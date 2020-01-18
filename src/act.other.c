@@ -374,6 +374,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	extern bool global_mute_slash_channel_joins;
 	
 	char sys[MAX_STRING_LENGTH], mort_in[MAX_STRING_LENGTH], mort_out[MAX_STRING_LENGTH], mort_alt[MAX_STRING_LENGTH], temp[256];
+	const char *msg;
 	descriptor_data *desc, *next_d;
 	bool show_start = FALSE;
 	int invis_lev, old_invis, last_tell;
@@ -495,8 +496,8 @@ void perform_alternate(char_data *old, char_data *new) {
 	if (!IS_APPROVED(new)) {
 		send_to_char(unapproved_login_message, new);
 	}
-	if (show_start) {
-		send_to_char(START_MESSG, new);
+	if (show_start && (msg = config_get_string("start_message")) && *msg) {
+		msg_to_char(new, "\r\n&Y%s&0", msg);
 	}
 	
 	if (!IS_IMMORTAL(new)) {
