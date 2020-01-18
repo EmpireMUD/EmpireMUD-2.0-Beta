@@ -1738,6 +1738,7 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "no_person", CONFTYPE_SHORT_STRING, "bad target error for no person");
 	init_config(CONFIG_GAME, "huh_string", CONFTYPE_SHORT_STRING, "message for invalid command");
 	init_config(CONFIG_GAME, "public_logins", CONFTYPE_BOOL, "login/out/alt display to mortlog instead of elog");
+	init_config(CONFIG_GAME, "start_message", CONFTYPE_LONG_STRING, "shown to new characters on login");
 	init_config(CONFIG_GAME, "who_list_sort", CONFTYPE_INT, "what order the who-list appears in");
 		init_config_custom("who_list_sort", config_show_who_list_sort, config_edit_who_list_sort, NULL);
 
