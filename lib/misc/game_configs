@@ -18,6 +18,7 @@ mud_name EmpireMUD
 mud_status Live
 mud_website
 name_rules 0
+name_rules_lastname 0
 newyear_message The ground under you shakes violently!
 no_person No-one by that name here.
 ok_string Okay.
