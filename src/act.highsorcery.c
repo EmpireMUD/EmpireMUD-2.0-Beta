@@ -2004,7 +2004,7 @@ RITUAL_SETUP_FUNC(start_devastation_ritual) {
 
 RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 	extern void change_chop_territory(room_data *room);
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+	void uncrop_tile(room_data *room);
 	
 	room_data *rand_room, *to_room = NULL;
 	crop_data *cp;
@@ -2044,9 +2044,7 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 		if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
 			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
 			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
-			
-			// change to default sect
-			change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			uncrop_tile(to_room);
 		}
 		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < config_get_int("chop_depletion")) {
 			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
@@ -2057,7 +2055,7 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 			act("$n's powerful ritual devastates the seeded field!", FALSE, ch, NULL, NULL, TO_ROOM);
 			
 			// check to default sect
-			change_terrain(to_room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+			uncrop_tile(to_room);
 		}
 		else {
 			msg_to_char(ch, "The Devastation Ritual has failed.\r\n");

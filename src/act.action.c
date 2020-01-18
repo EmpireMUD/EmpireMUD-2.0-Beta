@@ -36,7 +36,6 @@
 */
 
 // external vars
-extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 extern const char *tool_flags[];
 
 // external funcs
@@ -48,6 +47,7 @@ extern bool is_deep_mine(room_data *room);
 void process_build(char_data *ch, room_data *room, int act_type);
 void scale_item_to_level(obj_data *obj, int level);
 void schedule_crop_growth(struct map_data *map);
+void uncrop_tile(room_data *room);
 
 // cancel protos
 void cancel_resource_list(char_data *ch);
@@ -1820,15 +1820,8 @@ void process_harvesting(char_data *ch) {
 			msg_to_char(ch, "You fail to harvest anything here.\r\n");
 		}
 		
-		// change the sector: attempt to detect
-		crop_data *cp = ROOM_CROP(IN_ROOM(ch));
-		sector_data *sect = cp ? sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]) : NULL;
-		if (!sect) {
-			sect = find_first_matching_sector(NOBITS, SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE);
-		}
-		if (sect) {
-			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
-		}
+		// change the sector:
+		uncrop_tile(IN_ROOM(ch));
 	}
 }
 

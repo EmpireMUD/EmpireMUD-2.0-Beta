@@ -2965,6 +2965,8 @@ const char *evo_types[] = {
 	"WINTER",	// 15
 	"BURNS-TO",
 	"SPREADS-TO",
+	"HARVEST-TO",
+	"DEFAULT-HARVEST-TO",
 	"\n"
 };
 
@@ -2989,6 +2991,8 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// winter
 	EVO_VAL_NONE,	// burns-to
 	EVO_VAL_SECTOR,	// spreads-to
+	EVO_VAL_NONE,	// harvest-to
+	EVO_VAL_NONE,	// default-harvest-to
 };
 
 
@@ -3012,6 +3016,8 @@ bool evo_is_over_time[] = {
 	TRUE,	// winter
 	FALSE,	// burns-to
 	TRUE,	// spreads-to
+	FALSE,	// harvest-to
+	FALSE,	// default-harvest-to
 };
 
 

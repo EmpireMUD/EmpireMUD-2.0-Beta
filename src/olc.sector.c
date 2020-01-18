@@ -224,7 +224,6 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void remove_sector_from_table(sector_data *sect);
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
 	quest_data *quest, *next_quest;
@@ -255,7 +254,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	save_library_file_for_vnum(DB_BOOT_SECTOR, vnum);
 	
 	// find a replacement sector for the world
-	replace_sect = sector_proto(climate_default_sector[CLIMATE_TEMPERATE]);
+	replace_sect = sector_proto(config_get_int(""));
 	if (!replace_sect) {
 		// just pull the first one
 		HASH_ITER(hh, sector_table, sect_iter, next_sect) {

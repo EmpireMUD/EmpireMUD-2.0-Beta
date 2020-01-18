@@ -200,7 +200,7 @@ char *list_one_crop(crop_data *crop, bool detail) {
 void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	void remove_crop_from_table(crop_data *crop);
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+	void uncrop_tile(room_data *room);
 	
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
@@ -208,7 +208,6 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	struct map_data *map;
 	room_data *room;
 	crop_data *crop;
-	sector_data *base = NULL;
 	bool found;
 	int count;
 	
@@ -225,9 +224,6 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	// remove it from the hash table first
 	remove_crop_from_table(crop);
 	
-	// save base sect for later
-	base = sector_proto(climate_default_sector[GET_CROP_CLIMATE(crop)]);
-
 	// save index and crop file now
 	save_index(DB_BOOT_CROP);
 	save_library_file_for_vnum(DB_BOOT_CROP, vnum);
@@ -242,7 +238,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 				room = real_room(map->vnum);
 			}
 			set_crop_type(room, NULL);	// remove it explicitly
-			change_terrain(room, GET_SECT_VNUM(base));
+			uncrop_tile(room);
 			++count;
 		}
 	}

@@ -210,6 +210,7 @@ default_adventure_sect 31
 default_building_sect 10
 default_inside_sect 11
 default_interior 1
+default_land_sect 0
 generic_facing bdeklmno
 interlink_distance 4
 interlink_mountain_limit 1

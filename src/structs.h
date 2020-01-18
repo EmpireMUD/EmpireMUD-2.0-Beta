@@ -2511,7 +2511,9 @@ typedef struct vehicle_data vehicle_data;
 #define EVO_WINTER  15	// triggers if it's winter
 #define EVO_BURNS_TO  16	// caused by a player burning it
 #define EVO_SPREADS_TO  17	// reverse of adjacent-one
-#define NUM_EVOS  18	// total
+#define EVO_HARVEST_TO  18	// always harvests to a specific sector type (no matter what it was when planted)
+#define EVO_DEFAULT_HARVEST_TO  19	// sect it becomes when harvested/cleared IF no data exists
+#define NUM_EVOS  20	// total
 
 // evolution value types
 #define EVO_VAL_NONE  0

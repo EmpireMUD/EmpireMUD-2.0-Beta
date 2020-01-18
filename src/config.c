@@ -24,7 +24,6 @@
 
 // TODO convert more of these configs to the in-game config system
 // TODO add string-array config type (default channels, could have add/remove)
-// TODO add long-string type (fread_string; text editor)
 // TODO add double-array (empire score levels)
 
 
@@ -37,7 +36,6 @@
 *   Operation Options
 *   Player Configs
 *   War Configs
-*   World Configs
 *   Config System: Data
 *   Config System: Editors
 *   Config System: Custom Editors
@@ -254,21 +252,6 @@ const char *book_name_list[] = {
  *  PK_FULL    - may pk ANYONE
  */	
 bitvector_t pk_ok = PK_WAR;
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// WORLD CONFIGS ///////////////////////////////////////////////////////////
-
-// TODO is it possible to use an int-array but tie its size to NUM_CLIMATES (e.g.)
-
-// CLIMATE_x
-const sector_vnum climate_default_sector[NUM_CLIMATES] = {
-	0,	// plains (no climate)
-	0,	// plains (temperate)
-	20,	// desert
-	27	// jungle
-};
-
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1930,6 +1913,8 @@ void init_config_system(void) {
 		init_config_custom("default_inside_sect", config_show_sector, config_edit_sector, NULL);
 	init_config(CONFIG_WORLD, "default_adventure_sect", CONFTYPE_INT, "vnum of sector used by instancing system");
 		init_config_custom("default_adventure_sect", config_show_sector, config_edit_sector, NULL);
+	init_config(CONFIG_WORLD, "default_land_sect", CONFTYPE_INT, "vnum of sector for basic land");
+		init_config_custom("default_land_sect", config_show_sector, config_edit_sector, NULL);
 
 
 	// last
