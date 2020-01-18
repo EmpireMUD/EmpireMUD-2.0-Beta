@@ -1808,7 +1808,7 @@ void prompt_creation(descriptor_data *d) {
 		case CON_SLAST_NAME: {
 			const char *rules = config_get_string("name_rules_lastname");
 			if (rules && *rules) {
-				msg_to_desc(d, "\r\n%s\r\n", rules);
+				msg_to_desc(d, "\r\n%s", rules);
 			}
 			SEND_TO_Q("\r\nEnter your last name: ", d);
 			break;
