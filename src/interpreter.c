@@ -2319,7 +2319,6 @@ void nanny(descriptor_data *d, char *arg) {
 	
 	extern struct promo_code_list promo_codes[];
 	extern const char *unapproved_login_message;
-	extern char *START_MESSG;
 	extern int wizlock_level;
 	extern char *wizlock_message;
 
@@ -2765,6 +2764,8 @@ void nanny(descriptor_data *d, char *arg) {
 		}
 
 		case CON_RMOTD: {		/* read CR after printing motd   */
+			const char *msg;
+			
 			if (PLR_FLAGGED(d->character, PLR_IPMASK)) {
 				strcpy(d->host, "masked");
 			}
@@ -2841,8 +2842,8 @@ void nanny(descriptor_data *d, char *arg) {
 			if (!IS_APPROVED(d->character)) {
 				send_to_char(unapproved_login_message, d->character);
 			}
-			if (show_start) {
-				send_to_char(START_MESSG, d->character);
+			if (show_start && (msg = config_get_string("start_message")) && *msg) {
+				msg_to_char(d->character, "\r\n&Y%s&0", msg);
 			}
 			
 			if (!IS_APPROVED(d->character) && !IS_IMMORTAL(d->character) && has_anonymous_host(d)) {

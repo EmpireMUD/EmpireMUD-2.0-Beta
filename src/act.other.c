@@ -369,7 +369,6 @@ void perform_alternate(char_data *old, char_data *new) {
 	void display_tip_to_char(char_data *ch);
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	void start_new_character(char_data *ch);
-	extern char *START_MESSG;
 	extern const char *unapproved_login_message;
 	extern bool global_mute_slash_channel_joins;
 	
