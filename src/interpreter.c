@@ -1810,11 +1810,12 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_CLAST_NAME: {
+			/* for lastnames
 			const char *rules = config_get_string("name_rules");
-			msg_to_desc(d, "\r\nNew character:\r\n");
 			if (rules && *rules) {
 				msg_to_desc(d, "%s\r\n", rules);
 			}
+			*/
 			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? ", GET_PC_NAME(d->character), GET_LASTNAME(d->character), (UPPER(*GET_LASTNAME(d->character)) != *GET_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "");
 			break;
 		}
@@ -2377,6 +2378,7 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 				else {
 					/* player unknown -- make new character */
+					const char *rules = config_get_string("name_rules");
 
 					/* Check for multiple creations of a character. */
 					if (!Valid_Name(tmp_name)) {
@@ -2385,7 +2387,12 @@ void nanny(descriptor_data *d, char *arg) {
 					}
 					GET_PC_NAME(d->character) = str_dup(CAP(tmp_name));
 
-					sprintf(buf, "Did I get that right, %s (Y/N)? ", tmp_name);
+					msg_to_desc(d, "\r\nNew character:\r\n");
+					if (rules && *rules) {
+						msg_to_desc(d, "%s\r\n", rules);
+					}
+
+					sprintf(buf, "Did I get that name right, %s (Y/N)? ", tmp_name);
 					SEND_TO_Q(buf, d);
 					STATE(d) = CON_NAME_CNFRM;
 				}
