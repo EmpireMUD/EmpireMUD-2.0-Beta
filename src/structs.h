@@ -144,6 +144,9 @@
 // defines what belongs in the land_map table
 #define SECT_IS_LAND_MAP(sect)  (GET_SECT_VNUM(sect) != BASIC_OCEAN)
 
+// for the in-game configs
+#define CONFIG_HANDLER(name)	void (name)(char_data *ch, struct config_type *config, char *argument)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// BASIC TYPES AND CONSTS //////////////////////////////////////////////////
@@ -2598,6 +2601,7 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_COIN  2140000000	// 2.14b (< MAX_INT)
 #define MAX_COIN_TYPES  10	// don't store more than this many different coin types
 #define MAX_CONDITION  750	// FULL, etc
+#define MAX_CONFIG_TEXT  4000	// long-string configs
 #define MAX_EMPIRE_DESCRIPTION  2000
 #define MAX_FACTION_DESCRIPTION  4000
 #define MAX_GROUP_SIZE  4	// how many members a group allows
@@ -2704,6 +2708,36 @@ struct ban_list_element {
 	char name[MAX_NAME_LENGTH+1];
 	
 	struct ban_list_element *next;
+};
+
+
+// data storage for config system
+union config_data_union {
+	bitvector_t bitvector_val;
+	bool bool_val;
+	double double_val;
+	int int_val;
+	int *int_array;
+	char *string_val;
+};
+
+
+// for the master config system
+struct config_type {
+	int set;	// CONFIG_
+	char *key;	// string key
+	int type;	// CONFTYPE_x how to access the data
+	char *description;	// long desc for contextual help
+	
+	union config_data_union data;	// whatever type of data is stored here (based on type)
+	int data_size;	// for array data
+	
+	// for types with their own handlers
+	CONFIG_HANDLER(*show_func);
+	CONFIG_HANDLER(*edit_func);
+	void *custom_data;
+	
+	UT_hash_handle hh;	// config_table hash
 };
 
 
@@ -3662,6 +3696,7 @@ struct descriptor_data {
 	int notes_id;	// idnum of player for notes-editing
 	int island_desc_id;	// editing an island desc
 	any_vnum save_empire;	// for the text editor to know which empire to save
+	struct config_type *save_config;	// saves the config file when done editing text
 	bool allow_null;	// string editor can be empty/null
 	
 	int has_prompt;	// is the user at a prompt?

@@ -293,9 +293,6 @@ const sector_vnum climate_default_sector[NUM_CLIMATES] = {
  //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: DATA /////////////////////////////////////////////////////
 
-#define CONFIG_HANDLER(name)	void (name)(char_data *ch, struct config_type *config, char *argument)
-
-
 // groupings for config command
 #define CONFIG_GAME  0
 #define CONFIG_ACTIONS  1
@@ -321,6 +318,7 @@ const sector_vnum climate_default_sector[NUM_CLIMATES] = {
 #define CONFTYPE_INT  4
 #define CONFTYPE_INT_ARRAY  5
 #define CONFTYPE_SHORT_STRING  6 // max length ~ 128
+#define CONFTYPE_LONG_STRING  7	// paragraph length
 
 
 // CONFIG_x groupings for the config command
@@ -352,6 +350,7 @@ const char *config_types[] = {
 	"int",
 	"int array",
 	"short string",
+	"long string",
 	"\n"
 };
 
@@ -363,35 +362,6 @@ const char *who_list_sort_types[] = {
 	"\n"
 };
 
-
-// data storage for config system
-union config_data_union {
-	bitvector_t bitvector_val;
-	bool bool_val;
-	double double_val;
-	int int_val;
-	int *int_array;
-	char *string_val;
-};
-
-
-// for the master config system
-struct config_type {
-	int set;	// CONFIG_
-	char *key;	// string key
-	int type;	// CONFTYPE_x how to access the data
-	char *description;	// long desc for contextual help
-	
-	union config_data_union data;	// whatever type of data is stored here (based on type)
-	int data_size;	// for array data
-	
-	// for types with their own handlers
-	CONFIG_HANDLER(*show_func);
-	CONFIG_HANDLER(*edit_func);
-	void *custom_data;
-	
-	UT_hash_handle hh;	// config_table hash
-};
 
 struct config_type *config_table = NULL;	// hash table of configs
 
@@ -597,7 +567,7 @@ const char *config_get_string(char *key) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_string called with invalid key '%s'", key);
 		return default_string;
 	}
-	if (cnf->type != CONFTYPE_SHORT_STRING) {
+	if (cnf->type != CONFTYPE_SHORT_STRING && cnf->type != CONFTYPE_LONG_STRING) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_string with non-string key '%s'", key);
 		return default_string;
 	}
@@ -802,6 +772,30 @@ CONFIG_HANDLER(config_edit_int) {
 }
 
 
+// basic handler for long string
+CONFIG_HANDLER(config_edit_long_string) {
+	// basic sanitation
+	if (!ch || !config) {
+		log("SYSERR: config_edit_long_string called without %s", ch ? "config" : "ch");
+		msg_to_char(ch, "Error editing type.\r\n");
+		return;
+	}
+	if (!ch->desc) {
+		return;	// no desc = no work
+	}
+	
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+		return;
+	}
+	else {
+		sprintf(buf, "text for %s", config->key);
+		start_string_editor(ch->desc, buf, &config->data.string_val, MAX_CONFIG_TEXT, TRUE);
+		ch->desc->save_config = config;
+	}
+}
+
+
 // basic handler for sector
 CONFIG_HANDLER(config_edit_sector) {
 	sector_data *old_sect, *new_sect;
@@ -849,7 +843,7 @@ CONFIG_HANDLER(config_edit_short_string) {
 	
 	// basic sanitation
 	if (!ch || !config) {
-		log("SYSERR: config_edit_short_String called without %s", ch ? "config" : "ch");
+		log("SYSERR: config_edit_short_string called without %s", ch ? "config" : "ch");
 		msg_to_char(ch, "Error editing type.\r\n");
 		return;
 	}
@@ -1102,6 +1096,19 @@ CONFIG_HANDLER(config_show_int) {
 }
 
 
+// basic handler for long string type
+CONFIG_HANDLER(config_show_long_string) {
+	// basic sanitation
+	if (!ch || !config) {
+		log("SYSERR: config_show_long_string called without %s", ch ? "config" : "ch");
+		msg_to_char(ch, "Error showing type.\r\n");
+		return;
+	}
+	
+	msg_to_char(ch, "&y%s&0:\r\n%s\r\n", config->key, config->data.string_val ? config->data.string_val : "<not set>");
+}
+
+
 // basic handler for sector
 CONFIG_HANDLER(config_show_sector) {
 	sector_data *sect;
@@ -1303,6 +1310,15 @@ void load_config_system_from_file(void) {
 				cnf->data.string_val = str_dup(arg);
 				break;
 			}
+			case CONFTYPE_LONG_STRING: {
+				if (atoi(arg) > 0) {	// only read if the # is not 0 (0 indicates null text)
+					cnf->data.string_val = fread_string(fl, "config file");
+				}
+				else {
+					cnf->data.string_val = NULL;
+				}
+				break;
+			}
 			default: {
 				log("Unable to load config system: %s: unloadable config type %d", cnf->key, cnf->type);
 				break;
@@ -1342,6 +1358,7 @@ void write_config_int_array(struct config_type *cnf, FILE *fl) {
 * Save all game configs to file.
 */
 void save_config_system(void) {
+	char temp[MAX_STRING_LENGTH];
 	struct config_type *cnf, *next_cnf;
 	int last_set = -1;
 	FILE *fl;
@@ -1386,6 +1403,17 @@ void save_config_system(void) {
 			}
 			case CONFTYPE_SHORT_STRING: {
 				fprintf(fl, "%s %s\n", cnf->key, cnf->data.string_val);
+				break;
+			}
+			case CONFTYPE_LONG_STRING: {
+				if (cnf->data.string_val) {
+					strcpy(temp, NULLSAFE(cnf->data.string_val));
+					strip_crlf(temp);
+					fprintf(fl, "%s 1\n%s~\n", cnf->key, temp);
+				}
+				else {
+					fprintf(fl, "%s 0\n", cnf->key);
+				}
 				break;
 			}
 			default: {
@@ -1597,6 +1625,11 @@ void init_config(int set, char *key, int type, char *description) {
 		case CONFTYPE_SHORT_STRING: {
 			cnf->show_func = config_show_short_string;
 			cnf->edit_func = config_edit_short_string;
+			break;
+		}
+		case CONFTYPE_LONG_STRING: {
+			cnf->show_func = config_show_long_string;
+			cnf->edit_func = config_edit_long_string;
 			break;
 		}
 		case CONFTYPE_BITVECTOR:
@@ -1991,6 +2024,9 @@ ACMD(do_config) {
 				case CONFTYPE_SHORT_STRING: {
 					lsize = snprintf(line, sizeof(line), "%s", cnf->data.string_val);
 					break;
+				}
+				case CONFTYPE_LONG_STRING: {
+					lsize = snprintf(line, sizeof(line), "<set>");
 				}
 				default: {
 					syslog(SYS_ERROR, GET_INVIS_LEV(ch), TRUE, "SYSERR: config: %s: unable to display unknown type %d", cnf->key, cnf->type);

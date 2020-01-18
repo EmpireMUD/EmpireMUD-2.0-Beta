@@ -128,6 +128,7 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 	d->save_empire = NOTHING;
 	d->file_storage = NULL;
 	d->allow_null = allow_null;
+	d->save_config = NULL;
 	
 	if (STATE(d) == CON_PLAYING && !d->straight_to_editor) {
 		msg_to_desc(d, "&cEdit %s: (, to add; ,/s to save; ,/h for help)&0\r\n", prompt);
@@ -339,6 +340,13 @@ void string_add(descriptor_data *d, char *str) {
 				free(d->file_storage);
 			}
 			d->file_storage = NULL;
+		}
+		else if (d->save_config) {
+			void save_config_system();
+			
+			save_config_system();
+			syslog(SYS_CONFIG, GET_INVIS_LEV(d->character), TRUE, "CONFIG: %s edited the text for %s", GET_NAME(d->character), d->save_config->key);
+			msg_to_char(d->character, "Text for %s saved.\r\n", d->save_config->key);
 		}
 		else {
 			if (action != STRINGADD_ABORT) {
