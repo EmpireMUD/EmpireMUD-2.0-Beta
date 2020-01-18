@@ -95,14 +95,6 @@ struct promo_code_list promo_codes[] = {
 };
 
 
-// Text shown to players if they are not approved on login  -- TODO add long-form strings to in-game configs
-const char *unapproved_login_message =
-"\r\n&o"
-"Your character is not yet approved to play on this MUD. You can still enter\r\n"
-"the game, but have a limited set of commands and features. Contact the game's\r\n"
-"staff to find out what you have to do to be approved.&0\r\n";
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// EMPIRE CONFIGS //////////////////////////////////////////////////////////
 
@@ -1701,6 +1693,7 @@ void init_config_system(void) {
 	init_config(CONFIG_APPROVAL, "terraform_approval", CONFTYPE_BOOL, "excavate, fillin, chant of nature");
 	init_config(CONFIG_APPROVAL, "title_approval", CONFTYPE_BOOL, "set own title");
 	init_config(CONFIG_APPROVAL, "travel_approval", CONFTYPE_BOOL, "transport, portal, summon, vehicles");
+	init_config(CONFIG_APPROVAL, "unapproved_greeting", CONFTYPE_LONG_STRING, "shown to unapproved characters on login");
 	init_config(CONFIG_APPROVAL, "write_approval", CONFTYPE_BOOL, "boards, books, mail");
 
 	// game configs

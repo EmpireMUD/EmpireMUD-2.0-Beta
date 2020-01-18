@@ -240,5 +240,10 @@ tell_approval 1
 terraform_approval 1
 title_approval 1
 travel_approval 1
+unapproved_greeting 1
+   Your character is not yet approved to play on this MUD. You can still enter
+the game, but have a limited set of commands and features. Contact the game's
+staff to find out what you have to do to be approved.
+~
 write_approval 1
 $~

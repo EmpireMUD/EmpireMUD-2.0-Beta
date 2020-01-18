@@ -2318,7 +2318,6 @@ void nanny(descriptor_data *d, char *arg) {
 	extern int Valid_Name(char *newname);
 	
 	extern struct promo_code_list promo_codes[];
-	extern const char *unapproved_login_message;
 	extern int wizlock_level;
 	extern char *wizlock_message;
 
@@ -2839,8 +2838,8 @@ void nanny(descriptor_data *d, char *arg) {
 				send_to_char("&rYou have mail waiting.&0\r\n", d->character);
 			}
 			
-			if (!IS_APPROVED(d->character)) {
-				send_to_char(unapproved_login_message, d->character);
+			if (!IS_APPROVED(d->character) && (msg = config_get_string("unapproved_greeting")) && *msg) {
+				msg_to_char(d->character, "\r\n&o%s&0", msg);
 			}
 			if (show_start && (msg = config_get_string("start_message")) && *msg) {
 				msg_to_char(d->character, "\r\n&Y%s&0", msg);

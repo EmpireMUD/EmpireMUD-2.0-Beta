@@ -369,7 +369,6 @@ void perform_alternate(char_data *old, char_data *new) {
 	void display_tip_to_char(char_data *ch);
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	void start_new_character(char_data *ch);
-	extern const char *unapproved_login_message;
 	extern bool global_mute_slash_channel_joins;
 	
 	char sys[MAX_STRING_LENGTH], mort_in[MAX_STRING_LENGTH], mort_out[MAX_STRING_LENGTH], mort_alt[MAX_STRING_LENGTH], temp[256];
@@ -492,8 +491,8 @@ void perform_alternate(char_data *old, char_data *new) {
 		send_to_char("&rYou have mail waiting.&0\r\n", new);
 	}
 	
-	if (!IS_APPROVED(new)) {
-		send_to_char(unapproved_login_message, new);
+	if (!IS_APPROVED(new) && (msg = config_get_string("unapproved_greeting")) && *msg) {
+		msg_to_char(new, "\r\n&o%s&0", msg);
 	}
 	if (show_start && (msg = config_get_string("start_message")) && *msg) {
 		msg_to_char(new, "\r\n&Y%s&0", msg);
