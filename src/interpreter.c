@@ -1806,14 +1806,14 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_SLAST_NAME: {
+			const char *rules = config_get_string("name_rules_lastname");
+			if (rules && *rules) {
+				msg_to_desc(d, "\r\n%s\r\n", rules);
+			}
 			SEND_TO_Q("\r\nEnter your last name: ", d);
 			break;
 		}
 		case CON_CLAST_NAME: {
-			const char *rules = config_get_string("name_rules_lastname");
-			if (rules && *rules) {
-				msg_to_desc(d, "%s\r\n", rules);
-			}
 			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? ", GET_PC_NAME(d->character), GET_LASTNAME(d->character), (UPPER(*GET_LASTNAME(d->character)) != *GET_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "");
 			break;
 		}
