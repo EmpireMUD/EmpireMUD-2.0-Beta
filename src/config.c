@@ -1105,7 +1105,7 @@ CONFIG_HANDLER(config_show_long_string) {
 		return;
 	}
 	
-	msg_to_char(ch, "&y%s&0:\r\n%s\r\n", config->key, config->data.string_val ? config->data.string_val : "<not set>");
+	msg_to_char(ch, "&y%s&0:\r\n%s", config->key, config->data.string_val ? config->data.string_val : "<not set>\r\n");
 }
 
 
