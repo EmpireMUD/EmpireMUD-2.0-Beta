@@ -2028,6 +2028,7 @@ ACMD(do_config) {
 				}
 				case CONFTYPE_LONG_STRING: {
 					lsize = snprintf(line, sizeof(line), "<%s>", cnf->data.string_val ? "set" : "not set");
+					break;
 				}
 				default: {
 					syslog(SYS_ERROR, GET_INVIS_LEV(ch), TRUE, "SYSERR: config: %s: unable to display unknown type %d", cnf->key, cnf->type);
