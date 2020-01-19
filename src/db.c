@@ -897,7 +897,7 @@ void verify_sectors(void) {
 	// ensure we have a backup sect
 	use_sect = sector_proto(config_get_int("default_land_sect"));
 	if (!use_sect) {	// backup: try to find one
-		use_sect = find_first_matching_sector(NOBITS, SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE);
+		use_sect = find_first_matching_sector(NOBITS, SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE, NOBITS);
 	}
 	if (!use_sect) {	// backup: just pull the first one in the list
 		HASH_ITER(hh, sector_table, sect, next_sect) {
@@ -1952,6 +1952,7 @@ const char *versions_list[] = {
 	"b5.80",
 	"b5.82",
 	"b5.83",
+	"b5.84",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3586,6 +3587,74 @@ PLAYER_UPDATE_FUNC(b5_83_update_players) {
 }
 
 
+// climates changed from scalar ints to bitvectors
+void b5_84_climate_update(void) {
+	sector_data *sect, *next_sect;
+	crop_data *crop, *next_crop;
+	bool changed, any = FALSE;
+	
+	const any_vnum old_climate_temperate = 1;
+	const any_vnum old_climate_arid = 2;
+	const any_vnum old_climate_tropical = 3;
+	
+	log("Updating sectors and crops for the b5.84 patch:");
+	
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		changed = FALSE;
+		switch (GET_SECT_CLIMATE(sect)) {
+			case old_climate_temperate: {
+				GET_SECT_CLIMATE(sect) = CLIM_TEMPERATE;
+				changed = TRUE;
+				break;
+			}
+			case old_climate_arid: {
+				GET_SECT_CLIMATE(sect) = CLIM_ARID;
+				changed = TRUE;
+				break;
+			}
+			case old_climate_tropical: {
+				GET_SECT_CLIMATE(sect) = CLIM_TROPICAL;
+				changed = TRUE;
+				break;
+			}
+			// no default: no work if it's not one of those
+		}
+		if (changed) {
+			any = TRUE;
+			save_library_file_for_vnum(DB_BOOT_SECTOR, GET_SECT_VNUM(sect));
+			log("- Sector [%d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+		}
+	}
+	
+	HASH_ITER(hh, crop_table, crop, next_crop) {
+		changed = FALSE;
+		switch (GET_CROP_CLIMATE(crop)) {
+			case old_climate_temperate: {
+				GET_CROP_CLIMATE(crop) = CLIM_TEMPERATE;
+				changed = TRUE;
+				break;
+			}
+			case old_climate_arid: {
+				GET_CROP_CLIMATE(crop) = CLIM_ARID;
+				changed = TRUE;
+				break;
+			}
+			case old_climate_tropical: {
+				GET_CROP_CLIMATE(crop) = CLIM_TROPICAL;
+				changed = TRUE;
+				break;
+			}
+			// no default: no work if it's not one of those
+		}
+		if (changed) {
+			any = TRUE;
+			save_library_file_for_vnum(DB_BOOT_CROP, GET_CROP_VNUM(crop));
+			log("- Crop [%d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+		}
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3877,6 +3946,9 @@ void check_version(void) {
 		if (MATCH_VERSION("b5.83")) {
 			log("Applying b5.83 tool update to players...");
 			update_all_players(NULL, b5_83_update_players);
+		}
+		if (MATCH_VERSION("b5.84")) {
+			b5_84_climate_update();
 		}
 	}
 	

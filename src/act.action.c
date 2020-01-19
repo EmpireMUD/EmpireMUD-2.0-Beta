@@ -3229,7 +3229,7 @@ ACMD(do_pick) {
 
 
 ACMD(do_plant) {
-	extern const char *climate_types[];
+	extern const char *climate_flags[];
 	
 	struct evolution_data *evo;
 	sector_data *original;
@@ -3278,9 +3278,9 @@ ACMD(do_plant) {
 	else if (!(evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_PLANTS_TO))) {
 		msg_to_char(ch, "Nothing can be planted here.\r\n");
 	}
-	else if (GET_SECT_CLIMATE(SECT(IN_ROOM(ch))) != GET_CROP_CLIMATE(cp)) {
-		strcpy(buf, climate_types[GET_CROP_CLIMATE(cp)]);
-		msg_to_char(ch, "You can only plant that in %s areas.\r\n", strtolower(buf));
+	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, SECT(IN_ROOM(ch)))) {
+		sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf, TRUE);
+		msg_to_char(ch, "You can only plant that in %s areas.\r\n", trim(buf));
 	}
 	else {
 		original = SECT(IN_ROOM(ch));

@@ -2885,23 +2885,37 @@ const char *bld_relationship_types[] = {
 };
 
 
-// CLIMATE_x
-const char *climate_types[] = {
-	"NONE",
-	"TEMPERATE",
-	"ARID",
-	"TROPICAL",
+// CLIM_x: climate flags
+const char *climate_flags[] = {
+	"*",	// 0
+	"*",
+	"*",
+	"*",
+	"hot",
+	"cold",	// 5
+	"high",
+	"low",
+	"magical",
+	"temperate",
+	"arid",	// 10
+	"tropical",
+	"mountain",
+	"river",
+	"fresh water",
+	"salt water",	// 15
+	"forest",
 	"\n"
 };
 
 
 // CROPF_x
 const char *crop_flags[] = {
-	"REQUIRES-WATER",
+	"REQUIRES-WATER",	// 0
 	"ORCHARD",
 	"!WILD",
 	"NEWBIE-ONLY",
 	"!NEWBIE",
+	"ANY-LISTED-CLIMATE",	// 5
 	"\n"
 };
 

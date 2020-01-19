@@ -2680,12 +2680,30 @@ behave like regular crafts.
 #d
 "CROPEDIT CLIMATE" "SECTEDIT CLIMATE"
 
-Usage:  .climate <type>
+Usage:  .climate [add | remove] <flags>
 
 Each crop and sector has a climate, and these must match for the crop to be
 planted on the sector. Climate also affects certain abilities, such as morphs.
-Terrains like generic rivers and mountains may have no climate at all. However,
-every crop must be associated with a climate.
+Every crop must be associated with at least 1 climate flag.
+
+If a crop has multiple climate flags, the sector must match ALL of them for the
+crop to be planted there, unless the crop has the ANY-LISTED-CLIMATE flag, in
+which case they must only match at least 1 climate.
+
+Climates:
+ &chot&0 - Hotter than normal for this type (modifier).
+ &ccold&0 - Coler than normal for this type (modifier).
+ &chigh&0 - Higher than normal for this type (modifier), e.g. mountain peak.
+ &clow&0 - Lower than normal for this type (modifier).
+ &cmagical&0 - Magical in some way (enchanted forest).
+ &ctemperate&0 - Temperate climate.
+ &carid&0 - Arid climate.
+ &ctropical&0 - Tropical climate.
+ &cmountain&0 - Mountainous region.
+ &criver&0 - Moving water such as a river.
+ &cfresh water&0 - Non-moving fresh water.
+ &csalt water&0 - Ocean, sea, or salt lake.
+ &cforest&0 - Any kind of forest.
 
 See also: OLC CROPS, OLC SECTORS
 #d
@@ -2701,6 +2719,7 @@ Available flags:
  !WILD - Won't spawn in the wild
  NEWBIE-ONLY - Only spawns on newbie islands (can be planted anywhere)
  !NEWBIE - Does not spawn on newbie islands
+ ANY-LISTED-CLIMATE - Only 1 of the climate flags must match to plant this.
 
 See also: OLC CROPS
 #d

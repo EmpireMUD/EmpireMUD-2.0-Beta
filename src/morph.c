@@ -310,8 +310,6 @@ const char *get_morph_desc(char_data *ch, bool long_desc_if_true) {
 * @return bool TRUE if the morph passes the affinities check.
 */
 bool morph_affinity_ok(room_data *location, morph_data *morph) {
-	int climate = NOTHING;
-	crop_data *cp;
 	bool ok = TRUE;
 	
 	// shortcut
@@ -319,20 +317,13 @@ bool morph_affinity_ok(room_data *location, morph_data *morph) {
 		return TRUE;
 	}
 	
-	if (ROOM_SECT_FLAGGED(location, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(location))) {
-		climate = GET_CROP_CLIMATE(cp);
-	}
-	else {
-		climate = GET_SECT_CLIMATE(SECT(location));
-	}
-	
-	if (MORPH_FLAGGED(morph, MORPHF_TEMPERATE_AFFINITY) && climate != CLIMATE_TEMPERATE) {
+	if (MORPH_FLAGGED(morph, MORPHF_TEMPERATE_AFFINITY) && !IS_SET(GET_SECT_CLIMATE(SECT(location)), CLIM_TEMPERATE)) {
 		ok = FALSE;
 	}
-	if (MORPH_FLAGGED(morph, MORPHF_ARID_AFFINITY) && climate != CLIMATE_ARID) {
+	if (MORPH_FLAGGED(morph, MORPHF_ARID_AFFINITY) && !IS_SET(GET_SECT_CLIMATE(SECT(location)), CLIM_ARID)) {
 		ok = FALSE;
 	}
-	if (MORPH_FLAGGED(morph, MORPHF_TROPICAL_AFFINITY) && climate != CLIMATE_TROPICAL) {
+	if (MORPH_FLAGGED(morph, MORPHF_TROPICAL_AFFINITY) && !IS_SET(GET_SECT_CLIMATE(SECT(location)), CLIM_TROPICAL)) {
 		ok = FALSE;
 	}
 	

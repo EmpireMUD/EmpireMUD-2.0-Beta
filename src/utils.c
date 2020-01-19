@@ -3467,18 +3467,34 @@ void unmark_items_for_char(char_data *ch, bool ground) {
 *
 * @param bitvector_t with_flags Find a sect that has these flags.
 * @param bitvector_t without_flags Find a sect that doesn't have these flags.
+* @param bitvector_t prefer_climate Will attempt to find a good match for this climate (but will return without it if not).
 * @return sector_data* A sector, or NULL if none matches.
 */
-sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags) {
-	sector_data *sect, *next_sect;
+sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags, bitvector_t prefer_climate) {
+	sector_data *sect, *next_sect, *low_climate = NULL, *no_climate = NULL;
 	
 	HASH_ITER(hh, sector_table, sect, next_sect) {
-		if ((with_flags == NOBITS || SECT_FLAGGED(sect, with_flags)) && (without_flags == NOBITS || !SECT_FLAGGED(sect, without_flags))) {
-			return sect;
+		if (with_flags && !SECT_FLAGGED(sect, with_flags)) {
+			continue;
+		}
+		if (without_flags && SECT_FLAGGED(sect, without_flags)) {
+			continue;
+		}
+		
+		// ok it matches flags, now check climate
+		if (!prefer_climate || (GET_SECT_CLIMATE(sect) & prefer_climate) == prefer_climate) {
+			return sect;	// perfect match
+		}
+		else if (!low_climate && prefer_climate && (GET_SECT_CLIMATE(sect) & prefer_climate)) {
+			low_climate = sect;	// missing some climate flags
+		}
+		else if (!no_climate) {
+			no_climate = sect;	// missing all climate flags
 		}
 	}
 	
-	return NULL;
+	// if we got here, there was no perfect match
+	return low_climate ? low_climate : no_climate;
 }
 
 

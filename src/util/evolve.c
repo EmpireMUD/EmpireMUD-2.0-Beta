@@ -460,7 +460,7 @@ int get_line(FILE *fl, char *buf) {
 * @param sector_vnum vnum The sector vnum
 */
 void parse_sector(FILE *fl, sector_vnum vnum) {
-	char line[256], str_in[256], str_in2[256], char_in[2], error[256], *tmp;
+	char line[256], str_in[256], str_in2[256], str_in3[256], char_in[2], error[256], *tmp;
 	struct evolution_data *evo, *last_evo = NULL;
 	sector_data *sect, *find;
 	double dbl_in;
@@ -487,14 +487,14 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 	GET_SECT_TITLE(sect) = fread_string(fl, error);
 	
 	// line 3: roadside, mapout, climate, movement, flags, build flags
-	if (!get_line(fl, line) || sscanf(line, "'%c' %d %d %d %s %s", &char_in[0], &int_in[0], &int_in[1], &int_in[2], str_in, str_in2) != 6) {
+	if (!get_line(fl, line) || sscanf(line, "'%c' %d %s %d %s %s", &char_in[0], &int_in[0], str_in3, &int_in[2], str_in, str_in2) != 6) {
 		printf("ERROR: Format error in line 3 of %s\n", error);
 		exit(1);
 	}
 	
 	GET_SECT_ROADSIDE_ICON(sect) = char_in[0];
 	GET_SECT_MAPOUT(sect) = int_in[0];
-	GET_SECT_CLIMATE(sect) = int_in[1];
+	GET_SECT_CLIMATE(sect) = asciiflag_conv(str_in3);
 	GET_SECT_MOVE_LOSS(sect) = int_in[2];
 	GET_SECT_FLAGS(sect) = asciiflag_conv(str_in);
 	GET_SECT_BUILD_FLAGS(sect) = asciiflag_conv(str_in2);

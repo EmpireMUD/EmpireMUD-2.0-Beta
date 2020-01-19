@@ -1247,7 +1247,7 @@ void parse_crop(FILE *fl, crop_vnum vnum) {
 	crop_data *crop, *find;
 	int int_in[4];
 	double dbl_in;
-	char line[256], str_in[256];
+	char line[256], str_in[256], str_in2[256];
 	struct spawn_info *spawn, *stemp;
 	
 	// create
@@ -1270,14 +1270,14 @@ void parse_crop(FILE *fl, crop_vnum vnum) {
 	GET_CROP_TITLE(crop) = fread_string(fl, buf2);
 	
 	// line 3: mapout, climate, flags
-	if (!get_line(fl, line) || sscanf(line, "%d %d %s", &int_in[0], &int_in[1], str_in) != 3) {
+	if (!get_line(fl, line) || sscanf(line, "%d %s %s", &int_in[0], str_in, str_in2) != 3) {
 		log("SYSERR: Format error in line 3 of %s", buf2);
 		exit(1);
 	}
 	
 	GET_CROP_MAPOUT(crop) = int_in[0];
-	GET_CROP_CLIMATE(crop) = int_in[1];
-	GET_CROP_FLAGS(crop) = asciiflag_conv(str_in);
+	GET_CROP_CLIMATE(crop) = asciiflag_conv(str_in);
+	GET_CROP_FLAGS(crop) = asciiflag_conv(str_in2);
 			
 	// line 4: x_min, x_max, y_min, y_max
 	if (!get_line(fl, line) || sscanf(line, "%d %d %d %d", &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 4) {
@@ -1356,6 +1356,7 @@ void parse_crop(FILE *fl, crop_vnum vnum) {
 * @param crop_data *cp The thing to save.
 */
 void write_crop_to_file(FILE *fl, crop_data *cp) {
+	char temp1[256], temp2[256];
 	struct spawn_info *spawn;
 	
 	if (!fl || !cp) {
@@ -1368,7 +1369,9 @@ void write_crop_to_file(FILE *fl, crop_data *cp) {
 	fprintf(fl, "%s~\n", NULLSAFE(cp->name));
 	fprintf(fl, "%s~\n", NULLSAFE(cp->title));
 
-	fprintf(fl, "%d %d %s\n", GET_CROP_MAPOUT(cp), cp->climate, bitv_to_alpha(cp->flags));
+	strcpy(temp1, bitv_to_alpha(GET_CROP_CLIMATE(cp)));
+	strcpy(temp2, bitv_to_alpha(GET_CROP_FLAGS(cp)));
+	fprintf(fl, "%d %s %s\n", GET_CROP_MAPOUT(cp), temp1, temp2);
 	fprintf(fl, "%d %d %d %d\n", cp->x_min, cp->x_max, cp->y_min, cp->y_max);
 	
 	// D: icons
@@ -6491,7 +6494,7 @@ void init_sector(sector_data *st) {
 * @param sector_vnum vnum The sector vnum
 */
 void parse_sector(FILE *fl, sector_vnum vnum) {
-	char line[256], str_in[256], str_in2[256], char_in[2];
+	char line[256], str_in[256], str_in2[256], str_in3[256], char_in[2];
 	struct evolution_data *evo, *last_evo = NULL;
 	struct spawn_info *spawn, *stemp;
 	sector_data *sect, *find;
@@ -6518,14 +6521,14 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 	GET_SECT_TITLE(sect) = fread_string(fl, buf2);
 	
 	// line 3: roadside, mapout, climate, movement, flags, build flags
-	if (!get_line(fl, line) || sscanf(line, "'%c' %d %d %d %s %s", &char_in[0], &int_in[0], &int_in[1], &int_in[2], str_in, str_in2) != 6) {
+	if (!get_line(fl, line) || sscanf(line, "'%c' %d %s %d %s %s", &char_in[0], &int_in[0], str_in3, &int_in[2], str_in, str_in2) != 6) {
 		log("SYSERR: Format error in line 3 of %s", buf2);
 		exit(1);
 	}
 	
 	GET_SECT_ROADSIDE_ICON(sect) = char_in[0];
 	GET_SECT_MAPOUT(sect) = int_in[0];
-	GET_SECT_CLIMATE(sect) = int_in[1];
+	GET_SECT_CLIMATE(sect) = asciiflag_conv(str_in3);
 	GET_SECT_MOVE_LOSS(sect) = int_in[2];
 	GET_SECT_FLAGS(sect) = asciiflag_conv(str_in);
 	GET_SECT_BUILD_FLAGS(sect) = asciiflag_conv(str_in2);
@@ -6626,7 +6629,7 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 * @param sector_data *st The thing to save.
 */
 void write_sector_to_file(FILE *fl, sector_data *st) {
-	char temp[64], temp2[64];
+	char temp[64], temp2[64], temp3[64];
 	struct evolution_data *evo;
 	struct spawn_info *spawn;
 	
@@ -6642,7 +6645,8 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 
 	strcpy(temp, bitv_to_alpha(GET_SECT_FLAGS(st)));
 	strcpy(temp2, bitv_to_alpha(GET_SECT_BUILD_FLAGS(st)));
-	fprintf(fl, "'%c' %d %d %d %s %s\n", GET_SECT_ROADSIDE_ICON(st), GET_SECT_MAPOUT(st), GET_SECT_CLIMATE(st), GET_SECT_MOVE_LOSS(st), temp, temp2);
+	strcpy(temp3, bitv_to_alpha(GET_SECT_CLIMATE(st)));
+	fprintf(fl, "'%c' %d %s %d %s %s\n", GET_SECT_ROADSIDE_ICON(st), GET_SECT_MAPOUT(st), temp3, GET_SECT_MOVE_LOSS(st), temp, temp2);
 	
 	// C: commands list
 	if (GET_SECT_COMMANDS(st) && *GET_SECT_COMMANDS(st)) {

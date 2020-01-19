@@ -1033,6 +1033,7 @@ typedef struct vehicle_data vehicle_data;
 #define CROPF_NOT_WILD  BIT(2)	// crop will never spawn in the wild
 #define CROPF_NEWBIE_ONLY  BIT(3)	// only spawns on newbie islands
 #define CROPF_NO_NEWBIE  BIT(4)	// never spawns on newbie islands
+#define CROPF_ANY_LISTED_CLIMATE  BIT(5)	// climtes are "or" not "and"
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2471,12 +2472,27 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_OF_DIRS  15	// total number of directions
 
 
-// data for climate types
-#define CLIMATE_NONE  0
-#define CLIMATE_TEMPERATE  1
-#define CLIMATE_ARID  2
-#define CLIMATE_TROPICAL  3
-#define NUM_CLIMATES  4 // total
+// CLIM_x: climate flags -- keywords specifically related to climate
+// These were formally 4 separate 'types' rather than flags. It should be safe
+// to bits a-d after b6, but in b5.84 they are used to detect sectors and crops
+// that need to be updated
+#define CLIM_UNUSED1  BIT(0)	// a. prior to b5.84, this was CLIMATE_NONE 0
+#define CLIM_UNUSED2  BIT(1)	// b. prior to b5.84, this was CLIMATE_TEMPERATE 1
+#define CLIM_UNUSED3  BIT(2)	// c. prior to b5.84, this was CLIMATE_ARID 2
+#define CLIM_UNUSED4  BIT(3)	// d. prior to b5.84, this was CLIMATE_TROPICAL 3
+#define CLIM_HOT  BIT(4)	// e. climate is warmer than normal
+#define CLIM_COLD  BIT(5)	// f. climate is colder than normal
+#define CLIM_HIGH  BIT(6)	// g. higher than normal (peaks)
+#define CLIM_LOW  BIT(7)	// h. lower than normal (depression)
+#define CLIM_MAGICAL  BIT(8)	// i. magical in some way
+#define CLIM_TEMPERATE  BIT(9)	// j. temperate climate
+#define CLIM_ARID  BIT(10)	// k. arid climate or desert
+#define CLIM_TROPICAL  BIT(11)	// l. tropical climate
+#define CLIM_MOUNTAIN  BIT(12)	// m. mountainous climate
+#define CLIM_RIVER  BIT(13)	// n. moving (fresh) water
+#define CLIM_FRESH_WATER  BIT(14)	// o. lake, pond; non-moving water
+#define CLIM_SALT_WATER  BIT(15)	// p. ocean, sea; salt water
+#define CLIM_FOREST  BIT(16)	// q. forested
 
 
 // DPLTN_x: depletion types
@@ -4269,8 +4285,8 @@ struct crop_data {
 	struct icon_data *icons;	// linked list of available icons
 	int mapout;	// position in mapout_color_names, mapout_color_tokens
 	
-	int climate;	// CLIMATE_x
-	bitvector_t flags;	// CROPF_x flags
+	bitvector_t climate;	// CLIM_ flags
+	bitvector_t flags;	// CROPF_ flags
 	
 	// only spawns where:
 	int x_min;	// x >= this
@@ -5176,8 +5192,8 @@ struct sector_data {
 	int mapout;	// position in mapout_color_names, mapout_color_tokens
 	
 	int movement_loss;	// move point cost
-	int climate;	// CLIMATE_x
-	bitvector_t flags;	// SECTF_x flags
+	bitvector_t climate;	// CLIM_ flags
+	bitvector_t flags;	// SECTF_ flags
 	bitvector_t build_flags;	// matches up with craft_data.build_on and .build_facing
 	
 	struct spawn_info *spawns;	// mob spawn data

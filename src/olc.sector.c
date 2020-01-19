@@ -30,7 +30,7 @@
 
 // external consts
 extern const char *bld_on_flags[];
-extern const char *climate_types[];
+extern const char *climate_flags[];
 extern const char *evo_types[];
 extern const int evo_val_types[NUM_EVOS];
 extern const char *interact_types[];
@@ -93,7 +93,7 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 			problem = TRUE;
 		}
 	}
-	if (GET_SECT_CLIMATE(sect) == CLIMATE_NONE) {
+	if (GET_SECT_CLIMATE(sect) == NOBITS) {
 		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Climate not set");
 		problem = TRUE;
 	}
@@ -683,7 +683,8 @@ void olc_show_sector(char_data *ch) {
 	get_icons_display(GET_SECT_ICONS(st), buf1);
 	strcat(buf, buf1);
 
-	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(st->climate, 0), climate_types[st->climate]);
+	sprintbit(GET_SECT_CLIMATE(st), climate_flags, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(st->climate, NOBITS), lbuf);
 	sprintf(buf + strlen(buf), "<%smovecost\t0> %d\r\n", OLC_LABEL_VAL(st->movement_loss, 0), st->movement_loss);
 
 	sprintbit(GET_SECT_FLAGS(st), sector_flags, lbuf, TRUE);
@@ -728,7 +729,7 @@ OLC_MODULE(sectedit_buildflags) {
 
 OLC_MODULE(sectedit_climate) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	st->climate = olc_process_type(ch, argument, "climate", "climate", climate_types, st->climate);
+	GET_SECT_CLIMATE(st) = olc_process_flag(ch, argument, "climate", "climate", climate_flags, GET_SECT_CLIMATE(st));
 }
 
 

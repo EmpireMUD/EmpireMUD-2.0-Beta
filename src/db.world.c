@@ -914,7 +914,7 @@ void uncrop_tile(room_data *room) {
 	
 	// 4. attempt to find one
 	if (!to_sect) {
-		to_sect = find_first_matching_sector(NOBITS, invalid_sect_flags);
+		to_sect = find_first_matching_sector(NOBITS, invalid_sect_flags, GET_SECT_CLIMATE(SECT(room)));
 	}
 	
 	// 5. did we fail entirely?
@@ -3223,7 +3223,6 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 	bool water = find_flagged_sect_within_distance_from_room(location, SECTF_FRESH_WATER, NOBITS, config_get_int("water_crop_distance"));
 	bool x_min_ok, x_max_ok, y_min_ok, y_max_ok;
 	struct island_info *isle = NULL;
-	int climate;
 	crop_data *found, *crop, *next_crop;
 	int num_found = 0;
 	
@@ -3235,19 +3234,11 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 	x = WRAP_X_COORD(x);
 	y = WRAP_Y_COORD(y);
 	
-	// determine climate
-	climate = GET_SECT_CLIMATE(SECT(location));
-	
-	// don't allow NONE climates in here
-	if (climate == CLIMATE_NONE) {
-		climate = CLIMATE_TEMPERATE;
-	}
-	
 	// find any match
 	found = NULL;
 	HASH_ITER(hh, crop_table, crop, next_crop) {
 		// basic checks
-		if (GET_CROP_CLIMATE(crop) != climate || CROP_FLAGGED(crop, CROPF_NOT_WILD)) {
+		if (!MATCH_CROP_SECTOR_CLIMATE(crop, SECT(location))) {
 			continue;
 		}
 		if (CROP_FLAGGED(crop, CROPF_REQUIRES_WATER) && !water) {

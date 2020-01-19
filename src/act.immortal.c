@@ -44,7 +44,7 @@ extern const char *apply_types[];
 extern const char *apply_type_names[];
 extern const char *bld_on_flags[];
 extern const char *bonus_bits[];
-extern const char *climate_types[];
+extern const char *climate_flags[];
 extern const char *component_flags[];
 extern const char *component_types[];
 extern const char *craft_types[];
@@ -5259,8 +5259,9 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 	
 	msg_to_char(ch, "Crop VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
 	msg_to_char(ch, "Room Title: %s, Mapout Color: %s\r\n", GET_CROP_TITLE(cp), mapout_color_names[GET_CROP_MAPOUT(cp)]);
-
-	msg_to_char(ch, "Climate: &g%s&0\r\n", climate_types[GET_CROP_CLIMATE(cp)]);
+	
+	sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf, TRUE);
+	msg_to_char(ch, "Climate: &g%s&0\r\n", GET_CROP_CLIMATE(cp) ? buf : "(none)");
 	
 	sprintbit(GET_CROP_FLAGS(cp), crop_flags, buf, TRUE);
 	msg_to_char(ch, "Crop flags: &g%s&0\r\n", buf);
@@ -5676,7 +5677,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	
 	// data that isn't type-based:
 	if (OBJ_FLAGGED(j, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE)))) {
-		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), climate_types[GET_CROP_CLIMATE(cp)]);
+		sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf, TRUE);
+		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? trim(buf) : "any climate");
 	}
 
 	/*
@@ -6081,6 +6083,7 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 	void get_evolution_display(struct evolution_data *list, char *save_buffer);
 	
 	struct sector_index_type *idx = find_sector_index(GET_SECT_VNUM(st));
+	char buf[MAX_STRING_LENGTH];
 	
 	msg_to_char(ch, "Sector VNum: [&c%d&0], Name: '&c%s&0', Live Count [&c%d&0/&c%d&0]\r\n", st->vnum, st->name, idx->sect_count, idx->base_count);
 	msg_to_char(ch, "Room Title: %s\r\n", st->title);
@@ -6091,7 +6094,8 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 	
 	msg_to_char(ch, "Movement cost: [&g%d&0]  Roadside Icon: %c  Mapout Color: %s\r\n", st->movement_loss, st->roadside_icon, mapout_color_names[GET_SECT_MAPOUT(st)]);
 
-	msg_to_char(ch, "Climate: &g%s&0\r\n", climate_types[st->climate]);
+	sprintbit(GET_SECT_CLIMATE(st), climate_flags, buf, TRUE);
+	msg_to_char(ch, "Climate: &g%s&0\r\n", buf);
 	
 	if (st->icons) {
 		msg_to_char(ch, "Icons:\r\n");

@@ -333,7 +333,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *apply_type_names[];
-	extern const char *climate_types[];
+	extern const char *climate_flags[];
 	extern const char *craft_types[];
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
@@ -598,7 +598,8 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	// data that isn't type-based:
 	if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
-		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), climate_types[GET_CROP_CLIMATE(cp)]);
+		sprintbit(GET_CROP_CLIMATE(cp), climate_flags, lbuf, TRUE);
+		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? trim(lbuf) : "any climate");
 	}
 	
 	if (has_interaction(obj->interactions, INTERACT_COMBINE)) {
