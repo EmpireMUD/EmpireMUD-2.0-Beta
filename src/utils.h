@@ -485,7 +485,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 
 // helpers
 #define CROP_FLAGGED(crp, flg)  (IS_SET(GET_CROP_FLAGS(crp), (flg)))
-#define MATCH_CROP_SECTOR_CLIMATE(crop, sect)  (!GET_CROP_CLIMATE(crop) || (GET_CROP_CLIMATE(crop) & GET_SECT_CLIMATE(sect)) != (CROP_FLAGGED((crop), CROPF_ANY_LISTED_CLIMATE) ? NOBITS : GET_CROP_CLIMATE(crop)))
+#define MATCH_CROP_SECTOR_CLIMATE(crop, sect)  (!GET_CROP_CLIMATE(crop) || (GET_CROP_CLIMATE(crop) & GET_SECT_CLIMATE(sect)) == GET_CROP_CLIMATE(crop) || (CROP_FLAGGED((crop), CROPF_ANY_LISTED_CLIMATE) && (GET_CROP_CLIMATE(crop) & GET_SECT_CLIMATE(sect))))
 
 
  //////////////////////////////////////////////////////////////////////////////
