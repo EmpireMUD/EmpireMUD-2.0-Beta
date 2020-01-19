@@ -6892,8 +6892,9 @@ Usage:  .flags [add | remove] <flags>
 Skill flags set various properties on skills.
 
 Available flags:
- IN-DEVELOPMENT - Players can't see or gain the skill.
- BASIC - Always shows in the list for players, even at 0.
+ &cIN-DEVELOPMENT&0 - Players can't see or gain the skill.
+ &cBASIC&0 - Always shows in the list for players, even at 0.
+ &cNO-SPECIALIZE&0 - Players can't pass 50/75 except via script/quest.
 
 See also: OLC SKILLS, OLC REMOVEINDEV
 #d

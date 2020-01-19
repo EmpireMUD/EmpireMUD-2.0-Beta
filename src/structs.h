@@ -432,6 +432,7 @@ typedef struct vehicle_data vehicle_data;
 // SKILLF_x: skill flags
 #define SKILLF_IN_DEVELOPMENT  BIT(0)	// a. not live, won't show up on skill lists
 #define SKILLF_BASIC  BIT(1)	// b. always shows in the list
+#define SKILLF_NO_SPECIALIZE  BIT(2)	// c. players must pass 50/75 via script/quest
 
 
 // mob spawn flags

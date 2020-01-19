@@ -3436,8 +3436,9 @@ double skill_check_difficulty_modifier[NUM_DIFF_TYPES] = {
 
 // SKILLF_x: skill flags
 const char *skill_flags[] = {
-	"IN-DEVELOPMENT",
+	"IN-DEVELOPMENT",	// 0
 	"BASIC",
+	"NO-SPECIALIZE",
 	"\n"
 };
 
