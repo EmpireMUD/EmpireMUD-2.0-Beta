@@ -3593,9 +3593,9 @@ void b5_84_climate_update(void) {
 	crop_data *crop, *next_crop;
 	bool changed, any = FALSE;
 	
-	const any_vnum old_climate_temperate = 1;
-	const any_vnum old_climate_arid = 2;
-	const any_vnum old_climate_tropical = 3;
+	#define old_climate_temperate  1
+	#define old_climate_arid  2
+	#define old_climate_tropical  3
 	
 	log("Updating sectors and crops for the b5.84 patch:");
 	
@@ -3651,6 +3651,10 @@ void b5_84_climate_update(void) {
 			save_library_file_for_vnum(DB_BOOT_CROP, GET_CROP_VNUM(crop));
 			log("- Crop [%d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
 		}
+	}
+	
+	if (!any) {
+		log("- no old climates detected");
 	}
 }
 
