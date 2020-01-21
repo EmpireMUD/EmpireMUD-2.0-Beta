@@ -48,7 +48,6 @@
 */
 
 // external vars
-extern const char *bld_on_flags[];
 extern const char *techs[];
 
 // locals

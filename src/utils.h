@@ -1700,6 +1700,7 @@ extern int count_icon_codes(char *string);
 extern bool strchrstr(const char *haystack, const char *needles);
 extern int str_cmp(const char *arg1, const char *arg2);
 extern int strn_cmp(const char *arg1, const char *arg2, int n);
+void ordered_sprintbit(bitvector_t bitvector, const char *names[], const bitvector_t order[], bool commas, char *result);
 void prettier_sprintbit(bitvector_t bitvector, const char *names[], char *result);
 void prune_crlf(char *txt);
 extern const char *skip_filler(const char *string);

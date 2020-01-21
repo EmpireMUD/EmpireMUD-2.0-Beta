@@ -2795,7 +2795,7 @@ const char *quest_reward_types[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// ROOM/WORLD CONSTANTS ////////////////////////////////////////////////////
 
-// BLD_ON_x
+// BLD_ON_x (1/2): names of build-on flags
 const char *bld_on_flags[] = {
 	"water",	// 0
 	"plains",
@@ -2820,6 +2820,42 @@ const char *bld_on_flags[] = {
 	"lake",	// 20
 	"base-terrain-allowed",
 	"\n"
+};
+
+
+// BLD_ON_x (2/2): order to display build-in flags
+const bitvector_t bld_on_flags_order[] = {
+	BLD_ON_PLAINS,
+	BLD_ON_MOUNTAIN,
+	BLD_ON_FOREST,
+	BLD_ANY_FOREST,
+	
+	// desert types
+	BLD_ON_DESERT,
+	BLD_ON_OASIS,
+	BLD_ON_GROVE,
+	
+	// jungle types
+	BLD_ON_JUNGLE,
+	BLD_ON_SWAMP,
+	
+	// water types
+	BLD_ON_WATER,
+	BLD_ON_OCEAN,
+	BLD_ON_SHALLOW_SEA,
+	BLD_ON_COAST,
+	BLD_ON_ESTUARY,
+	BLD_ON_RIVER,
+	BLD_ON_RIVERBANK,
+	BLD_ON_LAKE,
+	
+	// end modifiers
+	BLD_ON_FLAT_TERRAIN,
+	BLD_FACING_OPEN_BUILDING,
+	BLD_ON_BASE_TERRAIN_ALLOWED,
+	BLD_FACING_CROP,
+	BLD_ON_NOT_PLAYER_MADE,
+	NOBITS	// end
 };
 
 

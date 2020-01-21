@@ -43,6 +43,7 @@ extern const char *affected_bits[];
 extern const char *apply_types[];
 extern const char *apply_type_names[];
 extern const char *bld_on_flags[];
+extern const bitvector_t bld_on_flags_order[];
 extern const char *bonus_bits[];
 extern const char *climate_flags[];
 extern const char *component_flags[];
@@ -5231,9 +5232,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	msg_to_char(ch, "Requires tool: &y%s&0\r\n", buf);
 	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
-		sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, buf, TRUE);
+		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "Build on: &g%s&0\r\n", buf);
-		sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, buf, TRUE);
+		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, FALSE, buf);
 		msg_to_char(ch, "Build facing: &c%s&0\r\n", buf);
 	}
 	
@@ -6106,7 +6107,7 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 	sprintbit(st->flags, sector_flags, buf, TRUE);
 	msg_to_char(ch, "Sector flags: &g%s&0\r\n", buf);
 	
-	sprintbit(st->build_flags, bld_on_flags, buf, TRUE);
+	ordered_sprintbit(st->build_flags, bld_on_flags, bld_on_flags_order, TRUE, buf);
 	msg_to_char(ch, "Build flags: &g%s&0\r\n", buf);
 	
 	if (st->evolution) {

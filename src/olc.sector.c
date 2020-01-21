@@ -30,6 +30,7 @@
 
 // external consts
 extern const char *bld_on_flags[];
+extern const bitvector_t bld_on_flags_order[];
 extern const char *climate_flags[];
 extern const char *evo_types[];
 extern const int evo_val_types[NUM_EVOS];
@@ -690,7 +691,7 @@ void olc_show_sector(char_data *ch) {
 	sprintbit(GET_SECT_FLAGS(st), sector_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_SECT_FLAGS(st), NOBITS), lbuf);
 	
-	sprintbit(st->build_flags, bld_on_flags, lbuf, TRUE);
+	ordered_sprintbit(st->build_flags, bld_on_flags, bld_on_flags_order, TRUE, lbuf);
 	sprintf(buf + strlen(buf), "<%sbuildflags\t0> %s\r\n", OLC_LABEL_VAL(st->build_flags, NOBITS), lbuf);
 	
 	sprintf(buf + strlen(buf), "<%sevolution\t0>\r\n", OLC_LABEL_PTR(st->evolution));

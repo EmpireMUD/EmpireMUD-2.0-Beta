@@ -3887,6 +3887,56 @@ bool multi_isname(const char *arg, const char *namelist) {
 }
 
 
+/*
+ * Like sprintbit, this turns a bitvector and a list of names into a string.
+ * However, this one also takes an orderering array -- the bits will be
+ * displayed in the order of that array (for each bit present) and any bits
+ * not in that array will not be displayed.
+ *
+ * If you don't have a 'const' array, just cast it as such.  It's safer
+ * to cast a non-const array as const than to cast a const one as non-const.
+ * Doesn't really matter since this function doesn't change the array though.
+ * 
+ * @param bitvector_t bitvector The bits to display.
+ * @param const char *names[] The names for each bit (terminated with "\n" at the end of the array).
+ * @param const bitvector_t order[] The order to display the bits in (terminated with 0/NOBITS at the end).
+ * @param bool commas If TRUE, comma-separates the bits.
+ * @param char *result A string to store the output in (ideally MAX_STRING_LENGTH).
+ */
+void ordered_sprintbit(bitvector_t bitvector, const char *names[], const bitvector_t order[], bool commas, char *result) {
+	int iter, pos, n_len = 0;
+	bitvector_t temp;
+	
+	// determine lengths of the name array (safe max of 128 is double the largest possible number of bits)
+	// - this is for array access safety if they are not the same length or if bits fall outside those arrays
+	for (iter = 0; n_len == 0 && iter < 128; ++iter) {
+		if (*names[iter] == '\n') {
+			n_len = iter;
+		}
+	}
+	
+	// init string
+	*result = '\0';
+	
+	// iterate over order array
+	for (iter = 0; order[iter] != NOBITS; ++iter) {
+		if (IS_SET(bitvector, order[iter])) {
+			// determine bit pos and append flag name
+			temp = order[iter];
+			for (pos = 0; temp; ++pos, temp >>= 1) {
+				if (IS_SET(temp, 1)) {
+					sprintf(result + strlen(result), "%s%s", (*result ? (commas ? ", " : " ") : ""), (pos < n_len ? names[pos] : "UNDEFINED"));
+				}
+			}
+		}
+	}
+	
+	if (!*result) {
+		strcpy(result, "NOBITS");
+	}
+}
+
+
 /**
 * This does the same thing as sprintbit but looks nicer for players.
 */

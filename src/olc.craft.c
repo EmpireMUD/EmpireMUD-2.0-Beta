@@ -31,6 +31,7 @@
 // externs
 extern const char *apply_types[];
 extern const char *bld_on_flags[];
+extern const bitvector_t bld_on_flags_order[];
 extern const char *craft_flags[];
 extern const char *craft_types[];
 extern const char *road_types[];
@@ -644,10 +645,10 @@ void olc_show_craft(char_data *ch) {
 		}
 		sprintf(buf + strlen(buf), "<%sbuilds\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_CRAFT_BUILD_TYPE(craft), NOTHING), GET_CRAFT_BUILD_TYPE(craft), lbuf);
 		
-		prettier_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, buf1);
+		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf1);
 		sprintf(buf + strlen(buf), "<%sbuildon\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_BUILD_ON(craft), NOBITS), buf1);
 		
-		prettier_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, buf1);
+		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, buf1);
 		sprintf(buf + strlen(buf), "<%sbuildfacing\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_BUILD_FACING(craft), NOBITS), buf1);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
