@@ -5234,7 +5234,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
 		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "Build on: &g%s&0\r\n", buf);
-		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, FALSE, buf);
+		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "Build facing: &c%s&0\r\n", buf);
 	}
 	
