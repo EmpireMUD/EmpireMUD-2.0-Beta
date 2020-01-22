@@ -1192,7 +1192,7 @@ SCAN
 
 Usage:  scan <direction>
         scan <tile/vehicle name>
-        scan <claimed/unclaimed/foreign>
+        scan <claimed/unclaimed/foreign/adventures>
 
 This command shows you the same information as the screen-reader map display,
 but in only one direction. The distance you see on a scan is based on your

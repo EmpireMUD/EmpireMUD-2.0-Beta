@@ -2830,6 +2830,7 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 */
 void scan_for_tile(char_data *ch, char *argument) {
 	extern byte distance_can_see(char_data *ch);
+	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	void get_informative_tile_string(char_data *ch, room_data *room, char *buffer);
 	extern int get_map_radius(char_data *ch);
 	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
@@ -2842,7 +2843,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 	size_t size, lsize;
 	vehicle_data *veh;
 	crop_data *crop;
-	bool ok, claimed, unclaimed, foreign;
+	bool ok, claimed, unclaimed, foreign, adventures;
 	
 	skip_spaces(&argument);
 	
@@ -2862,6 +2863,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 	claimed = !str_cmp(argument, "claimed") || !str_cmp(argument, "claim");
 	unclaimed = !str_cmp(argument, "unclaimed") || !str_cmp(argument, "unclaim");
 	foreign = !str_cmp(argument, "foreign");
+	adventures = !str_cmp(argument, "adventures") || !str_cmp(argument, "adventure");
 	
 	for (x = -mapsize; x <= mapsize; ++x) {
 		for (y = -mapsize; y <= mapsize; ++y) {
@@ -2893,6 +2895,9 @@ void scan_for_tile(char_data *ch, char *argument) {
 				ok = TRUE;	// skip unowned AND skip ocean
 			}
 			else if (foreign && ROOM_OWNER(room) && ROOM_OWNER(room) != GET_LOYALTY(ch)) {
+				ok = TRUE;
+			}
+			else if (adventures && find_instance_by_room(room, FALSE, TRUE)) {
 				ok = TRUE;
 			}
 			else if (multi_isname(argument, GET_SECT_NAME(SECT(room)))) {
