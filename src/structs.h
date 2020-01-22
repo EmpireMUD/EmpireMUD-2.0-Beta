@@ -1166,7 +1166,7 @@ typedef struct vehicle_data vehicle_data;
 
 // PRIV_x: Empire Privilege Levels
 #define PRIV_CLAIM  0	// Claim land
-#define PRIV_BUILD  1	// Build/Dismantle structures
+#define PRIV_BUILD  1	// Build structures
 #define PRIV_HARVEST  2	// Harvest/plant things
 #define PRIV_PROMOTE  3	// Promote/demote others
 #define PRIV_CHOP  4	// Chop trees
@@ -1185,7 +1185,8 @@ typedef struct vehicle_data vehicle_data;
 #define PRIV_STORAGE  17	// can retrieve from storage
 #define PRIV_WAREHOUSE  18	// can retrieve from warehouse
 #define PRIV_PROGRESS  19	// can buy/manage progression goals
-#define NUM_PRIVILEGES  20	// total
+#define PRIV_DISMANTLE  20	// can dismantle things (not required for ones they built themselves)
+#define NUM_PRIVILEGES  21	// total
 
 
 // SCORE_x: for empire scores (e.g. sorting)
@@ -2601,6 +2602,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_MINE_GLB_VNUM  17
 #define ROOM_EXTRA_TRENCH_FILL_TIME  18  // when the trench will be filled
 #define ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR  19	// for un-trenching correctly
+#define ROOM_EXTRA_ORIGINAL_BUILDER  20	// person who started the building
 
 
 // number of different appearances

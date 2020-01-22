@@ -408,6 +408,7 @@ void disassociate_building(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_BUILD_RECIPE);
 	remove_room_extra_data(room, ROOM_EXTRA_FOUND_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_REDESIGNATE_TIME);
+	remove_room_extra_data(room, ROOM_EXTRA_ORIGINAL_BUILDER);
 	
 	// some event types must be canceled
 	cancel_stored_event_room(room, SEV_BURN_DOWN);
@@ -1513,6 +1514,9 @@ ACMD(do_build) {
 	// begin setup
 	construct_building(IN_ROOM(ch), GET_CRAFT_BUILD_TYPE(type));
 	set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
+	if (!IS_NPC(ch)) {
+		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
+	}
 	
 	special_building_setup(ch, IN_ROOM(ch));
 	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
@@ -1632,7 +1636,7 @@ ACMD(do_dismantle) {
 		return;
 	}
 
-	if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || (!has_permission(ch, PRIV_DISMANTLE, IN_ROOM(ch)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id)) {
 		msg_to_char(ch, "You don't have permission to dismantle this building.\r\n");
 		return;
 	}

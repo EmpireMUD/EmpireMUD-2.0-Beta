@@ -758,7 +758,7 @@ This toggle helps you keep your minions from accidentally dismantling one of
 your buildings. They'll still be able to toggle it off and dismantle anyway,
 but nobody will take down an important structure by accident.
 
-This uses the same 'build' privilege as build and dismantle.
+This uses the 'build'.
 
 See also: PRIVILEGES
 #

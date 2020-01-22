@@ -1814,26 +1814,27 @@ const char *empire_trait_types[] = {
 
 // PRIV_x
 const char *priv[] = {
-	"claim",
+	"claim",	// 0
 	"build",
 	"harvest",
 	"promote",
 	"chop",
-	"cede",
+	"cede",	// 5
 	"enroll",
 	"withdraw",
 	"diplomacy",
 	"customize",
-	"workforce",
+	"workforce",	// 10
 	"stealth",
 	"cities",
 	"trade",
 	"logs",
-	"shipping",
+	"shipping",	// 15
 	"homes",
 	"storage",
 	"warehouse",
 	"progress",
+	"dismantle",	// 20
 	"\n"
 };
 
@@ -3298,26 +3299,27 @@ const char *room_aff_bits[] = {
 
 // ROOM_EXTRA_x
 const char *room_extra_types[] = {
-	"prospect empire",
+	"prospect empire",	// 0
 	"mine amount",
 	"fire remaining",
 	"seed time",
 	"tavern type",
-	"tavern brewing time",
+	"tavern brewing time",	// 5
 	"tavern available time",
 	"ruins icon",
 	"chop progress",
 	"trench progress",
-	"harvest progress",
+	"harvest progress",	// 10
 	"garden workforce progress",
 	"quarry workforce progress",
 	"build recipe",
 	"found time",
-	"redesignate time",
+	"redesignate time",	// 15
 	"ceded",
 	"mine global vnum",
 	"trench fill time",
 	"trench original sector",
+	"original builder",	// 20
 	"\n"
 };
 
