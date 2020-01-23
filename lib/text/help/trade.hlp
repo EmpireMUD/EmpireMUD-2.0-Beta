@@ -219,7 +219,7 @@ Command:  cook [number] <item>
 
 Speed boosts:  Faster Chores bonus
 
-The bake and cook commandas allow you to make food from a variety of raw
+The bake and cook commands allow you to make food from a variety of raw
 ingredients. To cook, you'll need a heat source: a cooking fire, a kitchen,
 a bakery, an alchemist, or a laboratory. The Touch of Flame ability also works.
 However, to bake anything, you'll need a kitchen, bakery, or another type of
