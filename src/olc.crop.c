@@ -613,7 +613,7 @@ void olc_show_crop(char_data *ch) {
 	get_icons_display(GET_CROP_ICONS(cp), buf1);
 	strcat(buf, buf1);
 	
-	sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf1, TRUE);
+	sprintbit(GET_CROP_CLIMATE(cp), climate_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(GET_CROP_CLIMATE(cp), NOBITS), lbuf);
 
 	sprintbit(GET_CROP_FLAGS(cp), crop_flags, lbuf, TRUE);
