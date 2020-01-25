@@ -1889,6 +1889,11 @@ void process_hunting(char_data *ch) {
 		if (!number(0, 2)) {
 			act("You stalk low to the ground, hunting...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
 		}
+		
+		// chance to raise depletion anyway (the hunter is scaring off game)
+		if (!number(0, 5)) {
+			add_depletion(IN_ROOM(ch), DPLTN_HUNT, FALSE);
+		}
 	}
 }
 
