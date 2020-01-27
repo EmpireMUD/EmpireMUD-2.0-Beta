@@ -598,7 +598,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	// data that isn't type-based:
 	if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
-		sprintbit(GET_CROP_CLIMATE(cp), climate_flags, lbuf, TRUE);
+		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
+			prettier_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, lbuf);
+		}
+		else {
+			sprintbit(GET_CROP_CLIMATE(cp), climate_flags, lbuf, TRUE);
+		}
 		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? trim(lbuf) : "any climate");
 	}
 	
