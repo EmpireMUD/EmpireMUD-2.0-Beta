@@ -1,7 +1,7 @@
 #10775
 Withered Tree~
 A Withered Tree~
-'^' 14 1 5 d np
+'^' 14 jq 5 d np
 C
 chop, dig, gather~
 D0
@@ -109,7 +109,7 @@ S
 #10776
 Withered Tree~
 A Withered Tree~
-'^' 14 2 5 d p
+'^' 14 kq 5 d p
 C
 chop, dig, gather~
 D0

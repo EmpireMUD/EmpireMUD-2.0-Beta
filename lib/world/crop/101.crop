@@ -1,7 +1,7 @@
 #10146
 saguaro cacti~
 A Giant Saguaro Cactus~
-12 2 bc
+12 k bc
 0 100 0 100
 D1
 .&r`&j|&?.~
@@ -134,7 +134,7 @@ S
 #10150
 mesquite trees~
 A Mesquite Tree~
-13 2 bc
+13 k bc
 0 100 0 100
 D1
 ..&j^&?.~
@@ -280,7 +280,7 @@ S
 #10153
 alligator pears~
 A Patch of Alligator Pear Trees~
-33 2 bc
+33 k bc
 0 100 0 100
 D0
 .&G^^&?.~
@@ -412,7 +412,7 @@ S
 #10155
 limes~
 A Grove of Lime Trees~
-32 2 bc
+32 k bc
 0 100 0 100
 D0
 .&l^^&?.~
@@ -544,7 +544,7 @@ S
 #10157
 firemelons~
 A Bed of Firemelons~
-3 2 c
+3 k c
 0 100 0 100
 D0
 wwww~

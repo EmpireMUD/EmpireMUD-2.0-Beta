@@ -32,6 +32,10 @@ if %self.cooldown(250)%
   halt
 end
 set room %self.room%
+if %room.empire% != %self.empire% || !%room.empire.in_city%
+  * Not my empire / not my city
+  halt
+end
 set person %room.people%
 set ally_guards_present 0
 while %person%

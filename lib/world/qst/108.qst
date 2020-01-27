@@ -694,7 +694,7 @@ Examples of Early Sewing~
 The curator needs some examples of early sewn crafts.
 Steps:
  1. You need at least level 5 Trade skill.
- 2. You will need a sewing kit (craft feather sewing needles) and a knife
+ 2. You will need a sewing kit (craft feather sewing kit) and a knife
     (a handaxe will work).
  3. Type 'skill buy sew'.
  4. Type 'sew info whip' and 'sew info tent' to see what's needed.
@@ -704,7 +704,7 @@ Steps:
 ~
 Horation is impressed with your crafting skills.
 ~
-28 d 0 25 -1
+29 d 0 25 -1
 A
 1 10826
 P

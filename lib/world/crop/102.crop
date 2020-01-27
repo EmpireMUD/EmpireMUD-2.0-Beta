@@ -1,7 +1,7 @@
 #10225
 pineapples~
 A Pineapple Field~
-13 3 c
+13 l c
 0 100 0 100
 D0
 wwww~
@@ -82,7 +82,7 @@ S
 #10226
 agave~
 A Field of Agave~
-10 2 c
+10 k c
 0 100 0 100
 D0
 vvvv~
@@ -139,7 +139,7 @@ S
 #10227
 prickly pears~
 A Field of Prickly Pears~
-4 2 c
+4 k c
 0 100 0 100
 D0
 o88o~
@@ -196,7 +196,7 @@ S
 #10228
 aloe~
 A Field of Aloe~
-14 2 c
+14 k c
 0 100 0 100
 D0
 xxxx~

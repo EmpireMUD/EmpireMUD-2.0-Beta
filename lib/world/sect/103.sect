@@ -1,7 +1,7 @@
 #10300
 Scorched Woods~
 The Scorched Woods~
-'^' 3 1 4 0 p
+'^' 3 j 4 0 p
 D0
 &r.&y^&r..~
 &y~
@@ -55,7 +55,7 @@ S
 #10301
 Scorched Grove~
 The Scorched Grove~
-'.' 3 2 4 0 p
+'.' 3 k 4 0 p
 D0
 &r.&y^&r..~
 &y~
@@ -109,7 +109,7 @@ S
 #10302
 Scorched Plains~
 The Scorched Plains~
-'.' 3 1 4 0 p
+'.' 3 j 4 0 p
 D0
 ....~
 &r~
@@ -154,7 +154,7 @@ S
 #10303
 Scorched Crop~
 The Scorched Crops~
-'.' 3 1 4 0 p
+'.' 3 j 4 0 p
 D0
 ....~
 &r~
@@ -199,7 +199,7 @@ S
 #10304
 Scorched Desert Crop~
 The Scorched Crops~
-'.' 3 2 4 0 p
+'.' 3 k 4 0 p
 D0
 ....~
 &r~
@@ -244,7 +244,7 @@ S
 #10305
 Scorched Desert~
 The Scorched Desert~
-'.' 3 2 4 0 p
+'.' 3 k 4 0 p
 D0
 ....~
 &r~

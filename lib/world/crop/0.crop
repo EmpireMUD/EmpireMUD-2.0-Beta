@@ -1,7 +1,7 @@
 #0
 bugs~
 A Field of Bugs~
-25 1 c
+25 j c
 0 50 50 100
 D0
 ????~
@@ -10,7 +10,7 @@ S
 #1
 wheat~
 A Field of Wheat~
-20 1 0
+20 j 0
 75 25 0 50
 D0
 ;;;;~
@@ -100,7 +100,7 @@ S
 #2
 corn~
 A Field of Corn~
-5 1 0
+5 j 0
 0 50 0 50
 D0
 iiii~
@@ -190,7 +190,7 @@ S
 #3
 hops~
 A Field of Hops~
-15 1 0
+15 j 0
 25 75 50 100
 D0
 ::::~
@@ -279,7 +279,7 @@ S
 #4
 cotton~
 A Field of Cotton~
-2 2 0
+2 jk 0
 0 100 54 45
 D0
 ::::~
@@ -335,7 +335,7 @@ S
 #5
 barley~
 A Field of Barley~
-20 1 0
+20 j 0
 25 75 0 50
 D0
 ::::~
@@ -425,7 +425,7 @@ S
 #6
 peaches~
 A Peach Orchard~
-22 1 b
+22 j b
 50 100 50 100
 D0
 ^^^^~
@@ -549,7 +549,7 @@ S
 #7
 cherries~
 A Cherry Orchard~
-9 1 b
+9 j b
 50 100 0 50
 D0
 ^^^^~
@@ -673,7 +673,7 @@ S
 #8
 oranges~
 An Orange Grove~
-23 2 b
+23 k b
 0 100 0 54
 D0
 .&G^^&?.~
@@ -738,7 +738,7 @@ S
 #9
 rice~
 A Rice Paddy~
-2 1 a
+2 j a
 50 100 63 36
 D0
 ,,,,~
@@ -828,7 +828,7 @@ S
 #10
 olives~
 An Olive Grove~
-15 2 b
+15 k b
 0 100 45 100
 D0
 .&G^^&?.~
@@ -893,7 +893,7 @@ S
 #11
 peas~
 A Field of Peas~
-4 1 0
+4 j 0
 75 25 50 100
 D0
 ....~
@@ -982,7 +982,7 @@ S
 #12
 squash~
 A Field of Squash Vines~
-23 1 a
+23 j a
 0 50 63 36
 D0
 oooo~
@@ -1067,7 +1067,7 @@ S
 #13
 apples~
 An Apple Orchard~
-11 1 b
+11 j b
 0 50 50 100
 D0
 ^^^^~
@@ -1191,7 +1191,7 @@ S
 #14
 plantains~
 A Group of Plantain Stems~
-21 3 0
+21 l 0
 0 50 50 100
 D0
 &Gd&?\/&Gb~

@@ -1,7 +1,7 @@
 #3000
 tomatoes~
 A Tomato Patch~
-3 1 0
+3 j 0
 0 25 70 100
 D0
 &Ro&?88&Ro~
@@ -100,7 +100,7 @@ S
 #3001
 bananas~
 A Banana Grove~
-5 3 0
+5 l 0
 50 100 50 100
 D0
 &Yd&?\/&Yb~
@@ -181,7 +181,7 @@ S
 #3002
 coconuts~
 A Coconut Grove~
-25 2 b
+25 k b
 0 100 50 100
 D0
 .&gT&to&?.~
@@ -263,7 +263,7 @@ S
 #3003
 grapes~
 A Field of Grapes~
-13 1 0
+13 j 0
 50 75 70 100
 D0
 xgxx~
@@ -365,7 +365,7 @@ S
 #3004
 peppers~
 A Field of Peppers~
-3 2 0
+3 k 0
 0 100 0 50
 D0
 nnn&Ri&?~
@@ -431,7 +431,7 @@ S
 #3005
 potatoes~
 A Potato Field~
-25 1 0
+25 j 0
 0 25 0 30
 D0
 nnnn~
@@ -529,7 +529,7 @@ S
 #3006
 plums~
 A Plum Orchard~
-38 1 b
+38 j b
 75 100 70 100
 D0
 ^^^&vo~
@@ -634,7 +634,7 @@ S
 #3007
 strawberries~
 A Strawberry Field~
-3 1 0
+3 j 0
 50 75 0 30
 D0
 &Rv&?nnn~
@@ -742,7 +742,7 @@ S
 #3008
 mangoes~
 A Mango Grove~
-23 3 b
+23 l b
 50 100 0 50
 D0
 ^&Oo&?^^~
@@ -832,7 +832,7 @@ S
 #3009
 blueberries~
 A Field of Blueberries~
-28 1 0
+28 j 0
 25 50 70 100
 D0
 %%%%~
@@ -943,7 +943,7 @@ S
 #3011
 coffee~
 A Field of Coffee Plants~
-25 1 0
+25 j 0
 75 100 0 30
 D0
 ^^^^~
@@ -1068,7 +1068,7 @@ S
 #3015
 oats~
 A Field of Oats~
-37 1 0
+37 j 0
 25 50 0 30
 D0
 iiii~
@@ -1168,7 +1168,7 @@ S
 #3016
 watermelons~
 A Bed of Watermelons~
-4 3 0
+4 l 0
 0 50 0 50
 D0
 wwww~
@@ -1275,7 +1275,7 @@ S
 #3017
 lettuce~
 A Lettuce Patch~
-13 1 d
+13 j d
 0 100 0 100
 D0
 @@@@~
@@ -1376,7 +1376,7 @@ S
 #3018
 calabash gourds~
 A Field of Calabash Gourds~
-13 1 ad
+13 j ad
 0 100 0 100
 D0
 oooo~

@@ -1,7 +1,7 @@
 #11100
 carrots~
 A Carrot Patch~
-23 1 c
+23 j c
 0 100 0 100
 D0
 ,,,,~
@@ -100,7 +100,7 @@ S
 #11101
 blackberries~
 A Patch of Ripe Blackberries~
-7 1 c
+7 j c
 0 100 0 100
 D0
 %%%%~
@@ -211,7 +211,7 @@ S
 #11102
 pears~
 A Pear Orchard~
-10 1 bc
+10 j bc
 0 50 50 100
 D0
 ^^^^~

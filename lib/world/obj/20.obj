@@ -452,7 +452,7 @@ a leather rope~
 A leather rope is coiled on the ground.~
 Rope can be used to lead, tie, or harness an animal.
 ~
-3 0 a 0 6
+3 0 a 0 7
 0 0 0
 7 0
 M
@@ -471,6 +471,8 @@ R
 5153 0
 R
 5154 0
+R
+5134 0
 S
 #2036
 tent collapsed folded~
@@ -512,7 +514,7 @@ A rope is coiled on the ground.~
    This rope is made from twisted plant fibers. It may be thin, but it is far
 stronger than it looks. Rope can be used to lead, tie, or harness an animal.
 ~
-3 l a 0 6
+3 l a 0 7
 0 0 0
 0 0
 M
@@ -531,6 +533,8 @@ R
 5153 0
 R
 5154 0
+R
+5134 0
 S
 #2039
 loom parts backstrap strap~
