@@ -3284,8 +3284,14 @@ ACMD(do_plant) {
 		msg_to_char(ch, "Nothing can be planted here.\r\n");
 	}
 	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, SECT(IN_ROOM(ch)))) {
-		sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf, TRUE);
-		msg_to_char(ch, "You can only plant that in %s areas.\r\n", trim(buf));
+		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
+			prettier_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf);
+			msg_to_char(ch, "You can only plant that in areas that are: %s\r\n", buf);
+		}
+		else {
+			sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf, TRUE);
+			msg_to_char(ch, "You can only plant that in %s areas.\r\n", trim(buf));
+		}
 	}
 	else {
 		original = SECT(IN_ROOM(ch));
