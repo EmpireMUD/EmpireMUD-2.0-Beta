@@ -32,7 +32,7 @@ if %self.cooldown(250)%
   halt
 end
 set room %self.room%
-if %room.empire% != %self.empire% || !%room.empire.in_city%
+if %room.empire% != %self.empire% || !%room.in_city%
   * Not my empire / not my city
   halt
 end
