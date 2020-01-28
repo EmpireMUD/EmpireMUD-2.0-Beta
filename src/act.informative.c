@@ -39,6 +39,7 @@
 extern struct city_metadata_type city_type[];
 extern const char *class_role[];
 extern const char *class_role_color[];
+extern const char *climate_flags[];
 extern const char *dirs[];
 extern struct gen_craft_data_t gen_craft_data[];
 extern struct help_index_element *help_table;
@@ -3381,6 +3382,7 @@ ACMD(do_score) {
 
 
 ACMD(do_survey) {
+	char buf[MAX_STRING_LENGTH];
 	struct empire_city_data *city;
 	struct empire_island *eisle;
 	struct island_info *island;
@@ -3397,6 +3399,11 @@ ACMD(do_survey) {
 		else {
 			msg_to_char(ch, "Location: %s%s%s\r\n", get_island_name_for(island->id, ch), IS_SET(island->flags, ISLE_NEWBIE) ? " (newbie island)" : "", IS_SET(island->flags, ISLE_CONTINENT) ? " (continent)" : "");
 		}
+	}
+	
+	if (IS_OUTDOOR_TILE(IN_ROOM(ch)) && GET_SECT_CLIMATE(SECT(IN_ROOM(ch)))) {
+		sprintbit(GET_SECT_CLIMATE(SECT(IN_ROOM(ch))), climate_flags, buf, TRUE);
+		msg_to_char(ch, "Climate: %s\r\n", buf);
 	}
 	
 	// empire

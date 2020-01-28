@@ -46,7 +46,6 @@
 
 // external vars
 extern struct city_metadata_type city_type[];
-extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 extern bool need_world_index;
 extern const int rev_dir[];
 extern bool world_map_needs_save;
@@ -86,6 +85,7 @@ void save_world_map_to_file();
 void schedule_check_unload(room_data *room, bool offset);
 void schedule_trench_fill(struct map_data *map);
 extern int sort_empire_islands(struct empire_island *a, struct empire_island *b);
+void uncrop_tile(room_data *room);
 void update_island_names();
 
 
@@ -119,13 +119,10 @@ void change_base_sector(room_data *room, sector_data *sect) {
 */
 void change_chop_territory(room_data *room) {
 	struct evolution_data *evo;
-	crop_data *cp;
 	
-	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) && (cp = ROOM_CROP(room))) {
+	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD)) {
 		// TODO: This is a special case for orchards
-		
-		// change to default sect
-		change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(cp)]);
+		uncrop_tile(room);
 	}
 	else if ((evo = get_evolution_by_type(SECT(room), EVO_CHOPPED_DOWN))) {
 		// normal case
@@ -874,6 +871,79 @@ void perform_burn_room(room_data *room) {
 
 
 /**
+* This handles returning a crop tile to a non-crop state after harvesting (or
+* for any other reason). It prefers the harvest-to evolution, but has a chain
+* of data sources for the target sector.
+*
+* @param room_data *room The map tile to un-crop.
+*/
+void uncrop_tile(room_data *room) {
+	char buf[MAX_STRING_LENGTH], name[MAX_STRING_LENGTH];
+	struct evolution_data *evo;
+	sector_data *to_sect = NULL;
+	
+	// flags that cannot be on the sector we choose here
+	const bitvector_t invalid_sect_flags = SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE;
+	
+	// safety first
+	if (!room) {
+		return;
+	}
+	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: uncrop_tile called on non-map room vnum %d", GET_ROOM_VNUM(room));
+		return;
+	}
+	
+	// in order of priority for determining a sector:
+	// TODO if crops get evolutions, the crop may override this
+	
+	// 1. harvest-to evo (overrides everything)
+	if (!to_sect && (evo = get_evolution_by_type(SECT(room), EVO_HARVEST_TO))) {
+		to_sect = sector_proto(evo->becomes);	// even if it has invalid_sect_flags
+	}
+	
+	// 2. stored base sector from before it was a crop
+	if (!to_sect && BASE_SECT(room) != SECT(room) && !SECT_FLAGGED(BASE_SECT(room), invalid_sect_flags)) {
+		to_sect = BASE_SECT(room);
+	}
+	
+	// 3. default-harvest-to evo
+	if (!to_sect && (evo = get_evolution_by_type(SECT(room), EVO_DEFAULT_HARVEST_TO))) {
+		to_sect = sector_proto(evo->becomes);	// even if it has invalid_sect_flags
+	}
+	
+	// 4. attempt to find one
+	if (!to_sect) {
+		to_sect = find_first_matching_sector(NOBITS, invalid_sect_flags, GET_SECT_CLIMATE(SECT(room)));
+	}
+	
+	// 5. did we fail entirely?
+	if (!to_sect) {
+		to_sect = sector_proto(config_get_int("default_land_sect"));
+	}
+	
+	// fail?
+	if (!to_sect) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: uncrop_tile: unable to find a valid tile to return to; 'config world default_land_sect' may not be set");
+		return;
+	}
+	
+	// ok: now change it
+	change_terrain(room, GET_SECT_VNUM(to_sect));
+	
+	if (ROOM_PEOPLE(room)) {
+		strcpy(name, GET_SECT_NAME(to_sect));
+		strtolower(name);
+		sprintf(buf, "The area is now %s%s%s.", (name[strlen(name)-1] == 's' ? "" : AN(name)), (name[strlen(name)-1] == 's' ? "" : " "), name);
+		act(buf, FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+	}
+	
+	// this could possibly remove DPLTN_FORAGE and DPLTN_PICK, but since it has
+	// just changed back from being a crop, those are probably safe to keep
+}
+
+
+/**
 * Converts a trench back into its base sect.
 *
 * @param room_data *room The trench to convert back.
@@ -1134,7 +1204,7 @@ void annual_update_map_tile(struct map_data *tile) {
 		}
 		
 		// change to base sect
-		change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(ROOM_CROP(room))]);
+		uncrop_tile(room);
 		
 		// stop all possible chores here since the sector changed
 		stop_room_action(room, ACT_HARVESTING, CHORE_FARMING);
@@ -3153,7 +3223,6 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 	bool water = find_flagged_sect_within_distance_from_room(location, SECTF_FRESH_WATER, NOBITS, config_get_int("water_crop_distance"));
 	bool x_min_ok, x_max_ok, y_min_ok, y_max_ok;
 	struct island_info *isle = NULL;
-	int climate;
 	crop_data *found, *crop, *next_crop;
 	int num_found = 0;
 	
@@ -3165,19 +3234,11 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 	x = WRAP_X_COORD(x);
 	y = WRAP_Y_COORD(y);
 	
-	// determine climate
-	climate = GET_SECT_CLIMATE(SECT(location));
-	
-	// don't allow NONE climates in here
-	if (climate == CLIMATE_NONE) {
-		climate = CLIMATE_TEMPERATE;
-	}
-	
 	// find any match
 	found = NULL;
 	HASH_ITER(hh, crop_table, crop, next_crop) {
 		// basic checks
-		if (GET_CROP_CLIMATE(crop) != climate || CROP_FLAGGED(crop, CROPF_NOT_WILD)) {
+		if (!MATCH_CROP_SECTOR_CLIMATE(crop, SECT(location))) {
 			continue;
 		}
 		if (CROP_FLAGGED(crop, CROPF_REQUIRES_WATER) && !water) {

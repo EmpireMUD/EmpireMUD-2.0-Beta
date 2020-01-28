@@ -144,6 +144,9 @@
 // defines what belongs in the land_map table
 #define SECT_IS_LAND_MAP(sect)  (GET_SECT_VNUM(sect) != BASIC_OCEAN)
 
+// for the in-game configs
+#define CONFIG_HANDLER(name)	void (name)(char_data *ch, struct config_type *config, char *argument)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// BASIC TYPES AND CONSTS //////////////////////////////////////////////////
@@ -429,6 +432,7 @@ typedef struct vehicle_data vehicle_data;
 // SKILLF_x: skill flags
 #define SKILLF_IN_DEVELOPMENT  BIT(0)	// a. not live, won't show up on skill lists
 #define SKILLF_BASIC  BIT(1)	// b. always shows in the list
+#define SKILLF_NO_SPECIALIZE  BIT(2)	// c. players must pass 50/75 via script/quest
 
 
 // mob spawn flags
@@ -1029,6 +1033,7 @@ typedef struct vehicle_data vehicle_data;
 #define CROPF_NOT_WILD  BIT(2)	// crop will never spawn in the wild
 #define CROPF_NEWBIE_ONLY  BIT(3)	// only spawns on newbie islands
 #define CROPF_NO_NEWBIE  BIT(4)	// never spawns on newbie islands
+#define CROPF_ANY_LISTED_CLIMATE  BIT(5)	// climtes are "or" not "and"
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1161,7 +1166,7 @@ typedef struct vehicle_data vehicle_data;
 
 // PRIV_x: Empire Privilege Levels
 #define PRIV_CLAIM  0	// Claim land
-#define PRIV_BUILD  1	// Build/Dismantle structures
+#define PRIV_BUILD  1	// Build structures
 #define PRIV_HARVEST  2	// Harvest/plant things
 #define PRIV_PROMOTE  3	// Promote/demote others
 #define PRIV_CHOP  4	// Chop trees
@@ -1180,7 +1185,8 @@ typedef struct vehicle_data vehicle_data;
 #define PRIV_STORAGE  17	// can retrieve from storage
 #define PRIV_WAREHOUSE  18	// can retrieve from warehouse
 #define PRIV_PROGRESS  19	// can buy/manage progression goals
-#define NUM_PRIVILEGES  20	// total
+#define PRIV_DISMANTLE  20	// can dismantle things (not required for ones they built themselves)
+#define NUM_PRIVILEGES  21	// total
 
 
 // SCORE_x: for empire scores (e.g. sorting)
@@ -1922,7 +1928,7 @@ typedef struct vehicle_data vehicle_data;
 #define PLAYER_LOG_CHANNEL  "grats"
 
 
-// Modes of connectedness
+// CON_x: Modes of connectedness
 #define CON_PLAYING  0	// Playing - Nominal state
 #define CON_CLOSE  1	// Disconnecting
 #define CON_GET_NAME  2	// By what name ..?
@@ -1946,7 +1952,7 @@ typedef struct vehicle_data vehicle_data;
 #define CON_FINISH_CREATION  20	// Done!
 #define CON_Q_ARCHETYPE  21	// starting skills and spells
 #define CON_GOODBYE  22	// Close on <enter>
-#define CON_BONUS_CREATION  23	// choose bonus trait (new character)
+	#define CON_UNUSED2  23
 #define CON_BONUS_EXISTING  24	// choose bonus trait (existing char)
 #define CON_PROMO_CODE  25	// promo code?
 #define CON_CONFIRM_PROMO_CODE  26	// promo confirmation
@@ -2467,12 +2473,27 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_OF_DIRS  15	// total number of directions
 
 
-// data for climate types
-#define CLIMATE_NONE  0
-#define CLIMATE_TEMPERATE  1
-#define CLIMATE_ARID  2
-#define CLIMATE_TROPICAL  3
-#define NUM_CLIMATES  4 // total
+// CLIM_x: climate flags -- keywords specifically related to climate
+// These were formally 4 separate 'types' rather than flags. It should be safe
+// to bits a-d after b6, but in b5.84 they are used to detect sectors and crops
+// that need to be updated
+#define CLIM_UNUSED1  BIT(0)	// a. prior to b5.84, this was CLIMATE_NONE 0
+#define CLIM_UNUSED2  BIT(1)	// b. prior to b5.84, this was CLIMATE_TEMPERATE 1
+#define CLIM_UNUSED3  BIT(2)	// c. prior to b5.84, this was CLIMATE_ARID 2
+#define CLIM_UNUSED4  BIT(3)	// d. prior to b5.84, this was CLIMATE_TROPICAL 3
+#define CLIM_HOT  BIT(4)	// e. climate is warmer than normal
+#define CLIM_COLD  BIT(5)	// f. climate is colder than normal
+#define CLIM_HIGH  BIT(6)	// g. higher than normal (peaks)
+#define CLIM_LOW  BIT(7)	// h. lower than normal (depression)
+#define CLIM_MAGICAL  BIT(8)	// i. magical in some way
+#define CLIM_TEMPERATE  BIT(9)	// j. temperate climate
+#define CLIM_ARID  BIT(10)	// k. arid climate or desert
+#define CLIM_TROPICAL  BIT(11)	// l. tropical climate
+#define CLIM_MOUNTAIN  BIT(12)	// m. mountainous climate
+#define CLIM_RIVER  BIT(13)	// n. moving (fresh) water
+#define CLIM_FRESH_WATER  BIT(14)	// o. lake, pond; non-moving water
+#define CLIM_SALT_WATER  BIT(15)	// p. ocean, sea; salt water
+#define CLIM_FOREST  BIT(16)	// q. forested
 
 
 // DPLTN_x: depletion types
@@ -2508,7 +2529,9 @@ typedef struct vehicle_data vehicle_data;
 #define EVO_WINTER  15	// triggers if it's winter
 #define EVO_BURNS_TO  16	// caused by a player burning it
 #define EVO_SPREADS_TO  17	// reverse of adjacent-one
-#define NUM_EVOS  18	// total
+#define EVO_HARVEST_TO  18	// always harvests to a specific sector type (no matter what it was when planted)
+#define EVO_DEFAULT_HARVEST_TO  19	// sect it becomes when harvested/cleared IF no data exists
+#define NUM_EVOS  20	// total
 
 // evolution value types
 #define EVO_VAL_NONE  0
@@ -2579,6 +2602,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_MINE_GLB_VNUM  17
 #define ROOM_EXTRA_TRENCH_FILL_TIME  18  // when the trench will be filled
 #define ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR  19	// for un-trenching correctly
+#define ROOM_EXTRA_ORIGINAL_BUILDER  20	// person who started the building
 
 
 // number of different appearances
@@ -2598,6 +2622,7 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_COIN  2140000000	// 2.14b (< MAX_INT)
 #define MAX_COIN_TYPES  10	// don't store more than this many different coin types
 #define MAX_CONDITION  750	// FULL, etc
+#define MAX_CONFIG_TEXT  4000	// long-string configs
 #define MAX_EMPIRE_DESCRIPTION  2000
 #define MAX_FACTION_DESCRIPTION  4000
 #define MAX_GROUP_SIZE  4	// how many members a group allows
@@ -2704,6 +2729,36 @@ struct ban_list_element {
 	char name[MAX_NAME_LENGTH+1];
 	
 	struct ban_list_element *next;
+};
+
+
+// data storage for config system
+union config_data_union {
+	bitvector_t bitvector_val;
+	bool bool_val;
+	double double_val;
+	int int_val;
+	int *int_array;
+	char *string_val;
+};
+
+
+// for the master config system
+struct config_type {
+	int set;	// CONFIG_
+	char *key;	// string key
+	int type;	// CONFTYPE_x how to access the data
+	char *description;	// long desc for contextual help
+	
+	union config_data_union data;	// whatever type of data is stored here (based on type)
+	int data_size;	// for array data
+	
+	// for types with their own handlers
+	CONFIG_HANDLER(*show_func);
+	CONFIG_HANDLER(*edit_func);
+	void *custom_data;
+	
+	UT_hash_handle hh;	// config_table hash
 };
 
 
@@ -3662,6 +3717,7 @@ struct descriptor_data {
 	int notes_id;	// idnum of player for notes-editing
 	int island_desc_id;	// editing an island desc
 	any_vnum save_empire;	// for the text editor to know which empire to save
+	struct config_type *save_config;	// saves the config file when done editing text
 	bool allow_null;	// string editor can be empty/null
 	
 	int has_prompt;	// is the user at a prompt?
@@ -4231,8 +4287,8 @@ struct crop_data {
 	struct icon_data *icons;	// linked list of available icons
 	int mapout;	// position in mapout_color_names, mapout_color_tokens
 	
-	int climate;	// CLIMATE_x
-	bitvector_t flags;	// CROPF_x flags
+	bitvector_t climate;	// CLIM_ flags
+	bitvector_t flags;	// CROPF_ flags
 	
 	// only spawns where:
 	int x_min;	// x >= this
@@ -5138,8 +5194,8 @@ struct sector_data {
 	int mapout;	// position in mapout_color_names, mapout_color_tokens
 	
 	int movement_loss;	// move point cost
-	int climate;	// CLIMATE_x
-	bitvector_t flags;	// SECTF_x flags
+	bitvector_t climate;	// CLIM_ flags
+	bitvector_t flags;	// SECTF_ flags
 	bitvector_t build_flags;	// matches up with craft_data.build_on and .build_facing
 	
 	struct spawn_info *spawns;	// mob spawn data

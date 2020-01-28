@@ -923,6 +923,7 @@ Privileges:
   storage: can retrieve from storage buildings
   warehouse: can retrieve unique items from the warehouse
   progress: can buy progression goals
+  dismantle: can dismantle buildings owned by the empire
 
 See also: CLAIM, BUILD, HARVEST, PROMOTE, DEMOTE, CHOP, CEDE, EEDIT, ELOG
 #

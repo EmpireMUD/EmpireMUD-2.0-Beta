@@ -17,10 +17,17 @@ mud_minimum_age
 mud_name EmpireMUD
 mud_status Live
 mud_website
+name_rules 0
+name_rules_lastname 0
 newyear_message The ground under you shakes violently!
 no_person No-one by that name here.
 ok_string Okay.
 public_logins 0
+start_message 1
+   Welcome. This is your new EmpireMUD character! You can now earn wealth,
+acquire territory, harvest grain, and command an empire! Try the INFO and HELP
+commands to get started.
+~
 starting_year 1150
 welcome_message Welcome to your EmpireMUD! Prepare to face your destiny!
 who_list_sort 0
@@ -131,6 +138,8 @@ default_map_size 7
 delete_inactive_players_after 0
 delete_invalid_players_after 30
 exp_level_difference 50
+hours_to_first_bonus_trait 4
+hours_to_second_bonus_trait 48
 idle_linkdead_rent_time 5
 idle_rent_time 20
 max_capitals_in_name 2
@@ -201,6 +210,7 @@ default_adventure_sect 31
 default_building_sect 10
 default_inside_sect 11
 default_interior 1
+default_land_sect 0
 generic_facing bdeklmno
 interlink_distance 4
 interlink_mountain_limit 1
@@ -231,5 +241,10 @@ tell_approval 1
 terraform_approval 1
 title_approval 1
 travel_approval 1
+unapproved_greeting 1
+   Your character is not yet approved to play on this MUD. You can still enter
+the game, but have a limited set of commands and features. Contact the game's
+staff to find out what you have to do to be approved.
+~
 write_approval 1
 $~

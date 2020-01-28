@@ -29,7 +29,7 @@
 */
 
 // external consts
-extern const char *climate_types[];
+extern const char *climate_flags[];
 extern const char *crop_flags[];
 extern const char *interact_types[];
 extern const byte interact_vnum_types[NUM_INTERACTS];
@@ -106,7 +106,7 @@ bool audit_crop(crop_data *cp, char_data *ch) {
 			problem = TRUE;
 		}
 	}
-	if (GET_CROP_CLIMATE(cp) == CLIMATE_NONE) {
+	if (GET_CROP_CLIMATE(cp) == NOBITS) {
 		olc_audit_msg(ch, GET_CROP_VNUM(cp), "Climate not set");
 		problem = TRUE;
 	}
@@ -200,7 +200,7 @@ char *list_one_crop(crop_data *crop, bool detail) {
 void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	void remove_crop_from_table(crop_data *crop);
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+	void uncrop_tile(room_data *room);
 	
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
@@ -208,7 +208,6 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	struct map_data *map;
 	room_data *room;
 	crop_data *crop;
-	sector_data *base = NULL;
 	bool found;
 	int count;
 	
@@ -225,9 +224,6 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	// remove it from the hash table first
 	remove_crop_from_table(crop);
 	
-	// save base sect for later
-	base = sector_proto(climate_default_sector[GET_CROP_CLIMATE(crop)]);
-
 	// save index and crop file now
 	save_index(DB_BOOT_CROP);
 	save_library_file_for_vnum(DB_BOOT_CROP, vnum);
@@ -242,7 +238,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 				room = real_room(map->vnum);
 			}
 			set_crop_type(room, NULL);	// remove it explicitly
-			change_terrain(room, GET_SECT_VNUM(base));
+			uncrop_tile(room);
 			++count;
 		}
 	}
@@ -302,8 +298,8 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 void olc_fullsearch_crop(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts;
-	bitvector_t not_flagged = NOBITS, only_flags = NOBITS;
-	int count, only_climate = NOTHING, only_mapout = NOTHING, only_x = NOTHING, only_y = NOTHING;
+	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
+	int count, only_mapout = NOTHING, only_x = NOTHING, only_y = NOTHING;
 	struct interaction_item *inter;
 	crop_data *crop, *next_crop;
 	struct icon_data *icon;
@@ -325,7 +321,7 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 			continue;	// just skip stray dashes
 		}
 		
-		FULLSEARCH_LIST("climate", only_climate, climate_types)
+		FULLSEARCH_FLAGS("climate", only_climate, climate_flags)
 		FULLSEARCH_FLAGS("flags", only_flags, crop_flags)
 		FULLSEARCH_FLAGS("flagged", only_flags, crop_flags)
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
@@ -372,7 +368,7 @@ void olc_fullsearch_crop(char_data *ch, char *argument) {
 		if (not_flagged != NOBITS && CROP_FLAGGED(crop, not_flagged)) {
 			continue;
 		}
-		if (only_climate != NOTHING && GET_CROP_CLIMATE(crop) != only_climate) {
+		if (only_climate != NOBITS && (GET_CROP_CLIMATE(crop) & only_climate) != only_climate) {
 			continue;
 		}
 		if (only_mapout != NOTHING && GET_CROP_MAPOUT(crop) != only_mapout) {
@@ -617,7 +613,8 @@ void olc_show_crop(char_data *ch) {
 	get_icons_display(GET_CROP_ICONS(cp), buf1);
 	strcat(buf, buf1);
 	
-	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(GET_CROP_CLIMATE(cp), 0), climate_types[GET_CROP_CLIMATE(cp)]);
+	sprintbit(GET_CROP_CLIMATE(cp), climate_flags, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(GET_CROP_CLIMATE(cp), NOBITS), lbuf);
 
 	sprintbit(GET_CROP_FLAGS(cp), crop_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_CROP_FLAGS(cp), NOBITS), lbuf);
@@ -650,7 +647,7 @@ void olc_show_crop(char_data *ch) {
 
 OLC_MODULE(cropedit_climate) {
 	crop_data *cp = GET_OLC_CROP(ch->desc);
-	GET_CROP_CLIMATE(cp) = olc_process_type(ch, argument, "climate", "climate", climate_types, GET_CROP_CLIMATE(cp));
+	GET_CROP_CLIMATE(cp) = olc_process_flag(ch, argument, "climate", "climate", climate_flags, GET_CROP_CLIMATE(cp));
 }
 
 

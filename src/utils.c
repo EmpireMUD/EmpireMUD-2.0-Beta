@@ -269,7 +269,8 @@ bool has_one_day_playtime(char_data *ch) {
 */
 int num_earned_bonus_traits(char_data *ch) {
 	struct time_info_data t;
-	int count = 1;	// all players deserve 1
+	int hours;
+	int count = 0;	// number of traits to give
 	
 	if (IS_NPC(ch)) {
 		return 0;
@@ -277,7 +278,11 @@ int num_earned_bonus_traits(char_data *ch) {
 	
 	// extra point at 2 days playtime
 	t = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
-	if (t.day >= 2) {
+	hours = t.day * 24 + t.hours;
+	if (hours >= config_get_int("hours_to_first_bonus_trait")) {
+		++count;
+	}
+	if (hours >= config_get_int("hours_to_second_bonus_trait")) {
 		++count;
 	}
 
@@ -3462,18 +3467,34 @@ void unmark_items_for_char(char_data *ch, bool ground) {
 *
 * @param bitvector_t with_flags Find a sect that has these flags.
 * @param bitvector_t without_flags Find a sect that doesn't have these flags.
+* @param bitvector_t prefer_climate Will attempt to find a good match for this climate (but will return without it if not).
 * @return sector_data* A sector, or NULL if none matches.
 */
-sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags) {
-	sector_data *sect, *next_sect;
+sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags, bitvector_t prefer_climate) {
+	sector_data *sect, *next_sect, *low_climate = NULL, *no_climate = NULL;
 	
 	HASH_ITER(hh, sector_table, sect, next_sect) {
-		if ((with_flags == NOBITS || SECT_FLAGGED(sect, with_flags)) && (without_flags == NOBITS || !SECT_FLAGGED(sect, without_flags))) {
-			return sect;
+		if (with_flags && !SECT_FLAGGED(sect, with_flags)) {
+			continue;
+		}
+		if (without_flags && SECT_FLAGGED(sect, without_flags)) {
+			continue;
+		}
+		
+		// ok it matches flags, now check climate
+		if (!prefer_climate || (GET_SECT_CLIMATE(sect) & prefer_climate) == prefer_climate) {
+			return sect;	// perfect match
+		}
+		else if (!low_climate && prefer_climate && (GET_SECT_CLIMATE(sect) & prefer_climate)) {
+			low_climate = sect;	// missing some climate flags
+		}
+		else if (!no_climate) {
+			no_climate = sect;	// missing all climate flags
 		}
 	}
 	
-	return NULL;
+	// if we got here, there was no perfect match
+	return low_climate ? low_climate : no_climate;
 }
 
 
@@ -3863,6 +3884,56 @@ bool multi_isname(const char *arg, const char *namelist) {
 	}
 	
 	return ok;
+}
+
+
+/*
+ * Like sprintbit, this turns a bitvector and a list of names into a string.
+ * However, this one also takes an orderering array -- the bits will be
+ * displayed in the order of that array (for each bit present) and any bits
+ * not in that array will not be displayed.
+ *
+ * If you don't have a 'const' array, just cast it as such.  It's safer
+ * to cast a non-const array as const than to cast a const one as non-const.
+ * Doesn't really matter since this function doesn't change the array though.
+ * 
+ * @param bitvector_t bitvector The bits to display.
+ * @param const char *names[] The names for each bit (terminated with "\n" at the end of the array).
+ * @param const bitvector_t order[] The order to display the bits in (terminated with 0/NOBITS at the end).
+ * @param bool commas If TRUE, comma-separates the bits.
+ * @param char *result A string to store the output in (ideally MAX_STRING_LENGTH).
+ */
+void ordered_sprintbit(bitvector_t bitvector, const char *names[], const bitvector_t order[], bool commas, char *result) {
+	int iter, pos, n_len = 0;
+	bitvector_t temp;
+	
+	// determine lengths of the name array (safe max of 128 is double the largest possible number of bits)
+	// - this is for array access safety if they are not the same length or if bits fall outside those arrays
+	for (iter = 0; n_len == 0 && iter < 128; ++iter) {
+		if (*names[iter] == '\n') {
+			n_len = iter;
+		}
+	}
+	
+	// init string
+	*result = '\0';
+	
+	// iterate over order array
+	for (iter = 0; order[iter] != NOBITS; ++iter) {
+		if (IS_SET(bitvector, order[iter])) {
+			// determine bit pos and append flag name
+			temp = order[iter];
+			for (pos = 0; temp; ++pos, temp >>= 1) {
+				if (IS_SET(temp, 1)) {
+					sprintf(result + strlen(result), "%s%s", (*result ? (commas ? ", " : " ") : ""), (pos < n_len ? names[pos] : "UNDEFINED"));
+				}
+			}
+		}
+	}
+	
+	if (!*result) {
+		strcpy(result, "NOBITS");
+	}
 }
 
 

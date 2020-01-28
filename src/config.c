@@ -24,7 +24,6 @@
 
 // TODO convert more of these configs to the in-game config system
 // TODO add string-array config type (default channels, could have add/remove)
-// TODO add long-string type (fread_string; text editor)
 // TODO add double-array (empire score levels)
 
 
@@ -37,7 +36,6 @@
 *   Operation Options
 *   Player Configs
 *   War Configs
-*   World Configs
 *   Config System: Data
 *   Config System: Editors
 *   Config System: Custom Editors
@@ -50,7 +48,6 @@
 */
 
 // external vars
-extern const char *bld_on_flags[];
 extern const char *techs[];
 
 // locals
@@ -93,14 +90,6 @@ struct promo_code_list promo_codes[] = {
 	// last
 	{ "\n", FALSE, NULL }
 };
-
-
-// Text shown to players if they are not approved on login  -- TODO add long-form strings to in-game configs
-const char *unapproved_login_message =
-"\r\n&o"
-"Your character is not yet approved to play on this MUD. You can still enter\r\n"
-"the game, but have a limited set of commands and features. Contact the game's\r\n"
-"staff to find out what you have to do to be approved.&0\r\n";
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -163,17 +152,6 @@ struct tedit_struct tedit_option[] = {
 
 	{ "\n", 0, NULL, 0, NULL }
 };
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// MESSAGE CONFIGS /////////////////////////////////////////////////////////
-
-// shown to newbies
-const char *START_MESSG =
-"\r\n"
-"&YWelcome. This is your new EmpireMUD character! You can now earn wealth,\r\n"
-"acquire territory, harvest grain, and command an empire! Try the INFO\r\n"
-"and HELP commands to get started.&0\r\n";
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -276,25 +254,7 @@ bitvector_t pk_ok = PK_WAR;
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// WORLD CONFIGS ///////////////////////////////////////////////////////////
-
-// TODO is it possible to use an int-array but tie its size to NUM_CLIMATES (e.g.)
-
-// CLIMATE_x
-const sector_vnum climate_default_sector[NUM_CLIMATES] = {
-	0,	// plains (no climate)
-	0,	// plains (temperate)
-	20,	// desert
-	27	// jungle
-};
-
-
-
- //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: DATA /////////////////////////////////////////////////////
-
-#define CONFIG_HANDLER(name)	void (name)(char_data *ch, struct config_type *config, char *argument)
-
 
 // groupings for config command
 #define CONFIG_GAME  0
@@ -321,6 +281,7 @@ const sector_vnum climate_default_sector[NUM_CLIMATES] = {
 #define CONFTYPE_INT  4
 #define CONFTYPE_INT_ARRAY  5
 #define CONFTYPE_SHORT_STRING  6 // max length ~ 128
+#define CONFTYPE_LONG_STRING  7	// paragraph length
 
 
 // CONFIG_x groupings for the config command
@@ -352,6 +313,7 @@ const char *config_types[] = {
 	"int",
 	"int array",
 	"short string",
+	"long string",
 	"\n"
 };
 
@@ -363,35 +325,6 @@ const char *who_list_sort_types[] = {
 	"\n"
 };
 
-
-// data storage for config system
-union config_data_union {
-	bitvector_t bitvector_val;
-	bool bool_val;
-	double double_val;
-	int int_val;
-	int *int_array;
-	char *string_val;
-};
-
-
-// for the master config system
-struct config_type {
-	int set;	// CONFIG_
-	char *key;	// string key
-	int type;	// CONFTYPE_x how to access the data
-	char *description;	// long desc for contextual help
-	
-	union config_data_union data;	// whatever type of data is stored here (based on type)
-	int data_size;	// for array data
-	
-	// for types with their own handlers
-	CONFIG_HANDLER(*show_func);
-	CONFIG_HANDLER(*edit_func);
-	void *custom_data;
-	
-	UT_hash_handle hh;	// config_table hash
-};
 
 struct config_type *config_table = NULL;	// hash table of configs
 
@@ -597,7 +530,7 @@ const char *config_get_string(char *key) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_string called with invalid key '%s'", key);
 		return default_string;
 	}
-	if (cnf->type != CONFTYPE_SHORT_STRING) {
+	if (cnf->type != CONFTYPE_SHORT_STRING && cnf->type != CONFTYPE_LONG_STRING) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: config_get_string with non-string key '%s'", key);
 		return default_string;
 	}
@@ -802,6 +735,30 @@ CONFIG_HANDLER(config_edit_int) {
 }
 
 
+// basic handler for long string
+CONFIG_HANDLER(config_edit_long_string) {
+	// basic sanitation
+	if (!ch || !config) {
+		log("SYSERR: config_edit_long_string called without %s", ch ? "config" : "ch");
+		msg_to_char(ch, "Error editing type.\r\n");
+		return;
+	}
+	if (!ch->desc) {
+		return;	// no desc = no work
+	}
+	
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+		return;
+	}
+	else {
+		sprintf(buf, "text for %s", config->key);
+		start_string_editor(ch->desc, buf, &config->data.string_val, MAX_CONFIG_TEXT, TRUE);
+		ch->desc->save_config = config;
+	}
+}
+
+
 // basic handler for sector
 CONFIG_HANDLER(config_edit_sector) {
 	sector_data *old_sect, *new_sect;
@@ -849,7 +806,7 @@ CONFIG_HANDLER(config_edit_short_string) {
 	
 	// basic sanitation
 	if (!ch || !config) {
-		log("SYSERR: config_edit_short_String called without %s", ch ? "config" : "ch");
+		log("SYSERR: config_edit_short_string called without %s", ch ? "config" : "ch");
 		msg_to_char(ch, "Error editing type.\r\n");
 		return;
 	}
@@ -1102,6 +1059,19 @@ CONFIG_HANDLER(config_show_int) {
 }
 
 
+// basic handler for long string type
+CONFIG_HANDLER(config_show_long_string) {
+	// basic sanitation
+	if (!ch || !config) {
+		log("SYSERR: config_show_long_string called without %s", ch ? "config" : "ch");
+		msg_to_char(ch, "Error showing type.\r\n");
+		return;
+	}
+	
+	msg_to_char(ch, "&y%s&0:\r\n%s", config->key, config->data.string_val ? config->data.string_val : "<not set>\r\n");
+}
+
+
 // basic handler for sector
 CONFIG_HANDLER(config_show_sector) {
 	sector_data *sect;
@@ -1303,6 +1273,15 @@ void load_config_system_from_file(void) {
 				cnf->data.string_val = str_dup(arg);
 				break;
 			}
+			case CONFTYPE_LONG_STRING: {
+				if (atoi(arg) > 0) {	// only read if the # is not 0 (0 indicates null text)
+					cnf->data.string_val = fread_string(fl, "config file");
+				}
+				else {
+					cnf->data.string_val = NULL;
+				}
+				break;
+			}
 			default: {
 				log("Unable to load config system: %s: unloadable config type %d", cnf->key, cnf->type);
 				break;
@@ -1342,6 +1321,7 @@ void write_config_int_array(struct config_type *cnf, FILE *fl) {
 * Save all game configs to file.
 */
 void save_config_system(void) {
+	char temp[MAX_STRING_LENGTH];
 	struct config_type *cnf, *next_cnf;
 	int last_set = -1;
 	FILE *fl;
@@ -1386,6 +1366,17 @@ void save_config_system(void) {
 			}
 			case CONFTYPE_SHORT_STRING: {
 				fprintf(fl, "%s %s\n", cnf->key, cnf->data.string_val);
+				break;
+			}
+			case CONFTYPE_LONG_STRING: {
+				if (cnf->data.string_val) {
+					strcpy(temp, NULLSAFE(cnf->data.string_val));
+					strip_crlf(temp);
+					fprintf(fl, "%s 1\n%s~\n", cnf->key, temp);
+				}
+				else {
+					fprintf(fl, "%s 0\n", cnf->key);
+				}
 				break;
 			}
 			default: {
@@ -1599,6 +1590,11 @@ void init_config(int set, char *key, int type, char *description) {
 			cnf->edit_func = config_edit_short_string;
 			break;
 		}
+		case CONFTYPE_LONG_STRING: {
+			cnf->show_func = config_show_long_string;
+			cnf->edit_func = config_edit_long_string;
+			break;
+		}
 		case CONFTYPE_BITVECTOR:
 		case CONFTYPE_INT_ARRAY:
 		default: {
@@ -1679,6 +1675,7 @@ void init_config_system(void) {
 	init_config(CONFIG_APPROVAL, "terraform_approval", CONFTYPE_BOOL, "excavate, fillin, chant of nature");
 	init_config(CONFIG_APPROVAL, "title_approval", CONFTYPE_BOOL, "set own title");
 	init_config(CONFIG_APPROVAL, "travel_approval", CONFTYPE_BOOL, "transport, portal, summon, vehicles");
+	init_config(CONFIG_APPROVAL, "unapproved_greeting", CONFTYPE_LONG_STRING, "shown to unapproved characters on login");
 	init_config(CONFIG_APPROVAL, "write_approval", CONFTYPE_BOOL, "boards, books, mail");
 
 	// game configs
@@ -1696,6 +1693,8 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "mud_name", CONFTYPE_SHORT_STRING, "name of your mud");
 	init_config(CONFIG_GAME, "mud_status", CONFTYPE_SHORT_STRING, "one of: Alpha, Closed Beta, Open Beta, Live");
 	init_config(CONFIG_GAME, "mud_website", CONFTYPE_SHORT_STRING, "your mud's website");
+	init_config(CONFIG_GAME, "name_rules", CONFTYPE_LONG_STRING, "shown during creation");
+	init_config(CONFIG_GAME, "name_rules_lastname", CONFTYPE_LONG_STRING, "shown during creation for last names");
 	init_config(CONFIG_GAME, "newyear_message", CONFTYPE_SHORT_STRING, "text shown to players before the laggy 'new year' world update");
 	init_config(CONFIG_GAME, "starting_year", CONFTYPE_INT, "base year");
 	init_config(CONFIG_GAME, "welcome_message", CONFTYPE_SHORT_STRING, "message shown to all players on login");
@@ -1703,6 +1702,7 @@ void init_config_system(void) {
 	init_config(CONFIG_GAME, "no_person", CONFTYPE_SHORT_STRING, "bad target error for no person");
 	init_config(CONFIG_GAME, "huh_string", CONFTYPE_SHORT_STRING, "message for invalid command");
 	init_config(CONFIG_GAME, "public_logins", CONFTYPE_BOOL, "login/out/alt display to mortlog instead of elog");
+	init_config(CONFIG_GAME, "start_message", CONFTYPE_LONG_STRING, "shown to new characters on login");
 	init_config(CONFIG_GAME, "who_list_sort", CONFTYPE_INT, "what order the who-list appears in");
 		init_config_custom("who_list_sort", config_show_who_list_sort, config_edit_who_list_sort, NULL);
 
@@ -1819,6 +1819,8 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "delete_inactive_players_after", CONFTYPE_INT, "days to a player can be inactive before auto-delete (0 = never)");
 	init_config(CONFIG_PLAYERS, "delete_invalid_players_after", CONFTYPE_INT, "days to wait before deleting players with bad level data (0 = never)");
 	init_config(CONFIG_PLAYERS, "exp_level_difference", CONFTYPE_INT, "levels a player can have above a mob and still gain exp from it");
+	init_config(CONFIG_PLAYERS, "hours_to_first_bonus_trait", CONFTYPE_INT, "how much playtime to get the first bonus trait");
+	init_config(CONFIG_PLAYERS, "hours_to_second_bonus_trait", CONFTYPE_INT, "how much playtime to get the second bonus trait");
 	init_config(CONFIG_PLAYERS, "pool_bonus_amount", CONFTYPE_INT, "bonus trait amount for health/move/mana, multiplied by (level/25)");
 	init_config(CONFIG_PLAYERS, "num_daily_skill_points", CONFTYPE_INT, "easy skillups per day");
 	init_config(CONFIG_PLAYERS, "num_bonus_trait_daily_skills", CONFTYPE_INT, "bonus trait for skillups");
@@ -1910,6 +1912,8 @@ void init_config_system(void) {
 		init_config_custom("default_inside_sect", config_show_sector, config_edit_sector, NULL);
 	init_config(CONFIG_WORLD, "default_adventure_sect", CONFTYPE_INT, "vnum of sector used by instancing system");
 		init_config_custom("default_adventure_sect", config_show_sector, config_edit_sector, NULL);
+	init_config(CONFIG_WORLD, "default_land_sect", CONFTYPE_INT, "vnum of sector for basic land");
+		init_config_custom("default_land_sect", config_show_sector, config_edit_sector, NULL);
 
 
 	// last
@@ -1988,6 +1992,10 @@ ACMD(do_config) {
 				}
 				case CONFTYPE_SHORT_STRING: {
 					lsize = snprintf(line, sizeof(line), "%s", cnf->data.string_val);
+					break;
+				}
+				case CONFTYPE_LONG_STRING: {
+					lsize = snprintf(line, sizeof(line), "<%s>", cnf->data.string_val ? "set" : "not set");
 					break;
 				}
 				default: {

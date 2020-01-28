@@ -36,7 +36,6 @@
 */
 
 // external vars
-extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 extern const char *tool_flags[];
 
 // external funcs
@@ -48,6 +47,7 @@ extern bool is_deep_mine(room_data *room);
 void process_build(char_data *ch, room_data *room, int act_type);
 void scale_item_to_level(obj_data *obj, int level);
 void schedule_crop_growth(struct map_data *map);
+void uncrop_tile(room_data *room);
 
 // cancel protos
 void cancel_resource_list(char_data *ch);
@@ -1820,15 +1820,8 @@ void process_harvesting(char_data *ch) {
 			msg_to_char(ch, "You fail to harvest anything here.\r\n");
 		}
 		
-		// change the sector: attempt to detect
-		crop_data *cp = ROOM_CROP(IN_ROOM(ch));
-		sector_data *sect = cp ? sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]) : NULL;
-		if (!sect) {
-			sect = find_first_matching_sector(NOBITS, SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE);
-		}
-		if (sect) {
-			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
-		}
+		// change the sector:
+		uncrop_tile(IN_ROOM(ch));
 	}
 }
 
@@ -1848,6 +1841,12 @@ void process_hunting(char_data *ch) {
 	// from stored data
 	any_vnum mob_vnum = GET_ACTION_VNUM(ch, 0);
 	int chance_times_100 = GET_ACTION_VNUM(ch, 1);
+	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to keep hunting now.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	
 	if (number(1, 10000) <= chance_times_100) {
 		// found it!
@@ -1889,6 +1888,11 @@ void process_hunting(char_data *ch) {
 		// tick messaging
 		if (!number(0, 2)) {
 			act("You stalk low to the ground, hunting...", FALSE, ch, NULL, NULL, TO_CHAR | TO_SPAMMY);
+		}
+		
+		// chance to raise depletion anyway (the hunter is scaring off game)
+		if (!number(0, 5)) {
+			add_depletion(IN_ROOM(ch), DPLTN_HUNT, FALSE);
 		}
 	}
 }
@@ -2713,7 +2717,7 @@ ACMD(do_chip) {
 		msg_to_char(ch, "You can't chip that!\r\n");
 	}
 	else if (!has_tool(ch, TOOL_KNAPPER)) {
-		msg_to_char(ch, "You need to be wielding some kind of hammer or rock to chip it.\r\n");
+		msg_to_char(ch, "You need to be wielding some kind of knapper (or basic rock) to chip it.\r\n");
 	}
 	else {
 		start_action(ch, ACT_CHIPPING, chip_timer);
@@ -3230,7 +3234,7 @@ ACMD(do_pick) {
 
 
 ACMD(do_plant) {
-	extern const char *climate_types[];
+	extern const char *climate_flags[];
 	
 	struct evolution_data *evo;
 	sector_data *original;
@@ -3279,9 +3283,15 @@ ACMD(do_plant) {
 	else if (!(evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_PLANTS_TO))) {
 		msg_to_char(ch, "Nothing can be planted here.\r\n");
 	}
-	else if (GET_SECT_CLIMATE(SECT(IN_ROOM(ch))) != GET_CROP_CLIMATE(cp)) {
-		strcpy(buf, climate_types[GET_CROP_CLIMATE(cp)]);
-		msg_to_char(ch, "You can only plant that in %s areas.\r\n", strtolower(buf));
+	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, SECT(IN_ROOM(ch)))) {
+		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
+			prettier_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf);
+			msg_to_char(ch, "You can only plant that in areas that are: %s\r\n", buf);
+		}
+		else {
+			sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf, TRUE);
+			msg_to_char(ch, "You can only plant that in %s areas.\r\n", trim(buf));
+		}
 	}
 	else {
 		original = SECT(IN_ROOM(ch));

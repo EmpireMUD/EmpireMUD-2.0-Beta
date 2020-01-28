@@ -1,5 +1,5 @@
 #100
-rock~
+rock rocks~
 a rock~
 A rock is lying on the ground.~
    It's an ordinary, common rock of the sort you find everywhere in the ground.
@@ -30,7 +30,7 @@ R
 5110 0
 S
 #102
-flint stone~
+flint stones rocks~
 a flint stone~
 A piece of flint is lying on the ground.~
    This piece of flint is rough and unworked but, like all flint, holds the
@@ -47,7 +47,7 @@ R
 5117 0
 S
 #103
-stone lightning translucent yellow~
+stone lightning translucent yellow stones gems~
 a yellow lightning stone~
 A translucent yellow lightning stone is lying here.~
 The lightning stone can be used for certain crafts and enchantments.
@@ -61,7 +61,7 @@ R
 5164 0
 S
 #104
-stone bloodstone red~
+stone bloodstone red stones gems~
 a red bloodstone~
 A red bloodstone is sitting on the ground.~
 The bloodstone can be used for certain crafts and enchantments.
@@ -75,7 +75,7 @@ R
 5164 0
 S
 #105
-block stone huge~
+block blocks stone huge~
 a huge stone block~
 A huge stone block is sitting here.~
 The stone block is used in monumental architecture.
@@ -95,7 +95,7 @@ R
 5117 0
 S
 #106
-obsidian rough black piece~
+obsidian rough black piece rocks~
 a rough piece of obsidian~
 A black piece of obsidian is on the ground.~
    Although it's rough and dirty, the gleaming black center of this piece of
@@ -112,7 +112,7 @@ R
 5117 0
 S
 #120
-tree large~
+tree trees large~
 a large tree~
 A large tree has fallen here.~
    You can use a sharp tool to scrape a tree until it's a log, or craft it
@@ -161,7 +161,7 @@ R
 5118 0
 S
 #122
-wood rough~
+wood rough trees~
 some rough wood~
 Some rough wood is stacked here.~
    This scraggly wood looks like it came from more than one type of desert
@@ -193,7 +193,7 @@ It's a very pretty flower.
 7 64
 S
 #124
-log heavy~
+log heavy pillars~
 a heavy log~
 A heavy log has been left here.~
 Logs are used in construction.
@@ -245,7 +245,7 @@ R
 5134 0
 S
 #126
-boards rough~
+boards rough lumber~
 some rough boards~
 There are rough boards stacked here.~
 Lumber is used in building construction.
@@ -274,7 +274,7 @@ R
 5134 0
 S
 #127
-column wooden bound~
+column wooden bound pillars~
 a bound wooden column~
 A bound column of wood is lying on the ground.~
    This sturdy column is made by several thin saplings bound with rope. It
@@ -302,7 +302,7 @@ R
 5118 0
 S
 #128
-tree massive jungle~
+tree trees massive jungle~
 a massive jungle tree~
 A massive tree is lying on its side.~
    You can use a sharp tool to shape this exotic tree into a pillar, or you can
@@ -323,7 +323,7 @@ R
 5118 0
 S
 #129
-pillar wooden fine~
+pillar pillars wooden fine~
 a fine wooden pillar~
 A fine wooden pillar is lying here.~
 This pillar can be used in construction, or sawn into lumber.
@@ -384,7 +384,7 @@ R
 5134 0
 S
 #131
-sapling green~
+sapling saplings green~
 a green sapling~
 A green sapling has fallen here.~
    This sapling is young, straight, and taller than you are. It could be used
@@ -437,7 +437,7 @@ R
 5118 0
 S
 #134
-sapling thorny~
+sapling saplings thorny~
 a thorny sapling~
 A thorny sapling has fallen here.~
    This small sapling is covered in thorns or spines -- the difference hardly
@@ -456,7 +456,7 @@ R
 5118 0
 S
 #135
-sapling reaching~
+sapling saplings reaching~
 a reaching sapling~
 A reaching sapling has fallen here.~
    This sapling is thin, but very strong. In its short life, it grew tall,
@@ -475,7 +475,7 @@ R
 5118 0
 S
 #136
-shoot large~
+shoot large saplings~
 a large shoot~
 A large shoot is lying here.~
    This shoot once grew out of a mighty tree. It is long and straight, and
@@ -643,7 +643,7 @@ R
 5115 0
 S
 #167
-tiningot tin ingot~
+tiningot tin ingots~
 a tin ingot~
 A tin ingot is stacked here.~
    The tin has a bright white color. Tin ingots are primarily smelted with
@@ -658,7 +658,7 @@ R
 5115 0
 S
 #168
-bronzeingot bronze ingot~
+bronzeingot bronze ingots~
 a bronze ingot~
 A bronze ingot is stacked here.~
    The bronze has a rich, brown color and a fine finish. Bronze is used to make
@@ -673,7 +673,7 @@ R
 5115 0
 S
 #170
-ingot silver~
+silveringot silver ingots~
 a silver ingot~
 A silver ingot is stacked here.~
    Ingots are used in crafting, but aren't as valuable as the larger silver
@@ -688,7 +688,7 @@ R
 5611 a
 S
 #171
-ingot gold~
+goldingot gold ingots~
 a gold ingot~
 A gold ingot is stacked here.~
    Ingots are usually used in crafting, and aren't as valuable as larger bars
@@ -703,7 +703,7 @@ R
 5611 a
 S
 #172
-silverbar bar silver~
+silverbar bars silver~
 a silver bar~
 A bar of silver has been left on the ground.~
    Store the silver bar in your vault to gain wealth. You can also separate the
@@ -719,7 +719,7 @@ R
 5611 a
 S
 #173
-goldbar bar gold~
+goldbar bars gold~
 a gold bar~
 A bar of gold is lying on the ground.~
    Store the gold bar in your vault to gain wealth. You can also separate the
@@ -747,7 +747,7 @@ R
 5611 a
 S
 #175
-ironingot ingot iron~
+ironingot ingots iron~
 an iron ingot~
 An iron ingot is sitting on the ground.~
 Iron is used for forging and building.
@@ -761,7 +761,7 @@ R
 5115 0
 S
 #176
-nocturniumingot ingot nocturnium~
+nocturniumingot ingots nocturnium~
 an ingot of nocturnium~
 A nocturnium ingot is sitting on the ground.~
 Nocturnium ore is used in forging high-quality armor and weapons.
@@ -781,7 +781,7 @@ R
 5115 0
 S
 #177
-imperiumingot ingot imperium~
+imperiumingot ingots imperium~
 an imperium ingot~
 An imperium ingot is sitting on the ground.~
 Imperium ore is used in forging high-quality armor and weapons.
@@ -801,7 +801,7 @@ R
 5115 0
 S
 #178
-copperingot copper ingot~
+copperingot copper ingots~
 a copper ingot~
 A copper ingot is sitting here.~
    Copper ingots can be made into bars (to be stored in the vault, for wealth),
@@ -816,7 +816,7 @@ R
 5115 0
 S
 #179
-copperbar bar copper~
+copperbar bars copper~
 a copper bar~
 A bar of copper has been left here.~
 Store the copper bar in your vault to gain wealth.
@@ -833,7 +833,7 @@ R
 5611 a
 S
 #180
-flint chipped~
+flint flints chipped~
 a chipped flint~
 A chipped flint is lying on the ground.~
    Flint knapping -- the process of chipping flakes off a piece of flint to

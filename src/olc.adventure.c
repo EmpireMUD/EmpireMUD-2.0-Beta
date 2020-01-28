@@ -34,6 +34,7 @@ extern const char *adventure_flags[];
 extern const char *adventure_link_flags[];
 extern const char *adventure_link_types[];
 extern const char *bld_on_flags[];
+extern const bitvector_t bld_on_flags_order[];
 extern const char *dirs[];
 
 // external funcs
@@ -603,11 +604,11 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 	
 	for (rule = list; rule; rule = rule->next) {
 		// prepare build on/facing as several types use them
-		sprintbit(rule->bld_on, bld_on_flags, bon, TRUE);
+		ordered_sprintbit(rule->bld_on, bld_on_flags, bld_on_flags_order, FALSE, bon);
 		if (bon[strlen(bon)-1] == ' ') {
 			bon[strlen(bon)-1] = '\0';	// trim
 		}
-		sprintbit(rule->bld_facing, bld_on_flags, bfac, TRUE);
+		ordered_sprintbit(rule->bld_facing, bld_on_flags, bld_on_flags_order, FALSE, bfac);
 		if (bfac[strlen(bfac)-1] == ' ') {
 			bfac[strlen(bfac)-1] = '\0';	// trim
 		}
@@ -1135,11 +1136,11 @@ OLC_MODULE(advedit_linking) {
 				msg_to_char(ch, " - dir: %s\r\n", dirs[dir]);
 			}
 			if (need_buildon) {
-				sprintbit(buildon, bld_on_flags, lbuf, TRUE);
+				ordered_sprintbit(buildon, bld_on_flags, bld_on_flags_order, TRUE, lbuf);
 				msg_to_char(ch, " - built on: %s\r\n", lbuf);
 			}
 			if (need_buildfacing) {
-				sprintbit(buildfacing, bld_on_flags, lbuf, TRUE);
+				ordered_sprintbit(buildfacing, bld_on_flags, bld_on_flags_order, TRUE, lbuf);
 				msg_to_char(ch, " - built facing: %s\r\n", lbuf);
 			}
 			if (need_portalin) {

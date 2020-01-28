@@ -485,6 +485,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 
 // helpers
 #define CROP_FLAGGED(crp, flg)  (IS_SET(GET_CROP_FLAGS(crp), (flg)))
+#define MATCH_CROP_SECTOR_CLIMATE(crop, sect)  (!GET_CROP_CLIMATE(crop) || (GET_CROP_CLIMATE(crop) & GET_SECT_CLIMATE(sect)) == GET_CROP_CLIMATE(crop) || (CROP_FLAGGED((crop), CROPF_ANY_LISTED_CLIMATE) && (GET_CROP_CLIMATE(crop) & GET_SECT_CLIMATE(sect))))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1699,6 +1700,7 @@ extern int count_icon_codes(char *string);
 extern bool strchrstr(const char *haystack, const char *needles);
 extern int str_cmp(const char *arg1, const char *arg2);
 extern int strn_cmp(const char *arg1, const char *arg2, int n);
+void ordered_sprintbit(bitvector_t bitvector, const char *names[], const bitvector_t order[], bool commas, char *result);
 void prettier_sprintbit(bitvector_t bitvector, const char *names[], char *result);
 void prune_crlf(char *txt);
 extern const char *skip_filler(const char *string);
@@ -1724,7 +1726,7 @@ extern int get_direction_to(room_data *from, room_data *to);
 extern room_data *get_map_location_for(room_data *room);
 extern room_data *real_shift(room_data *origin, int x_shift, int y_shift);
 extern room_data *straight_line(room_data *origin, room_data *destination, int iter);
-extern sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags);
+extern sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags, bitvector_t prefer_climate);
 
 // misc functions from utils.c
 extern char *simple_time_since(time_t when);

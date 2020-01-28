@@ -744,6 +744,10 @@ ACMD(do_hunt) {
 		msg_to_char(ch, "You don't have the right ability to hunt anything.\r\n");
 		return;
 	}
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to hunt anything right now.\r\n");
+		return;
+	}
 	if (!IS_OUTDOORS(ch)) {
 		msg_to_char(ch, "You can only hunt while outdoors.\r\n");
 		return;

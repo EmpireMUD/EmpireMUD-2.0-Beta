@@ -1,7 +1,7 @@
 #0
 Plains~
 The Open Plains~
-'.' 10 1 2 l bp
+'.' 10 j 2 l bp
 C
 dig, pick~
 D1
@@ -192,7 +192,7 @@ S
 #1
 Light Forest~
 A Light Forest~
-'.' 14 1 2 dl np
+'.' 14 jq 2 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -364,7 +364,7 @@ S
 #2
 Forest~
 A Forest~
-'^' 14 1 3 dl np
+'^' 14 jq 3 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -502,7 +502,7 @@ S
 #3
 Shady Forest~
 A Shady Forest~
-'^' 14 1 4 dl np
+'^' 14 jq 4 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -630,7 +630,7 @@ S
 #4
 Overgrown Forest~
 An Overgrown Forest~
-'^' 14 1 5 dl dnp
+'^' 14 jq 5 dl dnp
 C
 chop, dig, gather, pick~
 D1
@@ -786,7 +786,7 @@ S
 #5
 River~
 A River~
-'~' 17 0 10 gi af
+'~' 17 no 10 gi af
 D1
 ~~~~~
 &c~
@@ -820,7 +820,7 @@ S
 #6
 Ocean~
 The Ocean~
-'~' 19 0 10 ceho ai
+'~' 19 p 10 ceho ai
 D0
 ~~~~~
 &B~
@@ -933,7 +933,7 @@ S
 #7
 Crop~
 A Crop~
-'.' 10 1 3 djk kp
+'.' 10 j 3 djk kp
 C
 dig, harvest~
 D1
@@ -948,6 +948,8 @@ D3
 D4
 ????~
 &0~
+E
+19 0 100.00 0
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
@@ -995,7 +997,7 @@ S
 #8
 Mountain~
 On a Mountain~
-'^' 25 0 75 lnsv c
+'^' 25 m 75 lnsv c
 C
 dig, pick~
 D1
@@ -1168,7 +1170,7 @@ S
 #12
 Desert Crop~
 A Desert Crop~
-'.' 21 2 3 djk kp
+'.' 21 k 3 djk kp
 C
 dig, harvest~
 D1
@@ -1183,6 +1185,8 @@ D3
 D4
 ????~
 &y~
+E
+19 0 100.00 20
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
@@ -1280,7 +1284,7 @@ S
 #13
 Seeded Field~
 A Seeded Field~
-',' 10 1 3 j kp
+',' 10 j 3 j kp
 C
 dig~
 D0
@@ -1290,6 +1294,8 @@ E
 1 0 100.00 7
 E
 9 0 20.00 7
+E
+19 0 100.00 0
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3003 100.00 1  # FORAGE: a handful of grain
@@ -1349,7 +1355,7 @@ S
 #14
 Sandy Field~
 A Sandy Field~
-',' 21 2 3 j kp
+',' 21 k 3 j kp
 C
 dig~
 D0
@@ -1359,6 +1365,8 @@ E
 1 0 100.00 12
 E
 9 0 20.00 12
+E
+19 0 100.00 20
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
@@ -1457,7 +1465,7 @@ S
 #15
 Jungle Field~
 A Jungle Field~
-',' 12 3 3 j kp
+',' 12 l 3 j kp
 C
 gather~
 D0
@@ -1467,6 +1475,8 @@ E
 1 0 100.00 16
 E
 9 0 20.00 16
+E
+19 0 100.00 27
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 133 100.00 1  # GATHER: a tangle of vines
 M
@@ -1539,7 +1549,7 @@ S
 #16
 Jungle Crop~
 A Jungle Crop~
-'.' 12 3 3 djk kp
+'.' 12 l 3 djk kp
 C
 harvest~
 D1
@@ -1554,6 +1564,8 @@ D3
 D4
 ????~
 &g~
+E
+19 0 100.00 27
 M
 9061 0.01 d
 M
@@ -1624,7 +1636,7 @@ S
 #17
 Trench~
 A Trench~
-'.' 24 1 4 t 0
+'.' 24 hj 4 t 0
 C
 dig, excavate, fillin, pour~
 D1
@@ -1667,7 +1679,7 @@ S
 #19
 Canal~
 A Canal~
-'~' 17 0 8 gi af
+'~' 17 o 8 gi af
 D0
 @w&?~~@e~
 &c~
@@ -1675,7 +1687,7 @@ S
 #20
 Desert~
 An Arid Desert~
-'.' 21 2 2 l ep
+'.' 21 k 2 l ep
 C
 dig~
 D1
@@ -1810,7 +1822,7 @@ S
 #21
 Oasis~
 A Sparkling Oasis~
-'~' 18 2 6 iw jop
+'~' 18 ko 6 iw jop
 C
 dig, drink, fill, gather, pick~
 D1
@@ -1941,7 +1953,7 @@ S
 #22
 Sandy Trench~
 A Sandy Trench~
-'.' 24 2 4 t 0
+'.' 24 hk 4 t 0
 C
 dig, excavate, fillin, pour~
 D1
@@ -1965,7 +1977,7 @@ S
 #23
 Desert Stumps~
 A Group of Stumps in the Desert~
-'.' 21 2 2 dl ep
+'.' 21 k 2 dl ep
 C
 burn stumps, dig, pick~
 D1
@@ -2104,7 +2116,7 @@ S
 #24
 Desert Copse~
 A Gnarled Desert Copse~
-'w' 11 2 6 ad p
+'w' 11 k 6 ad p
 C
 chop, dig, pick~
 D0
@@ -2217,7 +2229,7 @@ S
 #25
 Desert Shrub~
 A Large Shrub in the Desert~
-'w' 11 2 5 ad p
+'w' 11 k 5 ad p
 C
 chop, dig, pick~
 D0
@@ -2333,7 +2345,7 @@ S
 #26
 Grove~
 A Shady Desert Grove~
-'^' 10 2 6 adl lp
+'^' 10 kq 6 adl lp
 C
 chop, dig, gather, pick~
 D0
@@ -2447,7 +2459,7 @@ S
 #27
 Partial Jungle~
 The Jungle, Partially Cleared~
-'^' 12 3 6 d g
+'^' 12 lq 6 d g
 C
 chop, gather~
 D1
@@ -2555,7 +2567,7 @@ S
 #28
 Jungle~
 The Jungle~
-'^' 12 3 8 d g
+'^' 12 lq 8 d g
 C
 chop, gather~
 D1
@@ -2657,7 +2669,7 @@ S
 #29
 Swamp~
 A Murky Swamp~
-'~' 13 3 10 aw m
+'~' 13 lo 10 aw m
 D0
 ~~~&G^~
 &c~
@@ -2740,7 +2752,7 @@ S
 #30
 Tundra~
 The Arctic Tundra~
-',' 16 1 50 cev 0
+',' 16 f 50 cev 0
 D0
 ,,,,~
 &W~
@@ -2779,7 +2791,7 @@ S
 #31
 Adventure~
 An Adventure~
-'?' 0 1 2 b 0
+'?' 0 j 2 b 0
 D0
 ....~
 &0~
@@ -2787,7 +2799,7 @@ S
 #32
 Lake~
 A Lake~
-'~' 17 0 10 gi au
+'~' 17 o 10 gi au
 D0
 ~~~~~
 &c~
@@ -2807,7 +2819,7 @@ S
 #33
 Frozen Lake~
 A Frozen Lake~
-'~' 2 0 10 0 a
+'~' 2 f 10 0 a
 D0
 ~~~~~
 &W~
@@ -2821,7 +2833,7 @@ S
 #34
 Damaged Jungle~
 A Frost-Damaged Jungle~
-'^' 12 3 6 d 0
+'^' 12 l 6 d 0
 C
 chop, gather~
 D0
@@ -2842,7 +2854,7 @@ S
 #35
 Marsh~
 A Marshy Lakeshore~
-'~' 13 3 10 aw m
+'~' 13 lo 10 aw m
 D0
 ~~~&G^~
 &c~
@@ -2923,7 +2935,7 @@ S
 #36
 Stumps~
 A Field of Stumps~
-'.' 10 1 2 dl bp
+'.' 10 j 2 dl bp
 C
 burn stumps, dig~
 D1
@@ -3098,7 +3110,7 @@ S
 #37
 Small Copse~
 A Small Copse~
-'w' 13 1 2 d p
+'w' 13 j 2 d p
 C
 chop, dig~
 D1
@@ -3264,7 +3276,7 @@ S
 #38
 Copse~
 A Copse of Young Trees~
-'w' 13 1 3 dl p
+'w' 13 j 3 dl p
 C
 chop, dig~
 D1
@@ -3430,7 +3442,7 @@ S
 #39
 Forest Edge~
 The Edge of the Forest~
-'w' 13 1 2 d np
+'w' 13 j 2 d np
 C
 chop, dig~
 D1
@@ -3596,7 +3608,7 @@ S
 #40
 Riverbank~
 On the Plains, Above the Riverbank~
-'.' 10 1 1 l bps
+'.' 10 j 1 l bps
 C
 dig, pick~
 D1
@@ -3777,7 +3789,7 @@ S
 #41
 Floodplains~
 A Flooded Plain~
-'~' 17 1 8 gi ps
+'~' 17 jo 8 gi ps
 C
 fish, pick~
 D0
@@ -3812,7 +3824,7 @@ S
 #42
 Flooded Woods~
 Some Flooded Woods~
-'~' 17 1 3 dgi ps
+'~' 17 joq 3 dgi ps
 C
 chop, fish, pick~
 D0
@@ -3978,7 +3990,7 @@ S
 #43
 Flooded Forest~
 A Flooded Forest~
-'~' 17 1 6 dgi ps
+'~' 17 joq 6 dgi ps
 C
 chop, fish, pick~
 D0
@@ -4016,7 +4028,7 @@ S
 #44
 Light Riverbank Forest~
 Some Trees on the Riverbank~
-'.' 14 1 2 dl nps
+'.' 14 jq 2 dl nps
 C
 chop, dig, gather, pick~
 D1
@@ -4196,7 +4208,7 @@ S
 #45
 Forested Riverbank~
 A Forest, Above the Riverbank~
-'^' 14 1 3 dl nps
+'^' 14 jq 3 dl nps
 C
 chop, dig, gather, pick~
 D1
@@ -4372,7 +4384,7 @@ S
 #46
 Stumped Riverbank~
 Some Stumps on the Riverbank~
-'.' 10 1 1 dl bps
+'.' 10 j 1 dl bps
 C
 burn stumps, dig, pick~
 D1
@@ -4535,7 +4547,7 @@ S
 #47
 Riverside Copse~
 A Copse on the Riverbank~
-'w' 13 1 3 d p
+'w' 13 j 3 d p
 C
 chop, dig, pick~
 D1
@@ -4715,7 +4727,7 @@ S
 #50
 Shore~
 Along the Shore~
-'.' 10 1 2 l bpr
+'.' 10 j 2 l bpr
 C
 dig, pick~
 D1
@@ -4889,7 +4901,7 @@ S
 #51
 Beach~
 A Sandy Beach~
-'.' 21 2 2 l epr
+'.' 21 k 2 l epr
 C
 dig, pick~
 D1
@@ -5019,7 +5031,7 @@ S
 #52
 Cliffs~
 Along the Cliffs~
-'^' 25 0 50 nv c
+'^' 25 m 50 nv c
 C
 dig, pick~
 D1
@@ -5069,7 +5081,7 @@ S
 #53
 Estuary~
 An Estuary~
-'~' 18 0 10 g afit
+'~' 18 o 10 g afit
 D0
 ~~~~~
 &a~
@@ -5102,7 +5114,7 @@ S
 #54
 Shoreside Tree~
 A Tree by the Shore~
-'.' 14 1 2 dl npr
+'.' 14 j 2 dl npr
 C
 chop, dig, gather, pick~
 D1
@@ -5283,7 +5295,7 @@ S
 #55
 Seaside Jungle~
 The Edge of the Jungle, Overlooking the Sea~
-'^' 12 3 5 d g
+'^' 12 l 5 d g
 C
 chop, gather, pick~
 D0
@@ -5389,7 +5401,7 @@ S
 #56
 Estuary Shore~
 The Shore of the Estuary~
-'.' 37 1 2 l bprs
+'.' 37 j 2 l bprs
 C
 dig, pick~
 D1
@@ -5553,7 +5565,7 @@ S
 #57
 Shallow Sea~
 The Shallow Sea, Near the Coast~
-'~' 18 0 10 h aiq
+'~' 18 p 10 h aiq
 D0
 ~~~~~
 &a~
@@ -5571,7 +5583,7 @@ S
 #58
 Foothills~
 In the Foothills, By a Lake~
-'.' 10 1 4 l bp
+'.' 10 j 4 l bp
 C
 dig, pick~
 D1
@@ -5726,7 +5738,7 @@ S
 #59
 Seaside Stumps~
 Some Stumps Along the Shore~
-'.' 10 1 2 dl bpr
+'.' 10 j 2 dl bpr
 C
 burn stumps, dig, pick~
 D1
@@ -5906,7 +5918,7 @@ S
 #60
 Seaside Copse~
 A Small Copse by the Sea~
-'w' 13 1 2 dl pr
+'w' 13 j 2 dl pr
 C
 chop, dig, pick~
 D1
@@ -6091,7 +6103,7 @@ S
 #61
 Jungle Stumps~
 A Densely Vined Field of Stumps~
-'.' 10 3 3 dl p
+'.' 10 l 3 dl p
 C
 burn stumps~
 D1
@@ -6207,7 +6219,7 @@ S
 #62
 Jungle Copse~
 A Copse of Young Jungle Trees~
-'w' 13 3 6 d 0
+'w' 13 l 6 d 0
 C
 chop~
 D1
@@ -6314,7 +6326,7 @@ S
 #63
 Seaside Jungle Stumps~
 Amidst Tropical Stumps on the Seaside~
-'.' 10 3 3 dl pr
+'.' 10 l 3 dl pr
 C
 burn stumps, pick~
 D0
@@ -6529,7 +6541,7 @@ S
 #64
 Seaside Jungle Copse~
 A Copse in the Jungle by the Sea~
-'w' 13 3 6 d pr
+'w' 13 l 6 d pr
 C
 chop, pick~
 D0
@@ -6747,7 +6759,7 @@ S
 #65
 Jungle Edge~
 The Edge of the Jungle~
-'w' 13 3 5 d 0
+'w' 13 l 5 d 0
 C
 chop~
 D0
@@ -6845,7 +6857,7 @@ S
 #70
 Irrigated Plains~
 An Irrigated Plain~
-'.' 10 1 2 l bp
+'.' 10 j 2 l bp
 C
 dig, pick~
 D1
@@ -6981,7 +6993,7 @@ S
 #71
 Irrigated Forest~
 A Marshy Forest~
-'^' 14 1 3 dl np
+'^' 14 jq 3 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -7119,7 +7131,7 @@ S
 #72
 Irrigated Jungle~
 A Marshy Jungle~
-'^' 14 3 3 d g
+'^' 14 lq 3 d g
 C
 chop, dig, gather, pick~
 D0
@@ -7273,7 +7285,7 @@ S
 #73
 Irrigated Stumps~
 Some Stumps on the Irrigated Plain~
-'.' 10 1 2 dl bp
+'.' 10 j 2 dl bp
 C
 burn stumps, dig, pick~
 D1
@@ -7411,7 +7423,7 @@ S
 #74
 Irrigated Copse~
 An Irrigated Copse~
-'w' 13 1 3 d p
+'w' 13 j 3 d p
 C
 chop, dig, pick~
 D1
@@ -7546,7 +7558,7 @@ S
 #75
 Irrigated Jungle Stumps~
 A Marshy Field of Stumps~
-'.' 10 3 3 dl p
+'.' 10 l 3 dl p
 C
 chop, dig, pick~
 D0
@@ -7700,7 +7712,7 @@ S
 #76
 Irrigated Jungle Copse~
 Irrigated Jungle Copse~
-'w' 13 3 6 d p
+'w' 13 l 6 d p
 C
 chop, dig, pick~
 D0

@@ -45,7 +45,6 @@
 */
 
 // external vars
-extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 
 // external functions
 void check_delayed_load(char_data *ch);
@@ -896,9 +895,11 @@ void verify_sectors(void) {
 	room_data *room;
 	
 	// ensure we have a backup sect
-	use_sect = sector_proto(climate_default_sector[CLIMATE_TEMPERATE]);
-	if (!use_sect) {
-		// just pull the first one
+	use_sect = sector_proto(config_get_int("default_land_sect"));
+	if (!use_sect) {	// backup: try to find one
+		use_sect = find_first_matching_sector(NOBITS, SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE, NOBITS);
+	}
+	if (!use_sect) {	// backup: just pull the first one in the list
 		HASH_ITER(hh, sector_table, sect, next_sect) {
 			use_sect = sect;
 			break;
@@ -1951,6 +1952,7 @@ const char *versions_list[] = {
 	"b5.80",
 	"b5.82",
 	"b5.83",
+	"b5.84",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2107,23 +2109,23 @@ PLAYER_UPDATE_FUNC(b3_2_player_gear_disenchant) {
 
 // removes the PLAYER-MADE flag from rooms and sets their "natural sect" instead
 void b3_2_map_and_gear(void) {
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 	void save_trading_post();
 
 	obj_data *obj, *next_obj, *new, *proto;
 	struct empire_unique_storage *eus;
 	struct trading_post_data *tpd;
-	room_data *room, *next_room;
 	empire_data *emp, *next_emp;
-	crop_vnum type;
-	
-	int ROOM_EXTRA_CROP_TYPE = 2;	// removed extra type
-	bitvector_t ROOM_AFF_PLAYER_MADE = BIT(11);	// removed flag
-	sector_vnum OASIS = 21, SANDY_TRENCH = 22;
 	
 	log("Applying b3.2 update...");
 	
+	/* as of b5.84, this is no longer active because climate_default_sector is gone
 	log(" - updating the map...");
+	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+	room_data *room, *next_room;
+	crop_vnum type;
+	sector_vnum OASIS = 21, SANDY_TRENCH = 22;
+	int ROOM_EXTRA_CROP_TYPE = 2;	// removed extra type
+	bitvector_t ROOM_AFF_PLAYER_MADE = BIT(11);	// removed flag
 	HASH_ITER(hh, world_table, room, next_room) {
 		// player-made
 		if (IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE)) {
@@ -2145,6 +2147,7 @@ void b3_2_map_and_gear(void) {
 			remove_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
 		}
 	}
+	*/
 	
 	log(" - disenchanting the object list...");
 	for (obj = object_list; obj; obj = next_obj) {
@@ -3584,6 +3587,78 @@ PLAYER_UPDATE_FUNC(b5_83_update_players) {
 }
 
 
+// climates changed from scalar ints to bitvectors
+void b5_84_climate_update(void) {
+	sector_data *sect, *next_sect;
+	crop_data *crop, *next_crop;
+	bool changed, any = FALSE;
+	
+	#define old_climate_temperate  1
+	#define old_climate_arid  2
+	#define old_climate_tropical  3
+	
+	log("Updating sectors and crops for the b5.84 patch:");
+	
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		changed = FALSE;
+		switch (GET_SECT_CLIMATE(sect)) {
+			case old_climate_temperate: {
+				GET_SECT_CLIMATE(sect) = CLIM_TEMPERATE;
+				changed = TRUE;
+				break;
+			}
+			case old_climate_arid: {
+				GET_SECT_CLIMATE(sect) = CLIM_ARID;
+				changed = TRUE;
+				break;
+			}
+			case old_climate_tropical: {
+				GET_SECT_CLIMATE(sect) = CLIM_TROPICAL;
+				changed = TRUE;
+				break;
+			}
+			// no default: no work if it's not one of those
+		}
+		if (changed) {
+			any = TRUE;
+			save_library_file_for_vnum(DB_BOOT_SECTOR, GET_SECT_VNUM(sect));
+			log("- Sector [%d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+		}
+	}
+	
+	HASH_ITER(hh, crop_table, crop, next_crop) {
+		changed = FALSE;
+		switch (GET_CROP_CLIMATE(crop)) {
+			case old_climate_temperate: {
+				GET_CROP_CLIMATE(crop) = CLIM_TEMPERATE;
+				changed = TRUE;
+				break;
+			}
+			case old_climate_arid: {
+				GET_CROP_CLIMATE(crop) = CLIM_ARID;
+				changed = TRUE;
+				break;
+			}
+			case old_climate_tropical: {
+				GET_CROP_CLIMATE(crop) = CLIM_TROPICAL;
+				changed = TRUE;
+				break;
+			}
+			// no default: no work if it's not one of those
+		}
+		if (changed) {
+			any = TRUE;
+			save_library_file_for_vnum(DB_BOOT_CROP, GET_CROP_VNUM(crop));
+			log("- Crop [%d] %s", GET_CROP_VNUM(crop), GET_CROP_NAME(crop));
+		}
+	}
+	
+	if (!any) {
+		log("- no old climates detected");
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3636,6 +3711,7 @@ void check_version(void) {
 					// setting it back to seeded
 					change_base_sector(room, SECT(room));
 				}
+				/* as of b5.84, this is no longer active because climate_default_sector is gone
 				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT(room) == BASE_SECT(room)) {
 					// second error case: a Seeded crop with itself as its
 					// original sect: detect a new original sect
@@ -3646,6 +3722,7 @@ void check_version(void) {
 						change_base_sector(room, sect);
 					}
 				}
+				*/
 			}
 		}
 		if (MATCH_VERSION("b2.11")) {
@@ -3713,6 +3790,7 @@ void check_version(void) {
 					// setting it back to seeded
 					change_base_sector(room, SECT(room));
 				}
+				/* as of b5.84, this is no longer active because climate_default_sector is gone
 				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(BASE_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(BASE_SECT(room), SECTF_CROP)) {
 					// second error case: a Seeded crop with a Seeded crop as
 					// its original sect: detect a new original sect
@@ -3723,6 +3801,7 @@ void check_version(void) {
 						change_base_sector(room, sect);
 					}
 				}
+				*/
 			}
 		}
 		if (MATCH_VERSION("b3.1")) {
@@ -3871,6 +3950,9 @@ void check_version(void) {
 		if (MATCH_VERSION("b5.83")) {
 			log("Applying b5.83 tool update to players...");
 			update_all_players(NULL, b5_83_update_players);
+		}
+		if (MATCH_VERSION("b5.84")) {
+			b5_84_climate_update();
 		}
 	}
 	

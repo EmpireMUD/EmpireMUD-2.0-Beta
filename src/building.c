@@ -51,6 +51,7 @@ void stop_room_action(room_data *room, int action, int chore);
 
 // external vars
 extern const char *bld_on_flags[];
+extern const bitvector_t bld_on_flags_order[];
 extern const bool can_designate_dir[NUM_OF_DIRS];
 extern const bool can_designate_dir_vehicle[NUM_OF_DIRS];
 extern const char *dirs[];
@@ -407,6 +408,7 @@ void disassociate_building(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_BUILD_RECIPE);
 	remove_room_extra_data(room, ROOM_EXTRA_FOUND_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_REDESIGNATE_TIME);
+	remove_room_extra_data(room, ROOM_EXTRA_ORIGINAL_BUILDER);
 	
 	// some event types must be canceled
 	cancel_stored_event_room(room, SEV_BURN_DOWN);
@@ -1437,7 +1439,7 @@ ACMD(do_build) {
 		msg_to_char(ch, "You don't have permission to build here.\r\n");
 	}
 	else if (!can_build_on(IN_ROOM(ch), GET_CRAFT_BUILD_ON(type))) {
-		prettier_sprintbit(GET_CRAFT_BUILD_ON(type), bld_on_flags, buf);
+		ordered_sprintbit(GET_CRAFT_BUILD_ON(type), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "You need to build on: %s\r\n", buf);
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
@@ -1493,7 +1495,7 @@ ACMD(do_build) {
 		}
 
 		if (!can_build_on(to_room, GET_CRAFT_BUILD_FACING(type))) {
-			prettier_sprintbit(GET_CRAFT_BUILD_FACING(type), bld_on_flags, buf);
+			ordered_sprintbit(GET_CRAFT_BUILD_FACING(type), bld_on_flags, bld_on_flags_order, TRUE, buf);
 			msg_to_char(ch, "You need to build facing: %s\r\n", buf);
 			return;
 		}
@@ -1503,7 +1505,7 @@ ACMD(do_build) {
 		to_rev = real_shift(IN_ROOM(ch), shift_dir[rev_dir[dir]][0], shift_dir[rev_dir[dir]][1]);
 
 		if (!to_rev || !can_build_on(to_rev, GET_CRAFT_BUILD_FACING(type))) {
-			prettier_sprintbit(GET_CRAFT_BUILD_FACING(type), bld_on_flags, buf);
+			ordered_sprintbit(GET_CRAFT_BUILD_FACING(type), bld_on_flags, bld_on_flags_order, TRUE, buf);
 			msg_to_char(ch, "You need to build with the reverse side facing: %s\r\n", buf);
 			return;
 		}
@@ -1512,6 +1514,9 @@ ACMD(do_build) {
 	// begin setup
 	construct_building(IN_ROOM(ch), GET_CRAFT_BUILD_TYPE(type));
 	set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
+	if (!IS_NPC(ch)) {
+		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
+	}
 	
 	special_building_setup(ch, IN_ROOM(ch));
 	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
@@ -1631,7 +1636,7 @@ ACMD(do_dismantle) {
 		return;
 	}
 
-	if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || (!has_permission(ch, PRIV_DISMANTLE, IN_ROOM(ch)) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER) != GET_ACCOUNT(ch)->id)) {
 		msg_to_char(ch, "You don't have permission to dismantle this building.\r\n");
 		return;
 	}
@@ -2059,7 +2064,7 @@ ACMD(do_lay) {
 	static struct resource_data *cost = NULL;
 	sector_data *original_sect = SECT(IN_ROOM(ch));
 	sector_data *check_sect = (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD) ? BASE_SECT(IN_ROOM(ch)) : SECT(IN_ROOM(ch)));
-	sector_data *road_sect = find_first_matching_sector(SECTF_IS_ROAD, NOBITS);
+	sector_data *road_sect = find_first_matching_sector(SECTF_IS_ROAD, NOBITS, GET_SECT_CLIMATE(check_sect));
 	struct resource_data *charged = NULL;
 	
 	if (!cost) {
@@ -2291,7 +2296,7 @@ ACMD(do_tunnel) {
 		msg_to_char(ch, "You must be in an empire with the technology to make tunnels to do that.\r\n");
 	}
 	else if (!can_build_on(IN_ROOM(ch), exit_bld_flags)) {
-		prettier_sprintbit(exit_bld_flags, bld_on_flags, buf);
+		ordered_sprintbit(exit_bld_flags, bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "You must start the tunnel from: %s\r\n", buf);
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
@@ -2304,7 +2309,7 @@ ACMD(do_tunnel) {
 		msg_to_char(ch, "Invalid tunnel direction '%s'.\r\n", arg);
 	}
 	else if (!(entrance = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])) || !can_build_on(entrance, mountain_bld_flags)) {
-		prettier_sprintbit(mountain_bld_flags, bld_on_flags, buf);
+		ordered_sprintbit(mountain_bld_flags, bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "You must have the entrance on: %s\r\n", buf);
 	}
 	else if (!can_use_room(ch, entrance, MEMBERS_ONLY)) {
@@ -2346,7 +2351,7 @@ ACMD(do_tunnel) {
 			msg_to_char(ch, "You are unable to tunnel through the mountain here.\r\n");
 		}
 		else if (!can_build_on(exit, mountain_bld_flags)) {
-			prettier_sprintbit(mountain_bld_flags, bld_on_flags, buf);
+			ordered_sprintbit(mountain_bld_flags, bld_on_flags, bld_on_flags_order, TRUE, buf);
 			msg_to_char(ch, "You must have the exit on: %s (something may be in the way)\r\n", buf);
 		}
 		else if (!can_use_room(ch, exit, MEMBERS_ONLY)) {
@@ -2359,7 +2364,7 @@ ACMD(do_tunnel) {
 			msg_to_char(ch, "You don't have permission to tunnel through the other side.\r\n");
 		}
 		else if (!can_build_on(past_exit, exit_bld_flags)) {
-			prettier_sprintbit(exit_bld_flags, bld_on_flags, buf);
+			ordered_sprintbit(exit_bld_flags, bld_on_flags, bld_on_flags_order, TRUE, buf);
 			msg_to_char(ch, "You must end the tunnel on: %s\r\n", buf);
 		}
 		else {

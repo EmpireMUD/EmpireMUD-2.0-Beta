@@ -629,6 +629,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
 	extern const char *bld_on_flags[];
+	extern const bitvector_t bld_on_flags_order[];
 	extern const char *craft_flag_for_info[];
 	extern const char *item_types[];
 	extern const char *wear_bits[];
@@ -723,10 +724,10 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	msg_to_char(ch, "Notes: %s\r\n", part);
 	
 	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
-		prettier_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, buf);
+		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "Build on: %s\r\n", buf);
 		if (GET_CRAFT_BUILD_FACING(craft)) {
-			prettier_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, buf);
+			ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
 			msg_to_char(ch, "Build facing: %s\r\n", buf);
 		}
 	}

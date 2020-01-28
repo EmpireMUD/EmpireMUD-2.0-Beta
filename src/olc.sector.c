@@ -30,7 +30,8 @@
 
 // external consts
 extern const char *bld_on_flags[];
-extern const char *climate_types[];
+extern const bitvector_t bld_on_flags_order[];
+extern const char *climate_flags[];
 extern const char *evo_types[];
 extern const int evo_val_types[NUM_EVOS];
 extern const char *interact_types[];
@@ -93,7 +94,7 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 			problem = TRUE;
 		}
 	}
-	if (GET_SECT_CLIMATE(sect) == CLIMATE_NONE) {
+	if (GET_SECT_CLIMATE(sect) == NOBITS) {
 		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Climate not set");
 		problem = TRUE;
 	}
@@ -224,7 +225,6 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void remove_sector_from_table(sector_data *sect);
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
 	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
 	quest_data *quest, *next_quest;
@@ -255,7 +255,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	save_library_file_for_vnum(DB_BOOT_SECTOR, vnum);
 	
 	// find a replacement sector for the world
-	replace_sect = sector_proto(climate_default_sector[CLIMATE_TEMPERATE]);
+	replace_sect = sector_proto(config_get_int(""));
 	if (!replace_sect) {
 		// just pull the first one
 		HASH_ITER(hh, sector_table, sect_iter, next_sect) {
@@ -684,13 +684,14 @@ void olc_show_sector(char_data *ch) {
 	get_icons_display(GET_SECT_ICONS(st), buf1);
 	strcat(buf, buf1);
 
-	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(st->climate, 0), climate_types[st->climate]);
+	sprintbit(GET_SECT_CLIMATE(st), climate_flags, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(st->climate, NOBITS), lbuf);
 	sprintf(buf + strlen(buf), "<%smovecost\t0> %d\r\n", OLC_LABEL_VAL(st->movement_loss, 0), st->movement_loss);
 
 	sprintbit(GET_SECT_FLAGS(st), sector_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_SECT_FLAGS(st), NOBITS), lbuf);
 	
-	sprintbit(st->build_flags, bld_on_flags, lbuf, TRUE);
+	ordered_sprintbit(st->build_flags, bld_on_flags, bld_on_flags_order, TRUE, lbuf);
 	sprintf(buf + strlen(buf), "<%sbuildflags\t0> %s\r\n", OLC_LABEL_VAL(st->build_flags, NOBITS), lbuf);
 	
 	sprintf(buf + strlen(buf), "<%sevolution\t0>\r\n", OLC_LABEL_PTR(st->evolution));
@@ -729,7 +730,7 @@ OLC_MODULE(sectedit_buildflags) {
 
 OLC_MODULE(sectedit_climate) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	st->climate = olc_process_type(ch, argument, "climate", "climate", climate_types, st->climate);
+	GET_SECT_CLIMATE(st) = olc_process_flag(ch, argument, "climate", "climate", climate_flags, GET_SECT_CLIMATE(st));
 }
 
 

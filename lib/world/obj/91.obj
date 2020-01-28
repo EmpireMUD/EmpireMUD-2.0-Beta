@@ -1,5 +1,5 @@
 #9113
-fur spotted~
+fur furs spotted~
 a spotted fur~
 A spotted fur is draped here.~
 This spotted fur looks like it must have come from some exotic cat.
@@ -13,7 +13,7 @@ R
 5120 0
 S
 #9124
-feather large ostrich~
+feather feathers large ostrich~
 a large ostrich feather~
 A large ostrich feather is lying here.~
 This feather is so large you could almost stuff a pillow with it alone.
@@ -44,7 +44,7 @@ R
 5120 0
 S
 #9136
-antler huge~
+antler antlers huge~
 a huge antler~
 A huge antler is lying here.~
 This antler must have come from a truly enormous animal!
@@ -58,7 +58,7 @@ R
 5120 0
 S
 #9139
-horn rare rhinoceros~
+horn horns rare rhinoceros~
 a rare rhinoceros horn~
 A rare rhinoceros horn is lying here.~
    This exotic conical horn comes from a rhinoceros. Due to their rarity, the
@@ -73,7 +73,7 @@ R
 5193 a
 S
 #9140
-tusk ivory huge~
+tusk tusks ivory huge~
 a huge ivory tusk~
 A huge ivory tusk is lying here.~
 The long, elegantly curved ivory tusk must have come from a great elephant.
@@ -87,7 +87,7 @@ R
 5193 a
 S
 #9141
-horn rhinoceros~
+horn horns rhinoceros~
 a rhinoceros horn~
 A rhinoceros horn is lying here.~
 The horn is cracked, but should still fetch a decent price.
@@ -160,7 +160,7 @@ C
 1 100
 S
 #9177
-fur bear polar~
+fur furs bear polar~
 a polar bear fur~
 A polar bear's fur is heaped on the ice.~
    The polar bear fur is thick and warm. It could be sewn into garments for
@@ -177,7 +177,7 @@ R
 5120 0
 S
 #9178
-horn narwhal narwal~
+horn horns narwhal narwal~
 a narwhal's horn~
 A narwhal's horn pokes through the ice nearby.~
    Long as a lance from base to tip, the exposed surface of the horn weaves a
@@ -194,7 +194,7 @@ C
 100 150
 S
 #9180
-tusk walrus~
+tusk tusks walrus~
 a walrus tusk~
 A tusk from a walrus sticks out of the ice nearby.~
    The tusk forms a curve from massive root to blunted tip, easily the length
@@ -209,7 +209,7 @@ R
 5120 0
 S
 #9181
-fur wolverine~
+fur furs wolverine~
 a wolverine fur~
 A wolverine fur is piled on the ice.~
    The thick, slightly oily wolverine fur is a bristling mess of tawny-tipped
@@ -243,7 +243,7 @@ C
 75 100
 S
 #9183
-bear polarbear cloak~
+cloak bear polarbear~
 a polar bear cloak~
 A cloak of polar bear fur rests nearby.~
    The thick white fur is slightly oily to the touch, perfect for protection
@@ -260,7 +260,7 @@ C
 100 150
 S
 #9185
-sealskin skin~
+sealskin skins~
 a sealskin~
 A sealskin is piled on the ice.~
    The skin of the elephant seal is beaded with melted snow, which runs off due

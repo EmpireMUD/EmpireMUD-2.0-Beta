@@ -1794,13 +1794,14 @@ This command allows you to set your character moving in a given direction, or
 along a path you specify. Paths must be pairs of directions and distances which
 your character will move in order.
 
-You will run faster if you took the 'faster walking' bonus trait during
-character creation.
+You will run faster if you have the 'faster walking' bonus trait.
 
 Examples:
  > run east
  > run 3e 4n 7nw
  > run east 3, north 4, northwest 7
+
+See also: BONUS TRAITS
 #
 SAIL DRIVE PILOT SAILING DRIVING PILOTING
 

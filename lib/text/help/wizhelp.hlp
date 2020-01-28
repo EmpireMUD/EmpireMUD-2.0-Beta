@@ -160,6 +160,8 @@ view explanations for the configs using the -v option with any set of configs.
 Be careful changing global configs, as some of them make powerful changes to
 features.
 
+Long strings use the full text editor. To edit, use: config <type> <key> edit
+
 There is no undo button, but all changes are logged.
 
 If you want to experiment with the system, you can change test_config in the

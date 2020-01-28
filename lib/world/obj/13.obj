@@ -1,5 +1,5 @@
 #1300
-seashell shell green glowing~
+seashell shells green glowing gems~
 a glowing green seashell~
 A glowing green seashell is sitting on the ground.~
 The seashell can be used in certain crafts and enchantments.
@@ -111,7 +111,7 @@ R
 5610 0
 S
 #1307
-dye deadly violet vial~
+dye dyes deadly violet vial~
 deadly violet dye~
 A vial of deadly violet dye is sitting here.~
    The vial is filled with a liquid so dark it almost looks black. But when you
@@ -128,7 +128,7 @@ R
 5137 0
 S
 #1308
-dye deep orange vial~
+dye dyes deep orange vial~
 deep orange dye~
 A vial of deep orange dye is sitting here.~
    Deep orange dye is made from the peels of fresh fruit, mixed with the
@@ -183,7 +183,7 @@ C
 0 100
 S
 #1311
-eel spotted~
+eel spotted fish~
 a spotted eel~
 A spotted eel is dried up and rotting.~
 You can eat the fish.
@@ -197,7 +197,7 @@ R
 5119 0
 S
 #1312
-trout speckled~
+trout speckled fish~
 a speckled trout~
 A speckled trout lies dead on the ground.~
 You can eat the fish.
@@ -239,7 +239,7 @@ R
 5119 0
 S
 #1315
-perch yellow~
+perch yellow fish~
 a yellow perch~
 A yellow perch lies dead on the ground.~
 You can eat the fish.
@@ -267,7 +267,7 @@ R
 5119 0
 S
 #1350
-smallskin skin small pile~
+smallskin skins small pile~
 a small skin~
 A small pile of skin is stacked on the ground.~
 Skin can be tanned to make leather.
@@ -282,7 +282,7 @@ R
 5120 0
 S
 #1351
-largeskin skin large pile~
+largeskin skins large pile~
 a large skin~
 A large pile of skin is stacked on the ground.~
 Skin can be tanned to make leather.
@@ -297,7 +297,7 @@ R
 5120 0
 S
 #1352
-fur fox luxurious~
+fur furs fox luxurious~
 a luxurious fox fur~
 A fox fur is crumpled on the ground.~
 Fox fur is used in some types of clothing.
@@ -311,7 +311,7 @@ R
 5120 0
 S
 #1353
-pelt big cat~
+pelt furs big cat~
 a big cat pelt~
 A big cat pelt is lying here.~
 This pelt, from a dangerous big cat, can be made into fancy clothing.
@@ -325,7 +325,7 @@ R
 5120 0
 S
 #1354
-skin shark~
+skin skins shark~
 a shark skin~
 A shark skin is drying on the ground.~
 The shark skin is smooth one way, rough the other.
@@ -337,7 +337,7 @@ R
 5120 0
 S
 #1355
-snakeskin skin~
+snakeskin skins~
 some snakeskin~
 Some snakeskin is crumpled on the ground.~
 The snakeskin can be used for certain crafts.
@@ -349,7 +349,7 @@ R
 5120 0
 S
 #1356
-smallleather leather small piece~
+smallleather leathers small piece~
 a small piece of leather~
 A pile of small pieces of leather is sitting here.~
 Leather can be sewn into armor.
@@ -365,7 +365,7 @@ R
 5120 0
 S
 #1357
-largeleather leather large piece~
+largeleather leathers large piece~
 a large piece of leather~
 A pile of large pieces of leather is sitting here.~
 Leather can be sewn into armor.

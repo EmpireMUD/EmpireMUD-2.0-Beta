@@ -46,6 +46,7 @@ void parse_archetype_menu(descriptor_data *desc, char *argument);
 
 // locals
 bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
+void next_creation_step(descriptor_data *d);
 void set_creation_state(descriptor_data *d, int state);
 void show_bonus_trait_menu(char_data *ch);
 
@@ -1738,14 +1739,13 @@ struct {
 	{ CON_Q_ALT_NAME },
 	{ CON_Q_ALT_PASSWORD },
 	
-	{ CON_Q_ARCHETYPE },	// skips to CON_BONUS_CREATION if no archetypes exist
+	{ CON_Q_ARCHETYPE },	// skips to CON_PROMO_CODE if no archetypes exist
 	{ CON_ARCHETYPE_CNFRM },
-	{ CON_BONUS_CREATION },
 	
 	{ CON_PROMO_CODE },
 	{ CON_CONFIRM_PROMO_CODE },	// only if given invalid code
 	
-	{ CON_REFERRAL },
+	{ CON_REFERRAL },	// skipped if alt
 	{ CON_FINISH_CREATION },
 	
 	// put this last
@@ -1806,11 +1806,15 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_SLAST_NAME: {
+			const char *rules = config_get_string("name_rules_lastname");
+			if (rules && *rules) {
+				msg_to_desc(d, "\r\n%s", rules);
+			}
 			SEND_TO_Q("\r\nEnter your last name: ", d);
 			break;
 		}
 		case CON_CLAST_NAME: {
-			msg_to_desc(d, "\r\nDid I get that right, %s %s%s (y/n)? ", GET_PC_NAME(d->character), GET_LASTNAME(d->character), (UPPER(*GET_LASTNAME(d->character)) != *GET_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "");
+			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? ", GET_PC_NAME(d->character), GET_LASTNAME(d->character), (UPPER(*GET_LASTNAME(d->character)) != *GET_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "");
 			break;
 		}
 		case CON_QSEX: {
@@ -1824,7 +1828,7 @@ void prompt_creation(descriptor_data *d) {
 			}
 			else {
 				// no archetypes for some reason?
-				set_creation_state(d, CON_BONUS_CREATION);
+				set_creation_state(d, CON_PROMO_CODE);
 			}
 			break;
 		}
@@ -1858,15 +1862,19 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_REFERRAL: {
-			SEND_TO_Q("\r\nWhere did you hear about us (optional, but please mention which website or friend): ", d);
+			if (!GET_REFERRED_BY(d->character)) {
+				SEND_TO_Q("\r\nWhere did you hear about us (optional, but please mention which website or friend): ", d);
+			}
+			else {
+				next_creation_step(d);
+			}
 			break;
 		}
 		case CON_FINISH_CREATION: {
 			SEND_TO_Q("\r\n*** Press ENTER: ", d);
 			break;
 		}
-		case CON_BONUS_EXISTING:
-		case CON_BONUS_CREATION: {
+		case CON_BONUS_EXISTING: {
 			show_bonus_trait_menu(d->character);
 			break;
 		}
@@ -1951,6 +1959,13 @@ void process_alt_password(descriptor_data *d, char *arg) {
 				save = TRUE;
 			}
 			GET_TEMPORARY_ACCOUNT_ID(d->character) = GET_ACCOUNT(alt)->id;
+			
+			if ((!GET_REFERRED_BY(d->character) || !*GET_REFERRED_BY(d->character)) && GET_REFERRED_BY(alt)) {
+				if (GET_REFERRED_BY(d->character)) {
+					free(GET_REFERRED_BY(d->character));
+				}
+				GET_REFERRED_BY(d->character) = str_dup(GET_REFERRED_BY(alt));
+			}
 			
 			next_creation_step(d);
 		}
@@ -2303,8 +2318,6 @@ void nanny(descriptor_data *d, char *arg) {
 	extern int Valid_Name(char *newname);
 	
 	extern struct promo_code_list promo_codes[];
-	extern const char *unapproved_login_message;
-	extern char *START_MESSG;
 	extern int wizlock_level;
 	extern char *wizlock_message;
 
@@ -2361,6 +2374,7 @@ void nanny(descriptor_data *d, char *arg) {
 				}
 				else {
 					/* player unknown -- make new character */
+					const char *rules = config_get_string("name_rules");
 
 					/* Check for multiple creations of a character. */
 					if (!Valid_Name(tmp_name)) {
@@ -2369,7 +2383,12 @@ void nanny(descriptor_data *d, char *arg) {
 					}
 					GET_PC_NAME(d->character) = str_dup(CAP(tmp_name));
 
-					sprintf(buf, "Did I get that right, %s (Y/N)? ", tmp_name);
+					msg_to_desc(d, "\r\nNew character:\r\n");
+					if (rules && *rules) {
+						msg_to_desc(d, "%s\r\n", rules);
+					}
+
+					sprintf(buf, "Did I get that name right, %s (Y/N)? ", tmp_name);
 					SEND_TO_Q(buf, d);
 					STATE(d) = CON_NAME_CNFRM;
 				}
@@ -2493,8 +2512,8 @@ void nanny(descriptor_data *d, char *arg) {
 					syslog(SYS_LOGIN, GET_INVIS_LEV(d->character), TRUE, "%s [%s] has connected", GET_NAME(d->character), PLR_FLAGGED(d->character, PLR_IPMASK) ? "masked" : d->host);
 				}
 
-				// check here if they need more traits than they have (IF they are an existing char?)
-				if (GET_ACCESS_LEVEL(d->character) > 0 && num_earned_bonus_traits(d->character) > count_bits(GET_BONUS_TRAITS(d->character))) {
+				// check here if they need more traits than they have
+				if (num_earned_bonus_traits(d->character) > count_bits(GET_BONUS_TRAITS(d->character))) {
 					show_bonus_trait_menu(d->character);
 					STATE(d) = CON_BONUS_EXISTING;
 					return;
@@ -2744,6 +2763,8 @@ void nanny(descriptor_data *d, char *arg) {
 		}
 
 		case CON_RMOTD: {		/* read CR after printing motd   */
+			const char *msg;
+			
 			if (PLR_FLAGGED(d->character, PLR_IPMASK)) {
 				strcpy(d->host, "masked");
 			}
@@ -2817,11 +2838,11 @@ void nanny(descriptor_data *d, char *arg) {
 				send_to_char("&rYou have mail waiting.&0\r\n", d->character);
 			}
 			
-			if (!IS_APPROVED(d->character)) {
-				send_to_char(unapproved_login_message, d->character);
+			if (!IS_APPROVED(d->character) && (msg = config_get_string("unapproved_greeting")) && *msg) {
+				msg_to_char(d->character, "\r\n&o%s&0", msg);
 			}
-			if (show_start) {
-				send_to_char(START_MESSG, d->character);
+			if (show_start && (msg = config_get_string("start_message")) && *msg) {
+				msg_to_char(d->character, "\r\n&Y%s&0", msg);
 			}
 			
 			if (!IS_APPROVED(d->character) && !IS_IMMORTAL(d->character) && has_anonymous_host(d)) {
@@ -2836,8 +2857,7 @@ void nanny(descriptor_data *d, char *arg) {
 			break;
 		}
 
-		// both add-trait menus
-		case CON_BONUS_CREATION:
+		// add-trait menu
 		case CON_BONUS_EXISTING: {
 			bool skip = FALSE;
 			i = 0;
@@ -2868,8 +2888,8 @@ void nanny(descriptor_data *d, char *arg) {
 				SET_BIT(GET_BONUS_TRAITS(d->character), BIT(i));
 			}
 			
-			// only apply now if they are NOT creating
-			if (STATE(d) != CON_BONUS_CREATION) {
+			// only apply now if they are NOT currently doing creation -- otherwise it will be applied during creation
+			if (GET_ACCESS_LEVEL(d->character) > 0) {
 				void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
 				
 				if (!skip) {

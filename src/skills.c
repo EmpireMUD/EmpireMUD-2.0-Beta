@@ -2018,6 +2018,9 @@ ACMD(do_specialize) {
 	else if (!(sk = find_skill_by_name(argument))) {
 		msg_to_char(ch, "No such skill.\r\n");
 	}
+	else if (SKILL_FLAGGED(sk, SKILLF_NO_SPECIALIZE)) {
+		msg_to_char(ch, "You can't specialize in that skill using this command.\r\n");
+	}
 	else if (get_skill_level(ch, SKILL_VNUM(sk)) != BASIC_SKILL_CAP && get_skill_level(ch, SKILL_VNUM(sk)) != SPECIALTY_SKILL_CAP) {
 		msg_to_char(ch, "You can only specialize skills which are at %d or %d.\r\n", BASIC_SKILL_CAP, SPECIALTY_SKILL_CAP);
 	}

@@ -1855,7 +1855,7 @@ INTERACTION_FUNC(one_farming_chore) {
 
 void do_chore_farming(empire_data *emp, room_data *room) {
 	void schedule_crop_growth(struct map_data *map);
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+	void uncrop_tile(room_data *room);
 	
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_FARMING].mob);
 	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_FARMING, INTERACT_HARVEST);
@@ -1895,7 +1895,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 					}
 					else {
 						// change to base sect
-						change_terrain(room, climate_default_sector[GET_CROP_CLIMATE(ROOM_CROP(room))]);
+						uncrop_tile(room);
 						
 						if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_FARMED)) {
 							abandon_room(room);

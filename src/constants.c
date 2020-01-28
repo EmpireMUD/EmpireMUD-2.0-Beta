@@ -760,7 +760,7 @@ const char *connected_types[] = {
 	"Finish Creation",	// 20
 	"Archetype",
 	"Goodbye",
-	"Choose bonus",
+		"UNUSED 2",
 	"Add bonus",
 	"Promo code?",	// 25
 	"Confirm promo",
@@ -1814,26 +1814,27 @@ const char *empire_trait_types[] = {
 
 // PRIV_x
 const char *priv[] = {
-	"claim",
+	"claim",	// 0
 	"build",
 	"harvest",
 	"promote",
 	"chop",
-	"cede",
+	"cede",	// 5
 	"enroll",
 	"withdraw",
 	"diplomacy",
 	"customize",
-	"workforce",
+	"workforce",	// 10
 	"stealth",
 	"cities",
 	"trade",
 	"logs",
-	"shipping",
+	"shipping",	// 15
 	"homes",
 	"storage",
 	"warehouse",
 	"progress",
+	"dismantle",	// 20
 	"\n"
 };
 
@@ -2795,7 +2796,7 @@ const char *quest_reward_types[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// ROOM/WORLD CONSTANTS ////////////////////////////////////////////////////
 
-// BLD_ON_x
+// BLD_ON_x (1/2): names of build-on flags
 const char *bld_on_flags[] = {
 	"water",	// 0
 	"plains",
@@ -2820,6 +2821,42 @@ const char *bld_on_flags[] = {
 	"lake",	// 20
 	"base-terrain-allowed",
 	"\n"
+};
+
+
+// BLD_ON_x (2/2): order to display build-in flags
+const bitvector_t bld_on_flags_order[] = {
+	BLD_ON_PLAINS,
+	BLD_ON_MOUNTAIN,
+	BLD_ON_FOREST,
+	BLD_ANY_FOREST,
+	
+	// desert types
+	BLD_ON_DESERT,
+	BLD_ON_OASIS,
+	BLD_ON_GROVE,
+	
+	// jungle types
+	BLD_ON_JUNGLE,
+	BLD_ON_SWAMP,
+	
+	// water types
+	BLD_ON_WATER,
+	BLD_ON_OCEAN,
+	BLD_ON_SHALLOW_SEA,
+	BLD_ON_COAST,
+	BLD_ON_ESTUARY,
+	BLD_ON_RIVER,
+	BLD_ON_RIVERBANK,
+	BLD_ON_LAKE,
+	
+	// end modifiers
+	BLD_ON_FLAT_TERRAIN,
+	BLD_FACING_OPEN_BUILDING,
+	BLD_ON_BASE_TERRAIN_ALLOWED,
+	BLD_FACING_CROP,
+	BLD_ON_NOT_PLAYER_MADE,
+	NOBITS	// end
 };
 
 
@@ -2885,23 +2922,37 @@ const char *bld_relationship_types[] = {
 };
 
 
-// CLIMATE_x
-const char *climate_types[] = {
-	"NONE",
-	"TEMPERATE",
-	"ARID",
-	"TROPICAL",
+// CLIM_x: climate flags
+const char *climate_flags[] = {
+	"*",	// 0
+	"*",
+	"*",
+	"*",
+	"hot",
+	"cold",	// 5
+	"high",
+	"low",
+	"magical",
+	"temperate",
+	"arid",	// 10
+	"tropical",
+	"mountain",
+	"river",
+	"fresh water",
+	"salt water",	// 15
+	"forest",
 	"\n"
 };
 
 
 // CROPF_x
 const char *crop_flags[] = {
-	"REQUIRES-WATER",
+	"REQUIRES-WATER",	// 0
 	"ORCHARD",
 	"!WILD",
 	"NEWBIE-ONLY",
 	"!NEWBIE",
+	"ANY-LISTED-CLIMATE",	// 5
 	"\n"
 };
 
@@ -2965,6 +3016,8 @@ const char *evo_types[] = {
 	"WINTER",	// 15
 	"BURNS-TO",
 	"SPREADS-TO",
+	"HARVEST-TO",
+	"DEFAULT-HARVEST-TO",
 	"\n"
 };
 
@@ -2989,6 +3042,8 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// winter
 	EVO_VAL_NONE,	// burns-to
 	EVO_VAL_SECTOR,	// spreads-to
+	EVO_VAL_NONE,	// harvest-to
+	EVO_VAL_NONE,	// default-harvest-to
 };
 
 
@@ -3012,6 +3067,8 @@ bool evo_is_over_time[] = {
 	TRUE,	// winter
 	FALSE,	// burns-to
 	TRUE,	// spreads-to
+	FALSE,	// harvest-to
+	FALSE,	// default-harvest-to
 };
 
 
@@ -3242,26 +3299,27 @@ const char *room_aff_bits[] = {
 
 // ROOM_EXTRA_x
 const char *room_extra_types[] = {
-	"prospect empire",
+	"prospect empire",	// 0
 	"mine amount",
 	"fire remaining",
 	"seed time",
 	"tavern type",
-	"tavern brewing time",
+	"tavern brewing time",	// 5
 	"tavern available time",
 	"ruins icon",
 	"chop progress",
 	"trench progress",
-	"harvest progress",
+	"harvest progress",	// 10
 	"garden workforce progress",
 	"quarry workforce progress",
 	"build recipe",
 	"found time",
-	"redesignate time",
+	"redesignate time",	// 15
 	"ceded",
 	"mine global vnum",
 	"trench fill time",
 	"trench original sector",
+	"original builder",	// 20
 	"\n"
 };
 
@@ -3430,8 +3488,9 @@ double skill_check_difficulty_modifier[NUM_DIFF_TYPES] = {
 
 // SKILLF_x: skill flags
 const char *skill_flags[] = {
-	"IN-DEVELOPMENT",
+	"IN-DEVELOPMENT",	// 0
 	"BASIC",
+	"NO-SPECIALIZE",
 	"\n"
 };
 
