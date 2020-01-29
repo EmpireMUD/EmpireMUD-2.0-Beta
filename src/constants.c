@@ -3841,6 +3841,7 @@ const char *global_types[] = {
 	"Mob Interactions",
 	"Mine Data",
 	"Newbie Gear",
+	"Map Spawns",
 	"\n"
 };
 

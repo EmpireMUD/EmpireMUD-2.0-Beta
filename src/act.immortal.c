@@ -5429,6 +5429,9 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 			msg_to_char(ch, "Gear:\r\n%s", buf2);
 			break;
 		}
+		case GLOBAL_MAP_SPAWNS: {
+			break;
+		}
 	}
 	
 	if (GET_GLOBAL_INTERACTIONS(glb)) {
@@ -5678,7 +5681,12 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	
 	// data that isn't type-based:
 	if (OBJ_FLAGGED(j, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE)))) {
-		sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf, TRUE);
+		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
+			prettier_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf);
+		}
+		else {
+			sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf, TRUE);
+		}
 		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? trim(buf) : "any climate");
 	}
 
@@ -6260,6 +6268,9 @@ int vnum_global(char *searchname, char_data *ch) {
 				case GLOBAL_MINE_DATA: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), sector_flags, flags, TRUE);
 					msg_to_char(ch, "%3d. [%5d] %s - %s (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, global_types[GET_GLOBAL_TYPE(iter)]);
+					break;
+				}
+				case GLOBAL_MAP_SPAWNS: {
 					break;
 				}
 				default: {

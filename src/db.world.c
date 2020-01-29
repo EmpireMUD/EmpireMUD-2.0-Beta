@@ -720,6 +720,42 @@ void finish_trench(room_data *room) {
 }
 
 
+// validates rare metals for global mine data
+GLB_VALIDATOR(validate_global_mine_data) {
+	struct glb_room_emp_bean *data = (struct glb_room_emp_bean*)other_data;
+	empire_data *emp = (data ? data->empire : NULL);
+	
+	if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_RARE) && (!emp || !EMPIRE_HAS_TECH(emp, TECH_RARE_METALS)) && (!ch || !GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_RARE_METALS))) {
+		return FALSE;
+	}
+	return TRUE;
+}
+
+
+// set up mine for init_mine()
+GLB_FUNCTION(run_global_mine_data) {
+	struct glb_room_emp_bean *data = (struct glb_room_emp_bean*)other_data;
+	empire_data *emp = (data ? data->empire : NULL);
+	room_data *room = (data ? data->room : NULL);
+	
+	if (!data || !room) {
+		return;	// no work
+	}
+	
+	set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, GET_GLOBAL_VNUM(glb));
+	set_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, number(GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) / 2, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE)));
+	
+	if (ch && (has_player_tech(ch, PTECH_DEEP_MINES) || (emp && EMPIRE_HAS_TECH(emp, TECH_DEEP_MINES)) || (GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_DEEP_MINES)))) {
+		multiply_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, 1.5);
+		gain_player_tech_exp(ch, PTECH_DEEP_MINES, 15);
+	}
+	
+	if (ch && GET_GLOBAL_ABILITY(glb) != NO_ABIL) {
+		gain_ability_exp(ch, GET_GLOBAL_ABILITY(glb), 75);
+	}
+}
+
+
 /**
 * Choose a mine type for a room. The 'ch' is optional, for ability
 * requirements.
@@ -731,108 +767,18 @@ void finish_trench(room_data *room) {
 void init_mine(room_data *room, char_data *ch, empire_data *emp) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
-	struct global_data *glb, *next_glb, *choose_last, *found;
-	bool done_cumulative = FALSE;
-	int cumulative_prc;
-	adv_data *adv;
+	struct glb_room_emp_bean *data;
 	
 	// no work
 	if (!room || !ROOM_CAN_MINE(room) || get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM) > 0) {
 		return;
 	}
 	
-	adv = (GET_ROOM_TEMPLATE(room) ? get_adventure_for_vnum(GET_RMT_VNUM(GET_ROOM_TEMPLATE(room))) : NULL);
-	cumulative_prc = number(1, 10000);
-	choose_last = found = NULL;
-	
-	HASH_ITER(hh, globals_table, glb, next_glb) {
-		if (GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
-			continue;
-		}
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
-			continue;
-		}
-		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && (!ch || !has_ability(ch, GET_GLOBAL_ABILITY(glb)))) {
-			continue;
-		}
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_RARE) && (!emp || !EMPIRE_HAS_TECH(emp, TECH_RARE_METALS)) && (!ch || !GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_RARE_METALS))) {
-			continue;	// missing rare metals
-		}
-		
-		// level limits
-		if (GET_GLOBAL_MIN_LEVEL(glb) > 0 && (!ch || GET_COMPUTED_LEVEL(ch) < GET_GLOBAL_MIN_LEVEL(glb))) {
-			continue;
-		}
-		if (GET_GLOBAL_MAX_LEVEL(glb) > 0 && ch && GET_COMPUTED_LEVEL(ch) > GET_GLOBAL_MAX_LEVEL(glb)) {
-			continue;
-		}
-		
-		// match ALL type-flags
-		if ((GET_SECT_FLAGS(BASE_SECT(room)) & GET_GLOBAL_TYPE_FLAGS(glb)) != GET_GLOBAL_TYPE_FLAGS(glb)) {
-			continue;
-		}
-		// match ZERO type-excludes
-		if ((GET_SECT_FLAGS(BASE_SECT(room)) & GET_GLOBAL_TYPE_EXCLUDE(glb)) != 0) {
-			continue;
-		}
-		
-		// check adventure-only -- late-matching because it does more work than other conditions
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv) {
-			continue;
-		}
-		
-		// percent checks last
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
-			if (done_cumulative) {
-				continue;
-			}
-			cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
-			if (cumulative_prc <= 0) {
-				done_cumulative = TRUE;
-			}
-			else {
-				continue;	// not this time
-			}
-		}
-		else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
-			// normal not-cumulative percent
-			continue;
-		}
-		
-		// we have a match!
-		
-		// check choose-last
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
-			if (!choose_last) {
-				choose_last = glb;
-			}
-			continue;
-		}
-		else {	// not choose-last
-			found = glb;
-			break;	// can only use first match
-		}
-	}
-	
-	// failover
-	if (!found) {
-		found = choose_last;
-	}
-	
-	// VICTORY: set mine type
-	if (found) {
-		set_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM, GET_GLOBAL_VNUM(found));
-		set_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, number(GET_GLOBAL_VAL(found, GLB_VAL_MAX_MINE_SIZE) / 2, GET_GLOBAL_VAL(found, GLB_VAL_MAX_MINE_SIZE)));
-		
-		if (ch && (has_player_tech(ch, PTECH_DEEP_MINES) || (emp && EMPIRE_HAS_TECH(emp, TECH_DEEP_MINES)) || (GET_LOYALTY(ch) && EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_DEEP_MINES)))) {
-			multiply_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT, 1.5);
-			gain_player_tech_exp(ch, PTECH_DEEP_MINES, 15);
-		}
-		
-		if (ch && GET_GLOBAL_ABILITY(found) != NO_ABIL) {
-			gain_ability_exp(ch, GET_GLOBAL_ABILITY(found), 75);
-		}
-	}
+	CREATE(data, struct glb_room_emp_bean, 1);
+	data->empire = emp;
+	data->room = room;
+	run_globals(GLOBAL_MINE_DATA, run_global_mine_data, FALSE, GET_SECT_FLAGS(BASE_SECT(room)), ch, (GET_ROOM_TEMPLATE(room) ? get_adventure_for_vnum(GET_RMT_VNUM(GET_ROOM_TEMPLATE(room))) : NULL), ch ? GET_COMPUTED_LEVEL(ch) : 0, validate_global_mine_data, data);
+	free(data);
 }
 
 

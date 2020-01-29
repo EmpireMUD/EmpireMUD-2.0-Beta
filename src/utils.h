@@ -732,6 +732,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_GLOBAL_MAX_LEVEL(glb)  ((glb)->max_level)
 #define GET_GLOBAL_VAL(glb, pos)  ((glb)->value[(pos)])
 #define GET_GLOBAL_INTERACTIONS(glb)  ((glb)->interactions)
+#define GET_GLOBAL_SPARE_BITS(glb)  ((glb)->spare_bits)
 
 // global value types
 #define GLB_VAL_MAX_MINE_SIZE  0	// which global value is used for max mine size

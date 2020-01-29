@@ -93,6 +93,12 @@ bool audit_global(struct global_data *glb, char_data *ch) {
 				}
 				break;
 			}
+			case GLOBAL_NEWBIE_GEAR: {
+				break;
+			}
+			case GLOBAL_MAP_SPAWNS: {
+				break;
+			}
 		}
 	}
 		

@@ -41,6 +41,7 @@
 *   Empire Needs Handlers
 *   Empire Targeting Handlers
 *   Follow Handlers
+*   Global Handlers
 *   Group Handlers
 *   Help Handlers
 *   Interaction Handlers
@@ -94,6 +95,14 @@ void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 
 // local file scope variables
 static int extractions_pending = 0;
+
+
+// for run_global_mob_interactions_func
+struct glb_mob_interact_bean {
+	char_data *mob;
+	int type;
+	INTERACTION_FUNC(*func);
+};
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -3443,6 +3452,125 @@ void stop_follower(char_data *ch) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// GLOBAL HANDLERS /////////////////////////////////////////////////////////
+
+/**
+* This is the master function for running a set of globals.
+*
+* If you need to pass additional data through to the validator, put it into a
+* pointer and pass it as 'other_data' (see: struct glb_emp_bean).
+*
+* For optional parameters, pass NULL or 0 to omit that parameter.
+*
+* @param int glb_type The GLOBAL_ type to run.
+* @param GLB_FUNCTION(*func) The function to be called on any successful global(s).
+* @param bool allow_many If TRUE, multiple globals can run. If FALSE, stops at the first successful one.
+* @param bitvector_t type_flags The flag set to compare against the global's type-flags and type-exclude.
+* @param char_data *ch Optional: The person running it (for level/ability requirements).
+* @param adv_data *adv Optional: The adventure it's running in, if any (GLB_FLAG_ADVENTURE_ONLY).
+* @param int level Optional: For level-constrained globals.
+* @param GLB_VALIDATOR(*validator) Optional: A function for additional validation.
+* @param void *other_data Optional: Additional data that can be passed through to the validator and to the final run function. This data may be cast to whatever type you need it to be.
+* @return bool TRUE if any globals ran; FALSE if not.
+*/
+bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t type_flags, char_data *ch, adv_data *adv, int level, GLB_VALIDATOR(*validator), void *other_data) {
+	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
+	
+	struct global_data *glb, *next_glb, *choose_last;
+	bool done_cumulative = FALSE, found = FALSE;
+	int cumulative_prc;
+	
+	cumulative_prc = number(1, 10000);
+	choose_last = NULL;
+	
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		if (GET_GLOBAL_TYPE(glb) != glb_type) {
+			continue;
+		}
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
+			continue;
+		}
+		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && (!ch || !has_ability(ch, GET_GLOBAL_ABILITY(glb)))) {
+			continue;
+		}
+		
+		// level limits
+		if (GET_GLOBAL_MIN_LEVEL(glb) > 0 && level < GET_GLOBAL_MIN_LEVEL(glb)) {
+			continue;
+		}
+		if (GET_GLOBAL_MAX_LEVEL(glb) > 0 && level > GET_GLOBAL_MAX_LEVEL(glb)) {
+			continue;
+		}
+		
+		// match ALL type-flags
+		if ((type_flags & GET_GLOBAL_TYPE_FLAGS(glb)) != GET_GLOBAL_TYPE_FLAGS(glb)) {
+			continue;
+		}
+		// match ZERO type-excludes
+		if ((type_flags & GET_GLOBAL_TYPE_EXCLUDE(glb)) != 0) {
+			continue;
+		}
+		
+		// check adventure-only -- late-matching because it does more work than other conditions
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && (!adv || get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv)) {
+			continue;
+		}
+		
+		// now the user-specified validator
+		if (validator && !validator(glb, ch, other_data)) {
+			continue;
+		}
+		
+		// percent checks last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
+			if (done_cumulative) {
+				continue;
+			}
+			cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
+			if (cumulative_prc <= 0) {
+				done_cumulative = TRUE;
+			}
+			else {
+				continue;	// not this time
+			}
+		}
+		else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
+			// normal not-cumulative percent
+			continue;
+		}
+		
+		// we have a match!
+		
+		// check choose-last
+		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
+			if (!choose_last) {
+				choose_last = glb;
+			}
+			continue;
+		}
+		else {	// not choose-last
+			if (func) {
+				func(glb, ch, other_data);
+			}
+			found = TRUE;
+			if (!allow_many) {
+				break;	// only use first match
+			}
+			// otherwise, continue with execution
+		}
+	}
+	
+	// failover/choose-last
+	if (!found && choose_last && func) {
+		func(choose_last, ch, other_data);
+		found = TRUE;
+	}
+	
+	return found;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// GROUP HANDLERS ///////////////////////////////////////////////////////////
 
 /**
@@ -3847,6 +3975,13 @@ bool meets_interaction_restrictions(struct interact_restriction *list, char_data
 }
 
 
+
+GLB_FUNCTION(run_global_mob_interactions_func) {
+	struct glb_mob_interact_bean *data = (struct glb_mob_interact_bean*)other_data;
+	run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), data->type, IN_ROOM(ch), data->mob, NULL, data->func);
+}
+
+
 /**
 * Attempts to run global mob interactions -- interactions from the globals table.
 *
@@ -3858,11 +3993,9 @@ bool meets_interaction_restrictions(struct interact_restriction *list, char_data
 bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func)) {
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
-	bool any = FALSE, done_cumulative = FALSE;
-	struct global_data *glb, *next_glb, *choose_last;
+	struct glb_mob_interact_bean *data;
 	struct instance_data *inst;
-	int cumulative_prc;
-	adv_data *adv;
+	bool any = FALSE;
 	
 	// no work
 	if (!ch || !mob || !IS_NPC(mob) || !func) {
@@ -3870,79 +4003,13 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 	}
 	
 	inst = real_instance(MOB_INSTANCE_ID(mob));
-	adv = inst ? INST_ADVENTURE(inst) : NULL;
-	cumulative_prc = number(1, 10000);
-	choose_last = NULL;
-
-	HASH_ITER(hh, globals_table, glb, next_glb) {
-		if (GET_GLOBAL_TYPE(glb) != GLOBAL_MOB_INTERACTIONS) {
-			continue;
-		}
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
-			continue;
-		}
-		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !has_ability(ch, GET_GLOBAL_ABILITY(glb))) {
-			continue;
-		}
-		
-		// level limits
-		if (GET_GLOBAL_MIN_LEVEL(glb) > 0 && GET_CURRENT_SCALE_LEVEL(mob) < GET_GLOBAL_MIN_LEVEL(glb)) {
-			continue;
-		}
-		if (GET_GLOBAL_MAX_LEVEL(glb) > 0 && GET_CURRENT_SCALE_LEVEL(mob) > GET_GLOBAL_MAX_LEVEL(glb)) {
-			continue;
-		}
-		
-		// match ALL type-flags
-		if ((MOB_FLAGS(mob) & GET_GLOBAL_TYPE_FLAGS(glb)) != GET_GLOBAL_TYPE_FLAGS(glb)) {
-			continue;
-		}
-		// match ZERO type-excludes
-		if ((MOB_FLAGS(mob) & GET_GLOBAL_TYPE_EXCLUDE(glb)) != 0) {
-			continue;
-		}
-		
-		// check adventure-only -- late-matching because it does more work than other conditions
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_ADVENTURE_ONLY) && (!adv || get_adventure_for_vnum(GET_GLOBAL_VNUM(glb)) != adv)) {
-			continue;
-		}
-		
-		// percent checks last
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
-			if (done_cumulative) {
-				continue;
-			}
-			cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
-			if (cumulative_prc <= 0) {
-				done_cumulative = TRUE;
-			}
-			else {
-				continue;	// not this time
-			}
-		}
-		else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
-			// normal not-cumulative percent
-			continue;
-		}
-		
-		// we have a match!
-		
-		// check choose-last
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
-			if (!choose_last) {
-				choose_last = glb;
-			}
-			continue;
-		}
-		
-		// not choose-last: run it
-		any |= run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), type, IN_ROOM(ch), mob, NULL, func);
-	}
 	
-	// do the choose-last
-	if (choose_last && !any) {
-		any |= run_interactions(ch, GET_GLOBAL_INTERACTIONS(choose_last), type, IN_ROOM(ch), mob, NULL, func);
-	}
+	CREATE(data, struct glb_mob_interact_bean, 1);
+	data->mob = mob;
+	data->type = type;
+	data->func = func;
+	any = run_globals(GLOBAL_MOB_INTERACTIONS, run_global_mob_interactions_func, TRUE, MOB_FLAGS(mob), ch, (inst ? INST_ADVENTURE(inst) : NULL), GET_CURRENT_SCALE_LEVEL(mob), NULL, data);
+	free(data);
 	
 	return any;
 }

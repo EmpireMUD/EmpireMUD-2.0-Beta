@@ -317,6 +317,7 @@ typedef struct vehicle_data vehicle_data;
 #define GLOBAL_MOB_INTERACTIONS  0
 #define GLOBAL_MINE_DATA  1
 #define GLOBAL_NEWBIE_GEAR  2
+#define GLOBAL_MAP_SPAWNS  3
 
 
 // GLB_FLAG_x flags for global_data
@@ -435,7 +436,7 @@ typedef struct vehicle_data vehicle_data;
 #define SKILLF_NO_SPECIALIZE  BIT(2)	// c. players must pass 50/75 via script/quest
 
 
-// mob spawn flags
+// SPAWN_x: mob spawn flags
 #define SPAWN_NOCTURNAL  BIT(0)	// a. only spawns at night
 #define SPAWN_DIURNAL  BIT(1)	// b. only spawns during day
 #define SPAWN_CLAIMED  BIT(2)	// c. only claimed land
@@ -2802,7 +2803,7 @@ struct generic_name_data {
 struct global_data {
 	any_vnum vnum;
 	char *name;	// descriptive text
-	int type;	// GLOBAL_x
+	int type;	// GLOBAL_
 	bitvector_t flags;	// GLB_FLAG_ flags
 	int value[NUM_GLB_VAL_POSITIONS];	// misc vals
 	
@@ -2811,6 +2812,7 @@ struct global_data {
 	double percent;	// chance to trigger
 	bitvector_t type_flags;	// type-dependent flags
 	bitvector_t type_exclude;	// type-dependent flags
+	bitvector_t spare_bits;	// more flags that can be used by various globals
 	int min_level;
 	int max_level;
 	
@@ -2819,6 +2821,19 @@ struct global_data {
 	struct archetype_gear *gear;
 	
 	UT_hash_handle hh;
+};
+
+
+// for GLB_VALIDATOR
+struct glb_emp_bean {
+	empire_data *empire;
+};
+
+
+// for GLB_VALIDATOR
+struct glb_room_emp_bean {
+	room_data *room;
+	empire_data *empire;
 };
 
 
