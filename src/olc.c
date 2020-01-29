@@ -1099,7 +1099,7 @@ const struct olc_command_data olc_data[] = {
 	
 	
 	// misc commands that should not take precedence over editor commands
-	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_ROOM_TEMPLATE | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
+	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_ROOM_TEMPLATE | OLC_SECTOR | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
 	
 	// this goes last
 	{ "\n", NULL, NOBITS, NOBITS }
@@ -2684,6 +2684,11 @@ OLC_MODULE(olc_fullsearch) {
 		case OLC_ROOM_TEMPLATE: {
 			void olc_fullsearch_room_template(char_data *ch, char *argument);
 			olc_fullsearch_room_template(ch, argument);
+			break;
+		}
+		case OLC_SECTOR: {
+			void olc_fullsearch_sector(char_data *ch, char *argument);
+			olc_fullsearch_sector(ch, argument);
 			break;
 		}
 		case OLC_TRIGGER: {

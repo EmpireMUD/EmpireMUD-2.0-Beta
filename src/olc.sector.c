@@ -406,6 +406,141 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	free_sector(sect);
 }
 
+/**
+* Searches properties of sectors.
+*
+* @param char_data *ch The person searching.
+* @param char *argument The argument they entered.
+*/
+void olc_fullsearch_sector(char_data *ch, char *argument) {
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	bitvector_t find_interacts = NOBITS, found_interacts, only_build = NOBITS;
+	bitvector_t find_evos = NOBITS, found_evos;
+	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
+	int count, only_mapout = NOTHING;
+	char only_roadside = '\0';
+	struct interaction_item *inter;
+	struct evolution_data *evo;
+	sector_data *sect, *next_sect;
+	struct icon_data *icon;
+	size_t size;
+	bool match;
+	
+	if (!*argument) {
+		msg_to_char(ch, "See HELP SECTEDIT FULLSEARCH for syntax.\r\n");
+		return;
+	}
+	
+	// process argument
+	*find_keywords = '\0';
+	while (*argument) {
+		// figure out a type
+		argument = any_one_arg(argument, type_arg);
+		
+		if (!strcmp(type_arg, "-")) {
+			continue;	// just skip stray dashes
+		}
+		
+		FULLSEARCH_FLAGS("buildflags", only_build, bld_on_flags)
+		FULLSEARCH_FLAGS("buildflagged", only_build, bld_on_flags)
+		FULLSEARCH_FLAGS("climate", only_climate, climate_flags)
+		FULLSEARCH_FLAGS("flags", only_flags, sector_flags)
+		FULLSEARCH_FLAGS("flagged", only_flags, sector_flags)
+		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
+		FULLSEARCH_FLAGS("evolution", find_evos, evo_types)
+		FULLSEARCH_LIST("mapout", only_mapout, mapout_color_names)
+		FULLSEARCH_CHAR("roadsideicon", only_roadside)
+		FULLSEARCH_FLAGS("unflagged", not_flagged, sector_flags)
+		
+		else {	// not sure what to do with it? treat it like a keyword
+			sprintf(find_keywords + strlen(find_keywords), "%s%s", *find_keywords ? " " : "", type_arg);
+		}
+		
+		// prepare for next loop
+		skip_spaces(&argument);
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Sector fullsearch: %s\r\n", find_keywords);
+	count = 0;
+	
+	// okay now look up sects
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		if (only_build != NOBITS && (GET_SECT_BUILD_FLAGS(sect) & only_build) != only_build) {
+			continue;
+		}
+		if (only_flags != NOBITS && (GET_SECT_FLAGS(sect) & only_flags) != only_flags) {
+			continue;
+		}
+		if (not_flagged != NOBITS && SECT_FLAGGED(sect, not_flagged)) {
+			continue;
+		}
+		if (only_climate != NOBITS && (GET_SECT_CLIMATE(sect) & only_climate) != only_climate) {
+			continue;
+		}
+		if (only_mapout != NOTHING && GET_SECT_MAPOUT(sect) != only_mapout) {
+			continue;
+		}
+		if (only_roadside != '\0' && GET_SECT_ROADSIDE_ICON(sect) != only_roadside) {
+			continue;
+		}
+		if (find_evos) {	// look up its evolutions
+			found_evos = NOBITS;
+			LL_FOREACH(GET_SECT_EVOS(sect), evo) {
+				found_evos |= BIT(evo->type);
+			}
+			if ((find_evos & found_evos) != find_evos) {
+				continue;
+			}
+		}
+		if (find_interacts) {	// look up its interactions
+			found_interacts = NOBITS;
+			LL_FOREACH(GET_SECT_INTERACTIONS(sect), inter) {
+				found_interacts |= BIT(inter->type);
+			}
+			if ((find_interacts & found_interacts) != find_interacts) {
+				continue;
+			}
+		}
+		
+		// string search
+		if (*find_keywords && !multi_isname(find_keywords, GET_SECT_NAME(sect)) && !multi_isname(find_keywords, GET_SECT_TITLE(sect)) && !multi_isname(find_keywords, GET_SECT_COMMANDS(sect))) {
+			// check icons too
+			match = FALSE;
+			LL_FOREACH(GET_SECT_ICONS(sect), icon) {
+				if (multi_isname(find_keywords, icon->color) || multi_isname(find_keywords, icon->icon)) {
+					match = TRUE;
+					break;	// only need 1 match
+				}
+			}
+			if (!match) {
+				continue;
+			}
+		}
+		
+		// show it
+		snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+		if (strlen(line) + size < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s", line);
+			++count;
+		}
+		else {
+			size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+			break;
+		}
+	}
+	
+	if (count > 0 && (size + 14) < sizeof(buf)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "(%d sector%s)\r\n", count, PLURAL(count));
+	}
+	else if (count == 0) {
+		size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
+	}
+	
+	if (ch->desc) {
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
 
 /**
 * Searches for all uses of a crop and displays them.
