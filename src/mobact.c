@@ -1122,7 +1122,7 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 		}
 		
 		// global spawn lists
-		if (count < config_get_int("spawn_limit_per_room")) {
+		if (IS_OUTDOOR_TILE(room) && !ROOM_SECT_FLAGGED(room, SECTF_NO_GLOBAL_SPAWNS) && !ROOM_CROP_FLAGGED(room, CROPF_NO_GLOBAL_SPAWNS) && count < config_get_int("spawn_limit_per_room")) {
 			struct glb_map_spawn_bean *data;
 			bool junk;
 			
