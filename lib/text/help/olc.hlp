@@ -2703,7 +2703,8 @@ Climates:
  &criver&0 - Moving water such as a river.
  &cfresh water&0 - Non-moving fresh water.
  &csalt water&0 - Ocean, sea, or salt lake.
- &cforest&0 - Any kind of forest.
+ &cforest&0 - Any kind of forest or jungle.
+ &cgrassland&0 - Plains, savannah, or steppe.
 
 See also: OLC CROPS, OLC SECTORS
 #d

@@ -2941,6 +2941,7 @@ const char *climate_flags[] = {
 	"fresh water",
 	"salt water",	// 15
 	"forest",
+	"grassland",
 	"\n"
 };
 

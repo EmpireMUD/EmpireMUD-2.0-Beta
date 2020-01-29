@@ -2495,6 +2495,7 @@ typedef struct vehicle_data vehicle_data;
 #define CLIM_FRESH_WATER  BIT(14)	// o. lake, pond; non-moving water
 #define CLIM_SALT_WATER  BIT(15)	// p. ocean, sea; salt water
 #define CLIM_FOREST  BIT(16)	// q. forested
+#define CLIM_GRASSLAND  BIT(17)	// p. plains, savannah, steppe
 
 
 // DPLTN_x: depletion types
