@@ -717,7 +717,7 @@ ACMD(do_forage) {
 
 
 ACMD(do_hunt) {
-	extern bool validate_spawn_location(room_data *room, struct spawn_info *spawn, int x_coord, int y_coord, bool in_city);
+	extern bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
 	
 	struct spawn_info *spawn, *found_spawn = NULL;
 	char_data *mob, *found_proto = NULL;
@@ -830,7 +830,7 @@ ACMD(do_hunt) {
 			if (spawn->percent < min_percent) {
 				continue;	// too low
 			}
-			if (!validate_spawn_location(IN_ROOM(ch), spawn, x_coord, y_coord, FALSE)) {
+			if (!validate_spawn_location(IN_ROOM(ch), spawn->flags, x_coord, y_coord, FALSE)) {
 				continue;	// cannot spawn here
 			}
 			if (!(mob = mob_proto(spawn->vnum))) {

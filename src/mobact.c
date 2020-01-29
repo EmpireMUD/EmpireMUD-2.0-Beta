@@ -46,7 +46,15 @@ extern int perform_move(char_data *ch, int dir, bitvector_t flags);
 void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
 void scale_mob_to_level(char_data *mob, int level);
-bool validate_spawn_location(room_data *room, struct spawn_info *spawn, int x_coord, int y_coord, bool in_city);
+bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
+
+
+// for validate_global_map_spawns, run_global_map_spawns
+struct glb_map_spawn_bean {
+	room_data *room;
+	int x_coord, y_coord;
+	bool in_city;
+};
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -967,7 +975,7 @@ static int spawn_one_list(room_data *room, struct spawn_info *list) {
 	
 	LL_FOREACH(list, spawn) {
 		// validate flags
-		if (!validate_spawn_location(room, spawn, x_coord, y_coord, in_city)) {
+		if (!validate_spawn_location(room, spawn->flags, x_coord, y_coord, in_city)) {
 			continue;
 		}
 		
@@ -1000,6 +1008,23 @@ static int spawn_one_list(room_data *room, struct spawn_info *list) {
 	}
 	
 	return count;
+}
+
+
+GLB_VALIDATOR(validate_global_map_spawns) {
+	struct glb_map_spawn_bean *data = (struct glb_map_spawn_bean*)other_data;
+	if (!other_data) {
+		return FALSE;
+	}
+	return validate_spawn_location(data->room, GET_GLOBAL_SPARE_BITS(glb), data->x_coord, data->y_coord, data->in_city);
+}
+
+
+GLB_FUNCTION(run_global_map_spawns) {
+	struct glb_map_spawn_bean *data = (struct glb_map_spawn_bean*)other_data;
+	if (data) {
+		spawn_one_list(data->room, GET_GLOBAL_SPAWNS(glb));
+	}
 }
 
 
@@ -1095,6 +1120,20 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 				count += spawn_one_list(room, GET_SECT_SPAWNS(SECT(room)));
 			}
 		}
+		
+		// global spawn lists
+		if (count < config_get_int("spawn_limit_per_room")) {
+			struct glb_map_spawn_bean *data;
+			bool junk;
+			
+			CREATE(data, struct glb_map_spawn_bean, 1);
+			data->room = room;
+			data->x_coord = X_COORD(room);
+			data->y_coord = Y_COORD(room);
+			data->in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
+			run_globals(GLOBAL_MAP_SPAWNS, run_global_map_spawns, TRUE, GET_SECT_FLAGS(BASE_SECT(room)), NULL, NULL, 0, validate_global_map_spawns, data);
+			free(data);
+		}
 	}
 
 	// spawn interior rooms: recursively
@@ -1156,57 +1195,57 @@ void spawn_mobs_from_center(room_data *center) {
 * the function will call it many many times.
 *
 * @param room_data *room The room to validate.
-* @param struct spawn_info *spawn The spawn data to match to the room.
+* @param bitvector_t spawn_flags The flags to validate for the room.
 * @param int x_coord The x-coordinate of the room (prevents multiple function calls).
 * @param int y_coord The y-coordinate of the room (prevents multiple function calls).
 * @param bool in_city Whether or not the room is in-city (prevents multiple function calls).
 * @return bool TRUE if the spawn matches; FALSE if not.
 */
-bool validate_spawn_location(room_data *room, struct spawn_info *spawn, int x_coord, int y_coord, bool in_city) {
+bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city) {
 	room_data *home;
 	
-	if (!room || !spawn) {
+	if (!room) {
 		return FALSE;	// shortcut
 	}
 	
 	// SPAWN_x: this code validates spawn flags
 	
 	// easy checks
-	if (IS_SET(spawn->flags, SPAWN_NOCTURNAL) && weather_info.sunlight != SUN_DARK && weather_info.sunlight != SUN_SET) {
+	if (IS_SET(spawn_flags, SPAWN_NOCTURNAL) && weather_info.sunlight != SUN_DARK && weather_info.sunlight != SUN_SET) {
 		return FALSE;
 	}
-	if (IS_SET(spawn->flags, SPAWN_DIURNAL) && weather_info.sunlight != SUN_LIGHT && weather_info.sunlight != SUN_RISE) {
+	if (IS_SET(spawn_flags, SPAWN_DIURNAL) && weather_info.sunlight != SUN_LIGHT && weather_info.sunlight != SUN_RISE) {
 		return FALSE;
 	}
 	
 	// home room checks
 	home = HOME_ROOM(room);
-	if (IS_SET(spawn->flags, SPAWN_CLAIMED) && !ROOM_OWNER(home)) {
+	if (IS_SET(spawn_flags, SPAWN_CLAIMED) && !ROOM_OWNER(home)) {
 		return FALSE;
 	}
-	if (IS_SET(spawn->flags, SPAWN_UNCLAIMED) && ROOM_OWNER(home)) {
+	if (IS_SET(spawn_flags, SPAWN_UNCLAIMED) && ROOM_OWNER(home)) {
 		return FALSE;
 	}
 	
 	// in-city checks
-	if (IS_SET(spawn->flags, SPAWN_CITY) && !in_city) {
+	if (IS_SET(spawn_flags, SPAWN_CITY) && !in_city) {
 		return FALSE;
 	}
-	if (IS_SET(spawn->flags, SPAWN_OUT_OF_CITY) && in_city) {
+	if (IS_SET(spawn_flags, SPAWN_OUT_OF_CITY) && in_city) {
 		return FALSE;
 	}
 	
 	// validate coords
-	if (IS_SET(spawn->flags, SPAWN_NORTHERN) && (y_coord == -1 || y_coord < (MAP_HEIGHT / 2))) {
+	if (IS_SET(spawn_flags, SPAWN_NORTHERN) && (y_coord == -1 || y_coord < (MAP_HEIGHT / 2))) {
 		return FALSE;
 	}
-	if (IS_SET(spawn->flags, SPAWN_SOUTHERN) && (y_coord == -1 || y_coord >= (MAP_HEIGHT / 2))) {
+	if (IS_SET(spawn_flags, SPAWN_SOUTHERN) && (y_coord == -1 || y_coord >= (MAP_HEIGHT / 2))) {
 		return FALSE;
 	}
-	if (IS_SET(spawn->flags, SPAWN_EASTERN) && (x_coord == -1 || x_coord < (MAP_WIDTH / 2))) {
+	if (IS_SET(spawn_flags, SPAWN_EASTERN) && (x_coord == -1 || x_coord < (MAP_WIDTH / 2))) {
 		return FALSE;
 	}
-	if (IS_SET(spawn->flags, SPAWN_WESTERN) && (x_coord == -1 || x_coord >= (MAP_WIDTH / 2))) {
+	if (IS_SET(spawn_flags, SPAWN_WESTERN) && (x_coord == -1 || x_coord >= (MAP_WIDTH / 2))) {
 		return FALSE;
 	}
 	
