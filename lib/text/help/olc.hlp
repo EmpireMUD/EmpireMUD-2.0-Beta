@@ -6711,6 +6711,32 @@ Available sector flags:
 
 See also: OLC SECTORS
 #d
+"SECTEDIT FULLSEARCH" "SECTOR FULLSEARCH"
+
+Usage:  .sector fullsearch -<field> <argument> <...>
+
+This command allows you to search for sectors with certain criteria. You can
+specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the sector's name, title, and commands.
+
+Fields:
+  &c-buildflagged&0 - see HELP SECTEDIT BUILDFLAGS
+  &c-climate&0 - see HELP SECTEDIT CLIMATE
+  &c-evolution&0 - has a certain evolution, see SECTEDIT EVOLUTIONS
+  &c-flagged&0, &cunflagged&0 - see HELP SECTEDIT FLAGS
+  &c-interaction&0 - has a specific type, see HELP SECTEDIT INTERACTION
+  &c-mapout&0 - color name, see HELP SECTEDIT MAPOUT
+  &c-roadsideicon&0 - has a certain icon letter - HELP SECTEDIT ROADSIDEICON
+
+Examples:
+ > .sect fullsearch -climate forest -evolution CHOPPED-DOWN
+ > .sect fullsearch -flagged CHORE -flagged ROUGH
+ > .sect fullsearch -interaction CHOP
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all sectors that spawn a certain mob,
+use ".m search <mob's vnum>".
+#d
 "SECTEDIT ICONS" "CROPEDIT ICONS"
 
 Usage:  .icons add <type> <color code> <icon>
