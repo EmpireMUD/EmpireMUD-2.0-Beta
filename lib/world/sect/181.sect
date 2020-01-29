@@ -45,18 +45,6 @@ I 20 121 25.00 6 a  # CHOP: some sticks and leaves
 I 20 121 25.00 10 a  # CHOP: some sticks and leaves
 I 20 121 25.00 14 a  # CHOP: some sticks and leaves
 M
-237 5.00 ce
-M
-201 5.00 bce
-M
-200 5.00 bce
-M
-222 5.00 bce
-M
-223 5.00 bce
-M
-251 15.00 ce
-M
 252 10.00 cf
 M
 240 6.00 bc
@@ -65,15 +53,9 @@ M
 M
 9154 10.00 bc
 M
-9004 5.00 bce
-M
 9014 5.00 bd
 M
-9010 5.00 bce
-M
 9012 10.00 bd
-M
-9009 10.00 bce
 M
 9152 5.00 bd
 M
@@ -82,8 +64,6 @@ M
 9020 5.00 bd
 M
 9044 1.00 bdh
-M
-9011 5.00 bce
 M
 9025 5.00 bd
 M
@@ -95,8 +75,6 @@ M
 M
 9032 1.00 bd
 M
-9022 5.00 ace
-M
 9015 5.00 ad
 M
 9116 5.00 ad
@@ -104,8 +82,6 @@ M
 9133 5.00 ad
 M
 9023 5.00 d
-M
-9024 5.00 ce
 M
 246 0.30 ad
 M
@@ -149,23 +125,9 @@ M
 M
 9040 0.01 d
 M
-9034 5.00 ce
-M
 9028 10.00 bdg
 M
 9041 10.00 bdh
-M
-9036 5.00 ceh
-M
-9037 5.00 ceh
-M
-9038 5.00 ceh
-M
-9033 5.00 ceg
-M
-9035 5.00 ceg
-M
-9039 5.00 ceg
 M
 9064 0.90 ad
 M
