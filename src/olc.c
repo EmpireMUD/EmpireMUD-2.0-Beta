@@ -849,8 +849,8 @@ const struct olc_command_data olc_data[] = {
 	{ "requiresability", gedit_ability, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "sectorexclude", gedit_sectorexclude, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "sectorflags", gedit_sectorflags, OLC_GLOBAL, OLC_CF_EDITOR },
-	{ "spawnflags", gedit_spawnflags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "spawns", gedit_spawns, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "spawnflags", gedit_spawnflags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "type", gedit_type, OLC_GLOBAL, OLC_CF_EDITOR },
 	
 	// mob commands

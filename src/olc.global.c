@@ -190,7 +190,7 @@ char *list_one_global(struct global_data *glb, bool detail) {
 			if (detail) {
 				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, flags, TRUE);
 				sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags_short, flags2, TRUE);
-				snprintf(output, sizeof(output), "[%5d] %s%s %.2f%%%s %s | %s (%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags, flags2, global_types[GET_GLOBAL_TYPE(glb)]);
+				snprintf(output, sizeof(output), "[%5d] %s%s %.2f%%%s %s| %s(%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags, flags2, global_types[GET_GLOBAL_TYPE(glb)]);
 			}
 			else {
 				snprintf(output, sizeof(output), "[%5d] %s (%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), global_types[GET_GLOBAL_TYPE(glb)]);

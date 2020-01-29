@@ -5435,6 +5435,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 			msg_to_char(ch, "Climate: &c%s&0 (Exclude: &c%s&0)\r\n", buf, buf2);
 			sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags, buf, TRUE);
 			msg_to_char(ch, "Spawn flags: &g%s&0\r\n", buf);
+			show_spawn_summary_to_char(ch, GET_GLOBAL_SPAWNS(glb));
 			break;
 		}
 	}
@@ -6278,7 +6279,7 @@ int vnum_global(char *searchname, char_data *ch) {
 				case GLOBAL_MAP_SPAWNS: {
 					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), climate_flags, flags, TRUE);
 					sprintbit(GET_GLOBAL_SPARE_BITS(iter), spawn_flags_short, flags2, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s (%s | %s) (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, flags2, global_types[GET_GLOBAL_TYPE(iter)]);
+					msg_to_char(ch, "%3d. [%5d] %s (%s| %s) (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, trim(flags2), global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				default: {
