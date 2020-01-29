@@ -2954,6 +2954,7 @@ const char *crop_flags[] = {
 	"NEWBIE-ONLY",
 	"!NEWBIE",
 	"ANY-LISTED-CLIMATE",	// 5
+	"NO-GLOBAL-SPAWNS",
 	"\n"
 };
 
@@ -3371,14 +3372,14 @@ const char *sector_flags[] = {
 	"LARGE-CITY-RADIUS",
 	"OBSCURE-VISION",
 	"IS-TRENCH",
-		"*",
+	"NO-GLOBAL-SPAWNS",
 	"ROUGH",
 	"SHALLOW-WATER",
 	"\n"
 };
 
 
-// SPAWN_x
+// SPAWN_x (1/2) -- full length spawn flags
 const char *spawn_flags[] = {
 	"NOCTURNAL",
 	"DIURNAL",
@@ -3394,7 +3395,7 @@ const char *spawn_flags[] = {
 };
 
 
-// SPAWN_x -- short form for compressed display
+// SPAWN_x (2/2) -- short form for compressed display
 const char *spawn_flags_short[] = {
 	"NOCT",
 	"DIA",

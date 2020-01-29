@@ -30,11 +30,14 @@
 
 // external consts
 extern const char *action_bits[];
+extern const char *climate_flags[];
 extern const char *global_flags[];
 extern const char *global_types[];
 extern const char *interact_types[];
 extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *sector_flags[];
+extern const char *spawn_flags[];
+extern const char *spawn_flags_short[];
 
 // external funcs
 extern struct archetype_gear *copy_archetype_gear(struct archetype_gear *input);
@@ -146,7 +149,7 @@ char *list_one_global(struct global_data *glb, bool detail) {
 	extern const char *action_bits[];
 	
 	static char output[MAX_STRING_LENGTH];
-	char abil[MAX_STRING_LENGTH], flags[MAX_STRING_LENGTH];
+	char abil[MAX_STRING_LENGTH], flags[MAX_STRING_LENGTH], flags2[MAX_STRING_LENGTH];
 	ability_data *ab;
 	
 	// ability required
@@ -177,6 +180,17 @@ char *list_one_global(struct global_data *glb, bool detail) {
 			if (detail) {
 				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, flags, TRUE);
 				snprintf(output, sizeof(output), "[%5d] %s%s %.2f%%%s %s (%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags, global_types[GET_GLOBAL_TYPE(glb)]);
+			}
+			else {
+				snprintf(output, sizeof(output), "[%5d] %s (%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), global_types[GET_GLOBAL_TYPE(glb)]);
+			}
+			break;
+		}
+		case GLOBAL_MAP_SPAWNS: {
+			if (detail) {
+				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, flags, TRUE);
+				sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags_short, flags2, TRUE);
+				snprintf(output, sizeof(output), "[%5d] %s%s %.2f%%%s %s | %s (%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags, flags2, global_types[GET_GLOBAL_TYPE(glb)]);
 			}
 			else {
 				snprintf(output, sizeof(output), "[%5d] %s (%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), global_types[GET_GLOBAL_TYPE(glb)]);
@@ -356,8 +370,10 @@ void olc_show_global(char_data *ch) {
 	void get_interaction_display(struct interaction_item *list, char *save_buffer);
 	
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH];
+	struct spawn_info *spawn;
 	ability_data *abil;
+	int count;
 	
 	if (!glb) {
 		return;
@@ -438,8 +454,26 @@ void olc_show_global(char_data *ch) {
 			sprintf(buf + strlen(buf), "Gear: <%sgear\t0>\r\n%s", OLC_LABEL_PTR(GET_GLOBAL_GEAR(glb)), GET_GLOBAL_GEAR(glb) ? lbuf : "");
 			break;
 		}
+		case GLOBAL_MAP_SPAWNS: {
+			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<%sclimateflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
+			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<%sclimateexclude\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
+			sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<%sspawnflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_SPARE_BITS(glb), NOBITS), lbuf);
+	
+			sprintf(buf + strlen(buf), "<%sspawns\t0>\r\n", OLC_LABEL_PTR(GET_GLOBAL_SPAWNS(glb)));
+			if (GET_GLOBAL_SPAWNS(glb)) {
+				count = 0;
+				LL_FOREACH(GET_GLOBAL_SPAWNS(glb), spawn) {
+					sprintbit(spawn->flags, spawn_flags, lbuf, TRUE);
+					sprintf(buf + strlen(buf), " %d. %s (%d) %.2f%% %s\r\n", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum)), spawn->vnum, spawn->percent, lbuf);
+				}
+			}
+			break;
+		}
 	}
-		
+	
 	page_string(ch->desc, buf, TRUE);
 }
 
@@ -488,6 +522,30 @@ OLC_MODULE(gedit_capacity) {
 	}
 	else {
 		GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) = olc_process_number(ch, argument, "mine capacity", "capacity", 1, 1000, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE));
+	}
+}
+
+
+OLC_MODULE(gedit_climateexclude) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MAP_SPAWNS) {
+		msg_to_char(ch, "You can't set climateexclude on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_TYPE_EXCLUDE(glb) = olc_process_flag(ch, argument, "climate", "climateexclude", climate_flags, GET_GLOBAL_TYPE_EXCLUDE(glb));
+	}
+}
+
+
+OLC_MODULE(gedit_climateflags) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MAP_SPAWNS) {
+		msg_to_char(ch, "You can't set climateflags on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_TYPE_FLAGS(glb) = olc_process_flag(ch, argument, "climate", "climateflags", climate_flags, GET_GLOBAL_TYPE_FLAGS(glb));
 	}
 }
 
@@ -615,6 +673,24 @@ OLC_MODULE(gedit_sectorflags) {
 }
 
 
+OLC_MODULE(gedit_spawnflags) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MAP_SPAWNS) {
+		msg_to_char(ch, "You can't set spawnflags on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_SPARE_BITS(glb) = olc_process_flag(ch, argument, "spawn", "spawnflags", spawn_flags, GET_GLOBAL_SPARE_BITS(glb));
+	}
+}
+
+
+OLC_MODULE(gedit_spawns) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	olc_process_spawns(ch, argument, &GET_GLOBAL_SPAWNS(glb));
+}
+
+
 OLC_MODULE(gedit_type) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	int iter, old = GET_GLOBAL_TYPE(glb);
@@ -625,6 +701,7 @@ OLC_MODULE(gedit_type) {
 	if (GET_GLOBAL_TYPE(glb) != old) {
 		GET_GLOBAL_TYPE_FLAGS(glb) = NOBITS;
 		GET_GLOBAL_TYPE_EXCLUDE(glb) = NOBITS;
+		GET_GLOBAL_SPARE_BITS(glb) = NOBITS;
 		for (iter = 0; iter < NUM_GLB_VAL_POSITIONS; ++iter) {
 			GET_GLOBAL_VAL(glb, iter) = 0;
 		}

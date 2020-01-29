@@ -240,6 +240,8 @@ OLC_MODULE(genedit_singular);
 // global modules
 OLC_MODULE(gedit_ability);
 OLC_MODULE(gedit_capacity);
+OLC_MODULE(gedit_climateexclude);
+OLC_MODULE(gedit_climateflags);
 OLC_MODULE(gedit_flags);
 OLC_MODULE(gedit_gear);
 OLC_MODULE(gedit_interaction);
@@ -251,6 +253,8 @@ OLC_MODULE(gedit_name);
 OLC_MODULE(gedit_percent);
 OLC_MODULE(gedit_sectorexclude);
 OLC_MODULE(gedit_sectorflags);
+OLC_MODULE(gedit_spawnflags);
+OLC_MODULE(gedit_spawns);
 OLC_MODULE(gedit_type);
 
 // mob edit modules
@@ -831,6 +835,8 @@ const struct olc_command_data olc_data[] = {
 	
 	// globals commands
 	{ "capacity", gedit_capacity, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "climateflags", gedit_climateflags, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "climateexclude", gedit_climateexclude, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "flags", gedit_flags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "gear", gedit_gear, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "interaction", gedit_interaction, OLC_GLOBAL, OLC_CF_EDITOR },
@@ -843,6 +849,8 @@ const struct olc_command_data olc_data[] = {
 	{ "requiresability", gedit_ability, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "sectorexclude", gedit_sectorexclude, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "sectorflags", gedit_sectorflags, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "spawnflags", gedit_spawnflags, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "spawns", gedit_spawns, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "type", gedit_type, OLC_GLOBAL, OLC_CF_EDITOR },
 	
 	// mob commands

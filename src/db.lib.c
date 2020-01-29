@@ -4073,6 +4073,7 @@ void parse_global(FILE *fl, any_vnum vnum) {
 
 	struct global_data *glb, *find;
 	char line[256], str_in[256], str_in2[256], str_in3[256], str_in4[256];
+	struct spawn_info *spawn;
 	int int_in[4];
 	double dbl_in;
 
@@ -4149,6 +4150,23 @@ void parse_global(FILE *fl, any_vnum vnum) {
 				parse_interaction(line, &GET_GLOBAL_INTERACTIONS(glb), buf2);
 				break;
 			}
+			
+			// mob spawn
+			case 'M': {
+				if (!get_line(fl, line) || sscanf(line, "%d %lf %s", &int_in[0], &dbl_in, str_in) != 3) {
+					log("SYSERR: Format error in M line of %s", buf2);
+					exit(1);
+				}
+				
+				CREATE(spawn, struct spawn_info, 1);
+				spawn->vnum = int_in[0];
+				spawn->percent = dbl_in;
+				spawn->flags = asciiflag_conv(str_in);
+				spawn->next = NULL;
+				
+				LL_APPEND(GET_GLOBAL_SPAWNS(glb), spawn);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -4175,6 +4193,7 @@ void write_global_to_file(FILE *fl, struct global_data *glb) {
 	void write_archetype_gear_to_file(FILE *fl, struct archetype_gear *list);
 	
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH], temp4[MAX_STRING_LENGTH];
+	struct spawn_info *spawn;
 	
 	if (!fl || !glb) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_global_to_file called without %s", !fl ? "file" : "global");
@@ -4201,6 +4220,12 @@ void write_global_to_file(FILE *fl, struct global_data *glb) {
 	
 	// I: interactions
 	write_interactions_to_file(fl, GET_GLOBAL_INTERACTIONS(glb));
+	
+	// M: mob spawns
+	LL_FOREACH(GET_GLOBAL_SPAWNS(glb), spawn) {
+		fprintf(fl, "M\n");
+		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
+	}
 	
 	// end
 	fprintf(fl, "S\n");

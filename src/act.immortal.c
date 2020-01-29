@@ -5430,6 +5430,11 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 			break;
 		}
 		case GLOBAL_MAP_SPAWNS: {
+			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, buf, TRUE);
+			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, buf2, TRUE);
+			msg_to_char(ch, "Climate: &c%s&0 (Exclude: &c%s&0)\r\n", buf, buf2);
+			sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags, buf, TRUE);
+			msg_to_char(ch, "Spawn flags: &g%s&0\r\n", buf);
 			break;
 		}
 	}
@@ -6253,7 +6258,7 @@ int vnum_global(char *searchname, char_data *ch) {
 	extern const char *global_types[];
 	
 	struct global_data *iter, *next_iter;
-	char flags[MAX_STRING_LENGTH];
+	char flags[MAX_STRING_LENGTH], flags2[MAX_STRING_LENGTH];
 	int found = 0;
 	
 	HASH_ITER(hh, globals_table, iter, next_iter) {
@@ -6271,6 +6276,9 @@ int vnum_global(char *searchname, char_data *ch) {
 					break;
 				}
 				case GLOBAL_MAP_SPAWNS: {
+					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), climate_flags, flags, TRUE);
+					sprintbit(GET_GLOBAL_SPARE_BITS(iter), spawn_flags_short, flags2, TRUE);
+					msg_to_char(ch, "%3d. [%5d] %s (%s | %s) (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, flags2, global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				default: {

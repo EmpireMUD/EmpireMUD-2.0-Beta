@@ -1035,6 +1035,7 @@ typedef struct vehicle_data vehicle_data;
 #define CROPF_NEWBIE_ONLY  BIT(3)	// only spawns on newbie islands
 #define CROPF_NO_NEWBIE  BIT(4)	// never spawns on newbie islands
 #define CROPF_ANY_LISTED_CLIMATE  BIT(5)	// climtes are "or" not "and"
+#define CROPF_NO_GLOBAL_SPAWNS  BIT(6)	// won't use global spawn lists
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2326,7 +2327,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// SECTOR DEFINES //////////////////////////////////////////////////////////
 
-// sector flags -- see constants.world.c
+// SECTF_x: sector flags -- see constants.world.c
 #define SECTF_LOCK_ICON  BIT(0)	// random icon is chosen once and kept
 #define SECTF_ADVENTURE  BIT(1)	// uses the adventure zone template
 #define SECTF_NON_ISLAND  BIT(2)	// does not count as an island for island detection (e.g. ocean, tundra)
@@ -2347,7 +2348,7 @@ typedef struct vehicle_data vehicle_data;
 #define SECTF_LARGE_CITY_RADIUS  BIT(17)	// counts as in-city much further than normal
 #define SECTF_OBSCURE_VISION  BIT(18)	// blocks mappc
 #define SECTF_IS_TRENCH  BIT(19)	// excavate-related
-	#define SECTF_UNUSED1  BIT(20)
+#define SECTF_NO_GLOBAL_SPAWNS  BIT(20)	// won't use global spawn lists
 #define SECTF_ROUGH  BIT(21)	// hard terrain, requires ATR; other mountain-like properties
 #define SECTF_SHALLOW_WATER  BIT(22)	// can't earthmeld; other properties like swamp and oasis have
 
@@ -2818,8 +2819,9 @@ struct global_data {
 	int max_level;
 	
 	// data
-	struct interaction_item *interactions;
-	struct archetype_gear *gear;
+	struct interaction_item *interactions;	// GLOBAL_MINE_DATA, GLOBAL_MOB_INTERAXTIONS
+	struct archetype_gear *gear;	// GLOBAL_NEWBIE_GEAR
+	struct spawn_info *spawns;	// GLOBAL_MAP_SPAWNS
 	
 	UT_hash_handle hh;
 };
