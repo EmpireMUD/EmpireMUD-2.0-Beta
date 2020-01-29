@@ -389,7 +389,7 @@ void olc_show_global(char_data *ch) {
 	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT), lbuf);
 	
-	if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR) {
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR && GET_GLOBAL_TYPE(glb) != GLOBAL_MAP_SPAWNS) {
 		if (GET_GLOBAL_MIN_LEVEL(glb) == 0) {
 			sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 		}
@@ -484,6 +484,11 @@ void olc_show_global(char_data *ch) {
 OLC_MODULE(gedit_ability) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	ability_data *abil;
+	
+	if (GET_GLOBAL_TYPE(glb) == GLOBAL_NEWBIE_GEAR || GET_GLOBAL_TYPE(glb) == GLOBAL_MAP_SPAWNS) {
+		msg_to_char(ch, "This global type can't use abilities.\r\n");
+		return;
+	}
 	
 	if (!*argument) {
 		msg_to_char(ch, "Require what ability (or 'none')?\r\n");
@@ -603,12 +608,24 @@ OLC_MODULE(gedit_interaction) {
 
 OLC_MODULE(gedit_maxlevel) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) == GLOBAL_NEWBIE_GEAR || GET_GLOBAL_TYPE(glb) == GLOBAL_MAP_SPAWNS) {
+		msg_to_char(ch, "This global type can't require levels.\r\n");
+		return;
+	}
+	
 	GET_GLOBAL_MAX_LEVEL(glb) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_GLOBAL_MAX_LEVEL(glb));
 }
 
 
 OLC_MODULE(gedit_minlevel) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) == GLOBAL_NEWBIE_GEAR || GET_GLOBAL_TYPE(glb) == GLOBAL_MAP_SPAWNS) {
+		msg_to_char(ch, "This global type can't require levels.\r\n");
+		return;
+	}
+	
 	GET_GLOBAL_MIN_LEVEL(glb) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_GLOBAL_MIN_LEVEL(glb));
 }
 
@@ -704,6 +721,17 @@ OLC_MODULE(gedit_type) {
 		GET_GLOBAL_SPARE_BITS(glb) = NOBITS;
 		for (iter = 0; iter < NUM_GLB_VAL_POSITIONS; ++iter) {
 			GET_GLOBAL_VAL(glb, iter) = 0;
+		}
+		
+		// more resets by type: things not used by that type
+		switch (GET_GLOBAL_TYPE(glb)) {
+			case GLOBAL_NEWBIE_GEAR:
+			case GLOBAL_MAP_SPAWNS: {
+				GET_GLOBAL_ABILITY(glb) = NO_ABIL;
+				GET_GLOBAL_MAX_LEVEL(glb) = 0;
+				GET_GLOBAL_MIN_LEVEL(glb) = 0;
+				break;
+			}
 		}
 	}
 }
