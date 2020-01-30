@@ -255,7 +255,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	save_library_file_for_vnum(DB_BOOT_SECTOR, vnum);
 	
 	// find a replacement sector for the world
-	replace_sect = sector_proto(config_get_int(""));
+	replace_sect = sector_proto(config_get_int("default_land_sect"));
 	if (!replace_sect) {
 		// just pull the first one
 		HASH_ITER(hh, sector_table, sect_iter, next_sect) {
