@@ -1202,7 +1202,10 @@ void spawn_mobs_from_center(room_data *center) {
 * @return bool TRUE if the spawn matches; FALSE if not.
 */
 bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city) {
+	extern int pick_season(room_data *room);
+	
 	room_data *home;
+	int season;
 	
 	if (!room) {
 		return FALSE;	// shortcut
@@ -1247,6 +1250,27 @@ bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coo
 	}
 	if (IS_SET(spawn_flags, SPAWN_WESTERN) && (x_coord == -1 || x_coord >= (MAP_WIDTH / 2))) {
 		return FALSE;
+	}
+	
+	// validate continent/not
+	if (IS_SET(spawn_flags, SPAWN_CONTINENT_ONLY)) {
+		if (!GET_ISLAND(room) || !IS_SET(GET_ISLAND(room)->flags, ISLE_CONTINENT)) {
+			return FALSE;	// not a continent
+		}
+	}
+	else if (IS_SET(spawn_flags, SPAWN_NO_CONTINENT)) {
+		if (GET_ISLAND(room) && IS_SET(GET_ISLAND(room)->flags, ISLE_CONTINENT)) {
+			return FALSE;	// oops is a continent
+		}
+	}
+	
+	// validate seasons -- if any are set
+	if (IS_SET(spawn_flags, SPAWN_SPRING_ONLY | SPAWN_SUMMER_ONLY | SPAWN_AUTUMN_ONLY | SPAWN_WINTER_ONLY)) {
+		season = pick_season(room);
+		if (!((IS_SET(spawn_flags, SPAWN_SPRING_ONLY) && season == TILESET_SPRING) || (IS_SET(spawn_flags, SPAWN_SUMMER_ONLY) && season == TILESET_SUMMER) || (IS_SET(spawn_flags, SPAWN_AUTUMN_ONLY) && season == TILESET_AUTUMN) || (IS_SET(spawn_flags, SPAWN_WINTER_ONLY) && season == TILESET_WINTER))) {
+			// none of the seasons match (only 1 must match)
+			return FALSE;
+		}
 	}
 	
 	// ok?

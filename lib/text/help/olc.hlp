@@ -2171,7 +2171,7 @@ NOTE: If players add bedrooms to a building, it will spawn additional citizens.
 
 See also: BEDIT DESIGNATE, OLC BUILDINGS
 #d
-"BEDIT SPAWNS" "CROPEDIT SPAWNS" "GEDIT SPAWNS" "SECTEDIT SPAWNS" "VEDIT SPAWNS"
+"BEDIT SPAWNS" "CROPEDIT SPAWNS" "GEDIT SPAWNS" "SECTEDIT SPAWNS" "VEDIT SPAWNS" "SPAWN FLAGS"
 
 Usage:  .spawns add <mob vnum> <percent> [flags]
         .spawns copy <from type> <from vnum>
@@ -2194,16 +2194,17 @@ will result in the mob never spawning. The flags indicate the mob will spawn
 ONLY if the condition is met.
 
 Available spawn flags:
- NOCTURNAL - only spawns at night
- DIURNAL - only spawns during the day
- CLAIMED - only spawns if the room/tile is claimed
- UNCLAIMED - only spawns if the room/tile is NOT claimed
- CITY - only spawns if the tile is in-city (and claimed)
- OUT-OF-CITY - only spawns if the tile is not in a city, or is unclaimed
- NORTHERN - only spawns in the northern half of the map
- SOUTHERN - only spawns in the southern half of the map
- EASTERN - only spawns in the eastern half of the map
- WESTERN - only spawns in the western half of the map
+ &cNOCTURNAL&0 - only spawns at night
+ &cDIURNAL&0 - only spawns during the day
+ &cCLAIMED&0 - only spawns if the room/tile is claimed
+ &cUNCLAIMED&0 - only spawns if the room/tile is NOT claimed
+ &cCITY&0 - only spawns if the tile is in-city (and claimed)
+ &cOUT-OF-CITY&0 - only spawns if the tile is not in a city, or is unclaimed
+ &cNORTHERN, SOUTHERN, EASTERN, WESTERN&0 - only spawns in that half of the map
+ &cCONTINENT&0 - only spawns on continents
+ &c!CONTINENT&0 - won't spawn on continents
+ &cSPRING-ONLY, SUMMER-ONLY, AUTUMN-ONLY, WINTER-ONLY&0 - only spawns in one of
+   these seasons
 
 Example:
  > .spawns add 12499 3 NOCTURNAL UNCLAIMED

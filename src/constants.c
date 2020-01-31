@@ -3381,32 +3381,44 @@ const char *sector_flags[] = {
 
 // SPAWN_x (1/2) -- full length spawn flags
 const char *spawn_flags[] = {
-	"NOCTURNAL",
+	"NOCTURNAL",	// 0
 	"DIURNAL",
 	"CLAIMED",
 	"UNCLAIMED",
 	"CITY",
-	"OUT-OF-CITY",
+	"OUT-OF-CITY",	// 5
 	"NORTHERN",
 	"SOUTHERN",
 	"EASTERN",
 	"WESTERN",
+	"CONTINENT-ONLY",	// 10
+	"!CONTINENT",
+	"SPRING-ONLY",
+	"SUMMER-ONLY",
+	"AUTUMN-ONLY",
+	"WINTER-ONLY",	// 15
 	"\n"
 };
 
 
 // SPAWN_x (2/2) -- short form for compressed display
 const char *spawn_flags_short[] = {
-	"NOCT",
+	"NOCT",	// 0
 	"DIA",
 	"CLM",
 	"!CLM",
 	"CITY",
-	"!CITY",
+	"!CITY",	// 5
 	"NORTH",
 	"SOUTH",
 	"EAST",
 	"WEST",
+	"CONT",	// 10
+	"!CONT",
+	"SPRING",
+	"SUMMER",
+	"AUTUMN",
+	"WINTER",	// 15
 	"\n"
 };
 

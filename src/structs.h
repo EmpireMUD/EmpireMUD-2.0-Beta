@@ -447,6 +447,12 @@ typedef struct vehicle_data vehicle_data;
 #define SPAWN_SOUTHERN  BIT(7)	// h. only spawns in the southern half
 #define SPAWN_EASTERN  BIT(8)	// i. only spawns in the east half
 #define SPAWN_WESTERN  BIT(9)	// j. only spawns in the west half
+#define SPAWN_CONTINENT_ONLY  BIT(10)	// k. only spawns on continents
+#define SPAWN_NO_CONTINENT  BIT(11)	// l. won't spawn on continents
+#define SPAWN_SPRING_ONLY  BIT(12)	// m. only during spring (or multiple seasons as listed)
+#define SPAWN_SUMMER_ONLY  BIT(13)	// n. only during summer (or multiple seasons as listed)
+#define SPAWN_AUTUMN_ONLY  BIT(14)	// o. only during autumn (or multiple seasons as listed)
+#define SPAWN_WINTER_ONLY  BIT(15)	// p. only during winter (or multiple seasons as listed)
 
 
 // trading post data state flags
@@ -3064,7 +3070,7 @@ struct slash_channel {
 struct spawn_info {
 	mob_vnum vnum;
 	double percent;	// .01 - 100.0
-	bitvector_t flags;	// SPAWN_x
+	bitvector_t flags;	// SPAWN_
 	
 	struct spawn_info *next;
 };
