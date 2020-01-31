@@ -287,6 +287,7 @@ void olc_search_global(char_data *ch, any_vnum vnum) {
 void save_olc_global(descriptor_data *desc) {	
 	struct global_data *proto, *glb = GET_OLC_GLOBAL(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	struct spawn_info *spawn;
 	UT_hash_handle hh;
 
 	// have a place to save it?
@@ -300,6 +301,10 @@ void save_olc_global(descriptor_data *desc) {
 	}
 	free_interactions(&GET_GLOBAL_INTERACTIONS(proto));
 	free_archetype_gear(GET_GLOBAL_GEAR(proto));
+	while ((spawn = GET_GLOBAL_SPAWNS(proto))) {
+		GET_GLOBAL_SPAWNS(proto) = spawn->next;
+		free(spawn);
+	}
 	
 	// sanity
 	if (!GET_GLOBAL_NAME(glb) || !*GET_GLOBAL_NAME(glb)) {
@@ -344,6 +349,7 @@ struct global_data *setup_olc_global(struct global_data *input) {
 		// copy pointers
 		GET_GLOBAL_INTERACTIONS(new) = copy_interaction_list(GET_GLOBAL_INTERACTIONS(input));
 		GET_GLOBAL_GEAR(new) = copy_archetype_gear(GET_GLOBAL_GEAR(input));
+		GET_GLOBAL_SPAWNS(new) = copy_spawn_list(GET_GLOBAL_SPAWNS(input));
 	}
 	else {
 		// brand new: some defaults
