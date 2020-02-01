@@ -7353,6 +7353,13 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 					}
 					break;
 				}
+				case OLC_GLOBAL: {
+					struct global_data *glb = global_proto(vnum);
+					if (glb) {
+						copyfrom = GET_GLOBAL_SPAWNS(glb);
+					}
+					break;
+				}
 				case OLC_SECTOR: {
 					if ((sect = sector_proto(vnum))) {
 						copyfrom = GET_SECT_SPAWNS(sect);
