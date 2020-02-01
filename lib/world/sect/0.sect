@@ -1,7 +1,7 @@
 #0
 Plains~
 The Open Plains~
-'.' 10 j 2 l bp
+'.' 10 jr 2 l bp
 C
 dig, pick~
 D1
@@ -772,7 +772,7 @@ S
 #10
 Building~
 A Building~
-'?' 27 0 1 dop 0
+'?' 27 0 1 dopu 0
 D1
 [..]~
 &0~
