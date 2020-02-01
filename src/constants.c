@@ -2368,22 +2368,23 @@ const double obj_flag_scaling_bonus[] = {
 
 // MAT_x -- name, TRUE if it floats
 const struct material_data materials[NUM_MATERIALS] = {
-	{ "WOOD", TRUE },
-	{ "ROCK", FALSE },
-	{ "IRON", FALSE },
-	{ "SILVER", FALSE },
-	{ "GOLD", FALSE },
-	{ "FLINT", FALSE },
-	{ "CLAY", FALSE },
-	{ "FLESH", TRUE },
-	{ "GLASS", FALSE },
-	{ "WAX", TRUE },
-	{ "MAGIC", TRUE },
-	{ "CLOTH", TRUE },
-	{ "GEM", FALSE },
-	{ "COPPER", FALSE },
-	{ "BONE", TRUE },
-	{ "HAIR", TRUE }
+	// name, floats, chance-to-get-from-dismantle
+	{ "WOOD", TRUE, 50.0 },
+	{ "ROCK", FALSE, 95.0 },
+	{ "IRON", FALSE, 90.0 },
+	{ "SILVER", FALSE, 100.0 },
+	{ "GOLD", FALSE, 100.0 },
+	{ "FLINT", FALSE, 95.0 },
+	{ "CLAY", FALSE, 75.0 },
+	{ "FLESH", TRUE, 50.0 },
+	{ "GLASS", FALSE, 50.0 },
+	{ "WAX", TRUE, 25.0 },
+	{ "MAGIC", TRUE, 100.0 },
+	{ "CLOTH", TRUE, 50.0 },
+	{ "GEM", FALSE, 100.0 },
+	{ "COPPER", FALSE, 100.0 },
+	{ "BONE", TRUE, 50.0 },
+	{ "HAIR", TRUE, 50.0 }
 };
 
 

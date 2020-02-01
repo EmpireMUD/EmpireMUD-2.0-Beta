@@ -4370,6 +4370,7 @@ struct empire_chore_type {
 struct material_data {
 	char *name;
 	bool floats;
+	double chance_to_dismantle;	// percent chance of getting it back when dismantling
 };
 
 

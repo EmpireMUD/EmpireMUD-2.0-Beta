@@ -3347,12 +3347,17 @@ void init_room(room_data *room, room_vnum vnum) {
 */
 void ruin_one_building(room_data *room) {
 	bool closed = ROOM_IS_CLOSED(room) ? TRUE : FALSE;
+	struct resource_data *res, *next_res, *save;
 	bld_data *bld = GET_BUILDING(room);
 	int dir = BUILDING_ENTRANCE(room);
 	vehicle_data *veh, *next_veh;
 	char buf[MAX_STRING_LENGTH];
 	room_data *to_room;
 	bld_vnum type;
+	
+	// save the resource list for later
+	save = GET_BUILT_WITH(room);
+	GET_BUILT_WITH(room) = NULL;
 	
 	// abandon first -- this will take care of accessory rooms, too
 	abandon_room(room);
@@ -3378,7 +3383,7 @@ void ruin_one_building(room_data *room) {
 				closed = FALSE;
 			}
 		}
-
+		
 		// basic setup
 		if (SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)) {
 			type = BUILDING_RUINS_FLOODED;
@@ -3391,7 +3396,7 @@ void ruin_one_building(room_data *room) {
 		}
 		construct_building(room, type);
 		COMPLEX_DATA(room)->entrance = dir;
-	
+		
 		// make the exit
 		if (closed && to_room) {
 			create_exit(room, to_room, rev_dir[dir], FALSE);
@@ -3407,6 +3412,20 @@ void ruin_one_building(room_data *room) {
 		
 		// run completion on the ruins
 		complete_building(room);
+		
+		// reattach built-with (if any) and reduce it to 22%
+		GET_BUILT_WITH(room) = save;
+		LL_FOREACH_SAFE(GET_BUILT_WITH(room), res, next_res) {
+			res->amount = ceil(res->amount * 0.22);
+			
+			if (res->amount <= 0) {	// delete if empty
+				LL_DELETE(GET_BUILT_WITH(room), res);
+				free(res);
+			}
+		}
+	}
+	else if (save) {
+		free_resource_list(save);
 	}
 }
 
