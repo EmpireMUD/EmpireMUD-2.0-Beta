@@ -461,9 +461,9 @@ void olc_show_global(char_data *ch) {
 			break;
 		}
 		case GLOBAL_MAP_SPAWNS: {
-			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, lbuf, TRUE);
+			prettier_sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, lbuf);
 			sprintf(buf + strlen(buf), "<%sclimateflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
-			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, lbuf, TRUE);
+			prettier_sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, lbuf);
 			sprintf(buf + strlen(buf), "<%sclimateexclude\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
 			sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<%sspawnflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_SPARE_BITS(glb), NOBITS), lbuf);

@@ -5430,8 +5430,8 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 			break;
 		}
 		case GLOBAL_MAP_SPAWNS: {
-			sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, buf, TRUE);
-			sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, buf2, TRUE);
+			prettier_sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, buf);
+			prettier_sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, buf2);
 			msg_to_char(ch, "Climate: &c%s&0(Exclude: &c%s&0)\r\n", buf, trim(buf2));
 			sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags, buf, TRUE);
 			msg_to_char(ch, "Spawn flags: &g%s&0\r\n", buf);
