@@ -59,7 +59,9 @@ const char *default_glb_name = "Unnamed Global";
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_global(struct global_data *glb, char_data *ch) {
+	char buf[MAX_STRING_LENGTH];
 	struct interaction_item *interact;
+	struct spawn_info *spawn;
 	bool problem = FALSE;
 
 	if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
@@ -102,6 +104,15 @@ bool audit_global(struct global_data *glb, char_data *ch) {
 			case GLOBAL_MAP_SPAWNS: {
 				break;
 			}
+		}
+	}
+	
+	// audit spawns
+	LL_FOREACH(GET_GLOBAL_SPAWNS(glb), spawn) {
+		if ((spawn->flags & GET_GLOBAL_SPARE_BITS(glb)) != NOBITS) {
+			prettier_sprintbit(spawn->flags & GET_GLOBAL_SPARE_BITS(glb), spawn_flags, buf);
+			olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Spawn has same flags as the global's spawn flags: %s", buf);
+			problem = TRUE;
 		}
 	}
 		
@@ -717,6 +728,7 @@ OLC_MODULE(gedit_spawns) {
 OLC_MODULE(gedit_type) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	int iter, old = GET_GLOBAL_TYPE(glb);
+	struct spawn_info *spawn;
 	
 	GET_GLOBAL_TYPE(glb) = olc_process_type(ch, argument, "type", "type", global_types, GET_GLOBAL_TYPE(glb));
 	
@@ -738,6 +750,16 @@ OLC_MODULE(gedit_type) {
 				GET_GLOBAL_MIN_LEVEL(glb) = 0;
 				break;
 			}
+		}
+		
+		// remove gear
+		free_archetype_gear(GET_GLOBAL_GEAR(glb));
+		GET_GLOBAL_GEAR(glb) = NULL;
+		
+		// remove spawns too
+		while ((spawn = GET_GLOBAL_SPAWNS(glb))) {
+			GET_GLOBAL_SPAWNS(glb) = spawn->next;
+			free(spawn);
 		}
 	}
 }
