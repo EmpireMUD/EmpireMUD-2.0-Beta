@@ -3356,8 +3356,14 @@ void ruin_one_building(room_data *room) {
 	bld_vnum type;
 	
 	// save the resource list for later
-	save = GET_BUILT_WITH(room);
-	GET_BUILT_WITH(room) = NULL;
+	if (GET_BUILT_WITH(room)) {
+		save = GET_BUILT_WITH(room);
+		GET_BUILT_WITH(room) = NULL;
+	}
+	else if (IS_DISMANTLING(room)) {
+		save = GET_BUILDING_RESOURCES(room);
+		GET_BUILDING_RESOURCES(room) = NULL;
+	}
 	
 	// abandon first -- this will take care of accessory rooms, too
 	abandon_room(room);
