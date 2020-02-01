@@ -3347,7 +3347,7 @@ void init_room(room_data *room, room_vnum vnum) {
 */
 void ruin_one_building(room_data *room) {
 	bool closed = ROOM_IS_CLOSED(room) ? TRUE : FALSE;
-	struct resource_data *res, *next_res, *save;
+	struct resource_data *res, *next_res, *save = NULL;
 	bld_data *bld = GET_BUILDING(room);
 	int dir = BUILDING_ENTRANCE(room);
 	vehicle_data *veh, *next_veh;
