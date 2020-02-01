@@ -30,14 +30,14 @@ R
 5110 0
 S
 #102
-flint stones rocks~
+flint flints stones~
 a flint stone~
 A piece of flint is lying on the ground.~
    This piece of flint is rough and unworked but, like all flint, holds the
 potential to be shaped into a powerful primitive weapon. Wield a rock and
 'chip' this flint to work it into a more useful shape.
 ~
-1 il ano 0 5
+1 il ano 0 6
 0 1 5
 5 0
 I 19 180 100.00 1  # CHIP: a chipped flint
@@ -95,14 +95,14 @@ R
 5117 0
 S
 #106
-obsidian rough black piece rocks~
+obsidian rough black piece~
 a rough piece of obsidian~
 A black piece of obsidian is on the ground.~
    Although it's rough and dirty, the gleaming black center of this piece of
 obsidian shows through. Obsidian forms a cutting edge like no other stone. Use
 'chip' to give it a sharp edge.
 ~
-1 hl ano 0 7
+1 hl ano 0 8
 0 2 5
 8 0
 I 19 182 100.00 1  # CHIP: a sharpened piece of obsidian
