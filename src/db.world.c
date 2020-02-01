@@ -3352,6 +3352,7 @@ void ruin_one_building(room_data *room) {
 	int dir = BUILDING_ENTRANCE(room);
 	vehicle_data *veh, *next_veh;
 	char buf[MAX_STRING_LENGTH];
+	double save_resources;
 	room_data *to_room;
 	bld_vnum type;
 	
@@ -3419,10 +3420,11 @@ void ruin_one_building(room_data *room) {
 		// run completion on the ruins
 		complete_building(room);
 		
-		// reattach built-with (if any) and reduce it to 22%
+		// reattach built-with (if any) and reduce it to 5-20%
+		save_resources = number(5, 20) / 100.0;
 		GET_BUILT_WITH(room) = save;
 		LL_FOREACH_SAFE(GET_BUILT_WITH(room), res, next_res) {
-			res->amount = ceil(res->amount * 0.22);
+			res->amount = ceil(res->amount * save_resources);
 			
 			if (res->amount <= 0) {	// delete if empty
 				LL_DELETE(GET_BUILT_WITH(room), res);
