@@ -2633,6 +2633,8 @@ struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
 	{ "pistol", "shoot", "shoots", "shot", { 2.0, 2.4, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
 	{ "musket", "shoot", "shoots", "shot", { 3.6, 3.8, 4.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
 	{ "fire breath", "breathe fire at", "breathes fire at", "fire breath", { 3.6, 3.8, 4.0 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE },
+	{ "sling", "shoot", "shoots", "shot", { 3.0, 3.5, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "spear-thrower", "shoot", "shoots", "shot", { 3.5, 4.0, 4.5 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
 };
 
 

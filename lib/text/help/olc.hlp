@@ -5488,6 +5488,8 @@ The following weapon types are available:
 31. crossbow (shoot) - a crossbow
 32. pistol (shoot) - a small firearm
 33. musket (shoot) - a large firearm
+34. sling (shoot) - a primitive ranged weapon that shoots sling bullets
+35. spear-thrower (shoot) - a primitive ranged weapon that shoots spears/darts
 
 See also: OLC OBJECTS
 #d

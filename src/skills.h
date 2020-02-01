@@ -314,8 +314,10 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define TYPE_PISTOL  31	// shoot / pistol
 #define TYPE_MUSKET  32	// shoot / musket
 #define TYPE_FIRE_BREATH  33	// non-disarmable fire blast
+#define TYPE_SLING  34	// shoot / sling
+#define TYPE_SPEAR_THROWER  35	// shoot / spear-thrower
 
-#define NUM_ATTACK_TYPES  34	// total
+#define NUM_ATTACK_TYPES  36	// total
 
 // helpfulment
 #define IS_WEAPON_TYPE(type) (((type) >= TYPE_RESERVED) && ((type) < TYPE_SUFFERING))
