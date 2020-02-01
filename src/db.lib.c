@@ -4045,6 +4045,7 @@ void clear_global(struct global_data *glb) {
 */
 void free_global(struct global_data *glb) {
 	struct global_data *proto = global_proto(GET_GLOBAL_VNUM(glb));
+	struct spawn_info *spawn;
 	
 	if (GET_GLOBAL_NAME(glb) && (!proto || GET_GLOBAL_NAME(glb) != GET_GLOBAL_NAME(proto))) {
 		free(GET_GLOBAL_NAME(glb));
@@ -4056,6 +4057,13 @@ void free_global(struct global_data *glb) {
 	
 	if (GET_GLOBAL_GEAR(glb) && (!proto || GET_GLOBAL_GEAR(glb) != GET_GLOBAL_GEAR(proto))) {
 		free_archetype_gear(GET_GLOBAL_GEAR(glb));
+	}
+	
+	if (GET_GLOBAL_SPAWNS(glb) && (!proto || GET_GLOBAL_SPAWNS(glb) != GET_GLOBAL_SPAWNS(proto))) {
+		while ((spawn = GET_GLOBAL_SPAWNS(glb))) {
+			GET_GLOBAL_SPAWNS(glb) = spawn->next;
+			free(spawn);
+		}
 	}
 	
 	free(glb);
