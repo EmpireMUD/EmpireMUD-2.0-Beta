@@ -2503,6 +2503,9 @@ typedef struct vehicle_data vehicle_data;
 #define CLIM_SALT_WATER  BIT(15)	// p. ocean, sea; salt water
 #define CLIM_FOREST  BIT(16)	// q. forested
 #define CLIM_GRASSLAND  BIT(17)	// p. plains, savannah, steppe
+#define CLIM_COASTAL  BIT(18)	// q. marks the edge on either the ocean or grassland side
+#define CLIM_OCEAN  BIT(19)	// r. out to sea (compare to salt-water which could also be a lake)
+#define CLIM_LAKE  BIT(20)	// s. either fresh or salt water
 
 
 // DPLTN_x: depletion types

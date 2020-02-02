@@ -31,6 +31,7 @@
 // external consts
 extern const char *action_bits[];
 extern const char *climate_flags[];
+extern const bitvector_t climate_flags_order[];
 extern const char *global_flags[];
 extern const char *global_types[];
 extern const char *interact_types[];
@@ -199,7 +200,7 @@ char *list_one_global(struct global_data *glb, bool detail) {
 		}
 		case GLOBAL_MAP_SPAWNS: {
 			if (detail) {
-				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, flags, TRUE);
+				ordered_sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, climate_flags_order, TRUE, flags);
 				sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags_short, flags2, TRUE);
 				snprintf(output, sizeof(output), "[%5d] %s%s %.2f%%%s %s| %s(%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags, flags2, global_types[GET_GLOBAL_TYPE(glb)]);
 			}
@@ -472,9 +473,9 @@ void olc_show_global(char_data *ch) {
 			break;
 		}
 		case GLOBAL_MAP_SPAWNS: {
-			prettier_sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, lbuf);
+			ordered_sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, climate_flags_order, TRUE, lbuf);
 			sprintf(buf + strlen(buf), "<%sclimateflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
-			prettier_sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, lbuf);
+			ordered_sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, climate_flags_order, TRUE, lbuf);
 			sprintf(buf + strlen(buf), "<%sclimateexclude\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
 			sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<%sspawnflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_SPARE_BITS(glb), NOBITS), lbuf);

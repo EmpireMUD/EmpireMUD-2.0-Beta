@@ -2925,7 +2925,7 @@ const char *bld_relationship_types[] = {
 };
 
 
-// CLIM_x: climate flags
+// CLIM_x (1/2): climate flags
 const char *climate_flags[] = {
 	"*",	// 0
 	"*",
@@ -2945,7 +2945,29 @@ const char *climate_flags[] = {
 	"salt water",	// 15
 	"forest",
 	"grassland",
+	"coastal",
+	"ocean",
+	"lake",	// 20
 	"\n"
+};
+
+
+// CLIM_x (2/2): order to display climate flags
+const bitvector_t climate_flags_order[] = {
+	CLIM_HOT, CLIM_COLD,	// temperatures first
+	CLIM_HIGH, CLIM_LOW,	// relative elevation
+	CLIM_MAGICAL,			// special attribute
+	
+	CLIM_TEMPERATE, CLIM_ARID, CLIM_TROPICAL,	// latitude adjustments
+	
+	CLIM_COASTAL, CLIM_FRESH_WATER, CLIM_SALT_WATER,	// water prefixes
+	CLIM_RIVER, CLIM_OCEAN, CLIM_LAKE,	// water types
+	
+	CLIM_MOUNTAIN,		// land terrain that could be prefix or whole name
+	CLIM_FOREST, CLIM_GRASSLAND,	// land terrains
+	
+	CLIM_UNUSED1, CLIM_UNUSED2, CLIM_UNUSED3, CLIM_UNUSED4,	// move these when used
+	NOBITS	// last
 };
 
 

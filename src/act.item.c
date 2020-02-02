@@ -334,6 +334,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *apply_type_names[];
 	extern const char *climate_flags[];
+	extern const bitvector_t climate_flags_order[];
 	extern const char *craft_types[];
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
@@ -598,12 +599,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	// data that isn't type-based:
 	if (OBJ_FLAGGED(obj, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
-		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
-			prettier_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, lbuf);
-		}
-		else {
-			sprintbit(GET_CROP_CLIMATE(cp), climate_flags, lbuf, TRUE);
-		}
+		ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, lbuf);
 		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? trim(lbuf) : "any climate");
 	}
 	

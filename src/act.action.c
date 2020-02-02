@@ -3235,6 +3235,7 @@ ACMD(do_pick) {
 
 ACMD(do_plant) {
 	extern const char *climate_flags[];
+	extern const bitvector_t climate_flags_order[];
 	
 	struct evolution_data *evo;
 	sector_data *original;
@@ -3285,11 +3286,11 @@ ACMD(do_plant) {
 	}
 	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, SECT(IN_ROOM(ch)))) {
 		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
-			prettier_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf);
+			ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, TRUE, buf);
 			msg_to_char(ch, "You can only plant that in areas that are: %s\r\n", buf);
 		}
 		else {
-			sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf, TRUE);
+			ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, FALSE, buf);
 			msg_to_char(ch, "You can only plant that in %s areas.\r\n", trim(buf));
 		}
 	}

@@ -46,6 +46,7 @@ extern const char *bld_on_flags[];
 extern const bitvector_t bld_on_flags_order[];
 extern const char *bonus_bits[];
 extern const char *climate_flags[];
+extern const bitvector_t climate_flags_order[];
 extern const char *component_flags[];
 extern const char *component_types[];
 extern const char *craft_types[];
@@ -5261,7 +5262,7 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 	msg_to_char(ch, "Crop VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
 	msg_to_char(ch, "Room Title: %s, Mapout Color: %s\r\n", GET_CROP_TITLE(cp), mapout_color_names[GET_CROP_MAPOUT(cp)]);
 	
-	sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf, TRUE);
+	ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE), buf);
 	msg_to_char(ch, "Climate: &g%s&0\r\n", GET_CROP_CLIMATE(cp) ? buf : "(none)");
 	
 	sprintbit(GET_CROP_FLAGS(cp), crop_flags, buf, TRUE);
@@ -5430,8 +5431,8 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 			break;
 		}
 		case GLOBAL_MAP_SPAWNS: {
-			prettier_sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, buf);
-			prettier_sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, buf2);
+			ordered_sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, climate_flags_order, TRUE, buf);
+			ordered_sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, climate_flags_order, TRUE, buf2);
 			msg_to_char(ch, "Climate: &c%s&0(Exclude: &c%s&0)\r\n", buf, trim(buf2));
 			sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags, buf, TRUE);
 			msg_to_char(ch, "Spawn flags: &g%s&0\r\n", buf);
@@ -5687,12 +5688,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	
 	// data that isn't type-based:
 	if (OBJ_FLAGGED(j, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE)))) {
-		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
-			prettier_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf);
-		}
-		else {
-			sprintbit(GET_CROP_CLIMATE(cp), climate_flags, buf, TRUE);
-		}
+		ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, buf);
 		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? trim(buf) : "any climate");
 	}
 
@@ -6109,7 +6105,7 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 	
 	msg_to_char(ch, "Movement cost: [&g%d&0]  Roadside Icon: %c  Mapout Color: %s\r\n", st->movement_loss, st->roadside_icon, mapout_color_names[GET_SECT_MAPOUT(st)]);
 
-	sprintbit(GET_SECT_CLIMATE(st), climate_flags, buf, TRUE);
+	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, buf);
 	msg_to_char(ch, "Climate: &g%s&0\r\n", buf);
 	
 	if (st->icons) {
@@ -6277,7 +6273,7 @@ int vnum_global(char *searchname, char_data *ch) {
 					break;
 				}
 				case GLOBAL_MAP_SPAWNS: {
-					sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), climate_flags, flags, TRUE);
+					ordered_sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), climate_flags, climate_flags_order, TRUE, flags);
 					sprintbit(GET_GLOBAL_SPARE_BITS(iter), spawn_flags_short, flags2, TRUE);
 					msg_to_char(ch, "%3d. [%5d] %s (%s| %s) (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, trim(flags2), global_types[GET_GLOBAL_TYPE(iter)]);
 					break;

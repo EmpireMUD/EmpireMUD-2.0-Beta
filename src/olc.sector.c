@@ -32,6 +32,7 @@
 extern const char *bld_on_flags[];
 extern const bitvector_t bld_on_flags_order[];
 extern const char *climate_flags[];
+extern const bitvector_t climate_flags_order[];
 extern const char *evo_types[];
 extern const int evo_val_types[NUM_EVOS];
 extern const char *interact_types[];
@@ -819,7 +820,7 @@ void olc_show_sector(char_data *ch) {
 	get_icons_display(GET_SECT_ICONS(st), buf1);
 	strcat(buf, buf1);
 
-	sprintbit(GET_SECT_CLIMATE(st), climate_flags, lbuf, TRUE);
+	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, lbuf);
 	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(st->climate, NOBITS), lbuf);
 	sprintf(buf + strlen(buf), "<%smovecost\t0> %d\r\n", OLC_LABEL_VAL(st->movement_loss, 0), st->movement_loss);
 
