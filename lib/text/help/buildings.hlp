@@ -1346,7 +1346,7 @@ See also: CIRCLE, GATEHOUSE, GREAT WALLS, RITUAL OF DEFENSE
 #
 WELL
 
-&t(&c~~&t)  Well  (Build ability)
+&t(&c~~&t)&0  Well  (Build ability)
 
 Wells provide water for your little settlement. They can be built on temperate
 plains or on an oasis in the desert.
