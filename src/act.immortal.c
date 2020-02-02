@@ -5263,7 +5263,7 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 	msg_to_char(ch, "Room Title: %s, Mapout Color: %s\r\n", GET_CROP_TITLE(cp), mapout_color_names[GET_CROP_MAPOUT(cp)]);
 	
 	ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE), buf);
-	msg_to_char(ch, "Climate: &g%s&0\r\n", GET_CROP_CLIMATE(cp) ? buf : "(none)");
+	msg_to_char(ch, "Climate: &c%s&0\r\n", GET_CROP_CLIMATE(cp) ? buf : "(none)");
 	
 	sprintbit(GET_CROP_FLAGS(cp), crop_flags, buf, TRUE);
 	msg_to_char(ch, "Crop flags: &g%s&0\r\n", buf);
@@ -6104,9 +6104,6 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 	}
 	
 	msg_to_char(ch, "Movement cost: [&g%d&0]  Roadside Icon: %c  Mapout Color: %s\r\n", st->movement_loss, st->roadside_icon, mapout_color_names[GET_SECT_MAPOUT(st)]);
-
-	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, buf);
-	msg_to_char(ch, "Climate: &g%s&0\r\n", buf);
 	
 	if (st->icons) {
 		msg_to_char(ch, "Icons:\r\n");
@@ -6116,6 +6113,9 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 	
 	sprintbit(st->flags, sector_flags, buf, TRUE);
 	msg_to_char(ch, "Sector flags: &g%s&0\r\n", buf);
+	
+	ordered_sprintbit(GET_SECT_CLIMATE(st), climate_flags, climate_flags_order, FALSE, buf);
+	msg_to_char(ch, "Climate: &c%s&0\r\n", buf);
 	
 	ordered_sprintbit(st->build_flags, bld_on_flags, bld_on_flags_order, TRUE, buf);
 	msg_to_char(ch, "Build flags: &g%s&0\r\n", buf);
