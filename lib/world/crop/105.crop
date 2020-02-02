@@ -16,10 +16,6 @@ I 8 10501 20.00 4 H  # HARVEST: a handful of glowkra pods
 I 8 10501 20.00 5 H  # HARVEST: a handful of glowkra pods
 I 8 10501 20.00 6 H  # HARVEST: a handful of glowkra pods
 M
-9134 5.00 bdh
-M
-9120 15.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -27,24 +23,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9044 1.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
 S
 #10501
 spadebrush~
@@ -76,16 +54,6 @@ M
 M
 246 0.30 ad
 M
-9044 1.00 bdh
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
-M
 9150 5.00 d
 M
 9149 5.00 d
@@ -93,14 +61,6 @@ M
 9148 5.00 d
 M
 9008 5.00 d
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
 S
 #10502
 dragonsteeth~
@@ -124,14 +84,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
 M
 10506 10.00 bd
 M
@@ -172,10 +124,6 @@ I 8 10510 20.00 6 H  # HARVEST: a bushel of bladegrass
 I 8 10509 75.00 1 S  # HARVEST: a handful of bladegrass seeds
 I 8 10509 25.00 2 S  # HARVEST: a handful of bladegrass seeds
 M
-9134 5.00 bdh
-M
-9120 15.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -183,24 +131,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9044 1.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
 S
 #10504
 gemfruit~
@@ -229,10 +159,6 @@ I 8 10514 20.00 4 H  # HARVEST: a basket of sparkling gemfruits
 I 8 10514 20.00 5 H  # HARVEST: a basket of sparkling gemfruits
 I 8 10514 20.00 6 H  # HARVEST: a basket of sparkling gemfruits
 M
-9134 5.00 bdh
-M
-9120 15.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -240,24 +166,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9044 1.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
 S
 #10505
 magic mushrooms~
@@ -286,16 +194,6 @@ M
 M
 246 0.30 ad
 M
-9044 1.00 bdh
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
-M
 9150 5.00 d
 M
 9149 5.00 d
@@ -303,14 +201,6 @@ M
 9148 5.00 d
 M
 9008 5.00 d
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
 S
 #10506
 pudding figs~
@@ -350,16 +240,6 @@ M
 M
 246 0.30 ad
 M
-9044 1.00 bdh
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
-M
 9150 5.00 d
 M
 9149 5.00 d
@@ -367,14 +247,6 @@ M
 9148 5.00 d
 M
 9008 5.00 d
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
 S
 #10507
 giant beanstalks~
@@ -401,16 +273,6 @@ M
 M
 246 0.30 ad
 M
-9044 1.00 bdh
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
-M
 9150 5.00 d
 M
 9149 5.00 d
@@ -418,14 +280,6 @@ M
 9148 5.00 d
 M
 9008 5.00 d
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
 S
 #10508
 axeroot~
@@ -454,16 +308,6 @@ M
 M
 246 0.30 ad
 M
-9044 1.00 bdh
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
-M
 9150 5.00 d
 M
 9149 5.00 d
@@ -471,14 +315,6 @@ M
 9148 5.00 d
 M
 9008 5.00 d
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
 S
 #10509
 puppy plants~
@@ -508,12 +344,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9044 1.00 bdh
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
 M
 9150 5.00 d
 M
@@ -554,16 +384,6 @@ M
 M
 246 0.30 ad
 M
-9044 1.00 bdh
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
-M
 9150 5.00 d
 M
 9149 5.00 d
@@ -571,14 +391,6 @@ M
 9148 5.00 d
 M
 9008 5.00 d
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
 S
 #10511
 vigilant vines~
@@ -603,31 +415,9 @@ I 8 10535 20.00 6 H  # HARVEST: a bundle of vigilant vines
 M
 10515 50.00 e
 M
-9134 5.00 bdh
-M
-9120 15.00 adg
-M
 248 1.00 bd
 M
 247 0.10 d
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9044 1.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
 M
 10516 0.50 d
 S

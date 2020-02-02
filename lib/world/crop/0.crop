@@ -23,10 +23,6 @@ I 8 141 20.00 4 H  # HARVEST: a bundle of wheat
 I 8 141 20.00 5 H  # HARVEST: a bundle of wheat
 I 8 141 20.00 6 H  # HARVEST: a bundle of wheat
 M
-9134 5.00 bdh
-M
-9120 15.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -34,24 +30,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9044 1.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
 S
 #2
 corn~
@@ -69,10 +47,6 @@ I 8 3005 20.00 4 H  # HARVEST: a bushel of corn
 I 8 3005 20.00 5 H  # HARVEST: a bushel of corn
 I 8 3005 20.00 6 H  # HARVEST: a bushel of corn
 M
-9134 5.00 bdh
-M
-9120 15.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -80,24 +54,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9044 1.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
 S
 #3
 hops~
@@ -114,10 +70,6 @@ I 8 143 20.00 4 H  # HARVEST: a bushel of hops
 I 8 143 20.00 5 H  # HARVEST: a bushel of hops
 I 8 143 20.00 6 H  # HARVEST: a bushel of hops
 M
-9134 5.00 bdh
-M
-9120 15.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -125,24 +77,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9044 1.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
 S
 #4
 cotton~
@@ -176,8 +110,6 @@ M
 M
 9018 5.00 d
 M
-9120 15.00 ad
-M
 9130 15.00 ad
 M
 9117 15.00 bd
@@ -189,8 +121,6 @@ M
 9125 5.00 bd
 M
 9042 5.00 d
-M
-9044 1.00 bdh
 S
 #5
 barley~
@@ -208,10 +138,6 @@ I 8 145 20.00 4 H  # HARVEST: a sack of barley
 I 8 145 20.00 5 H  # HARVEST: a sack of barley
 I 8 145 20.00 6 H  # HARVEST: a sack of barley
 M
-9134 5.00 bdh
-M
-9120 15.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -219,24 +145,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9044 1.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
 S
 #6
 peaches~
@@ -290,16 +198,6 @@ M
 M
 246 0.30 ad
 M
-9044 1.00 bdh
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
-M
 9150 5.00 d
 M
 9149 5.00 d
@@ -307,14 +205,6 @@ M
 9148 5.00 d
 M
 9008 5.00 d
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
 S
 #7
 cherries~
@@ -368,16 +258,6 @@ M
 M
 246 0.30 ad
 M
-9044 1.00 bdh
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
-M
 9150 5.00 d
 M
 9149 5.00 d
@@ -385,14 +265,6 @@ M
 9148 5.00 d
 M
 9008 5.00 d
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
 S
 #8
 oranges~
@@ -435,8 +307,6 @@ M
 M
 9018 5.00 d
 M
-9120 15.00 ad
-M
 9130 15.00 ad
 M
 9117 15.00 bd
@@ -448,8 +318,6 @@ M
 9125 5.00 bd
 M
 9042 5.00 d
-M
-9044 1.00 bdh
 S
 #9
 rice~
@@ -467,10 +335,6 @@ I 8 3011 20.00 4 H  # HARVEST: a sack of dried rice
 I 8 3011 20.00 5 H  # HARVEST: a sack of dried rice
 I 8 3011 20.00 6 H  # HARVEST: a sack of dried rice
 M
-9134 5.00 bdh
-M
-9120 15.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -478,24 +342,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9044 1.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
 S
 #10
 olives~
@@ -538,8 +384,6 @@ M
 M
 9018 5.00 d
 M
-9120 15.00 ad
-M
 9130 15.00 ad
 M
 9117 15.00 bd
@@ -551,8 +395,6 @@ M
 9125 5.00 bd
 M
 9042 5.00 d
-M
-9044 1.00 bdh
 S
 #11
 peas~
@@ -569,10 +411,6 @@ I 8 3021 20.00 4 H  # HARVEST: a basket of peas
 I 8 3021 20.00 5 H  # HARVEST: a basket of peas
 I 8 3021 20.00 6 H  # HARVEST: a basket of peas
 M
-9134 5.00 bdh
-M
-9120 15.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -580,24 +418,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9044 1.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
 S
 #12
 squash~
@@ -610,10 +430,6 @@ oooo~
 I 6 3022 100.00 1  # FORAGE: a yellow squash
 I 8 3023 100.00 2  # HARVEST: a basket of squash
 M
-9134 5.00 bdh
-M
-9120 15.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -621,24 +437,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9044 1.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
 S
 #13
 apples~
@@ -692,16 +490,6 @@ M
 M
 246 0.30 ad
 M
-9044 1.00 bdh
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9152 5.00 bd
-M
-9014 10.00 bd
-M
 9150 5.00 d
 M
 9149 5.00 d
@@ -709,14 +497,6 @@ M
 9148 5.00 d
 M
 9008 5.00 d
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
 S
 #14
 plantains~

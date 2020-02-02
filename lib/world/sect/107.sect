@@ -20,8 +20,6 @@ I 6 3015 100.00 1  # FORAGE: some red berries
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 120 100.00 1  # CHOP: a large tree
 M
-9040 0.01 d
-M
 9056 0.01 d
 M
 9109 10.00 dh
@@ -64,10 +62,6 @@ M
 M
 9153 10.00 bc
 M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
 9201 5.00 dh
 M
 9202 5.00 dh
@@ -97,8 +91,6 @@ I 20 122 10.00 3 c  # CHOP: some rough wood
 I 20 122 50.00 2 c  # CHOP: some rough wood
 I 20 122 35.00 1 c  # CHOP: some rough wood
 M
-9040 0.01 d
-M
 9059 0.01 ad
 M
 9055 0.01 bd
@@ -117,15 +109,11 @@ M
 M
 9131 5.00 d
 M
-9128 5.00 d
-M
 9027 15.00 bd
 M
 9123 5.00 d
 M
 9018 5.00 d
-M
-9120 15.00 ad
 M
 9118 15.00 ad
 M
@@ -148,7 +136,5 @@ M
 9153 10.00 bc
 M
 9042 5.00 d
-M
-9044 1.00 bdh
 S
 $

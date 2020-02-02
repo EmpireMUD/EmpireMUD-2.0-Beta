@@ -21,8 +21,6 @@ I 8 10146 33.30 3 H  # HARVEST: a basket of saguaro fruit
 I 8 10146 33.30 4 H  # HARVEST: a basket of saguaro fruit
 I 20 10149 100.00 1  # CHOP: a fallen saguaro cactus
 M
-9040 0.01 d
-M
 9059 0.01 ad
 M
 9055 0.01 bd
@@ -41,15 +39,11 @@ M
 M
 9131 5.00 d
 M
-9128 5.00 d
-M
 9027 15.00 bd
 M
 9123 5.00 d
 M
 9018 5.00 d
-M
-9120 15.00 ad
 M
 9118 15.00 ad
 M
@@ -92,8 +86,6 @@ M
 10158 3.00 c
 M
 9042 5.00 d
-M
-9044 1.00 bdh
 S
 #10150
 mesquite trees~
@@ -131,8 +123,6 @@ I 9 132 100.00 1  # GATHER: some thorny branches
 I 20 10151 50.00 2 c  # CHOP: a mesquite tree
 I 20 10151 50.00 1 c  # CHOP: a mesquite tree
 M
-9040 0.01 d
-M
 9059 0.01 ad
 M
 9055 0.01 bd
@@ -151,15 +141,11 @@ M
 M
 9131 5.00 d
 M
-9128 5.00 d
-M
 9027 15.00 bd
 M
 9123 5.00 d
 M
 9018 5.00 d
-M
-9120 15.00 ad
 M
 9118 15.00 ad
 M
@@ -202,8 +188,6 @@ M
 10158 3.00 c
 M
 9042 5.00 d
-M
-9044 1.00 bdh
 S
 #10153
 alligator pears~
@@ -227,8 +211,6 @@ I 8 10153 100.00 1  # HARVEST: a basket of alligator pears
 I 20 122 50.00 2 c  # CHOP: some rough wood
 I 20 122 50.00 1 c  # CHOP: some rough wood
 M
-9040 0.01 d
-M
 9059 0.01 ad
 M
 9055 0.01 bd
@@ -247,15 +229,11 @@ M
 M
 9131 5.00 d
 M
-9128 5.00 d
-M
 9027 15.00 bd
 M
 9123 5.00 d
 M
 9018 5.00 d
-M
-9120 15.00 ad
 M
 9118 15.00 ad
 M
@@ -298,8 +276,6 @@ M
 10158 3.00 c
 M
 9042 5.00 d
-M
-9044 1.00 bdh
 S
 #10155
 limes~
@@ -323,8 +299,6 @@ I 8 10155 100.00 1  # HARVEST: a basket of limes
 I 20 122 50.00 2 c  # CHOP: some rough wood
 I 20 122 50.00 1 c  # CHOP: some rough wood
 M
-9040 0.01 d
-M
 9059 0.01 ad
 M
 9055 0.01 bd
@@ -343,15 +317,11 @@ M
 M
 9131 5.00 d
 M
-9128 5.00 d
-M
 9027 15.00 bd
 M
 9123 5.00 d
 M
 9018 5.00 d
-M
-9120 15.00 ad
 M
 9118 15.00 ad
 M
@@ -394,8 +364,6 @@ M
 10158 3.00 c
 M
 9042 5.00 d
-M
-9044 1.00 bdh
 S
 #10157
 firemelons~
@@ -434,8 +402,6 @@ I 8 10158 16.67 2 H  # HARVEST: a crimson firemelon
 I 8 10158 16.67 3 H  # HARVEST: a crimson firemelon
 I 8 10158 16.66 4 H  # HARVEST: a crimson firemelon
 M
-9040 0.01 d
-M
 9059 0.01 ad
 M
 9055 0.01 bd
@@ -454,15 +420,11 @@ M
 M
 9131 5.00 d
 M
-9128 5.00 d
-M
 9027 15.00 bd
 M
 9123 5.00 d
 M
 9018 5.00 d
-M
-9120 15.00 ad
 M
 9118 15.00 ad
 M
@@ -505,7 +467,5 @@ M
 10158 20.00 c
 M
 9042 5.00 d
-M
-9044 1.00 bdh
 S
 $
