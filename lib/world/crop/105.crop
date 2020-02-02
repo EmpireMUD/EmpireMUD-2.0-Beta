@@ -42,10 +42,6 @@ I 8 10506 75.00 1 S  # HARVEST: a handful of spadebrush seeds
 I 8 10506 25.00 2 S  # HARVEST: a handful of spadebrush seeds
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 M
-9145 5.00 adh
-M
-9144 5.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -53,14 +49,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
-M
-9008 5.00 d
 S
 #10502
 dragonsteeth~
@@ -182,10 +170,6 @@ I 8 10516 20.00 4 H  # HARVEST: a basket of magic mushrooms
 I 8 10516 20.00 5 H  # HARVEST: a basket of magic mushrooms
 I 8 10516 20.00 6 H  # HARVEST: a basket of magic mushrooms
 M
-9145 5.00 adh
-M
-9144 5.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -193,14 +177,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
-M
-9008 5.00 d
 S
 #10506
 pudding figs~
@@ -228,10 +204,6 @@ I 8 10519 100.00 1  # HARVEST: a basket of pudding figs
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 120 100.00 1  # CHOP: a large tree
 M
-9145 5.00 adh
-M
-9144 5.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -239,14 +211,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
-M
-9008 5.00 d
 S
 #10507
 giant beanstalks~
@@ -261,10 +225,6 @@ I 8 10537 100.00 1  # HARVEST: a giant beanstalk
 I 8 10523 75.00 1 S  # HARVEST: a handful of magic beans
 I 8 10523 25.00 2 S  # HARVEST: a handful of magic beans
 M
-9145 5.00 adh
-M
-9144 5.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -272,14 +232,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
-M
-9008 5.00 d
 S
 #10508
 axeroot~
@@ -296,10 +248,6 @@ I 8 10525 20.00 4 H  # HARVEST: an axeroot
 I 8 10525 20.00 5 H  # HARVEST: an axeroot
 I 8 10525 20.00 6 H  # HARVEST: an axeroot
 M
-9145 5.00 adh
-M
-9144 5.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -307,14 +255,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
-M
-9008 5.00 d
 S
 #10509
 puppy plants~
@@ -344,12 +284,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
 S
 #10510
 pickthorn~
@@ -372,10 +306,6 @@ I 8 10531 75.00 1 S  # HARVEST: a red pickthorn fruit
 I 8 10531 25.00 2 S  # HARVEST: a red pickthorn fruit
 I 9 132 100.00 1  # GATHER: some thorny branches
 M
-9145 5.00 adh
-M
-9144 5.00 adg
-M
 250 0.10 ad
 M
 248 1.00 bd
@@ -383,14 +313,6 @@ M
 247 0.10 d
 M
 246 0.30 ad
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
-M
-9008 5.00 d
 S
 #10511
 vigilant vines~
@@ -442,8 +364,6 @@ M
 M
 9179 15.00 g
 M
-9171 5.00 0
-M
 10556 5.00 0
 M
 10557 5.00 0
@@ -467,8 +387,6 @@ M
 9177 5.00 g
 M
 9179 15.00 g
-M
-9171 5.00 0
 M
 10556 5.00 0
 M
