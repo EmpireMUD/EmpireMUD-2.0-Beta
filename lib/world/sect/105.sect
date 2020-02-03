@@ -128,18 +128,6 @@ I 7 123 100.00 1 p  # PICK: a small flower
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 10558 100.00 1  # CHOP: a spruce tree
 M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-253 10.00 cf
-M
-240 6.00 bc
-M
 9154 10.00 bc
 M
 10556 5.00 0
@@ -206,18 +194,6 @@ I 7 123 100.00 1 p  # PICK: a small flower
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 10558 100.00 1  # CHOP: a spruce tree
 M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-253 10.00 cf
-M
-240 6.00 bc
-M
 9154 10.00 bc
 M
 10556 5.00 0
@@ -260,18 +236,6 @@ I 7 123 100.00 1 p  # PICK: a small flower
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 10558 100.00 1  # CHOP: a spruce tree
 M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-253 10.00 cf
-M
-240 6.00 bc
-M
 9154 10.00 bc
 M
 10556 5.00 0
@@ -309,18 +273,6 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: a small flower
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 10558 100.00 1  # CHOP: a spruce tree
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-253 10.00 cf
-M
-240 6.00 bc
 M
 9154 10.00 bc
 M
@@ -369,18 +321,6 @@ E
 I 5 10552 9.00 1 X  # DIG: some arctic brambleberries
 I 5 100 100.00 1 X  # DIG: a rock
 I 6 3013 100.00 1  # FORAGE: a handful of nuts
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-253 10.00 cf
-M
-240 6.00 bc
 M
 9154 10.00 bc
 M

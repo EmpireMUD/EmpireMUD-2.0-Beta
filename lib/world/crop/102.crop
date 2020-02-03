@@ -12,18 +12,6 @@ I 8 10226 20.00 3 H  # HARVEST: a pineapple
 I 8 10226 20.00 4 H  # HARVEST: a pineapple
 I 8 10226 20.00 5 H  # HARVEST: a pineapple
 I 8 10226 20.00 6 H  # HARVEST: a pineapple
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-253 10.00 cf
-M
-240 6.00 bc
 S
 #10226
 agave~
@@ -39,14 +27,6 @@ I 8 10227 20.00 3 H  # HARVEST: an agave heart
 I 8 10227 20.00 4 H  # HARVEST: an agave heart
 I 8 10227 20.00 5 H  # HARVEST: an agave heart
 I 8 10227 20.00 6 H  # HARVEST: an agave heart
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #10227
 prickly pears~
@@ -62,14 +42,6 @@ I 8 10228 20.00 3 H  # HARVEST: a stack of cactus pads
 I 8 10228 20.00 4 H  # HARVEST: a stack of cactus pads
 I 8 10228 20.00 5 H  # HARVEST: a stack of cactus pads
 I 8 10228 20.00 6 H  # HARVEST: a stack of cactus pads
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #10228
 aloe~
@@ -85,13 +57,5 @@ I 8 10230 20.00 3 H  # HARVEST: some thick aloe leaves
 I 8 10230 20.00 4 H  # HARVEST: some thick aloe leaves
 I 8 10230 20.00 5 H  # HARVEST: some thick aloe leaves
 I 8 10230 20.00 6 H  # HARVEST: some thick aloe leaves
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 $

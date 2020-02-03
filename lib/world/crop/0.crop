@@ -22,14 +22,6 @@ I 8 141 20.00 3 H  # HARVEST: a bundle of wheat
 I 8 141 20.00 4 H  # HARVEST: a bundle of wheat
 I 8 141 20.00 5 H  # HARVEST: a bundle of wheat
 I 8 141 20.00 6 H  # HARVEST: a bundle of wheat
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #2
 corn~
@@ -46,14 +38,6 @@ I 8 3005 20.00 3 H  # HARVEST: a bushel of corn
 I 8 3005 20.00 4 H  # HARVEST: a bushel of corn
 I 8 3005 20.00 5 H  # HARVEST: a bushel of corn
 I 8 3005 20.00 6 H  # HARVEST: a bushel of corn
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #3
 hops~
@@ -69,14 +53,6 @@ I 8 143 20.00 3 H  # HARVEST: a bushel of hops
 I 8 143 20.00 4 H  # HARVEST: a bushel of hops
 I 8 143 20.00 5 H  # HARVEST: a bushel of hops
 I 8 143 20.00 6 H  # HARVEST: a bushel of hops
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #4
 cotton~
@@ -91,14 +67,6 @@ I 8 144 20.00 3 H  # HARVEST: a basket of cotton
 I 8 144 20.00 4 H  # HARVEST: a basket of cotton
 I 8 144 20.00 5 H  # HARVEST: a basket of cotton
 I 8 144 20.00 6 H  # HARVEST: a basket of cotton
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #5
 barley~
@@ -115,14 +83,6 @@ I 8 145 20.00 3 H  # HARVEST: a sack of barley
 I 8 145 20.00 4 H  # HARVEST: a sack of barley
 I 8 145 20.00 5 H  # HARVEST: a sack of barley
 I 8 145 20.00 6 H  # HARVEST: a sack of barley
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #6
 peaches~
@@ -163,14 +123,6 @@ I 6 3006 100.00 1  # FORAGE: a plump peach
 I 8 3004 100.00 1  # HARVEST: a basket of peaches
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 120 100.00 1  # CHOP: a large tree
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #7
 cherries~
@@ -211,14 +163,6 @@ I 6 3007 100.00 1  # FORAGE: a couple red cherries
 I 8 3008 100.00 1  # HARVEST: a bag of cherries
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 120 100.00 1  # CHOP: a large tree
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #8
 oranges~
@@ -242,14 +186,6 @@ I 8 3010 100.00 1  # HARVEST: a sack of oranges
 I 9 132 100.00 1  # GATHER: some thorny branches
 I 20 122 50.00 1 c  # CHOP: some rough wood
 I 20 122 50.00 2 c  # CHOP: some rough wood
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #9
 rice~
@@ -266,14 +202,6 @@ I 8 3011 20.00 3 H  # HARVEST: a sack of dried rice
 I 8 3011 20.00 4 H  # HARVEST: a sack of dried rice
 I 8 3011 20.00 5 H  # HARVEST: a sack of dried rice
 I 8 3011 20.00 6 H  # HARVEST: a sack of dried rice
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #10
 olives~
@@ -297,14 +225,6 @@ I 8 3019 100.00 1  # HARVEST: a basket of olives
 I 9 132 100.00 1  # GATHER: some thorny branches
 I 20 122 50.00 1 c  # CHOP: some rough wood
 I 20 122 50.00 2 c  # CHOP: some rough wood
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #11
 peas~
@@ -320,14 +240,6 @@ I 8 3021 20.00 3 H  # HARVEST: a basket of peas
 I 8 3021 20.00 4 H  # HARVEST: a basket of peas
 I 8 3021 20.00 5 H  # HARVEST: a basket of peas
 I 8 3021 20.00 6 H  # HARVEST: a basket of peas
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #12
 squash~
@@ -339,14 +251,6 @@ oooo~
 &y~
 I 6 3022 100.00 1  # FORAGE: a yellow squash
 I 8 3023 100.00 2  # HARVEST: a basket of squash
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #13
 apples~
@@ -387,14 +291,6 @@ I 6 3001 100.00 1  # FORAGE: a green apple
 I 8 3002 100.00 1  # HARVEST: a bunch of apples
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 120 100.00 1  # CHOP: a large tree
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #14
 plantains~
@@ -410,17 +306,5 @@ I 8 3025 20.00 3 H  # HARVEST: a basket of plantains
 I 8 3025 20.00 4 H  # HARVEST: a basket of plantains
 I 8 3025 20.00 5 H  # HARVEST: a basket of plantains
 I 8 3025 20.00 6 H  # HARVEST: a basket of plantains
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-253 10.00 cf
-M
-240 6.00 bc
 S
 $

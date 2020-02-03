@@ -21,18 +21,6 @@ I 8 10146 33.30 3 H  # HARVEST: a basket of saguaro fruit
 I 8 10146 33.30 4 H  # HARVEST: a basket of saguaro fruit
 I 20 10149 100.00 1  # CHOP: a fallen saguaro cactus
 M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-240 6.00 bc
-M
-252 10.00 cf
-M
 10150 5.00 a
 M
 10151 5.00 0
@@ -89,18 +77,6 @@ I 9 132 100.00 1  # GATHER: some thorny branches
 I 20 10151 50.00 2 c  # CHOP: a mesquite tree
 I 20 10151 50.00 1 c  # CHOP: a mesquite tree
 M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-240 6.00 bc
-M
-252 10.00 cf
-M
 10150 5.00 a
 M
 10151 5.00 0
@@ -143,18 +119,6 @@ I 8 10153 100.00 1  # HARVEST: a basket of alligator pears
 I 20 122 50.00 2 c  # CHOP: some rough wood
 I 20 122 50.00 1 c  # CHOP: some rough wood
 M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-240 6.00 bc
-M
-252 10.00 cf
-M
 10150 5.00 a
 M
 10151 5.00 0
@@ -196,18 +160,6 @@ I 6 10156 100.00 1  # FORAGE: a single ripe lime
 I 8 10155 100.00 1  # HARVEST: a basket of limes
 I 20 122 50.00 2 c  # CHOP: some rough wood
 I 20 122 50.00 1 c  # CHOP: some rough wood
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-240 6.00 bc
-M
-252 10.00 cf
 M
 10150 5.00 a
 M
@@ -265,18 +217,6 @@ I 8 10157 16.66 4 H  # HARVEST: a maroon firemelon
 I 8 10158 16.67 2 H  # HARVEST: a crimson firemelon
 I 8 10158 16.67 3 H  # HARVEST: a crimson firemelon
 I 8 10158 16.66 4 H  # HARVEST: a crimson firemelon
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-240 6.00 bc
-M
-252 10.00 cf
 M
 10150 5.00 a
 M

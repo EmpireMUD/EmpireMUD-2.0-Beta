@@ -27,14 +27,6 @@ I 8 10303 20.00 3 H  # HARVEST: a seething firefruit
 I 8 10303 20.00 4 H  # HARVEST: a seething firefruit
 I 8 10303 20.00 5 H  # HARVEST: a seething firefruit
 I 8 10303 20.00 6 H  # HARVEST: a seething firefruit
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 #10338
 dragonfruit~
@@ -77,13 +69,5 @@ I 8 10339 20.00 3 H  # HARVEST: a basket of dragonfruit
 I 8 10339 20.00 4 H  # HARVEST: a basket of dragonfruit
 I 8 10339 20.00 5 H  # HARVEST: a basket of dragonfruit
 I 8 10339 20.00 6 H  # HARVEST: a basket of dragonfruit
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
 S
 $

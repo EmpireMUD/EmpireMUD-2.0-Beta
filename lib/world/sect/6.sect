@@ -50,10 +50,6 @@ I 5 102 9.00 1 d  # DIG: a flint stone
 I 5 100 83.00 1 d  # DIG: a rock
 I 6 606 100.00 1  # FORAGE: a handful of elderberries
 M
-253 10.00 cf
-M
-252 10.00 f
-M
 602 100.00 d
 S
 #602
@@ -112,10 +108,6 @@ M
 615 3.33 c
 M
 616 0.33 c
-M
-253 10.00 cf
-M
-252 10.00 f
 M
 602 100.00 d
 S
@@ -189,10 +181,6 @@ M
 615 6.66 c
 M
 616 0.66 c
-M
-253 10.00 cf
-M
-252 10.00 f
 S
 #604
 Enchanted Forest~
@@ -418,10 +406,6 @@ M
 615 10.00 c
 M
 616 1.00 c
-M
-253 10.00 cf
-M
-252 10.00 f
 S
 #605
 Dead Forest~
@@ -487,13 +471,5 @@ I 5 102 9.00 1 d  # DIG: a flint stone
 I 5 100 91.00 1 d  # DIG: a rock
 I 6 3015 100.00 1  # FORAGE: some red berries
 I 20 605 100.00 3 c  # CHOP: a pile of dead wood
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-246 0.30 ad
-M
-253 10.00 cf
 S
 $
