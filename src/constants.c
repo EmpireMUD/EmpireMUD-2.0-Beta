@@ -3417,7 +3417,7 @@ const char *spawn_flags[] = {
 	"EASTERN",
 	"WESTERN",
 	"CONTINENT-ONLY",	// 10
-	"!CONTINENT",
+	"NO-CONTINENT",
 	"SPRING-ONLY",
 	"SUMMER-ONLY",
 	"AUTUMN-ONLY",
