@@ -5433,7 +5433,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 		case GLOBAL_MAP_SPAWNS: {
 			ordered_sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, climate_flags_order, TRUE, buf);
 			ordered_sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, climate_flags_order, TRUE, buf2);
-			msg_to_char(ch, "Climate: &c%s&0(Exclude: &c%s&0)\r\n", buf, trim(buf2));
+			msg_to_char(ch, "Climate: &c%s&0 (Exclude: &c%s&0)\r\n", buf, buf2);
 			sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags, buf, TRUE);
 			msg_to_char(ch, "Spawn flags: &g%s&0\r\n", buf);
 			show_spawn_summary_to_char(ch, GET_GLOBAL_SPAWNS(glb));
@@ -5689,7 +5689,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	// data that isn't type-based:
 	if (OBJ_FLAGGED(j, OBJ_PLANTABLE) && (cp = crop_proto(GET_OBJ_VAL(j, VAL_FOOD_CROP_TYPE)))) {
 		ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE) ? TRUE : FALSE, buf);
-		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? trim(buf) : "any climate");
+		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? buf : "any climate");
 	}
 
 	/*
@@ -6275,7 +6275,7 @@ int vnum_global(char *searchname, char_data *ch) {
 				case GLOBAL_MAP_SPAWNS: {
 					ordered_sprintbit(GET_GLOBAL_TYPE_FLAGS(iter), climate_flags, climate_flags_order, TRUE, flags);
 					sprintbit(GET_GLOBAL_SPARE_BITS(iter), spawn_flags_short, flags2, TRUE);
-					msg_to_char(ch, "%3d. [%5d] %s (%s| %s) (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, trim(flags2), global_types[GET_GLOBAL_TYPE(iter)]);
+					msg_to_char(ch, "%3d. [%5d] %s (%s | %s) (%s)\r\n", ++found, GET_GLOBAL_VNUM(iter), GET_GLOBAL_NAME(iter), flags, trim(flags2), global_types[GET_GLOBAL_TYPE(iter)]);
 					break;
 				}
 				default: {
