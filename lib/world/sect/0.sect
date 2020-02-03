@@ -565,24 +565,6 @@ E
 19 0 100.00 27
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 133 100.00 1  # GATHER: a tangle of vines
-M
-9111 10.00 bdh
-M
-9103 5.00 adh
-M
-9113 5.00 adh
-M
-9102 5.00 adh
-M
-9043 1.00 bdg
-M
-9112 5.00 bdg
-M
-9110 5.00 bdg
-M
-9100 5.00 adg
-M
-9016 5.00 adg
 S
 #16
 Jungle Crop~
@@ -604,24 +586,6 @@ D4
 &g~
 E
 19 0 100.00 27
-M
-9111 10.00 bdh
-M
-9103 5.00 adh
-M
-9113 5.00 adh
-M
-9102 5.00 adh
-M
-9043 1.00 bdg
-M
-9112 5.00 bdg
-M
-9110 5.00 bdg
-M
-9100 5.00 adg
-M
-9016 5.00 adg
 S
 #17
 Trench~
@@ -979,24 +943,6 @@ E
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 133 100.00 1  # GATHER: a tangle of vines
 I 20 128 100.00 1  # CHOP: a massive jungle tree
-M
-9111 10.00 bdh
-M
-9103 5.00 adh
-M
-9113 5.00 adh
-M
-9102 5.00 adh
-M
-9043 1.00 bdg
-M
-9112 5.00 bdg
-M
-9110 5.00 bdg
-M
-9100 5.00 adg
-M
-9016 5.00 adg
 S
 #28
 Jungle~
@@ -1031,24 +977,6 @@ E
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 9 133 100.00 1  # GATHER: a tangle of vines
 I 20 128 100.00 1  # CHOP: a massive jungle tree
-M
-9111 15.00 bdh
-M
-9103 15.00 adh
-M
-9113 15.00 adh
-M
-9102 15.00 adh
-M
-9043 5.00 bdg
-M
-9112 15.00 bdg
-M
-9110 15.00 bdg
-M
-9100 15.00 adg
-M
-9016 15.00 adg
 S
 #29
 Swamp~
@@ -1956,24 +1884,6 @@ I 9 133 88.00 1 g  # GATHER: a tangle of vines
 I 9 135 12.00 1 g  # GATHER: a reaching sapling
 I 20 128 100.00 1  # CHOP: a massive jungle tree
 M
-9111 10.00 bdh
-M
-9103 5.00 adh
-M
-9113 5.00 adh
-M
-9102 5.00 adh
-M
-9043 1.00 bdg
-M
-9112 5.00 bdg
-M
-9110 5.00 bdg
-M
-9100 5.00 adg
-M
-9016 5.00 adg
-M
 9203 10.00 a
 M
 9204 10.00 0
@@ -2233,24 +2143,6 @@ E
 E
 16 0 100.00 0
 I 6 3017 100.00 1  # FORAGE: a plump fig
-M
-9111 10.00 bdh
-M
-9103 5.00 adh
-M
-9113 5.00 adh
-M
-9102 5.00 adh
-M
-9043 1.00 bdg
-M
-9112 5.00 bdg
-M
-9110 5.00 bdg
-M
-9100 5.00 adg
-M
-9016 5.00 adg
 S
 #62
 Jungle Copse~
@@ -2290,24 +2182,6 @@ E
 15 0 1.00 34
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 20 135 100.00 1  # CHOP: a reaching sapling
-M
-9111 10.00 bdh
-M
-9103 5.00 adh
-M
-9113 5.00 adh
-M
-9102 5.00 adh
-M
-9043 1.00 bdg
-M
-9112 5.00 bdg
-M
-9110 5.00 bdg
-M
-9100 5.00 adg
-M
-9016 5.00 adg
 S
 #63
 Seaside Jungle Stumps~
@@ -2337,24 +2211,6 @@ I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1200 100.00 1 p  # PICK: a handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: a small flower
-M
-9111 10.00 bdh
-M
-9103 5.00 adh
-M
-9113 5.00 adh
-M
-9102 5.00 adh
-M
-9043 1.00 bdg
-M
-9112 5.00 bdg
-M
-9110 5.00 bdg
-M
-9100 5.00 adg
-M
-9016 5.00 adg
 M
 9203 10.00 g
 M
@@ -2396,24 +2252,6 @@ I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: a small flower
 I 20 135 100.00 1  # CHOP: a reaching sapling
 M
-9111 10.00 bdh
-M
-9103 5.00 adh
-M
-9113 5.00 adh
-M
-9102 5.00 adh
-M
-9043 1.00 bdg
-M
-9112 5.00 bdg
-M
-9110 5.00 bdg
-M
-9100 5.00 adg
-M
-9016 5.00 adg
-M
 9203 10.00 g
 M
 9204 10.00 0
@@ -2451,24 +2289,6 @@ E
 15 0 1.00 34
 I 6 3017 100.00 1  # FORAGE: a plump fig
 I 20 135 100.00 1  # CHOP: a reaching sapling
-M
-9111 10.00 bdh
-M
-9103 5.00 adh
-M
-9113 5.00 adh
-M
-9102 5.00 adh
-M
-9043 1.00 bdg
-M
-9112 5.00 bdg
-M
-9110 5.00 bdg
-M
-9100 5.00 adg
-M
-9016 5.00 adg
 S
 #70
 Irrigated Plains~
@@ -2599,24 +2419,6 @@ I 9 123 88.00 1 g  # GATHER: a small flower
 I 9 135 12.00 1 g  # GATHER: a reaching sapling
 I 20 128 50.00 1 c  # CHOP: a massive jungle tree
 I 20 128 50.00 2 c  # CHOP: a massive jungle tree
-M
-9111 10.00 bdh
-M
-9103 5.00 adh
-M
-9113 5.00 adh
-M
-9102 5.00 adh
-M
-9043 1.00 bdg
-M
-9112 5.00 bdg
-M
-9110 5.00 bdg
-M
-9100 5.00 adg
-M
-9016 5.00 adg
 S
 #73
 Irrigated Stumps~
@@ -2746,24 +2548,6 @@ I+ 0 70  # Ability: Find Herbs
 I 7 1204 45.84 1 p  # PICK: a daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: a small flower
-M
-9111 10.00 bdh
-M
-9103 5.00 adh
-M
-9113 5.00 adh
-M
-9102 5.00 adh
-M
-9043 1.00 bdg
-M
-9112 5.00 bdg
-M
-9110 5.00 bdg
-M
-9100 5.00 adg
-M
-9016 5.00 adg
 S
 #76
 Irrigated Jungle Copse~
@@ -2799,23 +2583,5 @@ I 7 1204 45.84 1 p  # PICK: a daggerbite frond
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: a small flower
 I 20 135 100.00 1  # CHOP: a reaching sapling
-M
-9111 10.00 bdh
-M
-9103 5.00 adh
-M
-9113 5.00 adh
-M
-9102 5.00 adh
-M
-9043 1.00 bdg
-M
-9112 5.00 bdg
-M
-9110 5.00 bdg
-M
-9100 5.00 adg
-M
-9016 5.00 adg
 S
 $
