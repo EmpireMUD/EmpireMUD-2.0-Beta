@@ -119,6 +119,25 @@ INTERACTION_FUNC(do_one_forage) {
 
 
 /**
+* When a player forages in the wild and gets nothing, they get a chance at a
+* local crop, too, even if that crop is not on this tile.
+*
+* @param char_data *ch The person trying to forage.
+* @return bool TRUE if any forage interactions ran successfully, FALSE if not.
+*/
+bool do_crop_forage(char_data *ch) {
+	crop_data *crop = get_potential_crop_for_location(IN_ROOM(ch), TRUE);
+	
+	if (crop) {
+		return run_interactions(ch, GET_CROP_INTERACTIONS(crop), INTERACT_FORAGE, IN_ROOM(ch), NULL, NULL, do_one_forage);
+	}
+	else {
+		return FALSE;	// no crop
+	}
+}
+
+
+/**
 * Finds the best saddle in a player's inventory.
 *
 * @param char_data *ch the person
@@ -685,11 +704,6 @@ ACMD(do_forage) {
 		msg_to_char(ch, "You don't have permission to forage here.\r\n");
 		return;
 	}
-	
-	if (!can_interact_room(IN_ROOM(ch), INTERACT_FORAGE)) {
-		msg_to_char(ch, "There's nothing you can forage for here.\r\n");
-		return;
-	}
 
 	if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE) >= short_depletion) {
 		msg_to_char(ch, "You can't seem to find anything to forage for.\r\n");
@@ -706,7 +720,12 @@ ACMD(do_forage) {
 	}
 
 	if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, do_one_forage)) {
-		// success
+		// success: local forage list
+		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
+		gain_player_tech_exp(ch, PTECH_FORAGE, 15);
+	}
+	else if (do_crop_forage(ch)) {
+		// success: crop forage list
 		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
 		gain_player_tech_exp(ch, PTECH_FORAGE, 15);
 	}

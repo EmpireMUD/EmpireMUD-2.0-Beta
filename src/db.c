@@ -52,7 +52,7 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 void discrete_load(FILE *fl, int mode, char *filename);
 void free_complex_data(struct complex_room_data *data);
-extern crop_data *get_potential_crop_for_location(room_data *location);
+extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 void index_boot(int mode);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void save_whole_world();
@@ -932,7 +932,7 @@ void verify_sectors(void) {
 			if (!room) {
 				room = real_room(map->vnum);	// load it into memory
 			}
-			new_crop = get_potential_crop_for_location(room);
+			new_crop = get_potential_crop_for_location(room, FALSE);
 			if (new_crop) {
 				set_crop_type(room, new_crop);
 			}
@@ -2143,7 +2143,7 @@ void b3_2_map_and_gear(void) {
 		// crops
 		if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
 			type = get_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
-			set_crop_type(room, type > 0 ? crop_proto(type) : get_potential_crop_for_location(room));
+			set_crop_type(room, type > 0 ? crop_proto(type) : get_potential_crop_for_location(room, FALSE));
 			remove_room_extra_data(room, ROOM_EXTRA_CROP_TYPE);
 		}
 	}
@@ -2260,7 +2260,7 @@ PLAYER_UPDATE_FUNC(b3_12_update_players) {
 
 // respawns wild crops and converts 5% of jungle to crops
 void b3_15_crop_update(void) {
-	extern crop_data *get_potential_crop_for_location(room_data *location);
+	extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 	
 	struct map_data *map;
 	room_data *room;
@@ -2281,7 +2281,7 @@ void b3_15_crop_update(void) {
 		if (map->crop_type) {
 			// update crop
 			if (room || (room = real_room(map->vnum))) {
-				set_crop_type(room, get_potential_crop_for_location(room));
+				set_crop_type(room, get_potential_crop_for_location(room, FALSE));
 			}
 		}
 		else if (map->sector_type->vnum == SECT_JUNGLE && number(1, 100) <= JUNGLE_PERCENT) {

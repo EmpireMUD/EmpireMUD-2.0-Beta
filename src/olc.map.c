@@ -34,7 +34,7 @@ extern bool world_map_needs_save;
 // external funcs
 void complete_building(room_data *room);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
-extern crop_data *get_potential_crop_for_location(room_data *location);
+extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -600,7 +600,7 @@ OLC_MODULE(mapedit_naturalize) {
 				// already same -- but refresh crop type if applicable
 				if (SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA)) {
 					if (room || (room = real_room(map->vnum))) {
-						set_crop_type(room, get_potential_crop_for_location(room));
+						set_crop_type(room, get_potential_crop_for_location(room, FALSE));
 					}
 				}
 				continue;	// no need to change terrain
@@ -625,7 +625,7 @@ OLC_MODULE(mapedit_naturalize) {
 				
 				if (SECT_FLAGGED(map->natural_sector, SECTF_HAS_CROP_DATA)) {
 					room = real_room(map->vnum);	// need it loaded after all
-					set_crop_type(room, get_potential_crop_for_location(room));
+					set_crop_type(room, get_potential_crop_for_location(room, FALSE));
 				}
 				else {
 					map->crop_type = NULL;
@@ -662,7 +662,7 @@ OLC_MODULE(mapedit_naturalize) {
 		
 		// reset crop?
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA)) {
-			set_crop_type(IN_ROOM(ch), get_potential_crop_for_location(IN_ROOM(ch)));
+			set_crop_type(IN_ROOM(ch), get_potential_crop_for_location(IN_ROOM(ch), FALSE));
 		}
 		
 		// probably no need to log 1-tile naturalizes

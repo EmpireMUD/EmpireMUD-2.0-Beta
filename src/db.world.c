@@ -77,7 +77,7 @@ struct empire_territory_data *create_territory_entry(empire_data *emp, room_data
 void decustomize_room(room_data *room);
 room_vnum find_free_vnum();
 room_data *get_extraction_room();
-crop_data *get_potential_crop_for_location(room_data *location);
+crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 void ruin_one_building(room_data *room);
@@ -143,7 +143,6 @@ void change_chop_territory(room_data *room) {
 * @param sector_vnum sect Any sector vnum
 */
 void change_terrain(room_data *room, sector_vnum sect) {
-	extern crop_data *get_potential_crop_for_location(room_data *location);
 	void lock_icon(room_data *room, struct icon_data *use_icon);
 	
 	sector_data *old_sect = SECT(room), *st = sector_proto(sect);
@@ -190,7 +189,7 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	
 	// need to determine a crop?
 	if (!new_crop && SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
-		new_crop = get_potential_crop_for_location(room);
+		new_crop = get_potential_crop_for_location(room, FALSE);
 	}
 		
 	// need room data?
@@ -1364,7 +1363,7 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 		
 		if (SECT_FLAGGED(tile->natural_sector, SECTF_HAS_CROP_DATA)) {
 			room = real_room(tile->vnum);	// need it loaded after all
-			set_crop_type(room, get_potential_crop_for_location(room));
+			set_crop_type(room, get_potential_crop_for_location(room, FALSE));
 		}
 		else {
 			tile->crop_type = NULL;
@@ -3162,9 +3161,10 @@ int get_main_island(empire_data *emp) {
 * for the purposes of spawning fresh crops. This is only an approximation.
 * 
 * @param room_data *location The location to pick a crop for.
+* @param bool must_have_forage If TRUE, only crops with a forage interaction can be chosen.
 * @return crop_data* Any crop.
 */
-crop_data *get_potential_crop_for_location(room_data *location) {
+crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage) {
 	int x = X_COORD(location), y = Y_COORD(location);
 	bool water = find_flagged_sect_within_distance_from_room(location, SECTF_FRESH_WATER, NOBITS, config_get_int("water_crop_distance"));
 	bool x_min_ok, x_max_ok, y_min_ok, y_max_ok;
@@ -3188,6 +3188,9 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 			continue;
 		}
 		if (CROP_FLAGGED(crop, CROPF_REQUIRES_WATER) && !water) {
+			continue;
+		}
+		if (must_have_forage && !has_interaction(GET_CROP_INTERACTIONS(crop), INTERACT_FORAGE)) {
 			continue;
 		}
 		if (CROP_FLAGGED(crop, CROPF_NO_NEWBIE | CROPF_NEWBIE_ONLY)) {
