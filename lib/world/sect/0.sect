@@ -292,7 +292,7 @@ S
 #6
 Ocean~
 The Ocean~
-'~' 19 p 10 ceho ai
+'~' 19 pt 10 ceho ai
 D0
 ~~~~~
 &B~
@@ -1016,7 +1016,7 @@ S
 #30
 Tundra~
 The Arctic Tundra~
-',' 16 f 50 cev 0
+',' 16 fs 50 cev 0
 D0
 ,,,,~
 &W~
@@ -1037,7 +1037,7 @@ S
 #32
 Lake~
 A Lake~
-'~' 17 o 10 gi au
+'~' 17 ou 10 gi au
 D0
 ~~~~~
 &c~
@@ -1090,7 +1090,7 @@ S
 #35
 Marsh~
 A Marshy Lakeshore~
-'~' 13 lo 10 aw m
+'~' 13 lou 10 aw m
 D0
 ~~~&G^~
 &c~
@@ -1651,7 +1651,7 @@ S
 #50
 Shore~
 Along the Shore~
-'.' 10 j 2 l bpr
+'.' 10 js 2 l bpr
 C
 dig, pick~
 D1
@@ -1695,7 +1695,7 @@ S
 #51
 Beach~
 A Sandy Beach~
-'.' 21 k 2 l epr
+'.' 21 ks 2 l epr
 C
 dig, pick~
 D1
@@ -1731,7 +1731,7 @@ S
 #52
 Cliffs~
 Along the Cliffs~
-'^' 25 m 50 nv c
+'^' 25 ms 50 nv c
 C
 dig, pick~
 D1
@@ -1761,7 +1761,7 @@ S
 #53
 Estuary~
 An Estuary~
-'~' 18 o 10 g afit
+'~' 18 os 10 g afit
 D0
 ~~~~~
 &a~
@@ -1782,7 +1782,7 @@ S
 #54
 Shoreside Tree~
 A Tree by the Shore~
-'.' 14 j 2 dl npr
+'.' 14 js 2 dl npr
 C
 chop, dig, gather, pick~
 D1
@@ -1829,7 +1829,7 @@ S
 #55
 Seaside Jungle~
 The Edge of the Jungle, Overlooking the Sea~
-'^' 12 l 5 d g
+'^' 12 ls 5 d g
 C
 chop, gather, pick~
 D0
@@ -1859,7 +1859,7 @@ S
 #56
 Estuary Shore~
 The Shore of the Estuary~
-'.' 37 j 2 l bprs
+'.' 37 js 2 l bprs
 C
 dig, pick~
 D1
@@ -1893,7 +1893,7 @@ S
 #57
 Shallow Sea~
 The Shallow Sea, Near the Coast~
-'~' 18 p 10 h aiq
+'~' 18 pst 10 h aiq
 D0
 ~~~~~
 &a~
@@ -1909,7 +1909,7 @@ S
 #58
 Foothills~
 In the Foothills, By a Lake~
-'.' 10 j 4 l bp
+'.' 10 gjr 4 l bp
 C
 dig, pick~
 D1
@@ -1938,7 +1938,7 @@ S
 #59
 Seaside Stumps~
 Some Stumps Along the Shore~
-'.' 10 j 2 dl bpr
+'.' 10 js 2 dl bpr
 C
 burn stumps, dig, pick~
 D1
@@ -1988,7 +1988,7 @@ S
 #60
 Seaside Copse~
 A Small Copse by the Sea~
-'w' 13 j 2 dl pr
+'w' 13 js 2 dl pr
 C
 chop, dig, pick~
 D1
@@ -2126,7 +2126,7 @@ S
 #63
 Seaside Jungle Stumps~
 Amidst Tropical Stumps on the Seaside~
-'.' 10 l 3 dl pr
+'.' 10 ls 3 dl pr
 C
 burn stumps, pick~
 D0
@@ -2155,7 +2155,7 @@ S
 #64
 Seaside Jungle Copse~
 A Copse in the Jungle by the Sea~
-'w' 13 l 6 d pr
+'w' 13 ls 6 d pr
 C
 chop, pick~
 D0
@@ -2217,7 +2217,7 @@ S
 #70
 Irrigated Plains~
 An Irrigated Plain~
-'.' 10 j 2 l bp
+'.' 10 jkr 2 l bp
 C
 dig, pick~
 D1
@@ -2265,7 +2265,7 @@ S
 #71
 Irrigated Forest~
 A Marshy Forest~
-'^' 14 jq 3 dl np
+'^' 14 jkq 3 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -2315,7 +2315,7 @@ S
 #72
 Irrigated Jungle~
 A Marshy Jungle~
-'^' 14 lq 3 d g
+'^' 14 klq 3 d g
 C
 chop, dig, gather, pick~
 D0
@@ -2347,7 +2347,7 @@ S
 #73
 Irrigated Stumps~
 Some Stumps on the Irrigated Plain~
-'.' 10 j 2 dl bp
+'.' 10 jk 2 dl bp
 C
 burn stumps, dig, pick~
 D1
@@ -2397,7 +2397,7 @@ S
 #74
 Irrigated Copse~
 An Irrigated Copse~
-'w' 13 j 3 d p
+'w' 13 jk 3 d p
 C
 chop, dig, pick~
 D1
@@ -2444,7 +2444,7 @@ S
 #75
 Irrigated Jungle Stumps~
 A Marshy Field of Stumps~
-'.' 10 l 3 dl p
+'.' 10 kl 3 dl p
 C
 chop, dig, pick~
 D0
@@ -2476,7 +2476,7 @@ S
 #76
 Irrigated Jungle Copse~
 Irrigated Jungle Copse~
-'w' 13 l 6 d p
+'w' 13 kl 6 d p
 C
 chop, dig, pick~
 D0
