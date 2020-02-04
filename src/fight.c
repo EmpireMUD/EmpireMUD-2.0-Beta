@@ -4003,6 +4003,25 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
 						break;
 					}
+					case TYPE_SLING: {
+						if (!AFF_FLAGGED(vict, AFF_IMMUNE_STUN | AFF_STUNNED | AFF_HARD_STUNNED)) {
+							af = create_flag_aff(ATYPE_TRICK_SHOT, 1, AFF_STUNNED, ch);
+							affect_join(vict, af, 0);
+						
+							act("That shot to the head seems to stun $N!", FALSE, ch, NULL, vict, TO_CHAR);
+							act("$n's last shot hit your head! You feel stunned.", FALSE, ch, NULL, vict, TO_VICT);
+							act("$n's last shot seems to stun $N!", FALSE, ch, NULL, vict, TO_NOTVICT);
+						}
+						break;
+					}
+					case TYPE_SPEAR_THROWER: {
+						apply_dot_effect(vict, ATYPE_TRICK_SHOT, 5, DAM_PHYSICAL, 5, 5, ch);
+						
+						act("Your shot opens a deep artery in $N -- $E is bleeding!", FALSE, ch, NULL, vict, TO_CHAR);
+						act("$n's shot opens a deep artery -- you are bleeding!", FALSE, ch, NULL, vict, TO_VICT);
+						act("$n's shot opens a deep artery -- $N is bleeding!", FALSE, ch, NULL, vict, TO_NOTVICT);
+						break;
+					}
 				}
 			}
 		}

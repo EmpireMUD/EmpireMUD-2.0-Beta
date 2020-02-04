@@ -4045,6 +4045,7 @@ void clear_global(struct global_data *glb) {
 */
 void free_global(struct global_data *glb) {
 	struct global_data *proto = global_proto(GET_GLOBAL_VNUM(glb));
+	struct spawn_info *spawn;
 	
 	if (GET_GLOBAL_NAME(glb) && (!proto || GET_GLOBAL_NAME(glb) != GET_GLOBAL_NAME(proto))) {
 		free(GET_GLOBAL_NAME(glb));
@@ -4056,6 +4057,13 @@ void free_global(struct global_data *glb) {
 	
 	if (GET_GLOBAL_GEAR(glb) && (!proto || GET_GLOBAL_GEAR(glb) != GET_GLOBAL_GEAR(proto))) {
 		free_archetype_gear(GET_GLOBAL_GEAR(glb));
+	}
+	
+	if (GET_GLOBAL_SPAWNS(glb) && (!proto || GET_GLOBAL_SPAWNS(glb) != GET_GLOBAL_SPAWNS(proto))) {
+		while ((spawn = GET_GLOBAL_SPAWNS(glb))) {
+			GET_GLOBAL_SPAWNS(glb) = spawn->next;
+			free(spawn);
+		}
 	}
 	
 	free(glb);
@@ -4072,7 +4080,8 @@ void parse_global(FILE *fl, any_vnum vnum) {
 	void parse_archetype_gear(FILE *fl, struct archetype_gear **list, char *error);
 
 	struct global_data *glb, *find;
-	char line[256], str_in[256], str_in2[256], str_in3[256];
+	char line[256], str_in[256], str_in2[256], str_in3[256], str_in4[256];
+	struct spawn_info *spawn;
 	int int_in[4];
 	double dbl_in;
 
@@ -4093,10 +4102,18 @@ void parse_global(FILE *fl, any_vnum vnum) {
 	// line 1
 	GET_GLOBAL_NAME(glb) = fread_string(fl, buf2);
 	
-	// line 2: type flags typeflags typeexclude min_level-max_level
-	if (!get_line(fl, line) || sscanf(line, "%d %s %s %s %d-%d", &int_in[0], str_in, str_in2, str_in3, &int_in[1], &int_in[2]) != 6) {
-		log("SYSERR: Format error in line 2 of %s", buf2);
+	// line 2: type flags typeflags typeexclude min_level-max_level spare-bits
+	if (!get_line(fl, line)) {
+		log("SYSERR: Missing line 2 of %s", buf2);
 		exit(1);
+	}
+	if (sscanf(line, "%d %s %s %s %d-%d %s", &int_in[0], str_in, str_in2, str_in3, &int_in[1], &int_in[2], str_in4) != 7) {
+		strcpy(str_in4, "0");	// backwards-compatible without spare-bits
+		
+		if (sscanf(line, "%d %s %s %s %d-%d", &int_in[0], str_in, str_in2, str_in3, &int_in[1], &int_in[2]) != 6) {
+			log("SYSERR: Format error in line 2 of %s", buf2);
+			exit(1);
+		}
 	}
 	
 	GET_GLOBAL_TYPE(glb) = int_in[0];
@@ -4105,6 +4122,7 @@ void parse_global(FILE *fl, any_vnum vnum) {
 	GET_GLOBAL_TYPE_EXCLUDE(glb) = asciiflag_conv(str_in3);
 	GET_GLOBAL_MIN_LEVEL(glb) = int_in[1];
 	GET_GLOBAL_MAX_LEVEL(glb) = int_in[2];
+	GET_GLOBAL_SPARE_BITS(glb) = asciiflag_conv(str_in4);
 		
 	// optionals
 	for (;;) {
@@ -4140,6 +4158,23 @@ void parse_global(FILE *fl, any_vnum vnum) {
 				parse_interaction(line, &GET_GLOBAL_INTERACTIONS(glb), buf2);
 				break;
 			}
+			
+			// mob spawn
+			case 'M': {
+				if (!get_line(fl, line) || sscanf(line, "%d %lf %s", &int_in[0], &dbl_in, str_in) != 3) {
+					log("SYSERR: Format error in M line of %s", buf2);
+					exit(1);
+				}
+				
+				CREATE(spawn, struct spawn_info, 1);
+				spawn->vnum = int_in[0];
+				spawn->percent = dbl_in;
+				spawn->flags = asciiflag_conv(str_in);
+				spawn->next = NULL;
+				
+				LL_APPEND(GET_GLOBAL_SPAWNS(glb), spawn);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -4165,7 +4200,8 @@ void parse_global(FILE *fl, any_vnum vnum) {
 void write_global_to_file(FILE *fl, struct global_data *glb) {
 	void write_archetype_gear_to_file(FILE *fl, struct archetype_gear *list);
 	
-	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH], temp4[MAX_STRING_LENGTH];
+	struct spawn_info *spawn;
 	
 	if (!fl || !glb) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_global_to_file called without %s", !fl ? "file" : "global");
@@ -4179,7 +4215,8 @@ void write_global_to_file(FILE *fl, struct global_data *glb) {
 	strcpy(temp, bitv_to_alpha(GET_GLOBAL_FLAGS(glb)));
 	strcpy(temp2, bitv_to_alpha(GET_GLOBAL_TYPE_FLAGS(glb)));
 	strcpy(temp3, bitv_to_alpha(GET_GLOBAL_TYPE_EXCLUDE(glb)));
-	fprintf(fl, "%d %s %s %s %d-%d\n", GET_GLOBAL_TYPE(glb), temp, temp2, temp3, GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb));
+	strcpy(temp4, bitv_to_alpha(GET_GLOBAL_SPARE_BITS(glb)));
+	fprintf(fl, "%d %s %s %s %d-%d %s\n", GET_GLOBAL_TYPE(glb), temp, temp2, temp3, GET_GLOBAL_MIN_LEVEL(glb), GET_GLOBAL_MAX_LEVEL(glb), temp4);
 	
 	// E: extra data
 	fprintf(fl, "E\n");
@@ -4191,6 +4228,12 @@ void write_global_to_file(FILE *fl, struct global_data *glb) {
 	
 	// I: interactions
 	write_interactions_to_file(fl, GET_GLOBAL_INTERACTIONS(glb));
+	
+	// M: mob spawns
+	LL_FOREACH(GET_GLOBAL_SPAWNS(glb), spawn) {
+		fprintf(fl, "M\n");
+		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
+	}
 	
 	// end
 	fprintf(fl, "S\n");

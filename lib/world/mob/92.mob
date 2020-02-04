@@ -207,4 +207,170 @@ M
 0
 $n waves $s flippers around.~
 S
+#9212
+panda red~
+a red panda~
+A red panda watches you as it chews a leaf.
+~
+10 20 djo c 2
+0 0 11 9
+D
+   This odd creature, sometimes called the red bear-cat, is indeed mostly red,
+with white markings on its face, a black belly, and a striped red tail.
+~
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 9212 50.00 1 a  # SKIN: a bright red fur
+I 1 1350 50.00 1 a  # SKIN: a small skin
+M
+0
+$n twitches $s whiskers.~
+M
+0
+$n prances around you.~
+M
+0
+$n sniffs cautiously at your pack, perhaps looking for food.~
+M
+0
+$n chews a leaf.~
+S
+#9213
+bear panda~
+a panda bear~
+A panda bear slowly chews a shoot as it watches you.
+~
+20 40 djkoy c 4
+0 0 0 9
+D
+   These huge black and white bears almost appear to be wearing masks. The
+panda is notoriously lazy, and spends most of its time resting and chewing.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
+I 1 1351 25.00 1 s  # SKIN: a large skin
+I 1 9213 75.00 1 s  # SKIN: a black and white hide
+M
+0
+$n eyes you cautiously as you move around.~
+M
+0
+$n snarls as $e chews on $s shoot.~
+M
+0
+$n nibbles on a bundle of leaves.~
+S
+#9214
+dove mourning morning~
+a mourning dove~
+A mourning dove pecks at the ground.
+~
+1 5 djo 0 1
+0 0 2 26
+D
+This little brown dove seems intent to peck at the ground for food.
+~
+I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
+M
+0
+$n coos loudly.~
+M
+0
+$n lets out a loud, deep coo.~
+S
+#9215
+duck mallard~
+a mallard duck~
+A mallard duck is looking for food.
+~
+1 5 djo 0 1
+1 0 2 9
+D
+   The mallard has a bright green head and a ring of white around its neck. It
+can often be found near water.
+~
+I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
+M
+0
+$n quacks.~
+S
+#9216
+duck teal~
+a teal duck~
+A teal duck is foraging around.
+~
+1 5 djo 0 1
+1 0 2 9
+D
+   The teal has a brown body but when it stretches its wings, it reveals the
+bright feathers that give it its name.
+~
+I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
+M
+0
+$n quacks.~
+S
+#9217
+bear honey little~
+a honey bear~
+A little honey bear dangles from a tree.
+~
+10 20 djo c 2
+0 0 1 10
+D
+   This honey bear, sometimes called a kinkajou, is the size of a small dog. 
+It almost looks like a bear, but it has a long prehensile tail.
+~
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1350 100.00 1 a  # SKIN: a small skin
+S
+#9218
+ovenbird bird~
+an ovenbird~
+An ovenbird is walking around on the ground.
+~
+1 5 djo 0 1
+0 0 2 26
+D
+   Named for its nests that resemble old wood-fired ovens, the ovenbird is a
+common sight in this part of the world.
+~
+I 0 3200 100.00 1  # BUTCHER: a cut of poultry
+I 0 9025 75.00 1  # BUTCHER: some bird feathers
+M
+0
+$n sings loudly.~
+M
+0
+$n beats its wings and makes a trilling noise as it sings.~
+M
+0
+$n sings a loud song.~
+S
+#9219
+squirrel dire~
+a dire squirrel~
+A dire squirrel circles you menacingly.
+~
+75 100 djko c 2
+0 0 0 9
+D
+   This gray squirrel is far larger than the average rodent you see scurrying
+up and down the trees. As it chitters at you, its mouth begins to foam. 
+Hopefully it isn't rabid.
+~
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1350 100.00 2  # SKIN: a small skin
+I 4 9219 100.00 1  # LOOT: a golden acorn
+M
+0
+$n foams at the mouth as it chitters at you.~
+M
+0
+$n charges at you, trying to scare you off!~
+M
+0
+$n seems angry at you.~
+S
 $

@@ -30,11 +30,15 @@
 
 // external consts
 extern const char *action_bits[];
+extern const char *climate_flags[];
+extern const bitvector_t climate_flags_order[];
 extern const char *global_flags[];
 extern const char *global_types[];
 extern const char *interact_types[];
 extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *sector_flags[];
+extern const char *spawn_flags[];
+extern const char *spawn_flags_short[];
 
 // external funcs
 extern struct archetype_gear *copy_archetype_gear(struct archetype_gear *input);
@@ -56,7 +60,9 @@ const char *default_glb_name = "Unnamed Global";
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_global(struct global_data *glb, char_data *ch) {
+	char buf[MAX_STRING_LENGTH];
 	struct interaction_item *interact;
+	struct spawn_info *spawn;
 	bool problem = FALSE;
 
 	if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
@@ -93,6 +99,21 @@ bool audit_global(struct global_data *glb, char_data *ch) {
 				}
 				break;
 			}
+			case GLOBAL_NEWBIE_GEAR: {
+				break;
+			}
+			case GLOBAL_MAP_SPAWNS: {
+				break;
+			}
+		}
+	}
+	
+	// audit spawns
+	LL_FOREACH(GET_GLOBAL_SPAWNS(glb), spawn) {
+		if ((spawn->flags & GET_GLOBAL_SPARE_BITS(glb)) != NOBITS) {
+			prettier_sprintbit(spawn->flags & GET_GLOBAL_SPARE_BITS(glb), spawn_flags, buf);
+			olc_audit_msg(ch, GET_GLOBAL_VNUM(glb), "Spawn has same flags as the global's spawn flags: %s", buf);
+			problem = TRUE;
 		}
 	}
 		
@@ -140,7 +161,7 @@ char *list_one_global(struct global_data *glb, bool detail) {
 	extern const char *action_bits[];
 	
 	static char output[MAX_STRING_LENGTH];
-	char abil[MAX_STRING_LENGTH], flags[MAX_STRING_LENGTH];
+	char abil[MAX_STRING_LENGTH], flags[MAX_STRING_LENGTH], flags2[MAX_STRING_LENGTH];
 	ability_data *ab;
 	
 	// ability required
@@ -171,6 +192,17 @@ char *list_one_global(struct global_data *glb, bool detail) {
 			if (detail) {
 				sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), sector_flags, flags, TRUE);
 				snprintf(output, sizeof(output), "[%5d] %s%s %.2f%%%s %s (%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags, global_types[GET_GLOBAL_TYPE(glb)]);
+			}
+			else {
+				snprintf(output, sizeof(output), "[%5d] %s (%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), global_types[GET_GLOBAL_TYPE(glb)]);
+			}
+			break;
+		}
+		case GLOBAL_MAP_SPAWNS: {
+			if (detail) {
+				ordered_sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, climate_flags_order, TRUE, flags);
+				sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags_short, flags2, TRUE);
+				snprintf(output, sizeof(output), "[%5d] %s%s %.2f%%%s %s | %s(%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), abil, GET_GLOBAL_PERCENT(glb), IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT) ? "C" : "", flags, flags2, global_types[GET_GLOBAL_TYPE(glb)]);
 			}
 			else {
 				snprintf(output, sizeof(output), "[%5d] %s (%s)", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb), global_types[GET_GLOBAL_TYPE(glb)]);
@@ -267,6 +299,7 @@ void olc_search_global(char_data *ch, any_vnum vnum) {
 void save_olc_global(descriptor_data *desc) {	
 	struct global_data *proto, *glb = GET_OLC_GLOBAL(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	struct spawn_info *spawn;
 	UT_hash_handle hh;
 
 	// have a place to save it?
@@ -280,6 +313,10 @@ void save_olc_global(descriptor_data *desc) {
 	}
 	free_interactions(&GET_GLOBAL_INTERACTIONS(proto));
 	free_archetype_gear(GET_GLOBAL_GEAR(proto));
+	while ((spawn = GET_GLOBAL_SPAWNS(proto))) {
+		GET_GLOBAL_SPAWNS(proto) = spawn->next;
+		free(spawn);
+	}
 	
 	// sanity
 	if (!GET_GLOBAL_NAME(glb) || !*GET_GLOBAL_NAME(glb)) {
@@ -324,6 +361,7 @@ struct global_data *setup_olc_global(struct global_data *input) {
 		// copy pointers
 		GET_GLOBAL_INTERACTIONS(new) = copy_interaction_list(GET_GLOBAL_INTERACTIONS(input));
 		GET_GLOBAL_GEAR(new) = copy_archetype_gear(GET_GLOBAL_GEAR(input));
+		GET_GLOBAL_SPAWNS(new) = copy_spawn_list(GET_GLOBAL_SPAWNS(input));
 	}
 	else {
 		// brand new: some defaults
@@ -350,8 +388,10 @@ void olc_show_global(char_data *ch) {
 	void get_interaction_display(struct interaction_item *list, char *save_buffer);
 	
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
-	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH];
+	struct spawn_info *spawn;
 	ability_data *abil;
+	int count;
 	
 	if (!glb) {
 		return;
@@ -367,7 +407,7 @@ void olc_show_global(char_data *ch) {
 	sprintbit(GET_GLOBAL_FLAGS(glb), global_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT), lbuf);
 	
-	if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR) {
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR && GET_GLOBAL_TYPE(glb) != GLOBAL_MAP_SPAWNS) {
 		if (GET_GLOBAL_MIN_LEVEL(glb) == 0) {
 			sprintf(buf + strlen(buf), "<%sminlevel\t0> none\r\n", OLC_LABEL_UNCHANGED);
 		}
@@ -432,8 +472,26 @@ void olc_show_global(char_data *ch) {
 			sprintf(buf + strlen(buf), "Gear: <%sgear\t0>\r\n%s", OLC_LABEL_PTR(GET_GLOBAL_GEAR(glb)), GET_GLOBAL_GEAR(glb) ? lbuf : "");
 			break;
 		}
+		case GLOBAL_MAP_SPAWNS: {
+			ordered_sprintbit(GET_GLOBAL_TYPE_FLAGS(glb), climate_flags, climate_flags_order, TRUE, lbuf);
+			sprintf(buf + strlen(buf), "<%sclimateflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_FLAGS(glb), NOBITS), lbuf);
+			ordered_sprintbit(GET_GLOBAL_TYPE_EXCLUDE(glb), climate_flags, climate_flags_order, TRUE, lbuf);
+			sprintf(buf + strlen(buf), "<%sclimateexclude\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_TYPE_EXCLUDE(glb), NOBITS), lbuf);
+			sprintbit(GET_GLOBAL_SPARE_BITS(glb), spawn_flags, lbuf, TRUE);
+			sprintf(buf + strlen(buf), "<%sspawnflags\t0> %s\r\n", OLC_LABEL_VAL(GET_GLOBAL_SPARE_BITS(glb), NOBITS), lbuf);
+	
+			sprintf(buf + strlen(buf), "<%sspawns\t0>\r\n", OLC_LABEL_PTR(GET_GLOBAL_SPAWNS(glb)));
+			if (GET_GLOBAL_SPAWNS(glb)) {
+				count = 0;
+				LL_FOREACH(GET_GLOBAL_SPAWNS(glb), spawn) {
+					sprintbit(spawn->flags, spawn_flags, lbuf, TRUE);
+					sprintf(buf + strlen(buf), " %d. %s (%d) %.2f%% %s\r\n", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum)), spawn->vnum, spawn->percent, lbuf);
+				}
+			}
+			break;
+		}
 	}
-		
+	
 	page_string(ch->desc, buf, TRUE);
 }
 
@@ -444,6 +502,11 @@ void olc_show_global(char_data *ch) {
 OLC_MODULE(gedit_ability) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	ability_data *abil;
+	
+	if (GET_GLOBAL_TYPE(glb) == GLOBAL_NEWBIE_GEAR || GET_GLOBAL_TYPE(glb) == GLOBAL_MAP_SPAWNS) {
+		msg_to_char(ch, "This global type can't use abilities.\r\n");
+		return;
+	}
 	
 	if (!*argument) {
 		msg_to_char(ch, "Require what ability (or 'none')?\r\n");
@@ -482,6 +545,30 @@ OLC_MODULE(gedit_capacity) {
 	}
 	else {
 		GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE) = olc_process_number(ch, argument, "mine capacity", "capacity", 1, 1000, GET_GLOBAL_VAL(glb, GLB_VAL_MAX_MINE_SIZE));
+	}
+}
+
+
+OLC_MODULE(gedit_climateexclude) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MAP_SPAWNS) {
+		msg_to_char(ch, "You can't set climateexclude on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_TYPE_EXCLUDE(glb) = olc_process_flag(ch, argument, "climate", "climateexclude", climate_flags, GET_GLOBAL_TYPE_EXCLUDE(glb));
+	}
+}
+
+
+OLC_MODULE(gedit_climateflags) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MAP_SPAWNS) {
+		msg_to_char(ch, "You can't set climateflags on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_TYPE_FLAGS(glb) = olc_process_flag(ch, argument, "climate", "climateflags", climate_flags, GET_GLOBAL_TYPE_FLAGS(glb));
 	}
 }
 
@@ -539,12 +626,24 @@ OLC_MODULE(gedit_interaction) {
 
 OLC_MODULE(gedit_maxlevel) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) == GLOBAL_NEWBIE_GEAR || GET_GLOBAL_TYPE(glb) == GLOBAL_MAP_SPAWNS) {
+		msg_to_char(ch, "This global type can't require levels.\r\n");
+		return;
+	}
+	
 	GET_GLOBAL_MAX_LEVEL(glb) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_GLOBAL_MAX_LEVEL(glb));
 }
 
 
 OLC_MODULE(gedit_minlevel) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) == GLOBAL_NEWBIE_GEAR || GET_GLOBAL_TYPE(glb) == GLOBAL_MAP_SPAWNS) {
+		msg_to_char(ch, "This global type can't require levels.\r\n");
+		return;
+	}
+	
 	GET_GLOBAL_MIN_LEVEL(glb) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_GLOBAL_MIN_LEVEL(glb));
 }
 
@@ -609,9 +708,28 @@ OLC_MODULE(gedit_sectorflags) {
 }
 
 
+OLC_MODULE(gedit_spawnflags) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	
+	if (GET_GLOBAL_TYPE(glb) != GLOBAL_MAP_SPAWNS) {
+		msg_to_char(ch, "You can't set spawnflags on this type.\r\n");
+	}
+	else {
+		GET_GLOBAL_SPARE_BITS(glb) = olc_process_flag(ch, argument, "spawn", "spawnflags", spawn_flags, GET_GLOBAL_SPARE_BITS(glb));
+	}
+}
+
+
+OLC_MODULE(gedit_spawns) {
+	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
+	olc_process_spawns(ch, argument, &GET_GLOBAL_SPAWNS(glb));
+}
+
+
 OLC_MODULE(gedit_type) {
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	int iter, old = GET_GLOBAL_TYPE(glb);
+	struct spawn_info *spawn;
 	
 	GET_GLOBAL_TYPE(glb) = olc_process_type(ch, argument, "type", "type", global_types, GET_GLOBAL_TYPE(glb));
 	
@@ -619,8 +737,30 @@ OLC_MODULE(gedit_type) {
 	if (GET_GLOBAL_TYPE(glb) != old) {
 		GET_GLOBAL_TYPE_FLAGS(glb) = NOBITS;
 		GET_GLOBAL_TYPE_EXCLUDE(glb) = NOBITS;
+		GET_GLOBAL_SPARE_BITS(glb) = NOBITS;
 		for (iter = 0; iter < NUM_GLB_VAL_POSITIONS; ++iter) {
 			GET_GLOBAL_VAL(glb, iter) = 0;
+		}
+		
+		// more resets by type: things not used by that type
+		switch (GET_GLOBAL_TYPE(glb)) {
+			case GLOBAL_NEWBIE_GEAR:
+			case GLOBAL_MAP_SPAWNS: {
+				GET_GLOBAL_ABILITY(glb) = NO_ABIL;
+				GET_GLOBAL_MAX_LEVEL(glb) = 0;
+				GET_GLOBAL_MIN_LEVEL(glb) = 0;
+				break;
+			}
+		}
+		
+		// remove gear
+		free_archetype_gear(GET_GLOBAL_GEAR(glb));
+		GET_GLOBAL_GEAR(glb) = NULL;
+		
+		// remove spawns too
+		while ((spawn = GET_GLOBAL_SPAWNS(glb))) {
+			GET_GLOBAL_SPAWNS(glb) = spawn->next;
+			free(spawn);
 		}
 	}
 }

@@ -140,9 +140,9 @@ Usage:  dismantle
 Speed boosts:  Faster Chores bonus, haste
 
 This command allows you to tear down a building when you're done with it. You
-get back approximately half of the resources you spent to build it, although
-dismantle can only refund items that were used -- it can't refund any coins,
-mana, or liquids that were spent.
+get back some of the resources you spent to build it depending on the condition
+of the building, although dismantle can only refund items that were used -- it
+can't refund any coins, mana, or liquids that were spent.
 
 This requires the 'dismantle' empire privilege, unless you are the person who
 originally built the building.

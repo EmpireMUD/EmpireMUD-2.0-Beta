@@ -1358,7 +1358,7 @@ Available flags:
  &c!CITY&0 - Will not link to claimed tiles in cities.
  &cCLAIMED-ONLY&0 - Will only link to claimed tiles.
  &cCONTINENT-ONLY&0 - Only spawns on islands with the CONTINENT flag.
- &c!CONTINENT&0 - Will not spawn on continents.
+ &cNO-CONTINENT&0 - Will not spawn on continents.
 
 Portals require a portal object for both the entrance and exit (they may be
 the same object). Existing buildings may also be interior rooms, but new
@@ -2171,7 +2171,7 @@ NOTE: If players add bedrooms to a building, it will spawn additional citizens.
 
 See also: BEDIT DESIGNATE, OLC BUILDINGS
 #d
-"BEDIT SPAWNS" "CROPEDIT SPAWNS" "SECTEDIT SPAWNS" "VEDIT SPAWNS"
+"BEDIT SPAWNS" "CROPEDIT SPAWNS" "GEDIT SPAWNS" "SECTEDIT SPAWNS" "VEDIT SPAWNS" "SPAWN FLAGS"
 
 Usage:  .spawns add <mob vnum> <percent> [flags]
         .spawns copy <from type> <from vnum>
@@ -2194,16 +2194,17 @@ will result in the mob never spawning. The flags indicate the mob will spawn
 ONLY if the condition is met.
 
 Available spawn flags:
- NOCTURNAL - only spawns at night
- DIURNAL - only spawns during the day
- CLAIMED - only spawns if the room/tile is claimed
- UNCLAIMED - only spawns if the room/tile is NOT claimed
- CITY - only spawns if the tile is in-city (and claimed)
- OUT-OF-CITY - only spawns if the tile is not in a city, or is unclaimed
- NORTHERN - only spawns in the northern half of the map
- SOUTHERN - only spawns in the southern half of the map
- EASTERN - only spawns in the eastern half of the map
- WESTERN - only spawns in the western half of the map
+ &cNOCTURNAL&0 - only spawns at night
+ &cDIURNAL&0 - only spawns during the day
+ &cCLAIMED&0 - only spawns if the room/tile is claimed
+ &cUNCLAIMED&0 - only spawns if the room/tile is NOT claimed
+ &cCITY&0 - only spawns if the tile is in-city (and claimed)
+ &cOUT-OF-CITY&0 - only spawns if the tile is not in a city, or is unclaimed
+ &cNORTHERN, SOUTHERN, EASTERN, WESTERN&0 - only spawns in that half of the map
+ &cCONTINENT&0 - only spawns on continents
+ &c!CONTINENT&0 - won't spawn on continents
+ &cSPRING-ONLY, SUMMER-ONLY, AUTUMN-ONLY, WINTER-ONLY&0 - only spawns in one of
+   these seasons
 
 Example:
  > .spawns add 12499 3 NOCTURNAL UNCLAIMED
@@ -2703,7 +2704,8 @@ Climates:
  &criver&0 - Moving water such as a river.
  &cfresh water&0 - Non-moving fresh water.
  &csalt water&0 - Ocean, sea, or salt lake.
- &cforest&0 - Any kind of forest.
+ &cforest&0 - Any kind of forest or jungle.
+ &cgrassland&0 - Plains, savannah, or steppe.
 
 See also: OLC CROPS, OLC SECTORS
 #d
@@ -2720,6 +2722,7 @@ Available flags:
  NEWBIE-ONLY - Only spawns on newbie islands (can be planted anywhere)
  !NEWBIE - Does not spawn on newbie islands
  ANY-LISTED-CLIMATE - Only 1 of the climate flags must match to plant this.
+ NO-GLOBAL-SPAWNS - Won't use global spawn lists.
 
 See also: OLC CROPS
 #d
@@ -3295,6 +3298,31 @@ is optional.
 
 See also: OLC GENERICS, GENERIC AFFECTS
 #d
+"GEDIT CLIMATEEXCLUDE"
+
+Usage:  .climateexclude [add | remove] <flags>
+
+A 'Map Spawns' global table may have climate flags set to exclude. If so, the
+global table is only used if a tile DOES NOT have all the flags in this set.
+For example, you can use it to create a set that does not apply to arid
+climates.
+
+These are the same set of flags from HELP SECTEDIT CLIMATE.
+
+See also: OLC GLOBALS
+#d
+"GEDIT CLIMATEFLAGS"
+
+Usage:  .climateflags [add | remove] <flags>
+
+A 'Map Spawns' global table may have climate flags set. If so, the global
+table is only used if a tile has ALL of the flags set here. For example, you
+might set a global table to only apply to 'temperate forest' climates.
+
+These are the same set of flags from HELP SECTEDIT CLIMATE.
+
+See also: OLC GLOBALS
+#d
 "GEDIT FLAGS"
 
 Usage:  .flags [add | remove] <flags>
@@ -3421,6 +3449,20 @@ These are the same set of flags from HELP SECTEDIT FLAGS.
 
 See also: OLC GLOBALS
 #d
+"GEDIT SPAWNFLAGS"
+
+Usage:  .spawnflags [add | remove] <flags>
+
+A 'Map Spawns' global table may have spawn flags set. These apply to ALL spawns
+in this global.
+
+This lets you have a global that handles all the nocturnal creatures for a
+terrain type, for example.
+
+These are the same set of flags from HELP GEDIT SPAWNS.
+
+See also: OLC GLOBALS
+#d
 "GEDIT TYPE"
 
 Usage:  .type <type>
@@ -3432,6 +3474,7 @@ Types:
  Mob Interactions - Used for global SHEAR, LOOT, and PICKPOCKET tables.
  Mine Data - Used for MINE interactions, see HELP MINE DATA GLOBAL.
  Newbie Gear - Given/equipped to all new players.
+ Map Spawns - Global spawn lists for map tiles, based on climate.
 
 See also: OLC GLOBALS
 #d
@@ -5445,6 +5488,8 @@ The following weapon types are available:
 31. crossbow (shoot) - a crossbow
 32. pistol (shoot) - a small firearm
 33. musket (shoot) - a large firearm
+34. sling (shoot) - a primitive ranged weapon that shoots sling bullets
+35. spear-thrower (shoot) - a primitive ranged weapon that shoots spears/darts
 
 See also: OLC OBJECTS
 #d
@@ -6663,11 +6708,37 @@ Available sector flags:
  LARGE-CITY-RADIUS - This tile counts as in-city even in the outskirts
  OBSCURE-VISION - Players can't be seen here; also blocks guard towers
  IS-TRENCH - Sector counts as a trench and fills with water
- * - unused
+ NO-GLOBAL-SPAWNS - Won't use global spawn lists.
  ROUGH - This is rough, raised terrain, like a mountain
  SHALLOW-WATER - The tile has water but requires no boat (like a swamp)
 
 See also: OLC SECTORS
+#d
+"SECTEDIT FULLSEARCH" "SECTOR FULLSEARCH"
+
+Usage:  .sector fullsearch -<field> <argument> <...>
+
+This command allows you to search for sectors with certain criteria. You can
+specify multiple fields if you want. Any arguments that don't start with a
+dash (-) are matched to the sector's name, title, and commands.
+
+Fields:
+  &c-buildflagged&0 - see HELP SECTEDIT BUILDFLAGS
+  &c-climate&0 - see HELP SECTEDIT CLIMATE
+  &c-evolution&0 - has a certain evolution, see SECTEDIT EVOLUTIONS
+  &c-flagged&0, &cunflagged&0 - see HELP SECTEDIT FLAGS
+  &c-interaction&0 - has a specific type, see HELP SECTEDIT INTERACTION
+  &c-mapout&0 - color name, see HELP SECTEDIT MAPOUT
+  &c-roadsideicon&0 - has a certain icon letter - HELP SECTEDIT ROADSIDEICON
+
+Examples:
+ > .sect fullsearch -climate forest -evolution CHOPPED-DOWN
+ > .sect fullsearch -flagged CHORE -flagged ROUGH
+ > .sect fullsearch -interaction CHOP
+
+To search other fields, you can generally use the normal "search" option for
+other OLC types. For example, to find all sectors that spawn a certain mob,
+use ".m search <mob's vnum>".
 #d
 "SECTEDIT ICONS" "CROPEDIT ICONS"
 

@@ -49,6 +49,11 @@
 #define INTERACTION_FUNC(name)	bool (name)(char_data *ch, struct interaction_item *interaction, room_data *inter_room, char_data *inter_mob, obj_data *inter_item)
 
 
+// global function types -- for run_globals
+#define GLB_VALIDATOR(name)		bool (name)(struct global_data *glb, char_data *ch, void *other_data)
+#define GLB_FUNCTION(name)		void (name)(struct global_data *glb, char_data *ch, void *other_data)
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// HANDLER MACROS //////////////////////////////////////////////////////////
 
@@ -171,6 +176,9 @@ extern empire_data *get_empire_by_name(char *name);
 // follow handlers
 void add_follower(char_data *ch, char_data *leader, bool msg);
 void stop_follower(char_data *ch);
+
+// global handlers
+bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t type_flags, char_data *ch, adv_data *adv, int level, GLB_VALIDATOR(*validator), void *other_data);
 
 // group handlers
 extern int count_group_members(struct group_data *group);

@@ -15,80 +15,6 @@ I 8 10501 20.00 3 H  # HARVEST: a handful of glowkra pods
 I 8 10501 20.00 4 H  # HARVEST: a handful of glowkra pods
 I 8 10501 20.00 5 H  # HARVEST: a handful of glowkra pods
 I 8 10501 20.00 6 H  # HARVEST: a handful of glowkra pods
-M
-9134 5.00 bdh
-M
-9037 5.00 ceh
-M
-9038 5.00 ceh
-M
-9036 5.00 ceh
-M
-9120 15.00 adg
-M
-9039 5.00 ceg
-M
-9035 5.00 ceg
-M
-9033 5.00 ceg
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-9153 10.00 d
-M
-9024 5.00 ce
-M
-9023 10.00 d
-M
-9034 5.00 ce
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9133 10.00 ad
-M
-9116 5.00 ad
-M
-9022 20.00 ace
-M
-9015 20.00 ad
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9025 5.00 bd
-M
-9011 10.00 bce
-M
-9044 1.00 bdh
-M
-9020 5.00 bd
-M
-9154 5.00 bd
-M
-9152 5.00 bd
-M
-9009 10.00 bce
-M
-9012 10.00 bd
-M
-9010 10.00 bce
-M
-9004 10.00 bce
-M
-9014 10.00 bd
 S
 #10501
 spadebrush~
@@ -107,90 +33,6 @@ I 8 10507 20.00 6 H  # HARVEST: a bundle of spadebrush
 I 8 10506 75.00 1 S  # HARVEST: a handful of spadebrush seeds
 I 8 10506 25.00 2 S  # HARVEST: a handful of spadebrush seeds
 I 9 121 100.00 1  # GATHER: some sticks and leaves
-M
-9145 5.00 adh
-M
-9037 5.00 ceh
-M
-9038 5.00 ceh
-M
-9036 5.00 ceh
-M
-9141 5.00 dg
-M
-9144 5.00 adg
-M
-9039 5.00 ceg
-M
-9035 5.00 ceg
-M
-9033 5.00 ceg
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-9153 10.00 d
-M
-9044 1.00 bdh
-M
-9024 5.00 ce
-M
-9034 5.00 ce
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9011 10.00 bce
-M
-9010 10.00 bce
-M
-9154 5.00 bd
-M
-9152 5.00 bd
-M
-9009 10.00 bce
-M
-9004 10.00 bce
-M
-9014 10.00 bd
-M
-9012 10.00 d
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
-M
-9023 5.00 d
-M
-9008 5.00 d
-M
-9133 5.00 ad
-M
-9116 5.00 ad
-M
-9022 5.00 ace
-M
-9015 5.00 ad
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
-M
-9025 5.00 bd
-M
-9020 5.00 bd
 S
 #10502
 dragonsteeth~
@@ -206,22 +48,6 @@ I 8 10504 20.00 3 H  # HARVEST: a dragon's tooth
 I 8 10504 20.00 4 H  # HARVEST: a dragon's tooth
 I 8 10504 20.00 5 H  # HARVEST: a dragon's tooth
 I 8 10504 20.00 6 H  # HARVEST: a dragon's tooth
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
 M
 10506 10.00 bd
 M
@@ -261,80 +87,6 @@ I 8 10510 20.00 5 H  # HARVEST: a bushel of bladegrass
 I 8 10510 20.00 6 H  # HARVEST: a bushel of bladegrass
 I 8 10509 75.00 1 S  # HARVEST: a handful of bladegrass seeds
 I 8 10509 25.00 2 S  # HARVEST: a handful of bladegrass seeds
-M
-9134 5.00 bdh
-M
-9037 5.00 ceh
-M
-9038 5.00 ceh
-M
-9036 5.00 ceh
-M
-9120 15.00 adg
-M
-9039 5.00 ceg
-M
-9035 5.00 ceg
-M
-9033 5.00 ceg
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-9153 10.00 d
-M
-9024 5.00 ce
-M
-9023 10.00 d
-M
-9034 5.00 ce
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9133 10.00 ad
-M
-9116 5.00 ad
-M
-9022 20.00 ace
-M
-9015 20.00 ad
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9025 5.00 bd
-M
-9011 10.00 bce
-M
-9044 1.00 bdh
-M
-9020 5.00 bd
-M
-9154 5.00 bd
-M
-9152 5.00 bd
-M
-9009 10.00 bce
-M
-9012 10.00 bd
-M
-9010 10.00 bce
-M
-9004 10.00 bce
-M
-9014 10.00 bd
 S
 #10504
 gemfruit~
@@ -362,80 +114,6 @@ I 8 10514 20.00 3 H  # HARVEST: a basket of sparkling gemfruits
 I 8 10514 20.00 4 H  # HARVEST: a basket of sparkling gemfruits
 I 8 10514 20.00 5 H  # HARVEST: a basket of sparkling gemfruits
 I 8 10514 20.00 6 H  # HARVEST: a basket of sparkling gemfruits
-M
-9134 5.00 bdh
-M
-9037 5.00 ceh
-M
-9038 5.00 ceh
-M
-9036 5.00 ceh
-M
-9120 15.00 adg
-M
-9039 5.00 ceg
-M
-9035 5.00 ceg
-M
-9033 5.00 ceg
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-9153 10.00 d
-M
-9024 5.00 ce
-M
-9023 10.00 d
-M
-9034 5.00 ce
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9133 10.00 ad
-M
-9116 5.00 ad
-M
-9022 20.00 ace
-M
-9015 20.00 ad
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9025 5.00 bd
-M
-9011 10.00 bce
-M
-9044 1.00 bdh
-M
-9020 5.00 bd
-M
-9154 5.00 bd
-M
-9152 5.00 bd
-M
-9009 10.00 bce
-M
-9012 10.00 bd
-M
-9010 10.00 bce
-M
-9004 10.00 bce
-M
-9014 10.00 bd
 S
 #10505
 magic mushrooms~
@@ -451,90 +129,6 @@ I 8 10516 20.00 3 H  # HARVEST: a basket of magic mushrooms
 I 8 10516 20.00 4 H  # HARVEST: a basket of magic mushrooms
 I 8 10516 20.00 5 H  # HARVEST: a basket of magic mushrooms
 I 8 10516 20.00 6 H  # HARVEST: a basket of magic mushrooms
-M
-9145 5.00 adh
-M
-9037 5.00 ceh
-M
-9038 5.00 ceh
-M
-9036 5.00 ceh
-M
-9141 5.00 dg
-M
-9144 5.00 adg
-M
-9039 5.00 ceg
-M
-9035 5.00 ceg
-M
-9033 5.00 ceg
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-9153 10.00 d
-M
-9044 1.00 bdh
-M
-9024 5.00 ce
-M
-9034 5.00 ce
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9011 10.00 bce
-M
-9010 10.00 bce
-M
-9154 5.00 bd
-M
-9152 5.00 bd
-M
-9009 10.00 bce
-M
-9004 10.00 bce
-M
-9014 10.00 bd
-M
-9012 10.00 d
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
-M
-9023 5.00 d
-M
-9008 5.00 d
-M
-9133 5.00 ad
-M
-9116 5.00 ad
-M
-9022 5.00 ace
-M
-9015 5.00 ad
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
-M
-9025 5.00 bd
-M
-9020 5.00 bd
 S
 #10506
 pudding figs~
@@ -561,90 +155,6 @@ I 6 10518 100.00 1 a  # FORAGE: an unripe fig
 I 8 10519 100.00 1  # HARVEST: a basket of pudding figs
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 120 100.00 1  # CHOP: a large tree
-M
-9145 5.00 adh
-M
-9037 5.00 ceh
-M
-9038 5.00 ceh
-M
-9036 5.00 ceh
-M
-9141 5.00 dg
-M
-9144 5.00 adg
-M
-9039 5.00 ceg
-M
-9035 5.00 ceg
-M
-9033 5.00 ceg
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-9153 10.00 d
-M
-9044 1.00 bdh
-M
-9024 5.00 ce
-M
-9034 5.00 ce
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9011 10.00 bce
-M
-9010 10.00 bce
-M
-9154 5.00 bd
-M
-9152 5.00 bd
-M
-9009 10.00 bce
-M
-9004 10.00 bce
-M
-9014 10.00 bd
-M
-9012 10.00 d
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
-M
-9023 5.00 d
-M
-9008 5.00 d
-M
-9133 5.00 ad
-M
-9116 5.00 ad
-M
-9022 5.00 ace
-M
-9015 5.00 ad
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
-M
-9025 5.00 bd
-M
-9020 5.00 bd
 S
 #10507
 giant beanstalks~
@@ -658,90 +168,6 @@ I 6 10523 100.00 1  # FORAGE: a handful of magic beans
 I 8 10537 100.00 1  # HARVEST: a giant beanstalk
 I 8 10523 75.00 1 S  # HARVEST: a handful of magic beans
 I 8 10523 25.00 2 S  # HARVEST: a handful of magic beans
-M
-9145 5.00 adh
-M
-9037 5.00 ceh
-M
-9038 5.00 ceh
-M
-9036 5.00 ceh
-M
-9141 5.00 dg
-M
-9144 5.00 adg
-M
-9039 5.00 ceg
-M
-9035 5.00 ceg
-M
-9033 5.00 ceg
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-9153 10.00 d
-M
-9044 1.00 bdh
-M
-9024 5.00 ce
-M
-9034 5.00 ce
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9011 10.00 bce
-M
-9010 10.00 bce
-M
-9154 5.00 bd
-M
-9152 5.00 bd
-M
-9009 10.00 bce
-M
-9004 10.00 bce
-M
-9014 10.00 bd
-M
-9012 10.00 d
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
-M
-9023 5.00 d
-M
-9008 5.00 d
-M
-9133 5.00 ad
-M
-9116 5.00 ad
-M
-9022 5.00 ace
-M
-9015 5.00 ad
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
-M
-9025 5.00 bd
-M
-9020 5.00 bd
 S
 #10508
 axeroot~
@@ -757,90 +183,6 @@ I 8 10525 20.00 3 H  # HARVEST: an axeroot
 I 8 10525 20.00 4 H  # HARVEST: an axeroot
 I 8 10525 20.00 5 H  # HARVEST: an axeroot
 I 8 10525 20.00 6 H  # HARVEST: an axeroot
-M
-9145 5.00 adh
-M
-9037 5.00 ceh
-M
-9038 5.00 ceh
-M
-9036 5.00 ceh
-M
-9141 5.00 dg
-M
-9144 5.00 adg
-M
-9039 5.00 ceg
-M
-9035 5.00 ceg
-M
-9033 5.00 ceg
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-9153 10.00 d
-M
-9044 1.00 bdh
-M
-9024 5.00 ce
-M
-9034 5.00 ce
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9011 10.00 bce
-M
-9010 10.00 bce
-M
-9154 5.00 bd
-M
-9152 5.00 bd
-M
-9009 10.00 bce
-M
-9004 10.00 bce
-M
-9014 10.00 bd
-M
-9012 10.00 d
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
-M
-9023 5.00 d
-M
-9008 5.00 d
-M
-9133 5.00 ad
-M
-9116 5.00 ad
-M
-9022 5.00 ace
-M
-9015 5.00 ad
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
-M
-9025 5.00 bd
-M
-9020 5.00 bd
 S
 #10509
 puppy plants~
@@ -862,52 +204,6 @@ I 8 10529 20.00 3 H  # HARVEST: a puppy pod
 I 8 10529 20.00 4 H  # HARVEST: a puppy pod
 I 8 10529 20.00 5 H  # HARVEST: a puppy pod
 I 8 10529 20.00 6 H  # HARVEST: a puppy pod
-M
-9037 5.00 ceh
-M
-9038 5.00 ceh
-M
-9036 5.00 ceh
-M
-9039 5.00 ceg
-M
-9035 5.00 ceg
-M
-9033 5.00 ceg
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-9153 10.00 d
-M
-9044 1.00 bdh
-M
-9024 5.00 ce
-M
-9034 5.00 ce
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
-M
-9133 5.00 ad
-M
-9025 5.00 bd
-M
-9020 5.00 bd
-M
-9012 50.00 0
 S
 #10510
 pickthorn~
@@ -929,90 +225,6 @@ I 8 10532 20.00 6 H  # HARVEST: a pickthorn stalk
 I 8 10531 75.00 1 S  # HARVEST: a red pickthorn fruit
 I 8 10531 25.00 2 S  # HARVEST: a red pickthorn fruit
 I 9 132 100.00 1  # GATHER: some thorny branches
-M
-9145 5.00 adh
-M
-9037 5.00 ceh
-M
-9038 5.00 ceh
-M
-9036 5.00 ceh
-M
-9141 5.00 dg
-M
-9144 5.00 adg
-M
-9039 5.00 ceg
-M
-9035 5.00 ceg
-M
-9033 5.00 ceg
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-246 0.30 ad
-M
-9153 10.00 d
-M
-9044 1.00 bdh
-M
-9024 5.00 ce
-M
-9034 5.00 ce
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9011 10.00 bce
-M
-9010 10.00 bce
-M
-9154 5.00 bd
-M
-9152 5.00 bd
-M
-9009 10.00 bce
-M
-9004 10.00 bce
-M
-9014 10.00 bd
-M
-9012 10.00 d
-M
-9150 5.00 d
-M
-9149 5.00 d
-M
-9148 5.00 d
-M
-9023 5.00 d
-M
-9008 5.00 d
-M
-9133 5.00 ad
-M
-9116 5.00 ad
-M
-9022 5.00 ace
-M
-9015 5.00 ad
-M
-9032 5.00 bd
-M
-9031 5.00 bd
-M
-9030 5.00 bd
-M
-9029 5.00 bd
-M
-9025 5.00 bd
-M
-9020 5.00 bd
 S
 #10511
 vigilant vines~
@@ -1037,76 +249,6 @@ I 8 10535 20.00 6 H  # HARVEST: a bundle of vigilant vines
 M
 10515 50.00 e
 M
-9134 5.00 bdh
-M
-9037 5.00 ceh
-M
-9038 5.00 ceh
-M
-9036 5.00 ceh
-M
-9120 15.00 adg
-M
-9039 5.00 ceg
-M
-9035 5.00 ceg
-M
-9033 5.00 ceg
-M
-248 1.00 bd
-M
-247 0.10 d
-M
-9153 10.00 d
-M
-9024 5.00 ce
-M
-9023 10.00 d
-M
-9034 5.00 ce
-M
-9028 10.00 bdg
-M
-9041 10.00 bdh
-M
-9133 10.00 ad
-M
-9116 5.00 ad
-M
-9022 20.00 ace
-M
-9015 20.00 ad
-M
-9032 10.00 bd
-M
-9031 10.00 bd
-M
-9030 10.00 bd
-M
-9029 10.00 bd
-M
-9025 5.00 bd
-M
-9011 10.00 bce
-M
-9044 1.00 bdh
-M
-9020 5.00 bd
-M
-9154 5.00 bd
-M
-9152 5.00 bd
-M
-9009 10.00 bce
-M
-9012 10.00 bd
-M
-9010 10.00 bce
-M
-9004 10.00 bce
-M
-9014 10.00 bd
-M
 10516 0.50 d
 S
 #10551
@@ -1129,8 +271,6 @@ M
 9177 5.00 g
 M
 9179 15.00 g
-M
-9171 5.00 0
 M
 10556 5.00 0
 M
@@ -1155,8 +295,6 @@ M
 9177 5.00 g
 M
 9179 15.00 g
-M
-9171 5.00 0
 M
 10556 5.00 0
 M

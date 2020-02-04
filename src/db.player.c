@@ -4063,6 +4063,15 @@ void set_title(char_data *ch, char *title) {
 }
 
 
+// for start_new_character
+GLB_FUNCTION(run_global_newbie_gear) {
+	struct archetype_gear *gear;
+	LL_FOREACH(GET_GLOBAL_GEAR(glb), gear) {
+		give_newbie_gear(ch, gear->vnum, gear->wear);
+	}
+}
+
+
 /**
 * Some initializations for characters, including initial skills
 *
@@ -4080,13 +4089,10 @@ void start_new_character(char_data *ch) {
 	extern int tips_of_the_day_size;
 	
 	char lbuf[MAX_INPUT_LENGTH];
-	struct global_data *glb, *next_glb, *choose_last;
-	int arch_iter, cumulative_prc, iter, level;
-	bool done_cumulative = FALSE;
+	int arch_iter, iter, level;
 	struct archetype_gear *gear;
 	struct archetype_skill *sk;
 	archetype_data *arch;
-	bool found;
 	
 	// announce to existing players that we have a newbie
 	mortlog("%s has joined the game", PERS(ch, ch, TRUE));
@@ -4196,58 +4202,8 @@ void start_new_character(char_data *ch) {
 		}
 	}
 	
-	// global newbie gear -- TODO there must be a better, more generic way to run globals -pc 5/24/2016
-	cumulative_prc = number(1, 10000);
-	choose_last = NULL;
-	found = FALSE;
-	HASH_ITER(hh, globals_table, glb, next_glb) {
-		if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR || IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_IN_DEVELOPMENT)) {
-			continue;
-		}
-		if (GET_GLOBAL_ABILITY(glb) != NO_ABIL && !has_ability(ch, GET_GLOBAL_ABILITY(glb))) {
-			continue;
-		}
-		
-		// percent checks last
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CUMULATIVE_PERCENT)) {
-			if (done_cumulative) {
-				continue;
-			}
-			cumulative_prc -= (int)(GET_GLOBAL_PERCENT(glb) * 100);
-			if (cumulative_prc <= 0) {
-				done_cumulative = TRUE;
-			}
-			else {
-				continue;	// not this time
-			}
-		}
-		else if (number(1, 10000) > (int)(GET_GLOBAL_PERCENT(glb) * 100)) {
-			// normal not-cumulative percent
-			continue;
-		}
-	
-		// success!
-		
-		// check choose-last
-		if (IS_SET(GET_GLOBAL_FLAGS(glb), GLB_FLAG_CHOOSE_LAST)) {
-			if (!choose_last) {
-				choose_last = glb;
-			}
-			continue;
-		}
-		
-		// safe to apply
-		for (gear = GET_GLOBAL_GEAR(glb); gear; gear = gear->next) {
-			give_newbie_gear(ch, gear->vnum, gear->wear);
-		}
-		found = TRUE;
-	}
-	// do the choose-last
-	if (choose_last && !found) {
-		for (gear = GET_GLOBAL_GEAR(choose_last); gear; gear = gear->next) {
-			give_newbie_gear(ch, gear->vnum, gear->wear);
-		}
-	}
+	// global newbie gear
+	run_globals(GLOBAL_NEWBIE_GEAR, run_global_newbie_gear, TRUE, NOBITS, ch, NULL, 0, NULL, NULL);
 	
 	// basic updates
 	determine_gear_level(ch);

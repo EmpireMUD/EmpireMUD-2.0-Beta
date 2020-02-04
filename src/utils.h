@@ -732,6 +732,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_GLOBAL_MAX_LEVEL(glb)  ((glb)->max_level)
 #define GET_GLOBAL_VAL(glb, pos)  ((glb)->value[(pos)])
 #define GET_GLOBAL_INTERACTIONS(glb)  ((glb)->interactions)
+#define GET_GLOBAL_SPARE_BITS(glb)  ((glb)->spare_bits)
+#define GET_GLOBAL_SPAWNS(glb)  ((glb)->spawns)
 
 // global value types
 #define GLB_VAL_MAX_MINE_SIZE  0	// which global value is used for max mine size
@@ -1669,7 +1671,6 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 extern struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj);
 extern char *get_resource_name(struct resource_data *res);
 void give_resources(char_data *ch, struct resource_data *list, bool split);
-void halve_resource_list(struct resource_data **list, bool remove_nonrefundables);
 extern bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs);
 void show_resource_list(struct resource_data *list, char *save_buffer);
 

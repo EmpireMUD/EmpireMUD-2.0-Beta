@@ -718,6 +718,8 @@ Available affects:
   crossbow (shoot) - Causes a stackable physical DoT.
   pistol (shoot) - The victim loses dodge based on your Dexterity.
   musket (shoot) - Causes a stackable physical DoT.
+  sling (shoot) - Stuns the victim briefly.
+  spear-thrower (shoot) - Causes a stackable physical DoT.
 
 Gain experience when fighting at range.
 

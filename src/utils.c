@@ -3204,33 +3204,73 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 
 
 /**
-* Cuts a list of resources in half, for things that only return half. Empty
-* entries (half=0) will be removed.
+* Removes some resources from a resource list when dismantling starts, based on
+* the material type and the damage to the building.
 *
+* @param room_data *room The building being dismantled.
 * @param struct resource_data **list The list to halve.
 * @param bool remove_nonrefundables If TRUE, removes entries that cannot be refunded.
 */
-void halve_resource_list(struct resource_data **list, bool remove_nonrefundables) {
-	struct resource_data *res, *next_res;
-	bool odd = FALSE;
+void reduce_dismantle_resources(room_data *room, struct resource_data **list, bool remove_nonrefundables) {
+	extern const struct material_data materials[NUM_MATERIALS];
 	
-	LL_FOREACH_SAFE(*list, res, next_res) {
-		if (odd && (res->amount % 2) != 0) {
-			// a previous one was odd (round up this time)
-			res->amount = (res->amount + 1) / 2;
-			odd = FALSE;
-		}
-		else if (odd) {
-			// we have a stored odd but this one isn't odd too, so we keep the stored odd
-			res->amount /= 2;
-		}
-		else {
-			// no stored odd -- do a normal round-down divide
-			odd = (res->amount % 2);
-			res->amount /= 2;
-		}
+	struct resource_data *res, *next_res;
+	int iter, count, total, remaining;
+	double damage_prc, prc_to_keep;
+	obj_data *proto;
+	bld_data *bld;
+	
+	// determine how damaged the building it -- 1.0+ is VERY damaged, 0 is not damaged at all
+	bld = GET_BUILDING(room);
+	damage_prc = (BUILDING_DAMAGE(room) / MAX(1, bld ? GET_BLD_MAX_DAMAGE(bld) : 1));
+	damage_prc = MIN(1.0, damage_prc);	// reduce to 0-1.0 range (1.0 is fully damaged)
+	
+	// we keep a percent of the items based on how damaged it is, in the 20-90% range
+	prc_to_keep = (1.0 - damage_prc) * 0.7 + 0.2;
+	
+	// count these to determine how much we removed
+	total = remaining = 0;
+	
+	// first round: only lower res->amount, do not delete res here
+	LL_FOREACH(*list, res) {
+		total += res->amount;	// number of resources in the list
 		
-		// check for no remaining resource
+		// random chance of decay for items based on material type
+		if (res->type == RES_OBJECT && (proto = obj_proto(res->vnum))) {
+			for (iter = 0; iter < res->amount; ++iter) {
+				if (number(1, 10000) > materials[GET_OBJ_MATERIAL(proto)].chance_to_dismantle * 100) {
+					res->amount -= 1;
+				}
+			}
+			remaining += res->amount;	// how much survived this round
+		}
+		else {	// survives this round
+			++remaining;
+		}
+	}
+	
+	// ensure no 0
+	total = MAX(1, total);
+	
+	// second round (if we didn't reduce enough)
+	count = 0;
+	while (count < 10 && ((double) remaining) / total > prc_to_keep) {
+		++count;	// prevents infinite loop
+		
+		LL_FOREACH(*list, res) {
+			if (res->amount > 0 && !number(0, 1)) {
+				res->amount -= 1;
+				--remaining;
+			}
+			
+			if (((double) remaining) / total <= prc_to_keep) {
+				break;	// enough
+			}
+		}
+	}
+	
+	// check for no remaining resources and delete res entries if so
+	LL_FOREACH_SAFE(*list, res, next_res) {
 		if (res->amount <= 0) {
 			LL_DELETE(*list, res);
 			free(res);

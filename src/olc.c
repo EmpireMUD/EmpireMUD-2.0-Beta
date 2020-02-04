@@ -240,6 +240,8 @@ OLC_MODULE(genedit_singular);
 // global modules
 OLC_MODULE(gedit_ability);
 OLC_MODULE(gedit_capacity);
+OLC_MODULE(gedit_climateexclude);
+OLC_MODULE(gedit_climateflags);
 OLC_MODULE(gedit_flags);
 OLC_MODULE(gedit_gear);
 OLC_MODULE(gedit_interaction);
@@ -251,6 +253,8 @@ OLC_MODULE(gedit_name);
 OLC_MODULE(gedit_percent);
 OLC_MODULE(gedit_sectorexclude);
 OLC_MODULE(gedit_sectorflags);
+OLC_MODULE(gedit_spawnflags);
+OLC_MODULE(gedit_spawns);
 OLC_MODULE(gedit_type);
 
 // mob edit modules
@@ -831,6 +835,8 @@ const struct olc_command_data olc_data[] = {
 	
 	// globals commands
 	{ "capacity", gedit_capacity, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "climateflags", gedit_climateflags, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "climateexclude", gedit_climateexclude, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "flags", gedit_flags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "gear", gedit_gear, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "interaction", gedit_interaction, OLC_GLOBAL, OLC_CF_EDITOR },
@@ -843,6 +849,8 @@ const struct olc_command_data olc_data[] = {
 	{ "requiresability", gedit_ability, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "sectorexclude", gedit_sectorexclude, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "sectorflags", gedit_sectorflags, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "spawns", gedit_spawns, OLC_GLOBAL, OLC_CF_EDITOR },
+	{ "spawnflags", gedit_spawnflags, OLC_GLOBAL, OLC_CF_EDITOR },
 	{ "type", gedit_type, OLC_GLOBAL, OLC_CF_EDITOR },
 	
 	// mob commands
@@ -1091,7 +1099,7 @@ const struct olc_command_data olc_data[] = {
 	
 	
 	// misc commands that should not take precedence over editor commands
-	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_ROOM_TEMPLATE | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
+	{ "fullsearch", olc_fullsearch, OLC_ABILITY | OLC_BUILDING | OLC_CRAFT | OLC_CROP | OLC_MOBILE |  OLC_OBJECT | OLC_PROGRESS | OLC_ROOM_TEMPLATE | OLC_SECTOR | OLC_TRIGGER | OLC_VEHICLE, NOBITS },
 	
 	// this goes last
 	{ "\n", NULL, NOBITS, NOBITS }
@@ -2676,6 +2684,11 @@ OLC_MODULE(olc_fullsearch) {
 		case OLC_ROOM_TEMPLATE: {
 			void olc_fullsearch_room_template(char_data *ch, char *argument);
 			olc_fullsearch_room_template(ch, argument);
+			break;
+		}
+		case OLC_SECTOR: {
+			void olc_fullsearch_sector(char_data *ch, char *argument);
+			olc_fullsearch_sector(ch, argument);
 			break;
 		}
 		case OLC_TRIGGER: {
@@ -7337,6 +7350,13 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 					crop_data *crop = crop_proto(vnum);
 					if (crop) {
 						copyfrom = GET_CROP_SPAWNS(crop);
+					}
+					break;
+				}
+				case OLC_GLOBAL: {
+					struct global_data *glb = global_proto(vnum);
+					if (glb) {
+						copyfrom = GET_GLOBAL_SPAWNS(glb);
 					}
 					break;
 				}

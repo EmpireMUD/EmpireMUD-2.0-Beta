@@ -1066,6 +1066,8 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 * @param room_data *loc The location to dismantle.
 */
 void start_dismantle_building(room_data *loc) {
+	void reduce_dismantle_resources(room_data *room, struct resource_data **list, bool remove_nonrefundables);
+	
 	struct resource_data *composite_resources = NULL, *crcp, *res, *next_res;
 	room_data *room, *next_room;
 	char_data *targ, *next_targ;
@@ -1177,8 +1179,8 @@ void start_dismantle_building(room_data *loc) {
 		}
 	}
 	
-	// cut resources in half: they only get that much back
-	halve_resource_list(&GET_BUILDING_RESOURCES(loc), TRUE);
+	// reduce resource: they don't get it all back
+	reduce_dismantle_resources(loc, &GET_BUILDING_RESOURCES(loc), TRUE);
 
 	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);

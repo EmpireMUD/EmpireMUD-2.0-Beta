@@ -2368,22 +2368,23 @@ const double obj_flag_scaling_bonus[] = {
 
 // MAT_x -- name, TRUE if it floats
 const struct material_data materials[NUM_MATERIALS] = {
-	{ "WOOD", TRUE },
-	{ "ROCK", FALSE },
-	{ "IRON", FALSE },
-	{ "SILVER", FALSE },
-	{ "GOLD", FALSE },
-	{ "FLINT", FALSE },
-	{ "CLAY", FALSE },
-	{ "FLESH", TRUE },
-	{ "GLASS", FALSE },
-	{ "WAX", TRUE },
-	{ "MAGIC", TRUE },
-	{ "CLOTH", TRUE },
-	{ "GEM", FALSE },
-	{ "COPPER", FALSE },
-	{ "BONE", TRUE },
-	{ "HAIR", TRUE }
+	// name, floats, chance-to-get-from-dismantle
+	{ "WOOD", TRUE, 50.0 },
+	{ "ROCK", FALSE, 95.0 },
+	{ "IRON", FALSE, 90.0 },
+	{ "SILVER", FALSE, 100.0 },
+	{ "GOLD", FALSE, 100.0 },
+	{ "FLINT", FALSE, 95.0 },
+	{ "CLAY", FALSE, 75.0 },
+	{ "FLESH", TRUE, 50.0 },
+	{ "GLASS", FALSE, 50.0 },
+	{ "WAX", TRUE, 25.0 },
+	{ "MAGIC", TRUE, 100.0 },
+	{ "CLOTH", TRUE, 50.0 },
+	{ "GEM", FALSE, 100.0 },
+	{ "COPPER", FALSE, 100.0 },
+	{ "BONE", TRUE, 50.0 },
+	{ "HAIR", TRUE, 50.0 }
 };
 
 
@@ -2632,6 +2633,8 @@ struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES] = {
 	{ "pistol", "shoot", "shoots", "shot", { 2.0, 2.4, 3.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
 	{ "musket", "shoot", "shoots", "shot", { 3.6, 3.8, 4.2 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
 	{ "fire breath", "breathe fire at", "breathes fire at", "fire breath", { 3.6, 3.8, 4.0 }, WEAPON_MAGIC, DAM_MAGICAL, FALSE },
+	{ "sling", "shoot", "shoots", "shot", { 3.0, 3.5, 4.0 }, WEAPON_BLUNT, DAM_PHYSICAL, FALSE },
+	{ "spear-thrower", "shoot", "shoots", "shot", { 3.5, 4.0, 4.5 }, WEAPON_SHARP, DAM_PHYSICAL, FALSE },
 };
 
 
@@ -2922,7 +2925,7 @@ const char *bld_relationship_types[] = {
 };
 
 
-// CLIM_x: climate flags
+// CLIM_x (1/2): climate flags
 const char *climate_flags[] = {
 	"*",	// 0
 	"*",
@@ -2941,7 +2944,30 @@ const char *climate_flags[] = {
 	"fresh water",
 	"salt water",	// 15
 	"forest",
+	"grassland",
+	"coastal",
+	"ocean",
+	"lake",	// 20
 	"\n"
+};
+
+
+// CLIM_x (2/2): order to display climate flags
+const bitvector_t climate_flags_order[] = {
+	CLIM_HOT, CLIM_COLD,	// temperatures first
+	CLIM_HIGH, CLIM_LOW,	// relative elevation
+	CLIM_MAGICAL,			// special attribute
+	
+	CLIM_TEMPERATE, CLIM_ARID, CLIM_TROPICAL,	// latitude adjustments
+	
+	CLIM_COASTAL, CLIM_FRESH_WATER, CLIM_SALT_WATER,	// water prefixes
+	CLIM_RIVER, CLIM_OCEAN, CLIM_LAKE,	// water types
+	
+	CLIM_MOUNTAIN,		// land terrain that could be prefix or whole name
+	CLIM_FOREST, CLIM_GRASSLAND,	// land terrains
+	
+	CLIM_UNUSED1, CLIM_UNUSED2, CLIM_UNUSED3, CLIM_UNUSED4,	// move these when used
+	NOBITS	// last
 };
 
 
@@ -2953,6 +2979,7 @@ const char *crop_flags[] = {
 	"NEWBIE-ONLY",
 	"!NEWBIE",
 	"ANY-LISTED-CLIMATE",	// 5
+	"NO-GLOBAL-SPAWNS",
 	"\n"
 };
 
@@ -3370,41 +3397,53 @@ const char *sector_flags[] = {
 	"LARGE-CITY-RADIUS",
 	"OBSCURE-VISION",
 	"IS-TRENCH",
-		"*",
+	"NO-GLOBAL-SPAWNS",
 	"ROUGH",
 	"SHALLOW-WATER",
 	"\n"
 };
 
 
-// SPAWN_x
+// SPAWN_x (1/2) -- full length spawn flags
 const char *spawn_flags[] = {
-	"NOCTURNAL",
+	"NOCTURNAL",	// 0
 	"DIURNAL",
 	"CLAIMED",
 	"UNCLAIMED",
 	"CITY",
-	"OUT-OF-CITY",
+	"OUT-OF-CITY",	// 5
 	"NORTHERN",
 	"SOUTHERN",
 	"EASTERN",
 	"WESTERN",
+	"CONTINENT-ONLY",	// 10
+	"NO-CONTINENT",
+	"SPRING-ONLY",
+	"SUMMER-ONLY",
+	"AUTUMN-ONLY",
+	"WINTER-ONLY",	// 15
 	"\n"
 };
 
 
-// SPAWN_x -- short form for compressed display
+// SPAWN_x (2/2) -- short form for compressed display
 const char *spawn_flags_short[] = {
-	"NOCT",
+	"NOCT",	// 0
 	"DIA",
 	"CLM",
 	"!CLM",
 	"CITY",
-	"!CITY",
+	"!CITY",	// 5
 	"NORTH",
 	"SOUTH",
 	"EAST",
 	"WEST",
+	"CONT",	// 10
+	"!CONT",
+	"SPRING",
+	"SUMMER",
+	"AUTUMN",
+	"WINTER",	// 15
 	"\n"
 };
 
@@ -3841,6 +3880,7 @@ const char *global_types[] = {
 	"Mob Interactions",
 	"Mine Data",
 	"Newbie Gear",
+	"Map Spawns",
 	"\n"
 };
 

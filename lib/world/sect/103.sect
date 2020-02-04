@@ -1,7 +1,7 @@
 #10300
 Scorched Woods~
 The Scorched Woods~
-'^' 3 j 4 0 p
+'^' 3 j 4 u p
 D0
 &r.&y^&r..~
 &y~
@@ -22,24 +22,6 @@ E
 9 0 75.00 1
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds
 M
-250 0.10 ad
-M
-248 1.00 bd
-M
-246 0.30 ad
-M
-9024 5.00 ce
-M
-9116 5.00 ad
-M
-9022 5.00 ace
-M
-9015 5.00 ad
-M
-9029 1.00 bd
-M
-9025 5.00 bd
-M
 10302 5.00 0
 M
 10303 5.00 0
@@ -55,7 +37,7 @@ S
 #10301
 Scorched Grove~
 The Scorched Grove~
-'.' 3 k 4 0 p
+'.' 3 k 4 u p
 D0
 &r.&y^&r..~
 &y~
@@ -76,24 +58,6 @@ E
 9 0 75.00 26
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds
 M
-250 0.10 ad
-M
-248 1.00 bd
-M
-246 0.30 ad
-M
-9024 5.00 ce
-M
-9116 5.00 ad
-M
-9022 5.00 ace
-M
-9015 5.00 ad
-M
-9029 1.00 bd
-M
-9025 5.00 bd
-M
 10302 5.00 0
 M
 10303 5.00 0
@@ -109,7 +73,7 @@ S
 #10302
 Scorched Plains~
 The Scorched Plains~
-'.' 3 j 4 0 p
+'.' 3 j 4 u p
 D0
 ....~
 &r~
@@ -120,24 +84,6 @@ E
 E
 9 0 75.00 1
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-246 0.30 ad
-M
-9024 5.00 ce
-M
-9116 5.00 ad
-M
-9022 5.00 ace
-M
-9015 5.00 ad
-M
-9029 1.00 bd
-M
-9025 5.00 bd
 M
 10302 5.00 0
 M
@@ -154,7 +100,7 @@ S
 #10303
 Scorched Crop~
 The Scorched Crops~
-'.' 3 j 4 0 p
+'.' 3 j 4 u p
 D0
 ....~
 &r~
@@ -165,24 +111,6 @@ E
 E
 9 0 75.00 1
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-246 0.30 ad
-M
-9024 5.00 ce
-M
-9116 5.00 ad
-M
-9022 5.00 ace
-M
-9015 5.00 ad
-M
-9029 1.00 bd
-M
-9025 5.00 bd
 M
 10302 5.00 0
 M
@@ -199,7 +127,7 @@ S
 #10304
 Scorched Desert Crop~
 The Scorched Crops~
-'.' 3 k 4 0 p
+'.' 3 k 4 u p
 D0
 ....~
 &r~
@@ -210,24 +138,6 @@ E
 E
 9 0 75.00 26
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-246 0.30 ad
-M
-9024 5.00 ce
-M
-9116 5.00 ad
-M
-9022 5.00 ace
-M
-9015 5.00 ad
-M
-9029 1.00 bd
-M
-9025 5.00 bd
 M
 10302 5.00 0
 M
@@ -244,7 +154,7 @@ S
 #10305
 Scorched Desert~
 The Scorched Desert~
-'.' 3 k 4 0 p
+'.' 3 k 4 u p
 D0
 ....~
 &r~
@@ -253,24 +163,6 @@ E
 E
 9 0 75.00 25
 I 6 10302 100.00 1  # FORAGE: some firefruit seeds
-M
-250 0.10 ad
-M
-248 1.00 bd
-M
-246 0.30 ad
-M
-9024 5.00 ce
-M
-9116 5.00 ad
-M
-9022 5.00 ace
-M
-9015 5.00 ad
-M
-9029 1.00 bd
-M
-9025 5.00 bd
 M
 10302 5.00 0
 M

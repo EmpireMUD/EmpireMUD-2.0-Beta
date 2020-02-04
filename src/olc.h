@@ -150,6 +150,15 @@ bool find_event_reward_in_list(struct event_reward *list, int type, any_vnum vnu
 		var = TRUE;	\
 	}
 
+#define FULLSEARCH_CHAR(string, var)	\
+	else if (is_abbrev(type_arg, "-"string)) {	\
+		argument = any_one_word(argument, val_arg);	\
+		if (!(var = *val_arg)) {	\
+			msg_to_char(ch, "Invalid %s '%s'.\r\n", string, val_arg);	\
+			return;	\
+		}	\
+	}
+
 #define FULLSEARCH_INT(string, var, min, max)	\
 	else if (is_abbrev(type_arg, "-"string)) {	\
 		argument = any_one_word(argument, val_arg);	\

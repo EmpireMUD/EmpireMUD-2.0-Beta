@@ -30,6 +30,7 @@
 
 // external consts
 extern const char *climate_flags[];
+extern const bitvector_t climate_flags_order[];
 extern const char *crop_flags[];
 extern const char *interact_types[];
 extern const byte interact_vnum_types[NUM_INTERACTS];
@@ -613,7 +614,7 @@ void olc_show_crop(char_data *ch) {
 	get_icons_display(GET_CROP_ICONS(cp), buf1);
 	strcat(buf, buf1);
 	
-	sprintbit(GET_CROP_CLIMATE(cp), climate_flags, lbuf, TRUE);
+	ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, FALSE, lbuf);
 	sprintf(buf + strlen(buf), "<%sclimate\t0> %s\r\n", OLC_LABEL_VAL(GET_CROP_CLIMATE(cp), NOBITS), lbuf);
 
 	sprintbit(GET_CROP_FLAGS(cp), crop_flags, lbuf, TRUE);

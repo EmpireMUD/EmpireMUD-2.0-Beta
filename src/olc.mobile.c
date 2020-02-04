@@ -395,6 +395,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	// update globals
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(glb), TYPE_MOB, vnum);
+		found |= delete_mob_from_spawn_list(&GET_GLOBAL_SPAWNS(glb), vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_GLB, GET_GLOBAL_VNUM(glb));
 		}
@@ -498,6 +499,13 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			}
 			if (delete_from_interaction_list(&GET_OLC_CROP(desc)->interactions, TYPE_MOB, vnum)) {
 				msg_to_char(desc->character, "One of the mobs in an interaction for the crop you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_GLOBAL(desc)) {
+			found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(GET_OLC_GLOBAL(desc)), TYPE_MOB, vnum);
+			found |= delete_mob_from_spawn_list(&GET_GLOBAL_SPAWNS(GET_OLC_GLOBAL(desc)), vnum);
+			if (found) {
+				msg_to_char(desc->character, "One of the mobs used by the global you're editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_MOBILE(desc)) {
@@ -808,6 +816,13 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+			}
+		}
+		LL_FOREACH(GET_GLOBAL_SPAWNS(glb), spawn) {
+			if (spawn->vnum == vnum) {
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "GLB [%5d] %s\r\n", GET_GLOBAL_VNUM(glb), GET_GLOBAL_NAME(glb));
+				break;
 			}
 		}
 	}

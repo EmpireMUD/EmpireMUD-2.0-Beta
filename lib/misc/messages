@@ -971,6 +971,66 @@ You breathe fire at $N, but it doesn't seem to affect $M.
 $n breathes fire fire at you, but you can barely feel it.
 $n breathes fire fire at $N, who isn't even singed.
 
+* Sling (shoot)
+M
+ 34
+You sling the bullet right between $N's eyes and $E falls limply to the ground!
+The last thing you see is $n's sling bullet coming at your head!
+$n slings a bullet right between $N's eyes and $E falls limply to the ground!
+Your shot flies off into the air, completely missing $N.
+$n shoots at you, but misses widely.
+$n shoots at $N, but misses completely.
+#
+#
+#
+Your sling bullet stops in midair before $N.
+A sling bullet from $n stops in midair before you.
+A sling bullet from $n stops in midair before $N.
+M
+ 34
+Your sling bullet grazes $N's neck and $E falls to the ground trying in vain to stop the profuse bleeding!
+You feel a sling bullet from $n graze your neck, and the warm, wet feeling of blood gushing into your clothing as your vision goes dark!
+A sling bullet from $n seems to graze $N's neck, but $E falls to the ground, trying in vein to stop the profuse bleeding!
+Your shot hits the ground near $N.
+$n shoots at you, but hits the ground nearby.
+$n shoots at $N, but misses.
+#
+#
+#
+Your sling bullet stops in midair before $N, and drops to the ground.
+A sling bullet from $n stops in midair before you, and drops to the ground.
+A sling bullet from $n stops in midair before $N, and drops to the ground.
+
+* Spear-thrower (shoot)
+M
+ 35
+You hurl the dart right into $N's chest so hard $E flies backwards, hits $S head, and dies!
+The last thing you see is a dart from $n hitting you in the chest so hard you fly backwards!
+$n hurls a dart right into $N's chest so hard $E flies backwards, hits $S head, and dies!
+Your shot flies off into the air, completely missing $N.
+$n shoots at you, but misses widely.
+$n shoots at $N, but misses completely.
+#
+#
+#
+You shoot a dart at $N but it vanishes before it hits $M.
+$n shoots a dart at you, but it vanishes before it reaches you.
+$n shoots a dart at $N, but it vanishes before it hits $M.
+M
+ 35
+You shoot the dart straight into $N's heart! $E staggers backwards and dies.
+$n shoots a dart straight into your heart! You clutch at your chest as the world goes dark.
+$n shoots a dart straight into $N's heart! $E staggers backwards and dies.
+Your throw as hard as you can, but your dart lands short of $N.
+$n throws a dart at you but it lands short.
+$n throws a dart but it lands short of $N.
+#
+#
+#
+You hurl a dart at $N but it explodes into flower petals.
+$n hurls a dart at you, but it explodes into flower petals.
+$n hurls a dart at $N, but it explodes into flower petals.
+
 * Suffering
 M
  50

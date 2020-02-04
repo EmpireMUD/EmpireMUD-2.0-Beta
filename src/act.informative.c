@@ -40,6 +40,7 @@ extern struct city_metadata_type city_type[];
 extern const char *class_role[];
 extern const char *class_role_color[];
 extern const char *climate_flags[];
+extern const bitvector_t climate_flags_order[];
 extern const char *dirs[];
 extern struct gen_craft_data_t gen_craft_data[];
 extern struct help_index_element *help_table;
@@ -3402,7 +3403,7 @@ ACMD(do_survey) {
 	}
 	
 	if (IS_OUTDOOR_TILE(IN_ROOM(ch)) && GET_SECT_CLIMATE(SECT(IN_ROOM(ch)))) {
-		sprintbit(GET_SECT_CLIMATE(SECT(IN_ROOM(ch))), climate_flags, buf, TRUE);
+		ordered_sprintbit(GET_SECT_CLIMATE(SECT(IN_ROOM(ch))), climate_flags, climate_flags_order, FALSE, buf);
 		msg_to_char(ch, "Climate: %s\r\n", buf);
 	}
 	

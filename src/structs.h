@@ -317,6 +317,7 @@ typedef struct vehicle_data vehicle_data;
 #define GLOBAL_MOB_INTERACTIONS  0
 #define GLOBAL_MINE_DATA  1
 #define GLOBAL_NEWBIE_GEAR  2
+#define GLOBAL_MAP_SPAWNS  3
 
 
 // GLB_FLAG_x flags for global_data
@@ -435,7 +436,7 @@ typedef struct vehicle_data vehicle_data;
 #define SKILLF_NO_SPECIALIZE  BIT(2)	// c. players must pass 50/75 via script/quest
 
 
-// mob spawn flags
+// SPAWN_x: mob spawn flags
 #define SPAWN_NOCTURNAL  BIT(0)	// a. only spawns at night
 #define SPAWN_DIURNAL  BIT(1)	// b. only spawns during day
 #define SPAWN_CLAIMED  BIT(2)	// c. only claimed land
@@ -446,6 +447,12 @@ typedef struct vehicle_data vehicle_data;
 #define SPAWN_SOUTHERN  BIT(7)	// h. only spawns in the southern half
 #define SPAWN_EASTERN  BIT(8)	// i. only spawns in the east half
 #define SPAWN_WESTERN  BIT(9)	// j. only spawns in the west half
+#define SPAWN_CONTINENT_ONLY  BIT(10)	// k. only spawns on continents
+#define SPAWN_NO_CONTINENT  BIT(11)	// l. won't spawn on continents
+#define SPAWN_SPRING_ONLY  BIT(12)	// m. only during spring (or multiple seasons as listed)
+#define SPAWN_SUMMER_ONLY  BIT(13)	// n. only during summer (or multiple seasons as listed)
+#define SPAWN_AUTUMN_ONLY  BIT(14)	// o. only during autumn (or multiple seasons as listed)
+#define SPAWN_WINTER_ONLY  BIT(15)	// p. only during winter (or multiple seasons as listed)
 
 
 // trading post data state flags
@@ -1034,6 +1041,7 @@ typedef struct vehicle_data vehicle_data;
 #define CROPF_NEWBIE_ONLY  BIT(3)	// only spawns on newbie islands
 #define CROPF_NO_NEWBIE  BIT(4)	// never spawns on newbie islands
 #define CROPF_ANY_LISTED_CLIMATE  BIT(5)	// climtes are "or" not "and"
+#define CROPF_NO_GLOBAL_SPAWNS  BIT(6)	// won't use global spawn lists
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2325,7 +2333,7 @@ typedef struct vehicle_data vehicle_data;
  //////////////////////////////////////////////////////////////////////////////
 //// SECTOR DEFINES //////////////////////////////////////////////////////////
 
-// sector flags -- see constants.world.c
+// SECTF_x: sector flags -- see constants.world.c
 #define SECTF_LOCK_ICON  BIT(0)	// random icon is chosen once and kept
 #define SECTF_ADVENTURE  BIT(1)	// uses the adventure zone template
 #define SECTF_NON_ISLAND  BIT(2)	// does not count as an island for island detection (e.g. ocean, tundra)
@@ -2346,7 +2354,7 @@ typedef struct vehicle_data vehicle_data;
 #define SECTF_LARGE_CITY_RADIUS  BIT(17)	// counts as in-city much further than normal
 #define SECTF_OBSCURE_VISION  BIT(18)	// blocks mappc
 #define SECTF_IS_TRENCH  BIT(19)	// excavate-related
-	#define SECTF_UNUSED1  BIT(20)
+#define SECTF_NO_GLOBAL_SPAWNS  BIT(20)	// won't use global spawn lists
 #define SECTF_ROUGH  BIT(21)	// hard terrain, requires ATR; other mountain-like properties
 #define SECTF_SHALLOW_WATER  BIT(22)	// can't earthmeld; other properties like swamp and oasis have
 
@@ -2494,6 +2502,10 @@ typedef struct vehicle_data vehicle_data;
 #define CLIM_FRESH_WATER  BIT(14)	// o. lake, pond; non-moving water
 #define CLIM_SALT_WATER  BIT(15)	// p. ocean, sea; salt water
 #define CLIM_FOREST  BIT(16)	// q. forested
+#define CLIM_GRASSLAND  BIT(17)	// p. plains, savannah, steppe
+#define CLIM_COASTAL  BIT(18)	// q. marks the edge on either the ocean or grassland side
+#define CLIM_OCEAN  BIT(19)	// r. out to sea (compare to salt-water which could also be a lake)
+#define CLIM_LAKE  BIT(20)	// s. either fresh or salt water
 
 
 // DPLTN_x: depletion types
@@ -2802,7 +2814,7 @@ struct generic_name_data {
 struct global_data {
 	any_vnum vnum;
 	char *name;	// descriptive text
-	int type;	// GLOBAL_x
+	int type;	// GLOBAL_
 	bitvector_t flags;	// GLB_FLAG_ flags
 	int value[NUM_GLB_VAL_POSITIONS];	// misc vals
 	
@@ -2811,14 +2823,29 @@ struct global_data {
 	double percent;	// chance to trigger
 	bitvector_t type_flags;	// type-dependent flags
 	bitvector_t type_exclude;	// type-dependent flags
+	bitvector_t spare_bits;	// more flags that can be used by various globals
 	int min_level;
 	int max_level;
 	
 	// data
-	struct interaction_item *interactions;
-	struct archetype_gear *gear;
+	struct interaction_item *interactions;	// GLOBAL_MINE_DATA, GLOBAL_MOB_INTERAXTIONS
+	struct archetype_gear *gear;	// GLOBAL_NEWBIE_GEAR
+	struct spawn_info *spawns;	// GLOBAL_MAP_SPAWNS
 	
 	UT_hash_handle hh;
+};
+
+
+// for GLB_VALIDATOR
+struct glb_emp_bean {
+	empire_data *empire;
+};
+
+
+// for GLB_VALIDATOR
+struct glb_room_emp_bean {
+	room_data *room;
+	empire_data *empire;
 };
 
 
@@ -3046,7 +3073,7 @@ struct slash_channel {
 struct spawn_info {
 	mob_vnum vnum;
 	double percent;	// .01 - 100.0
-	bitvector_t flags;	// SPAWN_x
+	bitvector_t flags;	// SPAWN_
 	
 	struct spawn_info *next;
 };
@@ -4346,6 +4373,7 @@ struct empire_chore_type {
 struct material_data {
 	char *name;
 	bool floats;
+	double chance_to_dismantle;	// percent chance of getting it back when dismantling
 };
 
 

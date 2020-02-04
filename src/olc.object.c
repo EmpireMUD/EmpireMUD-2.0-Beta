@@ -190,6 +190,14 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Object has !STORE - this flag is meaningless on a prototype");
 		problem = TRUE;
 	}
+	if (CAN_WEAR(obj, ITEM_WEAR_WIELD) && !IS_WEAPON(obj)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Wieldable item is not a weapon");
+		problem = TRUE;
+	}
+	if (CAN_WEAR(obj, ITEM_WEAR_RANGED) && !IS_MISSILE_WEAPON(obj)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Ranged item is not a missile weapon");
+		problem = TRUE;
+	}
 	
 	problem |= audit_interactions(GET_OBJ_VNUM(obj), obj->interactions, TYPE_OBJ, ch);
 	

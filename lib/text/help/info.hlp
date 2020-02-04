@@ -485,7 +485,7 @@ different types of resources:
    Tasks are written in square brackets like "1x [dig]". They take time like
    adding any other resource, but don't use any materials.
 
-When you dismantle a building, you get back half of the resources you used to
+When you dismantle a building, you get back some of the resources you used to
 build it -- but only items (including generic components). Canceling a craft
 before it's finished will refund the entire cost including coins and pools.
 
