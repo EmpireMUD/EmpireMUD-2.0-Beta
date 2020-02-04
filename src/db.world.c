@@ -3190,6 +3190,9 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 		if (CROP_FLAGGED(crop, CROPF_REQUIRES_WATER) && !water) {
 			continue;
 		}
+		if (CROP_FLAGGED(crop, CROPF_NOT_WILD)) {
+			continue;	// must be wild
+		}
 		if (CROP_FLAGGED(crop, CROPF_NO_NEWBIE | CROPF_NEWBIE_ONLY)) {
 			if (!isle) {
 				isle = GET_ISLAND(location);
