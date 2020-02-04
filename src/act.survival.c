@@ -737,7 +737,7 @@ ACMD(do_forage) {
 	}
 	else {
 		msg_to_char(ch, "You don't seem to be able to find anything to forage for.\r\n");
-		cancel_action(ch);
+		command_lag(ch, WAIT_ABILITY);
 	}
 }
 
