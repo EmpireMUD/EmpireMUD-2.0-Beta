@@ -126,6 +126,8 @@ INTERACTION_FUNC(do_one_forage) {
 * @return bool TRUE if any forage interactions ran successfully, FALSE if not.
 */
 bool do_crop_forage(char_data *ch) {
+	extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
+	
 	crop_data *crop = get_potential_crop_for_location(IN_ROOM(ch), TRUE);
 	
 	if (crop) {
@@ -731,6 +733,7 @@ ACMD(do_forage) {
 	}
 	else {
 		msg_to_char(ch, "You don't seem to be able to find anything to forage for.\r\n");
+		cancel_action(ch);
 	}
 }
 
