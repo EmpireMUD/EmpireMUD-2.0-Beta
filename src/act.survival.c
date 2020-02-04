@@ -128,9 +128,13 @@ INTERACTION_FUNC(do_one_forage) {
 bool do_crop_forage(char_data *ch) {
 	extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 	
-	crop_data *crop = get_potential_crop_for_location(IN_ROOM(ch), TRUE);
+	crop_data *crop;
 	
-	if (crop) {
+	if (!IS_OUTDOOR_TILE(IN_ROOM(ch)) || IS_MAP_BUILDING(IN_ROOM(ch))) {
+		return FALSE;	// must be outdoor
+	}
+	
+	if ((crop = get_potential_crop_for_location(IN_ROOM(ch), TRUE))) {
 		return run_interactions(ch, GET_CROP_INTERACTIONS(crop), INTERACT_FORAGE, IN_ROOM(ch), NULL, NULL, do_one_forage);
 	}
 	else {
