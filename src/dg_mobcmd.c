@@ -717,11 +717,11 @@ ACMD(do_mload) {
 			}
 		}
 		
-		load_mtrigger(mob);
-		
 		if (ally) {
 			add_follower(mob, ch, FALSE);
 		}
+		
+		load_mtrigger(mob);
 	}
 	else if (is_abbrev(arg1, "object")) {
 		if (!obj_proto(number)) {
