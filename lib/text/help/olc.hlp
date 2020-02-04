@@ -217,6 +217,9 @@ Crops (CROPEDIT):
   should usually use a 1x item for this interaction.
 - Orchard crops need a CHOP interaction if they will give trees. Orchards are
   still choppable without this, though.
+- Players foraging on any tile have a chance to find the forage item from any
+  wild crop in the area, if they get nothing back from the sector's own forage
+  list.
 
 Events (EVEDIT):
 - Use quests or scripts to give event points.
@@ -4056,7 +4059,9 @@ Object interaction types:
 
 Room/vehicle interaction types:
  DIG - Items received when using the dig action.
- FORAGE - Items received when using the Forage ability.
+ FORAGE - Items received when using the Forage ability. Note that if the player
+   gets nothing from a sector's forage list, they may also receive a forage
+   item from any wild crop that grows in the area.
  PICK - Items found when picking.
  HARVEST - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
  GATHER - Items received from the gather action.
