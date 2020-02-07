@@ -4322,7 +4322,7 @@ ACMD(do_combine) {
 	if (!*arg) {
 		msg_to_char(ch, "Combine what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_COMBINE))) {
 		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(obj->interactions, INTERACT_COMBINE)) {
@@ -6249,7 +6249,7 @@ ACMD(do_seed) {
 	if (!*arg) {
 		msg_to_char(ch, "Remove the seeds from what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SEED))) {
 		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(obj->interactions, INTERACT_SEED)) {
@@ -6284,7 +6284,7 @@ ACMD(do_separate) {
 	if (!*arg) {
 		msg_to_char(ch, "Separate what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SEPARATE))) {
 		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(obj->interactions, INTERACT_SEPARATE)) {
