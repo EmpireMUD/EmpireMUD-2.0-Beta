@@ -2850,7 +2850,7 @@ void check_auto_assist(char_data *ch) {
 				}
 				top_iter = ch_iter;
 				while (top_iter->master && !IS_NPC(top_iter)) {
-					top_iter = top_ch->master;
+					top_iter = top_iter->master;
 				}
 				if (top_ch == top_iter && !IS_NPC(top_ch)) {
 					// found same follow chain AND no players in that chain
