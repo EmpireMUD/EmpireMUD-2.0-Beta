@@ -1481,7 +1481,7 @@ archetypes (character creation options). It provides a simple in-game menu with
 contextual choices to design any archetype.
 
 All commands in the editor are highlighted in yellow/green and placed inside
-<angle braces>. You can get help on these by typing: &yHELP ARCHEDIT <COMMMAND>&0
+<angle braces>. You can get help on these by typing: &yHELP ARCHEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -1634,7 +1634,7 @@ The .olc augment editor is a powerful tool for creating and editing augments
 contextual choices to design multiple types of augments.
 
 All commands in the editor are highlighted in yellow/green and placed inside
-<angle braces>. You can get help on these by typing &yHELP AUGEDIT <COMMMAND>&0
+<angle braces>. You can get help on these by typing &yHELP AUGEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -3690,7 +3690,7 @@ See also: MAPEDIT DELETE ROOM, MAP OLC
 
 Usage:  .map deleteroom ok
 
-This commmand deletes the room you are standing in. It only works on interior
+This command deletes the room you are standing in. It only works on interior
 (designated) rooms, and cannot be used out on the map. It will automatically
 delete any exits that link to the room you're in.
 
@@ -5661,7 +5661,7 @@ contextual choices to set up the recipe.
 
 All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
-  &yHELP CEDIT <COMMMAND>&0
+  &yHELP CEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -5842,7 +5842,7 @@ object.
 
 All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
-  &yHELP OEDIT <COMMMAND>&0
+  &yHELP OEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -7106,7 +7106,7 @@ The .olc social editor is a tool for creating and editing social commands
 contextual choices to design all types of socials.
 
 All commands in the editor are highlighted in yellow/green and placed inside
-<angle braces>. You can get help on these by typing: &yHELP SOCEDIT <COMMMAND>&0
+<angle braces>. You can get help on these by typing: &yHELP SOCEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
