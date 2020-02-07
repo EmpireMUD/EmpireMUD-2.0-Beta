@@ -2845,11 +2845,11 @@ void check_auto_assist(char_data *ch) {
 			else if (ch->master || ch_iter->master) {	// if not BAF, still assist if in the same follow chain without players
 				// check same follow chain
 				top_ch = ch;
-				while (top_ch->master && !IS_NPC(top_ch)) {
+				while (top_ch->master && IS_NPC(top_ch)) {
 					top_ch = top_ch->master;
 				}
 				top_iter = ch_iter;
-				while (top_iter->master && !IS_NPC(top_iter)) {
+				while (top_iter->master && IS_NPC(top_iter)) {
 					top_iter = top_iter->master;
 				}
 				if (top_ch == top_iter && !IS_NPC(top_ch)) {
