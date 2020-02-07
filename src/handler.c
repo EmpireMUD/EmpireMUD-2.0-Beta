@@ -6272,6 +6272,55 @@ obj_data *get_obj_in_list_vis(char_data *ch, char *name, obj_data *list) {
 
 
 /**
+* Finds an object the char can see in any list (ch->carrying, etc), with a
+* preference for one that has a given interaction type. However, if the player
+* gave a specific object using a number (2.tree) this will ignore the interact
+* request.
+*
+* @param char_data *ch The person who's looking.
+* @param char *name The target argument.
+* @param obj_data *list The list to search.
+* @return int interact_type Any INTERACT_ to prefer on a matching object.
+* @return obj_data *The item found, or NULL. May or may not have the interaction.
+*/
+obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, obj_data *list, int interact_type) {
+	obj_data *i, *backup = NULL;
+	int j = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	bool gave_num;
+
+	strcpy(tmp, name);
+	gave_num = isdigit(*tmp);
+	
+	// 0.x does not target items
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+
+	for (i = list; i && (j <= number); i = i->next_content) {
+		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
+			if (gave_num) {
+				if (++j == number) {
+					return i;
+				}
+			}
+			else {	// did not give a number
+				if (has_interaction(i->interactions, interact_type)) {
+					return i;	// perfect match
+				}
+				else if (!backup) {
+					backup = i;	// missing interaction but otherwise a match
+				}
+			}
+		}
+	}
+
+	return backup;
+}
+
+
+/**
 * Gets the position of a piece of equipment the character is using, by name.
 *
 * @param char_data *ch The person who's looking.

@@ -5434,7 +5434,7 @@ ACMD(do_light) {
 			msg_to_char(ch, "You don't have anything to %s that with.\r\n", cmdname[subcmd]);
 		}
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_LIGHT)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_LIGHT))) {
 		// try burning a vehicle
 		if ((veh = get_vehicle_in_room_vis(ch, arg))) {
 			do_light_vehicle(ch, veh, lighter);
