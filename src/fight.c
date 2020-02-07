@@ -2837,6 +2837,10 @@ void check_auto_assist(char_data *ch) {
 			// party assist
 			assist = TRUE;
 		}
+		else if (iter_master == ch && AFF_FLAGGED(ch_iter, AFF_CHARM)) {
+			// charm
+			assist = TRUE;
+		}
 		else if (IS_NPC(ch) && IS_NPC(ch_iter) && !AFF_FLAGGED(ch_iter, AFF_CHARM) && !AFF_FLAGGED(ch, AFF_CHARM)) {
 			// BAF (if both are NPCs and neither is charmed)
 			if (MOB_FLAGGED(ch_iter, MOB_BRING_A_FRIEND)) {
@@ -2857,10 +2861,6 @@ void check_auto_assist(char_data *ch) {
 					assist = TRUE;
 				}
 			}
-		}
-		else if (iter_master == ch && AFF_FLAGGED(ch_iter, AFF_CHARM)) {
-			// charm
-			assist = TRUE;
 		}
 		
 		// if we got this far and hit an assist condition
