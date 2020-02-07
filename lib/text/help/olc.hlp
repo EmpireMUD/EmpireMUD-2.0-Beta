@@ -3949,7 +3949,9 @@ that you cannot remove flag #4 ISNPC -- this indicates the mob is an NPC.
 Never set a flag marked with an * (asterisk).
 
 Available mob flags:
- BRING-A-FRIEND - Assists any non-charmed mob in combat.
+ BRING-A-FRIEND - Assists any non-charmed mob in combat. Without this, mobs
+   will still assist other mobs in their same follow-chain if no players are
+   in the chain and if neither are charmed.
  SENTINEL - Stays in one room and never wanders.
  AGGR - Aggressive; will attack players.
  ISNPC - Is an NPC (this is always set).
