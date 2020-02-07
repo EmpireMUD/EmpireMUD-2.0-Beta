@@ -6291,14 +6291,14 @@ obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, obj_
 	bool gave_num;
 
 	strcpy(tmp, name);
-	gave_num = isdigit(*name);
+	gave_num = isdigit(*name) ? TRUE : FALSE;
 	
 	// 0.x does not target items
 	if ((number = get_number(&tmp)) == 0) {
 		return (NULL);
 	}
 
-	for (i = list; i && (j <= number); i = i->next_content) {
+	for (i = list; i; i = i->next_content) {
 		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
 			if (gave_num) {
 				if (++j == number) {
