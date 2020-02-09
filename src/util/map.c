@@ -214,7 +214,7 @@ void load_and_shift_map(int dist);
 #define RIVER			2
 #define OCEAN			3
 #define MOUNTAIN		4
-#define TEMPERATE_CROP	5
+	#define TEMPERATE_CROP	5	// this is no longer used as of b5.86 because the generator no longer spawns crop tiles
 #define DESERT			6
 #define TOWER			7
 #define JUNGLE			8
@@ -223,8 +223,8 @@ void load_and_shift_map(int dist);
 #define SWAMP			11
 #define TUNDRA          12
 #define LAKE			13
-#define DESERT_CROP		14
-#define JUNGLE_CROP		15
+	#define DESERT_CROP		14	// this is no longer used as of b5.86 because the generator no longer spawns crop tiles
+	#define JUNGLE_CROP		15	// this is no longer used as of b5.86 because the generator no longer spawns crop tiles
 #define RIVERBANK_TREES	16
 #define SHORE_TREES		17
 #define SHORE_JUNGLE	18
@@ -250,7 +250,7 @@ struct {
 	{ "i", "River", 5, TRUE, TRUE },
 	{ "k", "Ocean", 6, FALSE, FALSE },
 	{ "q", "Mountain", 8, TRUE, TRUE },
-	{ "b", "Temp Crop", 7, TRUE, TRUE },	// 5
+		{ "b", "Temp Crop", 7, TRUE, TRUE },	// 5, unused
 	{ "m", "Desert", 20, TRUE, TRUE },
 	{ "*", "Tower", 18, TRUE, TRUE },
 	{ "d", "Jungle", 28, TRUE, TRUE },
@@ -259,8 +259,8 @@ struct {
 	{ "e", "Swamp", 29, TRUE, TRUE },
 	{ "h", "Tundra", 30, FALSE, FALSE },
 	{ "i", "Lake", 32, TRUE, TRUE },
-	{ "o", "Dsrt Crop", 12, TRUE, TRUE },
-	{ "3", "Jngl Crop", 16, TRUE, TRUE },	// 15
+		{ "o", "Dsrt Crop", 12, TRUE, TRUE },	// unused
+		{ "3", "Jngl Crop", 16, TRUE, TRUE },	// 15, unused
 	{ "f", "Riverbank", 45, TRUE, TRUE },
 	{ "f", "Shore", 54, TRUE, TRUE },
 	{ "d", "Jngl Shore", 55, TRUE, TRUE },
@@ -1379,23 +1379,28 @@ void complete_map(void) {
 	for (iter = 0; iter < USE_SIZE; ++iter) {
 		switch (grid[iter].type) {
 			case PLAINS: {
+				/* prior to b5.86:
 				if (number(0, 3) == 0) {
 					change_grid(iter, TEMPERATE_CROP);
 				}
 				else {
 					change_grid(iter, FOREST);
 				}
+				*/
 				
 				// nothing stays plains
+				change_grid(iter, FOREST);
 				break;
 			}
 			case DESERT: {
 				if (number(0, 74) == 0) {
 					change_grid(iter, OASIS);
 				}
+				/* prior to b5.86:
 				else if (number(0, 24) == 0) {
 					change_grid(iter, DESERT_CROP);
 				}
+				*/
 				else if (number(0, 3) == 0) {
 					change_grid(iter, GROVE);
 				}
@@ -1404,11 +1409,13 @@ void complete_map(void) {
 				break;
 			}
 			case JUNGLE: {
+				/* prior to b5.86:
 				if (number(1, 100) <= 5) {
 					change_grid(iter, JUNGLE_CROP);
 				}
+				*/
 				
-				// most spaces remain jungle
+				// all spaces remain jungle
 				break;
 			}
 		}
@@ -1901,38 +1908,38 @@ void load_and_shift_map(int dist) {
 // this struct is used to ensure crops in all correct parts of the map
 struct {
 	char *name;
-	int sect;	// which crop sector to look for
+	int sect;	// which sector to look for
 	int min_x, max_x;
 	int min_y, max_y;
 } crop_regions[] = {
 	// temperate: northern quarters
-	{ "Temperate NW", TEMPERATE_CROP, 0, USE_WIDTH/4, USE_HEIGHT*2/3, USE_HEIGHT },
-	{ "Temperate NNW", TEMPERATE_CROP, USE_WIDTH/4, USE_WIDTH/2, USE_HEIGHT*2/3, USE_HEIGHT },
-	{ "Temperate NNE", TEMPERATE_CROP, USE_WIDTH/2, USE_WIDTH*3/4, USE_HEIGHT*2/3, USE_HEIGHT },
-	{ "Temperate NE", TEMPERATE_CROP, USE_WIDTH*3/4, USE_WIDTH, USE_HEIGHT*2/3, USE_HEIGHT },
+	{ "Temperate NW", FOREST, 0, USE_WIDTH/4, USE_HEIGHT*2/3, USE_HEIGHT },
+	{ "Temperate NNW", FOREST, USE_WIDTH/4, USE_WIDTH/2, USE_HEIGHT*2/3, USE_HEIGHT },
+	{ "Temperate NNE", FOREST, USE_WIDTH/2, USE_WIDTH*3/4, USE_HEIGHT*2/3, USE_HEIGHT },
+	{ "Temperate NE", FOREST, USE_WIDTH*3/4, USE_WIDTH, USE_HEIGHT*2/3, USE_HEIGHT },
 	
 	// temperate: mid quarters
-	{ "Temperate Mid-W", TEMPERATE_CROP, 0, USE_WIDTH/4, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
-	{ "Temperate Mid-Mid-W", TEMPERATE_CROP, USE_WIDTH/4, USE_WIDTH/2, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
-	{ "Temperate Mid-Mid-E", TEMPERATE_CROP, USE_WIDTH/2, USE_WIDTH*3/4, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
-	{ "Temperate Mid-E", TEMPERATE_CROP, USE_WIDTH*3/4, USE_WIDTH, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
+	{ "Temperate Mid-W", FOREST, 0, USE_WIDTH/4, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
+	{ "Temperate Mid-Mid-W", FOREST, USE_WIDTH/4, USE_WIDTH/2, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
+	{ "Temperate Mid-Mid-E", FOREST, USE_WIDTH/2, USE_WIDTH*3/4, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
+	{ "Temperate Mid-E", FOREST, USE_WIDTH*3/4, USE_WIDTH, USE_HEIGHT*1/3, USE_HEIGHT*2/3 },
 	
 	// temperate: southern quarters
-	{ "Temperate SW", TEMPERATE_CROP, 0, USE_WIDTH/4, 0, USE_HEIGHT*1/3 },
-	{ "Temperate SSW", TEMPERATE_CROP, USE_WIDTH/4, USE_WIDTH/2, 0, USE_HEIGHT*1/3 },
-	{ "Temperate SSE", TEMPERATE_CROP, USE_WIDTH/2, USE_WIDTH*3/4, 0, USE_HEIGHT*1/3 },
-	{ "Temperate SE", TEMPERATE_CROP, USE_WIDTH*3/4, USE_WIDTH, 0, USE_HEIGHT*1/3 },
+	{ "Temperate SW", FOREST, 0, USE_WIDTH/4, 0, USE_HEIGHT*1/3 },
+	{ "Temperate SSW", FOREST, USE_WIDTH/4, USE_WIDTH/2, 0, USE_HEIGHT*1/3 },
+	{ "Temperate SSE", FOREST, USE_WIDTH/2, USE_WIDTH*3/4, 0, USE_HEIGHT*1/3 },
+	{ "Temperate SE", FOREST, USE_WIDTH*3/4, USE_WIDTH, 0, USE_HEIGHT*1/3 },
 	
 	// desert: requires a special zone in the middle; no east/west difference
-	{ "Desert S", DESERT_CROP, 0, USE_WIDTH, 0, USE_HEIGHT*45/100 },	// bottom part
-	{ "Desert M", DESERT_CROP, 0, USE_WIDTH, USE_HEIGHT*45/100, USE_HEIGHT*54/100 },	// middle
-	{ "Desert N", DESERT_CROP, 0, USE_WIDTH, USE_HEIGHT*54/100, USE_HEIGHT },	// top part
+	{ "Desert S", DESERT, 0, USE_WIDTH, 0, USE_HEIGHT*45/100 },	// bottom part
+	{ "Desert M", DESERT, 0, USE_WIDTH, USE_HEIGHT*45/100, USE_HEIGHT*54/100 },	// middle
+	{ "Desert N", DESERT, 0, USE_WIDTH, USE_HEIGHT*54/100, USE_HEIGHT },	// top part
 	
 	// jungle: true quarters
-	{ "Jungle SW", JUNGLE_CROP, 0, USE_WIDTH/2, 0, USE_HEIGHT/2 },	// sw
-	{ "Jungle NW", JUNGLE_CROP, 0, USE_WIDTH/2, USE_HEIGHT/2, USE_HEIGHT },	// nw
-	{ "Jungle SE", JUNGLE_CROP, USE_WIDTH/2, USE_WIDTH, 0, USE_HEIGHT/2 },	// se
-	{ "Jungle NE", JUNGLE_CROP, USE_WIDTH/2, USE_WIDTH, USE_HEIGHT/2, USE_HEIGHT },	// ne
+	{ "Jungle SW", JUNGLE, 0, USE_WIDTH/2, 0, USE_HEIGHT/2 },	// sw
+	{ "Jungle NW", JUNGLE, 0, USE_WIDTH/2, USE_HEIGHT/2, USE_HEIGHT },	// nw
+	{ "Jungle SE", JUNGLE, USE_WIDTH/2, USE_WIDTH, 0, USE_HEIGHT/2 },	// se
+	{ "Jungle NE", JUNGLE, USE_WIDTH/2, USE_WIDTH, USE_HEIGHT/2, USE_HEIGHT },	// ne
 
 	{ "\n", -1, -1, -1, -1, -1 }	// last
 };
@@ -1974,8 +1981,8 @@ void audit_crops(void) {
 	// now, did we miss any regions?
 	missed = 0;
 	for (sub = 0; crop_regions[sub].sect != -1; ++sub) {
-		if (counts[sub] < 50) {
-			printf("Warning: %s has %d crop tile%s\n", crop_regions[sub].name, counts[sub], counts[sub] == 1 ? "" : "s");
+		if (counts[sub] < 250) {
+			printf("Warning: %s has %d land tile%s for crops\n", crop_regions[sub].name, counts[sub], counts[sub] == 1 ? "" : "s");
 			++missed;
 		}
 	}
