@@ -1054,7 +1054,7 @@ void annual_update_depletions(struct depletion_data **list) {
 		// quarter each year
 		dep->count /= 4;
 
-		if (dep->count <= 5) {
+		if (dep->count < 10) {
 			// at this point just remove it to save space, or it will take years to hit 0
 			LL_DELETE(*list, dep);
 			free(dep);
