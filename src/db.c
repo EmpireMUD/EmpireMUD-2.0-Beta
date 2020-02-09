@@ -1953,6 +1953,7 @@ const char *versions_list[] = {
 	"b5.82",
 	"b5.83",
 	"b5.84",
+	"b5.86",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3659,6 +3660,56 @@ void b5_84_climate_update(void) {
 }
 
 
+// removes 'crop' tiles from the 'natural sectors' of all tiles, but does not affect any current sectors
+void b5_86_crop_update(void) {
+	struct map_data *map;
+	int temp = 0, des = 0, jung = 0;
+	
+	any_vnum temperate_crop = 7;
+	any_vnum desert_crop = 12;
+	any_vnum jungle_crop = 16;
+	
+	sector_data *temperate_sect = sector_proto(4);	// overgrown forest
+	sector_data *desert_sect = sector_proto(26);	// desert grove
+	sector_data *jungle_sect = sector_proto(28);	// jungle
+	
+	log("Applying b5.86 update: removing crops from 'natural' sectors (but not current sectors)...");
+	
+	if (!temperate_sect) {
+		log("- replacement temperate sector (4) is missing; canceling b5.86 update");
+		return;
+	}
+	if (!desert_sect) {
+		log("- replacement desert sector (26) is missing; canceling b5.86 update");
+		return;
+	}
+	if (!jungle_sect) {
+		log("- replacement jungle sector (28) is missing; canceling b5.86 update");
+		return;
+	}
+	
+	// update all map tiles
+	LL_FOREACH(land_map, map) {
+		if (!map->natural_sector || GET_SECT_VNUM(map->natural_sector) == temperate_crop) {
+			map->natural_sector = temperate_sect;
+			++temp;
+		}
+		else if (GET_SECT_VNUM(map->natural_sector) == desert_crop) {
+			map->natural_sector = desert_sect;
+			++des;
+		}
+		else if (GET_SECT_VNUM(map->natural_sector) == jungle_crop) {
+			map->natural_sector = jungle_sect;
+			++jung;
+		}
+	}
+	
+	log("- replaced natural sectors on %d temperate, %d desert, and %d jungle tile%s", temp, des, jung, PLURAL(temp+des+jung));
+	world_map_needs_save = TRUE;
+	save_whole_world();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -3953,6 +4004,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.84")) {
 			b5_84_climate_update();
+		}
+		if (MATCH_VERSION("b5.86")) {
+			b5_86_crop_update();
 		}
 	}
 	
