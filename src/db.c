@@ -1953,7 +1953,7 @@ const char *versions_list[] = {
 	"b5.82",
 	"b5.83",
 	"b5.84",
-	"b5.86",
+	"b5.86a",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3660,8 +3660,40 @@ void b5_84_climate_update(void) {
 }
 
 
+// b5.86 refreshes missile weapons
+PLAYER_UPDATE_FUNC(b5_86_player_missile_weapons) {
+	obj_data *obj, *next_obj, *new;
+	int iter;
+	
+	check_delayed_load(ch);
+	
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if ((obj = GET_EQ(ch, iter)) && IS_MISSILE_WEAPON(obj)) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+	for (obj = ch->carrying; obj; obj = next_obj) {
+		next_obj = obj->next_content;
+		if (IS_MISSILE_WEAPON(obj)) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+}
+
+
 // removes 'crop' tiles from the 'natural sectors' of all tiles, but does not affect any current sectors
-void b5_86_crop_update(void) {
+// also refreshes missile weapons
+void b5_86_update(void) {
+	void save_trading_post();
+	
+	obj_data *obj, *next_obj, *new;
+	struct empire_unique_storage *eus;
+	struct trading_post_data *tpd;
+	empire_data *emp, *next_emp;
 	struct map_data *map;
 	int temp = 0, des = 0, jung = 0;
 	
@@ -3673,6 +3705,49 @@ void b5_86_crop_update(void) {
 	sector_data *desert_sect = sector_proto(26);	// desert grove
 	sector_data *jungle_sect = sector_proto(28);	// jungle
 	
+	// part 1:
+	log("Applying b5.86 update to missile weapons...");
+	
+	log(" - refreshing the object list...");
+	for (obj = object_list; obj; obj = next_obj) {
+		next_obj = obj->next;
+		if (IS_MISSILE_WEAPON(obj)) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			swap_obj_for_obj(obj, new);
+			extract_obj(obj);
+		}
+	}
+	
+	log(" - refreshing warehouse objects...");
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+			if ((obj = eus->obj) && IS_MISSILE_WEAPON(obj)) {
+				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				eus->obj = new;
+				extract_obj(obj);
+				EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+			}
+		}
+	}
+	
+	log(" - refreshing trading post objects...");
+	for (tpd = trading_list; tpd; tpd = tpd->next) {
+		if ((obj = tpd->obj) && IS_MISSILE_WEAPON(obj)) {
+			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			tpd->obj = new;
+			extract_obj(obj);
+		}
+	}
+	
+	log(" - refreshing player inventories...");
+	update_all_players(NULL, b5_86_player_missile_weapons);
+	
+	// ensure everything gets saved this way since we won't do this again
+	save_all_empires();
+	save_trading_post();
+	save_whole_world();
+	
+	// part 2:
 	log("Applying b5.86 update: removing crops from 'natural' sectors (but not current sectors)...");
 	
 	if (!temperate_sect) {
@@ -4005,8 +4080,8 @@ void check_version(void) {
 		if (MATCH_VERSION("b5.84")) {
 			b5_84_climate_update();
 		}
-		if (MATCH_VERSION("b5.86")) {
-			b5_86_crop_update();
+		if (MATCH_VERSION("b5.86a")) {
+			b5_86_update();
 		}
 	}
 	
