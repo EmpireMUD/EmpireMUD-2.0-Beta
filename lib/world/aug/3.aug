@@ -1,6 +1,6 @@
 #300
 health~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 15 1
 R
@@ -8,7 +8,7 @@ R
 S
 #301
 mana~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 16 1
 R
@@ -16,7 +16,7 @@ R
 S
 #302
 stamina~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 11 1
 R
@@ -24,7 +24,7 @@ R
 S
 #303
 regeneration~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 3 1
 R
@@ -32,7 +32,7 @@ R
 S
 #304
 longrunning~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 6 1
 R
@@ -40,7 +40,7 @@ R
 S
 #305
 energy~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 7 1
 R
@@ -48,7 +48,7 @@ R
 S
 #306
 protection~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 12 1
 R
@@ -56,7 +56,7 @@ R
 S
 #307
 evasion~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 18 1
 R
@@ -64,7 +64,7 @@ R
 S
 #308
 rage~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 1 1
 R
@@ -72,7 +72,7 @@ R
 S
 #309
 power~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 8 1
 R
@@ -80,7 +80,7 @@ R
 S
 #310
 spellwarding~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 24 1
 R
@@ -88,7 +88,7 @@ R
 S
 #311
 focus~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 17 1
 R
@@ -96,7 +96,7 @@ R
 S
 #312
 acrobatics~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 2 1
 R
@@ -104,7 +104,7 @@ R
 S
 #313
 bloodwell~
-1 0 fiklq 184 -1
+1 0 fhiklq 184 -1
 A
 20 1
 R
