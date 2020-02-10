@@ -625,6 +625,7 @@ M
 $n doesn't seem interested in you.~
 T 9028
 T 9027
+T 9005
 S
 #9234
 yak hairy~
@@ -638,8 +639,34 @@ D
 herd it into a stable and milk or shear it.
 ~
 I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
+I 2 9234 5.00 4 s  # SHEAR: a sack of yak wool
+I 2 9234 45.00 3 s  # SHEAR: a sack of yak wool
+I 2 9234 50.00 2 s  # SHEAR: a sack of yak wool
 M
 0
 $n chews some grass.~
+S
+#9235
+hedgehog hog little~
+a hedgehog~
+A little hedgehog is sniffing around.
+~
+1 5 djo c 1
+0 0 0 9
+D
+   This spiny little creature is a hedgehog -- like a mix between a shrew and a
+porcupine.
+~
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+M
+0
+$n sniffs around at the ground.~
+M
+0
+$n moves surprisingly slowly.~
+M
+0
+$n shuffles around on the ground.~
+T 9117
 S
 $

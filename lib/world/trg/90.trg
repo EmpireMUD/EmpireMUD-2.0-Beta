@@ -98,6 +98,19 @@ else
   end
 end
 ~
+#9005
+No Herd~
+0 c 0
+herd~
+* test targeting me
+if %actor.char_target(%arg.car%)% != %self%
+  return 0
+  halt
+end
+%send% %actor% You can't herd %self.name%.
+%echoaround% %actor% %actor.name% tries and fails to herd %self.name%.
+return 1
+~
 #9008
 Squirrel Animation~
 0 bw 4
