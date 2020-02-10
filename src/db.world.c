@@ -190,6 +190,9 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	// need to determine a crop?
 	if (!new_crop && SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
 		new_crop = get_potential_crop_for_location(room, FALSE);
+		if (!new_crop) {
+			new_crop = crop_table;
+		}
 	}
 		
 	// need room data?
@@ -1321,6 +1324,7 @@ void annual_world_update(void) {
 * @return int 1 if the tile was naturalized (for counting), 0 if not.
 */
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
+	crop_data *new_crop;
 	room_data *room;
 	
 	// simple checks
@@ -1363,7 +1367,8 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 		
 		if (SECT_FLAGGED(tile->natural_sector, SECTF_HAS_CROP_DATA)) {
 			room = real_room(tile->vnum);	// need it loaded after all
-			set_crop_type(room, get_potential_crop_for_location(room, FALSE));
+			new_crop = get_potential_crop_for_location(room, FALSE);
+			set_crop_type(room, new_crop ? new_crop : crop_table);
 		}
 		else {
 			tile->crop_type = NULL;
@@ -3162,7 +3167,7 @@ int get_main_island(empire_data *emp) {
 * 
 * @param room_data *location The location to pick a crop for.
 * @param bool must_have_forage If TRUE, only crops with a forage interaction can be chosen.
-* @return crop_data* Any crop.
+* @return crop_data* Any crop, or NULL if it can't find one.
 */
 crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage) {
 	int x = X_COORD(location), y = Y_COORD(location);
@@ -3224,13 +3229,7 @@ crop_data *get_potential_crop_for_location(room_data *location, bool must_have_f
 		}
 	}
 	
-	if (!found) {
-		// not found? possibly just bad configs -- default to first in table
-		log("SYSERR: get_potential_crop_for_location unable to determine a crop for #%d", GET_ROOM_VNUM(location));
-		found = crop_table;
-	}
-	
-	return found;
+	return found;	// if any
 }
 
 

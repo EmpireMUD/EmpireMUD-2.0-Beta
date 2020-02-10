@@ -933,9 +933,7 @@ void verify_sectors(void) {
 				room = real_room(map->vnum);	// load it into memory
 			}
 			new_crop = get_potential_crop_for_location(room, FALSE);
-			if (new_crop) {
-				set_crop_type(room, new_crop);
-			}
+			set_crop_type(room, new_crop ? new_crop : crop_table);
 		}
 	}
 }
@@ -2264,6 +2262,7 @@ void b3_15_crop_update(void) {
 	extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 	
 	struct map_data *map;
+	crop_data *new_crop;
 	room_data *room;
 	
 	const int SECT_JUNGLE = 28;	// convert jungles at random
@@ -2282,7 +2281,8 @@ void b3_15_crop_update(void) {
 		if (map->crop_type) {
 			// update crop
 			if (room || (room = real_room(map->vnum))) {
-				set_crop_type(room, get_potential_crop_for_location(room, FALSE));
+				new_crop = get_potential_crop_for_location(room, FALSE);
+				set_crop_type(room, new_crop ? new_crop : crop_table);
 			}
 		}
 		else if (map->sector_type->vnum == SECT_JUNGLE && number(1, 100) <= JUNGLE_PERCENT) {
