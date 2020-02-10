@@ -4,8 +4,8 @@ a basket of papayas~
 A basket of papayas has been left here.~
 You can eat this fleshy pink fruit, or plant it.
 ~
-6 bl a 7
-24 18500 0
+6 bl a 0 8
+12 18500 0
 7 168
 I 15 18501 100.00 4 x  # SEPARATE: a single papaya
 O
@@ -19,8 +19,8 @@ a single papaya~
 Someone has dropped a single papaya here.~
 This is just one papaya, not enough to plant but enough to eat.
 ~
-6 0 a 6
-6 0 0
+6 0 a 0 7
+2 0 0
 7 48
 I 14 18500 100.00 4 x  # COMBINE: a basket of papayas
 O
@@ -34,7 +34,7 @@ A sign has been hastily erected here.~
 Society. Please come back later when we're done disarming the traps and putting
 torches up.'
 ~
-3 0 0 2
+3 0 0 0 2
 0 0 0
 0 8064
 S
@@ -44,7 +44,7 @@ a pile of ancient coins~
 A pile of ancient coins is lying here.~
 Money!
 ~
-11 m a 1
+11 m a 0 1
 1 -1 0
 4 0
 C
@@ -58,7 +58,7 @@ A huge emerald-green orb is half-embedded in the door.~
 weapon. But how hard should you hit it?
 Usage:  difficulty <hard | boss>
 ~
-3 0 0 9
+3 0 0 0 9
 0 0 0
 10 0
 T 18514
@@ -70,7 +70,7 @@ An eerie green light fills the temple.~
    It looks like it's very slowly fading away. You should probably finish
 exploring this place before it does...
 ~
-3 0 0 10
+3 0 0 0 10
 0 0 0
 10 72
 T 18515
@@ -81,7 +81,7 @@ the jade idol~
 A small jade idol of a serpent is displayed here.~
 This ancient idol is carved from a single gemstone! It looks valuable!
 ~
-15 0 a 8
+15 0 a 0 8
 10 0 0
 12 0
 R
@@ -95,7 +95,7 @@ a secret passageway~
 A secret passageway has opened up nearby!~
 It looks like a shortcut to somewhere else in the area.
 ~
-8 0 0 3
+8 0 0 0 3
 18504 0 0
 0 0
 S
@@ -105,7 +105,7 @@ the jungle temple trash spawner~
 The jungle temple trash spawner isn't working.~
 This item spawns a mob and then purges itself.
 ~
-3 0 0 2
+3 0 0 0 2
 0 0 0
 0 0
 T 18511
@@ -116,7 +116,7 @@ a riding jaguar whistle~
 A riding jaguar whistle is lying on the ground.~
 This whistle can be used just once, to summon a riding jaguar mount.
 ~
-3 0 a 4
+3 0 a 0 4
 18512 0 0
 14 0
 T 9910
@@ -127,7 +127,7 @@ a sea serpent whistle~
 A sea serpent whistle is lying on the ground.~
 This whistle can be used just once, to summon a sea serpent mount.
 ~
-3 0 a 4
+3 0 a 0 4
 18513 0 0
 14 0
 T 9910
@@ -138,7 +138,7 @@ the feathered serpent whistle~
 A feathered serpent whistle is lying on the ground here.~
 This whistle can be used just once, to summon a feathered serpent mount.
 ~
-3 0 a 7
+3 0 a 0 7
 18514 0 0
 14 0
 T 9910
@@ -150,7 +150,7 @@ A jaguar cub whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-19 p a 8
+19 p a 0 8
 18515 0 0
 2 0
 S
@@ -162,7 +162,7 @@ This primitive totem is carved from a dark greenish stone.
 
 'morph jaguar' (requires Animal Forms): Improved tropical disguise morph.
 ~
-3 p a 2
+3 p a 0 2
 0 0 0
 1 0
 S
@@ -174,7 +174,7 @@ A suit of fearsome jaguar armor is arranged on the ground.~
 from head to foot. The characteristic spotted coat of the jaguar is accentuated
 with huge, sharp teeth and long, colorful feathers.
 ~
-27 emo aq 1
+27 emo aq 0 1
 3 0 0
 7 0
 A
@@ -204,7 +204,7 @@ A fearsome jaguar armor pattern is lying here.~
 ferocity and stamina of a jaguar. It teaches you to forge fearsome jaguar
 armor.
 ~
-7 0 a 4
+7 0 a 0 4
 18517 0 0
 0 0
 S
@@ -216,7 +216,7 @@ A suit of red coyote armor is stacked on the ground.~
 covered with the hide of a coyote. The top of the armor is made to look like a
 coyote's head, with its sly, calculating eyes and upturned ears.
 ~
-27 emo aq 2
+27 emo aq 0 2
 1 0 0
 7 0
 A
@@ -245,7 +245,7 @@ A red coyote armor pattern is lying here.~
    Unleash your inner coyote and prowl the night with your pack! It teaches you
 to sew red coyote armor.
 ~
-7 0 a 5
+7 0 a 0 5
 18519 0 0
 0 0
 S
@@ -258,7 +258,7 @@ the huge fangs and swirling eyes tell a different story. With the golden
 jewelry and highlights of red feathers, it is clear that this armor represents
 some powerful jungle deity.
 ~
-27 emo aq 4
+27 emo aq 0 4
 0 0 0
 7 0
 A
@@ -288,7 +288,7 @@ A feathered serpent armor pattern is lying here.~
 serpent deity of the jungle. It won't help you fly, but it will give your magic
 a light touch, like the wind. It teaches you to sew feathered serpent armor.
 ~
-7 0 a 6
+7 0 a 0 6
 18521 0 0
 0 0
 S
@@ -300,7 +300,7 @@ A suit of eagle warrior armor is nestled in the corner.~
 kit. Long green feathers drape from the arms, tail, and head to give the armor
 a fearsome appearance.
 ~
-27 emo aq 5
+27 emo aq 0 5
 0 0 0
 7 0
 A
@@ -330,7 +330,7 @@ An eagle warrior armor pattern is lying here.~
 war shaman! Unfortunately, it won't help you fly. It teaches you to sew eagle
 warrior armor.
 ~
-7 0 a 7
+7 0 a 0 7
 18523 0 0
 0 0
 S
@@ -343,7 +343,7 @@ its head to its tail. Huge, spiral eyes seem to follow you wherever you stand.
 The chameleon scales are actually small rings of dark metal and, though blue in
 color, they seem to reflect the greens and browns around them.
 ~
-27 emo aq 6
+27 emo aq 0 6
 2 0 0
 7 0
 A
@@ -373,7 +373,7 @@ A blue chameleon armor pattern is lying here.~
 chameleon! It probably won't make you invisible, but at least it will look
 cool. It teaches you to forge blue chameleon armor.
 ~
-7 o a 8
+7 o a 0 8
 18525 0 0
 0 0
 S
@@ -384,7 +384,7 @@ A jaguar claw ring is poking up from the ground.~
    This ring is made from the claw and finger bone of a jaguar, and painted to
 resemble the jaguar's spots.
 ~
-2 mp ab 2
+2 mp ab 0 2
 0 0 0
 14 0
 A
@@ -400,7 +400,7 @@ An obsidian coyote ring is stuck into the ground.~
 has been carved from pure obsidian. Every edge is sharp to the touch, and it
 cuts your skin as you try to test it.
 ~
-2 mp ab 5
+2 mp ab 0 5
 0 0 0
 14 0
 A
@@ -415,7 +415,7 @@ A serpent fang ring is stuck in the ground.~
    This ring is made from the fang and skull of a small serpent. Where the fang
 contacts your skin, your finger seems to have gone numb.
 ~
-2 mp ab 4
+2 mp ab 0 4
 0 0 0
 14 0
 A
@@ -430,7 +430,7 @@ An eagle talon ring is sticking up out of the ground.~
    This ring is made from the talon and toe of an eagle, and decorated with a
 pair of feathers.
 ~
-2 mp ab 5
+2 mp ab 0 5
 0 0 0
 14 0
 A
@@ -445,7 +445,7 @@ A chameleon tail is ringed up on the floor.~
    This ring is actually just the bright green tail of a chameleon, wrapped to
 the size of your finger.
 ~
-2 mp ab 7
+2 mp ab 0 7
 0 0 0
 14 0
 A
@@ -463,7 +463,7 @@ A pair of plated jaguar gauntlets is lying here.~
 The exotic fur of a jaguar adorns the back of the gauntlets, which are
 surprisingly comfortable for such heavy plate.
 ~
-27 mp ah 4
+27 mp ah 0 4
 3 0 0
 2 0
 A
@@ -479,7 +479,7 @@ A pair of coyote claw gauntlets is lying here.~
 of coyotes in order to imbue them with the power of nature's greatest
 tricksters.
 ~
-27 mp ah 4
+27 mp ah 0 4
 1 0 0
 7 0
 A
@@ -495,7 +495,7 @@ A pair of sparkling feathered gloves is lying here.~
 From there, long green, red, and yellow feathers have been sewn in, making the
 gloves appear larger but surprisingly light.
 ~
-27 mp ah 3
+27 mp ah 0 3
 0 0 0
 7 0
 A
@@ -511,7 +511,7 @@ A pair of eagle talon gloves is lying here.~
 eagle feathers. A strange, serene energy flows through your fingertips as you
 touch them, and the punctuated screech of an eagle fills your ears.
 ~
-27 mp ah 3
+27 mp ah 0 3
 0 0 0
 7 0
 A
@@ -528,7 +528,7 @@ seem to shimmer and shift in the light. The gauntlets are soft and pliable to
 the touch, but when you punch or block, they instantly harden as if they were
 made from argentine imperium.
 ~
-27 mp ah 3
+27 mp ah 0 3
 2 0 0
 7 0
 A
@@ -546,7 +546,7 @@ The roar of the jaguar lingers in the air.~
 beast is pouncing on you from just out of sight! But when you turn to look, it
 is gone.
 ~
-27 mp ak 3
+27 mp ak 0 3
 3 0 0
 10 0
 A
@@ -562,7 +562,7 @@ The howl of the coyote pierces the air.~
 Then another howl. And another. Just as it seems that a pack of hungry coyotes
 is bearing down on you, you turn... And the howls fade into the wind.
 ~
-27 mp ak 3
+27 mp ak 0 3
 1 0 0
 10 0
 A
@@ -580,7 +580,7 @@ You feel something brush against your ankle, and your neck. But just as the
 little hairs on your arms and neck begin to stand up, the feeling is gone, like
 the wind itself.
 ~
-27 mp ak 3
+27 mp ak 0 3
 0 0 0
 10 0
 A
@@ -597,7 +597,7 @@ Then another eagle calls to you from another direction, and another. You feel
 the oppressive burst of air from a raptor swooping over you, but you turn to
 look and there is nothing.
 ~
-27 mp ak 3
+27 mp ak 0 3
 0 0 0
 10 0
 A
@@ -613,7 +613,7 @@ The shadow of the chameleon fades into the background.~
 you're blinded. There's nothing there. Another shadow creeps past you, but when
 you glance toward it, it is gone.
 ~
-27 mp ak 3
+27 mp ak 0 3
 2 0 0
 10 0
 A
@@ -632,7 +632,7 @@ A jungle temple token is lying here.~
    This token, redeemable for rewards at the Lost Temple adventure's shop, will
 be automatically stored in your pouch when taken.
 ~
-12 p a 10
+12 p a 0 10
 1 18500 0
 7 0
 S
@@ -643,7 +643,7 @@ Some boss loot has bugged out.~
    This item purges itself and spawns an actual boss-kill reward. But only on
 Group and Boss difficulties.
 ~
-3 p a 8
+3 p a 0 8
 0 0 0
 10 0
 T 18544
@@ -656,7 +656,7 @@ The solar raiment lies folded here.~
 ancient, continent-spanning empire. Wear it, and bring a light into the dark
 places of the world!
 ~
-2 o ad 12
+2 o ad 0 12
 0 0 0
 11 0
 A

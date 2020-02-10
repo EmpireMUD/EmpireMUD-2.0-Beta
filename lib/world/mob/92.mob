@@ -526,7 +526,7 @@ dog feral~
 a feral dog~
 A feral dog snarls at you.
 ~
-15 25 adjoz c 2
+15 25 djoz c 2
 0 0 11 9
 D
    This grungy dog looks like it has lived in the wild all its life, and it's
@@ -559,5 +559,87 @@ exactly what it is, but it appears to eat grass. Maybe you could ride it.
 ~
 I 0 3012 100.00 5  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 2  # SKIN: a large skin
+S
+#9231
+badger honey~
+a honey badger~
+A honey badger is digging at the ground.
+~
+20 40 djoz c 2
+0 0 0 10
+D
+   The honey badger is alternately sniffing at the ground and digging madly
+into it. It must be looking for food.
+~
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 1350 100.00 1  # SKIN: a small skin
+M
+0
+$n doesn't seem to care about you.~
+M
+0
+$n sniffs at the ground.~
+M
+0
+$n digs frantically.~
+M
+0
+$n makes a hoarse 'khrya-ya-ya-ya' sound.~
+M
+0
+$n digs wildly at the ground.~
+S
+#9232
+jellyfish fish box~
+a box jellyfish~
+You can see box jellyfish below the surface.
+~
+50 100 dhjlnoy s 5
+0 0 27 23
+D
+   This strange, cube-shaped, transparent jelly is among the most feared
+jellies in the ocean. Their sting is known to be terrifically painful, and can
+kill an adult.
+~
+T 9232
+S
+#9233
+yak wild hairy~
+a wild yak~
+A hairy yak seems to have been separated from the herd.
+~
+20 30 djkoy 0 4
+0 0 0 27
+D
+   The yak is a large, hairy cow that lives high in the mountains. They mainly
+eat grains, but will eat whatever small plant material is available.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
+I 1 1351 100.00 1  # SKIN: a large skin
+I 24 9234 100.00 1  # TAME: a yak
+M
+0
+$n chews some grass.~
+M
+0
+$n doesn't seem interested in you.~
+T 9028
+T 9027
+S
+#9234
+yak hairy~
+a yak~
+A hairy yak is chewing some grass.
+~
+20 30 dfjkoy 0 4
+0 0 0 27
+D
+   The yak is like a large, hairy cow. The yak seems tame. You could probably
+herd it into a stable and milk or shear it.
+~
+I 0 3012 100.00 3  # BUTCHER: a fillet of raw meat
+M
+0
+$n chews some grass.~
 S
 $

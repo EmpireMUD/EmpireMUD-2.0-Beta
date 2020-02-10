@@ -469,7 +469,7 @@ E
 9 0 50.00 3
 I 5 102 9.00 1 d  # DIG: a flint stone
 I 5 100 91.00 1 d  # DIG: a rock
-I 6 3015 100.00 1  # FORAGE: some red berries
+I 6 3015 75.00 1  # FORAGE: some red berries
 I 20 605 100.00 3 c  # CHOP: a pile of dead wood
 S
 $

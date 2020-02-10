@@ -113,6 +113,8 @@ M
 9044 1.00 k
 M
 9134 5.00 b
+M
+9231 2.00 0
 S
 #20
 Temperate Forest Spawns - Everywhere~
@@ -300,6 +302,8 @@ M
 9123 5.00 0
 M
 9128 5.00 0
+M
+9231 3.00 h
 S
 #51
 Desert Continent Spawns - Day~
@@ -321,7 +325,7 @@ M
 9117 5.00 0
 S
 #52
-Desert Spawns - Night~
+Desert Continent Spawns - Night~
 3 0 k mop 0-0 adk
 E
 -1 100.00

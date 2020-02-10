@@ -56,7 +56,7 @@ if %self.varexists(success)%
     set success 1
   end
 end
-if %success%
+if %success% || %self.room% != %actor.room%
   nop %self.remove_mob_flag(NO-ATTACK)%
   dg_affect #12601 %self% off
 else

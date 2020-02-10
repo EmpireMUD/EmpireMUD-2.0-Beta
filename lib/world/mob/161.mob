@@ -3,7 +3,7 @@ hydra oceanic monstrous~
 the oceanic hydra~
 A monstrous oceanic hydra forms its own waves as it surfaces! (adventure)
 ~
-225 325 adlyBE cE 4
+225 325 dlyBE cE 4
 0 0 6 25
 D
    This serpentine monster can't be seen properly as a majority of its body is
@@ -38,7 +38,7 @@ head ethereal~
 an ethereal head~
 An ethereal head sways here.
 ~
-225 325 abdhlxAE cdjG 0
+225 325 bdhlxAE cdjG 0
 0 0 6 28
 D
    A non-corporeal, serpent-like head attaches to an equally ethereal neck
@@ -53,7 +53,7 @@ head vicious~
 a vicious head~
 A vicious head sways here.
 ~
-225 325 abdhlzAE cdq 3
+225 325 bdhlzAE cdq 3
 0 0 6 9
 D
    A vicious serpent-like head sways back and forth here on the end of a
@@ -69,7 +69,7 @@ head withered~
 a withered head~
 A withered head sways here.
 ~
-225 325 abdhlAE cd 3
+225 325 bdhlAE cd 3
 0 0 6 9
 D
    Blackened and shriveled flesh peeks through the scattered scales on this
@@ -84,7 +84,7 @@ head majestic~
 a majestic head~
 A majestic head sways here.
 ~
-225 325 abdhlxAE cds 3
+225 325 bdhlxAE cds 3
 0 0 6 15
 D
    This head seems to sit back away from the main fighting and direct the

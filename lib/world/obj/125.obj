@@ -240,11 +240,9 @@ A clockwork lower cannon was left here.~
 This piece of advanced weaponry accelerates brass cannonballs using a series of
 gears.
 ~
-20 emp ap 0 4
-32 4 1
+20 emp ap 0 5
+32 1 1
 2 0
-A
-17 1 0
 T 12522
 S
 #12519
