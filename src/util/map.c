@@ -1982,7 +1982,7 @@ void audit_crops(void) {
 	missed = 0;
 	for (sub = 0; crop_regions[sub].sect != -1; ++sub) {
 		if (counts[sub] < 250) {
-			printf("Warning: %s has %d land tile%s for crops\n", crop_regions[sub].name, counts[sub], counts[sub] == 1 ? "" : "s");
+			printf("Warning: %s has only %d land tile%s for crops\n", crop_regions[sub].name, counts[sub], counts[sub] == 1 ? "" : "s");
 			++missed;
 		}
 	}
