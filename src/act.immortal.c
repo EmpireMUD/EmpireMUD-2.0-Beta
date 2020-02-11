@@ -6215,7 +6215,7 @@ int vnum_craft(char *searchname, char_data *ch) {
 	
 	HASH_ITER(hh, craft_table, iter, next_iter) {
 		if (multi_isname(searchname, GET_CRAFT_NAME(iter))) {
-			msg_to_char(ch, "%3d. [%5d] %s\r\n", ++found, GET_CRAFT_VNUM(iter), GET_CRAFT_NAME(iter));
+			msg_to_char(ch, "%3d. [%5d] %s (%s)\r\n", ++found, GET_CRAFT_VNUM(iter), GET_CRAFT_NAME(iter), craft_types[GET_CRAFT_TYPE(iter)]);
 		}
 	}
 	
