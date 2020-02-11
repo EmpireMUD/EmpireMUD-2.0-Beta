@@ -4869,10 +4869,7 @@ ACMD(do_eat) {
 	
 	// 7. cleanup
 	if (extract) {
-		if (has_interaction(food->interactions, INTERACT_CONSUMES_TO)) {
-			run_interactions(ch, food->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, food, consumes_or_decays_interact);
-		}
-		
+		run_interactions(ch, food->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, food, consumes_or_decays_interact);
 		extract_obj(food);
 	}
 	else {
