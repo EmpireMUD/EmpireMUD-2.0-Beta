@@ -54,6 +54,7 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern struct shop_temp_list *build_available_shop_list(char_data *ch);
 extern bool can_steal(char_data *ch, empire_data *emp);
 extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
+INTERACTION_FUNC(consumes_or_decays_interact);
 void expire_trading_post_item(struct trading_post_data *tpd);
 void free_player_eq_set(struct player_eq_set *eq_set);
 void free_shop_temp_list(struct shop_temp_list *list);
@@ -4868,6 +4869,10 @@ ACMD(do_eat) {
 	
 	// 7. cleanup
 	if (extract) {
+		if (has_interaction(food->interactions, INTERACT_CONSUMES_TO)) {
+			run_interactions(ch, food->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, food, consumes_or_decays_interact);
+		}
+		
 		extract_obj(food);
 	}
 	else {

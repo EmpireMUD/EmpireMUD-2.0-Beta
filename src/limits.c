@@ -316,9 +316,12 @@ void check_should_dismount(char_data *ch) {
 
 
 /**
-* Interaction func for "decays-to".
+* Interaction func for "decays-to" and "consumes-to".
 */
-INTERACTION_FUNC(decays_to_interact) {
+INTERACTION_FUNC(consumes_or_decays_interact) {
+	struct obj_binding *copy_obj_bindings(struct obj_binding *from);
+	void free_obj_binding(struct obj_binding **list);
+	
 	obj_data *new_obj;
 	bool fail = FALSE;
 	int iter;
@@ -330,6 +333,11 @@ INTERACTION_FUNC(decays_to_interact) {
 		// ownership
 		new_obj->last_owner_id = inter_item->last_owner_id;
 		new_obj->last_empire_id = inter_item->last_empire_id;
+		
+		if (OBJ_FLAGGED(new_obj, OBJ_BIND_FLAGS)) {
+			free_obj_binding(&OBJ_BOUND_TO(new_obj));	// unbind first
+			OBJ_BOUND_TO(new_obj) = copy_obj_bindings(OBJ_BOUND_TO(inter_item));
+		}
 		
 		// put it somewhere
 		if (!CAN_WEAR(new_obj, ITEM_WEAR_TAKE) && inter_room) {
@@ -1749,7 +1757,7 @@ void point_update_obj(obj_data *obj) {
 			}
 			
 			if (has_interaction(obj->interactions, INTERACT_DECAYS_TO)) {
-				run_interactions(NULL, obj->interactions, INTERACT_DECAYS_TO, obj_room(obj), NULL, obj, decays_to_interact);
+				run_interactions(NULL, obj->interactions, INTERACT_DECAYS_TO, obj_room(obj), NULL, obj, consumes_or_decays_interact);
 			}
 			
 			empty_obj_before_extract(obj);
