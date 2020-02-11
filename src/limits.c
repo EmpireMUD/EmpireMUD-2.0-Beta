@@ -52,6 +52,7 @@ extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
+void scale_item_to_level(obj_data *obj, int level);
 void stop_room_action(room_data *room, int action, int chore);
 
 // locals
@@ -311,6 +312,56 @@ void check_should_dismount(char_data *ch) {
 	if (!ok) {
 		do_dismount(ch, "", 0, 0);
 	}
+}
+
+
+/**
+* Interaction func for "decays-to".
+*/
+INTERACTION_FUNC(decays_to_interact) {
+	obj_data *new_obj;
+	bool fail = FALSE;
+	int iter;
+	
+	for (iter = 0; iter < interaction->quantity; ++iter) {
+		new_obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
+		
+		// ownership
+		new_obj->last_owner_id = inter_item->last_owner_id;
+		new_obj->last_empire_id = inter_item->last_empire_id;
+		
+		// put it somewhere
+		if (!CAN_WEAR(new_obj, ITEM_WEAR_TAKE) && inter_room) {
+			obj_to_room(new_obj, inter_room);
+		}
+		else if (inter_item->carried_by) {
+			obj_to_char(new_obj, inter_item->carried_by);
+		}
+		else if (inter_item->worn_by) {
+			obj_to_char(new_obj, inter_item->worn_by);
+		}
+		else if (inter_item->in_obj) {
+			obj_to_obj(new_obj, inter_item->in_obj);
+		}
+		else if (inter_item->in_vehicle) {
+			obj_to_vehicle(new_obj, inter_item->in_vehicle);
+		}
+		else if (inter_room) {
+			obj_to_room(new_obj, inter_room);
+		}
+		else {	// nowhere to put it
+			fail = TRUE;
+			extract_obj(new_obj);
+			break;
+		}
+		
+		if (!fail) {
+			load_otrigger(new_obj);
+		}
+	}
+	
+	return TRUE;
 }
 
 
@@ -1696,7 +1747,11 @@ void point_update_obj(obj_data *obj) {
 					}
 					break;
 			}
-
+			
+			if (has_interaction(obj->interactions, INTERACT_DECAYS_TO)) {
+				run_interactions(NULL, obj->interactions, INTERACT_DECAYS_TO, obj_room(obj), NULL, obj, decays_to_interact);
+			}
+			
 			empty_obj_before_extract(obj);
 			extract_obj(obj);
 			return;
