@@ -3198,9 +3198,11 @@ crop_data *get_potential_crop_for_location(room_data *location, bool must_have_f
 		if (CROP_FLAGGED(crop, CROPF_NOT_WILD)) {
 			continue;	// must be wild
 		}
+
 		if (must_have_forage && !has_interaction(GET_CROP_INTERACTIONS(crop), INTERACT_FORAGE)) {
 			continue;
 		}
+
 		if (CROP_FLAGGED(crop, CROPF_NO_NEWBIE | CROPF_NEWBIE_ONLY)) {
 			if (!isle) {
 				isle = GET_ISLAND(location);
