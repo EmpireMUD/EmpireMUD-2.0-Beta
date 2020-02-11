@@ -36,6 +36,7 @@
 extern const int rev_dir[];
 
 // external funcs
+INTERACTION_FUNC(consumes_or_decays_interact);
 ACMD(do_dismount);
 void check_combat_start(char_data *ch);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c

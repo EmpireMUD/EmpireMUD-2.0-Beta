@@ -49,6 +49,7 @@ extern struct character_size_data size_data[];
 ACMD(do_flee);
 bool check_scaling(char_data *mob, char_data *based_on);
 extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
+INTERACTION_FUNC(consumes_or_decays_interact);
 extern int determine_best_scale_level(char_data *ch, bool check_group);
 void end_pursuit(char_data *ch, char_data *target);
 void scale_item_to_level(obj_data *obj, int level);
