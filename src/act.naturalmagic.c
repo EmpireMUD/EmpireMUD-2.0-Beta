@@ -1158,6 +1158,11 @@ ACMD(do_quaff) {
 		act("$n quaffs $p!", TRUE, ch, obj, NULL, TO_ROOM);
 
 		apply_potion(obj, ch);
+		
+		if (has_interaction(obj->interactions, INTERACT_CONSUMES_TO)) {
+			run_interactions(ch, obj->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, consumes_or_decays_interact);
+		}
+		
 		extract_obj(obj);
 	}	
 }
