@@ -4019,7 +4019,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 * Runs a set of interactions and passes successful ones through to a function
 * pointer.
 *
-* @param char_data *ch The actor.
+* @param char_data *ch Optional: The actor.
 * @param struct interaction_item *run_list A pointer to the start of the list to run.
 * @param int type Any INTERACT_ const.
 * @param room_data *inter_room For room interactions, the room.
@@ -4035,13 +4035,13 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 	bool success = FALSE;
 
 	for (interact = run_list; interact; interact = interact->next) {
-		if (interact->type == type && meets_interaction_restrictions(interact->restrictions, ch, GET_LOYALTY(ch)) && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent)) {
+		if (interact->type == type && meets_interaction_restrictions(interact->restrictions, ch, ch ? GET_LOYALTY(ch) : NULL) && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent)) {
 			if (func) {
 				// run function
 				success |= (func)(ch, interact, inter_room, inter_mob, inter_item);
 				
 				// skill gains?
-				if (!IS_NPC(ch)) {
+				if (ch && !IS_NPC(ch)) {
 					LL_FOREACH(interact->restrictions, res) {
 						switch (res->type) {
 							case INTERACT_RESTRICT_ABILITY: {
