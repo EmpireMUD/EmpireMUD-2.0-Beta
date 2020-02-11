@@ -2274,6 +2274,10 @@ ACMD(do_paint) {
 		COMPLEX_DATA(IN_ROOM(ch))->paint_color = GET_PAINT_COLOR(paint);
 		
 		command_lag(ch, WAIT_ABILITY);
+		
+		if (has_interaction(paint->interactions, INTERACT_CONSUMES_TO)) {
+			run_interactions(ch, paint->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, paint, consumes_or_decays_interact);
+		}
 		extract_obj(paint);
 	}
 }
