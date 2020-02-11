@@ -4038,40 +4038,42 @@ rooms, sectors, crops, and vehicles -- this may save you time if many are the
 same.
 
 Mob interaction types:
- BUTCHER - Items received when the Butcher ability is used.
- SKIN - Items received via the skin command.
- SHEAR - Items received when the shear command is used in a stable.
- BARDE - Mob loaded when the Barde ability is used in a stable.
- LOOT - Items dropped into the corpse when the mob is killed.
- PICKPOCKET - Items gained from the pickpocket skill.
- TAME - Becomes another mob when it is 'tamed'.
+ &cBUTCHER&0 - Items received when the Butcher ability is used.
+ &cSKIN&0 - Items received via the skin command.
+ &cSHEAR&0 - Items received when the shear command is used in a stable.
+ &cBARDE&0 - Mob loaded when the Barde ability is used in a stable.
+ &cLOOT&0 - Items dropped into the corpse when the mob is killed.
+ &cPICKPOCKET&0 - Items gained from the pickpocket skill.
+ &cTAME&0 - Becomes another mob when it is 'tamed'.
  
 Object interaction types:
- LIGHT - Item something is converted into when lit on fire.
- COMBINE** - Combine multiple copies of an obj into another obj (quantity is the
+ &cLIGHT&0 - Item something is converted into when lit on fire.
+ &cCOMBINE**&0 - Combine multiple copies of an obj into another obj (quantity is the
     number required, rather than number you get).
- SEPARATE** - Split this item into multiple other items.
+ &cSEPARATE**&0 - Split this item into multiple other items.
  ** Both COMBINE and SEPARATE should be set exclusive, as they will extract
     the original item.
- SCRAPE - Items you get when scraping this item (tree -> log).
- SAW - Items you get when sawing this item (tree -> lumber).
- TAN - Items you get when tanning this item (skin -> leather).
- CHIP - What you get for chipping at the item.
- SEED - Gives an item when seeded.
+ &cSCRAPE&0 - Items you get when scraping this item (tree -> log).
+ &cSAW&0 - Items you get when sawing this item (tree -> lumber).
+ &cTAN&0 - Items you get when tanning this item (skin -> leather).
+ &cCHIP&0 - What you get for chipping at the item.
+ &cSEED&0 - Gives an item when seeded.
+ &cDECAYS-TO&0 - Becomes a different object when its timer expires (e.g. ashes).
+ &cCONSUMES-TO&0 - Becomes a different object when eaten/used up (e.g. a jar).
 
 Room/vehicle interaction types:
- DIG - Items received when using the dig action.
- FORAGE - Items received when using the Forage ability. Note that if the player
+ &cDIG&0 - Items received when using the dig action.
+ &cFORAGE&0 - Items received when using the Forage ability. Note that if the player
    gets nothing from a sector's forage list, they may also receive a forage
    item from any wild crop that grows in the area.
- PICK - Items found when picking.
- HARVEST - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
- GATHER - Items received from the gather action.
- ENCOUNTER - Hostile mob loaded when a random encounter triggers.
- CHOP - Things that can be found when chopping here.
- FISH - Things that can be found by fishing here.
- PAN - Things that can be found by panning here.
- QUARRY - Things you can find by quarrying here.
+ &cPICK&0 - Items found when picking.
+ &cHARVEST&0 - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
+ &cGATHER&0 - Items received from the gather action.
+ &cENCOUNTER&0 - Hostile mob loaded when a random encounter triggers.
+ &cCHOP&0 - Things that can be found when chopping here.
+ &cFISH&0 - Things that can be found by fishing here.
+ &cPAN&0 - Things that can be found by panning here.
+ &cQUARRY&0 - Things you can find by quarrying here.
 
 The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
 than 1, the percent is only checked once for the entire quantity. If you want

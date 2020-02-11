@@ -1505,6 +1505,7 @@ ACMD(do_gen_craft) {
 	vehicle_data *veh;
 	bool is_master;
 	obj_data *found_obj = NULL, *drinkcon = NULL;
+	struct resource_data *res;
 	ability_data *cft_abil;
 	
 	if (IS_NPC(ch)) {
@@ -1702,6 +1703,13 @@ ACMD(do_gen_craft) {
 		
 		// must call this after start_action() because it stores resources
 		extract_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), &GET_ACTION_RESOURCES(ch));
+		
+		if (CRAFT_FLAGGED(type, CRAFT_REMOVE_PRODUCTION) && GET_LOYALTY(ch)) {
+			// remove 'produced' amounts from the empire now
+			LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
+				add_production_total(GET_LOYALTY(ch), res->vnum, -(res->amount));
+			}
+		}
 		
 		msg_to_char(ch, "You start %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		sprintf(buf, "$n starts %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);

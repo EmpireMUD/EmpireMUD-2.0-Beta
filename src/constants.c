@@ -1582,6 +1582,7 @@ const char *craft_flags[] = {
 	"BLD-UPGRADED",
 	"LEARNED",
 	"BY-RIVER",
+	"REMOVE-PRODUCTION",
 	"\n"
 };
 
@@ -1606,6 +1607,7 @@ const char *craft_flag_for_info[] = {
 	"requires upgrade",
 	"",	// learned
 	"must be by a river",
+	"",	// remove-production
 	"\n"
 };
 
@@ -3924,6 +3926,8 @@ const char *interact_types[] = {
 	"QUARRY",
 	"TAME",
 	"SEED",	// 25
+	"DECAYS-TO",
+	"CONSUMES-TO",
 	"\n"
 };
 
@@ -3965,6 +3969,8 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ROOM,	// quarry
 	TYPE_MOB,	// tame
 	TYPE_OBJ,	// seed
+	TYPE_OBJ,	// decays-to
+	TYPE_OBJ,	// consumes-to
 };
 
 
@@ -3996,6 +4002,8 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// quarry
 	TYPE_MOB,	// tame
 	TYPE_OBJ,	// seed
+	TYPE_OBJ,	// decays-to
+	TYPE_OBJ,	// consumes-to
 };
 
 

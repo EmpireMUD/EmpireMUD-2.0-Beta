@@ -359,7 +359,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_QUARRY  23
 #define INTERACT_TAME  24
 #define INTERACT_SEED  25
-#define NUM_INTERACTS  26
+#define INTERACT_DECAYS_TO  26
+#define INTERACT_CONSUMES_TO  27
+#define NUM_INTERACTS  28
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
@@ -1017,6 +1019,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
 #define CRAFT_LEARNED  BIT(16)	// cannot use unless learned
 #define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
+#define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
 
 // list of above craft flags that require a building in some way
 #define CRAFT_FLAGS_REQUIRING_BUILDINGS  (CRAFT_GLASSBLOWER | CRAFT_CARPENTER | CRAFT_ALCHEMY | CRAFT_SHIPYARD)
