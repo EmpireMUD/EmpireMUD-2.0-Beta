@@ -437,6 +437,10 @@ int apply_poison(char_data *ch, char_data *vict) {
 		}
 		
 		if (GET_POISON_CHARGES(obj) <= 0) {
+			if (has_interaction(obj->interactions, INTERACT_CONSUMES_TO)) {
+				run_interactions(ch, obj->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, consumes_or_decays_interact);
+			}
+			
 			extract_obj(obj);
 		}
 		return 0;
@@ -447,6 +451,9 @@ int apply_poison(char_data *ch, char_data *vict) {
 		}
 		if (!number(0, 2)) {
 			if (GET_POISON_CHARGES(obj) <= 0) {
+				if (has_interaction(obj->interactions, INTERACT_CONSUMES_TO)) {
+					run_interactions(ch, obj->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, consumes_or_decays_interact);
+				}
 				extract_obj(obj);
 			}
 			return 0;
@@ -503,6 +510,9 @@ int apply_poison(char_data *ch, char_data *vict) {
 	// fire a consume trigger but it can't block execution here
 	if (consume_otrigger(obj, ch, OCMD_POISON, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL)) {
 		if (GET_POISON_CHARGES(obj) <= 0) {
+			if (has_interaction(obj->interactions, INTERACT_CONSUMES_TO)) {
+				run_interactions(ch, obj->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, consumes_or_decays_interact);
+			}
 			extract_obj(obj);
 		}
 	}
