@@ -2271,10 +2271,18 @@ ACMD(do_herd) {
 	}
 	else if (ROOM_IS_CLOSED(IN_ROOM(ch)) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED))
 		msg_to_char(ch, "You don't have permission to herd here.\r\n");
-	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH))
+	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN)) {
 		msg_to_char(ch, "You find it difficult to do that here.\r\n");
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_ROUGH) || ROOM_BLD_FLAGGED(to_room, BLD_BARRIER))
-		msg_to_char(ch, "You find that difficult to do.\r\n");
+	}
+	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && !MOB_FLAGGED(victim, MOB_MOUNTAINWALK)) {
+		msg_to_char(ch, "You find it difficult to do that here.\r\n");
+	}
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED(to_room, BLD_BARRIER)) {
+		msg_to_char(ch, "You find it difficult to herd anything in that direction.\r\n");
+	}
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !MOB_FLAGGED(victim, MOB_MOUNTAINWALK)) {
+		msg_to_char(ch, "You find it difficult to herd anything in that direction.\r\n");
+	}
 	else if (GET_LED_BY(victim) && IN_ROOM(GET_LED_BY(victim)) == IN_ROOM(victim))
 		msg_to_char(ch, "You can't herd someone who is being led by someone else.\r\n");
 	else if (ROOM_IS_CLOSED(to_room) && !ROOM_BLD_FLAGGED(to_room, BLD_HERD))

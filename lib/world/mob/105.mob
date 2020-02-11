@@ -343,7 +343,7 @@ sword enchanted ice~
 the enchanted ice sword~
 A sword of ice animated by Aquilo's power is flying around.
 ~
-0 0 abdhzDF m 2
+0 0 bdhzDF m 2
 0 0 2 1
 T 10564
 S
@@ -352,7 +352,7 @@ sprite ice~
 an ice sprite~
 An ice sprite is flitting around here.
 ~
-75 125 abdhoxDF cm 1
+75 125 bdhoxDF cm 1
 0 0 2 28
 T 10564
 S
@@ -361,7 +361,7 @@ elemental ice~
 an ice elemental~
 A summoned ice elemental soars overhead on wings of rime.
 ~
-75 125 abdhoxzDF cm 1
+75 125 bdhoxzDF cm 1
 0 0 2 20
 T 10564
 S

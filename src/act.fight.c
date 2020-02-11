@@ -501,8 +501,12 @@ ACMD(do_shoot) {
 		msg_to_char(ch, "Shooting yourself in the foot will do you no good now.\r\n");
 	else if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master == vict)
 		act("$N is just such a good friend, you simply can't hit $M.", FALSE, ch, 0, vict, TO_CHAR);
-	else if (!GET_EQ(ch, WEAR_RANGED) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_RANGED)) != ITEM_MISSILE_WEAPON)
-		msg_to_char(ch, "You don't have anything to shoot!\r\n");
+	else if (!GET_EQ(ch, WEAR_RANGED)) {
+		msg_to_char(ch, "You aren't holding anything you can shoot!\r\n");
+	}
+	else if (GET_OBJ_TYPE(GET_EQ(ch, WEAR_RANGED)) != ITEM_MISSILE_WEAPON) {
+		msg_to_char(ch, "The item in your ranged slot isn't a ranged weapon.\r\n");
+	}
 	else if (FIGHTING(ch) && vict == FIGHTING(ch)) {
 		act("You're already fighting $N!", FALSE, ch, NULL, vict, TO_CHAR);
 	}

@@ -7,7 +7,7 @@ foe of the ancient world. Anat killed men and gods alike as she walked the
 world, drenched in blood. Unfortunately, these chains are broken and it seems
 she walks the Earth again. Seek out Anat -- hopefully she hasn't gotten far.
 ~
-3 0 0 3
+3 0 0 0 3
 0 0 0
 2 1152
 S
@@ -20,7 +20,7 @@ has been scratched off. You could use this to build a binding circle powerful
 enough to summon one of them.
 Usage: build bindingcircle
 ~
-3 gp a 2
+3 gp a 0 2
 0 0 0
 0 0
 S
@@ -30,7 +30,7 @@ the mournful wails of Anat~
 The mournful wails of Anat fill the air!~
 It seems Anat has been defeated.
 ~
-3 0 0 3
+3 0 0 0 3
 0 0 0
 10 16
 T 12005
@@ -43,7 +43,7 @@ Anat's bindings are piled here.~
 still surge with forgotten power, long lost to the world. These might be
 valuable, to the right person.
 ~
-15 0 a 1
+15 0 a 0 1
 1 0 0
 2 0
 R
@@ -60,7 +60,7 @@ neck, enough to protect your heart from mortal strikes. The chain is impossibly
 light despite the glimmer of pure gold, and pulling on it does not cause it to
 tighten.
 ~
-2 amp ac 6
+2 amp ac 0 6
 0 0 0
 4 0
 A
@@ -87,7 +87,7 @@ the golden chain of Anat design~
 The golden chain of Anat design is on the ground.~
 This design will teach you to forge: golden chain of Anat.
 ~
-7 0 a 1
+7 0 a 0 1
 12004 0 0
 0 0
 S
@@ -100,7 +100,7 @@ from the veins of the goddess Anat, virgin warrior of the Old World. The vial
 is suspended from a chain of gold and silver, warm to the touch, and absolutely
 bursting with mana.
 ~
-2 amp ac 6
+2 amp ac 0 6
 0 0 0
 4 0
 A
@@ -127,7 +127,7 @@ the blood of Anat design~
 The blood of Anat design is on the ground.~
 This design will teach you to forge: blood of Anat.
 ~
-7 0 a 1
+7 0 a 0 1
 12006 0 0
 0 0
 S
@@ -139,7 +139,7 @@ An idol of the old god Anat is dangling here.~
 dangling from a golden necklace. Anat's arm is held high and holding an axe --
 or a club, you aren't sure.
 ~
-2 amp ac 7
+2 amp ac 0 7
 0 0 0
 4 0
 A
@@ -164,7 +164,7 @@ the idol of Anat design~
 The idol of Anat design is on the ground.~
 This design will teach you to forge: idol of Anat.
 ~
-7 0 a 1
+7 0 a 0 1
 12008 0 0
 0 0
 S
@@ -176,7 +176,7 @@ The hawk pendant of the old god Anat is dangling here.~
 form. The hawk's talons are extended, but its face shows the serenity that only
 a hawk can find in battle.
 ~
-2 amp ac 7
+2 amp ac 0 7
 0 0 0
 4 0
 A
@@ -201,7 +201,7 @@ the hawk pendant of Anat design~
 The hawk pendant of Anat design is on the ground.~
 This design will teach you to forge: hawk pendant of Anat.
 ~
-7 0 a 1
+7 0 a 0 1
 12010 0 0
 0 0
 S
@@ -215,7 +215,7 @@ your own heart, beating faster, and faster, and faster, until you can hear
 blood pumping in your ears and you realize the entire world will burn in your
 wake.
 ~
-2 amp ac 8
+2 amp ac 0 8
 0 0 0
 4 0
 A
@@ -244,7 +244,7 @@ the stone of wrath of Anat design~
 The stone of wrath of Anat design is on the ground.~
 This design will teach you to forge: stone of wrath of Anat.
 ~
-7 0 a 1
+7 0 a 0 1
 12012 0 0
 0 0
 S
@@ -257,7 +257,7 @@ remains of the old god Mot, slain by the warrior goddess Anat in ancient times.
 It is said that the bearer of these grains shall be a leader among men, capable
 of feats of greatness.
 ~
-2 amp ac 9
+2 amp ac 0 9
 0 0 0
 4 0
 A
@@ -280,7 +280,7 @@ the winnowed grain of Anat recipe~
 The winnowed grain of Anat recipe is on the ground.~
 This recipe will teach you to forge: winnowed grain of Anat.
 ~
-7 0 a 1
+7 0 a 0 1
 12014 0 0
 0 0
 S
@@ -291,7 +291,7 @@ A hawk whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-19 p a 5
+19 p a 0 5
 12016 0 0
 2 0
 S
@@ -304,7 +304,7 @@ once mighty and feared, now reduced to rags and ash. It would be a fitting end
 to build her a tomb and bury these for all time.
 Usage: build tombofanat <direction>
 ~
-3 g a 2
+3 g a 0 2
 0 0 0
 7 0
 S
@@ -317,7 +317,7 @@ inscribed with the dual symbols of the old god Anat and her faithful attendant
 Yatpan, who takes the form of a hawk. Type 'use whistle' to summon a flying
 mount.
 ~
-3 o a 10
+3 o a 0 10
 12018 0 0
 14 0
 T 9910
@@ -329,7 +329,7 @@ The feast of Anat has been set out on a cloth.~
    This feast has meats and fruits from across the many empires, set out for
 the conquering warrior-goddess Anat.
 ~
-6 m 0 6
+6 m 0 0 6
 96 0 0
 7 336
 A
@@ -348,7 +348,7 @@ the feast of Anat recipe~
 The feast of Anat recipe is on the ground.~
 This recipe will teach you to cook: feast of Anat.
 ~
-7 0 a 1
+7 0 a 0 1
 12019 0 0
 0 0
 S
@@ -359,7 +359,7 @@ The battle dress of the old god Anat is lying here.~
    These clothing, died with saffron and murex, bear the symbols of the virgin
 warrior-goddess Anat.
 ~
-2 o ad 2
+2 o ad 0 2
 0 0 0
 7 0
 A
@@ -381,7 +381,7 @@ Ba'al Hadad brought good fortune and ill, as his storms fed crops but destroyed
 empires. Now these chains are broken, and it seems the stormlord walks the
 Earth once again. Seek him out -- he can't have gone far.
 ~
-3 0 0 4
+3 0 0 0 4
 0 0 0
 2 1152
 S
@@ -391,7 +391,7 @@ the last echoes of Ba'al Hadad~
 The last echoes of Ba'al Hadad fill the air!~
 It would appear someone has defeated Ba'al Hadad.
 ~
-3 0 0 4
+3 0 0 0 4
 0 0 0
 10 16
 T 12005
@@ -404,7 +404,7 @@ Ba'al Hadad's bindings are piled here.~
 still surge with forgotten power, long lost to the world. These might be
 valuable, to the right person.
 ~
-15 0 a 2
+15 0 a 0 2
 1 0 0
 2 0
 R
@@ -420,7 +420,7 @@ The bronze bull ring of Ba'al Hadad is lying here.~
 finger, with its horns protruding from the top. Wedge shapes pressed into the
 side spell out 'Ba'al Hadad, God of Storms'.
 ~
-2 amp ab 7
+2 amp ab 0 7
 0 0 0
 4 0
 A
@@ -445,7 +445,7 @@ the bull ring of Ba'al Hadad design~
 The bull ring of Ba'al Hadad design is on the ground.~
 This design will teach you to forge: bull ring of Ba'al Hadad.
 ~
-7 0 a 1
+7 0 a 0 1
 12034 0 0
 0 0
 S
@@ -457,7 +457,7 @@ The clouded ring of Ba'al Hadad is lying here.~
 shimmering white at the same time. It is pressed with cuneiform wedges to spell
 out 'Ba'al Hadad, God of Storms'.
 ~
-2 amp ab 8
+2 amp ab 0 8
 0 0 0
 1 0
 A
@@ -480,7 +480,7 @@ the clouded ring of Ba'al Hadad design~
 The clouded ring of Ba'al Hadad design is on the ground.~
 This design will teach you to forge: clouded ring of Ba'al Hadad.
 ~
-7 0 a 1
+7 0 a 0 1
 12036 0 0
 0 0
 S
@@ -493,7 +493,7 @@ lighting, as if frozen in time and turned to metal by some arcane craftsman.
 The inside of the ring is pressed with wedge-shaped letters that spell out
 'Ba'al Hadad, God of Storms'.
 ~
-2 amp ab 9
+2 amp ab 0 9
 0 0 0
 1 0
 A
@@ -516,7 +516,7 @@ the lightning ring of Ba'al Hadad design~
 The lightning ring of Ba'al Hadad design is on the ground.~
 This design will teach you to forge: lightning ring of Ba'al Hadad.
 ~
-7 0 a 1
+7 0 a 0 1
 12038 0 0
 0 0
 S
@@ -529,7 +529,7 @@ begins to vibrate and let out an overpowering clap of thunder, as if someone
 has trapped the coming storm in this tiny artifact. The inside of the ring is
 pressed with wedge-shaped letters spelling out 'Ba'al Hadad, God of Storms'.
 ~
-2 amp ab 10
+2 amp ab 0 10
 0 0 0
 1 0
 A
@@ -552,7 +552,7 @@ the thunderbolt ring of Ba'al Hadad design~
 The thunderbolt ring of Ba'al Hadad design is on the ground.~
 This design will teach you to forge: thunderbolt ring of Ba'al Hadad.
 ~
-7 0 a 1
+7 0 a 0 1
 12040 0 0
 0 0
 S
@@ -564,7 +564,7 @@ The hurricane ring of Ba'al Hadad is lying here.~
 your finger, the sand comes loose and whirls about like a hurricane, encircling
 your finger. It seems to be a totem of Ba'al Hadad, God of Storms.
 ~
-2 amp ab 11
+2 amp ab 0 11
 0 0 0
 1 0
 A
@@ -591,7 +591,7 @@ the hurricane ring of Ba'al Hadad design~
 The hurricane ring of Ba'al Hadad design is on the ground.~
 This design will teach you to forge: hurricane ring of Ba'al Hadad.
 ~
-7 0 a 1
+7 0 a 0 1
 12042 0 0
 0 0
 S
@@ -603,7 +603,7 @@ The stormwashed ring of Ba'al Hadad is lying here.~
 perfectly smooth. An inscription on the inside reads 'Ba'al Hadad, God of
 Storms'.
 ~
-2 amp ab 12
+2 amp ab 0 12
 0 0 0
 1 0
 A
@@ -628,7 +628,7 @@ the stormwashed ring of Ba'al Hadad design~
 The stormwashed ring of Ba'al Hadad design is on the ground.~
 This design will teach you to forge: stormwashed ring of Ba'al Hadad.
 ~
-7 0 a 1
+7 0 a 0 1
 12044 0 0
 0 0
 S
@@ -640,7 +640,7 @@ A jar of thunder is sitting on the ground.~
 Hadad. You could use this to craft the storm god's own chariot.
 Usage: manufacture stormcloud of Ba'al Hadad
 ~
-3 0 a 2
+3 0 a 0 2
 0 0 0
 6 0
 M
@@ -657,7 +657,7 @@ A bronze bull whistle is lying here.~
 This whistle can summon a noncombat pet!
 Type 'use whistle' to summon it.
 ~
-19 p a 5
+19 p a 0 5
 12047 0 0
 2 0
 S
@@ -668,7 +668,7 @@ A lightning whistle is lying here.~
    This strange bronze whistle has a lightningbolt carved on it, along with the
 name Ba'al Hadad. Type 'use whistle' to summon a new flying mount.
 ~
-3 o a 11
+3 o a 0 11
 12048 0 0
 14 0
 T 9910
@@ -682,7 +682,7 @@ having been forged from a lightningbolt and bound with the southern winds. It
 bears the name of Ba'al Hadad, God of Storms. You can 'use' the stormcaller to
 call up a storm.
 ~
-3 p ao 2
+3 p ao 0 2
 0 0 0
 0 0
 T 12049
@@ -694,7 +694,7 @@ A stormcloud hangs low in the sky, pouring ceaseless rain.~
    This cloud is tall and dark, but unnaturally small. Its pouring rains drench
 the land only in this small area, and it doesn't seem to be moving.
 ~
-3 0 0 8
+3 0 0 0 8
 10800 0 0
 10 144
 T 10165
@@ -709,7 +709,7 @@ The Ugarit tunic of Ba'al Hadad is lying here.~
 a true god, and the power of the Storm is stitched into every part of it. Only
 the worthy dare wear it.
 ~
-2 o ad 3
+2 o ad 0 3
 0 0 0
 7 0
 A
@@ -728,8 +728,8 @@ A bag of dates is stacked here.~
    Sweet dates like these have been grown for thousands of years, as they
 flourish in warm areas. You can eat these dates or plant them.
 ~
-6 b a 5
-24 12052 0
+6 b a 0 6
+12 12052 0
 7 168
 O
 9 bc
@@ -744,7 +744,7 @@ A jar of date palm seeds is sitting here.~
 have been sealed inside. You could probably still plant them, if you had a
 fertile desert.
 ~
-3 b a 7
+3 b a 0 7
 0 12052 0
 7 168
 R
@@ -757,7 +757,7 @@ The feast of Ba'al Hadad has been set out on a cloth.~
    This feast of fruits and vegetables celebrates the many crops that the storm
 god Ba'al Hadad nourishes with his torrential rains.
 ~
-6 m 0 7
+6 m 0 0 7
 96 0 0
 7 336
 A
@@ -778,7 +778,7 @@ the feast of Ba'al Hadad recipe~
 The feast of Ba'al Hadad recipe is on the ground.~
 This recipe will teach you to cook: feast of Ba'al Hadad.
 ~
-7 0 a 1
+7 0 a 0 1
 12054 0 0
 0 0
 S

@@ -15,7 +15,7 @@ A Field of Wheat~
 D0
 ;;;;~
 &Y~
-I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 6 3058 100.00 1  # FORAGE: a handful of grain
 I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 141 20.00 2 H  # HARVEST: a bundle of wheat
 I 8 141 20.00 3 H  # HARVEST: a bundle of wheat
@@ -31,7 +31,7 @@ A Field of Corn~
 D0
 iiii~
 &g~
-I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 6 3059 100.00 1  # FORAGE: a handful of kernels
 I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 3005 20.00 2 H  # HARVEST: a bushel of corn
 I 8 3005 20.00 3 H  # HARVEST: a bushel of corn
@@ -47,7 +47,7 @@ A Field of Hops~
 D0
 ::::~
 &G~
-I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 6 3060 100.00 1  # FORAGE: a handful of seeds
 I 8 143 20.00 2 H  # HARVEST: a bushel of hops
 I 8 143 20.00 3 H  # HARVEST: a bushel of hops
 I 8 143 20.00 4 H  # HARVEST: a bushel of hops
@@ -58,10 +58,11 @@ S
 cotton~
 A Field of Cotton~
 2 jk f
-0 100 54 45
+0 100 40 60
 D0
 ::::~
 &0~
+I 6 3061 100.00 1 f  # FORAGE: a handful of seeds
 I 8 144 20.00 2 H  # HARVEST: a basket of cotton
 I 8 144 20.00 3 H  # HARVEST: a basket of cotton
 I 8 144 20.00 4 H  # HARVEST: a basket of cotton
@@ -76,7 +77,7 @@ A Field of Barley~
 D0
 ::::~
 &Y~
-I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 6 3062 100.00 1  # FORAGE: a handful of seeds
 I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 145 20.00 2 H  # HARVEST: a sack of barley
 I 8 145 20.00 3 H  # HARVEST: a sack of barley
@@ -195,7 +196,7 @@ A Rice Paddy~
 D0
 ,,,,~
 &g~
-I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 6 3063 100.00 1  # FORAGE: a handful of rice
 I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 3011 20.00 2 H  # HARVEST: a sack of dried rice
 I 8 3011 20.00 3 H  # HARVEST: a sack of dried rice

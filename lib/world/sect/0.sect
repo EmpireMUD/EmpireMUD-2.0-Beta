@@ -55,7 +55,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3013 100.00 1  # FORAGE: a handful of nuts
+I 6 3013 75.00 1  # FORAGE: a handful of nuts
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 100.00 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -96,7 +96,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3015 100.00 1  # FORAGE: some red berries
+I 6 3015 75.00 1  # FORAGE: some red berries
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 100.00 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -140,7 +140,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3015 100.00 1  # FORAGE: some red berries
+I 6 3015 75.00 1  # FORAGE: some red berries
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 100.00 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -184,7 +184,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3015 100.00 1  # FORAGE: some red berries
+I 6 3015 75.00 1  # FORAGE: some red berries
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 100.00 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -252,7 +252,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3015 100.00 1  # FORAGE: some red berries
+I 6 3015 75.00 1  # FORAGE: some red berries
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 100.00 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -369,6 +369,7 @@ D0
 ~~~~~
 &B~
 I 10 9019 5.00 1  # ENCOUNTER: a shark
+I 10 9232 0.05 1  # ENCOUNTER: a box jellyfish
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
 I 21 1305 0.25 1 f  # FISH: a worn old statuette
 I 21 256 0.25 1 f  # FISH: a hestian trinket
@@ -663,8 +664,6 @@ E
 E
 3 20 0.28 25
 E
-3 20 0.28 12
-E
 5 0 100.00 22
 E
 7 19 4.00 70
@@ -675,7 +674,7 @@ E
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3014 100.00 1  # FORAGE: some dry beans
+I 6 3014 75.00 1  # FORAGE: some dry beans
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1204 100.00 1 p  # PICK: a daggerbite frond
 I+ 0 70  # Ability: Find Herbs
@@ -712,7 +711,7 @@ E
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3014 100.00 1  # FORAGE: some dry beans
+I 6 3014 50.00 1  # FORAGE: some dry beans
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1203 100.00 1 p  # PICK: some magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
@@ -785,7 +784,7 @@ E
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3014 100.00 1  # FORAGE: some dry beans
+I 6 3014 75.00 1  # FORAGE: some dry beans
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1204 100.00 1 p  # PICK: a daggerbite frond
 I+ 0 70  # Ability: Find Herbs
@@ -821,7 +820,7 @@ E
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3016 100.00 1  # FORAGE: a handful of dates
+I 6 3016 75.00 1  # FORAGE: a handful of dates
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1204 100.00 1 p  # PICK: a daggerbite frond
 I+ 0 70  # Ability: Find Herbs
@@ -861,7 +860,7 @@ E
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3016 100.00 1  # FORAGE: a handful of dates
+I 6 3016 75.00 1  # FORAGE: a handful of dates
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1204 100.00 1 p  # PICK: a daggerbite frond
 I+ 0 70  # Ability: Find Herbs
@@ -892,7 +891,7 @@ E
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3016 100.00 1  # FORAGE: a handful of dates
+I 6 3016 75.00 1  # FORAGE: a handful of dates
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1204 100.00 1 p  # PICK: a daggerbite frond
 I+ 0 70  # Ability: Find Herbs
@@ -940,7 +939,7 @@ E
 9 0 50.00 28
 E
 15 0 1.00 34
-I 6 3017 100.00 1  # FORAGE: a plump fig
+I 6 3017 75.00 1  # FORAGE: a plump fig
 I 9 133 100.00 1  # GATHER: a tangle of vines
 I 20 128 100.00 1  # CHOP: a massive jungle tree
 S
@@ -974,7 +973,7 @@ E
 7 5 2.00 29
 E
 15 0 1.00 34
-I 6 3017 100.00 1  # FORAGE: a plump fig
+I 6 3017 75.00 1  # FORAGE: a plump fig
 I 9 133 100.00 1  # GATHER: a tangle of vines
 I 20 128 100.00 1  # CHOP: a massive jungle tree
 S
@@ -1000,7 +999,7 @@ E
 11 5 4.00 27
 E
 15 0 5.00 34
-I 6 3310 100.00 1  # FORAGE: a wood ear mushroom
+I 6 3310 75.00 1  # FORAGE: a wood ear mushroom
 I 10 9114 1.00 1  # ENCOUNTER: a massive crocodile
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
 I 21 1305 0.25 1 f  # FISH: a worn old statuette
@@ -1107,7 +1106,7 @@ E
 9 0 25.00 27
 E
 10 32 4.00 27
-I 6 3310 100.00 1  # FORAGE: a wood ear mushroom
+I 6 3310 75.00 1  # FORAGE: a wood ear mushroom
 I 10 9114 1.00 1  # ENCOUNTER: a massive crocodile
 I 21 1300 20.00 1 f  # FISH: a glowing green seashell
 I 21 1305 0.25 1 f  # FISH: a worn old statuette
@@ -1167,7 +1166,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3013 100.00 1  # FORAGE: a handful of nuts
+I 6 3013 75.00 1  # FORAGE: a handful of nuts
 S
 #37
 Small Copse~
@@ -1206,7 +1205,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3015 100.00 1  # FORAGE: some red berries
+I 6 3015 75.00 1  # FORAGE: some red berries
 I 20 131 100.00 1  # CHOP: a green sapling
 S
 #38
@@ -1246,7 +1245,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3015 100.00 1  # FORAGE: some red berries
+I 6 3015 75.00 1  # FORAGE: some red berries
 I 20 131 100.00 1  # CHOP: a green sapling
 S
 #39
@@ -1286,7 +1285,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3015 100.00 1  # FORAGE: some red berries
+I 6 3015 75.00 1  # FORAGE: some red berries
 I 20 131 100.00 1  # CHOP: a green sapling
 S
 #40
@@ -1338,7 +1337,7 @@ E
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a lump of clay
-I 6 3013 100.00 1  # FORAGE: a handful of nuts
+I 6 3013 75.00 1  # FORAGE: a handful of nuts
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1205 100.00 1 p  # PICK: some bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -1401,7 +1400,7 @@ E
 14 0 20.00 44
 E
 15 0 20.00 44
-I 6 3015 100.00 1  # FORAGE: some red berries
+I 6 3015 75.00 1  # FORAGE: some red berries
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1205 100.00 1 p  # PICK: some bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -1437,7 +1436,7 @@ E
 14 0 20.00 45
 E
 15 0 20.00 45
-I 6 3015 100.00 1  # FORAGE: some red berries
+I 6 3015 75.00 1  # FORAGE: some red berries
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1205 100.00 1 p  # PICK: some bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -1498,7 +1497,7 @@ E
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a lump of clay
-I 6 3015 100.00 1  # FORAGE: some red berries
+I 6 3015 75.00 1  # FORAGE: some red berries
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1205 100.00 1 p  # PICK: some bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -1548,7 +1547,7 @@ E
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a lump of clay
-I 6 3015 100.00 1  # FORAGE: some red berries
+I 6 3015 75.00 1  # FORAGE: some red berries
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1205 100.00 1 p  # PICK: some bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -1588,7 +1587,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 9.00 1 X  # DIG: a rock
 I 5 101 100.00 1 X  # DIG: a lump of clay
-I 6 3013 100.00 1  # FORAGE: a handful of nuts
+I 6 3013 75.00 1  # FORAGE: a handful of nuts
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1205 100.00 1 p  # PICK: some bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -1641,7 +1640,7 @@ E
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 9.00 1 X  # DIG: a rock
 I 5 101 100.00 1 X  # DIG: a lump of clay
-I 6 3015 100.00 1  # FORAGE: some red berries
+I 6 3015 75.00 1  # FORAGE: some red berries
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1205 100.00 1 p  # PICK: some bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -1816,8 +1815,8 @@ E
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a lump of clay
-I 6 3051 50.00 1 x  # FORAGE: a sea urchin
-I 6 3052 50.00 1 x  # FORAGE: a clam
+I 6 3051 40.00 1 x  # FORAGE: a sea urchin
+I 6 3052 40.00 1 x  # FORAGE: a clam
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1200 100.00 1 p  # PICK: a handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -1846,8 +1845,8 @@ E
 8 0 100.00 15
 E
 10 57 5.00 27
-I 6 3051 50.00 1 x  # FORAGE: a sea urchin
-I 6 3052 50.00 1 x  # FORAGE: a clam
+I 6 3051 40.00 1 x  # FORAGE: a sea urchin
+I 6 3052 40.00 1 x  # FORAGE: a clam
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1200 100.00 1 p  # PICK: a handful of whitegrass
 I+ 0 70  # Ability: Find Herbs
@@ -1929,7 +1928,7 @@ E
 I 5 102 9.00 1 x  # DIG: a flint stone
 I 5 100 9.00 1 x  # DIG: a rock
 I 5 101 100.00 1 x  # DIG: a lump of clay
-I 6 3013 100.00 1  # FORAGE: a handful of nuts
+I 6 3013 75.00 1  # FORAGE: a handful of nuts
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1205 100.00 1 p  # PICK: some bileberries
 I+ 0 70  # Ability: Find Herbs
@@ -2082,7 +2081,7 @@ E
 15 0 1.00 0
 E
 16 0 100.00 0
-I 6 3017 100.00 1  # FORAGE: a plump fig
+I 6 3017 75.00 1  # FORAGE: a plump fig
 S
 #62
 Jungle Copse~
@@ -2120,7 +2119,7 @@ E
 9 0 50.00 27
 E
 15 0 1.00 34
-I 6 3017 100.00 1  # FORAGE: a plump fig
+I 6 3017 75.00 1  # FORAGE: a plump fig
 I 20 135 100.00 1  # CHOP: a reaching sapling
 S
 #63
@@ -2211,7 +2210,7 @@ E
 9 0 50.00 27
 E
 15 0 1.00 34
-I 6 3017 100.00 1  # FORAGE: a plump fig
+I 6 3017 75.00 1  # FORAGE: a plump fig
 I 20 135 100.00 1  # CHOP: a reaching sapling
 S
 #70
@@ -2254,7 +2253,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3014 100.00 1  # FORAGE: some dry beans
+I 6 3014 75.00 1  # FORAGE: some dry beans
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 45.83 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -2300,7 +2299,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3014 100.00 1  # FORAGE: some dry beans
+I 6 3014 75.00 1  # FORAGE: some dry beans
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 45.83 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -2332,7 +2331,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3014 100.00 1  # FORAGE: some dry beans
+I 6 3014 75.00 1  # FORAGE: some dry beans
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 45.83 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -2386,7 +2385,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3014 100.00 1  # FORAGE: some dry beans
+I 6 3014 75.00 1  # FORAGE: some dry beans
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 45.83 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -2432,7 +2431,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3014 100.00 1  # FORAGE: some dry beans
+I 6 3014 75.00 1  # FORAGE: some dry beans
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 45.83 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -2465,7 +2464,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3014 100.00 1  # FORAGE: some dry beans
+I 6 3014 75.00 1  # FORAGE: some dry beans
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 45.83 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
@@ -2499,7 +2498,7 @@ I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 103 8.00 1 X  # DIG: a yellow lightning stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3014 100.00 1  # FORAGE: some dry beans
+I 6 3014 75.00 1  # FORAGE: some dry beans
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 45.83 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs

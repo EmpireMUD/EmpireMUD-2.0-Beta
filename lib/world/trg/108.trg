@@ -177,12 +177,6 @@ while %tries% > 0
   end
 done
 ~
-#10852
-Give Scythe~
-2 u 100
-~
-%load% obj 10856 %actor%
-~
 #10853
 Give Skinning Knife~
 2 u 100
@@ -219,15 +213,6 @@ elseif %direction% == north && !%actor.aff_flagged(SNEAK)%
   %send% %actor% You can't get there unless you're sneaking.
   return 0
 end
-~
-#10856
-Detect Harvest~
-1 c 3
-harvest~
-if %actor.room.crop%
-  %quest% %actor% trigger 10856
-end
-return 0
 ~
 #10857
 Start Blood Tutorial~

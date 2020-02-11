@@ -80,10 +80,10 @@ static int perform_sacrifice(char_data *ch, char_data *god, obj_data *obj, bool 
 			sprintf(buf1, "$n sacrifices $p to %s!", PERS(god, god, 1));
 			sprintf(buf2, "$n sacrifices $p to you!");
 		}
-		act(buf, TRUE, ch, obj, god, TO_CHAR);
-		act(buf1, TRUE, ch, obj, god, TO_NOTVICT);
+		act(buf, TRUE, ch, obj, god, TO_CHAR | TO_QUEUE);
+		act(buf1, TRUE, ch, obj, god, TO_NOTVICT | TO_QUEUE);
 		if (IN_ROOM(ch) == IN_ROOM(god) && ch != god)
-			act(buf2, TRUE, ch, obj, god, TO_VICT);
+			act(buf2, TRUE, ch, obj, god, TO_VICT | TO_QUEUE);
 	}
 	while (obj->contains) {
 		num += perform_sacrifice(ch, god, obj->contains, FALSE);

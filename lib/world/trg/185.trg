@@ -275,7 +275,7 @@ switch %random.4%
       set times 1
     end
     while %times% > 0
-      %load% mob 18507 %self% %self.level%
+      %load% mob 18507 ally %self.level%
       eval times %times% - 1
       set summon %self.room.people%
       if %summon.vnum% == 18507

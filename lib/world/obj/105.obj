@@ -6,8 +6,8 @@ Someone has dropped a glowing vegetable.~
 appears to be a magi-netically modified crop from the deranged druids of the
 Magiterranean.
 ~
-6 0 a 0 6
-6 0 0
+6 0 a 0 7
+1 0 0
 7 48
 I 14 10501 100.00 4 x  # COMBINE: a handful of glowkra pods
 M
@@ -26,8 +26,8 @@ You've heard they glow brighter when pickled. You also have a good recipe for
 seafood glowkra gumbo that just needs some magenta arrowfish and some rice.
 This strange crop is surely the work of the mad druids of the Magiterranean.
 ~
-6 b a 0 6
-24 10500 0
+6 b a 0 7
+12 10500 0
 7 168
 I 15 10500 100.00 4 x  # SEPARATE: a glowkra pod
 R
@@ -114,8 +114,8 @@ A handful of spadebrush seeds is scattered here.~
    These magi-netically modified seeds can be used to plant spadebrush, or as a
 light snack.
 ~
-6 b a 0 3
-3 10501 0
+6 b a 0 4
+1 10501 0
 0 48
 C
 0 1
@@ -281,8 +281,8 @@ growing a lot of them.
 
 Brew (Healing Elixirs): magic mushroom potion
 ~
-6 b a 0 9
-24 10505 0
+6 b a 0 10
+12 10505 0
 7 168
 B
 u
@@ -314,8 +314,8 @@ an unripe fig~
 An unripe fig is lying here.~
 This fig looks a little under-ripe, but it's strangely mushy.
 ~
-6 0 a 0 2
-6 0 0
+6 0 a 0 3
+1 0 0
 7 48
 S
 #10519
@@ -609,8 +609,8 @@ A bunch of rhubarb is piled on the ground.~
    These rhubarb stems are bright red, and fresh. There are some seeds
 intermixed in the bunch, so you could also plant them.
 ~
-6 b a 0 5
-24 10551 0
+6 b a 0 6
+12 10551 0
 7 168
 O
 9 bq
@@ -623,8 +623,8 @@ some arctic brambleberries~
 Some arctic brambleberries are scattered on the ground.~
 You can eat the berries.
 ~
-6 0 a 0 4
-6 0 0
+6 0 a 0 5
+2 0 0
 7 48
 O
 9 nq

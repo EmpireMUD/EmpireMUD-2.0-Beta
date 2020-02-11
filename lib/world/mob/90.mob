@@ -3,7 +3,7 @@ wolf snarling brown~
 a snarling wolf~
 A brown wolf snarls at you.
 ~
-20 40 adjo c 3
+20 40 djo c 3
 0 0 0 10
 D
    The wolf lowers its head, pulls back its ears, and bares its teeth and gums
@@ -27,7 +27,7 @@ wolf brown~
 a brown wolf~
 A brown wolf is sitting here.
 ~
-10 20 adjo c 3
+10 20 djo c 3
 0 0 0 10
 D
    The wolf has a brown coat, though you recognize that it's actually a grey
@@ -59,7 +59,7 @@ wolf small brown~
 a small wolf~
 A small, brown wolf is resting here.
 ~
-5 15 abdjo c 2
+5 15 bdjo c 2
 0 0 0 10
 D
    The wolf looks younger, probably an adolescent learning to hunt with its
@@ -97,9 +97,9 @@ D
 in a circle around you.
 ~
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
-I 2 1358 100.00 1  # SHEAR: a bag of wool
-I 2 1358 50.00 1  # SHEAR: a bag of wool
-I 2 1358 5.00 1  # SHEAR: a bag of wool
+I 2 1358 100.00 1  # SHEAR: a bag of sheep's wool
+I 2 1358 50.00 1  # SHEAR: a bag of sheep's wool
+I 2 1358 5.00 1  # SHEAR: a bag of sheep's wool
 M
 0
 $n eats some grass.~
@@ -1018,9 +1018,9 @@ I 0 9058 100.00 1  # BUTCHER: an enormous mammoth tusk
 I 0 9058 50.00 1  # BUTCHER: an enormous mammoth tusk
 I 1 1351 100.00 3  # SKIN: a large skin
 I 1 1351 75.00 1  # SKIN: a large skin
-I 2 1358 100.00 4  # SHEAR: a bag of wool
-I 2 1358 50.00 4  # SHEAR: a bag of wool
-I 2 1358 5.00 4  # SHEAR: a bag of wool
+I 2 1358 100.00 4  # SHEAR: a bag of sheep's wool
+I 2 1358 50.00 4  # SHEAR: a bag of sheep's wool
+I 2 1358 5.00 4  # SHEAR: a bag of sheep's wool
 I 3 304 100.00 1 X  # BARDE: an armored warmammoth
 S
 #9059

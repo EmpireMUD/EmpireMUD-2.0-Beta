@@ -3,7 +3,7 @@ goblin necromancer necrogoblin~
 the necrogoblin~
 The goblin necromancer is chanting here.
 ~
-125 200 adxB cd 2
+125 200 dxB cd 2
 1 0 0 20
 D
    The translucent flesh of this goblin is stretched over a skeleton with
@@ -52,7 +52,7 @@ skeleton warrior skeletal~
 a skeletal warrior~
 A skeletal warrior rattles here.
 ~
-125 200 acdhop cG 3
+125 200 cdhop cG 3
 0 0 22 15
 D
    This skeleton stands with no weapon in hand, but clearly ready to fight for
@@ -75,7 +75,7 @@ skeleton soldier skeletal~
 a skeletal soldier~
 A skeletal soldier rattles here.
 ~
-125 200 acdhopz cqG 3
+125 200 cdhopz cqG 3
 0 0 22 1
 D
    This skeleton stands with a simple but effective blade in hand, clearly

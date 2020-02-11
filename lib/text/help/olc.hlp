@@ -217,6 +217,9 @@ Crops (CROPEDIT):
   should usually use a 1x item for this interaction.
 - Orchard crops need a CHOP interaction if they will give trees. Orchards are
   still choppable without this, though.
+- Players foraging on any tile have a chance to find the forage item from any
+  wild crop in the area, if they get nothing back from the sector's own forage
+  list.
 
 Events (EVEDIT):
 - Use quests or scripts to give event points.
@@ -1478,7 +1481,7 @@ archetypes (character creation options). It provides a simple in-game menu with
 contextual choices to design any archetype.
 
 All commands in the editor are highlighted in yellow/green and placed inside
-<angle braces>. You can get help on these by typing: &yHELP ARCHEDIT <COMMMAND>&0
+<angle braces>. You can get help on these by typing: &yHELP ARCHEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -1631,7 +1634,7 @@ The .olc augment editor is a powerful tool for creating and editing augments
 contextual choices to design multiple types of augments.
 
 All commands in the editor are highlighted in yellow/green and placed inside
-<angle braces>. You can get help on these by typing &yHELP AUGEDIT <COMMMAND>&0
+<angle braces>. You can get help on these by typing &yHELP AUGEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -3687,7 +3690,7 @@ See also: MAPEDIT DELETE ROOM, MAP OLC
 
 Usage:  .map deleteroom ok
 
-This commmand deletes the room you are standing in. It only works on interior
+This command deletes the room you are standing in. It only works on interior
 (designated) rooms, and cannot be used out on the map. It will automatically
 delete any exits that link to the room you're in.
 
@@ -3946,7 +3949,9 @@ that you cannot remove flag #4 ISNPC -- this indicates the mob is an NPC.
 Never set a flag marked with an * (asterisk).
 
 Available mob flags:
- BRING-A-FRIEND - Assists any non-charmed mob in combat.
+ BRING-A-FRIEND - Assists any non-charmed mob in combat. Without this, mobs
+   will still assist other mobs in their same follow-chain if no players are
+   in the chain and if neither are charmed.
  SENTINEL - Stays in one room and never wanders.
  AGGR - Aggressive; will attack players.
  ISNPC - Is an NPC (this is always set).
@@ -4056,7 +4061,9 @@ Object interaction types:
 
 Room/vehicle interaction types:
  DIG - Items received when using the dig action.
- FORAGE - Items received when using the Forage ability.
+ FORAGE - Items received when using the Forage ability. Note that if the player
+   gets nothing from a sector's forage list, they may also receive a forage
+   item from any wild crop that grows in the area.
  PICK - Items found when picking.
  HARVEST - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
  GATHER - Items received from the gather action.
@@ -5654,7 +5661,7 @@ contextual choices to set up the recipe.
 
 All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
-  &yHELP CEDIT <COMMMAND>&0
+  &yHELP CEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -5835,7 +5842,7 @@ object.
 
 All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on these commands by typing:
-  &yHELP OEDIT <COMMMAND>&0
+  &yHELP OEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 
@@ -7099,7 +7106,7 @@ The .olc social editor is a tool for creating and editing social commands
 contextual choices to design all types of socials.
 
 All commands in the editor are highlighted in yellow/green and placed inside
-<angle braces>. You can get help on these by typing: &yHELP SOCEDIT <COMMMAND>&0
+<angle braces>. You can get help on these by typing: &yHELP SOCEDIT <COMMAND>&0
 
 You can close an open editor with .abort or .save.
 

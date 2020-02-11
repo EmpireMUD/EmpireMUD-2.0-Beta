@@ -77,7 +77,7 @@ struct empire_territory_data *create_territory_entry(empire_data *emp, room_data
 void decustomize_room(room_data *room);
 room_vnum find_free_vnum();
 room_data *get_extraction_room();
-crop_data *get_potential_crop_for_location(room_data *location);
+crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 void ruin_one_building(room_data *room);
@@ -143,7 +143,6 @@ void change_chop_territory(room_data *room) {
 * @param sector_vnum sect Any sector vnum
 */
 void change_terrain(room_data *room, sector_vnum sect) {
-	extern crop_data *get_potential_crop_for_location(room_data *location);
 	void lock_icon(room_data *room, struct icon_data *use_icon);
 	
 	sector_data *old_sect = SECT(room), *st = sector_proto(sect);
@@ -190,7 +189,10 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	
 	// need to determine a crop?
 	if (!new_crop && SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
-		new_crop = get_potential_crop_for_location(room);
+		new_crop = get_potential_crop_for_location(room, FALSE);
+		if (!new_crop) {
+			new_crop = crop_table;
+		}
 	}
 		
 	// need room data?
@@ -1052,8 +1054,8 @@ void annual_update_depletions(struct depletion_data **list) {
 	struct depletion_data *dep, *next_dep;
 	
 	LL_FOREACH_SAFE(*list, dep, next_dep) {
-		// halve each year
-		dep->count /= 2;
+		// quarter each year
+		dep->count /= 4;
 
 		if (dep->count < 10) {
 			// at this point just remove it to save space, or it will take years to hit 0
@@ -1143,8 +1145,8 @@ void annual_update_map_tile(struct map_data *tile) {
 		}
 	}
 	
-	// 33% chance that unclaimed non-wild crops vanish
-	if (tile->crop_type && (!room || !ROOM_OWNER(room)) && CROP_FLAGGED(tile->crop_type, CROPF_NOT_WILD) && !number(0, 2)) {
+	// 33% chance that unclaimed non-wild crops vanish, 2% chance of wild crops vanishing
+	if (tile->crop_type && (!room || !ROOM_OWNER(room)) && ((!CROP_FLAGGED(tile->crop_type, CROPF_NOT_WILD) && !number(0, 49)) || (CROP_FLAGGED(tile->crop_type, CROPF_NOT_WILD) && !number(0, 2)))) {
 		if (!room) {	// load room if needed
 			room = real_room(tile->vnum);
 		}
@@ -1322,6 +1324,7 @@ void annual_world_update(void) {
 * @return int 1 if the tile was naturalized (for counting), 0 if not.
 */
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
+	crop_data *new_crop;
 	room_data *room;
 	
 	// simple checks
@@ -1364,7 +1367,8 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 		
 		if (SECT_FLAGGED(tile->natural_sector, SECTF_HAS_CROP_DATA)) {
 			room = real_room(tile->vnum);	// need it loaded after all
-			set_crop_type(room, get_potential_crop_for_location(room));
+			new_crop = get_potential_crop_for_location(room, FALSE);
+			set_crop_type(room, new_crop ? new_crop : crop_table);
 		}
 		else {
 			tile->crop_type = NULL;
@@ -3162,9 +3166,10 @@ int get_main_island(empire_data *emp) {
 * for the purposes of spawning fresh crops. This is only an approximation.
 * 
 * @param room_data *location The location to pick a crop for.
-* @return crop_data* Any crop.
+* @param bool must_have_forage If TRUE, only crops with a forage interaction can be chosen.
+* @return crop_data* Any crop, or NULL if it can't find one.
 */
-crop_data *get_potential_crop_for_location(room_data *location) {
+crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage) {
 	int x = X_COORD(location), y = Y_COORD(location);
 	bool water = find_flagged_sect_within_distance_from_room(location, SECTF_FRESH_WATER, NOBITS, config_get_int("water_crop_distance"));
 	bool x_min_ok, x_max_ok, y_min_ok, y_max_ok;
@@ -3193,6 +3198,11 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 		if (CROP_FLAGGED(crop, CROPF_NOT_WILD)) {
 			continue;	// must be wild
 		}
+
+		if (must_have_forage && !has_interaction(GET_CROP_INTERACTIONS(crop), INTERACT_FORAGE)) {
+			continue;
+		}
+
 		if (CROP_FLAGGED(crop, CROPF_NO_NEWBIE | CROPF_NEWBIE_ONLY)) {
 			if (!isle) {
 				isle = GET_ISLAND(location);
@@ -3221,13 +3231,7 @@ crop_data *get_potential_crop_for_location(room_data *location) {
 		}
 	}
 	
-	if (!found) {
-		// not found? possibly just bad configs -- default to first in table
-		log("SYSERR: get_potential_crop_for_location unable to determine a crop for #%d", GET_ROOM_VNUM(location));
-		found = crop_table;
-	}
-	
-	return found;
+	return found;	// if any
 }
 
 

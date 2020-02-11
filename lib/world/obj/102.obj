@@ -211,11 +211,9 @@ Filks's firebranded bow~
 A firebranded bow is lying here.~
 The bow appears to be goblincraft.
 ~
-20 eimp ap 0 2
+20 eimp ap 0 3
 29 1 0
 0 0
-A
-17 1 0
 C
 50 150
 S
@@ -385,8 +383,8 @@ A pineapple is sitting on the ground.~
    You can eat this succulent tropical fruit, or plant it. You'll have to plant
 it on partially-cleared jungle.
 ~
-6 bl a 0 2
-24 10225 0
+6 bl a 0 3
+12 10225 0
 7 168
 O
 9 fnr
@@ -399,8 +397,8 @@ an agave heart~
 An agave heart is lying here.~
 You can eat this heart of the agave plant, or replant it.
 ~
-6 bl a 0 1
-24 10226 0
+6 bl a 0 2
+12 10226 0
 7 168
 R
 5116 0
@@ -412,8 +410,8 @@ Some cactus pads are stacked here.~
    These cactus pads are edible, since they've been despined. They can also be
 used to plant more.
 ~
-6 bl a 0 1
-24 10227 0
+6 bl a 0 2
+6 10227 0
 7 168
 R
 5114 0
@@ -424,8 +422,8 @@ a cactus fruit~
 A cactus fruit is lying here.~
 This little red fruit came from a cactus, and it looks sweet.
 ~
-6 0 a 0 1
-6 0 0
+6 0 a 0 2
+1 0 0
 7 48
 S
 #10230
@@ -446,8 +444,8 @@ some desert dandelions~
 Some desert dandelions have been left here.~
 These plants, though not delicious, are still edible.
 ~
-6 0 a 0 1
-6 0 0
+6 0 a 0 2
+1 0 0
 7 48
 S
 #10232

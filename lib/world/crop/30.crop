@@ -118,6 +118,7 @@ A Potato Field~
 D0
 nnnn~
 &g~
+I 6 3064 100.00 1  # FORAGE: a raw potato
 I 8 3036 20.00 2 H  # HARVEST: a sack of potatoes
 I 8 3036 20.00 3 H  # HARVEST: a sack of potatoes
 I 8 3036 20.00 4 H  # HARVEST: a sack of potatoes
@@ -255,6 +256,7 @@ D0
 D0
 &to&?^^^~
 &Y~
+I 6 3065 100.00 1  # FORAGE: some red berries
 I 8 3045 20.00 2 H  # HARVEST: a sack of coffee beans
 I 8 3045 20.00 3 H  # HARVEST: a sack of coffee beans
 I 8 3045 20.00 4 H  # HARVEST: a sack of coffee beans
@@ -269,7 +271,7 @@ A Field of Oats~
 D0
 iiii~
 &T~
-I 6 3003 100.00 1  # FORAGE: a handful of grain
+I 6 3066 100.00 1  # FORAGE: a handful of grain
 I 8 3342 100.00 1  # HARVEST: a bale of straw
 I 8 3046 20.00 2 H  # HARVEST: a sack of oats
 I 8 3046 20.00 3 H  # HARVEST: a sack of oats
@@ -312,6 +314,7 @@ owow~
 D0
 wowo~
 &G~
+I 6 3067 100.00 1  # FORAGE: a small watermelon
 I 8 3047 20.00 2 H  # HARVEST: a single ripe watermelon
 I 8 3047 20.00 3 H  # HARVEST: a single ripe watermelon
 I 8 3047 20.00 4 H  # HARVEST: a single ripe watermelon

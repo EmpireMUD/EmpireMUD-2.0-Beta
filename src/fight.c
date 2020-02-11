@@ -2795,7 +2795,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 void check_auto_assist(char_data *ch) {
 	void perform_rescue(char_data *ch, char_data *vict, char_data *from, int msg);
 	
-	char_data *ch_iter, *next_iter, *iter_master;
+	char_data *ch_iter, *next_iter, *iter_master, *top_ch, *top_iter;
 	bool assist;
 	
 	// sanity
@@ -2836,14 +2836,31 @@ void check_auto_assist(char_data *ch) {
 		if (!IS_NPC(ch_iter) && in_same_group(ch, ch_iter)) {
 			// party assist
 			assist = TRUE;
-		}		
-		else if (IS_NPC(ch) && IS_NPC(ch_iter) && MOB_FLAGGED(ch_iter, MOB_BRING_A_FRIEND) && !AFF_FLAGGED(ch_iter, AFF_CHARM) && !AFF_FLAGGED(ch, AFF_CHARM)) {
-			// BAF (if both are NPCs and neither is charmed)
-			assist = TRUE;
 		}
 		else if (iter_master == ch && AFF_FLAGGED(ch_iter, AFF_CHARM)) {
 			// charm
 			assist = TRUE;
+		}
+		else if (IS_NPC(ch) && IS_NPC(ch_iter) && !AFF_FLAGGED(ch_iter, AFF_CHARM) && !AFF_FLAGGED(ch, AFF_CHARM)) {
+			// BAF (if both are NPCs and neither is charmed)
+			if (MOB_FLAGGED(ch_iter, MOB_BRING_A_FRIEND)) {
+				assist = TRUE;
+			}
+			else if (ch->master || ch_iter->master) {	// if not BAF, still assist if in the same follow chain without players
+				// check same follow chain
+				top_ch = ch;
+				while (top_ch->master && IS_NPC(top_ch)) {
+					top_ch = top_ch->master;
+				}
+				top_iter = ch_iter;
+				while (top_iter->master && IS_NPC(top_iter)) {
+					top_iter = top_iter->master;
+				}
+				if (top_ch == top_iter && IS_NPC(top_ch)) {
+					// found same follow chain AND no players in that chain
+					assist = TRUE;
+				}
+			}
 		}
 		
 		// if we got this far and hit an assist condition

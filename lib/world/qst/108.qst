@@ -1182,50 +1182,6 @@ W
 Z
 1 10855
 S
-#10856
-Empire: Early Harvest~
-   The Spirit of Progress wants to teach you to harvest crops, an essential
-step in building your empire. Harvesting is a good way to gain Empire skill at
-low levels, and will provide you with food or raw materials. You are provided a
-stone scythe for this quest, but most sharp weapons can be used to harvest.
- 1. Go out onto the map and find a crop tile like a wheat field or
-    a patch of vegetables. Orchards won't work for this, since they
-    use 'pick' instead of 'harvest'.
- 2. Wield your scythe or other sharp weapon.
- 3. Type 'harvest'. It will take a minute to finish.
- 4. Return to the Spirit of Progress when you've harvested a crop.
-~
-You have satisfied the Spirit of Progress.
-~
-14 a 0 25 -1
-A
-1 10856
-P
-0 10850 0 1 a
-P
-10 1 0 49 a
-P
-9 1 0 1 a
-R
-5 1 1
-R
-0 0 1
-R
-8 10852 1
-R
-6 10859 1
-R
-6 10860 1
-R
-6 10865 10865
-T 10852
-W
-10 1 0 49 a
-W
-11 0 0 1 a
-Z
-1 10856
-S
 #10857
 Vampire: Feed On Blood~
    The Spirit of Blood wants you to feed on a living creature to refill your
@@ -1360,8 +1316,6 @@ P
 6 10801 0 1 a
 P
 6 10802 0 1 a
-P
-0 10856 0 1 a
 R
 6 10801 1
 W

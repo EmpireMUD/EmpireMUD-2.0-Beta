@@ -43,6 +43,8 @@ M
 9002 5.00 a
 M
 9214 5.00 0
+M
+9235 5.00 a
 S
 #3
 Temperate (all) Spawns - South~
@@ -113,6 +115,8 @@ M
 9044 1.00 k
 M
 9134 5.00 b
+M
+9231 2.00 0
 S
 #20
 Temperate Forest Spawns - Everywhere~
@@ -281,65 +285,53 @@ M
 9105 15.00 b
 S
 #50
-Desert Spawns - All hours~
-3 0 k mop 0-0 d
+Desert Continent Spawns - All hours~
+3 0 k mop 0-0 dk
 E
 -1 100.00
 0 0 0
 M
 9040 0.01 0
 M
-9055 0.01 0
-M
-9066 0.02 0
-M
 9018 5.00 0
 M
-9119 5.00 0
+9119 5.00 g
 M
 9042 5.00 0
 M
-9121 5.00 0
+9121 5.00 g
 M
 9123 5.00 0
 M
 9128 5.00 0
 M
-9131 5.00 0
+9231 3.00 h
 S
 #51
-Desert Spawns - Day~
-3 0 k mop 0-0 bd
+Desert Continent Spawns - Day~
+3 0 k mop 0-0 bdk
 E
 -1 100.00
 0 0 0
 M
-9044 1.00 k
+9044 1.00 0
 M
 9124 5.00 0
 M
 9125 5.00 0
-M
-9126 5.00 0
 M
 9122 5.00 0
 M
 9027 15.00 0
 M
 9117 5.00 0
-M
-9127 5.00 0
 S
 #52
-Desert Spawns - Night~
-3 0 k mop 0-0 ad
+Desert Continent Spawns - Night~
+3 0 k mop 0-0 adk
 E
 -1 100.00
 0 0 0
-M
-9059 0.02 0
-M
-9064 0.90 0
 M
 9116 15.00 0
 M
@@ -350,6 +342,91 @@ M
 9129 15.00 0
 M
 9130 15.00 0
+S
+#53
+Desert Island Spawns - North~
+3 0 k mop 0-0 dgl
+E
+-1 100.00
+0 0 0
+M
+9119 5.00 0
+M
+9121 5.00 0
+M
+9123 5.00 0
+M
+9128 5.00 0
+M
+9125 5.00 b
+M
+9122 5.00 b
+M
+9117 5.00 b
+M
+9120 15.00 a
+M
+9129 15.00 a
+M
+9130 15.00 a
+M
+9018 5.00 0
+M
+9116 15.00 a
+M
+9040 0.01 0
+S
+#54
+Desert Island Spawns - South~
+3 0 k mop 0-0 dhl
+E
+-1 100.00
+0 0 0
+M
+9230 0.02 0
+M
+9227 5.00 0
+M
+9226 7.50 b
+M
+9229 4.00 0
+M
+9225 5.00 b
+M
+9224 5.00 0
+M
+9223 10.00 0
+M
+9222 5.00 0
+M
+9115 15.00 a
+M
+9228 15.00 b
+M
+9221 5.00 b
+M
+9220 10.00 0
+S
+#55
+Desert Spawns - Anywhere~
+3 0 k mop 0-0 d
+E
+-1 100.00
+0 0 0
+M
+9055 0.01 0
+M
+9059 0.02 a
+M
+9064 0.90 a
+M
+9066 0.02 0
+M
+9131 5.00 0
+M
+9126 5.00 b
+M
+9127 5.00 b
 S
 #60
 Ocean Spawns~
@@ -473,6 +550,8 @@ M
 9045 10.00 h
 M
 9143 10.00 h
+M
+9233 2.00 g
 S
 #88
 Cold Spawns - North~

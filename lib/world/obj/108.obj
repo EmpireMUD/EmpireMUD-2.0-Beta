@@ -146,22 +146,6 @@ C
 0 1
 Q 10853
 S
-#10856
-scythe stone~
-a stone scythe~
-A stone scythe is lying on the ground.~
-   This flaked stone scythe looks like it won't last very long, but it should
-be good for at least one harvest. Wield the scythe and type 'harvest' on a crop
-tile.
-~
-1 0 an d 4
-0 1 1
-1 0
-C
-0 1
-Q 10856
-T 10856
-S
 #10859
 bell spirit~
 a spirit bell~

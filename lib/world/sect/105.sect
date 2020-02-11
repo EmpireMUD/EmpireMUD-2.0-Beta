@@ -1,7 +1,7 @@
 #10550
 Frozen River~
 A Frozen River~
-'~' 2 0 25 0 0
+'~' 2 f 25 0 0
 D0
 ~~~~~
 &W~
@@ -25,7 +25,7 @@ S
 #10551
 Frozen Estuary~
 A Frozen Estuary~
-'~' 2 0 25 0 0
+'~' 2 f 25 0 0
 D0
 ~~~~~
 &W~
@@ -49,7 +49,7 @@ S
 #10552
 Frozen Canal~
 A Frozen Canal~
-'~' 2 0 25 0 0
+'~' 2 f 25 0 0
 D0
 ~~~~~
 &W~
@@ -73,7 +73,7 @@ S
 #10553
 Frozen Lake~
 A Frozen Lake~
-'~' 2 0 25 0 0
+'~' 2 f 25 0 0
 D0
 ~~~~~
 &W~
@@ -97,7 +97,7 @@ S
 #10562
 Thin Evergreen Forest~
 A Thin Evergreen Forest~
-'.' 33 jq 3 dl np
+'.' 33 fjq 3 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -120,15 +120,13 @@ E
 9 0 50.00 10563
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
+I 6 10552 75.00 1  # FORAGE: some arctic brambleberries
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 100.00 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: a small flower
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 10558 100.00 1  # CHOP: a spruce tree
-M
-9154 10.00 bc
 M
 10556 5.00 0
 M
@@ -139,7 +137,7 @@ S
 #10563
 Evergreen Forest~
 An Evergreen Forest~
-'^' 33 jq 4 dl np
+'^' 33 fjq 4 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -186,15 +184,13 @@ E
 9 0 50.00 10564
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
+I 6 10552 75.00 1  # FORAGE: some arctic brambleberries
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 100.00 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: a small flower
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 10558 100.00 1  # CHOP: a spruce tree
-M
-9154 10.00 bc
 M
 10556 5.00 0
 M
@@ -205,7 +201,7 @@ S
 #10564
 Overgrown Evergreen Forest~
 An Overgrown Evergreen Forest~
-'^' 33 jq 5 dl np
+'^' 33 fjq 5 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -228,15 +224,13 @@ E
 9 0 50.00 10565
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
+I 6 10552 75.00 1  # FORAGE: some arctic brambleberries
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 100.00 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: a small flower
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 10558 100.00 1  # CHOP: a spruce tree
-M
-9154 10.00 bc
 M
 10556 5.00 0
 M
@@ -247,7 +241,7 @@ S
 #10565
 Thick Evergreen Forest~
 A Thick Evergreen Forest~
-'^' 33 jq 6 dl dnp
+'^' 33 fjq 6 dl dnp
 C
 chop, dig, gather, pick~
 D1
@@ -266,15 +260,13 @@ E
 0 1 100.00 10564
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 10552 100.00 1  # FORAGE: some arctic brambleberries
+I 6 10552 75.00 1  # FORAGE: some arctic brambleberries
 I 7 1206 8.33 1 p  # PICK: an iridescent blue iris
 I 7 1201 100.00 1 p  # PICK: a sack of fiveleaf
 I+ 0 70  # Ability: Find Herbs
 I 7 123 100.00 1 p  # PICK: a small flower
 I 9 121 100.00 1  # GATHER: some sticks and leaves
 I 20 10558 100.00 1  # CHOP: a spruce tree
-M
-9154 10.00 bc
 M
 10556 5.00 0
 M
@@ -285,7 +277,7 @@ S
 #10566
 Stumps~
 A Field of Stumps~
-'.' 10 j 2 dl bp
+'.' 10 fj 2 dl bp
 C
 burn stumps, dig~
 D1
@@ -320,9 +312,7 @@ E
 16 0 100.00 0
 I 5 10552 9.00 1 X  # DIG: some arctic brambleberries
 I 5 100 100.00 1 X  # DIG: a rock
-I 6 3013 100.00 1  # FORAGE: a handful of nuts
-M
-9154 10.00 bc
+I 6 3013 75.00 1  # FORAGE: a handful of nuts
 M
 10556 5.00 0
 M
