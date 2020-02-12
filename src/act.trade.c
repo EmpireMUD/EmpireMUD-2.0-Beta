@@ -40,6 +40,7 @@ extern struct gen_craft_data_t gen_craft_data[];
 extern const char *tool_flags[];
 
 // external functions
+INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 extern bool has_cooking_fire(char_data *ch);
@@ -879,7 +880,7 @@ void finish_gen_craft(char_data *ch) {
 	char lbuf[MAX_INPUT_LENGTH];
 	struct resource_data *res;
 	ability_data *cft_abil;
-	obj_data *obj = NULL;
+	obj_data *proto, *temp_obj, *obj = NULL;
 	int iter, amt = 1;
 	
 	cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(type));
@@ -972,10 +973,22 @@ void finish_gen_craft(char_data *ch) {
 		gain_ability_exp(ch, ABIL_MASTERY_ABIL(cft_abil), 33.4);
 	}
 	
+	// remove 'produced' amounts from the empire now, if applicable
 	if (CRAFT_FLAGGED(type, CRAFT_REMOVE_PRODUCTION) && GET_LOYALTY(ch)) {
-		// remove 'produced' amounts from the empire now
 		LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
 			add_production_total(GET_LOYALTY(ch), res->vnum, -(res->amount));
+		}
+	}
+	
+	// check for consumes-to on the resources
+	LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
+		if ((proto = obj_proto(res->vnum)) && has_interaction(proto->interactions, INTERACT_CONSUMES_TO)) {
+			temp_obj = read_object(res->vnum, FALSE);
+			obj_to_char(temp_obj, ch);
+			for (iter = 0; iter < res->vnum; ++iter) {
+				run_interactions(ch, temp_obj->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, temp_obj, consumes_or_decays_interact);
+			}
+			extract_obj(temp_obj);
 		}
 	}
 	
