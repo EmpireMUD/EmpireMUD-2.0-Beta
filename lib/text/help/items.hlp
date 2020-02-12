@@ -626,6 +626,11 @@ If you don't have the "storage" empire privilege, you can't retrieve items
 If you're visiting another empire, you can store and retrieve your own items
 on credit from their public (or allied) buildings, IF you have a trade pact.
 
+If the item you retrieve can't be picked up, it will end up on the ground in
+the room. You can only retrieve one such item at a time; if you're trying to
+retrieve more than one thing, it will stop when it reaches one that goes to
+the ground.
+
 See also: STORE, INVENTORY, DIPLOMACY, WAREHOUSE
 #
 ROCKS "ROCK COMPONENT"
