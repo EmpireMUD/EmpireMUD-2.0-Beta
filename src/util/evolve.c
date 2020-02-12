@@ -657,7 +657,7 @@ void load_base_map(void) {
 	char line[256], line2[256], error_buf[MAX_STRING_LENGTH], *tmp;
 	struct map_t *map, *last = NULL, *last_land = NULL;
 	struct room_extra_data *red;
-	int var[7], x, y;
+	int var[7], x, y, type;
 	FILE *fl;
 	
 	// init
@@ -750,7 +750,8 @@ void load_base_map(void) {
 						break;
 					}
 					
-					HASH_FIND_INT(last->extra, &var[0], red);
+					type = var[0];
+					HASH_FIND_INT(last->extra, &type, red);
 					if (!red) {
 						CREATE(red, struct room_extra_data, 1);
 						red->type = var[0];
@@ -758,7 +759,7 @@ void load_base_map(void) {
 					}
 					red->value = var[1];
 					
-					printf("Debug read: %d %d / %d %d", var[0], red->type, var[1], red->value);
+					//printf("Debug read: %d %d / %d %d", var[0], red->type, var[1], red->value);
 					break;
 				}
 			}
@@ -925,6 +926,7 @@ time_t get_sector_time(struct map_t *tile) {
 	struct room_extra_data *red;
 	int type = ROOM_EXTRA_SECTOR_TIME;
 	HASH_FIND_INT(tile->extra, &type, red);
+	printf("Debug time: %d: %s %d", tile->vnum, red ? "found" : "not-found", red->value);
 	return red ? red->value : 0;
 }
 
