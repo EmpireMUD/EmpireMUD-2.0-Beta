@@ -163,7 +163,7 @@ void check_sector_times(any_vnum only_sect) {
 		
 		log("Debug: Checking sector times for %d %s / %d %d %d", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), only_sect, idx->vnum, idx->sect_count);
 		
-		LL_FOREACH(idx->sect_rooms, map) {
+		LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
 			log("Debug: Checking %d %d", map->vnum, GET_SECT_VNUM(map->sector_type));
 			if (map->sector_type == sect && get_extra_data(map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME) <= 0) {
 				// missing time -- set now
