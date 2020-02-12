@@ -5769,7 +5769,7 @@ void obj_to_char_if_okay(obj_data *obj, char_data *ch) {
 * @param char_data *ch The person to try to give it to.
 */
 void obj_to_char_or_room(obj_data *obj, char_data *ch) {
-	if (!CAN_WEAR(obj, ITEM_WEAR_TAKE) || (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj) && IN_ROOM(ch))) {
+	if (IN_ROOM(ch) && (!CAN_WEAR(obj, ITEM_WEAR_TAKE) || (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)))) {
 		// bind it to the player anyway, as if they received it, if it's BoP
 		if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP)) {
 			bind_obj_to_player(obj, ch);
