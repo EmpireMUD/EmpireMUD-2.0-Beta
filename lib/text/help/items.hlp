@@ -117,7 +117,7 @@ Available generic components:
  &cblock&0 - building materials like bricks or blocks
  &cclay&0 - moldable clay
  &cdye&0 - any kind of dye
- &cfeathers&0 - not currently used
+ &cfeathers&0 - not currently used (use fibers instead)
  &cfibers&0 - cotton, straw, etc.
  &cflour&0 - ground up grains
  &cfruit&0 - for cooking
@@ -140,6 +140,8 @@ Available generic components:
  &ctextile&0 - cloth or fabric for crafting
  &cvegetable&0 - for cooking
  &crope&0 - for construction and harnessing animals
+ &cpaint&0 - for painting houses
+ &cwax&0 - for candle-making
 
 See also: COMPONENT
 #
@@ -998,5 +1000,16 @@ Note: Immortals can see the warehouse lists for other empires using the syntax
 "warehouse inv <empire> [keywords]".
 
 See also: KEEP, RETRIEVE, STORE, VAULT
+#
+WAX "WAX COMPONENT"
+
+Wax (component)
+
+Used for:  candle-making
+
+Types of wax:
+  beeswax - from beehives or apiaries
+
+See also: COMPONENT
 #
 $

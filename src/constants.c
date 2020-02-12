@@ -2449,6 +2449,7 @@ const char *component_types[] = {
 	"vegetable",
 	"rope",
 	"paint",
+	"wax",	// 30
 	"\n"
 };
 

@@ -1592,6 +1592,7 @@ typedef struct vehicle_data vehicle_data;
 #define CMP_VEGETABLE  27
 #define CMP_ROPE  28
 #define CMP_PAINT  29
+#define CMP_WAX  30
 
 
 // CMPF_x: component flags

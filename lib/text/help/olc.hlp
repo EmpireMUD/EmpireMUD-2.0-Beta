@@ -4797,6 +4797,7 @@ Available components (common flags listed in parentheses):
  &cvegetable&0 - for cooking
  &crope&0 - for construction and harnessing animals
  &cpaint&0 - for painting buildings
+ &cwax&0 - for making candles
 
 See also: COMPONENT FLAGS, SHOW COMPONENTS
 #d
