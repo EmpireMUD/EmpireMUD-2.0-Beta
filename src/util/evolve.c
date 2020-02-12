@@ -757,6 +757,8 @@ void load_base_map(void) {
 						HASH_ADD_INT(last->extra, type, red);
 					}
 					red->value = var[1];
+					
+					printf("Debug read: %d %d / %d %d", var[0], red->type, var[1], red->value);
 					break;
 				}
 			}
