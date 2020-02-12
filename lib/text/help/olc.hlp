@@ -2365,6 +2365,9 @@ Available flags:
  BLD-UPGRADED - requires being at a building with the UPGRADED flag
  LEARNED - requires the player/empire 'learn' a recipe to use it
  BY-RIVER - must be adjacent to a river
+ REMOVE-PRODUCTION - removes this craft's resources from empire production
+    counts. Used e.g. in smelting copper bars, to prevent smelt/separate loops.
+    Does not work on vehicles/buildings.
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d

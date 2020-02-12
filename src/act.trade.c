@@ -877,6 +877,7 @@ void finish_gen_craft(char_data *ch) {
 	bool applied_master = FALSE, is_master = FALSE;
 	int num = GET_ACTION_VNUM(ch, 2);
 	char lbuf[MAX_INPUT_LENGTH];
+	struct resource_data *res;
 	ability_data *cft_abil;
 	obj_data *obj = NULL;
 	int iter, amt = 1;
@@ -969,6 +970,13 @@ void finish_gen_craft(char_data *ch) {
 	// master?
 	if (is_master && applied_master) {
 		gain_ability_exp(ch, ABIL_MASTERY_ABIL(cft_abil), 33.4);
+	}
+	
+	if (CRAFT_FLAGGED(type, CRAFT_REMOVE_PRODUCTION) && GET_LOYALTY(ch)) {
+		// remove 'produced' amounts from the empire now
+		LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
+			add_production_total(GET_LOYALTY(ch), res->vnum, -(res->amount));
+		}
 	}
 	
 	// free the stored action resources now -- we no longer risk refunding them
@@ -1504,7 +1512,6 @@ ACMD(do_gen_craft) {
 	vehicle_data *veh;
 	bool is_master;
 	obj_data *found_obj = NULL, *drinkcon = NULL;
-	struct resource_data *res;
 	ability_data *cft_abil;
 	
 	if (IS_NPC(ch)) {
@@ -1702,13 +1709,6 @@ ACMD(do_gen_craft) {
 		
 		// must call this after start_action() because it stores resources
 		extract_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), &GET_ACTION_RESOURCES(ch));
-		
-		if (CRAFT_FLAGGED(type, CRAFT_REMOVE_PRODUCTION) && GET_LOYALTY(ch)) {
-			// remove 'produced' amounts from the empire now
-			LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
-				add_production_total(GET_LOYALTY(ch), res->vnum, -(res->amount));
-			}
-		}
 		
 		msg_to_char(ch, "You start %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		sprintf(buf, "$n starts %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
