@@ -6615,10 +6615,10 @@ ACMD(do_split) {
 ACMD(do_store) {
 	char buf[MAX_STRING_LENGTH];
 	struct empire_storage_data *store;
-	obj_data *obj, *next_obj;
-	int count = 0, total = 1, done = 0, dotmode;
+	obj_data *obj, *next_obj, *lists[2];
+	int count = 0, total = 1, done = 0, dotmode, iter;
 	empire_data *emp, *room_emp = ROOM_OWNER(IN_ROOM(ch));
-	bool full = 0;
+	bool full = 0, use_room = FALSE;
 
 	if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You'll need to finish the building first.\r\n");
@@ -6659,6 +6659,11 @@ ACMD(do_store) {
 		return;
 	}
 
+	// set up search lists for "all" modes
+	lists[0] = ch->carrying;
+	use_room = (ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch));
+	lists[1] = use_room ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+	
 	dotmode = find_all_dots(arg);
 
 	if (dotmode == FIND_ALL) {
@@ -6666,17 +6671,19 @@ ACMD(do_store) {
 			send_to_char("You don't seem to be carrying anything.\r\n", ch);
 			return;
 		}
-		for (obj = ch->carrying; obj; obj = next_obj) {
-			next_obj = obj->next_content;
+		for (iter = 0; iter < 2; ++iter) {
+			for (obj = lists[iter]; obj; obj = next_obj) {
+				next_obj = obj->next_content;
 			
-			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), FALSE)) {
-				if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
-					if (store->amount >= MAX_STORAGE) {
-						full = 1;
+				if (!OBJ_FLAGGED(obj, OBJ_KEEP) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), FALSE)) {
+					if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
+						if (store->amount >= MAX_STORAGE) {
+							full = 1;
+						}
 					}
-				}
-				if (!full) {
-					done += store_resource(ch, emp, obj);
+					if (!full) {
+						done += store_resource(ch, emp, obj);
+					}
 				}
 			}
 		}
@@ -6699,12 +6706,15 @@ ACMD(do_store) {
 			msg_to_char(ch, "What do you want to store all of?\r\n");
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!use_room || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))) {
 			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
 			return;
 		}
 		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
-			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+			// try to set up next-obj
+			if (!(next_obj = get_obj_in_list_vis(ch, arg, obj->next_content)) && use_room) {
+				next_obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)));
+			}
 			
 			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), FALSE)) {
 				if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {

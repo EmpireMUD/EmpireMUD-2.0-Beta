@@ -758,7 +758,8 @@ Usage:  store <item>
 
 It is recommended that you keep most of your extra resources stored. Items left
 on the ground in claimed territory will eventually be stored by the empire's
-citizens. Drink containers are usually emptied out when you store them.
+citizens. Drink containers are usually emptied out when you store them. Items
+can be stored from your inventory or from the ground.
 
 If you don't have the "storage" empire privilege, you can store items, but
 can't retrieve them.
