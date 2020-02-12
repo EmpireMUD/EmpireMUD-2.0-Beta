@@ -761,7 +761,7 @@ void load_base_map(void) {
 					red->value = var[1];
 					
 					if (red->type == ROOM_EXTRA_SECTOR_TIME) {
-						printf("Debug read: %d %d / %d %d\n", var[0], red->type, var[1], red->value);
+						printf("Debug read: %d %d %d\n", last->vnum, red->type, red->value);
 					}
 					break;
 				}
