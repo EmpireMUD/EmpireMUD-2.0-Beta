@@ -1007,14 +1007,14 @@ Note: Immortals can see the warehouse lists for other empires using the syntax
 
 See also: KEEP, RETRIEVE, STORE, VAULT
 #
-WAX "WAX COMPONENT"
+WAX "WAX COMPONENT" BEESWAX "BEES WAX"
 
 Wax (component)
 
 Used for:  candle-making
 
 Types of wax:
-  beeswax - from beehives or apiaries
+  beeswax (basic) - from beehives or apiaries
 
 See also: COMPONENT
 #
