@@ -132,6 +132,7 @@ void evolve_one(struct map_t *tile) {
 	
 	// run some evolutions!
 	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_TIMED)) && time(0) <= get_sector_time(tile) + evo->value * SECS_PER_REAL_MIN) {
+		printf("Debug evo: %d time=%ld sect-time=%ld delay=%d/%d\n", tile->vnum, time(0), get_sector_time(tile), evo->value, evo->value * SECS_PER_REAL_MIN);
 		become = evo->becomes;
 	}
 	
