@@ -148,17 +148,20 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 void check_sector_times(any_vnum only_sect) {
 	struct sector_index_type *idx, *next_idx;
 	struct map_data *map;
+	sector_data *sect;
 	
 	HASH_ITER(hh, sector_index, idx, next_idx) {
 		if (only_sect != NOTHING && only_sect != idx->vnum) {
 			continue;	// skip others if 'only' 1
 		}
-		if (idx->sect_count < 1) {
+		if (idx->sect_count < 1 || !(sect = sector_proto(idx->vnum))) {
 			continue;	// no work
 		}
-		if (!has_evolution_type(sector_proto(idx->vnum), EVO_TIMED)) {
+		if (!has_evolution_type(sect, EVO_TIMED)) {
 			continue;	// only looking for missing timers
 		}
+		
+		log("Debug: Checking sector times for %d %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
 		
 		LL_FOREACH(idx->sect_rooms, map) {
 			if (get_extra_data(map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME) <= 0) {
