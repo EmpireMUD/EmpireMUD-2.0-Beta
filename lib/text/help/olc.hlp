@@ -2008,7 +2008,7 @@ Available functions:
  DIGGING - triggers the workforce digging chore (also need interaction)
  DOCKS - grants the seaport tech to the empire; counts as a dock for ships
  FORGE - can use the forge and reforge commands here
- GLASSBLOWER - grants the Glassblowing tech to the empire
+ GLASSBLOWER - required for some crafts
  GUARD-TOWER - hostile toward enemy players, at range
  HENGE - allows Chant of Druids
  &rLIBRARY*&0 - can write and store books here
@@ -2349,10 +2349,9 @@ live, at which point it becomes available to players who have the right skill.
 Available flags:
  POTTERY - always requires cooking fire, goes faster at potter's hut
  APIARIES-TECH - requires being inside an empire with Apiaries tech
- GLASS-TECH - requires being inside an empire with Glassblowing tech
- GLASSBLOWER - requires being at an actual glassblower building
+ GLASSBLOWER - requires being at glassblower building
  CARPENTER - requires being at a carpenter building
- ALCHEMY - requires cooking fire and glassblowing tech, or alchemist/laboratory
+ ALCHEMY - requires cooking fire or alchemist/laboratory
  FIRE - requires cooking fire
  SOUP - requires a container of water and creates a liquid instead of an item
  IN-DEVELOPMENT - only immortals can use this recipe

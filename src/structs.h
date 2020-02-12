@@ -1003,7 +1003,7 @@ typedef struct vehicle_data vehicle_data;
 // CRAFT_x: Craft Flags for do_gen_craft
 #define CRAFT_POTTERY  BIT(0)  // bonus at pottery; requires fire
 #define CRAFT_APIARIES  BIT(1)  // requires apiary tech
-#define CRAFT_GLASS  BIT(2)  // requires glassblowing tech
+	#define CRAFT_UNUSED1  BIT(2)  // formerly "requires glassblowing tech"
 #define CRAFT_GLASSBLOWER  BIT(3)  // requires glassblower building
 #define CRAFT_CARPENTER  BIT(4)  // requires carpenter building
 #define CRAFT_ALCHEMY  BIT(5)  // requires access to glass/alchemist and fire
@@ -1215,7 +1215,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // TECH_x: Technologies
-#define TECH_GLASSBLOWING  0
+	#define TECH_UNUSED  0	// formerly glassblowing
 #define TECH_CITY_LIGHTS  1
 #define TECH_LOCKS  2
 #define TECH_APIARIES  3

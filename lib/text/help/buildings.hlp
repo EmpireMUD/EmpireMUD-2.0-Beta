@@ -7,8 +7,7 @@ ALCHEMIST
 Stored here:  herbs, poisons
 
 The alchemist is a specialty building that allows you to store and process many
-types of herbs. While you can brew potions and mix poisons using any fire, it
-requires glassblowing technology if you're not at the alchemist building.
+types of herbs. You can brew potions and mix poisons.
 
 See also: BREW, LABORATORY, MIX, STORAGE
 #
@@ -474,9 +473,9 @@ GLASSBLOWER "GLASS BLOWER" GLASSBLOWING "GLASS BLOWING"
 (GG)  Glass Blower  (Foundations goal)
 
 The glass blower is an artisan shop that creates flasks, vials, panes, and
-many other glass items for the empire. This building's function is passive --
-you don't blow the glass yourself. Instead, you simply need to be in the
-territory of an empire that has a glass blower in order to do certain crafts.
+many other glass items for the empire. Most of these require Basic Crafts.
+
+See also: BASIC CRAFTS
 #
 GRANARY
 
@@ -793,8 +792,7 @@ Command:  build painter <direction>
 Requires:  Architect ability, Foundations goal
 Stored here:  paints
 
-This building is used to make and store paints (although you also require
-glassblowing tech to make them).
+This building is used to make and store paints.
 
 A Master Craftsman can learn to make paints, and can start the quest to make
 paints once a painter spawns in this building.

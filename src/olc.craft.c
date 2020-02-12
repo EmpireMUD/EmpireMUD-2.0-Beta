@@ -68,7 +68,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "IN-DEVELOPMENT");
 		problem = TRUE;
 	}
-	if (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_APIARIES | CRAFT_GLASS) && !GET_CRAFT_RESOURCES(craft)) {
+	if (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_APIARIES) && !GET_CRAFT_RESOURCES(craft)) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires no resources");
 		problem = TRUE;
 	}

@@ -2214,12 +2214,6 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 			isle->tech[TECH_APIARIES] += amt;
 		}
 	}
-	if (HAS_FUNCTION(room, FNC_GLASSBLOWER)) {
-		EMPIRE_TECH(emp, TECH_GLASSBLOWING) += amt;
-		if (isle || (isle = get_empire_island(emp, island))) {
-			isle->tech[TECH_GLASSBLOWING] += amt;
-		}
-	}
 	if (HAS_FUNCTION(room, FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
@@ -2267,12 +2261,6 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 		EMPIRE_TECH(emp, TECH_APIARIES) += amt;
 		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
 			isle->tech[TECH_APIARIES] += amt;
-		}
-	}
-	if (IS_SET(VEH_FUNCTIONS(veh), FNC_GLASSBLOWER)) {
-		EMPIRE_TECH(emp, TECH_GLASSBLOWING) += amt;
-		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
-			isle->tech[TECH_GLASSBLOWING] += amt;
 		}
 	}
 	if (IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS)) {

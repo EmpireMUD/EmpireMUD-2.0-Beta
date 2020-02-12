@@ -1566,7 +1566,7 @@ struct character_size_data size_data[] = {
 const char *craft_flags[] = {
 	"POTTERY",
 	"APIARIES-TECH",
-	"GLASS-TECH",
+	"*",	// former glass-tech
 	"GLASSBLOWER",
 	"CARPENTER",
 	"ALCHEMY",
@@ -1591,7 +1591,7 @@ const char *craft_flags[] = {
 const char *craft_flag_for_info[] = {
 	"pottery",
 	"requires apiaries",
-	"requires glassblowing",
+	"",
 	"requires glassblower building",
 	"requires carpenter building",
 	"alchemy",
@@ -1783,7 +1783,7 @@ const char *offense_flags[] = {
 
 // TECH_x
 const char *techs[] = {
-	"Glassblowing",
+	"*",
 	"City Lights",
 	"Locks",
 	"Apiaries",
