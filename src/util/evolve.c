@@ -52,6 +52,7 @@ struct map_t {
 	int island_id;
 	sector_vnum sector_type, base_sector, natural_sector;
 	bitvector_t affects;
+	struct room_extra_data *extra;
 	
 	struct map_t *next;	// next in land
 };
@@ -88,6 +89,7 @@ const int shift_dir[][2] = {
 int count_adjacent(struct map_t *tile, sector_vnum sect, bool count_original_sect);
 void empire_srandom(unsigned long initial_seed);
 struct evolution_data *get_evo_by_type(sector_vnum sect, int type);
+time_t get_sector_time(struct map_t *tile);
 void index_boot_sectors();
 void load_base_map();
 int map_distance(struct map_t *start, struct map_t *end);
@@ -129,6 +131,10 @@ void evolve_one(struct map_t *tile) {
 	become = NOTHING;
 	
 	// run some evolutions!
+	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_TIMED)) && time(0) <= get_sector_time(tile) + evo->value * SECS_PER_REAL_MIN) {
+		become = evo->becomes;
+	}
+	
 	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_RANDOM))) {
 		become = evo->becomes;
 	}
@@ -650,6 +656,7 @@ void index_boot_sectors(void) {
 void load_base_map(void) {
 	char line[256], line2[256], error_buf[MAX_STRING_LENGTH], *tmp;
 	struct map_t *map, *last = NULL, *last_land = NULL;
+	struct room_extra_data *red;
 	int var[7], x, y;
 	FILE *fl;
 	
@@ -733,9 +740,23 @@ void load_base_map(void) {
 					break;
 				}
 				case 'X':	// resource depletion
-				case 'Y':	// tracks
-				case 'Z': {	// extra data
+				case 'Y': {	// tracks
 					get_line(fl, line2);
+					break;
+				}
+				case 'Z': {	// extra data
+					if (!get_line(fl, line2) || sscanf(line2, "%d %d", &var[0], &var[1]) != 2) {
+						printf("ERROR: Bad formatting in Z section of room #%d", last->vnum);
+						break;
+					}
+					
+					HASH_FIND_INT(last->extra, &var[0], red);
+					if (!red) {
+						CREATE(red, struct room_extra_data, 1);
+						red->type = var[0];
+						HASH_ADD_INT(last->extra, type, red);
+					}
+					red->value = var[1];
 					break;
 				}
 			}
@@ -888,6 +909,21 @@ struct evolution_data *get_evo_by_type(sector_vnum sect, int type) {
 	}
 	
 	return found;
+}
+
+
+/**
+* If the sector has a stored timestamp, this fetches it. This is used for
+* TIMED evos.
+*
+* @param struct map_t *tile The map tile.
+* @return time_t The timestamp from the tile, or 0 if none.
+*/
+time_t get_sector_time(struct map_t *tile) {
+	struct room_extra_data *red;
+	int type = ROOM_EXTRA_SECTOR_TIME;
+	HASH_FIND_INT(tile->extra, &type, red);
+	return red ? red->value : 0;
 }
 
 

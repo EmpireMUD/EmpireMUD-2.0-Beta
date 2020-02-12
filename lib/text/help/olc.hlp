@@ -6665,26 +6665,27 @@ Evolutions are automatically sorted by type and by percentage. Only one will
 be called at a time -- the first one whose percentage check passes.
 
 Available types ([value] isn't used unless specified):
- CHOPPED-DOWN - Sector to become when chopped by a player; you should also add
+ &cCHOPPED-DOWN&0 - Sector to become when chopped by a player; you should also add
     chop interactions.
- CROP-GROWS - Sector to become when the crop finishes growing (Seeded -> Crop).
- ADJACENT-ONE - Called when this sector is next to a certain other sector
+ &cCROP-GROWS&0 - Sector to become when the crop finishes growing (Seeded -> Crop).
+ &cADJACENT-ONE&0 - Called when this sector is next to a certain other sector
     (value is the sector vnum that it's adjacent to).
- ADJACENT-MANY - Called when this sector is next to at least 6 of another
+ &cADJACENT-MANY&0 - Called when this sector is next to at least 6 of another
     sector (value is the sector vnum that it's adjacent to many of).
- RANDOM - Checked periodically and called it if passes.
- TRENCH-START - Sector this one becomes if a person starts to excavate.
- TRENCH-FULL - Sector this one becomes, if it's a trench, when it fills up.
- NEAR-SECTOR - Checked when this sector is within 2 tiles of another sector
+ &cRANDOM&0 - Checked periodically and called it if passes.
+ &cTRENCH-START&0 - Sector this one becomes if a person starts to excavate.
+ &cTRENCH-FULL&0 - Sector this one becomes, if it's a trench, when it fills up.
+ &cNEAR-SECTOR&0 - Checked when this sector is within 2 tiles of another sector
     (value is the sector vnum that must be nearby).
- PLANTS-TO - Sector this one becomes when you start to plant a crop on it.
- MAGIC-GROWTH - Sector this one becomes if it is magically forced to grow.
- NOT-ADJACENT - No matching sector within 1 tile (value is the sector vnum).
- NOT-NEAR-SECTOR - No matching sector within 2 tiles (value is the sector
+ &cPLANTS-TO&0 - Sector this one becomes when you start to plant a crop on it.
+ &cMAGIC-GROWTH&0 - Sector this one becomes if it is magically forced to grow.
+ &cNOT-ADJACENT&0 - No matching sector within 1 tile (value is the sector vnum).
+ &cNOT-NEAR-SECTOR&0 - No matching sector within 2 tiles (value is the sector
     vnum).
- SPRING, SUMMER, AUTUMN, WINTER - Triggers during this season.
- BURNS-TO - Sector this tile becomes when burned down by a player.
- SPREADS-TO - The opposite of adjacent-one: spreads from this tile to that one.
+ &cSPRING, SUMMER, AUTUMN, WINTER&0 - Triggers during this season.
+ &cBURNS-TO&0 - Sector this tile becomes when burned down by a player.
+ &cSPREADS-TO&0 - The opposite of adjacent-one: spreads from this tile to that one.
+ &cTIMED&0 - Occurs after the given number of minutes.
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28

@@ -302,6 +302,7 @@ void boot_db(void) {
 	void check_learned_empire_crafts();
 	void check_nowhere_einv_all();
 	void check_ruined_cities();
+	void check_sector_times(any_vnum only_sect);
 	void check_version();
 	void delete_old_players();
 	void delete_orphaned_rooms();
@@ -401,6 +402,7 @@ void boot_db(void) {
 	
 	log("Verifying world sectors.");
 	verify_sectors();
+	check_sector_times(NOTHING);
 	
 	// convert vehicles -- this normally does nothing, but it may free a temporary list
 	run_convert_vehicle_list();

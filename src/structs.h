@@ -2546,9 +2546,10 @@ typedef struct vehicle_data vehicle_data;
 #define EVO_SPREADS_TO  17	// reverse of adjacent-one
 #define EVO_HARVEST_TO  18	// always harvests to a specific sector type (no matter what it was when planted)
 #define EVO_DEFAULT_HARVEST_TO  19	// sect it becomes when harvested/cleared IF no data exists
-#define NUM_EVOS  20	// total
+#define EVO_TIMED  20	// evolves after a certain number of minutes
+#define NUM_EVOS  21	// total
 
-// evolution value types
+// EVO_VAL_x: evolution value types
 #define EVO_VAL_NONE  0
 #define EVO_VAL_SECTOR  1
 #define EVO_VAL_NUMBER  2
@@ -2618,6 +2619,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_TRENCH_FILL_TIME  18  // when the trench will be filled
 #define ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR  19	// for un-trenching correctly
 #define ROOM_EXTRA_ORIGINAL_BUILDER  20	// person who started the building
+#define ROOM_EXTRA_SECTOR_TIME  21	// when it became this sector type (for types with a timed evo)
 
 
 // number of different appearances

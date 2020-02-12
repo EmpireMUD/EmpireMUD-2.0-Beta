@@ -2087,6 +2087,14 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	// make sure its island status is correct
 	check_island_assignment(loc, map);
+	
+	// if needed, set a sector evolution time
+	if (has_evolution_type(sect, EVO_TIMED)) {
+		set_extra_data(loc ? &ROOM_EXTRA_DATA(loc) : &map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME, time(0));
+	}
+	else {
+		remove_extra_data(loc ? &ROOM_EXTRA_DATA(loc) : &map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME);
+	}
 }
 
 

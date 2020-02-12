@@ -3047,11 +3047,12 @@ const char *evo_types[] = {
 	"SPREADS-TO",
 	"HARVEST-TO",
 	"DEFAULT-HARVEST-TO",
+	"TIMED",	// 20
 	"\n"
 };
 
 
-// EVO_x 2/3: what type of data the evolution.value uses
+// EVO_x 2/3 and EVO_VAL_x: what type of data the evolution.value uses
 const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// chopped-down
 	EVO_VAL_NONE,	// crop-grows
@@ -3073,6 +3074,7 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_SECTOR,	// spreads-to
 	EVO_VAL_NONE,	// harvest-to
 	EVO_VAL_NONE,	// default-harvest-to
+	EVO_VAL_NUMBER,	// timed (minutes)
 };
 
 
@@ -3098,6 +3100,7 @@ bool evo_is_over_time[] = {
 	TRUE,	// spreads-to
 	FALSE,	// harvest-to
 	FALSE,	// default-harvest-to
+	TRUE,	// timed
 };
 
 
@@ -3349,6 +3352,7 @@ const char *room_extra_types[] = {
 	"trench fill time",
 	"trench original sector",
 	"original builder",	// 20
+	"sector time",
 	"\n"
 };
 
