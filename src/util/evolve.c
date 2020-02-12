@@ -131,8 +131,7 @@ void evolve_one(struct map_t *tile) {
 	become = NOTHING;
 	
 	// run some evolutions!
-	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_TIMED)) && time(0) <= get_sector_time(tile) + evo->value * SECS_PER_REAL_MIN) {
-		printf("Debug evo: %d time=%ld sect-time=%ld delay=%d/%d\n", tile->vnum, time(0), get_sector_time(tile), evo->value, evo->value * SECS_PER_REAL_MIN);
+	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_TIMED)) && time(0) > get_sector_time(tile) + evo->value * SECS_PER_REAL_MIN) {
 		become = evo->becomes;
 	}
 	
@@ -760,10 +759,6 @@ void load_base_map(void) {
 						HASH_ADD_INT(last->extra, type, red);
 					}
 					red->value = var[1];
-					
-					if (red->type == ROOM_EXTRA_SECTOR_TIME) {
-						printf("Debug read: %d %d %d\n", last->vnum, red->type, red->value);
-					}
 					break;
 				}
 			}
@@ -930,7 +925,6 @@ time_t get_sector_time(struct map_t *tile) {
 	struct room_extra_data *red;
 	int type = ROOM_EXTRA_SECTOR_TIME;
 	HASH_FIND_INT(tile->extra, &type, red);
-	printf("Debug time: %d: %s %d\n", tile->vnum, red ? "found" : "not-found", red->value);
 	return red ? red->value : 0;
 }
 
