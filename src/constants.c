@@ -2450,6 +2450,7 @@ const char *component_types[] = {
 	"rope",
 	"paint",
 	"wax",	// 30
+	"sweetener",
 	"\n"
 };
 
