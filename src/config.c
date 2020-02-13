@@ -100,7 +100,7 @@ struct promo_code_list promo_codes[] = {
 const double score_levels[] = { 0.0625, 0.125, 0.25, 0.5, 1.0, 1.5, 2.0, 4.0, 8.0, 16.0, -1 };	// terminate with -1
 
 // techs that only work if they're on the same island (these should not be techs that come from player abilities)
-const int techs_requiring_same_island[] = { TECH_APIARIES, TECH_SEAPORT, NOTHING };	// terminate with a NOTHING
+const int techs_requiring_same_island[] = { TECH_SEAPORT, NOTHING };	// terminate with a NOTHING
 
 
  //////////////////////////////////////////////////////////////////////////////

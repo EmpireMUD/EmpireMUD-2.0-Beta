@@ -2216,12 +2216,6 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	
 	// WARNING: do not check in-city status on these ... it can change at a time when territory is not re-scanned
 	
-	if (HAS_FUNCTION(room, FNC_APIARY)) {
-		EMPIRE_TECH(emp, TECH_APIARIES) += amt;
-		if (isle || (isle = get_empire_island(emp, island))) {
-			isle->tech[TECH_APIARIES] += amt;
-		}
-	}
 	if (HAS_FUNCTION(room, FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
@@ -2265,12 +2259,6 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 		return;	// do NOT adjust tech if inside a moving vehicle
 	}
 	
-	if (IS_SET(VEH_FUNCTIONS(veh), FNC_APIARY)) {
-		EMPIRE_TECH(emp, TECH_APIARIES) += amt;
-		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
-			isle->tech[TECH_APIARIES] += amt;
-		}
-	}
 	if (IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
 		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {

@@ -796,7 +796,7 @@ typedef struct vehicle_data vehicle_data;
 
 // FNC_x: function flags (for buildings)
 #define FNC_ALCHEMIST  BIT(0)	// can brew and mix here
-#define FNC_APIARY  BIT(1)	// grants the Apiaries tech to the empire
+#define FNC_APIARY  BIT(1)	// no current use
 #define FNC_BATHS  BIT(2)	// can use the bathe command here
 #define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
 #define FNC_CARPENTER  BIT(4)	// required by some crafts
@@ -1002,7 +1002,7 @@ typedef struct vehicle_data vehicle_data;
 
 // CRAFT_x: Craft Flags for do_gen_craft
 #define CRAFT_POTTERY  BIT(0)  // bonus at pottery; requires fire
-#define CRAFT_APIARIES  BIT(1)  // requires apiary tech
+	#define CRAFT_UNUSED0  BIT(1)  // formerly "requires apiary tech"
 	#define CRAFT_UNUSED1  BIT(2)  // formerly "requires glassblowing tech"
 #define CRAFT_GLASSBLOWER  BIT(3)  // requires glassblower building
 #define CRAFT_CARPENTER  BIT(4)  // requires carpenter building
@@ -1218,7 +1218,7 @@ typedef struct vehicle_data vehicle_data;
 	#define TECH_UNUSED  0	// formerly glassblowing
 #define TECH_CITY_LIGHTS  1
 #define TECH_LOCKS  2
-#define TECH_APIARIES  3
+	#define TECH_UNUSED1  3	// formerly apiaries
 #define TECH_SEAPORT  4
 #define TECH_WORKFORCE  5
 #define TECH_PROMINENCE  6
