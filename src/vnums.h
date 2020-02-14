@@ -83,6 +83,10 @@
 // clay
 #define o_BRICKS  257	// TODO: create a workforce brickmaking ability/craft
 
+// beekeeping chore -- TODO figure out how to make a generic workforce system where these are data on the room
+#define o_BEESWAX  850
+#define o_HONEYCOMB  3069
+
 // Wood crafts
 #define o_STAKE  915	// could be a flag
 #define o_BLANK_SIGN  918
@@ -199,6 +203,7 @@
 #define PRESS_WORKER  276
 #define MINE_SUPERVISOR  277
 #define FISHERMAN  279
+#define BEEKEEPER  281
 
 
  //////////////////////////////////////////////////////////////////////////////

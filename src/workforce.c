@@ -38,6 +38,7 @@
 struct empire_territory_data *global_next_territory_entry = NULL;
 
 // protos
+void do_chore_beekeeping(empire_data *emp, room_data *room);
 void do_chore_brickmaking(empire_data *emp, room_data *room);
 void do_chore_building(empire_data *emp, room_data *room, int mode);
 void do_chore_burn_stumps(empire_data *emp, room_data *room);
@@ -122,6 +123,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "general", NOTHING, TRUE },
 	{ "fishing", FISHERMAN, FALSE },
 	{ "burn-stumps", STUMP_BURNER, FALSE },
+	{ "beekeeping", BEEKEEPER, FALSE },
 };
 
 
@@ -247,6 +249,9 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		}
 		if (room_has_function_and_city_ok(room, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
 			do_chore_fishing(emp, room);
+		}
+		if (room_has_function_and_city_ok(room, FNC_APIARY) && CHORE_ACTIVE(CHORE_BEEKEEPING)) {
+			do_chore_beekeeping(emp, room);
 		}
 		if (BUILDING_VNUM(room) == BUILDING_TRAPPERS_POST && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_TRAPPING)) {
 			do_chore_trapping(emp, room);
@@ -1324,6 +1329,51 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 
  /////////////////////////////////////////////////////////////////////////////
 //// CHORE FUNCTIONS ////////////////////////////////////////////////////////
+
+void do_chore_beekeeping(empire_data *emp, room_data *room) {
+	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BEEKEEPING].mob);
+	int islid = GET_ISLAND_ID(room);
+	bool can_gain_honeycomb = can_gain_chore_resource(emp, room, CHORE_BEEKEEPING, o_HONEYCOMB);
+	bool can_gain_wax = can_gain_chore_resource(emp, room, CHORE_BEEKEEPING, o_BEESWAX);
+	bool can_do = can_gain_honeycomb || can_gain_wax;
+	
+	if (worker && can_do) {
+		add_empire_needs(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, 1);
+		
+		if (can_gain_honeycomb) {
+			ewt_mark_resource_worker(emp, room, o_HONEYCOMB);
+			add_to_empire_storage(emp, islid, o_HONEYCOMB, 1);
+			add_production_total(emp, o_HONEYCOMB, 1);
+		}
+		if (can_gain_wax) {
+			ewt_mark_resource_worker(emp, room, o_BEESWAX);
+			add_to_empire_storage(emp, islid, o_BEESWAX, 1);
+			add_production_total(emp, o_BEESWAX, 1);
+		}
+	}
+	else if (can_do) {
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_BEEKEEPING, room))) {
+			if (can_gain_honeycomb) {
+				ewt_mark_resource_worker(emp, room, o_HONEYCOMB);
+			}
+			if (can_gain_wax) {
+				ewt_mark_resource_worker(emp, room, o_BEESWAX);
+			}
+		}
+	}
+	else if (worker) {
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_BEEKEEPING, WF_PROB_OVER_LIMIT);
+	}
+	
+	if (!can_do) {
+		log_workforce_problem(emp, room, CHORE_BEEKEEPING, WF_PROB_OVER_LIMIT, FALSE);
+	}
+}
+
 
 void do_chore_brickmaking(empire_data *emp, room_data *room) {
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BRICKMAKING].mob);
