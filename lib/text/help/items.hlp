@@ -338,7 +338,7 @@ magic, refined:  prismatic crystals
 
 See also: COMPONENT, PRISMATIC CRYSTAL
 #
-GLASS "GLASS COMPONENT"
+GLASS "GLASS COMPONENT" "GLASS INGOTS"
 
 Glass (component)
 
@@ -561,6 +561,8 @@ rare, fine:     silver and gold ingots
 refined:        copper, silver and gold bars
 refined, fine:  silver and gold bars
 hard, rare:     argentine and eventide ingots
+
+Note: Glass ingots are made from sand using the 'craft' command.
 
 See also: COMPONENT, SMELT, SEPARATE, IRON, COPPER, MINE
 #
