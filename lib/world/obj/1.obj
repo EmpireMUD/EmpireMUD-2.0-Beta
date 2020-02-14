@@ -111,6 +111,36 @@ O
 R
 5117 0
 S
+#107
+sand bag~
+a bag of sand~
+A bag of sand is lying here.~
+   This small bag of fine sand can be used to make glass ingots at the glass
+blower. From there, you can blow it into all kinds of useful glassware.
+~
+3 l a 0 9
+0 0 0
+1 0
+O
+32 u
+R
+5117 0
+S
+#108
+ingot glass ingots~
+a glass ingot~
+A glass ingot is stacked here.~
+   This ingot of glass is rough and raw, but of good quality and mostly
+transparent. You could craft it into various things at a glass blower.
+~
+3 l a 0 8
+0 0 0
+8 0
+O
+33 lu
+R
+5135 0
+S
 #120
 tree trees large~
 a large tree~
@@ -491,6 +521,65 @@ O
 25 u
 R
 5118 0
+S
+#137
+tree ancient massive~
+an ancient tree~
+A massive, ancient tree is lying on the ground.~
+   This tree is truly massive, and equally ancient. On its side, it's still
+taller than you are. It's far too big to carry, but you could saw it up or
+scrape it where it lies.
+~
+3 0 0 0 11
+0 0 0
+0 1152
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 16 138 100.00 1  # SCRAPE: an enormous mast
+I 16 136 5.00 10 p  # SCRAPE: a large shoot
+I 16 136 5.00 7 p  # SCRAPE: a large shoot
+I 16 136 10.00 4 p  # SCRAPE: a large shoot
+I 16 136 5.00 2 p  # SCRAPE: a large shoot
+I 16 121 25.00 6 s  # SCRAPE: some sticks and leaves
+I 16 121 25.00 8 s  # SCRAPE: some sticks and leaves
+I 16 121 25.00 10 s  # SCRAPE: some sticks and leaves
+I 16 121 25.00 12 s  # SCRAPE: some sticks and leaves
+I 17 125 100.00 12  # SAW: a stack of lumber
+I 17 136 5.00 10 p  # SAW: a large shoot
+I 17 136 5.00 7 p  # SAW: a large shoot
+I 17 136 10.00 4 p  # SAW: a large shoot
+I 17 136 5.00 2 p  # SAW: a large shoot
+I 17 121 50.00 6 s  # SAW: some sticks and leaves
+I 17 121 40.00 10 s  # SAW: some sticks and leaves
+I 17 121 10.00 12 s  # SAW: some sticks and leaves
+R
+5118 0
+S
+#138
+mast enormous~
+an enormous mast~
+An enormous mast is lying here.~
+   This mast is truly massive, made from an ancient tree and strong enough to
+withstand the worst winds on the high seas. It could also be used as a pillar
+for other purposes.
+~
+3 e a 0 9
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 17 125 75.00 3 s  # SAW: a stack of lumber
+I 17 125 25.00 4 s  # SAW: a stack of lumber
+M
+6
+You stand the mast on $V.~
+M
+7
+$n stands the mast on $V.~
+O
+21 f
+R
+5118 0
+R
+5153 0
 S
 #141
 wheat bundle~

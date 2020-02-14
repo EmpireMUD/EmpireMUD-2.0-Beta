@@ -625,11 +625,13 @@ a soothing aloe elixir~
 A soothing aloe elixir has been left here.~
 Quaff this swirling greenish potion to regain health.
 ~
-25 m a 0 3
+25 m a 0 4
 -1 0 -1
 8 0
 C
 150 150
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 T 1250

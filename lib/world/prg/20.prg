@@ -59,9 +59,8 @@ you'll need some basic resources first. Produce small stockpiles each of any
 type of rock, lumber, block, pillar, stick, and metal ingots. Completing this
 goal will allow your empire to build new artisan buildings.
 ~
-10 2 0 5 0
+11 2 0 5 0
 K 2 5130
-K 2 5131
 K 2 5132
 K 2 5134
 K 2 5135
@@ -112,7 +111,7 @@ Advanced Artisans~
 flourish. With the help of your artisans, you will be able to upgrade your
 cities to a larger size.
 ~
-6 2 0 15 0
+7 2 0 15 0
 K 3 1
 P 2012
 W
@@ -121,8 +120,6 @@ W
 7 5134 0 1 a
 W
 7 5138 0 1 a
-W
-7 5131 0 1 a
 W
 7 5130 0 1 a
 S

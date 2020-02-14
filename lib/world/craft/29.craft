@@ -162,7 +162,7 @@ R
 R
 611 4 0 0
 R
-21 4 1 0
+21 4 1 32
 R
 28 24 1 0
 R
@@ -182,6 +182,8 @@ R
 1210 3 0 0
 R
 1300 1 0 0
+R
+800 1 0 0
 S
 #2920
 imperial stamina potion~
@@ -195,6 +197,8 @@ R
 1211 1 0 0
 R
 103 1 0 0
+R
+800 1 0 0
 S
 #2922
 imperial mana potion~
@@ -208,6 +212,8 @@ R
 1211 1 0 0
 R
 1206 1 0 0
+R
+800 1 0 0
 S
 #2924
 imperial wayfarer's potion~
@@ -221,6 +227,8 @@ R
 1215 1 0 0
 R
 103 1 0 0
+R
+800 1 0 0
 S
 #2926
 imperial hex-purging potion~
@@ -232,5 +240,7 @@ R
 1210 3 0 0
 R
 1300 1 0 0
+R
+800 1 0 0
 S
 $

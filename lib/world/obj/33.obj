@@ -714,13 +714,15 @@ a jar of strawberry jam~
 A jar of strawberry jam has been dropped here.~
 This glass jar has been filled with delicious strawberry jam.
 ~
-6 m a 0 6
+6 m a 0 8
 24 0 0
 7 336
 A
 7 1 0
 C
 1 1
+I 26 801 100.00 1  # DECAYS-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: a jar
 R
 5606 0
 R
@@ -760,13 +762,15 @@ a jar of blueberry jam~
 A jar of blueberry jam has been dropped on the ground.~
 A glass jar filled with delicious blueberry jam.
 ~
-6 m a 0 5
+6 m a 0 6
 24 0 0
 7 336
 A
 16 1 0
 C
 1 1
+I 26 801 100.00 1  # DECAYS-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: a jar
 R
 5619 0
 R
@@ -796,11 +800,15 @@ a sack of oatmeal~
 A sack of oatmeal has been left on the ground.~
 Oatmeal can be baked into nourishing cakes.
 ~
-3 0 a 0 4
+3 0 a 0 6
 0 0 0
 7 0
 R
 5116 0
+R
+5109 0
+R
+5606 0
 S
 #3344
 cake oat flat~

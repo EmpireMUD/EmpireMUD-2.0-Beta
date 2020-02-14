@@ -112,6 +112,24 @@ fhlnv 19 1 0 0 0 0 0
 P
 2
 S
+#916
+beehive hive~
+a beehive~
+A beehive has been set up here.~
+   The beehive has been carefully constructed from wood, with removable trays
+for harvesting honeycomb and tending the hive.
+Type 'check beehive' to see how much honeycomb is available.
+Type 'harvest beehive' to retrieve honeycomb.
+~
+~
+hln 19 2 0 0 0 0 0
+P
+2
+R
+916 1 5 0
+T 916
+T 918
+S
 #917
 throne~
 the throne~

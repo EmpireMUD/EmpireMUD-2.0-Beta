@@ -335,9 +335,11 @@ dragonfruit jam~
 A jar of dragonfruit jam is lying here.~
 The jam is bright red, and doesn't really smell like anything.
 ~
-6 0 a 0 2
+6 0 a 0 3
 48 0 0
 7 336
+I 26 801 100.00 1  # DECAYS-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: a jar
 R
 5619 0
 R

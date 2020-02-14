@@ -130,7 +130,7 @@ A large beehive has been left here.~
    Beehives are used to set up apiaries, where your citizens can tend bees to
 provide honey for your empire's food and crafts.
 ~
-3 e a 0 3
+3 e a 0 6
 0 0 0
 0 0
 M
@@ -141,6 +141,7 @@ M
 $n sets up $p.~
 R
 5131 0
+T 917
 S
 #918
 sign blank~

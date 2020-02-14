@@ -342,7 +342,7 @@ S
 plantain unripe~
 an unripe plantain~
 There is an unripe plantain on the ground.~
-   This plantain doesn't quite look ripe and it will be starchy, but edible. 
+   This plantain doesn't quite look ripe and it will be starchy, but edible.
 If you combine several of them, you can fill a whole basket of plantains, which
 would be enough to plant your own crop.
 ~
@@ -613,7 +613,7 @@ S
 mango ripe single~
 a single ripe mango~
 A single ripe mango has been dropped on the ground.~
-   This bright mango looks good enough to eat, but it's only a small snack. 
+   This bright mango looks good enough to eat, but it's only a small snack.
 Combine a few of them into a basket of mangoes and you'd have enough to plant
 your own crop.
 ~
@@ -971,5 +971,24 @@ O
 23 0
 R
 5210 0
+S
+#3069
+honeycomb comb~
+some honeycomb~
+Some honeycomb is dripping on the ground.~
+   The honeycomb looks very fresh. You could eat it, though it's not very
+filling, or you could cook with the honey from it as a sweetener. You'll get
+back the wax from the honeycomb if you use it for this, or you can 'craft
+beeswax' to discard the honey and just keep the wax.
+~
+6 l a 0 3
+1 0 0
+0 145
+I 26 850 100.00 1  # DECAYS-TO: some beeswax
+I 27 850 100.00 1  # CONSUMES-TO: some beeswax
+R
+5131 0
+R
+5606 0
 S
 $

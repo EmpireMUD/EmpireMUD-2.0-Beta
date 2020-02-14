@@ -121,4 +121,13 @@ Everyone in your empire will now prospect faster.
 K 0 17
 P 2016
 S
+#2912
+Beekeeping~
+   Your empire can now build apiaries, allowing your workforce to keep bees and
+produce honey and wax for your citizens. ('build apiary')
+~
+2 2 30 0 b
+K 2 5131
+P 2019
+S
 $

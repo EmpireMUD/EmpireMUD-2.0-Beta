@@ -5,6 +5,109 @@ Shoddy Raft Drop~
 %load% veh 923
 %purge% %self%
 ~
+#916
+Harvest Beehive~
+5 c 0
+harvest check~
+if !%arg% || %actor.veh_target(%arg%)% != %self%
+  return 0
+  halt
+end
+* otherwise return 1 in all cases
+return 1
+* pull out variable
+if %self.varexists(stored)%
+  set stored %self.stored%
+else
+  set stored 0
+end
+* just checking honey?
+if %cmd% == check
+  if %stored% > 1
+    %send% %actor% It looks like you could harvest %stored% honeycombs from this hive.
+  elseif %stored% == 1
+    %send% %actor% It looks like you could harvest 1 honeycomb from this hive.
+  else
+    %send% %actor% There's no honeycomb to spare in this hive.
+  end
+  halt
+end
+if %stored% < 1
+  %send% %actor% There isn't enough honeycomb in %self.shortdesc% to harvest.
+  halt
+end
+* prepare to extract
+set got 0
+set full 0
+* now in a loop
+while %stored% > 0 && !%full%
+  if %actor.carrying% >= %actor.maxcarrying%
+    set full 1
+  else
+    eval stored %stored% - 1
+    eval got %got% + 1
+    %load% obj 3069 %actor% inv
+  end
+done
+* store var back
+remote stored %self.id%
+* messaging
+if %got% > 1
+  %send% %actor% You harvest some honeycomb (x%got%) from %self.shortdesc%.
+  %echoaround% %actor% %actor.name% harvests some honeycomb from %self.shortdesc%.
+elseif %got% == 1
+  %send% %actor% You harvest some honeycomb from %self.shortdesc%.
+  %echoaround% %actor% %actor.name% harvests some honeycomb from %self.shortdesc%.
+end
+if %full%
+  %send% %actor% You can't carry any more.
+end
+~
+#917
+Convert Old Beehives~
+1 hn 100
+~
+* default return is 1 -- unless we hit a particular condition
+return 1
+if %command% && %command% == junk
+  halt
+end
+%load% veh 916
+wait 1
+%purge% %self%
+~
+#918
+Beehive Growth~
+5 ab 2
+~
+* config: max honeycomb to store
+set max 24
+* pull out variable
+if %self.varexists(stored)%
+  set stored %self.stored%
+else
+  set stored 0
+end
+set season %self.room.season%
+* season-based changes
+if %season% == spring
+  eval stored %stored% + 1
+elseif %season% == summer
+  eval stored %stored% + 2
+elseif %season% == autumn
+  eval stored %stored% + 1
+elseif %season% == winter
+  * no change over winter
+end
+if %stored% > %max%
+  set stored %max%
+end
+remote stored %self.id%
+if %stored% >= %max%
+  * prevents the script from running for a while
+  wait 7200 s
+end
+~
 #921
 Caravan setup~
 5 n 100
