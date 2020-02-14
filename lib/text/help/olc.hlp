@@ -2001,7 +2001,7 @@ room as the vehicle.
 
 Available functions:
  ALCHEMIST - can brew and mix here
- APIARY - houses bees (no current function)
+ APIARY - houses bees (required for beekeeping workforce)
  BATHS - can use the bathe command here
  BEDROOM - boosts regen while sleeping
  CARPENTER - required by some crafts
