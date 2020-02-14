@@ -4791,6 +4791,7 @@ Available components (common flags listed in parentheses):
  &cpillar&0 - for construction, like a log
  &crock&0 - common stones dug up from the ground
  &crope&0 - for construction and harnessing animals
+ &csand&0 - used for glassmaking
  &csapling&0 - a common building and crafting material
  &cseeds&0 - for planting or cooking
  &cskin&0 - unprocessed animal skin or rawhide

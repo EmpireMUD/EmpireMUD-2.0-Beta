@@ -136,6 +136,8 @@ Available generic components:
  &cpillar&0 - for construction, like a log
  &crock&0 - common stones dug up from the ground
  &crope&0 - for construction and harnessing animals
+ &csand&0 - used for things like glass
+ &csapling&0 - used in handles and primitive buildings
  &cseeds&0 - for planting or cooking
  &cskin&0 - unprocessed animal skin or rawhide
  &cstick&0 - a common building and crafting material
@@ -739,6 +741,19 @@ more ropes are needed afterwards.
 You can craft basic ropes from plant fiber or small pieces of leather.
 
 See also: COMPONENT, CRAFT, MANUFACTURE
+#
+SAND "SAND COMPONENT"
+
+Sand (component)
+
+Used for:  glassmaking
+
+Sand can be made into glass ingots at the glass blower.
+
+You can dig up basic sand in most coastal areas. Build a sand pit to dig up
+even more sand.
+
+See also: COMPONENT, DIG, SAND PIT
 #
 SAPLING SAPLINGS "SAPLING COMPONENT"
 
