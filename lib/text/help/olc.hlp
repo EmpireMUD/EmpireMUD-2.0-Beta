@@ -4778,6 +4778,7 @@ Available components (common flags listed in parentheses):
  &cfruit&0 - for cooking
  &cfur&0 - animal furs for crafting
  &cgem&0 - precious stones
+ &cglass&0 - made of, or used for making, glass
  &cgrain&0 - wheat, etc.
  &chandle&0 - used for tools and weapons
  &cherb&0 - used in potions and cooking

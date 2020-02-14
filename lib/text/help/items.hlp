@@ -123,6 +123,7 @@ Available generic components:
  &cfruit&0 - for cooking
  &cfur&0 - animal furs for crafting
  &cgem&0 - precious stones
+ &cglass&0 - made of, or used for making, glass
  &cgrain&0 - wheat, etc.
  &chandle&0 - used for tools and weapons
  &cherb&0 - used in potions and cooking
@@ -336,6 +337,17 @@ magic, basic:  iris, bloodstone, seashell, lightning stone
 magic, refined:  prismatic crystals
 
 See also: COMPONENT, PRISMATIC CRYSTAL
+#
+GLASS "GLASS COMPONENT"
+
+Glass (component)
+
+Used for:  glassmaking
+
+Types of glass:
+  ingot of glass (raw) - crafted from sand at the glass blower
+
+See also: COMPONENT, GLASS BLOWER
 #
 "GLOWING GREEN SEASHELL" "GLOWING SEASHELL" "GREEN SEASHELL" SEASHELL
 
