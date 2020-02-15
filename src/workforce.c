@@ -1338,14 +1338,16 @@ void do_chore_beekeeping(empire_data *emp, room_data *room) {
 	bool can_do = can_gain_honeycomb || can_gain_wax;
 	
 	if (worker && can_do) {
+		// eats constantly even though it only produces periodically
 		add_empire_needs(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, 1);
 		
-		if (can_gain_honeycomb) {
+		// these produce slowly
+		if (can_gain_honeycomb && !number(0, 23)) {
 			ewt_mark_resource_worker(emp, room, o_HONEYCOMB);
 			add_to_empire_storage(emp, islid, o_HONEYCOMB, 1);
 			add_production_total(emp, o_HONEYCOMB, 1);
 		}
-		if (can_gain_wax) {
+		if (can_gain_wax && !number(0, 23)) {
 			ewt_mark_resource_worker(emp, room, o_BEESWAX);
 			add_to_empire_storage(emp, islid, o_BEESWAX, 1);
 			add_production_total(emp, o_BEESWAX, 1);
