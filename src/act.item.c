@@ -6712,7 +6712,7 @@ ACMD(do_store) {
 		}
 		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
 			// try to set up next-obj
-			if (!(next_obj = get_obj_in_list_vis(ch, arg, obj->next_content)) && use_room) {
+			if (!(next_obj = get_obj_in_list_vis(ch, arg, obj->next_content)) && obj->carried_by && use_room) {
 				next_obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)));
 			}
 			
