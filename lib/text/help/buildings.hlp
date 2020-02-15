@@ -146,7 +146,7 @@ Basic buildings:
   {UU} utilityshed -- store tools
   |__| quarry -- must be on flat land facing a mountain
   &y|__|&0 claypit -- must be on flat land facing water
-  &t|__|&0 sandpit -- must be facing an ocean or lake
+  &Y|__|&0 sandpit -- must be facing an ocean or lake
   ..x. familygravesite -- used as a respawn point (city only)
 
 For more information on building your first house, see HELP HOUSING GUIDE.
@@ -916,7 +916,7 @@ See also: MAINTAIN
 #
 SANDPIT "SAND PIT"
 
-&t|__|&0  Sand Pit  (Build ability)
+&Y|__|&0  Sand Pit  (Build ability)
 
 Sand pits are reinforced areas where fine, clean sand can be dug more
 effectively. You can dig more sand from them before depletion.
