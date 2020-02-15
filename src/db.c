@@ -1955,6 +1955,7 @@ const char *versions_list[] = {
 	"b5.84",
 	"b5.86",
 	"b5.86a",
+	"b5.87",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3788,6 +3789,80 @@ void b5_86_update(void) {
 }
 
 
+// removes 75% of unclaimed crops (previous patch removed wild crops in the map generator)
+// also adds old-growth forests
+void b5_87_crop_and_old_growth(void) {
+	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
+	void stop_room_action(room_data *room, int action, int chore);
+	void uncrop_tile(room_data *room);
+	
+	int removed_crop = 0, total_crop = 0, new_og = 0, total_forest = 0;
+	struct empire_completed_goal *goal, *next_goal;
+	empire_data *emp, *next_emp;
+	struct map_data *map;
+	room_data *room;
+	bool has_og;
+	
+	any_vnum overgrown_forest = 4;	// sect to change
+	any_vnum old_growth = 90;	// new sect
+	
+	log("Applying b5.87 update: removing 75%% of unclaimed crops and adding old-growth forests...");
+	has_og = (sector_proto(old_growth) ? TRUE : FALSE);
+	
+	LL_FOREACH(land_map, map) {
+		if (SECT_FLAGGED(map->sector_type, SECTF_CROP) && map->crop_type && (room = real_room(map->vnum)) && !ROOM_OWNER(room)) {
+			++total_crop;
+			
+			if (number(1,100) <= 75) {
+				++removed_crop;
+				// change to base sect
+				uncrop_tile(room);
+				
+				// stop all possible chores here since the sector changed
+				stop_room_action(room, ACT_HARVESTING, CHORE_FARMING);
+				stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
+				stop_room_action(room, ACT_PICKING, CHORE_HERB_GARDENING);
+				stop_room_action(room, ACT_GATHERING, NOTHING);
+			}
+		}
+		else if (has_og && GET_SECT_VNUM(map->sector_type) == overgrown_forest && (room = real_room(map->vnum)) && !ROOM_OWNER(room)) {
+			++total_forest;
+			if (!number(0, 9)) {
+				// 10% chance of becoming old-growth now
+				++new_og;
+				change_terrain(real_room(map->vnum), old_growth);
+			}
+			else {
+				// otherwise, back-date their sector time 3-4 weeks
+				set_extra_data(&map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME, time(0) - number(1814400, 2419200));
+			}
+		}
+	}
+	
+	log("- removed %d of %d unclaimed crop tiles", removed_crop, total_crop);
+	log("- converted %d of %d Overgrown Forests to Old-Growth Forests", new_og, total_forest);
+	
+	log("- removing apiaries from the learned-list of empires with 2011 Foundations...");
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), goal, next_goal) {
+			// Some goals were changed in this patch. Need to update anybody who completed them.
+			switch (goal->vnum) {
+				case 2011: {	// Foundations: -craft
+					remove_learned_craft_empire(emp, 5131, FALSE);	// apiary
+					save_empire(emp, TRUE);
+					break;
+				}
+			}
+		}
+	}
+	
+	if (removed_crop > 0 || total_forest > 0) {
+		world_map_needs_save = TRUE;
+		save_whole_world();
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4085,6 +4160,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.86a")) {
 			b5_86_update();
+		}
+		if (MATCH_VERSION("b5.87")) {
+			b5_87_crop_and_old_growth();
 		}
 	}
 	
