@@ -3204,7 +3204,8 @@ const char *mapout_color_names[] = {
 	"Dark Pink",
 	"Tan",
 	"Violet",
-	"Deep Violet",	// 39
+	"Deep Violet",
+	"Dark Dark Green",	// 40
 	"\n"
 };
 
@@ -3251,7 +3252,8 @@ const char mapout_color_tokens[] = {
 	'B',	// "Dark Pink",
 	'C',	// "Tan",
 	'D',	// "Violet",
-	'E',	// "Deep Violet",	// 39
+	'E',	// "Deep Violet",
+	'F',	// "Dark Dark Green",	// 40
 };
 
 
