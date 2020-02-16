@@ -118,13 +118,15 @@ A bag of sand is lying here.~
    This small bag of fine sand can be used to make glass ingots at the glass
 blower. From there, you can blow it into all kinds of useful glassware.
 ~
-3 l a 0 9
+3 l a 0 10
 0 0 0
 1 0
 O
 32 u
 R
 5117 0
+R
+5135 0
 S
 #108
 ingot glass ingots~

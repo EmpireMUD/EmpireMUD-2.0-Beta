@@ -4,7 +4,7 @@ a flask~
 A flask has been left here.~
 This glass flask can be used to hold water, or to make potions.
 ~
-5 0 a 0 4
+5 l a 0 5
 10 0 0
 8 0
 R
@@ -19,7 +19,7 @@ A jar has been left here.~
    It's a simple glass jar. You can keep water in the jar. It can also be used
 to make some foods.
 ~
-5 0 a 0 5
+5 l a 0 6
 10 0 0
 8 0
 R
@@ -33,7 +33,7 @@ a small pane of glass~
 A small pane of glass has been left here.~
 Glass panes can be used to make various items.
 ~
-3 0 a 0 2
+3 l a 0 3
 0 0 0
 8 0
 R
@@ -108,7 +108,7 @@ a vial~
 A vial is lying on the ground.~
 This little glass vial is empty.
 ~
-3 0 a 0 6
+3 l a 0 7
 0 0 0
 8 0
 R
@@ -138,10 +138,14 @@ an unlit candle~
 An unlit candle has been dropped here.~
 Light the candle to see after dark.
 ~
-3 l ao 0 3
+3 l ao 0 4
 0 0 0
 9 8064
 I 11 852 100.00 1  # LIGHT: a candle
+R
+5121 0
+R
+5610 0
 S
 #852
 candle~

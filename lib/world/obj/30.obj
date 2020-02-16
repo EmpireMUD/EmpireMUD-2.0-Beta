@@ -981,11 +981,13 @@ filling, or you could cook with the honey from it as a sweetener. You'll get
 back the wax from the honeycomb if you use it for this, or you can 'craft
 beeswax' to discard the honey and just keep the wax.
 ~
-6 l a 0 3
+6 l a 0 4
 1 0 0
 0 145
 I 26 850 100.00 1  # DECAYS-TO: some beeswax
 I 27 850 100.00 1  # CONSUMES-TO: some beeswax
+O
+31 0
 R
 5131 0
 R
