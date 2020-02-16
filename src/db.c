@@ -1903,52 +1903,19 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
  //////////////////////////////////////////////////////////////////////////////
 //// VERSION CHECKING ////////////////////////////////////////////////////////
 
+// WARNING: Do not remove items from this list if there is any chance the mud
+// could have that item as the last version it applied. If it fails to find its
+// the last recorded version in this list, it skips the check_version process.
+
 // add versions in ascending order: this is used by check_version()
 const char *versions_list[] = {
 	// this system was added in b2.5
-	"b2.5",
-	"b2.7",
-	"b2.8",
-	"b2.9",
-	"b2.11",
-	"b3.0",
-	"b3.1",
-	"b3.2",
-	"b3.6",
-	"b3.8",
-	"b3.11",
-	"b3.12",
-	"b3.15",
-	"b3.17",
-	"b4.1",
-	"b4.2",
-	"b4.4",
-	"b4.15",
-	"b4.19",
-	"b4.32",
-	"b4.36",
-	"b4.38",
-	"b4.39",
-	"b5.1",
-	"b5.3",
-	"b5.14",
-	"b5.17",
-	"b5.19",
-	"b5.20",
-	"b5.23",
-	"b5.24",
-	"b5.25",
-	"b5.30",
-	"b5.34",
-	"b5.35",
-	"b5.37",
-	"b5.38",
-	"b5.40",
-	"b5.45",
-	"b5.47",
-	"b5.48",
-	"b5.58",
-	"b5.60",
+	"b2.5", "b2.7", "b2.8", "b2.9", "b2.11",
+	"b3.0", "b3.1", "b3.2", "b3.6", "b3.8", "b3.11", "b3.12", "b3.15", "b3.17",
+	"b4.1", "b4.2", "b4.4", "b4.15", "b4.19", "b4.32", "b4.36", "b4.38", "b4.39",
+	"b5.1", "b5.3", "b5.14", "b5.17", "b5.19", "b5.20", "b5.23", "b5.24",
+	"b5.25", "b5.30", "b5.34", "b5.35", "b5.37", "b5.38", "b5.40", "b5.45",
+	"b5.47", "b5.48", "b5.58", "b5.60",
 	"b5.80",
 	"b5.82",
 	"b5.83",
@@ -1968,7 +1935,7 @@ const char *versions_list[] = {
 int get_last_boot_version(void) {
 	char str[256];
 	FILE *fl;
-	int iter;
+	int iter, pos;
 	
 	if (!(fl = fopen(VERSION_FILE, "r"))) {
 		// if no file, do not run auto-updaters -- skip them
@@ -1982,7 +1949,17 @@ int get_last_boot_version(void) {
 	get_line(fl, str);
 	fclose(fl);
 	
-	return search_block(str, versions_list, TRUE);
+	pos = search_block(str, versions_list, TRUE);
+	if (pos == NOTHING) {
+		// failed to find the version? find the last version instead
+		for (iter = 0; *versions_list[iter] != '\n'; ++iter) {
+			// just looking for last entry
+		}
+		pos = iter - 1;
+		log("SYSERR: get_last_boot_version got unknown version '%s' from version file '%s' -- skipping auto-updaters and assuming version '%s'", str, VERSION_FILE, versions_list[pos]);
+	}
+	
+	return pos;
 }
 
 /**
