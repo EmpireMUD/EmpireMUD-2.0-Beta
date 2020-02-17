@@ -470,15 +470,6 @@ appear when you type 'look', but without all the other information from the
 
 See also: LOOK
 #
-COTTON
-
-Stored in:  Tailor
-
-Cotton is a crop that is only grown in the desert. It can be stored in a
-tailor.
-
-See also: TAILOR, WEAVE
-#
 CUSTOMIZE "CUSTOMIZE VEHICLE" "CUSTOMIZE ROAD"
 
 Usage:  customize <type> [target] <field> <value | none>
