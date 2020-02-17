@@ -1386,44 +1386,44 @@ See also: WORKFORCE
 "WORKFORCE CHORES" "WORKFORCE TYPES"
 
 Workforce types:
+  &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping.
+  &yabandon-dismantled:&0 NPCs will abandon a tile when they finish dismantling.
+  &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
+  &ybeekeeping:&0 Will produce honey and wax the apiary.
+  &ybrickmaking:&0 NPCs will make bricks at the potter.
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
             any building you've started to dismantle. They build using stored
             empire resources, not items on the ground. Workers can't provide
             coins, liquids (like water), or pools (like mana) for building. Any
             building that requires one of these must be finished manually.
+  &yburn-stumps:&0 Will burn down 'stumps' tiles.
   &ychopping:&0 NPCs will chop down forests and desert groves (Not orchards - 
      use farming without replanting for that).
   &ydigging:&0 NPCs will dig for in any quarry, clay pit, or sand pit.
-  &yfarming:&0 NPCs will harvest crops. Costs no food.
-  &yreplanting:&0 after farming crops, NPCs will replant them.
-  &ymaintenance:&0 NPCs will keep buildings maintained.
-  &ymining:&0 NPCs will mine your mines.
-  &yscraping:&0 NPCs will convert trees into logs at lumber yards.
-  &ysawing:&0 NPCs will convert trees into lumber at lumber yards.
-  &ysmelting:&0 NPCs will smelt ore and precious metals at foundries.
-  &yweaving:&0 NPCs will convert cotton to cloth at the tailor.
-  &yquarrying:&0 NPCs will quarry huge stone blocks at the quarry.
-  &ynailmaking:&0 NPCs will forge pouches of nails at the forge.
-  &ybrickmaking:&0 NPCs will make bricks at the potter.
-  &yabandon-dismantled:&0 NPCs will abandon a tile when they finish dismantling.
-  &cherb-gardening (skilled):&0 NPCs will gather herbs in gardens.
-  &yfire-brigade:&0 NPCs will put out fires.
-  &ctrapping (skilled):&0 NPCs will gather skins at trapper's posts.
-  &ytanning:&0 NPCs will tan skins into leather.
-  &yshearing:&0 NPCs will shear animals in stables.
-  &cminting (skilled):&0 NPCs will mint treasure into coins.
   &ydismantle-mines:&0 mines will be dismantled when empty.
-  &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping.
-  &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
+  &yfarming:&0 NPCs will harvest crops. Costs no food.
+  &yfire-brigade:&0 NPCs will put out fires.
+  &yfishing:&0 Will catch fish at the fishery. Costs no food.
+  &yglassmaking:&0 Turns basic sand into glass ingots at the glass blower.
+  &cherb-gardening (skilled):&0 NPCs will gather herbs in gardens.
+  &ymaintenance:&0 NPCs will keep buildings maintained.
+  &ymilling:&0 Will mill grains into flour.
+  &ymining:&0 NPCs will mine your mines.
+  &cminting (skilled):&0 NPCs will mint treasure into coins.
+  &ynailmaking:&0 NPCs will forge pouches of nails at the forge.
   &cnexus-crystal (skilled):&0 Will make nexus crystals at the sorcery tower;
      requires both Exarch Crafts and Skilled Labor.
-  &ymilling:&0 Will mill grains into flour.
-  &yrepair-vehicles&0: Will keep vehicles maintained.
   &yoilmaking:&0 Will press oil.
-  &yfishing:&0 Will catch fish at the fishery. Costs no food.
-  &yburn-stumps:&0 Will burn down 'stumps' tiles.
-  &ybeekeeping:&0 Will produce honey and wax the apiary.
-  &yglassmaking:&0 Turns basic sand into glass ingots at the glass blower.
+  &yquarrying:&0 NPCs will quarry huge stone blocks at the quarry.
+  &yrepair-vehicles&0: Will keep vehicles maintained.
+  &yreplanting:&0 after farming crops, NPCs will replant them.
+  &ysawing:&0 NPCs will convert trees into lumber at lumber yards.
+  &yscraping:&0 NPCs will convert trees into logs at lumber yards.
+  &yshearing:&0 NPCs will shear animals in stables.
+  &ysmelting:&0 NPCs will smelt ore and precious metals at foundries.
+  &ytanning:&0 NPCs will tan skins into leather.
+  &ctrapping (skilled):&0 NPCs will gather skins at trapper's posts.
+  &yweaving:&0 NPCs will convert cotton to cloth at the tailor.
   
 Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores
 tend to cost more food.
