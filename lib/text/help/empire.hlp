@@ -1423,6 +1423,7 @@ Workforce types:
   &yfishing:&0 Will catch fish at the fishery. Costs no food.
   &yburn-stumps:&0 Will burn down 'stumps' tiles.
   &ybeekeeping:&0 Will produce honey and wax the apiary.
+  &yglassmaking:&0 Turns basic sand into glass ingots at the glass blower.
   
 Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores
 tend to cost more food.

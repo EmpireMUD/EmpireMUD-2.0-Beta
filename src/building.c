@@ -1211,6 +1211,8 @@ void start_dismantle_building(room_data *loc) {
 	stop_room_action(loc, NOTHING, CHORE_NEXUS_CRYSTALS);
 	stop_room_action(loc, NOTHING, CHORE_MILLING);
 	stop_room_action(loc, NOTHING, CHORE_OILMAKING);
+	stop_room_action(loc, NOTHING, CHORE_BEEKEEPING);
+	stop_room_action(loc, NOTHING, CHORE_GLASSMAKING);
 }
 
 

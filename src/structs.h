@@ -1110,7 +1110,8 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_FISHING  29
 #define CHORE_BURN_STUMPS  30
 #define CHORE_BEEKEEPING  31
-#define NUM_CHORES  32		// total
+#define CHORE_GLASSMAKING  32
+#define NUM_CHORES  33		// total
 
 
 // DIPL_x: Diplomacy types

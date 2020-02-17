@@ -51,6 +51,7 @@ void do_chore_farming(empire_data *emp, room_data *room);
 void do_chore_fishing(empire_data *emp, room_data *room);
 void do_chore_fire_brigade(empire_data *emp, room_data *room);
 void do_chore_gardening(empire_data *emp, room_data *room);
+void do_chore_glassmaking(empire_data *emp, room_data *room);
 void do_chore_mining(empire_data *emp, room_data *room);
 void do_chore_minting(empire_data *emp, room_data *room);
 void do_chore_nailmaking(empire_data *emp, room_data *room);
@@ -124,6 +125,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "fishing", FISHERMAN, FALSE },
 	{ "burn-stumps", STUMP_BURNER, FALSE },
 	{ "beekeeping", BEEKEEPER, FALSE },
+	{ "glassmaking", GLASSMAKER, FALSE },
 };
 
 
@@ -252,6 +254,9 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		}
 		if (room_has_function_and_city_ok(room, FNC_APIARY) && CHORE_ACTIVE(CHORE_BEEKEEPING)) {
 			do_chore_beekeeping(emp, room);
+		}
+		if (room_has_function_and_city_ok(room, FNC_GLASSBLOWER) && CHORE_ACTIVE(CHORE_GLASSMAKING)) {
+			do_chore_glassmaking(emp, room);
 		}
 		if (BUILDING_VNUM(room) == BUILDING_TRAPPERS_POST && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_TRAPPING)) {
 			do_chore_trapping(emp, room);
@@ -2121,6 +2126,47 @@ void do_chore_gardening(empire_data *emp, room_data *room) {
 	}
 	if (!can_gain) {
 		log_workforce_problem(emp, room, CHORE_HERB_GARDENING, WF_PROB_OVER_LIMIT, FALSE);
+	}
+}
+
+
+// converts 2 basic sand to 1 glass ingot
+void do_chore_glassmaking(empire_data *emp, room_data *room) {
+	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_GLASSMAKING].mob);
+	int islid = GET_ISLAND_ID(room);
+	bool can_gain = can_gain_chore_resource(emp, room, CHORE_GLASSMAKING, o_GLASS_INGOT);
+	struct empire_storage_data *sand = find_stored_resource(emp, islid, o_SAND);
+	bool has_sand = (sand && sand->amount >= 2);
+	bool can_do = can_gain && has_sand;
+	
+	if (worker && can_do) {
+		add_empire_needs(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, 1);
+		ewt_mark_resource_worker(emp, room, o_GLASS_INGOT);
+		
+		charge_stored_resource(emp, islid, o_SAND, 2);
+		add_to_empire_storage(emp, islid, o_GLASS_INGOT, 1);
+		add_production_total(emp, o_GLASS_INGOT, 1);
+		
+		act("$n finishes a glass ingot and sets it to cool.", FALSE, worker, NULL, NULL, TO_ROOM);
+	}
+	else if (can_do) {
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_GLASSMAKING, room))) {
+			ewt_mark_resource_worker(emp, room, o_GLASS_INGOT);
+		}
+	}
+	else if (worker) {
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_GLASSMAKING, !has_sand ? WF_PROB_NO_RESOURCES : WF_PROB_OVER_LIMIT);
+	}
+	
+	if (!has_sand) {
+		log_workforce_problem(emp, room, CHORE_GLASSMAKING, WF_PROB_NO_RESOURCES, FALSE);
+	}
+	if (!can_gain) {
+		log_workforce_problem(emp, room, CHORE_GLASSMAKING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 

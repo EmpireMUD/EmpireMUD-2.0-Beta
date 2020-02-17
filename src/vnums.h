@@ -87,6 +87,10 @@
 #define o_BEESWAX  850
 #define o_HONEYCOMB  3069
 
+// glassmaking chore -- TODO this should probably be configured somewhere in-game too
+#define o_SAND  107
+#define o_GLASS_INGOT  108
+
 // Wood crafts
 #define o_STAKE  915	// could be a flag
 #define o_BLANK_SIGN  918
@@ -204,6 +208,7 @@
 #define MINE_SUPERVISOR  277
 #define FISHERMAN  279
 #define BEEKEEPER  281
+#define GLASSMAKER  282
 
 
  //////////////////////////////////////////////////////////////////////////////
