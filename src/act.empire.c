@@ -1333,9 +1333,11 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 * @param char_data *ch The person to show it to.
 */
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
+	extern int *get_ordered_chores();
+	
 	struct empire_island *isle, *next_isle, *this_isle;
 	char part[MAX_STRING_LENGTH];
-	int iter, on, off, size;
+	int iter, on, off, size, *order, chore;
 	bool here;
 	
 	if (!emp) {
@@ -1345,8 +1347,12 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 	msg_to_char(ch, "Workforce setup for %s%s&0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	this_isle = (GET_ISLAND_ID(IN_ROOM(ch)) != NO_ISLAND ? get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))) : NULL);
 	
+	order = get_ordered_chores();
+	
 	for (iter = 0; iter < NUM_CHORES; ++iter) {
-		if (chore_data[iter].hidden) {
+		chore = order[iter];
+		
+		if (chore_data[chore].hidden) {
 			continue;	// skip hidden here
 		}
 		
@@ -1358,16 +1364,16 @@ void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
 				continue;
 			}
 			
-			if (isle->workforce_limit[iter] == 0) {
+			if (isle->workforce_limit[chore] == 0) {
 				++off;
 			}
 			else {
 				++on;
 			}
 		}
-		here = (this_isle ? (this_isle->workforce_limit[iter] != 0) : FALSE);
+		here = (this_isle ? (this_isle->workforce_limit[chore] != 0) : FALSE);
 		
-		snprintf(part, sizeof(part), "%s: %s%s", chore_data[iter].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " (partial)" : "*") : "");
+		snprintf(part, sizeof(part), "%s: %s%s", chore_data[chore].name, here ? "&con&0" : "&yoff&0", ((on && !here) || (off && here)) ? (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " (partial)" : "*") : "");
 		size = 24 + color_code_length(part) + (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? 24 : 0);
 		msg_to_char(ch, " %-*.*s%s", size, size, part, (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !((iter+1)%3)) ? "\r\n" : " ");
 	}
@@ -6761,6 +6767,8 @@ ACMD(do_unpublicize) {
 
 
 ACMD(do_workforce) {
+	extern int *get_ordered_chores();
+	
 	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH], island_arg[MAX_INPUT_LENGTH];
 	struct empire_storage_data *store, *next_store;
 	struct island_info *island = NULL;

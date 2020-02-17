@@ -921,6 +921,45 @@ struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc
 
 
 /**
+* Fetches an int array of size NUM_CHORES with the chore ids in alphabetical
+* order. Use it like this:
+*   int *order = get_ordered_chores();
+*   for (iter = 0; iter < NUM_CHORES; ++iter) {
+*     strcpy(name, chore_data[order[iter]].name);
+*     ...
+*   }
+*/
+int *get_ordered_chores(void) {
+	static int *data = NULL;
+	int iter, sub, temp;
+	
+	if (data) {
+		return data;	// only have to do this once per boot
+	}
+	// otherwise, determine it:
+	
+	// create and initialize:
+	CREATE(data, int, NUM_CHORES);
+	for (iter = 0; iter < NUM_CHORES; ++iter) {
+		data[iter] = iter;
+	}
+	
+	// sort it alphabetically
+	for (iter = 0; iter < NUM_CHORES; ++iter) {
+		for (sub = iter + 1; sub < NUM_CHORES; ++sub) {
+			if (strcmp(chore_data[data[iter]].name, chore_data[data[sub]].name) > 0) {
+				temp = data[iter];
+				data[iter] = data[sub];
+				data[sub] = temp;
+			}
+		}
+	}
+	
+	return data;
+}
+
+
+/**
 * Mark the reason workforce couldn't work a given spot this time (logs are
 * freed every time workforce runs).
 *
