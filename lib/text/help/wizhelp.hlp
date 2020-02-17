@@ -384,7 +384,7 @@ For both GOTO and TRANS, the location specifier can be either a virtual room
 number, coordinates, or the name of a character, object, or vehicle.
 
 Examples:
-
+  > goto (123,456)
   > goto 3001
   > goto rasmussen
   > trans dog
