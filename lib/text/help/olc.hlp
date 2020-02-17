@@ -2683,7 +2683,7 @@ room until they are completed.
 Vehicle crafts don't use the "quantity" or "time" fields. Otherwise, they
 behave like regular crafts.
 #d
-"CROPEDIT CLIMATE" "SECTEDIT CLIMATE"
+"CROPEDIT CLIMATE" "SECTEDIT CLIMATE" "CLIMATE FLAGS"
 
 Usage:  .climate [add | remove] <flags>
 
@@ -3301,6 +3301,20 @@ ends. It will only be shown to players who can see that person. This message
 is optional.
 
 See also: OLC GENERICS, GENERIC AFFECTS
+#d
+"GEDIT CAPACITY"
+
+Usage:  .capacity <amount>
+
+This sets the amount you can mine in a 'Mine Data' global. Mines may randomly
+have as low as half this amount, but the amount you set here is the maximum.
+
+If the mine is built with Deep Mines, it will have 50% more.
+
+For example, if you set the capacity to 50, it will have 25-50 ore normally or
+37-75 ore if it's a deep mine.
+
+See also: GEDIT, DEEP MINES, GLOBAL MINE DATA
 #d
 "GEDIT CLIMATEEXCLUDE"
 
