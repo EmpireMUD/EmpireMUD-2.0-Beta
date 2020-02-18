@@ -1812,6 +1812,8 @@ struct tower_victim_list {
 * @param char_data *vict Potential target
 */
 static bool tower_would_shoot(room_data *from_room, char_data *vict) {
+	extern bool ignore_distrustful_due_to_start_loc(room_data *loc);
+	
 	empire_data *emp = ROOM_OWNER(from_room);
 	empire_data *enemy = IS_NPC(vict) ? NULL : GET_LOYALTY(vict);
 	empire_data *m_empire;
@@ -1882,7 +1884,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 		return FALSE;
 	}
 	
-	if (!has_empire_trait(emp, to_room, ETRAIT_DISTRUSTFUL) && !enemy && !hostile) {
+	if (!enemy && !hostile && (!has_empire_trait(emp, to_room, ETRAIT_DISTRUSTFUL) || ignore_distrustful_due_to_start_loc(to_room))) {
 		return FALSE;
 	}
 

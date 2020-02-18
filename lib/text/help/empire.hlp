@@ -311,6 +311,8 @@ be hostile to neutral players (ones with no diplomatic relationship, or where
 you have a truce but not peace with them).
 
 If your empire is not distrustful, your guards will not attack neutral players.
+The distrustful setting also won't work within 75 tiles of a starting location
+(Tower of Souls).
 
 The exchange rate with distrust is 25%.
 

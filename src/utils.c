@@ -60,6 +60,7 @@ void send_char_pos(char_data *ch, int dam);
 #define WHITESPACE " \t"	// used by some of the string functions
 bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
 bool empire_can_claim(empire_data *emp);
+bool ignore_distrustful_due_to_start_loc(room_data *loc);
 bool is_trading_with(empire_data *emp, empire_data *partner);
 void score_empires();
 void unmark_items_for_char(char_data *ch, bool ground);
@@ -997,8 +998,10 @@ bool empire_is_hostile(empire_data *emp, empire_data *enemy, room_data *loc) {
 		return FALSE;
 	}
 	
-	if ((!loc && IS_SET(EMPIRE_FRONTIER_TRAITS(emp), ETRAIT_DISTRUSTFUL)) || has_empire_trait(emp, loc, ETRAIT_DISTRUSTFUL)) {
-		distrustful = TRUE;
+	if (!loc || !ignore_distrustful_due_to_start_loc(loc)) {
+		if ((!loc && IS_SET(EMPIRE_FRONTIER_TRAITS(emp), ETRAIT_DISTRUSTFUL)) || has_empire_trait(emp, loc, ETRAIT_DISTRUSTFUL)) {
+			distrustful = TRUE;
+		}
 	}
 	
 	if (emp && enemy) {
@@ -1107,6 +1110,36 @@ bool has_relationship(empire_data *emp, empire_data *fremp, bitvector_t diplomac
 	}
 	
 	return FALSE;
+}
+
+
+/**
+* This function checks the "min_distrustful_distance" config, which is the
+* distance from a starting location where the distrustful flag stops working.
+* Anybody closer is proteted from distrustful-based attacks.
+*
+* @param room_data *loc The location to test.
+* @return bool TRUE if this location is too close to a starting location; FALSE if not.
+*/
+bool ignore_distrustful_due_to_start_loc(room_data *loc) {
+	extern int highest_start_loc_index;
+	extern int *start_locs;
+	
+	int safe_distance = config_get_int("min_distrustful_distance");
+	int iter;
+	
+	// short-circuit if this feature is turned off
+	if (safe_distance == 0) {
+		return FALSE;
+	}
+	
+	for (iter = 0; iter <= highest_start_loc_index; ++iter) {
+		if (compute_distance(loc, real_room(start_locs[iter])) < safe_distance) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;	// didn't find any start locs in range
 }
 
 
