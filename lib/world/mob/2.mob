@@ -1025,4 +1025,15 @@ D
 This citizen is taking care of the beehives. (workforce beekeeping)
 ~
 S
+#282
+#n glassmaker~
+glassmaker #n~
+#n is working as the glassblower's apprentice.
+~
+20 50 bdqv 0 3
+1 0 0 12
+D
+This citizen is making glass ingots for the glassblower. (workforce glassmaking)
+~
+S
 $

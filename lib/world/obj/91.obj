@@ -87,12 +87,12 @@ R
 5193 a
 S
 #9141
-horn horns rhinoceros~
-a rhinoceros horn~
+horn horns rhinoceros common~
+a common rhinoceros horn~
 A rhinoceros horn is lying here.~
 The horn is cracked, but should still fetch a decent price.
 ~
-15 0 a 0 10
+15 0 a 0 11
 1 0 0
 14 0
 O

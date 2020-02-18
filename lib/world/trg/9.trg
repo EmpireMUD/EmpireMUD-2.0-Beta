@@ -82,6 +82,11 @@ Beehive Growth~
 ~
 * config: max honeycomb to store
 set max 24
+* ensure we can act here: outdoors or in apiary
+if !%self.room.is_outdoors% && !%self.room.function(APIARY)%
+  wait 3600 s
+  halt
+end
 * pull out variable
 if %self.varexists(stored)%
   set stored %self.stored%
