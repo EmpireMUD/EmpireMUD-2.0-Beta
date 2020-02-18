@@ -419,7 +419,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 		obj = new;
 		
 		if (notify && notify->desc) {
-			msg_to_char(notify, "&yItem '%s' updated.&0\r\n", GET_OBJ_SHORT_DESC(obj));
+			stack_msg_to_desc(notify->desc, "&yItem '%s' updated.&0\r\n", GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	

@@ -40,6 +40,7 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
 // externs
 void adjust_building_tech(empire_data *emp, room_data *room, bool add);
 extern bool can_claim(char_data *ch);
+INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter);
 void free_complex_data(struct complex_room_data *data);
@@ -1210,6 +1211,8 @@ void start_dismantle_building(room_data *loc) {
 	stop_room_action(loc, NOTHING, CHORE_NEXUS_CRYSTALS);
 	stop_room_action(loc, NOTHING, CHORE_MILLING);
 	stop_room_action(loc, NOTHING, CHORE_OILMAKING);
+	stop_room_action(loc, NOTHING, CHORE_BEEKEEPING);
+	stop_room_action(loc, NOTHING, CHORE_GLASSMAKING);
 }
 
 
@@ -2274,6 +2277,8 @@ ACMD(do_paint) {
 		COMPLEX_DATA(IN_ROOM(ch))->paint_color = GET_PAINT_COLOR(paint);
 		
 		command_lag(ch, WAIT_ABILITY);
+		
+		run_interactions(ch, paint->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, paint, consumes_or_decays_interact);
 		extract_obj(paint);
 	}
 }

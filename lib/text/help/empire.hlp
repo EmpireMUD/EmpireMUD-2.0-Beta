@@ -614,7 +614,6 @@ Foundations (Industry goal)
 
 Rewards the following buildings:
   (AA)  alchemist
-  {BB}  apiary
   (BB)  bakery
   (CC)  carpenter
   {DD}  depository
@@ -676,7 +675,10 @@ Usage:  home
 
 You can choose a house in your empire to make your own private residence. Once
 you set it as your home, other members of the empire can't enter (except the
-highest-ranking leaders).
+highest-ranking leaders). If you 'designate' a bedroom in your home, a chest
+will appear in that bedroom. You can safely put bound items and non-storable
+items in the chest, but any storable items will still autostore from there.
+You can also safely leave these items on the floor in your house.
 
 You can unset your home from anywhere, or clear the owner for the building
 you're in. Only the empire leaders can clear homes they don't own.
@@ -688,7 +690,7 @@ Only buildings that normally house citizens can be set as homes. This does not
 include buildings where adding a bedroom grants a citizen, if the building
 itself doesn't house citizens.
 
-See also: CITIZENS, FINE POTTERY
+See also: AUTOSTORE, CITIZENS, DESIGNATE, FINE POTTERY
 #
 HOMESTEAD "HOMESTEAD GOAL"
 
@@ -1185,10 +1187,8 @@ Empires can earn many different technologies to boost their abilities and
 effectiveness.
 
 Available technologies are:
- - Glassblowing*: allows you to craft various items which require glass
  - City Lights: all claimed territory lights up at night
  - Locks: enemy infiltration is much more difficult
- - Apiaries*: lets you cook with honey and craft with wax
  - Seaport*: you have a dock!
  - Workforce: citizens will do chores for the empire
  - Prominence: the empire appears on the main list
@@ -1389,42 +1389,44 @@ See also: WORKFORCE
 "WORKFORCE CHORES" "WORKFORCE TYPES"
 
 Workforce types:
+  &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping.
+  &yabandon-dismantled:&0 NPCs will abandon a tile when they finish dismantling.
+  &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
+  &ybeekeeping:&0 Will produce honey and wax the apiary.
+  &ybrickmaking:&0 NPCs will make bricks at the potter.
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
             any building you've started to dismantle. They build using stored
             empire resources, not items on the ground. Workers can't provide
             coins, liquids (like water), or pools (like mana) for building. Any
             building that requires one of these must be finished manually.
+  &yburn-stumps:&0 Will burn down 'stumps' tiles.
   &ychopping:&0 NPCs will chop down forests and desert groves (Not orchards - 
      use farming without replanting for that).
-  &ydigging:&0 NPCs will dig for rocks in any quarry, or clay in any clay pit.
-  &yfarming:&0 NPCs will harvest crops. Costs no food.
-  &yreplanting:&0 after farming crops, NPCs will replant them.
-  &ymaintenance:&0 NPCs will keep buildings maintained.
-  &ymining:&0 NPCs will mine your mines.
-  &yscraping:&0 NPCs will convert trees into logs at lumber yards.
-  &ysawing:&0 NPCs will convert trees into lumber at lumber yards.
-  &ysmelting:&0 NPCs will smelt ore and precious metals at foundries.
-  &yweaving:&0 NPCs will convert cotton to cloth at the tailor.
-  &yquarrying:&0 NPCs will quarry huge stone blocks at the quarry.
-  &ynailmaking:&0 NPCs will forge pouches of nails at the forge.
-  &ybrickmaking:&0 NPCs will make bricks at the potter.
-  &yabandon-dismantled:&0 NPCs will abandon a tile when they finish dismantling.
-  &cherb-gardening (skilled):&0 NPCs will gather herbs in gardens.
-  &yfire-brigade:&0 NPCs will put out fires.
-  &ctrapping (skilled):&0 NPCs will gather skins at trapper's posts.
-  &ytanning:&0 NPCs will tan skins into leather.
-  &yshearing:&0 NPCs will shear animals in stables.
-  &cminting (skilled):&0 NPCs will mint treasure into coins.
+  &ydigging:&0 NPCs will dig for in any quarry, clay pit, or sand pit.
   &ydismantle-mines:&0 mines will be dismantled when empty.
-  &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping.
-  &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
+  &yfarming:&0 NPCs will harvest crops. Costs no food.
+  &yfire-brigade:&0 NPCs will put out fires.
+  &yfishing:&0 Will catch fish at the fishery. Costs no food.
+  &yglassmaking:&0 Turns basic sand into glass ingots at the glass blower.
+  &cherb-gardening (skilled):&0 NPCs will gather herbs in gardens.
+  &ymaintenance:&0 NPCs will keep buildings maintained.
+  &ymilling:&0 Will mill grains into flour.
+  &ymining:&0 NPCs will mine your mines.
+  &cminting (skilled):&0 NPCs will mint treasure into coins.
+  &ynailmaking:&0 NPCs will forge pouches of nails at the forge.
   &cnexus-crystal (skilled):&0 Will make nexus crystals at the sorcery tower;
      requires both Exarch Crafts and Skilled Labor.
-  &ymilling:&0 Will mill grains into flour.
-  &yrepair-vehicles&0: Will keep vehicles maintained.
   &yoilmaking:&0 Will press oil.
-  &yfishing:&0 Will catch fish at the fishery. Costs no food.
-  &yburn-stumps:&0 Will burn down 'stumps' tiles.
+  &yquarrying:&0 NPCs will quarry huge stone blocks at the quarry.
+  &yrepair-vehicles&0: Will keep vehicles maintained.
+  &yreplanting:&0 after farming crops, NPCs will replant them.
+  &ysawing:&0 NPCs will convert trees into lumber at lumber yards.
+  &yscraping:&0 NPCs will convert trees into logs at lumber yards.
+  &yshearing:&0 NPCs will shear animals in stables.
+  &ysmelting:&0 NPCs will smelt ore and precious metals at foundries.
+  &ytanning:&0 NPCs will tan skins into leather.
+  &ctrapping (skilled):&0 NPCs will gather skins at trapper's posts.
+  &yweaving:&0 NPCs will convert cotton to cloth at the tailor.
   
 Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores
 tend to cost more food.

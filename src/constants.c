@@ -1565,8 +1565,8 @@ struct character_size_data size_data[] = {
 // CRAFT_x (1/2): flag names
 const char *craft_flags[] = {
 	"POTTERY",
-	"APIARIES-TECH",
-	"GLASS-TECH",
+	"*",	// former apiaries tech
+	"*",	// former glass-tech
 	"GLASSBLOWER",
 	"CARPENTER",
 	"ALCHEMY",
@@ -1582,6 +1582,7 @@ const char *craft_flags[] = {
 	"BLD-UPGRADED",
 	"LEARNED",
 	"BY-RIVER",
+	"REMOVE-PRODUCTION",
 	"\n"
 };
 
@@ -1589,8 +1590,8 @@ const char *craft_flags[] = {
 // CRAFT_x (2/2): how flags that show up on "craft info"
 const char *craft_flag_for_info[] = {
 	"pottery",
-	"requires apiaries",
-	"requires glassblowing",
+	"",
+	"",
 	"requires glassblower building",
 	"requires carpenter building",
 	"alchemy",
@@ -1606,6 +1607,7 @@ const char *craft_flag_for_info[] = {
 	"requires upgrade",
 	"",	// learned
 	"must be by a river",
+	"",	// remove-production
 	"\n"
 };
 
@@ -1781,10 +1783,10 @@ const char *offense_flags[] = {
 
 // TECH_x
 const char *techs[] = {
-	"Glassblowing",
+	"*",
 	"City Lights",
 	"Locks",
-	"Apiaries",
+	"*",
 	"Seaport",
 	"Workforce",
 	"Prominence",
@@ -2368,23 +2370,23 @@ const double obj_flag_scaling_bonus[] = {
 
 // MAT_x -- name, TRUE if it floats
 const struct material_data materials[NUM_MATERIALS] = {
-	// name, floats, chance-to-get-from-dismantle
-	{ "WOOD", TRUE, 50.0 },
-	{ "ROCK", FALSE, 95.0 },
-	{ "IRON", FALSE, 90.0 },
-	{ "SILVER", FALSE, 100.0 },
-	{ "GOLD", FALSE, 100.0 },
-	{ "FLINT", FALSE, 95.0 },
-	{ "CLAY", FALSE, 75.0 },
-	{ "FLESH", TRUE, 50.0 },
-	{ "GLASS", FALSE, 50.0 },
-	{ "WAX", TRUE, 25.0 },
-	{ "MAGIC", TRUE, 100.0 },
-	{ "CLOTH", TRUE, 50.0 },
-	{ "GEM", FALSE, 100.0 },
-	{ "COPPER", FALSE, 100.0 },
-	{ "BONE", TRUE, 50.0 },
-	{ "HAIR", TRUE, 50.0 }
+	// name, floats, chance-to-get-from-dismantle, decay-on-char, decay-in-room
+	{ "WOOD", TRUE, 50.0, "$p rots away in your hands.", "$p rots away to nothing." },
+	{ "ROCK", FALSE, 95.0, "$p crumbles in your hands.", "$p crumbles and disintegrates." },
+	{ "IRON", FALSE, 90.0, "$p rusts in your hands.", "$p rusts and disintegrates." },
+	{ "SILVER", FALSE, 100.0, "$p cracks and disintegrates in your hands.", "$p cracks and disintegrates." },
+	{ "GOLD", FALSE, 100.0, "$p cracks and disintegrates in your hands.", "$p cracks and disintegrates." },
+	{ "FLINT", FALSE, 95.0, "$p crumbles in your hands.", "$p crumbles and disintegrates." },
+	{ "CLAY", FALSE, 75.0, "$p cracks and disintegrates in your hands.", "$p cracks and disintegrates." },
+	{ "FLESH", TRUE, 50.0, "$p decays in your hands.", "A quivering horde of maggots consumes $p." },
+	{ "GLASS", FALSE, 50.0, "$p cracks and shatters in your hands.", "$p cracks and shatters." },
+	{ "WAX", TRUE, 25.0, "$p melts in your hands and is gone.", "$p melts and is gone." },
+	{ "MAGIC", TRUE, 100.0, "$p flickers briefly in your hands, then vanishes with a poof.", "$p flickers briefly, then vanishes with a poof." },
+	{ "CLOTH", TRUE, 50.0, "$p rots away in your hands.", "$p rots away to nothing." },
+	{ "GEM", FALSE, 100.0, "$p cracks and shatters in your hands.", "$p cracks and shatters." },
+	{ "COPPER", FALSE, 100.0, "$p cracks and disintegrates in your hands.", "$p cracks and disintegrates." },
+	{ "BONE", TRUE, 50.0, "$p rots away in your hands.", "$p rots away to nothing." },
+	{ "HAIR", TRUE, 50.0, "$p rots away in your hands.", "$p rots away to nothing." }
 };
 
 
@@ -2447,6 +2449,10 @@ const char *component_types[] = {
 	"vegetable",
 	"rope",
 	"paint",
+	"wax",	// 30
+	"sweetener",
+	"sand",
+	"glass",
 	"\n"
 };
 
@@ -2591,6 +2597,8 @@ const char *obj_custom_types[] = {
 	"longdesc-male",
 	"fish-to-char",	// 15
 	"fish-to-room",
+	"decays-on-char",
+	"decays-in-room",
 	"\n"
 };
 
@@ -3045,11 +3053,12 @@ const char *evo_types[] = {
 	"SPREADS-TO",
 	"HARVEST-TO",
 	"DEFAULT-HARVEST-TO",
+	"TIMED",	// 20
 	"\n"
 };
 
 
-// EVO_x 2/3: what type of data the evolution.value uses
+// EVO_x 2/3 and EVO_VAL_x: what type of data the evolution.value uses
 const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// chopped-down
 	EVO_VAL_NONE,	// crop-grows
@@ -3071,6 +3080,7 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_SECTOR,	// spreads-to
 	EVO_VAL_NONE,	// harvest-to
 	EVO_VAL_NONE,	// default-harvest-to
+	EVO_VAL_NUMBER,	// timed (minutes)
 };
 
 
@@ -3096,6 +3106,7 @@ bool evo_is_over_time[] = {
 	TRUE,	// spreads-to
 	FALSE,	// harvest-to
 	FALSE,	// default-harvest-to
+	TRUE,	// timed
 };
 
 
@@ -3195,7 +3206,8 @@ const char *mapout_color_names[] = {
 	"Dark Pink",
 	"Tan",
 	"Violet",
-	"Deep Violet",	// 39
+	"Deep Violet",
+	"Dark Dark Green",	// 40
 	"\n"
 };
 
@@ -3242,7 +3254,8 @@ const char mapout_color_tokens[] = {
 	'B',	// "Dark Pink",
 	'C',	// "Tan",
 	'D',	// "Violet",
-	'E',	// "Deep Violet",	// 39
+	'E',	// "Deep Violet",
+	'F',	// "Dark Dark Green",	// 40
 };
 
 
@@ -3347,6 +3360,7 @@ const char *room_extra_types[] = {
 	"trench fill time",
 	"trench original sector",
 	"original builder",	// 20
+	"sector time",
 	"\n"
 };
 
@@ -3924,6 +3938,8 @@ const char *interact_types[] = {
 	"QUARRY",
 	"TAME",
 	"SEED",	// 25
+	"DECAYS-TO",
+	"CONSUMES-TO",
 	"\n"
 };
 
@@ -3965,6 +3981,8 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_ROOM,	// quarry
 	TYPE_MOB,	// tame
 	TYPE_OBJ,	// seed
+	TYPE_OBJ,	// decays-to
+	TYPE_OBJ,	// consumes-to
 };
 
 
@@ -3996,6 +4014,8 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// quarry
 	TYPE_MOB,	// tame
 	TYPE_OBJ,	// seed
+	TYPE_OBJ,	// decays-to
+	TYPE_OBJ,	// consumes-to
 };
 
 

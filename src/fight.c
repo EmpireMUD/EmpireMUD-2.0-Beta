@@ -49,6 +49,7 @@ extern struct character_size_data size_data[];
 ACMD(do_flee);
 bool check_scaling(char_data *mob, char_data *based_on);
 extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
+INTERACTION_FUNC(consumes_or_decays_interact);
 extern int determine_best_scale_level(char_data *ch, bool check_group);
 void end_pursuit(char_data *ch, char_data *target);
 void scale_item_to_level(obj_data *obj, int level);
@@ -4060,6 +4061,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	// ammo countdown/extract (only if the ammo wasn't extracted by a script)
 	if (purge && best) {
 		if (GET_AMMO_QUANTITY(best) <= 0) {
+			run_interactions(ch, best->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, best, consumes_or_decays_interact);
 			extract_obj(best);
 		}
 	}

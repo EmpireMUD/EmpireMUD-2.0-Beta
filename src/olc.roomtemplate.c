@@ -1285,7 +1285,7 @@ OLC_MODULE(rmedit_spawns) {
 	struct adventure_spawn *spawn, *temp, *change, *copyfrom = NULL;
 	double prc;
 	any_vnum vnum;
-	bool found;
+	bool found, none;
 	
 	// arg1 argument
 	argument = any_one_arg(argument, arg1);
@@ -1310,12 +1310,14 @@ OLC_MODULE(rmedit_spawns) {
 		}
 		else {
 			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			none = FALSE;
 			
 			switch (findtype) {
 				case OLC_ROOM_TEMPLATE: {
 					room_template *rmt = room_template_proto(vnum);
 					if (rmt) {
 						copyfrom = GET_RMT_SPAWNS(rmt);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -1325,7 +1327,10 @@ OLC_MODULE(rmedit_spawns) {
 				}
 			}
 			
-			if (!copyfrom) {
+			if (none) {
+				msg_to_char(ch, "No spawns to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
 				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, arg3);
 			}
 			else {

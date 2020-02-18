@@ -115,9 +115,8 @@ Crafting is faster if you have the Master Craftsman ability.
 
 Basic Crafts:
   bricks
-  jar  (glassblower)
-  candle  (apiaries)
-  flask
+  jar, flask, vial, pane of glass (glassblower)
+  candle
   rope
   leather rope
   shiv
@@ -126,8 +125,7 @@ Basic Crafts:
   bound wooden column
   saddle
   backstrap loom
-  violet dye  (glassblowing)
-  orange dye  (glassblowing)
+  violet dye, orange dye
 
 This ability also allows you to:
   mill (grains into flour)
@@ -1215,7 +1213,7 @@ With Woodworking you can craft:
   stake
   cart*
   walking stick
-  lantern*  (glassblowing)
+  lantern*
   wooden sword
   fire drill (lights fires)
   blank sign*

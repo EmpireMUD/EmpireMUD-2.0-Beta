@@ -302,6 +302,7 @@ void boot_db(void) {
 	void check_learned_empire_crafts();
 	void check_nowhere_einv_all();
 	void check_ruined_cities();
+	void check_sector_times(any_vnum only_sect);
 	void check_version();
 	void delete_old_players();
 	void delete_orphaned_rooms();
@@ -401,6 +402,7 @@ void boot_db(void) {
 	
 	log("Verifying world sectors.");
 	verify_sectors();
+	check_sector_times(NOTHING);
 	
 	// convert vehicles -- this normally does nothing, but it may free a temporary list
 	run_convert_vehicle_list();
@@ -1901,58 +1903,26 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
  //////////////////////////////////////////////////////////////////////////////
 //// VERSION CHECKING ////////////////////////////////////////////////////////
 
+// WARNING: Do not remove items from this list if there is any chance the mud
+// could have that item as the last version it applied. If it fails to find its
+// the last recorded version in this list, it skips the check_version process.
+
 // add versions in ascending order: this is used by check_version()
 const char *versions_list[] = {
 	// this system was added in b2.5
-	"b2.5",
-	"b2.7",
-	"b2.8",
-	"b2.9",
-	"b2.11",
-	"b3.0",
-	"b3.1",
-	"b3.2",
-	"b3.6",
-	"b3.8",
-	"b3.11",
-	"b3.12",
-	"b3.15",
-	"b3.17",
-	"b4.1",
-	"b4.2",
-	"b4.4",
-	"b4.15",
-	"b4.19",
-	"b4.32",
-	"b4.36",
-	"b4.38",
-	"b4.39",
-	"b5.1",
-	"b5.3",
-	"b5.14",
-	"b5.17",
-	"b5.19",
-	"b5.20",
-	"b5.23",
-	"b5.24",
-	"b5.25",
-	"b5.30",
-	"b5.34",
-	"b5.35",
-	"b5.37",
-	"b5.38",
-	"b5.40",
-	"b5.45",
-	"b5.47",
-	"b5.48",
-	"b5.58",
-	"b5.60",
+	"b2.5", "b2.7", "b2.8", "b2.9", "b2.11",
+	"b3.0", "b3.1", "b3.2", "b3.6", "b3.8", "b3.11", "b3.12", "b3.15", "b3.17",
+	"b4.1", "b4.2", "b4.4", "b4.15", "b4.19", "b4.32", "b4.36", "b4.38", "b4.39",
+	"b5.1", "b5.3", "b5.14", "b5.17", "b5.19", "b5.20", "b5.23", "b5.24",
+	"b5.25", "b5.30", "b5.34", "b5.35", "b5.37", "b5.38", "b5.40", "b5.45",
+	"b5.47", "b5.48", "b5.58", "b5.60",
 	"b5.80",
 	"b5.82",
 	"b5.83",
 	"b5.84",
 	"b5.86",
 	"b5.86a",
+	"b5.87",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -1965,7 +1935,7 @@ const char *versions_list[] = {
 int get_last_boot_version(void) {
 	char str[256];
 	FILE *fl;
-	int iter;
+	int iter, pos;
 	
 	if (!(fl = fopen(VERSION_FILE, "r"))) {
 		// if no file, do not run auto-updaters -- skip them
@@ -1979,7 +1949,17 @@ int get_last_boot_version(void) {
 	get_line(fl, str);
 	fclose(fl);
 	
-	return search_block(str, versions_list, TRUE);
+	pos = search_block(str, versions_list, TRUE);
+	if (pos == NOTHING) {
+		// failed to find the version? find the last version instead
+		for (iter = 0; *versions_list[iter] != '\n'; ++iter) {
+			// just looking for last entry
+		}
+		pos = iter - 1;
+		log("SYSERR: get_last_boot_version got unknown version '%s' from version file '%s' -- skipping auto-updaters and assuming version '%s'", str, VERSION_FILE, versions_list[pos]);
+	}
+	
+	return pos;
 }
 
 /**
@@ -3786,6 +3766,80 @@ void b5_86_update(void) {
 }
 
 
+// removes 75% of unclaimed crops (previous patch removed wild crops in the map generator)
+// also adds old-growth forests
+void b5_87_crop_and_old_growth(void) {
+	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
+	void stop_room_action(room_data *room, int action, int chore);
+	void uncrop_tile(room_data *room);
+	
+	int removed_crop = 0, total_crop = 0, new_og = 0, total_forest = 0;
+	struct empire_completed_goal *goal, *next_goal;
+	empire_data *emp, *next_emp;
+	struct map_data *map;
+	room_data *room;
+	bool has_og;
+	
+	any_vnum overgrown_forest = 4;	// sect to change
+	any_vnum old_growth = 90;	// new sect
+	
+	log("Applying b5.87 update: removing 75%% of unclaimed crops and adding old-growth forests...");
+	has_og = (sector_proto(old_growth) ? TRUE : FALSE);
+	
+	LL_FOREACH(land_map, map) {
+		if (SECT_FLAGGED(map->sector_type, SECTF_CROP) && map->crop_type && (room = real_room(map->vnum)) && !ROOM_OWNER(room)) {
+			++total_crop;
+			
+			if (number(1,100) <= 75) {
+				++removed_crop;
+				// change to base sect
+				uncrop_tile(room);
+				
+				// stop all possible chores here since the sector changed
+				stop_room_action(room, ACT_HARVESTING, CHORE_FARMING);
+				stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
+				stop_room_action(room, ACT_PICKING, CHORE_HERB_GARDENING);
+				stop_room_action(room, ACT_GATHERING, NOTHING);
+			}
+		}
+		else if (has_og && GET_SECT_VNUM(map->sector_type) == overgrown_forest && (room = real_room(map->vnum)) && !ROOM_OWNER(room)) {
+			++total_forest;
+			if (!number(0, 9)) {
+				// 10% chance of becoming old-growth now
+				++new_og;
+				change_terrain(real_room(map->vnum), old_growth);
+			}
+			else {
+				// otherwise, back-date their sector time 3-4 weeks
+				set_extra_data(&map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME, time(0) - number(1814400, 2419200));
+			}
+		}
+	}
+	
+	log("- removed %d of %d unclaimed crop tiles", removed_crop, total_crop);
+	log("- converted %d of %d Overgrown Forests to Old-Growth Forests", new_og, total_forest);
+	
+	log("- removing apiaries from the learned-list of empires with 2011 Foundations...");
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		HASH_ITER(hh, EMPIRE_COMPLETED_GOALS(emp), goal, next_goal) {
+			// Some goals were changed in this patch. Need to update anybody who completed them.
+			switch (goal->vnum) {
+				case 2011: {	// Foundations: -craft
+					remove_learned_craft_empire(emp, 5131, FALSE);	// apiary
+					save_empire(emp, TRUE);
+					break;
+				}
+			}
+		}
+	}
+	
+	if (removed_crop > 0 || total_forest > 0) {
+		world_map_needs_save = TRUE;
+		save_whole_world();
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4083,6 +4137,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.86a")) {
 			b5_86_update();
+		}
+		if (MATCH_VERSION("b5.87")) {
+			b5_87_crop_and_old_growth();
 		}
 	}
 	

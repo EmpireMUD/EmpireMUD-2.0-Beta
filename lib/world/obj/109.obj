@@ -874,13 +874,15 @@ A jar of cranberry jelly has been left here.~
    This little old jar has been filled with a tart cranberry jelly. It would go
 perfectly with turkey.
 ~
-6 m a 0 7
+6 m a 0 8
 24 0 0
 7 336
 A
 7 1 0
 C
 50 50
+I 26 801 100.00 1  # DECAYS-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: a jar
 R
 5606 0
 R

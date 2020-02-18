@@ -5422,7 +5422,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 	bitvector_t misc;
 	any_vnum vnum;
 	char group;
-	bool found;
+	bool found, none;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
 	
@@ -5448,6 +5448,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		else {
 			sprintbit(findtype, olc_type_bits, buf, FALSE);
 			copyfrom = NULL;
+			none = FALSE;
 			
 			switch (findtype) {
 				case OLC_PROGRESS: {
@@ -5455,6 +5456,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 					if (from_prg) {
 						copyfrom = PRG_TASKS(from_prg);
 					}
+					none = copyfrom ? FALSE : TRUE;
 					break;
 				}
 				case OLC_QUEST: {
@@ -5466,6 +5468,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 					quest_data *from_qst = quest_proto(vnum);
 					if (from_qst) {
 						copyfrom = (is_abbrev(field_arg, "tasks") ? QUEST_TASKS(from_qst) : QUEST_PREREQS(from_qst));
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -5473,6 +5476,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 					social_data *from_soc = social_proto(vnum);
 					if (from_soc) {
 						copyfrom = SOC_REQUIREMENTS(from_soc);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -5482,7 +5486,10 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 				}
 			}
 			
-			if (!copyfrom) {
+			if (none) {
+				msg_to_char(ch, "No %s to copy from that.\r\n", command);
+			}
+			else if (!copyfrom) {
 				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
 			}
 			else {
@@ -6225,7 +6232,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 	struct icon_data *icon, *change, *temp, *copyfrom;
 	int iter, loc, num, findtype;
 	any_vnum vnum;
-	bool found;
+	bool found, none;
 	
 	half_chop(argument, arg1, arg2);
 	
@@ -6318,6 +6325,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 		}
 		else {
 			copyfrom = NULL;
+			none = FALSE;
 			sprintbit(findtype, olc_type_bits, buf, FALSE);
 			
 			// OLC_x: copyable icons
@@ -6326,6 +6334,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 					crop_data *crop;
 					if ((crop = crop_proto(vnum))) {
 						copyfrom = GET_CROP_ICONS(crop);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -6333,6 +6342,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 					sector_data *sect;
 					if ((sect = sector_proto(vnum))) {
 						copyfrom = GET_SECT_ICONS(sect);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -6342,7 +6352,10 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 				}
 			}
 			
-			if (!copyfrom) {
+			if (none) {
+				msg_to_char(ch, "No icons to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
 				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, arg3);
 			}
 			else {
@@ -6534,7 +6547,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 	int iter, loc, num, count, findtype;
 	any_vnum vnum;
 	double prc;
-	bool found, up;
+	bool found, up, none;
 	char exc;
 	
 	half_chop(argument, arg1, arg2);
@@ -6558,6 +6571,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		}
 		else {
 			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			none = FALSE;
 			
 			// OLC_x: copyable interactions
 			switch (findtype) {
@@ -6565,6 +6579,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 					bld_data *bld = building_proto(vnum);
 					if (bld) {
 						copyfrom = GET_BLD_INTERACTIONS(bld);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -6572,6 +6587,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 					crop_data *crop;
 					if ((crop = crop_proto(vnum))) {
 						copyfrom = GET_CROP_INTERACTIONS(crop);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -6579,6 +6595,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 					struct global_data *glb;
 					if ((glb = global_proto(vnum))) {
 						copyfrom = GET_GLOBAL_INTERACTIONS(glb);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -6586,6 +6603,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 					char_data *mob = mob_proto(vnum);
 					if (mob) {
 						copyfrom = mob->interactions;
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -6593,6 +6611,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 					obj_data *obj = obj_proto(vnum);
 					if (obj) {
 						copyfrom = obj->interactions;
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -6600,6 +6619,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 					room_template *rmt = room_template_proto(vnum);
 					if (rmt) {
 						copyfrom = GET_RMT_INTERACTIONS(rmt);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -6607,6 +6627,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 					sector_data *sect;
 					if ((sect = sector_proto(vnum))) {
 						copyfrom = GET_SECT_INTERACTIONS(sect);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -6614,6 +6635,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 					vehicle_data *veh;
 					if ((veh = vehicle_proto(vnum))) {
 						copyfrom = VEH_INTERACTIONS(veh);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -6623,7 +6645,10 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				}
 			}
 			
-			if (!copyfrom) {
+			if (none) {
+				msg_to_char(ch, "No interactions to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
 				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, arg3);
 			}
 			else {
@@ -7313,7 +7338,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 	sector_data *sect;
 	any_vnum vnum;
 	double prc;
-	bool found;
+	bool found, none;
 	
 	// arg1 arg2
 	half_chop(argument, arg1, arg2);
@@ -7337,12 +7362,14 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 		}
 		else {
 			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			none = FALSE;
 			
 			switch (findtype) {
 				case OLC_BUILDING: {
 					bld_data *bld = building_proto(vnum);
 					if (bld) {
 						copyfrom = GET_BLD_SPAWNS(bld);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -7350,6 +7377,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 					crop_data *crop = crop_proto(vnum);
 					if (crop) {
 						copyfrom = GET_CROP_SPAWNS(crop);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -7357,18 +7385,21 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 					struct global_data *glb = global_proto(vnum);
 					if (glb) {
 						copyfrom = GET_GLOBAL_SPAWNS(glb);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
 				case OLC_SECTOR: {
 					if ((sect = sector_proto(vnum))) {
 						copyfrom = GET_SECT_SPAWNS(sect);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
 				case OLC_VEHICLE: {
 					if ((veh = vehicle_proto(vnum))) {
 						copyfrom = VEH_SPAWNS(veh);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -7378,7 +7409,10 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 				}
 			}
 			
-			if (!copyfrom) {
+			if (none) {
+				msg_to_char(ch, "No spawns to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
 				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, arg3);
 			}
 			else {
@@ -7563,7 +7597,7 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 	int num, pos, findtype;
 	any_vnum vnum;
 	trig_data *trig;
-	bool found;
+	bool found, none;
 	
 	// arg1 arg2
 	half_chop(argument, arg1, arg2);
@@ -7587,12 +7621,14 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 		}
 		else {
 			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			none = FALSE;
 			
 			switch (findtype) {
 				case OLC_ADVENTURE: {
 					adv_data *adv = adventure_proto(vnum);
 					if (adv && trigger_attach == WLD_TRIGGER) {
 						copyfrom = GET_ADV_SCRIPTS(adv);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -7600,6 +7636,7 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 					char_data *mob = mob_proto(vnum);
 					if (mob && trigger_attach == MOB_TRIGGER) {
 						copyfrom = mob->proto_script;
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -7607,6 +7644,7 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 					obj_data *obj = obj_proto(vnum);
 					if (obj && trigger_attach == OBJ_TRIGGER) {
 						copyfrom = obj->proto_script;
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -7614,6 +7652,7 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 					room_template *rmt = room_template_proto(vnum);
 					if (rmt && trigger_attach == WLD_TRIGGER) {
 						copyfrom = GET_RMT_SCRIPTS(rmt);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -7621,6 +7660,7 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 					vehicle_data *veh = vehicle_proto(vnum);
 					if (veh && trigger_attach == VEH_TRIGGER) {
 						copyfrom = veh->proto_script;
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -7630,7 +7670,10 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 				}
 			}
 			
-			if (!copyfrom) {
+			if (none) {
+				msg_to_char(ch, "No scripts to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
 				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, arg3);
 			}
 			else {

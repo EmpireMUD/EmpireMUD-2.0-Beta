@@ -7,23 +7,19 @@ ALCHEMIST
 Stored here:  herbs, poisons
 
 The alchemist is a specialty building that allows you to store and process many
-types of herbs. While you can brew potions and mix poisons using any fire, it
-requires glassblowing technology if you're not at the alchemist building.
+types of herbs. You can brew potions and mix poisons.
 
 See also: BREW, LABORATORY, MIX, STORAGE
 #
 APIARY APIARIES
 
-{BB}  Apiary  (Foundations goal)
+{BB}  Apiary  (Beekeeping goal)
 
 Apiaries are used as hives for raising domestic bees. They produce honey and
-wax for the empire. Some crafts require that the empire have access to these
-resources, and you can only make those crafts if you are in the territory of
-an empire with apiaries.
+wax for the empire. You must enable the 'beekeeping' workforce option to
+function.
 
-Beehives are made by Advanced Woodworking.
-
-See also: ADVANCED WOODWORKING
+See also: BEEHIVE, WORKFORCE
 #
 "ASTRAL NEXUS" ASTRALNEXUS
 
@@ -150,6 +146,7 @@ Basic buildings:
   {UU} utilityshed -- store tools
   |__| quarry -- must be on flat land facing a mountain
   &y|__|&0 claypit -- must be on flat land facing water
+  &Y|__|&0 sandpit -- must be facing an ocean or lake
   ..x. familygravesite -- used as a respawn point (city only)
 
 For more information on building your first house, see HELP HOUSING GUIDE.
@@ -474,9 +471,9 @@ GLASSBLOWER "GLASS BLOWER" GLASSBLOWING "GLASS BLOWING"
 (GG)  Glass Blower  (Foundations goal)
 
 The glass blower is an artisan shop that creates flasks, vials, panes, and
-many other glass items for the empire. This building's function is passive --
-you don't blow the glass yourself. Instead, you simply need to be in the
-territory of an empire that has a glass blower in order to do certain crafts.
+many other glass items for the empire. Most of these require Basic Crafts.
+
+See also: BASIC CRAFTS
 #
 GRANARY
 
@@ -793,8 +790,7 @@ Command:  build painter <direction>
 Requires:  Architect ability, Foundations goal
 Stored here:  paints
 
-This building is used to make and store paints (although you also require
-glassblowing tech to make them).
+This building is used to make and store paints.
 
 A Master Craftsman can learn to make paints, and can start the quest to make
 paints once a painter spawns in this building.
@@ -917,6 +913,17 @@ It takes roughly two and a half months (realtime) for buildings to decay,
 although unfinished buildings decay faster.
 
 See also: MAINTAIN
+#
+SANDPIT "SAND PIT"
+
+&Y|__|&0  Sand Pit  (Build ability)
+
+Sand pits are reinforced areas where fine, clean sand can be dug more
+effectively. You can dig more sand from them before depletion.
+
+Sand pits count as in-city territory when built in the outskirts (4x radius).
+
+See also: DIG
 #
 SEEDSILO "SEED SILO"
 

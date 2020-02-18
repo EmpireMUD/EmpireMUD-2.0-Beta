@@ -4,7 +4,7 @@ a handful of whitegrass~
 A handful of picked whitegrass is on the ground.~
 Whitegrass is an herb used to make potions.
 ~
-3 l a 4
+3 l a 0 4
 0 0 0
 0 0
 M
@@ -24,7 +24,7 @@ a sack of fiveleaf~
 A sack of fiveleaf is lying on the ground.~
 Fiveleaf is an herb used to make potions.
 ~
-3 l a 5
+3 l a 0 5
 0 0 0
 0 0
 M
@@ -44,7 +44,7 @@ a twig of redthorn~
 A twig of redthorn has been dropped here.~
 Redthorn is an herb used to make potions.
 ~
-3 l a 4
+3 l a 0 4
 0 0 0
 0 0
 M
@@ -64,7 +64,7 @@ some magewhisper sepals~
 A pile of magewhisper sepals sits on the ground.~
 Magewhisper is an herb used to make potions.
 ~
-3 l a 4
+3 l a 0 4
 0 0 0
 0 0
 M
@@ -84,7 +84,7 @@ a daggerbite frond~
 A daggerbite frond has been left here.~
 Daggerbite is an herb used to make potions.
 ~
-3 l a 4
+3 l a 0 4
 0 0 0
 0 0
 M
@@ -104,7 +104,7 @@ some bileberries~
 Some noxious bileberries are lying on the ground.~
 Bileberries are an herb used to make potions.
 ~
-3 l a 4
+3 l a 0 4
 0 0 0
 0 0
 M
@@ -124,7 +124,7 @@ an iridescent blue iris~
 An iridescent iris is growing here.~
 The iridescent flower can be used in certain crafts and enchantments.
 ~
-3 l a 5
+3 l a 0 5
 0 0 0
 0 0
 O
@@ -138,9 +138,11 @@ a jar of distilled whitegrass~
 A jar of distilled whitegrass has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 4
+3 0 a 0 5
 0 0 0
 8 0
+I 26 801 100.00 1  # DECAYS-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: a jar
 O
 14 m
 R
@@ -152,9 +154,11 @@ a jar of fiveleaf resin~
 A jar of fiveleaf resin has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 6
+3 0 a 0 7
 0 0 0
 8 0
+I 26 801 100.00 1  # DECAYS-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: a jar
 O
 14 m
 R
@@ -166,9 +170,11 @@ a jar of redthorn extract~
 A jar of redthorn extract has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 7
+3 0 a 0 8
 0 0 0
 8 0
+I 26 801 100.00 1  # DECAYS-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: a jar
 O
 14 m
 R
@@ -180,9 +186,11 @@ a jar of magewhisper essence~
 A jar of magewhisper essence has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 7
+3 0 a 0 8
 0 0 0
 8 0
+I 26 801 100.00 1  # DECAYS-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: a jar
 O
 14 m
 R
@@ -194,9 +202,11 @@ a jar of concentrated daggerbite~
 A jar of concentrated daggerbite has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 8
+3 0 a 0 9
 0 0 0
 8 0
+I 26 801 100.00 1  # DECAYS-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: a jar
 O
 14 m
 R
@@ -208,9 +218,11 @@ a jar of bileberry juice~
 A jar of bileberry juice has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-25 0 a 11
+25 0 a 0 12
 -1 0 -1
 8 0
+I 26 801 100.00 1  # DECAYS-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: a jar
 O
 14 m
 R
@@ -223,11 +235,13 @@ A healing potion is sitting on the ground.~
    Quaff this swirling white potion to regain health. Hint: create an alias for
 'quaff healing-potion' to make sure you target the right potion.
 ~
-25 m a 5
+25 m a 0 6
 1250 30 -1
 8 0
 C
 75 75
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 T 1250
@@ -238,13 +252,15 @@ a regeneration potion~
 A regeneration potion is sitting on the ground.~
 Quaff this swirling white potion to regain health over time.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3029
 8 0
 A
 3 1 0
 C
 75 75
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S
@@ -255,11 +271,13 @@ A stamina potion is sitting on the ground.~
    Quaff this swirling yellow potion to regain movement points. Hint: create an
 alias for 'quaff stamina-potion' to make sure you target the right potion.
 ~
-25 m a 5
+25 m a 0 6
 1252 30 -1
 8 0
 C
 75 75
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 T 1252
@@ -270,13 +288,15 @@ a potion of longrunning~
 A potion of longrunning is sitting on the ground.~
 Quaff this swirling yellow potion to regain movement points over time.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3029
 8 0
 A
 6 1 0
 C
 75 75
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S
@@ -287,11 +307,13 @@ A mana potion is sitting on the ground.~
    Quaff this swirling blue potion to regain mana. Hint: create an alias for
 'quaff mana-potion' to make sure you target the right potion.
 ~
-25 m a 5
+25 m a 0 6
 1254 30 -1
 8 0
 C
 75 75
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 T 1254
@@ -302,13 +324,15 @@ a potion of energy~
 A potion of energy is sitting on the ground.~
 Quaff this swirling blue potion to regain mana over time.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3029
 8 0
 A
 7 1 0
 C
 75 75
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S
@@ -318,13 +342,15 @@ a strength potion~
 A strength potion is sitting on the ground.~
 Quaff this swirling red potion to become stronger.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3030
 8 0
 A
 1 1 0
 C
 75 75
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S
@@ -334,13 +360,15 @@ a dexterity potion~
 A dexterity potion is sitting on the ground.~
 Quaff this swirling red potion to become more agile.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3030
 8 0
 A
 2 1 0
 C
 75 75
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S
@@ -350,13 +378,15 @@ a charisma potion~
 A charisma potion is sitting on the ground.~
 Quaff this swirling red potion to become more charismatic.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3030
 8 0
 A
 4 1 0
 C
 75 75
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S
@@ -366,13 +396,15 @@ an intelligence potion~
 An intelligence potion is sitting on the ground.~
 Quaff this swirling red potion to become smarter.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3030
 8 0
 A
 8 1 0
 C
 75 75
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S
@@ -382,13 +414,15 @@ a wits potion~
 A wits potion is sitting on the ground.~
 Quaff this swirling red potion to gain wits.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3030
 8 0
 A
 9 1 0
 C
 75 75
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S
@@ -398,13 +432,15 @@ a potion of armor~
 A potion of armor is sitting on the ground.~
 Quaff this swirling red potion to gain protection from damage.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3030
 8 0
 A
 12 1 0
 C
 100 100
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S
@@ -414,13 +450,15 @@ a haste potion~
 A haste potion is sitting on the ground.~
 Quaff this swirling red potion to become faster.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3030
 8 0
 B
 q
 C
 100 100
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S
@@ -430,13 +468,15 @@ a potion of blocking~
 A blocking potion is sitting on the ground.~
 Quaff this swirling red potion to block better.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3030
 8 0
 A
 13 1 0
 C
 100 100
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S
@@ -446,11 +486,13 @@ a vial of searing poison~
 A vial of searing poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 5
+26 0 a 0 6
 0 15 -1
 8 0
 C
 100 100
+I 26 808 100.00 1  # DECAYS-TO: a vial
+I 27 808 100.00 1  # CONSUMES-TO: a vial
 R
 5130 0
 T 1264
@@ -461,13 +503,15 @@ a vial of weakness poison~
 A vial of weakness poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 m a 6
+26 m a 0 7
 0 15 3004
 8 0
 A
 15 -1 0
 C
 100 100
+I 26 808 100.00 1  # DECAYS-TO: a vial
+I 27 808 100.00 1  # CONSUMES-TO: a vial
 R
 5130 0
 S
@@ -477,13 +521,15 @@ a vial of exhaustion poison~
 A vial of exhaustion poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 m a 5
+26 m a 0 6
 0 15 3004
 8 0
 A
 11 -1 0
 C
 100 100
+I 26 808 100.00 1  # DECAYS-TO: a vial
+I 27 808 100.00 1  # CONSUMES-TO: a vial
 R
 5130 0
 S
@@ -493,13 +539,15 @@ a vial of brain drain poison~
 A vial of brain drain poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 m a 6
+26 m a 0 7
 0 15 3004
 8 0
 A
 16 -1 0
 C
 100 100
+I 26 808 100.00 1  # DECAYS-TO: a vial
+I 27 808 100.00 1  # CONSUMES-TO: a vial
 R
 5130 0
 S
@@ -509,13 +557,15 @@ a vial of strength poison~
 A vial of strength poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 m a 5
+26 m a 0 6
 0 15 3004
 8 0
 A
 1 -1 0
 C
 100 100
+I 26 808 100.00 1  # DECAYS-TO: a vial
+I 27 808 100.00 1  # CONSUMES-TO: a vial
 R
 5130 0
 S
@@ -525,13 +575,15 @@ a vial of dexterity poison~
 A vial of dexterity poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 m a 4
+26 m a 0 5
 0 15 -1
 8 0
 A
 2 -1 0
 C
 100 100
+I 26 808 100.00 1  # DECAYS-TO: a vial
+I 27 808 100.00 1  # CONSUMES-TO: a vial
 R
 5130 0
 S
@@ -541,13 +593,15 @@ a vial of charisma poison~
 A vial of charisma poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 m a 4
+26 m a 0 5
 0 15 -1
 8 0
 A
 4 -1 0
 C
 100 100
+I 26 808 100.00 1  # DECAYS-TO: a vial
+I 27 808 100.00 1  # CONSUMES-TO: a vial
 R
 5130 0
 S
@@ -557,13 +611,15 @@ a vial of intelligence poison~
 A vial of intelligence poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 m a 4
+26 m a 0 5
 0 15 -1
 8 0
 A
 8 -1 0
 C
 100 100
+I 26 808 100.00 1  # DECAYS-TO: a vial
+I 27 808 100.00 1  # CONSUMES-TO: a vial
 R
 5130 0
 S
@@ -573,13 +629,15 @@ a vial of wits poison~
 A vial of wits poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 m a 4
+26 m a 0 5
 0 15 -1
 8 0
 A
 9 -1 0
 C
 100 100
+I 26 808 100.00 1  # DECAYS-TO: a vial
+I 27 808 100.00 1  # CONSUMES-TO: a vial
 R
 5130 0
 S
@@ -589,11 +647,13 @@ a vial of pain poison~
 A vial of pain poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 0 a 5
+26 0 a 0 6
 0 15 -1
 8 0
 C
 100 100
+I 26 808 100.00 1  # DECAYS-TO: a vial
+I 27 808 100.00 1  # CONSUMES-TO: a vial
 R
 5130 0
 T 1273
@@ -604,13 +664,15 @@ a vial of slow poison~
 A vial of slow poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 m a 4
+26 m a 0 5
 0 15 -1
 8 0
 B
 s
 C
 100 100
+I 26 808 100.00 1  # DECAYS-TO: a vial
+I 27 808 100.00 1  # CONSUMES-TO: a vial
 R
 5130 0
 S
@@ -620,13 +682,15 @@ a vial of heartstop poison~
 A vial of heartstop poison has been left on the ground.~
 Use this poison to enhance your attacks.
 ~
-26 m a 4
+26 m a 0 5
 0 15 -1
 8 0
 B
 v
 C
 100 100
+I 26 808 100.00 1  # DECAYS-TO: a vial
+I 27 808 100.00 1  # CONSUMES-TO: a vial
 R
 5130 0
 S
@@ -637,11 +701,13 @@ A healing elixir is sitting here.~
    Quaff this swirling white potion to regain health. Hint: create an alias for
 'quaff healing-elixir' to make sure you target the right potion.
 ~
-25 m a 4
+25 m a 0 5
 1250 30 -1
 8 0
 C
 100 100
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 T 1250
@@ -652,13 +718,15 @@ a regeneration elixir~
 A regeneration elixir is sitting here.~
 Quaff this swirling white potion to regain health over time.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3029
 8 0
 A
 3 1 0
 C
 100 100
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S
@@ -669,11 +737,13 @@ A stamina elixir is sitting here.~
    Quaff this swirling yellow potion to regain movement points. Hint: create an
 alias for 'quaff stamina-elixir' to make sure you target the right potion.
 ~
-25 m a 5
+25 m a 0 6
 1252 30 -1
 8 0
 C
 100 100
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 T 1252
@@ -684,13 +754,15 @@ an elixir of longrunning~
 An elixir of longrunning is lying here.~
 Quaff this swirling yellow potion to regain movement points over time.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3029
 8 0
 A
 6 1 0
 C
 100 100
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S
@@ -701,11 +773,13 @@ A mana elixir is lying here.~
    Quaff this swirling blue potion to regain mana. Hint: create an alias for
 'quaff mana-elixir' to make sure you target the right potion.
 ~
-25 m a 4
+25 m a 0 5
 1254 30 -1
 8 0
 C
 100 100
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 T 1254
@@ -716,13 +790,15 @@ an elixir of energy~
 An elixir of energy is lying here.~
 Quaff this swirling blue potion to regain mana over time.
 ~
-25 m a 4
+25 m a 0 5
 -1 0 3029
 8 0
 A
 7 1 0
 C
 100 100
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S

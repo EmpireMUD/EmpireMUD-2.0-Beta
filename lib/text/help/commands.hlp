@@ -296,7 +296,7 @@ but don't forget to turn it off again!
 
 See also: BITE, CEDE, PURIFY, SIRE, TOGGLE
 #
-BRIEF
+BRIEF "TOGGLE BRIEF"
 
 Usage:  toggle brief [on/off]
 
@@ -469,15 +469,6 @@ appear when you type 'look', but without all the other information from the
 'look' command.
 
 See also: LOOK
-#
-COTTON
-
-Stored in:  Tailor
-
-Cotton is a crop that is only grown in the desert. It can be stored in a
-tailor.
-
-See also: TAILOR, WEAVE
 #
 CUSTOMIZE "CUSTOMIZE VEHICLE" "CUSTOMIZE ROAD"
 
@@ -1882,7 +1873,7 @@ Your top two skills are dsplayed, if both of these skills are past 75. The
 level shown on score is your total level, with your skill level shown in
 parentheses.
 
-Conditions are displayed as:  Health: &g50&0/&g100&0+&g15&0/5s
+Conditions are displayed as:  Health: &g50&0/&g100&0 +&g15&0/5s
 The first number (50) is your current health, the second (100) is your maximum
 health, and the final number (15/5s) is your rate of regeneration. Your
 regeneration happens every 5 seconds.
@@ -1893,7 +1884,7 @@ below your base (by spells or pieces of gear).
 
 You can get more information on most of the traits on the score from their own
 help files (e.g. HELP DODGE). The 'Resist' trait is split into two parts: the
-first is resist-physical, and the second is resist-magical.
+first is resist-physical (p), and the second is resist-magical (m).
 
 Skills are shown as:  Battle: &g100 (1)&0
 In this example, "Battle" is the name of the skill, 100 is your rating in it,

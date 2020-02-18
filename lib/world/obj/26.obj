@@ -278,7 +278,7 @@ An imperial potion of ferocity is on the ground.~
 potion within. Hint: create an alias for 'quaff imperial-ferocity' to make sure
 you target the right potion.
 ~
-25 m a 0 9
+25 m a 0 10
 -1 0 3030
 8 0
 A
@@ -289,6 +289,8 @@ A
 21 2 0
 C
 200 200
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 S

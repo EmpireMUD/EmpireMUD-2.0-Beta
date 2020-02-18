@@ -4019,7 +4019,7 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 * Runs a set of interactions and passes successful ones through to a function
 * pointer.
 *
-* @param char_data *ch The actor.
+* @param char_data *ch Optional: The actor.
 * @param struct interaction_item *run_list A pointer to the start of the list to run.
 * @param int type Any INTERACT_ const.
 * @param room_data *inter_room For room interactions, the room.
@@ -4035,13 +4035,13 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 	bool success = FALSE;
 
 	for (interact = run_list; interact; interact = interact->next) {
-		if (interact->type == type && meets_interaction_restrictions(interact->restrictions, ch, GET_LOYALTY(ch)) && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent)) {
+		if (interact->type == type && meets_interaction_restrictions(interact->restrictions, ch, ch ? GET_LOYALTY(ch) : NULL) && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent)) {
 			if (func) {
 				// run function
 				success |= (func)(ch, interact, inter_room, inter_mob, inter_item);
 				
 				// skill gains?
-				if (!IS_NPC(ch)) {
+				if (ch && !IS_NPC(ch)) {
 					LL_FOREACH(interact->restrictions, res) {
 						switch (res->type) {
 							case INTERACT_RESTRICT_ABILITY: {
@@ -5769,7 +5769,7 @@ void obj_to_char_if_okay(obj_data *obj, char_data *ch) {
 * @param char_data *ch The person to try to give it to.
 */
 void obj_to_char_or_room(obj_data *obj, char_data *ch) {
-	if (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj) && IN_ROOM(ch)) {
+	if (IN_ROOM(ch) && (!CAN_WEAR(obj, ITEM_WEAR_TAKE) || (!IS_NPC(ch) && !CAN_CARRY_OBJ(ch, obj)))) {
 		// bind it to the player anyway, as if they received it, if it's BoP
 		if (OBJ_FLAGGED(obj, OBJ_BIND_ON_PICKUP)) {
 			bind_obj_to_player(obj, ch);
@@ -8447,6 +8447,7 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 	
 	obj_data *obj, *proto;
+	bool room = FALSE;
 	int available;
 
 	proto = store->proto;
@@ -8465,8 +8466,14 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	available = store->amount - 1;	// for later
 	charge_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), store->vnum, 1);
 	scale_item_to_level(obj, 1);	// scale to its minimum
-
-	obj_to_char(obj, ch);
+	
+	if (CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
+		obj_to_char(obj, ch);
+	}
+	else {
+		obj_to_room(obj, IN_ROOM(ch));
+		room = TRUE;
+	}
 	act("You retrieve $p.", FALSE, ch, obj, 0, TO_CHAR | TO_QUEUE);
 	act("$n retrieves $p.", TRUE, ch, obj, 0, TO_ROOM | TO_QUEUE);
 	load_otrigger(obj);
@@ -8481,8 +8488,8 @@ bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_da
 	
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	
-	// if it ran out, return false to prevent loops
-	return (available > 0);
+	// if it ran out, return false to prevent loops; same for if it went to the room (one at a time)
+	return (available > 0 && !room);
 }
 
 

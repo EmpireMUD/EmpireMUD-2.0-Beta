@@ -112,6 +112,7 @@ $data = array(
 	'C' => imagecolorallocate($im, 210, 180, 140),	// Tan
 	'D' => imagecolorallocate($im, 127, 0, 255),	// Violet
 	'E' => imagecolorallocate($im, 76, 0, 153),	// Deep Violet
+	'F' => imagecolorallocate($im, 0, 50, 0),	// Dark Dark Green / old-growth forest
 	
 	);
 

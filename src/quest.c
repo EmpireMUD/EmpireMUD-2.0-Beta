@@ -3687,7 +3687,7 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct quest_giver *giver, *iter, *change, *copyfrom;
 	int findtype, num, type;
-	bool found, ok;
+	bool found, ok, none;
 	any_vnum vnum;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
@@ -3714,6 +3714,7 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 		else {
 			sprintbit(findtype, olc_type_bits, buf, FALSE);
 			copyfrom = NULL;
+			none = FALSE;
 			
 			switch (findtype) {
 				case OLC_QUEST: {
@@ -3725,6 +3726,7 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 					quest_data *from_qst = quest_proto(vnum);
 					if (from_qst) {
 						copyfrom = (is_abbrev(field_arg, "starts") ? QUEST_STARTS_AT(from_qst) : QUEST_ENDS_AT(from_qst));
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -3732,6 +3734,7 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 					shop_data *from_shp = real_shop(vnum);
 					if (from_shp) {
 						copyfrom = SHOP_LOCATIONS(from_shp);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -3741,7 +3744,10 @@ void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_give
 				}
 			}
 			
-			if (!copyfrom) {
+			if (none) {
+				msg_to_char(ch, "No %s to copy from that.\r\n", command);
+			}
+			else if (!copyfrom) {
 				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
 			}
 			else {
@@ -5256,7 +5262,7 @@ OLC_MODULE(qedit_rewards) {
 	struct quest_reward *reward, *iter, *change, *copyfrom;
 	struct quest_reward **list = &QUEST_REWARDS(quest);
 	int findtype, num, stype;
-	bool found;
+	bool found, none;
 	any_vnum vnum;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
@@ -5282,12 +5288,14 @@ OLC_MODULE(qedit_rewards) {
 		else {
 			sprintbit(findtype, olc_type_bits, buf, FALSE);
 			copyfrom = NULL;
+			none = FALSE;
 			
 			switch (findtype) {
 				case OLC_QUEST: {
 					quest_data *from_qst = quest_proto(vnum);
 					if (from_qst) {
 						copyfrom = QUEST_REWARDS(from_qst);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -5297,7 +5305,10 @@ OLC_MODULE(qedit_rewards) {
 				}
 			}
 			
-			if (!copyfrom) {
+			if (none) {
+				msg_to_char(ch, "No rewards to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
 				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
 			}
 			else {

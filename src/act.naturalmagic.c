@@ -35,6 +35,7 @@
 // external vars
 
 // external funcs
+INTERACTION_FUNC(consumes_or_decays_interact);
 ACMD(do_dismount);
 extern obj_data *find_obj(int n, bool error);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
@@ -1158,6 +1159,8 @@ ACMD(do_quaff) {
 		act("$n quaffs $p!", TRUE, ch, obj, NULL, TO_ROOM);
 
 		apply_potion(obj, ch);
+		
+		run_interactions(ch, obj->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, consumes_or_decays_interact);
 		extract_obj(obj);
 	}	
 }

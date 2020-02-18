@@ -19,10 +19,10 @@ See also: USE
 #
 BEEHIVE "BEE HIVE" HIVE
 
-Beehives are used to build the Apiary building, and can also be stored there.
-You require Advanced Woodworking to craft a beehive.
+Beehives can be used to raise bees for honey and wax. Drag the beehive to a
+good spot and be sure to check on it regularly.
 
-See also: ADVANCED WOODWORKING, APIARY
+See also: ADVANCED WOODWORKING, APIARY, DRAG
 #
 BONES "BONE COMPONENT"
 
@@ -117,12 +117,13 @@ Available generic components:
  &cblock&0 - building materials like bricks or blocks
  &cclay&0 - moldable clay
  &cdye&0 - any kind of dye
- &cfeathers&0 - not currently used
+ &cfeathers&0 - not currently used (use fibers instead)
  &cfibers&0 - cotton, straw, etc.
  &cflour&0 - ground up grains
  &cfruit&0 - for cooking
  &cfur&0 - animal furs for crafting
  &cgem&0 - precious stones
+ &cglass&0 - made of, or used for making, glass
  &cgrain&0 - wheat, etc.
  &chandle&0 - used for tools and weapons
  &cherb&0 - used in potions and cooking
@@ -132,14 +133,19 @@ Available generic components:
  &cmetal&0 - various useful or precious metals
  &cnails&0 - a core building material
  &coil&0 - for cooking or maintaining machinery
+ &cpaint&0 - for painting houses
  &cpillar&0 - for construction, like a log
  &crock&0 - common stones dug up from the ground
+ &crope&0 - for construction and harnessing animals
+ &csand&0 - used for things like glass
+ &csapling&0 - used in handles and primitive buildings
  &cseeds&0 - for planting or cooking
  &cskin&0 - unprocessed animal skin or rawhide
  &cstick&0 - a common building and crafting material
+ &csweetener&0 - for cooking
  &ctextile&0 - cloth or fabric for crafting
  &cvegetable&0 - for cooking
- &crope&0 - for construction and harnessing animals
+ &cwax&0 - for candle-making
 
 See also: COMPONENT
 #
@@ -331,6 +337,17 @@ magic, basic:  iris, bloodstone, seashell, lightning stone
 magic, refined:  prismatic crystals
 
 See also: COMPONENT, PRISMATIC CRYSTAL
+#
+GLASS "GLASS COMPONENT" "GLASS INGOTS"
+
+Glass (component)
+
+Used for:  glassmaking
+
+Types of glass:
+  ingot of glass (raw, basic) - craft from sand at the glass blower
+
+See also: COMPONENT, GLASS BLOWER
 #
 "GLOWING GREEN SEASHELL" "GLOWING SEASHELL" "GREEN SEASHELL" SEASHELL
 
@@ -545,6 +562,8 @@ refined:        copper, silver and gold bars
 refined, fine:  silver and gold bars
 hard, rare:     argentine and eventide ingots
 
+Note: Glass ingots are made from sand using the 'craft' command.
+
 See also: COMPONENT, SMELT, SEPARATE, IRON, COPPER, MINE
 #
 MEAT "MEAT COMPONENT"
@@ -591,7 +610,7 @@ The most common oil is olive oil. You can get olive oil by pressing olives.
 
 See also: COMPONENT, COOK, PRESS
 #
-PILLARS "PILLAR COMPONENT" COLUMN "BOUND WOODEN COLUMN"
+PILLARS "PILLAR COMPONENT" COLUMN "BOUND WOODEN COLUMN" MAST
 
 Pillar (component)
 
@@ -605,6 +624,7 @@ Common types of pillars are:
  heavy log (basic) -- scrape a tree
  bound wooden column (basic) -- craft with Basic Crafts
  fine wooden pillar (basic) -- scrape a jungle tree
+ enormous mast (large) -- scrape an ancient tree
 
 See also: BASIC CRAFTS, COMPONENT, LOGS, SCRAPE
 #
@@ -623,6 +643,11 @@ If you don't have the "storage" empire privilege, you can't retrieve items
 
 If you're visiting another empire, you can store and retrieve your own items
 on credit from their public (or allied) buildings, IF you have a trade pact.
+
+If the item you retrieve can't be picked up, it will end up on the ground in
+the room. You can only retrieve one such item at a time; if you're trying to
+retrieve more than one thing, it will stop when it reaches one that goes to
+the ground.
 
 See also: STORE, INVENTORY, DIPLOMACY, WAREHOUSE
 #
@@ -705,6 +730,17 @@ can be used in any recipe that says (fiber) or (plant fiber).
 
 See also: FIBER COMPONENT, GATHER, BUILD, CRAFT, SCRAPE
 #
+SWEETENER "SWEETENER COMPONENT" "SWEETENER COMPONENT" HONEYCOMB
+
+Sweetener (component)
+
+Used for:  cooking
+
+Sweeteners are used to make food taste good. Available sweeteners include:
+  honeycomb - from beehives and apiaries
+
+See also: COMPONENT
+#
 ROPE ROPES "ROPE COMPONENT"
 
 Rope (component)
@@ -719,6 +755,19 @@ more ropes are needed afterwards.
 You can craft basic ropes from plant fiber or small pieces of leather.
 
 See also: COMPONENT, CRAFT, MANUFACTURE
+#
+SAND "SAND COMPONENT"
+
+Sand (component)
+
+Used for:  glassmaking
+
+Sand can be made into glass ingots at the glass blower.
+
+You can dig up basic sand in most coastal areas. Build a sand pit to dig up
+even more sand.
+
+See also: COMPONENT, DIG, SAND PIT
 #
 SAPLING SAPLINGS "SAPLING COMPONENT"
 
@@ -751,7 +800,8 @@ Usage:  store <item>
 
 It is recommended that you keep most of your extra resources stored. Items left
 on the ground in claimed territory will eventually be stored by the empire's
-citizens. Drink containers are usually emptied out when you store them.
+citizens. Drink containers are usually emptied out when you store them. Items
+can be stored from your inventory or from the ground.
 
 If you don't have the "storage" empire privilege, you can store items, but
 can't retrieve them.
@@ -998,5 +1048,16 @@ Note: Immortals can see the warehouse lists for other empires using the syntax
 "warehouse inv <empire> [keywords]".
 
 See also: KEEP, RETRIEVE, STORE, VAULT
+#
+WAX "WAX COMPONENT" BEESWAX "BEES WAX"
+
+Wax (component)
+
+Used for:  candle-making
+
+Types of wax:
+  beeswax (basic) - from beehives or apiaries
+
+See also: COMPONENT
 #
 $

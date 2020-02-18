@@ -140,6 +140,38 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 
 
 /**
+* Ensures that there's a "sector time" stamp on any room whose sector has a
+* timed evolution. This checks all timed-evo sectors unless you give it just 1.
+*
+* @param any_vnum only_sect Optional: Only checks the specific sector. (use NOTHING to check all of them)
+*/
+void check_sector_times(any_vnum only_sect) {
+	struct sector_index_type *idx, *next_idx;
+	struct map_data *map;
+	sector_data *sect;
+	
+	HASH_ITER(hh, sector_index, idx, next_idx) {
+		if (only_sect != NOTHING && only_sect != idx->vnum) {
+			continue;	// skip others if 'only' 1
+		}
+		if (idx->sect_count < 1 || !(sect = sector_proto(idx->vnum))) {
+			continue;	// no work
+		}
+		if (!has_evolution_type(sect, EVO_TIMED)) {
+			continue;	// only looking for missing timers
+		}
+		
+		LL_FOREACH2(idx->sect_rooms, map, next_in_sect) {
+			if (get_extra_data(map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME) <= 0) {
+				// missing time -- set now
+				set_extra_data(&map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME, time(0));
+			}
+		}
+	}
+}
+
+
+/**
 * Creates a new sector entry.
 * 
 * @param sector_vnum vnum The number to create.
@@ -721,6 +753,11 @@ void save_olc_sector(descriptor_data *desc) {
 	
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_SECTOR, vnum);
+	
+	// if it has a timed evo, verify all live copies of the sector have timers
+	if (has_evolution_type(proto, EVO_TIMED)) {
+		check_sector_times(GET_SECT_VNUM(proto));
+	}
 }
 
 

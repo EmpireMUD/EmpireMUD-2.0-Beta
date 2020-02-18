@@ -40,13 +40,15 @@ A jar of pickled glowkra is shining away.~
    This jar contains freshly pickled glowkra pods. It's bright enough to light
 the way at night.
 ~
-6 c a 0 5
+6 c a 0 6
 12 0 0
 8 336
 B
 c
 C
 0 10
+I 26 801 100.00 1  # DECAYS-TO: a jar
+I 27 801 100.00 1  # CONSUMES-TO: a jar
 M
 4
 You pop a glowing pod into your mouth from $p.~
@@ -299,11 +301,13 @@ a magic mushroom potion~
 A magic mushroom potion is sitting here.~
 This foul-smelling mana potion is made from magic mushrooms.
 ~
-25 m a 0 6
+25 m a 0 7
 -1 0 -1
 8 0
 C
 150 150
+I 26 800 100.00 1  # DECAYS-TO: a flask
+I 27 800 100.00 1  # CONSUMES-TO: a flask
 R
 5130 0
 T 1254

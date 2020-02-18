@@ -433,11 +433,13 @@ S
 #2343
 clockwork lens array~
 2343 1
-2 243 c 12 -1 0
+2 243 d 12 -1 0
 R
 171 1 0 0
 R
 175 4 0 0
+R
+33 5 1 2048
 S
 #2344
 guild patterned cloth~

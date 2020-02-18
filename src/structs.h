@@ -359,7 +359,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_QUARRY  23
 #define INTERACT_TAME  24
 #define INTERACT_SEED  25
-#define NUM_INTERACTS  26
+#define INTERACT_DECAYS_TO  26
+#define INTERACT_CONSUMES_TO  27
+#define NUM_INTERACTS  28
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
@@ -794,7 +796,7 @@ typedef struct vehicle_data vehicle_data;
 
 // FNC_x: function flags (for buildings)
 #define FNC_ALCHEMIST  BIT(0)	// can brew and mix here
-#define FNC_APIARY  BIT(1)	// grants the Apiaries tech to the empire
+#define FNC_APIARY  BIT(1)	// no current use
 #define FNC_BATHS  BIT(2)	// can use the bathe command here
 #define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
 #define FNC_CARPENTER  BIT(4)	// required by some crafts
@@ -1000,8 +1002,8 @@ typedef struct vehicle_data vehicle_data;
 
 // CRAFT_x: Craft Flags for do_gen_craft
 #define CRAFT_POTTERY  BIT(0)  // bonus at pottery; requires fire
-#define CRAFT_APIARIES  BIT(1)  // requires apiary tech
-#define CRAFT_GLASS  BIT(2)  // requires glassblowing tech
+	#define CRAFT_UNUSED0  BIT(1)  // formerly "requires apiary tech"
+	#define CRAFT_UNUSED1  BIT(2)  // formerly "requires glassblowing tech"
 #define CRAFT_GLASSBLOWER  BIT(3)  // requires glassblower building
 #define CRAFT_CARPENTER  BIT(4)  // requires carpenter building
 #define CRAFT_ALCHEMY  BIT(5)  // requires access to glass/alchemist and fire
@@ -1017,6 +1019,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
 #define CRAFT_LEARNED  BIT(16)	// cannot use unless learned
 #define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
+#define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
 
 // list of above craft flags that require a building in some way
 #define CRAFT_FLAGS_REQUIRING_BUILDINGS  (CRAFT_GLASSBLOWER | CRAFT_CARPENTER | CRAFT_ALCHEMY | CRAFT_SHIPYARD)
@@ -1106,7 +1109,9 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_GENERAL  28	// for reporting problems
 #define CHORE_FISHING  29
 #define CHORE_BURN_STUMPS  30
-#define NUM_CHORES  31		// total
+#define CHORE_BEEKEEPING  31
+#define CHORE_GLASSMAKING  32
+#define NUM_CHORES  33		// total
 
 
 // DIPL_x: Diplomacy types
@@ -1212,10 +1217,10 @@ typedef struct vehicle_data vehicle_data;
 
 
 // TECH_x: Technologies
-#define TECH_GLASSBLOWING  0
+	#define TECH_UNUSED  0	// formerly glassblowing
 #define TECH_CITY_LIGHTS  1
 #define TECH_LOCKS  2
-#define TECH_APIARIES  3
+	#define TECH_UNUSED1  3	// formerly apiaries
 #define TECH_SEAPORT  4
 #define TECH_WORKFORCE  5
 #define TECH_PROMINENCE  6
@@ -1589,6 +1594,10 @@ typedef struct vehicle_data vehicle_data;
 #define CMP_VEGETABLE  27
 #define CMP_ROPE  28
 #define CMP_PAINT  29
+#define CMP_WAX  30
+#define CMP_SWEETENER  31
+#define CMP_SAND  32
+#define CMP_GLASS  33
 
 
 // CMPF_x: component flags
@@ -1751,6 +1760,8 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_CUSTOM_LONGDESC_MALE  14
 #define OBJ_CUSTOM_FISH_TO_CHAR  15
 #define OBJ_CUSTOM_FISH_TO_ROOM  16
+#define OBJ_CUSTOM_DECAYS_ON_CHAR  17	// worn/held
+#define OBJ_CUSTOM_DECAYS_IN_ROOM  18	// everywhere else
 
 
 // RES_x: resource requirement types
@@ -2543,9 +2554,10 @@ typedef struct vehicle_data vehicle_data;
 #define EVO_SPREADS_TO  17	// reverse of adjacent-one
 #define EVO_HARVEST_TO  18	// always harvests to a specific sector type (no matter what it was when planted)
 #define EVO_DEFAULT_HARVEST_TO  19	// sect it becomes when harvested/cleared IF no data exists
-#define NUM_EVOS  20	// total
+#define EVO_TIMED  20	// evolves after a certain number of minutes
+#define NUM_EVOS  21	// total
 
-// evolution value types
+// EVO_VAL_x: evolution value types
 #define EVO_VAL_NONE  0
 #define EVO_VAL_SECTOR  1
 #define EVO_VAL_NUMBER  2
@@ -2615,6 +2627,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_TRENCH_FILL_TIME  18  // when the trench will be filled
 #define ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR  19	// for un-trenching correctly
 #define ROOM_EXTRA_ORIGINAL_BUILDER  20	// person who started the building
+#define ROOM_EXTRA_SECTOR_TIME  21	// when it became this sector type (for types with a timed evo)
 
 
 // number of different appearances
@@ -4374,6 +4387,8 @@ struct material_data {
 	char *name;
 	bool floats;
 	double chance_to_dismantle;	// percent chance of getting it back when dismantling
+	char *decay_on_char;	// message sent if carried/used by a person
+	char *decay_in_room;	// message sent if it decays in the room
 };
 
 

@@ -2087,6 +2087,14 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	// make sure its island status is correct
 	check_island_assignment(loc, map);
+	
+	// if needed, set a sector evolution time
+	if (has_evolution_type(sect, EVO_TIMED)) {
+		set_extra_data(loc ? &ROOM_EXTRA_DATA(loc) : &map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME, time(0));
+	}
+	else {
+		remove_extra_data(loc ? &ROOM_EXTRA_DATA(loc) : &map->shared->extra_data, ROOM_EXTRA_SECTOR_TIME);
+	}
 }
 
 
@@ -2208,18 +2216,6 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	
 	// WARNING: do not check in-city status on these ... it can change at a time when territory is not re-scanned
 	
-	if (HAS_FUNCTION(room, FNC_APIARY)) {
-		EMPIRE_TECH(emp, TECH_APIARIES) += amt;
-		if (isle || (isle = get_empire_island(emp, island))) {
-			isle->tech[TECH_APIARIES] += amt;
-		}
-	}
-	if (HAS_FUNCTION(room, FNC_GLASSBLOWER)) {
-		EMPIRE_TECH(emp, TECH_GLASSBLOWING) += amt;
-		if (isle || (isle = get_empire_island(emp, island))) {
-			isle->tech[TECH_GLASSBLOWING] += amt;
-		}
-	}
 	if (HAS_FUNCTION(room, FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
@@ -2263,18 +2259,6 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 		return;	// do NOT adjust tech if inside a moving vehicle
 	}
 	
-	if (IS_SET(VEH_FUNCTIONS(veh), FNC_APIARY)) {
-		EMPIRE_TECH(emp, TECH_APIARIES) += amt;
-		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
-			isle->tech[TECH_APIARIES] += amt;
-		}
-	}
-	if (IS_SET(VEH_FUNCTIONS(veh), FNC_GLASSBLOWER)) {
-		EMPIRE_TECH(emp, TECH_GLASSBLOWING) += amt;
-		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
-			isle->tech[TECH_GLASSBLOWING] += amt;
-		}
-	}
 	if (IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
 		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {

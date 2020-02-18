@@ -38,6 +38,7 @@
 struct empire_territory_data *global_next_territory_entry = NULL;
 
 // protos
+void do_chore_beekeeping(empire_data *emp, room_data *room);
 void do_chore_brickmaking(empire_data *emp, room_data *room);
 void do_chore_building(empire_data *emp, room_data *room, int mode);
 void do_chore_burn_stumps(empire_data *emp, room_data *room);
@@ -50,6 +51,7 @@ void do_chore_farming(empire_data *emp, room_data *room);
 void do_chore_fishing(empire_data *emp, room_data *room);
 void do_chore_fire_brigade(empire_data *emp, room_data *room);
 void do_chore_gardening(empire_data *emp, room_data *room);
+void do_chore_glassmaking(empire_data *emp, room_data *room);
 void do_chore_mining(empire_data *emp, room_data *room);
 void do_chore_minting(empire_data *emp, room_data *room);
 void do_chore_nailmaking(empire_data *emp, room_data *room);
@@ -122,6 +124,8 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "general", NOTHING, TRUE },
 	{ "fishing", FISHERMAN, FALSE },
 	{ "burn-stumps", STUMP_BURNER, FALSE },
+	{ "beekeeping", BEEKEEPER, FALSE },
+	{ "glassmaking", GLASSMAKER, FALSE },
 };
 
 
@@ -247,6 +251,12 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		}
 		if (room_has_function_and_city_ok(room, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
 			do_chore_fishing(emp, room);
+		}
+		if (room_has_function_and_city_ok(room, FNC_APIARY) && CHORE_ACTIVE(CHORE_BEEKEEPING)) {
+			do_chore_beekeeping(emp, room);
+		}
+		if (room_has_function_and_city_ok(room, FNC_GLASSBLOWER) && CHORE_ACTIVE(CHORE_GLASSMAKING)) {
+			do_chore_glassmaking(emp, room);
 		}
 		if (BUILDING_VNUM(room) == BUILDING_TRAPPERS_POST && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_TRAPPING)) {
 			do_chore_trapping(emp, room);
@@ -911,6 +921,45 @@ struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc
 
 
 /**
+* Fetches an int array of size NUM_CHORES with the chore ids in alphabetical
+* order. Use it like this:
+*   int *order = get_ordered_chores();
+*   for (iter = 0; iter < NUM_CHORES; ++iter) {
+*     strcpy(name, chore_data[order[iter]].name);
+*     ...
+*   }
+*/
+int *get_ordered_chores(void) {
+	static int *data = NULL;
+	int iter, sub, temp;
+	
+	if (data) {
+		return data;	// only have to do this once per boot
+	}
+	// otherwise, determine it:
+	
+	// create and initialize:
+	CREATE(data, int, NUM_CHORES);
+	for (iter = 0; iter < NUM_CHORES; ++iter) {
+		data[iter] = iter;
+	}
+	
+	// sort it alphabetically
+	for (iter = 0; iter < NUM_CHORES; ++iter) {
+		for (sub = iter + 1; sub < NUM_CHORES; ++sub) {
+			if (strcmp(chore_data[data[iter]].name, chore_data[data[sub]].name) > 0) {
+				temp = data[iter];
+				data[iter] = data[sub];
+				data[sub] = temp;
+			}
+		}
+	}
+	
+	return data;
+}
+
+
+/**
 * Mark the reason workforce couldn't work a given spot this time (logs are
 * freed every time workforce runs).
 *
@@ -1324,6 +1373,53 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 
  /////////////////////////////////////////////////////////////////////////////
 //// CHORE FUNCTIONS ////////////////////////////////////////////////////////
+
+void do_chore_beekeeping(empire_data *emp, room_data *room) {
+	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BEEKEEPING].mob);
+	int islid = GET_ISLAND_ID(room);
+	bool can_gain_honeycomb = can_gain_chore_resource(emp, room, CHORE_BEEKEEPING, o_HONEYCOMB);
+	bool can_gain_wax = can_gain_chore_resource(emp, room, CHORE_BEEKEEPING, o_BEESWAX);
+	bool can_do = can_gain_honeycomb || can_gain_wax;
+	
+	if (worker && can_do) {
+		// eats constantly even though it only produces periodically
+		add_empire_needs(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, 1);
+		
+		// these produce slowly
+		if (can_gain_honeycomb && !number(0, 23)) {
+			ewt_mark_resource_worker(emp, room, o_HONEYCOMB);
+			add_to_empire_storage(emp, islid, o_HONEYCOMB, 1);
+			add_production_total(emp, o_HONEYCOMB, 1);
+		}
+		if (can_gain_wax && !number(0, 23)) {
+			ewt_mark_resource_worker(emp, room, o_BEESWAX);
+			add_to_empire_storage(emp, islid, o_BEESWAX, 1);
+			add_production_total(emp, o_BEESWAX, 1);
+		}
+	}
+	else if (can_do) {
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_BEEKEEPING, room))) {
+			if (can_gain_honeycomb) {
+				ewt_mark_resource_worker(emp, room, o_HONEYCOMB);
+			}
+			if (can_gain_wax) {
+				ewt_mark_resource_worker(emp, room, o_BEESWAX);
+			}
+		}
+	}
+	else if (worker) {
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_BEEKEEPING, WF_PROB_OVER_LIMIT);
+	}
+	
+	if (!can_do) {
+		log_workforce_problem(emp, room, CHORE_BEEKEEPING, WF_PROB_OVER_LIMIT, FALSE);
+	}
+}
+
 
 void do_chore_brickmaking(empire_data *emp, room_data *room) {
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BRICKMAKING].mob);
@@ -2069,6 +2165,47 @@ void do_chore_gardening(empire_data *emp, room_data *room) {
 	}
 	if (!can_gain) {
 		log_workforce_problem(emp, room, CHORE_HERB_GARDENING, WF_PROB_OVER_LIMIT, FALSE);
+	}
+}
+
+
+// converts 2 basic sand to 1 glass ingot
+void do_chore_glassmaking(empire_data *emp, room_data *room) {
+	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_GLASSMAKING].mob);
+	int islid = GET_ISLAND_ID(room);
+	bool can_gain = can_gain_chore_resource(emp, room, CHORE_GLASSMAKING, o_GLASS_INGOT);
+	struct empire_storage_data *sand = find_stored_resource(emp, islid, o_SAND);
+	bool has_sand = (sand && sand->amount >= 2);
+	bool can_do = can_gain && has_sand;
+	
+	if (worker && can_do) {
+		add_empire_needs(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, 1);
+		ewt_mark_resource_worker(emp, room, o_GLASS_INGOT);
+		
+		charge_stored_resource(emp, islid, o_SAND, 2);
+		add_to_empire_storage(emp, islid, o_GLASS_INGOT, 1);
+		add_production_total(emp, o_GLASS_INGOT, 1);
+		
+		act("$n finishes a glass ingot and sets it to cool.", FALSE, worker, NULL, NULL, TO_ROOM);
+	}
+	else if (can_do) {
+		// place worker
+		if ((worker = place_chore_worker(emp, CHORE_GLASSMAKING, room))) {
+			ewt_mark_resource_worker(emp, room, o_GLASS_INGOT);
+		}
+	}
+	else if (worker) {
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_GLASSMAKING, !has_sand ? WF_PROB_NO_RESOURCES : WF_PROB_OVER_LIMIT);
+	}
+	
+	if (!has_sand) {
+		log_workforce_problem(emp, room, CHORE_GLASSMAKING, WF_PROB_NO_RESOURCES, FALSE);
+	}
+	if (!can_gain) {
+		log_workforce_problem(emp, room, CHORE_GLASSMAKING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 

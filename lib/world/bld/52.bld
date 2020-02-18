@@ -200,4 +200,20 @@ R
 R
 1010 1 5 0
 S
+#5211
+Sand Pit~
+A Sand Pit~
+&Y|__|~
+4 0 dmL 0
+0 0 0 -1
+C
+dig~
+F
+f
+I 5 100 4.00 1 x  # DIG: a rock
+I 5 102 4.00 1 x  # DIG: a flint stone
+I 5 107 92.00 1 x  # DIG: a bag of sand
+R
+1000 1 5 0
+S
 $

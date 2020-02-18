@@ -40,6 +40,7 @@ extern struct gen_craft_data_t gen_craft_data[];
 extern const char *tool_flags[];
 
 // external functions
+INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 extern bool has_cooking_fire(char_data *ch);
@@ -104,12 +105,6 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if ((GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS || GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER | CRAFT_SHIPYARD | CRAFT_GLASSBLOWER)) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "You can't do that here because this building isn't in a city.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_APIARIES) && !has_tech_available(ch, TECH_APIARIES)) {
-		// message sent for us
-	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_GLASS) && !has_tech_available(ch, TECH_GLASSBLOWING)) {
-		// message sent for us
-	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && !has_cooking_fire(ch)) {
 		msg_to_char(ch, "You need a fire to bake the clay.\r\n");
 	}
@@ -131,9 +126,11 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP) && !find_water_container(ch, ch->carrying) && !find_water_container(ch, ROOM_CONTENTS(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need a container of water to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
+	/* alchemy formerly required the alchemist OR glassblowing tech. That tech was removed, now it just needs flasks.
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_ALCHEMY) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_ALCHEMIST) && !has_tech_available(ch, TECH_GLASSBLOWING)) {
 		// sends its own messages -- needs glassblowing unless in alchemist room
 	}
+	*/
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FLAGS_REQUIRING_BUILDINGS) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
@@ -878,8 +875,9 @@ void finish_gen_craft(char_data *ch) {
 	bool applied_master = FALSE, is_master = FALSE;
 	int num = GET_ACTION_VNUM(ch, 2);
 	char lbuf[MAX_INPUT_LENGTH];
+	struct resource_data *res;
 	ability_data *cft_abil;
-	obj_data *obj = NULL;
+	obj_data *proto, *temp_obj, *obj = NULL;
 	int iter, amt = 1;
 	
 	cft_abil = find_ability_by_vnum(GET_CRAFT_ABILITY(type));
@@ -970,6 +968,25 @@ void finish_gen_craft(char_data *ch) {
 	// master?
 	if (is_master && applied_master) {
 		gain_ability_exp(ch, ABIL_MASTERY_ABIL(cft_abil), 33.4);
+	}
+	
+	// remove 'produced' amounts from the empire now, if applicable
+	if (CRAFT_FLAGGED(type, CRAFT_REMOVE_PRODUCTION) && GET_LOYALTY(ch)) {
+		LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
+			add_production_total(GET_LOYALTY(ch), res->vnum, -(res->amount));
+		}
+	}
+	
+	// check for consumes-to on the resources
+	LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
+		if ((proto = obj_proto(res->vnum)) && has_interaction(proto->interactions, INTERACT_CONSUMES_TO)) {
+			temp_obj = read_object(res->vnum, FALSE);
+			obj_to_char(temp_obj, ch);
+			for (iter = 0; iter < res->amount; ++iter) {
+				run_interactions(ch, temp_obj->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, temp_obj, consumes_or_decays_interact);
+			}
+			extract_obj(temp_obj);
+		}
 	}
 	
 	// free the stored action resources now -- we no longer risk refunding them

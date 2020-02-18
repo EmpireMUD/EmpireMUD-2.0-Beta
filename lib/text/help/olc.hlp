@@ -2001,14 +2001,14 @@ room as the vehicle.
 
 Available functions:
  ALCHEMIST - can brew and mix here
- APIARY - grants the Apiaries tech to the empire
+ APIARY - houses bees (required for beekeeping workforce)
  BATHS - can use the bathe command here
  BEDROOM - boosts regen while sleeping
  CARPENTER - required by some crafts
  DIGGING - triggers the workforce digging chore (also need interaction)
  DOCKS - grants the seaport tech to the empire; counts as a dock for ships
  FORGE - can use the forge and reforge commands here
- GLASSBLOWER - grants the Glassblowing tech to the empire
+ GLASSBLOWER - required for some crafts
  GUARD-TOWER - hostile toward enemy players, at range
  HENGE - allows Chant of Druids
  &rLIBRARY*&0 - can write and store books here
@@ -2348,11 +2348,9 @@ live, at which point it becomes available to players who have the right skill.
 
 Available flags:
  POTTERY - always requires cooking fire, goes faster at potter's hut
- APIARIES-TECH - requires being inside an empire with Apiaries tech
- GLASS-TECH - requires being inside an empire with Glassblowing tech
- GLASSBLOWER - requires being at an actual glassblower building
+ GLASSBLOWER - requires being at glassblower building
  CARPENTER - requires being at a carpenter building
- ALCHEMY - requires cooking fire and glassblowing tech, or alchemist/laboratory
+ ALCHEMY - requires cooking fire or alchemist/laboratory
  FIRE - requires cooking fire
  SOUP - requires a container of water and creates a liquid instead of an item
  IN-DEVELOPMENT - only immortals can use this recipe
@@ -2366,6 +2364,9 @@ Available flags:
  BLD-UPGRADED - requires being at a building with the UPGRADED flag
  LEARNED - requires the player/empire 'learn' a recipe to use it
  BY-RIVER - must be adjacent to a river
+ REMOVE-PRODUCTION - removes this craft's resources from empire production
+    counts. Used e.g. in smelting copper bars, to prevent smelt/separate loops.
+    Does not work on vehicles/buildings.
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
@@ -2682,7 +2683,7 @@ room until they are completed.
 Vehicle crafts don't use the "quantity" or "time" fields. Otherwise, they
 behave like regular crafts.
 #d
-"CROPEDIT CLIMATE" "SECTEDIT CLIMATE"
+"CROPEDIT CLIMATE" "SECTEDIT CLIMATE" "CLIMATE FLAGS"
 
 Usage:  .climate [add | remove] <flags>
 
@@ -3300,6 +3301,20 @@ ends. It will only be shown to players who can see that person. This message
 is optional.
 
 See also: OLC GENERICS, GENERIC AFFECTS
+#d
+"GEDIT CAPACITY"
+
+Usage:  .capacity <amount>
+
+This sets the amount you can mine in a 'Mine Data' global. Mines may randomly
+have as low as half this amount, but the amount you set here is the maximum.
+
+If the mine is built with Deep Mines, it will have 50% more.
+
+For example, if you set the capacity to 50, it will have 25-50 ore normally or
+37-75 ore if it's a deep mine.
+
+See also: GEDIT, DEEP MINES, GLOBAL MINE DATA
 #d
 "GEDIT CLIMATEEXCLUDE"
 
@@ -4038,40 +4053,42 @@ rooms, sectors, crops, and vehicles -- this may save you time if many are the
 same.
 
 Mob interaction types:
- BUTCHER - Items received when the Butcher ability is used.
- SKIN - Items received via the skin command.
- SHEAR - Items received when the shear command is used in a stable.
- BARDE - Mob loaded when the Barde ability is used in a stable.
- LOOT - Items dropped into the corpse when the mob is killed.
- PICKPOCKET - Items gained from the pickpocket skill.
- TAME - Becomes another mob when it is 'tamed'.
+ &cBUTCHER&0 - Items received when the Butcher ability is used.
+ &cSKIN&0 - Items received via the skin command.
+ &cSHEAR&0 - Items received when the shear command is used in a stable.
+ &cBARDE&0 - Mob loaded when the Barde ability is used in a stable.
+ &cLOOT&0 - Items dropped into the corpse when the mob is killed.
+ &cPICKPOCKET&0 - Items gained from the pickpocket skill.
+ &cTAME&0 - Becomes another mob when it is 'tamed'.
  
 Object interaction types:
- LIGHT - Item something is converted into when lit on fire.
- COMBINE** - Combine multiple copies of an obj into another obj (quantity is the
+ &cLIGHT&0 - Item something is converted into when lit on fire.
+ &cCOMBINE**&0 - Combine multiple copies of an obj into another obj (quantity is the
     number required, rather than number you get).
- SEPARATE** - Split this item into multiple other items.
+ &cSEPARATE**&0 - Split this item into multiple other items.
  ** Both COMBINE and SEPARATE should be set exclusive, as they will extract
     the original item.
- SCRAPE - Items you get when scraping this item (tree -> log).
- SAW - Items you get when sawing this item (tree -> lumber).
- TAN - Items you get when tanning this item (skin -> leather).
- CHIP - What you get for chipping at the item.
- SEED - Gives an item when seeded.
+ &cSCRAPE&0 - Items you get when scraping this item (tree -> log).
+ &cSAW&0 - Items you get when sawing this item (tree -> lumber).
+ &cTAN&0 - Items you get when tanning this item (skin -> leather).
+ &cCHIP&0 - What you get for chipping at the item.
+ &cSEED&0 - Gives an item when seeded.
+ &cDECAYS-TO&0 - Becomes a different object when its timer expires (e.g. ashes).
+ &cCONSUMES-TO&0 - Becomes a different object when eaten/used up (e.g. a jar).
 
 Room/vehicle interaction types:
- DIG - Items received when using the dig action.
- FORAGE - Items received when using the Forage ability. Note that if the player
+ &cDIG&0 - Items received when using the dig action.
+ &cFORAGE&0 - Items received when using the Forage ability. Note that if the player
    gets nothing from a sector's forage list, they may also receive a forage
    item from any wild crop that grows in the area.
- PICK - Items found when picking.
- HARVEST - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
- GATHER - Items received from the gather action.
- ENCOUNTER - Hostile mob loaded when a random encounter triggers.
- CHOP - Things that can be found when chopping here.
- FISH - Things that can be found by fishing here.
- PAN - Things that can be found by panning here.
- QUARRY - Things you can find by quarrying here.
+ &cPICK&0 - Items found when picking.
+ &cHARVEST&0 - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
+ &cGATHER&0 - Items received from the gather action.
+ &cENCOUNTER&0 - Hostile mob loaded when a random encounter triggers.
+ &cCHOP&0 - Things that can be found when chopping here.
+ &cFISH&0 - Things that can be found by fishing here.
+ &cPAN&0 - Things that can be found by panning here.
+ &cQUARRY&0 - Things you can find by quarrying here.
 
 The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
 than 1, the percent is only checked once for the entire quantity. If you want
@@ -4775,6 +4792,7 @@ Available components (common flags listed in parentheses):
  &cfruit&0 - for cooking
  &cfur&0 - animal furs for crafting
  &cgem&0 - precious stones
+ &cglass&0 - made of, or used for making, glass
  &cgrain&0 - wheat, etc.
  &chandle&0 - used for tools and weapons
  &cherb&0 - used in potions and cooking
@@ -4784,15 +4802,18 @@ Available components (common flags listed in parentheses):
  &cmetal&0 - various useful or precious metals
  &cnails&0 - a core building material
  &coil&0 - for cooking or maintaining machinery
+ &cpaint&0 - for painting buildings
  &cpillar&0 - for construction, like a log
  &crock&0 - common stones dug up from the ground
+ &crope&0 - for construction and harnessing animals
+ &csand&0 - used for glassmaking
  &csapling&0 - a common building and crafting material
  &cseeds&0 - for planting or cooking
  &cskin&0 - unprocessed animal skin or rawhide
+ &csweetener&0 - for cooking
  &ctextile&0 - cloth or fabric for crafting
  &cvegetable&0 - for cooking
- &crope&0 - for construction and harnessing animals
- &cpaint&0 - for painting buildings
+ &cwax&0 - for making candles
 
 See also: COMPONENT FLAGS, SHOW COMPONENTS
 #d
@@ -4918,6 +4939,8 @@ Message types:
  &clongdesc-male&0 - Same as longdesc but only for males.
  &cfish-to-char&0 - Shown to the player when they catch a fish ($p for item caught).
  &cfish-to-room&0 - Shown to the room when someone catches a fish ($p for item caught).
+ &cdecays-on-char&0 - Shown to the holder/user of the item on decay, if any.
+ &cdecays-in-room&0 - Shown to the room if the item decays on the ground.
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d
@@ -5785,10 +5808,12 @@ Supported types:
   ability
   building (search designatable rooms with -flag ROOM)
   craft
+  crop
   mobile
   object
   progress
-  room templates
+  room template
+  sector
   trigger
   vehicle
 #d
@@ -6661,26 +6686,33 @@ Evolutions are automatically sorted by type and by percentage. Only one will
 be called at a time -- the first one whose percentage check passes.
 
 Available types ([value] isn't used unless specified):
- CHOPPED-DOWN - Sector to become when chopped by a player; you should also add
+ &cCHOPPED-DOWN&0 - Sector to become when chopped by a player; you should also add
     chop interactions.
- CROP-GROWS - Sector to become when the crop finishes growing (Seeded -> Crop).
- ADJACENT-ONE - Called when this sector is next to a certain other sector
+ &cCROP-GROWS&0 - Sector to become when the crop finishes growing (Seeded -> Crop).
+ &cADJACENT-ONE&0 - Called when this sector is next to a certain other sector
     (value is the sector vnum that it's adjacent to).
- ADJACENT-MANY - Called when this sector is next to at least 6 of another
+ &cADJACENT-MANY&0 - Called when this sector is next to at least 6 of another
     sector (value is the sector vnum that it's adjacent to many of).
- RANDOM - Checked periodically and called it if passes.
- TRENCH-START - Sector this one becomes if a person starts to excavate.
- TRENCH-FULL - Sector this one becomes, if it's a trench, when it fills up.
- NEAR-SECTOR - Checked when this sector is within 2 tiles of another sector
+ &cRANDOM&0 - Checked periodically and called it if passes.
+ &cTRENCH-START&0 - Sector this one becomes if a person starts to excavate.
+ &cTRENCH-FULL&0 - Sector this one becomes, if it's a trench, when it fills up.
+ &cNEAR-SECTOR&0 - Checked when this sector is within 2 tiles of another sector
     (value is the sector vnum that must be nearby).
- PLANTS-TO - Sector this one becomes when you start to plant a crop on it.
- MAGIC-GROWTH - Sector this one becomes if it is magically forced to grow.
- NOT-ADJACENT - No matching sector within 1 tile (value is the sector vnum).
- NOT-NEAR-SECTOR - No matching sector within 2 tiles (value is the sector
+ &cPLANTS-TO&0 - Sector this one becomes when you start to plant a crop on it.
+ &cMAGIC-GROWTH&0 - Sector this one becomes if it is magically forced to grow.
+ &cNOT-ADJACENT&0 - No matching sector within 1 tile (value is the sector vnum).
+ &cNOT-NEAR-SECTOR&0 - No matching sector within 2 tiles (value is the sector
     vnum).
- SPRING, SUMMER, AUTUMN, WINTER - Triggers during this season.
- BURNS-TO - Sector this tile becomes when burned down by a player.
- SPREADS-TO - The opposite of adjacent-one: spreads from this tile to that one.
+ &cSPRING, SUMMER, AUTUMN, WINTER&0 - Triggers during this season.
+ &cBURNS-TO&0 - Sector this tile becomes when burned down by a player.
+ &cSPREADS-TO&0 - The opposite of adjacent-one: spreads from this tile to that one.
+ &cHARVEST-TO&0 - Becomes this sector when a crop is removed, always. This also
+    triggers if it's on a sector that a crop tile became, e.g. harvesting the
+    crop returns it to a Scorched Plain, then calls HARVEST-TO evolutions on
+    that Scorched Plain.
+ &cDEFAULT-HARVEST-TO&0 - Becomes this sector if a crop is removed and there's
+    no stored previous sector to return to.
+ &cTIMED&0 - Occurs after the given number of minutes.
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28

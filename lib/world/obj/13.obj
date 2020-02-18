@@ -119,9 +119,10 @@ hold it up to the light, you can see its true color is a deep, deep violet.
 This dye, made from a mix of wild berries, imbues a fabric with unusual
 properties.
 ~
-3 l a 0 2
+3 l a 0 3
 0 0 0
 8 0
+I 26 808 100.00 1  # DECAYS-TO: a vial
 O
 5 0
 R
@@ -135,9 +136,10 @@ A vial of deep orange dye is sitting here.~
 pigment of a magenta arrowfish. It has an unusual glow in dim light, like it
 catches and amplifies every ray of light that hits it.
 ~
-3 l a 0 3
+3 l a 0 4
 0 0 0
 8 0
+I 26 808 100.00 1  # DECAYS-TO: a vial
 M
 6
 You paint $V orange.~
