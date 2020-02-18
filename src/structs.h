@@ -1760,6 +1760,8 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_CUSTOM_LONGDESC_MALE  14
 #define OBJ_CUSTOM_FISH_TO_CHAR  15
 #define OBJ_CUSTOM_FISH_TO_ROOM  16
+#define OBJ_CUSTOM_DECAYS_ON_CHAR  17	// worn/held
+#define OBJ_CUSTOM_DECAYS_IN_ROOM  18	// everywhere else
 
 
 // RES_x: resource requirement types
@@ -4385,6 +4387,8 @@ struct material_data {
 	char *name;
 	bool floats;
 	double chance_to_dismantle;	// percent chance of getting it back when dismantling
+	char *decay_on_char;	// message sent if carried/used by a person
+	char *decay_in_room;	// message sent if it decays in the room
 };
 
 

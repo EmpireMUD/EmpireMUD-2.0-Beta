@@ -1675,87 +1675,44 @@ void point_update_obj(obj_data *obj) {
 			// do not extract
 		}
 		else {  // all others actually decay
-			switch (GET_OBJ_MATERIAL(obj)) {
-				case MAT_FLESH:
-					if (obj->carried_by)
-						act("$p decays in your hands.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
-					else if (obj->worn_by)
-						act("$p decays in your hands.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
-					else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
-						act("A quivering horde of maggots consumes $p.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_ROOM);
-						act("A quivering horde of maggots consumes $p.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR);
-					}
-					break;
-				case MAT_IRON:
-					if (obj->carried_by)
-						act("$p rusts in your hands.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
-					else if (obj->worn_by)
-						act("$p rusts in your hands.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
-					else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
-						act("$p rusts and disintegrates.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_ROOM);
-						act("$p rusts and disintegrates.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR);
-					}
-					break;
-				case MAT_ROCK:
-				case MAT_FLINT:
-					if (obj->carried_by)
-						act("$p disintegrates in your hands.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
-					else if (obj->worn_by)
-						act("$p disintegrates in your hands.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
-					else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
-						act("$p disintegrates.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_ROOM);
-						act("$p disintegrates.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR);
-					}
-					break;
-				case MAT_GOLD:
-				case MAT_SILVER:
-				case MAT_COPPER:
-				case MAT_CLAY:
-					if (obj->carried_by)
-						act("$p cracks and disintegrates in your hands.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
-					else if (obj->worn_by)
-						act("$p cracks and disintegrates in your hands.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
-					else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
-						act("$p cracks and disintegrates.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_ROOM);
-						act("$p cracks and disintegrates.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR);
-					}
-					break;
-				case MAT_MAGIC:
-					if (obj->carried_by)
-						act("$p flickers briefly in your hands, then vanishes with a poof.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
-					else if (obj->worn_by)
-						act("$p flickers briefly in your hands, then vanishes with a poof.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
-					else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
-						act("$p flickers briefly, then vanishes with a poof.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_ROOM);
-						act("$p flickers briefly, then vanishes with a poof.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR);
-					}
-					break;
-				case MAT_WAX: {
-					if (obj->carried_by)
-						act("$p melts in your hands and is gone.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
-					else if (obj->worn_by)
-						act("$p melts off of you and is gone.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
-					else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
-						act("$p melts and is gone.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_ROOM);
-						act("$p melts and is gone.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR);
-					}
-					break;
+			char *to_char = NULL, *to_room = NULL;
+			
+			// check custom messages first, then material message, then default
+			if (obj->carried_by || obj->worn_by) {
+				if (obj_has_custom_message(obj, OBJ_CUSTOM_DECAYS_ON_CHAR)) {
+					to_char = obj_get_custom_message(obj, OBJ_CUSTOM_DECAYS_ON_CHAR);
 				}
-				case MAT_WOOD:
-				case MAT_BONE:
-				case MAT_HAIR:
-				default:
-					if (obj->carried_by)
-						act("$p rots in your hands.", FALSE, obj->carried_by, obj, 0, TO_CHAR);
-					else if (obj->worn_by)
-						act("$p rots in your hands.", FALSE, obj->worn_by, obj, 0, TO_CHAR);
-					else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
-						act("$p rots and disintegrates.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_ROOM);
-						act("$p rots and disintegrates.", TRUE, ROOM_PEOPLE(IN_ROOM(obj)), obj, 0, TO_CHAR);
-					}
-					break;
+				else if (materials[GET_OBJ_MATERIAL(obj)].decay_on_char) {
+					to_char = materials[GET_OBJ_MATERIAL(obj)].decay_on_char;
+				}
+				else {
+					to_char = "$p disintegrates in your hands.";
+				}
+			}
+			else if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
+				if (obj_has_custom_message(obj, OBJ_CUSTOM_DECAYS_IN_ROOM)) {
+					to_room = obj_get_custom_message(obj, OBJ_CUSTOM_DECAYS_IN_ROOM);
+				}
+				else if (materials[GET_OBJ_MATERIAL(obj)].decay_in_room) {
+					to_room = materials[GET_OBJ_MATERIAL(obj)].decay_in_room;
+				}
+				else {
+					to_room = "$p disintegrates and falls apart.";
+				}
 			}
 			
+			// send messages
+			if (obj->carried_by && to_char) {
+				act(to_char, FALSE, obj->carried_by, obj, NULL, TO_CHAR | TO_QUEUE);
+			}
+			else if (obj->worn_by && to_char) {
+				act(to_char, FALSE, obj->worn_by, obj, NULL, TO_CHAR | TO_QUEUE);
+			}
+			if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj)) && to_room) {
+				act(to_char, FALSE,ROOM_PEOPLE(IN_ROOM(obj)), obj, NULL, TO_CHAR | TO_ROOM | TO_QUEUE);
+			}
+			
+			// decays-to
 			run_interactions(NULL, obj->interactions, INTERACT_DECAYS_TO, obj_room(obj), NULL, obj, consumes_or_decays_interact);
 			
 			empty_obj_before_extract(obj);

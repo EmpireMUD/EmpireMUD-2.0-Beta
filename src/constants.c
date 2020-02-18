@@ -2370,23 +2370,23 @@ const double obj_flag_scaling_bonus[] = {
 
 // MAT_x -- name, TRUE if it floats
 const struct material_data materials[NUM_MATERIALS] = {
-	// name, floats, chance-to-get-from-dismantle
-	{ "WOOD", TRUE, 50.0 },
-	{ "ROCK", FALSE, 95.0 },
-	{ "IRON", FALSE, 90.0 },
-	{ "SILVER", FALSE, 100.0 },
-	{ "GOLD", FALSE, 100.0 },
-	{ "FLINT", FALSE, 95.0 },
-	{ "CLAY", FALSE, 75.0 },
-	{ "FLESH", TRUE, 50.0 },
-	{ "GLASS", FALSE, 50.0 },
-	{ "WAX", TRUE, 25.0 },
-	{ "MAGIC", TRUE, 100.0 },
-	{ "CLOTH", TRUE, 50.0 },
-	{ "GEM", FALSE, 100.0 },
-	{ "COPPER", FALSE, 100.0 },
-	{ "BONE", TRUE, 50.0 },
-	{ "HAIR", TRUE, 50.0 }
+	// name, floats, chance-to-get-from-dismantle, decay-on-char, decay-in-room
+	{ "WOOD", TRUE, 50.0, "$p rots away in your hands.", "$p rots away to nothing." },
+	{ "ROCK", FALSE, 95.0, "$p crumbles in your hands.", "$p crumbles and disintegrates." },
+	{ "IRON", FALSE, 90.0, "$p rusts in your hands.", "$p rusts and disintegrates." },
+	{ "SILVER", FALSE, 100.0, "$p cracks and disintegrates in your hands.", "$p cracks and disintegrates." },
+	{ "GOLD", FALSE, 100.0, "$p cracks and disintegrates in your hands.", "$p cracks and disintegrates." },
+	{ "FLINT", FALSE, 95.0, "$p crumbles in your hands.", "$p crumbles and disintegrates." },
+	{ "CLAY", FALSE, 75.0, "$p cracks and disintegrates in your hands.", "$p cracks and disintegrates." },
+	{ "FLESH", TRUE, 50.0, "$p decays in your hands.", "A quivering horde of maggots consumes $p." },
+	{ "GLASS", FALSE, 50.0, "$p cracks and shatters in your hands.", "$p cracks and shatters." },
+	{ "WAX", TRUE, 25.0, "$p melts in your hands and is gone.", "$p melts and is gone." },
+	{ "MAGIC", TRUE, 100.0, "$p flickers briefly in your hands, then vanishes with a poof.", "$p flickers briefly, then vanishes with a poof." },
+	{ "CLOTH", TRUE, 50.0, "$p rots away in your hands.", "$p rots away to nothing." },
+	{ "GEM", FALSE, 100.0, "$p cracks and shatters in your hands.", "$p cracks and shatters." },
+	{ "COPPER", FALSE, 100.0, "$p cracks and disintegrates in your hands.", "$p cracks and disintegrates." },
+	{ "BONE", TRUE, 50.0, "$p rots away in your hands.", "$p rots away to nothing." },
+	{ "HAIR", TRUE, 50.0, "$p rots away in your hands.", "$p rots away to nothing." }
 };
 
 
@@ -2597,6 +2597,8 @@ const char *obj_custom_types[] = {
 	"longdesc-male",
 	"fish-to-char",	// 15
 	"fish-to-room",
+	"decays-on-char",
+	"decays-in-room",
 	"\n"
 };
 
