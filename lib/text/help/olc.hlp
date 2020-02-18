@@ -5806,10 +5806,12 @@ Supported types:
   ability
   building (search designatable rooms with -flag ROOM)
   craft
+  crop
   mobile
   object
   progress
-  room templates
+  room template
+  sector
   trigger
   vehicle
 #d

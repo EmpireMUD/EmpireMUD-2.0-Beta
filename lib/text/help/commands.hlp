@@ -296,7 +296,7 @@ but don't forget to turn it off again!
 
 See also: BITE, CEDE, PURIFY, SIRE, TOGGLE
 #
-BRIEF
+BRIEF "TOGGLE BRIEF"
 
 Usage:  toggle brief [on/off]
 

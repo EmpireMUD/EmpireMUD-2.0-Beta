@@ -675,7 +675,9 @@ Usage:  home
 
 You can choose a house in your empire to make your own private residence. Once
 you set it as your home, other members of the empire can't enter (except the
-highest-ranking leaders).
+highest-ranking leaders). If you 'designate' a bedroom in your home, a chest
+will appear in that bedroom. You can safely put bound items and non-storable
+items in the chest, but any storable items will still autostore from there.
 
 You can unset your home from anywhere, or clear the owner for the building
 you're in. Only the empire leaders can clear homes they don't own.
@@ -687,7 +689,7 @@ Only buildings that normally house citizens can be set as homes. This does not
 include buildings where adding a bedroom grants a citizen, if the building
 itself doesn't house citizens.
 
-See also: CITIZENS, FINE POTTERY
+See also: AUTOSTORE, CITIZENS, DESIGNATE, FINE POTTERY
 #
 HOMESTEAD "HOMESTEAD GOAL"
 
