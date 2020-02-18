@@ -6706,6 +6706,12 @@ Available types ([value] isn't used unless specified):
  &cSPRING, SUMMER, AUTUMN, WINTER&0 - Triggers during this season.
  &cBURNS-TO&0 - Sector this tile becomes when burned down by a player.
  &cSPREADS-TO&0 - The opposite of adjacent-one: spreads from this tile to that one.
+ &cHARVEST-TO&0 - Becomes this sector when a crop is removed, always. This also
+    triggers if it's on a sector that a crop tile became, e.g. harvesting the
+    crop returns it to a Scorched Plain, then calls HARVEST-TO evolutions on
+    that Scorched Plain.
+ &cDEFAULT-HARVEST-TO&0 - Becomes this sector if a crop is removed and there's
+    no stored previous sector to return to.
  &cTIMED&0 - Occurs after the given number of minutes.
 
 Examples:
