@@ -322,7 +322,7 @@ void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear 
 	archetype_data *copyarch;
 	bitvector_t findtype;
 	int loc, num;
-	bool found;
+	bool found, none;
 	
 	argument = any_one_arg(argument, cmd_arg);
 	skip_spaces(&argument);
@@ -443,6 +443,7 @@ void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear 
 		argument = any_one_arg(argument, type_arg);
 		argument = any_one_arg(argument, num_arg);
 		copyfrom = NULL;
+		none = FALSE;
 		
 		if (!*type_arg || !*num_arg) {
 			msg_to_char(ch, "Usage: gear copy <from type> <from vnum>\r\n");
@@ -464,6 +465,7 @@ void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear 
 				case OLC_ARCHETYPE: {
 					if ((copyarch = archetype_proto(num))) {
 						copyfrom = GET_ARCH_GEAR(copyarch);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -471,6 +473,7 @@ void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear 
 					struct global_data *glb;
 					if ((glb = global_proto(num))) {
 						copyfrom = GET_GLOBAL_GEAR(glb);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -480,7 +483,10 @@ void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear 
 				}
 			}
 			
-			if (!copyfrom) {
+			if (none) {
+				msg_to_char(ch, "No gear to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
 				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, num_arg);
 			}
 			else {

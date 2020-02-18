@@ -1428,7 +1428,7 @@ OLC_MODULE(bedit_relations) {
 	struct bld_relation *relat, *iter, *change, *copyfrom;
 	int findtype, num, rtype;
 	any_vnum vnum;
-	bool found;
+	bool found, none;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
 	
@@ -1454,12 +1454,14 @@ OLC_MODULE(bedit_relations) {
 		else {
 			sprintbit(findtype, olc_type_bits, buf, FALSE);
 			copyfrom = NULL;
+			none = FALSE;
 			
 			switch (findtype) {
 				case OLC_BUILDING: {
 					bld_data *from_bld = building_proto(vnum);
 					if (from_bld) {
 						copyfrom = GET_BLD_RELATIONS(from_bld);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -1469,7 +1471,10 @@ OLC_MODULE(bedit_relations) {
 				}
 			}
 			
-			if (!copyfrom) {
+			if (none) {
+				msg_to_char(ch, "No relations to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
 				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
 			}
 			else {

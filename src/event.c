@@ -1551,7 +1551,7 @@ void process_evedit_rewards(char_data *ch, char *argument, struct event_reward *
 	struct event_reward *reward, *iter, *change, *copyfrom;
 	int findtype, num = 1, stype, temp, min, max = 0;
 	any_vnum vnum;
-	bool found;
+	bool found, none;
 	char *pos;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
@@ -1577,12 +1577,14 @@ void process_evedit_rewards(char_data *ch, char *argument, struct event_reward *
 		else {
 			sprintbit(findtype, olc_type_bits, buf, FALSE);
 			copyfrom = NULL;
+			none = FALSE;
 			
 			switch (findtype) {
 				case OLC_EVENT: {
 					event_data *from_event = find_event_by_vnum(vnum);
 					if (from_event) {
 						copyfrom = rank ? EVT_RANK_REWARDS(from_event) : EVT_THRESHOLD_REWARDS(from_event);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -1592,7 +1594,10 @@ void process_evedit_rewards(char_data *ch, char *argument, struct event_reward *
 				}
 			}
 			
-			if (!copyfrom) {
+			if (none) {
+				msg_to_char(ch, "No rewards to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
 				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
 			}
 			else {

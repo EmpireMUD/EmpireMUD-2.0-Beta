@@ -1263,7 +1263,7 @@ OLC_MODULE(shopedit_items) {
 	struct shop_item *item, *iter, *change, *copyfrom;
 	int findtype, num, cost, rep;
 	any_vnum vnum, cur_vnum;
-	bool found;
+	bool found, none;
 	
 	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
 	
@@ -1287,12 +1287,14 @@ OLC_MODULE(shopedit_items) {
 		else {
 			sprintbit(findtype, olc_type_bits, buf, FALSE);
 			copyfrom = NULL;
+			none = FALSE;
 			
 			switch (findtype) {
 				case OLC_SHOP: {
 					shop_data *find = real_shop(vnum);
 					if (find) {
 						copyfrom = SHOP_ITEMS(find);
+						none = copyfrom ? FALSE : TRUE;
 					}
 					break;
 				}
@@ -1302,7 +1304,10 @@ OLC_MODULE(shopedit_items) {
 				}
 			}
 			
-			if (!copyfrom) {
+			if (none) {
+				msg_to_char(ch, "No items to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
 				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
 			}
 			else {
