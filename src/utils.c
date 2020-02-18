@@ -3782,7 +3782,7 @@ char *fname(const char *namelist) {
 	static char holder[30];
 	register char *point;
 
-	for (point = holder; isalpha(*namelist); namelist++, point++) {
+	for (point = holder; *namelist && !isspace(*namelist); namelist++, point++) {
 		*point = *namelist;
 	}
 
