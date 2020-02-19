@@ -3847,16 +3847,10 @@ void b5_88_irrigation_repair(void) {
 	struct map_data *map;
 	
 	// any tiles with current OR base sect in this range are trouble
-		// plains and basic forests
-		// jungle and swamp
-		// damaged jungle, marsh, stumps, copse, riverbank tiles
-		// shore, old-growth forest
-		// shoreside/seaside tiles
-		// jungle edge tiles
-		// enchanted forest
-		// evergreen forests
-		// goblin stumps
-		// beaver flooding
+		// plains and basic forests; jungle and swamp;
+		// damaged jungle, marsh, stumps, copse, riverbank tiles;
+		// shore, old-growth forest; shoreside/seaside tiles; jungle edge tiles;
+		// enchanted forest; evergreen forests; goblin stumps; beaver flooding
 	#define b588_TARGET_SECT(vnum)  ( \
 		((vnum) >= 0 && (vnum) <= 4) || \
 		((vnum) >= 27 && (vnum) <= 29) || \
@@ -3870,9 +3864,7 @@ void b5_88_irrigation_repair(void) {
 		((vnum) >= 18451 && (vnum) <= 18452) \
 	)
 	// natural sect to look for (indicates the tile is a problem if it has this natural sect and one of the above current/base sect)
-		// desert
-		// oasis
-		// grove
+		// desert, oasis, grove
 	#define b588_NATURAL_SECT(vnum)  ( \
 		(vnum) == 20 || \
 		(vnum) == 21 || \
