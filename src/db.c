@@ -3889,10 +3889,12 @@ void b5_88_irrigation_repair(void) {
 		if (map->sector_type && b588_TARGET_SECT(GET_SECT_VNUM(map->sector_type))) {
 			++fixed_current;
 			change_terrain(real_room(map->vnum), GET_SECT_VNUM(map->natural_sector));
+			log(" - current: %d (%d, %d)", map->vnum, MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 		}
 		else if (map->base_sector && b588_TARGET_SECT(GET_SECT_VNUM(map->base_sector))) {
 			++fixed_base;
 			change_base_sector(real_room(map->vnum), map->natural_sector);
+			log(" - current: %d (%d, %d)", map->vnum, MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 		}
 	}
 	
