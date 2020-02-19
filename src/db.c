@@ -1923,6 +1923,7 @@ const char *versions_list[] = {
 	"b5.86",
 	"b5.86a",
 	"b5.87",
+	"b5.88",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3840,6 +3841,70 @@ void b5_87_crop_and_old_growth(void) {
 }
 
 
+// fixes tiles that fell prey to a now-fixed bug where the tile went: desert -> irrigated plains -> crop -> regular plains
+void b5_88_irrigation_repair(void) {
+	int fixed_current = 0, fixed_base = 0;
+	struct map_data *map;
+	
+	// any tiles with current OR base sect in this range are trouble
+		// plains and basic forests
+		// jungle and swamp
+		// damaged jungle, marsh, stumps, copse, riverbank tiles
+		// shore, old-growth forest
+		// shoreside/seaside tiles
+		// jungle edge tiles
+		// enchanted forest
+		// evergreen forests
+		// goblin stumps
+		// beaver flooding
+	#define b588_TARGET_SECT(vnum)  ( \
+		((vnum) >= 0 && (vnum) <= 4) || \
+		((vnum) >= 27 && (vnum) <= 29) || \
+		((vnum) >= 34 && (vnum) <= 47) || \
+		(vnum) == 50 || (vnum) == 90 || \
+		((vnum) >= 54 && (vnum) <= 56) || \
+		((vnum) >= 59 && (vnum) <= 65) || \
+		((vnum) >= 600 && (vnum) <= 604) || \
+		((vnum) >= 10562 && (vnum) <= 10566) || \
+		(vnum) == 18100 || \
+		((vnum) >= 18451 && (vnum) <= 18452) \
+	)
+	// natural sect to look for (indicates the tile is a problem if it has this natural sect and one of the above current/base sect)
+		// desert
+		// oasis
+		// grove
+	#define b588_NATURAL_SECT(vnum)  ( \
+		(vnum) == 20 || \
+		(vnum) == 21 || \
+		(vnum) == 26 \
+	)
+	
+	log("Applying b5.88 update: repairing tiles affected by previous irrigation bug...");
+	
+	LL_FOREACH(land_map, map) {
+		if (!map->natural_sector || !b588_NATURAL_SECT(GET_SECT_VNUM(map->natural_sector))) {
+			continue;	// doesn't have the natural sect we're looking for: skip
+		}
+		
+		if (map->sector_type && b588_TARGET_SECT(GET_SECT_VNUM(map->sector_type))) {
+			++fixed_current;
+			change_terrain(real_room(map->vnum), GET_SECT_VNUM(map->natural_sector));
+		}
+		else if (map->base_sector && b588_TARGET_SECT(GET_SECT_VNUM(map->base_sector))) {
+			++fixed_base;
+			change_base_sector(real_room(map->vnum), map->natural_sector);
+		}
+	}
+	
+	log("- repaired %d current and %d base sectors", fixed_current, fixed_base);
+	
+	if (fixed_current > 0 || fixed_base > 0) {
+		world_map_needs_save = TRUE;
+		save_whole_world();
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4140,6 +4205,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.87")) {
 			b5_87_crop_and_old_growth();
+		}
+		if (MATCH_VERSION("b5.88")) {
+			b5_88_irrigation_repair();
 		}
 	}
 	
