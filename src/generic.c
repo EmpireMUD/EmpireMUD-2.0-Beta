@@ -243,7 +243,9 @@ bool has_generic_relation(struct generic_relation *list, any_vnum vnum) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_generic(generic_data *gen, char_data *ch) {
+	struct generic_relation *rel, *next_rel;
 	bool problem = FALSE;
+	generic_data *alt;
 	
 	if (!GEN_NAME(gen) || !*GEN_NAME(gen) || !str_cmp(GEN_NAME(gen), default_generic_name)) {
 		olc_audit_msg(ch, GEN_VNUM(gen), "No name set");
@@ -309,6 +311,20 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 			if (!GET_COMPONENT_PLURAL(gen) || !*GET_COMPONENT_PLURAL(gen)) {
 				olc_audit_msg(ch, GEN_VNUM(gen), "Plural form not set.");
 				problem = TRUE;
+			}
+			HASH_ITER(hh, GEN_RELATIONS(gen), rel, next_rel) {
+				if (rel->vnum == GEN_VNUM(gen)) {
+					olc_audit_msg(ch, GEN_VNUM(gen), "Has itself as a relation.");
+					problem = TRUE;
+				}
+				else if (!(alt = real_generic(rel->vnum))) {
+					olc_audit_msg(ch, GEN_VNUM(gen), "Invalid relation vnum %d.", rel->vnum);
+					problem = TRUE;
+				}
+				else if (has_generic_relation(GEN_RELATIONS(alt), GEN_VNUM(gen))) {
+					olc_audit_msg(ch, GEN_VNUM(gen), "Circular relationship with %d.", rel->vnum);
+					problem = TRUE;
+				}
 			}
 			break;
 		}
