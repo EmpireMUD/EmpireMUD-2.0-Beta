@@ -1618,13 +1618,16 @@ OLC_MODULE(genedit_type) {
 		
 		switch (GEN_TYPE(gen)) {
 			case GENERIC_COMPONENT: {
+				if (GEN_NAME(gen) && *GEN_NAME(gen)) {
+					sprintf(buf, "%ss", GEN_NAME(gen));
+					GEN_STRING(gen, GSTR_COMPONENT_PLURAL) = str_dup(buf);
+				}
 				if (obj_proto(GEN_VNUM(gen))) {
 					// default to same-vnum and similar-plural
 					GEN_VALUE(gen, GVAL_OBJ_VNUM) = GEN_VNUM(gen);
-					if (GEN_NAME(gen) && *GEN_NAME(gen)) {
-						sprintf(buf, "%ss", GEN_NAME(gen));
-						GEN_STRING(gen, GSTR_COMPONENT_PLURAL) = str_dup(buf);
-					}
+				}
+				else {
+					GEN_VALUE(gen, GVAL_OBJ_VNUM) = NOTHING;
 				}
 				break;
 			}
