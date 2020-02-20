@@ -1404,7 +1404,7 @@ void get_generic_relation_display(struct generic_relation *list, bool show_vnums
 			this_line = strlen(part);
 		}
 		else {
-			sprintf(save_buf + strlen(save_buf), "%s%s", this_line ? ", " : "", part);
+			sprintf(save_buf + strlen(save_buf), "%s%s", this_line ? ", " : "  ", part);
 			this_line += strlen(part) + 2;
 		}
 	}
