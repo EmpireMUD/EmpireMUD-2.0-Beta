@@ -1071,6 +1071,11 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_GEN);
 	save_library_file_for_vnum(DB_BOOT_GEN, vnum);
 	
+	// remove from computed data
+	if (GEN_TYPE(gen) == GENERIC_COMPONENT || GEN_RELATIONS(gen) || GEN_COMPUTED_RELATIONS(gen)) {
+		compute_generic_relations();
+	}
+	
 	// now remove from prototypes
 	
 	// update abilities
