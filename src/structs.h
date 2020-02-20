@@ -1445,7 +1445,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // GEN_x: generic flags
-// #define GEN_...  BIT(0)	// a. no flags are implemented
+#define GEN_BASIC  BIT(0)	// a. indicates it's basic (varies by type)
 
 
 // how many strings a generic stores (can be safely raised with no updates)

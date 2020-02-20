@@ -1987,7 +1987,7 @@ const char *generic_types[] = {
 
 // GEN_x: generic flags
 const char *generic_flags[] = {
-	// none yet defined
+	"BASIC",	// 0
 	"\n"
 };
 
