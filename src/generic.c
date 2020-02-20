@@ -664,6 +664,15 @@ void parse_generic(FILE *fl, any_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'R': {	// relation
+				if (sscanf(line, "R %d", &int_in[0]) != 1) {
+					log("SYSERR: Format error in R line of %s", error);
+					break;
+				}
+				
+				add_generic_relation(&GEN_RELATIONS(gen), int_in[0]);
+				break;
+			}
 			case 'T': {	// string
 				int_in[0] = atoi(line+1);
 				ptr = fread_string(fl, error);
@@ -778,6 +787,7 @@ void write_generic_index(FILE *fl) {
 * @param generic_data *gen The thing to save.
 */
 void write_generic_to_file(FILE *fl, generic_data *gen) {
+	struct generic_relation *rel, *next_rel;
 	char temp[256];
 	int iter;
 	
@@ -797,6 +807,11 @@ void write_generic_to_file(FILE *fl, generic_data *gen) {
 	
 	// 3. values -- need to adjust this if NUM_GENERIC_VALUES changes
 	fprintf(fl, "%d %d %d %d\n", GEN_VALUE(gen, 0), GEN_VALUE(gen, 1), GEN_VALUE(gen, 2), GEN_VALUE(gen, 3));
+	
+	// 'R' relations
+	HASH_ITER(hh, GEN_RELATIONS(gen), rel, next_rel) {
+		fprintf(fl, "R %d\n", rel->vnum);
+	}
 	
 	// 'T' strings
 	for (iter = 0; iter < NUM_GENERIC_STRINGS; ++iter) {
