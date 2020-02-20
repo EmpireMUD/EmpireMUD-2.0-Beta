@@ -49,6 +49,11 @@ extern const char *generic_flags[];
 extern const char *generic_types[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
+// local funcs
+struct generic_relation *copy_generic_relations(struct generic_relation *list);
+void free_generic_relations(struct generic_relation **list);
+bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
+
 // external funcs
 extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
 extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
@@ -79,6 +84,54 @@ void add_generic_relation(struct generic_relation **list, any_vnum vnum) {
 			item->vnum = vnum;
 			HASH_ADD_INT(*list, vnum, item);
 		}
+	}
+}
+
+
+/**
+* Called at startup or after an OLC save to re-compute the full list of
+* generic relations, to save time later.
+*/
+void compute_generic_relations(void) {
+	struct generic_relation *rel, *next_rel, *alt, *next_alt;
+	generic_data *gen, *next_gen, *other;
+	bool changed;
+	int safety;
+	
+	// first clear them all out
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		free_generic_relations(&GEN_COMPUTED_RELATIONS(gen));
+	}
+	
+	// now repeatedly look for ones that have any to add
+	safety = 0;
+	do {
+		changed = FALSE;	// look for anything that was added in this round
+		++safety;
+		
+		HASH_ITER(hh, generic_table, gen, next_gen) {
+			// check that it has its basic relations in its computed relations
+			if (GEN_RELATIONS(gen) && !GEN_COMPUTED_RELATIONS(gen)) {
+				changed = TRUE;
+				GEN_COMPUTED_RELATIONS(gen) = copy_generic_relations(GEN_RELATIONS(gen));
+			}
+			
+			// now attempt to expand computed relations
+			HASH_ITER(hh, GEN_COMPUTED_RELATIONS(gen), rel, next_rel) {
+				if ((other = real_generic(rel->vnum))) {
+					HASH_ITER(hh, GEN_COMPUTED_RELATIONS(other), alt, next_alt) {
+						if (!has_generic_relation(GEN_COMPUTED_RELATIONS(gen), alt->vnum)) {
+							changed = TRUE;
+							add_generic_relation(&GEN_COMPUTED_RELATIONS(gen), alt->vnum);
+						}
+					}
+				}
+			}
+		}
+	} while (changed && safety < 100);
+	
+	if (safety == 100) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: compute_generic_relations: looped over 100 times");
 	}
 }
 
@@ -1330,7 +1383,10 @@ void save_olc_generic(descriptor_data *desc) {
 	// resort
 	HASH_SORT(sorted_generics, sort_generics_by_data);
 	
-	// TODO: update computed relations
+	// update computed relations
+	if (GEN_TYPE(gen) == GENERIC_COMPONENT || GEN_RELATIONS(gen) || GEN_COMPUTED_RELATIONS(gen)) {
+		compute_generic_relations();
+	}
 }
 
 

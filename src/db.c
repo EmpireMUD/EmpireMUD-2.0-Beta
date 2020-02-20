@@ -470,6 +470,7 @@ void boot_world(void) {
 	void check_newbie_islands();
 	void check_triggers();
 	void clean_empire_logs();
+	void compute_generic_relations();
 	void index_boot_world();
 	void init_reputation();
 	void load_daily_quest_file();
@@ -620,6 +621,7 @@ void boot_world(void) {
 	verify_running_events();
 	read_ability_requirements();
 	check_triggers();
+	compute_generic_relations();
 	
 	log("Sorting data.");
 	HASH_SRT(sorted_hh, sorted_abilities, sort_abilities_by_data);
