@@ -36,6 +36,7 @@
 *   Displays
 *   Generic OLC Modules
 *   Action OLC Modules
+*   Component OLC Modules
 *   Liquid OLC Modules
 */
 
@@ -60,6 +61,46 @@ extern bool remove_thing_from_resource_list(struct resource_data **list, int typ
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Adds a generic relationship (if it is not already present).
+*
+* @param struct generic_relation **list A pointer to the list to add to.
+* @param any_vnum vnum The other generic's vnum, to add as a relation.
+*/
+void add_generic_relation(struct generic_relation **list, any_vnum vnum) {
+	struct generic_relation *item;
+	
+	if (list && vnum != NOTHING) {
+		HASH_FIND_INT(*list, &vnum, item);
+		
+		if (!item) {
+			CREATE(item, struct generic_relation, 1);
+			item->vnum = vnum;
+			HASH_ADD_INT(*list, vnum, item);
+		}
+	}
+}
+
+
+/**
+* Deletes a generic relationship, if present.
+*
+* @param struct generic_relation **list Pointer to the list to delete from.
+* @param any_vnum vnum The other generic's vnum, to delete.
+* @return bool TRUE if it had that relation and deleted it, FALSE if not.
+*/
+bool delete_generic_relation(struct generic_relation **list, any_vnum vnum) {
+	struct generic_relation *item;
+	HASH_FIND_INT(*list, &vnum, item);
+	if (item) {
+		HASH_DEL(*list, item);
+		free(item);
+		return TRUE;
+	}
+	return FALSE;
+}
+
 
 /**
 * Gets a generic's name by vnum, safely.
@@ -121,6 +162,20 @@ int get_generic_value_by_vnum(any_vnum vnum, int type, int pos) {
 	else {
 		return GEN_VALUE(gen, pos);
 	}
+}
+
+
+/**
+* Determines if a generic has a given relationship with another generic.
+*
+* @param struct generic_relation *list The list to check.
+* @param any_vnum vnum The other generic's vnum, to look for.
+* @return bool TRUE if it has that relation, FALSE if not.
+*/
+bool has_generic_relation(struct generic_relation *list, any_vnum vnum) {
+	struct generic_relation *item;
+	HASH_FIND_INT(list, &vnum, item);
+	return item ? TRUE : FALSE;
 }
 
 
@@ -193,6 +248,17 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 			}
 			break;
 		}
+		case GENERIC_COMPONENT: {
+			if (GET_COMPONENT_OBJ_VNUM(gen) == NOTHING || !obj_proto(GET_COMPONENT_OBJ_VNUM(gen))) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Item vnum not set or invalid.");
+				problem = TRUE;
+			}
+			if (!GET_COMPONENT_PLURAL(gen) || !*GET_COMPONENT_PLURAL(gen)) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Plural form not set.");
+				problem = TRUE;
+			}
+			break;
+		}
 		case GENERIC_AFFECT:
 		case GENERIC_COOLDOWN: {
 			// everything here is optional
@@ -242,7 +308,7 @@ char *list_one_generic(generic_data *gen, bool detail) {
 */
 void olc_search_generic(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
-	generic_data *gen = real_generic(vnum);
+	generic_data *gen = real_generic(vnum), *gen_iter, *next_gen;
 	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	event_data *event, *next_event;
@@ -330,6 +396,14 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(event), EVT_NAME(event));
+		}
+	}
+	
+	// other generics
+	HASH_ITER(hh, generic_table, gen_iter, next_gen) {
+		if (has_generic_relation(GEN_RELATIONS(gen_iter), vnum)) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "GEN [%5d] %s\r\n", GEN_VNUM(gen_iter), GEN_NAME(gen_iter));
 		}
 	}
 	
@@ -490,6 +564,20 @@ void clear_generic(generic_data *gen) {
 
 
 /**
+* Frees a list of generic relations.
+*
+* @param struct generic_relation **list The list to free.
+*/
+void free_generic_relations(struct generic_relation **list) {
+	struct generic_relation *item, *next;
+	HASH_ITER(hh, *list, item, next) {
+		HASH_DEL(*list, item);
+		free(item);
+	}
+}
+
+
+/**
 * frees up memory for a generic data item.
 *
 * See also: olc_delete_generic
@@ -508,6 +596,13 @@ void free_generic(generic_data *gen) {
 		if (GEN_STRING(gen, iter) && (!proto || GEN_STRING(gen, iter) != GEN_STRING(proto, iter))) {
 			free(GEN_STRING(gen, iter));
 		}
+	}
+	
+	if (GEN_RELATIONS(gen) && (!proto || GEN_RELATIONS(gen) != GEN_RELATIONS(proto))) {
+		free_generic_relations(&GEN_RELATIONS(gen));
+	}
+	if (GEN_COMPUTED_RELATIONS(gen) && (!proto || GEN_COMPUTED_RELATIONS(gen) != GEN_COMPUTED_RELATIONS(proto))) {
+		free_generic_relations(&GEN_COMPUTED_RELATIONS(gen));
 	}
 	
 	free(gen);
@@ -719,6 +814,22 @@ void write_generic_to_file(FILE *fl, generic_data *gen) {
 //// OLC HANDLERS ////////////////////////////////////////////////////////////
 
 /**
+* Duplicates a list of generic relations, for OLC.
+*
+* @param struct generic_relation *list The list to copy.
+* @return struct generic_relation* The new list.
+*/
+struct generic_relation *copy_generic_relations(struct generic_relation *list) {
+	struct generic_relation *new_list = NULL, *rel, *next;
+	
+	HASH_ITER(hh, list, rel, next) {
+		add_generic_relation(&new_list, rel->vnum);
+	}
+	return new_list;
+}
+
+
+/**
 * Creates a new generic entry.
 * 
 * @param any_vnum vnum The number to create.
@@ -774,7 +885,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
-	generic_data *gen;
+	generic_data *gen, *gen_iter, *next_gen;
 	char_data *chiter;
 	bool found;
 	int res_type;
@@ -952,6 +1063,13 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update other generics
+	HASH_ITER(hh, generic_table, gen_iter, next_gen) {
+		if (delete_generic_relation(&GEN_RELATIONS(gen_iter), vnum)) {
+			save_library_file_for_vnum(DB_BOOT_GEN, GEN_VNUM(gen_iter));
+		}
+	}
+	
 	// update objs
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		found = FALSE;
@@ -1061,6 +1179,11 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 				msg_to_char(desc->character, "One of the resources used in the craft you're editing was deleted.\r\n");
 			}	
 		}
+		if (GET_OLC_GENERIC(desc)) {
+			if (delete_generic_relation(&GEN_RELATIONS(GET_OLC_GENERIC(desc)), vnum)) {
+				msg_to_char(ch, "One of the related generics for the one you're editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_EVENT(desc)) {
 			// QR_x: event reward types
 			found = delete_event_reward_from_list(&EVT_RANK_REWARDS(GET_OLC_EVENT(desc)), QR_CURRENCY, vnum);
@@ -1139,6 +1262,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 void save_olc_generic(descriptor_data *desc) {	
 	generic_data *proto, *gen = GET_OLC_GENERIC(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	struct generic_relation *cmprel;
 	UT_hash_handle hh, sorted_hh;
 	int iter;
 
@@ -1156,6 +1280,11 @@ void save_olc_generic(descriptor_data *desc) {
 			free(GEN_STRING(proto, iter));
 		}
 	}
+	free_generic_relations(&GEN_RELATIONS(proto));
+	
+	// save these for later
+	cmprel = GEN_COMPUTED_RELATIONS(proto);
+	GEN_COMPUTED_RELATIONS(proto) = NULL;
 	
 	// sanity
 	if (!GEN_NAME(gen) || !*GEN_NAME(gen)) {
@@ -1178,12 +1307,15 @@ void save_olc_generic(descriptor_data *desc) {
 	proto->vnum = vnum;	// ensure correct vnum
 	proto->hh = hh;	// restore old hash handles
 	proto->sorted_hh = sorted_hh;
+	GEN_COMPUTED_RELATIONS(proto) = cmprel;	// restore old computed relations
 		
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_GEN, vnum);
 	
-	// and resort
+	// resort
 	HASH_SORT(sorted_generics, sort_generics_by_data);
+	
+	// TODO: update computed relations
 }
 
 
@@ -1211,6 +1343,10 @@ generic_data *setup_olc_generic(generic_data *input) {
 		for (iter = 0; iter < NUM_GENERIC_STRINGS; ++iter) {
 			GEN_STRING(new, iter) = GEN_STRING(input, iter) ? str_dup(GEN_STRING(input, iter)) : NULL;
 		}
+		
+		// copy basic relations but skip computed ones
+		GEN_RELATIONS(new) = copy_generic_relations(GEN_RELATIONS(input));
+		GEN_COMPUTED_RELATIONS(new) = NULL;
 	}
 	else {
 		// brand new: some defaults
@@ -1226,13 +1362,52 @@ generic_data *setup_olc_generic(generic_data *input) {
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
 /**
+* Displays relations on multiple lines.
+*
+* @param struct generic_relation *list The list to show.
+* @param bool show_vnums If true, shows the vnums with each entry.
+* @param char *save_buf A string buffer for the output.
+*/
+void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf) {
+	struct generic_relation *rel, *next;
+	char part[MAX_STRING_LENGTH];
+	int this_line = 0;
+	
+	*save_buf = '\0';
+	
+	HASH_ITER(hh, list, rel, next) {
+		if (show_vnums) {
+			sprintf(part, "[%d] %s", rel->vnum, get_generic_name_by_vnum(rel->vnum));
+		}
+		else {
+			strcpy(part, get_generic_name_by_vnum(rel->vnum));
+		}
+		
+		// append how
+		if (this_line > 0 && this_line + strlen(part) + 2 >= 80) {
+			sprintf(save_buf + strlen(save_buf), "\r\n%s", part);
+			this_line = strlen(part);
+		}
+		else {
+			sprintf(save_buf + strlen(save_buf), "%s%s", this_line ? ", " : "", part);
+			this_line += strlen(part) + 2;
+		}
+	}
+	
+	if (this_line > 0) {
+		strcat(save_buf, "\r\n");
+	}
+}
+
+
+/**
 * For vstat.
 *
 * @param char_data *ch The player requesting stats.
 * @param generic_data *gen The generic to display.
 */
 void do_stat_generic(char_data *ch, generic_data *gen) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH * 2];
 	size_t size;
 	
 	if (!gen) {
@@ -1275,6 +1450,16 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 		case GENERIC_CURRENCY: {
 			size += snprintf(buf + size, sizeof(buf) - size, "Singular: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR)));
 			size += snprintf(buf + size, sizeof(buf) - size, "Plural: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_PLURAL)));
+			break;
+		}
+		case GENERIC_COMPONENT: {
+			size += snprintf(buf + size, sizeof(buf) - size, "Plural: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_COMPONENT_PLURAL)));
+			size += snprintf(buf + size, sizeof(buf) - size, "Item: [%d] %s\r\n", GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
+			
+			get_generic_relation_display(GEN_RELATIONS(gen), TRUE, part);
+			size += snprintf(buf + size, sizeof(buf) - size, "Relations:\r\n%s", GEN_RELATIONS(gen) ? part : " none\r\n");
+			get_generic_relation_display(GEN_COMPUTED_RELATIONS(gen), TRUE, part);
+			size += snprintf(buf + size, sizeof(buf) - size, "Extended Relations:\r\n%s", GEN_COMPUTED_RELATIONS(gen) ? part : " none\r\n");
 			break;
 		}
 	}
@@ -1343,6 +1528,14 @@ void olc_show_generic(char_data *ch) {
 			sprintf(buf + strlen(buf), "<%splural\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_CURRENCY_PLURAL), ""), GEN_STRING(gen, GSTR_CURRENCY_PLURAL) ? GEN_STRING(gen, GSTR_CURRENCY_PLURAL) : "(not set)");
 			break;
 		}
+		case GENERIC_COMPONENT: {
+			sprintf(buf + strlen(buf), "<%splural\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COMPONENT_PLURAL), ""), GEN_STRING(gen, GSTR_COMPONENT_PLURAL) ? GEN_STRING(gen, GSTR_COMPONENT_PLURAL) : "(not set)");
+			sprintf(buf + strlen(buf), "<%sitem\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_COMPONENT_OBJ_VNUM(gen), NOTHING), GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
+			
+			get_generic_relation_display(GEN_RELATIONS(gen), TRUE, lbuf);
+			sprintf(buf + strlen(buf), "<%srelations\t0>\r\n%s", OLC_LABEL_PTR(GEN_RELATIONS(gen)), lbuf);
+			break;
+		}
 	}
 		
 	page_string(ch->desc, buf, TRUE);
@@ -1387,6 +1580,7 @@ OLC_MODULE(genedit_name) {
 
 OLC_MODULE(genedit_type) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	char buf[MAX_STRING_LENGTH];
 	int old = GEN_TYPE(gen), iter;
 	
 	GEN_TYPE(gen) = olc_process_type(ch, argument, "type", "type", generic_types, GEN_TYPE(gen));
@@ -1400,6 +1594,24 @@ OLC_MODULE(genedit_type) {
 			if (GEN_STRING(gen, iter)) {
 				free(GEN_STRING(gen, iter));
 				GEN_STRING(gen, iter) = NULL;
+			}
+		}
+		
+		if (GEN_TYPE(gen) != GENERIC_COMPONENT) {
+			free_generic_relations(&GEN_RELATIONS(gen));
+		}
+		
+		switch (GEN_TYPE(gen)) {
+			case GENERIC_COMPONENT: {
+				if (obj_proto(GEN_VNUM(gen))) {
+					// default to same-vnum and similar-plural
+					GEN_VALUE(gen, GVAL_OBJ_VNUM) = GEN_VNUM(gen);
+					if (GEN_NAME(gen) && *GEN_NAME(gen)) {
+						sprintf(buf, "%ss", GEN_NAME(gen));
+						GEN_STRING(gen, GSTR_COMPONENT_PLURAL) = str_dup(buf);
+					}
+				}
+				break;
 			}
 		}
 	}
@@ -1528,12 +1740,25 @@ OLC_MODULE(genedit_repair2room) {
 
 OLC_MODULE(genedit_plural) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	int pos = NOTHING;
 	
-	if (GEN_TYPE(gen) != GENERIC_CURRENCY) {
-		msg_to_char(ch, "You can only change that on an CURRENCY generic.\r\n");
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_CURRENCY: {
+			pos = GSTR_CURRENCY_PLURAL;
+			break;
+		}
+		case GENERIC_COMPONENT: {
+			pos = GSTR_COMPONENT_PLURAL;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can't set a plural on this type of generic.\r\n");
+			return;
+		}
 	}
-	else {
-		olc_process_string(ch, argument, "plural", &GEN_STRING(gen, GSTR_CURRENCY_PLURAL));
+	
+	if (pos != NOTHING) {
+		olc_process_string(ch, argument, "plural", &GEN_STRING(gen, pos));
 	}
 }
 
@@ -1885,6 +2110,143 @@ OLC_MODULE(genedit_wearoff2room) {
 	}
 	else {
 		olc_process_string(ch, argument, "wearoff2room", &GEN_STRING(gen, pos));
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// COMPONENT OLC MODULES ///////////////////////////////////////////////////
+
+OLC_MODULE(genedit_item) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	obj_vnum old = GET_COMPONENT_OBJ_VNUM(gen);
+	
+	if (GEN_TYPE(gen) != GENERIC_COMPONENT) {
+		msg_to_char(ch, "You can only change that on a COMPONENT generic.\r\n");
+	}
+	else {
+		GEN_VALUE(gen, GVAL_OBJ_VNUM) = olc_process_number(ch, argument, "object vnum", "item", 0, MAX_VNUM, GET_COMPONENT_OBJ_VNUM(gen));
+		if (!obj_proto(GET_COMPONENT_OBJ_VNUM(gen))) {
+			GEN_VALUE(gen, GVAL_OBJ_VNUM) = old;
+			msg_to_char(ch, "There is no object with that vnum. Old value restored.\r\n");
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It is now represented by item [%d] %s.\r\n", GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
+		}
+	}
+}
+
+
+OLC_MODULE(genedit_relations) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	struct generic_relation **list = &GEN_RELATIONS(gen);
+	char cmd_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct generic_relation *iter, *copyfrom, *next_rel;
+	bool found, none;
+	any_vnum vnum;
+	int num;
+	
+	if (GEN_TYPE(gen) != GENERIC_COMPONENT) {
+		msg_to_char(ch, "You can only set relations on COMPONENT generics.\r\n");
+		return;
+	}
+	
+	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
+	
+	if (is_abbrev(cmd_arg, "copy")) {
+		// usage: relation copy <from vnum>
+		argument = any_one_arg(argument, vnum_arg);	// any vnum for that type
+		
+		if (!*vnum_arg) {
+			msg_to_char(ch, "Usage: relation copy <from vnum>\r\n");
+		}
+		else if (!isdigit(*vnum_arg)) {
+			msg_to_char(ch, "Copy from which generic?\r\n");
+		}
+		else if ((vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum.\r\n");
+		}
+		else {
+			generic_data *from_gen = real_generic(vnum);
+			if (from_gen) {
+				copyfrom = GEN_RELATIONS(from_gen);
+				none = copyfrom ? FALSE : TRUE;
+			}
+			else {
+				copyfrom = NULL;
+				none = FALSE;
+			}
+			
+			if (none) {
+				msg_to_char(ch, "No relations to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
+				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
+			}
+			else {
+				HASH_ITER(hh, copyfrom, iter, next_rel) {
+					add_generic_relation(list, iter->vnum);
+				}
+				msg_to_char(ch, "Copied relations from generic %d.\r\n", vnum);
+			}
+		}
+	}	// end 'copy'
+	else if (is_abbrev(cmd_arg, "remove")) {
+		// usage: relation remove <vnum | all>
+		skip_spaces(&argument);	// only arg is number
+		
+		if (!*argument) {
+			msg_to_char(ch, "Remove which relation (vnum)?\r\n");
+		}
+		else if (!str_cmp(argument, "all")) {
+			free_generic_relations(list);
+			*list = NULL;
+			msg_to_char(ch, "You remove all the relations.\r\n");
+		}
+		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
+			msg_to_char(ch, "Invalid relation vnum.\r\n");
+		}
+		else {
+			found = FALSE;
+			HASH_ITER(hh, *list, iter, next_rel) {
+				if (iter->vnum == num) {
+					found = TRUE;
+					msg_to_char(ch, "You remove the relation to [%d] %s.\r\n", iter->vnum, get_generic_name_by_vnum(iter->vnum));
+					HASH_DEL(*list, iter);
+					free(iter);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid relation vnum.\r\n");
+			}
+		}
+	}	// end 'remove'
+	else if (is_abbrev(cmd_arg, "add")) {
+		// usage: relation add <vnum>
+		argument = any_one_arg(argument, vnum_arg);
+		
+		if (!*vnum_arg) {
+			msg_to_char(ch, "Usage: relation add <vnum>\r\n");
+		}
+		else if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum '%s'.\r\n", vnum_arg);
+		}
+		else if (!real_generic(vnum)) {
+			msg_to_char(ch, "Unable to find generic %d.\r\n", vnum);
+			return;
+		}
+		else {
+			// success
+			add_generic_relation(list, vnum);
+			msg_to_char(ch, "You add relation: [%d] %s\r\n", vnum, get_generic_name_by_vnum(vnum));
+		}
+	}	// end 'add'
+	else {
+		msg_to_char(ch, "Usage: relation add <vnum>\r\n");
+		msg_to_char(ch, "Usage: relation copy <from vnum>\r\n");
+		msg_to_char(ch, "Usage: relation remove <vnum | all>\r\n");
 	}
 }
 

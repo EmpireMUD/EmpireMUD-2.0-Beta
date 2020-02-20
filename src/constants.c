@@ -1974,12 +1974,13 @@ struct faction_reputation_type reputation_levels[] = {
 
 // GENERIC_x: generic types
 const char *generic_types[] = {
-	"UNKNOWN",
+	"UNKNOWN",	// 0
 	"LIQUID",
 	"ACTION",
 	"COOLDOWN",
 	"AFFECT",
-	"CURRENCY",
+	"CURRENCY",	// 5
+	"COMPONENT",
 	"\n"
 };
 

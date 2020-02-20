@@ -481,6 +481,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	augment_data *aug, *next_aug;
+	generic_data *gen, *next_gen;
 	vehicle_data *veh, *next_veh;
 	crop_data *crop, *next_crop;
 	room_data *room, *next_room;
@@ -710,6 +711,14 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update generics
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		if (GET_COMPONENT_OBJ_VNUM(gen) == vnum) {
+			GEN_VALUE(gen, GVAL_OBJ_VNUM) = NOTHING;
+			save_library_file_for_vnum(DB_BOOT_GEN, GEN_VNUM(gen));
+		}
+	}
+	
 	// update globals
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(glb), TYPE_OBJ, vnum);
@@ -920,6 +929,12 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			if (found) {
 				// SET_BIT(EVT_FLAGS(GET_OLC_EVENT(desc)), EVTF_IN_DEVELOPMENT);
 				msg_to_desc(desc, "An object used as a reward by the event you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_GENERIC(desc)) {
+			if (GET_COMPONENT_OBJ_VNUM(GET_OLC_GENERIC(desc)) == vnum) {
+				GEN_VALUE(GET_OLC_GENERIC(desc), GVAL_OBJ_VNUM) = NOTHING;
+				msg_to_char(ch, "The matching item for the generic component you're editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_GLOBAL(desc)) {
@@ -1228,6 +1243,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	augment_data *aug, *next_aug;
+	generic_data *gen, *next_gen;
 	vehicle_data *veh, *next_veh;
 	social_data *soc, *next_soc;
 	struct archetype_gear *gear;
@@ -1354,6 +1370,14 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(event), EVT_NAME(event));
+		}
+	}
+	
+	// generics
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		if (GET_COMPONENT_OBJ_VNUM(gen) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "GEN [%5d] %s\r\n", GEN_VNUM(gen), GEN_NAME(gen));
 		}
 	}
 	

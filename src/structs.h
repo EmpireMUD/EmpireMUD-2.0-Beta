@@ -1441,6 +1441,7 @@ typedef struct vehicle_data vehicle_data;
 #define GENERIC_COOLDOWN  3	// for cooldowns (COOLDOWN_*)!
 #define GENERIC_AFFECT  4	// for affects (ATYPE_*)
 #define GENERIC_CURRENCY  5	// tokens, for shops
+#define GENERIC_COMPONENT  6	// types of generic objects
 
 
 // GEN_x: generic flags
@@ -4978,8 +4979,19 @@ struct generic_data {
 	int value[NUM_GENERIC_VALUES];
 	char *string[NUM_GENERIC_STRINGS];	// this can be expanded
 	
+	// connected to other generics
+	struct generic_relation *relations;	// set in OLC
+	struct generic_relation *computed_relations;	// determined at runtime (expanded list)
+	
 	UT_hash_handle hh;	// generic_table hash
 	UT_hash_handle sorted_hh;	// sorted_generics hash
+};
+
+
+// this indicates a one-way "is a" relationship between one generic and another
+struct generic_relation {
+	any_vnum vnum;	// another generic
+	UT_hash_handle hh;	// hashed by vnum of the other generic
 };
 
 

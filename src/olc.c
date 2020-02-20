@@ -220,7 +220,9 @@ OLC_MODULE(genedit_type);
 OLC_MODULE(genedit_color);
 OLC_MODULE(genedit_drunk);
 OLC_MODULE(genedit_hunger);
+OLC_MODULE(genedit_item);
 OLC_MODULE(genedit_liquid);
+OLC_MODULE(genedit_relations);
 OLC_MODULE(genedit_thirst);
 OLC_MODULE(genedit_apply2char);
 OLC_MODULE(genedit_apply2room);
@@ -832,6 +834,9 @@ const struct olc_command_data olc_data[] = {
 	// generic: currency
 	{ "plural", genedit_plural, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "singular", genedit_singular, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: component
+	{ "item", genedit_item, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "relations", genedit_relations, OLC_GENERIC, OLC_CF_EDITOR },
 	
 	// globals commands
 	{ "capacity", gedit_capacity, OLC_GLOBAL, OLC_CF_EDITOR },

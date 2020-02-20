@@ -664,8 +664,10 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 //// GENERIC UTILS ///////////////////////////////////////////////////////////
 
 #define GEN_VNUM(gen)  ((gen)->vnum)
+#define GEN_COMPUTED_RELATIONS(gen)  ((gen)->computed_relations)
 #define GEN_FLAGS(gen)  ((gen)->flags)
 #define GEN_NAME(gen)  ((gen)->name)
+#define GEN_RELATIONS(gen)  ((gen)->relations)
 #define GEN_STRING(gen, pos)  ((gen)->string[(pos)])
 #define GEN_TYPE(gen)  ((gen)->type)
 #define GEN_VALUE(gen, pos)  ((gen)->value[(pos)])
@@ -714,6 +716,13 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_CURRENCY_SINGULAR(gen)  (GEN_TYPE(gen) == GENERIC_CURRENCY ? GEN_STRING((gen), GSTR_CURRENCY_SINGULAR) : NULL)
 #define GET_CURRENCY_PLURAL(gen)  (GEN_TYPE(gen) == GENERIC_CURRENCY ? GEN_STRING((gen), GSTR_CURRENCY_PLURAL) : NULL)
 #define WHICH_CURRENCY(amt)  (((amt) == 1) ? GSTR_CURRENCY_SINGULAR : GSTR_CURRENCY_PLURAL)
+
+// GENERIC_COMPONENT
+#define GSTR_COMPONENT_PLURAL  0
+#define GVAL_OBJ_VNUM  1
+#define GET_COMPONENT_OBJ_VNUM(gen)  (GEN_TYPE(gen) == GENERIC_COMPONENT ? GEN_VALUE((gen), GVAL_OBJ_VNUM) : NOTHING)
+#define GET_COMPONENT_PLURAL(gen)  (GEN_TYPE(gen) == GENERIC_COMPONENT ? GEN_STRING((gen), GSTR_COMPONENT_PLURAL) : NULL)
+#define GET_COMPONENT_SINGULAR(gen)  (GEN_TYPE(gen) == GENERIC_COMPONENT ? GEN_NAME(gen) : NULL)
 
 
  //////////////////////////////////////////////////////////////////////////////
