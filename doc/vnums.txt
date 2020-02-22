@@ -46,7 +46,15 @@ blocks that are currently in use.
 5500  System rooms (ships, etc)
 5600  Designate rooms
 
-6000  Components (generics and their matching objects)
+6000  Wood, rock and clay components (generics and their matching objects)
+6100  Fruit and vegetable components
+6200  Meat components
+6300  Various food components
+6400  Fiber, fur, and feather components
+6500  Skin, leather, and fur components
+6600  Magical components (gems, herbs)
+6700  Metal components
+6800  Textiles, handles, glass, paint, rope, and wax components
 
 9000  Map Animals (and related objects and triggers)
 9100      |
