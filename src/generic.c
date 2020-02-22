@@ -1477,7 +1477,7 @@ void get_generic_relation_display(struct generic_relation *list, bool show_vnums
 		
 		// append how
 		if (this_line > 0 && this_line + strlen(part) + 2 >= 80) {
-			sprintf(save_buf + strlen(save_buf), "\r\n%s", part);
+			sprintf(save_buf + strlen(save_buf), "\r\n  %s", part);
 			this_line = strlen(part);
 		}
 		else {
