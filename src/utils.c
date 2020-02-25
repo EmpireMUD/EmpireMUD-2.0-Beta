@@ -3383,8 +3383,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 	for (cycle = 0; cycle < NUM_HASRES_CYCLES; ++cycle) {
 		LL_FOREACH(list, res) {
 			// only RES_OBJECT is checked in the first cycle
-			// - as of b5.88, RES_COMPONENT is checked in BOTH cycles, but only exact matches happen on pass 1
-			if (HASRES_OBJS && res->type != RES_OBJECT && res->type != RES_COMPONENT) {
+			if (HASRES_OBJS && res->type != RES_OBJECT) {
 				continue;
 			}
 			else if (HASRES_OTHER && res->type == RES_OBJECT) {
@@ -3428,9 +3427,8 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 									break;
 								}
 								case RES_COMPONENT: {
-									// 1st pass requires exact component match
-									// TODO: future version of this could prefer 'basic' components on pass 2, and a 3rd pass for non-basic
-									if ((HASRES_OBJS && GET_OBJ_COMPONENT(obj) == res->vnum) || (HASRES_OTHER && is_component_vnum(obj, res->vnum))) {
+									// TODO: future version of this could prefer 'basic' components on pass 1
+									if (GET_OBJ_COMPONENT(obj) == res->vnum || is_component_vnum(obj, res->vnum)) {
 										++total;
 										obj->search_mark = TRUE;
 									}
