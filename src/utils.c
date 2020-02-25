@@ -1869,7 +1869,7 @@ generic_data *find_generic_component(char *name) {
 	}
 	
 	// not number
-	HASH_ITER(sorted_hh, generic_table, gen, next_gen) {
+	HASH_ITER(hh, generic_table, gen, next_gen) {
 		if (GEN_TYPE(gen) != GENERIC_COMPONENT) {
 			continue;
 		}
