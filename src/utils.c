@@ -1862,7 +1862,7 @@ adv_data *get_adventure_for_vnum(rmt_vnum vnum) {
 * @return generic_data* The generic component, or NULL if it doesn't exist.
 */
 generic_data *find_generic_component(char *name) {
-	generic_data *gen, *next_gen, *abbrev = FALSE;
+	generic_data *gen, *next_gen, *abbrev = NULL;
 	
 	if (is_number(name)) {
 		return find_generic(atoi(name), GENERIC_COMPONENT);
