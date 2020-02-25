@@ -1607,6 +1607,7 @@ extern struct time_info_data *real_time_passed(time_t t2, time_t t1);
 
 // component functions from utils.c
 extern generic_data *find_generic_component(char *name);
+extern bool is_basic_component(obj_data *obj);
 extern bool is_component(obj_data *obj, generic_data *cmp);
 #define is_component_vnum(obj, vnum)  is_component((obj), real_generic(vnum))
 
