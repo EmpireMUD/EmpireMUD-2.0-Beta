@@ -3920,9 +3920,11 @@ void b5_88_resource_components_update(void) {
 	vehicle_data *veh, *next_veh;
 	augment_data *aug, *next_aug;
 	social_data *soc, *next_soc;
+	int this_block, last_block;
 	quest_data *qst, *next_qst;
 	struct resource_data *res;
 	bld_data *bld, *next_bld;
+	obj_data *obj, *next_obj;
 	struct req_data *req;
 	any_vnum vn;
 	bool any;
@@ -4088,6 +4090,16 @@ void b5_88_resource_components_update(void) {
 		}
 		if (any) {
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+		}
+	}
+	
+	// lastly, force a full save of all objects -- because their component types were converted when they loaded
+	last_block = -1;
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		this_block = GET_OBJ_VNUM(obj) / 100;
+		if (this_block != last_block) {
+			last_block = this_block;
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
 	
