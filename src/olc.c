@@ -4229,7 +4229,7 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 				break;
 			}
 			case RES_COMPONENT: {
-				sprintf(line, "%dx (%s)", res->amount, get_generic_name_by_vnum(res->vnum));
+				sprintf(line, "%dx (%s)", res->amount, res->amount == 1 ? get_generic_name_by_vnum(res->vnum) : get_generic_string_by_vnum(res->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
 				break;
 			}
