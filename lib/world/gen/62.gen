@@ -1,0 +1,94 @@
+#6200
+raw meat~
+6 a
+0 6200 0 0
+T0
+raw meat~
+S
+#6201
+raw poultry~
+6 a
+0 3200 0 0
+R 6200
+T0
+raw poultry~
+S
+#6202
+raw pork~
+6 a
+0 3201 0 0
+R 6200
+T0
+raw pork~
+S
+#6203
+raw fish~
+6 a
+0 6203 0 0
+R 6200
+T0
+raw fish~
+S
+#6204
+raw red meat~
+6 a
+0 3012 0 0
+R 6200
+T0
+raw red meat~
+S
+#6220
+cooked meat~
+6 a
+0 6220 0 0
+T0
+cooked meat~
+S
+#6221
+cooked poultry~
+6 a
+0 6221 0 0
+R 6220
+T0
+cooked poultry~
+S
+#6222
+cooked pork~
+6 a
+0 6222 0 0
+R 6220
+T0
+cooked pork~
+S
+#6223
+cooked fish~
+6 a
+0 6223 0 0
+R 6220
+T0
+cooked fish~
+S
+#6224
+cooked red meat~
+6 a
+0 6224 0 0
+R 6220
+T0
+cooked red meat~
+S
+#6240
+cooked meal~
+6 a
+0 6240 0 0
+T0
+cooked meals~
+S
+#6241
+cooked vegetarian meal~
+6 a
+0 6241 0 0
+R 6240
+T0
+cooked vegetarian meals~
+S
+$

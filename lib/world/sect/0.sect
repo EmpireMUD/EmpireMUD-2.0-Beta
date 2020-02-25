@@ -250,7 +250,7 @@ E
 E
 3 29 0.80 29
 E
-20 40320 1.00 90
+20 40320 0.01 90
 I 5 102 9.00 1 X  # DIG: a flint stone
 I 5 101 15.00 1 X  # DIG: a lump of clay
 I 5 100 100.00 1 X  # DIG: a rock
@@ -685,7 +685,7 @@ S
 #21
 Oasis~
 A Sparkling Oasis~
-'~' 18 ko 6 iw jop
+'.' 18 ko 6 iw jop
 C
 dig, drink, fill, gather, pick~
 D1
@@ -2551,6 +2551,8 @@ D4
 &W~
 E
 0 0 75.00 4
+E
+0 0 100.00 90
 E
 2 57 5.00 50
 E

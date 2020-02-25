@@ -1,0 +1,75 @@
+#6800
+cloth~
+6 a
+0 6800 0 0
+T0
+cloth~
+S
+#6810
+magic cloth~
+6 0
+0 6810 0 0
+R 6800
+T0
+magic cloth~
+S
+#6830
+glass~
+6 a
+0 6830 0 0
+T0
+glass~
+S
+#6831
+glass ingot~
+6 a
+0 108 0 0
+R 6830
+T0
+glass ingots~
+S
+#6850
+handle~
+6 a
+0 919 0 0
+T0
+handles~
+S
+#6851
+magic handle~
+6 0
+0 6851 0 0
+R 6850
+T0
+magic handles~
+S
+#6870
+cord~
+6 a
+0 6870 0 0
+T0
+cords~
+S
+#6880
+rope~
+6 a
+0 2038 0 0
+R 6870
+T0
+ropes~
+S
+#6890
+paint~
+6 a
+0 6890 0 0
+T0
+paints~
+S
+#6891
+wax~
+6 a
+0 6891 0 0
+T0
+wax~
+S
+$

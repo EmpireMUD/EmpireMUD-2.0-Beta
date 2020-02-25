@@ -1,0 +1,185 @@
+#6001
+lumber magic~
+some magic lumber~
+Some magic lumber is stacked here.~
+This lumber is imbued with magic.
+~
+3 e a 0 9
+0 0 0
+0 0
+I 11 617 100.00 1  # LIGHT: a magical fire
+M
+0
+You place $p in midair, where it seems to float.~
+M
+1
+$n places $p in midair, where it seems to float.~
+M
+6
+You attach $p in midair, where it seems to float.~
+M
+7
+$n attaches $p in midair, where it seems to float.~
+O
+16 g
+R
+5118 0
+S
+#6002
+lumber fine~
+some fine lumber~
+Some fine lumber is stacked here.~
+This is high-quality lumber, perfect for building or crafting fine things.
+~
+3 e a 0 10
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+M
+0
+You position $p and tie it in place.~
+M
+1
+$n positions $p and ties it in place.~
+M
+6
+You position $p on the frame of $V.~
+M
+7
+$n positions $p on the frame of $V.~
+O
+16 g
+R
+5118 0
+S
+#6015
+pillar pillars~
+a pillar~
+A pillar is lying here.~
+Pillars are used for all kinds of construction projects.
+~
+3 e a 0 8
+0 0 0
+0 0
+M
+7
+$n hoists $p onto $V.~
+M
+6
+You hoist $p onto $V.~
+O
+21 u
+R
+5118 0
+S
+#6016
+pillar pillars fine~
+a fine pillar~
+A fine pillar is lying here.~
+Pillars are used for all kinds of construction projects.
+~
+3 e a 0 9
+0 0 0
+0 0
+M
+7
+$n hoists $p onto $V.~
+M
+6
+You hoist $p onto $V.~
+O
+21 du
+R
+5118 0
+S
+#6017
+pillar pillars large~
+a large pillar~
+A large pillar is lying here.~
+   Pillars are used for all kinds of construction projects. Pillars of this
+size are also used as masts for ships.
+~
+3 e a 0 10
+0 0 0
+0 0
+M
+7
+$n hoists $p onto $V.~
+M
+6
+You hoist $p onto $V.~
+O
+21 du
+R
+5118 0
+S
+#6025
+sapling saplings~
+a sapling~
+A sapling is lying here.~
+This sapling is long and straight, perfect for many crafts or buildings.
+~
+3 0 a 0 5
+0 0 0
+0 0
+O
+25 qu
+R
+5118 0
+S
+#6026
+sapling saplings fine~
+a fine sapling~
+A fine sapling is lying here.~
+   This sapling is long and straight, perfect for many crafts or buildings. It
+is of high quality.
+~
+3 0 a 0 6
+0 0 0
+0 0
+O
+25 d
+R
+5118 0
+S
+#6075
+block blocks~
+a block~
+A block is sitting here.~
+This block could be used for building.
+~
+3 e a 0 8
+0 0 0
+1 0
+M
+0
+You heave $p into place.~
+M
+1
+$n heaves $p into place.~
+O
+3 u
+R
+5117 0
+S
+#6077
+block blocks large~
+a large block~
+A large block is sitting here.~
+This block could be used for building.
+~
+3 e a 0 7
+0 0 0
+1 0
+M
+0
+You heave $p into place.~
+M
+1
+$n heaves $p into place.~
+O
+3 nu
+R
+5117 0
+S
+$

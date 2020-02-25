@@ -525,14 +525,14 @@ R
 5118 0
 S
 #137
-tree ancient massive~
+ancient-tree trees massive~
 an ancient tree~
-A massive, ancient tree is lying on the ground.~
+A massive ancient tree is lying on the ground.~
    This tree is truly massive, and equally ancient. On its side, it's still
 taller than you are. It's far too big to carry, but you could saw it up or
 scrape it where it lies.
 ~
-3 0 0 0 11
+3 0 0 0 14
 0 0 0
 0 1152
 I 11 1002 100.00 1  # LIGHT: a roaring fire

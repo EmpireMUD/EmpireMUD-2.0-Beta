@@ -1,0 +1,31 @@
+#6600
+magic gem~
+6 a
+0 6600 0 0
+T0
+magic gems~
+S
+#6601
+powerful magic gem~
+6 0
+0 6601 0 0
+R 6600
+T0
+powerful magic gems~
+S
+#6650
+herb~
+6 a
+0 6650 0 0
+T0
+herbs~
+S
+#6651
+refined herb~
+6 0
+0 6651 0 0
+R 6650
+T0
+refined herbs~
+S
+$

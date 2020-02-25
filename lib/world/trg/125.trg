@@ -2,12 +2,10 @@
 Board / climb colossus~
 0 c 0
 climb board enter up~
-if !(climb /= %cmd%)
-  eval helper %%actor.char_target(%arg%)%%
-  if %helper% != %self%
-    return 0
-    halt
-  end
+eval helper %%actor.char_target(%arg%)%%
+if %helper% != %self%
+  return 0
+  halt
 end
 if !%instance.start%
   %echo% %self.name% disappears! Or... was it ever there in the first place?
@@ -402,6 +400,39 @@ else
   %damage% %target% 75 magical
   %damage% %target% 75 fire
 end
+~
+#12511
+Board command at scaffold without colossus~
+2 c 0
+climb board enter up~
+* find colossus present
+set person %room.people%
+while %person%
+  if (%person.vnum% == 12500 || %person.vnum% == 12501)
+    * colossus is here: let it handle this command instead
+    return 0
+    halt
+  end
+  set person %person.next_in_room%
+done
+* match keywords
+if !(colossus /= %arg% || clockwork /= %arg% || enormous /= %arg%)
+  return 0
+  halt
+end
+* otherwise...
+%send% %actor% The colossus isn't here. Look for it roaming the countryside nearby.
+~
+#12512
+Try to board mini-colossus~
+0 c 0
+climb board enter up~
+if %actor.char_target(%arg%)% != %self%
+  return 0
+  halt
+end
+%send% %actor% The colossus has shrunk! It's no longer possible to climb it.
+return 1
 ~
 #12513
 Colossus mob block higher room~
