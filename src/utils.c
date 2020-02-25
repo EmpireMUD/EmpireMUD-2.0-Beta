@@ -2874,8 +2874,7 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 	for (cycle = 0; cycle < NUM_EXRES_CYCLES; ++cycle) {
 		LL_FOREACH(list, res) {
 			// only RES_OBJECT is checked in the first cycle
-			// - as of b5.88, RES_COMPONENT is checked in BOTH cycles, but only exact matches happen on pass 1
-			if (EXRES_OBJS && res->type != RES_OBJECT && res->type != RES_COMPONENT) {
+			if (EXRES_OBJS && res->type != RES_OBJECT) {
 				continue;
 			}
 			else if (EXRES_OTHER && res->type == RES_OBJECT) {
@@ -2919,9 +2918,8 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 									break;
 								}
 								case RES_COMPONENT: {
-									// 1st pass requires exact component match
-									// TODO: future version of this could prefer 'basic' components on pass 2, and a 3rd pass for non-basic
-									if ((EXRES_OBJS && GET_OBJ_COMPONENT(obj) == res->vnum) || (EXRES_OTHER && is_component_vnum(obj, res->vnum))) {
+									// TODO: future version of this could prefer 'basic' components on pass 1, and a 2nd pass for non-basic
+									if (GET_OBJ_COMPONENT(obj) == res->vnum || is_component_vnum(obj, res->vnum)) {
 										if (build_used_list) {
 											add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 										}
