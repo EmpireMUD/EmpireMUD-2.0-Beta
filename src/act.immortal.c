@@ -2317,7 +2317,7 @@ SHOW(show_components) {
 	}
 	else {
 		// preamble
-		size = snprintf(buf, sizeof(buf), "Components for (%s):\r\n", GEN_NAME(cmp));
+		size = snprintf(buf, sizeof(buf), "Components for [%d] (%s):\r\n", GEN_VNUM(cmp), GEN_NAME(cmp));
 		
 		HASH_ITER(hh, object_table, obj, next_obj) {
 			if (size >= sizeof(buf)) {
@@ -3694,7 +3694,7 @@ SHOW(show_uses) {
 	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	extern bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
 	
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 3], part[MAX_STRING_LENGTH];
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -3718,7 +3718,7 @@ SHOW(show_uses) {
 	}
 	else {
 		// preamble
-		size = snprintf(buf, sizeof(buf), "Uses for (%s):\r\n", GEN_NAME(cmp));
+		size = snprintf(buf, sizeof(buf), "Uses for [%d] (%s):\r\n", GEN_VNUM(cmp), GEN_NAME(cmp));
 		
 		HASH_ITER(hh, augment_table, aug, next_aug) {
 			if (size >= sizeof(buf)) {
