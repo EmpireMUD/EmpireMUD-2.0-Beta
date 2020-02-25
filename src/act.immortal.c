@@ -3692,8 +3692,9 @@ SHOW(show_unlearnable) {
 
 SHOW(show_uses) {
 	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
+	extern bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
 	
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -3724,10 +3725,21 @@ SHOW(show_uses) {
 			}
 			
 			LL_FOREACH(GET_AUG_RESOURCES(aug), res) {
-				if (res->type != RES_COMPONENT || res->vnum != GEN_VNUM(cmp)) {
+				if (res->type != RES_COMPONENT) {
 					continue;
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
+				if (res->vnum != GEN_VNUM(cmp) && !has_generic_relation(GEN_COMPUTED_RELATIONS(cmp), res->vnum)) {
+					continue;
+				}
+				
+				// success
+				if (res->vnum == GEN_VNUM(cmp)) {
+					*part = '\0';
+				}
+				else {
+					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
+				}
+				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s%s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), part);
 			}
 		}
 		
@@ -3737,10 +3749,21 @@ SHOW(show_uses) {
 			}
 			
 			LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
-				if (res->type != RES_COMPONENT || res->vnum != GEN_VNUM(cmp)) {
+				if (res->type != RES_COMPONENT) {
 					continue;
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+				if (res->vnum != GEN_VNUM(cmp) && !has_generic_relation(GEN_COMPUTED_RELATIONS(cmp), res->vnum)) {
+					continue;
+				}
+				
+				// success
+				if (res->vnum == GEN_VNUM(cmp)) {
+					*part = '\0';
+				}
+				else {
+					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
+				}
+				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s%s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), part);
 			}
 		}
 		
@@ -3750,10 +3773,21 @@ SHOW(show_uses) {
 			}
 			
 			LL_FOREACH(GET_CRAFT_RESOURCES(craft), res) {
-				if (res->type != RES_COMPONENT || res->vnum != GEN_VNUM(cmp)) {
+				if (res->type != RES_COMPONENT) {
 					continue;
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+				if (res->vnum != GEN_VNUM(cmp) && !has_generic_relation(GEN_COMPUTED_RELATIONS(cmp), res->vnum)) {
+					continue;
+				}
+				
+				// success
+				if (res->vnum == GEN_VNUM(cmp)) {
+					*part = '\0';
+				}
+				else {
+					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
+				}
+				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s%s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), part);
 			}
 		}
 		
