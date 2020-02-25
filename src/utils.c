@@ -1877,7 +1877,7 @@ generic_data *find_generic_component(char *name) {
 		if (!str_cmp(name, GEN_NAME(gen))) {
 			return gen;	// exact match
 		}
-		else if (!abbrev && is_multiword_abbrev(name, GEN_NAME(gen))) {
+		else if (!abbrev && multi_isname(name, GEN_NAME(gen))) {
 			abbrev = gen;	// partial match
 		}
 	}
