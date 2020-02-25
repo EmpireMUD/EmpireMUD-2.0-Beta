@@ -2303,13 +2303,12 @@ OLC_MODULE(genedit_item) {
 
 
 OLC_MODULE(genedit_relations) {
-	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	generic_data *gen = GET_OLC_GENERIC(ch->desc), *cmp = NULL;
 	struct generic_relation **list = &GEN_RELATIONS(gen);
 	char cmd_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct generic_relation *iter, *copyfrom, *next_rel;
 	bool found, none;
 	any_vnum vnum;
-	int num;
 	
 	if (GEN_TYPE(gen) != GENERIC_COMPONENT) {
 		msg_to_char(ch, "You can only set relations on COMPONENT generics.\r\n");
@@ -2361,20 +2360,20 @@ OLC_MODULE(genedit_relations) {
 		skip_spaces(&argument);	// only arg is number
 		
 		if (!*argument) {
-			msg_to_char(ch, "Remove which relation (vnum)?\r\n");
+			msg_to_char(ch, "Remove which relation (vnum or name)?\r\n");
 		}
 		else if (!str_cmp(argument, "all")) {
 			free_generic_relations(list);
 			*list = NULL;
 			msg_to_char(ch, "You remove all the relations.\r\n");
 		}
-		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
-			msg_to_char(ch, "Invalid relation vnum.\r\n");
+		else if (!(cmp = find_generic_component(argument))) {
+			msg_to_char(ch, "Invalid related generic (vnum or name).\r\n");
 		}
 		else {
 			found = FALSE;
 			HASH_ITER(hh, *list, iter, next_rel) {
-				if (iter->vnum == num) {
+				if (cmp && iter->vnum == GEN_VNUM(cmp)) {
 					found = TRUE;
 					msg_to_char(ch, "You remove the relation to [%d] %s.\r\n", iter->vnum, get_generic_name_by_vnum(iter->vnum));
 					HASH_DEL(*list, iter);
@@ -2384,7 +2383,7 @@ OLC_MODULE(genedit_relations) {
 			}
 			
 			if (!found) {
-				msg_to_char(ch, "Invalid relation vnum.\r\n");
+				msg_to_char(ch, "Invalid relation vnum or name.\r\n");
 			}
 		}
 	}	// end 'remove'
@@ -2393,19 +2392,15 @@ OLC_MODULE(genedit_relations) {
 		argument = any_one_arg(argument, vnum_arg);
 		
 		if (!*vnum_arg) {
-			msg_to_char(ch, "Usage: relation add <vnum>\r\n");
+			msg_to_char(ch, "Usage: relation add <vnum | name>\r\n");
 		}
-		else if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-			msg_to_char(ch, "Invalid vnum '%s'.\r\n", vnum_arg);
-		}
-		else if (!real_generic(vnum)) {
-			msg_to_char(ch, "Unable to find generic %d.\r\n", vnum);
-			return;
+		else if (!(cmp = find_generic_component(vnum_arg))) {
+			msg_to_char(ch, "Invalid generic '%s'.\r\n", vnum_arg);
 		}
 		else {
 			// success
-			add_generic_relation(list, vnum);
-			msg_to_char(ch, "You add relation: [%d] %s\r\n", vnum, get_generic_name_by_vnum(vnum));
+			add_generic_relation(list, GEN_VNUM(cmp));
+			msg_to_char(ch, "You add relation: [%d] %s\r\n", GEN_VNUM(cmp), GEN_NAME(cmp));
 		}
 	}	// end 'add'
 	else {

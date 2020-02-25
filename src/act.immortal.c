@@ -2317,7 +2317,7 @@ SHOW(show_components) {
 	}
 	else {
 		// preamble
-		size = snprintf(buf, sizeof(buf), "Components for %s:\r\n", GEN_NAME(cmp));
+		size = snprintf(buf, sizeof(buf), "Components for (%s):\r\n", GEN_NAME(cmp));
 		
 		HASH_ITER(hh, object_table, obj, next_obj) {
 			if (size >= sizeof(buf)) {
@@ -3716,7 +3716,7 @@ SHOW(show_uses) {
 	}
 	else {
 		// preamble
-		size = snprintf(buf, sizeof(buf), "Uses for %s:\r\n", GEN_NAME(cmp));
+		size = snprintf(buf, sizeof(buf), "Uses for (%s):\r\n", GEN_NAME(cmp));
 		
 		HASH_ITER(hh, augment_table, aug, next_aug) {
 			if (size >= sizeof(buf)) {

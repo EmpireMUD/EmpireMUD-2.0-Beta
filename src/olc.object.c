@@ -2488,7 +2488,7 @@ OLC_MODULE(oedit_coinamount) {
 
 OLC_MODULE(oedit_component) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	any_vnum old = GET_OBJ_COMPONENT(obj);
+	generic_data *cmp;
 	
 	if (!str_cmp(argument, "none") || atoi(argument) == NOTHING) {
 		GET_OBJ_COMPONENT(obj) = NOTHING;
@@ -2500,13 +2500,13 @@ OLC_MODULE(oedit_component) {
 		}
 	}
 	else {
-		GET_OBJ_COMPONENT(obj) = olc_process_number(ch, argument, "generic component vnum", "component", 0, MAX_VNUM, GET_OBJ_COMPONENT(obj));
-		if (!find_generic(GET_OBJ_COMPONENT(obj), GENERIC_COMPONENT)) {
-			GET_OBJ_COMPONENT(obj) = old;
-			msg_to_char(ch, "There is no generic component with that vnum. Old value restored.\r\n");
+		cmp = find_generic_component(argument);
+		if (!cmp) {
+			msg_to_char(ch, "There is no generic component with that vnum.\r\n");
 		}
-		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
-			msg_to_char(ch, "It is now %s '%s'.\r\n", AN(get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj))), get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)));
+		else {
+			GET_OBJ_COMPONENT(obj) = GEN_VNUM(cmp);
+			msg_to_char(ch, "It is now %s (%s).\r\n", AN(get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj))), get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)));
 		}
 	}
 
