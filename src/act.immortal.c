@@ -3703,10 +3703,11 @@ SHOW(show_uses) {
 	social_data *soc, *next_soc;
 	struct resource_data *res;
 	bld_data *bld, *next_bld;
+	struct req_data *req, *req_list[2] = { NULL, NULL };
 	generic_data *cmp;
 	size_t size;
-	bool any;
-	
+	int iter;
+		
 	skip_spaces(&argument);	// optional flags
 	
 	if (!*argument) {
@@ -3795,8 +3796,23 @@ SHOW(show_uses) {
 			if (size >= sizeof(buf)) {
 				break;
 			}
-			if (find_requirement_in_list(PRG_TASKS(prg), REQ_GET_COMPONENT, GEN_VNUM(cmp))) {
-				size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
+			
+			LL_FOREACH(PRG_TASKS(prg), req) {
+				if (req->type != REQ_GET_COMPONENT && req->type != REQ_EMPIRE_PRODUCED_COMPONENT) {
+					continue;	// wrong type
+				}
+				if (req->vnum != GEN_VNUM(cmp) && !has_generic_relation(GEN_COMPUTED_RELATIONS(cmp), req->vnum)) {
+					continue;
+				}
+				
+				// success
+				if (res->vnum == GEN_VNUM(cmp)) {
+					*part = '\0';
+				}
+				else {
+					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
+				}
+				size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s%s\r\n", PRG_VNUM(prg), PRG_NAME(prg), part);
 			}
 		}
 		
@@ -3804,11 +3820,27 @@ SHOW(show_uses) {
 			if (size >= sizeof(buf)) {
 				break;
 			}
-			any = find_requirement_in_list(QUEST_TASKS(quest), REQ_GET_COMPONENT, GEN_VNUM(cmp));
-			any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_GET_COMPONENT, GEN_VNUM(cmp));
-		
-			if (any) {
-				size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+			req_list[0] = QUEST_TASKS(quest);
+			req_list[1] = QUEST_PREREQS(quest);
+			
+			for (iter = 0; iter < 2; ++iter) {
+				LL_FOREACH(req_list[iter], req) {
+					if (req->type != REQ_GET_COMPONENT && req->type != REQ_EMPIRE_PRODUCED_COMPONENT) {
+						continue;	// wrong type
+					}
+					if (req->vnum != GEN_VNUM(cmp) && !has_generic_relation(GEN_COMPUTED_RELATIONS(cmp), req->vnum)) {
+						continue;
+					}
+				
+					// success
+					if (res->vnum == GEN_VNUM(cmp)) {
+						*part = '\0';
+					}
+					else {
+						snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
+					}
+					size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
+				}
 			}
 		}
 		
@@ -3816,9 +3848,21 @@ SHOW(show_uses) {
 			if (size >= sizeof(buf)) {
 				break;
 			}
-			any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_COMPONENT, GEN_VNUM(cmp));
-		
-			if (any) {
+			LL_FOREACH(SOC_REQUIREMENTS(soc), req) {
+				if (req->type != REQ_GET_COMPONENT && req->type != REQ_EMPIRE_PRODUCED_COMPONENT) {
+					continue;	// wrong type
+				}
+				if (req->vnum != GEN_VNUM(cmp) && !has_generic_relation(GEN_COMPUTED_RELATIONS(cmp), req->vnum)) {
+					continue;
+				}
+				
+				// success
+				if (res->vnum == GEN_VNUM(cmp)) {
+					*part = '\0';
+				}
+				else {
+					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(req->vnum));
+				}
 				size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
 			}
 		}
@@ -3829,10 +3873,21 @@ SHOW(show_uses) {
 			}
 			
 			LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
-				if (res->type != RES_COMPONENT || res->vnum != GEN_VNUM(cmp)) {
+				if (res->type != RES_COMPONENT) {
 					continue;
 				}
-				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				if (res->vnum != GEN_VNUM(cmp) && !has_generic_relation(GEN_COMPUTED_RELATIONS(cmp), res->vnum)) {
+					continue;
+				}
+				
+				// success
+				if (res->vnum == GEN_VNUM(cmp)) {
+					*part = '\0';
+				}
+				else {
+					snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(res->vnum));
+				}
+				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s%s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh), part);
 			}
 		}
 		
