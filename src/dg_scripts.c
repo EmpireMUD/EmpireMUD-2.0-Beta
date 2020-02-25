@@ -38,8 +38,6 @@ extern unsigned long pulse;
 extern const char *action_bits[];
 extern const char *affected_bits[];
 extern const char *alt_dirs[];
-extern const char *component_flags[];
-extern const char *component_types[];
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
 extern const char *extra_bits[];
@@ -75,7 +73,6 @@ extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);	// quest.c
 extern int is_substring(char *sub, char *string);
 extern room_data *obj_room(obj_data *obj);
-extern bool parse_script_component_args(char *argument, int *cmp_type, int *number, bitvector_t *cmp_flags);
 trig_data *read_trigger(trig_vnum vnum);
 obj_data *get_object_in_equip(char_data *ch, char *name);
 void extract_trigger(trig_data *trig);
@@ -3128,16 +3125,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "charge_component")) {
+						// args: (type, number) -- type may be vnum or name
+						char arg1[256], arg2[256];
 						struct resource_data *resources = NULL;
-						bitvector_t cmp_flags = NOBITS;
-						int cmp_type = 0, number = 0;
+						generic_data *cmp;
 						
-						if (!subfield || !parse_script_component_args(subfield, &cmp_type, &number, &cmp_flags)) {
+						comma_args(subfield, arg1, arg2);
+						
+						if (!subfield || !isdigit(*arg2) || !(cmp = find_generic_component(arg1))) {
 							script_log("Trigger: %s, VNum %d, bad args to charge_component(%s)", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), NULLSAFE(subfield));
 							*str = '\0';
 						}
 						else {
-							add_to_resource_list(&resources, RES_COMPONENT, cmp_type, number, cmp_flags);
+							add_to_resource_list(&resources, RES_COMPONENT, GEN_VNUM(cmp), atoi(arg2), 0);
 							extract_resources(c, resources, FALSE, NULL);
 							free_resource_list(resources);
 							strcpy(str, "1");
@@ -3512,16 +3512,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'h': {	// char.h*
 					if (!str_cmp(field, "has_component")) {
+						// args: (type, number) -- type may be vnum or name
+						char arg1[256], arg2[256];
 						struct resource_data *resources = NULL;
-						bitvector_t cmp_flags = NOBITS;
-						int cmp_type = 0, number = 0;
+						generic_data *cmp;
 						
-						if (!subfield || !parse_script_component_args(subfield, &cmp_type, &number, &cmp_flags)) {
+						comma_args(subfield, arg1, arg2);
+						
+						if (!subfield || !isdigit(*arg2) || !(cmp = find_generic_component(arg1))) {
 							script_log("Trigger: %s, VNum %d, bad args to has_component(%s)", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), NULLSAFE(subfield));
 							*str = '\0';
 						}
 						else {
-							add_to_resource_list(&resources, RES_COMPONENT, cmp_type, number, cmp_flags);
+							add_to_resource_list(&resources, RES_COMPONENT, GEN_VNUM(cmp), atoi(arg2), 0);
 							snprintf(str, slen, "%d", has_resources(c, resources, FALSE, FALSE) ? 1 : 0);
 							free_resource_list(resources);
 						}
@@ -4447,7 +4450,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							strcpy(str,"");
 					}
 					else if (!str_cmp(field, "component_type")) {
-						snprintf(str, slen, "%s", GET_OBJ_CMP_TYPE(o) != CMP_NONE ? component_string(GET_OBJ_CMP_TYPE(o), GET_OBJ_CMP_FLAGS(o)) : "");
+						snprintf(str, slen, "%s", GET_OBJ_COMPONENT(o) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(o)) : "");
 					}
 					else if (!str_cmp(field, "contents")) {
 						if (o->contains)
@@ -4561,46 +4564,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					
 					else if (!str_cmp(field, "is_component")) {
-						// format: %obj.is_component(type, flags...)%
-						char arg1[256], arg2[256], tmp[256];
-						bitvector_t cmp_flags = NOBITS;
-						int cmp_type, pos;
+						generic_data *cmp = NULL;
 						
 						if (subfield && *subfield) {
-							comma_args(subfield, arg1, arg2);
-							
-							// arg1 is a component type
-							if ((cmp_type = search_block(arg1, component_types, FALSE)) != NOTHING && cmp_type != CMP_NONE) {
-								// arg2 is optional and could be any number of component flags
-								while (*arg2) {
-									strcpy(tmp, arg2);
-									if (strchr(tmp, ',')) {
-										comma_args(tmp, arg1, arg2);
-									}
-									else {	// no comma -- just split by words
-										half_chop(tmp, arg1, arg2);
-									}
-									
-									// arg1 is now the first word of the flags section
-									if (*arg1 && (pos = search_block(arg1, component_flags, FALSE)) != NOTHING) {
-										cmp_flags |= BIT(pos);
-									}
-								}	// end flag processing loop
-								
-								if (GET_OBJ_CMP_TYPE(o) == cmp_type && (GET_OBJ_CMP_FLAGS(o) & cmp_flags) == cmp_flags) {
-									// full type/flags match
-									snprintf(str, slen, "1");
-								}
-								else {
-									snprintf(str, slen, "0");
-								}
+							if ((cmp = find_generic_component(subfield)) && is_component(o, cmp)) {
+								// match
+								snprintf(str, slen, "1");
 							}
-							else {	// invalid component type
+							else {
 								snprintf(str, slen, "0");
 							}
 						}
 						else {	// no subfield: is a component at all?
-							snprintf(str, slen, "%d", GET_OBJ_CMP_TYPE(o) != CMP_NONE ? 1 : 0);
+							snprintf(str, slen, "%d", GET_OBJ_COMPONENT(o) != NOTHING ? 1 : 0);
 						}
 					}
 

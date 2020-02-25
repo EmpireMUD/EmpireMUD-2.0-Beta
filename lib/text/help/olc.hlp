@@ -1723,7 +1723,7 @@ See also: OLC AUGMENTS, VNUM
 #d
 "AUGEDIT RESOURCES"
 
-Usage:  .resource add <type> <amount> <vnum/name> [flags, for components only]
+Usage:  .resource add <type> <amount> <vnum/name>
         .resource change <number> <quantity | vnum | name | flags> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>
@@ -2135,7 +2135,7 @@ See also: OLC BUILDINGS
 #d
 "BEDIT RESOURCES" "BEDIT YEARLY MAINTENANCE"
 
-Usage:  .resource add <type> <amount> <vnum/name> [flags, for components only]
+Usage:  .resource add <type> <amount> <vnum/name>
         .resource change <number> <quantity | vnum | name | flags> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>
@@ -2466,7 +2466,7 @@ See also: OLC CRAFTS, VNUM
 #d
 "CEDIT RESOURCES"
 
-Usage:  .resource add <type> <amount> <vnum/name> [flags, for components only]
+Usage:  .resource add <type> <amount> <vnum/name>
         .resource change <number> <quantity | vnum | name | flags> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>
@@ -2664,15 +2664,12 @@ See also: OLC CLASSES, VNUM
 COMPONENTS "RESOURCE COMPONENTS" "COMPONENT RESOURCES"
 
 Components are generic categories of objects. This allows recipes to require
-a type of object, rather than a specific object. Components can also have flags
-that indicate specific properties, like a rare log or a magic feather. An
-object should be set as a component if 
+a type of object, rather than a specific object. Components are 'generics',
+so there can be any number of types of components in the game. Components can
+also be sub-types of other components using the 'relations' settings in the
+generic editor.
 
-If a resource list requires a component with certain flags, an objects must
-be of the matching component type and have ALL of those flags. (It's okay if
-the object also has additional flags.)
-
-See also: OEDIT COMPONENT, COMPONENT FLAGS
+See also: GENERIC COMPONENTS, OEDIT COMPONENT
 #d
 "CRAFT VEHICLES" "VEHICLE CRAFTS"
 
@@ -3095,7 +3092,7 @@ See also: OLC FACTIONS, OLC LEVELS, REPUTATIONS
 #d
 GENEDIT GENERICEDIT "OLC GENERICS "GENERIC OLC" "GENERIC EDIT"
 
-Usage:  .generic <comman>
+Usage:  .generic <command>
         .<command>
 
 The .olc generics editor allows you to add, edit, or delete generics from
@@ -3108,7 +3105,7 @@ All commands in the editor are highlighted in yellow/green and placed inside
 
 Each type of generic provides a different function, and has its own help file.
 See: GENERIC LIQUID, GENERIC ACTION, GENERIC COOLDOWN, GENERIC AFFECT,
-  GENERIC CURRENCY
+  GENERIC CURRENCY, GENERIC COMPONENT
 
 You can close an open editor with .abort or .save.
 
@@ -3186,6 +3183,32 @@ only be shown to players who can see that person. This message is optional.
 
 See also: OLC GENERICS, GENERIC AFFECTS
 #d
+"GENERIC COMPONENTS" "COMPONENT GENERICS" "COMPONENT EDITOR"
+
+The 'component' generic type is used to create generic types of items that can
+be used in craft recipes (and scripts). Components can be 'types of' other
+components using the <relations> field. For example, if 'fine sapling' is
+related to 'sapling', than any fine sapling object can be used when the craft
+requires a sapling.
+
+Most new crafting resources should be set with a component type using the
+<component> field of the object. Use these guidelines:
+ - Where possible, use an existing component type rather than adding one.
+ - Only add a new component type if you think multiple items will use it.
+ - Only add a new component type if you think some crafts will require it.
+
+You must set 3 properties on currency:
+  <&yplural&0> a name to show when there's more than one (e.g. saplings)
+  <&yitem&0> a representative item that is this type of generic
+     (where possible, you should use the same vnum for the item as the generic)
+  <&yrelations&0> Other generic components that this one 'counts as'.
+
+Flags:
+  BASIC - Common component types should be set with this flag. The game will
+    generally prefer basic components over non-basic ones.
+
+See also: OLC GENERICS, GENEDIT PLURAL, GENEDIT ITEM, GENEDIT RELATIONS
+#d
 "GENERIC COOLDOWN" "COOLDOWN EDITOR" "COOLDOWN GENERICS"
 
 Generic 'cooldowns' are used to track time limits on players' abilities, as
@@ -3200,7 +3223,7 @@ You can also create quick cooldowns with: .gen quickcooldown <type> <vnum>
 
 See also: GENEDIT QUICKCOOLDOWN, OLC GENERICS
 #d
-"GENERIC CURRENCY" "CURRENCY GENERICS" "CURRENCY EDITOR" "GENEDIT SINGULAR" "GENEDIT PLURAL"
+"GENERIC CURRENCY" "CURRENCY GENERICS" "CURRENCY EDITOR" "GENEDIT SINGULAR"
 
 The 'currency' generic type is used to create money for use in shops and in
 scripts. This is separate from player-minted coins. The most common type of
@@ -3210,7 +3233,7 @@ You must set 2 properties on currency:
   <&ysingular&0> the money's name (e.g. dragon token)
   <&yplural&0> a name to show when there's more than one (e.g. dragon tokens)
 
-See also: OLC GENERICS
+See also: OLC GENERICS, GENEDIT PLURAL
 #d
 "GENERIC LIQUIDS" "LIQUID GENERICS" "LIQUID EDITOR" "GENEDIT LIQUID" "GENEDIT COLOR" "GENEDIT HUNGER" "GENEDIT THIRST" "GENEDIT DRUNK"
 
@@ -3237,6 +3260,20 @@ available.
 
 See also: OLC GENERICS
 #d
+"GENEDIT ITEM"
+
+Usage:  .item <vnum>
+
+This sets the representative item for a generic component. That item should
+have its component type set to this component. For example, if the generic
+component you're making is called 'rock', then the item should be a basic
+rock.
+
+Where possible, try to use the same vnum for the item and for the component.
+However, this is not required if you have a compelling reason not to.
+
+See also: GENERIC COMPONENTS
+#d
 "GENEDIT NAME"
 
 Usage:  .name <name>
@@ -3245,9 +3282,17 @@ The name of a generic has various rules based on the generic type. On some
 types, like liquids, the name is never shown to players. However, other types
 such as actions do appear to the player.
 
-Action names should be lowercase unless they are proper nouns.
+Action and component names should be lowercase unless they are proper nouns.
 
 See also: OLC GENERICS
+#d
+"GENEDIT PLURAL"
+
+Usage:  .plural <text>
+
+For currencies and components, this is the plural version of the name.
+
+See also: GENERIC CURRENCY, GENERIC COMPONENTS
 #d
 "GENEDIT QUICKCOOLDOWN"
 
@@ -3258,6 +3303,22 @@ example, using it on an object named "a puppy whistle" results in a new
 cooldown named "puppy whistle" and with the standard wear-off message.
 
 See also: OLC GENERICS
+#d
+"GENEDIT RELATIONS"
+
+Usage:  .relation add <vnum>
+        .relation copy <from vnum>
+        .relation remove <vnum | all>
+
+Relations are other generics that are tied to this one. These relationships
+are one-way, so one generic may relate to another but that other one does not
+relate back to it.
+
+Components: A generic component 'counts as' all the types it's related to. For
+example, a 'fine sapling' component could have 'sapling' as one of its
+relations. This means all 'fine saplings' also count as 'saplings'.
+
+See also: GENERIC COMPONENTS
 #d
 "GENEDIT STANDARDWEAROFF"
 
@@ -3279,6 +3340,7 @@ for each type:
  COOLDOWN - For use in abilities and scripts (GENERIC COOLDOWNS)
  AFFECT - Shown on the 'affects' list, and wear-off messages (GENERIC AFFECTS)
  CURRENCY - Used in shops and scripts (GENERIC CURRENCY)
+ COMPONENT - Used for crafting/building (GENERIC COMPONENT)
 
 See also: OLC GENERICS
 #d
@@ -4768,92 +4830,18 @@ not scalable.
 
 See also: ITEM SCALING, OEDIT TYPE, OLC OBJECTS
 #d
-"OEDIT COMPONENT" "OEDIT COMP" "COMPONENT TYPES"
+"OEDIT COMPONENT" "OEDIT COMP"
 
-Usage:  .component <type>
+Usage:  .component <name | vnum>
 
 This sets the object to be a generic component. These are things used in
 craft recipes (and other resource lists) that can accept any item of a
 generic type. An item should only be a component if it could be used as a
 generic part of a crafting recipe.
 
-Once you choose a component type, you can also set the .compflags property
-to add modifiers to your component type.
+Components are all 'generics' -- use 'vnum gen <name>' to search them.
 
-Available components (common flags listed in parentheses):
- &cadhesive&0 - not currently used
- &cbone&0 - not currently used
- &cblock&0 - building materials like bricks or blocks
- &cclay&0 - moldable clay
- &cdye&0 - any kind of dye
- &cfeathers&0 - not currently used
- &cfibers&0 - cotton, straw, etc.
- &cflour&0 - ground up grains
- &cfruit&0 - for cooking
- &cfur&0 - animal furs for crafting
- &cgem&0 - precious stones
- &cglass&0 - made of, or used for making, glass
- &cgrain&0 - wheat, etc.
- &chandle&0 - used for tools and weapons
- &cherb&0 - used in potions and cooking
- &cleather&0 - for armor and crafts
- &clumber&0 - a core building material
- &cmeat&0 - raw ingredients for cooking, don't set on cooked meat
- &cmetal&0 - various useful or precious metals
- &cnails&0 - a core building material
- &coil&0 - for cooking or maintaining machinery
- &cpaint&0 - for painting buildings
- &cpillar&0 - for construction, like a log
- &crock&0 - common stones dug up from the ground
- &crope&0 - for construction and harnessing animals
- &csand&0 - used for glassmaking
- &csapling&0 - a common building and crafting material
- &cseeds&0 - for planting or cooking
- &cskin&0 - unprocessed animal skin or rawhide
- &csweetener&0 - for cooking
- &ctextile&0 - cloth or fabric for crafting
- &cvegetable&0 - for cooking
- &cwax&0 - for making candles
-
-See also: COMPONENT FLAGS, SHOW COMPONENTS
-#d
-"OEDIT COMPFLAGS" "OEDIT COMPONENT FLAGS" "COMPONENT FLAGS"
-
-Usage:  .compflags [add | remove] <flags>
-
-Component flags are modifiers to the generic component type. When a recipe
-requires a component with certain flags, the object must have all those flags.
-These flags are interpreted loosely -- it's only important that they match.
-
-&rDon't over-assign flags.&0 Only use these flags if there is a real distinction
-or reason to use them. Most of these flags come in pairs (magic/mundane) and
-you only need to assign the mundane flag if some versions of the resource are
-magical and a recipe could require the non-magical version.
-
-Available flags:
- &canimal&0 - From an animal (like animal fibers)
- &cbunch of&0 - A group of things
- &cdesert&0 - Comes from the desert (especially foods)
- &cfine&0 - High-quality
- &chard&0 - As opposed to soft
- &clarge&0 - For example, large leather vs small leather
- &cmagic&0 - Has magical properties
- &cmundane&0 - Is very non-magical
- &cplant&0 - From a plant (like plant fibers)
- &cpoor&0 - Low-quality
- &crare&0 - Hard to find or premium
- &craw&0 - Natural, unrefined, or uncooked
- &crefined&0 - As opposed to raw
- &csingle&0 - An individual thing (not a group)
- &csmall&0 - As in small leather
- &csoft&0 - For things that can be soft or hard
- &ctemperate&0 - Comes from temperate areas (especially foods)
- &ctropical&0 - Comes from tropical areas (especially foods)
- &ccommon&0 - Opposite of rare
- &caquatic&0 - Comes from the water
- &cbasic&0 - A tier 1, minimum-level resource.
-
-See also: OEDIT COMPONENT
+See also: SHOW COMPONENTS, SHOW USES, GENERIC COMPONENTS
 #d
 "OEDIT CONTAINERFLAGS" "OEDIT CONTAINER FLAGS"
 
@@ -5057,8 +5045,6 @@ dash (-) are matched to the object's keywords and short/long/look descriptions.
 Fields:
   &c-affects&0 - see HELP AFFECT FLAGS
   &c-apply&0 - see HELP OEDIT APPLY
-  &c-cflagged&0, &cnotcflagged&0 - see HELP COMPONENT FLAGS
-  &c-component&0 - see HELP OEDIT COMPONENT
   &c-custom&0 - has a specific type, see HELP OEDIT CUSTOM
   &c-flagged&0, &cunflagged&0 - see HELP OEDIT FLAGS
   &c-interaction&0 - has a specific type, see HELP OEDIT INTERACTION
@@ -5927,7 +5913,7 @@ See also: OLC CONTROLS, OLC ADVENTURES, ADVEDIT FLAGS, CEDIT FLAGS
 #d
 "OLC RESOURCES" "RESOURCE ADD" "RESOURCE CHANGE" "RESOURCE REMOVE" "RESOURCE MOVE"
 
-Usage:  .resource add <type> <amount> <vnum/name> [flags, for components only]
+Usage:  .resource add <type> <amount> <vnum/name>
         .resource change <number> <quantity | vnum | name | flags> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>
@@ -5938,7 +5924,7 @@ other pools), coins, and liquids.
 
 Specific syntaxes for adding:
   .resource add object <quantity> <vnum>
-  .resource add component <quantity> <component type> [component flags]
+  .resource add component <quantity> <component name/vnum>
   .resource add liquid <number of units> <liquid vnum>
   .resource add coins <amount>
   .resource add pool <number of points> <pool type>
@@ -5948,7 +5934,7 @@ Specific syntaxes for adding:
 
 Valid pools are: health, mana, move, blood.
 
-See also: COMPONENTS, COMPONENT FLAGS, OEDIT LIQUID, RESOURCE ACTIONS
+See also: COMPONENTS, OEDIT LIQUID, RESOURCE ACTIONS
 See also: AUGEDIT RESOURCES, CEDIT RESOURCES, VEDIT RESOURCES, TOOL TYPES
 #d
 "OLC ROOM TEMPLATES" "OLC ROOMTEMPLATES" "OLC ROOMS" REDIT
@@ -6559,10 +6545,6 @@ any 1 group. Group names are always a single case-sensitive letter.
 Available tasks:
  &cCOMPLETED-QUEST&0 - Must complete a certain quest.
  &cGET-COMPONENT&0 - Must have components.
-   Note: If you use multiple component flags, they must be in quotes:
-         .requirement add get-component 3 skin "large basic"
-         If you want to add a [group], you MUST provide flags even if empty:
-         .requirement add get-component 3 skin "" a
  &cGET-OBJECT&0 - Must have items.
  &cKILL-MOB &r*&0&0 - Must kill a certain mob.
  &cKILL-MOB-FLAGGED &r*&0^ - Must kill mobs with certain flags.
@@ -6607,7 +6589,7 @@ Available tasks:
 ^ If a type requires flags and you use more than one flag, you MUST put the
   flags in "quotation marks".
 
-See also: COMPONENT FLAGS, MEDIT FLAG, %QUEST%
+See also: COMPONENTS, MEDIT FLAG, %QUEST%
 #d
 "SECTEDIT BUILDFLAGS"
 
@@ -7990,7 +7972,7 @@ See also: OLC VEHICLES
 #d
 "VEDIT RESOURCES" "VEDIT YEARLY MAINTENANCE"
 
-Usage:  .resource add <type> <amount> <vnum/name> [flags, for components only]
+Usage:  .resource add <type> <amount> <vnum/name>
         .resource change <number> <quantity | vnum | name | flags> <value>
         .resource remove <number | all>
         .resource move <number> <up | down>

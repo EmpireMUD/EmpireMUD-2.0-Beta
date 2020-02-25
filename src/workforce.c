@@ -1305,7 +1305,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 			else if (res->type == RES_OBJECT && (!(store = find_stored_resource(emp, islid, res->vnum)) || store->keep == UNLIMITED || store->amount <= store->keep || (store->amount - store->keep) < res->amount)) {
 				has_res = FALSE;
 			}
-			else if (res->type == RES_COMPONENT && !empire_can_afford_component(emp, islid, res->vnum, res->misc, res->amount, FALSE)) {
+			else if (res->type == RES_COMPONENT && !empire_can_afford_component(emp, islid, res->vnum, res->amount, FALSE)) {
 				// this actually requires all of the component be the same type -- it won't mix component types
 				has_res = FALSE;
 			}
@@ -1332,7 +1332,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 				charge_stored_resource(emp, islid, res->vnum, res->amount);
 			}
 			else if (res->type == RES_COMPONENT) {
-				charge_stored_component(emp, islid, res->vnum, res->misc, res->amount, FALSE, NULL);
+				charge_stored_component(emp, islid, res->vnum, res->amount, FALSE, NULL);
 			}
 		}
 		
@@ -1425,14 +1425,14 @@ void do_chore_brickmaking(empire_data *emp, room_data *room) {
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BRICKMAKING].mob);
 	int islid = GET_ISLAND_ID(room);
 	bool can_gain = can_gain_chore_resource(emp, room, CHORE_BRICKMAKING, o_BRICKS);
-	bool has_clay = empire_can_afford_component(emp, islid, CMP_CLAY, NOBITS, 2, FALSE);
+	bool has_clay = empire_can_afford_component(emp, islid, COMP_CLAY, 2, FALSE);
 	bool can_do = can_gain && has_clay;
 	
 	if (worker && can_do) {
 		add_empire_needs(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, 1);
 		ewt_mark_resource_worker(emp, room, o_BRICKS);
 		
-		charge_stored_component(emp, islid, CMP_CLAY, NOBITS, 2, FALSE, NULL);
+		charge_stored_component(emp, islid, COMP_CLAY, 2, FALSE, NULL);
 		add_to_empire_storage(emp, islid, o_BRICKS, 1);
 		add_production_total(emp, o_BRICKS, 1);
 		
@@ -1488,7 +1488,7 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->keep != UNLIMITED && store->amount > store->keep && store->amount > 0) {
 			can_do = TRUE;
 		}
-		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1, FALSE)) {
+		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, 1, FALSE)) {
 			can_do = TRUE;
 		}
 		else if (res->type == RES_ACTION || res->type == RES_TOOL) {
@@ -1518,7 +1518,7 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 					// remove an older matching component
 					remove_like_component_from_built_with(&GET_BUILT_WITH(room), res->vnum);
 				}
-				charge_stored_component(emp, islid, res->vnum, res->misc, 1, FALSE, &GET_BUILT_WITH(room));
+				charge_stored_component(emp, islid, res->vnum, 1, FALSE, &GET_BUILT_WITH(room));
 			}
 			
 			res->amount -= 1;
@@ -2371,14 +2371,14 @@ void do_chore_nailmaking(empire_data *emp, room_data *room) {
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_NAILMAKING].mob);
 	int islid = GET_ISLAND_ID(room);
 	bool can_gain = can_gain_chore_resource(emp, room, CHORE_NAILMAKING, o_NAILS);
-	bool has_metal = empire_can_afford_component(emp, islid, CMP_METAL, CMPF_COMMON, 1, FALSE);
+	bool has_metal = empire_can_afford_component(emp, islid, COMP_COMMON_METAL, 1, FALSE);
 	bool can_do = can_gain && has_metal;
 	
 	if (worker && can_do) {
 		add_empire_needs(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, 1);
 		ewt_mark_resource_worker(emp, room, o_NAILS);
 		
-		charge_stored_component(emp, islid, CMP_METAL, CMPF_COMMON, 1, FALSE, NULL);
+		charge_stored_component(emp, islid, COMP_COMMON_METAL, 1, FALSE, NULL);
 		add_to_empire_storage(emp, islid, o_NAILS, 4);
 		add_production_total(emp, o_NAILS, 4);
 		
@@ -2627,7 +2627,7 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->keep != UNLIMITED && store->amount > store->keep && store->amount > 0) {
 			can_do = TRUE;
 		}
-		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, res->misc, 1, FALSE)) {
+		else if (res->type == RES_COMPONENT && empire_can_afford_component(emp, islid, res->vnum, 1, FALSE)) {
 			can_do = TRUE;
 		}
 		else if (res->type == RES_ACTION || res->type == RES_TOOL) {
@@ -2645,7 +2645,7 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 				charge_stored_resource(emp, islid, res->vnum, 1);
 			}
 			else if (res->type == RES_COMPONENT) {
-				charge_stored_component(emp, islid, res->vnum, res->misc, 1, FALSE, NULL);
+				charge_stored_component(emp, islid, res->vnum, 1, FALSE, NULL);
 			}
 			// apply it
 			res->amount -= 1;

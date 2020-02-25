@@ -223,8 +223,13 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 			case 'C': {
 				if (OBJ_FILE_TAG(line, "Component:", length)) {
 					if (sscanf(line + length + 1, "%d %s", &i_in[0], s_in) == 2) {
-						GET_OBJ_CMP_TYPE(obj) = i_in[0];
-						GET_OBJ_CMP_FLAGS(obj) = asciiflag_conv(s_in);
+						// old pre-b5.88 version: ignore
+						// GET_OBJ_CMP_TYPE(obj) = i_in[0];
+						// GET_OBJ_CMP_FLAGS(obj) = asciiflag_conv(s_in);
+					}
+					else if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+						// newer version
+						GET_OBJ_COMPONENT(obj) = i_in[0];
 					}
 				}
 				else if (OBJ_FILE_TAG(line, "Current-scale:", length)) {
@@ -542,8 +547,8 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	if (!proto || GET_OBJ_MATERIAL(obj) != GET_OBJ_MATERIAL(proto)) {
 		fprintf(fl, "Material: %d\n", GET_OBJ_MATERIAL(obj));
 	}
-	if (!proto || GET_OBJ_CMP_TYPE(obj) != GET_OBJ_CMP_TYPE(proto) || GET_OBJ_CMP_FLAGS(obj) != GET_OBJ_CMP_FLAGS(proto)) {
-		fprintf(fl, "Component: %d %s\n", GET_OBJ_CMP_TYPE(obj), bitv_to_alpha(GET_OBJ_CMP_FLAGS(obj)));
+	if (!proto && GET_OBJ_COMPONENT(obj) != NOTHING) {
+		fprintf(fl, "Component: %d\n", GET_OBJ_COMPONENT(obj));
 	}
 	if (!proto || GET_OBJ_CURRENT_SCALE_LEVEL(obj) != GET_OBJ_CURRENT_SCALE_LEVEL(proto)) {
 		fprintf(fl, "Current-scale: %d\n", GET_OBJ_CURRENT_SCALE_LEVEL(obj));

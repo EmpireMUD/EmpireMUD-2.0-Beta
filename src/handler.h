@@ -158,7 +158,7 @@ void perform_claim_room(room_data *room, empire_data *emp);
 void add_production_total(empire_data *emp, obj_vnum vnum, int amount);
 void add_production_total_for_tag_list(struct mob_tag *list, obj_vnum vnum, int amount);
 extern int get_production_total(empire_data *emp, obj_vnum vnum);
-extern int get_production_total_component(empire_data *emp, int cmp_type, bitvector_t cmp_flags);
+extern int get_production_total_component(empire_data *emp, any_vnum cmp_vnum);
 void mark_production_trade(empire_data *emp, obj_vnum vnum, int imported, int exported);
 
 // empire needs handlers
@@ -224,7 +224,6 @@ void empty_obj_before_extract(obj_data *obj);
 void extract_obj(obj_data *obj);
 extern obj_data *fresh_copy_obj(obj_data *obj, int scale_level);
 extern bool objs_are_identical(obj_data *obj_a, obj_data *obj_b);
-extern bool parse_component(char *str, int *type, bitvector_t *flags);
 void remove_from_object_list(obj_data *obj);
 
 // object binding handlers
@@ -266,7 +265,7 @@ extern bool has_custom_message(struct custom_message *list, int type);
 #define abil_has_custom_message(abil, type)  has_custom_message(ABIL_CUSTOM_MSGS(abil), type)
 
 // object targeting handlers
-extern obj_data *get_component_in_list(int cmp_type, bitvector_t cmp_flags, obj_data *list, bool *kept);
+extern obj_data *get_component_in_list(any_vnum cmp_vnum, obj_data *list, bool *kept);
 extern obj_data *get_obj_by_char_share(char_data *ch, char *arg);
 extern obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]);
 extern obj_data *get_obj_in_list_num(int num, obj_data *list);
@@ -331,10 +330,10 @@ sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_t
 
 // storage handlers
 void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount);
-extern bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, bool use_kept, struct resource_data **build_used_list);
+extern bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool use_kept, struct resource_data **build_used_list);
 extern bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount);
 extern bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
-extern bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, bool include_kept);
+extern bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool include_kept);
 extern struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
 extern struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
 extern int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping);

@@ -3202,7 +3202,7 @@ ACMD(do_barde) {
 	int num;
 	
 	if (!res) {
-		add_to_resource_list(&res, RES_COMPONENT, CMP_METAL, 10, CMPF_COMMON);
+		add_to_resource_list(&res, RES_COMPONENT, COMP_COMMON_METAL, 10, 0);
 	}
 	
 	one_argument(argument, arg);

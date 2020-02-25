@@ -220,6 +220,7 @@
 //// BITVECTOR UTILS /////////////////////////////////////////////////////////
 
 #define IS_SET(flag,bit)  ((flag) & (bit))
+#define IS_SET_STRICT(flag,bit)  (((flag) & (bit)) == (bit))
 #define SET_BIT(var,bit)  ((var) |= (bit))
 #define REMOVE_BIT(var,bit)  ((var) &= ~(bit))
 #define TOGGLE_BIT(var,bit)  ((var) = (var) ^ (bit))
@@ -872,8 +873,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_ACTION_DESC(obj)  ((obj)->action_description)
 #define GET_OBJ_AFF_FLAGS(obj)  ((obj)->obj_flags.bitvector)
 #define GET_OBJ_CARRYING_N(obj)  ((obj)->obj_flags.carrying_n)
-#define GET_OBJ_CMP_TYPE(obj)  ((obj)->obj_flags.cmp_type)
-#define GET_OBJ_CMP_FLAGS(obj)  ((obj)->obj_flags.cmp_flags)
+#define GET_OBJ_COMPONENT(obj)  ((obj)->obj_flags.component)
 #define GET_OBJ_CURRENT_SCALE_LEVEL(obj)  ((obj)->obj_flags.current_scale_level)
 #define GET_OBJ_EQ_SETS(obj)  ((obj)->eq_sets)
 #define GET_OBJ_EXTRA(obj)  ((obj)->obj_flags.extra_flags)
@@ -907,7 +907,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // helpers
 #define OBJ_FLAGGED(obj, flag)  (IS_SET(GET_OBJ_EXTRA(obj), (flag)))
-#define OBJ_CMP_FLAGGED(obj, flg)  IS_SET(GET_OBJ_CMP_FLAGS(obj), (flg))
 #define OBJS(obj, vict)  (CAN_SEE_OBJ((vict), (obj)) ? GET_OBJ_DESC((obj), vict, 1) : "something")
 #define OBJVAL_FLAGGED(obj, flag)  (IS_SET(GET_OBJ_VAL((obj), 1), (flag)))
 #define CAN_WEAR(obj, part)  (IS_SET(GET_OBJ_WEAR(obj), (part)))
@@ -1606,6 +1605,11 @@ extern struct time_info_data *age(char_data *ch);
 extern struct time_info_data *mud_time_passed(time_t t2, time_t t1);
 extern struct time_info_data *real_time_passed(time_t t2, time_t t1);
 
+// component functions from utils.c
+extern generic_data *find_generic_component(char *name);
+extern bool is_component(obj_data *obj, generic_data *cmp);
+#define is_component_vnum(obj, vnum)  is_component((obj), real_generic(vnum))
+
 // empire utils from utils.c
 extern int count_members_online(empire_data *emp);
 extern int count_tech(empire_data *emp);
@@ -1675,7 +1679,6 @@ extern bool wake_and_stand(char_data *ch);
 // resource functions from utils.c
 void add_to_resource_list(struct resource_data **list, int type, any_vnum vnum, int amount, int misc);
 void apply_resource(char_data *ch, struct resource_data *res, struct resource_data **list, obj_data *use_obj, int msg_type, vehicle_data *crafting_veh, struct resource_data **build_used_list);
-extern char *component_string(int type, bitvector_t flags);
 void extract_resources(char_data *ch, struct resource_data *list, bool ground, struct resource_data **build_used_list);
 extern struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj);
 extern char *get_resource_name(struct resource_data *res);

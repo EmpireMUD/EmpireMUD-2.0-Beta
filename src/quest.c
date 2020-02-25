@@ -432,23 +432,24 @@ int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags) {
 * Counts how many components a player has available for a quest.
 *
 * @param char_data *ch The player.
-* @param int type CMP_ type
-* @param bitvector_t flags CMPF_ flags to match
+* @param any_vnum cmp_vnum The generic component to count.
 * @param bool skip_keep If TRUE, skips items marked (keep) because they can't be taken.
 * @return int The number of matching component items.
 */
-int count_quest_components(char_data *ch, int type, bitvector_t flags, bool skip_keep) {
+int count_quest_components(char_data *ch, any_vnum cmp_vnum, bool skip_keep) {
+	generic_data *cmp = real_generic(cmp_vnum);
 	obj_data *obj;
 	int count = 0;
 	
+	if (!cmp) {
+		return 0;	// no component = nothing to count
+	}
+	
 	LL_FOREACH2(ch->carrying, obj, next_content) {
-		if (GET_OBJ_CMP_TYPE(obj) != type) {
-			continue;
-		}
-		if ((GET_OBJ_CMP_FLAGS(obj) & flags) != flags) {
-			continue;
-		}
 		if (skip_keep && OBJ_FLAGGED(obj, OBJ_KEEP)) {
+			continue;
+		}
+		if (!is_component(obj, cmp)) {
 			continue;
 		}
 		
@@ -942,7 +943,7 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				break;
 			}
 			case REQ_GET_COMPONENT: {
-				task->current = count_quest_components(ch, task->vnum, task->misc, QUEST_FLAGGED(quest, QST_EXTRACT_TASK_OBJECTS));
+				task->current = count_quest_components(ch, task->vnum, QUEST_FLAGGED(quest, QST_EXTRACT_TASK_OBJECTS));
 				break;
 			}
 			case REQ_GET_OBJECT: {
@@ -1103,7 +1104,7 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 				break;
 			}
 			case REQ_EMPIRE_PRODUCED_COMPONENT: {
-				task->current = GET_LOYALTY(ch) ? get_production_total_component(GET_LOYALTY(ch), task->vnum, task->misc) : 0;
+				task->current = GET_LOYALTY(ch) ? get_production_total_component(GET_LOYALTY(ch), task->vnum) : 0;
 				break;
 			}
 			case REQ_EVENT_RUNNING: {
@@ -2379,7 +2380,7 @@ void qt_drop_obj(char_data *ch, obj_data *obj) {
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
-			if (task->type == REQ_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {
+			if (task->type == REQ_GET_COMPONENT &&  GET_OBJ_COMPONENT(obj) != NOTHING && is_component_vnum(obj, task->vnum)) {
 				--task->current;
 			}
 			else if (task->type == REQ_GET_OBJECT && GET_OBJ_VNUM(obj) == task->vnum) {
@@ -2574,7 +2575,7 @@ void qt_change_production_total(char_data *ch, any_vnum vnum, int amount) {
 			if (task->type == REQ_EMPIRE_PRODUCED_OBJECT && task->vnum == vnum) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, FALSE);
 			}
-			else if (task->type == REQ_EMPIRE_PRODUCED_COMPONENT && GET_OBJ_CMP_TYPE(proto) == task->vnum && (GET_OBJ_CMP_FLAGS(proto) & task->misc) == task->misc) {
+			else if (task->type == REQ_EMPIRE_PRODUCED_COMPONENT && GET_OBJ_COMPONENT(proto) != NOTHING && is_component_vnum(proto, task->vnum)) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, FALSE);
 			}
 		}
@@ -2741,7 +2742,7 @@ void qt_get_obj(char_data *ch, obj_data *obj) {
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
-			if (task->type == REQ_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {
+			if (task->type == REQ_GET_COMPONENT && GET_OBJ_COMPONENT(obj) != NOTHING && is_component_vnum(obj, task->vnum)) {
 				++task->current;
 			}
 			else if (task->type == REQ_GET_OBJECT && GET_OBJ_VNUM(obj) == task->vnum) {
@@ -2785,7 +2786,7 @@ void qt_keep_obj(char_data *ch, obj_data *obj, bool true_for_keep) {
 		}
 		
 		LL_FOREACH(pq->tracker, task) {
-			if (task->type == REQ_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {
+			if (task->type == REQ_GET_COMPONENT && GET_OBJ_COMPONENT(obj) != NOTHING && is_component_vnum(obj, task->vnum)) {
 				task->current += (true_for_keep ? -1 : 1);
 			}
 			else if (task->type == REQ_GET_OBJECT && GET_OBJ_VNUM(obj) == task->vnum) {

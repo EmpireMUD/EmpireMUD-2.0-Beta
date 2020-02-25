@@ -1830,6 +1830,7 @@ void clear_object(obj_data *obj) {
 	obj->worn_on = NO_WEAR;
 	
 	GET_OBJ_REQUIRES_QUEST(obj) = NOTHING;
+	GET_OBJ_COMPONENT(obj) = NOTHING;
 	
 	obj->last_owner_id = NOBODY;
 	obj->last_empire_id = NOTHING;
@@ -1926,6 +1927,7 @@ const char *versions_list[] = {
 	"b5.86a",
 	"b5.87",
 	"b5.88",
+	"b5.88a",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3908,6 +3910,192 @@ void b5_88_irrigation_repair(void) {
 }
 
 
+// updates 
+void b5_88_resource_components_update(void) {
+	extern any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
+	void check_progress_refresh();
+	
+	craft_data *craft, *next_craft;
+	progress_data *prg, *next_prg;
+	vehicle_data *veh, *next_veh;
+	augment_data *aug, *next_aug;
+	social_data *soc, *next_soc;
+	quest_data *qst, *next_qst;
+	struct resource_data *res;
+	bld_data *bld, *next_bld;
+	struct req_data *req;
+	any_vnum vn;
+	bool any;
+	
+	log("Applying b5.88 update: Updating components...");
+	
+	// augments
+	HASH_ITER(hh, augment_table, aug, next_aug) {
+		any = FALSE;
+		LL_FOREACH(GET_AUG_RESOURCES(aug), res) {
+			if (res->type == RES_COMPONENT && res->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
+					log("- converting resource on augment [%d] %s from (%d %s) to [%d] %s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), res->vnum, bitv_to_alpha(res->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert resource on augment [%d] %s from (%d %s)", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), res->vnum, bitv_to_alpha(res->misc));
+				}
+				res->vnum = vn;
+				res->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			save_library_file_for_vnum(DB_BOOT_AUG, GET_AUG_VNUM(aug));
+		}
+	}
+	
+	// buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		any = FALSE;
+		LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+			if (res->type == RES_COMPONENT && res->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
+					log("- converting resource on building [%d] %s from (%d %s) to [%d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), res->vnum, bitv_to_alpha(res->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert resource on building [%d] %s from (%d %s)", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), res->vnum, bitv_to_alpha(res->misc));
+				}
+				res->vnum = vn;
+				res->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+		}
+	}
+	
+	// crafts
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		any = FALSE;
+		LL_FOREACH(GET_CRAFT_RESOURCES(craft), res) {
+			if (res->type == RES_COMPONENT && res->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
+					log("- converting resource on craft [%d] %s from (%d %s) to [%d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), res->vnum, bitv_to_alpha(res->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert resource on craft [%d] %s from (%d %s)", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), res->vnum, bitv_to_alpha(res->misc));
+				}
+				res->vnum = vn;
+				res->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+		}
+	}
+	
+	// progress goals
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		any = FALSE;
+		LL_FOREACH(PRG_TASKS(prg), req) {
+			if (req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) {
+				if ((vn = b5_88_old_component_to_new_component(req->vnum, req->misc)) != NOTHING) {
+					log("- converting task on progress [%d] %s from (%d %s) to [%d] %s", PRG_VNUM(prg), PRG_NAME(prg), req->vnum, bitv_to_alpha(req->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert task on progress [%d] %s from (%d %s)", PRG_VNUM(prg), PRG_NAME(prg), req->vnum, bitv_to_alpha(req->misc));
+				}
+				req->vnum = vn;
+				req->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			PRG_VERSION(prg) += 1;	// triggers updates for empires
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, qst, next_qst) {
+		any = FALSE;
+		LL_FOREACH(QUEST_TASKS(qst), req) {
+			if (req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) {
+				if ((vn = b5_88_old_component_to_new_component(req->vnum, req->misc)) != NOTHING) {
+					log("- converting task on quest task [%d] %s from (%d %s) to [%d] %s", QUEST_VNUM(qst), QUEST_NAME(qst), req->vnum, bitv_to_alpha(req->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert task on quest task [%d] %s from (%d %s)", QUEST_VNUM(qst), QUEST_NAME(qst), req->vnum, bitv_to_alpha(req->misc));
+				}
+				req->vnum = vn;
+				req->misc = 0;
+				any = TRUE;
+			}
+		}
+		LL_FOREACH(QUEST_PREREQS(qst), req) {
+			if (req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) {
+				if ((vn = b5_88_old_component_to_new_component(req->vnum, req->misc)) != NOTHING) {
+					log("- converting task on quest prereq [%d] %s from (%d %s) to [%d] %s", QUEST_VNUM(qst), QUEST_NAME(qst), req->vnum, bitv_to_alpha(req->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert task on quest prereq [%d] %s from (%d %s)", QUEST_VNUM(qst), QUEST_NAME(qst), req->vnum, bitv_to_alpha(req->misc));
+				}
+				req->vnum = vn;
+				req->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			QUEST_VERSION(qst) += 1;	// triggers updates for players
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(qst));
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		any = FALSE;
+		LL_FOREACH(SOC_REQUIREMENTS(soc), req) {
+			if (req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) {
+				if ((vn = b5_88_old_component_to_new_component(req->vnum, req->misc)) != NOTHING) {
+					log("- converting requirement on social [%d] %s from (%d %s) to [%d] %s", SOC_VNUM(soc), SOC_NAME(soc), req->vnum, bitv_to_alpha(req->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert requirement on social [%d] %s from (%d %s)", SOC_VNUM(soc), SOC_NAME(soc), req->vnum, bitv_to_alpha(req->misc));
+				}
+				req->vnum = vn;
+				req->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		any = FALSE;
+		LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
+			if (res->type == RES_COMPONENT && res->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
+					log("- converting resource on vehicle [%d] %s from (%d %s) to [%d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh), res->vnum, bitv_to_alpha(res->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert resource on vehicle [%d] %s from (%d %s)", VEH_VNUM(veh), VEH_SHORT_DESC(veh), res->vnum, bitv_to_alpha(res->misc));
+				}
+				res->vnum = vn;
+				res->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+		}
+	}
+	
+	need_progress_refresh = TRUE;
+	check_progress_refresh();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4211,6 +4399,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.88")) {
 			b5_88_irrigation_repair();
+		}
+		if (MATCH_VERSION("b5.88a")) {
+			b5_88_resource_components_update();
 		}
 	}
 	

@@ -330,6 +330,8 @@ int get_wear_by_item_wear(bitvector_t item_wear) {
 * @param char_data *ch The person to show the data to.
 */
 void identify_obj_to_char(obj_data *obj, char_data *ch) {
+	void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
+	
 	extern double get_base_dps(obj_data *weapon);
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern double get_weapon_speed(obj_data *weapon);
@@ -351,6 +353,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	struct eq_set_obj *oset;
 	struct obj_apply *apply;
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH], *temp;
+	generic_data *comp = NULL;
 	obj_data *proto;
 	crop_data *cp;
 	bld_data *bld;
@@ -388,8 +391,8 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	// component info
 	*part = '\0';
-	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
-		sprintf(part, " (%s)", component_string(GET_OBJ_CMP_TYPE(obj), GET_OBJ_CMP_FLAGS(obj)));
+	if (GET_OBJ_COMPONENT(obj) != NOTHING && (comp = find_generic(GET_OBJ_COMPONENT(obj), GENERIC_COMPONENT))) {
+		sprintf(part, " (%s)", GEN_NAME(comp));
 	}
 	
 	// basic info
@@ -623,6 +626,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	if (*lbuf) {
 		msg_to_char(ch, "Modifiers: %s\r\n", lbuf);
+	}
+	
+	// more component data
+	if (comp && GEN_COMPUTED_RELATIONS(comp)) {
+		get_generic_relation_display(GEN_COMPUTED_RELATIONS(comp), FALSE, lbuf, "Can be used as: ");
+		msg_to_char(ch, "%s", lbuf);
 	}
 	
 	// some custom messages

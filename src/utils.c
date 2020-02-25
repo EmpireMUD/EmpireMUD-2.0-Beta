@@ -36,6 +36,7 @@
 *   File Utils
 *   Logging Utils
 *   Adventure Utils
+*   Component Utils
 *   Interpreter Utils
 *   Mobile Utils
 *   Object Utils
@@ -46,6 +47,7 @@
 *   Type Utils
 *   World Utils
 *   Misc Utils
+*   Converter Utils
 */
 
 // external vars
@@ -1851,6 +1853,68 @@ adv_data *get_adventure_for_vnum(rmt_vnum vnum) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// COMPONENT UTILS /////////////////////////////////////////////////////////
+
+/**
+* Finds a generic component by name or vnum.
+*
+* @param char *name The name to search.
+* @return generic_data* The generic component, or NULL if it doesn't exist.
+*/
+generic_data *find_generic_component(char *name) {
+	generic_data *gen, *next_gen, *abbrev = FALSE;
+	
+	if (is_number(name)) {
+		return find_generic(atoi(name), GENERIC_COMPONENT);
+	}
+	
+	// not number
+	HASH_ITER(sorted_hh, sorted_generics, gen, next_gen) {
+		if (GEN_TYPE(gen) != GENERIC_COMPONENT) {
+			continue;
+		}
+		
+		if (!str_cmp(name, GEN_NAME(gen))) {
+			return gen;	// exact match
+		}
+		else if (!abbrev && is_multiword_abbrev(name, GEN_NAME(gen))) {
+			abbrev = gen;	// partial match
+		}
+	}
+	
+	return abbrev;	// if any
+}
+
+
+/**
+* Determines if an objext is a certain type of generic component -- or any
+* of its related types. It does not indicate WHICH of those types it is.
+*
+* @param obj_data *obj The object to check.
+* @param generic_data *cmp The generic component to compare it to.
+* @return bool TRUE if obj matches cmp (or one of its related types); FALSE if not
+*/
+bool is_component(obj_data *obj, generic_data *cmp) {
+	bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
+	
+	generic_data *my_cmp;
+	
+	if (!obj || !cmp || GEN_TYPE(cmp) != GENERIC_COMPONENT) {
+		return FALSE;	// basic sanity
+	}
+	if (GET_OBJ_COMPONENT(obj) == GEN_VNUM(cmp)) {
+		return TRUE;	// exact match = SUCCESS
+	}
+	if (GET_OBJ_COMPONENT(obj) == NOTHING || !(my_cmp = real_generic(GET_OBJ_COMPONENT(obj)))) {
+		return FALSE;	// not a component at all = fail
+	}
+	
+	// otherwise check dependent types
+	return has_generic_relation(GEN_COMPUTED_RELATIONS(my_cmp), GEN_VNUM(cmp));
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// INTERPRETER UTILS ///////////////////////////////////////////////////////
 
 
@@ -1919,6 +1983,11 @@ char *any_one_word(char *argument, char *first_arg) {
 void comma_args(char *string, char *arg1, char *arg2) {
 	char *comma;
 	int len;
+	
+	if (!string) {
+		*arg1 = *arg2 = '\0';
+		return;
+	}
 	
 	skip_spaces(&string);
 
@@ -2781,31 +2850,6 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 
 
 /**
-* The name of a component with its flags.
-*
-* @param int type CMP_ component type.
-* @param bitvector_t flags CMPF_ component flags.
-*/
-char *component_string(int type, bitvector_t flags) {
-	extern const char *component_flags[];
-	extern const char *component_types[];
-	
-	char mods[MAX_STRING_LENGTH];
-	static char output[256];
-	
-	if (flags) {
-		prettier_sprintbit(flags, component_flags, mods);
-		strcat(mods, " ");
-	}
-	else {
-		*mods = '\0';
-	}
-	snprintf(output, sizeof(output), "%s%s", mods, component_types[type]);
-	return output;
-}
-
-
-/**
 * Extract resources from the list, hopefully having checked has_resources, as
 * this function does not error if it runs out -- it just keeps extracting
 * until it's out of items, or hits its required limit.
@@ -2830,7 +2874,8 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 	for (cycle = 0; cycle < NUM_EXRES_CYCLES; ++cycle) {
 		LL_FOREACH(list, res) {
 			// only RES_OBJECT is checked in the first cycle
-			if (EXRES_OBJS && res->type != RES_OBJECT) {
+			// - as of b5.88, RES_COMPONENT is checked in BOTH cycles, but only exact matches happen on pass 1
+			if (EXRES_OBJS && res->type != RES_OBJECT && res->type != RES_COMPONENT) {
 				continue;
 			}
 			else if (EXRES_OTHER && res->type == RES_OBJECT) {
@@ -2874,8 +2919,9 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 									break;
 								}
 								case RES_COMPONENT: {
-									// require full match on cmp flags
-									if (GET_OBJ_CMP_TYPE(obj) == res->vnum && (GET_OBJ_CMP_FLAGS(obj) & res->misc) == res->misc) {
+									// 1st pass requires exact component match
+									// TODO: future version of this could prefer 'basic' components on pass 2, and a 3rd pass for non-basic
+									if ((EXRES_OBJS && GET_OBJ_COMPONENT(obj) == res->vnum) || (EXRES_OTHER && is_component_vnum(obj, res->vnum))) {
 										if (build_used_list) {
 											add_to_resource_list(build_used_list, RES_OBJECT, GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 										}
@@ -3009,8 +3055,8 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 								break;
 							}
 							case RES_COMPONENT: {
-								// require full match on cmp flags
-								if (GET_OBJ_CMP_TYPE(obj) == res->vnum && (GET_OBJ_CMP_FLAGS(obj) & res->misc) == res->misc) {
+								// TODO: future version of this could prefer 'basic' components on pass 1, and a 2nd pass for non-basic
+								if (GET_OBJ_COMPONENT(obj) == res->vnum || is_component_vnum(obj, res->vnum)) {
 									// got one!
 									*found_obj = obj;
 									return res;
@@ -3098,7 +3144,7 @@ char *get_resource_name(struct resource_data *res) {
 			break;
 		}
 		case RES_COMPONENT: {
-			snprintf(output, sizeof(output), "%dx (%s)", res->amount, component_string(res->vnum, res->misc));
+			snprintf(output, sizeof(output), "%dx (%s)", res->amount, res->amount == 1 ? get_generic_name_by_vnum(res->vnum) : get_generic_string_by_vnum(res->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 			break;
 		}
 		case RES_LIQUID: {
@@ -3337,7 +3383,8 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 	for (cycle = 0; cycle < NUM_HASRES_CYCLES; ++cycle) {
 		LL_FOREACH(list, res) {
 			// only RES_OBJECT is checked in the first cycle
-			if (HASRES_OBJS && res->type != RES_OBJECT) {
+			// - as of b5.88, RES_COMPONENT is checked in BOTH cycles, but only exact matches happen on pass 1
+			if (HASRES_OBJS && res->type != RES_OBJECT && res->type != RES_COMPONENT) {
 				continue;
 			}
 			else if (HASRES_OTHER && res->type == RES_OBJECT) {
@@ -3381,8 +3428,9 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 									break;
 								}
 								case RES_COMPONENT: {
-									// require full match on cmp flags
-									if (GET_OBJ_CMP_TYPE(obj) == res->vnum && (GET_OBJ_CMP_FLAGS(obj) & res->misc) == res->misc) {
+									// 1st pass requires exact component match
+									// TODO: future version of this could prefer 'basic' components on pass 2, and a 3rd pass for non-basic
+									if ((HASRES_OBJS && GET_OBJ_COMPONENT(obj) == res->vnum) || (HASRES_OTHER && is_component_vnum(obj, res->vnum))) {
 										++total;
 										obj->search_mark = TRUE;
 									}
@@ -3421,7 +3469,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 									break;
 								}
 								case RES_COMPONENT: {
-									msg_to_char(ch, "%s %d more (%s)", (ok ? "You need" : ","), res->amount - total, component_string(res->vnum, res->misc));
+									msg_to_char(ch, "%s %d more (%s)", (ok ? "You need" : ","), res->amount - total, get_generic_name_by_vnum(res->vnum));
 									break;
 								}
 								case RES_LIQUID: {
@@ -5665,4 +5713,142 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 			SAVE_CHAR(ch);
 		}
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// CONVERTER UTILS /////////////////////////////////////////////////////////
+
+/**
+* This convertions the pre-b5.88 components to the new versions.
+*
+* @param int old_type The old component type, previously CMP_x.
+* @param bitvector_t old_flags Any flags that were set on the old component, callled CMPF_x.
+* @return any_vnum The new generic vnum component that matches it.
+*/
+any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags) {
+	// first, we need the pre-b5.88 component types (ones not listed do not need conversion)
+	const int cmp_BONE = 2, cmp_BLOCK = 3, cmp_CLAY = 4, cmp_FIBERS = 7,
+		cmp_FLOUR = 8, cmp_FRUIT = 9, cmp_FUR = 10, cmp_GEM = 11,
+		cmp_GRAIN = 12, cmp_HANDLE = 13, cmp_HERB = 14, cmp_LEATHER = 15,
+		cmp_LUMBER = 16, cmp_MEAT = 17, cmp_METAL = 18, cmp_NAILS = 19,
+		cmp_OIL = 20, cmp_PILLAR = 21, cmp_ROCK = 22, cmp_SEEDS = 23,
+		cmp_SKIN = 24, cmp_SAPLING = 25, cmp_TEXTILE = 26, cmp_VEGETABLE = 27,
+		cmp_ROPE = 28, cmp_PAINT = 29, cmp_WAX = 30, cmp_SWEETENER = 31,
+		cmp_SAND = 32, cmp_GLASS = 33;
+	// and old component flags
+	const int cmpf_ANIMAL = BIT(0), cmpf_BUNCH = BIT(1), cmpf_DESERT = BIT(2),
+		cmpf_FINE = BIT(3), cmpf_HARD = BIT(4), cmpf_LARGE = BIT(5),
+		cmpf_MAGIC = BIT(6), cmpf_PLANT = BIT(8), cmpf_POOR = BIT(9),
+		cmpf_RARE = BIT(10), cmpf_RAW = BIT(11), cmpf_REFINED = BIT(12),
+		cmpf_SINGLE = BIT(13), cmpf_SMALL = BIT(14), cmpf_SOFT = BIT(15),
+		cmpf_TEMPERATE = BIT(16), cmpf_TROPICAL = BIT(17),
+		cmpf_COMMON = BIT(18), cmpf_AQUATIC = BIT(19);
+	
+	const struct {
+		int type, flags;
+		any_vnum new_comp;
+	} b5_88_conversion[] = {
+		// This will run in order from top to bottom, matching component +
+		// exact flags, and returning the number on the right
+		{ cmp_BONE, cmpf_LARGE | cmpf_MAGIC | cmpf_RARE, 6565 },	// dragon bone
+		{ cmp_BONE, cmpf_LARGE | cmpf_RARE, 6563 },	// ivory
+		{ cmp_BONE, cmpf_MAGIC, 6564 },	// magic bone
+		{ cmp_BONE, NOBITS, 6560 },	// bone
+		{ cmp_BLOCK, cmpf_BUNCH, 6076 },	// bricks
+		{ cmp_BLOCK, cmpf_SINGLE, 6077 },	// large block
+		{ cmp_BLOCK, NOBITS, 6075 },	// block
+		{ cmp_CLAY, NOBITS, 6090 },	// clay (no variants)
+		{ cmp_FIBERS, cmpf_HARD | cmpf_PLANT, 6422 },	// hard plant fibers
+		{ cmp_FIBERS, cmpf_SOFT | cmpf_PLANT, 6421 },	// soft plant fibers
+		{ cmp_FIBERS, cmpf_SOFT | cmpf_ANIMAL, 6441 },	// wool
+		{ cmp_FIBERS, NOBITS, 6400 },	// basic fibers
+		{ cmp_FLOUR, NOBITS, 6300 },	// basic flour
+		{ cmp_FRUIT, cmpf_MAGIC | cmpf_SINGLE, 6121 },	// small magic fruit
+		{ cmp_FRUIT, cmpf_MAGIC | cmpf_BUNCH, 6131 },	// large magic fruit
+		{ cmp_FRUIT, cmpf_TEMPERATE | cmpf_SINGLE, 6122 },	// small temperate fruit
+		{ cmp_FRUIT, cmpf_TEMPERATE | cmpf_BUNCH, 6132 },	// large temperate fruit
+		{ cmp_FRUIT, cmpf_DESERT | cmpf_SINGLE, 6124 },	// small desert fruit
+		{ cmp_FRUIT, cmpf_DESERT | cmpf_BUNCH, 6134 },	// large desert fruit
+		{ cmp_FRUIT, cmpf_TROPICAL | cmpf_SINGLE, 6123 },	// small tropical fruit
+		{ cmp_FRUIT, cmpf_TROPICAL | cmpf_BUNCH, 6133 },	// large tropical fruit
+		{ cmp_FRUIT, cmpf_SINGLE, 6120 },	// small fruit
+		{ cmp_FRUIT, cmpf_BUNCH, 6130 },	// large fruit
+		{ cmp_FRUIT, NOBITS, 6120 },	// small fruit
+		{ cmp_VEGETABLE, cmpf_MAGIC | cmpf_SINGLE, 6141 },	// small magic veg
+		{ cmp_VEGETABLE, cmpf_MAGIC | cmpf_BUNCH, 6151 },	// large magic veg
+		{ cmp_VEGETABLE, cmpf_TEMPERATE | cmpf_SINGLE, 6142 },	// small temperate veg
+		{ cmp_VEGETABLE, cmpf_TEMPERATE | cmpf_BUNCH, 6152 },	// large temperate veg
+		{ cmp_VEGETABLE, cmpf_DESERT | cmpf_SINGLE, 6144 },	// small desert veg
+		{ cmp_VEGETABLE, cmpf_DESERT | cmpf_BUNCH, 6154 },	// large desert veg
+		{ cmp_VEGETABLE, cmpf_TROPICAL | cmpf_SINGLE, 6143 },	// small tropical veg
+		{ cmp_VEGETABLE, cmpf_TROPICAL | cmpf_BUNCH, 6153 },	// large tropical veg
+		{ cmp_VEGETABLE, cmpf_SINGLE, 6140 },	// small veg
+		{ cmp_VEGETABLE, cmpf_BUNCH, 6150 },	// large veg
+		{ cmp_VEGETABLE, NOBITS, 6140 },	// small veg
+		{ cmp_GRAIN, cmpf_SINGLE, 6160 },	// small grain
+		{ cmp_GRAIN, cmpf_BUNCH, 6170 },	// large grain
+		{ cmp_GRAIN, NOBITS, 6160 },	// small grain
+		{ cmp_SEEDS, NOBITS, 6181 },	// edible seeds
+		{ cmp_GEM, cmpf_REFINED, 6601 },	// powerful magic gem
+		{ cmp_GEM, NOBITS, 6600 },	// magic gem
+		{ cmp_HERB, cmpf_REFINED, 6651 },	// refined herb
+		{ cmp_HERB, NOBITS, 6650 },	// herb
+		{ cmp_SWEETENER, NOBITS, 6340 },	// basic sweetener
+		{ cmp_OIL, NOBITS, 6320 },	// basic oil -- there are more types but no way to tell from flags
+		{ cmp_GLASS, cmpf_RAW, 6831 },	// glass ingot
+		{ cmp_GLASS, NOBITS, 6830 },	// glass
+		{ cmp_SAND, NOBITS, 6085 },	// only 1 type of sand
+		{ cmp_WAX, NOBITS, 6891 },	// basic wax
+		{ cmp_PAINT, NOBITS, 6890 },	// basic paint
+		{ cmp_ROPE, NOBITS, 6880 },	// basic rope
+		{ cmp_HANDLE, cmpf_MAGIC, 6851 },	// magic handle
+		{ cmp_HANDLE, NOBITS, 6850 },	// basic handle
+		{ cmp_TEXTILE, cmpf_MAGIC, 6810 },	// magic cloth
+		{ cmp_TEXTILE, NOBITS, 6800 },	// basic cloth
+		{ cmp_NAILS, NOBITS, 6790 },	// only 1 type
+		{ cmp_METAL, cmpf_POOR, 6710 },	// poor metal
+		{ cmp_METAL, cmpf_COMMON, 6720 },	// common metal
+		{ cmp_METAL, cmpf_HARD, 6740 },	// hardened metal
+		{ cmp_METAL, cmpf_FINE, 6750 },	// precious metal 1
+		{ cmp_METAL, cmpf_REFINED, 6750 },	// precious metal 2
+		{ cmp_METAL, cmpf_MAGIC, 6760 },	// magic metal
+		{ cmp_METAL, cmpf_RARE, 6730 },	// rare metal
+		{ cmp_METAL, NOBITS, 6700 },	// basic metal
+		{ cmp_ROCK, NOBITS, 6050 },	// basic rock
+		{ cmp_SAPLING, cmpf_FINE, 6026 },	// fine sapling
+		{ cmp_SAPLING, NOBITS, 6025 },	// basic sapling
+		{ cmp_LUMBER, cmpf_MAGIC, 6001 },	// magic lumber
+		{ cmp_LUMBER, cmpf_FINE, 6002 },	// fine lumber
+		{ cmp_LUMBER, NOBITS, 6000 },	// basic lumber
+		{ cmp_PILLAR, cmpf_LARGE, 6017 },	// large pillar
+		{ cmp_PILLAR, cmpf_FINE, 6016 },	// fine pillar
+		{ cmp_PILLAR, NOBITS, 6015 },	// basic pillar
+		{ cmp_FUR, cmpf_LARGE, 6550 },	// large fur
+		{ cmp_FUR, cmpf_SMALL, 6541 },	// small fur
+		{ cmp_FUR, NOBITS, 6540 },	// basic fur
+		{ cmp_SKIN, cmpf_MAGIC, 6511 },	// magic skin
+		{ cmp_SKIN, cmpf_LARGE, 6510 },	// thick skin
+		{ cmp_SKIN, cmpf_SMALL, 6501 },	// thin skin
+		{ cmp_SKIN, NOBITS, 6500 },	// basic skin
+		{ cmp_LEATHER, cmpf_MAGIC, 6531 },	// magic leather
+		{ cmp_LEATHER, cmpf_LARGE, 6530 },	// thick leather
+		{ cmp_LEATHER, cmpf_SMALL, 6521 },	// thin leather
+		{ cmp_LEATHER, NOBITS, 6520 },	// basic leather
+		{ cmp_MEAT, cmpf_AQUATIC, 6203 },	// raw fish
+		{ cmp_MEAT, NOBITS, 6200 },	// raw meat
+		
+		{ -1, -1, -1 }	// LAST
+	};
+	
+	int iter;
+	
+	for (iter = 0; b5_88_conversion[iter].type != -1; ++iter) {
+		if (b5_88_conversion[iter].type == old_type && (b5_88_conversion[iter].flags == NOBITS || IS_SET_STRICT(old_flags, b5_88_conversion[iter].flags))) {
+			return b5_88_conversion[iter].new_comp;
+		}
+	}
+	
+	// didn't find it? no valid component type
+	return NOTHING;
 }

@@ -47,8 +47,6 @@ extern const bitvector_t bld_on_flags_order[];
 extern const char *bonus_bits[];
 extern const char *climate_flags[];
 extern const bitvector_t climate_flags_order[];
-extern const char *component_flags[];
-extern const char *component_types[];
 extern const char *craft_types[];
 extern const char *dirs[];
 extern const char *extra_bits[];
@@ -2304,46 +2302,39 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 
 
 SHOW(show_components) {
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	obj_data *obj, *next_obj;
-	bitvector_t flags;
+	generic_data *cmp;
 	size_t size;
-	int type;
 	
-	argument = any_one_word(argument, arg);	// component type
-	skip_spaces(&argument);	// optional flags
+	skip_spaces(&argument);	// component name/vnum
 	
-	if (!*arg) {
-		msg_to_char(ch, "Usage: show components <type> [flags]\r\n");
-		msg_to_char(ch, "See: HELP COMPONENT TYPES, HELP COMPONENT FLAGS\r\n");
+	if (!*argument) {
+		msg_to_char(ch, "Usage: show components <name | vnum>\r\n");
 	}
-	else if ((type = search_block(arg, component_types, FALSE)) == NOTHING) {
-		msg_to_char(ch, "Unknown component type '%s' (see HELP COMPONENT TYPES).\r\n", arg);
+	else if (!(cmp = find_generic_component(argument))) {
+		msg_to_char(ch, "Unknown generic component type '%s'.\r\n", argument);
 	}
 	else {
-		flags = *argument ? olc_process_flag(ch, argument, "component", "flags", component_flags, NOBITS) : NOBITS;
-		
 		// preamble
-		size = snprintf(buf, sizeof(buf), "Components for %s:\r\n", component_string(type, flags));
+		size = snprintf(buf, sizeof(buf), "Components for %s:\r\n", GEN_NAME(cmp));
 		
 		HASH_ITER(hh, object_table, obj, next_obj) {
 			if (size >= sizeof(buf)) {
 				break;
 			}
-			if (GET_OBJ_CMP_TYPE(obj) != type) {
-				continue;
-			}
-			if (flags && (flags & GET_OBJ_CMP_FLAGS(obj)) != flags) {
-				continue;
+			if (!is_component(obj, cmp)) {
+				continue;	// wrong type
 			}
 			
-			if (GET_OBJ_CMP_FLAGS(obj)) {
-				prettier_sprintbit(GET_OBJ_CMP_FLAGS(obj), component_flags, part);
+			// show component name if it's not an exact match
+			if (GET_OBJ_COMPONENT(obj) != GEN_VNUM(cmp)) {
+				snprintf(part, sizeof(part), " (%s)", get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)));
 			}
 			else {
 				*part = '\0';
 			}
-			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s%s%s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), *part ? " (" : "", part, *part ? ")" : "");
+			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), part);
 		}
 		
 		if (ch->desc) {
@@ -3702,34 +3693,30 @@ SHOW(show_unlearnable) {
 SHOW(show_uses) {
 	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
+	progress_data *prg, *next_prg;
 	augment_data *aug, *next_aug;
 	vehicle_data *veh, *next_veh;
 	social_data *soc, *next_soc;
 	struct resource_data *res;
 	bld_data *bld, *next_bld;
-	bitvector_t flags;
+	generic_data *cmp;
 	size_t size;
-	int type;
 	bool any;
 	
-	argument = any_one_word(argument, arg);	// component type
 	skip_spaces(&argument);	// optional flags
 	
-	if (!*arg) {
-		msg_to_char(ch, "Usage: show uses <type> [flags]\r\n");
-		msg_to_char(ch, "See: HELP COMPONENT TYPES, HELP COMPONENT FLAGS\r\n");
+	if (!*argument) {
+		msg_to_char(ch, "Usage: show uses <name | vnum>\r\n");
 	}
-	else if ((type = search_block(arg, component_types, FALSE)) == NOTHING) {
-		msg_to_char(ch, "Unknown component type '%s' (see HELP COMPONENT TYPES).\r\n", arg);
+	else if (!(cmp = find_generic_component(argument))) {
+		msg_to_char(ch, "Unknown component type '%s'.\r\n", argument);
 	}
 	else {
-		flags = *argument ? olc_process_flag(ch, argument, "component", "flags", component_flags, NOBITS) : NOBITS;
-		
 		// preamble
-		size = snprintf(buf, sizeof(buf), "Uses for %s:\r\n", component_string(type, flags));
+		size = snprintf(buf, sizeof(buf), "Uses for %s:\r\n", GEN_NAME(cmp));
 		
 		HASH_ITER(hh, augment_table, aug, next_aug) {
 			if (size >= sizeof(buf)) {
@@ -3737,20 +3724,10 @@ SHOW(show_uses) {
 			}
 			
 			LL_FOREACH(GET_AUG_RESOURCES(aug), res) {
-				if (res->type != RES_COMPONENT || res->vnum != type) {
+				if (res->type != RES_COMPONENT || res->vnum != GEN_VNUM(cmp)) {
 					continue;
 				}
-				if (flags && (res->misc & flags) != flags) {
-					continue;
-				}
-				
-				if (res->misc) {
-					prettier_sprintbit(res->misc, component_flags, part);
-				}
-				else {
-					*part = '\0';
-				}
-				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s%s%s%s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), *part ? " (" : "", part, *part ? ")" : "");
+				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
 			}
 		}
 		
@@ -3760,20 +3737,10 @@ SHOW(show_uses) {
 			}
 			
 			LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
-				if (res->type != RES_COMPONENT || res->vnum != type) {
+				if (res->type != RES_COMPONENT || res->vnum != GEN_VNUM(cmp)) {
 					continue;
 				}
-				if (flags && (res->misc & flags) != flags) {
-					continue;
-				}
-				
-				if (res->misc) {
-					prettier_sprintbit(res->misc, component_flags, part);
-				}
-				else {
-					*part = '\0';
-				}
-				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s%s%s%s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), *part ? " (" : "", part, *part ? ")" : "");
+				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
 		
@@ -3783,20 +3750,19 @@ SHOW(show_uses) {
 			}
 			
 			LL_FOREACH(GET_CRAFT_RESOURCES(craft), res) {
-				if (res->type != RES_COMPONENT || res->vnum != type) {
+				if (res->type != RES_COMPONENT || res->vnum != GEN_VNUM(cmp)) {
 					continue;
 				}
-				if (flags && (res->misc & flags) != flags) {
-					continue;
-				}
-				
-				if (res->misc) {
-					prettier_sprintbit(res->misc, component_flags, part);
-				}
-				else {
-					*part = '\0';
-				}
-				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s%s%s%s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), *part ? " (" : "", part, *part ? ")" : "");
+				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+			}
+		}
+		
+		HASH_ITER(hh, progress_table, prg, next_prg) {
+			if (size >= sizeof(buf)) {
+				break;
+			}
+			if (find_requirement_in_list(PRG_TASKS(prg), REQ_GET_COMPONENT, GEN_VNUM(cmp))) {
+				size += snprintf(buf + size, sizeof(buf) - size, "PRG [%5d] %s\r\n", PRG_VNUM(prg), PRG_NAME(prg));
 			}
 		}
 		
@@ -3804,8 +3770,8 @@ SHOW(show_uses) {
 			if (size >= sizeof(buf)) {
 				break;
 			}
-			any = find_requirement_in_list(QUEST_TASKS(quest), REQ_GET_COMPONENT, type);
-			any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_GET_COMPONENT, type);
+			any = find_requirement_in_list(QUEST_TASKS(quest), REQ_GET_COMPONENT, GEN_VNUM(cmp));
+			any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_GET_COMPONENT, GEN_VNUM(cmp));
 		
 			if (any) {
 				size += snprintf(buf + size, sizeof(buf) - size, "QST [%5d] %s\r\n", QUEST_VNUM(quest), QUEST_NAME(quest));
@@ -3816,7 +3782,7 @@ SHOW(show_uses) {
 			if (size >= sizeof(buf)) {
 				break;
 			}
-			any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_COMPONENT, type);
+			any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_COMPONENT, GEN_VNUM(cmp));
 		
 			if (any) {
 				size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
@@ -3829,20 +3795,10 @@ SHOW(show_uses) {
 			}
 			
 			LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
-				if (res->type != RES_COMPONENT || res->vnum != type) {
+				if (res->type != RES_COMPONENT || res->vnum != GEN_VNUM(cmp)) {
 					continue;
 				}
-				if (flags && (res->misc & flags) != flags) {
-					continue;
-				}
-				
-				if (res->misc) {
-					prettier_sprintbit(res->misc, component_flags, part);
-				}
-				else {
-					*part = '\0';
-				}
-				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s%s%s%s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh), *part ? " (" : "", part, *part ? ")" : "");
+				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 			}
 		}
 		
@@ -5513,7 +5469,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	prettier_sprintbit(GET_OBJ_TOOL_FLAGS(j), tool_flags, buf);
 	msg_to_char(ch, "Tool types: &y%s&0\r\n", buf);
 	
-	msg_to_char(ch, "Timer: &y%d&0, Material: &y%s&0, Component type: &y%s&0\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name, component_string(GET_OBJ_CMP_TYPE(j), GET_OBJ_CMP_FLAGS(j)));
+	msg_to_char(ch, "Timer: &y%d&0, Material: &y%s&0, Component type: [&y%d&0] &y%s&0\r\n", GET_OBJ_TIMER(j), materials[GET_OBJ_MATERIAL(j)].name, GET_OBJ_COMPONENT(j), GET_OBJ_COMPONENT(j) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(j)) : "none");
 	
 	if (GET_OBJ_REQUIRES_QUEST(j) != NOTHING) {
 		msg_to_char(ch, "Requires quest: [%d] &c%s&0\r\n", GET_OBJ_REQUIRES_QUEST(j), get_quest_name_by_proto(GET_OBJ_REQUIRES_QUEST(j)));

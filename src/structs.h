@@ -1564,67 +1564,6 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_TYPE_BOSS_DROP  6	// only applies if the item is GROUP- and HARD-DROP both when scaled
 
 
-// CMP_x: component types
-#define CMP_NONE  0	// not a component
-#define CMP_ADHESIVE  1
-#define CMP_BONE  2
-#define CMP_BLOCK  3
-#define CMP_CLAY  4
-#define CMP_DYE  5
-#define CMP_FEATHERS  6
-#define CMP_FIBERS  7
-#define CMP_FLOUR  8
-#define CMP_FRUIT  9
-#define CMP_FUR  10
-#define CMP_GEM  11
-#define CMP_GRAIN  12
-#define CMP_HANDLE  13
-#define CMP_HERB  14
-#define CMP_LEATHER  15
-#define CMP_LUMBER  16
-#define CMP_MEAT  17
-#define CMP_METAL  18
-#define CMP_NAILS  19
-#define CMP_OIL  20
-#define CMP_PILLAR  21
-#define CMP_ROCK  22
-#define CMP_SEEDS  23
-#define CMP_SKIN  24
-#define CMP_SAPLING  25
-#define CMP_TEXTILE  26
-#define CMP_VEGETABLE  27
-#define CMP_ROPE  28
-#define CMP_PAINT  29
-#define CMP_WAX  30
-#define CMP_SWEETENER  31
-#define CMP_SAND  32
-#define CMP_GLASS  33
-
-
-// CMPF_x: component flags
-#define CMPF_ANIMAL  BIT(0)
-#define CMPF_BUNCH  BIT(1)
-#define CMPF_DESERT  BIT(2)
-#define CMPF_FINE  BIT(3)
-#define CMPF_HARD  BIT(4)
-#define CMPF_LARGE  BIT(5)
-#define CMPF_MAGIC  BIT(6)
-#define CMPF_MUNDANE  BIT(6)
-#define CMPF_PLANT  BIT(8)
-#define CMPF_POOR  BIT(9)
-#define CMPF_RARE  BIT(10)
-#define CMPF_RAW  BIT(11)
-#define CMPF_REFINED  BIT(12)
-#define CMPF_SINGLE  BIT(13)
-#define CMPF_SMALL  BIT(14)
-#define CMPF_SOFT  BIT(15)
-#define CMPF_TEMPERATE  BIT(16)
-#define CMPF_TROPICAL  BIT(17)
-#define CMPF_COMMON  BIT(18)
-#define CMPF_AQUATIC  BIT(19)
-#define CMPF_BASIC  BIT(20)
-
-
 // Container flags -- limited to 31 because of int type in obj value
 #define CONT_CLOSEABLE  BIT(0)	// Container can be closed
 #define CONT_CLOSED  BIT(1)	// Container is closed
@@ -1767,7 +1706,7 @@ typedef struct vehicle_data vehicle_data;
 
 // RES_x: resource requirement types
 #define RES_OBJECT  0	// specific obj (vnum= obj vnum, misc= scale level [refunds only])
-#define RES_COMPONENT  1	// an obj of a given generic type (vnum= CMP_ type, misc= CMPF_ flags)
+#define RES_COMPONENT  1	// an obj of a given 'generic component' type (e.g. generic vnum 6000)
 #define RES_LIQUID  2	// a volume of a given liquid (vnum= LIQ_ vnum)
 #define RES_COINS  3	// an amount of coins (vnum= empire id of coins)
 #define RES_POOL  4	// health, mana, etc (vnum= HEALTH, etc)
@@ -5018,8 +4957,7 @@ struct obj_flag_data {
 	bitvector_t bitvector;	// To set chars bits
 	int material;	// Material this is made out of
 	
-	int cmp_type;	// CMP_ component type (CMP_NONE if not a component)
-	int cmp_flags;	// CMPF_ component flags
+	any_vnum component;	// matching generic component vnum
 	
 	int current_scale_level;	// level the obj was scaled to, or -1 for not scaled
 	int min_scale_level;	// minimum level this obj may be scaled to

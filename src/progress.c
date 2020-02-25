@@ -98,20 +98,20 @@ int count_diplomacy(empire_data *emp, bitvector_t dip_flags) {
 
 
 /**
-* Counts how many items an empire has in storage which match a component flag.
+* Counts how many items an empire has in storage which match a component type.
 *
 * @param empire_data *emp The empire.
-* @param int type The CMP_ type.
-* @param bitvector_t flags The CMPF_ flags (optional; all flags must be present to match).
+* @param any_vnum cmp_vnum The generic component to count.
 * @return int The number of matching items.
 */
-int count_empire_components(empire_data *emp, int type, bitvector_t flags) {
+int count_empire_components(empire_data *emp, any_vnum cmp_vnum) {
 	struct empire_storage_data *store, *next_store;
+	generic_data *cmp = real_generic(cmp_vnum);
 	struct empire_island *isle, *next_isle;
 	obj_data *proto;
 	int count = 0;
 	
-	if (!emp) {
+	if (!emp || !cmp) {
 		return 0;	// safety first
 	}
 	
@@ -120,11 +120,7 @@ int count_empire_components(empire_data *emp, int type, bitvector_t flags) {
 			if (store->amount < 1 || !(proto = store->proto)) {
 				continue;
 			}
-			
-			if (GET_OBJ_CMP_TYPE(proto) != type) {
-				continue;
-			}
-			if ((GET_OBJ_CMP_FLAGS(proto) & flags) != flags) {
+			if (GET_OBJ_COMPONENT(proto) == NOTHING || !is_component(proto, cmp)) {
 				continue;
 			}
 			
@@ -920,7 +916,7 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 		// REQ_x: refreshable/empire types only
 		switch (task->type) {
 			case REQ_GET_COMPONENT: {
-				task->current = count_empire_components(emp, task->vnum, task->misc);
+				task->current = count_empire_components(emp, task->vnum);
 				break;
 			}
 			case REQ_GET_OBJECT: {
@@ -988,7 +984,7 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				break;
 			}
 			case REQ_EMPIRE_PRODUCED_COMPONENT: {
-				task->current = get_production_total_component(emp, task->vnum, task->misc);
+				task->current = get_production_total_component(emp, task->vnum);
 				break;
 			}
 			case REQ_EVENT_RUNNING: {
@@ -1373,7 +1369,7 @@ void et_change_production_total(empire_data *emp, obj_vnum vnum, int amount) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, FALSE);
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
-			else if (task->type == REQ_EMPIRE_PRODUCED_COMPONENT && GET_OBJ_CMP_TYPE(proto) == task->vnum && (GET_OBJ_CMP_FLAGS(proto) & task->misc) == task->misc) {
+			else if (task->type == REQ_EMPIRE_PRODUCED_COMPONENT && is_component_vnum(proto, task->vnum)) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, FALSE);
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
@@ -1412,7 +1408,7 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total) {
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next) {
 		LL_FOREACH(goal->tracker, task) {
-			if (task->type == REQ_GET_COMPONENT && GET_OBJ_CMP_TYPE(obj) == task->vnum && (GET_OBJ_CMP_FLAGS(obj) & task->misc) == task->misc) {
+			if (task->type == REQ_GET_COMPONENT && is_component_vnum(obj, task->vnum)) {
 				SAFE_ADD(task->current, amount, 0, INT_MAX, TRUE);
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}

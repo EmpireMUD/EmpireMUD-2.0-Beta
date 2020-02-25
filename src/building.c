@@ -262,9 +262,9 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 	int iter;
 	
 	if (!resources) {
-		add_to_resource_list(&resources, RES_COMPONENT, CMP_PILLAR, 12, 0);
-		add_to_resource_list(&resources, RES_COMPONENT, CMP_LUMBER, 8, 0);
-		add_to_resource_list(&resources, RES_COMPONENT, CMP_NAILS, 4, 0);
+		add_to_resource_list(&resources, RES_COMPONENT, COMP_PILLAR, 12, 0);
+		add_to_resource_list(&resources, RES_COMPONENT, COMP_LUMBER, 8, 0);
+		add_to_resource_list(&resources, RES_COMPONENT, COMP_NAILS, 4, 0);
 	}
 	
 	// entrance
@@ -977,18 +977,22 @@ void remove_designate_objects(room_data *room) {
 * replace an older one. Call this BEFORE adding the new resource to built-with.
 *
 * @param struct resource_data **built_with The room's &GET_BUILT_WITH()
-* @param int cmp_type What type of component we're replacing.
+* @param obj_data *obj The item that was added -- remove something with a matching component type.
 */
-void remove_like_component_from_built_with(struct resource_data **built_with, int cmp_type) {
+void remove_like_component_from_built_with(struct resource_data **built_with, obj_data *obj) {
 	struct resource_data *iter, *next;
+	generic_data *my_cmp;
 	obj_data *proto;
 	
-	if (!built_with || !*built_with) {
+	if (!built_with || !*built_with || !obj || GET_OBJ_COMPONENT(obj) == NOTHING) {
 		return;	// no work
 	}
 	
+	my_cmp = real_generic(GET_OBJ_COMPONENT(obj));
+	
 	LL_FOREACH_SAFE(*built_with, iter, next) {
-		if (iter->type == RES_OBJECT && (proto = obj_proto(iter->vnum)) && GET_OBJ_CMP_TYPE(proto) == cmp_type) {
+		// anything with a matching component type (either way) is safe to remove
+		if (iter->type == RES_OBJECT && (proto = obj_proto(iter->vnum)) && GET_OBJ_COMPONENT(proto) != NOTHING && (GET_OBJ_COMPONENT(obj) == GET_OBJ_COMPONENT(proto) || is_component_vnum(obj, GET_OBJ_COMPONENT(proto)) || is_component(proto, my_cmp))) {
 			iter->amount -= 1;
 			if (iter->amount <= 0) {
 				LL_DELETE(*built_with, iter);
@@ -1018,7 +1022,7 @@ void remove_like_item_from_built_with(struct resource_data **built_with, obj_dat
 	}
 	
 	LL_FOREACH_SAFE(*built_with, iter, next) {
-		if (iter->type == RES_OBJECT && (iter->vnum == GET_OBJ_VNUM(obj) || ((proto = obj_proto(iter->vnum)) && GET_OBJ_CMP_TYPE(proto) == GET_OBJ_CMP_TYPE(obj)))) {
+		if (iter->type == RES_OBJECT && (iter->vnum == GET_OBJ_VNUM(obj) || ((proto = obj_proto(iter->vnum)) && is_component_vnum(obj, GET_OBJ_COMPONENT(proto))))) {
 			iter->amount -= 1;
 			if (iter->amount <= 0) {
 				LL_DELETE(*built_with, iter);
@@ -2071,7 +2075,7 @@ ACMD(do_lay) {
 	struct resource_data *charged = NULL;
 	
 	if (!cost) {
-		add_to_resource_list(&cost, RES_COMPONENT, CMP_ROCK, 20, 0);
+		add_to_resource_list(&cost, RES_COMPONENT, COMP_ROCK, 20, 0);
 	}
 
 	if (IS_NPC(ch)) {
