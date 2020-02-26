@@ -2873,6 +2873,9 @@ void apply_resource(char_data *ch, struct resource_data *res, struct resource_da
 *
 * This function always takes from inventory first, and ground second.
 *
+* For components, this prefers an exact match, then a basic match, then any
+* extended/related component.
+*
 * @param char_data *ch The person whose resources to take.
 * @param struct resource_data *list Any resource list.
 * @param bool ground If TRUE, will also take resources off the ground.
@@ -3032,6 +3035,9 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 * object it found (if applicable to the resource type), but it doesn't extract
 * or free anything.
 *
+* For components, this prefers an exact match, then a basic match, then any
+* extended/related component.
+*
 * Apply the found resource using apply_resource().
 *
 * @param char_data *ch The person who is doing the building.
@@ -3041,9 +3047,9 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 * @param obj_data **found_obj A variable to bind the matching item to, for resources that require items.
 */
 struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj) {
-	struct resource_data *res;
+	struct resource_data *res, *basic_res = NULL, *extended_res = NULL;
+	obj_data *obj, *basic_obj = NULL, *extended_obj = NULL;
 	int liter, amt;
-	obj_data *obj;
 	
 	*found_obj = NULL;
 	
@@ -3080,11 +3086,22 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 								break;
 							}
 							case RES_COMPONENT: {
-								// TODO: future version of this could prefer 'basic' components on pass 1, and a 2nd pass for non-basic
-								if (GET_OBJ_COMPONENT(obj) == res->vnum || is_component_vnum(obj, res->vnum)) {
-									// got one!
+								if (GET_OBJ_COMPONENT(obj) == res->vnum) {
+									// got one! exact match means we're done
 									*found_obj = obj;
 									return res;
+								}
+								else if (!basic_obj && is_component_vnum(obj, res->vnum)) {
+									if (is_basic_component(obj)) {
+										// fall back to this one if no exact match
+										basic_obj = obj;
+										basic_res = res;
+									}
+									else if (!extended_obj) {
+										// fall back to this one if no basic match
+										extended_obj = obj;
+										extended_res = res;
+									}
 								}
 								break;
 							}
@@ -3145,8 +3162,18 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 		}
 	}
 	
-	// found nothing
-	return NULL;
+	// no exact matches...
+	if (basic_obj && basic_res) {
+		*found_obj = basic_obj;
+		return basic_res;
+	}
+	else if (extended_obj && extended_res) {
+		*found_obj = extended_obj;
+		return extended_res;
+	}
+	else {
+		return NULL;	// found nothing
+	}
 }
 
 
@@ -3385,6 +3412,10 @@ void reduce_dismantle_resources(room_data *room, struct resource_data **list, bo
 
 /**
 * Find out if a person has resources available.
+*
+* For components, this prefers an exact match, then a basic match, then any
+* extended/related component. This prevents an item from blocking another item
+* and resulting in "you don't have enough".
 *
 * @param char_data *ch The person whose resources to check.
 * @param struct resource_data *list Any resource list.
