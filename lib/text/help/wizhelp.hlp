@@ -1345,14 +1345,12 @@ it as unlearnable.
 #e
 "SHOW USES"
 
-Usage:  show uses <type> [flags]
+Usage:  show uses <component name/vnum>
 
 This command looks up buildings, crafts, vehicles, and augments that require a
-given component type. If you specify any flags, all those flags must match the
-output.
-
-For a list of component types, see: HELP COMPONENT TYPES
-For a list of component flags, see: HELP COMPONENT FLAGS
+given component type. It also lists ones that use a sub-type of that component.
+For example, if you search for 'large sticks' and a recipe requires regular
+'sticks', 
 #e
 "SHOW WORKFORCE"
 
