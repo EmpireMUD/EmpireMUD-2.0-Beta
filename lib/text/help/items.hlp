@@ -37,15 +37,14 @@ See also: COMPONENT
 "BLOCK COMPONENT" "STONE BLOCKS" BLOCKS BRICKS "CLAY BRICKS"
 
 Block (component)
-Huge Stone Block (resource)
-Bricks (resource)
 
-The Block component is the building block of most buildings, and consists of
-stone blocks and clay bricks. Any recipes that call for (block) allow the use
-of either, while some buildings require a specific one:
+The block component is the building block of most buildings, and includes
+stone blocks and clay bricks. Any recipes that call for (blocks) allow the use
+of either, while some buildings require a specific one.
 
-bunch of:  bricks (clay)
-single:  stone block
+Common types of blocks are:
+  huge stone block (large block, basic)
+  pile of bricks (bricks, basic)
 
 You can quarry stone blocks from the ground at a quarry. They are used in
 monumental architecture.
@@ -111,42 +110,33 @@ See also: CLAY PIT, COMPONENT, POTTER
 #
 "COMPONENT TYPES" "COMPONENT TYPE LIST" "COMPONENT LIST" "RESOURCE TYPES" "RESOURCE LIST" "RESOURCE TYPE LIST"
 
-Available generic components:
- &cadhesive&0 - not currently used
- &cbone&0 - not currently used
- &cblock&0 - building materials like bricks or blocks
- &cclay&0 - moldable clay
- &cdye&0 - any kind of dye
- &cfeathers&0 - not currently used (use fibers instead)
- &cfibers&0 - cotton, straw, etc.
- &cflour&0 - ground up grains
- &cfruit&0 - for cooking
- &cfur&0 - animal furs for crafting
- &cgem&0 - precious stones
- &cglass&0 - made of, or used for making, glass
- &cgrain&0 - wheat, etc.
- &chandle&0 - used for tools and weapons
- &cherb&0 - used in potions and cooking
- &cleather&0 - for armor and crafts
- &clumber&0 - a core building material
- &cmeat&0 - raw meat for cooking
- &cmetal&0 - various useful or precious metals
- &cnails&0 - a core building material
- &coil&0 - for cooking or maintaining machinery
+There are many common types of generic components, most of which have their
+own help files. Here are some of the common types of components:
+ &cblocks&0 and &cbricks&0 - building materials
+ &clumber&0 and &cpillars&0 - building materials
+ &crocks&0 - common stones dug up from the ground, for building
+ &cnails&0 - building materials
+ &csaplings&0 - used in handles and primitive buildings
+ &cclay&0 - moldable clay for crafting
+ &cfibers&0, &cfeathers&0, and &csticks&0 - used for crafting and building
+ &cfruits&0, &cvegetabless&0, &cgrains&0, and &cseeds&0 - for cooking and baking
+ &cflour&0 - ground up grains used in baking
+ &csweeteners&0 - for cooking
+ &craw meat&0 - raw meat for cooking
+ &cskins&0, &cleathers&0, &cbones&0, and &cfurs&0 - used in crafting
+ &cmagic gems&0 - precious stones used in crafting
+ &chandles&0 - used for tools and weapons
+ &cherbs&0 - used in potions, poisons, and cooking
+ &cmetal&0 - various useful or precious metals for cooking
+ &coils&0 - for cooking or maintaining machinery
  &cpaint&0 - for painting houses
- &cpillar&0 - for construction, like a log
- &crock&0 - common stones dug up from the ground
- &crope&0 - for construction and harnessing animals
+ &ccord&0 and &crope&0 - for crafting, construction, and harnessing animals
  &csand&0 - used for things like glass
- &csapling&0 - used in handles and primitive buildings
- &cseeds&0 - for planting or cooking
- &cskin&0 - unprocessed animal skin or rawhide
- &csweetener&0 - for cooking
- &ctextile&0 - cloth or fabric for crafting
- &cvegetable&0 - for cooking
+ &cglass&0 - made of, or used for making, glass
  &cwax&0 - for candle-making
+ &ccloth&0 - textiles for making clothing
 
-See also: COMPONENT
+See also: RESOURCES
 #
 CONVEYANCE "TRINKET OF CONVEYANCE"
 
@@ -159,6 +149,17 @@ certain adventures. If you find yourself in one of these places, find a way
 out before using your trinket.
 
 See also: POTTERY, HESTIAN TRINKET
+#
+"COOKED MEAT COMPONENT" "COOKED POULTRY" "COOKED FISH" "COOKED RED MEAT" "COOKED MEAL" "VEGETARIAN MEAL" "COOKED VEGETARIAN MEAL" MEAL
+
+Cooked Meat, Cooked Meal (components)
+
+Used for:  food
+
+Cooked meats and meals are components created by the 'cook' and 'bake'
+commands. These are generally just eaten as food.
+
+See also: COMPONENT, COOK, RAW MEAT, EAT
 #
 "CRAFTER ITEMS" "CRAFTING ITEMS" "CRAFT ITEMS" "CRAFTING LEVEL" "CRAFTER LEVEL" "CRAFT LEVEL"
 
@@ -208,25 +209,14 @@ eligible for these flags, and are indicated by a GENERIC-DROP flag.
 
 See also: CONSIDER, IDENTIFY
 #
-DYES "DYE COMPONENT"
+"EDIBLE PLANT" "SMALL EDIBLE PLANT" "LARGE EDIBLE PLANT"
 
-Dye (component)
+Edible plants (component)
 
-Used for:  none
+Most types of fruit and vegetables are sub-types of the 'edible plant'
+component.
 
-Dyes are not currently used.
-
-See also: COMPONENT
-#
-FEATHERS "FEATHERS COMPONENT" "FEATHER COMPONENT"
-
-Feathers (component)
-
-Used for:  nothing (yet)
-
-Feathers are a component type.
-
-See also: COMPONENT
+See also: FRUIT COMPONENT, VEGETABLE COMPONENT
 #
 FIBERS "FIBERS COMPONENT" "FIBER COMPONENT" "PLANT FIBER"
 
@@ -266,7 +256,7 @@ Flint can be used to make:
 
 See also: BUILD, COMPONENT, DIG, CHIP, CRAFT, FORGE, LAY, ROCK COMPONENT
 #
-FLOUR "FLOUR COMPONENT"
+FLOUR "FLOUR COMPONENT" FLOURS
 
 Flour (resource, component)
 
@@ -278,7 +268,7 @@ from wheat) along with similar ingredients such as cornmeal.
 
 See also: COMPONENT, MILL, CROPS
 #
-FRUITS "FRUIT COMPONENT"
+FRUITS "FRUIT COMPONENT" "SMALL FRUITS" "LARGE FRUITS"
 
 Fruit (component)
 
@@ -342,7 +332,7 @@ Glass (component)
 Used for:  glassmaking
 
 Types of glass:
-  ingot of glass (raw, basic) - craft from sand at the glass blower
+  ingot of glass (basic) - craft from sand at the glass blower
 
 See also: COMPONENT, GLASS BLOWER
 #
@@ -356,11 +346,17 @@ This rare seashell can be found while fishing.
 
 See also: FISH, GEM
 #
-GRAINS "GRAIN COMPONENT"
+GRAINS "GRAIN COMPONENT" "HANDFUL OF GRAIN" "HANDFULS OF GRAIN" "BUNCH OF GRAIN" "BUNCHES OF GRAIN"
 
 Grain (component)
 
 Used for:  cooking
+
+Grain components are split into two basic sizes: handfuls of grain (usually
+used for snacking or planting) and bunches of grain (used for planting or
+cooking).
+
+Common grains: wheat, barley, corn, rice, oats
 
 See also: COMPONENT
 #
@@ -373,7 +369,7 @@ can craft a simple grinding stone using Primitive Crafts.
 
 See also: MILL
 #
-HANDLE "HANDLE COMPONENT"
+HANDLE "HANDLE COMPONENT" "MAGIC HANDLE"
 
 Handle (component)
 
@@ -563,20 +559,23 @@ Note: Glass ingots are made from sand using the 'craft' command.
 
 See also: COMPONENT, SMELT, SEPARATE, IRON, COPPER, MINE
 #
-MEAT "MEAT COMPONENT"
+MEAT "MEAT COMPONENT" "RAW MEAT" "RAW RED MEAT" "RAW POULTRY" "RAW PORK" "RAW FISH" "RED MEAT" POULTRY PORK FISH
 
-Meat (component)
+Raw Meat (component)
 
 Used for:  cooking
 
 Meat is a component type mostly used in cooking. It is obtained by butchering
-animal corpses or fishing. Only raw meats count as a meat component, and are
-cooked when used in a recipe.
+animal corpses or fishing. Common types of raw meat are:
+  fillet of raw meat (raw red meat)
+  cut of poultry (raw poultry)
+  slab of pork (raw pork)
+  striped barbfish, giant linefish, magenta arrowfish (raw fish)
+  spotted eel, speckled trout, bright red leaping fish (raw fish)
+  fat catfish, yellow perch, slab of shark meat (raw fish)
+  small gator (raw meat)
 
-raw:  meat fillets, poultry, pork
-raw, aquatic:  fish
-
-See also: COMPONENT, BUTCHER, COOK, FISH
+See also: COMPONENT, BUTCHER, COOK, FISH, COOKED MEAT
 #
 NAILS "POUCH OF NAILS"
 
@@ -597,13 +596,16 @@ stored in Towers of Sorcery, and are used to build certain buildings.
 
 See also: EXARCH CRAFTS, PORTAL, PORTAL MAGIC
 #
-OIL "OIL COMPONENT"
+OIL OILS "OIL COMPONENT" "SEED OILS" "VEGETABLE OILS"
 
 Oil (component)
 
 Used for:  cooking, vehicle repair
 
-The most common oil is olive oil. You can get olive oil by pressing olives.
+You can obtain most oils by pressing fruits. Common oils include:
+  olive oil (vegetable oil)
+  lettuce seed oil (seed oil)
+  coconut oil
 
 See also: COMPONENT, COOK, PRESS
 #
@@ -661,19 +663,25 @@ hammer for chipping flint, for laying roads, and as filler for many building.
 There are multiple types of rock, but in most cases where you need a (rock)
 component, any rock will do.
 
+Common types of rocks are:
+  rock (basic)
+  flint stone
+  rough piece of obsidian
+
 See also: BUILD, COMPONENT, DIG, CHIP, LAY, FLINT
 #
-SEEDS "SEED COMPONENT" "SEEDS COMPONENT"
+SEEDS "SEED COMPONENT" "SEEDS COMPONENT" "EDIBLE SEEDS"
 
 Seeds (component)
 
-Used for:  nothing
+Used for:  planting, cooking, snacking
 
-While there are not currently any generic uses for the 'seeds' component type,
-some crops use seeds for planting. However, most crops are planted using the
-harvested item (e.g. a bunch of apples).
+Seeds are separated into two broad categories: edible seeds and inedible seeds.
+Some seeds can be planted (but you can often plant a crop using the fruit or
+other harvested items from that crop). Identify a seed to see more information
+about it.
 
-See also: PLANT
+See also: PLANT, SEED COMMAND
 #
 "SEWING KIT" NEEDLES
 
@@ -739,9 +747,9 @@ Sweeteners are used to make food taste good. Available sweeteners include:
 
 See also: COMPONENT
 #
-ROPE ROPES "ROPE COMPONENT"
+ROPE ROPES "ROPE COMPONENT" CORDS CORDAGE "CORD COMPONENT"
 
-Rope (component)
+Cord, Rope (components)
 
 Stored at:  Utility Shed, Store Room, Shipyard
 Used for:  manufacturing
@@ -750,7 +758,11 @@ Ropes are used to tie mounts to land vehicles to pull them, and to control the
 sails of ships. They will be consumed when you manufacture the vehicles - no
 more ropes are needed afterwards.
 
-You can craft basic ropes from plant fiber or small pieces of leather.
+Cords are thinner and weaker than ropes, but can be used in some crafts. Ropes
+count as cords, but cords do not count as ropes.
+
+Vines are a basic type of cord. You can craft basic ropes from plant fiber or
+small pieces of leather.
 
 See also: COMPONENT, CRAFT, MANUFACTURE
 #
@@ -782,11 +794,11 @@ The best ways to get saplings are:
  scraping or sawing trees (rare result)
  gathering in a forest (rare result)
 
-Common types of sapling are:
- large shoot (basic)
- green sapling (temperate, basic)
- thorny sapling (desert, basic)
- reaching sapling (tropical, basic)
+Common types of saplings are:
+  green sapling (basic)
+  thorny sapling (basic)
+  reaching sapling (basic)
+  large shoot (basic)
 
 See also: COMPONENT, GATHER, SCRAPE, SAW, COPSE
 #
@@ -998,7 +1010,7 @@ stored in the vault using the regular "store" command, not "warehouse".
 
 See also: CASTLE, DESIGNATE, PRIVILEGE, RETRIEVE, STORE, WAREHOUSE
 #
-VEGETABLES "VEGETABLE COMPONENT"
+VEGETABLES "VEGETABLE COMPONENT" "SMALL VEGETABLES" "LARGE VEGETABLES"
 
 Vegetable (component)
 

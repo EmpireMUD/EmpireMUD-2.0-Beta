@@ -1387,7 +1387,7 @@ Examples:
   > order puppy eat bread
   > order cityguard sleep
 #
-PAINT PAINTING UNPAINT
+PAINT PAINTING UNPAINT "PAINT COMPONENT"
 
 Usage:  paint <using paint item>
         unpaint
@@ -1934,7 +1934,7 @@ some people for features like the WHO list.
 
 See also: TOGGLE
 #
-SEED SEEDS SEEDING DESEED DE-SEED "REMOVE SEEDS"
+SEED SEEDS SEEDING DESEED DE-SEED "REMOVE SEEDS" "SEED COMMAND"
 
 Usage:  seed <fruit>
 
@@ -1942,7 +1942,7 @@ This command allows you to remove the seeds from a fruit, usually to plant
 them. Most fruits can still be eaten afterwards. Some fruits can also be
 planted without removing the seeds first.
 
-See also: PLANT, CROPS
+See also: PLANT, CROPS, SEED COMPONENT
 #
 SELFDELETE "SELF DELETE" SELF-DELETE DELETE
 
