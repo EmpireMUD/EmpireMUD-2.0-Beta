@@ -3998,7 +3998,7 @@ void b5_88_resource_components_update(void) {
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		any = FALSE;
 		LL_FOREACH(PRG_TASKS(prg), req) {
-			if (req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) {
+			if ((req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) && req->vnum < 100) {
 				if ((vn = b5_88_old_component_to_new_component(req->vnum, req->misc)) != NOTHING) {
 					log("- converting task on progress [%d] %s from (%d %s) to [%d] %s", PRG_VNUM(prg), PRG_NAME(prg), req->vnum, bitv_to_alpha(req->misc), vn, get_generic_name_by_vnum(vn));
 				}
@@ -4020,7 +4020,7 @@ void b5_88_resource_components_update(void) {
 	HASH_ITER(hh, quest_table, qst, next_qst) {
 		any = FALSE;
 		LL_FOREACH(QUEST_TASKS(qst), req) {
-			if (req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) {
+			if ((req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) && req->vnum < 100) {
 				if ((vn = b5_88_old_component_to_new_component(req->vnum, req->misc)) != NOTHING) {
 					log("- converting task on quest task [%d] %s from (%d %s) to [%d] %s", QUEST_VNUM(qst), QUEST_NAME(qst), req->vnum, bitv_to_alpha(req->misc), vn, get_generic_name_by_vnum(vn));
 				}
@@ -4033,7 +4033,7 @@ void b5_88_resource_components_update(void) {
 			}
 		}
 		LL_FOREACH(QUEST_PREREQS(qst), req) {
-			if (req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) {
+			if ((req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) && req->vnum < 100) {
 				if ((vn = b5_88_old_component_to_new_component(req->vnum, req->misc)) != NOTHING) {
 					log("- converting task on quest prereq [%d] %s from (%d %s) to [%d] %s", QUEST_VNUM(qst), QUEST_NAME(qst), req->vnum, bitv_to_alpha(req->misc), vn, get_generic_name_by_vnum(vn));
 				}
@@ -4055,7 +4055,7 @@ void b5_88_resource_components_update(void) {
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		any = FALSE;
 		LL_FOREACH(SOC_REQUIREMENTS(soc), req) {
-			if (req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) {
+			if ((req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) && req->vnum < 100) {
 				if ((vn = b5_88_old_component_to_new_component(req->vnum, req->misc)) != NOTHING) {
 					log("- converting requirement on social [%d] %s from (%d %s) to [%d] %s", SOC_VNUM(soc), SOC_NAME(soc), req->vnum, bitv_to_alpha(req->misc), vn, get_generic_name_by_vnum(vn));
 				}
