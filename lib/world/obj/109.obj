@@ -20,8 +20,7 @@ it can be used to make powerful equipment.
 0 0 0
 7 0
 I 18 10928 100.00 1 x  # TAN: tough dragon leather
-O
-24 fgk
+O+ 1 6511
 R
 5193 0
 R
@@ -38,8 +37,7 @@ trees in that pack of yours.
 3 e a 0 5
 0 0 0
 14 0
-O
-2 fgk
+O+ 1 6565
 R
 5193 0
 R
@@ -89,11 +87,10 @@ A huge dragon steak is lying on the ground.~
 long-lasting and very filling. Or, if you're a Gourmet Chef, you can make a
 roast dragon feast and boost the party's damage significantly.
 ~
-3 0 a 0 7
+3 0 a 0 8
 0 0 0
 7 288
-O
-17 gl
+O+ 1 6204
 R
 5119 0
 S
@@ -103,7 +100,7 @@ a dragon roast~
 Some roast dragon meat has been left here.~
 This giant piece of roast meat has the pre-charred aroma of dragon.
 ~
-6 0 a 0 5
+6 0 a 0 6
 72 0 0
 7 288
 M
@@ -112,8 +109,7 @@ You nearly choke on a huge bite of $p.~
 M
 5
 $n nearly chokes on a huge bite of $p.~
-O
-17 g
+O+ 1 6224
 R
 5619 0
 R
@@ -507,8 +503,7 @@ original dragon hide state.
 0 0 0
 7 0
 I 11 10902 100.00 1 x  # LIGHT: a red dragon hide
-O
-26 gk
+O+ 1 6810
 R
 5193 0
 R
@@ -526,8 +521,7 @@ return it to its original dragon hide state.
 0 0 0
 7 0
 I 11 10902 100.00 1 x  # LIGHT: a red dragon hide
-O
-15 gk
+O+ 1 6531
 R
 5193 0
 R
@@ -546,8 +540,7 @@ original dragon bone state.
 0 0 0
 14 0
 I 11 10903 100.00 1 x  # LIGHT: a colossal dragon bone
-O
-18 gk
+O+ 1 6760
 R
 5193 0
 R
@@ -862,8 +855,7 @@ You can bake: cranbread
 3 b a 0 8
 0 10956 0
 7 168
-O
-9 br
+O+ 1 6133
 R
 5114 0
 S
@@ -1045,8 +1037,7 @@ hold up the roof of a mine or be sawn into lumber.
 C
 100 100
 I 17 125 100.00 8  # SAW: a stack of lumber
-O
-21 0
+O+ 1 6015
 R
 5193 0
 S
@@ -1093,8 +1084,7 @@ you. It has the faint smell of rotten eggs.
 3 0 a 0 5
 0 0 0
 1 0
-O
-11 gu
+O+ 1 6600
 R
 5164 0
 S

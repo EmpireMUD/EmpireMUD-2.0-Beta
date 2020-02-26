@@ -59,7 +59,7 @@ you'll need some basic resources first. Produce small stockpiles each of any
 type of rock, lumber, block, pillar, stick, and metal ingots. Completing this
 goal will allow your empire to build new artisan buildings.
 ~
-11 2 0 5 0
+12 2 0 5 0
 K 2 5130
 K 2 5132
 K 2 5134
@@ -73,17 +73,17 @@ K 2 1401
 K 2 5209
 P 2010
 W
-35 18 0 50 a
+35 6700 0 50 a
 W
-35 22 0 50 a
+35 6050 0 50 a
 W
-35 3 0 50 a
+35 6075 0 50 a
 W
-35 21 0 50 a
+35 6015 0 50 a
 W
-35 25 0 50 a
+35 6025 0 50 a
 W
-35 16 0 50 a
+35 6000 0 50 a
 S
 #2012
 Artisans~
@@ -142,28 +142,28 @@ the basic component types: lumber, rock, block, pillar, sapling, and metal.
 You can mix and match different types of each component, such as tin and
 copper. Completing this goal earns you another city point.
 ~
-10 2 0 15 0
+11 2 0 15 0
 K 1 1
 P 2011
 W
-35 18 0 250 a
+35 6700 0 250 a
 W
-35 21 0 250 a
+35 6015 0 250 a
 W
-35 3 0 250 a
+35 6075 0 250 a
 W
-35 22 0 250 a
+35 6050 0 250 a
 W
-35 25 0 250 a
+35 6025 0 250 a
 W
-35 16 0 250 a
+35 6000 0 250 a
 S
 #2016
 Rare Surplus~
    If your empire is going to be successful, you'll need to produce a surplus
 of the rarer resources: leather, gems, and rare metals.
 ~
-7 2 0 25 0
+8 2 0 25 0
 K 6 100
 P 2011
 W
@@ -179,9 +179,9 @@ W
 W
 34 176 0 25 a
 W
-35 15 16384 50 a
+35 6521 0 50 a
 W
-35 15 32 50 a
+35 6530 0 50 a
 S
 #2017
 Rare Stockpiles~
@@ -189,7 +189,7 @@ Rare Stockpiles~
 resources: leather, gems, and rare metals. Completing this goal earns you a
 higher workforce cap, if you have a workforce.
 ~
-7 2 0 50 0
+8 2 0 50 0
 K 6 100
 P 2016
 W
@@ -205,9 +205,9 @@ W
 W
 34 176 0 75 a
 W
-35 15 16384 250 a
+35 6521 0 250 a
 W
-35 15 32 250 a
+35 6530 0 250 a
 S
 #2018
 Collecting Herbs~

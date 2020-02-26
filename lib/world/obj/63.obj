@@ -7,8 +7,7 @@ The oil can be used for crafts or cooking.
 3 0 a 0 7
 0 0 0
 7 168
-O
-20 u
+O+ 1 6320
 R
 5134 0
 R
@@ -22,11 +21,10 @@ a skin of seed oil~
 A skin of seed oil is lying here.~
 The oil can be used for crafts or cooking.
 ~
-3 0 a 0 8
+3 0 a 0 9
 0 0 0
 7 168
-O
-20 u
+O+ 1 6321
 R
 5134 0
 R
@@ -40,11 +38,10 @@ a skin of vegetable oil~
 A skin of vegetable oil is lying here.~
 The oil can be used for crafts or cooking.
 ~
-3 0 a 0 9
+3 0 a 0 10
 0 0 0
 7 168
-O
-20 u
+O+ 1 6322
 R
 5134 0
 R
@@ -61,7 +58,6 @@ You're not sure what this is made from, but it tastes sweeter than fruit.
 3 0 a 0 2
 0 0 0
 7 96
-O
-31 0
+O+ 1 6340
 S
 $

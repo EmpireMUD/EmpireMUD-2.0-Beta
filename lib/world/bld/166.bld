@@ -11,9 +11,9 @@ M
 M
 16651 5.00 0
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #16654
 Ballroom~
@@ -108,11 +108,11 @@ walls impossible. Steam rolls off the frozen blocks, but they never thaw. The
 magic that holds this palace together must be powerful indeed.
 ~
 R
-16 2 1 1048576
+6000 2 1 0
 R
-19 2 1 0
+6790 2 1 0
 R
-3 2 1 0
+6075 2 1 0
 T 16658
 S
 $

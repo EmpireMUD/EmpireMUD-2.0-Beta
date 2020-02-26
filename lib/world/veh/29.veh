@@ -6,17 +6,17 @@ An imperial carriage is parked here.~
 looks like it has lots of storage space, perfect for the traveling monarch.
 ~
 ~
-bfhio 19 36 500 2
+bfhio 19 36 500 2 0 0 0
 C
 100 200
 D
 2908 0 0
-R
-19 1 1 0
-R
-20 1 1 0
 P
 2
+R
+6790 1 1 0
+R
+6320 1 1 0
 S
 #2916
 caravan heroic~
@@ -28,18 +28,18 @@ wood and well-appointed with golden highlights, and surely belongs to the
 world's most successful adventurers.
 ~
 &V{][}~
-bfio 19 128 500 6
+bfio 19 128 500 6 0 0 0
 C
 200 300
 D
 2916 0 0
-R
-19 1 1 0
-R
-20 1 1 0
-T 2916
 P
 3
+R
+6790 1 1 0
+R
+6320 1 1 0
+T 2916
 S
 #2917
 galleon heroic~
@@ -50,19 +50,19 @@ itself. It appears to be made from some exotic wood, and sits higher in the
 water than an ordinary ship.
 ~
 &p<&u44&0&p>~
-ciktu 20 128 800 0
+ciktu 20 128 800 0 0 0 0
 C
 200 300
 D
 5522 10 opq
-R
-16 2 1 64
-R
-19 2 1 0
-R
-26 2 1 0
-T 2917
 P
 3
+R
+6001 2 1 0
+R
+6790 2 1 0
+R
+6800 2 1 0
+T 2917
 S
 $

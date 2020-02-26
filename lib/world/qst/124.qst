@@ -6,7 +6,7 @@ pirates.
 ~
 Quartermaster Smeegle takes the lumber from you with a grin.
 ~
-4 bcd 50 150 -1
+5 bcd 50 150 -1
 A
 1 12403
 P
@@ -17,7 +17,7 @@ R
 6 12405 1
 T 12411
 W
-1 16 0 12 a
+1 6000 0 12 a
 W
 16 12401 0 1 a
 Z
@@ -31,7 +31,7 @@ promises of future gratitude.
 ~
 Smeegle grins from ear to green ear when you hand him the nails.
 ~
-4 bcd 50 150 -1
+5 bcd 50 150 -1
 A
 1 12403
 P
@@ -42,7 +42,7 @@ R
 6 12405 1
 T 12411
 W
-1 19 0 12 a
+1 6790 0 12 a
 W
 16 12401 0 1 a
 Z
@@ -155,10 +155,10 @@ S
 #12409
 A Deeper Evil~
    Fathma confides that she came down here not just for seafood and rare
-reagents, but to gain the honor of killing a great sea creature. 
+reagents, but to gain the honor of killing a great sea creature.
 Unfortunately, she has been stuck in this air bubble unable to stop casting for
 fear of running out of air. But if you kill one of the ocean's legendary
-denizens in her name, and she steals the credit, that will be close enough. 
+denizens in her name, and she steals the credit, that will be close enough.
 Hunt down one of the great creatures that dwells in these caverns, and slay it
 for her.
 ~

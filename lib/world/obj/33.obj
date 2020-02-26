@@ -115,8 +115,7 @@ The cornmeal can be cooked into various foods.
 3 0 a 0 2
 0 0 0
 7 168
-O
-8 0
+O+ 1 6300
 R
 5109 0
 R
@@ -168,11 +167,10 @@ a jar of olive oil~
 A jar of olive oil is sitting on the ground.~
 The olive oil looks rich.
 ~
-3 l a 0 4
+3 l a 0 5
 0 0 0
 6 168
-O
-20 u
+O+ 1 6322
 R
 5134 0
 R
@@ -189,8 +187,7 @@ Flour is used to bake bread.
 3 l a 0 2
 0 0 0
 7 168
-O
-8 0
+O+ 1 6300
 R
 5109 0
 R
@@ -787,8 +784,7 @@ wheat. It has been used since ancient times in crafting and construction.
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
-O
-7 eiu
+O+ 1 6422
 R
 5118 0
 R
@@ -1143,11 +1139,10 @@ There is a jar of lettuce seed oil here.~
    The jar has a sacred seal on top, as the oil inside is primarily used in
 ceremonies. It is made from the pressed seeds of the lettuce plant.
 ~
-3 l a 0 6
+3 l a 0 7
 0 0 0
 6 168
-O
-20 u
+O+ 1 6321
 R
 5134 0
 R
@@ -1189,8 +1184,7 @@ The coconut oil inside the jar is a rich yellow-orange color.
 3 0 a 0 8
 0 0 0
 6 168
-O
-20 u
+O+ 1 6320
 R
 5606 0
 R

@@ -5,7 +5,7 @@ A pen is lying here.~
    It's a ball-point pen with a clicking mechanism. When you 'click' the pen,
 it makes a very satisfying sound.
 ~
-3 0 a 2
+3 0 a 0 2
 0 0 0
 2 1440
 T 11500
@@ -16,7 +16,7 @@ a first place event trophy~
 A first place event trophy is standing here.~
 This trophy looks like it came from a first-place win!
 ~
-15 0 a 5
+15 0 a 0 5
 64 0 0
 4 0
 R
@@ -28,7 +28,7 @@ an event trophy~
 An event trophy is standing here.~
 This golden trophy must have come from a high-ranking event finish!
 ~
-15 0 a 6
+15 0 a 0 6
 32 0 0
 4 0
 R
@@ -40,7 +40,7 @@ a participation trophy~
 A participation trophy is sitting here.~
 It looks like the owner of this trophy participated in an event.
 ~
-15 0 a 7
+15 0 a 0 7
 16 0 0
 4 0
 R
@@ -59,7 +59,7 @@ can see details by typing 'event Supplies for the Guild'.
 (Keep this list so you can make the items. If you lose it, re-start any of the
 event quests.)
 ~
-3 k a 4
+3 k a 0 4
 0 0 0
 0 1152
 S
@@ -74,7 +74,7 @@ the swords are rather low-quality and will surely need replacing soon.
 Talk to your guildhall superintendant or to Nostrazak the Incautious to
 turn in these swords while the event is still running.
 ~
-3 ek a 3
+3 ek a 0 3
 0 0 0
 2 0
 S
@@ -89,7 +89,7 @@ to loot so many ancient treasures without them.
 Talk to your local guildmage or umbramancer to turn in these smudges while the
 event is still running.
 ~
-3 ek a 5
+3 ek a 0 5
 0 0 0
 0 0
 S
@@ -104,7 +104,7 @@ most decoys don't survive the process, so the Guild needs a lot of them.
 Talk to your guildhall librarian or tinker to turn in this decoy kit while
 the event is still running.
 ~
-3 ek a 4
+3 ek a 0 4
 0 0 0
 0 0
 S
@@ -116,7 +116,7 @@ The blueprints for a statue of an adventurer are here.~
 pick a good spot for it, because the blueprints crumble after the first use.
 You require the Architect ability to build this.
 ~
-3 g a 3
+3 g a 0 3
 0 0 0
 0 0
 S
@@ -126,7 +126,7 @@ a brown adventure hound whistle~
 A brown adventure hound whistle is hanging here.~
 This whistle grants you a new mini-pet! Type 'use whistle' to get it.
 ~
-19 p a 5
+19 p a 0 5
 11510 0 0
 0 0
 S
@@ -136,7 +136,7 @@ an adventurer's steed whistle~
 The whistle for an adventurer's steed is lying here.~
 This whistle can be used to summon an adventurer's steed.
 ~
-3 p a 7
+3 p a 0 7
 11511 0 0
 14 0
 T 9910
@@ -147,7 +147,7 @@ an adventurer's pegasus whistle~
 The whistle for an adventurer's pegasus is lying here.~
 This whistle can be used to summon an adventurer's flying pegasus.
 ~
-3 p a 8
+3 p a 0 8
 11512 0 0
 14 0
 T 9910
@@ -159,7 +159,7 @@ A small shipment of resources is sitting here.~
    This shipment of resources could contain almost anything. I wonder what's
 inside?
 ~
-3 0 a 4
+3 0 a 0 4
 20 10 0
 0 0
 T 11513
@@ -171,7 +171,7 @@ A great shipment of resources is sitting here.~
    This shipment could contain almost anything. I wonder what great resources
 you'll find inside?
 ~
-3 0 a 5
+3 0 a 0 5
 10 5 0
 0 0
 T 11514
@@ -183,7 +183,7 @@ A pair of brown adventuring boots is sitting here.~
    These leather boots are carved with arcane symbols, perhaps to protect you
 from whatever you might step in on your next adventure.
 ~
-2 mp ag 5
+2 mp ag 0 5
 0 0 0
 7 0
 A
@@ -202,7 +202,7 @@ A dragonskin canteen is lying here.~
    This canteen looks to be made from dragonskin, although it's quite thin and
 could as easily be snakeskin.
 ~
-5 p a 5
+5 p a 0 5
 224 224 11516
 7 0
 S
@@ -213,7 +213,7 @@ A dragonskin rucksack is lying here.~
    This pack appears to be made from dragonskin, but it's rather thin and might
 turn out to be plain old snakeskin.
 ~
-24 mp ar 2
+24 mp ar 0 2
 1 0 0
 7 0
 S
@@ -229,7 +229,7 @@ To summon your sprite-sniffing hog: &cwhistle hog&0
 To catch a pixy: &ccatch pixy&0
 To turn in pixies and dust for points at the Alchemist: &cexchange&0
 ~
-3 p a 9
+3 p a 0 9
 0 0 0
 8 0
 Q 11520
@@ -247,7 +247,7 @@ A little pixy dust is piled on the ground.~
 must still have the enchanted pixy jars to make the exchange. If you've lost
 your jars, re-start the Pixy Pursuit quest at the alchemist.
 ~
-3 k a 4
+3 k a 0 4
 10 0 0
 10 0
 S
@@ -260,7 +260,7 @@ pixy for Pixy Pursuit event points at an Alchemist. You must still have the
 enchanted pixy jars to make the exchange. If you've lost your jars, re-start
 the Pixy Pursuit quest at the alchemist.
 ~
-3 k a 3
+3 k a 0 3
 20 0 0
 8 0
 S
@@ -271,7 +271,7 @@ Some pixy droppings are scattered on the ground.~
    It looks like a pixy has been here recently. On closer inspection, it's
 mostly leaves and berries. Oh well; you'd better look somewhere else for now.
 ~
-3 0 0 2
+3 0 0 0 2
 0 0 0
 0 3
 S
@@ -283,7 +283,7 @@ Some flowing iridescent robes have been left here.~
 layers so that all you can see is a cascade of rainbows as the light twinkles
 off of them.
 ~
-2 p ad 7
+2 p ad 0 7
 0 0 0
 11 0
 A
@@ -314,7 +314,7 @@ A talking animal morphing stone is lying here.~
 if you have the Animal Forms ability.
 You can morph into: talking horse, talking bunny, singing bear
 ~
-3 p a 3
+3 p a 0 3
 0 0 0
 12 0
 S
@@ -324,7 +324,7 @@ an enchanted rainbow flying vehicle~
 An enchanted rainbow flying vehicle is here.~
 This rainbow has been enchanted to function almost like a flying carriage!
 ~
-3 p a 2
+3 p a 0 2
 0 0 0
 10 0
 T 11526
@@ -338,7 +338,7 @@ building a tiny pixy house. These houses are known to shrink anyone who enters
 them. Be warned, you can only use this schematic a single time.
 Usage: build pixyhouse <direction to face>
 ~
-3 g a 2
+3 g a 0 2
 0 0 0
 0 0
 S
@@ -348,7 +348,7 @@ a rainbow firefly minipet whistle~
 A rainbow firefly minipet whistle is lying here.~
 This whistle grants you a new mini-pet! Type 'use whistle' to get it.
 ~
-19 p a 6
+19 p a 0 6
 11528 0 0
 0 0
 S
@@ -358,7 +358,7 @@ a rainbow beetle mount whistle~
 The whistle for a rainbow beetle mount is lying here.~
 This whistle can be used to summon a giant rainbow beetle mount.
 ~
-3 p a 8
+3 p a 0 8
 11529 0 0
 14 0
 T 9910
@@ -369,7 +369,7 @@ a rainbow dragonfly mount whistle~
 The whistle for a rainbow dragonfly mount is lying here.~
 This whistle can be used to summon a giant rainbow dragonfly flying mount.
 ~
-3 p a 10
+3 p a 0 10
 11530 0 0
 14 0
 T 9910
@@ -383,7 +383,7 @@ tiny stitchwork and near-invisible seams. Elves of this sort are known to make
 shoes for impoverished and overworked shoemakers who make the right sacrifices
 under the new moon.
 ~
-2 mp ag 7
+2 mp ag 0 7
 0 0 0
 7 0
 A
@@ -404,7 +404,7 @@ There is an enchanted dewdrop on the ground.~
    This large drop of dew has been enchanted to hold itself together. You even
 seem to be able to carry it around without it spilling.
 ~
-5 p a 7
+5 p a 0 7
 224 224 11532
 7 0
 S
@@ -416,7 +416,7 @@ A wishing bag is lying here.~
 wishes it hears. You don't have the correct ability to put wishes in the bag,
 but it does look like it would hold a bunch of your stuff.
 ~
-24 mp ar 3
+24 mp ar 0 3
 1 0 0
 7 0
 S
@@ -428,7 +428,7 @@ Some elf-made ugprade dust is lying here.~
 used to upgrade the elf-made shoes and the wishing bag items.
 Usage: upgrade <item>
 ~
-3 p a 2
+3 p a 0 2
 0 0 0
 0 0
 T 11534
@@ -443,7 +443,7 @@ enchanted pixy jars to make the exchange. If you've lost your jars, re-start
 the Pixy Pursuit quest at the alchemist.
    Royal pixies are worth more points.
 ~
-3 k a 3
+3 k a 0 3
 30 0 0
 8 0
 S

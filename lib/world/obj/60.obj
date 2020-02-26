@@ -20,8 +20,7 @@ You attach $p in midair, where it seems to float.~
 M
 7
 $n attaches $p in midair, where it seems to float.~
-O
-16 g
+O+ 1 6001
 R
 5118 0
 S
@@ -31,7 +30,7 @@ some fine lumber~
 Some fine lumber is stacked here.~
 This is high-quality lumber, perfect for building or crafting fine things.
 ~
-3 e a 0 10
+3 e a 0 11
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -47,8 +46,7 @@ You position $p on the frame of $V.~
 M
 7
 $n positions $p on the frame of $V.~
-O
-16 g
+O+ 1 6002
 R
 5118 0
 S
@@ -67,8 +65,7 @@ $n hoists $p onto $V.~
 M
 6
 You hoist $p onto $V.~
-O
-21 u
+O+ 1 6015
 R
 5118 0
 S
@@ -87,8 +84,7 @@ $n hoists $p onto $V.~
 M
 6
 You hoist $p onto $V.~
-O
-21 du
+O+ 1 6016
 R
 5118 0
 S
@@ -99,7 +95,7 @@ A large pillar is lying here.~
    Pillars are used for all kinds of construction projects. Pillars of this
 size are also used as masts for ships.
 ~
-3 e a 0 10
+3 e a 0 11
 0 0 0
 0 0
 M
@@ -108,8 +104,7 @@ $n hoists $p onto $V.~
 M
 6
 You hoist $p onto $V.~
-O
-21 du
+O+ 1 6017
 R
 5118 0
 S
@@ -122,8 +117,7 @@ This sapling is long and straight, perfect for many crafts or buildings.
 3 0 a 0 5
 0 0 0
 0 0
-O
-25 qu
+O+ 1 6025
 R
 5118 0
 S
@@ -137,8 +131,7 @@ is of high quality.
 3 0 a 0 6
 0 0 0
 0 0
-O
-25 d
+O+ 1 6026
 R
 5118 0
 S
@@ -157,8 +150,7 @@ You heave $p into place.~
 M
 1
 $n heaves $p into place.~
-O
-3 u
+O+ 1 6075
 R
 5117 0
 S
@@ -177,8 +169,7 @@ You heave $p into place.~
 M
 1
 $n heaves $p into place.~
-O
-3 nu
+O+ 1 6077
 R
 5117 0
 S

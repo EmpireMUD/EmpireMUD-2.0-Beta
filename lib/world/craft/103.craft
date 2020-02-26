@@ -5,7 +5,7 @@ dragonscale leggings~
 R
 10006 3 0 0
 R
-15 4 1 32
+6530 4 1 0
 R
 103 6 0 0
 R
@@ -18,7 +18,7 @@ dragonweave stockings~
 R
 10006 3 0 0
 R
-15 4 1 32
+6530 4 1 0
 R
 103 6 0 0
 R
@@ -31,7 +31,7 @@ dragonplate breeches~
 R
 10006 3 0 0
 R
-15 4 1 32
+6530 4 1 0
 R
 104 6 0 0
 R
@@ -44,7 +44,7 @@ dragonmail chaps~
 R
 10006 3 0 0
 R
-15 4 1 32
+6530 4 1 0
 R
 104 6 0 0
 R
@@ -66,7 +66,7 @@ dragonscale wristguard~
 R
 10006 3 0 0
 R
-15 2 1 16384
+6521 2 1 0
 R
 177 10 0 0
 R
@@ -90,7 +90,7 @@ dragonscale bracers~
 R
 10006 3 0 0
 R
-15 2 1 16384
+6521 2 1 0
 R
 177 10 0 0
 R
@@ -103,7 +103,7 @@ dragonscale saddle~
 R
 10006 2 0 0
 R
-15 8 1 32
+6530 8 1 0
 R
 1206 6 0 0
 S

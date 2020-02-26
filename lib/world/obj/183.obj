@@ -428,11 +428,10 @@ A bundle of flax fibers lies on the ground.~
    The golden flax fibers have been bundled together, and could be woven into
 fine linen cloth.
 ~
-3 0 a 0 2
+3 0 a 0 3
 0 0 0
 0 0
-O
-7 ei
+O+ 1 6421
 R
 5137 0
 S
@@ -445,8 +444,7 @@ The small seeds aren't very good to eat, but can be pressed into linseed oil.
 6 b a 0 5
 2 18321 0
 0 96
-O
-23 0
+O+ 1 6181
 R
 5210 0
 S
@@ -457,11 +455,10 @@ A jar of linseed oil is sitting here.~
    The jar of linseed oil, which is made from flax, has been sealed for
 storage. It could be used for cooking or for vehicle maintenance.
 ~
-3 0 a 0 7
+3 0 a 0 8
 0 0 0
 6 168
-O
-20 u
+O+ 1 6321
 R
 5134 0
 R
@@ -486,8 +483,7 @@ You carefully hang some linen cloth on $V.~
 M
 7
 $n carefully hangs some linen cloth on $V.~
-O
-26 dh
+O+ 1 6800
 R
 5137 0
 R

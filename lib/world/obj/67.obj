@@ -7,8 +7,7 @@ This metal is some kind of mixed alloy. You can't identify it.
 3 0 a 0 7
 0 0 0
 2 0
-O
-18 u
+O+ 1 6700
 R
 5115 0
 S
@@ -18,11 +17,10 @@ some metal ore~
 Some metal ore has been left here.~
 This unrefined ore is hard to identify. It doesn't seem very pure.
 ~
-3 0 a 0 8
+3 0 a 0 9
 0 0 0
 2 0
-O
-18 u
+O+ 1 6701
 R
 5115 0
 S
@@ -35,8 +33,7 @@ This dull gray metal seems to be low-quality, but might still be useful.
 3 0 a 0 8
 0 0 0
 2 0
-O
-18 ju
+O+ 1 6710
 R
 5115 0
 S
@@ -49,8 +46,7 @@ This metal has a dull color but seems to be of good strength.
 3 0 a 0 9
 0 0 0
 2 0
-O
-18 su
+O+ 1 6720
 R
 5115 0
 S
@@ -63,8 +59,7 @@ This metal has a bright shine and high luster.
 3 0 a 0 10
 0 0 0
 2 0
-O
-18 k
+O+ 1 6730
 R
 5115 0
 S
@@ -77,8 +72,7 @@ This metal seems unusually strong and hard.
 3 0 a 0 9
 0 0 0
 2 0
-O
-18 ek
+O+ 1 6740
 R
 5115 0
 S
@@ -91,8 +85,7 @@ This metal looks quite valuable.
 3 0 a 0 10
 0 0 0
 2 0
-O
-18 km
+O+ 1 6750
 R
 5115 0
 S
@@ -105,8 +98,7 @@ The metal ingot seems to be glowing!
 3 0 a 0 11
 0 0 0
 2 0
-O
-18 gk
+O+ 1 6760
 R
 5115 0
 S

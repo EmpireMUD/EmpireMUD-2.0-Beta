@@ -173,7 +173,7 @@ forest, or get them by scraping trees.
 wonders aloud whether you'll be able to carry enough of them for the next part
 of the tutorial.
 ~
-18 a 0 25 -1
+19 a 0 25 -1
 A
 1 10802
 P
@@ -193,7 +193,7 @@ R
 W
 6 10800 0 1 a
 W
-1 25 0 20 a
+1 6025 0 20 a
 Z
 1 10802
 S
@@ -325,7 +325,7 @@ to build the whole forge.
 ~
 Rosemary inspects your building materials, and approves.
 ~
-24 a 0 25 -1
+25 a 0 25 -1
 A
 1 10802
 P
@@ -345,9 +345,9 @@ R
 W
 6 10800 0 1 a
 W
-1 16 0 6 a
+1 6000 0 6 a
 W
-1 22 0 10 a
+1 6050 0 10 a
 Z
 1 10802
 S
@@ -420,7 +420,7 @@ drop this quest by typing 'quest drop The Perfect Rock'.
 brass calipers, weighs it on the scale, and even tastes the top of it. But,
 this just isn't the right rock, so he tells you to keep it.
 ~
-14 0 0 25 0
+15 0 0 25 0
 P
 10 6 0 14
 R
@@ -428,7 +428,7 @@ R
 W
 10 6 0 14 a
 W
-1 22 0 1 a
+1 6050 0 1 a
 Z
 1 10826
 S
@@ -477,7 +477,7 @@ Note: Make sure you don't have Trade noskilled.
 ~
 Horation looks over each of the rocks and saplings, and seems to approve.
 ~
-23 0 0 25 -1
+24 0 0 25 -1
 A
 1 10826
 P
@@ -499,7 +499,7 @@ W
 W
 2 102 0 4 a
 W
-1 25 0 2 a
+1 6025 0 2 a
 Z
 1 10826
 S
@@ -614,7 +614,7 @@ Return to Horation when you have all the items.
    Horation examines the materials you collected, and determines them to be
 correct.
 ~
-28 0 0 25 -1
+29 0 0 25 -1
 A
 1 10826
 P
@@ -634,11 +634,11 @@ R
 W
 6 10825 0 1 a
 W
-1 15 16384 2 a
+1 6521 0 2 a
 W
-1 4 0 2 a
+1 6090 0 2 a
 W
-1 25 0 3 a
+1 6025 0 3 a
 Z
 1 10826
 S

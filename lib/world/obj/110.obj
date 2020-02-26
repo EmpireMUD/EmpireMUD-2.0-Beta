@@ -40,8 +40,7 @@ You notice the half-digested lobster tastes surprisingly good.~
 M
 5
 $n looks surprised at how good a half-digested giant lobster tastes as $e eats it.~
-O
-17 lt
+O+ 1 6203
 R
 5119 0
 S
@@ -53,7 +52,7 @@ Most of a dolphin carcass is rotting on the ground.~
 rotten smell of having been inside the stomach of a larger creature. And since
 the carcass isn't chewed, that creature must have been much larger indeed.
 ~
-6 e a 0 5
+6 e a 0 6
 48 0 0
 7 168
 M
@@ -62,8 +61,7 @@ You take a nauseating bite of the half-digested dolphin.~
 M
 5
 $n makes a sour face as $e eats a half-digested dolphin.~
-O
-17 lt
+O+ 1 6200
 R
 5119 0
 S
@@ -114,8 +112,7 @@ reagent that can be milled into a burnt zephyr salve.
 0 0 0
 0 0
 I 11 11015 100.00 1  # LIGHT: a burnt zephyr cattail
-O
-7 ip
+O+ 1 6421
 S
 #11010
 seeds handful purple~
@@ -127,8 +124,7 @@ them before.
 6 b a 0 2
 1 11011 0
 0 48
-O
-23 0
+O+ 1 6181
 S
 #11011
 eggplant~
@@ -140,8 +136,7 @@ are prized at market, as few dishes require more than one.
 6 b a 0 10
 8 11011 0
 7 168
-O
-27 bq
+O+ 1 6152
 R
 5114 0
 S
@@ -155,8 +150,7 @@ the size of a tomato.
 6 0 a 0 11
 2 0 0
 7 48
-O
-27 nq
+O+ 1 6142
 S
 #11013
 feather roc gigantic~
@@ -166,11 +160,10 @@ A gigantic roc feather is blowing around.~
 bird aloft. The feather is rust-colored and despite its size, it weighs next to
 nothing.
 ~
-3 0 a 0 3
+3 0 a 0 4
 0 0 0
 7 0
-O
-7 afp
+O+ 1 6443
 R
 5193 0
 R
@@ -187,8 +180,7 @@ light.
 3 0 a 0 1
 0 0 0
 0 0
-O
-11 g
+O+ 1 6600
 R
 5193 0
 R

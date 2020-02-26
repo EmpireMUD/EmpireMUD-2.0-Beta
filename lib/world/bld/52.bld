@@ -19,7 +19,7 @@ M
 R
 1009 1 5 0
 R
-16 1 1 1048576
+6000 1 1 0
 S
 #5201
 Burial Cavern~
@@ -88,9 +88,9 @@ mountainside, but the shafts of light that cut through the ceiling hint that
 this place is astonishingly large.
 ~
 R
-16 2 1 0
+6000 2 1 0
 R
-19 2 1 0
+6790 2 1 0
 S
 #5204
 Mountain Garrison~
@@ -104,7 +104,7 @@ stone alcoves to house its soldiers. Still, for a mountain empire that must
 always be at the ready, it provides a warm home for the soldiers.
 ~
 R
-3 2 1 0
+6075 2 1 0
 S
 #5205
 Mountain Lodge~
@@ -119,7 +119,7 @@ enough that as you look out the window, the only chill you feel is from gazing
 at the snowy mountaintops.
 ~
 R
-19 1 1 0
+6790 1 1 0
 R
 1003 1 5 0
 S
@@ -130,11 +130,11 @@ A Boardwalk Over the Shallows~
 16 0 dm 0
 0 0 0 -1
 R
-21 1 1 0
+6015 1 1 0
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5207
 River Fishery~
@@ -152,7 +152,7 @@ I 21 1312 100.00 1 f  # FISH: a speckled trout
 R
 1002 1 5 0
 R
-7 1 1 1048848
+6422 1 1 0
 S
 #5208
 Lake Fishery~
@@ -170,7 +170,7 @@ I 21 1312 100.00 1 f  # FISH: a speckled trout
 R
 1002 1 5 0
 R
-7 1 1 1048848
+6422 1 1 0
 S
 #5209
 Depository~
@@ -183,9 +183,9 @@ store (any storable item)~
 F
 J
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5210
 Seed Silo~

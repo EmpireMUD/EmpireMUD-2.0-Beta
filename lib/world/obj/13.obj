@@ -7,8 +7,7 @@ The seashell can be used in certain crafts and enchantments.
 3 l a 0 4
 0 0 0
 1 0
-O
-11 gu
+O+ 1 6600
 R
 5164 0
 S
@@ -21,8 +20,7 @@ You can eat the fish.
 6 kl a 0 3
 24 0 0
 7 168
-O
-17 lt
+O+ 1 6203
 R
 5119 0
 S
@@ -35,8 +33,7 @@ You can eat the fish.
 6 k a 0 3
 24 0 0
 7 168
-O
-17 lt
+O+ 1 6203
 R
 5119 0
 S
@@ -49,8 +46,7 @@ You can eat the fish.
 6 k a 0 3
 24 0 0
 7 168
-O
-17 lt
+O+ 1 6203
 R
 5119 0
 S
@@ -101,8 +97,7 @@ You hammer nails into $V.~
 M
 7
 $n hammers nails into $V.~
-O
-19 u
+O+ 1 6790
 R
 5134 0
 R
@@ -123,8 +118,6 @@ properties.
 0 0 0
 8 0
 I 26 808 100.00 1  # DECAYS-TO: a vial
-O
-5 0
 R
 5137 0
 S
@@ -146,8 +139,6 @@ You paint $V orange.~
 M
 7
 $n paints $V orange.~
-O
-5 0
 R
 5137 0
 S
@@ -193,8 +184,7 @@ You can eat the fish.
 6 k a 0 4
 24 0 0
 7 168
-O
-17 lt
+O+ 1 6203
 R
 5119 0
 S
@@ -207,8 +197,7 @@ You can eat the fish.
 6 k a 0 5
 24 0 0
 7 168
-O
-17 lt
+O+ 1 6203
 R
 5119 0
 S
@@ -221,8 +210,7 @@ You can eat the fish.
 6 k a 0 7
 24 0 0
 7 168
-O
-17 lt
+O+ 1 6203
 R
 5119 0
 S
@@ -235,8 +223,7 @@ You can eat the fish.
 6 k a 0 9
 24 0 0
 7 168
-O
-17 lt
+O+ 1 6203
 R
 5119 0
 S
@@ -249,8 +236,7 @@ You can eat the fish.
 6 k a 0 9
 24 0 0
 7 168
-O
-17 lt
+O+ 1 6203
 R
 5119 0
 S
@@ -263,8 +249,7 @@ You could eat the gator.
 6 k a 0 10
 24 0 0
 7 168
-O
-17 l
+O+ 1 6200
 R
 5119 0
 S
@@ -278,8 +263,7 @@ Skin can be tanned to make leather.
 0 0 0
 7 0
 I 18 1356 100.00 1  # TAN: a small piece of leather
-O
-24 ou
+O+ 1 6501
 R
 5120 0
 S
@@ -293,8 +277,7 @@ Skin can be tanned to make leather.
 0 0 0
 7 0
 I 18 1357 100.00 1  # TAN: a large piece of leather
-O
-24 fu
+O+ 1 6510
 R
 5120 0
 S
@@ -307,8 +290,7 @@ Fox fur is used in some types of clothing.
 3 0 a 0 3
 0 0 0
 7 0
-O
-10 ou
+O+ 1 6541
 R
 5120 0
 S
@@ -321,8 +303,7 @@ This pelt, from a dangerous big cat, can be made into fancy clothing.
 3 l a 0 3
 0 0 0
 7 0
-O
-10 fu
+O+ 1 6550
 R
 5120 0
 S
@@ -359,8 +340,7 @@ Leather can be sewn into armor.
 3 l a 0 3
 0 0 0
 7 0
-O
-15 ou
+O+ 1 6521
 R
 5134 0
 R
@@ -375,8 +355,7 @@ Leather can be sewn into armor.
 3 l a 0 3
 0 0 0
 7 0
-O
-15 fu
+O+ 1 6530
 R
 5120 0
 S
@@ -389,8 +368,7 @@ You can weave the wool into cloth.
 3 l a 0 6
 0 0 0
 7 0
-O
-7 ap
+O+ 1 6441
 R
 5137 0
 S
@@ -409,8 +387,7 @@ You hang some cloth on $V.~
 M
 7
 $n hangs some cloth on $V.~
-O
-26 hu
+O+ 1 6800
 R
 5137 0
 R
@@ -431,8 +408,7 @@ You hang some cloth on $V.~
 M
 7
 $n hangs some cloth on $V.~
-O
-26 hu
+O+ 1 6800
 R
 5137 0
 R
@@ -448,8 +424,7 @@ can be woven into llama fiber cloth.
 3 l a 0 3
 0 0 0
 7 0
-O
-7 ap
+O+ 1 6441
 R
 5137 0
 S
@@ -463,8 +438,7 @@ sew clothing.
 3 0 a 0 2
 0 0 0
 11 0
-O
-26 hu
+O+ 1 6800
 R
 5137 0
 R

@@ -383,11 +383,10 @@ A pineapple is sitting on the ground.~
    You can eat this succulent tropical fruit, or plant it. You'll have to plant
 it on partially-cleared jungle.
 ~
-6 bl a 0 3
+6 bl a 0 4
 12 10225 0
 7 168
-O
-9 fnr
+O+ 1 6133
 R
 5114 0
 S

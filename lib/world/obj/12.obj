@@ -13,8 +13,7 @@ You plant some whitegrass in a bed of moss.~
 M
 1
 $n plants some whitegrass in a bed of moss.~
-O
-14 u
+O+ 1 6650
 R
 5130 0
 S
@@ -33,8 +32,7 @@ You plant some fiveleaf cuttings and tie them to stakes.~
 M
 1
 $n plants some fiveleaf cuttings and ties them to stakes.~
-O
-14 u
+O+ 1 6650
 R
 5130 0
 S
@@ -53,8 +51,7 @@ You plant a twig of redthorn and pour some water around it.~
 M
 1
 $n plants a twig of redthorn and pours some water around it.~
-O
-14 u
+O+ 1 6650
 R
 5130 0
 S
@@ -73,8 +70,7 @@ You sprinkle shredded magewhisper sepals over fertilizer and watch as stems inst
 M
 1
 $n sprinkles shredded magewhisper sepals over fertilizer. You watch as stems instantly begin to grow.~
-O
-14 u
+O+ 1 6650
 R
 5130 0
 S
@@ -93,8 +89,7 @@ You plant a frond of daggerbite in some sand.~
 M
 1
 $n plants a frond of daggerbite in some sand.~
-O
-14 u
+O+ 1 6650
 R
 5130 0
 S
@@ -113,8 +108,7 @@ You plant some bileberries on a raft of twigs.~
 M
 1
 $n plants some bileberries on a raft of twigs.~
-O
-14 u
+O+ 1 6650
 R
 5130 0
 S
@@ -127,8 +121,7 @@ The iridescent flower can be used in certain crafts and enchantments.
 3 l a 0 5
 0 0 0
 0 0
-O
-11 gu
+O+ 1 6600
 R
 5164 0
 S
@@ -143,8 +136,7 @@ This is a distilled herb used to brew advanced potions.
 8 0
 I 26 801 100.00 1  # DECAYS-TO: a jar
 I 27 801 100.00 1  # CONSUMES-TO: a jar
-O
-14 m
+O+ 1 6651
 R
 5130 0
 S
@@ -159,8 +151,7 @@ This is a distilled herb used to brew advanced potions.
 8 0
 I 26 801 100.00 1  # DECAYS-TO: a jar
 I 27 801 100.00 1  # CONSUMES-TO: a jar
-O
-14 m
+O+ 1 6651
 R
 5130 0
 S
@@ -175,8 +166,7 @@ This is a distilled herb used to brew advanced potions.
 8 0
 I 26 801 100.00 1  # DECAYS-TO: a jar
 I 27 801 100.00 1  # CONSUMES-TO: a jar
-O
-14 m
+O+ 1 6651
 R
 5130 0
 S
@@ -191,8 +181,7 @@ This is a distilled herb used to brew advanced potions.
 8 0
 I 26 801 100.00 1  # DECAYS-TO: a jar
 I 27 801 100.00 1  # CONSUMES-TO: a jar
-O
-14 m
+O+ 1 6651
 R
 5130 0
 S
@@ -207,8 +196,7 @@ This is a distilled herb used to brew advanced potions.
 8 0
 I 26 801 100.00 1  # DECAYS-TO: a jar
 I 27 801 100.00 1  # CONSUMES-TO: a jar
-O
-14 m
+O+ 1 6651
 R
 5130 0
 S
@@ -223,8 +211,7 @@ This is a distilled herb used to brew advanced potions.
 8 0
 I 26 801 100.00 1  # DECAYS-TO: a jar
 I 27 801 100.00 1  # CONSUMES-TO: a jar
-O
-14 m
+O+ 1 6651
 R
 5130 0
 S

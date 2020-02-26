@@ -4,11 +4,10 @@ a little edible plant~
 A little edible plant is lying on the ground.~
 This looks like you could eat it, but you're not sure what it is.
 ~
-6 0 a 0 2
+6 0 a 0 3
 1 0 0
 7 48
-O
-27 n
+O+ 1 6100
 S
 #6110
 plants edible~
@@ -17,11 +16,10 @@ Some edible plants have been left here.~
    There's a good amount of edible plant material here, although you can't
 identify any of it.
 ~
-6 0 a 0 2
+6 0 a 0 3
 12 0 0
 7 48
-O
-27 b
+O+ 1 6110
 R
 5114 0
 S
@@ -34,8 +32,7 @@ This looks like you could eat it, but you're not sure what it is.
 6 0 a 0 2
 1 0 0
 7 48
-O
-9 n
+O+ 1 6120
 S
 #6121
 fruit magic small~
@@ -46,8 +43,7 @@ This little fruit glows with magical power.
 6 0 a 0 4
 1 0 0
 7 48
-O
-9 gn
+O+ 1 6121
 S
 #6122
 fruit temperate small~
@@ -58,8 +54,7 @@ This fruit looks like it was grown in a temperate region.
 6 0 a 0 3
 1 0 0
 7 48
-O
-9 nq
+O+ 1 6122
 S
 #6123
 fruit small tropical~
@@ -70,8 +65,7 @@ This fruit looks like it was grown in a tropical region.
 6 0 a 0 4
 1 0 0
 7 48
-O
-9 nr
+O+ 1 6123
 S
 #6124
 fruit desert small~
@@ -82,8 +76,7 @@ This fruit looks like it was grown in a desert region.
 6 0 a 0 5
 1 0 0
 7 48
-O
-9 cn
+O+ 1 6124
 S
 #6130
 fruit fresh~
@@ -95,8 +88,7 @@ any of it is.
 6 0 a 0 3
 12 0 0
 7 48
-O
-9 b
+O+ 1 6130
 R
 5114 0
 S
@@ -109,8 +101,7 @@ This fruit hovers near the ground, glowing. You're not really sure what it is.
 6 0 a 0 4
 12 0 0
 7 48
-O
-9 bg
+O+ 1 6131
 R
 5114 0
 S
@@ -123,8 +114,7 @@ This fruit looks like it comes from a temperate region.
 6 0 a 0 5
 12 0 0
 7 48
-O
-9 bq
+O+ 1 6132
 R
 5114 0
 S
@@ -137,8 +127,7 @@ This fruit looks like it comes from a tropical region.
 6 0 a 0 6
 12 0 0
 7 48
-O
-9 br
+O+ 1 6133
 R
 5114 0
 S
@@ -151,8 +140,7 @@ This fruit looks like it comes from a desert region.
 6 0 a 0 8
 12 0 0
 7 48
-O
-9 bc
+O+ 1 6134
 R
 5114 0
 S
@@ -165,8 +153,7 @@ This looks like you could eat it, but you're not sure what it is.
 6 0 a 0 3
 1 0 0
 7 48
-O
-27 n
+O+ 1 6140
 S
 #6141
 vegetable magic small~
@@ -177,8 +164,7 @@ This unidentifiable little vegetable is glowing!
 6 0 a 0 4
 1 0 0
 7 48
-O
-27 gn
+O+ 1 6141
 S
 #6142
 vegetable temperate small~
@@ -189,8 +175,7 @@ This vegetable looks like it was grown somewhere temperate.
 6 0 a 0 5
 1 0 0
 7 48
-O
-27 nq
+O+ 1 6142
 S
 #6143
 vegetable tropical small~
@@ -201,8 +186,7 @@ This vegetable looks like it was grown somewhere tropical.
 6 0 a 0 6
 1 0 0
 7 48
-O
-27 nr
+O+ 1 6143
 S
 #6144
 vegetable desert small~
@@ -213,8 +197,7 @@ This vegetable looks like it was grown somewhere arid.
 6 0 a 0 7
 1 0 0
 7 48
-O
-27 cn
+O+ 1 6144
 S
 #6150
 vegetables bunch~
@@ -226,8 +209,7 @@ identify any of it.
 6 0 a 0 3
 12 0 0
 7 48
-O
-27 b
+O+ 1 6150
 R
 5114 0
 S
@@ -240,8 +222,7 @@ These plants are glowing! You could make a fair amount of food from this.
 6 0 a 0 4
 12 0 0
 7 48
-O
-27 bg
+O+ 1 6151
 R
 5114 0
 S
@@ -254,8 +235,7 @@ These vegetables look like they were grown somewhere temperate.
 6 0 a 0 5
 12 0 0
 7 48
-O
-27 bq
+O+ 1 6152
 R
 5114 0
 S
@@ -268,8 +248,7 @@ These vegetables look like they were grown somewhere tropical.
 6 0 a 0 6
 12 0 0
 7 48
-O
-27 br
+O+ 1 6153
 R
 5114 0
 S
@@ -282,8 +261,7 @@ These vegetables look like they were grown somewhere warm.
 6 0 a 0 7
 12 0 0
 7 48
-O
-27 bc
+O+ 1 6154
 R
 5114 0
 S
@@ -296,8 +274,7 @@ You're not sure what this grain is but it doesn't look like you can eat it.
 3 0 a 0 3
 0 0 0
 0 1152
-O
-12 n
+O+ 1 6160
 S
 #6170
 grain bunch~
@@ -308,8 +285,7 @@ You're not sure what this grain is but it doesn't look like you can eat it.
 3 0 a 0 5
 0 0 0
 0 1152
-O
-12 b
+O+ 1 6170
 R
 5116 0
 S
@@ -319,11 +295,10 @@ some seeds~
 Some seeds are scattered here.~
 You can't tell where these seeds came from, but they probably aren't edible.
 ~
-3 0 a 0 3
+3 0 a 0 4
 0 0 0
 0 0
-O
-23 0
+O+ 1 6180
 S
 #6181
 seeds~
@@ -334,7 +309,6 @@ These seeds seem okay to eat.
 6 0 a 0 4
 1 0 0
 0 0
-O
-23 0
+O+ 1 6181
 S
 $

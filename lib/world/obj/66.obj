@@ -7,8 +7,7 @@ You can feel the gem buzzing with magical power.
 3 0 a 0 6
 0 0 0
 8 0
-O
-11 gu
+O+ 1 6600
 R
 5164 0
 S
@@ -21,8 +20,7 @@ The raw power of this gem is practically bursting through its cold, hard shell.
 3 0 a 0 7
 0 0 0
 8 0
-O
-11 gm
+O+ 1 6601
 R
 5164 0
 S
@@ -35,8 +33,7 @@ You can't quite tell what kind of herbs these are.
 3 0 a 0 5
 0 0 0
 0 0
-O
-14 u
+O+ 1 6650
 R
 5130 0
 S
@@ -47,11 +44,10 @@ There are some refined herbs here.~
    You can't quite tell what kind of herbs these are. They've been processed
 and refined, and seem to be good quality.
 ~
-3 0 a 0 7
+3 0 a 0 8
 0 0 0
 0 0
-O
-14 0
+O+ 1 6651
 R
 5130 0
 S

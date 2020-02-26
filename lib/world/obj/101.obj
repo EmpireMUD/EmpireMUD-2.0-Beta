@@ -441,8 +441,7 @@ fruit aroma wafts up from the basket, so they won't keep long before rotting.
 6 b a 0 8
 12 10146 0
 7 168
-O
-9 bc
+O+ 1 6134
 R
 5114 0
 S
@@ -455,8 +454,7 @@ This strange, spiny fruit has a sweet, earthy flavor.
 6 0 a 0 6
 1 0 0
 7 48
-O
-9 cn
+O+ 1 6124
 S
 #10148
 ribs pile saguaro~
@@ -481,8 +479,7 @@ You put some saguaro ribs in place and tie them down.~
 M
 7
 $n puts some saguaro ribs in place and ties them down.~
-O
-16 c
+O+ 1 6000
 R
 5118 0
 S
@@ -523,8 +520,7 @@ You hoist some mesquite lumber onto $V.~
 M
 7
 $n hoists some mesquite lumber onto $V.~
-O
-16 c
+O+ 1 6000
 R
 5118 0
 S
@@ -555,11 +551,10 @@ A handful of mesquite pods is scattered on the ground.~
    The mesquite pods are long, and filled with rock-hard beans. The pods have a
 sweet taste, but aren't very filling.
 ~
-3 b a 0 3
+3 b a 0 4
 0 10150 0
 0 0
-O
-23 0
+O+ 1 6180
 R
 5210 0
 S
@@ -575,8 +570,7 @@ seed. They aren't sweet, but have a creamy texture.
 12 10153 0
 7 168
 I 15 10154 100.00 4 x  # SEPARATE: a ripe alligator pear
-O
-27 bc
+O+ 1 6154
 R
 5619 0
 S
@@ -591,8 +585,7 @@ and creamy.
 2 0 0
 7 48
 I 14 10153 100.00 4 x  # COMBINE: a basket of alligator pears
-O
-27 cn
+O+ 1 6144
 S
 #10155
 limes basket~
@@ -610,8 +603,7 @@ You wince as you eat $p.~
 M
 5
 $n winces as $e eats $p.~
-O
-9 bc
+O+ 1 6134
 R
 5114 0
 S
@@ -631,8 +623,7 @@ You wince as you eat $p.~
 M
 5
 $n winces as $e eats $p.~
-O
-9 c
+O+ 1 6120
 S
 #10157
 melon firemelon maroon~
@@ -641,7 +632,7 @@ A maroon firemelon is rolling around on the ground.~
    This firemelon has a deep maroon hue, striped by brighter red. The melon is
 warm to the touch, and smells like cinnamon.
 ~
-6 bem a 0 11
+6 bem a 0 12
 12 10157 0
 7 336
 A
@@ -651,8 +642,7 @@ C
 M
 4
 You eat the firemelon and feel a burning in your stomach.~
-O
-9 cfn
+O+ 1 6134
 R
 5114 0
 S
@@ -663,7 +653,7 @@ A crimson firemelon is rolling around on the ground.~
    This firemelon has a bright crimson hue, striped by darker red. The melon is
 warm to the touch, and smells like cinnamon.
 ~
-6 bem a 0 12
+6 bem a 0 13
 12 10157 0
 7 336
 A
@@ -673,8 +663,7 @@ C
 M
 4
 You eat the firemelon and feel a burning in your stomach.~
-O
-9 cfn
+O+ 1 6134
 R
 5114 0
 S
@@ -754,8 +743,7 @@ the mesquite tree, which grows in the driest deserts.
 3 0 a 0 3
 0 0 0
 7 168
-O
-8 c
+O+ 1 6300
 R
 5109 0
 S
@@ -860,8 +848,7 @@ than the underlying structure.
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
-O
-25 c
+O+ 1 6025
 R
 5118 0
 S

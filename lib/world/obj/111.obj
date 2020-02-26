@@ -32,8 +32,7 @@ You can eat carrots, or plant them.
 12 11100 0
 7 168
 I 15 11103 100.00 4 x  # SEPARATE: a carrot
-O
-27 bq
+O+ 1 6152
 R
 5606 0
 S
@@ -43,12 +42,11 @@ a carrot~
 Someone dropped a large carrot here.~
 This is just one carrot, so it's not enough to plant, but it tastes good.
 ~
-6 0 a 0 5
+6 0 a 0 6
 1 0 0
 7 48
 I 14 11102 100.00 4 x  # COMBINE: a bunch of carrots
-O
-27 cn
+O+ 1 6142
 S
 #11104
 blackberries bunch berries~
@@ -60,8 +58,7 @@ You can eat blackberries, or plant them.
 12 11101 0
 7 168
 I 15 11105 100.00 4 x  # SEPARATE: a few blackberries
-O
-9 bq
+O+ 1 6132
 R
 5114 0
 S
@@ -75,8 +72,7 @@ This is just a few blackberries, so they're not enough to plant, but they taste 
 1 0 0
 7 48
 I 14 11104 100.00 4 x  # COMBINE: a bunch of blackberries
-O
-9 nq
+O+ 1 6122
 S
 #11106
 pears juicy~
@@ -88,8 +84,7 @@ You can eat pears, or plant them.
 12 11102 0
 7 168
 I 15 11107 100.00 4 x  # SEPARATE: a ripe pear
-O
-9 bq
+O+ 1 6132
 R
 5114 0
 S
@@ -103,8 +98,7 @@ This is just one pear, so it's not enough to plant, but it tastes good.
 2 0 0
 7 48
 I 14 11106 100.00 4 x  # COMBINE: some juicy pears
-O
-9 nq
+O+ 1 6122
 S
 #11108
 scarlet-feathered feathered scarlet hood~

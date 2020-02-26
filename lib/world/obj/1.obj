@@ -10,8 +10,7 @@ roads and build some buildings.
 1 il ano e 7
 0 2 5
 1 0
-O
-22 u
+O+ 1 6050
 R
 5117 0
 S
@@ -24,8 +23,7 @@ You can craft clay into pottery.
 3 l a 0 4
 0 0 0
 6 0
-O
-4 u
+O+ 1 6090
 R
 5110 0
 S
@@ -41,8 +39,7 @@ potential to be shaped into a powerful primitive weapon. Wield a rock and
 0 1 5
 5 0
 I 19 180 100.00 1  # CHIP: a chipped flint
-O
-22 u
+O+ 1 6050
 R
 5117 0
 S
@@ -55,8 +52,7 @@ The lightning stone can be used for certain crafts and enchantments.
 3 l a 0 4
 0 0 0
 1 0
-O
-11 gu
+O+ 1 6600
 R
 5164 0
 S
@@ -69,8 +65,7 @@ The bloodstone can be used for certain crafts and enchantments.
 3 l a 0 4
 0 0 0
 1 0
-O
-11 gu
+O+ 1 6600
 R
 5164 0
 S
@@ -89,8 +84,7 @@ You heave a huge stone block into place.~
 M
 1
 $n heaves a huge stone block into place.~
-O
-3 nu
+O+ 1 6077
 R
 5117 0
 S
@@ -106,8 +100,7 @@ obsidian shows through. Obsidian forms a cutting edge like no other stone. Use
 0 2 5
 8 0
 I 19 182 100.00 1  # CHIP: a sharpened piece of obsidian
-O
-22 u
+O+ 1 6050
 R
 5117 0
 S
@@ -121,8 +114,7 @@ blower. From there, you can blow it into all kinds of useful glassware.
 3 l a 0 10
 0 0 0
 1 0
-O
-32 u
+O+ 1 6085
 R
 5117 0
 R
@@ -138,8 +130,7 @@ transparent. You could craft it into various things at a glass blower.
 3 l a 0 8
 0 0 0
 8 0
-O
-33 lu
+O+ 1 6831
 R
 5135 0
 S
@@ -181,14 +172,13 @@ Some sticks and leaves are piled here.~
    It's a small pile of plant debris. It might be useful for crafting or
 building.
 ~
-3 l a 0 5
+3 l a 0 6
 0 0 0
 0 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: a torch
-O
-7 eiqu
+O+ 1 6423
 R
 5118 0
 S
@@ -242,8 +232,7 @@ $n hoists a log onto $V.~
 M
 6
 You hoist a log onto $V.~
-O
-21 u
+O+ 1 6015
 R
 5118 0
 S
@@ -269,8 +258,7 @@ You position some lumber on the frame of $V.~
 M
 7
 $n positions some lumber on the frame of $V.~
-O
-16 u
+O+ 1 6000
 R
 5118 0
 R
@@ -298,8 +286,7 @@ You attach some rough boards to the frame of $V.~
 M
 7
 $n attaches some rough boards to the frame of $V.~
-O
-16 u
+O+ 1 6000
 R
 5118 0
 R
@@ -328,8 +315,7 @@ You hoist a bound wooden column onto $V.~
 M
 7
 $n hoists a bound wooden column onto $V.~
-O
-21 u
+O+ 1 6015
 R
 5118 0
 S
@@ -360,7 +346,7 @@ a fine wooden pillar~
 A fine wooden pillar is lying here.~
 This pillar can be used in construction, or sawn into lumber.
 ~
-3 e a 0 6
+3 e a 0 7
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -378,8 +364,7 @@ You hoist a fine wooden pillar onto $V.~
 M
 7
 $n hoists a fine wooden pillar onto $V.~
-O
-21 u
+O+ 1 6016
 R
 5118 0
 R
@@ -392,7 +377,7 @@ Some fine tropical lumber is stacked here.~
    This exotic lumber looks like it was cut from the darkest of jungles. It can
 be used for construction and exquisite crafts.
 ~
-3 e a 0 6
+3 e a 0 7
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -408,8 +393,7 @@ You position some lumber on the frame of $V.~
 M
 7
 $n positions some lumber on the frame of $V.~
-O
-16 u
+O+ 1 6002
 R
 5118 0
 R
@@ -428,8 +412,7 @@ to build a simple hut, or carved into a handle, or fashioned into an arrow.
 C
 1 1
 I 11 184 100.00 1  # LIGHT: a torch
-O
-25 qu
+O+ 1 6025
 R
 5118 0
 S
@@ -446,8 +429,7 @@ building.
 C
 1 1
 I 11 184 100.00 1  # LIGHT: a torch
-O
-7 ceiu
+O+ 1 6422
 R
 5118 0
 S
@@ -458,13 +440,12 @@ A tangle of vines is piled on the ground.~
    This tangle of vines must have come from an incredible jungle. It's a small
 pile of plant debris. It might be useful for crafting or building.
 ~
-3 l a 0 7
+3 l a 0 8
 0 0 0
 0 0
 C
 1 1
-O
-7 ipru
+O+ 1 6424
 R
 5118 0
 S
@@ -482,8 +463,7 @@ or carved into a handle.
 C
 1 1
 I 11 184 100.00 1  # LIGHT: a torch
-O
-25 cu
+O+ 1 6025
 R
 5118 0
 S
@@ -501,8 +481,7 @@ building, or carved into a handle.
 C
 1 1
 I 11 184 100.00 1  # LIGHT: a torch
-O
-25 ru
+O+ 1 6025
 R
 5118 0
 S
@@ -519,8 +498,7 @@ would be just as useful as a young sapling for building or crafting.
 C
 1 1
 I 11 184 100.00 1  # LIGHT: a torch
-O
-25 u
+O+ 1 6025
 R
 5118 0
 S
@@ -576,8 +554,7 @@ You stand the mast on $V.~
 M
 7
 $n stands the mast on $V.~
-O
-21 f
+O+ 1 6017
 R
 5118 0
 R
@@ -592,8 +569,7 @@ Wheat can be milled into flour, or planted.
 3 bl a 0 2
 0 1 0
 7 168
-O
-12 bq
+O+ 1 6170
 R
 5116 0
 S
@@ -624,8 +600,7 @@ Weave cotton into cloth.
 3 bl a 0 3
 0 4 0
 7 0
-O
-7 ip
+O+ 1 6421
 R
 5137 0
 S
@@ -644,20 +619,20 @@ You stock the store room with $p.~
 M
 1
 $n stocks the store room with $p.~
-O
-12 bq
+O+ 1 6170
 R
 5116 0
 S
 #160
-ironore ore iron piece~
+iron-ore ore iron piece~
 some iron ore~
 A piece of iron ore has fallen to the ground.~
 Iron is used for forging and building.
 ~
-3 l a 0 3
+3 l a 0 5
 0 0 0
 2 0
+O+ 1 6701
 R
 5115 0
 S
@@ -686,50 +661,54 @@ R
 5611 a
 S
 #163
-nocturniumore nocturnium ore chunk~
+nocturnium-ore nocturnium ore chunk~
 some nocturnium ore~
 A chunk of nocturnium ore has fallen to the ground.~
 Nocturnium ore is used in forging high-quality armor and weapons.
 ~
-3 l a 0 5
+3 l a 0 7
 0 0 0
 2 0
+O+ 1 6701
 R
 5115 0
 S
 #164
-imperiumore imperium ore glistening hunk~
+imperium-ore imperium ore glistening hunk~
 some imperium ore~
 A glistening hunk of imperium ore is sitting here.~
 Imperium ore is used in forging high-quality armor and weapons.
 ~
-3 l a 0 3
+3 l a 0 5
 0 0 0
 2 0
+O+ 1 6701
 R
 5115 0
 S
 #165
-copperore ore copper pile~
+copper-ore ore copper pile~
 some copper ore~
 Some copper ore is piled on the ground.~
 Copper ore can be smelted into ingots and bars.
 ~
-3 l a 0 2
+3 l a 0 4
 0 0 0
 13 0
+O+ 1 6701
 R
 5115 0
 S
 #166
-tinore ore tin pile~
+tin-ore ore tin pile~
 some tin ore~
 Some tin ore is piled on the ground.~
 Tin ore can be smelted into ingots, which are then used to make bronze.
 ~
-3 l a 0 3
+3 l a 0 5
 0 0 0
 2 0
+O+ 1 6701
 R
 5115 0
 S
@@ -743,8 +722,7 @@ copper to make bronze.
 3 l a 0 6
 0 0 0
 2 0
-O
-18 ju
+O+ 1 6710
 R
 5115 0
 S
@@ -758,8 +736,7 @@ many different tools and armors.
 3 l a 0 6
 0 0 0
 13 0
-O
-18 su
+O+ 1 6720
 R
 5115 0
 S
@@ -773,8 +750,7 @@ bars. They can be stored in your vault to add to your wealth.
 15 l a 0 7
 4 0 0
 3 0
-O
-18 dk
+O+ 1 6750
 R
 5611 a
 S
@@ -788,8 +764,7 @@ of gold. They can be stored in the vault to add to your wealth.
 15 l a 0 8
 6 0 0
 4 0
-O
-18 dk
+O+ 1 6750
 R
 5611 a
 S
@@ -804,8 +779,7 @@ bar back into ingots for crafting.
 10 1 0
 3 0
 I 15 170 100.00 2 s  # SEPARATE: a silver ingot
-O
-18 dm
+O+ 1 6750
 R
 5611 a
 S
@@ -820,8 +794,7 @@ bar back into ingots for crafting.
 16 1 0
 4 0
 I 15 171 100.00 2 s  # SEPARATE: a gold ingot
-O
-18 dm
+O+ 1 6750
 R
 5611 a
 S
@@ -846,8 +819,7 @@ Iron is used for forging and building.
 3 l a 0 3
 0 0 0
 2 0
-O
-18 su
+O+ 1 6720
 R
 5115 0
 S
@@ -866,8 +838,7 @@ You pour molten nocturnium into a ring around the base of the building.~
 M
 1
 $n pours molten nocturnium into a ring around the base of the building.~
-O
-18 k
+O+ 1 6730
 R
 5115 0
 S
@@ -886,8 +857,7 @@ You install imperium locks on the doors.~
 M
 1
 $n installs imperium locks on the doors.~
-O
-18 k
+O+ 1 6730
 R
 5115 0
 S
@@ -901,8 +871,7 @@ or smelted with tin to make bronze ingots.
 3 l a 0 4
 0 0 0
 13 0
-O
-18 ju
+O+ 1 6710
 R
 5115 0
 S
@@ -916,8 +885,7 @@ Store the copper bar in your vault to gain wealth.
 1 1 0
 13 0
 I 15 178 100.00 2 s  # SEPARATE: a copper ingot
-O
-18 m
+O+ 1 6750
 R
 5115 a
 R

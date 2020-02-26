@@ -7,8 +7,7 @@ This spotted fur looks like it must have come from some exotic cat.
 3 0 a 0 4
 0 0 0
 7 0
-O
-10 ou
+O+ 1 6541
 R
 5120 0
 S
@@ -18,13 +17,12 @@ a large ostrich feather~
 A large ostrich feather is lying here.~
 This feather is so large you could almost stuff a pillow with it alone.
 ~
-3 0 a 0 7
+3 0 a 0 8
 0 0 0
 7 0
 C
 1 1
-O
-7 apu
+O+ 1 6443
 R
 5137 0
 S
@@ -35,11 +33,10 @@ A set of pronged horns are lying here.~
    These odd bifurcated horns can only have come from the pronghorn. Perhaps
 they could be used for crafts.
 ~
-3 0 a 0 4
+3 0 a 0 5
 0 0 0
 14 0
-O
-2 u
+O+ 1 6562
 R
 5120 0
 S
@@ -49,11 +46,10 @@ a huge antler~
 A huge antler is lying here.~
 This antler must have come from a truly enormous animal!
 ~
-3 e a 0 3
+3 e a 0 4
 0 0 0
 14 0
-O
-2 u
+O+ 1 6561
 R
 5120 0
 S
@@ -64,11 +60,10 @@ A rare rhinoceros horn is lying here.~
    This exotic conical horn comes from a rhinoceros. Due to their rarity, the
 horns are quite expensive.
 ~
-15 0 a 0 9
+15 0 a 0 10
 8 0 0
 14 0
-O
-2 k
+O+ 1 6562
 R
 5193 a
 S
@@ -81,8 +76,7 @@ The long, elegantly curved ivory tusk must have come from a great elephant.
 15 e a 0 8
 4 0 0
 14 0
-O
-2 fk
+O+ 1 6563
 R
 5193 a
 S
@@ -92,11 +86,10 @@ a common rhinoceros horn~
 A rhinoceros horn is lying here.~
 The horn is cracked, but should still fetch a decent price.
 ~
-15 0 a 0 11
+15 0 a 0 12
 1 0 0
 14 0
-O
-2 k
+O+ 1 6562
 R
 5193 a
 S
@@ -133,11 +126,10 @@ warts before branching smoothly into a half-dozen, widely-spaced prongs.
 
 Forge (Deadly Weapons): reindeer antler dagger
 ~
-3 e a 0 4
+3 e a 0 5
 0 0 0
 14 0
-O
-2 u
+O+ 1 6561
 R
 5120 0
 S
@@ -171,8 +163,7 @@ Sew (Dangerous Leathers): polar bear cloak
 3 e a 0 3
 0 0 0
 7 0
-O
-10 f
+O+ 1 6550
 R
 5120 0
 S
@@ -221,8 +212,7 @@ Sew (Dangerous Leathers): wolverine fur cap
 3 0 a 0 3
 0 0 0
 7 0
-O
-10 o
+O+ 1 6541
 R
 5120 0
 S
@@ -272,8 +262,7 @@ Sew (Dangerous Leathers): sealskin leggings
 3 e a 0 4
 0 0 0
 7 0
-O
-24 fk
+O+ 1 6510
 R
 5120 0
 S

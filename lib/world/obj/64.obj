@@ -8,8 +8,7 @@ them for crafting.
 3 0 a 0 2
 0 0 0
 0 0
-O
-7 u
+O+ 1 6400
 R
 5137 0
 S
@@ -20,11 +19,10 @@ Some soft fibers are scattered here.~
    You aren't sure what these fibers came from, but you might be able to use
 them for crafting.
 ~
-3 0 a 0 2
+3 0 a 0 3
 0 0 0
 0 0
-O
-7 pu
+O+ 1 6401
 R
 5137 0
 S
@@ -35,11 +33,10 @@ Some stiff fibers are scattered here.~
    You aren't sure what these fibers came from, but you might be able to use
 them for crafting.
 ~
-3 0 a 0 4
+3 0 a 0 5
 0 0 0
 0 0
-O
-7 eu
+O+ 1 6402
 R
 5118 0
 S
@@ -50,11 +47,10 @@ Some plant fibers are lying on the ground.~
    You aren't sure what these fibers came from, but you might be able to use
 them for crafting.
 ~
-3 0 a 0 3
+3 0 a 0 4
 0 0 0
 0 0
-O
-7 iu
+O+ 1 6420
 R
 5118 0
 S
@@ -68,8 +64,7 @@ them for crafting.
 3 0 a 0 4
 0 0 0
 0 0
-O
-7 ipu
+O+ 1 6421
 R
 5118 0
 S
@@ -83,8 +78,7 @@ them for crafting.
 3 0 a 0 5
 0 0 0
 0 0
-O
-7 eiu
+O+ 1 6422
 R
 5118 0
 S
@@ -94,11 +88,10 @@ some sticks~
 Some sticks are lying on the ground.~
 These sticks could be used for various crafts.
 ~
-3 0 a 0 6
+3 0 a 0 7
 0 0 0
 0 0
-O
-7 eiu
+O+ 1 6423
 R
 5118 0
 S
@@ -109,11 +102,10 @@ Some animal fibers are lying here.~
    You aren't sure what these fibers came from, but you might be able to use
 them for crafting.
 ~
-3 0 a 0 3
+3 0 a 0 4
 0 0 0
 7 0
-O
-7 apu
+O+ 1 6440
 R
 5137 0
 S
@@ -126,8 +118,7 @@ You can weave the wool into cloth.
 3 0 a 0 7
 0 0 0
 7 0
-O
-7 ap
+O+ 1 6441
 R
 5137 0
 S
@@ -137,11 +128,10 @@ a large feather~
 A large feather is standing out of the ground.~
 This feather is so large you could almost stuff a pillow with it alone.
 ~
-3 0 a 0 9
+3 0 a 0 10
 0 0 0
 7 0
-O
-7 apu
+O+ 1 6443
 R
 5137 0
 S

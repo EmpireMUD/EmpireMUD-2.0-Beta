@@ -664,8 +664,7 @@ Perhaps you could plant them...
 6 b a 0 12
 1 12687 0
 10 168
-O
-31 0
+O+ 1 6340
 S
 #12687
 candy cotton bunch~
@@ -697,8 +696,7 @@ You hang some candy cloth on $V.~
 M
 7
 $n hangs some candy cloth on $V.~
-O
-26 h
+O+ 1 6800
 R
 5193 0
 R
