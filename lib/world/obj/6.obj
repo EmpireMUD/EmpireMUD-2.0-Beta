@@ -44,7 +44,7 @@ R
 5164 0
 S
 #603
-tree trees enchanted~
+enchanted-tree tree trees enchanted~
 an enchanted tree~
 An enchanted tree is lying here, leaking mana from its stump.~
    This bright pink tree must have come from an enchanted forest. Lumber from
@@ -131,7 +131,7 @@ R
 5120 0
 S
 #608
-leather leathers shimmering piece~
+shimmering-leather leathers shimmering piece~
 a piece of shimmering leather~
 A large piece of shimmering leather is lying here.~
    This large piece of leather tanned from the skin of a magical beast glows
@@ -161,7 +161,7 @@ R
 5115 0
 S
 #610
-argentineingot argentine ingots~
+argentine-ingot argentine ingots~
 an argentine ingot~
 An argentine ingot is stacked here.~
    The ingot is almost pure white, perhaps more silver than silver itself.
@@ -176,7 +176,7 @@ R
 5115 0
 S
 #611
-eventideingot ingots eventide~
+eventide-ingot ingots eventide~
 an eventide ingot~
 An eventide ingot is stacked here.~
    This ingot is blue-black like the sky at midnight, and what little light
@@ -224,7 +224,7 @@ R
 5137 0
 S
 #614
-briarhide hide briar pile leathers~
+briar-hide hide briar pile leathers~
 some briar hide~
 A pile of briar hide is precariously stacked here.~
    Briar hide is leather that has been magically treated with redthorn until
@@ -239,7 +239,7 @@ R
 5120 0
 S
 #615
-absinthianleather leather absinthian pile leathers~
+absinthian-leather leather absinthian pile leathers~
 absinthian leather~
 A pile of absinthian leather seethes on the ground.~
    Absinthian leather is an exotic hide, treated with bileberries until its

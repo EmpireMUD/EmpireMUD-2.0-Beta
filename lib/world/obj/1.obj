@@ -637,7 +637,7 @@ R
 5115 0
 S
 #161
-silvernugget nugget silver~
+silver-nugget nugget silver~
 a silver nugget~
 A silver nugget has fallen to the ground.~
 Silver can be melted down for money.
@@ -649,7 +649,7 @@ R
 5611 a
 S
 #162
-golddust dust gold pile sparkling~
+gold-dust dust gold pile sparkling~
 a pile of gold dust~
 Some sparkling gold dust is scattered across the ground.~
 Gold can be melted down for money.
@@ -713,7 +713,7 @@ R
 5115 0
 S
 #167
-tiningot tin ingots~
+tin-ingot tin ingots~
 a tin ingot~
 A tin ingot is stacked here.~
    The tin has a bright white color. Tin ingots are primarily smelted with
@@ -727,7 +727,7 @@ R
 5115 0
 S
 #168
-bronzeingot bronze ingots~
+bronze-ingot bronze ingots~
 a bronze ingot~
 A bronze ingot is stacked here.~
    The bronze has a rich, brown color and a fine finish. Bronze is used to make
@@ -741,7 +741,7 @@ R
 5115 0
 S
 #170
-silveringot silver ingots~
+silver-ingot silver ingots~
 a silver ingot~
 A silver ingot is stacked here.~
    Ingots are used in crafting, but aren't as valuable as the larger silver
@@ -755,7 +755,7 @@ R
 5611 a
 S
 #171
-goldingot gold ingots~
+gold-ingot gold ingots~
 a gold ingot~
 A gold ingot is stacked here.~
    Ingots are usually used in crafting, and aren't as valuable as larger bars
@@ -769,7 +769,7 @@ R
 5611 a
 S
 #172
-silverbar bars silver~
+silver-bar bars silver~
 a silver bar~
 A bar of silver has been left on the ground.~
    Store the silver bar in your vault to gain wealth. You can also separate the
@@ -784,7 +784,7 @@ R
 5611 a
 S
 #173
-goldbar bars gold~
+gold-bar bars gold~
 a gold bar~
 A bar of gold is lying on the ground.~
    Store the gold bar in your vault to gain wealth. You can also separate the
@@ -799,7 +799,7 @@ R
 5611 a
 S
 #174
-goldflake flake golden small~
+gold-flake flake golden small~
 a small flake of gold~
 A small golden flake is lying here.~
 You can smelt 8 gold flakes into an ingot using 'smelt gold flake ingot'.
@@ -811,7 +811,7 @@ R
 5611 a
 S
 #175
-ironingot ingots iron~
+iron-ingot ingots iron~
 an iron ingot~
 An iron ingot is sitting on the ground.~
 Iron is used for forging and building.
@@ -824,7 +824,7 @@ R
 5115 0
 S
 #176
-nocturniumingot ingots nocturnium~
+nocturnium-ingot ingots nocturnium~
 an ingot of nocturnium~
 A nocturnium ingot is sitting on the ground.~
 Nocturnium ore is used in forging high-quality armor and weapons.
@@ -843,7 +843,7 @@ R
 5115 0
 S
 #177
-imperiumingot ingots imperium~
+imperium-ingot ingots imperium~
 an imperium ingot~
 An imperium ingot is sitting on the ground.~
 Imperium ore is used in forging high-quality armor and weapons.
@@ -862,7 +862,7 @@ R
 5115 0
 S
 #178
-copperingot copper ingots~
+copper-ingot copper ingots~
 a copper ingot~
 A copper ingot is sitting here.~
    Copper ingots can be made into bars (to be stored in the vault, for wealth),
@@ -876,7 +876,7 @@ R
 5115 0
 S
 #179
-copperbar bars copper~
+copper-bar bars copper~
 a copper bar~
 A bar of copper has been left here.~
 Store the copper bar in your vault to gain wealth.
