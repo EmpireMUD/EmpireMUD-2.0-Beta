@@ -1470,7 +1470,7 @@ void do_chore_brickmaking(empire_data *emp, room_data *room) {
 void do_chore_building(empire_data *emp, room_data *room, int mode) {
 	void finish_building(char_data *ch, room_data *room);
 	void finish_maintenance(char_data *ch, room_data *room);
-	void remove_like_component_from_built_with(struct resource_data **built_with, int cmp_type);
+	void remove_like_component_from_built_with(struct resource_data **built_with, obj_data *obj);
 	void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 	
 	char_data *worker = find_chore_worker_in_room(room, chore_data[mode].mob);
@@ -1516,7 +1516,7 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 			else if (res->type == RES_COMPONENT) {
 				if (mode == CHORE_MAINTENANCE) {
 					// remove an older matching component
-					remove_like_component_from_built_with(&GET_BUILT_WITH(room), res->vnum);
+					remove_like_component_from_built_with(&GET_BUILT_WITH(room), obj_proto(res->vnum));
 				}
 				charge_stored_component(emp, islid, res->vnum, 1, FALSE, &GET_BUILT_WITH(room));
 			}
