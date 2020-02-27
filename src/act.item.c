@@ -342,17 +342,20 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
+	extern struct gen_craft_data_t gen_craft_data[];
 	extern const char *size_types[];
 	extern const char *tool_flags[];
 	extern const char *wear_bits[];
 
 	struct obj_storage_type *store;
+	craft_data *craft, *next_craft;
 	struct custom_message *ocm;
 	struct player_eq_set *pset;
 	player_index_data *index;
 	struct eq_set_obj *oset;
 	struct obj_apply *apply;
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH], *temp;
+	size_t size, line_size, part_size;
 	generic_data *comp = NULL;
 	obj_data *proto;
 	crop_data *cp;
@@ -627,9 +630,30 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "Component type: %s%s\r\n", GEN_NAME(comp), GEN_FLAGGED(comp, GEN_BASIC) ? " (basic)" : "");
 	
 		if (GEN_COMPUTED_RELATIONS(comp)) {
-			get_generic_relation_display(GEN_COMPUTED_RELATIONS(comp), FALSE, lbuf, "Can be used as:");
+			get_generic_relation_display(GEN_COMPUTED_RELATIONS(comp), FALSE, lbuf, "Can be used as: ");
 			msg_to_char(ch, "%s", lbuf);
 		}
+	}
+	
+	// recipes
+	size = line_size = snprintf(lbuf, sizeof(lbuf), "Allows: ");
+	any = FALSE;
+	HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
+		if (GET_CRAFT_REQUIRES_OBJ(craft) == GET_OBJ_VNUM(obj)) {
+			part_size = snprintf(part, sizeof(part), "%s %s", gen_craft_data[GET_CRAFT_TYPE(craft)].command, GET_CRAFT_NAME(craft));
+			
+			if (line_size + part_size + 2 >= 80 && part_size < 75) {
+				size += snprintf(lbuf + size, sizeof(lbuf) - size, ",\r\n%s", part);
+				line_size = part_size;
+			}
+			else {
+				size += snprintf(lbuf + size, sizeof(lbuf) - size, ", %s", part);
+				line_size += part_size;
+			}
+		}
+	}
+	if (any) {
+		msg_to_char(ch, "%s\r\n", lbuf);
 	}
 	
 	// some custom messages
