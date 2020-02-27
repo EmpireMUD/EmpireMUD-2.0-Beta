@@ -389,14 +389,8 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		*location = '\0';
 	}
 	
-	// component info
-	*part = '\0';
-	if (GET_OBJ_COMPONENT(obj) != NOTHING && (comp = find_generic(GET_OBJ_COMPONENT(obj), GENERIC_COMPONENT))) {
-		sprintf(part, " (%s)", GEN_NAME(comp));
-	}
-	
 	// basic info
-	snprintf(lbuf, sizeof(lbuf), "Your analysis of $p%s%s reveals:", part, location);
+	snprintf(lbuf, sizeof(lbuf), "Your analysis of $p%s reveals:", location);
 	act(lbuf, FALSE, ch, obj, NULL, TO_CHAR);
 	
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
@@ -628,10 +622,14 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "Modifiers: %s\r\n", lbuf);
 	}
 	
-	// more component data
-	if (comp && GEN_COMPUTED_RELATIONS(comp)) {
-		get_generic_relation_display(GEN_COMPUTED_RELATIONS(comp), FALSE, lbuf, "Can be used as: ");
-		msg_to_char(ch, "%s", lbuf);
+	// component info
+	if (GET_OBJ_COMPONENT(obj) != NOTHING && (comp = find_generic(GET_OBJ_COMPONENT(obj), GENERIC_COMPONENT))) {
+		msg_to_char(ch, "Component type: %s%s\r\n", GEN_NAME(comp), GEN_FLAGGED(comp, GEN_BASIC) ? " (basic)" : "");
+	
+		if (GEN_COMPUTED_RELATIONS(comp)) {
+			get_generic_relation_display(GEN_COMPUTED_RELATIONS(comp), FALSE, lbuf, "Can be used as:");
+			msg_to_char(ch, "%s", lbuf);
+		}
 	}
 	
 	// some custom messages
