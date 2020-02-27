@@ -24,13 +24,16 @@ good spot and be sure to check on it regularly.
 
 See also: ADVANCED WOODWORKING, APIARY, DRAG
 #
-BONES "BONE COMPONENT"
+BONES "BONE COMPONENT" ANTLERS HORNS IVORY
 
 Bone (component)
 
 Used for:  nothing (yet)
 
-Bone is a component type.
+Bone is a component type used in many crafts. Sub-types of bone include:
+  antler (basic)
+  horn (basic)
+  ivory
 
 See also: COMPONENT
 #
@@ -152,7 +155,7 @@ See also: POTTERY, HESTIAN TRINKET
 #
 "COOKED MEAT COMPONENT" "COOKED POULTRY" "COOKED FISH" "COOKED RED MEAT" "COOKED MEAL" "VEGETARIAN MEAL" "COOKED VEGETARIAN MEAL" MEAL
 
-Cooked Meat, Cooked Meal (components)
+Cooked meat, cooked meal (components)
 
 Used for:  food
 
@@ -181,7 +184,9 @@ The first tier of crafter items comes at level 100:
 
 See also: CRAFT, ENCHANT, FORGE, SCORE, SEW
 #
-"DISTILLED HERBS" "ADVANCED HERBS" "HERB JARS" "JAR HERBS"
+"DISTILLED HERBS" "ADVANCED HERBS" "HERB JARS" "JAR HERBS" "DISTILLED HERB COMPONENTS"
+
+Distilled herbs (component)
 
 Distilled herbs are herbs that have been processed to make them more potent, so
 that you can make more powerful potions. You must have the 'Healing Elixirs'
@@ -307,21 +312,22 @@ large:  big cat pelt, polar bear fur
 
 See also: COMPONENT, SEW, SKIN COMMAND
 #
-GEMS "GEM COMPONENT"
+GEM GEMS "MAGIC GEMS" "GEM COMPONENT" "MAGIC GEM COMPONENT"
 
-Gem (component)
+Magic gem (component)
 
 Used for:  crafting, enchanting
 Stored in:  Tower of Sorcery
 
-Gems are a component type encompassing the magical gems. The basic examples are
-red bloodstones, yellow lightning stones, iridescent blue irises, and glowing
-green seashells.
+Magic gems are used for many mystic crafts and abilities. Most recipes require
+a specific one of these, but a few accept any of them.
 
-Most recipes require a specific one of these, but a few accept any of them.
-
-magic, basic:  iris, bloodstone, seashell, lightning stone
-magic, refined:  prismatic crystals
+Common magic gems include:
+  yellow lightning stone - buried in the desert
+  red bloodstone - dug up in the mountains
+  iridescent blue iris - found near herbs
+  glowing green seashell - found while fishing
+  prismatic crystal (powerful magic gem)
 
 See also: COMPONENT, PRISMATIC CRYSTAL
 #
@@ -395,12 +401,12 @@ Used for:  potions, poisons, crafting
 The herb component type covers all the herbs which can be found using the Find
 Herbs ability. Most recipes call for a specific herb, though. The basic herbs
 are:
- whitegrass
- fiveleaf
- redthorn
- magewhisper
- daggerbite
- bileberries
+ whitegrass - beaches and shores
+ fiveleaf - forests and plains
+ redthorn - mountains
+ magewhisper - oasis
+ daggerbite - deserts and groves
+ bileberries - riverbanks
 
 See also: COMPONENT, DISTILLED HERBS, FIND HERBS, MIX, BREW
 #
@@ -561,7 +567,7 @@ See also: COMPONENT, SMELT, SEPARATE, IRON, COPPER, MINE
 #
 MEAT "MEAT COMPONENT" "RAW MEAT" "RAW RED MEAT" "RAW POULTRY" "RAW PORK" "RAW FISH" "RED MEAT" POULTRY PORK FISH
 
-Raw Meat (component)
+Raw meat (component)
 
 Used for:  cooking
 
@@ -577,7 +583,7 @@ animal corpses or fishing. Common types of raw meat are:
 
 See also: COMPONENT, BUTCHER, COOK, FISH, COOKED MEAT
 #
-NAILS "POUCH OF NAILS"
+NAILS "POUCH OF NAILS" "NAIL COMPONENT" "NAILS COMPONENT"
 
 Nails (resource/component)
 
@@ -749,7 +755,7 @@ See also: COMPONENT
 #
 ROPE ROPES "ROPE COMPONENT" CORDS CORDAGE "CORD COMPONENT"
 
-Cord, Rope (components)
+Cord, rope (components)
 
 Stored at:  Utility Shed, Store Room, Shipyard
 Used for:  manufacturing
@@ -848,8 +854,7 @@ See also: SCALABLE CRAFTS
 #
 TEXTILES "TEXTILE COMPONENT" "CLOTH COMPONENT" CLOTH "COTTON CLOTH" "WOOL CLOTH"
 
-Textile (component)
-Bolt of cloth (resource)
+Bolt of cloth (component)
 
 Used for:  sewing, crafting, building, vehicles
 Stored in:  Tailor, Carpenter
@@ -857,15 +862,14 @@ Stored in:  Tailor, Carpenter
 You can weave cotton or wool into cloth. It will go faster if you're at a
 Tailor.
 
-You can use any type of cloth if a recipe calls for a (textile), but some
-recipes may need a specific type.
+You can use any type of cloth if a recipe calls for (cloth), but some recipes
+may need a specific type.
 
-Common types of textile are:
- cotton cloth (mundane, basic)
- wool cloth (mundane, basic)
- llama wool cloth (mundane, basic)
- sparkfiber cloth (magic)
- manasilk cloth (magic)
+Common types of cloth are:
+  cotton cloth
+  wool cloth
+  sparkfiber cloth (magic cloth)
+  manasilk cloth (magic cloth)
 
 See also: COMPONENT, COTTON, HERBCLOTH WEAVING, TAILOR, WEAVE, WOOL
 #
