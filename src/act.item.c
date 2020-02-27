@@ -642,7 +642,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		if (GET_CRAFT_REQUIRES_OBJ(craft) == GET_OBJ_VNUM(obj)) {
 			part_size = snprintf(part, sizeof(part), "%s %s", gen_craft_data[GET_CRAFT_TYPE(craft)].command, GET_CRAFT_NAME(craft));
 			
-			if (line_size + part_size + 2 >= 80 && part_size < 75 && !any) {
+			if (line_size + part_size + 2 >= 80 && part_size < 75 && any) {
 				size += snprintf(lbuf + size, sizeof(lbuf) - size, ",\r\n%s", part);
 				line_size = part_size;
 			}
