@@ -7210,7 +7210,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		case REQ_GET_COMPONENT: {
-			snprintf(output, sizeof(output), "Get component%s: %dx (%s)", PLURAL(req->needed), req->needed, get_generic_name_by_vnum(req->vnum));
+			snprintf(output, sizeof(output), "Get component%s: %dx (%s)", PLURAL(req->needed), req->needed, req->needed == 1 ? get_generic_name_by_vnum(req->vnum) : get_generic_string_by_vnum(req->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 			break;
 		}
 		case REQ_GET_OBJECT: {
@@ -7361,7 +7361,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		case REQ_EMPIRE_PRODUCED_COMPONENT: {
-			snprintf(output, sizeof(output), "Empire has produced: %dx (%s)", req->needed, get_generic_name_by_vnum(req->vnum));
+			snprintf(output, sizeof(output), "Empire has produced: %dx (%s)", req->needed, req->needed == 1 ? get_generic_name_by_vnum(req->vnum) : get_generic_string_by_vnum(req->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 			break;
 		}
 		case REQ_EVENT_RUNNING: {
