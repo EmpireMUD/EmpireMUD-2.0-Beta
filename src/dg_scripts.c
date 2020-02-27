@@ -4564,16 +4564,22 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					
 					else if (!str_cmp(field, "is_component")) {
+						char arg[256], temp[256], remain[256];
 						generic_data *cmp = NULL;
+						bool any = FALSE;
 						
 						if (subfield && *subfield) {
-							if ((cmp = find_generic_component(subfield)) && is_component(o, cmp)) {
-								// match
-								snprintf(str, slen, "1");
+							strcpy(remain, subfield);
+							while (*remain) {
+								comma_args(remain, arg, temp);
+								strcpy(remain, temp);
+								if ((cmp = find_generic_component(arg)) && is_component(o, cmp)) {
+									any = TRUE;	// only need 1
+									break;
+								}
 							}
-							else {
-								snprintf(str, slen, "0");
-							}
+							
+							snprintf(str, slen, "%d", any ? 1 : 0);
 						}
 						else {	// no subfield: is a component at all?
 							snprintf(str, slen, "%d", GET_OBJ_COMPONENT(o) != NOTHING ? 1 : 0);

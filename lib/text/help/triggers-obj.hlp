@@ -188,8 +188,9 @@ When using field  - The variable returns:
 &chas_in(str)&0 - Has an object (name/vnum) inside it.
 &chas_trigger(vnum)&0 - Has the specified trigger attached.
 &cid&0 - The unique id of the object.
-&cis_component(name/vnum)&0 - Returns whether or not the object matches a
-   given generic component.
+&cis_component(name/vnum, ...)&0 - Returns whether or not the object matches
+   one of the components listed here. Specify as many as you want, separated
+   by commas.
 &cis_flagged(FLAG)&0 - Returns whether or not the flag is on. With no argument,
    lists current flags instead.
 &cis_inroom&0 - Returns true if object is in room.
