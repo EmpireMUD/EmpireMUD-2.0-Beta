@@ -640,6 +640,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	any = FALSE;
 	HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
 		if (GET_CRAFT_REQUIRES_OBJ(craft) == GET_OBJ_VNUM(obj)) {
+			any = TRUE;
 			part_size = snprintf(part, sizeof(part), "%s %s", gen_craft_data[GET_CRAFT_TYPE(craft)].command, GET_CRAFT_NAME(craft));
 			
 			if (line_size + part_size + 2 >= 80 && part_size < 75) {
