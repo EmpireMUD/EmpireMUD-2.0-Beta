@@ -307,8 +307,8 @@ Used for:  sewing
 
 Fur is a component type primarily used for clothing and mage armor.
 
-small:  fox fur, wolverine fur
-large:  big cat pelt, polar bear fur
+small furs: fox, wolverine, bright red, spotted fur
+large:  big cat pelt, wolf, tiger, polar bear fur
 
 See also: COMPONENT, SEW, SKIN COMMAND
 #
@@ -470,11 +470,11 @@ Leather is a component type used in many sewing recipes. You can make leather
 by tanning skins.
 
 Common types of leather are:
- small leather (small, basic)
- large leather (large, basic)
- shimmering leather (large)
- briar hide (magic)
- absinthian leather (magic)
+  small piece of leather (thin leather)
+  large piece of leather (thick leather)
+  shimmering leather (thick leather)
+  briar hide (thick magic leather)
+  absinthian leather (thick magic leather)
 
 See also: COMPONENT, TAN, SKIN, VERDANT LEATHERS
 #
@@ -700,7 +700,7 @@ birds.
 
 See also: SEW, CRAFT, FORGE, PRIMITIVE CRAFTS, JEWELRY
 #
-SKIN SKINS "SKIN COMPONENT"
+SKIN SKINS "SKIN COMPONENT" "THIN SKIN" "THICK SKIN" "SMALL SKIN" "LARGE SKIN"
 
 (Disambiguation: did you mean HELP SKIN COMMAND ?)
 
@@ -710,11 +710,14 @@ Used for:  sewing
 Stored in:  Tannery
 
 While not as good as tanned leather, skins can be used to sew basic rawhide
-equipment. Not everything you can get from the skin command counts as a skin.
+equipment. You can tan some skins into leather at the Tannery.
 
-You can tan some skins into leather at the Tannery.
+Common skin components include:
+  small skin (thin skin)
+  large skin (thick skin)
+  shimmering hide (thick skin)
 
-See also: SKIN COMMAND, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN,
+See also: SKIN COMMAND, SEWING, LEATHERWORKING, RAWHIDE STITCHING, TAN, FUR
    HUNTSMAN
 #
 SPLIT
