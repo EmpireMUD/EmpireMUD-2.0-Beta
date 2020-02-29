@@ -6751,18 +6751,18 @@ ACMD(do_store) {
 		}
 	}
 	else {
-		if (!*arg) {
+		if (!*arg1) {
 			msg_to_char(ch, "What do you want to store all of?\r\n");
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!use_room || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))) {
-			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
+		if (!(obj = get_obj_in_list_vis(ch, arg1, ch->carrying)) && (!use_room || !(obj = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch)))))) {
+			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg1);
 			return;
 		}
 		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
 			// try to set up next-obj
-			if (!(next_obj = get_obj_in_list_vis(ch, arg, obj->next_content)) && obj->carried_by && use_room) {
-				next_obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)));
+			if (!(next_obj = get_obj_in_list_vis(ch, arg1, obj->next_content)) && obj->carried_by && use_room) {
+				next_obj = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch)));
 			}
 			
 			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), FALSE)) {
