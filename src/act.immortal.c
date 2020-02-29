@@ -2540,7 +2540,7 @@ SHOW(show_islands) {
 
 
 SHOW(show_piles) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], owner[256];
 	room_data *room, *next_room;
 	int count, max = 100;
 	obj_data *obj, *sub;
@@ -2571,7 +2571,13 @@ SHOW(show_piles) {
 		}
 		
 		if (count >= max) {
-			snprintf(line, sizeof(line), "[%d] %s: %d item%s\r\n", GET_ROOM_VNUM(room), get_room_name(room, FALSE), count, PLURAL(count));
+			if (ROOM_OWNER(room)) {
+				snprintf(owner, sizeof(owner), " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+			}
+			else {
+				*owner = '\0';
+			}
+			snprintf(line, sizeof(line), "[%d] %s: %d item%s%s\r\n", GET_ROOM_VNUM(room), get_room_name(room, FALSE), count, PLURAL(count), owner);
 			any = TRUE;
 			
 			if (size + strlen(line) + 18 < sizeof(buf)) {
