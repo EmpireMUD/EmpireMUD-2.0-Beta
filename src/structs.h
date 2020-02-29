@@ -3018,6 +3018,8 @@ struct slash_channel {
 	char *name;
 	char *lc_name;	// lowercase name (for speed)
 	char color;
+	struct channel_history_data *history;
+	
 	struct slash_channel *next;
 };
 
@@ -3577,6 +3579,8 @@ struct account_player {
 
 // used in descriptor for personal channel histories -- act.comm.c
 struct channel_history_data {
+	int idnum;	// id of the author
+	int invis_level;	// if it's an invisible immortal
 	char *message;
 	long timestamp;
 	struct channel_history_data *next;
@@ -3866,14 +3870,6 @@ struct player_slash_channel {
 };
 
 
-// channel histories
-struct player_slash_history {
-	char *channel;	// lowercase channel name
-	struct channel_history_data *history;
-	UT_hash_handle hh;	// hashed by channe;
-};
-
-
 // player techs (from abilities)
 struct player_tech {
 	int id;	// which PTECH_
@@ -3944,7 +3940,6 @@ struct player_special_data {
 	struct player_eq_set *eq_sets;	// player's saved equipment sets
 	struct offer_data *offers;	// various offers for do_accept/reject
 	struct player_slash_channel *slash_channels;	// channels the player is on
-	struct player_slash_history *slash_history;	// slash-channel histories
 	struct slash_channel *load_slash_channels;	// temporary storage between load and join
 	struct player_faction_data *factions;	// hash table of factions
 	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories

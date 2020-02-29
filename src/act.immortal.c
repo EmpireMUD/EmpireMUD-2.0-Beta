@@ -7121,7 +7121,7 @@ ACMD(do_distance) {
 
 // this also handles emote
 ACMD(do_echo) {
-	void add_to_channel_history(char_data *ch, int type, char *message);
+	void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message);
 	void clear_last_act_message(descriptor_data *desc);
 	extern bool is_ignoring(char_data *ch, char_data *victim);
 	
@@ -7221,7 +7221,7 @@ ACMD(do_echo) {
 				*hbuf = '\0';
 			}
 			strcat(hbuf, ch->desc->last_act_message);
-			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, hbuf);
+			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, hbuf);
 		}
 	}
 
@@ -7250,7 +7250,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, c->desc->last_act_message);
-				add_to_channel_history(c, CHANNEL_HISTORY_SAY, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
 			}
 			else if (c->desc && c != ch && c != vict) {
 				// just in case
@@ -7292,7 +7292,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, vict->desc->last_act_message);
-				add_to_channel_history(vict, CHANNEL_HISTORY_SAY, hbuf);
+				add_to_channel_history(vict, CHANNEL_HISTORY_SAY, ch, hbuf);
 			}
 		}
 	}
@@ -7322,7 +7322,7 @@ ACMD(do_echo) {
 					*hbuf = '\0';
 				}
 				strcat(hbuf, c->desc->last_act_message);
-				add_to_channel_history(c, CHANNEL_HISTORY_SAY, hbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, hbuf);
 			}
 			else if (c->desc && c != ch) {
 				// just in case

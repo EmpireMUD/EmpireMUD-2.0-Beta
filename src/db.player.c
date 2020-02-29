@@ -798,7 +798,6 @@ void free_char(char_data *ch) {
 	struct mount_data *mount, *next_mount;
 	struct channel_history_data *history;
 	struct player_slash_channel *slash;
-	struct player_slash_history *slash_hist, *next_slash_hist;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
 	struct minipet_data *mini, *next_mini;
@@ -932,17 +931,6 @@ void free_char(char_data *ch) {
 				}
 				free(history);
 			}
-		}
-		HASH_ITER(hh, GET_SLASH_HISTORY(ch), slash_hist, next_slash_hist) {
-			while ((history = slash_hist->history)) {
-				slash_hist->history = history->next;
-				if (history->message) {
-					free(history->message);
-				}
-				free(history);
-			}
-			HASH_DEL(GET_SLASH_HISTORY(ch), slash_hist);
-			free(slash_hist);
 		}
 		
 		while ((a = GET_ALIASES(ch)) != NULL) {
@@ -1973,22 +1961,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					LOAD_SLASH_CHANNELS(ch) = slash;
 				}
 				else if (PFILE_TAG(line, "Slash-History:", length)) {
-					sscanf(line + length + 1, "%s %ld", str_in, &l_in[1]);
-					if (*str_in) {
-						struct player_slash_history *psh;
-						struct channel_history_data *hist;
-						
-						HASH_FIND_STR(GET_SLASH_HISTORY(ch), str_in, psh);
-						if (!psh) {
-							CREATE(psh, struct player_slash_history, 1);
-							psh->channel = str_dup(str_in);
-							HASH_ADD_STR(GET_SLASH_HISTORY(ch), channel, psh);
-						}
-						
-						CREATE(hist, struct channel_history_data, 1);
-						hist->timestamp = l_in[1];
-						hist->message = fread_string(fl, error);
-						LL_APPEND(psh->history, hist);
+					// this line is ignored after b5.88 -- slash histories are now global
+					char *junk = fread_string(fl, error);
+					if (junk) {
+						free(junk);
 					}
 				}
 				else if (PFILE_TAG(line, "Syslog Flags:", length)) {
@@ -2704,7 +2680,6 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	
 	struct player_completed_quest *plrcom, *next_plrcom;
 	struct player_automessage *automsg, *next_automsg;
-	struct player_slash_history *psh, *next_psh;
 	struct player_faction_data *pfd, *next_pfd;
 	struct player_event_data *ped, *next_ped;
 	struct channel_history_data *hist;
@@ -2791,11 +2766,6 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'S'
-	HASH_ITER(hh, GET_SLASH_HISTORY(ch), psh, next_psh) {
-		LL_FOREACH(psh->history, hist) {
-			fprintf(fl, "Slash-History: %s %ld\n%s~\n", psh->channel, hist->timestamp, NULLSAFE(hist->message));
-		}
-	}
 	
 	// 'V'
 	if (SCRIPT(ch) && SCRIPT(ch)->global_vars) {
@@ -3287,7 +3257,6 @@ void check_skills_and_abilities(char_data *ch) {
 */
 void clean_old_history(char_data *ch) {
 	struct channel_history_data *hist, *next_hist;
-	struct player_slash_history *psh, *next_psh;
 	long now = time(0);
 	int iter;
 	
@@ -3305,28 +3274,6 @@ void clean_old_history(char_data *ch) {
 				LL_DELETE(GET_HISTORY(ch, iter), hist);
 				free(hist);
 			}
-		}
-	}
-	
-	HASH_ITER(hh, GET_SLASH_HISTORY(ch), psh, next_psh) {
-		LL_FOREACH_SAFE(psh->history, hist, next_hist) {
-			if (hist->timestamp + (60 * 60 * 24) < now) {
-				// 24 hours old
-				if (hist->message) {
-					free(hist->message);
-				}
-				LL_DELETE(psh->history, hist);
-				free(hist);
-			}
-		}
-		
-		// no more history
-		if (!psh->history) {
-			if (psh->channel) {
-				free(psh->channel);
-			}
-			HASH_DEL(GET_SLASH_HISTORY(ch), psh);
-			free(psh);
 		}
 	}
 }

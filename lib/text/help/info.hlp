@@ -763,9 +763,8 @@ typing 'history tells'.
 
 Group-says, emotes, and socials also appear on 'say' history.
 
-Your chat history only contains messages that you were connected and in-game
-for. History messages last for up to 24 hours, but only the last 20 messages
-are stored.
+History messages last for up to 24 hours, but you only see the last 20 messages
+from that time period.
 
 See also: SAYHISTORY, TELLHISTORY, EHISTORY, GHISTORY, /HISTORY
 #

@@ -54,6 +54,7 @@
 #define LIB_PLAYERS  "players/"
 #define LIB_OBJPACK  "packs/"
 #define LIB_EMPIRE  "empires/"
+#define LIB_CHANNELS  "channels/"
 
 
 // file suffixes for common write files
