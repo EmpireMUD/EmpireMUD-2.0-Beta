@@ -1150,7 +1150,7 @@ ACMD(do_slash_channel) {
 				}
 				
 				if (hist->invis_level > 0 && hist->invis_level <= GET_ACCESS_LEVEL(ch)) {
-					sprintf(buf, " %s", (index = find_player_index_by_idnum(hist->idnum)) ? index->name : "<unknown>");
+					sprintf(buf, " (%s)", (index = find_player_index_by_idnum(hist->idnum)) ? index->fullname : "<unknown>");
 				}
 				else {
 					*buf = '\0';
