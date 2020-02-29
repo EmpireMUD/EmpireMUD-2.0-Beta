@@ -673,8 +673,10 @@ when you harvest them. The crops listed here grow wild on the map -- you can
 find them by foraging. There are more crops to be found in adventure zones.
 
 Temperate crops (plains):
- &Y^^&Go&Y^&0  Apples              &Y::::&0  Barley               &g%&Bo&g%%&0  Blueberries
+ &Y^^&Go&Y^&0  Apples              &Y^&oo&Y^^&0  Apricots             &Y::::&0  Barley
+ &g%&Bo&g%%&0  Blueberries
  &Y^^&Ro&Y^&0  Cherries            &Y^&to&Y^^&0  Coffee               &giiii&0  Corn
+ &gmmom&0  Cucumbers           &T,,,,&0  Garlic
  &gxgxx&0  Grapes              &g::::&0  Hops                 &Tiiii&0  Oats
  &Y^o^^&0  Peaches             &G....&0  Peas                 &g^^&vo&g^&0  Plums
  &gnnnn&0  Potatoes            &gn&Rv&gnn&0  Strawberries         &Ro&g88&Ro&0  Tomatoes
@@ -686,7 +688,7 @@ Arid crops (desert):
 
 Tropical crops (partially cleared jungle):
  &Yd&G\/&Yb&0  Bananas             &G^&Oo&G^&Oo&0  Mangoes              &Gd&g\/&Gb&0  Plantains
- &Gwwow&0  Watermelons
+ &G||||&0  Sugarcane           &G^&Yo&G^^&0  Lemons               &Gwwow&0  Watermelons
 
 River crops (plains near river):
  &yoooo&0  Squash              &g,,,,&0  Rice
@@ -699,6 +701,10 @@ More crops come from adventures. Make sure you claim all your map tiles that
 have crops as unclaimed crops may vanish at the end of the year.
 
 See also: CHOP, COOK, FORAGE, HARVEST, MILL, PICK, PLANT, TAVERN, WEAVE
+#
+APRICOTS CUCUMBERS GARLIC LEMONS SUGARCANE
+
+See also: CROPS
 #
 "FLAT TERRAIN" FLAT-TERRAIN
 
