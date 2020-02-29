@@ -674,13 +674,14 @@ find them by foraging. There are more crops to be found in adventure zones.
 
 Temperate crops (plains):
  &Y^^&Go&Y^&0  Apples              &Y^&oo&Y^^&0  Apricots             &Y::::&0  Barley
- &g%&Bo&g%%&0  Blueberries
- &Y^^&Ro&Y^&0  Cherries            &Y^&to&Y^^&0  Coffee               &giiii&0  Corn
- &gmmom&0  Cucumbers           &T,,,,&0  Garlic
- &gxgxx&0  Grapes              &g::::&0  Hops                 &Tiiii&0  Oats
- &Y^o^^&0  Peaches             &G....&0  Peas                 &g^^&vo&g^&0  Plums
- &gnnnn&0  Potatoes            &gn&Rv&gnn&0  Strawberries         &Ro&g88&Ro&0  Tomatoes
- &Y;;;;&0  Wheat
+ &g%&Bo&g%%&0  Blueberries         &Y^^&Ro&Y^&0  Cherries             &Y^&to&Y^^&0  Coffee
+ &giiii&0  Corn                &T,,,,&0  Garlic               &gxgxx&0  Grapes
+ &g::::&0  Hops                &Tiiii&0  Oats                 &Y^o^^&0  Peaches
+ &G....&0  Peas                &g^^&vo&g^&0  Plums                &gnnnn&0  Potatoes
+ &gn&Rv&gnn&0  Strawberries          &Ro&g88&Ro&0  Tomatoes            &Y;;;;&0  Wheat
+
+River crops (plains near river):
+ &yoooo&0  Squash              &g,,,,&0  Rice
 
 Arid crops (desert):
  &y.&g/&to&y.&0  Coconuts            &0::::&0  Cotton               &Y.&G^o&G.&0  Olives
@@ -688,10 +689,10 @@ Arid crops (desert):
 
 Tropical crops (partially cleared jungle):
  &Yd&G\/&Yb&0  Bananas             &G^&Oo&G^&Oo&0  Mangoes              &Gd&g\/&Gb&0  Plantains
- &G||||&0  Sugarcane           &G^&Yo&G^^&0  Lemons               &Gwwow&0  Watermelons
-
-River crops (plains near river):
- &yoooo&0  Squash              &g,,,,&0  Rice
+ &G^&Yo&G^^&0  Lemons              &Gwwow&0  Watermelons
+ 
+Tropical river crops (partially cleared jungle near river):
+ &gmmom&0  Cucumbers           &G||||&0  Sugarcane
 
 Newbie island crops:
  &G@@@@&0  Lettuce             &goooo&0  Calabash gourds
