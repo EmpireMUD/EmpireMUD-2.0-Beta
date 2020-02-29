@@ -820,6 +820,8 @@ STORE STORAGE
 Usage:  store <item>
         store <number> <item>
         store all
+        store room  (all storable items on the ground)
+        store inventory  (all storable items in your inventory)
 
 It is recommended that you keep most of your extra resources stored. Items left
 on the ground in claimed territory will eventually be stored by the empire's

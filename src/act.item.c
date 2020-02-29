@@ -6646,12 +6646,12 @@ ACMD(do_split) {
 
 
 ACMD(do_store) {
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct empire_storage_data *store;
 	obj_data *obj, *next_obj, *lists[2];
 	int count = 0, total = 1, done = 0, dotmode, iter;
 	empire_data *emp, *room_emp = ROOM_OWNER(IN_ROOM(ch));
-	bool full = 0, use_room = FALSE;
+	bool full = FALSE, use_room = FALSE, all = FALSE, room = FALSE, inv = FALSE;
 
 	if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You'll need to finish the building first.\r\n");
@@ -6671,35 +6671,51 @@ ACMD(do_store) {
 		return;
 	}
 
-	two_arguments(argument, arg, buf);
+	two_arguments(argument, arg1, arg2);
 
-	/* This goes first because I want it to move buf to arg */
-	if (*arg && is_number(arg)) {
-		total = atoi(arg);
+	/* This goes first because I want it to move arg2 to arg1 */
+	if (*arg1 && is_number(arg1)) {
+		total = atoi(arg1);
 		if (total < 1) {
 			msg_to_char(ch, "You have to store at least 1.\r\n");
 			return;
 		}
-		strcpy(arg, buf);
+		strcpy(arg1, arg2);
+		*arg2 = '\0';
 	}
-	else if (*arg && *buf && !str_cmp(arg, "all")) {
+	else if (*arg1 && *arg2 && !str_cmp(arg1, "all")) {	// 'store all <thing>'
 		total = CAN_CARRY_N(ch) + 1;
-		strcpy(arg, buf);
+		strcpy(arg1, arg2);
+		*arg2 = '\0';
+	}
+	else if (!str_cmp(arg1, "all") && !*arg2) {
+		all = TRUE;	// basic 'store all'
+	}
+	else if (!str_cmp(arg1, "room") && !*arg2) {
+		room = TRUE;	// store all on ground
+	}
+	else if ((!str_cmp(arg1, "inv") || !str_cmp(arg1, "inventory")) && !*arg2) {
+		inv = TRUE;	// store all from inventory
 	}
 
-	if (!*arg) {
+	if (!*arg1) {
 		msg_to_char(ch, "What would you like to store?\r\n");
 		return;
 	}
 
 	// set up search lists for "all" modes
-	lists[0] = ch->carrying;
-	use_room = (ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch));
+	lists[0] = !room ? ch->carrying : NULL;	// only if they didn't specify 'room'
+	use_room = (!inv && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch));
 	lists[1] = use_room ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
 	
-	dotmode = find_all_dots(arg);
+	if (!use_room && room) {
+		msg_to_char(ch, "You can't store items from the room because your empire doesn't own it.\r\n");
+		return;
+	}
+	
+	dotmode = find_all_dots(arg1);
 
-	if (dotmode == FIND_ALL) {
+	if (dotmode == FIND_ALL || all || room || inv) {
 		if (!ch->carrying) {
 			send_to_char("You don't seem to be carrying anything.\r\n", ch);
 			return;
