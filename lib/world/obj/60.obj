@@ -50,6 +50,46 @@ O+ 1 6002
 R
 5118 0
 S
+#6011
+tree small~
+a small tree~
+A small tree has fallen here.~
+   This tree is small and crooked, not as useful as a straight sapling, nor
+thick enough to make a dugout canoe. You could probably still get some lumber
+out of it.
+~
+3 e a 0 10
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 17 125 100.00 1  # SAW: a stack of lumber
+O+ 1 6011
+R
+5118 0
+S
+#6012
+tree trees rare~
+a rare tree~
+A rare tree is lying here.~
+   You can use a sharp tool to scrape a tree until it's a log, or craft it
+into a canoe.
+~
+3 e a 0 9
+0 0 0
+0 0
+I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 16 124 100.00 1  # SCRAPE: a heavy log
+I 17 125 100.00 2  # SAW: a stack of lumber
+M
+7
+$n carves out a tree for $V.~
+M
+6
+You carve out a tree for $V.~
+O+ 1 6012
+R
+5118 0
+S
 #6015
 pillar pillars~
 a pillar~

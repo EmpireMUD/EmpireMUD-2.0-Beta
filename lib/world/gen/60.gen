@@ -21,6 +21,28 @@ R 6000
 T0
 fine lumber~
 S
+#6010
+tree~
+6 a
+0 120 0 0
+T0
+trees~
+S
+#6011
+small tree~
+6 a
+0 6011 0 0
+T0
+small trees~
+S
+#6012
+rare tree~
+6 0
+0 6012 0 0
+R 6010
+T0
+rare trees~
+S
 #6015
 pillar~
 6 a
@@ -65,6 +87,22 @@ rock~
 0 100 0 0
 T0
 rocks~
+S
+#6051
+flint~
+6 0
+0 102 0 0
+R 6050
+T0
+flints~
+S
+#6052
+obsidian~
+6 0
+0 106 0 0
+R 6050
+T0
+obsidians~
 S
 #6075
 block~

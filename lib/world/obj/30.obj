@@ -938,4 +938,139 @@ R
 R
 5606 0
 S
+#3070
+apricots basket~
+a basket of apricots~
+Someone has dropped a basket of apricots.~
+You can eat apricots, or plant them.
+~
+6 bl a 0 9
+12 3070 0
+7 168
+I 15 3071 100.00 4 e  # SEPARATE: a couple of apricots
+O+ 1 6132
+R
+5114 0
+S
+#3071
+apricots couple~
+a couple of apricots~
+A couple of apricots have been scattered on the ground.~
+   These apricots have a fresh, summery taste. Combine a few of them into a
+basket of apricots and you'll have enough to plant your own orchard.
+~
+6 0 a 0 6
+2 0 0
+7 48
+I 14 3070 100.00 4 e  # COMBINE: a basket of apricots
+O+ 1 6122
+S
+#3072
+sugarcane bundle~
+a bundle of sugarcane~
+A bundle of sugarcane has been dropped here.~
+You can plant sugarcane or mill it into sugar.
+~
+3 b a 0 6
+0 3072 0
+7 168
+R
+5116 0
+S
+#3073
+grain handful~
+a handful of grain~
+A handful of grain is scattered on the ground.~
+   This grain is hard to identify but it looks like you could snack on it. Or
+plant it.
+~
+6 b a 0 7
+1 3072 0
+0 1152
+O+ 1 6160
+S
+#3074
+garlic basket~
+a basket of garlic~
+A basket of garlic has been dropped on the ground.~
+You can eat garlic, or plant it.
+~
+6 bl a 0 7
+4 3074 0
+7 168
+I 15 3075 100.00 4 e  # SEPARATE: a clove of garlic
+O+ 1 6152
+R
+5606 0
+R
+5116 0
+S
+#3075
+garlic clove~
+a clove of garlic~
+A clove of garlic has been dropped on the ground.~
+   This clove of garlic has a fresh, pungent taste to it. Combine a few cloves
+into a basket of garlic and you'll have enough to plant your own crop.
+~
+6 0 a 0 5
+1 0 0
+7 48
+I 14 3074 100.00 4 e  # COMBINE: a basket of garlic
+O+ 1 6142
+S
+#3076
+lemons basket~
+a basket of lemons~
+A basket of lemons has been dropped here.~
+You can eat lemons, or plant them.
+~
+6 bl a 0 6
+4 3076 0
+7 168
+I 15 3077 100.00 4 e  # SEPARATE: a single ripe lemon
+O+ 1 6133
+R
+5114 0
+S
+#3077
+lemon ripe single~
+a single ripe lemon~
+A single ripe lemon is on the ground.~
+   This ripe lemon looks as if it has just fallen from the tree. If you combine
+a few of them into a basket of lemons, you might have enough to plant an
+orchard of them.
+~
+6 0 a 0 5
+1 0 0
+7 48
+I 14 3076 100.00 4 e  # COMBINE: a basket of lemons
+O+ 1 6123
+S
+#3078
+cucumbers basket~
+a basket of cucumbers~
+Someone has dropped a basket of cucumbers on the ground.~
+Cucumbers can be planted, eaten, or made into pickles.
+~
+6 bl a 0 9
+6 3078 0
+7 168
+I 15 3079 100.00 4 e  # SEPARATE: a single ripe cucumber
+O+ 1 6152
+R
+5114 0
+S
+#3079
+cucumber ripe single~
+a single ripe cucumber~
+A single ripe cucumber is ready to eat.~
+   This little cucumber tastes fresh and ripe. If you combined a few of these
+into a basket of cucumbers, you'd have enough to plant a field of them.
+~
+6 0 a 0 5
+1 0 0
+0 48
+I 14 3078 100.00 4 e  # COMBINE: a basket of cucumbers
+O+ 1 6142
+S
 $

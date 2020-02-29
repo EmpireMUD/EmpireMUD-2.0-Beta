@@ -165,15 +165,16 @@ Z
 1 10802
 S
 #10805
-Collect 20 Sticks~
-   Rosemary wants you to collect some sticks. You can either gather them in the
-forest, or get them by scraping trees.
+collect 20 Saplings~
+   Rosemary wants you to collect some saplings. You can either gather them in
+the forest, or get them by scraping trees. You can also find them by chopping
+down copses.
 ~
-   Rosemary stifles a laugh at how you've filled your pack with sticks, and
+   Rosemary stifles a laugh at how you've filled your pack with saplings, and
 wonders aloud whether you'll be able to carry enough of them for the next part
 of the tutorial.
 ~
-19 a 0 25 -1
+20 a 0 25 -1
 A
 1 10802
 P

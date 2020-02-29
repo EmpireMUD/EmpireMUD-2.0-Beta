@@ -686,11 +686,12 @@ A spooky dead tree is laying here.~
    This tree looks like it has been dead for some time, but you can probably
 still get some good lumber out of it.
 ~
-3 e a 0 4
+3 e a 0 5
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
 I 17 125 100.00 2  # SAW: a stack of lumber
+O+ 1 6010
 R
 5118 0
 S

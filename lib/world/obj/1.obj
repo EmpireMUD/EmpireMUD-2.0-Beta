@@ -35,11 +35,11 @@ A piece of flint is lying on the ground.~
 potential to be shaped into a powerful primitive weapon. Wield a rock and
 'chip' this flint to work it into a more useful shape.
 ~
-1 il ano 0 6
+1 il ano 0 7
 0 1 5
 5 0
 I 19 180 100.00 1  # CHIP: a chipped flint
-O+ 1 6050
+O+ 1 6051
 R
 5117 0
 S
@@ -96,11 +96,11 @@ A black piece of obsidian is on the ground.~
 obsidian shows through. Obsidian forms a cutting edge like no other stone. Use
 'chip' to give it a sharp edge.
 ~
-1 hl ano 0 8
+1 hl ano 0 9
 0 2 5
 8 0
 I 19 182 100.00 1  # CHIP: a sharpened piece of obsidian
-O+ 1 6050
+O+ 1 6052
 R
 5117 0
 S
@@ -141,7 +141,7 @@ A large tree has fallen here.~
    You can use a sharp tool to scrape a tree until it's a log, or craft it
 into a canoe.
 ~
-3 el a 0 6
+3 el a 0 7
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -162,6 +162,7 @@ $n carves out a tree for $V.~
 M
 6
 You carve out a tree for $V.~
+O+ 1 6010
 R
 5118 0
 S
@@ -190,7 +191,7 @@ Some rough wood is stacked here.~
 tree. You can saw it into boards, and might even be able to salvage some
 sticks.
 ~
-3 e a 0 7
+3 e a 0 8
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -201,6 +202,7 @@ I 17 132 20.00 2 s  # SAW: some thorny branches
 I 17 132 20.00 3 s  # SAW: some thorny branches
 I 17 132 20.00 4 s  # SAW: some thorny branches
 I 17 132 20.00 5 s  # SAW: some thorny branches
+O+ 1 6011
 R
 5118 0
 S
@@ -326,7 +328,7 @@ A massive tree is lying on its side.~
    You can use a sharp tool to shape this exotic tree into a pillar, or you can
 saw it into lumber.
 ~
-3 e a 0 6
+3 e a 0 7
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -337,6 +339,7 @@ I 17 130 50.00 1 c  # SAW: some fine tropical lumber
 I 17 130 50.00 2 c  # SAW: some fine tropical lumber
 I 17 133 50.00 1 s  # SAW: a tangle of vines
 I 17 133 25.00 2 s  # SAW: a tangle of vines
+O+ 1 6010
 R
 5118 0
 S
@@ -510,7 +513,7 @@ A massive ancient tree is lying on the ground.~
 taller than you are. It's far too big to carry, but you could saw it up or
 scrape it where it lies.
 ~
-3 0 0 0 14
+3 0 0 0 16
 0 0 0
 0 1152
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -531,6 +534,7 @@ I 17 136 5.00 2 p  # SAW: a large shoot
 I 17 121 50.00 6 s  # SAW: some sticks and leaves
 I 17 121 40.00 10 s  # SAW: some sticks and leaves
 I 17 121 10.00 12 s  # SAW: some sticks and leaves
+O+ 1 6012
 R
 5118 0
 S
@@ -747,10 +751,10 @@ A silver ingot is stacked here.~
    Ingots are used in crafting, but aren't as valuable as the larger silver
 bars. They can be stored in your vault to add to your wealth.
 ~
-15 l a 0 7
+15 l a 0 8
 4 0 0
 3 0
-O+ 1 6750
+O+ 1 6751
 R
 5611 a
 S
@@ -761,10 +765,10 @@ A gold ingot is stacked here.~
    Ingots are usually used in crafting, and aren't as valuable as larger bars
 of gold. They can be stored in the vault to add to your wealth.
 ~
-15 l a 0 8
+15 l a 0 9
 6 0 0
 4 0
-O+ 1 6750
+O+ 1 6751
 R
 5611 a
 S

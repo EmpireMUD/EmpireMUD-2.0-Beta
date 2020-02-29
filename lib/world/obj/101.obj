@@ -58,9 +58,10 @@ a fistful of firebird feathers~
 Some firebird feathers are glowing on the ground.~
 The feathers come from the mythical firebird, and glow even when plucked.
 ~
-3 c a 0 1
+3 c a 0 2
 0 0 0
 10 400
+O+ 1 6442
 S
 #10105
 armor black leather set~
@@ -531,7 +532,7 @@ A scraggly mesquite tree is lying on the ground.~
    This rough, twisted wood has long spines on its branches. The wood has a
 fresh desert scent, and would be good for cooking meat.
 ~
-3 e a 0 9
+3 e a 0 10
 0 0 0
 0 0
 I 11 10145 100.00 1  # LIGHT: a mesquite fire
@@ -541,6 +542,7 @@ I 17 132 20.00 2 s  # SAW: some thorny branches
 I 17 132 20.00 3 s  # SAW: some thorny branches
 I 17 132 20.00 4 s  # SAW: some thorny branches
 I 17 132 20.00 5 s  # SAW: some thorny branches
+O+ 1 6011
 R
 5118 0
 S

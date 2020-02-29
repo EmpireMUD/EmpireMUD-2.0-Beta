@@ -51,11 +51,12 @@ An enchanted tree is lying here, leaking mana from its stump.~
 these trees is used in certain advanced crafts, to bring magical properties to
 highly skilled artifacts.
 ~
-3 e a 0 8
+3 e a 0 10
 0 0 0
 0 0
 I 11 617 100.00 1  # LIGHT: a magical fire
 I 17 604 100.00 2  # SAW: some stellar magewood
+O+ 1 6012
 R
 5118 0
 S

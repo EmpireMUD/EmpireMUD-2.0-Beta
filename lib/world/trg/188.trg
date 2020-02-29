@@ -710,24 +710,22 @@ offer~
 * Value0 tracks sacrifices remaining
 switch %self.vnum%
   case 18850
-    set component_base metal
-    set component_flags common
+    set component_base 6720
     set sacrifice_amount 10
     set display_str 10x common metal
   break
   case 18851
-    set component_base block
+    set component_base 6075
     set sacrifice_amount 10
     set display_str 10x block
   break
   case 18852
-    set component_base rock
+    set component_base 6050
     set sacrifice_amount 10
     set display_str 10x rock
   break
   case 18853
-    set component_base fibers
-    set component_flags plant
+    set component_base 6420
     set sacrifice_amount 10
     set display_str 10x plant fibers
   break
@@ -755,13 +753,13 @@ if %sacrifices_left% < 1
   halt
 end
 * actual sacrifice
-if !%actor.has_component(%component_base%, %sacrifice_amount%, %component_flags%)%
+if !%actor.has_component(%component_base%, %sacrifice_amount%)%
   %send% %actor% You don't have the (%display_str%) required for this sacrifice...
   halt
 end
 %send% %actor% You offer up (%display_str%) to appease the spirits of the dead...
 %echoaround% %actor% %actor.name% offers up (%display_str%) to appease the spirits of the dead...
-nop %actor.charge_component(%component_base%, %sacrifice_amount%, %component_flags%)%
+nop %actor.charge_component(%component_base%, %sacrifice_amount%)%
 eval sacrifices_left %sacrifices_left% - 1
 nop %self.val0(%sacrifices_left%)%
 if %sacrifices_left% == 0

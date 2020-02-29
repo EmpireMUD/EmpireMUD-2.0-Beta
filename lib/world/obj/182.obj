@@ -680,7 +680,7 @@ A great dragon tree lays on its side, still taller than you are.~
    The dragon tree is truly massive! When it stood, this tree was taller than a
 castle. Now it might provide enough lumber for an entire house.
 ~
-3 e a 0 3
+3 e a 0 5
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -688,6 +688,7 @@ I 16 124 100.00 12  # SCRAPE: a heavy log
 I 16 121 100.00 60  # SCRAPE: some sticks and leaves
 I 17 125 100.00 24  # SAW: a stack of lumber
 I 17 121 100.00 60  # SAW: some sticks and leaves
+O+ 1 6012
 R
 5118 0
 S

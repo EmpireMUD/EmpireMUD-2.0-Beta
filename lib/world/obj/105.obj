@@ -696,7 +696,7 @@ A fallen spruce tree is lying here.~
    The spruce tree is covered in thin branches, and still has the fresh scent
 of winter about it.
 ~
-3 e a 0 5
+3 e a 0 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -713,6 +713,7 @@ $n carves out a tree for $V.~
 M
 6
 You carve out a tree for $V.~
+O+ 1 6010
 R
 5118 0
 S

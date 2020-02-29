@@ -77,15 +77,28 @@ R
 5115 0
 S
 #6750
+bar bars precious metal~
+a bar of precious metal~
+A bar of precious metal is sitting here.~
+This metal looks quite valuable.
+~
+3 0 a 0 11
+0 0 0
+2 0
+O+ 1 6750
+R
+5611 a
+S
+#6751
 ingot ingots precious metals~
 an ingot of precious metal~
 An ingot of precious metal is sitting here.~
 This metal looks quite valuable.
 ~
-3 0 a 0 10
+3 0 a 0 12
 0 0 0
 2 0
-O+ 1 6750
+O+ 1 6751
 R
 5115 0
 S
