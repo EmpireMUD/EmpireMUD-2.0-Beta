@@ -1132,6 +1132,7 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entry) {
 	if (fl && entry) {
 		fprintf(fl, "M %ld %d %d\n%s~\n", entry->timestamp, entry->idnum, entry->invis_level, NULLSAFE(entry->message));
+		fflush(fl);
 	}
 }
 
@@ -1151,6 +1152,7 @@ void write_slash_channel_configs(struct slash_channel *chan) {
 	}
 	
 	fprintf(chan->fl, "N %c %s\n", chan->color, chan->name);
+	fflush(chan->fl);
 }
 
 
@@ -1186,7 +1188,7 @@ ACMD(do_slash_channel) {
 	int iter, count;
 	bool ok, found;
 	
-	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "check", "recase", "echo", "\n" };
+	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "check", "recase", "echo", "index", "\n" };
 	
 	half_chop(argument, arg, arg2);
 	

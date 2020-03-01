@@ -3579,7 +3579,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	global_mute_slash_channel_joins = TRUE;
 	for (load_slash = LOAD_SLASH_CHANNELS(ch); load_slash; load_slash = next_slash) {
 		next_slash = load_slash->next;
-		if (load_slash->name && *load_slash->name) {
+		if (load_slash->name && *load_slash->name && str_cmp(load_slash->name, "index")) {
+			// for safety reasons, ignores channels named "index" (could never write this name to file)
 			sprintf(lbuf, "join %s", load_slash->name);
 			do_slash_channel(ch, lbuf, 0, 0);
 		}
