@@ -994,6 +994,11 @@ void open_slash_channel_file(struct slash_channel *chan) {
 	if (!chan || chan->fl) {
 		return;
 	}
+	if (!str_cmp(chan->lc_name, "index")) {
+		// emergency saftey: cannot write a channel named "index" because it would overwrite the index
+		log("SYSERR: Trying to open file for slash-channel named 'index'");
+		return;
+	}
 	
 	snprintf(fname, sizeof(fname), "%s%s", LIB_CHANNELS, chan->lc_name);
 	if (!(chan->fl = fopen(fname, "a"))) {
