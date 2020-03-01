@@ -634,7 +634,7 @@ void announce_to_slash_channel(struct slash_channel *chan, char_data *person, co
 
 /**
 * Removes old messages and writes a clean version of the slash-channel's log
-* file.
+* file. Then, it also frees up the memory from older messages in memory.
 *
 * @param struct slash_channel *chan The channel to clean/write.
 */
@@ -642,6 +642,7 @@ void clean_slash_channel(struct slash_channel *chan) {
 	struct channel_history_data *hist, *next_hist;
 	time_t clear_before;
 	char filename[256];
+	int count;
 	FILE *fl;
 	
 	clear_before = time(0) - (config_get_int("slash_message_log_days") * SECS_PER_REAL_DAY);
@@ -660,9 +661,11 @@ void clean_slash_channel(struct slash_channel *chan) {
 	}
 	
 	// clean the history and write any remaining history
+	count = 0;
 	LL_FOREACH_SAFE(chan->history, hist, next_hist) {
 		if (hist->timestamp >= clear_before) {
 			write_one_slash_channel_message(fl, hist);
+			++count;
 		}
 		else {
 			LL_DELETE(chan->history, hist);
@@ -674,6 +677,17 @@ void clean_slash_channel(struct slash_channel *chan) {
 	}
 	
 	fclose(fl);
+	
+	// free up memory for any entries that wouldn't be shown on histories
+	LL_FOREACH_SAFE(chan->history, hist, next_hist) {
+		if (count-- > MAX_RECENT_CHANNELS) {
+			LL_DELETE(chan->history, hist);
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
+		}
+	}
 	
 	// and write the current configs now (will re-open the file for append)
 	write_slash_channel_configs(chan);
