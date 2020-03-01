@@ -315,6 +315,7 @@ void boot_db(void) {
 	void load_data_table();
 	void load_intro_screens();
 	void load_fight_messages();
+	void load_slash_channels();
 	void load_tips_of_the_day();
 	void load_trading_post();
 	int run_convert_vehicle_list();
@@ -360,6 +361,9 @@ void boot_db(void) {
 
 	log("Loading help entries.");
 	index_boot_help();
+	
+	// logs its own message
+	load_slash_channels();
 	
 	log("Loading player accounts.");
 	index_boot(DB_BOOT_ACCT);
