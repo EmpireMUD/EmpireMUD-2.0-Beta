@@ -37,7 +37,7 @@ void clear_last_act_message(descriptor_data *desc);
 struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
 bool is_ignoring(char_data *ch, char_data *victim);
 void open_slash_channel_file(struct slash_channel *chan);
-struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message, bool limit);
+struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message);
 void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entry);
 void write_slash_channel_configs(struct slash_channel *chan);
 void write_slash_channel_index();
@@ -97,7 +97,7 @@ bool add_ignore(char_data *ch, int idnum) {
 */
 void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message) {
 	if (!REAL_NPC(ch)) {
-		process_add_to_channel_history(&GET_HISTORY(REAL_CHAR(ch), type), NULL, message, TRUE);
+		process_add_to_channel_history(&GET_HISTORY(REAL_CHAR(ch), type), NULL, message);
 	}
 }
 
@@ -111,7 +111,7 @@ void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *m
 */
 void add_to_slash_channel_history(struct slash_channel *chan, char_data *speaker, char *message) {
 	struct channel_history_data *entry;
-	entry = process_add_to_channel_history(&(chan->history), speaker, message, FALSE);
+	entry = process_add_to_channel_history(&(chan->history), speaker, message);
 	
 	if (!(chan->fl)) {
 		open_slash_channel_file(chan);
@@ -331,10 +331,9 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 * @param struct channel_history_data **history a pointer to a history storage pointer
 * @param char_data *ch The player speaking on the channel (if applicable)
 * @param char *message the message to store
-* @param bool limit If TRUE, removes old messages after MAX_RECENT_CHANNELS entries.
 * @return struct channel_history_data* The new history entry.
 */
-struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message, bool limit) {
+struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message) {
 	struct channel_history_data *new, *old, *iter;
 	int count;
 	
