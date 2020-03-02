@@ -1918,7 +1918,7 @@ the number of tiles you see in each direction on commands like look and scan.
 Available options:
  * toggle informative - If on, tiles will indicate if they are being built
      or dismantled, need repair, and some other status types.
- * toggle political - Indicates who owns different each map tile.
+ * toggle political - Indicates who owns each map tile.
  * toggle brief - This will hide the map display entirely and not show you
      what you can see in each direction.
 
