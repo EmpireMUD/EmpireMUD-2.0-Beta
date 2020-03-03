@@ -3019,7 +3019,6 @@ struct slash_channel {
 	char *lc_name;	// lowercase name (for speed)
 	char color;
 	struct channel_history_data *history;
-	FILE *fl;	// file to be left open for appending output
 	
 	struct slash_channel *next;
 };

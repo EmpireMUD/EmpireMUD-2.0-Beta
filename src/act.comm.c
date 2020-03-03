@@ -36,7 +36,7 @@ void clear_last_act_message(descriptor_data *desc);
 // locals
 struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
 bool is_ignoring(char_data *ch, char_data *victim);
-void open_slash_channel_file(struct slash_channel *chan);
+FILE *open_slash_channel_file(struct slash_channel *chan);
 struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message);
 void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entry);
 void write_slash_channel_configs(struct slash_channel *chan);
@@ -111,15 +111,15 @@ void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *m
 */
 void add_to_slash_channel_history(struct slash_channel *chan, char_data *speaker, char *message) {
 	struct channel_history_data *entry;
+	FILE *fl;
+	
 	entry = process_add_to_channel_history(&(chan->history), speaker, message);
-	
-	if (!(chan->fl)) {
-		open_slash_channel_file(chan);
+	if (!(fl = open_slash_channel_file(chan))) {
+		return;	// unable to write
 	}
 	
-	if (chan->fl) {
-		write_one_slash_channel_message(chan->fl, entry);
-	}
+	write_one_slash_channel_message(fl, entry);
+	fclose(fl);
 }
 
 
@@ -646,12 +646,6 @@ void clean_slash_channel(struct slash_channel *chan) {
 	
 	clear_before = time(0) - (config_get_int("slash_message_log_days") * SECS_PER_REAL_DAY);
 	
-	// ensure file not open
-	if (chan->fl) {
-		fclose(chan->fl);
-		chan->fl = NULL;
-	}
-	
 	// open the file for write (overwrite the old one)
 	sprintf(filename, "%s%s", LIB_CHANNELS, chan->lc_name);
 	if (!(fl = fopen(filename, "w"))) {
@@ -690,21 +684,6 @@ void clean_slash_channel(struct slash_channel *chan) {
 	
 	// and write the current configs now (will re-open the file for append)
 	write_slash_channel_configs(chan);
-}
-
-
-/**
-* Ensures all slash channel files are closed.
-*/
-void close_slash_channel_files(void) {
-	struct slash_channel *chan;
-	
-	LL_FOREACH(slash_channel_list, chan) {
-		if (chan->fl) {
-			fclose(chan->fl);
-			chan->fl = NULL;
-		}
-	}
 }
 
 
@@ -859,12 +838,6 @@ void load_slash_channels(void) {
 			chan = create_slash_channel(name);
 		}
 		
-		// close the channel's file if it's open
-		if (chan->fl) {
-			fclose(chan->fl);
-			chan->fl = NULL;
-		}
-		
 		// prevent trouble while reloading: clear anything already loaded (should be nothing)
 		while ((hist = chan->history)) {
 			chan->history = hist->next;
@@ -997,26 +970,29 @@ void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, 
 
 
 /**
-* Ensures the slash-channel's log file is open for writing.
+* Opens the slash-channel's log file to append to.
 *
 * @param struct slash_channel *chan The channel to open the file for.
+* @return FILE* The open file for writing, if possible.
 */
-void open_slash_channel_file(struct slash_channel *chan) {
+FILE *open_slash_channel_file(struct slash_channel *chan) {
 	char fname[256];
+	FILE *fl;
 	
-	if (!chan || chan->fl) {
-		return;
+	if (!chan) {
+		return NULL;
 	}
 	if (!str_cmp(chan->lc_name, "index")) {
 		// emergency saftey: cannot write a channel named "index" because it would overwrite the index
 		log("SYSERR: Trying to open file for slash-channel named 'index'");
-		return;
+		return NULL;
 	}
 	
 	snprintf(fname, sizeof(fname), "%s%s", LIB_CHANNELS, chan->lc_name);
-	if (!(chan->fl = fopen(fname, "a"))) {
+	if (!(fl = fopen(fname, "a"))) {
 		log("SYSERR: Unable to open slash-channel file '%s' for appending", fname);
 	}
+	return fl;
 }
 
 
@@ -1161,16 +1137,13 @@ void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entr
 * @param struct slash_channel *chan The channel to write to.
 */
 void write_slash_channel_configs(struct slash_channel *chan) {
-	if (!chan->fl) {
-		open_slash_channel_file(chan);
-		if (!chan->fl) {
-			// unable to write
-			return;
-		}
+	FILE *fl = open_slash_channel_file(chan);
+	if (!fl) {
+		return;	// unable to write
 	}
 	
-	fprintf(chan->fl, "N %c %s\n", chan->color, chan->name);
-	fflush(chan->fl);
+	fprintf(fl, "N %c %s\n", chan->color, chan->name);
+	fclose(fl);
 }
 
 

@@ -739,7 +739,6 @@ bool check_reboot_confirms(void) {
 * Perform a reboot/shutdown.
 */
 void perform_reboot(void) {
-	void close_slash_channel_files();
 	extern const char *reboot_strings[];
 	extern int num_of_reboot_strings;
 	
@@ -759,7 +758,6 @@ void perform_reboot(void) {
 	// prepare for the end!
 	save_all_empires();
 	save_whole_world();
-	close_slash_channel_files();
 
 	if (reboot_control.type == SCMD_REBOOT) {
 		sprintf(buf, "\r\n[0;0;31m *** Rebooting ***[0;0;37m\r\nPlease be patient, this will take a second.\r\n\r\n");
