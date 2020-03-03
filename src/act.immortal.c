@@ -3812,7 +3812,7 @@ SHOW(show_uses) {
 				}
 				
 				// success
-				if (res->vnum == GEN_VNUM(cmp)) {
+				if (req->vnum == GEN_VNUM(cmp)) {
 					*part = '\0';
 				}
 				else {
@@ -3839,7 +3839,7 @@ SHOW(show_uses) {
 					}
 				
 					// success
-					if (res->vnum == GEN_VNUM(cmp)) {
+					if (req->vnum == GEN_VNUM(cmp)) {
 						*part = '\0';
 					}
 					else {
@@ -3863,7 +3863,7 @@ SHOW(show_uses) {
 				}
 				
 				// success
-				if (res->vnum == GEN_VNUM(cmp)) {
+				if (req->vnum == GEN_VNUM(cmp)) {
 					*part = '\0';
 				}
 				else {
