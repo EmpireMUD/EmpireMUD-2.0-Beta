@@ -8068,12 +8068,13 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 * @param any_vnum cmp_vnum The vnum of the component to charge (will also accept sub-types of this).
 * @param int amount How much to charge*
 * @param bool use_kept If TRUE, will use items with the 'keep' flag instead of ignorning them
+* @param bool basic_only If TRUE, will only use basic components.
 * @param struct resource_data **build_used_list Optional: A place to store the exact item used, e.g. for later dismantling. (NULL if none)
 * @return bool TRUE if it was able to charge enough, FALSE if not
 */
-bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool use_kept, struct resource_data **build_used_list) {
+bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool use_kept, bool basic_only, struct resource_data **build_used_list) {
 	struct empire_storage_data *store, *next_store;
-	generic_data *cmp = real_generic(cmp_vnum);
+	generic_data *cmp = real_generic(cmp_vnum), *gen;
 	struct empire_island *isle, *next_isle;
 	int this, can_take, found = 0;
 	obj_data *proto;
@@ -8101,6 +8102,9 @@ bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, in
 			// need obj
 			if (!(proto = store->proto)) {
 				continue;
+			}
+			if (basic_only && cmp_vnum != GET_OBJ_COMPONENT(proto) && (!(gen = real_generic(GET_OBJ_COMPONENT(proto))) || !GEN_FLAGGED(gen, GEN_BASIC))) {
+				continue;	// must be basic (or exact match)
 			}
 		
 			// matching component?
@@ -8210,10 +8214,11 @@ bool delete_stored_resource(empire_data *emp, obj_vnum vnum) {
 * @param any_vnum cmp_vnum The generic component to check for (also allows subtypes).
 * @param int amount The number that must be available.
 * @param bool include_kept If TRUE, ignores the 'keep' flag and will use kept items.
+* @param bool basic_only If TRUE, skips non-basic components.
 */
-bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool include_kept) {
+bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool include_kept, bool basic_only) {
 	struct empire_storage_data *store, *next_store;
-	generic_data *cmp = real_generic(cmp_vnum);
+	generic_data *cmp = real_generic(cmp_vnum), *gen;
 	struct empire_island *isle;
 	obj_data *proto;
 	int amt, found = 0;
@@ -8229,6 +8234,9 @@ bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum
 		
 		if (!(proto = store->proto)) {
 			continue;	// need obj
+		}
+		if (basic_only && cmp_vnum != GET_OBJ_COMPONENT(proto) && (!(gen = real_generic(GET_OBJ_COMPONENT(proto))) || !GEN_FLAGGED(gen, GEN_BASIC))) {
+			continue;	// must be basic (or exact match)
 		}
 		
 		// is it a match, though?
