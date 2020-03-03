@@ -140,9 +140,9 @@ you've seen, save for the size, which is enormous. A hovel made for a single
 giant can easily sleep a family of eight.
 ~
 R
-21 1 1 0
+6015 1 1 0
 R
-7 2 1 1048848
+6422 2 1 0
 S
 #10975
 Giant Stone Head~
@@ -217,11 +217,11 @@ shelves to the books are half-sundered. But on the bright side, the massive
 crack in the wall lets in a lot of light.
 ~
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 R
-3 1 1 0
+6075 1 1 0
 T 5511
 U
 1 5164

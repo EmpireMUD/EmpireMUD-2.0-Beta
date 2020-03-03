@@ -251,9 +251,10 @@ void evolve_map(void) {
 			write_tile(tile, old);
 			++changed;
 		}
-		
-		// spreader-style evos
-		changed += spread_one(tile);
+		else {
+			// spreader-style evos
+			changed += spread_one(tile);
+		}
 	}
 	
 	if (DEBUG_MODE) {

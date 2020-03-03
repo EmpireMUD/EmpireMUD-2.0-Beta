@@ -38,9 +38,10 @@ set obj %actor.inventory()%
 %purge% %self%
 ~
 #601
-Enchanted seed plant~
+Enchanted seed plant - desert (default)~
 1 c 2
 plant~
+* default script for obj 601: can only make enchanted forests in the desert
 if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
@@ -51,15 +52,15 @@ if !%actor.canuseroom_member()%
   return 1
   halt
 end
-if %room.sector% != Plains
-  %send% %actor% You can only plant %self.shortdesc% on open plains.
+if %room.sector_vnum% != 26
+  %send% %actor% You can only plant %self.shortdesc% in a desert grove.
   return 1
   halt
 end
 %send% %actor% You dig a hole and plant %self.shortdesc% in it.
 %echoaround% %actor% %actor.name% digs a hole and plant %self.shortdesc% in it.
-%echo% Dozens of strange saplings spring up!
-%terraform% %room% 600
+%echo% The trees around you twist and turn and take on a strange violet hue.
+%terraform% %room% 610
 %purge% %self%
 ~
 #602
@@ -88,7 +89,7 @@ while %cycles_left% >= 0
       %echo% %self.name% plants %self.hisher% skull staff into the ground...
     break
     case 4
-      %echo% %self.name% mutters an unspeakable word, killing the grass...
+      %echo% %self.name% mutters an unspeakable word, killing the undergrowth...
     break
     case 3
       %echo% %self.name% sends out a shockwave of death magic, withering the leaves on the trees...
@@ -101,7 +102,15 @@ while %cycles_left% >= 0
     break
     case 0
       %echo% %self.name% completes %self.hisher% ritual, killing the forest!
-      %terraform% %room% 605
+      * terraform based on sector
+      if %room.sector_vnum% >= 600 && %room.sector_vnum% <= 604
+        %terraform% %room% 605
+      elseif %room.sector_vnum% >= 610 && %room.sector_vnum% <= 614
+        %terraform% %room% 615
+      else
+        * not a sector we can finish
+        nop %self.add_mob_flag(SPAWNED)%
+      end
       halt
     break
   done
@@ -109,6 +118,62 @@ while %cycles_left% >= 0
   eval cycles_left %cycles_left% - 1
 done
 %echo% %self.name% looks confused...
+~
+#603
+Enchanted seed plant - desert AND plains~
+1 c 2
+plant~
+* If you prefer both desert AND temperate enchanted forests, put this script on obj vnum 601 instead of its normal one
+if %actor.obj_target(%arg%)% != %self%
+  return 0
+  halt
+end
+set room %self.room%
+if !%actor.canuseroom_member()%
+  %send% %actor% You don't have permission to plant anything here.
+  return 1
+  halt
+end
+if (%room.sector_vnum% != 0 && %room.sector_vnum% != 26)
+  %send% %actor% You can only plant %self.shortdesc% on open plains or in a desert grove.
+  return 1
+  halt
+end
+%send% %actor% You dig a hole and plant %self.shortdesc% in it.
+%echoaround% %actor% %actor.name% digs a hole and plant %self.shortdesc% in it.
+%echo% Dozens of strange saplings spring up!
+if %room.sector_vnum% == 26
+  %terraform% %room% 610
+else
+  %terraform% %room% 600
+end
+%purge% %self%
+~
+#604
+Enchanted seed plant - Temperate Only~
+1 c 2
+plant~
+* If your MUD has too few deserts, put this script on obj vnum 601 instead of its normal one
+if %actor.obj_target(%arg%)% != %self%
+  return 0
+  halt
+end
+set room %self.room%
+if !%actor.canuseroom_member()%
+  %send% %actor% You don't have permission to plant anything here.
+  return 1
+  halt
+end
+if %room.sector_vnum% != 0
+  %send% %actor% You can only plant %self.shortdesc% on open plains.
+  return 1
+  halt
+end
+%send% %actor% You dig a hole and plant %self.shortdesc% in it.
+%echoaround% %actor% %actor.name% digs a hole and plant %self.shortdesc% in it.
+%echo% Dozens of strange saplings spring up!
+%terraform% %room% 600
+%purge% %self%
 ~
 #610
 Talking Horse script~
@@ -310,5 +375,49 @@ switch %random.4%
     say If we don't quash the fairy revolt, I'll be replaced by a Piczar!
   break
 done
+~
+#617
+Free genie load~
+0 n 100
+~
+wait 1
+* only allows 1 copy of the genie here
+set ch %self.next_in_room%
+while %ch%
+  if %ch.vnum% == %self.vnum%
+    say I shall go enjoy my freedom.
+    %echo% %self.name% vanishes in a puff of smoke!
+    %purge% %self%
+    halt
+  end
+  set ch %ch.next_in_room%
+done
+* still here?
+dg_affect %self% !ATTACK on -1
+detach 617 %self.id%
+~
+#618
+Genie trigger phrase~
+0 d 1
+wish~
+if %actor.is_npc% || %actor.nohassle%
+  halt
+end
+wait 1
+say Wish? You wish? I've had enough with wishes!
+wait 1
+if %actor.room% != %self.room%
+  halt
+end
+dg_affect %self% !ATTACK off
+%aggro% %actor%
+~
+#619
+Genie death~
+0 f 100
+~
+say No! Noooo! I won't go back in the bottle!
+%echo% %self.name% screams as he's sucked into a brass bottle, expelling all his power trying in vain to get free.
+return 0
 ~
 $

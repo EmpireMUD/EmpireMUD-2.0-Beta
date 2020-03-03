@@ -93,6 +93,7 @@ land_per_wealth 0.100000
 member_timeout_full 120
 member_timeout_max_threshold 168
 member_timeout_newbie 7
+min_distrustful_distance 75
 minutes_per_day_full 150
 minutes_per_day_newbie 15
 newbie_island_day_limit 7
@@ -152,6 +153,7 @@ num_daily_skill_points 15
 offer_time 75
 pool_bonus_amount 15
 remove_lore_after_years 2
+slash_message_log_days 7
 *
 * Skills configs
 enchant_points_at_100 2.000000

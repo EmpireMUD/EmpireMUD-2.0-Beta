@@ -220,7 +220,9 @@ OLC_MODULE(genedit_type);
 OLC_MODULE(genedit_color);
 OLC_MODULE(genedit_drunk);
 OLC_MODULE(genedit_hunger);
+OLC_MODULE(genedit_item);
 OLC_MODULE(genedit_liquid);
+OLC_MODULE(genedit_relations);
 OLC_MODULE(genedit_thirst);
 OLC_MODULE(genedit_apply2char);
 OLC_MODULE(genedit_apply2room);
@@ -327,7 +329,6 @@ OLC_MODULE(oedit_capacity);
 OLC_MODULE(oedit_cdtime);
 OLC_MODULE(oedit_charges);
 OLC_MODULE(oedit_coinamount);
-OLC_MODULE(oedit_compflags);
 OLC_MODULE(oedit_component);
 OLC_MODULE(oedit_containerflags);
 OLC_MODULE(oedit_contents);
@@ -501,8 +502,6 @@ OLC_MODULE(vedit_speed);
 
 
 // externs
-extern const char *component_flags[];
-extern const char *component_types[];
 extern const char *interact_types[];
 extern const int interact_attach_types[NUM_INTERACTS];
 extern const byte interact_vnum_types[NUM_INTERACTS];
@@ -832,6 +831,9 @@ const struct olc_command_data olc_data[] = {
 	// generic: currency
 	{ "plural", genedit_plural, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "singular", genedit_singular, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: component
+	{ "item", genedit_item, OLC_GENERIC, OLC_CF_EDITOR },
+	{ "relations", genedit_relations, OLC_GENERIC, OLC_CF_EDITOR },
 	
 	// globals commands
 	{ "capacity", gedit_capacity, OLC_GLOBAL, OLC_CF_EDITOR },
@@ -922,8 +924,7 @@ const struct olc_command_data olc_data[] = {
 	{ "cdtime", oedit_cdtime, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "charges", oedit_charges, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "coinamount", oedit_coinamount, OLC_OBJECT, OLC_CF_EDITOR },
-	{ "component", oedit_component, OLC_OBJECT, OLC_CF_EDITOR },	// deliberately before "compflags"
-	{ "compflags", oedit_compflags, OLC_OBJECT, OLC_CF_EDITOR },
+	{ "component", oedit_component, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "containerflags", oedit_containerflags, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "contents", oedit_contents, OLC_OBJECT, OLC_CF_EDITOR },
 	{ "cooldown", oedit_cooldown, OLC_OBJECT, OLC_CF_EDITOR },
@@ -4228,7 +4229,7 @@ void get_resource_display(struct resource_data *list, char *save_buffer) {
 				break;
 			}
 			case RES_COMPONENT: {
-				sprintf(line, "%dx (%s)", res->amount, component_string(res->vnum, res->misc));
+				sprintf(line, "%dx (%s)", res->amount, res->amount == 1 ? get_generic_name_by_vnum(res->vnum) : get_generic_string_by_vnum(res->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 				sprintf(save_buffer + strlen(save_buffer), " &y%2d&0. %-34.34s", num, line);
 				break;
 			}
@@ -5056,8 +5057,6 @@ int olc_process_number(char_data *ch, char *argument, char *name, char *command,
 bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc, char *group) {
 	extern const char *action_bits[];
 	extern const char *diplomacy_flags[];
-	extern const char *component_flags[];
-	extern const char *component_types[];
 	extern const char *function_flags[];
 	extern const char *vehicle_flags[];
 	
@@ -5220,19 +5219,18 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 		}
 	}
 	if (need_component) {
-		argument = any_one_arg(argument, arg);
-		skip_spaces(&argument);
+		generic_data *cmp;
+		argument = any_one_word(argument, arg);
 		if (!*arg) {
-			msg_to_char(ch, "You must provide a component type.\r\n");
+			msg_to_char(ch, "You must provide a component name/vnum.\r\n");
 			return FALSE;
 		}
-		if ((*vnum = search_block(arg, component_types, FALSE)) == NOTHING) {
+		if (!(cmp = find_generic_component(arg))) {
 			msg_to_char(ch, "Invalid component type '%s'.\r\n", arg);
 			return FALSE;
 		}
-		if (*argument) {
-			argument = any_one_word(argument, arg);
-			*misc = olc_process_flag(ch, arg, "component", "", component_flags, NOBITS);
+		else {
+			*vnum = GEN_VNUM(cmp);
 		}
 	}
 	if (need_currency) {
@@ -6945,7 +6943,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 */
 void olc_process_resources(char_data *ch, char *argument, struct resource_data **list) {	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
-	char arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg4[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
 	int num, type, misc;
 	any_vnum vnum;
@@ -6987,16 +6985,12 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 		}
 	}
 	else if (is_abbrev(arg1, "add")) {
-		strcpy(buf, arg4);	// split out one more arg
-		half_chop(buf, arg4, arg5);
-		
 		// arg2 is "type"
 		num = atoi(arg3);
 		vnum = atoi(arg4);	// not necessarily a number though
-		// arg5 may be flags
 		
 		if (!*arg2 || !*arg3 || !isdigit(*arg3)) {
-			msg_to_char(ch, "Usage: resource add <type> <quantity> <vnum/name> [flags, for components only]\r\n");
+			msg_to_char(ch, "Usage: resource add <type> <quantity> <vnum/name>\r\n");
 		}
 		else if ((type = search_block(arg2, resource_types, FALSE)) == NOTHING) {
 			msg_to_char(ch, "Unknown resource type '%s'.\r\n", arg2);
@@ -7007,7 +7001,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 		else {
 			misc = 0;
 			
-			// RES_x: validate arg4/arg5 based on type
+			// RES_x: validate arg4 based on type
 			switch (type) {
 				case RES_OBJECT: {
 					if (!*arg4 || !isdigit(*arg4)) {
@@ -7021,17 +7015,17 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					break;
 				}
 				case RES_COMPONENT: {
+					generic_data *cmp;
 					if (!*arg4) {
-						msg_to_char(ch, "Usage: resource add component <quantity> <type> [flags]\r\n");
+						msg_to_char(ch, "Usage: resource add component <quantity> <vnum/name>\r\n");
 						return;
 					}
-					if ((vnum = search_block(arg4, component_types, FALSE)) == NOTHING) {
+					if (!(cmp = find_generic_component(arg4))) {
 						msg_to_char(ch, "Unknown component type '%s'.\r\n", arg4);
 						return;
 					}
-					
-					if (*arg5) {
-						misc = olc_process_flag(ch, arg5, "component", "resource add component <quantity> <type>", component_flags, NOBITS);
+					else {
+						vnum = GEN_VNUM(cmp);
 					}
 					break;
 				}
@@ -7182,7 +7176,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 	}
 	else if (is_abbrev(arg1, "change")) {
 		if (!*arg2 || !*arg3 || !*arg4 || !isdigit(*arg2)) {
-			msg_to_char(ch, "Usage: resource change <number> <quantity | vnum | name | flags> <value>\r\n");
+			msg_to_char(ch, "Usage: resource change <number> <quantity | vnum | name> <value>\r\n");
 			return;
 		}
 		
@@ -7254,14 +7248,18 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			// RES_x: some resource types support "change name"
 			switch (change->type) {
 				case RES_COMPONENT: {
-					if ((vnum = search_block(arg4, component_types, FALSE)) == NOTHING) {
+					generic_data *cmp;
+					if (!(cmp = find_generic_component(arg4))) {
 						msg_to_char(ch, "Unknown component type '%s'.\r\n", arg4);
 						return;
+					}
+					else {
+						vnum = GEN_VNUM(cmp);
 					}
 					
 					change->vnum = vnum;
 					
-					msg_to_char(ch, "You change resource %d's component to %s.\r\n", atoi(arg2), component_string(vnum, change->misc));
+					msg_to_char(ch, "You change resource %d's component to (%s).\r\n", atoi(arg2), get_generic_name_by_vnum(vnum));
 					break;
 				}
 				case RES_POOL: {
@@ -7292,26 +7290,12 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 				}
 			}
 		}
-		else if (is_abbrev(arg3, "flags")) {
-			if (change->type != RES_COMPONENT) {
-				msg_to_char(ch, "You can't change the vnum on a resource that isn't a component.\r\n");
-			}
-			else {
-				misc = olc_process_flag(ch, arg4, "component", "resource change <number> flags <value>", component_flags, change->misc);
-				
-				// if there are no changes, they should have gotten an error message
-				if (misc != change->misc) {
-					change->misc = misc;
-					msg_to_char(ch, "You change resource %d's component to %s.\r\n", atoi(arg2), component_string(change->vnum, misc));
-				}
-			}
-		}
 		else {
-			msg_to_char(ch, "Usage: resource change <number> <quantity | vnum | name | flags> <value>\r\n");
+			msg_to_char(ch, "Usage: resource change <number> <quantity | vnum | name> <value>\r\n");
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: resource add <type> <quantity> <vnum/name> [flags, for component only]\r\n");
+		msg_to_char(ch, "Usage: resource add <type> <quantity> <vnum/name>\r\n");
 		msg_to_char(ch, "Usage: resource change <number> <quantity | vnum> <value>\r\n");
 		msg_to_char(ch, "Usage: resource remove <number | all>\r\n");
 		msg_to_char(ch, "Usage: resource move <number> <up | down>\r\n");

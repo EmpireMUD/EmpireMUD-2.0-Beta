@@ -7,14 +7,16 @@ accenting every edge. The symbol of the sun atop the barge represents its
 mythological role as Ra's chariot across the blue sky.
 ~
 &t\&g&u=n&0&t/~
-ciklu 3 32 300 0
+ciklu 3 32 300 0 0 0 0
 C
 250 300
 D
 18329 0 0
+P
+2
 R
-16 1 1 0
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 $

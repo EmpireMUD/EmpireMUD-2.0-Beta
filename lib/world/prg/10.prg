@@ -168,12 +168,12 @@ Forging the Future~
 Build a forge and make 50 nails. Be sure to claim the forge to complete this
 goal.
 ~
-3 1 0 15 0
+4 1 0 15 0
 P 1030
 W
 26 0 128 1 a
 W
-35 19 0 50 a
+35 6790 0 50 a
 S
 #1040
 Luxuries~

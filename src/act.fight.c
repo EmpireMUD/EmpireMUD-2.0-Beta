@@ -741,7 +741,7 @@ ACMD(do_tie) {
 	}
 	else if (GET_POS(victim) >= POS_SLEEPING)
 		act("You need to knock $M out first.", FALSE, ch, 0, victim, TO_CHAR);
-	else if (!(rope = get_component_in_list(CMP_ROPE, NOBITS, ch->carrying, &kept))) {
+	else if (!(rope = get_component_in_list(COMP_ROPE, ch->carrying, &kept))) {
 		msg_to_char(ch, "You don't seem to have any rope%s.\r\n", kept ? " that isn't marked 'keep'" : "");
 	}
 	else {

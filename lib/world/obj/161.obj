@@ -1130,8 +1130,9 @@ An intact hydra tongue is coiled here like a spool of rope.~
    A rare thing, an intact tongue from a dead hydra. Most often, they mangle
 it with their serrated teeth in their death throws. You can use this to bind
 bones together and build an oceanic tower.
+Usage: build oceanictower <direction>
 ~
-3 0 a 0 2
+3 0 a 0 3
 0 0 0
 7 0
 R

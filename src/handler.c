@@ -3035,24 +3035,24 @@ int get_production_total(empire_data *emp, obj_vnum vnum) {
 * Gets the total count produced (or traded for) by an empire, for a component.
 *
 * @param empire_data *emp Which empire.
-* @param int cmp_type Which component type.
-* @param bitvector_t cmp_flags Any required component flags.
+* @param any_vnum cmp_vnum The generic component type to check for (counts other versions of it too).
 * @return int How many matching items the empire has ever gained.
 */
-int get_production_total_component(empire_data *emp, int cmp_type, bitvector_t cmp_flags) {
+int get_production_total_component(empire_data *emp, any_vnum cmp_vnum) {
 	struct empire_production_total *egt, *next_egt;
+	generic_data *cmp = real_generic(cmp_vnum);
 	int count = 0;
 	
-	if (!emp || cmp_type == CMP_NONE) {
+	if (!emp || !cmp) {
 		return count;	// no work
 	}
 	
 	HASH_ITER(hh, EMPIRE_PRODUCTION_TOTALS(emp), egt, next_egt) {
-		if (!egt->proto) {
+		if (!egt->proto || GET_OBJ_COMPONENT(egt->proto) == NOTHING) {
 			continue;
 		}
 		
-		if (GET_OBJ_CMP_TYPE(egt->proto) == cmp_type && (GET_OBJ_CMP_FLAGS(egt->proto) & cmp_flags) == cmp_flags) {
+		if (is_component(egt->proto, cmp)) {
 			count += (egt->amount - MAX(0, egt->imported - egt->exported));
 		}
 	}
@@ -5204,59 +5204,6 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 
 
 /**
-* Takes player input of a complex component like "bunch of block" or
-* "large, single fruit" and gets the CMP_ and CMPF_ settings from it.
-*
-* @param char *str The character's input.
-* @param int *type A variable to bind a CMP_ type (may be NOTHING or CMP_NONE).
-* @param bitvector_t *flags Any CMPF_ flags requested.
-* @return bool TRUE if the whole string parses into a component, FALSE if not.
-*/
-bool parse_component(char *str, int *type, bitvector_t *flags) {
-	extern const char *component_types[];
-	extern const char *component_flags[];
-	
-	char temp[MAX_INPUT_LENGTH], word[MAX_INPUT_LENGTH], *ptr;
-	int flg;
-	
-	// base setup
-	*type = NOTHING;
-	*flags = NOBITS;
-	
-	// make copy
-	strncpy(temp, str, MAX_INPUT_LENGTH-1);
-	temp[MAX_INPUT_LENGTH-1] = '\0';	// safety firsty
-	
-	// remove commas
-	while ((ptr = strchr(temp, ','))) {
-		*ptr = ' ';
-	}
-	
-	// check words 1 at a time
-	while (*temp) {
-		half_chop(temp, word, temp);	// split out first word
-		
-		if (!*temp) {	// final word is the component type
-			*type = search_block(word, component_types, FALSE);
-		}
-		else {	// each previous word is a possible flag
-			flg = search_block(word, component_flags, FALSE);
-			if (flg != NOTHING) {
-				*flags |= BIT(flg);
-			}
-			else {
-				// bad flag
-				*type = NOTHING;
-				return FALSE;
-			}
-		}
-	}
-	
-	return (*type != NOTHING && *type != CMP_NONE);
-}
-
-
-/**
 * Remove an object from the global object list.
 *
 * @param obj_data *obj The item to remove from the global object list.
@@ -6124,31 +6071,55 @@ bool has_custom_message(struct custom_message *list, int type) {
 
 /**
 * Search a given list for a matching component and return it (will not return
-* kept items).
+* kept items). If finds an extended match (not perfect match) on the component,
+* it will prefer a 'basic' component over a non-basic one.
 *
-* @param int cmp_type The CMP_ type to find.
-* @param bitvector_t cmp_flags Any required flags (all must match).
+* @param any_vnum cmp_vnum The generic component to look for (or any of its subtypes).
 * @param obj_data *list The start of any object list.
 * @param bool *kept A variable to bind to if there was a match but it was marked 'keep' (which won't be returned).
 * @return obj_data *The first matching object in the list, if any.
 */
-obj_data *get_component_in_list(int cmp_type, bitvector_t cmp_flags, obj_data *list, bool *kept) {
+obj_data *get_component_in_list(any_vnum cmp_vnum, obj_data *list, bool *kept) {
+	obj_data *obj, *basic = NULL, *non_basic = NULL;
 	bool found_keep = FALSE;
-	obj_data *obj;
+	generic_data *gen, *tmp;
 	
 	*kept = FALSE;
 	
+	// load the generic component
+	if (!(gen = real_generic(cmp_vnum)) || GEN_TYPE(gen) != GENERIC_COMPONENT) {
+		return NULL;
+	}
+	
 	LL_FOREACH2(list, obj, next_content) {
-		if (GET_OBJ_CMP_TYPE(obj) == cmp_type && (GET_OBJ_CMP_FLAGS(obj) & cmp_flags) == cmp_flags) {
-			// valid match?
+		if (GET_OBJ_COMPONENT(obj) == cmp_vnum) {
+			// full match
 			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 				found_keep = TRUE;
 			}
 			else {
-				// found!
-				return obj;
+				return obj;	// found perfect match
 			}
 		}
+		else if (is_component(obj, gen)) {
+			// partial match
+			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+				found_keep = TRUE;
+			}
+			else if (!basic) {
+				if ((tmp = real_generic(GET_OBJ_COMPONENT(obj))) && GEN_FLAGGED(tmp, GEN_BASIC)) {
+					basic = obj;
+				}
+				else if (tmp && !non_basic) {
+					non_basic = obj;
+				}
+			}
+		}
+	}
+	
+	// found a partial match?
+	if (basic || non_basic) {
+		return basic ? basic : non_basic;
 	}
 	
 	// failed
@@ -7136,7 +7107,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 				break;
 			}
 			case REQ_EMPIRE_PRODUCED_COMPONENT: {
-				if (!GET_LOYALTY(ch) || get_production_total_component(GET_LOYALTY(ch), req->vnum, req->misc) < req->needed) {
+				if (!GET_LOYALTY(ch) || get_production_total_component(GET_LOYALTY(ch), req->vnum) < req->needed) {
 					ok = FALSE;
 				}
 				break;
@@ -7239,7 +7210,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		case REQ_GET_COMPONENT: {
-			snprintf(output, sizeof(output), "Get component%s: %dx (%s)", PLURAL(req->needed), req->needed, component_string(req->vnum, req->misc));
+			snprintf(output, sizeof(output), "Get component%s: %dx (%s)", PLURAL(req->needed), req->needed, req->needed == 1 ? get_generic_name_by_vnum(req->vnum) : get_generic_string_by_vnum(req->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 			break;
 		}
 		case REQ_GET_OBJECT: {
@@ -7390,7 +7361,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		case REQ_EMPIRE_PRODUCED_COMPONENT: {
-			snprintf(output, sizeof(output), "Empire has produced: %dx (%s)", req->needed, component_string(req->vnum, req->misc));
+			snprintf(output, sizeof(output), "Empire has produced: %dx (%s)", req->needed, req->needed == 1 ? get_generic_name_by_vnum(req->vnum) : get_generic_string_by_vnum(req->vnum, GENERIC_COMPONENT, GSTR_COMPONENT_PLURAL));
 			break;
 		}
 		case REQ_EVENT_RUNNING: {
@@ -8089,25 +8060,30 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 
 
 /**
-* removes X stored components from an empire
+* removes X stored components from an empire (will also accept sub-types/
+* related components)
 *
 * @param empire_data *emp
 * @param int island Which island to charge for storage, or ANY_ISLAND to take from any available storage
-* @param int cmp_type Which CMP_ type to charge
-* @param int cmp_flags Required CMPF_ flags to match on the component
+* @param any_vnum cmp_vnum The vnum of the component to charge (will also accept sub-types of this).
 * @param int amount How much to charge*
 * @param bool use_kept If TRUE, will use items with the 'keep' flag instead of ignorning them
+* @param bool basic_only If TRUE, will only use basic components.
 * @param struct resource_data **build_used_list Optional: A place to store the exact item used, e.g. for later dismantling. (NULL if none)
 * @return bool TRUE if it was able to charge enough, FALSE if not
 */
-bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, bool use_kept, struct resource_data **build_used_list) {
+bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool use_kept, bool basic_only, struct resource_data **build_used_list) {
 	struct empire_storage_data *store, *next_store;
+	generic_data *cmp = real_generic(cmp_vnum), *gen;
 	struct empire_island *isle, *next_isle;
 	int this, can_take, found = 0;
 	obj_data *proto;
 	
 	if (amount < 0) {
 		return TRUE;	// can't charge a negative amount
+	}
+	if (!cmp) {
+		return FALSE;	// no valid component to charge
 	}
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
@@ -8127,9 +8103,12 @@ bool charge_stored_component(empire_data *emp, int island, int cmp_type, int cmp
 			if (!(proto = store->proto)) {
 				continue;
 			}
+			if (basic_only && cmp_vnum != GET_OBJ_COMPONENT(proto) && (!(gen = real_generic(GET_OBJ_COMPONENT(proto))) || !GEN_FLAGGED(gen, GEN_BASIC))) {
+				continue;	// must be basic (or exact match)
+			}
 		
 			// matching component?
-			if (GET_OBJ_CMP_TYPE(proto) != cmp_type || (GET_OBJ_CMP_FLAGS(proto) & cmp_flags) != cmp_flags) {
+			if (GET_OBJ_COMPONENT(proto) == NOTHING || !is_component(proto, cmp)) {
 				continue;
 			}
 		
@@ -8232,18 +8211,19 @@ bool delete_stored_resource(empire_data *emp, obj_vnum vnum) {
 *
 * @param empire_data *emp The empire.
 * @param int island Which island to search.
-* @param int cmp_type Any CMP_ type.
-* @param int cmp_flags Any CMPF_ flags to match all of.
+* @param any_vnum cmp_vnum The generic component to check for (also allows subtypes).
 * @param int amount The number that must be available.
 * @param bool include_kept If TRUE, ignores the 'keep' flag and will use kept items.
+* @param bool basic_only If TRUE, skips non-basic components.
 */
-bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int cmp_flags, int amount, bool include_kept) {
+bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool include_kept, bool basic_only) {
 	struct empire_storage_data *store, *next_store;
+	generic_data *cmp = real_generic(cmp_vnum), *gen;
 	struct empire_island *isle;
 	obj_data *proto;
 	int amt, found = 0;
 	
-	if (island == NO_ISLAND || !(isle = get_empire_island(emp, island))) {
+	if (!cmp || island == NO_ISLAND || !(isle = get_empire_island(emp, island))) {
 		return FALSE;	// shortcut out
 	}
 	
@@ -8255,9 +8235,12 @@ bool empire_can_afford_component(empire_data *emp, int island, int cmp_type, int
 		if (!(proto = store->proto)) {
 			continue;	// need obj
 		}
+		if (basic_only && cmp_vnum != GET_OBJ_COMPONENT(proto) && (!(gen = real_generic(GET_OBJ_COMPONENT(proto))) || !GEN_FLAGGED(gen, GEN_BASIC))) {
+			continue;	// must be basic (or exact match)
+		}
 		
 		// is it a match, though?
-		if (GET_OBJ_CMP_TYPE(proto) == cmp_type && (GET_OBJ_CMP_FLAGS(proto) & cmp_flags) == cmp_flags) {
+		if (GET_OBJ_COMPONENT(proto) != NOTHING && is_component(proto, cmp)) {
 			amt = (store->keep > 0 ? store->amount - store->keep : store->amount);
 			SAFE_ADD(found, amt, 0, MAX_INT, FALSE);
 			if (found >= amount) {

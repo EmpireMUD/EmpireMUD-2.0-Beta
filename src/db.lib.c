@@ -66,6 +66,7 @@ extern struct offense_info_type offense_info[NUM_OFFENSES];
 extern bool world_is_sorted;
 
 // external funcs
+extern any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
 extern struct complex_room_data *init_complex_data();
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 void free_archetype_gear(struct archetype_gear *list);
@@ -5136,6 +5137,7 @@ void parse_object(FILE *obj_f, int nr) {
 	struct obj_storage_type *store, *last_store = NULL;
 	struct obj_apply *apply, *last_apply = NULL;
 	obj_data *obj, *find;
+	any_vnum vn;
 	
 	// create
 	CREATE(obj, obj_data, 1);
@@ -5292,14 +5294,31 @@ void parse_object(FILE *obj_f, int nr) {
 				break;
 			}
 			
-			case 'O': {	// component info
-				if (!get_line(obj_f, line) || sscanf(line, "%d %s", t, f1) != 2) {
-					log("SYSERR: Format error in 'O' Field, %s", buf2);
-					exit(1);
+			case 'O': {	// component info (O+ is the current version)
+				if (*(line + 1) == '+') {	// v2 (post-b5.88 version)
+					if (sscanf(line, "O+ %d %d", &t[0], &t[1]) != 2) {
+						log("SYSERR: Format error in 'O+' Field, %s", buf2);
+						exit(1);
+					}
+					
+					// t[0] is not currently used -- future use should be 'quantity'
+					GET_OBJ_COMPONENT(obj) = t[1];
 				}
-				
-				GET_OBJ_CMP_TYPE(obj) = t[0];
-				GET_OBJ_CMP_FLAGS(obj) = asciiflag_conv(f1);
+				else {	// v1 (two lines) -- convert
+					if (!get_line(obj_f, line) || sscanf(line, "%d %s", t, f1) != 2) {
+						log("SYSERR: Format error in 'O' Field, %s", buf2);
+						exit(1);
+					}
+					
+					vn = b5_88_old_component_to_new_component(t[0], asciiflag_conv(f1));
+					if (vn != NOTHING) {
+						log("- converting component on obj [%d] %s from (%d %s) to [%d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), t[0], f1, vn, get_generic_name_by_vnum(vn));
+						GET_OBJ_COMPONENT(obj) = vn;
+					}
+					else {
+						log("- unable to convert component on obj [%d] %s from (%d %s)", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), t[0], f1);
+					}
+				}
 				break;
 			}
 			
@@ -5414,10 +5433,11 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	// M: custom message
 	write_custom_messages_to_file(fl, 'M', obj->custom_msgs);
 	
-	// O: component data
-	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
-		fprintf(fl, "O\n");
-		fprintf(fl, "%d %s\n", GET_OBJ_CMP_TYPE(obj), bitv_to_alpha(GET_OBJ_CMP_FLAGS(obj)));
+	// O+: component data v2
+	//    prior to b5.88 this was "O\ntype flags" flags for the old component system
+	if (GET_OBJ_COMPONENT(obj) != NOTHING) {
+		// NOTE: the '1' here is for future 'quantity' use but is currently ignored
+		fprintf(fl, "O+ 1 %d\n", GET_OBJ_COMPONENT(obj));
 	}
 	
 	// Q: requires quest

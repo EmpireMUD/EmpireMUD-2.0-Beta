@@ -36,6 +36,7 @@
 *   Displays
 *   Generic OLC Modules
 *   Action OLC Modules
+*   Component OLC Modules
 *   Liquid OLC Modules
 */
 
@@ -47,6 +48,11 @@ const char *default_generic_name = "Unnamed Generic";
 extern const char *generic_flags[];
 extern const char *generic_types[];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
+
+// local funcs
+struct generic_relation *copy_generic_relations(struct generic_relation *list);
+void free_generic_relations(struct generic_relation **list);
+bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
 
 // external funcs
 extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
@@ -60,6 +66,94 @@ extern bool remove_thing_from_resource_list(struct resource_data **list, int typ
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Adds a generic relationship (if it is not already present).
+*
+* @param struct generic_relation **list A pointer to the list to add to.
+* @param any_vnum vnum The other generic's vnum, to add as a relation.
+*/
+void add_generic_relation(struct generic_relation **list, any_vnum vnum) {
+	struct generic_relation *item;
+	
+	if (list && vnum != NOTHING) {
+		HASH_FIND_INT(*list, &vnum, item);
+		
+		if (!item) {
+			CREATE(item, struct generic_relation, 1);
+			item->vnum = vnum;
+			HASH_ADD_INT(*list, vnum, item);
+		}
+	}
+}
+
+
+/**
+* Called at startup or after an OLC save to re-compute the full list of
+* generic relations, to save time later.
+*/
+void compute_generic_relations(void) {
+	struct generic_relation *rel, *next_rel, *alt, *next_alt;
+	generic_data *gen, *next_gen, *other;
+	bool changed;
+	int safety;
+	
+	// first clear them all out
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		free_generic_relations(&GEN_COMPUTED_RELATIONS(gen));
+	}
+	
+	// now repeatedly look for ones that have any to add
+	safety = 0;
+	do {
+		changed = FALSE;	// look for anything that was added in this round
+		++safety;
+		
+		HASH_ITER(hh, generic_table, gen, next_gen) {
+			// check that it has its basic relations in its computed relations
+			if (GEN_RELATIONS(gen) && !GEN_COMPUTED_RELATIONS(gen)) {
+				changed = TRUE;
+				GEN_COMPUTED_RELATIONS(gen) = copy_generic_relations(GEN_RELATIONS(gen));
+			}
+			
+			// now attempt to expand computed relations
+			HASH_ITER(hh, GEN_COMPUTED_RELATIONS(gen), rel, next_rel) {
+				if ((other = real_generic(rel->vnum))) {
+					HASH_ITER(hh, GEN_COMPUTED_RELATIONS(other), alt, next_alt) {
+						if (!has_generic_relation(GEN_COMPUTED_RELATIONS(gen), alt->vnum)) {
+							changed = TRUE;
+							add_generic_relation(&GEN_COMPUTED_RELATIONS(gen), alt->vnum);
+						}
+					}
+				}
+			}
+		}
+	} while (changed && safety < 100);
+	
+	if (safety == 100) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: compute_generic_relations: looped over 100 times");
+	}
+}
+
+
+/**
+* Deletes a generic relationship, if present.
+*
+* @param struct generic_relation **list Pointer to the list to delete from.
+* @param any_vnum vnum The other generic's vnum, to delete.
+* @return bool TRUE if it had that relation and deleted it, FALSE if not.
+*/
+bool delete_generic_relation(struct generic_relation **list, any_vnum vnum) {
+	struct generic_relation *item;
+	HASH_FIND_INT(*list, &vnum, item);
+	if (item) {
+		HASH_DEL(*list, item);
+		free(item);
+		return TRUE;
+	}
+	return FALSE;
+}
+
 
 /**
 * Gets a generic's name by vnum, safely.
@@ -124,6 +218,20 @@ int get_generic_value_by_vnum(any_vnum vnum, int type, int pos) {
 }
 
 
+/**
+* Determines if a generic has a given relationship with another generic.
+*
+* @param struct generic_relation *list The list to check.
+* @param any_vnum vnum The other generic's vnum, to look for.
+* @return bool TRUE if it has that relation, FALSE if not.
+*/
+bool has_generic_relation(struct generic_relation *list, any_vnum vnum) {
+	struct generic_relation *item;
+	HASH_FIND_INT(list, &vnum, item);
+	return item ? TRUE : FALSE;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 
@@ -135,7 +243,10 @@ int get_generic_value_by_vnum(any_vnum vnum, int type, int pos) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_generic(generic_data *gen, char_data *ch) {
+	struct generic_relation *rel, *next_rel;
 	bool problem = FALSE;
+	generic_data *alt;
+	obj_data *proto;
 	
 	if (!GEN_NAME(gen) || !*GEN_NAME(gen) || !str_cmp(GEN_NAME(gen), default_generic_name)) {
 		olc_audit_msg(ch, GEN_VNUM(gen), "No name set");
@@ -193,6 +304,35 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 			}
 			break;
 		}
+		case GENERIC_COMPONENT: {
+			if (GET_COMPONENT_OBJ_VNUM(gen) == NOTHING || !(proto = obj_proto(GET_COMPONENT_OBJ_VNUM(gen)))) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Item vnum not set or invalid.");
+				problem = TRUE;
+			}
+			else if (GET_OBJ_COMPONENT(proto) != GEN_VNUM(gen)) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Matching item is not set to this component type.");
+				problem = TRUE;
+			}
+			if (!GET_COMPONENT_PLURAL(gen) || !*GET_COMPONENT_PLURAL(gen)) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Plural form not set.");
+				problem = TRUE;
+			}
+			HASH_ITER(hh, GEN_RELATIONS(gen), rel, next_rel) {
+				if (rel->vnum == GEN_VNUM(gen)) {
+					olc_audit_msg(ch, GEN_VNUM(gen), "Has itself as a relation.");
+					problem = TRUE;
+				}
+				else if (!(alt = real_generic(rel->vnum))) {
+					olc_audit_msg(ch, GEN_VNUM(gen), "Invalid relation vnum %d.", rel->vnum);
+					problem = TRUE;
+				}
+				else if (has_generic_relation(GEN_RELATIONS(alt), GEN_VNUM(gen))) {
+					olc_audit_msg(ch, GEN_VNUM(gen), "Circular relationship with %d.", rel->vnum);
+					problem = TRUE;
+				}
+			}
+			break;
+		}
 		case GENERIC_AFFECT:
 		case GENERIC_COOLDOWN: {
 			// everything here is optional
@@ -220,6 +360,10 @@ char *list_one_generic(generic_data *gen, bool detail) {
 				snprintf(output, sizeof(output), "[%5d] %s (%s): %s", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)], NULLSAFE(GET_COOLDOWN_WEAR_OFF(gen)));
 				break;
 			}
+			case GENERIC_COMPONENT: {
+				snprintf(output, sizeof(output), "[%5d] %s%s (%s)", GEN_VNUM(gen), GEN_NAME(gen), GEN_FLAGGED(gen, GEN_BASIC) ? " (basic)" : "", generic_types[GEN_TYPE(gen)]);
+				break;
+			}
 			default: {
 				snprintf(output, sizeof(output), "[%5d] %s (%s)", GEN_VNUM(gen), GEN_NAME(gen), generic_types[GEN_TYPE(gen)]);
 				break;
@@ -242,7 +386,7 @@ char *list_one_generic(generic_data *gen, bool detail) {
 */
 void olc_search_generic(char_data *ch, any_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
-	generic_data *gen = real_generic(vnum);
+	generic_data *gen = real_generic(vnum), *gen_iter, *next_gen;
 	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	event_data *event, *next_event;
@@ -281,7 +425,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, augment_table, aug, next_aug) {
 		any = FALSE;
 		for (res = GET_AUG_RESOURCES(aug); res && !any; res = res->next) {
-			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID))) {
+			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "AUG [%5d] %s\r\n", GET_AUG_VNUM(aug), GET_AUG_NAME(aug));
@@ -293,7 +437,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		any = FALSE;
 		for (res = GET_BLD_YEARLY_MAINTENANCE(bld); res && !any; res = res->next) {
-			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID))) {
+			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
@@ -310,7 +454,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
 		for (res = GET_CRAFT_RESOURCES(craft); res && !any; res = res->next) {
-			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID))) {
+			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
@@ -333,6 +477,14 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// other generics
+	HASH_ITER(hh, generic_table, gen_iter, next_gen) {
+		if (has_generic_relation(GEN_RELATIONS(gen_iter), vnum)) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "GEN [%5d] %s\r\n", GEN_VNUM(gen_iter), GEN_NAME(gen_iter));
+		}
+	}
+	
 	// objects
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		any = FALSE;
@@ -340,6 +492,9 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 			any = TRUE;
 		}
 		if (GEN_TYPE(gen) == GENERIC_CURRENCY && IS_CURRENCY(obj) && GET_CURRENCY_VNUM(obj) == vnum) {
+			any = TRUE;
+		}
+		if (GEN_TYPE(gen) == GENERIC_COMPONENT && GET_OBJ_COMPONENT(obj) == vnum) {
 			any = TRUE;
 		}
 		
@@ -356,6 +511,8 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		}
 		// REQ_x: requirement search
 		any = find_requirement_in_list(PRG_TASKS(prg), REQ_GET_CURRENCY, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_GET_COMPONENT, vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
 		
 		if (any) {
 			++found;
@@ -371,6 +528,10 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 		// QR_x, REQ_x: quest types
 		any = find_requirement_in_list(QUEST_TASKS(quest), REQ_GET_CURRENCY, vnum);
 		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_GET_CURRENCY, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_GET_COMPONENT, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_GET_COMPONENT, vnum);
+		any |= find_requirement_in_list(QUEST_TASKS(quest), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
+		any |= find_requirement_in_list(QUEST_PREREQS(quest), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
 		any |= find_quest_reward_in_list(QUEST_REWARDS(quest), QR_CURRENCY, vnum);
 		
 		if (any) {
@@ -395,6 +556,8 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 			break;
 		}
 		any = find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_CURRENCY, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_GET_COMPONENT, vnum);
+		any |= find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
 		
 		if (any) {
 			++found;
@@ -406,7 +569,7 @@ void olc_search_generic(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		any = FALSE;
 		for (res = VEH_YEARLY_MAINTENANCE(veh); res && !any; res = res->next) {
-			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID))) {
+			if (res->vnum == vnum && ((GEN_TYPE(gen) == GENERIC_ACTION && res->type == RES_ACTION) || (GEN_TYPE(gen) == GENERIC_LIQUID && res->type == RES_LIQUID) || (GEN_TYPE(gen) == GENERIC_COMPONENT && res->type == RES_COMPONENT))) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
@@ -490,6 +653,20 @@ void clear_generic(generic_data *gen) {
 
 
 /**
+* Frees a list of generic relations.
+*
+* @param struct generic_relation **list The list to free.
+*/
+void free_generic_relations(struct generic_relation **list) {
+	struct generic_relation *item, *next;
+	HASH_ITER(hh, *list, item, next) {
+		HASH_DEL(*list, item);
+		free(item);
+	}
+}
+
+
+/**
 * frees up memory for a generic data item.
 *
 * See also: olc_delete_generic
@@ -508,6 +685,13 @@ void free_generic(generic_data *gen) {
 		if (GEN_STRING(gen, iter) && (!proto || GEN_STRING(gen, iter) != GEN_STRING(proto, iter))) {
 			free(GEN_STRING(gen, iter));
 		}
+	}
+	
+	if (GEN_RELATIONS(gen) && (!proto || GEN_RELATIONS(gen) != GEN_RELATIONS(proto))) {
+		free_generic_relations(&GEN_RELATIONS(gen));
+	}
+	if (GEN_COMPUTED_RELATIONS(gen) && (!proto || GEN_COMPUTED_RELATIONS(gen) != GEN_COMPUTED_RELATIONS(proto))) {
+		free_generic_relations(&GEN_COMPUTED_RELATIONS(gen));
 	}
 	
 	free(gen);
@@ -569,6 +753,15 @@ void parse_generic(FILE *fl, any_vnum vnum) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'R': {	// relation
+				if (sscanf(line, "R %d", &int_in[0]) != 1) {
+					log("SYSERR: Format error in R line of %s", error);
+					break;
+				}
+				
+				add_generic_relation(&GEN_RELATIONS(gen), int_in[0]);
+				break;
+			}
 			case 'T': {	// string
 				int_in[0] = atoi(line+1);
 				ptr = fread_string(fl, error);
@@ -683,6 +876,7 @@ void write_generic_index(FILE *fl) {
 * @param generic_data *gen The thing to save.
 */
 void write_generic_to_file(FILE *fl, generic_data *gen) {
+	struct generic_relation *rel, *next_rel;
 	char temp[256];
 	int iter;
 	
@@ -703,6 +897,11 @@ void write_generic_to_file(FILE *fl, generic_data *gen) {
 	// 3. values -- need to adjust this if NUM_GENERIC_VALUES changes
 	fprintf(fl, "%d %d %d %d\n", GEN_VALUE(gen, 0), GEN_VALUE(gen, 1), GEN_VALUE(gen, 2), GEN_VALUE(gen, 3));
 	
+	// 'R' relations
+	HASH_ITER(hh, GEN_RELATIONS(gen), rel, next_rel) {
+		fprintf(fl, "R %d\n", rel->vnum);
+	}
+	
 	// 'T' strings
 	for (iter = 0; iter < NUM_GENERIC_STRINGS; ++iter) {
 		if (GEN_STRING(gen, iter) && *GEN_STRING(gen, iter)) {
@@ -717,6 +916,22 @@ void write_generic_to_file(FILE *fl, generic_data *gen) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// OLC HANDLERS ////////////////////////////////////////////////////////////
+
+/**
+* Duplicates a list of generic relations, for OLC.
+*
+* @param struct generic_relation *list The list to copy.
+* @return struct generic_relation* The new list.
+*/
+struct generic_relation *copy_generic_relations(struct generic_relation *list) {
+	struct generic_relation *new_list = NULL, *rel, *next;
+	
+	HASH_ITER(hh, list, rel, next) {
+		add_generic_relation(&new_list, rel->vnum);
+	}
+	return new_list;
+}
+
 
 /**
 * Creates a new generic entry.
@@ -756,6 +971,7 @@ generic_data *create_generic_table_entry(any_vnum vnum) {
 void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	void complete_building(room_data *room);
+	void refresh_all_quests(char_data *ch);
 	
 	struct trading_post_data *tpd, *next_tpd;
 	struct player_currency *cur, *next_cur;
@@ -774,9 +990,9 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	bld_data *bld, *next_bld;
 	obj_data *obj, *next_obj;
 	descriptor_data *desc;
-	generic_data *gen;
-	char_data *chiter;
-	bool found;
+	generic_data *gen, *gen_iter, *next_gen;
+	char_data *chiter, *next_ch;
+	bool found, any_quest = FALSE, any_progress = FALSE;
 	int res_type;
 	
 	if (!(gen = real_generic(vnum))) {
@@ -791,6 +1007,10 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 		case GENERIC_LIQUID: {
 			res_type = RES_LIQUID;
+			break;
+		}
+		case GENERIC_COMPONENT: {
+			res_type = RES_COMPONENT;
 			break;
 		}
 		default: {
@@ -892,6 +1112,11 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_GEN);
 	save_library_file_for_vnum(DB_BOOT_GEN, vnum);
 	
+	// remove from computed data
+	if (GEN_TYPE(gen) == GENERIC_COMPONENT || GEN_RELATIONS(gen) || GEN_COMPUTED_RELATIONS(gen)) {
+		compute_generic_relations();
+	}
+	
 	// now remove from prototypes
 	
 	// update abilities
@@ -952,18 +1177,30 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update other generics
+	HASH_ITER(hh, generic_table, gen_iter, next_gen) {
+		if (delete_generic_relation(&GEN_RELATIONS(gen_iter), vnum)) {
+			save_library_file_for_vnum(DB_BOOT_GEN, GEN_VNUM(gen_iter));
+		}
+	}
+	
 	// update objs
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		found = FALSE;
 		if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == vnum) {
 			found = TRUE;
+			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 		}
 		if (GEN_TYPE(gen) == GENERIC_CURRENCY && IS_CURRENCY(obj) && GET_CURRENCY_VNUM(obj) == vnum) {
 			found = TRUE;
+			GET_OBJ_VAL(obj, VAL_CURRENCY_VNUM) = NOTHING;
+		}
+		if (GEN_TYPE(gen) == GENERIC_COMPONENT && GET_OBJ_COMPONENT(obj) == vnum) {
+			found = TRUE;
+			GET_OBJ_COMPONENT(obj) = NOTHING;
 		}
 		
 		if (found) {
-			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 		}
 	}
@@ -971,8 +1208,11 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	// update progress
 	HASH_ITER(hh, progress_table, prg, next_prg) {
 		found = delete_requirement_from_list(&PRG_TASKS(prg), REQ_GET_CURRENCY, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_GET_COMPONENT, vnum);
+		found |= delete_requirement_from_list(&PRG_TASKS(prg), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
 		
 		if (found) {
+			any_progress = TRUE;
 			SET_BIT(PRG_FLAGS(prg), PRG_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
 			need_progress_refresh = TRUE;
@@ -984,9 +1224,15 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		// REQ_x, QR_x: quest types
 		found = delete_requirement_from_list(&QUEST_TASKS(quest), REQ_GET_CURRENCY, vnum);
 		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_GET_CURRENCY, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_GET_COMPONENT, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_GET_COMPONENT, vnum);
+		found |= delete_requirement_from_list(&QUEST_TASKS(quest), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
+		found |= delete_requirement_from_list(&QUEST_PREREQS(quest), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
+		
 		found |= delete_quest_reward_from_list(&QUEST_REWARDS(quest), QR_CURRENCY, vnum);
 		
 		if (found) {
+			any_quest = TRUE;
 			SET_BIT(QUEST_FLAGS(quest), QST_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(quest));
 		}
@@ -1003,6 +1249,8 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	// update socials
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		found = delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_GET_CURRENCY, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_GET_COMPONENT, vnum);
+		found |= delete_requirement_from_list(&SOC_REQUIREMENTS(soc), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
 		
 		if (found) {
 			SET_BIT(SOC_FLAGS(soc), SOC_IN_DEVELOPMENT);
@@ -1061,6 +1309,11 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 				msg_to_char(desc->character, "One of the resources used in the craft you're editing was deleted.\r\n");
 			}	
 		}
+		if (GET_OLC_GENERIC(desc)) {
+			if (delete_generic_relation(&GEN_RELATIONS(GET_OLC_GENERIC(desc)), vnum)) {
+				msg_to_char(ch, "One of the related generics for the one you're editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_EVENT(desc)) {
 			// QR_x: event reward types
 			found = delete_event_reward_from_list(&EVT_RANK_REWARDS(GET_OLC_EVENT(desc)), QR_CURRENCY, vnum);
@@ -1075,33 +1328,44 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			found = FALSE;
 			if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(GET_OLC_OBJECT(desc)) && GET_DRINK_CONTAINER_TYPE(GET_OLC_OBJECT(desc)) == vnum) {
 				found = TRUE;
+				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+				msg_to_char(desc->character, "The generic liquid used by the object you're editing was deleted.\r\n");
 			}
 			if (GEN_TYPE(gen) == GENERIC_CURRENCY && IS_CURRENCY(GET_OLC_OBJECT(desc)) && GET_CURRENCY_VNUM(GET_OLC_OBJECT(desc)) == vnum) {
 				found = TRUE;
+				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_CURRENCY_VNUM) = NOTHING;
+				msg_to_char(desc->character, "The generic currency used by the object you're editing was deleted.\r\n");
 			}
-			
-			if (found) {
-				GET_OBJ_VAL(GET_OLC_OBJECT(desc), VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
-				msg_to_char(desc->character, "The liquid used by the object you're editing was deleted.\r\n");
+			if (GEN_TYPE(gen) == GENERIC_COMPONENT && GET_OBJ_COMPONENT(GET_OLC_OBJECT(desc)) == vnum) {
+				found = TRUE;
+				GET_OBJ_COMPONENT(GET_OLC_OBJECT(desc)) = NOTHING;
+				msg_to_char(desc->character, "The generic component used by the object you're editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_PROGRESS(desc)) {
 			found = delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_GET_CURRENCY, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_GET_COMPONENT, vnum);
+			found |= delete_requirement_from_list(&PRG_TASKS(GET_OLC_PROGRESS(desc)), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_PROGRESS(desc)), PRG_IN_DEVELOPMENT);
-				msg_to_desc(desc, "A generic currency used by the progression goal you're editing has been deleted.\r\n");
+				msg_to_desc(desc, "A 'generic' used by the progression goal you're editing has been deleted.\r\n");
 			}
 		}
 		if (GET_OLC_QUEST(desc)) {
 			// REQ_x, QR_x: quest types
 			found = delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_GET_CURRENCY, vnum);
 			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_GET_CURRENCY, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_GET_COMPONENT, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_GET_COMPONENT, vnum);
+			found |= delete_requirement_from_list(&QUEST_TASKS(GET_OLC_QUEST(desc)), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
+			found |= delete_requirement_from_list(&QUEST_PREREQS(GET_OLC_QUEST(desc)), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
+			
 			found |= delete_quest_reward_from_list(&QUEST_REWARDS(GET_OLC_QUEST(desc)), QR_CURRENCY, vnum);
 		
 			if (found) {
 				SET_BIT(QUEST_FLAGS(GET_OLC_QUEST(desc)), QST_IN_DEVELOPMENT);
-				msg_to_desc(desc, "A currency used by the quest you are editing was deleted.\r\n");
+				msg_to_desc(desc, "A 'generic' used by the quest you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_SHOP(desc)) {
@@ -1111,10 +1375,12 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 		if (GET_OLC_SOCIAL(desc)) {
 			found = delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_GET_CURRENCY, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_GET_COMPONENT, vnum);
+			found |= delete_requirement_from_list(&SOC_REQUIREMENTS(GET_OLC_SOCIAL(desc)), REQ_EMPIRE_PRODUCED_COMPONENT, vnum);
 		
 			if (found) {
 				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
-				msg_to_desc(desc, "A currency required by the social you are editing was deleted.\r\n");
+				msg_to_desc(desc, "A 'generic' required by the social you are editing was deleted.\r\n");
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
@@ -1128,6 +1394,17 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	msg_to_char(ch, "Generic %d deleted.\r\n", vnum);
 	
 	free_generic(gen);
+	
+	if (any_progress) {
+		need_progress_refresh = TRUE;
+	}
+	if (any_quest) {
+		LL_FOREACH_SAFE(character_list, chiter, next_ch) {
+			if (!IS_NPC(chiter)) {
+				refresh_all_quests(chiter);
+			}
+		}
+	}
 }
 
 
@@ -1139,6 +1416,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 void save_olc_generic(descriptor_data *desc) {	
 	generic_data *proto, *gen = GET_OLC_GENERIC(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
+	struct generic_relation *cmprel;
 	UT_hash_handle hh, sorted_hh;
 	int iter;
 
@@ -1156,6 +1434,11 @@ void save_olc_generic(descriptor_data *desc) {
 			free(GEN_STRING(proto, iter));
 		}
 	}
+	free_generic_relations(&GEN_RELATIONS(proto));
+	
+	// save these for later
+	cmprel = GEN_COMPUTED_RELATIONS(proto);
+	GEN_COMPUTED_RELATIONS(proto) = NULL;
 	
 	// sanity
 	if (!GEN_NAME(gen) || !*GEN_NAME(gen)) {
@@ -1178,12 +1461,18 @@ void save_olc_generic(descriptor_data *desc) {
 	proto->vnum = vnum;	// ensure correct vnum
 	proto->hh = hh;	// restore old hash handles
 	proto->sorted_hh = sorted_hh;
+	GEN_COMPUTED_RELATIONS(proto) = cmprel;	// restore old computed relations
 		
 	// and save to file
 	save_library_file_for_vnum(DB_BOOT_GEN, vnum);
 	
-	// and resort
+	// resort
 	HASH_SORT(sorted_generics, sort_generics_by_data);
+	
+	// update computed relations
+	if (GEN_TYPE(gen) == GENERIC_COMPONENT || GEN_RELATIONS(gen) || GEN_COMPUTED_RELATIONS(gen)) {
+		compute_generic_relations();
+	}
 }
 
 
@@ -1211,6 +1500,10 @@ generic_data *setup_olc_generic(generic_data *input) {
 		for (iter = 0; iter < NUM_GENERIC_STRINGS; ++iter) {
 			GEN_STRING(new, iter) = GEN_STRING(input, iter) ? str_dup(GEN_STRING(input, iter)) : NULL;
 		}
+		
+		// copy basic relations but skip computed ones
+		GEN_RELATIONS(new) = copy_generic_relations(GEN_RELATIONS(input));
+		GEN_COMPUTED_RELATIONS(new) = NULL;
 	}
 	else {
 		// brand new: some defaults
@@ -1226,13 +1519,57 @@ generic_data *setup_olc_generic(generic_data *input) {
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
 /**
+* Displays relations on multiple lines.
+*
+* @param struct generic_relation *list The list to show.
+* @param bool show_vnums If true, shows the vnums with each entry.
+* @param char *save_buf A string buffer for the output.
+* @param char *prefix Optional: Prepends this text to the output string while preserving line-formatting (NULL for none)
+*/
+void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix) {
+	struct generic_relation *rel, *next;
+	char part[MAX_STRING_LENGTH];
+	int this_line = 0;
+	bool any = FALSE;
+	
+	strcpy(save_buf, NULLSAFE(prefix));
+	this_line = strlen(save_buf);
+	
+	HASH_ITER(hh, list, rel, next) {
+		if (show_vnums) {
+			sprintf(part, "[%d] %s", rel->vnum, get_generic_name_by_vnum(rel->vnum));
+		}
+		else {
+			strcpy(part, get_generic_name_by_vnum(rel->vnum));
+		}
+		
+		// append how
+		if (this_line > 0 && this_line + strlen(part) + 2 >= 80) {
+			sprintf(save_buf + strlen(save_buf), "%s\r\n  %s", (any ? "," : ""), part);
+			this_line = strlen(part);
+		}
+		else {
+			sprintf(save_buf + strlen(save_buf), "%s%s", (any ? (this_line ? ", " : "  ") : ""), part);
+			this_line += strlen(part) + 2;
+		}
+		
+		any = TRUE;
+	}
+	
+	if (this_line > 0) {
+		strcat(save_buf, "\r\n");
+	}
+}
+
+
+/**
 * For vstat.
 *
 * @param char_data *ch The player requesting stats.
 * @param generic_data *gen The generic to display.
 */
 void do_stat_generic(char_data *ch, generic_data *gen) {
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH * 2];
 	size_t size;
 	
 	if (!gen) {
@@ -1275,6 +1612,16 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 		case GENERIC_CURRENCY: {
 			size += snprintf(buf + size, sizeof(buf) - size, "Singular: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_SINGULAR)));
 			size += snprintf(buf + size, sizeof(buf) - size, "Plural: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_CURRENCY_PLURAL)));
+			break;
+		}
+		case GENERIC_COMPONENT: {
+			size += snprintf(buf + size, sizeof(buf) - size, "Plural: %s\r\n", NULLSAFE(GEN_STRING(gen, GSTR_COMPONENT_PLURAL)));
+			size += snprintf(buf + size, sizeof(buf) - size, "Item: [%d] %s\r\n", GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
+			
+			get_generic_relation_display(GEN_RELATIONS(gen), TRUE, part, NULL);
+			size += snprintf(buf + size, sizeof(buf) - size, "Relations:\r\n%s", GEN_RELATIONS(gen) ? part : " none\r\n");
+			get_generic_relation_display(GEN_COMPUTED_RELATIONS(gen), TRUE, part, NULL);
+			size += snprintf(buf + size, sizeof(buf) - size, "Extended Relations:\r\n%s", GEN_COMPUTED_RELATIONS(gen) ? part : " none\r\n");
 			break;
 		}
 	}
@@ -1343,6 +1690,14 @@ void olc_show_generic(char_data *ch) {
 			sprintf(buf + strlen(buf), "<%splural\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_CURRENCY_PLURAL), ""), GEN_STRING(gen, GSTR_CURRENCY_PLURAL) ? GEN_STRING(gen, GSTR_CURRENCY_PLURAL) : "(not set)");
 			break;
 		}
+		case GENERIC_COMPONENT: {
+			sprintf(buf + strlen(buf), "<%splural\t0> %s\r\n", OLC_LABEL_STR(GEN_STRING(gen, GSTR_COMPONENT_PLURAL), ""), GEN_STRING(gen, GSTR_COMPONENT_PLURAL) ? GEN_STRING(gen, GSTR_COMPONENT_PLURAL) : "(not set)");
+			sprintf(buf + strlen(buf), "<%sitem\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_COMPONENT_OBJ_VNUM(gen), NOTHING), GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
+			
+			get_generic_relation_display(GEN_RELATIONS(gen), TRUE, lbuf, NULL);
+			sprintf(buf + strlen(buf), "<%srelations\t0>\r\n%s", OLC_LABEL_PTR(GEN_RELATIONS(gen)), lbuf);
+			break;
+		}
 	}
 		
 	page_string(ch->desc, buf, TRUE);
@@ -1387,6 +1742,7 @@ OLC_MODULE(genedit_name) {
 
 OLC_MODULE(genedit_type) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	char buf[MAX_STRING_LENGTH];
 	int old = GEN_TYPE(gen), iter;
 	
 	GEN_TYPE(gen) = olc_process_type(ch, argument, "type", "type", generic_types, GEN_TYPE(gen));
@@ -1400,6 +1756,27 @@ OLC_MODULE(genedit_type) {
 			if (GEN_STRING(gen, iter)) {
 				free(GEN_STRING(gen, iter));
 				GEN_STRING(gen, iter) = NULL;
+			}
+		}
+		
+		if (GEN_TYPE(gen) != GENERIC_COMPONENT) {
+			free_generic_relations(&GEN_RELATIONS(gen));
+		}
+		
+		switch (GEN_TYPE(gen)) {
+			case GENERIC_COMPONENT: {
+				if (GEN_NAME(gen) && *GEN_NAME(gen)) {
+					sprintf(buf, "%ss", GEN_NAME(gen));
+					GEN_STRING(gen, GSTR_COMPONENT_PLURAL) = str_dup(buf);
+				}
+				if (obj_proto(GEN_VNUM(gen))) {
+					// default to same-vnum and similar-plural
+					GEN_VALUE(gen, GVAL_OBJ_VNUM) = GEN_VNUM(gen);
+				}
+				else {
+					GEN_VALUE(gen, GVAL_OBJ_VNUM) = NOTHING;
+				}
+				break;
 			}
 		}
 	}
@@ -1528,12 +1905,25 @@ OLC_MODULE(genedit_repair2room) {
 
 OLC_MODULE(genedit_plural) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	int pos = NOTHING;
 	
-	if (GEN_TYPE(gen) != GENERIC_CURRENCY) {
-		msg_to_char(ch, "You can only change that on an CURRENCY generic.\r\n");
+	switch (GEN_TYPE(gen)) {
+		case GENERIC_CURRENCY: {
+			pos = GSTR_CURRENCY_PLURAL;
+			break;
+		}
+		case GENERIC_COMPONENT: {
+			pos = GSTR_COMPONENT_PLURAL;
+			break;
+		}
+		default: {
+			msg_to_char(ch, "You can't set a plural on this type of generic.\r\n");
+			return;
+		}
 	}
-	else {
-		olc_process_string(ch, argument, "plural", &GEN_STRING(gen, GSTR_CURRENCY_PLURAL));
+	
+	if (pos != NOTHING) {
+		olc_process_string(ch, argument, "plural", &GEN_STRING(gen, pos));
 	}
 }
 
@@ -1885,6 +2275,138 @@ OLC_MODULE(genedit_wearoff2room) {
 	}
 	else {
 		olc_process_string(ch, argument, "wearoff2room", &GEN_STRING(gen, pos));
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// COMPONENT OLC MODULES ///////////////////////////////////////////////////
+
+OLC_MODULE(genedit_item) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	obj_vnum old = GET_COMPONENT_OBJ_VNUM(gen);
+	
+	if (GEN_TYPE(gen) != GENERIC_COMPONENT) {
+		msg_to_char(ch, "You can only change that on a COMPONENT generic.\r\n");
+	}
+	else {
+		GEN_VALUE(gen, GVAL_OBJ_VNUM) = olc_process_number(ch, argument, "object vnum", "item", 0, MAX_VNUM, GET_COMPONENT_OBJ_VNUM(gen));
+		if (!obj_proto(GET_COMPONENT_OBJ_VNUM(gen))) {
+			GEN_VALUE(gen, GVAL_OBJ_VNUM) = old;
+			msg_to_char(ch, "There is no object with that vnum. Old value restored.\r\n");
+		}
+		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			msg_to_char(ch, "It is now represented by item [%d] %s.\r\n", GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
+		}
+	}
+}
+
+
+OLC_MODULE(genedit_relations) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc), *cmp = NULL;
+	struct generic_relation **list = &GEN_RELATIONS(gen);
+	char cmd_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct generic_relation *iter, *copyfrom, *next_rel;
+	bool found, none;
+	any_vnum vnum;
+	
+	if (GEN_TYPE(gen) != GENERIC_COMPONENT) {
+		msg_to_char(ch, "You can only set relations on COMPONENT generics.\r\n");
+		return;
+	}
+	
+	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
+	
+	if (is_abbrev(cmd_arg, "copy")) {
+		// usage: relation copy <from vnum>
+		argument = any_one_arg(argument, vnum_arg);	// any vnum for that type
+		
+		if (!*vnum_arg) {
+			msg_to_char(ch, "Usage: relation copy <from vnum>\r\n");
+		}
+		else if (!isdigit(*vnum_arg)) {
+			msg_to_char(ch, "Copy from which generic?\r\n");
+		}
+		else if ((vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum.\r\n");
+		}
+		else {
+			generic_data *from_gen = real_generic(vnum);
+			if (from_gen) {
+				copyfrom = GEN_RELATIONS(from_gen);
+				none = copyfrom ? FALSE : TRUE;
+			}
+			else {
+				copyfrom = NULL;
+				none = FALSE;
+			}
+			
+			if (none) {
+				msg_to_char(ch, "No relations to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
+				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
+			}
+			else {
+				HASH_ITER(hh, copyfrom, iter, next_rel) {
+					add_generic_relation(list, iter->vnum);
+				}
+				msg_to_char(ch, "Copied relations from generic %d.\r\n", vnum);
+			}
+		}
+	}	// end 'copy'
+	else if (is_abbrev(cmd_arg, "remove")) {
+		// usage: relation remove <vnum | all>
+		skip_spaces(&argument);	// only arg is number
+		
+		if (!*argument) {
+			msg_to_char(ch, "Remove which relation (vnum or name)?\r\n");
+		}
+		else if (!str_cmp(argument, "all")) {
+			free_generic_relations(list);
+			*list = NULL;
+			msg_to_char(ch, "You remove all the relations.\r\n");
+		}
+		else if (!(cmp = find_generic_component(argument))) {
+			msg_to_char(ch, "Invalid related generic (vnum or name).\r\n");
+		}
+		else {
+			found = FALSE;
+			HASH_ITER(hh, *list, iter, next_rel) {
+				if (cmp && iter->vnum == GEN_VNUM(cmp)) {
+					found = TRUE;
+					msg_to_char(ch, "You remove the relation to [%d] %s.\r\n", iter->vnum, get_generic_name_by_vnum(iter->vnum));
+					HASH_DEL(*list, iter);
+					free(iter);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid relation vnum or name.\r\n");
+			}
+		}
+	}	// end 'remove'
+	else if (is_abbrev(cmd_arg, "add")) {
+		// usage: relation add <vnum>
+		argument = any_one_arg(argument, vnum_arg);
+		
+		if (!*vnum_arg) {
+			msg_to_char(ch, "Usage: relation add <vnum | name>\r\n");
+		}
+		else if (!(cmp = find_generic_component(vnum_arg))) {
+			msg_to_char(ch, "Invalid generic '%s'.\r\n", vnum_arg);
+		}
+		else {
+			// success
+			add_generic_relation(list, GEN_VNUM(cmp));
+			msg_to_char(ch, "You add relation: [%d] %s\r\n", GEN_VNUM(cmp), GEN_NAME(cmp));
+		}
+	}	// end 'add'
+	else {
+		msg_to_char(ch, "Usage: relation add <vnum>\r\n");
+		msg_to_char(ch, "Usage: relation copy <from vnum>\r\n");
+		msg_to_char(ch, "Usage: relation remove <vnum | all>\r\n");
 	}
 }
 

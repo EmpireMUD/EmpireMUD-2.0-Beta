@@ -2491,7 +2491,7 @@ void perform_npc_tie(char_data *ch, char_data *victim, int subcmd) {
 	else if (!MOB_FLAGGED(victim, MOB_ANIMAL)) {
 		msg_to_char(ch, "You can only tie animals.\r\n");
 	}
-	else if (!(rope = get_component_in_list(CMP_ROPE, NOBITS, ch->carrying, &kept))) {
+	else if (!(rope = get_component_in_list(COMP_ROPE, ch->carrying, &kept))) {
 		msg_to_char(ch, "You don't seem to have any rope%s.\r\n", kept ? " that isn't marked 'keep'" : "");
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN))

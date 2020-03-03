@@ -793,65 +793,6 @@ bool has_trigger(struct script_data *sc, any_vnum vnum) {
 }
 
 
-/**
-* For the has_component and charge_component script functions. Both are
-* expected to look like:
-*   %actor.has_component(type, amount, <optional comma-separated flags>)%
-*
-* Examples: %actor.has_component(fibers, 3, plant, hard)%
-*           %actor.charge_component(sapling, 1)%
-*
-* @param char *argument The text inside the (parens).
-* @param int *cmp_type An int pointer to pass back the component type.
-* @param int *number An int pointer to pass back the number requested.
-* @param bitvector_t *cmp_flags A pointer to pass back and component flags.
-* @return bool TRUE if the string parsed correctly; FALSE if this was not a valid string.
-*/
-bool parse_script_component_args(char *argument, int *cmp_type, int *number, bitvector_t *cmp_flags) {
-	extern const char *component_flags[];
-	extern const char *component_types[];
-	
-	char str_arg[256], num_arg[256], arg[256], temp[256];
-	bitvector_t flag;
-	
-	*cmp_type = 0;
-	*number = 0;
-	*cmp_flags = NOBITS;
-	
-	comma_args(argument, str_arg, temp);	// type?
-	strcpy(arg, temp);
-	comma_args(arg, num_arg, temp);	/// number
-	strcpy(arg, temp);
-	
-	// basic args
-	if (!*str_arg || !*num_arg) {
-		return FALSE;	// first 2 args are required
-	}
-	if ((*cmp_type = search_block(str_arg, component_types, FALSE)) == NOTHING) {
-		return FALSE;	// not a valid type
-	}
-	if (!isdigit(*num_arg) || (*number = atoi(num_arg)) < 0) {
-		return FALSE;	// invalid number
-	}
-	
-	// any remaining args? these will be bits
-	while (*arg) {
-		comma_args(arg, str_arg, temp);
-		strcpy(arg, temp);
-		
-		if ((flag = search_block(str_arg, component_flags, FALSE)) != NOTHING) {
-			*cmp_flags |= BIT(flag);
-		}
-		else {
-			return FALSE;	// not a valid component flag
-		}
-	}
-	
-	// if we survived to here, we got a full match (and already set the pointers)
-	return TRUE;
-}
-
-
 void send_char_pos(char_data *ch, int dam) {
 	switch (GET_POS(ch)) {
 		case POS_MORTALLYW:

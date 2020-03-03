@@ -1963,7 +1963,7 @@ ACMD(do_recipes) {
 				if (res->type == RES_OBJECT && GET_OBJ_VNUM(obj) != NOTHING && res->vnum == GET_OBJ_VNUM(obj)) {
 					uses_item = TRUE;
 				}
-				else if (res->type == RES_COMPONENT && res->vnum == GET_OBJ_CMP_TYPE(obj) && (res->misc & GET_OBJ_CMP_FLAGS(obj)) == res->misc) {
+				else if (res->type == RES_COMPONENT && is_component_vnum(obj, res->vnum)) {
 					uses_item = TRUE;
 				}
 			}
@@ -2009,7 +2009,7 @@ ACMD(do_recipes) {
 				if (GET_OBJ_VNUM(obj) != NOTHING && res->type == RES_OBJECT && res->vnum == GET_OBJ_VNUM(obj)) {
 					uses_item = TRUE;
 				}
-				else if (res->type == RES_COMPONENT && res->vnum == GET_OBJ_CMP_TYPE(obj) && (res->misc & GET_OBJ_CMP_FLAGS(obj)) == res->misc) {
+				else if (res->type == RES_COMPONENT && is_component_vnum(obj, res->vnum)) {
 					uses_item = TRUE;
 				}
 			}

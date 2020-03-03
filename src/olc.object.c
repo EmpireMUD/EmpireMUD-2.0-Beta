@@ -35,8 +35,6 @@ extern const char *affected_bits[];
 extern const char *apply_type_names[];
 extern const char *apply_types[];
 extern const char *armor_types[NUM_ARMOR_TYPES+1];
-extern const char *component_flags[];
-extern const char *component_types[];
 extern const char *container_bits[];
 extern const char *extra_bits[];
 extern const char *interact_types[];
@@ -196,6 +194,10 @@ bool audit_object(obj_data *obj, char_data *ch) {
 	}
 	if (CAN_WEAR(obj, ITEM_WEAR_RANGED) && !IS_MISSILE_WEAPON(obj)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Ranged item is not a missile weapon");
+		problem = TRUE;
+	}
+	if (GET_OBJ_COMPONENT(obj) != NOTHING && !find_generic(GET_OBJ_COMPONENT(obj), GENERIC_COMPONENT)) {
+		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Invalid component vnum %d does not match a generic component", GET_OBJ_COMPONENT(obj));
 		problem = TRUE;
 	}
 	
@@ -481,6 +483,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	augment_data *aug, *next_aug;
+	generic_data *gen, *next_gen;
 	vehicle_data *veh, *next_veh;
 	crop_data *crop, *next_crop;
 	room_data *room, *next_room;
@@ -710,6 +713,14 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// update generics
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		if (GET_COMPONENT_OBJ_VNUM(gen) == vnum) {
+			GEN_VALUE(gen, GVAL_OBJ_VNUM) = NOTHING;
+			save_library_file_for_vnum(DB_BOOT_GEN, GEN_VNUM(gen));
+		}
+	}
+	
 	// update globals
 	HASH_ITER(hh, globals_table, glb, next_glb) {
 		found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(glb), TYPE_OBJ, vnum);
@@ -922,6 +933,12 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				msg_to_desc(desc, "An object used as a reward by the event you are editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_GENERIC(desc)) {
+			if (GET_COMPONENT_OBJ_VNUM(GET_OLC_GENERIC(desc)) == vnum) {
+				GEN_VALUE(GET_OLC_GENERIC(desc), GVAL_OBJ_VNUM) = NOTHING;
+				msg_to_char(ch, "The matching item for the generic component you're editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_GLOBAL(desc)) {
 			found = delete_from_interaction_list(&GET_GLOBAL_INTERACTIONS(GET_OLC_GLOBAL(desc)), TYPE_OBJ, vnum);
 			if (found) {
@@ -1043,10 +1060,10 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
-	bitvector_t only_worn = NOBITS, cmp_flags = NOBITS, not_cmp_flagged = NOBITS, only_affs = NOBITS;
+	bitvector_t only_worn = NOBITS, only_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t only_tools = NOBITS;
-	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING, only_cmp = NOTHING;
+	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
 	int only_weapontype = NOTHING;
 	struct interaction_item *inter;
 	struct custom_message *cust;
@@ -1074,9 +1091,6 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("affects", only_affs, affected_bits)
 		FULLSEARCH_FLAGS("apply", find_applies, apply_types)
 		FULLSEARCH_FLAGS("applies", find_applies, apply_types)
-		FULLSEARCH_FLAGS("cflags", cmp_flags, component_flags)
-		FULLSEARCH_FLAGS("cflagged", cmp_flags, component_flags)
-		FULLSEARCH_LIST("component", only_cmp, component_types)
 		FULLSEARCH_FLAGS("custom", find_custom, obj_custom_types)
 		FULLSEARCH_FLAGS("flags", only_flags, extra_bits)
 		FULLSEARCH_FLAGS("flagged", only_flags, extra_bits)
@@ -1085,7 +1099,6 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_LIST("material", only_mat, (const char **)olc_material_list)
 		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
 		FULLSEARCH_LIST("type", only_type, item_types)
-		FULLSEARCH_FLAGS("uncflagged", not_cmp_flagged, component_flags)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, extra_bits)
 		FULLSEARCH_FUNC("weapontype", only_weapontype, get_attack_type_by_name(val_arg))
 		FULLSEARCH_FLAGS("wear", only_worn, wear_bits)
@@ -1112,22 +1125,13 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 				continue;
 			}
 		}
-		if (only_cmp != NOTHING && GET_OBJ_CMP_TYPE(obj) != only_cmp) {
-			continue;
-		}
 		if (only_type != NOTHING && GET_OBJ_TYPE(obj) != only_type) {
-			continue;
-		}
-		if (not_cmp_flagged != NOBITS && OBJ_CMP_FLAGGED(obj, not_cmp_flagged)) {
 			continue;
 		}
 		if (not_flagged != NOBITS && OBJ_FLAGGED(obj, not_flagged)) {
 			continue;
 		}
 		if (only_affs != NOBITS && (GET_OBJ_AFF_FLAGS(obj) & only_affs) != only_affs) {
-			continue;
-		}
-		if (cmp_flags != NOBITS && (GET_OBJ_CMP_FLAGS(obj) & cmp_flags) != cmp_flags) {
 			continue;
 		}
 		if (only_flags != NOBITS && (GET_OBJ_EXTRA(obj) & only_flags) != only_flags) {
@@ -1228,6 +1232,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
 	augment_data *aug, *next_aug;
+	generic_data *gen, *next_gen;
 	vehicle_data *veh, *next_veh;
 	social_data *soc, *next_soc;
 	struct archetype_gear *gear;
@@ -1354,6 +1359,14 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "EVT [%5d] %s\r\n", EVT_VNUM(event), EVT_NAME(event));
+		}
+	}
+	
+	// generics
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		if (GET_COMPONENT_OBJ_VNUM(gen) == vnum) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "GEN [%5d] %s\r\n", GEN_VNUM(gen), GEN_NAME(gen));
 		}
 	}
 	
@@ -1573,6 +1586,9 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 	if (to_update->custom_msgs == old_proto->custom_msgs) {
 		to_update->custom_msgs = new_proto->custom_msgs;
 	}
+	
+	// ensure this is up to date
+	GET_OBJ_COMPONENT(to_update) = GET_OBJ_COMPONENT(new_proto);
 	
 	// remove old scripts
 	if (SCRIPT(to_update)) {
@@ -2030,11 +2046,7 @@ void olc_show_object(char_data *ch) {
 	sprintbit(GET_OBJ_TOOL_FLAGS(obj), tool_flags, buf1, TRUE);
 	sprintf(buf + strlen(buf), "<%stools\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_TOOL_FLAGS(obj), NOBITS), buf1);
 	
-	sprintf(buf + strlen(buf), "<%scomponent\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_CMP_TYPE(obj), 0), component_types[GET_OBJ_CMP_TYPE(obj)]);
-	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
-		prettier_sprintbit(GET_OBJ_CMP_FLAGS(obj), component_flags, buf1);
-		sprintf(buf + strlen(buf), "<%scompflags\t0> %s\r\n", OLC_LABEL_VAL(GET_OBJ_CMP_FLAGS(obj), NOBITS), buf1);
-	}
+	sprintf(buf + strlen(buf), "<%scomponent\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_OBJ_COMPONENT(obj), NOTHING), GET_OBJ_COMPONENT(obj), GET_OBJ_COMPONENT(obj) != NOTHING ? get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)) : "none");
 	
 	if (GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
 		sprintf(buf + strlen(buf), "<%sminlevel\t0> %d\r\n", OLC_LABEL_CHANGED, GET_OBJ_MIN_SCALE_LEVEL(obj));
@@ -2474,28 +2486,30 @@ OLC_MODULE(oedit_coinamount) {
 }
 
 
-OLC_MODULE(oedit_compflags) {
-	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	
-	if (GET_OBJ_CMP_TYPE(obj) == CMP_NONE) {
-		msg_to_char(ch, "You can only set component flags once you've set a component type.\r\n");
-	}
-	else {
-		GET_OBJ_CMP_FLAGS(obj) = olc_process_flag(ch, argument, "component", "compflags", component_flags, GET_OBJ_CMP_FLAGS(obj));
-	}
-}
-
-
 OLC_MODULE(oedit_component) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	int old = GET_OBJ_CMP_TYPE(obj);
+	generic_data *cmp;
 	
-	GET_OBJ_CMP_TYPE(obj) = olc_process_type(ch, argument, "component type", "component", component_types, GET_OBJ_CMP_TYPE(obj));
-	
-	// reset flags if going to/from none
-	if (old == CMP_NONE || GET_OBJ_CMP_TYPE(obj) == CMP_NONE) {
-		GET_OBJ_CMP_FLAGS(obj) = NOBITS;
+	if (!str_cmp(argument, "none") || atoi(argument) == NOTHING) {
+		GET_OBJ_COMPONENT(obj) = NOTHING;
+		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
+			send_config_msg(ch, "ok_string");
+		}
+		else {
+			msg_to_char(ch, "It is no longer a component.\r\n");
+		}
 	}
+	else {
+		cmp = find_generic_component(argument);
+		if (!cmp) {
+			msg_to_char(ch, "There is no generic component with that vnum.\r\n");
+		}
+		else {
+			GET_OBJ_COMPONENT(obj) = GEN_VNUM(cmp);
+			msg_to_char(ch, "It is now %s (%s).\r\n", AN(get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj))), get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)));
+		}
+	}
+
 }
 
 

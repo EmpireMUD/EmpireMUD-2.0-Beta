@@ -330,6 +330,8 @@ int get_wear_by_item_wear(bitvector_t item_wear) {
 * @param char_data *ch The person to show the data to.
 */
 void identify_obj_to_char(obj_data *obj, char_data *ch) {
+	void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
+	
 	extern double get_base_dps(obj_data *weapon);
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern double get_weapon_speed(obj_data *weapon);
@@ -340,17 +342,21 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
+	extern struct gen_craft_data_t gen_craft_data[];
 	extern const char *size_types[];
 	extern const char *tool_flags[];
 	extern const char *wear_bits[];
 
 	struct obj_storage_type *store;
+	craft_data *craft, *next_craft;
 	struct custom_message *ocm;
 	struct player_eq_set *pset;
 	player_index_data *index;
 	struct eq_set_obj *oset;
 	struct obj_apply *apply;
 	char lbuf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], location[MAX_STRING_LENGTH], *temp;
+	size_t size, line_size, part_size;
+	generic_data *comp = NULL;
 	obj_data *proto;
 	crop_data *cp;
 	bld_data *bld;
@@ -386,14 +392,8 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		*location = '\0';
 	}
 	
-	// component info
-	*part = '\0';
-	if (GET_OBJ_CMP_TYPE(obj) != CMP_NONE) {
-		sprintf(part, " (%s)", component_string(GET_OBJ_CMP_TYPE(obj), GET_OBJ_CMP_FLAGS(obj)));
-	}
-	
 	// basic info
-	snprintf(lbuf, sizeof(lbuf), "Your analysis of $p%s%s reveals:", part, location);
+	snprintf(lbuf, sizeof(lbuf), "Your analysis of $p%s reveals:", location);
 	act(lbuf, FALSE, ch, obj, NULL, TO_CHAR);
 	
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
@@ -623,6 +623,39 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	if (*lbuf) {
 		msg_to_char(ch, "Modifiers: %s\r\n", lbuf);
+	}
+	
+	// component info
+	if (GET_OBJ_COMPONENT(obj) != NOTHING && (comp = find_generic(GET_OBJ_COMPONENT(obj), GENERIC_COMPONENT))) {
+		msg_to_char(ch, "Component type: %s%s\r\n", GEN_NAME(comp), GEN_FLAGGED(comp, GEN_BASIC) ? " (basic)" : "");
+	
+		if (GEN_COMPUTED_RELATIONS(comp)) {
+			get_generic_relation_display(GEN_COMPUTED_RELATIONS(comp), FALSE, lbuf, "Can be used as: ");
+			msg_to_char(ch, "%s", lbuf);
+		}
+	}
+	
+	// recipes
+	size = line_size = snprintf(lbuf, sizeof(lbuf), "Allows: ");
+	any = FALSE;
+	HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
+		if (GET_CRAFT_REQUIRES_OBJ(craft) == GET_OBJ_VNUM(obj)) {
+			part_size = snprintf(part, sizeof(part), "%s %s", gen_craft_data[GET_CRAFT_TYPE(craft)].command, GET_CRAFT_NAME(craft));
+			
+			if (line_size + part_size + 2 >= 80 && part_size < 75 && any) {
+				size += snprintf(lbuf + size, sizeof(lbuf) - size, ",\r\n%s", part);
+				line_size = part_size;
+			}
+			else {
+				size += snprintf(lbuf + size, sizeof(lbuf) - size, "%s%s", (any ? ", " : ""), part);
+				line_size += part_size;
+			}
+			
+			any = TRUE;
+		}
+	}
+	if (any) {
+		msg_to_char(ch, "%s\r\n", lbuf);
 	}
 	
 	// some custom messages
@@ -6613,12 +6646,12 @@ ACMD(do_split) {
 
 
 ACMD(do_store) {
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct empire_storage_data *store;
 	obj_data *obj, *next_obj, *lists[2];
 	int count = 0, total = 1, done = 0, dotmode, iter;
 	empire_data *emp, *room_emp = ROOM_OWNER(IN_ROOM(ch));
-	bool full = 0, use_room = FALSE;
+	bool full = FALSE, use_room = FALSE, all = FALSE, room = FALSE, inv = FALSE;
 
 	if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You'll need to finish the building first.\r\n");
@@ -6638,35 +6671,51 @@ ACMD(do_store) {
 		return;
 	}
 
-	two_arguments(argument, arg, buf);
+	two_arguments(argument, arg1, arg2);
 
-	/* This goes first because I want it to move buf to arg */
-	if (*arg && is_number(arg)) {
-		total = atoi(arg);
+	/* This goes first because I want it to move arg2 to arg1 */
+	if (*arg1 && is_number(arg1)) {
+		total = atoi(arg1);
 		if (total < 1) {
 			msg_to_char(ch, "You have to store at least 1.\r\n");
 			return;
 		}
-		strcpy(arg, buf);
+		strcpy(arg1, arg2);
+		*arg2 = '\0';
 	}
-	else if (*arg && *buf && !str_cmp(arg, "all")) {
+	else if (*arg1 && *arg2 && !str_cmp(arg1, "all")) {	// 'store all <thing>'
 		total = CAN_CARRY_N(ch) + 1;
-		strcpy(arg, buf);
+		strcpy(arg1, arg2);
+		*arg2 = '\0';
+	}
+	else if (!str_cmp(arg1, "all") && !*arg2) {
+		all = TRUE;	// basic 'store all'
+	}
+	else if (!str_cmp(arg1, "room") && !*arg2) {
+		room = TRUE;	// store all on ground
+	}
+	else if ((!str_cmp(arg1, "inv") || !str_cmp(arg1, "inventory")) && !*arg2) {
+		inv = TRUE;	// store all from inventory
 	}
 
-	if (!*arg) {
+	if (!*arg1) {
 		msg_to_char(ch, "What would you like to store?\r\n");
 		return;
 	}
 
 	// set up search lists for "all" modes
-	lists[0] = ch->carrying;
-	use_room = (ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch));
+	lists[0] = !room ? ch->carrying : NULL;	// only if they didn't specify 'room'
+	use_room = (!inv && ROOM_OWNER(IN_ROOM(ch)) == GET_LOYALTY(ch));
 	lists[1] = use_room ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
 	
-	dotmode = find_all_dots(arg);
+	if (!use_room && room) {
+		msg_to_char(ch, "You can't store items from the room because your empire doesn't own it.\r\n");
+		return;
+	}
+	
+	dotmode = find_all_dots(arg1);
 
-	if (dotmode == FIND_ALL) {
+	if (dotmode == FIND_ALL || all || room || inv) {
 		if (!ch->carrying) {
 			send_to_char("You don't seem to be carrying anything.\r\n", ch);
 			return;
@@ -6702,18 +6751,18 @@ ACMD(do_store) {
 		}
 	}
 	else {
-		if (!*arg) {
+		if (!*arg1) {
 			msg_to_char(ch, "What do you want to store all of?\r\n");
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!use_room || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))) {
-			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
+		if (!(obj = get_obj_in_list_vis(ch, arg1, ch->carrying)) && (!use_room || !(obj = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch)))))) {
+			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg1);
 			return;
 		}
 		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
 			// try to set up next-obj
-			if (!(next_obj = get_obj_in_list_vis(ch, arg, obj->next_content)) && obj->carried_by && use_room) {
-				next_obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)));
+			if (!(next_obj = get_obj_in_list_vis(ch, arg1, obj->next_content)) && obj->carried_by && use_room) {
+				next_obj = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch)));
 			}
 			
 			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), FALSE)) {

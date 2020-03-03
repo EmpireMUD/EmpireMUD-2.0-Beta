@@ -1,0 +1,100 @@
+#6400
+fiber~
+6 a
+0 6400 0 0
+T0
+fibers~
+S
+#6401
+soft fiber~
+6 a
+0 6401 0 0
+R 6400
+T0
+soft fibers~
+S
+#6402
+stiff fiber~
+6 a
+0 6402 0 0
+R 6400
+T0
+stiff fibers~
+S
+#6420
+plant fiber~
+6 a
+0 6420 0 0
+R 6400
+T0
+plant fibers~
+S
+#6421
+soft plant fiber~
+6 a
+0 6421 0 0
+R 6420
+R 6401
+T0
+soft plant fibers~
+S
+#6422
+stiff plant fiber~
+6 a
+0 6422 0 0
+R 6420
+R 6402
+T0
+stiff plant fibers~
+S
+#6423
+stick~
+6 a
+0 6423 0 0
+R 6422
+T0
+sticks~
+S
+#6424
+vine~
+6 a
+0 133 0 0
+R 6421
+R 6870
+T0
+vines~
+S
+#6440
+animal fiber~
+6 a
+0 6440 0 0
+R 6401
+T0
+animal fibers~
+S
+#6441
+wool~
+6 a
+0 6441 0 0
+R 6440
+T0
+wool~
+S
+#6442
+feather~
+6 a
+0 9025 0 0
+R 6440
+T0
+feathers~
+S
+#6443
+large feather~
+6 a
+0 6443 0 0
+R 6440
+R 6402
+T0
+large feathers~
+S
+$

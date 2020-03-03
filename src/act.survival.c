@@ -26,6 +26,7 @@
 /**
 * Contents:
 *   Helpers
+*   Hunt Helpers
 *   Mount Commands
 *   Commands
 */
@@ -35,6 +36,7 @@
 // external funcs
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 void scale_item_to_level(obj_data *obj, int level);
+extern bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
 
 // local protos
 ACMD(do_dismount);
@@ -191,6 +193,44 @@ bool valid_no_trace(room_data *room) {
 	
 	// all other cases?
 	return TRUE;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// HUNT HELPERS ////////////////////////////////////////////////////////////
+	
+// helper data: stores spawn lists for do_hunt
+struct hunt_helper {
+	struct spawn_info *list;
+	struct hunt_helper *next;	// linked list
+};
+
+// for finding global spawn lists
+struct hunt_global_bean {
+	room_data *room;
+	int x_coord, y_coord;
+	struct hunt_helper **helpers;	// pointer to existing list of helpers
+};
+
+
+GLB_VALIDATOR(validate_global_hunt_for_map_spawns) {
+	struct hunt_global_bean *data = (struct hunt_global_bean*)other_data;
+	if (!other_data) {
+		return FALSE;
+	}
+	return validate_spawn_location(data->room, GET_GLOBAL_SPARE_BITS(glb), data->x_coord, data->y_coord, FALSE);
+}
+
+
+GLB_FUNCTION(run_global_hunt_for_map_spawns) {
+	struct hunt_global_bean *data = (struct hunt_global_bean*)other_data;
+	struct hunt_helper *hlp;
+	
+	if (data && data->helpers) {
+		CREATE(hlp, struct hunt_helper, 1);
+		hlp->list = GET_GLOBAL_SPAWNS(glb);
+		LL_APPEND(*(data->helpers), hlp);
+	}
 }
 
 
@@ -743,21 +783,15 @@ ACMD(do_forage) {
 
 
 ACMD(do_hunt) {
-	extern bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
-	
+	struct hunt_helper *helpers = NULL, *item, *next_item;
 	struct spawn_info *spawn, *found_spawn = NULL;
 	char_data *mob, *found_proto = NULL;
+	struct hunt_global_bean *data;
 	vehicle_data *veh, *next_veh;
 	bool junk, non_animal = FALSE;
 	int count, x_coord, y_coord;
 	
 	double min_percent = 1.0;	// won't find things below 1% spawn
-	
-	// helper data
-	struct hunt_helper {
-		struct spawn_info *list;
-		struct hunt_helper *next;	// linked list
-	} *helpers = NULL, *item, *next_item;
 	
 	skip_spaces(&argument);
 	
@@ -846,9 +880,18 @@ ACMD(do_hunt) {
 		LL_PREPEND(helpers, item);
 	}
 	
-	// prepare data for validation (calling these here prevents multiple function calls
+	// prepare data for validation (calling these here prevents multiple function calls)
 	x_coord = X_COORD(IN_ROOM(ch));
 	y_coord = Y_COORD(IN_ROOM(ch));
+	
+	// build lists: global spawns
+	CREATE(data, struct hunt_global_bean, 1);
+	data->room = IN_ROOM(ch);
+	data->x_coord = x_coord;
+	data->y_coord = y_coord;
+	data->helpers = &helpers;	// reference current list
+	run_globals(GLOBAL_MAP_SPAWNS, run_global_hunt_for_map_spawns, TRUE, GET_SECT_CLIMATE(BASE_SECT(IN_ROOM(ch))), NULL, NULL, 0, validate_global_hunt_for_map_spawns, data);
+	free(data);
 	
 	// find the thing to hunt
 	LL_FOREACH_SAFE(helpers, item, next_item) {

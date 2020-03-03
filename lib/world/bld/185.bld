@@ -26,11 +26,11 @@ corner of the platform at the top of the pyramid to a torch-lit chamber below.
 M
 244 20.00 c
 R
-16 1 1 0
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 R
-3 1 1 0
+6075 1 1 0
 T 18521
 T 18517
 S
@@ -150,10 +150,10 @@ pyramid has collapsed, blocking access to the interior.
 M
 244 20.00 c
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 R
-3 1 1 0
+6075 1 1 0
 S
 $

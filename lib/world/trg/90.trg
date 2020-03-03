@@ -358,7 +358,7 @@ if %actor.cooldown(9027)%
 end
 nop %actor.set_cooldown(9027, 5)%
 wait 3
-if !%object.is_component(fruit)% && !%object.is_component(vegetable)% && !%object.is_component(grain)%
+if !%object.is_component(6120, 6130, 6140, 6150, 6160, 6170)%
   %echo% %self.name% does not seem interested.
   drop all
   halt

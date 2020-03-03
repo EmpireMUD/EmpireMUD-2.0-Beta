@@ -828,7 +828,8 @@ void perform_burn_room(room_data *room) {
 void uncrop_tile(room_data *room) {
 	char buf[MAX_STRING_LENGTH], name[MAX_STRING_LENGTH];
 	struct evolution_data *evo;
-	sector_data *to_sect = NULL;
+	sector_data *to_sect = NULL, *next_sect;
+	int safety;
 	
 	// flags that cannot be on the sector we choose here
 	const bitvector_t invalid_sect_flags = SECTF_HAS_CROP_DATA | SECTF_CROP | SECTF_MAP_BUILDING | SECTF_INSIDE | SECTF_ADVENTURE;
@@ -874,6 +875,22 @@ void uncrop_tile(room_data *room) {
 	if (!to_sect) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: uncrop_tile: unable to find a valid tile to return to; 'config world default_land_sect' may not be set");
 		return;
+	}
+	
+	// loop time: does THIS sect have a harvest-to? If so, follow it down the chain
+	safety = 0;
+	while ((evo = get_evolution_by_type(to_sect, EVO_HARVEST_TO)) && safety < 100) {
+		++safety;
+		if ((next_sect = sector_proto(evo->becomes))) {
+			to_sect = next_sect;
+		}
+		else {
+			break;	// missing next_sect; keep the one we have
+		}
+	}
+	
+	if (safety >= 100) {
+		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: uncrop_tile: possible infinte loop on HARVEST-TO interactions for sector [%d] %s", GET_SECT_VNUM(to_sect), GET_SECT_NAME(to_sect));
 	}
 	
 	// ok: now change it

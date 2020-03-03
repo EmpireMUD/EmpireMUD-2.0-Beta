@@ -36,7 +36,11 @@ void clear_last_act_message(descriptor_data *desc);
 // locals
 struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
 bool is_ignoring(char_data *ch, char_data *victim);
-void process_add_to_channel_history(struct channel_history_data **history, char *message);
+FILE *open_slash_channel_file(struct slash_channel *chan);
+struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message);
+void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entry);
+void write_slash_channel_configs(struct slash_channel *chan);
+void write_slash_channel_index();
 
 
 #define MAX_RECENT_CHANNELS		20		/* Number of pub_comm uses to remember */
@@ -86,39 +90,36 @@ bool add_ignore(char_data *ch, int idnum) {
 
 
 /**
-* @param descriptor_data *desc
+* @param char_data *ch The player whose history to write to
 * @param int type CHANNEL_HISTORY_x -- structs.h
+* @param char_data *speaker Who said the message
 * @param char *message full string including sender
 */
-void add_to_channel_history(char_data *ch, int type, char *message) {
+void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message) {
 	if (!REAL_NPC(ch)) {
-		process_add_to_channel_history(&GET_HISTORY(REAL_CHAR(ch), type), message);
+		process_add_to_channel_history(&GET_HISTORY(REAL_CHAR(ch), type), NULL, message);
 	}
 }
 
 
 /**
-* Adds a message to a player's /history for a channel.
+* Adds a message to the global /history for a channel.
 *
-* @param char_data *ch The player.
 * @param struct slash_channel *chan The channel.
+* @param char_data *speaker Who sent the message.
 * @param char *message The message to add.
 */
-void add_to_slash_channel_history(char_data *ch, struct slash_channel *chan, char *message) {
-	struct player_slash_history *psh;
+void add_to_slash_channel_history(struct slash_channel *chan, char_data *speaker, char *message) {
+	struct channel_history_data *entry;
+	FILE *fl;
 	
-	if (!ch || IS_NPC(ch) || !chan || !message || !*message) {
-		return;	// don't bother
+	entry = process_add_to_channel_history(&(chan->history), speaker, message);
+	if (!(fl = open_slash_channel_file(chan))) {
+		return;	// unable to write
 	}
 	
-	HASH_FIND_STR(GET_SLASH_HISTORY(ch), chan->lc_name, psh);
-	if (!psh) {
-		CREATE(psh, struct player_slash_history, 1);
-		psh->channel = str_dup(chan->lc_name);
-		HASH_ADD_STR(GET_SLASH_HISTORY(ch), channel, psh);
-	}
-	
-	process_add_to_channel_history(&(psh->history), message);
+	write_one_slash_channel_message(fl, entry);
+	fclose(fl);
 }
 
 
@@ -210,6 +211,29 @@ bool is_ignoring(char_data *ch, char_data *victim) {
 
 
 /**
+* is_ignoring but for when you only have an ID
+*
+* @param char_data *ch The player to check.
+* @param int idnum The id of the person who might be ignored.
+* @return bool TRUE if ch is ignoring the idnum's player
+*/
+bool is_ignoring_idnum(char_data *ch, int idnum) {
+	player_index_data *index;
+	bool ignoring = FALSE, is_file = FALSE;
+	char_data *victim;
+	
+	if ((index = find_player_index_by_idnum(idnum)) && (victim = find_or_load_player(index->name, &is_file))) {
+		ignoring = is_ignoring(ch, victim);
+		if (is_file) {
+			free_char(victim);
+		}
+	}
+	
+	return ignoring;
+}
+
+
+/**
 * Verifies the tellability of a person -- sends its own error message if not.
 *
 * @param char_data *ch The teller
@@ -268,7 +292,7 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 	if (vict->desc && vict->desc->last_act_message) {
 		// the message was sent via act(), we can retrieve it from the desc
 		sprintf(lbuf, "\t%c%s", color, vict->desc->last_act_message);
-		add_to_channel_history(vict, CHANNEL_HISTORY_TELLS, lbuf);
+		add_to_channel_history(vict, CHANNEL_HISTORY_TELLS, ch, lbuf);
 	}
 
 	if (PRF_FLAGGED(ch, PRF_NOREPEAT))
@@ -286,7 +310,7 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 
 		if (ch->desc && ch->desc->last_act_message) {
 			// the message was sent via act(), we can retrieve it from the desc
-			add_to_channel_history(ch, CHANNEL_HISTORY_TELLS, ch->desc->last_act_message);
+			add_to_channel_history(ch, CHANNEL_HISTORY_TELLS, ch, ch->desc->last_act_message);
 		}
 	}
 	
@@ -305,38 +329,26 @@ void perform_tell(char_data *ch, char_data *vict, char *arg) {
 
 /**
 * @param struct channel_history_data **history a pointer to a history storage pointer
+* @param char_data *ch The player speaking on the channel (if applicable)
 * @param char *message the message to store
+* @return struct channel_history_data* The new history entry.
 */
-void process_add_to_channel_history(struct channel_history_data **history, char *message) {
-	struct channel_history_data *new, *old, *chd_iter, *last;
+struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message) {
+	struct channel_history_data *new, *old, *iter;
 	int count;
 	
 	// setup
 	CREATE(new, struct channel_history_data, 1);
 	new->message = strdup(message);
+	new->idnum = (ch ? GET_IDNUM(ch) : 0);
+	new->invis_level = (ch && !IS_NPC(ch)) ? GET_INVIS_LEV(ch) : 0;
 	new->timestamp = time(0);
-	new->next = NULL;
 	
-	// find the end
-	last = NULL;
-	count = 0;
-	for (chd_iter = *history; chd_iter; chd_iter = chd_iter->next) {
-		++count;
-		if (!(chd_iter->next)) {
-			last = chd_iter;
-		}
-	}
-	
-	// append at end
-	++count;
-	if (last != NULL) {
-		last->next = new;
-	}
-	else {
-		*history = new;
-	}
+	// put it at the end
+	LL_APPEND(*history, new);
 	
 	// check limit
+	LL_COUNT(*history, iter, count);
 	if (count > MAX_RECENT_CHANNELS) {
 		// remove the first one
 		old = *history;
@@ -346,6 +358,8 @@ void process_add_to_channel_history(struct channel_history_data **history, char 
 		}
 		free(old);
 	}
+	
+	return new;
 }
 
 
@@ -473,7 +487,7 @@ ACMD(do_pub_comm) {
 			
 			// trap last act() and send to the history
 			if (ch->desc && ch->desc->last_act_message && pub_comm[subcmd].history != NO_HISTORY) {
-				add_to_channel_history(ch, pub_comm[subcmd].history, ch->desc->last_act_message);
+				add_to_channel_history(ch, pub_comm[subcmd].history, ch, ch->desc->last_act_message);
 			}
 		}
 		
@@ -553,7 +567,7 @@ ACMD(do_pub_comm) {
 									strcpy(lbuf, desc->last_act_message);
 								}
 								
-								add_to_channel_history(desc->character, pub_comm[subcmd].history, lbuf);
+								add_to_channel_history(desc->character, pub_comm[subcmd].history, ch, lbuf);
 							}
 							else {
 								// color terminator if they somehow missed the rest of the string
@@ -610,8 +624,6 @@ void announce_to_slash_channel(struct slash_channel *chan, char_data *person, co
 			}
 			
 			SEND_TO_Q(lbuf, d);
-			// no longer putting announcements on history
-			// process_add_to_channel_history(&(slash->history), lbuf);
 		}
 
 		va_end(tArgList);
@@ -620,36 +632,58 @@ void announce_to_slash_channel(struct slash_channel *chan, char_data *person, co
 
 
 /**
-* Checks if a slash-channel is now empty, and deletes it.
+* Removes old messages and writes a clean version of the slash-channel's log
+* file. Then, it also frees up the memory from older messages in memory.
 *
-* @param struct slash_channel *chan The channel to check/delete.
+* @param struct slash_channel *chan The channel to clean/write.
 */
-void check_empty_slash_channel(struct slash_channel *chan) {
-	char_data *ch;
-	int count = 0;
+void clean_slash_channel(struct slash_channel *chan) {
+	struct channel_history_data *hist, *next_hist;
+	time_t clear_before;
+	char filename[256];
+	int count;
+	FILE *fl;
 	
-	LL_FOREACH(character_list, ch) {
-		if (IS_NPC(ch)) {
-			continue;
-		}
-		if (!(find_on_slash_channel(ch, chan->id))) {
-			continue;
-		}
-		
-		++count;
-		break;	// only need 1
+	clear_before = time(0) - (config_get_int("slash_message_log_days") * SECS_PER_REAL_DAY);
+	
+	// open the file for write (overwrite the old one)
+	sprintf(filename, "%s%s", LIB_CHANNELS, chan->lc_name);
+	if (!(fl = fopen(filename, "w"))) {
+		log("SYSERR: Unable to write slash-channel file '%s'", filename);
+		return;
 	}
 	
-	if (!count) {	// delete the channel
-		LL_DELETE(slash_channel_list, chan);
-		if (chan->name) {
-			free(chan->name);
+	// clean the history and write any remaining history
+	count = 0;
+	LL_FOREACH_SAFE(chan->history, hist, next_hist) {
+		if (hist->timestamp >= clear_before) {
+			write_one_slash_channel_message(fl, hist);
+			++count;
 		}
-		if (chan->lc_name) {
-			free(chan->lc_name);
+		else {
+			LL_DELETE(chan->history, hist);
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
 		}
-		free(chan);
 	}
+	
+	fclose(fl);
+	
+	// free up memory for any entries that wouldn't be shown on histories
+	LL_FOREACH_SAFE(chan->history, hist, next_hist) {
+		if (count-- > MAX_RECENT_CHANNELS) {
+			LL_DELETE(chan->history, hist);
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
+		}
+	}
+	
+	// and write the current configs now (will re-open the file for append)
+	write_slash_channel_configs(chan);
 }
 
 
@@ -688,6 +722,8 @@ struct slash_channel *create_slash_channel(char *name) {
 	chan->color = compute_slash_channel_color(name);
 	
 	LL_APPEND(slash_channel_list, chan);
+	write_slash_channel_index();	// ensure index is up to date now
+	
 	return chan;
 }
 
@@ -777,6 +813,115 @@ struct player_slash_channel *find_on_slash_channel(char_data *ch, int id) {
 
 
 /**
+* Loads the slash channels from their files and does some maintenance on them.
+*/
+void load_slash_channels(void) {
+	char name[256], filename[256], line[256], error[256], str[256];
+	struct channel_history_data *hist, *last;
+	struct slash_channel *chan;
+	char color, *tmp;
+	int idnum, invis;
+	FILE *index, *fl;
+	long timestamp;
+	
+	log("Loading slash-channels...");
+	
+	if (!(index = fopen(LIB_CHANNELS INDEX_FILE, "r"))) {
+		log("- no index (no channels loaded)");
+		return;
+	}
+	
+	fscanf(index, "%s\n", name);
+	while (*name != '$') {
+		// find or create the channel...
+		if (!(chan = find_slash_channel_by_name(name, TRUE))) {
+			chan = create_slash_channel(name);
+		}
+		
+		// prevent trouble while reloading: clear anything already loaded (should be nothing)
+		while ((hist = chan->history)) {
+			chan->history = hist->next;
+			if (hist->message) {
+				free(hist->message);
+			}
+			free(hist);
+		}
+		
+		// now try to load from file
+		sprintf(filename, "%s%s", LIB_CHANNELS, name);
+		if ((fl = fopen(filename, "r"))) {
+			// file open..
+			snprintf(error, sizeof(error), "slash-channel %s", name);
+			last = NULL;
+			
+			for (;;) {
+				if (!get_line(fl, line)) {
+					break;	// done (no terminating code)
+				}
+				
+				switch (*line) {
+					case 'M': {	// message
+						if (sscanf(line, "M %ld %d %d", &timestamp, &idnum, &invis) != 3) {
+							// skip this entry
+							tmp = fread_string(fl, error);
+							if (tmp) {
+								free(tmp);
+							}
+							continue;
+						}
+						
+						CREATE(hist, struct channel_history_data, 1);
+						hist->idnum = idnum;
+						hist->invis_level = invis;
+						hist->timestamp = timestamp;
+						hist->message = fread_string(fl, error);
+						
+						// put it at the end
+						if (last) {
+							last->next = hist;
+						}
+						else {
+							chan->history = hist;
+						}
+						last = hist;
+						break;
+					}
+					case 'N': {	// name/configs
+						if (sscanf(line, "N %c %s", &color, str) != 2) {
+							continue;	// skip line: invalid config
+						}
+						
+						// accept new capitalization of the name ONLY if it's still the same name
+						if (!str_cmp(str, chan->lc_name)) {
+							if (chan->name) {
+								free(chan->name);
+							}
+							chan->name = str_dup(str);
+						}
+						
+						// accept new color
+						chan->color = color;
+						break;
+					}
+					
+					// default: ignore the line as garbage
+				}
+			}
+			
+			fclose(fl);
+			clean_slash_channel(chan);
+		}
+		else {	// no file
+			log (" - unable to load file for channel '%s'", name);
+		}
+		fscanf(index, "%s\n", name);
+	}
+	
+	fclose(index);
+}
+
+
+/**
 * Sends game data logs to slash channels.
 *
 * @param char *chan_name The name of the slash channel to announce to.
@@ -795,6 +940,7 @@ void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, 
 	}
 	if (!(chan = find_slash_channel_by_name(chan_name, TRUE))) {
 		chan = create_slash_channel(chan_name);
+		write_slash_channel_configs(chan);
 	}
 	
 	if (messg) {
@@ -814,11 +960,39 @@ void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, 
 			}
 			
 			SEND_TO_Q(lbuf, d);
-			add_to_slash_channel_history(d->character, chan, lbuf);
 		}
+		
+		add_to_slash_channel_history(chan, ignorable_person, lbuf);
 
 		va_end(tArgList);
 	}
+}
+
+
+/**
+* Opens the slash-channel's log file to append to.
+*
+* @param struct slash_channel *chan The channel to open the file for.
+* @return FILE* The open file for writing, if possible.
+*/
+FILE *open_slash_channel_file(struct slash_channel *chan) {
+	char fname[256];
+	FILE *fl;
+	
+	if (!chan) {
+		return NULL;
+	}
+	if (!str_cmp(chan->lc_name, "index")) {
+		// emergency saftey: cannot write a channel named "index" because it would overwrite the index
+		log("SYSERR: Trying to open file for slash-channel named 'index'");
+		return NULL;
+	}
+	
+	snprintf(fname, sizeof(fname), "%s%s", LIB_CHANNELS, chan->lc_name);
+	if (!(fl = fopen(fname, "a"))) {
+		log("SYSERR: Unable to open slash-channel file '%s' for appending", fname);
+	}
+	return fl;
 }
 
 
@@ -886,17 +1060,24 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 	else {
 		*invis_string = '\0';
 	}
+	
+	// log the history
+	if (echo) {
+		sprintf(lbuf, "[\t%c/%s\t0] %s\tn", chan->color, chan->name, argument);
+	}
+	else if (emote) {
+		sprintf(lbuf, "[\t%c/%s\t0] %s %s\tn", chan->color, chan->name, GET_INVIS_LEV(ch) > 1 ? "Someone" : PERS(ch, ch, TRUE), argument);
+	}
+	else {
+		sprintf(lbuf, "[\t%c/%s\t0 %s]: %s\tn", chan->color, chan->name, GET_INVIS_LEV(ch) > 1 ? "Someone" : PERS(ch, ch, TRUE), argument);
+	}
+	add_to_slash_channel_history(chan, ch, lbuf);
 
 	// msg to self
 	if (PRF_FLAGGED(ch, PRF_NOREPEAT) && !echo) {
 		send_config_msg(ch, "ok_string");
 	}
 	else {
-		// for channel history
-		if (ch->desc) {
-			clear_last_act_message(ch->desc);
-		}
-		
 		color = (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_SLASH)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_SLASH) : '0';
 
 		if (echo) {
@@ -909,17 +1090,10 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 			sprintf(lbuf, "\t%c[\t%c/%s\t%c $o%s]: %s\tn", color, chan->color, chan->name, color, invis_string, argument);
 		}
 		act(lbuf, FALSE, ch, 0, 0, TO_CHAR | TO_SLEEP);
-		
-		if (ch->desc && ch->desc->last_act_message) {
-			add_to_slash_channel_history(ch, chan, ch->desc->last_act_message);
-		}
 	}
 
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if (STATE(desc) == CON_PLAYING && (vict = desc->character) && !IS_NPC(vict) && vict != ch && !is_ignoring(vict, ch) && (slash = find_on_slash_channel(vict, chan->id))) {
-			// for channel history
-			clear_last_act_message(desc);
-
 			color = (!IS_NPC(vict) && GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SLASH)) ? GET_CUSTOM_COLOR(vict, CUSTOM_COLOR_SLASH) : '0';
 
 			if (echo) {
@@ -938,13 +1112,59 @@ void speak_on_slash_channel(char_data *ch, struct slash_channel *chan, char *arg
 			}
 
 			act(lbuf, FALSE, ch, 0, vict, TO_VICT | TO_SLEEP | TO_NODARK);
-		
-			// the message was sent via act(), we can retrieve it from the desc
-			if (desc->last_act_message) {
-				add_to_slash_channel_history(vict, chan, desc->last_act_message);
-			}
 		}
 	}
+}
+
+
+/**
+* Writes a single slash-channel entry to a slash-channel log file.
+*
+* @param FILE *fl The open file to write to.
+* @param struct channel_history_data *entry The message entry to write.
+*/
+void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entry) {
+	if (fl && entry) {
+		fprintf(fl, "M %ld %d %d\n%s~\n", entry->timestamp, entry->idnum, entry->invis_level, NULLSAFE(entry->message));
+		fflush(fl);
+	}
+}
+
+
+/**
+* Writes a fresh copy of any relevant configs to a slash-channel's data file.
+*
+* @param struct slash_channel *chan The channel to write to.
+*/
+void write_slash_channel_configs(struct slash_channel *chan) {
+	FILE *fl = open_slash_channel_file(chan);
+	if (!fl) {
+		return;	// unable to write
+	}
+	
+	fprintf(fl, "N %c %s\n", chan->color, chan->name);
+	fclose(fl);
+}
+
+
+/**
+* Updates the index file for slash channels.
+*/
+void write_slash_channel_index(void) {
+	struct slash_channel *chan;
+	FILE *fl;
+	
+	if (!(fl = fopen(LIB_CHANNELS INDEX_FILE TEMP_SUFFIX, "w"))) {
+		log("SYSERR: Unable to open slash channel index for writing");
+		return;
+	}
+	
+	LL_FOREACH(slash_channel_list, chan) {
+		fprintf(fl, "%s\n", chan->lc_name);
+	}
+	fprintf(fl, "$\n");
+	fclose(fl);
+	rename(LIB_CHANNELS INDEX_FILE TEMP_SUFFIX, LIB_CHANNELS INDEX_FILE);
 }
 
 
@@ -953,12 +1173,13 @@ ACMD(do_slash_channel) {
 	struct channel_history_data *hist;
 	struct player_slash_channel *slash, *temp;
 	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	player_index_data *index;
 	descriptor_data *desc;
 	char_data *vict;
 	int iter, count;
 	bool ok, found;
 	
-	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "check", "recase", "echo", "\n" };
+	char *invalid_channel_names[] = { "/", "join", "leave", "who", "hist", "history", "list", "check", "recase", "echo", "index", "\n" };
 	
 	half_chop(argument, arg, arg2);
 	
@@ -1059,6 +1280,7 @@ ACMD(do_slash_channel) {
 		
 		if (!(chan = find_slash_channel_by_name(arg3, TRUE))) {
 			chan = create_slash_channel(arg3);
+			write_slash_channel_configs(chan);
 		}
 		
 		if (find_on_slash_channel(ch, chan->id)) {
@@ -1105,8 +1327,6 @@ ACMD(do_slash_channel) {
 			if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO)) {
 				announce_to_slash_channel(chan, ch, "%s has left the channel", PERS(ch, ch, TRUE));
 			}
-			
-			check_empty_slash_channel(chan);
 		}
 	}
 	else if (!str_cmp(arg, "who")) {
@@ -1142,15 +1362,26 @@ ACMD(do_slash_channel) {
 			msg_to_char(ch, "You're not even on that channel.\r\n");
 		}
 		else {
-			struct player_slash_history *psh;
-			
 			msg_to_char(ch, "Last %d messages on \t%c/%s\tn:\r\n", MAX_RECENT_CHANNELS, chan->color, chan->name);
 			
-			HASH_FIND_STR(GET_SLASH_HISTORY(ch), chan->lc_name, psh);
-			if (psh) {
-				LL_FOREACH(psh->history, hist) {
-					msg_to_char(ch, "%3s: %s%s", simple_time_since(hist->timestamp), hist->message, (hist->message[strlen(hist->message) - 1] != '\n') ? "\r\n" : "");
+			// count so we can just show the last N
+			LL_COUNT(chan->history, hist, count);
+			
+			LL_FOREACH(chan->history, hist) {
+				if (count-- > MAX_RECENT_CHANNELS) {
+					continue;	// skip down to the last N
 				}
+				if (is_ignoring_idnum(ch, hist->idnum)) {
+					continue;	// ignore list
+				}
+				
+				if (hist->invis_level > 0 && hist->invis_level <= GET_ACCESS_LEVEL(ch)) {
+					sprintf(buf, " (%s)", (index = find_player_index_by_idnum(hist->idnum)) ? index->fullname : "<unknown>");
+				}
+				else {
+					*buf = '\0';
+				}
+				msg_to_char(ch, "%3s%s: %s%s", simple_time_since(hist->timestamp), buf, hist->message, (hist->message[strlen(hist->message) - 1] != '\n') ? "\r\n" : "");
 			}
 		}
 	}
@@ -1197,6 +1428,7 @@ ACMD(do_slash_channel) {
 			free(chan->name);
 			chan->name = str_dup(arg3);
 			chan->color = compute_slash_channel_color(arg3);
+			write_slash_channel_configs(chan);
 			send_config_msg(ch, "ok_string");
 		}
 	}
@@ -1242,7 +1474,7 @@ ACMD(do_gsay) {
 			delete_doubledollar(normal);
 			send_to_char(normal, ch);
 			if (ch->desc) {
-				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, normal);
+				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, normal);
 			}
 		}
 
@@ -1271,7 +1503,7 @@ ACMD(do_gsay) {
 			}
 			
 			act(string, FALSE, ch, NULL, desc->character, TO_VICT | TO_SLEEP | TO_NODARK);
-			add_to_channel_history(desc->character, CHANNEL_HISTORY_SAY, desc->last_act_message);
+			add_to_channel_history(desc->character, CHANNEL_HISTORY_SAY, ch, desc->last_act_message);
 		}
 	}
 }
@@ -1614,7 +1846,7 @@ ACMD(do_say) {
 			if (c->desc && c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
 				sprintf(lbuf, "\t%c%s", color, c->desc->last_act_message);
-				add_to_channel_history(c, CHANNEL_HISTORY_SAY, lbuf);
+				add_to_channel_history(c, CHANNEL_HISTORY_SAY, ch, lbuf);
 			}
 		}
 		
@@ -1627,7 +1859,7 @@ ACMD(do_say) {
 			send_to_char(lbuf, ch);
 
 			if (ch->desc) {
-				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, lbuf);
+				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, lbuf);
 			}
 		}
 		
@@ -1700,7 +1932,7 @@ ACMD(do_spec_comm) {
 		if (vict->desc && vict->desc->last_act_message) {
 			// the message was sent via act(), we can retrieve it from the desc
 			sprintf(buf, "\t%c%s", color, vict->desc->last_act_message);
-			add_to_channel_history(vict, CHANNEL_HISTORY_SAY, buf);
+			add_to_channel_history(vict, CHANNEL_HISTORY_SAY, ch, buf);
 		}
 		
 		// msg to char
@@ -1712,7 +1944,7 @@ ACMD(do_spec_comm) {
 			sprintf(buf, "\t%cYou %s %s, '%s\t%c'\t0", color, action_sing, PERS(vict, ch, FALSE), buf2, color);
 			msg_to_char(ch, "%s\r\n", buf);
 			if (ch->desc) {
-				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, buf);
+				add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, buf);
 			}
 		}
 

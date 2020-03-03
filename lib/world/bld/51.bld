@@ -164,7 +164,7 @@ M
 R
 1009 1 5 0
 R
-16 1 1 1048576
+6000 1 1 0
 S
 #5109
 Mill~
@@ -185,9 +185,9 @@ n
 M
 234 10.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5110
 Potter~
@@ -208,9 +208,9 @@ rGL
 M
 241 15.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5111
 Stable~
@@ -235,9 +235,9 @@ M
 M
 233 10.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5112
 Fence~
@@ -248,7 +248,7 @@ A Wooden Fence~
 R
 1003 1 5 0
 R
-25 1 1 1048576
+6025 1 1 0
 S
 #5113
 Gate~
@@ -259,7 +259,7 @@ A Wooden Gate~
 R
 1003 1 5 0
 R
-25 1 1 1048576
+6025 1 1 0
 S
 #5114
 Cannery~
@@ -468,7 +468,7 @@ The house seems somehow colder, though. Nevertheless, it is very inviting.
 R
 1003 1 5 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5125
 Large House~
@@ -483,9 +483,9 @@ robust, capable of supporting an entire family or more. It is ideal for the
 head of a plantation or as the seat of a small empire.
 ~
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5126
 Tree House~
@@ -502,7 +502,7 @@ hideout of the forest-dwellers, though easily found by those who know what to
 look for.
 ~
 R
-19 1 1 0
+6790 1 1 0
 R
 1003 1 5 0
 S
@@ -521,9 +521,9 @@ of wood and easily burnt, but it has the advantage of being very difficult to
 spot from afar.
 ~
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5128
 Underground Complex~
@@ -540,9 +540,9 @@ elegance. The entrance is easily obscured and difficult to find, except at
 night when light spills out.
 ~
 R
-21 1 1 0
+6015 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5129
 Mine Complex~
@@ -556,9 +556,9 @@ desert and plains both in complexity and durability. Nearly indestructible,
 this is a mountain dweller's dream fortress.
 ~
 R
-21 1 1 0
+6015 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5130
 Alchemist~
@@ -580,9 +580,9 @@ aG
 M
 241 15.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5131
 Apiary~
@@ -600,9 +600,9 @@ b
 M
 241 15.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5132
 Bakery~
@@ -623,9 +623,9 @@ GL
 M
 241 15.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5133
 Bridge~
@@ -634,11 +634,11 @@ A Bridge Over the River~
 16 0 dmD 0
 0 0 0 -1
 R
-21 1 1 0
+6015 1 1 0
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5134
 Carpenter~
@@ -657,9 +657,9 @@ furniture, as well as other things.
 F
 e
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5135
 Glass Blower~
@@ -680,9 +680,9 @@ i
 M
 241 15.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5136
 Pigeon Post~
@@ -728,9 +728,9 @@ y
 M
 241 15.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5138
 Tavern~
@@ -772,9 +772,9 @@ M
 M
 232 1.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 T 5138
 S
 #5139
@@ -819,7 +819,7 @@ dedicate~
 R
 1001 1 5 0
 R
-3 1 1 0
+6075 1 1 0
 S
 #5142
 Henge~
@@ -836,7 +836,7 @@ M
 R
 1001 1 5 0
 R
-3 1 1 0
+6075 1 1 0
 S
 #5143
 Megalith~
@@ -847,7 +847,7 @@ A Gigantic Megalith~
 R
 1001 1 5 0
 R
-3 1 1 0
+6075 1 1 0
 S
 #5144
 Cemetery~
@@ -927,7 +927,7 @@ stench is what attracts patron gods.
 R
 1002 1 5 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5148
 Temple~
@@ -946,9 +946,9 @@ down into the earth below.
 M
 244 20.00 c
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5149
 Library~
@@ -970,9 +970,9 @@ l
 M
 9198 2.00 0
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5150
 High Temple~
@@ -991,11 +991,11 @@ state mandated by any god worthy of a temple of such stature.
 M
 244 20.00 c
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 R
-3 1 1 0
+6075 1 1 0
 S
 #5151
 Pyramid~
@@ -1023,11 +1023,11 @@ M
 M
 9197 2.00 0
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 R
-3 1 1 0
+6075 1 1 0
 S
 #5152
 Docks~
@@ -1045,9 +1045,9 @@ of larger pieces of equipment into the ship's hold.
 F
 g
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5153
 Shipyard~
@@ -1066,9 +1066,9 @@ animals. Ships may also not be brought back in once they leave.
 F
 u
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 U
 0 5154
 S
@@ -1089,11 +1089,11 @@ animals. Ships may also not be brought back in once they leave.
 F
 u
 R
-16 1 1 1048576
+6000 1 1 0
 R
-21 1 1 0
+6015 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 U
 1 5153
 S
@@ -1115,7 +1115,7 @@ A Platform in the Swamp~
 R
 1005 1 5 0
 R
-7 1 1 1048848
+6422 1 1 0
 T 5156
 S
 #5157
@@ -1134,7 +1134,7 @@ a swamp.
 R
 1002 1 5 0
 R
-7 2 1 1048848
+6422 2 1 0
 S
 #5158
 Swamp Manor~
@@ -1149,9 +1149,9 @@ city. The roof is made of sticks and pitch, but the manor has been fireproofed
 and built to last.
 ~
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5159
 Swamp Complex~
@@ -1167,9 +1167,9 @@ rotting trees and guarded by crocodiles. Inside, you find it well-constructed,
 safe, and delightfully far from civilization.
 ~
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5160
 Courtyard~
@@ -1198,9 +1198,9 @@ M
 M
 9195 5.00 c
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5162
 Baths~
@@ -1223,9 +1223,9 @@ M
 M
 236 10.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5163
 Fountain~
@@ -1238,7 +1238,7 @@ drink, fill~
 F
 F
 R
-3 1 1 0
+6075 1 1 0
 S
 #5164
 Tower of Sorcery~
@@ -1259,11 +1259,11 @@ is supporting the stairs.
 M
 237 20.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 R
-3 1 1 0
+6075 1 1 0
 T 5164
 S
 #5165
@@ -1283,9 +1283,9 @@ portcullis gate~
 The portcullis is massive. It must take 5 men to close it.
 ~
 R
-16 2 1 1048576
+6000 2 1 0
 R
-19 2 1 0
+6790 2 1 0
 S
 #5166
 Great Hall~
@@ -1300,9 +1300,9 @@ important parts of the castle as it shows the wealth of the monarch. It also
 leads to the throne room.
 ~
 R
-16 2 1 1048576
+6000 2 1 0
 R
-19 2 1 0
+6790 2 1 0
 S
 #5167
 Guard Tower~
@@ -1324,9 +1324,9 @@ j
 M
 251 5.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 U
 0 5168
 S
@@ -1350,9 +1350,9 @@ j
 M
 251 5.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 U
 0 5169
 S
@@ -1373,11 +1373,11 @@ j
 M
 251 5.00 ce
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 R
-18 1 1 262144
+6720 1 1 0
 S
 #5170
 Outpost~
@@ -1394,7 +1394,7 @@ making it very durable and safe.
 M
 252 33.00 c
 R
-3 2 1 0
+6075 2 1 0
 S
 #5171
 Barracks~
@@ -1409,7 +1409,7 @@ meat wafts from the kitchen at all hours. So long as the troops are well-fed
 and well-trained, there is little need for the empire to fear.
 ~
 R
-3 2 1 0
+6075 2 1 0
 S
 #5172
 Training Yard~
@@ -1424,7 +1424,7 @@ finest troops hone their combat skills and square off against each other for
 pride and glory, lest they be unprepared when war comes.
 ~
 R
-3 2 1 0
+6075 2 1 0
 S
 #5173
 Gatehouse~
@@ -1440,7 +1440,7 @@ infiltrators, it prevents access by common men and animals.
 M
 251 33.00 ce
 R
-3 1 1 0
+6075 1 1 0
 R
 1003 1 5 0
 S
@@ -1451,7 +1451,7 @@ A Stone Wall~
 32 0 djkn 0
 0 0 0 -1
 R
-3 1 1 0
+6075 1 1 0
 R
 1003 1 5 0
 S
@@ -1478,7 +1478,7 @@ swimmers. Guards stand post along the walls of the gate, and strong laborers
 turn cranks to open and close the doors.
 ~
 R
-3 1 1 0
+6075 1 1 0
 R
 1003 1 5 0
 S
@@ -1492,9 +1492,9 @@ C
 pick~
 I 7 1202 100.00 1  # PICK: a twig of redthorn
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5178
 Raft Garden~
@@ -1506,9 +1506,9 @@ C
 pick~
 I 7 1205 100.00 1  # PICK: some bileberries
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5179
 Oasis Garden~
@@ -1521,9 +1521,9 @@ pick~
 I 7 1204 50.00 1 X  # PICK: a daggerbite frond
 I 7 1203 100.00 1 X  # PICK: some magewhisper sepals
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5180
 Estuary Garden~
@@ -1535,9 +1535,9 @@ C
 pick~
 I 7 1200 100.00 1  # PICK: a handful of whitegrass
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5181
 Shady Garden~
@@ -1549,9 +1549,9 @@ C
 pick~
 I 7 1201 100.00 1  # PICK: a sack of fiveleaf
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5182
 Mint~
@@ -1574,11 +1574,11 @@ M
 M
 254 100.00 e
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 R
-3 1 1 0
+6075 1 1 0
 S
 #5183
 Trading Post~
@@ -1598,9 +1598,9 @@ reads 'No Bartering'.
 F
 C
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5184
 Secret Cache~
@@ -1623,11 +1623,11 @@ D
 M
 254 33.00 c
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 R
-3 1 1 0
+6075 1 1 0
 U
 1 5611
 S
@@ -1648,7 +1648,7 @@ power that flows through this place.
 F
 q
 R
-3 1 1 0
+6075 1 1 0
 R
 1007 1 5 0
 S
@@ -1669,9 +1669,9 @@ M
 R
 1004 1 5 0
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 T 5186
 S
 #5187
@@ -1693,9 +1693,9 @@ M
 R
 1004 1 5 0
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 T 5187
 S
 #5188
@@ -1716,9 +1716,9 @@ M
 R
 1004 1 5 0
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 T 5186
 S
 #5189
@@ -1740,9 +1740,9 @@ M
 R
 1004 1 5 0
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 T 5187
 S
 #5190
@@ -1756,7 +1756,7 @@ summon player <name>~
 F
 xK
 R
-3 1 1 0
+6075 1 1 0
 R
 1007 1 5 0
 S
@@ -1769,7 +1769,7 @@ A Draining Oasis~
 R
 1005 1 5 0
 R
-7 1 1 1048848
+6422 1 1 0
 T 5191
 S
 #5192
@@ -1788,9 +1788,9 @@ heavy stone press in the other corner extracts the precious oil.
 F
 s
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5193
 Cabinet of Curiosities~
@@ -1810,9 +1810,9 @@ the dusty air blocks what little light sneaks in between the relics.
 R
 1002 1 5 0
 R
-16 1 1 1048576
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5194
 Family Gravesite~
@@ -1854,7 +1854,7 @@ sweating instantly, unable to escape the powerful furnace.
 F
 hv
 R
-3 2 1 0
+6075 2 1 0
 R
 1007 1 5 0
 T 5195
@@ -1875,7 +1875,7 @@ I 21 1301 100.00 1 f  # FISH: a striped barbfish
 R
 1002 1 5 0
 R
-7 1 1 1048848
+6422 1 1 0
 S
 #5197
 Stilt House~
@@ -1889,9 +1889,9 @@ this raised wooden house. Despite its high perch, the house feels stable and
 seems well-built. It makes the perfect home for a fisherman.
 ~
 R
-16 1 1 0
+6000 1 1 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5198
 Coastal Shrine~
@@ -1904,7 +1904,7 @@ dedicate~
 R
 1002 1 5 0
 R
-19 1 1 0
+6790 1 1 0
 S
 #5199
 Mountain Well~

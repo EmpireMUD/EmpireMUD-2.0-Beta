@@ -1,0 +1,141 @@
+#6500
+skin~
+6 a
+0 6500 0 0
+T0
+skins~
+S
+#6501
+thin skin~
+6 a
+0 1350 0 0
+R 6500
+T0
+thin skins~
+S
+#6510
+thick skin~
+6 a
+0 1351 0 0
+R 6500
+T0
+thick skins~
+S
+#6511
+thick magic skin~
+6 0
+0 6511 0 0
+R 6510
+T0
+thick magic skins~
+S
+#6520
+leather~
+6 a
+0 6520 0 0
+T0
+leathers~
+S
+#6521
+thin leather~
+6 a
+0 1356 0 0
+R 6520
+T0
+thin leathers~
+S
+#6530
+thick leather~
+6 a
+0 1357 0 0
+R 6520
+T0
+thick leathers~
+S
+#6531
+thick magic leather~
+6 0
+0 6531 0 0
+R 6530
+T0
+thick magic leathers~
+S
+#6540
+fur~
+6 a
+0 6540 0 0
+T0
+furs~
+S
+#6541
+small fur~
+6 a
+0 6541 0 0
+R 6540
+T0
+small furs~
+S
+#6550
+large fur~
+6 a
+0 6550 0 0
+R 6540
+T0
+large furs~
+S
+#6551
+mythic fur~
+6 0
+0 6551 0 0
+R 6550
+T0
+mythic furs~
+S
+#6560
+bone~
+6 a
+0 6560 0 0
+T0
+bones~
+S
+#6561
+antler~
+6 a
+0 6561 0 0
+R 6560
+T0
+antlers~
+S
+#6562
+horn~
+6 a
+0 6562 0 0
+R 6560
+T0
+horns~
+S
+#6563
+ivory~
+6 0
+0 6563 0 0
+R 6560
+T0
+ivories~
+S
+#6564
+magic bone~
+6 0
+0 6564 0 0
+R 6560
+T0
+magic bones~
+S
+#6565
+dragon bone~
+6 0
+0 6565 0 0
+R 6564
+T0
+dragon bones~
+S
+$

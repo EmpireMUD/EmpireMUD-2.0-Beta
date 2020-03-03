@@ -1063,7 +1063,7 @@ Mode       Level    Description
 stats      God      Shows game stats including prototypes.
 ammotypes  Immort   Shows the 'ammo type' setting for all bows and ammo.
 buildings  Immort   Shows occurrences of buildings (vnum/name optional).
-components Immort   Shows all items matching a component type (and flags).
+components Immort   Shows all items matching a generic component vnum.
 crops      Immort   Shows tile counts for all the crops (vnum/name optional).
 currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
@@ -1121,13 +1121,12 @@ to use for a new weapon/ammo.
 #e
 "SHOW COMPONENTS"
 
-Usage:  show components <type> [flags]
+Usage:  show components <name | vnum>
 
 This command allows you to look up objects that are a given component type.
-If you specify any flags, all those flags must match the output.
+Components are 'generics'; you can search them with 'vnum generic'.
 
-For a list of component types, see: HELP COMPONENT TYPES
-For a list of component flags, see: HELP COMPONENT FLAGS
+See also: VNUM, GENERIC COMPONENTS
 #e
 "SHOW CURRENCY" "SHOW CURRENCIES"
 
@@ -1346,14 +1345,12 @@ it as unlearnable.
 #e
 "SHOW USES"
 
-Usage:  show uses <type> [flags]
+Usage:  show uses <component name/vnum>
 
 This command looks up buildings, crafts, vehicles, and augments that require a
-given component type. If you specify any flags, all those flags must match the
-output.
-
-For a list of component types, see: HELP COMPONENT TYPES
-For a list of component flags, see: HELP COMPONENT FLAGS
+given component type. It also lists ones that use a sub-type of that component.
+For example, if you search for 'large sticks' and a recipe requires regular
+'sticks', 
 #e
 "SHOW WORKFORCE"
 

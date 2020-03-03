@@ -315,6 +315,7 @@ void boot_db(void) {
 	void load_data_table();
 	void load_intro_screens();
 	void load_fight_messages();
+	void load_slash_channels();
 	void load_tips_of_the_day();
 	void load_trading_post();
 	int run_convert_vehicle_list();
@@ -360,6 +361,9 @@ void boot_db(void) {
 
 	log("Loading help entries.");
 	index_boot_help();
+	
+	// logs its own message
+	load_slash_channels();
 	
 	log("Loading player accounts.");
 	index_boot(DB_BOOT_ACCT);
@@ -470,6 +474,7 @@ void boot_world(void) {
 	void check_newbie_islands();
 	void check_triggers();
 	void clean_empire_logs();
+	void compute_generic_relations();
 	void index_boot_world();
 	void init_reputation();
 	void load_daily_quest_file();
@@ -620,6 +625,7 @@ void boot_world(void) {
 	verify_running_events();
 	read_ability_requirements();
 	check_triggers();
+	compute_generic_relations();
 	
 	log("Sorting data.");
 	HASH_SRT(sorted_hh, sorted_abilities, sort_abilities_by_data);
@@ -1828,6 +1834,7 @@ void clear_object(obj_data *obj) {
 	obj->worn_on = NO_WEAR;
 	
 	GET_OBJ_REQUIRES_QUEST(obj) = NOTHING;
+	GET_OBJ_COMPONENT(obj) = NOTHING;
 	
 	obj->last_owner_id = NOBODY;
 	obj->last_empire_id = NOTHING;
@@ -1923,6 +1930,8 @@ const char *versions_list[] = {
 	"b5.86",
 	"b5.86a",
 	"b5.87",
+	"b5.88",
+	"b5.88a",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3840,6 +3849,269 @@ void b5_87_crop_and_old_growth(void) {
 }
 
 
+// fixes tiles that fell prey to a now-fixed bug where the tile went: desert -> irrigated plains -> crop -> regular plains
+void b5_88_irrigation_repair(void) {
+	int fixed_current = 0, fixed_base = 0;
+	struct map_data *map;
+	
+	// any tiles with current OR base sect in this range are trouble
+		// plains and basic forests; jungle and swamp;
+		// damaged jungle, marsh, stumps, copse, riverbank tiles;
+		// shore, old-growth forest; shoreside/seaside tiles; jungle edge tiles;
+		// enchanted forest; evergreen forests; goblin stumps; beaver flooding
+	#define b588_TARGET_SECT(vnum)  ( \
+		((vnum) >= 0 && (vnum) <= 4) || \
+		((vnum) >= 27 && (vnum) <= 29) || \
+		((vnum) >= 34 && (vnum) <= 47) || \
+		(vnum) == 50 || (vnum) == 90 || \
+		((vnum) >= 54 && (vnum) <= 56) || \
+		((vnum) >= 59 && (vnum) <= 65) || \
+		((vnum) >= 600 && (vnum) <= 604) || \
+		((vnum) >= 10562 && (vnum) <= 10566) || \
+		(vnum) == 18100 || \
+		((vnum) >= 18451 && (vnum) <= 18452) \
+	)
+	// natural sect to look for (indicates the tile is a problem if it has this natural sect and one of the above current/base sect)
+		// desert, oasis, grove
+	#define b588_NATURAL_SECT(vnum)  ( \
+		(vnum) == 20 || \
+		(vnum) == 21 || \
+		(vnum) == 26 \
+	)
+	
+	log("Applying b5.88 update: repairing tiles affected by previous irrigation bug...");
+	
+	LL_FOREACH(land_map, map) {
+		if (!map->natural_sector || !b588_NATURAL_SECT(GET_SECT_VNUM(map->natural_sector))) {
+			continue;	// doesn't have the natural sect we're looking for: skip
+		}
+		
+		if (map->sector_type && b588_TARGET_SECT(GET_SECT_VNUM(map->sector_type))) {
+			++fixed_current;
+			change_terrain(real_room(map->vnum), GET_SECT_VNUM(map->natural_sector));
+			// log(" - current: %d (%d, %d)", map->vnum, MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+		}
+		else if (map->base_sector && b588_TARGET_SECT(GET_SECT_VNUM(map->base_sector))) {
+			if (map->crop_type) {	// crop with bad base: remove crop
+				++fixed_current;
+				change_terrain(real_room(map->vnum), GET_SECT_VNUM(map->natural_sector));
+				// log(" - current (crop): %d (%d, %d)", map->vnum, MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			}
+			else {	// no crop -- only need to fix base
+				++fixed_base;
+				change_base_sector(real_room(map->vnum), map->natural_sector);
+				// log(" - base: %d (%d, %d)", map->vnum, MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
+			}
+		}
+	}
+	
+	log("- repaired %d current and %d base sectors", fixed_current, fixed_base);
+	
+	if (fixed_current > 0 || fixed_base > 0) {
+		world_map_needs_save = TRUE;
+		save_whole_world();
+	}
+}
+
+
+// updates 
+void b5_88_resource_components_update(void) {
+	extern any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
+	void check_progress_refresh();
+	
+	craft_data *craft, *next_craft;
+	progress_data *prg, *next_prg;
+	vehicle_data *veh, *next_veh;
+	augment_data *aug, *next_aug;
+	social_data *soc, *next_soc;
+	int this_block, last_block;
+	quest_data *qst, *next_qst;
+	struct resource_data *res;
+	bld_data *bld, *next_bld;
+	obj_data *obj, *next_obj;
+	struct req_data *req;
+	any_vnum vn;
+	bool any;
+	
+	log("Applying b5.88 update: Updating components...");
+	
+	// augments
+	HASH_ITER(hh, augment_table, aug, next_aug) {
+		any = FALSE;
+		LL_FOREACH(GET_AUG_RESOURCES(aug), res) {
+			if (res->type == RES_COMPONENT && res->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
+					log("- converting resource on augment [%d] %s from (%d %s) to [%d] %s", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), res->vnum, bitv_to_alpha(res->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert resource on augment [%d] %s from (%d %s)", GET_AUG_VNUM(aug), GET_AUG_NAME(aug), res->vnum, bitv_to_alpha(res->misc));
+				}
+				res->vnum = vn;
+				res->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			save_library_file_for_vnum(DB_BOOT_AUG, GET_AUG_VNUM(aug));
+		}
+	}
+	
+	// buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		any = FALSE;
+		LL_FOREACH(GET_BLD_YEARLY_MAINTENANCE(bld), res) {
+			if (res->type == RES_COMPONENT && res->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
+					log("- converting resource on building [%d] %s from (%d %s) to [%d] %s", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), res->vnum, bitv_to_alpha(res->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert resource on building [%d] %s from (%d %s)", GET_BLD_VNUM(bld), GET_BLD_NAME(bld), res->vnum, bitv_to_alpha(res->misc));
+				}
+				res->vnum = vn;
+				res->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+		}
+	}
+	
+	// crafts
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		any = FALSE;
+		LL_FOREACH(GET_CRAFT_RESOURCES(craft), res) {
+			if (res->type == RES_COMPONENT && res->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
+					log("- converting resource on craft [%d] %s from (%d %s) to [%d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), res->vnum, bitv_to_alpha(res->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert resource on craft [%d] %s from (%d %s)", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft), res->vnum, bitv_to_alpha(res->misc));
+				}
+				res->vnum = vn;
+				res->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+		}
+	}
+	
+	// progress goals
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		any = FALSE;
+		LL_FOREACH(PRG_TASKS(prg), req) {
+			if ((req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) && req->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(req->vnum, req->misc)) != NOTHING) {
+					log("- converting task on progress [%d] %s from (%d %s) to [%d] %s", PRG_VNUM(prg), PRG_NAME(prg), req->vnum, bitv_to_alpha(req->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert task on progress [%d] %s from (%d %s)", PRG_VNUM(prg), PRG_NAME(prg), req->vnum, bitv_to_alpha(req->misc));
+				}
+				req->vnum = vn;
+				req->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			PRG_VERSION(prg) += 1;	// triggers updates for empires
+			save_library_file_for_vnum(DB_BOOT_PRG, PRG_VNUM(prg));
+		}
+	}
+	
+	// quests
+	HASH_ITER(hh, quest_table, qst, next_qst) {
+		any = FALSE;
+		LL_FOREACH(QUEST_TASKS(qst), req) {
+			if ((req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) && req->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(req->vnum, req->misc)) != NOTHING) {
+					log("- converting task on quest task [%d] %s from (%d %s) to [%d] %s", QUEST_VNUM(qst), QUEST_NAME(qst), req->vnum, bitv_to_alpha(req->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert task on quest task [%d] %s from (%d %s)", QUEST_VNUM(qst), QUEST_NAME(qst), req->vnum, bitv_to_alpha(req->misc));
+				}
+				req->vnum = vn;
+				req->misc = 0;
+				any = TRUE;
+			}
+		}
+		LL_FOREACH(QUEST_PREREQS(qst), req) {
+			if ((req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) && req->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(req->vnum, req->misc)) != NOTHING) {
+					log("- converting task on quest prereq [%d] %s from (%d %s) to [%d] %s", QUEST_VNUM(qst), QUEST_NAME(qst), req->vnum, bitv_to_alpha(req->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert task on quest prereq [%d] %s from (%d %s)", QUEST_VNUM(qst), QUEST_NAME(qst), req->vnum, bitv_to_alpha(req->misc));
+				}
+				req->vnum = vn;
+				req->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			QUEST_VERSION(qst) += 1;	// triggers updates for players
+			save_library_file_for_vnum(DB_BOOT_QST, QUEST_VNUM(qst));
+		}
+	}
+	
+	// socials
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		any = FALSE;
+		LL_FOREACH(SOC_REQUIREMENTS(soc), req) {
+			if ((req->type == REQ_GET_COMPONENT || req->type == REQ_EMPIRE_PRODUCED_COMPONENT) && req->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(req->vnum, req->misc)) != NOTHING) {
+					log("- converting requirement on social [%d] %s from (%d %s) to [%d] %s", SOC_VNUM(soc), SOC_NAME(soc), req->vnum, bitv_to_alpha(req->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert requirement on social [%d] %s from (%d %s)", SOC_VNUM(soc), SOC_NAME(soc), req->vnum, bitv_to_alpha(req->misc));
+				}
+				req->vnum = vn;
+				req->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			save_library_file_for_vnum(DB_BOOT_SOC, SOC_VNUM(soc));
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		any = FALSE;
+		LL_FOREACH(VEH_YEARLY_MAINTENANCE(veh), res) {
+			if (res->type == RES_COMPONENT && res->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
+					log("- converting resource on vehicle [%d] %s from (%d %s) to [%d] %s", VEH_VNUM(veh), VEH_SHORT_DESC(veh), res->vnum, bitv_to_alpha(res->misc), vn, get_generic_name_by_vnum(vn));
+				}
+				else {
+					log("- unable to convert resource on vehicle [%d] %s from (%d %s)", VEH_VNUM(veh), VEH_SHORT_DESC(veh), res->vnum, bitv_to_alpha(res->misc));
+				}
+				res->vnum = vn;
+				res->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
+		}
+	}
+	
+	// lastly, force a full save of all objects -- because their component types were converted when they loaded
+	last_block = -1;
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		this_block = GET_OBJ_VNUM(obj) / 100;
+		if (this_block != last_block) {
+			last_block = this_block;
+			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
+		}
+	}
+	
+	need_progress_refresh = TRUE;
+	check_progress_refresh();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4140,6 +4412,12 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.87")) {
 			b5_87_crop_and_old_growth();
+		}
+		if (MATCH_VERSION("b5.88")) {
+			b5_88_irrigation_repair();
+		}
+		if (MATCH_VERSION("b5.88a")) {
+			b5_88_resource_components_update();
 		}
 	}
 	

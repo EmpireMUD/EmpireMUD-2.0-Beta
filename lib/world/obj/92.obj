@@ -20,8 +20,7 @@ This fur is a deep shade of red, with a red striped tail.
 3 0 a 0 5
 0 0 0
 7 0
-O
-10 ou
+O+ 1 6541
 R
 5120 0
 S
@@ -35,8 +34,7 @@ animal.
 3 0 a 0 6
 0 0 0
 7 0
-O
-10 fu
+O+ 1 6550
 R
 5120 0
 S
@@ -45,14 +43,14 @@ acorn golden~
 a golden acorn~
 A golden acorn is lying here.~
    This strange golden acorn is made of gold. You're not sure where that
-squirrel got it, and it doens't look like it would grow into a tree, but it
+squirrel got it, and it doesn't look like it would grow into a tree, but it
 would certainly look good in your vault.
 ~
-15 0 a 0 1
+15 0 a 0 2
 3 0 0
 4 0
 R
-5193 0
+5611 a
 S
 #9234
 wool sack yak~
@@ -63,8 +61,7 @@ You can weave 'yak wool cloth' from this. It's just as good as any other wool.
 3 0 a 0 8
 0 0 0
 7 0
-O
-7 ap
+O+ 1 6441
 R
 5137 0
 S

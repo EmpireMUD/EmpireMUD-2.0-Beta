@@ -42,9 +42,10 @@ a fistful of firebird feathers~
 Some firebird feathers are glowing on the ground.~
 The feathers come from the mythical firebird, and glow even when plucked.
 ~
-3 c a 0 2
+3 c a 0 3
 0 0 0
 10 400
+O+ 1 6442
 S
 #19005
 rope hanging ladder~
@@ -617,8 +618,7 @@ You have a handful of small, round seeds. They can be used to plant okra.
 6 b a 0 10
 1 19041 0
 7 576
-O
-23 0
+O+ 1 6181
 R
 5210 0
 S
@@ -632,8 +632,7 @@ You could use them to make gumbo or fried okra.
 6 0 a 0 7
 4 3017 0
 7 168
-O
-27 br
+O+ 1 6153
 R
 5606 0
 S

@@ -1,0 +1,38 @@
+#6300
+flour~
+6 a
+0 3312 0 0
+T0
+flour~
+S
+#6320
+oil~
+6 a
+0 6320 0 0
+T0
+oil~
+S
+#6321
+seed oil~
+6 a
+0 6321 0 0
+R 6320
+T0
+seed oil~
+S
+#6322
+vegetable oil~
+6 a
+0 6322 0 0
+R 6320
+T0
+vegetable oil~
+S
+#6340
+sweetener~
+6 a
+0 6340 0 0
+T0
+sweeteners~
+S
+$

@@ -349,4 +349,132 @@ oooo~
 I 6 3053 100.00 1  # FORAGE: a green calabash
 I 8 3054 100.00 2  # HARVEST: a sack of fresh calabash gourds
 S
+#3070
+apricots~
+An Apricot Orchard~
+23 j b
+55 80 75 100
+D0
+^^^^~
+&Y~
+D0
+^^^^~
+&Y~
+D0
+^^^^~
+&Y~
+D0
+^^^^~
+&Y~
+D0
+^^^^~
+&Y~
+D0
+^^^^~
+&Y~
+D0
+^^^&oo~
+&Y~
+D0
+^^&oo&?^~
+&Y~
+D0
+^&oo&?^^~
+&Y~
+D0
+&oo&?^^^~
+&Y~
+I 6 3071 100.00 1  # FORAGE: a couple of apricots
+I 8 3070 100.00 1  # HARVEST: a basket of apricots
+I 9 121 100.00 1  # GATHER: some sticks and leaves
+I 20 120 100.00 1  # CHOP: a large tree
+S
+#3072
+sugarcane~
+A Field of Sugarcane~
+4 l a
+75 100 0 50
+D0
+||||~
+&G~
+D0
+||||~
+&G~
+D0
+||||~
+&G~
+D0
+////~
+&G~
+D0
+\\\\~
+&G~
+I 6 3073 100.00 1  # FORAGE: a handful of grain
+I 8 3072 100.00 1  # HARVEST: a bundle of sugarcane
+S
+#3074
+garlic~
+A Field of Garlic~
+37 j 0
+75 100 75 100
+D0
+,,,,~
+&T~
+I 6 3075 100.00 1  # FORAGE: a clove of garlic
+I 8 3074 100.00 1  # HARVEST: a basket of garlic
+S
+#3076
+lemons~
+A Lemon Orchard~
+5 l b
+0 50 0 50
+D0
+^&Yo&?^^~
+&G~
+D0
+^^^&Yo~
+&G~
+D0
+^&Yo&?^&Yo~
+&G~
+D0
+^^&Yo&?^~
+&G~
+D0
+&Yo&?^&Yo&?^~
+&G~
+I 6 3077 100.00 1  # FORAGE: a single ripe lemon
+I 8 3076 100.00 1  # HARVEST: a basket of lemons
+I 9 121 100.00 1  # GATHER: some sticks and leaves
+I 20 120 100.00 1  # CHOP: a large tree
+S
+#3078
+cucumbers~
+A Cucumber Field~
+12 j a
+25 75 35 65
+D0
+mmmm~
+&g~
+D0
+mmmm~
+&g~
+D0
+mmmm~
+&g~
+D0
+mmmm~
+&g~
+D0
+mmmm~
+&g~
+D0
+momm~
+&g~
+D0
+mmom~
+&g~
+I 6 3079 100.00 1  # FORAGE: a single ripe cucumber
+I 8 3078 100.00 1  # HARVEST: a basket of cucumbers
+S
 $

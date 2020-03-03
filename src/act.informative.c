@@ -2657,9 +2657,9 @@ ACMD(do_inventory) {
 	}
 	else {	// advanced inventory
 		char word[MAX_INPUT_LENGTH], heading[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
-		int cmp_type = NOTHING, wear_type = NOTHING, type_type = NOTHING;
+		int wear_type = NOTHING, type_type = NOTHING;
 		bool kept = FALSE, not_kept = FALSE, identify = FALSE;
-		bitvector_t cmpf_type = NOBITS;
+		generic_data *cmp = NULL;
 		obj_data *obj;
 		size_t size;
 		int count;
@@ -2673,15 +2673,15 @@ ACMD(do_inventory) {
 					strcpy(word, argument+2);
 					*argument = '\0';	// no further args
 					if (!*word) {
-						msg_to_char(ch, "Show what components?\r\n");
+						msg_to_char(ch, "Show what component?\r\n");
 						return;
 					}
-					if (!parse_component(word, &cmp_type, &cmpf_type)) {
+					if (!(cmp = find_generic_component(word))) {
 						msg_to_char(ch, "Unknown component type '%s'.\r\n", word);
 						return;
 					}
 					
-					snprintf(heading, sizeof(heading), "Items of type '%s':", component_string(cmp_type, cmpf_type));
+					snprintf(heading, sizeof(heading), "Items of type '%s':", GEN_NAME(cmp));
 					break;
 				}
 				case 'w': {
@@ -2759,11 +2759,8 @@ ACMD(do_inventory) {
 			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(obj))) {
 				continue;	// not matching keywords
 			}
-			if (cmp_type != NOTHING && GET_OBJ_CMP_TYPE(obj) != cmp_type) {
+			if (cmp && !is_component(obj, cmp)) {
 				continue;	// not matching component type
-			}
-			if (cmpf_type != NOBITS && (GET_OBJ_CMP_FLAGS(obj) & cmpf_type) != cmpf_type) {
-				continue;	// not matching component flags
 			}
 			if (wear_type != NOTHING && !CAN_WEAR(obj, BIT(wear_type))) {
 				continue;	// not matching wear pos

@@ -1,0 +1,144 @@
+#6000
+lumber~
+6 a
+0 125 0 0
+T0
+lumber~
+S
+#6001
+magic lumber~
+6 0
+0 6001 0 0
+R 6000
+T0
+magic lumber~
+S
+#6002
+fine lumber~
+6 0
+0 6002 0 0
+R 6000
+T0
+fine lumber~
+S
+#6010
+tree~
+6 a
+0 120 0 0
+T0
+trees~
+S
+#6011
+small tree~
+6 a
+0 6011 0 0
+T0
+small trees~
+S
+#6012
+rare tree~
+6 0
+0 6012 0 0
+R 6010
+T0
+rare trees~
+S
+#6015
+pillar~
+6 a
+0 6015 0 0
+T0
+pillars~
+S
+#6016
+fine pillar~
+6 0
+0 6016 0 0
+R 6015
+T0
+fine pillars~
+S
+#6017
+large pillar~
+6 0
+0 6017 0 0
+R 6015
+T0
+large pillars~
+S
+#6025
+sapling~
+6 a
+0 6025 0 0
+T0
+saplings~
+S
+#6026
+fine sapling~
+6 0
+0 6026 0 0
+R 6025
+T0
+fine saplings~
+S
+#6050
+rock~
+6 a
+0 100 0 0
+T0
+rocks~
+S
+#6051
+flint~
+6 0
+0 102 0 0
+R 6050
+T0
+flints~
+S
+#6052
+obsidian~
+6 0
+0 106 0 0
+R 6050
+T0
+obsidians~
+S
+#6075
+block~
+6 a
+0 6075 0 0
+T0
+blocks~
+S
+#6076
+bricks~
+6 0
+0 257 0 0
+R 6075
+T0
+bricks~
+S
+#6077
+large block~
+6 a
+0 6077 0 0
+R 6075
+T0
+large blocks~
+S
+#6085
+sand~
+6 a
+0 107 0 0
+T0
+sand~
+S
+#6090
+clay~
+6 a
+0 101 0 0
+T0
+clay~
+S
+$

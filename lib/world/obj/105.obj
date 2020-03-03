@@ -589,8 +589,7 @@ Beanstalks work as pillars in place of logs.
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
-O
-21 0
+O+ 1 6015
 R
 5118 0
 S
@@ -616,8 +615,7 @@ intermixed in the bunch, so you could also plant them.
 6 b a 0 6
 12 10551 0
 7 168
-O
-9 bq
+O+ 1 6132
 R
 5114 0
 S
@@ -630,8 +628,7 @@ You can eat the berries.
 6 0 a 0 5
 2 0 0
 7 48
-O
-9 nq
+O+ 1 6122
 S
 #10553
 pie rhubarb~
@@ -699,7 +696,7 @@ A fallen spruce tree is lying here.~
    The spruce tree is covered in thin branches, and still has the fresh scent
 of winter about it.
 ~
-3 e a 0 5
+3 e a 0 6
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire
@@ -716,6 +713,7 @@ $n carves out a tree for $V.~
 M
 6
 You carve out a tree for $V.~
+O+ 1 6010
 R
 5118 0
 S
@@ -742,8 +740,7 @@ You position some lumber on the frame of $V.~
 M
 7
 $n positions some lumber on the frame of $V.~
-O
-16 u
+O+ 1 6000
 R
 5118 0
 R
@@ -766,8 +763,7 @@ $n hoists a post onto $V.~
 M
 6
 You hoist a post onto $V.~
-O
-21 u
+O+ 1 6015
 R
 5118 0
 S
@@ -1339,8 +1335,7 @@ cooking it first...
 3 0 a 0 4
 0 0 0
 7 720
-O
-17 l
+O+ 1 6200
 S
 #10597
 plate cold cuts~
@@ -1366,8 +1361,7 @@ It twinkles like a gemstone, but it seems to be mere ice.
 3 0 a 0 5
 0 0 0
 1 24
-O
-11 gu
+O+ 1 6600
 T 10598
 S
 #10599

@@ -1,0 +1,118 @@
+#6700
+ingot ingots metals~
+a metal ingot~
+A metal ingot is lying here.~
+This metal is some kind of mixed alloy. You can't identify it.
+~
+3 0 a 0 7
+0 0 0
+2 0
+O+ 1 6700
+R
+5115 0
+S
+#6701
+metal metals ores~
+some metal ore~
+Some metal ore has been left here.~
+This unrefined ore is hard to identify. It doesn't seem very pure.
+~
+3 0 a 0 9
+0 0 0
+2 0
+O+ 1 6701
+R
+5115 0
+S
+#6710
+ingot ingots metals poor~
+an ingot of poor metal~
+An ingot of poor metal is sitting here.~
+This dull gray metal seems to be low-quality, but might still be useful.
+~
+3 0 a 0 8
+0 0 0
+2 0
+O+ 1 6710
+R
+5115 0
+S
+#6720
+ingot ingots metals common~
+an ingot of common metal~
+An ingot of common metal is sitting here.~
+This metal has a dull color but seems to be of good strength.
+~
+3 0 a 0 9
+0 0 0
+2 0
+O+ 1 6720
+R
+5115 0
+S
+#6730
+ingot ingots metals rare~
+an ingot of rare metal~
+An ingot of rare metal is sitting here.~
+This metal has a bright shine and high luster.
+~
+3 0 a 0 10
+0 0 0
+2 0
+O+ 1 6730
+R
+5115 0
+S
+#6740
+ingot ingots hardened~
+a hardened ingot~
+A hardened ingot is lying here.~
+This metal seems unusually strong and hard.
+~
+3 0 a 0 9
+0 0 0
+2 0
+O+ 1 6740
+R
+5115 0
+S
+#6750
+bar bars precious metal~
+a bar of precious metal~
+A bar of precious metal is sitting here.~
+This metal looks quite valuable.
+~
+3 0 a 0 11
+0 0 0
+2 0
+O+ 1 6750
+R
+5611 a
+S
+#6751
+ingot ingots precious metals~
+an ingot of precious metal~
+An ingot of precious metal is sitting here.~
+This metal looks quite valuable.
+~
+3 0 a 0 12
+0 0 0
+2 0
+O+ 1 6751
+R
+5115 0
+S
+#6760
+ingot ingots metals magic~
+an ingot of magic metal~
+An ingot of magic metal is sitting here.~
+The metal ingot seems to be glowing!
+~
+3 0 a 0 11
+0 0 0
+2 0
+O+ 1 6760
+R
+5115 0
+S
+$

@@ -55,7 +55,7 @@ S
 #602
 Enchanted Copse~
 An Enchanted Copse~
-'^' 35 ijq 4 d p
+'^' 35 ijq 4 d np
 C
 chop, dig~
 D1
@@ -114,7 +114,7 @@ S
 #603
 Enchanted Woods~
 The Enchanted Woods~
-'^' 35 ijq 6 d p
+'^' 35 ijq 6 d np
 C
 chop, dig~
 D1
@@ -157,6 +157,12 @@ E
 0 0 100.00 602
 E
 4 0 0.20 604
+E
+17 0 0.03 602
+E
+17 40 0.03 602
+E
+17 50 0.03 602
 I 5 103 2.00 1 d  # DIG: a yellow lightning stone
 I 5 104 2.00 1 d  # DIG: a red bloodstone
 I 5 1300 2.00 1 d  # DIG: a glowing green seashell
@@ -185,7 +191,7 @@ S
 #604
 Enchanted Forest~
 The Enchanted Forest~
-'^' 35 ijq 8 d p
+'^' 35 ijq 8 d dnp
 C
 chop, dig~
 D1
@@ -382,6 +388,12 @@ D4
 &C~
 E
 0 0 100.00 603
+E
+17 0 0.30 602
+E
+17 40 0.30 602
+E
+17 50 0.30 602
 I 5 103 2.00 1 d  # DIG: a yellow lightning stone
 I 5 104 2.00 1 d  # DIG: a red bloodstone
 I 5 1300 2.00 1 d  # DIG: a glowing green seashell
@@ -471,5 +483,588 @@ I 5 102 9.00 1 d  # DIG: a flint stone
 I 5 100 91.00 1 d  # DIG: a rock
 I 6 3015 75.00 1  # FORAGE: some red berries
 I 20 605 100.00 3 c  # CHOP: a pile of dead wood
+S
+#610
+Weirdwood Saplings~
+Among the Weirdwood Saplings~
+'.' 38 ik 2 0 p
+C
+chant nature~
+D1
+..&Vw&?.~
+&Y~
+D1
+.&Vw&?..~
+&Y~
+D2
+..&Vw&?.~
+&y~
+D2
+.&Vw&?..~
+&y~
+D3
+..&Vw&?.~
+&Y~
+D3
+.&Vw&?..~
+&Y~
+D4
+..&Vw&?.~
+&y~
+D4
+.&Vw&?..~
+&y~
+E
+9 0 100.00 614
+S
+#611
+Clear-Cut Weirdwood~
+A Clear-Cut Enchanted Grove~
+'.' 38 ik 2 0 p
+C
+dig~
+D1
+..&V.&?.~
+&Y~
+D1
+.&V.&?..~
+&Y~
+D2
+..&V.&?.~
+&y~
+D2
+.&V.&?..~
+&y~
+D3
+..&V.&?.~
+&Y~
+D3
+.&V.&?..~
+&Y~
+D4
+..&V.&?.~
+&y~
+D4
+.&V.&?..~
+&y~
+E
+4 0 0.20 612
+I 5 103 2.00 1 d  # DIG: a yellow lightning stone
+I 5 104 2.00 1 d  # DIG: a red bloodstone
+I 5 1300 2.00 1 d  # DIG: a glowing green seashell
+I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
+I 5 102 9.00 1 d  # DIG: a flint stone
+I 5 100 83.00 1 d  # DIG: a rock
+I 6 606 100.00 1  # FORAGE: a handful of elderberries
+M
+602 100.00 d
+S
+#612
+Weirdwood Thicket~
+A Weirdwood Thicket~
+'.' 38 ikq 4 d np
+C
+chop, dig~
+D1
+..&Vw&?.~
+&Y~
+D1
+.&Vw&?..~
+&Y~
+D2
+..&Vw&?.~
+&y~
+D2
+.&Vw&?..~
+&y~
+D3
+..&Vw&?.~
+&Y~
+D3
+.&Vw&?..~
+&Y~
+D4
+..&Vw&?.~
+&y~
+D4
+.&Vw&?..~
+&y~
+E
+0 0 100.00 611
+E
+4 0 0.20 613
+I 5 103 2.00 1 d  # DIG: a yellow lightning stone
+I 5 104 2.00 1 d  # DIG: a red bloodstone
+I 5 1300 2.00 1 d  # DIG: a glowing green seashell
+I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
+I 5 102 9.00 1 d  # DIG: a flint stone
+I 5 100 83.00 1 d  # DIG: a rock
+I 6 606 100.00 1  # FORAGE: a handful of elderberries
+I 20 618 100.00 1  # CHOP: a weirdwood tree
+M
+602 100.00 d
+M
+9151 10.00 c
+M
+612 3.00 c
+M
+613 3.00 c
+M
+614 10.00 c
+M
+615 10.00 c
+M
+616 1.00 c
+M
+619 5.00 c
+M
+618 10.00 c
+M
+621 10.00 c
+S
+#613
+Weirdwood Grove~
+A Weirdwood Grove~
+'.' 38 ikq 6 d np
+C
+chop, dig~
+D1
+&VW&?.&Vw&?.~
+&Y~
+D1
+.&VW&?.&Vw~
+&Y~
+D1
+&Vw&?.&VW&?.~
+&Y~
+D1
+.&Vw&?.&VW~
+&Y~
+D1
+&VW&?..&Vw~
+&Y~
+D1
+&VW&?..&Vw~
+&Y~
+D1
+&Vw&?..&VW~
+&Y~
+D1
+&Vw&?..&VW~
+&Y~
+D2
+&VW&?.&Vw&?.~
+&y~
+D2
+.&VW&?.&Vw~
+&y~
+D2
+&Vw&?.&VW&?.~
+&y~
+D2
+.&Vw&?.&VW~
+&y~
+D2
+&VW&?..&Vw~
+&y~
+D2
+&VW&?..&Vw~
+&y~
+D2
+&Vw&?..&VW~
+&y~
+D2
+&Vw&?..&VW~
+&y~
+D3
+&VW&?.&Vw&?.~
+&Y~
+D3
+.&VW&?.&Vw~
+&Y~
+D3
+&Vw&?.&VW&?.~
+&Y~
+D3
+.&Vw&?.&VW~
+&Y~
+D3
+&VW&?..&Vw~
+&Y~
+D3
+&VW&?..&Vw~
+&Y~
+D3
+&Vw&?..&VW~
+&Y~
+D3
+&Vw&?..&VW~
+&Y~
+D4
+&VW&?.&Vw&?.~
+&y~
+D4
+.&VW&?.&Vw~
+&y~
+D4
+&Vw&?.&VW&?.~
+&y~
+D4
+.&Vw&?.&VW~
+&y~
+D4
+&VW&?..&Vw~
+&y~
+D4
+&VW&?..&Vw~
+&y~
+D4
+&Vw&?..&VW~
+&y~
+D4
+&Vw&?..&VW~
+&y~
+E
+0 0 100.00 612
+E
+4 0 0.20 614
+E
+17 20 0.03 612
+E
+17 51 0.03 612
+E
+17 70 0.03 612
+I 5 103 2.00 1 d  # DIG: a yellow lightning stone
+I 5 104 2.00 1 d  # DIG: a red bloodstone
+I 5 1300 2.00 1 d  # DIG: a glowing green seashell
+I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
+I 5 102 9.00 1 d  # DIG: a flint stone
+I 5 100 83.00 1 d  # DIG: a rock
+I 6 606 100.00 1  # FORAGE: a handful of elderberries
+I 20 618 100.00 1  # CHOP: a weirdwood tree
+M
+602 100.00 d
+M
+9151 10.00 c
+M
+612 3.00 c
+M
+613 3.00 c
+M
+614 10.00 c
+M
+615 10.00 c
+M
+616 1.00 c
+M
+619 5.00 c
+M
+618 10.00 c
+M
+621 10.00 c
+S
+#614
+Weirdwood Weald~
+A Weirdwood Weald~
+'w' 39 ikq 8 dl dnp
+C
+chop, dig~
+D1
+&Y.&?WwW~
+&V~
+D1
+W&Y.&?wW~
+&V~
+D1
+Ww&Y.&?W~
+&V~
+D1
+WwW&Y.~
+&V~
+D1
+&Y.&?WwW~
+&V~
+D1
+W&Y.&?wW~
+&V~
+D1
+Ww&Y.&?W~
+&V~
+D1
+WwW&Y.~
+&V~
+D1
+W&P*&?wW~
+&V~
+D1
+Ww&P*&?W~
+&V~
+D1
+W&A*&?wW~
+&V~
+D1
+Ww&A*&?W~
+&V~
+D2
+&y.&?WwW~
+&V~
+D2
+W&y.&?wW~
+&V~
+D2
+Ww&y.&?W~
+&V~
+D2
+WwW&y.~
+&V~
+D2
+&y.&?WwW~
+&V~
+D2
+W&y.&?wW~
+&V~
+D2
+Ww&y.&?W~
+&V~
+D2
+WwW&y.~
+&V~
+D2
+W&P*&?wW~
+&V~
+D2
+Ww&P*&?W~
+&V~
+D2
+W&A*&?wW~
+&V~
+D2
+Ww&A*&?W~
+&V~
+D3
+&Y.&?WwW~
+&V~
+D3
+W&Y.&?wW~
+&V~
+D3
+Ww&Y.&?W~
+&V~
+D3
+WwW&Y.~
+&V~
+D3
+&Y.&?WwW~
+&V~
+D3
+W&Y.&?wW~
+&V~
+D3
+Ww&Y.&?W~
+&V~
+D3
+WwW&Y.~
+&V~
+D3
+W&P*&?wW~
+&V~
+D3
+Ww&P*&?W~
+&V~
+D3
+W&A*&?wW~
+&V~
+D3
+Ww&A*&?W~
+&V~
+D4
+&y.&?WwW~
+&V~
+D4
+W&y.&?wW~
+&V~
+D4
+Ww&y.&?W~
+&V~
+D4
+WwW&y.~
+&V~
+D4
+&y.&?WwW~
+&V~
+D4
+W&y.&?wW~
+&V~
+D4
+Ww&y.&?W~
+&V~
+D4
+WwW&y.~
+&V~
+D4
+W&P*&?wW~
+&V~
+D4
+Ww&P*&?W~
+&V~
+D4
+W&A*&?wW~
+&V~
+D4
+Ww&A*&?W~
+&V~
+E
+0 0 100.00 613
+E
+17 20 0.30 612
+E
+17 51 0.30 612
+E
+17 70 0.30 612
+E
+17 21 0.50 616
+I 5 103 2.00 1 d  # DIG: a yellow lightning stone
+I 5 104 2.00 1 d  # DIG: a red bloodstone
+I 5 1300 2.00 1 d  # DIG: a glowing green seashell
+I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
+I 5 102 9.00 1 d  # DIG: a flint stone
+I 5 100 83.00 1 d  # DIG: a rock
+I 6 606 100.00 1  # FORAGE: a handful of elderberries
+I 20 618 100.00 1  # CHOP: a weirdwood tree
+M
+602 100.00 d
+M
+9151 10.00 c
+M
+612 3.00 c
+M
+613 3.00 c
+M
+614 10.00 c
+M
+615 10.00 c
+M
+616 1.00 c
+M
+619 5.00 c
+M
+618 10.00 c
+M
+621 10.00 c
+S
+#615
+Dead Grove~
+A Dead Grove~
+'w' 28 kq 8 d np
+C
+chop, dig~
+D1
+&Y.&?WwW~
+&b~
+D1
+W&Y.&?wW~
+&b~
+D1
+Ww&Y.&?W~
+&b~
+D1
+WwW&Y.~
+&b~
+D2
+&y.&?WwW~
+&b~
+D2
+W&y.&?wW~
+&b~
+D2
+Ww&y.&?W~
+&b~
+D2
+WwW&y.~
+&b~
+D3
+&Y.&?WwW~
+&b~
+D3
+W&Y.&?wW~
+&b~
+D3
+Ww&Y.&?W~
+&b~
+D3
+WwW&Y.~
+&b~
+D4
+&y.&?WwW~
+&b~
+D4
+W&y.&?wW~
+&b~
+D4
+Ww&y.&?W~
+&b~
+D4
+WwW&y.~
+&b~
+E
+0 0 100.00 23
+E
+4 0 0.80 25
+E
+9 0 50.00 26
+I 5 102 9.00 1 d  # DIG: a flint stone
+I 5 100 91.00 1 d  # DIG: a rock
+I 6 3016 75.00 1  # FORAGE: a handful of dates
+I 20 605 100.00 3 c  # CHOP: a pile of dead wood
+S
+#616
+Enchanted Oasis~
+An Enchanted Oasis~
+'.' 35 iko 6 iw jop
+C
+dig, drink, fill, gather, pick~
+D1
+@w&P~~@e~
+&Y~
+D2
+@w&P~~@e~
+&y~
+D3
+@w&P~~@e~
+&Y~
+D4
+@w&P~~@e~
+&y~
+E
+10 614 5.00 21
+I 5 103 2.00 1 d  # DIG: a yellow lightning stone
+I 5 104 2.00 1 d  # DIG: a red bloodstone
+I 5 1300 2.00 1 d  # DIG: a glowing green seashell
+I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
+I 5 102 9.00 1 d  # DIG: a flint stone
+I 5 100 83.00 1 d  # DIG: a rock
+I 6 606 100.00 1  # FORAGE: a handful of elderberries
+I 7 103 2.00 1 p  # PICK: a yellow lightning stone
+I 7 104 2.00 1 p  # PICK: a red bloodstone
+I 7 1206 2.00 1 p  # PICK: an iridescent blue iris
+I 7 1300 2.00 1 p  # PICK: a glowing green seashell
+I 7 1203 100.00 1 p  # PICK: some magewhisper sepals
+I+ 0 70  # Ability: Find Herbs
+I 7 123 100.00 1 p  # PICK: a small flower
+I 20 618 100.00 1  # CHOP: a weirdwood tree
+M
+602 100.00 d
+M
+9151 10.00 c
+M
+610 1.00 c
+M
+616 1.00 c
+M
+617 0.99 c
+M
+618 15.00 c
+M
+619 15.00 c
 S
 $

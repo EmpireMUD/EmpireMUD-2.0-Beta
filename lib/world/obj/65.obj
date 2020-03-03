@@ -1,0 +1,193 @@
+#6500
+skin skins animal~
+some animal skin~
+Some animal skin is hanging here.~
+   You can't really tell what animal this skin came from. It's not in good
+condition.
+~
+3 0 a 0 7
+0 0 0
+7 0
+I 18 6520 100.00 1  # TAN: some leather
+O+ 1 6500
+R
+5120 0
+S
+#6511
+skin skins magic thick~
+some thick magic skin~
+Some thick magic skin is hanging here.~
+This thick hide has a magical property about it.
+~
+3 0 a 0 9
+0 0 0
+7 0
+I 18 6531 100.00 1  # TAN: some thick magic leather
+O+ 1 6511
+R
+5120 0
+S
+#6520
+leather leathers~
+some leather~
+Some leather is lying on the ground.~
+   It's impossible to tell what animal this leather came from; it's not in good
+condition.
+~
+3 0 a 0 5
+0 0 0
+7 0
+O+ 1 6520
+R
+5120 0
+S
+#6531
+leather leathers thick magic~
+some thick magic leather~
+Some thick magic leather is piled here.~
+This strange leather has been imbued with magical properties.
+~
+3 0 a 0 6
+0 0 0
+7 0
+O+ 1 6531
+R
+5120 0
+S
+#6540
+fur furs animal~
+an animal fur~
+An animal fur is draped here.~
+   You can't tell what animal this fur came from, but it seems to be in nice
+condition.
+~
+3 0 a 0 5
+0 0 0
+7 0
+O+ 1 6540
+R
+5120 0
+S
+#6541
+fur furs small~
+a small fur~
+A small fur is lying here.~
+This beautiful fur is small, and you can't tell what animal it came from.
+~
+3 0 a 0 6
+0 0 0
+7 0
+O+ 1 6541
+R
+5120 0
+S
+#6550
+fur furs large~
+a large fur~
+A large fur is lying here.~
+   This beautiful fur would make many fine crafts, but you can't tell what
+animal it came from.
+~
+3 0 a 0 7
+0 0 0
+7 0
+O+ 1 6550
+R
+5120 0
+S
+#6551
+fur mythic~
+a mythic fur~
+A mythic fur is lying here.~
+This fur is so exotic that it might rightly be called mythological.
+~
+3 0 a 0 9
+0 0 0
+7 0
+O+ 1 6551
+R
+5120 0
+S
+#6560
+bone bones~
+a bone~
+A bone is lying here.~
+   It's not clear what this bone came from, but perhaps you can make something
+from it.
+~
+3 0 a 0 3
+0 0 0
+14 0
+O+ 1 6560
+R
+5120 0
+S
+#6561
+antler antlers~
+an antler~
+An antler is lying here.~
+   This antler must have come from some kind of deer. Perhaps you can make
+something with it.
+~
+3 e a 0 5
+0 0 0
+14 0
+O+ 1 6561
+R
+5120 0
+S
+#6562
+horn horns~
+a horn~
+A horn is lying on the ground.~
+   This horn must have come from a bull, or perhaps a ram. Maybe you can craft
+something from it.
+~
+3 0 a 0 6
+0 0 0
+14 0
+O+ 1 6562
+R
+5120 0
+S
+#6563
+ivory some~
+some ivory~
+Some ivory has been left here.~
+   This appears to be fine ivory, although it's not in great condition. It
+could still be used to craft something.
+~
+3 e a 0 7
+0 0 0
+14 0
+O+ 1 6563
+R
+5120 0
+S
+#6564
+bone bones magic~
+a magic bone~
+A magic bone is glowing on the ground.~
+This large bone is unusual, and seems to have a slight magical glow.
+~
+3 e a 0 6
+0 0 0
+14 0
+O+ 1 6564
+R
+5120 0
+S
+#6565
+bone bones dragon~
+a dragon bone~
+A dragon bone is lying here.~
+A bone like this can only have come from a dragon!
+~
+3 e a 0 7
+0 0 0
+14 0
+O+ 1 6565
+R
+5120 0
+S
+$

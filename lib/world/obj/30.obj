@@ -20,8 +20,7 @@ collect a few apples and then combine them to make a whole bunch.
 2 0 0
 7 48
 I 14 3002 100.00 4 x  # COMBINE: a bunch of apples
-O
-9 nq
+O+ 1 6122
 S
 #3002
 apples bunch~
@@ -34,8 +33,7 @@ You can eat apples, or plant them.
 7 168
 I 15 3001 100.00 4 x  # SEPARATE: a green apple
 I 25 3057 100.00 2  # SEED: some apple seeds
-O
-9 bq
+O+ 1 6132
 R
 5114 0
 S
@@ -48,8 +46,7 @@ You can eat the grain, but it's not really anything you could plant.
 6 0 a 0 2
 6 0 0
 7 48
-O
-12 n
+O+ 1 6160
 S
 #3004
 peaches basket~
@@ -62,8 +59,7 @@ them, or store them in the cannery.
 12 6 0
 7 168
 I 15 3006 100.00 4 x  # SEPARATE: a plump peach
-O
-9 bq
+O+ 1 6132
 R
 5114 0
 S
@@ -76,8 +72,7 @@ You can eat corn, or plant it.
 6 bl a 0 2
 24 2 0
 7 168
-O
-12 bq
+O+ 1 6170
 R
 5116 0
 S
@@ -93,8 +88,7 @@ plant them.
 2 0 0
 7 48
 I 14 3004 100.00 4 x  # COMBINE: a basket of peaches
-O
-9 nq
+O+ 1 6122
 S
 #3007
 cherry cherries couple red~
@@ -108,8 +102,7 @@ some cherry trees.
 2 0 0
 7 48
 I 14 3008 100.00 4 x  # COMBINE: a bag of cherries
-O
-9 nq
+O+ 1 6122
 S
 #3008
 cherries bag~
@@ -122,8 +115,7 @@ them at the cannery or use them to plant an orchard.
 12 7 0
 7 168
 I 15 3007 100.00 4 x  # SEPARATE: a couple red cherries
-O
-9 bq
+O+ 1 6132
 R
 5114 0
 S
@@ -139,8 +131,7 @@ plant that.
 2 0 0
 7 48
 I 14 3010 100.00 4 x  # COMBINE: a sack of oranges
-O
-9 cn
+O+ 1 6124
 S
 #3010
 oranges sack~
@@ -152,8 +143,7 @@ This prize sack of oranges can be eaten or planted.
 12 8 0
 7 168
 I 15 3009 100.00 4 x  # SEPARATE: an orange
-O
-9 bc
+O+ 1 6134
 R
 5114 0
 S
@@ -166,8 +156,7 @@ Rice can be planted near rivers.
 3 bl a 0 2
 0 9 0
 7 168
-O
-12 bq
+O+ 1 6170
 R
 5116 0
 S
@@ -177,11 +166,10 @@ a fillet of raw meat~
 There is a fillet of raw meat sitting on the ground.~
 You can eat the meat raw... or cook it.
 ~
-6 l a 0 3
+6 l a 0 4
 6 0 0
 7 24
-O
-17 l
+O+ 1 6204
 R
 5119 0
 S
@@ -215,8 +203,7 @@ You can eat the berries. However, you don't seem to be able to plant them.
 6 0 a 0 4
 1 0 0
 7 48
-O
-9 n
+O+ 1 6120
 S
 #3016
 dates handful~
@@ -227,8 +214,7 @@ The dates look good enough to eat.
 6 0 a 0 3
 1 0 0
 7 48
-O
-9 n
+O+ 1 6120
 S
 #3017
 fig plump~
@@ -239,8 +225,7 @@ The fig looks good enough to eat.
 6 0 a 0 3
 6 0 0
 7 48
-O
-9 nq
+O+ 1 6122
 S
 #3018
 olives couple green~
@@ -254,8 +239,7 @@ with more olives to get enough to plant.
 0 0 0
 7 48
 I 14 3019 100.00 4 x  # COMBINE: a basket of olives
-O
-27 cn
+O+ 1 6144
 S
 #3019
 olives basket~
@@ -268,8 +252,7 @@ or used as a vegetable. You can also plant them.
 0 10 0
 7 168
 I 15 3018 100.00 4 x  # SEPARATE: a couple of olives
-O
-27 bcr
+O+ 1 6154
 R
 5114 0
 S
@@ -285,8 +268,7 @@ whole basket for planting.
 2 0 0
 7 48
 I 14 3021 100.00 4 x  # COMBINE: a basket of peas
-O
-27 nq
+O+ 1 6142
 S
 #3021
 peas basket green~
@@ -302,8 +284,7 @@ own pea crop.
 12 11 0
 7 168
 I 15 3020 100.00 4 x  # SEPARATE: a handful of peas
-O
-27 bq
+O+ 1 6152
 R
 5114 0
 S
@@ -318,8 +299,7 @@ squash crop, combine it with a few more to get a basket of squash first.
 2 0 0
 7 48
 I 14 3023 100.00 4 x  # COMBINE: a basket of squash
-O
-27 nq
+O+ 1 6142
 S
 #3023
 squash basket~
@@ -331,8 +311,7 @@ The yellow squash are fresh. You could eat them or plant them.
 12 12 0
 7 168
 I 15 3022 100.00 4 x  # SEPARATE: a yellow squash
-O
-27 bq
+O+ 1 6152
 R
 5606 0
 R
@@ -350,8 +329,7 @@ would be enough to plant your own crop.
 1 0 0
 7 48
 I 14 3025 100.00 4 x  # COMBINE: a basket of plantains
-O
-27 nr
+O+ 1 6143
 S
 #3025
 plantains basket~
@@ -364,8 +342,7 @@ to start your own crop.
 12 14 0
 7 168
 I 15 3024 100.00 4 x  # SEPARATE: an unripe plantain
-O
-27 br
+O+ 1 6153
 R
 5116 0
 S
@@ -379,8 +356,7 @@ You can eat tomatoes, or plant them.
 12 3000 0
 7 168
 I 15 3027 100.00 4 e  # SEPARATE: a ripe tomato
-O
-27 bq
+O+ 1 6152
 R
 5114 0
 S
@@ -396,8 +372,7 @@ plant a crop of them.
 1 0 0
 7 48
 I 14 3026 100.00 4 e  # COMBINE: a basket of tomatoes
-O
-27 nq
+O+ 1 6142
 S
 #3028
 bananas bunch~
@@ -409,8 +384,7 @@ You can eat bananas, or plant them.
 12 3001 0
 7 168
 I 15 3029 100.00 4 e  # SEPARATE: a ripe yellow banana
-O
-9 br
+O+ 1 6133
 R
 5114 0
 S
@@ -426,8 +400,7 @@ entire bunch, and you could plant that.
 1 0 0
 7 48
 I 14 3028 100.00 4 e  # COMBINE: a bunch of bananas
-O
-9 nr
+O+ 1 6123
 S
 #3030
 coconuts bunch~
@@ -467,8 +440,7 @@ You can eat grapes, or plant them.
 12 3003 0
 7 168
 I 15 3033 100.00 4 e  # SEPARATE: a few grapes
-O
-9 bq
+O+ 1 6132
 R
 5114 0
 S
@@ -484,8 +456,7 @@ more grapes to get an entire bunch, which you could plant.
 2 0 0
 7 48
 I 14 3032 100.00 4 e  # COMBINE: a bunch of grapes
-O
-9 nq
+O+ 1 6122
 S
 #3034
 peppers basket~
@@ -497,8 +468,7 @@ You can plant peppers, cook food or brew them into poisons.
 0 3004 0
 7 168
 I 15 3035 100.00 4 e  # SEPARATE: a ripe pepper
-O
-27 bc
+O+ 1 6154
 R
 5116 0
 S
@@ -514,8 +484,7 @@ plant.
 1 0 0
 7 48
 I 14 3034 100.00 4 e  # COMBINE: a basket of peppers
-O
-27 cn
+O+ 1 6144
 S
 #3036
 potatoes sack~
@@ -529,8 +498,7 @@ Cook: baked potatoes
 0 3005 0
 7 168
 I 15 3064 100.00 4  # SEPARATE: a raw potato
-O
-27 bq
+O+ 1 6152
 R
 5116 0
 S
@@ -544,8 +512,7 @@ You can eat plums, or plant them.
 12 3006 0
 7 168
 I 15 3038 100.00 4 e  # SEPARATE: a ripe plum
-O
-9 bq
+O+ 1 6132
 R
 5114 0
 S
@@ -561,8 +528,7 @@ could be planted.
 1 0 0
 7 48
 I 14 3037 100.00 4 x  # COMBINE: a basket of plums
-O
-9 nq
+O+ 1 6122
 S
 #3039
 strawberries basket~
@@ -574,8 +540,7 @@ You can eat strawberries, or plant them.
 12 3007 0
 7 168
 I 15 3040 100.00 4 e  # SEPARATE: a couple of strawberries
-O
-9 bq
+O+ 1 6132
 R
 5114 0
 S
@@ -591,8 +556,7 @@ strawberries, which you could plant.
 1 0 0
 7 48
 I 14 3039 100.00 4 e  # COMBINE: a basket of strawberries
-O
-9 nq
+O+ 1 6122
 S
 #3041
 mangoes mangos basket~
@@ -604,8 +568,7 @@ You can eat mangoes, or plant them.
 12 3008 0
 7 168
 I 15 3042 100.00 4 e  # SEPARATE: a single ripe mango
-O
-9 br
+O+ 1 6133
 R
 5114 0
 S
@@ -621,8 +584,7 @@ your own crop.
 2 0 0
 7 48
 I 14 3041 100.00 4 e  # COMBINE: a basket of mangoes
-O
-9 nr
+O+ 1 6123
 S
 #3043
 blueberries basket~
@@ -634,8 +596,7 @@ You can eat blueberries, or plant them.
 12 3009 0
 7 168
 I 15 3044 100.00 4 e  # SEPARATE: a handful of blueberries
-O
-9 bq
+O+ 1 6132
 R
 5114 0
 S
@@ -651,8 +612,7 @@ enough to plant a crop.
 1 0 0
 7 48
 I 14 3043 100.00 4 e  # COMBINE: a basket of blueberries
-O
-9 nq
+O+ 1 6122
 S
 #3045
 beans coffee sack~
@@ -675,8 +635,7 @@ Oats can be milled into oatmeal.
 3 bl a 0 6
 0 3015 0
 7 168
-O
-12 bq
+O+ 1 6170
 R
 5116 0
 S
@@ -687,12 +646,11 @@ A large ripe watermelon is on the ground.~
    This large ripe watermelon looks like it would make a good snack. You could
 also seed it and grow your own.
 ~
-6 l a 0 6
+6 l a 0 7
 6 0 0
 7 336
 I 25 3068 100.00 1  # SEED: some watermelon seeds
-O
-9 fnr
+O+ 1 6133
 R
 5114 0
 S
@@ -762,8 +720,7 @@ ripe enough to dry into a bottle, but it might satisfy your hunger.
 6 0 a 0 7
 2 0 0
 7 12
-O
-27 nq
+O+ 1 6142
 T 3053
 S
 #3054
@@ -777,8 +734,7 @@ this sack out to dry, you could craft it into a bottle.
 6 el a 0 8
 12 0 0
 7 132
-O
-27 bq
+O+ 1 6152
 R
 5606 0
 R
@@ -818,11 +774,10 @@ some apple seeds~
 Some apple seeds are scattered here.~
 This handful of tiny brown seeds comes from the mighty apple tree.
 ~
-3 b a 0 2
+3 b a 0 3
 0 13 0
 0 0
-O
-23 0
+O+ 1 6180
 R
 5210 0
 S
@@ -836,8 +791,7 @@ plant it.
 6 b a 0 6
 1 1 0
 0 1152
-O
-12 n
+O+ 1 6160
 S
 #3059
 kernels handful~
@@ -850,8 +804,7 @@ Cook: toasted kernels
 3 b a 0 7
 0 2 0
 0 1152
-O
-12 n
+O+ 1 6160
 S
 #3060
 seeds handful~
@@ -863,8 +816,7 @@ snack on them. Or plant them.
 6 b a 0 6
 1 3 0
 0 1152
-O
-23 0
+O+ 1 6181
 S
 #3061
 seeds handful~
@@ -887,8 +839,7 @@ snack on them. Or plant them.
 6 b a 0 7
 1 5 0
 0 1152
-O
-23 0
+O+ 1 6181
 S
 #3063
 rice handful~
@@ -915,8 +866,7 @@ Cook: baked potato
 0 0 0
 0 168
 I 14 3036 100.00 4  # COMBINE: a sack of potatoes
-O
-27 nq
+O+ 1 6142
 S
 #3065
 berries red berry~
@@ -928,8 +878,7 @@ should make a good snack. You could also try planting them.
 6 b a 0 4
 1 3011 0
 7 48
-O
-9 n
+O+ 1 6120
 S
 #3066
 grain handful~
@@ -941,8 +890,7 @@ plant it.
 6 b a 0 7
 1 3015 0
 0 1152
-O
-12 n
+O+ 1 6160
 S
 #3067
 watermelon small~
@@ -955,8 +903,7 @@ and plant some more.
 2 3016 0
 7 336
 I 25 3068 100.00 1  # SEED: some watermelon seeds
-O
-9 nor
+O+ 1 6123
 S
 #3068
 seeds watermelon~
@@ -964,11 +911,10 @@ some watermelon seeds~
 Some watermelon seeds are scattered here.~
 These seeds can be planted in the jungle to grow a crop of watermelons.
 ~
-3 b a 0 7
+3 b a 0 8
 0 3016 0
 0 1152
-O
-23 0
+O+ 1 6180
 R
 5210 0
 S
@@ -986,11 +932,145 @@ beeswax' to discard the honey and just keep the wax.
 0 145
 I 26 850 100.00 1  # DECAYS-TO: some beeswax
 I 27 850 100.00 1  # CONSUMES-TO: some beeswax
-O
-31 0
+O+ 1 6340
 R
 5131 0
 R
 5606 0
+S
+#3070
+apricots basket~
+a basket of apricots~
+Someone has dropped a basket of apricots.~
+You can eat apricots, or plant them.
+~
+6 bl a 0 9
+12 3070 0
+7 168
+I 15 3071 100.00 4 e  # SEPARATE: a couple of apricots
+O+ 1 6132
+R
+5114 0
+S
+#3071
+apricots couple~
+a couple of apricots~
+A couple of apricots have been scattered on the ground.~
+   These apricots have a fresh, summery taste. Combine a few of them into a
+basket of apricots and you'll have enough to plant your own orchard.
+~
+6 0 a 0 6
+2 0 0
+7 48
+I 14 3070 100.00 4 e  # COMBINE: a basket of apricots
+O+ 1 6122
+S
+#3072
+sugarcane bundle~
+a bundle of sugarcane~
+A bundle of sugarcane has been dropped here.~
+You can plant sugarcane or mill it into sugar.
+~
+3 b a 0 6
+0 3072 0
+7 168
+R
+5116 0
+S
+#3073
+grain handful~
+a handful of grain~
+A handful of grain is scattered on the ground.~
+   This grain is hard to identify but it looks like you could snack on it. Or
+plant it.
+~
+6 b a 0 7
+1 3072 0
+0 1152
+O+ 1 6160
+S
+#3074
+garlic basket~
+a basket of garlic~
+A basket of garlic has been dropped on the ground.~
+You can eat garlic, or plant it.
+~
+6 bl a 0 7
+4 3074 0
+7 168
+I 15 3075 100.00 4 e  # SEPARATE: a clove of garlic
+O+ 1 6152
+R
+5606 0
+R
+5116 0
+S
+#3075
+garlic clove~
+a clove of garlic~
+A clove of garlic has been dropped on the ground.~
+   This clove of garlic has a fresh, pungent taste to it. Combine a few cloves
+into a basket of garlic and you'll have enough to plant your own crop.
+~
+6 0 a 0 5
+1 0 0
+7 48
+I 14 3074 100.00 4 e  # COMBINE: a basket of garlic
+O+ 1 6142
+S
+#3076
+lemons basket~
+a basket of lemons~
+A basket of lemons has been dropped here.~
+You can eat lemons, or plant them.
+~
+6 bl a 0 6
+4 3076 0
+7 168
+I 15 3077 100.00 4 e  # SEPARATE: a single ripe lemon
+O+ 1 6133
+R
+5114 0
+S
+#3077
+lemon ripe single~
+a single ripe lemon~
+A single ripe lemon is on the ground.~
+   This ripe lemon looks as if it has just fallen from the tree. If you combine
+a few of them into a basket of lemons, you might have enough to plant an
+orchard of them.
+~
+6 0 a 0 5
+1 0 0
+7 48
+I 14 3076 100.00 4 e  # COMBINE: a basket of lemons
+O+ 1 6123
+S
+#3078
+cucumbers basket~
+a basket of cucumbers~
+Someone has dropped a basket of cucumbers on the ground.~
+Cucumbers can be planted, eaten, or made into pickles.
+~
+6 bl a 0 9
+6 3078 0
+7 168
+I 15 3079 100.00 4 e  # SEPARATE: a single ripe cucumber
+O+ 1 6152
+R
+5114 0
+S
+#3079
+cucumber ripe single~
+a single ripe cucumber~
+A single ripe cucumber is ready to eat.~
+   This little cucumber tastes fresh and ripe. If you combined a few of these
+into a basket of cucumbers, you'd have enough to plant a field of them.
+~
+6 0 a 0 5
+1 0 0
+0 48
+I 14 3078 100.00 4 e  # COMBINE: a basket of cucumbers
+O+ 1 6142
 S
 $

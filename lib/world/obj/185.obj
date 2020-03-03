@@ -8,8 +8,7 @@ You can eat this fleshy pink fruit, or plant it.
 12 18500 0
 7 168
 I 15 18501 100.00 4 x  # SEPARATE: a single papaya
-O
-9 br
+O+ 1 6133
 R
 5114 0
 S
@@ -23,8 +22,7 @@ This is just one papaya, not enough to plant but enough to eat.
 2 0 0
 7 48
 I 14 18500 100.00 4 x  # COMBINE: a basket of papayas
-O
-9 nr
+O+ 1 6123
 S
 #18502
 sign~

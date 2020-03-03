@@ -1,0 +1,204 @@
+#6100
+small edible plant~
+6 a
+0 6100 0 0
+T0
+small edible plants~
+S
+#6110
+large edible plant~
+6 a
+0 6110 0 0
+T0
+large edible plants~
+S
+#6120
+small fruit~
+6 a
+0 6120 0 0
+R 6100
+T0
+small fruits~
+S
+#6121
+small magic fruit~
+6 0
+0 6121 0 0
+R 6120
+T0
+small magic fruits~
+S
+#6122
+small temperate fruit~
+6 a
+0 6122 0 0
+R 6120
+T0
+small temperate fruits~
+S
+#6123
+small tropical fruit~
+6 a
+0 6123 0 0
+R 6120
+T0
+small tropical fruits~
+S
+#6124
+small desert fruit~
+6 a
+0 6124 0 0
+R 6120
+T0
+small desert fruits~
+S
+#6130
+large fruit~
+6 a
+0 6130 0 0
+R 6110
+T0
+large fruits~
+S
+#6131
+large magic fruit~
+6 0
+0 6131 0 0
+R 6130
+T0
+large magic fruits~
+S
+#6132
+large temperate fruit~
+6 a
+0 6132 0 0
+R 6130
+T0
+large temperate fruits~
+S
+#6133
+large tropical fruit~
+6 a
+0 6133 0 0
+R 6130
+T0
+large tropical fruits~
+S
+#6134
+large desert fruit~
+6 a
+0 6134 0 0
+R 6130
+T0
+large desert fruits~
+S
+#6140
+small vegetable~
+6 a
+0 6140 0 0
+R 6100
+T0
+small vegetables~
+S
+#6141
+small magic vegetable~
+6 0
+0 6141 0 0
+R 6140
+T0
+small magic vegetables~
+S
+#6142
+small temperate vegetable~
+6 a
+0 6142 0 0
+R 6140
+T0
+small temperate vegetables~
+S
+#6143
+small tropical vegetable~
+6 a
+0 6143 0 0
+R 6140
+T0
+small tropical vegetables~
+S
+#6144
+small desert vegetable~
+6 a
+0 6144 0 0
+R 6140
+T0
+small desert vegetables~
+S
+#6150
+large vegetable~
+6 a
+0 6150 0 0
+R 6110
+T0
+large vegetables~
+S
+#6151
+large magic vegetable~
+6 0
+0 6151 0 0
+R 6150
+T0
+large magic vegetables~
+S
+#6152
+large temperate vegetable~
+6 a
+0 6152 0 0
+R 6150
+T0
+large temperate vegetables~
+S
+#6153
+large tropical vegetable~
+6 a
+0 6153 0 0
+R 6150
+T0
+large tropical vegetables~
+S
+#6154
+large desert vegetable~
+6 a
+0 6154 0 0
+R 6150
+T0
+large desert vegetables~
+S
+#6160
+handful of grain~
+6 a
+0 6160 0 0
+T0
+handfuls of grain~
+S
+#6170
+bunch of grain~
+6 0
+0 6170 0 0
+T0
+bunches of grain~
+S
+#6180
+seeds~
+6 a
+0 6180 0 0
+T0
+seeds~
+S
+#6181
+edible seeds~
+6 a
+0 6181 0 0
+R 6180
+T0
+edible seeds~
+S
+$

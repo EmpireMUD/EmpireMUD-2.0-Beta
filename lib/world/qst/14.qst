@@ -32,7 +32,7 @@ it. Gather three basic gems and then go talk to the painter.
 ~
 Now that you've collected the materials, you should be ready to begin.
 ~
-5 f 75 0 -1
+6 f 75 0 -1
 A
 1 1401
 P
@@ -42,7 +42,7 @@ P
 R
 6 1402 1
 W
-1 11 1048576 3
+1 6600 0 3
 Z
 1 1401
 S

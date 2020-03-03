@@ -1,0 +1,75 @@
+#6700
+metal ingot~
+6 a
+0 6700 0 0
+T0
+metal ingots~
+S
+#6701
+ore~
+6 0
+0 6701 0 0
+T0
+ores~
+S
+#6710
+poor metal ingot~
+6 a
+0 6710 0 0
+R 6700
+T0
+poor metal ingots~
+S
+#6720
+common metal ingot~
+6 a
+0 6720 0 0
+R 6700
+T0
+common metal ingots~
+S
+#6730
+rare metal ingot~
+6 0
+0 6730 0 0
+R 6700
+T0
+rare metal ingots~
+S
+#6740
+hardened metal ingot~
+6 0
+0 6740 0 0
+R 6730
+T0
+hardened metal ingots~
+S
+#6750
+bar of precious metal~
+6 0
+0 6750 0 0
+T0
+bars of precious metal~
+S
+#6751
+precious metal ingot~
+6 0
+0 6751 0 0
+T0
+precious metal ingots~
+S
+#6760
+magic metal ingot~
+6 0
+0 6760 0 0
+T0
+magic metal ingots~
+S
+#6790
+nail~
+6 a
+0 1306 0 0
+T0
+nails~
+S
+$

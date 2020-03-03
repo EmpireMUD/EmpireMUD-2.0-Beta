@@ -1974,19 +1974,20 @@ struct faction_reputation_type reputation_levels[] = {
 
 // GENERIC_x: generic types
 const char *generic_types[] = {
-	"UNKNOWN",
+	"UNKNOWN",	// 0
 	"LIQUID",
 	"ACTION",
 	"COOLDOWN",
 	"AFFECT",
-	"CURRENCY",
+	"CURRENCY",	// 5
+	"COMPONENT",
 	"\n"
 };
 
 
 // GEN_x: generic flags
 const char *generic_flags[] = {
-	// none yet defined
+	"BASIC",	// 0
 	"\n"
 };
 
@@ -2413,73 +2414,6 @@ const double armor_scale_bonus[NUM_ARMOR_TYPES] = {
 const char *container_bits[] = {
 	"CLOSEABLE",
 	"CLOSED",
-	"\n"
-};
-
-
-// CMP_x: component types
-const char *component_types[] = {
-	"none",
-	"adhesive",
-	"bone",
-	"block",
-	"clay",
-	"dye",		// 5
-	"feathers",
-	"fibers",
-	"flour",
-	"fruit",
-	"fur",	// 10
-	"gem",
-	"grain",
-	"handle",
-	"herb",
-	"leather",	// 15
-	"lumber",
-	"meat",
-	"metal",
-	"nails",
-	"oil",	// 20
-	"pillar",
-	"rock",
-	"seeds",
-	"skin",
-	"sapling",	// 25
-	"textile",
-	"vegetable",
-	"rope",
-	"paint",
-	"wax",	// 30
-	"sweetener",
-	"sand",
-	"glass",
-	"\n"
-};
-
-
-// CMPF_x: component flags
-const char *component_flags[] = {
-	"animal",
-	"bunch of",
-	"desert",
-	"fine",
-	"hard",
-	"large",	// 5
-	"magic",
-	"mundane",
-	"plant",
-	"poor",
-	"rare",	// 10
-	"raw",
-	"refined",
-	"single",
-	"small",
-	"soft",	// 15
-	"temperate",
-	"tropical",
-	"common",
-	"aquatic",
-	"basic",
 	"\n"
 };
 
