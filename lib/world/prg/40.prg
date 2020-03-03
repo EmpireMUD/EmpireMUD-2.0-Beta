@@ -211,7 +211,7 @@ W
 28 0 0 5000000
 S
 #4030
-Sprouting Magic~
+Secret of the Sands~
    The world is covered in forests from pole to pole, but most forests are of
 little note. Legends tell of a weirdwood forest which can be grown from a
 single enchanted seed. Find the crystal seed, enchant it, and plant it in a
@@ -220,22 +220,74 @@ forest right away, because a mysterious cult of necrovandals is known to
 destroy unclaimed magical forests. You will need to chop down some of the
 weirdwood and saw it into magewood to complete this goal.
 ~
-5 4 0 5 0
+6 4 0 5 0
 K 5 5
 W
 34 619 0 6
 S
 #4031
-A Purple Forest~
+Grove of Wonders~
    A single tree does not a forest make. Carefully tend and grow your weirdwood
 forest by keeping it surrounded by clear, claimed desert tiles, and by allowing
 it to grow rather than chopping it down. You'll need to grow your forest to get
 enough magewood to complete this goal.
 ~
-4 4 0 15 0
+5 4 0 15 0
 K 7 5
 P 4030
 W
 34 619 0 100
+S
+#4032
+Weirdwood Warden~
+   Through careful management of your land, you can produce yet more of the
+prized magewood from your enchanted deserts. Grow your weirdwood forest larger
+and carefully chop down and saw enough of it to produce 750 empyreal magewood.
+~
+6 4 0 25 0
+K 7 5
+P 4031
+W
+34 619 0 750
+S
+#4033
+Empyreal Nights~
+   Only the most powerful empires achieve the level of greatness it takes to
+manage a large weirdwood forest and product 2000 empyreal magewood. Accomplish
+this and bards will tell the tale of your empire for ages to come.
+~
+5 4 0 50 0
+K 7 50
+P 4032
+W
+34 619 0 2000
+S
+#4034
+The Spice is Rife~
+   Continue to grow your weirdwood forest beyond all reason as you succumb to
+its violet lure. Carefully chop trees from the center of your forest as it
+grows at the edges, until you have produced an incredible 5000 empyreal
+magewood.
+~
+7 4 0 50 0
+K 7 50
+P 4033
+W
+34 619 0 5000
+S
+#4035
+I Dream of Weirdwood in the Desert Sand~
+   Few empires ever stand in the shadow of the prestige required to produce
+10,000 empyreal magewood. Grow, claim, and tend your weirdwood forest to become
+the greatest producer of magewood the world has ever seen and achieve renown
+to last a thousand years.
+~
+8 4 0 50 0
+K 7 50
+P 4034
+W
+25 616 0 1 a
+W
+34 619 0 10000 a
 S
 $
