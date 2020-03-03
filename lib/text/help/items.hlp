@@ -521,7 +521,7 @@ Common types of lumber are:
 
 See also: COMPONENT, CHOP, MAGEWOOD, SAW
 #
-MAGEWOOD "MAGE WOOD" "ENCHANTED TREE" "ENCHANTED FOREST" "ENCHANTED WOODS" "ENCHANTED COPSE" "CRYSTAL SEED" "PRISMATIC SEED" "STRANGE CRYSTAL SEED"
+MAGEWOOD "MAGE WOOD" "ENCHANTED TREE" "ENCHANTED FOREST" "ENCHANTED WOODS" "ENCHANTED COPSE" "CRYSTAL SEED" "PRISMATIC SEED" "STRANGE CRYSTAL SEED" WEIRDWOOD "WEIRD WOOD"
 
 Magewood is a type of lumber sawn from the trees of the enchanted forest. This
 type of forest is extremely rare. To grow it, you must find the strange crystal
