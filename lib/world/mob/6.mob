@@ -153,4 +153,174 @@ I 4 1300 20.00 1 g  # LOOT: a glowing green seashell
 I 4 1206 20.00 1 g  # LOOT: an iridescent blue iris
 T 616
 S
+#617
+genie~
+the genie~
+A genie hovers around, trailing smoke from his tail.
+~
+200 300 bdhoxzA c 3
+1 0 27 21
+D
+   This odd man has a blue tinge to his skin, and his hair is pulled into a
+small tuft on top of his head, but the best indication that he's a genie is
+that his body ends at the waist and everything below that is just a funnel of
+sand and smoke. Since he has no binding cuffs on his wrists, you can also
+assume this is a free genie.
+~
+I 4 620 100.00 1  # LOOT: a brass bottle
+M
+1
+Finally free of that itty bitty living space.~
+M
+1
+A man should be his own master.~
+M
+1
+Freedom is being you, without anyone's permission.~
+M
+1
+Freedom means the opportunity to be what we never thought we would be.~
+M
+1
+The secret of happiness is freedom; the secret of freedom is courage.~
+M
+1
+You have to fight for freedom every day.~
+M
+1
+To be free is not merely to cast off one's chains, but to live in a way that respects and enhances the freedom of others.~
+T 617
+T 618
+T 619
+S
+#618
+monkey hat~
+a monkey in a hat~
+A monkey in a little hat is sitting here, staring.
+~
+40 60 djo 0 2
+0 0 1 16
+D
+It looks like a rather plain monkey, except for the fez on its head.
+~
+I 0 3012 100.00 1  # BUTCHER: a fillet of raw meat
+I 1 607 100.00 1  # SKIN: a shimmering hide
+M
+0
+$n pulls out a pair of brass cymbals and clangs them together repeatedly.~
+M
+0
+$n changes into an elephant, but only for a second.~
+M
+0
+$n seems to be following you.~
+M
+0
+$n crosses $s arms and pouts.~
+M
+0
+You notice $n's tail reaching into your pocket.~
+M
+0
+$n tips $s hat at you.~
+S
+#619
+camel singing~
+a singing camel~
+A camel hums quietly as it lumbers around.
+~
+40 60 dejo 0 4
+0 0 26 9
+D
+It just looks like an ordinary camel.
+~
+I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+I 1 607 100.00 2  # SKIN: a shimmering hide
+M
+0
+$n croons, 'Salome the camel has ten humps. Salome the camel has ten humps. Salome the camel has ten humps, so ride, Salome, ride. Salome the camel has nine humps...'~
+M
+0
+$n croons, 'Salome the camel has no humps. Salome the camel has no humps. Salome the camel has no humps, because Salome is a horse.'~
+M
+0
+$n croons, 'Oh, the sons of the prophet are hardy and grim and quite unaccustomed to fear. But none were so reckless of life or of limb as Abdul Abulbul Amir...'~
+M
+0
+$n clears $s throat...~
+M
+0
+$n clears $s throat...~
+M
+0
+$n clears $s throat...~
+M
+0
+$n croons, 'Oh I come from a land, from a faraway place, where the caravan camels roam...'~
+M
+0
+$n croons, 'Arabian nights, like Arabian days, more often than not are hotter than hot, in a lot of good ways...'~
+M
+0
+$n croons, 'Arabian nights, 'neath Arabian moons... A fool off his guard could fall and fall hard out there on the dunes...'~
+S
+#620
+genie baby blue~
+a baby genie~
+A blue baby genie is rolling around on the ground.
+~
+1 1 bdoDF n 1
+1 0 0 21
+D
+   The little genie looks like a fat, laughing baby, except for the blue tinge
+to his skin and the swirl of sand and smoke where his legs should be. He
+doesn't seem to understand anything you say, so you're not sure if he can grant
+wishes, but he does already seem to be learning to use his powers.
+~
+M
+0
+$n conjures a rattle and begins shaking it.~
+M
+0
+$n picks up rocks in one hand, then the other hand, then several more hands that appear from $s sides.~
+M
+0
+$n finds a bottle on the ground and rubs it, but nothing happens.~
+M
+0
+$n tries to remove the shackles from $s wrists, but can't seem to get them off.~
+M
+0
+$n flies around on an invisible carpet.~
+M
+0
+$n turns a pebble into candy and eats it.~
+T 9902
+S
+#621
+sandstorm storm whirling~
+a whirling sandstorm~
+A sandstorm is whirling around violently!
+~
+0 0 d n 1
+2 0 36 22
+D
+The sandstorm is huge, and irritating, but doesn't seem to be hurting you.
+~
+M
+0
+$n throws debris everywhere!~
+M
+0
+$n blocks out the light!~
+M
+0
+$n gets in your eyes!~
+M
+0
+$n spins about, apparently without disturbing the trees.~
+M
+0
+$n roars as it turns around you.~
+S
 $

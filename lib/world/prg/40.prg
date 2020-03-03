@@ -51,7 +51,7 @@ an enchanted forest for your empire. Be sure to claim the forest right away,
 because a mysterious cult of necrovandals is known to destroy unclaimed magical
 forests. Completing this goal earns your empire more territory per greatness.
 ~
-4 4 0 5 0
+5 4 0 5 d
 K 5 5
 W
 25 604 0 1
@@ -209,5 +209,33 @@ K 7 25
 P 4025
 W
 28 0 0 5000000
+S
+#4030
+Sprouting Magic~
+   The world is covered in forests from pole to pole, but most forests are of
+little note. Legends tell of a weirdwood forest which can be grown from a
+single enchanted seed. Find the crystal seed, enchant it, and plant it in a
+desert grove to start an enchanted forest for your empire. Be sure to claim the
+forest right away, because a mysterious cult of necrovandals is known to
+destroy unclaimed magical forests. You will need to chop down some of the
+weirdwood and saw it into magewood to complete this goal.
+~
+5 4 0 5 0
+K 5 5
+W
+34 619 0 6
+S
+#4031
+A Purple Forest~
+   A single tree does not a forest make. Carefully tend and grow your weirdwood
+forest by keeping it surrounded by clear, claimed desert tiles, and by allowing
+it to grow rather than chopping it down. You'll need to grow your forest to get
+enough magewood to complete this goal.
+~
+4 4 0 15 0
+K 7 5
+P 4030
+W
+34 619 0 100
 S
 $

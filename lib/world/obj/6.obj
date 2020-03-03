@@ -281,4 +281,60 @@ and a cool, smoky mist of mana.
 0 0 0
 0 48
 S
+#618
+weirdwood-tree trees wood~
+a weirdwood tree~
+A weirdwood tree has fallen here, leaking mana from its stump.~
+   This strange violet tree must have come from an enchanted forest. Lumber
+from these trees is used in certain advanced crafts, to bring magical
+properties to highly skilled artifacts.
+~
+3 e a 0 12
+0 0 0
+0 0
+I 11 617 100.00 1  # LIGHT: a magical fire
+I 17 619 100.00 2  # SAW: some empyreal magewood
+O+ 1 6012
+R
+5118 0
+S
+#619
+magewood wood empyreal pile lumber~
+some empyreal magewood~
+A pile of empyreal magewood is stacked here.~
+   This bluish-violet lumber must have come from an incredible enchanted
+forest. Mana seeps from its ends forming a cool blue mist on the ground. 
+Magewood is used in some highly skilled crafts.
+~
+3 el a 0 9
+0 0 0
+0 0
+I 11 617 100.00 1  # LIGHT: a magical fire
+M
+0
+You place $p in midair, where it seems to float.~
+M
+1
+$n places $p in midair, where it seems to float.~
+M
+6
+You attach $p in midair, where it seems to float.~
+M
+7
+$n attaches $p in midair, where it seems to float.~
+O+ 1 6001
+R
+5118 0
+S
+#620
+bottle brass~
+a brass bottle~
+A brass bottle is lying here.~
+   This looks like a brass baby's bottle. You rattle it around, but can't tell
+what's inside. Try typing 'use bottle' to get the mini-pet inside.
+~
+19 0 a 0 2
+620 0 0
+13 0
+S
 $
