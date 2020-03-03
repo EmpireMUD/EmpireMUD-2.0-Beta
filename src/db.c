@@ -4122,23 +4122,31 @@ void b5_88_maintenance_fix(void) {
 	struct resource_data *res;
 	vehicle_data *veh;
 	any_vnum vn;
+	bool any;
 	
 	log("Applying b5.88b update: Repairing build/maintenance lists...");
 	
 	HASH_ITER(hh, world_table, room, next_room) {
+		any = FALSE;
 		LL_FOREACH(BUILDING_RESOURCES(room), res) {
-			if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
-				res->vnum = vn;
+			if (res->type == RES_COMPONENT && res->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
+					res->vnum = vn;
+				}
+				else {
+					res->vnum = COMP_NAILS;	// safe backup
+				}
+				res->misc = 0;
+				any = TRUE;
 			}
-			else {
-				res->vnum = COMP_NAILS;	// safe backup
-			}
-			res->misc = 0;
+		}
+		if (any) {
 			++fixed_rm;
 		}
 	}
 	
 	LL_FOREACH(vehicle_list, veh) {
+		any = FALSE;
 		LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
 			if (res->type == RES_COMPONENT && res->vnum < 100) {
 				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
@@ -4148,8 +4156,11 @@ void b5_88_maintenance_fix(void) {
 					res->vnum = COMP_NAILS;	// safe backup
 				}
 				res->misc = 0;
-				++fixed_veh;
+				any = TRUE;
 			}
+		}
+		if (any) {
+			++fixed_veh;
 		}
 	}
 	
