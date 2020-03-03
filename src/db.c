@@ -4126,7 +4126,7 @@ void b5_88_maintenance_fix(void) {
 	log("Applying b5.88b update: Repairing build/maintenance lists...");
 	
 	HASH_ITER(hh, world_table, room, next_room) {
-		LL_FOREACH(GET_BUILDING_RESOURCES(room), res) {
+		LL_FOREACH(BUILDING_RESOURCES(room), res) {
 			if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
 				res->vnum = vn;
 			}
