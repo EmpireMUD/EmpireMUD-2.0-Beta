@@ -5978,7 +5978,7 @@ ACMD(do_progress) {
 		
 		page_string(ch->desc, buf, TRUE);
 	}
-	else if (((cat = search_block(argument, progress_types, FALSE)) != NOTHING || (cat = search_block(arg, progress_types, FALSE)) != NOTHING) && cat != PROGRESS_UNDEFINED) {
+	else if (((strlen(argument) >= 3 && (cat = search_block(argument, progress_types, FALSE)) != NOTHING) || ((strlen(arg) >= 3 && (cat = search_block(arg, progress_types, FALSE)) != NOTHING))) && cat != PROGRESS_UNDEFINED) {
 		// show completed goals instead?
 		if (is_abbrev(arg2, "completed") && strlen(arg2) > 3) {
 			show_completed_goals(ch, emp, cat, FALSE);
@@ -6076,7 +6076,7 @@ ACMD(do_progress) {
 		
 		page_string(ch->desc, buf, TRUE);
 	}
-	else if (is_abbrev(arg, "completed")) {
+	else if (strlen(arg) >= 3 && is_abbrev(arg, "completed")) {
 		// check category request
 		cat = *arg2 ? search_block(arg2, progress_types, FALSE) : NOTHING;
 		if (cat == PROGRESS_UNDEFINED) {
@@ -6085,7 +6085,7 @@ ACMD(do_progress) {
 		
 		show_completed_goals(ch, emp, cat, FALSE);
 	}
-	else if (is_abbrev(arg, "purchased")) {
+	else if (strlen(arg) >= 3 && is_abbrev(arg, "purchased")) {
 		// check category request
 		cat = *arg2 ? search_block(arg2, progress_types, FALSE) : NOTHING;
 		if (cat == PROGRESS_UNDEFINED) {
