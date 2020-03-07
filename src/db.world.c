@@ -1718,6 +1718,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 		set_room_extra_data(location, ROOM_EXTRA_FOUND_TIME, time(0));
 		complete_building(location);
 	}
+	ROOM_CITY(location) = city;
 	
 	// verify ownership
 	claim_room(location, emp);
