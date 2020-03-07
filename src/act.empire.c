@@ -1602,6 +1602,8 @@ void claim_city(char_data *ch, empire_data *emp, char *argument) {
 
 void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	struct empire_city_data *city;
+	room_data *cityloc;
+	int old_type;
 	
 	skip_spaces(&argument);
 	
@@ -1622,12 +1624,16 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 		msg_to_char(ch, "%s empire has no city by that name.\r\n", emp == GET_LOYALTY(ch) ? "Your" : "The");
 		return;
 	}
-
+	
+	// store for later
+	cityloc = city->location;
+	old_type = city->type;
+	
+	// do the downgrade
 	if (city->type > 0) {
 		city->type--;
 		log_to_empire(emp, ELOG_TERRITORY, "%s has downgraded %s to a %s", PERS(ch, ch, 1), city->name, city_type[city->type].name);
 		et_change_cities(emp);
-		update_room_city_pointers(city->location, city_type[city->type+1].radius * config_get_double("outskirts_modifier"), emp);
 	}
 	else {
 		log_to_empire(emp, ELOG_TERRITORY, "%s has downgraded %s - it is no longer a city", PERS(ch, ch, 1), city->name);
@@ -1636,6 +1642,8 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 		}
 		perform_abandon_city(emp, city, FALSE);
 	}
+	
+	update_room_city_pointers(cityloc, city_type[old_type].radius * config_get_double("outskirts_modifier"), emp);
 	
 	send_config_msg(ch, "ok_string");
 	read_empire_territory(emp, FALSE);
