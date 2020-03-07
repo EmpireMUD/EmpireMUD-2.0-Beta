@@ -1738,6 +1738,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 * @param empire_data *emp The empire being updated.
 */
 void update_room_city_pointers(room_data *center, int outskirts_radius, empire_data *emp) {
+	struct empire_territory_data *ter, *next_ter;
 	int x_shift, y_shift, x_coord, y_coord;
 	struct map_data *map_loc;
 	room_data *room;
@@ -1767,6 +1768,13 @@ void update_room_city_pointers(room_data *center, int outskirts_radius, empire_d
 				ROOM_CITY(room) = NULL;	// ensure city not set (claims may already be gone)
 			}
 			// else: owned by someone else / ignore
+		}
+	}
+	
+	// now interior rooms -- in this case we can just use the territory list
+	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+		if (compute_distance(center, ter->room) <= outskirts_radius) {
+			ROOM_CITY(ter->room) = find_city(emp, ter->room, TRUE);
 		}
 	}
 }
