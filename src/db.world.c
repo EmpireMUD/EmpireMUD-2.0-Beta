@@ -1758,12 +1758,15 @@ void update_room_city_pointers(room_data *center, int outskirts_radius, empire_d
 			if (!(room = real_real_room((y_coord * MAP_WIDTH) + x_coord))) {
 				continue;	// room not currently loaded -- no need to update
 			}
-			if (ROOM_OWNER(room) != emp) {
-				continue;	// wrong owner
-			}
 			
 			// valid room
-			ROOM_CITY(room) = find_city(emp, room, TRUE);
+			if (ROOM_OWNER(room) == emp) {
+				ROOM_CITY(room) = find_city(emp, room, TRUE);
+			}
+			else if (!ROOM_OWNER(room)) {
+				ROOM_CITY(room) = NULL;
+			}
+			// else: owned by someone else / ignore
 		}
 	}
 }
