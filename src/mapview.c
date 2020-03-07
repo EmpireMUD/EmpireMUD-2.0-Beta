@@ -995,7 +995,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		msg_to_char(ch, "\r\n");
 	}
 	else if (emp) {
-		if (ROOM_CITY(room)) {
+		if (ROOM_CITY(room) && compute_distance(room, ROOM_CITY(room)->location) <= city_type[ROOM_CITY(room)->type].radius) {
 			msg_to_char(ch, "This is the %s%s&0 %s of %s.", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), city_type[ROOM_CITY(room)->type].name, ROOM_CITY(room)->name);
 		}
 		else {
