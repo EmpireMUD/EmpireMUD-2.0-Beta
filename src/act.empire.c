@@ -1828,7 +1828,7 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 				return TER_CITY;
 			}
 			else {
-				return TER_OUTSKIRTS;
+				return LARGE_CITY_RADIUS(loc) ? TER_CITY : TER_OUTSKIRTS;
 			}
 		}
 		return TER_FRONTIER;	// owned but not near enough to a city
