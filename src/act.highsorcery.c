@@ -1858,7 +1858,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_detection) {
 	if (!GET_LOYALTY(ch)) {
 		msg_to_char(ch, "The ritual fails as you aren't in any empire.\r\n");
 	}
-	else if (!is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) || !(city = find_city(GET_LOYALTY(ch), IN_ROOM(ch)))) {
+	else if (!is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) || !(city = find_city(GET_LOYALTY(ch), IN_ROOM(ch), FALSE))) {
 		msg_to_char(ch, "The ritual fails as you aren't in one of your cities%s.\r\n", wait ? " (this city was founded too recently)" : "");
 	}
 	else {
@@ -1867,7 +1867,7 @@ RITUAL_FINISH_FUNC(perform_ritual_of_detection) {
 		found = FALSE;
 		for (d = descriptor_list; d; d = d->next) {
 			if (STATE(d) == CON_PLAYING && (targ = d->character) && targ != ch && !IS_NPC(targ) && !IS_IMMORTAL(targ)) {
-				if (find_city(GET_LOYALTY(ch), IN_ROOM(targ)) == city) {
+				if (find_city(GET_LOYALTY(ch), IN_ROOM(targ), FALSE) == city) {
 					found = TRUE;
 					msg_to_char(ch, "You sense %s at %s%s\r\n", PERS(targ, targ, FALSE), get_room_name(IN_ROOM(targ), FALSE), coord_display_room(ch, IN_ROOM(targ), FALSE));
 				}

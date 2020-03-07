@@ -1285,6 +1285,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 // basic room data
 #define GET_ROOM_VNUM(room)  ((room)->vnum)
 #define ROOM_AFFECTS(room)  ((room)->af)
+#define ROOM_CITY(room)  ((room)->city)
 #define ROOM_CONTENTS(room)  ((room)->contents)
 #define ROOM_CROP(room)  ((room)->crop_type)
 #define ROOM_LAST_SPAWN_TIME(room)  ((room)->last_spawn_time)

@@ -5875,7 +5875,7 @@ void do_stat_room(char_data *ch) {
 	// ownership
 	if ((emp = ROOM_OWNER(home))) {
 		msg_to_char(ch, "Owner: %s%s&0", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
-		if ((city = find_city(emp, IN_ROOM(ch)))) {
+		if ((city = find_city(emp, IN_ROOM(ch), FALSE))) {
 			msg_to_char(ch, ", City: %s", city->name);
 		}
 		if (ROOM_PRIVATE_OWNER(home) != NOBODY) {

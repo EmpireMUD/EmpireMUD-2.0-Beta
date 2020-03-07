@@ -72,6 +72,7 @@ extern bool is_trading_with(empire_data *emp, empire_data *partner);
 extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 void identify_obj_to_char(obj_data *obj, char_data *ch);
 void refresh_all_quests(char_data *ch);
+void update_room_city_pointers(room_data *center, int outskirts_radius, empire_data *emp);
 
 // locals
 bool is_affiliated_island(empire_data *emp, int island_id);
@@ -1626,6 +1627,7 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 		city->type--;
 		log_to_empire(emp, ELOG_TERRITORY, "%s has downgraded %s to a %s", PERS(ch, ch, 1), city->name, city_type[city->type].name);
 		et_change_cities(emp);
+		update_room_city_pointers(city->location, city_type[city->type+1].radius * config_get_double("outskirts_modifier"), emp);
 	}
 	else {
 		log_to_empire(emp, ELOG_TERRITORY, "%s has downgraded %s - it is no longer a city", PERS(ch, ch, 1), city->name);
@@ -1774,6 +1776,9 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	stop_room_action(IN_ROOM(ch), ACT_HARVESTING, NOTHING);
 	stop_room_action(IN_ROOM(ch), ACT_PLANTING, NOTHING);
 	
+	// update city pointers
+	update_room_city_pointers(IN_ROOM(ch), city_type[city->type].radius * config_get_double("outskirts_modifier"), emp);
+	
 	// move einv here if any is lost
 	check_nowhere_einv(emp, GET_ISLAND_ID(IN_ROOM(ch)));
 	
@@ -1812,6 +1817,24 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 		return TER_CITY;
 	}
 	
+	// shortcut if there's relevant city info on the tile, otherwise we have to detect it
+	if (ROOM_OWNER(loc) == emp) {
+		if (ROOM_CITY(loc)) {
+			if (check_wait && (get_room_extra_data(ROOM_CITY(loc)->location, ROOM_EXTRA_FOUND_TIME) + wait) > time(0)) {
+				*city_too_soon = TRUE;
+				return TER_FRONTIER;
+			}
+			else if (compute_distance(loc, ROOM_CITY(loc)->location) <= city_type[ROOM_CITY(loc)->type].radius) {
+				return TER_CITY;
+			}
+			else {
+				return TER_OUTSKIRTS;
+			}
+		}
+		return TER_FRONTIER;	// owned but not near enough to a city
+	}
+	
+	// attempt to detect city
 	LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
 		dist = compute_distance(loc, city->location);
 		
@@ -1820,7 +1843,7 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 			// check wait?
 			type = TER_CITY;
 		}
-		else if (dist <= (city_type[city->type].radius * outskirts_multiplier)) {
+		else if (dist <= (city_type[city->type].radius * outskirts_multiplier) && GET_ISLAND(loc) == GET_ISLAND(city->location)) {
 			type = LARGE_CITY_RADIUS(loc) ? TER_CITY : TER_OUTSKIRTS;
 		}
 		else {
@@ -1989,6 +2012,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 	}
 	
 	et_change_cities(emp);
+	update_room_city_pointers(cityloc, radius * config_get_double("outskirts_modifier"), emp);
 }
 
 
@@ -2065,6 +2089,7 @@ void upgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	}
 	
 	city->type++;
+	update_room_city_pointers(city->location, city_type[city->type].radius * config_get_double("outskirts_modifier"), emp);
 	
 	log_to_empire(emp, ELOG_TERRITORY, "%s has upgraded %s to a %s", PERS(ch, ch, 1), city->name, city_type[city->type].name);
 	send_config_msg(ch, "ok_string");
@@ -4613,6 +4638,7 @@ ACMD(do_enroll) {
 				if (ROOM_OWNER(room) == old) {
 					// just change owner
 					ROOM_OWNER(room) = e;
+					ROOM_CITY(room) = find_city(e, room, TRUE);
 					
 					// this may have been the cause of city centers abandoning during a move
 					// abandon_room(room);

@@ -167,7 +167,7 @@ extern struct empire_needs *get_empire_needs(empire_data *emp, int island, int t
 extern bool empire_has_needs_status(empire_data *emp, int island, int type, bitvector_t status);
 
 // empire targeting handlers
-extern struct empire_city_data *find_city(empire_data *emp, room_data *loc);
+extern struct empire_city_data *find_city(empire_data *emp, room_data *loc, bool include_outskirts);
 extern struct empire_city_data *find_city_entry(empire_data *emp, room_data *location);
 extern struct empire_city_data *find_city_by_name(empire_data *emp, char *name);
 extern struct empire_city_data *find_closest_city(empire_data *emp, room_data *loc);

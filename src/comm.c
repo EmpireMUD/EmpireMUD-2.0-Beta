@@ -258,7 +258,7 @@ void msdp_update_room(char_data *ch) {
 	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE))) {
 		snprintf(area_name, sizeof(area_name), "%s", GET_ADV_NAME(INST_ADVENTURE(inst)));
 	}
-	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch)))) {
+	else if ((city = find_city(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch), FALSE))) {
 		snprintf(area_name, sizeof(area_name), "%s", city->name);
 	}
 	else if ((island = GET_ISLAND(IN_ROOM(ch)))) {

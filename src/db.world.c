@@ -1726,6 +1726,45 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 }
 
 
+/**
+* All tiles in the 'radius' which are owned by 'emp' will have their city
+* pointers updated. You must add/remove/resize a city BEFORE calling this,
+* then call this function using the larger of it's old/new radii so it will
+* remove old associations when a city shrinks.
+*
+* @param room_data *center City location.
+* @param int outskirts_radius The distance out from the center.
+* @param empire_data *emp The empire being updated.
+*/
+void update_room_city_pointers(room_data *center, int outskirts_radius, empire_data *emp) {
+	int x_shift, y_shift, x_coord, y_coord;
+	room_data *room;
+	
+	if (!center || !emp || outskirts_radius < 1 || !GET_MAP_LOC(center)) {
+		return;	// no work
+	}
+	
+	center = GET_MAP_LOC(center);	// ensure we're on the map
+	
+	for (x_shift = -outskirts_radius; x_shift <= outskirts_radius; ++x_shift) {
+		for (y_shift = -outskirts_radius; y_shift <= outskirts_radius; ++y_shift) {
+			if (!get_coord_shift(FLAT_X_COORD(center), FLAT_Y_COORD(center), x_shift, y_shift, &x_coord, &y_coord)) {
+				continue;	// off the map
+			}
+			if (!(room = real_real_room((y_coord * MAP_WIDTH) + x_coord))) {
+				continue;	// room not currently loaded -- no need to update
+			}
+			if (ROOM_OWNER(room) != emp) {
+				continue;	// wrong owner
+			}
+			
+			// valid room
+			ROOM_CITY(room) = find_city(emp, room, TRUE);
+		}
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ROOM RESETS /////////////////////////////////////////////////////////////
 
@@ -3082,6 +3121,10 @@ room_data *load_map_room(room_vnum vnum) {
 	
 	// checks if it's unloadable, and unloads it
 	schedule_check_unload(room, FALSE);
+	
+	if (ROOM_OWNER(room)) {	// check if it needs a city association
+		ROOM_CITY(room) = find_city(ROOM_OWNER(room), room, TRUE);
+	}
 	
 	return room;
 }

@@ -5419,6 +5419,7 @@ struct room_data {
 	crop_data *crop_type;	// if this room has a crop, this is it
 	
 	struct map_data *map_loc;	// map location if any
+	struct empire_city_data *city;	// pointer to city, if any, including if on the outskirts
 	struct complex_room_data *complex; // for rooms that are buildings, inside, adventures, etc
 	struct shared_room_data *shared;	// data that could be local OR from the map tile
 	byte light;  // number of light sources

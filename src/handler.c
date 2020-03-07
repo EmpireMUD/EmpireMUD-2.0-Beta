@@ -2845,6 +2845,7 @@ void perform_abandon_room(room_data *room) {
 	}
 	
 	ROOM_OWNER(room) = NULL;
+	ROOM_CITY(room) = NULL;
 
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK);
 	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK);
@@ -2882,6 +2883,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	bool junk;
 	
 	ROOM_OWNER(room) = emp;
+	ROOM_CITY(room) = find_city(emp, room, TRUE);
 	remove_room_extra_data(room, ROOM_EXTRA_CEDED);	// not ceded if just claimed
 	
 	adjust_building_tech(emp, room, TRUE);
@@ -3199,24 +3201,35 @@ bool empire_has_needs_status(empire_data *emp, int island, int type, bitvector_t
 /**
 * @param empire_data *emp Which empire to check for cities in
 * @param room_data *loc Location to check
+* @param bool include_outskirts If TRUE, will also return a city if in the outskirts (defaults to 4x radius).
 * @return struct empire_city_data* Returns the closest city that loc is inside, or NULL if none
 */
-struct empire_city_data *find_city(empire_data *emp, room_data *loc) {
+struct empire_city_data *find_city(empire_data *emp, room_data *loc, bool include_outskirts) {
 	extern struct city_metadata_type city_type[];
 
 	struct empire_city_data *city, *found = NULL;
+	bool min_is_in = FALSE;
 	int dist, min = -1;
+	
+	// radius multiplier IF outskirts are allowed
+	double outskirts_multiplier = include_outskirts ? config_get_double("outskirts_modifier") : 1.0;
 
 	if (!emp) {
 		return FALSE;
 	}
 	
 	for (city = EMPIRE_CITY_LIST(emp); city; city = city->next) {
-		if ((dist = compute_distance(loc, city->location)) <= city_type[city->type].radius) {
-			if (!found || min == -1 || dist < min) {
-				found = city;
-				min = dist;
-			}
+		if (GET_ISLAND(loc) != GET_ISLAND(city->location)) {
+			continue;	// wrong location
+		}
+		if ((dist = compute_distance(loc, city->location)) > (city_type[city->type].radius * outskirts_multiplier)) {
+			continue;	// too far
+		}
+		
+		if (!found || min == -1 || dist < min || (dist <= city_type[city->type].radius && !min_is_in)) {
+			found = city;
+			min = dist;
+			min_is_in = (dist <= city_type[city->type].radius ? TRUE : FALSE);	// fully in-city
 		}
 	}
 	

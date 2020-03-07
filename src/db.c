@@ -967,6 +967,9 @@ void process_temporary_room_data(void) {
 			// owner
 			if (trd->owner != NOTHING) {
 				ROOM_OWNER(room) = real_empire(trd->owner);
+				if (ROOM_OWNER(room)) {
+					ROOM_CITY(room) = find_city(ROOM_OWNER(room), room, TRUE);
+				}
 			}
 		}
 		HASH_DEL(temporary_room_data, trd);
@@ -1038,7 +1041,10 @@ void renum_world(void) {
 			}
 		}
 		
-		// other room setup
+		// other room setup:
+		if (ROOM_OWNER(room) && !ROOM_CITY(room)) {
+			ROOM_CITY(room) = find_city(ROOM_OWNER(room), room, TRUE);
+		}
 		check_tavern_setup(room);
 		
 		// ensure affects
