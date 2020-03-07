@@ -3225,6 +3225,9 @@ struct empire_city_data *find_city(empire_data *emp, room_data *loc, bool includ
 		if ((dist = compute_distance(loc, city->location)) > (city_type[city->type].radius * outskirts_multiplier)) {
 			continue;	// too far
 		}
+		if (dist > city_type[city->type].radius && min_is_in) {
+			continue;	// already found one in-city
+		}
 		
 		if (!found || min == -1 || dist < min || (dist <= city_type[city->type].radius && !min_is_in)) {
 			found = city;
