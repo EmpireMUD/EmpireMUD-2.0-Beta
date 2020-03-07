@@ -1932,6 +1932,7 @@ const char *versions_list[] = {
 	"b5.87",
 	"b5.88",
 	"b5.88a",
+	"b5.88b",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -4112,6 +4113,61 @@ void b5_88_resource_components_update(void) {
 }
 
 
+// addendum to b5_88_resource_components_update to fix maintenance/repair lists
+void b5_88_maintenance_fix(void) {
+	extern any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
+	
+	int fixed_veh = 0, fixed_rm = 0;
+	room_data *room, *next_room;
+	struct resource_data *res;
+	vehicle_data *veh;
+	any_vnum vn;
+	bool any;
+	
+	log("Applying b5.88b update: Repairing build/maintenance lists...");
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		any = FALSE;
+		LL_FOREACH(BUILDING_RESOURCES(room), res) {
+			if (res->type == RES_COMPONENT && res->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
+					res->vnum = vn;
+				}
+				else {
+					res->vnum = COMP_NAILS;	// safe backup
+				}
+				res->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			++fixed_rm;
+		}
+	}
+	
+	LL_FOREACH(vehicle_list, veh) {
+		any = FALSE;
+		LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
+			if (res->type == RES_COMPONENT && res->vnum < 100) {
+				if ((vn = b5_88_old_component_to_new_component(res->vnum, res->misc)) != NOTHING) {
+					res->vnum = vn;
+				}
+				else {
+					res->vnum = COMP_NAILS;	// safe backup
+				}
+				res->misc = 0;
+				any = TRUE;
+			}
+		}
+		if (any) {
+			++fixed_veh;
+		}
+	}
+	
+	log("- fixed %d vehicle%s and %d building%s", fixed_veh, PLURAL(fixed_veh), fixed_rm, PLURAL(fixed_rm));
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4418,6 +4474,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.88a")) {
 			b5_88_resource_components_update();
+		}
+		if (MATCH_VERSION("b5.88b")) {
+			b5_88_maintenance_fix();
 		}
 	}
 	
