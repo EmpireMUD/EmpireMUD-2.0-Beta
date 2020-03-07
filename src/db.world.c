@@ -1738,13 +1738,16 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 */
 void update_room_city_pointers(room_data *center, int outskirts_radius, empire_data *emp) {
 	int x_shift, y_shift, x_coord, y_coord;
+	struct map_data *map_loc;
 	room_data *room;
 	
 	if (!center || !emp || outskirts_radius < 1 || !GET_MAP_LOC(center)) {
 		return;	// no work
 	}
 	
-	center = GET_MAP_LOC(center);	// ensure we're on the map
+	if ((map_loc = GET_MAP_LOC(center))) {
+		center = real_room(map_loc->vnum);	// ensure we're on the map
+	}
 	
 	for (x_shift = -outskirts_radius; x_shift <= outskirts_radius; ++x_shift) {
 		for (y_shift = -outskirts_radius; y_shift <= outskirts_radius; ++y_shift) {
