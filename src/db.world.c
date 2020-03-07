@@ -1764,7 +1764,7 @@ void update_room_city_pointers(room_data *center, int outskirts_radius, empire_d
 				ROOM_CITY(room) = find_city(emp, room, TRUE);
 			}
 			else if (!ROOM_OWNER(room)) {
-				ROOM_CITY(room) = NULL;
+				ROOM_CITY(room) = NULL;	// ensure city not set (claims may already be gone)
 			}
 			// else: owned by someone else / ignore
 		}
