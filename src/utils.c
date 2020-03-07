@@ -826,6 +826,7 @@ bool process_import_one(empire_data *emp) {
 				
 				// update limit
 				limit -= trade_amt;
+				my_amt += trade_amt;
 				any = TRUE;
 				
 				// log
