@@ -1,10 +1,10 @@
 #800
-flask~
-a flask~
+flask glass~
+a glass flask~
 A flask has been left here.~
 This glass flask can be used to hold water, or to make potions.
 ~
-5 l a 0 5
+5 l a 0 6
 10 0 0
 8 0
 R
@@ -13,13 +13,13 @@ R
 5130 0
 S
 #801
-jar~
-a jar~
+jar glass~
+a glass jar~
 A jar has been left here.~
    It's a simple glass jar. You can keep water in the jar. It can also be used
 to make some foods.
 ~
-5 l a 0 6
+5 l a 0 7
 10 0 0
 8 0
 R
@@ -103,12 +103,12 @@ R
 T 806
 S
 #808
-vial~
-a vial~
+vial glass~
+a glass vial~
 A vial is lying on the ground.~
 This little glass vial is empty.
 ~
-3 l a 0 7
+3 l a 0 8
 0 0 0
 8 0
 R
