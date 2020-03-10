@@ -253,10 +253,10 @@ S
 #4033
 Empyreal Nights~
    Only the most powerful empires achieve the level of greatness it takes to
-manage a large weirdwood forest and product 2000 empyreal magewood. Accomplish
+manage a large weirdwood forest and produce 2000 empyreal magewood. Accomplish
 this and bards will tell the tale of your empire for ages to come.
 ~
-5 4 0 50 0
+6 4 0 50 0
 K 7 50
 P 4032
 W
@@ -265,11 +265,11 @@ S
 #4034
 The Spice is Rife~
    Continue to grow your weirdwood forest beyond all reason as you succumb to
-its violet lure. Carefully chop trees from the center of your forest as it
+its violet allure. Carefully chop trees from the center of your forest as it
 grows at the edges, until you have produced an incredible 5000 empyreal
 magewood.
 ~
-7 4 0 50 0
+8 4 0 50 0
 K 7 50
 P 4033
 W

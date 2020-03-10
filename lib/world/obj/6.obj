@@ -61,14 +61,14 @@ R
 5118 0
 S
 #604
-magewood wood stellar pile lumber~
+magewood wood stellar pile~
 some stellar magewood~
 A pile of magewood is lying here.~
    This bright pink lumber must have come from an enchanted forest. Mana seeps
 from its ends, forming a cool mist on the ground. Magewood is used in some
 highly skilled crafts.
 ~
-3 el a 0 8
+3 el a 0 9
 0 0 0
 0 0
 I 11 617 100.00 1  # LIGHT: a magical fire
@@ -299,14 +299,14 @@ R
 5118 0
 S
 #619
-magewood wood empyreal pile lumber~
+magewood wood empyreal pile~
 some empyreal magewood~
 A pile of empyreal magewood is stacked here.~
    This bluish-violet lumber must have come from an incredible enchanted
-forest. Mana seeps from its ends forming a cool blue mist on the ground. 
+forest. Mana seeps from its ends forming a cool blue mist on the ground.
 Magewood is used in some highly skilled crafts.
 ~
-3 el a 0 9
+3 el a 0 10
 0 0 0
 0 0
 I 11 617 100.00 1  # LIGHT: a magical fire

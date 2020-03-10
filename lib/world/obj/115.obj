@@ -116,7 +116,7 @@ The blueprints for a statue of an adventurer are here.~
 pick a good spot for it, because the blueprints crumble after the first use.
 You require the Architect ability to build this.
 ~
-3 g a 0 3
+3 0 a 0 4
 0 0 0
 0 0
 S
@@ -338,7 +338,7 @@ building a tiny pixy house. These houses are known to shrink anyone who enters
 them. Be warned, you can only use this schematic a single time.
 Usage: build pixyhouse <direction to face>
 ~
-3 g a 0 2
+3 0 a 0 3
 0 0 0
 0 0
 S

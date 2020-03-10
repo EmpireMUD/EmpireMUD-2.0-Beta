@@ -2481,7 +2481,7 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 				*coin_conv = '\0';
 			}
 			
-			sprintf(line, " %s (%d%%) is %sing it at &y%.1f%s coin%s&0%s%s%s\r\n", EMPIRE_NAME(iter), (int)(100 * rate), trade_type[find_type], trade->cost, coin_conv, (trade->cost != 1.0 ? "s" : ""), ((find_type != TRADE_EXPORT || has_avail) ? "" : " (none available)"), ((find_type != TRADE_IMPORT || is_buying) ? "" : " (full)"), (is_trading_with(emp, iter) ? "" : " (not trading)"));
+			sprintf(line, " %s (%d%%) is %sing it at &y%.1f%s coin%s&0%s%s%s\r\n", EMPIRE_NAME(iter), (int)(100 * rate), trade_type[find_type], trade->cost, coin_conv, (trade->cost != 1.0 ? "s" : ""), ((find_type != TRADE_EXPORT || has_avail) ? "" : " (none available)"), ((find_type != TRADE_IMPORT || is_buying) ? "" : " (full)"), (emp == iter ? " (you)" : (is_trading_with(emp, iter) ? "" : " (not trading)")));
 			found = TRUE;
 			
 			if (strlen(buf) + strlen(line) < MAX_STRING_LENGTH + 15) {
