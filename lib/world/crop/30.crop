@@ -410,7 +410,11 @@ D0
 \\\\~
 &G~
 I 6 3073 100.00 1  # FORAGE: a handful of grain
-I 8 3072 100.00 1  # HARVEST: a bundle of sugarcane
+I 8 3072 20.00 2 H  # HARVEST: a bundle of sugarcane
+I 8 3072 20.00 3 H  # HARVEST: a bundle of sugarcane
+I 8 3072 20.00 4 H  # HARVEST: a bundle of sugarcane
+I 8 3072 20.00 5 H  # HARVEST: a bundle of sugarcane
+I 8 3072 20.00 6 H  # HARVEST: a bundle of sugarcane
 S
 #3074
 garlic~
@@ -421,7 +425,11 @@ D0
 ,,,,~
 &T~
 I 6 3075 100.00 1  # FORAGE: a clove of garlic
-I 8 3074 100.00 1  # HARVEST: a basket of garlic
+I 8 3074 20.00 2 H  # HARVEST: a basket of garlic
+I 8 3074 20.00 3 H  # HARVEST: a basket of garlic
+I 8 3074 20.00 4 H  # HARVEST: a basket of garlic
+I 8 3074 20.00 5 H  # HARVEST: a basket of garlic
+I 8 3074 20.00 6 H  # HARVEST: a basket of garlic
 S
 #3076
 lemons~
@@ -475,6 +483,10 @@ D0
 mmom~
 &g~
 I 6 3079 100.00 1  # FORAGE: a single ripe cucumber
-I 8 3078 100.00 1  # HARVEST: a basket of cucumbers
+I 8 3078 20.00 2 H  # HARVEST: a basket of cucumbers
+I 8 3078 20.00 3 H  # HARVEST: a basket of cucumbers
+I 8 3078 20.00 4 H  # HARVEST: a basket of cucumbers
+I 8 3078 20.00 5 H  # HARVEST: a basket of cucumbers
+I 8 3078 20.00 6 H  # HARVEST: a basket of cucumbers
 S
 $
