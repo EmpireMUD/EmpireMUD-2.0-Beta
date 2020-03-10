@@ -826,6 +826,7 @@ bool process_import_one(empire_data *emp) {
 				
 				// update limit
 				limit -= trade_amt;
+				my_amt += trade_amt;
 				any = TRUE;
 				
 				// log
@@ -3569,6 +3570,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 				case RES_TOOL: {
 					prettier_sprintbit(res->vnum, tool_flags, buf);
 					msg_to_char(ch, "%s %d more %s (tool%s)", (ok ? "You need" : ","), res->amount, buf, PLURAL(res->amount));
+					break;
 				}
 				case RES_COINS: {
 					empire_data *coin_emp = real_empire(res->vnum);

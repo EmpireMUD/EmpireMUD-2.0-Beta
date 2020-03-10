@@ -2966,6 +2966,7 @@ ACMD(do_fillin) {
 		// always takes 1 minute
 		start_action(ch, ACT_START_FILLIN, SECS_PER_REAL_MIN / ACTION_CYCLE_TIME);
 		msg_to_char(ch, "You begin preparing to fill in the trench.\r\n");
+		act("$n prepares to fill in the trench.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 
