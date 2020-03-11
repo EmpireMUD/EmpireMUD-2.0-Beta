@@ -328,6 +328,7 @@ static void msdp_update(void) {
 	extern const char *damage_types[];
 	extern const char *genders[];
 	extern const double hit_per_dex;
+	extern const char *month_name[];
 	extern const char *seasons[];
 	
 	struct player_skill_data *skill, *next_skill;
@@ -511,6 +512,7 @@ static void msdp_update(void) {
 			}
 			
 			MSDPSetNumber(d, eMSDP_WORLD_TIME, time_info.hours);
+			MSDPSetString(d, eMSDP_WORLD_MONTH, month_name[(int)time_info.month]);
 			MSDPSetNumber(d, eMSDP_WORLD_YEAR, time_info.year);
 			MSDPSetString(d, eMSDP_WORLD_SEASON, seasons[pick_season(IN_ROOM(ch))]);
 			
