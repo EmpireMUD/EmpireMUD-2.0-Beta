@@ -6839,7 +6839,7 @@ ACMD(do_workforce) {
 					EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = UNLIMITED;
 					msg_to_char(ch, "Default 'keep' is now set to: all\r\n");
 				}
-				else if (isdigit(*lim_arg) && (limit = atoi(lim_arg) >= 0)) {
+				else if (isdigit(*lim_arg) && (limit = atoi(lim_arg)) >= 0) {
 					EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = limit;
 					msg_to_char(ch, "Default 'keep' is now set to: %d\r\n", limit);
 				}
