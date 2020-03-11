@@ -8041,6 +8041,7 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 		CREATE(store, struct empire_storage_data, 1);
 		store->vnum = vnum;
 		store->proto = obj_proto(vnum);
+		store->keep = EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP);
 		HASH_ADD_INT(isle->store, vnum, store);
 	}
 	

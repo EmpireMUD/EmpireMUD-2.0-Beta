@@ -1070,7 +1070,8 @@ typedef struct vehicle_data vehicle_data;
 #define EATT_TERRITORY_PER_GREATNESS  4	// bonus to ter-per-grt
 #define EATT_WORKFORCE_CAP  5	// workforce resource cap
 #define EATT_BONUS_TERRITORY  6	// direct add to territory
-#define NUM_EMPIRE_ATTRIBUTES  7	// total
+#define EATT_DEFAULT_KEEP  7	// how many of an item to keep by default
+#define NUM_EMPIRE_ATTRIBUTES  8	// total
 
 
 // ETRAIT_x: empire trait flags

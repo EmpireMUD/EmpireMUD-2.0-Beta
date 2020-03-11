@@ -6822,7 +6822,40 @@ ACMD(do_workforce) {
 			return;
 		}
 		
-		if (!strn_cmp(argument, "all ", 4)) {
+		if (!strn_cmp(argument, "default", 7)) {
+			// special handling for: workforce keep default [amount]
+			half_chop(argument, local_arg, lim_arg);
+			
+			if (!*lim_arg) {
+				if (EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) == UNLIMITED) {
+					msg_to_char(ch, "Default 'keep' is set to: all\r\n");
+				}
+				else {
+					msg_to_char(ch, "Default 'keep' amount is set to: %d\r\n", EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP));
+				}
+			}
+			else {
+				if (!str_cmp(lim_arg, "all")) {
+					EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = UNLIMITED;
+					msg_to_char(ch, "Default 'keep' is now set to: all\r\n");
+				}
+				else if (isdigit(*lim_arg) && (limit = atoi(lim_arg) >= 0)) {
+					EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = limit;
+					msg_to_char(ch, "Default 'keep' is now set to: %d\r\n", limit);
+				}
+				else if (!str_cmp(lim_arg, "none")) {
+					EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = 0;
+					msg_to_char(ch, "Default 'keep' is now set to: none\r\n");
+				}
+				else {
+					msg_to_char(ch, "Invalid default 'keep' value '%s'.\r\n", lim_arg);
+				}
+			}
+			
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			return;	// no further work for 'default'
+		}
+		else if (!strn_cmp(argument, "all ", 4)) {
 			limit = UNLIMITED;
 			half_chop(argument, lim_arg, argument);	// strip off the "all"
 		}
