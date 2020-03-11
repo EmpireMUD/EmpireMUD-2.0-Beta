@@ -2219,10 +2219,10 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				// validate vnum
 				proto = obj_proto(t[0]);
 				if (proto && proto->storage) {
-					add_to_empire_storage(emp, t[2], t[0], t[1]);
+					store = add_to_empire_storage(emp, t[2], t[0], t[1]);
 					
 					// check keep
-					if (t[3] && (store = find_stored_resource(emp, t[2], t[0]))) {
+					if (store) {
 						store->keep = t[3];
 					}
 				}

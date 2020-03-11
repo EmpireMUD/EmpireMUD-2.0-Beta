@@ -8025,16 +8025,17 @@ void sort_evolutions(sector_data *sect) {
 * @param int island Which island to store it on
 * @param obj_vnum vnum Any object to store.
 * @param int amount How much to add
+* @return struct empire_storage_data* Returns a pointer to the storage entry.
 */
-void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount) {
+struct empire_storage_data *add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount) {
 	struct empire_storage_data *store = find_stored_resource(emp, island, vnum);
 	struct empire_island *isle = get_empire_island(emp, island);
 	
 	if (!isle || !amount) {
-		return;	// nothing to do
+		return NULL;	// nothing to do
 	}
 	if (amount < 0 && !store) {
-		return;	// nothing to take
+		return NULL;	// nothing to take
 	}
 	
 	if (!store) {	// create storage
@@ -8057,6 +8058,7 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	
 	et_get_obj(emp, obj_proto(vnum), amount, store ? store->amount : 0);
+	return store;
 }
 
 
