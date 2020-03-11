@@ -1008,6 +1008,7 @@ EmpireMUD supports the following MSDP variables:
  ROOM_NAME - Name of the room the character is in
  ROOM_VNUM - Virtual number of the room the character is in - NOT SUPPORTED
  WORLD_TIME - Current time (24-hour format)
+ WORLD_YEAR - Current year
  WORLD_SEASON - Current season
 
  The following GUI variables are provided, for a generic GUI:

@@ -511,6 +511,7 @@ static void msdp_update(void) {
 			}
 			
 			MSDPSetNumber(d, eMSDP_WORLD_TIME, time_info.hours);
+			MSDPSetNumber(d, eMSDP_WORLD_YEAR, time_info.year);
 			MSDPSetString(d, eMSDP_WORLD_SEASON, seasons[pick_season(IN_ROOM(ch))]);
 			
 			// done -- send it
