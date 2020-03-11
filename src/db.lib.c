@@ -2221,7 +2221,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				if (proto && proto->storage) {
 					store = add_to_empire_storage(emp, t[2], t[0], t[1]);
 					
-					// check keep
+					// set keep
 					if (store) {
 						store->keep = t[3];
 					}
