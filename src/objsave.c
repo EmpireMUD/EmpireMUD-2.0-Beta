@@ -91,6 +91,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH], *tmp;
 	obj_data *proto = obj_proto(vnum);
+	struct extra_descr_data *ex;
 	struct obj_apply *apply, *last_apply = NULL;
 	obj_data *obj, *new;
 	bool end = FALSE;
@@ -221,7 +222,18 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 			}
 			case 'C': {
 				if (OBJ_FILE_TAG(line, "Component:", length)) {
-					// as of b5.90 you can no longer change the component type of an item
+					if (sscanf(line + length + 1, "%d %s", &i_in[0], s_in) == 2) {
+						// old pre-b5.88 version: ignore
+						// GET_OBJ_CMP_TYPE(obj) = i_in[0];
+						// GET_OBJ_CMP_FLAGS(obj) = asciiflag_conv(s_in);
+					}
+					else if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
+						// newer version
+						if (GET_OBJ_VNUM(obj) == NOTHING) {
+							// only allowed for 'anonymous' objs
+							obj->proto_data->component = i_in[0];
+						}
+					}
 				}
 				else if (OBJ_FILE_TAG(line, "Current-scale:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
@@ -232,12 +244,23 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 			}
 			case 'E': {
 				if (OBJ_FILE_TAG(line, "Extra-desc:", length)) {
-					// These are no longer used but just in case, this will read the data
-					if ((tmp = fread_string(fl, error))) {
-						free(tmp);
+					if (GET_OBJ_VNUM(obj) == NOTHING) {
+						// only allowed on 'anonymous' objs
+						CREATE(ex, struct extra_descr_data, 1);
+						ex->next = obj->proto_data->ex_description;
+						obj->proto_data->ex_description = ex;
+						
+						ex->keyword = fread_string(fl, error);
+						ex->description = fread_string(fl, error);
 					}
-					if ((tmp = fread_string(fl, error))) {
-						free(tmp);
+					else {
+						// not allowed; read in 2 strings but dump them
+						if ((tmp = fread_string(fl, error))) {
+							free(tmp);
+						}
+						if ((tmp = fread_string(fl, error))) {
+							free(tmp);
+						}
 					}
 				}
 				else if (OBJ_FILE_TAG(line, "Eq-set:", length)) {
@@ -291,17 +314,26 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 			case 'M': {
 				if (OBJ_FILE_TAG(line, "Max-scale:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
-						GET_OBJ_MAX_SCALE_LEVEL(obj) = i_in[0];
+						if (GET_OBJ_VNUM(obj) == NOTHING) {
+							// only allowed for 'anonymous' objs
+							obj->proto_data->max_scale_level = i_in[0];
+						}
 					}
 				}
 				else if (OBJ_FILE_TAG(line, "Material:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
-						GET_OBJ_MATERIAL(obj) = i_in[0];
+						if (GET_OBJ_VNUM(obj) == NOTHING) {
+							// only allowed for 'anonymous' objs
+							obj->proto_data->material = i_in[0];
+						}
 					}
 				}
 				else if (OBJ_FILE_TAG(line, "Min-scale:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
-						GET_OBJ_MIN_SCALE_LEVEL(obj) = i_in[0];
+						if (GET_OBJ_VNUM(obj) == NOTHING) {
+							// only allowed for 'anonymous' objs
+							obj->proto_data->min_scale_level = i_in[0];
+						}
 					}
 				}
 				break;
@@ -309,7 +341,10 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 			case 'Q': {
 				if (OBJ_FILE_TAG(line, "Quest:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
-						GET_OBJ_REQUIRES_QUEST(obj) = i_in[0];
+						if (GET_OBJ_VNUM(obj) == NOTHING) {
+							// only allowed for 'anonymous' objs
+							obj->proto_data->requires_quest = i_in[0];
+						}
 					}
 				}
 				break;
@@ -339,6 +374,14 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						GET_OBJ_TIMER(obj) = i_in[0];
 					}
 				}
+				else if (OBJ_FILE_TAG(line, "Tool:", length)) {
+					if (sscanf(line + length + 1, "%s", s_in)) {
+						if (GET_OBJ_VNUM(obj) == NOTHING) {
+							// only allowed for 'anonymous' objs
+							obj->proto_data->tool_flags = asciiflag_conv(s_in);
+						}
+					}
+				}
 				else if (OBJ_FILE_TAG(line, "Trigger:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0]) && real_trigger(i_in[0])) {
 						if (!SCRIPT(obj)) {
@@ -349,7 +392,10 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 				}
 				else if (OBJ_FILE_TAG(line, "Type:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
-						GET_OBJ_TYPE(obj) = i_in[0];
+						if (GET_OBJ_VNUM(obj) == NOTHING) {
+							// only allowed for 'anonymous' objs
+							obj->proto_data->type_flag = i_in[0];
+						}
 					}
 				}
 				break;
@@ -466,6 +512,7 @@ void Crash_save(obj_data *obj, FILE *fp, int location) {
 */
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	char temp[MAX_STRING_LENGTH];
+	struct extra_descr_data *ex;
 	struct trig_var_data *tvd;
 	struct eq_set_obj *eq_set;
 	struct obj_binding *bind;
@@ -502,6 +549,15 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 		fprintf(fl, "Action-desc:\n%s~\n", temp);
 	}
 
+	if (!proto && GET_OBJ_EX_DESCS(obj)) {
+		LL_FOREACH(GET_OBJ_EX_DESCS(obj), ex) {
+			fprintf(fl, "Extra-desc:\n%s~\n", NULLSAFE(ex->keyword));
+			strcpy(temp, NULLSAFE(ex->description));
+			strip_crlf(temp);
+			fprintf(fl, "%s~\n", temp);
+		}
+	}
+
 	// always save obj vals	
 	for (iter = 0; iter < NUM_OBJ_VAL_POSITIONS; ++iter) {
 		fprintf(fl, "Val-%d: %d\n", iter, GET_OBJ_VAL(obj, iter));
@@ -510,7 +566,7 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	// always save flags
 	fprintf(fl, "Flags: %s\n", bitv_to_alpha(GET_OBJ_EXTRA(obj)));
 	
-	if (!proto || GET_OBJ_TYPE(obj) != GET_OBJ_TYPE(proto)) {
+	if (!proto) {	// only saves if no proto
 		fprintf(fl, "Type: %d\n", GET_OBJ_TYPE(obj));
 	}
 	if (!proto || GET_OBJ_WEAR(obj) != GET_OBJ_WEAR(proto)) {
@@ -522,20 +578,26 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	if (!proto || GET_OBJ_TIMER(obj) != GET_OBJ_TIMER(proto)) {
 		fprintf(fl, "Timer: %d\n", GET_OBJ_TIMER(obj));
 	}
-	if (!proto || GET_OBJ_MATERIAL(obj) != GET_OBJ_MATERIAL(proto)) {
+	if (!proto) {	// only saves if no proto
 		fprintf(fl, "Material: %d\n", GET_OBJ_MATERIAL(obj));
+	}
+	if (!proto && GET_OBJ_COMPONENT(obj) != NOTHING) {
+		fprintf(fl, "Component: %d\n", GET_OBJ_COMPONENT(obj));
 	}
 	if (!proto || GET_OBJ_CURRENT_SCALE_LEVEL(obj) != GET_OBJ_CURRENT_SCALE_LEVEL(proto)) {
 		fprintf(fl, "Current-scale: %d\n", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 	}
-	if (!proto || GET_OBJ_MIN_SCALE_LEVEL(obj) != GET_OBJ_MIN_SCALE_LEVEL(proto)) {
+	if (!proto && GET_OBJ_MIN_SCALE_LEVEL(obj) > 0) {
 		fprintf(fl, "Min-scale: %d\n", GET_OBJ_MIN_SCALE_LEVEL(obj));
 	}
-	if (!proto || GET_OBJ_MAX_SCALE_LEVEL(obj) != GET_OBJ_MAX_SCALE_LEVEL(proto)) {
+	if (!proto && GET_OBJ_MAX_SCALE_LEVEL(obj) > 0) {
 		fprintf(fl, "Max-scale: %d\n", GET_OBJ_MAX_SCALE_LEVEL(obj));
 	}
-	if (!proto || GET_OBJ_REQUIRES_QUEST(obj) != GET_OBJ_REQUIRES_QUEST(proto)) {
+	if (!proto && GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
 		fprintf(fl, "Quest: %d\n", GET_OBJ_REQUIRES_QUEST(obj));
+	}
+	if (!proto && GET_OBJ_TOOL_FLAGS(obj) != NOBITS) {
+		fprintf(fl, "Tool: %s\n", bitv_to_alpha(GET_OBJ_TOOL_FLAGS(obj)));
 	}
 
 	if (obj->last_empire_id != NOTHING) {

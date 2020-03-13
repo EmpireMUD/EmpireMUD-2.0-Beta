@@ -2715,14 +2715,14 @@ OLC_MODULE(oedit_long_desc) {
 OLC_MODULE(oedit_material) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	check_oedit_material_list();
-	GET_OBJ_MATERIAL(obj) = olc_process_type(ch, argument, "material", "material", (const char**)olc_material_list, GET_OBJ_MATERIAL(obj));
+	obj->proto_data->material = olc_process_type(ch, argument, "material", "material", (const char**)olc_material_list, GET_OBJ_MATERIAL(obj));
 }
 
 
 OLC_MODULE(oedit_maxlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
-	GET_OBJ_MAX_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_OBJ_MAX_SCALE_LEVEL(obj));
+	obj->proto_data->max_scale_level = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_OBJ_MAX_SCALE_LEVEL(obj));
 }
 
 
@@ -2766,7 +2766,7 @@ OLC_MODULE(oedit_minipet) {
 OLC_MODULE(oedit_minlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
-	GET_OBJ_MIN_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_OBJ_MIN_SCALE_LEVEL(obj));
+	obj->proto_data->min_scale_level = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_OBJ_MIN_SCALE_LEVEL(obj));
 }
 
 
@@ -2858,7 +2858,7 @@ OLC_MODULE(oedit_quick_recipe) {
 	
 	// create it
 	obj = GET_OLC_OBJECT(ch->desc) = setup_olc_object(NULL);
-	GET_OBJ_TYPE(obj) = ITEM_RECIPE;
+	obj->proto_data->type_flag = ITEM_RECIPE;
 	GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = GET_CRAFT_VNUM(cft);
 	
 	// keywords
@@ -2924,7 +2924,7 @@ OLC_MODULE(oedit_requiresquest) {
 	obj_vnum old = GET_OBJ_REQUIRES_QUEST(obj);
 	
 	if (!str_cmp(argument, "none") || atoi(argument) == NOTHING) {
-		GET_OBJ_REQUIRES_QUEST(obj) = NOTHING;
+		obj->proto_data->requires_quest = NOTHING;
 		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
 		}
@@ -2933,9 +2933,9 @@ OLC_MODULE(oedit_requiresquest) {
 		}
 	}
 	else {
-		GET_OBJ_REQUIRES_QUEST(obj) = olc_process_number(ch, argument, "quest vnum", "requiresquest", 0, MAX_VNUM, GET_OBJ_REQUIRES_QUEST(obj));
+		obj->proto_data->requires_quest = olc_process_number(ch, argument, "quest vnum", "requiresquest", 0, MAX_VNUM, GET_OBJ_REQUIRES_QUEST(obj));
 		if (!quest_proto(GET_OBJ_REQUIRES_QUEST(obj))) {
-			GET_OBJ_REQUIRES_QUEST(obj) = old;
+			obj->proto_data->requires_quest = old;
 			msg_to_char(ch, "There is no quest with that vnum. Old value restored.\r\n");
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
@@ -3135,7 +3135,7 @@ OLC_MODULE(oedit_timer) {
 
 OLC_MODULE(oedit_tools) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	GET_OBJ_TOOL_FLAGS(obj) = olc_process_flag(ch, argument, "tool", "tools", tool_flags, GET_OBJ_TOOL_FLAGS(obj));
+	obj->proto_data->tool_flags = olc_process_flag(ch, argument, "tool", "tools", tool_flags, GET_OBJ_TOOL_FLAGS(obj));
 }
 
 
@@ -3143,7 +3143,7 @@ OLC_MODULE(oedit_type) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	int old = GET_OBJ_TYPE(obj);
 	
-	GET_OBJ_TYPE(obj) = olc_process_type(ch, argument, "type", "type", item_types, GET_OBJ_TYPE(obj));
+	obj->proto_data->type_flag = olc_process_type(ch, argument, "type", "type", item_types, GET_OBJ_TYPE(obj));
 	
 	// reset values to defaults now
 	if (old != GET_OBJ_TYPE(obj)) {

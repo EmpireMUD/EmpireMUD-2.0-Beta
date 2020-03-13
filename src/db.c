@@ -1840,8 +1840,6 @@ void clear_object(obj_data *obj) {
 	IN_ROOM(obj) = NULL;
 	obj->worn_on = NO_WEAR;
 	
-	GET_OBJ_REQUIRES_QUEST(obj) = NOTHING;
-	
 	obj->last_owner_id = NOBODY;
 	obj->last_empire_id = NOTHING;
 	obj->stolen_from = NOTHING;
@@ -1861,6 +1859,7 @@ struct obj_proto_data *create_obj_proto_data(void) {
 	CREATE(data, struct obj_proto_data, 1);
 	
 	data->component = NOTHING;
+	data->requires_quest = NOTHING;
 	
 	return data;
 }

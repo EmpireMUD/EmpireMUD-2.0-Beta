@@ -5214,10 +5214,10 @@ void parse_object(FILE *obj_f, int nr) {
 			}
 		}
 	}
-	obj->obj_flags.type_flag = t[0];
+	obj->proto_data->type_flag = t[0];
 	obj->obj_flags.extra_flags = asciiflag_conv(f1);
 	obj->obj_flags.wear_flags = asciiflag_conv(f2);
-	obj->obj_flags.tool_flags = asciiflag_conv(f3);
+	obj->proto_data->tool_flags = asciiflag_conv(f3);
 	OBJ_VERSION(obj) = t[1];
 
 	if (!get_line(obj_f, line)) {
@@ -5244,7 +5244,7 @@ void parse_object(FILE *obj_f, int nr) {
 		exit(1);
 	}
 
-	obj->obj_flags.material = t[0];
+	obj->proto_data->material = t[0];
 	obj->obj_flags.timer = t[1];
 
 	/* *** extra descriptions and affect fields *** */
@@ -5303,8 +5303,8 @@ void parse_object(FILE *obj_f, int nr) {
 					exit(1);
 				}
 				
-				GET_OBJ_MIN_SCALE_LEVEL(obj) = t[0];
-				GET_OBJ_MAX_SCALE_LEVEL(obj) = t[1];
+				obj->proto_data->min_scale_level = t[0];
+				obj->proto_data->max_scale_level = t[1];
 				break;
 			}
 
@@ -5353,7 +5353,7 @@ void parse_object(FILE *obj_f, int nr) {
 			
 			case 'Q': {	// requires quest
 				if (sscanf(line, "Q %d", &t[0]) == 1) {
-					GET_OBJ_REQUIRES_QUEST(obj) = t[0];
+					obj->proto_data->requires_quest = t[0];
 				}
 				break;
 			}

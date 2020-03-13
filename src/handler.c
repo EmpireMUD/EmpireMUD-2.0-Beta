@@ -2113,8 +2113,8 @@ obj_data *create_money(empire_data *type, int amount) {
 	}
 
 	// data
-	GET_OBJ_TYPE(obj) = ITEM_COINS;
-	GET_OBJ_MATERIAL(obj) = MAT_GOLD;
+	obj->proto_data->type_flag = ITEM_COINS;
+	obj->proto_data->material = MAT_GOLD;
 	SET_BIT(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
 
 	GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = amount;
@@ -4902,7 +4902,6 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	GET_OBJ_CURRENT_SCALE_LEVEL(obj) = GET_OBJ_CURRENT_SCALE_LEVEL(input);
 	GET_OBJ_AFF_FLAGS(obj) = GET_OBJ_AFF_FLAGS(input);
 	GET_OBJ_TIMER(obj) = GET_OBJ_TIMER(input);
-	GET_OBJ_TYPE(obj) = GET_OBJ_TYPE(input);
 	GET_OBJ_WEAR(obj) = GET_OBJ_WEAR(input);
 	GET_STOLEN_TIMER(obj) = GET_STOLEN_TIMER(input);
 	GET_STOLEN_FROM(obj) = GET_STOLEN_FROM(input);

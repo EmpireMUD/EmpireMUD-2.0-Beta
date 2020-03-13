@@ -4940,31 +4940,30 @@ struct obj_binding {
 };
 
 
-// object numeric data -- part of obj_data
+// object numeric data -- part of obj_data; often unique to each obj instance
 struct obj_flag_data {
 	int value[NUM_OBJ_VAL_POSITIONS];	// Values of the item (see list)
-	byte type_flag;	// Type of item
 	bitvector_t wear_flags;	// Where you can wear it
 	bitvector_t extra_flags;	// If it hums, glows, etc.
-	bitvector_t tool_flags;	// any TOOL_ uses it provides when equipped
 	int carrying_n;	// number of items inside
-	int cost;	// Value when sold (gp.)
 	int timer;	// Timer for object
-	bitvector_t bitvector;	// To set chars bits
-	int material;	// Material this is made out of
-	
-	
+	bitvector_t bitvector;	// To set chars bits (AFF_ flags)
 	int current_scale_level;	// level the obj was scaled to, or -1 for not scaled
-	int min_scale_level;	// minimum level this obj may be scaled to
-	int max_scale_level;	// maximum level this obj may be scaled to
-	
-	any_vnum requires_quest;	// can only have obj whilst on quest
 };
 
 
 // object properties which never vary from the prototype
 struct obj_proto_data {
+	byte type_flag;	// Type of item
+	int material;	// material this is made out of
 	any_vnum component;	// matching generic component vnum
+	
+	bitvector_t tool_flags;	// any TOOL_ uses it provides when equipped
+	
+	int min_scale_level;	// minimum level this obj may be scaled to
+	int max_scale_level;	// maximum level this obj may be scaled to
+	
+	any_vnum requires_quest;	// can only have obj whilst on quest
 	
 	// lists
 	struct extra_descr_data *ex_description;	// extra descriptions
