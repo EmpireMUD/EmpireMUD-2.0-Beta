@@ -4963,10 +4963,22 @@ struct obj_flag_data {
 };
 
 
+// object properties which never vary from the prototype
+struct obj_proto_data {
+	struct extra_descr_data *ex_description;	// extra descriptions
+	struct custom_message *custom_msgs;	// any custom messages
+	struct interaction_item *interactions;	// interaction items
+	struct obj_storage_type *storage;	// linked list of where an obj can be stored
+	struct quest_lookup *quest_lookups;
+	struct shop_lookup *shop_lookups;
+};
+
+
 // a game item
 struct obj_data {
 	obj_vnum vnum;	// object's virtual number
 	ush_int version;	// for auto-updating objects
+	struct obj_proto_data *proto_data;	// data which never changes on instances of objects
 	
 	room_data *in_room;	// In what room -- NULL when container/carried
 
@@ -4977,8 +4989,6 @@ struct obj_data {
 	char *description;	// When in room (long desc)
 	char *short_description;	// sentence-building; when worn/carry/in cont.
 	char *action_description;	// What to write when looked at
-	struct extra_descr_data *ex_description;	// extra descriptions
-	struct custom_message *custom_msgs;	// any custom messages
 	vehicle_data *in_vehicle;	// in vehicle or NULL
 	char_data *carried_by;	// Carried by NULL in room/container
 	char_data *worn_by;	// Worn by?
@@ -4989,8 +4999,6 @@ struct obj_data {
 	time_t stolen_timer;	// when the object was last stolen
 	empire_vnum stolen_from;	// empire who owned it
 	
-	struct interaction_item *interactions;	// interaction items
-	struct obj_storage_type *storage;	// linked list of where an obj can be stored
 	time_t autostore_timer;	// how long an object has been where it be
 	
 	struct obj_binding *bound_to;	// LL of who it's bound to
@@ -5006,10 +5014,7 @@ struct obj_data {
 	obj_data *next_content;	// For 'contains' lists
 	obj_data *next;	// For the object list
 	
-	// live data (not saved, not freed)
-	struct quest_lookup *quest_lookups;
-	struct shop_lookup *shop_lookups;
-	bool search_mark;
+	bool search_mark;	// for things that iterate over inventory/lists repeatedly
 	
 	UT_hash_handle hh;	// object_table hash
 };

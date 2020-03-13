@@ -87,7 +87,6 @@ struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest
 struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
-void update_obj_quest_lookups(obj_vnum vnum);
 void update_veh_quest_lookups(any_vnum vnum);
 void write_daily_quest_file();
 
@@ -1432,12 +1431,11 @@ void add_or_remove_all_quest_lookups_for(quest_data *quest, bool add) {
 				case QG_OBJECT: {
 					if ((obj = obj_proto(giver->vnum))) {
 						if (add) {
-							add_quest_lookup(&GET_OBJ_QUEST_LOOKUPS(obj), quest);
+							add_quest_lookup(&obj->proto_data->quest_lookups, quest);
 						}
 						else {
-							remove_quest_lookup(&GET_OBJ_QUEST_LOOKUPS(obj), quest);
+							remove_quest_lookup(&obj->proto_data->quest_lookups, quest);
 						}
-						update_obj_quest_lookups(GET_OBJ_VNUM(obj));
 					}
 					break;
 				}
@@ -1553,26 +1551,6 @@ void update_mob_quest_lookups(mob_vnum vnum) {
 		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == vnum) {
 			// re-set the pointer
 			MOB_QUEST_LOOKUPS(mob) = MOB_QUEST_LOOKUPS(proto);
-		}
-	}
-}
-
-
-/**
-* Fixes quest lookup pointers on live copies of objs -- this should ALWAYS
-* point to the proto.
-*/
-void update_obj_quest_lookups(obj_vnum vnum) {
-	obj_data *proto, *obj;
-	
-	if (!(proto = obj_proto(vnum))) {
-		return;
-	}
-	
-	LL_FOREACH(object_list, obj) {
-		if (GET_OBJ_VNUM(obj) == vnum) {
-			// re-set the pointer
-			GET_OBJ_QUEST_LOOKUPS(obj) = GET_OBJ_QUEST_LOOKUPS(proto);
 		}
 	}
 }

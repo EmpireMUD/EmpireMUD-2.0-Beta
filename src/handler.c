@@ -4896,9 +4896,6 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	if (GET_OBJ_ACTION_DESC(input) && (!proto || GET_OBJ_ACTION_DESC(input) != GET_OBJ_ACTION_DESC(proto))) {
 		GET_OBJ_ACTION_DESC(obj) = str_dup(GET_OBJ_ACTION_DESC(input));
 	}
-	if (input->ex_description && (!proto || input->ex_description != proto->ex_description)) {
-		obj->ex_description = copy_extra_descs(input->ex_description);
-	}
 	
 	// non-point copies
 	GET_OBJ_EXTRA(obj) = GET_OBJ_EXTRA(input);
@@ -5169,9 +5166,6 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 		return FALSE;
 	}
 	if (GET_OBJ_ACTION_DESC(obj_a) != GET_OBJ_ACTION_DESC(obj_b) && !str_cmp(GET_OBJ_ACTION_DESC(obj_a), GET_OBJ_ACTION_DESC(obj_b))) {
-		return FALSE;
-	}
-	if (obj_a->ex_description != obj_b->ex_description) {
 		return FALSE;
 	}
 	
@@ -6277,7 +6271,7 @@ obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, obj_
 				}
 			}
 			else {	// did not give a number
-				if (has_interaction(i->interactions, interact_type)) {
+				if (has_interaction(GET_OBJ_INTERACTIONS(i), interact_type)) {
 					return i;	// perfect match
 				}
 				else if (!backup) {
@@ -6327,7 +6321,7 @@ obj_vnum get_obj_vnum_by_name(char *name, bool storable_only) {
 	obj_data *obj, *next_obj;
 	
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		if (storable_only && !obj->storage) {
+		if (storable_only && !GET_OBJ_STORAGE(obj)) {
 			continue;
 		}
 		if (!multi_isname(name, GET_OBJ_KEYWORDS(obj))) {
@@ -8362,11 +8356,11 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 	}
 	
 	// We skip this check in retrieval mode, since STORE_ALL does not function for retrieval.
-	if (!retrieval_mode && obj->storage && room_has_function_and_city_ok(loc, FNC_STORE_ALL)) {
+	if (!retrieval_mode && GET_OBJ_STORAGE(obj) && room_has_function_and_city_ok(loc, FNC_STORE_ALL)) {
 		return TRUE; // As long as it can be stored anywhere, it can be stored here.
 	}
 	
-	for (store = obj->storage; store; store = store->next) {
+	for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {
 		if (store->building_type == BUILDING_VNUM(loc)) {
 			return TRUE;
 		}
@@ -8510,7 +8504,7 @@ bool stored_item_requires_withdraw(obj_data *obj) {
 	struct obj_storage_type *sdt;
 	
 	if (obj) {
-		for (sdt = obj->storage; sdt; sdt = sdt->next) {
+		for (sdt = GET_OBJ_STORAGE(obj); sdt; sdt = sdt->next) {
 			if (IS_SET(sdt->flags, STORAGE_WITHDRAW)) {
 				return TRUE;
 			}

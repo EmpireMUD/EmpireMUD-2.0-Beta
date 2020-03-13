@@ -2871,7 +2871,7 @@ SHOW(show_resource) {
 	}
 	else {	// look up by name
 		HASH_ITER(hh, object_table, obj_iter, next_obj) {
-			if (obj_iter->storage && multi_isname(argument, GET_OBJ_KEYWORDS(obj_iter))) {
+			if (GET_OBJ_STORAGE(obj_iter) && multi_isname(argument, GET_OBJ_KEYWORDS(obj_iter))) {
 				proto = obj_iter;
 				break;
 			}
@@ -2883,7 +2883,7 @@ SHOW(show_resource) {
 		msg_to_char(ch, "Unknown storable object '%s'.\r\n", argument);
 		return;
 	}
-	if (!proto->storage) {
+	if (!GET_OBJ_STORAGE(proto)) {
 		msg_to_char(ch, "You can only use 'show resource' on storable objects.\r\n");
 		return;
 	}
@@ -4509,7 +4509,7 @@ SHOW(show_storage) {
 		HASH_ITER(hh, object_table, obj, next_obj) {
 			ok = FALSE;
 		
-			for (store = obj->storage; store && !ok; store = store->next) {
+			for (store = GET_OBJ_STORAGE(obj); store && !ok; store = store->next) {
 				if (store->building_type == building_type) {
 					ok = TRUE;
 				}
@@ -4891,7 +4891,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	*buf = '\0';
 	*line = '\0';
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		for (store = obj->storage; store; store = store->next) {
+		for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {
 			if (store->building_type == GET_BLD_VNUM(bdg)) {
 				sprintf(buf1, " %s", GET_OBJ_SHORT_DESC(obj));
 				if (*line || *buf) {
@@ -5542,10 +5542,10 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	}
 
 	*buf = 0;
-	if (j->ex_description) {
+	if (GET_OBJ_EX_DESCS(j)) {
 		struct extra_descr_data *desc;
 		sprintf(buf, "Extra descs:&c");
-		for (desc = j->ex_description; desc; desc = desc->next) {
+		for (desc = GET_OBJ_EX_DESCS(j); desc; desc = desc->next) {
 			strcat(buf, " ");
 			strcat(buf, desc->keyword);
 		}
@@ -5782,11 +5782,11 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 	send_to_char("\r\n", ch);
 	
-	if (j->storage) {
+	if (GET_OBJ_STORAGE(j)) {
 		msg_to_char(ch, "Storage locations:");
 		
 		found = 0;
-		for (store = j->storage; store; store = store->next) {			
+		for (store = GET_OBJ_STORAGE(j); store; store = store->next) {			
 			msg_to_char(ch, "%s%s", (found++ > 0 ? ", " : " "), GET_BLD_NAME(building_proto(store->building_type)));
 			
 			if (store->flags) {
@@ -5798,16 +5798,16 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		msg_to_char(ch, "\r\n");
 	}
 	
-	if (j->interactions) {
+	if (GET_OBJ_INTERACTIONS(j)) {
 		send_to_char("Interactions:\r\n", ch);
-		get_interaction_display(j->interactions, buf);
+		get_interaction_display(GET_OBJ_INTERACTIONS(j), buf);
 		send_to_char(buf, ch);
 	}
 	
-	if (j->custom_msgs) {
+	if (GET_OBJ_CUSTOM_MSGS(j)) {
 		msg_to_char(ch, "Custom messages:\r\n");
 		
-		for (ocm = j->custom_msgs; ocm; ocm = ocm->next) {
+		for (ocm = GET_OBJ_CUSTOM_MSGS(j); ocm; ocm = ocm->next) {
 			msg_to_char(ch, " %s: %s\r\n", obj_custom_types[ocm->type], ocm->msg);
 		}
 	}

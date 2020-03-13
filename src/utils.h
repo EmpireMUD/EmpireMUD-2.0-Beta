@@ -882,8 +882,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_MATERIAL(obj)  ((obj)->obj_flags.material)
 #define GET_OBJ_MAX_SCALE_LEVEL(obj)  ((obj)->obj_flags.max_scale_level)
 #define GET_OBJ_MIN_SCALE_LEVEL(obj)  ((obj)->obj_flags.min_scale_level)
-#define GET_OBJ_QUEST_LOOKUPS(obj)  ((obj)->quest_lookups)
-#define GET_OBJ_SHOP_LOOKUPS(obj)  ((obj)->shop_lookups)
 #define GET_OBJ_REQUIRES_QUEST(obj)  ((obj)->obj_flags.requires_quest)
 #define GET_OBJ_SHORT_DESC(obj)  ((obj)->short_description)
 #define GET_OBJ_TIMER(obj)  ((obj)->obj_flags.timer)
@@ -896,6 +894,14 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define LAST_OWNER_ID(obj)  ((obj)->last_owner_id)
 #define OBJ_BOUND_TO(obj)  ((obj)->bound_to)
 #define OBJ_VERSION(obj)  ((obj)->version)
+
+// prototype data
+#define GET_OBJ_EX_DESCS(obj)  ((obj)->proto_data ? (obj)->proto_data->ex_description : NULL)
+#define GET_OBJ_CUSTOM_MSGS(obj)  ((obj)->proto_data ? (obj)->proto_data->custom_msgs : NULL)
+#define GET_OBJ_INTERACTIONS(obj)  ((obj)->proto_data ? (obj)->proto_data->interactions : NULL)
+#define GET_OBJ_STORAGE(obj)  ((obj)->proto_data ? (obj)->proto_data->storage : NULL)
+#define GET_OBJ_QUEST_LOOKUPS(obj)  ((obj)->proto_data ? (obj)->proto_data->quest_lookups : NULL)
+#define GET_OBJ_SHOP_LOOKUPS(obj)  ((obj)->proto_data ? (obj)->proto_data->shop_lookups : NULL)
 
 // compound attributes
 #define GET_OBJ_DESC(obj, ch, mode)  get_obj_desc((obj), (ch), (mode))
@@ -914,7 +920,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // for stacking, sotring, etc
 #define OBJ_CAN_STACK(obj)  (GET_OBJ_TYPE(obj) != ITEM_CONTAINER && !IS_AMMO(obj))
-#define OBJ_CAN_STORE(obj)  ((obj)->storage && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_SUPERIOR | OBJ_ENCHANTED) && !IS_STOLEN(obj))
+#define OBJ_CAN_STORE(obj)  (GET_OBJ_STORAGE(obj) && !OBJ_BOUND_TO(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_SUPERIOR | OBJ_ENCHANTED) && !IS_STOLEN(obj))
 #define UNIQUE_OBJ_CAN_STORE(obj)  (!OBJ_BOUND_TO(obj) && !OBJ_CAN_STORE(obj) && !OBJ_FLAGGED((obj), OBJ_NO_STORE | OBJ_JUNK) && GET_OBJ_TIMER(obj) == UNLIMITED && !IS_STOLEN(obj) && GET_OBJ_REQUIRES_QUEST(obj) == NOTHING && !IS_STOLEN(obj))
 #define OBJ_STACK_FLAGS  (OBJ_SUPERIOR | OBJ_KEEP | OBJ_ENCHANTED)
 #define OBJS_ARE_SAME(o1, o2)  (GET_OBJ_VNUM(o1) == GET_OBJ_VNUM(o2) && ((GET_OBJ_EXTRA(o1) & OBJ_STACK_FLAGS) == (GET_OBJ_EXTRA(o2) & OBJ_STACK_FLAGS)) && (GET_OBJ_SHORT_DESC(o1) == GET_OBJ_SHORT_DESC(o2) || !strcmp(GET_OBJ_SHORT_DESC(o1), GET_OBJ_SHORT_DESC(o2))) && (GET_OBJ_LONG_DESC(o1) == GET_OBJ_LONG_DESC(o2) || !strcmp(GET_OBJ_LONG_DESC(o1), GET_OBJ_LONG_DESC(o2))) && (!IS_DRINK_CONTAINER(o1) || GET_DRINK_CONTAINER_TYPE(o1) == GET_DRINK_CONTAINER_TYPE(o2)) && (!IS_BOOK(o1) || !IS_BOOK(o2) || GET_BOOK_ID(o1) == GET_BOOK_ID(o2)) && (!IS_AMMO(o1) || !IS_AMMO(o2) || GET_AMMO_QUANTITY(o1) == GET_AMMO_QUANTITY(o2)) && (IS_STOLEN(o1) == IS_STOLEN(o2)))

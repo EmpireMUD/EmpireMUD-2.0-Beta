@@ -791,11 +791,11 @@ void check_for_bad_buildings(void) {
 	
 	// check obj protos for storage locations that used a deleted building: delete
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		for (store = obj->storage; store; store = next_store) {
+		for (store = GET_OBJ_STORAGE(obj); store; store = next_store) {
 			next_store = store->next;
 			
 			if (store->building_type != NOTHING && !building_proto(store->building_type)) {
-				REMOVE_FROM_LIST(store, obj->storage, next);
+				REMOVE_FROM_LIST(store, obj->proto_data->storage, next);
 				free(store);
 				log(" removing storage for obj %d for bad building type", obj->vnum);
 				save_library_file_for_vnum(DB_BOOT_OBJ, obj->vnum);
@@ -806,11 +806,11 @@ void check_for_bad_buildings(void) {
 	// check open obj editors for storage in deleted buildings: delete
 	for (dd = descriptor_list; dd; dd = dd->next) {
 		if (GET_OLC_TYPE(dd) == OLC_OBJECT && GET_OLC_OBJECT(dd)) {
-			for (store = GET_OLC_OBJECT(dd)->storage; store; store = next_store) {
+			for (store = GET_OBJ_STORAGE(GET_OLC_OBJECT(dd)); store; store = next_store) {
 				next_store = store->next;
 			
 				if (store->building_type != NOTHING && !building_proto(store->building_type)) {
-					REMOVE_FROM_LIST(store, GET_OLC_OBJECT(dd)->storage, next);
+					REMOVE_FROM_LIST(store, GET_OLC_OBJECT(dd)->proto_data->storage, next);
 					free(store);
 					msg_to_desc(dd, "&RYou are editing an object whose storage building has been deleted. Building type removed.&0\r\n");
 				}
@@ -1825,7 +1825,13 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
  //////////////////////////////////////////////////////////////////////////////
 //// OBJECT LOADING //////////////////////////////////////////////////////////
 
-
+/**
+* Clears basic data about the object. You should generally not call this
+* directly -- prefer read_object() for prototyped items or create_obj() for
+* non-prototyped ones.
+*
+* @param obj_data *obj The object to clear.
+*/
 void clear_object(obj_data *obj) {
 	memset((char *) obj, 0, sizeof(obj_data));
 
@@ -1839,6 +1845,8 @@ void clear_object(obj_data *obj) {
 	obj->last_owner_id = NOBODY;
 	obj->last_empire_id = NOTHING;
 	obj->stolen_from = NOTHING;
+	
+	// this does NOT create proto_data -- that must be done separately
 }
 
 
@@ -1853,6 +1861,7 @@ obj_data *create_obj(void) {
 
 	CREATE(obj, obj_data, 1);
 	clear_object(obj);
+	CREATE(obj->proto_data, struct obj_proto_data, 1);
 	add_to_object_list(obj);
 	
 	// ensure it doesn't decay unless asked
@@ -1884,7 +1893,7 @@ obj_data *read_object(obj_vnum nr, bool with_triggers) {
 	CREATE(obj, obj_data, 1);
 	clear_object(obj);
 
-	*obj = *proto;
+	*obj = *proto;	// copies the proto_data pointer here too
 	add_to_object_list(obj);
 	
 	// applies are ALWAYS a copy
@@ -2193,7 +2202,7 @@ void b3_6_einv_fix(void) {
 	obj_vnum silver = 161;
 	
 	proto = obj_proto(vnum);
-	if (!proto || proto->storage || !obj_proto(cloth) || !obj_proto(silver)) {
+	if (!proto || GET_OBJ_STORAGE(proto) || !obj_proto(cloth) || !obj_proto(silver)) {
 		return;	// no work to do on this EmpireMUD
 	}
 	
@@ -2928,7 +2937,7 @@ void b5_23_potion_update(void) {
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		LL_FOREACH_SAFE(EMPIRE_UNIQUE_STORAGE(emp), eus, next_eus) {
 			if ((obj = eus->obj) && IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-				if (proto->storage) {
+				if (GET_OBJ_STORAGE(proto)) {
 					// move to regular einv if now possible
 					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount);
 					remove_eus_entry(eus, emp);
@@ -3011,7 +3020,7 @@ void b5_24_poison_update(void) {
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		LL_FOREACH_SAFE(EMPIRE_UNIQUE_STORAGE(emp), eus, next_eus) {
 			if ((obj = eus->obj) && IS_POISON(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
-				if (proto->storage) {
+				if (GET_OBJ_STORAGE(proto)) {
 					// move to regular einv if now possible
 					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount);
 					remove_eus_entry(eus, emp);
@@ -3084,7 +3093,7 @@ void b5_30_empire_update(void) {
 		
 		// fixes an older issue with trade data -- unstorable items
 		LL_FOREACH_SAFE(EMPIRE_TRADE(emp), trade, next_trade) {
-			if (!(proto = obj_proto(trade->vnum)) || !proto->storage) {
+			if (!(proto = obj_proto(trade->vnum)) || !GET_OBJ_STORAGE(proto)) {
 				LL_DELETE(EMPIRE_TRADE(emp), trade);
 			}
 		}

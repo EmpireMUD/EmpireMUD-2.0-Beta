@@ -2616,7 +2616,7 @@ static const char *GetMSSP_Extra_Descs() {
 		if (GET_OBJ_ACTION_DESC(obj) && *GET_OBJ_ACTION_DESC(obj)) {
 			++count;
 		}
-		for (ex = obj->ex_description; ex; ex = ex->next) {
+		for (ex = GET_OBJ_EX_DESCS(obj); ex; ex = ex->next) {
 			++count;
 		}
 	}

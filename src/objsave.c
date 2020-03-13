@@ -89,9 +89,8 @@ void ensure_safe_obj(obj_data *obj) {
 obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify) {
 	void scale_item_to_level(obj_data *obj, int level);
 
-	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH];
+	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH], *tmp;
 	obj_data *proto = obj_proto(vnum);
-	struct extra_descr_data *ex;
 	struct obj_apply *apply, *last_apply = NULL;
 	obj_data *obj, *new;
 	bool end = FALSE;
@@ -241,16 +240,13 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 			}
 			case 'E': {
 				if (OBJ_FILE_TAG(line, "Extra-desc:", length)) {
-					if (proto && obj->ex_description == proto->ex_description) {
-						obj->ex_description = NULL;
+					// These are no longer used but just in case, this will read the data
+					if ((tmp = fread_string(fl, error))) {
+						free(tmp);
 					}
-			
-					CREATE(ex, struct extra_descr_data, 1);
-					ex->next = obj->ex_description;
-					obj->ex_description = ex;
-			
-					ex->keyword = fread_string(fl, error);
-					ex->description = fread_string(fl, error);
+					if ((tmp = fread_string(fl, error))) {
+						free(tmp);
+					}
 				}
 				else if (OBJ_FILE_TAG(line, "Eq-set:", length)) {
 					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
@@ -478,7 +474,6 @@ void Crash_save(obj_data *obj, FILE *fp, int location) {
 */
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 	char temp[MAX_STRING_LENGTH];
-	struct extra_descr_data *ex;
 	struct trig_var_data *tvd;
 	struct eq_set_obj *eq_set;
 	struct obj_binding *bind;
@@ -513,15 +508,6 @@ void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location) {
 		strcpy(temp, NULLSAFE(GET_OBJ_ACTION_DESC(obj)));
 		strip_crlf(temp);
 		fprintf(fl, "Action-desc:\n%s~\n", temp);
-	}
-
-	if (!proto || obj->ex_description != proto->ex_description) {
-		for (ex = obj->ex_description; ex; ex = ex->next) {
-			fprintf(fl, "Extra-desc:\n%s~\n", NULLSAFE(ex->keyword));
-			strcpy(temp, NULLSAFE(ex->description));
-			strip_crlf(temp);
-			fprintf(fl, "%s~\n", temp);
-		}
 	}
 
 	// always save obj vals	

@@ -408,10 +408,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "&0");
 	}
 
-	if (obj->storage && !OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
+	if (GET_OBJ_STORAGE(obj) && !OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
 		msg_to_char(ch, "Storage locations:");
 		found = 0;
-		for (store = obj->storage; store; store = store->next) {			
+		for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {			
 			if ((bld = building_proto(store->building_type))) {
 				msg_to_char(ch, "%s%s", (found++ > 0 ? ", " : " "), GET_BLD_NAME(bld));
 			}
@@ -604,10 +604,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		msg_to_char(ch, "Plants %s (%s).\r\n", GET_CROP_NAME(cp), GET_CROP_CLIMATE(cp) ? lbuf : "any climate");
 	}
 	
-	if (has_interaction(obj->interactions, INTERACT_COMBINE)) {
+	if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE)) {
 		msg_to_char(ch, "It can be combined.\r\n");
 	}
-	if (has_interaction(obj->interactions, INTERACT_SEPARATE)) {
+	if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE)) {
 		msg_to_char(ch, "It can be separated.\r\n");
 	}
 	
@@ -659,7 +659,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 	
 	// some custom messages
-	LL_FOREACH(obj->custom_msgs, ocm) {
+	LL_FOREACH(GET_OBJ_CUSTOM_MSGS(obj), ocm) {
 		switch (ocm->type) {
 			case OBJ_CUSTOM_LONGDESC: {
 				sprintf(lbuf, "Gives long description: %s", ocm->msg);
@@ -4359,12 +4359,12 @@ ACMD(do_combine) {
 	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_COMBINE))) {
 		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (!has_interaction(obj->interactions, INTERACT_COMBINE)) {
+	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE)) {
 		msg_to_char(ch, "You can't combine that!\r\n");
 	}
 	else {
 		// will extract no matter what happens here
-		if (!run_interactions(ch, obj->interactions, INTERACT_COMBINE, IN_ROOM(ch), NULL, obj, combine_obj_interact)) {
+		if (!run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE, IN_ROOM(ch), NULL, obj, combine_obj_interact)) {
 			act("You fail to combine $p.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		command_lag(ch, WAIT_OTHER);
@@ -4902,7 +4902,7 @@ ACMD(do_eat) {
 	
 	// 7. cleanup
 	if (extract) {
-		run_interactions(ch, food->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, food, consumes_or_decays_interact);
+		run_interactions(ch, GET_OBJ_INTERACTIONS(food), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, food, consumes_or_decays_interact);
 		extract_obj(food);
 	}
 	else {
@@ -5481,7 +5481,7 @@ ACMD(do_light) {
 			msg_to_char(ch, "You don't have a %s.\r\n", arg);
 		}
 	}
-	else if (!has_interaction(obj->interactions, INTERACT_LIGHT)) {
+	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT)) {
 		msg_to_char(ch, "You can't %s that!\r\n", cmdname[subcmd]);
 	}
 	else {
@@ -5501,7 +5501,7 @@ ACMD(do_light) {
 		
 		// will extract no matter what happens here
 		empty_obj_before_extract(obj);
-		run_interactions(ch, obj->interactions, INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, light_obj_interact);
+		run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, light_obj_interact);
 		extract_obj(obj);
 		command_lag(ch, WAIT_OTHER);
 		
@@ -6287,14 +6287,14 @@ ACMD(do_seed) {
 	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SEED))) {
 		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (!has_interaction(obj->interactions, INTERACT_SEED)) {
+	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEED)) {
 		msg_to_char(ch, "You can't seed that!\r\n");
 	}
 	else if (OBJ_FLAGGED(obj, OBJ_SEEDED)) {
 		msg_to_char(ch, "It has already been seeded.\r\n");
 	}
 	else {		
-		if (run_interactions(ch, obj->interactions, INTERACT_SEED, IN_ROOM(ch), NULL, obj, seed_obj_interact)) {
+		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEED, IN_ROOM(ch), NULL, obj, seed_obj_interact)) {
 			if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
 				extract_obj(obj);
 			}
@@ -6322,11 +6322,11 @@ ACMD(do_separate) {
 	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SEPARATE))) {
 		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (!has_interaction(obj->interactions, INTERACT_SEPARATE)) {
+	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE)) {
 		msg_to_char(ch, "You can't separate that!\r\n");
 	}
 	else {		
-		if (run_interactions(ch, obj->interactions, INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
+		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
 			if (GET_LOYALTY(ch)) {
 				// subtract old item from empire counts
 				add_production_total(GET_LOYALTY(ch), GET_OBJ_VNUM(obj), -1);

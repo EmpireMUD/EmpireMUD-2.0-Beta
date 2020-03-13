@@ -6608,7 +6608,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				case OLC_OBJECT: {
 					obj_data *obj = obj_proto(vnum);
 					if (obj) {
-						copyfrom = obj->interactions;
+						copyfrom = GET_OBJ_INTERACTIONS(obj);
 						none = copyfrom ? FALSE : TRUE;
 					}
 					break;

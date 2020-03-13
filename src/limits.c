@@ -1713,7 +1713,7 @@ void point_update_obj(obj_data *obj) {
 			}
 			
 			// decays-to
-			run_interactions(NULL, obj->interactions, INTERACT_DECAYS_TO, obj_room(obj), NULL, obj, consumes_or_decays_interact);
+			run_interactions(NULL, GET_OBJ_INTERACTIONS(obj), INTERACT_DECAYS_TO, obj_room(obj), NULL, obj, consumes_or_decays_interact);
 			
 			empty_obj_before_extract(obj);
 			extract_obj(obj);
