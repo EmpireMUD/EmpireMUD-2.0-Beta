@@ -5156,6 +5156,8 @@ void free_obj(obj_data *obj) {
 * @param int nr The vnum of the object.
 */
 void parse_object(FILE *obj_f, int nr) {
+	extern struct obj_proto_data *create_obj_proto_data();
+	
 	static char line[256];
 	int t[10], retval;
 	char *tmpptr;
@@ -5168,8 +5170,8 @@ void parse_object(FILE *obj_f, int nr) {
 	// create
 	CREATE(obj, obj_data, 1);
 	clear_object(obj);
-	CREATE(obj->proto_data, struct obj_proto_data, 1);
 	obj->vnum = nr;
+	obj->proto_data = create_obj_proto_data();
 
 	HASH_FIND_INT(object_table, &nr, find);
 	if (find) {
@@ -5329,7 +5331,7 @@ void parse_object(FILE *obj_f, int nr) {
 					}
 					
 					// t[0] is not currently used -- future use should be 'quantity'
-					GET_OBJ_COMPONENT(obj) = t[1];
+					obj->proto_data->component = t[1];
 				}
 				else {	// v1 (two lines) -- convert
 					if (!get_line(obj_f, line) || sscanf(line, "%d %s", t, f1) != 2) {
@@ -5340,7 +5342,7 @@ void parse_object(FILE *obj_f, int nr) {
 					vn = b5_88_old_component_to_new_component(t[0], asciiflag_conv(f1));
 					if (vn != NOTHING) {
 						log("- converting component on obj [%d] %s from (%d %s) to [%d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), t[0], f1, vn, get_generic_name_by_vnum(vn));
-						GET_OBJ_COMPONENT(obj) = vn;
+						obj->proto_data->component = vn;
 					}
 					else {
 						log("- unable to convert component on obj [%d] %s from (%d %s)", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), t[0], f1);

@@ -1828,7 +1828,8 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 /**
 * Clears basic data about the object. You should generally not call this
 * directly -- prefer read_object() for prototyped items or create_obj() for
-* non-prototyped ones.
+* non-prototyped ones. You must assign proto_data afterwards, either from a
+* prototype or by setting it to create_obj_proto_data().
 *
 * @param obj_data *obj The object to clear.
 */
@@ -1840,13 +1841,28 @@ void clear_object(obj_data *obj) {
 	obj->worn_on = NO_WEAR;
 	
 	GET_OBJ_REQUIRES_QUEST(obj) = NOTHING;
-	GET_OBJ_COMPONENT(obj) = NOTHING;
 	
 	obj->last_owner_id = NOBODY;
 	obj->last_empire_id = NOTHING;
 	obj->stolen_from = NOTHING;
 	
 	// this does NOT create proto_data -- that must be done separately
+}
+
+
+/**
+* Creates and initializes the proto_data, to be used on an object.
+*
+* @return struct obj_proto_data* The new data.
+*/
+struct obj_proto_data *create_obj_proto_data(void) {
+	struct obj_proto_data *data;
+	
+	CREATE(data, struct obj_proto_data, 1);
+	
+	data->component = NOTHING;
+	
+	return data;
 }
 
 
@@ -1861,7 +1877,7 @@ obj_data *create_obj(void) {
 
 	CREATE(obj, obj_data, 1);
 	clear_object(obj);
-	CREATE(obj->proto_data, struct obj_proto_data, 1);
+	obj->proto_data = create_obj_proto_data();
 	add_to_object_list(obj);
 	
 	// ensure it doesn't decay unless asked

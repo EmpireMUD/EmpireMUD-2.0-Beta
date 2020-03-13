@@ -4953,7 +4953,6 @@ struct obj_flag_data {
 	bitvector_t bitvector;	// To set chars bits
 	int material;	// Material this is made out of
 	
-	any_vnum component;	// matching generic component vnum
 	
 	int current_scale_level;	// level the obj was scaled to, or -1 for not scaled
 	int min_scale_level;	// minimum level this obj may be scaled to
@@ -4965,10 +4964,15 @@ struct obj_flag_data {
 
 // object properties which never vary from the prototype
 struct obj_proto_data {
+	any_vnum component;	// matching generic component vnum
+	
+	// lists
 	struct extra_descr_data *ex_description;	// extra descriptions
 	struct custom_message *custom_msgs;	// any custom messages
 	struct interaction_item *interactions;	// interaction items
 	struct obj_storage_type *storage;	// linked list of where an obj can be stored
+	
+	// lookup tables
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;
 };

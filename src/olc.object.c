@@ -371,6 +371,7 @@ void check_oedit_material_list(void) {
 * @return obj_data* The new object's prototype.
 */
 obj_data *create_obj_table_entry(obj_vnum vnum) {
+	extern struct obj_proto_data *create_obj_proto_data();
 	void add_object_to_table(obj_data *obj);
 	
 	obj_data *obj;
@@ -383,8 +384,8 @@ obj_data *create_obj_table_entry(obj_vnum vnum) {
 	
 	CREATE(obj, obj_data, 1);
 	clear_object(obj);
-	CREATE(obj->proto_data, struct obj_proto_data, 1);
 	obj->vnum = vnum;
+	obj->proto_data = create_obj_proto_data();
 	add_object_to_table(obj);
 	
 	// save obj index and obj file now so there's no trouble later
@@ -1579,9 +1580,6 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 		GET_OBJ_ACTION_DESC(to_update) = GET_OBJ_ACTION_DESC(new_proto);
 	}
 	
-	// ensure this is up to date
-	GET_OBJ_COMPONENT(to_update) = GET_OBJ_COMPONENT(new_proto);
-	
 	// remove old scripts
 	if (SCRIPT(to_update)) {
 		remove_all_triggers(to_update, OBJ_TRIGGER);
@@ -1779,6 +1777,8 @@ struct obj_storage_type *copy_storage(struct obj_storage_type *list) {
 * @return obj_data *The copied object.
 */
 obj_data *setup_olc_object(obj_data *input) {
+	extern struct obj_proto_data *create_obj_proto_data();
+	
 	obj_data *new;
 	
 	CREATE(new, obj_data, 1);
@@ -1795,12 +1795,15 @@ obj_data *setup_olc_object(obj_data *input) {
 		GET_OBJ_ACTION_DESC(new) = GET_OBJ_ACTION_DESC(input) ? str_dup(GET_OBJ_ACTION_DESC(input)) : NULL;
 		
 		// copy prototype data
-		CREATE(new->proto_data, struct obj_proto_data, 1);
+		new->proto_data = create_obj_proto_data();
+		*new->proto_data = *input->proto_data;
 		new->proto_data->ex_description = copy_extra_descs(input->proto_data->ex_description);
 		new->proto_data->custom_msgs = copy_custom_messages(input->proto_data->custom_msgs);
 		new->proto_data->interactions = copy_interaction_list(input->proto_data->interactions);
 		new->proto_data->storage = copy_storage(input->proto_data->storage);
-		// don't bother with quest_lookups or shop_lookups
+		// don't keep quest_lookups or shop_lookups
+		new->proto_data->quest_lookups = NULL;
+		new->proto_data->shop_lookups = NULL;
 		
 		// copy applies
 		GET_OBJ_APPLIES(new) = copy_obj_apply_list(GET_OBJ_APPLIES(input));
@@ -1814,7 +1817,7 @@ obj_data *setup_olc_object(obj_data *input) {
 	}
 	else {
 		// brand new
-		CREATE(new->proto_data, struct obj_proto_data, 1);
+		new->proto_data = create_obj_proto_data();
 		GET_OBJ_KEYWORDS(new) = str_dup(default_obj_keywords);
 		GET_OBJ_SHORT_DESC(new) = str_dup(default_obj_short);
 		GET_OBJ_LONG_DESC(new) = str_dup(default_obj_long);
@@ -2491,7 +2494,7 @@ OLC_MODULE(oedit_component) {
 	generic_data *cmp;
 	
 	if (!str_cmp(argument, "none") || atoi(argument) == NOTHING) {
-		GET_OBJ_COMPONENT(obj) = NOTHING;
+		obj->proto_data->component = NOTHING;
 		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
 		}
@@ -2505,7 +2508,7 @@ OLC_MODULE(oedit_component) {
 			msg_to_char(ch, "There is no generic component with that vnum.\r\n");
 		}
 		else {
-			GET_OBJ_COMPONENT(obj) = GEN_VNUM(cmp);
+			obj->proto_data->component = GEN_VNUM(cmp);
 			msg_to_char(ch, "It is now %s (%s).\r\n", AN(get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj))), get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)));
 		}
 	}

@@ -1197,7 +1197,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		}
 		if (GEN_TYPE(gen) == GENERIC_COMPONENT && GET_OBJ_COMPONENT(obj) == vnum) {
 			found = TRUE;
-			GET_OBJ_COMPONENT(obj) = NOTHING;
+			obj->proto_data->component = NOTHING;
 		}
 		
 		if (found) {
@@ -1338,7 +1338,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			}
 			if (GEN_TYPE(gen) == GENERIC_COMPONENT && GET_OBJ_COMPONENT(GET_OLC_OBJECT(desc)) == vnum) {
 				found = TRUE;
-				GET_OBJ_COMPONENT(GET_OLC_OBJECT(desc)) = NOTHING;
+				GET_OLC_OBJECT(desc)->proto_data->component = NOTHING;
 				msg_to_char(desc->character, "The generic component used by the object you're editing was deleted.\r\n");
 			}
 		}
