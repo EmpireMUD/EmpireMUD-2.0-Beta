@@ -3167,7 +3167,7 @@ SHOW(show_skills) {
 		msg_to_char(ch, "%s\r\n", (found ? "" : "none"));
 	}
 	
-	msg_to_char(ch, "&yClass&0: &g");
+	msg_to_char(ch, "&ySynergy&0: &g");
 	found = FALSE;
 	HASH_ITER(hh, GET_ABILITY_HASH(vict), plab, next_plab) {
 		abil = plab->ptr;
