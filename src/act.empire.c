@@ -5888,6 +5888,7 @@ ACMD(do_progress) {
 	if (*argument && imm_access) {
 		ptr = any_one_word(argument, arg);
 		if ((emp = get_empire_by_name(arg))) {
+			msg_to_char(ch, "(Progress for %s)\r\n", EMPIRE_NAME(emp));
 			// WAS an empire
 			argument = ptr;
 		}
