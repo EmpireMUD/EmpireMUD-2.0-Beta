@@ -1164,7 +1164,7 @@ void do_instance_info(char_data *ch, char *argument) {
 			if (INST_MOB_COUNTS(inst)) {
 				msg_to_char(ch, "Mob counts:\r\n");
 				HASH_ITER(hh, INST_MOB_COUNTS(inst), mc, next_mc) {
-					msg_to_char(ch, "%3d %s\r\n", mc->count, skip_filler(get_mob_name_by_proto(mc->vnum)));
+					msg_to_char(ch, "%3d %s\r\n", mc->count, skip_filler(get_mob_name_by_proto(mc->vnum, FALSE)));
 				}
 			}
 			
@@ -4685,11 +4685,11 @@ void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list) {
 		if (spawn->flags) {
 			sprintbit(spawn->flags, spawn_flags_short, flg, TRUE);
 			flg[strlen(flg) - 1] = '\0';	// removes the trailing space
-			sprintf(entry, " %s (%d) %.2f%% %s", skip_filler(get_mob_name_by_proto(spawn->vnum)), spawn->vnum, spawn->percent, flg);
+			sprintf(entry, " %s (%d) %.2f%% %s", skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent, flg);
 		}
 		else {
 			// no flags
-			sprintf(entry, " %s (%d) %.2f%%", skip_filler(get_mob_name_by_proto(spawn->vnum)), spawn->vnum, spawn->percent);
+			sprintf(entry, " %s (%d) %.2f%%", skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent);
 		}
 		
 		if (*line || *output) {
@@ -4841,7 +4841,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	
 	// artisan?
 	if (GET_BLD_ARTISAN(bdg) != NOTHING) {
-		sprintf(buf, ", Artisan: &g%d&0 &c%s&0", GET_BLD_ARTISAN(bdg), get_mob_name_by_proto(GET_BLD_ARTISAN(bdg)));
+		sprintf(buf, ", Artisan: &g%d&0 &c%s&0", GET_BLD_ARTISAN(bdg), get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE));
 	}
 	else {
 		*buf = '\0';
@@ -5646,7 +5646,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			msg_to_char(ch, "Corpse of: ");
 
 			if (IS_NPC_CORPSE(j)) {
-				msg_to_char(ch, "%s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j)));
+				msg_to_char(ch, "%s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(j), FALSE));
 			}
 			else if (IS_PC_CORPSE(j)) {
 				msg_to_char(ch, "%s\r\n", (index = find_player_index_by_idnum(GET_CORPSE_PC_ID(j))) ? index->fullname : "a player");
@@ -5729,7 +5729,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			break;
 		}
 		case ITEM_MINIPET: {
-			msg_to_char(ch, "Mini-pet: [%d] %s\r\n", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j)));
+			msg_to_char(ch, "Mini-pet: [%d] %s\r\n", GET_MINIPET_VNUM(j), get_mob_name_by_proto(GET_MINIPET_VNUM(j), FALSE));
 			break;
 		}
 		default:

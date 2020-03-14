@@ -1669,7 +1669,7 @@ void mortlog(const char *str, ...) __attribute__((format(printf, 1, 2)));
 void syslog(bitvector_t type, int level, bool file, const char *str, ...) __attribute__((format(printf, 4, 5)));
 
 // mobile functions from utils.c
-extern char *get_mob_name_by_proto(mob_vnum vnum);
+extern char *get_mob_name_by_proto(mob_vnum vnum, bool replace_placeholders);
 
 // object functions from utils.c
 extern char *get_obj_name_by_proto(obj_vnum vnum);

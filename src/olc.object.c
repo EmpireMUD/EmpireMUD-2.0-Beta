@@ -1863,7 +1863,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_CORPSE: {
-			sprintf(storage + strlen(storage), "<%scorpseof\t0> %d %s\r\n", OLC_LABEL_VAL(GET_CORPSE_NPC_VNUM(obj), 0), GET_CORPSE_NPC_VNUM(obj), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+			sprintf(storage + strlen(storage), "<%scorpseof\t0> %d %s\r\n", OLC_LABEL_VAL(GET_CORPSE_NPC_VNUM(obj), 0), GET_CORPSE_NPC_VNUM(obj), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj), FALSE));
 			sprintf(storage + strlen(storage), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(GET_CORPSE_SIZE(obj), 0), size_types[GET_CORPSE_SIZE(obj)]);
 			break;
 		}
@@ -1967,7 +1967,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_MINIPET: {
-			sprintf(storage + strlen(storage), "<%sminipet\t0> %d %s\r\n", OLC_LABEL_VAL(GET_MINIPET_VNUM(obj), NOTHING), GET_MINIPET_VNUM(obj), get_mob_name_by_proto(GET_MINIPET_VNUM(obj)));
+			sprintf(storage + strlen(storage), "<%sminipet\t0> %d %s\r\n", OLC_LABEL_VAL(GET_MINIPET_VNUM(obj), NOTHING), GET_MINIPET_VNUM(obj), get_mob_name_by_proto(GET_MINIPET_VNUM(obj), FALSE));
 			break;
 		}
 		
@@ -2580,7 +2580,7 @@ OLC_MODULE(oedit_corpseof) {
 			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
-			msg_to_char(ch, "It is now the corpse of: %s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+			msg_to_char(ch, "It is now the corpse of: %s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj), FALSE));
 		}
 		else {
 			send_config_msg(ch, "ok_string");
@@ -2745,7 +2745,7 @@ OLC_MODULE(oedit_minipet) {
 			return;
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
-			msg_to_char(ch, "It now gives the mini-pet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj)));
+			msg_to_char(ch, "It now gives the mini-pet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj), FALSE));
 		}
 		else {
 			send_config_msg(ch, "ok_string");

@@ -1171,7 +1171,7 @@ void olc_show_building(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%scitizens\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_CITIZENS(bdg), 0), GET_BLD_CITIZENS(bdg));
 	sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_MILITARY(bdg), 0), GET_BLD_MILITARY(bdg));
 	
-	sprintf(buf + strlen(buf), "<%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BLD_ARTISAN(bdg), NOTHING), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) == NOTHING ? "none" : get_mob_name_by_proto(GET_BLD_ARTISAN(bdg)));
+	sprintf(buf + strlen(buf), "<%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BLD_ARTISAN(bdg), NOTHING), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) == NOTHING ? "none" : get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE));
 	
 	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_FLAGS(bdg), NOBITS), lbuf);
@@ -1281,7 +1281,7 @@ OLC_MODULE(bedit_artisan) {
 			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
-			msg_to_char(ch, "It now has artisan: %s\r\n", get_mob_name_by_proto(GET_BLD_ARTISAN(bdg)));
+			msg_to_char(ch, "It now has artisan: %s\r\n", get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE));
 		}
 	}
 }

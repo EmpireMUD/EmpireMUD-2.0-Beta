@@ -485,7 +485,7 @@ void olc_show_global(char_data *ch) {
 				count = 0;
 				LL_FOREACH(GET_GLOBAL_SPAWNS(glb), spawn) {
 					sprintbit(spawn->flags, spawn_flags, lbuf, TRUE);
-					sprintf(buf + strlen(buf), " %d. %s (%d) %.2f%% %s\r\n", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum)), spawn->vnum, spawn->percent, lbuf);
+					sprintf(buf + strlen(buf), " %d. %s (%d) %.2f%% %s\r\n", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent, lbuf);
 				}
 			}
 			break;

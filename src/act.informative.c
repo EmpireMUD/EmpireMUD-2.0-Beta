@@ -1001,7 +1001,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		act("...$e is flying with gossamer mana wings!", FALSE, i, 0, ch, TO_VICT);
 	}
 	if (IS_RIDING(i)) {
-		sprintf(buf, "...$E is %s upon %s.", (MOUNT_FLAGGED(i, MOUNT_FLYING) ? "flying" : "mounted"), get_mob_name_by_proto(GET_MOUNT_VNUM(i)));
+		sprintf(buf, "...$E is %s upon %s.", (MOUNT_FLAGGED(i, MOUNT_FLYING) ? "flying" : "mounted"), get_mob_name_by_proto(GET_MOUNT_VNUM(i), TRUE));
 		act(buf, FALSE, ch, 0, i, TO_CHAR);
 	}
 	if (GET_LED_BY(i)) {
@@ -2066,10 +2066,10 @@ ACMD(do_affects) {
 	
 	// mount
 	if (IS_RIDING(ch)) {
-		msg_to_char(ch, "   You are riding %s.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
+		msg_to_char(ch, "   You are riding %s.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
 	else if (has_player_tech(ch, PTECH_RIDING) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
-		msg_to_char(ch, "   You have %s. Type 'mount' to ride it.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
+		msg_to_char(ch, "   You have %s. Type 'mount' to ride it.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
 
 	/* Morph */

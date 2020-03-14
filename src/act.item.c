@@ -515,7 +515,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			msg_to_char(ch, "Corpse of ");
 
 			if (mob_proto(GET_CORPSE_NPC_VNUM(obj))) {
-				strcpy(lbuf, get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+				strcpy(lbuf, get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj), FALSE));
 				if (strstr(lbuf, "#n") || strstr(lbuf, "#a") || strstr(lbuf, "#e")) {
 					// #n
 					temp = str_replace("#n", "somebody", lbuf);
@@ -593,7 +593,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			break;
 		}
 		case ITEM_MINIPET: {
-			msg_to_char(ch, "Grants mini-pet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj)));
+			msg_to_char(ch, "Grants mini-pet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj), TRUE));
 			break;
 		}
 	}

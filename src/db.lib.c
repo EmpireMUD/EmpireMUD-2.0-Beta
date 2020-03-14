@@ -4460,7 +4460,7 @@ void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
 			fprintf(fl, " %c", interact->exclusion_code);
 		}
 		
-		fprintf(fl, "  # %s: %s\n", interact_types[interact->type], (interact_vnum_types[interact->type] == TYPE_MOB) ? get_mob_name_by_proto(interact->vnum) : get_obj_name_by_proto(interact->vnum));
+		fprintf(fl, "  # %s: %s\n", interact_types[interact->type], (interact_vnum_types[interact->type] == TYPE_MOB) ? get_mob_name_by_proto(interact->vnum, FALSE) : get_obj_name_by_proto(interact->vnum));
 		
 		// restrictions?
 		LL_FOREACH(interact->restrictions, res) {

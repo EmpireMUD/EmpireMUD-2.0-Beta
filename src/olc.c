@@ -4166,7 +4166,7 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 	
 	for (interact = list; interact; interact = interact->next) {
 		if (interact_vnum_types[interact->type] == TYPE_MOB) {
-			strcpy(lbuf, skip_filler(get_mob_name_by_proto(interact->vnum)));
+			strcpy(lbuf, skip_filler(get_mob_name_by_proto(interact->vnum, FALSE)));
 		}
 		else {
 			strcpy(lbuf, skip_filler(get_obj_name_by_proto(interact->vnum)));
@@ -4442,23 +4442,23 @@ bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch) {
 			problem = TRUE;
 		}
 		if (IS_SET(iter->flags, SPAWN_NOCTURNAL) && IS_SET(iter->flags, SPAWN_DIURNAL)) {
-			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum, FALSE));
 			problem = TRUE;
 		}
 		if (IS_SET(iter->flags, SPAWN_CLAIMED) && IS_SET(iter->flags, SPAWN_UNCLAIMED)) {
-			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum, FALSE));
 			problem = TRUE;
 		}
 		if (IS_SET(iter->flags, SPAWN_CITY) && IS_SET(iter->flags, SPAWN_OUT_OF_CITY)) {
-			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum, FALSE));
 			problem = TRUE;
 		}
 		if (IS_SET(iter->flags, SPAWN_NORTHERN) && IS_SET(iter->flags, SPAWN_SOUTHERN)) {
-			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum, FALSE));
 			problem = TRUE;
 		}
 		if (IS_SET(iter->flags, SPAWN_EASTERN) && IS_SET(iter->flags, SPAWN_WESTERN)) {
-			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum));
+			olc_audit_msg(ch, vnum, "Spawn for mob %d (%s) has conflicting flags", iter->vnum, get_mob_name_by_proto(iter->vnum, FALSE));
 			problem = TRUE;
 		}
 	}
@@ -6675,7 +6675,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove %s: %dx %s %.2f%%\r\n", interact_types[interact->type], interact->quantity, (interact_vnum_types[interact->type] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(interact->vnum)) : skip_filler(get_obj_name_by_proto(interact->vnum))), interact->percent);
+					msg_to_char(ch, "You remove %s: %dx %s %.2f%%\r\n", interact_types[interact->type], interact->quantity, (interact_vnum_types[interact->type] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(interact->vnum, FALSE)) : skip_filler(get_obj_name_by_proto(interact->vnum))), interact->percent);
 					REMOVE_FROM_LIST(interact, *list, next);
 					free(interact);
 				}
@@ -6810,7 +6810,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			}
 
 			sort_interactions(list);
-			msg_to_char(ch, "You add %s: %dx %s %.2f%%", interact_types[loc], num, (interact_vnum_types[loc] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(vnum)) : skip_filler(get_obj_name_by_proto(vnum))), prc);
+			msg_to_char(ch, "You add %s: %dx %s %.2f%%", interact_types[loc], num, (interact_vnum_types[loc] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(vnum, FALSE)) : skip_filler(get_obj_name_by_proto(vnum))), prc);
 			if (exc) {
 				msg_to_char(ch, " (%c)", exc);
 			}
@@ -6876,7 +6876,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			}
 			else {
 				change->vnum = vnum;
-				msg_to_char(ch, "Interaction %d vnum changed to [%d] %s.\r\n", atoi(arg2), vnum, (interact_vnum_types[change->type] == TYPE_MOB) ? get_mob_name_by_proto(vnum) : get_obj_name_by_proto(vnum));
+				msg_to_char(ch, "Interaction %d vnum changed to [%d] %s.\r\n", atoi(arg2), vnum, (interact_vnum_types[change->type] == TYPE_MOB) ? get_mob_name_by_proto(vnum, FALSE) : get_obj_name_by_proto(vnum));
 			}
 		}
 		else if (is_abbrev(arg3, "percent")) {
@@ -7436,7 +7436,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 			}
 			else {
 				change->vnum = vnum;
-				msg_to_char(ch, "Spawn %d changed to vnum %d (%s).\r\n", atoi(num_arg), vnum, get_mob_name_by_proto(vnum));
+				msg_to_char(ch, "Spawn %d changed to vnum %d (%s).\r\n", atoi(num_arg), vnum, get_mob_name_by_proto(vnum, FALSE));
 			}
 		}
 		else if (is_abbrev(type_arg, "percent")) {
@@ -7478,7 +7478,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove the spawn info for %s.\r\n", get_mob_name_by_proto(spawn->vnum));
+					msg_to_char(ch, "You remove the spawn info for %s.\r\n", get_mob_name_by_proto(spawn->vnum, FALSE));
 					
 					REMOVE_FROM_LIST(spawn, *list, next);
 					free(spawn);
@@ -7535,7 +7535,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 			}
 			
 			sprintbit(spawn->flags, spawn_flags, buf1, TRUE);
-			msg_to_char(ch, "You add spawn for %s (%d) at %.2f%% with flags: %s\r\n", get_mob_name_by_proto(vnum), vnum, prc, buf1);
+			msg_to_char(ch, "You add spawn for %s (%d) at %.2f%% with flags: %s\r\n", get_mob_name_by_proto(vnum, FALSE), vnum, prc, buf1);
 		}
 	}
 	else if (is_abbrev(arg1, "list")) {
@@ -7543,7 +7543,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 		*buf = '\0';
 		for (spawn = *list; spawn; spawn = spawn->next) {
 			sprintbit(spawn->flags, spawn_flags, buf1, TRUE);
-			sprintf(buf + strlen(buf), " %d. %s (%d) %.2f%% %s\r\n", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum)), spawn->vnum, spawn->percent, buf1);
+			sprintf(buf + strlen(buf), " %d. %s (%d) %.2f%% %s\r\n", ++count, skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)), spawn->vnum, spawn->percent, buf1);
 		}
 		
 		page_string(ch->desc, buf, TRUE);

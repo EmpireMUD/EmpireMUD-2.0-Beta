@@ -807,7 +807,7 @@ char *quest_giver_string(struct quest_giver *giver, bool show_vnums) {
 			break;
 		}
 		case QG_MOBILE: {
-			snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_mob_name_by_proto(giver->vnum)));
+			snprintf(output, sizeof(output), "%s%s", vnum, skip_filler(get_mob_name_by_proto(giver->vnum, FALSE)));
 			break;
 		}
 		case QG_OBJECT: {
