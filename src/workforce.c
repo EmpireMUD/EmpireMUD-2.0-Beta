@@ -1510,7 +1510,7 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 					remove_like_item_from_built_with(&GET_BUILT_WITH(room), obj_proto(res->vnum));
 				}
 				
-				add_to_resource_list(&GET_BUILT_WITH(room), RES_OBJECT, res->vnum, 1, 0);
+				add_to_resource_list(&GET_BUILT_WITH(room), RES_OBJECT, res->vnum, 1, 1);
 				charge_stored_resource(emp, islid, res->vnum, 1);
 			}
 			else if (res->type == RES_COMPONENT) {
