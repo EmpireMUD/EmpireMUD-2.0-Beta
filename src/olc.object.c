@@ -48,6 +48,7 @@ extern const char *size_types[];
 extern const char *storage_bits[];
 extern const char *tool_flags[];
 extern const char *wear_bits[];
+extern struct world_storage *world_storage_list;
 
 // external funcs
 extern double get_base_dps(obj_data *weapon);
@@ -472,6 +473,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	struct trading_post_data *tpd, *next_tpd;
 	struct archetype_gear *gear, *next_gear;
 	obj_data *proto, *obj_iter, *next_obj;
+	struct world_storage *wst, *next_wst;
 	struct global_data *glb, *next_glb;
 	struct empire_production_total *egt;
 	archetype_data *arch, *next_arch;
@@ -494,6 +496,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
 	descriptor_data *desc;
+	struct map_data *map;
 	bool found, any_trades = FALSE;
 	
 	if (!(proto = obj_proto(vnum))) {
@@ -527,7 +530,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
-	// remove from live resource lists: room resources
+	// remove from live resource lists and world-storage
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (!COMPLEX_DATA(room)) {
 			continue;
@@ -547,6 +550,24 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				else {
 					complete_building(room);
 				}
+			}
+		}
+		LL_FOREACH_SAFE(GET_WORLD_STORAGE(room), wst, next_wst) {
+			if (wst->vnum == vnum) {
+				LL_DELETE(GET_WORLD_STORAGE(room), wst);
+				LL_DELETE2(world_storage_list, wst, next_global);
+				free(wst);
+			}
+		}
+	}
+	
+	// remove from world storage
+	LL_FOREACH(land_map, map) {
+		LL_FOREACH_SAFE(map->shared->storage, wst, next_wst) {
+			if (wst->vnum == vnum) {
+				LL_DELETE(map->shared->storage, wst);
+				LL_DELETE2(world_storage_list, wst, next_global);
+				free(wst);
 			}
 		}
 	}

@@ -5611,6 +5611,7 @@ void remove_room_from_world_tables(room_data *room) {
 * @param room_vnum vnum The vnum to read in.
 */
 void parse_room(FILE *fl, room_vnum vnum) {
+	extern struct world_storage *add_to_world_storage(struct world_storage **list, obj_vnum vnum, int amount, int level, int timer);
 	void add_trd_home_room(room_vnum vnum, room_vnum home_room);
 	void add_trd_owner(room_vnum vnum, empire_vnum owner);
 
@@ -5905,6 +5906,16 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				dep->next = ROOM_DEPLETION(room);
 				ROOM_DEPLETION(room) = dep;
 				
+				break;
+			}
+			
+			case 'V': {	// world-storage
+				if (sscanf(line, "V %d %d %d %d", &t[0], &t[1], &t[2], &t[3]) != 4) {
+					log("SYSERR: Unable to read world-storage line V of room #%d", vnum);
+					exit(1);
+				}
+				
+				add_to_world_storage(&GET_WORLD_STORAGE(room), t[0], t[1], t[2], t[3]);
 				break;
 			}
 			
@@ -9128,8 +9139,11 @@ void free_complex_data(struct complex_room_data *data) {
 * @param struct shared_room_data *data The data to free.
 */
 void free_shared_room_data(struct shared_room_data *data) {
+	extern struct world_storage *world_storage_list;
+	
 	struct room_extra_data *room_ex, *next_room_ex;
 	struct stored_event *ev, *next_ev;
+	struct world_storage *store;
 	struct depletion_data *dep;
 	struct track_data *track;
 	
@@ -9154,6 +9168,11 @@ void free_shared_room_data(struct shared_room_data *data) {
 	while ((track = data->tracks)) {
 		data->tracks = track->next;
 		free(track);
+	}
+	while ((store = data->storage)) {
+		data->storage = store->next;
+		LL_DELETE2(world_storage_list, store, next_global);
+		free(store);
 	}
 	
 	HASH_ITER(hh, data->events, ev, next_ev) {
@@ -9451,6 +9470,7 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	char temp[MAX_STRING_LENGTH];
 	struct depletion_data *dep;
 	struct track_data *track, *next_track;
+	struct world_storage *store;
 	time_t now = time(0);
 	
 	// E affects
@@ -9473,6 +9493,11 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	// N name
 	if (dat->name) {
 		fprintf(fl, "N\n%s~\n", dat->name);
+	}
+	
+	// V world storage
+	LL_FOREACH(dat->storage, store) {
+		fprintf(fl, "V %d %d %d %d\n", store->vnum, store->amount, store->level, store->timer);
 	}
 	
 	// X depletion

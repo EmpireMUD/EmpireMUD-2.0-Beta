@@ -2697,6 +2697,19 @@ struct ban_list_element {
 };
 
 
+// for character size, search SIZE_x
+struct character_size_data {
+	int max_blood;	// how much blood the mob has
+	bitvector_t corpse_flags;	// large or not
+	bool can_take_corpse;	// corpse is no-take if false
+	bool show_on_map;	// show (oo)/name on map at range
+	char *corpse_keywords;	// additional keywords on the corpse
+	char *corpse_long_desc;	// custom long desc with %s for the "corpse of"
+	char *body_long_desc;	// custom long desc with %s for "the body of"
+	char *show_on_look;	// if not null, shows when you look at a person of this size
+};
+
+
 // data storage for config system
 union config_data_union {
 	bitvector_t bitvector_val;
@@ -5493,6 +5506,7 @@ struct shared_room_data {
 	struct depletion_data *depletion;	// resource depletion
 	struct room_extra_data *extra_data;	// hash of misc storage
 	struct track_data *tracks;	// for tracking
+	struct world_storage *storage;	// world-storage items (not stored to empire)
 	
 	// events
 	struct stored_event *events;	// hash table (by type) of stored events
@@ -5594,14 +5608,13 @@ struct map_data {
 };
 
 
-// for character size, search SIZE_x
-struct character_size_data {
-	int max_blood;	// how much blood the mob has
-	bitvector_t corpse_flags;	// large or not
-	bool can_take_corpse;	// corpse is no-take if false
-	bool show_on_map;	// show (oo)/name on map at range
-	char *corpse_keywords;	// additional keywords on the corpse
-	char *corpse_long_desc;	// custom long desc with %s for the "corpse of"
-	char *body_long_desc;	// custom long desc with %s for "the body of"
-	char *show_on_look;	// if not null, shows when you look at a person of this size
+// for items stored to the world (rather than to an empire)
+struct world_storage {
+	any_vnum vnum;	// object stored
+	int amount;	// how many
+	int level;	// what level they are
+	int timer;	// decay timer, if any
+	
+	struct world_storage *next;	// linked list on shared data
+	struct world_storage *next_global;	// globally linked list for updating
 };

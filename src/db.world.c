@@ -3834,6 +3834,8 @@ void build_world_map(void) {
 * run after sectors are loaded, and before the .wld files are read in.
 */
 void load_world_map_from_file(void) {
+	extern struct world_storage *add_to_world_storage(struct world_storage **list, obj_vnum vnum, int amount, int level, int timer);
+	
 	char line[256], line2[256], error_buf[MAX_STRING_LENGTH];
 	struct map_data *map, *last = NULL;
 	struct depletion_data *dep;
@@ -3947,6 +3949,15 @@ void load_world_map_from_file(void) {
 						free(last->shared->name);
 					}
 					last->shared->name = fread_string(fl, error_buf);
+					break;
+				}
+				case 'V': {	// world-storage
+					if (sscanf(line, "V %d %d %d %d", &var[0], &var[1], &var[2], &var[3]) != 4) {
+						log("SYSERR: Unable to read world-storage line V of map tile #%d", last->vnum);
+						exit(1);
+					}
+					
+					add_to_world_storage(&last->shared->storage, var[0], var[1], var[2], var[3]);
 					break;
 				}
 				case 'X': {	// resource depletion

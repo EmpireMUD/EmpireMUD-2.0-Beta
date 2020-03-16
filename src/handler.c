@@ -1488,6 +1488,7 @@ void char_to_room(char_data *ch, room_data *room) {
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	extern int lock_instance_level(room_data *room, int level);
 	void spawn_mobs_from_center(room_data *center);
+	void unpack_world_storage(room_data *room);
 	
 	int pos;
 	obj_data *obj;
@@ -1531,6 +1532,9 @@ void char_to_room(char_data *ch, room_data *room) {
 		if (!IS_NPC(ch)) {
 			spawn_mobs_from_center(IN_ROOM(ch));
 		}
+		
+		// dump any world-storage items back into the room
+		unpack_world_storage(room);
 		
 		// look for an instance to lock
 		if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(room) && (inst || (inst = find_instance_by_room(room, FALSE, TRUE)))) {

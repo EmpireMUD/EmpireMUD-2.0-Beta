@@ -247,6 +247,7 @@ struct map_data *land_map = NULL;	// linked list of non-ocean
 int size_of_world = 1;	// used by the instancer to adjust instance counts
 struct shared_room_data ocean_shared_data;	// for BASIC_OCEAN tiles
 bool world_map_needs_save = TRUE;	// always do at least 1 save
+struct world_storage *world_storage_list = NULL;	// global linked list of world_storage (LL: next_global)
 
 
 // DB_BOOT_x
@@ -473,6 +474,7 @@ void boot_world(void) {
 	void check_for_bad_sectors();
 	void check_newbie_islands();
 	void check_triggers();
+	void check_world_storage();
 	void clean_empire_logs();
 	void compute_generic_relations();
 	void index_boot_world();
@@ -626,6 +628,7 @@ void boot_world(void) {
 	read_ability_requirements();
 	check_triggers();
 	compute_generic_relations();
+	check_world_storage();
 	
 	log("Sorting data.");
 	HASH_SRT(sorted_hh, sorted_abilities, sort_abilities_by_data);

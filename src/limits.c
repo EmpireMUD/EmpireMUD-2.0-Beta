@@ -1448,6 +1448,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 * @return bool TRUE if the item is still in the world, FALSE if it was extracted
 */
 bool check_autostore(obj_data *obj, bool force) {
+	extern struct world_storage *add_to_world_storage(struct world_storage **list, obj_vnum vnum, int amount, int level, int timer);
 	extern int get_main_island(empire_data *emp);
 	
 	empire_data *emp = NULL;
@@ -1537,7 +1538,7 @@ bool check_autostore(obj_data *obj, bool force) {
 	// OK GO:
 	empty_obj_before_extract(obj);
 	
-	if (emp) {					
+	if (emp) {	// empire storage
 		if (IS_COINS(obj)) {
 			increase_empire_coins(emp, real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj));
 		}
@@ -1556,6 +1557,11 @@ bool check_autostore(obj_data *obj, bool force) {
 			if (islid != NO_ISLAND) {	// MUST be not-nowhere to autostore
 				add_to_empire_storage(emp, islid, GET_OBJ_VNUM(obj), 1);
 			}
+		}
+	}
+	else {	// no empire -- attempt to world-store it
+		if (!OBJ_FLAGGED(obj, OBJ_JUNK | OBJ_UNCOLLECTED_LOOT) && !OBJ_BOUND_TO(obj) && SHARED_DATA(real_loc) != &ocean_shared_data) {
+			add_to_world_storage(&GET_WORLD_STORAGE(real_loc), GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj), GET_OBJ_TIMER(obj));
 		}
 	}
 	
@@ -2188,11 +2194,14 @@ int move_gain(char_data *ch, bool info_only) {
 * update for that tick, to avoid iterating a second time over the same data.
 */
 void point_update(bool run_real) {
+	extern struct world_storage *world_storage_list;
+	
 	void clean_offers(char_data *ch);
 	void setup_daily_quest_cycles(int only_cycle);
 	void update_players_online_stats();
 	
 	vehicle_data *veh, *next_veh;
+	struct world_storage *store;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
 	
@@ -2246,6 +2255,17 @@ void point_update(bool run_real) {
 		
 		real_update_obj(obj);
 		point_update_obj(obj);
+	}
+	
+	// world storage timers
+	LL_FOREACH2(world_storage_list, store, next_global) {
+		if (store->timer > 0) {	// only if the timer is positive
+			--store->timer;
+			if (store->timer == 0) {
+				// when timer runs out, clear the amount -- we can't really delete the entry here because we don't know what room it's in
+				store->amount = 0;
+			}
+		}
 	}
 }
 
