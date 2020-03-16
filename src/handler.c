@@ -1534,7 +1534,9 @@ void char_to_room(char_data *ch, room_data *room) {
 		}
 		
 		// dump any world-storage items back into the room
-		unpack_world_storage(room);
+		if (!IS_NPC(ch)) {
+			unpack_world_storage(room);
+		}
 		
 		// look for an instance to lock
 		if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(room) && (inst || (inst = find_instance_by_room(room, FALSE, TRUE)))) {

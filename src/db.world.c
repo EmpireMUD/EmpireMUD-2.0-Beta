@@ -1264,6 +1264,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 * This runs once a mud year to update the world.
 */
 void annual_world_update(void) {
+	extern struct world_storage *world_storage_list;
 	void check_ruined_cities();
 	
 	char message[MAX_STRING_LENGTH];
