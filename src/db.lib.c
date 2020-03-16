@@ -9495,9 +9495,11 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 		fprintf(fl, "N\n%s~\n", dat->name);
 	}
 	
-	// V world storage
+	// V world storage (skips items with 0 stored, as these have expired)
 	LL_FOREACH(dat->storage, store) {
-		fprintf(fl, "V %d %d %d %d\n", store->vnum, store->amount, store->level, store->timer);
+		if (store->amount > 0) {
+			fprintf(fl, "V %d %d %d %d\n", store->vnum, store->amount, store->level, store->timer);
+		}
 	}
 	
 	// X depletion
