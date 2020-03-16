@@ -1268,6 +1268,7 @@ void annual_world_update(void) {
 	
 	char message[MAX_STRING_LENGTH];
 	vehicle_data *veh, *next_veh;
+	struct world_storage *store;
 	descriptor_data *d;
 	room_data *room, *next_room;
 	struct map_data *tile;
@@ -1313,6 +1314,11 @@ void annual_world_update(void) {
 	
 	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		annual_update_vehicle(veh);
+	}
+	
+	// reduce all world storage items by 10%
+	LL_FOREACH2(world_storage_list, store, next_global) {
+		store->amount *= 0.9;
 	}
 	
 	// crumble cities that lost their buildings

@@ -170,8 +170,8 @@ inventory (if possible). If items can't be stored, they remain on the ground
 be cleaned up and removed despite being on claimed land. Items which are
 enchanted or superior cannot be stored.
 
-If the land is not claimed, animals and stray humans make off with the items,
-never to be seen again.
+If the land is not claimed, animals and stray humans may make off with the
+items, never to be seen again. This happens gradually for most items.
 
 Items which can't be picked up, like signs, are not normally affected by this
 system. However, items left inside of vehicles will be stored or cleaned up.
