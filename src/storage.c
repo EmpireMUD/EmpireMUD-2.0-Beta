@@ -69,7 +69,7 @@ struct world_storage *add_to_world_storage(struct world_storage **list, obj_vnum
 	// if we didn't find it, create it
 	CREATE(store, struct world_storage, 1);
 	store->vnum = vnum;
-	store->amount = 1;
+	store->amount = amount;
 	store->level = level;
 	store->timer = timer;
 	LL_PREPEND(*list, store);
