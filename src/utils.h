@@ -1552,6 +1552,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VEH_SHORT_DESC(veh)  ((veh)->short_desc)
 #define VEH_SITTING_ON(veh)  ((veh)->sitting_on)
 #define VEH_VNUM(veh)  ((veh)->vnum)
+#define VEH_WORLD_STORAGE(veh)  ((veh)->world_storage)
 
 // attribute (non-instanced) data
 #define VEH_ANIMALS_REQUIRED(veh)  ((veh)->attributes->animals_required)

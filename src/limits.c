@@ -1561,7 +1561,7 @@ bool check_autostore(obj_data *obj, bool force) {
 	}
 	else {	// no empire -- attempt to world-store it
 		if (!OBJ_FLAGGED(obj, OBJ_JUNK | OBJ_UNCOLLECTED_LOOT) && !OBJ_BOUND_TO(obj) && SHARED_DATA(real_loc) != &ocean_shared_data) {
-			add_to_world_storage(&GET_WORLD_STORAGE(real_loc), GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj), GET_OBJ_TIMER(obj));
+			add_to_world_storage(in_veh ? &VEH_WORLD_STORAGE(in_veh) : &GET_WORLD_STORAGE(real_loc), GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj), GET_OBJ_TIMER(obj));
 		}
 	}
 	

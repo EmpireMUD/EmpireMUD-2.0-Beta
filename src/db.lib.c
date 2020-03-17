@@ -9466,11 +9466,12 @@ void write_requirements_to_file(FILE *fl, char letter, struct req_data *list) {
 * @param struct shared_room_data *dat The shared data to write.
 */
 void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
+	void write_world_storage(char *header, FILE *fl, struct world_storage *list);
+	
 	struct room_extra_data *red, *next_red;
 	char temp[MAX_STRING_LENGTH];
 	struct depletion_data *dep;
 	struct track_data *track, *next_track;
-	struct world_storage *store;
 	time_t now = time(0);
 	
 	// E affects
@@ -9495,12 +9496,8 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 		fprintf(fl, "N\n%s~\n", dat->name);
 	}
 	
-	// V world storage (skips items with 0 stored, as these have expired)
-	LL_FOREACH(dat->storage, store) {
-		if (store->amount > 0) {
-			fprintf(fl, "V %d %d %d %d\n", store->vnum, store->amount, store->level, store->timer);
-		}
-	}
+	// V world storage
+	write_world_storage("V", fl, dat->storage);
 	
 	// X depletion
 	LL_FOREACH(dat->depletion, dep) {
@@ -9523,3 +9520,4 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 		fprintf(fl, "Z\n%d %d\n", red->type, red->value);
 	}
 }
+

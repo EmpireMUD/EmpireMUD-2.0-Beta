@@ -988,6 +988,7 @@ int sort_vehicles(vehicle_data *a, vehicle_data *b) {
 */
 void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	void Crash_save(obj_data *obj, FILE *fp, int location);
+	void write_world_storage(char *header, FILE *fl, struct world_storage *list);
 	
 	struct vehicle_attached_mob *vam;
 	char temp[MAX_STRING_LENGTH];
@@ -1056,6 +1057,7 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 		// arg order is backwards-compatible to pre-2.0b3.17
 		fprintf(fl, "Needs-res: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
 	}
+	write_world_storage("Storage:", fl, VEH_WORLD_STORAGE(veh));
 	
 	// scripts
 	if (SCRIPT(veh)) {
@@ -1086,6 +1088,7 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 * @return vehicle_data* The loaded vehicle, if possible.
 */
 vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
+	extern struct world_storage *add_to_world_storage(struct world_storage **list, obj_vnum vnum, int amount, int level, int timer);
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH];
@@ -1376,6 +1379,11 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					}
 					VEH_SHORT_DESC(veh) = fread_string(fl, error);
 				}
+				else if (OBJ_FILE_TAG(line, "Storage:", length)) {
+					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) == 4) {
+						add_to_world_storage(&VEH_WORLD_STORAGE(veh), i_in[0], i_in[1], i_in[2], i_in[3]);
+					}
+				}
 				break;
 			}
 			case 'T': {
@@ -1495,8 +1503,11 @@ void clear_vehicle(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle data to free.
 */
 void free_vehicle(vehicle_data *veh) {
+	extern struct world_storage *world_storage_list;
+	
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
 	struct vehicle_attached_mob *vam;
+	struct world_storage *store;
 	struct spawn_info *spawn;
 	
 	// strings
@@ -1523,6 +1534,11 @@ void free_vehicle(vehicle_data *veh) {
 	while ((vam = VEH_ANIMALS(veh))) {
 		VEH_ANIMALS(veh) = vam->next;
 		free(vam);
+	}
+	while ((store = VEH_WORLD_STORAGE(veh))) {
+		VEH_WORLD_STORAGE(veh) = store->next;
+		LL_DELETE2(world_storage_list, store, next_global);
+		free(store);
 	}
 	empty_vehicle(veh);
 	

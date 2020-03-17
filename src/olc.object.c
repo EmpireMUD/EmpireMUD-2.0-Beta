@@ -586,6 +586,13 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				}
 			}
 		}
+		LL_FOREACH_SAFE(VEH_WORLD_STORAGE(veh), wst, next_wst) {
+			if (wst->vnum == vnum) {
+				LL_DELETE(VEH_WORLD_STORAGE(veh), wst);
+				LL_DELETE2(world_storage_list, wst, next_global);
+				free(wst);
+			}
+		}
 	}
 	
 	// remove from empire inventories and trade -- DO THIS BEFORE REMOVING FROM OBJ TABLE

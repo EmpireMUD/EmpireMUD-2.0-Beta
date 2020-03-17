@@ -104,6 +104,7 @@ void check_world_storage_one(struct world_storage **list) {
 */
 void check_world_storage(void) {
 	struct map_data *map;
+	vehicle_data *veh;
 	room_data *room;
 	
 	LL_FOREACH(land_map, map) {
@@ -111,6 +112,9 @@ void check_world_storage(void) {
 	}
 	LL_FOREACH2(interior_room_list, room, next_interior) {
 		check_world_storage_one(&GET_WORLD_STORAGE(room));
+	}
+	LL_FOREACH(vehicle_list, veh) {
+		check_world_storage_one(&VEH_WORLD_STORAGE(veh));
 	}
 }
 
@@ -149,4 +153,60 @@ void unpack_world_storage(room_data *room) {
 	}
 	
 	// don't bother marking the world as needing a save -- it just still has them saved as world-stored
+}
+
+
+/**
+* Called when a player walks into the room to unpack world-storage items back
+* into the vehicle's contents.
+*
+* @param vehicle_data *veh The vehicle to unpack.
+*/
+void unpack_world_storage_veh(vehicle_data *veh) {
+	struct world_storage *store, *next_store;
+	obj_data *obj;
+	int iter;
+	
+	if (!veh) {
+		return;
+	}
+	
+	LL_FOREACH_SAFE(VEH_WORLD_STORAGE(veh), store, next_store) {
+		for (iter = 0; iter < store->amount; ++iter) {
+			if ((obj = read_object(store->vnum, TRUE))) {
+				scale_item_to_level(obj, store->level);
+				GET_OBJ_TIMER(obj) = store->timer;
+				obj_to_vehicle(obj, veh);
+				
+				// do NOT call the load trigger: it's not fresh-loaded
+			}
+		}
+		
+		// and clean up data
+		LL_DELETE(VEH_WORLD_STORAGE(veh), store);
+		LL_DELETE2(world_storage_list, store, next_global);
+		free(store);
+	}
+}
+
+
+/**
+* Writes world-storage data to a map/vehicle/room file.
+*
+* @param char *header The leading text, e.g. "V" for a world entry or "Storage:" for a vehicle file.
+* @param FILE *fl The file, open for writing.
+* @param struct world_storage *list The list to write.
+*/
+void write_world_storage(char *header, FILE *fl, struct world_storage *list) {
+	struct world_storage *store;
+	
+	if (!header || !fl || !list) {
+		return;	// no work
+	}
+	
+	LL_FOREACH(list, store) {
+		if (store->amount > 0) {
+			fprintf(fl, "%s %d %d %d %d\n", header, store->vnum, store->amount, store->level, store->timer);
+		}
+	}
 }

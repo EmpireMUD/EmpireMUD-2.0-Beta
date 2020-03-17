@@ -85,6 +85,7 @@ void check_delayed_load(char_data *ch);
 void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
 void scale_item_to_level(obj_data *obj, int level);
+void unpack_world_storage_veh(vehicle_data *veh);
 
 // locals
 static void add_obj_binding(int idnum, struct obj_binding **list);
@@ -1493,6 +1494,7 @@ void char_to_room(char_data *ch, room_data *room) {
 	int pos;
 	obj_data *obj;
 	struct instance_data *inst = NULL;
+	vehicle_data *veh;
 
 	if (!ch || !room) {
 		log("SYSERR: Illegal value(s) passed to char_to_room. (Room :%p, Ch: %p)", room, ch);
@@ -1536,6 +1538,14 @@ void char_to_room(char_data *ch, room_data *room) {
 		// dump any world-storage items back into the room
 		if (!IS_NPC(ch)) {
 			unpack_world_storage(room);
+			
+			if (GET_ROOM_VEHICLE(room)) {
+				unpack_world_storage_veh(GET_ROOM_VEHICLE(room));
+			}
+			
+			LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+				unpack_world_storage_veh(veh);
+			}
 		}
 		
 		// look for an instance to lock
@@ -9015,6 +9025,7 @@ void vehicle_from_room(vehicle_data *veh) {
 */
 void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	struct vehicle_room_list *vrl;
+	char_data *ch;
 	
 	if (!veh || !room) {
 		log("SYSERR: Illegal value(s) passed to vehicle_to_room. (Room %p, vehicle %p)", room, veh);
@@ -9034,7 +9045,14 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 		GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(room);
 		GET_ISLAND(vrl->room) = GET_ISLAND(room);
 		GET_MAP_LOC(vrl->room) = GET_MAP_LOC(room);
+	}
 	
+	// unpack if players present
+	LL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
+		if (!IS_NPC(ch)) {
+			unpack_world_storage_veh(veh);
+			break;	// only need 1
+		}
 	}
 }
 

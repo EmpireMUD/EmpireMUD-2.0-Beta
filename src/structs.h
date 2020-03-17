@@ -5333,6 +5333,7 @@ struct vehicle_data {
 	double health;	// current health
 	obj_data *contains;	// contains objects
 	int carrying_n;	// size of contents
+	struct world_storage *world_storage;	// items that have been flattened into world-storage
 	struct vehicle_attached_mob *animals;	// linked list of mobs attached
 	struct resource_data *needs_resources;	// resources until finished/maintained
 	room_data *interior_home_room;	// the vehicle's main room
