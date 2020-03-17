@@ -1455,6 +1455,7 @@ bool check_autostore(obj_data *obj, bool force) {
 	vehicle_data *in_veh;
 	room_data *real_loc;
 	obj_data *top_obj;
+	trig_data *trig;
 	bool store, unique, full, is_home;
 	int islid;
 	
@@ -1488,6 +1489,15 @@ bool check_autostore(obj_data *obj, bool force) {
 	}
 	if (!in_veh && (!real_loc || IS_ADVENTURE_ROOM(real_loc))) {
 		return TRUE;
+	}
+	
+	// check if it has a timer trigger and a timer (this will block autostore)
+	if (GET_OBJ_TIMER(obj) > 0 && SCRIPT(obj)) {
+		LL_FOREACH(TRIGGERS(SCRIPT(obj)), trig) {
+			if (trig->attach_type == OBJ_TRIGGER && IS_SET(GET_TRIG_TYPE(trig), OTRIG_TIMER)) {
+				return TRUE;	// only need 1 -- block autostore
+			}
+		}
 	}
 		
 	// never do it in front of players

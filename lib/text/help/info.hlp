@@ -175,7 +175,8 @@ items, never to be seen again. This happens gradually for most items.
 
 Items which can't be picked up, like signs, are not normally affected by this
 system. However, items left inside of vehicles will be stored or cleaned up.
-This also applies to personal chests, if the item is storable.
+This also applies to personal chests, if the item is storable. Items that have
+'timer triggers' won't autostore.
 
 Bound items and other non-storables are safe to keep in your home or chest.
 #
