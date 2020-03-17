@@ -1542,6 +1542,9 @@ bool check_autostore(obj_data *obj, bool force) {
 		if (IS_COINS(obj)) {
 			increase_empire_coins(emp, real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj));
 		}
+		else if (in_veh && (!real_loc || GET_ISLAND_ID(real_loc) == NO_ISLAND) && !OBJ_FLAGGED(obj, OBJ_JUNK | OBJ_UNCOLLECTED_LOOT) && !OBJ_BOUND_TO(obj)) {
+		add_to_world_storage(&VEH_WORLD_STORAGE(in_veh), GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj), GET_OBJ_TIMER(obj));	
+		}
 		else if (unique) {
 			// this extracts it itself
 			store_unique_item(NULL, obj, emp, real_loc, &full);
@@ -1560,7 +1563,7 @@ bool check_autostore(obj_data *obj, bool force) {
 		}
 	}
 	else {	// no empire -- attempt to world-store it
-		if (!OBJ_FLAGGED(obj, OBJ_JUNK | OBJ_UNCOLLECTED_LOOT) && !OBJ_BOUND_TO(obj) && SHARED_DATA(real_loc) != &ocean_shared_data) {
+		if (!OBJ_FLAGGED(obj, OBJ_JUNK | OBJ_UNCOLLECTED_LOOT) && !OBJ_BOUND_TO(obj) && (in_veh || SHARED_DATA(real_loc) != &ocean_shared_data)) {
 			add_to_world_storage(in_veh ? &VEH_WORLD_STORAGE(in_veh) : &GET_WORLD_STORAGE(real_loc), GET_OBJ_VNUM(obj), 1, GET_OBJ_CURRENT_SCALE_LEVEL(obj), GET_OBJ_TIMER(obj));
 		}
 	}
