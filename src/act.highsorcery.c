@@ -476,7 +476,7 @@ void summon_materials(char_data *ch, char *argument) {
 	empire_data *emp;
 	int cost = 2;	// * number of things to summon
 	obj_data *proto;
-	bool one, found = FALSE;
+	bool one, found = FALSE, full = FALSE;
 
 	half_chop(argument, arg1, arg2);
 	
@@ -551,6 +551,7 @@ void summon_materials(char_data *ch, char *argument) {
 					++count;	// got one
 				}
 				if (!one) {
+					full = TRUE;	// probably
 					break;	// done with this loop
 				}
 			}
@@ -558,17 +559,19 @@ void summon_materials(char_data *ch, char *argument) {
 	}
 	
 	if (found && count < total && count > 0) {
-		if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch)) {
-			msg_to_char(ch, "You managed to summon %d.\r\n", count);
+		if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch) || full) {
+			if (ch->desc) {
+				stack_msg_to_desc(ch->desc, "You managed to summon %d.\r\n", count);
+			}
 		}
-		else {
-			msg_to_char(ch, "There weren't enough, but you managed to summon %d.\r\n", count);
+		else if (ch->desc) {
+			stack_msg_to_desc(ch->desc, "There weren't enough, but you managed to summon %d.\r\n", count);
 		}
 	}
 	
 	// result messages
 	if (!found) {
-		if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch)) {
+		if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch) || full) {
 			msg_to_char(ch, "Your arms are full.\r\n");
 		}
 		else {

@@ -4063,7 +4063,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	// ammo countdown/extract (only if the ammo wasn't extracted by a script)
 	if (purge && best) {
 		if (GET_AMMO_QUANTITY(best) <= 0) {
-			run_interactions(ch, best->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, best, consumes_or_decays_interact);
+			run_interactions(ch, GET_OBJ_INTERACTIONS(best), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, best, consumes_or_decays_interact);
 			extract_obj(best);
 		}
 	}

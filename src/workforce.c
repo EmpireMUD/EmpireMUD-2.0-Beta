@@ -496,7 +496,7 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 	obj_data *proto;
 	
 	// safety
-	if (!emp || !loc || vnum == NOTHING || !(proto = obj_proto(vnum)) || !proto->storage) {
+	if (!emp || !loc || vnum == NOTHING || !(proto = obj_proto(vnum)) || !GET_OBJ_STORAGE(proto)) {
 		return FALSE;
 	}
 	
@@ -563,7 +563,7 @@ bool can_gain_chore_resource_from_interaction_list(empire_data *emp, room_data *
 		if (!(proto = obj_proto(interact->vnum))) {
 			continue;
 		}
-		if (!proto->storage) {
+		if (!GET_OBJ_STORAGE(proto)) {
 			continue;	// MUST be storable
 		}
 		if (!meets_interaction_restrictions(interact->restrictions, NULL, emp)) {
@@ -1510,7 +1510,7 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 					remove_like_item_from_built_with(&GET_BUILT_WITH(room), obj_proto(res->vnum));
 				}
 				
-				add_to_resource_list(&GET_BUILT_WITH(room), RES_OBJECT, res->vnum, 1, 0);
+				add_to_resource_list(&GET_BUILT_WITH(room), RES_OBJECT, res->vnum, 1, 1);
 				charge_stored_resource(emp, islid, res->vnum, 1);
 			}
 			else if (res->type == RES_COMPONENT) {
@@ -1738,7 +1738,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 	}
 	else {
 		LL_FOREACH(BUILDING_RESOURCES(room), res) {
-			if (res->type == RES_OBJECT && (proto = obj_proto(res->vnum)) && proto->storage) {
+			if (res->type == RES_OBJECT && (proto = obj_proto(res->vnum)) && GET_OBJ_STORAGE(proto)) {
 				can_do = TRUE;
 				break;
 			}
@@ -1752,7 +1752,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 			next_res = res->next;
 			
 			// can only remove storable obj types
-			if (res->type != RES_OBJECT || !(proto = obj_proto(res->vnum)) || !proto->storage) {
+			if (res->type != RES_OBJECT || !(proto = obj_proto(res->vnum)) || !GET_OBJ_STORAGE(proto)) {
 				continue;
 			}
 			
@@ -1866,10 +1866,10 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 		if (!(proto = store->proto)) {
 			continue;
 		}
-		if (!has_interaction(proto->interactions, interact_type)) {
+		if (!has_interaction(GET_OBJ_INTERACTIONS(proto), interact_type)) {
 			continue;
 		}
-		if (!can_gain_chore_resource_from_interaction_list(emp, room, chore, proto->interactions, interact_type, TRUE)) {
+		if (!can_gain_chore_resource_from_interaction_list(emp, room, chore, GET_OBJ_INTERACTIONS(proto), interact_type, TRUE)) {
 			any_over_limit = TRUE;
 			continue;
 		}
@@ -1887,7 +1887,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 		
 		einv_interaction_chore_type = chore;
 		
-		if (run_interactions(worker, found_proto->interactions, interact_type, room, worker, found_proto, one_einv_interaction_chore) && found_store) {
+		if (run_interactions(worker, GET_OBJ_INTERACTIONS(found_proto), interact_type, room, worker, found_proto, one_einv_interaction_chore) && found_store) {
 			charge_stored_resource(emp, islid, found_store->vnum, 1);
 		}
 		else {
@@ -1899,7 +1899,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 	}
 	else if (found_proto) {
 		if ((worker = place_chore_worker(emp, chore, room))) {
-			ewt_mark_for_interaction_list(emp, room, found_proto->interactions, interact_type);
+			ewt_mark_for_interaction_list(emp, room, GET_OBJ_INTERACTIONS(found_proto), interact_type);
 		}
 	}
 	else if (worker) {
@@ -1926,7 +1926,7 @@ INTERACTION_FUNC(one_farming_chore) {
 	obj_data *proto = obj_proto(interaction->vnum);
 	int amt;
 	
-	if (emp && proto && proto->storage && can_gain_chore_resource(emp, inter_room, CHORE_FARMING, interaction->vnum)) {
+	if (emp && proto && GET_OBJ_STORAGE(proto) && can_gain_chore_resource(emp, inter_room, CHORE_FARMING, interaction->vnum)) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum);
 		
 		amt = interaction->quantity;
@@ -2224,7 +2224,7 @@ INTERACTION_FUNC(one_mining_chore) {
 	proto = obj_proto(interaction->vnum);
 	
 	// check vars and limits
-	if (!emp || !proto || !proto->storage || !can_gain_chore_resource(emp, inter_room, CHORE_MINING, interaction->vnum)) {
+	if (!emp || !proto || !GET_OBJ_STORAGE(proto) || !can_gain_chore_resource(emp, inter_room, CHORE_MINING, interaction->vnum)) {
 		return FALSE;
 	}
 	

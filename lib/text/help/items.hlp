@@ -569,7 +569,7 @@ Note: Glass ingots are made from sand using the 'craft' command.
 
 See also: COMPONENT, SMELT, SEPARATE, IRON, COPPER, MINE
 #
-MEAT "MEAT COMPONENT" "RAW MEAT" "RAW RED MEAT" "RAW POULTRY" "RAW PORK" "RAW FISH" "RED MEAT" POULTRY PORK FISH
+MEAT "MEAT COMPONENT" "RAW MEAT" "RAW RED MEAT" "RAW POULTRY" "RAW PORK" "RAW FISH" "RED MEAT" POULTRY PORK
 
 Raw meat (component)
 
@@ -585,7 +585,7 @@ animal corpses or fishing. Common types of raw meat are:
   fat catfish, yellow perch, slab of shark meat (raw fish)
   small gator (raw meat)
 
-See also: COMPONENT, BUTCHER, COOK, FISH, COOKED MEAT
+See also: COMPONENT, BUTCHER, COOK, FISH COMMAND, COOKED MEAT
 #
 NAILS "POUCH OF NAILS" "NAIL COMPONENT" "NAILS COMPONENT"
 

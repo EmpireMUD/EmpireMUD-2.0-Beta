@@ -1747,6 +1747,7 @@ const char *empire_attributes[] = {
 	"Tty per Greatness",
 	"Workforce Cap",
 	"Bonus Territory",
+	"Default Keep",
 	"\n"
 };
 

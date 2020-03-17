@@ -2218,15 +2218,15 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				
 				// validate vnum
 				proto = obj_proto(t[0]);
-				if (proto && proto->storage) {
-					add_to_empire_storage(emp, t[2], t[0], t[1]);
+				if (proto && GET_OBJ_STORAGE(proto)) {
+					store = add_to_empire_storage(emp, t[2], t[0], t[1]);
 					
-					// check keep
-					if (t[3] && (store = find_stored_resource(emp, t[2], t[0]))) {
+					// set keep
+					if (store) {
 						store->keep = t[3];
 					}
 				}
-				else if (proto && !proto->storage) {
+				else if (proto && !GET_OBJ_STORAGE(proto)) {
 					log("- removing %dx #%d from empire storage for %s: not storable", t[1], t[0], EMPIRE_NAME(emp));
 				}
 				else {
@@ -4460,7 +4460,7 @@ void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
 			fprintf(fl, " %c", interact->exclusion_code);
 		}
 		
-		fprintf(fl, "  # %s: %s\n", interact_types[interact->type], (interact_vnum_types[interact->type] == TYPE_MOB) ? get_mob_name_by_proto(interact->vnum) : get_obj_name_by_proto(interact->vnum));
+		fprintf(fl, "  # %s: %s\n", interact_types[interact->type], (interact_vnum_types[interact->type] == TYPE_MOB) ? get_mob_name_by_proto(interact->vnum, FALSE) : get_obj_name_by_proto(interact->vnum));
 		
 		// restrictions?
 		LL_FOREACH(interact->restrictions, res) {
@@ -5063,9 +5063,47 @@ void free_obj_eq_set(struct eq_set_obj *eq_set) {
 }
 
 
+/**
+* Frees all the obj_proto_data. Normally this is only freed if the object is
+* deleted, because it's data stored on the prototype, not the instance of the
+* object.
+*
+* @param struct obj_proto_data *data The data to free.
+*/
+void free_obj_proto_data(struct obj_proto_data *data) {
+	struct obj_storage_type *store;
+	struct quest_lookup *ql;
+	struct shop_lookup *sl;
+	
+	if (!data) {
+		return;	// basic safety
+	}
+	
+	free_extra_descs(&data->ex_description);
+	free_custom_messages(data->custom_msgs);
+	free_interactions(&data->interactions);
+	
+	while ((store = data->storage)) {
+		data->storage = store->next;
+		free(store);
+	}
+	
+	while ((ql = data->quest_lookups)) {
+		data->quest_lookups = ql->next;
+		free(ql);
+	}
+	
+	while ((sl = data->shop_lookups)) {
+		data->shop_lookups = sl->next;
+		free(sl);
+	}
+	
+	free(data);
+}
+
+
 /* release memory allocated for an obj struct */
 void free_obj(obj_data *obj) {
-	struct obj_storage_type *store;
 	obj_data *proto;
 	
 	proto = obj_proto(GET_OBJ_VNUM(obj));
@@ -5082,32 +5120,20 @@ void free_obj(obj_data *obj) {
 	if (GET_OBJ_ACTION_DESC(obj) && (!proto || GET_OBJ_ACTION_DESC(obj) != GET_OBJ_ACTION_DESC(proto))) {
 		free(GET_OBJ_ACTION_DESC(obj));
 	}
-	if (obj->ex_description && (!proto || obj->ex_description != proto->ex_description)) {
-		free_extra_descs(&obj->ex_description);
+	if (obj->proto_data && (!proto || obj->proto_data != proto->proto_data)) {
+		free_obj_proto_data(obj->proto_data);
 	}
 	if (obj->proto_script && (!proto || obj->proto_script != proto->proto_script)) {
 		free_proto_scripts(&obj->proto_script);
-	}
-
-	if (obj->interactions && (!proto || obj->interactions != proto->interactions)) {
-		free_interactions(&obj->interactions);
-	}
-	if (obj->storage && (!proto || obj->storage != proto->storage)) {
-		while ((store = obj->storage)) {
-			obj->storage = store->next;
-			free(store);
-		}
-	}
-	
-	if (obj->custom_msgs && (!proto || obj->custom_msgs != proto->custom_msgs)) {
-		free_custom_messages(obj->custom_msgs);
 	}
 	
 	free_obj_binding(&OBJ_BOUND_TO(obj));
 	clear_obj_eq_sets(obj);
 	
-	// applies are ALWAYS a copy
-	free_obj_apply_list(GET_OBJ_APPLIES(obj));
+	// applies are ALWAYS a copy, but we now verify anyway
+	if (GET_OBJ_APPLIES(obj) && (!proto || GET_OBJ_APPLIES(obj) != GET_OBJ_APPLIES(proto))) {
+		free_obj_apply_list(GET_OBJ_APPLIES(obj));
+	}
 	
 	/* free any assigned scripts */
 	if (SCRIPT(obj)) {
@@ -5130,6 +5156,8 @@ void free_obj(obj_data *obj) {
 * @param int nr The vnum of the object.
 */
 void parse_object(FILE *obj_f, int nr) {
+	extern struct obj_proto_data *create_obj_proto_data();
+	
 	static char line[256];
 	int t[10], retval;
 	char *tmpptr;
@@ -5143,6 +5171,7 @@ void parse_object(FILE *obj_f, int nr) {
 	CREATE(obj, obj_data, 1);
 	clear_object(obj);
 	obj->vnum = nr;
+	obj->proto_data = create_obj_proto_data();
 
 	HASH_FIND_INT(object_table, &nr, find);
 	if (find) {
@@ -5185,10 +5214,10 @@ void parse_object(FILE *obj_f, int nr) {
 			}
 		}
 	}
-	obj->obj_flags.type_flag = t[0];
+	obj->proto_data->type_flag = t[0];
 	obj->obj_flags.extra_flags = asciiflag_conv(f1);
 	obj->obj_flags.wear_flags = asciiflag_conv(f2);
-	obj->obj_flags.tool_flags = asciiflag_conv(f3);
+	obj->proto_data->tool_flags = asciiflag_conv(f3);
 	OBJ_VERSION(obj) = t[1];
 
 	if (!get_line(obj_f, line)) {
@@ -5215,7 +5244,7 @@ void parse_object(FILE *obj_f, int nr) {
 		exit(1);
 	}
 
-	obj->obj_flags.material = t[0];
+	obj->proto_data->material = t[0];
 	obj->obj_flags.timer = t[1];
 
 	/* *** extra descriptions and affect fields *** */
@@ -5274,23 +5303,23 @@ void parse_object(FILE *obj_f, int nr) {
 					exit(1);
 				}
 				
-				GET_OBJ_MIN_SCALE_LEVEL(obj) = t[0];
-				GET_OBJ_MAX_SCALE_LEVEL(obj) = t[1];
+				obj->proto_data->min_scale_level = t[0];
+				obj->proto_data->max_scale_level = t[1];
 				break;
 			}
 
 			case 'E': {	// extra desc
-				parse_extra_desc(obj_f, &(obj->ex_description), buf2);
+				parse_extra_desc(obj_f, &(obj->proto_data->ex_description), buf2);
 				break;
 			}
 
 			case 'I': {	// interaction item
-				parse_interaction(line, &obj->interactions, buf2);
+				parse_interaction(line, &obj->proto_data->interactions, buf2);
 				break;
 			}
 						
 			case 'M': {	// custom messages
-				parse_custom_message(obj_f, &obj->custom_msgs, buf2);
+				parse_custom_message(obj_f, &obj->proto_data->custom_msgs, buf2);
 				break;
 			}
 			
@@ -5302,7 +5331,7 @@ void parse_object(FILE *obj_f, int nr) {
 					}
 					
 					// t[0] is not currently used -- future use should be 'quantity'
-					GET_OBJ_COMPONENT(obj) = t[1];
+					obj->proto_data->component = t[1];
 				}
 				else {	// v1 (two lines) -- convert
 					if (!get_line(obj_f, line) || sscanf(line, "%d %s", t, f1) != 2) {
@@ -5313,7 +5342,7 @@ void parse_object(FILE *obj_f, int nr) {
 					vn = b5_88_old_component_to_new_component(t[0], asciiflag_conv(f1));
 					if (vn != NOTHING) {
 						log("- converting component on obj [%d] %s from (%d %s) to [%d] %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), t[0], f1, vn, get_generic_name_by_vnum(vn));
-						GET_OBJ_COMPONENT(obj) = vn;
+						obj->proto_data->component = vn;
 					}
 					else {
 						log("- unable to convert component on obj [%d] %s from (%d %s)", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj), t[0], f1);
@@ -5324,7 +5353,7 @@ void parse_object(FILE *obj_f, int nr) {
 			
 			case 'Q': {	// requires quest
 				if (sscanf(line, "Q %d", &t[0]) == 1) {
-					GET_OBJ_REQUIRES_QUEST(obj) = t[0];
+					obj->proto_data->requires_quest = t[0];
 				}
 				break;
 			}
@@ -5344,7 +5373,7 @@ void parse_object(FILE *obj_f, int nr) {
 					last_store->next = store;
 				}
 				else {
-					obj->storage = store;
+					obj->proto_data->storage = store;
 				}
 				last_store = store;
 				break;
@@ -5425,13 +5454,13 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	}
 	
 	// E: extra descriptions
-	write_extra_descs_to_file(fl, obj->ex_description);
+	write_extra_descs_to_file(fl, GET_OBJ_EX_DESCS(obj));
 	
 	// I: interactions
-	write_interactions_to_file(fl, obj->interactions);
+	write_interactions_to_file(fl, GET_OBJ_INTERACTIONS(obj));
 	
 	// M: custom message
-	write_custom_messages_to_file(fl, 'M', obj->custom_msgs);
+	write_custom_messages_to_file(fl, 'M', GET_OBJ_CUSTOM_MSGS(obj));
 	
 	// O+: component data v2
 	//    prior to b5.88 this was "O\ntype flags" flags for the old component system
@@ -5446,7 +5475,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	}
 	
 	// R: storage
-	for (store = obj->storage; store; store = store->next) {
+	for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {
 		fprintf(fl, "R\n");
 		fprintf(fl, "%d %s\n", store->building_type, bitv_to_alpha(store->flags));
 	}

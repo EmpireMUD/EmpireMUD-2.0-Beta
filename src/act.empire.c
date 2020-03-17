@@ -2285,7 +2285,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 		// max coin is a safe limit here
 		msg_to_char(ch, "That limit is out of bounds.\r\n");
 	}
-	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !obj->storage)) {
+	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !GET_OBJ_STORAGE(obj))) {
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
@@ -2446,7 +2446,7 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 	if (!*argument) {
 		msg_to_char(ch, "Usage: %s analyze <item name>\r\n", trade_type[subcmd]);
 	}
-	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !obj->storage)) {
+	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !GET_OBJ_STORAGE(obj))) {
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
@@ -5917,6 +5917,7 @@ ACMD(do_progress) {
 	if (*argument && imm_access) {
 		ptr = any_one_word(argument, arg);
 		if ((emp = get_empire_by_name(arg))) {
+			msg_to_char(ch, "(Progress command for: %s)\r\n", EMPIRE_NAME(emp));
 			// WAS an empire
 			argument = ptr;
 		}
@@ -6851,7 +6852,40 @@ ACMD(do_workforce) {
 			return;
 		}
 		
-		if (!strn_cmp(argument, "all ", 4)) {
+		if (!strn_cmp(argument, "default", 7)) {
+			// special handling for: workforce keep default [amount]
+			half_chop(argument, local_arg, lim_arg);
+			
+			if (!*lim_arg) {
+				if (EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) == UNLIMITED) {
+					msg_to_char(ch, "Default 'keep' is set to: all\r\n");
+				}
+				else {
+					msg_to_char(ch, "Default 'keep' amount is set to: %d\r\n", EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP));
+				}
+			}
+			else {
+				if (!str_cmp(lim_arg, "all")) {
+					EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = UNLIMITED;
+					msg_to_char(ch, "Default 'keep' is now set to: all\r\n");
+				}
+				else if (isdigit(*lim_arg) && (limit = atoi(lim_arg)) >= 0) {
+					EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = limit;
+					msg_to_char(ch, "Default 'keep' is now set to: %d\r\n", limit);
+				}
+				else if (!str_cmp(lim_arg, "none")) {
+					EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP) = 0;
+					msg_to_char(ch, "Default 'keep' is now set to: none\r\n");
+				}
+				else {
+					msg_to_char(ch, "Invalid default 'keep' value '%s'.\r\n", lim_arg);
+				}
+			}
+			
+			EMPIRE_NEEDS_SAVE(emp) = TRUE;
+			return;	// no further work for 'default'
+		}
+		else if (!strn_cmp(argument, "all ", 4)) {
 			limit = UNLIMITED;
 			half_chop(argument, lim_arg, argument);	// strip off the "all"
 		}

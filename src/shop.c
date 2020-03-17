@@ -54,7 +54,6 @@ void get_quest_giver_display(struct quest_giver *list, char *save_buffer);
 void add_shop_lookup(struct shop_lookup **list, shop_data *shop);
 bool remove_shop_lookup(struct shop_lookup **list, shop_data *shop);
 void update_mob_shop_lookups(mob_vnum vnum);
-void update_obj_shop_lookups(obj_vnum vnum);
 void update_vehicle_shop_lookups(any_vnum vnum);
 
 
@@ -220,12 +219,11 @@ void add_or_remove_all_shop_lookups_for(shop_data *shop, bool add) {
 			case QG_OBJECT: {
 				if ((obj = obj_proto(giver->vnum))) {
 					if (add) {
-						add_shop_lookup(&GET_OBJ_SHOP_LOOKUPS(obj), shop);
+						add_shop_lookup(&obj->proto_data->shop_lookups, shop);
 					}
 					else {
-						remove_shop_lookup(&GET_OBJ_SHOP_LOOKUPS(obj), shop);
+						remove_shop_lookup(&obj->proto_data->shop_lookups, shop);
 					}
-					update_obj_shop_lookups(GET_OBJ_VNUM(obj));
 				}
 				break;
 			}
@@ -474,26 +472,6 @@ void update_mob_shop_lookups(mob_vnum vnum) {
 		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == vnum) {
 			// re-set the pointer
 			MOB_SHOP_LOOKUPS(mob) = MOB_SHOP_LOOKUPS(proto);
-		}
-	}
-}
-
-
-/**
-* Fixes shop lookup pointers on live copies of objs -- this should ALWAYS
-* point to the proto.
-*/
-void update_obj_shop_lookups(obj_vnum vnum) {
-	obj_data *proto, *obj;
-	
-	if (!(proto = obj_proto(vnum))) {
-		return;
-	}
-	
-	LL_FOREACH(object_list, obj) {
-		if (GET_OBJ_VNUM(obj) == vnum) {
-			// re-set the pointer
-			GET_OBJ_SHOP_LOOKUPS(obj) = GET_OBJ_SHOP_LOOKUPS(proto);
 		}
 	}
 }

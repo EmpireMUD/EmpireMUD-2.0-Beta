@@ -1007,8 +1007,11 @@ EmpireMUD supports the following MSDP variables:
  ROOM - The room data array, see http://tintin.sourceforge.net/msdp/index.php
  ROOM_EXITS - A table of vnums for each direction -- only indoors
  ROOM_NAME - Name of the room the character is in
- ROOM_VNUM - Virtual number of the room the character is in
+ ROOM_VNUM - Virtual number of the room the character is in - NOT SUPPORTED
  WORLD_TIME - Current time (24-hour format)
+ WORLD_DAY_OF_MONTH - Current day of the month (1-30)
+ WORLD_MONTH - Current month (January, etc)
+ WORLD_YEAR - Current year number
  WORLD_SEASON - Current season
 
  The following GUI variables are provided, for a generic GUI:

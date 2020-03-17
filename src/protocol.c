@@ -209,6 +209,9 @@ static variable_name_t VariableNameTable[eMSDP_MAX+1] = {
 	{ eMSDP_ROOM_NAME, "ROOM_NAME", STRING_READ_ONLY },
 	{ eMSDP_ROOM_VNUM, "ROOM_VNUM", NUMBER_READ_ONLY },
 	{ eMSDP_WORLD_TIME, "WORLD_TIME", NUMBER_READ_ONLY },
+	{ eMSDP_WORLD_DAY_OF_MONTH, "WORLD_DAY_OF_MONTH", NUMBER_READ_ONLY },
+	{ eMSDP_WORLD_MONTH, "WORLD_MONTH", STRING_READ_ONLY },
+	{ eMSDP_WORLD_YEAR, "WORLD_YEAR", NUMBER_READ_ONLY },
 	{ eMSDP_WORLD_SEASON, "WORLD_SEASON", STRING_READ_ONLY },
 	
 	/* Configurable variables */
@@ -2613,7 +2616,7 @@ static const char *GetMSSP_Extra_Descs() {
 		if (GET_OBJ_ACTION_DESC(obj) && *GET_OBJ_ACTION_DESC(obj)) {
 			++count;
 		}
-		for (ex = obj->ex_description; ex; ex = ex->next) {
+		for (ex = GET_OBJ_EX_DESCS(obj); ex; ex = ex->next) {
 			++count;
 		}
 	}

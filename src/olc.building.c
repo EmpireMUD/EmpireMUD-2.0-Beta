@@ -426,9 +426,9 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	
 	// obj storage
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		LL_FOREACH_SAFE(obj->storage, store, next_store) {
+		LL_FOREACH_SAFE(GET_OBJ_STORAGE(obj), store, next_store) {
 			if (store->building_type == vnum) {
-				LL_DELETE(obj->storage, store);
+				LL_DELETE(obj->proto_data->storage, store);
 				free(store);
 				save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
 			}
@@ -517,9 +517,9 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		}
 		if (GET_OLC_OBJECT(desc)) {
 			found = FALSE;
-			LL_FOREACH_SAFE(GET_OLC_OBJECT(desc)->storage, store, next_store) {
+			LL_FOREACH_SAFE(GET_OBJ_STORAGE(GET_OLC_OBJECT(desc)), store, next_store) {
 				if (store->building_type == vnum) {
-					LL_DELETE(GET_OLC_OBJECT(desc)->storage, store);
+					LL_DELETE(GET_OLC_OBJECT(desc)->proto_data->storage, store);
 					free(store);
 					if (!found) {
 						msg_to_desc(desc, "A storage location for the the object you're editing was deleted.\r\n");
@@ -863,7 +863,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 			break;
 		}
 		any = FALSE;
-		for (store = obj->storage; store && !any; store = store->next) {
+		for (store = GET_OBJ_STORAGE(obj); store && !any; store = store->next) {
 			if (store->building_type == vnum) {
 				any = TRUE;
 				++found;
@@ -1171,7 +1171,7 @@ void olc_show_building(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%scitizens\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_CITIZENS(bdg), 0), GET_BLD_CITIZENS(bdg));
 	sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(GET_BLD_MILITARY(bdg), 0), GET_BLD_MILITARY(bdg));
 	
-	sprintf(buf + strlen(buf), "<%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BLD_ARTISAN(bdg), NOTHING), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) == NOTHING ? "none" : get_mob_name_by_proto(GET_BLD_ARTISAN(bdg)));
+	sprintf(buf + strlen(buf), "<%sartisan\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_BLD_ARTISAN(bdg), NOTHING), GET_BLD_ARTISAN(bdg), GET_BLD_ARTISAN(bdg) == NOTHING ? "none" : get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE));
 	
 	sprintbit(GET_BLD_FLAGS(bdg), bld_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sflags\t0> %s\r\n", OLC_LABEL_VAL(GET_BLD_FLAGS(bdg), NOBITS), lbuf);
@@ -1281,7 +1281,7 @@ OLC_MODULE(bedit_artisan) {
 			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
-			msg_to_char(ch, "It now has artisan: %s\r\n", get_mob_name_by_proto(GET_BLD_ARTISAN(bdg)));
+			msg_to_char(ch, "It now has artisan: %s\r\n", get_mob_name_by_proto(GET_BLD_ARTISAN(bdg), FALSE));
 		}
 	}
 }

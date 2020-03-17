@@ -836,8 +836,8 @@ OLC_MODULE(advedit_cascade) {
 			snprintf(line, sizeof(line), "not scalable");
 		}
 		else {
-			GET_OBJ_MIN_SCALE_LEVEL(obj) = GET_ADV_MIN_LEVEL(adv);
-			GET_OBJ_MAX_SCALE_LEVEL(obj) = GET_ADV_MAX_LEVEL(adv);
+			obj->proto_data->min_scale_level = GET_ADV_MIN_LEVEL(adv);
+			obj->proto_data->max_scale_level = GET_ADV_MAX_LEVEL(adv);
 			OBJ_VERSION(obj) += 1;
 			snprintf(line, sizeof(line), "updated");
 			save_objs = TRUE;
@@ -1444,8 +1444,8 @@ OLC_MODULE(advedit_uncascade) {
 			snprintf(line, sizeof(line), "not scalable");
 		}
 		else {
-			GET_OBJ_MIN_SCALE_LEVEL(obj) = 0;
-			GET_OBJ_MAX_SCALE_LEVEL(obj) = 0;
+			obj->proto_data->min_scale_level = 0;
+			obj->proto_data->max_scale_level = 0;
 			OBJ_VERSION(obj) += 1;
 			snprintf(line, sizeof(line), "updated");
 			save_objs = TRUE;

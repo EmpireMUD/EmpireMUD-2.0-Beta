@@ -979,11 +979,11 @@ void finish_gen_craft(char_data *ch) {
 	
 	// check for consumes-to on the resources
 	LL_FOREACH(GET_ACTION_RESOURCES(ch), res) {
-		if ((proto = obj_proto(res->vnum)) && has_interaction(proto->interactions, INTERACT_CONSUMES_TO)) {
+		if ((proto = obj_proto(res->vnum)) && has_interaction(GET_OBJ_INTERACTIONS(proto), INTERACT_CONSUMES_TO)) {
 			temp_obj = read_object(res->vnum, FALSE);
 			obj_to_char(temp_obj, ch);
 			for (iter = 0; iter < res->amount; ++iter) {
-				run_interactions(ch, temp_obj->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, temp_obj, consumes_or_decays_interact);
+				run_interactions(ch, GET_OBJ_INTERACTIONS(temp_obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, temp_obj, consumes_or_decays_interact);
 			}
 			extract_obj(temp_obj);
 		}

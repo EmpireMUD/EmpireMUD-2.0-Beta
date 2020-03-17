@@ -177,7 +177,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "No maximum scale level on non-adventure obj");
 		problem = TRUE;
 	}
-	if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && obj->storage && GET_OBJ_MAX_SCALE_LEVEL(obj) != GET_OBJ_MIN_SCALE_LEVEL(obj)) {
+	if (OBJ_FLAGGED(obj, OBJ_SCALABLE) && GET_OBJ_STORAGE(obj) && GET_OBJ_MAX_SCALE_LEVEL(obj) != GET_OBJ_MIN_SCALE_LEVEL(obj)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Scalable object has storage locations");
 		problem = TRUE;
 	}
@@ -202,7 +202,7 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		problem = TRUE;
 	}
 	
-	problem |= audit_interactions(GET_OBJ_VNUM(obj), obj->interactions, TYPE_OBJ, ch);
+	problem |= audit_interactions(GET_OBJ_VNUM(obj), GET_OBJ_INTERACTIONS(obj), TYPE_OBJ, ch);
 	
 	// ITEM_X: auditors
 	switch (GET_OBJ_TYPE(obj)) {
@@ -372,6 +372,7 @@ void check_oedit_material_list(void) {
 * @return obj_data* The new object's prototype.
 */
 obj_data *create_obj_table_entry(obj_vnum vnum) {
+	extern struct obj_proto_data *create_obj_proto_data();
 	void add_object_to_table(obj_data *obj);
 	
 	obj_data *obj;
@@ -385,6 +386,7 @@ obj_data *create_obj_table_entry(obj_vnum vnum) {
 	CREATE(obj, obj_data, 1);
 	clear_object(obj);
 	obj->vnum = vnum;
+	obj->proto_data = create_obj_proto_data();
 	add_object_to_table(obj);
 	
 	// save obj index and obj file now so there's no trouble later
@@ -782,7 +784,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	
 	// update objs
 	HASH_ITER(hh, object_table, obj_iter, next_obj) {
-		found = delete_from_interaction_list(&obj_iter->interactions, TYPE_OBJ, vnum);
+		found = delete_from_interaction_list(&obj_iter->proto_data->interactions, TYPE_OBJ, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj_iter));
 		}
@@ -992,7 +994,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			}
 		}
 		if (GET_OLC_OBJECT(desc)) {
-			found = delete_from_interaction_list(&GET_OLC_OBJECT(desc)->interactions, TYPE_OBJ, vnum);
+			found = delete_from_interaction_list(&GET_OLC_OBJECT(desc)->proto_data->interactions, TYPE_OBJ, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the objects in an interaction for the item you're editing was deleted.\r\n");
 			}
@@ -1188,7 +1190,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		}
 		if (find_custom) {	// look up its custom messages
 			found_custom = NOBITS;
-			LL_FOREACH(obj->custom_msgs, cust) {
+			LL_FOREACH(GET_OBJ_CUSTOM_MSGS(obj), cust) {
 				found_custom |= BIT(cust->type);
 			}
 			if ((find_custom & found_custom) != find_custom) {
@@ -1197,14 +1199,14 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		}
 		if (find_interacts) {	// look up its interactions
 			found_interacts = NOBITS;
-			LL_FOREACH(obj->interactions, inter) {
+			LL_FOREACH(GET_OBJ_INTERACTIONS(obj), inter) {
 				found_interacts |= BIT(inter->type);
 			}
 			if ((find_interacts & found_interacts) != find_interacts) {
 				continue;
 			}
 		}
-		if (*find_keywords && !multi_isname(find_keywords, GET_OBJ_KEYWORDS(obj)) && !multi_isname(find_keywords, GET_OBJ_SHORT_DESC(obj)) && !multi_isname(find_keywords, GET_OBJ_LONG_DESC(obj)) && !multi_isname(find_keywords, NULLSAFE(GET_OBJ_ACTION_DESC(obj))) && !search_custom_messages(find_keywords, obj->custom_msgs) && !search_extra_descs(find_keywords, obj->ex_description)) {
+		if (*find_keywords && !multi_isname(find_keywords, GET_OBJ_KEYWORDS(obj)) && !multi_isname(find_keywords, GET_OBJ_SHORT_DESC(obj)) && !multi_isname(find_keywords, GET_OBJ_LONG_DESC(obj)) && !multi_isname(find_keywords, NULLSAFE(GET_OBJ_ACTION_DESC(obj))) && !search_custom_messages(find_keywords, GET_OBJ_CUSTOM_MSGS(obj)) && !search_extra_descs(find_keywords, GET_OBJ_EX_DESCS(obj))) {
 			continue;
 		}
 		
@@ -1440,7 +1442,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	// obj interactions
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		any = FALSE;
-		for (inter = obj->interactions; inter && !any; inter = inter->next) {
+		for (inter = GET_OBJ_INTERACTIONS(obj); inter && !any; inter = inter->next) {
 			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
@@ -1587,6 +1589,11 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 	// NOTE: If you ever choose to update flags here, some flags like LIGHT
 	// also require updates to the light counts in the world.
 	
+	// proto data
+	if (to_update->proto_data == old_proto->proto_data) {
+		to_update->proto_data = new_proto->proto_data;
+	}
+	
 	// strings
 	if (GET_OBJ_KEYWORDS(to_update) == GET_OBJ_KEYWORDS(old_proto)) {
 		GET_OBJ_KEYWORDS(to_update) = GET_OBJ_KEYWORDS(new_proto);
@@ -1600,23 +1607,6 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 	if (GET_OBJ_ACTION_DESC(to_update) == GET_OBJ_ACTION_DESC(old_proto)) {
 		GET_OBJ_ACTION_DESC(to_update) = GET_OBJ_ACTION_DESC(new_proto);
 	}
-	
-	// pointers
-	if (to_update->ex_description == old_proto->ex_description) {
-		to_update->ex_description = new_proto->ex_description;
-	}
-	if (to_update->storage == old_proto->storage) {
-		to_update->storage = new_proto->storage;
-	}
-	if (to_update->interactions == old_proto->interactions) {
-		to_update->interactions = new_proto->interactions;
-	}
-	if (to_update->custom_msgs == old_proto->custom_msgs) {
-		to_update->custom_msgs = new_proto->custom_msgs;
-	}
-	
-	// ensure this is up to date
-	GET_OBJ_COMPONENT(to_update) = GET_OBJ_COMPONENT(new_proto);
 	
 	// remove old scripts
 	if (SCRIPT(to_update)) {
@@ -1638,16 +1628,14 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 * @param descriptor_data *desc The descriptor who is saving an object.
 */
 void save_olc_object(descriptor_data *desc) {
+	void free_obj_proto_data(struct obj_proto_data *data);
 	void prune_extra_descs(struct extra_descr_data **list);
 	
 	obj_data *obj = GET_OLC_OBJECT(desc), *obj_iter, *proto;
 	obj_vnum vnum = GET_OLC_VNUM(desc);
 	struct empire_unique_storage *eus;
-	struct obj_storage_type *store;
 	struct trading_post_data *tpd;
 	empire_data *emp, *next_emp;
-	struct quest_lookup *ql;
-	struct shop_lookup *sl;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
@@ -1678,6 +1666,15 @@ void save_olc_object(descriptor_data *desc) {
 		}
 	}
 	
+	// migrate over the quest/shop lookups
+	if (proto->proto_data) {
+		obj->proto_data->quest_lookups = proto->proto_data->quest_lookups;
+		proto->proto_data->quest_lookups = NULL;	// prevent freeing
+		
+		obj->proto_data->shop_lookups = proto->proto_data->shop_lookups;
+		proto->proto_data->shop_lookups = NULL;	// prevent freeing
+	}
+	
 	// free prototype strings and pointers
 	if (GET_OBJ_KEYWORDS(proto)) {
 		free(GET_OBJ_KEYWORDS(proto));
@@ -1691,13 +1688,7 @@ void save_olc_object(descriptor_data *desc) {
 	if (GET_OBJ_ACTION_DESC(proto)) {
 		free(GET_OBJ_ACTION_DESC(proto));
 	}
-	free_extra_descs(&proto->ex_description);
-	free_interactions(&proto->interactions);
-	while ((store = proto->storage)) {
-		proto->storage = store->next;
-		free(store);
-	}
-	free_custom_messages(proto->custom_msgs);
+	free_obj_proto_data(proto->proto_data);
 	
 	// old applies
 	free_obj_apply_list(GET_OBJ_APPLIES(proto));
@@ -1712,19 +1703,15 @@ void save_olc_object(descriptor_data *desc) {
 	if (GET_OBJ_TIMER(obj) <= 0) {
 		GET_OBJ_TIMER(obj) = UNLIMITED;
 	}
-	prune_extra_descs(&obj->ex_description);
+	prune_extra_descs(&obj->proto_data->ex_description);
 
 	// save data back over the proto-type
 	hh = proto->hh;	// save old hash handle
-	ql = proto->quest_lookups;	// save lookups
-	sl = proto->shop_lookups;
 	
 	*proto = *obj;
 	proto->vnum = vnum;	// ensure correct vnum
 	
 	proto->hh = hh;	// restore hash handle
-	proto->quest_lookups = ql;	// restore lookups
-	proto->shop_lookups = sl;
 	
 	// remove the reference to this so it won't be free'd
 	GET_OBJ_APPLIES(obj) = NULL;
@@ -1781,6 +1768,35 @@ struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list) {
 
 
 /**
+* Duplicates a list of storage locations.
+*
+* @param struct obj_storage_type *list The list to copy.
+* @return struct obj_storage_type* The copied list.
+*/
+struct obj_storage_type *copy_storage(struct obj_storage_type *list) {
+	struct obj_storage_type *store, *new_store, *last_store, *new_list;
+	
+	new_list = last_store = NULL;
+	LL_FOREACH(list, store) {
+		CREATE(new_store, struct obj_storage_type, 1);
+		
+		*new_store = *store;
+		new_store->next = NULL;
+		
+		if (last_store) {
+			last_store->next = new_store;
+		}
+		else {
+			new_list = new_store;
+		}
+		last_store = new_store;
+	}
+	
+	return new_list;
+}
+
+
+/**
 * Creates a copy of an object, or clears a new one, for editing. Note that this
 * will increase the version number of the item by 1, for the auto-update
 * system.
@@ -1789,7 +1805,8 @@ struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list) {
 * @return obj_data *The copied object.
 */
 obj_data *setup_olc_object(obj_data *input) {
-	struct obj_storage_type *store, *new_store, *last_store;
+	extern struct obj_proto_data *create_obj_proto_data();
+	
 	obj_data *new;
 	
 	CREATE(new, obj_data, 1);
@@ -1805,31 +1822,16 @@ obj_data *setup_olc_object(obj_data *input) {
 		GET_OBJ_SHORT_DESC(new) = GET_OBJ_SHORT_DESC(input) ? str_dup(GET_OBJ_SHORT_DESC(input)) : NULL;
 		GET_OBJ_ACTION_DESC(new) = GET_OBJ_ACTION_DESC(input) ? str_dup(GET_OBJ_ACTION_DESC(input)) : NULL;
 		
-		// copy extra descs
-		new->ex_description = copy_extra_descs(input->ex_description);
-		
-		// copy interactions
-		new->interactions = copy_interaction_list(input->interactions);
-		
-		new->storage = NULL;
-		last_store = NULL;
-		for (store = input->storage; store; store = store->next) {
-			CREATE(new_store, struct obj_storage_type, 1);
-			
-			*new_store = *store;
-			new_store->next = NULL;
-			
-			if (last_store) {
-				last_store->next = new_store;
-			}
-			else {
-				new->storage = new_store;
-			}
-			last_store = new_store;
-		}
-		
-		// copy custom msgs
-		new->custom_msgs = copy_custom_messages(input->custom_msgs);
+		// copy prototype data
+		new->proto_data = create_obj_proto_data();
+		*new->proto_data = *input->proto_data;
+		new->proto_data->ex_description = copy_extra_descs(input->proto_data->ex_description);
+		new->proto_data->custom_msgs = copy_custom_messages(input->proto_data->custom_msgs);
+		new->proto_data->interactions = copy_interaction_list(input->proto_data->interactions);
+		new->proto_data->storage = copy_storage(input->proto_data->storage);
+		// don't keep quest_lookups or shop_lookups
+		new->proto_data->quest_lookups = NULL;
+		new->proto_data->shop_lookups = NULL;
 		
 		// copy applies
 		GET_OBJ_APPLIES(new) = copy_obj_apply_list(GET_OBJ_APPLIES(input));
@@ -1843,6 +1845,7 @@ obj_data *setup_olc_object(obj_data *input) {
 	}
 	else {
 		// brand new
+		new->proto_data = create_obj_proto_data();
 		GET_OBJ_KEYWORDS(new) = str_dup(default_obj_keywords);
 		GET_OBJ_SHORT_DESC(new) = str_dup(default_obj_short);
 		GET_OBJ_LONG_DESC(new) = str_dup(default_obj_long);
@@ -1888,7 +1891,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_CORPSE: {
-			sprintf(storage + strlen(storage), "<%scorpseof\t0> %d %s\r\n", OLC_LABEL_VAL(GET_CORPSE_NPC_VNUM(obj), 0), GET_CORPSE_NPC_VNUM(obj), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+			sprintf(storage + strlen(storage), "<%scorpseof\t0> %d %s\r\n", OLC_LABEL_VAL(GET_CORPSE_NPC_VNUM(obj), 0), GET_CORPSE_NPC_VNUM(obj), get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj), FALSE));
 			sprintf(storage + strlen(storage), "<%ssize\t0> %s\r\n", OLC_LABEL_VAL(GET_CORPSE_SIZE(obj), 0), size_types[GET_CORPSE_SIZE(obj)]);
 			break;
 		}
@@ -1992,7 +1995,7 @@ void olc_get_values_display(char_data *ch, char *storage) {
 			break;
 		}
 		case ITEM_MINIPET: {
-			sprintf(storage + strlen(storage), "<%sminipet\t0> %d %s\r\n", OLC_LABEL_VAL(GET_MINIPET_VNUM(obj), NOTHING), GET_MINIPET_VNUM(obj), get_mob_name_by_proto(GET_MINIPET_VNUM(obj)));
+			sprintf(storage + strlen(storage), "<%sminipet\t0> %d %s\r\n", OLC_LABEL_VAL(GET_MINIPET_VNUM(obj), NOTHING), GET_MINIPET_VNUM(obj), get_mob_name_by_proto(GET_MINIPET_VNUM(obj), FALSE));
 			break;
 		}
 		
@@ -2110,22 +2113,22 @@ void olc_show_object(char_data *ch) {
 	}
 	
 	// exdesc
-	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(obj->ex_description));
-	if (obj->ex_description) {
-		get_extra_desc_display(obj->ex_description, buf1);
+	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_EX_DESCS(obj)));
+	if (GET_OBJ_EX_DESCS(obj)) {
+		get_extra_desc_display(GET_OBJ_EX_DESCS(obj), buf1);
 		strcat(buf, buf1);
 	}
 
-	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(obj->interactions));
-	if (obj->interactions) {
-		get_interaction_display(obj->interactions, buf1);
+	sprintf(buf + strlen(buf), "Interactions: <%sinteraction\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_INTERACTIONS(obj)));
+	if (GET_OBJ_INTERACTIONS(obj)) {
+		get_interaction_display(GET_OBJ_INTERACTIONS(obj), buf1);
 		strcat(buf, buf1);
 	}
 	
 	// storage
-	sprintf(buf + strlen(buf), "Storage: <%sstorage\t0>\r\n", OLC_LABEL_PTR(obj->storage));
+	sprintf(buf + strlen(buf), "Storage: <%sstorage\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_STORAGE(obj)));
 	count = 0;
-	for (store = obj->storage; store; store = store->next) {
+	for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {
 		bld = building_proto(store->building_type);
 		
 		sprintbit(store->flags, storage_bits, buf2, TRUE);
@@ -2133,9 +2136,9 @@ void olc_show_object(char_data *ch) {
 	}
 	
 	// custom messages
-	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(obj->custom_msgs));
+	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_CUSTOM_MSGS(obj)));
 	count = 0;
-	for (ocm = obj->custom_msgs; ocm; ocm = ocm->next) {
+	for (ocm = GET_OBJ_CUSTOM_MSGS(obj); ocm; ocm = ocm->next) {
 		sprintf(buf + strlen(buf), " \ty%d\t0. [%s] %s\r\n", ++count, obj_custom_types[ocm->type], ocm->msg);
 	}
 	
@@ -2519,7 +2522,7 @@ OLC_MODULE(oedit_component) {
 	generic_data *cmp;
 	
 	if (!str_cmp(argument, "none") || atoi(argument) == NOTHING) {
-		GET_OBJ_COMPONENT(obj) = NOTHING;
+		obj->proto_data->component = NOTHING;
 		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
 		}
@@ -2533,7 +2536,7 @@ OLC_MODULE(oedit_component) {
 			msg_to_char(ch, "There is no generic component with that vnum.\r\n");
 		}
 		else {
-			GET_OBJ_COMPONENT(obj) = GEN_VNUM(cmp);
+			obj->proto_data->component = GEN_VNUM(cmp);
 			msg_to_char(ch, "It is now %s (%s).\r\n", AN(get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj))), get_generic_name_by_vnum(GET_OBJ_COMPONENT(obj)));
 		}
 	}
@@ -2605,7 +2608,7 @@ OLC_MODULE(oedit_corpseof) {
 			msg_to_char(ch, "There is no mobile with that vnum. Old value restored.\r\n");
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
-			msg_to_char(ch, "It is now the corpse of: %s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj)));
+			msg_to_char(ch, "It is now the corpse of: %s\r\n", get_mob_name_by_proto(GET_CORPSE_NPC_VNUM(obj), FALSE));
 		}
 		else {
 			send_config_msg(ch, "ok_string");
@@ -2634,7 +2637,7 @@ OLC_MODULE(oedit_currency) {
 OLC_MODULE(oedit_custom) {
 	void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	olc_process_custom_messages(ch, argument, &(obj->custom_msgs), obj_custom_types);
+	olc_process_custom_messages(ch, argument, &(obj->proto_data->custom_msgs), obj_custom_types);
 }
 
 
@@ -2675,7 +2678,7 @@ OLC_MODULE(oedit_damage) {
 
 OLC_MODULE(oedit_extra_desc) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	olc_process_extra_desc(ch, argument, &obj->ex_description);
+	olc_process_extra_desc(ch, argument, &obj->proto_data->ex_description);
 }
 
 
@@ -2699,7 +2702,7 @@ OLC_MODULE(oedit_fullness) {
 
 OLC_MODULE(oedit_interaction) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	olc_process_interactions(ch, argument, &obj->interactions, TYPE_OBJ);
+	olc_process_interactions(ch, argument, &obj->proto_data->interactions, TYPE_OBJ);
 }
 
 
@@ -2740,14 +2743,14 @@ OLC_MODULE(oedit_long_desc) {
 OLC_MODULE(oedit_material) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	check_oedit_material_list();
-	GET_OBJ_MATERIAL(obj) = olc_process_type(ch, argument, "material", "material", (const char**)olc_material_list, GET_OBJ_MATERIAL(obj));
+	obj->proto_data->material = olc_process_type(ch, argument, "material", "material", (const char**)olc_material_list, GET_OBJ_MATERIAL(obj));
 }
 
 
 OLC_MODULE(oedit_maxlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
-	GET_OBJ_MAX_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_OBJ_MAX_SCALE_LEVEL(obj));
+	obj->proto_data->max_scale_level = olc_process_number(ch, argument, "maximum level", "maxlevel", 0, MAX_INT, GET_OBJ_MAX_SCALE_LEVEL(obj));
 }
 
 
@@ -2770,7 +2773,7 @@ OLC_MODULE(oedit_minipet) {
 			return;
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
-			msg_to_char(ch, "It now gives the mini-pet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj)));
+			msg_to_char(ch, "It now gives the mini-pet: %s\r\n", get_mob_name_by_proto(GET_MINIPET_VNUM(obj), FALSE));
 		}
 		else {
 			send_config_msg(ch, "ok_string");
@@ -2791,7 +2794,7 @@ OLC_MODULE(oedit_minipet) {
 OLC_MODULE(oedit_minlevel) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	
-	GET_OBJ_MIN_SCALE_LEVEL(obj) = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_OBJ_MIN_SCALE_LEVEL(obj));
+	obj->proto_data->min_scale_level = olc_process_number(ch, argument, "minimum level", "minlevel", 0, MAX_INT, GET_OBJ_MIN_SCALE_LEVEL(obj));
 }
 
 
@@ -2883,7 +2886,7 @@ OLC_MODULE(oedit_quick_recipe) {
 	
 	// create it
 	obj = GET_OLC_OBJECT(ch->desc) = setup_olc_object(NULL);
-	GET_OBJ_TYPE(obj) = ITEM_RECIPE;
+	obj->proto_data->type_flag = ITEM_RECIPE;
 	GET_OBJ_VAL(obj, VAL_RECIPE_VNUM) = GET_CRAFT_VNUM(cft);
 	
 	// keywords
@@ -2949,7 +2952,7 @@ OLC_MODULE(oedit_requiresquest) {
 	obj_vnum old = GET_OBJ_REQUIRES_QUEST(obj);
 	
 	if (!str_cmp(argument, "none") || atoi(argument) == NOTHING) {
-		GET_OBJ_REQUIRES_QUEST(obj) = NOTHING;
+		obj->proto_data->requires_quest = NOTHING;
 		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {
 			send_config_msg(ch, "ok_string");
 		}
@@ -2958,9 +2961,9 @@ OLC_MODULE(oedit_requiresquest) {
 		}
 	}
 	else {
-		GET_OBJ_REQUIRES_QUEST(obj) = olc_process_number(ch, argument, "quest vnum", "requiresquest", 0, MAX_VNUM, GET_OBJ_REQUIRES_QUEST(obj));
+		obj->proto_data->requires_quest = olc_process_number(ch, argument, "quest vnum", "requiresquest", 0, MAX_VNUM, GET_OBJ_REQUIRES_QUEST(obj));
 		if (!quest_proto(GET_OBJ_REQUIRES_QUEST(obj))) {
-			GET_OBJ_REQUIRES_QUEST(obj) = old;
+			obj->proto_data->requires_quest = old;
 			msg_to_char(ch, "There is no quest with that vnum. Old value restored.\r\n");
 		}
 		else if (!PRF_FLAGGED(ch, PRF_NOREPEAT)) {
@@ -3025,8 +3028,8 @@ OLC_MODULE(oedit_storage) {
 			msg_to_char(ch, "Remove which storage location (number)?\r\n");
 		}
 		else if (!str_cmp(arg2, "all")) {
-			while ((store = obj->storage)) {
-				obj->storage = store->next;
+			while ((store = GET_OBJ_STORAGE(obj))) {
+				obj->proto_data->storage = store->next;
 				free(store);
 			}
 			msg_to_char(ch, "You remove all the storage locations.\r\n");
@@ -3036,13 +3039,13 @@ OLC_MODULE(oedit_storage) {
 		}
 		else {
 			found = FALSE;
-			for (store = obj->storage; store && !found; store = store->next) {
+			for (store = GET_OBJ_STORAGE(obj); store && !found; store = store->next) {
 				if (--num == 0) {
 					found = TRUE;
 					
 					msg_to_char(ch, "You remove the storage in the %s.\r\n", GET_BLD_NAME(building_proto(store->building_type)));
 					
-					REMOVE_FROM_LIST(store, obj->storage, next);
+					REMOVE_FROM_LIST(store, obj->proto_data->storage, next);
 					free(store);
 				}
 			}
@@ -3073,15 +3076,15 @@ OLC_MODULE(oedit_storage) {
 			store->next = NULL;
 			
 			// append to end
-			if (obj->storage) {
-				temp = obj->storage;
+			if (GET_OBJ_STORAGE(obj)) {
+				temp = GET_OBJ_STORAGE(obj);
 				while (temp->next) {
 					temp = temp->next;
 				}
 				temp->next = store;
 			}
 			else {
-				obj->storage = store;
+				obj->proto_data->storage = store;
 			}
 			
 			// process flags as space-separated string
@@ -3109,7 +3112,7 @@ OLC_MODULE(oedit_storage) {
 		// find which one to change
 		num = atoi(num_arg);
 		change = NULL;
-		for (store = obj->storage; store && !change; store = store->next) {
+		for (store = GET_OBJ_STORAGE(obj); store && !change; store = store->next) {
 			if (--num == 0) {
 				change = store;
 				break;
@@ -3160,7 +3163,7 @@ OLC_MODULE(oedit_timer) {
 
 OLC_MODULE(oedit_tools) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
-	GET_OBJ_TOOL_FLAGS(obj) = olc_process_flag(ch, argument, "tool", "tools", tool_flags, GET_OBJ_TOOL_FLAGS(obj));
+	obj->proto_data->tool_flags = olc_process_flag(ch, argument, "tool", "tools", tool_flags, GET_OBJ_TOOL_FLAGS(obj));
 }
 
 
@@ -3168,7 +3171,7 @@ OLC_MODULE(oedit_type) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	int old = GET_OBJ_TYPE(obj);
 	
-	GET_OBJ_TYPE(obj) = olc_process_type(ch, argument, "type", "type", item_types, GET_OBJ_TYPE(obj));
+	obj->proto_data->type_flag = olc_process_type(ch, argument, "type", "type", item_types, GET_OBJ_TYPE(obj));
 	
 	// reset values to defaults now
 	if (old != GET_OBJ_TYPE(obj)) {
