@@ -1123,7 +1123,7 @@ void perform_saw(char_data *ch) {
 			act("You finish sawing $p.", FALSE, ch, proto, NULL, TO_CHAR);
 			act("$n finishes sawing $p.", TRUE, ch, proto, NULL, TO_ROOM);
 			
-			success = run_interactions(ch, proto->interactions, INTERACT_SAW, IN_ROOM(ch), NULL, proto, finish_scraping);
+			success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_SAW, IN_ROOM(ch), NULL, proto, finish_scraping);
 		}
 		
 		if (!success && !proto) {
@@ -1323,7 +1323,7 @@ void process_chipping(char_data *ch) {
 		act("$n finishes chipping $p!", TRUE, ch, proto, NULL, TO_ROOM);
 		GET_ACTION(ch) = ACT_NONE;
 		
-		success = run_interactions(ch, proto->interactions, INTERACT_CHIP, IN_ROOM(ch), NULL, proto, finish_scraping);
+		success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_CHIP, IN_ROOM(ch), NULL, proto, finish_scraping);
 		free_resource_list(GET_ACTION_RESOURCES(ch));
 		GET_ACTION_RESOURCES(ch) = NULL;
 
@@ -2461,7 +2461,7 @@ void process_scraping(char_data *ch) {
 			act("You finish scraping off $p.", FALSE, ch, proto, NULL, TO_CHAR);
 			act("$n finishes scraping off $p.", TRUE, ch, proto, NULL, TO_ROOM);
 			
-			success = run_interactions(ch, proto->interactions, INTERACT_SCRAPE, IN_ROOM(ch), NULL, proto, finish_scraping);
+			success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_SCRAPE, IN_ROOM(ch), NULL, proto, finish_scraping);
 		}
 		
 		if (!success && !proto) {
@@ -2615,7 +2615,7 @@ void process_tanning(char_data *ch) {
 
 		GET_ACTION(ch) = ACT_NONE;
 		
-		success = run_interactions(ch, proto->interactions, INTERACT_TAN, IN_ROOM(ch), NULL, proto, finish_scraping);
+		success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_TAN, IN_ROOM(ch), NULL, proto, finish_scraping);
 		free_resource_list(GET_ACTION_RESOURCES(ch));
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
@@ -2713,7 +2713,7 @@ ACMD(do_chip) {
 	else if (!(target = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_CHIP)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !(target = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_CHIP)))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (!has_interaction(target->interactions, INTERACT_CHIP)) {
+	else if (!has_interaction(GET_OBJ_INTERACTIONS(target), INTERACT_CHIP)) {
 		msg_to_char(ch, "You can't chip that!\r\n");
 	}
 	else if (!has_tool(ch, TOOL_KNAPPER)) {
@@ -3273,7 +3273,7 @@ ACMD(do_plant) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
 	}
 	else if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
-		msg_to_char(ch, "You can't plant that!%s\r\n", has_interaction(obj->interactions, INTERACT_SEED) ? " Try seeding it first." : "");
+		msg_to_char(ch, "You can't plant that!%s\r\n", has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEED) ? " Try seeding it first." : "");
 	}
 	else if (!(cp = crop_proto(GET_OBJ_VAL(obj, VAL_FOOD_CROP_TYPE)))) {
 		// this is a sanity check for bad crop values
@@ -3448,7 +3448,7 @@ ACMD(do_saw) {
 	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SAW)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_SAW))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (!has_interaction(obj->interactions, INTERACT_SAW)) {
+	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SAW)) {
 		msg_to_char(ch, "You can't saw that!\r\n");
 	}
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
@@ -3495,7 +3495,7 @@ ACMD(do_scrape) {
 	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SCRAPE)) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_SCRAPE)))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
-	else if (!has_interaction(obj->interactions, INTERACT_SCRAPE)) {
+	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SCRAPE)) {
 		msg_to_char(ch, "You can't scrape that!\r\n");
 	}
 	else if (!has_tool(ch, TOOL_AXE | TOOL_KNIFE)) {
@@ -3565,7 +3565,7 @@ ACMD(do_tan) {
 	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_TAN)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_TAN))) {
 		msg_to_char(ch, "You don't seem to have more to tan.\r\n");
 	}
-	else if (!has_interaction(obj->interactions, INTERACT_TAN)) {
+	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_TAN)) {
 		msg_to_char(ch, "You can't tan that!\r\n");
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {

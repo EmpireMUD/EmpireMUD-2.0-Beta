@@ -2282,7 +2282,7 @@ ACMD(do_paint) {
 		
 		command_lag(ch, WAIT_ABILITY);
 		
-		run_interactions(ch, paint->interactions, INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, paint, consumes_or_decays_interact);
+		run_interactions(ch, GET_OBJ_INTERACTIONS(paint), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, paint, consumes_or_decays_interact);
 		extract_obj(paint);
 	}
 }

@@ -1335,6 +1335,7 @@ Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce why [chore | location | here]
         workforce copy <island name>
         workforce keep [number | all] <item name>
+        workforce keep default [number | all | none]
 
 Once your empire has purchased the Workforce progress reward, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
@@ -1438,6 +1439,7 @@ See also: EXARCH CRAFTS, WORKFORCE
 "WORKFORCE KEEP"
 
 Usage:  workforce keep [number | all] <item name>
+        workforce keep default [number | all | none]
 
 This command will prevent your workers from using/eating an item in your
 empire's inventory. You can specify more than one keyword if you're having
@@ -1446,10 +1448,15 @@ trouble targeting the right item.
 This command only affects the island you are currently on. Using this command
 without a number/all argument will toggle 'keep' on or off.
 
+When you run out of an item in your empire's inventory, it will lose its 'keep'
+information. You can use 'workforce keep default' to set a default number to
+keep for any new items your empire acquires.
+
 Examples:
  > workforce keep stick
  > workforce keep all gold bar
  > workforce keep 200 spruce lumber
+ > workforce keep default 1
 
 See also: WORKFORCE
 #

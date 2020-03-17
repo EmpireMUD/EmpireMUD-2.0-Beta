@@ -7509,10 +7509,13 @@ Object values on a MINIPET item:
  0 - mob vnum to teach
 
 Mini-pet mobs should have the following traits:
- - Flags: SENTINEL SPAWNED !LOOT !EXPERIENCE (and ISNPC)
- - Affects: !ATTACK
- - Scripts: 9901 (Dismissable; optional), 9902 (Lonely Despawn)
+ - Locked to a low level like 1
  - Adorable custom messages (optional)
+
+Mini-pets automatically gain the following when summoned:
+ - Scaled to the player's level
+ - Flags: SENTINEL SPAWNED !LOOT !EXPERIENCE (and ISNPC)
+ - Affects: !ATTACK CHARMED
 
 See also: OLC OBJECTS, MINIPET, GENERIC COOLDOWN
 #d

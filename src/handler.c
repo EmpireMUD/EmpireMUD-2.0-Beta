@@ -2113,8 +2113,8 @@ obj_data *create_money(empire_data *type, int amount) {
 	}
 
 	// data
-	GET_OBJ_TYPE(obj) = ITEM_COINS;
-	GET_OBJ_MATERIAL(obj) = MAT_GOLD;
+	obj->proto_data->type_flag = ITEM_COINS;
+	obj->proto_data->material = MAT_GOLD;
 	SET_BIT(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
 
 	GET_OBJ_VAL(obj, VAL_COINS_AMOUNT) = amount;
@@ -4896,16 +4896,12 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 	if (GET_OBJ_ACTION_DESC(input) && (!proto || GET_OBJ_ACTION_DESC(input) != GET_OBJ_ACTION_DESC(proto))) {
 		GET_OBJ_ACTION_DESC(obj) = str_dup(GET_OBJ_ACTION_DESC(input));
 	}
-	if (input->ex_description && (!proto || input->ex_description != proto->ex_description)) {
-		obj->ex_description = copy_extra_descs(input->ex_description);
-	}
 	
 	// non-point copies
 	GET_OBJ_EXTRA(obj) = GET_OBJ_EXTRA(input);
 	GET_OBJ_CURRENT_SCALE_LEVEL(obj) = GET_OBJ_CURRENT_SCALE_LEVEL(input);
 	GET_OBJ_AFF_FLAGS(obj) = GET_OBJ_AFF_FLAGS(input);
 	GET_OBJ_TIMER(obj) = GET_OBJ_TIMER(input);
-	GET_OBJ_TYPE(obj) = GET_OBJ_TYPE(input);
 	GET_OBJ_WEAR(obj) = GET_OBJ_WEAR(input);
 	GET_STOLEN_TIMER(obj) = GET_STOLEN_TIMER(input);
 	GET_STOLEN_FROM(obj) = GET_STOLEN_FROM(input);
@@ -5169,9 +5165,6 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 		return FALSE;
 	}
 	if (GET_OBJ_ACTION_DESC(obj_a) != GET_OBJ_ACTION_DESC(obj_b) && !str_cmp(GET_OBJ_ACTION_DESC(obj_a), GET_OBJ_ACTION_DESC(obj_b))) {
-		return FALSE;
-	}
-	if (obj_a->ex_description != obj_b->ex_description) {
 		return FALSE;
 	}
 	
@@ -6277,7 +6270,7 @@ obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, obj_
 				}
 			}
 			else {	// did not give a number
-				if (has_interaction(i->interactions, interact_type)) {
+				if (has_interaction(GET_OBJ_INTERACTIONS(i), interact_type)) {
 					return i;	// perfect match
 				}
 				else if (!backup) {
@@ -6327,7 +6320,7 @@ obj_vnum get_obj_vnum_by_name(char *name, bool storable_only) {
 	obj_data *obj, *next_obj;
 	
 	HASH_ITER(hh, object_table, obj, next_obj) {
-		if (storable_only && !obj->storage) {
+		if (storable_only && !GET_OBJ_STORAGE(obj)) {
 			continue;
 		}
 		if (!multi_isname(name, GET_OBJ_KEYWORDS(obj))) {
@@ -7226,7 +7219,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		case REQ_KILL_MOB: {
-			snprintf(output, sizeof(output), "Kill %dx mob%s: %s%s", req->needed, PLURAL(req->needed), vnum, get_mob_name_by_proto(req->vnum));
+			snprintf(output, sizeof(output), "Kill %dx mob%s: %s%s", req->needed, PLURAL(req->needed), vnum, get_mob_name_by_proto(req->vnum, TRUE));
 			break;
 		}
 		case REQ_KILL_MOB_FLAGGED: {
@@ -8025,22 +8018,24 @@ void sort_evolutions(sector_data *sect) {
 * @param int island Which island to store it on
 * @param obj_vnum vnum Any object to store.
 * @param int amount How much to add
+* @return struct empire_storage_data* Returns a pointer to the storage entry.
 */
-void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount) {
+struct empire_storage_data *add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount) {
 	struct empire_storage_data *store = find_stored_resource(emp, island, vnum);
 	struct empire_island *isle = get_empire_island(emp, island);
 	
 	if (!isle || !amount) {
-		return;	// nothing to do
+		return NULL;	// nothing to do
 	}
 	if (amount < 0 && !store) {
-		return;	// nothing to take
+		return NULL;	// nothing to take
 	}
 	
 	if (!store) {	// create storage
 		CREATE(store, struct empire_storage_data, 1);
 		store->vnum = vnum;
 		store->proto = obj_proto(vnum);
+		store->keep = EMPIRE_ATTRIBUTE(emp, EATT_DEFAULT_KEEP);
 		HASH_ADD_INT(isle->store, vnum, store);
 	}
 	
@@ -8056,6 +8051,7 @@ void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amou
 	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	
 	et_get_obj(emp, obj_proto(vnum), amount, store ? store->amount : 0);
+	return store;
 }
 
 
@@ -8359,11 +8355,11 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 	}
 	
 	// We skip this check in retrieval mode, since STORE_ALL does not function for retrieval.
-	if (!retrieval_mode && obj->storage && room_has_function_and_city_ok(loc, FNC_STORE_ALL)) {
+	if (!retrieval_mode && GET_OBJ_STORAGE(obj) && room_has_function_and_city_ok(loc, FNC_STORE_ALL)) {
 		return TRUE; // As long as it can be stored anywhere, it can be stored here.
 	}
 	
-	for (store = obj->storage; store; store = store->next) {
+	for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {
 		if (store->building_type == BUILDING_VNUM(loc)) {
 			return TRUE;
 		}
@@ -8507,7 +8503,7 @@ bool stored_item_requires_withdraw(obj_data *obj) {
 	struct obj_storage_type *sdt;
 	
 	if (obj) {
-		for (sdt = obj->storage; sdt; sdt = sdt->next) {
+		for (sdt = GET_OBJ_STORAGE(obj); sdt; sdt = sdt->next) {
 			if (IS_SET(sdt->flags, STORAGE_WITHDRAW)) {
 				return TRUE;
 			}

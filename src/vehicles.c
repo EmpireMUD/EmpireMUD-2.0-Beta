@@ -415,7 +415,7 @@ char *list_harnessed_mobs(vehicle_data *veh) {
 			*mult = '\0';
 		}
 	
-		size += snprintf(output+size, sizeof(output)-size, "%s%s%s", ((num == 0) ? "" : (next_iter ? ", " : (num > 1 ? ", and " : " and "))), get_mob_name_by_proto(iter->mob), mult);
+		size += snprintf(output+size, sizeof(output)-size, "%s%s%s", ((num == 0) ? "" : (next_iter ? ", " : (num > 1 ? ", and " : " and "))), get_mob_name_by_proto(iter->mob, TRUE), mult);
 		++num;
 	}
 	

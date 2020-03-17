@@ -31,6 +31,12 @@ if %room.sector_vnum% >= 1 && %room.sector_vnum% <= 4
   else
     %echo% %self.name% fells a tree with a mighty crash!
   end
+elseif %room.sector_vnum% == 90
+  * old-growth -> overgrown
+  nop %self.add_mob_flag(SENTINEL)%
+  %terraform% %room% 4
+  eval logs %logs% + 1
+  %echo% %self.name% fells a tree with a mighty crash!
 elseif %room.sector_vnum% == 26
   nop %self.add_mob_flag(SENTINEL)%
   %echo% %self.name% fells two trees!

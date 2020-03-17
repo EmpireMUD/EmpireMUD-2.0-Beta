@@ -178,7 +178,7 @@ ACMD(do_mail) {
 				GET_OBJ_KEYWORDS(obj) = str_dup("letter small mail");
 				GET_OBJ_SHORT_DESC(obj) = str_dup("a small letter");
 				GET_OBJ_LONG_DESC(obj) = str_dup("Someone has left a small letter here.");
-				GET_OBJ_TYPE(obj) = ITEM_MAIL;
+				obj->proto_data->type_flag = ITEM_MAIL;
 				GET_OBJ_WEAR(obj) = ITEM_WEAR_TAKE | ITEM_WEAR_HOLD;
 				GET_OBJ_TIMER(obj) = UNLIMITED;
 				

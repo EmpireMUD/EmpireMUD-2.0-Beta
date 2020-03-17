@@ -94,7 +94,7 @@ Gains experience when you use any command which benefits from it.
 
 See also: DIG, GATHER, PICK, PAN
 #
-FISH FISHING
+FISH FISHING "FISH COMMAND"
 
 Fish (Survival ability)
 
@@ -116,7 +116,7 @@ fishing tool will improve your fishing speed.
 
 Gains experience when you catch something.
 
-See also: CHIP, CRAFT, DEPLETION
+See also: CHIP, CRAFT, DEPLETION, RAW FISH, COOKED FISH
 #
 FORAGE
 

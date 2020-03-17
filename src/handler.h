@@ -259,8 +259,8 @@ extern char *get_custom_message(struct custom_message *list, int type);
 extern bool has_custom_message(struct custom_message *list, int type);
 
 // custom message helpers
-#define obj_get_custom_message(obj, type)  get_custom_message(obj->custom_msgs, type)
-#define obj_has_custom_message(obj, type)  has_custom_message(obj->custom_msgs, type)
+#define obj_get_custom_message(obj, type)  get_custom_message(GET_OBJ_CUSTOM_MSGS(obj), type)
+#define obj_has_custom_message(obj, type)  has_custom_message(GET_OBJ_CUSTOM_MSGS(obj), type)
 #define abil_get_custom_message(abil, type)  get_custom_message(ABIL_CUSTOM_MSGS(abil), type)
 #define abil_has_custom_message(abil, type)  has_custom_message(ABIL_CUSTOM_MSGS(abil), type)
 
@@ -329,7 +329,7 @@ extern bool has_evolution_type(sector_data *st, int type);
 sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_type);
 
 // storage handlers
-void add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount);
+struct empire_storage_data *add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount);
 extern bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool use_kept, bool basic_only, struct resource_data **build_used_list);
 extern bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount);
 extern bool delete_stored_resource(empire_data *emp, obj_vnum vnum);

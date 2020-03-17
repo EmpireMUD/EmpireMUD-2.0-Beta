@@ -900,7 +900,7 @@ void get_exit_template_display(struct exit_template *list, char *save_buffer) {
 void get_spawn_template_name(struct adventure_spawn *spawn, char *save_buffer) {
 	switch (spawn->type) {
 		case ADV_SPAWN_MOB: {
-			strcpy(save_buffer, skip_filler(get_mob_name_by_proto(spawn->vnum)));
+			strcpy(save_buffer, skip_filler(get_mob_name_by_proto(spawn->vnum, FALSE)));
 			break;
 		}
 		case ADV_SPAWN_OBJ: {

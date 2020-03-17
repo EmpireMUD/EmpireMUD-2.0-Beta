@@ -2300,13 +2300,37 @@ void despawn_charmies(char_data *ch) {
 * Quick way to turn a vnum into a name, safely.
 *
 * @param mob_vnum vnum The vnum to look up.
+* @param bool replace_placeholders If TRUE, will replace #n, #e, and #a with <name> etc
 * @return char* A name for the vnum, or "UNKNOWN".
 */
-char *get_mob_name_by_proto(mob_vnum vnum) {
+char *get_mob_name_by_proto(mob_vnum vnum, bool replace_placeholders) {
+	static char output[MAX_STRING_LENGTH];
 	char_data *proto = mob_proto(vnum);
 	char *unk = "UNKNOWN";
+	char *tmp;
 	
-	return proto ? GET_SHORT_DESC(proto) : unk;
+	if (!replace_placeholders || !proto || !strchr(buf, '#')) {
+		// short way out
+		return proto ? GET_SHORT_DESC(proto) : unk;
+	}
+	else {
+		strcpy(output, GET_SHORT_DESC(proto));
+		
+		// #n
+		tmp = str_replace("#n", "<name>", output);
+		strcpy(output, tmp);
+		free(tmp);
+		// #e
+		tmp = str_replace("#e", "<empire>", output);
+		strcpy(output, tmp);
+		free(tmp);
+		// #a
+		tmp = str_replace("#a", "<empire>", output);
+		strcpy(output, tmp);
+		free(tmp);
+		
+		return output;
+	}
 }
 
 

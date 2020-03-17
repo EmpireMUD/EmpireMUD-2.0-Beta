@@ -205,7 +205,7 @@ struct custom_message *pick_custom_longdesc(char_data *ch) {
 			continue;
 		}
 		
-		LL_FOREACH(GET_EQ(ch, iter)->custom_msgs, ocm) {
+		LL_FOREACH(GET_OBJ_CUSTOM_MSGS(GET_EQ(ch, iter)), ocm) {
 			if (ocm->type != OBJ_CUSTOM_LONGDESC && ocm->type != OBJ_CUSTOM_LONGDESC_FEMALE && ocm->type != OBJ_CUSTOM_LONGDESC_MALE) {
 				continue;
 			}
@@ -372,7 +372,7 @@ void look_at_target(char_data *ch, char *arg) {
 	/* Does the argument match an extra desc in the char's inventory? */
 	for (obj = ch->carrying; obj && !found; obj = obj->next_content) {
 		if (CAN_SEE_OBJ(ch, obj))
-			if ((desc = find_exdesc(arg, obj->ex_description)) != NULL && ++i == fnum) {
+			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
 				send_to_char(desc, ch);
 				act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
 				found = TRUE;
@@ -382,7 +382,7 @@ void look_at_target(char_data *ch, char *arg) {
 	/* Does the argument match an extra desc in the char's equipment? */
 	for (j = 0; j < NUM_WEARS && !found; j++)
 		if (GET_EQ(ch, j) && CAN_SEE_OBJ(ch, GET_EQ(ch, j)))
-			if ((desc = find_exdesc(arg, GET_EQ(ch, j)->ex_description)) != NULL && ++i == fnum) {
+			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(GET_EQ(ch, j)))) != NULL && ++i == fnum) {
 				send_to_char(desc, ch);
 				act("$n looks at $p.", TRUE, ch, GET_EQ(ch, j), NULL, TO_ROOM);
 				found = TRUE;
@@ -391,7 +391,7 @@ void look_at_target(char_data *ch, char *arg) {
 	/* Does the argument match an extra desc of an object in the room? */
 	for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj && !found; obj = obj->next_content)
 		if (CAN_SEE_OBJ(ch, obj))
-			if ((desc = find_exdesc(arg, obj->ex_description)) != NULL && ++i == fnum) {
+			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
 				send_to_char(desc, ch);
 				act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
 				found = TRUE;
@@ -1001,7 +1001,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		act("...$e is flying with gossamer mana wings!", FALSE, i, 0, ch, TO_VICT);
 	}
 	if (IS_RIDING(i)) {
-		sprintf(buf, "...$E is %s upon %s.", (MOUNT_FLAGGED(i, MOUNT_FLYING) ? "flying" : "mounted"), get_mob_name_by_proto(GET_MOUNT_VNUM(i)));
+		sprintf(buf, "...$E is %s upon %s.", (MOUNT_FLAGGED(i, MOUNT_FLYING) ? "flying" : "mounted"), get_mob_name_by_proto(GET_MOUNT_VNUM(i), TRUE));
 		act(buf, FALSE, ch, 0, i, TO_CHAR);
 	}
 	if (GET_LED_BY(i)) {
@@ -2066,10 +2066,10 @@ ACMD(do_affects) {
 	
 	// mount
 	if (IS_RIDING(ch)) {
-		msg_to_char(ch, "   You are riding %s.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
+		msg_to_char(ch, "   You are riding %s.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
 	else if (has_player_tech(ch, PTECH_RIDING) && GET_MOUNT_VNUM(ch) != NOTHING && mob_proto(GET_MOUNT_VNUM(ch))) {
-		msg_to_char(ch, "   You have %s. Type 'mount' to ride it.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch)));
+		msg_to_char(ch, "   You have %s. Type 'mount' to ride it.\r\n", get_mob_name_by_proto(GET_MOUNT_VNUM(ch), TRUE));
 	}
 
 	/* Morph */

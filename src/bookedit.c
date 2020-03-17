@@ -103,7 +103,7 @@ obj_data *create_book_obj(book_data *book) {
 	GET_OBJ_LONG_DESC(obj) = str_dup(buf);
 	GET_OBJ_ACTION_DESC(obj) = str_dup(NULLSAFE(book->item_description));
 	
-	GET_OBJ_TYPE(obj) = ITEM_BOOK;
+	obj->proto_data->type_flag = ITEM_BOOK;
 	GET_OBJ_WEAR(obj) = ITEM_WEAR_TAKE;
 	GET_OBJ_TIMER(obj) = UNLIMITED;
 	GET_OBJ_VAL(obj, VAL_BOOK_ID) = book->vnum;
