@@ -608,7 +608,7 @@ build make for an intimidating sight.
 ~
 I 0 3012 100.00 4  # BUTCHER: a fillet of raw meat
 I 0 9139 5.00 1 a  # BUTCHER: a rare rhinoceros horn
-I 0 9141 95.00 1 a  # BUTCHER: a rhinoceros horn
+I 0 9141 95.00 1 a  # BUTCHER: a common rhinoceros horn
 I 1 1351 100.00 2  # SKIN: a large skin
 T 9118
 T 9503
@@ -1417,7 +1417,7 @@ A large spider creeps by.
 1 5 djo cG 1
 0 0 9 9
 D
-   This spider is larger enough -- and hairy enough -- to be a mouse. Instead,
+   This spider is large enough -- and hairy enough -- to be a mouse. Instead,
 though, it's the thing mice see in their nightmares.
 ~
 T 9188

@@ -572,9 +572,9 @@ S
 net ratcatcher's ratcatchers~
 a ratcatcher's net~
 A ratcatcher's net is here.~
-You can 'use net rat' to catch a rat.
+Type 'net rat' to catch a rat.
 ~
-3 0 a 0 2
+3 0 a 0 3
 0 0 0
 0 0
 Q 18285
