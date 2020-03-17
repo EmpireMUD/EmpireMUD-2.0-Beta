@@ -2542,7 +2542,8 @@ SHOW(show_islands) {
 SHOW(show_piles) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], owner[256];
 	room_data *room, *next_room;
-	int count, max = 100;
+	struct world_storage *store;
+	int count, stored, max = 100;
 	obj_data *obj, *sub;
 	vehicle_data *veh;
 	size_t size;
@@ -2556,7 +2557,7 @@ SHOW(show_piles) {
 	
 	any = FALSE;
 	HASH_ITER(hh, world_table, room, next_room) {
-		count = 0;
+		count = stored = 0;
 		LL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
 			++count;
 			
@@ -2569,15 +2570,18 @@ SHOW(show_piles) {
 				++count;
 			}
 		}
+		LL_FOREACH(GET_WORLD_STORAGE(room), store) {
+			stored += store->amount;
+		}
 		
-		if (count >= max) {
+		if (count + stored >= max) {
 			if (ROOM_OWNER(room)) {
 				snprintf(owner, sizeof(owner), " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
 			}
 			else {
 				*owner = '\0';
 			}
-			snprintf(line, sizeof(line), "[%d] %s: %d item%s%s\r\n", GET_ROOM_VNUM(room), get_room_name(room, FALSE), count, PLURAL(count), owner);
+			snprintf(line, sizeof(line), "[%d] %s: %d/%d item%s%s\r\n", GET_ROOM_VNUM(room), get_room_name(room, FALSE), count, stored, PLURAL(count + stored), owner);
 			any = TRUE;
 			
 			if (size + strlen(line) + 18 < sizeof(buf)) {

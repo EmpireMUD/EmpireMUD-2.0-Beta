@@ -1214,6 +1214,10 @@ Usage:  show piles [max size]
 
 This shows rooms which have more than 100 items in them (or whatever pile size
 you specify).
+
+Two numbers are shown: live items in the room and world-stored items in the
+room. World-stored items (the second digit) are highly reduced to take up
+less space, and don't count toward the number of items in the world.
 #e
 "SHOW PLAYER"
 
