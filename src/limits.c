@@ -45,6 +45,7 @@ extern const int regen_by_pos[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
+void build_city_storage_regions(empire_data *emp);
 extern obj_data *die(char_data *ch, char_data *killer);
 void death_log(char_data *ch, char_data *killer, int type);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
@@ -971,6 +972,7 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 	if (!found_building) {
 		log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) abandoned as ruins", city->name, X_COORD(city->location), Y_COORD(city->location));
 		perform_abandon_city(emp, city, TRUE);
+		build_city_storage_regions(emp);
 		return TRUE;
 	}
 	
@@ -1085,6 +1087,7 @@ static void reduce_city_overage_one(empire_data *emp) {
 	else {
 		log_to_empire(emp, ELOG_TERRITORY, "%s (%d, %d) is no longer a city because of too many city points in use", city->name, X_COORD(loc), Y_COORD(loc));
 		perform_abandon_city(emp, city, FALSE);
+		build_city_storage_regions(emp);
 	}
 	
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;

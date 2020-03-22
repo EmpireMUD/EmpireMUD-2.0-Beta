@@ -432,6 +432,7 @@ room_data *create_room(room_data *home) {
 * @param bool check_exits If TRUE, updates all world exits right away*.
 */
 void delete_room(room_data *room, bool check_exits) {
+	void build_city_storage_regions(empire_data *emp);
 	EVENT_CANCEL_FUNC(cancel_room_expire_event);
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
@@ -481,6 +482,7 @@ void delete_room(room_data *room, bool check_exits) {
 				// ... this should not be possible, but just in case ...
 				log_to_empire(emp, ELOG_TERRITORY, "%s was lost", city->name);
 				perform_abandon_city(emp, city, FALSE);
+				build_city_storage_regions(emp);
 			}
 		}
 		

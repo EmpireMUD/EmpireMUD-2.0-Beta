@@ -57,6 +57,7 @@ extern const char *trade_overunder[];
 
 // external funcs
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
+void build_city_storage_regions(empire_data *emp);
 extern bool can_claim(char_data *ch);
 void check_nowhere_einv(empire_data *emp, int new_island);
 extern int city_points_available(empire_data *emp);
@@ -1435,6 +1436,7 @@ void abandon_city(char_data *ch, empire_data *emp, char *argument) {
 	send_config_msg(ch, "ok_string");
 	perform_abandon_city(emp, city, TRUE);
 	
+	build_city_storage_regions(emp);
 	read_empire_territory(emp, FALSE);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	
@@ -1642,6 +1644,7 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	}
 	
 	send_config_msg(ch, "ok_string");
+	build_city_storage_regions(emp);
 	read_empire_territory(emp, FALSE);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
@@ -1784,6 +1787,7 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	update_room_city_pointers(IN_ROOM(ch), city_type[city->type].radius * config_get_double("outskirts_modifier"), emp);
 	
 	// move einv here if any is lost
+	build_city_storage_regions(emp);
 	check_nowhere_einv(emp, GET_ISLAND_ID(IN_ROOM(ch)));
 	
 	read_empire_territory(emp, FALSE);
@@ -1986,6 +1990,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 	if (IS_CITY_CENTER(cityloc)) {
 		disassociate_building(cityloc);
 	}
+	delete_city_storage_region(emp, city->storage_region);
 	LL_DELETE(EMPIRE_CITY_LIST(emp), city);
 	if (city->name) {
 		free(city->name);
@@ -2097,6 +2102,7 @@ void upgrade_city(char_data *ch, empire_data *emp, char *argument) {
 	
 	log_to_empire(emp, ELOG_TERRITORY, "%s has upgraded %s to a %s", PERS(ch, ch, 1), city->name, city_type[city->type].name);
 	send_config_msg(ch, "ok_string");
+	build_city_storage_regions(emp);
 	read_empire_territory(emp, FALSE);
 	et_change_cities(emp);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
@@ -4691,6 +4697,7 @@ ACMD(do_enroll) {
 		}
 		
 		// This will PROPERLY reset wealth and land, plus members and abilities
+		build_city_storage_regions(GET_LOYALTY(ch));
 		reread_empire_tech(GET_LOYALTY(ch));
 		
 		// need to update quests too: do this AFTER rereading tech

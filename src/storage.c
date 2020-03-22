@@ -199,26 +199,29 @@ void build_city_storage_regions(empire_data *emp) {
 		}
 	} while (found);
 	
-	// assign storage to its regions -- only if they have any cities (no need otherwise)
-	if (EMPIRE_CITY_LIST(emp)) {
-		HASH_ITER(hh, EMPIRE_STORAGE(emp), estore, next_estore) {
-			// for each type of item stored to the empire
-			HASH_ITER(hh, estore->local, local, next_local) {
-				if (!(room = real_room(local->loc))) {
-					continue;	// unknown location somehow
-				}
-				if (!ROOM_CITY(room) || !ROOM_CITY(room)->storage_region) {
-					continue;	// not in a city -- no need to assign to a region
-				}
+	// assign storage to its regions
+	HASH_ITER(hh, EMPIRE_STORAGE(emp), estore, next_estore) {
+		// for each type of item stored to the empire
+		HASH_ITER(hh, estore->local, local, next_local) {
+			// clear data first
+			local->city = NULL;
+			local->next_in_city = NULL;
 			
-				// TODO: don't assign to a city if it's stored to a vehicle that moves?
-			
-				// and add/update the entry
-				if ((cla = find_city_local_assoc(&ROOM_CITY(room)->storage_region->storage, estore->vnum, TRUE))) {
-					LL_PREPEND2(cla->local, local, next_in_city);
-					local->city = ROOM_CITY(room)->storage_region;
-					SAFE_ADD(cla->total, local->amount, 0, INT_MAX, FALSE);
-				}
+			// validate city...
+			if (!(room = real_room(local->loc))) {
+				continue;	// unknown location somehow
+			}
+			if (!ROOM_CITY(room) || !ROOM_CITY(room)->storage_region) {
+				continue;	// not in a city -- no need to assign to a region
+			}
+		
+			// TODO: don't assign to a city if it's stored to a vehicle that moves?
+		
+			// and add/update the entry
+			if ((cla = find_city_local_assoc(&ROOM_CITY(room)->storage_region->storage, estore->vnum, TRUE))) {
+				LL_PREPEND2(cla->local, local, next_in_city);
+				local->city = ROOM_CITY(room)->storage_region;
+				SAFE_ADD(cla->total, local->amount, 0, INT_MAX, FALSE);
 			}
 		}
 	}
