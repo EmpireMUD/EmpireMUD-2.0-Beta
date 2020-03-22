@@ -1919,6 +1919,7 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 * @param empire_data *emp The empire to free
 */
 void free_empire(empire_data *emp) {
+	void delete_city_storage_region(empire_data *emp, struct city_storage_region *region);
 	void free_empire_goals(struct empire_goal *hash);
 	void free_empire_completed_goals(struct empire_completed_goal *hash);
 	
@@ -1973,6 +1974,9 @@ void free_empire(empire_data *emp) {
 	
 	// free cities (while they last)
 	while ((city = emp->city_list)) {
+		if (city->storage_region) {
+			delete_city_storage_region(emp, city->storage_region);
+		}
 		if (city->name) {
 			free(city->name);
 		}

@@ -1189,17 +1189,17 @@ Empires can earn many different technologies to boost their abilities and
 effectiveness.
 
 Available technologies are:
- - City Lights: all claimed territory lights up at night
- - Locks: enemy infiltration is much more difficult
- - Seaport*: you have a dock!
- - Workforce: citizens will do chores for the empire
- - Prominence: the empire appears on the main list
- - Citizens: people will move into homes and bedrooms in your empire
- - Portals: members of the empire can open portals
- - Master Portals: the empire's portals have unlimited range
- - Skilled Labor: the workforce can perform even more chores
- - Trade Routes: lets you set up trade with other empires
- - Exarch Crafts: your workforce can craft nexus crystals
+ - City Lights: All claimed territory lights up at night.
+ - Locks: Enemy infiltration is much more difficult.
+ - Seaport*: You have a dock!
+ - Workforce: Citizens will do chores for the empire.
+ - Prominence: The empire appears on the main list.
+ - Citizens: People will move into homes and bedrooms in your empire.
+ - Portals: Members of the empire can open portals.
+ - Master Portals: The empire's portals have unlimited range.
+ - Skilled Labor: The workforce can perform even more chores.
+ - Trade Routes: Lets you set up trade with other empires.
+ - Exarch Crafts: Your workforce can craft nexus crystals.
  - Deep Mines: Mines will be 50% deeper than normal.
  - Rare Metals: Mines can have rare metals.
  - Bonus Experience: Empire members get +5 bonus experience each day.
@@ -1208,8 +1208,8 @@ Available technologies are:
  - Fast Excavate: Members of the empire excavate much faster when in-city.
  - Hidden Progress: The empire's progress won't show on the /progress channel.
 
-* some technologies only function on the same island as the building that
-  provides them
+* some technologies only function in the same city or region as the building
+  that grants them.
 
 See also: TERRITORY
 #

@@ -99,8 +99,8 @@ struct promo_code_list promo_codes[] = {
 // if there are 10 entries (before the -1), that means up to 10 points available
 const double score_levels[] = { 0.0625, 0.125, 0.25, 0.5, 1.0, 1.5, 2.0, 4.0, 8.0, 16.0, -1 };	// terminate with -1
 
-// techs that only work if they're on the same island (these should not be techs that come from player abilities)
-const int techs_requiring_same_island[] = { TECH_SEAPORT, NOTHING };	// terminate with a NOTHING
+// techs that only work if they're in the same city or are nearby (these should not be techs that come from player abilities)
+const int distance_limited_techs[] = { TECH_SEAPORT, NOTHING };	// terminate with a NOTHING
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1296,7 +1296,7 @@ void load_config_system_from_file(void) {
 /**
 * Writes an int array as: key size val val val
 * For example:
-*  techs_requiring_same_island 3 1 2 -1
+*  distance_limited_techs 3 1 2 -1
 *
 * @param struct config_type *cnf The config element to write.
 * @param FILE *fl The file open for writing.
@@ -1807,8 +1807,8 @@ void init_config_system(void) {
 	init_config(CONFIG_MOBS, "use_mob_stacking", CONFTYPE_BOOL, "whether or not mobs show as stacks on look");
 
 /*	// this will take some testing to convert
-	init_config(CONFIG_EMPIRE, "techs_requiring_same_island", CONFTYPE_INT_ARRAY, "techs that only work if they're on the same island (these should not be techs that come from player abilities)");
-		init_config_custom("techs_requiring_same_island", config_show_typelist, config_edit_typelist, (void*)techs);
+	init_config(CONFIG_EMPIRE, "distance_limited_techs", CONFTYPE_INT_ARRAY, "techs that only work if they're on the same island (these should not be techs that come from player abilities)");
+		init_config_custom("distance_limited_techs", config_show_typelist, config_edit_typelist, (void*)techs);
 
 */
 	// other

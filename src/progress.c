@@ -500,7 +500,6 @@ void add_completed_goal(empire_data *emp, any_vnum vnum) {
 * @param bool add If TRUE, applies it. If FALSE, reverses it.
 */
 void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
-	struct empire_island *isle, *next_isle;
 	struct progress_perk *perk;
 	
 	if (!emp || !prg) {
@@ -527,9 +526,6 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 					
 					// also update current-tech
 					EMPIRE_TECH(emp, perk->value) += (add ? 1 : -1);
-					HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
-						isle->tech[perk->value] += (add ? 1 : -1);
-					}
 				}
 				break;
 			}

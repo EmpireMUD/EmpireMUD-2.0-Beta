@@ -1446,21 +1446,20 @@ bool has_tech_available_city(empire_data *emp, struct empire_city_data *city, in
 
 /**
 * This determines if the given location has the tech available.
-* It takes the location into account, not just the tech flags.
+* It takes the location into account, not just the tech types.
 *
 * @param room_data *room The location to check.
 * @param int tech TECH_ id
 * @return TRUE if successful, FALSE if not (and sends its own error message to ch)
 */
 bool has_tech_available_room(room_data *room, int tech) {
-	extern const int techs_requiring_same_island[];
+	extern const int distance_limited_techs[];
 	
 	empire_data *emp = ROOM_OWNER(room);
 	struct local_technology *local;
-	bool requires_island = FALSE;
-	struct empire_island *isle;
+	bool requires_local = FALSE;
 	room_data *loc;
-	int id, iter;
+	int iter;
 	
 	int max_distance = config_get_int("local_tech_distance");
 	
@@ -1468,24 +1467,24 @@ bool has_tech_available_room(room_data *room, int tech) {
 		return FALSE;
 	}
 	
+	if (EMPIRE_IMM_ONLY(emp)) {
+		return TRUE;	// immortal empires always have all tech available
+	}
+	
 	// see if it requires island
-	for (iter = 0; techs_requiring_same_island[iter] != NOTHING; ++iter) {
-		if (tech == techs_requiring_same_island[iter]) {
-			requires_island = TRUE;
+	for (iter = 0; distance_limited_techs[iter] != NOTHING; ++iter) {
+		if (tech == distance_limited_techs[iter]) {
+			requires_local = TRUE;
 			break;
 		}
 	}
 	
 	// easy way out
-	if (!requires_island && EMPIRE_HAS_TECH(emp, tech)) {
+	if (!requires_local && EMPIRE_HAS_TECH(emp, tech)) {
 		return TRUE;
 	}
 	
-	// check the island
-	id = GET_ISLAND_ID(room);
-	if (id != NO_ISLAND && (isle = get_empire_island(emp, id))) {
-		return (isle->tech[tech] > 0);
-	}
+	// everything else requires that the tech be local somewhere
 	
 	// check valid city tech
 	if (ROOM_CITY(room) && has_tech_available_city(emp, ROOM_CITY(room), tech)) {

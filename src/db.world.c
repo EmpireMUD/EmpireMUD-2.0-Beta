@@ -2322,7 +2322,6 @@ void remove_local_tech(empire_data *emp, room_data *room, int tech) {
 * @param bool add Adds the techs if TRUE, or removes them if FALSE.
 */
 void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
-	struct empire_island *isle = NULL;
 	int amt = add ? 1 : -1;	// adding or removing 1
 	int island;
 	
@@ -2340,9 +2339,7 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	
 	if (HAS_FUNCTION(room, FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
-		if (isle || (isle = get_empire_island(emp, island))) {
-			isle->tech[TECH_SEAPORT] += amt;
-		}
+		
 		if (add) {
 			add_local_tech(emp, room, TECH_SEAPORT);
 		}
@@ -2368,7 +2365,6 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 */
 void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 	int amt = add ? 1 : -1;	// adding or removing 1
-	struct empire_island *isle = NULL;
 	empire_data *emp = NULL;
 	room_data *room = NULL;
 	int island = NO_ISLAND;
@@ -2389,9 +2385,7 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 	
 	if (IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
-		if (island != NO_ISLAND && (isle || (isle = get_empire_island(emp, island)))) {
-			isle->tech[TECH_SEAPORT] += amt;
-		}
+		// TODO: need local tech for vehicles
 	}
 	
 	// other traits from buildings?
@@ -2422,7 +2416,6 @@ void clear_empire_techs(empire_data *emp) {
 		HASH_ITER(hh, EMPIRE_ISLANDS(iter), isle, next_isle) {
 			for (sub = 0; sub < NUM_TECHS; ++sub) {
 				isle->population = 0;
-				isle->tech[sub] = EMPIRE_BASE_TECH(iter, sub);
 			}
 		}
 		// main techs
@@ -2602,7 +2595,6 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 void reread_empire_tech(empire_data *emp) {
 	void resort_empires(bool force);
 	
-	struct empire_island *isle, *next_isle;
 	empire_data *iter, *next_iter;
 	vehicle_data *veh;
 	int sub;
@@ -2644,12 +2636,6 @@ void reread_empire_tech(empire_data *emp) {
 		// give all techs
 		for (sub = 0; sub < NUM_TECHS; ++sub) {
 			EMPIRE_TECH(iter, sub) += 1;
-		}
-		HASH_ITER(hh, EMPIRE_ISLANDS(iter), isle, next_isle) {
-			// give all island techs
-			for (sub = 0; sub < NUM_TECHS; ++sub) {
-				isle->tech[sub] += 1;
-			}
 		}
 	}
 	

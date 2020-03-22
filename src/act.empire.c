@@ -63,6 +63,7 @@ extern int city_points_available(empire_data *emp);
 void clear_private_owner(int id);
 void deactivate_workforce(empire_data *emp, int island_id, int type);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
+void delete_city_storage_region(empire_data *emp, struct city_storage_region *region);
 extern bool empire_can_claim(empire_data *emp);
 extern bool empire_is_ignoring(empire_data *emp, char_data *victim);
 extern int get_main_island(empire_data *emp);
@@ -4612,6 +4613,9 @@ ACMD(do_enroll) {
 			
 			// cities
 			LL_FOREACH_SAFE(EMPIRE_CITY_LIST(old), city, next_city) {
+				if (city->storage_region) {
+					delete_city_storage_region(old, city->storage_region);
+				}
 				if (city_points_available(e) >= (city->type + 1)) {
 					// can keep city
 					LL_DELETE(EMPIRE_CITY_LIST(old), city);

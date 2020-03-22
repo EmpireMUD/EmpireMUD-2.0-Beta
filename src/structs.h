@@ -4458,7 +4458,6 @@ struct empire_island {
 	struct empire_needs *needs;	// hash of stuff needed
 	
 	// unsaved portion
-	int tech[NUM_TECHS];	// TECH_ present on that island
 	int population;	// citizens
 	unsigned int territory[NUM_TERRITORY_TYPES];	// territory counts on this island
 	

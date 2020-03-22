@@ -298,6 +298,7 @@ void boot_db(void) {
 	void boot_world();
 	void build_all_quest_lookups();
 	void build_all_shop_lookups();
+	void build_city_storage_regions_all();
 	void build_player_index();
 	void check_for_new_map();
 	void check_learned_empire_crafts();
@@ -434,6 +435,7 @@ void boot_db(void) {
 	log(" Calculating empire data.");
 	reread_empire_tech(NULL);
 	check_for_new_map();
+	build_city_storage_regions_all();
 	setup_island_levels();
 	expire_old_politics();
 	check_learned_empire_crafts();
