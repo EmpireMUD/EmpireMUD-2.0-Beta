@@ -4603,7 +4603,11 @@ struct empire_workforce_tracker {
 
 // places where an empire has localized technologies
 struct local_technology {
-	room_vnum loc;	// where the empire has this tech
+	union {	// places this can be (each has its own list)
+		room_vnum room;	// room/building where the empire has this tech
+		vehicle_data *veh;	// vehicle providing the tech
+	} where;
+	
 	int tech;	// which TECH_ it's providing
 	struct local_technology *next;	// linked list: EMPIRE_LOCAL_TECHS()
 };
@@ -4722,6 +4726,7 @@ struct empire_data {
 	int greatness;	// total greatness of members
 	int tech[NUM_TECHS];	// TECH_, detected from buildings and abilities
 	struct local_technology *local_techs;	// TECH_ from buildings with specific locations
+	struct local_technology *vehicle_techs;	// TECH_ from vehicles with specific locations
 	struct empire_island *islands;	// empire island data hash
 	int members;	// Number of members, calculated at boot time
 	int total_member_count;	// Total number of members including timeouts and dupes

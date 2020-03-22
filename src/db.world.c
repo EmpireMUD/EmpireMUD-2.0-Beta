@@ -2274,7 +2274,7 @@ void check_tavern_setup(room_data *room) {
 * @param room_data *room Where the technology is.
 * @param int tech Which TECH_ it is.
 */
-void add_local_tech(empire_data *emp, room_data *room, int tech) {
+void add_local_room_tech(empire_data *emp, room_data *room, int tech) {
 	struct local_technology *local;
 	
 	if (!emp || !room) {
@@ -2282,9 +2282,30 @@ void add_local_tech(empire_data *emp, room_data *room, int tech) {
 	}
 	
 	CREATE(local, struct local_technology, 1);
-	local->loc = GET_ROOM_VNUM(room);
+	local->where.room = GET_ROOM_VNUM(room);
 	local->tech = tech;
 	LL_PREPEND(EMPIRE_LOCAL_TECHS(emp), local);
+}
+
+
+/**
+* This adds a vehicle technology to an empire.
+*
+* @param empire_data *emp Which empire.
+* @param vehicle_data *veh The vehicle providing the tech.
+* @param int tech Which TECH_ it is.
+*/
+void add_local_vehicle_tech(empire_data *emp, vehicle_data *veh, int tech) {
+	struct local_technology *local;
+	
+	if (!emp || !veh) {
+		return;	// safety
+	}
+	
+	CREATE(local, struct local_technology, 1);
+	local->where.veh = veh;
+	local->tech = tech;
+	LL_PREPEND(EMPIRE_VEHICLE_TECHS(emp), local);
 }
 
 
@@ -2295,7 +2316,7 @@ void add_local_tech(empire_data *emp, room_data *room, int tech) {
 * @param room_data *room Where the technology is.
 * @param int tech Which TECH_ it is.
 */
-void remove_local_tech(empire_data *emp, room_data *room, int tech) {
+void remove_local_room_tech(empire_data *emp, room_data *room, int tech) {
 	struct local_technology *local, *next;
 	
 	if (!emp || !room) {
@@ -2303,8 +2324,31 @@ void remove_local_tech(empire_data *emp, room_data *room, int tech) {
 	}
 	
 	LL_FOREACH_SAFE(EMPIRE_LOCAL_TECHS(emp), local, next) {
-		if (local->loc == GET_ROOM_VNUM(room) && local->tech == tech) {
+		if (local->where.room == GET_ROOM_VNUM(room) && local->tech == tech) {
 			LL_DELETE(EMPIRE_LOCAL_TECHS(emp), local);
+			free(local);
+		}
+	}
+}
+
+
+/**
+* This removes a vehicle technology from an empire.
+*
+* @param empire_data *emp Which empire.
+* @param vehicle_data *veh The vehicle that was providing the tech.
+* @param int tech Which TECH_ it is.
+*/
+void remove_local_vehicle_tech(empire_data *emp, vehicle_data *veh, int tech) {
+	struct local_technology *local, *next;
+	
+	if (!emp || !veh) {
+		return;	// safety
+	}
+	
+	LL_FOREACH_SAFE(EMPIRE_VEHICLE_TECHS(emp), local, next) {
+		if (local->where.veh == veh && local->tech == tech) {
+			LL_DELETE(EMPIRE_VEHICLE_TECHS(emp), local);
 			free(local);
 		}
 	}
@@ -2341,10 +2385,10 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
 		
 		if (add) {
-			add_local_tech(emp, room, TECH_SEAPORT);
+			add_local_room_tech(emp, room, TECH_SEAPORT);
 		}
 		else {
-			remove_local_tech(emp, room, TECH_SEAPORT);
+			remove_local_room_tech(emp, room, TECH_SEAPORT);
 		}
 	}
 	
@@ -2385,7 +2429,12 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 	
 	if (IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS)) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
-		// TODO: need local tech for vehicles
+		if (add) {
+			add_local_vehicle_tech(emp, veh, TECH_SEAPORT);
+		}
+		else {
+			remove_local_vehicle_tech(emp, veh, TECH_SEAPORT);
+		}
 	}
 	
 	// other traits from buildings?
@@ -2424,6 +2473,7 @@ void clear_empire_techs(empire_data *emp) {
 		}
 		// local techs
 		free_local_techs(&EMPIRE_LOCAL_TECHS(iter));
+		free_local_techs(&EMPIRE_VEHICLE_TECHS(iter));
 	}
 }
 

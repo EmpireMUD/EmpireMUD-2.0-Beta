@@ -594,6 +594,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_ISLANDS(emp)  ((emp)->islands)
 #define EMPIRE_TOP_SHIPPING_ID(emp)  ((emp)->top_shipping_id)
 #define EMPIRE_OFFENSES(emp)  ((emp)->offenses)
+#define EMPIRE_VEHICLE_TECHS(emp)  ((emp)->vehicle_techs)
 #define EMPIRE_WORKFORCE_LOG(emp)  ((emp)->wf_log)
 
 // helpers

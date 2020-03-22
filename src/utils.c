@@ -1428,7 +1428,7 @@ bool has_tech_available_city(empire_data *emp, struct empire_city_data *city, in
 		if (local->tech != tech) {
 			continue;	// wrong tech
 		}
-		if (!(loc = real_room(local->loc))) {
+		if (!(loc = real_room(local->where.room))) {
 			continue;	// no valid location?
 		}
 		if (!ROOM_CITY(loc) || ROOM_CITY(loc)->storage_region != city->storage_region) {
@@ -1436,6 +1436,21 @@ bool has_tech_available_city(empire_data *emp, struct empire_city_data *city, in
 		}
 		
 		// found a valid match!
+		return TRUE;
+	}
+	
+	LL_FOREACH(EMPIRE_VEHICLE_TECHS(emp), local) {
+		if (local->tech != tech) {
+			continue;	// wrong tech
+		}
+		if (!IN_ROOM(local->where.veh)) {
+			continue;	// vehicle is nowhere?
+		}
+		if (!ROOM_CITY(IN_ROOM(local->where.veh)) || ROOM_CITY(IN_ROOM(local->where.veh))->storage_region != city->storage_region) {
+			continue;	// not in same region
+		}
+		
+		// seems to be a match
 		return TRUE;
 	}
 	
@@ -1496,7 +1511,26 @@ bool has_tech_available_room(room_data *room, int tech) {
 		if (local->tech != tech) {
 			continue;	// wrong tech
 		}
-		if (!(loc = real_room(local->loc))) {
+		if (!(loc = real_room(local->where.room))) {
+			continue;	// no location?
+		}
+		if (GET_ISLAND_ID(loc) == NO_ISLAND || GET_ISLAND_ID(loc) != GET_ISLAND_ID(room)) {
+			continue;	// wrong island
+		}
+		if (compute_distance(room, loc) > max_distance) {
+			continue;	// too far
+		}
+		
+		// found local tech!
+		return TRUE;
+	}
+	
+	// check vehicle techs
+	LL_FOREACH(EMPIRE_VEHICLE_TECHS(emp), local) {
+		if (local->tech != tech) {
+			continue;	// wrong tech
+		}
+		if (!(loc = IN_ROOM(local->where.veh))) {
 			continue;	// no location?
 		}
 		if (GET_ISLAND_ID(loc) == NO_ISLAND || GET_ISLAND_ID(loc) != GET_ISLAND_ID(room)) {

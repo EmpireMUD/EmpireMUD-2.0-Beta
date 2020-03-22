@@ -2065,6 +2065,7 @@ void free_empire(empire_data *emp) {
 	
 	// free other lists
 	free_local_techs(&EMPIRE_LOCAL_TECHS(emp));
+	free_local_techs(&EMPIRE_VEHICLE_TECHS(emp));
 	
 	// free strings
 	if (emp->name) {
