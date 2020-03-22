@@ -1409,6 +1409,42 @@ bool has_tech_available(char_data *ch, int tech) {
 
 
 /**
+* Determines if a city has a given technology somewhere in its storage region.
+* 
+* @param empire_data *emp Which empire we're checking.
+* @param struct empire_city_data *city Which of the empire's cities.
+* @param int tech Which TECH_ to look for.
+* @return bool TRUE if the tech is available in the city, FALSE if not.
+*/
+bool has_tech_available_city(empire_data *emp, struct empire_city_data *city, int tech) {
+	struct local_technology *local;
+	room_data *loc;
+	
+	if (!emp || !city) {
+		return FALSE;	// shortcut
+	}
+	
+	LL_FOREACH(EMPIRE_LOCAL_TECHS(emp), local) {
+		if (local->tech != tech) {
+			continue;	// wrong tech
+		}
+		if (!(loc = real_room(local->loc))) {
+			continue;	// no valid location?
+		}
+		if (!ROOM_CITY(loc) || ROOM_CITY(loc)->storage_region != city->storage_region) {
+			continue;	// not in the same storage region
+		}
+		
+		// found a valid match!
+		return TRUE;
+	}
+	
+	// no match found
+	return FALSE;
+}
+
+
+/**
 * This determines if the given location has the tech available.
 * It takes the location into account, not just the tech flags.
 *
@@ -1420,9 +1456,13 @@ bool has_tech_available_room(room_data *room, int tech) {
 	extern const int techs_requiring_same_island[];
 	
 	empire_data *emp = ROOM_OWNER(room);
+	struct local_technology *local;
 	bool requires_island = FALSE;
 	struct empire_island *isle;
+	room_data *loc;
 	int id, iter;
+	
+	int max_distance = config_get_int("local_tech_distance");
 	
 	if (!emp) {
 		return FALSE;
@@ -1445,6 +1485,30 @@ bool has_tech_available_room(room_data *room, int tech) {
 	id = GET_ISLAND_ID(room);
 	if (id != NO_ISLAND && (isle = get_empire_island(emp, id))) {
 		return (isle->tech[tech] > 0);
+	}
+	
+	// check valid city tech
+	if (ROOM_CITY(room) && has_tech_available_city(emp, ROOM_CITY(room), tech)) {
+		return TRUE;
+	}
+	
+	// check local techs
+	LL_FOREACH(EMPIRE_LOCAL_TECHS(emp), local) {
+		if (local->tech != tech) {
+			continue;	// wrong tech
+		}
+		if (!(loc = real_room(local->loc))) {
+			continue;	// no location?
+		}
+		if (GET_ISLAND_ID(loc) == NO_ISLAND || GET_ISLAND_ID(loc) != GET_ISLAND_ID(room)) {
+			continue;	// wrong island
+		}
+		if (compute_distance(room, loc) > max_distance) {
+			continue;	// too far
+		}
+		
+		// found local tech!
+		return TRUE;
 	}
 	
 	// nope

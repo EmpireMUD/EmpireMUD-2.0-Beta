@@ -1766,6 +1766,7 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "frontier_timeout", CONFTYPE_INT, "after this many days, all frontier territory is lost; 0 to disable this");
 	init_config(CONFIG_EMPIRE, "time_to_empire_delete", CONFTYPE_INT, "weeks until an empire is deleted");
 	init_config(CONFIG_EMPIRE, "time_to_empire_emptiness", CONFTYPE_INT, "weeks until NPCs don't spawn");
+	init_config(CONFIG_EMPIRE, "local_tech_distance", CONFTYPE_INT, "how far local techs work -- if they're not in the same city region");
 	init_config(CONFIG_EMPIRE, "member_timeout_newbie", CONFTYPE_INT, "days until newbie times out");
 	init_config(CONFIG_EMPIRE, "minutes_per_day_newbie", CONFTYPE_INT, "minutes played per day for noob status");
 	init_config(CONFIG_EMPIRE, "member_timeout_full", CONFTYPE_INT, "days until full member times out");

@@ -4389,7 +4389,27 @@ struct empire_city_data {
 	room_data *location;
 	bitvector_t traits;	// ETRAIT_x
 	
+	// storage region: other cities linked to this one
+	struct city_storage_region *storage_region;
+	struct empire_city_data *next_in_storage_region;
+	
 	struct empire_city_data *next;
+};
+
+
+// storage meta-data and lists for the city -- each local_storage may be in multiple cities
+struct city_local_assoc {
+	struct local_storage *local;	// list of places the item is stored in this city (LL: next_in_city)
+	int total;	// total stored in the city
+	int keep;	// how many to keep here (UNLIMITED/-1 or >0)
+	struct city_local_assoc *next;
+};
+
+
+// regions are separate from cities because multiple cities can overlap to form 1 region
+struct city_storage_region {
+	struct empire_city_data *cities;	// linked list of cities in the region (LL: next_in_storage_region)
+	struct city_local_assoc *storage;	// linked list of stuff stored here (LL: next)
 };
 
 
@@ -4446,6 +4466,21 @@ struct empire_island {
 };
 
 
+// these are subsets of empire_storage entries for WHERE a thing is stored
+struct local_storage {
+	room_vnum loc;	// specific building where stored
+	int amount;	// how many are stored here
+	
+	// eventually: might add level, decay timer here so items can decay in storage
+	
+	struct city_storage_region *city;	// if any
+	struct local_storage *next_in_city;	// LL pointer for city_local_assoc->local
+	
+	struct empire_storage *parent;	// pointer back to the storage it's part of (vnum is there)
+	UT_hash_handle hh;	// hash: empire_storage->local
+};
+
+
 struct empire_log_data {
 	int type;	// ELOG_
 	time_t timestamp;
@@ -4486,6 +4521,19 @@ struct empire_political_data {
 	time_t start_time;	// used mainly for war
 
 	struct empire_political_data *next;
+};
+
+
+// hash (by vnum) of stored objects: new during beta5, replaces empire_storage_data and replaces island-based storage with local storage
+struct empire_storage {		// new struct name to make it easier to find places to change
+	obj_vnum vnum;	// what's stored (hash key)
+	obj_data *proto;	// shortcut to the prototype
+	int total;	// global total
+	// int keep;	// how many to keep globally (UNLIMITED/-1 or >0)	-- may not need this at all
+	
+	struct local_storage *local;	// where specifically it's stored (hash table by room vnum)
+	
+	UT_hash_handle hh;	// hash: EMPIRE_STORAGE(emp), by obj vnum
 };
 
 
@@ -4551,6 +4599,14 @@ struct empire_workforce_tracker {
 	int total_amount;	// amount of resource, total
 	struct empire_workforce_tracker_island *islands;	// amount per island
 	UT_hash_handle hh;
+};
+
+
+// places where an empire has localized technologies
+struct local_technology {
+	room_vnum loc;	// where the empire has this tech
+	int tech;	// which TECH_ it's providing
+	struct local_technology *next;	// linked list: EMPIRE_LOCAL_TECHS()
 };
 
 
@@ -4651,6 +4707,7 @@ struct empire_data {
 	struct theft_log *theft_logs;	// recently stolen items
 	struct empire_production_total *production_totals;	// totals of items produced by the empire (hash by vnum)
 	struct script_data *script;	// for storing variables
+	struct empire_storage *storage;	// stored items
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum
@@ -4665,6 +4722,7 @@ struct empire_data {
 	int military;	// number of soldiers
 	int greatness;	// total greatness of members
 	int tech[NUM_TECHS];	// TECH_, detected from buildings and abilities
+	struct local_technology *local_techs;	// TECH_ from buildings with specific locations
 	struct empire_island *islands;	// empire island data hash
 	int members;	// Number of members, calculated at boot time
 	int total_member_count;	// Total number of members including timeouts and dupes

@@ -90,6 +90,7 @@ land_outside_city_modifier 0.350000
 land_per_greatness 15
 land_per_tech 15
 land_per_wealth 0.100000
+local_tech_distance 20
 member_timeout_full 120
 member_timeout_max_threshold 168
 member_timeout_newbie 7

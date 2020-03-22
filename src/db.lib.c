@@ -80,6 +80,7 @@ int check_object(obj_data *obj);
 int count_hash_records(FILE *fl);
 void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 empire_vnum find_free_empire_vnum(void);
+void free_local_techs(struct local_technology **list);
 void free_obj_eq_set(struct eq_set_obj *eq_set);
 void free_theft_logs(struct theft_log *list);
 void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
@@ -2058,6 +2059,9 @@ void free_empire(empire_data *emp) {
 	free_empire_goals(EMPIRE_GOALS(emp));
 	free_empire_completed_goals(EMPIRE_COMPLETED_GOALS(emp));
 	
+	// free other lists
+	free_local_techs(&EMPIRE_LOCAL_TECHS(emp));
+	
 	// free strings
 	if (emp->name) {
 		free(emp->name);
@@ -2083,6 +2087,23 @@ void free_empire(empire_data *emp) {
 	}
 	
 	free(emp);
+}
+
+
+/**
+* Frees up a list of local techs (for empires).
+*
+* @param struct local_technology **list A pointer to the list to free.
+*/
+void free_local_techs(struct local_technology **list) {
+	struct local_technology *iter, *next;
+	
+	if (list) {
+		LL_FOREACH_SAFE(*list, iter, next) {
+			free(iter);
+		}
+		*list = NULL;
+	}
 }
 
 

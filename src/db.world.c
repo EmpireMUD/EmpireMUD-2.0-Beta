@@ -2268,6 +2268,50 @@ void check_tavern_setup(room_data *room) {
 //// TERRITORY ///////////////////////////////////////////////////////////////
 
 /**
+* This adds a localized technology to an empire.
+*
+* @param empire_data *emp Which empire.
+* @param room_data *room Where the technology is.
+* @param int tech Which TECH_ it is.
+*/
+void add_local_tech(empire_data *emp, room_data *room, int tech) {
+	struct local_technology *local;
+	
+	if (!emp || !room) {
+		return;	// safety
+	}
+	
+	CREATE(local, struct local_technology, 1);
+	local->loc = GET_ROOM_VNUM(room);
+	local->tech = tech;
+	LL_PREPEND(EMPIRE_LOCAL_TECHS(emp), local);
+}
+
+
+/**
+* This removes local technology from an empire.
+*
+* @param empire_data *emp Which empire.
+* @param room_data *room Where the technology is.
+* @param int tech Which TECH_ it is.
+*/
+void remove_local_tech(empire_data *emp, room_data *room, int tech) {
+	struct local_technology *local, *next;
+	
+	if (!emp || !room) {
+		return;	// safety
+	}
+	
+	LL_FOREACH_SAFE(EMPIRE_LOCAL_TECHS(emp), local, next) {
+		if (local->loc == GET_ROOM_VNUM(room) && local->tech == tech) {
+			LL_DELETE(EMPIRE_LOCAL_TECHS(emp), local);
+			free(local);
+		}
+	}
+}
+
+
+/**
 * Mark empire technologies, fame, etc; based on room. You should call this
 * BEFORE starting a dismantle, as it only works on completed buildings. Also
 * call it when you finish a building, or claim one. Call it with add=FALSE
@@ -2298,6 +2342,12 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 		EMPIRE_TECH(emp, TECH_SEAPORT) += amt;
 		if (isle || (isle = get_empire_island(emp, island))) {
 			isle->tech[TECH_SEAPORT] += amt;
+		}
+		if (add) {
+			add_local_tech(emp, room, TECH_SEAPORT);
+		}
+		else {
+			remove_local_tech(emp, room, TECH_SEAPORT);
 		}
 	}
 	
@@ -2356,6 +2406,8 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 * @param empire_data *emp An empire if doing one, or NULL to clear all of them.
 */
 void clear_empire_techs(empire_data *emp) {
+	void free_local_techs(struct local_technology **list);
+	
 	struct empire_island *isle, *next_isle;
 	empire_data *iter, *next_iter;
 	int sub;
@@ -2377,6 +2429,8 @@ void clear_empire_techs(empire_data *emp) {
 		for (sub = 0; sub < NUM_TECHS; ++sub) {
 			EMPIRE_TECH(iter, sub) = EMPIRE_BASE_TECH(iter, sub);
 		}
+		// local techs
+		free_local_techs(&EMPIRE_LOCAL_TECHS(iter));
 	}
 }
 
