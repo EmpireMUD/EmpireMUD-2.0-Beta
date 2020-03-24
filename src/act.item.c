@@ -4844,6 +4844,7 @@ ACMD(do_eat) {
 	if (IS_FOOD(food)) {
 		GET_OBJ_VAL(food, VAL_FOOD_HOURS_OF_FULLNESS) -= eat_hours;
 		extract = (GET_FOOD_HOURS_OF_FULLNESS(food) <= 0);
+		SET_BIT(GET_OBJ_EXTRA(food), OBJ_NO_STORE);	// no longer storable
 	}
 	
 	// 5. messaging

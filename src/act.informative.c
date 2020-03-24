@@ -2670,8 +2670,11 @@ ACMD(do_inventory) {
 		if (*argument == '-') {
 			switch (*(argument+1)) {
 				case 'c': {
-					strcpy(word, argument+2);
+					argument += 2;	// skip past -c
+					skip_spaces(&argument);
+					strcpy(word, argument);
 					*argument = '\0';	// no further args
+					
 					if (!*word) {
 						msg_to_char(ch, "Show what component?\r\n");
 						return;

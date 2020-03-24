@@ -1356,8 +1356,13 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
-	else {
-		mark_workforce_delay(emp, room, chore, any_no_res ? WF_PROB_NO_RESOURCES : WF_PROB_OVER_LIMIT);
+	else {	// mark delays
+		if (any_no_res) {
+			mark_workforce_delay(emp, room, chore, WF_PROB_NO_RESOURCES);
+		}
+		if (any_over_limit) {
+			mark_workforce_delay(emp, room, chore, WF_PROB_OVER_LIMIT);
+		}
 	}
 	
 	if (!done_any) {
