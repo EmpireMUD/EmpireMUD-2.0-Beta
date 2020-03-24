@@ -1876,10 +1876,10 @@ generic_data *find_generic_component(char *name) {
 			continue;
 		}
 		
-		if (!str_cmp(name, GEN_NAME(gen))) {
+		if (!str_cmp(name, GEN_NAME(gen)) || (GET_COMPONENT_PLURAL(gen) && !str_cmp(name, GET_COMPONENT_PLURAL(gen)))) {
 			return gen;	// exact match
 		}
-		else if (!abbrev && multi_isname(name, GEN_NAME(gen))) {
+		else if (!abbrev && (multi_isname(name, GEN_NAME(gen)) || (GET_COMPONENT_PLURAL(gen) && multi_isname(name, GET_COMPONENT_PLURAL(gen))))) {
 			abbrev = gen;	// partial match
 		}
 	}
