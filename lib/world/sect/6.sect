@@ -41,7 +41,7 @@ D4
 &0..&?.&0.~
 &C~
 E
-4 0 0.20 602
+4 0 0.40 602
 I 5 103 2.00 1 d  # DIG: a yellow lightning stone
 I 5 104 2.00 1 d  # DIG: a red bloodstone
 I 5 1300 2.00 1 d  # DIG: a glowing green seashell
@@ -85,7 +85,7 @@ D4
 E
 0 0 100.00 601
 E
-4 0 0.20 603
+4 0 0.40 603
 I 5 103 2.00 1 d  # DIG: a yellow lightning stone
 I 5 104 2.00 1 d  # DIG: a red bloodstone
 I 5 1300 2.00 1 d  # DIG: a glowing green seashell
@@ -156,13 +156,13 @@ D4
 E
 0 0 100.00 602
 E
-4 0 0.20 604
+4 0 0.40 604
 E
-17 0 0.03 602
+17 0 0.10 602
 E
-17 40 0.03 602
+17 40 0.10 602
 E
-17 50 0.03 602
+17 50 0.10 602
 I 5 103 2.00 1 d  # DIG: a yellow lightning stone
 I 5 104 2.00 1 d  # DIG: a red bloodstone
 I 5 1300 2.00 1 d  # DIG: a glowing green seashell
@@ -548,7 +548,7 @@ D4
 .&V.&?..~
 &y~
 E
-4 0 0.20 612
+4 0 0.40 612
 I 5 103 2.00 1 d  # DIG: a yellow lightning stone
 I 5 104 2.00 1 d  # DIG: a red bloodstone
 I 5 1300 2.00 1 d  # DIG: a glowing green seashell
@@ -592,7 +592,7 @@ D4
 E
 0 0 100.00 611
 E
-4 0 0.20 613
+4 0 0.40 613
 I 5 103 2.00 1 d  # DIG: a yellow lightning stone
 I 5 104 2.00 1 d  # DIG: a red bloodstone
 I 5 1300 2.00 1 d  # DIG: a glowing green seashell
@@ -727,13 +727,13 @@ D4
 E
 0 0 100.00 612
 E
-4 0 0.20 614
+4 0 0.40 614
 E
-17 20 0.03 612
+17 20 0.10 612
 E
-17 51 0.03 612
+17 51 0.10 612
 E
-17 70 0.03 612
+17 70 0.10 612
 I 5 103 2.00 1 d  # DIG: a yellow lightning stone
 I 5 104 2.00 1 d  # DIG: a red bloodstone
 I 5 1300 2.00 1 d  # DIG: a glowing green seashell

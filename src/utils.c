@@ -1963,6 +1963,8 @@ adv_data *get_adventure_for_vnum(rmt_vnum vnum) {
 generic_data *find_generic_component(char *name) {
 	generic_data *gen, *next_gen, *abbrev = NULL;
 	
+	skip_spaces(&name);
+	
 	if (is_number(name)) {
 		return find_generic(atoi(name), GENERIC_COMPONENT);
 	}
@@ -1973,10 +1975,10 @@ generic_data *find_generic_component(char *name) {
 			continue;
 		}
 		
-		if (!str_cmp(name, GEN_NAME(gen))) {
+		if (!str_cmp(name, GEN_NAME(gen)) || (GET_COMPONENT_PLURAL(gen) && !str_cmp(name, GET_COMPONENT_PLURAL(gen)))) {
 			return gen;	// exact match
 		}
-		else if (!abbrev && multi_isname(name, GEN_NAME(gen))) {
+		else if (!abbrev && (multi_isname(name, GEN_NAME(gen)) || (GET_COMPONENT_PLURAL(gen) && multi_isname(name, GET_COMPONENT_PLURAL(gen))))) {
 			abbrev = gen;	// partial match
 		}
 	}
@@ -5774,7 +5776,7 @@ char *simple_time_since(time_t when) {
 		diff %= SECS_PER_REAL_MIN;
 		++parts;
 	}
-	if (diff > 0 && parts < 2) {
+	if ((diff > 0 && parts < 2) || (diff == 0 && parts == 0)) {
 		sprintf(output + strlen(output), "%*ds", parts ? 1 : 2, diff);
 		++parts;
 	}

@@ -2008,6 +2008,7 @@ ACMD(do_gen_write) {
 	}
 	if (fbuf.st_size >= config_get_int("max_filesize")) {
 		send_to_char("Sorry, the file is full right now... try again later.\r\n", ch);
+		syslog(SYS_INFO, GET_INVIS_LEV(ch), FALSE, "Warning: %s file is full", name);
 		return;
 	}
 	if (!(fl = fopen(filename, "a"))) {

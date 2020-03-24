@@ -2345,8 +2345,8 @@ int new_descriptor(int s) {
 			snprintf(buf, sizeof(buf), "Warning: gethostbyaddr [%s]", inet_ntoa(peer.sin_addr));
 			perror(buf);
 			
-			// did it take longer than 5 seconds to look up?
-			if (when + 5 < time(0)) {
+			// did it take longer than 3 seconds to look up?
+			if (when + 3 < time(0)) {
 				log("- added %s to slow IP list", inet_ntoa(peer.sin_addr));
 				add_slow_ip(inet_ntoa(peer.sin_addr));
 			}
