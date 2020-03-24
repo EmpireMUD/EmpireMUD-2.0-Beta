@@ -1866,6 +1866,8 @@ adv_data *get_adventure_for_vnum(rmt_vnum vnum) {
 generic_data *find_generic_component(char *name) {
 	generic_data *gen, *next_gen, *abbrev = NULL;
 	
+	skip_spaces(&name);
+	
 	if (is_number(name)) {
 		return find_generic(atoi(name), GENERIC_COMPONENT);
 	}
