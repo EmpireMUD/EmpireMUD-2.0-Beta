@@ -5677,7 +5677,7 @@ char *simple_time_since(time_t when) {
 		diff %= SECS_PER_REAL_MIN;
 		++parts;
 	}
-	if (diff > 0 && parts < 2) {
+	if ((diff > 0 && parts < 2) || (diff == 0 && parts == 0)) {
 		sprintf(output + strlen(output), "%*ds", parts ? 1 : 2, diff);
 		++parts;
 	}
