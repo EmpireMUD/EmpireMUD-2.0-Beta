@@ -362,8 +362,19 @@ int get_war_cost(empire_data *emp, empire_data *victim) {
 * @return bool True if the empire is affiliated to that island or false if not.
 */
 bool is_affiliated_island(empire_data *emp, int island_id) {
-	struct empire_island *isle;
+	struct empire_storage *store, *next_store;
+	struct local_storage *local, *next_local;
 	struct empire_unique_storage *eus;
+	struct empire_city_data *city;
+	struct empire_island *isle;
+	room_data *room;
+	
+	// check cities
+	LL_FOREACH(EMPIRE_CITY_LIST(emp), city) {
+		if (GET_ISLAND_ID(city->location) == island_id) {
+			return TRUE;
+		}
+	}
 	
 	//Grab the empire_isle information.
 	isle = get_empire_island(emp,island_id);
@@ -373,15 +384,23 @@ bool is_affiliated_island(empire_data *emp, int island_id) {
 		return TRUE;
 	}
 	
-	//Check if the empire has at least an item in there.
-	if (isle->store) {
-		return TRUE;
-	}
-	
-	//Check unique storage too
+	//Check unique storage
 	for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
 		if (isle->island == eus->island) {
 			return TRUE;
+		}
+	}
+	
+	// check local storage
+	HASH_ITER(hh, EMPIRE_STORAGE(emp), store, next_store) {
+		if (store->total <= 0) {
+			continue;	// skippable
+		}
+		
+		HASH_ITER(hh, store->local, local, next_local) {
+			if (local->amount > 0 && (room = real_room(local->loc)) && GET_ISLAND_ID(room) == island_id) {
+				return TRUE;
+			}
 		}
 	}
 	
@@ -434,7 +453,7 @@ void set_workforce_limit_all(empire_data *emp, int chore, int limit) {
 			continue;	// skip if non-island
 		}
 		if (limit != 0 && isle->workforce_limit[chore] == 0) {	// things we only skip if it's not "off" or there's already data
-			if (!isle->store && !isle->population && isle->territory[TER_TOTAL] < 1) {
+			if (!isle->population && isle->territory[TER_TOTAL] < 1) {
 				continue;	// appears to be a non-island
 			}
 		}
@@ -778,19 +797,10 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 * @param char *argument The requested inventory item.
 */
 static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *argument) {
-	//Helper structure.
-	struct eid_per_island {
-		int island;
-		int quantity;
-		int keep;
-		UT_hash_handle hh;
-	};
-	
-	struct empire_storage_data *store, *next_store;
-	struct eid_per_island *eid_pi, *eid_pi_next, *eid_pi_list = NULL;
-	struct empire_island *isle, *next_isle;
-	obj_data *proto = NULL;
-	char keepstr[256];
+	struct empire_storage *store, *next_store, *found = NULL;
+	struct local_storage *local, *next_local;
+	char citystr[256], keepstr[256];
+	room_data *room;
 	
 	
 	if (!ch || !ch->desc) {
@@ -802,51 +812,55 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 		return;
 	}
 	
-	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
-		HASH_ITER(hh, isle->store, store, next_store) {
-			//If there isn't an item proto yet, the first item that matches the given argument will become the item used for the rest of the loop.
-			if ( !proto ) {
-				if (!multi_isname(argument, GET_OBJ_KEYWORDS(store->proto))) {
-					continue;
-				} else {
-					proto = store->proto;
-				}
-			}else if ( proto->vnum != store->vnum){
-				continue;
-			}
-		
-			//We have a match.
-			CREATE(eid_pi, struct eid_per_island, 1);
-			eid_pi->island = isle->island;
-			eid_pi->quantity = store->amount;
-			eid_pi->keep = store->keep;
-			HASH_ADD_INT(eid_pi_list, island, eid_pi);
+	HASH_ITER(hh, EMPIRE_STORAGE(emp), store, next_store) {
+		if (store->total <= 0) {
+			continue;	// skip things we have none of
 		}
+		if (!multi_isname(argument, GET_OBJ_KEYWORDS(store->proto))) {
+			continue;	// not a name match
+		}
+		
+		//We have a match.
+		found = store;
+		break;	// only needed 1 match
 	}
-	if ( !proto ) {
+	if (!found) {
 		msg_to_char(ch, "This empire has no item by that name.\r\n");
 		return;
 	}
 	
-	identify_obj_to_char(proto, ch);
+	identify_obj_to_char(found->proto, ch);
 	
 	msg_to_char(ch, "Storage list: \r\n");
-	HASH_ITER(hh, eid_pi_list, eid_pi, eid_pi_next) {
-		if (eid_pi->keep == UNLIMITED) {
+	HASH_ITER(hh, found->local, local, next_local) {
+		if (local->amount <= 0 && local->status != STORE_NORMAL) {
+			continue;	// skip non-normal storage with 0 amount
+		}
+		if (!(room = real_room(local->loc))) {
+			continue;	// bad location?
+		}
+		
+		// prepare to show it:
+		
+		if (local->keep == UNLIMITED) {
 			strcpy(keepstr, " (keep)");
 		}
-		else if (eid_pi->keep > 0) {
-			snprintf(keepstr, sizeof(keepstr), " (keep %d)", eid_pi->keep);
+		else if (local->keep > 0) {
+			snprintf(keepstr, sizeof(keepstr), " (keep %d)", local->keep);
 		}
 		else {
 			*keepstr = '\0';
 		}
 		
-		msg_to_char(ch, "(%4d) %s%s\r\n", eid_pi->quantity, get_island_name_for(eid_pi->island, ch), keepstr);
-		// Cleaning as we use the hash.
-		HASH_DEL(eid_pi_list, eid_pi);
-		free(eid_pi);
-	}	
+		if (ROOM_CITY(room)) {
+			snprintf(citystr, sizeof(citystr), " [%s]", ROOM_CITY(room)->name);
+		}
+		else {
+			*citystr = '\0';
+		}
+		
+		msg_to_char(ch, "(%4d) %s%s%s%s\r\n", local->amount, get_room_name(room, FALSE), coord_display_room(ch, room, TRUE), keepstr, citystr);
+	}
 }
 
 
@@ -866,13 +880,14 @@ int sort_einv_list(struct einv_type *a, struct einv_type *b) {
 static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char *argument) {
 	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], vstr[256], keepstr[256];
 	struct einv_type *einv, *next_einv, *list = NULL;
-	obj_vnum vnum, last_vnum = NOTHING;
-	struct empire_storage_data *store, *next_store;
-	struct empire_island *isle, *next_isle;
+	struct empire_storage *store, *next_store;
+	struct local_storage *local, *next_local;
+	struct city_storage_region *region;
+	struct empire_city_data *city;
 	struct shipping_data *shipd;
-	obj_data *proto = NULL;
 	size_t lsize, size;
-	bool all = FALSE, any = FALSE;
+	bool all = FALSE, any;
+	obj_vnum vnum;
 	
 	if (!ch->desc) {
 		return;
@@ -888,39 +903,65 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		all = TRUE;
 	}
 	
+	// detect storage region
+	city = find_city(emp, IN_ROOM(ch), TRUE);
+	region = city ? city->storage_region : NULL;
+	
 	// build list
-	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
-		HASH_ITER(hh, isle->store, store, next_store) {
-			// prototype lookup
-			if (store->vnum != last_vnum) {
-				proto = store->proto;
-				last_vnum = store->vnum;
-			}
-			
-			if (!proto) {
-				continue;
-			}
-			
-			// argument given but doesn't match
-			if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(proto))) {
-				continue;
-			}
-			
-			// ready to add
-			vnum = store->vnum;
-			HASH_FIND_INT(list, &vnum, einv);
-			if (!einv) {
-				CREATE(einv, struct einv_type, 1);
-				einv->vnum = vnum;
-				einv->local = einv->total = 0;
-				HASH_ADD_INT(list, vnum, einv);
-			}
+	HASH_ITER(hh, EMPIRE_STORAGE(emp), store, next_store) {
+		if (store->total <= 0) {
+			continue;	// skippable
+		}
 		
-			// add
-			SAFE_ADD(einv->total, store->amount, 0, INT_MAX, FALSE);
-			if (isle->island == GET_ISLAND_ID(IN_ROOM(ch))) {
-				SAFE_ADD(einv->local, store->amount, 0, INT_MAX, FALSE);
-				einv->keep = store->keep;
+		// argument given but doesn't match
+		if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(store->proto))) {
+			continue;
+		}
+		
+		// no arg given: show local only
+		if (!*argument && !all) {
+			any = FALSE;
+			HASH_ITER(hh, store->local, local, next_local) {
+				if (region && local->city != region) {
+					continue;
+				}
+				else if (!region && local->loc != GET_ROOM_VNUM(IN_ROOM(ch))) {
+					continue;
+				}
+				
+				any = TRUE;	// found! (only need 1)
+				break;
+			}
+			if (!any) {
+				continue;
+			}
+		}
+		
+		// ready to add
+		vnum = store->vnum;
+		HASH_FIND_INT(list, &vnum, einv);
+		if (!einv) {
+			CREATE(einv, struct einv_type, 1);
+			einv->vnum = vnum;
+			einv->local = einv->total = 0;
+			HASH_ADD_INT(list, vnum, einv);
+		}
+		
+		// add
+		SAFE_ADD(einv->total, store->total, 0, INT_MAX, FALSE);
+		
+		// add locals
+		HASH_ITER(hh, store->local, local, next_local) {
+			if (region && local->city != region) {
+				continue;
+			}
+			else if (!region && local->loc != GET_ROOM_VNUM(IN_ROOM(ch))) {
+				continue;
+			}
+			
+			SAFE_ADD(einv->local, local->amount, 0, INT_MAX, FALSE);
+			if (einv->keep != UNLIMITED && local->keep) {
+				einv->keep = local->keep;
 			}
 		}
 	}
@@ -947,6 +988,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	// build output
 	size = snprintf(output, sizeof(output), "Inventory of %s%s&0 on this island:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	
+	any = FALSE;
 	HASH_ITER(hh, list, einv, next_einv) {
 		// only display it if it's on the requested island, or if they requested it by name, or all
 		if (all || einv->local > 0 || *argument) {

@@ -1217,6 +1217,11 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_SCORES  10	// total
 
 
+// STORE_x: storage status (ubyte)
+#define STORE_NORMAL  0	// no special status
+#define STORE_NO_BUILDING  1	// lacks a storage building (provisional storage)
+
+
 // TECH_x: Technologies
 	#define TECH_UNUSED  0	// formerly glassblowing
 #define TECH_CITY_LIGHTS  1
@@ -4469,6 +4474,8 @@ struct empire_island {
 struct local_storage {
 	room_vnum loc;	// specific building where stored
 	int amount;	// how many are stored here
+	int keep;	// how many to keep here (if it can't inherit from the city)
+	ubyte status;	// STORE_
 	
 	// eventually: might add level, decay timer here so items can decay in storage
 	
