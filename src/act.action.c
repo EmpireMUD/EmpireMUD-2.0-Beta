@@ -504,14 +504,27 @@ bool validate_burn_area(char_data *ch, int subcmd) {
 //// ACTION CANCELERS ////////////////////////////////////////////////////////
 
 /**
-* Returns a set of resources from the resource list (if any).
+* Returns a set of resources from the resource list (if any). This will return
+* the player to the room they started the action in (temporarily) if they have
+* moved but the action doesn't allow it.
 *
 * @param char_data *ch The person canceling the craft (or whatever).
 */
 void cancel_resource_list(char_data *ch) {
+	room_data *action_room, *was_in = NULL;
+	
+	if (GET_ACTION_ROOM(ch) != GET_ROOM_VNUM(IN_ROOM(ch)) && !IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ANYWHERE) && (action_room = real_room(GET_ACTION_ROOM(ch)))) {
+		was_in = IN_ROOM(ch);
+		char_to_room(ch, action_room);
+	}
+	
 	give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
 	free_resource_list(GET_ACTION_RESOURCES(ch));
 	GET_ACTION_RESOURCES(ch) = NULL;
+	
+	if (was_in && was_in != IN_ROOM(ch)) {
+		char_to_room(ch, was_in);
+	}
 }
 
 

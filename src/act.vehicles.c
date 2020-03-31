@@ -1514,7 +1514,7 @@ ACMD(do_dispatch) {
 	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 
 	struct island_info *to_isle;
-	char targ[MAX_INPUT_LENGTH];
+	char targ[MAX_INPUT_LENGTH], isle_arg[MAX_INPUT_LENGTH];
 	struct empire_npc_data *npc;
 	struct shipping_data *shipd;
 	char_data *worker;
@@ -1523,13 +1523,21 @@ ACMD(do_dispatch) {
 	argument = one_argument(argument, targ);
 	skip_spaces(&argument);
 	
+	// since 'ship' requires quotes around the island name, we are optionally taking them here
+	if (*argument == '"') {
+		any_one_word(argument, isle_arg);
+	}
+	else {
+		strcpy(isle_arg, argument);
+	}
+	
 	if (IS_NPC(ch) || !GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You can't dispatch any ships.\r\n");
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_SHIPPING)) {
 		msg_to_char(ch, "You don't have permission to dispatch ships.\r\n");
 	}
-	else if (!*targ || !*argument) {
+	else if (!*targ || !*isle_arg) {
 		msg_to_char(ch, "Dispatch which ship to which island?\r\n");
 	}
 	
@@ -1563,8 +1571,8 @@ ACMD(do_dispatch) {
 	else if (!GET_ISLAND(IN_ROOM(veh))) {
 		msg_to_char(ch, "You can't automatically dispatch ships that are out at sea.\r\n");
 	}
-	else if (!(to_isle = get_island_by_name(ch, argument)) && !(to_isle = get_island_by_coords(argument))) {
-		msg_to_char(ch, "Unknown target island \"%s\".\r\n", argument);
+	else if (!(to_isle = get_island_by_name(ch, isle_arg)) && !(to_isle = get_island_by_coords(isle_arg))) {
+		msg_to_char(ch, "Unknown target island \"%s\".\r\n", isle_arg);
 	}
 	else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(veh)) && room_has_function_and_city_ok(IN_ROOM(veh), FNC_DOCKS)) {
 		msg_to_char(ch, "It is already docked on that island.\r\n");
