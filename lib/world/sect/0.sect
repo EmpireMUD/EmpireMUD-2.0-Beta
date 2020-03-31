@@ -1181,8 +1181,8 @@ D2
 .w..~
 &g~
 D3
-&g.&?w&g..~
-&y~
+.&yw&?..~
+&g~
 D4
 .w..~
 &W~
@@ -2508,7 +2508,7 @@ Old-Growth Forest~
 An Old-Growth Forest~
 '^' 40 jq 5 dl dnp
 C
-chop, dig, gather, pick~
+chop, gather, pick~
 D1
 ^^^^~
 &g~

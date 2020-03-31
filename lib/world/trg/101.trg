@@ -489,7 +489,9 @@ Delayed aggro greet/entry~
 ~
 if %actor%
   * Actor entered room - valid target?
-  if (%actor.is_npc% && %actor.mob_flagged(HUMAN)% && !%actor.aff_flagged(!ATTACK)%) || (%actor.is_pc% && %actor.level% > 25 && !%actor.on_quest(10147)% && !%actor.nohassle%)
+  if (%actor.is_npc% && %actor.mob_flagged(HUMAN)% && !%actor.aff_flagged(!ATTACK)% && %actor.vnum% < 10000)
+    set target %actor%
+  elseif (%actor.is_pc% && %actor.level% > 25 && !%actor.on_quest(10147)% && !%actor.nohassle%)
     set target %actor%
   end
 else
@@ -529,7 +531,6 @@ end
 %echoaround% %target% %self.name% attacks %target.name%!
 %send% %target% %self.name% attacks you!
 %aggro% %target%
-look
 ~
 #10142
 Monsoon Rift cleanup + complete~
