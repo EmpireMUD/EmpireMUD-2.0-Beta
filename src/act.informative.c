@@ -3459,7 +3459,7 @@ ACMD(do_time) {
 			weekday = ((30 * time_info.month) + time_info.day + 1) % 7;
 			strcat(buf, weekdays[weekday]);
 		}
-		strcat(buf, "\r\n");
+		strcat(buf, ".\r\n");
 		send_to_char(buf, ch);
 	
 		gain_player_tech_exp(ch, PTECH_CLOCK, 1);
