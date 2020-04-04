@@ -116,8 +116,8 @@
 
 
 // What range of a 'real world' is covered by this map (-90 to 90 is the maximum range of latitudes)
-#define Y_MIN_LATITUDE  -72	// 0 is the equator, -66.56 is the anarctic circle
-#define Y_MAX_LATITUDE  72	// 66.56 is the arctic circle, 90 is the north pole
+#define Y_MIN_LATITUDE  -69	// 0 is the equator, -66.56 is the anarctic circle
+#define Y_MAX_LATITUDE  69	// 66.56 is the arctic circle, 90 is the north pole
 
 // converts a Y-coordinate to the equivalent latitude, based on Y_MIN_LATITUDE/Y_MAX_LATITUDE
 #define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * (ABSOLUTE(Y_MIN_LATITUDE) + ABSOLUTE(Y_MAX_LATITUDE))) + Y_MIN_LATITUDE)
