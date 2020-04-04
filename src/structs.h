@@ -119,6 +119,9 @@
 #define Y_MIN_LATITUDE  -71	// 0 is the equator, -66.56 is the anarctic circle
 #define Y_MAX_LATITUDE  71	// 66.56 is the arctic circle, 90 is the north pole
 
+#define ARCTIC_LATITUDE  66.56	// based on the real world
+#define TROPIC_LATITUDE  23.43	// based on the real world
+
 // converts a Y-coordinate to the equivalent latitude, based on Y_MIN_LATITUDE/Y_MAX_LATITUDE
 #define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * (ABSOLUTE(Y_MIN_LATITUDE) + ABSOLUTE(Y_MAX_LATITUDE))) + Y_MIN_LATITUDE)
 

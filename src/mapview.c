@@ -430,14 +430,10 @@ int pick_season(room_data *room) {
 	double latitude = Y_TO_LATITUDE(ycoord);
 	bool northern = (latitude >= 0);
 	
-	// based on real-world locations:
-	double arctic_lat = 66.56;
-	double tropic_lat = 23.43;
-	
 	// month 0 is january; year is 0-359 days
 	
 	// tropics? -- take half the tropic value, convert to percent, multiply by map height
-	if (ABSOLUTE(latitude) < tropic_lat) {
+	if (ABSOLUTE(latitude) < TROPIC_LATITUDE) {
 		if (time_info.month < 2) {
 			return TILESET_SPRING;
 		}
@@ -450,7 +446,7 @@ int pick_season(room_data *room) {
 	}
 	
 	// arctic? -- take half the arctic value, convert to percent, check map edges
-	if (ABSOLUTE(latitude) > arctic_lat) {
+	if (ABSOLUTE(latitude) > ARCTIC_LATITUDE) {
 		return TILESET_WINTER;
 	}
 	
@@ -459,15 +455,15 @@ int pick_season(room_data *room) {
 	day_of_year = time_info.month * 30 + time_info.day;
 	
 	if (northern) {
-		y_arctic = arctic_lat;
-		y_tropics = tropic_lat;
+		y_arctic = ARCTIC_LATITUDE;
+		y_tropics = TROPIC_LATITUDE;
 		a_slope = ((y_arctic - 1) - (y_tropics + 1)) / 120.0;	// basic slope of the seasonal gradient
 		b_slope = ((y_arctic - 1) - (y_tropics + 1)) / 90.0;
 		half_y = latitude - y_tropics; // simplify by moving the y axis to match the tropics line
 	}
 	else {
-		y_arctic = y_max - arctic_lat;
-		y_tropics = y_max - tropic_lat;
+		y_arctic = y_max - ARCTIC_LATITUDE;
+		y_tropics = y_max - TROPIC_LATITUDE;
 		a_slope = ((y_tropics - 1) - (y_arctic + 1)) / 120.0;	// basic slope of the seasonal gradient
 		b_slope = ((y_tropics - 1) - (y_arctic + 1)) / 90.0;
 		half_y = y_max - ABSOLUTE(latitude) - y_arctic;	// adjust to remove arctic
