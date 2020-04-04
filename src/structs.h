@@ -2190,6 +2190,8 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_BITE_STEAL_BLOOD  61	// steals blood on each 'bite' attack
 #define PTECH_SEE_IN_DARK_OUTDOORS  62  // can see in dark only if outside
 #define PTECH_HUNT_ANIMALS  63	// can use the 'hunt' command on animals
+#define PTECH_CLOCK  64	// can tell time
+#define PTECH_CALENDAR  65	// can tell the date
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

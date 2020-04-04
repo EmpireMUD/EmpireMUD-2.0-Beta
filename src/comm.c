@@ -3414,21 +3414,40 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				}
 				case 't':	/* Sun timer */
 				case 'T':
-					if (time_info.hours >= 12)
-						strcpy(spare, "pm");
-					else
-						strcpy(spare, "am");
+					if (has_player_tech(ch, PTECH_CLOCK)) {
+						if (time_info.hours >= 12)
+							strcpy(spare, "pm");
+						else
+							strcpy(spare, "am");
 
-					if (time_info.hours == 6)
-						sprintf(i, "\tC%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
-					else if (time_info.hours < 19 && time_info.hours > 6)
-						sprintf(i, "\tY%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
-					else if (time_info.hours == 19)
-						sprintf(i, "\tR%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
-					else if (time_info.hours == 0)
-						sprintf(i, "\tB12am\t0");
-					else
-						sprintf(i, "\tB%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						if (time_info.hours == 6)
+							sprintf(i, "\tC%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						else if (time_info.hours < 19 && time_info.hours > 6)
+							sprintf(i, "\tY%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						else if (time_info.hours == 19)
+							sprintf(i, "\tR%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						else if (time_info.hours == 0)
+							sprintf(i, "\tB12am\t0");
+						else
+							sprintf(i, "\tB%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+					}
+					else {	// no clock
+						if (time_info.hours == 6) {
+							strcpy(i, "dawn");
+						}
+						else if (time_info.hours == 12) {
+							strcpy(i, "noon");
+						}
+						else if (time_info.hours < 19 && time_info.hours > 6) {
+							strcpy(i, "day");
+						}
+						else if (time_info.hours == 19) {
+							strcpy(i, "dusk");
+						}
+						else {
+							strcpy(i, "night");
+						}
+					}
 					tmp = i;
 					break;
 				case 'a': {	// action

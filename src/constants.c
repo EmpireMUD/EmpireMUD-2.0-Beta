@@ -834,6 +834,8 @@ const char *player_tech_types[] = {
 	"Bite-Steal-Blood",
 	"See-In-Dark-Outdoors",
 	"Hunt-Animals",
+	"Clock",
+	"Calendar",	// 65
 	"\n"
 };
 

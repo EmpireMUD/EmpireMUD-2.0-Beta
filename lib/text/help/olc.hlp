@@ -1003,6 +1003,8 @@ Available techs are:
  &cBite-Steal-Blood&0 - Bite steals a small amount of blood.
  &cSee-In-Dark-Outdoors&0 - Can see in dark rooms if outdoors.
  &cHunt-Animals&0 - Can use the 'hunt' command, on animals.
+ &cClock&0 - Can tell the time.
+ &cCalendar&0 - Knows the date.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 

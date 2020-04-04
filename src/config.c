@@ -249,8 +249,10 @@ const char *book_name_list[] = {
 * these.
 */
 void init_inherent_player_techs(void) {
-	// example:
-	// set_inherent_ptech(PTECH_NAVIGATION);
+	// these default 'inherent' techs can be removed if you want to add an
+	// ability for these things
+	set_inherent_ptech(PTECH_CALENDAR);
+	set_inherent_ptech(PTECH_CLOCK);
 }
 
 
