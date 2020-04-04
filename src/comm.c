@@ -3433,19 +3433,19 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					}
 					else {	// no clock
 						if (time_info.hours == 6) {
-							strcpy(i, "dawn");
+							strcpy(i, "\tCdawn\t0");
 						}
 						else if (time_info.hours == 12) {
-							strcpy(i, "noon");
+							strcpy(i, "\tYnoon\t0");
 						}
 						else if (time_info.hours < 19 && time_info.hours > 6) {
-							strcpy(i, "day");
+							strcpy(i, "\tYday\t0");
 						}
 						else if (time_info.hours == 19) {
-							strcpy(i, "dusk");
+							strcpy(i, "\tRdusk\t0");
 						}
 						else {
-							strcpy(i, "night");
+							strcpy(i, "\tBnight\t0");
 						}
 					}
 					tmp = i;
