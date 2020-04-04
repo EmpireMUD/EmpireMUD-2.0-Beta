@@ -42,8 +42,6 @@
 // global vars (these are changed by command line args)
 int nearby_distance = 2;	// for nearby evos
 int day_of_year = 180;	// for seasons
-double arctic_percent = 6.0;	// for seasons
-double tropics_percent = 35.0;	// for seasons
 
 
 // light version of map data for this program
@@ -270,8 +268,8 @@ int main(int argc, char **argv) {
 	struct map_t *tile;
 	int num, pid = 0;
 	
-	if (argc < 5 || argc > 6) {
-		printf("Format: %s <nearby distance> <day of year> <arctic percent> <tropics percent> [pid to signal]\n", argv[0]);
+	if (argc < 3 || argc > 4) {
+		printf("Format: %s <nearby distance> <day of year> [pid to signal]\n", argv[0]);
 		exit(0);
 	}
 	
@@ -279,19 +277,15 @@ int main(int argc, char **argv) {
 	
 	nearby_distance = atoi(argv[1]);
 	day_of_year = atoi(argv[2]);
-	arctic_percent = atof(argv[3]);
-	tropics_percent = atof(argv[4]);
 	
 	if (DEBUG_MODE) {
 		printf("Using nearby distance of: %d\n", nearby_distance);
 		printf("Using day of year: %d\n", day_of_year);
-		printf("Using arctic percent: %.2f\n", arctic_percent);
-		printf("Using tropics percent: %.2f\n", tropics_percent);
 	}
 	
 	// determines if we will send a signal back to the mud
-	if (argc == 6) {
-		pid = atoi(argv[5]);
+	if (argc == 4) {
+		pid = atoi(argv[3]);
 		if (DEBUG_MODE) {
 			printf("Will signal pid: %d\n", pid);
 		}

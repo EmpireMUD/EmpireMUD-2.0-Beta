@@ -1915,8 +1915,8 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "interlink_mountain_limit", CONFTYPE_INT, "how many intervening tiles may be mountain");
 	init_config(CONFIG_WORLD, "generic_facing", CONFTYPE_BITVECTOR, "deprecated: do not set");
 	init_config(CONFIG_WORLD, "newbie_adventure_cap", CONFTYPE_INT, "highest adventure min-level that can spawn on newbie islands");
-	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "what percent of top/bottom of the map is arctic");
-	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "what percent of the middle of the map is tropics");
+	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "deprecated: do not set");
+	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "deprecated: do not set");
 	
 	// TODO note: deprecated
 	init_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT, "deprecated: do not set");
