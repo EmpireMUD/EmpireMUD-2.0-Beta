@@ -6569,12 +6569,22 @@ void add_player_tech(char_data *ch, any_vnum abil, int tech) {
 * @return bool TRUE if the player has it, FALSE otherwise.
 */
 bool has_player_tech(char_data *ch, int tech) {
+	extern struct int_hash *inherent_ptech_hash;
+	
 	struct player_tech *iter;
+	struct int_hash *find;
 	
 	if (IS_NPC(ch)) {
 		return FALSE;
 	}
 	
+	// check inherent techs
+	HASH_FIND_INT(inherent_ptech_hash, &tech, find);
+	if (find) {
+		return TRUE;
+	}
+	
+	// check player techs
 	LL_FOREACH(GET_TECHS(ch), iter) {
 		if (iter->id == tech) {
 			return TRUE;

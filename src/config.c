@@ -50,6 +50,9 @@
 // external vars
 extern const char *techs[];
 
+// external funcs
+void set_inherent_ptech(int ptech);
+
 // locals
 bool add_int_to_int_array(int to_add, int **array, int *size);
 bool find_int_in_array(int to_find, int *array, int size);
@@ -238,6 +241,17 @@ const char *book_name_list[] = {
 	"tome",
 	"\n"
 };
+
+
+/**
+* Any player technologies that are 'inherent' -- that is, don't require an
+* ability to use them, can be configured here. All players will have access to
+* these.
+*/
+void init_inherent_player_techs(void) {
+	// example:
+	// set_inherent_ptech(PTECH_NAVIGATION);
+}
 
 
  //////////////////////////////////////////////////////////////////////////////

@@ -2861,6 +2861,13 @@ struct index_data {
 };
 
 
+// for various hashes that just need an int
+struct int_hash {
+	int num;	// the int
+	UT_hash_handle hh;	// hash handle
+};
+
+
 // for exclusive interaction processing
 struct interact_exclusion_data {
 	int code;	// a-z, A-Z, or empty (stored as an int for easy-int funcs)
