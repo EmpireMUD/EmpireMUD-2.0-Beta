@@ -114,6 +114,15 @@
 #define WRAP_X  TRUE	// whether the mud wraps east-west
 #define WRAP_Y  FALSE	// whether the mud wraps north-south
 
+
+// What range of a 'real world' is covered by this map (-90 to 90 is the maximum range of latitudes)
+#define Y_MIN_LATITUDE  -66.56	// 0 is the equator, -66.56 is the anarctic circle
+#define Y_MAX_LATITUDE  66.56	// 66.56 is the arctic circle, 90 is the north pole
+
+// converts a Y-coordinate to the equivalent latitude, based on Y_MIN_LATITUDE/Y_MAX_LATITUDE
+#define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * (ABSOLUTE(Y_MIN_LATITUDE) + ABSOLUTE(Y_MAX_LATITUDE))) + Y_MIN_LATITUDE)
+
+
 #define COIN_VALUE  0.1	// value of a coin as compared to 1 wealth (0.1 coin value = 10 coins per wealth)
 
 // ***WARNING*** Change this before starting your playerfile
