@@ -463,14 +463,14 @@ int pick_season(room_data *room) {
 		y_tropics = tropic_lat;
 		a_slope = ((y_arctic - 1) - (y_tropics + 1)) / 120.0;	// basic slope of the seasonal gradient
 		b_slope = ((y_arctic - 1) - (y_tropics + 1)) / 90.0;
-		half_y = ABSOLUTE(latitude - y_max) - y_tropics; // simplify by moving the y axis to match the tropics line
+		half_y = latitude - y_tropics; // simplify by moving the y axis to match the tropics line
 	}
 	else {
 		y_arctic = y_max - arctic_lat;
 		y_tropics = y_max - tropic_lat;
 		a_slope = ((y_tropics - 1) - (y_arctic + 1)) / 120.0;	// basic slope of the seasonal gradient
 		b_slope = ((y_tropics - 1) - (y_arctic + 1)) / 90.0;
-		half_y = latitude - y_arctic;	// adjust to remove arctic
+		half_y = y_max - ABSOLUTE(latitude) - y_arctic;	// adjust to remove arctic
 	}
 	
 	if (day_of_year < 6 * 30) {	// first half of year
