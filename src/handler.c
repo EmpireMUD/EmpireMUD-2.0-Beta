@@ -4082,7 +4082,7 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	
 	struct temp_veh_helper {
 		vehicle_data *veh;
-		struct temp_veh_helper *next;
+		struct temp_veh_helper *next, *prev;
 	} *list = NULL, *tvh, *next_tvh;
 	
 	success = FALSE;
@@ -4096,22 +4096,22 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 			
 			// attempt a semi-random order (randomly goes first or else last)
 			if (!number(0, num++) || !list) {
-				LL_PREPEND(list, tvh);
+				DL_PREPEND(list, tvh);
 			}
 			else {
-				LL_APPEND(list, tvh);
+				DL_APPEND(list, tvh);
 			}
 		}
 	}
 	
 	// now, try vehicles in random order...
-	LL_FOREACH_SAFE(list, tvh, next_tvh) {
+	DL_FOREACH_SAFE(list, tvh, next_tvh) {
 		if (!success) {
 			success |= run_interactions(ch, VEH_INTERACTIONS(tvh->veh), type, room, NULL, NULL, func);
 		}
+		DL_DELETE(list, tvh);
 		free(tvh);	// clean up
 	}
-	list = NULL;	// already empty
 	
 	// building first
 	if (!success && GET_BUILDING(room)) {
@@ -5363,7 +5363,7 @@ struct obj_binding *copy_obj_bindings(struct obj_binding *from) {
 	LL_FOREACH(from, iter) {
 		CREATE(bind, struct obj_binding, 1);
 		*bind = *iter;
-		LL_APPEND(list, bind);
+		LL_PREPEND(list, bind);
 	}
 	
 	return list;
@@ -5980,7 +5980,7 @@ obj_data *unequip_char_to_room(char_data *ch, int pos) {
 * @return struct custom_message* The copied list.
 */
 struct custom_message *copy_custom_messages(struct custom_message *from) {
-	struct custom_message *list = NULL, *mes, *iter;
+	struct custom_message *list = NULL, *mes, *iter, *last = NULL;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(mes, struct custom_message, 1);
@@ -5988,7 +5988,13 @@ struct custom_message *copy_custom_messages(struct custom_message *from) {
 		mes->type = iter->type;
 		mes->msg = iter->msg ? str_dup(iter->msg) : NULL;
 		
-		LL_APPEND(list, mes);
+		if (last) {
+			last->next = mes;
+		}
+		else {
+			list = mes;
+		}
+		last = mes;
 	}
 	
 	return list;

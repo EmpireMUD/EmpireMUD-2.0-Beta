@@ -3658,7 +3658,7 @@ struct player_index_data {
 struct stack_msg {
 	char *string;	// text
 	int count;	// (x2)
-	struct stack_msg *next;
+	struct stack_msg *prev, *next;	// doubly-linked list for speed
 };
 
 
