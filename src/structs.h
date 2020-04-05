@@ -3605,7 +3605,7 @@ struct channel_history_data {
 	int invis_level;	// if it's an invisible immortal
 	char *message;
 	long timestamp;
-	struct channel_history_data *next;
+	struct channel_history_data *prev, *next;	// doubly-linked list
 };
 
 
@@ -3964,7 +3964,7 @@ struct player_special_data {
 	struct player_slash_channel *slash_channels;	// channels the player is on
 	struct slash_channel *load_slash_channels;	// temporary storage between load and join
 	struct player_faction_data *factions;	// hash table of factions
-	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories
+	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// DLs: histories
 	struct player_automessage *automessages;	// hash of seen messages
 	struct player_event_data *event_data;	// hash of event scores and results
 
