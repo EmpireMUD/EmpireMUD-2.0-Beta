@@ -172,6 +172,7 @@ int top_account_id = 0;  // highest account number in use, determined during sta
 struct group_data *group_list = NULL;	// global LL of groups
 bool pause_affect_total = FALSE;	// helps prevent unnecessary calls to affect_total
 int max_inventory_size = 25;	// records how high inventories go right now (for script safety)
+struct int_hash *inherent_ptech_hash = NULL;	// hash of PTECH_ that are automatic
 
 // progress
 progress_data *progress_table = NULL;	// hashed by vnum, sorted by vnum
@@ -309,6 +310,7 @@ void boot_db(void) {
 	void expire_old_politics();
 	void generate_island_descriptions();
 	void init_config_system();
+	void init_inherent_player_techs();
 	void link_and_check_vehicles();
 	void load_automessages();
 	void load_banned();
@@ -332,6 +334,7 @@ void boot_db(void) {
 	
 	log("Loading game config system.");
 	init_config_system();
+	init_inherent_player_techs();
 	
 	log("Loading game data system.");
 	load_data_table();
@@ -4590,6 +4593,27 @@ void reset_time(void) {
 		weather_info.sky = SKY_CLOUDY;
 	else
 		weather_info.sky = SKY_CLOUDLESS;
+}
+
+
+/**
+* Sets a player tech as 'inherent' -- all players automatically have it. This
+* allows some variation from EmpireMUD to EmpireMUD, as some games require
+* players to earn more techs.
+*
+* @param int ptech The PTECH_ type to set as 'inherent'.
+*/
+void set_inherent_ptech(int ptech) {
+	extern struct int_hash *inherent_ptech_hash;
+	struct int_hash *entry;
+	
+	HASH_FIND_INT(inherent_ptech_hash, &ptech, entry);
+	
+	if (!entry) {
+		CREATE(entry, struct int_hash, 1);
+		entry->num = ptech;
+		HASH_ADD_INT(inherent_ptech_hash, num, entry);
+	}
 }
 
 

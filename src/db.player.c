@@ -796,7 +796,7 @@ void free_char(char_data *ch) {
 	struct player_skill_data *skill, *next_skill;
 	struct ability_gain_hook *hook, *next_hook;
 	struct mount_data *mount, *next_mount;
-	struct channel_history_data *history;
+	struct channel_history_data *history, *next_hist;
 	struct player_slash_channel *slash;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
@@ -924,8 +924,9 @@ void free_char(char_data *ch) {
 		
 		// free channel histories
 		for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
-			while ((history = GET_HISTORY(ch, iter))) {
-				GET_HISTORY(ch, iter) = history->next;
+			DL_FOREACH_SAFE(GET_HISTORY(ch, iter), history, next_hist) {
+				DL_DELETE(GET_HISTORY(ch, iter), history);
+				
 				if (history->message) {
 					free(history->message);
 				}
@@ -1587,7 +1588,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						CREATE(hist, struct channel_history_data, 1);
 						hist->timestamp = l_in[1];
 						hist->message = fread_string(fl, error);
-						LL_APPEND(GET_HISTORY(ch, i_in[0]), hist);
+						DL_APPEND(GET_HISTORY(ch, i_in[0]), hist);
 					}
 				}
 				BAD_TAG_WARNING(line);
@@ -2734,7 +2735,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	
 	// 'H'
 	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
-		LL_FOREACH(GET_HISTORY(ch, iter), hist) {
+		DL_FOREACH(GET_HISTORY(ch, iter), hist) {
 			fprintf(fl, "History: %d %ld\n%s~\n", iter, hist->timestamp, NULLSAFE(hist->message));
 		}
 	}
@@ -3265,13 +3266,13 @@ void clean_old_history(char_data *ch) {
 	}
 	
 	for (iter = 0; iter < NUM_CHANNEL_HISTORY_TYPES; ++iter) {
-		LL_FOREACH_SAFE(GET_HISTORY(ch, iter), hist, next_hist) {
+		DL_FOREACH_SAFE(GET_HISTORY(ch, iter), hist, next_hist) {
 			if (hist->timestamp + (60 * 60 * 24) < now) {
 				// 24 hours old
 				if (hist->message) {
 					free(hist->message);
 				}
-				LL_DELETE(GET_HISTORY(ch, iter), hist);
+				DL_DELETE(GET_HISTORY(ch, iter), hist);
 				free(hist);
 			}
 		}

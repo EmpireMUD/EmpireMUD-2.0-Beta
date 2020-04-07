@@ -345,14 +345,15 @@ struct channel_history_data *process_add_to_channel_history(struct channel_histo
 	new->timestamp = time(0);
 	
 	// put it at the end
-	LL_APPEND(*history, new);
+	DL_APPEND(*history, new);
 	
 	// check limit
-	LL_COUNT(*history, iter, count);
+	DL_COUNT(*history, iter, count);
 	if (count > MAX_RECENT_CHANNELS) {
 		// remove the first one
 		old = *history;
-		*history = old->next;
+		DL_DELETE(*history, old);
+		
 		if (old->message) {
 			free(old->message);
 		}
@@ -655,13 +656,13 @@ void clean_slash_channel(struct slash_channel *chan) {
 	
 	// clean the history and write any remaining history
 	count = 0;
-	LL_FOREACH_SAFE(chan->history, hist, next_hist) {
+	DL_FOREACH_SAFE(chan->history, hist, next_hist) {
 		if (hist->timestamp >= clear_before) {
 			write_one_slash_channel_message(fl, hist);
 			++count;
 		}
 		else {
-			LL_DELETE(chan->history, hist);
+			DL_DELETE(chan->history, hist);
 			if (hist->message) {
 				free(hist->message);
 			}
@@ -672,9 +673,9 @@ void clean_slash_channel(struct slash_channel *chan) {
 	fclose(fl);
 	
 	// free up memory for any entries that wouldn't be shown on histories
-	LL_FOREACH_SAFE(chan->history, hist, next_hist) {
+	DL_FOREACH_SAFE(chan->history, hist, next_hist) {
 		if (count-- > MAX_RECENT_CHANNELS) {
-			LL_DELETE(chan->history, hist);
+			DL_DELETE(chan->history, hist);
 			if (hist->message) {
 				free(hist->message);
 			}
@@ -817,7 +818,7 @@ struct player_slash_channel *find_on_slash_channel(char_data *ch, int id) {
 */
 void load_slash_channels(void) {
 	char name[256], filename[256], line[256], error[256], str[256];
-	struct channel_history_data *hist, *last;
+	struct channel_history_data *hist, *next_hist;
 	struct slash_channel *chan;
 	char color, *tmp;
 	int idnum, invis;
@@ -839,8 +840,9 @@ void load_slash_channels(void) {
 		}
 		
 		// prevent trouble while reloading: clear anything already loaded (should be nothing)
-		while ((hist = chan->history)) {
-			chan->history = hist->next;
+		DL_FOREACH_SAFE(chan->history, hist, next_hist) {
+			DL_DELETE(chan->history, hist);
+			
 			if (hist->message) {
 				free(hist->message);
 			}
@@ -852,7 +854,6 @@ void load_slash_channels(void) {
 		if ((fl = fopen(filename, "r"))) {
 			// file open..
 			snprintf(error, sizeof(error), "slash-channel %s", name);
-			last = NULL;
 			
 			for (;;) {
 				if (!get_line(fl, line)) {
@@ -877,13 +878,7 @@ void load_slash_channels(void) {
 						hist->message = fread_string(fl, error);
 						
 						// put it at the end
-						if (last) {
-							last->next = hist;
-						}
-						else {
-							chan->history = hist;
-						}
-						last = hist;
+						DL_APPEND(chan->history, hist);
 						break;
 					}
 					case 'N': {	// name/configs
@@ -1365,9 +1360,9 @@ ACMD(do_slash_channel) {
 			msg_to_char(ch, "Last %d messages on \t%c/%s\tn:\r\n", MAX_RECENT_CHANNELS, chan->color, chan->name);
 			
 			// count so we can just show the last N
-			LL_COUNT(chan->history, hist, count);
+			DL_COUNT(chan->history, hist, count);
 			
-			LL_FOREACH(chan->history, hist) {
+			DL_FOREACH(chan->history, hist) {
 				if (count-- > MAX_RECENT_CHANNELS) {
 					continue;	// skip down to the last N
 				}
@@ -1565,8 +1560,8 @@ ACMD(do_history) {
 	
 	// show a history
 	msg_to_char(ch, "Last %d %s:\r\n", MAX_RECENT_CHANNELS, types[type]);
-
-	for (chd_iter = GET_HISTORY(REAL_CHAR(ch), type); chd_iter; chd_iter = chd_iter->next) {
+	
+	DL_FOREACH(GET_HISTORY(REAL_CHAR(ch), type), chd_iter) {
 		// verify has newline
 		pos = strlen(chd_iter->message) - 1;
 		found_crlf = FALSE;

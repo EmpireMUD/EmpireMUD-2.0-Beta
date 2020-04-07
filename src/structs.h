@@ -114,6 +114,18 @@
 #define WRAP_X  TRUE	// whether the mud wraps east-west
 #define WRAP_Y  FALSE	// whether the mud wraps north-south
 
+
+// What range of a 'real world' is covered by this map (-90 to 90 is the maximum range of latitudes)
+#define Y_MIN_LATITUDE  -71	// 0 is the equator, -66.56 is the anarctic circle
+#define Y_MAX_LATITUDE  71	// 66.56 is the arctic circle, 90 is the north pole
+
+#define ARCTIC_LATITUDE  66.56	// based on the real world
+#define TROPIC_LATITUDE  23.43	// based on the real world
+
+// converts a Y-coordinate to the equivalent latitude, based on Y_MIN_LATITUDE/Y_MAX_LATITUDE
+#define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * (ABSOLUTE(Y_MIN_LATITUDE) + ABSOLUTE(Y_MAX_LATITUDE))) + Y_MIN_LATITUDE)
+
+
 #define COIN_VALUE  0.1	// value of a coin as compared to 1 wealth (0.1 coin value = 10 coins per wealth)
 
 // ***WARNING*** Change this before starting your playerfile
@@ -2178,6 +2190,8 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_BITE_STEAL_BLOOD  61	// steals blood on each 'bite' attack
 #define PTECH_SEE_IN_DARK_OUTDOORS  62  // can see in dark only if outside
 #define PTECH_HUNT_ANIMALS  63	// can use the 'hunt' command on animals
+#define PTECH_CLOCK  64	// can tell time
+#define PTECH_CALENDAR  65	// can tell the date
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -2846,6 +2860,13 @@ struct index_data {
 
 	char *farg;	// string argument for special function
 	struct trig_data *proto;	// for triggers... the trigger
+};
+
+
+// for various hashes that just need an int
+struct int_hash {
+	int num;	// the int
+	UT_hash_handle hh;	// hash handle
 };
 
 
@@ -3584,7 +3605,7 @@ struct channel_history_data {
 	int invis_level;	// if it's an invisible immortal
 	char *message;
 	long timestamp;
-	struct channel_history_data *next;
+	struct channel_history_data *prev, *next;	// doubly-linked list
 };
 
 
@@ -3637,7 +3658,7 @@ struct player_index_data {
 struct stack_msg {
 	char *string;	// text
 	int count;	// (x2)
-	struct stack_msg *next;
+	struct stack_msg *prev, *next;	// doubly-linked list for speed
 };
 
 
@@ -3943,7 +3964,7 @@ struct player_special_data {
 	struct player_slash_channel *slash_channels;	// channels the player is on
 	struct slash_channel *load_slash_channels;	// temporary storage between load and join
 	struct player_faction_data *factions;	// hash table of factions
-	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// histories
+	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// DLs: histories
 	struct player_automessage *automessages;	// hash of seen messages
 	struct player_event_data *event_data;	// hash of event scores and results
 

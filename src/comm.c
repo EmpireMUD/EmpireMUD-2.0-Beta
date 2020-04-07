@@ -1684,7 +1684,7 @@ void send_stacked_msgs(descriptor_data *desc) {
 		return;
 	}
 	
-	LL_FOREACH_SAFE(desc->stack_msg_list, iter, next_iter) {
+	DL_FOREACH_SAFE(desc->stack_msg_list, iter, next_iter) {
 		if (iter->count > 1) {
 			// deconstruct to add the (x2)
 			len = strlen(iter->string);
@@ -1699,7 +1699,7 @@ void send_stacked_msgs(descriptor_data *desc) {
 		}
 		
 		// free it up
-		LL_DELETE(desc->stack_msg_list, iter);
+		DL_DELETE(desc->stack_msg_list, iter);
 		if (iter->string) {
 			free(iter->string);
 		}
@@ -1750,7 +1750,7 @@ void stack_simple_msg_to_desc(descriptor_data *desc, const char *messg) {
 	}
 	
 	// look in queue
-	LL_FOREACH(desc->stack_msg_list, iter) {
+	DL_FOREACH(desc->stack_msg_list, iter) {
 		if (!strcmp(iter->string, messg)) {
 			++iter->count;
 			found = TRUE;
@@ -1763,7 +1763,7 @@ void stack_simple_msg_to_desc(descriptor_data *desc, const char *messg) {
 		CREATE(stm, struct stack_msg, 1);
 		stm->string = str_dup(messg);
 		stm->count = 1;
-		LL_APPEND(desc->stack_msg_list, stm);
+		DL_APPEND(desc->stack_msg_list, stm);
 	}
 }
 
@@ -1773,7 +1773,7 @@ void stack_simple_msg_to_desc(descriptor_data *desc, const char *messg) {
 
 
 void close_socket(descriptor_data *d) {
-	struct stack_msg *stacked;
+	struct stack_msg *stacked, *next_stacked;
 	descriptor_data *temp;
 
 	REMOVE_FROM_LIST(d, descriptor_list, next);
@@ -1854,8 +1854,8 @@ void close_socket(descriptor_data *d) {
 	}
 	
 	// leftover stacked messages
-	while ((stacked = d->stack_msg_list)) {
-		d->stack_msg_list = stacked->next;
+	DL_FOREACH_SAFE(d->stack_msg_list, stacked, next_stacked) {
+		DL_DELETE(d->stack_msg_list, stacked);
 		
 		if (stacked->string) {
 			free(stacked->string);
@@ -3414,21 +3414,40 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				}
 				case 't':	/* Sun timer */
 				case 'T':
-					if (time_info.hours >= 12)
-						strcpy(spare, "pm");
-					else
-						strcpy(spare, "am");
+					if (has_player_tech(ch, PTECH_CLOCK)) {
+						if (time_info.hours >= 12)
+							strcpy(spare, "pm");
+						else
+							strcpy(spare, "am");
 
-					if (time_info.hours == 6)
-						sprintf(i, "\tC%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
-					else if (time_info.hours < 19 && time_info.hours > 6)
-						sprintf(i, "\tY%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
-					else if (time_info.hours == 19)
-						sprintf(i, "\tR%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
-					else if (time_info.hours == 0)
-						sprintf(i, "\tB12am\t0");
-					else
-						sprintf(i, "\tB%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						if (time_info.hours == 6)
+							sprintf(i, "\tC%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						else if (time_info.hours < 19 && time_info.hours > 6)
+							sprintf(i, "\tY%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						else if (time_info.hours == 19)
+							sprintf(i, "\tR%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+						else if (time_info.hours == 0)
+							sprintf(i, "\tB12am\t0");
+						else
+							sprintf(i, "\tB%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+					}
+					else {	// no clock
+						if (time_info.hours == 6) {
+							strcpy(i, "\tCdawn\t0");
+						}
+						else if (time_info.hours == 12) {
+							strcpy(i, "\tYnoon\t0");
+						}
+						else if (time_info.hours < 19 && time_info.hours > 6) {
+							strcpy(i, "\tYday\t0");
+						}
+						else if (time_info.hours == 19) {
+							strcpy(i, "\tRdusk\t0");
+						}
+						else {
+							strcpy(i, "\tBnight\t0");
+						}
+					}
 					tmp = i;
 					break;
 				case 'a': {	// action

@@ -50,6 +50,9 @@
 // external vars
 extern const char *techs[];
 
+// external funcs
+void set_inherent_ptech(int ptech);
+
 // locals
 bool add_int_to_int_array(int to_add, int **array, int *size);
 bool find_int_in_array(int to_find, int *array, int size);
@@ -238,6 +241,19 @@ const char *book_name_list[] = {
 	"tome",
 	"\n"
 };
+
+
+/**
+* Any player technologies that are 'inherent' -- that is, don't require an
+* ability to use them, can be configured here. All players will have access to
+* these.
+*/
+void init_inherent_player_techs(void) {
+	// these default 'inherent' techs can be removed if you want to add an
+	// ability for these things
+	set_inherent_ptech(PTECH_CALENDAR);
+	set_inherent_ptech(PTECH_CLOCK);
+}
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1901,8 +1917,8 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "interlink_mountain_limit", CONFTYPE_INT, "how many intervening tiles may be mountain");
 	init_config(CONFIG_WORLD, "generic_facing", CONFTYPE_BITVECTOR, "deprecated: do not set");
 	init_config(CONFIG_WORLD, "newbie_adventure_cap", CONFTYPE_INT, "highest adventure min-level that can spawn on newbie islands");
-	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "what percent of top/bottom of the map is arctic");
-	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "what percent of the middle of the map is tropics");
+	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "deprecated: do not set");
+	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "deprecated: do not set");
 	
 	// TODO note: deprecated
 	init_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT, "deprecated: do not set");

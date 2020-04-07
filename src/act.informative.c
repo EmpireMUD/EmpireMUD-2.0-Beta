@@ -823,17 +823,22 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 
 	msg_to_char(to, "%s's lore:\r\n", PERS(ch, ch, 1));
 
-	for (lore = GET_LORE(ch); lore; lore = lore->next) {
-		t = *mud_time_passed((time_t) lore->date, (time_t) beginning_of_time);
+		for (lore = GET_LORE(ch); lore; lore = lore->next) {
+			if (has_player_tech(to, PTECH_CALENDAR)) {
+			t = *mud_time_passed((time_t) lore->date, (time_t) beginning_of_time);
 
-		strcpy(buf, month_name[(int) t.month]);
-		if (!strn_cmp(buf, "the ", 4))
-			strcpy(buf1, buf + 4);
-		else
-			strcpy(buf1, buf);
+			strcpy(buf, month_name[(int) t.month]);
+			if (!strn_cmp(buf, "the ", 4))
+				strcpy(buf1, buf + 4);
+			else
+				strcpy(buf1, buf);
 
-		snprintf(daystring, sizeof(daystring), "%d %s, Year %d", t.day + 1, buf1, t.year);
-		msg_to_char(to, " %s on %s.\r\n", NULLSAFE(lore->text), daystring);
+			snprintf(daystring, sizeof(daystring), "%d %s, Year %d", t.day + 1, buf1, t.year);
+			msg_to_char(to, " %s on %s.\r\n", NULLSAFE(lore->text), daystring);
+		}
+		else {
+			msg_to_char(ch, " %s.\r\n", NULLSAFE(lore->text));
+		}
 	}
 }
 
@@ -3445,31 +3450,63 @@ ACMD(do_time) {
 	extern const char *seasons[];
 	extern int pick_season(room_data *room);
 	extern const char *weekdays[];
+	
 	const char *suf;
 	int weekday, day;
+	
+	if (has_player_tech(ch, PTECH_CLOCK)) {
+		sprintf(buf, "It is %d o'clock %s", ((time_info.hours % 12 == 0) ? 12 : ((time_info.hours) % 12)), ((time_info.hours >= 12) ? "pm" : "am"));
+		
+		if (has_player_tech(ch, PTECH_CALENDAR)) {
+			strcat(buf, ", on ");
+			
+			/* 30 days in a month */
+			weekday = ((30 * time_info.month) + time_info.day + 1) % 7;
+			strcat(buf, weekdays[weekday]);
+		}
+		strcat(buf, ".\r\n");
+		send_to_char(buf, ch);
+	
+		gain_player_tech_exp(ch, PTECH_CLOCK, 1);
+	}
+	else {
+		if (time_info.hours < 6 || time_info.hours > 19) {
+			msg_to_char(ch, "It is nighttime.\r\n");
+		}
+		else if (time_info.hours == 6) {
+			msg_to_char(ch, "It is almost dawn.\r\n");
+		}
+		else if (time_info.hours == 19) {
+			msg_to_char(ch, "It is sunset.\r\n");
+		}
+		else if (time_info.hours == 12) {
+			msg_to_char(ch, "It is nighttime.\r\n");
+		}
+		else if (time_info.hours < 12) {
+			msg_to_char(ch, "It is %smorning.\r\n", time_info.hours <= 8 ? "early " : "");
+		}
+		else {	// afternoon is all that's left
+			msg_to_char(ch, "It is %safternoon.\r\n", time_info.hours >= 17 ? "late " : "");
+		}
+	}
 
-	sprintf(buf, "It is %d o'clock %s, on ", ((time_info.hours % 12 == 0) ? 12 : ((time_info.hours) % 12)), ((time_info.hours >= 12) ? "pm" : "am"));
+	if (has_player_tech(ch, PTECH_CALENDAR)) {
+		day = time_info.day + 1;	/* day in [1..30] */
 
-	/* 30 days in a month */
-	weekday = ((30 * time_info.month) + time_info.day + 1) % 7;
+		/* 11, 12, and 13 are the infernal exceptions to the rule */
+		if ((day % 10) == 1 && day != 11)
+			suf = "st";
+		else if ((day % 10) == 2 && day != 12)
+			suf = "nd";
+		else if ((day % 10) == 3 && day != 13)
+			suf = "rd";
+		else
+			suf = "th";
 
-	strcat(buf, weekdays[weekday]);
-	strcat(buf, "\r\n");
-	send_to_char(buf, ch);
-
-	day = time_info.day + 1;	/* day in [1..30] */
-
-	/* 11, 12, and 13 are the infernal exceptions to the rule */
-	if ((day % 10) == 1 && day != 11)
-		suf = "st";
-	else if ((day % 10) == 2 && day != 12)
-		suf = "nd";
-	else if ((day % 10) == 3 && day != 13)
-		suf = "rd";
-	else
-		suf = "th";
-
-	msg_to_char(ch, "The %d%s day of the month of %s, year %d.\r\n", day, suf, month_name[(int) time_info.month], time_info.year);
+		msg_to_char(ch, "The %d%s day of the month of %s, year %d.\r\n", day, suf, month_name[(int) time_info.month], time_info.year);
+		
+		gain_player_tech_exp(ch, PTECH_CALENDAR, 1);
+	}
 	
 	if (IS_OUTDOORS(ch)) {
 		msg_to_char(ch, "%s\r\n", seasons[pick_season(IN_ROOM(ch))]);

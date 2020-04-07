@@ -202,14 +202,14 @@ bool valid_no_trace(room_data *room) {
 // helper data: stores spawn lists for do_hunt
 struct hunt_helper {
 	struct spawn_info *list;
-	struct hunt_helper *next;	// linked list
+	struct hunt_helper *prev, *next;	// doubly-linked list
 };
 
 // for finding global spawn lists
 struct hunt_global_bean {
 	room_data *room;
 	int x_coord, y_coord;
-	struct hunt_helper **helpers;	// pointer to existing list of helpers
+	struct hunt_helper **helpers;	// pointer to existing DLL of helpers
 };
 
 
@@ -229,7 +229,7 @@ GLB_FUNCTION(run_global_hunt_for_map_spawns) {
 	if (data && data->helpers) {
 		CREATE(hlp, struct hunt_helper, 1);
 		hlp->list = GET_GLOBAL_SPAWNS(glb);
-		LL_APPEND(*(data->helpers), hlp);
+		DL_APPEND(*(data->helpers), hlp);
 	}
 }
 
@@ -855,7 +855,7 @@ ACMD(do_hunt) {
 		if (VEH_SPAWNS(veh)) {
 			CREATE(item, struct hunt_helper, 1);
 			item->list = VEH_SPAWNS(veh);
-			LL_PREPEND(helpers, item);
+			DL_PREPEND(helpers, item);
 		}
 	}
 	// build lists: building
@@ -864,20 +864,20 @@ ACMD(do_hunt) {
 		if (IS_COMPLETE(IN_ROOM(ch)) && GET_BLD_SPAWNS(GET_BUILDING(IN_ROOM(ch)))) {
 			CREATE(item, struct hunt_helper, 1);
 			item->list = GET_BLD_SPAWNS(GET_BUILDING(IN_ROOM(ch)));
-			LL_PREPEND(helpers, item);
+			DL_PREPEND(helpers, item);
 		}
 	}
 	// build lists: crop
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CROP) && ROOM_CROP(IN_ROOM(ch))) {
 		CREATE(item, struct hunt_helper, 1);
 		item->list = GET_CROP_SPAWNS(ROOM_CROP(IN_ROOM(ch)));
-		LL_PREPEND(helpers, item);
+		DL_PREPEND(helpers, item);
 	}
 	// build lists: sect
 	else {
 		CREATE(item, struct hunt_helper, 1);
 		item->list = GET_SECT_SPAWNS(SECT(IN_ROOM(ch)));
-		LL_PREPEND(helpers, item);
+		DL_PREPEND(helpers, item);
 	}
 	
 	// prepare data for validation (calling these here prevents multiple function calls)
@@ -894,7 +894,7 @@ ACMD(do_hunt) {
 	free(data);
 	
 	// find the thing to hunt
-	LL_FOREACH_SAFE(helpers, item, next_item) {
+	DL_FOREACH_SAFE(helpers, item, next_item) {
 		LL_FOREACH(item->list, spawn) {
 			if (spawn->percent < min_percent) {
 				continue;	// too low
@@ -919,9 +919,9 @@ ACMD(do_hunt) {
 		}
 		
 		// and free the temporary data while we're here
+		DL_DELETE(helpers, item);
 		free(item);
 	}
-	helpers = NULL;	// all freed by the ll_foreach_safe
 	
 	// did we find anything?
 	if (found_proto) {
