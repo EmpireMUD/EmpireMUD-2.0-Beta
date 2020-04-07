@@ -3809,6 +3809,23 @@ Triggers immediate growth, similar to chant of nature.
 
 See also: MAP OLC
 #d
+"MAPEDIT HEIGHT"
+
+Usage:  .map height <value>
+
+This command sets the 'height' of a map tile. You can see the current height
+on 'stat room'. Height values are not shown to players, but they determine
+things like whether or not a player can climb between two tiles without the
+proper skill.
+
+For mountains, height is positive and is the distance from flat land.
+
+For rivers/lakes, height is negative and is the distance from the sea (more
+negative means further from the sea). If a river or lake has no height
+property, it probably isn't attached to the sea.
+
+See also: STAT
+#d
 "MAPEDIT ICON"
 
 Usage:  .map icon <icon>
