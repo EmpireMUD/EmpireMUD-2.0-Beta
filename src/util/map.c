@@ -1656,6 +1656,10 @@ void number_islands_and_fix_lakes(void) {
 			
 			push_ndt(&ndt_stack, iter, 0);
 			while ((ndt = pop_ndt(&ndt_stack))) {
+				if (grid[pos].island_id != old) {
+					continue;
+				}
+				
 				grid[ndt->loc].island_id = use_id;
 	
 				for (x = -1; x <= 1; ++x) {
