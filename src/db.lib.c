@@ -5642,6 +5642,7 @@ void remove_room_from_world_tables(room_data *room) {
 void parse_room(FILE *fl, room_vnum vnum) {
 	void add_trd_home_room(room_vnum vnum, room_vnum home_room);
 	void add_trd_owner(room_vnum vnum, empire_vnum owner);
+	void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
 
 	char line[256], line2[256], error_buf[256], error_log[MAX_STRING_LENGTH], str1[256], str2[256];
 	double dbl_in;
@@ -5915,6 +5916,11 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				// must be left in to be backwards-compatbile. If your mud has
 				// been up since b2.11, you can safely remove this block.
 				parse_trig_proto(line, &(room->proto_script), error_log);
+				break;
+			}
+			
+			case 'U': {	// other data (height etc)
+				parse_other_shared_data(SHARED_DATA(room), line, error_buf);
 				break;
 			}
 			
@@ -9482,6 +9488,9 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	struct track_data *track, *next_track;
 	time_t now = time(0);
 	
+	// WARNING: this shares a list of key letters between 'parse_room' and
+	// 'load_world_map_from_file' -- more letters are used than appear here
+	
 	// E affects
 	if (dat->base_affects) {
 		fprintf(fl, "E\n%llu\n", dat->base_affects);
@@ -9502,6 +9511,11 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	// N name
 	if (dat->name) {
 		fprintf(fl, "N\n%s~\n", dat->name);
+	}
+	
+	// U0 height
+	if (dat->height) {
+		fprintf(fl, "U0 %d\n", dat->height);
 	}
 	
 	// X depletion

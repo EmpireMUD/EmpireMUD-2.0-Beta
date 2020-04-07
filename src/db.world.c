@@ -80,6 +80,7 @@ room_data *get_extraction_room();
 crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
+void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
 void ruin_one_building(room_data *room);
 void save_world_map_to_file();
 void schedule_check_unload(room_data *room, bool offset);
@@ -3891,6 +3892,10 @@ void load_world_map_from_file(void) {
 					last->shared->name = fread_string(fl, error_buf);
 					break;
 				}
+				case 'U': {	// other data (height etc)
+					parse_other_shared_data(last->shared, line, error_buf);
+					break;
+				}
 				case 'X': {	// resource depletion
 					if (!get_line(fl, line2)) {
 						log("SYSERR: Unable to read depletion line of map tile #%d", last->vnum);
@@ -3986,4 +3991,37 @@ void save_world_map_to_file(void) {
 	fclose(fl);
 	rename(WORLD_MAP_FILE TEMP_SUFFIX, WORLD_MAP_FILE);
 	world_map_needs_save = FALSE;
+}
+
+
+/**
+* Parses any 'other data' for the 'shared room data' of a map tile or room.
+*
+* Note: This currently only includes 'height' but is expandable to handle other
+* 'other data' in the future.
+*
+* @param struct shared_room_data *shared A pointer to the room's shared data.
+* @param char *line The line from the file, starting with 'U'.
+* @param char *error_part An explanation of where this data was read from, for error reporting.
+*/
+void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part) {
+	int int_in[2];
+	
+	if (!shared || !line || !*line || !error_part) {
+		log("SYSERR: Bad shared line '%s' or missing shared pointer in %s", NULLSAFE(line), error_part ? error_part : "UNKNOWN");
+		exit(1);
+	}
+	
+	// expected format is: U0 0
+	switch (line[1]) {
+		case '0': {
+			if (sscanf(line, "U0 %d", &int_in[0]) != 1) {
+				log("SYSERR: Bad U0 entry '%s' in %s", line, error_part);
+				exit(1);
+			}
+			
+			shared->height = int_in[0];
+			break;
+		}
+	}
 }
