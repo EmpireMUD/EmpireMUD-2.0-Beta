@@ -823,17 +823,22 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 
 	msg_to_char(to, "%s's lore:\r\n", PERS(ch, ch, 1));
 
-	for (lore = GET_LORE(ch); lore; lore = lore->next) {
-		t = *mud_time_passed((time_t) lore->date, (time_t) beginning_of_time);
+		for (lore = GET_LORE(ch); lore; lore = lore->next) {
+			if (has_player_tech(to, PTECH_CALENDAR)) {
+			t = *mud_time_passed((time_t) lore->date, (time_t) beginning_of_time);
 
-		strcpy(buf, month_name[(int) t.month]);
-		if (!strn_cmp(buf, "the ", 4))
-			strcpy(buf1, buf + 4);
-		else
-			strcpy(buf1, buf);
+			strcpy(buf, month_name[(int) t.month]);
+			if (!strn_cmp(buf, "the ", 4))
+				strcpy(buf1, buf + 4);
+			else
+				strcpy(buf1, buf);
 
-		snprintf(daystring, sizeof(daystring), "%d %s, Year %d", t.day + 1, buf1, t.year);
-		msg_to_char(to, " %s on %s.\r\n", NULLSAFE(lore->text), daystring);
+			snprintf(daystring, sizeof(daystring), "%d %s, Year %d", t.day + 1, buf1, t.year);
+			msg_to_char(to, " %s on %s.\r\n", NULLSAFE(lore->text), daystring);
+		}
+		else {
+			msg_to_char(ch, " %s.\r\n", NULLSAFE(lore->text));
+		}
 	}
 }
 
