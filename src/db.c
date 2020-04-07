@@ -4228,7 +4228,7 @@ void b5_94_terrain_heights(void) {
 	for (x = 0; x < MAP_WIDTH; ++x) {
 		for (y = 0; y < MAP_HEIGHT; ++y) {
 			world_map[x][y].shared->height = INT_MAX;
-			if (!IS_SET(GET_SECT_CLIMATE(world_map[x][y].base_sector), CLIM_MOUNTAIN | CLIM_RIVER)) {
+			if (!IS_SET(GET_SECT_CLIMATE(world_map[x][y].base_sector), CLIM_MOUNTAIN | CLIM_RIVER | CLIM_LAKE)) {
 				queue_tdt(big_queue, world_map[x][y], 0);
 			}
 		}
@@ -4263,7 +4263,7 @@ void b5_94_terrain_heights(void) {
 					// detect any mountain edge
 					queue_tdt(mountain_queue, world_map[x][y], 1);
 				}
-				else if (IS_SET(GET_SECT_CLIMATE(tdt->loc->base_sector), CLIM_OCEAN) && IS_SET(GET_SECT_CLIMATE(world_map[x][y].base_sector), CLIM_RIVER)) {
+				else if (IS_SET(GET_SECT_CLIMATE(tdt->loc->base_sector), CLIM_OCEAN) && IS_SET(GET_SECT_CLIMATE(world_map[x][y].base_sector), CLIM_RIVER | CLIM_LAKE)) {
 					// detect river touching ocean
 					queue_tdt(river_queue, world_map[x][y], -1);
 				}
@@ -4328,7 +4328,7 @@ void b5_94_terrain_heights(void) {
 					continue;	// don't think this is possible but best to be safe
 				}
 				
-				if (IS_SET(GET_SECT_CLIMATE(world_map[x][y].base_sector), CLIM_RIVER)) {
+				if (IS_SET(GET_SECT_CLIMATE(world_map[x][y].base_sector), CLIM_RIVER | CLIM_LAKE)) {
 					// work up the river
 					queue_tdt(river_queue, world_map[x][y], tdt->height - 1);
 				}
@@ -4338,6 +4338,19 @@ void b5_94_terrain_heights(void) {
 		DL_DELETE(river_queue, tdt);
 		free(tdt);
 	}
+	
+	log("- checking for missed tiles...");
+	for (x = 0; x < MAP_WIDTH; ++x) {
+		for (y = 0; y < MAP_HEIGHT; ++y) {
+			if (world_map[x][y].shared->height == INT_MAX) {
+				log("  - (%d, %d) %s: missed", x, y, GET_SECT_NAME(world_map[x][y].base_sector));
+				world_map[x][y].shared->height = 0;
+			}
+		}
+	}
+	
+	world_map_needs_save = TRUE;
+	save_whole_world();
 }
 
 
