@@ -3809,7 +3809,7 @@ Triggers immediate growth, similar to chant of nature.
 
 See also: MAP OLC
 #d
-"MAPEDIT HEIGHT"
+"MAPEDIT HEIGHT" HEIGHT "TERRAIN HEIGHT"
 
 Usage:  .map height <value>
 
@@ -3823,6 +3823,9 @@ For mountains, height is positive and is the distance from flat land.
 For rivers/lakes, height is negative and is the distance from the sea (more
 negative means further from the sea). If a river or lake has no height
 property, it probably isn't attached to the sea.
+
+Sectors that cover or replace mountains, rivers, and lakes should have the
+NEEDS-HEIGHT sector flag so they will keep their previous heights.
 
 See also: STAT
 #d
@@ -6753,7 +6756,7 @@ Available sector flags:
  SHALLOW-WATER - The tile has water but requires no boat (like a swamp)
  NEEDS-HEIGHT - Uses the 'height' property in some way and will inherit it.
 
-See also: OLC SECTORS
+See also: OLC SECTORS, TERRAIN HEIGHT
 #d
 "SECTEDIT FULLSEARCH" "SECTOR FULLSEARCH"
 
