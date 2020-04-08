@@ -6751,6 +6751,7 @@ Available sector flags:
  NO-GLOBAL-SPAWNS - Won't use global spawn lists.
  ROUGH - This is rough, raised terrain, like a mountain
  SHALLOW-WATER - The tile has water but requires no boat (like a swamp)
+ NEEDS-HEIGHT - Uses the 'height' property in some way and will inherit it.
 
 See also: OLC SECTORS
 #d

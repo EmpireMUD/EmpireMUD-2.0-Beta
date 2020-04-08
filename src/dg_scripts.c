@@ -5031,6 +5031,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");	// no vnum provided
 						}
 					}
+					else if (!str_cmp(field, "height")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							ROOM_HEIGHT(r) = atoi(subfield);
+						}
+						snprintf(str, slen, "%d", ROOM_HEIGHT(r));
+					}
 					break;
 				}
 				case 'i': {	// room.i*

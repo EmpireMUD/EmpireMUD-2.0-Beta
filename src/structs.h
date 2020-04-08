@@ -2323,6 +2323,7 @@ typedef struct vehicle_data vehicle_data;
 #define SECTF_NO_GLOBAL_SPAWNS  BIT(20)	// won't use global spawn lists
 #define SECTF_ROUGH  BIT(21)	// hard terrain, requires ATR; other mountain-like properties
 #define SECTF_SHALLOW_WATER  BIT(22)	// can't earthmeld; other properties like swamp and oasis have
+#define SECTF_NEEDS_HEIGHT  BIT(23)	// will automatically set its 'height' property under certain circumstances
 
 
  //////////////////////////////////////////////////////////////////////////////
