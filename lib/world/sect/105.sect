@@ -1,7 +1,7 @@
 #10550
 Frozen River~
 A Frozen River~
-'~' 2 f 25 0 0
+'~' 2 f 25 x 0
 D0
 ~~~~~
 &W~
@@ -73,7 +73,7 @@ S
 #10553
 Frozen Lake~
 A Frozen Lake~
-'~' 2 f 25 0 0
+'~' 2 f 25 x 0
 D0
 ~~~~~
 &W~

@@ -1,7 +1,7 @@
 #10190
 Flowing Lava~
 A Raging Lava Flow~
-'^' 3 em 100 sv 0
+'^' 3 em 100 svx 0
 D0
 /\/\~
 &R~
@@ -13,7 +13,7 @@ S
 #10191
 Cooling Lava~
 A Cooling Lava Flow~
-'^' 34 em 100 sv 0
+'^' 34 em 100 svx 0
 D0
 /\/\~
 &w~
@@ -25,7 +25,7 @@ S
 #10192
 Volcanic Mountain~
 On a Volcanic Mountain~
-'^' 27 em 100 sv 0
+'^' 27 em 100 svx 0
 C
 dig~
 D0
