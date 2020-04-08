@@ -4208,7 +4208,7 @@ void b5_94_terrain_heights(void) {
 	
 	#define queue_tdt(queue, map, ht)  { struct temp_dat_t *temp; CREATE(temp, struct temp_dat_t, 1); temp->loc = &(map); temp->height = (ht); DL_APPEND(queue, temp); }
 	
-	#define b594_is_water(sect)  (IS_SET(GET_SECT_CLIMATE(sect), CLIM_RIVER | CLIM_LAKE) || GET_SECT_VNUM(sect) == 32 || GET_SECT_VNUM(sect) == 33 || GET_SECT_VNUM(sect) == 5 || GET_SECT_VNUM(sect) == 10550)
+	// #define b594_is_water(sect)  (IS_SET(GET_SECT_CLIMATE(sect), CLIM_RIVER | CLIM_LAKE) || GET_SECT_VNUM(sect) == 32 || GET_SECT_VNUM(sect) == 33 || GET_SECT_VNUM(sect) == 5 || GET_SECT_VNUM(sect) == 10550)
 	
 	log("Applying b5.94 update: Attempting to detect map heights...");
 	
@@ -4230,7 +4230,7 @@ void b5_94_terrain_heights(void) {
 	for (x = 0; x < MAP_WIDTH; ++x) {
 		for (y = 0; y < MAP_HEIGHT; ++y) {
 			world_map[x][y].shared->height = INT_MAX;
-			if (!b594_is_water(world_map[x][y].base_sector)) {
+			if (!SECT_FLAGGED(world_map[x][y].base_sector, SECTF_NEEDS_HEIGHT)) {
 				queue_tdt(big_queue, world_map[x][y], 0);
 			}
 		}
@@ -4265,7 +4265,7 @@ void b5_94_terrain_heights(void) {
 					// detect any mountain edge
 					queue_tdt(mountain_queue, world_map[x][y], 1);
 				}
-				else if (IS_SET(GET_SECT_CLIMATE(tdt->loc->base_sector), CLIM_OCEAN) && b594_is_water(world_map[x][y].base_sector)) {
+				else if (IS_SET(GET_SECT_CLIMATE(tdt->loc->base_sector), CLIM_OCEAN) && SECT_FLAGGED(world_map[x][y].base_sector, SECTF_NEEDS_HEIGHT)) {
 					// detect river touching ocean
 					queue_tdt(river_queue, world_map[x][y], -1);
 				}
@@ -4330,7 +4330,7 @@ void b5_94_terrain_heights(void) {
 					continue;	// don't think this is possible but best to be safe
 				}
 				
-				if (b594_is_water(world_map[x][y].base_sector)) {
+				if (!IS_SET(GET_SECT_CLIMATE(world_map[x][y].base_sector), CLIM_MOUNTAIN) && SECT_FLAGGED(world_map[x][y].base_sector, SECTF_NEEDS_HEIGHT)) {
 					// work up the river
 					queue_tdt(river_queue, world_map[x][y], tdt->height - 1);
 				}
@@ -4346,7 +4346,7 @@ void b5_94_terrain_heights(void) {
 	for (x = 0; x < MAP_WIDTH; ++x) {
 		for (y = 0; y < MAP_HEIGHT; ++y) {
 			if (world_map[x][y].shared->height == INT_MAX) {
-				// log("  - (%d, %d) %s: missed", x, y, GET_SECT_NAME(world_map[x][y].base_sector));
+				log("  - (%d, %d) %s: missed", x, y, GET_SECT_NAME(world_map[x][y].base_sector));
 				world_map[x][y].shared->height = 0;
 			}
 		}
