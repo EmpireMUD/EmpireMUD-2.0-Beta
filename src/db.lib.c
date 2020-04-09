@@ -6781,7 +6781,7 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 	if (GET_SECT_NOTES(st) && *GET_SECT_NOTES(st)) {
 		strcpy(temp, GET_SECT_NOTES(st));
 		strip_crlf(temp);
-		fprintf(fl, "_\n%s\n", temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
