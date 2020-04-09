@@ -892,7 +892,7 @@ void olc_show_sector(char_data *ch) {
 		sprintf(buf + strlen(buf), " %d spawn%s set\r\n", count, PLURAL(count));
 	}
 	
-	sprintf(buf + strlen(buf), "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_SECT_NOTES(st)), GET_SECT_NOTES(st));
+	sprintf(buf + strlen(buf), "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_SECT_NOTES(st)), NULLSAFE(GET_SECT_NOTES(st)));
 	
 	page_string(ch->desc, buf, TRUE);
 }
