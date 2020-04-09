@@ -2617,6 +2617,7 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_MESSAGES  100	// fight.c
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
 #define MAX_NAME_LENGTH  20
+#define MAX_NOTES  8000
 #define MAX_OBJ_AFFECT  6
 #define MAX_PLAYER_DESCRIPTION  4000
 #define MAX_POOFIN_LENGTH  80
@@ -5220,6 +5221,8 @@ struct sector_data {
 	struct spawn_info *spawns;	// mob spawn data
 	struct evolution_data *evolution;	// change over time
 	struct interaction_item *interactions;	// interaction items
+	
+	char *notes;	// misc notes shown only to imms
 	
 	UT_hash_handle hh;	// sector_table hash
 };

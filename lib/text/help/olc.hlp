@@ -927,6 +927,15 @@ matches "Horrid Form".
 
 See also: OLC ABILITIES
 #d
+"SECTEDIT NOTES"
+
+Usage:  .notes
+
+This text field allows you to set notes that are only visible in the OLC editor
+and via the 'stat' command. You can put any information you want in the notes.
+
+See also: OLC, STAT
+#d
 "ABILEDIT PLAYER-TECH ABILITY" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH
 
 Usage:  .data add ptech <type>

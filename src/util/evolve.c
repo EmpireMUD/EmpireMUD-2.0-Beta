@@ -551,6 +551,12 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				get_line(fl, line);	// 1 extra line
 				break;
 			}
+			
+			case '_': {	// notes -- unneeded
+				tmp = fread_string(fl, error);
+				free(tmp);
+				break;
+			}
 
 			// end
 			case 'S': {

@@ -6548,6 +6548,9 @@ void free_sector(sector_data *st) {
 	if (GET_SECT_COMMANDS(st) && (!proto || GET_SECT_COMMANDS(st) != GET_SECT_COMMANDS(proto))) {
 		free(GET_SECT_COMMANDS(st));
 	}
+	if (GET_SECT_NOTES(st) && (!proto || GET_SECT_NOTES(st) != GET_SECT_NOTES(proto))) {
+		free(GET_SECT_NOTES(st));
+	}
 	
 	if (GET_SECT_ICONS(st) && (!proto || GET_SECT_ICONS(st) != GET_SECT_ICONS(proto))) {
 		free_icon_set(&GET_SECT_ICONS(st));
@@ -6704,6 +6707,11 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				}
 				break;
 			}
+			
+			case '_': {	// notes
+				GET_SECT_NOTES(sect) = fread_string(fl, buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -6727,7 +6735,7 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 * @param sector_data *st The thing to save.
 */
 void write_sector_to_file(FILE *fl, sector_data *st) {
-	char temp[64], temp2[64], temp3[64];
+	char temp[MAX_STRING_LENGTH], temp2[64], temp3[64];
 	struct evolution_data *evo;
 	struct spawn_info *spawn;
 	
@@ -6768,6 +6776,12 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 	for (spawn = GET_SECT_SPAWNS(st); spawn; spawn = spawn->next) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
+	}
+	
+	if (GET_SECT_NOTES(st) && *GET_SECT_NOTES(st)) {
+		strcpy(temp, GET_SECT_NOTES(st));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s\n", temp);
 	}
 	
 	// end

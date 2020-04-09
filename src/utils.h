@@ -1443,6 +1443,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_SECT_MAPOUT(sect)  ((sect)->mapout)
 #define GET_SECT_MOVE_LOSS(sect)  ((sect)->movement_loss)
 #define GET_SECT_NAME(sect)  ((sect)->name)
+#define GET_SECT_NOTES(sect)  ((sect)->notes)
 #define GET_SECT_ROADSIDE_ICON(sect)  ((sect)->roadside_icon)
 #define GET_SECT_SPAWNS(sect)  ((sect)->spawns)
 #define GET_SECT_TITLE(sect)  ((sect)->title)

@@ -423,6 +423,7 @@ OLC_MODULE(sectedit_interaction);
 OLC_MODULE(sectedit_mapout);
 OLC_MODULE(sectedit_movecost);
 OLC_MODULE(sectedit_name);
+OLC_MODULE(sectedit_notes);
 OLC_MODULE(sectedit_roadsideicon);
 OLC_MODULE(sectedit_spawns);
 OLC_MODULE(sectedit_title);
@@ -1022,6 +1023,7 @@ const struct olc_command_data olc_data[] = {
 	{ "mapout", sectedit_mapout, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "movecost", sectedit_movecost, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "name", sectedit_name, OLC_SECTOR, OLC_CF_EDITOR },
+	{ "notes", sectedit_notes, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "roadsideicon", sectedit_roadsideicon, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "spawns", sectedit_spawns, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "title", sectedit_title, OLC_SECTOR, OLC_CF_EDITOR },

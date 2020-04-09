@@ -6184,6 +6184,10 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 	}
 	
 	show_spawn_summary_to_char(ch, st->spawns);
+	
+	if (GET_SECT_NOTES(st) && *GET_SECT_NOTES(st)) {
+		msg_to_char(ch, "Notes:\r\n%s", GET_SECT_NOTES(st));
+	}
 }
 
 
