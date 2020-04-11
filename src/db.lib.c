@@ -1428,9 +1428,13 @@ void remove_empire_from_table(empire_data *emp) {
 * This function detects when the mud boots up on a new map, and moves all
 * empire territory to "no island" (to be moved back later). It also cleans up
 * empire data and ensures players don't log in mid-ocean.
+*
+* This also does a small amount of maintenance on new maps, such as ensuring
+* icon-locking is done.
 */
 void check_for_new_map(void) {
 	void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
+	void lock_icon(room_data *room, struct icon_data *use_icon);	// utils.c
 	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 	
 	struct empire_storage_data *store, *next_store;
@@ -1442,6 +1446,7 @@ void check_for_new_map(void) {
 	struct instance_data *inst, *next_inst;
 	struct empire_unique_storage *eus;
 	empire_data *emp, *next_emp;
+	struct map_data *map;
 	room_data *room;
 	FILE *fl;
 	
@@ -1551,6 +1556,13 @@ void check_for_new_map(void) {
 	
 	// rescan all empires
 	reread_empire_tech(NULL);
+
+	// check icon-locking:
+	LL_FOREACH(land_map, map) {
+		if (!map->shared->icon && SECT_FLAGGED(map->sector_type, SECTF_LOCK_ICON)) {
+			lock_icon(real_room(map->vnum), NULL);
+		}
+	}
 }
 
 

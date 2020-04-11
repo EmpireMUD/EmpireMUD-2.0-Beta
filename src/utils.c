@@ -5437,8 +5437,8 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	struct icon_data *icon;
 	int season;
 
-	// don't do it if a custom icon is set
-	if (ROOM_CUSTOM_ICON(room)) {
+	// don't do it if a custom icon is set (or no room provided)
+	if (!room || ROOM_CUSTOM_ICON(room)) {
 		return;
 	}
 
