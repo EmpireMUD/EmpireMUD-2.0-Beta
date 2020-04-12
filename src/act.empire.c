@@ -6774,6 +6774,7 @@ ACMD(do_workforce) {
 	extern int *get_ordered_chores();
 	
 	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH], island_arg[MAX_INPUT_LENGTH];
+	char temp[MAX_INPUT_LENGTH];
 	struct empire_storage_data *store, *next_store;
 	struct island_info *island = NULL;
 	bool all = FALSE, here = FALSE, found;
@@ -6858,10 +6859,12 @@ ACMD(do_workforce) {
 		}
 		else if (!strn_cmp(argument, "all ", 4)) {
 			limit = UNLIMITED;
-			half_chop(argument, lim_arg, argument);	// strip off the "all"
+			half_chop(argument, lim_arg, temp);	// strip off the "all"
+			strcpy(argument, temp);
 		}
 		else if (isdigit(*argument)) {
-			half_chop(argument, lim_arg, argument);	// find a number
+			half_chop(argument, lim_arg, temp);	// find a number
+			strcpy(argument, temp);
 			limit = atoi(lim_arg);
 			if (limit < 0) {
 				msg_to_char(ch, "Invalid number to keep.\r\n");

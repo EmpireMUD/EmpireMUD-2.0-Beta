@@ -112,7 +112,8 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	// sometimes charname is an affect vnum
 	if (*charname == '#') {
 		atype = atoi(charname+1);
-		half_chop(cmd, charname, cmd);
+		half_chop(cmd, charname, temp);
+		strcpy(cmd, temp);
 		if (!find_generic(atype, GENERIC_AFFECT)) {
 			script_log("Trigger: %s, VNum %d. dg_affect: Missing requested generic affect vnum %d", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), atype);
 			atype = ATYPE_DG_AFFECT;
@@ -241,7 +242,8 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	// sometimes roomname is an affect vnum
 	if (*roomname == '#') {
 		atype = atoi(roomname+1);
-		half_chop(cmd, roomname, cmd);
+		half_chop(cmd, roomname, temp);
+		strcpy(cmd, temp);
 		if (!find_generic(atype, GENERIC_AFFECT)) {
 			atype = ATYPE_DG_AFFECT;
 		}

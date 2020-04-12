@@ -6661,15 +6661,15 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 	
 	char junk[MAX_INPUT_LENGTH], varname[MAX_INPUT_LENGTH];
 	char arg[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH];
-	char uid[MAX_INPUT_LENGTH];
+	char uid[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
 	char_data *mob;
 
 	*uid = '\0';
-	half_chop(cmd, junk, cmd);    /* makeuid */
-	half_chop(cmd, varname, cmd); /* variable name */
-	half_chop(cmd, arg, cmd);     /* numerical id or 'obj' 'mob' or 'room' */
-	half_chop(cmd, name, cmd);    /* if the above was obj, mob or room, this is the name */
+	half_chop(cmd, junk, temp);    /* makeuid */
+	half_chop(temp, varname, cmd); /* variable name */
+	half_chop(cmd, arg, temp);     /* numerical id or 'obj' 'mob' or 'room' */
+	half_chop(temp, name, cmd);    /* if the above was obj, mob or room, this is the name */
 
 	if (!*varname) {
 		script_log("Trigger: %s, VNum %d. makeuid w/o an arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
@@ -7211,7 +7211,7 @@ void process_context(struct script_data *sc, trig_data *trig, char *cmd) {
 }
 
 void extract_value(struct script_data *sc, trig_data *trig, char *cmd) {
-	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
+	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	char *buf3;
 	char to[128];
 	int num;
@@ -7229,7 +7229,8 @@ void extract_value(struct script_data *sc, trig_data *trig, char *cmd) {
 	half_chop(buf, buf3, buf2);
 
 	while (num>0) {
-		half_chop(buf2, buf, buf2);
+		half_chop(buf2, buf, temp);
+		strcpy(buf2, temp);
 		num--;
 	}
 

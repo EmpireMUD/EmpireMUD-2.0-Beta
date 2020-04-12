@@ -9022,6 +9022,7 @@ ACMD(do_send) {
 
 ACMD(do_set) {
 	char field[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	char temp[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	bool is_file = FALSE, load_from_file = FALSE;
 	int mode, len, retval;
 	char_data *vict = NULL;
@@ -9031,17 +9032,20 @@ ACMD(do_set) {
 
 	if (!str_cmp(name, "file")) {
 		is_file = 1;
-		half_chop(buf, name, buf);
+		half_chop(buf, name, temp);
+		strcpy(buf, temp);
 	}
 	else if (!str_cmp(name, "player")) {
 		is_player = 1;
-		half_chop(buf, name, buf);
+		half_chop(buf, name, temp);
+		strcpy(buf, temp);
 	}
-	else if (!str_cmp(name, "mob"))
-		half_chop(buf, name, buf);
+	else if (!str_cmp(name, "mob")) {
+		half_chop(buf, name, temp);
+		strcpy(buf, temp);
+	}
 
-	half_chop(buf, field, buf);
-	strcpy(val_arg, buf);
+	half_chop(buf, field, val_arg);
 
 	if (!*name || !*field) {
 		send_to_char("Usage: set <victim> <field> <value>\r\n", ch);
