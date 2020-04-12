@@ -6065,14 +6065,18 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go, struct scri
 
 	/* strip off extra spaces at begin and end */
 	while (*lhs && isspace(*lhs)) 
-		lhs++;
+		++lhs;
 	while (*rhs && isspace(*rhs))
-		rhs++;
+		++rhs;
 
-	for (p = lhs; *p; p++);
-	for (--p; isspace(*p) && (p > lhs); *p-- = '\0');
-	for (p = rhs; *p; p++);
-	for (--p; isspace(*p) && (p > rhs); *p-- = '\0');  
+	for (p = lhs; *p; ++p);
+	if (p > lhs) {
+		for (--p; isspace(*p) && (p > lhs); *p-- = '\0');
+	}
+	for (p = rhs; *p; ++p);
+	if (p > rhs) {
+		for (--p; isspace(*p) && (p > rhs); *p-- = '\0');  
+	}
 
 	/* find the op, and figure out the value */
 	if (!strcmp("||", op)) {
