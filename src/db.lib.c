@@ -2116,7 +2116,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 	}
 	
 	// error for later
-	sprintf(buf,"SYSERR: Format error in empire logs for #%d (expecting letter, got %s)", EMPIRE_VNUM(emp), line);
+	sprintf(buf,"SYSERR: Format error in empire logs for #%d (expecting letter)", EMPIRE_VNUM(emp));
 
 	for (;;) {
 		if (!get_line(fl, line)) {
