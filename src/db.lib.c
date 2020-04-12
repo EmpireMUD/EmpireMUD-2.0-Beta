@@ -9168,7 +9168,7 @@ void free_complex_data(struct complex_room_data *data) {
 	
 	while ((ex = data->exits)) {
 		data->exits = ex->next;
-		// ex->room_ptr is unreliable here during deletes
+		// ex->room_ptr is unreliable here during deletes (when check_exits is off and check_all_exits hasn't run yet)
 		if ((to_room = real_real_room(ex->to_room))) {
 			--GET_EXITS_HERE(to_room);
 		}
