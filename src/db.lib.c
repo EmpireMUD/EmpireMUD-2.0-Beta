@@ -2207,7 +2207,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	}
 	
 	// error for later
-	sprintf(buf,"SYSERR: Format error in empire storage for #%d (expecting letter, got %s)", EMPIRE_VNUM(emp), line);
+	sprintf(buf,"SYSERR: Format error in empire storage for #%d (expecting letter)", EMPIRE_VNUM(emp));
 
 	for (;;) {
 		if (!get_line(fl, line)) {
