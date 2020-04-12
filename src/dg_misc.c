@@ -119,8 +119,8 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 		}
 	}
 	
-	half_chop(cmd, property, cmd);
-	half_chop(cmd, value_p, duration_p);
+	half_chop(cmd, property, temp);
+	half_chop(temp, value_p, duration_p);
 
 	/* make sure all parameters are present */
 	if (!*charname || !*property) {
