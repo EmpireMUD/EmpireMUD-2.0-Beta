@@ -9164,11 +9164,13 @@ struct complex_room_data *init_complex_data() {
 */
 void free_complex_data(struct complex_room_data *data) {
 	struct room_direction_data *ex;
+	room_data *to_room;
 	
 	while ((ex = data->exits)) {
 		data->exits = ex->next;
-		if (ex->room_ptr) {
-			--GET_EXITS_HERE(ex->room_ptr);
+		// ex->room_ptr is unreliable here during deletes
+		if ((to_room = real_real_room(ex->to_room))) {
+			--GET_EXITS_HERE(to_room);
 		}
 		if (ex->keyword) {
 			free(ex->keyword);
