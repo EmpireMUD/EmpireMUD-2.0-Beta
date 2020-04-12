@@ -111,6 +111,8 @@ int is_substring(char *sub, char *string) {
 * @return bool TRUE if the input matches, FALSE if not.
 */
 bool match_command_trig(char *input, char *match, bool mode) {
+	char temp[MAX_STRING_LENGTH];
+	
 	if (!input || !match) {	// missing input
 		return FALSE;
 	}
@@ -132,7 +134,8 @@ bool match_command_trig(char *input, char *match, bool mode) {
 		char buffer[MAX_INPUT_LENGTH], word[MAX_INPUT_LENGTH];
 		strcpy(buffer, match);
 		while (*buffer) {
-			half_chop(buffer, word, buffer);
+			half_chop(buffer, word, temp);
+			strcpy(buffer, temp);
 			if ((mode == CMDTRG_EXACT && !str_cmp(input, word)) || (mode == CMDTRG_ABBREV && is_abbrev(input, word) && str_cmp(input, word))) {
 				return TRUE;
 			}

@@ -101,13 +101,14 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect" */
 	char charname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
 	char value_p[MAX_INPUT_LENGTH], duration_p[MAX_INPUT_LENGTH];
+	char temp[MAX_INPUT_LENGTH];
 	any_vnum atype = ATYPE_DG_AFFECT;
 	bitvector_t i = 0, type = 0;
 	struct affected_type af;
 	bool all_off = FALSE;
 
-	half_chop(cmd, junk, cmd);
-	half_chop(cmd, charname, cmd);
+	half_chop(cmd, junk, temp);
+	half_chop(temp, charname, cmd);
 	// sometimes charname is an affect vnum
 	if (*charname == '#') {
 		atype = atoi(charname+1);
