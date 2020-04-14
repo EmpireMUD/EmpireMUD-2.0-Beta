@@ -158,8 +158,9 @@ void output_stats(void);
 void print_island_file();
 void print_map_graphic(void);
 void print_map_to_files(void);
-struct num_data_t *pop_ndt(void);
-void push_ndt(int loc);
+struct num_data_t *pop_ndt(struct num_data_t **stack);
+void push_ndt(struct num_data_t **stack, int loc, int depth);
+void queue_ndt(struct num_data_t **queue, int loc, int depth);
 int sect_to_terrain(int sect_vnum);
 inline int shift(int origin, int x_shift, int y_shift);
 void shift_map_x(int amt);
@@ -553,19 +554,17 @@ int number(int from, int to) {
 
 struct num_data_t {
 	int loc;
-	struct num_data_t *next;	// LL
+	int depth;
+	struct num_data_t *prev, *next;	// doubly-linked list
 };
-
-struct num_data_t *ndt_stack = NULL;	// global list
 
 
 // pops an item from the stack and returns it, or NULL if empty
-struct num_data_t *pop_ndt(void) {
+struct num_data_t *pop_ndt(struct num_data_t **stack) {
 	struct num_data_t *temp = NULL;
 	
-	if (ndt_stack) {
-		temp = ndt_stack;
-		ndt_stack = temp->next;
+	if ((temp = *stack)) {
+		DL_DELETE(*stack, temp);
 	}
 	
 	return temp;
@@ -573,12 +572,22 @@ struct num_data_t *pop_ndt(void) {
 
 
 // push a location onto the stack
-void push_ndt(int loc) {
+void push_ndt(struct num_data_t **stack, int loc, int depth) {
 	struct num_data_t *ndt;
 	CREATE(ndt, struct num_data_t, 1);
 	ndt->loc = loc;
-	ndt->next = ndt_stack;
-	ndt_stack = ndt;
+	ndt->depth = depth;
+	DL_PREPEND(*stack, ndt);
+}
+
+
+// queue a location at the end of the stack (queue)
+void queue_ndt(struct num_data_t **queue, int loc, int depth) {
+	struct num_data_t *ndt;
+	CREATE(ndt, struct num_data_t, 1);
+	ndt->loc = loc;
+	ndt->depth = depth;
+	DL_APPEND(*queue, ndt);
 }
 
 
@@ -1617,7 +1626,7 @@ void land_mass(struct island_data *isle, int min_radius, int max_radius) {
 // sets up island numbers and converts trapped ocean to lake
 void number_islands_and_fix_lakes(void) {
 	int first_ocean_done = FALSE, changed = FALSE;
-	struct num_data_t *ndt;
+	struct num_data_t *ndt_stack = NULL, *ndt;
 	int old, x, y, pos;
 	int iter, use_id, use_land;
 	int top_id = 0;
@@ -1645,8 +1654,12 @@ void number_islands_and_fix_lakes(void) {
 			
 			old = grid[iter].island_id;
 			
-			push_ndt(iter);
-			while ((ndt = pop_ndt())) {
+			push_ndt(&ndt_stack, iter, 0);
+			while ((ndt = pop_ndt(&ndt_stack))) {
+				if (grid[ndt->loc].island_id != old) {
+					continue;
+				}
+				
 				grid[ndt->loc].island_id = use_id;
 	
 				for (x = -1; x <= 1; ++x) {
@@ -1654,7 +1667,7 @@ void number_islands_and_fix_lakes(void) {
 						if (x != 0 || y != 0) {
 							pos = shift(ndt->loc, x, y);
 							if (pos != -1 && grid[pos].island_id == old && terrains[grid[pos].type].is_land == use_land) {
-								push_ndt(pos);
+								push_ndt(&ndt_stack, pos, 0);
 							}
 						}
 					}

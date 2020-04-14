@@ -928,7 +928,7 @@ void verify_sectors(void) {
 		room = real_real_room(map->vnum);
 		
 		if (!map->sector_type) {
-			// can't use change_terrain() here
+			// can't use change_terrain() here -- note check_terrain_height() does not run here either
 			perform_change_sect(NULL, map, use_sect);
 		}
 		if (!map->base_sector) {
@@ -1213,7 +1213,9 @@ char *fread_string(FILE * fl, char *error) {
 		point = strchr(tmp, '\0');
 		
 		// backtrack past any \r\n or trailing space or tab
-		for (--point; *point == '\r' || *point == '\n' || *point == ' ' || *point == '\t'; --point);
+		if (point > tmp) {
+			for (--point; point > tmp && (*point == '\r' || *point == '\n' || *point == ' ' || *point == '\t'); --point);
+		}
 		
 		// look for a trailing ~
 		if (*point == '~') {
@@ -1960,6 +1962,7 @@ const char *versions_list[] = {
 	"b5.88",
 	"b5.88a",
 	"b5.88b",
+	"b5.94",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -4195,6 +4198,167 @@ void b5_88_maintenance_fix(void) {
 }
 
 
+void b5_94_terrain_heights(void) {
+	int x, y, dir;
+	bool any;
+	
+	struct temp_dat_t {
+		struct map_data *loc;
+		int height;
+		struct temp_dat_t *prev, *next;	// doubly-linked list
+	} *tdt, *big_queue = NULL, *river_queue = NULL, *mountain_queue = NULL;
+	
+	#define queue_tdt(queue, map, ht)  { struct temp_dat_t *temp; CREATE(temp, struct temp_dat_t, 1); temp->loc = &(map); temp->height = (ht); DL_APPEND(queue, temp); }
+	
+	// #define b594_is_water(sect)  (IS_SET(GET_SECT_CLIMATE(sect), CLIM_RIVER | CLIM_LAKE) || GET_SECT_VNUM(sect) == 32 || GET_SECT_VNUM(sect) == 33 || GET_SECT_VNUM(sect) == 5 || GET_SECT_VNUM(sect) == 10550)
+	
+	log("Applying b5.94 update: Attempting to detect map heights...");
+	
+	// make sure we need to do this
+	any = FALSE;
+	for (x = 0; x < MAP_WIDTH && !any; ++x) {
+		for (y = 0; y < MAP_HEIGHT && !any; ++y) {
+			if (world_map[x][y].shared->height > 0) {
+				any = TRUE;
+			}
+		}
+	}
+	if (any) {
+		log("- map already has height data; no work to do");
+		return;
+	}
+
+	// queue all non-mountain/rivers to start with AND reset all heights to INT_MAX
+	for (x = 0; x < MAP_WIDTH; ++x) {
+		for (y = 0; y < MAP_HEIGHT; ++y) {
+			world_map[x][y].shared->height = INT_MAX;
+			if (!SECT_FLAGGED(world_map[x][y].base_sector, SECTF_NEEDS_HEIGHT)) {
+				queue_tdt(big_queue, world_map[x][y], 0);
+			}
+		}
+	}
+	if (!big_queue) {
+		log("- unable to find non-river/mountain tiles to start");
+		return;
+	}
+	
+	log("- processing flat land...");
+	
+	// use a queue for a breadth-first search
+	while ((tdt = big_queue)) {
+		if (tdt->loc->shared->height == INT_MAX) {
+			// anything in the big queue is flat
+			tdt->loc->shared->height = 0;
+			
+			// check neighbors
+			for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
+				if (!get_coord_shift(MAP_X_COORD(tdt->loc->vnum), MAP_Y_COORD(tdt->loc->vnum), shift_dir[dir][0], shift_dir[dir][1], &x, &y)) {
+					continue;	// no neighbor in this direction
+				}
+				if (world_map[x][y].shared->height != INT_MAX) {
+					continue;	// already checked
+				}
+				if (!world_map[x][y].base_sector) {
+					continue;	// don't think this is possible but best to be safe
+				}
+				
+				// now queue based on type
+				if (IS_SET(GET_SECT_CLIMATE(world_map[x][y].base_sector), CLIM_MOUNTAIN)) {
+					// detect any mountain edge
+					queue_tdt(mountain_queue, world_map[x][y], 1);
+				}
+				else if (IS_SET(GET_SECT_CLIMATE(tdt->loc->base_sector), CLIM_OCEAN) && SECT_FLAGGED(world_map[x][y].base_sector, SECTF_NEEDS_HEIGHT)) {
+					// detect river touching ocean
+					queue_tdt(river_queue, world_map[x][y], -1);
+				}
+				else {
+					// neither mountain nor start-of-river -- ignore it; it's probably already in the queue
+				}
+			}
+		}
+		
+		DL_DELETE(big_queue, tdt);
+		free(tdt);
+	}
+	
+	log("- detecting mountain heights...");
+	
+	// work on mountains from the outside in
+	while ((tdt = mountain_queue)) {
+		if (tdt->loc->shared->height == INT_MAX) {
+			// assign height
+			tdt->loc->shared->height = tdt->height;
+			
+			// check neighbors
+			for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
+				if (!get_coord_shift(MAP_X_COORD(tdt->loc->vnum), MAP_Y_COORD(tdt->loc->vnum), shift_dir[dir][0], shift_dir[dir][1], &x, &y)) {
+					continue;	// no neighbor in this direction
+				}
+				if (world_map[x][y].shared->height != INT_MAX) {
+					continue;	// already checked
+				}
+				if (!world_map[x][y].base_sector) {
+					continue;	// don't think this is possible but best to be safe
+				}
+				
+				if (IS_SET(GET_SECT_CLIMATE(world_map[x][y].base_sector), CLIM_MOUNTAIN)) {
+					// work up the mountain
+					queue_tdt(mountain_queue, world_map[x][y], tdt->height + 1);
+				}
+			}
+		}
+		
+		DL_DELETE(mountain_queue, tdt);
+		free(tdt);
+	}
+	
+	log("- detecting river heights...");
+	
+	// work on rivers upstream
+	while ((tdt = river_queue)) {
+		if (tdt->loc->shared->height == INT_MAX) {
+			// assign height
+			tdt->loc->shared->height = tdt->height;
+			
+			// check neighbors
+			for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
+				if (!get_coord_shift(MAP_X_COORD(tdt->loc->vnum), MAP_Y_COORD(tdt->loc->vnum), shift_dir[dir][0], shift_dir[dir][1], &x, &y)) {
+					continue;	// no neighbor in this direction
+				}
+				if (world_map[x][y].shared->height != INT_MAX) {
+					continue;	// already checked
+				}
+				if (!world_map[x][y].base_sector) {
+					continue;	// don't think this is possible but best to be safe
+				}
+				
+				if (!IS_SET(GET_SECT_CLIMATE(world_map[x][y].base_sector), CLIM_MOUNTAIN) && SECT_FLAGGED(world_map[x][y].base_sector, SECTF_NEEDS_HEIGHT)) {
+					// work up the river
+					queue_tdt(river_queue, world_map[x][y], tdt->height - 1);
+				}
+			}
+		}
+		
+		DL_DELETE(river_queue, tdt);
+		free(tdt);
+	}
+	
+	// tiles are 'missed' if they do not connect to the sea
+	log("- checking for rivers/lakes with no height...");
+	for (x = 0; x < MAP_WIDTH; ++x) {
+		for (y = 0; y < MAP_HEIGHT; ++y) {
+			if (world_map[x][y].shared->height == INT_MAX) {
+				// log("  - (%d, %d) %s: not connected to ocean", x, y, GET_SECT_NAME(world_map[x][y].base_sector));
+				world_map[x][y].shared->height = 0;
+			}
+		}
+	}
+	
+	world_map_needs_save = TRUE;
+	save_whole_world();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4504,6 +4668,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.88b")) {
 			b5_88_maintenance_fix();
+		}
+		if (MATCH_VERSION("b5.94")) {
+			b5_94_terrain_heights();
 		}
 	}
 	

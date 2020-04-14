@@ -2661,7 +2661,7 @@ ACMD(do_inventory) {
 		}
 	}
 	else {	// advanced inventory
-		char word[MAX_INPUT_LENGTH], heading[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
+		char word[MAX_INPUT_LENGTH], heading[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH];
 		int wear_type = NOTHING, type_type = NOTHING;
 		bool kept = FALSE, not_kept = FALSE, identify = FALSE;
 		generic_data *cmp = NULL;
@@ -2693,7 +2693,8 @@ ACMD(do_inventory) {
 					break;
 				}
 				case 'w': {
-					half_chop(argument+2, word, argument);
+					half_chop(argument+2, word, temp);
+					strcpy(argument, temp);
 					if (!*word) {
 						msg_to_char(ch, "Show items worn on what part?\r\n");
 						return;
@@ -2707,7 +2708,8 @@ ACMD(do_inventory) {
 					break;
 				}
 				case 't': {
-					half_chop(argument+2, word, argument);
+					half_chop(argument+2, word, temp);
+					strcpy(argument, temp);
 					if (!*word) {
 						msg_to_char(ch, "Show items of what type?\r\n");
 						return;

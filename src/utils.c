@@ -4972,7 +4972,7 @@ int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_origina
 * Counts how many times a sector appears between two locations, NOT counting
 * the start/end locations.
 *
-* @param bitvector_t sectf_bits SECTF_x flag(s) to look for.
+* @param bitvector_t sectf_bits SECTF_ flag(s) to look for.
 * @param room_data *start Tile to start at (not inclusive).
 * @param room_data *end Tile to end at (not inclusive).
 * @param bool check_base_sect If TRUE, also looks for those flags on the base sector.
@@ -5437,8 +5437,8 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	struct icon_data *icon;
 	int season;
 
-	// don't do it if a custom icon is set
-	if (ROOM_CUSTOM_ICON(room)) {
+	// don't do it if a custom icon is set (or no room provided)
+	if (!room || ROOM_CUSTOM_ICON(room)) {
 		return;
 	}
 

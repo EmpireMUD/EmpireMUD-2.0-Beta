@@ -927,6 +927,15 @@ matches "Horrid Form".
 
 See also: OLC ABILITIES
 #d
+"SECTEDIT NOTES"
+
+Usage:  .notes
+
+This text field allows you to set notes that are only visible in the OLC editor
+and via the 'stat' command. You can put any information you want in the notes.
+
+See also: OLC, STAT
+#d
 "ABILEDIT PLAYER-TECH ABILITY" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH
 
 Usage:  .data add ptech <type>
@@ -3808,6 +3817,26 @@ Usage:  .map grow
 Triggers immediate growth, similar to chant of nature.
 
 See also: MAP OLC
+#d
+"MAPEDIT HEIGHT" HEIGHT "TERRAIN HEIGHT"
+
+Usage:  .map height <value>
+
+This command sets the 'height' of a map tile. You can see the current height
+on 'stat room'. Height values are not shown to players, but they determine
+things like whether or not a player can climb between two tiles without the
+proper skill.
+
+For mountains, height is positive and is the distance from flat land.
+
+For rivers/lakes, height is negative and is the distance from the sea (more
+negative means further from the sea). If a river or lake has no height
+property, it probably isn't attached to the sea.
+
+Sectors that cover or replace mountains, rivers, and lakes should have the
+NEEDS-HEIGHT sector flag so they will keep their previous heights.
+
+See also: STAT
 #d
 "MAPEDIT ICON"
 
@@ -6734,8 +6763,9 @@ Available sector flags:
  NO-GLOBAL-SPAWNS - Won't use global spawn lists.
  ROUGH - This is rough, raised terrain, like a mountain
  SHALLOW-WATER - The tile has water but requires no boat (like a swamp)
+ NEEDS-HEIGHT - Uses the 'height' property in some way and will inherit it.
 
-See also: OLC SECTORS
+See also: OLC SECTORS, TERRAIN HEIGHT
 #d
 "SECTEDIT FULLSEARCH" "SECTOR FULLSEARCH"
 

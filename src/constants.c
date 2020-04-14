@@ -3146,6 +3146,7 @@ const char *mapout_color_names[] = {
 	"Deep Violet",
 	"Dark Dark Green",	// 40
 	"Dark Brown",
+	"Deep Yellow",
 	"\n"
 };
 
@@ -3195,6 +3196,7 @@ const char mapout_color_tokens[] = {
 	'E',	// "Deep Violet",
 	'F',	// "Dark Dark Green",	// 40
 	'G',	// "Dark Brown",
+	'H',	// "Deep Yellow",
 };
 
 
@@ -3330,29 +3332,30 @@ const char *open_ruins_icons[NUM_RUINS_ICONS] = {
 
 // SECTF_x
 const char *sector_flags[] = {
-	"LOCK-ICON",
+	"LOCK-ICON",	// 0
 	"IS-ADVENTURE",
 	"NON-ISLAND",
 	"CHORE",
 	"!CLAIM",
-	"START-LOCATION",
+	"START-LOCATION",	// 5
 	"FRESH-WATER",
 	"OCEAN",
 	"DRINK",
 	"HAS-CROP-DATA",
-	"CROP",
+	"CROP",	// 10
 	"LAY-ROAD",
 	"IS-ROAD",
 	"CAN-MINE",
 	"SHOW-ON-POLITICAL-MAPOUT",
-	"MAP-BUILDING",
+	"MAP-BUILDING",	// 15
 	"INSIDE-ROOM",
 	"LARGE-CITY-RADIUS",
 	"OBSCURE-VISION",
 	"IS-TRENCH",
-	"NO-GLOBAL-SPAWNS",
+	"NO-GLOBAL-SPAWNS",	// 20
 	"ROUGH",
 	"SHALLOW-WATER",
+	"NEEDS-HEIGHT",
 	"\n"
 };
 

@@ -2323,6 +2323,7 @@ typedef struct vehicle_data vehicle_data;
 #define SECTF_NO_GLOBAL_SPAWNS  BIT(20)	// won't use global spawn lists
 #define SECTF_ROUGH  BIT(21)	// hard terrain, requires ATR; other mountain-like properties
 #define SECTF_SHALLOW_WATER  BIT(22)	// can't earthmeld; other properties like swamp and oasis have
+#define SECTF_NEEDS_HEIGHT  BIT(23)	// will automatically set its 'height' property under certain circumstances
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2616,6 +2617,7 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_MESSAGES  100	// fight.c
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
 #define MAX_NAME_LENGTH  20
+#define MAX_NOTES  8000
 #define MAX_OBJ_AFFECT  6
 #define MAX_PLAYER_DESCRIPTION  4000
 #define MAX_POOFIN_LENGTH  80
@@ -5220,6 +5222,8 @@ struct sector_data {
 	struct evolution_data *evolution;	// change over time
 	struct interaction_item *interactions;	// interaction items
 	
+	char *notes;	// misc notes shown only to imms
+	
 	UT_hash_handle hh;	// sector_table hash
 };
 
@@ -5509,6 +5513,7 @@ struct complex_room_data {
 struct shared_room_data {
 	int island_id;	// the island id (may be NO_ISLAND)
 	struct island_info *island_ptr;	// pointer to the island (may be NULL)
+	int height;	// mountain height, or river distance-from-ocean
 	
 	// custom data
 	char *name;  // room name may be set

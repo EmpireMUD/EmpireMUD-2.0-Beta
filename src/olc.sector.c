@@ -719,6 +719,9 @@ void save_olc_sector(descriptor_data *desc) {
 	if (GET_SECT_COMMANDS(proto)) {
 		free(GET_SECT_COMMANDS(proto));
 	}
+	if (GET_SECT_NOTES(proto)) {
+		free(GET_SECT_NOTES(proto));
+	}
 	while ((spawn = GET_SECT_SPAWNS(proto))) {
 		GET_SECT_SPAWNS(proto) = spawn->next;
 		free(spawn);
@@ -782,6 +785,7 @@ sector_data *setup_olc_sector(sector_data *input) {
 		GET_SECT_NAME(new) = GET_SECT_NAME(input) ? str_dup(GET_SECT_NAME(input)) : NULL;
 		GET_SECT_TITLE(new) = GET_SECT_TITLE(input) ? str_dup(GET_SECT_TITLE(input)) : NULL;
 		GET_SECT_COMMANDS(new) = GET_SECT_COMMANDS(input) ? str_dup(GET_SECT_COMMANDS(input)) : NULL;
+		GET_SECT_NOTES(new) = GET_SECT_NOTES(input) ? str_dup(GET_SECT_NOTES(input)) : NULL;
 		
 		// copy spawns
 		GET_SECT_SPAWNS(new) = copy_spawn_list(GET_SECT_SPAWNS(input));
@@ -836,7 +840,7 @@ void olc_show_sector(char_data *ch) {
 	void get_interaction_display(struct interaction_item *list, char *save_buffer);
 	
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	char lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH * 2];
 	struct spawn_info *spawn;
 	int count;
 	
@@ -887,7 +891,9 @@ void olc_show_sector(char_data *ch) {
 		}
 		sprintf(buf + strlen(buf), " %d spawn%s set\r\n", count, PLURAL(count));
 	}
-		
+	
+	sprintf(buf + strlen(buf), "<%snotes\t0>\r\n%s", OLC_LABEL_PTR(GET_SECT_NOTES(st)), NULLSAFE(GET_SECT_NOTES(st)));
+	
 	page_string(ch->desc, buf, TRUE);
 }
 
@@ -1194,6 +1200,19 @@ OLC_MODULE(sectedit_name) {
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
 	olc_process_string(ch, argument, "name", &GET_SECT_NAME(st));
 	CAP(GET_SECT_NAME(st));
+}
+
+
+OLC_MODULE(sectedit_notes) {
+	sector_data *st = GET_OLC_SECTOR(ch->desc);
+
+	if (ch->desc->str) {
+		msg_to_char(ch, "You are already editing a string.\r\n");
+	}
+	else {
+		sprintf(buf, "notes for %s", GET_SECT_NAME(st));
+		start_string_editor(ch->desc, buf, &GET_SECT_NOTES(st), MAX_NOTES, TRUE);
+	}
 }
 
 

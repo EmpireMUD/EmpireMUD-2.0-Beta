@@ -72,6 +72,7 @@ void stop_room_action(room_data *room, int action, int chore);
 void write_room_to_file(FILE *fl, room_data *room);
 
 // locals
+void check_terrain_height(room_data *room);
 int count_city_points_used(empire_data *emp);
 struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 void decustomize_room(room_data *room);
@@ -80,6 +81,7 @@ room_data *get_extraction_room();
 crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
+void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
 void ruin_one_building(room_data *room);
 void save_world_map_to_file();
 void schedule_check_unload(room_data *room, bool offset);
@@ -228,6 +230,9 @@ void change_terrain(room_data *room, sector_vnum sect) {
 		setup_start_locations();
 	}
 	
+	// ensure it has height if it needs it
+	check_terrain_height(room);
+	
 	// for later
 	emp = ROOM_OWNER(room);
 	
@@ -315,6 +320,58 @@ void check_island_assignment(room_data *room, struct map_data *map) {
 	
 	// if we get this far, it was not able to detect an island -- make a new one
 	number_and_count_islands(FALSE);
+}
+
+
+/**
+* Ensures a room has (or loses) its terrain height, to be called after you
+* change the sector with change_terrain().
+*
+* @param room_data *room The room to check.
+*/
+void check_terrain_height(room_data *room) {
+	room_data *to_room;
+	int dir;
+	
+	int good_match = 0, bad_match = 0;
+	
+	if ((ROOM_SECT_FLAGGED(room, SECTF_NEEDS_HEIGHT) || SECT_FLAGGED(BASE_SECT(room), SECTF_NEEDS_HEIGHT)) && ROOM_HEIGHT(room) == 0) {
+		// attempt to detect from neighbors
+		for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
+			if (!(to_room = real_shift(room, shift_dir[dir][0], shift_dir[dir][1]))) {
+				continue;	// no room that way
+			}
+			if (!ROOM_HEIGHT(to_room)) {
+				continue;	// no height to copy
+			}
+			
+			// ok, it has a height we can borrow... let's see if it's a good match
+			if (GET_SECT_CLIMATE(BASE_SECT(to_room)) == GET_SECT_CLIMATE(BASE_SECT(room))) {
+				// perfect match: just copy it
+				ROOM_HEIGHT(room) = ROOM_HEIGHT(to_room);
+				return;
+			}
+			else if (GET_SECT_CLIMATE(BASE_SECT(to_room)) & GET_SECT_CLIMATE(BASE_SECT(room)) && good_match != 0) {
+				// good match: save for later
+				good_match = ROOM_HEIGHT(to_room);
+			}
+			else if (!bad_match) {
+				// bad match: use if necessary
+				bad_match = ROOM_HEIGHT(to_room);
+			}
+		}
+		
+		if (good_match != 0) {
+			ROOM_HEIGHT(room) = good_match;
+		}
+		else {
+			ROOM_HEIGHT(room) = bad_match;	// may still be 0
+		}
+	}
+	else if (!ROOM_SECT_FLAGGED(room, SECTF_NEEDS_HEIGHT) && !SECT_FLAGGED(BASE_SECT(room), SECTF_NEEDS_HEIGHT)) {
+		// clear it
+		ROOM_HEIGHT(room) = 0;
+	}
 }
 
 
@@ -3069,7 +3126,7 @@ room_data *load_map_room(room_vnum vnum) {
 	GET_MAP_LOC(room) = map;
 	add_room_to_world_tables(room);
 	
-	// do not use perform_change_sect here because we're only loading from the existing data
+	// do not use perform_change_sect here because we're only loading from the existing data -- this already has height data
 	SECT(room) = map->sector_type;
 	BASE_SECT(room) = map->base_sector;
 	
@@ -3891,6 +3948,10 @@ void load_world_map_from_file(void) {
 					last->shared->name = fread_string(fl, error_buf);
 					break;
 				}
+				case 'U': {	// other data (height etc)
+					parse_other_shared_data(last->shared, line, error_buf);
+					break;
+				}
 				case 'X': {	// resource depletion
 					if (!get_line(fl, line2)) {
 						log("SYSERR: Unable to read depletion line of map tile #%d", last->vnum);
@@ -3986,4 +4047,37 @@ void save_world_map_to_file(void) {
 	fclose(fl);
 	rename(WORLD_MAP_FILE TEMP_SUFFIX, WORLD_MAP_FILE);
 	world_map_needs_save = FALSE;
+}
+
+
+/**
+* Parses any 'other data' for the 'shared room data' of a map tile or room.
+*
+* Note: This currently only includes 'height' but is expandable to handle other
+* 'other data' in the future.
+*
+* @param struct shared_room_data *shared A pointer to the room's shared data.
+* @param char *line The line from the file, starting with 'U'.
+* @param char *error_part An explanation of where this data was read from, for error reporting.
+*/
+void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part) {
+	int int_in[2];
+	
+	if (!shared || !line || !*line || !error_part) {
+		log("SYSERR: Bad shared line '%s' or missing shared pointer in %s", NULLSAFE(line), error_part ? error_part : "UNKNOWN");
+		exit(1);
+	}
+	
+	// expected format is: U0 0
+	switch (line[1]) {
+		case '0': {
+			if (sscanf(line, "U0 %d", &int_in[0]) != 1) {
+				log("SYSERR: Bad U0 entry '%s' in %s", line, error_part);
+				exit(1);
+			}
+			
+			shared->height = int_in[0];
+			break;
+		}
+	}
 }

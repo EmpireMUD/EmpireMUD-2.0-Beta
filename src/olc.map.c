@@ -261,6 +261,21 @@ OLC_MODULE(mapedit_grow) {
 }
 
 
+OLC_MODULE(mapedit_height) {
+	if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)) || GET_ROOM_VNUM(ch) >= MAP_SIZE) {
+		msg_to_char(ch, "You can only set heights on the map.\r\n");
+	}
+	else if (!*argument || !is_number(argument)) {
+		msg_to_char(ch, "You must specify the height as a number.\r\n");
+	}
+	else {
+		ROOM_HEIGHT(IN_ROOM(ch)) = atoi(argument);
+		msg_to_char(ch, "This tile now has a height of %d.\r\n", ROOM_HEIGHT(IN_ROOM(ch)));
+		world_map_needs_save = TRUE;
+	}
+}
+
+
 OLC_MODULE(mapedit_maintain) {
 	void finish_maintenance(char_data *ch, room_data *room);
 	
@@ -340,6 +355,7 @@ OLC_MODULE(mapedit_decustomize) {
 	
 	decustomize_room(IN_ROOM(ch));
 	msg_to_char(ch, "All customizations removed on this room/acre.\r\n");
+	world_map_needs_save = TRUE;
 }
 
 
@@ -352,6 +368,7 @@ OLC_MODULE(mapedit_room_name) {
 			ROOM_CUSTOM_NAME(IN_ROOM(ch)) = NULL;
 		}
 		msg_to_char(ch, "This room/tile no longer has a specialized name.\r\n");
+		world_map_needs_save = TRUE;
 	}
 	else {
 		if (ROOM_CUSTOM_NAME(IN_ROOM(ch))) {
@@ -359,6 +376,7 @@ OLC_MODULE(mapedit_room_name) {
 		}
 		ROOM_CUSTOM_NAME(IN_ROOM(ch)) = str_dup(argument);
 		msg_to_char(ch, "This room/tile is now called \"%s\".\r\n", argument);
+		world_map_needs_save = TRUE;
 	}
 }
 
@@ -374,9 +392,10 @@ OLC_MODULE(mapedit_icon) {
 		if (ROOM_CUSTOM_ICON(IN_ROOM(ch))) {
 			free(ROOM_CUSTOM_ICON(IN_ROOM(ch)));
 			ROOM_CUSTOM_ICON(IN_ROOM(ch)) = NULL;
-			}
-		msg_to_char(ch, "This area no longer has a specialized icon.\r\n");
 		}
+		msg_to_char(ch, "This area no longer has a specialized icon.\r\n");
+		world_map_needs_save = TRUE;
+	}
 	else if (!*argument)
 		msg_to_char(ch, "What would you like to set the icon to (or \"none\")?\r\n");
 	else if (!validate_icon(argument))
@@ -389,6 +408,7 @@ OLC_MODULE(mapedit_icon) {
 		}
 		ROOM_CUSTOM_ICON(IN_ROOM(ch)) = str_dup(argument);
 		msg_to_char(ch, "This area now has the icon \"%s&0\".\r\n", argument);
+		world_map_needs_save = TRUE;
 	}
 }
 
@@ -433,8 +453,9 @@ OLC_MODULE(mapedit_room_description) {
 		if (ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))) {
 			free(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch)));
 			ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch)) = NULL;
-			}
+		}
 		msg_to_char(ch, "This area no longer has a specialized description.\r\n");
+		world_map_needs_save = TRUE;
 	}
 	else if (is_abbrev(argument, "set")) {
 		if (ch->desc->str) {
@@ -442,6 +463,7 @@ OLC_MODULE(mapedit_room_description) {
 		}
 		else {
 			start_string_editor(ch->desc, "room description", &(ROOM_CUSTOM_DESCRIPTION(IN_ROOM(ch))), MAX_ROOM_DESCRIPTION, TRUE);
+			// warning: doesn't necessarily trigger a save
 		}
 	}
 	else

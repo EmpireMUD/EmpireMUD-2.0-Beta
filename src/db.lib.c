@@ -1428,9 +1428,13 @@ void remove_empire_from_table(empire_data *emp) {
 * This function detects when the mud boots up on a new map, and moves all
 * empire territory to "no island" (to be moved back later). It also cleans up
 * empire data and ensures players don't log in mid-ocean.
+*
+* This also does a small amount of maintenance on new maps, such as ensuring
+* icon-locking is done.
 */
 void check_for_new_map(void) {
 	void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
+	void lock_icon(room_data *room, struct icon_data *use_icon);	// utils.c
 	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 	
 	struct empire_storage_data *store, *next_store;
@@ -1442,6 +1446,7 @@ void check_for_new_map(void) {
 	struct instance_data *inst, *next_inst;
 	struct empire_unique_storage *eus;
 	empire_data *emp, *next_emp;
+	struct map_data *map;
 	room_data *room;
 	FILE *fl;
 	
@@ -1551,6 +1556,13 @@ void check_for_new_map(void) {
 	
 	// rescan all empires
 	reread_empire_tech(NULL);
+
+	// check icon-locking:
+	LL_FOREACH(land_map, map) {
+		if (!map->shared->icon && SECT_FLAGGED(map->sector_type, SECTF_LOCK_ICON)) {
+			lock_icon(real_room(map->vnum), NULL);
+		}
+	}
 }
 
 
@@ -2104,7 +2116,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 	}
 	
 	// error for later
-	sprintf(buf,"SYSERR: Format error in empire logs for #%d (expecting letter, got %s)", EMPIRE_VNUM(emp), line);
+	sprintf(buf,"SYSERR: Format error in empire logs for #%d (expecting letter)", EMPIRE_VNUM(emp));
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -2195,7 +2207,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	}
 	
 	// error for later
-	sprintf(buf,"SYSERR: Format error in empire storage for #%d (expecting letter, got %s)", EMPIRE_VNUM(emp), line);
+	sprintf(buf,"SYSERR: Format error in empire storage for #%d (expecting letter)", EMPIRE_VNUM(emp));
 
 	for (;;) {
 		if (!get_line(fl, line)) {
@@ -5642,6 +5654,7 @@ void remove_room_from_world_tables(room_data *room) {
 void parse_room(FILE *fl, room_vnum vnum) {
 	void add_trd_home_room(room_vnum vnum, room_vnum home_room);
 	void add_trd_owner(room_vnum vnum, empire_vnum owner);
+	void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
 
 	char line[256], line2[256], error_buf[256], error_log[MAX_STRING_LENGTH], str1[256], str2[256];
 	double dbl_in;
@@ -5915,6 +5928,11 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				// must be left in to be backwards-compatbile. If your mud has
 				// been up since b2.11, you can safely remove this block.
 				parse_trig_proto(line, &(room->proto_script), error_log);
+				break;
+			}
+			
+			case 'U': {	// other data (height etc)
+				parse_other_shared_data(SHARED_DATA(room), line, error_buf);
 				break;
 			}
 			
@@ -6542,6 +6560,9 @@ void free_sector(sector_data *st) {
 	if (GET_SECT_COMMANDS(st) && (!proto || GET_SECT_COMMANDS(st) != GET_SECT_COMMANDS(proto))) {
 		free(GET_SECT_COMMANDS(st));
 	}
+	if (GET_SECT_NOTES(st) && (!proto || GET_SECT_NOTES(st) != GET_SECT_NOTES(proto))) {
+		free(GET_SECT_NOTES(st));
+	}
 	
 	if (GET_SECT_ICONS(st) && (!proto || GET_SECT_ICONS(st) != GET_SECT_ICONS(proto))) {
 		free_icon_set(&GET_SECT_ICONS(st));
@@ -6698,6 +6719,11 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				}
 				break;
 			}
+			
+			case '_': {	// notes
+				GET_SECT_NOTES(sect) = fread_string(fl, buf2);
+				break;
+			}
 
 			// end
 			case 'S': {
@@ -6721,7 +6747,7 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 * @param sector_data *st The thing to save.
 */
 void write_sector_to_file(FILE *fl, sector_data *st) {
-	char temp[64], temp2[64], temp3[64];
+	char temp[MAX_STRING_LENGTH], temp2[64], temp3[64];
 	struct evolution_data *evo;
 	struct spawn_info *spawn;
 	
@@ -6762,6 +6788,12 @@ void write_sector_to_file(FILE *fl, sector_data *st) {
 	for (spawn = GET_SECT_SPAWNS(st); spawn; spawn = spawn->next) {
 		fprintf(fl, "M\n");
 		fprintf(fl, "%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
+	}
+	
+	if (GET_SECT_NOTES(st) && *GET_SECT_NOTES(st)) {
+		strcpy(temp, GET_SECT_NOTES(st));
+		strip_crlf(temp);
+		fprintf(fl, "_\n%s~\n", temp);
 	}
 	
 	// end
@@ -9132,11 +9164,13 @@ struct complex_room_data *init_complex_data() {
 */
 void free_complex_data(struct complex_room_data *data) {
 	struct room_direction_data *ex;
+	room_data *to_room;
 	
 	while ((ex = data->exits)) {
 		data->exits = ex->next;
-		if (ex->room_ptr) {
-			--GET_EXITS_HERE(ex->room_ptr);
+		// ex->room_ptr is unreliable here during deletes (when check_exits is off and check_all_exits hasn't run yet)
+		if ((to_room = real_real_room(ex->to_room))) {
+			--GET_EXITS_HERE(to_room);
 		}
 		if (ex->keyword) {
 			free(ex->keyword);
@@ -9482,6 +9516,9 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	struct track_data *track, *next_track;
 	time_t now = time(0);
 	
+	// WARNING: this shares a list of key letters between 'parse_room' and
+	// 'load_world_map_from_file' -- more letters are used than appear here
+	
 	// E affects
 	if (dat->base_affects) {
 		fprintf(fl, "E\n%llu\n", dat->base_affects);
@@ -9502,6 +9539,11 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	// N name
 	if (dat->name) {
 		fprintf(fl, "N\n%s~\n", dat->name);
+	}
+	
+	// U0 height
+	if (dat->height) {
+		fprintf(fl, "U0 %d\n", dat->height);
 	}
 	
 	// X depletion

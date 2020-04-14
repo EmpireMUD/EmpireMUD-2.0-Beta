@@ -287,6 +287,7 @@ OLC_MODULE(mapedit_delete_exit);
 OLC_MODULE(mapedit_delete_room);
 OLC_MODULE(mapedit_exits);
 OLC_MODULE(mapedit_grow);
+OLC_MODULE(mapedit_height);
 OLC_MODULE(mapedit_icon);
 OLC_MODULE(mapedit_maintain);
 OLC_MODULE(mapedit_naturalize);
@@ -422,6 +423,7 @@ OLC_MODULE(sectedit_interaction);
 OLC_MODULE(sectedit_mapout);
 OLC_MODULE(sectedit_movecost);
 OLC_MODULE(sectedit_name);
+OLC_MODULE(sectedit_notes);
 OLC_MODULE(sectedit_roadsideicon);
 OLC_MODULE(sectedit_spawns);
 OLC_MODULE(sectedit_title);
@@ -884,6 +886,7 @@ const struct olc_command_data olc_data[] = {
 	{ "description", mapedit_room_description, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "exit", mapedit_exits, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "grow", mapedit_grow, OLC_MAP, OLC_CF_MAP_EDIT },
+	{ "height", mapedit_height, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "icon", mapedit_icon, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "maintain", mapedit_maintain, OLC_MAP, OLC_CF_MAP_EDIT },
 	{ "name", mapedit_room_name, OLC_MAP, OLC_CF_MAP_EDIT },
@@ -1020,6 +1023,7 @@ const struct olc_command_data olc_data[] = {
 	{ "mapout", sectedit_mapout, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "movecost", sectedit_movecost, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "name", sectedit_name, OLC_SECTOR, OLC_CF_EDITOR },
+	{ "notes", sectedit_notes, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "roadsideicon", sectedit_roadsideicon, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "spawns", sectedit_spawns, OLC_SECTOR, OLC_CF_EDITOR },
 	{ "title", sectedit_title, OLC_SECTOR, OLC_CF_EDITOR },

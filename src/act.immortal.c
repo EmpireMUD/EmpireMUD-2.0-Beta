@@ -5862,7 +5862,7 @@ void do_stat_room(char_data *ch) {
 	}
 	
 	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0%s)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))), buf3);
-	msg_to_char(ch, "VNum: [&g%d&0], Island: [%d] %s\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island");
+	msg_to_char(ch, "VNum: [&g%d&0], Island: [\tg%d\t0] %s, Height [\tg%d\t0]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)));
 	
 	if (home != IN_ROOM(ch)) {
 		msg_to_char(ch, "Home room: &g%d&0 %s\r\n", GET_ROOM_VNUM(home), get_room_name(home, FALSE));
@@ -6184,6 +6184,10 @@ void do_stat_sector(char_data *ch, sector_data *st) {
 	}
 	
 	show_spawn_summary_to_char(ch, st->spawns);
+	
+	if (GET_SECT_NOTES(st) && *GET_SECT_NOTES(st)) {
+		msg_to_char(ch, "Notes:\r\n%s", GET_SECT_NOTES(st));
+	}
 }
 
 
@@ -9018,6 +9022,7 @@ ACMD(do_send) {
 
 ACMD(do_set) {
 	char field[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
+	char temp[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	bool is_file = FALSE, load_from_file = FALSE;
 	int mode, len, retval;
 	char_data *vict = NULL;
@@ -9027,17 +9032,20 @@ ACMD(do_set) {
 
 	if (!str_cmp(name, "file")) {
 		is_file = 1;
-		half_chop(buf, name, buf);
+		half_chop(buf, name, temp);
+		strcpy(buf, temp);
 	}
 	else if (!str_cmp(name, "player")) {
 		is_player = 1;
-		half_chop(buf, name, buf);
+		half_chop(buf, name, temp);
+		strcpy(buf, temp);
 	}
-	else if (!str_cmp(name, "mob"))
-		half_chop(buf, name, buf);
+	else if (!str_cmp(name, "mob")) {
+		half_chop(buf, name, temp);
+		strcpy(buf, temp);
+	}
 
-	half_chop(buf, field, buf);
-	strcpy(val_arg, buf);
+	half_chop(buf, field, val_arg);
 
 	if (!*name || !*field) {
 		send_to_char("Usage: set <victim> <field> <value>\r\n", ch);

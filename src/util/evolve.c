@@ -390,7 +390,9 @@ char *fread_string(FILE * fl, char *error) {
 		point = strchr(tmp, '\0');
 		
 		// backtrack past any \r\n or trailing space or tab
-		for (--point; *point == '\r' || *point == '\n' || *point == ' ' || *point == '\t'; --point);
+		if (point > tmp) {
+			for (--point; point > tmp && (*point == '\r' || *point == '\n' || *point == ' ' || *point == '\t'); --point);
+		}
 		
 		// look for a trailing ~
 		if (*point == '~') {
@@ -549,6 +551,12 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 			}
 			case 'M': {	// mob spawn -- unneeded
 				get_line(fl, line);	// 1 extra line
+				break;
+			}
+			
+			case '_': {	// notes -- unneeded
+				tmp = fread_string(fl, error);
+				free(tmp);
 				break;
 			}
 

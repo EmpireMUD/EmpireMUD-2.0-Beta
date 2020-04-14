@@ -316,6 +316,7 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 * @param room_data *room The map room to disassociate.
 */
 void disassociate_building(room_data *room) {
+	void check_terrain_height(room_data *room);
 	void decustomize_room(room_data *room);
 	void delete_instance(struct instance_data *inst, bool run_cleanup);
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
@@ -376,6 +377,7 @@ void disassociate_building(room_data *room) {
 
 	// restore sect: this does not use change_terrain()
 	perform_change_sect(room, NULL, BASE_SECT(room));
+	check_terrain_height(room);
 
 	// update requirement trackers
 	if (ROOM_OWNER(room)) {

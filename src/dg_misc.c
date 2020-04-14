@@ -101,25 +101,27 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 	char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect" */
 	char charname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
 	char value_p[MAX_INPUT_LENGTH], duration_p[MAX_INPUT_LENGTH];
+	char temp[MAX_INPUT_LENGTH];
 	any_vnum atype = ATYPE_DG_AFFECT;
 	bitvector_t i = 0, type = 0;
 	struct affected_type af;
 	bool all_off = FALSE;
 
-	half_chop(cmd, junk, cmd);
-	half_chop(cmd, charname, cmd);
+	half_chop(cmd, junk, temp);
+	half_chop(temp, charname, cmd);
 	// sometimes charname is an affect vnum
 	if (*charname == '#') {
 		atype = atoi(charname+1);
-		half_chop(cmd, charname, cmd);
+		half_chop(cmd, charname, temp);
+		strcpy(cmd, temp);
 		if (!find_generic(atype, GENERIC_AFFECT)) {
 			script_log("Trigger: %s, VNum %d. dg_affect: Missing requested generic affect vnum %d", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), atype);
 			atype = ATYPE_DG_AFFECT;
 		}
 	}
 	
-	half_chop(cmd, property, cmd);
-	half_chop(cmd, value_p, duration_p);
+	half_chop(cmd, property, temp);
+	half_chop(temp, value_p, duration_p);
 
 	/* make sure all parameters are present */
 	if (!*charname || !*property) {
@@ -227,6 +229,7 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect_room" */
 	char roomname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
 	char value_p[MAX_INPUT_LENGTH], duration_p[MAX_INPUT_LENGTH];
+	char temp[MAX_INPUT_LENGTH];
 	bitvector_t i = 0, type = 0;
 	int atype = ATYPE_DG_AFFECT;
 	struct affected_type af;
@@ -234,18 +237,19 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 	bool all_off = FALSE;
 	int duration = 0;
 
-	half_chop(cmd, junk, cmd);
-	half_chop(cmd, roomname, cmd);
+	half_chop(cmd, junk, temp);
+	half_chop(temp, roomname, cmd);
 	// sometimes roomname is an affect vnum
 	if (*roomname == '#') {
 		atype = atoi(roomname+1);
-		half_chop(cmd, roomname, cmd);
+		half_chop(cmd, roomname, temp);
+		strcpy(cmd, temp);
 		if (!find_generic(atype, GENERIC_AFFECT)) {
 			atype = ATYPE_DG_AFFECT;
 		}
 	}
-	half_chop(cmd, property, cmd);
-	half_chop(cmd, value_p, duration_p);
+	half_chop(cmd, property, temp);
+	half_chop(temp, value_p, duration_p);
 
 	/* make sure all parameters are present */
 	if (!*roomname || !*property) {

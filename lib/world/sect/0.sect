@@ -264,7 +264,7 @@ S
 #5
 River~
 A River~
-'~' 17 no 10 gi af
+'~' 17 no 10 gix af
 D1
 ~~~~~
 &c~
@@ -406,7 +406,7 @@ S
 #8
 Mountain~
 On a Mountain~
-'^' 25 m 75 lnsv c
+'^' 25 m 75 lnsvx c
 C
 dig, pick~
 D1
@@ -438,7 +438,7 @@ S
 #9
 Road~
 On a Road~
-'-' 26 0 1 mr op
+'-' 26 0 1 mrx op
 D1
 ----~
 &0~
@@ -455,7 +455,7 @@ S
 #10
 Building~
 A Building~
-'?' 27 0 1 dopu 0
+'?' 27 0 1 dopux 0
 D1
 [..]~
 &0~
@@ -1036,7 +1036,7 @@ S
 #32
 Lake~
 A Lake~
-'~' 17 ou 10 gi au
+'~' 17 ou 10 gix au
 D0
 ~~~~~
 &c~
@@ -1054,7 +1054,7 @@ S
 #33
 Frozen Lake~
 A Frozen Lake~
-'~' 2 f 10 0 a
+'~' 2 f 10 x a
 D0
 ~~~~~
 &W~
@@ -1726,7 +1726,7 @@ S
 #52
 Cliffs~
 Along the Cliffs~
-'^' 25 ms 50 nv c
+'^' 25 ms 50 nvx c
 C
 dig, pick~
 D1
@@ -1756,7 +1756,7 @@ S
 #53
 Estuary~
 An Estuary~
-'~' 18 os 10 g afit
+'~' 18 nos 10 gx afit
 D0
 ~~~~~
 &a~

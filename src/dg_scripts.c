@@ -5031,6 +5031,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");	// no vnum provided
 						}
 					}
+					else if (!str_cmp(field, "height")) {
+						if (subfield && *subfield && isdigit(*subfield)) {
+							ROOM_HEIGHT(r) = atoi(subfield);
+						}
+						snprintf(str, slen, "%d", ROOM_HEIGHT(r));
+					}
 					break;
 				}
 				case 'i': {	// room.i*
@@ -6059,14 +6065,18 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go, struct scri
 
 	/* strip off extra spaces at begin and end */
 	while (*lhs && isspace(*lhs)) 
-		lhs++;
+		++lhs;
 	while (*rhs && isspace(*rhs))
-		rhs++;
+		++rhs;
 
-	for (p = lhs; *p; p++);
-	for (--p; isspace(*p) && (p > lhs); *p-- = '\0');
-	for (p = rhs; *p; p++);
-	for (--p; isspace(*p) && (p > rhs); *p-- = '\0');  
+	for (p = lhs; *p; ++p);
+	if (p > lhs) {
+		for (--p; isspace(*p) && (p > lhs); *p-- = '\0');
+	}
+	for (p = rhs; *p; ++p);
+	if (p > rhs) {
+		for (--p; isspace(*p) && (p > rhs); *p-- = '\0');  
+	}
 
 	/* find the op, and figure out the value */
 	if (!strcmp("||", op)) {
@@ -6651,15 +6661,15 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 	
 	char junk[MAX_INPUT_LENGTH], varname[MAX_INPUT_LENGTH];
 	char arg[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH];
-	char uid[MAX_INPUT_LENGTH];
+	char uid[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
 	char_data *mob;
 
 	*uid = '\0';
-	half_chop(cmd, junk, cmd);    /* makeuid */
-	half_chop(cmd, varname, cmd); /* variable name */
-	half_chop(cmd, arg, cmd);     /* numerical id or 'obj' 'mob' or 'room' */
-	half_chop(cmd, name, cmd);    /* if the above was obj, mob or room, this is the name */
+	half_chop(cmd, junk, temp);    /* makeuid */
+	half_chop(temp, varname, cmd); /* variable name */
+	half_chop(cmd, arg, temp);     /* numerical id or 'obj' 'mob' or 'room' */
+	half_chop(temp, name, cmd);    /* if the above was obj, mob or room, this is the name */
 
 	if (!*varname) {
 		script_log("Trigger: %s, VNum %d. makeuid w/o an arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
@@ -7201,7 +7211,7 @@ void process_context(struct script_data *sc, trig_data *trig, char *cmd) {
 }
 
 void extract_value(struct script_data *sc, trig_data *trig, char *cmd) {
-	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
+	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	char *buf3;
 	char to[128];
 	int num;
@@ -7219,7 +7229,8 @@ void extract_value(struct script_data *sc, trig_data *trig, char *cmd) {
 	half_chop(buf, buf3, buf2);
 
 	while (num>0) {
-		half_chop(buf2, buf, buf2);
+		half_chop(buf2, buf, temp);
+		strcpy(buf2, temp);
 		num--;
 	}
 
