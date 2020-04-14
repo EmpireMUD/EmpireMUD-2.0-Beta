@@ -438,7 +438,7 @@ S
 #9
 Road~
 On a Road~
-'-' 26 0 1 mr op
+'-' 26 0 1 mrx op
 D1
 ----~
 &0~
@@ -455,7 +455,7 @@ S
 #10
 Building~
 A Building~
-'?' 27 0 1 dopu 0
+'?' 27 0 1 dopux 0
 D1
 [..]~
 &0~
