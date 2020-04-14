@@ -1955,6 +1955,7 @@ INTERACTION_FUNC(one_farming_chore) {
 
 
 void do_chore_farming(empire_data *emp, room_data *room) {
+	void check_terrain_height(room_data *room);
 	void schedule_crop_growth(struct map_data *map);
 	void uncrop_tile(room_data *room);
 	
@@ -1987,6 +1988,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 					if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_REPLANTING) && (old_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_CROP_GROWS))) {
 						// sly-convert back to what it was grown from ... not using change_terrain
 						perform_change_sect(room, NULL, old_sect);
+						check_terrain_height(room);
 				
 						// we are keeping the original sect the same as it was; set the time to one game day
 						set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, time(0) + (24 * SECS_PER_MUD_HOUR));

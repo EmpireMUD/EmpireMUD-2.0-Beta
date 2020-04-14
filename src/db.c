@@ -4344,11 +4344,11 @@ void b5_94_terrain_heights(void) {
 	}
 	
 	// tiles are 'missed' if they do not connect to the sea
-	log("- checking for missed tiles...");
+	log("- checking for rivers/lakes with no height...");
 	for (x = 0; x < MAP_WIDTH; ++x) {
 		for (y = 0; y < MAP_HEIGHT; ++y) {
 			if (world_map[x][y].shared->height == INT_MAX) {
-				log("  - (%d, %d) %s: missed", x, y, GET_SECT_NAME(world_map[x][y].base_sector));
+				log("  - (%d, %d) %s: not connected to ocean", x, y, GET_SECT_NAME(world_map[x][y].base_sector));
 				world_map[x][y].shared->height = 0;
 			}
 		}
