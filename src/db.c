@@ -928,7 +928,7 @@ void verify_sectors(void) {
 		room = real_real_room(map->vnum);
 		
 		if (!map->sector_type) {
-			// can't use change_terrain() here
+			// can't use change_terrain() here -- note check_terrain_height() does not run here either
 			perform_change_sect(NULL, map, use_sect);
 		}
 		if (!map->base_sector) {
@@ -4348,7 +4348,7 @@ void b5_94_terrain_heights(void) {
 	for (x = 0; x < MAP_WIDTH; ++x) {
 		for (y = 0; y < MAP_HEIGHT; ++y) {
 			if (world_map[x][y].shared->height == INT_MAX) {
-				log("  - (%d, %d) %s: not connected to ocean", x, y, GET_SECT_NAME(world_map[x][y].base_sector));
+				// log("  - (%d, %d) %s: not connected to ocean", x, y, GET_SECT_NAME(world_map[x][y].base_sector));
 				world_map[x][y].shared->height = 0;
 			}
 		}
