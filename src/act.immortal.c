@@ -5843,6 +5843,7 @@ void do_stat_room(char_data *ch) {
 	struct global_data *glb;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
 	struct instance_data *inst, *inst_iter;
+	struct map_data *map;
 	vehicle_data *veh;
 	
 	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
@@ -5861,7 +5862,20 @@ void do_stat_room(char_data *ch) {
 		*buf3 = '\0';
 	}
 	
-	msg_to_char(ch, "(%d, %d) %s (&c%s&0/&c%s&0%s)\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE), buf2, GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))), buf3);
+	msg_to_char(ch, "(%d, %d) %s\r\n", X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), get_room_name(IN_ROOM(ch), FALSE));
+	
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(IN_ROOM(ch)))) {
+		msg_to_char(ch, "Crop: [%d \tc%s\t0]", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
+	}
+	else {
+		msg_to_char(ch, "Sector: [%d \tc%s\t0]", GET_SECT_VNUM(SECT(IN_ROOM(ch))), GET_SECT_NAME(SECT(IN_ROOM(ch))));
+	}
+	msg_to_char(ch, ", Base: [%d \tc%s\t0]", GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))), GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
+	if (GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE && (map = &world_map[X_COORD(IN_ROOM(ch))][Y_COORD(IN_ROOM(ch))])) {
+		msg_to_char(ch, ", Natural: [%d \tc%s\t0]", GET_SECT_VNUM(map->natural_sector), GET_SECT_NAME(map->natural_sector));
+	}
+	msg_to_char(ch, "\r\n");
+	
 	msg_to_char(ch, "VNum: [&g%d&0], Island: [\tg%d\t0] %s, Height [\tg%d\t0]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)));
 	
 	if (home != IN_ROOM(ch)) {
