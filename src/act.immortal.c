@@ -5872,9 +5872,9 @@ void do_stat_room(char_data *ch) {
 	else {
 		msg_to_char(ch, "Sector: [\tc%d\t0 - \tc%s\t0]", GET_SECT_VNUM(SECT(IN_ROOM(ch))), GET_SECT_NAME(SECT(IN_ROOM(ch))));
 	}
-	msg_to_char(ch, ", Base: [\tc%d\t0 - \tc%s\t0]", GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))), GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
+	msg_to_char(ch, ", Base: [\ty%d\t0 - \tc=y%s\t0]", GET_SECT_VNUM(BASE_SECT(IN_ROOM(ch))), GET_SECT_NAME(BASE_SECT(IN_ROOM(ch))));
 	if (GET_ROOM_VNUM(IN_ROOM(ch)) < MAP_SIZE && (map = &world_map[X_COORD(IN_ROOM(ch))][Y_COORD(IN_ROOM(ch))])) {
-		msg_to_char(ch, ", Natural: [\tc%d\t0 - \tc%s\t0]", GET_SECT_VNUM(map->natural_sector), GET_SECT_NAME(map->natural_sector));
+		msg_to_char(ch, ", Natural: [\tg%d\t0 - \tg%s\t0]", GET_SECT_VNUM(map->natural_sector), GET_SECT_NAME(map->natural_sector));
 	}
 	msg_to_char(ch, "\r\n");
 	
