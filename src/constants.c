@@ -3147,6 +3147,7 @@ const char *mapout_color_names[] = {
 	"Dark Dark Green",	// 40
 	"Dark Brown",
 	"Deep Yellow",
+	"Deep Green",
 	"\n"
 };
 
@@ -3197,6 +3198,7 @@ const char mapout_color_tokens[] = {
 	'F',	// "Dark Dark Green",	// 40
 	'G',	// "Dark Brown",
 	'H',	// "Deep Yellow",
+	'I',	// "Deep Green",
 };
 
 
