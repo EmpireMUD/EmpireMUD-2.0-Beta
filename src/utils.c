@@ -4579,10 +4579,10 @@ void strip_crlf(char *buffer) {
 	str = ptr;
 
 	while ((*str = *ptr)) {
-		str++;
-		ptr++;
-		if (*ptr == '\r') {
-			ptr++;
+		++str;
+		++ptr;
+		while (*ptr == '\r') {
+			++ptr;
 		}
 	}
 }

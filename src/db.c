@@ -1213,9 +1213,7 @@ char *fread_string(FILE * fl, char *error) {
 		point = strchr(tmp, '\0');
 		
 		// backtrack past any \r\n or trailing space or tab
-		if (point > tmp) {
-			for (--point; point > tmp && (*point == '\r' || *point == '\n' || *point == ' ' || *point == '\t'); --point);
-		}
+		for (--point; *point == '\r' || *point == '\n' || *point == ' ' || *point == '\t'; --point);
 		
 		// look for a trailing ~
 		if (*point == '~') {
