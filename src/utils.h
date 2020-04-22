@@ -1354,6 +1354,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define BLD_ALLOWS_MOUNTS(room)  (ROOM_IS_CLOSED(room) ? (ROOM_BLD_FLAGGED((room), BLD_ALLOW_MOUNTS | BLD_OPEN) || RMT_FLAGGED((room), RMT_OUTDOOR)) : TRUE)
 #define CAN_CHOP_ROOM(room)  (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || can_interact_room((room), INTERACT_CHOP) || (ROOM_SECT_FLAGGED((room), SECTF_CROP) && ROOM_CROP_FLAGGED((room), CROPF_IS_ORCHARD)))
 #define DEPLETION_LIMIT(room)  (ROOM_BLD_FLAGGED((room), BLD_HIGH_DEPLETION) ? config_get_int("high_depletion") : config_get_int("common_depletion"))
+#define GET_SEASON(room)  y_coord_to_season[Y_COORD(room)]
 #define HAS_MINOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_minor") / 100)))
 #define HAS_MAJOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_major") / 100)))
 #define IS_CITY_CENTER(room)  (BUILDING_VNUM(room) == BUILDING_CITY_CENTER)

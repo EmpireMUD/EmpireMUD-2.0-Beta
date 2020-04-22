@@ -5432,10 +5432,8 @@ bool is_deep_mine(room_data *room) {
 */
 void lock_icon(room_data *room, struct icon_data *use_icon) {
 	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
-	extern int pick_season(room_data *room);
 	
 	struct icon_data *icon;
-	int season;
 
 	// don't do it if a custom icon is set (or no room provided)
 	if (!room || ROOM_CUSTOM_ICON(room)) {
@@ -5443,8 +5441,7 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	}
 
 	if (!(icon = use_icon)) {
-		season = pick_season(room);
-		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), season);
+		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
 	}
 	ROOM_CUSTOM_ICON(room) = str_dup(icon->icon);
 }

@@ -5127,10 +5127,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 's': {	// room.s*
 					if (!str_cmp(field, "season")) {
-						extern int pick_season(room_data *room);
 						extern const char *icon_types[];
-						int season = pick_season(r);
-						snprintf(str, slen, "%s", icon_types[season]);
+						snprintf(str, slen, "%s", icon_types[GET_SEASON(r)]);
 						*str = LOWER(*str);
 					}
 					else if (!str_cmp(field, "sector")) {

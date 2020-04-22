@@ -33,7 +33,7 @@ foreach ($raw as $file) {
 		$date = strtotime(sprintf("%04d-%02d-%02d", $match[3], $match[1], $match[2]));
 		$imgList[$date] = array(
 			'file' => $webDir . '/' . basename($file),
-			'date' => date('F Y', $date),
+			'date' => date('F j, Y', $date),
 		);
 	}
 }

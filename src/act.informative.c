@@ -3450,7 +3450,6 @@ ACMD(do_survey) {
 
 ACMD(do_time) {
 	extern const char *seasons[];
-	extern int pick_season(room_data *room);
 	extern const char *weekdays[];
 	
 	const char *suf;
@@ -3511,7 +3510,7 @@ ACMD(do_time) {
 	}
 	
 	if (IS_OUTDOORS(ch)) {
-		msg_to_char(ch, "%s\r\n", seasons[pick_season(IN_ROOM(ch))]);
+		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
 	}
 }
 
@@ -3524,7 +3523,6 @@ ACMD(do_tip) {
 
 ACMD(do_weather) {
 	extern const char *seasons[];
-	extern int pick_season(room_data *room);
 	void list_moons_to_char(char_data *ch);
 	const char *sky_look[] = {
 		"cloudless",
@@ -3542,7 +3540,7 @@ ACMD(do_weather) {
 			list_moons_to_char(ch);
 		}
 
-		msg_to_char(ch, "%s\r\n", seasons[pick_season(IN_ROOM(ch))]);
+		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
 	}
 	else {
 		msg_to_char(ch, "You can't see the sky from here.\r\n");

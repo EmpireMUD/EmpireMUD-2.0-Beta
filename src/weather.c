@@ -21,6 +21,9 @@
 #include "db.h"
 #include "skills.h"
 
+// local prototypes
+void determine_seasons();
+
 
 void weather_and_time(int mode) {
 	void another_hour(int mode);
@@ -33,7 +36,7 @@ void weather_and_time(int mode) {
 
 
 void another_hour(int mode) {
-	void annual_world_update();	
+	void annual_world_update();
 	void process_shipping();
 
 	descriptor_data *d;
@@ -84,7 +87,9 @@ void another_hour(int mode) {
 	if (time_info.hours > 23) {	/* Changed by HHS due to bug ??? */
 		time_info.hours -= 24;
 		time_info.day++;
-
+		
+		determine_seasons();
+		
 		if (time_info.day > 29) {
 			time_info.day = 0;
 			time_info.month++;
@@ -103,6 +108,107 @@ void another_hour(int mode) {
 				annual_world_update();
 			}
 		}
+	}
+}
+
+
+/**
+* This is called at startup and once per game day to update the seasons for the
+* entire map.
+*
+* It uses a lot of math to determine 3 things:
+*  1. Past the arctic line, always Winter.
+*  2. Between the tropics, alternate Spring, Summer, Autumn (no Winter).
+*  3. Everywhere else, seasons are based on time of year, and gradually move
+*     North/South each day. There should always be a boundary between the
+*     Summer and Winter regions (thus all the squirrelly numbers).
+*
+* A near-copy of this function exists in util/evolve.c for map evolutions.
+*/
+void determine_seasons(void) {
+	double half_y, latitude;
+	int ycoord, day_of_year;
+	bool northern;
+	
+	// basic defintions and math
+	#define north_y_arctic  ARCTIC_LATITUDE
+	#define south_y_arctic  (90.0 - ARCTIC_LATITUDE)
+	
+	#define north_y_tropics  TROPIC_LATITUDE
+	#define south_y_tropics  (90.0 - TROPIC_LATITUDE)
+	
+	// basic slope of the seasonal gradients
+	double north_a_slope = ((north_y_arctic - 1) - (north_y_tropics + 1)) / 120.0;	// summer/winter
+	double north_b_slope = ((north_y_arctic - 1) - (north_y_tropics + 1)) / 90.0;	// spring/autumn
+	
+	double south_a_slope = ((south_y_tropics - 1) - (south_y_arctic + 1)) / 120.0;	// same but for the south
+	double south_b_slope = ((south_y_tropics - 1) - (south_y_arctic + 1)) / 90.0;
+	
+	#define pick_slope(north, south)  (northern ? north : south)
+	
+	// Day_of_year is the x-axis of the graph that determines the season at a
+	// given y-coord. Month 0 is january; year is 0-359 days.
+	day_of_year = time_info.month * 30 + time_info.day;
+	
+	for (ycoord = 0; ycoord < MAP_HEIGHT; ++ycoord) {
+		latitude = Y_TO_LATITUDE(ycoord);
+		northern = (latitude >= 0.0);
+		
+		// tropics? -- take half the tropic value, convert to percent, multiply by map height
+		if (ABSOLUTE(latitude) < TROPIC_LATITUDE) {
+			if (time_info.month < 2) {
+				y_coord_to_season[ycoord] = TILESET_SPRING;
+			}
+			else if (time_info.month >= 10) {
+				y_coord_to_season[ycoord] = TILESET_AUTUMN;
+			}
+			else {
+				y_coord_to_season[ycoord] = TILESET_SUMMER;
+			}
+			continue;
+		}
+		
+		// arctic? -- take half the arctic value, convert to percent, check map edges
+		if (ABSOLUTE(latitude) > ARCTIC_LATITUDE) {
+			y_coord_to_season[ycoord] = TILESET_WINTER;
+			continue;
+		}
+		
+		// all other regions: first split the map in half (we'll invert for the south)	
+		if (northern) {
+			half_y = latitude - north_y_tropics; // simplify by moving the y axis to match the tropics line
+		}
+		else {
+			half_y = 90.0 - ABSOLUTE(latitude) - south_y_arctic;	// adjust to remove arctic
+		}
+	
+		if (day_of_year < 6 * 30) {	// first half of year
+			if (half_y >= (day_of_year + 1) * pick_slope(north_a_slope, south_a_slope)) {	// first winter line
+				y_coord_to_season[ycoord] = northern ? TILESET_WINTER : TILESET_SUMMER;
+			}
+			else if (half_y >= (day_of_year - 89) * pick_slope(north_b_slope, south_b_slope)) {	// spring line
+				y_coord_to_season[ycoord] = northern ? TILESET_SPRING : TILESET_AUTUMN;
+			}
+			else {
+				y_coord_to_season[ycoord] = northern ? TILESET_SUMMER : TILESET_WINTER;
+			}
+			continue;
+		}
+		else {	// 2nd half of year
+			if (half_y >= (day_of_year - 360) * -pick_slope(north_a_slope, south_a_slope)) {	// second winter line
+				y_coord_to_season[ycoord] = northern ? TILESET_WINTER : TILESET_SUMMER;
+			}
+			else if (half_y >= (day_of_year - 268) * -pick_slope(north_b_slope, south_b_slope)) {	// autumn line
+				y_coord_to_season[ycoord] = northern ? TILESET_AUTUMN : TILESET_SPRING;
+			}
+			else {
+				y_coord_to_season[ycoord] = northern ? TILESET_SUMMER : TILESET_WINTER;
+			}
+			continue;
+		}
+	
+		// fail? we should never reach this
+		y_coord_to_season[ycoord] = TILESET_SUMMER;
 	}
 }
 

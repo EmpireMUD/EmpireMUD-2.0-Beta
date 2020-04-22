@@ -2418,7 +2418,7 @@ typedef struct vehicle_data vehicle_data;
 #define TILESET_SPRING  1
 #define TILESET_SUMMER  2
 #define TILESET_AUTUMN  3
-#define TILESET_WINTER  4
+#define TILESET_WINTER  4	// winter must be the last season for reasons that appear if you search TILESET_WINTER
 #define NUM_TILESETS  5	// total
 
 

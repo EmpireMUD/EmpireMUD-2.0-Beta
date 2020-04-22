@@ -948,7 +948,7 @@ int map_distance(struct map_t *start, struct map_t *end) {
 /**
 * Calculates which season it is at a given location.
 *
-* Note: This is copied from mapview.c pick_season() (with only variable changes).
+* Note: This is copied from weather.c determine_seasons() (with only minor logical changes).
 *
 * @param struct map_t *tile The tile to find a season for.
 * @return int TILESET_ const for the chosen season.
