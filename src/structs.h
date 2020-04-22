@@ -123,7 +123,13 @@
 #define TROPIC_LATITUDE  23.43	// based on the real world
 
 // converts a Y-coordinate to the equivalent latitude, based on Y_MIN_LATITUDE/Y_MAX_LATITUDE
-#define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * (ABSOLUTE(Y_MIN_LATITUDE) + ABSOLUTE(Y_MAX_LATITUDE))) + Y_MIN_LATITUDE)
+#if ((Y_MIN_LATITUDE > 0 && Y_MAX_LATITUDE > 0) || (Y_MIN_LATITUDE < 0 && Y_MAX_LATITUDE < 0))
+	// if both are positive or negative, we want the difference of the latitudes
+	#define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * ABSOLUTE(Y_MAX_LATITUDE - Y_MIN_LATITUDE)) + Y_MIN_LATITUDE)
+#else
+	// if one is positive and one is negative, we want the sum of the latitudes
+	#define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * (ABSOLUTE(Y_MAX_LATITUDE) + ABSOLUTE(Y_MIN_LATITUDE))) + Y_MIN_LATITUDE)
+#endif
 
 
 #define COIN_VALUE  0.1	// value of a coin as compared to 1 wealth (0.1 coin value = 10 coins per wealth)
