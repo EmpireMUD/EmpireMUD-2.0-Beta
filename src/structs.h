@@ -116,9 +116,11 @@
 
 
 // What range of a 'real world' is covered by this map (-90 to 90 is the maximum range of latitudes)
-#define Y_MIN_LATITUDE  -71	// 0 is the equator, -66.56 is the anarctic circle
-#define Y_MAX_LATITUDE  71	// 66.56 is the arctic circle, 90 is the north pole
+// these must be whole numbers, no floating points:
+#define Y_MIN_LATITUDE  -67	// 0 is the equator, -66.56 is the anarctic circle
+#define Y_MAX_LATITUDE  67	// 66.56 is the arctic circle, 90 is the north pole
 
+// these can safely be floating points
 #define ARCTIC_LATITUDE  66.56	// based on the real world
 #define TROPIC_LATITUDE  23.43	// based on the real world
 
@@ -775,6 +777,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_ESTUARY  BIT(19)
 #define BLD_ON_LAKE  BIT(20)
 #define BLD_ON_BASE_TERRAIN_ALLOWED  BIT(21)	// for facing-only, allows the base sector to match
+#define BLD_ON_GIANT_TREE  BIT(22)
 
 
 // BLD_REL_x: relationships with other buildings

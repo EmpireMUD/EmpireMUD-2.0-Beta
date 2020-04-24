@@ -2768,6 +2768,7 @@ const char *bld_on_flags[] = {
 	"estuary",
 	"lake",	// 20
 	"base-terrain-allowed",
+	"giant-tree",
 	"\n"
 };
 
@@ -2778,6 +2779,7 @@ const bitvector_t bld_on_flags_order[] = {
 	BLD_ON_MOUNTAIN,
 	BLD_ON_FOREST,
 	BLD_ANY_FOREST,
+	BLD_ON_GIANT_TREE,
 	
 	// desert types
 	BLD_ON_DESERT,
