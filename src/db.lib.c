@@ -60,6 +60,7 @@
 extern struct automessage *automessages;
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
 extern struct player_special_data dummy_mob;
+extern struct generic_name_data *generic_names;
 extern struct empire_territory_data *global_next_territory_entry;
 extern int max_automessage_id;
 extern struct offense_info_type offense_info[NUM_OFFENSES];
@@ -7371,7 +7372,7 @@ void index_boot(int mode) {
 			return;
 		}
 		else if (mode == DB_BOOT_NAMES) {
-			// types that continue even if no #
+			// namelists don't have # in them so rec_count is 0 here
 		}
 		else {
 			// types that do require entries
@@ -7464,6 +7465,8 @@ void index_boot(int mode) {
 			break;
 		}
 		case DB_BOOT_NAMES: {
+			struct generic_name_data *name_iter;
+			LL_COUNT(generic_names, name_iter, rec_count);
 			log("   %d name lists.", rec_count);
 			break;
 		}
@@ -9262,7 +9265,6 @@ void parse_apply(FILE *fl, struct apply_data **list, char *error_str) {
 void parse_generic_name_file(FILE *fl, char *err_str) {
 	extern struct generic_name_data *get_generic_name_list(int name_set, int sex);
 	extern const char *genders[];
-	extern struct generic_name_data *generic_names;
 	extern int search_block(char *arg, const char **list, int exact);
 	
 	struct generic_name_data *data;
