@@ -5387,23 +5387,25 @@ ACMD(do_identify) {
 		act("$n identifies $p.", TRUE, ch, obj, NULL, TO_ROOM);
 		
 		// check if it has identifies-to
-		first = ch->carrying;
-		extract = FALSE;
-		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_IDENTIFIES_TO, IN_ROOM(ch), NULL, obj, identifies_to_interact)) {
-			if (GET_LOYALTY(ch)) {
-				// subtract old item from empire counts
-				add_production_total(GET_LOYALTY(ch), GET_OBJ_VNUM(obj), -1);
-			}
+		if (obj->carried_by == ch || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			first = ch->carrying;
+			extract = FALSE;
+			if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_IDENTIFIES_TO, IN_ROOM(ch), NULL, obj, identifies_to_interact)) {
+				if (GET_LOYALTY(ch)) {
+					// subtract old item from empire counts
+					add_production_total(GET_LOYALTY(ch), GET_OBJ_VNUM(obj), -1);
+				}
 			
-			// did have one
-			if (first != ch->carrying) {
-				extract_obj(obj);	// done with the old obj
-				obj = ch->carrying;	// idenify this obj instead
-				extract = FALSE;
-			}
-			else {
-				// otherwise will still identify this object but then will extract it
-				extract = TRUE;
+				// did have one
+				if (first != ch->carrying) {
+					extract_obj(obj);	// done with the old obj
+					obj = ch->carrying;	// idenify this obj instead
+					extract = FALSE;
+				}
+				else {
+					// otherwise will still identify this object but then will extract it after
+					extract = TRUE;
+				}
 			}
 		}
 		
