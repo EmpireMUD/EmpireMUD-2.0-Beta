@@ -3854,7 +3854,7 @@ const char *global_flags[] = {
 };
 
 
-// INTERACT_x, see also interact_vnum_types, interact_attach_types
+// INTERACT_x (1/3): names of interactions
 const char *interact_types[] = {
 	"BUTCHER",	// 0
 	"SKIN",
@@ -3884,20 +3884,12 @@ const char *interact_types[] = {
 	"SEED",	// 25
 	"DECAYS-TO",
 	"CONSUMES-TO",
+	"IDENTIFIES-TO",
 	"\n"
 };
 
 
-// INTERACT_RESTRICT_x: types of interaction restrictions
-const char *interact_restriction_types[] = {
-	"ability",
-	"ptech",
-	"tech",
-	"\n"
-};
-
-
-// INTERACT_x, see also interact_types, interact_vnum_types
+// INTERACT_x (2/3): what type of thing has this interaction
 const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_MOB,
 	TYPE_MOB,
@@ -3927,10 +3919,11 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// seed
 	TYPE_OBJ,	// decays-to
 	TYPE_OBJ,	// consumes-to
+	TYPE_OBJ,	// IDENTIFIES-TO
 };
 
 
-// INTERACT_x, see also interact_types, interact_attach_types
+// INTERACT_x (3/3): type of thing represented by interact->vnum
 const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,
 	TYPE_OBJ,
@@ -3960,6 +3953,16 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// seed
 	TYPE_OBJ,	// decays-to
 	TYPE_OBJ,	// consumes-to
+	TYPE_OBJ,	// IDENTIFIES-TO
+};
+
+
+// INTERACT_RESTRICT_x: types of interaction restrictions
+const char *interact_restriction_types[] = {
+	"ability",
+	"ptech",
+	"tech",
+	"\n"
 };
 
 

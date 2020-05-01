@@ -4168,6 +4168,7 @@ Object interaction types:
  &cSEED&0 - Gives an item when seeded.
  &cDECAYS-TO&0 - Becomes a different object when its timer expires (e.g. ashes).
  &cCONSUMES-TO&0 - Becomes a different object when eaten/used up (e.g. a jar).
+ &cIDENTIFIES-TO&0 - Becomds a different object when identified (e.g. a rock).
 
 Room/vehicle interaction types:
  &cDIG&0 - Items received when using the dig action.

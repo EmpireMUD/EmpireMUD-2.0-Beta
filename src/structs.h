@@ -381,7 +381,8 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_SEED  25
 #define INTERACT_DECAYS_TO  26
 #define INTERACT_CONSUMES_TO  27
-#define NUM_INTERACTS  28
+#define INTERACT_IDENTIFIES_TO  28
+#define NUM_INTERACTS  29
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions

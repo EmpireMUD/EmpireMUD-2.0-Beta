@@ -323,6 +323,60 @@ int get_wear_by_item_wear(bitvector_t item_wear) {
 }
 
 
+
+/**
+* Interaction func for "identify".
+*/
+INTERACTION_FUNC(identifies_to_interact) {
+	char to_char[MAX_STRING_LENGTH];
+	obj_data *new_obj;
+	int iter;
+	
+	// flags to keep on identifies-to
+	bitvector_t preserve_flags = OBJ_SEEDED | OBJ_CREATED;
+	
+	if (interaction->quantity > 1) {
+		snprintf(to_char, sizeof(to_char), "%s turns out to be %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	}
+	else {	// only 1
+		snprintf(to_char, sizeof(to_char), "%s turns out to be %s!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum));
+	}
+	act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
+	
+	if (GET_LOYALTY(ch)) {
+		// add the gained items (the original item is subtracted in do_identify)
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
+	for (iter = 0; iter < interaction->quantity; ++iter) {
+		new_obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
+	
+		if (GET_OBJ_TIMER(new_obj) != UNLIMITED && GET_OBJ_TIMER(inter_item) != UNLIMITED) {
+			GET_OBJ_TIMER(new_obj) = MIN(GET_OBJ_TIMER(new_obj), GET_OBJ_TIMER(inter_item));
+		}
+		
+		// copy these flags, if any
+		SET_BIT(GET_OBJ_EXTRA(new_obj), (GET_OBJ_EXTRA(inter_item) & preserve_flags));
+		
+		// ownership
+		new_obj->last_owner_id = GET_IDNUM(ch);
+		new_obj->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+	
+		// put it somewhere
+		if (CAN_WEAR(new_obj, ITEM_WEAR_TAKE)) {
+			obj_to_char(new_obj, ch);
+		}
+		else {
+			obj_to_room(new_obj, IN_ROOM(ch));
+		}
+		load_otrigger(new_obj);
+	}
+	
+	return TRUE;
+}
+
+
 /**
 * Shows an "identify" of the object -- its stats -- to a player.
 *
@@ -5312,9 +5366,10 @@ ACMD(do_grab) {
 
 
 ACMD(do_identify) {
+	obj_data *obj, *first;
 	char_data *tmp_char;
 	vehicle_data *veh;
-	obj_data *obj;
+	bool extract;
 	
 	one_argument(argument, arg);
 	
@@ -5328,14 +5383,42 @@ ACMD(do_identify) {
 		msg_to_char(ch, "You see nothing like that here.\r\n");
 	}
 	else if (obj) {
+		// message first in case the item changes
+		act("$n identifies $p.", TRUE, ch, obj, NULL, TO_ROOM);
+		
+		// check if it has identifies-to
+		first = ch->carrying;
+		extract = FALSE;
+		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_IDENTIFIES_TO, IN_ROOM(ch), NULL, obj, identifies_to_interact)) {
+			if (GET_LOYALTY(ch)) {
+				// subtract old item from empire counts
+				add_production_total(GET_LOYALTY(ch), GET_OBJ_VNUM(obj), -1);
+			}
+			
+			// did have one
+			if (first != ch->carrying) {
+				extract_obj(obj);	// done with the old obj
+				obj = ch->carrying;	// idenify this obj instead
+				extract = FALSE;
+			}
+			else {
+				// otherwise will still identify this object but then will extract it
+				extract = TRUE;
+			}
+		}
+		
 		if (!IS_IMMORTAL(ch) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
 			// for non-immortals, ensure scaling is done
 			scale_item_to_level(obj, get_approximate_level(ch));
 		}
 		
 		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
-		act("$n identifies $p.", TRUE, ch, obj, NULL, TO_ROOM);
 		identify_obj_to_char(obj, ch);
+		
+		if (extract) {
+			// ONLY if we need to extract it but didn't earlier
+			extract_obj(obj);
+		}
 	}
 	else if (veh) {
 		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
