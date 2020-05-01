@@ -751,6 +751,11 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		}
 		msg_to_char(ch, "%s\r\n", any ? "" : " none");
 	}
+	
+	// this only happens if they identify it somewhere that identifies-to can't happen
+	if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_IDENTIFIES_TO)) {
+		msg_to_char(ch, "Identify this object while it's in your inventory for more information.\r\n");
+	}
 }
 
 
@@ -5367,9 +5372,9 @@ ACMD(do_grab) {
 
 ACMD(do_identify) {
 	obj_data *obj, *first;
+	bool extract = FALSE;
 	char_data *tmp_char;
 	vehicle_data *veh;
-	bool extract;
 	
 	one_argument(argument, arg);
 	
@@ -5389,7 +5394,6 @@ ACMD(do_identify) {
 		// check if it has identifies-to
 		if (obj->carried_by == ch || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 			first = ch->carrying;
-			extract = FALSE;
 			if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_IDENTIFIES_TO, IN_ROOM(ch), NULL, obj, identifies_to_interact)) {
 				if (GET_LOYALTY(ch)) {
 					// subtract old item from empire counts
