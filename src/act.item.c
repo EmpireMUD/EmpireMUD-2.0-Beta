@@ -5521,6 +5521,10 @@ ACMD(do_identify) {
 			// check if it has identifies-to
 			if (obj->carried_by == ch || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 				run_identifies_to(ch, &obj, &extract);
+				if (ch->desc) {
+					// flush the stacked id message before id'ing it
+					send_stacked_msgs(ch->desc);
+				}
 			}
 		
 			if (!IS_IMMORTAL(ch) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
