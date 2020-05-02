@@ -5497,6 +5497,8 @@ ACMD(do_identify) {
 				if (extract) {	// usually it can do this itself, but just in case
 					extract_obj(obj);
 				}
+				
+				obj = next_obj;
 			}
 		}
 		
