@@ -341,7 +341,7 @@ INTERACTION_FUNC(identifies_to_interact) {
 	else {	// only 1
 		snprintf(to_char, sizeof(to_char), "%s turns out to be %s!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum));
 	}
-	act(to_char, FALSE, ch, NULL, NULL, TO_CHAR);
+	act(to_char, FALSE, ch, NULL, NULL, TO_CHAR | TO_QUEUE);
 	
 	if (GET_LOYALTY(ch)) {
 		// add the gained items (the original item is subtracted in do_identify)
