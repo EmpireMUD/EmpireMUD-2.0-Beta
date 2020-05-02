@@ -5470,6 +5470,7 @@ ACMD(do_identify) {
 		
 		if (any) {
 			act("$n identifies some items.", TRUE, ch, NULL, NULL, TO_ROOM);
+			command_lag(ch, WAIT_OTHER);
 		}
 		else {
 			msg_to_char(ch, "You don't have anything special to identify.\r\n");
@@ -5501,6 +5502,7 @@ ACMD(do_identify) {
 		
 		if (any) {
 			act("$n identifies some items.", TRUE, ch, NULL, NULL, TO_ROOM);
+			command_lag(ch, WAIT_OTHER);
 		}
 		else {
 			msg_to_char(ch, "You don't seem to have any %ss to identify.\r\n", arg);
