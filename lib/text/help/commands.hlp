@@ -1012,7 +1012,11 @@ Usage:  identify <item | vehicle>
 This command provides detailed information about an item or vehicle.
 
 Tip: When trying to identify an item in your inventory that has the same name
-as something you are wearing, try using "1.name".
+as something you are wearing, try using '1.name'.
+
+Some items become something else (usually a more specific version of whatever
+they were) when you identify them. You can identify multiple items at a time
+if they have this property, e.g. 'identify all.rock'.
 
 See also: EIDENTIFY
 #

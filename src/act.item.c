@@ -333,7 +333,7 @@ INTERACTION_FUNC(identifies_to_interact) {
 	int iter;
 	
 	// flags to keep on identifies-to
-	bitvector_t preserve_flags = OBJ_SEEDED | OBJ_CREATED;
+	bitvector_t preserve_flags = OBJ_SEEDED | OBJ_CREATED | OBJ_KEEP;
 	
 	if (interaction->quantity > 1) {
 		snprintf(to_char, sizeof(to_char), "%s turns out to be %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
@@ -374,6 +374,59 @@ INTERACTION_FUNC(identifies_to_interact) {
 	}
 	
 	return TRUE;
+}
+
+
+/**
+* Runs the identifies-to interactions on an object, if any. This may change
+* the object. In some cases it will extract the object itself. In other cases,
+* the object must be extracted after the identify.
+*
+* @param char_data *ch The player identifying the object.
+* @param obj_data **obj A pointer to the obj pointer (because the object may change during this function).
+* @param bool *extract A pointer to a boolean. If it sets this bool to TRUE, 'obj' must be extracted afterwards. If FALSE, any extractions were already handled.
+* @return bool TRUE if an object changed, FALSE if not.
+*/
+bool run_identifies_to(char_data *ch, obj_data **obj, bool *extract) {
+	obj_data *first_inv, *first_room;
+	bool result = FALSE;
+	
+	if (!ch || !obj || !*obj) {
+		return result;	// no work
+	}
+	
+	*extract = FALSE;
+	
+	// for detecting the change
+	first_inv = ch->carrying;
+	first_room = ROOM_CONTENTS(IN_ROOM(ch));
+	
+	if (run_interactions(ch, GET_OBJ_INTERACTIONS(*obj), INTERACT_IDENTIFIES_TO, IN_ROOM(ch), NULL, *obj, identifies_to_interact)) {
+		result = TRUE;
+		
+		if (GET_LOYALTY(ch)) {
+			// subtract old item from empire counts
+			add_production_total(GET_LOYALTY(ch), GET_OBJ_VNUM(*obj), -1);
+		}
+	
+		// did have one
+		if (first_inv != ch->carrying) {
+			extract_obj(*obj);	// done with the old obj
+			*obj = ch->carrying;	// idenify this obj instead
+			*extract = FALSE;
+		}
+		else if (first_room != ROOM_CONTENTS(IN_ROOM(ch))) {
+			extract_obj(*obj);	// done with the old obj
+			*obj = ROOM_CONTENTS(IN_ROOM(ch));	// idenify this obj instead
+			*extract = FALSE;
+		}
+		else {
+			// otherwise will still identify this object but then will extract it after
+			*extract = TRUE;
+		}
+	}
+	
+	return result;
 }
 
 
@@ -754,7 +807,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	
 	// this only happens if they identify it somewhere that identifies-to can't happen
 	if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_IDENTIFIES_TO)) {
-		msg_to_char(ch, "Identify this object while it's in your inventory for more information.\r\n");
+		msg_to_char(ch, "This item has a chance to become something else when identified in your inventory.\r\n");
 	}
 }
 
@@ -5371,65 +5424,119 @@ ACMD(do_grab) {
 
 
 ACMD(do_identify) {
-	obj_data *obj, *first;
-	bool extract = FALSE;
+	obj_data *obj, *next_obj, *list[2];
+	bool any, extract = FALSE;
 	char_data *tmp_char;
 	vehicle_data *veh;
+	int dotmode, iter;
 	
 	one_argument(argument, arg);
 	
 	if (GET_POS(ch) == POS_FIGHTING) {
 		msg_to_char(ch, "You're too busy to do that now!\r\n");
+		return;
 	}
-	else if (!*arg) {
+	if (!*arg) {
 		msg_to_char(ch, "Identify what object?\r\n");
+		return;
 	}
-	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &obj, &veh)) {
-		msg_to_char(ch, "You see nothing like that here.\r\n");
-	}
-	else if (obj) {
-		// message first in case the item changes
-		act("$n identifies $p.", TRUE, ch, obj, NULL, TO_ROOM);
+	
+	dotmode = find_all_dots(arg);
+	
+	if (dotmode == FIND_ALL) {
+		any = FALSE;
 		
-		// check if it has identifies-to
-		if (obj->carried_by == ch || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-			first = ch->carrying;
-			if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_IDENTIFIES_TO, IN_ROOM(ch), NULL, obj, identifies_to_interact)) {
-				if (GET_LOYALTY(ch)) {
-					// subtract old item from empire counts
-					add_production_total(GET_LOYALTY(ch), GET_OBJ_VNUM(obj), -1);
+		// inv
+		LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+			if (run_identifies_to(ch, &obj, &extract)) {
+				any = TRUE;
+			}
+			if (extract) {	// usually it can do this itself, but just in case
+				extract_obj(obj);
+			}
+		}
+		
+		// room
+		if (can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			LL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
+				if (run_identifies_to(ch, &obj, &extract)) {
+					any = TRUE;
 				}
-			
-				// did have one
-				if (first != ch->carrying) {
-					extract_obj(obj);	// done with the old obj
-					obj = ch->carrying;	// idenify this obj instead
-					extract = FALSE;
-				}
-				else {
-					// otherwise will still identify this object but then will extract it after
-					extract = TRUE;
+				if (extract) {	// usually it can do this itself, but just in case
+					extract_obj(obj);
 				}
 			}
 		}
 		
-		if (!IS_IMMORTAL(ch) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
-			// for non-immortals, ensure scaling is done
-			scale_item_to_level(obj, get_approximate_level(ch));
+		if (any) {
+			act("$n identifies some items.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+		else {
+			msg_to_char(ch, "You don't have anything special to identify.\r\n");
+		}
+	}	// /all
+	else if (dotmode == FIND_ALLDOT) {
+		if (!*arg) {
+			msg_to_char(ch, "Identify all of what?\r\n");
+			return;
 		}
 		
-		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
-		identify_obj_to_char(obj, ch);
+		any = FALSE;
+		list[0] = ch->carrying;
+		list[1] = can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
 		
-		if (extract) {
-			// ONLY if we need to extract it but didn't earlier
-			extract_obj(obj);
+		for (iter = 0; iter < 2; ++iter) {
+			obj = get_obj_in_list_vis(ch, arg, list[iter]);
+			while (obj) {
+				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				
+				if (run_identifies_to(ch, &obj, &extract)) {
+					any = TRUE;
+				}
+				if (extract) {	// usually it can do this itself, but just in case
+					extract_obj(obj);
+				}
+			}
 		}
-	}
-	else if (veh) {
-		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
-		act("$n identifies $V.", TRUE, ch, NULL, veh, TO_ROOM);
-		identify_vehicle_to_char(veh, ch);
+		
+		if (any) {
+			act("$n identifies some items.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+		else {
+			msg_to_char(ch, "You don't seem to have any %ss to identify.\r\n", arg);
+		}
+	}	// /all.
+	else {	// specific obj/vehicle
+		if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &obj, &veh)) {
+			msg_to_char(ch, "You see nothing like that here.\r\n");
+		}
+		else if (obj) {
+			// message first in case the item changes
+			act("$n identifies $p.", TRUE, ch, obj, NULL, TO_ROOM);
+			
+			// check if it has identifies-to
+			if (obj->carried_by == ch || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+				run_identifies_to(ch, &obj, &extract);
+			}
+		
+			if (!IS_IMMORTAL(ch) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
+				// for non-immortals, ensure scaling is done
+				scale_item_to_level(obj, get_approximate_level(ch));
+			}
+		
+			charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
+			identify_obj_to_char(obj, ch);
+		
+			if (extract) {
+				// ONLY if we need to extract it but didn't earlier
+				extract_obj(obj);
+			}
+		}
+		else if (veh) {
+			charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
+			act("$n identifies $V.", TRUE, ch, NULL, veh, TO_ROOM);
+			identify_vehicle_to_char(veh, ch);
+		}
 	}
 }
 
