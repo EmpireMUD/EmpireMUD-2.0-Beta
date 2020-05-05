@@ -496,7 +496,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_trigger(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count, lookup, only_attaches = NOTHING;
 	bitvector_t mob_types = NOBITS, obj_types = NOBITS, wld_types = NOBITS, veh_types = NOBITS;
 	trig_data *trig, *next_trig;

@@ -1060,7 +1060,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 void olc_fullsearch_obj(char_data *ch, char *argument) {
 	extern int get_attack_type_by_name(char *name);
 	
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_worn = NOBITS, only_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
