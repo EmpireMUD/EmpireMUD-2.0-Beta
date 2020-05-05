@@ -3787,6 +3787,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						*str = '\0';
 					}
+					else if (!str_cmp(field, "longdesc")) {
+						snprintf(str, slen, "%s", GET_LONG_DESC(c));
+						// trim trailing CRLFs
+						while (strchr("\r\n", str[strlen(str)-1])) {
+							str[strlen(str)-1] = '\0';
+						}
+					}
 					break;
 				}
 				case 'm': {	// char.m*
