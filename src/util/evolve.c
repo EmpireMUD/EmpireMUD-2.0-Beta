@@ -207,7 +207,7 @@ int spread_one(struct map_t *tile) {
 	sector_data *new_sect, *st;
 	bool done_dir[NUM_2D_DIRS];
 	struct map_t *to_room;
-	int iter, changed = 0;
+	int dir, changed = 0;
 	
 	
 	// load the sector
@@ -218,8 +218,8 @@ int spread_one(struct map_t *tile) {
 	}
 	
 	// initialize done_dir: This keeps us from evolving any adjacent tile more than once
-	for (iter = 0; iter < NUM_2D_DIRS; ++iter) {
-		done_dir[iter] = FALSE;
+	for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
+		done_dir[dir] = FALSE;
 	}
 	
 	// this iterates instead of using get_evo_by_type because more than one 100%
@@ -230,11 +230,11 @@ int spread_one(struct map_t *tile) {
 		}
 		
 		// try the evo
-		for (iter = 0; iter < NUM_2D_DIRS; ++iter) {
-			if (done_dir[iter]) {
+		for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
+			if (done_dir[dir]) {
 				continue;	// don't re-evolve a dir we already evolved
 			}
-			if (!(to_room = shift_tile(tile, shift_dir[iter][0], shift_dir[iter][1]))) {
+			if (!(to_room = shift_tile(tile, shift_dir[dir][0], shift_dir[dir][1]))) {
 				continue;	// no room that way
 			}
 			if (to_room->sector_type != evo->value || IS_SET(to_room->affects, ROOM_AFF_NO_EVOLVE)) {
@@ -254,6 +254,7 @@ int spread_one(struct map_t *tile) {
 				to_room->sector_type = become;
 				write_tile(to_room, old);
 				++changed;
+				done_dir[dir] = TRUE;
 			}
 		}
 	}
