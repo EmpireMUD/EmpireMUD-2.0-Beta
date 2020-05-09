@@ -437,6 +437,7 @@ bool run_identifies_to(char_data *ch, obj_data **obj, bool *extract) {
 * @param char_data *ch The person to show the data to.
 */
 void identify_obj_to_char(obj_data *obj, char_data *ch) {
+	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 	void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
 	
 	extern double get_base_dps(obj_data *weapon);
@@ -518,7 +519,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 
 	if (GET_OBJ_STORAGE(obj) && !OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
-		msg_to_char(ch, "Storage locations:");
 		for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {			
 			if ((bld = building_proto(store->building_type))) {
 				add_vnum_hash(&vhash, GET_BLD_VNUM(bld), 1);
@@ -534,12 +534,18 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			}
 		}
 		
+		snprintf(lbuf, sizeof(lbuf), "Storage locations:");
 		found = 0;
 		HASH_ITER(hh, vhash, vhash_iter, vhash_next) {
-			msg_to_char(ch, "%s%s", (found++ > 0 ? ", " : " "), get_bld_name_by_proto(vhash_iter->vnum));
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s", (found++ > 0 ? ", " : " "), get_bld_name_by_proto(vhash_iter->vnum));
 		}
-		msg_to_char(ch, "\r\n");
 		free_vnum_hash(&vhash);
+		if (strlen(lbuf) < sizeof(lbuf) + 2) {
+			strcat(lbuf, "\r\n");
+		}
+		temp = lbuf;
+		format_text(&temp, 0, NULL, MAX_STRING_LENGTH);
+		send_to_char(temp, ch);
 	}
 	if (UNIQUE_OBJ_CAN_STORE(obj)) {
 		msg_to_char(ch, "Storage location: Warehouse\r\n");
