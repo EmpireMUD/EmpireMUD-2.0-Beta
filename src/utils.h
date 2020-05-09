@@ -1601,6 +1601,10 @@ extern struct weather_data weather_info;	// db.c
 // log information
 #define log  basic_mud_log
 
+// vnum hash tools from utils.c
+void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count);
+void free_vnum_hash(struct vnum_hash **hash);
+
 // basic functions from utils.c
 extern bool any_players_in_room(room_data *room);
 extern const char *PERS(char_data *ch, char_data *vict, bool real);

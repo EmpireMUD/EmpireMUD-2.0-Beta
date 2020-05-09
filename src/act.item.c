@@ -454,10 +454,13 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *tool_flags[];
 	extern const char *wear_bits[];
 
+	struct vnum_hash *vhash = NULL, *vhash_iter, *vhash_next;
+	bld_data *bld, *bld_iter, *next_bld;
 	struct obj_storage_type *store;
 	craft_data *craft, *next_craft;
 	struct custom_message *ocm;
 	struct player_eq_set *pset;
+	struct bld_relation *relat;
 	player_index_data *index;
 	struct eq_set_obj *oset;
 	struct obj_apply *apply;
@@ -466,7 +469,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	generic_data *comp = NULL;
 	obj_data *proto;
 	crop_data *cp;
-	bld_data *bld;
 	int found;
 	double rating;
 	bool any;
@@ -517,13 +519,27 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 
 	if (GET_OBJ_STORAGE(obj) && !OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
 		msg_to_char(ch, "Storage locations:");
-		found = 0;
 		for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {			
 			if ((bld = building_proto(store->building_type))) {
-				msg_to_char(ch, "%s%s", (found++ > 0 ? ", " : " "), GET_BLD_NAME(bld));
+				add_vnum_hash(&vhash, GET_BLD_VNUM(bld), 1);
+				
+				// check stores-like relations
+				HASH_ITER(hh, building_table, bld_iter, next_bld) {
+					LL_FOREACH(GET_BLD_RELATIONS(bld_iter), relat) {
+						if (relat->type == BLD_REL_STORES_LIKE && relat->vnum == GET_BLD_VNUM(bld)) {
+							add_vnum_hash(&vhash, relat->vnum, 1);
+						}
+					}
+				}
 			}
-		}		
+		}
+		
+		found = 0;
+		HASH_ITER(hh, vhash, vhash_iter, vhash_next) {
+			msg_to_char(ch, "%s%s", (found++ > 0 ? ", " : " "), get_bld_name_by_proto(vhash_iter->vnum));
+		}
 		msg_to_char(ch, "\r\n");
+		free_vnum_hash(&vhash);
 	}
 	if (UNIQUE_OBJ_CAN_STORE(obj)) {
 		msg_to_char(ch, "Storage location: Warehouse\r\n");

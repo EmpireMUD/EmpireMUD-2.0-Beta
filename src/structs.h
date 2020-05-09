@@ -3103,6 +3103,14 @@ struct trading_post_data {
 };
 
 
+// simple structure for passing around a list of vnums
+struct vnum_hash {
+	any_vnum vnum;
+	int count;
+	UT_hash_handle hh;
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ABILITY STRUCTS /////////////////////////////////////////////////////////
 
