@@ -527,7 +527,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 				HASH_ITER(hh, building_table, bld_iter, next_bld) {
 					LL_FOREACH(GET_BLD_RELATIONS(bld_iter), relat) {
 						if (relat->type == BLD_REL_STORES_LIKE && relat->vnum == GET_BLD_VNUM(bld)) {
-							add_vnum_hash(&vhash, relat->vnum, 1);
+							add_vnum_hash(&vhash, GET_BLD_VNUM(bld_iter), 1);
 						}
 					}
 				}
