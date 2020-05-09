@@ -543,9 +543,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		if (strlen(lbuf) < sizeof(lbuf) + 2) {
 			strcat(lbuf, "\r\n");
 		}
-		temp = lbuf;
+		temp = str_dup(lbuf);
 		format_text(&temp, 0, NULL, MAX_STRING_LENGTH);
 		send_to_char(temp, ch);
+		free(temp);
 	}
 	if (UNIQUE_OBJ_CAN_STORE(obj)) {
 		msg_to_char(ch, "Storage location: Warehouse\r\n");
