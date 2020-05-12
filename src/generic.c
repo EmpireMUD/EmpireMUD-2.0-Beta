@@ -361,7 +361,7 @@ char *list_one_generic(generic_data *gen, bool detail) {
 				break;
 			}
 			case GENERIC_COMPONENT: {
-				snprintf(output, sizeof(output), "[%5d] %s%s (%s)", GEN_VNUM(gen), GEN_NAME(gen), GEN_FLAGGED(gen, GEN_BASIC) ? " (basic)" : "", generic_types[GEN_TYPE(gen)]);
+				snprintf(output, sizeof(output), "[%5d] %s%s (%s) [%d %s]", GEN_VNUM(gen), GEN_NAME(gen), GEN_FLAGGED(gen, GEN_BASIC) ? " (basic)" : "", generic_types[GEN_TYPE(gen)], GET_COMPONENT_OBJ_VNUM(gen), get_obj_name_by_proto(GET_COMPONENT_OBJ_VNUM(gen)));
 				break;
 			}
 			default: {
