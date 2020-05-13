@@ -620,7 +620,7 @@ ACMD(do_butcher) {
 		return;
 	}
 	else {
-		if (run_interactions(ch, proto->interactions, INTERACT_BUTCHER, IN_ROOM(ch), NULL, corpse, butcher_interact)) {
+		if (!IS_SET(GET_CORPSE_FLAGS(corpse), CORPSE_NO_LOOT) && run_interactions(ch, proto->interactions, INTERACT_BUTCHER, IN_ROOM(ch), NULL, corpse, butcher_interact)) {
 			// success
 			gain_player_tech_exp(ch, PTECH_BUTCHER_UPGRADE, 15);
 		}

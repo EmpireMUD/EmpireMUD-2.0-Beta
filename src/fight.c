@@ -1533,7 +1533,7 @@ obj_data *make_corpse(char_data *ch) {
 
 	GET_OBJ_VAL(corpse, VAL_CORPSE_IDNUM) = IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch));
 	GET_OBJ_VAL(corpse, VAL_CORPSE_SIZE) = size;
-	GET_OBJ_VAL(corpse, VAL_CORPSE_FLAGS) = 0;
+	GET_OBJ_VAL(corpse, VAL_CORPSE_FLAGS) = (MOB_FLAGGED(ch, MOB_NO_LOOT) ? CORPSE_NO_LOOT : NOBITS);
 		
 	if (human) {
 		SET_BIT(GET_OBJ_VAL(corpse, VAL_CORPSE_FLAGS), CORPSE_HUMAN);

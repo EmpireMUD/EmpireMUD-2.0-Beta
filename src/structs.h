@@ -1593,10 +1593,11 @@ typedef struct vehicle_data vehicle_data;
 #define CONT_CLOSED  BIT(1)	// Container is closed
 
 
-// Corpse flags -- limited to 31 because of int type in obj value
+// CORPSE_x: Corpse flags -- limited to 31 because of int type in obj value
 #define CORPSE_EATEN  BIT(0)	// The corpse is part-eaten
 #define CORPSE_SKINNED  BIT(1)	// The corpse has been skinned
 #define CORPSE_HUMAN  BIT(2)	// a person
+#define CORPSE_NO_LOOT  BIT(3)	// cannot butcher/skin due to !LOOT flag
 
 // ITEM_x: Item types
 #define ITEM_UNDEFINED  0

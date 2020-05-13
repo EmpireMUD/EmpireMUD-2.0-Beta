@@ -2959,7 +2959,7 @@ ACMD(do_skin) {
 		msg_to_char(ch, "You need to be using a good knife to skin a corpse.\r\n");
 	else {
 		// run it
-		if (!run_interactions(ch, proto->interactions, INTERACT_SKIN, IN_ROOM(ch), NULL, obj, skin_interact)) {
+		if (IS_SET(GET_CORPSE_FLAGS(obj), CORPSE_NO_LOOT) || !run_interactions(ch, proto->interactions, INTERACT_SKIN, IN_ROOM(ch), NULL, obj, skin_interact)) {
 			act("You try to skin $p but get nothing useful.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		else {
