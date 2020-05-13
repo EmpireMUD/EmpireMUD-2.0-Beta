@@ -5091,7 +5091,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'p': {	// room.p*
-					if (!str_cmp(field, "people")) {
+					if (!str_cmp(field, "players_present")) {
+						snprintf(str, slen, "%d", any_players_in_room(r) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "people")) {
 						char_data *temp_ch;
 				
 						// attempt to prevent extracted people from showing in lists
