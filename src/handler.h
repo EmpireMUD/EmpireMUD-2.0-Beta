@@ -259,6 +259,8 @@ extern char *get_custom_message(struct custom_message *list, int type);
 extern bool has_custom_message(struct custom_message *list, int type);
 
 // custom message helpers
+#define mob_get_custom_message(mob, type)  get_custom_message(MOB_CUSTOM_MSGS(mob), type)
+#define mob_has_custom_message(mob, type)  has_custom_message(MOB_CUSTOM_MSGS(mob), type)
 #define obj_get_custom_message(obj, type)  get_custom_message(GET_OBJ_CUSTOM_MSGS(obj), type)
 #define obj_has_custom_message(obj, type)  has_custom_message(GET_OBJ_CUSTOM_MSGS(obj), type)
 #define abil_get_custom_message(abil, type)  get_custom_message(ABIL_CUSTOM_MSGS(abil), type)

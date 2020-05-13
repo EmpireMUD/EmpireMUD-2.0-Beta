@@ -4040,7 +4040,12 @@ random each time.
 
 Message types:
  &cecho&0 - The message is shown to the room periodically (may use $ tokens).
+ &cecho-day&0 - Like echo, but only during the day.
+ &cecho-night&0 - Only during the night.
  &csay&0 - The message is said aloud by the mob periodically.
+ &csay-day&0 - Like say, but only during the day.
+ &csay-night&0 - Only during the night.
+ &clong-desc&0 - Variable long descriptions (prevents normal long desc showing)
 
 Note: The 'echo' and 'say' types share the same random interval, and the mob
 will only do one or the other each time.

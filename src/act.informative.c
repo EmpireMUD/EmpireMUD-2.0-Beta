@@ -923,6 +923,12 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		}
 		msg_to_char(ch, "%s\r\n", get_morph_desc(i, TRUE));
 	}
+	else if (IS_NPC(i) && mob_has_custom_message(i, MOB_CUSTOM_LONG_DESC) && GET_POS(i) == POS_STANDING) {
+		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
+			msg_to_char(ch, "*");
+		}
+		msg_to_char(ch, "%s\r\n", mob_get_custom_message(i, MOB_CUSTOM_LONG_DESC));
+	}
 	else if (IS_NPC(i) && GET_LONG_DESC(i) && GET_POS(i) == POS_STANDING) {
 		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
 			msg_to_char(ch, "*");

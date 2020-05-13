@@ -2046,6 +2046,7 @@ const char *mob_custom_types[] = {
 	"say-night",
 	"echo-day",
 	"echo-night",
+	"long-desc",
 	"\n"
 };
 

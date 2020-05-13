@@ -1525,6 +1525,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_CUSTOM_SAY_NIGHT  3
 #define MOB_CUSTOM_ECHO_DAY  4
 #define MOB_CUSTOM_ECHO_NIGHT  5
+#define MOB_CUSTOM_LONG_DESC  6	// random long descs
 
 
 // MOB_MOVE_x: mob/vehicle movement types
