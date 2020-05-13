@@ -5628,7 +5628,7 @@ int Y_COORD(room_data *room) {
 * @param int count How many to add (usually 1, but you can add any amount including a negative).
 */
 void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count) {
-	struct vnum_hash *item;
+	struct vnum_hash *item = NULL;
 	
 	if (hash) {
 		HASH_FIND_INT(*hash, &vnum, item);
