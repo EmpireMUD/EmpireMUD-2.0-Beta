@@ -1221,7 +1221,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 		return FALSE;
 	}
 	
-	if (IS_INJURED(ch, INJ_TIED) || IS_DEAD(ch)) {
+	if (IS_INJURED(ch, INJ_TIED) || GET_HEALTH(ch) < 1) {
 		msg_to_char(ch, "You can't seem to move!\r\n");
 		return FALSE;
 	}
