@@ -566,7 +566,7 @@ bool can_gain_chore_resource_from_interaction_list(empire_data *emp, room_data *
 		if (!GET_OBJ_STORAGE(proto)) {
 			continue;	// MUST be storable
 		}
-		if (!meets_interaction_restrictions(interact->restrictions, NULL, emp)) {
+		if (!meets_interaction_restrictions(interact->restrictions, NULL, emp, NULL, NULL)) {
 			continue;
 		}
 		
@@ -2499,7 +2499,7 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 			
 			// find shear interaction
 			for (interact = mob->interactions; interact && !shearable; interact = interact->next) {
-				if (interact->type != INTERACT_SHEAR || !meets_interaction_restrictions(interact->restrictions, NULL, emp)) {
+				if (interact->type != INTERACT_SHEAR || !meets_interaction_restrictions(interact->restrictions, NULL, emp, mob, NULL)) {
 					continue;
 				}
 				if (!can_gain_chore_resource(emp, room, CHORE_SHEARING, interact->vnum)) {

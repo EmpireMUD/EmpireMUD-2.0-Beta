@@ -3941,10 +3941,13 @@ bool has_interaction(struct interaction_item *list, int type) {
 * @param struct interact_restriction *list The list of restrictions to check.
 * @param char_data *ch Optional: The person trying to interact (for ability/ptech/local tech; may be NULL).
 * @param empire_data *emp Optional: The empire trying to interact (for techs; may be NULL).
+* @param char_data *inter_mob The mob who has the interactions, if any.
+* @param obj_data *inter_item The object that has the interactions, if any.
 * @return bool TRUE if okay, FALSE if failed.
 */
-bool meets_interaction_restrictions(struct interact_restriction *list, char_data *ch, empire_data *emp) {
+bool meets_interaction_restrictions(struct interact_restriction *list, char_data *ch, empire_data *emp, char_data *inter_mob, obj_data *inter_item) {
 	struct interact_restriction *res;
+	bool any_diff = FALSE, diff_ok = FALSE;
 	
 	LL_FOREACH(list, res) {
 		// INTERACT_RESTRICT_x
@@ -3952,6 +3955,36 @@ bool meets_interaction_restrictions(struct interact_restriction *list, char_data
 			case INTERACT_RESTRICT_ABILITY: {
 				if (!ch || IS_NPC(ch) || !has_ability(ch, res->vnum)) {
 					return FALSE;
+				}
+				break;
+			}
+			case INTERACT_RESTRICT_BOSS: {
+				any_diff = TRUE;
+				if (inter_mob && MOB_FLAGGED(inter_mob, MOB_HARD) && MOB_FLAGGED(inter_mob, MOB_GROUP)) {
+					diff_ok = TRUE;	// any matching diff is ok
+				}
+				if (inter_item && OBJ_FLAGGED(inter_item, OBJ_HARD_DROP) && OBJ_FLAGGED(inter_item, OBJ_GROUP_DROP)) {
+					diff_ok = TRUE;
+				}
+				break;
+			}
+			case INTERACT_RESTRICT_GROUP: {
+				any_diff = TRUE;
+				if (inter_mob && !MOB_FLAGGED(inter_mob, MOB_HARD) && MOB_FLAGGED(inter_mob, MOB_GROUP)) {
+					diff_ok = TRUE;	// any matching diff is ok
+				}
+				if (inter_item && !OBJ_FLAGGED(inter_item, OBJ_HARD_DROP) && OBJ_FLAGGED(inter_item, OBJ_GROUP_DROP)) {
+					diff_ok = TRUE;
+				}
+				break;
+			}
+			case INTERACT_RESTRICT_HARD: {
+				any_diff = TRUE;
+				if (inter_mob && MOB_FLAGGED(inter_mob, MOB_HARD) && !MOB_FLAGGED(inter_mob, MOB_GROUP)) {
+					diff_ok = TRUE;	// any matching diff is ok
+				}
+				if (inter_item && OBJ_FLAGGED(inter_item, OBJ_HARD_DROP) && !OBJ_FLAGGED(inter_item, OBJ_GROUP_DROP)) {
+					diff_ok = TRUE;
 				}
 				break;
 			}
@@ -3971,6 +4004,11 @@ bool meets_interaction_restrictions(struct interact_restriction *list, char_data
 		}
 	}
 	
+	if (any_diff) {
+		// if any difficulty was requested, we require diff_ok
+		return diff_ok;
+	}
+	// else:
 	return TRUE;	// made it this far
 }
 
@@ -4035,7 +4073,7 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 	bool success = FALSE;
 
 	for (interact = run_list; interact; interact = interact->next) {
-		if (interact->type == type && meets_interaction_restrictions(interact->restrictions, ch, ch ? GET_LOYALTY(ch) : NULL) && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent)) {
+		if (interact->type == type && meets_interaction_restrictions(interact->restrictions, ch, ch ? GET_LOYALTY(ch) : NULL, inter_mob, inter_item) && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent)) {
 			if (func) {
 				// run function
 				success |= (func)(ch, interact, inter_room, inter_mob, inter_item);

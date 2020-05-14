@@ -4128,6 +4128,18 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 				snprintf(line, sizeof(line), "Tech: %s", techs[res->vnum]);
 				break;
 			}
+			case INTERACT_RESTRICT_HARD: {
+				snprintf(line, sizeof(line), "Hard");
+				break;
+			}
+			case INTERACT_RESTRICT_GROUP: {
+				snprintf(line, sizeof(line), "Group");
+				break;
+			}
+			case INTERACT_RESTRICT_BOSS: {
+				snprintf(line, sizeof(line), "Boss");
+				break;
+			}
 			default: {
 				snprintf(line, sizeof(line), "Unknown %d:%d", res->type, res->vnum);
 				break;
@@ -6478,6 +6490,7 @@ bool parse_interaction_restrictions(char_data *ch, char *argument, struct intera
 				fail = TRUE;
 			}
 		}
+		// INTERACT_RESTRICT_x: parsing restrictions in olc
 		else if (is_abbrev(arg, "-ability")) {
 			ptr = any_one_word(ptr, arg);
 			if ((abil = find_ability(arg))) {	// valid restriction
@@ -6490,6 +6503,21 @@ bool parse_interaction_restrictions(char_data *ch, char *argument, struct intera
 				msg_to_char(ch, "Invalid ability '%s'.\r\n", arg);
 				fail = TRUE;
 			}
+		}
+		else if (is_abbrev(arg, "-boss")) {
+			CREATE(res, struct interact_restriction, 1);
+			res->type = INTERACT_RESTRICT_BOSS;
+			LL_APPEND(*found_restrictions, res);
+		}
+		else if (is_abbrev(arg, "-group")) {
+			CREATE(res, struct interact_restriction, 1);
+			res->type = INTERACT_RESTRICT_GROUP;
+			LL_APPEND(*found_restrictions, res);
+		}
+		else if (is_abbrev(arg, "-hard")) {
+			CREATE(res, struct interact_restriction, 1);
+			res->type = INTERACT_RESTRICT_HARD;
+			LL_APPEND(*found_restrictions, res);
 		}
 		else if (is_abbrev(arg, "-technology")) {
 			ptr = any_one_word(ptr, arg);

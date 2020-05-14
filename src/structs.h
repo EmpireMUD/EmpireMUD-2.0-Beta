@@ -389,6 +389,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_RESTRICT_ABILITY  0	// player must have an ability
 #define INTERACT_RESTRICT_PTECH  1	// player must have a ptech
 #define INTERACT_RESTRICT_TECH  2	// empire must have a tech
+#define INTERACT_RESTRICT_HARD  3	// only when mob/obj is 'hard' (but not group)
+#define INTERACT_RESTRICT_GROUP  4	// only when mob/obj is 'group' (but not hard)
+#define INTERACT_RESTRICT_BOSS  5	// only when mob/obj is 'hard' (hard + group)
 
 
 // for object saving
