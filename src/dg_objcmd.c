@@ -990,9 +990,7 @@ OCMD(do_oteleport) {
 				continue;
 			char_from_room(ch);
 			char_to_room(ch, target);
-			if (!IS_NPC(ch)) {
-				GET_LAST_DIR(ch) = NO_DIR;
-			}
+			GET_LAST_DIR(ch) = NO_DIR;
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 			qt_visit_room(ch, IN_ROOM(ch));
 			msdp_update_room(ch);
@@ -1019,9 +1017,7 @@ OCMD(do_oteleport) {
 					if (!IS_NPC(ch) || (ch->master && !IS_NPC(ch->master))) {
 						char_from_room(ch);
 						char_to_room(ch, target);
-						if (!IS_NPC(ch)) {
-							GET_LAST_DIR(ch) = NO_DIR;
-						}
+						GET_LAST_DIR(ch) = NO_DIR;
 						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 						qt_visit_room(ch, IN_ROOM(ch));
 						msdp_update_room(ch);
@@ -1035,9 +1031,7 @@ OCMD(do_oteleport) {
 			if (valid_dg_target(ch, DG_ALLOW_GODS)) {
 				char_from_room(ch);
 				char_to_room(ch, target);
-				if (!IS_NPC(ch)) {
-					GET_LAST_DIR(ch) = NO_DIR;
-				}
+				GET_LAST_DIR(ch) = NO_DIR;
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 				qt_visit_room(ch, IN_ROOM(ch));
 				msdp_update_room(ch);

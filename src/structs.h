@@ -4013,7 +4013,6 @@ struct player_special_data {
 	room_vnum load_room_check;	// this is the home room of the player's loadroom, used to check that they're still in the right place
 	room_vnum last_room;	// useful when dead
 	room_vnum tomb_room;	// location of player's chosen tomb
-	byte last_direction;	// used for walls and movement
 	int recent_death_count;	// for death penalty
 	long last_death_time;	// for death counts
 	int last_corpse_id;	// DG Scripts obj id of last corpse
@@ -4140,6 +4139,7 @@ struct char_special_data {
 	bitvector_t affected_by;	// Bitvector for spells/skills affected by
 	morph_data *morph;	// for morphed people
 	obj_vnum rope_vnum;	// for tied-up people
+	byte last_direction;	// used for walls and movement
 
 	// UNSAVED SECTION //
 	

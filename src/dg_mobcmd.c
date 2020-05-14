@@ -1296,9 +1296,7 @@ ACMD(do_mteleport) {
 			next_ch = vict->next_in_room;
 
 			if (valid_dg_target(vict, DG_ALLOW_GODS)) {
-				if (!IS_NPC(vict)) {
-					GET_LAST_DIR(vict) = NO_DIR;
-				}
+				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
 				char_to_room(vict, target);
 				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
@@ -1328,9 +1326,7 @@ ACMD(do_mteleport) {
 					if (!IS_NPC(vict) || (vict->master && !IS_NPC(vict->master))) {
 						char_from_room(vict);
 						char_to_room(vict, target);
-						if (!IS_NPC(vict)) {
-							GET_LAST_DIR(vict) = NO_DIR;
-						}
+						GET_LAST_DIR(vict) = NO_DIR;
 						enter_wtrigger(IN_ROOM(vict), ch, NO_DIR);
 						qt_visit_room(vict, IN_ROOM(vict));
 						msdp_update_room(vict);
@@ -1342,9 +1338,7 @@ ACMD(do_mteleport) {
 	else {
 		if ((*arg1 == UID_CHAR && (vict = get_char(arg1))) || (vict = get_char_vis(ch, arg1, FIND_CHAR_WORLD))) {
 			if (valid_dg_target(vict, DG_ALLOW_GODS)) {
-				if (!IS_NPC(vict)) {
-					GET_LAST_DIR(vict) = NO_DIR;
-				}
+				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
 				char_to_room(vict, target);
 				enter_wtrigger(IN_ROOM(vict), vict, NO_DIR);
