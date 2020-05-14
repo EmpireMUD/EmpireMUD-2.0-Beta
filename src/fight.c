@@ -1513,6 +1513,14 @@ obj_data *make_corpse(char_data *ch) {
 		}
 	}
 	
+	// flagging
+	if (MOB_FLAGGED(ch, MOB_HARD)) {
+		SET_BIT(GET_OBJ_EXTRA(corpse), OBJ_HARD_DROP);
+	}
+	if (MOB_FLAGGED(ch, MOB_GROUP)) {
+		SET_BIT(GET_OBJ_EXTRA(corpse), OBJ_GROUP_DROP);
+	}
+	
 	if (human) {
 		sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
 		sprintf(shortdesc, "%s's body", PERS(ch, ch, FALSE));

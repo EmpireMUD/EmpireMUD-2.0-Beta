@@ -1599,6 +1599,7 @@ typedef struct vehicle_data vehicle_data;
 #define CORPSE_HUMAN  BIT(2)	// a person
 #define CORPSE_NO_LOOT  BIT(3)	// cannot butcher/skin due to !LOOT flag
 
+
 // ITEM_x: Item types
 #define ITEM_UNDEFINED  0
 #define ITEM_WEAPON  1	// item is a weapon
