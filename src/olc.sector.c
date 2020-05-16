@@ -235,10 +235,13 @@ bool delete_sector_from_evolutions(sector_vnum vnum, struct evolution_data **lis
 * @return char* The line to show (without a CRLF).
 */
 char *list_one_sector(sector_data *sect, bool detail) {
+	char clim[MAX_STRING_LENGTH], bfl[MAX_STRING_LENGTH];
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+		ordered_sprintbit(GET_SECT_CLIMATE(sect), climate_flags, climate_flags_order, TRUE, clim);
+		ordered_sprintbit(GET_SECT_BUILD_FLAGS(sect), bld_on_flags, bld_on_flags_order, TRUE, bfl);
+		snprintf(output, sizeof(output), "[%5d] %s (%s) [%s]", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), clim, bfl);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
