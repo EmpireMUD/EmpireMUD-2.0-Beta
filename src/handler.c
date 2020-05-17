@@ -3988,6 +3988,16 @@ bool meets_interaction_restrictions(struct interact_restriction *list, char_data
 				}
 				break;
 			}
+			case INTERACT_RESTRICT_NORMAL: {
+				any_diff = TRUE;
+				if (inter_mob && !MOB_FLAGGED(inter_mob, MOB_HARD | MOB_GROUP)) {
+					diff_ok = TRUE;	// any matching diff is ok
+				}
+				if (inter_item && !OBJ_FLAGGED(inter_item, OBJ_HARD_DROP | OBJ_GROUP_DROP)) {
+					diff_ok = TRUE;
+				}
+				break;
+			}
 			case INTERACT_RESTRICT_PTECH: {
 				if (!ch || IS_NPC(ch) || !has_player_tech(ch, res->vnum)) {
 					return FALSE;

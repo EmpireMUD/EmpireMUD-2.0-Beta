@@ -4128,6 +4128,10 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 				snprintf(line, sizeof(line), "Tech: %s", techs[res->vnum]);
 				break;
 			}
+			case INTERACT_RESTRICT_NORMAL: {
+				snprintf(line, sizeof(line), "Normal");
+				break;
+			}
 			case INTERACT_RESTRICT_HARD: {
 				snprintf(line, sizeof(line), "Hard");
 				break;
@@ -6517,6 +6521,11 @@ bool parse_interaction_restrictions(char_data *ch, char *argument, struct intera
 		else if (is_abbrev(arg, "-hard")) {
 			CREATE(res, struct interact_restriction, 1);
 			res->type = INTERACT_RESTRICT_HARD;
+			LL_APPEND(*found_restrictions, res);
+		}
+		else if (is_abbrev(arg, "-normal")) {
+			CREATE(res, struct interact_restriction, 1);
+			res->type = INTERACT_RESTRICT_NORMAL;
 			LL_APPEND(*found_restrictions, res);
 		}
 		else if (is_abbrev(arg, "-technology")) {

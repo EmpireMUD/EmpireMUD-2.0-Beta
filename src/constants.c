@@ -3963,6 +3963,7 @@ const char *interact_restriction_types[] = {
 	"ability",
 	"ptech",
 	"tech",
+	"normal",
 	"hard",
 	"group",
 	"boss",
