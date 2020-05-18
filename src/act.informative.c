@@ -1573,9 +1573,12 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	extern int find_board(char_data *ch);
 	extern const char *extra_bits_inv_flags[];
 
-	char flags[256];
+	char buf[MAX_STRING_LENGTH], tags[MAX_STRING_LENGTH], flags[256];
 	int board_type;
 	room_data *room;
+	
+	// tags will be a comma-separated list of extra info, and PROBABLY starts with a space that can be skipped
+	*tags = '\0';
 
 	// initialize buf as the obj desc
 	if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
@@ -1587,14 +1590,14 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 
 	if (mode == OBJ_DESC_EQUIPMENT) {
 		if (obj->worn_by && AFF_FLAGGED(obj->worn_by, AFF_DISARM) && (obj->worn_on == WEAR_WIELD || obj->worn_on == WEAR_RANGED || obj->worn_on == WEAR_HOLD)) {
-			strcat(buf, " (disarmed)");
+			sprintf(tags + strlen(tags), "%s disarmed", (*tags ? "," : ""));
 		}
 	}
 	
 	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG) {
 		// show level:
 		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0 && mode != OBJ_DESC_LONG) {
-			sprintf(buf + strlen(buf), " (L%d)", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			sprintf(tags + strlen(tags), "%s L-%d", (*tags ? "," : ""), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		}
 		
 		// prepare flags:
@@ -1602,13 +1605,13 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 			if (!PRF_FLAGGED(ch, PRF_NO_LOOT_QUALITY)) {
 				// screenreader needs loot quality as text
 				if (OBJ_FLAGGED(obj, OBJ_HARD_DROP) && OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
-					strcat(buf, " (boss)");
+					sprintf(tags + strlen(tags), "%s boss", (*tags ? "," : ""));
 				}
 				else if (OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
-					strcat(buf, " (group)");
+					sprintf(tags + strlen(tags), "%s group", (*tags ? "," : ""));
 				}
 				else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP)) {
-					strcat(buf, " (hard)");
+					sprintf(tags + strlen(tags), "%s hard", (*tags ? "," : ""));
 				}
 			}
 			
@@ -1618,26 +1621,32 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 			sprintbit((GET_OBJ_EXTRA(obj) & ~OBJ_SUPERIOR), extra_bits_inv_flags, flags, TRUE);
 		}
 		
-		if (strncmp(flags, "NOBITS", 6)) {
-			sprintf(buf + strlen(buf), " %.*s", ((int)strlen(flags)-1), flags);	// remove trailing space
+		// append flags
+		if (*flags && strncmp(flags, "NOBITS", 6) && strncmp(flags, "none", 4)) {
+			sprintf(tags + strlen(tags), "%s %s", (*tags ? "," : ""), flags);
 		}
 		
 		if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
-			strcat(buf, " (quest)");
+			sprintf(tags + strlen(tags), "%s quest", (*tags ? "," : ""));
 		}
 		
 		if (IS_STOLEN(obj)) {
-			strcat(buf, " (STOLEN)");
+			sprintf(tags + strlen(tags), "%s STOLEN", (*tags ? "," : ""));
 		}
 	}
 	
 	if (mode == OBJ_DESC_INVENTORY || (mode == OBJ_DESC_LONG && CAN_WEAR(obj, ITEM_WEAR_TAKE))) {
 		if (can_get_quest_from_obj(ch, obj, NULL)) {
-			strcat(buf, " (quest available)");
+			sprintf(tags + strlen(tags), "%s quest available", (*tags ? "," : ""));
 		}
 		if (can_turn_quest_in_to_obj(ch, obj, NULL)) {
-			strcat(buf, " (finished quest)");
+			sprintf(tags + strlen(tags), "%s finished quest", (*tags ? "," : ""));
 		}
+	}
+	
+	if (*tags) {
+		// tags starts with a space so we use tags+1 here
+		sprintf(buf + strlen(buf), " (%s)", tags+1);
 	}
 	
 	if (mode == OBJ_DESC_LOOK_AT) {
@@ -2861,7 +2870,7 @@ ACMD(do_inventory) {
 			
 			// looks okay
 			if (identify && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
-				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (L%d)\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (L-%d)\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			}
 			else {
 				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));

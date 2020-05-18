@@ -1350,7 +1350,7 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 	char flg[256], info[256], owner[MAX_STRING_LENGTH];
 
 	if (INST_LEVEL(inst) > 0) {
-		sprintf(info, " L%d", INST_LEVEL(inst));
+		sprintf(info, " L-%d", INST_LEVEL(inst));
 	}
 	else {
 		*info = '\0';

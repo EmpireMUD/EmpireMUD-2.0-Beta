@@ -2312,25 +2312,25 @@ const char *extra_bits[] = {
 
 // OBJ_x (extra bits), part 2 -- shown in inventory/equipment list as flags
 const char *extra_bits_inv_flags[] = {
-	"(unique)",	// unique
+	"unique",	// unique
 	"",	// plantable
-	"(light)",
-	"(superior)",
-	"(large)",
+	"light",
+	"superior",
+	"large",
 	"",	// created
 	"",	// 1-use
 	"",	// slow
 	"",	// fast
-	"(enchanted)",
+	"enchanted",
 	"",	// junk
 	"",	// creatable
 	"",	// scalable
-	"(2h)",
-	"(boe)",
-	"(bop)",
+	"2h",
+	"BoE",
+	"BoP",
 	"",	// *
 	"",	// uncollected
-	"(keep)",
+	"keep",
 	"",	// *
 	"",	// *
 	"",	// !autostore
