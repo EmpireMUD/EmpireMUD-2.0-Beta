@@ -1604,7 +1604,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		// prepare flags:
 		show_flags = GET_OBJ_EXTRA(obj);
 		if (!PRF_FLAGGED(ch, PRF_ITEM_DETAILS)) {
-			show_flags &= ~PRF_ITEM_DETAILS;
+			show_flags &= ~OBJ_ENCHANTED;
 		}
 		
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
