@@ -1615,10 +1615,10 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 				}
 			}
 			
-			sprintbit(GET_OBJ_EXTRA(obj), extra_bits_inv_flags, flags, TRUE);
+			prettier_sprintbit(GET_OBJ_EXTRA(obj), extra_bits_inv_flags, flags);
 		}
 		else {	// non-screenreader: suppress superior flag here
-			sprintbit((GET_OBJ_EXTRA(obj) & ~OBJ_SUPERIOR), extra_bits_inv_flags, flags, TRUE);
+			prettier_sprintbit((GET_OBJ_EXTRA(obj) & ~OBJ_SUPERIOR), extra_bits_inv_flags, flags);
 		}
 		
 		// append flags
@@ -1628,6 +1628,10 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		
 		if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
 			sprintf(tags + strlen(tags), "%s quest", (*tags ? "," : ""));
+		}
+		
+		if (OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP) && !OBJ_BOUND_TO(obj)) {
+			sprintf(tags + strlen(tags), "%s unbound", (*tags ? "," : ""));
 		}
 		
 		if (IS_STOLEN(obj)) {
