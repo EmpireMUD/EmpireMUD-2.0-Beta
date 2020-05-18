@@ -1348,6 +1348,39 @@ void show_character_affects(char_data *ch, char_data *to) {
 //// OBJECT DISPLAY FUNCTIONS ////////////////////////////////////////////////
 
 /**
+* Allows items to be colored by their loot quality.
+*
+* @param obj_data *obj The object to color.
+* @param char_data *ch The player who will see it (for preference flags).
+*/
+char *obj_color_by_quality(obj_data *obj, char_data *ch) {
+	// static char output[8];
+	
+	if (!ch || !obj || REAL_NPC(ch)) {
+		return "";
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP) && OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+		return "\tB";
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+		return "\tC";
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP)) {
+		return "\tC";
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_SUPERIOR)) {
+		return "\tY";
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_JUNK)) {
+		return "\tw";
+	}
+	else {	// no quality
+		return "\tn";
+	}
+}
+
+
+/**
 * @param obj_data *obj
 * @param char_data *ch person to show it to
 * @param int mode OBJ_DESC_SHORT, OBJ_DESC_LONG
@@ -1357,8 +1390,15 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 
 	static char output[MAX_STRING_LENGTH];
 	char sdesc[MAX_STRING_LENGTH];
-
-	*output = '\0';
+	bool color = FALSE;
+	
+	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT) {
+		strcpy(output, obj_color_by_quality(obj, ch));
+		color = TRUE;
+	}
+	else {
+		*output = '\0';
+	}
 
 	/* sdesc will be empty unless the short desc is modified */
 	*sdesc = '\0';
@@ -1400,11 +1440,14 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 		case OBJ_DESC_SHORT:
 		default: {
 			if (*sdesc)
-				strcpy(output, sdesc);
+				strcat(output, sdesc);
 			else
-				strcpy(output, GET_OBJ_SHORT_DESC(obj));
+				strcat(output, GET_OBJ_SHORT_DESC(obj));
 			break;
 		}
+	}
+	if (color) {
+		strcat(output, "\tn");
 	}
 	return output;
 }

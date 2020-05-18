@@ -4209,6 +4209,7 @@ Optional interaction restrictions:
  &c-boss&0 - Mob must have HARD+GROUP flags; obj must have HARD- and GROUP-DROP.
  &c-hard&0 - Mob must have only HARD flag, or object must have only HARD-DROP.
  &c-group&0 - Mob must have only GROUP flag, or object must have only GROUP-DROP.
+ &c-normal&0 - Mob/obj must have no HARD or GROUP flag.
  &c-ptech <name>&0 - Player must have this player-tech.
  &c-tech <name>&0 - Empire must have this tech.
 
