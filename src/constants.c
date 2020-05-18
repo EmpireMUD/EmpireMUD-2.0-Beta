@@ -719,7 +719,7 @@ const struct toggle_data_type toggle_data[] = {
 	
 	{ "map-color", TOG_OFFON, PRF_NOMAPCOL, 0, tog_mapcolor },
 	{ "item-details", TOG_ONOFF, PRF_ITEM_DETAILS, 0, NULL },
-	{ "item-quality", TOG_OFFON, PRF_NO_ITEM_QUALITY, 0, NULL },
+	{ "item-quality", TOG_ONOFF, PRF_ITEM_QUALITY, 0, NULL },
 	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	

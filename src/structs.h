@@ -115,8 +115,8 @@
 #define WRAP_Y  FALSE	// whether the mud wraps north-south
 
 
-// What range of a 'real world' is covered by this map (-90 to 90 is the maximum range of latitudes)
-// these must be whole numbers, no floating points:
+// What range of a 'real world' is covered by this map (-90 to 90 is the maximum range of latitudes; degrees south are represented as a negative number)
+// Y_MAX_LATITUDE must always be the further north of the two:
 #define Y_MIN_LATITUDE  -67	// 0 is the equator, -66.56 is the anarctic circle
 #define Y_MAX_LATITUDE  67	// 66.56 is the arctic circle, 90 is the north pole
 
@@ -125,14 +125,7 @@
 #define TROPIC_LATITUDE  23.43	// based on the real world
 
 // converts a Y-coordinate to the equivalent latitude, based on Y_MIN_LATITUDE/Y_MAX_LATITUDE
-#if ((Y_MIN_LATITUDE > 0 && Y_MAX_LATITUDE > 0) || (Y_MIN_LATITUDE < 0 && Y_MAX_LATITUDE < 0))
-	// if both are positive or negative, we want the difference of the latitudes
-	#define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * ABSOLUTE(Y_MAX_LATITUDE - Y_MIN_LATITUDE)) + Y_MIN_LATITUDE)
-#else
-	// if one is positive and one is negative, we want the sum of the latitudes
-	#define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * (ABSOLUTE(Y_MAX_LATITUDE) + ABSOLUTE(Y_MIN_LATITUDE))) + Y_MIN_LATITUDE)
-#endif
-
+#define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * ABSOLUTE(Y_MAX_LATITUDE - Y_MIN_LATITUDE)) + Y_MIN_LATITUDE)
 
 #define COIN_VALUE  0.1	// value of a coin as compared to 1 wealth (0.1 coin value = 10 coins per wealth)
 
@@ -2139,7 +2132,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_TRAVEL_LOOK  BIT(35)	// auto-looks each time you run or move a vehicle
 #define PRF_AUTOCLIMB  BIT(36)	// will enter mountains without 'climb'
 #define PRF_AUTOSWIM  BIT(37)	// will enter water without 'swim'
-#define PRF_NO_ITEM_QUALITY  BIT(38)	// hides loot quality color/tag in inv/eq
+#define PRF_ITEM_QUALITY  BIT(38)	// shows loot quality color/tag in inv/eq
 #define PRF_ITEM_DETAILS  BIT(39)	// shows additional item details on inv/eq
 // note: if you add prefs, consider adding them to alt_import_preferences()
 
