@@ -1574,6 +1574,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	extern const char *extra_bits_inv_flags[];
 
 	char buf[MAX_STRING_LENGTH], tags[MAX_STRING_LENGTH], flags[256];
+	bitvector_t show_flags;
 	int board_type;
 	room_data *room;
 	
@@ -1601,6 +1602,11 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		}
 		
 		// prepare flags:
+		show_flags = GET_OBJ_EXTRA(obj);
+		if (!PRF_FLAGGED(ch, PRF_ITEM_DETAILS)) {
+			show_flags &= ~PRF_ITEM_DETAILS;
+		}
+		
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 			if (!PRF_FLAGGED(ch, PRF_NO_ITEM_QUALITY)) {
 				// screenreader needs item quality as text
@@ -1615,10 +1621,10 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 				}
 			}
 			
-			prettier_sprintbit(GET_OBJ_EXTRA(obj), extra_bits_inv_flags, flags);
+			prettier_sprintbit(show_flags, extra_bits_inv_flags, flags);
 		}
 		else {	// non-screenreader: suppress superior flag here
-			prettier_sprintbit((GET_OBJ_EXTRA(obj) & ~OBJ_SUPERIOR), extra_bits_inv_flags, flags);
+			prettier_sprintbit((show_flags & ~OBJ_SUPERIOR), extra_bits_inv_flags, flags);
 		}
 		
 		// append flags

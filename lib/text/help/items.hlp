@@ -222,8 +222,6 @@ tags next to the item name. For everyone else, the items will be in color:
 - &wjunk (gray)&0
 - normal (no quality)
 
-The 'enchanted' tag is also hidden by turning off item-quality.
-
 See also: CONSIDER, IDENTIFY, TOGGLE
 #
 "EDIBLE PLANT" "SMALL EDIBLE PLANT" "LARGE EDIBLE PLANT"
