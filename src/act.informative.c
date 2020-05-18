@@ -1360,13 +1360,13 @@ char *obj_color_by_quality(obj_data *obj, char_data *ch) {
 		return "";
 	}
 	else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP) && OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
-		return "\tB";
+		return "\tM";
 	}
 	else if (OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
 		return "\tC";
 	}
 	else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP)) {
-		return "\tC";
+		return "\tG";
 	}
 	else if (OBJ_FLAGGED(obj, OBJ_SUPERIOR)) {
 		return "\tY";
@@ -1392,7 +1392,7 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	char sdesc[MAX_STRING_LENGTH];
 	bool color = FALSE;
 	
-	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT) {
+	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS) {
 		strcpy(output, obj_color_by_quality(obj, ch));
 		color = TRUE;
 	}
