@@ -202,7 +202,7 @@ The distilled herbs are:
 
 See also: FIND HERBS, HEALING ELIXIRS
 #
-"DROP FLAGS" "LOOT QUALITY FLAGS" "HARD DROP" "GROUP DROP" "GENERIC DROP" HARD-DROP GROUP-DROP GENERIC-DROP LOOT-QUALITY "TOGGLE LOOT-QUALITY"
+"DROP FLAGS" "ITEM QUALITY" "LOOT QUALITY FLAGS" "HARD DROP" "GROUP DROP" "GENERIC DROP" HARD-DROP GROUP-DROP GENERIC-DROP LOOT-QUALITY ITEM-QUALITY "TOGGLE ITEM-QUALITY"
 
 Items dropped by enemies intended for larger groups are usually slightly more
 powerful than others of the same level, to compensate for the increased
@@ -212,7 +212,7 @@ size recommended to fight the mob, displayed when the item is identified.
 Items which can be obtained from enemies of varying difficulties are often not
 eligible for these flags, and are indicated by a GENERIC-DROP flag.
 
-You can 'toggle loot-quality' to turn on/off the display of loot quality in
+You can 'toggle item-quality' to turn on/off the display of item quality in
 your inventory and equipment list. For screenreader users, these appear as
 tags next to the item name. For everyone else, the items will be in color:
 - &Mboss (magenta)&0
@@ -221,6 +221,8 @@ tags next to the item name. For everyone else, the items will be in color:
 - &Ysuperior (yellow)&0
 - &wjunk (gray)&0
 - normal (no quality)
+
+The 'enchanted' tag is also hidden by turning off item-quality.
 
 See also: CONSIDER, IDENTIFY, TOGGLE
 #
@@ -860,7 +862,7 @@ legendary artisan. Crafts that require tools, such as forge, will go faster
 if the tool you use is superior. Scaled items such as armor and weapons will
 be better in their superior form than without it, even at the same level.
 
-Superior items are yellow in your inventory/equipment when loot-quality is
+Superior items are yellow in your inventory/equipment when item-quality is
 toggled on.
 
 As long as you have the right mastery ability for the ability your recipe comes
@@ -872,7 +874,7 @@ Masterwork abilities:
   Pottery - Master Craftsman
   Woodworking - Master Craftsman
 
-See also: SCALABLE CRAFTS, LOOT-QUALITY
+See also: SCALABLE CRAFTS, ITEM-QUALITY
 #
 TEXTILES "TEXTILE COMPONENT" "CLOTH COMPONENT" CLOTH "COTTON CLOTH" "WOOL CLOTH"
 

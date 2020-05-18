@@ -1392,7 +1392,7 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	char sdesc[MAX_STRING_LENGTH];
 	bool color = FALSE;
 	
-	if (!PRF_FLAGGED(ch, PRF_NO_LOOT_QUALITY) && (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS)) {
+	if (!PRF_FLAGGED(ch, PRF_NO_ITEM_QUALITY) && (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS)) {
 		strcpy(output, obj_color_by_quality(obj, ch));
 		color = TRUE;
 	}
@@ -1596,14 +1596,14 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	
 	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG) {
 		// show level:
-		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0 && mode != OBJ_DESC_LONG) {
+		if (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 1 && mode != OBJ_DESC_LONG && mode != OBJ_DESC_LOOK_AT) {
 			sprintf(tags + strlen(tags), "%s L-%d", (*tags ? "," : ""), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		}
 		
 		// prepare flags:
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
-			if (!PRF_FLAGGED(ch, PRF_NO_LOOT_QUALITY)) {
-				// screenreader needs loot quality as text
+			if (!PRF_FLAGGED(ch, PRF_NO_ITEM_QUALITY)) {
+				// screenreader needs item quality as text
 				if (OBJ_FLAGGED(obj, OBJ_HARD_DROP) && OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
 					sprintf(tags + strlen(tags), "%s boss", (*tags ? "," : ""));
 				}
@@ -1626,11 +1626,11 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 			sprintf(tags + strlen(tags), "%s %s", (*tags ? "," : ""), flags);
 		}
 		
-		if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+		if (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) && GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
 			sprintf(tags + strlen(tags), "%s quest", (*tags ? "," : ""));
 		}
 		
-		if (OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP) && !OBJ_BOUND_TO(obj)) {
+		if (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) && OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP) && !OBJ_BOUND_TO(obj)) {
 			sprintf(tags + strlen(tags), "%s unbound", (*tags ? "," : ""));
 		}
 		

@@ -644,7 +644,8 @@ const char *preference_bits[] = {
 	"TRAVEL-LOOK",
 	"AUTOCLIMB",
 	"AUTOSWIM",
-	"!LOOT-QUALITY",
+	"!ITEM-QUALITY",
+	"ITEM-DETAILS",
 	"\n"
 };
 
@@ -717,7 +718,9 @@ const struct toggle_data_type toggle_data[] = {
 	{ "shout", TOG_OFFON, PRF_DEAF, 0, NULL },
 	
 	{ "map-color", TOG_OFFON, PRF_NOMAPCOL, 0, tog_mapcolor },
-	{ "loot-quality", TOG_OFFON, PRF_NO_LOOT_QUALITY, 0, NULL },
+	{ "item-details", TOG_ONOFF, PRF_ITEM_DETAILS, 0, NULL },
+	{ "item-quality", TOG_OFFON, PRF_NO_ITEM_QUALITY, 0, NULL },
+	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	
 	// imm section
