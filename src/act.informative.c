@@ -1592,6 +1592,11 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	}
 	
 	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG) {
+		// show level:
+		if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0 && mode != OBJ_DESC_LONG) {
+			sprintf(buf + strlen(buf), " (L%d)", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+		}
+		
 		// prepare flags:
 		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 			if (!PRF_FLAGGED(ch, PRF_NO_LOOT_QUALITY)) {
@@ -2855,8 +2860,8 @@ ACMD(do_inventory) {
 			}
 			
 			// looks okay
-			if (identify) {
-				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (%d)\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			if (identify && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (L%d)\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			}
 			else {
 				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
