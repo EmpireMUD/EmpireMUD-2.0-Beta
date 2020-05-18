@@ -1602,7 +1602,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 				else if (OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
 					strcat(buf, " (group)");
 				}
-				else if (OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+				else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP)) {
 					strcat(buf, " (hard)");
 				}
 			}
