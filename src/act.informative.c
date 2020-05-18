@@ -1392,7 +1392,7 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	char sdesc[MAX_STRING_LENGTH];
 	bool color = FALSE;
 	
-	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS) {
+	if (!PRF_FLAGGED(ch, PRF_NO_LOOT_QUALITY) && (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS)) {
 		strcpy(output, obj_color_by_quality(obj, ch));
 		color = TRUE;
 	}
@@ -1592,7 +1592,27 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	}
 	
 	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG) {
-		sprintbit(GET_OBJ_EXTRA(obj), extra_bits_inv_flags, flags, TRUE);
+		// prepare flags:
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			if (!PRF_FLAGGED(ch, PRF_NO_LOOT_QUALITY)) {
+				// screenreader needs loot quality as text
+				if (OBJ_FLAGGED(obj, OBJ_HARD_DROP) && OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+					strcat(buf, " (boss)");
+				}
+				else if (OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+					strcat(buf, " (group)");
+				}
+				else if (OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+					strcat(buf, " (hard)");
+				}
+			}
+			
+			sprintbit(GET_OBJ_EXTRA(obj), extra_bits_inv_flags, flags, TRUE);
+		}
+		else {	// non-screenreader: suppress superior flag here
+			sprintbit((GET_OBJ_EXTRA(obj) & ~OBJ_SUPERIOR), extra_bits_inv_flags, flags, TRUE);
+		}
+		
 		if (strncmp(flags, "NOBITS", 6)) {
 			sprintf(buf + strlen(buf), " %.*s", ((int)strlen(flags)-1), flags);	// remove trailing space
 		}

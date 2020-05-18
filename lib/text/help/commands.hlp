@@ -2248,6 +2248,7 @@ Toggles:
   compact - no extra newlines
   extra-spacing - adds an extra blank line after you type a command
   informative - informative map coloring -- HELP INFORMATIVE
+  loot-quality - shows superior/hard/group/boss info in inventory/equipment
   map-color - shut off color for just the map
   mortlog - see logs when people create characters
   no-empire - will not create a new empire when you try to claim or build
