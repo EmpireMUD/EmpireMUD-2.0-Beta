@@ -1012,7 +1012,11 @@ Usage:  identify <item | vehicle>
 This command provides detailed information about an item or vehicle.
 
 Tip: When trying to identify an item in your inventory that has the same name
-as something you are wearing, try using "1.name".
+as something you are wearing, try using '1.name'.
+
+Some items become something else (usually a more specific version of whatever
+they were) when you identify them. You can identify multiple items at a time
+if they have this property, e.g. 'identify all.rock'.
 
 See also: EIDENTIFY
 #
@@ -2244,6 +2248,8 @@ Toggles:
   compact - no extra newlines
   extra-spacing - adds an extra blank line after you type a command
   informative - informative map coloring -- HELP INFORMATIVE
+  item-details - shows level and some other information in inventory/equipment
+  item-quality - shows superior/hard/group/boss info in inventory/equipment
   map-color - shut off color for just the map
   mortlog - see logs when people create characters
   no-empire - will not create a new empire when you try to claim or build

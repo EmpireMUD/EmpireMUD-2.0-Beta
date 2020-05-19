@@ -644,6 +644,8 @@ const char *preference_bits[] = {
 	"TRAVEL-LOOK",
 	"AUTOCLIMB",
 	"AUTOSWIM",
+	"!ITEM-QUALITY",
+	"ITEM-DETAILS",
 	"\n"
 };
 
@@ -716,6 +718,9 @@ const struct toggle_data_type toggle_data[] = {
 	{ "shout", TOG_OFFON, PRF_DEAF, 0, NULL },
 	
 	{ "map-color", TOG_OFFON, PRF_NOMAPCOL, 0, tog_mapcolor },
+	{ "item-details", TOG_ONOFF, PRF_ITEM_DETAILS, 0, NULL },
+	{ "item-quality", TOG_ONOFF, PRF_ITEM_QUALITY, 0, NULL },
+	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
 	
 	// imm section
@@ -2046,6 +2051,7 @@ const char *mob_custom_types[] = {
 	"say-night",
 	"echo-day",
 	"echo-night",
+	"long-desc",
 	"\n"
 };
 
@@ -2309,25 +2315,25 @@ const char *extra_bits[] = {
 
 // OBJ_x (extra bits), part 2 -- shown in inventory/equipment list as flags
 const char *extra_bits_inv_flags[] = {
-	"(unique)",	// unique
+	"unique",	// unique
 	"",	// plantable
-	"(light)",
-	"(superior)",
-	"(large)",
+	"light",
+	"superior",
+	"large",
 	"",	// created
 	"",	// 1-use
 	"",	// slow
 	"",	// fast
-	"(enchanted)",
+	"enchanted",
 	"",	// junk
 	"",	// creatable
 	"",	// scalable
-	"(2h)",
-	"(boe)",
-	"(bop)",
+	"2h",
+	"BoE",
+	"BoP",
 	"",	// *
 	"",	// uncollected
-	"(keep)",
+	"keep",
 	"",	// *
 	"",	// *
 	"",	// !autostore
@@ -2768,6 +2774,7 @@ const char *bld_on_flags[] = {
 	"estuary",
 	"lake",	// 20
 	"base-terrain-allowed",
+	"giant-tree",
 	"\n"
 };
 
@@ -2778,6 +2785,7 @@ const bitvector_t bld_on_flags_order[] = {
 	BLD_ON_MOUNTAIN,
 	BLD_ON_FOREST,
 	BLD_ANY_FOREST,
+	BLD_ON_GIANT_TREE,
 	
 	// desert types
 	BLD_ON_DESERT,
@@ -3852,7 +3860,7 @@ const char *global_flags[] = {
 };
 
 
-// INTERACT_x, see also interact_vnum_types, interact_attach_types
+// INTERACT_x (1/3): names of interactions
 const char *interact_types[] = {
 	"BUTCHER",	// 0
 	"SKIN",
@@ -3882,20 +3890,12 @@ const char *interact_types[] = {
 	"SEED",	// 25
 	"DECAYS-TO",
 	"CONSUMES-TO",
+	"IDENTIFIES-TO",
 	"\n"
 };
 
 
-// INTERACT_RESTRICT_x: types of interaction restrictions
-const char *interact_restriction_types[] = {
-	"ability",
-	"ptech",
-	"tech",
-	"\n"
-};
-
-
-// INTERACT_x, see also interact_types, interact_vnum_types
+// INTERACT_x (2/3): what type of thing has this interaction
 const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_MOB,
 	TYPE_MOB,
@@ -3925,10 +3925,11 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// seed
 	TYPE_OBJ,	// decays-to
 	TYPE_OBJ,	// consumes-to
+	TYPE_OBJ,	// IDENTIFIES-TO
 };
 
 
-// INTERACT_x, see also interact_types, interact_attach_types
+// INTERACT_x (3/3): type of thing represented by interact->vnum
 const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,
 	TYPE_OBJ,
@@ -3958,6 +3959,20 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// seed
 	TYPE_OBJ,	// decays-to
 	TYPE_OBJ,	// consumes-to
+	TYPE_OBJ,	// IDENTIFIES-TO
+};
+
+
+// INTERACT_RESTRICT_x: types of interaction restrictions
+const char *interact_restriction_types[] = {
+	"ability",
+	"ptech",
+	"tech",
+	"normal",
+	"hard",
+	"group",
+	"boss",
+	"\n"
 };
 
 

@@ -332,9 +332,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	if (VEH_SITTING_ON(veh)) {
 		char_to_room(VEH_SITTING_ON(veh), to_room);
 		qt_visit_room(VEH_SITTING_ON(veh), IN_ROOM(VEH_SITTING_ON(veh)));
-		if (!IS_NPC(VEH_SITTING_ON(veh))) {
-			GET_LAST_DIR(VEH_SITTING_ON(veh)) = dir;
-		}
+		GET_LAST_DIR(VEH_SITTING_ON(veh)) = dir;
 		
 		if (VEH_SITTING_ON(veh) != VEH_DRIVER(veh)) {
 			snprintf(buf, sizeof(buf), "$V %s %s%s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], coord_display_room(VEH_SITTING_ON(veh), IN_ROOM(veh), FALSE));
@@ -1292,9 +1290,7 @@ ACMD(do_board) {
 		// move ch
 		char_to_room(ch, to_room);
 		qt_visit_room(ch, IN_ROOM(ch));
-		if (!IS_NPC(ch)) {
-			GET_LAST_DIR(ch) = NO_DIR;
-		}
+		GET_LAST_DIR(ch) = NO_DIR;
 		look_at_room(ch);
 		
 		// move ch: in-message
@@ -1318,9 +1314,7 @@ ACMD(do_board) {
 			}
 			
 			char_to_room(GET_LEADING_MOB(ch), to_room);
-			if (!IS_NPC(GET_LEADING_MOB(ch))) {
-				GET_LAST_DIR(GET_LEADING_MOB(ch)) = NO_DIR;
-			}
+			GET_LAST_DIR(GET_LEADING_MOB(ch)) = NO_DIR;
 			look_at_room(GET_LEADING_MOB(ch));
 			
 			if (!AFF_FLAGGED(GET_LEADING_MOB(ch), AFF_SNEAK)) {
@@ -1366,9 +1360,7 @@ ACMD(do_board) {
 
 			char_to_room(k->follower, to_room);
 			qt_visit_room(k->follower, IN_ROOM(k->follower));
-			if (!IS_NPC(k->follower)) {
-				GET_LAST_DIR(k->follower) = NO_DIR;
-			}
+			GET_LAST_DIR(k->follower) = NO_DIR;
 			look_at_room(k->follower);
 			
 			snprintf(buf, sizeof(buf), "$n %ss.", command);
@@ -1417,9 +1409,7 @@ ACMD(do_disembark) {
 		
 		char_to_room(ch, to_room);
 		qt_visit_room(ch, IN_ROOM(ch));
-		if (!IS_NPC(ch)) {
-			GET_LAST_DIR(ch) = NO_DIR;
-		}
+		GET_LAST_DIR(ch) = NO_DIR;
 		look_at_room(ch);
 		
 		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
@@ -1437,9 +1427,7 @@ ACMD(do_disembark) {
 			act("$n is led off.", TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
 			
 			char_to_room(GET_LEADING_MOB(ch), to_room);
-			if (!IS_NPC(GET_LEADING_MOB(ch))) {
-				GET_LAST_DIR(GET_LEADING_MOB(ch)) = NO_DIR;
-			}
+			GET_LAST_DIR(GET_LEADING_MOB(ch)) = NO_DIR;
 			look_at_room(GET_LEADING_MOB(ch));
 			
 			if (!AFF_FLAGGED(GET_LEADING_MOB(ch), AFF_SNEAK)) {
@@ -1482,9 +1470,7 @@ ACMD(do_disembark) {
 
 			char_to_room(k->follower, to_room);
 			qt_visit_room(k->follower, IN_ROOM(k->follower));
-			if (!IS_NPC(k->follower)) {
-				GET_LAST_DIR(k->follower) = NO_DIR;
-			}
+			GET_LAST_DIR(k->follower) = NO_DIR;
 			look_at_room(k->follower);
 			
 			if (!AFF_FLAGGED(k->follower, AFF_SNEAK)) {

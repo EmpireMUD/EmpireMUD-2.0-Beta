@@ -194,7 +194,7 @@ extern bool check_exclusion_set(struct interact_exclusion_data **set, char code,
 extern struct interact_exclusion_data *find_exclusion_data(struct interact_exclusion_data **set, char code);
 void free_exclusion_data(struct interact_exclusion_data *list);
 extern bool has_interaction(struct interaction_item *list, int type);
-extern bool meets_interaction_restrictions(struct interact_restriction *list, char_data *ch, empire_data *emp);
+extern bool meets_interaction_restrictions(struct interact_restriction *list, char_data *ch, empire_data *emp, char_data *inter_mob, obj_data *inter_item);
 extern bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func));
 extern bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func));
 extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func));
@@ -259,6 +259,8 @@ extern char *get_custom_message(struct custom_message *list, int type);
 extern bool has_custom_message(struct custom_message *list, int type);
 
 // custom message helpers
+#define mob_get_custom_message(mob, type)  get_custom_message(MOB_CUSTOM_MSGS(mob), type)
+#define mob_has_custom_message(mob, type)  has_custom_message(MOB_CUSTOM_MSGS(mob), type)
 #define obj_get_custom_message(obj, type)  get_custom_message(GET_OBJ_CUSTOM_MSGS(obj), type)
 #define obj_has_custom_message(obj, type)  has_custom_message(GET_OBJ_CUSTOM_MSGS(obj), type)
 #define abil_get_custom_message(abil, type)  get_custom_message(ABIL_CUSTOM_MSGS(abil), type)

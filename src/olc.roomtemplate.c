@@ -441,7 +441,7 @@ void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_room_template(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count;
 	
 	bitvector_t only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;;

@@ -235,10 +235,13 @@ bool delete_sector_from_evolutions(sector_vnum vnum, struct evolution_data **lis
 * @return char* The line to show (without a CRLF).
 */
 char *list_one_sector(sector_data *sect, bool detail) {
+	char clim[MAX_STRING_LENGTH], bfl[MAX_STRING_LENGTH];
 	static char output[MAX_STRING_LENGTH];
 	
 	if (detail) {
-		snprintf(output, sizeof(output), "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
+		ordered_sprintbit(GET_SECT_CLIMATE(sect), climate_flags, climate_flags_order, TRUE, clim);
+		ordered_sprintbit(GET_SECT_BUILD_FLAGS(sect), bld_on_flags, bld_on_flags_order, TRUE, bfl);
+		snprintf(output, sizeof(output), "[%5d] %s (%s) [%s]", GET_SECT_VNUM(sect), GET_SECT_NAME(sect), clim, bfl);
 	}
 	else {
 		snprintf(output, sizeof(output), "[%5d] %s", GET_SECT_VNUM(sect), GET_SECT_NAME(sect));
@@ -446,7 +449,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_sector(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t find_interacts = NOBITS, found_interacts, only_build = NOBITS;
 	bitvector_t find_evos = NOBITS, found_evos;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;

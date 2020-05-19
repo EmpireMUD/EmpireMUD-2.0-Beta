@@ -596,7 +596,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_building(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count;
 	
 	char only_icon[MAX_INPUT_LENGTH], only_commands[MAX_INPUT_LENGTH];

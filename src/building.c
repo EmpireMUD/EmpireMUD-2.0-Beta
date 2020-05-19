@@ -426,9 +426,7 @@ void disassociate_building(room_data *room) {
 			
 			// move people and contents
 			while ((temp_ch = ROOM_PEOPLE(iter))) {
-				if (!IS_NPC(temp_ch)) {
-					GET_LAST_DIR(temp_ch) = NO_DIR;
-				}
+				GET_LAST_DIR(temp_ch) = NO_DIR;
 				char_to_room(temp_ch, room);
 				msdp_update_room(temp_ch);
 			}
@@ -1113,9 +1111,7 @@ void start_dismantle_building(room_data *loc) {
 			}
 			for (targ = ROOM_PEOPLE(room); targ; targ = next_targ) {
 				next_targ = targ->next_in_room;
-				if (!IS_NPC(targ)) {
-					GET_LAST_DIR(targ) = NO_DIR;
-				}
+				GET_LAST_DIR(targ) = NO_DIR;
 				char_from_room(targ);
 				char_to_room(targ, loc);
 				msdp_update_room(targ);

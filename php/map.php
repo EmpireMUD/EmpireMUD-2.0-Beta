@@ -114,7 +114,7 @@ $data = array(
 	'E' => imagecolorallocate($im, 76, 0, 153),	// Deep Violet
 	'F' => imagecolorallocate($im, 0, 50, 0),	// Dark Dark Green / old-growth forest
 	'G' => imagecolorallocate($im, 85, 69, 0),	// dark brown / mountain peak
-	'H' => imagecolorallocate($im, 255, 232, 114),	// Rich Yellow
+	'H' => imagecolorallocate($im, 255, 232, 114),	// Deep Yellow
 	
 	);
 

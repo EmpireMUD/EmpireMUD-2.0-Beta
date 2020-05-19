@@ -252,6 +252,7 @@ void set_crop_type(room_data *room, crop_data *cp);
 // various externs
 extern int Global_ignore_dark;
 extern struct time_info_data time_info;
+extern byte y_coord_to_season[MAP_HEIGHT];
 
 
 // abilities

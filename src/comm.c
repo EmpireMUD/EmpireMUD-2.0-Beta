@@ -322,7 +322,6 @@ static void msdp_update(void) {
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
 	extern int move_gain(char_data *ch, bool info_only);
-	extern int pick_season(room_data *room);
 	extern int total_bonus_healing(char_data *ch);
 	extern int get_total_score(empire_data *emp);
 	extern const char *damage_types[];
@@ -515,7 +514,7 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_WORLD_DAY_OF_MONTH, time_info.day + 1);
 			MSDPSetString(d, eMSDP_WORLD_MONTH, month_name[(int)time_info.month]);
 			MSDPSetNumber(d, eMSDP_WORLD_YEAR, time_info.year);
-			MSDPSetString(d, eMSDP_WORLD_SEASON, seasons[pick_season(IN_ROOM(ch))]);
+			MSDPSetString(d, eMSDP_WORLD_SEASON, seasons[GET_SEASON(IN_ROOM(ch))]);
 			
 			// done -- send it
 			MSDPUpdate(d);

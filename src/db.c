@@ -128,6 +128,7 @@ int Global_ignore_dark = 0;	// For use in public channels
 int no_auto_deletes = 0;	// skip player deletes on boot?
 struct time_info_data time_info;	// the infomation about the time
 struct weather_data weather_info;	// the infomation about the weather
+byte y_coord_to_season[MAP_HEIGHT];	// what season a given y-coord is in, as set by determine_seasons()
 int wizlock_level = 0;	// level of game restriction
 char *wizlock_message = NULL;	// Message sent to people trying to connect
 
@@ -4719,6 +4720,8 @@ void assign_old_workforce_chore(empire_data *emp, int chore) {
 
 /* reset the time in the game from file */
 void reset_time(void) {
+	void determine_seasons();
+	
 	long beginning_of_time = data_get_long(DATA_WORLD_START);
 	
 	// a whole new world!
@@ -4758,6 +4761,8 @@ void reset_time(void) {
 		weather_info.sky = SKY_CLOUDY;
 	else
 		weather_info.sky = SKY_CLOUDLESS;
+	
+	determine_seasons();
 }
 
 

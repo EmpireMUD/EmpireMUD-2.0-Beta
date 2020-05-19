@@ -629,9 +629,7 @@ WCMD(do_wteleport) {
 			next_ch = ch->next_in_room;
 			if (!valid_dg_target(ch, DG_ALLOW_GODS)) 
 				continue;
-			if (!IS_NPC(ch)) {
-				GET_LAST_DIR(ch) = NO_DIR;
-			}
+			GET_LAST_DIR(ch) = NO_DIR;
 			char_from_room(ch);
 			char_to_room(ch, target);
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
@@ -660,9 +658,7 @@ WCMD(do_wteleport) {
 					if (!IS_NPC(ch) || (ch->master && !IS_NPC(ch->master))) {
 						char_from_room(ch);
 						char_to_room(ch, target);
-						if (!IS_NPC(ch)) {
-							GET_LAST_DIR(ch) = NO_DIR;
-						}
+						GET_LAST_DIR(ch) = NO_DIR;
 						enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 						qt_visit_room(ch, IN_ROOM(ch));
 						msdp_update_room(ch);	// once we're sure we're staying
@@ -674,9 +670,7 @@ WCMD(do_wteleport) {
 	else {
 		if ((ch = get_char_by_room(room, arg1))) {
 			if (valid_dg_target(ch, DG_ALLOW_GODS)) {
-				if (!IS_NPC(ch)) {
-					GET_LAST_DIR(ch) = NO_DIR;
-				}
+				GET_LAST_DIR(ch) = NO_DIR;
 				char_from_room(ch);
 				char_to_room(ch, target);
 				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);

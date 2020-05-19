@@ -1513,6 +1513,14 @@ obj_data *make_corpse(char_data *ch) {
 		}
 	}
 	
+	// flagging
+	if (MOB_FLAGGED(ch, MOB_HARD)) {
+		SET_BIT(GET_OBJ_EXTRA(corpse), OBJ_HARD_DROP);
+	}
+	if (MOB_FLAGGED(ch, MOB_GROUP)) {
+		SET_BIT(GET_OBJ_EXTRA(corpse), OBJ_GROUP_DROP);
+	}
+	
 	if (human) {
 		sprintf(kws, "%s %s %s", GET_OBJ_KEYWORDS(corpse), skip_filler(PERS(ch, ch, FALSE)), size_data[size].corpse_keywords);
 		sprintf(shortdesc, "%s's body", PERS(ch, ch, FALSE));
@@ -1533,7 +1541,7 @@ obj_data *make_corpse(char_data *ch) {
 
 	GET_OBJ_VAL(corpse, VAL_CORPSE_IDNUM) = IS_NPC(ch) ? GET_MOB_VNUM(ch) : (-1 * GET_IDNUM(ch));
 	GET_OBJ_VAL(corpse, VAL_CORPSE_SIZE) = size;
-	GET_OBJ_VAL(corpse, VAL_CORPSE_FLAGS) = 0;
+	GET_OBJ_VAL(corpse, VAL_CORPSE_FLAGS) = (MOB_FLAGGED(ch, MOB_NO_LOOT) ? CORPSE_NO_LOOT : NOBITS);
 		
 	if (human) {
 		SET_BIT(GET_OBJ_VAL(corpse, VAL_CORPSE_FLAGS), CORPSE_HUMAN);

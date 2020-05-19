@@ -409,94 +409,6 @@ char *get_room_name(room_data *room, bool color) {
 }
 
 
-/**
-* determines which tileset to use for sector color...
-*
-* This function is designed to do 3 things using a lot of math:
-*  1. Past the arctic line, always Winter.
-*  2. Between the tropics, alternate Spring, Summer, Autumn (no Winter).
-*  3. Everywhere else, seasons are based on time of year, and gradually move
-*     North/South each day. There should always be a boundary between the
-*     Summer and Winter regions (thus all the squirrelly numbers).
-*
-* A near-copy of this function exists in util/evolve.c for map evolutions.
-*
-* @param room_data *room The room to get a season for.
-* @return int TILESET_ const for the chosen season.
-*/
-int pick_season(room_data *room) {
-	int ycoord = Y_COORD(room), y_max, day_of_year;
-	double a_slope, b_slope, y_arctic, y_tropics, half_y;
-	double latitude = Y_TO_LATITUDE(ycoord);
-	bool northern = (latitude >= 0);
-	
-	// month 0 is january; year is 0-359 days
-	
-	// tropics? -- take half the tropic value, convert to percent, multiply by map height
-	if (ABSOLUTE(latitude) < TROPIC_LATITUDE) {
-		if (time_info.month < 2) {
-			return TILESET_SPRING;
-		}
-		else if (time_info.month >= 10) {
-			return TILESET_AUTUMN;
-		}
-		else {
-			return TILESET_SUMMER;
-		}
-	}
-	
-	// arctic? -- take half the arctic value, convert to percent, check map edges
-	if (ABSOLUTE(latitude) > ARCTIC_LATITUDE) {
-		return TILESET_WINTER;
-	}
-	
-	// all other regions: first split the map in half (we'll invert for the south)
-	y_max = 90;	// based on 90 degrees latitude
-	day_of_year = time_info.month * 30 + time_info.day;
-	
-	if (northern) {
-		y_arctic = ARCTIC_LATITUDE;
-		y_tropics = TROPIC_LATITUDE;
-		a_slope = ((y_arctic - 1) - (y_tropics + 1)) / 120.0;	// basic slope of the seasonal gradient
-		b_slope = ((y_arctic - 1) - (y_tropics + 1)) / 90.0;
-		half_y = latitude - y_tropics; // simplify by moving the y axis to match the tropics line
-	}
-	else {
-		y_arctic = y_max - ARCTIC_LATITUDE;
-		y_tropics = y_max - TROPIC_LATITUDE;
-		a_slope = ((y_tropics - 1) - (y_arctic + 1)) / 120.0;	// basic slope of the seasonal gradient
-		b_slope = ((y_tropics - 1) - (y_arctic + 1)) / 90.0;
-		half_y = y_max - ABSOLUTE(latitude) - y_arctic;	// adjust to remove arctic
-	}
-	
-	if (day_of_year < 6 * 30) {	// first half of year
-		if (half_y >= (day_of_year + 1) * a_slope) {	// first winter line
-			return northern ? TILESET_WINTER : TILESET_SUMMER;
-		}
-		else if (half_y >= (day_of_year - 89) * b_slope) {	// spring line
-			return northern ? TILESET_SPRING : TILESET_AUTUMN;
-		}
-		else {
-			return northern ? TILESET_SUMMER : TILESET_WINTER;
-		}
-	}
-	else {	// 2nd half of year
-		if (half_y >= (day_of_year - 360) * -a_slope) {	// second winter line
-			return northern ? TILESET_WINTER : TILESET_SUMMER;
-		}
-		else if (half_y >= (day_of_year - 268) * -b_slope) {	// autumn line
-			return northern ? TILESET_AUTUMN : TILESET_SPRING;
-		}
-		else {
-			return northern ? TILESET_SUMMER : TILESET_WINTER;
-		}
-	}
-	
-	// fail? we should never reach this
-	return TILESET_SUMMER;
-}
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// MAPPC FUNCTIONS /////////////////////////////////////////////////////////
 
@@ -1344,7 +1256,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	struct empire_city_data *city;
 	int iter;
 	empire_data *emp, *chemp = GET_LOYALTY(ch);
-	int tileset = pick_season(to_room);
+	int tileset = GET_SEASON(to_room);
 	struct icon_data *base_icon, *icon, *crop_icon = NULL;
 	bool junk, enchanted, hidden = FALSE, painted;
 	crop_data *cp = ROOM_CROP(to_room);

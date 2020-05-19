@@ -456,10 +456,12 @@ When using field  - The variable returns:
 &cis_pc&0 - Checks if the actor is a player. Useful when you want a trigger
    to fire on players and not mobs.
 &clastname&0 - The actor's last name (empty for mobs).
+&clast_move_dir&0 - The last direction moved, if any (empty if none).
 &clearned(vnum)&0 - Whether the actor has learned a recipe vnum.
 &clevel&0 - The actor's computed level (or scaled level, for mobs).
 &clink_instance&0 - Marks this mob as belonging to the adventure instance of
    the room it's currently in.
+&clongdesc&0 - The mob's long description.
 &cmana&0 - The current mana points of the actor.
 &cmana(amount)&0 - Add/subtract mana on the actor.
 &cmaster&0 - The master of the actor (as an id), or an empty return.

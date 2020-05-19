@@ -194,36 +194,67 @@ void evolve_one(struct map_t *tile) {
 }
 
 
-// evolutions that spread TO other tiles, rather than FROM
+/**
+* Evolutions that spread TO other tiles, rather than FROM. These do not use
+* get_evo_by_type because more than one of them is allowed to run at once.
+*
+* @param struct map_t *tile The tile to spread from.
+* @return int The number of adjacent tiles that changed.
+*/
 int spread_one(struct map_t *tile) {
+	sector_vnum become = NOTHING, old, vnum;
 	struct evolution_data *evo;
-	sector_vnum become = NOTHING, old;
-	struct map_t *to_room, *found_room;
-	sector_data *new_sect;
-	int iter, count, changed = 0;
+	sector_data *new_sect, *st;
+	bool done_dir[NUM_2D_DIRS];
+	struct map_t *to_room;
+	int dir, changed = 0;
 	
-	if ((evo = get_evo_by_type(tile->sector_type, EVO_SPREADS_TO))) {
-		found_room = NULL;
-		count = 0;
-		
-		for (iter = 0; iter < NUM_2D_DIRS; ++iter) {
-			to_room = shift_tile(tile, shift_dir[iter][0], shift_dir[iter][1]);
-			if (to_room && to_room->sector_type == evo->value && !IS_SET(to_room->affects, ROOM_AFF_NO_EVOLVE)) {
-				// spreadable... choose a direction randomly
-				if (!number(0, count++) || !found_room) {
-					found_room = to_room;
-				}
-			}
+	
+	// load the sector
+	vnum = tile ? tile->sector_type : NOTHING;
+	HASH_FIND_INT(sector_table, &vnum, st);
+	if (!st) {
+		return 0;
+	}
+	
+	// initialize done_dir: This keeps us from evolving any adjacent tile more than once
+	for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
+		done_dir[dir] = FALSE;
+	}
+	
+	// this iterates instead of using get_evo_by_type because more than one 100%
+	// evolution can run here
+	LL_FOREACH(GET_SECT_EVOS(st), evo) {
+		if (evo->type != EVO_SPREADS_TO || (number(1, 10000) > ((int) 100 * evo->percent))) {
+			continue;	// wrong type or missed % chance
 		}
 		
-		if (found_room) {
+		// try the evo
+		for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
+			if (done_dir[dir]) {
+				continue;	// don't re-evolve a dir we already evolved
+			}
+			if (!(to_room = shift_tile(tile, shift_dir[dir][0], shift_dir[dir][1]))) {
+				continue;	// no room that way
+			}
+			if (to_room->sector_type != evo->value || IS_SET(to_room->affects, ROOM_AFF_NO_EVOLVE)) {
+				continue;	// wrong sect that way, or can't evolve it
+			}
+			
+			// seems valid -- 1 last check
+			if (changed > 0 && (number(1, 10000) > ((int) 100 * evo->percent))) {
+				continue;	// if this isn't the first valid match, run the percent again for the additional tile
+			}
+			
+			// apply it!
 			become = evo->becomes;
 			HASH_FIND_INT(sector_table, &become, new_sect);
 			if (become != NOTHING && new_sect) {
-				old = found_room->sector_type;
-				found_room->sector_type = become;
-				write_tile(found_room, old);
+				old = to_room->sector_type;
+				to_room->sector_type = become;
+				write_tile(to_room, old);
 				++changed;
+				done_dir[dir] = TRUE;
 			}
 		}
 	}
@@ -948,7 +979,7 @@ int map_distance(struct map_t *start, struct map_t *end) {
 /**
 * Calculates which season it is at a given location.
 *
-* Note: This is copied from mapview.c pick_season() (with only variable changes).
+* Note: This is copied from weather.c determine_seasons() (with only minor logical changes).
 *
 * @param struct map_t *tile The tile to find a season for.
 * @return int TILESET_ const for the chosen season.

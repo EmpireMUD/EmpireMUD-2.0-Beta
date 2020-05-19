@@ -115,16 +115,17 @@
 #define WRAP_Y  FALSE	// whether the mud wraps north-south
 
 
-// What range of a 'real world' is covered by this map (-90 to 90 is the maximum range of latitudes)
-#define Y_MIN_LATITUDE  -71	// 0 is the equator, -66.56 is the anarctic circle
-#define Y_MAX_LATITUDE  71	// 66.56 is the arctic circle, 90 is the north pole
+// What range of a 'real world' is covered by this map (-90 to 90 is the maximum range of latitudes; degrees south are represented as a negative number)
+// Y_MAX_LATITUDE must always be the further north of the two:
+#define Y_MIN_LATITUDE  -67	// 0 is the equator, -66.56 is the anarctic circle
+#define Y_MAX_LATITUDE  67	// 66.56 is the arctic circle, 90 is the north pole
 
+// these can safely be floating points
 #define ARCTIC_LATITUDE  66.56	// based on the real world
 #define TROPIC_LATITUDE  23.43	// based on the real world
 
 // converts a Y-coordinate to the equivalent latitude, based on Y_MIN_LATITUDE/Y_MAX_LATITUDE
-#define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * (ABSOLUTE(Y_MIN_LATITUDE) + ABSOLUTE(Y_MAX_LATITUDE))) + Y_MIN_LATITUDE)
-
+#define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * ABSOLUTE(Y_MAX_LATITUDE - Y_MIN_LATITUDE)) + Y_MIN_LATITUDE)
 
 #define COIN_VALUE  0.1	// value of a coin as compared to 1 wealth (0.1 coin value = 10 coins per wealth)
 
@@ -373,13 +374,18 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_SEED  25
 #define INTERACT_DECAYS_TO  26
 #define INTERACT_CONSUMES_TO  27
-#define NUM_INTERACTS  28
+#define INTERACT_IDENTIFIES_TO  28
+#define NUM_INTERACTS  29
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
 #define INTERACT_RESTRICT_ABILITY  0	// player must have an ability
 #define INTERACT_RESTRICT_PTECH  1	// player must have a ptech
 #define INTERACT_RESTRICT_TECH  2	// empire must have a tech
+#define INTERACT_RESTRICT_NORMAL  3	// only when mob/obj is not hard/group
+#define INTERACT_RESTRICT_HARD  4	// only when mob/obj is 'hard' (but not group)
+#define INTERACT_RESTRICT_GROUP  5	// only when mob/obj is 'group' (but not hard)
+#define INTERACT_RESTRICT_BOSS  6	// only when mob/obj is 'hard' (hard + group)
 
 
 // for object saving
@@ -769,6 +775,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_ESTUARY  BIT(19)
 #define BLD_ON_LAKE  BIT(20)
 #define BLD_ON_BASE_TERRAIN_ALLOWED  BIT(21)	// for facing-only, allows the base sector to match
+#define BLD_ON_GIANT_TREE  BIT(22)
 
 
 // BLD_REL_x: relationships with other buildings
@@ -1515,6 +1522,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_CUSTOM_SAY_NIGHT  3
 #define MOB_CUSTOM_ECHO_DAY  4
 #define MOB_CUSTOM_ECHO_NIGHT  5
+#define MOB_CUSTOM_LONG_DESC  6	// random long descs
 
 
 // MOB_MOVE_x: mob/vehicle movement types
@@ -1582,10 +1590,12 @@ typedef struct vehicle_data vehicle_data;
 #define CONT_CLOSED  BIT(1)	// Container is closed
 
 
-// Corpse flags -- limited to 31 because of int type in obj value
+// CORPSE_x: Corpse flags -- limited to 31 because of int type in obj value
 #define CORPSE_EATEN  BIT(0)	// The corpse is part-eaten
 #define CORPSE_SKINNED  BIT(1)	// The corpse has been skinned
 #define CORPSE_HUMAN  BIT(2)	// a person
+#define CORPSE_NO_LOOT  BIT(3)	// cannot butcher/skin due to !LOOT flag
+
 
 // ITEM_x: Item types
 #define ITEM_UNDEFINED  0
@@ -2122,6 +2132,8 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_TRAVEL_LOOK  BIT(35)	// auto-looks each time you run or move a vehicle
 #define PRF_AUTOCLIMB  BIT(36)	// will enter mountains without 'climb'
 #define PRF_AUTOSWIM  BIT(37)	// will enter water without 'swim'
+#define PRF_ITEM_QUALITY  BIT(38)	// shows loot quality color/tag in inv/eq
+#define PRF_ITEM_DETAILS  BIT(39)	// shows additional item details on inv/eq
 // note: if you add prefs, consider adding them to alt_import_preferences()
 
 
@@ -2418,7 +2430,7 @@ typedef struct vehicle_data vehicle_data;
 #define TILESET_SPRING  1
 #define TILESET_SUMMER  2
 #define TILESET_AUTUMN  3
-#define TILESET_WINTER  4
+#define TILESET_WINTER  4	// winter must be the last season for reasons that appear if you search TILESET_WINTER
 #define NUM_TILESETS  5	// total
 
 
@@ -3090,6 +3102,14 @@ struct trading_post_data {
 	empire_vnum coin_type;	// empire vnum or OTHER_COIN for buy/post coins
 	
 	struct trading_post_data *next;	// LL
+};
+
+
+// simple structure for passing around a list of vnums
+struct vnum_hash {
+	any_vnum vnum;
+	int count;
+	UT_hash_handle hh;
 };
 
 
@@ -3989,7 +4009,6 @@ struct player_special_data {
 	room_vnum load_room_check;	// this is the home room of the player's loadroom, used to check that they're still in the right place
 	room_vnum last_room;	// useful when dead
 	room_vnum tomb_room;	// location of player's chosen tomb
-	byte last_direction;	// used for walls and movement
 	int recent_death_count;	// for death penalty
 	long last_death_time;	// for death counts
 	int last_corpse_id;	// DG Scripts obj id of last corpse
@@ -4116,6 +4135,7 @@ struct char_special_data {
 	bitvector_t affected_by;	// Bitvector for spells/skills affected by
 	morph_data *morph;	// for morphed people
 	obj_vnum rope_vnum;	// for tied-up people
+	byte last_direction;	// used for walls and movement
 
 	// UNSAVED SECTION //
 	

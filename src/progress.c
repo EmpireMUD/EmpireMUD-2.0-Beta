@@ -2279,7 +2279,7 @@ void olc_delete_progress(char_data *ch, any_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_progress(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t  find_tasks = NOBITS, found_tasks, find_perks = NOBITS, found_perks;
 	int count, only_cost = NOTHING, only_value = NOTHING, only_type = NOTHING;

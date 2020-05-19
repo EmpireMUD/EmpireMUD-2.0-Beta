@@ -5432,10 +5432,8 @@ bool is_deep_mine(room_data *room) {
 */
 void lock_icon(room_data *room, struct icon_data *use_icon) {
 	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
-	extern int pick_season(room_data *room);
 	
 	struct icon_data *icon;
-	int season;
 
 	// don't do it if a custom icon is set (or no room provided)
 	if (!room || ROOM_CUSTOM_ICON(room)) {
@@ -5443,8 +5441,7 @@ void lock_icon(room_data *room, struct icon_data *use_icon) {
 	}
 
 	if (!(icon = use_icon)) {
-		season = pick_season(room);
-		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), season);
+		icon = get_icon_from_set(GET_SECT_ICONS(SECT(room)), GET_SEASON(room));
 	}
 	ROOM_CUSTOM_ICON(room) = str_dup(icon->icon);
 }
@@ -5617,6 +5614,51 @@ int Y_COORD(room_data *room) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISC UTILS //////////////////////////////////////////////////////////////
+
+/**
+* Adds an entry to a vnum hash. This is a general tool for listing/counting
+* unique vnums. Example:
+*   struct vnum_hash *my_hash = NULL;	// initialize to null
+*	add_vnum_hash(&my_hash, 123, 1);	// add items
+*   HASH_ITER(hh, my_hash, iter, next) { ... }	// use hash
+*   free_vnum_hash(&my_hash);	// free when done
+*
+* @param struct vnum_hash **hash A pointer to the hash we're adding to.
+* @param any_vnum vnum The vnum to add.
+* @param int count How many to add (usually 1, but you can add any amount including a negative).
+*/
+void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count) {
+	struct vnum_hash *item = NULL;
+	
+	if (hash) {
+		HASH_FIND_INT(*hash, &vnum, item);
+		if (!item) {
+			CREATE(item, struct vnum_hash, 1);
+			item->vnum = vnum;
+			HASH_ADD_INT(*hash, vnum, item);
+		}
+	}
+	
+	SAFE_ADD(item->count, count, INT_MIN, INT_MAX, FALSE);
+}
+
+
+/**
+* Frees a vnum_hash when you're done with it.
+*
+* @param struct vnum_hash **hash The vnum hash to free.
+*/
+void free_vnum_hash(struct vnum_hash **hash) {
+	struct vnum_hash *iter, *next;
+	
+	if (hash) {
+		HASH_ITER(hh, *hash, iter, next) {
+			HASH_DEL(*hash, iter);
+			free(iter);
+		}
+	}
+}
+
 
 /**
 * Gets a string fragment if an obj is shared (by someone other than ch). This

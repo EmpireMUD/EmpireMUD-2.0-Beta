@@ -3759,6 +3759,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "lastname")) {
 						snprintf(str, slen, "%s", IS_NPC(c) ? "" : GET_LASTNAME(c)); 
 					}
+					else if (!str_cmp(field, "last_move_dir")) {
+						snprintf(str, slen, "%s", GET_LAST_DIR(c) != NO_DIR ? dirs[GET_LAST_DIR(c)] : "");
+					}
 					else if (!str_cmp(field, "learned")) {
 						extern bool has_learned_craft(char_data *ch, any_vnum vnum);
 						
@@ -3786,6 +3789,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 						}
 						*str = '\0';
+					}
+					else if (!str_cmp(field, "longdesc")) {
+						snprintf(str, slen, "%s", GET_LONG_DESC(c));
+						// trim trailing CRLFs
+						while (strchr("\r\n", str[strlen(str)-1])) {
+							str[strlen(str)-1] = '\0';
+						}
 					}
 					break;
 				}
@@ -5084,7 +5094,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'p': {	// room.p*
-					if (!str_cmp(field, "people")) {
+					if (!str_cmp(field, "players_present")) {
+						snprintf(str, slen, "%d", any_players_in_room(r) ? 1 : 0);
+					}
+					else if (!str_cmp(field, "people")) {
 						char_data *temp_ch;
 				
 						// attempt to prevent extracted people from showing in lists
@@ -5127,10 +5140,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 's': {	// room.s*
 					if (!str_cmp(field, "season")) {
-						extern int pick_season(room_data *room);
 						extern const char *icon_types[];
-						int season = pick_season(r);
-						snprintf(str, slen, "%s", icon_types[season]);
+						snprintf(str, slen, "%s", icon_types[GET_SEASON(r)]);
 						*str = LOWER(*str);
 					}
 					else if (!str_cmp(field, "sector")) {

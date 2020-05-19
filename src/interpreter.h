@@ -274,6 +274,7 @@ struct alias_data {
 
 
 // obj desc flags
+// TODO: consider a config array for these, to set which ones show level/tags/colors, as well as what flags not to show
 #define OBJ_DESC_LONG  0	// long desc: in room
 #define OBJ_DESC_SHORT  1	// short desc: inventory, misc
 #define OBJ_DESC_CONTENTS  2	// short desc: is in an object

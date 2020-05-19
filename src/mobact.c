@@ -1202,8 +1202,6 @@ void spawn_mobs_from_center(room_data *center) {
 * @return bool TRUE if the spawn matches; FALSE if not.
 */
 bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city) {
-	extern int pick_season(room_data *room);
-	
 	room_data *home;
 	int season;
 	
@@ -1266,7 +1264,7 @@ bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coo
 	
 	// validate seasons -- if any are set
 	if (IS_SET(spawn_flags, SPAWN_SPRING_ONLY | SPAWN_SUMMER_ONLY | SPAWN_AUTUMN_ONLY | SPAWN_WINTER_ONLY)) {
-		season = pick_season(room);
+		season = GET_SEASON(room);
 		if (!((IS_SET(spawn_flags, SPAWN_SPRING_ONLY) && season == TILESET_SPRING) || (IS_SET(spawn_flags, SPAWN_SUMMER_ONLY) && season == TILESET_SUMMER) || (IS_SET(spawn_flags, SPAWN_AUTUMN_ONLY) && season == TILESET_AUTUMN) || (IS_SET(spawn_flags, SPAWN_WINTER_ONLY) && season == TILESET_WINTER))) {
 			// none of the seasons match (only 1 must match)
 			return FALSE;

@@ -732,9 +732,7 @@ void perform_transport(char_data *ch, room_data *to_room) {
 	char_to_room(ch, to_room);
 	qt_visit_room(ch, to_room);
 	look_at_room(ch);
-	if (!IS_NPC(ch)) {
-		GET_LAST_DIR(ch) = NO_DIR;
-	}
+	GET_LAST_DIR(ch) = NO_DIR;
 
 	act("$n materializes in front of you!", TRUE, ch, 0, 0, TO_ROOM);
 	
@@ -1137,9 +1135,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	
 	// update visit and last-dir
 	qt_visit_room(ch, to_room);
-	if (!IS_NPC(ch)) {
-		GET_LAST_DIR(ch) = NO_DIR;
-	}
+	GET_LAST_DIR(ch) = NO_DIR;
 	
 	// see if there's a different portal on the other end
 	use_portal = find_back_portal(to_room, was_in, portal);
@@ -1213,7 +1209,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
 	char lbuf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	room_data *was_in = IN_ROOM(ch), *from_room;
-	int need_movement, move_type, reverse = (IS_NPC(ch) || GET_LAST_DIR(ch) == NO_DIR) ? NORTH : rev_dir[(int) GET_LAST_DIR(ch)];
+	int need_movement, move_type, reverse = (GET_LAST_DIR(ch) == NO_DIR) ? NORTH : rev_dir[(int) GET_LAST_DIR(ch)];
 	char_data *animal = NULL, *vict;
 	
 	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
@@ -1221,7 +1217,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 		return FALSE;
 	}
 	
-	if (IS_INJURED(ch, INJ_TIED)) {
+	if (IS_INJURED(ch, INJ_TIED) || GET_HEALTH(ch) < 1) {
 		msg_to_char(ch, "You can't seem to move!\r\n");
 		return FALSE;
 	}
@@ -1281,7 +1277,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	}
 	
 	// unfinished tunnel
-	if ((BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_TUNNEL || BUILDING_VNUM(IN_ROOM(ch)) == RTYPE_TUNNEL) && (IS_NPC(ch) || GET_LAST_DIR(ch) != NO_DIR) && !IS_COMPLETE(IN_ROOM(ch)) && !IS_SET(flags, MOVE_EARTHMELD) && !REAL_NPC(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && (!IS_NPC(ch) && dir != rev_dir[(int) GET_LAST_DIR(ch)])) {
+	if ((BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_TUNNEL || BUILDING_VNUM(IN_ROOM(ch)) == RTYPE_TUNNEL) && GET_LAST_DIR(ch) != NO_DIR && !IS_COMPLETE(IN_ROOM(ch)) && !IS_SET(flags, MOVE_EARTHMELD) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && dir != rev_dir[(int) GET_LAST_DIR(ch)]) {
 		msg_to_char(ch, "The tunnel is incomplete. You can only go back %s.\r\n", dirs[get_direction_for_char(ch, rev_dir[(int) GET_LAST_DIR(ch)])]);
 		return FALSE;
 	}
@@ -1412,9 +1408,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	add_tracks(ch, was_in, dir);
 	mark_move_time(ch);
 
-	if (!IS_NPC(ch)) {
-		GET_LAST_DIR(ch) = dir;
-	}
+	GET_LAST_DIR(ch) = dir;
 
 	// cancel some actions on movement
 	if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && !IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ANYWHERE) && GET_ACTION_ROOM(ch) != GET_ROOM_VNUM(IN_ROOM(ch)) && GET_ACTION_ROOM(ch) != NOWHERE) {
@@ -1803,9 +1797,7 @@ ACMD(do_circle) {
 	char_to_room(ch, found_room);
 	qt_visit_room(ch, IN_ROOM(ch));
 	
-	if (!IS_NPC(ch)) {
-		GET_LAST_DIR(ch) = dir;
-	}
+	GET_LAST_DIR(ch) = dir;
 	
 	if (ch->desc) {
 		look_at_room(ch);

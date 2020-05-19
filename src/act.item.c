@@ -323,6 +323,113 @@ int get_wear_by_item_wear(bitvector_t item_wear) {
 }
 
 
+
+/**
+* Interaction func for "identify".
+*/
+INTERACTION_FUNC(identifies_to_interact) {
+	char to_char[MAX_STRING_LENGTH];
+	obj_data *new_obj;
+	int iter;
+	
+	// flags to keep on identifies-to
+	bitvector_t preserve_flags = OBJ_SEEDED | OBJ_CREATED | OBJ_KEEP;
+	
+	if (interaction->quantity > 1) {
+		snprintf(to_char, sizeof(to_char), "%s turns out to be %s (x%d)!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum), interaction->quantity);
+	}
+	else {	// only 1
+		snprintf(to_char, sizeof(to_char), "%s turns out to be %s!", GET_OBJ_SHORT_DESC(inter_item), get_obj_name_by_proto(interaction->vnum));
+	}
+	act(to_char, FALSE, ch, NULL, NULL, TO_CHAR | TO_QUEUE);
+	
+	if (GET_LOYALTY(ch)) {
+		// add the gained items (the original item is subtracted in do_identify)
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+	}
+	
+	for (iter = 0; iter < interaction->quantity; ++iter) {
+		new_obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(new_obj, GET_OBJ_CURRENT_SCALE_LEVEL(inter_item));
+	
+		if (GET_OBJ_TIMER(new_obj) != UNLIMITED && GET_OBJ_TIMER(inter_item) != UNLIMITED) {
+			GET_OBJ_TIMER(new_obj) = MIN(GET_OBJ_TIMER(new_obj), GET_OBJ_TIMER(inter_item));
+		}
+		
+		// copy these flags, if any
+		SET_BIT(GET_OBJ_EXTRA(new_obj), (GET_OBJ_EXTRA(inter_item) & preserve_flags));
+		
+		// ownership
+		new_obj->last_owner_id = GET_IDNUM(ch);
+		new_obj->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
+	
+		// put it somewhere
+		if (CAN_WEAR(new_obj, ITEM_WEAR_TAKE)) {
+			obj_to_char(new_obj, ch);
+		}
+		else {
+			obj_to_room(new_obj, IN_ROOM(ch));
+		}
+		load_otrigger(new_obj);
+	}
+	
+	return TRUE;
+}
+
+
+/**
+* Runs the identifies-to interactions on an object, if any. This may change
+* the object. In some cases it will extract the object itself. In other cases,
+* the object must be extracted after the identify.
+*
+* @param char_data *ch The player identifying the object.
+* @param obj_data **obj A pointer to the obj pointer (because the object may change during this function).
+* @param bool *extract A pointer to a boolean. If it sets this bool to TRUE, 'obj' must be extracted afterwards. If FALSE, any extractions were already handled.
+* @return bool TRUE if an object changed, FALSE if not.
+*/
+bool run_identifies_to(char_data *ch, obj_data **obj, bool *extract) {
+	obj_data *first_inv, *first_room;
+	bool result = FALSE;
+	
+	if (!ch || !obj || !*obj) {
+		return result;	// no work
+	}
+	
+	*extract = FALSE;
+	
+	// for detecting the change
+	first_inv = ch->carrying;
+	first_room = ROOM_CONTENTS(IN_ROOM(ch));
+	
+	if (run_interactions(ch, GET_OBJ_INTERACTIONS(*obj), INTERACT_IDENTIFIES_TO, IN_ROOM(ch), NULL, *obj, identifies_to_interact)) {
+		result = TRUE;
+		
+		if (GET_LOYALTY(ch)) {
+			// subtract old item from empire counts
+			add_production_total(GET_LOYALTY(ch), GET_OBJ_VNUM(*obj), -1);
+		}
+	
+		// did have one
+		if (first_inv != ch->carrying) {
+			extract_obj(*obj);	// done with the old obj
+			*obj = ch->carrying;	// idenify this obj instead
+			*extract = FALSE;
+		}
+		else if (first_room != ROOM_CONTENTS(IN_ROOM(ch))) {
+			extract_obj(*obj);	// done with the old obj
+			*obj = ROOM_CONTENTS(IN_ROOM(ch));	// idenify this obj instead
+			*extract = FALSE;
+		}
+		else {
+			// otherwise will still identify this object but then will extract it after
+			*extract = TRUE;
+		}
+	}
+	
+	return result;
+}
+
+
 /**
 * Shows an "identify" of the object -- its stats -- to a player.
 *
@@ -330,6 +437,7 @@ int get_wear_by_item_wear(bitvector_t item_wear) {
 * @param char_data *ch The person to show the data to.
 */
 void identify_obj_to_char(obj_data *obj, char_data *ch) {
+	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 	void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
 	
 	extern double get_base_dps(obj_data *weapon);
@@ -347,10 +455,13 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *tool_flags[];
 	extern const char *wear_bits[];
 
+	struct vnum_hash *vhash = NULL, *vhash_iter, *vhash_next;
+	bld_data *bld, *bld_iter, *next_bld;
 	struct obj_storage_type *store;
 	craft_data *craft, *next_craft;
 	struct custom_message *ocm;
 	struct player_eq_set *pset;
+	struct bld_relation *relat;
 	player_index_data *index;
 	struct eq_set_obj *oset;
 	struct obj_apply *apply;
@@ -359,7 +470,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	generic_data *comp = NULL;
 	obj_data *proto;
 	crop_data *cp;
-	bld_data *bld;
 	int found;
 	double rating;
 	bool any;
@@ -409,14 +519,34 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 
 	if (GET_OBJ_STORAGE(obj) && !OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
-		msg_to_char(ch, "Storage locations:");
-		found = 0;
 		for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {			
 			if ((bld = building_proto(store->building_type))) {
-				msg_to_char(ch, "%s%s", (found++ > 0 ? ", " : " "), GET_BLD_NAME(bld));
+				add_vnum_hash(&vhash, GET_BLD_VNUM(bld), 1);
+				
+				// check stores-like relations
+				HASH_ITER(hh, building_table, bld_iter, next_bld) {
+					LL_FOREACH(GET_BLD_RELATIONS(bld_iter), relat) {
+						if (relat->type == BLD_REL_STORES_LIKE && relat->vnum == GET_BLD_VNUM(bld)) {
+							add_vnum_hash(&vhash, GET_BLD_VNUM(bld_iter), 1);
+						}
+					}
+				}
 			}
-		}		
-		msg_to_char(ch, "\r\n");
+		}
+		
+		snprintf(lbuf, sizeof(lbuf), "Storage locations:");
+		found = 0;
+		HASH_ITER(hh, vhash, vhash_iter, vhash_next) {
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s", (found++ > 0 ? ", " : " "), get_bld_name_by_proto(vhash_iter->vnum));
+		}
+		free_vnum_hash(&vhash);
+		if (strlen(lbuf) < sizeof(lbuf) + 2) {
+			strcat(lbuf, "\r\n");
+		}
+		temp = str_dup(lbuf);
+		format_text(&temp, 0, NULL, MAX_STRING_LENGTH);
+		send_to_char(temp, ch);
+		free(temp);
 	}
 	if (UNIQUE_OBJ_CAN_STORE(obj)) {
 		msg_to_char(ch, "Storage location: Warehouse\r\n");
@@ -696,6 +826,11 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			}
 		}
 		msg_to_char(ch, "%s\r\n", any ? "" : " none");
+	}
+	
+	// this only happens if they identify it somewhere that identifies-to can't happen
+	if (has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_IDENTIFIES_TO)) {
+		msg_to_char(ch, "This item has a chance to become something else when identified in your inventory.\r\n");
 	}
 }
 
@@ -5312,35 +5447,127 @@ ACMD(do_grab) {
 
 
 ACMD(do_identify) {
+	obj_data *obj, *next_obj, *list[2];
+	bool any, extract = FALSE;
 	char_data *tmp_char;
 	vehicle_data *veh;
-	obj_data *obj;
+	int dotmode, iter;
 	
 	one_argument(argument, arg);
 	
 	if (GET_POS(ch) == POS_FIGHTING) {
 		msg_to_char(ch, "You're too busy to do that now!\r\n");
+		return;
 	}
-	else if (!*arg) {
+	if (!*arg) {
 		msg_to_char(ch, "Identify what object?\r\n");
+		return;
 	}
-	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &obj, &veh)) {
-		msg_to_char(ch, "You see nothing like that here.\r\n");
-	}
-	else if (obj) {
-		if (!IS_IMMORTAL(ch) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
-			// for non-immortals, ensure scaling is done
-			scale_item_to_level(obj, get_approximate_level(ch));
+	
+	dotmode = find_all_dots(arg);
+	
+	if (dotmode == FIND_ALL) {
+		any = FALSE;
+		
+		// inv
+		LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+			if (run_identifies_to(ch, &obj, &extract)) {
+				any = TRUE;
+			}
+			if (extract) {	// usually it can do this itself, but just in case
+				extract_obj(obj);
+			}
 		}
 		
-		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
-		act("$n identifies $p.", TRUE, ch, obj, NULL, TO_ROOM);
-		identify_obj_to_char(obj, ch);
-	}
-	else if (veh) {
-		charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
-		act("$n identifies $V.", TRUE, ch, NULL, veh, TO_ROOM);
-		identify_vehicle_to_char(veh, ch);
+		// room
+		if (can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			LL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
+				if (run_identifies_to(ch, &obj, &extract)) {
+					any = TRUE;
+				}
+				if (extract) {	// usually it can do this itself, but just in case
+					extract_obj(obj);
+				}
+			}
+		}
+		
+		if (any) {
+			act("$n identifies some items.", TRUE, ch, NULL, NULL, TO_ROOM);
+			command_lag(ch, WAIT_OTHER);
+		}
+		else {
+			msg_to_char(ch, "You don't have anything special to identify.\r\n");
+		}
+	}	// /all
+	else if (dotmode == FIND_ALLDOT) {
+		if (!*arg) {
+			msg_to_char(ch, "Identify all of what?\r\n");
+			return;
+		}
+		
+		any = FALSE;
+		list[0] = ch->carrying;
+		list[1] = can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+		
+		for (iter = 0; iter < 2; ++iter) {
+			obj = get_obj_in_list_vis(ch, arg, list[iter]);
+			while (obj) {
+				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				
+				if (run_identifies_to(ch, &obj, &extract)) {
+					any = TRUE;
+				}
+				if (extract) {	// usually it can do this itself, but just in case
+					extract_obj(obj);
+				}
+				
+				obj = next_obj;
+			}
+		}
+		
+		if (any) {
+			act("$n identifies some items.", TRUE, ch, NULL, NULL, TO_ROOM);
+			command_lag(ch, WAIT_OTHER);
+		}
+		else {
+			msg_to_char(ch, "You don't seem to have any %ss to identify.\r\n", arg);
+		}
+	}	// /all.
+	else {	// specific obj/vehicle
+		if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &obj, &veh)) {
+			msg_to_char(ch, "You see nothing like that here.\r\n");
+		}
+		else if (obj) {
+			// message first in case the item changes
+			act("$n identifies $p.", TRUE, ch, obj, NULL, TO_ROOM);
+			
+			// check if it has identifies-to
+			if (obj->carried_by == ch || can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+				run_identifies_to(ch, &obj, &extract);
+				if (ch->desc) {
+					// flush the stacked id message before id'ing it
+					send_stacked_msgs(ch->desc);
+				}
+			}
+		
+			if (!IS_IMMORTAL(ch) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
+				// for non-immortals, ensure scaling is done
+				scale_item_to_level(obj, get_approximate_level(ch));
+			}
+		
+			charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
+			identify_obj_to_char(obj, ch);
+		
+			if (extract) {
+				// ONLY if we need to extract it but didn't earlier
+				extract_obj(obj);
+			}
+		}
+		else if (veh) {
+			charge_ability_cost(ch, NOTHING, 0, NOTHING, 0, WAIT_OTHER);
+			act("$n identifies $V.", TRUE, ch, NULL, veh, TO_ROOM);
+			identify_vehicle_to_char(veh, ch);
+		}
 	}
 }
 

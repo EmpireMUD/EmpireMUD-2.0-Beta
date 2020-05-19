@@ -297,7 +297,7 @@ void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_crop(char_data *ch, char *argument) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_climate = NOBITS;
 	int count, only_mapout = NOTHING, only_x = NOTHING, only_y = NOTHING;

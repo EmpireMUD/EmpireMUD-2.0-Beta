@@ -1350,7 +1350,7 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 	char flg[256], info[256], owner[MAX_STRING_LENGTH];
 
 	if (INST_LEVEL(inst) > 0) {
-		sprintf(info, " L%d", INST_LEVEL(inst));
+		sprintf(info, " L-%d", INST_LEVEL(inst));
 	}
 	else {
 		*info = '\0';
@@ -9608,9 +9608,7 @@ ACMD(do_trans) {
 				act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM);
 				char_from_room(victim);
 				char_to_room(victim, to_room);
-				if (!IS_NPC(victim)) {
-					GET_LAST_DIR(victim) = NO_DIR;
-				}
+				GET_LAST_DIR(victim) = NO_DIR;
 				act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
 				act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
 				qt_visit_room(victim, IN_ROOM(victim));
@@ -9638,9 +9636,7 @@ ACMD(do_trans) {
 			act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM);
 			char_from_room(victim);
 			char_to_room(victim, to_room);
-			if (!IS_NPC(victim)) {
-				GET_LAST_DIR(victim) = NO_DIR;
-			}
+			GET_LAST_DIR(victim) = NO_DIR;
 			act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
 			act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
 			qt_visit_room(victim, IN_ROOM(victim));

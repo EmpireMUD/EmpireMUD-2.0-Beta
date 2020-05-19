@@ -1032,7 +1032,7 @@ void alt_import_preferences(char_data *ch, char_data *alt) {
 	bitvector_t set;
 	
 	// prf flags to import
-	bitvector_t prfs = PRF_COMPACT | PRF_DEAF | PRF_NOTELL | PRF_MORTLOG | PRF_NOREPEAT | PRF_NOMAPCOL | PRF_NO_CHANNEL_JOINS | PRF_SCROLLING | PRF_BRIEF | PRF_AUTORECALL | PRF_NOSPAM | PRF_SCREEN_READER | PRF_AUTOKILL | PRF_AUTODISMOUNT | PRF_NOEMPIRE | PRF_CLEARMETERS | PRF_NO_PAINT | PRF_EXTRA_SPACING | PRF_TRAVEL_LOOK | PRF_AUTOCLIMB | PRF_AUTOSWIM;
+	bitvector_t prfs = PRF_COMPACT | PRF_DEAF | PRF_NOTELL | PRF_MORTLOG | PRF_NOREPEAT | PRF_NOMAPCOL | PRF_NO_CHANNEL_JOINS | PRF_SCROLLING | PRF_BRIEF | PRF_AUTORECALL | PRF_NOSPAM | PRF_SCREEN_READER | PRF_AUTOKILL | PRF_AUTODISMOUNT | PRF_NOEMPIRE | PRF_CLEARMETERS | PRF_NO_PAINT | PRF_EXTRA_SPACING | PRF_TRAVEL_LOOK | PRF_AUTOCLIMB | PRF_AUTOSWIM | PRF_ITEM_QUALITY | PRF_ITEM_DETAILS;
 	
 	// add flags
 	set = PRF_FLAGS(alt) & prfs;
@@ -2959,7 +2959,7 @@ ACMD(do_skin) {
 		msg_to_char(ch, "You need to be using a good knife to skin a corpse.\r\n");
 	else {
 		// run it
-		if (!run_interactions(ch, proto->interactions, INTERACT_SKIN, IN_ROOM(ch), NULL, obj, skin_interact)) {
+		if (IS_SET(GET_CORPSE_FLAGS(obj), CORPSE_NO_LOOT) || !run_interactions(ch, proto->interactions, INTERACT_SKIN, IN_ROOM(ch), NULL, obj, skin_interact)) {
 			act("You try to skin $p but get nothing useful.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		else {

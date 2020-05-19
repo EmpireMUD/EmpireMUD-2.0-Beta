@@ -182,6 +182,7 @@ When using field - The variable returns:
 &cis_outdoors&0 - True if it's on the map, in an outdoor adventure, etc.
 &cname&0 - The name of the room.
 &cpeople&0 - The id of the first character in the room, or an empty return.
+&cplayers_present&0 - True if there's at least 1 player in the room.
 &crmt_flagged(AFF)&0 - True if the room has a room template flag on it.
    If called with no argument, lists current flags instead.
 &cseason&0 - The local season (spring, summer, autumn, winter).

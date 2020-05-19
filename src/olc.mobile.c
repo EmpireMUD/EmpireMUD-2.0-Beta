@@ -590,7 +590,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 void olc_fullsearch_mob(char_data *ch, char *argument) {
 	extern int get_attack_type_by_name(char *name);
 	
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS;
 	int only_attack = NOTHING, only_move = NOTHING, only_nameset = NOTHING;

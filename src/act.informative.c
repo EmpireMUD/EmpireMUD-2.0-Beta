@@ -823,8 +823,8 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 
 	msg_to_char(to, "%s's lore:\r\n", PERS(ch, ch, 1));
 
-		for (lore = GET_LORE(ch); lore; lore = lore->next) {
-			if (has_player_tech(to, PTECH_CALENDAR)) {
+	for (lore = GET_LORE(ch); lore; lore = lore->next) {
+		if (has_player_tech(to, PTECH_CALENDAR)) {
 			t = *mud_time_passed((time_t) lore->date, (time_t) beginning_of_time);
 
 			strcpy(buf, month_name[(int) t.month]);
@@ -837,7 +837,7 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 			msg_to_char(to, " %s on %s.\r\n", NULLSAFE(lore->text), daystring);
 		}
 		else {
-			msg_to_char(ch, " %s.\r\n", NULLSAFE(lore->text));
+			msg_to_char(to, " %s.\r\n", NULLSAFE(lore->text));
 		}
 	}
 }
@@ -922,6 +922,12 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 			msg_to_char(ch, "*");
 		}
 		msg_to_char(ch, "%s\r\n", get_morph_desc(i, TRUE));
+	}
+	else if (IS_NPC(i) && mob_has_custom_message(i, MOB_CUSTOM_LONG_DESC) && GET_POS(i) == POS_STANDING) {
+		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
+			msg_to_char(ch, "*");
+		}
+		msg_to_char(ch, "%s\r\n", mob_get_custom_message(i, MOB_CUSTOM_LONG_DESC));
 	}
 	else if (IS_NPC(i) && GET_LONG_DESC(i) && GET_POS(i) == POS_STANDING) {
 		if (AFF_FLAGGED(i, AFF_INVISIBLE)) {
@@ -1342,6 +1348,39 @@ void show_character_affects(char_data *ch, char_data *to) {
 //// OBJECT DISPLAY FUNCTIONS ////////////////////////////////////////////////
 
 /**
+* Allows items to be colored by their loot quality.
+*
+* @param obj_data *obj The object to color.
+* @param char_data *ch The player who will see it (for preference flags).
+*/
+char *obj_color_by_quality(obj_data *obj, char_data *ch) {
+	// static char output[8];
+	
+	if (!ch || !obj || REAL_NPC(ch)) {
+		return "";
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP) && OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+		return "\tM";
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+		return "\tC";
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP)) {
+		return "\tG";
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_SUPERIOR)) {
+		return "\tY";
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_JUNK)) {
+		return "\tw";
+	}
+	else {	// no quality
+		return "\tn";
+	}
+}
+
+
+/**
 * @param obj_data *obj
 * @param char_data *ch person to show it to
 * @param int mode OBJ_DESC_SHORT, OBJ_DESC_LONG
@@ -1351,8 +1390,15 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 
 	static char output[MAX_STRING_LENGTH];
 	char sdesc[MAX_STRING_LENGTH];
-
-	*output = '\0';
+	bool color = FALSE;
+	
+	if (PRF_FLAGGED(ch, PRF_ITEM_QUALITY) && (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS)) {
+		strcpy(output, obj_color_by_quality(obj, ch));
+		color = TRUE;
+	}
+	else {
+		*output = '\0';
+	}
 
 	/* sdesc will be empty unless the short desc is modified */
 	*sdesc = '\0';
@@ -1394,11 +1440,14 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 		case OBJ_DESC_SHORT:
 		default: {
 			if (*sdesc)
-				strcpy(output, sdesc);
+				strcat(output, sdesc);
 			else
-				strcpy(output, GET_OBJ_SHORT_DESC(obj));
+				strcat(output, GET_OBJ_SHORT_DESC(obj));
 			break;
 		}
+	}
+	if (color) {
+		strcat(output, "\tn");
 	}
 	return output;
 }
@@ -1524,9 +1573,13 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	extern int find_board(char_data *ch);
 	extern const char *extra_bits_inv_flags[];
 
-	char flags[256];
+	char buf[MAX_STRING_LENGTH], tags[MAX_STRING_LENGTH], flags[256];
+	bitvector_t show_flags;
 	int board_type;
 	room_data *room;
+	
+	// tags will be a comma-separated list of extra info, and PROBABLY starts with a space that can be skipped
+	*tags = '\0';
 
 	// initialize buf as the obj desc
 	if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
@@ -1538,32 +1591,75 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 
 	if (mode == OBJ_DESC_EQUIPMENT) {
 		if (obj->worn_by && AFF_FLAGGED(obj->worn_by, AFF_DISARM) && (obj->worn_on == WEAR_WIELD || obj->worn_on == WEAR_RANGED || obj->worn_on == WEAR_HOLD)) {
-			strcat(buf, " (disarmed)");
+			sprintf(tags + strlen(tags), "%s disarmed", (*tags ? "," : ""));
 		}
 	}
 	
 	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG) {
-		sprintbit(GET_OBJ_EXTRA(obj), extra_bits_inv_flags, flags, TRUE);
-		if (strncmp(flags, "NOBITS", 6)) {
-			sprintf(buf + strlen(buf), " %.*s", ((int)strlen(flags)-1), flags);	// remove trailing space
+		// show level:
+		if (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 1 && mode != OBJ_DESC_LONG && mode != OBJ_DESC_LOOK_AT) {
+			sprintf(tags + strlen(tags), "%s L-%d", (*tags ? "," : ""), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 		}
 		
-		if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
-			strcat(buf, " (quest)");
+		// prepare flags:
+		show_flags = GET_OBJ_EXTRA(obj);
+		if (!PRF_FLAGGED(ch, PRF_ITEM_DETAILS)) {
+			show_flags &= ~OBJ_ENCHANTED;
+		}
+		
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			if (PRF_FLAGGED(ch, PRF_ITEM_QUALITY)) {
+				// screenreader needs item quality as text
+				if (OBJ_FLAGGED(obj, OBJ_HARD_DROP) && OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+					sprintf(tags + strlen(tags), "%s boss", (*tags ? "," : ""));
+				}
+				else if (OBJ_FLAGGED(obj, OBJ_GROUP_DROP)) {
+					sprintf(tags + strlen(tags), "%s group", (*tags ? "," : ""));
+				}
+				else if (OBJ_FLAGGED(obj, OBJ_HARD_DROP)) {
+					sprintf(tags + strlen(tags), "%s hard", (*tags ? "," : ""));
+				}
+			}
+			else {	// only suppress superior if quality is off
+				show_flags &= ~OBJ_SUPERIOR;
+			}
+			
+			prettier_sprintbit(show_flags, extra_bits_inv_flags, flags);
+		}
+		else {	// non-screenreader: suppress superior flag here
+			prettier_sprintbit((show_flags & ~OBJ_SUPERIOR), extra_bits_inv_flags, flags);
+		}
+		
+		// append flags
+		if (*flags && strncmp(flags, "NOBITS", 6) && strncmp(flags, "none", 4)) {
+			sprintf(tags + strlen(tags), "%s %s", (*tags ? "," : ""), flags);
+		}
+		
+		if (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) && GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
+			sprintf(tags + strlen(tags), "%s quest", (*tags ? "," : ""));
+		}
+		
+		if (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) && OBJ_FLAGGED(obj, OBJ_BIND_ON_EQUIP) && !OBJ_BOUND_TO(obj)) {
+			sprintf(tags + strlen(tags), "%s unbound", (*tags ? "," : ""));
 		}
 		
 		if (IS_STOLEN(obj)) {
-			strcat(buf, " (STOLEN)");
+			sprintf(tags + strlen(tags), "%s STOLEN", (*tags ? "," : ""));
 		}
 	}
 	
 	if (mode == OBJ_DESC_INVENTORY || (mode == OBJ_DESC_LONG && CAN_WEAR(obj, ITEM_WEAR_TAKE))) {
 		if (can_get_quest_from_obj(ch, obj, NULL)) {
-			strcat(buf, " (quest available)");
+			sprintf(tags + strlen(tags), "%s quest available", (*tags ? "," : ""));
 		}
 		if (can_turn_quest_in_to_obj(ch, obj, NULL)) {
-			strcat(buf, " (finished quest)");
+			sprintf(tags + strlen(tags), "%s finished quest", (*tags ? "," : ""));
 		}
+	}
+	
+	if (*tags) {
+		// tags starts with a space so we use tags+1 here
+		sprintf(buf + strlen(buf), " (%s)", tags+1);
 	}
 	
 	if (mode == OBJ_DESC_LOOK_AT) {
@@ -2786,8 +2882,8 @@ ACMD(do_inventory) {
 			}
 			
 			// looks okay
-			if (identify) {
-				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (%d)\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
+			if (identify && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s (L-%d)\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			}
 			else {
 				size += snprintf(buf + size, sizeof(buf) - size, "%2d. %s\r\n", ++count, GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
@@ -3450,7 +3546,6 @@ ACMD(do_survey) {
 
 ACMD(do_time) {
 	extern const char *seasons[];
-	extern int pick_season(room_data *room);
 	extern const char *weekdays[];
 	
 	const char *suf;
@@ -3511,7 +3606,7 @@ ACMD(do_time) {
 	}
 	
 	if (IS_OUTDOORS(ch)) {
-		msg_to_char(ch, "%s\r\n", seasons[pick_season(IN_ROOM(ch))]);
+		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
 	}
 }
 
@@ -3524,7 +3619,6 @@ ACMD(do_tip) {
 
 ACMD(do_weather) {
 	extern const char *seasons[];
-	extern int pick_season(room_data *room);
 	void list_moons_to_char(char_data *ch);
 	const char *sky_look[] = {
 		"cloudless",
@@ -3542,7 +3636,7 @@ ACMD(do_weather) {
 			list_moons_to_char(ch);
 		}
 
-		msg_to_char(ch, "%s\r\n", seasons[pick_season(IN_ROOM(ch))]);
+		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
 	}
 	else {
 		msg_to_char(ch, "You can't see the sky from here.\r\n");
