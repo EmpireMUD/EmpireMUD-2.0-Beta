@@ -1620,6 +1620,9 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 					sprintf(tags + strlen(tags), "%s hard", (*tags ? "," : ""));
 				}
 			}
+			else {	// only suppress superior if quality is off
+				show_flags &= ~OBJ_SUPERIOR;
+			}
 			
 			prettier_sprintbit(show_flags, extra_bits_inv_flags, flags);
 		}
