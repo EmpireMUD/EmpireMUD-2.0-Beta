@@ -63,6 +63,7 @@
 #define MTRIG_REBOOT           BIT(23)	// after the mud reboots
 #define MTRIG_BUY              BIT(24)	// attempting a purchase
 #define MTRIG_KILL             BIT(25)	// mob has killed something
+#define MTRIG_ALLOW_MULTIPLE   BIT(26)	// for triggers that block other triggers, allows multiple to run
 
 
 // OTRIG_x: obj trigger types
