@@ -1058,7 +1058,8 @@ int season(struct map_t *tile) {
 
 
 /**
-* This determines if tile is close enough to a given sect.
+* This determines if tile is close enough to a given sect. Ignores the tile
+* itself (for detecting the same sect nearby).
 *
 * @param struct map_t *tile
 * @param sector_vnum sect Sector vnum
@@ -1074,7 +1075,7 @@ bool sect_within_distance(struct map_t *tile, sector_vnum sect, int distance, bo
 	for (x = -1 * distance; x <= distance && !found; ++x) {
 		for (y = -1 * distance; y <= distance && !found; ++y) {
 			shift = shift_tile(tile, x, y);
-			if (shift && (shift->sector_type == sect || (count_original_sect && shift->base_sector == sect)) && map_distance(tile, shift) <= distance) {
+			if (shift && shift != tile && (shift->sector_type == sect || (count_original_sect && shift->base_sector == sect)) && map_distance(tile, shift) <= distance) {
 				found = TRUE;
 			}
 		}
