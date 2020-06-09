@@ -3014,6 +3014,7 @@ void add_production_total_for_tag_list(struct mob_tag *list, obj_vnum vnum, int 
 */
 int get_production_total(empire_data *emp, obj_vnum vnum) {
 	struct empire_production_total *egt;
+	int amt;
 	
 	if (!emp || vnum == NOTHING) {
 		return 0;	// no work
@@ -3021,9 +3022,15 @@ int get_production_total(empire_data *emp, obj_vnum vnum) {
 	
 	HASH_FIND_INT(EMPIRE_PRODUCTION_TOTALS(emp), &vnum, egt);
 	if (egt) {
+		amt = egt->amount;
+		
 		// ignores any that may have been exported then imported, to prevent
 		// abuse where 2 empires could constantly import/export from each other
-		return egt->amount - MAX(0, egt->imported - egt->exported);
+		if (egt->imported > 0 && egt->exported > 0) {
+			amt -= MIN(egt->exported, egt->imported);
+		}
+		
+		return amt;
 	}
 	else {
 		return 0;
@@ -3053,7 +3060,12 @@ int get_production_total_component(empire_data *emp, any_vnum cmp_vnum) {
 		}
 		
 		if (is_component(egt->proto, cmp)) {
-			count += (egt->amount - MAX(0, egt->imported - egt->exported));
+			SAFE_ADD(count, egt->amount, 0, INT_MAX, FALSE);
+			
+			if (egt->imported > 0 && egt->exported > 0) {
+				// no need to safe-add as this will always leave count >= 0
+				count -= MIN(egt->imported, egt->exported);
+			}
 		}
 	}
 	

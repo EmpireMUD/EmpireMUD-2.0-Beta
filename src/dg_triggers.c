@@ -638,9 +638,10 @@ int receive_mtrigger(char_data *ch, char_data *actor, obj_data *obj) {
 int death_mtrigger(char_data *ch, char_data *actor) {
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
+	int val = 1;
 
 	if (!SCRIPT_CHECK(ch, MTRIG_DEATH))
-	return 1;
+		return val;
 
 	for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
 		if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
@@ -652,11 +653,16 @@ int death_mtrigger(char_data *ch, char_data *actor) {
 			if (actor && actor != ch)
 				ADD_UID_VAR(buf, t, char_script_id(actor), "actor", 0);
 			sdd.c = ch;
-			return script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+			val &= script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
+			
+			if (!IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+				// the first non-multiple breaks the loop
+				break;
+			}
 		}
 	}
 
-	return 1;
+	return val;
 }
 
 
@@ -705,7 +711,11 @@ void load_mtrigger(char_data *ch) {
 			union script_driver_data_u sdd;
 			sdd.c = ch;
 			script_driver(&sdd, t, MOB_TRIGGER, TRIG_NEW);
-			break;
+			
+			if (!IS_SET(GET_TRIG_TYPE(t), MTRIG_ALLOW_MULTIPLE)) {
+				// the first non-multiple breaks the loop
+				break;
+			}
 		}
 	}
 }
