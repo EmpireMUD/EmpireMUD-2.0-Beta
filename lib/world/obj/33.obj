@@ -80,14 +80,14 @@ a steaming casserole~
 A casserole is steaming on the ground.~
 The casserole looks delicious.
 ~
-6 m a 0 3
+6 m a 0 4
 24 0 0
 7 336
 A
 19 1 0
 C
 1 1
-O+ 1 6240
+O+ 1 6242
 R
 5619 0
 S
@@ -264,7 +264,7 @@ There is a full meal of chicken and vegetables just laying here.~
 with a sprig of parsley. The smell wafting up from this plate is delicious and
 the chicken is nice and crispy.
 ~
-6 m a 0 5
+6 m a 0 6
 24 0 0
 7 336
 A
@@ -283,7 +283,7 @@ $n tears off some meat from $p and wolfs it down.~
 M
 4
 You tear off a piece of chicken and take a good bite.~
-O+ 1 6240
+O+ 1 6242
 R
 5619 0
 S
@@ -355,7 +355,7 @@ A plate of chicken and pears is sitting here.~
 flowering appearance. Regardless of the finesse involved in creating this
 wonderful dish, it is sure to be gone in a matter of moments.
 ~
-6 0 a 0 2
+6 0 a 0 3
 72 0 0
 7 336
 M
@@ -370,7 +370,7 @@ You cut off a piece of chicken and savor the taste as you chew.~
 M
 4
 You seperate a piece of pear, taste it and finding it good eat it whole.~
-O+ 1 6240
+O+ 1 6242
 R
 5619 0
 S
@@ -428,9 +428,8 @@ a plate of mushrooms topped with chicken and rice~
 A fried mushroom plate topped with chicken and rice is sitting here.~
    A deep fried mushroom with little fried chicken bits and rice. It will
 probably clog your arteries but if Furl could see it, he'd just die with envy.
-
 ~
-6 m a 0 3
+6 m a 0 4
 24 0 0
 7 336
 A
@@ -443,7 +442,7 @@ You pop a bit of mushroom in your mouth and enjoy the flavor.~
 M
 5
 $n scoops up some chicken and rice with a bit of mushroom and pops it into $s mouth~
-O+ 1 6240
+O+ 1 6242
 R
 5619 0
 S
@@ -512,7 +511,7 @@ A hot plate of roast and vegetables has been left here.~
    A thick slab of finely cooked meat surrounded by sliced vegetables. Steamed
 to perfection, the sliced carrots and squash let off a surprising aroma.
 ~
-6 m a 0 3
+6 m a 0 4
 24 0 0
 7 336
 A
@@ -525,7 +524,7 @@ You cut off a bite of roast and add some vegetables to it, before savoring the f
 M
 5
 $n scoops up some vegetables with $s roast and eats them.~
-O+ 1 6240
+O+ 1 6242
 R
 5619 0
 S
@@ -537,7 +536,7 @@ A plate of fish and vegetables has been left here.~
 delicately poached with a hint of lemon and the vegetables have been arranged
 quite artisticly.
 ~
-6 m a 0 3
+6 m a 0 4
 24 0 0
 7 336
 A
@@ -550,7 +549,7 @@ You enjoy the lemon flavor as you take a bite of $p.~
 M
 5
 $n makes a delighted noise as he savors the taste of $p.~
-O+ 1 6240
+O+ 1 6242
 R
 5619 0
 S
@@ -561,7 +560,7 @@ A plate with fried catfish and hushpuppies has been left here.~
    Deep fried catfish with a hint of lemon takes up the majority of this plate.
 Alongside the fish are golden brown hushpuppies.
 ~
-6 m a 0 3
+6 m a 0 4
 24 0 0
 7 336
 A
@@ -574,7 +573,7 @@ You cut a piece of catfish and pop it and a hush puppy into your mouth.~
 M
 5
 $n slices off a piece of catfish and pops it into $s mouth, followed quickly by a hush puppy.~
-O+ 1 6240
+O+ 1 6242
 R
 5619 0
 S
@@ -585,10 +584,10 @@ A fillet of roast meat is sitting on the ground here.~
    You're not sure what this is from, but it probably tastes fine. Or at least
 better than it would have raw.
 ~
-6 0 a 0 3
+6 0 a 0 4
 18 0 0
 7 96
-O+ 1 6240
+O+ 1 6220
 R
 5619 0
 S
@@ -729,8 +728,8 @@ A
 7 1 0
 C
 1 1
-I 26 801 100.00 1  # DECAYS-TO: a jar
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+I 26 801 100.00 1  # DECAYS-TO: a glass jar
+I 27 801 100.00 1  # CONSUMES-TO: a glass jar
 R
 5606 0
 R
@@ -777,8 +776,8 @@ A
 16 1 0
 C
 1 1
-I 26 801 100.00 1  # DECAYS-TO: a jar
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+I 26 801 100.00 1  # DECAYS-TO: a glass jar
+I 27 801 100.00 1  # CONSUMES-TO: a glass jar
 R
 5619 0
 R
@@ -839,7 +838,7 @@ a hearty meatloaf~
 A hearty meatloaf is sitting on the ground.~
 This hearty meatloaf will make you strong.
 ~
-6 mp a 0 3
+6 mp a 0 4
 48 0 0
 7 336
 A
@@ -849,7 +848,7 @@ C
 M
 4
 You savor the hearty meatloaf.~
-O+ 1 6240
+O+ 1 6242
 S
 #3346
 pie shepherd's shepherds~
@@ -857,7 +856,7 @@ a shepherd's pie~
 A shepherd's pie is sitting on the ground.~
 This old family recipe will boost your dexterity.
 ~
-6 mp a 0 4
+6 mp a 0 5
 48 0 0
 7 336
 A
@@ -867,7 +866,7 @@ C
 M
 4
 You eat a big portion of the savory shepherd's pie.~
-O+ 1 6240
+O+ 1 6242
 S
 #3347
 fish chips plate~
@@ -876,7 +875,7 @@ A plate of fish and chips is sitting here.~
    These fish and chips remind you of your time at the seaside, and those salty
 memories will boost your charisma.
 ~
-6 mp a 0 4
+6 mp a 0 5
 48 0 0
 7 336
 A
@@ -886,7 +885,7 @@ C
 M
 4
 You eat the perfectly crispy fish and chips.~
-O+ 1 6240
+O+ 1 6242
 S
 #3348
 chicken dumplings plate~
@@ -894,7 +893,7 @@ chicken and dumplings~
 A plate of chicken and dumplings is sitting here.~
 This old cottage recipe will boost your intelligence.
 ~
-6 mp a 0 4
+6 mp a 0 5
 48 0 0
 7 336
 A
@@ -904,7 +903,7 @@ C
 M
 4
 You enjoy the chicken and dumplings -- just like mother used to make.~
-O+ 1 6240
+O+ 1 6242
 S
 #3349
 cobbler berry rich~
@@ -930,7 +929,7 @@ A black sausage is sitting here on the ground.~
    This sausage isn't made from the best parts of the animal, but it will boost
 your ability to hit things.
 ~
-6 mp a 0 4
+6 mp a 0 5
 48 0 0
 7 336
 A
@@ -940,7 +939,7 @@ C
 M
 4
 You choke down some of the black sausage.~
-O+ 1 6240
+O+ 1 6220
 S
 #3351
 eels jellied~
@@ -948,7 +947,7 @@ jellied eels~
 A plate of jellied eels is sitting here.~
 This old-fashioned dish will make you slippery and boost your dodge.
 ~
-6 mp a 0 4
+6 mp a 0 5
 48 0 0
 7 336
 A
@@ -958,7 +957,7 @@ C
 M
 4
 You eat some of the jellied eels, which taste better than they sound.~
-O+ 1 6240
+O+ 1 6242
 S
 #3352
 roast pot~
@@ -966,7 +965,7 @@ a pot roast~
 A pot roast is sitting here.~
 The savory pot roast will boost your health.
 ~
-6 mp a 0 4
+6 mp a 0 5
 48 0 0
 7 336
 A
@@ -976,7 +975,7 @@ C
 M
 4
 You eat the meaty pot roast.~
-O+ 1 6240
+O+ 1 6242
 S
 #3353
 chili bowl~
@@ -984,7 +983,7 @@ a bowl of chili~
 A bowl of chili is sitting here.~
 This spicy chili will warm your bones and boost your stamina.
 ~
-6 mp a 0 4
+6 mp a 0 5
 48 0 0
 7 336
 A
@@ -994,7 +993,7 @@ C
 M
 4
 You savor the spicy chili as you eat it.~
-O+ 1 6240
+O+ 1 6242
 S
 #3354
 pie mom's moms fruit~
@@ -1055,7 +1054,7 @@ Someone has set up a roast turkey feast!~
    There is a banquet of turkey and trimmings. It's enough to feed the whole
 party! This feast will boost melee fighters.
 ~
-6 m 0 0 4
+6 m 0 0 5
 96 0 0
 7 336
 A
@@ -1067,7 +1066,7 @@ A
 M
 4
 You fill yourself on turkey and stuffing.~
-O+ 1 6240
+O+ 1 6242
 S
 #3358
 board vegetables mixed~
@@ -1097,7 +1096,7 @@ Someone has set up a seafood feast!~
    This overflowing feast of seafood is enough to feed the whole party! This
 feast will boost casters.
 ~
-6 m 0 0 5
+6 m 0 0 6
 96 0 0
 7 336
 A
@@ -1109,7 +1108,7 @@ A
 M
 4
 You fill yourself on the bountiful seafood.~
-O+ 1 6240
+O+ 1 6242
 S
 #3360
 platter roast meat~
@@ -1118,7 +1117,7 @@ Someone has set up a roast meat platter!~
    This feast of roast meats is enough to feed the whole party! It will boost
 tanks in particular.
 ~
-6 m 0 0 5
+6 m 0 0 6
 96 0 0
 7 336
 A
@@ -1132,7 +1131,7 @@ A
 M
 4
 You fill yourself on roast meats.~
-O+ 1 6240
+O+ 1 6242
 S
 #3361
 platter dessert extravagant~
@@ -1222,14 +1221,14 @@ Some dried shark meat has been left here.~
    The dried shark meat is the perfect traveling food. Best of all, it's
 pre-salted!
 ~
-6 m a 0 4
+6 m a 0 5
 72 0 0
 7 672
 A
 11 1 0
 C
 1 1
-O+ 1 6240
+O+ 1 6220
 R
 5619 0
 S
@@ -1332,8 +1331,8 @@ solution.
 7 336
 A
 16 1 0
-I 26 801 100.00 1  # DECAYS-TO: a jar
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+I 26 801 100.00 1  # DECAYS-TO: a glass jar
+I 27 801 100.00 1  # CONSUMES-TO: a glass jar
 R
 5606 0
 S

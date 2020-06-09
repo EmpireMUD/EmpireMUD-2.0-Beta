@@ -91,4 +91,13 @@ R 6240
 T0
 cooked vegetarian meals~
 S
+#6242
+cooked meat meal~
+6 a
+0 6242 0 0
+R 6240
+R 6220
+T0
+cooked meat meals~
+S
 $
