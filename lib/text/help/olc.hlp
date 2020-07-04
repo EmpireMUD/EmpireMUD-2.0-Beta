@@ -6156,11 +6156,12 @@ See also: OLC PROGRESS, STRING EDITOR
 Usage:  .flags [add | remove] <flags>
 
 The following progress goal flags are available:
- IN-DEVELOPMENT - Empires cannot start or complete this goal.
- PURCHASABLE - This goal is purchased, not unlocked by tasks.
- SCRIPT-ONLY - For scripts; cannot be purchased and won't be earned unless a
+ &cIN-DEVELOPMENT&0 - Empires cannot start or complete this goal.
+ &cPURCHASABLE&0 - This goal is purchased, not unlocked by tasks.
+ &cSCRIPT-ONLY&0 - For scripts; cannot be purchased and won't be earned unless a
                script starts it first.
- HIDDEN - Will not show up in lists until completed.
+ &cHIDDEN&0 - Will not show up in lists until completed.
+ &cNO-ANNOUNCE&0 - Does not announce/log completion.
 
 See also: OLC PROGRESS
 #d

@@ -2682,6 +2682,7 @@ const char *progress_flags[] = {
 	"PURCHASABLE",
 	"SCRIPT-ONLY",
 	"HIDDEN",
+	"NO-ANNOUNCE",
 	"\n"
 };
 
