@@ -5390,7 +5390,7 @@ ACMD(do_tomb) {
 		else if (GET_POS(ch) < POS_STANDING) {
 			msg_to_char(ch, "You can't do that right now. You need to be standing.\r\n");
 		}
-		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		else if (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch))) {
 			msg_to_char(ch, "You need to own a building to make it your tomb.\r\n");
 		}
 		else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_TOMB)) {
