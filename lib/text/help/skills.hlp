@@ -652,7 +652,8 @@ Ingots are used for crafting. Gold and silver bars are worth more in the vault
 than their raw form. To return bars to their ingot form, use 'separate'.
 
 Typing "smelt" by itself will list things you can smelt with the ore available
-in your inventory.
+in your inventory. Smelting goes faster when you have the correct mastery
+ability (see 'smelt info <type>' to see the mastery ability).
 
 See also: CRAFT INFO, METAL, SEPARATE, WEALTH, RECIPES
 #

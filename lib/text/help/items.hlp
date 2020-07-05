@@ -122,7 +122,7 @@ own help files. Here are some of the common types of components:
  &csaplings&0 - used in handles and primitive buildings
  &cclay&0 - moldable clay for crafting
  &cfibers&0, &cfeathers&0, and &csticks&0 - used for crafting and building
- &cfruits&0, &cvegetabless&0, &cgrains&0, and &cseeds&0 - for cooking and baking
+ &cfruits&0, &cvegetables&0, &cgrains&0, and &cseeds&0 - for cooking and baking
  &cflour&0 - ground up grains used in baking
  &csweeteners&0 - for cooking
  &craw meat&0 - raw meat for cooking
@@ -854,7 +854,7 @@ You can identify an item to see where it can be stored.
 See also: AUTO-STORE, KEEP, RETRIEVE, IDENTIFY, INVENTORY, DIPLOMACY,
    WAREHOUSE, VAULT
 #
-SUPERIOR MASTERWORK
+SUPERIOR MASTERWORK "MASTERY ABILITY"
 
 The (superior) flag indicates that an item is a masterwork, crafted by a truly
 legendary artisan. Crafts that require tools, such as forge, will go faster
@@ -865,12 +865,14 @@ Superior items are yellow in your inventory/equipment when item-quality is
 toggled on.
 
 As long as you have the right mastery ability for the ability your recipe comes
-from, everything you make will be masterwork.
+from, everything you make will be masterwork. Check a craft's info (e.g. "forge
+info <name>") to see the mastery ability for it.
 
-Masterwork abilities:
+Masterwork abilities (usually):
   Sewing/Leatherworking - Master Tailor
   Forge - Master Blacksmith
   Pottery - Master Craftsman
+  Smelt - Master Craftsman or Master Blacksmith
   Woodworking - Master Craftsman
 
 See also: SCALABLE CRAFTS, ITEM-QUALITY
