@@ -233,7 +233,7 @@ component.
 
 See also: FRUIT COMPONENT, VEGETABLE COMPONENT
 #
-FIBERS "FIBERS COMPONENT" "FIBER COMPONENT" "PLANT FIBER"
+FIBERS "FIBERS COMPONENT" "FIBER COMPONENT" "PLANT FIBER" FEATHERS
 
 Fibers (component)
 
@@ -759,7 +759,7 @@ can be used in any recipe that says (fiber) or (plant fiber).
 
 See also: FIBER COMPONENT, GATHER, BUILD, CRAFT, SCRAPE
 #
-SWEETENER "SWEETENER COMPONENT" "SWEETENER COMPONENT" HONEYCOMB
+SWEETENER "SWEETENER COMPONENT" "SWEETENER COMPONENT" HONEYCOMB SUGAR
 
 Sweetener (component)
 
@@ -767,6 +767,7 @@ Used for:  cooking
 
 Sweeteners are used to make food taste good. Available sweeteners include:
   honeycomb - from beehives and apiaries
+  sugar - milled from sugarcane
 
 See also: COMPONENT
 #
