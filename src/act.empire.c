@@ -3093,7 +3093,7 @@ void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
 		msg_to_char(ch, "Just abandon the main room.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && !confirm) {
-		msg_to_char(ch, "This area is set no-abandon. You must use 'abandon [target] confirm' to abandon it.\r\n");
+		msg_to_char(ch, "The area is set no-abandon. You must use 'abandon [target] confirm' to abandon it.\r\n");
 	}
 	else if (IS_ANY_BUILDING(room) && room != IN_ROOM(ch) && !confirm) {
 		msg_to_char(ch, "%s might be valuable. You must use 'abandon <target> confirm' to abandon it.\r\n", get_room_name(room, FALSE));
@@ -3153,7 +3153,7 @@ ACMD(do_abandon) {
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
 	room_data *room = IN_ROOM(ch);
-	bool confirm;
+	bool confirm, confirm_arg_1;
 
 	if (IS_NPC(ch)) {
 		return;
@@ -3161,7 +3161,8 @@ ACMD(do_abandon) {
 	
 	argument = one_word(argument, arg);
 	skip_spaces(&argument);
-	confirm = !str_cmp(arg, "confirm") || !str_cmp(argument, "confirm");	// TRUE if they have the confirm arg
+	confirm_arg_1 = !str_cmp(argument, "confirm");
+	confirm = confirm_arg_1 || !str_cmp(arg, "confirm");	// TRUE if they have the confirm arg
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -3176,10 +3177,10 @@ ACMD(do_abandon) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}
-	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (*arg && !confirm_arg_1 && (veh = get_vehicle_in_room_vis(ch, arg))) {
 		do_abandon_vehicle(ch, veh, confirm);
 	}
-	else if (*arg && !(room = find_target_room(ch, arg))) {
+	else if (*arg && !confirm_arg_1 && !(room = find_target_room(ch, arg))) {
 		// sends own error
 	}
 	else if (!(room = HOME_ROOM(room))) {
