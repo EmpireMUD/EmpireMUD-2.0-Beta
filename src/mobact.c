@@ -635,6 +635,7 @@ void mobile_activity(void) {
 				if (time(0) - purs->last_seen > config_get_int("mob_pursuit_timeout") * SECS_PER_REAL_MIN || compute_distance(IN_ROOM(ch), real_room(purs->location)) > config_get_int("mob_pursuit_distance")) {
 					REMOVE_FROM_LIST(purs, MOB_PURSUIT(ch), next);
 					free(purs);
+					continue;
 				}
 				else {
 					// now see if we can track from here
@@ -654,6 +655,25 @@ void mobile_activity(void) {
 						if (track->player_id == purs->idnum) {
 							found = TRUE;
 							dir = track->dir;
+						}
+					}
+					
+					// try line-of-sight tracking
+					if (!found) {
+						// first see if they're playing
+						if (!(vict = is_playing(purs->idnum))) {
+							LL_DELETE(MOB_PURSUIT(ch), purs);
+							free(purs);
+							continue;
+						}
+						
+						// check distance: TODO this is magic-numbered to 7, similar to how far you can see players in mapview.c
+						if (compute_distance(IN_ROOM(ch), IN_ROOM(vict)) <= 7) {
+							dir = get_direction_to(IN_ROOM(ch), IN_ROOM(vict));
+							if (dir != NO_DIR) {
+								// found one
+								found = TRUE;
+							}
 						}
 					}
 				}
