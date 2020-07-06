@@ -3161,8 +3161,8 @@ ACMD(do_abandon) {
 	
 	argument = one_word(argument, arg);
 	skip_spaces(&argument);
-	confirm_arg_1 = !str_cmp(argument, "confirm");
-	confirm = confirm_arg_1 || !str_cmp(arg, "confirm");	// TRUE if they have the confirm arg
+	confirm_arg_1 = !str_cmp(arg, "confirm");
+	confirm = confirm_arg_1 || !str_cmp(argument, "confirm");	// TRUE if they have the confirm arg
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
