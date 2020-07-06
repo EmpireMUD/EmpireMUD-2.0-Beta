@@ -659,7 +659,7 @@ void mobile_activity(void) {
 					}
 					
 					// try line-of-sight tracking
-					if (!found) {
+					if (!found && IS_OUTDOORS(ch)) {
 						// first see if they're playing
 						if (!(vict = is_playing(purs->idnum))) {
 							LL_DELETE(MOB_PURSUIT(ch), purs);
@@ -668,7 +668,7 @@ void mobile_activity(void) {
 						}
 						
 						// check distance: TODO this is magic-numbered to 7, similar to how far you can see players in mapview.c
-						if (compute_distance(IN_ROOM(ch), IN_ROOM(vict)) <= 7) {
+						if (IS_OUTDOORS(vict) && compute_distance(IN_ROOM(ch), IN_ROOM(vict)) <= 7) {
 							dir = get_direction_to(IN_ROOM(ch), IN_ROOM(vict));
 							if (dir != NO_DIR) {
 								// found one
