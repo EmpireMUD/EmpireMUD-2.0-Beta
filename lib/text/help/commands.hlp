@@ -1632,6 +1632,8 @@ See also: GET, KEEP
 #
 QUIT
 
+Usage:  quit [confirm]
+
 When you get tired of playing, you can leave the game by typing 'quit'. This
 will save your character and disconnect you. Only players in the same empire
 will see a message that you quit, unless public logins are enabled.
@@ -1640,6 +1642,10 @@ You can use "alt" to quickly change characters, rather than quitting.
 
 You can't quit (or alt) in hostile territory. You can choose to disconnect
 instead, but this will leave your character vulnerable.
+
+If your character is dying or dead, you must type 'quit confirm' as it will
+kill your character. If you are editing any text, this will also require you
+to 'quit confirm'.
 
 See also: ALT, CHANGEPASS, SELFDELETE
 #
