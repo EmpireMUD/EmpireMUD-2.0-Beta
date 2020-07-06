@@ -2650,8 +2650,9 @@ struct manage_data_type {
 
 // configuration for do_manage
 const struct manage_data_type manage_data[] = {
+	{ "no-abandon", "noabandon", PRIV_CLAIM, TRUE, ROOM_AFF_NO_ABANDON, TRUE, 0, NOBITS, NULL },
 	{ "no-dismantle", "nodismantle", PRIV_BUILD, TRUE, ROOM_AFF_NO_DISMANTLE, TRUE, 0, NOBITS, NULL },
-	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, 0, FALSE, NOBITS, mng_nowork },
+	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, FALSE, 0, NOBITS, mng_nowork },
 	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS, NULL },
 	
 	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS, NULL },
@@ -3090,6 +3091,9 @@ void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
 	}
 	else if (HOME_ROOM(room) != room) {
 		msg_to_char(ch, "Just abandon the main room.\r\n");
+	}
+	else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && !confirm) {
+		msg_to_char(ch, "This area is set no-abandon. You must use 'abandon [target] confirm' to abandon it.\r\n");
 	}
 	else if (IS_ANY_BUILDING(room) && room != IN_ROOM(ch) && !confirm) {
 		msg_to_char(ch, "%s might be valuable. You must use 'abandon <target> confirm' to abandon it.\r\n", get_room_name(room, FALSE));

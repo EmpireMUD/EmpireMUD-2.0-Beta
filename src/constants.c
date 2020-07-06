@@ -3283,6 +3283,7 @@ const char *room_aff_bits[] = {
 	"!TELEPORT",
 	"BRIGHT-PAINT",
 	"FAKE-INSTANCE",
+	"!ABANDON",
 	"\n"
 };
 
