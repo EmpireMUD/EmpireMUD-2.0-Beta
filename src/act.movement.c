@@ -2382,7 +2382,7 @@ ACMD(do_run) {
 		}
 		GET_MOVEMENT_STRING(ch) = dir_only ? NULL : str_dup(argument);
 		
-		msg_to_char(ch, "You start running %s...\r\n", dirs[dir]);
+		msg_to_char(ch, "You start running %s...\r\n", dirs[get_direction_for_char(ch, dir)]);
 	}
 }
 
