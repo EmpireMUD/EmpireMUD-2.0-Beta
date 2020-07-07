@@ -434,12 +434,17 @@ choose. This helps you by clearing up many unwanted items and resources.
 This also may help you get favor with the god, and in turn, that god may help
 you out with a little help.
 
-Sacrifices are worth 1.5x the normal resources if you are at a temple (or other
-monument) dedicated to the god to whom you are making the sacrifice. The value
-of a sacrifice is based on its gear level.
+Gods receive resources when items are sacrifice to them. Sacrifices are worth
+1.5x the normal resources if you are at a temple (or other monument) dedicated
+to the god to whom you are making the sacrifice. The value of a sacrifice is
+based on its gear level.
 
-Example:  
-  > sacrifice stick Exar 
+See GODLIST for a list of gods to whom you can offer sacrifices.
+
+Example:
+  > sacrifice stick Exar
+
+See also: DEDICATE, GODLIST, IDENTIFY
 #
 SAW
 

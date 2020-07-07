@@ -2431,8 +2431,12 @@ WIZLIST GODLIST
 Usage:  wizlist
         godlist
 
-Lists the most powerful beings on the MUD. These are the people responsible
-for administering the system.
+The wizlist command lists the game's administrators, also called 'immortals'
+or sometimes 'wizards'. These are the people who contribute to the game's
+code, content, or community.
+
+The godlist is a list of gods, who are players that have been elevated to
+divine status. See HELP GOD SYSTEM for more information.
 #
 WOOL
 
