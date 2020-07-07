@@ -924,6 +924,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		if (emp == GET_LOYALTY(ch) && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_NO_DISMANTLE)) {
 			msg_to_char(ch, " (no-dismantle)");
 		}
+		if (emp == GET_LOYALTY(ch) && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_NO_ABANDON)) {
+			msg_to_char(ch, " (no-abandon)");
+		}
 		
 		msg_to_char(ch, "\r\n");
 		

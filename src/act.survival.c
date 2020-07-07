@@ -358,12 +358,15 @@ void do_mount_list(char_data *ch, char *argument) {
 		any = TRUE;
 	}
 	
-	if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && !(++count % 2)) {
+	if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 2)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 	}
 	
 	if (!any) {
 		size += snprintf(buf + size, sizeof(buf) - size, " no matches\r\n");
+	}
+	else {
+		size += snprintf(buf + size, sizeof(buf) - size, " (%d total mount%s)\r\n", count, PLURAL(count));
 	}
 	
 	if (ch->desc) {

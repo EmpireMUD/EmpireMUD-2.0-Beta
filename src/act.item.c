@@ -842,7 +842,10 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 * @param char_data *ch The person to show the data to.
 */
 void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
+	extern const char *identify_vehicle_flags[];
+	
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
+	char buf[MAX_STRING_LENGTH];
 	
 	// basic info
 	act("Your analysis of $V reveals:", FALSE, ch, NULL, veh, TO_CHAR);
@@ -853,6 +856,14 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	
 	msg_to_char(ch, "Type: %s\r\n", skip_filler(proto ? VEH_SHORT_DESC(proto) : VEH_SHORT_DESC(veh)));
 	msg_to_char(ch, "Level: %d\r\n", VEH_SCALE_LEVEL(veh));
+	
+	prettier_sprintbit(VEH_FLAGS(veh), identify_vehicle_flags, buf);
+	if (VEH_FLAGGED(veh, VEH_SIT)) {
+		sprintf(buf + strlen(buf), "%scan sit %s", *buf ? ", " : "", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+	}
+	if (*buf) {
+		msg_to_char(ch, "Notes: %s\r\n", buf);
+	}
 }
 
 

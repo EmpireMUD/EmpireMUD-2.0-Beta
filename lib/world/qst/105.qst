@@ -9,7 +9,7 @@ consecrated and buried.
    You have pacified the hostile mage-spawns of the Permafrost! You whisper a
 short chant of consecration, and bury the wand beneath the henge.
 ~
-19 be 75 125 -1
+20 be 75 125 -1
 A
 3 10550
 P
@@ -39,6 +39,8 @@ W
 11 0 0 1
 Z
 0 5142
+Z
+0 12671
 S
 #10551
 A Rare Item Indeed~

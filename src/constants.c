@@ -2682,6 +2682,7 @@ const char *progress_flags[] = {
 	"PURCHASABLE",
 	"SCRIPT-ONLY",
 	"HIDDEN",
+	"NO-ANNOUNCE",
 	"\n"
 };
 
@@ -3282,6 +3283,7 @@ const char *room_aff_bits[] = {
 	"!TELEPORT",
 	"BRIGHT-PAINT",
 	"FAKE-INSTANCE",
+	"!ABANDON",
 	"\n"
 };
 
@@ -4192,7 +4194,7 @@ const char *shutdown_types[] = {
 };
 
 
-// VEH_x: Vehicle flags
+// VEH_x (1/2): Vehicle flags
 const char *vehicle_flags[] = {
 	"*INCOMPLETE",
 	"DRIVING",
@@ -4218,6 +4220,35 @@ const char *vehicle_flags[] = {
 	"!CLAIM",
 	"\n"
 };
+
+
+// VEH_x (2/2): "identify <vehicle>" text for flags
+const char *identify_vehicle_flags[] = {
+	"",	// "*INCOMPLETE",
+	"can drive",
+	"can sail",
+	"can pilot (flying)",
+	"rough terrain (mountainwalk)",
+	"",	// "SIT", (has special handling)	// 5
+	"",	// "IN", (has sepcial meaning)
+	"burnable",
+	"container (get/put/look in)",
+	"used for shipping",
+	"customizable",	// 10
+	"draggable",
+	"large (cannot enter buildings)",
+	"can use portals",
+	"can be led",
+	"can carry vehicles",	// 15
+	"can carry NPCs",
+	"has siege weapons",
+	"",	// "ON-FIRE",
+	"cannot be loaded onto vehicles",
+	"",	// "VISIBLE-IN-DARK",	// 20
+	"",	// "!CLAIM",
+	"\n"
+};
+
 
 // VSPEED_x: Vehicle speed classes
 const char *vehicle_speed_types[] = {

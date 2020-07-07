@@ -2650,8 +2650,9 @@ struct manage_data_type {
 
 // configuration for do_manage
 const struct manage_data_type manage_data[] = {
+	{ "no-abandon", "noabandon", PRIV_CLAIM, TRUE, ROOM_AFF_NO_ABANDON, TRUE, 0, NOBITS, NULL },
 	{ "no-dismantle", "nodismantle", PRIV_BUILD, TRUE, ROOM_AFF_NO_DISMANTLE, TRUE, 0, NOBITS, NULL },
-	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, 0, FALSE, NOBITS, mng_nowork },
+	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, FALSE, 0, NOBITS, mng_nowork },
 	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS, NULL },
 	
 	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS, NULL },
@@ -3091,6 +3092,9 @@ void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
 	else if (HOME_ROOM(room) != room) {
 		msg_to_char(ch, "Just abandon the main room.\r\n");
 	}
+	else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && !confirm) {
+		msg_to_char(ch, "The area is set no-abandon. You must use 'abandon [target] confirm' to abandon it.\r\n");
+	}
 	else if (IS_ANY_BUILDING(room) && room != IN_ROOM(ch) && !confirm) {
 		msg_to_char(ch, "%s might be valuable. You must use 'abandon <target> confirm' to abandon it.\r\n", get_room_name(room, FALSE));
 	}
@@ -3149,7 +3153,7 @@ ACMD(do_abandon) {
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
 	room_data *room = IN_ROOM(ch);
-	bool confirm;
+	bool confirm, confirm_arg_1;
 
 	if (IS_NPC(ch)) {
 		return;
@@ -3157,7 +3161,8 @@ ACMD(do_abandon) {
 	
 	argument = one_word(argument, arg);
 	skip_spaces(&argument);
-	confirm = !str_cmp(arg, "confirm") || !str_cmp(argument, "confirm");	// TRUE if they have the confirm arg
+	confirm_arg_1 = !str_cmp(arg, "confirm");
+	confirm = confirm_arg_1 || !str_cmp(argument, "confirm");	// TRUE if they have the confirm arg
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -3172,10 +3177,10 @@ ACMD(do_abandon) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}
-	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (*arg && !confirm_arg_1 && (veh = get_vehicle_in_room_vis(ch, arg))) {
 		do_abandon_vehicle(ch, veh, confirm);
 	}
-	else if (*arg && !(room = find_target_room(ch, arg))) {
+	else if (*arg && !confirm_arg_1 && !(room = find_target_room(ch, arg))) {
 		// sends own error
 	}
 	else if (!(room = HOME_ROOM(room))) {
@@ -5390,7 +5395,7 @@ ACMD(do_tomb) {
 		else if (GET_POS(ch) < POS_STANDING) {
 			msg_to_char(ch, "You can't do that right now. You need to be standing.\r\n");
 		}
-		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		else if (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch))) {
 			msg_to_char(ch, "You need to own a building to make it your tomb.\r\n");
 		}
 		else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_TOMB)) {

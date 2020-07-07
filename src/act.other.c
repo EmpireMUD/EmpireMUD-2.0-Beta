@@ -2743,10 +2743,13 @@ ACMD(do_quit) {
 	extern obj_data *player_death(char_data *ch);
 	
 	descriptor_data *d, *next_d;
-	bool died = FALSE;
+	bool confirm = FALSE, died = FALSE;
 
 	if (IS_NPC(ch) || !ch->desc)
 		return;
+	
+	one_argument(argument, arg);
+	confirm = !str_cmp(arg, "confirm");
 
 	if (subcmd != SCMD_QUIT)
 		msg_to_char(ch, "You have to type quit--no less, to quit!\r\n");
@@ -2760,6 +2763,15 @@ ACMD(do_quit) {
 		msg_to_char(ch, "You can't quit while drinking blood!\r\n");
 	else if (IN_HOSTILE_TERRITORY(ch)) {
 		msg_to_char(ch, "You can't quit in hostile territory.\r\n");
+	}
+	else if (GET_OLC_TYPE(ch->desc) != 0 && !confirm) {
+		msg_to_char(ch, "You can't quit with an OLC editor open (use .save or .abort first, or 'quit confirm').\r\n");
+	}
+	else if (ch->desc->str && !confirm) {
+		msg_to_char(ch, "You can't quit with a text editor open (use /save or /abort first, or 'quit confirm').\r\n");
+	}
+	else if (GET_POS(ch) < POS_STUNNED && !confirm) {
+		msg_to_char(ch, "Quitting now will kill your character. Type 'quit confirm' to proceed.\r\n");
 	}
 	else {
 		if (GET_POS(ch) < POS_STUNNED) {

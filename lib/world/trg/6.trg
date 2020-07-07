@@ -70,7 +70,7 @@ Enchanted forest unclaimed chop~
 set room %self.room%
 set cycles_left 5
 while %cycles_left% >= 0
-  if (%self.room% != %room%) || %room.empire% || !(%room.sector% ~= Enchanted)
+  if (%self.room% != %room%) || %room.empire% || !(%room.sector% ~= Enchanted || %room.sector% ~= Weirdwood)
     * We've either moved or the room's no longer suitable for deforesting - despawn the mob
     %echo% %self.name%, seeing no opportunity for destruction here, starts wandering away.
     nop %self.add_mob_flag(SPAWNED)%

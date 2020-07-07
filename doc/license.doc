@@ -1,17 +1,15 @@
-EmpireMUD 0.0 Beta
+EmpireMUD 2.0 Beta
 
-The CircleMUD license encompasses all of the necessary information and thus
-saves me the headache of repeating what its done.  Jeremy Elson is a visionary
-in that he has forseen all possible legal aspects and compensated for them in
-his license.
+EmpireMUD follows the tenets of the original CircleMUD and DikuMud licenses.
+These licenses are included below and may not be altered or removed. EmpireMUD
+is copyrighted by Paul Clarke, and use of it requires adherence to the rules
+in this document.
 
-I have no copyright on any of the EmpireMUD code, nor do I plan to.  It's
-irrelevant, it's out there for you and it's protected by Circle and DIKU.
-Here are some clarifications:
+Here are some key notes for running or distributing any part of EmpireMUD:
 
-1. You MUST comply with the CircleMUD and DIKU licenses to the maximum
-   possible degree.  Running the mud in any capacity confirms that you've
-   read all of this and agree to comply with it.
+1. You MUST comply with the EmpireMUD, CircleMUD, and DIKU licenses to the
+   maximum possible degree.  Running the mud in any capacity confirms that
+   you've read all of this and agree to comply with it.
 2. DIKU and CircleMUD credits MUST appear in the login sequence.
    Traditionally, they appear on the intro screen.  However, Jeremy Elson has
    defined login sequence to be the time from when a player connects to when
@@ -26,20 +24,30 @@ Here are some clarifications:
    I have maintained all of CircleMUD's credit comments and added some of
    my own.  If a function lacks a credit, do not add your own unless you
    wrote that function.  Respect must be given to the authors.
+4. You cannot request or accept any money for running, maintaining, modifying,
+   distributing, or otherwise using EmpireMUD or any of its code or content.
+   This includes donations. Uncountable thousands of hours of work went into
+   building EmpireMUD (and CircleMUD, and DikuMud) without any form of
+   monetary compensation. Using any part of EmpireMUD binds you to this same
+   restriction.
+5. We are aware that DikuMud and CircleMUD have changed their licenses in 2020.
+   We do not believe they have the authority to do this because DikuMud was
+   created at a university and that university retains sole authority to change
+   the license. EmpireMUD is NOT offered under the updated LGPL license and
+   continues to use the original licenses provided by DikuMud and CircleMUD.
 
-In addition, I ask that you please e-mail me the following information.  This
+If possible, I ask that you please e-mail me the following information.  This
 is for demographic data and to help me better the EmpireMUD code.
-   - Your name
-   - Your e-mail address
+   - Your name and e-mail address
    - The address+port of your mud
    - Your mud's web page (if applicable)
    - The theme of your mud (for survey reasons)
    - Additions you'd like to see in EmpireMUD
    - Changes you've made (or plan to make) (don't be overspecific)
-This will help me better EmpireMUD in future versions.
 
 Paul Clarke
 paul@empiremud.net
+
 
 Now, without further ado, the CircleMUD License:
 

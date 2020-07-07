@@ -17,9 +17,10 @@ You can learn about founding and managing empires on HELP EMPIRE GUIDE.
 See also: CLAIM, PLEDGE, ENROLL, PROMOTE, TERRITORY, CITIES, CITY COMMAND,
     ROSTER, ESCORE, EMPIRE TRAITS, ELOG, EEDIT, ESTATS, ETALK
 #
-ABANDON
+ABANDON NO-ABANDON "NO ABANDON"
 
 Usage:  abandon [target/coordinates] [confirm]
+        manage no-abandon
 
 This command allows you to abandon a building or acre of land which your 
 empire no longer wants. This falls under the cede privilege. Buildings and rare
@@ -27,7 +28,11 @@ crops require you to type 'confirm' when you try to abandon them remotely.
 
 It can also be used to abandon vehicles.
 
-See also: CEDE, CLAIM, PRIVILEGE, PUBLICIZE
+If you use 'manage' to set a tile as no-abandon, you must add the 'confirm'
+to abandon it. Workforce chores like abandon-chopped will not abandon these
+tiles.
+
+See also: CEDE, CLAIM, MANAGE, PRIVILEGE, PUBLICIZE
 #
 ALLIANCE "DIPLOMACY ALLIANCE" ALLY ALLIES ALLIED
 
@@ -772,6 +777,7 @@ Usage:  manage [option] [on/off]
 This command allows you to manage land use. You can configure the following
 options:
  &cpublic&0 - Non-members can use the room/building.
+ &cno-abandon&0 - The tile cannot be abandoned by accident (or by Workforce).
  &cno-dismantle&0 - The building cannot be dismantled.
  &cno-work&0 - Workforce will not work the tile.
 
@@ -1434,7 +1440,7 @@ Workforce types:
 Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores
 tend to cost more food.
 
-See also: EXARCH CRAFTS, WORKFORCE
+See also: ABANDON, EXARCH CRAFTS, WORKFORCE
 #
 "WORKFORCE KEEP"
 

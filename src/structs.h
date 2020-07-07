@@ -2253,6 +2253,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRG_PURCHASABLE  BIT(1)	// b. can buy it
 #define PRG_SCRIPT_ONLY  BIT(2)	// c. cannot buy/achieve it
 #define PRG_HIDDEN  BIT(3)	// d. progress does not show up
+#define PRG_NO_ANNOUNCE  BIT(4)	// e. never announces when this goal is achieved
 
 
 // PRG_PERK_x: progress perks
@@ -2568,6 +2569,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_NO_TELEPORT  BIT(16)	// q. cannot teleport
 #define ROOM_AFF_BRIGHT_PAINT  BIT(17)	// r. paint is bright color
 #define ROOM_AFF_FAKE_INSTANCE  BIT(18)	// s. room is a fake_loc for an instance
+#define ROOM_AFF_NO_ABANDON  BIT(19)	// t. cannot abandon by accident
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 

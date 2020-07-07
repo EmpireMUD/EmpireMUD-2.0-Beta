@@ -47,8 +47,8 @@ B
 c
 C
 0 10
-I 26 801 100.00 1  # DECAYS-TO: a jar
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+I 26 801 100.00 1  # DECAYS-TO: a glass jar
+I 27 801 100.00 1  # CONSUMES-TO: a glass jar
 M
 4
 You pop a glowing pod into your mouth from $p.~
@@ -191,13 +191,13 @@ ironflour sack~
 a sack of ironflour~
 A sack of ironflour is sitting on the ground.~
    This sack of "flour" resembles iron filings in appearance and texture. It
-can be cooked (though perhaps forged would be a better term) into long-lasting
+can be baked (though perhaps forged would be a better term) into long-lasting
 iron rations.
 
-Cook (no skill required): ironbread
+Bake (no skill required): ironbread
   2x sack of ironflour
 ~
-3 0 a 0 6
+3 0 a 0 7
 0 0 0
 2 0
 R
@@ -306,8 +306,8 @@ This foul-smelling mana potion is made from magic mushrooms.
 8 0
 C
 150 150
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: a glass flask
+I 27 800 100.00 1  # CONSUMES-TO: a glass flask
 R
 5130 0
 T 1254
@@ -563,9 +563,10 @@ A bundle of vigilant vines is piled up here.~
    These vicious magi-netically engineered vines can be planted in your cities,
 and will grow carnivorous flora to attack invaders.
 ~
-3 b a 0 10
+3 b a 0 11
 0 10511 0
 7 168
+O+ 1 6870
 R
 5111 0
 S

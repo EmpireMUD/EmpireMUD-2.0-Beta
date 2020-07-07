@@ -413,6 +413,23 @@ Loch Colossus block door~
 %send% %actor% You cannot reach that while %self.name% is in the way.
 return 0
 ~
+#11123
+Start despawn time~
+2 g 100
+~
+if !%self.contents(11124)%
+  * start despawn
+  %load% obj 11124
+end
+detach 11123 %self.id%
+~
+#11124
+Burrow Canyons Timed Despawn~
+1 f 0
+~
+* After 2 hours, ends the instance
+%adventurecomplete%
+~
 #11130
 Caretaker Replacement~
 2 q 100
