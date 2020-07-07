@@ -340,6 +340,18 @@ A
 A
 9 1 0
 S
+#11124
+dust falling stream slow~
+the falling dust~
+A slow stream of dust falls from the ceiling.~
+   The old mining tunnel isn't terribly stable. Dust falls slowly (but
+constantly) near the entrance, punctuated by the occasional pebble or rock.
+~
+3 0 0 0 2
+0 0 0
+1 96
+T 11124
+S
 #11130
 leather leatherbound book journal~
 a mage's journal~

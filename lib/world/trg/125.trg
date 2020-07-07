@@ -910,7 +910,7 @@ if !%found_person%
   halt
 end
 if %success% && !%failure%
-  emote A red light on the side of %self.name% goes green.
+  emote A red light on the side of $n goes green.
   eval cycle %cycle% + 1
   remote cycle %self.id%
   if %cycle% >= 10
@@ -919,7 +919,7 @@ if %success% && !%failure%
   end
 else
   if %cycle% > 0
-    emote A green light on the side of %self.name% goes red.
+    emote A green light on the side of $n goes red.
     eval cycle %cycle% - 1
     remote cycle %self.id%
   end

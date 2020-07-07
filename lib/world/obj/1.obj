@@ -184,14 +184,14 @@ R
 5118 0
 S
 #122
-wood rough trees~
+rough-wood wood rough trees~
 some rough wood~
 Some rough wood is stacked here.~
    This scraggly wood looks like it came from more than one type of desert
 tree. You can saw it into boards, and might even be able to salvage some
 sticks.
 ~
-3 e a 0 8
+3 e a 0 9
 0 0 0
 0 0
 I 11 1002 100.00 1  # LIGHT: a roaring fire

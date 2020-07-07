@@ -864,9 +864,9 @@ A wild ass brays loudly as it darts away from you.
 10 20 djo 0 4
 0 0 11 9
 D
-   Although it's similar to domestic donkeys you've seen, the wild ass nowhere
-near as friendly. It also has striped legs that almost resemble a zebra, and a
-black fringe at the end of its short mane.
+   Although it's similar to domestic donkeys you've seen, the wild ass is
+nowhere near as friendly. It also has striped legs that almost resemble a
+zebra, and a black fringe at the end of its short mane.
 ~
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 1 1351 100.00 1  # SKIN: a large skin
@@ -1002,9 +1002,9 @@ like it.
 I 1 9057 100.00 1  # SKIN: a luxurious yeti fur
 S
 #9058
-mammoth wooly huge~
-a wooly mammoth~
-A huge wooly mammoth is standing over you!
+mammoth woolly wooly huge~
+a woolly mammoth~
+A huge woolly mammoth is standing over you!
 ~
 20 40 defjoy 0 5
 0 0 0 5

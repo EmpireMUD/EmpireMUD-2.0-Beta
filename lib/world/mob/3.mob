@@ -79,9 +79,9 @@ I 4 175 50.00 2  # LOOT: an iron ingot
 I 4 175 50.00 2  # LOOT: an iron ingot
 S
 #304
-warmammoth mammoth wooly armored~
+warmammoth mammoth woolly wooly armored~
 an armored warmammoth~
-An armored wooly warmammoth dominates the view!
+An armored woolly warmammoth dominates the view!
 ~
 100 150 bdefjy 0 5
 0 0 0 5
@@ -94,9 +94,9 @@ I 0 9058 100.00 1  # BUTCHER: an enormous mammoth tusk
 I 0 9058 50.00 1  # BUTCHER: an enormous mammoth tusk
 I 1 1351 100.00 3  # SKIN: a large skin
 I 1 1351 75.00 1  # SKIN: a large skin
-I 2 1358 100.00 4  # SHEAR: a bag of wool
-I 2 1358 50.00 4  # SHEAR: a bag of wool
-I 2 1358 5.00 4  # SHEAR: a bag of wool
+I 2 1358 100.00 4  # SHEAR: a bag of sheep's wool
+I 2 1358 50.00 4  # SHEAR: a bag of sheep's wool
+I 2 1358 5.00 4  # SHEAR: a bag of sheep's wool
 I 4 175 100.00 4  # LOOT: an iron ingot
 I 4 175 75.00 2  # LOOT: an iron ingot
 I 4 175 50.00 2  # LOOT: an iron ingot
