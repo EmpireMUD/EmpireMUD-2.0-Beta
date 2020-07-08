@@ -92,33 +92,13 @@ To build a road over other terrains, see boardwalk and swampwalk.
 
 See also: BOARDWALK, SWAMPWALK, PROGRESS
 #
-BUILD BUILDING "BASIC BUILDINGS"
+"BUILD ABILITY" "BASIC BUILDINGS"
 
 Build (Trade ability)
 
-Usage:  build <building> [direction]
-        build info <building>
+(Disambiguation: see also BUILD COMMAND)
 
-Speed boosts:  Faster Chores bonus, haste
-
-This command is used to create buildings using raw materials. Most buildings
-require a direction that they'll face. Resources are added from left to right
-in the requirements list (you can't add nails before lumber).
-
-You can just get information on a building, like what it costs to build, by
-typing 'build info <building>'. Typing 'build' by itself will resume work if
-you're in an incomplete building, or will list what you can build if not.
-
-You can't build on land that's inside another empire's city radius while at war
-with that empire.
-
-Until a building is completed, you can walk into and out of it freely, and you
-can't build any additional rooms inside. Once finished, nobody who is not
-loyal to your empire will be able to enter.
-
-All buildings give experience as you add materials to their construction.
-
-Basic buildings:
+Basic buildings granted by the Build ability:
   &g.&0()&g.&0 hut
   &y.&0()&y.&0 mudhut
   (--) cabin
@@ -149,10 +129,9 @@ Basic buildings:
   &Y|__|&0 sandpit -- must be facing an ocean or lake
   ..x. familygravesite -- used as a respawn point (city only)
 
-For more information on building your first house, see HELP HOUSING GUIDE.
+All buildings give experience as you add materials to their construction.
 
-See also: BUILD INFO, ARCHITECT, RESOURCES, KEEP, EMPIRE, DISMANTLE, DESIGNATE,
-   RECIPES
+See also: BUILD COMMAND, BUILD INFO, ARCHITECT
 #
 BURIALCAVERN "BURIAL CAVERN"
 
@@ -266,7 +245,7 @@ Cemeteries are a traditional place to bury the dead. When your character dies,
 you can re-spawn at a cemetery if your empire owns one on the same continent
 (otherwise, you'll re-spawn at a starting location).
 
-See also: STARTING LOCATION, TOMB
+See also: STARTING LOCATION, TOMB COMMAND
 #
 CLAYPIT "CLAY PIT"
 
@@ -598,23 +577,6 @@ regular plains; the desert version is the mud hut.
 
 See also: MUDHUT
 #
-INTERLINK INTERLINKING
-
-Usage:  interlink <direction> <code>
-
-Some buildings can be interlinked. You can connect the interior rooms of one
-interlinkable building to the interior rooms of a different nearby building.
-
-You can only interlink to buildings that are 4 tiles away or less. This limit
-drops to 1 in the mountains and you can't interlink over rivers at all.
-
-Typing "interlink" by itself will provide you with the interlink code for your
-current location.
-
-To find buildings that are interlinkable, try 'helpsearch interlink'.
-
-See also: HELPSEARCH, MARK
-#
 JUNGLESHELTER "JUNGLE SHELTER"
 
 &G^c^^&0  Jungle Shelter  (Find Shelter ability)
@@ -746,18 +708,6 @@ available water. Construction starts with a small pit, usually just two feet
 deep, to help insulate against the oppressive temperature of the desert air.
 
 See also: HUT
-#
-NODISMANTLE NO-DISMANTLE "NO DISMANTLE"
-
-Usage:  nodismantle
-
-This toggle helps you keep your minions from accidentally dismantling one of
-your buildings. They'll still be able to toggle it off and dismantle anyway,
-but nobody will take down an important structure by accident.
-
-This uses the 'build'.
-
-See also: PRIVILEGES
 #
 OASISGARDEN "OASIS GARDEN"
 
@@ -894,25 +844,6 @@ You can quickly build a shelter to protect yourself from nasty surprises
 while you sleep.
 
 When you're done with the shelter, be sure to dismantle and abandon it.
-#
-RUINS "DECAYING RUINS"
-
-../]  [\..  |\..  ../|  .-.]  [.-.  [__]
-
-._i.  .[..  ..v.  ./].  .(\.  .}\.  ..}.
-
-Decaying Ruins
-
-Fame:  -1
-
-When you fail to perform upkeep on your buildings, they eventually collapse
-into ruins. These ruins stand as a testament to the hubris of an empire that
-built more than it could maintain.
-
-It takes roughly two and a half months (realtime) for buildings to decay,
-although unfinished buildings decay faster.
-
-See also: MAINTAIN
 #
 SANDPIT "SAND PIT"
 
@@ -1161,23 +1092,18 @@ You can pick more herbs than normal before the tile is depleted.
 
 See also: PICK
 #
-TOMB
+"TOMB BUILDING"
+
+(Disambiguation: see also TOMB COMMAND)
 
 [oo]  Tomb  (Almost Famous goal)
 
 Fame:  1
 
-Command:  tomb [set | unset]
+Tombs are a prestigious place to bury the dead. You can use it as a place to
+respawn when you die.
 
-Tombs are a prestigious place to bury the dead.
-
-The tomb command allows you to choose a tomb or cemetery as your place of rest.
-If you die, you will find yourself resurrected at your own tomb, so long as
-it's nearby. Otherwise, you'll find yourself at a random tomb or cemetery
-on the continent where you died, or at a starting location if there isn't a
-tomb available.
-
-See also: CEMETERY, STARTING LOCATION
+See also: TOMB COMMAND
 #
 "TOWER OF SORCERY" TOWEROFSORCERY SORCERYTOWER "SORCERY TOWER" "SORCERY TOWER CONSTRUCTION GOAL"
 
@@ -1279,27 +1205,18 @@ stores items that are found on various adventures.
 
 See also: CABINET OF CURIOSITIES, STORAGE
 #
-TUNNEL
+"TUNNEL BUILDING"
+
+(Disambiguation: see also TUNNEL COMMAND)
 
 &y/&0OO&y\&0  Tunnel  (Mountain Engineering goal)
 
-Command:  tunnel <direction>
-
-This command allows you to begin construction on a tunnel through a mountain
-range. Tunnels always go in a straight line, and you can't pass through each
-part of a tunnel until it is finished. If you destroy one side of the tunnel,
-the other side will result in a dead end.
-
-To begin the tunnel, stand on flat ground (plains, desert, etc) next to the
-mountain and type "tunnel east" (or whichever way the mountain is). You must
-have permission to build on both ends of the tunnel (you can't tunnel into
-someone else's claimed land).
-
-The entrance and exit to the tunnel will be on the mountain tiles at the ends.
+A pair of tunnel entrances on opposite sides of a mountain allow you to cross
+the mountains with ease. Start one with the 'tunnel' command.
 
 Tunnels may be interlinked.
 
-See also: DISMANTLE, INTERLINK
+See also: INTERLINK, TUNNEL COMMAND
 #
 UNDERGROUNDCOMPLEX "UNDERGROUND COMPLEX" "UNDERGROUND PASSAGE"
 

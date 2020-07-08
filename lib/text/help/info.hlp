@@ -1180,6 +1180,24 @@ Climbing ability, or flight.
 
 See also: CLIMB, MOUNTAIN CLIMBING
 #
+RUINS "DECAYING RUINS"
+
+../]  [\..  |\..  ../|  .-.]  [.-.  [__]
+._i.  .[..  ..v.  ./].  .(\.  .}\.  ..}.
+
+Decaying Ruins
+
+Fame:  -1
+
+When you fail to perform upkeep on your buildings, they eventually collapse
+into ruins. These ruins stand as a testament to the hubris of an empire that
+built more than it could maintain.
+
+It takes roughly two and a half months (realtime) for buildings to decay,
+although unfinished buildings decay faster.
+
+See also: MAINTAIN
+#
 SCALING "MOB SCALING" "SCALING MOBS"
 
 EmpireMUD uses a system of mob-scaling where mobs are procedurally adjusted
