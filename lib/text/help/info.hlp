@@ -411,11 +411,11 @@ See also: DESIGNATE, MARK, WORKFORCE
 COIN COINS COINAGE CURRENCY GOLD "EXCHANGE RATE"
 
 Commands:  coins [type]
-           give <number> [empire] coins <person>
-           drop <number> [empire] coins
+           give <number> <empire | misc> coins <person>
+           drop <number> <empire | misc> coins
            withdraw <number> coins
-           deposit <number> [empire] coins
-           exchange <number> [empire] coins
+           deposit <number> <empire | misc> coins
+           exchange <number> <empire | misc> coins
            get coins
 
 Coins in EmpireMUD are minted by empires, and the value of a coin varies from
@@ -431,9 +431,10 @@ distrusted empires, and 50% for all other empire relationships. The exchange
 rate gets a 25% bonus (up to a maximum of 100%) for empires with trade
 relations.
 
-If you don't specify an empire for coin-related commands, it will default
-to your generic/miscellaneous coins. You can also specify those with the name
-"other" or "misc".
+You must either specify an empire (by adjective) or "miscellaneous" coins. If
+you try to give miscellaneous coins to someone but you only have empire coins,
+those coins will automatically be "downgraded" to miscellaneous coins. This may
+help with NPCs that require a bribe.
 
 You can only carry 10 different types of coins at a time. After that, when you
 gain new coins, the coins you have the fewest of are combined into the "misc"

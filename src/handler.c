@@ -2196,7 +2196,9 @@ double exchange_rate(empire_data *from, empire_data *to) {
 * This is considered to have found a string if the returned pointer is > input,
 * or *amount_found > 0.
 *
-* This parses: <number> [empire] coin[s]
+* This parses: <number> <empire | misc> coin[s]
+*
+* Prior to b5.98, the empire arg could be omitted and it would assume 'misc'.
 *
 * @param char *input The input string.
 * @param empire_data **emp_found A place to store the found empire id, if any.
@@ -2232,9 +2234,10 @@ char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, boo
 	// we found a numeric arg.. save it in case it works out.
 	amt = atoi(arg);
 	
-	// check for empire arg OR coins here
+	// check for empire arg	// OR coins here
 	pos = any_one_word(pos, arg);
 	
+	/* as of b5.98 you cannot omit the empire/misc arg -- this was letting players implicitly downgrade empire coins to misc coins by mistyping a 'give'
 	if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
 		// no empire arg but we're done
 		*amount_found = amt;
@@ -2244,6 +2247,7 @@ char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, boo
 		}
 		return pos;
 	}
+	*/
 	
 	if (!(*emp_found = get_empire_by_name(arg))) {
 		if (is_abbrev(arg, "other") || is_abbrev(arg, "miscellaneous") || is_abbrev(arg, "simple")) {
