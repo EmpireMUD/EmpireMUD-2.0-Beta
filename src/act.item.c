@@ -4808,8 +4808,12 @@ ACMD(do_drop) {
 			send_to_char(buf, ch);
 			}
 		else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-			sprintf(buf, "You don't seem to have any %ss.\r\n", arg);
-			send_to_char(buf, ch);
+			if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
+				msg_to_char(ch, "What kind of coins do you want to %s?\r\n", sname);
+			}
+			else {
+				msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
+			}
 		}
 		else {
 			do {
@@ -4866,8 +4870,12 @@ ACMD(do_drop) {
 				return;
 			}
 			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-				sprintf(buf, "You don't seem to have any %ss.\r\n", arg);
-				send_to_char(buf, ch);
+				if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
+					msg_to_char(ch, "What kind of coins do you want to %s?\r\n", sname);
+				}
+				else {
+					msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
+				}
 				return;
 			}
 			while (obj) {
@@ -4894,8 +4902,12 @@ ACMD(do_drop) {
 		}
 		else {
 			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-				sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
-				send_to_char(buf, ch);
+				if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
+					msg_to_char(ch, "What kind of coins do you want to %s?\r\n", sname);
+				}
+				else {
+					msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+				}
 			}
 			else {
 				amount += perform_drop(ch, obj, mode, sname);
