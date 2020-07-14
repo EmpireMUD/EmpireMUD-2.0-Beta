@@ -354,7 +354,8 @@ void do_mount_list(char_data *ch, char *argument) {
 			snprintf(part, sizeof(part), "%s%s", skip_filler(GET_SHORT_DESC(proto)), (cur && PRF_FLAGGED(ch, PRF_SCREEN_READER) ? " [current]" : ""));
 		}
 		
-		size += snprintf(buf + size, sizeof(buf) - size, " %s%-38s%s%s", (cur ? "&l" : ""), part, (cur ? "&0" : ""), PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : (!(++count % 2) ? "\r\n" : " "));
+		++count;
+		size += snprintf(buf + size, sizeof(buf) - size, " %s%-38s%s%s", (cur ? "&l" : ""), part, (cur ? "&0" : ""), PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : (!(count % 2) ? "\r\n" : " "));
 		any = TRUE;
 	}
 	

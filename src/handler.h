@@ -124,7 +124,7 @@ extern obj_data *create_money(empire_data *type, int amount);
 #define decrease_coins(ch, emp, amount)  increase_coins(ch, emp, -1 * amount)
 extern double exchange_coin_value(double amount, empire_data *convert_from, empire_data *convert_to);
 double exchange_rate(empire_data *from, empire_data *to);
-extern char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, bool assume_coins, bool *gave_coin_type);
+extern char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, bool require_coin_type, bool assume_coins, bool *gave_coin_type);
 extern struct coin_data *find_coin_entry(struct coin_data *list, empire_data *emp);
 extern int increase_coins(char_data *ch, empire_data *emp, int amount);
 extern const char *money_amount(empire_data *type, int amount);

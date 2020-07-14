@@ -4786,7 +4786,7 @@ ACMD(do_drop) {
 	}
 	
 	// drop coins?
-	if ((argpos = find_coin_arg(argument, &coin_emp, &coin_amt, FALSE, NULL)) > argument && coin_amt > 0) {
+	if ((argpos = find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, FALSE, NULL)) > argument && coin_amt > 0) {
 		perform_drop_coins(ch, coin_emp, coin_amt, mode);
 		return;
 	}
@@ -4808,8 +4808,12 @@ ACMD(do_drop) {
 			send_to_char(buf, ch);
 			}
 		else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-			sprintf(buf, "You don't seem to have any %ss.\r\n", arg);
-			send_to_char(buf, ch);
+			if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
+				msg_to_char(ch, "What kind of coins do you want to %s?\r\n", sname);
+			}
+			else {
+				msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
+			}
 		}
 		else {
 			do {
@@ -4866,8 +4870,12 @@ ACMD(do_drop) {
 				return;
 			}
 			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-				sprintf(buf, "You don't seem to have any %ss.\r\n", arg);
-				send_to_char(buf, ch);
+				if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
+					msg_to_char(ch, "What kind of coins do you want to %s?\r\n", sname);
+				}
+				else {
+					msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
+				}
 				return;
 			}
 			while (obj) {
@@ -4894,8 +4902,12 @@ ACMD(do_drop) {
 		}
 		else {
 			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-				sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
-				send_to_char(buf, ch);
+				if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
+					msg_to_char(ch, "What kind of coins do you want to %s?\r\n", sname);
+				}
+				else {
+					msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+				}
 			}
 			else {
 				amount += perform_drop(ch, obj, mode, sname);
@@ -5103,6 +5115,7 @@ ACMD(do_exchange) {
 	double rate;
 	char *pos;
 	
+	skip_spaces(&argument);
 	one_argument(argument, arg);
 	
 	if (IS_NPC(ch)) {
@@ -5123,7 +5136,7 @@ ACMD(do_exchange) {
 	else if (!*arg) {
 		msg_to_char(ch, "Exchange what for coins?\r\n");
 	}
-	else if ((pos = find_coin_arg(argument, &coin_emp, &amount, FALSE, NULL)) > argument && amount > 0) {
+	else if ((pos = find_coin_arg(argument, &coin_emp, &amount, TRUE, FALSE, NULL)) > argument && amount > 0) {
 		// exchanging coins
 		if (!(coin = find_coin_entry(GET_PLAYER_COINS(ch), coin_emp))) {
 			msg_to_char(ch, "You don't have any %s coins.\r\n", (coin_emp ? EMPIRE_ADJECTIVE(coin_emp) : "of those"));
@@ -5153,6 +5166,10 @@ ACMD(do_exchange) {
 			
 			// theoretically these had the same value so empire's coinage does not change
 		}
+	}
+	else if (isdigit(*argument) && strstr(argument, "coins")) {
+		// failed to detect as coins but the player is still (probably) trying to exchange coins
+		msg_to_char(ch, "Usage: exchange <number> <type> coins\r\n");
 	}
 	else {
 		// exchanging objs
@@ -5320,7 +5337,7 @@ ACMD(do_give) {
 	bool any = FALSE;
 	
 	// give coins?
-	if ((argpos = find_coin_arg(argument, &coin_emp, &coin_amt, FALSE, NULL)) > argument && coin_amt > 0) {
+	if ((argpos = find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, FALSE, NULL)) > argument && coin_amt > 0) {
 		argument = one_argument(argpos, arg);
 		if ((vict = give_find_vict(ch, arg))) {
 			perform_give_coins(ch, vict, coin_emp, coin_amt);
@@ -6855,7 +6872,7 @@ ACMD(do_split) {
 	}
 
 	// parse args
-	pos = find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, NULL);
+	pos = find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, TRUE, NULL);
 	
 	if (!*argument || pos == argument || coin_amt <= 0) {
 		msg_to_char(ch, "Usage: split <amount> <type> coins\r\n");

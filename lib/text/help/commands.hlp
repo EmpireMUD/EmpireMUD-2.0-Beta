@@ -320,6 +320,38 @@ Examples:
   > idea more types of pottery: wedding vase, corded pot, terrible helmet
   > typo 'sence' should be spelled 'cense'
 #
+BUILD BUILDING "BUILD COMMAND"
+
+(Disambiguation: see also BUILD ABILITY)
+
+Usage:  build <building> [direction]
+        build info <building>
+
+Speed boosts:  Faster Chores bonus, haste
+
+This command is used to create buildings using raw materials. Most buildings
+require a direction that they'll face. Resources are added from left to right
+in the requirements list (you can't add nails before lumber). You gain skill
+experience each time you add resources to a building, if you have the ability
+that was required to start the building.
+
+You can also use this command to get information on a building, like what it
+costs to build, by typing 'build info <building>'. Typing 'build' by itself
+will resume work if you're in an incomplete building, or will list what you can
+build if you type it outdoors.
+
+You can't build on land that's inside another empire's city radius while at war
+with that empire, even if the land isn't claimed by that empire.
+
+Until a building is completed, you can walk into and out of it freely, and you
+can't add any additional rooms inside. Once finished, players who are not loyal
+to your empire won't be able to enter.
+
+For more information on building your first house, see HELP HOUSING GUIDE.
+
+See also: BUILD INFO, RESOURCES, KEEP, EMPIRE, DISMANTLE, DESIGNATE, RECIPES,
+  BUILD ABILITY
+#
 BUY LIST SHOP SHOPS
 
 Usage:  list [keywords]
@@ -1100,6 +1132,23 @@ contents).
 
 See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR, STORE, RETRIEVE, WIELD, SWAP
 #
+INTERLINK INTERLINKING
+
+Usage:  interlink <direction> <code>
+
+Some buildings can be interlinked. You can connect the interior rooms of one
+interlinkable building to the interior rooms of a different nearby building.
+
+You can only interlink to buildings that are 4 tiles away or less. This limit
+drops to 1 in the mountains and you can't interlink over rivers at all.
+
+Typing "interlink" by itself will provide you with the interlink code for your
+current location.
+
+To find buildings that are interlinkable, try 'helpsearch interlink'.
+
+See also: HELPSEARCH, MARK
+#
 JUNK "JUNK ITEM" "JUNK OBJECT"
 
 Usage:  junk <object>
@@ -1346,6 +1395,18 @@ Usage:  news
 
 Shows any recent news from the game staff. For example, updates or new
 adventures might appear here.
+#
+NODISMANTLE NO-DISMANTLE "NO DISMANTLE"
+
+Usage:  nodismantle
+
+This toggle helps you keep your minions from accidentally dismantling one of
+your buildings. They'll still be able to toggle it off and dismantle anyway,
+but nobody will take down an important structure by accident.
+
+This uses the 'build' privilege.
+
+See also: MANAGE, PRIVILEGES
 #
 NOREPEAT NO-REPEAT "NO REPEAT"
 
@@ -2300,6 +2361,27 @@ This toggle turns off paint colors on the map. This can make it clearer what
 you're looking at since paint colors can make buildings look deceptively
 different.
 #
+TOMB "TOMB COMMAND"
+
+(Disambiguation: see also TOMB BUILDING)
+
+Command:  tomb [set | unset]
+
+The tomb command allows you to choose a tomb or cemetery as your place of rest.
+If you die, you will find yourself resurrected at your own tomb, so long as
+it's nearby. Otherwise, you'll find yourself at a random tomb or cemetery
+on the continent where you died, or at a starting location if there isn't a
+tomb available.
+
+Basic tombs:
+  ..x.  Grave  (newbie grave marker)
+  ..x.  Family Gravesite (Build ability)
+  .i.i  Cemetery  (Almost Famous goal)
+  [oo]  Tomb  (Almost Famous goal)
+        Crypt  (designated in castles and havens)
+
+See also: TOMB BUILDING, STARTING LOCATION
+#
 TRAVEL-LOOK "TRAVEL LOOK" "TOGGLE TRAVEL-LOOK"
 
 Usage:  toggle travel-look [on/off]
@@ -2307,6 +2389,28 @@ Usage:  toggle travel-look [on/off]
 This toggle causes you to automatically 'look' after each time you move when
 running or when driving, piloting, or sailing a vehicle. With this toggle off,
 you only see a short message indicating you moved.
+#
+TUNNEL "TUNNEL COMMAND"
+
+(Disambiguation: see also TUNNEL BUILDING)
+
+Command:  tunnel <direction>
+
+This command allows you to begin construction on a tunnel through a mountain
+range. Tunnels always go in a straight line, and you can't pass through each
+part of a tunnel until it is finished. If you destroy one side of the tunnel,
+the other side will result in a dead end.
+
+To begin the tunnel, stand on flat ground (plains, desert, etc) next to the
+mountain and type "tunnel east" (or whichever way the mountain is). You must
+have permission to build on both ends of the tunnel (you can't tunnel into
+someone else's claimed land).
+
+The entrance and exit to the tunnel will be on the mountain tiles at the ends.
+
+Tunnels may be interlinked.
+
+See also: INTERLINK, TUNNEL BUILDING
 #
 UNLOAD UNLOADVEHICLE BOATUNLOAD
 
@@ -2431,8 +2535,12 @@ WIZLIST GODLIST
 Usage:  wizlist
         godlist
 
-Lists the most powerful beings on the MUD. These are the people responsible
-for administering the system.
+The wizlist command lists the game's administrators, also called 'immortals'
+or sometimes 'wizards'. These are the people who contribute to the game's
+code, content, or community.
+
+The godlist is a list of gods, who are players that have been elevated to
+divine status. See HELP GOD SYSTEM for more information.
 #
 WOOL
 
