@@ -3729,8 +3729,8 @@ ACMD(do_deposit) {
 		// real members only
 		msg_to_char(ch, "You don't have permission to deposit coins here.\r\n");
 	}
-	else if (find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, NULL) == argument || coin_amt < 1) {
-		msg_to_char(ch, "Invalid argument. Usage: deposit <number> [type] coins\r\n");
+	else if (find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, TRUE, NULL) == argument || coin_amt < 1) {
+		msg_to_char(ch, "Invalid argument. Usage: deposit <number> <type> coins\r\n");
 	}
 	else if (!(coin = find_coin_entry(GET_PLAYER_COINS(ch), coin_emp)) || coin->amount < coin_amt) {
 		msg_to_char(ch, "You don't have %s.\r\n", money_amount(coin_emp, coin_amt));
@@ -7058,7 +7058,7 @@ ACMD(do_withdraw) {
 		// real members only
 		msg_to_char(ch, "You don't have permission to withdraw coins here.\r\n");
 	}
-	else if (find_coin_arg(argument, &coin_emp, &coin_amt, TRUE, &gave_type) == argument || coin_amt < 1) {
+	else if (find_coin_arg(argument, &coin_emp, &coin_amt, FALSE, TRUE, &gave_type) == argument || coin_amt < 1) {
 		msg_to_char(ch, "Usage: withdraw <number> coins\r\n");
 	}
 	else if ((coin_emp != emp && coin_emp != NULL) || (coin_emp == NULL && gave_type)) {

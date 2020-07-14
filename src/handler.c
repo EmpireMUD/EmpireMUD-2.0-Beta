@@ -2198,16 +2198,17 @@ double exchange_rate(empire_data *from, empire_data *to) {
 *
 * This parses: <number> <empire | misc> coin[s]
 *
-* Prior to b5.98, the empire arg could be omitted and it would assume 'misc'.
+* b5.98 adds the require_coin_type arg because some functions REQUIRE it.
 *
 * @param char *input The input string.
 * @param empire_data **emp_found A place to store the found empire id, if any.
 * @param int *amount_found The numerical argument.
+* @param bool require_coin_type If TRUE, the player MUST type an empire (adjective) or "misc" for the coin type.
 * @param bool assume_coins If TRUE, the word "coins" can be omitted.
 * @param bool *gave_coin_type Optional: A variable to bind whether or not the person typed a coin type ("10 misc coins" instead of "10 coins")
 * @return char* A pointer to the remaining argument (or the full argument, if no coins).
 */
-char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, bool assume_coins, bool *gave_coin_type) {
+char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, bool require_coin_type, bool assume_coins, bool *gave_coin_type) {
 	char arg[MAX_INPUT_LENGTH];
 	char *pos, *final;
 	int amt;
@@ -2237,8 +2238,8 @@ char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, boo
 	// check for empire arg	// OR coins here
 	pos = any_one_word(pos, arg);
 	
-	/* as of b5.98 you cannot omit the empire/misc arg -- this was letting players implicitly downgrade empire coins to misc coins by mistyping a 'give'
-	if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
+	// 1st arg may be 'coins' unless the type is REQUIRED
+	if (!require_coin_type && (!str_cmp(arg, "coin") || !str_cmp(arg, "coins"))) {
 		// no empire arg but we're done
 		*amount_found = amt;
 		*emp_found = REAL_OTHER_COIN;
@@ -2247,7 +2248,6 @@ char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, boo
 		}
 		return pos;
 	}
-	*/
 	
 	if (!(*emp_found = get_empire_by_name(arg))) {
 		if (is_abbrev(arg, "other") || is_abbrev(arg, "miscellaneous") || is_abbrev(arg, "simple")) {
