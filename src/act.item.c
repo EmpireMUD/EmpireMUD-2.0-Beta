@@ -5115,6 +5115,7 @@ ACMD(do_exchange) {
 	double rate;
 	char *pos;
 	
+	skip_spaces(&argument);
 	one_argument(argument, arg);
 	
 	if (IS_NPC(ch)) {
@@ -5165,6 +5166,10 @@ ACMD(do_exchange) {
 			
 			// theoretically these had the same value so empire's coinage does not change
 		}
+	}
+	else if (isdigit(*argument) && strstr(argument, "coins")) {
+		// failed to detect as coins but the player is still (probably) trying to exchange coins
+		msg_to_char(ch, "Usage: exchange <number> <type> coins\r\n");
 	}
 	else {
 		// exchanging objs
