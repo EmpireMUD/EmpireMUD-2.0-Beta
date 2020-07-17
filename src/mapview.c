@@ -1796,7 +1796,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			}
 			
 			// show ownership (political)
-			if (PRF_FLAGGED(ch, PRF_POLITICAL)) {
+			if (PRF_FLAGGED(ch, PRF_POLITICAL) && CHECK_CHAMELEON(origin, to_room)) {
 				emp = ROOM_OWNER(to_room);
 			
 				if (emp) {
