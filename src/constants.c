@@ -2902,6 +2902,7 @@ const char *climate_flags[] = {
 	"coastal",
 	"ocean",
 	"lake",	// 20
+	"waterside",
 	"\n"
 };
 
@@ -2916,6 +2917,8 @@ const bitvector_t climate_flags_order[] = {
 	
 	CLIM_COASTAL, CLIM_FRESH_WATER, CLIM_SALT_WATER,	// water prefixes
 	CLIM_RIVER, CLIM_OCEAN, CLIM_LAKE,	// water types
+	
+	CLIM_WATERSIDE,	// before land types
 	
 	CLIM_MOUNTAIN,		// land terrain that could be prefix or whole name
 	CLIM_FOREST, CLIM_GRASSLAND,	// land terrains
