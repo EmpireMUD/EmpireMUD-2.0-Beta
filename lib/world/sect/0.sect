@@ -683,7 +683,7 @@ S
 #21
 Oasis~
 A Sparkling Oasis~
-'.' 18 ko 6 iw jop
+'.' 18 kov 6 iw jop
 C
 dig, drink, fill, gather, pick~
 D1
@@ -980,7 +980,7 @@ S
 #29
 Swamp~
 A Murky Swamp~
-'~' 13 lo 10 aw m
+'~' 13 lov 10 aw m
 D0
 ~~~&G^~
 &c~
@@ -1089,7 +1089,7 @@ S
 #35
 Marsh~
 A Marshy Lakeshore~
-'~' 13 lou 10 aw m
+'~' 13 louv 10 aw m
 D0
 ~~~&G^~
 &c~
@@ -1291,7 +1291,7 @@ S
 #40
 Riverbank~
 On the Plains, Above the Riverbank~
-'.' 10 j 1 l bps
+'.' 10 jv 1 l bps
 C
 dig, pick~
 D1
@@ -1453,7 +1453,7 @@ S
 #44
 Light Riverbank Forest~
 Some Trees on the Riverbank~
-'.' 14 jq 2 dl nps
+'.' 14 jqv 2 dl nps
 C
 chop, dig, gather, pick~
 D1
@@ -1507,7 +1507,7 @@ S
 #45
 Forested Riverbank~
 A Forest, Above the Riverbank~
-'^' 14 jq 3 dl nps
+'^' 14 jqv 3 dl nps
 C
 chop, dig, gather, pick~
 D1
@@ -1557,7 +1557,7 @@ S
 #46
 Stumped Riverbank~
 Some Stumps on the Riverbank~
-'.' 10 j 1 dl bps
+'.' 10 jv 1 dl bps
 C
 burn stumps, dig, pick~
 D1
@@ -1594,7 +1594,7 @@ S
 #47
 Riverside Copse~
 A Copse on the Riverbank~
-'w' 13 j 3 d p
+'w' 13 jv 3 d p
 C
 chop, dig, pick~
 D1
@@ -2212,7 +2212,7 @@ S
 #70
 Irrigated Plains~
 An Irrigated Plain~
-'.' 10 jklr 2 l bp
+'.' 10 jklrv 2 l bp
 C
 dig, pick~
 D1
@@ -2260,7 +2260,7 @@ S
 #71
 Irrigated Forest~
 A Marshy Forest~
-'^' 14 jkq 3 dl np
+'^' 14 jkqv 3 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -2310,7 +2310,7 @@ S
 #72
 Irrigated Jungle~
 A Marshy Jungle~
-'^' 14 klq 3 d g
+'^' 14 klqv 3 d g
 C
 chop, dig, gather, pick~
 D0
@@ -2342,7 +2342,7 @@ S
 #73
 Irrigated Stumps~
 Some Stumps on the Irrigated Plain~
-'.' 10 jk 2 dl bp
+'.' 10 jkv 2 dl bp
 C
 burn stumps, dig, pick~
 D1
@@ -2392,7 +2392,7 @@ S
 #74
 Irrigated Copse~
 An Irrigated Copse~
-'w' 13 jk 3 d p
+'w' 13 jkv 3 d p
 C
 chop, dig, pick~
 D1
@@ -2439,7 +2439,7 @@ S
 #75
 Irrigated Jungle Stumps~
 A Marshy Field of Stumps~
-'.' 10 kl 3 dl p
+'.' 10 klv 3 dl p
 C
 chop, dig, pick~
 D0
@@ -2471,7 +2471,7 @@ S
 #76
 Irrigated Jungle Copse~
 Irrigated Jungle Copse~
-'w' 13 kl 6 d p
+'w' 13 klv 6 d p
 C
 chop, dig, pick~
 D0
