@@ -1388,6 +1388,34 @@ bool green_skill_deadend(char_data *ch, any_vnum skill) {
 
 
 /**
+* Determines if a player has any skill with a given flag. If so, returns the
+* player's level in that skill. If more than one skill matches, it returns the
+* highest level among them.
+*
+* @param char_data *ch The player to check.
+* @param bitvector_t skill_flag The SKILLF_ to check for (for multiple flags, will return if ANY of them are present).
+* @return int If the player has a matching skill, returns the level of that skill. If not, returns 0.
+*/
+int has_skill_flagged(char_data *ch, bitvector_t skill_flag) {
+	struct player_skill_data *plsk, *next_plsk;
+	int skill_level = 0;
+	
+	// npcs lack skills / shortcuts out
+	if (!ch || IS_NPC(ch) || !skill_flag) {
+		return 0;
+	}
+	
+	HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+		if (plsk->ptr && SKILL_FLAGGED(plsk->ptr, skill_flag)) {
+			skill_level = MAX(skill_level, plsk->level);
+		}
+	}
+	
+	return skill_level;	// or 0 for none
+}
+
+
+/**
 * Adds one to the number of levels ch gained from an ability.
 *
 * @param char_data *ch The player to check.

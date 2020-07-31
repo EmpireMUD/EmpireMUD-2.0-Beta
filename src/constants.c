@@ -3501,6 +3501,8 @@ const char *skill_flags[] = {
 	"IN-DEVELOPMENT",	// 0
 	"BASIC",
 	"NO-SPECIALIZE",
+	"VAMPIRE",
+	"CASTER",
 	"\n"
 };
 

@@ -4267,8 +4267,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							if ((!str_cmp("on", subfield) || *subfield == '1') && !IS_VAMPIRE(c)) {
 								if (!IS_NPC(c)) {
-									void make_vampire(char_data *ch, bool lore);
-									make_vampire(c, TRUE);
+									void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
+									make_vampire(c, TRUE, NOTHING);
 								}
 								else {
 									SET_BIT(MOB_FLAGS(c), MOB_VAMPIRE);

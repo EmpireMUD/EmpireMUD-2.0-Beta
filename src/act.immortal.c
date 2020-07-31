@@ -1519,7 +1519,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	/* Externs */
 	extern int _parse_name(char *arg, char *name);
 	extern int Valid_Name(char *newname);
-	void make_vampire(char_data *ch, bool lore);
+	void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
 
 	player_index_data *index, *next_index, *found_index;
 	int i, iter, on = 0, off = 0, value = 0;
@@ -1683,7 +1683,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			un_vampire(vict);
 		}
 		else {
-			make_vampire(vict, TRUE);
+			make_vampire(vict, TRUE, NOTHING);
 		}
 	}
 	else if SET_CASE("hunger") {

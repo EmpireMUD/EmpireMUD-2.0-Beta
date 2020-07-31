@@ -64,6 +64,7 @@ extern int get_ability_level(char_data *ch, any_vnum ability);
 extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
 extern int get_approximate_level(char_data *ch);
 extern struct player_skill_data *get_skill_data(char_data *ch, any_vnum vnum, bool add_if_missing);
+extern int has_skill_flagged(char_data *ch, bitvector_t skill_flag);
 void mark_level_gained_from_ability(char_data *ch, ability_data *abil);
 void remove_ability(char_data *ch, ability_data *abil, bool reset_levels);
 void set_skill(char_data *ch, any_vnum skill, int level);

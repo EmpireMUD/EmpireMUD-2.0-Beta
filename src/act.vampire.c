@@ -250,13 +250,54 @@ int GET_MAX_BLOOD(char_data *ch) {
 
 
 /**
-* char_data *ch becomes a vampire
-* bool lore if TRUE, also adds lore
+* This function sets all the important data for people who are becoming
+* vampires. This requires a skill tree with the VAMPIRE flag on it. You can
+* specify which skill or let the system detect it.
+*
+* @param char_data *ch becomes a vampire
+* @param bool lore if TRUE, also adds lore
+* @param any_vnum skill_vnum If you provide a VAMPIRE skill vnum here, gives the player that skill at level 1 (if they don't already have it). Pass NOTHING here to auto-detect.
 */
-void make_vampire(char_data *ch, bool lore) {
+void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
 	void set_skill(char_data *ch, any_vnum skill, int level);
+	skill_data *skl, *next_skl;
 	
-	if (!noskill_ok(ch, SKILL_VAMPIRE)) {
+	if (skill_vnum == NOTHING) {		// auto-detect skill:
+		skill_data *found = NULL;
+		int num_found = 0;
+		bool basic = FALSE;
+		
+		HASH_ITER(hh, skill_table, skl, next_skl) {
+			if (SKILL_FLAGGED(skl, SKILLF_IN_DEVELOPMENT) || !SKILL_FLAGGED(skl, SKILLF_VAMPIRE)) {
+				continue;	// bad flags
+			}
+			if (!SKILL_FLAGGED(skl, SKILLF_BASIC) && basic) {
+				continue;	// already have a basic one
+			}
+			
+			// ok, we should save this one:
+			if (SKILL_FLAGGED(skl, SKILLF_BASIC) && !basic) {
+				// first basic one: override num_found
+				num_found = 1;
+				found = skl;
+				basic = TRUE;
+			}
+			else if (!number(0, num_found++)) {
+				// rolled random number if more than 1 match to choose them at random
+				found = skl;
+			}
+		}
+		
+		if (found) {
+			skill_vnum = SKILL_VNUM(found);
+		}
+		else {
+			log("SYSERR: make_vampire called with no available skills flagged VAMPIRE");
+			return;
+		}
+	}
+	
+	if (!noskill_ok(ch, skill_vnum)) {
 		return;
 	}
 	
@@ -264,8 +305,8 @@ void make_vampire(char_data *ch, bool lore) {
 		/* set BEFORE set as a vampire! */
 		GET_APPARENT_AGE(ch) = GET_REAL_AGE(ch);
 		
-		if (get_skill_level(ch, SKILL_VAMPIRE) < 1) {
-			gain_skill(ch, find_skill_by_vnum(SKILL_VAMPIRE), 1);
+		if (get_skill_level(ch, skill_vnum) < 1) {
+			gain_skill(ch, find_skill_by_vnum(skill_vnum), 1);
 		}
 
 		GET_BLOOD(ch) = config_get_int("blood_starvation_level") * 1.5;
@@ -297,6 +338,11 @@ void retract_claws(char_data *ch) {
 
 // for do_sire
 void sire_char(char_data *ch, char_data *victim) {
+	struct player_skill_data *plsk, *next_plsk;
+	any_vnum vamp_skill = NOTHING;
+	int num_found = 0;
+	bool basic = FALSE;
+	
 	GET_FEEDING_FROM(ch) = NULL;
 	GET_FED_ON_BY(victim) = NULL;
 
@@ -304,8 +350,35 @@ void sire_char(char_data *ch, char_data *victim) {
 	act("$N drops limply from $n's fangs...", FALSE, ch, 0, victim, TO_NOTVICT);
 	act("You fall to the ground. In the distance, you think you see a light...", FALSE, ch, 0, victim, TO_VICT);
 	
-	if (CAN_GAIN_NEW_SKILLS(victim) && noskill_ok(victim, SKILL_VAMPIRE)) {
-		make_vampire(victim, FALSE);
+	// determine if ch has a VAMPIRE-flagged skill they can 'give' to the victim (preferring a basic one)
+	HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+		if (!plsk->ptr || SKILL_FLAGGED(plsk->ptr, SKILLF_IN_DEVELOPMENT) || !SKILL_FLAGGED(plsk->ptr, SKILLF_VAMPIRE)) {
+			continue;	// missing proto or not a valid VAMPIRE skill
+		}
+		if (!SKILL_FLAGGED(plsk->ptr, SKILLF_BASIC) && basic) {
+			continue;	// already found a basic one
+		}
+		if (!noskill_ok(victim, plsk->vnum)) {
+			continue;	// victim has noskilled it
+			// TODO: should probably REQUIRE a basic one if it exists; this will skip over SOME basic ones if noskilled
+		}
+		
+		// ok, we should save this one:
+		if (SKILL_FLAGGED(plsk->ptr, SKILLF_BASIC) && !basic) {
+			// first basic one: override num_found
+			num_found = 1;
+			vamp_skill = plsk->vnum;
+			basic = TRUE;
+		}
+		else if (!number(0, num_found++)) {
+			// rolled random number if more than 1 match to choose them at random
+			vamp_skill = plsk->vnum;
+		}
+	}
+	
+	// did we find a valid vamp skill
+	if (vamp_skill != NOTHING && CAN_GAIN_NEW_SKILLS(victim) && noskill_ok(victim, vamp_skill)) {
+		make_vampire(victim, FALSE, vamp_skill);
 		GET_BLOOD(ch) -= 10;
 
 		act("You tear open your wrist with your fangs and drip blood into $N's mouth!", FALSE, ch, 0, victim, TO_CHAR);
@@ -329,7 +402,7 @@ void sire_char(char_data *ch, char_data *victim) {
 		SAVE_CHAR(victim);
 	}
 	else {
-		// can't gain skills!
+		// can't gain a vampire skills
 		die(victim, ch);	// returns a corpse but we don't need it
 	}
 }
@@ -1128,9 +1201,9 @@ ACMD(do_command) {
 	else if (MOB_FLAGGED(victim, MOB_HARD | MOB_GROUP) || AFF_FLAGGED(victim, AFF_NO_ATTACK)) {
 		act("You can't command $N.", FALSE, ch, NULL, victim, TO_CHAR);
 	}
-	else if (IS_VAMPIRE(victim) && (IS_NPC(victim) || get_skill_level(victim, SKILL_VAMPIRE) > get_skill_level(ch, SKILL_VAMPIRE)))
+	else if (IS_VAMPIRE(victim) && (IS_NPC(victim) || has_skill_flagged(victim, SKILLF_VAMPIRE) > has_skill_flagged(ch, SKILLF_VAMPIRE)))
 		msg_to_char(ch, "You cannot force your will upon those of more powerful blood.\r\n");
-	else if (MAX(get_skill_level(ch, SKILL_VAMPIRE), get_approximate_level(ch)) - get_approximate_level(victim) < level_threshold) {
+	else if (MAX(has_skill_flagged(ch, SKILLF_VAMPIRE), get_approximate_level(ch)) - get_approximate_level(victim) < level_threshold) {
 		msg_to_char(ch, "Your victim is too powerful.\r\n");
 	}
 	else if (!AWAKE(victim))
