@@ -841,6 +841,8 @@ const char *player_tech_types[] = {
 	"Hunt-Animals",
 	"Clock",
 	"Calendar",	// 65
+	"Mint",
+	"Tan",
 	"\n"
 };
 

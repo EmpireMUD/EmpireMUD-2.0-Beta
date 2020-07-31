@@ -2045,7 +2045,7 @@ void process_minting(char_data *ch) {
 		increase_coins(ch, emp, num);
 		
 		GET_ACTION(ch) = ACT_NONE;
-		gain_ability_exp(ch, ABIL_BASIC_CRAFTS, 30);
+		gain_player_tech_exp(ch, PTECH_MINT, 30);
 		
 		if ((proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
 			strcpy(tmp, fname(GET_OBJ_KEYWORDS(proto)));
@@ -2633,7 +2633,7 @@ void process_tanning(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
 		if (success) {
-			gain_ability_exp(ch, ABIL_BASIC_CRAFTS, 20);
+			gain_player_tech_exp(ch, PTECH_TAN, 20);
 	
 			// repeat!
 			do_tan(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -3129,8 +3129,8 @@ ACMD(do_mint) {
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!has_ability(ch, ABIL_BASIC_CRAFTS)) {
-		msg_to_char(ch, "You need the Basic Crafts ability to mint anything.\r\n");
+	else if (!has_player_tech(ch, PTECH_MINT)) {
+		msg_to_char(ch, "You don't have the correct ability to mint anything.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
@@ -3566,8 +3566,8 @@ ACMD(do_tan) {
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!has_ability(ch, ABIL_BASIC_CRAFTS)) {
-		msg_to_char(ch, "You need the Basic Crafts ability to tan anything.\r\n");
+	else if (!has_player_tech(ch, PTECH_TAN)) {
+		msg_to_char(ch, "You don't have the correct ability to tan anything.\r\n");
 	}
 	else if (!*arg) {
 		msg_to_char(ch, "What would you like to tan?\r\n");

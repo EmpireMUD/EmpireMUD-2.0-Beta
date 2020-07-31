@@ -206,7 +206,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_DEVASTATION_RITUAL  191
 #define ABIL_SENSE_LIFE_RITUAL  192
 #define ABIL_RITUAL_OF_DETECTION  193
-#define ABIL_BASIC_CRAFTS  198
+// #define ABIL_BASIC_CRAFTS  198	// no longer used in code
 // formerly: #define ABIL_SKILLED_LABOR  201
 #define ABIL_MASTER_SURVIVALIST  205
 // formerly: #define ABIL_TUNNEL  206

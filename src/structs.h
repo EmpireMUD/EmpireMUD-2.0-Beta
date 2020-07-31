@@ -2204,6 +2204,8 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_HUNT_ANIMALS  63	// can use the 'hunt' command on animals
 #define PTECH_CLOCK  64	// can tell time
 #define PTECH_CALENDAR  65	// can tell the date
+#define PTECH_MINT  66	// can mint coins
+#define PTECH_TAN  67	// can use the 'tan' command
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
