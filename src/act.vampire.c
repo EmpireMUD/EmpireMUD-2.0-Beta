@@ -315,7 +315,7 @@ void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
 		remove_lore(ch, LORE_START_VAMPIRE);
 		remove_lore(ch, LORE_SIRE_VAMPIRE);
 		remove_lore(ch, LORE_PURIFY);
-		if (lore) {
+		if (lore && IS_VAMPIRE(ch)) {
 			add_lore(ch, LORE_START_VAMPIRE, "Sired");
 		}
 	
@@ -625,16 +625,34 @@ void un_deathshroud(char_data *ch) {
 }
 
 
-// undo vampirism
-void un_vampire(char_data *ch) {
+/**
+* Checks if a person is not a vampire and, if not, clears certain vampire
+* traits and restores the player's blood (since non-vampires cannot drink
+* blood).
+*
+* This function can also remove vampire skills, on-request.
+*
+* @param char_data *ch The player to check/remove vampire skills on.
+* @param bool remove_vampire_skills If TRUE, will set all VAMPIRE-flagged skills to 0 (forcefully un-vampires the player).
+*/
+void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 	void clear_char_abilities(char_data *ch, any_vnum skill);
-
-	if (!IS_NPC(ch)) {
+	
+	if (IS_NPC(ch)) {
+		if (remove_vampire_skills) {
+			REMOVE_BIT(MOB_FLAGS(ch), MOB_VAMPIRE);
+		}
+		return;	// no further work
+	}
+	
+	if (remove_vampire_skills) {
+		remove_skills_by_flag(ch, SKILLF_VAMPIRE);
+	}
+	
+	// only if not a vampire:
+	if (!IS_VAMPIRE(ch)) {
 		add_lore(ch, LORE_PURIFY, "Purified");
 		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
-		set_skill(ch, SKILL_VAMPIRE, 0);
-		clear_char_abilities(ch, SKILL_VAMPIRE);
-		SAVE_CHAR(ch);
 	}
 }
 

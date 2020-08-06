@@ -4276,8 +4276,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 							else if ((!str_cmp("off", subfield) || *subfield == '0') && IS_VAMPIRE(c)) {
 								if (!IS_NPC(c)) {
-									void un_vampire(char_data *ch);
-									un_vampire(c);
+									void check_un_vampire(char_data *ch, bool remove_vampire_skills);
+									check_un_vampire(c, TRUE);
 								}
 								else {
 									REMOVE_BIT(MOB_FLAGS(c), MOB_VAMPIRE);

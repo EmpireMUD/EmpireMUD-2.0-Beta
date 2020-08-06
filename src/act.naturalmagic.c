@@ -1062,9 +1062,8 @@ ACMD(do_moonrise) {
 
 
 ACMD(do_purify) {
-	void un_vampire(char_data *ch);
+	void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 	
-	struct player_skill_data *plsk, *next_plsk;
 	bool any = FALSE, was_vampire;
 	char_data *vict;
 	int cost = 50;
@@ -1115,17 +1114,14 @@ ACMD(do_purify) {
 			REMOVE_BIT(MOB_FLAGS(vict), MOB_VAMPIRE);
 		}
 		else {
-			HASH_ITER(hh, GET_SKILL_HASH(vict), plsk, next_plsk) {
-				if (plsk->ptr && SKILL_FLAGGED(plsk->ptr, SKILLF_REMOVED_BY_PURIFY) && plsk->level > 0) {
-					msg_to_char(vict, "You feel some of your power diminish and fade away as you lose the %s skill!\r\n", SKILL_NAME(plsk->ptr));
-					set_skill(vict, plsk->vnum, 0);
-					any = TRUE;	// for sure
-				}
+			any = remove_skills_by_flag(vict, SKILLF_REMOVED_BY_PURIFY);
+			if (any) {
+				msg_to_char(vict, "You feel some of your power diminish and fade away!");
 			}
 		}
 		
 		if (was_vampire && !IS_VAMPIRE(vict)) {
-			un_vampire(vict);
+			check_un_vampire(vict, FALSE);
 		}
 		
 		if (any) {

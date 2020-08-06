@@ -67,6 +67,7 @@ extern struct player_skill_data *get_skill_data(char_data *ch, any_vnum vnum, bo
 extern int has_skill_flagged(char_data *ch, bitvector_t skill_flag);
 void mark_level_gained_from_ability(char_data *ch, ability_data *abil);
 void remove_ability(char_data *ch, ability_data *abil, bool reset_levels);
+extern bool remove_skills_by_flag(char_data *ch, bitvector_t skill_flag);
 void set_skill(char_data *ch, any_vnum skill, int level);
 extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);

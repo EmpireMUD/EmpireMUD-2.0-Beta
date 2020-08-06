@@ -1678,13 +1678,14 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("vampire") {
-		if (IS_VAMPIRE(vict)) {
-			void un_vampire(char_data *ch);
-			un_vampire(vict);
+		if (IS_VAMPIRE(vict) && !str_cmp(val_arg, "off")) {
+			void check_un_vampire(char_data *ch, bool remove_vampire_skills);
+			check_un_vampire(vict, TRUE);
 		}
-		else {
+		else if (!IS_VAMPIRE(vict) && !str_cmp(val_arg, "on")) {
 			make_vampire(vict, TRUE, NOTHING);
 		}
+		// else nothing to do but the syslog won't be inaccurate
 	}
 	else if SET_CASE("hunger") {
 		if (!str_cmp(val_arg, "off")) {

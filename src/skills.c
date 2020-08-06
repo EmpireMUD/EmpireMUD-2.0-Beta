@@ -1535,6 +1535,33 @@ void remove_ability(char_data *ch, ability_data *abil, bool reset_levels) {
 
 
 /**
+* Removes all skills with a given flag/flags from a player.
+*
+* @param char_data *ch The player.
+* @param bitvector_t skill_flag The SKILLF_ flag(s) to match. If you specify more than one, they must all be present.
+* @return bool TRUE if any skills were removed.
+*/
+bool remove_skills_by_flag(char_data *ch, bitvector_t skill_flag) {
+	struct player_skill_data *plsk, *next_plsk;
+	bool any = FALSE;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;	// no skills
+	}
+	
+	HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+		if (plsk->ptr && (SKILL_FLAGS(plsk->ptr) & skill_flag) == skill_flag && plsk->level > 0) {
+			set_skill(ch, plsk->vnum, 0);
+			clear_char_abilities(ch, plsk->vnum);
+			any = TRUE;
+		}
+	}
+	
+	return any;
+}
+
+
+/**
 * When a character loses skill levels, we clear the "levels_gained" tracker
 * for abilities that are >= their new level, so they can successfully regain
 * those levels later.
