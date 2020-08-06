@@ -2209,6 +2209,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_CALENDAR  65	// can tell the date
 #define PTECH_MINT  66	// can mint coins
 #define PTECH_TAN  67	// can use the 'tan' command
+#define PTECH_NO_PURIFY  68	// cannot be affected by the 'purify' spell
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

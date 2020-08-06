@@ -1080,8 +1080,8 @@ ACMD(do_purify) {
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(vict) && has_ability(vict, ABIL_DAYWALKING)) {
-		msg_to_char(ch, "The light of your purify spell has no effect on daywalkers.\r\n");
+	else if (!IS_NPC(vict) && has_player_tech(vict, PTECH_NO_PURIFY)) {
+		msg_to_char(ch, "The light of your purify spell will have no effect on that person.\r\n");
 	}
 	else if (ch != vict && IS_NPC(vict) && MOB_FLAGGED(vict, MOB_HARD | MOB_GROUP)) {
 		msg_to_char(ch, "You cannot purify so powerful a creature.\r\n");

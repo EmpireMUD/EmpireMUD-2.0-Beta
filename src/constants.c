@@ -843,6 +843,7 @@ const char *player_tech_types[] = {
 	"Calendar",	// 65
 	"Mint",
 	"Tan",
+	"No-Purify",
 	"\n"
 };
 
