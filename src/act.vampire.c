@@ -651,6 +651,7 @@ void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 	
 	// only if not a vampire:
 	if (!IS_VAMPIRE(ch)) {
+		remove_lore(ch, LORE_PURIFY);
 		add_lore(ch, LORE_PURIFY, "Purified");
 		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
 	}
