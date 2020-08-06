@@ -77,7 +77,7 @@ S
 High Sorcery~
 Sor~
 Learn the secrets of the imperial sorcerers~
-b
+be
 A 207 -1 75
 A 188 187 65
 A 173 165 25
@@ -126,7 +126,7 @@ S
 Natural Magic~
 Nat~
 Attain mastery over the natural world~
-b
+be
 A 239 111 80
 A 215 34 50
 A 126 -1 50
@@ -379,7 +379,7 @@ S
 Vampire~
 Vam~
 Feed the hunger, control the blood~
-b
+bdf
 A 33 27 60
 A 2 107 75
 A 162 4 85
