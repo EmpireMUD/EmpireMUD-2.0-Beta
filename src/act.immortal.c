@@ -7118,7 +7118,7 @@ ACMD(do_distance) {
 	one_word(argument, arg);
 	
 	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && !HAS_NAVIGATION(ch)) {
-		msg_to_char(ch, "You don't know how to navigate.\r\n");
+		msg_to_char(ch, "You don't know how to navigate or determine distances.\r\n");
 	}
 	else if (!*arg) {
 		msg_to_char(ch, "Get the direction and distance to where?\r\n");

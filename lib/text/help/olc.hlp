@@ -7056,6 +7056,7 @@ Available flags:
  &cNO-SPECIALIZE&0 - Players can't pass 50/75 except via script/quest.
  &cVAMPIRE&0 - Players with this skill are considered vampires.
  &cCASTER&0 - Players with this skill are spellcasters/mages.
+ &cREMOVED-BY-PURIFY&0 - Lose this skill if hit by the purify spell.
 
 See also: OLC SKILLS, OLC REMOVEINDEV
 #d

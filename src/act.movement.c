@@ -2097,7 +2097,7 @@ ACMD(do_portal) {
 		argument = any_one_word(argument, arg);	// grab coords into 'arg'
 		
 		if (!HAS_NAVIGATION(ch)) {
-			msg_to_char(ch, "You can't do that without the Navigation ability.\r\n");
+			msg_to_char(ch, "You don't have the right ability to use the '-near' feature (e.g. Navigation).\r\n");
 			return;
 		}
 		if (!*arg) {

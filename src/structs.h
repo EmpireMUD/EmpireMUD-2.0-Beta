@@ -456,6 +456,7 @@ typedef struct vehicle_data vehicle_data;
 #define SKILLF_NO_SPECIALIZE  BIT(2)	// c. players must pass 50/75 via script/quest
 #define SKILLF_VAMPIRE  BIT(3)	// d. players with this skill are considered vampires
 #define SKILLF_CASTER  BIT(4)	// e. players with this skill are considered spellcasters/mages
+#define SKILLF_REMOVED_BY_PURIFY  BIT(5)	// f. lose this skill if hit by the 'purify' spell
 
 
 // SPAWN_x: mob spawn flags
