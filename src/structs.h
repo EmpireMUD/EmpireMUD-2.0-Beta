@@ -2210,6 +2210,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_MINT  66	// can mint coins
 #define PTECH_TAN  67	// can use the 'tan' command
 #define PTECH_NO_PURIFY  68	// cannot be affected by the 'purify' spell
+#define PTECH_VAMPIRE_SUN_IMMUNITY  69	// vampire not penalized in the sun
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

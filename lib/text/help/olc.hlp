@@ -1016,6 +1016,8 @@ Available techs are:
  &cCalendar&0 * - Knows the date.
  &cMint&0 * - Can mint coins.
  &cTan&0 * - Can use the 'tan' command.
+ &cNo-Purify&0 - Player cannot be purified.
+ &cVampire-Sun-Immunity&0 - Vampire powers now work in the sun.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 

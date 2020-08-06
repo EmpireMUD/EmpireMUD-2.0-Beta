@@ -844,6 +844,7 @@ const char *player_tech_types[] = {
 	"Mint",
 	"Tan",
 	"No-Purify",
+	"Vampire-Sun-Immunity",
 	"\n"
 };
 
