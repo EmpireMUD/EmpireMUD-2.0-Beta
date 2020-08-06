@@ -256,13 +256,14 @@ int GET_MAX_BLOOD(char_data *ch) {
 *
 * @param char_data *ch becomes a vampire
 * @param bool lore if TRUE, also adds lore
-* @param any_vnum skill_vnum If you provide a VAMPIRE skill vnum here, gives the player that skill at level 1 (if they don't already have it). Pass NOTHING here to auto-detect.
+* @param any_vnum skill_vnum If you provide a VAMPIRE skill vnum here, gives the player that skill at level 1 (if they don't already have it). Pass NOTHING here to auto-detect -- or to ignore it if the player already has a vampire skill.
 */
 void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
 	void set_skill(char_data *ch, any_vnum skill, int level);
 	skill_data *skl, *next_skl;
+	bool already_vampire = IS_VAMPIRE(ch);
 	
-	if (skill_vnum == NOTHING) {		// auto-detect skill:
+	if (!already_vampire && skill_vnum == NOTHING) {		// auto-detect skill:
 		skill_data *found = NULL;
 		int num_found = 0;
 		bool basic = FALSE;
@@ -297,7 +298,7 @@ void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
 		}
 	}
 	
-	if (!noskill_ok(ch, skill_vnum)) {
+	if (skill_vnum != NOTHING && !noskill_ok(ch, skill_vnum)) {
 		return;
 	}
 	
@@ -305,7 +306,7 @@ void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
 		/* set BEFORE set as a vampire! */
 		GET_APPARENT_AGE(ch) = GET_REAL_AGE(ch);
 		
-		if (get_skill_level(ch, skill_vnum) < 1) {
+		if (skill_vnum != NOTHING && get_skill_level(ch, skill_vnum) < 1) {
 			gain_skill(ch, find_skill_by_vnum(skill_vnum), 1);
 		}
 
@@ -654,6 +655,7 @@ void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 		remove_lore(ch, LORE_PURIFY);
 		add_lore(ch, LORE_PURIFY, "Purified");
 		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+		GET_APPARENT_AGE(ch) = 0;
 	}
 }
 

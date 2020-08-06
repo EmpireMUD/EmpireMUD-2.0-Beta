@@ -1586,8 +1586,11 @@ void reset_skill_gain_tracker_on_abilities_above_level(char_data *ch, any_vnum s
 
 // set a skill directly to a level
 void set_skill(char_data *ch, any_vnum skill, int level) {
+	void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
+	
 	struct player_skill_data *skdata;
 	bool gain = FALSE;
+	bool was_vampire = IS_VAMPIRE(ch);
 	
 	if ((skdata = get_skill_data(ch, skill, TRUE))) {
 		gain = (level > skdata->level);
@@ -1600,6 +1603,11 @@ void set_skill(char_data *ch, any_vnum skill, int level) {
 		}
 		
 		qt_change_skill_level(ch, skill);
+		
+		// ensure they are a vampire
+		if (!was_vampire && IS_VAMPIRE(ch)) {
+			make_vampire(ch, TRUE, NOTHING);
+		}
 	}
 }
 
@@ -1707,6 +1715,7 @@ ACMD(do_noskill) {
 
 
 ACMD(do_skills) {
+	void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 	void clear_char_abilities(char_data *ch, any_vnum skill);
 	
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
@@ -1899,6 +1908,7 @@ ACMD(do_skills) {
 			// good to go!
 			msg_to_char(ch, "You have dropped your %s skill to %d and reset abilities above that level.\r\n", SKILL_NAME(skill), level);
 			set_skill(ch, SKILL_VNUM(skill), level);
+			check_un_vampire(ch, FALSE);
 			update_class(ch);
 			check_ability_levels(ch, SKILL_VNUM(skill));
 			assign_class_abilities(ch, NULL, NOTHING);
