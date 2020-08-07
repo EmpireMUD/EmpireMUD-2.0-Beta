@@ -102,7 +102,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_GIFT_OF_NATURE  0
 #define ABIL_ANCIENT_BLOOD  2
 #define ABIL_BACKSTAB  3
-#define ABIL_WOLF_FORM  4
+// #define ABIL_WOLF_FORM  4
 #define ABIL_NULL_MANA  5
 #define ABIL_READY_BLOOD_WEAPONS  6
 #define ABIL_BOOST  7
@@ -114,11 +114,11 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_EARTHMELD  14
 #define ABIL_WORM  16
 #define ABIL_SEARCH  18
-#define ABIL_DAYWALKING  19
+// #define ABIL_DAYWALKING  19
 #define ABIL_HIDE  20
-#define ABIL_HORRID_FORM  21
+// #define ABIL_HORRID_FORM  21
 #define ABIL_DISPEL  22
-#define ABIL_MIST_FORM  24
+// #define ABIL_MIST_FORM  24
 #define ABIL_MUMMIFY  25
 #define ABIL_REGENERATE  27
 #define ABIL_SUMMON_THUG  28
@@ -186,7 +186,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_SAP  157
 #define ABIL_DAGGER_MASTERY  158
 #define ABIL_PRICK  161
-#define ABIL_BAT_FORM  162
+// #define ABIL_BAT_FORM  162
 #define ABIL_RITUAL_OF_BURDENS  163
 #define ABIL_MANASHIELD  165
 #define ABIL_SUMMON_SWIFT  168
@@ -215,11 +215,11 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 // formerly: #define ABIL_TUNNEL  206
 #define ABIL_ARCANE_POWER  207
 #define ABIL_OUTRAGE  209
-#define ABIL_DREAD_BLOOD_FORM  211
-#define ABIL_SAVAGE_WEREWOLF_FORM  212
-#define ABIL_TOWERING_WEREWOLF_FORM  213
-#define ABIL_SAGE_WEREWOLF_FORM  214
-#define ABIL_ANIMAL_FORMS  215
+// #define ABIL_DREAD_BLOOD_FORM  211
+// #define ABIL_SAVAGE_WEREWOLF_FORM  212
+// #define ABIL_TOWERING_WEREWOLF_FORM  213
+// #define ABIL_SAGE_WEREWOLF_FORM  214
+// #define ABIL_ANIMAL_FORMS  215
 #define ABIL_REFASHION  216
 // formerly: #define ABIL_TRADE_ROUTES  217
 #define ABIL_RESURRECT  219
@@ -251,9 +251,9 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_BANSHEE  261
 #define ABIL_HONE  262
 #define ABIL_CHANT_OF_ILLUSIONS  265
-#define ABIL_ASTRAL_WEREWOLF_FORM  267
+// #define ABIL_ASTRAL_WEREWOLF_FORM  267
 #define ABIL_WHISPERSTRIDE 268
-#define ABIL_WEREWOLF_FORM  269
+// #define ABIL_WEREWOLF_FORM  269
 #define ABIL_STABLEMASTER  272
 #define ABIL_ABLATE  273
 #define ABIL_ACIDBLAST  274
