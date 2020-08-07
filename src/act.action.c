@@ -2756,6 +2756,9 @@ ACMD(do_chop) {
 		act("$n stops chopping.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
+	else if (!has_player_tech(ch, PTECH_CHOP)) {
+		msg_to_char(ch, "You don't have the correct ability to chop anything.\r\n");
+	}
 	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
@@ -2799,6 +2802,9 @@ ACMD(do_dig) {
 		send_to_char("You stop digging.\r\n", ch);
 		act("$n stops digging.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
+	}
+	else if (!has_player_tech(ch, PTECH_DIG)) {
+		msg_to_char(ch, "You don't have the correct ability to dig anything.\r\n");
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -2995,6 +3001,9 @@ ACMD(do_gather) {
 		act("$n stops looking around.", TRUE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
+	else if (!has_player_tech(ch, PTECH_GATHER)) {
+		msg_to_char(ch, "You don't have the correct ability to gather anything.\r\n");
+	}
 	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
@@ -3025,6 +3034,9 @@ ACMD(do_harvest) {
 		msg_to_char(ch, "You stop harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
 		act("$n stops harvesting.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
+	}
+	else if (!has_player_tech(ch, PTECH_HARVEST)) {
+		msg_to_char(ch, "You don't have the correct ability to harvest anything.\r\n");
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -3218,13 +3230,16 @@ ACMD(do_pick) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot pick.\r\n");
 	}
-	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
-		send_config_msg(ch, "need_approval_string");
-	}
 	else if (GET_ACTION(ch) == ACT_PICKING) {
 		send_to_char("You stop searching.\r\n", ch);
 		act("$n stops looking around.", TRUE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
+	}
+	else if (!has_player_tech(ch, PTECH_PICK)) {
+		msg_to_char(ch, "You don't have the correct ability to pick anything.\r\n");
+	}
+	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
+		send_config_msg(ch, "need_approval_string");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
@@ -3406,6 +3421,9 @@ ACMD(do_quarry) {
 		send_to_char("You stop quarrying.\r\n", ch);
 		act("$n stops quarrying.", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
+	}
+	else if (!has_player_tech(ch, PTECH_QUARRY)) {
+		msg_to_char(ch, "You don't have the correct ability to quarry anything.\r\n");
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
 		send_config_msg(ch, "need_approval_string");
