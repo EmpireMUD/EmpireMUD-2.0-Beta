@@ -2211,6 +2211,12 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_TAN  67	// can use the 'tan' command
 #define PTECH_NO_PURIFY  68	// cannot be affected by the 'purify' spell
 #define PTECH_VAMPIRE_SUN_IMMUNITY  69	// vampire not penalized in the sun
+#define PTECH_GATHER  70	// can 'gather'
+#define PTECH_CHOP  71	// can 'chop'
+#define PTECH_DIG  72	// can 'dig'
+#define PTECH_HARVEST  73	// can 'harvest'
+#define PTECH_PICK  74	// can 'pick'
+#define PTECH_QUARRY  75	// can 'quarry'
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

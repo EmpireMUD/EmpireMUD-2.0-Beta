@@ -83,13 +83,14 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 
 
 // SKILL_x: skill vnums
-#define SKILL_BATTLE  0
-#define SKILL_EMPIRE  1
+// note: commented-out skills no longer have references in the code -- ideally all skills will be fully data-driven
+// #define SKILL_BATTLE  0
+// #define SKILL_EMPIRE  1
 #define SKILL_HIGH_SORCERY  2
 #define SKILL_NATURAL_MAGIC  3
-#define SKILL_STEALTH  4
-#define SKILL_SURVIVAL  5
-#define SKILL_TRADE  6
+// #define SKILL_STEALTH  4
+// #define SKILL_SURVIVAL  5
+// #define SKILL_TRADE  6
 #define SKILL_VAMPIRE  7
 
 
@@ -271,7 +272,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_WEAPON_PROFICIENCY  287
 #define ABIL_PRIMITIVE_CRAFTS  288	// has hard-coded gains
 // formerly: #define ABIL_CHORES  290
-#define ABIL_SCAVENGING  291
+// #define ABIL_SCAVENGING  291	// now data-driven
 #define ABIL_BITE  292
 #define ABIL_COOK  293
 #define ABIL_KITE  294

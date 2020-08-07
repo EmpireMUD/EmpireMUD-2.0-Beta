@@ -845,6 +845,12 @@ const char *player_tech_types[] = {
 	"Tan",
 	"No-Purify",
 	"Vampire-Sun-Immunity",
+	"Gather",	// 70
+	"Chop",
+	"Dig",
+	"Harvest",
+	"Pick",
+	"Quarry",	// 75
 	"\n"
 };
 

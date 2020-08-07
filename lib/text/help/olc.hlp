@@ -1018,6 +1018,12 @@ Available techs are:
  &cTan&0 * - Can use the 'tan' command.
  &cNo-Purify&0 - Player cannot be purified.
  &cVampire-Sun-Immunity&0 * - Vampire powers now work in the sun.
+ &cGather&0 * - Can 'gather'.
+ &cChop&0 * - Can 'chop'.
+ &cDig&0 * - Can 'dig'.
+ &cHarvest&0 * - Can 'harvest'.
+ &cPick&0 * - Can 'pick'.
+ &cQuarry&0 * - Can 'quarry'.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 

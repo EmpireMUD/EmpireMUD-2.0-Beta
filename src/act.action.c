@@ -863,7 +863,7 @@ INTERACTION_FUNC(finish_gathering) {
 		act(buf, FALSE, ch, obj, 0, TO_CHAR);
 		act("$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
 		
-		gain_ability_exp(ch, ABIL_SCAVENGING, 10);
+		gain_player_tech_exp(ch, PTECH_GATHER, 10);
 		
 		// action does not end normally
 		
@@ -1395,7 +1395,7 @@ void process_chop(char_data *ch) {
 		// attempt to change terrain
 		change_chop_territory(IN_ROOM(ch));
 		
-		gain_ability_exp(ch, ABIL_SCAVENGING, 15);
+		gain_player_tech_exp(ch, PTECH_CHOP, 15);
 		
 		// stoppin choppin -- don't use stop_room_action because we also restart them
 		// (this includes ch)
@@ -1438,7 +1438,7 @@ void process_digging(char_data *ch) {
 		
 		if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, finish_digging)) {
 			// success
-			gain_ability_exp(ch, ABIL_SCAVENGING, 10);
+			gain_player_tech_exp(ch, PTECH_DIG, 10);
 		
 			// character is still there and not digging?
 			if (GET_ACTION(ch) == ACT_NONE && in_room == IN_ROOM(ch)) {
@@ -1826,7 +1826,7 @@ void process_harvesting(char_data *ch) {
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting)) {
 			// skillups
-			gain_ability_exp(ch, ABIL_SCAVENGING, 30);
+			gain_player_tech_exp(ch, PTECH_HARVEST, 30);
 			gain_player_tech_exp(ch, PTECH_HARVEST_UPGRADE, 5);
 		}
 		else {
@@ -2193,13 +2193,13 @@ void process_picking(char_data *ch) {
 		}
 		else {
 			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_PICK, finish_picking)) {
-				gain_ability_exp(ch, ABIL_SCAVENGING, 10);
+				gain_player_tech_exp(ch, PTECH_PICK, 10);
 				found = TRUE;
 			}
 			else if (can_interact_room(IN_ROOM(ch), INTERACT_HARVEST) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD))) {
 				// only orchards allow pick -- and only run this if we hit no herbs at all
 				if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_picking)) {
-					gain_ability_exp(ch, ABIL_SCAVENGING, 10);
+					gain_player_tech_exp(ch, PTECH_PICK, 10);
 					found = TRUE;
 				}
 			}
@@ -2369,7 +2369,7 @@ void process_quarrying(char_data *ch) {
 		GET_ACTION(ch) = ACT_NONE;
 		
 		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_QUARRY, finish_quarrying)) {
-			gain_ability_exp(ch, ABIL_SCAVENGING, 25);
+			gain_player_tech_exp(ch, PTECH_QUARRY, 25);
 		
 			add_depletion(IN_ROOM(ch), DPLTN_QUARRY, TRUE);
 			
