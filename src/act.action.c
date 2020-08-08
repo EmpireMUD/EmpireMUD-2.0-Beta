@@ -715,7 +715,7 @@ void start_quarrying(char_data *ch) {
 //// ACTION FINISHERS ////////////////////////////////////////////////////////
 
 INTERACTION_FUNC(finish_chopping) {
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], *cust;
 	obj_data *obj = NULL;
 	int num;
 	
@@ -733,15 +733,17 @@ INTERACTION_FUNC(finish_chopping) {
 	
 	// messaging
 	if (obj) {
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
 		if (interaction->quantity > 1) {
-			sprintf(buf, "With a loud crack, $p (x%d) falls!", interaction->quantity);
+			sprintf(buf, "%s (x%d)", cust ? cust : "With a loud crack, $p falls!", interaction->quantity);
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		else {
-			act("With a loud crack, $p falls!", FALSE, ch, obj, NULL, TO_CHAR);
-		}		
+			act(cust ? cust : "With a loud crack, $p falls!", FALSE, ch, obj, NULL, TO_CHAR);
+		}
 		
-		act("$n collects $p.", FALSE, ch, obj, NULL, TO_ROOM);
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		act(cust ? cust : "$n collects $p.", FALSE, ch, obj, NULL, TO_ROOM);
 	}
 	
 	return TRUE;

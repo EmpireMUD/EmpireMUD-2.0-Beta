@@ -2552,6 +2552,8 @@ const char *obj_custom_types[] = {
 	"fish-to-room",
 	"decays-on-char",
 	"decays-in-room",
+	"resource-to-char",
+	"resource-to-room",	// 20
 	"\n"
 };
 

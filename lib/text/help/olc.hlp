@@ -4983,6 +4983,8 @@ Message types:
  &cfish-to-room&0 - Shown to the room when someone catches a fish ($p for item caught).
  &cdecays-on-char&0 - Shown to the holder/user of the item on decay, if any.
  &cdecays-in-room&0 - Shown to the room if the item decays on the ground.
+ &cresource-to-char&0 - Shown to the character when they gain it as a resource.
+ &cresource-to-room&0 - Shown to room when gained as a resource.
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d

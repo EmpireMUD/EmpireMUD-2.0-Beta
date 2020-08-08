@@ -1728,6 +1728,8 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_CUSTOM_FISH_TO_ROOM  16
 #define OBJ_CUSTOM_DECAYS_ON_CHAR  17	// worn/held
 #define OBJ_CUSTOM_DECAYS_IN_ROOM  18	// everywhere else
+#define OBJ_CUSTOM_RESOURCE_TO_CHAR  19  // when gained as a resource
+#define OBJ_CUSTOM_RESOURCE_TO_ROOM  20  // when gained as a resource
 
 
 // RES_x: resource requirement types

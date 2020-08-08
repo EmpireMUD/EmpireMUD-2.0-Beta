@@ -248,7 +248,7 @@ struct ritual_data_type {
 		{ "You chant as you dance in and out of the henge's ring...", "$n chants as $e dances in and out of the henge's ring..." },
 		{ "You chant the final verse of the chant of druids...", "$n chatns the final verse of the chant of druids..." },
 		{ "You spin in place, waving your arms as you near the end of the chant of druids...", "$n spins in place, waving $s arms up and down as $e chants..." },
-		{ "You collapse in the center of the henge, exhausged from the chant.", "$n collapses in the center of the henge." },
+		{ "You collapse in the center of the henge, exhausted from the chant.", "$n collapses in the center of the henge." },
 		MESSAGE_END
 	}},
 	
