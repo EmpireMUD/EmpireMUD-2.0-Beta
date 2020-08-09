@@ -826,6 +826,12 @@ INTERACTION_FUNC(finish_fishing) {
 			to_char = obj_get_custom_message(tool, OBJ_CUSTOM_FISH_TO_CHAR);
 			to_room = obj_get_custom_message(tool, OBJ_CUSTOM_FISH_TO_ROOM);
 		}
+		if (!to_char) {
+			to_char = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		}
+		if (!to_room) {
+			to_room = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		}
 		
 		if (interaction->quantity > 1) {
 			sprintf(buf, "%s (x%d)", to_char ? to_char : default_to_char, interaction->quantity);
@@ -933,16 +939,20 @@ INTERACTION_FUNC(finish_harvesting) {
 INTERACTION_FUNC(finish_mining) {
 	bool any = FALSE;
 	obj_data *obj;
+	char *cust;
 	int iter;
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// ensure scaling
 		obj_to_char_or_room(obj, ch);
-
-		act("With that last stroke, $p falls from the wall!", FALSE, ch, obj, 0, TO_CHAR);
-		act("With $s last stroke, $p falls from the wall where $n was picking!", FALSE, ch, obj, 0, TO_ROOM);
-
+		
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		act(cust ? cust : "With that last stroke, $p falls from the wall!", FALSE, ch, obj, NULL, TO_CHAR);
+		
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		act(cust ? cust : "With $s last stroke, $p falls from the wall where $n was picking!", FALSE, ch, obj, NULL, TO_ROOM);
+		
 		GET_ACTION(ch) = ACT_NONE;
 		load_otrigger(obj);
 		any = TRUE;
@@ -1072,6 +1082,7 @@ INTERACTION_FUNC(finish_scraping) {
 	obj_vnum vnum = interaction->vnum;
 	char buf[MAX_STRING_LENGTH];
 	obj_data *load = NULL;
+	char *cust;
 	int num;
 	
 	for (num = 0; num < interaction->quantity; ++num) {
@@ -1097,16 +1108,19 @@ INTERACTION_FUNC(finish_scraping) {
 	if (GET_LOYALTY(ch)) {
 		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
-
-	if (interaction->quantity > 1) {
-		sprintf(buf, "You get $p (x%d).", interaction->quantity);
-	}
-	else {
-		strcpy(buf, "You get $p.");
-	}
-		
+	
 	if (load) {
+		cust = obj_get_custom_message(load, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		if (interaction->quantity > 1) {
+			sprintf(buf, "%s (x%d)", cust ? cust : "You get $p.", interaction->quantity);
+		}
+		else {
+			strcpy(buf, cust ? cust : "You get $p.");
+		}
 		act(buf, FALSE, ch, load, NULL, TO_CHAR);
+		
+		cust = obj_get_custom_message(load, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		act(cust ? cust : "$n gets $p.", TRUE, ch, load, NULL, TO_ROOM);
 	}
 	
 	return TRUE;

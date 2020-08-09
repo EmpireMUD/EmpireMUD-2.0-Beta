@@ -4979,12 +4979,12 @@ Message types:
  &clongdesc&0 - Object gives the player a custom long description when worn.
  &clongdesc-female&0 - Same as longdesc but only for females.
  &clongdesc-male&0 - Same as longdesc but only for males.
- &cfish-to-char&0 - Shown to the player when they catch a fish ($p for item caught).
- &cfish-to-room&0 - Shown to the room when someone catches a fish ($p for item caught).
+ &cfish-to-char&0 - On a fishing tool, shown to player when catching a fish ($p for item caught).
+ &cfish-to-room&0 - On a fishing tool, shown to room when catching a fish ($p for item caught).
  &cdecays-on-char&0 - Shown to the holder/user of the item on decay, if any.
  &cdecays-in-room&0 - Shown to the room if the item decays on the ground.
  &cresource-to-char&0 - Shown to the character when they gain it as a resource.
- &cresource-to-room&0 - Shown to room when gained as a resource.
+ &cresource-to-room&0 - Shown to room when gained as a resource (e.g. chopped).
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d
