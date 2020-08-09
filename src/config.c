@@ -1728,6 +1728,7 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "chop_timer", CONFTYPE_INT, "weapon damage to chop 1 tree");
 	init_config(CONFIG_ACTIONS, "dig_base_timer", CONFTYPE_INT, "ticks, halved by Finder and/or shovel");
 	init_config(CONFIG_ACTIONS, "fishing_timer", CONFTYPE_INT, "time per fish, halved by high Survival");
+	init_config(CONFIG_ACTIONS, "forage_base_timer", CONFTYPE_INT, "ticks, cut in half by Finder");
 	init_config(CONFIG_ACTIONS, "gather_base_timer", CONFTYPE_INT, "ticks, halved by Finder");
 	init_config(CONFIG_ACTIONS, "harvest_timer", CONFTYPE_INT, "ticks to harvest a crop, modified by Dexterity, double for orchards");
 	init_config(CONFIG_ACTIONS, "mining_timer", CONFTYPE_INT, "weapon damage to mine 1 ore");

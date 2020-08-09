@@ -85,66 +85,6 @@ INTERACTION_FUNC(butcher_interact) {
 }
 
 
-INTERACTION_FUNC(do_one_forage) {
-	char lbuf[MAX_STRING_LENGTH];
-	obj_data *obj = NULL;
-	int iter, num;
-	
-	num = interaction->quantity;
-	
-	// more for skill wins
-	num += player_tech_skill_check(ch, PTECH_FORAGE, DIFF_EASY) ? 1 : 0;
-	num += player_tech_skill_check(ch, PTECH_FORAGE, DIFF_MEDIUM) ? 1 : 0;
-	num += player_tech_skill_check(ch, PTECH_FORAGE, DIFF_HARD) ? 1 : 0;
-	
-	for (iter = 0; iter < num; ++iter) {
-		obj = read_object(interaction->vnum, TRUE);
-		scale_item_to_level(obj, 1);	// minimum level
-		obj_to_char_or_room(obj, ch);
-		add_depletion(inter_room, DPLTN_FORAGE, TRUE);
-		load_otrigger(obj);
-	}
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, num);
-	}
-	
-	sprintf(lbuf, "You forage around and find $p (x%d)!", num);
-	act(lbuf, FALSE, ch, obj, NULL, TO_CHAR);
-	
-	sprintf(lbuf, "$n forages around and finds $p (x%d).", num);
-	act(lbuf, TRUE, ch, obj, NULL, TO_ROOM);
-	
-	return TRUE;
-}
-
-
-/**
-* When a player forages in the wild and gets nothing, they get a chance at a
-* local crop, too, even if that crop is not on this tile.
-*
-* @param char_data *ch The person trying to forage.
-* @return bool TRUE if any forage interactions ran successfully, FALSE if not.
-*/
-bool do_crop_forage(char_data *ch) {
-	extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
-	
-	crop_data *crop;
-	
-	if (!IS_OUTDOOR_TILE(IN_ROOM(ch)) || IS_MAP_BUILDING(IN_ROOM(ch))) {
-		return FALSE;	// must be outdoor
-	}
-	
-	if ((crop = get_potential_crop_for_location(IN_ROOM(ch), TRUE))) {
-		return run_interactions(ch, GET_CROP_INTERACTIONS(crop), INTERACT_FORAGE, IN_ROOM(ch), NULL, NULL, do_one_forage);
-	}
-	else {
-		return FALSE;	// no crop
-	}
-}
-
-
 /**
 * Finds the best saddle in a player's inventory.
 *
@@ -727,61 +667,6 @@ ACMD(do_fish) {
 		
 		start_action(ch, ACT_FISHING, config_get_int("fishing_timer") / (player_tech_skill_check(ch, PTECH_FISH, DIFF_EASY) ? 2 : 1));
 		GET_ACTION_VNUM(ch, 0) = dir;
-	}
-}
-
-
-ACMD(do_forage) {
-	int cost = 1;
-	
-	int short_depletion = config_get_int("short_depletion");
-	
-	if (!has_player_tech(ch, PTECH_FORAGE)) {
-		msg_to_char(ch, "You don't have the correct ability to forage.\r\n");
-		return;
-	}
-	
-	if (!can_use_ability(ch, NOTHING, MOVE, cost, NOTHING)) {
-		return;	// just checking cost, not ability
-	}
-	
-	if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're too busy to forage right now.\r\n");
-		return;
-	}
-	
-	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to forage here.\r\n");
-		return;
-	}
-
-	if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE) >= short_depletion) {
-		msg_to_char(ch, "You can't seem to find anything to forage for.\r\n");
-		return;
-	}
-	
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to forage for anything here.\r\n");
-		return;
-	}
-	
-	if (run_ability_triggers_by_player_tech(ch, PTECH_FORAGE, NULL, NULL)) {
-		return;
-	}
-
-	if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, do_one_forage)) {
-		// success: local forage list
-		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
-		gain_player_tech_exp(ch, PTECH_FORAGE, 15);
-	}
-	else if (do_crop_forage(ch)) {
-		// success: crop forage list
-		charge_ability_cost(ch, MOVE, cost, NOTHING, 0, WAIT_ABILITY);
-		gain_player_tech_exp(ch, PTECH_FORAGE, 15);
-	}
-	else {
-		msg_to_char(ch, "You don't seem to be able to find anything to forage for.\r\n");
-		command_lag(ch, WAIT_ABILITY);
 	}
 }
 

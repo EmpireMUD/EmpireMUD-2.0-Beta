@@ -1861,6 +1861,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_MAINTENANCE		39
 #define ACT_BURN_AREA		40
 #define ACT_HUNTING			41
+#define ACT_FORAGING		42
 
 // ACTF_x: act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it

@@ -40,6 +40,7 @@ chore_distance 20
 common_depletion 125
 dig_base_timer 4
 fishing_timer 40
+forage_base_timer 4
 garden_depletion 440
 gather_base_timer 4
 gather_depletion 50
