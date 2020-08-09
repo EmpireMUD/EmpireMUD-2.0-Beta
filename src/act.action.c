@@ -151,7 +151,7 @@ const struct action_data_struct action_data[] = {
 	{ "maintenance", "is repairing the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_maintenance, NULL },	// ACT_MAINTENANCE
 	{ "burning", "is preparing to burn the area.", ACTF_FAST_CHORES, process_burn_area, NULL },	// ACT_BURN_AREA
 	{ "hunting", "is low to the ground, hunting.", ACTF_FINDER, process_hunting, NULL },	// ACT_HUNTING
-	{ "foraging", "is looking around for food.", ACTF_FINDER | ACTF_HASTE, process_foraging, NULL },	// ACT_FORAGING
+	{ "foraging", "is looking around for food.", ACTF_ALWAYS_FAST | ACTF_FINDER | ACTF_HASTE, process_foraging, NULL },	// ACT_FORAGING
 	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
