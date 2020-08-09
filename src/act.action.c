@@ -970,6 +970,7 @@ INTERACTION_FUNC(finish_mining) {
 INTERACTION_FUNC(finish_panning) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj = NULL;
+	char *cust;
 	int num;
 	
 	for (num = 0; num < interaction->quantity; ++num) {
@@ -986,15 +987,17 @@ INTERACTION_FUNC(finish_panning) {
 	
 	// messaging
 	if (obj) {
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
 		if (interaction->quantity > 1) {
-			sprintf(buf, "You find $p (x%d)!", interaction->quantity);
+			sprintf(buf, "%s (x%d)", cust ? cust : "You find $p!", interaction->quantity);
 			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		else {
-			act("You find $p!", FALSE, ch, obj, NULL, TO_CHAR);
+			act(cust ? cust : "You find $p!", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		
-		act("$n finds $p!", FALSE, ch, obj, NULL, TO_ROOM);
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		act(cust ? cust : "$n finds $p!", FALSE, ch, obj, NULL, TO_ROOM);
 	}
 	
 	return TRUE;
@@ -1006,6 +1009,7 @@ INTERACTION_FUNC(finish_picking) {
 	room_data *in_room = IN_ROOM(ch);
 	obj_vnum vnum = interaction->vnum;
 	int iter, num = interaction->quantity;
+	char *cust;
 
 	// give objs
 	for (iter = 0; iter < num; ++iter) {
@@ -1022,14 +1026,17 @@ INTERACTION_FUNC(finish_picking) {
 	}
 	
 	if (obj) {
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
 		if (num > 1) {
-			sprintf(buf, "You find $p (x%d)!", num);
+			sprintf(buf, "%s (x%d)", cust ? cust : "You find $p!", num);
 			act(buf, FALSE, ch, obj, 0, TO_CHAR);
 		}
 		else {
-			act("You find $p!", FALSE, ch, obj, 0, TO_CHAR);
+			act(cust ? cust : "You find $p!", FALSE, ch, obj, 0, TO_CHAR);
 		}
-		act("$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
+		
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
 	}
 	else {
 		msg_to_char(ch, "You find nothing.\r\n");
@@ -1047,6 +1054,7 @@ INTERACTION_FUNC(finish_picking) {
 INTERACTION_FUNC(finish_quarrying) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj = NULL;
+	char *cust;
 	int num;
 	
 	for (num = 0; num < interaction->quantity; ++num) {
@@ -1061,16 +1069,18 @@ INTERACTION_FUNC(finish_quarrying) {
 		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 	}
 	
-	if (interaction->quantity > 1) {
-		sprintf(buf, "You give the plug drill one final swing and pry loose $p (x%d)!", interaction->quantity);
-	}
-	else {
-		strcpy(buf, "You give the plug drill one final swing and pry loose $p!");
-	}
-	
 	if (obj) {
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		if (interaction->quantity > 1) {
+			sprintf(buf, "%s (x%d)", cust ? cust : "You give the plug drill one final swing and pry loose $p!", interaction->quantity);
+		}
+		else {
+			strcpy(buf, cust ? cust : "You give the plug drill one final swing and pry loose $p!");
+		}
 		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-		act("$n hits the plug drill hard with a hammer and pries loose $p!", FALSE, ch, obj, NULL, TO_ROOM);
+		
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		act(cust ? cust : "$n hits the plug drill hard with a hammer and pries loose $p!", FALSE, ch, obj, NULL, TO_ROOM);
 	}
 	
 	return TRUE;
