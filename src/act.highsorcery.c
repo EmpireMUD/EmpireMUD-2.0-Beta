@@ -242,11 +242,11 @@ struct ritual_data_type {
 		{ "You chant as you dance in and out of the henge's ring...", "$n chants as $e dances in and out of the henge's ring..." },
 		{ "Your voice falters as you try to remember all the words to the chant...", "$n recites the chant of druids to the best of $s ability..." },
 		{ "You hum and chant as you dance in and out of the henge's ring...", "$n hums and chants as $e dances in and out of the henge's ring..." },
-		{ "You begin the second verse of the chant druids...", "$n begins the second verse of the chant of druids..." },
+		{ "You begin the second verse of the chant of druids...", "$n begins the second verse of the chant of druids..." },
 		{ "You make percussion noises with your mouth between lines of the chant...", "$n makes percussion noises with $s mouth..." },
 		{ "You reach the chorus and recite the chant of druids loudly...", "$n recites the chant of druids as loud as $e can..." },
 		{ "You chant as you dance in and out of the henge's ring...", "$n chants as $e dances in and out of the henge's ring..." },
-		{ "You chant the final verse of the chant of druids...", "$n chatns the final verse of the chant of druids..." },
+		{ "You chant the final verse of the chant of druids...", "$n chants the final verse of the chant of druids..." },
 		{ "You spin in place, waving your arms as you near the end of the chant of druids...", "$n spins in place, waving $s arms up and down as $e chants..." },
 		{ "You collapse in the center of the henge, exhausted from the chant.", "$n collapses in the center of the henge." },
 		MESSAGE_END
