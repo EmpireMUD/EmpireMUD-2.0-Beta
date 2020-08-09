@@ -753,6 +753,7 @@ INTERACTION_FUNC(finish_chopping) {
 INTERACTION_FUNC(finish_digging) {	
 	obj_vnum vnum = interaction->vnum;
 	obj_data *obj = NULL;
+	char *cust;
 	int num;
 	
 	// depleted? (uses rock for all types except clay)
@@ -776,16 +777,20 @@ INTERACTION_FUNC(finish_digging) {
 			add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
 		}
 		
-		if (interaction->quantity > 1) {
-			sprintf(buf1, "You pull $p from the ground (x%d)!", interaction->quantity);
-		}
-		else {
-			strcpy(buf1, "You pull $p from the ground!");
-		}
-		
 		if (obj) {
+			// to-char
+			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+			if (interaction->quantity > 1) {
+				sprintf(buf1, "%s (x%d)", cust ? cust : "You pull $p from the ground!", interaction->quantity);
+			}
+			else {
+				strcpy(buf1, cust ? cust : "You pull $p from the ground!");
+			}
 			act(buf1, FALSE, ch, obj, 0, TO_CHAR);
-			act("$n pulls $p from the ground!", FALSE, ch, obj, 0, TO_ROOM);
+			
+			// to-room
+			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+			act(cust ? cust : "$n pulls $p from the ground!", FALSE, ch, obj, NULL, TO_ROOM);
 		}
 	}
 	
@@ -839,6 +844,7 @@ INTERACTION_FUNC(finish_fishing) {
 
 INTERACTION_FUNC(finish_gathering) {
 	obj_data *obj = NULL;
+	char *cust;
 	int iter;
 	
 	for (iter = 0; iter < interaction->quantity; ++iter) {
@@ -855,15 +861,17 @@ INTERACTION_FUNC(finish_gathering) {
 	}
 	
 	if (obj) {
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
 		if (interaction->quantity > 1) {
-			sprintf(buf, "You find $p (x%d)!", interaction->quantity);
+			sprintf(buf, "%s (x%d)", cust ? cust : "You find $p!", interaction->quantity);
 		}
 		else {
-			strcpy(buf, "You find $p!");
+			strcpy(buf, cust ? cust : "You find $p!");
 		}
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
 		
-		act(buf, FALSE, ch, obj, 0, TO_CHAR);
-		act("$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, NULL, TO_ROOM);
 		
 		gain_player_tech_exp(ch, PTECH_GATHER, 10);
 		
@@ -880,6 +888,7 @@ INTERACTION_FUNC(finish_harvesting) {
 	crop_data *cp;
 	int count, num;
 	obj_data *obj = NULL;
+	char *cust;
 		
 	if ((cp = ROOM_CROP(inter_room)) ) {
 		// how many to get
@@ -900,8 +909,17 @@ INTERACTION_FUNC(finish_harvesting) {
 		
 		// info messaging
 		if (obj) {
-			sprintf(buf, "You got $p (x%d)!", num);
+			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+			if (num > 1) {
+				sprintf(buf, "%s (x%d)", cust ? cust : "You got $p!", num);
+			}
+			else {
+				strcpy(buf, cust ? cust : "You got $p!");
+			}
 			act(buf, FALSE, ch, obj, FALSE, TO_CHAR);
+			
+			cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+			act(cust ? cust : "$n gets $p!", FALSE, ch, obj, NULL, TO_ROOM);
 		}
 	}
 	else {
