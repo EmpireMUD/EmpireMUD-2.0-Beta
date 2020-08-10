@@ -2058,6 +2058,8 @@ Available functions:
  FISHING - workforce can fish here (also need fish interaction)
  STORE-ALL - any regular storable item can be stored (but not retrieved)
  &yIN-CITY-ONLY&0 - all function flags only work when in a city
+   Note: scripts cannot check this by itself using %room.function()%; use the
+   IN-CITY-ONLY building flag instead
  OVEN - allows baking
  
 &r* Note:&0 Functions marked with &r*&0 cannot be used on moving vehicles, only

@@ -87,7 +87,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 // #define SKILL_BATTLE  0
 // #define SKILL_EMPIRE  1
 #define SKILL_HIGH_SORCERY  2
-#define SKILL_NATURAL_MAGIC  3
+// #define SKILL_NATURAL_MAGIC  3
 // #define SKILL_STEALTH  4
 // #define SKILL_SURVIVAL  5
 // #define SKILL_TRADE  6

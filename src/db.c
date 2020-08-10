@@ -1962,6 +1962,7 @@ const char *versions_list[] = {
 	"b5.88a",
 	"b5.88b",
 	"b5.94",
+	"b5.99",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -4358,6 +4359,47 @@ void b5_94_terrain_heights(void) {
 }
 
 
+// b5.99 replaces chant of druids with a pair of triggers, which must be
+// attached to all live buildings
+void b5_99_henge_triggers(void) {
+	const any_vnum main_trig = 5142, second_trig = 5143;
+	struct trig_proto_list *tpl;
+	room_data *room, *next_room;
+	int count = 0;
+	
+	log("Applying b5.99 update to henges...");
+	
+	if (!real_trigger(main_trig) || !real_trigger(second_trig)) {
+		log("- b5.99 update skipped because trigs %d and %d don't exist", main_trig, second_trig);
+	}
+	
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (!GET_BUILDING(room)) {
+			continue;
+		}
+		
+		switch (GET_BLD_VNUM(GET_BUILDING(room))) {
+			case 5142:	// regular henge
+			case 12671: {	// wood henge
+				CREATE(tpl, struct trig_proto_list, 1);
+				tpl->vnum = main_trig;
+				LL_APPEND(room->proto_script, tpl);
+				
+				CREATE(tpl, struct trig_proto_list, 1);
+				tpl->vnum = second_trig;
+				LL_APPEND(room->proto_script, tpl);
+				
+				assign_triggers(room, WLD_TRIGGER);
+				++count;
+				break;
+			}
+		}
+	}
+	
+	log("- updated %d henge%s", count, PLURAL(count));
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4670,6 +4712,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.94")) {
 			b5_94_terrain_heights();
+		}
+		if (MATCH_VERSION("b5.99")) {
+			b5_99_henge_triggers();
 		}
 	}
 	
