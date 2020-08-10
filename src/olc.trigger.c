@@ -791,13 +791,11 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	extern struct cmdlist_element *compile_command_list(char *input);
 	void free_varlist(struct trig_var_data *vd);
 	
-	trig_data *proto, *live_trig, *next_trig, *find, *trig = GET_OLC_TRIGGER(desc);
+	trig_data *proto, *live_trig, *next_trig, *trig = GET_OLC_TRIGGER(desc);
 	trig_vnum vnum = GET_OLC_VNUM(desc);
 	struct cmdlist_element *cmd, *next_cmd, *cmdlist;
-	struct script_data *sc;
 	bool free_text = FALSE;
 	UT_hash_handle hh;
-	int pos;
 	
 	// have a place to save it?
 	if (!(proto = real_trigger(vnum))) {
@@ -820,6 +818,7 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 			GET_TRIG_DEPTH(live_trig) = 0;
 			free_varlist(GET_TRIG_VARS(live_trig));
 			GET_TRIG_VARS(live_trig) = NULL;
+			live_trig->curr_state = NULL;
 		}
 		
 		// check pointers
@@ -874,6 +873,7 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	proto->vnum = vnum;	// ensure correct vnum
 	
 	// remove and reattach existing copies of this trigger
+	/* this should not only NOT be necessary, but also result in bad trigger order
 	LL_FOREACH_SAFE2(trigger_list, live_trig, next_trig, next_in_world) {
 		if (GET_TRIG_VNUM(live_trig) != vnum) {
 			continue;	// wrong trigger
@@ -902,6 +902,7 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 			add_trigger(sc, live_trig, pos);
 		}
 	}
+	*/
 	
 	save_library_file_for_vnum(DB_BOOT_TRG, vnum);
 }
