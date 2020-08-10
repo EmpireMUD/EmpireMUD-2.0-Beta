@@ -872,38 +872,6 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	proto->hh = hh;
 	proto->vnum = vnum;	// ensure correct vnum
 	
-	// remove and reattach existing copies of this trigger
-	/* this should not only NOT be necessary, but also result in bad trigger order
-	LL_FOREACH_SAFE2(trigger_list, live_trig, next_trig, next_in_world) {
-		if (GET_TRIG_VNUM(live_trig) != vnum) {
-			continue;	// wrong trigger
-		}
-		if (!(sc = live_trig->attached_to)) {
-			continue;	// can't get attachment data for some reason
-		}
-		
-		// determin position
-		pos = 0;
-		LL_FOREACH(TRIGGERS(sc), find) {
-			if (find == trig) {
-				break;
-			}
-			else {
-				++pos;
-			}
-		}
-		
-		// un-attach and free
-		LL_DELETE(TRIGGERS(sc), live_trig);
-		extract_trigger(live_trig);
-		
-		// load and re-attach
-		if ((live_trig = read_trigger(vnum))) {
-			add_trigger(sc, live_trig, pos);
-		}
-	}
-	*/
-	
 	save_library_file_for_vnum(DB_BOOT_TRG, vnum);
 }
 
