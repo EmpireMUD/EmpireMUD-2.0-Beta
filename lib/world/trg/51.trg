@@ -16,6 +16,132 @@ if !%room.down(room)%
 end
 detach 5138 %room.id%
 ~
+#5142
+Chant of Druids (gain natural magic at a henge)~
+2 c 0
+chant~
+* Chant of Druids gains the player their 1st point of natural magic
+if !(druids /= %arg%)
+  return 0
+  halt
+end
+if !%actor.canuseroom_guest%
+  %send% %actor% You don't have permission to chant here.
+  halt
+end
+if !%room.in_city(true)% && %room.bld_flagged(IN-CITY-ONLY)%
+  %send% %actor% You can't perform the chant of druids because the building isn't in a city.
+  halt
+end
+if %actor.fighting% || %actor.disabled%
+  %send% %actor% You're a bit busy right now.
+  halt
+end
+if %actor.position% != Standing
+  %send% %actor% You need to be standing.
+  halt
+end
+* ready:
+set room %actor.room%
+set cycles_left 13
+while %cycles_left% >= 0
+  if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+    * We've either moved or the room's no longer suitable for the chant
+    if %cycles_left% < 13
+      %echoaround% %actor% %actor.name%'s chant is interrupted.
+      %send% %actor% Your chant is interrupted.
+    else
+      * combat, stun, sitting down, etc
+      %send% %actor% You can't do that now.
+    end
+    halt
+  end
+  *
+  * messaging
+  switch %cycles_left%
+    case 13
+      %send% %actor% You start the chant of druids...
+      %echoaround% %actor% %actor.name% starts the chant of druids...
+    break
+    case 12
+      %send% %actor% You dance around the henge...
+      %echoaround% %actor% %actor.name% $n dances around the henge...
+    break
+    case 11
+      %send% %actor% You recite the chant of druids as best you can...
+      %echoaround% %actor% %actor.name% $n recites the chant of druids...
+    break
+    case 10
+      %send% %actor% You chant as you dance in and out of the henge's ring...
+      %echoaround% %actor% %actor.name% $n chants as $e dances in and out of the henge's ring...
+    break
+    case 9
+      %send% %actor% Your voice falters as you try to remember all the words to the chant...
+      %echoaround% %actor% %actor.name% $n recites the chant of druids to the best of $s ability...
+    break
+    case 8
+      %send% %actor% You hum and chant as you dance in and out of the henge's ring...
+      %echoaround% %actor% %actor.name% $n hums and chants as $e dances in and out of the henge's ring...
+    break
+    case 7
+      %send% %actor% You begin the second verse of the chant of druids...
+      %echoaround% %actor% %actor.name% $n begins the second verse of the chant of druids...
+    break
+    case 6
+      %send% %actor% You make percussion noises with your mouth between lines of the chant...
+      %echoaround% %actor% %actor.name% $n makes percussion noises with $s mouth...
+    break
+    case 5
+      %send% %actor% You reach the chorus and recite the chant of druids loudly...
+      %echoaround% %actor% %actor.name% $n recites the chant of druids as loud as $e can...
+    break
+    case 4
+      %send% %actor% You chant as you dance in and out of the henge's ring...
+      %echoaround% %actor% %actor.name% $n chants as $e dances in and out of the henge's ring...
+    break
+    case 3
+      %send% %actor% You chant the final verse of the chant of druids...
+      %echoaround% %actor% %actor.name% $n chants the final verse of the chant of druids...
+    break
+    case 2
+      %send% %actor% You spin in place, waving your arms as you near the end of the chant of druids...
+      %echoaround% %actor% %actor.name% $n spins in place, waving $s arms up and down as $e chants...
+    break
+    case 1
+      %send% %actor% You collapse in the center of the henge, exhausted from the chant.
+      %echoaround% %actor% %actor.name% $n collapses in the center of the henge.
+    break
+    case 0
+      * chant complete
+      if %actor.skill(Natural Magic)% < 1
+        nop %actor.gain_skill(Natural Magic,1)%
+        if %actor.skill(Natural Magic)% >= 1
+          %send% %actor% &gAs you finish the chant, you begin to see the weave of mana through nature...&0
+        else
+          %send% %actor% You fail to grasp the concepts of the chant of druids (you cannot gain Natural Magic skill).
+        end
+      else
+        %send% %actor% You finish the chant.
+      end
+      halt
+    break
+  done
+  *
+  * cycle cleanup
+  eval cycles_left %cycles_left% - 1
+  wait 5 sec
+done
+~
+#5143
+Chant of Druids 2nd person (denial)~
+2 c 0
+chant~
+if !(druids /= %arg%)
+  return 0
+  halt
+end
+%send% %actor% Only one person can perform the chant of druids at a time.
+~
 #5156
 Swamp Platform~
 2 o 100
