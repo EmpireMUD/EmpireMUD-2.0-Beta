@@ -235,6 +235,19 @@ struct ritual_data_type {
 		NULL,
 		NULL,
 		{{ "You start a chant...", "$n starts a chant..." },
+		NO_MESSAGE,	// a bunch of no-messages here takes care of anybody who logged out doing this chant before it was removed
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
 		MESSAGE_END
 	}},
 	
