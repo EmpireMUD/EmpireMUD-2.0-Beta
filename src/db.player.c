@@ -790,6 +790,7 @@ void free_char(char_data *ch) {
 	void free_mail(struct mail_data *mail);
 	void free_player_completed_quests(struct player_completed_quest **hash);
 	void free_player_quests(struct player_quest *list);
+	void remove_passive_buff(char_data *ch, struct affected_type *aff);
 
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
@@ -957,6 +958,10 @@ void free_char(char_data *ch) {
 		while ((mail = GET_MAIL_PENDING(ch))) {
 			GET_MAIL_PENDING(ch) = mail->next;
 			free_mail(mail);
+		}
+		
+		while (GET_PASSIVE_BUFFS(ch)) {
+			remove_passive_buff(ch, GET_PASSIVE_BUFFS(ch));
 		}
 		
 		HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {

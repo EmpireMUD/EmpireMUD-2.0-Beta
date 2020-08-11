@@ -594,6 +594,43 @@ bool is_class_ability(ability_data *abil) {
 
 
 /**
+* Removes 1 passive buff from a player. You should affect_total() when you're
+* done with this.
+*
+* @param char_data *ch The player.
+* @param struct affected_type *aff The passive buff affect to remove.
+*/
+void remove_passive_buff(char_data *ch, struct affected_type *aff) {
+	if (ch && !IS_NPC(ch) && aff) {
+		// NOTE: does not use affected_type->expire_event
+		affect_modify(ch, aff->location, aff->modifier, aff->bitvector, FALSE);
+		LL_DELETE(GET_PASSIVE_BUFFS(ch), aff);
+		free(aff);
+	}
+}
+
+
+/**
+* Removes all passive buffs by ability vnum. You should affect_total() when
+* you're done removing abilities.
+*
+* @param char_data *ch The player.
+* @param any_vnum abil Which ability granted the passive buff.
+*/
+void remove_passive_buff_by_ability(char_data *ch, any_vnum abil) {
+	struct affected_type *aff, *next;
+	
+	if (!IS_NPC(ch)) {
+		LL_FOREACH_SAFE(GET_PASSIVE_BUFFS(ch), aff, next) {
+			if (aff->type == abil) {
+				remove_passive_buff(ch, aff);
+			}
+		}
+	}
+}
+
+
+/**
 * Removes a type from an ability and re-summarizes the type flags.
 *
 * @param ability_data *abil The ability to remove a type from.

@@ -4009,6 +4009,7 @@ struct player_special_data {
 	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// DLs: histories
 	struct player_automessage *automessages;	// hash of seen messages
 	struct player_event_data *event_data;	// hash of event scores and results
+	struct affected_type *passive_buffs;	// from PASSIVE-BUFF abilities
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered

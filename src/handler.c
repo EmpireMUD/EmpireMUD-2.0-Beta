@@ -738,13 +738,17 @@ void affect_total(char_data *ch) {
 		}
 	}
 	
-	// abilities
+	// remove passive buff abilities
 	if (!IS_NPC(ch)) {
+		LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
+			affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
+		}
 	}
 
-	// affects
-	for (af = ch->affected; af; af = af->next)
+	// remove affects
+	LL_FOREACH(ch->affected, af) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
+	}
 
 	// RESET!
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
@@ -772,6 +776,13 @@ void affect_total(char_data *ch) {
 			if (GET_OBJ_AFF_FLAGS(GET_EQ(ch, i))) {
 				affect_modify(ch, APPLY_NONE, 0, GET_OBJ_AFF_FLAGS(GET_EQ(ch, i)), TRUE);
 			}
+		}
+	}
+	
+	// passive buff abilities
+	if (!IS_NPC(ch)) {
+		LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
+			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 		}
 	}
 
