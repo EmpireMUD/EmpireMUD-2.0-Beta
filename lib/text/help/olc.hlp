@@ -538,7 +538,7 @@ See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 Usage:  .affects [add | remove] <flag>
 
 For buff abilities, these are affect flags that are placed on the target of the
-ability.
+ability. For passive-buff abilities, these affects are always on.
 
 See also: AFFECT FLAGS, OLC ABILITIES, BUFF ABILITY
 #d
@@ -563,6 +563,8 @@ Usage:  .apply add <value> <apply>
 
 For buff abilities, these are the various traits that are changed by the buff.
 The values should be positive for buffs, and negative for debuffs.
+
+For passive-buff abilities, these applies are always on.
 
 Unlike object applies, using a negative apply will NOT provide a bonus for the
 other positive applies.
@@ -936,6 +938,17 @@ and via the 'stat' command. You can put any information you want in the notes.
 
 See also: OLC, STAT
 #d
+"ABILEDIT PASSIVE-BUFF ABILITY" "PASSIVE-BUFF ABILITY" "PASSIVE-BUFF ABILITIES" "PASSIVE BUFF ABILITY"
+
+The PASSIVE-BUFF ability type means that the ability applies stats to the
+player at all times. These abilities cannot be turned off.
+
+Buff abilities have the following properties:
+ <&yaffects&0> Affect flags to set.
+ <&yapply&0> Trait modifiers to give.
+
+See also: OLC ABILITIES, ABILEDIT TYPES
+#d
 "ABILEDIT PLAYER-TECH ABILITY" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH
 
 Usage:  .data add ptech <type>
@@ -1096,10 +1109,11 @@ The following types are available (each has its own help file):
  &cBUFF&0 - Puts affects on characters.
  &cDAMAGE&0 - Deals direct damage.
  &cDOT&0 - Adds a damage-over-time effect.
- &cPLAYER-TECH&0 - Various 'techs' that players get from abilities.
+ &cPTECH&0 - Various 'techs' that players get from abilities.
+ &cPASSIVE-BUFF&0 - Applies stats to the player all the time.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
-   DOT ABILITY, PLAYER-TECH ABILITY
+   DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY
 #d
 "ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE"
 

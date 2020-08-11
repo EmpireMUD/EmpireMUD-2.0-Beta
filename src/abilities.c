@@ -91,6 +91,7 @@ struct {
 	{ ABILT_DAMAGE, prep_damage_ability, do_damage_ability },
 	{ ABILT_DOT, prep_dot_ability, do_dot_ability },
 	{ ABILT_PLAYER_TECH, NULL, NULL },
+	{ ABILT_PASSIVE_BUFF, NULL, NULL },
 	
 	{ NOBITS }	// this goes last
 };
@@ -2042,6 +2043,15 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 						ABIL_MAX_STACKS(abil) = int_in[4];
 						break;
 					}
+					case ABILT_PASSIVE_BUFF: {
+						if (!get_line(fl, line) || sscanf(line, "%s", str_in) != 1) {
+							log("SYSERR: Format error in 'X %s' line of %s", line+2, error);
+							exit(1);
+						}
+						
+						ABIL_AFFECTS(abil) = asciiflag_conv(str_in);
+						break;
+					}
 					default: {
 						log("SYSERR: Unknown flag X%llu in %s", type, error);
 						exit(1);
@@ -2205,6 +2215,11 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	}
 	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
 		fprintf(fl, "X %s\n%d %d %d %d %d\n", bitv_to_alpha(ABILT_DOT), ABIL_AFFECT_VNUM(abil), ABIL_SHORT_DURATION(abil), ABIL_LONG_DURATION(abil), ABIL_DAMAGE_TYPE(abil), ABIL_MAX_STACKS(abil));
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF)) {
+		strcpy(temp, bitv_to_alpha(ABILT_PASSIVE_BUFF));
+		strcpy(temp2, bitv_to_alpha(ABIL_AFFECTS(abil)));
+		fprintf(fl, "X %s\n%s\n", temp, temp2);
 	}
 	
 	// end
@@ -2896,7 +2911,7 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 			
 			size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
 		}	// end buff/dot
-		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
 			sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
 			size += snprintf(buf + size, sizeof(buf) - size, "Affect flags: \tg%s\t0\r\n", part);
 			
@@ -3010,7 +3025,7 @@ void olc_show_ability(char_data *ch) {
 				sprintf(buf + strlen(buf), "<%slongduration\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_LONG_DURATION(abil), 0), ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
 			}
 		}	// end buff/dot
-		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF)) {
+		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
 			sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
 			sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
 			
@@ -3079,7 +3094,7 @@ int vnum_ability(char *searchname, char_data *ch) {
 OLC_MODULE(abiledit_affects) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	bitvector_t allowed_types = ABILT_BUFF;
+	bitvector_t allowed_types = ABILT_BUFF | ABILT_PASSIVE_BUFF;
 	
 	if (!ABIL_COMMAND(abil) || !IS_SET(ABIL_TYPES(abil), allowed_types)) {
 		msg_to_char(ch, "This type of ability does not have this property.\r\n");

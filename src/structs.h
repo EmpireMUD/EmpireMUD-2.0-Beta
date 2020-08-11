@@ -513,6 +513,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_DAMAGE  BIT(2)	// deals damage
 #define ABILT_DOT  BIT(3)	// damage over time effect
 #define ABILT_PLAYER_TECH  BIT(4)	// some player tech feature
+#define ABILT_PASSIVE_BUFF  BIT(5)	// similar to a buff except always on
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)

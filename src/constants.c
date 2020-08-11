@@ -137,7 +137,8 @@ const char *ability_type_flags[] = {
 	"BUFF",
 	"DAMAGE",
 	"DOT",
-	"PLAYER-TECH",
+	"PTECH",
+	"PASSIVE-BUFF",	// 5
 /*
 	"UNAFFECTS",
 	"POINTS",
