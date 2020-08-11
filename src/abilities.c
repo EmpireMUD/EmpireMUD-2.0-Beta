@@ -41,7 +41,10 @@
 const char *default_ability_name = "Unnamed Ability";
 
 // local protos
+bool has_matching_role(char_data *ch, ability_data *abil);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
+void remove_passive_buff(char_data *ch, struct affected_type *aff);
+double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
 
 // external consts
 extern const char *ability_custom_types[];
@@ -49,6 +52,7 @@ extern const char *ability_data_types[];
 extern const char *ability_effects[];
 extern const char *ability_gain_hooks[];
 extern const char *ability_flags[];
+extern const bool apply_never_scales[];
 extern const char *ability_target_flags[];
 extern const char *ability_type_flags[];
 extern const char *affected_bits[];
@@ -271,6 +275,84 @@ void apply_all_ability_techs(char_data *ch) {
 			apply_ability_techs_to_player(ch, abil);
 		}
 	}
+}
+
+
+/**
+* Applies the passive buffs from 1 ability to the player. Call affect_total()
+* when you're done applying passive buffs.
+*
+* @param char_data *ch The player.
+* @param ability_data *abil The passive-buff ability to apply.
+*/
+void apply_one_passive_buff(char_data *ch, ability_data *abil) {
+	double remaining_points, total_points, share, amt;
+	struct ability_exec *data;
+	struct affected_type *af;
+	struct apply_data *apply;
+	int cap, level, total_w;
+	
+	if (!ch || IS_NPC(ch) || !abil || !IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF)) {
+		return;	// safety first
+	}
+	
+	CREATE(data, struct ability_exec, 1);
+	data->matching_role = has_matching_role(ch, abil);
+	
+	level = get_approximate_level(ch);
+	if (ABIL_ASSIGNED_SKILL(abil) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)))) < CLASS_SKILL_CAP) {
+		level = MIN(level, cap);	// constrain by skill level
+	}
+	total_points = remaining_points = standard_ability_scale(ch, abil, level, ABILT_PASSIVE_BUFF, data);
+	
+	if (total_points < 0) {	// no work
+		free(data);
+		return;
+	}
+	
+	// affect flags? cost == level 100 ability
+	if (ABIL_AFFECTS(abil)) {
+		remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
+		remaining_points = MAX(0, remaining_points);
+		
+		af = create_flag_aff(ABIL_VNUM(abil), 1, ABIL_AFFECTS(abil), ch);
+		LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
+		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
+	}
+	
+	// determine share for effects
+	total_w = 0;
+	LL_FOREACH(ABIL_APPLIES(abil), apply) {
+		if (!apply_never_scales[apply->location]) {
+			total_w += ABSOLUTE(apply->weight);
+		}
+	}
+	
+	// now create affects for each apply that we can afford
+	LL_FOREACH(ABIL_APPLIES(abil), apply) {
+		if (apply_never_scales[apply->location]) {
+			af = create_mod_aff(ABIL_VNUM(abil), 1, apply->location, apply->weight, ch);
+			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
+			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
+			continue;
+		}
+		
+		share = total_points * (double) ABSOLUTE(apply->weight) / (double) total_w;
+		if (share > remaining_points) {
+			share = MIN(share, remaining_points);
+		}
+		amt = round(share / apply_values[apply->location]) * ((apply->weight < 0) ? -1 : 1);
+		if (share > 0 && amt != 0) {
+			remaining_points -= share;
+			remaining_points = MAX(0, total_points);
+			
+			af = create_mod_aff(ABIL_VNUM(abil), 1, apply->location, amt, ch);
+			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
+			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
+		}
+	}
+	
+	free(data);
 }
 
 
@@ -571,6 +653,34 @@ double get_type_modifier(ability_data *abil, bitvector_t type) {
 
 
 /**
+* Determines if the player is in a matching role. This is always true if it's
+* an NPC or if the ability doesn't have role flags.
+*
+* @param char_data *ch The player or npc.
+* @param ability_data *abil The ability to check for a match.
+*/
+bool has_matching_role(char_data *ch, ability_data *abil) {
+	if (IS_NPC(ch) || !ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS)) {
+		return TRUE;	// npc/no-role-required
+	}
+	if (ABILITY_FLAGGED(abil, ABILF_CASTER_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+		return TRUE;
+	}
+	else if (ABILITY_FLAGGED(abil, ABILF_HEALER_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_HEALER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+		return TRUE;
+	}
+	else if (ABILITY_FLAGGED(abil, ABILF_MELEE_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_MELEE || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+		return TRUE;
+	}
+	else if (ABILITY_FLAGGED(abil, ABILF_TANK_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_TANK || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+		return TRUE;
+	}
+	
+	return FALSE;	// does not match
+}
+
+
+/**
 * @param ability_data *abil An ability to check.
 * @return bool TRUE if that ability is assigned to any class, or FALSE if not.
 */
@@ -590,6 +700,43 @@ bool is_class_ability(ability_data *abil) {
 	}
 	
 	return FALSE;	// no match
+}
+
+
+/**
+* Removes all the passive buffs on a character and re-applies them. This can be
+* called at startup, when the player gains an ability, or when a player gains
+* a level (changes effect scaling).
+*
+* @param char_data *ch The player to refresh passive ability buffs on.
+*/
+void refresh_passive_buffs(char_data *ch) {
+	struct player_ability_data *plab, *next_plab;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	// remove old ones
+	while (GET_PASSIVE_BUFFS(ch)) {
+		remove_passive_buff(ch, GET_PASSIVE_BUFFS(ch));
+	}
+	
+	// re-add
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		if (!plab->ptr || !IS_SET(ABIL_TYPES(plab->ptr), ABILT_PASSIVE_BUFF)) {
+			continue;	// not a passive buff
+		}
+		if (!plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+			continue;	// wrong skill set
+		}
+		
+		// apply it
+		apply_one_passive_buff(ch, plab->ptr);
+	}
+	
+	// and finish
+	affect_total(ch);
 }
 
 
@@ -1200,8 +1347,6 @@ void do_ability(char_data *ch, ability_data *abil, char *argument, char_data *ta
 * DO_ABIL provides: ch, abil, level, vict, data
 */
 DO_ABIL(do_buff_ability) {
-	extern const bool apply_never_scales[];
-	
 	struct affected_type *af;
 	struct apply_data *apply;
 	any_vnum affect_vnum;
@@ -1493,28 +1638,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	// exec data to pass through
 	CREATE(data, struct ability_exec, 1);
 	data->cost = ABIL_COST(abil);	// base cost, may be modified
-	
-	// detect role
-	if (!IS_NPC(ch) && ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS)) {
-		if (ABILITY_FLAGGED(abil, ABILF_CASTER_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
-			data->matching_role = TRUE;
-		}
-		else if (ABILITY_FLAGGED(abil, ABILF_HEALER_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_HEALER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
-			data->matching_role = TRUE;
-		}
-		else if (ABILITY_FLAGGED(abil, ABILF_MELEE_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_MELEE || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
-			data->matching_role = TRUE;
-		}
-		else if (ABILITY_FLAGGED(abil, ABILF_TANK_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_TANK || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
-			data->matching_role = TRUE;
-		}
-		else {
-			data->matching_role = FALSE;	// does not match
-		}
-	}
-	else {
-		data->matching_role = TRUE;	// by default
-	}
+	data->matching_role = has_matching_role(ch, abil);
 	
 	// run the ability
 	do_ability(ch, abil, argument, targ, obj, veh, data);

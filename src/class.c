@@ -1652,6 +1652,7 @@ ACMD(do_class) {
 
 
 ACMD(do_role) {
+	void refresh_passive_buffs(char_data *ch);
 	void resort_empires(bool force);
 	
 	char arg[MAX_INPUT_LENGTH], roles[NUM_ROLES+2][MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
@@ -1701,6 +1702,7 @@ ACMD(do_role) {
 			}
 			
 			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
+			refresh_passive_buffs(ch);
 		}
 	}
 	else {	// no arg

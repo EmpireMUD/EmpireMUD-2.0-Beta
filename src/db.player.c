@@ -3436,6 +3436,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	extern room_data *find_load_room(char_data *ch);
 	void give_level_zero_abilities(char_data *ch);
 	void refresh_all_quests(char_data *ch);
+	void refresh_passive_buffs(char_data *ch);
 	void reset_combat_meters(char_data *ch);
 	extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message);
 	
@@ -3710,6 +3711,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	check_eq_sets(ch);
 	check_minipets(ch);
 	check_player_events(ch);
+	refresh_passive_buffs(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {

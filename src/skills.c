@@ -84,27 +84,35 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	void finish_morphing(char_data *ch, morph_data *morph);
 	void remove_armor_by_type(char_data *ch, int armor_type);
 	void remove_honed_gear(char_data *ch);
+	void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
 	void retract_claws(char_data *ch);
 	void undisguise(char_data *ch);	
 	
 	struct ability_data_list *adl;
 	obj_data *obj;
-	bool found = TRUE;	// inverted detection, see default below
+	bool need_affect_total = FALSE;
 	
 	// empire_data *emp = GET_LOYALTY(ch);
 	
 	// un-morph
 	if (IS_MORPHED(ch) && MORPH_ABILITY(GET_MORPH(ch)) == ABIL_VNUM(abil)) {
 		finish_morphing(ch, NULL);
+		need_affect_total = TRUE;
 	}
 	
 	// generic affect abilities
 	if (affected_by_spell_from_caster(ch, ABIL_AFFECT_VNUM(abil), ch)) {
 		affect_from_char_by_caster(ch, ABIL_AFFECT_VNUM(abil), ch, TRUE);
+		need_affect_total = TRUE;
+	}
+	
+	// remove any passives
+	if (IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF)) {
+		remove_passive_buff_by_ability(ch, ABIL_VNUM(abil));
+		need_affect_total = TRUE;
 	}
 	
 	// player tech losses
-	// TODO: should this set the 'found' bool? It would be unset later tho
 	if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
 		LL_FOREACH(ABIL_DATA(abil), adl) {
 			if (adl->type != ADL_PLAYER_TECH) {
@@ -118,18 +126,22 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			switch (adl->vnum) {
 				case PTECH_ARMOR_HEAVY: {
 					remove_armor_by_type(ch, ARMOR_HEAVY);
+					need_affect_total = TRUE;
 					break;
 				}
 				case PTECH_ARMOR_LIGHT: {
 					remove_armor_by_type(ch, ARMOR_LIGHT);
+					need_affect_total = TRUE;
 					break;
 				}
 				case PTECH_ARMOR_MAGE: {
 					remove_armor_by_type(ch, ARMOR_MAGE);
+					need_affect_total = TRUE;
 					break;
 				}
 				case PTECH_ARMOR_MEDIUM: {
 					remove_armor_by_type(ch, ARMOR_MEDIUM);
+					need_affect_total = TRUE;
 					break;
 				}
 				case PTECH_BLOCK: {
@@ -137,6 +149,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 						act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_HOLD), NULL, TO_CHAR);
 						unequip_char_to_inventory(ch, WEAR_HOLD);
 						determine_gear_level(ch);
+						need_affect_total = TRUE;
 					}
 					break;
 				}
@@ -156,6 +169,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 						act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_RANGED), NULL, TO_CHAR);
 						unequip_char_to_inventory(ch, WEAR_RANGED);
 						determine_gear_level(ch);
+						need_affect_total = TRUE;
 					}
 					break;
 				}
@@ -163,6 +177,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 					if (IS_RIDING(ch)) {
 						msg_to_char(ch, "You climb down from your mount.\r\n");
 						perform_dismount(ch);
+						need_affect_total = TRUE;
 					}
 					break;
 				}
@@ -171,6 +186,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 						act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
 						unequip_char_to_inventory(ch, WEAR_WIELD);
 						determine_gear_level(ch);
+						need_affect_total = TRUE;
 					}
 					break;
 				}
@@ -192,6 +208,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
 				unequip_char_to_inventory(ch, WEAR_WIELD);
 				determine_gear_level(ch);
+				need_affect_total = TRUE;
 			}
 			break;
 		}
@@ -201,6 +218,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_BOOST: {
 			affect_from_char(ch, ATYPE_BOOST, TRUE);
+			need_affect_total = TRUE;
 			break;
 		}
 		case ABIL_CHANT_OF_NATURE: {
@@ -213,6 +231,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_CLAWS: {
 			retract_claws(ch);
+			need_affect_total = TRUE;
 			break;
 		}
 		case ABIL_COUNTERSPELL: {
@@ -223,6 +242,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			if (affected_by_spell(ch, ATYPE_DEATHSHROUD)) {
 				void un_deathshroud(char_data *ch);
 				un_deathshroud(ch);
+				need_affect_total = TRUE;
 			}
 			break;
 		}
@@ -233,6 +253,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		case ABIL_DISGUISE: {
 			if (IS_DISGUISED(ch)) {
 				undisguise(ch);
+				need_affect_total = TRUE;
 			}
 			break;
 		}
@@ -240,6 +261,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			if (affected_by_spell(ch, ATYPE_EARTHMELD)) {
 				void un_earthmeld(char_data *ch);
 				un_earthmeld(ch);
+				need_affect_total = TRUE;
 			}
 			break;
 		}
@@ -256,10 +278,12 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_HONE: {
 			remove_honed_gear(ch);
+			need_affect_total = TRUE;
 			break;
 		}
 		case ABIL_MANASHIELD: {
 			affect_from_char(ch, ATYPE_MANASHIELD, TRUE);
+			need_affect_total = TRUE;
 			break;
 		}
 		case ABIL_MANTICORE: {
@@ -278,6 +302,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			if (affected_by_spell(ch, ATYPE_MUMMIFY)) {
 				void un_mummify(char_data *ch);
 				un_mummify(ch);
+				need_affect_total = TRUE;
 			}
 			break;
 		}
@@ -291,6 +316,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_PHOENIX_RITE: {
 			affect_from_char(ch, ATYPE_PHOENIX_RITE, TRUE);
+			need_affect_total = TRUE;
 			break;
 		}
 		case ABIL_READY_FIREBALL: {
@@ -299,6 +325,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 					act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
 					unequip_char_to_inventory(ch, WEAR_WIELD);
 					determine_gear_level(ch);
+					need_affect_total = TRUE;
 				}
 			}
 			break;
@@ -307,6 +334,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			if (affected_by_spell(ch, ATYPE_UNBURDENED)) {
 				msg_to_char(ch, "Your burdens return.\r\n");
 				affect_from_char(ch, ATYPE_UNBURDENED, TRUE);
+				need_affect_total = TRUE;
 			}
 			break;
 		}
@@ -320,6 +348,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_SIPHON: {
 			affect_from_char(ch, ATYPE_SIPHON, TRUE);
+			need_affect_total = TRUE;
 			break;
 		}
 		case ABIL_SKELETAL_HULK: {
@@ -330,13 +359,10 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			despawn_familiar(ch, FAMILIAR_SPIRIT_WOLF);
 			break;
 		}
-		default: {
-			found = FALSE;
-		}
 	}
 	
 	determine_gear_level(ch);
-	if (found) {
+	if (need_affect_total) {
 		affect_total(ch);
 	}
 }
@@ -505,6 +531,8 @@ char *ability_color(char_data *ch, ability_data *abil) {
 * @param bool reset_levels If TRUE, wipes out the number of levels gained from the ability.
 */
 void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels) {
+	void apply_one_passive_buff(char_data *ch, ability_data *abil);
+	
 	struct player_ability_data *data = get_ability_data(ch, ABIL_VNUM(abil), TRUE);
 	
 	if (skill_set < 0 || skill_set >= NUM_SKILL_SETS) {
@@ -525,6 +553,10 @@ void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool r
 	
 		// attach gain hooks
 		add_ability_gain_hook(ch, abil);
+		
+		if (skill_set == GET_CURRENT_SKILL_SET(ch) && IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF)) {
+			apply_one_passive_buff(ch, abil);
+		}
 	}
 }
 
@@ -977,6 +1009,11 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount) {
 		// update class and progression
 		update_class(ch);
 		assign_class_abilities(ch, NULL, NOTHING);
+		
+		// only refresh buffs if they have any; otherwise save the work
+		if (GET_PASSIVE_BUFFS(ch)) {
+			refresh_passive_buffs(ch);
+		}
 		SAVE_CHAR(ch);
 	}
 	
