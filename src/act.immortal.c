@@ -1519,7 +1519,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	/* Externs */
 	extern int _parse_name(char *arg, char *name);
 	extern int Valid_Name(char *newname);
-	void make_vampire(char_data *ch, bool lore);
+	void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
 
 	player_index_data *index, *next_index, *found_index;
 	int i, iter, on = 0, off = 0, value = 0;
@@ -1678,13 +1678,14 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
 	}
 	else if SET_CASE("vampire") {
-		if (IS_VAMPIRE(vict)) {
-			void un_vampire(char_data *ch);
-			un_vampire(vict);
+		if (IS_VAMPIRE(vict) && !str_cmp(val_arg, "off")) {
+			void check_un_vampire(char_data *ch, bool remove_vampire_skills);
+			check_un_vampire(vict, TRUE);
 		}
-		else {
-			make_vampire(vict, TRUE);
+		else if (!IS_VAMPIRE(vict) && !str_cmp(val_arg, "on")) {
+			make_vampire(vict, TRUE, NOTHING);
 		}
+		// else nothing to do but the syslog won't be inaccurate
 	}
 	else if SET_CASE("hunger") {
 		if (!str_cmp(val_arg, "off")) {
@@ -7118,7 +7119,7 @@ ACMD(do_distance) {
 	one_word(argument, arg);
 	
 	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && !HAS_NAVIGATION(ch)) {
-		msg_to_char(ch, "You don't know how to navigate.\r\n");
+		msg_to_char(ch, "You don't know how to navigate or determine distances.\r\n");
 	}
 	else if (!*arg) {
 		msg_to_char(ch, "Get the direction and distance to where?\r\n");

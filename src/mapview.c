@@ -2180,7 +2180,7 @@ ACMD(do_mapscan) {
 	skip_spaces(&argument);
 	
 	if (IS_NPC(ch) || !HAS_NAVIGATION(ch)) {
-		msg_to_char(ch, "You need Navigation to use mapscan.\r\n");
+		msg_to_char(ch, "You don't have the right ability to use mapscan (e.g. Navigation).\r\n");
 	}
 	else if (!*argument) {
 		msg_to_char(ch, "Scan the map in which direction?\r\n");

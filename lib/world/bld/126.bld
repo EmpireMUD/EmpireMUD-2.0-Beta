@@ -27,9 +27,7 @@ A Wood Henge~
 16 4 dlp 0
 0 0 0 -1
 C
-chant~
-F
-k
+chant druids~
 M
 12671 75.00 c
 R
@@ -38,5 +36,7 @@ R
 6000 1 1 0
 R
 6790 1 1 0
+T 5142
+T 5143
 S
 $

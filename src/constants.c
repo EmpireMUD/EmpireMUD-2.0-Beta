@@ -841,6 +841,16 @@ const char *player_tech_types[] = {
 	"Hunt-Animals",
 	"Clock",
 	"Calendar",	// 65
+	"Mint",
+	"Tan",
+	"No-Purify",
+	"Vampire-Sun-Immunity",
+	"Gather",	// 70
+	"Chop",
+	"Dig",
+	"Harvest",
+	"Pick",
+	"Quarry",	// 75
 	"\n"
 };
 
@@ -2542,6 +2552,8 @@ const char *obj_custom_types[] = {
 	"fish-to-room",
 	"decays-on-char",
 	"decays-in-room",
+	"resource-to-char",
+	"resource-to-room",	// 20
 	"\n"
 };
 
@@ -2902,6 +2914,7 @@ const char *climate_flags[] = {
 	"coastal",
 	"ocean",
 	"lake",	// 20
+	"waterside",
 	"\n"
 };
 
@@ -2916,6 +2929,8 @@ const bitvector_t climate_flags_order[] = {
 	
 	CLIM_COASTAL, CLIM_FRESH_WATER, CLIM_SALT_WATER,	// water prefixes
 	CLIM_RIVER, CLIM_OCEAN, CLIM_LAKE,	// water types
+	
+	CLIM_WATERSIDE,	// before land types
 	
 	CLIM_MOUNTAIN,		// land terrain that could be prefix or whole name
 	CLIM_FOREST, CLIM_GRASSLAND,	// land terrains
@@ -3496,6 +3511,9 @@ const char *skill_flags[] = {
 	"IN-DEVELOPMENT",	// 0
 	"BASIC",
 	"NO-SPECIALIZE",
+	"VAMPIRE",
+	"CASTER",
+	"REMOVED-BY-PURIFY",	// 5
 	"\n"
 };
 

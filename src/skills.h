@@ -64,8 +64,10 @@ extern int get_ability_level(char_data *ch, any_vnum ability);
 extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
 extern int get_approximate_level(char_data *ch);
 extern struct player_skill_data *get_skill_data(char_data *ch, any_vnum vnum, bool add_if_missing);
+extern int has_skill_flagged(char_data *ch, bitvector_t skill_flag);
 void mark_level_gained_from_ability(char_data *ch, ability_data *abil);
 void remove_ability(char_data *ch, ability_data *abil, bool reset_levels);
+extern bool remove_skills_by_flag(char_data *ch, bitvector_t skill_flag);
 void set_skill(char_data *ch, any_vnum skill, int level);
 extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
 extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
@@ -81,13 +83,14 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 
 
 // SKILL_x: skill vnums
-#define SKILL_BATTLE  0
-#define SKILL_EMPIRE  1
+// note: commented-out skills no longer have references in the code -- ideally all skills will be fully data-driven
+// #define SKILL_BATTLE  0
+// #define SKILL_EMPIRE  1
 #define SKILL_HIGH_SORCERY  2
-#define SKILL_NATURAL_MAGIC  3
-#define SKILL_STEALTH  4
-#define SKILL_SURVIVAL  5
-#define SKILL_TRADE  6
+// #define SKILL_NATURAL_MAGIC  3
+// #define SKILL_STEALTH  4
+// #define SKILL_SURVIVAL  5
+// #define SKILL_TRADE  6
 #define SKILL_VAMPIRE  7
 
 
@@ -99,7 +102,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_GIFT_OF_NATURE  0
 #define ABIL_ANCIENT_BLOOD  2
 #define ABIL_BACKSTAB  3
-#define ABIL_WOLF_FORM  4
+// #define ABIL_WOLF_FORM  4
 #define ABIL_NULL_MANA  5
 #define ABIL_READY_BLOOD_WEAPONS  6
 #define ABIL_BOOST  7
@@ -111,11 +114,11 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_EARTHMELD  14
 #define ABIL_WORM  16
 #define ABIL_SEARCH  18
-#define ABIL_DAYWALKING  19
+// #define ABIL_DAYWALKING  19
 #define ABIL_HIDE  20
-#define ABIL_HORRID_FORM  21
+// #define ABIL_HORRID_FORM  21
 #define ABIL_DISPEL  22
-#define ABIL_MIST_FORM  24
+// #define ABIL_MIST_FORM  24
 #define ABIL_MUMMIFY  25
 #define ABIL_REGENERATE  27
 #define ABIL_SUMMON_THUG  28
@@ -183,7 +186,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_SAP  157
 #define ABIL_DAGGER_MASTERY  158
 #define ABIL_PRICK  161
-#define ABIL_BAT_FORM  162
+// #define ABIL_BAT_FORM  162
 #define ABIL_RITUAL_OF_BURDENS  163
 #define ABIL_MANASHIELD  165
 #define ABIL_SUMMON_SWIFT  168
@@ -206,17 +209,17 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_DEVASTATION_RITUAL  191
 #define ABIL_SENSE_LIFE_RITUAL  192
 #define ABIL_RITUAL_OF_DETECTION  193
-#define ABIL_BASIC_CRAFTS  198
+// #define ABIL_BASIC_CRAFTS  198	// no longer used in code
 // formerly: #define ABIL_SKILLED_LABOR  201
 #define ABIL_MASTER_SURVIVALIST  205
 // formerly: #define ABIL_TUNNEL  206
 #define ABIL_ARCANE_POWER  207
 #define ABIL_OUTRAGE  209
-#define ABIL_DREAD_BLOOD_FORM  211
-#define ABIL_SAVAGE_WEREWOLF_FORM  212
-#define ABIL_TOWERING_WEREWOLF_FORM  213
-#define ABIL_SAGE_WEREWOLF_FORM  214
-#define ABIL_ANIMAL_FORMS  215
+// #define ABIL_DREAD_BLOOD_FORM  211
+// #define ABIL_SAVAGE_WEREWOLF_FORM  212
+// #define ABIL_TOWERING_WEREWOLF_FORM  213
+// #define ABIL_SAGE_WEREWOLF_FORM  214
+// #define ABIL_ANIMAL_FORMS  215
 #define ABIL_REFASHION  216
 // formerly: #define ABIL_TRADE_ROUTES  217
 #define ABIL_RESURRECT  219
@@ -248,9 +251,9 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_BANSHEE  261
 #define ABIL_HONE  262
 #define ABIL_CHANT_OF_ILLUSIONS  265
-#define ABIL_ASTRAL_WEREWOLF_FORM  267
+// #define ABIL_ASTRAL_WEREWOLF_FORM  267
 #define ABIL_WHISPERSTRIDE 268
-#define ABIL_WEREWOLF_FORM  269
+// #define ABIL_WEREWOLF_FORM  269
 #define ABIL_STABLEMASTER  272
 #define ABIL_ABLATE  273
 #define ABIL_ACIDBLAST  274
@@ -269,7 +272,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_WEAPON_PROFICIENCY  287
 #define ABIL_PRIMITIVE_CRAFTS  288	// has hard-coded gains
 // formerly: #define ABIL_CHORES  290
-#define ABIL_SCAVENGING  291
+// #define ABIL_SCAVENGING  291	// now data-driven
 #define ABIL_BITE  292
 #define ABIL_COOK  293
 #define ABIL_KITE  294

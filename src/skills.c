@@ -1388,6 +1388,34 @@ bool green_skill_deadend(char_data *ch, any_vnum skill) {
 
 
 /**
+* Determines if a player has any skill with a given flag. If so, returns the
+* player's level in that skill. If more than one skill matches, it returns the
+* highest level among them.
+*
+* @param char_data *ch The player to check.
+* @param bitvector_t skill_flag The SKILLF_ to check for (for multiple flags, will return if ANY of them are present).
+* @return int If the player has a matching skill, returns the level of that skill. If not, returns 0.
+*/
+int has_skill_flagged(char_data *ch, bitvector_t skill_flag) {
+	struct player_skill_data *plsk, *next_plsk;
+	int skill_level = 0;
+	
+	// npcs lack skills / shortcuts out
+	if (!ch || IS_NPC(ch) || !skill_flag) {
+		return 0;
+	}
+	
+	HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+		if (plsk->ptr && SKILL_FLAGGED(plsk->ptr, skill_flag)) {
+			skill_level = MAX(skill_level, plsk->level);
+		}
+	}
+	
+	return skill_level;	// or 0 for none
+}
+
+
+/**
 * Adds one to the number of levels ch gained from an ability.
 *
 * @param char_data *ch The player to check.
@@ -1507,6 +1535,33 @@ void remove_ability(char_data *ch, ability_data *abil, bool reset_levels) {
 
 
 /**
+* Removes all skills with a given flag/flags from a player.
+*
+* @param char_data *ch The player.
+* @param bitvector_t skill_flag The SKILLF_ flag(s) to match. If you specify more than one, they must all be present.
+* @return bool TRUE if any skills were removed.
+*/
+bool remove_skills_by_flag(char_data *ch, bitvector_t skill_flag) {
+	struct player_skill_data *plsk, *next_plsk;
+	bool any = FALSE;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;	// no skills
+	}
+	
+	HASH_ITER(hh, GET_SKILL_HASH(ch), plsk, next_plsk) {
+		if (plsk->ptr && (SKILL_FLAGS(plsk->ptr) & skill_flag) == skill_flag && plsk->level > 0) {
+			set_skill(ch, plsk->vnum, 0);
+			clear_char_abilities(ch, plsk->vnum);
+			any = TRUE;
+		}
+	}
+	
+	return any;
+}
+
+
+/**
 * When a character loses skill levels, we clear the "levels_gained" tracker
 * for abilities that are >= their new level, so they can successfully regain
 * those levels later.
@@ -1531,8 +1586,11 @@ void reset_skill_gain_tracker_on_abilities_above_level(char_data *ch, any_vnum s
 
 // set a skill directly to a level
 void set_skill(char_data *ch, any_vnum skill, int level) {
+	void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
+	
 	struct player_skill_data *skdata;
 	bool gain = FALSE;
+	bool was_vampire = IS_VAMPIRE(ch);
 	
 	if ((skdata = get_skill_data(ch, skill, TRUE))) {
 		gain = (level > skdata->level);
@@ -1545,6 +1603,11 @@ void set_skill(char_data *ch, any_vnum skill, int level) {
 		}
 		
 		qt_change_skill_level(ch, skill);
+		
+		// ensure they are a vampire
+		if (!was_vampire && IS_VAMPIRE(ch)) {
+			make_vampire(ch, TRUE, NOTHING);
+		}
 	}
 }
 
@@ -1652,6 +1715,7 @@ ACMD(do_noskill) {
 
 
 ACMD(do_skills) {
+	void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 	void clear_char_abilities(char_data *ch, any_vnum skill);
 	
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
@@ -1844,6 +1908,7 @@ ACMD(do_skills) {
 			// good to go!
 			msg_to_char(ch, "You have dropped your %s skill to %d and reset abilities above that level.\r\n", SKILL_NAME(skill), level);
 			set_skill(ch, SKILL_VNUM(skill), level);
+			check_un_vampire(ch, FALSE);
 			update_class(ch);
 			check_ability_levels(ch, SKILL_VNUM(skill));
 			assign_class_abilities(ch, NULL, NOTHING);

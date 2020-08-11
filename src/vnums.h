@@ -67,13 +67,11 @@
 #define BOARD_IMM  2
 
 // Natural resources
-#define o_ROCK  100	// TODO: rocks are special-cased for chipping
 #define o_LIGHTNING_STONE  103
 #define o_BLOODSTONE  104
 #define o_WHEAT  141
 #define o_HOPS  143
 #define o_BARLEY  145
-#define o_HANDAXE  181	// TODO: this is special-cased for mining
 
 // brewing items
 #define o_APPLES  3002

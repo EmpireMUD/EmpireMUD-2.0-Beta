@@ -468,7 +468,7 @@ void point_update_char(char_data *ch) {
 		
 		// light-based gains
 		if (weather_info.sunlight == SUN_LIGHT && IS_OUTDOORS(ch)) {
-			gain_ability_exp(ch, ABIL_DAYWALKING, 2);
+			gain_player_tech_exp(ch, PTECH_VAMPIRE_SUN_IMMUNITY, 2);
 		}
 		
 		if (GET_MOUNT_LIST(ch)) {

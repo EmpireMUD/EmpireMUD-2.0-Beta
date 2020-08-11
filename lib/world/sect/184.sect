@@ -1,7 +1,7 @@
 #18450
 Beaver Dam~
 A Beaver Dam~
-'#' 26 o 6 w 0
+'#' 26 ov 6 w 0
 D0
 ####~
 &t~
@@ -13,7 +13,7 @@ S
 #18451
 Flooded Plains~
 The Flooded Plains~
-'~' 17 jo 10 w p
+'~' 17 jov 10 w p
 D1
 ~~~&g.~
 &c~
@@ -70,7 +70,7 @@ S
 #18452
 Flooded Woods~
 The Flooded Woods~
-'~' 17 joq 10 w p
+'~' 17 joqv 10 w p
 D1
 ~&g^&c~&g^~
 &c~
@@ -103,7 +103,7 @@ S
 #18453
 Flooded Desert~
 The Flooded Desert~
-'~' 17 ko 10 w p
+'~' 17 kov 10 w p
 D0
 ~~~&Y.~
 &c~

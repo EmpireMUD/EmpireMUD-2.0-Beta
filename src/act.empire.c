@@ -1870,7 +1870,7 @@ void list_cities(char_data *ch, empire_data *emp, char *argument) {
 	
 	if (*arg) {
 		if (!HAS_NAVIGATION(ch) && !imm_access) {
-			msg_to_char(ch, "You can't list cities for other empires without Navigation.\r\n");
+			msg_to_char(ch, "You don't have an ability that lets you list cities for other empires (e.g. Navigation).\r\n");
 			return;
 		}
 		
@@ -5225,7 +5225,7 @@ ACMD(do_islands) {
 		return;
 	}
 	if (!HAS_NAVIGATION(ch)) {
-		msg_to_char(ch, "You need to purchase the Navigation ability to do that.\r\n");
+		msg_to_char(ch, "You don't have an ability that lets you list islands (e.g. Navigation).\r\n");
 		return;
 	}
 	if (!emp) {
@@ -6642,7 +6642,7 @@ ACMD(do_territory) {
 		return;
 	}
 	if (!ch->desc || IS_NPC(ch) || !HAS_NAVIGATION(ch)) {
-		msg_to_char(ch, "You need the Navigation ability to list the coordinates of your territory.\r\n");
+		msg_to_char(ch, "You don't have the correct ability to list the coordinates of your territory (e.g. Navigation).\r\n");
 		return;
 	}
 	

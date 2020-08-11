@@ -454,6 +454,9 @@ typedef struct vehicle_data vehicle_data;
 #define SKILLF_IN_DEVELOPMENT  BIT(0)	// a. not live, won't show up on skill lists
 #define SKILLF_BASIC  BIT(1)	// b. always shows in the list
 #define SKILLF_NO_SPECIALIZE  BIT(2)	// c. players must pass 50/75 via script/quest
+#define SKILLF_VAMPIRE  BIT(3)	// d. players with this skill are considered vampires
+#define SKILLF_CASTER  BIT(4)	// e. players with this skill are considered spellcasters/mages
+#define SKILLF_REMOVED_BY_PURIFY  BIT(5)	// f. lose this skill if hit by the 'purify' spell
 
 
 // SPAWN_x: mob spawn flags
@@ -1725,6 +1728,8 @@ typedef struct vehicle_data vehicle_data;
 #define OBJ_CUSTOM_FISH_TO_ROOM  16
 #define OBJ_CUSTOM_DECAYS_ON_CHAR  17	// worn/held
 #define OBJ_CUSTOM_DECAYS_IN_ROOM  18	// everywhere else
+#define OBJ_CUSTOM_RESOURCE_TO_CHAR  19  // when gained as a resource
+#define OBJ_CUSTOM_RESOURCE_TO_ROOM  20  // when gained as a resource
 
 
 // RES_x: resource requirement types
@@ -1856,6 +1861,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_MAINTENANCE		39
 #define ACT_BURN_AREA		40
 #define ACT_HUNTING			41
+#define ACT_FORAGING		42
 
 // ACTF_x: act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -2204,6 +2210,16 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_HUNT_ANIMALS  63	// can use the 'hunt' command on animals
 #define PTECH_CLOCK  64	// can tell time
 #define PTECH_CALENDAR  65	// can tell the date
+#define PTECH_MINT  66	// can mint coins
+#define PTECH_TAN  67	// can use the 'tan' command
+#define PTECH_NO_PURIFY  68	// cannot be affected by the 'purify' spell
+#define PTECH_VAMPIRE_SUN_IMMUNITY  69	// vampire not penalized in the sun
+#define PTECH_GATHER  70	// can 'gather'
+#define PTECH_CHOP  71	// can 'chop'
+#define PTECH_DIG  72	// can 'dig'
+#define PTECH_HARVEST  73	// can 'harvest'
+#define PTECH_PICK  74	// can 'pick'
+#define PTECH_QUARRY  75	// can 'quarry'
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -2486,6 +2502,7 @@ typedef struct vehicle_data vehicle_data;
 #define CLIM_COASTAL  BIT(18)	// q. marks the edge on either the ocean or grassland side
 #define CLIM_OCEAN  BIT(19)	// r. out to sea (compare to salt-water which could also be a lake)
 #define CLIM_LAKE  BIT(20)	// s. either fresh or salt water
+#define CLIM_WATERSIDE  BIT(21)	// t. adjacent to fresh water
 
 
 // DPLTN_x: depletion types

@@ -119,10 +119,8 @@ RITUAL_SETUP_FUNC(start_siege_ritual);
 RITUAL_SETUP_FUNC(start_simple_ritual);
 
 // chant prototypes
-RITUAL_FINISH_FUNC(perform_chant_of_druids);
 RITUAL_FINISH_FUNC(perform_chant_of_illusions);
 RITUAL_FINISH_FUNC(perform_chant_of_nature);
-RITUAL_SETUP_FUNC(start_chant_of_druids);
 RITUAL_SETUP_FUNC(start_chant_of_illusions);
 RITUAL_SETUP_FUNC(start_chant_of_nature);
 
@@ -232,23 +230,24 @@ struct ritual_data_type {
 		MESSAGE_END
 	}},
 	
-	// 8: chant of druids
-	{ "druids", 0, NO_ABIL, 0, SCMD_CHANT,
-		start_chant_of_druids,
-		perform_chant_of_druids,
-		{{ "You start the chant of druids...", "$n starts the chant of druids..." },
-		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
-		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
-		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
-		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
-		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
-		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
-		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
-		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
-		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
-		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
-		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
-		{ "You chant, 'Chant of druids placeholder text.'", "$n chants, 'Chant of druids placeholder text.'" },
+	// 8: DEPRECATED (formerly druids)
+	{ "", 0, NO_ABIL, 0, SCMD_CHANT,
+		NULL,
+		NULL,
+		{{ "You start a chant...", "$n starts a chant..." },
+		NO_MESSAGE,	// a bunch of no-messages here takes care of anybody who logged out doing this chant before it was removed
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
+		NO_MESSAGE,
 		MESSAGE_END
 	}},
 	
@@ -1157,7 +1156,7 @@ ACMD(do_ritual) {
 		
 		found = FALSE;
 		for (iter = 0; *ritual_data[iter].name != '\n'; ++iter) {
-			if (ritual_data[iter].subcmd == subcmd && can_use_ritual(ch, iter)) {
+			if (ritual_data[iter].subcmd == subcmd && can_use_ritual(ch, iter) && *ritual_data[iter].name) {
 				msg_to_char(ch, "%s%s", (found ? ", " : " "), ritual_data[iter].name);
 				found = TRUE;
 			}
@@ -1175,7 +1174,7 @@ ACMD(do_ritual) {
 	// find ritual
 	found = FALSE;
 	for (iter = 0; *ritual_data[iter].name != '\n' && rit == NOTHING; ++iter) {
-		if (ritual_data[iter].subcmd == subcmd && can_use_ritual(ch, iter) && is_abbrev(arg, ritual_data[iter].name)) {
+		if (ritual_data[iter].subcmd == subcmd && *ritual_data[iter].name && can_use_ritual(ch, iter) && is_abbrev(arg, ritual_data[iter].name)) {
 			found = TRUE;
 			rit = iter;
 		}
@@ -1438,37 +1437,6 @@ ACMD(do_vigor) {
 
  ///////////////////////////////////////////////////////////////////////////////
 //// CHANTS ///////////////////////////////////////////////////////////////////
-
-RITUAL_SETUP_FUNC(start_chant_of_druids) {
-	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_HENGE)) {
-		msg_to_char(ch, "You can't perform the chant of druids unless you are at a henge.\r\n");
-		return FALSE;
-	}
-	if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This building must be in a city to use it.\r\n");
-		return FALSE;
-	}
-	if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You need to finish it before you can perform the chant of druids.\r\n");
-		return FALSE;
-	}
-	
-	// OK
-	start_ritual(ch, ritual);
-	return TRUE;
-}
-
-RITUAL_FINISH_FUNC(perform_chant_of_druids) {
-	if (CAN_GAIN_NEW_SKILLS(ch) && get_skill_level(ch, SKILL_NATURAL_MAGIC) == 0 && noskill_ok(ch, SKILL_NATURAL_MAGIC) && room_has_function_and_city_ok(IN_ROOM(ch), FNC_HENGE)) {
-		msg_to_char(ch, "&gAs you finish the chant, you begin to see the weave of mana through nature...&0\r\n");
-		set_skill(ch, SKILL_NATURAL_MAGIC, 1);
-		SAVE_CHAR(ch);
-	}
-	else {
-		msg_to_char(ch, "You have finished the chant.\r\n");
-	}
-}
-
 
 RITUAL_SETUP_FUNC(start_chant_of_illusions) {
 	static struct resource_data *illusion_res = NULL;

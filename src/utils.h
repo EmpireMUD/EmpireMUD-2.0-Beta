@@ -347,7 +347,7 @@
 #define GET_MOVE(ch)  GET_CURRENT_POOL(ch, MOVE)
 #define GET_MAX_MOVE(ch)  GET_MAX_POOL(ch, MOVE)
 #define GET_BLOOD(ch)  GET_CURRENT_POOL(ch, BLOOD)
-#define GET_BLOOD_UPKEEP(ch)  (GET_EXTRA_ATT(ch, ATT_BLOOD_UPKEEP) + (get_skill_level(ch, SKILL_VAMPIRE) <= 15 ? 1 : 0))
+#define GET_BLOOD_UPKEEP(ch)  (GET_EXTRA_ATT(ch, ATT_BLOOD_UPKEEP) + (has_skill_flagged(ch, SKILLF_VAMPIRE) <= 15 ? 1 : 0))
 extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max pools, and max_pools[BLOOD] is not used.
 #define GET_HEALTH_DEFICIT(ch)  GET_DEFICIT((ch), HEALTH)
 #define GET_MOVE_DEFICIT(ch)  GET_DEFICIT((ch), MOVE)
@@ -409,9 +409,9 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define FREE_TO_CARRY(obj)  (IS_COINS(obj) || GET_OBJ_REQUIRES_QUEST(obj) != NOTHING)
 #define HAS_INFRA(ch)  AFF_FLAGGED(ch, AFF_INFRAVISION)
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
-#define IS_MAGE(ch)  (IS_NPC(ch) ? GET_MAX_MANA(ch) > 0 : (get_skill_level((ch), SKILL_NATURAL_MAGIC) > 0 || get_skill_level((ch), SKILL_HIGH_SORCERY) > 0))
+#define IS_MAGE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_CASTER) : (has_skill_flagged((ch), SKILLF_CASTER) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
-#define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (get_skill_level((ch), SKILL_VAMPIRE) > 0))
+#define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (has_skill_flagged((ch), SKILLF_VAMPIRE) > 0))
 #define NOT_MELEE_RANGE(ch, vict)  ((FIGHTING(ch) && FIGHT_MODE(ch) != FMODE_MELEE) || (FIGHTING(vict) && FIGHT_MODE(vict) != FMODE_MELEE))
 #define WOULD_EXECUTE(ch, vict)  (MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP) || (IS_NPC(ch) ? (((ch)->master && !IS_NPC((ch)->master)) ? PRF_FLAGGED((ch)->master, PRF_AUTOKILL) : (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP))) : PRF_FLAGGED((ch), PRF_AUTOKILL)))
 

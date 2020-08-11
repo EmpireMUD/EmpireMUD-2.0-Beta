@@ -4029,7 +4029,7 @@ GLB_FUNCTION(run_global_newbie_gear) {
 void start_new_character(char_data *ch) {
 	void add_archetype_lore(char_data *ch);
 	void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
-	void make_vampire(char_data *ch, bool lore);
+	void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
 	void set_skill(char_data *ch, any_vnum skill, int level);
 	extern const char *default_channels[];
 	extern bool global_mute_slash_channel_joins;
@@ -4041,6 +4041,7 @@ void start_new_character(char_data *ch) {
 	int arch_iter, iter, level;
 	struct archetype_gear *gear;
 	struct archetype_skill *sk;
+	skill_data *skill_data;
 	archetype_data *arch;
 	
 	// announce to existing players that we have a newbie
@@ -4133,8 +4134,8 @@ void start_new_character(char_data *ch) {
 			set_skill(ch, sk->skill, level);
 			
 			// special case for vampire
-			if (sk->skill == SKILL_VAMPIRE && !IS_VAMPIRE(ch)) {
-				make_vampire(ch, TRUE);
+			if ((skill_data = find_skill_by_vnum(sk->skill)) && SKILL_FLAGGED(skill_data, SKILLF_VAMPIRE) && !IS_VAMPIRE(ch)) {
+				make_vampire(ch, TRUE, sk->skill);
 			}
 		}
 		

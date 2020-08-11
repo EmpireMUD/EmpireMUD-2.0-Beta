@@ -1062,8 +1062,9 @@ ACMD(do_moonrise) {
 
 
 ACMD(do_purify) {
-	void un_vampire(char_data *ch);
+	void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 	
+	bool any = FALSE, was_vampire;
 	char_data *vict;
 	int cost = 50;
 	
@@ -1078,11 +1079,11 @@ ACMD(do_purify) {
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(vict) && has_ability(vict, ABIL_DAYWALKING)) {
-		msg_to_char(ch, "The light of your purify spell has no effect on daywalkers.\r\n");
+	else if (!IS_NPC(vict) && has_player_tech(vict, PTECH_NO_PURIFY)) {
+		msg_to_char(ch, "The light of your purify spell will have no effect on that person.\r\n");
 	}
-	else if (ch != vict && IS_NPC(vict) && IS_VAMPIRE(vict) && MOB_FLAGGED(vict, MOB_HARD | MOB_GROUP)) {
-		msg_to_char(ch, "You cannot purify so powerful a vampire.\r\n");
+	else if (ch != vict && IS_NPC(vict) && MOB_FLAGGED(vict, MOB_HARD | MOB_GROUP)) {
+		msg_to_char(ch, "You cannot purify so powerful a creature.\r\n");
 	}
 	else if (vict != ch && !IS_NPC(vict) && !PRF_FLAGGED(vict, PRF_BOTHERABLE)) {
 		act("You can't purify someone without permission (ask $M to type 'toggle bother').", FALSE, ch, NULL, vict, TO_CHAR);
@@ -1095,6 +1096,7 @@ ACMD(do_purify) {
 	}
 	else {
 		charge_ability_cost(ch, MANA, cost, NOTHING, 0, WAIT_SPELL);
+		was_vampire = IS_VAMPIRE(vict);
 		
 		if (ch == vict) {
 			msg_to_char(ch, "You let your mana wash over your body and purify your form.\r\n");
@@ -1106,17 +1108,23 @@ ACMD(do_purify) {
 			act("$n holds out $s hands and $s mana washes over $N, purifying $M.", FALSE, ch, NULL, vict, TO_NOTVICT);
 		}
 		
-		if (IS_VAMPIRE(vict)) {
-			msg_to_char(vict, "You feel the power of your blood fade and your vampiric powers vanish.\r\n");
-			if (IS_NPC(vict)) {
-				REMOVE_BIT(MOB_FLAGS(vict), MOB_VAMPIRE);
-			}
-			else {
-				un_vampire(vict);
+		// clear skills if applicable
+		if (IS_NPC(vict)) {
+			any = IS_VAMPIRE(vict);
+			REMOVE_BIT(MOB_FLAGS(vict), MOB_VAMPIRE);
+		}
+		else {
+			any = remove_skills_by_flag(vict, SKILLF_REMOVED_BY_PURIFY);
+			if (any) {
+				msg_to_char(vict, "You feel some of your power diminish and fade away!");
 			}
 		}
 		
-		if (can_gain_exp_from(ch, vict)) {
+		if (was_vampire && !IS_VAMPIRE(vict)) {
+			check_un_vampire(vict, FALSE);
+		}
+		
+		if (any) {
 			gain_ability_exp(ch, ABIL_PURIFY, 50);
 		}
 

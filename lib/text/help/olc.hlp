@@ -1011,9 +1011,19 @@ Available techs are:
     taunts if in Tank role.
  &cBite-Steal-Blood&0 - Bite steals a small amount of blood.
  &cSee-In-Dark-Outdoors&0 - Can see in dark rooms if outdoors.
- &cHunt-Animals&0 - Can use the 'hunt' command, on animals.
- &cClock&0 - Can tell the time.
- &cCalendar&0 - Knows the date.
+ &cHunt-Animals&0 * - Can use the 'hunt' command, on animals.
+ &cClock&0 * - Can tell the time.
+ &cCalendar&0 * - Knows the date.
+ &cMint&0 * - Can mint coins.
+ &cTan&0 * - Can use the 'tan' command.
+ &cNo-Purify&0 - Player cannot be purified.
+ &cVampire-Sun-Immunity&0 * - Vampire powers now work in the sun.
+ &cGather&0 * - Can 'gather'.
+ &cChop&0 * - Can 'chop'.
+ &cDig&0 * - Can 'dig'.
+ &cHarvest&0 * - Can 'harvest'.
+ &cPick&0 * - Can 'pick'.
+ &cQuarry&0 * - Can 'quarry'.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 
@@ -2048,6 +2058,8 @@ Available functions:
  FISHING - workforce can fish here (also need fish interaction)
  STORE-ALL - any regular storable item can be stored (but not retrieved)
  &yIN-CITY-ONLY&0 - all function flags only work when in a city
+   Note: scripts cannot check this by itself using %room.function()%; use the
+   IN-CITY-ONLY building flag instead
  OVEN - allows baking
  
 &r* Note:&0 Functions marked with &r*&0 cannot be used on moving vehicles, only
@@ -2718,6 +2730,7 @@ Climates:
  &csalt water&0 - Ocean, sea, or salt lake.
  &cforest&0 - Any kind of forest or jungle.
  &cgrassland&0 - Plains, savannah, or steppe.
+ &cwaterside&0 - Adjacent (or near) fresh water.
 
 See also: OLC CROPS, OLC SECTORS
 #d
@@ -4968,10 +4981,12 @@ Message types:
  &clongdesc&0 - Object gives the player a custom long description when worn.
  &clongdesc-female&0 - Same as longdesc but only for females.
  &clongdesc-male&0 - Same as longdesc but only for males.
- &cfish-to-char&0 - Shown to the player when they catch a fish ($p for item caught).
- &cfish-to-room&0 - Shown to the room when someone catches a fish ($p for item caught).
+ &cfish-to-char&0 - On a fishing tool, shown to player when catching a fish ($p for item caught).
+ &cfish-to-room&0 - On a fishing tool, shown to room when catching a fish ($p for item caught).
  &cdecays-on-char&0 - Shown to the holder/user of the item on decay, if any.
  &cdecays-in-room&0 - Shown to the room if the item decays on the ground.
+ &cresource-to-char&0 - Shown to the character when they gain it as a resource.
+ &cresource-to-room&0 - Shown to room when gained as a resource (e.g. chopped).
 
 See also: OLC OBJECTS, DOLLAR SIGN CODES
 #d
@@ -7051,6 +7066,9 @@ Available flags:
  &cIN-DEVELOPMENT&0 - Players can't see or gain the skill.
  &cBASIC&0 - Always shows in the list for players, even at 0.
  &cNO-SPECIALIZE&0 - Players can't pass 50/75 except via script/quest.
+ &cVAMPIRE&0 - Players with this skill are considered vampires.
+ &cCASTER&0 - Players with this skill are spellcasters/mages.
+ &cREMOVED-BY-PURIFY&0 - Lose this skill if hit by the purify spell.
 
 See also: OLC SKILLS, OLC REMOVEINDEV
 #d
