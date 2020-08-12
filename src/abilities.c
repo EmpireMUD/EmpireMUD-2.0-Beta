@@ -286,11 +286,11 @@ void apply_all_ability_techs(char_data *ch) {
 * @param ability_data *abil The passive-buff ability to apply.
 */
 void apply_one_passive_buff(char_data *ch, ability_data *abil) {
-	double remaining_points, total_points, share, amt;
+	double remaining_points = 0, total_points = 0, share, amt;
 	struct ability_exec *data;
 	struct affected_type *af;
 	struct apply_data *apply;
-	int cap, level, total_w;
+	int cap, level, total_w = 0;
 	bool unscaled;
 	
 	if (!ch || IS_NPC(ch) || !abil || !IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF)) {
