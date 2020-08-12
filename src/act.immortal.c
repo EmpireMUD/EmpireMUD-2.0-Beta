@@ -89,6 +89,7 @@ void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern char *get_room_name(room_data *room, bool color);
+void refresh_passive_buffs(char_data *ch);
 void replace_question_color(char *input, char *color, char *output);
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
@@ -2541,8 +2542,6 @@ SHOW(show_islands) {
 
 
 SHOW(show_passives) {
-	void refresh_passive_buffs(char_data *ch);
-	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	bool found = FALSE, is_file = FALSE;
 	struct affected_type *aff;
