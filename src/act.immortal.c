@@ -9488,6 +9488,7 @@ ACMD(do_stat) {
 			send_to_char("Sorry, you can't do that.\r\n", ch);
 		}
 		else {
+			refresh_passive_buffs(victim);
 			do_stat_character(ch, victim);
 		}
 		
