@@ -91,7 +91,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 // #define SKILL_STEALTH  4
 // #define SKILL_SURVIVAL  5
 // #define SKILL_TRADE  6
-#define SKILL_VAMPIRE  7
+// #define SKILL_VAMPIRE  7
 
 
 // for ability definitions

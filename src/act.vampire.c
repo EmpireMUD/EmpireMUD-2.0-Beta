@@ -228,13 +228,6 @@ int GET_MAX_BLOOD(char_data *ch) {
 		base += GET_EXTRA_BLOOD(ch);
 
 		if (IS_VAMPIRE(ch)) {
-			if (IS_SPECIALTY_SKILL(ch, SKILL_VAMPIRE)) {
-				base += 50;
-			}
-			if (IS_CLASS_SKILL(ch, SKILL_VAMPIRE)) {
-				base += 50;
-			}
-
 			if (has_ability(ch, ABIL_ANCIENT_BLOOD)) {
 				base *= 2;
 			}
