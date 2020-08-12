@@ -947,6 +947,9 @@ Buff abilities have the following properties:
  <&yaffects&0> Affect flags to set.
  <&yapply&0> Trait modifiers to give.
 
+Note: Passive-buff abilities are not affected by the 'solo' role's limitation
+on being alone; they will remain active.
+
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
 "ABILEDIT PLAYER-TECH ABILITY" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH

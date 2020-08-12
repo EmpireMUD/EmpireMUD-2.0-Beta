@@ -41,7 +41,7 @@
 const char *default_ability_name = "Unnamed Ability";
 
 // local protos
-bool has_matching_role(char_data *ch, ability_data *abil);
+bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 void remove_passive_buff(char_data *ch, struct affected_type *aff);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
@@ -297,7 +297,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	}
 	
 	CREATE(data, struct ability_exec, 1);
-	data->matching_role = has_matching_role(ch, abil);
+	data->matching_role = has_matching_role(ch, abil, FALSE);
 	
 	level = get_approximate_level(ch);
 	if (ABIL_ASSIGNED_SKILL(abil) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)))) < CLASS_SKILL_CAP) {
@@ -658,21 +658,22 @@ double get_type_modifier(ability_data *abil, bitvector_t type) {
 *
 * @param char_data *ch The player or npc.
 * @param ability_data *abil The ability to check for a match.
+* @param bool ignore_solo_check If TRUE, doesn't care if the player is alone for 'solo' abilities.
 */
-bool has_matching_role(char_data *ch, ability_data *abil) {
+bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check) {
 	if (IS_NPC(ch) || !ABILITY_FLAGGED(abil, ABILITY_ROLE_FLAGS)) {
 		return TRUE;	// npc/no-role-required
 	}
-	if (ABILITY_FLAGGED(abil, ABILF_CASTER_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+	if (ABILITY_FLAGGED(abil, ABILF_CASTER_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_CASTER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && (ignore_solo_check || check_solo_role(ch))) {
 		return TRUE;
 	}
-	else if (ABILITY_FLAGGED(abil, ABILF_HEALER_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_HEALER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+	else if (ABILITY_FLAGGED(abil, ABILF_HEALER_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_HEALER || GET_CLASS_ROLE(ch) == ROLE_SOLO) && (ignore_solo_check || check_solo_role(ch))) {
 		return TRUE;
 	}
-	else if (ABILITY_FLAGGED(abil, ABILF_MELEE_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_MELEE || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+	else if (ABILITY_FLAGGED(abil, ABILF_MELEE_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_MELEE || GET_CLASS_ROLE(ch) == ROLE_SOLO) && (ignore_solo_check || check_solo_role(ch))) {
 		return TRUE;
 	}
-	else if (ABILITY_FLAGGED(abil, ABILF_TANK_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_TANK || GET_CLASS_ROLE(ch) == ROLE_SOLO) && check_solo_role(ch)) {
+	else if (ABILITY_FLAGGED(abil, ABILF_TANK_ROLE) && (GET_CLASS_ROLE(ch) == ROLE_TANK || GET_CLASS_ROLE(ch) == ROLE_SOLO) && (ignore_solo_check || check_solo_role(ch))) {
 		return TRUE;
 	}
 	
@@ -1638,7 +1639,7 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 	// exec data to pass through
 	CREATE(data, struct ability_exec, 1);
 	data->cost = ABIL_COST(abil);	// base cost, may be modified
-	data->matching_role = has_matching_role(ch, abil);
+	data->matching_role = has_matching_role(ch, abil, TRUE);
 	
 	// run the ability
 	do_ability(ch, abil, argument, targ, obj, veh, data);
@@ -2921,6 +2922,7 @@ void save_olc_ability(descriptor_data *desc) {
 			if (abd->purchased[GET_CURRENT_SKILL_SET(chiter)]) {
 				remove_player_tech(chiter, ABIL_VNUM(abil));
 				apply_ability_techs_to_player(chiter, abil);
+				remove_passive_buff_by_ability(chiter, vnum);
 			}
 		}
 	}
@@ -2965,6 +2967,17 @@ void save_olc_ability(descriptor_data *desc) {
 	// ... and update some things
 	HASH_SRT(sorted_hh, sorted_abilities, sort_abilities_by_data);
 	read_ability_requirements();	// may have lost/changed its skill assignment
+	
+	// apply passive buffs
+	if (IS_SET(ABIL_TYPES(proto), ABILT_PASSIVE_BUFF)) {
+		LL_FOREACH(character_list, chiter) {
+			if (!IS_NPC(chiter) && (abd = get_ability_data(chiter, vnum, FALSE))) {
+				if (abd->purchased[GET_CURRENT_SKILL_SET(chiter)]) {
+					apply_one_passive_buff(chiter, proto);
+				}
+			}
+		}
+	}
 }
 
 
