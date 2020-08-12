@@ -475,9 +475,6 @@ void point_update_char(char_data *ch) {
 			gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
 		}
 		
-		gain_ability_exp(ch, ABIL_GIFT_OF_NATURE, 2);
-		gain_ability_exp(ch, ABIL_ARCANE_POWER, 2);
-		
 		run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_HOURLY);
 		
 		// death count decrease after 3 minutes without a death

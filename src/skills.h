@@ -99,7 +99,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 
 
 // ABIL_x: ability vnums
-#define ABIL_GIFT_OF_NATURE  0
+// #define ABIL_GIFT_OF_NATURE  0
 #define ABIL_ANCIENT_BLOOD  2
 #define ABIL_BACKSTAB  3
 // #define ABIL_WOLF_FORM  4
@@ -213,7 +213,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 // formerly: #define ABIL_SKILLED_LABOR  201
 #define ABIL_MASTER_SURVIVALIST  205
 // formerly: #define ABIL_TUNNEL  206
-#define ABIL_ARCANE_POWER  207
+// #define ABIL_ARCANE_POWER  207
 #define ABIL_OUTRAGE  209
 // #define ABIL_DREAD_BLOOD_FORM  211
 // #define ABIL_SAVAGE_WEREWOLF_FORM  212
