@@ -947,10 +947,13 @@ Buff abilities have the following properties:
  <&yaffects&0> Affect flags to set.
  <&yapply&0> Trait modifiers to give.
 
+Immortals can see what passive buffs are currently affecting a character using
+'show passives'.
+
 Note: Passive-buff abilities are not affected by the 'solo' role's limitation
 on being alone; they will remain active.
 
-See also: OLC ABILITIES, ABILEDIT TYPES
+See also: OLC ABILITIES, ABILEDIT TYPES, SHOW PASSIVES
 #d
 "ABILEDIT PLAYER-TECH ABILITY" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH
 
