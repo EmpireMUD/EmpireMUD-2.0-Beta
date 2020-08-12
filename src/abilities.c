@@ -291,6 +291,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	struct affected_type *af;
 	struct apply_data *apply;
 	int cap, level, total_w;
+	bool unscaled;
 	
 	if (!ch || IS_NPC(ch) || !abil || !IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF)) {
 		return;	// safety first
@@ -298,22 +299,28 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	
 	CREATE(data, struct ability_exec, 1);
 	data->matching_role = has_matching_role(ch, abil, FALSE);
+	unscaled = ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF);
 	
-	level = get_approximate_level(ch);
-	if (ABIL_ASSIGNED_SKILL(abil) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)))) < CLASS_SKILL_CAP) {
-		level = MIN(level, cap);	// constrain by skill level
-	}
-	total_points = remaining_points = standard_ability_scale(ch, abil, level, ABILT_PASSIVE_BUFF, data);
-	
-	if (total_points < 0) {	// no work
-		free(data);
-		return;
+	// things only needed for scaled buffs
+	if (!unscaled) {
+		level = get_approximate_level(ch);
+		if (ABIL_ASSIGNED_SKILL(abil) && (cap = get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil)))) < CLASS_SKILL_CAP) {
+			level = MIN(level, cap);	// constrain by skill level
+		}
+		total_points = remaining_points = standard_ability_scale(ch, abil, level, ABILT_PASSIVE_BUFF, data);
+		
+		if (total_points < 0) {	// no work
+			free(data);
+			return;
+		}
 	}
 	
 	// affect flags? cost == level 100 ability
 	if (ABIL_AFFECTS(abil)) {
-		remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
-		remaining_points = MAX(0, remaining_points);
+		if (!unscaled) {
+			remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
+			remaining_points = MAX(0, remaining_points);
+		}
 		
 		af = create_flag_aff(ABIL_VNUM(abil), 1, ABIL_AFFECTS(abil), ch);
 		LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
@@ -321,16 +328,18 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	}
 	
 	// determine share for effects
-	total_w = 0;
-	LL_FOREACH(ABIL_APPLIES(abil), apply) {
-		if (!apply_never_scales[apply->location]) {
-			total_w += ABSOLUTE(apply->weight);
+	if (!unscaled) {
+		total_w = 0;
+		LL_FOREACH(ABIL_APPLIES(abil), apply) {
+			if (!apply_never_scales[apply->location]) {
+				total_w += ABSOLUTE(apply->weight);
+			}
 		}
 	}
 	
 	// now create affects for each apply that we can afford
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
-		if (apply_never_scales[apply->location]) {
+		if (apply_never_scales[apply->location] || unscaled) {
 			af = create_mod_aff(ABIL_VNUM(abil), 1, apply->location, apply->weight, ch);
 			LL_APPEND(GET_PASSIVE_BUFFS(ch), af);
 			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
@@ -1353,15 +1362,18 @@ DO_ABIL(do_buff_ability) {
 	any_vnum affect_vnum;
 	double total_points, remaining_points, share, amt;
 	int dur, total_w;
-	bool messaged;
+	bool messaged, unscaled;
 	
 	affect_vnum = (ABIL_AFFECT_VNUM(abil) != NOTHING) ? ABIL_AFFECT_VNUM(abil) : ATYPE_BUFF;
 	
-	total_points = get_ability_type_data(data, ABILT_BUFF)->scale_points;
-	remaining_points = total_points;
-	
-	if (total_points <= 0) {
-		return;
+	unscaled = ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF);
+	if (!unscaled) {
+		total_points = get_ability_type_data(data, ABILT_BUFF)->scale_points;
+		remaining_points = total_points;
+		
+		if (total_points <= 0) {
+			return;
+		}
 	}
 	
 	if (ABIL_IMMUNITIES(abil) && AFF_FLAGGED(vict, ABIL_IMMUNITIES(abil))) {
@@ -1379,8 +1391,10 @@ DO_ABIL(do_buff_ability) {
 	
 	// affect flags? cost == level 100 ability
 	if (ABIL_AFFECTS(abil)) {
-		remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
-		remaining_points = MAX(0, remaining_points);
+		if (!unscaled) {
+			remaining_points -= count_bits(ABIL_AFFECTS(abil)) * config_get_double("scale_points_at_100");
+			remaining_points = MAX(0, remaining_points);
+		}
 		
 		af = create_flag_aff(affect_vnum, dur, ABIL_AFFECTS(abil), ch);
 		affect_join(vict, af, messaged ? SILENT_AFF : NOBITS);
@@ -1388,16 +1402,18 @@ DO_ABIL(do_buff_ability) {
 	}
 	
 	// determine share for effects
-	total_w = 0;
-	LL_FOREACH(ABIL_APPLIES(abil), apply) {
-		if (!apply_never_scales[apply->location]) {
-			total_w += ABSOLUTE(apply->weight);
+	if (!unscaled) {
+		total_w = 0;
+		LL_FOREACH(ABIL_APPLIES(abil), apply) {
+			if (!apply_never_scales[apply->location]) {
+				total_w += ABSOLUTE(apply->weight);
+			}
 		}
 	}
 	
 	// now create affects for each apply that we can afford
 	LL_FOREACH(ABIL_APPLIES(abil), apply) {
-		if (apply_never_scales[apply->location]) {
+		if (apply_never_scales[apply->location] || unscaled) {
 			af = create_mod_aff(affect_vnum, dur, apply->location, apply->weight, ch);
 			affect_join(vict, af, messaged ? SILENT_AFF : NOBITS);
 			messaged = TRUE;

@@ -127,6 +127,7 @@ const char *ability_flags[] = {
 	"TANK-ROLE",
 	"RANGED-ONLY",
 	"IGNORE-SUN",
+	"UNSCALED-BUFF",
 	"\n"
 };
 

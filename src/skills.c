@@ -943,6 +943,8 @@ void gain_player_tech_exp(char_data *ch, int tech, double amount) {
 * @param bool Returns TRUE if a skill point was gained or lost.
 */
 bool gain_skill(char_data *ch, skill_data *skill, int amount) {
+	void refresh_passive_buffs(char_data *ch);
+	
 	bool any = FALSE, pos = (amount > 0);
 	struct player_skill_data *skdata;
 	int points;
