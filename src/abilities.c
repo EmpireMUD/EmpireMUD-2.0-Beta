@@ -3082,50 +3082,50 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 		size += snprintf(buf + size, sizeof(buf) - size, "Wait type: [\ty%s\t0], Linked trait: [\ty%s\t0]\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
 		size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
-		
-		// type-specific data
-		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
-			if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
-				strcpy(part, "unlimited");
-			}
-			else {
-				snprintf(part, sizeof(part), "%d", ABIL_SHORT_DURATION(abil));
-			}
-			if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
-				strcpy(part2, "unlimited");
-			}
-			else {
-				snprintf(part2, sizeof(part2), "%d", ABIL_LONG_DURATION(abil));
-			}
-			size += snprintf(buf + size, sizeof(buf) - size, "Durations: [\tc%s/%s seconds\t0]\r\n", part, part2);
-			
-			size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
-		}	// end buff/dot
-		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
-			sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
-			size += snprintf(buf + size, sizeof(buf) - size, "Affect flags: \tg%s\t0\r\n", part);
-			
-			// applies
-			size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
-			count = 0;
-			LL_FOREACH(ABIL_APPLIES(abil), app) {
-				size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", count++ ? ", " : "", app->weight, apply_types[app->location]);
-			}
-			if (!ABIL_APPLIES(abil)) {
-				size += snprintf(buf + size, sizeof(buf) - size, "none");
-			}
-			size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
-		}	// end buff
-		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "Attack type: [\tc%d\t0]\r\n", ABIL_ATTACK_TYPE(abil));
-		}	// end damage
-		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "Damage type: [\tc%s\t0]\r\n", damage_types[ABIL_DAMAGE_TYPE(abil)]);
-		}	// end damage/dot
-		if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
-			size += snprintf(buf + size, sizeof(buf) - size, "Max stacks: [\tc%d\t0]\r\n", ABIL_MAX_STACKS(abil));
-		}	// end dot
 	}
+	
+	// type-specific data
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
+		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
+			strcpy(part, "unlimited");
+		}
+		else {
+			snprintf(part, sizeof(part), "%d", ABIL_SHORT_DURATION(abil));
+		}
+		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
+			strcpy(part2, "unlimited");
+		}
+		else {
+			snprintf(part2, sizeof(part2), "%d", ABIL_LONG_DURATION(abil));
+		}
+		size += snprintf(buf + size, sizeof(buf) - size, "Durations: [\tc%s/%s seconds\t0]\r\n", part, part2);
+		
+		size += snprintf(buf + size, sizeof(buf) - size, "Custom affect: [\ty%d %s\t0]\r\n", ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
+	}	// end buff/dot
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
+		sprintbit(ABIL_AFFECTS(abil), affected_bits, part, TRUE);
+		size += snprintf(buf + size, sizeof(buf) - size, "Affect flags: \tg%s\t0\r\n", part);
+		
+		// applies
+		size += snprintf(buf + size, sizeof(buf) - size, "Applies: ");
+		count = 0;
+		LL_FOREACH(ABIL_APPLIES(abil), app) {
+			size += snprintf(buf + size, sizeof(buf) - size, "%s%d to %s", count++ ? ", " : "", app->weight, apply_types[app->location]);
+		}
+		if (!ABIL_APPLIES(abil)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "none");
+		}
+		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
+	}	// end buff
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Attack type: [\tc%d\t0]\r\n", ABIL_ATTACK_TYPE(abil));
+	}	// end damage
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Damage type: [\tc%s\t0]\r\n", damage_types[ABIL_DAMAGE_TYPE(abil)]);
+	}	// end damage/dot
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Max stacks: [\tc%d\t0]\r\n", ABIL_MAX_STACKS(abil));
+	}	// end dot
 	
 	if (ABIL_CUSTOM_MSGS(abil)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Custom messages:\r\n");
@@ -3198,46 +3198,46 @@ void olc_show_ability(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 		sprintf(buf + strlen(buf), "<%swaittype\t0> %s, <%slinkedtrait\t0> %s\r\n", OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)], OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
 		sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
-		
-		// type-specific data
-		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
-			if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
-				sprintf(buf + strlen(buf), "<%sshortduration\t0> unlimited, ", OLC_LABEL_CHANGED);
-			}
-			else {
-				sprintf(buf + strlen(buf), "<%sshortduration\t0> %d second%s, ", OLC_LABEL_VAL(ABIL_SHORT_DURATION(abil), 0), ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)));
-			}
-			
-			if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
-				sprintf(buf + strlen(buf), "<%slongduration\t0> unlimited\r\n", OLC_LABEL_CHANGED);
-			}
-			else {
-				sprintf(buf + strlen(buf), "<%slongduration\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_LONG_DURATION(abil), 0), ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
-			}
-		}	// end buff/dot
-		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
-			sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
-			sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
-			
-			sprintf(buf + strlen(buf), "Applies: <%sapply\t0>\r\n", OLC_LABEL_PTR(ABIL_APPLIES(abil)));
-			count = 0;
-			LL_FOREACH(ABIL_APPLIES(abil), apply) {
-				sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", ++count, apply->weight, apply_types[apply->location]);
-			}
-		}	// end buff
-		if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
-			sprintf(buf + strlen(buf), "<%saffectvnum\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_AFFECT_VNUM(abil), NOTHING), ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
-		}	// end buff/dot
-		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
-			sprintf(buf + strlen(buf), "<%sattacktype\t0> %d\r\n", OLC_LABEL_VAL(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil));
-		}	// end damage
-		if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
-			sprintf(buf + strlen(buf), "<%sdamagetype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DAMAGE_TYPE(abil), 0), damage_types[ABIL_DAMAGE_TYPE(abil)]);
-		}	// end damage/dot
-		if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
-			sprintf(buf + strlen(buf), "<%smaxstacks\t0> %d\r\n", OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
-		}	// end dot
 	}
+		
+	// type-specific data
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
+		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
+			sprintf(buf + strlen(buf), "<%sshortduration\t0> unlimited, ", OLC_LABEL_CHANGED);
+		}
+		else {
+			sprintf(buf + strlen(buf), "<%sshortduration\t0> %d second%s, ", OLC_LABEL_VAL(ABIL_SHORT_DURATION(abil), 0), ABIL_SHORT_DURATION(abil), PLURAL(ABIL_SHORT_DURATION(abil)));
+		}
+		
+		if (ABIL_LONG_DURATION(abil) == UNLIMITED) {
+			sprintf(buf + strlen(buf), "<%slongduration\t0> unlimited\r\n", OLC_LABEL_CHANGED);
+		}
+		else {
+			sprintf(buf + strlen(buf), "<%slongduration\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_LONG_DURATION(abil), 0), ABIL_LONG_DURATION(abil), PLURAL(ABIL_LONG_DURATION(abil)));
+		}
+	}	// end buff/dot
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_PASSIVE_BUFF)) {
+		sprintbit(ABIL_AFFECTS(abil), affected_bits, lbuf, TRUE);
+		sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(ABIL_AFFECTS(abil), NOBITS), lbuf);
+		
+		sprintf(buf + strlen(buf), "Applies: <%sapply\t0>\r\n", OLC_LABEL_PTR(ABIL_APPLIES(abil)));
+		count = 0;
+		LL_FOREACH(ABIL_APPLIES(abil), apply) {
+			sprintf(buf + strlen(buf), " %2d. %d to %s\r\n", ++count, apply->weight, apply_types[apply->location]);
+		}
+	}	// end buff
+	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
+		sprintf(buf + strlen(buf), "<%saffectvnum\t0> %d %s\r\n", OLC_LABEL_VAL(ABIL_AFFECT_VNUM(abil), NOTHING), ABIL_AFFECT_VNUM(abil), get_generic_name_by_vnum(ABIL_AFFECT_VNUM(abil)));
+	}	// end buff/dot
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE)) {
+		sprintf(buf + strlen(buf), "<%sattacktype\t0> %d\r\n", OLC_LABEL_VAL(ABIL_ATTACK_TYPE(abil), 0), ABIL_ATTACK_TYPE(abil));
+	}	// end damage
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DAMAGE | ABILT_DOT)) {
+		sprintf(buf + strlen(buf), "<%sdamagetype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DAMAGE_TYPE(abil), 0), damage_types[ABIL_DAMAGE_TYPE(abil)]);
+	}	// end damage/dot
+	if (IS_SET(ABIL_TYPES(abil), ABILT_DOT)) {
+		sprintf(buf + strlen(buf), "<%smaxstacks\t0> %d\r\n", OLC_LABEL_VAL(ABIL_MAX_STACKS(abil), 1), ABIL_MAX_STACKS(abil));
+	}	// end dot
 	
 	// custom messages
 	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(ABIL_CUSTOM_MSGS(abil)));
