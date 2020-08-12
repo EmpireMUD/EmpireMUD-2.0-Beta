@@ -2566,7 +2566,7 @@ SHOW(show_passives) {
 	
 	// these aren't normally loaded when offline
 	if (is_file) {
-		refresh_passive_buffs(ch);
+		refresh_passive_buffs(vict);
 	}
 	
 	msg_to_char(ch, "Passive buffs for %s:\r\n", PERS(vict, ch, TRUE));
