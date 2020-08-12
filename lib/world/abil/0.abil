@@ -42,7 +42,12 @@ Ready Blood Weapons~
 S
 #7
 Boost~
-0 -1 1.00 0 0
+o -1 1.00 0 0
+A
+20 50
+T f 1
+X f
+0
 S
 #8
 Claws~

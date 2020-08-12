@@ -102,7 +102,12 @@ T e 1
 S
 #226
 Sanguine Restoration~
-0 -1 1.00 0 0
+o -1 1.00 0 0
+A
+20 75
+T f 1
+X f
+0
 S
 #227
 Ward Against Magic~
