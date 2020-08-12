@@ -3091,7 +3091,6 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	if (!full_miss && !IS_NPC(victim) && ch != victim && !EXTRACTED(victim)) {
 		// endurance (extra HP)
 		if (can_gain_exp_from(victim, ch)) {
-			gain_ability_exp(victim, ABIL_ENDURANCE, 2);
 			run_ability_gain_hooks(victim, ch, AGH_TAKE_DAMAGE);
 		}
 

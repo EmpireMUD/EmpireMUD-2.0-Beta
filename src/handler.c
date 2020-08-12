@@ -802,9 +802,11 @@ void affect_total(char_data *ch) {
 
 	// ability-based modifiers
 	if (!IS_NPC(ch)) {
+		/* old version of endurance, pre-b5.100
 		if (has_ability(ch, ABIL_ENDURANCE)) {
 			GET_MAX_HEALTH(ch) = MIN(GET_MAX_HEALTH(ch), 1000) * 2.0 + MAX(GET_MAX_HEALTH(ch) - 1000, 0) * 1.25;
 		}
+		*/
 		if (has_ability(ch, ABIL_GIFT_OF_NATURE)) {
 			GET_MAX_MANA(ch) *= 1.35;
 		}

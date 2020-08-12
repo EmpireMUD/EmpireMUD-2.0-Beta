@@ -140,7 +140,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_REFLEXES  84
 #define ABIL_QUICK_BLOCK  86
 #define ABIL_REFORGE  87
-#define ABIL_ENDURANCE  92
+// #define ABIL_ENDURANCE  92
 #define ABIL_RESCUE  93
 #define ABIL_DISARM  94
 #define ABIL_SPARRING  95
