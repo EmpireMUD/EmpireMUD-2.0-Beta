@@ -2304,6 +2304,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		}
 	}
 	
+	// unaffect: passives
+	LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
+		affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
+	}
+	
 	// unaffect: affects
 	af_list = NULL;
 	while ((af = ch->affected)) {
@@ -2635,6 +2640,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	
 	// END PLAYER FILE
 	fprintf(fl, "End Player File\n");
+	
+	// re-affect: passives
+	LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
+		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
+	}
 	
 	// re-apply: affects
 	for (af = af_list; af; af = next_af) {
