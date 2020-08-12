@@ -299,7 +299,7 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	
 	CREATE(data, struct ability_exec, 1);
 	data->matching_role = has_matching_role(ch, abil, FALSE);
-	unscaled = ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF) ? TRUE : FALSE;
+	unscaled = (ABILITY_FLAGGED(abil, ABILF_UNSCALED_BUFF) ? TRUE : FALSE);
 	
 	// things only needed for scaled buffs
 	if (!unscaled) {
