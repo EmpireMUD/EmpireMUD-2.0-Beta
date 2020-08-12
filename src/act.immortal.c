@@ -2566,6 +2566,7 @@ SHOW(show_passives) {
 	
 	// these aren't normally loaded when offline
 	if (is_file) {
+		check_delayed_load(vict);
 		refresh_passive_buffs(vict);
 	}
 	
