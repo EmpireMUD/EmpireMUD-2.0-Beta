@@ -44,6 +44,7 @@ const char *default_ability_name = "Unnamed Ability";
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 void remove_passive_buff(char_data *ch, struct affected_type *aff);
+void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
 
 // external consts
@@ -296,6 +297,9 @@ void apply_one_passive_buff(char_data *ch, ability_data *abil) {
 	if (!ch || IS_NPC(ch) || !abil || !IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF)) {
 		return;	// safety first
 	}
+	
+	// remove if already on there
+	remove_passive_buff_by_ability(ch, ABIL_VNUM(abil));
 	
 	CREATE(data, struct ability_exec, 1);
 	data->matching_role = has_matching_role(ch, abil, FALSE);
