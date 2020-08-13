@@ -2831,8 +2831,10 @@ void clear_delayed_update(char_data *ch) {
 	// use ch->script_id instead of char_script_id() because we don't want to assign one if it doesn't have one
 	if (ch && (id = ch->script_id) > 0) {
 		HASH_FIND_INT(char_delayed_update_list, &id, cdu);
-		HASH_DEL(char_delayed_update_list, cdu);
-		free(cdu);
+		if (cdu) {
+			HASH_DEL(char_delayed_update_list, cdu);
+			free(cdu);
+		}
 	}
 }
 
