@@ -1075,7 +1075,6 @@ minipets   Immort   Shows you mini-pets collected by a player.
 mounts     Immort   Shows you mounts owned by a player.
 notes      Immort   Show notes on a player.
 olc        Immort   Shows all players with OLC access (vnum optional).
-passives   Immort   Shows passive buffs (from abilities) on a player.
 player     Immort   Shows player summary information.
 players    Immort   Shows health and status for all current players.
 produced   Immort   Shows total produced items for an empire.
@@ -1208,13 +1207,6 @@ Usage:  show olc [vnum]
 
 This shows you all players who have OLC access. If you specify a vnum, it
 shows only players who have access to that vnum.
-#e
-"SHOW PASSIVES"
-
-Usage:  show passives <player>
-
-This shows all passive buffs on a player. These come from PASSIVE-BUFF
-abilities. There is no other way to view them.
 #e
 "SHOW PILES"
 

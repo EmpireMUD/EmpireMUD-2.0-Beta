@@ -2541,69 +2541,6 @@ SHOW(show_islands) {
 }
 
 
-SHOW(show_passives) {
-	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-	bool found = FALSE, is_file = FALSE;
-	struct affected_type *aff;
-	char_data *vict;
-	
-	one_argument(argument, arg);
-	
-	if (!(vict = find_or_load_player(arg, &is_file))) {
-		send_config_msg(ch, "no_person");
-		return;
-	}
-		
-	if (IS_NPC(vict)) {
-		msg_to_char(ch, "You can't show passives on an NPC.\r\n");
-		if (is_file) {
-			// unlikely to get here, but playing it safe
-			free_char(vict);
-		}
-		return;
-	}
-	
-	// these aren't normally loaded when offline
-	if (is_file) {
-		check_delayed_load(vict);
-		refresh_passive_buffs(vict);
-	}
-	
-	msg_to_char(ch, "Passive buffs for %s:\r\n", PERS(vict, ch, TRUE));
-	
-	LL_FOREACH(GET_PASSIVE_BUFFS(vict), aff) {
-		*buf2 = '\0';
-		
-		sprintf(buf, " &c%s&0 ", get_ability_name_by_vnum(aff->type));
-
-		if (aff->modifier) {
-			sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);
-			strcat(buf, buf2);
-		}
-		if (aff->bitvector) {
-			if (*buf2) {
-				strcat(buf, ", sets ");
-			}
-			else {
-				strcat(buf, "sets ");
-			}
-			sprintbit(aff->bitvector, affected_bits, buf2, TRUE);
-			strcat(buf, buf2);
-		}
-		send_to_char(strcat(buf, "\r\n"), ch);
-		found = TRUE;
-	}
-	
-	if (!found) {
-		msg_to_char(ch, " none\r\n");
-	}
-	
-	if (is_file) {
-		free_char(vict);
-	}
-}
-
-
 SHOW(show_piles) {
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], owner[256];
 	room_data *room, *next_room;
@@ -9238,7 +9175,6 @@ ACMD(do_show) {
 		{ "tools", LVL_START_IMM, show_tools },
 		{ "shops", LVL_START_IMM, show_shops },
 		{ "piles", LVL_CIMPL, show_piles },
-		{ "passives", LVL_START_IMM, show_passives },
 		{ "progress", LVL_START_IMM, show_progress },
 		{ "progression", LVL_START_IMM, show_progression },
 		{ "produced", LVL_START_IMM, show_produced },
