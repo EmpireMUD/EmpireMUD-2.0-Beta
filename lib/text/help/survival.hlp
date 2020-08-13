@@ -351,12 +351,9 @@ STAMINA
 
 Stamina (Survival ability)
 
-Stamina increases the rate at which you recover movement points. They will
-regenerate even faster if you're also asleep.
+Stamina increases the rate at which you recover movement points.
 
-Gains experience when you recover movement.
-
-See also: SLEEP
+Gains experience when moving.
 #
 SWIMMING
 
