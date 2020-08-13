@@ -820,7 +820,6 @@ void free_char(char_data *ch) {
 	if (GROUP(ch)) {
 		leave_group(ch);
 	}
-	clear_delayed_update(ch);
 	
 	// clean up gear/items, if any
 	extract_all_items(ch);
@@ -1050,6 +1049,9 @@ void free_char(char_data *ch) {
 	if (ch->desc) {
 		ch->desc->character = NULL;
 	}
+	
+	// clear any pending updates
+	clear_delayed_update(ch);
 
 	/* find_char helper */
 	if (ch->script_id > 0) {

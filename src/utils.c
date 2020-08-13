@@ -2546,7 +2546,7 @@ void determine_gear_level(char_data *ch) {
 	old = GET_GEAR_LEVEL(ch);
 	GET_GEAR_LEVEL(ch) = MAX(level, 0);
 	
-	if (!IS_NPC(ch) && old != GET_GEAR_LEVEL(ch)) {
+	if (old != GET_GEAR_LEVEL(ch)) {
 		queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
 	}
 }
