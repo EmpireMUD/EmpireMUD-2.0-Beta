@@ -686,7 +686,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			if (show_title) {
 				send_to_char(output, ch);
 			}
-			show_screenreader_room(ch, room, options);
+			else if (!PRF_FLAGGED(ch, PRF_NO_EXITS)) {
+				show_screenreader_room(ch, room, options);
+			}
 		}
 		else {	// normal map view
 			magnitude = PRF_FLAGGED(ch, PRF_BRIEF) ? 3 : mapsize;
@@ -1030,7 +1032,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 
 	/* Exits ? */
-	if (COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
+	if (!PRF_FLAGGED(ch, PRF_NO_EXITS) && COMPLEX_DATA(room) && ROOM_IS_CLOSED(room)) {
 		do_exits(ch, "", -1, GET_ROOM_VNUM(room));
 	}
 }

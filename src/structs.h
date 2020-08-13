@@ -2142,6 +2142,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_AUTOSWIM  BIT(37)	// will enter water without 'swim'
 #define PRF_ITEM_QUALITY  BIT(38)	// shows loot quality color/tag in inv/eq
 #define PRF_ITEM_DETAILS  BIT(39)	// shows additional item details on inv/eq
+#define PRF_NO_EXITS  BIT(40)	// hides exits on look and auto-look
 // note: if you add prefs, consider adding them to alt_import_preferences()
 
 

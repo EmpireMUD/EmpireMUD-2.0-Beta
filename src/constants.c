@@ -648,6 +648,7 @@ const char *preference_bits[] = {
 	"AUTOSWIM",
 	"!ITEM-QUALITY",
 	"ITEM-DETAILS",
+	"!EXITS",
 	"\n"
 };
 
@@ -724,6 +725,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "item-quality", TOG_ONOFF, PRF_ITEM_QUALITY, 0, NULL },
 	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
+	{ "exits", TOG_OFFON, PRF_NO_EXITS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },

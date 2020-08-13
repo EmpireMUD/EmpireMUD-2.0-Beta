@@ -2325,6 +2325,7 @@ Toggles:
   channel-joins - blocks slash-channel join messages
   clearmeters - automatically clears your meters between combats
   compact - no extra newlines
+  exits - shows or hides exits and directions when you 'look'
   extra-spacing - adds an extra blank line after you type a command
   informative - informative map coloring -- HELP INFORMATIVE
   item-details - shows level and some other information in inventory/equipment
