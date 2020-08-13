@@ -28,6 +28,7 @@
 *   Getters
 *   Account DB
 *   Core Player DB
+*   Delayed Update System
 *   Autowiz Wizlist Generator
 *   Helpers
 *   Empire Player Management
@@ -2804,6 +2805,54 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	
 	// END DELAY-LOADED SECTION
 	fprintf(fl, "End Player File\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// DELAYED UPDATE SYSTEM ///////////////////////////////////////////////////
+
+struct char_delayed_update *char_delayed_update_list = NULL;	// characters who need updating
+
+
+/**
+* Removes a queued char update, if any exists. This is generally called while
+* extracting a character.
+*
+* @param char_data *ch The character to delete update entries for.
+*/
+void clear_delayed_update(char_data *ch) {
+	struct char_delayed_update *cdu;
+	int id;
+	
+	// use ch->script_id instead of char_script_id() because we don't want to assign one if it doesn't have one
+	if (ch && (id = ch->script_id) > 0) {
+		HASH_FIND_INT(char_delayed_update_list, &id, cdu);
+		HASH_DEL(char_delayed_update_list, cdu);
+		free(cdu);
+	}
+}
+
+
+/**
+* Queues a some kind of delayed update for a character.
+*
+* @param char_data *ch The player.
+* @param bitvector_t type The CDU_ flag(s) to queue.
+*/
+void queue_delayed_update(char_data *ch, bitvector_t type) {
+	struct char_delayed_update *cdu;
+	int id;
+	
+	if (ch && (id = char_script_id(ch)) > 0) {
+		HASH_FIND_INT(char_delayed_update_list, &id, cdu);
+		if (!cdu) {
+			CREATE(cdu, struct char_delayed_update, 1);
+			cdu->id = id;
+			cdu->ch = ch;
+			HASH_ADD_INT(char_delayed_update_list, id, cdu);
+		}
+		cdu->type |= type;
+	}
 }
 
 

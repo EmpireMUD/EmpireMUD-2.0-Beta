@@ -1901,6 +1901,10 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_BONUS_TRAITS  17
 
 
+// CDU_x: delayed update types
+#define CDU_PASSIVE_BUFFS  BIT(0)	// refresh passive buffs
+
+
 // types of channel histories -- act.comm.c
 #define NO_HISTORY  -1	// reserved
 #define CHANNEL_HISTORY_GOD  0
@@ -2745,6 +2749,15 @@ struct ban_list_element {
 	char name[MAX_NAME_LENGTH+1];
 	
 	struct ban_list_element *next;
+};
+
+
+// for queuing up data that needs to be updated
+struct char_delayed_update {
+	int id;	// unique id; use char_script_id()
+	char_data *ch;	// person to update
+	bitvector_t type;	// CDU_ update type
+	UT_hash_handle hh;	// hash handle (by id)
 };
 
 

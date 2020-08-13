@@ -82,6 +82,7 @@ const struct wear_data_type wear_data[NUM_WEARS];
 void adjust_building_tech(empire_data *emp, room_data *room, bool add);
 EVENT_CANCEL_FUNC(cancel_room_event);
 void check_delayed_load(char_data *ch);
+void clear_delayed_update(char_data *ch);
 void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
 void scale_item_to_level(obj_data *obj, int level);
@@ -1107,6 +1108,9 @@ void extract_char_final(char_data *ch) {
 		leave_group(ch);
 	}
 	
+	// if any delayed updates:
+	clear_delayed_update(ch);
+	
 	if (ch->desc) {
 		/* Forget snooping, if applicable */
 		if (ch->desc->snooping) {
@@ -1278,6 +1282,9 @@ void extract_char(char_data *ch) {
 	if (ch->followers || ch->master) {
 		die_follower(ch);
 	}
+	
+	// if any:
+	clear_delayed_update(ch);
 }
 
 
@@ -5555,6 +5562,9 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 
 		affect_total(ch);
 		qt_wear_obj(ch, obj);
+		if (!IS_NPC(ch)) {
+			queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
+		}
 	}
 }
 
@@ -5992,6 +6002,9 @@ obj_data *unequip_char(char_data *ch, int pos) {
 
 		affect_total(ch);
 		qt_remove_obj(ch, obj);
+		if (!IS_NPC(ch)) {
+			queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
+		}
 	}
 
 	return obj;

@@ -333,7 +333,7 @@ extern descriptor_data *descriptor_list;
 // empires
 extern empire_data *empire_table;
 extern struct trading_post_data *trading_list;
-extern bool check_delayed_refresh;
+extern bool check_empire_refresh;
 void delete_empire(empire_data *emp);
 extern struct empire_island *get_empire_island(empire_data *emp, int island_id);
 extern empire_data *get_or_create_empire(char_data *ch);
@@ -429,6 +429,7 @@ void set_title(char_data *ch, char *title);
 void save_char(char_data *ch, room_data *load_room);
 #define SAVE_CHAR(ch)  save_char((ch), (IN_ROOM(ch) ? IN_ROOM(ch) : (GET_LOADROOM(ch) != NOWHERE ? real_room(GET_LOADROOM(ch)) : NULL)))
 
+void queue_delayed_update(char_data *ch, bitvector_t type);
 void update_player_index(player_index_data *index, char_data *ch);
 extern char_data *find_or_load_player(char *name, bool *is_file);
 void store_loaded_char(char_data *ch);

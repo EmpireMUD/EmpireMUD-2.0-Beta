@@ -943,8 +943,6 @@ void gain_player_tech_exp(char_data *ch, int tech, double amount) {
 * @param bool Returns TRUE if a skill point was gained or lost.
 */
 bool gain_skill(char_data *ch, skill_data *skill, int amount) {
-	void refresh_passive_buffs(char_data *ch);
-	
 	bool any = FALSE, pos = (amount > 0);
 	struct player_skill_data *skdata;
 	int points;
@@ -1012,10 +1010,7 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount) {
 		update_class(ch);
 		assign_class_abilities(ch, NULL, NOTHING);
 		
-		// only refresh buffs if they have any; otherwise save the work
-		if (GET_PASSIVE_BUFFS(ch)) {
-			refresh_passive_buffs(ch);
-		}
+		queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
 		SAVE_CHAR(ch);
 	}
 	
@@ -1526,6 +1521,8 @@ void perform_swap_skill_sets(char_data *ch) {
 		adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);
 		resort_empires(FALSE);
 	}
+	
+	queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
 }
 
 

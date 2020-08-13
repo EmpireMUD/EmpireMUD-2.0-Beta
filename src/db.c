@@ -105,7 +105,7 @@ crop_data *crop_table = NULL;	// crop hash table
 empire_data *empire_table = NULL;	// hash table of empires
 double empire_score_average[NUM_SCORES];
 struct trading_post_data *trading_list = NULL;	// global LL of trading post stuff
-bool check_delayed_refresh = FALSE;	// triggers multiple refreshes
+bool check_empire_refresh = FALSE;	// triggers empire refreshes
 
 // events
 event_data *event_table = NULL;	// global hash table (hh)
