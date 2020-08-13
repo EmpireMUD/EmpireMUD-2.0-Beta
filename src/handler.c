@@ -1108,9 +1108,6 @@ void extract_char_final(char_data *ch) {
 		leave_group(ch);
 	}
 	
-	// if any delayed updates:
-	clear_delayed_update(ch);
-	
 	if (ch->desc) {
 		/* Forget snooping, if applicable */
 		if (ch->desc->snooping) {

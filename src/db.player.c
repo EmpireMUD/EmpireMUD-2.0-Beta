@@ -58,6 +58,7 @@ void update_class(char_data *ch);
 
 // local protos
 void check_eq_sets(char_data *ch);
+void clear_delayed_update(char_data *ch);
 void clear_player(char_data *ch);
 void delete_player_character(char_data *ch);
 void free_player_eq_set(struct player_eq_set *eq_set);
@@ -819,6 +820,7 @@ void free_char(char_data *ch) {
 	if (GROUP(ch)) {
 		leave_group(ch);
 	}
+	clear_delayed_update(ch);
 	
 	// clean up gear/items, if any
 	extract_all_items(ch);
@@ -2843,7 +2845,7 @@ void queue_delayed_update(char_data *ch, bitvector_t type) {
 	struct char_delayed_update *cdu;
 	int id;
 	
-	if (ch && (id = char_script_id(ch)) > 0) {
+	if (ch && !EXTRACTED(ch) && (id = char_script_id(ch)) > 0) {
 		HASH_FIND_INT(char_delayed_update_list, &id, cdu);
 		if (!cdu) {
 			CREATE(cdu, struct char_delayed_update, 1);
