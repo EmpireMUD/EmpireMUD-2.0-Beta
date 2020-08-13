@@ -686,7 +686,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			if (show_title) {
 				send_to_char(output, ch);
 			}
-			else if (!PRF_FLAGGED(ch, PRF_NO_EXITS)) {
+			if (!PRF_FLAGGED(ch, PRF_NO_EXITS)) {
 				show_screenreader_room(ch, room, options);
 			}
 		}
