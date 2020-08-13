@@ -1,6 +1,11 @@
 #0
 Gift of Nature~
-0 -1 1.00 0 0
+ij -1 1.00 0 h
+A
+16 1
+T f 1
+X f
+0
 S
 #1
 Fly~
@@ -504,7 +509,7 @@ T e 1
 S
 #92
 Endurance~
-0 -1 1.00 0 f
+l -1 1.50 0 f
 A
 15 1
 T f 1
