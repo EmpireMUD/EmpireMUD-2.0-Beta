@@ -100,7 +100,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 
 // ABIL_x: ability vnums
 // #define ABIL_GIFT_OF_NATURE  0
-#define ABIL_ANCIENT_BLOOD  2
+// #define ABIL_ANCIENT_BLOOD  2
 #define ABIL_BACKSTAB  3
 // #define ABIL_WOLF_FORM  4
 #define ABIL_NULL_MANA  5

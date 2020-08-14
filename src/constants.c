@@ -855,6 +855,7 @@ const char *player_tech_types[] = {
 	"Harvest",
 	"Pick",
 	"Quarry",	// 75
+	"Drink-Blood-Faster",
 	"\n"
 };
 

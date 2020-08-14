@@ -1043,6 +1043,7 @@ Available techs are:
  &cHarvest&0 * - Can 'harvest'.
  &cPick&0 * - Can 'pick'.
  &cQuarry&0 * - Can 'quarry'.
+ &cDrink-Blood-Faster&0 - Vampires drink blood at 2x the speed.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 
