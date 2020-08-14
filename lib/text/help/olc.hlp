@@ -1057,6 +1057,8 @@ Ready-Weapons abilities have the following properties:
  <&ydata&0> Add the READY-WEAPON data type to grant weapons.
             - You should usually set the 1-USE flag on the weapon.
             - Only weapons and ranged weapons can be used.
+            - If a weapon has HOLD but not WIELD, it will equip to the hold
+              slot. Otherwise, it will only equip to the wield slot.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, READY
 #d
