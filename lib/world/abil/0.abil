@@ -28,6 +28,13 @@ S
 #2
 Ancient Blood~
 0 -1 1.00 0 0
+A
+20 1
+D 1 76 0
+T f 1
+T e 0
+X f
+0
 S
 #3
 Backstab~
@@ -357,7 +364,12 @@ T e 1
 S
 #66
 Stamina~
-0 -1 1.00 0 0
+0 -1 1.50 0 m
+A
+6 1
+T f 1
+X f
+0
 S
 #67
 By Moonlight~
