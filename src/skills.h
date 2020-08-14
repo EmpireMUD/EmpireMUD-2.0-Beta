@@ -104,7 +104,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_BACKSTAB  3
 // #define ABIL_WOLF_FORM  4
 #define ABIL_NULL_MANA  5
-#define ABIL_READY_BLOOD_WEAPONS  6
+// #define ABIL_READY_BLOOD_WEAPONS  6
 #define ABIL_BOOST  7
 #define ABIL_CLAWS  8
 #define ABIL_VAMP_COMMAND  9
@@ -160,7 +160,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_REJUVENATE  114
 #define ABIL_PURIFY  115
 #define ABIL_CLEANSE  116
-#define ABIL_READY_FIREBALL  117
+// #define ABIL_READY_FIREBALL  117
 #define ABIL_LIGHTNINGBOLT  118
 #define ABIL_COUNTERSPELL  120
 #define ABIL_ENTANGLE  121
