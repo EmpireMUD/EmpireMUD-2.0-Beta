@@ -848,6 +848,7 @@ This tells the ability when to trigger skill gain:
  &cONLY-VS-ANIMAL&0 - Only gains if the ability is being used against an animal.
  &cVAMPIRE-FEEDING&0 - Gains when feeding on someone.
  &cMOVING&0 - Gains when the player moves.
+ &cONLY-USING-READY-WEAPON&0 - Only when using a ready-weapon from the ability.
 
 See also: OLC ABILITIES
 #d

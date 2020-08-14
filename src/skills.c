@@ -91,6 +91,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	struct ability_data_list *adl;
 	obj_data *obj;
 	bool need_affect_total = FALSE;
+	int pos;
 	
 	// empire_data *emp = GET_LOYALTY(ch);
 	
@@ -110,6 +111,23 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	if (IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF)) {
 		remove_passive_buff_by_ability(ch, ABIL_VNUM(abil));
 		need_affect_total = TRUE;
+	}
+	
+	// remove readied weapons
+	LL_FOREACH(ABIL_DATA(abil), adl) {
+		if (adl->type != ADL_READY_WEAPON) {
+			continue;
+		}
+		
+		// is the player using the item in any slot
+		for (pos = 0; pos < NUM_WEARS; ++pos) {
+			if ((obj = GET_EQ(ch, pos)) && GET_OBJ_VNUM(obj) == adl->vnum) {
+				act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
+				unequip_char_to_inventory(ch, pos);
+				determine_gear_level(ch);
+				need_affect_total = TRUE;
+			}
+		}
 	}
 	
 	// player tech losses
@@ -201,15 +219,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_BASILISK: {
 			despawn_familiar(ch, FAMILIAR_BASILISK);
-			break;
-		}
-		case ABIL_READY_BLOOD_WEAPONS: {
-			if ((obj = GET_EQ(ch, WEAR_WIELD)) && IS_BLOOD_WEAPON(obj)) {
-				act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
-				unequip_char_to_inventory(ch, WEAR_WIELD);
-				determine_gear_level(ch);
-				need_affect_total = TRUE;
-			}
 			break;
 		}
 		case ABIL_SUMMON_BODYGUARD: {
@@ -317,17 +326,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		case ABIL_PHOENIX_RITE: {
 			affect_from_char(ch, ATYPE_PHOENIX_RITE, TRUE);
 			need_affect_total = TRUE;
-			break;
-		}
-		case ABIL_READY_FIREBALL: {
-			if ((obj = GET_EQ(ch, WEAR_WIELD))) {
-				if (GET_OBJ_VNUM(obj) == o_FIREBALL) {
-					act("You stop using $p.", FALSE, ch, GET_EQ(ch, WEAR_WIELD), NULL, TO_CHAR);
-					unequip_char_to_inventory(ch, WEAR_WIELD);
-					determine_gear_level(ch);
-					need_affect_total = TRUE;
-				}
-			}
 			break;
 		}
 		case ABIL_RITUAL_OF_BURDENS: {

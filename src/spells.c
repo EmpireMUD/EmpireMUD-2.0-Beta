@@ -330,30 +330,6 @@ ACMD(do_damage_spell) {
  //////////////////////////////////////////////////////////////////////////////
 //// READIES /////////////////////////////////////////////////////////////////
 
-// for do_ready
-struct ready_magic_weapon_type {
-	char *name;
-	int cost;
-	int cost_pool;	// MANA, etc
-	any_vnum ability;
-	obj_vnum vnum;
-} ready_magic_weapon[] = {
-	{ "bloodaxe", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODAXE },
-	{ "bloodmace", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODMACE },
-	{ "bloodmattock", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODMATTOCK },
-	{ "bloodmaul", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODMAUL },
-	{ "bloodskean", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSKEAN },
-	{ "bloodspear", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSPEAR },
-	{ "bloodsword", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSWORD },
-	{ "bloodstaff", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODSTAFF },
-	{ "bloodwhip", 40, BLOOD, ABIL_READY_BLOOD_WEAPONS, o_BLOODWHIP },
-	
-	{ "fireball", 30, MANA, ABIL_READY_FIREBALL, o_FIREBALL },
-	
-	{ "\n", 0, NO_ABIL, NOTHING }
-};
-
-
 ACMD(do_ready) {
 	extern bool check_vampire_sun(char_data *ch, bool message);
 	void scale_item_to_level(obj_data *obj, int level);

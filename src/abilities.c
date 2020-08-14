@@ -828,8 +828,14 @@ void remove_type_from_ability(ability_data *abil, bitvector_t type) {
 */
 void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trigger) {
 	struct ability_gain_hook *agh, *next_agh;
+	struct ability_data_list *adl;
 	ability_data *abil;
 	double amount;
+	bool found;
+	int pos;
+	
+	// list of slots to check: terminate with -1
+	int check_ready_weapon_slots[] = { WEAR_WIELD, WEAR_HOLD, WEAR_RANGED, -1 };
 	
 	if (!ch || IS_NPC(ch)) {
 		return;
@@ -870,6 +876,31 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 		}
 		if (IS_SET(agh->triggers, AGH_ONLY_WHEN_AFFECTED) && (!(abil = find_ability_by_vnum(agh->ability)) || !affected_by_spell(ch, ABIL_AFFECT_VNUM(abil)))) {
 			continue;	// not currently affected
+		}
+		if (IS_SET(agh->triggers, AGH_ONLY_USING_READY_WEAPON)) {
+			// check if using a readied item
+			found = FALSE;
+			if ((abil = find_ability_by_vnum(agh->ability))) {
+				LL_FOREACH(ABIL_DATA(abil), adl) {
+					if (found) {
+						break;	// exit early
+					}
+					if (adl->type != ADL_READY_WEAPON) {
+						continue;
+					}
+					
+					// is the player using the item in any slot
+					for (pos = 0; check_ready_weapon_slots[pos] != -1 && !found; ++pos) {
+						if (GET_EQ(ch, check_ready_weapon_slots[pos]) && GET_OBJ_VNUM(GET_EQ(ch, check_ready_weapon_slots[pos])) == adl->vnum) {
+							found = TRUE;
+						}
+					}
+				}
+			}
+			
+			if (!found) {
+				continue;	// not using the item
+			}
 		}
 		if (IS_SET(agh->triggers, AGH_ONLY_DARK) && !IS_DARK(IN_ROOM(ch))) {
 			continue;	// not dark

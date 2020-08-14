@@ -587,6 +587,7 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_ONLY_VS_ANIMAL  BIT(10)	// only if the target was an animal
 #define AGH_VAMPIRE_FEEDING  BIT(11)	// gains when feeding
 #define AGH_MOVING  BIT(12)	// gain when moving
+#define AGH_ONLY_USING_READY_WEAPON  BIT(13)	// only gains if a ready-weapon is equipped
 
 
 // RUN_ABIL_x: modes for activating abilities

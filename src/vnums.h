@@ -99,19 +99,9 @@
 
 // Skill tree items
 #define o_PORTAL  1100  // could probably safely generate a NOTHING item
-#define o_BLOODSWORD  1101
-#define o_BLOODSPEAR  1102
-#define o_BLOODSKEAN  1103
-#define o_BLOODMACE  1104
-#define o_FIREBALL  1105
 #define o_IMPERIUM_SPIKE  1114
 #define o_NEXUS_CRYSTAL  1115
-#define o_BLOODSTAFF  1116
-#define o_BLOODWHIP  1117
-#define o_BLOODAXE  1118
 #define o_NOCTURNIUM_SPIKE  1119
-#define o_BLOODMAUL  1120
-#define o_BLOODMATTOCK  1122
 
 // herbs
 #define o_IRIDESCENT_IRIS  1206
