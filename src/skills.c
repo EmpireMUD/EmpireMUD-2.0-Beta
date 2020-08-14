@@ -1593,6 +1593,10 @@ bool remove_skills_by_flag(char_data *ch, bitvector_t skill_flag) {
 		}
 	}
 	
+	if (any) {
+		update_class(ch);
+	}
+	
 	return any;
 }
 
