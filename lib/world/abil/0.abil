@@ -27,7 +27,7 @@ X b
 S
 #2
 Ancient Blood~
-0 -1 1.00 0 0
+0 -1 1.00 0 l
 A
 20 1
 D 1 76 0
@@ -50,7 +50,19 @@ Null Mana~
 S
 #6
 Ready Blood Weapons~
-0 -1 1.00 0 0
+0 -1 1.00 0 bcn
+C
+unknown 0 0 3 40 0 -1 0 0 0 0
+D 4 1101 0
+D 4 1102 0
+D 4 1103 0
+D 4 1104 0
+D 4 1116 0
+D 4 1117 0
+D 4 1118 0
+D 4 1120 0
+D 4 1122 0
+T g 0
 S
 #7
 Boost~
