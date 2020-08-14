@@ -752,7 +752,7 @@ void check_ability_levels(char_data *ch, any_vnum skill) {
 		clear_char_abilities(ch, skill);
 	}
 	
-	SAVE_CHAR(ch);
+	queue_delayed_update(ch, CDU_SAVE);
 	
 	// add ability techs -- only if playing
 	if (emp && ch->desc && STATE(ch->desc) == CON_PLAYING) {
@@ -802,7 +802,7 @@ void clear_char_abilities(char_data *ch, any_vnum skill) {
 				}
 			}
 		}
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 		
 		// add ability techs -- only if playing
 		if (emp && ch->desc && STATE(ch->desc) == CON_PLAYING) {
@@ -1008,8 +1008,7 @@ bool gain_skill(char_data *ch, skill_data *skill, int amount) {
 		update_class(ch);
 		assign_class_abilities(ch, NULL, NOTHING);
 		
-		queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_PASSIVE_BUFFS | CDU_SAVE);
 	}
 	
 	return any;
@@ -1853,7 +1852,7 @@ ACMD(do_skills) {
 		
 		add_ability(ch, abil, FALSE);
 		msg_to_char(ch, "You purchase %s.\r\n", ABIL_NAME(abil));
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 		
 		// re-add empire abilities
 		if (emp) {
@@ -1902,7 +1901,7 @@ ACMD(do_skills) {
 			clear_char_abilities(ch, SKILL_VNUM(skill));
 			
 			msg_to_char(ch, "You have reset your %s abilities.\r\n", SKILL_NAME(skill));
-			SAVE_CHAR(ch);
+			queue_delayed_update(ch, CDU_SAVE);
 		}
 		
 		// end "reset"
@@ -1951,7 +1950,7 @@ ACMD(do_skills) {
 			check_ability_levels(ch, SKILL_VNUM(skill));
 			assign_class_abilities(ch, NULL, NOTHING);
 			
-			SAVE_CHAR(ch);
+			queue_delayed_update(ch, CDU_SAVE);
 		}
 	}
 	else if (!str_cmp(arg, "swap")) {
@@ -2070,7 +2069,7 @@ ACMD(do_skills) {
 
 		remove_ability(ch, abil, FALSE);
 		check_skill_sell(ch, abil);
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 		
 		if (GET_LOYALTY(ch)) {
 			adjust_abilities_to_empire(ch, GET_LOYALTY(ch), TRUE);

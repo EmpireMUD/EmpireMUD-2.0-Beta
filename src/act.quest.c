@@ -573,7 +573,7 @@ QCMD(qcmd_drop) {
 	else {
 		msg_to_char(ch, "You drop %s%s\t0.\r\n", QUEST_LEVEL_COLOR(ch, qst), QUEST_NAME(qst));
 		drop_quest(ch, pq);
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 	}
 }
 
@@ -685,7 +685,7 @@ QCMD(qcmd_finish) {
 				any |= qcmd_finish_one(ch, pq, FALSE);
 			}
 			if (any) {
-				SAVE_CHAR(ch);
+				queue_delayed_update(ch, CDU_SAVE);
 			}
 			else {
 				msg_to_char(ch, "You don't have any quests to turn in here.\r\n");
@@ -694,7 +694,7 @@ QCMD(qcmd_finish) {
 		else {
 			any = qcmd_finish_one(ch, pq, TRUE);
 			if (any) {
-				SAVE_CHAR(ch);
+				queue_delayed_update(ch, CDU_SAVE);
 			}
 		}
 	}

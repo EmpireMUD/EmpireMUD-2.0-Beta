@@ -1906,6 +1906,7 @@ typedef struct vehicle_data vehicle_data;
 
 // CDU_x: delayed update types
 #define CDU_PASSIVE_BUFFS  BIT(0)	// refresh passive buffs
+#define CDU_SAVE  BIT(1)	// saves the character
 
 
 // types of channel histories -- act.comm.c

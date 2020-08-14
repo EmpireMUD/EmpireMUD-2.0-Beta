@@ -434,7 +434,7 @@ void do_mount_release(char_data *ch, char *argument) {
 		// unset current-mount
 		GET_MOUNT_VNUM(ch) = NOTHING;
 		GET_MOUNT_FLAGS(ch) = NOBITS;
-		SAVE_CHAR(ch);	// prevent mob duplication
+		queue_delayed_update(ch, CDU_SAVE);	// prevent mob duplication
 		
 		load_mtrigger(mob);
 	}

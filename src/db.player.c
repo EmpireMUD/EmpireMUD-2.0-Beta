@@ -3645,7 +3645,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	determine_gear_level(ch);
 	add_all_gain_hooks(ch);
 	
-	SAVE_CHAR(ch);
+	queue_delayed_update(ch, CDU_SAVE);
 
 	// re-join slash-channels
 	global_mute_slash_channel_joins = TRUE;
@@ -3793,7 +3793,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	msdp_update_room(ch);
 	
 	// now is a good time to save and be sure we have a good save file
-	SAVE_CHAR(ch);
+	queue_delayed_update(ch, CDU_SAVE);
 	
 	pause_affect_total = FALSE;
 	affect_total(ch);
@@ -4036,13 +4036,20 @@ void reset_char(char_data *ch) {
 
 /**
 * This saves all connected players.
+*
+* @param bool delay if TRUE, queues them instead of saving instantly
 */
-void save_all_players(void) {
+void save_all_players(bool delay) {
 	descriptor_data *desc;
 
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if ((STATE(desc) == CON_PLAYING) && !IS_NPC(desc->character)) {
-			SAVE_CHAR(desc->character);
+			if (delay) {
+				queue_delayed_update(desc->character, CDU_SAVE);
+			}
+			else {
+				SAVE_CHAR(desc->character);
+			}
 		}
 	}
 }

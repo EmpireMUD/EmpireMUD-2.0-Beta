@@ -472,7 +472,7 @@ ADMIN_UTIL(util_approval) {
 							store_loaded_char(pers);
 						}
 						else {
-							SAVE_CHAR(pers);
+							queue_delayed_update(pers, CDU_SAVE);
 						}
 					}
 					// no break in this one -- need to do all alts
@@ -2185,7 +2185,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 						alt = NULL;
 					}
 					else {
-						SAVE_CHAR(alt);
+						queue_delayed_update(alt, CDU_SAVE);
 					}
 				}
 				else {
@@ -6600,7 +6600,7 @@ ACMD(do_advance) {
 
 	GET_ACCESS_LEVEL(victim) = newlevel;
 	GET_IMMORTAL_LEVEL(victim) = GET_ACCESS_LEVEL(victim) > LVL_MORTAL ? (LVL_TOP - GET_ACCESS_LEVEL(victim)) : -1;
-	SAVE_CHAR(victim);
+	queue_delayed_update(victim, CDU_SAVE);
 	check_autowiz(victim);
 }
 
@@ -9120,7 +9120,7 @@ ACMD(do_set) {
 			send_to_char("Saved in file.\r\n", ch);
 		}
 		else if (!IS_NPC(vict)) {
-			SAVE_CHAR(vict);
+			queue_delayed_update(vict, CDU_SAVE);
 		}
 	}
 	else if (load_from_file) {
@@ -10446,6 +10446,6 @@ ACMD(do_wizutil) {
 				break;
 		}
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
-		SAVE_CHAR(vict);
+		queue_delayed_update(vict, CDU_SAVE);
 	}
 }

@@ -308,8 +308,8 @@ void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
 		if (lore && IS_VAMPIRE(ch)) {
 			add_lore(ch, LORE_START_VAMPIRE, "Sired");
 		}
-	
-		SAVE_CHAR(ch);
+		
+		queue_delayed_update(ch, CDU_SAVE);
 	}
 }
 
@@ -388,8 +388,8 @@ void sire_char(char_data *ch, char_data *victim) {
 		/* Turn off that SIRING action */
 		GET_ACTION(ch) = ACT_NONE;
 
-		SAVE_CHAR(ch);
-		SAVE_CHAR(victim);
+		queue_delayed_update(ch, CDU_SAVE);
+		queue_delayed_update(victim, CDU_SAVE);
 	}
 	else {
 		// can't gain a vampire skills

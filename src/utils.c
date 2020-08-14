@@ -410,6 +410,11 @@ void run_delayed_refresh(void) {
 			refresh_passive_buffs(cdu->ch);
 		}
 		
+		// do this one last (anything above may be save-able)
+		if (IS_SET(cdu->type, CDU_SAVE)) {
+			SAVE_CHAR(cdu->ch);
+		}
+		
 		HASH_DEL(char_delayed_update_list, cdu);
 	}
 
@@ -5869,7 +5874,7 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 			ch = NULL;
 		}
 		else {
-			SAVE_CHAR(ch);
+			queue_delayed_update(ch, CDU_SAVE);
 		}
 	}
 }

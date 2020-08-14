@@ -3596,7 +3596,7 @@ ACMD(do_defect) {
 	else {
 		GET_LOYALTY(ch) = NULL;
 		add_cooldown(ch, COOLDOWN_LEFT_EMPIRE, 2 * SECS_PER_REAL_HOUR);
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 		
 		log_to_empire(e, ELOG_MEMBERS, "%s has defected from the empire", PERS(ch, ch, 1));
 		msg_to_char(ch, "You defect from the empire!\r\n");
@@ -3690,7 +3690,7 @@ ACMD(do_demote) {
 			file = FALSE;
 		}
 		else {
-			SAVE_CHAR(victim);
+			queue_delayed_update(victim, CDU_SAVE);
 		}
 	}
 
@@ -4903,7 +4903,7 @@ ACMD(do_expel) {
 		}
 		else {
 			refresh_all_quests(targ);
-			SAVE_CHAR(targ);
+			queue_delayed_update(targ, CDU_SAVE);
 		}
 
 		// do this AFTER the save -- fixes member counts, etc
@@ -5861,7 +5861,7 @@ ACMD(do_pledge) {
 		add_cooldown(ch, COOLDOWN_PLEDGE, SECS_PER_REAL_HOUR);
 		log_to_empire(e, ELOG_MEMBERS, "%s has offered %s pledge to this empire", PERS(ch, ch, 1), REAL_HSHR(ch));
 		msg_to_char(ch, "You offer your pledge to %s.\r\n", EMPIRE_NAME(e));
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 	}
 }
 
@@ -6352,7 +6352,7 @@ ACMD(do_promote) {
 			file = FALSE;
 		}
 		else {
-			SAVE_CHAR(victim);
+			queue_delayed_update(victim, CDU_SAVE);
 		}
 	}
 	
