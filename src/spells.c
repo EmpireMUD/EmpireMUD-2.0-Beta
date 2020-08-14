@@ -374,6 +374,7 @@ ACMD(do_ready) {
 					
 					strcat(line, "\r\n");
 					lsize += 2;
+					found = TRUE;
 					
 					if (size + lsize < sizeof(buf)) {
 						strcat(buf, line);
