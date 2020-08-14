@@ -736,8 +736,9 @@ Usage:  .data add <type> <name | vnum>
         .data remove <number | all>
 
 The 'data' field is used by different types of abilities. Available types are:
- &cPTECH&0 - Player technologies. Used by the PLAYER-TECH ability type.
+ &cPTECH&0 - Player technologies. Used by the PTECH ability type.
  &cEFFECT&0 - Something happens when the ability activates. See ABILITY EFFECTS
+ &cREADY-WEAPON&0 - Adds a weapon to the player's 'ready' command.
 
 See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d
@@ -947,15 +948,12 @@ Buff abilities have the following properties:
  <&yaffects&0> Affect flags to set.
  <&yapply&0> Trait modifiers to give.
 
-Immortals can see what passive buffs are currently affecting a character using
-'show passives'.
-
 Note: Passive-buff abilities are not affected by the 'solo' role's limitation
 on being alone; they will remain active.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, PASSIVES
 #d
-"ABILEDIT PLAYER-TECH ABILITY" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH
+"ABILEDIT PLAYER-TECH ABILITY" "PTECH ABILITY" "PTECH ABILITIES" "PLAYER-TECH ABILITY" "PLAYER-TECH ABILITIES" "PLAYER TECH ABILITY" "PLAYER TECHNOLOGY" "PLAYER TECHNOLOGIES" PTECH
 
 Usage:  .data add ptech <type>
 
@@ -1049,6 +1047,19 @@ Available techs are:
 
 See also: OLC ABILITIES, ABILEDIT DATA, ABILEDIT TYPES
 #d
+"ABILEDIT READY-WEAPONS ABILITY" "READY-WEAPONS ABILITY" "READY-WEAPONS ABILITIES" "READY WEAPONS ABILITY" "READY-WEAPON ABILITY" "READY WEAPON ABILITIES"
+
+The READY-WEAPONS ability type adds weapons to the player's 'ready' command.
+These are temporary weapons that the player can summon directly to their
+wield/ranged slots.
+
+Ready-Weapons abilities have the following properties:
+ <&ydata&0> Add the READY-WEAPON data type to grant weapons.
+            - You should usually set the 1-USE flag on the weapon.
+            - Only weapons and ranged weapons can be used.
+
+See also: OLC ABILITIES, ABILEDIT TYPES, READY
+#d
 "ABILEDIT SCALE"
 
 Usage:  .scale <percent>
@@ -1118,9 +1129,11 @@ The following types are available (each has its own help file):
  &cDOT&0 - Adds a damage-over-time effect.
  &cPTECH&0 - Various 'techs' that players get from abilities.
  &cPASSIVE-BUFF&0 - Applies stats to the player all the time.
+ &cREADY-WEAPONS&0 - Adds weapons to the player's 'ready' command.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
-   DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY
+   DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY,
+   READY-WEAPONS ABILITY
 #d
 "ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE"
 

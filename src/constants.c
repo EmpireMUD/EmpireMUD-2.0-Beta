@@ -140,6 +140,7 @@ const char *ability_type_flags[] = {
 	"DOT",
 	"PTECH",
 	"PASSIVE-BUFF",	// 5
+	"READY-WEAPONS",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -200,6 +201,7 @@ const char *ability_custom_types[] = {
 const char *ability_data_types[] = {
 	"PTECH",
 	"EFFECT",
+	"READY-WEAPON",
 	"\n"
 };
 

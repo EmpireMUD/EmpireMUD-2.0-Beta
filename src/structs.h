@@ -515,6 +515,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_DOT  BIT(3)	// damage over time effect
 #define ABILT_PLAYER_TECH  BIT(4)	// some player tech feature
 #define ABILT_PASSIVE_BUFF  BIT(5)	// similar to a buff except always on
+#define ABILT_READY_WEAPONS  BIT(6)	// use READY-WEAPON data to add to a player's ready list
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)
@@ -569,6 +570,7 @@ typedef struct vehicle_data vehicle_data;
 // ADL_x: for ability_data_list (these are bit flags because one ability may have multiple types)
 #define ADL_PLAYER_TECH  BIT(0)	// vnum will be PTECH_ types
 #define ADL_EFFECT  BIT(1)	// an ABIL_EFFECT_ that happens when the ability is used
+#define ADL_READY_WEAPON  BIT(2)	// adds to the "ready"
 
 
 // AGH_x: ability gain hooks

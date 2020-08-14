@@ -97,6 +97,7 @@ struct {
 	{ ABILT_DOT, prep_dot_ability, do_dot_ability },
 	{ ABILT_PLAYER_TECH, NULL, NULL },
 	{ ABILT_PASSIVE_BUFF, NULL, NULL },
+	{ ABILT_READY_WEAPONS, NULL, NULL },
 	
 	{ NOBITS }	// this goes last
 };
@@ -125,6 +126,10 @@ char *ability_data_display(struct ability_data_list *adl) {
 		}
 		case ADL_EFFECT: {
 			snprintf(output, sizeof(output), "%s: %s", temp, ability_effects[adl->vnum]);
+			break;
+		}
+		case ADL_READY_WEAPON: {
+			snprintf(output, sizeof(output), "%s: [%d] %s", temp, adl->vnum, get_obj_name_by_proto(adl->vnum));
 			break;
 		}
 		default: {
@@ -3251,7 +3256,7 @@ void olc_show_ability(char_data *ch) {
 	}
 	
 	// data
-	sprintf(buf + strlen(buf), "Extra data: <%sdata\t0>\r\n", OLC_LABEL_PTR(ABIL_DATA(abil)));
+	sprintf(buf + strlen(buf), "Data: <%sdata\t0>\r\n", OLC_LABEL_PTR(ABIL_DATA(abil)));
 	count = 0;
 	LL_FOREACH(ABIL_DATA(abil), adl) {
 		sprintf(buf + strlen(buf), " \ty%d\t0. %s\r\n", ++count, ability_data_display(adl));
@@ -3477,10 +3482,13 @@ OLC_MODULE(abiledit_data) {
 	int iter, num, type_id, val_id;
 	bool found;
 	
-	// determine valid types first
+	// ADL_x: determine valid types first
 	allowed_types |= ADL_EFFECT;
 	if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH)) {
 		allowed_types |= ADL_PLAYER_TECH;
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS)) {
+		allowed_types |= ADL_READY_WEAPON;
 	}
 	
 	// arg1 arg2
@@ -3545,6 +3553,13 @@ OLC_MODULE(abiledit_data) {
 				case ADL_EFFECT: {
 					if ((val_id = search_block(val_arg, ability_effects, FALSE)) == NOTHING) {
 						msg_to_char(ch, "Invalid ability effect '%s'.\r\n", val_arg);
+						return;
+					}
+					break;
+				}
+				case ADL_READY_WEAPON: {
+					if ((val_id = atoi(val_arg)) <= 0 || !obj_proto(val_id)) {
+						msg_to_char(ch, "Invalid weapon vnum to ready '%s'.\r\n", val_arg);
 						return;
 					}
 					break;
