@@ -402,8 +402,10 @@ ACMD(do_ready) {
 					if (size + lsize < sizeof(buf)) {
 						strcat(buf, line);
 						size += lsize;
-						full = TRUE;
 						break;
+					}
+					else {
+						full = TRUE;
 					}
 				}
 			}
