@@ -6485,7 +6485,11 @@ bool parse_interaction_restrictions(char_data *ch, char *argument, struct intera
 	while (*ptr && !fail) {
 		ptr = any_one_word(ptr, arg);
 		
-		if (strlen(arg) == 1 && isalpha(*arg)) {	// probably an exclusion code
+		if (!*arg) {
+			// just trailing spaces
+			break;
+		}
+		else if (strlen(arg) == 1 && isalpha(*arg)) {	// probably an exclusion code
 			if (!*found_exclusion) {
 				*found_exclusion = *arg;
 			}
