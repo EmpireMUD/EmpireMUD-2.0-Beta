@@ -3359,6 +3359,55 @@ void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool m
 
 
 /**
+* Removes and frees a homeless citizen.
+*
+* @param empire_data *emp The empire to remove the homeless citizen from.
+* @param struct empire_homeless_citizen *ehc The homeless citizen to delete.
+*/
+void remove_homeless_citizen(empire_data *emp, struct empire_homeless_citizen *ehc) {
+	if (emp && ehc) {
+		LL_DELETE(EMPIRE_HOMELESS_CITIZENS(emp), ehc);
+		free(ehc);
+	}
+}
+
+
+/**
+* Finds an available homeless npc for a given location, from the empire's
+* homeless list. Homeless citizens become available over time, based on the
+* 'homeless_citizen_speed' config.
+*
+* @param empire_data *emp The empire that needs a homeless citizen.
+* @param struct map_data *loc Where the citizen will live (determines distance/speed).
+* @param any_vnum with_vnum Require a homeless npc with a specific vnum.
+* @return struct empire_homeless_citizen* A homeless citizen that matches these requirements, or NULL if none exists.
+*/
+struct empire_homeless_citizen *find_homeless_citizen(empire_data *emp, struct map_data *loc, any_vnum with_vnum) {
+	struct empire_homeless_citizen *ehc;
+	int dist;
+	
+	int homeless_citizen_speed = config_get_int("homeless_citizen_speed");	// tiles per minute
+	
+	LL_FOREACH(EMPIRE_HOMELESS_CITIZENS(emp), ehc) {
+		if (with_vnum != NOTHING && ehc->vnum != with_vnum) {
+			continue;	// doesn't match required vnum
+		}
+		if (ehc->loc) {
+			dist = compute_map_distance(MAP_X_COORD(ehc->loc->vnum), MAP_Y_COORD(ehc->loc->vnum), MAP_X_COORD(loc->vnum), MAP_Y_COORD(loc->vnum));
+			if ((((time(0) - ehc->when) / SECS_PER_REAL_MIN) + 1) < dist / homeless_citizen_speed) {
+				continue;	// too soon for this distance
+			}
+		}
+		
+		// apparent match
+		return ehc;
+	}
+	
+	return NULL;	// no match
+}
+
+
+/**
 * Adds a homeless citizen to an empire based on an existing npc. You can
 * safely free the npc afterwards (but this won't do it).
 *
@@ -3386,45 +3435,46 @@ struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct e
 
 
 /**
-* Causes a room to populate (NPC moves in), if possible.
+* Causes a room to populate (NPC moves in), if possible. It attempts to grab
+* a homeless NPC if possible, which is faster, or else will move in a new
+* citizen, which has a longer timer.
 *
 * @param room_data *room The location to populate.
 * @param struct empire_territory_data *ter The territory entry, if you already have it (will attempt to detect otherwise).
+* @param bool force If TRUE, will override the population timer.
 */
-void populate_npc(room_data *room, struct empire_territory_data *ter) {
+void populate_npc(room_data *room, struct empire_territory_data *ter, bool force) {
 	extern int pick_generic_name(int name_set, int sex);
 	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 	
-	struct empire_npc_data *npc;
+	struct empire_homeless_citizen *homeless;
+	struct empire_npc_data *npc = NULL;
+	mob_vnum artisan, citizen, backup;
 	struct empire_island *isle;
 	bool found_artisan = FALSE;
 	int count, max, sex;
 	empire_data *emp;
 	char_data *proto;
-	mob_vnum artisan;
 	
-	if (!room || !(emp = ROOM_OWNER(room)) || !EMPIRE_HAS_TECH(emp, TECH_CITIZENS) || (!ter && !(ter = find_territory_entry(emp, room)))) {
+	if (!room || !GET_BUILDING(room) || !(emp = ROOM_OWNER(room)) || !EMPIRE_HAS_TECH(emp, TECH_CITIZENS) || (!ter && !(ter = find_territory_entry(emp, room)))) {
 		return;	// no work
 	}
 	if (!IS_COMPLETE(room) || ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
 		return;	// nobody populates here
 	}
 	
-	// reset timer
-	ter->population_timer = config_get_int("building_population_timer");
+	// check timer: exits early if there are no homeless and no 'force'
+	if (!force && --ter->population_timer > 0 && !EMPIRE_HOMELESS_CITIZENS(emp)) {
+		return;
+	}
 	
 	// detect max npcs
-	if (GET_BUILDING(room)) {
-		max = GET_BLD_CITIZENS(GET_BUILDING(room));
-		artisan = GET_BLD_ARTISAN(GET_BUILDING(room));
-	}
-	else {
-		max = 0;
-		artisan = NOTHING;
-	}
+	max = GET_BLD_CITIZENS(GET_BUILDING(room));
+	artisan = GET_BLD_ARTISAN(GET_BUILDING(room));
 	
 	// check npcs living here
-	for (count = 0, npc = ter->npcs; npc; npc = npc->next) {
+	count = 0;
+	LL_FOREACH(ter->npcs, npc) {
 		++count;
 		if (npc->vnum == artisan) {
 			found_artisan = TRUE;
@@ -3433,37 +3483,62 @@ void populate_npc(room_data *room, struct empire_territory_data *ter) {
 	
 	// further processing only if we're short npcs here
 	if (artisan != NOTHING && !found_artisan) {
-		sex = number(SEX_MALE, SEX_FEMALE);
-		proto = mob_proto(artisan);
-		npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter);
-		EMPIRE_POPULATION(emp) += 1;
-		if (!GET_ROOM_VEHICLE(room) && (isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
-			isle->population += 1;
+		if ((homeless = find_homeless_citizen(emp, GET_MAP_LOC(room), artisan))) {
+			npc = create_empire_npc(emp, artisan, homeless->sex, homeless->name, ter);
+			remove_homeless_citizen(emp, homeless);
 		}
-		
-		// spawn it right away if anybody is in the room
-		if (ROOM_PEOPLE(room)) {
-			spawn_empire_npc_to_room(emp, npc, ter->room, NOTHING);
+		else if (ter->population_timer <= 0) {
+			sex = number(SEX_MALE, SEX_FEMALE);
+			proto = mob_proto(artisan);
+			npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter);
 		}
-		
-		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		else {
+			// timer still running and cannot add an npc
+			return;
+		}
+		// more at end of function...
 	}
-	else if (count < max) {
+	else if (count < max) {	// ordinary citizen
+		// determine preferred sex/citizen
 		sex = number(SEX_MALE, SEX_FEMALE);
-		proto = mob_proto(sex == SEX_MALE ? CITIZEN_MALE : CITIZEN_FEMALE);
-		npc = create_empire_npc(emp, proto ? GET_MOB_VNUM(proto) : 0, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter);
-		EMPIRE_POPULATION(emp) += 1;
-		if (!GET_ROOM_VEHICLE(room) && (isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
-			isle->population += 1;
-		}
-
-		// spawn it right away if anybody is in the room
-		if (ROOM_PEOPLE(room)) {
-			spawn_empire_npc_to_room(emp, npc, room, NOTHING);
-		}
+		citizen = (sex == SEX_MALE) ? CITIZEN_MALE : CITIZEN_FEMALE;
+		backup = (sex == SEX_MALE) ? CITIZEN_FEMALE : CITIZEN_MALE;
 		
-		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+		if ((homeless = find_homeless_citizen(emp, GET_MAP_LOC(room), citizen)) || (homeless = find_homeless_citizen(emp, GET_MAP_LOC(room), backup))) {
+			// (homeless citizen can be either male or female vnum)
+			npc = create_empire_npc(emp, homeless->vnum, homeless->sex, homeless->name, ter);
+			remove_homeless_citizen(emp, homeless);
+		}
+		else if (ter->population_timer <= 0) {
+			proto = mob_proto(citizen);
+			npc = create_empire_npc(emp, citizen, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter);
+		}
+		else {
+			// timer still running and cannot add an npc
+			return;
+		}
+		// more at end of function...
 	}
+	else {
+		// nothing to add
+		return;
+	}
+	
+	// if we got here, we added an npc
+	ter->population_timer = config_get_int("building_population_timer");
+	
+	// update pop
+	EMPIRE_POPULATION(emp) += 1;
+	if (!GET_ROOM_VEHICLE(room) && (isle = get_empire_island(emp, GET_ISLAND_ID(room)))) {
+		isle->population += 1;
+	}
+	
+	// spawn it right away if anybody is in the room
+	if (npc && ROOM_PEOPLE(room)) {
+		spawn_empire_npc_to_room(emp, npc, room, NOTHING);
+	}
+	
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 }
 
 
@@ -3485,9 +3560,7 @@ void update_empire_npc_data(void) {
 		
 		// each territory spot
 		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
-			if (--ter->population_timer <= 0) {
-				populate_npc(ter->room, ter);
-			}
+			populate_npc(ter->room, ter, FALSE);
 		}
 	}
 }
