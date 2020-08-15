@@ -85,6 +85,7 @@ players_per_city_point 2
 building_population_timer 48
 empire_log_ttl 30
 frontier_timeout 30
+homeless_citizen_speed 10
 land_frontier_modifier 0.050000
 land_min_cap 15
 land_outside_city_modifier 0.350000

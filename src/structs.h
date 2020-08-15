@@ -4498,6 +4498,20 @@ struct empire_goal {
 };
 
 
+// used to track homeless npcs
+struct empire_homeless_citizen {
+	mob_vnum vnum;	// npc type
+	int sex;	// SEX_x
+	int name;	// position in the name list
+	struct map_data *loc;	// where it became homeless
+	time_t when;	// time when it became homeless
+	
+	// empire_vnum empire_id;	// empire vnum -- probably not needed
+	// char_data *mob;	// can't currently spawn from this
+	struct empire_homeless_citizen *next;	// linked list
+};
+
+
 // per-island data for the empire
 struct empire_island {
 	int island;	// which island id
@@ -4722,6 +4736,7 @@ struct empire_data {
 	struct player_craft_data *learned_crafts;	// crafts available to the whole empire
 	struct theft_log *theft_logs;	// recently stolen items
 	struct empire_production_total *production_totals;	// totals of items produced by the empire (hash by vnum)
+	struct empire_homeless_citizen *homeless;	// list of homeless npcs
 	struct script_data *script;	// for storing variables
 	
 	// unsaved data

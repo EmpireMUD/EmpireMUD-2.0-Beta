@@ -42,11 +42,12 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add);
 extern bool can_claim(char_data *ch);
 INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
-void delete_room_npcs(room_data *room, struct empire_territory_data *ter);
+void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
 void free_complex_data(struct complex_room_data *data);
 extern char *get_room_name(room_data *room, bool color);
 extern room_data *create_room(room_data *home);
 extern bool has_learned_craft(char_data *ch, any_vnum vnum);
+struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 void scale_item_to_level(obj_data *obj, int level);
 void stop_room_action(room_data *room, int action, int chore);
 
@@ -353,7 +354,7 @@ void disassociate_building(room_data *room) {
 	if (GET_BUILDING(room)) {
 		detach_building_from_room(room);
 	}
-	delete_room_npcs(room, NULL);
+	delete_room_npcs(room, NULL, TRUE);
 	
 	// remove bits including dismantle
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT);
@@ -1103,7 +1104,7 @@ void start_dismantle_building(room_data *loc) {
 		if (HOME_ROOM(room) == loc) {
 			remove_designate_objects(room);
 			dismantle_wtrigger(room, NULL, FALSE);
-			delete_room_npcs(room, NULL);
+			delete_room_npcs(room, NULL, TRUE);
 		
 			for (obj = ROOM_CONTENTS(room); obj; obj = next_obj) {
 				next_obj = obj->next_content;
@@ -1185,7 +1186,7 @@ void start_dismantle_building(room_data *loc) {
 
 	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
-	delete_room_npcs(loc, NULL);
+	delete_room_npcs(loc, NULL, TRUE);
 	
 	if (loc && ROOM_OWNER(loc) && GET_BUILDING(loc) && complete) {
 		qt_empire_players(ROOM_OWNER(loc), qt_lose_building, GET_BLD_VNUM(GET_BUILDING(loc)));
@@ -1917,6 +1918,7 @@ ACMD(do_designate) {
 			remove_designate_objects(new);
 			if (ROOM_OWNER(home) && (ter = find_territory_entry(ROOM_OWNER(home), new))) {
 				while (ter->npcs) {
+					make_citizen_homeless(ROOM_OWNER(home), ter->npcs);
 					delete_territory_npc(ter, ter->npcs);
 				}
 			}

@@ -69,6 +69,7 @@ extern int get_main_island(empire_data *emp);
 extern int get_total_score(empire_data *emp);
 extern char *get_room_name(room_data *room, bool color);
 extern bool is_trading_with(empire_data *emp, empire_data *partner);
+struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 void identify_obj_to_char(obj_data *obj, char_data *ch);
 void refresh_all_quests(char_data *ch);
@@ -5137,6 +5138,7 @@ ACMD(do_home) {
 			// clear out npcs
 			if ((ter = find_territory_entry(emp, real))) {
 				while (ter->npcs) {
+					make_citizen_homeless(emp, ter->npcs);
 					delete_territory_npc(ter, ter->npcs);
 				}
 			}
@@ -5152,6 +5154,7 @@ ACMD(do_home) {
 				
 				if ((ter = find_territory_entry(emp, iter))) {
 					while (ter->npcs) {
+						make_citizen_homeless(emp, ter->npcs);
 						delete_territory_npc(ter, ter->npcs);
 					}
 				}

@@ -2824,7 +2824,7 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, do
 void perform_abandon_room(room_data *room) {
 	void check_tavern_setup(room_data *room);
 	void deactivate_workforce_room(empire_data *emp, room_data *room);
-	void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter);
+	void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
 	void schedule_check_unload(room_data *room, bool offset);
 	
 	empire_data *emp = ROOM_OWNER(room);
@@ -2850,7 +2850,7 @@ void perform_abandon_room(room_data *room) {
 		}
 		// territory list
 		if ((ter = find_territory_entry(emp, room))) {
-			delete_territory_entry(emp, ter);
+			delete_territory_entry(emp, ter, TRUE);
 		}
 		
 		// quest tracker for members

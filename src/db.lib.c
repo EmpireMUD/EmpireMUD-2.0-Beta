@@ -83,6 +83,7 @@ void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_d
 empire_vnum find_free_empire_vnum(void);
 void free_obj_eq_set(struct eq_set_obj *eq_set);
 void free_theft_logs(struct theft_log *list);
+struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 void parse_generic_name_file(FILE *fl, char *err_str);
@@ -1516,6 +1517,7 @@ void check_for_new_map(void) {
 			
 			// free npcs
 			while (ter->npcs) {
+				make_citizen_homeless(emp, ter->npcs);
 				delete_territory_npc(ter, ter->npcs);
 			}
 			
@@ -1938,6 +1940,7 @@ void free_empire(empire_data *emp) {
 	struct workforce_delay_chore *wdc, *next_wdc;
 	struct workforce_delay *delay, *next_delay;
 	struct empire_island *isle, *next_isle;
+	struct empire_homeless_citizen *ehc, *next_ehc;
 	struct empire_storage_data *store, *next_store;
 	struct empire_unique_storage *eus;
 	struct empire_territory_data *ter, *next_ter;
@@ -2051,6 +2054,11 @@ void free_empire(empire_data *emp) {
 		}
 		HASH_DEL(EMPIRE_DELAYS(emp), delay);
 		free(delay);
+	}
+	
+	// free homeless
+	LL_FOREACH_SAFE(EMPIRE_HOMELESS_CITIZENS(emp), ehc, next_ehc) {
+		free(ehc);
 	}
 	
 	// free workforce log
@@ -2405,6 +2413,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_territory_data *ter;
 	struct empire_trade_data *trade, *last_trade = NULL;
 	struct empire_goal *egoal, *last_egoal = NULL;
+	struct empire_homeless_citizen *ehc;
 	struct empire_completed_goal *ecg;
 	struct player_craft_data *pcd;
 	struct empire_log_data *elog;
@@ -2668,6 +2677,21 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				}
 				break;
 			}
+			case 'H': { // homeless
+				if (sscanf(line, "H %d %d %d %d %ld", &t[0], &t[1], &t[2], &t[3], &long_in) == 5) {
+					CREATE(ehc, struct empire_homeless_citizen, 1);
+					ehc->vnum = t[0];
+					ehc->sex = t[1];
+					ehc->name = t[2];
+					ehc->loc = (t[3] >= 0 && t[3] < MAP_SIZE) ? &(world_map[MAP_X_COORD(t[3])][MAP_Y_COORD(t[3])]) : NULL;
+					ehc->when = long_in;
+					LL_PREPEND(EMPIRE_HOMELESS_CITIZENS(emp), ehc);
+				}
+				else {
+					log("SYSERR: Homeless line of empire %d does not scan.\r\n", emp->vnum);
+				}
+				break;
+			}
 			case 'I': {	// island name
 				if ((isle = get_empire_island(emp, atoi(line+1)))) {
 					isle->name = fread_string(fl, buf2);
@@ -2880,6 +2904,7 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	struct player_craft_data *pcd, *next_pcd;
 	struct empire_goal *egoal, *next_egoal;
 	struct empire_needs *need, *next_need;
+	struct empire_homeless_citizen *ehc;
 	struct empire_trade_data *trade;
 	struct empire_city_data *city;
 	struct empire_npc_data *npc;
@@ -2957,6 +2982,11 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 		if (EMPIRE_PROGRESS_POINTS(emp, iter)) {
 			fprintf(fl, "GP %d %d\n", iter, EMPIRE_PROGRESS_POINTS(emp, iter));
 		}
+	}
+	
+	// H: homeless
+	LL_FOREACH(EMPIRE_HOMELESS_CITIZENS(emp), ehc) {
+		fprintf(fl, "H %d %d %d %d %ld\n", ehc->vnum, ehc->sex, ehc->name, ehc->loc ? ehc->loc->vnum : NOWHERE, ehc->when);
 	}
 	
 	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
@@ -3299,8 +3329,9 @@ struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mobv, int s
 *
 * @param room_data *room The room to clean up (optional)
 * @param struct empire_territory_data *ter the territory to clean up (optional)
+* @param bool make_homeless If TRUE, moves the citizens to the homeless list.
 */
-void delete_room_npcs(room_data *room, struct empire_territory_data *ter) {
+void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless) {
 	struct empire_territory_data *tt = ter;
 	room_data *loc = (room ? room : ter->room);
 	empire_data *emp;
@@ -3318,9 +3349,39 @@ void delete_room_npcs(room_data *room, struct empire_territory_data *ter) {
 	
 	if (tt) {
 		while (tt->npcs) {
+			if (emp && make_homeless) {
+				make_citizen_homeless(emp, tt->npcs);
+			}
 			delete_territory_npc(tt, tt->npcs);
 		}
 	}
+}
+
+
+/**
+* Adds a homeless citizen to an empire based on an existing npc. You can
+* safely free the npc afterwards (but this won't do it).
+*
+* @param empire_data *emp The empire whose npc it is.
+* @param struct empire_npc_data *npc The npc to make homeless.
+* @return struct empire_homeless_citizen* The new homeless entry (already added to the empire). May return NULL if parameter(s) are missing.
+*/
+struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc) {
+	struct empire_homeless_citizen *ehc;
+	
+	if (!emp || !npc) {
+		return NULL;	// no work
+	}
+	
+	CREATE(ehc, struct empire_homeless_citizen, 1);
+	ehc->vnum = npc->vnum;
+	ehc->sex = npc->sex;
+	ehc->name = npc->name;
+	ehc->loc = npc->home ? GET_MAP_LOC(npc->home) : NULL;
+	ehc->when = time(0);
+	
+	LL_PREPEND(EMPIRE_HOMELESS_CITIZENS(emp), ehc);
+	return ehc;
 }
 
 

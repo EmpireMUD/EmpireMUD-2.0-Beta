@@ -82,6 +82,7 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd);	// act.ite
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
+extern struct generic_name_data *get_best_name_list(int name_set, int sex);
 extern int get_highest_access_level(account_data *acct);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
@@ -2441,6 +2442,71 @@ SHOW(show_factions) {
 	if (file) {
 		free_char(vict);
 	}
+}
+
+
+SHOW(show_homeless) {
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	struct empire_homeless_citizen *ehc;
+	struct generic_name_data *nameset;
+	size_t size, lsize;
+	empire_data *emp;
+	char_data *proto;
+	int count;
+	
+	if (!ch->desc) {
+		return;	// somehow
+	}
+	
+	one_word(argument, arg);
+	if (!*arg) {
+		msg_to_char(ch, "Show homeless citizens for which empire?\r\n");
+		return;
+	}
+	if (!(emp = get_empire_by_name(arg))) {
+		msg_to_char(ch, "Unknown empire '%s'.\r\n", arg);
+		return;
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Homeless citizens for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	
+	count = 0;
+	LL_FOREACH(EMPIRE_HOMELESS_CITIZENS(emp), ehc) {
+		if (!(proto = mob_proto(ehc->vnum))) {
+			continue;	// no mob
+		}
+		
+		++count;
+		
+		// location / start of string
+		if (ehc->loc) {
+			lsize = snprintf(line, sizeof(line), " (%*d, %*d) ", X_PRECISION, MAP_X_COORD(ehc->loc->vnum), Y_PRECISION, MAP_Y_COORD(ehc->loc->vnum));
+		}
+		else {
+			lsize = snprintf(line, sizeof(line), " (%*.*s) ", (X_PRECISION + Y_PRECISION + 2), (X_PRECISION + Y_PRECISION + 2), "no loc");
+		}
+		
+		// load name list
+		nameset = get_best_name_list(MOB_NAME_SET(proto), ehc->sex);
+		
+		// mob portion of the display
+		lsize += snprintf(line + lsize, sizeof(line) - lsize, "[%5d] %s '%s'\r\n", ehc->vnum, get_mob_name_by_proto(ehc->vnum, FALSE), ehc->name < nameset->size ? nameset->names[ehc->name] : "unknown");
+		
+		if (size + lsize < sizeof(buf)) {
+			strcat(buf, line);
+			size += lsize;
+		}
+		else {
+			snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**\r\n");
+			break;
+		}
+	}
+	
+	if (count == 0) {
+		strcat(buf, " none\r\n");	// always room if count == 0
+	}
+	
+	page_string(ch->desc, buf, TRUE);
 }
 
 
@@ -5821,7 +5887,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 /* Displays the vital statistics of IN_ROOM(ch) to ch */
 void do_stat_room(char_data *ch) {
-	extern struct generic_name_data *get_best_name_list(int name_set, int sex);
 	extern const char *exit_bits[];
 	extern const char *depletion_type[NUM_DEPLETION_TYPES];
 	extern const char *instance_flags[];
@@ -9180,6 +9245,7 @@ ACMD(do_show) {
 		{ "produced", LVL_START_IMM, show_produced },
 		{ "resource", LVL_START_IMM, show_resource },
 		{ "olc", LVL_START_IMM, show_olc },
+		{ "homeless", LVL_START_IMM, show_homeless },
 
 		// last
 		{ "\n", 0, NULL }
