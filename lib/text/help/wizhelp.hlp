@@ -1155,6 +1155,15 @@ be filtered by name.
 
 See also: FACTION, SET FACTION
 #e
+"SHOW HOMELESS"
+
+Usage:  show homeless <empire>
+
+This command shows the list of homeless NPCs for the empire including the
+location where they previously lived.
+
+See also: HOMELESS CITIZENS
+#e
 "SHOW IGNORING"
 
 Usage:  show ignoring <player name>

@@ -406,7 +406,7 @@ move in.
 Eventually your empire can learn to put citizens to work. Citizens work chores
 within 20 tiles of their homes.
 
-See also: DESIGNATE, MARK, WORKFORCE
+See also: DESIGNATE, HOMELESS CITIZENS, MARK, WORKFORCE
 #
 COIN COINS COINAGE CURRENCY GOLD "EXCHANGE RATE"
 
@@ -768,6 +768,17 @@ History messages last for up to 24 hours, but you only see the last 20 messages
 from that time period.
 
 See also: SAYHISTORY, TELLHISTORY, EHISTORY, GHISTORY, /HISTORY
+#
+HOMELESS "HOMELESS CITIZENS" "HOMELESS NPCS"
+
+When a building is burnt down, dismantled, or otherwise lost, the citizens who
+lived there become homeless. Homeless citizens will move into new homes faster
+than new citizens would. The time it takes is based on the distance from the
+citizen's previous home.
+
+Immortals can view an empire's homeless citizen list with 'show homeless'.
+
+See also: CITIZENS
 #
 HOSTILE ROGUE THIEF
 
