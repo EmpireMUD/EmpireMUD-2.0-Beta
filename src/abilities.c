@@ -877,6 +877,15 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 		if (IS_SET(agh->triggers, AGH_ONLY_WHEN_AFFECTED) && (!(abil = find_ability_by_vnum(agh->ability)) || !affected_by_spell(ch, ABIL_AFFECT_VNUM(abil)))) {
 			continue;	// not currently affected
 		}
+		if (IS_SET(agh->triggers, AGH_ONLY_DARK) && !IS_DARK(IN_ROOM(ch))) {
+			continue;	// not dark
+		}
+		if (IS_SET(agh->triggers, AGH_ONLY_LIGHT) && IS_DARK(IN_ROOM(ch))) {
+			continue;	// not light
+		}
+		if (IS_SET(agh->triggers, AGH_ONLY_VS_ANIMAL) && (!opponent || !MOB_FLAGGED(opponent, MOB_ANIMAL))) {
+			continue;	// not an animal
+		}
 		if (IS_SET(agh->triggers, AGH_ONLY_USING_READY_WEAPON)) {
 			// check if using a readied item
 			found = FALSE;
@@ -901,15 +910,6 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 			if (!found) {
 				continue;	// not using the item
 			}
-		}
-		if (IS_SET(agh->triggers, AGH_ONLY_DARK) && !IS_DARK(IN_ROOM(ch))) {
-			continue;	// not dark
-		}
-		if (IS_SET(agh->triggers, AGH_ONLY_LIGHT) && IS_DARK(IN_ROOM(ch))) {
-			continue;	// not light
-		}
-		if (IS_SET(agh->triggers, AGH_ONLY_VS_ANIMAL) && (!opponent || !MOB_FLAGGED(opponent, MOB_ANIMAL))) {
-			continue;	// not an animal
 		}
 		
 		gain_ability_exp(ch, agh->ability, amount);
