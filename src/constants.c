@@ -3125,11 +3125,12 @@ const char *function_flags[] = {
 
 // ISLE_x -- island flags
 const char *island_bits[] = {
-	"NEWBIE",
+	"NEWBIE",	// 0
 	"!AGGRO",
 	"!CUSTOMIZE",
 	"CONTINENT",
 	"*",	// has-custom-desc (internal use only)
+	"!CHART",	// 5
 	"\n"
 };
 

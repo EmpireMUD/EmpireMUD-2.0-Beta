@@ -2572,6 +2572,7 @@ typedef struct vehicle_data vehicle_data;
 #define ISLE_NO_CUSTOMIZE  BIT(2)	// c. cannot be renamed
 #define ISLE_CONTINENT  BIT(3)	// d. island is a continent (usually large, affects spawns)
 #define ISLE_HAS_CUSTOM_DESC  BIT(4)	// e. ** island has a custom desc -- internal use only (not having this flag will get the desc replaced)
+#define ISLE_NO_CHART  BIT(5)	// f. island can't be targeted with the chart command
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them

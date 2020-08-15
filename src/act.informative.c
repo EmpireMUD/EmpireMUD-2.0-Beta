@@ -2202,6 +2202,9 @@ ACMD(do_chart) {
 	else if (!(isle = get_island_by_name(ch, argument)) || isle->id == NO_ISLAND) {
 		msg_to_char(ch, "Unknown island.\r\n");
 	}
+	else if (IS_SET(isle->flags, ISLE_NO_CHART)) {
+		msg_to_char(ch, "That island doesn't appear on any charts.\r\n");
+	}
 	else {
 		msg_to_char(ch, "Chart information for %s:\r\n", isle->name);
 		if (isle->desc) {
