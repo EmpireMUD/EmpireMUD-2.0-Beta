@@ -3368,6 +3368,7 @@ void remove_homeless_citizen(empire_data *emp, struct empire_homeless_citizen *e
 	if (emp && ehc) {
 		LL_DELETE(EMPIRE_HOMELESS_CITIZENS(emp), ehc);
 		free(ehc);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 }
 
@@ -3430,6 +3431,7 @@ struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct e
 	ehc->when = time(0);
 	
 	LL_PREPEND(EMPIRE_HOMELESS_CITIZENS(emp), ehc);
+	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	return ehc;
 }
 
