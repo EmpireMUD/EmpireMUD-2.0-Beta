@@ -304,11 +304,17 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
+	void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
+	void remove_minipet(char_data *ch, any_vnum vnum);
+	void remove_homeless_citizen(empire_data *emp, struct empire_homeless_citizen *ehc);
 	
 	void extract_pending_chars();
 	void remove_mobile_from_table(char_data *mob);
 	
+	struct empire_homeless_citizen *ehc, *next_ehc;
+	struct empire_territory_data *ter, *next_ter;
 	char_data *proto, *mob_iter, *next_mob;
+	struct empire_npc_data *end, *next_end;
 	descriptor_data *desc;
 	struct global_data *glb, *next_glb;
 	quest_data *quest, *next_quest;
@@ -318,6 +324,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	sector_data *sect, *next_sect;
 	crop_data *crop, *next_crop;
 	shop_data *shop, *next_shop;
+	empire_data *emp, *next_emp;
 	social_data *soc, *next_soc;
 	bld_data *bld, *next_bld;
 	struct mount_data *mount;
@@ -345,6 +352,8 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 			}
 		}
 		else {	// player
+			remove_minipet(mob_iter, vnum);
+			
 			if (GET_MOUNT_VNUM(mob_iter) == vnum) {
 				if (IS_RIDING(mob_iter)) {
 					msg_to_char(mob_iter, "Your mount has been deleted.\r\n");
@@ -356,6 +365,27 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 					HASH_DEL(GET_MOUNT_LIST(mob_iter), mount);
 					free(mount);
 				}
+			}
+			
+			// TODO minipets
+		}
+	}
+	
+	// remove empire npcs
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// regular npcs
+		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
+			LL_FOREACH_SAFE(ter->npcs, end, next_end) {
+				if (end->vnum == vnum) {
+					delete_territory_npc(ter, end);
+				}
+			}
+		}
+		
+		// homeless npcs
+		LL_FOREACH_SAFE(EMPIRE_HOMELESS_CITIZENS(emp), ehc, next_ehc) {
+			if (ehc->vnum == vnum) {
+				remove_homeless_citizen(emp, ehc);
 			}
 		}
 	}
