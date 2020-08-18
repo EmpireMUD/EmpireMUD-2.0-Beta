@@ -82,6 +82,7 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd);	// act.ite
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
+extern struct generic_name_data *get_best_name_list(int name_set, int sex);
 extern int get_highest_access_level(account_data *acct);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
@@ -89,6 +90,7 @@ void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern char *get_room_name(room_data *room, bool color);
+void refresh_passive_buffs(char_data *ch);
 void replace_question_color(char *input, char *color, char *output);
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
@@ -471,7 +473,7 @@ ADMIN_UTIL(util_approval) {
 							store_loaded_char(pers);
 						}
 						else {
-							SAVE_CHAR(pers);
+							queue_delayed_update(pers, CDU_SAVE);
 						}
 					}
 					// no break in this one -- need to do all alts
@@ -2184,7 +2186,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 						alt = NULL;
 					}
 					else {
-						SAVE_CHAR(alt);
+						queue_delayed_update(alt, CDU_SAVE);
 					}
 				}
 				else {
@@ -2440,6 +2442,71 @@ SHOW(show_factions) {
 	if (file) {
 		free_char(vict);
 	}
+}
+
+
+SHOW(show_homeless) {
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	struct empire_homeless_citizen *ehc;
+	struct generic_name_data *nameset;
+	size_t size, lsize;
+	empire_data *emp;
+	char_data *proto;
+	int count;
+	
+	if (!ch->desc) {
+		return;	// somehow
+	}
+	
+	one_word(argument, arg);
+	if (!*arg) {
+		msg_to_char(ch, "Show homeless citizens for which empire?\r\n");
+		return;
+	}
+	if (!(emp = get_empire_by_name(arg))) {
+		msg_to_char(ch, "Unknown empire '%s'.\r\n", arg);
+		return;
+	}
+	
+	size = snprintf(buf, sizeof(buf), "Homeless citizens for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	
+	count = 0;
+	LL_FOREACH(EMPIRE_HOMELESS_CITIZENS(emp), ehc) {
+		if (!(proto = mob_proto(ehc->vnum))) {
+			continue;	// no mob
+		}
+		
+		++count;
+		
+		// location / start of string
+		if (ehc->loc) {
+			lsize = snprintf(line, sizeof(line), " (%*d, %*d) ", X_PRECISION, MAP_X_COORD(ehc->loc->vnum), Y_PRECISION, MAP_Y_COORD(ehc->loc->vnum));
+		}
+		else {
+			lsize = snprintf(line, sizeof(line), " (%*.*s) ", (X_PRECISION + Y_PRECISION + 2), (X_PRECISION + Y_PRECISION + 2), "no loc");
+		}
+		
+		// load name list
+		nameset = get_best_name_list(MOB_NAME_SET(proto), ehc->sex);
+		
+		// mob portion of the display
+		lsize += snprintf(line + lsize, sizeof(line) - lsize, "[%5d] %s '%s'\r\n", ehc->vnum, get_mob_name_by_proto(ehc->vnum, FALSE), ehc->name < nameset->size ? nameset->names[ehc->name] : "unknown");
+		
+		if (size + lsize < sizeof(buf)) {
+			strcat(buf, line);
+			size += lsize;
+		}
+		else {
+			snprintf(buf + size, sizeof(buf) - size, "**OVERFLOW**\r\n");
+			break;
+		}
+	}
+	
+	if (count == 0) {
+		strcat(buf, " none\r\n");	// always room if count == 0
+	}
+	
+	page_string(ch->desc, buf, TRUE);
 }
 
 
@@ -4174,7 +4241,7 @@ SHOW(show_currency) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Currencies:\r\n");
 		
 			HASH_ITER(hh, GET_CURRENCIES(plr), cur, next_cur) {
-				snprintf(line, sizeof(line), "%3d %s\r\n", cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
+				snprintf(line, sizeof(line), "%3d [%5d] %s\r\n", cur->amount, cur->vnum, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
 			
 				if (size + strlen(line) < sizeof(buf)) {
 					strcat(buf, line);
@@ -5820,7 +5887,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 /* Displays the vital statistics of IN_ROOM(ch) to ch */
 void do_stat_room(char_data *ch) {
-	extern struct generic_name_data *get_best_name_list(int name_set, int sex);
 	extern const char *exit_bits[];
 	extern const char *depletion_type[NUM_DEPLETION_TYPES];
 	extern const char *instance_flags[];
@@ -6599,7 +6665,7 @@ ACMD(do_advance) {
 
 	GET_ACCESS_LEVEL(victim) = newlevel;
 	GET_IMMORTAL_LEVEL(victim) = GET_ACCESS_LEVEL(victim) > LVL_MORTAL ? (LVL_TOP - GET_ACCESS_LEVEL(victim)) : -1;
-	SAVE_CHAR(victim);
+	queue_delayed_update(victim, CDU_SAVE);
 	check_autowiz(victim);
 }
 
@@ -9119,7 +9185,7 @@ ACMD(do_set) {
 			send_to_char("Saved in file.\r\n", ch);
 		}
 		else if (!IS_NPC(vict)) {
-			SAVE_CHAR(vict);
+			queue_delayed_update(vict, CDU_SAVE);
 		}
 	}
 	else if (load_from_file) {
@@ -9179,6 +9245,7 @@ ACMD(do_show) {
 		{ "produced", LVL_START_IMM, show_produced },
 		{ "resource", LVL_START_IMM, show_resource },
 		{ "olc", LVL_START_IMM, show_olc },
+		{ "homeless", LVL_START_IMM, show_homeless },
 
 		// last
 		{ "\n", 0, NULL }
@@ -9422,6 +9489,7 @@ ACMD(do_stat) {
 			send_to_char("Sorry, you can't do that.\r\n", ch);
 		}
 		else {
+			refresh_passive_buffs(victim);
 			do_stat_character(ch, victim);
 		}
 		
@@ -10444,6 +10512,6 @@ ACMD(do_wizutil) {
 				break;
 		}
 		SAVE_ACCOUNT(GET_ACCOUNT(vict));
-		SAVE_CHAR(vict);
+		queue_delayed_update(vict, CDU_SAVE);
 	}
 }

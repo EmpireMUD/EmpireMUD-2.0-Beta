@@ -1479,6 +1479,18 @@ tile, or the one you're standing in.
 
 See also: DEPLETION, FORGE
 #
+PASSIVES "PASSIVE BUFFS"
+
+Usage:  passives
+
+This command shows all your passive buffs. These generally come from abilities,
+and are always active while you have those abilities. Most passive buffs scale
+with your level and may also be affected by your role.
+
+Immortals can target other players with this command.
+
+See also: ROLE
+#
 PLAY INSTRUMENTS MUSIC
 
 Speed boosts:  haste
@@ -2313,6 +2325,7 @@ Toggles:
   channel-joins - blocks slash-channel join messages
   clearmeters - automatically clears your meters between combats
   compact - no extra newlines
+  exits - shows or hides exits and directions when you 'look'
   extra-spacing - adds an extra blank line after you type a command
   informative - informative map coloring -- HELP INFORMATIVE
   item-details - shows level and some other information in inventory/equipment

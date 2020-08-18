@@ -701,7 +701,7 @@ OLC_MODULE(mapedit_naturalize) {
 
 
 OLC_MODULE(mapedit_populate) {
-	void populate_npc(room_data *room, struct empire_territory_data *ter);
+	void populate_npc(room_data *room, struct empire_territory_data *ter, bool force);
 	char_data *current = ROOM_PEOPLE(IN_ROOM(ch));
 	
 	if (!GET_BUILDING(IN_ROOM(ch))) {
@@ -712,7 +712,7 @@ OLC_MODULE(mapedit_populate) {
 	}
 	else {
 		// should send an "arrives" message if successful
-		populate_npc(IN_ROOM(ch), NULL);
+		populate_npc(IN_ROOM(ch), NULL, TRUE);
 		
 		if (current == ROOM_PEOPLE(IN_ROOM(ch))) {
 			msg_to_char(ch, "Okay. But there didn't seem to be anything to populate.\r\n");

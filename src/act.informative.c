@@ -2202,6 +2202,9 @@ ACMD(do_chart) {
 	else if (!(isle = get_island_by_name(ch, argument)) || isle->id == NO_ISLAND) {
 		msg_to_char(ch, "Unknown island.\r\n");
 	}
+	else if (IS_SET(isle->flags, ISLE_NO_CHART)) {
+		msg_to_char(ch, "That island doesn't appear on any charts.\r\n");
+	}
 	else {
 		msg_to_char(ch, "Chart information for %s:\r\n", isle->name);
 		if (isle->desc) {
@@ -3457,6 +3460,85 @@ ACMD(do_no_cmd) {
 			send_config_msg(ch, "huh_string");
 			break;
 		}
+	}
+}
+
+
+ACMD(do_passives) {
+	void check_delayed_load(char_data *ch);
+	void refresh_passive_buffs(char_data *ch);
+	extern const char *affected_bits[];
+	extern const char *apply_types[];
+	
+	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+	bool found = FALSE, is_file = FALSE;
+	struct affected_type *aff;
+	char_data *vict = ch;
+	
+	one_argument(argument, arg);
+	
+	// only immortals can target this command
+	if (IS_IMMORTAL(ch) && *arg) {
+		if (!(vict = find_or_load_player(arg, &is_file))) {
+			send_config_msg(ch, "no_person");
+			return;
+		}
+		if (IS_NPC(vict)) {
+			msg_to_char(ch, "You can't view passive buffs on an NPC.\r\n");
+			if (is_file) {
+				// unlikely to get here, but playing it safe
+				free_char(vict);
+			}
+			return;
+		}
+	}
+	else if (IS_NPC(vict)) {	// when viewing passives on yourself
+		msg_to_char(ch, "You don't have passive buffs.\r\n");
+	}
+	
+	// these aren't normally loaded when offline
+	if (is_file) {
+		check_delayed_load(vict);
+		refresh_passive_buffs(vict);
+	}
+	
+	// header
+	if (ch == vict) {
+		msg_to_char(ch, "Passive buffs:\r\n");
+	}
+	else {
+		msg_to_char(ch, "Passive buffs for %s:\r\n", PERS(vict, ch, TRUE));
+	}
+	
+	LL_FOREACH(GET_PASSIVE_BUFFS(vict), aff) {
+		*buf2 = '\0';
+		
+		sprintf(buf, " &c%s&0 ", get_ability_name_by_vnum(aff->type));
+
+		if (aff->modifier) {
+			sprintf(buf2, "%+d to %s", aff->modifier, apply_types[(int) aff->location]);
+			strcat(buf, buf2);
+		}
+		if (aff->bitvector) {
+			if (*buf2) {
+				strcat(buf, ", sets ");
+			}
+			else {
+				strcat(buf, "sets ");
+			}
+			sprintbit(aff->bitvector, affected_bits, buf2, TRUE);
+			strcat(buf, buf2);
+		}
+		send_to_char(strcat(buf, "\r\n"), ch);
+		found = TRUE;
+	}
+	
+	if (!found) {
+		msg_to_char(ch, " none\r\n");
+	}
+	
+	if (is_file) {
+		free_char(vict);
 	}
 }
 

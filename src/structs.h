@@ -504,6 +504,7 @@ typedef struct vehicle_data vehicle_data;
 #define ABILF_TANK_ROLE  BIT(11)	// l. bonus if in 'tank' role
 #define ABILF_RANGED_ONLY  BIT(12)	// m. requires ranged combat
 #define ABILF_IGNORE_SUN  BIT(13)	// n. vampire ability ignores sunlight
+#define ABILF_UNSCALED_BUFF  BIT(14)	// o. buff does not scale at all (fixed values)
 
 #define ABILITY_ROLE_FLAGS  (ABILF_CASTER_ROLE | ABILF_HEALER_ROLE | ABILF_MELEE_ROLE | ABILF_TANK_ROLE)
 
@@ -513,6 +514,8 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_DAMAGE  BIT(2)	// deals damage
 #define ABILT_DOT  BIT(3)	// damage over time effect
 #define ABILT_PLAYER_TECH  BIT(4)	// some player tech feature
+#define ABILT_PASSIVE_BUFF  BIT(5)	// similar to a buff except always on
+#define ABILT_READY_WEAPONS  BIT(6)	// use READY-WEAPON data to add to a player's ready list
 /*
 #define ABILT_UNAFFECTS  BIT(2)
 #define ABILT_POINTS  BIT(3)
@@ -567,6 +570,7 @@ typedef struct vehicle_data vehicle_data;
 // ADL_x: for ability_data_list (these are bit flags because one ability may have multiple types)
 #define ADL_PLAYER_TECH  BIT(0)	// vnum will be PTECH_ types
 #define ADL_EFFECT  BIT(1)	// an ABIL_EFFECT_ that happens when the ability is used
+#define ADL_READY_WEAPON  BIT(2)	// adds to the "ready"
 
 
 // AGH_x: ability gain hooks
@@ -583,6 +587,7 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_ONLY_VS_ANIMAL  BIT(10)	// only if the target was an animal
 #define AGH_VAMPIRE_FEEDING  BIT(11)	// gains when feeding
 #define AGH_MOVING  BIT(12)	// gain when moving
+#define AGH_ONLY_USING_READY_WEAPON  BIT(13)	// only gains if a ready-weapon is equipped
 
 
 // RUN_ABIL_x: modes for activating abilities
@@ -1899,6 +1904,11 @@ typedef struct vehicle_data vehicle_data;
 #define NUM_BONUS_TRAITS  17
 
 
+// CDU_x: delayed update types
+#define CDU_PASSIVE_BUFFS  BIT(0)	// refresh passive buffs
+#define CDU_SAVE  BIT(1)	// saves the character
+
+
 // types of channel histories -- act.comm.c
 #define NO_HISTORY  -1	// reserved
 #define CHANNEL_HISTORY_GOD  0
@@ -2140,6 +2150,7 @@ typedef struct vehicle_data vehicle_data;
 #define PRF_AUTOSWIM  BIT(37)	// will enter water without 'swim'
 #define PRF_ITEM_QUALITY  BIT(38)	// shows loot quality color/tag in inv/eq
 #define PRF_ITEM_DETAILS  BIT(39)	// shows additional item details on inv/eq
+#define PRF_NO_EXITS  BIT(40)	// hides exits on look and auto-look
 // note: if you add prefs, consider adding them to alt_import_preferences()
 
 
@@ -2220,6 +2231,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_HARVEST  73	// can 'harvest'
 #define PTECH_PICK  74	// can 'pick'
 #define PTECH_QUARRY  75	// can 'quarry'
+#define PTECH_DRINK_BLOOD_FASTER  76	// vampires drink blood at 2x speed
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -2560,6 +2572,7 @@ typedef struct vehicle_data vehicle_data;
 #define ISLE_NO_CUSTOMIZE  BIT(2)	// c. cannot be renamed
 #define ISLE_CONTINENT  BIT(3)	// d. island is a continent (usually large, affects spawns)
 #define ISLE_HAS_CUSTOM_DESC  BIT(4)	// e. ** island has a custom desc -- internal use only (not having this flag will get the desc replaced)
+#define ISLE_NO_CHART  BIT(5)	// f. island can't be targeted with the chart command
 
 
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
@@ -2742,6 +2755,15 @@ struct ban_list_element {
 	char name[MAX_NAME_LENGTH+1];
 	
 	struct ban_list_element *next;
+};
+
+
+// for queuing up data that needs to be updated
+struct char_delayed_update {
+	int id;	// unique id; use char_script_id()
+	char_data *ch;	// person to update
+	bitvector_t type;	// CDU_ update type
+	UT_hash_handle hh;	// hash handle (by id)
 };
 
 
@@ -4008,6 +4030,7 @@ struct player_special_data {
 	struct channel_history_data *channel_history[NUM_CHANNEL_HISTORY_TYPES];	// DLs: histories
 	struct player_automessage *automessages;	// hash of seen messages
 	struct player_event_data *event_data;	// hash of event scores and results
+	struct affected_type *passive_buffs;	// from PASSIVE-BUFF abilities
 
 	// some daily stuff
 	int daily_cycle;	// Last update cycle registered
@@ -4475,6 +4498,20 @@ struct empire_goal {
 };
 
 
+// used to track homeless npcs
+struct empire_homeless_citizen {
+	mob_vnum vnum;	// npc type
+	int sex;	// SEX_x
+	int name;	// position in the name list
+	struct map_data *loc;	// where it became homeless
+	time_t when;	// time when it became homeless
+	
+	// empire_vnum empire_id;	// empire vnum -- probably not needed
+	// char_data *mob;	// can't currently spawn from this
+	struct empire_homeless_citizen *next;	// linked list
+};
+
+
 // per-island data for the empire
 struct empire_island {
 	int island;	// which island id
@@ -4699,6 +4736,7 @@ struct empire_data {
 	struct player_craft_data *learned_crafts;	// crafts available to the whole empire
 	struct theft_log *theft_logs;	// recently stolen items
 	struct empire_production_total *production_totals;	// totals of items produced by the empire (hash by vnum)
+	struct empire_homeless_citizen *homeless;	// list of homeless npcs
 	struct script_data *script;	// for storing variables
 	
 	// unsaved data

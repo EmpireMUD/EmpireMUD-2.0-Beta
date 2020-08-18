@@ -228,17 +228,6 @@ int GET_MAX_BLOOD(char_data *ch) {
 		base += GET_EXTRA_BLOOD(ch);
 
 		if (IS_VAMPIRE(ch)) {
-			if (IS_SPECIALTY_SKILL(ch, SKILL_VAMPIRE)) {
-				base += 50;
-			}
-			if (IS_CLASS_SKILL(ch, SKILL_VAMPIRE)) {
-				base += 50;
-			}
-
-			if (has_ability(ch, ABIL_ANCIENT_BLOOD)) {
-				base *= 2;
-			}
-			
 			if (HAS_BONUS_TRAIT(ch, BONUS_BLOOD)) {
 				base += config_get_int("pool_bonus_amount") * (1 + (get_approximate_level(ch) / 25));
 			}
@@ -319,8 +308,8 @@ void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
 		if (lore && IS_VAMPIRE(ch)) {
 			add_lore(ch, LORE_START_VAMPIRE, "Sired");
 		}
-	
-		SAVE_CHAR(ch);
+		
+		queue_delayed_update(ch, CDU_SAVE);
 	}
 }
 
@@ -399,8 +388,8 @@ void sire_char(char_data *ch, char_data *victim) {
 		/* Turn off that SIRING action */
 		GET_ACTION(ch) = ACT_NONE;
 
-		SAVE_CHAR(ch);
-		SAVE_CHAR(victim);
+		queue_delayed_update(ch, CDU_SAVE);
+		queue_delayed_update(victim, CDU_SAVE);
 	}
 	else {
 		// can't gain a vampire skills
@@ -689,7 +678,7 @@ void update_biting_char(char_data *ch) {
 	GET_BLOOD(victim) -= amount;
 	
 	// can gain more
-	if (has_ability(ch, ABIL_ANCIENT_BLOOD)) {
+	if (has_player_tech(ch, PTECH_DRINK_BLOOD_FASTER)) {
 		amount *= 2;
 	}
 	GET_BLOOD(ch) = MIN(GET_MAX_BLOOD(ch), GET_BLOOD(ch) + amount);
@@ -723,10 +712,6 @@ void update_biting_char(char_data *ch) {
 		
 		// cancel a can't-stop effect, if present
 		affect_from_char(ch, ATYPE_CANT_STOP, FALSE);
-		
-		if (can_gain_exp_from(ch, victim)) {
-			gain_ability_exp(ch, ABIL_ANCIENT_BLOOD, 15);
-		}
 
 		act("$n is dead! R.I.P.", FALSE, victim, 0, 0, TO_ROOM);
 		msg_to_char(victim, "You are dead! Sorry...\r\n");
@@ -756,10 +741,6 @@ void update_biting_char(char_data *ch) {
 		
 		if ((GET_BLOOD(victim) * 100 / GET_MAX_BLOOD(victim)) < 20) {
 			act("...$e sways from lack of blood.", FALSE, victim, NULL, NULL, TO_ROOM);
-		}
-		
-		if (has_ability(ch, ABIL_ANCIENT_BLOOD) && can_gain_exp_from(ch, victim)) {
-			gain_ability_exp(ch, ABIL_ANCIENT_BLOOD, 1);
 		}
 	}
 	

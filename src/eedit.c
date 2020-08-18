@@ -437,7 +437,7 @@ EEDIT(eedit_change_leader) {
 			file = FALSE;
 		}
 		else {
-			SAVE_CHAR(victim);
+			queue_delayed_update(victim, CDU_SAVE);
 		}
 		
 		// demote old leader (at least, in lore)
@@ -452,7 +452,7 @@ EEDIT(eedit_change_leader) {
 					file = FALSE;
 				}
 				else {
-					SAVE_CHAR(victim);
+					queue_delayed_update(victim, CDU_SAVE);
 				}
 			}
 			else if (file) {
@@ -753,7 +753,7 @@ EEDIT(eedit_num_ranks) {
 				mem = NULL;
 			}
 			else {
-				SAVE_CHAR(mem);
+				queue_delayed_update(mem, CDU_SAVE);
 			}
 		}
 		

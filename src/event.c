@@ -3062,7 +3062,7 @@ EVENT_CMD(evcmd_collect) {
 	}
 	
 	if (any) {
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 	}
 	else {
 		msg_to_char(ch, "You have no pending rewards to collect.\r\n");

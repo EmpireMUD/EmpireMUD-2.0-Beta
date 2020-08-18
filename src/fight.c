@@ -3091,7 +3091,6 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	if (!full_miss && !IS_NPC(victim) && ch != victim && !EXTRACTED(victim)) {
 		// endurance (extra HP)
 		if (can_gain_exp_from(victim, ch)) {
-			gain_ability_exp(victim, ABIL_ENDURANCE, 2);
 			run_ability_gain_hooks(victim, ch, AGH_TAKE_DAMAGE);
 		}
 
@@ -3479,10 +3478,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 			if (!IS_NPC(ch) && has_ability(ch, ABIL_CLAWS) && w_type == TYPE_VAMPIRE_CLAWS && can_gain_exp_from(ch, victim)) {
 				gain_ability_exp(ch, ABIL_CLAWS, 2);
 			}
-			if (!IS_NPC(ch) && GET_EQ(ch, WEAR_WIELD) && IS_BLOOD_WEAPON(GET_EQ(ch, WEAR_WIELD)) && w_type == GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) && can_gain_exp_from(ch, victim)) {
-				// this verifies w_type to make sure it's a normal weapon attack
-				gain_ability_exp(ch, ABIL_READY_BLOOD_WEAPONS, 2);
-			}
 			
 			// raw damage modified by hunt
 			if (IS_NPC(victim) && MOB_FLAGGED(victim, MOB_ANIMAL) && has_player_tech(ch, PTECH_BONUS_VS_ANIMALS)) {
@@ -3514,11 +3509,6 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 					gain_ability_exp(ch, ABIL_WEAPON_PROFICIENCY, 5);
 				}
 				gain_ability_exp(ch, ABIL_FINESSE, 2);
-			
-				// fireball skill gain
-				if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_VNUM(GET_EQ(ch, WEAR_WIELD)) == o_FIREBALL) {
-					gain_ability_exp(ch, ABIL_READY_FIREBALL, 2);
-				}
 			}
 		}
 		if (result >= 0 && combat_round && can_gain_skill && !IS_NPC(victim) && can_gain_exp_from(victim, ch)) {

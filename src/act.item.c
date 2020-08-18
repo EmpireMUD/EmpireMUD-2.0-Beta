@@ -1749,7 +1749,7 @@ void do_eq_delete(char_data *ch, char *argument) {
 	
 	LL_DELETE(GET_EQ_SETS(ch), eq_set);
 	free_player_eq_set(eq_set);
-	SAVE_CHAR(ch);
+	queue_delayed_update(ch, CDU_SAVE);
 }
 
 
@@ -1851,7 +1851,7 @@ void do_eq_set(char_data *ch, char *argument) {
 	}
 	
 	msg_to_char(ch, "Your current equipment has been saved as '%s'.\r\n", argument);
-	SAVE_CHAR(ch);
+	queue_delayed_update(ch, CDU_SAVE);
 	
 	command_lag(ch, WAIT_OTHER);
 }
@@ -3613,7 +3613,7 @@ void trade_buy(char_data *ch, char *argument) {
 		tpd->obj = NULL;
 		
 		// cleanup
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 		save_trading_post();
 		return;
 	}
@@ -3760,7 +3760,7 @@ void trade_collect(char_data *ch, char *argument) {
 	}
 	
 	if (any) {
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 		save_trading_post();
 	}
 	else {
@@ -3908,7 +3908,7 @@ void trade_post(char_data *ch, char *argument) {
 		tpd->obj = obj;
 		remove_from_object_list(obj);
 		
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 		save_trading_post();
 	}
 }
@@ -4243,7 +4243,7 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		msg_to_char(ch, "You don't seem to be able to retrieve anything like that.\r\n");
 	}
 	else {
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 		EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
 	}
 }
@@ -4375,7 +4375,7 @@ void warehouse_store(char_data *ch, char *argument) {
 	}
 
 	if (done) {
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 		EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
 	}
 }

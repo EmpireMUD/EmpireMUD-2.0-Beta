@@ -1,6 +1,11 @@
 #0
 Gift of Nature~
-0 -1 1.00 0 0
+ij -1 1.00 0 h
+A
+16 1
+T f 1
+X f
+0
 S
 #1
 Fly~
@@ -22,7 +27,14 @@ X b
 S
 #2
 Ancient Blood~
-0 -1 1.00 0 0
+0 -1 1.00 0 l
+A
+20 1
+D 1 76 0
+T f 1
+T e 0
+X f
+0
 S
 #3
 Backstab~
@@ -38,11 +50,28 @@ Null Mana~
 S
 #6
 Ready Blood Weapons~
-0 -1 1.00 0 0
+0 -1 1.00 0 bcn
+C
+unknown 0 0 3 40 0 -1 0 0 0 0
+D 4 1101 0
+D 4 1102 0
+D 4 1103 0
+D 4 1104 0
+D 4 1116 0
+D 4 1117 0
+D 4 1118 0
+D 4 1120 0
+D 4 1122 0
+T g 0
 S
 #7
 Boost~
-0 -1 1.00 0 0
+o -1 1.00 0 0
+A
+20 50
+T f 1
+X f
+0
 S
 #8
 Claws~
@@ -347,7 +376,12 @@ T e 1
 S
 #66
 Stamina~
-0 -1 1.00 0 0
+0 -1 1.50 0 m
+A
+6 1
+T f 1
+X f
+0
 S
 #67
 By Moonlight~
@@ -499,7 +533,12 @@ T e 1
 S
 #92
 Endurance~
-0 -1 1.00 0 0
+l -1 1.50 0 f
+A
+15 1
+T f 1
+X f
+0
 S
 #93
 Rescue~

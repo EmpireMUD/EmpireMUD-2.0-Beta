@@ -56,7 +56,7 @@ void add_room_to_world_tables(room_data *room);
 EVENT_CANCEL_FUNC(cancel_room_event);
 extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 void complete_building(room_data *room);
-void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter);
+void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
 extern struct complex_room_data *init_complex_data();
 void free_complex_data(struct complex_room_data *bld);
 void free_shared_room_data(struct shared_room_data *data);
@@ -529,7 +529,7 @@ void delete_room(room_data *room, bool check_exits) {
 	// ensure not owned (and update empire stuff if so)
 	if ((emp = ROOM_OWNER(room))) {
 		if ((ter = find_territory_entry(emp, room))) {
-			delete_territory_entry(emp, ter);
+			delete_territory_entry(emp, ter, TRUE);
 		}
 		
 		// update all empire cities
@@ -2151,7 +2151,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 		}
 		if (belongs != BELONGS_IN_TERRITORY_LIST(loc)) {	// do we need to add/remove the territory entry?
 			if (belongs && (ter = find_territory_entry(ROOM_OWNER(loc), loc))) {	// losing
-				delete_territory_entry(ROOM_OWNER(loc), ter);
+				delete_territory_entry(ROOM_OWNER(loc), ter, TRUE);
 			}
 			else if (!belongs && !find_territory_entry(ROOM_OWNER(loc), loc)) {	// adding
 				create_territory_entry(ROOM_OWNER(loc), loc);
@@ -2410,9 +2410,10 @@ struct empire_territory_data *create_territory_entry(empire_data *emp, room_data
 *
 * @param empire_data *emp Which empire.
 * @param struct empire_territory_data *ter Which entry to delete.
+* @param bool make_npcs_homeless If TRUE, any NPCs in the territory become homeless.
 */
-void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter) {
-	void delete_room_npcs(room_data *room, struct empire_territory_data *ter);
+void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless) {
+	void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
 	extern struct empire_territory_data *global_next_territory_entry;
 	
 	// prevent loss
@@ -2420,7 +2421,7 @@ void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter)
 		global_next_territory_entry = ter->hh.next;
 	}
 
-	delete_room_npcs(NULL, ter);
+	delete_room_npcs(NULL, ter, make_npcs_homeless);
 	ter->npcs = NULL;
 	
 	HASH_DEL(EMPIRE_TERRITORY_LIST(emp), ter);
@@ -2527,7 +2528,7 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 		if (e == emp || !emp) {
 			HASH_ITER(hh, EMPIRE_TERRITORY_LIST(e), ter, next_ter) {
 				if (!ter->marked) {
-					delete_territory_entry(e, ter);
+					delete_territory_entry(e, ter, TRUE);
 				}
 			}
 		}

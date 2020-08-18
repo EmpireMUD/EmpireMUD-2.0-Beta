@@ -471,6 +471,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	void save_trading_post();
 
 	struct empire_trade_data *trade, *next_trade;
+	struct ability_data_list *adl, *next_adl;
 	struct trading_post_data *tpd, *next_tpd;
 	struct archetype_gear *gear, *next_gear;
 	obj_data *proto, *obj_iter, *next_obj;
@@ -479,6 +480,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	archetype_data *arch, *next_arch;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
+	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	event_data *event, *next_event;
 	morph_data *morph, *next_morph;
@@ -627,6 +629,22 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_ADV, GET_ADV_VNUM(adv));
+		}
+	}
+	
+	// update abilities
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		found = FALSE;
+		LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next_adl) {
+			if (adl->type == ADL_READY_WEAPON && adl->vnum == vnum) {
+				LL_DELETE(ABIL_DATA(abil), adl);
+				free(adl);
+				found = TRUE;
+			}
+		}
+		
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_ABIL, ABIL_VNUM(abil));
 		}
 	}
 	
@@ -854,6 +872,20 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			remove_thing_from_resource_list(&GET_ACTION_RESOURCES(desc->character), RES_OBJECT, vnum);
 		}
 		
+		if (GET_OLC_ABILITY(desc)) {
+			found = FALSE;
+			LL_FOREACH_SAFE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl, next_adl) {
+				if (adl->type == ADL_READY_WEAPON && adl->vnum == vnum) {
+					LL_DELETE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl);
+					free(adl);
+					found = TRUE;
+				}
+			}
+		
+			if (found) {
+				msg_to_desc(desc, "An object listed in the data for the ability you're editing has been removed.\r\n");
+			}
+		}
 		if (GET_OLC_ADVENTURE(desc)) {
 			found = FALSE;
 			found |= delete_link_rule_by_portal(&(GET_OLC_ADVENTURE(desc)->linking), vnum);
@@ -1226,10 +1258,12 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	struct adventure_link_rule *link;
 	struct global_data *glb, *next_glb;
 	archetype_data *arch, *next_arch;
+	ability_data *abil, *next_abil;
 	craft_data *craft, *next_craft;
 	morph_data *morph, *next_morph;
 	event_data *event, *next_event;
 	quest_data *quest, *next_quest;
+	struct ability_data_list *adl;
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
 	sector_data *sect, *next_sect;
@@ -1255,6 +1289,17 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of object %d (%s):\r\n", vnum, GET_OBJ_SHORT_DESC(proto));
+	
+	// abilities
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_READY_WEAPON && adl->vnum == vnum) {
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+				break;
+			}
+		}
+	}
 	
 	// adventure zones
 	HASH_ITER(hh, adventure_table, adv, next_adv) {

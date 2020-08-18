@@ -559,6 +559,7 @@ Island flags:
  !AGGRO - Prevents aggro mobs, and guard towers won't fire
  !CUSTOMIZE - Cannot be renamed by players
  CONTINENT - Is a whole continent (affects adventure spawns)
+ !CHART - Cannot be charted by players
 
 See also: CHART, GRANT
 #d
@@ -1068,6 +1069,7 @@ crops      Immort   Shows tile counts for all the crops (vnum/name optional).
 currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
 factions   Immort   Shows a player's faction levels.
+homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
 learned    Immort   Shows you learned recipes.
@@ -1152,6 +1154,15 @@ This command shows you all of a player's faction reputation levels. It can
 be filtered by name.
 
 See also: FACTION, SET FACTION
+#e
+"SHOW HOMELESS"
+
+Usage:  show homeless <empire>
+
+This command shows the list of homeless NPCs for the empire including the
+location where they previously lived.
+
+See also: HOMELESS CITIZENS
 #e
 "SHOW IGNORING"
 

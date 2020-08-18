@@ -549,6 +549,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_NUM_RANKS(emp)  ((emp)->num_ranks)
 #define EMPIRE_RANK(emp, num)  ((emp)->rank[(num)])
 #define EMPIRE_FRONTIER_TRAITS(emp)  ((emp)->frontier_traits)
+#define EMPIRE_HOMELESS_CITIZENS(emp)  ((emp)->homeless)
 #define EMPIRE_COINS(emp)  ((emp)->coins)
 #define EMPIRE_COMPLETED_GOALS(emp)  ((emp)->completed_goals)
 #define EMPIRE_PRIV(emp, num)  ((emp)->priv[(num)])
@@ -601,7 +602,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_TOTAL_WEALTH(emp)  (EMPIRE_WEALTH(emp) + (EMPIRE_COINS(emp) * COIN_VALUE))
 #define EXPLICIT_BANNER_TERMINATOR(emp)  (EMPIRE_BANNER_HAS_UNDERLINE(emp) ? "\t0" : "")
 #define OUTSKIRTS_CLAIMS_AVAILABLE(emp)  (land_can_claim((emp), TER_OUTSKIRTS) + land_can_claim((emp), TER_FRONTIER) - EMPIRE_TERRITORY((emp), TER_FRONTIER))
-#define TRIGGER_DELAYED_REFRESH(emp, flag)  { SET_BIT(EMPIRE_DELAYED_REFRESH(emp), (flag)); check_delayed_refresh = TRUE; }
+#define TRIGGER_DELAYED_REFRESH(emp, flag)  { SET_BIT(EMPIRE_DELAYED_REFRESH(emp), (flag)); check_empire_refresh = TRUE; }
 
 // definitions
 #define OFFENSE_HAS_WEIGHT(off)  (!IS_SET((off)->flags, OFF_AVENGED | OFF_WAR))
@@ -908,7 +909,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OBJ_VNUM(obj)  ((obj)->vnum)
 
 // definitions
-#define IS_BLOOD_WEAPON(obj)  (GET_OBJ_VNUM(obj) == o_BLOODSWORD || GET_OBJ_VNUM(obj) == o_BLOODSTAFF || GET_OBJ_VNUM(obj) == o_BLOODSPEAR || GET_OBJ_VNUM(obj) == o_BLOODSKEAN || GET_OBJ_VNUM(obj) == o_BLOODMACE)
 #define IS_STOLEN(obj)  (GET_STOLEN_TIMER(obj) > 0 && (config_get_int("stolen_object_timer") * SECS_PER_REAL_MIN) + GET_STOLEN_TIMER(obj) > time(0))
 
 // helpers
@@ -1181,6 +1181,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OLC_FLAGS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_flags))
 #define GET_OLC_MAX_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_max_vnum))
 #define GET_OLC_MIN_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_min_vnum))
+#define GET_PASSIVE_BUFFS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->passive_buffs))
 #define GET_PLAYER_COINS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->coins))
 #define GET_PLEDGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->pledge))
 #define GET_PROMO_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->promo_id))

@@ -64,7 +64,7 @@ extern int max_playing;
 extern char *help;
 
 // external functions
-void save_all_players();
+void save_all_players(bool delay);
 extern char *flush_reduced_color_codes(descriptor_data *desc);
 void mobile_activity(void);
 void show_string(descriptor_data *d, char *input);
@@ -1066,7 +1066,7 @@ void heartbeat(int heart_pulse) {
 		if (debug_log && HEARTBEAT(15)) { log("debug 19a:\t%lld", microtime()); }
 		if (++mins_since_crashsave >= 5) {
 			mins_since_crashsave = 0;
-			save_all_players();
+			save_all_players(TRUE);
 			if (debug_log && HEARTBEAT(15)) { log("debug 19b:\t%lld", microtime()); }
 		}
 		
@@ -3932,7 +3932,7 @@ void init_game(ush_int port) {
 	log("Entering game loop.");
 	game_loop(mother_desc);
 
-	save_all_players();
+	save_all_players(FALSE);
 
 	log("Closing all sockets.");
 	while (descriptor_list)

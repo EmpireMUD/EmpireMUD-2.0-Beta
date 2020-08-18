@@ -392,14 +392,35 @@ struct time_info_data *real_time_passed(time_t t2, time_t t1) {
 //// EMPIRE UTILS ////////////////////////////////////////////////////////////
 
 /**
-* Checks all empires for delayed-refresh commands.
+* Checks players and empires for delayed-refresh commands.
 */
 void run_delayed_refresh(void) {
 	void complete_goal(empire_data *emp, struct empire_goal *goal);
 	extern int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island);
 	void count_quest_tasks(struct req_data *list, int *complete, int *total);
+	void refresh_passive_buffs(char_data *ch);
+	extern struct char_delayed_update *char_delayed_update_list;
 	
-	if (check_delayed_refresh) {
+	struct char_delayed_update *cdu, *next_cdu;
+	
+	// player portion
+	HASH_ITER(hh, char_delayed_update_list, cdu, next_cdu) {
+		// CDU_x: functionality for delayed update types
+		if (IS_SET(cdu->type, CDU_PASSIVE_BUFFS)) {
+			refresh_passive_buffs(cdu->ch);
+		}
+		
+		// do this one last (anything above may be save-able)
+		if (IS_SET(cdu->type, CDU_SAVE)) {
+			SAVE_CHAR(cdu->ch);
+		}
+		
+		HASH_DEL(char_delayed_update_list, cdu);
+	}
+
+	
+	// empire portion
+	if (check_empire_refresh) {
 		struct empire_goal *goal, *next_goal;
 		int complete, total, crop_var;
 		empire_data *emp, *next_emp;
@@ -439,7 +460,7 @@ void run_delayed_refresh(void) {
 			EMPIRE_DELAYED_REFRESH(emp) = NOBITS;
 		}
 		
-		check_delayed_refresh = FALSE;
+		check_empire_refresh = FALSE;
 	}
 }
 
@@ -2489,7 +2510,7 @@ void determine_gear_level(char_data *ch) {
 	extern const struct wear_data_type wear_data[NUM_WEARS];
 
 	double total, slots;
-	int avg, level, pos;
+	int avg, level, pos, old;
 	
 	// sanity check: we really have no work to do for mobs
 	if (IS_NPC(ch)) {
@@ -2527,7 +2548,12 @@ void determine_gear_level(char_data *ch) {
 	// player's gear level (which will be added to skill level) is:
 	level = avg + 50 - 100;	// 50 higher than the average scaled level of their gear, -100 to compensate for skill level
 	
+	old = GET_GEAR_LEVEL(ch);
 	GET_GEAR_LEVEL(ch) = MAX(level, 0);
+	
+	if (old != GET_GEAR_LEVEL(ch)) {
+		queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
+	}
 }
 
 
@@ -5848,7 +5874,7 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 			ch = NULL;
 		}
 		else {
-			SAVE_CHAR(ch);
+			queue_delayed_update(ch, CDU_SAVE);
 		}
 	}
 }

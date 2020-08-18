@@ -475,9 +475,6 @@ void point_update_char(char_data *ch) {
 			gain_ability_exp(ch, ABIL_STABLEMASTER, 2);
 		}
 		
-		gain_ability_exp(ch, ABIL_GIFT_OF_NATURE, 2);
-		gain_ability_exp(ch, ABIL_ARCANE_POWER, 2);
-		
 		run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_HOURLY);
 		
 		// death count decrease after 3 minutes without a death
@@ -2154,14 +2151,6 @@ int move_gain(char_data *ch, bool info_only) {
 	else {
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_MOVE_REGEN(ch);
-		
-		if (has_ability(ch, ABIL_STAMINA)) {
-			gain *= 2;
-			
-			if (GET_MOVE(ch) < GET_MAX_MOVE(ch) && !info_only) {
-				gain_ability_exp(ch, ABIL_STAMINA, 1);
-			}
-		}
 		
 		if (HAS_BONUS_TRAIT(ch, BONUS_MOVE_REGEN)) {
 			gain += 1 + (get_approximate_level(ch) / 20);

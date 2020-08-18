@@ -441,13 +441,12 @@ See also: RIDE
 
 Gift of Nature (Natural Magic ability)
 
-Nature mages blessed with the Gift of Nature have 35% more mana than those
-without it. This modifies your total mana, so anything else that increases
-your mana pool will be modified by Gift of Nature.
+Nature mages blessed with the Gift of Nature have more mana than those without
+it. Your total mana increases based on your level and role.
 
 Gift of Nature gains experience passively over time.
 
-See also: ARCANE POWER
+See also: ARCANE POWER, ROLE
 #
 "GRIFFIN FAMILIAR"
 

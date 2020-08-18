@@ -127,6 +127,7 @@ const char *ability_flags[] = {
 	"TANK-ROLE",
 	"RANGED-ONLY",
 	"IGNORE-SUN",
+	"UNSCALED-BUFF",
 	"\n"
 };
 
@@ -137,7 +138,9 @@ const char *ability_type_flags[] = {
 	"BUFF",
 	"DAMAGE",
 	"DOT",
-	"PLAYER-TECH",
+	"PTECH",
+	"PASSIVE-BUFF",	// 5
+	"READY-WEAPONS",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -198,6 +201,7 @@ const char *ability_custom_types[] = {
 const char *ability_data_types[] = {
 	"PTECH",
 	"EFFECT",
+	"READY-WEAPON",
 	"\n"
 };
 
@@ -224,6 +228,7 @@ const char *ability_gain_hooks[] = {
 	"ONLY-VS-ANIMAL",	// 10
 	"VAMPIRE-FEEDING",
 	"MOVING",
+	"ONLY-USING-READY-WEAPON",
 	"\n"
 };
 
@@ -646,6 +651,7 @@ const char *preference_bits[] = {
 	"AUTOSWIM",
 	"!ITEM-QUALITY",
 	"ITEM-DETAILS",
+	"!EXITS",
 	"\n"
 };
 
@@ -722,6 +728,7 @@ const struct toggle_data_type toggle_data[] = {
 	{ "item-quality", TOG_ONOFF, PRF_ITEM_QUALITY, 0, NULL },
 	
 	{ "channel-joins", TOG_OFFON, PRF_NO_CHANNEL_JOINS, 0, NULL },
+	{ "exits", TOG_OFFON, PRF_NO_EXITS, 0, NULL },
 	
 	// imm section
 	{ "wiznet", TOG_OFFON, PRF_NOWIZ, LVL_START_IMM, NULL },
@@ -851,6 +858,7 @@ const char *player_tech_types[] = {
 	"Harvest",
 	"Pick",
 	"Quarry",	// 75
+	"Drink-Blood-Faster",
 	"\n"
 };
 
@@ -3117,11 +3125,12 @@ const char *function_flags[] = {
 
 // ISLE_x -- island flags
 const char *island_bits[] = {
-	"NEWBIE",
+	"NEWBIE",	// 0
 	"!AGGRO",
 	"!CUSTOMIZE",
 	"CONTINENT",
 	"*",	// has-custom-desc (internal use only)
+	"!CHART",	// 5
 	"\n"
 };
 

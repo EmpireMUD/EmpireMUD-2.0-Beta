@@ -69,6 +69,7 @@ extern int get_main_island(empire_data *emp);
 extern int get_total_score(empire_data *emp);
 extern char *get_room_name(room_data *room, bool color);
 extern bool is_trading_with(empire_data *emp, empire_data *partner);
+struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 void identify_obj_to_char(obj_data *obj, char_data *ch);
 void refresh_all_quests(char_data *ch);
@@ -3596,7 +3597,7 @@ ACMD(do_defect) {
 	else {
 		GET_LOYALTY(ch) = NULL;
 		add_cooldown(ch, COOLDOWN_LEFT_EMPIRE, 2 * SECS_PER_REAL_HOUR);
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 		
 		log_to_empire(e, ELOG_MEMBERS, "%s has defected from the empire", PERS(ch, ch, 1));
 		msg_to_char(ch, "You defect from the empire!\r\n");
@@ -3690,7 +3691,7 @@ ACMD(do_demote) {
 			file = FALSE;
 		}
 		else {
-			SAVE_CHAR(victim);
+			queue_delayed_update(victim, CDU_SAVE);
 		}
 	}
 
@@ -4903,7 +4904,7 @@ ACMD(do_expel) {
 		}
 		else {
 			refresh_all_quests(targ);
-			SAVE_CHAR(targ);
+			queue_delayed_update(targ, CDU_SAVE);
 		}
 
 		// do this AFTER the save -- fixes member counts, etc
@@ -5137,6 +5138,7 @@ ACMD(do_home) {
 			// clear out npcs
 			if ((ter = find_territory_entry(emp, real))) {
 				while (ter->npcs) {
+					make_citizen_homeless(emp, ter->npcs);
 					delete_territory_npc(ter, ter->npcs);
 				}
 			}
@@ -5152,6 +5154,7 @@ ACMD(do_home) {
 				
 				if ((ter = find_territory_entry(emp, iter))) {
 					while (ter->npcs) {
+						make_citizen_homeless(emp, ter->npcs);
 						delete_territory_npc(ter, ter->npcs);
 					}
 				}
@@ -5861,7 +5864,7 @@ ACMD(do_pledge) {
 		add_cooldown(ch, COOLDOWN_PLEDGE, SECS_PER_REAL_HOUR);
 		log_to_empire(e, ELOG_MEMBERS, "%s has offered %s pledge to this empire", PERS(ch, ch, 1), REAL_HSHR(ch));
 		msg_to_char(ch, "You offer your pledge to %s.\r\n", EMPIRE_NAME(e));
-		SAVE_CHAR(ch);
+		queue_delayed_update(ch, CDU_SAVE);
 	}
 }
 
@@ -6352,7 +6355,7 @@ ACMD(do_promote) {
 			file = FALSE;
 		}
 		else {
-			SAVE_CHAR(victim);
+			queue_delayed_update(victim, CDU_SAVE);
 		}
 	}
 	

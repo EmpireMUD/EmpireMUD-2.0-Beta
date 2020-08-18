@@ -28,6 +28,7 @@
 *   Getters
 *   Account DB
 *   Core Player DB
+*   Delayed Update System
 *   Autowiz Wizlist Generator
 *   Helpers
 *   Empire Player Management
@@ -57,6 +58,7 @@ void update_class(char_data *ch);
 
 // local protos
 void check_eq_sets(char_data *ch);
+void clear_delayed_update(char_data *ch);
 void clear_player(char_data *ch);
 void delete_player_character(char_data *ch);
 void free_player_eq_set(struct player_eq_set *eq_set);
@@ -790,6 +792,7 @@ void free_char(char_data *ch) {
 	void free_mail(struct mail_data *mail);
 	void free_player_completed_quests(struct player_completed_quest **hash);
 	void free_player_quests(struct player_quest *list);
+	void remove_passive_buff(char_data *ch, struct affected_type *aff);
 
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
@@ -959,6 +962,10 @@ void free_char(char_data *ch) {
 			free_mail(mail);
 		}
 		
+		while (GET_PASSIVE_BUFFS(ch)) {
+			remove_passive_buff(ch, GET_PASSIVE_BUFFS(ch));
+		}
+		
 		HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
 			HASH_DEL(GET_SKILL_HASH(ch), skill);
 			free(skill);
@@ -1042,6 +1049,9 @@ void free_char(char_data *ch) {
 	if (ch->desc) {
 		ch->desc->character = NULL;
 	}
+	
+	// clear any pending updates
+	clear_delayed_update(ch);
 
 	/* find_char helper */
 	if (ch->script_id > 0) {
@@ -2299,6 +2309,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		}
 	}
 	
+	// unaffect: passives
+	LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
+		affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
+	}
+	
 	// unaffect: affects
 	af_list = NULL;
 	while ((af = ch->affected)) {
@@ -2631,6 +2646,11 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	// END PLAYER FILE
 	fprintf(fl, "End Player File\n");
 	
+	// re-affect: passives
+	LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
+		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
+	}
+	
 	// re-apply: affects
 	for (af = af_list; af; af = next_af) {
 		next_af = af->next;
@@ -2789,6 +2809,56 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	
 	// END DELAY-LOADED SECTION
 	fprintf(fl, "End Player File\n");
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// DELAYED UPDATE SYSTEM ///////////////////////////////////////////////////
+
+struct char_delayed_update *char_delayed_update_list = NULL;	// characters who need updating
+
+
+/**
+* Removes a queued char update, if any exists. This is generally called while
+* extracting a character.
+*
+* @param char_data *ch The character to delete update entries for.
+*/
+void clear_delayed_update(char_data *ch) {
+	struct char_delayed_update *cdu;
+	int id;
+	
+	// use ch->script_id instead of char_script_id() because we don't want to assign one if it doesn't have one
+	if (ch && (id = ch->script_id) > 0) {
+		HASH_FIND_INT(char_delayed_update_list, &id, cdu);
+		if (cdu) {
+			HASH_DEL(char_delayed_update_list, cdu);
+			free(cdu);
+		}
+	}
+}
+
+
+/**
+* Queues a some kind of delayed update for a character.
+*
+* @param char_data *ch The player.
+* @param bitvector_t type The CDU_ flag(s) to queue.
+*/
+void queue_delayed_update(char_data *ch, bitvector_t type) {
+	struct char_delayed_update *cdu;
+	int id;
+	
+	if (ch && !EXTRACTED(ch) && (id = char_script_id(ch)) > 0) {
+		HASH_FIND_INT(char_delayed_update_list, &id, cdu);
+		if (!cdu) {
+			CREATE(cdu, struct char_delayed_update, 1);
+			cdu->id = id;
+			cdu->ch = ch;
+			HASH_ADD_INT(char_delayed_update_list, id, cdu);
+		}
+		cdu->type |= type;
+	}
 }
 
 
@@ -3431,6 +3501,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	extern room_data *find_load_room(char_data *ch);
 	void give_level_zero_abilities(char_data *ch);
 	void refresh_all_quests(char_data *ch);
+	void refresh_passive_buffs(char_data *ch);
 	void reset_combat_meters(char_data *ch);
 	extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message);
 	
@@ -3574,7 +3645,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	determine_gear_level(ch);
 	add_all_gain_hooks(ch);
 	
-	SAVE_CHAR(ch);
+	queue_delayed_update(ch, CDU_SAVE);
 
 	// re-join slash-channels
 	global_mute_slash_channel_joins = TRUE;
@@ -3705,6 +3776,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	check_eq_sets(ch);
 	check_minipets(ch);
 	check_player_events(ch);
+	refresh_passive_buffs(ch);
 	
 	// break last reply if invis
 	if (GET_LAST_TELL(ch) && (repl = is_playing(GET_LAST_TELL(ch))) && (GET_INVIS_LEV(repl) > GET_ACCESS_LEVEL(ch) || (!IS_IMMORTAL(ch) && PRF_FLAGGED(repl, PRF_INCOGNITO)))) {
@@ -3721,7 +3793,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	msdp_update_room(ch);
 	
 	// now is a good time to save and be sure we have a good save file
-	SAVE_CHAR(ch);
+	queue_delayed_update(ch, CDU_SAVE);
 	
 	pause_affect_total = FALSE;
 	affect_total(ch);
@@ -3964,13 +4036,20 @@ void reset_char(char_data *ch) {
 
 /**
 * This saves all connected players.
+*
+* @param bool delay if TRUE, queues them instead of saving instantly
 */
-void save_all_players(void) {
+void save_all_players(bool delay) {
 	descriptor_data *desc;
 
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if ((STATE(desc) == CON_PLAYING) && !IS_NPC(desc->character)) {
-			SAVE_CHAR(desc->character);
+			if (delay) {
+				queue_delayed_update(desc->character, CDU_SAVE);
+			}
+			else {
+				SAVE_CHAR(desc->character);
+			}
 		}
 	}
 }

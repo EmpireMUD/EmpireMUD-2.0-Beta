@@ -7707,7 +7707,7 @@ void add_to_lookup_table(int uid, void *c) {
 
 	for (;lt->next; lt = lt->next)
 		if (lt->c == c) {
-			log ("Add_to_lookup failed. Already there.");
+			log ("Add_to_lookup failed. %d already there.", uid);
 			return;
 		}
 

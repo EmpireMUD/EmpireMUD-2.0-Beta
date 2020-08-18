@@ -82,6 +82,7 @@ const struct wear_data_type wear_data[NUM_WEARS];
 void adjust_building_tech(empire_data *emp, room_data *room, bool add);
 EVENT_CANCEL_FUNC(cancel_room_event);
 void check_delayed_load(char_data *ch);
+void clear_delayed_update(char_data *ch);
 void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
 void scale_item_to_level(obj_data *obj, int level);
@@ -392,7 +393,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {
-	// int diff, orig;
+	int diff, orig;
 	
 	if (add) {
 		SET_BIT(AFF_FLAGS(ch), bitv);
@@ -441,9 +442,9 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_MAX_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
 			// prevent from going negative
-			//orig = GET_MOVE(ch);
+			orig = GET_MOVE(ch);
 			SAFE_ADD(GET_MOVE(ch), mod, INT_MIN, INT_MAX, TRUE);
-			/*
+			
 			if (!IS_NPC(ch)) {
 				if (GET_MOVE(ch) < 0) {
 					GET_MOVE_DEFICIT(ch) -= GET_MOVE(ch);
@@ -455,16 +456,15 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					GET_MOVE(ch) -= diff;
 				}
 			}
-			*/
 			break;
 		case APPLY_HEALTH:
 			SAFE_ADD(GET_MAX_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
 			// prevent from going negative
-			//orig = GET_HEALTH(ch);
+			orig = GET_HEALTH(ch);
 			SAFE_ADD(GET_HEALTH(ch), mod, INT_MIN, INT_MAX, TRUE);
 			GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
-			/*
+			
 			if (!IS_NPC(ch)) {
 				if (GET_HEALTH(ch) < 1) {	// min 1 on health
 					GET_HEALTH_DEFICIT(ch) -= (GET_HEALTH(ch)-1);
@@ -481,15 +481,14 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 				// npcs cannot die this way
 				GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
 			}
-			*/
 			break;
 		case APPLY_MANA:
 			SAFE_ADD(GET_MAX_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
 			
 			// prevent from going negative
-			//orig = GET_MANA(ch);
+			orig = GET_MANA(ch);
 			SAFE_ADD(GET_MANA(ch), mod, INT_MIN, INT_MAX, TRUE);
-			/*
+			
 			if (!IS_NPC(ch)) {
 				if (GET_MANA(ch) < 0) {
 					GET_MANA_DEFICIT(ch) -= GET_MANA(ch);
@@ -501,7 +500,6 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 					GET_MANA(ch) -= diff;
 				}
 			}
-			*/
 			break;
 		case APPLY_BLOOD: {
 			SAFE_ADD(GET_EXTRA_BLOOD(ch), mod, INT_MIN, INT_MAX, TRUE);
@@ -738,13 +736,17 @@ void affect_total(char_data *ch) {
 		}
 	}
 	
-	// abilities
+	// remove passive buff abilities
 	if (!IS_NPC(ch)) {
+		LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
+			affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
+		}
 	}
 
-	// affects
-	for (af = ch->affected; af; af = af->next)
+	// remove affects
+	LL_FOREACH(ch->affected, af) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
+	}
 
 	// RESET!
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
@@ -774,6 +776,13 @@ void affect_total(char_data *ch) {
 			}
 		}
 	}
+	
+	// passive buff abilities
+	if (!IS_NPC(ch)) {
+		LL_FOREACH(GET_PASSIVE_BUFFS(ch), af) {
+			affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
+		}
+	}
 
 	for (af = ch->affected; af; af = af->next) {
 		affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
@@ -791,6 +800,7 @@ void affect_total(char_data *ch) {
 
 	// ability-based modifiers
 	if (!IS_NPC(ch)) {
+		/* old version of these abilities, pre-b5.100
 		if (has_ability(ch, ABIL_ENDURANCE)) {
 			GET_MAX_HEALTH(ch) = MIN(GET_MAX_HEALTH(ch), 1000) * 2.0 + MAX(GET_MAX_HEALTH(ch) - 1000, 0) * 1.25;
 		}
@@ -800,6 +810,7 @@ void affect_total(char_data *ch) {
 		if (has_ability(ch, ABIL_ARCANE_POWER)) {
 			GET_MAX_MANA(ch) *= 1.35;
 		}
+		*/
 	}
 
 	/* Make sure maximums are considered */
@@ -1268,6 +1279,9 @@ void extract_char(char_data *ch) {
 	if (ch->followers || ch->master) {
 		die_follower(ch);
 	}
+	
+	// if any:
+	clear_delayed_update(ch);
 }
 
 
@@ -2810,7 +2824,7 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, do
 void perform_abandon_room(room_data *room) {
 	void check_tavern_setup(room_data *room);
 	void deactivate_workforce_room(empire_data *emp, room_data *room);
-	void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter);
+	void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
 	void schedule_check_unload(room_data *room, bool offset);
 	
 	empire_data *emp = ROOM_OWNER(room);
@@ -2836,7 +2850,7 @@ void perform_abandon_room(room_data *room) {
 		}
 		// territory list
 		if ((ter = find_territory_entry(emp, room))) {
-			delete_territory_entry(emp, ter);
+			delete_territory_entry(emp, ter, TRUE);
 		}
 		
 		// quest tracker for members
@@ -5545,6 +5559,9 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 
 		affect_total(ch);
 		qt_wear_obj(ch, obj);
+		if (!IS_NPC(ch)) {
+			queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
+		}
 	}
 }
 
@@ -5982,6 +5999,9 @@ obj_data *unequip_char(char_data *ch, int pos) {
 
 		affect_total(ch);
 		qt_remove_obj(ch, obj);
+		if (!IS_NPC(ch)) {
+			queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
+		}
 	}
 
 	return obj;

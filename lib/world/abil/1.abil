@@ -92,7 +92,11 @@ Cleanse~
 S
 #117
 Ready Fireball~
-0 -1 1.00 0 0
+0 -1 1.00 0 bcn
+C
+unknown 0 0 2 30 0 -1 0 0 0 0
+D 4 1105 0
+T g 1
 S
 #118
 Lightningbolt~

@@ -1701,6 +1701,7 @@ ACMD(do_role) {
 			}
 			
 			msg_to_char(ch, "Your group role is now: %s.\r\n", class_role[(int) GET_CLASS_ROLE(ch)]);
+			queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
 		}
 	}
 	else {	// no arg

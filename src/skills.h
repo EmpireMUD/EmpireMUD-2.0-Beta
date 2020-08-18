@@ -91,7 +91,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 // #define SKILL_STEALTH  4
 // #define SKILL_SURVIVAL  5
 // #define SKILL_TRADE  6
-#define SKILL_VAMPIRE  7
+// #define SKILL_VAMPIRE  7
 
 
 // for ability definitions
@@ -99,12 +99,12 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 
 
 // ABIL_x: ability vnums
-#define ABIL_GIFT_OF_NATURE  0
-#define ABIL_ANCIENT_BLOOD  2
+// #define ABIL_GIFT_OF_NATURE  0
+// #define ABIL_ANCIENT_BLOOD  2
 #define ABIL_BACKSTAB  3
 // #define ABIL_WOLF_FORM  4
 #define ABIL_NULL_MANA  5
-#define ABIL_READY_BLOOD_WEAPONS  6
+// #define ABIL_READY_BLOOD_WEAPONS  6
 #define ABIL_BOOST  7
 #define ABIL_CLAWS  8
 #define ABIL_VAMP_COMMAND  9
@@ -132,7 +132,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_BLOOD_FORTITUDE  38
 // formerly: #define ABIL_LOCKS  41
 // formerly: #define ABIL_ROADS  49
-#define ABIL_STAMINA  66
+// #define ABIL_STAMINA  66
 #define ABIL_FISH  72
 #define ABIL_TRACK  73
 #define ABIL_RESIST_POISON  77
@@ -140,7 +140,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_REFLEXES  84
 #define ABIL_QUICK_BLOCK  86
 #define ABIL_REFORGE  87
-#define ABIL_ENDURANCE  92
+// #define ABIL_ENDURANCE  92
 #define ABIL_RESCUE  93
 #define ABIL_DISARM  94
 #define ABIL_SPARRING  95
@@ -160,7 +160,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_REJUVENATE  114
 #define ABIL_PURIFY  115
 #define ABIL_CLEANSE  116
-#define ABIL_READY_FIREBALL  117
+// #define ABIL_READY_FIREBALL  117
 #define ABIL_LIGHTNINGBOLT  118
 #define ABIL_COUNTERSPELL  120
 #define ABIL_ENTANGLE  121
@@ -213,7 +213,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 // formerly: #define ABIL_SKILLED_LABOR  201
 #define ABIL_MASTER_SURVIVALIST  205
 // formerly: #define ABIL_TUNNEL  206
-#define ABIL_ARCANE_POWER  207
+// #define ABIL_ARCANE_POWER  207
 #define ABIL_OUTRAGE  209
 // #define ABIL_DREAD_BLOOD_FORM  211
 // #define ABIL_SAVAGE_WEREWOLF_FORM  212
