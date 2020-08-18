@@ -366,8 +366,6 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 					free(mount);
 				}
 			}
-			
-			// TODO minipets
 		}
 	}
 	
