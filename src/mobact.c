@@ -1380,12 +1380,12 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 
 
 /**
-* Scales a mob below the master's level like a familiar.
+* Scales a mob below the master's level like a companion.
 *
 * @param char_data *mob The mob to scale.
 * @param char_data *master The person to base it on.
 */
-void scale_mob_as_familiar(char_data *mob, char_data *master) {
+void scale_mob_as_companion(char_data *mob, char_data *master) {
 	int scale_level;
 	
 	scale_level = get_approximate_level(master);

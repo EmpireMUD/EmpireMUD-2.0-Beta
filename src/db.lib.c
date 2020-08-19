@@ -6203,7 +6203,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 		}
 		if (ROOM_PEOPLE(room)) {
 			for (mob = ROOM_PEOPLE(room); mob; mob = mob->next_in_room) {
-				if (mob && IS_NPC(mob) && GET_MOB_VNUM(mob) != NOTHING && !MOB_FLAGGED(mob, MOB_EMPIRE | MOB_FAMILIAR)) {
+				if (mob && IS_NPC(mob) && GET_MOB_VNUM(mob) != NOTHING && !MOB_FLAGGED(mob, MOB_EMPIRE) && !GET_COMPANION(mob)) {
 					// C M vnum flags rope-vnum
 					fprintf(fl, "C M %d %s %d\n", GET_MOB_VNUM(mob), bitv_to_alpha(MOB_FLAGS(mob)), GET_ROPE_VNUM(mob));
 					

@@ -2844,6 +2844,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					
+					else if (!str_cmp(field, "add_companion")) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
+							struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
+							char_data *pet = mob_proto(atoi(subfield));
+							if (pet) {
+								add_companion(c, GET_MOB_VNUM(pet), NO_ABIL);
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, attempting to add invalid companion: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						
+						strcpy(str, "0");
+					}
+					
 					else if (!str_cmp(field, "add_learned")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							void add_learned_craft(char_data *ch, any_vnum vnum);
@@ -3206,6 +3221,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "cha") || !str_cmp(field, "charisma")) {
 						snprintf(str, slen, "%d", GET_CHARISMA(c));
 					}
+					else if (!str_cmp(field, "companion")) {
+						if (GET_COMPANION(c)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(GET_COMPANION(c)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
 					else if (!str_cmp(field, "completed_quest")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							any_vnum vnum = atoi(subfield);
@@ -3511,7 +3534,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'h': {	// char.h*
-					if (!str_cmp(field, "has_component")) {
+					if (!str_cmp(field, "has_companion")) {
+						struct companion_data *has_companion(char_data *ch, any_vnum vnum);
+						
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield) && has_companion(c, atoi(subfield)) != NULL) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
+					else if (!str_cmp(field, "has_component")) {
 						// args: (type, number) -- type may be vnum or name
 						char arg1[256], arg2[256];
 						struct resource_data *resources = NULL;
@@ -4066,7 +4099,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'r': {	// char.r*
-					if (!str_cmp(field, "remove_learned")) {
+					if (!str_cmp(field, "remove_companion")) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
+							void remove_companion(char_data *ch, any_vnum vnum);
+							remove_companion(c, atoi(subfield));
+						}
+						
+						strcpy(str, "0");
+					}
+					else if (!str_cmp(field, "remove_learned")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							void remove_learned_craft(char_data *ch, any_vnum vnum);
 							remove_learned_craft(c, atoi(subfield));

@@ -655,7 +655,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// check master's solo role
-	if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_FAMILIAR) && ch->master && !check_solo_role(ch->master)) {
+	if (IS_NPC(ch) && GET_COMPANION(ch) && ch->master && !check_solo_role(ch->master)) {
 		act("$N vanishes because you're in the solo role but not alone.", FALSE, ch->master, NULL, ch, TO_CHAR);
 		act("$N vanishes.", FALSE, ch->master, NULL, ch, TO_NOTVICT);
 		extract_char(ch);
@@ -904,8 +904,8 @@ void real_update_char(char_data *ch) {
 			continue;
 		}
 		
-		// don't care about familiars
-		if (MOB_FLAGGED(room_ch, MOB_FAMILIAR)) {
+		// don't care about companions
+		if (GET_COMPANION(room_ch)) {
 			continue;
 		}
 		

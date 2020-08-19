@@ -581,11 +581,13 @@ See also: BOARD, SAIL, UNLOAD, SHIPS
 #
 DISMISS
 
-Usage:  dismiss <familiar | minipet>
+Usage:  dismiss <companion | minipet>
 
-This command causes your familiar or mini-pet to leave. You can target it by
-name if it's in the room with you, or else can type 'dismiss familiar' or
+This command causes your companion or mini-pet to leave. You can target it by
+name if it's in the room with you, or else can type 'dismiss companion' or
 'dismiss minipet' to dismiss it anywhere in the world.
+
+See also: COMPANION
 #
 DISPATCH
 

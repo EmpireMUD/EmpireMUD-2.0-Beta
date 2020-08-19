@@ -2298,8 +2298,8 @@ char *two_arguments(char *argument, char *first_arg, char *second_arg) {
 //// MOBILE UTILS ////////////////////////////////////////////////////////////
 
 /**
-* Despawns all familiars and charmies a player has. This is usually called upon
-* player death.
+* Despawns all companionss and charmies a player has. This is usually called
+* upon player death.
 *
 * @param char_data *ch The person whose followers to despawn.
 */
@@ -2310,7 +2310,7 @@ void despawn_charmies(char_data *ch) {
 		next_iter = iter->next;
 		
 		if (IS_NPC(iter) && iter->master == ch) {
-			if (MOB_FLAGGED(iter, MOB_FAMILIAR) || AFF_FLAGGED(iter, AFF_CHARM)) {
+			if (GET_COMPANION(iter) == ch || AFF_FLAGGED(iter, AFF_CHARM)) {
 				act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
 				extract_char(iter);
 			}

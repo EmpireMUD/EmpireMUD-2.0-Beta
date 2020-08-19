@@ -98,6 +98,7 @@ struct {
 	{ ABILT_PLAYER_TECH, NULL, NULL },
 	{ ABILT_PASSIVE_BUFF, NULL, NULL },
 	{ ABILT_READY_WEAPONS, NULL, NULL },
+	{ ABILT_COMPANION, NULL, NULL },
 	
 	{ NOBITS }	// this goes last
 };
@@ -130,6 +131,10 @@ char *ability_data_display(struct ability_data_list *adl) {
 		}
 		case ADL_READY_WEAPON: {
 			snprintf(output, sizeof(output), "%s: [%d] %s", temp, adl->vnum, get_obj_name_by_proto(adl->vnum));
+			break;
+		}
+		case ADL_COMPANION: {
+			snprintf(output, sizeof(output), "%s: [%d] %s", temp, adl->vnum, get_mob_name_by_proto(adl->vnum, FALSE));
 			break;
 		}
 		default: {
@@ -909,6 +914,21 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 			
 			if (!found) {
 				continue;	// not using the item
+			}
+		}
+		if (IS_SET(agh->triggers, AGH_ONLY_USING_COMPANION)) {
+			// check if using a cmpanion
+			found = FALSE;
+			if (GET_COMPANION(ch) && (abil = find_ability_by_vnum(agh->ability))) {
+				LL_FOREACH(ABIL_DATA(abil), adl) {
+					if (adl->type == ADL_COMPANION && adl->vnum == GET_MOB_VNUM(GET_COMPANION(ch))) {
+						found = TRUE;
+						break;
+					}
+				}
+			}
+			if (!found) {
+				continue;	// not using the companion
 			}
 		}
 		
@@ -3449,7 +3469,7 @@ OLC_MODULE(abiledit_cooldown) {
 OLC_MODULE(abiledit_cost) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS)) {
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION)) {
 		msg_to_char(ch, "Only command abilities and certain other types have this property.\r\n");
 	}
 	else {
@@ -3473,7 +3493,7 @@ OLC_MODULE(abiledit_costperscalepoint) {
 OLC_MODULE(abiledit_costtype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS)) {
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION)) {
 		msg_to_char(ch, "Only command abilities and certain other types have this property.\r\n");
 	}
 	else {
@@ -3520,6 +3540,9 @@ OLC_MODULE(abiledit_data) {
 	}
 	if (IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS)) {
 		allowed_types |= ADL_READY_WEAPON;
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_COMPANION)) {
+		allowed_types |= ADL_COMPANION;
 	}
 	
 	// arg1 arg2
@@ -3591,6 +3614,13 @@ OLC_MODULE(abiledit_data) {
 				case ADL_READY_WEAPON: {
 					if ((val_id = atoi(val_arg)) <= 0 || !obj_proto(val_id)) {
 						msg_to_char(ch, "Invalid weapon vnum to ready '%s'.\r\n", val_arg);
+						return;
+					}
+					break;
+				}
+				case ADL_COMPANION: {
+					if ((val_id = atoi(val_arg)) <= 0 || !mob_proto(val_id)) {
+						msg_to_char(ch, "Invalid mob vnum for companion '%s'.\r\n", val_arg);
 						return;
 					}
 					break;

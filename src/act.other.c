@@ -37,7 +37,7 @@
 */
 
 // configs for mini-pets
-#define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && (mob)->master == (ch) && !MOB_FLAGGED((mob), MOB_FAMILIAR) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
+#define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && (mob)->master == (ch) && !GET_COMPANION(mob) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
 bitvector_t default_minipet_flags = MOB_SENTINEL | MOB_SPAWNED | MOB_NO_LOOT | MOB_NO_EXPERIENCE;
 bitvector_t default_minipet_affs = AFF_NO_ATTACK | AFF_CHARM;
 
@@ -53,10 +53,9 @@ extern struct instance_data *find_instance_by_room(room_data *room, bool check_h
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 extern char *get_room_name(room_data *room, bool color);
-extern char_data *has_familiar(char_data *ch);
 extern bool is_ignoring(char_data *ch, char_data *victim);
 void scale_item_to_level(obj_data *obj, int level);
-void scale_mob_as_familiar(char_data *mob, char_data *master);
+void scale_mob_as_companion(char_data *mob, char_data *master);
 extern char *show_color_codes(char *string);
 
 // locals
@@ -1789,7 +1788,7 @@ ACMD(do_customize) {
 
 
 ACMD(do_dismiss) {
-	bool despawn_familiar(char_data *ch, mob_vnum vnum);
+	bool despawn_companion(char_data *ch, mob_vnum vnum);
 	
 	char_data *vict;
 	
@@ -1798,10 +1797,10 @@ ACMD(do_dismiss) {
 	if (!*arg) {
 		msg_to_char(ch, "Dismiss whom?\r\n");
 	}
-	else if (!strn_cmp(arg, "famil", 5) && is_abbrev(arg, "familiar")) {
-		// requires abbrev of at least "famil"
-		if (!despawn_familiar(ch, NOTHING)) {
-			msg_to_char(ch, "You do not have a familiar to dismiss.\r\n");
+	else if (!strn_cmp(arg, "comp", 4) && is_abbrev(arg, "companion")) {
+		// requires abbrev of at least "comp"
+		if (!despawn_companion(ch, NOTHING)) {
+			msg_to_char(ch, "You do not have a companion to dismiss.\r\n");
 		}
 		else {
 			send_config_msg(ch, "ok_string");
@@ -1819,8 +1818,8 @@ ACMD(do_dismiss) {
 	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!IS_NPC(vict) || vict->master != ch || (!MOB_FLAGGED(vict, MOB_FAMILIAR) && !IS_MINIPET_OF(vict, ch))) {
-		msg_to_char(ch, "You can only dismiss a familiar or mini-pet.\r\n");
+	else if (!IS_NPC(vict) || vict->master != ch || (!GET_COMPANION(vict) && !IS_MINIPET_OF(vict, ch))) {
+		msg_to_char(ch, "You can only dismiss a companion or mini-pet.\r\n");
 	}
 	else if (FIGHTING(vict) || GET_POS(vict) < POS_SLEEPING) {
 		act("You can't dismiss $M right now.", FALSE, ch, NULL, vict, TO_CHAR);
@@ -2462,7 +2461,7 @@ ACMD(do_minipets) {
 			SET_BIT(AFF_FLAGS(mob), default_minipet_affs);	// will this work?
 			
 			// try to scale mob to the summoner (most minipets have level caps of 1 tho)
-			scale_mob_as_familiar(mob, ch);
+			scale_mob_as_companion(mob, ch);
 			
 			char_to_room(mob, IN_ROOM(ch));
 			act("You whistle and $N appears!", FALSE, ch, NULL, mob, TO_CHAR);
@@ -3196,8 +3195,8 @@ ACMD(do_summon) {
 				msg_to_char(ch, "You must be in an empire to summon a bodyguard.\r\n");
 				return;
 			}
-			if (has_familiar(ch)) {
-				msg_to_char(ch, "You can't summon a bodyguard while you have a familiar or charmed follower.\r\n");
+			if (GET_COMPANION(ch)) {
+				msg_to_char(ch, "You can't summon a bodyguard -- you already have a companion.\r\n");
 				return;
 			}
 			if (!can_use_ability(ch, ability, cost_type, cost, cooldown)) {
@@ -3255,7 +3254,7 @@ ACMD(do_summon) {
 			setup_generic_npc(mob, emp, NOTHING, NOTHING);
 
 			// try to scale mob to the summoner
-			scale_mob_as_familiar(mob, ch);
+			scale_mob_as_companion(mob, ch);
 			
 			// spawn data
 			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED | MOB_NO_LOOT);
@@ -3265,7 +3264,6 @@ ACMD(do_summon) {
 			
 			if (familiar) {				
 				SET_BIT(AFF_FLAGS(mob), AFF_CHARM);
-				SET_BIT(MOB_FLAGS(mob), MOB_FAMILIAR);
 				add_follower(mob, ch, TRUE);
 			}
 			else if (charm) {

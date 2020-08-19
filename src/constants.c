@@ -141,6 +141,7 @@ const char *ability_type_flags[] = {
 	"PTECH",
 	"PASSIVE-BUFF",	// 5
 	"READY-WEAPONS",
+	"COMPANION",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -202,6 +203,7 @@ const char *ability_data_types[] = {
 	"PTECH",
 	"EFFECT",
 	"READY-WEAPON",
+	"COMPANION",
 	"\n"
 };
 
@@ -229,6 +231,7 @@ const char *ability_gain_hooks[] = {
 	"VAMPIRE-FEEDING",
 	"MOVING",
 	"ONLY-USING-READY-WEAPON",
+	"ONLY-USING-COMPANIONS",
 	"\n"
 };
 
@@ -2040,7 +2043,7 @@ const char *action_bits[] = {
 	"SPAWNED",
 	"CHAMPION",	// 15
 	"EMPIRE",
-	"FAMILIAR",
+	"*",
 	"*PICKPOCKETED",
 	"CITYGUARD",
 	"PURSUE",	// 20

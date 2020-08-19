@@ -181,7 +181,6 @@ ACMD(do_exits);
 ACMD(do_expel);
 
 ACMD(do_factions);
-ACMD(do_familiar);
 ACMD(do_feed);
 ACMD(do_fightmessages);
 ACMD(do_file);
@@ -733,7 +732,6 @@ cpp_extern const struct command_info cmd_info[] = {
 
 	SCMD_CMD( "fill", POS_STANDING, do_pour, NO_MIN, CTYPE_UTIL, SCMD_FILL ),
 	SIMPLE_CMD( "factions", POS_DEAD, do_factions, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "familiar", POS_STANDING, do_familiar, NO_MIN, CTYPE_SKILL ),
 	SCMD_CMD( "fastmorph", POS_RESTING, do_morph, NO_MIN, CTYPE_MOVE, SCMD_FASTMORPH ),
 	SIMPLE_CMD( "feed", POS_STANDING, do_feed, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "fightmessages", POS_DEAD, do_fightmessages, NO_MIN, CTYPE_UTIL ),

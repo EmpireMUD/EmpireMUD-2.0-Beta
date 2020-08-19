@@ -44,7 +44,6 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 extern bool trigger_counterspell(char_data *ch);	// spells.c
 
 // locals
-char_data *has_familiar(char_data *ch);
 void un_earthmeld(char_data *ch);
 
 
@@ -72,39 +71,30 @@ int ancestral_healing(char_data *ch) {
 
 
 /**
-* Finds a familiar belonging to ch that has the matching vnum and despawns it.
+* Despawns ch's companion if it has the given vnum. This will send a 'leaves'
+* message.
 * 
-* @param char_data *ch The player to find familiars for.
-* @param mob_vnum vnum Despawn only if matching this vnum (NOTHING for all familiars).
+* @param char_data *ch The player whose companion we might despawn.
+* @param mob_vnum vnum Despawn only if matching this vnum (pass NOTHING for all companions).
 * @return bool TRUE if it despawned a mob; FALSE if not.
 */
-bool despawn_familiar(char_data *ch, mob_vnum vnum) {
-	char_data *iter, *next_iter;
-	bool any = FALSE;
+bool despawn_companion(char_data *ch, mob_vnum vnum) {
+	char_data *mob;
 	
-	for (iter = character_list; iter; iter = next_iter) {
-		next_iter = iter->next;
-		
-		if (!IS_NPC(iter)) {
-			continue;
-		}
-		if (!MOB_FLAGGED(iter, MOB_FAMILIAR)) {
-			continue;
-		}
-		if (iter->master != ch) {
-			continue;
-		}
-		
-		if (vnum != NOTHING && GET_MOB_VNUM(iter) != vnum) {
-			continue;
-		}
-		
-		act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
-		extract_char(iter);
-		any = TRUE;
+	if (!(mob = GET_COMPANION(ch))) {
+		return FALSE;	// no companion
+	}
+	if (!IS_NPC(mob)) {
+		return FALSE;	// is a player
+	}
+	if (vnum != NOTHING && GET_MOB_VNUM(mob) != vnum) {
+		return FALSE;	// wrong vnum
 	}
 	
-	return any;
+	// seems despawnable
+	act("$n leaves.", TRUE, mob, NULL, NULL, TO_ROOM);
+	extract_char(mob);
+	return TRUE;
 }
 
 
@@ -114,25 +104,6 @@ bool despawn_familiar(char_data *ch, mob_vnum vnum) {
 */
 int total_bonus_healing(char_data *ch) {
 	return GET_BONUS_HEALING(ch) + ancestral_healing(ch);
-}
-
-
-/**
-* @param char_data *ch
-* @return char_data *the familiar if one exists, or NULL
-*/
-char_data *has_familiar(char_data *ch) {
-	char_data *ch_iter, *found;
-	
-	// check existing familiars
-	found = NULL;
-	for (ch_iter = character_list; !found && ch_iter; ch_iter = ch_iter->next) {
-		if (IS_NPC(ch_iter) && MOB_FLAGGED(ch_iter, MOB_FAMILIAR) && ch_iter->master == ch) {
-			found = ch_iter;
-		}
-	}
-	
-	return found;
 }
 
 
@@ -674,143 +645,6 @@ ACMD(do_entangle) {
 	if (can_gain_exp_from(ch, vict)) {
 		gain_ability_exp(ch, ABIL_ENTANGLE, 15);
 	}
-}
-
-
-ACMD(do_familiar) {
-	void scale_mob_as_familiar(char_data *mob, char_data *master);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
-	ability_data *abil = NULL;
-	char_data *mob;
-	int iter, type;
-	bool any;
-	
-	struct {
-		char *name;
-		any_vnum ability;
-		int level;	// natural magic level required
-		mob_vnum vnum;
-		int cost;
-	} familiars[] = {
-		// base familiars
-		{ "cat", ABIL_FAMILIAR, 0, FAMILIAR_CAT, 40 },
-		{ "saber-toothed cat", ABIL_FAMILIAR, 51, FAMILIAR_SABERTOOTH, 40 },
-		{ "sphinx", ABIL_FAMILIAR, 76, FAMILIAR_SPHINX, 40 },
-		{ "giant tortoise", ABIL_FAMILIAR, 100, FAMILIAR_GIANT_TORTOISE, 40 },
-		
-		// class animals
-		{ "griffin", ABIL_GRIFFIN, 100, FAMILIAR_GRIFFIN, 40 },
-		{ "dire wolf", ABIL_DIRE_WOLF, 100, FAMILIAR_DIRE_WOLF, 40 },
-		{ "moon rabbit", ABIL_MOON_RABBIT, 100, FAMILIAR_MOON_RABBIT, 40 },
-		{ "spirit wolf", ABIL_SPIRIT_WOLF, 100, FAMILIAR_SPIRIT_WOLF, 40 },
-		{ "manticore", ABIL_MANTICORE, 100, FAMILIAR_MANTICORE, 40 },
-		{ "phoenix", ABIL_PHOENIX, 100, FAMILIAR_PHOENIX, 40 },
-		{ "scorpion shadow", ABIL_SCORPION_SHADOW, 100, FAMILIAR_SCORPION_SHADOW, 40 },
-		{ "owl shadow", ABIL_OWL_SHADOW, 100, FAMILIAR_OWL_SHADOW, 40 },
-		{ "basilisk", ABIL_BASILISK, 100, FAMILIAR_BASILISK, 40 },
-		{ "salamander", ABIL_SALAMANDER, 100, FAMILIAR_SALAMANDER, 40 },
-		{ "skeletal hulk", ABIL_SKELETAL_HULK, 100, FAMILIAR_SKELETAL_HULK, 40 },
-		{ "banshee", ABIL_BANSHEE, 100, FAMILIAR_BANSHEE, 40 },
-
-		{ "\n", NO_ABIL, 0, NOTHING, 0 }
-	};
-	
-	if (has_familiar(ch)) {
-		msg_to_char(ch, "You can't summon a familiar while you already have one.\r\n");
-		return;
-	}
-	
-	skip_spaces(&argument);
-	
-	// no-arg: just list
-	if (!*argument) {
-		msg_to_char(ch, "Summon which familiar:");
-		any = FALSE;
-		for (iter = 0; *familiars[iter].name != '\n'; ++iter) {
-			if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !has_ability(ch, familiars[iter].ability)) {
-				continue;
-			}
-			abil = find_ability_by_vnum(familiars[iter].ability);
-			if (abil && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < familiars[iter].level) {
-				continue;
-			}
-			if (!abil && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
-				continue;
-			}
-			
-			msg_to_char(ch, "%s%s", any ? ", " : " ", familiars[iter].name);
-			any = TRUE;
-		}
-		
-		if (!any) {
-			msg_to_char(ch, " (you know of none)");
-		}
-		msg_to_char(ch, "\r\n");
-		
-		return;
-	}
-	
-	// find which one they wanted
-	type = -1;
-	for (iter = 0; *familiars[iter].name != '\n'; ++iter) {
-		if (!IS_NPC(ch) && familiars[iter].ability != NO_ABIL && !has_ability(ch, familiars[iter].ability)) {
-			continue;
-		}
-		abil = find_ability_by_vnum(familiars[iter].ability);
-		if (abil && ABIL_ASSIGNED_SKILL(abil) != NULL && get_skill_level(ch, SKILL_VNUM(ABIL_ASSIGNED_SKILL(abil))) < familiars[iter].level) {
-			continue;
-		}
-		if (!abil && GET_SKILL_LEVEL(ch) < familiars[iter].level) {
-			continue;
-		}
-		if (is_abbrev(argument, familiars[iter].name)) {
-			type = iter;
-			break;
-		}
-	}
-	
-	if (type == -1) {
-		msg_to_char(ch, "Unknown familiar.\r\n");
-		return;
-	}
-	
-	if (!can_use_ability(ch, familiars[type].ability, MANA, familiars[type].cost, NOTHING)) {
-		return;
-	}
-	
-	if (familiars[type].ability != NO_ABIL && ABILITY_TRIGGERS(ch, NULL, NULL, familiars[type].ability)) {
-		return;
-	}
-	
-	charge_ability_cost(ch, MANA, familiars[type].cost, NOTHING, 0, WAIT_SPELL);
-	mob = read_mobile(familiars[type].vnum, TRUE);
-	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);
-	if (IS_NPC(ch)) {
-		MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
-		if (MOB_INSTANCE_ID(mob) != NOTHING) {
-			add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
-		}
-	}
-	setup_generic_npc(mob, GET_LOYALTY(ch), NOTHING, NOTHING);
-	
-	// scale to summoner
-	scale_mob_as_familiar(mob, ch);
-	
-	char_to_room(mob, IN_ROOM(ch));
-	
-	act("You send up a jet of sparkling blue mana and $N appears!", FALSE, ch, NULL, mob, TO_CHAR);
-	act("$n sends up a jet of sparkling blue mana and $N appears!", FALSE, ch, NULL, mob, TO_NOTVICT);
-	
-	SET_BIT(AFF_FLAGS(mob), AFF_CHARM);
-	SET_BIT(MOB_FLAGS(mob), MOB_FAMILIAR);
-	add_follower(mob, ch, TRUE);
-	
-	if (familiars[type].ability != NO_ABIL) {
-		gain_ability_exp(ch, familiars[type].ability, 33.4);
-	}
-	
-	load_mtrigger(mob);
 }
 
 

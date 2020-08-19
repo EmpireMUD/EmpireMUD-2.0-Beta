@@ -768,7 +768,7 @@ void list_char_to_char(char_data *list, char_data *ch) {
 	int c = 1;
 	
 	bool use_mob_stacking = config_get_bool("use_mob_stacking");
-	#define MOB_CAN_STACK(ch)  (use_mob_stacking && !GET_LED_BY(ch) && GET_POS(ch) != POS_FIGHTING && !MOB_FLAGGED((ch), MOB_EMPIRE | MOB_TIED | MOB_MOUNTABLE | MOB_FAMILIAR))
+	#define MOB_CAN_STACK(ch)  (use_mob_stacking && !GET_COMPANION(ch) && !GET_LED_BY(ch) && GET_POS(ch) != POS_FIGHTING && !MOB_FLAGGED((ch), MOB_EMPIRE | MOB_TIED | MOB_MOUNTABLE))
 	
 	// no work
 	if (!list || !ch || !ch->desc) {

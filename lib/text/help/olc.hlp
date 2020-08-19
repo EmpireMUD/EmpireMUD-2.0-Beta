@@ -614,6 +614,18 @@ Buff abilities have the following properties:
 
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
+"ABILEDIT COMPANION ABILITY" "COMPANION ABILITY" "COMPANION ABILITIES"
+
+The COMPANION ability type adds 1 or more mobs to the player's 'companions'
+command. Players can summon one of these at a time.
+
+Companion abilities have the following properties:
+ <&ydata&0> Add the COMPANION data type to grant new companions.
+            - You can set level limits on the mob.
+            - The mob will be CHARMED.
+
+See also: OLC ABILITIES, ABILEDIT TYPES, COMPANION
+#d
 "ABILEDIT CRAFT ABILITY" "CRAFT ABILITY" "CRAFTING ABILITY" "CRAFT ABILITIES"
 
 The CRAFT ability type indicates that an ability is only used to make crafts.
@@ -739,6 +751,7 @@ The 'data' field is used by different types of abilities. Available types are:
  &cPTECH&0 - Player technologies. Used by the PTECH ability type.
  &cEFFECT&0 - Something happens when the ability activates. See ABILITY EFFECTS
  &cREADY-WEAPON&0 - Adds a weapon to the player's 'ready' command.
+ &cCOMPANION&0 - Adds a mob to the player's 'companions' list.
 
 See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d
@@ -849,6 +862,7 @@ This tells the ability when to trigger skill gain:
  &cVAMPIRE-FEEDING&0 - Gains when feeding on someone.
  &cMOVING&0 - Gains when the player moves.
  &cONLY-USING-READY-WEAPON&0 - Only when using a ready-weapon from the ability.
+ &cONLY-USING-COMPANION&0 - Only if player's active companion is from the ability.
 
 See also: OLC ABILITIES
 #d
@@ -1133,10 +1147,11 @@ The following types are available (each has its own help file):
  &cPTECH&0 - Various 'techs' that players get from abilities.
  &cPASSIVE-BUFF&0 - Applies stats to the player all the time.
  &cREADY-WEAPONS&0 - Adds weapons to the player's 'ready' command.
+ &cCOMPANION&0 - Adds 1 or more mobs to the player's 'companions' command.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY,
-   READY-WEAPONS ABILITY
+   READY-WEAPONS ABILITY, COMPANION ABILITY
 #d
 "ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE"
 
@@ -4131,7 +4146,7 @@ Available mob flags:
  SPAWNED - De-spawns after 5 minutes if no players are nearby.
  CHAMPION - Will rescue its master in combat.
  EMPIRE - Will not be saved through reboots.
- FAMILIAR - Will not be saved through reboots; players may only have one familiar follower at a time.
+ * - Unused (formerly FAMILIAR)
  *PICKPOCKETED - Has already been pickpocketed; cannot be pickpocketed again.
  CITYGUARD - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
  PURSUE - Will pursue players who flee in combat.

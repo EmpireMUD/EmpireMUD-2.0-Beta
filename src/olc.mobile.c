@@ -274,7 +274,7 @@ char *list_one_mobile(char_data *mob, bool detail) {
 	static char output[MAX_STRING_LENGTH];
 	char flags[MAX_STRING_LENGTH];
 	
-	bitvector_t show_flags = MOB_BRING_A_FRIEND | MOB_SENTINEL | MOB_AGGRESSIVE | MOB_MOUNTABLE | MOB_ANIMAL | MOB_AQUATIC | MOB_NO_ATTACK | MOB_SPAWNED | MOB_CHAMPION | MOB_FAMILIAR | MOB_EMPIRE | MOB_CITYGUARD | MOB_GROUP | MOB_HARD | MOB_DPS | MOB_TANK | MOB_CASTER | MOB_VAMPIRE | MOB_HUMAN;
+	bitvector_t show_flags = MOB_BRING_A_FRIEND | MOB_SENTINEL | MOB_AGGRESSIVE | MOB_MOUNTABLE | MOB_ANIMAL | MOB_AQUATIC | MOB_NO_ATTACK | MOB_SPAWNED | MOB_CHAMPION | MOB_EMPIRE | MOB_CITYGUARD | MOB_GROUP | MOB_HARD | MOB_DPS | MOB_TANK | MOB_CASTER | MOB_VAMPIRE | MOB_HUMAN;
 	
 	if (detail) {
 		if (IS_SET(MOB_FLAGS(mob), show_flags)) {
@@ -313,10 +313,12 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	struct empire_homeless_citizen *ehc, *next_ehc;
 	struct empire_territory_data *ter, *next_ter;
+	struct ability_data_list *adl, *next_adl;
 	char_data *proto, *mob_iter, *next_mob;
 	struct empire_npc_data *end, *next_end;
 	descriptor_data *desc;
 	struct global_data *glb, *next_glb;
+	ability_data *abil, *next_abil;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
@@ -397,6 +399,22 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	// save mob index and mob file now so there's no trouble later
 	save_index(DB_BOOT_MOB);
 	save_library_file_for_vnum(DB_BOOT_MOB, vnum);
+	
+	// update abilities
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		found = FALSE;
+		LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next_adl) {
+			if (adl->type == ADL_COMPANION && adl->vnum == vnum) {
+				LL_DELETE(ABIL_DATA(abil), adl);
+				free(adl);
+				found = TRUE;
+			}
+		}
+		
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_ABIL, ABIL_VNUM(abil));
+		}
+	}
 	
 	// update buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {
@@ -509,6 +527,20 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	
 	// remove spawn locations and interactions from active editors
 	for (desc = descriptor_list; desc; desc = desc->next) {
+		if (GET_OLC_ABILITY(desc)) {
+			found = FALSE;
+			LL_FOREACH_SAFE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl, next_adl) {
+				if (adl->type == ADL_COMPANION && adl->vnum == vnum) {
+					LL_DELETE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl);
+					free(adl);
+					found = TRUE;
+				}
+			}
+		
+			if (found) {
+				msg_to_desc(desc, "A mob listed in the data for the ability you're editing has been removed.\r\n");
+			}
+		}
 		if (GET_OLC_BUILDING(desc)) {
 			if (GET_BLD_ARTISAN(GET_OLC_BUILDING(desc)) == vnum) {
 				GET_BLD_ARTISAN(GET_OLC_BUILDING(desc)) = NOTHING;
@@ -767,11 +799,13 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char_data *proto, *mob, *next_mob;
+	struct ability_data_list *adl;
 	char buf[MAX_STRING_LENGTH];
 	struct spawn_info *spawn;
 	struct adventure_spawn *asp;
 	struct interaction_item *inter;
 	struct global_data *glb, *next_glb;
+	ability_data *abil, *next_abil;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	room_template *rmt, *next_rmt;
@@ -791,6 +825,17 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of mobile %d (%s):\r\n", vnum, GET_SHORT_DESC(proto));
+	
+	// abilities
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_COMPANION && adl->vnum == vnum) {
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
+				break;
+			}
+		}
+	}
 	
 	// buildings
 	HASH_ITER(hh, building_table, bld, next_bld) {

@@ -47,7 +47,7 @@
 *   Interaction Handlers
 *   Learned Craft Handlers
 *   Lore Handlers
-*   Mini-pet Handlers
+*   Mini-pet and Companion Handlers
 *   Mob Tagging Handlers
 *   Mount Handlers
 *   Object Handlers
@@ -91,6 +91,7 @@ void scale_item_to_level(obj_data *obj, int level);
 static void add_obj_binding(int idnum, struct obj_binding **list);
 void die_follower(char_data *ch);
 struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
+void remove_companion(char_data *ch, any_vnum vnum);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
 void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 
@@ -1274,6 +1275,14 @@ void extract_char(char_data *ch) {
 	
 	// get rid of friends now (extracts them as well)
 	despawn_charmies(ch);
+	
+	// clear companion (both directions) if any
+	if (GET_COMPANION(ch)) {
+		if (GET_COMPANION(GET_COMPANION(ch)) == ch) {
+			GET_COMPANION(GET_COMPANION(ch)) = NULL;
+		}
+		GET_COMPANION(ch) = NULL;
+	}
 	
 	// end following now
 	if (ch->followers || ch->master) {
@@ -4522,7 +4531,7 @@ void remove_lore_record(char_data *ch, struct lore_data *lore) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// MINI-PET HANDLERS ///////////////////////////////////////////////////////
+//// MINI-PET AND COMPANION HANDLERS /////////////////////////////////////////
 
 // for minipets/show minipets
 int sort_minipets(struct minipet_data *a, struct minipet_data *b) {
@@ -4534,6 +4543,33 @@ int sort_minipets(struct minipet_data *a, struct minipet_data *b) {
 	else {	// sort by 1st keyword
 		return strcmp(GET_PC_NAME(acr), GET_PC_NAME(bcr));
 	}
+}
+
+
+/**
+* Adds a companion (mob) vnum to a player's list.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The mob vnum of the companion to gain.
+* @param any_vnum from_abil If the companion comes from an ability, specify it here. Otherwise, use NO_ABIL.
+* @return struct companion_data* The added entry.
+*/
+struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil) {
+	struct companion_data *cd;
+	
+	if (IS_NPC(ch)) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(GET_COMPANIONS(ch), &vnum, cd);
+	if (!cd) {
+		CREATE(cd, struct companion_data, 1);
+		cd->vnum = vnum;
+		HASH_ADD_INT(GET_COMPANIONS(ch), vnum, cd);
+	}
+	cd->from_abil = from_abil;	// may be NO_ABIL
+	
+	return cd;
 }
 
 
@@ -4565,13 +4601,20 @@ void add_minipet(char_data *ch, any_vnum vnum) {
 *
 * @param char_data *ch The player to check.
 */
-void check_minipets(char_data *ch) {
+void check_minipets_and_companions(char_data *ch) {
 	void remove_minipet(char_data *ch, any_vnum vnum);
 	
 	struct minipet_data *mini, *next_mini;
+	struct companion_data *cd, *next_cd;
 	
 	if (IS_NPC(ch)) {
 		return;
+	}
+	
+	HASH_ITER(hh, GET_COMPANIONS(ch), cd, next_cd) {
+		if (!mob_proto(cd->vnum)) {
+			remove_companion(ch, cd->vnum);
+		}
 	}
 
 	HASH_ITER(hh, GET_MINIPETS(ch), mini, next_mini) {
@@ -4579,6 +4622,53 @@ void check_minipets(char_data *ch) {
 			remove_minipet(ch, mini->vnum);
 		}
 	}
+}
+
+
+/**
+* Frees the data for 1 player companion.
+*
+* @param struct companion_data *cd The companion data to free.
+*/
+void free_companion(struct companion_data *cd) {
+	void free_varlist(struct trig_var_data *vd);
+	
+	if (cd) {
+		struct companion_mod *mod, *next_mods;
+		
+		free_proto_scripts(&cd->scripts);
+		free_varlist(cd->vars);
+		
+		LL_FOREACH_SAFE(cd->mods, mod, next_mods) {
+			if (mod->str) {
+				free(mod->str);
+			}
+			free(mod);
+		}
+		
+		free(cd);
+	}
+}
+
+
+/**
+* @param char_data *ch The player.
+* @param any_vnum vnum The companion vnum to check.
+* @return struct companion_data* The companion entry, if the player has it AND has whatever ability it requires.
+*/
+struct companion_data *has_companion(char_data *ch, any_vnum vnum) {
+	struct companion_data *cd;
+	
+	if (IS_NPC(ch)) {
+		return FALSE;
+	}
+	
+	HASH_FIND_INT(GET_COMPANIONS(ch), &vnum, cd);
+	
+	if (cd && (cd->from_abil == NO_ABIL || has_ability(ch, cd->from_abil))) {
+		return cd;
+	}
+	return NULL;
 }
 
 
@@ -4600,6 +4690,31 @@ bool has_minipet(char_data *ch, any_vnum vnum) {
 		return TRUE;
 	}
 	return FALSE;
+}
+
+
+/**
+* Removes a companion vnum from a player's list. Normally you DON'T call this
+* on ones granted by abilities when losing those abilities -- they will be
+* hidden from the player but their data remains. However, if you DO remove a
+* companion that comes from an ability, it will result in the player getting
+* a fresh copy of it next time they summon it.
+*
+* @param char_data *ch The player.
+* @param any_vnum vnum The companion vnum to lose.
+*/
+void remove_companion(char_data *ch, any_vnum vnum) {
+	struct companion_data *cd;
+	
+	if (IS_NPC(ch)) {
+		return;
+	}
+	
+	HASH_FIND_INT(GET_COMPANIONS(ch), &vnum, cd);
+	if (cd) {
+		HASH_DEL(GET_COMPANIONS(ch), cd);
+		free_companion(cd);
+	}
 }
 
 
@@ -4740,7 +4855,7 @@ void free_mob_tags(struct mob_tag **list) {
 void tag_mob(char_data *mob, char_data *player) {
 	struct group_member_data *mem;
 	
-	// find top player -- if it's a familiar or charmie of some kind
+	// find top player -- if it's a companion or charmie of some kind
 	while (player && IS_NPC(player) && player->master && IN_ROOM(player) == IN_ROOM(player->master)) {
 		player = player->master;
 	}
