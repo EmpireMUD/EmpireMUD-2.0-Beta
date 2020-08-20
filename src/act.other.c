@@ -1729,8 +1729,8 @@ ACMD(do_companions) {
 	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct companion_data *cd, *next_cd, *found_cd;
+	char_data *mob, *proto = NULL;
 	struct companion_mod *cmod;
-	char_data *mob, *proto;
 	ability_data *abil;
 	size_t size, lsize;
 	bool found, full;
