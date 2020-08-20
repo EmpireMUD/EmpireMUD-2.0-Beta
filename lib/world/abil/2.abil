@@ -217,52 +217,100 @@ Workforce Sawing~
 T a 0
 S
 #250
-Griffin~
-0 -1 1.00 0 0
+Griffin Familiar~
+0 -1 1.00 0 ho
+C
+unknown 0 0 2 40 0 -1 0 0 0 0
+D 8 503 0
+T h 0
 S
 #251
-Dire Wolf~
-0 -1 1.00 0 0
+Dire Wolf Familiar~
+0 -1 1.00 0 ho
+C
+unknown 0 0 2 40 0 -1 0 0 0 0
+D 8 504 0
+T h 0
 S
 #252
-Moon Rabbit~
-0 -1 1.00 0 0
+Moon Rabbit Familiar~
+0 -1 1.00 0 ho
+C
+unknown 0 0 2 40 0 -1 0 0 0 0
+D 8 505 0
+T h 0
 S
 #253
-Spirit Wolf~
-0 -1 1.00 0 0
+Spirit Wolf Familiar~
+0 -1 1.00 0 ho
+C
+unknown 0 0 2 40 0 -1 0 0 0 0
+D 8 507 0
+T h 0
 S
 #254
-Manticore~
-0 -1 1.00 0 0
+Manticore Familiar~
+0 -1 1.00 0 ho
+C
+unknown 0 0 2 40 0 -1 0 0 0 0
+D 8 508 0
+T h 0
 S
 #255
-Phoenix~
-0 -1 1.00 0 0
+Phoenix Familiar~
+0 -1 1.00 0 ho
+C
+unknown 0 0 2 40 0 -1 0 0 0 0
+D 8 509 0
+T h 0
 S
 #256
-Scorpion Shadow~
-0 -1 1.00 0 0
+Scorpion Shadow Familiar~
+0 -1 1.00 0 ho
+C
+unknown 0 0 2 40 0 -1 0 0 0 0
+D 8 510 0
+T h 0
 S
 #257
-Owl Shadow~
-0 -1 1.00 0 0
+Owl Shadow Familiar~
+0 -1 1.00 0 ho
+C
+unknown 0 0 2 40 0 -1 0 0 0 0
+D 8 511 0
+T h 0
 S
 #258
-Basilisk~
-0 -1 1.00 0 0
+Basilisk Familiar~
+0 -1 1.00 0 ho
+C
+unknown 0 0 2 40 0 -1 0 0 0 0
+D 8 512 0
+T h 0
 S
 #259
-Salamander~
-0 -1 1.00 0 0
+Salamander Familiar~
+0 -1 1.00 0 ho
+C
+unknown 0 0 2 40 0 -1 0 0 0 0
+D 8 513 0
+T h 0
 S
 #260
-Skeletal Hulk~
-0 -1 1.00 0 0
+Skeletal Hulk Familiar~
+0 -1 1.00 0 ho
+C
+unknown 0 0 2 40 0 -1 0 0 0 0
+D 8 514 0
+T h 0
 S
 #261
-Banshee~
-0 -1 1.00 0 0
+Banshee Familiar~
+0 -1 1.00 0 ho
+C
+unknown 0 0 2 40 0 -1 0 0 0 0
+D 8 515 0
+T h 0
 S
 #262
 Hone~

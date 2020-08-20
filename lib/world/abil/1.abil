@@ -145,6 +145,13 @@ S
 #122
 Familiar~
 0 -1 1.00 0 0
+C
+unknown 0 0 2 40 0 -1 0 0 0 0
+D 8 500 0
+D 8 501 0
+D 8 502 0
+D 8 506 0
+T h 0
 S
 #123
 Nature Potions~
@@ -175,8 +182,12 @@ D 1 10 0
 T e 1
 S
 #138
-Summon Bodyguard~
-0 -1 1.00 0 0
+Bodyguard~
+0 -1 1.00 0 ho
+C
+unknown 0 0 2 0 0 -1 0 0 0 0
+D 8 205 0
+T h 0
 S
 #142
 Pickpocket~

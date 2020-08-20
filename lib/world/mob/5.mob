@@ -3,7 +3,7 @@ cat black familiar~
 a black cat~
 A black cat curls around its master's ankles.
 ~
-10 50 doG cfmG 2
+1 50 doG cfmG 2
 0 0 0 10
 D
    This appears on first glance to be an ordinary black housecat, but upon
@@ -49,7 +49,7 @@ A griffin sits beside its master, sharpening its talons on its beak.
 D
    The griffin is a powerful and majestic magical beast with the body of a
 lion, and the head and wings of an eagle. While traditionally known for
-guarding treasure, this one has instead decided to guard the mage it serves. 
+guarding treasure, this one has instead decided to guard the mage it serves.
 In combat, it will attempt to rescue its master from attackers by forcing them
 to attack it instead.
 ~
@@ -62,7 +62,7 @@ A dire wolf hunches low and bares its fangs.
 100 0 dozG cfmG 4
 0 0 0 9
 D
-   This bulky, muscular wolf is a powerful fighter and a loyal companion. 
+   This bulky, muscular wolf is a powerful fighter and a loyal companion.
 Judging by the magical glint in its eye, serves as a mage's familiar, perhaps
 seeing in them something of itself. In combat, it simply attacks with great
 ferocity.
@@ -190,7 +190,7 @@ A basilisk curls around its master and hisses.
 100 0 dnoG cfmG 2
 0 0 0 10
 D
-   The basilisk is a cat-sized, grey-brown lizard with a crown-shaped crest. 
+   The basilisk is a cat-sized, grey-brown lizard with a crown-shaped crest.
 Its most famous and dangerous feature is not its venomous bite, but its bright
 yellow, serpentine eyes, capable of turning anyone or anything who meets its
 gaze into stone. This one has formed a bond with a mage. In combat, it uses its
