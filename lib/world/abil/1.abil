@@ -151,6 +151,12 @@ D 8 500 0
 D 8 501 0
 D 8 502 0
 D 8 506 0
+M
+2
+You send up a jet of sparkling blue mana and $N appears!~
+M
+4
+$n sends up a jet of sparkling blue mana and $N appears!~
 T h 0
 S
 #123

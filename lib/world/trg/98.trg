@@ -31,6 +31,9 @@ return 0
 Companion dies permanently~
 0 f 100
 ~
+* This script deletes a companion's entry when it dies.
+* If the companion comes from an ability (like Bodyguard) the player will
+* get a fresh copy of the companion right away.
 set ch %self.companion%
 if %self.is_npc% && %ch% && !%ch.is_npc%
   %ch.remove_companion(%self.vnum%)%
