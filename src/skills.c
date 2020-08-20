@@ -89,6 +89,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	void undisguise(char_data *ch);	
 	
 	struct ability_data_list *adl;
+	char_data *mob, *next_mob;
 	obj_data *obj;
 	bool need_affect_total = FALSE;
 	int pos;
@@ -274,7 +275,12 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_MIRRORIMAGE: {
-			despawn_companion(ch, MIRROR_IMAGE_MOB);
+			LL_FOREACH_SAFE(character_list, mob, next_mob) {
+				if (mob->master == ch && IS_NPC(mob) && GET_MOB_VNUM(mob) == MIRROR_IMAGE_MOB) {
+					act("$n vanishes.", TRUE, mob, NULL, NULL, TO_ROOM);
+					extract_char(mob);
+				}
+			}
 			break;
 		}
 		case ABIL_MUMMIFY: {
