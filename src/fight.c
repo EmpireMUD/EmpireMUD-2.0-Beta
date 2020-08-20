@@ -1313,6 +1313,15 @@ obj_data *die(char_data *ch, char_data *killer) {
 	
 	// for players, die() ends here, until they respawn or quit
 	if (!IS_NPC(ch)) {
+		// player messaging is here
+		if (ch == killer) {
+			act("$n is dead -- R.I.P.", FALSE, ch, NULL, killer, TO_NOTVICT);
+		}
+		else {
+			act("$n is dead, killed by $N! R.I.P.", FALSE, ch, NULL, killer, TO_NOTVICT);
+			act("You have killed $n! R.I.P.", FALSE, ch, NULL, killer, TO_VICT);
+		}
+		
 		if (ch != killmaster) {
 			add_player_kill(ch, killmaster);
 		}
@@ -1331,6 +1340,13 @@ obj_data *die(char_data *ch, char_data *killer) {
 	trig_val = death_mtrigger(ch, killmaster);
 	trig_val &= run_kill_triggers(ch, killer, NULL);
 	if (trig_val) {
+		if (ch == killer) {
+			act("$n is dead -- R.I.P.", FALSE, ch, NULL, killer, TO_NOTVICT);
+		}
+		else {
+			act("$n is dead, killed by $N! R.I.P.", FALSE, ch, NULL, killer, TO_NOTVICT);
+			act("You have killed $n! R.I.P.", FALSE, ch, NULL, killer, TO_VICT);
+		}
 		death_cry(ch);
 	}
 	GET_POS(ch) = POS_DEAD;
@@ -3641,14 +3657,6 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 		if (msg) {
 			act(buf, TRUE, victim, 0, 0, TO_ROOM);
 		}
-	}
-	
-	if (ch == victim) {
-		act("$n is dead -- R.I.P.", FALSE, victim, NULL, ch, TO_NOTVICT);
-	}
-	else {
-		act("$n is dead, killed by $N! R.I.P.", FALSE, victim, NULL, ch, TO_NOTVICT);
-		act("You have killed $n! R.I.P.", FALSE, victim, NULL, ch, TO_VICT);
 	}
 
 	// cleanup
