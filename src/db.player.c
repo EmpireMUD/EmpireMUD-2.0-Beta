@@ -1435,8 +1435,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					last_coin = coin;
 				}
 				else if (PFILE_TAG(line, "Companion:", length)) {
-					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
+					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
 					last_companion = add_companion(ch, i_in[0], i_in[1]);
+					last_companion->instantiated = i_in[2] ? TRUE : FALSE;
 				}
 				else if (PFILE_TAG(line, "Compan-mod:", length)) {
 					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
@@ -2790,7 +2791,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Coin: %d %d %ld\n", coin->amount, coin->empire_id, coin->last_acquired);
 	}
 	HASH_ITER(hh, GET_COMPANIONS(ch), compan, next_compan) {
-		fprintf(fl, "Companion: %d %d\n", compan->vnum, compan->from_abil);
+		fprintf(fl, "Companion: %d %d %d\n", compan->vnum, compan->from_abil, compan->instantiated);
 		LL_FOREACH(compan->mods, cmod) {
 			if (cmod->str && *cmod->str) {
 				strcpy(temp, cmod->str);

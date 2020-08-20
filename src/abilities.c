@@ -756,7 +756,7 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 	despawn_companion(master, NOTHING);
 	
 	// load mob
-	mob = read_mobile(cd->vnum, FALSE);
+	mob = read_mobile(cd->vnum, cd->instantiated ? FALSE : TRUE);
 	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);
 	SET_BIT(AFF_FLAGS(mob), AFF_CHARM);
 	setup_generic_npc(mob, GET_LOYALTY(master), NOTHING, NOTHING);
@@ -829,23 +829,18 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 	// ensure any custom strings are saved
 	if (GET_REAL_SEX(mob) != GET_REAL_SEX(proto)) {
 		add_companion_mod(cd, CMOD_SEX, GET_REAL_SEX(mob), NULL);
-		queue_delayed_update(master, CDU_SAVE);
 	}
 	if (GET_PC_NAME(mob) != GET_PC_NAME(proto)) {
 		add_companion_mod(cd, CMOD_KEYWORDS, 0, GET_PC_NAME(mob));
-		queue_delayed_update(master, CDU_SAVE);
 	}
 	if (GET_SHORT_DESC(mob) != GET_SHORT_DESC(proto)) {
 		add_companion_mod(cd, CMOD_SHORT_DESC, 0, GET_SHORT_DESC(mob));
-		queue_delayed_update(master, CDU_SAVE);
 	}
 	if (GET_LONG_DESC(mob) != GET_LONG_DESC(proto)) {
 		add_companion_mod(cd, CMOD_LONG_DESC, 0, GET_LONG_DESC(mob));
-		queue_delayed_update(master, CDU_SAVE);
 	}
 	if (GET_LOOK_DESC(mob) != GET_LOOK_DESC(proto)) {
 		add_companion_mod(cd, CMOD_LOOK_DESC, 0, GET_LOOK_DESC(mob));
-		queue_delayed_update(master, CDU_SAVE);
 	}
 	
 	// scale to summoner
@@ -855,6 +850,10 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 	
 	// triggers last
 	load_mtrigger(mob);
+	
+	// mark as instantiated
+	cd->instantiated = TRUE;
+	queue_delayed_update(master, CDU_SAVE);
 	
 	return mob;
 }

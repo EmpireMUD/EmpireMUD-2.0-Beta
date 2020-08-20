@@ -3697,6 +3697,7 @@ struct coin_data {
 struct companion_data {
 	any_vnum vnum;	// mob vnum (unique)
 	any_vnum from_abil;	// if not NOTHING, player can only use/list this companion while they have the abil
+	bool instantiated;	// TRUE if it has ever been loaded as a mob
 	
 	struct companion_mod *mods;	// modifications to the companion
 	struct trig_proto_list *scripts;	// list of triggers to attach
