@@ -1519,6 +1519,7 @@ struct set_struct {
 /* All setting is done here, for simplicity */
 int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	/* Externs */
+	void change_sex(char_data *ch, int sex);
 	extern int _parse_name(char *arg, char *name);
 	extern int Valid_Name(char *newname);
 	void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
@@ -1811,7 +1812,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			send_to_char("Must be 'male', 'female', or 'neutral'.\r\n", ch);
 			return (0);
 		}
-		GET_REAL_SEX(vict) = i;
+		change_sex(vict, i);
 		sprintf(output, "%s's sex is now %s.", GET_NAME(vict), genders[(int) GET_REAL_SEX(vict)]);
 	}
 	else if SET_CASE("age") {

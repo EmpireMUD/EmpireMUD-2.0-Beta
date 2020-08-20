@@ -971,6 +971,7 @@ ACMD(do_manashield) {
 
 
 ACMD(do_mirrorimage) {
+	void change_sex(char_data *ch, int sex);
 	extern struct custom_message *pick_custom_longdesc(char_data *ch);
 	void scale_mob_as_companion(char_data *mob, char_data *master);
 	
@@ -1019,7 +1020,7 @@ ACMD(do_mirrorimage) {
 	// restrings
 	GET_PC_NAME(mob) = str_dup(PERS(ch, ch, FALSE));
 	GET_SHORT_DESC(mob) = str_dup(GET_PC_NAME(mob));
-	GET_REAL_SEX(mob) = GET_SEX(ch);	// need this for some desc stuff
+	change_sex(mob, GET_SEX(ch));	// need this for some desc stuff
 	
 	// longdesc is more complicated
 	if (GET_MORPH(ch)) {

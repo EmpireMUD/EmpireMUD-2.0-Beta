@@ -4574,6 +4574,39 @@ struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from
 
 
 /**
+* Stores a companion modification (new name, sex, etc).
+*
+* @param struct companion_data *companion The data for the modified companion.
+* @param int type A CMOD_ const.
+* @param int num The numeric value of the change (or 0 if not applicable).
+* @param char *str The string value of the change (or NULL if not applicable). This string will be copied.
+*/
+void add_companion_mod(struct companion_data *companion, int type, int num, char *str) {
+	struct companion_mod *mod;
+	bool found = FALSE;
+	
+	LL_FOREACH(companion->mods, mod) {
+		if (mod->type == type) {
+			mod->num = num;
+			if (mod->str) {
+				free(mod->str);
+			}
+			mod->str = str_dup(str);
+			found = TRUE;
+		}
+	}
+	
+	if (!found) {
+		CREATE(mod, struct companion_mod, 1);
+		mod->type = type;
+		mod->num = num;
+		mod->str = str_dup(str);
+		LL_PREPEND(companion->mods, mod);
+	}
+}
+
+
+/**
 * Adds a minipet vnum to a player's list.
 *
 * @param char_data *ch The player.
@@ -4736,6 +4769,31 @@ void remove_companion(char_data *ch, any_vnum vnum) {
 	if (cd) {
 		HASH_DEL(GET_COMPANIONS(ch), cd);
 		free_companion(cd);
+	}
+}
+
+
+/**
+* Deletes a companion modification, if present.
+*
+* @param struct companion_data **companion Pointer to the list of mods.
+* @param int type A CMOD_ const to remove.
+*/
+void remove_companion_mod(struct companion_data **companion, int type) {
+	struct companion_mod *mod, *next;
+	
+	if (!companion) {
+		return;	// no work
+	}
+	
+	LL_FOREACH_SAFE((*companion)->mods, mod, next) {
+		if (mod->type == type) {
+			LL_DELETE((*companion)->mods, mod);
+			if (mod->str) {
+				free(mod->str);
+			}
+			free(mod);
+		}
 	}
 }
 
