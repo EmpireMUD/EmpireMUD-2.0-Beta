@@ -1576,7 +1576,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOVE_SWEEPS  36
 
 
-// name sets: add matching files in lib/text/names/
+// NAMES_x: name sets: add matching files in lib/text/names/
 #define NAMES_CITIZENS  0
 #define NAMES_COUNTRYFOLK  1
 #define NAMES_ROMAN  2
