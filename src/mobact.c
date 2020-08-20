@@ -415,25 +415,29 @@ void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
 	}
 	
 	// restrings: uses "afar"/"lost" if there is no empire
-	GET_PC_NAME(mob) = str_dup(replace_npc_names(GET_PC_NAME(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
-	GET_SHORT_DESC(mob) = str_dup(replace_npc_names(GET_SHORT_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
-	GET_LONG_DESC(mob) = str_dup(replace_npc_names(GET_LONG_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
-	if (GET_LOOK_DESC(mob)) {
+	if (strchr(GET_PC_NAME(proto ? proto : mob), '#')) {
+		GET_PC_NAME(mob) = str_dup(replace_npc_names(GET_PC_NAME(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+		if (free_name) {
+			free(free_name);
+		}
+	}
+	if (strchr(GET_SHORT_DESC(proto ? proto : mob), '#')) {
+		GET_SHORT_DESC(mob) = str_dup(replace_npc_names(GET_SHORT_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+		if (free_short) {
+			free(free_short);
+		}
+	}
+	if (strchr(GET_LONG_DESC(proto ? proto : mob), '#')) {
+		GET_LONG_DESC(mob) = str_dup(replace_npc_names(GET_LONG_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+		if (free_long) {
+			free(free_long);
+		}
+	}
+	if (GET_LOOK_DESC(mob) && strchr(GET_LOOK_DESC(proto ? proto : mob), '#')) {
 		GET_LOOK_DESC(mob) = str_dup(replace_npc_names(GET_LOOK_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
-	}
-	
-	// and free that memory if necessary
-	if (free_name) {
-		free(free_name);
-	}
-	if (free_short) {
-		free(free_short);
-	}
-	if (free_long) {
-		free(free_long);
-	}
-	if (free_look) {
-		free(free_look);
+		if (free_look) {
+			free(free_look);
+		}
 	}
 }
 

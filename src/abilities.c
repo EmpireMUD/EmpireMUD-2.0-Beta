@@ -737,6 +737,7 @@ bool is_class_ability(ability_data *abil) {
 * @return char_data* The mob that was summoned, if possible (NULL otherwise).
 */
 char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
+	void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
 	extern bool despawn_companion(char_data *ch, mob_vnum vnum);
 	void scale_mob_as_companion(char_data *mob, char_data *master);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
@@ -824,6 +825,28 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 	// set companion data
 	GET_COMPANION(master) = mob;
 	GET_COMPANION(mob) = master;
+	
+	// ensure any custom strings are saved
+	if (GET_REAL_SEX(mob) != GET_REAL_SEX(proto)) {
+		add_companion_mod(cd, CMOD_SEX, GET_REAL_SEX(mob), NULL);
+		queue_delayed_update(master, CDU_SAVE);
+	}
+	if (GET_PC_NAME(mob) != GET_PC_NAME(proto)) {
+		add_companion_mod(cd, CMOD_KEYWORDS, 0, GET_PC_NAME(mob));
+		queue_delayed_update(master, CDU_SAVE);
+	}
+	if (GET_SHORT_DESC(mob) != GET_SHORT_DESC(proto)) {
+		add_companion_mod(cd, CMOD_KEYWORDS, 0, GET_SHORT_DESC(mob));
+		queue_delayed_update(master, CDU_SAVE);
+	}
+	if (GET_LONG_DESC(mob) != GET_LONG_DESC(proto)) {
+		add_companion_mod(cd, CMOD_KEYWORDS, 0, GET_LONG_DESC(mob));
+		queue_delayed_update(master, CDU_SAVE);
+	}
+	if (GET_LOOK_DESC(mob) != GET_LOOK_DESC(proto)) {
+		add_companion_mod(cd, CMOD_KEYWORDS, 0, GET_LOOK_DESC(mob));
+		queue_delayed_update(master, CDU_SAVE);
+	}
 	
 	// scale to summoner
 	scale_mob_as_companion(mob, master);
