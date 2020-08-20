@@ -1502,6 +1502,7 @@ struct set_struct {
 		{ "minipet", LVL_START_IMM, PC, MISC },
 		{ "mount", LVL_START_IMM, PC, MISC },
 		{ "currency", LVL_START_IMM, PC, MISC },
+		{ "companion", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
 		{ "dexterity",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -1922,6 +1923,36 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 				amt -= coin->amount;
 			}
 			increase_coins(vict, type, amt);
+		}
+	}
+	else if SET_CASE("companion") {
+		extern struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
+		void remove_companion(char_data *ch, any_vnum vnum);
+		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
+		char_data *pet;
+		
+		half_chop(val_arg, vnum_arg, onoff_arg);
+		
+		if (!*vnum_arg || !isdigit(*vnum_arg) || !*onoff_arg) {
+			msg_to_char(ch, "Usage: set <name> companion <mob vnum> <on | off>\r\n");
+			return 0;
+		}
+		if (!(pet = mob_proto(atoi(vnum_arg)))) {
+			msg_to_char(ch, "Invalid mob vnum.\r\n");
+			return 0;
+		}
+		
+		if (!str_cmp(onoff_arg, "on")) {
+			add_companion(vict, GET_MOB_VNUM(pet), NO_ABIL);
+			sprintf(output, "%s: gained companion %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+		}
+		else if (!str_cmp(onoff_arg, "off")) {
+			remove_companion(vict, GET_MOB_VNUM(pet));
+			sprintf(output, "%s: removed companion %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+		}
+		else {
+			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
+			return 0;
 		}
 	}
 	else if SET_CASE("faction") {
