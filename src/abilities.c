@@ -836,15 +836,15 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 		queue_delayed_update(master, CDU_SAVE);
 	}
 	if (GET_SHORT_DESC(mob) != GET_SHORT_DESC(proto)) {
-		add_companion_mod(cd, CMOD_KEYWORDS, 0, GET_SHORT_DESC(mob));
+		add_companion_mod(cd, CMOD_SHORT_DESC, 0, GET_SHORT_DESC(mob));
 		queue_delayed_update(master, CDU_SAVE);
 	}
 	if (GET_LONG_DESC(mob) != GET_LONG_DESC(proto)) {
-		add_companion_mod(cd, CMOD_KEYWORDS, 0, GET_LONG_DESC(mob));
+		add_companion_mod(cd, CMOD_LONG_DESC, 0, GET_LONG_DESC(mob));
 		queue_delayed_update(master, CDU_SAVE);
 	}
 	if (GET_LOOK_DESC(mob) != GET_LOOK_DESC(proto)) {
-		add_companion_mod(cd, CMOD_KEYWORDS, 0, GET_LOOK_DESC(mob));
+		add_companion_mod(cd, CMOD_LOOK_DESC, 0, GET_LOOK_DESC(mob));
 		queue_delayed_update(master, CDU_SAVE);
 	}
 	
