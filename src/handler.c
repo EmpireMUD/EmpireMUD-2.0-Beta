@@ -4652,6 +4652,28 @@ void free_companion(struct companion_data *cd) {
 
 
 /**
+* Find a companion modification in the list, by type.
+*
+* @param struct companion_data *cd The companion's data.
+* @param int type The CMOD_ type to fetch.
+* @return struct companion_mod* The matching data, if any (or NULL).
+*/
+struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type) {
+	struct companion_mod *mod;
+	
+	if (cd) {
+		LL_FOREACH(cd->mods, mod) {
+			if (mod->type == type) {
+				return mod;
+			}
+		}
+	}
+	
+	return NULL;	// if not found
+}
+
+
+/**
 * @param char_data *ch The player.
 * @param any_vnum vnum The companion vnum to check.
 * @return struct companion_data* The companion entry, if the player has it AND has whatever ability it requires.

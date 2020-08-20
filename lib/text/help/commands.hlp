@@ -466,6 +466,19 @@ command. Useful if you have a small display.
 
 See also: TOGGLE
 #
+COMPANION COMPANIONS
+
+Usage:  companions
+        companion <name>
+
+Companions are NPCs that will follow and assist your character. You can collect
+many different companions, but can only use one at a time. Companions may come
+from abilities, from adventures, or from other rewards.
+
+You can dismiss your companion from anywhere using 'dismiss companion'.
+
+See also: DISMISS, BODYGUARD, FAMILIAR
+#
 CONFIRM
 
 Usage:  confirm

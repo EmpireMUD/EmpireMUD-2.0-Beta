@@ -728,6 +728,116 @@ bool is_class_ability(ability_data *abil) {
 
 
 /**
+* Loads a companion as a mob, from its companion_data entry. This places the
+* mob in the room and runs load triggers, but does not send any messages of its
+* own.
+*
+* @param char_data *master The player summoning the companion.
+* @param struct companion_data *cd The companion (data) to summon as a mob.
+* @return char_data* The mob that was summoned, if possible (NULL otherwise).
+*/
+char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
+	extern bool despawn_companion(char_data *ch, mob_vnum vnum);
+	void scale_mob_as_companion(char_data *mob, char_data *master);
+	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+	
+	struct trig_proto_list *tp;
+	struct trig_var_data *var;
+	struct companion_mod *cm;
+	char_data *mob, *proto;
+	trig_data *trig;
+	
+	if (!master || IS_NPC(master) || !cd || !(proto = mob_proto(cd->vnum))) {
+		return NULL;	// safety first
+	}
+	
+	// get rid of any old companion
+	despawn_companion(master, NOTHING);
+	
+	// load mob
+	mob = read_mobile(cd->vnum, FALSE);
+	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);
+	SET_BIT(AFF_FLAGS(mob), AFF_CHARM);
+	setup_generic_npc(mob, GET_LOYALTY(master), NOTHING, NOTHING);
+	
+	// CMOD_x: modify the companion
+	LL_FOREACH(cd->mods, cm) {
+		switch (cm->type) {
+			case CMOD_SEX: {
+				GET_REAL_SEX(mob) = cm->num;
+				break;
+			}
+			case CMOD_KEYWORDS: {
+				if (cm->str && *cm->str) {
+					if (GET_PC_NAME(mob) && (!proto || GET_PC_NAME(mob) != GET_PC_NAME(proto))) {
+						free(GET_PC_NAME(mob));
+					}
+					GET_PC_NAME(mob) = str_dup(cm->str);
+				}
+				break;
+			}
+			case CMOD_SHORT_DESC: {
+				if (cm->str && *cm->str) {
+					if (GET_SHORT_DESC(mob) && (!proto || GET_SHORT_DESC(mob) != GET_SHORT_DESC(proto))) {
+						free(GET_SHORT_DESC(mob));
+					}
+					GET_SHORT_DESC(mob) = str_dup(cm->str);
+				}
+				break;
+			}
+			case CMOD_LONG_DESC: {
+				if (cm->str && *cm->str) {
+					if (GET_LONG_DESC(mob) && (!proto || GET_LONG_DESC(mob) != GET_LONG_DESC(proto))) {
+						free(GET_LONG_DESC(mob));
+					}
+					GET_LONG_DESC(mob) = str_dup(cm->str);
+				}
+				break;
+			}
+			case CMOD_LOOK_DESC: {
+				if (cm->str && *cm->str) {
+					if (GET_LOOK_DESC(mob) && (!proto || GET_LOOK_DESC(mob) != GET_LOOK_DESC(proto))) {
+						free(GET_LOOK_DESC(mob));
+					}
+					GET_LOOK_DESC(mob) = str_dup(cm->str);
+				}
+				break;
+			}
+		}
+	}
+	
+	// re-attach scripts
+	if (!SCRIPT(mob)) {
+		create_script_data(mob, MOB_TRIGGER);
+	}
+	LL_FOREACH(cd->scripts, tp) {
+		if ((trig = read_trigger(tp->vnum))) {
+			add_trigger(SCRIPT(mob), trig, -1);
+		}
+	}
+	
+	// re-attach script vars
+	LL_FOREACH(cd->vars, var) {
+		add_var(&(SCRIPT(mob)->global_vars), var->name, var->value, var->context);
+	}
+	
+	// set companion data
+	GET_COMPANION(master) = mob;
+	GET_COMPANION(mob) = master;
+	
+	// scale to summoner
+	scale_mob_as_companion(mob, master);
+	char_to_room(mob, IN_ROOM(master));
+	add_follower(mob, master, FALSE);
+	
+	// triggers last
+	load_mtrigger(mob);
+	
+	return mob;
+}
+
+
+/**
 * Removes all the passive buffs on a character and re-applies them. This can be
 * called at startup, when the player gains an ability, or when a player gains
 * a level (changes effect scaling).
@@ -933,6 +1043,38 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 		}
 		
 		gain_ability_exp(ch, agh->ability, amount);
+	}
+}
+
+
+/**
+* Ensures a player has companion entries for all the companions granted by
+* his/her abilities.
+*
+* @param char_data *ch The player.
+*/
+void setup_ability_companions(char_data *ch) {
+	extern struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
+	
+	struct player_ability_data *plab, *next_plab;
+	struct ability_data_list *adl;
+	ability_data *abil;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;	// no work
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		if (!abil || !plab->purchased[GET_CURRENT_SKILL_SET(ch)] || !IS_SET(ABIL_TYPES(abil), ABILT_COMPANION)) {
+			continue;
+		}
+		
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_COMPANION) {
+				add_companion(ch, adl->vnum, ABIL_VNUM(abil));
+			}
+		}
 	}
 }
 

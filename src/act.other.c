@@ -49,6 +49,7 @@ extern const struct toggle_data_type toggle_data[];	// constants.c
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 void check_delayed_load(char_data *ch);
 extern bool check_scaling(char_data *mob, char_data *attacker);
+extern bool check_vampire_sun(char_data *ch, bool message);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
@@ -1720,6 +1721,162 @@ ACMD(do_changepass) {
 }
 
 
+ACMD(do_companions) {
+	extern struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type);
+	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
+	void setup_ability_companions(char_data *ch);
+	extern const char *pool_types[];
+	
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	struct companion_data *cd, *next_cd, *found_cd;
+	struct companion_mod *cmod;
+	char_data *mob, *proto;
+	ability_data *abil;
+	size_t size, lsize;
+	bool found, full;
+	
+	skip_spaces(&argument);
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs can't use this command.\r\n");
+		return;
+	}
+	
+	setup_ability_companions(ch);
+	
+	if (!*argument) {
+		size = snprintf(buf, sizeof(buf), "You can summon the following companions:\r\n");
+		
+		found = full = FALSE;
+		HASH_ITER(hh, GET_COMPANIONS(ch), cd, next_cd) {
+			if (cd->from_abil != NOTHING && !has_ability(ch, cd->from_abil)) {
+				continue;	// missing ability: don't show
+			}
+			if (!(proto = mob_proto(cd->vnum))) {
+				continue;	// mob missing
+			}
+			
+			// build display
+			cmod = get_companion_mod_by_type(cd, CMOD_SHORT_DESC);
+			lsize = snprintf(line, sizeof(line), " %s", skip_filler(cmod ? cmod->str : GET_SHORT_DESC(proto)));
+			
+			if (cd->from_abil != NOTHING && (abil = find_ability_by_vnum(cd->from_abil)) && ABIL_COST(abil) > 0) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
+			}
+			
+			if (GET_MIN_SCALE_LEVEL(proto) > GET_COMPUTED_LEVEL(ch)) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " \trrequires level %d\t0", GET_MIN_SCALE_LEVEL(proto));
+			}
+			
+			strcat(line, "\r\n");
+			lsize += 2;
+			found = TRUE;
+			
+			if (size + lsize < sizeof(buf)) {
+				strcat(buf, line);
+				size += lsize;
+			}
+			else {
+				full = TRUE;
+				break;
+			}
+			
+			if (full) {
+				break;
+			}
+		}
+		
+		if (!found) {
+			strcat(buf, " none\r\n");	// always room for this if !found
+		}
+		if (full) {
+			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+		return;
+	}
+	
+	// got this far but wrong pos?
+	if (GET_POS(ch) < POS_STANDING) {
+		send_low_pos_msg(ch);
+		return;
+	}
+	
+	// lookup
+	found_cd = NULL;
+	HASH_ITER(hh, GET_COMPANIONS(ch), cd, next_cd) {
+		if (cd->from_abil != NOTHING && !has_ability(ch, cd->from_abil)) {
+			continue;	// missing ability
+		}
+		if (!(proto = mob_proto(cd->vnum))) {
+			continue;	// mob missing
+		}
+		if ((cmod = get_companion_mod_by_type(cd, CMOD_KEYWORDS)) && !multi_isname(argument, cmod->str)) {
+			continue;	// has custom keywords and doesn't match
+		}
+		else if (!cmod && !multi_isname(argument, GET_PC_NAME(proto))) {
+			continue;	// no custom keywords and doesn't match mob's keywords
+		}
+		
+		// seems to be found!
+		found_cd = cd;
+		break;
+	}
+	
+	// fetch ability if any
+	abil = (found_cd && found_cd->from_abil != NOTHING) ? find_ability_by_vnum(found_cd->from_abil) : NULL;
+	
+	// validate
+	if (GET_COMPANION(ch)) {
+		msg_to_char(ch, "You already have a companion. Dismiss it first.\r\n");
+		return;
+	}
+	if (!found_cd || !proto) {
+		msg_to_char(ch, "You don't have a companion called '%s'.\r\n", argument);
+		return;
+	}
+	if (GET_MIN_SCALE_LEVEL(proto) > GET_COMPUTED_LEVEL(ch)) {
+		msg_to_char(ch, "You must be level %d to summon that companion.\r\n", GET_MIN_SCALE_LEVEL(proto));
+		return;
+	}
+	if (abil && !can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil), NOTHING)) {
+		return;
+	}
+	if (abil && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && ABIL_COST(abil) > 0 && ABIL_COST_TYPE(abil) == BLOOD && !check_vampire_sun(ch, TRUE)) {
+		return;
+	}
+	if (abil && ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_VNUM(abil))) {
+		return;
+	}
+	
+	// proceed:
+	charge_ability_cost(ch, abil ? ABIL_COST_TYPE(abil) : MOVE, abil ? ABIL_COST(abil) : 0, NOTHING, 0, WAIT_OTHER);
+	mob = load_companion_mob(ch, found_cd);
+	
+	// messaging to char
+	if (abil && abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, mob, TO_CHAR);
+	}
+	else {
+		act("You summon $N.", FALSE, ch, NULL, mob, TO_CHAR);
+	}
+	
+	// messaging to room
+	if (abil && abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE, ch, NULL, mob, TO_NOTVICT);
+	}
+	else {
+		act("$n summons $N.", FALSE, ch, NULL, mob, TO_NOTVICT);
+	}
+	
+	if (abil) {
+		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
+	}
+}
+
+
 ACMD(do_confirm) {
 	bool check_reboot_confirms();
 	void perform_reboot();
@@ -2477,7 +2634,6 @@ ACMD(do_minipets) {
 
 
 ACMD(do_morph) {
-	extern bool check_vampire_sun(char_data *ch, bool message);
 	extern morph_data *find_morph_by_name(char_data *ch, char *name);
 	void finish_morphing(char_data *ch, morph_data *morph);
 	extern bool morph_affinity_ok(room_data *location, morph_data *morph);
@@ -2991,7 +3147,6 @@ ACMD(do_skin) {
 
 
 ACMD(do_summon) {
-	extern bool check_vampire_sun(char_data *ch, bool message);
 	void summon_materials(char_data *ch, char *argument);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
@@ -3033,11 +3188,6 @@ ACMD(do_summon) {
 	else if (is_abbrev(arg, "guards")) {
 		ability = SUMMON_GUARDS;
 		cooldown = COOLDOWN_SUMMON_GUARDS;
-		cooldown_time = 3 * SECS_PER_REAL_MIN;
-	}
-	else if (is_abbrev(arg, "bodyguard")) {
-		ability = ABIL_SUMMON_BODYGUARD;
-		cooldown = COOLDOWN_SUMMON_BODYGUARD;
 		cooldown_time = 3 * SECS_PER_REAL_MIN;
 	}
 	else if (is_abbrev(arg, "thugs")) {
@@ -3185,28 +3335,6 @@ ACMD(do_summon) {
 			
 			vnum = GUARD;
 			max = MAX(1, GET_CHARISMA(ch) / 2);
-			break;
-		}
-		case ABIL_SUMMON_BODYGUARD: {
-			cost = 25;
-			cost_type = MOVE;
-			
-			if (!(emp = GET_LOYALTY(ch))) {
-				msg_to_char(ch, "You must be in an empire to summon a bodyguard.\r\n");
-				return;
-			}
-			if (GET_COMPANION(ch)) {
-				msg_to_char(ch, "You can't summon a bodyguard -- you already have a companion.\r\n");
-				return;
-			}
-			if (!can_use_ability(ch, ability, cost_type, cost, cooldown)) {
-				return;
-			}
-			
-			vnum = BODYGUARD;
-			diff = DIFF_TRIVIAL;
-			follow = TRUE;
-			familiar = TRUE;
 			break;
 		}
 	}

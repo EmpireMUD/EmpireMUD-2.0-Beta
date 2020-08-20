@@ -218,10 +218,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	}
 	
 	switch (ABIL_VNUM(abil)) {
-		case ABIL_SUMMON_BODYGUARD: {
-			despawn_companion(ch, BODYGUARD);
-			break;
-		}
 		case ABIL_BOOST: {
 			affect_from_char(ch, ATYPE_BOOST, TRUE);
 			need_affect_total = TRUE;

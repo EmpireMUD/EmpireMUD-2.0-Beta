@@ -108,6 +108,7 @@ ACMD(do_colorburst);
 ACMD(do_combine);
 ACMD(do_command);
 ACMD(do_commands);
+ACMD(do_companions);
 ACMD(do_confer);
 ACMD(do_config);
 ACMD(do_confirm);
@@ -643,6 +644,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "combine", POS_RESTING, do_combine, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "command", POS_STANDING, do_command, NO_MIN, CTYPE_SKILL, ABIL_VAMP_COMMAND ),
 	SCMD_CMD( "commands", POS_DEAD, do_commands, NO_MIN, CTYPE_UTIL, SCMD_COMMANDS ),
+	SIMPLE_CMD( "companions", POS_DEAD, do_companions, NO_MIN, CTYPE_SKILL ),
 	SIMPLE_CMD( "consider", POS_RESTING, do_consider, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "config", POS_DEAD, do_config, LVL_CIMPL, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "confirm", POS_DEAD, do_confirm, NO_MIN, CTYPE_UTIL ),

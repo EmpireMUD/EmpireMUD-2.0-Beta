@@ -685,24 +685,23 @@ Usage:  summary
 
 This command shows a summary of you, your allies, and your enemies in combat.
 #
-"SUMMON BODYGUARD"
+"BODYGUARD"
 
-Summon Bodyguard (Battle ability)
+Bodyguard (Battle ability)
 
-Usage:  summon bodyguard
-Cooldown:  3 minutes
+Usage:  companion bodyguard
 Cost:  25 move
 
 This powerful ability allows you to summon a bodyguard. The bodyguard is strong
 enough to protect against many dangerous situations. He (or she) will take
 simple orders and will rescue you in battle.
 
-The bodyguard counts as a companion, and can be removed with the "dismiss"
-command.
+The bodyguard is a companion, and can be removed with the "dismiss" command.
 
-Gains experience when you summon your bodyguard.
+Gains experience when you summon your bodyguard or while the bodyguard is
+your active companion.
 
-See also: DISMISS, ORDER
+See also: COMPANION, DISMISS, ORDER
 #
 "TRICK SHOTS"
 
