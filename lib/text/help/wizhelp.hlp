@@ -1064,6 +1064,7 @@ Mode       Level    Description
 stats      God      Shows game stats including prototypes.
 ammotypes  Immort   Shows the 'ammo type' setting for all bows and ammo.
 buildings  Immort   Shows occurrences of buildings (vnum/name optional).
+companions Immort   Shows a player's available companions.
 components Immort   Shows all items matching a generic component vnum.
 crops      Immort   Shows tile counts for all the crops (vnum/name optional).
 currency   Immort   Shows coins and adventure currencies for a player.
@@ -1120,6 +1121,14 @@ Usage:  show ammotypes
 
 Lists all bows and ammo by ammotype. Useful for figuring out what ammotype
 to use for a new weapon/ammo.
+#e
+"SHOW COMPANIONS"
+
+Usage:  show companions <player> [search phrase]
+
+Lists the companions a player has available.
+
+See also: COMPANIONS
 #e
 "SHOW COMPONENTS"
 
