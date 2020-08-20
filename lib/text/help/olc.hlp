@@ -624,6 +624,10 @@ Companion abilities have the following properties:
             - You can set level limits on the mob.
             - The mob will be CHARMED.
 
+Companion abilities will use the &ctarg-to-char&0 and &ctarg-to-room&0 custom
+messages when a player summons the companion. &c$n&0 represents the player and
+&c&N&0 represents the companion.
+
 See also: OLC ABILITIES, ABILEDIT TYPES, COMPANION
 #d
 "ABILEDIT CRAFT ABILITY" "CRAFT ABILITY" "CRAFTING ABILITY" "CRAFT ABILITIES"
