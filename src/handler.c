@@ -91,6 +91,7 @@ void scale_item_to_level(obj_data *obj, int level);
 static void add_obj_binding(int idnum, struct obj_binding **list);
 void die_follower(char_data *ch);
 struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
+struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 void remove_companion(char_data *ch, any_vnum vnum);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
 void schedule_room_affect_expire(room_data *room, struct affected_type *af);
@@ -4607,6 +4608,26 @@ void add_companion_mod(struct companion_data *companion, int type, int num, char
 
 
 /**
+* If the mob is a companion, ensures that the var is saved.
+*
+* @param char_data *mob The possible companion.
+* @param char *name The var name.
+* @param char *value The var's value.
+* @param int id The var's context/id.
+*/
+void add_companion_var(char_data *mob, char *name, char *value, int id) {
+	struct companion_data *cd;
+	
+	if (!mob || !name || !value || !IS_NPC(mob) || !GET_COMPANION(mob) || !(cd = has_companion(GET_COMPANION(mob), GET_MOB_VNUM(mob)))) {
+		return;	// no work
+	}
+	
+	add_var(&(cd->vars), name, value, id);
+	queue_delayed_update(GET_COMPANION(mob), CDU_SAVE);
+}
+
+
+/**
 * Adds a minipet vnum to a player's list.
 *
 * @param char_data *ch The player.
@@ -4794,6 +4815,38 @@ void remove_companion_mod(struct companion_data **companion, int type) {
 			}
 			free(mod);
 		}
+	}
+}
+
+
+/**
+* If the mob is a companion, ensures that the var is deleted.
+*
+* @param char_data *mob The possible companion.
+* @param char *name The var name.
+* @param int id The var's context/id.
+*/
+void remove_companion_var(char_data *mob, char *name, int context) {
+	struct trig_var_data *vd, *next_vd;
+	struct companion_data *cd;
+	bool found = FALSE;
+	
+	if (!mob || !name || !IS_NPC(mob) || !GET_COMPANION(mob) || !(cd = has_companion(GET_COMPANION(mob), GET_MOB_VNUM(mob)))) {
+		return;	// no work
+	}
+	
+	LL_FOREACH_SAFE(cd->vars, vd, next_vd) {
+		if (!str_cmp(vd->name, name) && (vd->context == 0 || vd->context == context)) {
+			found = TRUE;
+			LL_DELETE(cd->vars, vd);
+			free(vd->value);
+			free(vd->name);
+			free(vd);
+		}
+	}
+	
+	if (found) {
+		queue_delayed_update(GET_COMPANION(mob), CDU_SAVE);
 	}
 }
 

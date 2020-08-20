@@ -6947,6 +6947,8 @@ void process_unset(struct script_data *sc, trig_data *trig, char *cmd) {
 *     'remote <variable_name> <uid>'
 */
 void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
+	void add_companion_var(char_data *mob, char *name, char *value, int id);
+	
 	struct trig_var_data *vd;
 	struct script_data *sc_remote=NULL;
 	char *line, *var, *uid_p;
@@ -7005,6 +7007,7 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 		sc_remote = SCRIPT(mob) ? SCRIPT(mob) : create_script_data(mob, MOB_TRIGGER);
 		if (!IS_NPC(mob))
 			context = 0;
+		add_companion_var(mob, vd->name, vd->value, context);
 	}
 	else if ((obj = find_obj(uid, FALSE))) {
 		sc_remote = SCRIPT(obj) ? SCRIPT(obj) : create_script_data(obj, OBJ_TRIGGER);
@@ -7034,6 +7037,8 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 * named vdelete so people didn't think it was to delete rooms
 */
 ACMD(do_vdelete) {
+	void remove_companion_var(char_data *mob, char *name, int context);
+	
 	struct trig_var_data *vd, *vd_prev=NULL;
 	struct script_data *sc_remote=NULL;
 	char *var, *uid_p;
@@ -7071,6 +7076,7 @@ ACMD(do_vdelete) {
 	}
 	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob);
+		remove_companion_var(mob, var, 0);
 		/*
 		// this was set but never used...
 		if (!IS_NPC(mob))
@@ -7131,6 +7137,8 @@ ACMD(do_vdelete) {
 *     'rdelete <variable_name> <uid>'
 */
 void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
+	void remove_companion_var(char_data *mob, char *name, int context);
+	
 	struct trig_var_data *vd, *vd_prev=NULL;
 	struct script_data *sc_remote=NULL;
 	char *line, *var, *uid_p;
@@ -7169,6 +7177,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	}
 	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob);
+		remove_companion_var(mob, var, sc->context);
 		/*
 		// this was set but never used
 		if (!IS_NPC(mob))
