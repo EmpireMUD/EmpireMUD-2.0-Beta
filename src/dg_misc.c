@@ -1177,10 +1177,12 @@ void script_heal(void *thing, int type, char *argument) {
 void script_modify(char *argument) {
 	void change_keywords(char_data *ch, char *str);
 	void change_long_desc(char_data *ch, char *str);
+	void change_sex(char_data *ch, int sex);
 	void change_short_desc(char_data *ch, char *str);
 	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 	extern char *get_room_description(room_data *room);
 	extern vehicle_data *get_vehicle(char *name);
+	extern const char *genders[];
 	extern bool world_map_needs_save;
 	
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
@@ -1189,6 +1191,7 @@ void script_modify(char *argument) {
 	obj_data *obj = NULL, *o_proto;
 	room_data *room = NULL;
 	bool clear;
+	int pos;
 	
 	half_chop(argument, targ_arg, temp);
 	half_chop(temp, field_arg, value);
@@ -1216,6 +1219,14 @@ void script_modify(char *argument) {
 		else if (is_abbrev(field_arg, "longdescription")) {
 			strcat(value, "\r\n");	// required by long descs
 			change_long_desc(mob, clear ? NULL : value);
+		}
+		else if (is_abbrev(field_arg, "sex")) {
+			if ((pos = search_block(value, genders, FALSE)) != NOTHING) {
+				change_sex(mob, pos);
+			}
+			else {
+				script_log("%%mod%% called with invalid mob sex field '%s'", value);
+			}
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
 			change_short_desc(mob, clear ? NULL : value);
