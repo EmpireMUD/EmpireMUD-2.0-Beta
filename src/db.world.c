@@ -1795,6 +1795,7 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 void reset_one_room(room_data *room) {
 	void add_convert_vehicle_data(char_data *mob, any_vnum vnum);
 	void change_keywords(char_data *ch, char *str);
+	void change_long_desc(char_data *ch, char *str);
 	void change_sex(char_data *ch, int sex);
 	void change_short_desc(char_data *ch, char *str);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
