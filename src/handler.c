@@ -4591,7 +4591,7 @@ void add_companion_mod(struct companion_data *companion, int type, int num, char
 			if (mod->str) {
 				free(mod->str);
 			}
-			mod->str = str_dup(str);
+			mod->str = str ? str_dup(str) : NULL;
 			found = TRUE;
 		}
 	}
@@ -4600,7 +4600,7 @@ void add_companion_mod(struct companion_data *companion, int type, int num, char
 		CREATE(mod, struct companion_mod, 1);
 		mod->type = type;
 		mod->num = num;
-		mod->str = str_dup(str);
+		mod->str = str ? str_dup(str) : NULL;
 		LL_PREPEND(companion->mods, mod);
 	}
 }
