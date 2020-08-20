@@ -739,6 +739,7 @@ bool is_class_ability(ability_data *abil) {
 char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 	void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
 	extern bool despawn_companion(char_data *ch, mob_vnum vnum);
+	void reread_companion_trigs(char_data *mob);
 	void scale_mob_as_companion(char_data *mob, char_data *master);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
@@ -826,21 +827,31 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 	GET_COMPANION(master) = mob;
 	GET_COMPANION(mob) = master;
 	
-	// ensure any custom strings are saved
-	if (GET_REAL_SEX(mob) != GET_REAL_SEX(proto)) {
-		add_companion_mod(cd, CMOD_SEX, GET_REAL_SEX(mob), NULL);
-	}
-	if (GET_PC_NAME(mob) != GET_PC_NAME(proto)) {
-		add_companion_mod(cd, CMOD_KEYWORDS, 0, GET_PC_NAME(mob));
-	}
-	if (GET_SHORT_DESC(mob) != GET_SHORT_DESC(proto)) {
-		add_companion_mod(cd, CMOD_SHORT_DESC, 0, GET_SHORT_DESC(mob));
-	}
-	if (GET_LONG_DESC(mob) != GET_LONG_DESC(proto)) {
-		add_companion_mod(cd, CMOD_LONG_DESC, 0, GET_LONG_DESC(mob));
-	}
-	if (GET_LOOK_DESC(mob) != GET_LOOK_DESC(proto)) {
-		add_companion_mod(cd, CMOD_LOOK_DESC, 0, GET_LOOK_DESC(mob));
+	// for new mobs, ensure any data is saved back
+	if (!cd->instantiated) {
+		// sex/string changes
+		if (GET_REAL_SEX(mob) != GET_REAL_SEX(proto)) {
+			add_companion_mod(cd, CMOD_SEX, GET_REAL_SEX(mob), NULL);
+		}
+		if (GET_PC_NAME(mob) != GET_PC_NAME(proto)) {
+			add_companion_mod(cd, CMOD_KEYWORDS, 0, GET_PC_NAME(mob));
+		}
+		if (GET_SHORT_DESC(mob) != GET_SHORT_DESC(proto)) {
+			add_companion_mod(cd, CMOD_SHORT_DESC, 0, GET_SHORT_DESC(mob));
+		}
+		if (GET_LONG_DESC(mob) != GET_LONG_DESC(proto)) {
+			add_companion_mod(cd, CMOD_LONG_DESC, 0, GET_LONG_DESC(mob));
+		}
+		if (GET_LOOK_DESC(mob) != GET_LOOK_DESC(proto)) {
+			add_companion_mod(cd, CMOD_LOOK_DESC, 0, GET_LOOK_DESC(mob));
+		}
+		
+		// save scripts
+		reread_companion_trigs(mob);
+		
+		// mark as instantiated
+		cd->instantiated = TRUE;
+		queue_delayed_update(master, CDU_SAVE);
 	}
 	
 	// scale to summoner
@@ -850,10 +861,6 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 	
 	// triggers last
 	load_mtrigger(mob);
-	
-	// mark as instantiated
-	cd->instantiated = TRUE;
-	queue_delayed_update(master, CDU_SAVE);
 	
 	return mob;
 }

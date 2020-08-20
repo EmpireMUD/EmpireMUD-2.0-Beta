@@ -74,6 +74,7 @@ extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);	// quest
 extern int is_substring(char *sub, char *string);
 extern room_data *obj_room(obj_data *obj);
 trig_data *read_trigger(trig_vnum vnum);
+void reread_companion_trigs(char_data *mob);
 obj_data *get_object_in_equip(char_data *ch, char *name);
 void extract_trigger(trig_data *trig);
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type);
@@ -1486,6 +1487,7 @@ ACMD(do_tattach) {
 			create_script_data(victim, MOB_TRIGGER);
 		}
 		add_trigger(SCRIPT(victim), trig, loc);
+		reread_companion_trigs(victim);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim));
@@ -1887,6 +1889,7 @@ ACMD(do_tdetach) {
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
 			check_extract_script(victim, MOB_TRIGGER);
+			reread_companion_trigs(victim);
 		}
 		else
 			msg_to_char(ch, "That trigger was not found.\r\n");
@@ -6580,6 +6583,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 			create_script_data(c, MOB_TRIGGER);
 		}
 		add_trigger(SCRIPT(c), newtrig, -1);
+		reread_companion_trigs(c);
 		return;
 	}
 
@@ -6653,6 +6657,7 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 		if (remove_trigger(SCRIPT(c), trignum_s)) {
 			check_extract_script(c, MOB_TRIGGER);
 		}
+		reread_companion_trigs(c);
 		return;
 	}
 

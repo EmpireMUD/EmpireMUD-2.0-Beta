@@ -4872,6 +4872,35 @@ void remove_minipet(char_data *ch, any_vnum vnum) {
 }
 
 
+/**
+* If the mob is a companion, ensures that its triggers are saved.
+*
+* @param char_data *mob The possible companion.
+*/
+void reread_companion_trigs(char_data *mob) {
+	struct trig_proto_list *tp;
+	struct companion_data *cd;
+	trig_data *trig;
+	
+	if (!mob || !IS_NPC(mob) || !GET_COMPANION(mob) || !(cd = has_companion(GET_COMPANION(mob), GET_MOB_VNUM(mob)))) {
+		return;	// no work
+	}
+	
+	free_proto_scripts(&cd->scripts);
+	cd->scripts = NULL;
+	
+	if (SCRIPT(mob)) {
+		LL_FOREACH(TRIGGERS(SCRIPT(mob)), trig) {
+			CREATE(tp, struct trig_proto_list, 1);
+			tp->vnum = GET_TRIG_VNUM(trig);
+			LL_APPEND(cd->scripts, tp);
+		}
+	}
+	
+	queue_delayed_update(GET_COMPANION(mob), CDU_SAVE);
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MOB TAGGING HANDLERS ////////////////////////////////////////////////////
 
