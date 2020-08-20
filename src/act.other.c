@@ -1758,7 +1758,7 @@ ACMD(do_companions) {
 			
 			// build display
 			cmod = get_companion_mod_by_type(cd, CMOD_SHORT_DESC);
-			lsize = snprintf(line, sizeof(line), " %s", skip_filler(cmod ? cmod->str : GET_SHORT_DESC(proto)));
+			lsize = snprintf(line, sizeof(line), " %s", skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
 			
 			if (cd->from_abil != NOTHING && (abil = find_ability_by_vnum(cd->from_abil)) && ABIL_COST(abil) > 0) {
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
