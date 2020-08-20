@@ -2332,7 +2332,7 @@ char *get_mob_name_by_proto(mob_vnum vnum, bool replace_placeholders) {
 	char *unk = "UNKNOWN";
 	char *tmp;
 	
-	if (!replace_placeholders || !proto || !strchr(buf, '#')) {
+	if (!replace_placeholders || !proto || !strchr(GET_SHORT_DESC(proto), '#')) {
 		// short way out
 		return proto ? GET_SHORT_DESC(proto) : unk;
 	}
