@@ -175,6 +175,11 @@ bool is_ignoring(char_data *ch, char_data *victim) {
 	struct account_player *plr;
 	int iter, alts = 0;
 	
+	// if it's an npc, follow up the chain to a player (e.g. charmed npc)
+	while (victim && IS_NPC(victim) && victim->master) {
+		victim = victim->master;
+	}
+	
 	// shortcuts
 	if (REAL_NPC(ch) || REAL_NPC(victim)) {
 		return FALSE;
