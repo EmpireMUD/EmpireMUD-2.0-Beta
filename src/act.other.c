@@ -1847,7 +1847,7 @@ ACMD(do_companions) {
 		msg_to_char(ch, "You must be alone to summon that companion in the solo role.\r\n");
 		return;
 	}
-	if (abil && !can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil), NOTHING)) {
+	if (abil && !can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil))) {
 		return;
 	}
 	if (abil && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && ABIL_COST(abil) > 0 && ABIL_COST_TYPE(abil) == BLOOD && !check_vampire_sun(ch, TRUE)) {
@@ -1858,7 +1858,7 @@ ACMD(do_companions) {
 	}
 	
 	// proceed:
-	charge_ability_cost(ch, abil ? ABIL_COST_TYPE(abil) : MOVE, abil ? ABIL_COST(abil) : 0, NOTHING, 0, WAIT_OTHER);
+	charge_ability_cost(ch, abil ? ABIL_COST_TYPE(abil) : MOVE, abil ? ABIL_COST(abil) : 0, abil ? ABIL_COOLDOWN(abil) : NOTHING, abil ? ABIL_COOLDOWN_SECS(abil) : 0, WAIT_OTHER);
 	mob = load_companion_mob(ch, found_cd);
 	
 	// messaging to char

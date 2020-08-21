@@ -433,7 +433,7 @@ ACMD(do_ready) {
 		msg_to_char(ch, "You don't know how to ready that.\r\n");
 		return;
 	}
-	if (!can_use_ability(ch, ABIL_VNUM(found_abil), ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), NOTHING)) {
+	if (!can_use_ability(ch, ABIL_VNUM(found_abil), ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), ABIL_COOLDOWN(found_abil))) {
 		return;
 	}
 	if (!ABILITY_FLAGGED(found_abil, ABILF_IGNORE_SUN) && ABIL_COST(found_abil) > 0 && ABIL_COST_TYPE(found_abil) == BLOOD && !check_vampire_sun(ch, TRUE)) {
@@ -484,7 +484,7 @@ ACMD(do_ready) {
 		ch_level = get_approximate_level(ch);
 	}
 	
-	charge_ability_cost(ch, ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), NOTHING, 0, WAIT_SPELL);
+	charge_ability_cost(ch, ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), WAIT_SPELL);
 	
 	// load the object
 	obj = read_object(GET_OBJ_VNUM(proto), TRUE);
