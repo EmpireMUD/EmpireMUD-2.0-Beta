@@ -1843,6 +1843,10 @@ ACMD(do_companions) {
 		msg_to_char(ch, "You must be level %d to summon that companion.\r\n", GET_MIN_SCALE_LEVEL(proto));
 		return;
 	}
+	if (abil && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
+		msg_to_char(ch, "You must be alone to summon that companion in the solo role.\r\n");
+		return;
+	}
 	if (abil && !can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil), NOTHING)) {
 		return;
 	}
