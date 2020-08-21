@@ -1217,7 +1217,10 @@ void script_modify(char *argument) {
 		// player-targetable mods first
 		if (is_abbrev(field_arg, "companion")) {
 			if (!IS_NPC(mob)) {
-				if ((cd = has_companion(mob, atoi(value)))) {
+				if (!str_cmp(value, "none")) {
+					despawn_companion(mob, NOTHING);
+				}
+				else if ((cd = has_companion(mob, atoi(value)))) {
 					despawn_companion(mob, NOTHING);
 					mob = load_companion_mob(mob, cd);
 				}
