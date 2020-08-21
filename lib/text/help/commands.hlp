@@ -475,7 +475,9 @@ Companions are NPCs that will follow and assist your character. You can collect
 many different companions, but can only use one at a time. Companions may come
 from abilities, from adventures, or from other rewards.
 
-You can dismiss your companion from anywhere using 'dismiss companion'.
+You can dismiss your companion from anywhere using 'dismiss companion'. If you
+log out with a companion active, it will automatically be re-summoned when you
+log back in (but you will have to re-cast any buffs on it).
 
 See also: DISMISS, BODYGUARD, FAMILIAR
 #
