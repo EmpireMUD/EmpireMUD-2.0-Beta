@@ -1179,7 +1179,10 @@ void script_modify(char *argument) {
 	void change_long_desc(char_data *ch, char *str);
 	void change_sex(char_data *ch, int sex);
 	void change_short_desc(char_data *ch, char *str);
+	extern bool despawn_companion(char_data *ch, mob_vnum vnum);
 	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
+	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
+	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
 	extern char *get_room_description(room_data *room);
 	extern vehicle_data *get_vehicle(char *name);
 	extern const char *genders[];
@@ -1187,6 +1190,7 @@ void script_modify(char *argument) {
 	
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
 	vehicle_data *veh = NULL, *v_proto;
+	struct companion_data *cd;
 	char_data *mob = NULL;
 	obj_data *obj = NULL, *o_proto;
 	room_data *room = NULL;
@@ -1209,8 +1213,21 @@ void script_modify(char *argument) {
 	clear = !str_cmp(value, "-") || !str_cmp(value, "--");
 	
 	// CHARACTER MODE
-	if ((mob = get_char(targ_arg))) {		
-		if (!IS_NPC(mob)) {
+	if ((mob = get_char(targ_arg))) {
+		// player-targetable mods first
+		if (is_abbrev(field_arg, "companion")) {
+			if (!IS_NPC(mob)) {
+				if ((cd = has_companion(mob, atoi(value)))) {
+					despawn_companion(mob, NOTHING);
+					mob = load_companion_mob(mob, cd);
+				}
+			}
+			else {
+				script_log("%%mod%% companion cannot target an NPC");
+			}
+		}
+		// no player-targeting below this line
+		else if (!IS_NPC(mob)) {
 			script_log("%%mod%% cannot target a player");
 		}
 		else if (is_abbrev(field_arg, "keywords")) {

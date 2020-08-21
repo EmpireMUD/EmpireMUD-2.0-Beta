@@ -497,6 +497,7 @@ and then the 'append-description' field to add more lines. It will
 automatically format itself.
 
 Supported fields are:
+ Players: companion <vnum>
  Mobs: keywords, longdesc, sex, shortdesc
  Objects: keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
           append-lookdesc-noformat
