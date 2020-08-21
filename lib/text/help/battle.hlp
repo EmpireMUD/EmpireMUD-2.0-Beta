@@ -690,6 +690,7 @@ This command shows a summary of you, your allies, and your enemies in combat.
 Bodyguard (Battle ability)
 
 Usage:  companion bodyguard
+Cooldown:  3 minutes (after the bodyguard dies)
 Cost:  25 move
 
 This powerful ability allows you to summon a bodyguard. The bodyguard is strong
