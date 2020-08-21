@@ -1279,6 +1279,12 @@ void extract_char(char_data *ch) {
 	
 	// clear companion (both directions) if any
 	if (GET_COMPANION(ch)) {
+		if (!IS_NPC(ch)) {
+			GET_LAST_COMPANION(ch) = NOTHING;
+		}
+		if (!IS_NPC(GET_COMPANION(ch))) {
+			GET_LAST_COMPANION(GET_COMPANION(ch)) = NOTHING;
+		}
 		if (GET_COMPANION(GET_COMPANION(ch)) == ch) {
 			GET_COMPANION(GET_COMPANION(ch)) = NULL;
 		}

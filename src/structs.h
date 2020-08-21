@@ -4027,6 +4027,7 @@ struct player_special_data {
 	int ignore_list[MAX_IGNORES];	// players who can't message you
 	int last_tell;	// idnum of last tell from
 	time_t last_offense_seen;	// timestamp of last time the player checked offenses
+	any_vnum last_companion;	// if the player has a companion out, this triggers a re-summon
 	
 	// character strings
 	char *lastname;	// Last name

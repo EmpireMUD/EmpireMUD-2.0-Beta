@@ -826,6 +826,7 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 	// set companion data
 	GET_COMPANION(master) = mob;
 	GET_COMPANION(mob) = master;
+	GET_LAST_COMPANION(master) = GET_MOB_VNUM(mob);
 	
 	// for new mobs, ensure any data is saved back
 	if (!cd->instantiated) {

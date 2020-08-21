@@ -1708,6 +1708,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				else if (PFILE_TAG(line, "Last Room:", length)) {
 					GET_LAST_ROOM(ch) = atoi(line + length + 1);
 				}
+				else if (PFILE_TAG(line, "Last Companion:", length)) {
+					GET_LAST_COMPANION(ch) = atoi(line + length + 1);
+				}
 				else if (PFILE_TAG(line, "Last Direction:", length)) {
 					GET_LAST_DIR(ch) = atoi(line + length + 1);
 				}
@@ -2837,6 +2840,9 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'L'
+	if (GET_LAST_COMPANION(ch) != NOTHING) {
+		fprintf(fl, "Last Companion: %d\n", GET_LAST_COMPANION(ch));
+	}
 	for (lore = GET_LORE(ch); lore; lore = lore->next) {
 		if (lore->text && *lore->text) {
 			fprintf(fl, "Lore: %d %ld\n%s\n", lore->type, lore->date, lore->text);
@@ -3575,7 +3581,9 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void clean_player_kills(char_data *ch);
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
+	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 	void give_level_zero_abilities(char_data *ch);
+	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
 	void refresh_all_quests(char_data *ch);
 	void refresh_passive_buffs(char_data *ch);
 	void reset_combat_meters(char_data *ch);
@@ -3586,7 +3594,8 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	struct slash_channel *load_slash, *next_slash, *temp;
 	bool stop_action = FALSE, try_home = FALSE;
 	room_data *load_room = NULL;
-	char_data *ch = d->character, *repl;
+	char_data *ch = d->character, *repl, *mob;
+	struct companion_data *compan;
 	char lbuf[MAX_STRING_LENGTH];
 	struct affected_type *af;
 	player_index_data *index;
@@ -3873,6 +3882,11 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	pause_affect_total = FALSE;
 	affect_total(ch);
+	
+	// reload last companion?
+	if (GET_LAST_COMPANION(ch) != NOTHING && (compan = has_companion(ch, GET_LAST_COMPANION(ch)))) {
+		mob = load_companion_mob(ch, compan);
+	}
 }
 
 

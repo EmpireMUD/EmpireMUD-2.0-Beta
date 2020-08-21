@@ -50,6 +50,7 @@ extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 void check_delayed_load(char_data *ch);
 extern bool check_scaling(char_data *mob, char_data *attacker);
 extern bool check_vampire_sun(char_data *ch, bool message);
+extern bool despawn_companion(char_data *ch, mob_vnum vnum);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
@@ -415,6 +416,7 @@ void perform_alternate(char_data *old, char_data *new) {
 	GET_LAST_KNOWN_LEVEL(old) = GET_COMPUTED_LEVEL(old);
 	SAVE_CHAR(old);
 	dismiss_any_minipet(old);
+	despawn_companion(old, NOTHING);
 	
 	// save this to switch over replies
 	last_tell = GET_LAST_TELL(old);
@@ -1945,8 +1947,6 @@ ACMD(do_customize) {
 
 
 ACMD(do_dismiss) {
-	bool despawn_companion(char_data *ch, mob_vnum vnum);
-	
 	char_data *vict;
 	
 	one_argument(argument, arg);
@@ -2906,6 +2906,7 @@ ACMD(do_quit) {
 	
 	descriptor_data *d, *next_d;
 	bool confirm = FALSE, died = FALSE;
+	any_vnum vnum = NOTHING;
 
 	if (IS_NPC(ch) || !ch->desc)
 		return;
@@ -2942,6 +2943,10 @@ ACMD(do_quit) {
 			player_death(ch);
 			died = TRUE;
 		}
+		else if (GET_COMPANION(ch)) {
+			// preserve companion
+			vnum = GET_MOB_VNUM(GET_COMPANION(ch));
+		}
 		
 		if (!GET_INVIS_LEV(ch)) {
 			act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
@@ -2957,6 +2962,7 @@ ACMD(do_quit) {
 		}
 		send_to_char("Goodbye, friend... Come back soon!\r\n", ch);
 		dismiss_any_minipet(ch);
+		despawn_companion(ch, NOTHING);
 
 		/*
 		 * kill off all sockets connected to the same player as the one who is
@@ -2970,6 +2976,7 @@ ACMD(do_quit) {
 		}
 		
 		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
+		GET_LAST_COMPANION(ch) = vnum;
 		save_char(ch, died ? NULL : IN_ROOM(ch));
 		
 		display_statistics_to_char(ch);
