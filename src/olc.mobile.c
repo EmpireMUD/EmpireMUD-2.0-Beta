@@ -135,11 +135,11 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Invalid attack type");
 		problem = TRUE;
 	}
-	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !has_interaction(mob->interactions, INTERACT_SKIN)) {
+	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !MOB_FLAGGED(mob, MOB_NO_CORPSE) && !has_interaction(mob->interactions, INTERACT_SKIN)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Animal has no skin");
 		problem = TRUE;
 	}
-	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !has_interaction(mob->interactions, INTERACT_BUTCHER)) {
+	if (MOB_FLAGGED(mob, MOB_ANIMAL) && !MOB_FLAGGED(mob, MOB_NO_CORPSE) && !has_interaction(mob->interactions, INTERACT_BUTCHER)) {
 		olc_audit_msg(ch, GET_MOB_VNUM(mob), "Animal can't be butchered");
 		problem = TRUE;
 	}
