@@ -3594,7 +3594,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	struct slash_channel *load_slash, *next_slash, *temp;
 	bool stop_action = FALSE, try_home = FALSE;
 	room_data *load_room = NULL;
-	char_data *ch = d->character, *repl, *mob;
+	char_data *ch = d->character, *repl;
 	struct companion_data *compan;
 	char lbuf[MAX_STRING_LENGTH];
 	struct affected_type *af;
@@ -3885,7 +3885,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// reload last companion?
 	if (GET_LAST_COMPANION(ch) != NOTHING && (compan = has_companion(ch, GET_LAST_COMPANION(ch)))) {
-		mob = load_companion_mob(ch, compan);
+		load_companion_mob(ch, compan);
 	}
 }
 
