@@ -2127,6 +2127,7 @@ const char *name_sets[] = {
 	"Roman",
 	"Northern",
 	"Primitive-Short",
+	"Descriptive",
 	"\n"
 };
 

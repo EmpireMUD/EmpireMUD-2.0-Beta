@@ -1582,6 +1582,7 @@ typedef struct vehicle_data vehicle_data;
 #define NAMES_ROMAN  2
 #define NAMES_NORTHERN  3
 #define NAMES_PRIMITIVE_SHORT  4
+#define NAMES_DESCRIPTIVE  5
 
 
  //////////////////////////////////////////////////////////////////////////////
