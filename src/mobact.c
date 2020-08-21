@@ -988,7 +988,7 @@ static int spawn_one_list(room_data *room, struct spawn_info *list) {
 	struct spawn_info *spawn;
 	bool in_city, junk;
 	room_data *home;
-	char_data *mob;
+	char_data *mob, *proto;
 	
 	if (!room || !list) {
 		return 0;	// safety first
@@ -1011,6 +1011,11 @@ static int spawn_one_list(room_data *room, struct spawn_info *list) {
 		// check percent
 		if (number(1, 10000) > (int)(100 * spawn->percent)) {
 			continue;
+		}
+		
+		// check repel-animals
+		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_REPEL_ANIMALS) && (!(proto = mob_proto(spawn->vnum)) || MOB_FLAGGED(proto, MOB_ANIMAL))) {
+			continue;	// repelled by this flag
 		}
 		
 		// passed! let's spawn
@@ -1103,68 +1108,73 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 		return;
 	}
 	
-	// spawn empire npcs who live here first
-	if (ROOM_OWNER(home) && (ter = find_territory_entry(ROOM_OWNER(home), room))) {
-		for (npc = ter->npcs; npc; npc = npc->next) {
-			if (npc->mob) {
-				continue;	// check if the mob is already spawned
-			}
-			if (only_artisans && npc->vnum != artisan) {
-				continue;	// not spawning this now
-			}
+	
+	if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_REPEL_NPCS)) {
+		// spawns not blocked by repel-npcs
+	
+		// spawn empire npcs who live here first
+		if (ROOM_OWNER(home) && (ter = find_territory_entry(ROOM_OWNER(home), room))) {
+			for (npc = ter->npcs; npc; npc = npc->next) {
+				if (npc->mob) {
+					continue;	// check if the mob is already spawned
+				}
+				if (only_artisans && npc->vnum != artisan) {
+					continue;	// not spawning this now
+				}
 			
-			spawn_empire_npc_to_room(ROOM_OWNER(home), npc, room, NOTHING);
-		}
-	}
-	
-	// count creatures in the room; don't spawn rooms that are already populous
-	count = 0;
-	for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
-		if (IS_NPC(ch_iter)) {
-			++count;
-		}
-	}
-	
-	// normal spawn list
-	if (!only_artisans && count < config_get_int("spawn_limit_per_room")) {
-		// spawn based on vehicles?
-		LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-			if (VEH_SPAWNS(veh)) {
-				count += spawn_one_list(room, VEH_SPAWNS(veh));
+				spawn_empire_npc_to_room(ROOM_OWNER(home), npc, room, NOTHING);
 			}
 		}
-		
-		// spawn based on tile type -- if we're not now over the count
-		if (count < config_get_int("spawn_limit_per_room")) {
-			if (GET_BUILDING(room)) {
-				// only find a spawn list here if the building is complete; otherwise no list = no spawn
-				if (IS_COMPLETE(room)) {
-					count += spawn_one_list(room, GET_BLD_SPAWNS(GET_BUILDING(room)));
+	
+		// count creatures in the room; don't spawn rooms that are already populous
+		count = 0;
+		for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
+			if (IS_NPC(ch_iter)) {
+				++count;
+			}
+		}
+	
+		// normal spawn list
+		if (!only_artisans && count < config_get_int("spawn_limit_per_room")) {
+			// spawn based on vehicles?
+			LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+				if (VEH_SPAWNS(veh)) {
+					count += spawn_one_list(room, VEH_SPAWNS(veh));
 				}
 			}
-			else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
-				count += spawn_one_list(room, GET_CROP_SPAWNS(cp));
-			}
-			else {
-				count += spawn_one_list(room, GET_SECT_SPAWNS(SECT(room)));
-			}
-		}
 		
-		// global spawn lists
-		if (IS_OUTDOOR_TILE(room) && !ROOM_SECT_FLAGGED(room, SECTF_NO_GLOBAL_SPAWNS) && !ROOM_CROP_FLAGGED(room, CROPF_NO_GLOBAL_SPAWNS) && count < config_get_int("spawn_limit_per_room")) {
-			struct glb_map_spawn_bean *data;
-			bool junk;
+			// spawn based on tile type -- if we're not now over the count
+			if (count < config_get_int("spawn_limit_per_room")) {
+				if (GET_BUILDING(room)) {
+					// only find a spawn list here if the building is complete; otherwise no list = no spawn
+					if (IS_COMPLETE(room)) {
+						count += spawn_one_list(room, GET_BLD_SPAWNS(GET_BUILDING(room)));
+					}
+				}
+				else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
+					count += spawn_one_list(room, GET_CROP_SPAWNS(cp));
+				}
+				else {
+					count += spawn_one_list(room, GET_SECT_SPAWNS(SECT(room)));
+				}
+			}
+		
+			// global spawn lists
+			if (IS_OUTDOOR_TILE(room) && !ROOM_SECT_FLAGGED(room, SECTF_NO_GLOBAL_SPAWNS) && !ROOM_CROP_FLAGGED(room, CROPF_NO_GLOBAL_SPAWNS) && count < config_get_int("spawn_limit_per_room")) {
+				struct glb_map_spawn_bean *data;
+				bool junk;
 			
-			CREATE(data, struct glb_map_spawn_bean, 1);
-			data->room = room;
-			data->x_coord = X_COORD(room);
-			data->y_coord = Y_COORD(room);
-			data->in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
-			run_globals(GLOBAL_MAP_SPAWNS, run_global_map_spawns, TRUE, GET_SECT_CLIMATE(BASE_SECT(room)), NULL, NULL, 0, validate_global_map_spawns, data);
-			free(data);
+				CREATE(data, struct glb_map_spawn_bean, 1);
+				data->room = room;
+				data->x_coord = X_COORD(room);
+				data->y_coord = Y_COORD(room);
+				data->in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
+				run_globals(GLOBAL_MAP_SPAWNS, run_global_map_spawns, TRUE, GET_SECT_CLIMATE(BASE_SECT(room)), NULL, NULL, 0, validate_global_map_spawns, data);
+				free(data);
+			}
 		}
-	}
-
+	}	// end repel-npcs block
+	
 	// spawn interior rooms: recursively
 	if (GET_INSIDE_ROOMS(room) > 0) {
 		for (iter = interior_room_list; iter; iter = next_iter) {
