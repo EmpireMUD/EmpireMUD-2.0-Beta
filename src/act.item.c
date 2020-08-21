@@ -6682,6 +6682,10 @@ ACMD(do_sheathe) {
 		obj_to_char(unequip_char(ch, from_loc), ch);
 	}
 	perform_wear(ch, obj, to_loc);
+	
+	if (FIGHTING(ch)) {
+		command_lag(ch, WAIT_COMBAT_ABILITY);
+	}
 }
 
 
