@@ -1804,6 +1804,9 @@ ACMD(do_say) {
 		msg_to_char(ch, "Yes, but WHAT do you want to say?\r\n");
 	else if (subcmd != SCMD_OOCSAY && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT))
 		msg_to_char(ch, "You speak, but no words come out!\r\n");
+	else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_ANIMAL) && AFF_FLAGGED(ch, AFF_CHARM)) {
+		msg_to_char(ch, "Animals can't talk.\r\n");
+	}
 	else {
 		if (subcmd == SCMD_OOCSAY) {
 			strcpy(buf1, " out of character,");
