@@ -2613,6 +2613,8 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_BRIGHT_PAINT  BIT(17)	// r. paint is bright color
 #define ROOM_AFF_FAKE_INSTANCE  BIT(18)	// s. room is a fake_loc for an instance
 #define ROOM_AFF_NO_ABANDON  BIT(19)	// t. cannot abandon by accident
+#define ROOM_AFF_REPEL_NPCS  BIT(20)	// u. all npcs are prevented from wandering in
+#define ROOM_AFF_REPEL_ANIMALS  BIT(21)	// u. animals are prevented from wandering in
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 

@@ -3311,8 +3311,10 @@ const char *room_aff_bits[] = {
 	"*INCOMPLETE",	// 15
 	"!TELEPORT",
 	"BRIGHT-PAINT",
-	"FAKE-INSTANCE",
+	"*FAKE-INSTANCE",
 	"!ABANDON",
+	"REPEL-NPCS",	// 20
+	"REPEL-ANIMALS",
 	"\n"
 };
 

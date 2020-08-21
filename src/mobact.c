@@ -458,8 +458,13 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	bool ok = FALSE;
 	
 	// sect- and ability-based determinations
-	
-	if (SECT_FLAGGED(sect, SECTF_IS_ROAD) && !MOB_FLAGGED(mob, MOB_AQUATIC) && move_type != MOB_MOVE_SWIM) {
+	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_REPEL_NPCS)) {
+		ok = FALSE;
+	}
+	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_REPEL_ANIMALS) && MOB_FLAGGED(mob, MOB_ANIMAL)) {
+		ok = FALSE;
+	}
+	else if (SECT_FLAGGED(sect, SECTF_IS_ROAD) && !MOB_FLAGGED(mob, MOB_AQUATIC) && move_type != MOB_MOVE_SWIM) {
 		ok = TRUE;
 	}
 	else if (AFF_FLAGGED(mob, AFF_FLY)) {

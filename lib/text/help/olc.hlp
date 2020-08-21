@@ -1858,6 +1858,9 @@ Available affects:
  !WEATHER - suppress weather messages and command
  !DISREPAIR - never falls into disrepair (caution: this prevents empire decay)
  !TELEPORT - cannot teleport here
+ !ABANDON - cannot be abandoned (managed by empires)
+ REPEL-NPCS - npcs won't wander in
+ REPEL-ANIMALS - animal npcs won't wander in
 
 Some affects are managed by live data and commands (do not set affects with *):
  *HAS-INSTANCE - an adventure is linked here
@@ -1869,6 +1872,7 @@ Some affects are managed by live data and commands (do not set affects with *):
  *!WORK - workforce ignores the room
  *!DISMANTLE - cannot be dismantled until nodismantle is toggled
  *INCOMPLETE - building is unfinished
+ *FAKE-INSTANCE - roaming adventure is using this tile
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
