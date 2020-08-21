@@ -2981,7 +2981,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 				lsize = snprintf(line, sizeof(line), "%2d %s: ", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])));
 				
 				if (node->veh) {	// scanned for vehicle
-					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s / %s", skip_filler(VEH_SHORT_DESC(node->veh)), (GET_BUILDING(node->loc) ? GET_BLD_NAME(GET_BUILDING(node->loc)) : GET_SECT_NAME(SECT(node->loc))));
+					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s: %s", (GET_BUILDING(node->loc) ? GET_BLD_NAME(GET_BUILDING(node->loc)) : GET_SECT_NAME(SECT(node->loc))), skip_filler(VEH_SHORT_DESC(node->veh)));
 				}
 				else {	// not a vehicle
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s", get_room_name(node->loc, FALSE));
