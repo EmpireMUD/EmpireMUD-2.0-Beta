@@ -758,7 +758,7 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 	
 	// load mob
 	mob = read_mobile(cd->vnum, cd->instantiated ? FALSE : TRUE);
-	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);
+	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE | MOB_SPAWNED);
 	SET_BIT(AFF_FLAGS(mob), AFF_CHARM);
 	setup_generic_npc(mob, GET_LOYALTY(master), NOTHING, NOTHING);
 	
