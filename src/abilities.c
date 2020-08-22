@@ -758,8 +758,8 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 	
 	// load mob
 	mob = read_mobile(cd->vnum, cd->instantiated ? FALSE : TRUE);
-	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE | MOB_SPAWNED);
-	SET_BIT(AFF_FLAGS(mob), AFF_CHARM);
+	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE | MOB_SPAWNED | MOB_NO_EXPERIENCE | MOB_NO_LOOT);
+	SET_BIT(AFF_FLAGS(mob), AFF_CHARM | AFF_NO_DRINK_BLOOD);
 	setup_generic_npc(mob, GET_LOYALTY(master), NOTHING, NOTHING);
 	
 	// CMOD_x: modify the companion
