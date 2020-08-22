@@ -57,7 +57,7 @@ void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 extern char *get_room_name(room_data *room, bool color);
 extern bool is_ignoring(char_data *ch, char_data *victim);
 void scale_item_to_level(obj_data *obj, int level);
-void scale_mob_as_companion(char_data *mob, char_data *master);
+void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
 extern char *show_color_codes(char *string);
 
 // locals
@@ -2622,7 +2622,7 @@ ACMD(do_minipets) {
 			SET_BIT(AFF_FLAGS(mob), default_minipet_affs);	// will this work?
 			
 			// try to scale mob to the summoner (most minipets have level caps of 1 tho)
-			scale_mob_as_companion(mob, ch);
+			scale_mob_as_companion(mob, ch, 0);
 			
 			char_to_room(mob, IN_ROOM(ch));
 			act("You whistle and $N appears!", FALSE, ch, NULL, mob, TO_CHAR);
@@ -3158,6 +3158,7 @@ ACMD(do_skin) {
 
 
 ACMD(do_summon) {
+	extern int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 	void summon_materials(char_data *ch, char *argument);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
@@ -3393,7 +3394,7 @@ ACMD(do_summon) {
 			setup_generic_npc(mob, emp, NOTHING, NOTHING);
 
 			// try to scale mob to the summoner
-			scale_mob_as_companion(mob, ch);
+			scale_mob_as_companion(mob, ch, get_player_level_for_ability(ch, ability));
 			
 			// spawn data
 			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED | MOB_NO_LOOT);

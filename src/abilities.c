@@ -580,6 +580,45 @@ void get_ability_type_display(struct ability_type *list, char *save_buffer) {
 
 
 /**
+* Abilities which come from skills are capped by the player's skill level if
+* they haven't specialized it to its max. When the player HAS capped the
+* ability, their full level is used.
+*
+* @param char_data *ch The player.
+* @param any_vnum abil_vnum Which ability.
+* @return int Some level >= 1, based on the player, their skills, and the ability.
+*/
+int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum) {
+	int level, skill_level;
+	ability_data *abil;
+	skill_data *skl;
+	
+	if (!ch) {
+		return 1;	// no work
+	}
+	
+	// start here
+	level = get_approximate_level(ch);
+	
+	if (abil_vnum == NO_ABIL || !(abil = find_ability_by_vnum(abil_vnum))) {
+		return level;	// no abil = no adjustment
+	}
+	if (!(skl = ABIL_ASSIGNED_SKILL(abil)) || ABIL_IS_SYNERGY(abil)) {
+		return level;	// no limit here either
+	}
+	
+	skill_level = get_skill_level(ch, SKILL_VNUM(skl));
+	
+	// constrain only if player hasn't maxed this skill
+	if (skill_level < SKILL_MAX_LEVEL(skl)) {
+		level = MIN(level, skill_level);
+	}
+	
+	return level;
+}
+
+
+/**
 * Gives a modifier (as a decimal, like 1.0 for 100%) based on a character's
 * value in a given trait. For example, for Strength, 100% is the character's
 * maximum possible strength.
@@ -740,7 +779,7 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 	void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
 	extern bool despawn_companion(char_data *ch, mob_vnum vnum);
 	void reread_companion_trigs(char_data *mob);
-	void scale_mob_as_companion(char_data *mob, char_data *master);
+	void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	struct trig_proto_list *tp;
@@ -856,7 +895,7 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 	}
 	
 	// scale to summoner
-	scale_mob_as_companion(mob, master);
+	scale_mob_as_companion(mob, master, get_player_level_for_ability(master, cd->from_abil));
 	char_to_room(mob, IN_ROOM(master));
 	add_follower(mob, master, FALSE);
 	

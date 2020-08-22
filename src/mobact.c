@@ -1399,15 +1399,25 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 
 
 /**
-* Scales a mob below the master's level like a companion.
+* Scales a mob below the master's level like a companion. Companions generally
+* scale 25 levels below the character's level (or the use_level, if you pass
+* one) if the level is over 100. That is, companions scale with the character
+* up to level 100.
 *
 * @param char_data *mob The mob to scale.
 * @param char_data *master The person to base it on.
+* @param int use_level If you are using something other than character's level, e.g. the level of a skill, pass it here (or 0 to detect level here).
 */
-void scale_mob_as_companion(char_data *mob, char_data *master) {
+void scale_mob_as_companion(char_data *mob, char_data *master, int use_level) {
 	int scale_level;
 	
-	scale_level = get_approximate_level(master);
+	if (use_level > 0) {
+		scale_level = use_level;
+	}
+	else {
+		scale_level = get_approximate_level(master);
+	}
+	
 	if (scale_level > CLASS_SKILL_CAP) {
 		// 25 levels lower if over 100
 		scale_level = MAX(CLASS_SKILL_CAP, scale_level - 25);

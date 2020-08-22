@@ -973,7 +973,7 @@ ACMD(do_manashield) {
 ACMD(do_mirrorimage) {
 	void change_sex(char_data *ch, int sex);
 	extern struct custom_message *pick_custom_longdesc(char_data *ch);
-	void scale_mob_as_companion(char_data *mob, char_data *master);
+	void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
 	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], *tmp;
 	char_data *mob, *other;
@@ -1013,7 +1013,7 @@ ACMD(do_mirrorimage) {
 	mob = read_mobile(vnum, TRUE);
 	
 	// scale mob to the summoner -- so it won't change its attributes later
-	scale_mob_as_companion(mob, ch);
+	scale_mob_as_companion(mob, ch, 0);
 	
 	char_to_room(mob, IN_ROOM(ch));
 	
