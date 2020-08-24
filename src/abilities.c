@@ -3674,7 +3674,7 @@ OLC_MODULE(abiledit_cooldown) {
 OLC_MODULE(abiledit_cost) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION)) {
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
 		msg_to_char(ch, "Only command abilities and certain other types have this property.\r\n");
 	}
 	else {
@@ -3698,7 +3698,7 @@ OLC_MODULE(abiledit_costperscalepoint) {
 OLC_MODULE(abiledit_costtype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION)) {
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
 		msg_to_char(ch, "Only command abilities and certain other types have this property.\r\n");
 	}
 	else {
