@@ -3293,9 +3293,9 @@ ACMD(do_summon) {
 	
 	char buf[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], *arg2, *line;
 	struct player_ability_data *plab, *next_plab;
+	int count, num, fol_count, to_summon;
 	struct ability_data_list *adl;
 	char_data *mob, *proto = NULL;
-	int count, num, to_summon;
 	any_vnum summon_vnum;
 	ability_data *abil;
 	size_t size, lsize;
@@ -3303,6 +3303,7 @@ ACMD(do_summon) {
 	
 	// maximum npcs present when summoning
 	int max_npcs = config_get_int("summon_npc_limit");
+	int max_followers = config_get_int("npc_follower_limit");
 	
 	arg2 = one_argument(argument, arg);	// split out first word for certain special summons
 	skip_spaces(&argument);	// most of the command uses this full argument
@@ -3395,13 +3396,22 @@ ACMD(do_summon) {
 	
 	// count mobs and check limit
 	count = 0;
+	fol_count = 0;
 	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 		if (IS_NPC(mob)) {
 			++count;
+			
+			if (!GET_COMPANION(mob) && mob->master == ch) {
+				++fol_count;
+			}
 		}
 	}
-	if (count > max_npcs) {
+	if (count >= max_npcs) {
 		msg_to_char(ch, "There are too many NPCs here to summon more.\r\n");
+		return;
+	}
+	if (fol_count >= max_followers) {
+		msg_to_char(ch, "You have too many npcs folowers already.\r\n");
 		return;
 	}
 	
@@ -3426,7 +3436,7 @@ ACMD(do_summon) {
 				
 				// else: summon it!
 				to_summon = (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) ? ceil(get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)) / 3.0) : 1;
-				to_summon = MIN(max_npcs, MAX(1, to_summon));	// safety limits
+				to_summon = MIN((max_followers - fol_count), MAX(1, to_summon));	// safety limits
 				
 				found = TRUE;
 				for (num = 0; num < to_summon; ++num) {
@@ -3446,7 +3456,7 @@ ACMD(do_summon) {
 			// else: summon it! but, have to go through the list at random
 			found = TRUE;
 			to_summon = (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) ? ceil(get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)) / 3.0) : 1;
-			to_summon = MIN(max_npcs, MAX(1, to_summon));	// safety limits
+			to_summon = MIN((max_followers - fol_count), MAX(1, to_summon));	// safety limits
 			
 			// main summon loop: counting number to summon
 			for (num = 0; num < to_summon; ++num) {

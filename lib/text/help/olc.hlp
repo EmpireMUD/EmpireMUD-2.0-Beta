@@ -1066,6 +1066,8 @@ Available techs are:
  &cPick&0 * - Can 'pick'.
  &cQuarry&0 * - Can 'quarry'.
  &cDrink-Blood-Faster&0 - Vampires drink blood at 2x the speed.
+ &cSummon-Materials&0 * - Can use the 'summon materials' command. Supports
+    custom pre-retrieve messages using self-to-char and self-to-room.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 
@@ -1127,6 +1129,13 @@ Summon abilities have the following properties:
             - A SUMMON-RANDOM ability will only list the ability name on the
               'summon' command.
             - You can set level limits on the mob.
+
+Notes:
+- Summoned mobs silently follow the player. Use a trigger like #9804 to cancel
+  it using mfollow if you don't want this.
+- If you want the summoned mob to be charmed, use a trigger like #9805.
+- Setting a linked trait will increase the number of summons but it's really
+  only implemented for base attributes like Strength and Wits.
 
 These abilities will use the &ctarg-to-char&0 and &ctarg-to-room&0 custom
 messages when a player summons the mob. &c$n&0 represents the player and

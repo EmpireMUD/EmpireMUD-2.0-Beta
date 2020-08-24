@@ -863,6 +863,7 @@ const char *player_tech_types[] = {
 	"Pick",
 	"Quarry",	// 75
 	"Drink-Blood-Faster",
+	"Summon-Materials",
 	"\n"
 };
 

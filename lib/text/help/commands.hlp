@@ -2205,16 +2205,6 @@ alias pol toggle political;look
 
 See also: ALIAS, IDEA
 #
-"SUMMON GUARDS"
-
-Usage:  summon guards
-Cooldown:  3 minutes
-Cost:  25 move
-
-This ability summons up to (Charisma / 2, rounded down) guards. They aren't
-very strong, but they count as city guards and will attack intruders and
-hostile mobs. You can only use this in your empire's own cities and outskirts.
-#
 "SUMMON PLAYERS"
 
 Command:  summon player <name>

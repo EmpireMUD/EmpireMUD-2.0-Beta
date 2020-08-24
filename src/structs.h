@@ -2246,6 +2246,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_PICK  74	// can 'pick'
 #define PTECH_QUARRY  75	// can 'quarry'
 #define PTECH_DRINK_BLOOD_FASTER  76	// vampires drink blood at 2x speed
+#define PTECH_SUMMON_MATERIALS  77	// can use the 'summon materials' command
 
 
 // summon types for oval_summon, ofin_summon, and add_offer

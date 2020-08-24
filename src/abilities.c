@@ -522,6 +522,39 @@ ability_data *find_ability_on_skill(char *name, skill_data *skill) {
 
 
 /**
+* Finds which ability a player has that's giving them a ptech. If there's more
+* than one, it returns the first one it finds.
+*
+* @param char_data *ch The player.
+* @param int ptech Any PTECH_ const.
+* @return ability_data* Which ability the player has that grants that ptech, or NULL if none.
+*/
+ability_data *find_player_ability_by_tech(char_data *ch, int ptech) {
+	struct player_ability_data *plab, *next_plab;
+	struct ability_data_list *adl;
+	ability_data *abil;
+	
+	if (!ch || IS_NPC(ch)) {
+		return NULL;
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		
+		if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH) && plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+			LL_FOREACH(ABIL_DATA(abil), adl) {
+				if (adl->type == ADL_PLAYER_TECH && adl->vnum == ptech) {
+					return abil;
+				}
+			}
+		}
+	}
+	
+	return NULL;	// if we got here
+}
+
+
+/**
 * @param any_vnum vnum An ability vnum.
 * @return char* The ability name, or "Unknown" if no match.
 */
