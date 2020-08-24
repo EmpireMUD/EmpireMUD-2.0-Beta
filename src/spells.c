@@ -335,7 +335,7 @@ ACMD(do_ready) {
 	void scale_item_to_level(obj_data *obj, int level);
 	extern const char *pool_types[];
 	
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], *to_char, *to_room;
 	struct player_ability_data *plab, *next_plab;
 	int scale_level, ch_level = 0, pos;
 	ability_data *abil, *found_abil;
@@ -503,24 +503,36 @@ ACMD(do_ready) {
 	}
 	scale_item_to_level(obj, scale_level);
 	
+	// non-custom messages
 	switch (ABIL_COST_TYPE(found_abil)) {
 		case MANA: {
-			act("Mana twists and swirls around your hand and becomes $p!", FALSE, ch, obj, NULL, TO_CHAR);
-			act("Mana twists and swirls around $n's hand and becomes $p!", TRUE, ch, obj, NULL, TO_ROOM);
+			to_char = "Mana twists and swirls around your hand and becomes $p!";
+			to_room = "Mana twists and swirls around $n's hand and becomes $p!";
 			break;
 		}
 		case BLOOD: {
-			act("You drain blood from your wrist and mold it into $p!", FALSE, ch, obj, NULL, TO_CHAR);
-			act("$n twists and molds $s own blood into $p!", TRUE, ch, obj, NULL, TO_ROOM);
+			to_char = "You drain blood from your wrist and mold it into $p!";
+			to_room = "$n twists and molds $s own blood into $p!";
 			break;
 		}
 		// HEALTH, MOVE (these could have their own messages if they were used)
 		default: {
-			act("You pull $p from the ether!", FALSE, ch, obj, NULL, TO_CHAR);
-			act("$n pulls $p from the ether!", TRUE, ch, obj, NULL, TO_ROOM);
+			to_char = "You pull $p from the ether!";
+			to_room = "$n pulls $p from the ether!";
 			break;
 		}
 	}
+	
+	// custom overrides
+	if (abil_has_custom_message(found_abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
+		to_char = abil_get_custom_message(found_abil, ABIL_CUSTOM_SELF_TO_CHAR);
+	}
+	if (abil_has_custom_message(found_abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
+		to_room = abil_get_custom_message(found_abil, ABIL_CUSTOM_SELF_TO_ROOM);
+	}
+	
+	act(to_char, FALSE, ch, obj, NULL, TO_CHAR);
+	act(to_room, ABILITY_FLAGGED(found_abil, ABILF_INVISIBLE) ? TRUE : FALSE, ch, obj, NULL, TO_ROOM);
 	
 	equip_char(ch, obj, pos);
 	determine_gear_level(ch);

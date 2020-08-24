@@ -1086,6 +1086,9 @@ Ready-Weapons abilities have the following properties:
             - If a weapon has HOLD but not WIELD, it will equip to the hold
               slot. Otherwise, it will only equip to the wield slot.
 
+The ready command will use the &cself-to-char&0 and &cself-to-room&0 custom
+messages. &c$n&0 represents the player and &c&p&0 represents the weapon.
+
 See also: OLC ABILITIES, ABILEDIT TYPES, READY
 #d
 "ABILEDIT SCALE"
