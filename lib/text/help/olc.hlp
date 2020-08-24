@@ -624,9 +624,11 @@ Companion abilities have the following properties:
             - You can set level limits on the mob.
             - The mob will be CHARMED.
 
-Companion abilities will use the &ctarg-to-char&0 and &ctarg-to-room&0 custom
-messages when a player summons the companion. &c$n&0 represents the player and
-&c&N&0 represents the companion.
+Notes:
+- Companion abilities will use the &ctarg-to-char&0 and &ctarg-to-room&0 custom
+  messages when a player summons the companion. &c$n&0 represents the player
+  and &c&N&0 represents the companion.
+- Cannot use the INVISIBLE flag for messaging.
 
 When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
 and !DRINK-BLOOD flags.
@@ -1086,8 +1088,9 @@ Ready-Weapons abilities have the following properties:
             - If a weapon has HOLD but not WIELD, it will equip to the hold
               slot. Otherwise, it will only equip to the wield slot.
 
-The ready command will use the &cself-to-char&0 and &cself-to-room&0 custom
-messages. &c$n&0 represents the player and &c&p&0 represents the weapon.
+Notes:
+- The ready command will use the &cself-to-char&0 and &cself-to-room&0 custom
+  messages. &c$n&0 represents the player and &c&p&0 represents the weapon.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, READY
 #d
@@ -1139,10 +1142,10 @@ Notes:
 - If you want the summoned mob to be charmed, use a trigger like #9805.
 - Setting a linked trait will increase the number of summons but it's really
   only implemented for base attributes like Strength and Wits.
-
-These abilities will use the &ctarg-to-char&0 and &ctarg-to-room&0 custom
-messages when a player summons the mob. &c$n&0 represents the player and
-&c&N&0 represents the companion.
+- Cannot use the INVISIBLE flag for messaging.
+- These abilities will use the &ctarg-to-char&0 and &ctarg-to-room&0 custom
+  messages when a player summons the mob. &c$n&0 represents the player and
+  &c&N&0 represents the mob.
 
 When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
 and !DRINK-BLOOD flags.

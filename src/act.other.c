@@ -624,7 +624,7 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 	
 	// messaging to room
 	if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
-		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE, ch, NULL, mob, TO_NOTVICT);
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), FALSE, ch, NULL, mob, TO_NOTVICT);
 	}
 	else {
 		act("$n summons $N.", FALSE, ch, NULL, mob, TO_NOTVICT);
