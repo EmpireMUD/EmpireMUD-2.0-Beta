@@ -404,7 +404,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		found = FALSE;
 		LL_FOREACH_SAFE(ABIL_DATA(abil), adl, next_adl) {
-			if (adl->type == ADL_COMPANION && adl->vnum == vnum) {
+			if (adl->type == ADL_SUMMON_MOB && adl->vnum == vnum) {
 				LL_DELETE(ABIL_DATA(abil), adl);
 				free(adl);
 				found = TRUE;
@@ -530,7 +530,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 		if (GET_OLC_ABILITY(desc)) {
 			found = FALSE;
 			LL_FOREACH_SAFE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl, next_adl) {
-				if (adl->type == ADL_COMPANION && adl->vnum == vnum) {
+				if (adl->type == ADL_SUMMON_MOB && adl->vnum == vnum) {
 					LL_DELETE(ABIL_DATA(GET_OLC_ABILITY(desc)), adl);
 					free(adl);
 					found = TRUE;
@@ -829,7 +829,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	// abilities
 	HASH_ITER(hh, ability_table, abil, next_abil) {
 		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (adl->type == ADL_COMPANION && adl->vnum == vnum) {
+			if (adl->type == ADL_SUMMON_MOB && adl->vnum == vnum) {
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "ABIL [%5d] %s\r\n", ABIL_VNUM(abil), ABIL_NAME(abil));
 				break;

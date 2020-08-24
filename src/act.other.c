@@ -53,6 +53,7 @@ extern bool check_vampire_sun(char_data *ch, bool message);
 extern bool despawn_companion(char_data *ch, mob_vnum vnum);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
+extern int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 extern char *get_room_name(room_data *room, bool color);
 extern bool is_ignoring(char_data *ch, char_data *victim);
@@ -1766,7 +1767,7 @@ ACMD(do_companions) {
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
 			}
 			
-			if (GET_MIN_SCALE_LEVEL(proto) > GET_COMPUTED_LEVEL(ch)) {
+			if (GET_MIN_SCALE_LEVEL(proto) > 0 && (cd->from_abil ? get_player_level_for_ability(ch, cd->from_abil) : get_approximate_level(ch)) < GET_MIN_SCALE_LEVEL(proto)) {
 				lsize += snprintf(line + lsize, sizeof(line) - lsize, " \trrequires level %d\t0", GET_MIN_SCALE_LEVEL(proto));
 			}
 			
@@ -1797,12 +1798,6 @@ ACMD(do_companions) {
 		if (ch->desc) {
 			page_string(ch->desc, buf, TRUE);
 		}
-		return;
-	}
-	
-	// got this far but wrong pos?
-	if (GET_POS(ch) < POS_STANDING) {
-		send_low_pos_msg(ch);
 		return;
 	}
 	
@@ -1845,6 +1840,10 @@ ACMD(do_companions) {
 	}
 	if (abil && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
 		msg_to_char(ch, "You must be alone to summon that companion in the solo role.\r\n");
+		return;
+	}
+	if (GET_POS(ch) < (abil ? ABIL_MIN_POS(abil) : POS_STANDING)) {
+		send_low_pos_msg(ch);
 		return;
 	}
 	if (abil && !can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil))) {

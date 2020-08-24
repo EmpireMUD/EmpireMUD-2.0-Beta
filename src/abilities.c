@@ -99,6 +99,8 @@ struct {
 	{ ABILT_PASSIVE_BUFF, NULL, NULL },
 	{ ABILT_READY_WEAPONS, NULL, NULL },
 	{ ABILT_COMPANION, NULL, NULL },
+	{ ABILT_SUMMON_ANY, NULL, NULL },
+	{ ABILT_SUMMON_RANDOM, NULL, NULL },
 	
 	{ NOBITS }	// this goes last
 };
@@ -133,7 +135,7 @@ char *ability_data_display(struct ability_data_list *adl) {
 			snprintf(output, sizeof(output), "%s: [%d] %s", temp, adl->vnum, get_obj_name_by_proto(adl->vnum));
 			break;
 		}
-		case ADL_COMPANION: {
+		case ADL_SUMMON_MOB: {
 			snprintf(output, sizeof(output), "%s: [%d] %s", temp, adl->vnum, get_mob_name_by_proto(adl->vnum, FALSE));
 			break;
 		}
@@ -1100,7 +1102,7 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 			found = FALSE;
 			if (GET_COMPANION(ch) && (abil = find_ability_by_vnum(agh->ability))) {
 				LL_FOREACH(ABIL_DATA(abil), adl) {
-					if (adl->type == ADL_COMPANION && adl->vnum == GET_MOB_VNUM(GET_COMPANION(ch))) {
+					if (adl->type == ADL_SUMMON_MOB && adl->vnum == GET_MOB_VNUM(GET_COMPANION(ch))) {
 						found = TRUE;
 						break;
 					}
@@ -1140,7 +1142,7 @@ void setup_ability_companions(char_data *ch) {
 		}
 		
 		LL_FOREACH(ABIL_DATA(abil), adl) {
-			if (adl->type == ADL_COMPANION) {
+			if (adl->type == ADL_SUMMON_MOB) {
 				add_companion(ch, adl->vnum, ABIL_VNUM(abil));
 			}
 		}
@@ -2285,6 +2287,7 @@ void clear_ability(ability_data *abil) {
 	ABIL_AFFECT_VNUM(abil) = NOTHING;
 	ABIL_SCALE(abil) = 1.0;
 	ABIL_MAX_STACKS(abil) = 1;
+	ABIL_MIN_POS(abil) = POS_STANDING;
 }
 
 
@@ -2411,7 +2414,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				if (ABIL_COMMAND(abil)) {
 					free(ABIL_COMMAND(abil));
 				}
-				ABIL_COMMAND(abil) = *str_in ? str_dup(str_in) : NULL;
+				ABIL_COMMAND(abil) = (*str_in && str_cmp(str_in, "unknown")) ? str_dup(str_in) : NULL;
 				ABIL_MIN_POS(abil) = int_in[0];
 				ABIL_TARGETS(abil) = asciiflag_conv(str_in2);
 				ABIL_COST_TYPE(abil) = int_in[1];
@@ -2636,7 +2639,7 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	write_applies_to_file(fl, ABIL_APPLIES(abil));
 	
 	// 'C' command
-	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil) || ABIL_DIFFICULTY(abil)) {
+	if (ABIL_COMMAND(abil) || ABIL_MIN_POS(abil) != POS_STANDING || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil) || ABIL_DIFFICULTY(abil)) {
 		fprintf(fl, "C\n%s %d %s %d %d %d %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil), ABIL_DIFFICULTY(abil));
 	}
 	
@@ -3346,14 +3349,12 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0]\r\n");
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Min position: [\tc%s\t0]\r\n", ABIL_COMMAND(abil), position_types[ABIL_MIN_POS(abil)]);
-		
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
-		size += snprintf(buf + size, sizeof(buf) - size, "Targets: \tg%s\t0\r\n", part);
-		size += snprintf(buf + size, sizeof(buf) - size, "Wait type: [\ty%s\t0], Linked trait: [\ty%s\t0]\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
-		size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Targets: \tg%s\t0\r\n", ABIL_COMMAND(abil), part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+	size += snprintf(buf + size, sizeof(buf) - size, "Min position: [\tc%s\t0], Linked trait: [\ty%s\t0]\r\n", position_types[ABIL_MIN_POS(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
 	
 	// type-specific data
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
@@ -3462,15 +3463,14 @@ void olc_show_ability(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%scommand\t0> (not a command)\r\n", OLC_LABEL_UNCHANGED);
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%scommand\t0> %s, <%sminposition\t0> %s (minimum)\r\n", OLC_LABEL_CHANGED, ABIL_COMMAND(abil), OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_DEAD), position_types[ABIL_MIN_POS(abil)]);
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
-		sprintf(buf + strlen(buf), "<%stargets\t0> %s\r\n", OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
-		sprintf(buf + strlen(buf), "<%swaittype\t0> %s, <%slinkedtrait\t0> %s\r\n", OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)], OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
-		sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		sprintf(buf + strlen(buf), "<%scommand\t0> %s, <%stargets\t0> %s\r\n", OLC_LABEL_CHANGED, ABIL_COMMAND(abil), OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
+		sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s, <%swaittype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)], OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)]);
 	}
 	sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %d, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
 	sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
-		
+	sprintf(buf + strlen(buf), "<%sminposition\t0> %s (minimum), <%slinkedtrait\t0> %s\r\n", OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_STANDING), position_types[ABIL_MIN_POS(abil)], OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
+	
 	// type-specific data
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
 		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
@@ -3746,8 +3746,8 @@ OLC_MODULE(abiledit_data) {
 	if (IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS)) {
 		allowed_types |= ADL_READY_WEAPON;
 	}
-	if (IS_SET(ABIL_TYPES(abil), ABILT_COMPANION)) {
-		allowed_types |= ADL_COMPANION;
+	if (IS_SET(ABIL_TYPES(abil), ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
+		allowed_types |= ADL_SUMMON_MOB;
 	}
 	
 	// arg1 arg2
@@ -3823,9 +3823,9 @@ OLC_MODULE(abiledit_data) {
 					}
 					break;
 				}
-				case ADL_COMPANION: {
+				case ADL_SUMMON_MOB: {
 					if ((val_id = atoi(val_arg)) <= 0 || !mob_proto(val_id)) {
-						msg_to_char(ch, "Invalid mob vnum for companion '%s'.\r\n", val_arg);
+						msg_to_char(ch, "Invalid mob vnum for summonable mob '%s'.\r\n", val_arg);
 						return;
 					}
 					break;
@@ -3896,8 +3896,8 @@ OLC_MODULE(abiledit_immunities) {
 OLC_MODULE(abiledit_linkedtrait) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil)) {
-		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else {
 		ABIL_LINKED_TRAIT(abil) = olc_process_type(ch, argument, "linked trait", "linkedtrait", apply_types, ABIL_LINKED_TRAIT(abil));
@@ -3972,8 +3972,8 @@ OLC_MODULE(abiledit_maxstacks) {
 OLC_MODULE(abiledit_minposition) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil)) {
-		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM | ABILT_COMPANION)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else {
 		ABIL_MIN_POS(abil) = olc_process_type(ch, argument, "position", "minposition", position_types, ABIL_MIN_POS(abil));

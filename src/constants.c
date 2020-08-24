@@ -142,6 +142,8 @@ const char *ability_type_flags[] = {
 	"PASSIVE-BUFF",	// 5
 	"READY-WEAPONS",
 	"COMPANION",
+	"SUMMON-ANY",
+	"SUMMON-RANDOM",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -149,7 +151,6 @@ const char *ability_type_flags[] = {
 	"GROUPS",
 	"MASSES",
 	"AREAS",
-	"SUMMONS",
 	"CREATIONS",
 	"MANUAL",
 	"ROOMS",
@@ -200,10 +201,10 @@ const char *ability_custom_types[] = {
 
 // ADL_x: for adding to ability_data_list
 const char *ability_data_types[] = {
-	"PTECH",
+	"PTECH",	// 0
 	"EFFECT",
 	"READY-WEAPON",
-	"COMPANION",
+	"SUMMON-MOB",
 	"\n"
 };
 

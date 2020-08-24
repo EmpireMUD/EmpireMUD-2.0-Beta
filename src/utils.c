@@ -2514,14 +2514,15 @@ void change_short_desc(char_data *ch, char *str) {
 * upon player death.
 *
 * @param char_data *ch The person whose followers to despawn.
+* @param any_vnum only_vnum Optional: Only despawn a specific mob vnum (pass NOTHING for all charmies).
 */
-void despawn_charmies(char_data *ch) {
+void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 	char_data *iter, *next_iter;
 	
 	for (iter = character_list; iter; iter = next_iter) {
 		next_iter = iter->next;
 		
-		if (IS_NPC(iter) && iter->master == ch) {
+		if (IS_NPC(iter) && iter->master == ch && (only_vnum == NOTHING || GET_MOB_VNUM(iter) == only_vnum)) {
 			if (GET_COMPANION(iter) == ch || AFF_FLAGGED(iter, AFF_CHARM)) {
 				act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
 				extract_char(iter);

@@ -1236,7 +1236,7 @@ void death_restore(char_data *ch) {
 */
 obj_data *die(char_data *ch, char_data *killer) {
 	void cancel_blood_upkeeps(char_data *ch);
-	void despawn_charmies(char_data *ch);
+	void despawn_charmies(char_data *ch, any_vnum only_vnum);
 	void kill_empire_npc(char_data *ch);
 	
 	char_data *ch_iter, *player, *killmaster;
@@ -1309,7 +1309,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	}
 	
 	// get rid of any charmies who are lying around
-	despawn_charmies(ch);
+	despawn_charmies(ch, NOTHING);
 	
 	// for players, die() ends here, until they respawn or quit
 	if (!IS_NPC(ch)) {

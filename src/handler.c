@@ -1253,7 +1253,7 @@ void extract_char_final(char_data *ch) {
 * @param char_data *ch The character to mark for extraction.
 */
 void extract_char(char_data *ch) {
-	void despawn_charmies(char_data *ch);
+	void despawn_charmies(char_data *ch, any_vnum only_vnum);
 	
 	if (ch == dg_owner_mob) {
 		dg_owner_purged = 1;
@@ -1275,7 +1275,7 @@ void extract_char(char_data *ch) {
 	}
 	
 	// get rid of friends now (extracts them as well)
-	despawn_charmies(ch);
+	despawn_charmies(ch, NOTHING);
 	
 	// clear companion (both directions) if any
 	if (GET_COMPANION(ch)) {

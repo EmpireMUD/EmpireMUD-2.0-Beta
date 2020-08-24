@@ -80,7 +80,7 @@ int sort_synergies(struct synergy_ability *a, struct synergy_ability *b);
 * @param ability_data *abil The ability to sell
 */
 void check_skill_sell(char_data *ch, ability_data *abil) {
-	bool despawn_companion(char_data *ch, mob_vnum vnum);
+	bool despawn_charmies(char_data *ch, any_vnum only_vnum);
 	void finish_morphing(char_data *ch, morph_data *morph);
 	void remove_armor_by_type(char_data *ch, int armor_type);
 	void remove_honed_gear(char_data *ch);
@@ -129,8 +129,8 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 				}
 				break;
 			}
-			case ADL_COMPANION: {
-				despawn_companion(ch, adl->vnum);
+			case ADL_SUMMON_MOB: {
+				despawn_charmies(ch, adl->vnum);
 				break;
 			}
 		}

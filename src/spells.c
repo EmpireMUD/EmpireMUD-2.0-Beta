@@ -433,6 +433,10 @@ ACMD(do_ready) {
 		msg_to_char(ch, "You don't know how to ready that.\r\n");
 		return;
 	}
+	if (GET_POS(ch) < ABIL_MIN_POS(found_abil)) {
+		send_low_pos_msg(ch);
+		return;
+	}
 	if (!can_use_ability(ch, ABIL_VNUM(found_abil), ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), ABIL_COOLDOWN(found_abil))) {
 		return;
 	}
