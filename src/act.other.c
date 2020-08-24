@@ -43,6 +43,7 @@ bitvector_t default_minipet_affs = AFF_NO_ATTACK | AFF_CHARM;
 
 
 // external vars
+extern const char *pool_types[];
 extern const struct toggle_data_type toggle_data[];	// constants.c
 
 // external prototypes
@@ -360,6 +361,53 @@ char_data *find_minipet(char_data *ch) {
 
 
 /**
+* Skips past the word 'summon ' or 'summons ' (case-insensitive).
+*
+* @param char *input The string to strip of 'summon(s) ', if present.
+* @return char* A pointer to the position in the string after the word 'summon(s) '.
+*/
+char *format_summon_name(char *input) {
+	char *start = input;
+	
+	skip_spaces(&start);
+	if (!strn_cmp(start, "summon ", 7)) {
+		start += 7;
+	}
+	else if (!strn_cmp(start, "summons ", 7)) {
+		start += 8;
+	}
+	
+	return start;
+}
+
+
+/**
+* Gets the line display for one summonable thing.
+*
+* @param char_data *ch The player.
+* @param const char *name The ability or mob name to show.
+* @param int min_level The required level, if any.
+* @param ability_data *from_abil The ability that grants the summon, if any.
+* @return char* The text for the summon list.
+*/
+char *one_summon_entry(char_data *ch, const char *name, int min_level, ability_data *from_abil) {
+	static char output[256];
+	size_t size;
+	
+	size = snprintf(output, sizeof(output), "%s", name);
+	
+	if (from_abil && ABIL_COST(from_abil) > 0) {
+		size += snprintf(output + size, sizeof(output) - size, " (%d %s)", ABIL_COST(from_abil), pool_types[ABIL_COST_TYPE(from_abil)]);
+	}
+	if (min_level > 0 && (from_abil ? get_player_level_for_ability(ch, ABIL_VNUM(from_abil)) : get_approximate_level(ch)) < min_level) {
+		size += snprintf(output + size, sizeof(output) - size, " \trrequires level %d\t0", min_level);
+	}
+	
+	return output;
+}
+
+
+/**
 * This quits out an old character and swaps the descriptor over to the new
 * character. Caution: The new character may already be in-game, if it was
 * linkdead.
@@ -505,6 +553,90 @@ void perform_alternate(char_data *old, char_data *new) {
 		add_cooldown(new, COOLDOWN_ALTERNATE, SECS_PER_REAL_MIN);
 	}
 	GET_LAST_TELL(new) = last_tell;
+}
+
+
+/**
+* Attempts to summon 1 mob. This does some final checks if you pass the
+* 'checks' var, which only needs to happen once if you're summoning several of
+* something.
+*
+* @param char_data *ch The player summoning.
+* @param ability_data *abil Which ability they are summoning with.
+* @param any_vnum vnum The mob vnum to summon.
+* @param bool checks If TRUE, checks a bunch of things and sends error messages.
+* @return bool TRUE if anything was summoned; FALSE if we sent an error.
+*/
+bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool checks) {
+	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+	
+	int level = get_player_level_for_ability(ch, abil ? ABIL_VNUM(abil) : NO_ABIL);
+	char_data *proto = mob_proto(vnum);
+	char_data *mob;
+	
+	if (!proto || !abil) {
+		msg_to_char(ch, "That summon is not implemented yet.\r\n");
+		return FALSE;
+	}
+	if (checks && level < GET_MIN_SCALE_LEVEL(proto)) {
+		msg_to_char(ch, "You must be level %d to summon that.\r\n", GET_MIN_SCALE_LEVEL(proto));
+		return FALSE;
+	}
+	if (checks && GET_POS(ch) < ABIL_MIN_POS(abil)) {
+		send_low_pos_msg(ch);
+		return FALSE;
+	}
+	if (checks && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
+		msg_to_char(ch, "You must be alone to summon that in the solo role.\r\n");
+		return FALSE;
+	}
+	if (checks && !can_use_ability(ch, ABIL_VNUM(abil), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil))) {
+		return FALSE;
+	}
+	if (checks && !ABILITY_FLAGGED(abil, ABILF_IGNORE_SUN) && ABIL_COST(abil) > 0 && ABIL_COST_TYPE(abil) == BLOOD && !check_vampire_sun(ch, TRUE)) {
+		return FALSE;
+	}
+	if (checks && ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_VNUM(abil))) {
+		return FALSE;
+	}
+	
+	// proceed:
+	if (checks) {
+		charge_ability_cost(ch, ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), WAIT_OTHER);
+	}
+	
+	// load/update mob:
+	mob = read_mobile(vnum, TRUE);
+	
+	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE | MOB_SPAWNED | MOB_NO_LOOT);
+	setup_generic_npc(mob, MOB_FLAGGED(mob, MOB_EMPIRE) ? GET_LOYALTY(ch) : NULL, NOTHING, NOTHING);
+	scale_mob_as_companion(mob, ch, level);
+	char_to_room(mob, IN_ROOM(ch));
+	add_follower(mob, ch, FALSE);
+	
+	// messaging to char
+	if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, mob, TO_CHAR);
+	}
+	else {
+		act("You summon $N.", FALSE, ch, NULL, mob, TO_CHAR);
+	}
+	
+	// messaging to room
+	if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE, ch, NULL, mob, TO_NOTVICT);
+	}
+	else {
+		act("$n summons $N.", FALSE, ch, NULL, mob, TO_NOTVICT);
+	}
+	
+	load_mtrigger(mob);
+	
+	if (checks) {
+		gain_ability_exp(ch, ABIL_VNUM(abil), 15);
+	}
+	
+	return TRUE;
 }
 
 
@@ -1728,7 +1860,6 @@ ACMD(do_companions) {
 	extern struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type);
 	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
 	void setup_ability_companions(char_data *ch);
-	extern const char *pool_types[];
 	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct companion_data *cd, *next_cd, *found_cd;
@@ -3157,274 +3288,210 @@ ACMD(do_skin) {
 
 
 ACMD(do_summon) {
-	extern int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
+	extern int get_attribute_by_apply(char_data *ch, int apply_type);
 	void summon_materials(char_data *ch, char *argument);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
-	char_data *mob;
-	int vnum = NOTHING, ability = NO_ABIL, iter, max = 1, cost = 0, diff = DIFF_MEDIUM;
-	empire_data *emp = NULL;
-	bool junk, follow = FALSE, familiar = FALSE, charm = FALSE, local = FALSE;
-	int count, cooldown = NOTHING, cooldown_time = 0, cost_type = MOVE, gain = 20;
+	char buf[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], *arg2, *line;
+	struct player_ability_data *plab, *next_plab;
+	struct ability_data_list *adl;
+	char_data *mob, *proto = NULL;
+	int count, num, to_summon;
+	any_vnum summon_vnum;
+	ability_data *abil;
+	size_t size, lsize;
+	bool found, full;
 	
-	const int animal_vnums[] = { DOG, CHICKEN, QUAIL };
-	const int num_animal_vnums = 3;
+	// maximum npcs present when summoning
+	int max_npcs = config_get_int("summon_npc_limit");
 	
-	const int human_vnums[] = { HUMAN_MALE_1, HUMAN_MALE_2, HUMAN_FEMALE_1, HUMAN_FEMALE_2 };
-	const int num_human_vnums = 4;
+	arg2 = one_argument(argument, arg);	// split out first word for certain special summons
+	skip_spaces(&argument);	// most of the command uses this full argument
 	
-	// non-ability summons (must be unique and negative):
-	#define SUMMON_GUARDS  -10
-	
-	argument = one_argument(argument, arg);
-	
-	// types of summon
-	if (is_abbrev(arg, "humans")) {
-		// check ability immediately because the sun error message is misleading otherwise
-		if (!can_use_ability(ch, ABIL_SUMMON_HUMANS, NOTHING, 0, NOTHING)) {
-			return;
-		}
-		if (!check_vampire_sun(ch, TRUE)) {
-			return;
-		}
-		ability = ABIL_SUMMON_HUMANS;
-		cooldown = COOLDOWN_SUMMON_HUMANS;
-		cooldown_time = SECS_PER_REAL_MIN;
-	}
-	else if (is_abbrev(arg, "animals")) {
-		ability = ABIL_SUMMON_ANIMALS;
-		cooldown = COOLDOWN_SUMMON_ANIMALS;
-		cooldown_time = 30;
-	}
-	else if (is_abbrev(arg, "guards")) {
-		ability = SUMMON_GUARDS;
-		cooldown = COOLDOWN_SUMMON_GUARDS;
-		cooldown_time = 3 * SECS_PER_REAL_MIN;
-	}
-	else if (is_abbrev(arg, "thugs")) {
-		ability = ABIL_SUMMON_THUG;
-		cooldown = COOLDOWN_SUMMON_THUG;
-		cooldown_time = 30;
-	}
-	else if (is_abbrev(arg, "swift")) {
-		ability = ABIL_SUMMON_SWIFT;
-		cooldown = COOLDOWN_SUMMON_SWIFT;
-		cooldown_time = SECS_PER_REAL_MIN;
-	}
-	else if (!IS_NPC(ch) && is_abbrev(arg, "materials")) {
-		ability = ABIL_SUMMON_MATERIALS;
-		summon_materials(ch, argument);
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs can't use this command.\r\n");
 		return;
 	}
-	else if (!IS_NPC(ch) && is_abbrev(arg, "player")) {
-		ability = NO_ABIL;
+	
+	#define VALID_SUMMON_ABIL(ch, plab)  ((plab)->ptr && (plab)->purchased[GET_CURRENT_SKILL_SET(ch)] && IS_SET(ABIL_TYPES((plab)->ptr), ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM))
+	
+	// sepecial summons first
+	if (!IS_NPC(ch) && *arg && is_abbrev(arg, "materials")) {
+		summon_materials(ch, arg2);
+		return;
+	}
+	if (!IS_NPC(ch) && *arg && is_abbrev(arg, "player")) {
 		summon_player(ch, argument);
 		return;
 	}
-	else {
-		msg_to_char(ch, "What do you want to summon?\r\n");
+	
+	// no-arg: show summonable list
+	if (!*argument) {
+		size = snprintf(buf, sizeof(buf), "You can summon the following things:\r\n");
+		
+		found = full = FALSE;
+		HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+			abil = plab->ptr;
+			if (!VALID_SUMMON_ABIL(ch, plab)) {
+				continue;
+			}
+			
+			// show it
+			if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMON_ANY)) {
+				// summon-any lists the mobs themselves
+				LL_FOREACH(ABIL_DATA(abil), adl) {
+					if (adl->type == ADL_SUMMON_MOB && (proto = mob_proto(adl->vnum))) {
+						line = one_summon_entry(ch, skip_filler(GET_SHORT_DESC(proto)), GET_MIN_SCALE_LEVEL(proto), abil);
+						lsize = strlen(line);
+						if (size + lsize + 3 < sizeof(buf)) {
+							size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
+						}
+						else {
+							full = TRUE;
+							break;
+						}
+					}
+				}
+			}
+			else if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMON_RANDOM)) {
+				// summon-random just shows the ability name, minus the word 'summon'
+				line = one_summon_entry(ch, format_summon_name(ABIL_NAME(abil)), 0, abil);
+				lsize = strlen(line);
+				if (size + lsize + 3 < sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
+				}
+				else {
+					full = TRUE;
+				}
+			}
+			else {
+				continue;
+			}
+			
+			// if we got here, we did find one
+			found = TRUE;
+			
+			if (full) {
+				break;
+			}
+		}
+		
+		if (!found) {
+			strcat(buf, " none\r\n");	// always room for this if !found
+		}
+		if (full) {
+			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
 		return;
 	}
 	
-	if (!can_use_ability(ch, ability, NOTHING, 0, cooldown)) {
+	// things that alway block, unrelated to the mob/ability
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_START_LOCATION) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER)) {
+		msg_to_char(ch, "You can't summon anyone here.\r\n");
 		return;
 	}
 	
-	for (mob = ROOM_PEOPLE(IN_ROOM(ch)), count = 0; mob; mob = mob->next_in_room) {
+	// count mobs and check limit
+	count = 0;
+	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 		if (IS_NPC(mob)) {
 			++count;
 		}
 	}
-	
-	if (count > config_get_int("summon_npc_limit")) {
+	if (count > max_npcs) {
 		msg_to_char(ch, "There are too many NPCs here to summon more.\r\n");
 		return;
 	}
-
-	// types of summon	
-	switch (ability) {
-		case ABIL_SUMMON_HUMANS: {
-			if (!IS_VAMPIRE(ch)) {
-				send_config_msg(ch, "must_be_vampire");
-				return;
-			}
-			
-			cost = 10;
-			cost_type = BLOOD;
-			if (!can_use_ability(ch, ability, cost_type, cost, cooldown)) {
-				return;
-			}
-			
-			vnum = human_vnums[number(0, num_human_vnums-1)];
-			max = ceil(GET_CHARISMA(ch) / 3.0);
-			break;
+	
+	// lookup
+	found = FALSE;
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		if (!VALID_SUMMON_ABIL(ch, plab)) {
+			continue;
 		}
-		case ABIL_SUMMON_ANIMALS: {
-			cost = 10;
-			cost_type = MANA;
-			if (!can_use_ability(ch, ability, cost_type, cost, cooldown)) {
-				return;
-			}
-
-			charm = TRUE;
-			vnum = animal_vnums[number(0, num_animal_vnums-1)];
-			max = ceil(GET_CHARISMA(ch) / 3.0);
-			break;
-		}
-		case ABIL_SUMMON_SWIFT: {
-			cost = 10;
-			cost_type = MANA;
-			
-			// argument
-			skip_spaces(&argument);
-			
-			if (is_abbrev(argument, "stag")) {
-				vnum = SWIFT_STAG;
-			}
-			else if (is_abbrev(argument, "deinonychus") && IS_SPECIALTY_SKILL(ch, SKILL_HIGH_SORCERY)) {
-				vnum = SWIFT_DEINONYCHUS;
-			}
-			else if (is_abbrev(argument, "serpent") && IS_SPECIALTY_SKILL(ch, SKILL_HIGH_SORCERY)) {
-				vnum = SWIFT_SERPENT;
-			}
-			else if (is_abbrev(argument, "liger") && IS_CLASS_SKILL(ch, SKILL_HIGH_SORCERY)) {
-				vnum = SWIFT_LIGER;
-			}
-			else if (is_abbrev(argument, "bear") && IS_CLASS_SKILL(ch, SKILL_HIGH_SORCERY)) {
-				vnum = SWIFT_BEAR;
-			}
-			else {
-				send_to_char("What kind of swift would you like to summon: stag", ch);
-				if (IS_SPECIALTY_SKILL(ch, SKILL_HIGH_SORCERY)) { 
-					send_to_char(", deinonychus, serpent", ch);
+		
+		// show it
+		if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMON_ANY)) {
+			// summon by mob name
+			LL_FOREACH(ABIL_DATA(abil), adl) {
+				if (adl->type != ADL_SUMMON_MOB || !(proto = mob_proto(adl->vnum))) {
+					continue;	// no match
 				}
-				if (IS_CLASS_SKILL(ch, SKILL_HIGH_SORCERY)) { 
-					send_to_char(", liger, bear", ch);
+				if (!multi_isname(argument, GET_PC_NAME(proto))) {
+					continue;	// no string match
 				}
 				
-				send_to_char("\r\n", ch);
-				return;
+				// else: summon it!
+				to_summon = (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) ? ceil(get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)) / 3.0) : 1;
+				to_summon = MIN(max_npcs, MAX(1, to_summon));	// safety limits
+				
+				found = TRUE;
+				for (num = 0; num < to_summon; ++num) {
+					if (!perform_summon(ch, abil, adl->vnum, (num == 0))) {
+						return;	// received an error
+					}
+				}
+				break;
 			}
-			
-			if (!can_use_ability(ch, ability, cost_type, cost, cooldown)) {
-				return;
-			}
-
-			max = 1;
-			break;
 		}
-		case ABIL_SUMMON_THUG: {
-			cost = 50;
-			cost_type = MOVE;
-			
-			if (!can_use_ability(ch, ability, cost_type, cost, cooldown)) {
-				return;
+		else if (IS_SET(ABIL_TYPES(abil), ABILT_SUMMON_RANDOM)) {
+			// summon-random by ability name (minus the word summon)
+			if (!multi_isname(argument, format_summon_name(ABIL_NAME(abil)))) {
+				continue;	// no name match
 			}
 			
-			vnum = THUG;
-			max = 1;
-			follow = FALSE;
-			local = TRUE;
-			break;
-		}
-		case SUMMON_GUARDS: {
-			cost = 25;
-			cost_type = MOVE;
+			// else: summon it! but, have to go through the list at random
+			found = TRUE;
+			to_summon = (ABIL_LINKED_TRAIT(abil) != APPLY_NONE) ? ceil(get_attribute_by_apply(ch, ABIL_LINKED_TRAIT(abil)) / 3.0) : 1;
+			to_summon = MIN(max_npcs, MAX(1, to_summon));	// safety limits
 			
-			if (!(emp = GET_LOYALTY(ch))) {
-				msg_to_char(ch, "You must be in an empire to summon guards.\r\n");
-				return;
-			}
-			if (GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch)) || get_territory_type_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), FALSE, &junk) == TER_FRONTIER) {
-				msg_to_char(ch, "You can only summon guards in your empire's cities and outskirts.\r\n");
-				return;
-			}
-
-			if (!can_use_ability(ch, ability, cost_type, cost, cooldown)) {
-				return;
-			}
-			
-			vnum = GUARD;
-			max = MAX(1, GET_CHARISMA(ch) / 2);
-			break;
-		}
-	}
-
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN | SECTF_START_LOCATION)) {
-		msg_to_char(ch, "You can't summon anyone here.\r\n");
-		return;
-	}
-	
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER)) {
-		msg_to_char(ch, "You can't summon anyone here.\r\n");
-		return;
-	}
-
-	if (vnum == NOTHING) {
-		msg_to_char(ch, "This ability doesn't seem to work properly.\r\n");
-		return;
-	}
-	
-	// check triggers only if a real ability
-	if (ability != NO_ABIL && ability >= 0 && ABILITY_TRIGGERS(ch, NULL, NULL, ability)) {
-		return;
-	}
-	
-	charge_ability_cost(ch, cost_type, cost, cooldown, cooldown_time, WAIT_ABILITY);
-
-	msg_to_char(ch, "You whistle loudly...\r\n");
-	act("$n whistles loudly!", FALSE, ch, 0, 0, TO_ROOM);
-
-	for (iter = 0; iter < max; ++iter) {
-		if (ability == NO_ABIL || ability < 0 || skill_check(ch, ability, diff)) {
-			mob = read_mobile(vnum, TRUE);
-			if (IS_NPC(ch)) {
-				MOB_INSTANCE_ID(mob) = MOB_INSTANCE_ID(ch);
-				if (MOB_INSTANCE_ID(mob) != NOTHING) {
-					add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
+			// main summon loop: counting number to summon
+			for (num = 0; num < to_summon; ++num) {
+				// inner loop: determining who to summon at random
+				summon_vnum = NOTHING;
+				count = 0;
+				LL_FOREACH(ABIL_DATA(abil), adl) {
+					if (adl->type != ADL_SUMMON_MOB || !(proto = mob_proto(adl->vnum))) {
+						continue;	// not a mob
+					}
+					if (get_player_level_for_ability(ch, ABIL_VNUM(abil)) < GET_MIN_SCALE_LEVEL(proto)) {
+						continue;	// pre-checking level failed
+					}
+					
+					// presumably this is ok
+					if (!number(0, count++)) {
+						summon_vnum = adl->vnum;
+					}
+				}
+				
+				if (summon_vnum != NOTHING) {
+					// do it!
+					if (!perform_summon(ch, abil, summon_vnum, (num == 0))) {
+						return;	// received an error
+					}
+				}
+				else if (num == 0) {
+					// failed to find a summon on the first round
+					msg_to_char(ch, "You can't seem to summon anything from that ability.\r\n");
+					return;
 				}
 			}
-			
-			SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE);	// never gain exp
-			if (emp) {
-				// guarantee empire flag
-				SET_BIT(MOB_FLAGS(mob), MOB_EMPIRE);
-			}
-			setup_generic_npc(mob, emp, NOTHING, NOTHING);
-
-			// try to scale mob to the summoner
-			scale_mob_as_companion(mob, ch, get_player_level_for_ability(ch, ability));
-			
-			// spawn data
-			SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED | MOB_NO_LOOT);
-			
-			char_to_room(mob, IN_ROOM(ch));
-			act("$n approaches!", FALSE, mob, 0, 0, TO_ROOM);
-			
-			if (familiar) {				
-				SET_BIT(AFF_FLAGS(mob), AFF_CHARM);
-				add_follower(mob, ch, TRUE);
-			}
-			else if (charm) {
-				SET_BIT(AFF_FLAGS(mob), AFF_CHARM);
-				add_follower(mob, ch, TRUE);
-			}
-			else if (follow) {
-				add_follower(mob, ch, TRUE);
-				SET_BIT(MOB_FLAGS(mob), MOB_SENTINEL);
-			}
-			
-			// mob empire attachment
-			if (local) {
-				GET_LOYALTY(mob) = ROOM_OWNER(IN_ROOM(ch));
-			}
-			
-			load_mtrigger(mob);
+		}
+		else {
+			continue;
+		}
+		
+		if (found) {
+			break;	// only 1 successful match
 		}
 	}
 	
-	if (ability != NO_ABIL && ability >= 0) {
-		gain_ability_exp(ch, ability, gain);
+	if (!found) {
+		msg_to_char(ch, "You don't know how to summon %s '%s'.\r\n", AN(argument), argument);
+		return;
 	}
 }
 

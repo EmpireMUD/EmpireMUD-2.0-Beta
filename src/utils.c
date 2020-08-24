@@ -2533,6 +2533,113 @@ void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 
 
 /**
+* Fetches the current attribute from a character based on an APPLY_ type. For
+* example, APPLY_STRENGTH fetches the character's strength.
+*
+* @param char_data *ch The character.
+* @param int apply_type Any APPLY_ const.
+* @return int The character's value for that attributes.
+*/
+int get_attribute_by_apply(char_data *ch, int apply_type) {
+	extern int get_block_rating(char_data *ch, bool can_gain_skill);
+	extern int get_crafting_level(char_data *ch);
+	extern int total_bonus_healing(char_data *ch);
+	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
+	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
+	extern int health_gain(char_data *ch, bool info_only);
+	extern int move_gain(char_data *ch, bool info_only);
+	extern int mana_gain(char_data *ch, bool info_only);
+	
+	if (!ch) {
+		return 0;	// shortcut/safety
+	}
+	
+	// APPLY_x
+	switch (apply_type) {
+		case APPLY_STRENGTH: {
+			return GET_STRENGTH(ch);
+		}
+		case APPLY_DEXTERITY: {
+			return GET_DEXTERITY(ch);
+		}
+		case APPLY_HEALTH_REGEN: {
+			return health_gain(ch, TRUE);
+		}
+		case APPLY_CHARISMA: {
+			return GET_CHARISMA(ch);
+		}
+		case APPLY_GREATNESS: {
+			return GET_GREATNESS(ch);
+		}
+		case APPLY_MOVE_REGEN: {
+			return move_gain(ch, TRUE);
+		}
+		case APPLY_MANA_REGEN: {
+			return mana_gain(ch, TRUE);
+		}
+		case APPLY_INTELLIGENCE: {
+			return GET_INTELLIGENCE(ch);
+		}
+		case APPLY_WITS: {
+			return GET_WITS(ch);
+		}
+		case APPLY_AGE: {
+			return GET_AGE(ch);
+		}
+		case APPLY_MOVE: {
+			return GET_MAX_MOVE(ch);
+		}
+		case APPLY_RESIST_PHYSICAL: {
+			return GET_RESIST_PHYSICAL(ch);
+		}
+		case APPLY_BLOCK: {
+			return get_block_rating(ch, FALSE);
+		}
+		case APPLY_HEAL_OVER_TIME: {
+			return GET_HEAL_OVER_TIME(ch);
+		}
+		case APPLY_HEALTH: {
+			return GET_MAX_HEALTH(ch);
+		}
+		case APPLY_MANA: {
+			return GET_MAX_MANA(ch);
+		}
+		case APPLY_TO_HIT: {
+			return get_to_hit(ch, NULL, FALSE, FALSE);
+		}
+		case APPLY_DODGE: {
+			return get_dodge_modifier(ch, NULL, FALSE);
+		}
+		case APPLY_INVENTORY: {
+			return CAN_CARRY_N(ch);
+		}
+		case APPLY_BLOOD: {
+			return GET_MAX_BLOOD(ch);
+		}
+		case APPLY_BONUS_PHYSICAL: {
+			return GET_BONUS_PHYSICAL(ch);
+		}
+		case APPLY_BONUS_MAGICAL: {
+			return GET_BONUS_MAGICAL(ch);
+		}
+		case APPLY_BONUS_HEALING: {
+			return total_bonus_healing(ch);
+		}
+		case APPLY_RESIST_MAGICAL: {
+			return GET_RESIST_MAGICAL(ch);
+		}
+		case APPLY_CRAFTING: {
+			return get_crafting_level(ch);
+		}
+		case APPLY_BLOOD_UPKEEP: {
+			return GET_BLOOD_UPKEEP(ch);
+		}
+	}
+	return 0;	// if we got this far
+}
+
+
+/**
 * Quick way to turn a vnum into a name, safely.
 *
 * @param mob_vnum vnum The vnum to look up.
