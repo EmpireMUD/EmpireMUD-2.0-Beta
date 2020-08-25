@@ -36,6 +36,7 @@
 // external vars
 
 // external funcs
+extern bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
 void check_combat_start(char_data *ch);
 
 
@@ -433,8 +434,7 @@ ACMD(do_ready) {
 		msg_to_char(ch, "You don't know how to ready that.\r\n");
 		return;
 	}
-	if (GET_POS(ch) < ABIL_MIN_POS(found_abil)) {
-		send_low_pos_msg(ch);
+	if (!char_can_act(ch, ABIL_MIN_POS(found_abil), !ABILITY_FLAGGED(found_abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(found_abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT))) {
 		return;
 	}
 	if (!can_use_ability(ch, ABIL_VNUM(found_abil), ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), ABIL_COOLDOWN(found_abil))) {

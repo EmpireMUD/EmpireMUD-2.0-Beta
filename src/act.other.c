@@ -48,6 +48,7 @@ extern const struct toggle_data_type toggle_data[];	// constants.c
 
 // external prototypes
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
+extern bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
 void check_delayed_load(char_data *ch);
 extern bool check_scaling(char_data *mob, char_data *attacker);
 extern bool check_vampire_sun(char_data *ch, bool message);
@@ -582,8 +583,7 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 		msg_to_char(ch, "You must be level %d to summon that.\r\n", GET_MIN_SCALE_LEVEL(proto));
 		return FALSE;
 	}
-	if (checks && GET_POS(ch) < ABIL_MIN_POS(abil)) {
-		send_low_pos_msg(ch);
+	if (checks && !char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT))) {
 		return FALSE;
 	}
 	if (checks && ABIL_IS_SYNERGY(abil) && !check_solo_role(ch)) {
@@ -1973,7 +1973,10 @@ ACMD(do_companions) {
 		msg_to_char(ch, "You must be alone to summon that companion in the solo role.\r\n");
 		return;
 	}
-	if (GET_POS(ch) < (abil ? ABIL_MIN_POS(abil) : POS_STANDING)) {
+	if (abil && !char_can_act(ch, ABIL_MIN_POS(abil), !ABILITY_FLAGGED(abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT))) {
+		return;
+	}
+	if (!abil && GET_POS(ch) < POS_STANDING) {
 		send_low_pos_msg(ch);
 		return;
 	}
