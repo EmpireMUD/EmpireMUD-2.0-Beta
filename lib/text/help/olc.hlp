@@ -628,7 +628,8 @@ Notes:
 - Companion abilities will use the &ctarg-to-char&0 and &ctarg-to-room&0 custom
   messages when a player summons the companion. &c$n&0 represents the player
   and &c&N&0 represents the companion. For fails, use &cfail-self-to-char&0 and
-  &cfail-self-to-room&0.
+  &cfail-self-to-room&0. For pre-ability messages, use &cpre-self-to-char&0 and
+  &cpre-self-to-room&0.
 - Cannot use the INVISIBLE flag for messaging.
 
 When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
@@ -1097,7 +1098,8 @@ Ready-Weapons abilities have the following properties:
 Notes:
 - The ready command will use the &cself-to-char&0 and &cself-to-room&0 custom
   messages. &c$n&0 represents the player and &c&p&0 represents the weapon.
-  For fails, use &cfail-self-to-char&0 and &cfail-self-to-room&0.
+  For fails, use &cfail-self-to-char&0 and &cfail-self-to-room&0. For pre-
+  ability messages, use &cpre-self-to-char&0 and &cpre-self-to-room&0.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, READY
 #d
@@ -1153,7 +1155,8 @@ Notes:
 - These abilities will use the &ctarg-to-char&0 and &ctarg-to-room&0 custom
   messages when a player summons the mob. &c$n&0 represents the player and
   &c&N&0 represents the mob. For fails, use &cfail-self-to-char&0 and
-  &cfail-self-to-room&0.
+  &cfail-self-to-room&0. For pre-ability messages, use &cpre-self-to-char&0 and
+  &cpre-self-to-room&0.
 
 When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
 and !DRINK-BLOOD flags.
