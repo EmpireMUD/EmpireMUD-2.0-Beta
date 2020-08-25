@@ -686,11 +686,13 @@ A guard whistle is lying here.~
 your established cities. Be sure to use it on a claimed tile.
 Usage: use guardwhistle (Requires Jewelry ability)
 ~
-3 o a 0 4
+3 o a 0 5
 204 0 0
 2 0
 R
 5121 0
+R
+5610 0
 T 2149
 S
 $
