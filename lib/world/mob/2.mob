@@ -45,11 +45,11 @@ This citizen doesn't seem to be in a hurry.
 ~
 S
 #204
-#n guard #a~
+#n guard~
 guard #n~
-#a guard #n is standing here.
+Guard #n is standing here.
 ~
-50 75 bdqtuv 0 3
+50 75 bdoqtuvDF c 3
 0 0 0 1
 D
 The guard looks ready to protect the realm.
