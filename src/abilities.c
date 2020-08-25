@@ -150,6 +150,72 @@ char *ability_data_display(struct ability_data_list *adl) {
 
 
 /**
+* Sends the failure message for using an ability.
+*
+* @param char_data *ch The player using the ability.
+* @param char_data *vict The targeted player, if any (or NULL).
+* @param ability_data *abil The ability.
+*/
+void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil) {
+	bool invis;
+	
+	if (!ch || !abil) {
+		return;	// no work
+	}
+	
+	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	
+	if (ch == vict || !vict) {	// message: targeting self
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		}
+	
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM), invis, ch, NULL, vict, TO_ROOM);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n fails to use %s!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, NULL, vict, TO_ROOM);
+		}
+	}
+	else {	// message: ch != vict
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		}
+	
+		// to vict
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT), invis, ch, NULL, vict, TO_VICT);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n tries to use %s on you, but fails!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, NULL, vict, TO_VICT);
+		}
+	
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM), invis, ch, NULL, vict, TO_NOTVICT);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n tries to use %s on $N, but fails!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, NULL, vict, TO_NOTVICT);
+		}
+	}
+}
+
+
+/**
 * Adds a gain hook for an ability.
 *
 * @param char_data *ch The player to add a hook to.
@@ -1448,53 +1514,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	// check for FAILURE:
 	if (!skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
-		if (ch == cvict || !cvict) {	// message: targeting self
-			// to-char
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
-			}
-			else {
-				snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
-				act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
-			}
-		
-			// to room
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM), invis, ch, NULL, cvict, TO_ROOM);
-			}
-			else {
-				snprintf(buf, sizeof(buf), "$n fails to use %s!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, NULL, cvict, TO_ROOM);
-			}
-		}
-		else {	// message: ch != cvict
-			// to-char
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
-			}
-			else {
-				snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
-				act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
-			}
-		
-			// to cvict
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT), invis, ch, NULL, cvict, TO_VICT);
-			}
-			else {
-				snprintf(buf, sizeof(buf), "$n tries to use %s on you, but fails!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, NULL, cvict, TO_VICT);
-			}
-		
-			// to room
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM), invis, ch, NULL, cvict, TO_NOTVICT);
-			}
-			else {
-				snprintf(buf, sizeof(buf), "$n tries to use %s on $N, but fails!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, NULL, cvict, TO_NOTVICT);
-			}
-		}
+		ability_fail_message(ch, cvict, abil);
 		
 		data->success = TRUE;	// causes it to charge, skillup, and cooldown
 		data->stop = TRUE;	// prevents normal activation
@@ -3384,10 +3404,10 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 	else {
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
 		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Targets: \tg%s\t0\r\n", ABIL_COMMAND(abil), part);
-		size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 	size += snprintf(buf + size, sizeof(buf) - size, "Min position: [\tc%s\t0], Linked trait: [\ty%s\t0]\r\n", position_types[ABIL_MIN_POS(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
+	size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
 	
 	// type-specific data
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
@@ -3498,11 +3518,11 @@ void olc_show_ability(char_data *ch) {
 	else {
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
 		sprintf(buf + strlen(buf), "<%scommand\t0> %s, <%stargets\t0> %s\r\n", OLC_LABEL_CHANGED, ABIL_COMMAND(abil), OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
-		sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s, <%swaittype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)], OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)]);
 	}
 	sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %d, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
 	sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
 	sprintf(buf + strlen(buf), "<%sminposition\t0> %s (minimum), <%slinkedtrait\t0> %s\r\n", OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_STANDING), position_types[ABIL_MIN_POS(abil)], OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
+	sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s, <%swaittype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)], OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)]);
 	
 	// type-specific data
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
@@ -3898,13 +3918,7 @@ OLC_MODULE(abiledit_data) {
 
 OLC_MODULE(abiledit_difficulty) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	
-	if (!ABIL_COMMAND(abil)) {
-		msg_to_char(ch, "Only command abilities have this property.\r\n");
-	}
-	else {
-		ABIL_DIFFICULTY(abil) = olc_process_type(ch, argument, "difficulty", "difficulty", skill_check_difficulty, ABIL_DIFFICULTY(abil));
-	}
+	ABIL_DIFFICULTY(abil) = olc_process_type(ch, argument, "difficulty", "difficulty", skill_check_difficulty, ABIL_DIFFICULTY(abil));
 }
 
 
@@ -4173,11 +4187,5 @@ OLC_MODULE(abiledit_types) {
 
 OLC_MODULE(abiledit_waittype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	
-	if (!ABIL_COMMAND(abil)) {
-		msg_to_char(ch, "Only command abilities have this property.\r\n");
-	}
-	else {
-		ABIL_WAIT_TYPE(abil) = olc_process_type(ch, argument, "wait type", "waittype", wait_types, ABIL_WAIT_TYPE(abil));
-	}
+	ABIL_WAIT_TYPE(abil) = olc_process_type(ch, argument, "wait type", "waittype", wait_types, ABIL_WAIT_TYPE(abil));
 }

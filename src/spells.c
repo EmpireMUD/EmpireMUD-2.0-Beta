@@ -36,6 +36,7 @@
 // external vars
 
 // external funcs
+void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
 extern bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
 void check_combat_start(char_data *ch);
 
@@ -488,7 +489,12 @@ ACMD(do_ready) {
 		ch_level = get_approximate_level(ch);
 	}
 	
-	charge_ability_cost(ch, ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), WAIT_SPELL);
+	charge_ability_cost(ch, ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
+	
+	if (!skill_check(ch, ABIL_VNUM(found_abil), ABIL_DIFFICULTY(found_abil))) {
+		ability_fail_message(ch, NULL, found_abil);
+		return;
+	}
 	
 	// load the object
 	obj = read_object(GET_OBJ_VNUM(proto), TRUE);

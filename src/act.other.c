@@ -47,6 +47,7 @@ extern const char *pool_types[];
 extern const struct toggle_data_type toggle_data[];	// constants.c
 
 // external prototypes
+void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 extern bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
 void check_delayed_load(char_data *ch);
@@ -565,7 +566,7 @@ void perform_alternate(char_data *old, char_data *new) {
 * @param char_data *ch The player summoning.
 * @param ability_data *abil Which ability they are summoning with.
 * @param any_vnum vnum The mob vnum to summon.
-* @param bool checks If TRUE, checks a bunch of things and sends error messages.
+* @param bool checks If TRUE, checks a bunch of things and sends error messages. This is only for the first call in a loop.
 * @return bool TRUE if anything was summoned; FALSE if we sent an error.
 */
 bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool checks) {
@@ -602,7 +603,15 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 	
 	// proceed:
 	if (checks) {
-		charge_ability_cost(ch, ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), WAIT_OTHER);
+		charge_ability_cost(ch, ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
+	}
+	
+	// any failure exits, even without 'checks'.. but only send a fail message if 'checks' (first summon)
+	if (!skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
+		if (checks) {
+			ability_fail_message(ch, NULL, abil);
+		}
+		return FALSE;
 	}
 	
 	// load/update mob:
@@ -1991,7 +2000,12 @@ ACMD(do_companions) {
 	}
 	
 	// proceed:
-	charge_ability_cost(ch, abil ? ABIL_COST_TYPE(abil) : MOVE, abil ? ABIL_COST(abil) : 0, abil ? ABIL_COOLDOWN(abil) : NOTHING, abil ? ABIL_COOLDOWN_SECS(abil) : 0, WAIT_OTHER);
+	charge_ability_cost(ch, abil ? ABIL_COST_TYPE(abil) : MOVE, abil ? ABIL_COST(abil) : 0, abil ? ABIL_COOLDOWN(abil) : NOTHING, abil ? ABIL_COOLDOWN_SECS(abil) : 0, abil ? ABIL_WAIT_TYPE(abil) : WAIT_OTHER);
+	if (abil && !skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
+		ability_fail_message(ch, NULL, abil);
+		return;
+	}
+	
 	mob = load_companion_mob(ch, found_cd);
 	
 	// messaging to char
