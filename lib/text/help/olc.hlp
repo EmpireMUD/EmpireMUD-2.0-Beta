@@ -726,6 +726,11 @@ Message types:
  &cfail-targ-to-char&0 - To the actor when the ability fails targeting a character.
  &cfail-targ-to-vict&0 - To the victim when the ability fails targeting a character.
  &cfail-targ-to-room&0 - To the room when it fails targeting a character.
+ &cpre-self-to-char&0 - To the actor before an ability executes, when targeting self/nobody.
+ &cpre-self-to-room&0 - To the room before an ability executes, when targeting self/nobody.
+ &cpre-targ-to-char&0 - To the actor before an ability executes, when targeted.
+ &cpre-targ-to-vict&0 - To the victim before an ability executes, when targeted.
+ &cpre-targ-to-room&0 - To the room before an ability executes, when targeted.
 
 See also: OLC ABILITIES, DOLLAR SIGN CODES
 #d

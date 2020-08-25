@@ -563,6 +563,11 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR  10
 #define ABIL_CUSTOM_FAIL_TARGETED_TO_VICT  11
 #define ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM  12
+#define ABIL_CUSTOM_PRE_SELF_TO_CHAR  13
+#define ABIL_CUSTOM_PRE_SELF_TO_ROOM  14
+#define ABIL_CUSTOM_PRE_TARGETED_TO_CHAR  15
+#define ABIL_CUSTOM_PRE_TARGETED_TO_VICT  16
+#define ABIL_CUSTOM_PRE_TARGETED_TO_ROOM  17
 
 
 // ABIL_EFFECT_x: things that happen when an ability is used

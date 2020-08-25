@@ -1008,6 +1008,53 @@ char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
 
 
 /**
+* Sends the pre-ability messages, if any. These are optional, and only appear
+* if set in the ability's custom data.
+*
+* @param char_data *ch The player using the ability.
+* @param char_data *vict The targeted player, if any (or NULL).
+* @param ability_data *abil The ability.
+*/
+void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil) {
+	bool invis;
+	
+	if (!ch || !abil) {
+		return;	// no work
+	}
+	
+	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	
+	if (ch == vict || !vict) {	// message: targeting self
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+		}
+	
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_ROOM), invis, ch, NULL, vict, TO_ROOM);
+		}
+	}
+	else {	// message: ch != vict
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+		}
+	
+		// to vict
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_VICT)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_VICT), invis, ch, NULL, vict, TO_VICT);
+		}
+	
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM), invis, ch, NULL, vict, TO_NOTVICT);
+		}
+	}
+}
+
+
+/**
 * Removes all the passive buffs on a character and re-applies them. This can be
 * called at startup, when the player gains an ability, or when a player gains
 * a level (changes effect scaling).
@@ -1474,6 +1521,9 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 			check_combat_start(cvict);
 		}
 	}
+	
+	// pre-messages if any
+	pre_ability_message(ch, cvict, abil);
 	
 	// locked in! apply the effects
 	apply_ability_effects(abil, ch);

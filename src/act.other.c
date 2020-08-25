@@ -60,6 +60,7 @@ extern int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 extern char *get_room_name(room_data *room, bool color);
 extern bool is_ignoring(char_data *ch, char_data *victim);
+void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
 extern char *show_color_codes(char *string);
@@ -604,6 +605,7 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 	// proceed:
 	if (checks) {
 		charge_ability_cost(ch, ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
+		pre_ability_message(ch, NULL, abil);
 	}
 	
 	// any failure exits, even without 'checks'.. but only send a fail message if 'checks' (first summon)
@@ -1998,6 +2000,9 @@ ACMD(do_companions) {
 	if (abil && ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_VNUM(abil))) {
 		return;
 	}
+	
+	// pre-message, if any
+	pre_ability_message(ch, NULL, abil);
 	
 	// proceed:
 	charge_ability_cost(ch, abil ? ABIL_COST_TYPE(abil) : MOVE, abil ? ABIL_COST(abil) : 0, abil ? ABIL_COOLDOWN(abil) : NOTHING, abil ? ABIL_COOLDOWN_SECS(abil) : 0, abil ? ABIL_WAIT_TYPE(abil) : WAIT_OTHER);

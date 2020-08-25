@@ -415,11 +415,14 @@ See also: CRAFTING LEVEL, COOK, RESOURCES, KEEP, OIL, CRAFT INFO, RECIPES
 #
 READY
 
-Usage:  ready <weapon type>
+Usage:  ready [weapon type]
 
 Some abilities allow you to create a weapon from mana, blood, or other
 energies. These weapons are temporary and will disappear if you stop using
 them.
+
+Typing ready by itself will list the things you know how to ready, along with
+their costs (if any).
 
 See also:
   READY FIREBALL  (Natural Magic)
@@ -698,6 +701,11 @@ Command:  summon [type]
 The summon command is used by several different abilities to summon various
 creatures, items, or guards. Each may serve a different purpose, so you
 should consult the help file for the specific summon ability you're using.
+
+Typing summon by itself will list the things you know how to summon, along with
+their costs (if any). If you are too low-level for a summon, the level will
+be displayed, too. If the ability comes from a skill tree, this may be your
+level in that skill tree.
 
 See also:
  SUMMON ANIMALS  (Natural Magic ability)

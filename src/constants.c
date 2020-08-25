@@ -195,6 +195,11 @@ const char *ability_custom_types[] = {
 	"fail-targ-to-char",	// 10
 	"fail-targ-to-vict",
 	"fail-targ-to-room",
+	"pre-self-to-char",
+	"pre-self-to-room",
+	"pre-targ-to-char",	// 15
+	"pre-targ-to-vict",
+	"pre-targ-to-room",
 	"\n"
 };
 

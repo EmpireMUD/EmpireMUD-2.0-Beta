@@ -475,6 +475,11 @@ Companions are NPCs that will follow and assist your character. You can collect
 many different companions, but can only use one at a time. Companions may come
 from abilities, from adventures, or from other rewards.
 
+Typing this command by itself (companions) will list your available companions
+and the cost to summon them, if any. If you are too low-level for a companion,
+the level will be displayed, too. If the ability comes from a skill tree, this
+may be your level in that skill tree.
+
 You can dismiss your companion from anywhere using 'dismiss companion'. If you
 log out with a companion active, it will automatically be re-summoned when you
 log back in (but you will have to re-cast any buffs on it).
