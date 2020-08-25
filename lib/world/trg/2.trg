@@ -26,6 +26,22 @@ Stealth GM Bribe item: Prevent~
 %send% %actor% %self.name% doesn't take bribes like that any more. Complete %self.hisher% quest instead.
 return 0
 ~
+#230
+Summon Thug load script~
+0 n 100
+~
+* cancels follow and sets loyalty to current room's empire
+if %self.master%
+  mfollow self
+end
+set room %self.room%
+if %room.empire%
+  %own% %self% %room.empire%
+else
+  %own% %self% none
+end
+detach 230 %self.id%
+~
 #250
 City Guard: Distract~
 0 k 50

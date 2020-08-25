@@ -3,7 +3,7 @@ deinonychus swift ferocious~
 a swift deinonychus~
 A ferocious deinonychus is stalking around!
 ~
-40 50 dejo 0 3
+75 75 dejo 0 3
 0 0 0 10
 D
    The deinonychus looks like a fearsome bird with a feathered tail longer than
@@ -12,13 +12,14 @@ is lined with razor-sharp teeth. Though shorter than a person, this swift beast
 has been magically prepared to serve as a mount.
 ~
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+T 9804
 S
 #401
 liger swift gigantic~
 a swift liger~
 A gigantic liger is prowling around!
 ~
-40 50 dejo 0 4
+100 100 dejo 0 4
 0 0 0 10
 D
    This truly enormous beast is a liger -- a hybrid of a lion and a tiger, but
@@ -28,26 +29,28 @@ stripes. It seems unnaturally tame, like you could ride it.
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 0 3012 75.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 75.00 1  # BUTCHER: a fillet of raw meat
+T 9804
 S
 #402
 serpent giant swift~
 a swift giant serpent~
 A swift, giant serpent is coiled and ready to strike!
 ~
-40 50 dejo 0 4
+75 75 dejo 0 4
 0 0 5 7
 D
    This massive snake is sleek, with soft scales the size of dinner plates. It
 seems oddly tame, like you could ride it.
 ~
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+T 9804
 S
 #403
 stag swift majestic white~
 a swift white stag~
 A majestic white stag is standing before you!
 ~
-40 50 dejo 0 4
+15 50 dejo 0 4
 0 0 0 27
 D
    This massive stag is as white as the driven snow, from its hooves to its
@@ -55,13 +58,14 @@ antlers. It seems quite tame, like you could ride it, if you could figure out
 how to get all the way up onto it.
 ~
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
+T 9804
 S
 #404
 bear swift golden~
 a swift golden bear~
 A swift golden bear stands up and towers over you!
 ~
-40 50 dejo 0 4
+100 100 dejo 0 4
 0 0 0 10
 D
    This enormous bear has golden fur, like no bear you've ever seen. Though its
@@ -70,6 +74,7 @@ teeth are as big as daggers, the bear seems unnaturally tame when you approach.
 I 0 3012 100.00 2  # BUTCHER: a fillet of raw meat
 I 0 3012 75.00 1  # BUTCHER: a fillet of raw meat
 I 0 3012 75.00 1  # BUTCHER: a fillet of raw meat
+T 9804
 S
 #450
 mirror image~

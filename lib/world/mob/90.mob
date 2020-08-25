@@ -601,6 +601,7 @@ D
    The man is barely clothed, with ragged hair and deep creases in his face.
 He must live just beyond the edges of society.
 ~
+T 9804
 S
 #9030
 man human~
@@ -613,6 +614,7 @@ D
    The man doesn't wear the colors of any empire. Perhaps he belongs to a free
 village?
 ~
+T 9804
 S
 #9031
 woman young human~
@@ -624,6 +626,7 @@ A young woman walks past you.
 D
 The young woman doesn't bear the colors of any empire.
 ~
+T 9804
 S
 #9032
 woman human~
@@ -635,6 +638,7 @@ A woman is standing here.
 D
 The woman doesn't bear the colors of any empire.
 ~
+T 9804
 S
 #9033
 horse brown~

@@ -220,7 +220,7 @@ S
 Griffin Familiar~
 0 -1 1.00 0 ho
 C
-unknown 0 0 2 40 0 -1 0 0 0 0
+unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 503 0
 M
 2
@@ -234,7 +234,7 @@ S
 Dire Wolf Familiar~
 0 -1 1.00 0 ho
 C
-unknown 0 0 2 40 0 -1 0 0 0 0
+unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 504 0
 M
 2
@@ -248,7 +248,7 @@ S
 Moon Rabbit Familiar~
 0 -1 1.00 0 ho
 C
-unknown 0 0 2 40 0 -1 0 0 0 0
+unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 505 0
 M
 2
@@ -262,7 +262,7 @@ S
 Spirit Wolf Familiar~
 0 -1 1.00 0 ho
 C
-unknown 0 0 2 40 0 -1 0 0 0 0
+unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 507 0
 M
 2
@@ -276,7 +276,7 @@ S
 Manticore Familiar~
 0 -1 1.00 0 ho
 C
-unknown 0 0 2 40 0 -1 0 0 0 0
+unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 508 0
 M
 2
@@ -290,7 +290,7 @@ S
 Phoenix Familiar~
 0 -1 1.00 0 ho
 C
-unknown 0 0 2 40 0 -1 0 0 0 0
+unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 509 0
 M
 2
@@ -304,7 +304,7 @@ S
 Scorpion Shadow Familiar~
 0 -1 1.00 0 ho
 C
-unknown 0 0 2 40 0 -1 0 0 0 0
+unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 510 0
 M
 2
@@ -318,7 +318,7 @@ S
 Owl Shadow Familiar~
 0 -1 1.00 0 ho
 C
-unknown 0 0 2 40 0 -1 0 0 0 0
+unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 511 0
 M
 2
@@ -332,7 +332,7 @@ S
 Basilisk Familiar~
 0 -1 1.00 0 ho
 C
-unknown 0 0 2 40 0 -1 0 0 0 0
+unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 512 0
 M
 2
@@ -346,7 +346,7 @@ S
 Salamander Familiar~
 0 -1 1.00 0 ho
 C
-unknown 0 0 2 40 0 -1 0 0 0 0
+unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 513 0
 M
 2
@@ -360,7 +360,7 @@ S
 Skeletal Hulk Familiar~
 0 -1 1.00 0 ho
 C
-unknown 0 0 2 40 0 -1 0 0 0 0
+unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 514 0
 M
 2
@@ -374,7 +374,7 @@ S
 Banshee Familiar~
 0 -1 1.00 0 ho
 C
-unknown 0 0 2 40 0 -1 0 0 0 0
+unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 515 0
 M
 2

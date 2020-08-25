@@ -39,6 +39,26 @@ if %self.is_npc% && %ch% && !%ch.is_npc%
   %ch.remove_companion(%self.vnum%)%
 end
 ~
+#9804
+Cancel follow on load (for summons)~
+0 n 100
+~
+* Summons enter the game following (silentyl). This cancels that.
+if %self.master%
+  mfollow self
+end
+detach 9804 %self.id%
+~
+#9805
+Summoned mob is charmed~
+0 n 100
+~
+* Adds a CHARMED flag to the mob
+if %self.master%
+  dg_affect %self% *CHARM on -1
+end
+detach 9805 %self.id%
+~
 #9850
 Equip imm-only~
 1 j 0

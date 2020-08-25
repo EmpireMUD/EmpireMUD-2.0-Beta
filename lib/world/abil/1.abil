@@ -94,7 +94,7 @@ S
 Ready Fireball~
 0 -1 1.00 0 bcn
 C
-unknown 0 0 2 30 0 -1 0 0 0 0
+unknown 5 0 2 30 0 -1 0 0 3 0
 D 4 1105 0
 T g 1
 S
@@ -146,7 +146,7 @@ S
 Familiar~
 0 -1 1.00 0 0
 C
-unknown 0 0 2 40 0 -1 0 0 0 0
+unknown 8 0 2 40 0 -1 0 0 5 0
 D 8 500 0
 D 8 501 0
 D 8 502 0
@@ -191,7 +191,7 @@ S
 Bodyguard~
 0 -1 1.00 0 ho
 C
-unknown 0 0 1 25 0 2030 0 0 0 0
+unknown 8 0 1 25 0 2030 0 0 1 0
 D 8 205 0
 T h 0
 S
@@ -372,6 +372,26 @@ S
 #168
 Summon Swift~
 0 -1 1.00 0 0
+C
+unknown 8 0 2 10 0 2032 60 0 5 2
+D 8 400 0
+D 8 401 0
+D 8 402 0
+D 8 403 0
+D 8 404 0
+M
+2
+You open a portal and $N dashes out!~
+M
+4
+$n opens a portal and $N dashes out!~
+M
+8
+You open a portal but nobody comes out.~
+M
+9
+$n opens a portal but nothing comes out.~
+T i 0
 S
 #169
 Summon Materials~

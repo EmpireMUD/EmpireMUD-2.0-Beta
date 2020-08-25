@@ -52,7 +52,7 @@ S
 Ready Blood Weapons~
 0 -1 1.00 0 bcn
 C
-unknown 0 0 3 40 0 -1 0 0 0 0
+unknown 5 0 3 40 0 -1 0 0 2 0
 D 4 1101 0
 D 4 1102 0
 D 4 1103 0
@@ -227,6 +227,22 @@ S
 #28
 Summon Thug~
 0 -1 1.00 0 0
+C
+unknown 8 0 1 50 0 2031 30 0 1 2
+D 8 230 0
+M
+2
+You give the secret signal... $N appears.~
+M
+4
+$N walks up.~
+M
+8
+You give the secret signal... but nobody shows up.~
+M
+9
+$n makes a hand gesture.~
+T j 0
 S
 #29
 Sneak~
@@ -275,10 +291,54 @@ S
 #34
 Summon Animals~
 0 -1 1.00 0 0
+C
+unknown 8 0 2 10 0 2028 30 4 5 2
+D 8 530 0
+D 8 531 0
+D 8 532 0
+D 8 533 0
+D 8 534 0
+D 8 535 0
+D 8 536 0
+D 8 537 0
+D 8 538 0
+D 8 539 0
+M
+2
+You let out a melodic whistle and $N arrives immediately!~
+M
+4
+$n lets out a melodic whistle and $N arrives immediately!~
+M
+8
+You let out a melodic whistle... but nobody arrives.~
+M
+9
+$n lets out a melodic whistle.~
+T j 0
 S
 #35
 Summon Humans~
 0 -1 1.00 0 0
+C
+unknown 8 0 3 10 0 2027 60 4 1 2
+D 8 9029 0
+D 8 9030 0
+D 8 9031 0
+D 8 9032 0
+M
+2
+You focus your supernatural pheromones into a single drop of blood and $N arrives before the drop hits the ground.~
+M
+4
+$N walks up.~
+M
+8
+You focus your supernatural pheromones into a single drop of blood, but it fails to summon anybody.~
+M
+9
+$n drips blood on the ground.~
+T j 0
 S
 #36
 Heartstop~
