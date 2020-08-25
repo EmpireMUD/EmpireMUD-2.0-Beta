@@ -627,18 +627,18 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 	
 	// messaging to char
 	if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR)) {
-		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, mob, TO_CHAR);
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_CHAR), FALSE, ch, NULL, mob, TO_CHAR | TO_QUEUE);
 	}
 	else {
-		act("You summon $N.", FALSE, ch, NULL, mob, TO_CHAR);
+		act("You summon $N.", FALSE, ch, NULL, mob, TO_CHAR | TO_QUEUE);
 	}
 	
 	// messaging to room
 	if (abil_has_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM)) {
-		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), FALSE, ch, NULL, mob, TO_NOTVICT);
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_TARGETED_TO_ROOM), FALSE, ch, NULL, mob, TO_NOTVICT | TO_QUEUE);
 	}
 	else {
-		act("$n summons $N.", FALSE, ch, NULL, mob, TO_NOTVICT);
+		act("$n summons $N.", FALSE, ch, NULL, mob, TO_NOTVICT | TO_QUEUE);
 	}
 	
 	load_mtrigger(mob);
