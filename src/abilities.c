@@ -98,6 +98,9 @@ struct {
 	{ ABILT_PLAYER_TECH, NULL, NULL },
 	{ ABILT_PASSIVE_BUFF, NULL, NULL },
 	{ ABILT_READY_WEAPONS, NULL, NULL },
+	{ ABILT_COMPANION, NULL, NULL },
+	{ ABILT_SUMMON_ANY, NULL, NULL },
+	{ ABILT_SUMMON_RANDOM, NULL, NULL },
 	
 	{ NOBITS }	// this goes last
 };
@@ -132,6 +135,10 @@ char *ability_data_display(struct ability_data_list *adl) {
 			snprintf(output, sizeof(output), "%s: [%d] %s", temp, adl->vnum, get_obj_name_by_proto(adl->vnum));
 			break;
 		}
+		case ADL_SUMMON_MOB: {
+			snprintf(output, sizeof(output), "%s: [%d] %s", temp, adl->vnum, get_mob_name_by_proto(adl->vnum, FALSE));
+			break;
+		}
 		default: {
 			snprintf(output, sizeof(output), "%s: ???", temp);
 			break;
@@ -139,6 +146,72 @@ char *ability_data_display(struct ability_data_list *adl) {
 	}
 	
 	return output;
+}
+
+
+/**
+* Sends the failure message for using an ability.
+*
+* @param char_data *ch The player using the ability.
+* @param char_data *vict The targeted player, if any (or NULL).
+* @param ability_data *abil The ability.
+*/
+void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil) {
+	bool invis;
+	
+	if (!ch || !abil) {
+		return;	// no work
+	}
+	
+	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	
+	if (ch == vict || !vict) {	// message: targeting self
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		}
+	
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM), invis, ch, NULL, vict, TO_ROOM);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n fails to use %s!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, NULL, vict, TO_ROOM);
+		}
+	}
+	else {	// message: ch != vict
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+		}
+	
+		// to vict
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT), invis, ch, NULL, vict, TO_VICT);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n tries to use %s on you, but fails!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, NULL, vict, TO_VICT);
+		}
+	
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM), invis, ch, NULL, vict, TO_NOTVICT);
+		}
+		else {
+			snprintf(buf, sizeof(buf), "$n tries to use %s on $N, but fails!", SAFE_ABIL_COMMAND(abil));
+			act(buf, invis, ch, NULL, vict, TO_NOTVICT);
+		}
+	}
 }
 
 
@@ -515,6 +588,39 @@ ability_data *find_ability_on_skill(char *name, skill_data *skill) {
 
 
 /**
+* Finds which ability a player has that's giving them a ptech. If there's more
+* than one, it returns the first one it finds.
+*
+* @param char_data *ch The player.
+* @param int ptech Any PTECH_ const.
+* @return ability_data* Which ability the player has that grants that ptech, or NULL if none.
+*/
+ability_data *find_player_ability_by_tech(char_data *ch, int ptech) {
+	struct player_ability_data *plab, *next_plab;
+	struct ability_data_list *adl;
+	ability_data *abil;
+	
+	if (!ch || IS_NPC(ch)) {
+		return NULL;
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		
+		if (IS_SET(ABIL_TYPES(abil), ABILT_PLAYER_TECH) && plab->purchased[GET_CURRENT_SKILL_SET(ch)]) {
+			LL_FOREACH(ABIL_DATA(abil), adl) {
+				if (adl->type == ADL_PLAYER_TECH && adl->vnum == ptech) {
+					return abil;
+				}
+			}
+		}
+	}
+	
+	return NULL;	// if we got here
+}
+
+
+/**
 * @param any_vnum vnum An ability vnum.
 * @return char* The ability name, or "Unknown" if no match.
 */
@@ -571,6 +677,45 @@ void get_ability_type_display(struct ability_type *list, char *save_buffer) {
 	if (count == 0) {
 		strcat(save_buffer, "none");
 	}
+}
+
+
+/**
+* Abilities which come from skills are capped by the player's skill level if
+* they haven't specialized it to its max. When the player HAS capped the
+* ability, their full level is used.
+*
+* @param char_data *ch The player.
+* @param any_vnum abil_vnum Which ability.
+* @return int Some level >= 1, based on the player, their skills, and the ability.
+*/
+int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum) {
+	int level, skill_level;
+	ability_data *abil;
+	skill_data *skl;
+	
+	if (!ch) {
+		return 1;	// no work
+	}
+	
+	// start here
+	level = get_approximate_level(ch);
+	
+	if (abil_vnum == NO_ABIL || !(abil = find_ability_by_vnum(abil_vnum))) {
+		return level;	// no abil = no adjustment
+	}
+	if (!(skl = ABIL_ASSIGNED_SKILL(abil)) || ABIL_IS_SYNERGY(abil)) {
+		return level;	// no limit here either
+	}
+	
+	skill_level = get_skill_level(ch, SKILL_VNUM(skl));
+	
+	// constrain only if player hasn't maxed this skill
+	if (skill_level < SKILL_MAX_LEVEL(skl)) {
+		level = MIN(level, skill_level);
+	}
+	
+	return level;
 }
 
 
@@ -719,6 +864,193 @@ bool is_class_ability(ability_data *abil) {
 	}
 	
 	return FALSE;	// no match
+}
+
+
+/**
+* Loads a companion as a mob, from its companion_data entry. This places the
+* mob in the room and runs load triggers, but does not send any messages of its
+* own.
+*
+* @param char_data *master The player summoning the companion.
+* @param struct companion_data *cd The companion (data) to summon as a mob.
+* @return char_data* The mob that was summoned, if possible (NULL otherwise).
+*/
+char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
+	void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
+	extern bool despawn_companion(char_data *ch, mob_vnum vnum);
+	void reread_companion_trigs(char_data *mob);
+	void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
+	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+	
+	struct trig_proto_list *tp;
+	struct trig_var_data *var;
+	struct companion_mod *cm;
+	char_data *mob, *proto;
+	trig_data *trig;
+	
+	if (!master || IS_NPC(master) || !cd || !(proto = mob_proto(cd->vnum))) {
+		return NULL;	// safety first
+	}
+	
+	// get rid of any old companion
+	despawn_companion(master, NOTHING);
+	
+	// load mob
+	mob = read_mobile(cd->vnum, cd->instantiated ? FALSE : TRUE);
+	SET_BIT(MOB_FLAGS(mob), MOB_NO_EXPERIENCE | MOB_SPAWNED | MOB_NO_EXPERIENCE | MOB_NO_LOOT);
+	SET_BIT(AFF_FLAGS(mob), AFF_CHARM | AFF_NO_DRINK_BLOOD);
+	setup_generic_npc(mob, GET_LOYALTY(master), NOTHING, NOTHING);
+	
+	// CMOD_x: modify the companion
+	LL_FOREACH(cd->mods, cm) {
+		switch (cm->type) {
+			case CMOD_SEX: {
+				GET_REAL_SEX(mob) = cm->num;
+				break;
+			}
+			case CMOD_KEYWORDS: {
+				if (cm->str && *cm->str) {
+					if (GET_PC_NAME(mob) && (!proto || GET_PC_NAME(mob) != GET_PC_NAME(proto))) {
+						free(GET_PC_NAME(mob));
+					}
+					GET_PC_NAME(mob) = str_dup(cm->str);
+				}
+				break;
+			}
+			case CMOD_SHORT_DESC: {
+				if (cm->str && *cm->str) {
+					if (GET_SHORT_DESC(mob) && (!proto || GET_SHORT_DESC(mob) != GET_SHORT_DESC(proto))) {
+						free(GET_SHORT_DESC(mob));
+					}
+					GET_SHORT_DESC(mob) = str_dup(cm->str);
+				}
+				break;
+			}
+			case CMOD_LONG_DESC: {
+				if (cm->str && *cm->str) {
+					if (GET_LONG_DESC(mob) && (!proto || GET_LONG_DESC(mob) != GET_LONG_DESC(proto))) {
+						free(GET_LONG_DESC(mob));
+					}
+					GET_LONG_DESC(mob) = str_dup(cm->str);
+				}
+				break;
+			}
+			case CMOD_LOOK_DESC: {
+				if (cm->str && *cm->str) {
+					if (GET_LOOK_DESC(mob) && (!proto || GET_LOOK_DESC(mob) != GET_LOOK_DESC(proto))) {
+						free(GET_LOOK_DESC(mob));
+					}
+					GET_LOOK_DESC(mob) = str_dup(cm->str);
+				}
+				break;
+			}
+		}
+	}
+	
+	// re-attach scripts
+	if (!SCRIPT(mob)) {
+		create_script_data(mob, MOB_TRIGGER);
+	}
+	LL_FOREACH(cd->scripts, tp) {
+		if ((trig = read_trigger(tp->vnum))) {
+			add_trigger(SCRIPT(mob), trig, -1);
+		}
+	}
+	
+	// re-attach script vars
+	LL_FOREACH(cd->vars, var) {
+		add_var(&(SCRIPT(mob)->global_vars), var->name, var->value, var->context);
+	}
+	
+	// set companion data
+	GET_COMPANION(master) = mob;
+	GET_COMPANION(mob) = master;
+	GET_LAST_COMPANION(master) = GET_MOB_VNUM(mob);
+	
+	// for new mobs, ensure any data is saved back
+	if (!cd->instantiated) {
+		// sex/string changes
+		if (GET_REAL_SEX(mob) != GET_REAL_SEX(proto)) {
+			add_companion_mod(cd, CMOD_SEX, GET_REAL_SEX(mob), NULL);
+		}
+		if (GET_PC_NAME(mob) != GET_PC_NAME(proto)) {
+			add_companion_mod(cd, CMOD_KEYWORDS, 0, GET_PC_NAME(mob));
+		}
+		if (GET_SHORT_DESC(mob) != GET_SHORT_DESC(proto)) {
+			add_companion_mod(cd, CMOD_SHORT_DESC, 0, GET_SHORT_DESC(mob));
+		}
+		if (GET_LONG_DESC(mob) != GET_LONG_DESC(proto)) {
+			add_companion_mod(cd, CMOD_LONG_DESC, 0, GET_LONG_DESC(mob));
+		}
+		if (GET_LOOK_DESC(mob) != GET_LOOK_DESC(proto)) {
+			add_companion_mod(cd, CMOD_LOOK_DESC, 0, GET_LOOK_DESC(mob));
+		}
+		
+		// save scripts
+		reread_companion_trigs(mob);
+		
+		// mark as instantiated
+		cd->instantiated = TRUE;
+		queue_delayed_update(master, CDU_SAVE);
+	}
+	
+	// scale to summoner
+	scale_mob_as_companion(mob, master, get_player_level_for_ability(master, cd->from_abil));
+	char_to_room(mob, IN_ROOM(master));
+	add_follower(mob, master, FALSE);
+	
+	// triggers last
+	load_mtrigger(mob);
+	
+	return mob;
+}
+
+
+/**
+* Sends the pre-ability messages, if any. These are optional, and only appear
+* if set in the ability's custom data.
+*
+* @param char_data *ch The player using the ability.
+* @param char_data *vict The targeted player, if any (or NULL).
+* @param ability_data *abil The ability.
+*/
+void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil) {
+	bool invis;
+	
+	if (!ch || !abil) {
+		return;	// no work
+	}
+	
+	invis = ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE;
+	
+	if (ch == vict || !vict) {	// message: targeting self
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+		}
+	
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_SELF_TO_ROOM), invis, ch, NULL, vict, TO_ROOM);
+		}
+	}
+	else {	// message: ch != vict
+		// to-char
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_CHAR), FALSE, ch, NULL, vict, TO_CHAR);
+		}
+	
+		// to vict
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_VICT)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_VICT), invis, ch, NULL, vict, TO_VICT);
+		}
+	
+		// to room
+		if (abil_has_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM)) {
+			act(abil_get_custom_message(abil, ABIL_CUSTOM_PRE_TARGETED_TO_ROOM), invis, ch, NULL, vict, TO_NOTVICT);
+		}
+	}
 }
 
 
@@ -911,8 +1243,55 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 				continue;	// not using the item
 			}
 		}
+		if (IS_SET(agh->triggers, AGH_ONLY_USING_COMPANION)) {
+			// check if using a cmpanion
+			found = FALSE;
+			if (GET_COMPANION(ch) && (abil = find_ability_by_vnum(agh->ability))) {
+				LL_FOREACH(ABIL_DATA(abil), adl) {
+					if (adl->type == ADL_SUMMON_MOB && adl->vnum == GET_MOB_VNUM(GET_COMPANION(ch))) {
+						found = TRUE;
+						break;
+					}
+				}
+			}
+			if (!found) {
+				continue;	// not using the companion
+			}
+		}
 		
 		gain_ability_exp(ch, agh->ability, amount);
+	}
+}
+
+
+/**
+* Ensures a player has companion entries for all the companions granted by
+* his/her abilities.
+*
+* @param char_data *ch The player.
+*/
+void setup_ability_companions(char_data *ch) {
+	extern struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
+	
+	struct player_ability_data *plab, *next_plab;
+	struct ability_data_list *adl;
+	ability_data *abil;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;	// no work
+	}
+	
+	HASH_ITER(hh, GET_ABILITY_HASH(ch), plab, next_plab) {
+		abil = plab->ptr;
+		if (!abil || !plab->purchased[GET_CURRENT_SKILL_SET(ch)] || !IS_SET(ABIL_TYPES(abil), ABILT_COMPANION)) {
+			continue;
+		}
+		
+		LL_FOREACH(ABIL_DATA(abil), adl) {
+			if (adl->type == ADL_SUMMON_MOB) {
+				add_companion(ch, adl->vnum, ABIL_VNUM(abil));
+			}
+		}
 	}
 }
 
@@ -1143,6 +1522,9 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 		}
 	}
 	
+	// pre-messages if any
+	pre_ability_message(ch, cvict, abil);
+	
 	// locked in! apply the effects
 	apply_ability_effects(abil, ch);
 	
@@ -1182,53 +1564,7 @@ void call_ability(char_data *ch, ability_data *abil, char *argument, char_data *
 	
 	// check for FAILURE:
 	if (!skill_check(ch, ABIL_VNUM(abil), ABIL_DIFFICULTY(abil))) {
-		if (ch == cvict || !cvict) {	// message: targeting self
-			// to-char
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
-			}
-			else {
-				snprintf(buf, sizeof(buf), "You fail to use %s!", SAFE_ABIL_COMMAND(abil));
-				act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
-			}
-		
-			// to room
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_SELF_TO_ROOM), invis, ch, NULL, cvict, TO_ROOM);
-			}
-			else {
-				snprintf(buf, sizeof(buf), "$n fails to use %s!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, NULL, cvict, TO_ROOM);
-			}
-		}
-		else {	// message: ch != cvict
-			// to-char
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR), FALSE, ch, NULL, cvict, TO_CHAR);
-			}
-			else {
-				snprintf(buf, sizeof(buf), "You try to use %s on $N, but fail!", SAFE_ABIL_COMMAND(abil));
-				act(buf, FALSE, ch, NULL, cvict, TO_CHAR);
-			}
-		
-			// to cvict
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_VICT), invis, ch, NULL, cvict, TO_VICT);
-			}
-			else {
-				snprintf(buf, sizeof(buf), "$n tries to use %s on you, but fails!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, NULL, cvict, TO_VICT);
-			}
-		
-			// to room
-			if (abil_has_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM)) {
-				act(abil_get_custom_message(abil, ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM), invis, ch, NULL, cvict, TO_NOTVICT);
-			}
-			else {
-				snprintf(buf, sizeof(buf), "$n tries to use %s on $N, but fails!", SAFE_ABIL_COMMAND(abil));
-				act(buf, invis, ch, NULL, cvict, TO_NOTVICT);
-			}
-		}
+		ability_fail_message(ch, cvict, abil);
 		
 		data->success = TRUE;	// causes it to charge, skillup, and cooldown
 		data->stop = TRUE;	// prevents normal activation
@@ -2054,6 +2390,7 @@ void clear_ability(ability_data *abil) {
 	ABIL_AFFECT_VNUM(abil) = NOTHING;
 	ABIL_SCALE(abil) = 1.0;
 	ABIL_MAX_STACKS(abil) = 1;
+	ABIL_MIN_POS(abil) = POS_STANDING;
 }
 
 
@@ -2180,7 +2517,7 @@ void parse_ability(FILE *fl, any_vnum vnum) {
 				if (ABIL_COMMAND(abil)) {
 					free(ABIL_COMMAND(abil));
 				}
-				ABIL_COMMAND(abil) = *str_in ? str_dup(str_in) : NULL;
+				ABIL_COMMAND(abil) = (*str_in && str_cmp(str_in, "unknown")) ? str_dup(str_in) : NULL;
 				ABIL_MIN_POS(abil) = int_in[0];
 				ABIL_TARGETS(abil) = asciiflag_conv(str_in2);
 				ABIL_COST_TYPE(abil) = int_in[1];
@@ -2405,7 +2742,7 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
 	write_applies_to_file(fl, ABIL_APPLIES(abil));
 	
 	// 'C' command
-	if (ABIL_COMMAND(abil) || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil) || ABIL_DIFFICULTY(abil)) {
+	if (ABIL_COMMAND(abil) || ABIL_MIN_POS(abil) != POS_STANDING || ABIL_TARGETS(abil) || ABIL_COST(abil) || ABIL_COST_PER_SCALE_POINT(abil) || ABIL_COOLDOWN(abil) != NOTHING || ABIL_COOLDOWN_SECS(abil) || ABIL_WAIT_TYPE(abil) || ABIL_LINKED_TRAIT(abil) || ABIL_DIFFICULTY(abil)) {
 		fprintf(fl, "C\n%s %d %s %d %d %d %d %d %d %d %d\n", ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "unknown", ABIL_MIN_POS(abil), bitv_to_alpha(ABIL_TARGETS(abil)), ABIL_COST_TYPE(abil), ABIL_COST(abil), ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_LINKED_TRAIT(abil), ABIL_WAIT_TYPE(abil), ABIL_DIFFICULTY(abil));
 	}
 	
@@ -3115,14 +3452,12 @@ void do_stat_ability(char_data *ch, ability_data *abil) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\tcnot a command\t0]\r\n");
 	}
 	else {
-		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Min position: [\tc%s\t0]\r\n", ABIL_COMMAND(abil), position_types[ABIL_MIN_POS(abil)]);
-		
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, part, TRUE);
-		size += snprintf(buf + size, sizeof(buf) - size, "Targets: \tg%s\t0\r\n", part);
-		size += snprintf(buf + size, sizeof(buf) - size, "Wait type: [\ty%s\t0], Linked trait: [\ty%s\t0]\r\n", wait_types[ABIL_WAIT_TYPE(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
-		size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		size += snprintf(buf + size, sizeof(buf) - size, "Command info: [\ty%s\t0], Targets: \tg%s\t0\r\n", ABIL_COMMAND(abil), part);
 	}
 	size += snprintf(buf + size, sizeof(buf) - size, "Cost: [\tc%d %s (+%d/scale)\t0], Cooldown: [\tc%d %s\t0], Cooldown time: [\tc%d second%s\t0]\r\n", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)], ABIL_COST_PER_SCALE_POINT(abil), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)),  ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+	size += snprintf(buf + size, sizeof(buf) - size, "Min position: [\tc%s\t0], Linked trait: [\ty%s\t0]\r\n", position_types[ABIL_MIN_POS(abil)], apply_types[ABIL_LINKED_TRAIT(abil)]);
+	size += snprintf(buf + size, sizeof(buf) - size, "Difficulty: \ty%s\t0, Wait type: [\ty%s\t0]\r\n", skill_check_difficulty[ABIL_DIFFICULTY(abil)], wait_types[ABIL_WAIT_TYPE(abil)]);
 	
 	// type-specific data
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
@@ -3231,15 +3566,14 @@ void olc_show_ability(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%scommand\t0> (not a command)\r\n", OLC_LABEL_UNCHANGED);
 	}
 	else {
-		sprintf(buf + strlen(buf), "<%scommand\t0> %s, <%sminposition\t0> %s (minimum)\r\n", OLC_LABEL_CHANGED, ABIL_COMMAND(abil), OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_DEAD), position_types[ABIL_MIN_POS(abil)]);
 		sprintbit(ABIL_TARGETS(abil), ability_target_flags, lbuf, TRUE);
-		sprintf(buf + strlen(buf), "<%stargets\t0> %s\r\n", OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
-		sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
-		sprintf(buf + strlen(buf), "<%swaittype\t0> %s, <%slinkedtrait\t0> %s\r\n", OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)], OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
-		sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)]);
+		sprintf(buf + strlen(buf), "<%scommand\t0> %s, <%stargets\t0> %s\r\n", OLC_LABEL_CHANGED, ABIL_COMMAND(abil), OLC_LABEL_VAL(ABIL_TARGETS(abil), NOBITS), lbuf);
 	}
 	sprintf(buf + strlen(buf), "<%scost\t0> %d, <%scostperscalepoint\t0> %d, <%scosttype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_COST(abil), 0), ABIL_COST(abil), OLC_LABEL_VAL(ABIL_COST_PER_SCALE_POINT(abil), 0), ABIL_COST_PER_SCALE_POINT(abil), OLC_LABEL_VAL(ABIL_COST_TYPE(abil), 0), pool_types[ABIL_COST_TYPE(abil)]);
-		
+	sprintf(buf + strlen(buf), "<%scooldown\t0> [%d] %s, <%scdtime\t0> %d second%s\r\n", OLC_LABEL_VAL(ABIL_COOLDOWN(abil), NOTHING), ABIL_COOLDOWN(abil), get_generic_name_by_vnum(ABIL_COOLDOWN(abil)), OLC_LABEL_VAL(ABIL_COOLDOWN_SECS(abil), 0), ABIL_COOLDOWN_SECS(abil), PLURAL(ABIL_COOLDOWN_SECS(abil)));
+	sprintf(buf + strlen(buf), "<%sminposition\t0> %s (minimum), <%slinkedtrait\t0> %s\r\n", OLC_LABEL_VAL(ABIL_MIN_POS(abil), POS_STANDING), position_types[ABIL_MIN_POS(abil)], OLC_LABEL_VAL(ABIL_LINKED_TRAIT(abil), APPLY_NONE), apply_types[ABIL_LINKED_TRAIT(abil)]);
+	sprintf(buf + strlen(buf), "<%sdifficulty\t0> %s, <%swaittype\t0> %s\r\n", OLC_LABEL_VAL(ABIL_DIFFICULTY(abil), 0), skill_check_difficulty[ABIL_DIFFICULTY(abil)], OLC_LABEL_VAL(ABIL_WAIT_TYPE(abil), WAIT_NONE), wait_types[ABIL_WAIT_TYPE(abil)]);
+	
 	// type-specific data
 	if (IS_SET(ABIL_TYPES(abil), ABILT_BUFF | ABILT_DOT)) {
 		if (ABIL_SHORT_DURATION(abil) == UNLIMITED) {
@@ -3384,10 +3718,7 @@ OLC_MODULE(abiledit_attacktype) {
 OLC_MODULE(abiledit_cdtime) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil)) {
-		msg_to_char(ch, "Only command abilities have this property.\r\n");
-	}
-	else if (ABIL_COOLDOWN(abil) == NOTHING) {
+	if (ABIL_COOLDOWN(abil) == NOTHING) {
 		msg_to_char(ch, "Set a cooldown vnum first.\r\n");
 	}
 	else {
@@ -3426,10 +3757,7 @@ OLC_MODULE(abiledit_cooldown) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	any_vnum old;
 	
-	if (!ABIL_COMMAND(abil)) {
-		msg_to_char(ch, "Only command abilities have this property.\r\n");
-	}
-	else if (!str_cmp(argument, "none")) {
+	if (!str_cmp(argument, "none")) {
 		ABIL_COOLDOWN(abil) = NOTHING;
 		ABIL_COOLDOWN_SECS(abil) = 0;
 		msg_to_char(ch, "It no longer has a cooldown.\r\n");
@@ -3449,7 +3777,7 @@ OLC_MODULE(abiledit_cooldown) {
 OLC_MODULE(abiledit_cost) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS)) {
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
 		msg_to_char(ch, "Only command abilities and certain other types have this property.\r\n");
 	}
 	else {
@@ -3473,7 +3801,7 @@ OLC_MODULE(abiledit_costperscalepoint) {
 OLC_MODULE(abiledit_costtype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS)) {
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
 		msg_to_char(ch, "Only command abilities and certain other types have this property.\r\n");
 	}
 	else {
@@ -3520,6 +3848,9 @@ OLC_MODULE(abiledit_data) {
 	}
 	if (IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS)) {
 		allowed_types |= ADL_READY_WEAPON;
+	}
+	if (IS_SET(ABIL_TYPES(abil), ABILT_COMPANION | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
+		allowed_types |= ADL_SUMMON_MOB;
 	}
 	
 	// arg1 arg2
@@ -3595,6 +3926,13 @@ OLC_MODULE(abiledit_data) {
 					}
 					break;
 				}
+				case ADL_SUMMON_MOB: {
+					if ((val_id = atoi(val_arg)) <= 0 || !mob_proto(val_id)) {
+						msg_to_char(ch, "Invalid mob vnum for summonable mob '%s'.\r\n", val_arg);
+						return;
+					}
+					break;
+				}
 			}
 			
 			if (val_id == NOTHING) {
@@ -3630,13 +3968,7 @@ OLC_MODULE(abiledit_data) {
 
 OLC_MODULE(abiledit_difficulty) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	
-	if (!ABIL_COMMAND(abil)) {
-		msg_to_char(ch, "Only command abilities have this property.\r\n");
-	}
-	else {
-		ABIL_DIFFICULTY(abil) = olc_process_type(ch, argument, "difficulty", "difficulty", skill_check_difficulty, ABIL_DIFFICULTY(abil));
-	}
+	ABIL_DIFFICULTY(abil) = olc_process_type(ch, argument, "difficulty", "difficulty", skill_check_difficulty, ABIL_DIFFICULTY(abil));
 }
 
 
@@ -3661,8 +3993,8 @@ OLC_MODULE(abiledit_immunities) {
 OLC_MODULE(abiledit_linkedtrait) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil)) {
-		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_PASSIVE_BUFF | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else {
 		ABIL_LINKED_TRAIT(abil) = olc_process_type(ch, argument, "linked trait", "linkedtrait", apply_types, ABIL_LINKED_TRAIT(abil));
@@ -3737,8 +4069,8 @@ OLC_MODULE(abiledit_maxstacks) {
 OLC_MODULE(abiledit_minposition) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
-	if (!ABIL_COMMAND(abil)) {
-		msg_to_char(ch, "Only command abilities have this property.\r\n");
+	if (!ABIL_COMMAND(abil) && !IS_SET(ABIL_TYPES(abil), ABILT_READY_WEAPONS | ABILT_SUMMON_ANY | ABILT_SUMMON_RANDOM | ABILT_COMPANION)) {
+		msg_to_char(ch, "This type of ability does not have this property.\r\n");
 	}
 	else {
 		ABIL_MIN_POS(abil) = olc_process_type(ch, argument, "position", "minposition", position_types, ABIL_MIN_POS(abil));
@@ -3905,11 +4237,5 @@ OLC_MODULE(abiledit_types) {
 
 OLC_MODULE(abiledit_waittype) {
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
-	
-	if (!ABIL_COMMAND(abil)) {
-		msg_to_char(ch, "Only command abilities have this property.\r\n");
-	}
-	else {
-		ABIL_WAIT_TYPE(abil) = olc_process_type(ch, argument, "wait type", "waittype", wait_types, ABIL_WAIT_TYPE(abil));
-	}
+	ABIL_WAIT_TYPE(abil) = olc_process_type(ch, argument, "wait type", "waittype", wait_types, ABIL_WAIT_TYPE(abil));
 }

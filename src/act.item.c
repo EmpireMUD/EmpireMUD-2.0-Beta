@@ -3405,7 +3405,7 @@ void trade_check(char_data *ch, char *argument) {
 		if (tpd->player != GET_IDNUM(ch)) {
 			continue;
 		}
-		// if it's just collectable coins, don't show
+		// if it's just collectible coins, don't show
 		if (IS_SET(tpd->state, TPD_BOUGHT) && IS_SET(tpd->state, TPD_COINS_PENDING)) {
 			to_collect += round(tpd->buy_cost * (1.0 - trading_post_fee)) + tpd->post_cost;
 			continue;
@@ -6682,6 +6682,10 @@ ACMD(do_sheathe) {
 		obj_to_char(unequip_char(ch, from_loc), ch);
 	}
 	perform_wear(ch, obj, to_loc);
+	
+	if (FIGHTING(ch)) {
+		command_lag(ch, WAIT_COMBAT_ABILITY);
+	}
 }
 
 

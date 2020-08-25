@@ -788,6 +788,7 @@ void check_delayed_load(char_data *ch) {
 void free_char(char_data *ch) {
 	void die_follower(char_data *ch);
 	void free_alias(struct alias_data *a);
+	void free_companion(struct companion_data *cd);
 	void free_player_event_data(struct player_event_data *hash);
 	void free_mail(struct mail_data *mail);
 	void free_player_completed_quests(struct player_completed_quest **hash);
@@ -797,6 +798,7 @@ void free_char(char_data *ch) {
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
+	struct companion_data *compan, *next_compan;
 	struct ability_gain_hook *hook, *next_hook;
 	struct mount_data *mount, *next_mount;
 	struct channel_history_data *history, *next_hist;
@@ -955,6 +957,11 @@ void free_char(char_data *ch) {
 		while ((coin = GET_PLAYER_COINS(ch))) {
 			GET_PLAYER_COINS(ch) = coin->next;
 			free(coin);
+		}
+		
+		HASH_ITER(hh, GET_COMPANIONS(ch), compan, next_compan) {
+			HASH_DEL(GET_COMPANIONS(ch), compan);
+			free_companion(compan);
 		}
 		
 		while ((mail = GET_MAIL_PENDING(ch))) {
@@ -1131,13 +1138,14 @@ char_data *load_player(char *name, bool normal) {
 * @return char_data* The loaded character.
 */
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
+	extern struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
 	void add_minipet(char_data *ch, any_vnum vnum);
 	extern struct player_event_data *create_event_data(char_data *ch, int event_id, any_vnum event_vnum);
 	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
 	
-	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH];
+	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH], *read;
 	int account_id = NOTHING, ignore_pos = 0;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
@@ -1145,6 +1153,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct player_quest *plrq, *last_plrq = NULL;
 	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
+	struct companion_data *last_companion = NULL;
 	struct resource_data *res, *last_res = NULL;
 	struct coin_data *coin, *last_coin = NULL;
 	struct mail_data *mail, *last_mail = NULL;
@@ -1425,6 +1434,46 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 					last_coin = coin;
 				}
+				else if (PFILE_TAG(line, "Companion:", length)) {
+					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
+					last_companion = add_companion(ch, i_in[0], i_in[1]);
+					last_companion->instantiated = i_in[2] ? TRUE : FALSE;
+				}
+				else if (PFILE_TAG(line, "Compan-mod:", length)) {
+					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
+					read = fread_string(fl, error);
+					
+					if (last_companion) {
+						struct companion_mod *cmod;
+						CREATE(cmod, struct companion_mod, 1);
+						cmod->type = i_in[0];
+						cmod->num = i_in[1];
+						cmod->str = read;
+						LL_PREPEND(last_companion->mods, cmod);
+					}
+					else if (read) {
+						// something went wrong?
+						free(read);
+					}
+				}
+				else if (PFILE_TAG(line, "Compan-trg:", length)) {
+					sscanf(line + length + 1, "%d", &i_in[0]);
+					if (last_companion) {
+						struct trig_proto_list *tpl;
+						CREATE(tpl, struct trig_proto_list, 1);
+						tpl->vnum = i_in[0];
+						LL_APPEND(last_companion->scripts, tpl);
+					}
+				}
+				else if (PFILE_TAG(line, "Compan-var:", length)) {
+					if (sscanf(line + length + 1, "%s %ld", str_in, &l_in[0]) != 2 || !get_line(fl, line)) {
+						log("SYSERR: Bad compan-var format in read_player_delayed_data: %s", GET_NAME(ch));
+						exit(1);
+					}
+					if (last_companion) {
+						add_var(&(last_companion->vars), str_in, line, l_in[0]);
+					}
+				}
 				else if (PFILE_TAG(line, "Confused Direction:", length)) {
 					GET_CONFUSED_DIR(ch) = atoi(line + length + 1);
 				}
@@ -1658,6 +1707,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "Last Room:", length)) {
 					GET_LAST_ROOM(ch) = atoi(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Last Companion:", length)) {
+					GET_LAST_COMPANION(ch) = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Last Direction:", length)) {
 					GET_LAST_DIR(ch) = atoi(line + length + 1);
@@ -2699,12 +2751,16 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	extern struct slash_channel *find_slash_channel_by_id(int id);
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
+	char temp[MAX_STRING_LENGTH];
 	struct player_completed_quest *plrcom, *next_plrcom;
 	struct player_automessage *automsg, *next_automsg;
+	struct companion_data *compan, *next_compan;
 	struct player_faction_data *pfd, *next_pfd;
 	struct player_event_data *ped, *next_ped;
 	struct channel_history_data *hist;
+	struct trig_proto_list *tpro;
 	struct player_eq_set *eq_set;
+	struct companion_mod *cmod;
 	struct trig_var_data *vars;
 	struct player_quest *plrq;
 	struct alias_data *alias;
@@ -2737,6 +2793,29 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	for (coin = GET_PLAYER_COINS(ch); coin; coin = coin->next) {
 		fprintf(fl, "Coin: %d %d %ld\n", coin->amount, coin->empire_id, coin->last_acquired);
 	}
+	HASH_ITER(hh, GET_COMPANIONS(ch), compan, next_compan) {
+		fprintf(fl, "Companion: %d %d %d\n", compan->vnum, compan->from_abil, compan->instantiated);
+		LL_FOREACH(compan->mods, cmod) {
+			if (cmod->str && *cmod->str) {
+				strcpy(temp, cmod->str);
+				strip_crlf(temp);
+			}
+			else {
+				*temp = '\0';
+			}
+			fprintf(fl, "Compan-mod: %d %d\n%s~\n", cmod->type, cmod->num, temp);
+		}
+		LL_FOREACH(compan->scripts, tpro) {
+			fprintf(fl, "Compan-trg: %d\n", tpro->vnum);
+		}
+		LL_FOREACH(compan->vars, vars) {
+			if (*vars->name == '-' || !*vars->value) { // don't save if it begins with - or is empty
+				continue;
+			}
+			
+			fprintf(fl, "Compan-var: %s %ld\n%s\n", vars->name, vars->context, vars->value);
+		}
+	}
 	
 	// 'E'
 	LL_FOREACH(GET_EQ_SETS(ch), eq_set) {
@@ -2761,6 +2840,9 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// 'L'
+	if (GET_LAST_COMPANION(ch) != NOTHING) {
+		fprintf(fl, "Last Companion: %d\n", GET_LAST_COMPANION(ch));
+	}
 	for (lore = GET_LORE(ch); lore; lore = lore->next) {
 		if (lore->text && *lore->text) {
 			fprintf(fl, "Lore: %d %ld\n%s\n", lore->type, lore->date, lore->text);
@@ -3493,13 +3575,15 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void apply_all_ability_techs(char_data *ch);
 	void assign_class_abilities(char_data *ch, class_data *cls, int role);
 	void check_delayed_load(char_data *ch);
-	void check_minipets(char_data *ch);
+	void check_minipets_and_companions(char_data *ch);
 	void check_player_events(char_data *ch);
 	void clean_lore(char_data *ch);
 	void clean_player_kills(char_data *ch);
 	extern room_data *find_home(char_data *ch);
 	extern room_data *find_load_room(char_data *ch);
+	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 	void give_level_zero_abilities(char_data *ch);
+	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
 	void refresh_all_quests(char_data *ch);
 	void refresh_passive_buffs(char_data *ch);
 	void reset_combat_meters(char_data *ch);
@@ -3511,6 +3595,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	bool stop_action = FALSE, try_home = FALSE;
 	room_data *load_room = NULL;
 	char_data *ch = d->character, *repl;
+	struct companion_data *compan;
 	char lbuf[MAX_STRING_LENGTH];
 	struct affected_type *af;
 	player_index_data *index;
@@ -3774,7 +3859,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	check_learned_crafts(ch);
 	check_currencies(ch);
 	check_eq_sets(ch);
-	check_minipets(ch);
+	check_minipets_and_companions(ch);
 	check_player_events(ch);
 	refresh_passive_buffs(ch);
 	
@@ -3797,6 +3882,11 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	pause_affect_total = FALSE;
 	affect_total(ch);
+	
+	// reload last companion?
+	if (GET_LAST_COMPANION(ch) != NOTHING && (compan = has_companion(ch, GET_LAST_COMPANION(ch)))) {
+		load_companion_mob(ch, compan);
+	}
 }
 
 

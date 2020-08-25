@@ -678,4 +678,21 @@ in your tool slot and use it for skinning, butchering, and even crafting.
 C
 1 1
 S
+#2149
+whistle guard guardwhistle~
+a guard whistle~
+A guard whistle is lying here.~
+ This shiny little whistle can be used to summon a guard, but only in one of
+your established cities. Be sure to use it on a claimed tile.
+Usage: use guardwhistle (Requires Jewelry ability)
+~
+3 o a 0 5
+204 0 0
+2 0
+R
+5121 0
+R
+5610 0
+T 2149
+S
 $

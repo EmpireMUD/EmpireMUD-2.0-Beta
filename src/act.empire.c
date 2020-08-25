@@ -2758,6 +2758,7 @@ void show_tavern_status(char_data *ch) {
 // for do_findmaintenance and do_territory
 struct find_territory_node {
 	room_data *loc;
+	vehicle_data *veh;	// optional: person scanned for a vehicle
 	int count;
 	
 	struct find_territory_node *next;
@@ -2849,10 +2850,10 @@ void scan_for_tile(char_data *ch, char *argument) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
 	char output[MAX_STRING_LENGTH], line[128], info[256];
+	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
 	room_data *map, *room;
 	size_t size, lsize;
-	vehicle_data *veh;
 	crop_data *crop;
 	bool ok, claimed, unclaimed, foreign, adventures;
 	
@@ -2899,6 +2900,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			
 			// validate tile
 			ok = FALSE;
+			scanned_veh = NULL;
 			if (claimed && ROOM_OWNER(room)) {
 				ok = TRUE;
 			}
@@ -2938,6 +2940,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 					
 					// found a vehicle match (only need 1)
 					ok = TRUE;
+					scanned_veh = veh;
 					break;
 				}
 			}
@@ -2946,8 +2949,8 @@ void scan_for_tile(char_data *ch, char *argument) {
 				CREATE(node, struct find_territory_node, 1);
 				node->loc = room;
 				node->count = 1;
-				node->next = node_list;
-				node_list = node;
+				node->veh = scanned_veh;	// if any
+				LL_PREPEND(node_list, node);
 			}
 		}
 	}
@@ -2973,9 +2976,21 @@ void scan_for_tile(char_data *ch, char *argument) {
 			
 				dist = compute_distance(IN_ROOM(ch), node->loc);
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), node->loc));
-			
-				lsize = snprintf(line, sizeof(line), "%2d %s: %s%s", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])), get_room_name(node->loc, FALSE), coord_display(ch, check_x, check_y, FALSE));
 				
+				// distance and direction
+				lsize = snprintf(line, sizeof(line), "%2d %s: ", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])));
+				
+				if (node->veh) {	// scanned for vehicle
+					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s: %s", (GET_BUILDING(node->loc) ? GET_BLD_NAME(GET_BUILDING(node->loc)) : GET_SECT_NAME(SECT(node->loc))), skip_filler(VEH_SHORT_DESC(node->veh)));
+				}
+				else {	// not a vehicle
+					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s", get_room_name(node->loc, FALSE));
+				}
+				
+				// coords
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s", coord_display(ch, check_x, check_y, FALSE));
+				
+				// info
 				if ((PRF_FLAGGED(ch, PRF_POLITICAL) || claimed || foreign) && ROOM_OWNER(node->loc)) {
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%s%s\t0)", EMPIRE_BANNER(ROOM_OWNER(node->loc)), EMPIRE_ADJECTIVE(ROOM_OWNER(node->loc)));
 				}

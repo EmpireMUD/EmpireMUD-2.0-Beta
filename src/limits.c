@@ -599,6 +599,7 @@ void real_update_char(char_data *ch) {
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	void do_unseat_from_vehicle(char_data *ch);
 	extern bool fail_daily_quests(char_data *ch);
+	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 	void random_encounter(char_data *ch);
 	extern bool starving_vampire_aggro(char_data *ch);
 	void update_biting_char(char_data *ch);
@@ -608,10 +609,12 @@ void real_update_char(char_data *ch) {
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *af, *next_af, *immune;
 	char_data *room_ch, *next_ch, *caster;
+	struct companion_data *compan;
 	char buf[MAX_STRING_LENGTH];
 	struct instance_data *inst;
 	int result, iter, type;
 	int fol_count, gain;
+	ability_data *abil;
 	bool found, took_dot, msg;
 	
 	// check for end of meters (in case it was missed in the fight code)
@@ -655,7 +658,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// check master's solo role
-	if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_FAMILIAR) && ch->master && !check_solo_role(ch->master)) {
+	if (IS_NPC(ch) && GET_COMPANION(ch) && GET_CLASS_ROLE(GET_COMPANION(ch)) == ROLE_SOLO && (compan = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch))) && compan->from_abil != NO_ABIL && (abil = find_ability_by_vnum(compan->from_abil)) && ABIL_IS_SYNERGY(abil) && !check_solo_role(GET_COMPANION(ch))) {
 		act("$N vanishes because you're in the solo role but not alone.", FALSE, ch->master, NULL, ch, TO_CHAR);
 		act("$N vanishes.", FALSE, ch->master, NULL, ch, TO_NOTVICT);
 		extract_char(ch);
@@ -904,8 +907,8 @@ void real_update_char(char_data *ch) {
 			continue;
 		}
 		
-		// don't care about familiars
-		if (MOB_FLAGGED(room_ch, MOB_FAMILIAR)) {
+		// don't care about companions
+		if (GET_COMPANION(room_ch)) {
 			continue;
 		}
 		

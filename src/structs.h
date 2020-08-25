@@ -516,14 +516,16 @@ typedef struct vehicle_data vehicle_data;
 #define ABILT_PLAYER_TECH  BIT(4)	// some player tech feature
 #define ABILT_PASSIVE_BUFF  BIT(5)	// similar to a buff except always on
 #define ABILT_READY_WEAPONS  BIT(6)	// use READY-WEAPON data to add to a player's ready list
+#define ABILT_COMPANION  BIT(7)	// grants companions
+#define ABILT_SUMMON_ANY  BIT(8)	// player can summon from a list of mobs
+#define ABILT_SUMMON_RANDOM  BIT(9)	// player can summon a mob at random from a list
 /*
 #define ABILT_UNAFFECTS  BIT(2)
-#define ABILT_POINTS  BIT(3)
+#define ABILT_POINTS  BIT(3)	// e.g. heal?
 #define ABILT_ALTER_OBJS  BIT(4)
 #define ABILT_GROUPS  BIT(5)
 #define ABILT_MASSES  BIT(6)
 #define ABILT_AREAS  BIT(7)
-#define ABILT_SUMMONS  BIT(8)
 #define ABILT_CREATIONS  BIT(9)
 #define ABILT_MANUAL  BIT(10)
 #define ABILT_ROOMS  BIT(11)
@@ -561,6 +563,11 @@ typedef struct vehicle_data vehicle_data;
 #define ABIL_CUSTOM_FAIL_TARGETED_TO_CHAR  10
 #define ABIL_CUSTOM_FAIL_TARGETED_TO_VICT  11
 #define ABIL_CUSTOM_FAIL_TARGETED_TO_ROOM  12
+#define ABIL_CUSTOM_PRE_SELF_TO_CHAR  13
+#define ABIL_CUSTOM_PRE_SELF_TO_ROOM  14
+#define ABIL_CUSTOM_PRE_TARGETED_TO_CHAR  15
+#define ABIL_CUSTOM_PRE_TARGETED_TO_VICT  16
+#define ABIL_CUSTOM_PRE_TARGETED_TO_ROOM  17
 
 
 // ABIL_EFFECT_x: things that happen when an ability is used
@@ -571,6 +578,7 @@ typedef struct vehicle_data vehicle_data;
 #define ADL_PLAYER_TECH  BIT(0)	// vnum will be PTECH_ types
 #define ADL_EFFECT  BIT(1)	// an ABIL_EFFECT_ that happens when the ability is used
 #define ADL_READY_WEAPON  BIT(2)	// adds to the "ready"
+#define ADL_SUMMON_MOB  BIT(3)	// adds a mob to companions/summon-any/summon-random abilities (depending on skill type)
 
 
 // AGH_x: ability gain hooks
@@ -588,6 +596,7 @@ typedef struct vehicle_data vehicle_data;
 #define AGH_VAMPIRE_FEEDING  BIT(11)	// gains when feeding
 #define AGH_MOVING  BIT(12)	// gain when moving
 #define AGH_ONLY_USING_READY_WEAPON  BIT(13)	// only gains if a ready-weapon is equipped
+#define AGH_ONLY_USING_COMPANION  BIT(14)	// only if the player is using a companion from this ability
 
 
 // RUN_ABIL_x: modes for activating abilities
@@ -1504,7 +1513,7 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_SPAWNED  BIT(14)	// o. Mob was spawned and should despawn if nobody is around
 #define MOB_CHAMPION  BIT(15)	// p. Mob auto-rescues its master
 #define MOB_EMPIRE  BIT(16)	// q. empire NPC
-#define MOB_FAMILIAR  BIT(17)	// r. familiar: special rules apply
+	#define MOB_UNUSED  BIT(17)	// formerly 'familiar'
 #define MOB_PICKPOCKETED  BIT(18)	// s. has already been pickpocketed
 #define MOB_CITYGUARD  BIT(19)	// t. assists empiremates
 #define MOB_PURSUE  BIT(20)	// u. mob remembers and pursues players
@@ -1573,11 +1582,13 @@ typedef struct vehicle_data vehicle_data;
 #define MOB_MOVE_SWEEPS  36
 
 
-// name sets: add matching files in lib/text/names/
+// NAMES_x: name sets: add matching files in lib/text/names/
 #define NAMES_CITIZENS  0
 #define NAMES_COUNTRYFOLK  1
 #define NAMES_ROMAN  2
 #define NAMES_NORTHERN  3
+#define NAMES_PRIMITIVE_SHORT  4
+#define NAMES_DESCRIPTIVE  5
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1926,6 +1937,14 @@ typedef struct vehicle_data vehicle_data;
 #define PLAYER_LOG_CHANNEL  "grats"
 
 
+// CMOD_x: modifications to companions (struct companion_mod)
+#define CMOD_SEX  0	// overrides mob's sex (num)
+#define CMOD_KEYWORDS  1	// custom mob keywords (str)
+#define CMOD_SHORT_DESC  2	// custom mob short-desc (str)
+#define CMOD_LONG_DESC  3	// custom mob long-desc (str)
+#define CMOD_LOOK_DESC  4	// custom mob look-desc (str)
+
+
 // CON_x: Modes of connectedness
 #define CON_PLAYING  0	// Playing - Nominal state
 #define CON_CLOSE  1	// Disconnecting
@@ -2232,6 +2251,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_PICK  74	// can 'pick'
 #define PTECH_QUARRY  75	// can 'quarry'
 #define PTECH_DRINK_BLOOD_FASTER  76	// vampires drink blood at 2x speed
+#define PTECH_SUMMON_MATERIALS  77	// can use the 'summon materials' command
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -2600,6 +2620,8 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_BRIGHT_PAINT  BIT(17)	// r. paint is bright color
 #define ROOM_AFF_FAKE_INSTANCE  BIT(18)	// s. room is a fake_loc for an instance
 #define ROOM_AFF_NO_ABANDON  BIT(19)	// t. cannot abandon by accident
+#define ROOM_AFF_REPEL_NPCS  BIT(20)	// u. all npcs are prevented from wandering in
+#define ROOM_AFF_REPEL_ANIMALS  BIT(21)	// u. animals are prevented from wandering in
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
@@ -3682,6 +3704,29 @@ struct coin_data {
 };
 
 
+// companion characters (familiars, bodyguards, and other combat pets)
+struct companion_data {
+	any_vnum vnum;	// mob vnum (unique)
+	any_vnum from_abil;	// if not NOTHING, player can only use/list this companion while they have the abil
+	bool instantiated;	// TRUE if it has ever been loaded as a mob
+	
+	struct companion_mod *mods;	// modifications to the companion
+	struct trig_proto_list *scripts;	// list of triggers to attach
+	struct trig_var_data *vars;	// global script variables on the mob
+	
+	UT_hash_handle hh;	// hashed by mob vnum
+};
+
+
+// changes to companions
+struct companion_mod {
+	byte type;	// CMOD_ type
+	int num;	// numeric data (used by some types)
+	char *str;	// string data (used by some types)
+	struct companion_mod *next;
+};
+
+
 // track who/when a player has been killed by another player
 struct pk_data {
 	int killed_alt;	// id of which alt died
@@ -3989,6 +4034,7 @@ struct player_special_data {
 	int ignore_list[MAX_IGNORES];	// players who can't message you
 	int last_tell;	// idnum of last tell from
 	time_t last_offense_seen;	// timestamp of last time the player checked offenses
+	any_vnum last_companion;	// if the player has a companion out, this triggers a re-summon
 	
 	// character strings
 	char *lastname;	// Last name
@@ -4020,6 +4066,7 @@ struct player_special_data {
 	
 	// various lists
 	struct coin_data *coins;	// linked list of coin data
+	struct companion_data *companions;	// player's companions (familiars, bodyguards, hirelings)
 	struct player_currency *currencies;	// hash table of adventure currencies
 	struct alias_data *aliases;	// Character's aliases
 	struct player_eq_set *eq_sets;	// player's saved equipment sets
@@ -4186,7 +4233,9 @@ struct char_special_data {
 
 	char_data *feeding_from;	// Who person is biting
 	char_data *fed_on_by;	// Who is biting person
-
+	
+	char_data *companion;	// for PC this is the NPC companion; for NPC it's the player they are the companion OF
+	
 	char_data *led_by;	// A person may lead a mob
 	char_data *leading_mob;	// A mob may lead a person
 	vehicle_data *leading_vehicle;	// A person may lead a vehicle

@@ -74,6 +74,7 @@ extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);	// quest
 extern int is_substring(char *sub, char *string);
 extern room_data *obj_room(obj_data *obj);
 trig_data *read_trigger(trig_vnum vnum);
+void reread_companion_trigs(char_data *mob);
 obj_data *get_object_in_equip(char_data *ch, char *name);
 void extract_trigger(trig_data *trig);
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type);
@@ -1486,6 +1487,7 @@ ACMD(do_tattach) {
 			create_script_data(victim, MOB_TRIGGER);
 		}
 		add_trigger(SCRIPT(victim), trig, loc);
+		reread_companion_trigs(victim);
 
 		syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: Trigger %d (%s) attached to %s [%d] by %s", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim), GET_NAME(ch));
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim));
@@ -1887,6 +1889,7 @@ ACMD(do_tdetach) {
 			}
 			msg_to_char(ch, "Trigger removed.\r\n");
 			check_extract_script(victim, MOB_TRIGGER);
+			reread_companion_trigs(victim);
 		}
 		else
 			msg_to_char(ch, "That trigger was not found.\r\n");
@@ -2844,6 +2847,21 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					
+					else if (!str_cmp(field, "add_companion")) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
+							struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
+							char_data *pet = mob_proto(atoi(subfield));
+							if (pet) {
+								add_companion(c, GET_MOB_VNUM(pet), NO_ABIL);
+							}
+							else {
+								script_log("Trigger: %s, VNum %d, attempting to add invalid companion: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), subfield);
+							}
+						}
+						
+						strcpy(str, "0");
+					}
+					
 					else if (!str_cmp(field, "add_learned")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							void add_learned_craft(char_data *ch, any_vnum vnum);
@@ -3206,6 +3224,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "cha") || !str_cmp(field, "charisma")) {
 						snprintf(str, slen, "%d", GET_CHARISMA(c));
 					}
+					else if (!str_cmp(field, "companion")) {
+						if (GET_COMPANION(c)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(GET_COMPANION(c)));
+						}
+						else {
+							*str = '\0';
+						}
+					}
 					else if (!str_cmp(field, "completed_quest")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							any_vnum vnum = atoi(subfield);
@@ -3511,7 +3537,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'h': {	// char.h*
-					if (!str_cmp(field, "has_component")) {
+					if (!str_cmp(field, "has_companion")) {
+						struct companion_data *has_companion(char_data *ch, any_vnum vnum);
+						
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield) && has_companion(c, atoi(subfield)) != NULL) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
+					else if (!str_cmp(field, "has_component")) {
 						// args: (type, number) -- type may be vnum or name
 						char arg1[256], arg2[256];
 						struct resource_data *resources = NULL;
@@ -4066,7 +4102,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'r': {	// char.r*
-					if (!str_cmp(field, "remove_learned")) {
+					if (!str_cmp(field, "remove_companion")) {
+						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
+							void remove_companion(char_data *ch, any_vnum vnum);
+							remove_companion(c, atoi(subfield));
+						}
+						
+						strcpy(str, "0");
+					}
+					else if (!str_cmp(field, "remove_learned")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							void remove_learned_craft(char_data *ch, any_vnum vnum);
 							remove_learned_craft(c, atoi(subfield));
@@ -6539,6 +6583,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 			create_script_data(c, MOB_TRIGGER);
 		}
 		add_trigger(SCRIPT(c), newtrig, -1);
+		reread_companion_trigs(c);
 		return;
 	}
 
@@ -6612,6 +6657,7 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 		if (remove_trigger(SCRIPT(c), trignum_s)) {
 			check_extract_script(c, MOB_TRIGGER);
 		}
+		reread_companion_trigs(c);
 		return;
 	}
 
@@ -6906,6 +6952,8 @@ void process_unset(struct script_data *sc, trig_data *trig, char *cmd) {
 *     'remote <variable_name> <uid>'
 */
 void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
+	void add_companion_var(char_data *mob, char *name, char *value, int id);
+	
 	struct trig_var_data *vd;
 	struct script_data *sc_remote=NULL;
 	char *line, *var, *uid_p;
@@ -6964,6 +7012,7 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 		sc_remote = SCRIPT(mob) ? SCRIPT(mob) : create_script_data(mob, MOB_TRIGGER);
 		if (!IS_NPC(mob))
 			context = 0;
+		add_companion_var(mob, vd->name, vd->value, context);
 	}
 	else if ((obj = find_obj(uid, FALSE))) {
 		sc_remote = SCRIPT(obj) ? SCRIPT(obj) : create_script_data(obj, OBJ_TRIGGER);
@@ -6993,6 +7042,8 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 * named vdelete so people didn't think it was to delete rooms
 */
 ACMD(do_vdelete) {
+	void remove_companion_var(char_data *mob, char *name, int context);
+	
 	struct trig_var_data *vd, *vd_prev=NULL;
 	struct script_data *sc_remote=NULL;
 	char *var, *uid_p;
@@ -7030,6 +7081,7 @@ ACMD(do_vdelete) {
 	}
 	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob);
+		remove_companion_var(mob, var, 0);
 		/*
 		// this was set but never used...
 		if (!IS_NPC(mob))
@@ -7090,6 +7142,8 @@ ACMD(do_vdelete) {
 *     'rdelete <variable_name> <uid>'
 */
 void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
+	void remove_companion_var(char_data *mob, char *name, int context);
+	
 	struct trig_var_data *vd, *vd_prev=NULL;
 	struct script_data *sc_remote=NULL;
 	char *line, *var, *uid_p;
@@ -7128,6 +7182,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	}
 	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob);
+		remove_companion_var(mob, var, sc->context);
 		/*
 		// this was set but never used
 		if (!IS_NPC(mob))

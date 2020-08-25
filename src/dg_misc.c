@@ -1175,17 +1175,27 @@ void script_heal(void *thing, int type, char *argument) {
 * @param char *argument Expected to be: <variable> <field> <value>
 */
 void script_modify(char *argument) {
+	void change_keywords(char_data *ch, char *str);
+	void change_long_desc(char_data *ch, char *str);
+	void change_sex(char_data *ch, int sex);
+	void change_short_desc(char_data *ch, char *str);
+	extern bool despawn_companion(char_data *ch, mob_vnum vnum);
 	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
+	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
+	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
 	extern char *get_room_description(room_data *room);
 	extern vehicle_data *get_vehicle(char *name);
+	extern const char *genders[];
 	extern bool world_map_needs_save;
 	
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
 	vehicle_data *veh = NULL, *v_proto;
-	char_data *mob = NULL, *m_proto;
+	struct companion_data *cd;
+	char_data *mob = NULL;
 	obj_data *obj = NULL, *o_proto;
 	room_data *room = NULL;
 	bool clear;
+	int pos;
 	
 	half_chop(argument, targ_arg, temp);
 	half_chop(temp, field_arg, value);
@@ -1204,30 +1214,42 @@ void script_modify(char *argument) {
 	
 	// CHARACTER MODE
 	if ((mob = get_char(targ_arg))) {
-		m_proto = IS_NPC(mob) ? mob_proto(GET_MOB_VNUM(mob)) : NULL;
-		mob->customized = TRUE;	// triggers string saving
-		
-		if (!IS_NPC(mob)) {
+		// player-targetable mods first
+		if (is_abbrev(field_arg, "companion")) {
+			if (!IS_NPC(mob)) {
+				if (!str_cmp(value, "none")) {
+					despawn_companion(mob, NOTHING);
+				}
+				else if ((cd = has_companion(mob, atoi(value)))) {
+					despawn_companion(mob, NOTHING);
+					mob = load_companion_mob(mob, cd);
+				}
+			}
+			else {
+				script_log("%%mod%% companion cannot target an NPC");
+			}
+		}
+		// no player-targeting below this line
+		else if (!IS_NPC(mob)) {
 			script_log("%%mod%% cannot target a player");
 		}
 		else if (is_abbrev(field_arg, "keywords")) {
-			if (GET_PC_NAME(mob) && (!m_proto || GET_PC_NAME(mob) != GET_PC_NAME(m_proto))) {
-				free(GET_PC_NAME(mob));
-			}
-			GET_PC_NAME(mob) = clear ? (m_proto ? GET_PC_NAME(m_proto) : str_dup("ERROR")) : str_dup(value);
+			change_keywords(mob, clear ? NULL : value);
 		}
 		else if (is_abbrev(field_arg, "longdescription")) {
-			if (GET_LONG_DESC(mob) && (!m_proto || GET_LONG_DESC(mob) != GET_LONG_DESC(m_proto))) {
-				free(GET_LONG_DESC(mob));
-			}
 			strcat(value, "\r\n");	// required by long descs
-			GET_LONG_DESC(mob) = clear ? (m_proto ? GET_LONG_DESC(m_proto) : str_dup("ERROR")) : str_dup(value);
+			change_long_desc(mob, clear ? NULL : value);
+		}
+		else if (is_abbrev(field_arg, "sex")) {
+			if ((pos = search_block(value, genders, FALSE)) != NOTHING) {
+				change_sex(mob, pos);
+			}
+			else {
+				script_log("%%mod%% called with invalid mob sex field '%s'", value);
+			}
 		}
 		else if (is_abbrev(field_arg, "shortdescription")) {
-			if (GET_SHORT_DESC(mob) && (!m_proto || GET_SHORT_DESC(mob) != GET_SHORT_DESC(m_proto))) {
-				free(GET_SHORT_DESC(mob));
-			}
-			GET_SHORT_DESC(mob) = clear ? (m_proto ? GET_SHORT_DESC(m_proto) : str_dup("ERROR")) : str_dup(value);
+			change_short_desc(mob, clear ? NULL : value);
 		}
 		else {
 			script_log("%%mod%% called with invalid mob field '%s'", field_arg);

@@ -1743,6 +1743,7 @@ void init_player_specials(char_data *ch) {
 		CREATE(ch->player_specials, struct player_special_data, 1);
 	}
 	
+	GET_LAST_COMPANION(ch) = NOTHING;
 	GET_LAST_ROOM(ch) = NOWHERE;
 	GET_LOADROOM(ch) = NOWHERE;
 	GET_LOAD_ROOM_CHECK(ch) = NOWHERE;

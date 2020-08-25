@@ -1794,6 +1794,10 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 */
 void reset_one_room(room_data *room) {
 	void add_convert_vehicle_data(char_data *mob, any_vnum vnum);
+	void change_keywords(char_data *ch, char *str);
+	void change_long_desc(char_data *ch, char *str);
+	void change_sex(char_data *ch, int sex);
+	void change_short_desc(char_data *ch, char *str);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	void objpack_load_room(room_data *room);
 	
@@ -1801,7 +1805,6 @@ void reset_one_room(room_data *room) {
 	struct reset_com *reset;
 	char_data *tmob = NULL; /* for trigger assignment */
 	char_data *mob = NULL;
-	char_data *m_proto;
 	trig_data *trig;
 	
 	// shortcut
@@ -1847,7 +1850,7 @@ void reset_one_room(room_data *room) {
 			case 'Y': {	// add customizations to mob
 				if (mob) {
 					if (reset->arg1 != NOTHING) {
-						GET_REAL_SEX(mob) = reset->arg1;
+						change_sex(mob, reset->arg1);
 						MOB_DYNAMIC_SEX(mob) = reset->arg1;
 					}
 					if (reset->arg2 != NOTHING) {
@@ -1870,29 +1873,16 @@ void reset_one_room(room_data *room) {
 			
 			case 'S': { // custom string
 				if (mob) {
-					m_proto = mob_proto(GET_MOB_VNUM(mob));
 					half_chop(reset->sarg1, field, str);
 					if (is_abbrev(field, "keywords")) {
-						if (GET_PC_NAME(mob) && (!m_proto || GET_PC_NAME(mob) != GET_PC_NAME(m_proto))) {
-							free(GET_PC_NAME(mob));
-						}
-						GET_PC_NAME(mob) = str_dup(str);
-						mob->customized = TRUE;
+						change_keywords(mob, str);
 					}
 					else if (is_abbrev(field, "longdescription")) {
-						if (GET_LONG_DESC(mob) && (!m_proto || GET_LONG_DESC(mob) != GET_LONG_DESC(m_proto))) {
-							free(GET_LONG_DESC(mob));
-						}
 						strcat(str, "\r\n");	// required by long descs
-						GET_LONG_DESC(mob) = str_dup(str);
-						mob->customized = TRUE;
+						change_long_desc(mob, str);
 					}
 					else if (is_abbrev(field, "shortdescription")) {
-						if (GET_SHORT_DESC(mob) && (!m_proto || GET_SHORT_DESC(mob) != GET_SHORT_DESC(m_proto))) {
-							free(GET_SHORT_DESC(mob));
-						}
-						GET_SHORT_DESC(mob) = str_dup(str);
-						mob->customized = TRUE;
+						change_short_desc(mob, str);
 					}
 					else {
 						log("Warning: Unknown mob string in resets for room %d: C S %s", GET_ROOM_VNUM(room), reset->sarg1);

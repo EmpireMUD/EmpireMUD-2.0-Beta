@@ -141,6 +141,9 @@ const char *ability_type_flags[] = {
 	"PTECH",
 	"PASSIVE-BUFF",	// 5
 	"READY-WEAPONS",
+	"COMPANION",
+	"SUMMON-ANY",
+	"SUMMON-RANDOM",
 /*
 	"UNAFFECTS",
 	"POINTS",
@@ -148,7 +151,6 @@ const char *ability_type_flags[] = {
 	"GROUPS",
 	"MASSES",
 	"AREAS",
-	"SUMMONS",
 	"CREATIONS",
 	"MANUAL",
 	"ROOMS",
@@ -193,15 +195,21 @@ const char *ability_custom_types[] = {
 	"fail-targ-to-char",	// 10
 	"fail-targ-to-vict",
 	"fail-targ-to-room",
+	"pre-self-to-char",
+	"pre-self-to-room",
+	"pre-targ-to-char",	// 15
+	"pre-targ-to-vict",
+	"pre-targ-to-room",
 	"\n"
 };
 
 
 // ADL_x: for adding to ability_data_list
 const char *ability_data_types[] = {
-	"PTECH",
+	"PTECH",	// 0
 	"EFFECT",
 	"READY-WEAPON",
+	"SUMMON-MOB",
 	"\n"
 };
 
@@ -229,6 +237,7 @@ const char *ability_gain_hooks[] = {
 	"VAMPIRE-FEEDING",
 	"MOVING",
 	"ONLY-USING-READY-WEAPON",
+	"ONLY-USING-COMPANIONS",
 	"\n"
 };
 
@@ -859,6 +868,7 @@ const char *player_tech_types[] = {
 	"Pick",
 	"Quarry",	// 75
 	"Drink-Blood-Faster",
+	"Summon-Materials",
 	"\n"
 };
 
@@ -2040,7 +2050,7 @@ const char *action_bits[] = {
 	"SPAWNED",
 	"CHAMPION",	// 15
 	"EMPIRE",
-	"FAMILIAR",
+	"*",
 	"*PICKPOCKETED",
 	"CITYGUARD",
 	"PURSUE",	// 20
@@ -2123,6 +2133,8 @@ const char *name_sets[] = {
 	"Country-folk",
 	"Roman",
 	"Northern",
+	"Primitive-Short",
+	"Descriptive",
 	"\n"
 };
 
@@ -3306,8 +3318,10 @@ const char *room_aff_bits[] = {
 	"*INCOMPLETE",	// 15
 	"!TELEPORT",
 	"BRIGHT-PAINT",
-	"FAKE-INSTANCE",
+	"*FAKE-INSTANCE",
 	"!ABANDON",
+	"REPEL-NPCS",	// 20
+	"REPEL-ANIMALS",
 	"\n"
 };
 

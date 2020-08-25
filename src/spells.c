@@ -36,6 +36,8 @@
 // external vars
 
 // external funcs
+void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
+extern bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
 void check_combat_start(char_data *ch);
 
 
@@ -332,10 +334,11 @@ ACMD(do_damage_spell) {
 
 ACMD(do_ready) {
 	extern bool check_vampire_sun(char_data *ch, bool message);
+	void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
 	void scale_item_to_level(obj_data *obj, int level);
 	extern const char *pool_types[];
 	
-	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], *to_char, *to_room;
 	struct player_ability_data *plab, *next_plab;
 	int scale_level, ch_level = 0, pos;
 	ability_data *abil, *found_abil;
@@ -433,7 +436,10 @@ ACMD(do_ready) {
 		msg_to_char(ch, "You don't know how to ready that.\r\n");
 		return;
 	}
-	if (!can_use_ability(ch, ABIL_VNUM(found_abil), ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), NOTHING)) {
+	if (!char_can_act(ch, ABIL_MIN_POS(found_abil), !ABILITY_FLAGGED(found_abil, ABILF_NO_ANIMAL), !ABILITY_FLAGGED(found_abil, ABILF_NO_INVULNERABLE | ABILF_VIOLENT))) {
+		return;
+	}
+	if (!can_use_ability(ch, ABIL_VNUM(found_abil), ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), ABIL_COOLDOWN(found_abil))) {
 		return;
 	}
 	if (!ABILITY_FLAGGED(found_abil, ABILF_IGNORE_SUN) && ABIL_COST(found_abil) > 0 && ABIL_COST_TYPE(found_abil) == BLOOD && !check_vampire_sun(ch, TRUE)) {
@@ -484,7 +490,13 @@ ACMD(do_ready) {
 		ch_level = get_approximate_level(ch);
 	}
 	
-	charge_ability_cost(ch, ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), NOTHING, 0, WAIT_SPELL);
+	charge_ability_cost(ch, ABIL_COST_TYPE(found_abil), ABIL_COST(found_abil), ABIL_COOLDOWN(abil), ABIL_COOLDOWN_SECS(abil), ABIL_WAIT_TYPE(abil));
+	pre_ability_message(ch, NULL, found_abil);
+	
+	if (!skill_check(ch, ABIL_VNUM(found_abil), ABIL_DIFFICULTY(found_abil))) {
+		ability_fail_message(ch, NULL, found_abil);
+		return;
+	}
 	
 	// load the object
 	obj = read_object(GET_OBJ_VNUM(proto), TRUE);
@@ -499,24 +511,36 @@ ACMD(do_ready) {
 	}
 	scale_item_to_level(obj, scale_level);
 	
+	// non-custom messages
 	switch (ABIL_COST_TYPE(found_abil)) {
 		case MANA: {
-			act("Mana twists and swirls around your hand and becomes $p!", FALSE, ch, obj, NULL, TO_CHAR);
-			act("Mana twists and swirls around $n's hand and becomes $p!", TRUE, ch, obj, NULL, TO_ROOM);
+			to_char = "Mana twists and swirls around your hand and becomes $p!";
+			to_room = "Mana twists and swirls around $n's hand and becomes $p!";
 			break;
 		}
 		case BLOOD: {
-			act("You drain blood from your wrist and mold it into $p!", FALSE, ch, obj, NULL, TO_CHAR);
-			act("$n twists and molds $s own blood into $p!", TRUE, ch, obj, NULL, TO_ROOM);
+			to_char = "You drain blood from your wrist and mold it into $p!";
+			to_room = "$n twists and molds $s own blood into $p!";
 			break;
 		}
 		// HEALTH, MOVE (these could have their own messages if they were used)
 		default: {
-			act("You pull $p from the ether!", FALSE, ch, obj, NULL, TO_CHAR);
-			act("$n pulls $p from the ether!", TRUE, ch, obj, NULL, TO_ROOM);
+			to_char = "You pull $p from the ether!";
+			to_room = "$n pulls $p from the ether!";
 			break;
 		}
 	}
+	
+	// custom overrides
+	if (abil_has_custom_message(found_abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
+		to_char = abil_get_custom_message(found_abil, ABIL_CUSTOM_SELF_TO_CHAR);
+	}
+	if (abil_has_custom_message(found_abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
+		to_room = abil_get_custom_message(found_abil, ABIL_CUSTOM_SELF_TO_ROOM);
+	}
+	
+	act(to_char, FALSE, ch, obj, NULL, TO_CHAR);
+	act(to_room, ABILITY_FLAGGED(found_abil, ABILF_INVISIBLE) ? TRUE : FALSE, ch, obj, NULL, TO_ROOM);
 	
 	equip_char(ch, obj, pos);
 	determine_gear_level(ch);

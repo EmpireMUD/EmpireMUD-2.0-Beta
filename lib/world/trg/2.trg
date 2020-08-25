@@ -1,3 +1,17 @@
+#205
+Bodyguard refresh and cooldown on death~
+0 f 100
+~
+* partial copy of 9803
+* This script deletes a companion's entry when it dies.
+* If the companion comes from an ability (like Bodyguard) the player will
+* get a fresh copy of the companion right away.
+set ch %self.companion%
+if %self.is_npc% && %ch% && !%ch.is_npc%
+  %ch.remove_companion(%self.vnum%)%
+  nop %ch.set_cooldown(2030,180)%
+end
+~
 #221
 Stealth GM Bribe coins: Prevent~
 0 m 0
@@ -11,6 +25,22 @@ Stealth GM Bribe item: Prevent~
 ~
 %send% %actor% %self.name% doesn't take bribes like that any more. Complete %self.hisher% quest instead.
 return 0
+~
+#230
+Summon Thug load script~
+0 n 100
+~
+* cancels follow and sets loyalty to current room's empire
+if %self.master%
+  mfollow self
+end
+set room %self.room%
+if %room.empire%
+  %own% %self% %room.empire%
+else
+  %own% %self% none
+end
+detach 230 %self.id%
 ~
 #250
 City Guard: Distract~

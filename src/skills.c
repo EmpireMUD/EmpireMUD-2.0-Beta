@@ -80,7 +80,7 @@ int sort_synergies(struct synergy_ability *a, struct synergy_ability *b);
 * @param ability_data *abil The ability to sell
 */
 void check_skill_sell(char_data *ch, ability_data *abil) {
-	bool despawn_familiar(char_data *ch, mob_vnum vnum);
+	bool despawn_charmies(char_data *ch, any_vnum only_vnum);
 	void finish_morphing(char_data *ch, morph_data *morph);
 	void remove_armor_by_type(char_data *ch, int armor_type);
 	void remove_honed_gear(char_data *ch);
@@ -89,6 +89,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	void undisguise(char_data *ch);	
 	
 	struct ability_data_list *adl;
+	char_data *mob, *next_mob;
 	obj_data *obj;
 	bool need_affect_total = FALSE;
 	int pos;
@@ -113,19 +114,24 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		need_affect_total = TRUE;
 	}
 	
-	// remove readied weapons
+	// remove readied weapons and companions
 	LL_FOREACH(ABIL_DATA(abil), adl) {
-		if (adl->type != ADL_READY_WEAPON) {
-			continue;
-		}
-		
-		// is the player using the item in any slot
-		for (pos = 0; pos < NUM_WEARS; ++pos) {
-			if ((obj = GET_EQ(ch, pos)) && GET_OBJ_VNUM(obj) == adl->vnum) {
-				act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
-				unequip_char_to_inventory(ch, pos);
-				determine_gear_level(ch);
-				need_affect_total = TRUE;
+		switch (adl->type) {
+			case ADL_READY_WEAPON: {
+				// is the player using the item in any slot
+				for (pos = 0; pos < NUM_WEARS; ++pos) {
+					if ((obj = GET_EQ(ch, pos)) && GET_OBJ_VNUM(obj) == adl->vnum) {
+						act("You stop using $p.", FALSE, ch, obj, NULL, TO_CHAR);
+						unequip_char_to_inventory(ch, pos);
+						determine_gear_level(ch);
+						need_affect_total = TRUE;
+					}
+				}
+				break;
+			}
+			case ADL_SUMMON_MOB: {
+				despawn_charmies(ch, adl->vnum);
+				break;
 			}
 		}
 	}
@@ -213,18 +219,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	}
 	
 	switch (ABIL_VNUM(abil)) {
-		case ABIL_BANSHEE: {
-			despawn_familiar(ch, FAMILIAR_BANSHEE);
-			break;
-		}
-		case ABIL_BASILISK: {
-			despawn_familiar(ch, FAMILIAR_BASILISK);
-			break;
-		}
-		case ABIL_SUMMON_BODYGUARD: {
-			despawn_familiar(ch, BODYGUARD);
-			break;
-		}
 		case ABIL_BOOST: {
 			affect_from_char(ch, ATYPE_BOOST, TRUE);
 			need_affect_total = TRUE;
@@ -255,10 +249,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			}
 			break;
 		}
-		case ABIL_DIRE_WOLF: {
-			despawn_familiar(ch, FAMILIAR_DIRE_WOLF);
-			break;
-		}
 		case ABIL_DISGUISE: {
 			if (IS_DISGUISED(ch)) {
 				undisguise(ch);
@@ -274,17 +264,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			}
 			break;
 		}
-		case ABIL_FAMILIAR: {
-			despawn_familiar(ch, FAMILIAR_CAT);
-			despawn_familiar(ch, FAMILIAR_SABERTOOTH);
-			despawn_familiar(ch, FAMILIAR_SPHINX);
-			despawn_familiar(ch, FAMILIAR_GIANT_TORTOISE);
-			break;
-		}
-		case ABIL_GRIFFIN: {
-			despawn_familiar(ch, FAMILIAR_GRIFFIN);
-			break;
-		}
 		case ABIL_HONE: {
 			remove_honed_gear(ch);
 			need_affect_total = TRUE;
@@ -295,16 +274,13 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			need_affect_total = TRUE;
 			break;
 		}
-		case ABIL_MANTICORE: {
-			despawn_familiar(ch, FAMILIAR_MANTICORE);
-			break;
-		}
 		case ABIL_MIRRORIMAGE: {
-			despawn_familiar(ch, MIRROR_IMAGE_MOB);
-			break;
-		}
-		case ABIL_MOON_RABBIT: {
-			despawn_familiar(ch, FAMILIAR_MOON_RABBIT);
+			LL_FOREACH_SAFE(character_list, mob, next_mob) {
+				if (mob->master == ch && IS_NPC(mob) && GET_MOB_VNUM(mob) == MIRROR_IMAGE_MOB) {
+					act("$n vanishes.", TRUE, mob, NULL, NULL, TO_ROOM);
+					extract_char(mob);
+				}
+			}
 			break;
 		}
 		case ABIL_MUMMIFY: {
@@ -313,14 +289,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 				un_mummify(ch);
 				need_affect_total = TRUE;
 			}
-			break;
-		}
-		case ABIL_OWL_SHADOW: {
-			despawn_familiar(ch, FAMILIAR_OWL_SHADOW);
-			break;
-		}
-		case ABIL_PHOENIX: {
-			despawn_familiar(ch, FAMILIAR_PHOENIX);
 			break;
 		}
 		case ABIL_PHOENIX_RITE: {
@@ -336,25 +304,9 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			}
 			break;
 		}
-		case ABIL_SALAMANDER: {
-			despawn_familiar(ch, FAMILIAR_SALAMANDER);
-			break;
-		}
-		case ABIL_SCORPION_SHADOW: {
-			despawn_familiar(ch, FAMILIAR_SCORPION_SHADOW);
-			break;
-		}
 		case ABIL_SIPHON: {
 			affect_from_char(ch, ATYPE_SIPHON, TRUE);
 			need_affect_total = TRUE;
-			break;
-		}
-		case ABIL_SKELETAL_HULK: {
-			despawn_familiar(ch, FAMILIAR_SKELETAL_HULK);
-			break;
-		}
-		case ABIL_SPIRIT_WOLF: {
-			despawn_familiar(ch, FAMILIAR_SPIRIT_WOLF);
 			break;
 		}
 	}

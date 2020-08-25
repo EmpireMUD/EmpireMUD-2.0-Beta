@@ -238,6 +238,8 @@ void dg_obj_trigger(char *line, obj_data *obj) {
 }
 
 void assign_triggers(void *i, int type) {
+	void reread_companion_trigs(char_data *mob);
+	
 	vehicle_data *veh = NULL;
 	char_data *mob = NULL;
 	obj_data *obj = NULL;
@@ -262,6 +264,7 @@ void assign_triggers(void *i, int type) {
 				}
 				trg_proto = trg_proto->next;
 			}
+			reread_companion_trigs(mob);
 			break;
 		case OBJ_TRIGGER:
 			obj = (obj_data*)i;

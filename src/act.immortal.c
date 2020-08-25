@@ -1502,6 +1502,7 @@ struct set_struct {
 		{ "minipet", LVL_START_IMM, PC, MISC },
 		{ "mount", LVL_START_IMM, PC, MISC },
 		{ "currency", LVL_START_IMM, PC, MISC },
+		{ "companion", LVL_START_IMM, PC, MISC },
 
 		{ "strength",	LVL_START_IMM,	BOTH,	NUMBER },
 		{ "dexterity",	LVL_START_IMM,	BOTH,	NUMBER },
@@ -1519,6 +1520,7 @@ struct set_struct {
 /* All setting is done here, for simplicity */
 int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	/* Externs */
+	void change_sex(char_data *ch, int sex);
 	extern int _parse_name(char *arg, char *name);
 	extern int Valid_Name(char *newname);
 	void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
@@ -1811,7 +1813,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			send_to_char("Must be 'male', 'female', or 'neutral'.\r\n", ch);
 			return (0);
 		}
-		GET_REAL_SEX(vict) = i;
+		change_sex(vict, i);
 		sprintf(output, "%s's sex is now %s.", GET_NAME(vict), genders[(int) GET_REAL_SEX(vict)]);
 	}
 	else if SET_CASE("age") {
@@ -1921,6 +1923,36 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 				amt -= coin->amount;
 			}
 			increase_coins(vict, type, amt);
+		}
+	}
+	else if SET_CASE("companion") {
+		extern struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
+		void remove_companion(char_data *ch, any_vnum vnum);
+		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
+		char_data *pet;
+		
+		half_chop(val_arg, vnum_arg, onoff_arg);
+		
+		if (!*vnum_arg || !isdigit(*vnum_arg) || !*onoff_arg) {
+			msg_to_char(ch, "Usage: set <name> companion <mob vnum> <on | off>\r\n");
+			return 0;
+		}
+		if (!(pet = mob_proto(atoi(vnum_arg)))) {
+			msg_to_char(ch, "Invalid mob vnum.\r\n");
+			return 0;
+		}
+		
+		if (!str_cmp(onoff_arg, "on")) {
+			add_companion(vict, GET_MOB_VNUM(pet), NO_ABIL);
+			sprintf(output, "%s: gained companion %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+		}
+		else if (!str_cmp(onoff_arg, "off")) {
+			remove_companion(vict, GET_MOB_VNUM(pet));
+			sprintf(output, "%s: removed companion %d %s.", GET_NAME(vict), GET_MOB_VNUM(pet), GET_SHORT_DESC(pet));
+		}
+		else {
+			msg_to_char(ch, "Do you want to turn it on or off?\r\n");
+			return 0;
 		}
 	}
 	else if SET_CASE("faction") {
@@ -3368,6 +3400,98 @@ SHOW(show_commons) {
 }
 
 
+SHOW(show_companions) {
+	extern struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type);
+	void setup_ability_companions(char_data *ch);
+	extern const char *pool_types[];
+	
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
+	char_data *proto = NULL, *plr = NULL;
+	struct companion_data *cd, *next_cd;
+	bool full, found, file = FALSE;
+	struct companion_mod *cmod;
+	ability_data *abil;
+	size_t size, lsize;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show companions <player> [keywords]\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		check_delayed_load(plr);
+		setup_ability_companions(plr);
+		
+		if (*argument) {
+			size = snprintf(buf, sizeof(buf), "Companions matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+		}
+		else {
+			size = snprintf(buf, sizeof(buf), "Companions for %s:\r\n", GET_NAME(plr));
+		}
+		
+		found = full = FALSE;
+		HASH_ITER(hh, GET_COMPANIONS(plr), cd, next_cd) {
+			if (cd->from_abil != NOTHING && !has_ability(plr, cd->from_abil)) {
+				continue;	// missing ability: don't show
+			}
+			if (!(proto = mob_proto(cd->vnum))) {
+				continue;	// mob missing
+			}
+			// check requested keywords
+			if (*argument) {
+				cmod = get_companion_mod_by_type(cd, CMOD_KEYWORDS);
+				if (!multi_isname(argument, cmod ? cmod->str : GET_PC_NAME(proto))) {
+					continue;	// no kw match
+				}
+			}
+			
+			// build display
+			cmod = get_companion_mod_by_type(cd, CMOD_SHORT_DESC);
+			lsize = snprintf(line, sizeof(line), " [%5d] %s", cd->vnum, skip_filler(cmod ? cmod->str : get_mob_name_by_proto(cd->vnum, TRUE)));
+			
+			if (cd->from_abil != NOTHING && (abil = find_ability_by_vnum(cd->from_abil)) && ABIL_COST(abil) > 0) {
+				lsize += snprintf(line + lsize, sizeof(line) - lsize, " (%d %s)", ABIL_COST(abil), pool_types[ABIL_COST_TYPE(abil)]);
+			}
+			
+			strcat(line, "\r\n");
+			lsize += 2;
+			found = TRUE;
+			
+			if (size + lsize < sizeof(buf)) {
+				strcat(buf, line);
+				size += lsize;
+			}
+			else {
+				full = TRUE;
+				break;
+			}
+			
+			if (full) {
+				break;
+			}
+		}
+		
+		if (!found) {
+			strcat(buf, " none\r\n");	// always room for this if !found
+		}
+		if (full) {
+			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+		}
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_crops) {
 	extern crop_data *get_crop_by_name(char *name);
 	
@@ -4241,7 +4365,7 @@ SHOW(show_currency) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Currencies:\r\n");
 		
 			HASH_ITER(hh, GET_CURRENCIES(plr), cur, next_cur) {
-				snprintf(line, sizeof(line), "%3d [%5d] %s\r\n", cur->amount, cur->vnum, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)));
+				snprintf(line, sizeof(line), "%3d %s (%d)\r\n", cur->amount, get_generic_string_by_vnum(cur->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(cur->amount)), cur->vnum);
 			
 				if (size + strlen(line) < sizeof(buf)) {
 					strcat(buf, line);
@@ -4417,7 +4541,7 @@ SHOW(show_minipets) {
 	skip_spaces(&argument);
 	
 	if (!*arg) {
-		msg_to_char(ch, "Usage: show minipets <player>\r\n");
+		msg_to_char(ch, "Usage: show minipets <player> [keywords]\r\n");
 	}
 	else if (!(plr = find_or_load_player(arg, &file))) {
 		send_to_char("There is no such player.\r\n", ch);
@@ -9246,6 +9370,7 @@ ACMD(do_show) {
 		{ "resource", LVL_START_IMM, show_resource },
 		{ "olc", LVL_START_IMM, show_olc },
 		{ "homeless", LVL_START_IMM, show_homeless },
+		{ "companions", LVL_START_IMM, show_companions },
 
 		// last
 		{ "\n", 0, NULL }

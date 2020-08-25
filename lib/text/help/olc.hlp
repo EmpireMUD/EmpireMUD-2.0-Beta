@@ -614,6 +614,29 @@ Buff abilities have the following properties:
 
 See also: OLC ABILITIES, ABILEDIT TYPES
 #d
+"ABILEDIT COMPANION ABILITY" "COMPANION ABILITY" "COMPANION ABILITIES"
+
+The COMPANION ability type adds 1 or more mobs to the player's 'companions'
+command. Players can summon one of these at a time.
+
+Companion abilities have the following properties:
+ <&ydata&0> Add the SUMMON-MOB data type to grant new companions.
+            - You can set level limits on the mob.
+            - The mob will be CHARMED.
+
+Notes:
+- Companion abilities will use the &ctarg-to-char&0 and &ctarg-to-room&0 custom
+  messages when a player summons the companion. &c$n&0 represents the player
+  and &c&N&0 represents the companion. For fails, use &cfail-self-to-char&0 and
+  &cfail-self-to-room&0. For pre-ability messages, use &cpre-self-to-char&0 and
+  &cpre-self-to-room&0.
+- Cannot use the INVISIBLE flag for messaging.
+
+When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
+and !DRINK-BLOOD flags.
+
+See also: OLC ABILITIES, ABILEDIT TYPES, COMPANION
+#d
 "ABILEDIT CRAFT ABILITY" "CRAFT ABILITY" "CRAFTING ABILITY" "CRAFT ABILITIES"
 
 The CRAFT ability type indicates that an ability is only used to make crafts.
@@ -704,6 +727,11 @@ Message types:
  &cfail-targ-to-char&0 - To the actor when the ability fails targeting a character.
  &cfail-targ-to-vict&0 - To the victim when the ability fails targeting a character.
  &cfail-targ-to-room&0 - To the room when it fails targeting a character.
+ &cpre-self-to-char&0 - To the actor before an ability executes, when targeting self/nobody.
+ &cpre-self-to-room&0 - To the room before an ability executes, when targeting self/nobody.
+ &cpre-targ-to-char&0 - To the actor before an ability executes, when targeted.
+ &cpre-targ-to-vict&0 - To the victim before an ability executes, when targeted.
+ &cpre-targ-to-room&0 - To the room before an ability executes, when targeted.
 
 See also: OLC ABILITIES, DOLLAR SIGN CODES
 #d
@@ -739,6 +767,7 @@ The 'data' field is used by different types of abilities. Available types are:
  &cPTECH&0 - Player technologies. Used by the PTECH ability type.
  &cEFFECT&0 - Something happens when the ability activates. See ABILITY EFFECTS
  &cREADY-WEAPON&0 - Adds a weapon to the player's 'ready' command.
+ &cSUMMON-MOB&0 - Adds a mob to a companion/summon ability
 
 See also: ABILEDIT TYPES, ABILITY EFFECTS, PLAYER TECHNOLOGIES, OLC ABILITIES
 #d
@@ -849,6 +878,7 @@ This tells the ability when to trigger skill gain:
  &cVAMPIRE-FEEDING&0 - Gains when feeding on someone.
  &cMOVING&0 - Gains when the player moves.
  &cONLY-USING-READY-WEAPON&0 - Only when using a ready-weapon from the ability.
+ &cONLY-USING-SUMMONED-MOB&0 - Only if player has a follower from the ability.
 
 See also: OLC ABILITIES
 #d
@@ -910,7 +940,8 @@ See also: OLC ABILITIES, DOT ABILITY, ABILEDIT SCALE
 Usage:  .minposition <position>
 
 This is the minimum position a character must be in to use the ability. For
-most abilities, this is "resting", "fighting", or "standing".
+most abilities, this is "resting", "fighting", or "standing". This applies to
+command abilities as well as companion, summon, and ready weapon abilities.
 
 See also: POSITIONS, OLC ABILITIES
 #d
@@ -948,6 +979,7 @@ player at all times. These abilities cannot be turned off.
 Buff abilities have the following properties:
  <&yaffects&0> Affect flags to set.
  <&yapply&0> Trait modifiers to give.
+ <&ylinkedtrait&0> Optional: Higher stats in this trait give a better buff.
 
 Note: Passive-buff abilities are not affected by the 'solo' role's limitation
 on being alone; they will remain active.
@@ -1043,6 +1075,8 @@ Available techs are:
  &cPick&0 * - Can 'pick'.
  &cQuarry&0 * - Can 'quarry'.
  &cDrink-Blood-Faster&0 - Vampires drink blood at 2x the speed.
+ &cSummon-Materials&0 * - Can use the 'summon materials' command. Supports
+    custom pre-retrieve messages using self-to-char and self-to-room.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 
@@ -1060,6 +1094,12 @@ Ready-Weapons abilities have the following properties:
             - Only weapons and ranged weapons can be used.
             - If a weapon has HOLD but not WIELD, it will equip to the hold
               slot. Otherwise, it will only equip to the wield slot.
+
+Notes:
+- The ready command will use the &cself-to-char&0 and &cself-to-room&0 custom
+  messages. &c$n&0 represents the player and &c&p&0 represents the weapon.
+  For fails, use &cfail-self-to-char&0 and &cfail-self-to-room&0. For pre-
+  ability messages, use &cpre-self-to-char&0 and &cpre-self-to-room&0.
 
 See also: OLC ABILITIES, ABILEDIT TYPES, READY
 #d
@@ -1088,6 +1128,40 @@ toggles. DoTs cannot have unlimited duration.
 You can also choose to set both durations to the same amount of time.
 
 See also: OLC ABILITIES, BUFF ABILITIES, DOT ABILITIES
+#d
+"ABILEDIT SUMMON ABILITY" "SUMMON ABILITY" "SUMMON ABILITIES" "ABILEDIT SUMMON-ANY ABILITY" "SUMMON-ANY ABILITY" "SUMMON-ANY ABILITIES" "ABILEDIT SUMMON-RANDOM ABILITY" "SUMMON-RANDOM ABILITY" "SUMMON-RANDOM ABILITIES"
+
+The SUMMON-* ability types add 1 or more mobs to the player's 'summon' command.
+Players can have a limited number of followers at a time, including ones from
+summons.
+
+Summon abilities have the following properties:
+ <&ylinkedtrait&0> Optional: If you set a linked trait, more than one mob may
+            be summoned at a time if that trait is high.
+ <&ydata&0> Add the SUMMON-MOB data type to grant new mobs.
+            - A SUMMON-ANY ability will list the mobs individually on the
+              'summon' command.
+            - A SUMMON-RANDOM ability will only list the ability name on the
+              'summon' command.
+            - You can set level limits on the mob.
+
+Notes:
+- Summoned mobs silently follow the player. Use a trigger like #9804 to cancel
+  it using mfollow if you don't want this.
+- If you want the summoned mob to be charmed, use a trigger like #9805.
+- Setting a linked trait will increase the number of summons but it's really
+  only implemented for base attributes like Strength and Wits.
+- Cannot use the INVISIBLE flag for messaging.
+- These abilities will use the &ctarg-to-char&0 and &ctarg-to-room&0 custom
+  messages when a player summons the mob. &c$n&0 represents the player and
+  &c&N&0 represents the mob. For fails, use &cfail-self-to-char&0 and
+  &cfail-self-to-room&0. For pre-ability messages, use &cpre-self-to-char&0 and
+  &cpre-self-to-room&0.
+
+When a companion is summoned, it automatically gets the SPAWNED, !LOOT, !EXP,
+and !DRINK-BLOOD flags.
+
+See also: OLC ABILITIES, ABILEDIT TYPES, COMPANION
 #d
 "ABILEDIT TARGETS"
 
@@ -1133,10 +1207,13 @@ The following types are available (each has its own help file):
  &cPTECH&0 - Various 'techs' that players get from abilities.
  &cPASSIVE-BUFF&0 - Applies stats to the player all the time.
  &cREADY-WEAPONS&0 - Adds weapons to the player's 'ready' command.
+ &cCOMPANION&0 - Adds 1 or more mobs to the player's 'companions' command.
+ &cSUMMON-ANY&0 - Player chooses from a list of mobs to summon.
+ &cSUMMON-RANDOM&0 - Player summons a random mob from this list.
 
 See also: OLC ABILITIES, BUFF ABILITY, CRAFT ABILITY, DAMAGE ABILITY,
    DOT ABILITY, PLAYER-TECH ABILITY, PASSIVE-BUFF ABILITY,
-   READY-WEAPONS ABILITY
+   READY-WEAPONS ABILITY, COMPANION ABILITY, SUMMON ABILITY
 #d
 "ABILEDIT WAITTYPE" "ABILEDIT WAIT TYPE"
 
@@ -1839,6 +1916,9 @@ Available affects:
  !WEATHER - suppress weather messages and command
  !DISREPAIR - never falls into disrepair (caution: this prevents empire decay)
  !TELEPORT - cannot teleport here
+ !ABANDON - cannot be abandoned (managed by empires)
+ REPEL-NPCS - npcs won't wander in
+ REPEL-ANIMALS - animal npcs won't wander in
 
 Some affects are managed by live data and commands (do not set affects with *):
  *HAS-INSTANCE - an adventure is linked here
@@ -1850,6 +1930,7 @@ Some affects are managed by live data and commands (do not set affects with *):
  *!WORK - workforce ignores the room
  *!DISMANTLE - cannot be dismantled until nodismantle is toggled
  *INCOMPLETE - building is unfinished
+ *FAKE-INSTANCE - roaming adventure is using this tile
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
@@ -4131,7 +4212,7 @@ Available mob flags:
  SPAWNED - De-spawns after 5 minutes if no players are nearby.
  CHAMPION - Will rescue its master in combat.
  EMPIRE - Will not be saved through reboots.
- FAMILIAR - Will not be saved through reboots; players may only have one familiar follower at a time.
+ * - Unused (formerly FAMILIAR)
  *PICKPOCKETED - Has already been pickpocketed; cannot be pickpocketed again.
  CITYGUARD - Will assist allies from the same empire. This will only work if it is spawned by the empire system.
  PURSUE - Will pursue players who flee in combat.

@@ -466,6 +466,26 @@ command. Useful if you have a small display.
 
 See also: TOGGLE
 #
+COMPANION COMPANIONS
+
+Usage:  companions
+        companion <name>
+
+Companions are NPCs that will follow and assist your character. You can collect
+many different companions, but can only use one at a time. Companions may come
+from abilities, from adventures, or from other rewards.
+
+Typing this command by itself (companions) will list your available companions
+and the cost to summon them, if any. If you are too low-level for a companion,
+the level will be displayed, too. If the ability comes from a skill tree, this
+may be your level in that skill tree.
+
+You can dismiss your companion from anywhere using 'dismiss companion'. If you
+log out with a companion active, it will automatically be re-summoned when you
+log back in (but you will have to re-cast any buffs on it).
+
+See also: DISMISS, BODYGUARD, FAMILIAR
+#
 CONFIRM
 
 Usage:  confirm
@@ -581,11 +601,13 @@ See also: BOARD, SAIL, UNLOAD, SHIPS
 #
 DISMISS
 
-Usage:  dismiss <familiar | minipet>
+Usage:  dismiss <companion | minipet>
 
-This command causes your familiar or mini-pet to leave. You can target it by
-name if it's in the room with you, or else can type 'dismiss familiar' or
+This command causes your companion or mini-pet to leave. You can target it by
+name if it's in the room with you, or else can type 'dismiss companion' or
 'dismiss minipet' to dismiss it anywhere in the world.
+
+See also: COMPANION
 #
 DISPATCH
 
@@ -2187,16 +2209,6 @@ alias inf toggle informative;look
 alias pol toggle political;look
 
 See also: ALIAS, IDEA
-#
-"SUMMON GUARDS"
-
-Usage:  summon guards
-Cooldown:  3 minutes
-Cost:  25 move
-
-This ability summons up to (Charisma / 2, rounded down) guards. They aren't
-very strong, but they count as city guards and will attack intruders and
-hostile mobs. You can only use this in your empire's own cities and outskirts.
 #
 "SUMMON PLAYERS"
 

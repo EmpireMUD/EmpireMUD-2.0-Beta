@@ -415,25 +415,29 @@ void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex) {
 	}
 	
 	// restrings: uses "afar"/"lost" if there is no empire
-	GET_PC_NAME(mob) = str_dup(replace_npc_names(GET_PC_NAME(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
-	GET_SHORT_DESC(mob) = str_dup(replace_npc_names(GET_SHORT_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
-	GET_LONG_DESC(mob) = str_dup(replace_npc_names(GET_LONG_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
-	if (GET_LOOK_DESC(mob)) {
+	if (strchr(GET_PC_NAME(proto ? proto : mob), '#')) {
+		GET_PC_NAME(mob) = str_dup(replace_npc_names(GET_PC_NAME(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+		if (free_name) {
+			free(free_name);
+		}
+	}
+	if (strchr(GET_SHORT_DESC(proto ? proto : mob), '#')) {
+		GET_SHORT_DESC(mob) = str_dup(replace_npc_names(GET_SHORT_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+		if (free_short) {
+			free(free_short);
+		}
+	}
+	if (strchr(GET_LONG_DESC(proto ? proto : mob), '#')) {
+		GET_LONG_DESC(mob) = str_dup(replace_npc_names(GET_LONG_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
+		if (free_long) {
+			free(free_long);
+		}
+	}
+	if (GET_LOOK_DESC(mob) && strchr(GET_LOOK_DESC(proto ? proto : mob), '#')) {
 		GET_LOOK_DESC(mob) = str_dup(replace_npc_names(GET_LOOK_DESC(proto ? proto : mob), name_set->names[name], !emp ? "afar" : EMPIRE_NAME(emp), !emp ? "lost" : EMPIRE_ADJECTIVE(emp)));
-	}
-	
-	// and free that memory if necessary
-	if (free_name) {
-		free(free_name);
-	}
-	if (free_short) {
-		free(free_short);
-	}
-	if (free_long) {
-		free(free_long);
-	}
-	if (free_look) {
-		free(free_look);
+		if (free_look) {
+			free(free_look);
+		}
 	}
 }
 
@@ -454,8 +458,13 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	bool ok = FALSE;
 	
 	// sect- and ability-based determinations
-	
-	if (SECT_FLAGGED(sect, SECTF_IS_ROAD) && !MOB_FLAGGED(mob, MOB_AQUATIC) && move_type != MOB_MOVE_SWIM) {
+	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_REPEL_NPCS)) {
+		ok = FALSE;
+	}
+	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_REPEL_ANIMALS) && MOB_FLAGGED(mob, MOB_ANIMAL)) {
+		ok = FALSE;
+	}
+	else if (SECT_FLAGGED(sect, SECTF_IS_ROAD) && !MOB_FLAGGED(mob, MOB_AQUATIC) && move_type != MOB_MOVE_SWIM) {
 		ok = TRUE;
 	}
 	else if (AFF_FLAGGED(mob, AFF_FLY)) {
@@ -979,7 +988,7 @@ static int spawn_one_list(room_data *room, struct spawn_info *list) {
 	struct spawn_info *spawn;
 	bool in_city, junk;
 	room_data *home;
-	char_data *mob;
+	char_data *mob, *proto;
 	
 	if (!room || !list) {
 		return 0;	// safety first
@@ -1002,6 +1011,11 @@ static int spawn_one_list(room_data *room, struct spawn_info *list) {
 		// check percent
 		if (number(1, 10000) > (int)(100 * spawn->percent)) {
 			continue;
+		}
+		
+		// check repel-animals
+		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_REPEL_ANIMALS) && (!(proto = mob_proto(spawn->vnum)) || MOB_FLAGGED(proto, MOB_ANIMAL))) {
+			continue;	// repelled by this flag
 		}
 		
 		// passed! let's spawn
@@ -1094,68 +1108,73 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 		return;
 	}
 	
-	// spawn empire npcs who live here first
-	if (ROOM_OWNER(home) && (ter = find_territory_entry(ROOM_OWNER(home), room))) {
-		for (npc = ter->npcs; npc; npc = npc->next) {
-			if (npc->mob) {
-				continue;	// check if the mob is already spawned
-			}
-			if (only_artisans && npc->vnum != artisan) {
-				continue;	// not spawning this now
-			}
+	
+	if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_REPEL_NPCS)) {
+		// spawns not blocked by repel-npcs
+	
+		// spawn empire npcs who live here first
+		if (ROOM_OWNER(home) && (ter = find_territory_entry(ROOM_OWNER(home), room))) {
+			for (npc = ter->npcs; npc; npc = npc->next) {
+				if (npc->mob) {
+					continue;	// check if the mob is already spawned
+				}
+				if (only_artisans && npc->vnum != artisan) {
+					continue;	// not spawning this now
+				}
 			
-			spawn_empire_npc_to_room(ROOM_OWNER(home), npc, room, NOTHING);
-		}
-	}
-	
-	// count creatures in the room; don't spawn rooms that are already populous
-	count = 0;
-	for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
-		if (IS_NPC(ch_iter)) {
-			++count;
-		}
-	}
-	
-	// normal spawn list
-	if (!only_artisans && count < config_get_int("spawn_limit_per_room")) {
-		// spawn based on vehicles?
-		LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-			if (VEH_SPAWNS(veh)) {
-				count += spawn_one_list(room, VEH_SPAWNS(veh));
+				spawn_empire_npc_to_room(ROOM_OWNER(home), npc, room, NOTHING);
 			}
 		}
-		
-		// spawn based on tile type -- if we're not now over the count
-		if (count < config_get_int("spawn_limit_per_room")) {
-			if (GET_BUILDING(room)) {
-				// only find a spawn list here if the building is complete; otherwise no list = no spawn
-				if (IS_COMPLETE(room)) {
-					count += spawn_one_list(room, GET_BLD_SPAWNS(GET_BUILDING(room)));
+	
+		// count creatures in the room; don't spawn rooms that are already populous
+		count = 0;
+		for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
+			if (IS_NPC(ch_iter)) {
+				++count;
+			}
+		}
+	
+		// normal spawn list
+		if (!only_artisans && count < config_get_int("spawn_limit_per_room")) {
+			// spawn based on vehicles?
+			LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+				if (VEH_SPAWNS(veh)) {
+					count += spawn_one_list(room, VEH_SPAWNS(veh));
 				}
 			}
-			else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
-				count += spawn_one_list(room, GET_CROP_SPAWNS(cp));
-			}
-			else {
-				count += spawn_one_list(room, GET_SECT_SPAWNS(SECT(room)));
-			}
-		}
 		
-		// global spawn lists
-		if (IS_OUTDOOR_TILE(room) && !ROOM_SECT_FLAGGED(room, SECTF_NO_GLOBAL_SPAWNS) && !ROOM_CROP_FLAGGED(room, CROPF_NO_GLOBAL_SPAWNS) && count < config_get_int("spawn_limit_per_room")) {
-			struct glb_map_spawn_bean *data;
-			bool junk;
+			// spawn based on tile type -- if we're not now over the count
+			if (count < config_get_int("spawn_limit_per_room")) {
+				if (GET_BUILDING(room)) {
+					// only find a spawn list here if the building is complete; otherwise no list = no spawn
+					if (IS_COMPLETE(room)) {
+						count += spawn_one_list(room, GET_BLD_SPAWNS(GET_BUILDING(room)));
+					}
+				}
+				else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
+					count += spawn_one_list(room, GET_CROP_SPAWNS(cp));
+				}
+				else {
+					count += spawn_one_list(room, GET_SECT_SPAWNS(SECT(room)));
+				}
+			}
+		
+			// global spawn lists
+			if (IS_OUTDOOR_TILE(room) && !ROOM_SECT_FLAGGED(room, SECTF_NO_GLOBAL_SPAWNS) && !ROOM_CROP_FLAGGED(room, CROPF_NO_GLOBAL_SPAWNS) && count < config_get_int("spawn_limit_per_room")) {
+				struct glb_map_spawn_bean *data;
+				bool junk;
 			
-			CREATE(data, struct glb_map_spawn_bean, 1);
-			data->room = room;
-			data->x_coord = X_COORD(room);
-			data->y_coord = Y_COORD(room);
-			data->in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
-			run_globals(GLOBAL_MAP_SPAWNS, run_global_map_spawns, TRUE, GET_SECT_CLIMATE(BASE_SECT(room)), NULL, NULL, 0, validate_global_map_spawns, data);
-			free(data);
+				CREATE(data, struct glb_map_spawn_bean, 1);
+				data->room = room;
+				data->x_coord = X_COORD(room);
+				data->y_coord = Y_COORD(room);
+				data->in_city = (ROOM_OWNER(home) && is_in_city_for_empire(room, ROOM_OWNER(home), TRUE, &junk)) ? TRUE : FALSE;
+				run_globals(GLOBAL_MAP_SPAWNS, run_global_map_spawns, TRUE, GET_SECT_CLIMATE(BASE_SECT(room)), NULL, NULL, 0, validate_global_map_spawns, data);
+				free(data);
+			}
 		}
-	}
-
+	}	// end repel-npcs block
+	
 	// spawn interior rooms: recursively
 	if (GET_INSIDE_ROOMS(room) > 0) {
 		for (iter = interior_room_list; iter; iter = next_iter) {
@@ -1380,15 +1399,25 @@ int determine_best_scale_level(char_data *ch, bool check_group) {
 
 
 /**
-* Scales a mob below the master's level like a familiar.
+* Scales a mob below the master's level like a companion. Companions generally
+* scale 25 levels below the character's level (or the use_level, if you pass
+* one) if the level is over 100. That is, companions scale with the character
+* up to level 100.
 *
 * @param char_data *mob The mob to scale.
 * @param char_data *master The person to base it on.
+* @param int use_level If you are using something other than character's level, e.g. the level of a skill, pass it here (or 0 to detect level here).
 */
-void scale_mob_as_familiar(char_data *mob, char_data *master) {
+void scale_mob_as_companion(char_data *mob, char_data *master, int use_level) {
 	int scale_level;
 	
-	scale_level = get_approximate_level(master);
+	if (use_level > 0) {
+		scale_level = use_level;
+	}
+	else {
+		scale_level = get_approximate_level(master);
+	}
+	
 	if (scale_level > CLASS_SKILL_CAP) {
 		// 25 levels lower if over 100
 		scale_level = MAX(CLASS_SKILL_CAP, scale_level - 25);

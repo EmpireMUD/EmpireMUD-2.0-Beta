@@ -175,6 +175,11 @@ bool is_ignoring(char_data *ch, char_data *victim) {
 	struct account_player *plr;
 	int iter, alts = 0;
 	
+	// if it's an npc, follow up the chain to a player (e.g. charmed npc)
+	while (victim && IS_NPC(victim) && victim->master) {
+		victim = victim->master;
+	}
+	
 	// shortcuts
 	if (REAL_NPC(ch) || REAL_NPC(victim)) {
 		return FALSE;
@@ -1804,6 +1809,9 @@ ACMD(do_say) {
 		msg_to_char(ch, "Yes, but WHAT do you want to say?\r\n");
 	else if (subcmd != SCMD_OOCSAY && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT))
 		msg_to_char(ch, "You speak, but no words come out!\r\n");
+	else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_ANIMAL) && AFF_FLAGGED(ch, AFF_CHARM)) {
+		msg_to_char(ch, "Animals can't talk.\r\n");
+	}
 	else {
 		if (subcmd == SCMD_OOCSAY) {
 			strcpy(buf1, " out of character,");

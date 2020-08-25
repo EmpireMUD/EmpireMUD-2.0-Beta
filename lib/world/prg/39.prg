@@ -47,4 +47,14 @@ see announcements of your progress on the /progress channel.
 1 3 30 0 b
 K 0 19
 S
+#3905
+Guard Whistle~
+   Your jewelers learn to forge guard whistles, which can summon guards when
+used in one of your own cities. The whistles can be re-used but have a 3-minute
+cooldown.
+~
+3 3 25 0 b
+K 2 2149
+P 1002
+S
 $

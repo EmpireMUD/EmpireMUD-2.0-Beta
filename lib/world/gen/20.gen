@@ -195,18 +195,18 @@ T0
 Your summon animals cooldown has ended.~
 S
 #2029
-summon guards~
+guard whistle~
 3 0
 0 0 0 0
 T0
-Your summon guards cooldown has ended.~
+Your guard whistle cooldown has ended.~
 S
 #2030
-summon bodyguard~
+bodyguard companion~
 3 0
 0 0 0 0
 T0
-Your summon bodyguard cooldown has ended.~
+Your bodyguard companion cooldown has ended.~
 S
 #2031
 summon thug~

@@ -466,12 +466,14 @@ void start_ritual(char_data *ch, int ritual) {
 * @param char *argument The typed arg.
 */
 void summon_materials(char_data *ch, char *argument) {
+	extern ability_data *find_player_ability_by_tech(char_data *ch, int ptech);
 	void read_vault(empire_data *emp);
 
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *objname;
 	struct empire_storage_data *store, *next_store;
 	int count = 0, total = 1, number, pos, carry;
 	struct empire_island *isle;
+	ability_data *abil;
 	empire_data *emp;
 	int cost = 2;	// * number of things to summon
 	obj_data *proto;
@@ -479,6 +481,10 @@ void summon_materials(char_data *ch, char *argument) {
 
 	half_chop(argument, arg1, arg2);
 	
+	if (!has_player_tech(ch, PTECH_SUMMON_MATERIALS)) {
+		msg_to_char(ch, "You don't have the right ability to summon materials.\r\n");
+		return;
+	}
 	if (!(emp = GET_LOYALTY(ch))) {
 		msg_to_char(ch, "You can't summon empire materials if you're not in an empire.\r\n");
 		return;
@@ -493,7 +499,7 @@ void summon_materials(char_data *ch, char *argument) {
 		return;
 	}
 	
-	if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_SUMMON_MATERIALS)) {
+	if (run_ability_triggers_by_player_tech(ch, PTECH_SUMMON_MATERIALS, NULL, NULL)) {
 		return;
 	}
 	
@@ -503,7 +509,7 @@ void summon_materials(char_data *ch, char *argument) {
 		if (total < 1) {
 			msg_to_char(ch, "You have to summon at least 1.\r\n");
 			return;
-			}
+		}
 		strcpy(arg1, arg2);
 	}
 	else if (*arg1 && *arg2) {
@@ -516,7 +522,7 @@ void summon_materials(char_data *ch, char *argument) {
 	number = get_number(&objname);
 
 	// multiply cost for total, but don't store it
-	if (!can_use_ability(ch, ABIL_SUMMON_MATERIALS, MANA, cost * total, NOTHING)) {
+	if (!can_use_ability(ch, NO_ABIL, MANA, cost * total, NOTHING)) {
 		return;
 	}
 
@@ -525,9 +531,21 @@ void summon_materials(char_data *ch, char *argument) {
 		return;
 	}
 	
-	msg_to_char(ch, "You open a tiny portal to summon materials...\r\n");
-	act("$n opens a tiny portal to summon materials...", FALSE, ch, NULL, NULL, TO_ROOM);
-
+	// messaging (allow custom messages)
+	abil = find_player_ability_by_tech(ch, PTECH_SUMMON_MATERIALS);
+	if (abil && abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR)) {
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_CHAR), FALSE, ch, NULL, NULL, TO_CHAR);
+	}
+	else {
+		act("You open a tiny portal to summon materials...", FALSE, ch, NULL, NULL, TO_CHAR);
+	}
+	if (abil && abil_has_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM)) {
+		act(abil_get_custom_message(abil, ABIL_CUSTOM_SELF_TO_ROOM), ABILITY_FLAGGED(abil, ABILF_INVISIBLE) ? TRUE : FALSE, ch, NULL, NULL, TO_CHAR);
+	}
+	else {
+		act("$n opens a tiny portal to summon materials...", (abil && ABILITY_FLAGGED(abil, ABILF_INVISIBLE)) ? TRUE : FALSE, ch, NULL, NULL, TO_ROOM);
+	}
+	
 	pos = 0;
 	HASH_ITER(hh, isle->store, store, next_store) {
 		if (found) {
@@ -585,7 +603,7 @@ void summon_materials(char_data *ch, char *argument) {
 		if (found) {
 			GET_MANA(ch) -= cost * count;	// charge only the amount retrieved
 			read_vault(emp);
-			gain_ability_exp(ch, ABIL_SUMMON_MATERIALS, 1);
+			gain_player_tech_exp(ch, PTECH_SUMMON_MATERIALS, 1);
 		}
 	}
 	
@@ -971,9 +989,9 @@ ACMD(do_manashield) {
 
 
 ACMD(do_mirrorimage) {
-	extern char_data *has_familiar(char_data *ch);
+	void change_sex(char_data *ch, int sex);
 	extern struct custom_message *pick_custom_longdesc(char_data *ch);
-	void scale_mob_as_familiar(char_data *mob, char_data *master);
+	void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
 	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], *tmp;
 	char_data *mob, *other;
@@ -1013,14 +1031,14 @@ ACMD(do_mirrorimage) {
 	mob = read_mobile(vnum, TRUE);
 	
 	// scale mob to the summoner -- so it won't change its attributes later
-	scale_mob_as_familiar(mob, ch);
+	scale_mob_as_companion(mob, ch, 0);
 	
 	char_to_room(mob, IN_ROOM(ch));
 	
 	// restrings
 	GET_PC_NAME(mob) = str_dup(PERS(ch, ch, FALSE));
 	GET_SHORT_DESC(mob) = str_dup(GET_PC_NAME(mob));
-	GET_REAL_SEX(mob) = GET_SEX(ch);	// need this for some desc stuff
+	change_sex(mob, GET_SEX(ch));	// need this for some desc stuff
 	
 	// longdesc is more complicated
 	if (GET_MORPH(ch)) {

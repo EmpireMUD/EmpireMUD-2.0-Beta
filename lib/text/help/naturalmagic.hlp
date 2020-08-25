@@ -191,7 +191,7 @@ See also: CHANT
 "CLASS FAMILIARS" "SYNERGY FAMILIARS"
 
 Each Natural Magic synergy has its own set of familiars. These are summoned
-with the 'familiar' command, but don't require the regular Familiar ability.
+with the 'companion' command, and don't require the regular Familiar ability.
 Some group roles have different familiars than other roles. Like all synergy
 abilities, you must reach maximum level in both skills to use these:
 
@@ -224,7 +224,7 @@ Vampire synergy:
   Banshee (healer) - Debuffs the enemy.
 
 See also: HELP <NAME> FAMILIAR
-See also: SYNERGIES, FAMILIAR, MIRROR IMAGE, SUPPORT FAMILIARS
+See also: COMPANION, SYNERGIES, FAMILIAR, MIRROR IMAGE, SUPPORT FAMILIARS
 #
 CLEANSE
 
@@ -380,29 +380,31 @@ FAMILIAR
 
 Familiar (Natural Magic ability)
 
-Usage:  familiar <type>
+Usage:  companion <familiar type>
 Cost:  40 mana
 
 Natural Magic users are able to become friends with all sorts of animals, to
 the point where they can summon the aid of a familiar animal. When you call
-a familiar, it appears, follows you, and prepares to take orders.
+a familiar, it appears, follows you, and prepares to take orders. Familiars
+are a type of companion.
 
 The power and abilities of the familiar are based on your prowess in Natural
 Magic and your total level.
 
-This ability gains experience when you summon these familiars.
+This ability gains experience when you summon these familiars or have one of
+them as your active companion.
 
 Available familiars:
   cat - A low-level familiar for novice mages.
-  saber-toothed cat - A larger cat with a bigger bite. (requires 51)
-  sphinx - A familiar that will tank for you in combat. (requires 76)
+  saber-toothed cat - A larger cat with a bigger bite. (requires level 50)
+  sphinx - A familiar that will tank for you in combat. (requires 75)
   giant tortoise - A stronger tank who deals no damage, but protects better.
     (requires 100)
 
 Each natural magic synergy has its own familiars, too. Use "dismiss" to get rid
 of your familiar.
 
-See also: SYNERGY FAMILIARS, DISMISS, ORDER
+See also: COMPANION, SYNERGY FAMILIARS, DISMISS, ORDER
 #
 FASTCASTING "FAST CASTING"
 

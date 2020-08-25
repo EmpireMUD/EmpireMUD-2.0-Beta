@@ -55,7 +55,10 @@ extern const char *pool_types[];
 extern const char *tool_flags[];
 
 // external funcs
+void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
+extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
+void remove_companion_mod(struct companion_data **companion, int type);
 void scale_item_to_level(obj_data *obj, int level);
 void send_char_pos(char_data *ch, int dam);
 
@@ -2298,24 +2301,341 @@ char *two_arguments(char *argument, char *first_arg, char *second_arg) {
 //// MOBILE UTILS ////////////////////////////////////////////////////////////
 
 /**
-* Despawns all familiars and charmies a player has. This is usually called upon
-* player death.
+* Processes a change to a mob's keywords. This may also update it in
+* additional places, such as stored companion data.
+*
+* @parma char_data *ch The mob.
+* @param char *str The new keywords (will be copied). Pass NULL to set it back to the prototype.
+*/
+void change_keywords(char_data *ch, char *str) {
+	struct companion_data *cd;
+	char_data *proto;
+	
+	if (!ch || !IS_NPC(ch)) {
+		return;	// no work
+	}
+	
+	proto = mob_proto(GET_MOB_VNUM(ch));
+	
+	// the change
+	if (str && *str) {
+		ch->customized = TRUE;
+		if (!proto || GET_PC_NAME(ch) != GET_PC_NAME(proto)) {
+			free(GET_PC_NAME(ch));
+		}
+		GET_PC_NAME(ch) = str_dup(str);
+		
+		// update companion data
+		if (GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
+			add_companion_mod(cd, CMOD_KEYWORDS, 0, str);
+			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
+		}
+	}
+	else if (proto) {	// reset to proto
+		if (GET_PC_NAME(ch) && GET_PC_NAME(ch) != GET_PC_NAME(proto)) {
+			free(GET_PC_NAME(ch));
+		}
+		GET_PC_NAME(ch) = GET_PC_NAME(proto);
+		
+		// delete companion data
+		if (GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
+			remove_companion_mod(&cd, CMOD_KEYWORDS);
+			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
+		}
+	}
+}
+
+
+/**
+* Processes a change to a mob's long desc. This may also update it in
+* additional places, such as stored companion data.
+*
+* @parma char_data *ch The mob.
+* @param char *str The new long desc (will be copied). Pass NULL to set it back to the prototype.
+*/
+void change_long_desc(char_data *ch, char *str) {
+	struct companion_data *cd;
+	char_data *proto;
+	
+	if (!ch || !IS_NPC(ch)) {
+		return;	// no work
+	}
+	
+	proto = mob_proto(GET_MOB_VNUM(ch));
+	
+	// the change
+	if (str && *str) {
+		ch->customized = TRUE;
+		if (!proto || GET_LONG_DESC(ch) != GET_LONG_DESC(proto)) {
+			free(GET_LONG_DESC(ch));
+		}
+		GET_LONG_DESC(ch) = str_dup(str);
+		
+		// update companion data
+		if (GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
+			add_companion_mod(cd, CMOD_LONG_DESC, 0, str);
+			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
+		}
+	}
+	else if (proto) {	// reset to proto
+		if (GET_LONG_DESC(ch) && GET_LONG_DESC(ch) != GET_LONG_DESC(proto)) {
+			free(GET_LONG_DESC(ch));
+		}
+		GET_LONG_DESC(ch) = GET_LONG_DESC(proto);
+		
+		// delete companion data
+		if (GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
+			remove_companion_mod(&cd, CMOD_LONG_DESC);
+			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
+		}
+	}
+}
+
+
+/**
+* Processes a change to a mob's look desc. This may also update it in
+* additional places, such as stored companion data.
+*
+* @parma char_data *ch The mob.
+* @param char *str The new look desc (will be copied). Pass NULL to set it back to the prototype.
+*/
+void change_look_desc(char_data *ch, char *str) {
+	struct companion_data *cd;
+	char_data *proto;
+	
+	if (!ch || !IS_NPC(ch)) {
+		return;	// no work
+	}
+	
+	proto = mob_proto(GET_MOB_VNUM(ch));
+	
+	// the change
+	if (str && *str) {
+		ch->customized = TRUE;
+		if (!proto || GET_LOOK_DESC(ch) != GET_LOOK_DESC(proto)) {
+			free(GET_LOOK_DESC(ch));
+		}
+		GET_LOOK_DESC(ch) = str_dup(str);
+		
+		// update companion data
+		if (GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
+			add_companion_mod(cd, CMOD_LOOK_DESC, 0, str);
+			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
+		}
+	}
+	else if (proto) {	// reset to proto
+		if (GET_LOOK_DESC(ch) && GET_LOOK_DESC(ch) != GET_LOOK_DESC(proto)) {
+			free(GET_LOOK_DESC(ch));
+		}
+		GET_LOOK_DESC(ch) = GET_LOOK_DESC(proto);
+		
+		// delete companion data
+		if (GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
+			remove_companion_mod(&cd, CMOD_LOOK_DESC);
+			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
+		}
+	}
+}
+
+
+/**
+* Processes a change to a character/mob's sex. This may also update it in
+* additional places, such as stored companion data.
+*
+* @param char_data *ch The player or NPC to change.
+* @param int sex The new sex.
+*/
+void change_sex(char_data *ch, int sex) {
+	struct companion_data *cd;
+	
+	if (!ch || sex < 0 || sex >= NUM_GENDERS) {
+		return;	// no work
+	}
+	
+	// the change
+	GET_REAL_SEX(ch) = sex;
+	
+	// update companion data
+	if (IS_NPC(ch) && GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
+		add_companion_mod(cd, CMOD_SEX, sex, NULL);
+		queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
+	}
+}
+
+
+/**
+* Processes a change to a mob's short desc. This may also update it in
+* additional places, such as stored companion data.
+*
+* @parma char_data *ch The mob.
+* @param char *str The new short desc (will be copied). Pass NULL to set it back to the prototype.
+*/
+void change_short_desc(char_data *ch, char *str) {
+	struct companion_data *cd;
+	char_data *proto;
+	
+	if (!ch || !IS_NPC(ch)) {
+		return;	// no work
+	}
+	
+	proto = mob_proto(GET_MOB_VNUM(ch));
+	
+	// the change
+	if (str && *str) {
+		ch->customized = TRUE;
+		if (!proto || GET_SHORT_DESC(ch) != GET_SHORT_DESC(proto)) {
+			free(GET_SHORT_DESC(ch));
+		}
+		GET_SHORT_DESC(ch) = str_dup(str);
+		
+		// update companion data
+		if (GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
+			add_companion_mod(cd, CMOD_SHORT_DESC, 0, str);
+			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
+		}
+	}
+	else if (proto) {	// reset to proto
+		if (GET_SHORT_DESC(ch) && GET_SHORT_DESC(ch) != GET_SHORT_DESC(proto)) {
+			free(GET_SHORT_DESC(ch));
+		}
+		GET_SHORT_DESC(ch) = GET_SHORT_DESC(proto);
+		
+		// delete companion data
+		if (GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
+			remove_companion_mod(&cd, CMOD_SHORT_DESC);
+			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
+		}
+	}
+}
+
+
+/**
+* Despawns all companionss and charmies a player has. This is usually called
+* upon player death.
 *
 * @param char_data *ch The person whose followers to despawn.
+* @param any_vnum only_vnum Optional: Only despawn a specific mob vnum (pass NOTHING for all charmies).
 */
-void despawn_charmies(char_data *ch) {
+void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 	char_data *iter, *next_iter;
 	
 	for (iter = character_list; iter; iter = next_iter) {
 		next_iter = iter->next;
 		
-		if (IS_NPC(iter) && iter->master == ch) {
-			if (MOB_FLAGGED(iter, MOB_FAMILIAR) || AFF_FLAGGED(iter, AFF_CHARM)) {
+		if (IS_NPC(iter) && iter->master == ch && (only_vnum == NOTHING || GET_MOB_VNUM(iter) == only_vnum)) {
+			if (GET_COMPANION(iter) == ch || AFF_FLAGGED(iter, AFF_CHARM)) {
 				act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
 				extract_char(iter);
 			}
 		}
 	}
+}
+
+
+/**
+* Fetches the current attribute from a character based on an APPLY_ type. For
+* example, APPLY_STRENGTH fetches the character's strength.
+*
+* @param char_data *ch The character.
+* @param int apply_type Any APPLY_ const.
+* @return int The character's value for that attributes.
+*/
+int get_attribute_by_apply(char_data *ch, int apply_type) {
+	extern int get_block_rating(char_data *ch, bool can_gain_skill);
+	extern int get_crafting_level(char_data *ch);
+	extern int total_bonus_healing(char_data *ch);
+	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
+	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
+	extern int health_gain(char_data *ch, bool info_only);
+	extern int move_gain(char_data *ch, bool info_only);
+	extern int mana_gain(char_data *ch, bool info_only);
+	
+	if (!ch) {
+		return 0;	// shortcut/safety
+	}
+	
+	// APPLY_x
+	switch (apply_type) {
+		case APPLY_STRENGTH: {
+			return GET_STRENGTH(ch);
+		}
+		case APPLY_DEXTERITY: {
+			return GET_DEXTERITY(ch);
+		}
+		case APPLY_HEALTH_REGEN: {
+			return health_gain(ch, TRUE);
+		}
+		case APPLY_CHARISMA: {
+			return GET_CHARISMA(ch);
+		}
+		case APPLY_GREATNESS: {
+			return GET_GREATNESS(ch);
+		}
+		case APPLY_MOVE_REGEN: {
+			return move_gain(ch, TRUE);
+		}
+		case APPLY_MANA_REGEN: {
+			return mana_gain(ch, TRUE);
+		}
+		case APPLY_INTELLIGENCE: {
+			return GET_INTELLIGENCE(ch);
+		}
+		case APPLY_WITS: {
+			return GET_WITS(ch);
+		}
+		case APPLY_AGE: {
+			return GET_AGE(ch);
+		}
+		case APPLY_MOVE: {
+			return GET_MAX_MOVE(ch);
+		}
+		case APPLY_RESIST_PHYSICAL: {
+			return GET_RESIST_PHYSICAL(ch);
+		}
+		case APPLY_BLOCK: {
+			return get_block_rating(ch, FALSE);
+		}
+		case APPLY_HEAL_OVER_TIME: {
+			return GET_HEAL_OVER_TIME(ch);
+		}
+		case APPLY_HEALTH: {
+			return GET_MAX_HEALTH(ch);
+		}
+		case APPLY_MANA: {
+			return GET_MAX_MANA(ch);
+		}
+		case APPLY_TO_HIT: {
+			return get_to_hit(ch, NULL, FALSE, FALSE);
+		}
+		case APPLY_DODGE: {
+			return get_dodge_modifier(ch, NULL, FALSE);
+		}
+		case APPLY_INVENTORY: {
+			return CAN_CARRY_N(ch);
+		}
+		case APPLY_BLOOD: {
+			return GET_MAX_BLOOD(ch);
+		}
+		case APPLY_BONUS_PHYSICAL: {
+			return GET_BONUS_PHYSICAL(ch);
+		}
+		case APPLY_BONUS_MAGICAL: {
+			return GET_BONUS_MAGICAL(ch);
+		}
+		case APPLY_BONUS_HEALING: {
+			return total_bonus_healing(ch);
+		}
+		case APPLY_RESIST_MAGICAL: {
+			return GET_RESIST_MAGICAL(ch);
+		}
+		case APPLY_CRAFTING: {
+			return get_crafting_level(ch);
+		}
+		case APPLY_BLOOD_UPKEEP: {
+			return GET_BLOOD_UPKEEP(ch);
+		}
+	}
+	return 0;	// if we got this far
 }
 
 
@@ -2332,25 +2652,31 @@ char *get_mob_name_by_proto(mob_vnum vnum, bool replace_placeholders) {
 	char *unk = "UNKNOWN";
 	char *tmp;
 	
-	if (!replace_placeholders || !proto || !strchr(buf, '#')) {
+	if (!replace_placeholders || !proto || !strchr(GET_SHORT_DESC(proto), '#')) {
 		// short way out
 		return proto ? GET_SHORT_DESC(proto) : unk;
 	}
 	else {
 		strcpy(output, GET_SHORT_DESC(proto));
 		
-		// #n
-		tmp = str_replace("#n", "<name>", output);
-		strcpy(output, tmp);
-		free(tmp);
-		// #e
-		tmp = str_replace("#e", "<empire>", output);
-		strcpy(output, tmp);
-		free(tmp);
-		// #a
-		tmp = str_replace("#a", "<empire>", output);
-		strcpy(output, tmp);
-		free(tmp);
+		// #n name
+		if (strstr(GET_SHORT_DESC(proto), "#n")) {
+			tmp = str_replace("#n", "<name>", output);
+			strcpy(output, tmp);
+			free(tmp);
+		}
+		// #e empire name
+		if (strstr(GET_SHORT_DESC(proto), "#e")) {
+			tmp = str_replace("#e", "<empire>", output);
+			strcpy(output, tmp);
+			free(tmp);
+		}
+		// #a empire adjective
+		if (strstr(GET_SHORT_DESC(proto), "#a")) {
+			tmp = str_replace("#a", "<empire>", output);
+			strcpy(output, tmp);
+			free(tmp);
+		}
 		
 		return output;
 	}

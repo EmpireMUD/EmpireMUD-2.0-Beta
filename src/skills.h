@@ -121,12 +121,12 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 // #define ABIL_MIST_FORM  24
 #define ABIL_MUMMIFY  25
 #define ABIL_REGENERATE  27
-#define ABIL_SUMMON_THUG  28
+// #define ABIL_SUMMON_THUG  28
 #define ABIL_SNEAK  29
 #define ABIL_SOLAR_POWER  30
 #define ABIL_SOULSIGHT  31
-#define ABIL_SUMMON_ANIMALS  34
-#define ABIL_SUMMON_HUMANS  35
+// #define ABIL_SUMMON_ANIMALS  34
+// #define ABIL_SUMMON_HUMANS  35
 #define ABIL_HEARTSTOP  36
 #define ABIL_TASTE_BLOOD  37
 #define ABIL_BLOOD_FORTITUDE  38
@@ -164,7 +164,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_LIGHTNINGBOLT  118
 #define ABIL_COUNTERSPELL  120
 #define ABIL_ENTANGLE  121
-#define ABIL_FAMILIAR  122
+// #define ABIL_FAMILIAR  122
 #define ABIL_SKYBRAND  125
 #define ABIL_CHANT_OF_NATURE  126
 // formerly: #define ABIL_REWARD  127
@@ -175,7 +175,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 // formerly: #define ABIL_COMMERCE  134
 // formerly: #define ABIL_PROMINENCE  135
 #define ABIL_INSPIRE  136
-#define ABIL_SUMMON_BODYGUARD  138
+// #define ABIL_SUMMON_BODYGUARD  138
 // formerly: #define ABIL_BARDE  139
 // formerly: #define ABIL_CITY_LIGHTS  140
 #define ABIL_STEAL  143
@@ -189,8 +189,8 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 // #define ABIL_BAT_FORM  162
 #define ABIL_RITUAL_OF_BURDENS  163
 #define ABIL_MANASHIELD  165
-#define ABIL_SUMMON_SWIFT  168
-#define ABIL_SUMMON_MATERIALS  169
+// #define ABIL_SUMMON_SWIFT  168
+// #define ABIL_SUMMON_MATERIALS  169
 #define ABIL_STAFF_MASTERY  171
 #define ABIL_SIEGE_RITUAL  172
 #define ABIL_COLORBURST  173
@@ -237,18 +237,18 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_ANCESTRAL_HEALING  239
 #define ABIL_CONFER  240
 #define ABIL_EXARCH_CRAFTS  248
-#define ABIL_GRIFFIN  250
-#define ABIL_DIRE_WOLF  251
-#define ABIL_MOON_RABBIT  252
-#define ABIL_SPIRIT_WOLF  253
-#define ABIL_MANTICORE  254
-#define ABIL_PHOENIX  255
-#define ABIL_SCORPION_SHADOW  256
-#define ABIL_OWL_SHADOW  257
-#define ABIL_BASILISK  258
-#define ABIL_SALAMANDER  259
-#define ABIL_SKELETAL_HULK  260
-#define ABIL_BANSHEE  261
+// #define ABIL_GRIFFIN  250
+// #define ABIL_DIRE_WOLF  251
+// #define ABIL_MOON_RABBIT  252
+// #define ABIL_SPIRIT_WOLF  253
+// #define ABIL_MANTICORE  254
+// #define ABIL_PHOENIX  255
+// #define ABIL_SCORPION_SHADOW  256
+// #define ABIL_OWL_SHADOW  257
+// #define ABIL_BASILISK  258
+// #define ABIL_SALAMANDER  259
+// #define ABIL_SKELETAL_HULK  260
+// #define ABIL_BANSHEE  261
 #define ABIL_HONE  262
 #define ABIL_CHANT_OF_ILLUSIONS  265
 // #define ABIL_ASTRAL_WEREWOLF_FORM  267

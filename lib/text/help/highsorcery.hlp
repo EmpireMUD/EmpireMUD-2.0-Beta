@@ -582,10 +582,10 @@ Gains experience when you attempt to summon a swift mount.
 
 Types of swift mounts:
   stag - a magnificent white deer
-  deinonychus - a feathered reptile with fearsome talons (requires 51)
-  serpent - a long, gigantic snake (requires 51)
-  liger - a massive striped cat (requires 76)
-  bear - a huge bear with golden fur (requires 76)
+  deinonychus - a feathered reptile with fearsome talons (requires 75 Sorcery)
+  serpent - a long, gigantic snake (requires 75 High Sorcery)
+  liger - a massive striped cat (requires 100 High Sorcery)
+  bear - a huge bear with golden fur (requires 100 High Sorcery)
 #
 SUNSHOCK "SUN SHOCK"
 

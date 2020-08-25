@@ -949,6 +949,7 @@ age            BOTH    NUMBER       Player age (and creation time)
 bonustrait     PC      MISC         Set bonus traits for player
 bonusexp       PC      NUMBER       Set daily bonus exp for the player
 coins          PC      MISC         Sets coins on-hand for player
+companion      PC      MISC         Sets a companion NPC on/off
 currency       PC      MISC         Sets amounts of adventure currencies
 dailyquestscompleted  PC  NUMBER    Number of dailies they have completed today
 faction        PC      MISC         Change faction reputations (SET FACTION)
@@ -1002,6 +1003,16 @@ scale          NPC     NUMBER       Rescales a mob to a given level
 
 See also: ACCESS LEVEL, GRANT, STAT
 #d
+"SET COMPANION"
+
+Usage:  set [file] <player> companion <mob vnum> <on | off>
+
+This lets you give (or revoke) companion NPCs.
+
+WARNING: This works on ANY mob vnum.
+
+See also: COMPANION, SHOW COMPANIONS
+#d
 "SET CURRENCY" "SET CURRENCIES"
 
 Usage:  set [file] <player> currency <vnum> <amount>
@@ -1035,7 +1046,7 @@ See also: LEARN, LEARNED, SHOW LEARNED
 
 Usage:  set [file] <player> minipet <mob vnum> <on | off>
 
-This lets you give (or revoke) collectable mini-pets.
+This lets you give (or revoke) collectible mini-pets.
 
 WARNING: This works on ANY mob vnum.
 
@@ -1064,6 +1075,7 @@ Mode       Level    Description
 stats      God      Shows game stats including prototypes.
 ammotypes  Immort   Shows the 'ammo type' setting for all bows and ammo.
 buildings  Immort   Shows occurrences of buildings (vnum/name optional).
+companions Immort   Shows a player's available companions.
 components Immort   Shows all items matching a generic component vnum.
 crops      Immort   Shows tile counts for all the crops (vnum/name optional).
 currency   Immort   Shows coins and adventure currencies for a player.
@@ -1120,6 +1132,14 @@ Usage:  show ammotypes
 
 Lists all bows and ammo by ammotype. Useful for figuring out what ammotype
 to use for a new weapon/ammo.
+#e
+"SHOW COMPANIONS"
+
+Usage:  show companions <player> [search phrase]
+
+Lists the companions a player has available.
+
+See also: COMPANIONS
 #e
 "SHOW COMPONENTS"
 

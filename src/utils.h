@@ -138,7 +138,7 @@
 #define ABIL_IS_CLASS(abil)  ((abil)->is_class)
 #define ABIL_IS_PURCHASE(abil)  (ABIL_ASSIGNED_SKILL(abil) != NULL)
 #define ABIL_IS_SYNERGY(abil)  ((abil)->is_synergy)
-#define SAFE_ABIL_COMMAND(abil)  (ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "something")
+#define SAFE_ABIL_COMMAND(abil)  (ABIL_COMMAND(abil) ? ABIL_COMMAND(abil) : "the ability")
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -370,6 +370,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define FIGHTING(ch)  ((ch)->char_specials.fighting.victim)
 #define FIGHT_MODE(ch)  ((ch)->char_specials.fighting.mode)
 #define FIGHT_WAIT(ch)  ((ch)->char_specials.fighting.wait)
+#define GET_COMPANION(ch)  ((ch)->char_specials.companion)
 #define GET_DRIVING(ch)  ((ch)->char_specials.driving)
 #define GET_EMPIRE_NPC_DATA(ch)  ((ch)->char_specials.empire_npc)
 #define GET_FED_ON_BY(ch)  ((ch)->char_specials.fed_on_by)
@@ -1126,6 +1127,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_CLASS_PROGRESSION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->class_progression))
 #define GET_CLASS_ROLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->class_role))
 #define GET_COMBAT_METERS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->meters))
+#define GET_COMPANIONS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->companions))
 #define GET_COMPLETED_QUESTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->completed_quests))
 #define GET_COMPUTED_LEVEL(ch)  (GET_SKILL_LEVEL(ch) + GET_GEAR_LEVEL(ch))
 #define GET_COND(ch, i)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->conditions[(i)]))
@@ -1156,6 +1158,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_INVIS_LEV(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->invis_level))
 #define GET_LARGEST_INVENTORY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->largest_inventory))
 #define GET_LASTNAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->lastname))
+#define GET_LAST_COMPANION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_companion))
 #define GET_LAST_CORPSE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_corpse_id))
 #define GET_LAST_DEATH_TIME(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_death_time))
 #define GET_LAST_GOAL_CHECK(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_goal_check))
