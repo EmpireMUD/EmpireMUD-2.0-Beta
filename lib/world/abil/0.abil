@@ -304,17 +304,23 @@ D 8 537 0
 D 8 538 0
 D 8 539 0
 M
+13
+You whistle a melodic little tune into the air...~
+M
+14
+$n whistles a melodic little tune into the air...~
+M
 2
-You let out a melodic whistle and $N arrives immediately!~
+$N arrives suddenly!~
 M
 4
-$n lets out a melodic whistle and $N arrives immediately!~
+$N arrives suddenly!~
 M
 8
-You let out a melodic whistle... but nobody arrives.~
+Nobody seems to respond.~
 M
 9
-$n lets out a melodic whistle.~
+Nothing seems to happen.~
 T j 0
 S
 #35
@@ -327,17 +333,23 @@ D 8 9030 0
 D 8 9031 0
 D 8 9032 0
 M
-2
-You focus your supernatural pheromones into a single drop of blood and $N arrives before the drop hits the ground.~
+13
+You focus your supernatural pheromones into a single drop of blood and let it fall to the ground...~
 M
-4
-$N walks up.~
+14
+$n drips blood on the ground...~
+M
+2
+$N arrives.~
 M
 8
-You focus your supernatural pheromones into a single drop of blood, but it fails to summon anybody.~
+Nobody seems to respond.~
 M
 9
-$n drips blood on the ground.~
+Nothing seems to happen.~
+M
+4
+$N arrives.~
 T j 0
 S
 #36
