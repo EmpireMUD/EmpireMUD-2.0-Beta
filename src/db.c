@@ -2962,7 +2962,8 @@ void b5_23_potion_update(void) {
 				if (GET_OBJ_STORAGE(proto)) {
 					// move to regular einv if now possible
 					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount);
-					remove_eus_entry(eus, emp);
+					LL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
+					free(eus);
 				}
 				else {	// otherwise replace with a fresh copy
 					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
@@ -3045,7 +3046,8 @@ void b5_24_poison_update(void) {
 				if (GET_OBJ_STORAGE(proto)) {
 					// move to regular einv if now possible
 					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount);
-					remove_eus_entry(eus, emp);
+					LL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
+					free(eus);
 				}
 				else {	// otherwise replace with a fresh copy
 					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));

@@ -5085,7 +5085,12 @@ room_data *find_home(char_data *ch) {
 
 ACMD(do_home) {
 	void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
+	void warehouse_inventory(char_data *ch, char *argument, int mode);
+	void warehouse_identify(char_data *ch, char *argument, int mode);
+	void warehouse_retrieve(char_data *ch, char *argument, int mode);
+	void warehouse_store(char_data *ch, char *argument, int mode);
 	
+	char command[MAX_INPUT_LENGTH];
 	struct empire_territory_data *ter;
 	room_data *iter, *next_iter, *home = NULL, *real = HOME_ROOM(IN_ROOM(ch));
 	empire_data *emp = GET_LOYALTY(ch);
@@ -5095,10 +5100,11 @@ ACMD(do_home) {
 		return;
 	}
 	
-	skip_spaces(&argument);
+	argument = any_one_arg(argument, command);
 	home = find_home(ch);
 	
-	if (!*argument) {
+	if (!*command) {
+		msg_to_char(ch, "Options: set, unset, inventory, identify, retrieve, store, clear\r\n");
 		if (!home) {
 			msg_to_char(ch, "You have no home set.\r\n");
 		}
@@ -5110,7 +5116,7 @@ ACMD(do_home) {
 			msg_to_char(ch, "Use 'home set' to claim this room.\r\n");
 		}
 	}
-	else if (!str_cmp(argument, "set")) {
+	else if (!str_cmp(command, "set")) {
 		if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
 			msg_to_char(ch, "You can't home-set while adventure-summoned.\r\n");
 		}
@@ -5181,11 +5187,14 @@ ACMD(do_home) {
 				}
 			}
 			
+			GET_LAST_HOME_SET_TIME(ch) = time(0);
+			queue_delayed_update(ch, CDU_SAVE);
+			
 			log_to_empire(emp, ELOG_TERRITORY, "%s has made (%d, %d) %s home", PERS(ch, ch, 1), X_COORD(real), Y_COORD(real), REAL_HSHR(ch));
 			msg_to_char(ch, "You make this your home.\r\n");
 		}
 	}
-	else if (!str_cmp(argument, "clear")) {
+	else if (!str_cmp(command, "clear")) {
 		if (ROOM_PRIVATE_OWNER(IN_ROOM(ch)) == NOBODY) {
 			msg_to_char(ch, "This isn't anybody's home.\r\n");
 		}
@@ -5203,12 +5212,28 @@ ACMD(do_home) {
 			msg_to_char(ch, "This home's private owner has been cleared.\r\n");
 		}
 	}
-	else if (!str_cmp(argument, "unset")) {
+	else if (!str_cmp(command, "unset")) {
 		clear_private_owner(GET_IDNUM(ch));
 		msg_to_char(ch, "Your home has been unset.\r\n");
 	}
+	else if (is_abbrev(command, "inventory")) {
+		warehouse_inventory(ch, argument, SCMD_HOME);
+	}
+	// all other commands require awakeness
+	else if (GET_POS(ch) < POS_RESTING || FIGHTING(ch)) {
+		msg_to_char(ch, "You can't do that right now.\r\n");
+	}
+	else if (is_abbrev(command, "identify")) {
+		warehouse_identify(ch, argument, SCMD_HOME);
+	}
+	else if (is_abbrev(command, "retrieve")) {
+		warehouse_retrieve(ch, argument, SCMD_HOME);
+	}
+	else if (is_abbrev(command, "store")) {
+		warehouse_store(ch, argument, SCMD_HOME);
+	}
 	else {
-		msg_to_char(ch, "Usage: home [set | unset | clear]\r\n");
+		msg_to_char(ch, "Usage: home [set | unset | clear | inventory | retrieve | store]\r\n");
 	}
 }
 

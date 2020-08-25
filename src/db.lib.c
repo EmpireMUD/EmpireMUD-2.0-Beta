@@ -1976,6 +1976,7 @@ void free_empire(empire_data *emp) {
 		if (eus->obj) {
 			extract_obj(eus->obj);
 		}
+		free(eus);
 	}
 	EMPIRE_UNIQUE_STORAGE(emp) = NULL;
 	

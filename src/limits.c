@@ -1543,7 +1543,7 @@ bool check_autostore(obj_data *obj, bool force) {
 		}
 		else if (unique) {
 			// this extracts it itself
-			store_unique_item(NULL, obj, emp, real_loc, &full);
+			store_unique_item(NULL, &EMPIRE_UNIQUE_STORAGE(emp), obj, emp, real_loc, &full);
 			return FALSE;
 		}
 		else if (OBJ_CAN_STORE(obj)) {

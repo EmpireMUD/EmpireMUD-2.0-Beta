@@ -4129,6 +4129,8 @@ struct player_special_data {
 	struct minipet_data *minipets;	// collection of summonable pets
 	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
 	struct player_tech *techs;	// techs from abilities
+	struct empire_unique_storage *home_storage;	// items stored in the home
+	time_t last_home_set_time;	// how long ago the player used home-set (blocks home retrieve)
 	
 	// tracking for specific skills
 	byte confused_dir;  // people without Navigation think this dir is north

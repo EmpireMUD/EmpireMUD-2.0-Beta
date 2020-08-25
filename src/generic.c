@@ -1029,8 +1029,19 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			if (cur->vnum == vnum) {
 				HASH_DEL(GET_CURRENCIES(chiter), cur);
 				free(cur);
+				queue_delayed_update(chiter, CDU_SAVE);
 			}
 		}
+		LL_FOREACH(GET_HOME_STORAGE(chiter), eus) {
+			if (!eus->obj) {
+				continue;
+			}
+			if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(eus->obj) && GET_DRINK_CONTAINER_TYPE(eus->obj) == vnum) {
+				GET_OBJ_VAL(eus->obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+				queue_delayed_update(chiter, CDU_SAVE);
+			}
+		}
+	
 	}
 	
 	// remove from live lists: drink containers

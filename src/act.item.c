@@ -3919,21 +3919,24 @@ void trade_post(char_data *ch, char *argument) {
 
 /**
 * Sub-processor for do_warehouse: inventory.
+* This also handles home storage.
 *
 * @param char_data *ch The player.
 * @param char *argument The rest of the argument after "list"
+* @param int mode SCMD_WAREHOUSE or SCMD_HOME
 */
-void warehouse_inventory(char_data *ch, char *argument) {
+void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	extern const char *unique_storage_flags[];
 
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*4], line[MAX_STRING_LENGTH], part[256], flags[256], quantity[256], level[256], objflags[256], *tmp;
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
+	bool home_mode = (mode == SCMD_HOME);
 	struct empire_unique_storage *iter;
 	empire_data *emp = GET_LOYALTY(ch);
 	int island = GET_ISLAND_ID(IN_ROOM(ch));
 	int num, size;
 	
-	if (imm_access) {
+	if (mode == SCMD_WAREHOUSE && imm_access) {
 		// if first word is 
 		tmp = any_one_word(argument, arg);
 		if (*arg && (emp = get_empire_by_name(arg))) {
@@ -3946,7 +3949,7 @@ void warehouse_inventory(char_data *ch, char *argument) {
 		}
 	}
 	
-	if (!emp) {
+	if (!emp && !home_mode) {
 		msg_to_char(ch, "You must be in an empire to do that.\r\n");
 		return;
 	}
@@ -3958,11 +3961,16 @@ void warehouse_inventory(char_data *ch, char *argument) {
 		snprintf(part, sizeof(part), "Unique");
 	}
 	
-	size = snprintf(output, sizeof(output), "%s items stored in %s%s&0:\r\n", part, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	if (home_mode) {
+		size = snprintf(output, sizeof(output), "%s items stored in your home:\r\n", part);
+	}
+	else {
+		size = snprintf(output, sizeof(output), "%s items stored in %s%s&0:\r\n", part, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+	}
 	num = 0;
 	
-	for (iter = EMPIRE_UNIQUE_STORAGE(emp); iter; iter = iter->next) {
-		if (!imm_access && iter->island != island) {
+	LL_FOREACH((home_mode ? GET_HOME_STORAGE(ch) : EMPIRE_UNIQUE_STORAGE(emp)), iter) {
+		if (!home_mode && !imm_access && iter->island != island) {
 			continue;
 		}
 		if (*argument && !multi_isname(argument, GET_OBJ_KEYWORDS(iter->obj))) {
@@ -4021,15 +4029,18 @@ void warehouse_inventory(char_data *ch, char *argument) {
 
 /**
 * Sub-processor for do_warehouse: identify.
+* This also handles home storage.
 *
 * @param char_data *ch The player.
 * @param char *argument The rest of the argument after "identify"
+* @param int mode SCMD_WAREHOUSE or SCMD_HOME
 */
-void warehouse_identify(char_data *ch, char *argument) {
+void warehouse_identify(char_data *ch, char *argument, int mode) {
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch));
 	struct empire_unique_storage *iter, *next_iter;
 	int island = GET_ISLAND_ID(IN_ROOM(ch));
+	bool home_mode = (mode == SCMD_HOME);
 	int number;
 	
 	if (!*argument) {
@@ -4038,19 +4049,19 @@ void warehouse_identify(char_data *ch, char *argument) {
 	}
 	
 	// access permission
-	if (!imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+	if (!home_mode && !imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 		return;
 	}
-	if (!imm_access && !IS_COMPLETE(IN_ROOM(ch))) {
+	if (!home_mode && !imm_access && !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "Complete the building first.\r\n");
 		return;
 	}
-	if (!imm_access && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && GET_LOYALTY(ch) != room_emp && !has_relationship(GET_LOYALTY(ch), room_emp, DIPL_TRADE)))) {
+	if (!home_mode && !imm_access && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && GET_LOYALTY(ch) != room_emp && !has_relationship(GET_LOYALTY(ch), room_emp, DIPL_TRADE)))) {
 		msg_to_char(ch, "You don't have permission to do that here.\r\n");
 		return;
 	}
-	if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+	if (!home_mode && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This building must be in a city to use it for that.\r\n");
 		return;
 	}
@@ -4069,10 +4080,8 @@ void warehouse_identify(char_data *ch, char *argument) {
 	}
 	
 	// ok, find it
-	for (iter = EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch)); iter; iter = next_iter) {
-		next_iter = iter->next;
-		
-		if (!imm_access && iter->island != island) {
+	LL_FOREACH_SAFE((home_mode ? GET_HOME_STORAGE(ch) : EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch))), iter, next_iter) {
+		if (!home_mode && !imm_access && iter->island != island) {
 			continue;
 		}
 		if (!multi_isname(argument, GET_OBJ_KEYWORDS(iter->obj))) {
@@ -4096,15 +4105,18 @@ void warehouse_identify(char_data *ch, char *argument) {
 
 /**
 * Sub-processor for do_warehouse: retrieve.
+* This also handles home storage.
 *
 * @param char_data *ch The player.
 * @param char *argument The rest of the argument after "retrieve"
+* @param int mode SCMD_WAREHOUSE or SCMD_HOME
 */
-void warehouse_retrieve(char_data *ch, char *argument) {
+void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch));
 	struct empire_unique_storage *iter, *next_iter;
 	int island = GET_ISLAND_ID(IN_ROOM(ch));
+	bool home_mode = (mode == SCMD_HOME);
 	char junk[MAX_INPUT_LENGTH], *tmp;
 	obj_data *obj = NULL;
 	int number, amt = 1;
@@ -4115,30 +4127,43 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		return;
 	}
 	
-	// access permission
-	if (!imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
-		msg_to_char(ch, "You can't do that here.\r\n");
-		return;
+	// check location/access
+	if (home_mode) {
+		if (!imm_access && ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) != GET_IDNUM(ch)) {
+			msg_to_char(ch, "You can only do this in your own private home.\r\n");
+			return;
+		}
+		if (!imm_access && time(0) - GET_LAST_HOME_SET_TIME(ch) < SECS_PER_REAL_HOUR) {
+			msg_to_char(ch, "You must wait a full hour before retrieving after setting your home -- your items are being moved.\r\n");
+			return;
+		}
 	}
-	if (!imm_access && !IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "Complete the building first.\r\n");
-		return;
-	}
-	if (!imm_access && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && GET_LOYALTY(ch) != room_emp && !has_relationship(GET_LOYALTY(ch), room_emp, DIPL_TRADE)))) {
-		msg_to_char(ch, "You don't have permission to do that here.\r\n");
-		return;
-	}
-	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
-		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
-		return;
-	}
-	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE, IN_ROOM(ch))) {
-		msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
-		return;
-	}
-	if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This building must be in a city to use it for that.\r\n");
-		return;
+	else {	// warehouse mode
+		// access permission
+		if (!imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+			msg_to_char(ch, "You can't do that here.\r\n");
+			return;
+		}
+		if (!imm_access && !IS_COMPLETE(IN_ROOM(ch))) {
+			msg_to_char(ch, "Complete the building first.\r\n");
+			return;
+		}
+		if (!imm_access && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && GET_LOYALTY(ch) != room_emp && !has_relationship(GET_LOYALTY(ch), room_emp, DIPL_TRADE)))) {
+			msg_to_char(ch, "You don't have permission to do that here.\r\n");
+			return;
+		}
+		if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
+			msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
+			return;
+		}
+		if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE, IN_ROOM(ch))) {
+			msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
+			return;
+		}
+		if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+			msg_to_char(ch, "This building must be in a city to use it for that.\r\n");
+			return;
+		}
 	}
 	
 	// detect leading number (amount to retrieve) with a space
@@ -4178,10 +4203,10 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 	}
 	
 	// ok, find it
-	for (iter = EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch)); iter && !done; iter = next_iter) {
+	for (iter = (home_mode ? GET_HOME_STORAGE(ch) : EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch))); iter && !done; iter = next_iter) {
 		next_iter = iter->next;
 		
-		if (!imm_access && iter->island != island) {
+		if (!home_mode && !imm_access && iter->island != island) {
 			continue;
 		}
 		if (!multi_isname(argument, GET_OBJ_KEYWORDS(iter->obj))) {
@@ -4230,7 +4255,14 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 		
 		// remove the entry
 		if (iter->amount <= 0 || !iter->obj) {
-			remove_eus_entry(iter, GET_LOYALTY(ch));
+			if (home_mode) {
+				LL_DELETE(GET_HOME_STORAGE(ch), iter);
+			}
+			else {
+				LL_DELETE(EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch)), iter);
+				EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
+			}
+		    free(iter);
 		}
 		
 		// only ever retrieve entry of thing, unless they used an all, unless unless they requested as specific one.
@@ -4244,20 +4276,22 @@ void warehouse_retrieve(char_data *ch, char *argument) {
 	}
 	else {
 		queue_delayed_update(ch, CDU_SAVE);
-		EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
 	}
 }
 
 
 /**
 * Sub-processor for do_warehouse: store.
+* This also handles home storage.
 *
 * @param char_data *ch The player.
 * @param char *argument The rest of the argument after "store"
+* @param int mode SCMD_WAREHOUSE or SCMD_HOME
 */
-void warehouse_store(char_data *ch, char *argument) {
+void warehouse_store(char_data *ch, char *argument, int mode) {
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
-	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch));
+	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch)), *use_emp = NULL;
+	bool home_mode = (mode == SCMD_HOME);
 	char numarg[MAX_INPUT_LENGTH], *tmp;
 	obj_data *obj, *next_obj;
 	int total = 1, done = 0, dotmode;
@@ -4268,26 +4302,36 @@ void warehouse_store(char_data *ch, char *argument) {
 		return;
 	}
 	
-	// access permission
-	if (!imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
-		msg_to_char(ch, "You can't do that here.\r\n");
-		return;
+	// check location/access
+	if (home_mode) {
+		use_emp = NULL;
+		if (!imm_access && ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) != GET_IDNUM(ch)) {
+			msg_to_char(ch, "You can only do this in your own private home.\r\n");
+			return;
+		}
 	}
-	if (!imm_access && !IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "Complete the building first.\r\n");
-		return;
-	}
-	if (!imm_access && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && GET_LOYALTY(ch) != room_emp && !has_relationship(GET_LOYALTY(ch), room_emp, DIPL_TRADE)))) {
-		msg_to_char(ch, "You don't have permission to do that here.\r\n");
-		return;
-	}
-	if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
-		msg_to_char(ch, "You don't have permission to store items here.\r\n");
-		return;
-	}
-	if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This building must be in a city to use it for that.\r\n");
-		return;
+	else {	// warehouse mode
+		use_emp = GET_LOYALTY(ch);
+		if (!imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+			msg_to_char(ch, "You can't do that here.\r\n");
+			return;
+		}
+		if (!imm_access && !IS_COMPLETE(IN_ROOM(ch))) {
+			msg_to_char(ch, "Complete the building first.\r\n");
+			return;
+		}
+		if (!imm_access && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && use_emp != room_emp && !has_relationship(use_emp, room_emp, DIPL_TRADE)))) {
+			msg_to_char(ch, "You don't have permission to do that here.\r\n");
+			return;
+		}
+		if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
+			msg_to_char(ch, "You don't have permission to store items here.\r\n");
+			return;
+		}
+		if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+			msg_to_char(ch, "This building must be in a city to use it for that.\r\n");
+			return;
+		}
 	}
 	
 	// possible #
@@ -4326,7 +4370,7 @@ void warehouse_store(char_data *ch, char *argument) {
 			// bound objects never store, nor can torches
 			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && UNIQUE_OBJ_CAN_STORE(obj)) {
 				// may extract obj
-				store_unique_item(ch, obj, GET_LOYALTY(ch), IN_ROOM(ch), &full);
+				store_unique_item(ch, (home_mode ? &GET_HOME_STORAGE(ch) : &EMPIRE_UNIQUE_STORAGE(use_emp)), obj, use_emp, home_mode ? NULL : IN_ROOM(ch), &full);
 				if (!full) {
 					++done;
 				}
@@ -4357,7 +4401,7 @@ void warehouse_store(char_data *ch, char *argument) {
 			// bound objects never store
 			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj)) {
 				// may extract obj
-				store_unique_item(ch, obj, GET_LOYALTY(ch), IN_ROOM(ch), &full);
+				store_unique_item(ch, (home_mode ? &GET_HOME_STORAGE(ch) : &EMPIRE_UNIQUE_STORAGE(use_emp)), obj, use_emp, home_mode ? NULL : IN_ROOM(ch), &full);
 				if (!full) {
 					++done;
 				}
@@ -4376,7 +4420,9 @@ void warehouse_store(char_data *ch, char *argument) {
 
 	if (done) {
 		queue_delayed_update(ch, CDU_SAVE);
-		EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
+		if (use_emp) {
+			EMPIRE_NEEDS_STORAGE_SAVE(use_emp) = TRUE;
+		}
 	}
 }
 
@@ -7227,20 +7273,20 @@ ACMD(do_warehouse) {
 		msg_to_char(ch, "You can only do that if you're in an empire.\r\n");
 	}
 	else if (is_abbrev(command, "inventory")) {
-		warehouse_inventory(ch, argument);
+		warehouse_inventory(ch, argument, SCMD_WAREHOUSE);
 	}
 	// all other commands require awakeness
 	else if (GET_POS(ch) < POS_RESTING || FIGHTING(ch)) {
 		msg_to_char(ch, "You can't do that right now.\r\n");
 	}
 	else if (is_abbrev(command, "identify")) {
-		warehouse_identify(ch, argument);
+		warehouse_identify(ch, argument, SCMD_WAREHOUSE);
 	}
 	else if (is_abbrev(command, "retrieve")) {
-		warehouse_retrieve(ch, argument);
+		warehouse_retrieve(ch, argument, SCMD_WAREHOUSE);
 	}
 	else if (is_abbrev(command, "store")) {
-		warehouse_store(ch, argument);
+		warehouse_store(ch, argument, SCMD_WAREHOUSE);
 	}
 	else {
 		msg_to_char(ch, "Options: inventory, identify, retrieve, store\r\n");

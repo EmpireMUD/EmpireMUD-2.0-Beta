@@ -8900,67 +8900,33 @@ bool stored_item_requires_withdraw(obj_data *obj) {
  //////////////////////////////////////////////////////////////////////////////
 //// UNIQUE STORAGE HANDLERS /////////////////////////////////////////////////
 
-
 /**
-* Adds a unique storage entry to an empire and to the global list.
-*
-* @param struct empire_unique_storage *eus The item to add.
-* @param empire_data *emp The empire to add storage to.
-*/
-void add_eus_entry(struct empire_unique_storage *eus, empire_data *emp) {
-	struct empire_unique_storage *temp;
-	
-	if (!eus || !emp) {
-		return;
-	}
-	
-	eus->next = NULL;
-	
-	if ((temp = EMPIRE_UNIQUE_STORAGE(emp))) {
-		while (temp->next) {
-			temp = temp->next;
-		}
-		temp->next = eus;
-	}
-	else {
-		EMPIRE_UNIQUE_STORAGE(emp) = eus;
-	}
-	
-	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-}
-
-
-/**
-* Remove items from the empire's storage list by vnum (e.g. if the item was
+* Remove items from the unique item storage list by vnum (e.g. if the item was
 * deleted).
 *
-* @param empire_data *emp The empire to check.
+* @param struct empire_unique_storage **list A pointer to the list to remove it from.
 * @param obj_vnum vnum The object vnum to remove.
 * @return bool TRUE if at least 1 was deleted.
 */
-bool delete_unique_storage_by_vnum(empire_data *emp, obj_vnum vnum) {
+bool delete_unique_storage_by_vnum(struct empire_unique_storage **list, obj_vnum vnum) {
 	struct empire_unique_storage *iter, *next_iter;
 	bool any = FALSE;
 	
-	if (!emp) {
+	if (!list) {
 		return FALSE;
 	}
 	
-	for (iter = EMPIRE_UNIQUE_STORAGE(emp); iter; iter = next_iter) {
-		next_iter = iter->next;
-		
+	LL_FOREACH_SAFE(*list, iter, next_iter) {
 		if (iter->obj && GET_OBJ_VNUM(iter->obj) == vnum) {
 			add_to_object_list(iter->obj);
 			extract_obj(iter->obj);
 			iter->obj = NULL;
-			remove_eus_entry(iter, emp);
+			LL_DELETE(*list, iter);
+			free(iter);
 			any = TRUE;
 		}
 	}
 	
-	if (any) {
-		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-	}
 	return any;
 }
 
@@ -8969,25 +8935,25 @@ bool delete_unique_storage_by_vnum(empire_data *emp, obj_vnum vnum) {
 * Find a matching entry for an object in unique storage.
 *
 * @param obj_data *obj The item to find a matching entry for.
-* @param empire_data *emp The empire to search.
+* @param struct empire_unique_storage **list The unique storage list to search
 * @param room_data *location The room to find matching storage for (optional).
 * @return struct empire_unique_storage* The storage entry, if it exists (or NULL).
 */
-struct empire_unique_storage *find_eus_entry(obj_data *obj, empire_data *emp, room_data *location) {
+struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique_storage *list, room_data *location) {
 	struct empire_unique_storage *iter;
 	
-	if (!emp || !obj) {
+	if (!obj) {
 		return NULL;
 	}
 	
-	for (iter = EMPIRE_UNIQUE_STORAGE(emp); iter; iter = iter->next) {
+	LL_FOREACH(list, iter) {
 		if (location && GET_ISLAND_ID(location) != iter->island) {
 			continue;
 		}
-		if (location && room_has_function_and_city_ok(location, FNC_VAULT) && !IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && !IS_SET(iter->flags, EUS_VAULT) && room_has_function_and_city_ok(location, FNC_VAULT)) {
 			continue;
 		}
-		if (location && !room_has_function_and_city_ok(location, FNC_VAULT) && IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && IS_SET(iter->flags, EUS_VAULT) && !room_has_function_and_city_ok(location, FNC_VAULT)) {
 			continue;
 		}
 		
@@ -9001,35 +8967,18 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, empire_data *emp, ro
 
 
 /**
-* Removes a unique object entry from a local list and from the global list.
-*
-* @param struct empire_unique_storage *eus The item to remove.
-* @param empire_data *emp The empire to remove from.
-*/
-void remove_eus_entry(struct empire_unique_storage *eus, empire_data *emp) {
-	struct empire_unique_storage *temp;
-	
-	if (!eus || !emp) {
-		return;
-	}
-	
-	REMOVE_FROM_LIST(eus, EMPIRE_UNIQUE_STORAGE(emp), next);
-	
-	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-	free(eus);
-}
-
-
-/**
-* Store a unique item to an empire. The object MAY be extracted.
+* Store a unique item to an empire. The object MAY be extracted. If save_emp
+* is NULL, it assumes you're saving character home storage instead of empire
+* warehouse storage.
 *
 * @param char_data *ch Person doing the storing (may be NULL; sends messages if not).
+* @param struct empire_unique_storage **to_list Where to store it to (empire or home storage).
 * @param obj_data *obj The unique item to store.
-* @param empire_data *emp The empire to store to.
-* @param room_data *room The location being store (for vault flag detection).
+* @param empire_data *save_emp The empire to save, if this is empire storage. If NULL, assumes home storage.
+* @param room_data *room The location being stored (for vault flag detection).
 * @param bool *full A variable to set TRUE if the storage is full and the item can't be stored.
 */
-void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data *room, bool *full) {
+void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, obj_data *obj, empire_data *save_emp, room_data *room, bool *full) {
 	extern int get_main_island(empire_data *emp);
 	
 	struct empire_unique_storage *eus;
@@ -9037,7 +8986,7 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 	
 	*full = FALSE;
 	
-	if (!obj || !emp) {
+	if (!obj || !to_list) {
 		return;
 	}
 	
@@ -9051,8 +9000,9 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 	}
-
-	if ((eus = find_eus_entry(obj, emp, room))) {
+	
+	// existing eus entry or new one? only passes 'room' if it's an empire; player storage is global
+	if ((eus = find_eus_entry(obj, *to_list, save_emp ? room : NULL))) {
 		// check limits
 		if (eus->amount >= MAX_STORAGE) {
 			*full = TRUE;
@@ -9066,15 +9016,15 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 	else {
 		// new entry
 		CREATE(eus, struct empire_unique_storage, 1);
-		add_eus_entry(eus, emp);
+		LL_PREPEND(*to_list, eus);
 		check_obj_in_void(obj);
 		eus->obj = obj;
 		eus->amount = 1;
-		eus->island = room ? GET_ISLAND_ID(room) : NO_ISLAND;
-		if (eus->island == NO_ISLAND) {
-			eus->island = get_main_island(emp);
+		eus->island = (save_emp && room) ? GET_ISLAND_ID(room) : NO_ISLAND;
+		if (save_emp && eus->island == NO_ISLAND) {
+			eus->island = get_main_island(save_emp);
 		}
-		if (room && room_has_function_and_city_ok(room, FNC_VAULT)) {
+		if (save_emp && room && room_has_function_and_city_ok(room, FNC_VAULT)) {
 			eus->flags = EUS_VAULT;
 		}
 			
@@ -9085,13 +9035,16 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 	if (ch) {
 		act("You store $p.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		act("$n stores $p.", FALSE, ch, obj, NULL, TO_ROOM | TO_QUEUE);
+		queue_delayed_update(ch, CDU_SAVE);
 	}
 	
 	if (extract) {
 		extract_obj(obj);
 	}
 	
-	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	if (save_emp) {
+		EMPIRE_NEEDS_STORAGE_SAVE(save_emp) = TRUE;
+	}
 }
 
 

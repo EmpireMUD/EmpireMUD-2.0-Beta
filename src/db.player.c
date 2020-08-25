@@ -802,6 +802,7 @@ void free_char(char_data *ch) {
 	struct ability_gain_hook *hook, *next_hook;
 	struct mount_data *mount, *next_mount;
 	struct channel_history_data *history, *next_hist;
+	struct empire_unique_storage *eus, *next_eus;
 	struct player_slash_channel *slash;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
@@ -1013,6 +1014,15 @@ void free_char(char_data *ch) {
 			free(ptech);
 		}
 		
+		// free unique storage
+		LL_FOREACH_SAFE(GET_HOME_STORAGE(ch), eus, next_eus) {
+			if (eus->obj) {
+				extract_obj(eus->obj);
+			}
+			free(eus);
+		}
+		GET_HOME_STORAGE(ch) = NULL;
+		
 		free_player_completed_quests(&GET_COMPLETED_QUESTS(ch));
 		free_player_quests(GET_QUESTS(ch));
 		
@@ -1146,10 +1156,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
 	
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH], *read;
-	int account_id = NOTHING, ignore_pos = 0;
+	int account_id = NOTHING, ignore_pos = 0, junk;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
 	struct affected_type *af, *next_af, *af_list = NULL;
+	struct empire_unique_storage *eus, *last_eus = NULL;
 	struct player_quest *plrq, *last_plrq = NULL;
 	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
@@ -1210,6 +1221,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	if ((last_plrq = GET_QUESTS(ch))) {
 		while (last_plrq->next) {
 			last_plrq = last_plrq->next;
+		}
+	}
+	if ((last_eus = GET_HOME_STORAGE(ch))) {
+		while (last_eus->next) {
+			last_eus = last_eus->next;
 		}
 	}
 	
@@ -1650,6 +1666,33 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						DL_APPEND(GET_HISTORY(ch, i_in[0]), hist);
 					}
 				}
+				else if (PFILE_TAG(line, "Home Storage:", length)) {
+					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
+					if (!get_line(fl, line) || sscanf(line, "#%d", &i_in[3]) != 1) {
+						log("SYSERR: Invalid Home Storage section of player %s: no obj", name);
+						// possibly just not fatal, if next line gives no problems
+						continue;
+					}
+					
+					obj = Obj_load_from_file(fl, i_in[3], &junk, NULL);
+					if (obj) {
+						remove_from_object_list(obj);	// doesn't really go here right now
+					
+						CREATE(eus, struct empire_unique_storage, 1);
+						eus->island = i_in[0];
+						eus->amount = i_in[1];
+						eus->flags = i_in[2];
+						eus->obj = obj;
+						
+						if (last_eus) {
+							last_eus->next = eus;
+						}
+						else {
+							GET_HOME_STORAGE(ch) = eus;
+						}
+						last_eus = eus;
+					}
+				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
@@ -1722,6 +1765,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "Last Goal Check:", length)) {
 					GET_LAST_GOAL_CHECK(ch) = atol(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Last Home Set:", length)) {
+					GET_LAST_HOME_SET_TIME(ch) = atol(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Last Offense:", length)) {
 					GET_LAST_OFFENSE_SEEN(ch) = atol(line + length + 1);
@@ -2748,6 +2794,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 */
 void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	void Crash_save(obj_data *obj, FILE *fp, int location);
+	void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 	extern struct slash_channel *find_slash_channel_by_id(int id);
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
@@ -2757,6 +2804,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	struct companion_data *compan, *next_compan;
 	struct player_faction_data *pfd, *next_pfd;
 	struct player_event_data *ped, *next_ped;
+	struct empire_unique_storage *eus;
 	struct channel_history_data *hist;
 	struct trig_proto_list *tpro;
 	struct player_eq_set *eq_set;
@@ -2838,10 +2886,20 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 			fprintf(fl, "History: %d %ld\n%s~\n", iter, hist->timestamp, NULLSAFE(hist->message));
 		}
 	}
+	LL_FOREACH(GET_HOME_STORAGE(ch), eus) {
+		if (eus->amount <= 0 || !eus->obj) {
+			continue;	// ??
+		}
+		fprintf(fl, "Home Storage: %d %d %d\n", eus->island, eus->amount, eus->flags);
+		Crash_save_one_obj_to_file(fl, eus->obj, 0);
+	}
 	
 	// 'L'
 	if (GET_LAST_COMPANION(ch) != NOTHING) {
 		fprintf(fl, "Last Companion: %d\n", GET_LAST_COMPANION(ch));
+	}
+	if (GET_LAST_HOME_SET_TIME(ch)) {
+		fprintf(fl, "Last Home Set: %ld\n", GET_LAST_HOME_SET_TIME(ch));
 	}
 	for (lore = GET_LORE(ch); lore; lore = lore->next) {
 		if (lore->text && *lore->text) {

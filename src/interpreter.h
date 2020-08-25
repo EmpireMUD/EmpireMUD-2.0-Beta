@@ -257,6 +257,10 @@ struct alias_data {
 #define TOG_OFFON  1
 #define NUM_TOG_TYPES  2
 
+// do_warehouse
+#define SCMD_WAREHOUSE  0
+#define SCMD_HOME  1
+
 
 // movement flags
 #define MOVE_LEAD  BIT(0)	// leading something
