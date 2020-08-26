@@ -5100,6 +5100,7 @@ ACMD(do_home) {
 	}
 	
 	argument = any_one_arg(argument, command);
+	skip_spaces(&argument);
 	home = find_home(ch);
 	
 	if (!*command) {
