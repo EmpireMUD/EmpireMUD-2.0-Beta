@@ -205,7 +205,7 @@ void display_statistics_to_char(char_data *ch) {
 	msg_to_char(ch, "Unique Creatures: %5d     Total Mobs:         %d\r\n", HASH_COUNT(mobile_table), count);
 
 	// objs
-	LL_COUNT(object_list, obj, count);
+	DL_COUNT(object_list, obj, count);
 	msg_to_char(ch, "Unique Objects:   %5d     Total Objects:      %d\r\n", HASH_COUNT(object_table), count);
 	
 	// vehicles

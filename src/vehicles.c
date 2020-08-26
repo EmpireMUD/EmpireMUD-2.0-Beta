@@ -1961,7 +1961,7 @@ int convert_to_vehicles(void) {
 	int iter, changed = 0;
 	bool found;
 	
-	LL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		// determine if it's in the list to replace
 		found = FALSE;
 		for (iter = 0; convert_list[iter] != NOTHING && !found; ++iter) {

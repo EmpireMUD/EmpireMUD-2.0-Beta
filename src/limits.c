@@ -2260,9 +2260,7 @@ void point_update(bool run_real) {
 	}
 	
 	// objs
-	for (obj = object_list; obj; obj = next_obj) {
-		next_obj = obj->next;
-		
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		real_update_obj(obj);
 		point_update_obj(obj);
 	}
@@ -2287,8 +2285,7 @@ void real_update(void) {
 	}
 
 	// objs
-	for (obj = object_list; obj; obj = next_obj) {
-		next_obj = obj->next;
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		real_update_obj(obj);
 	}
 }

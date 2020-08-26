@@ -511,9 +511,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	}
 	
 	// remove live objects: DO THIS FIRST
-	for (obj_iter = object_list; obj_iter; obj_iter = next_obj) {
-		next_obj = obj_iter->next;
-		
+	DL_FOREACH_SAFE(object_list, obj_iter, next_obj) {
 		if (GET_OBJ_VNUM(obj_iter) == vnum) {
 			// this is the removed item
 			
@@ -1670,7 +1668,7 @@ void save_olc_object(descriptor_data *desc) {
 	}
 	
 	// update the strings, pointers, and stats on live items
-	for (obj_iter = object_list; obj_iter; obj_iter = obj_iter->next) {
+	DL_FOREACH(object_list, obj_iter) {
 		if (GET_OBJ_VNUM(obj_iter) == vnum) {
 			update_live_obj_from_olc(obj_iter, proto, obj);
 		}

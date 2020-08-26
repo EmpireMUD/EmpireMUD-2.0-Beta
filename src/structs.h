@@ -5166,7 +5166,7 @@ struct obj_data {
 	struct script_data *script;	// script info for the object
 
 	obj_data *next_content;	// For 'contains' lists
-	obj_data *next;	// For the object list
+	obj_data *next, *prev;	// For the object double-linked list
 	
 	bool search_mark;	// for things that iterate over inventory/lists repeatedly
 	

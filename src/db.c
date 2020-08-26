@@ -161,7 +161,7 @@ morph_data *morph_table = NULL;	// master morph hash table
 morph_data *sorted_morphs = NULL;	// alphabetic version // sorted_hh
 
 // objects
-obj_data *object_list = NULL;	// global linked list of objs
+obj_data *object_list = NULL;	// global doubly-linked list of objs
 obj_data *object_table = NULL;	// hash table of objs
 
 // players
@@ -2170,8 +2170,7 @@ void b3_2_map_and_gear(void) {
 	*/
 	
 	log(" - disenchanting the object list...");
-	for (obj = object_list; obj; obj = next_obj) {
-		next_obj = obj->next;
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -2786,8 +2785,7 @@ void b5_14_superior_items(void) {
 	log("Applying b5.14 update...");
 	
 	log(" - refreshing superiors in the object list...");
-	for (obj = object_list; obj; obj = next_obj) {
-		next_obj = obj->next;
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -2946,7 +2944,7 @@ void b5_23_potion_update(void) {
 	log("Applying b5.23 item update...");
 	
 	log(" - updating the object list...");
-	LL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -3030,7 +3028,7 @@ void b5_24_poison_update(void) {
 	log("Applying b5.24 item update...");
 	
 	log(" - updating the object list...");
-	LL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (IS_POISON(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);

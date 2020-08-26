@@ -4535,7 +4535,7 @@ ACMD(do_enroll) {
 			}
 			
 			// objs
-			for (obj = object_list; obj; obj = obj->next) {
+			DL_FOREACH(object_list, obj) {
 				if (obj->last_empire_id == EMPIRE_VNUM(old)) {
 					obj->last_empire_id = EMPIRE_VNUM(e);
 				}

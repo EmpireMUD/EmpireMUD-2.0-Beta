@@ -1818,9 +1818,7 @@ void delete_empire(empire_data *emp) {
 	}
 	
 	// update all objs
-	for (obj = object_list; obj; obj = next_obj) {
-		next_obj = obj->next;
-		
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (obj->last_empire_id == vnum) {
 			obj->last_empire_id = NOTHING;
 		}

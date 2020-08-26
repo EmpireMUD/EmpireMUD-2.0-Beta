@@ -241,7 +241,7 @@ void extract_script(void *thing, int type) {
 	#if 0 /* debugging */
 	{
 		char_data *i;
-		obj_data *j = object_list;
+		obj_data *j;
 		room_data *k, *next_k;
 		vehicle_data *v;
 		
@@ -249,8 +249,8 @@ void extract_script(void *thing, int type) {
 			DL_FOREACH(character_list, i) {
 				assert(sc != SCRIPT(i));
 			}
-
-			for ( ; j ; j = j->next)
+			
+			DL_FOREACH(object_list, j) {
 				assert(sc != SCRIPT(j));
 			
 			LL_FOREACH(vehicle_list, v) {

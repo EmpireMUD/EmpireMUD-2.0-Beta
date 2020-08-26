@@ -1045,7 +1045,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	}
 	
 	// remove from live lists: drink containers
-	LL_FOREACH(object_list, obj) {
+	DL_FOREACH(object_list, obj) {
 		if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == vnum) {
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 		}

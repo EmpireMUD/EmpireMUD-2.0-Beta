@@ -868,7 +868,7 @@ void run_reboot_triggers(void) {
 	DL_FOREACH_SAFE(character_list, mob, next_mob) {
 		reboot_mtrigger(mob);
 	}
-	LL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		reboot_otrigger(obj);
 	}
 	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {

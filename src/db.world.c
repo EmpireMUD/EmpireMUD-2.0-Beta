@@ -554,9 +554,7 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	if (check_exits) {
 		// search world for portals that link here
-		for (o = object_list; o; o = next_o) {
-			next_o = o->next;
-		
+		DL_FOREACH_SAFE(object_list, o, next_o) {
 			if (IS_PORTAL(o) && GET_PORTAL_TARGET_VNUM(o) == GET_ROOM_VNUM(room)) {
 				if (IN_ROOM(o) && ROOM_PEOPLE(IN_ROOM(o))) {
 					act("$p closes and vanishes!", FALSE, ROOM_PEOPLE(IN_ROOM(o)), o, NULL, TO_CHAR | TO_ROOM);
@@ -2902,9 +2900,7 @@ void check_all_exits(void) {
 	obj_data *o, *next_o;
 	
 	// search world for portals that link to bad rooms
-	for (o = object_list; o; o = next_o) {
-		next_o = o->next;
-		
+	DL_FOREACH_SAFE(object_list, o, next_o) {
 		if (IS_PORTAL(o) && !real_real_room(GET_PORTAL_TARGET_VNUM(o))) {
 			if (IN_ROOM(o) && ROOM_PEOPLE(IN_ROOM(o))) {
 				act("$p closes and vanishes!", FALSE, ROOM_PEOPLE(IN_ROOM(o)), o, NULL, TO_CHAR | TO_ROOM);

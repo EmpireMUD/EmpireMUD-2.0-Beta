@@ -3098,7 +3098,7 @@ SHOW(show_stats) {
 	}
 	
 	// other counts
-	LL_COUNT(object_list, obj, num_objs);
+	DL_COUNT(object_list, obj, num_objs);
 	LL_COUNT(vehicle_list, veh, num_vehs);
 	LL_COUNT2(trigger_list, trig, num_trigs, next_in_world);
 

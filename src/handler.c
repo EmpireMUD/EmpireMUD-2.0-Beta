@@ -5216,8 +5216,7 @@ void perform_mount(char_data *ch, char_data *mount) {
 * @param obj_data *obj The item to add to the global object list.
 */
 void add_to_object_list(obj_data *obj) {
-	obj->next = object_list;
-	object_list = obj;
+	DL_PREPEND(object_list, obj);
 }
 
 
@@ -5619,8 +5618,7 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 * @param obj_data *obj The item to remove from the global object list.
 */
 void remove_from_object_list(obj_data *obj) {
-	obj_data *temp;
-	REMOVE_FROM_LIST(obj, object_list, next);
+	DL_DELETE(object_list, obj);
 }
 
 
@@ -6790,10 +6788,14 @@ obj_data *get_obj_vis(char_data *ch, char *name) {
 		return (NULL);
 
 	/* ok.. no luck yet. scan the entire obj list   */
-	for (i = object_list; i && (j <= number) && !found; i = i->next) {
+	DL_FOREACH(object_list, i) {
 		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
 			if (++j == number) {
 				found = i;
+				break;
+			}
+			else if (j > number) {
+				break;	// somehow
 			}
 		}
 	}
@@ -6845,11 +6847,15 @@ obj_data *get_obj_world(char *name) {
 	strcpy(tmp, name);
 	if ((number = get_number(&tmp)) == 0)
 		return (NULL);
-
-	for (i = object_list; i && (j <= number) && !found; i = i->next) {
+	
+	DL_FOREACH(object_list, i) {
 		if (MATCH_ITEM_NAME(tmp, i)) {
 			if (++j == number) {
 				found = i;
+				break;
+			}
+			else if (j > number) {
+				break;	// somehow
 			}
 		}
 	}

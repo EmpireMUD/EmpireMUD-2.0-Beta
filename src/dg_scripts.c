@@ -513,9 +513,11 @@ obj_data *get_obj(char *name)  {
 	if (*name == UID_CHAR)
 		return find_obj(atoi(name + 1), TRUE);
 	else {
-		for (obj = object_list; obj; obj = obj->next)
-			if (isname(name, obj->name))
+		DL_FOREACH(object_list, obj) {
+			if (isname(name, obj->name)) {
 				return obj;
+			}
+		}
 	}
 
 	return NULL;
@@ -813,10 +815,12 @@ obj_data *get_obj_by_room(room_data *room, char *name) {
 	for (obj = room->contents; obj; obj = obj->next_content)
 		if (isname(name, obj->name))
 			return obj;
-
-	for (obj = object_list; obj; obj = obj->next)
-		if (isname(name, obj->name))
+	
+	DL_FOREACH(object_list, obj) {
+		if (isname(name, obj->name)) {
 			return obj;
+		}
+	}
 
 	return NULL;
 }
@@ -1177,9 +1181,12 @@ EVENTFUNC(trig_wait_event) {
 		}
 		else if (type == OBJ_TRIGGER) {
 			obj_data *obj;
-			for (obj = object_list;obj && !found;obj = obj->next)
-				if (obj == (obj_data*)go)
+			DL_FOREACH(object_list, obj) {
+				if (obj == (obj_data*)go) {
 					found = TRUE;
+					break;
+				}
+			}
 		}
 		else if (type == VEH_TRIGGER) {
 			vehicle_data *veh;

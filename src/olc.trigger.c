@@ -344,7 +344,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	}
 	
 	// look for live objs with this script and remove
-	for (obj = object_list; obj; obj = obj->next) {
+	DL_FOREACH(object_list, obj) {
 		if (SCRIPT(obj)) {
 			remove_live_script_by_vnum(SCRIPT(obj), vnum);
 			check_extract_script(obj, OBJ_TRIGGER);
