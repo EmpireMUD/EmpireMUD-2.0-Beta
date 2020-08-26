@@ -527,6 +527,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				act("$p has been deleted.", FALSE, ROOM_PEOPLE(IN_ROOM(obj_iter)), obj_iter, NULL, TO_CHAR);
 			}
 			
+			empty_obj_before_extract(obj_iter);
 			extract_obj(obj_iter);
 		}
 	}
