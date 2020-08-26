@@ -403,12 +403,13 @@ struct time_info_data *real_time_passed(time_t t2, time_t t1) {
 void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_flag) {
 	empire_data *emp, *next_emp;
 	
-	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (only_emp && emp != only_emp) {
-			continue;
-		}
-		
+	if (only_emp) {
 		REMOVE_BIT(EMPIRE_DELAYED_REFRESH(emp), refresh_flag);
+	}
+	else {
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			REMOVE_BIT(EMPIRE_DELAYED_REFRESH(emp), refresh_flag);
+		}
 	}
 }
 
