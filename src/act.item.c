@@ -4510,7 +4510,7 @@ ACMD(do_buy) {
 			// load the object before the buy trigger, in case
 			obj = read_object(item->vnum, TRUE);
 			obj_to_char(obj, ch);
-			scale_item_to_level(obj, get_approximate_level(ch));
+			scale_item_to_level(obj, 1);
 			
 			if (!check_buy_trigger(ch, stl->from_mob, obj, item->cost, item->currency)) {
 				// triggered: purchase failed
