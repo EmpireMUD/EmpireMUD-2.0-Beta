@@ -158,7 +158,7 @@ EVENT_CANCEL_FUNC(cancel_room_expire_event) {
 void affect_from_char(char_data *ch, any_vnum type, bool show_msg) {
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *hjp, *next;
-	bool shown = FALSE;
+	bool shown = FALSE, any = FALSE;
 
 	for (hjp = ch->affected; hjp; hjp = next) {
 		next = hjp->next;
@@ -168,6 +168,7 @@ void affect_from_char(char_data *ch, any_vnum type, bool show_msg) {
 				shown = TRUE;
 			}
 			affect_remove(ch, hjp);
+			any = TRUE;
 		}
 	}
 	
@@ -180,7 +181,12 @@ void affect_from_char(char_data *ch, any_vnum type, bool show_msg) {
 				shown = TRUE;
 			}
 			dot_remove(ch, dot);
+			any = TRUE;
 		}
+	}
+	
+	if (any) {
+		affect_total(ch);
 	}
 }
 
@@ -195,7 +201,7 @@ void affect_from_char(char_data *ch, any_vnum type, bool show_msg) {
 */
 void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool show_msg) {
 	struct affected_type *aff, *next_aff;
-	bool shown = FALSE;
+	bool shown = FALSE, any = FALSE;
 
 	for (aff = ch->affected; aff; aff = next_aff) {
 		next_aff = aff->next;
@@ -205,7 +211,12 @@ void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool sho
 				shown = TRUE;
 			}
 			affect_remove(ch, aff);
+			any = TRUE;
 		}
+	}
+	
+	if (any) {
+		affect_total(ch);
 	}
 }
 
@@ -220,7 +231,7 @@ void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool sho
 */
 void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bits, bool show_msg) {
 	struct affected_type *aff, *next_aff;
-	bool shown = FALSE;
+	bool shown = FALSE, any = FALSE;
 
 	for (aff = ch->affected; aff; aff = next_aff) {
 		next_aff = aff->next;
@@ -230,7 +241,12 @@ void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bit
 				shown = TRUE;
 			}
 			affect_remove(ch, aff);
+			any = TRUE;
 		}
+	}
+	
+	if (any) {
+		affect_total(ch);
 	}
 }
 
@@ -245,7 +261,7 @@ void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bit
 */
 void affect_from_char_by_caster(char_data *ch, any_vnum type, char_data *caster, bool show_msg) {
 	struct affected_type *aff, *next_aff;
-	bool shown = FALSE;
+	bool shown = FALSE, any = FALSE;
 	
 	LL_FOREACH_SAFE(ch->affected, aff, next_aff) {
 		if (aff->type == type && aff->cast_by == CAST_BY_ID(caster)) {
@@ -255,7 +271,12 @@ void affect_from_char_by_caster(char_data *ch, any_vnum type, char_data *caster,
 			}
 			
 			affect_remove(ch, aff);
+			any = TRUE;
 		}
+	}
+	
+	if (any) {
+		affect_total(ch);
 	}
 }
 
@@ -380,6 +401,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 	
 	// affect_to_char seems to duplicate af so we must free it
 	free(af);
+	affect_total(ch);
 }
 
 
@@ -576,6 +598,8 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 * reaches zero). Pointer *af must never be NIL!  Frees mem and calls
 * affect_location_apply
 *
+* You should call affect_total(ch) when you are done removing affects.
+*
 * @param char_data *ch The person to remove the af from.
 * @param struct affected_by *af The affect to remove.
 */
@@ -590,7 +614,6 @@ void affect_remove(char_data *ch, struct affected_type *af) {
 	affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
 	REMOVE_FROM_LIST(af, ch->affected, next);
 	free(af);
-	affect_total(ch);
 }
 
 

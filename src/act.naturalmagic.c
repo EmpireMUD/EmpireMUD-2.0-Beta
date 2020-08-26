@@ -282,6 +282,8 @@ ACMD(do_cleanse) {
 			gain_condition(vict, DRUNK, -1 * GET_COND(vict, DRUNK));
 		}
 		
+		affect_total(vict);
+		
 		if (can_gain_exp_from(ch, vict)) {
 			gain_ability_exp(ch, ABIL_CLEANSE, 33.4);
 		}

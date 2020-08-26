@@ -1159,6 +1159,8 @@ void script_heal(void *thing, int type, char *argument) {
 					}
 				}
 			}
+			
+			affect_total(victim);
 		}
 	}
 	else {

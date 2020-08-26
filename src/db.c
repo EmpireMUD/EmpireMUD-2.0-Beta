@@ -3171,6 +3171,7 @@ PLAYER_UPDATE_FUNC(b5_34_player_update) {
 	while (ch->over_time_effects) {
 		dot_remove(ch, ch->over_time_effects);
 	}
+	affect_total(ch);
 }
 
 

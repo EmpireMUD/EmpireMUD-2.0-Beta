@@ -615,7 +615,7 @@ void real_update_char(char_data *ch) {
 	int result, iter, type;
 	int fol_count, gain;
 	ability_data *abil;
-	bool found, took_dot, msg;
+	bool found, took_dot, msg, any;
 	
 	// check for end of meters (in case it was missed in the fight code)
 	if (!FIGHTING(ch)) {
@@ -673,6 +673,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// update affects (NPCs get this, too)
+	any = FALSE;
 	for (af = ch->affected; af; af = next_af) {
 		next_af = af->next;
 		if (af->duration >= 1) {
@@ -692,7 +693,11 @@ void real_update_char(char_data *ch) {
 			}
 			
 			affect_remove(ch, af);
+			any = TRUE;
 		}
+	}
+	if (any) {
+		affect_total(ch);
 	}
 	
 	// heal-per-5 ? (stops at 0 health or incap)

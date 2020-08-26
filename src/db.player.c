@@ -2390,6 +2390,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		affect_remove(ch, af);
 	}
 	
+	affect_total(ch);
+	
 	// reset attributes
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
 		ch->aff_attributes[iter] = ch->real_attributes[iter];

@@ -1224,6 +1224,7 @@ void death_restore(char_data *ch) {
 	while (ch->over_time_effects) {
 		dot_remove(ch, ch->over_time_effects);
 	}
+	affect_total(ch);
 }
 
 
@@ -1307,6 +1308,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	while (ch->affected) {
 		affect_remove(ch, ch->affected);
 	}
+	affect_total(ch);
 	
 	// get rid of any charmies who are lying around
 	despawn_charmies(ch, NOTHING);

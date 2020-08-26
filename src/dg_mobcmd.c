@@ -1225,6 +1225,7 @@ ACMD(do_mrestore) {
 		if (GET_POS(victim) < POS_SLEEPING) {
 			GET_POS(victim) = POS_STANDING;
 		}
+		affect_total(victim);
 		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
 		GET_MOVE(victim) = GET_MAX_MOVE(victim);
 		GET_MANA(victim) = GET_MAX_MANA(victim);
