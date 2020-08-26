@@ -4645,8 +4645,6 @@ bool member_is_timed_out_ch(char_data *ch) {
 * @param bool read_techs if TRUE, will add techs based on players (usually only during startup)
 */
 void read_empire_members(empire_data *only_empire, bool read_techs) {
-	extern bool is_startup_sequence;
-	
 	void resort_empires(bool force);
 	bool should_delete_empire(empire_data *emp);
 	
@@ -4724,10 +4722,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		}
 		
 		if (ch && is_file) {
-			// no longer quick-freeing these unless it's the startup sequence; leave them in the queue to free soon
-			if (is_startup_sequence) {
-				free_char(ch);
-			}
+			free_char(ch);
 		}
 	}
 	
