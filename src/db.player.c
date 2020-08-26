@@ -780,6 +780,8 @@ void free_char(char_data *ch) {
 	char_data *proto;
 	obj_data *obj;
 	int iter;
+	
+	pause_affect_total = TRUE;
 
 	// in case somehow?
 	if (GROUP(ch)) {
@@ -1043,6 +1045,7 @@ void free_char(char_data *ch) {
 	}
 
 	free(ch);
+	pause_affect_total = FALSE;
 }
 
 
