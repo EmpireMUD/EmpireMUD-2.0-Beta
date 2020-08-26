@@ -2985,18 +2985,12 @@ EVENTFUNC(check_unload_room) {
 * @param int id The player id to clear rooms for.
 */
 void clear_private_owner(int id) {
-	void remove_designate_objects(room_data *room);
 	room_data *iter, *next_iter;
 	obj_data *obj;
 	
 	// check interior rooms first
 	LL_FOREACH2(interior_room_list, iter, next_interior) {
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(iter)) == id) {
-			// TODO some way to generalize this, please
-			if (BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
-				remove_designate_objects(iter);
-			}
-			
 			// reset autostore timer
 			LL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
 				GET_AUTOSTORE_TIMER(obj) = time(0);
@@ -3008,11 +3002,6 @@ void clear_private_owner(int id) {
 	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (COMPLEX_DATA(iter) && ROOM_PRIVATE_OWNER(iter) == id) {
 			COMPLEX_DATA(iter)->private_owner = NOBODY;
-		
-			// TODO some way to generalize this, please
-			if (BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
-				remove_designate_objects(iter);
-			}
 			
 			// reset autostore timer
 			LL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {

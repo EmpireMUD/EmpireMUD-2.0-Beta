@@ -53,7 +53,6 @@
 #define RTYPE_SORCERER_TOWER  5511
 #define RTYPE_EXTRACTION_PIT  5523	// a place to keep chars when they are pending extraction
 
-#define RTYPE_BEDROOM  5601
 #define RTYPE_TUNNEL  5612	// for mine complex, tunnel
 
 
@@ -95,7 +94,6 @@
 
 // core objects
 #define o_CORPSE  1000
-#define o_HOME_CHEST  1010
 
 // Skill tree items
 #define o_PORTAL  1100  // could probably safely generate a NOTHING item

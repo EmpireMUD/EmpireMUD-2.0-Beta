@@ -5094,7 +5094,6 @@ ACMD(do_home) {
 	struct empire_territory_data *ter;
 	room_data *iter, *next_iter, *home = NULL, *real = HOME_ROOM(IN_ROOM(ch));
 	empire_data *emp = GET_LOYALTY(ch);
-	obj_data *obj;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -5178,12 +5177,6 @@ ACMD(do_home) {
 						make_citizen_homeless(emp, ter->npcs);
 						delete_territory_npc(ter, ter->npcs);
 					}
-				}
-				
-				// TODO consider a trigger like RoomUpdate that passes a var like %update% == homeset
-				if (BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
-					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), iter);
-					load_otrigger(obj);
 				}
 			}
 			

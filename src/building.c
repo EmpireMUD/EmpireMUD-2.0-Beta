@@ -322,7 +322,6 @@ void disassociate_building(room_data *room) {
 	void delete_instance(struct instance_data *inst, bool run_cleanup);
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
-	void remove_designate_objects(room_data *room);
 	
 	sector_data *old_sect = SECT(room);
 	bool was_large, junk;
@@ -423,7 +422,6 @@ void disassociate_building(room_data *room) {
 		
 		if (HOME_ROOM(iter) == room && iter != room) {
 			dismantle_wtrigger(iter, NULL, FALSE);
-			remove_designate_objects(iter);
 			
 			// move people and contents
 			while ((temp_ch = ROOM_PEOPLE(iter))) {
@@ -947,32 +945,6 @@ void process_dismantling(char_data *ch, room_data *room) {
 
 
 /**
-* For do_designate: removes items from the room
-*
-* @param room_data *room The room to check for stray items.
-*/
-void remove_designate_objects(room_data *room) {
-	obj_data *o, *next_o;
-
-	// remove old objects
-	for (o = ROOM_CONTENTS(room); o; o = next_o) {
-		next_o = o->next_content;
-		
-		switch (BUILDING_VNUM(room)) {
-			case RTYPE_BEDROOM: {
-				if (GET_OBJ_VNUM(o) == o_HOME_CHEST) {
-					while (o->contains) {
-						obj_to_room(o->contains, room);
-					}
-					extract_obj(o);
-				}
-			}
-		}
-	}
-}
-
-
-/**
 * This removes an earlier entry (with the same component type) in a built-with
 * list. This is called during maintenance so that the newly-added resource will
 * replace an older one. Call this BEFORE adding the new resource to built-with.
@@ -1102,7 +1074,6 @@ void start_dismantle_building(room_data *loc) {
 		next_room = room->next_interior;
 		
 		if (HOME_ROOM(room) == loc) {
-			remove_designate_objects(room);
 			dismantle_wtrigger(room, NULL, FALSE);
 			delete_room_npcs(room, NULL, TRUE);
 		
@@ -1814,7 +1785,6 @@ ACMD(do_designate) {
 	bld_data *bld, *next_bld;
 	char_data *vict;
 	bld_data *type;
-	obj_data *obj;
 	bool found;
 	
 	vehicle_data *veh = NULL;	// if this is set, we're doing a vehicle designate instead of building
@@ -1915,7 +1885,6 @@ ACMD(do_designate) {
 			// redesignate this room
 			new = IN_ROOM(ch);
 			
-			remove_designate_objects(new);
 			if (ROOM_OWNER(home) && (ter = find_territory_entry(ROOM_OWNER(home), new))) {
 				while (ter->npcs) {
 					make_citizen_homeless(ROOM_OWNER(home), ter->npcs);
@@ -1942,17 +1911,6 @@ ACMD(do_designate) {
 			
 			if (ROOM_OWNER(home)) {
 				perform_claim_room(new, ROOM_OWNER(home));
-			}
-		}
-		
-		// add new objects
-		switch (GET_BLD_VNUM(type)) {
-			case RTYPE_BEDROOM: {
-				if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) != NOBODY) {
-					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), new);
-					load_otrigger(obj);
-				}
-				break;
 			}
 		}
 		
