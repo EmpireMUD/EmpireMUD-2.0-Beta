@@ -5482,7 +5482,10 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 * @return bool TRUE if the two items are functionally identical.
 */
 bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
-	struct obj_apply *a_apply, *b_list, *b_apply, *temp;
+	void free_obj_binding(struct obj_binding **list);
+	
+	struct obj_apply *a_apply, *b_list, *b_apply, *b_apply_next, *temp;
+	struct obj_binding *a_bind, *b_bind, *b_bind_list, *b_bind_next;
 	bool found;
 	int iter;
 	
@@ -5531,11 +5534,34 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 		return FALSE;
 	}
 	
+	// compare bindings just like applies
+	b_bind_list = copy_obj_bindings(OBJ_BOUND_TO(obj_b));
+	LL_FOREACH(OBJ_BOUND_TO(obj_a), a_bind) {
+		found = FALSE;
+		LL_FOREACH_SAFE(b_bind_list, b_bind, b_bind_next) {
+			if (a_bind->idnum == b_bind->idnum) {
+				LL_DELETE(b_bind_list, b_bind);
+				found = TRUE;
+				break;
+			}
+		}
+		
+		if (!found) {
+			free_obj_binding(&b_bind_list);	// remaining items
+			return FALSE;
+		}
+	}
+	if (b_bind_list) {	// more things in b_bind_list than a
+		free_obj_binding(&b_bind_list);
+		return FALSE;
+	}
+	
 	// to compare applies, we're going to copy and delete as we find them
 	b_list = copy_obj_apply_list(GET_OBJ_APPLIES(obj_b));
 	for (a_apply = GET_OBJ_APPLIES(obj_a); a_apply; a_apply = a_apply->next) {
 		found = FALSE;
-		for (b_apply = b_list; b_apply; b_apply = b_apply->next) {
+		for (b_apply = b_list; b_apply; b_apply = b_apply_next) {
+			b_apply_next = b_apply->next;
 			if (a_apply->location == b_apply->location && a_apply->modifier == b_apply->modifier && a_apply->apply_type == b_apply->apply_type) {
 				found = TRUE;
 				REMOVE_FROM_LIST(b_apply, b_list, next);
@@ -5545,7 +5571,7 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 		}
 		
 		if (!found) {
-			free_obj_apply_list(b_list);
+			free_obj_apply_list(b_list);	// remaining items
 			return FALSE;
 		}
 	}
