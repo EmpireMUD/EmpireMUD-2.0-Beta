@@ -164,6 +164,9 @@ or cleaned up automatically.
 The auto-store/auto-clean system engages when an item has been left alone for
 three hours, but will not trigger if a player is present.
 
+If items were left in a private home, they will autostore to the player's
+home storage.
+
 If the location is claimed by an empire, NPCs store the items to that empire's
 inventory (if possible). If items can't be stored, they remain on the ground
 (or in their containers) on claimed land. Certain items, like "sea junk", will
@@ -175,6 +178,8 @@ never to be seen again.
 
 Items which can't be picked up, like signs, are not normally affected by this
 system. However, items left inside of vehicles will be stored or cleaned up.
+
+See also: HOME
 #
 AXE
 
