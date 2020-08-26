@@ -252,6 +252,7 @@ void extract_script(void *thing, int type) {
 			
 			DL_FOREACH(object_list, j) {
 				assert(sc != SCRIPT(j));
+			}
 			
 			DL_FOREACH(vehicle_list, v) {
 				assert(sc != SCRIPT(v));
