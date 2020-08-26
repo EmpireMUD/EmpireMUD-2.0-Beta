@@ -135,6 +135,7 @@ static bool reboot_recovery = FALSE;
 int mother_desc;
 ush_int port;
 bool do_evo_import = FALSE;	// triggered by SIGUSR1 to import evolutions
+bool is_booting_up = FALSE;	// changes some save behavior
 
 // vars to prevent running multiple cycles during a missed-pulse catch-up cycle
 bool catch_up_combat = FALSE;	// frequent_combat()
@@ -3933,6 +3934,7 @@ void init_game(ush_int port) {
 		reboot_recover();
 
 	log("Entering game loop.");
+	is_booting_up = FALSE;
 	game_loop(mother_desc);
 
 	save_all_players(FALSE);
@@ -3952,6 +3954,8 @@ int main(int argc, char **argv) {
 
 	int pos = 1;
 	const char *dir;
+	
+	is_booting_up = TRUE;
 
 	/* Initialize these to check for overruns later. */
 	plant_magic(buf);
