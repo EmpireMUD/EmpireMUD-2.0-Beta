@@ -548,8 +548,11 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		send_to_char(temp, ch);
 		free(temp);
 	}
-	if (UNIQUE_OBJ_CAN_STORE(obj)) {
-		msg_to_char(ch, "Storage location: Warehouse\r\n");
+	if (UNIQUE_OBJ_CAN_STORE(obj, FALSE)) {
+		msg_to_char(ch, "Storage location: Home, Warehouse\r\n");
+	}
+	else if (UNIQUE_OBJ_CAN_STORE(obj, TRUE)) {
+		msg_to_char(ch, "Storage location: Home\r\n");
 	}
 	if (OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
 		msg_to_char(ch, "Storage location: none (modified object)\r\n");
@@ -4368,7 +4371,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 			next_obj = obj->next_content;
 			
 			// bound objects never store, nor can torches
-			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && UNIQUE_OBJ_CAN_STORE(obj)) {
+			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && UNIQUE_OBJ_CAN_STORE(obj, home_mode)) {
 				// may extract obj
 				store_unique_item(ch, (home_mode ? &GET_HOME_STORAGE(ch) : &EMPIRE_UNIQUE_STORAGE(use_emp)), obj, use_emp, home_mode ? NULL : IN_ROOM(ch), &full);
 				if (!full) {
@@ -4399,7 +4402,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 			next_obj = get_obj_in_list_vis(ch, argument, obj->next_content);
 
 			// bound objects never store
-			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj)) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj, home_mode)) {
 				// may extract obj
 				store_unique_item(ch, (home_mode ? &GET_HOME_STORAGE(ch) : &EMPIRE_UNIQUE_STORAGE(use_emp)), obj, use_emp, home_mode ? NULL : IN_ROOM(ch), &full);
 				if (!full) {

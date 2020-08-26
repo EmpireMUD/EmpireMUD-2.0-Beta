@@ -1513,7 +1513,7 @@ bool check_autostore(obj_data *obj, bool force) {
 		// but this otherwise blocks the item from storing
 		store = FALSE;
 	}
-	else if (UNIQUE_OBJ_CAN_STORE(obj) && !is_home) {
+	else if (UNIQUE_OBJ_CAN_STORE(obj, FALSE) && !is_home) {
 		// store unique items but not in private homes
 		store = TRUE;
 		unique = TRUE;
