@@ -713,7 +713,6 @@ void update_biting_char(char_data *ch) {
 		// cancel a can't-stop effect, if present
 		affect_from_char(ch, ATYPE_CANT_STOP, FALSE);
 
-		act("$n is dead! R.I.P.", FALSE, victim, 0, 0, TO_ROOM);
 		msg_to_char(victim, "You are dead! Sorry...\r\n");
 		if (!IS_NPC(victim)) {
 			death_log(victim, ch, ATTACK_EXECUTE);
