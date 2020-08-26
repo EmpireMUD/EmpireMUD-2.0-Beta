@@ -4648,7 +4648,6 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_flag);
 	void resort_empires(bool force);
 	bool should_delete_empire(empire_data *emp);
-	extern bool is_booting_up;
 	
 	struct empire_member_reader_data *account_list = NULL, *emrd;
 	player_index_data *index, *next_index;
@@ -4723,8 +4722,8 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			}
 		}
 		
-		if (ch && is_file && is_booting_up) {
-			// always free right away here-- or it will
+		if (ch && is_file && !only_empire) {
+			// only free right away if doing all empires -- it lags BADLY otherwise
 			free_char(ch);
 		}
 	}
