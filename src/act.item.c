@@ -4137,7 +4137,7 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 			return;
 		}
 		if (!imm_access && time(0) - GET_LAST_HOME_SET_TIME(ch) < SECS_PER_REAL_HOUR) {
-			amt = ((time(0) - GET_LAST_HOME_SET_TIME(ch) - 1) / SECS_PER_REAL_MIN) + 1;
+			amt = 60 - ((time(0) - GET_LAST_HOME_SET_TIME(ch)) / SECS_PER_REAL_MIN);
 			msg_to_char(ch, "You must wait another %d minute%s -- your items are being moved.\r\n", amt, PLURAL(amt));
 			return;
 		}
