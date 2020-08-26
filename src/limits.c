@@ -1475,7 +1475,7 @@ bool check_autostore(obj_data *obj, bool force) {
 	in_veh = top_obj->in_vehicle;
 	
 	// detect home?
-	if (real_loc && (home_idnum = ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) != NOBODY)) {
+	if (real_loc && (home_idnum = ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc))) != NOBODY) {
 		is_home = TRUE;
 	}
 	else if (in_veh && VEH_INTERIOR_HOME_ROOM(in_veh) && (home_idnum = ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(in_veh))) != NOBODY) {
