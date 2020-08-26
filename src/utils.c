@@ -419,6 +419,7 @@ void run_delayed_refresh(void) {
 		}
 		
 		HASH_DEL(char_delayed_update_list, cdu);
+		free(cdu);
 	}
 
 	
