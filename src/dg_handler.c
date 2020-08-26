@@ -185,7 +185,7 @@ void extract_trigger(trig_data *trig) {
 	}
 
 	/* walk the trigger list and remove this one */
-	DL_DELETE2(trigger_list, trig, next_in_world, prev_in_world);
+	DL_DELETE2(trigger_list, trig, prev_in_world, next_in_world);
 	
 	// global trig?
 	if (TRIG_IS_RANDOM(trig)) {
