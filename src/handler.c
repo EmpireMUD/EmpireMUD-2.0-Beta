@@ -838,7 +838,7 @@ void affect_total(char_data *ch) {
 	GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
 	
 	// check greatness thresholds
-	if (!IS_NPC(ch) && IN_ROOM(ch) && emp && (index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
+	if (!IS_NPC(ch) && emp && (index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
 		if (index->contributing_greatness && GET_GREATNESS(ch) < index->greatness_threshold) {
 			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
 		}
