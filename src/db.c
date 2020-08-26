@@ -3731,8 +3731,7 @@ void b5_86_update(void) {
 	log("Applying b5.86 update to missile weapons...");
 	
 	log(" - refreshing the object list...");
-	for (obj = object_list; obj; obj = next_obj) {
-		next_obj = obj->next;
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (IS_MISSILE_WEAPON(obj)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -4486,7 +4485,7 @@ void check_version(void) {
 			}
 			
 			log(" - assigning triggers to object list...");
-			for (obj = object_list; obj; obj = obj->next) {
+			DL_FOREACH(object_list, obj) {
 				if ((objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
 					obj->proto_script = copy_trig_protos(objpr->proto_script);
 					assign_triggers(obj, OBJ_TRIGGER);
