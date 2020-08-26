@@ -1450,12 +1450,14 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 bool check_autostore(obj_data *obj, bool force) {
 	extern int get_main_island(empire_data *emp);
 	
+	player_index_data *index;
 	empire_data *emp = NULL;
+	char_data *loaded_ch;
 	vehicle_data *in_veh;
 	room_data *real_loc;
 	obj_data *top_obj;
-	bool store, unique, full, is_home;
-	int islid;
+	bool store, unique, full, is_home, file;
+	int islid, home_idnum = NOBODY;
 	
 	// easy exclusions
 	if (obj->carried_by || obj->worn_by || !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
@@ -1471,7 +1473,14 @@ bool check_autostore(obj_data *obj, bool force) {
 	top_obj = get_top_object(obj);
 	real_loc = IN_ROOM(top_obj);
 	in_veh = top_obj->in_vehicle;
-	is_home = (real_loc && ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) != NOBODY) || (in_veh && VEH_INTERIOR_HOME_ROOM(in_veh) && ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(in_veh)) != NOBODY);
+	
+	// detect home?
+	if (real_loc && (home_idnum = ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) != NOBODY)) {
+		is_home = TRUE;
+	}
+	else if (in_veh && VEH_INTERIOR_HOME_ROOM(in_veh) && (home_idnum = ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(in_veh))) != NOBODY) {
+		is_home = TRUE;
+	}
 	
 	// detect owner here
 	if (!emp && in_veh) {
@@ -1513,8 +1522,13 @@ bool check_autostore(obj_data *obj, bool force) {
 		// but this otherwise blocks the item from storing
 		store = FALSE;
 	}
-	else if (UNIQUE_OBJ_CAN_STORE(obj, FALSE) && !is_home) {
-		// store unique items but not in private homes
+	else if (is_home && UNIQUE_OBJ_CAN_STORE(obj, TRUE)) {
+		// trigger home storage
+		store = TRUE;
+		unique = TRUE;
+	}
+	else if (!is_home && UNIQUE_OBJ_CAN_STORE(obj, FALSE)) {
+		// store unique items outside a private home
 		store = TRUE;
 		unique = TRUE;
 	}
@@ -1540,6 +1554,16 @@ bool check_autostore(obj_data *obj, bool force) {
 	if (emp) {					
 		if (IS_COINS(obj)) {
 			increase_empire_coins(emp, real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj));
+		}
+		else if (unique && is_home) {
+			// home storage
+			if ((index = find_player_index_by_idnum(home_idnum)) && (loaded_ch = find_or_load_player(index->name, &file))) {
+				store_unique_item(NULL, &GET_HOME_STORAGE(loaded_ch), obj, NULL, NULL, &full);
+				queue_delayed_update(loaded_ch, CDU_SAVE);
+				return FALSE;
+				// note: leaving loaded_ch open, to be auto-saved in a second, as this may run on many items
+			}
+			// failed to load owner: fall through to extract
 		}
 		else if (unique) {
 			// this extracts it itself
