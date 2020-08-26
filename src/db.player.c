@@ -4722,7 +4722,8 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		}
 		
 		if (ch && is_file) {
-			free_char(ch);
+			// leave char open in case they are called up again
+			// free_char(ch);
 		}
 	}
 	
