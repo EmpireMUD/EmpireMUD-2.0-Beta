@@ -89,6 +89,7 @@ void scale_item_to_level(obj_data *obj, int level);
 
 // locals
 static void add_obj_binding(int idnum, struct obj_binding **list);
+struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 void die_follower(char_data *ch);
 struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
 struct companion_data *has_companion(char_data *ch, any_vnum vnum);
@@ -5271,6 +5272,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 		GET_OBJ_VAL(obj, iter) = GET_OBJ_VAL(input, iter);
 	}
 	GET_OBJ_APPLIES(obj) = copy_obj_apply_list(GET_OBJ_APPLIES(input));
+	OBJ_BOUND_TO(obj) = copy_obj_bindings(OBJ_BOUND_TO(input));
 	
 	return obj;
 }

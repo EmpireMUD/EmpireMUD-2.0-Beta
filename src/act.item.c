@@ -4237,7 +4237,7 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 				break;
 			}
 		
-			if (iter->amount > 0) {
+			if (iter->amount > 1) {
 				obj = copy_warehouse_obj(iter->obj);
 			}
 			else {
