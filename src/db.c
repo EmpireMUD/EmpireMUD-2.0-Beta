@@ -304,9 +304,8 @@ void boot_db(void) {
 	void check_learned_empire_crafts();
 	void check_nowhere_einv_all();
 	void check_ruined_cities();
-	void check_sector_times(any_vnum only_sect);
 	void check_version();
-	void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_flag);
+	void check_sector_times(any_vnum only_sect);
 	void delete_old_players();
 	void delete_orphaned_rooms();
 	void expire_old_politics();
@@ -437,8 +436,6 @@ void boot_db(void) {
 	
 	log(" Calculating empire data.");
 	reread_empire_tech(NULL);
-	// reading tech can trigger additional reads
-	clear_delayed_empire_refresh(NULL, DELAY_REFRESH_MEMBERS);
 	check_for_new_map();
 	setup_island_levels();
 	expire_old_politics();

@@ -404,7 +404,7 @@ void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_fla
 	empire_data *emp, *next_emp;
 	
 	if (only_emp) {
-		REMOVE_BIT(EMPIRE_DELAYED_REFRESH(emp), refresh_flag);
+		REMOVE_BIT(EMPIRE_DELAYED_REFRESH(only_emp), refresh_flag);
 	}
 	else {
 		HASH_ITER(hh, empire_table, emp, next_emp) {

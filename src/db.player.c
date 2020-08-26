@@ -4645,6 +4645,7 @@ bool member_is_timed_out_ch(char_data *ch) {
 * @param bool read_techs if TRUE, will add techs based on players (usually only during startup)
 */
 void read_empire_members(empire_data *only_empire, bool read_techs) {
+	void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_flag);
 	void resort_empires(bool force);
 	bool should_delete_empire(empire_data *emp);
 	
@@ -4779,6 +4780,8 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	if (!read_techs) {
 		resort_empires(FALSE);
 	}
+	
+	clear_delayed_empire_refresh(only_empire, DELAY_REFRESH_MEMBERS);
 }
 
 
