@@ -1012,7 +1012,7 @@ ACMD(do_mirrorimage) {
 	
 	// limit 1
 	found = FALSE;
-	LL_FOREACH(character_list, other) {
+	DL_FOREACH(character_list, other) {
 		if (ch != other && IS_NPC(other) && GET_MOB_VNUM(other) == vnum && other->master == ch) {
 			found = TRUE;
 			break;

@@ -240,14 +240,15 @@ void extract_script(void *thing, int type) {
 
 	#if 0 /* debugging */
 	{
-		char_data *i = character_list;
+		char_data *i;
 		obj_data *j = object_list;
 		room_data *k, *next_k;
 		vehicle_data *v;
 		
 		if (sc) {
-			for ( ; i ; i = i->next)
+			DL_FOREACH(character_list, i) {
 				assert(sc != SCRIPT(i));
+			}
 
 			for ( ; j ; j = j->next)
 				assert(sc != SCRIPT(j));

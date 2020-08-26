@@ -699,7 +699,7 @@ void deactivate_workforce(empire_data *emp, int island_id, int type) {
 	char_data *mob, *next_mob;
 	
 	if (chore_data[type].mob != NOTHING) {
-		for (mob = character_list; mob; mob = next_mob) {
+		DL_FOREACH_SAFE(character_list, mob, next_mob) {
 			next_mob = mob->next;
 		
 			if (!IS_NPC(mob) || GET_LOYALTY(mob) != emp) {
@@ -736,7 +736,7 @@ void deactivate_workforce_island(empire_data *emp, int island_id) {
 	bool found;
 	int iter;
 	
-	LL_FOREACH_SAFE(character_list, mob, next_mob) {
+	DL_FOREACH_SAFE(character_list, mob, next_mob) {
 		if (!IS_NPC(mob) || GET_LOYALTY(mob) != emp || FIGHTING(mob)) {
 			continue;
 		}

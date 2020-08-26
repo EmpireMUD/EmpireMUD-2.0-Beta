@@ -3085,7 +3085,7 @@ SHOW(show_stats) {
 	}
 	
 	// count connections, players, mobs
-	for (vict = character_list; vict; vict = vict->next) {
+	DL_FOREACH(character_list, vict) {
 		if (IS_NPC(vict)) {
 			++num_mobs;
 		}
@@ -7152,7 +7152,7 @@ ACMD(do_autowiz) {
 ACMD(do_breakreply) {
 	char_data *iter;
 	
-	LL_FOREACH(character_list, iter) {
+	DL_FOREACH(character_list, iter) {
 		if (IS_NPC(iter) || GET_ACCESS_LEVEL(iter) >= GET_ACCESS_LEVEL(ch)) {
 			continue;
 		}
@@ -10090,7 +10090,7 @@ ACMD(do_users) {
 	one_argument(argument, arg);
 
 	if (!*host_search) {
-		for (tch = character_list; tch; tch = tch->next) {
+		DL_FOREACH(character_list, tch) {
 			if (IS_NPC(tch) || tch->desc)
 				continue;
 			result = users_output(ch, tch, NULL, name_search, low, high, rp);

@@ -1069,7 +1069,7 @@ void olc_delete_faction(char_data *ch, any_vnum vnum) {
 	remove_faction_from_table(fct);
 	
 	// remove from live players
-	LL_FOREACH(character_list, chiter) {
+	DL_FOREACH(character_list, chiter) {
 		if (IS_NPC(chiter) && MOB_FACTION(chiter) == fct) {
 			MOB_FACTION(chiter) = NULL;
 		}
@@ -1283,7 +1283,7 @@ void save_olc_faction(descriptor_data *desc) {
 	HASH_SRT(sorted_hh, sorted_factions, sort_factions_by_data);
 	
 	// update live players
-	LL_FOREACH(character_list, chiter) {
+	DL_FOREACH(character_list, chiter) {
 		if (IS_NPC(chiter)) {
 			continue;
 		}

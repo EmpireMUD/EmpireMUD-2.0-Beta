@@ -336,7 +336,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	}
 	
 	// look for live mobs with this script and remove
-	for (mob = character_list; mob; mob = mob->next) {
+	DL_FOREACH(character_list, mob) {
 		if (IS_NPC(mob) && SCRIPT(mob)) {
 			remove_live_script_by_vnum(SCRIPT(mob), vnum);
 			check_extract_script(mob, MOB_TRIGGER);

@@ -351,7 +351,7 @@ char_data *find_minipet(char_data *ch) {
 		}
 	}
 	if (!found) {
-		LL_FOREACH(character_list, chiter) {
+		DL_FOREACH(character_list, chiter) {
 			if (IS_MINIPET_OF(chiter, ch)) {
 				found = chiter;
 				break;

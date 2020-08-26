@@ -1941,7 +1941,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 	else {			/* print only FIRST char, not all. */
 		found = NULL;
 		closest = MAP_SIZE;
-		for (i = character_list; i; i = i->next) {
+		DL_FOREACH(character_list, i) {
 			if (i == ch || !IN_ROOM(i) || !CAN_RECOGNIZE(ch, i) || !CAN_SEE(ch, i) || AFF_FLAGGED(i, AFF_NO_WHERE))
 				continue;
 			if (!multi_isname(arg, GET_PC_NAME(i)))
@@ -2060,7 +2060,7 @@ void perform_immort_where(char_data *ch, char *arg) {
 		}
 	}
 	else {
-		for (i = character_list; i; i = i->next) {
+		DL_FOREACH(character_list, i) {
 			if (CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i) && multi_isname(arg, GET_PC_NAME(i))) {
 				found = 1;
 				msg_to_char(ch, "M%3d. %-25s - %s[%d]%s %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && HAS_TRIGGERS(i)) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE));

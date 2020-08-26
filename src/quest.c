@@ -1547,7 +1547,7 @@ void update_mob_quest_lookups(mob_vnum vnum) {
 		return;
 	}
 	
-	LL_FOREACH(character_list, mob) {
+	DL_FOREACH(character_list, mob) {
 		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == vnum) {
 			// re-set the pointer
 			MOB_QUEST_LOOKUPS(mob) = MOB_QUEST_LOOKUPS(proto);
@@ -2595,7 +2595,7 @@ void qt_event_start_stop(any_vnum event_vnum) {
 	struct req_data *task;
 	char_data *ch;
 	
-	LL_FOREACH(character_list, ch) {
+	DL_FOREACH(character_list, ch) {
 		if (IS_NPC(ch)) {
 			continue;
 		}
@@ -4612,7 +4612,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	remove_quest_from_table(quest);
 	
 	// look for people on the quest and force a refresh
-	LL_FOREACH(character_list, chiter) {
+	DL_FOREACH(character_list, chiter) {
 		if (IS_NPC(chiter)) {
 			continue;
 		}

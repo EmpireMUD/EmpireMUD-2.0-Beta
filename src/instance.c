@@ -1116,9 +1116,7 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	// any portal in will be cleaned up by delete_room
 	
 	// delete mobs
-	for (mob = character_list; mob; mob = next_mob) {
-		next_mob = mob->next;
-		
+	DL_FOREACH_SAFE(character_list, mob, next_mob) {
 		if (IS_NPC(mob) && MOB_INSTANCE_ID(mob) == INST_ID(inst)) {
 			if (ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_NO_MOB_CLEANUP)) {
 				// just disassociate
@@ -1603,7 +1601,7 @@ void check_instance_is_loaded(struct instance_data *inst) {
 bool check_outside_fights(struct instance_data *inst) {
 	char_data *mob;
 	
-	LL_FOREACH(character_list, mob) {
+	DL_FOREACH(character_list, mob) {
 		if (!FIGHTING(mob) || !IS_NPC(mob)) {
 			continue;	// not a mob / not fighting
 		}
@@ -2542,7 +2540,7 @@ void scale_instance_to_level(struct instance_data *inst, int level) {
 		}
 	}
 	
-	LL_FOREACH(character_list, ch) {
+	DL_FOREACH(character_list, ch) {
 		if (IS_NPC(ch) && MOB_INSTANCE_ID(ch) == INST_ID(inst) && GET_CURRENT_SCALE_LEVEL(ch) != level) {
 			GET_CURRENT_SCALE_LEVEL(ch) = 0;	// force override on level
 			scale_mob_to_level(ch, level);

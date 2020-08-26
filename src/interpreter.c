@@ -2197,10 +2197,8 @@ int perform_dupe_check(descriptor_data *d) {
 	 * choose one if one is available (while still deleting the other
 	 * duplicates, though theoretically none should be able to exist).
 	 */
-
-	for (ch = character_list; ch; ch = next_ch) {
-		next_ch = ch->next;
-
+	
+	DL_FOREACH_SAFE(character_list, ch, next_ch) {
 		if (IS_NPC(ch))
 			continue;
 		if (GET_IDNUM(ch) != id)

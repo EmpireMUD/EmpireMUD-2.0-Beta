@@ -2540,9 +2540,7 @@ void change_short_desc(char_data *ch, char *str) {
 void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 	char_data *iter, *next_iter;
 	
-	for (iter = character_list; iter; iter = next_iter) {
-		next_iter = iter->next;
-		
+	DL_FOREACH_SAFE(character_list, iter, next_iter) {
 		if (IS_NPC(iter) && iter->master == ch && (only_vnum == NOTHING || GET_MOB_VNUM(iter) == only_vnum)) {
 			if (GET_COMPANION(iter) == ch || AFF_FLAGGED(iter, AFF_CHARM)) {
 				act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
@@ -6190,7 +6188,7 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 	}
 	
 	// verify there are no disconnected players characters in-game, which might not be saved
-	for (ch = character_list; ch; ch = ch->next) {
+	DL_FOREACH(character_list, ch) {
 		if (!IS_NPC(ch) && !ch->desc) {
 			sprintf(buf, "update_all_players: Unable to update because of linkdead player (%s). Try again later.", GET_NAME(ch));
 			if (to_message) {

@@ -557,7 +557,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	}
 	
 	// remove from home storage
-	LL_FOREACH(character_list, chiter) {
+	DL_FOREACH(character_list, chiter) {
 		if (!IS_NPC(chiter) && delete_unique_storage_by_vnum(&GET_HOME_STORAGE(chiter), vnum)) {
 			queue_delayed_update(chiter, CDU_SAVE);
 		}
@@ -1677,7 +1677,7 @@ void save_olc_object(descriptor_data *desc) {
 	}
 	
 	// update objs in home storage
-	LL_FOREACH(character_list, chiter) {
+	DL_FOREACH(character_list, chiter) {
 		if (!IS_NPC(chiter)) {
 			LL_FOREACH(GET_HOME_STORAGE(chiter), eus) {
 				if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {

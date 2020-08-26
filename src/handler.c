@@ -1330,33 +1330,29 @@ void extract_char(char_data *ch) {
  * be its own list, but that would change the '->next' pointer, potentially
  * confusing some code. -gg This doesn't handle recursive extractions. */
 void extract_pending_chars(void) {
-	char_data *vict, *next_vict, *prev_vict;
+	char_data *vict, *next_vict;
 
 	if (extractions_pending < 0) {
 		log("SYSERR: Negative (%d) extractions pending.", extractions_pending);
 	}
-
-	for (vict = character_list, prev_vict = NULL; vict && extractions_pending > 0; vict = next_vict) {
-		next_vict = vict->next;
-
+	
+	DL_FOREACH_SAFE(character_list, vict, next_vict) {
+		// check if done?
+		if (extractions_pending <= 0) {
+			break;
+		}
+		
 		if (MOB_FLAGGED(vict, MOB_EXTRACTED)) {
 			REMOVE_BIT(MOB_FLAGS(vict), MOB_EXTRACTED);
 		}
 		else if (!IS_NPC(vict) && PLR_FLAGGED(vict, PLR_EXTRACTED)) {
 			REMOVE_BIT(PLR_FLAGS(vict), PLR_EXTRACTED);
 		}
-		else {
-			/* Last non-free'd character to continue chain from. */
-			prev_vict = vict;
+		else {	// not extracting
 			continue;
 		}
-
-		if (prev_vict) {
-			prev_vict->next = next_vict;
-		}
-		else {
-			character_list = next_vict;
-		}
+		
+		DL_DELETE(character_list, vict);
 
 		// moving this down below the prev_vict block because ch was still in
 		// the character list late in the process, causing a crash in some rare
@@ -1372,7 +1368,7 @@ void extract_pending_chars(void) {
 		
 		// likely an error -- search for people who need extracting (for next time)
 		extractions_pending = 0;
-		for (vict = character_list; vict; vict = vict->next) {
+		DL_FOREACH(character_list, vict) {
 			if (EXTRACTED(vict)) {
 				++extractions_pending;
 			}
@@ -1623,7 +1619,7 @@ char_data *find_closest_char(char_data *ch, char *arg, bool pc_only) {
 		return vict;
 	}
 	
-	LL_FOREACH(character_list, vict) {
+	DL_FOREACH(character_list, vict) {
 		if (pc_only && IS_NPC(vict)) {
 			continue;
 		}
@@ -1775,8 +1771,8 @@ char_data *get_char_vis(char_data *ch, char *name, bitvector_t where) {
 		if ((number = get_number(&tmp)) == 0) {
 			return get_player_vis(ch, tmp, where);
 		}
-
-		for (i = character_list; i && (j <= number) && !found; i = i->next) {
+		
+		DL_FOREACH(character_list, i) {
 			if (IS_SET(where, FIND_NPC_ONLY) && !IS_NPC(i)) {	
 				continue;
 			}
@@ -1787,6 +1783,10 @@ char_data *get_char_vis(char_data *ch, char *name, bitvector_t where) {
 			// found
 			if (++j == number) {
 				found = i;
+				break;	// done
+			}
+			else if (j > number) {
+				break;	// somehow
 			}
 		}
 	}
@@ -1805,8 +1805,8 @@ char_data *get_char_vis(char_data *ch, char *name, bitvector_t where) {
 */
 char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 	char_data *i, *found = NULL;
-
-	for (i = character_list; i && !found; i = i->next) {
+	
+	DL_FOREACH(character_list, i) {
 		if (IS_NPC(i))
 			continue;
 		if (IS_SET(flags, FIND_CHAR_ROOM) && !WIZHIDE_OK(ch, i)) {
@@ -1824,6 +1824,7 @@ char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 		}
 		
 		found = i;
+		break;	// done
 	}
 
 	return found;
@@ -1847,11 +1848,15 @@ char_data *get_char_world(char *name) {
 	if ((number = get_number(&tmp)) == 0) {
 		pc_only = TRUE;
 	}
-
-	for (ch = character_list; ch && (pos <= number) && !found; ch = ch->next) {
+	
+	DL_FOREACH(character_list, ch) {
 		if ((!IS_NPC(ch) || !pc_only) && match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
 			if (++pos == number || pc_only) {	// pc_only messes up pos
 				found = ch;
+				break;	// done
+			}
+			else if (pos > number) {
+				break;	// somehow
 			}
 		}
 	}
@@ -1977,7 +1982,7 @@ void cleanup_all_coins(void) {
 	char_data *ch;
 	descriptor_data *desc;
 	
-	for (ch = character_list; ch; ch = ch->next) {
+	DL_FOREACH(character_list, ch) {
 		if (!IS_NPC(ch)) {
 			cleanup_coins(ch);
 		}

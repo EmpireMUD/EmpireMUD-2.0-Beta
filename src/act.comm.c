@@ -1759,7 +1759,7 @@ ACMD(do_recolor) {
 
 
 ACMD(do_reply) {
-	char_data *tch;
+	char_data *tch, *iter;
 
 	if (REAL_NPC(ch))
 		return;
@@ -1783,9 +1783,12 @@ ACMD(do_reply) {
 		 *      we could not find link dead people.  Not that they can
 		 *      hear tells anyway. :) -gg 2/24/98
 		 */
-		tch = character_list;
-		while (tch != NULL && (REAL_NPC(tch) || GET_IDNUM(tch) != GET_LAST_TELL(ch))) {
-			tch = tch->next;
+		tch = NULL;
+		DL_FOREACH(character_list, iter) {
+			if (!REAL_NPC(iter) && GET_IDNUM(REAL_CHAR(tch)) == GET_LAST_TELL(ch)) {
+				tch = iter;
+				break;
+			}
 		}
 
 		if (tch == NULL) {

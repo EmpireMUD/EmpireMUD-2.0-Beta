@@ -617,9 +617,8 @@ void mobile_activity(void) {
 		return;
 	}
 	catch_up_mobs = FALSE;
-
-	for (ch = character_list; ch; ch = next_ch) {
-		next_ch = ch->next;
+	
+	DL_FOREACH_SAFE(character_list, ch, next_ch) {
 		moved = FALSE;
 
 		if (!IS_MOB(ch) || GET_FED_ON_BY(ch) || EXTRACTED(ch) || IS_DEAD(ch) || AFF_FLAGGED(ch, AFF_STUNNED | AFF_HARD_STUNNED))

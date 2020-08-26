@@ -197,7 +197,7 @@ void display_statistics_to_char(char_data *ch) {
 
 	// creatures
 	count = 0;
-	for (vict = character_list; vict; vict = vict->next) {
+	DL_FOREACH(character_list, vict) {
 		if (IS_NPC(vict)) {
 			++count;
 		}

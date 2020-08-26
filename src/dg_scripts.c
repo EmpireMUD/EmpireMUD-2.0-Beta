@@ -309,9 +309,11 @@ char_data *get_char(char *name) {
 			return i;
 	}
 	else {
-		for (i = character_list; i; i = i->next)
-			if (isname(name, i->player.name) && valid_dg_target(i, DG_ALLOW_GODS))
+		DL_FOREACH(character_list, i) {
+			if (isname(name, i->player.name) && valid_dg_target(i, DG_ALLOW_GODS)) {
 				return i;
+			}
+		}
 	}
 
 	return NULL;
@@ -635,10 +637,12 @@ char_data *get_char_by_obj(obj_data *obj, char *name) {
 
 		if (obj->worn_by && isname(name, obj->worn_by->player.name) && valid_dg_target(obj->worn_by, DG_ALLOW_GODS))
 			return obj->worn_by;
-
-		for (ch = character_list; ch; ch = ch->next)
-			if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS))
+		
+		DL_FOREACH(character_list, ch) {
+			if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS)) {
 				return ch;
+			}
+		}
 	}
 
 	return NULL;
@@ -682,7 +686,7 @@ char_data *get_char_by_vehicle(vehicle_data *veh, char *name) {
 		}
 		
 		// try whole world
-		LL_FOREACH(character_list, ch) {
+		DL_FOREACH(character_list, ch) {
 			if (isname(name, GET_PC_NAME(ch)) && valid_dg_target(ch, DG_ALLOW_GODS)) {
 				return ch;
 			}
@@ -710,10 +714,12 @@ char_data *get_char_by_room(room_data *room, char *name) {
 		for (ch = room->people; ch; ch = ch->next_in_room)
 			if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS))
 				return ch;
-
-		for (ch = character_list; ch; ch = ch->next)
-			if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS))
+		
+		DL_FOREACH(character_list, ch) {
+			if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS)) {
 				return ch;
+			}
+		}
 	}
 
 	return NULL;
@@ -1162,9 +1168,12 @@ EVENTFUNC(trig_wait_event) {
 		int found = FALSE;
 		if (type == MOB_TRIGGER) {
 			char_data *tch;
-			for (tch = character_list;tch && !found;tch = tch->next)
-				if (tch == (char_data*)go)
+			DL_FOREACH(character_list, tch) {
+				if (tch == (char_data*)go) {
 					found = TRUE;
+					break;
+				}
+			}
 		}
 		else if (type == OBJ_TRIGGER) {
 			obj_data *obj;
@@ -2636,7 +2645,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (subfield && *subfield && isdigit(*subfield)) {
 						char_data *miter, *found_mob = NULL;
 						mob_vnum vnum = atoi(subfield);
-						for (miter = character_list; miter && !found_mob; miter = miter->next) {
+						DL_FOREACH(character_list, miter) {
 							if (!EXTRACTED(miter) && GET_MOB_VNUM(miter) == vnum) {
 								if (MOB_INSTANCE_ID(miter) == INST_ID(inst) || ROOM_INSTANCE(IN_ROOM(miter)) == inst) {
 									found_mob = miter;

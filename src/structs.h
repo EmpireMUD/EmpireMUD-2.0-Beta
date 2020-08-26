@@ -4287,7 +4287,7 @@ struct char_data {
 	struct script_memory *memory;	// for mob memory triggers
 
 	char_data *next_in_room;	// For room->people - list
-	char_data *next;	// For either monster or ppl-list
+	char_data *next, *prev;	// For character_list (doubly-linked)
 	char_data *next_fighting;	// For fighting list
 	
 	struct follow_type *followers;	// List of chars followers

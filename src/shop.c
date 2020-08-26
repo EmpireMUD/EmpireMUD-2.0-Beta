@@ -468,7 +468,7 @@ void update_mob_shop_lookups(mob_vnum vnum) {
 		return;
 	}
 	
-	LL_FOREACH(character_list, mob) {
+	DL_FOREACH(character_list, mob) {
 		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == vnum) {
 			// re-set the pointer
 			MOB_SHOP_LOOKUPS(mob) = MOB_SHOP_LOOKUPS(proto);

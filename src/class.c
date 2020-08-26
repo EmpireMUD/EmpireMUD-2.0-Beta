@@ -1067,7 +1067,7 @@ void olc_delete_class(char_data *ch, any_vnum vnum) {
 	remove_class_from_table(cls);
 	
 	// remove from live players
-	LL_FOREACH(character_list, chiter) {
+	DL_FOREACH(character_list, chiter) {
 		if (IS_NPC(chiter)) {
 			continue;
 		}
@@ -1144,7 +1144,7 @@ void save_olc_class(descriptor_data *desc) {
 	HASH_SRT(sorted_hh, sorted_classes, sort_classes_by_data);
 	
 	// update all players in-game
-	LL_FOREACH(character_list, ch_iter) {
+	DL_FOREACH(character_list, ch_iter) {
 		if (!IS_NPC(ch_iter)) {
 			update_class(ch_iter);
 			assign_class_abilities(ch_iter, NULL, NOTHING);

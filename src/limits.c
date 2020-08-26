@@ -2235,9 +2235,7 @@ void point_update(bool run_real) {
 	}
 	
 	// characters
-	for (ch = character_list; ch; ch = next_ch) {
-		next_ch = ch->next;
-		
+	DL_FOREACH_SAFE(character_list, ch, next_ch) {
 		// remove stale offers -- this needs to happen even if dead (resurrect)
 		// TODO shouldn't this logic be inside the point_update_char function?
 		if (!IS_NPC(ch)) {
@@ -2280,9 +2278,7 @@ void real_update(void) {
 	char_data *ch, *next_ch;
 
 	// characters
-	for (ch = character_list; ch; ch = next_ch) {
-		next_ch = ch->next;
-		
+	DL_FOREACH_SAFE(character_list, ch, next_ch) {
 		if (EXTRACTED(ch) || IS_DEAD(ch)) {
 			continue;
 		}

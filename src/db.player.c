@@ -180,8 +180,8 @@ char_data *is_at_menu(int id) {
 */
 char_data *is_playing(int id) {
 	char_data *ch;
-
-	for (ch = character_list; ch; ch = ch->next) {
+	
+	DL_FOREACH(character_list, ch) {
 		if (!IS_NPC(ch) && GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
 			return ch;
 		}
@@ -3862,8 +3862,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		GET_APPARENT_AGE(ch) = 25;
 
 	// add to lists
-	ch->next = character_list;
-	character_list = ch;
+	DL_PREPEND(character_list, ch);
 	ch->script_id = GET_IDNUM(ch);
 	add_to_lookup_table(ch->script_id, (void *)ch);
 	

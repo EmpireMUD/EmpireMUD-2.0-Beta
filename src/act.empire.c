@@ -1140,7 +1140,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 	requesters_island = GET_ISLAND_ID(IN_ROOM(to));
 	
 	// count up workforce mobs
-	for (ch_iter = character_list; ch_iter; ch_iter = ch_iter->next) {
+	DL_FOREACH(character_list, ch_iter) {
 		if (!IS_NPC(ch_iter) || GET_LOYALTY(ch_iter) != emp) {
 			continue;
 		}
@@ -4528,7 +4528,7 @@ ACMD(do_enroll) {
 			}
 		
 			// mobs
-			for (mob = character_list; mob; mob = mob->next) {
+			DL_FOREACH(character_list, mob) {
 				if (GET_LOYALTY(mob) == old) {
 					GET_LOYALTY(mob) = e;
 				}
@@ -4682,7 +4682,7 @@ ACMD(do_enroll) {
 		reread_empire_tech(GET_LOYALTY(ch));
 		
 		// need to update quests too: do this AFTER rereading tech
-		LL_FOREACH(character_list, victim) {
+		DL_FOREACH(character_list, victim) {
 			if (!IS_NPC(victim) && GET_LOYALTY(victim) == e) {
 				refresh_all_quests(victim);
 			}

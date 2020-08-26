@@ -151,7 +151,7 @@ int top_island_num = -1;	// for number of islands
 // mobs
 char_data *mobile_table = NULL;	// hash table of mobs
 struct player_special_data dummy_mob;	// dummy spec area for mobs
-char_data *character_list = NULL;	// global linked list of chars (including players)
+char_data *character_list = NULL;	// global doubly-linked list of chars (including players)
 char_data *combat_list = NULL;	// head of l-list of fighting chars
 char_data *next_combat_list = NULL;	// used for iteration of combat_list when more than 1 person can be removed from combat in 1 loop iteration
 struct generic_name_data *generic_names = NULL;	// LL of generic name sets
@@ -1786,8 +1786,7 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	CREATE(mob, char_data, 1);
 	clear_char(mob);
 	*mob = *proto;
-	mob->next = character_list;
-	character_list = mob;
+	DL_PREPEND(character_list, mob);
 	
 	// safe minimums
 	if (GET_MAX_HEALTH(mob) < 1) {
@@ -3189,7 +3188,7 @@ void b5_34_mega_update(void) {
 	log("Applying b5.34 progression update...");
 	
 	// remove Spirit of Progress mob
-	LL_FOREACH_SAFE(character_list, mob, next_mob) {
+	DL_FOREACH_SAFE(character_list, mob, next_mob) {
 		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == 10856) {
 			extract_char(mob);
 		}
@@ -3477,7 +3476,7 @@ void b5_48_rope_update(void) {
 	obj_vnum OLD_ROPE = 2035;	// leather rope
 	
 	log("Applying b5.48 update to add ropes to tied mobs...");
-	LL_FOREACH(character_list, mob) {
+	DL_FOREACH(character_list, mob) {
 		if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_TIED)) {
 			GET_ROPE_VNUM(mob) = OLD_ROPE;
 			any = TRUE;
@@ -3567,7 +3566,7 @@ void b5_82_snowman_fix(void) {
 	
 	log("Applying b5.82 snowman fix...");
 	
-	LL_FOREACH_SAFE(character_list, ch, next_ch) {
+	DL_FOREACH_SAFE(character_list, ch, next_ch) {
 		if (!IS_NPC(ch) || GET_MOB_VNUM(ch) != snowman_vnum) {
 			continue;	// wrong mob
 		}
@@ -4481,7 +4480,7 @@ void check_version(void) {
 			
 			log("Applying b2.11 update:");
 			log(" - assigning mob triggers...");
-			for (mob = character_list; mob; mob = mob->next) {
+			DL_FOREACH(character_list, mob) {
 				if (IS_NPC(mob) && (mobpr = mob_proto(GET_MOB_VNUM(mob)))) {
 					mob->proto_script = copy_trig_protos(mobpr->proto_script);
 					assign_triggers(mob, MOB_TRIGGER);

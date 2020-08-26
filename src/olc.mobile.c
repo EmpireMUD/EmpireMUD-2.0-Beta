@@ -343,9 +343,7 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	}
 		
 	// remove mobs and mounts from the list: DO THIS FIRST
-	for (mob_iter = character_list; mob_iter; mob_iter = next_mob) {
-		next_mob = mob_iter->next;
-		
+	DL_FOREACH_SAFE(character_list, mob_iter, next_mob) {
 		if (IS_NPC(mob_iter)) {
 			if (GET_MOB_VNUM(mob_iter) == vnum) {
 				// this is the removed mob
@@ -1055,7 +1053,7 @@ void save_olc_mobile(descriptor_data *desc) {
 	}
 	
 	// update the strings and pointers on live mobs
-	for (mob_iter = character_list; mob_iter; mob_iter = mob_iter->next) {
+	DL_FOREACH(character_list, mob_iter) {
 		if (IS_NPC(mob_iter) && GET_MOB_VNUM(mob_iter) == vnum) {
 			// update strings
 			if (GET_PC_NAME(mob_iter) == GET_PC_NAME(proto)) {

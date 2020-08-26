@@ -1020,7 +1020,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	}
 	
 	// remove from live lists: player currencies
-	LL_FOREACH(character_list, chiter) {
+	DL_FOREACH(character_list, chiter) {
 		if (IS_NPC(chiter)) {
 			continue;
 		}
@@ -1410,7 +1410,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		need_progress_refresh = TRUE;
 	}
 	if (any_quest) {
-		LL_FOREACH_SAFE(character_list, chiter, next_ch) {
+		DL_FOREACH_SAFE(character_list, chiter, next_ch) {
 			if (!IS_NPC(chiter)) {
 				refresh_all_quests(chiter);
 			}

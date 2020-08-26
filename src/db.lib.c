@@ -1806,9 +1806,7 @@ void delete_empire(empire_data *emp) {
 	}
 	
 	// update all mobs
-	for (ch = character_list; ch; ch = next_ch) {
-		next_ch = ch->next;
-		
+	DL_FOREACH_SAFE(character_list, ch, next_ch) {
 		// this is "theoretically" just NPCs since we did players already
 		if (GET_LOYALTY(ch) == emp) {
 			GET_LOYALTY(ch) = NULL;
