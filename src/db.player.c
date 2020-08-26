@@ -29,6 +29,7 @@
 *   Account DB
 *   Core Player DB
 *   Delayed Update System
+*   loaded_player_hash For Offline Players
 *   Autowiz Wizlist Generator
 *   Helpers
 *   Empire Player Management
@@ -66,6 +67,7 @@ struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
 time_t get_member_timeout_time(time_t created, time_t last_login, double played_hours);
 void purge_bound_items(int idnum);
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch);
+void remove_loaded_player(char_data *ch);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
 int sort_players_by_name(player_index_data *a, player_index_data *b);
 void write_player_delayed_data_to_file(FILE *fl, char_data *ch);
@@ -74,46 +76,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch);
 
  //////////////////////////////////////////////////////////////////////////////
 //// GETTERS /////////////////////////////////////////////////////////////////
-
-/**
-* This has the same purpose as get_player_vis_or_file, but won't screw anything
-* up if the target is online but invisible. You must call store_loaded_char()
-* if is_file == TRUE, or the player won't be stored. If you do NOT wish to save
-* the character, use free_char() instead.
-*
-* @param char *name The player name
-* @param bool *is_file A place to store whether or not we loaded from file
-* @return char_data *ch or NULL
-*/
-char_data *find_or_load_player(char *name, bool *is_file) {
-	char buf[MAX_INPUT_LENGTH+2];
-	player_index_data *index;
-	char_data *ch = NULL;
-	
-	*is_file = FALSE;
-	
-	if ((index = find_player_index_by_name(name))) {
-		if (!(ch = is_playing(index->idnum))) {
-			if ((ch = load_player(index->name, TRUE))) {
-				SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
-				*is_file = TRUE;
-			}
-		}
-	}
-	
-	// not able to find -- look for a player partial match?
-	if (!ch) {
-		sprintf(buf, "0.%s", name);	// add 0. to force player match
-		ch = get_char_world(buf);
-		*is_file = FALSE;
-		if (ch && IS_NPC(ch)) {
-			ch = NULL;	// verify player only
-		}
-	}
-	
-	return ch;
-}
-
 
 /**
 * Look up a player's index entry by idnum.
@@ -826,6 +788,11 @@ void free_char(char_data *ch) {
 	
 	// clean up gear/items, if any
 	extract_all_items(ch);
+	
+	// ensure they are not queued for re-freeing
+	if (!IS_NPC(ch)) {
+		remove_loaded_player(ch);
+	}
 
 	if (ch->followers || ch->master) {
 		die_follower(ch);
@@ -3003,6 +2970,137 @@ void queue_delayed_update(char_data *ch, bitvector_t type) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// loaded_player_hash FOR OFFLINE PLAYERS //////////////////////////////////
+
+// for find_or_load_player(), tracks players that are kept in a 'loaded' state
+// and are freed up automatically
+struct loaded_player_data {
+	int id;
+	char_data *ch;
+	UT_hash_handle hh;
+};
+
+struct loaded_player_data *loaded_player_hash = NULL;
+
+
+/**
+* Sets a player as 'loaded from file' in the loaded_player_hash, triggering an
+* un-load up to 1 second later.
+*
+* @param char_data *ch The player to add to the loaded_player_hash.
+*/
+void add_loaded_player(char_data *ch) {
+	struct loaded_player_data *lpd;
+	int id;
+	
+	if (!IS_NPC(ch)) {
+		id = GET_IDNUM(ch);
+		HASH_FIND_INT(loaded_player_hash, &id, lpd);
+		if (!lpd) {
+			CREATE(lpd, struct loaded_player_data, 1);
+			lpd->id = id;
+			HASH_ADD_INT(loaded_player_hash, id, lpd);
+		}
+	
+		if (lpd->ch && lpd->ch != ch) {
+			log("SYSERR: add_loaded_player called when a different copy of the same player is already loaded");
+		}
+	
+		lpd->ch = ch;
+	}
+}
+
+
+/**
+* This has the same purpose as get_player_vis_or_file, but won't screw anything
+* up if the target is online but invisible. You can call SAVE_CHAR(ch) like
+* normal. You should call store_loaded_char() if is_file == TRUE, or the player
+* won't be stored. If you do NOT wish to save the character, you can use
+* free_char() instead.
+*
+* If you do not free the character yourself, it will automatically be freed
+* within 1 second. Leaving characters in this state can be advantageous if you
+* expect several functions to load them in sequence.
+*
+* @param char *name The player name
+* @param bool *is_file A place to store whether or not we loaded from file
+* @return char_data *ch or NULL
+*/
+char_data *find_or_load_player(char *name, bool *is_file) {
+	struct loaded_player_data *lpd;
+	char buf[MAX_INPUT_LENGTH+2];
+	player_index_data *index;
+	char_data *ch = NULL;
+	int id;
+	
+	*is_file = FALSE;
+	
+	if ((index = find_player_index_by_name(name))) {
+		if (!(ch = is_playing(index->idnum))) {
+			id = index->idnum;
+			HASH_FIND_INT(loaded_player_hash, &id, lpd);
+			if (lpd) {	// look in the loaded player hash first
+				*is_file = TRUE;
+				ch = lpd->ch;
+			}
+			else if ((ch = load_player(index->name, TRUE))) {
+				SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
+				*is_file = TRUE;
+				add_loaded_player(ch);
+			}
+		}
+	}
+	
+	// not able to find -- look for a player partial match?
+	if (!ch) {
+		sprintf(buf, "0.%s", name);	// add 0. to force player match
+		ch = get_char_world(buf);
+		*is_file = FALSE;
+		if (ch && IS_NPC(ch)) {
+			ch = NULL;	// verify player only
+		}
+	}
+	
+	return ch;
+}
+
+
+/**
+* Frees up players who have been left in a 'loaded' state by
+* find_or_load_player().
+*/
+void free_loaded_players(void) {
+	struct loaded_player_data *iter, *next;
+	HASH_ITER(hh, loaded_player_hash, iter, next) {
+		HASH_DEL(loaded_player_hash, iter);
+		free_char(iter->ch);
+		free(iter);
+	}
+}
+
+
+/**
+* Removes a player from the loaded_player_hash without freeing them. Use this
+* if a previously-loaded player logs into the game, or similar.
+*
+* @param char_data *ch The player to remove from the loaded_player_hash.
+*/
+void remove_loaded_player(char_data *ch) {
+	struct loaded_player_data *lpd;
+	int id;
+	
+	if (!IS_NPC(ch)) {
+		id = GET_IDNUM(ch);
+		HASH_FIND_INT(loaded_player_hash, &id, lpd);
+		if (lpd) {
+			HASH_DEL(loaded_player_hash, lpd);
+			free(lpd);
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// AUTOWIZ WIZLIST GENERATOR ///////////////////////////////////////////////
 
 /**
@@ -3668,6 +3766,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	clean_old_history(ch);
 	reset_combat_meters(ch);
 	GET_COMBAT_METERS(ch).over = TRUE;	// ensure no active meter
+	remove_loaded_player(ch);	// in case they were recently loaded
 	
 	// remove this now
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
@@ -4623,7 +4722,8 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		}
 		
 		if (ch && is_file) {
-			free_char(ch);
+			// no longer quick-freeing these; leave them in the queue to free soon
+			// free_char(ch);
 		}
 	}
 	

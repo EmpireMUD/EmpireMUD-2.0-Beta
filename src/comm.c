@@ -926,6 +926,7 @@ void heartbeat(int heart_pulse) {
 	void display_automessages();
 	void extract_pending_chars();
 	void free_freeable_triggers();
+	void free_loaded_players();
 	void frequent_combat(int pulse);
 	void generate_adventure_instances();
 	void output_map_to_file();
@@ -1149,6 +1150,8 @@ void heartbeat(int heart_pulse) {
 		if (debug_log && HEARTBEAT(15)) { log("debug 30:\t%lld", microtime()); }
 		run_delayed_refresh();
 		if (debug_log && HEARTBEAT(15)) { log("debug 31:\t%lld", microtime()); }
+		free_loaded_players();	// ensure this comes AFTER run_delayed_refresh
+		if (debug_log && HEARTBEAT(15)) { log("debug 32:\t%lld", microtime()); }
 	}
 
 	/* Every pulse! Don't want them to stink the place up... */
@@ -4122,7 +4125,9 @@ void setup_log(const char *filename, int fd) {
 
 void reboot_recover(void) {
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
+	void free_loaded_players();
 	extern bool global_mute_slash_channel_joins;
+	void run_delayed_refresh();
 
 	char buf[MAX_STRING_LENGTH];
 	descriptor_data *d;
@@ -4134,6 +4139,10 @@ void reboot_recover(void) {
 	char name[MAX_INPUT_LENGTH];
 
 	log("Reboot is recovering players...");
+	
+	// ensure nobody is sitting un-flushed in the queue before loading players
+	run_delayed_refresh();
+	free_loaded_players();
 
 	if (!(fp = fopen(REBOOT_FILE, "r"))) {
 		perror("reboot_recover: fopen");

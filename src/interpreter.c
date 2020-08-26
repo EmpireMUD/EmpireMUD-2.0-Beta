@@ -2314,8 +2314,10 @@ void nanny(descriptor_data *d, char *arg) {
 	void display_automessages_on_login(char_data *ch);
 	void display_tip_to_char(char_data *ch);
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
+	void free_loaded_players();
 	extern int isbanned(char *hostname);
 	extern int num_earned_bonus_traits(char_data *ch);
+	void run_delayed_refresh();
 	void start_new_character(char_data *ch);
 	extern int Valid_Name(char *newname);
 	
@@ -2338,6 +2340,10 @@ void nanny(descriptor_data *d, char *arg) {
 
 	switch (STATE(d)) {
 		case CON_GET_NAME: {	/* wait for input of name */
+			// ensure no characters are loaded/pending anything before loading one here
+			run_delayed_refresh();
+			free_loaded_players();
+			
 			if (d->character == NULL) {
 				CREATE(d->character, char_data, 1);
 				clear_char(d->character);

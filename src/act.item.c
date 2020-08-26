@@ -48,6 +48,7 @@ extern struct faction_reputation_type reputation_levels[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // extern functions
+ACMD(do_home);
 extern int add_eq_set_to_char(char_data *ch, int set_id, char *name);
 void add_obj_to_eq_set(obj_data *obj, int set_id, int pos);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
@@ -6511,6 +6512,11 @@ ACMD(do_retrieve) {
 				sprintf(buf, "retrieve %s", original);
 				do_warehouse(ch, buf, 0, 0);
 			}
+			else if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) == GET_IDNUM(ch)) {
+				// pass control to home store func
+				sprintf(buf, "retrieve %s", original);
+				do_home(ch, buf, 0, 0);
+			}
 			else {
 				msg_to_char(ch, "Nothing like that is stored here!\r\n");
 			}
@@ -7057,6 +7063,11 @@ ACMD(do_store) {
 				sprintf(buf, "store %s", argument);
 				do_warehouse(ch, buf, 0, 0);
 			}
+			else if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) == GET_IDNUM(ch)) {
+				// pass control to home store func
+				sprintf(buf, "store %s", argument);
+				do_home(ch, buf, 0, 0);
+			}
 			else {
 				msg_to_char(ch, "You don't have anything that can be stored here.\r\n");
 			}
@@ -7098,6 +7109,11 @@ ACMD(do_store) {
 				// pass control to warehouse func
 				sprintf(buf, "store %s", argument);
 				do_warehouse(ch, buf, 0, 0);
+			}
+			else if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) == GET_IDNUM(ch)) {
+				// pass control to home store func
+				sprintf(buf, "store %s", argument);
+				do_home(ch, buf, 0, 0);
 			}
 			else {
 				msg_to_char(ch, "You can't store that here!\r\n");

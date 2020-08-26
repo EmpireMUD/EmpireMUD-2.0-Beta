@@ -230,7 +230,8 @@ bool is_ignoring_idnum(char_data *ch, int idnum) {
 	if ((index = find_player_index_by_idnum(idnum)) && (victim = find_or_load_player(index->name, &is_file))) {
 		ignoring = is_ignoring(ch, victim);
 		if (is_file) {
-			free_char(victim);
+			// no longer quick-freeing these; leave them in the queue to free soon
+			// free_char(victim);
 		}
 	}
 	
