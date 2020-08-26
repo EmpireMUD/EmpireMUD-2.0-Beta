@@ -1366,7 +1366,7 @@ void annual_world_update(void) {
 		annual_update_depletions(&ROOM_DEPLETION(room));
 	}
 	
-	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		annual_update_vehicle(veh);
 	}
 	
@@ -2552,7 +2552,7 @@ void reread_empire_tech(empire_data *emp) {
 	read_empire_territory(emp, TRUE);
 	
 	// also read vehicles for tech/etc
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (emp && VEH_OWNER(veh) != emp) {
 			continue;	// only checking one
 		}

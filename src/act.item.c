@@ -3047,7 +3047,7 @@ vehicle_data *find_ship_by_shipping_id(empire_data *emp, int shipping_id) {
 		return NULL;
 	}
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_OWNER(veh) == emp && VEH_SHIPPING_ID(veh) == shipping_id) {
 			return veh;
 		}

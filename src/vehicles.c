@@ -70,7 +70,7 @@ void abandon_lost_vehicles(void) {
 	vehicle_data *veh;
 	empire_data *emp;
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (!(emp = VEH_OWNER(veh))) {
 			continue;	// only looking to abandon owned vehs
 		}
@@ -734,7 +734,7 @@ void link_and_check_vehicles(void) {
 	bool found = FALSE;
 	
 	// reverse-link the home-room of vehicles to this one
-	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
 			COMPLEX_DATA(VEH_INTERIOR_HOME_ROOM(veh))->vehicle = veh;
 		}
@@ -927,7 +927,7 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	}
 
 	*veh = *proto;
-	LL_PREPEND2(vehicle_list, veh, next);
+	DL_PREPEND(vehicle_list, veh);
 	
 	// new vehicle setup
 	VEH_OWNER(veh) = NULL;
@@ -2073,7 +2073,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	}
 	
 	// remove live vehicles
-	LL_FOREACH_SAFE(vehicle_list, iter, next_iter) {
+	DL_FOREACH_SAFE(vehicle_list, iter, next_iter) {
 		if (VEH_VNUM(iter) != vnum) {
 			continue;
 		}
@@ -2473,7 +2473,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 	prune_extra_descs(&VEH_EX_DESCS(veh));
 	
 	// update live vehicles
-	LL_FOREACH(vehicle_list, iter) {
+	DL_FOREACH(vehicle_list, iter) {
 		if (VEH_VNUM(iter) != vnum) {
 			continue;
 		}

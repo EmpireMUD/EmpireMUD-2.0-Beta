@@ -1825,7 +1825,7 @@ void delete_empire(empire_data *emp) {
 	}
 	
 	// update all vehicles
-	LL_FOREACH_SAFE2(vehicle_list, veh, next_veh, next) {
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		if (VEH_OWNER(veh) == emp) {
 			VEH_OWNER(veh) = NULL;
 			VEH_SHIPPING_ID(veh) = -1;

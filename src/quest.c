@@ -380,7 +380,7 @@ int count_owned_vehicles(empire_data *emp, any_vnum vnum) {
 		return count;
 	}
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
 			continue;
 		}
@@ -411,7 +411,7 @@ int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags) {
 		return count;
 	}
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
 			continue;
 		}
@@ -1567,7 +1567,7 @@ void update_veh_quest_lookups(any_vnum vnum) {
 		return;
 	}
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_VNUM(veh) == vnum) {
 			// re-set the pointer
 			VEH_QUEST_LOOKUPS(veh) = VEH_QUEST_LOOKUPS(proto);

@@ -609,7 +609,7 @@ vehicle_data *get_vehicle(char *name) {
 		return find_vehicle(atoi(name + 1));
 	}
 	else {
-		LL_FOREACH(vehicle_list, veh) {
+		DL_FOREACH(vehicle_list, veh) {
 			if (isname(name, VEH_KEYWORDS(veh))) {
 				return veh;
 			}
@@ -1190,7 +1190,7 @@ EVENTFUNC(trig_wait_event) {
 		}
 		else if (type == VEH_TRIGGER) {
 			vehicle_data *veh;
-			LL_FOREACH(vehicle_list, veh) {
+			DL_FOREACH(vehicle_list, veh) {
 				if (veh == (vehicle_data*)go) {
 					found = TRUE;
 					break;
@@ -1436,7 +1436,7 @@ void add_trigger(struct script_data *sc, trig_data *t, int loc) {
 	t->attached_to = sc;
 	
 	// add to lists
-	LL_PREPEND2(trigger_list, t, next_in_world);
+	DL_PREPEND2(trigger_list, t, next_in_world, prev_in_world);
 	if (TRIG_IS_RANDOM(t)) {
 		// add to end
 		DL_APPEND2(random_triggers, t, prev_in_random_triggers, next_in_random_triggers);

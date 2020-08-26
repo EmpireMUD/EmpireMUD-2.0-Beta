@@ -130,7 +130,7 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 	}
 	
 	// otherwise look for ones that match
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_OWNER(veh) != GET_LOYALTY(ch)) {
 			continue;
 		}

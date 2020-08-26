@@ -3099,8 +3099,8 @@ SHOW(show_stats) {
 	
 	// other counts
 	DL_COUNT(object_list, obj, num_objs);
-	LL_COUNT(vehicle_list, veh, num_vehs);
-	LL_COUNT2(trigger_list, trig, num_trigs, next_in_world);
+	DL_COUNT(vehicle_list, veh, num_vehs);
+	DL_COUNT2(trigger_list, trig, num_trigs, next_in_world);
 
 	// count active empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {

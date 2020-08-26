@@ -109,7 +109,7 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 	vehicle_data *veh;
 	int old_id, new_id;
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_OWNER(veh) != old_emp || VEH_SHIPPING_ID(veh) == -1) {
 			continue;
 		}
@@ -4039,7 +4039,7 @@ ACMD(do_efind) {
 		}
 		
 		// next, vehicles
-		LL_FOREACH(vehicle_list, veh) {
+		DL_FOREACH(vehicle_list, veh) {
 			if (!IN_ROOM(veh)) {
 				continue;
 			}
@@ -4577,7 +4577,7 @@ ACMD(do_enroll) {
 			convert_empire_shipping(old, e);
 			
 			// vehicles
-			LL_FOREACH_SAFE2(vehicle_list, veh, next_veh, next) {
+			DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 				if (VEH_OWNER(veh) == old) {
 					VEH_OWNER(veh) = e;
 				}

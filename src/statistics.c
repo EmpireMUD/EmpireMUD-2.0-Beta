@@ -209,7 +209,7 @@ void display_statistics_to_char(char_data *ch) {
 	msg_to_char(ch, "Unique Objects:   %5d     Total Objects:      %d\r\n", HASH_COUNT(object_table), count);
 	
 	// vehicles
-	LL_COUNT(vehicle_list, veh, count);
+	DL_COUNT(vehicle_list, veh, count);
 	msg_to_char(ch, "Unique Vehicles:  %5d     Total Vehicles:     %d\r\n", HASH_COUNT(vehicle_table), count);
 }
 

@@ -2255,7 +2255,7 @@ void point_update(bool run_real) {
 	}
 	
 	// vehicles
-	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		point_update_vehicle(veh);
 	}
 	

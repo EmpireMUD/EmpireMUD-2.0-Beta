@@ -222,7 +222,7 @@ int tips_of_the_day_size = 0;	// size of tip array
 
 // triggers
 trig_data *trigger_table = NULL;	// trigger prototype hash
-trig_data *trigger_list = NULL;	// LL of all attached triggers
+trig_data *trigger_list = NULL;	// DLL of all attached triggers
 trig_data *random_triggers = NULL;	// DLL of live random triggers (next_in_random_triggers, prev_in_random_triggers)
 trig_data *free_trigger_list = NULL;	// LL of triggers to free (next_to_free)
 int max_mob_id = MOB_ID_BASE;	// for unique mob ids
@@ -236,7 +236,7 @@ room_data *dg_owner_room = NULL;
 
 // vehicles
 vehicle_data *vehicle_table = NULL;	// master vehicle hash table
-vehicle_data *vehicle_list = NULL;	// global linked list of vehicles (veh->next)
+vehicle_data *vehicle_list = NULL;	// global doubly-linked list of vehicles (veh->next)
 
 // world / rooms
 room_data *world_table = NULL;	// hash table of the whole world
@@ -2256,7 +2256,7 @@ void b3_6_einv_fix(void) {
 void b3_11_ship_fix(void) {
 	vehicle_data *veh;
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (IN_ROOM(veh) && VEH_SHIPPING_ID(veh) != -1 && (!GET_BUILDING(IN_ROOM(veh)) || GET_BLD_VNUM(GET_BUILDING(IN_ROOM(veh))) != RTYPE_SHIP_HOLDING_PEN)) {
 			VEH_SHIPPING_ID(veh) = -1;
 		}
@@ -2715,7 +2715,7 @@ void b5_1_global_update(void) {
 	}
 	
 	// live vehicles
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
 			if (res->type == RES_ACTION && res->vnum < 100) {
 				res->vnum += 1000;
@@ -4176,7 +4176,7 @@ void b5_88_maintenance_fix(void) {
 		}
 	}
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		any = FALSE;
 		LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
 			if (res->type == RES_COMPONENT && res->vnum < 100) {

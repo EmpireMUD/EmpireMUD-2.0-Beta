@@ -219,6 +219,7 @@ struct trig_data {
 	
 	struct trig_data *next;	// next on assigned SCRIPT()
 	struct trig_data *next_in_world;    /* next in the global trigger list */
+	struct trig_data *prev_in_world;	// prev in the global trigger list
 	
 	struct trig_data *prev_in_random_triggers;	// DLL: random_triggers
 	struct trig_data *next_in_random_triggers;	// DLL: random_triggers

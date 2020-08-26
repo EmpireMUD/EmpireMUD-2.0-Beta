@@ -673,7 +673,7 @@ void chore_update(void) {
 				next_ter = global_next_territory_entry;
 			}
 			
-			LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+			DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 				if (VEH_OWNER(veh) == emp) {
 					process_one_vehicle_chore(emp, veh);
 				}

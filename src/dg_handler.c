@@ -185,7 +185,7 @@ void extract_trigger(trig_data *trig) {
 	}
 
 	/* walk the trigger list and remove this one */
-	LL_DELETE2(trigger_list, trig, next_in_world);
+	DL_DELETE2(trigger_list, trig, next_in_world, prev_in_world);
 	
 	// global trig?
 	if (TRIG_IS_RANDOM(trig)) {
@@ -253,7 +253,7 @@ void extract_script(void *thing, int type) {
 			DL_FOREACH(object_list, j) {
 				assert(sc != SCRIPT(j));
 			
-			LL_FOREACH(vehicle_list, v) {
+			DL_FOREACH(vehicle_list, v) {
 				assert(sc != SCRIPT(v));
 			}
 			

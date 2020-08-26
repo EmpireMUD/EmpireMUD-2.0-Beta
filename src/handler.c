@@ -9329,7 +9329,7 @@ void extract_vehicle(vehicle_data *veh) {
 		unharness_mob_from_vehicle(VEH_ANIMALS(veh), veh);
 	}
 	
-	LL_DELETE2(vehicle_list, veh, next);
+	DL_DELETE(vehicle_list, veh);
 	free_vehicle(veh);
 }
 
@@ -9478,7 +9478,7 @@ vehicle_data *get_vehicle_vis(char_data *ch, char *name) {
 		return (NULL);
 	}
 	
-	LL_FOREACH2(vehicle_list, iter, next) {
+	DL_FOREACH(vehicle_list, iter) {
 		if (!isname(tmp, VEH_KEYWORDS(iter))) {
 			continue;
 		}
@@ -9550,7 +9550,7 @@ vehicle_data *get_vehicle_world(char *name) {
 		return (NULL);
 	}
 	
-	LL_FOREACH2(vehicle_list, iter, next) {
+	DL_FOREACH(vehicle_list, iter) {
 		if (!isname(tmp, VEH_KEYWORDS(iter))) {
 			continue;
 		}

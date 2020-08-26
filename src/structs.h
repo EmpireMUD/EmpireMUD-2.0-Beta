@@ -5501,7 +5501,7 @@ struct vehicle_data {
 	struct script_data *script;	// script info for the object
 	
 	// lists
-	struct vehicle_data *next;	// vehicle_list (global) linked list
+	struct vehicle_data *next, *prev;	// vehicle_list (global) doubly-linked list
 	struct vehicle_data *next_in_room;	// ROOM_VEHICLES(room) linked list
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;

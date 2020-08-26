@@ -488,7 +488,7 @@ void update_vehicle_shop_lookups(mob_vnum vnum) {
 		return;
 	}
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_VNUM(veh) == vnum) {
 			// re-set the pointer
 			VEH_SHOP_LOOKUPS(veh) = VEH_SHOP_LOOKUPS(proto);
