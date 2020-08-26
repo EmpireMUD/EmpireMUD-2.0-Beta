@@ -395,6 +395,25 @@ struct time_info_data *real_time_passed(time_t t2, time_t t1) {
 //// EMPIRE UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Cancels a requested refresh on 1 or more empires.
+*
+* @param empire_data *only_emp Optional: Only remove from one empire (default: NULL = all)
+* @param bitvector_t refresh_flag The DELAY_REFRESH_ flag(s) to remove.
+*/
+void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_flag) {
+	empire_data *emp, *next_emp;
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		if (only_emp && emp != only_emp) {
+			continue;
+		}
+		
+		REMOVE_BIT(EMPIRE_DELAYED_REFRESH(emp), refresh_flag);
+	}
+}
+
+
+/**
 * Checks players and empires for delayed-refresh commands.
 */
 void run_delayed_refresh(void) {
