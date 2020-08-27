@@ -1352,7 +1352,10 @@ void extract_pending_chars(void) {
 			continue;
 		}
 		
-		DL_DELETE(character_list, vict);
+		// ensure they're really (probably) in the character list
+		if (character_list && (character_list == vict || vict->prev || vict->next)) {
+			DL_DELETE(character_list, vict);
+		}
 
 		// moving this down below the prev_vict block because ch was still in
 		// the character list late in the process, causing a crash in some rare
@@ -5618,7 +5621,10 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 * @param obj_data *obj The item to remove from the global object list.
 */
 void remove_from_object_list(obj_data *obj) {
-	DL_DELETE(object_list, obj);
+	// ensure it's (probably) in the list first
+	if (object_list && (object_list == obj || obj->next || obj->prev)) {
+		DL_DELETE(object_list, obj);
+	}
 }
 
 
@@ -9329,7 +9335,10 @@ void extract_vehicle(vehicle_data *veh) {
 		unharness_mob_from_vehicle(VEH_ANIMALS(veh), veh);
 	}
 	
-	DL_DELETE(vehicle_list, veh);
+	// ensure it's (probably) in the list first
+	if (vehicle_list && (vehicle_list == veh || veh->prev || veh->next)) {
+		DL_DELETE(vehicle_list, veh);
+	}
 	free_vehicle(veh);
 }
 
