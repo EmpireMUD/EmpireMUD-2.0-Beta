@@ -4421,6 +4421,7 @@ void b5_102_home_cleanup(void) {
 	}
 	
 	// autostore homes
+	/* this currently just deletes the items and I need to look into why
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
 			LL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
@@ -4428,6 +4429,7 @@ void b5_102_home_cleanup(void) {
 			}
 		}
 	}
+	*/
 	
 	save_whole_world();
 }
