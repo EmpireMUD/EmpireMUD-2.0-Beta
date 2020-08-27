@@ -2197,6 +2197,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 */
 void load_empire_storage_one(FILE *fl, empire_data *emp) {	
 	extern struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
+	void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
 	
 	int t[10], junk;
 	long l_in;
@@ -2207,6 +2208,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	struct empire_storage_data *store;
 	struct theft_log *tft;
 	obj_data *obj, *proto;
+	trig_data *trig;
 	
 	if (!fl || !emp) {
 		return;
@@ -2347,11 +2349,20 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 			}
 
 			case 'S': {	// fin
-				return;
+				break;
 			}
 			default: {
 				log("%s", buf);
 				exit(1);
+			}
+		}
+	}
+	
+	// ensure random triggers are shut off on unique storage
+	LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+		if (eus->obj && SCRIPT(eus->obj)) {
+			LL_FOREACH(TRIGGERS(SCRIPT(eus->obj)), trig) {
+				remove_trigger_from_global_lists(trig, TRUE);
 			}
 		}
 	}

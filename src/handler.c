@@ -85,6 +85,7 @@ void check_delayed_load(char_data *ch);
 void clear_delayed_update(char_data *ch);
 void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
+void free_varlist(struct trig_var_data *vd);
 void scale_item_to_level(obj_data *obj, int level);
 
 // locals
@@ -4723,8 +4724,6 @@ void check_minipets_and_companions(char_data *ch) {
 * @param struct companion_data *cd The companion data to free.
 */
 void free_companion(struct companion_data *cd) {
-	void free_varlist(struct trig_var_data *vd);
-	
 	if (cd) {
 		struct companion_mod *mod, *next_mods;
 		
@@ -9048,10 +9047,13 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique
 * @param bool *full A variable to set TRUE if the storage is full and the item can't be stored.
 */
 void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, obj_data *obj, empire_data *save_emp, room_data *room, bool *full) {
+	EVENT_CANCEL_FUNC(cancel_wait_event);
 	extern int get_main_island(empire_data *emp);
+	void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
 	
 	struct empire_unique_storage *eus;
 	bool extract = FALSE;
+	trig_data *trig;
 	
 	*full = FALSE;
 	
@@ -9099,6 +9101,22 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 			
 		// get it out of the object list
 		remove_from_object_list(obj);
+		
+		// cancel running trigs and shut off random trigs
+		if (SCRIPT(obj)) {
+			LL_FOREACH(TRIGGERS(SCRIPT(obj)), trig) {
+				remove_trigger_from_global_lists(trig, TRUE);
+				
+				if (GET_TRIG_WAIT(trig)) {
+					dg_event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
+					GET_TRIG_WAIT(trig) = NULL;
+					GET_TRIG_DEPTH(trig) = 0;
+					free_varlist(GET_TRIG_VARS(trig));
+					GET_TRIG_VARS(trig) = NULL;
+					trig->curr_state = NULL;
+				}
+			}
+		}
 	}
 	
 	if (ch) {

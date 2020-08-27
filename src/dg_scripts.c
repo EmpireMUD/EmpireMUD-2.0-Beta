@@ -1414,6 +1414,7 @@ void do_sstat_character(char_data *ch, char_data *k) {
 * add to the end, loc = 0 means add before all other triggers.
 */
 void add_trigger(struct script_data *sc, trig_data *t, int loc) {
+	void add_trigger_to_global_lists(trig_data *trig);
 	void check_reset_trigger_event(room_data *room, bool random_offset);
 	
 	trig_data *i;
@@ -1435,12 +1436,7 @@ void add_trigger(struct script_data *sc, trig_data *t, int loc) {
 	SCRIPT_TYPES(sc) |= GET_TRIG_TYPE(t);
 	t->attached_to = sc;
 	
-	// add to lists
-	DL_PREPEND2(trigger_list, t, prev_in_world, next_in_world);
-	if (TRIG_IS_RANDOM(t)) {
-		// add to end
-		DL_APPEND2(random_triggers, t, prev_in_random_triggers, next_in_random_triggers);
-	}
+	add_trigger_to_global_lists(t);
 	
 	if (sc->attached_type == WLD_TRIGGER && sc->attached_to) {
 		check_reset_trigger_event((room_data*)sc->attached_to, TRUE);

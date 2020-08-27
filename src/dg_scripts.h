@@ -220,9 +220,11 @@ struct trig_data {
 	struct trig_data *next;	// next on assigned SCRIPT()
 	struct trig_data *next_in_world;    /* next in the global trigger list */
 	struct trig_data *prev_in_world;	// prev in the global trigger list
+	bool in_world_list;
 	
 	struct trig_data *prev_in_random_triggers;	// DLL: random_triggers
 	struct trig_data *next_in_random_triggers;	// DLL: random_triggers
+	bool in_random_list;	// TRUE while it's in the random trigger list
 	
 	struct trig_data *next_to_free;	// LL: free_trigger_list
 	

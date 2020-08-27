@@ -177,23 +177,48 @@ void actually_free_trigger(trig_data *trig) {
 }
 
 
+/**
+* Adds the trigger to the trigger_list and random_triggers list, as needed.
+*
+* @param trig_data *trig The trigger to add.
+*/
+void add_trigger_to_global_lists(trig_data *trig) {
+	if (trig && !trig->in_world_list) {
+		DL_PREPEND2(trigger_list, trig, prev_in_world, next_in_world);
+		trig->in_world_list = TRUE;
+	}
+	if (trig && !trig->in_random_list && TRIG_IS_RANDOM(trig)) {
+		// add to end
+		DL_APPEND2(random_triggers, trig, prev_in_random_triggers, next_in_random_triggers);
+		trig->in_random_list = TRUE;
+	}
+}
+
+
+/**
+* Removes the trigger from the trigger_list and random_triggers, if present.
+*
+* @param trig_data *trig The trigger to remove.
+* @param bool random_only If TRUE, only removes it from the random trigger list. It remains in the main list, if present.
+*/
+void remove_trigger_from_global_lists(trig_data *trig, bool random_only) {
+	if (trig && trig->in_world_list && !random_only) {
+		DL_DELETE2(trigger_list, trig, prev_in_world, next_in_world);
+	}
+	if (trig && trig->in_random_list) {
+		DL_DELETE2(random_triggers, trig, prev_in_random_triggers, next_in_random_triggers);
+	}
+}
+
+
 /* remove a single trigger from a mob/obj/room */
 void extract_trigger(trig_data *trig) {
 	if (GET_TRIG_WAIT(trig)) {
 		dg_event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
 		GET_TRIG_WAIT(trig) = NULL;
 	}
-
-	// remove from trigger list, if it's (probably) in there
-	if (trigger_list && (trigger_list == trig || trig->prev_in_world || trig->next_in_world)) {
-		DL_DELETE2(trigger_list, trig, prev_in_world, next_in_world);
-	}
 	
-	// global trig?
-	if (TRIG_IS_RANDOM(trig)) {
-		DL_DELETE2(random_triggers, trig, prev_in_random_triggers, next_in_random_triggers);
-	}
-
+	remove_trigger_from_global_lists(trig, FALSE);
 	free_trigger(trig);
 }
 

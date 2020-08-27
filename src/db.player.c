@@ -1124,6 +1124,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
+	void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
 	
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH], *read;
 	int account_id = NOTHING, ignore_pos = 0, junk;
@@ -1151,6 +1152,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	account_data *acct;
 	bitvector_t bit_in;
 	bool end = FALSE;
+	trig_data *trig;
 	obj_data *obj;
 	double dbl_in;
 	long l_in[3];
@@ -2145,6 +2147,15 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	RESTORE_ON_LOGIN(ch) = (((int) (time(0) - ch->prev_logon)) >= 1 * SECS_PER_REAL_HOUR);
 	if (GET_LOYALTY(ch)) {
 		REREAD_EMPIRE_TECH_ON_LOGIN(ch) = (EMPIRE_MEMBERS(GET_LOYALTY(ch)) < 1 || get_member_timeout_time(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR) <= time(0));
+	}
+	
+	// ensure random triggers are shut off on home storage
+	LL_FOREACH(GET_HOME_STORAGE(ch), eus) {
+		if (eus->obj && SCRIPT(eus->obj)) {
+			LL_FOREACH(TRIGGERS(SCRIPT(eus->obj)), trig) {
+				remove_trigger_from_global_lists(trig, TRUE);
+			}
+		}
 	}
 	
 	free(cont_row);

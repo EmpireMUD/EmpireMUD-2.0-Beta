@@ -4130,6 +4130,8 @@ void warehouse_identify(char_data *ch, char *argument, int mode) {
 * @param int mode SCMD_WAREHOUSE or SCMD_HOME
 */
 void warehouse_retrieve(char_data *ch, char *argument, int mode) {
+	void add_trigger_to_global_lists(trig_data *trig);
+	
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch));
 	struct empire_unique_storage *iter, *next_iter;
@@ -4139,6 +4141,7 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 	obj_data *obj = NULL;
 	int number, amt = 1;
 	bool all = FALSE, any = FALSE, one = FALSE, done = FALSE;
+	trig_data *trig;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Retrieve what?\r\n");
@@ -4260,6 +4263,13 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 				iter->obj = NULL;
 				add_to_object_list(obj);	// put back in object list
 				obj->script_id = 0;	// clear this out so it's guaranteed to get a new one
+				
+				// re-add trigs to the random list
+				if (SCRIPT(obj)) {
+					LL_FOREACH(TRIGGERS(SCRIPT(obj)), trig) {
+						add_trigger_to_global_lists(trig);
+					}
+				}
 			}
 			
 			if (obj) {
