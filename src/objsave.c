@@ -992,7 +992,7 @@ void objpack_load_room(room_data *room) {
 				// no obj returned -- it was probably deleted
 				
 				// item is missing here -- attempt to dump stuff back to the room if pending
-				for (iter = MAX_BAG_ROWS - 1; iter > -location; --iter) {
+				for (iter = MAX_BAG_ROWS - 1; iter >= 0; --iter) {
 					if (cont_row[iter]) {		/* No container, back to room. */
 						for (; cont_row[iter]; cont_row[iter] = obj2) {
 							obj2 = cont_row[iter]->next_content;
