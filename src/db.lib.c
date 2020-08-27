@@ -2208,6 +2208,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	struct empire_storage_data *store;
 	struct theft_log *tft;
 	obj_data *obj, *proto;
+	bool done = FALSE;
 	trig_data *trig;
 	
 	if (!fl || !emp) {
@@ -2217,7 +2218,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	// error for later
 	sprintf(buf,"SYSERR: Format error in empire storage for #%d (expecting letter)", EMPIRE_VNUM(emp));
 
-	for (;;) {
+	while (!done) {
 		if (!get_line(fl, line)) {
 			log("%s", buf);
 			exit(1);
@@ -2349,6 +2350,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 			}
 
 			case 'S': {	// fin
+				done = TRUE;
 				break;
 			}
 			default: {
