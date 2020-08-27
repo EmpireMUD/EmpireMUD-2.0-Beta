@@ -309,6 +309,7 @@ void boot_db(void) {
 	void delete_old_players();
 	void delete_orphaned_rooms();
 	void expire_old_politics();
+	void free_loaded_players();
 	void generate_island_descriptions();
 	void init_config_system();
 	void init_inherent_player_techs();
@@ -322,6 +323,7 @@ void boot_db(void) {
 	void load_tips_of_the_day();
 	void load_trading_post();
 	int run_convert_vehicle_list();
+	void run_delayed_refresh();
 	void run_reboot_triggers();
 	void schedule_map_unloads();
 	void setup_island_levels();
@@ -453,6 +455,11 @@ void boot_db(void) {
 	log("Managing world memory.");
 	schedule_map_unloads();
 	update_instance_world_size();
+	
+	// this usually causes a little lag
+	log("Cleaning up.");
+	run_delayed_refresh();
+	free_loaded_players();
 	
 	// END
 	log("Boot db -- DONE.");
