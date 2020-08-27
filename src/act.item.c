@@ -3930,6 +3930,7 @@ void trade_post(char_data *ch, char *argument) {
 * @param int mode SCMD_WAREHOUSE or SCMD_HOME
 */
 void warehouse_inventory(char_data *ch, char *argument, int mode) {
+	void check_delayed_load(char_data *ch);
 	extern const char *unique_storage_flags[];
 
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*4], line[MAX_STRING_LENGTH], part[256], flags[256], quantity[256], level[256], objflags[256], *tmp;
@@ -3958,6 +3959,7 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 		// check first word is player
 		tmp = any_one_word(argument, arg);
 		if (*arg && (targ_player = find_or_load_player(arg, &file))) {
+			check_delayed_load(targ_player);
 			// move rest over
 			argument = tmp;
 			skip_spaces(&argument);

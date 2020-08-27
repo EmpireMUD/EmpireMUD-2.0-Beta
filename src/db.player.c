@@ -1040,7 +1040,7 @@ void free_char(char_data *ch) {
 	clear_delayed_update(ch);
 
 	/* find_char helper */
-	if (ch->script_id > 0) {
+	if (ch->in_lookup_table) {
 		remove_from_lookup_table(ch->script_id);
 	}
 
@@ -1102,7 +1102,6 @@ char_data *load_player(char *name, bool normal) {
 	
 	// mark that they are partially-loaded
 	NEEDS_DELAYED_LOAD(ch) = TRUE;
-	ch->script_id = GET_IDNUM(ch);
 	
 	return ch;
 }
@@ -2116,6 +2115,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	if (!GET_PASSWD(ch) || !*GET_PASSWD(ch)) {
 		log("SYSERR: Finished loading playerfile '%s' but did not find password", GET_PC_NAME(ch));
 	}
+	
+	// some systems use this early
+	ch->script_id = GET_IDNUM(ch);
 	
 	// have account?
 	if (normal && !GET_ACCOUNT(ch)) {
@@ -3876,7 +3878,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// add to lists
 	DL_PREPEND(character_list, ch);
 	ch->script_id = GET_IDNUM(ch);	// if not already set
-	add_to_lookup_table(ch->script_id, (void *)ch);
+	if (!ch->in_lookup_table) {
+		add_to_lookup_table(ch->script_id, (void *)ch);
+		ch->in_lookup_table = TRUE;
+	}
 	
 	// place character
 	char_to_room(ch, load_room);

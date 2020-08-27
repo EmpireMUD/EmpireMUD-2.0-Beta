@@ -343,6 +343,7 @@ int char_script_id(char_data *ch) {
 	if (ch->script_id == 0) {
 		ch->script_id = max_mob_id++;
 		add_to_lookup_table(ch->script_id, (void *)ch);
+		ch->in_lookup_table = TRUE;
 		
 		if (max_mob_id >= EMPIRE_ID_BASE && reboot_control.time > 16) {
 			reboot_control.time = 16;

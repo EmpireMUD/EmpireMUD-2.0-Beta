@@ -4282,6 +4282,7 @@ struct char_data {
 	descriptor_data *desc;	// NULL for mobiles
 
 	int script_id;	// used by DG triggers - unique id
+	bool in_lookup_table;	// if ch is in the script lookup table or not
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 	struct script_memory *memory;	// for mob memory triggers
