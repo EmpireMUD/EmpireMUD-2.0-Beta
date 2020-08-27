@@ -5624,6 +5624,7 @@ void remove_from_object_list(obj_data *obj) {
 	// ensure it's (probably) in the list first
 	if (object_list && (object_list == obj || obj->next || obj->prev)) {
 		DL_DELETE(object_list, obj);
+		obj->prev = obj->next = NULL;
 	}
 }
 
