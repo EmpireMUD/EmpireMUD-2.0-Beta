@@ -309,7 +309,6 @@ void boot_db(void) {
 	void delete_old_players();
 	void delete_orphaned_rooms();
 	void expire_old_politics();
-	void free_loaded_players();
 	void generate_island_descriptions();
 	void init_config_system();
 	void init_inherent_player_techs();
@@ -323,7 +322,6 @@ void boot_db(void) {
 	void load_tips_of_the_day();
 	void load_trading_post();
 	int run_convert_vehicle_list();
-	void run_delayed_refresh();
 	void run_reboot_triggers();
 	void schedule_map_unloads();
 	void setup_island_levels();
@@ -4405,7 +4403,9 @@ void b5_99_henge_triggers(void) {
 
 // remove home chests and auto-store private homes
 void b5_102_home_cleanup(void) {
+	void free_loaded_players();
 	void perform_autostore(obj_data *obj, empire_data *emp, int island);
+	void run_delayed_refresh();
 	
 	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
@@ -4431,6 +4431,8 @@ void b5_102_home_cleanup(void) {
 		}
 	}
 	
+	run_delayed_refresh();
+	free_loaded_players();
 	save_whole_world();
 }
 
