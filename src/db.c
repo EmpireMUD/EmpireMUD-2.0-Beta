@@ -455,12 +455,7 @@ void boot_db(void) {
 	log("Managing world memory.");
 	schedule_map_unloads();
 	update_instance_world_size();
-	
-	// this usually causes a little lag
-	log("Cleaning up.");
-	run_delayed_refresh();
-	free_loaded_players();
-	
+		
 	// END
 	log("Boot db -- DONE.");
 	boot_time = time(0);
