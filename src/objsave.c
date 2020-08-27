@@ -991,6 +991,19 @@ void objpack_load_room(room_data *room) {
 			else {
 				// no obj returned -- it was probably deleted
 				
+				// item is missing here -- attempt to dump stuff back to the room if pending
+				for (iter = MAX_BAG_ROWS - 1; iter > -location; --iter) {
+					if (cont_row[iter]) {		/* No container, back to room. */
+						for (; cont_row[iter]; cont_row[iter] = obj2) {
+							obj2 = cont_row[iter]->next_content;
+							timer = GET_AUTOSTORE_TIMER(cont_row[iter]);
+							obj_to_room(cont_row[iter], room);
+							GET_AUTOSTORE_TIMER(cont_row[iter]) = timer;
+						}
+						cont_row[iter] = NULL;
+					}
+				}
+				
 				/*
 				log("SYSERR: Got back non-object while loading vnum %d for %s", vnum, fname);
 				fclose(fl);
