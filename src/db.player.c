@@ -1102,6 +1102,7 @@ char_data *load_player(char *name, bool normal) {
 	
 	// mark that they are partially-loaded
 	NEEDS_DELAYED_LOAD(ch) = TRUE;
+	ch->script_id = GET_IDNUM(ch);
 	
 	return ch;
 }
@@ -3874,7 +3875,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 
 	// add to lists
 	DL_PREPEND(character_list, ch);
-	ch->script_id = GET_IDNUM(ch);
+	ch->script_id = GET_IDNUM(ch);	// if not already set
 	add_to_lookup_table(ch->script_id, (void *)ch);
 	
 	// place character
