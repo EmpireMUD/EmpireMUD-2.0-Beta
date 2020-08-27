@@ -2972,7 +2972,7 @@ void queue_delayed_update(char_data *ch, bitvector_t type) {
 	struct char_delayed_update *cdu;
 	int id;
 	
-	if (ch && !EXTRACTED(ch) && (id = char_script_id(ch)) > 0) {
+	if (ch && (id = char_script_id(ch)) > 0) {
 		HASH_FIND_INT(char_delayed_update_list, &id, cdu);
 		if (!cdu) {
 			CREATE(cdu, struct char_delayed_update, 1);
