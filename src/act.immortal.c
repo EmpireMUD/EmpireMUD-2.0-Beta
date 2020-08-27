@@ -140,7 +140,7 @@ void decustomize_island(int island_id) {
 * @param empire_data *emp The empire to store it to -- NOT CURRENTLY USED.
 * @param int island The islands to store it to -- NOT CURRENTLY USED.
 */
-static void perform_autostore(obj_data *obj, empire_data *emp, int island) {
+void perform_autostore(obj_data *obj, empire_data *emp, int island) {
 	extern bool check_autostore(obj_data *obj, bool force);
 	
 	obj_data *temp, *next_temp;

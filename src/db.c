@@ -1963,6 +1963,7 @@ const char *versions_list[] = {
 	"b5.88b",
 	"b5.94",
 	"b5.99",
+	"b5.102",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -4400,6 +4401,38 @@ void b5_99_henge_triggers(void) {
 }
 
 
+// remove home chests and auto-store private homes
+void b5_102_home_cleanup(void) {
+	void perform_autostore(obj_data *obj, empire_data *emp, int island);
+	
+	room_data *room, *next_room;
+	obj_data *obj, *next_obj;
+	
+	obj_vnum o_HOME_CHEST = 1010;	// the item to remove
+	
+	log("Applying b5.99 update to remove home chests and store home items...");
+	
+	// dump out chests...
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
+		if (GET_OBJ_VNUM(obj) == o_HOME_CHEST) {
+			empty_obj_before_extract(obj);
+			extract_obj(obj);
+		}
+	}
+	
+	// autostore homes
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (ROOM_PRIVATE_OWNER(room) != NOTHING) {
+			LL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
+				perform_autostore(obj, ROOM_OWNER(room), NO_ISLAND);
+			}
+		}
+	}
+	
+	save_whole_world();
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4715,6 +4748,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.99")) {
 			b5_99_henge_triggers();
+		}
+		if (MATCH_VERSION("b5.102")) {
+			b5_102_home_cleanup();
 		}
 	}
 	
