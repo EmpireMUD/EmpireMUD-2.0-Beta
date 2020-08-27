@@ -4405,7 +4405,7 @@ void b5_99_henge_triggers(void) {
 void b5_102_home_cleanup(void) {
 	void perform_autostore(obj_data *obj, empire_data *emp, int island);
 	
-	room_data *room, *next_room;
+	// room_data *room, *next_room;
 	obj_data *obj, *next_obj;
 	
 	obj_vnum o_HOME_CHEST = 1010;	// the item to remove
