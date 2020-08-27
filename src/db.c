@@ -4412,7 +4412,7 @@ void b5_99_henge_triggers(void) {
 void b5_102_home_cleanup(void) {
 	void perform_autostore(obj_data *obj, empire_data *emp, int island);
 	
-	// room_data *room, *next_room;
+	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
 	
 	obj_vnum o_HOME_CHEST = 1010;	// the item to remove
@@ -4428,7 +4428,6 @@ void b5_102_home_cleanup(void) {
 	}
 	
 	// autostore homes
-	/* this currently just deletes the items and I need to look into why
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
 			LL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
@@ -4436,7 +4435,6 @@ void b5_102_home_cleanup(void) {
 			}
 		}
 	}
-	*/
 	
 	save_whole_world();
 }

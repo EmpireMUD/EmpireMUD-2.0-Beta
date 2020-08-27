@@ -1453,6 +1453,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 * @return bool TRUE if the item is still in the world, FALSE if it was extracted
 */
 bool check_autostore(obj_data *obj, bool force) {
+	void check_delayed_load(char_data *ch);
 	extern int get_main_island(empire_data *emp);
 	
 	player_index_data *index;
@@ -1563,6 +1564,7 @@ bool check_autostore(obj_data *obj, bool force) {
 		else if (unique && is_home) {
 			// home storage
 			if ((index = find_player_index_by_idnum(home_idnum)) && (loaded_ch = find_or_load_player(index->name, &file))) {
+				check_delayed_load(loaded_ch);
 				store_unique_item(NULL, &GET_HOME_STORAGE(loaded_ch), obj, NULL, NULL, &full);
 				queue_delayed_update(loaded_ch, CDU_SAVE);
 				return FALSE;
