@@ -4320,13 +4320,15 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 * @param int mode SCMD_WAREHOUSE or SCMD_HOME
 */
 void warehouse_store(char_data *ch, char *argument, int mode) {
+	extern bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capped);
+	
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch)), *use_emp = NULL;
 	bool home_mode = (mode == SCMD_HOME);
 	char numarg[MAX_INPUT_LENGTH], *tmp;
 	obj_data *obj, *next_obj;
 	int total = 1, done = 0, dotmode;
-	bool full = FALSE;
+	bool full = FALSE, capped = FALSE;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Store what?\r\n");
@@ -4398,8 +4400,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 		for (obj = ch->carrying; obj && !full; obj = next_obj) {
 			next_obj = obj->next_content;
 			
-			// bound objects never store, nor can torches
-			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && UNIQUE_OBJ_CAN_STORE(obj, home_mode)) {
+			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && UNIQUE_OBJ_CAN_STORE(obj, home_mode) && check_home_store_cap(ch, obj, FALSE, &capped)) {
 				// may extract obj
 				store_unique_item(ch, (home_mode ? &GET_HOME_STORAGE(ch) : &EMPIRE_UNIQUE_STORAGE(use_emp)), obj, use_emp, home_mode ? NULL : IN_ROOM(ch), &full);
 				if (!full) {
@@ -4407,7 +4408,12 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 				}
 			}
 		}
-		if (!done) {
+		if (capped) {
+			if (ch->desc) {
+				stack_msg_to_desc(ch->desc, "You have hit the limit of %d unique items in your home storage.\r\n", config_get_int("max_home_store_uniques"));
+			}
+		}
+		else if (!done) {
 			if (full) {
 				msg_to_char(ch, "It's full.\r\n");
 			}
@@ -4428,9 +4434,8 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 
 		while (obj && (dotmode == FIND_ALLDOT || done < total)) {
 			next_obj = get_obj_in_list_vis(ch, argument, obj->next_content);
-
-			// bound objects never store
-			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj, home_mode)) {
+			
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj, home_mode) && check_home_store_cap(ch, obj, FALSE, &capped)) {
 				// may extract obj
 				store_unique_item(ch, (home_mode ? &GET_HOME_STORAGE(ch) : &EMPIRE_UNIQUE_STORAGE(use_emp)), obj, use_emp, home_mode ? NULL : IN_ROOM(ch), &full);
 				if (!full) {
@@ -4439,8 +4444,13 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 			}
 			obj = next_obj;
 		}
-		if (!done) {
-			if (full) {
+		if (capped) {
+			if (ch->desc) {
+				stack_msg_to_desc(ch->desc, "You have hit the limit of %d unique items in your home storage.\r\n", config_get_int("max_home_store_uniques"));
+			}
+		}
+		else if (!done) {
+			if (full) {	// this full is for MAX_STORAGE
 				msg_to_char(ch, "It's full.\r\n");
 			}
 			else {

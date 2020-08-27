@@ -8969,6 +8969,44 @@ bool stored_item_requires_withdraw(obj_data *obj) {
 //// UNIQUE STORAGE HANDLERS /////////////////////////////////////////////////
 
 /**
+* Checks if a player can store an item in their home.
+*
+* @param char_data *ch The player.
+* @parma obj_data *obj The object to try to store.
+* @param bool message If TRUE, sends its own error message when there's a failure.
+* @param bool *capped A variable to bind to: becomes TRUE if the player has hit the cap -- useful if you're not messaging here.
+* @return bool TRUE if the player can store, FALSE if they're over the limit.
+*/
+bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capped) {
+	struct empire_unique_storage *eus;
+	int count;
+	
+	*capped = FALSE;
+	
+	if (!ch || !obj || IS_NPC(ch)) {
+		if (message) {
+			msg_to_char(ch, "Error trying to store that.\r\n");
+		}
+		return FALSE;	// sanity check
+	}
+	
+	if (!find_eus_entry(obj, &GET_HOME_STORAGE(ch), NULL)) {
+		LL_COUNT(GET_HOME_STORAGE(ch), eus, count);
+		if (count >= config_get_int("max_home_store_uniques")) {
+			*capped = TRUE;
+			if (message) {
+				msg_to_char(ch, "You have already hit the %d-item limit for your home storage.\r\n", config_get_int("max_home_store_uniques"));
+			}
+			return FALSE;
+		}
+	}
+	
+	// appears ok
+	return TRUE;
+}
+
+
+/**
 * Remove items from the unique item storage list by vnum (e.g. if the item was
 * deleted).
 *

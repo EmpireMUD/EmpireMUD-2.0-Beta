@@ -686,10 +686,11 @@ highest-ranking leaders). You can unset your home from anywhere, or clear the
 owner for the building you're in. Only the empire leaders can clear homes they
 don't own.
 
-You can store unique items -- items that can't be stored in other buildings --
-in your home. When you move to a new home, you can access your stored items
-from your new home after 1 hour. You can check your home inventory and identify
-its items from anywhere.
+You can store up to 300 unique items -- items that can't be stored in other
+buildings -- in your home. Identical items stack with each other and don't
+count toward that 300. When you move to a new home, you can access your stored
+items from your new home after 1 hour. You can check your home inventory and
+identify its items from anywhere.
 
 Only buildings that normally house citizens can be set as homes. This does not
 include buildings where adding a bedroom grants a citizen, if the building
