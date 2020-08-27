@@ -695,6 +695,8 @@ Only buildings that normally house citizens can be set as homes. This does not
 include buildings where adding a bedroom grants a citizen, if the building
 itself doesn't house citizens.
 
+Immortals can check a player's home storage using: home inventory <player>
+
 See also: AUTOSTORE, CITIZENS, HESTIAN TRINKET
 #
 HOMESTEAD "HOMESTEAD GOAL"

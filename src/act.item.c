@@ -3938,6 +3938,8 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	struct empire_unique_storage *iter;
 	empire_data *emp = GET_LOYALTY(ch);
 	int island = GET_ISLAND_ID(IN_ROOM(ch));
+	char_data *targ_player = ch;
+	bool file = FALSE;
 	int num, size;
 	
 	if (mode == SCMD_WAREHOUSE && imm_access) {
@@ -3950,6 +3952,18 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 		}
 		else {
 			emp = GET_LOYALTY(ch);
+		}
+	}
+	else if (mode == SCMD_HOME && imm_access) {
+		// check first word is player
+		tmp = any_one_word(argument, arg);
+		if (*arg && (targ_player = find_or_load_player(arg, &file))) {
+			// move rest over
+			argument = tmp;
+			skip_spaces(&argument);
+		}
+		else {
+			targ_player = ch;
 		}
 	}
 	
@@ -3966,14 +3980,14 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	}
 	
 	if (home_mode) {
-		size = snprintf(output, sizeof(output), "%s items stored in your home:\r\n", part);
+		size = snprintf(output, sizeof(output), "%s items stored in %s home:\r\n", part, (targ_player == ch ? "your" : GET_PC_NAME(targ_player)));
 	}
 	else {
 		size = snprintf(output, sizeof(output), "%s items stored in %s%s&0:\r\n", part, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	}
 	num = 0;
 	
-	LL_FOREACH((home_mode ? GET_HOME_STORAGE(ch) : EMPIRE_UNIQUE_STORAGE(emp)), iter) {
+	LL_FOREACH((home_mode ? GET_HOME_STORAGE(targ_player) : EMPIRE_UNIQUE_STORAGE(emp)), iter) {
 		if (!home_mode && !imm_access && iter->island != island) {
 			continue;
 		}
