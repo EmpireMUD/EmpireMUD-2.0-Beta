@@ -4287,7 +4287,7 @@ struct char_data {
 	struct script_memory *memory;	// for mob memory triggers
 
 	char_data *next_in_room;	// For room->people - list
-	char_data *next, *prev;	// For character_list (doubly-linked)
+	char_data *prev, *next;	// For character_list (doubly-linked)
 	char_data *next_fighting;	// For fighting list
 	
 	struct follow_type *followers;	// List of chars followers
@@ -5166,7 +5166,7 @@ struct obj_data {
 	struct script_data *script;	// script info for the object
 
 	obj_data *next_content;	// For 'contains' lists
-	obj_data *next, *prev;	// For the object double-linked list
+	obj_data *prev, *next;	// For the object double-linked list
 	
 	bool search_mark;	// for things that iterate over inventory/lists repeatedly
 	
@@ -5501,7 +5501,7 @@ struct vehicle_data {
 	struct script_data *script;	// script info for the object
 	
 	// lists
-	struct vehicle_data *next, *prev;	// vehicle_list (global) doubly-linked list
+	struct vehicle_data *prev, *next;	// vehicle_list (global) doubly-linked list
 	struct vehicle_data *next_in_room;	// ROOM_VEHICLES(room) linked list
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;
