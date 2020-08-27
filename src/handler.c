@@ -8978,19 +8978,21 @@ bool stored_item_requires_withdraw(obj_data *obj) {
 * @return bool TRUE if the player can store, FALSE if they're over the limit.
 */
 bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capped) {
+	extern bool override_home_storage_cap;
+	
 	struct empire_unique_storage *eus;
 	int count;
 	
 	*capped = FALSE;
 	
-	if (!ch || !obj || IS_NPC(ch)) {
+	if (!ch || !obj || IS_NPC(ch) || override_home_storage_cap) {
 		if (message) {
 			msg_to_char(ch, "Error trying to store that.\r\n");
 		}
 		return FALSE;	// sanity check
 	}
 	
-	if (!find_eus_entry(obj, &GET_HOME_STORAGE(ch), NULL)) {
+	if (!find_eus_entry(obj, GET_HOME_STORAGE(ch), NULL)) {
 		LL_COUNT(GET_HOME_STORAGE(ch), eus, count);
 		if (count >= config_get_int("max_home_store_uniques")) {
 			*capped = TRUE;

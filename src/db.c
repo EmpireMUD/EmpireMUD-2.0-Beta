@@ -4401,7 +4401,9 @@ void b5_99_henge_triggers(void) {
 }
 
 
-// remove home chests and auto-store private homes
+// b5.102: remove home chests and auto-store private homes
+bool override_home_storage_cap = FALSE;	// this ensures nobody loses items during this patch
+
 void b5_102_home_cleanup(void) {
 	void free_loaded_players();
 	void perform_autostore(obj_data *obj, empire_data *emp, int island);
@@ -4412,7 +4414,8 @@ void b5_102_home_cleanup(void) {
 	
 	obj_vnum o_HOME_CHEST = 1010;	// the item to remove
 	
-	log("Applying b5.99 update to remove home chests and store home items...");
+	log("Applying b5.102 update to remove home chests and store home items...");
+	override_home_storage_cap = TRUE;
 	
 	// dump out chests...
 	DL_FOREACH_SAFE(object_list, obj, next_obj) {
@@ -4434,6 +4437,8 @@ void b5_102_home_cleanup(void) {
 	run_delayed_refresh();
 	free_loaded_players();
 	save_whole_world();
+	
+	override_home_storage_cap = FALSE;
 }
 
 
