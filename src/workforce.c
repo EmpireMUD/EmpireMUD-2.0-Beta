@@ -2368,6 +2368,9 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
+	else if (!highest) {
+		log_workforce_problem(emp, room, CHORE_MINTING, WF_PROB_NO_RESOURCES, FALSE);
+	}
 	else {
 		mark_workforce_delay(emp, room, CHORE_MINTING, WF_PROB_OVER_LIMIT);
 	}
