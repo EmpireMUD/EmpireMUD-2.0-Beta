@@ -2304,7 +2304,7 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 
 
 void do_chore_minting(empire_data *emp, room_data *room) {
-	struct empire_storage_data *highest, *store, *next_store;
+	struct empire_storage_data *highest = NULL, *store, *next_store;
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_MINTING].mob);
 	int high_amt, limit, islid = GET_ISLAND_ID(room);
 	struct empire_island *eisle = get_empire_island(emp, islid);
