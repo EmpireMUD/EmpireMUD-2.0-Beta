@@ -3980,20 +3980,20 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 		snprintf(part, sizeof(part), "\"%s\"", argument);
 	}
 	else {
-		strcpy(part, "unique");	// size ok
+		strcpy(part, "Unique");	// size ok
 	}
 	
 	if (home_mode) {
 		LL_COUNT(GET_HOME_STORAGE(ch), eus, num);
 		if (targ_player == ch) {
-			size = snprintf(output, sizeof(output), "%d/%d %s items stored in your home:\r\n", num, config_get_int("max_home_store_uniques"), part);
+			size = snprintf(output, sizeof(output), "%s items stored in your home (%d/%d):\r\n", part, num, config_get_int("max_home_store_uniques"));
 		}
 		else {
-			size = snprintf(output, sizeof(output), "%d/%d %s items stored in %s's home:\r\n", num, config_get_int("max_home_store_uniques"), part, GET_PC_NAME(targ_player));
+			size = snprintf(output, sizeof(output), "%s items stored in %s's home (%d/%d):\r\n", part, GET_PC_NAME(targ_player), num, config_get_int("max_home_store_uniques"));
 		}
 	}
 	else {
-		size = snprintf(output, sizeof(output), "%s items stored in %s%s&0:\r\n", CAP(part), EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		size = snprintf(output, sizeof(output), "%s items stored in %s%s&0:\r\n", part, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 	}
 	num = 0;
 	
