@@ -4028,14 +4028,14 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 		}
 		
 		if (iter->amount != 1) {
-			snprintf(quantity, sizeof(quantity), "(%d) ", iter->amount);
+			snprintf(quantity, sizeof(quantity), " (x%d)", iter->amount);
 		}
 		else {
 			*quantity = '\0';
 		}
 		
 		// build line
-		snprintf(line, sizeof(line), "%3d. %s%s%s%s%s\r\n", ++num, quantity, GET_OBJ_SHORT_DESC(iter->obj), level, objflags, part);
+		snprintf(line, sizeof(line), "%3d. %s\tc%s\t0%s%s%s\r\n", ++num, GET_OBJ_SHORT_DESC(iter->obj), level, objflags, part, quantity);
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);
