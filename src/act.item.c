@@ -3931,6 +3931,7 @@ void trade_post(char_data *ch, char *argument) {
 */
 void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	void check_delayed_load(char_data *ch);
+	extern char *obj_color_by_quality(obj_data *obj, char_data *ch);
 	extern const char *unique_storage_flags[];
 
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*4], line[MAX_STRING_LENGTH], part[256], flags[256], quantity[256], level[256], objflags[256], *tmp;
@@ -4035,7 +4036,7 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 		}
 		
 		// build line
-		snprintf(line, sizeof(line), "%3d. %s\tc%s\t0%s%s%s\r\n", ++num, GET_OBJ_SHORT_DESC(iter->obj), level, objflags, part, quantity);
+		snprintf(line, sizeof(line), "%3d. %s%s\t0%s%s%s%s\r\n", ++num, PRF_FLAGGED(ch, PRF_ITEM_QUALITY) ? obj_color_by_quality(iter->obj, ch) : "\tc", GET_OBJ_SHORT_DESC(iter->obj), level, objflags, part, quantity);
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);
