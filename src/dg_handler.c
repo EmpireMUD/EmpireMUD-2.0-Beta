@@ -204,9 +204,11 @@ void add_trigger_to_global_lists(trig_data *trig) {
 void remove_trigger_from_global_lists(trig_data *trig, bool random_only) {
 	if (trig && trig->in_world_list && !random_only) {
 		DL_DELETE2(trigger_list, trig, prev_in_world, next_in_world);
+		trig->in_world_list = FALSE;
 	}
 	if (trig && trig->in_random_list) {
 		DL_DELETE2(random_triggers, trig, prev_in_random_triggers, next_in_random_triggers);
+		trig->in_random_list = FALSE;
 	}
 }
 
