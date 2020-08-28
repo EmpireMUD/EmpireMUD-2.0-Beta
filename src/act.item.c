@@ -3984,7 +3984,7 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	}
 	
 	if (home_mode) {
-		LL_COUNT(GET_HOME_STORAGE(ch), eus, num);
+		LL_COUNT(GET_HOME_STORAGE(targ_player), eus, num);
 		if (targ_player == ch) {
 			size = snprintf(output, sizeof(output), "%s items stored in your home (%d/%d):\r\n", part, num, config_get_int("max_home_store_uniques"));
 		}
