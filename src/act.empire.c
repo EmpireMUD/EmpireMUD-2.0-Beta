@@ -5132,7 +5132,7 @@ ACMD(do_home) {
 		else if (ROOM_PRIVATE_OWNER(real) != NOBODY) {
 			msg_to_char(ch, "Someone already owns this home.%s\r\n", (GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) ? "" : "Use 'home clear' to clear it first.");
 		}
-		else if (!has_permission(ch, PRIV_HOMES, IN_ROOM(ch))) {	// after the has-owner check because otherwise the error is misleading
+		else if (!has_permission(ch, PRIV_HOMES, real)) {	// after the has-owner check because otherwise the error is misleading
 			msg_to_char(ch, "You aren't high enough rank to set a home.\r\n");
 		}
 		else if (!GET_BUILDING(real) || GET_BLD_CITIZENS(GET_BUILDING(real)) <= 0) {
@@ -5144,7 +5144,7 @@ ACMD(do_home) {
 		else if (ROOM_AFF_FLAGGED(real, ROOM_AFF_HAS_INSTANCE)) {
 			msg_to_char(ch, "You can't make this your home right now.\r\n");
 		}
-		else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		else if (!check_in_city_requirement(real, TRUE)) {
 			msg_to_char(ch, "You can't make this your home because it's not in a city.\r\n");
 		}
 		else {
@@ -5189,7 +5189,7 @@ ACMD(do_home) {
 		}
 	}
 	else if (!str_cmp(command, "clear")) {
-		if (ROOM_PRIVATE_OWNER(IN_ROOM(ch)) == NOBODY) {
+		if (ROOM_PRIVATE_OWNER(real) == NOBODY) {
 			msg_to_char(ch, "This isn't anybody's home.\r\n");
 		}
 		else if (GET_POS(ch) < POS_STANDING) {
@@ -5202,7 +5202,7 @@ ACMD(do_home) {
 			msg_to_char(ch, "You can't take away somebody's home.\r\n");
 		}
 		else {
-			clear_private_owner(ROOM_PRIVATE_OWNER(IN_ROOM(ch)));
+			clear_private_owner(ROOM_PRIVATE_OWNER(real));
 			msg_to_char(ch, "This home's private owner has been cleared.\r\n");
 		}
 	}
