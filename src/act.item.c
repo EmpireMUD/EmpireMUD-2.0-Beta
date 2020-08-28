@@ -4036,7 +4036,7 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 		}
 		
 		// build line
-		snprintf(line, sizeof(line), "%3d. %s%s%s%s%s%s\t0\r\n", ++num, PRF_FLAGGED(ch, PRF_ITEM_QUALITY) ? obj_color_by_quality(iter->obj, ch) : (num % 2 ? "\tc" : "\ty"), GET_OBJ_SHORT_DESC(iter->obj), level, objflags, part, quantity);
+		snprintf(line, sizeof(line), "%3d. %s%s%s%s%s%s\t0\r\n", ++num, PRF_FLAGGED(ch, PRF_ITEM_QUALITY) ? obj_color_by_quality(iter->obj, ch) : ((num % 2) ? "\tc" : "\ty"), GET_OBJ_SHORT_DESC(iter->obj), level, objflags, part, quantity);
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);
