@@ -4035,7 +4035,7 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 		}
 		
 		// build line
-		snprintf(line, sizeof(line), "%2d. %s%s%s%s%s\r\n", ++num, quantity, GET_OBJ_SHORT_DESC(iter->obj), level, objflags, part);
+		snprintf(line, sizeof(line), "%3d. %s%s%s%s%s\r\n", ++num, quantity, GET_OBJ_SHORT_DESC(iter->obj), level, objflags, part);
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);
