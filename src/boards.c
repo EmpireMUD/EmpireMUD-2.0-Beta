@@ -153,7 +153,7 @@ ACMD(do_write) {
 
 
 ACMD(do_read) {
-	void show_obj_to_char(obj_data *obj, char_data *ch, int mode);
+	char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 	void read_book(char_data *ch, obj_data *obj);
 	
 	obj_data *board, *obj;
@@ -172,8 +172,8 @@ ACMD(do_read) {
 			read_book(ch, obj);
 			return;
 		}
-		else if (GET_OBJ_TYPE(obj) == ITEM_MAIL) {
-			show_obj_to_char(obj, ch, OBJ_DESC_LOOK_AT);
+		else if (ch->desc && GET_OBJ_TYPE(obj) == ITEM_MAIL) {
+			page_string(ch->desc, obj_desc_for_char(obj, ch, OBJ_DESC_LOOK_AT), TRUE);
 			return;
 		}
 	}

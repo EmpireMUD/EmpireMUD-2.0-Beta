@@ -63,7 +63,7 @@ ACMD(do_affects);
 void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 void list_one_char(char_data *i, char_data *ch, int num);
 void look_at_char(char_data *i, char_data *ch, bool show_eq);
-void show_obj_to_char(obj_data *obj, char_data *ch, int mode);
+char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero);
 
 
@@ -428,7 +428,9 @@ void look_at_target(char_data *ch, char *arg) {
 	/* If an object was found back in generic_find */
 	if (bits) {
 		if (!found) {
-			show_obj_to_char(found_obj, ch, OBJ_DESC_LOOK_AT);	/* Show no-description */
+			if (ch->desc) {
+				page_string(ch->desc, obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT), TRUE);	/* Show no-description */
+			}
 			act("$n looks at $p.", TRUE, ch, found_obj, NULL, TO_ROOM);
 		}
 	}
@@ -1262,8 +1264,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 			act("$n is using:", FALSE, i, 0, ch, TO_VICT);
 			for (j = 0; j < NUM_WEARS; j++) {
 				if (GET_EQ(i, j) && CAN_SEE_OBJ(ch, GET_EQ(i, j))) {
-					send_to_char(wear_data[j].eq_prompt, ch);
-					show_obj_to_char(GET_EQ(i, j), ch, OBJ_DESC_EQUIPMENT);
+					msg_to_char(ch, "%s%s", wear_data[j].eq_prompt, obj_desc_for_char(GET_EQ(i, j), ch, OBJ_DESC_EQUIPMENT));
 				}
 			}
 		}
@@ -1552,7 +1553,7 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 				msg_to_char(ch, "(%2i) ", num);
 			}
 			
-			show_obj_to_char(i, ch, mode);
+			send_to_char(obj_desc_for_char(i, ch, mode), ch);
 			found = TRUE;
 		}
 	}
@@ -1564,7 +1565,7 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 /*
  * This function screams bitvector... -gg 6/45/98
  */
-void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
+char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 	extern int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board);
 	extern int board_loaded;
 	extern bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
@@ -1572,8 +1573,9 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	void init_boards(void);
 	extern int find_board(char_data *ch);
 	extern const char *extra_bits_inv_flags[];
-
-	char buf[MAX_STRING_LENGTH], tags[MAX_STRING_LENGTH], flags[256];
+	
+	static char buf[MAX_STRING_LENGTH];
+	char tags[MAX_STRING_LENGTH], flags[256];
 	bitvector_t show_flags;
 	int board_type;
 	room_data *room;
@@ -1670,12 +1672,11 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 				}
 			if ((board_type = find_board(ch)) != -1)
 				if (Board_show_board(board_type, ch, "board", obj))
-					return;
+					return "";
 			strcpy(buf, "You see nothing special.");
 		}
 		else if (GET_OBJ_TYPE(obj) == ITEM_MAIL) {
-			page_string(ch->desc, GET_OBJ_ACTION_DESC(obj) ? GET_OBJ_ACTION_DESC(obj) : "It's blank.\r\n", 1);
-			return;
+			return GET_OBJ_ACTION_DESC(obj) ? GET_OBJ_ACTION_DESC(obj) : "It's blank.\r\n";
 		}
 		else if (IS_PORTAL(obj)) {
 			room = real_room(GET_PORTAL_TARGET_VNUM(obj));
@@ -1711,7 +1712,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		}
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	return buf;
 }
 
 

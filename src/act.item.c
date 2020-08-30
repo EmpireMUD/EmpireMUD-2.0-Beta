@@ -1605,7 +1605,7 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 * @param bool show_all If TRUE, shows empty slots.
 */
 void do_eq_show_current(char_data *ch, bool show_all) {
-	void show_obj_to_char(obj_data *obj, char_data *ch, int mode);
+	char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 	
 	bool found = FALSE;
 	int pos;
@@ -1620,8 +1620,7 @@ void do_eq_show_current(char_data *ch, bool show_all) {
 	for (pos = 0; pos < NUM_WEARS; ++pos) {
 		if (GET_EQ(ch, pos)) {
 			if (CAN_SEE_OBJ(ch, GET_EQ(ch, pos))) {
-				send_to_char(wear_data[pos].eq_prompt, ch);
-				show_obj_to_char(GET_EQ(ch, pos), ch, OBJ_DESC_EQUIPMENT);
+				msg_to_char(ch, "%s%s", wear_data[pos].eq_prompt, obj_desc_for_char(GET_EQ(ch, pos), ch, OBJ_DESC_EQUIPMENT));
 				found = TRUE;
 			}
 			else {
@@ -3931,10 +3930,10 @@ void trade_post(char_data *ch, char *argument) {
 */
 void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	void check_delayed_load(char_data *ch);
-	extern char *obj_color_by_quality(obj_data *obj, char_data *ch);
+	char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 	extern const char *unique_storage_flags[];
 
-	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*4], line[MAX_STRING_LENGTH], part[256], flags[256], quantity[256], level[256], objflags[256], *tmp;
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*4], line[MAX_STRING_LENGTH], part[256], flags[256], quantity[256], *tmp;
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	bool home_mode = (mode == SCMD_HOME);
 	struct empire_unique_storage *iter;
@@ -4005,27 +4004,12 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 			continue;
 		}
 		
-		if (GET_OBJ_CURRENT_SCALE_LEVEL(iter->obj) > 0) {
-			snprintf(level, sizeof(level), " (level %d)", GET_OBJ_CURRENT_SCALE_LEVEL(iter->obj));
-		}
-		else {
-			*level = '\0';
-		}
-		
 		if (iter->flags) {
 			prettier_sprintbit(iter->flags, unique_storage_flags, flags);
 			snprintf(part, sizeof(part), " [%s]", flags);
 		}
 		else {
 			*part = '\0';
-		}
-		
-		if (GET_OBJ_EXTRA(iter->obj) & show_obj_flags) {
-			prettier_sprintbit(GET_OBJ_EXTRA(iter->obj) & show_obj_flags, extra_bits, flags);
-			snprintf(objflags, sizeof(objflags), " (%s)", flags);
-		}
-		else {
-			*objflags = '\0';
 		}
 		
 		if (iter->amount != 1) {
@@ -4036,7 +4020,7 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 		}
 		
 		// build line
-		snprintf(line, sizeof(line), "%s%3d. %s%s%s%s%s\t0\r\n", (PRF_FLAGGED(ch, PRF_ITEM_QUALITY) ? obj_color_by_quality(iter->obj, ch) : ""), ++num, GET_OBJ_SHORT_DESC(iter->obj), level, objflags, part, quantity);
+		snprintf(line, sizeof(line), "%3d. %s%s%s%s\t0\r\n", ++num, obj_desc_for_char(iter->obj, ch, OBJ_DESC_INVENTORY), part, quantity);
 		
 		if (size + strlen(line) < sizeof(output)) {
 			size += snprintf(output + size, sizeof(output) - size, "%s", line);

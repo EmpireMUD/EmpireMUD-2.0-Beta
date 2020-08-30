@@ -1053,7 +1053,7 @@ void objpack_load_room(room_data *room) {
 void Crash_listrent(char_data *ch, char *name) {
 	void check_delayed_load(char_data *ch);
 	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
-	void show_obj_to_char(obj_data *obj, char_data *ch, int mode);
+	char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 	
 	char_data *victim;
 	bool file = FALSE;
@@ -1069,8 +1069,7 @@ void Crash_listrent(char_data *ch, char *name) {
 	msg_to_char(ch, "%s is using:\r\n", GET_NAME(victim));
 	for (iter = 0; iter < NUM_WEARS; ++iter) {
 		if (GET_EQ(victim, iter)) {
-			send_to_char(wear_data[iter].eq_prompt, ch);
-			show_obj_to_char(GET_EQ(victim, iter), ch, OBJ_DESC_EQUIPMENT);
+			msg_to_char(ch, "%s%s", wear_data[iter].eq_prompt, obj_desc_for_char(GET_EQ(victim, iter), ch, OBJ_DESC_EQUIPMENT));
 		}
 	}
 	
