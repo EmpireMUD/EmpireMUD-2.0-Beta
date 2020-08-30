@@ -1393,7 +1393,7 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	char sdesc[MAX_STRING_LENGTH];
 	bool color = FALSE;
 	
-	if (PRF_FLAGGED(ch, PRF_ITEM_QUALITY) && (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS)) {
+	if (PRF_FLAGGED(ch, PRF_ITEM_QUALITY) && (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_WAREHOUSE)) {
 		strcpy(output, obj_color_by_quality(obj, ch));
 		color = TRUE;
 	}
@@ -1597,7 +1597,7 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 		}
 	}
 	
-	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG) {
+	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG || mode == OBJ_DESC_WAREHOUSE) {
 		// show level:
 		if (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 1 && mode != OBJ_DESC_LONG && mode != OBJ_DESC_LOOK_AT) {
 			sprintf(tags + strlen(tags), "%s L-%d", (*tags ? "," : ""), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
@@ -1698,8 +1698,8 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 		}
 	}
 	
-	// CRLF IS HERE
-	if (buf[strlen(buf)-1] != '\n') {
+	// CRLF IS HERE (not for warehouse)
+	if (buf[strlen(buf)-1] != '\n' && mode != OBJ_DESC_WAREHOUSE) {
 		strcat(buf, "\r\n");
 	}
 	

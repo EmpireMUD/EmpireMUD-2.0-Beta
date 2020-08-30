@@ -283,7 +283,7 @@ struct alias_data {
 #define OBJ_DESC_SHORT  1	// short desc: inventory, misc
 #define OBJ_DESC_CONTENTS  2	// short desc: is in an object
 #define OBJ_DESC_INVENTORY  3	// short desc: in inventory
-	// 4
+#define OBJ_DESC_WAREHOUSE  4	// short desc: in warehouse
 #define OBJ_DESC_LOOK_AT  5	// when you look AT the object
 	// 6
 #define OBJ_DESC_EQUIPMENT  7	// short desc: is equipped
