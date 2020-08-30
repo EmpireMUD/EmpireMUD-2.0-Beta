@@ -6138,11 +6138,11 @@ void eval_op(char *op, char *lhs, char *rhs, char *result, void *go, struct scri
 
 	for (p = lhs; *p; ++p);
 	if (p > lhs) {
-		for (--p; isspace(*p) && (p > lhs); *p-- = '\0');
+		for (--p; (p > lhs) && isspace(*p); *p-- = '\0');
 	}
 	for (p = rhs; *p; ++p);
 	if (p > rhs) {
-		for (--p; isspace(*p) && (p > rhs); *p-- = '\0');  
+		for (--p; (p > rhs) && isspace(*p); *p-- = '\0');  
 	}
 
 	/* find the op, and figure out the value */
