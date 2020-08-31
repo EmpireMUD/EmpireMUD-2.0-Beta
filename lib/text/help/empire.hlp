@@ -677,7 +677,7 @@ HOME "HOME STORAGE"
 Usage:  home [set/unset/clear]
         home inventory [item keywords]
         home identify <item keywords>
-        home retrieve [number] <item keywords>
+        home retrieve [number] [item keywords]
         home store [number] <item keywords>
 
 You can choose a house in your empire to make your own private residence. Once

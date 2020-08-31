@@ -4052,7 +4052,7 @@ void warehouse_identify(char_data *ch, char *argument, int mode) {
 	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch));
 	struct empire_unique_storage *iter, *next_iter;
 	int island = GET_ISLAND_ID(IN_ROOM(ch));
-	bool home_mode = (mode == SCMD_HOME);
+	bool home_mode = (mode == SCMD_HOME), num_only;
 	int number;
 	
 	if (!*argument) {
@@ -4078,8 +4078,15 @@ void warehouse_identify(char_data *ch, char *argument, int mode) {
 		return;
 	}
 	
-	// list position
-	number = get_number(&argument);
+	// list position or number?
+	if (is_number(argument)) {
+		number = atoi(argument);
+		num_only = TRUE;
+	}
+	else {
+		number = get_number(&argument);
+		num_only = FALSE;
+	}
 	
 	// final argument checks
 	if (number < 1) {
@@ -4096,7 +4103,7 @@ void warehouse_identify(char_data *ch, char *argument, int mode) {
 		if (!home_mode && !imm_access && iter->island != island) {
 			continue;
 		}
-		if (!multi_isname(argument, GET_OBJ_KEYWORDS(iter->obj))) {
+		if (!num_only && !multi_isname(argument, GET_OBJ_KEYWORDS(iter->obj))) {
 			continue;
 		}
 		
@@ -4130,7 +4137,7 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch));
 	struct empire_unique_storage *iter, *next_iter;
 	int island = GET_ISLAND_ID(IN_ROOM(ch));
-	bool home_mode = (mode == SCMD_HOME);
+	bool home_mode = (mode == SCMD_HOME), num_only;
 	char junk[MAX_INPUT_LENGTH], *tmp;
 	obj_data *obj = NULL;
 	int number, amt = 1;
@@ -4182,31 +4189,38 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 		}
 	}
 	
-	// detect leading number (amount to retrieve) with a space
-	tmp = any_one_arg(argument, junk);
-	if (is_number(junk)) {
-		if ((amt = atoi(junk)) < 1) {
-			msg_to_char(ch, "Invalid number to retrieve.\r\n");
-			return;
+	// detect number-only OR args
+	if (is_number(argument)) {
+		number = atoi(argument);
+		num_only = TRUE;
+	}
+	else {
+		// detect leading number (amount to retrieve) with a space
+		tmp = any_one_arg(argument, junk);
+		if (is_number(junk)) {
+			if ((amt = atoi(junk)) < 1) {
+				msg_to_char(ch, "Invalid number to retrieve.\r\n");
+				return;
+			}
+		
+			// skip past this arg
+			argument = tmp;
+			skip_spaces(&argument);
+		}
+		num_only = FALSE;
+	
+		if (!strn_cmp(argument, "all ", 4) || !strn_cmp(argument, "all.", 4)) {
+			argument += 4;
+			all = TRUE;
+		}
+	
+		// for later
+		if (isdigit(*argument) && !num_only) {
+			one = TRUE;
 		}
 		
-		// skip past this arg
-		argument = tmp;
-		skip_spaces(&argument);
-	}
-	
-	if (!strn_cmp(argument, "all ", 4) || !strn_cmp(argument, "all.", 4)) {
-		argument += 4;
-		all = TRUE;
-	}
-	
-	// for later
-	if (isdigit(*argument)) {
-		one = TRUE;
-	}
-	
-	// list position
-	number = get_number(&argument);
+		number = get_number(&argument);
+	}	// end !num_only
 	
 	// final argument checks
 	if (number < 1) {
@@ -4225,7 +4239,7 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 		if (!home_mode && !imm_access && iter->island != island) {
 			continue;
 		}
-		if (!multi_isname(argument, GET_OBJ_KEYWORDS(iter->obj))) {
+		if (!num_only && !multi_isname(argument, GET_OBJ_KEYWORDS(iter->obj))) {
 			continue;
 		}
 		

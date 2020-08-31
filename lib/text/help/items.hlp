@@ -1069,7 +1069,7 @@ Building:  {WW}  Warehouse  (Foundations goal)
 
 Command:  warehouse inventory [item keywords]
           warehouse identify <item keywords>
-          warehouse retrieve [number] <item keywords>
+          warehouse retrieve [number] [item keywords]
           warehouse store [number] <item keywords>
 
 While normal resource storage (e.g. the lumber yard) can store many simple
