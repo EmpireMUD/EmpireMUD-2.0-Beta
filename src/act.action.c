@@ -407,27 +407,34 @@ bool do_crop_forage(char_data *ch) {
 
 
 /**
-* Finds a tool equipped by the character.
+* Finds a tool equipped by the character. Returns the best one.
 *
 * @param char_data *ch The person who might have the tool.
 * @param bitvector_t flags The TOOL_ flags required -- player must have ONE of these flags (see has_all_tools).
 * @return obj_data* The character's equipped tool, or NULL if they have none.
 */
 obj_data *has_tool(char_data *ch, bitvector_t flags) {
-	obj_data *tool;
+	obj_data *tool, *best_tool = NULL;
 	int iter;
 	
 	// list of valid slots (in order of priority; terminate with -1
 	int slots[] = { WEAR_TOOL, WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
 	
 	for (iter = 0; slots[iter] != -1; ++iter) {
-		tool = GET_EQ(ch, slots[iter]);
-		if (tool && TOOL_FLAGGED(tool, flags)) {
-			return tool;
+		if (!(tool = GET_EQ(ch, slots[iter]))) {
+			continue;	// no item
+		}
+		if (!TOOL_FLAGGED(tool, flags)) {
+			continue;	// not flagged
+		}
+		
+		// ok! try to see if it's better
+		if (!best_tool || OBJ_FLAGGED(tool, OBJ_SUPERIOR) || (!OBJ_FLAGGED(best_tool, OBJ_SUPERIOR) && GET_OBJ_CURRENT_SCALE_LEVEL(tool) > GET_OBJ_CURRENT_SCALE_LEVEL(best_tool))) {
+			best_tool = tool;	// it seems better
 		}
 	}
 	
-	return NULL;
+	return best_tool;	// if any
 }
 
 
