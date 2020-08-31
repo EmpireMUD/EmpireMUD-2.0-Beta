@@ -4320,7 +4320,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 	char numarg[MAX_INPUT_LENGTH], *tmp;
 	obj_data *obj, *next_obj;
 	int total = 1, done = 0, dotmode;
-	bool full = FALSE, capped = FALSE;
+	bool full = FALSE, capped = FALSE, kept = FALSE;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Store what?\r\n");
@@ -4392,7 +4392,10 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 		for (obj = ch->carrying; obj && !full; obj = next_obj) {
 			next_obj = obj->next_content;
 			
-			if (!OBJ_FLAGGED(obj, OBJ_KEEP) && UNIQUE_OBJ_CAN_STORE(obj, home_mode) && check_home_store_cap(ch, obj, FALSE, &capped)) {
+			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+				kept = TRUE;
+			}
+			else if (UNIQUE_OBJ_CAN_STORE(obj, home_mode) && check_home_store_cap(ch, obj, FALSE, &capped)) {
 				// may extract obj
 				store_unique_item(ch, (home_mode ? &GET_HOME_STORAGE(ch) : &EMPIRE_UNIQUE_STORAGE(use_emp)), obj, use_emp, home_mode ? NULL : IN_ROOM(ch), &full);
 				if (!full) {
@@ -4410,7 +4413,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 				msg_to_char(ch, "It's full.\r\n");
 			}
 			else {
-				msg_to_char(ch, "You don't have anything that can be stored.\r\n");
+				msg_to_char(ch, "You don't have %s that can be stored.\r\n", (kept ? "any non-'keep' items" : "anything"));
 			}
 		}
 	}
@@ -4426,6 +4429,10 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 
 		while (obj && (dotmode == FIND_ALLDOT || done < total)) {
 			next_obj = get_obj_in_list_vis(ch, argument, obj->next_content);
+			
+			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+				kept = TRUE;	// mark for later
+			}
 			
 			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && UNIQUE_OBJ_CAN_STORE(obj, home_mode) && check_home_store_cap(ch, obj, FALSE, &capped)) {
 				// may extract obj
@@ -4444,6 +4451,9 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 		else if (!done) {
 			if (full) {	// this full is for MAX_STORAGE
 				msg_to_char(ch, "It's full.\r\n");
+			}
+			else if (kept) {
+				msg_to_char(ch, "You didn't have anything to store that wasn't marked 'keep'.\r\n");
 			}
 			else {
 				msg_to_char(ch, "You can't store that here!\r\n");

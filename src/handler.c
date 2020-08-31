@@ -5504,6 +5504,50 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 
 
 /**
+* Compare the person/people two objects are bound to.
+*
+* @param obj_data *obj_a The first obj.
+* @param obj_data *obj_b The second obj.
+* @return bool TRUE if the bindings are the same; FALSE if not.
+*/
+bool identical_bindings(obj_data *obj_a, obj_data *obj_b) {
+	void free_obj_binding(struct obj_binding **list);
+	
+	struct obj_binding *a_bind, *b_bind, *b_bind_list, *b_bind_next;
+	bool found;
+	
+	if (!OBJ_BOUND_TO(obj_a) && !OBJ_BOUND_TO(obj_b)) {
+		return TRUE;	// no bindings on either
+	}
+	
+	// compare bindings just like applies
+	b_bind_list = copy_obj_bindings(OBJ_BOUND_TO(obj_b));
+	LL_FOREACH(OBJ_BOUND_TO(obj_a), a_bind) {
+		found = FALSE;
+		LL_FOREACH_SAFE(b_bind_list, b_bind, b_bind_next) {
+			if (a_bind->idnum == b_bind->idnum) {
+				LL_DELETE(b_bind_list, b_bind);
+				found = TRUE;
+				break;
+			}
+		}
+		
+		if (!found) {
+			free_obj_binding(&b_bind_list);	// remaining items
+			return FALSE;
+		}
+	}
+	if (b_bind_list) {	// more things in b_bind_list than a
+		free_obj_binding(&b_bind_list);
+		return FALSE;
+	}
+	
+	// otherwise
+	return TRUE;
+}
+
+
+/**
 * Compares two items for identicallity. These may be highly-customized items.
 * 
 * @param obj_data *obj_a First object to compare.
@@ -5511,10 +5555,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 * @return bool TRUE if the two items are functionally identical.
 */
 bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
-	void free_obj_binding(struct obj_binding **list);
-	
 	struct obj_apply *a_apply, *b_list, *b_apply, *b_apply_next, *temp;
-	struct obj_binding *a_bind, *b_bind, *b_bind_list, *b_bind_next;
 	bool found;
 	int iter;
 	
@@ -5562,26 +5603,7 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 	if (GET_OBJ_ACTION_DESC(obj_a) != GET_OBJ_ACTION_DESC(obj_b) && !str_cmp(GET_OBJ_ACTION_DESC(obj_a), GET_OBJ_ACTION_DESC(obj_b))) {
 		return FALSE;
 	}
-	
-	// compare bindings just like applies
-	b_bind_list = copy_obj_bindings(OBJ_BOUND_TO(obj_b));
-	LL_FOREACH(OBJ_BOUND_TO(obj_a), a_bind) {
-		found = FALSE;
-		LL_FOREACH_SAFE(b_bind_list, b_bind, b_bind_next) {
-			if (a_bind->idnum == b_bind->idnum) {
-				LL_DELETE(b_bind_list, b_bind);
-				found = TRUE;
-				break;
-			}
-		}
-		
-		if (!found) {
-			free_obj_binding(&b_bind_list);	// remaining items
-			return FALSE;
-		}
-	}
-	if (b_bind_list) {	// more things in b_bind_list than a
-		free_obj_binding(&b_bind_list);
+	if (!identical_bindings(obj_a, obj_b)) {
 		return FALSE;
 	}
 	
