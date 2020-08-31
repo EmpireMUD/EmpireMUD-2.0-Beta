@@ -4233,7 +4233,7 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 	}
 	
 	// ok, find it
-	for (iter = (home_mode ? GET_HOME_STORAGE(ch) : EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch))); iter && !done; iter = next_iter) {
+	for (iter = (home_mode ? GET_HOME_STORAGE(ch) : EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch))); iter && !done && (amt > 0 || all); iter = next_iter) {
 		next_iter = iter->next;
 		
 		if (!home_mode && !imm_access && iter->island != island) {
@@ -4300,11 +4300,6 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 				EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
 			}
 		    free(iter);
-		}
-		
-		// only ever retrieve entry of thing, unless they used an all, unless unless they requested as specific one.
-		if (/*one ||*/ !all) {
-			break;
 		}
 	}
 	
