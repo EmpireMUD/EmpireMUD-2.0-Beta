@@ -3233,7 +3233,7 @@ ACMD(do_nearby) {
 	
 	int max_dist = room_has_function_and_city_ok(IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
 	
-	bool cities = TRUE, adventures = TRUE, starts = TRUE;
+	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct instance_data *inst;
 	struct empire_city_data *city;
@@ -3275,9 +3275,12 @@ ACMD(do_nearby) {
 		cities = FALSE;
 		starts = FALSE;
 	}
-	else if (is_abbrev(argument, "starting locations") || is_abbrev(argument, "starts") || is_abbrev(argument, "towers") || is_abbrev(argument, "tower of souls") || is_abbrev(argument, "tos")) {
+	else if (is_abbrev(argument, "starting locations") || is_abbrev(argument, "starts")) {
 		cities = FALSE;
 		adventures = FALSE;
+	}
+	else if (*argument) {
+		check_arg = TRUE;
 	}
 	
 	// displaying:
@@ -3290,7 +3293,7 @@ ACMD(do_nearby) {
 			loc = real_room(start_locs[iter]);
 			dist = compute_distance(IN_ROOM(ch), loc);
 		
-			if (dist <= max_dist) {
+			if (dist <= max_dist && (!check_arg || multi_isname(argument, get_room_name(loc, FALSE)))) {
 				found = TRUE;
 
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
@@ -3311,7 +3314,7 @@ ACMD(do_nearby) {
 				loc = city->location;
 				dist = compute_distance(IN_ROOM(ch), loc);
 
-				if (dist <= max_dist) {
+				if (dist <= max_dist && (!check_arg || multi_isname(argument, city->name))) {
 					found = TRUE;
 				
 					dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
@@ -3369,6 +3372,11 @@ ACMD(do_nearby) {
 			}
 			else if (dist > max_dist) {	// not global
 				continue;	// too far
+			}
+			
+			// check arg?
+			if (check_arg && !multi_isname(argument, GET_ADV_NAME(INST_ADVENTURE(inst)))) {
+				continue;
 			}
 			
 			// owner part
