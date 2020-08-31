@@ -417,11 +417,17 @@ obj_data *has_tool(char_data *ch, bitvector_t flags) {
 	obj_data *tool, *best_tool = NULL;
 	int iter;
 	
-	// list of valid slots (in order of priority; terminate with -1
-	int slots[] = { WEAR_TOOL, WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
+	// prefer tool slot
+	if (GET_EQ(ch, WEAR_TOOL) && TOOL_FLAGGED(GET_EQ(ch, WEAR_TOOL), flags)) {
+		best_tool = GET_EQ(ch, WEAR_TOOL);
+	}
 	
-	for (iter = 0; slots[iter] != -1; ++iter) {
-		if (!(tool = GET_EQ(ch, slots[iter]))) {
+	// then check other slots
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (iter == WEAR_TOOL || iter == WEAR_SHARE) {
+			continue;	// skip tool/share slots
+		}
+		if (!(tool = GET_EQ(ch, iter))) {
 			continue;	// no item
 		}
 		if (!TOOL_FLAGGED(tool, flags)) {
@@ -450,11 +456,18 @@ obj_data *has_all_tools(char_data *ch, bitvector_t flags) {
 	bitvector_t to_find = flags;
 	int iter;
 	
-	// list of valid slots (in order of priority; terminate with -1
-	int slots[] = { WEAR_TOOL, WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
+	// prefer tool slot
+	if (GET_EQ(ch, WEAR_TOOL) && TOOL_FLAGGED(GET_EQ(ch, WEAR_TOOL), flags)) {
+		best_tool = GET_EQ(ch, WEAR_TOOL);
+		REMOVE_BIT(to_find, GET_OBJ_TOOL_FLAGS(best_tool));
+	}
 	
-	for (iter = 0; to_find && slots[iter] != -1; ++iter) {
-		tool = GET_EQ(ch, slots[iter]);
+	for (iter = 0; to_find && iter < NUM_WEARS; ++iter) {
+		if (iter == WEAR_TOOL || iter == WEAR_SHARE) {
+			continue;	// skip tool/share slots
+		}
+		
+		tool = GET_EQ(ch, iter);
 		if (tool && TOOL_FLAGGED(tool, flags)) {
 			// it has 1 or more of the flags (original, not remaining flags): try to see if it's better
 			if (!best_tool || OBJ_FLAGGED(tool, OBJ_SUPERIOR) || (!OBJ_FLAGGED(best_tool, OBJ_SUPERIOR) && GET_OBJ_CURRENT_SCALE_LEVEL(tool) > GET_OBJ_CURRENT_SCALE_LEVEL(best_tool))) {

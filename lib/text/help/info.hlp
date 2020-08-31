@@ -1443,7 +1443,7 @@ TOOL TOOLS "TOOL TYPES" "TOOL FLAGS"
 
 You can't complete a task properly without the right tools. Identify an object
 to see if it's a tool. You can equip a tool with the 'use' command, but you
-can also wield or hold some other types of tools. Tools must be equipped to
+can also wear or hold some other types of tools. Tools must be equipped to
 use them (unless they're being used as a resource in a craft).
 
 Types of tools are:
