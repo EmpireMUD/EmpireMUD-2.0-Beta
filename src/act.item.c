@@ -4191,10 +4191,11 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 	
 	// detect number-only OR args
 	if (is_number(argument)) {
-		number = atoi(argument);
 		num_only = TRUE;
+		number = atoi(argument);
 	}
 	else {
+		num_only = FALSE;
 		// detect leading number (amount to retrieve) with a space
 		tmp = any_one_arg(argument, junk);
 		if (is_number(junk)) {
@@ -4207,7 +4208,6 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 			argument = tmp;
 			skip_spaces(&argument);
 		}
-		num_only = FALSE;
 	
 		if (!strn_cmp(argument, "all ", 4) || !strn_cmp(argument, "all.", 4)) {
 			argument += 4;
@@ -4215,7 +4215,7 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 		}
 	
 		// for later
-		if (isdigit(*argument) && !num_only) {
+		if (isdigit(*argument)) {
 			one = TRUE;
 		}
 		
@@ -4303,7 +4303,7 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 		}
 		
 		// only ever retrieve entry of thing, unless they used an all, unless unless they requested as specific one.
-		if (one || !all) {
+		if (/*one ||*/ !all) {
 			break;
 		}
 	}
