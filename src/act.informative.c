@@ -3267,15 +3267,15 @@ ACMD(do_nearby) {
 		++argument;
 	}
 	
-	if (is_abbrev(argument, "city") || is_abbrev(argument, "cities")) {
+	if ((is_abbrev(argument, "city") || is_abbrev(argument, "cities")) && strlen(argument) >= 3) {
 		adventures = FALSE;
 		starts = FALSE;
 	}
-	else if (is_abbrev(argument, "adventures")) {
+	else if (is_abbrev(argument, "adventures") && strlen(argument) >= 3) {
 		cities = FALSE;
 		starts = FALSE;
 	}
-	else if (is_abbrev(argument, "starting locations") || is_abbrev(argument, "starts")) {
+	else if ((is_abbrev(argument, "starting locations") || is_abbrev(argument, "starts")) && strlen(argument) >= 5) {
 		cities = FALSE;
 		adventures = FALSE;
 	}
