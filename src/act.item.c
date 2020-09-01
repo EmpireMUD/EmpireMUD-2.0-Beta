@@ -4139,7 +4139,7 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 	char junk[MAX_INPUT_LENGTH], *tmp;
 	obj_data *obj = NULL;
 	int number, amt = 1;
-	bool all = FALSE, any = FALSE, one = FALSE, done = FALSE;
+	bool all = FALSE, any = FALSE, done = FALSE;
 	trig_data *trig;
 	
 	if (!*argument) {
@@ -4210,11 +4210,6 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 		if (!strn_cmp(argument, "all ", 4) || !strn_cmp(argument, "all.", 4)) {
 			argument += 4;
 			all = TRUE;
-		}
-	
-		// for later
-		if (isdigit(*argument)) {
-			one = TRUE;
 		}
 		
 		number = get_number(&argument);
