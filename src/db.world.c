@@ -76,6 +76,7 @@ void check_terrain_height(room_data *room);
 int count_city_points_used(empire_data *emp);
 struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 void decustomize_room(room_data *room);
+void decustomize_shared_data(struct shared_room_data *shared);
 room_vnum find_free_vnum();
 room_data *get_extraction_room();
 crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
@@ -1423,6 +1424,7 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 	
 	// looks good: naturalize it
 	if (room) {
+		decustomize_room(room);
 		change_terrain(room, GET_SECT_VNUM(tile->natural_sector));
 		if (ROOM_PEOPLE(room)) {
 			act("The area returns to nature!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
@@ -1432,6 +1434,7 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 		remove_room_extra_data(room, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 	}
 	else {
+		decustomize_shared_data(tile->shared);
 		perform_change_sect(NULL, tile, tile->natural_sector);
 		perform_change_base_sect(NULL, tile, tile->natural_sector);
 		
@@ -3119,22 +3122,36 @@ room_data *load_map_room(room_vnum vnum) {
 
 
 /**
+* Removes custom name/icon/desc on shared room data.
+*
+* @param struct shared_room_data *shared The shared data to decustomize.
+*/
+void decustomize_shared_data(struct shared_room_data *shared) {
+	if (shared) {
+		if (shared->name) {
+			free(shared->name);
+			shared->name = NULL;
+		}
+		if (shared->description) {
+			free(shared->description);
+			shared->description = NULL;
+		}
+		if (shared->icon) {
+			free(shared->icon);
+			shared->icon = NULL;
+		}
+	}
+}
+
+
+/**
 * Removes the custom name/icon/description on rooms
 *
 * @param room_data *room
 */
 void decustomize_room(room_data *room) {
-	if (ROOM_CUSTOM_NAME(room)) {
-		free(ROOM_CUSTOM_NAME(room));
-		ROOM_CUSTOM_NAME(room) = NULL;
-	}
-	if (ROOM_CUSTOM_DESCRIPTION(room)) {
-		free(ROOM_CUSTOM_DESCRIPTION(room));
-		ROOM_CUSTOM_DESCRIPTION(room) = NULL;
-	}
-	if (ROOM_CUSTOM_ICON(room)) {
-		free(ROOM_CUSTOM_ICON(room));
-		ROOM_CUSTOM_ICON(room) = NULL;
+	if (room) {
+		decustomize_shared_data(SHARED_DATA(room));
 	}
 }
 
