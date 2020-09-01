@@ -230,7 +230,8 @@ bool is_ignoring_idnum(char_data *ch, int idnum) {
 	if ((index = find_player_index_by_idnum(idnum)) && (victim = find_or_load_player(index->name, &is_file))) {
 		ignoring = is_ignoring(ch, victim);
 		if (is_file) {
-			free_char(victim);
+			// no longer quick-freeing these; leave them in the queue to free soon
+			// free_char(victim);
 		}
 	}
 	
@@ -1758,7 +1759,7 @@ ACMD(do_recolor) {
 
 
 ACMD(do_reply) {
-	char_data *tch;
+	char_data *tch, *iter;
 
 	if (REAL_NPC(ch))
 		return;
@@ -1782,9 +1783,12 @@ ACMD(do_reply) {
 		 *      we could not find link dead people.  Not that they can
 		 *      hear tells anyway. :) -gg 2/24/98
 		 */
-		tch = character_list;
-		while (tch != NULL && (REAL_NPC(tch) || GET_IDNUM(tch) != GET_LAST_TELL(ch))) {
-			tch = tch->next;
+		tch = NULL;
+		DL_FOREACH(character_list, iter) {
+			if (!REAL_NPC(iter) && GET_IDNUM(REAL_CHAR(tch)) == GET_LAST_TELL(ch)) {
+				tch = iter;
+				break;
+			}
 		}
 
 		if (tch == NULL) {
@@ -1824,7 +1828,7 @@ ACMD(do_say) {
 		sprintf(string, "$n says,%s '%s\t%%c'\tn", buf1, double_percents(argument));
 		sprintf(recog, "$n ($o) says,%s '%s\t%%c'\tn", buf1, double_percents(argument));
 		
-		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (REAL_NPC(c) || ch == c || is_ignoring(c, ch))
 				continue;
 			

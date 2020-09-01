@@ -63,7 +63,7 @@ ACMD(do_affects);
 void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 void list_one_char(char_data *i, char_data *ch, int num);
 void look_at_char(char_data *i, char_data *ch, bool show_eq);
-void show_obj_to_char(obj_data *obj, char_data *ch, int mode);
+char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero);
 
 
@@ -370,13 +370,17 @@ void look_at_target(char_data *ch, char *arg) {
 	}
 
 	/* Does the argument match an extra desc in the char's inventory? */
-	for (obj = ch->carrying; obj && !found; obj = obj->next_content) {
-		if (CAN_SEE_OBJ(ch, obj))
-			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
-				send_to_char(desc, ch);
-				act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
-				found = TRUE;
+	if (!found) {
+		DL_FOREACH2(ch->carrying, obj, next_content) {
+			if (CAN_SEE_OBJ(ch, obj)) {
+				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
+					send_to_char(desc, ch);
+					act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
+					found = TRUE;
+					break;
+				}
 			}
+		}
 	}
 
 	/* Does the argument match an extra desc in the char's equipment? */
@@ -389,17 +393,22 @@ void look_at_target(char_data *ch, char *arg) {
 			}
 
 	/* Does the argument match an extra desc of an object in the room? */
-	for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj && !found; obj = obj->next_content)
-		if (CAN_SEE_OBJ(ch, obj))
-			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
-				send_to_char(desc, ch);
-				act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
-				found = TRUE;
+	if (!found) {
+		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+			if (CAN_SEE_OBJ(ch, obj)) {
+				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
+					send_to_char(desc, ch);
+					act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
+					found = TRUE;
+					break;
+				}
 			}
+		}
+	}
 
 	// does it match an extra desc of a vehicle here?
 	if (!found && ROOM_VEHICLES(IN_ROOM(ch))) {
-		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 			if (CAN_SEE_VEHICLE(ch, veh) && (desc = find_exdesc(arg, VEH_EX_DESCS(veh))) != NULL && ++i == fnum) {
 				send_to_char(desc, ch);
 				act("$n looks at $V.", TRUE, ch, NULL, veh, TO_ROOM);
@@ -428,7 +437,9 @@ void look_at_target(char_data *ch, char *arg) {
 	/* If an object was found back in generic_find */
 	if (bits) {
 		if (!found) {
-			show_obj_to_char(found_obj, ch, OBJ_DESC_LOOK_AT);	/* Show no-description */
+			if (ch->desc) {
+				page_string(ch->desc, obj_desc_for_char(found_obj, ch, OBJ_DESC_LOOK_AT), TRUE);	/* Show no-description */
+			}
 			act("$n looks at $p.", TRUE, ch, found_obj, NULL, TO_ROOM);
 		}
 	}
@@ -765,7 +776,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 */
 void list_char_to_char(char_data *list, char_data *ch) {
 	char_data *i, *j;
-	int c = 1;
+	int c;
 	
 	bool use_mob_stacking = config_get_bool("use_mob_stacking");
 	#define MOB_CAN_STACK(ch)  (use_mob_stacking && !GET_COMPANION(ch) && !GET_LED_BY(ch) && GET_POS(ch) != POS_FIGHTING && !MOB_FLAGGED((ch), MOB_EMPIRE | MOB_TIED | MOB_MOUNTABLE))
@@ -774,23 +785,26 @@ void list_char_to_char(char_data *list, char_data *ch) {
 	if (!list || !ch || !ch->desc) {
 		return;
 	}
-
-	for (i = list; i; i = i->next_in_room, c = 1) {
+	
+	DL_FOREACH2(list, i, next_in_room) {
+		c = 1;
 		if (ch != i) {
 			if (IS_NPC(i) && MOB_CAN_STACK(i)) {
-				for (j = list; j != i; j = j->next_in_room) {
-					if (GET_MOB_VNUM(j) == GET_MOB_VNUM(i) && MOB_CAN_STACK(j) && CAN_SEE(ch, j) && GET_POS(j) == GET_POS(i)) {
+				// check if already showed this mob...
+				DL_FOREACH2(list, j, next_in_room) {
+					if (j == i || (GET_MOB_VNUM(j) == GET_MOB_VNUM(i) && MOB_CAN_STACK(j) && CAN_SEE(ch, j) && GET_POS(j) == GET_POS(i))) {
 						break;
 					}
 				}
 			
 				if (j != i) {
-					continue;
+					continue;	// already showed this mob
 				}
-			
-				for (j = i->next_in_room; j; j = j->next_in_room) {
+				
+				// count duplicates
+				DL_FOREACH2(i->next_in_room, j, next_in_room) {
 					if (GET_MOB_VNUM(j) == GET_MOB_VNUM(i) && MOB_CAN_STACK(j) && CAN_SEE(ch, j) && GET_POS(j) == GET_POS(i)) {
-						c++;
+						++c;
 					}
 				}
 			}
@@ -1151,7 +1165,7 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
 		return;
 	}
 	
-	LL_FOREACH2(list, veh, next_in_room) {
+	DL_FOREACH2(list, veh, next_in_room) {
 		// conditions to show
 		if (!CAN_SEE_VEHICLE(ch, veh)) {
 			continue;	// should we show a "something" ?
@@ -1262,8 +1276,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 			act("$n is using:", FALSE, i, 0, ch, TO_VICT);
 			for (j = 0; j < NUM_WEARS; j++) {
 				if (GET_EQ(i, j) && CAN_SEE_OBJ(ch, GET_EQ(i, j))) {
-					send_to_char(wear_data[j].eq_prompt, ch);
-					show_obj_to_char(GET_EQ(i, j), ch, OBJ_DESC_EQUIPMENT);
+					msg_to_char(ch, "%s%s", wear_data[j].eq_prompt, obj_desc_for_char(GET_EQ(i, j), ch, OBJ_DESC_EQUIPMENT));
 				}
 			}
 		}
@@ -1392,7 +1405,7 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 	char sdesc[MAX_STRING_LENGTH];
 	bool color = FALSE;
 	
-	if (PRF_FLAGGED(ch, PRF_ITEM_QUALITY) && (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS)) {
+	if (PRF_FLAGGED(ch, PRF_ITEM_QUALITY) && (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_WAREHOUSE)) {
 		strcpy(output, obj_color_by_quality(obj, ch));
 		color = TRUE;
 	}
@@ -1509,15 +1522,18 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 	obj_data *i, *j = NULL;
 	bool found = FALSE;
 	int num;
-
-	for (i = list; i; i = i->next_content) {
+	
+	DL_FOREACH2(list, i, next_content) {
 		num = 0;
 		
 		if (OBJ_CAN_STACK(i)) {
 			// look for a previous matching item
 			
-			for (j = list; j != i; j = j->next_content) {
-				if (OBJ_CAN_STACK(j) && OBJS_ARE_SAME(i, j)) {
+			DL_FOREACH2(list, j, next_content) {
+				if (j == i) {
+					break;
+				}
+				else if (OBJ_CAN_STACK(j) && OBJS_ARE_SAME(i, j)) {
 					if (GET_OBJ_VNUM(j) == NOTHING) {
 						break;
 					}
@@ -1532,7 +1548,7 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 			}
 		
 			// determine number
-			for (j = i; j; j = j->next_content) {
+			DL_FOREACH2(i, j, next_content) {
 				if (OBJ_CAN_STACK(j) && OBJS_ARE_SAME(i, j)) {
 					if (GET_OBJ_VNUM(j) == NOTHING) {
 						num++;
@@ -1552,7 +1568,7 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 				msg_to_char(ch, "(%2i) ", num);
 			}
 			
-			show_obj_to_char(i, ch, mode);
+			send_to_char(obj_desc_for_char(i, ch, mode), ch);
 			found = TRUE;
 		}
 	}
@@ -1564,7 +1580,7 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 /*
  * This function screams bitvector... -gg 6/45/98
  */
-void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
+char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 	extern int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board);
 	extern int board_loaded;
 	extern bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
@@ -1572,8 +1588,9 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 	void init_boards(void);
 	extern int find_board(char_data *ch);
 	extern const char *extra_bits_inv_flags[];
-
-	char buf[MAX_STRING_LENGTH], tags[MAX_STRING_LENGTH], flags[256];
+	
+	static char buf[MAX_STRING_LENGTH];
+	char tags[MAX_STRING_LENGTH], flags[256];
 	bitvector_t show_flags;
 	int board_type;
 	room_data *room;
@@ -1595,7 +1612,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		}
 	}
 	
-	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG) {
+	if (mode == OBJ_DESC_INVENTORY || mode == OBJ_DESC_EQUIPMENT || mode == OBJ_DESC_CONTENTS || mode == OBJ_DESC_LONG || mode == OBJ_DESC_WAREHOUSE) {
 		// show level:
 		if (PRF_FLAGGED(ch, PRF_ITEM_DETAILS) && GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 1 && mode != OBJ_DESC_LONG && mode != OBJ_DESC_LOOK_AT) {
 			sprintf(tags + strlen(tags), "%s L-%d", (*tags ? "," : ""), GET_OBJ_CURRENT_SCALE_LEVEL(obj));
@@ -1670,12 +1687,11 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 				}
 			if ((board_type = find_board(ch)) != -1)
 				if (Board_show_board(board_type, ch, "board", obj))
-					return;
+					return "";
 			strcpy(buf, "You see nothing special.");
 		}
 		else if (GET_OBJ_TYPE(obj) == ITEM_MAIL) {
-			page_string(ch->desc, GET_OBJ_ACTION_DESC(obj) ? GET_OBJ_ACTION_DESC(obj) : "It's blank.\r\n", 1);
-			return;
+			return GET_OBJ_ACTION_DESC(obj) ? GET_OBJ_ACTION_DESC(obj) : "It's blank.\r\n";
 		}
 		else if (IS_PORTAL(obj)) {
 			room = real_room(GET_PORTAL_TARGET_VNUM(obj));
@@ -1697,8 +1713,8 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		}
 	}
 	
-	// CRLF IS HERE
-	if (buf[strlen(buf)-1] != '\n') {
+	// CRLF IS HERE (not for warehouse)
+	if (buf[strlen(buf)-1] != '\n' && mode != OBJ_DESC_WAREHOUSE) {
 		strcat(buf, "\r\n");
 	}
 	
@@ -1711,7 +1727,7 @@ void show_obj_to_char(obj_data *obj, char_data *ch, int mode) {
 		}
 	}
 	
-	page_string(ch->desc, buf, TRUE);
+	return buf;
 }
 
 
@@ -2354,7 +2370,7 @@ ACMD(do_contents) {
 	
 	// verify we can see even 1 obj
 	if (!can_see_anything) {
-		LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj)) {
 				can_see_anything = TRUE;
 				break;	// only need 1
@@ -2363,7 +2379,7 @@ ACMD(do_contents) {
 	}
 	// verify we can see even 1 vehicle
 	if (!can_see_anything) {
-		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 			if (CAN_SEE_VEHICLE(ch, veh)) {
 				can_see_anything = TRUE;
 				break;	// only need 1
@@ -2857,7 +2873,7 @@ ACMD(do_inventory) {
 		size = snprintf(buf, sizeof(buf), "%s\r\n", heading);
 		count = 0;
 		
-		LL_FOREACH2(ch->carrying, obj, next_content) {
+		DL_FOREACH2(ch->carrying, obj, next_content) {
 			// break out early
 			if (size + 80 > sizeof(buf)) {
 				size += snprintf(buf + size, sizeof(buf) - size, "... and more\r\n");
@@ -3232,7 +3248,7 @@ ACMD(do_nearby) {
 	
 	int max_dist = room_has_function_and_city_ok(IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
 	
-	bool cities = TRUE, adventures = TRUE, starts = TRUE;
+	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct instance_data *inst;
 	struct empire_city_data *city;
@@ -3266,17 +3282,20 @@ ACMD(do_nearby) {
 		++argument;
 	}
 	
-	if (is_abbrev(argument, "city") || is_abbrev(argument, "cities")) {
+	if ((is_abbrev(argument, "city") || is_abbrev(argument, "cities")) && strlen(argument) >= 3) {
 		adventures = FALSE;
 		starts = FALSE;
 	}
-	else if (is_abbrev(argument, "adventures")) {
+	else if (is_abbrev(argument, "adventures") && strlen(argument) >= 3) {
 		cities = FALSE;
 		starts = FALSE;
 	}
-	else if (is_abbrev(argument, "starting locations") || is_abbrev(argument, "starts") || is_abbrev(argument, "towers") || is_abbrev(argument, "tower of souls") || is_abbrev(argument, "tos")) {
+	else if ((is_abbrev(argument, "starting locations") || is_abbrev(argument, "starts")) && strlen(argument) >= 5) {
 		cities = FALSE;
 		adventures = FALSE;
+	}
+	else if (*argument) {
+		check_arg = TRUE;
 	}
 	
 	// displaying:
@@ -3289,7 +3308,7 @@ ACMD(do_nearby) {
 			loc = real_room(start_locs[iter]);
 			dist = compute_distance(IN_ROOM(ch), loc);
 		
-			if (dist <= max_dist) {
+			if (dist <= max_dist && (!check_arg || multi_isname(argument, get_room_name(loc, FALSE)))) {
 				found = TRUE;
 
 				dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
@@ -3310,7 +3329,7 @@ ACMD(do_nearby) {
 				loc = city->location;
 				dist = compute_distance(IN_ROOM(ch), loc);
 
-				if (dist <= max_dist) {
+				if (dist <= max_dist && (!check_arg || multi_isname(argument, city->name))) {
 					found = TRUE;
 				
 					dir = get_direction_for_char(ch, get_direction_to(IN_ROOM(ch), loc));
@@ -3368,6 +3387,11 @@ ACMD(do_nearby) {
 			}
 			else if (dist > max_dist) {	// not global
 				continue;	// too far
+			}
+			
+			// check arg?
+			if (check_arg && !multi_isname(argument, GET_ADV_NAME(INST_ADVENTURE(inst)))) {
+				continue;
 			}
 			
 			// owner part

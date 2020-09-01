@@ -651,9 +651,10 @@ ACMD(do_collapse) {
 	}
 	
 	// find the reverse portal
-	for (obj = ROOM_CONTENTS(to_room); obj && !reverse; obj = obj->next_content) {
+	DL_FOREACH2(ROOM_CONTENTS(to_room), obj, next_content) {
 		if (GET_PORTAL_TARGET_VNUM(obj) == GET_ROOM_VNUM(IN_ROOM(ch))) {
 			reverse = obj;
+			break;
 		}
 	}
 
@@ -1012,7 +1013,7 @@ ACMD(do_mirrorimage) {
 	
 	// limit 1
 	found = FALSE;
-	LL_FOREACH(character_list, other) {
+	DL_FOREACH(character_list, other) {
 		if (ch != other && IS_NPC(other) && GET_MOB_VNUM(other) == vnum && other->master == ch) {
 			found = TRUE;
 			break;
@@ -1120,7 +1121,7 @@ ACMD(do_mirrorimage) {
 	
 	// switch at least 1 thing that's hitting ch
 	found = FALSE;
-	for (other = ROOM_PEOPLE(IN_ROOM(ch)); other; other = other->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), other, next_in_room) {
 		if (FIGHTING(other) == ch) {
 			if (!found || !number(0, 1)) {
 				found = TRUE;
@@ -1425,9 +1426,12 @@ ACMD(do_vigor) {
 		
 		// check if vict is in combat
 		fighting = (FIGHTING(vict) != NULL);
-		for (iter = ROOM_PEOPLE(IN_ROOM(ch)); iter && !fighting; iter = iter->next_in_room) {
-			if (FIGHTING(iter) == vict) {
-				fighting = TRUE;
+		if (!fighting) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+				if (FIGHTING(iter) == vict) {
+					fighting = TRUE;
+					break;
+				}
 			}
 		}
 
@@ -1783,7 +1787,7 @@ RITUAL_FINISH_FUNC(perform_sense_life_ritual) {
 	act("$n finishes the ritual and $s eyes flash a bright white.", FALSE, ch, NULL, NULL, TO_ROOM);
 	
 	found = earthmeld = FALSE;
-	for (targ = ROOM_PEOPLE(IN_ROOM(ch)); targ; targ = targ->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), targ, next_in_room) {
 		if (targ == ch) {
 			continue;
 		}

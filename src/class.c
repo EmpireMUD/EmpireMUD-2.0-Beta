@@ -236,7 +236,7 @@ bool check_solo_role(char_data *ch) {
 		return TRUE;
 	}
 	
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 		if (iter != ch && !IS_NPC(iter) && !IS_IMMORTAL(iter) && CAN_SEE_NO_DARK(ch, iter) && !is_fight_enemy(ch, iter)) {
 			return FALSE;
 		}
@@ -1067,7 +1067,7 @@ void olc_delete_class(char_data *ch, any_vnum vnum) {
 	remove_class_from_table(cls);
 	
 	// remove from live players
-	LL_FOREACH(character_list, chiter) {
+	DL_FOREACH(character_list, chiter) {
 		if (IS_NPC(chiter)) {
 			continue;
 		}
@@ -1144,7 +1144,7 @@ void save_olc_class(descriptor_data *desc) {
 	HASH_SRT(sorted_hh, sorted_classes, sort_classes_by_data);
 	
 	// update all players in-game
-	LL_FOREACH(character_list, ch_iter) {
+	DL_FOREACH(character_list, ch_iter) {
 		if (!IS_NPC(ch_iter)) {
 			update_class(ch_iter);
 			assign_class_abilities(ch_iter, NULL, NOTHING);

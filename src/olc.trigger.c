@@ -336,7 +336,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	}
 	
 	// look for live mobs with this script and remove
-	for (mob = character_list; mob; mob = mob->next) {
+	DL_FOREACH(character_list, mob) {
 		if (IS_NPC(mob) && SCRIPT(mob)) {
 			remove_live_script_by_vnum(SCRIPT(mob), vnum);
 			check_extract_script(mob, MOB_TRIGGER);
@@ -344,7 +344,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	}
 	
 	// look for live objs with this script and remove
-	for (obj = object_list; obj; obj = obj->next) {
+	DL_FOREACH(object_list, obj) {
 		if (SCRIPT(obj)) {
 			remove_live_script_by_vnum(SCRIPT(obj), vnum);
 			check_extract_script(obj, OBJ_TRIGGER);
@@ -352,7 +352,7 @@ void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
 	}
 	
 	// live vehicles -> remove
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (SCRIPT(veh)) {
 			remove_live_script_by_vnum(SCRIPT(veh), vnum);
 			check_extract_script(veh, VEH_TRIGGER);
@@ -806,7 +806,7 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	cmdlist = compile_command_list(script_text);
 	
 	// update live triggers
-	LL_FOREACH_SAFE2(trigger_list, live_trig, next_trig, next_in_world) {
+	DL_FOREACH_SAFE2(trigger_list, live_trig, next_trig, next_in_world) {
 		if (GET_TRIG_VNUM(live_trig) != vnum) {
 			continue;	// wrong trigger
 		}

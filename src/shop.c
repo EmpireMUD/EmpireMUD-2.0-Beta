@@ -345,7 +345,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 	obj_data *obj;
 	
 	// mobs
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 		if (!IS_NPC(mob) || EXTRACTED(mob) || !CAN_SEE(ch, mob) || FIGHTING(mob) || GET_POS(mob) < POS_RESTING || IS_DEAD(mob)) {
 			continue;
 		}
@@ -357,7 +357,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 	}
 	
 	// search in inventory
-	LL_FOREACH2(ch->carrying, obj, next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		if (!CAN_SEE_OBJ(ch, obj)) {
 			continue;
 		}
@@ -369,7 +369,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 	}
 	
 	// objs in room
-	LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 		if (!CAN_SEE_OBJ(ch, obj)) {
 			continue;
 		}
@@ -381,7 +381,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 	}
 	
 	// vehicles
-	LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 		if (!CAN_SEE_VEHICLE(ch, veh)) {
 			continue;
 		}
@@ -468,7 +468,7 @@ void update_mob_shop_lookups(mob_vnum vnum) {
 		return;
 	}
 	
-	LL_FOREACH(character_list, mob) {
+	DL_FOREACH(character_list, mob) {
 		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == vnum) {
 			// re-set the pointer
 			MOB_SHOP_LOOKUPS(mob) = MOB_SHOP_LOOKUPS(proto);
@@ -488,7 +488,7 @@ void update_vehicle_shop_lookups(mob_vnum vnum) {
 		return;
 	}
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_VNUM(veh) == vnum) {
 			// re-set the pointer
 			VEH_SHOP_LOOKUPS(veh) = VEH_SHOP_LOOKUPS(proto);

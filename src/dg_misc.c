@@ -499,7 +499,7 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 		script_log("dg_purge_instance called with invalid arguments: %s %s %s", arg1, arg2, argument);
 	}
 	else if (is_abbrev(arg1, "mobile")) {
-		LL_FOREACH_SAFE(character_list, mob, next_mob) {
+		DL_FOREACH_SAFE(character_list, mob, next_mob) {
 			if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum || EXTRACTED(mob) || MOB_INSTANCE_ID(mob) != INST_ID(inst)) {
 				continue;
 			}
@@ -521,7 +521,7 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 				continue;
 			}
 			
-			LL_FOREACH_SAFE2(ROOM_CONTENTS(INST_ROOM(inst, iter)), obj, next_obj, next_content) {
+			DL_FOREACH_SAFE2(ROOM_CONTENTS(INST_ROOM(inst, iter)), obj, next_obj, next_content) {
 				if (GET_OBJ_VNUM(obj) != vnum) {
 					continue;
 				}
@@ -865,13 +865,13 @@ void run_reboot_triggers(void) {
 	HASH_ITER(hh, world_table, room, next_room) {
 		reboot_wtrigger(room);
 	}
-	LL_FOREACH_SAFE(character_list, mob, next_mob) {
+	DL_FOREACH_SAFE(character_list, mob, next_mob) {
 		reboot_mtrigger(mob);
 	}
-	LL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		reboot_otrigger(obj);
 	}
-	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		reboot_vtrigger(veh);
 	}
 }
@@ -1159,6 +1159,8 @@ void script_heal(void *thing, int type, char *argument) {
 					}
 				}
 			}
+			
+			affect_total(victim);
 		}
 	}
 	else {

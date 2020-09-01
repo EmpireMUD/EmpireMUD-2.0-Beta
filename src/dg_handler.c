@@ -177,21 +177,50 @@ void actually_free_trigger(trig_data *trig) {
 }
 
 
+/**
+* Adds the trigger to the trigger_list and random_triggers list, as needed.
+*
+* @param trig_data *trig The trigger to add.
+*/
+void add_trigger_to_global_lists(trig_data *trig) {
+	if (trig && !trig->in_world_list) {
+		DL_PREPEND2(trigger_list, trig, prev_in_world, next_in_world);
+		trig->in_world_list = TRUE;
+	}
+	if (trig && !trig->in_random_list && TRIG_IS_RANDOM(trig)) {
+		// add to end
+		DL_APPEND2(random_triggers, trig, prev_in_random_triggers, next_in_random_triggers);
+		trig->in_random_list = TRUE;
+	}
+}
+
+
+/**
+* Removes the trigger from the trigger_list and random_triggers, if present.
+*
+* @param trig_data *trig The trigger to remove.
+* @param bool random_only If TRUE, only removes it from the random trigger list. It remains in the main list, if present.
+*/
+void remove_trigger_from_global_lists(trig_data *trig, bool random_only) {
+	if (trig && trig->in_world_list && !random_only) {
+		DL_DELETE2(trigger_list, trig, prev_in_world, next_in_world);
+		trig->in_world_list = FALSE;
+	}
+	if (trig && trig->in_random_list) {
+		DL_DELETE2(random_triggers, trig, prev_in_random_triggers, next_in_random_triggers);
+		trig->in_random_list = FALSE;
+	}
+}
+
+
 /* remove a single trigger from a mob/obj/room */
 void extract_trigger(trig_data *trig) {
 	if (GET_TRIG_WAIT(trig)) {
 		dg_event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
 		GET_TRIG_WAIT(trig) = NULL;
 	}
-
-	/* walk the trigger list and remove this one */
-	LL_DELETE2(trigger_list, trig, next_in_world);
 	
-	// global trig?
-	if (TRIG_IS_RANDOM(trig)) {
-		DL_DELETE2(random_triggers, trig, prev_in_random_triggers, next_in_random_triggers);
-	}
-
+	remove_trigger_from_global_lists(trig, FALSE);
 	free_trigger(trig);
 }
 
@@ -240,19 +269,21 @@ void extract_script(void *thing, int type) {
 
 	#if 0 /* debugging */
 	{
-		char_data *i = character_list;
-		obj_data *j = object_list;
+		char_data *i;
+		obj_data *j;
 		room_data *k, *next_k;
 		vehicle_data *v;
 		
 		if (sc) {
-			for ( ; i ; i = i->next)
+			DL_FOREACH(character_list, i) {
 				assert(sc != SCRIPT(i));
-
-			for ( ; j ; j = j->next)
-				assert(sc != SCRIPT(j));
+			}
 			
-			LL_FOREACH(vehicle_list, v) {
+			DL_FOREACH(object_list, j) {
+				assert(sc != SCRIPT(j));
+			}
+			
+			DL_FOREACH(vehicle_list, v) {
 				assert(sc != SCRIPT(v));
 			}
 			

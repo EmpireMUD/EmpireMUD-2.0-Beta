@@ -252,7 +252,7 @@ void check_pointless_fight(char_data *mob) {
 	}
 	
 	any = FALSE;
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
 		if (iter == mob || FIGHTING(iter) != mob) {
 			continue;	// only care about people fighting mob
 		}
@@ -268,7 +268,7 @@ void check_pointless_fight(char_data *mob) {
 		stop_fighting(mob);
 		
 		// stop everyone hitting mob
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
 			if (FIGHTING(iter) == mob) {
 				stop_fighting(iter);
 			}
@@ -391,7 +391,7 @@ int limit_crowd_control(char_data *victim, int atype) {
 		return count;
 	}
 	
-	for (iter = ROOM_PEOPLE(IN_ROOM(victim)); iter; iter = iter->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(victim)), iter, next_in_room) {
 		if (iter != victim && affected_by_spell(iter, atype)) {
 			++count;
 			affect_from_char(iter, atype, TRUE);	// sends message
@@ -429,7 +429,7 @@ void point_update_char(char_data *ch) {
 	// check mob crowding (for npcs in stables)
 	if (IS_NPC(ch) && !ch->desc && room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) {
 		count = 1;	// me
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
 			if (ch != chiter && !EXTRACTED(chiter) && IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(ch)) {
 				++count;
 			}
@@ -449,7 +449,7 @@ void point_update_char(char_data *ch) {
 		// check way over-inventory (2x overburdened)
 		if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
 			found = FALSE;
-			LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+			DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 				if (IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
 					if (!found) {
 						found = TRUE;
@@ -513,9 +513,11 @@ void point_update_char(char_data *ch) {
 	if (IS_NPC(ch)) {
 		if (GET_POS(ch) >= POS_STUNNED && !FIGHTING(ch) && !GET_FED_ON_BY(ch)) {
 			// verify not fighting at all
-			for (c = ROOM_PEOPLE(IN_ROOM(ch)), found = FALSE; c && !found; c = c->next_in_room) {
+			found = FALSE;
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 				if (FIGHTING(c) == ch) {
 					found = TRUE;
+					break;
 				}
 			}
 			
@@ -615,7 +617,7 @@ void real_update_char(char_data *ch) {
 	int result, iter, type;
 	int fol_count, gain;
 	ability_data *abil;
-	bool found, took_dot, msg;
+	bool found, took_dot, msg, any;
 	
 	// check for end of meters (in case it was missed in the fight code)
 	if (!FIGHTING(ch)) {
@@ -673,6 +675,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// update affects (NPCs get this, too)
+	any = FALSE;
 	for (af = ch->affected; af; af = next_af) {
 		next_af = af->next;
 		if (af->duration >= 1) {
@@ -692,7 +695,11 @@ void real_update_char(char_data *ch) {
 			}
 			
 			affect_remove(ch, af);
+			any = TRUE;
 		}
+	}
+	if (any) {
+		affect_total(ch);
 	}
 	
 	// heal-per-5 ? (stops at 0 health or incap)
@@ -899,9 +906,7 @@ void real_update_char(char_data *ch) {
 	
 	// too-many-followers check
 	fol_count = 0;
-	for (room_ch = ROOM_PEOPLE(IN_ROOM(ch)); room_ch; room_ch = next_ch) {
-		next_ch = room_ch->next_in_room;
-		
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), room_ch, next_ch, next_in_room) {
 		// check is npc following ch
 		if (room_ch == ch || room_ch->desc || !IS_NPC(room_ch) || room_ch->master != ch) {
 			continue;
@@ -1448,14 +1453,17 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 * @return bool TRUE if the item is still in the world, FALSE if it was extracted
 */
 bool check_autostore(obj_data *obj, bool force) {
+	void check_delayed_load(char_data *ch);
 	extern int get_main_island(empire_data *emp);
 	
+	player_index_data *index;
 	empire_data *emp = NULL;
+	char_data *loaded_ch;
 	vehicle_data *in_veh;
 	room_data *real_loc;
 	obj_data *top_obj;
-	bool store, unique, full, is_home;
-	int islid;
+	bool store, unique, full, is_home, file;
+	int islid, home_idnum = NOBODY;
 	
 	// easy exclusions
 	if (obj->carried_by || obj->worn_by || !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
@@ -1471,7 +1479,14 @@ bool check_autostore(obj_data *obj, bool force) {
 	top_obj = get_top_object(obj);
 	real_loc = IN_ROOM(top_obj);
 	in_veh = top_obj->in_vehicle;
-	is_home = (real_loc && ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc)) != NOBODY) || (in_veh && VEH_INTERIOR_HOME_ROOM(in_veh) && ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(in_veh)) != NOBODY);
+	
+	// detect home?
+	if (real_loc && (home_idnum = ROOM_PRIVATE_OWNER(HOME_ROOM(real_loc))) != NOBODY) {
+		is_home = TRUE;
+	}
+	else if (in_veh && VEH_INTERIOR_HOME_ROOM(in_veh) && (home_idnum = ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(in_veh))) != NOBODY) {
+		is_home = TRUE;
+	}
 	
 	// detect owner here
 	if (!emp && in_veh) {
@@ -1513,8 +1528,13 @@ bool check_autostore(obj_data *obj, bool force) {
 		// but this otherwise blocks the item from storing
 		store = FALSE;
 	}
-	else if (UNIQUE_OBJ_CAN_STORE(obj) && !is_home) {
-		// store unique items but not in private homes
+	else if (is_home && UNIQUE_OBJ_CAN_STORE(obj, TRUE)) {
+		// trigger home storage
+		store = TRUE;
+		unique = TRUE;
+	}
+	else if (!is_home && UNIQUE_OBJ_CAN_STORE(obj, FALSE)) {
+		// store unique items outside a private home
 		store = TRUE;
 		unique = TRUE;
 	}
@@ -1541,9 +1561,20 @@ bool check_autostore(obj_data *obj, bool force) {
 		if (IS_COINS(obj)) {
 			increase_empire_coins(emp, real_empire(GET_COINS_EMPIRE_ID(obj)), GET_COINS_AMOUNT(obj));
 		}
+		else if (unique && is_home) {
+			// home storage
+			if ((index = find_player_index_by_idnum(home_idnum)) && (loaded_ch = find_or_load_player(index->name, &file))) {
+				check_delayed_load(loaded_ch);
+				store_unique_item(NULL, &GET_HOME_STORAGE(loaded_ch), obj, NULL, NULL, &full);
+				queue_delayed_update(loaded_ch, CDU_SAVE);
+				return FALSE;
+				// note: leaving loaded_ch open, to be auto-saved in a second, as this may run on many items
+			}
+			// failed to load owner: fall through to extract
+		}
 		else if (unique) {
 			// this extracts it itself
-			store_unique_item(NULL, obj, emp, real_loc, &full);
+			store_unique_item(NULL, &EMPIRE_UNIQUE_STORAGE(emp), obj, emp, real_loc, &full);
 			return FALSE;
 		}
 		else if (OBJ_CAN_STORE(obj)) {
@@ -1615,7 +1646,7 @@ void point_update_obj(obj_data *obj) {
 		if (materials[GET_OBJ_MATERIAL(obj)].floats && (to_room = real_shift(IN_ROOM(obj), shift_dir[WEST][0], shift_dir[WEST][1]))) {
 			if (!number(0, 2) && !ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_IS_CLOSED(to_room)) {
 				// float-west message
-				for (c = ROOM_PEOPLE(IN_ROOM(obj)); c; c = c->next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(obj)), c, next_in_room) {
 					if (c->desc) {
 						sprintf(buf, "$p floats %s.", dirs[get_direction_for_char(c, WEST)]);
 						act(buf, TRUE, c, obj, NULL, TO_CHAR);
@@ -1628,7 +1659,7 @@ void point_update_obj(obj_data *obj) {
 				GET_AUTOSTORE_TIMER(obj) = timer;
 				
 				// floats-in message
-				for (c = ROOM_PEOPLE(IN_ROOM(obj)); c; c = c->next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(obj)), c, next_in_room) {
 					if (c->desc) {
 						sprintf(buf, "$p floats in from %s.", from_dir[get_direction_for_char(c, WEST)]);
 						act(buf, TRUE, c, obj, NULL, TO_CHAR);
@@ -1806,7 +1837,7 @@ void autostore_vehicle_contents(vehicle_data *veh) {
 	}
 	
 	// ok we are good to autostore
-	LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 		check_autostore(obj, TRUE);
 	}
 }
@@ -1880,7 +1911,7 @@ bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner) {
 	}
 	
 	// !teleport mob?
-	for (mob = ROOM_PEOPLE(loc); mob; mob = mob->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(loc), mob, next_in_room) {
 		if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_NO_TELEPORT)) {
 			return FALSE;
 		}
@@ -2206,9 +2237,7 @@ void point_update(bool run_real) {
 	}
 	
 	// characters
-	for (ch = character_list; ch; ch = next_ch) {
-		next_ch = ch->next;
-		
+	DL_FOREACH_SAFE(character_list, ch, next_ch) {
 		// remove stale offers -- this needs to happen even if dead (resurrect)
 		// TODO shouldn't this logic be inside the point_update_char function?
 		if (!IS_NPC(ch)) {
@@ -2228,14 +2257,12 @@ void point_update(bool run_real) {
 	}
 	
 	// vehicles
-	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		point_update_vehicle(veh);
 	}
 	
 	// objs
-	for (obj = object_list; obj; obj = next_obj) {
-		next_obj = obj->next;
-		
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		real_update_obj(obj);
 		point_update_obj(obj);
 	}
@@ -2251,9 +2278,7 @@ void real_update(void) {
 	char_data *ch, *next_ch;
 
 	// characters
-	for (ch = character_list; ch; ch = next_ch) {
-		next_ch = ch->next;
-		
+	DL_FOREACH_SAFE(character_list, ch, next_ch) {
 		if (EXTRACTED(ch) || IS_DEAD(ch)) {
 			continue;
 		}
@@ -2262,8 +2287,7 @@ void real_update(void) {
 	}
 
 	// objs
-	for (obj = object_list; obj; obj = next_obj) {
-		next_obj = obj->next;
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		real_update_obj(obj);
 	}
 }

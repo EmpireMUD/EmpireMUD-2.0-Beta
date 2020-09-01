@@ -671,7 +671,7 @@ bool is_fighting(char_data *ch) {
 		return TRUE;
 	}
 	
-	for (iter = ROOM_PEOPLE(IN_ROOM(ch)); iter; iter = iter->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 		if (iter != ch && FIGHTING(iter) == ch) {
 			return TRUE;
 		}
@@ -836,7 +836,7 @@ void stop_combat_no_autokill(char_data *ch) {
 	}
 
 	// look for anybody in the room fighting ch who wouldn't execute:
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 		if (ch_iter != ch && FIGHTING(ch_iter) == ch && !WOULD_EXECUTE(ch_iter, ch)) {
 			stop_fighting(ch_iter);
 		}
@@ -1224,6 +1224,7 @@ void death_restore(char_data *ch) {
 	while (ch->over_time_effects) {
 		dot_remove(ch, ch->over_time_effects);
 	}
+	affect_total(ch);
 }
 
 
@@ -1307,6 +1308,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	while (ch->affected) {
 		affect_remove(ch, ch->affected);
 	}
+	affect_total(ch);
 	
 	// get rid of any charmies who are lying around
 	despawn_charmies(ch, NOTHING);
@@ -1566,8 +1568,9 @@ obj_data *make_corpse(char_data *ch) {
 	/* transfer character's inventory to the corpse -- ONLY FOR NPCs */
 	if (IS_NPC(ch)) {
 		corpse->contains = ch->carrying;
-		for (o = corpse->contains; o != NULL; o = o->next_content)
+		DL_FOREACH2(corpse->contains, o, next_content) {
 			o->in_obj = corpse;
+		}
 		object_list_no_owner(corpse);
 		
 		/* transfer character's equipment to the corpse */
@@ -1592,16 +1595,14 @@ obj_data *make_corpse(char_data *ch) {
 		ch->carrying = NULL;
 		
 		if (MOB_TAGGED_BY(ch)) {
-			LL_FOREACH2(corpse->contains, o, next_content) {
+			DL_FOREACH2(corpse->contains, o, next_content) {
 				add_production_total_for_tag_list(MOB_TAGGED_BY(ch), GET_OBJ_VNUM(o), 1);
 			}
 		}
 	}
 	else {
 		// not an npc, but check for stolen
-		for (o = ch->carrying; o; o = next_o) {
-			next_o = o->next_content;
-			
+		DL_FOREACH_SAFE2(ch->carrying, o, next_o, next_content) {
 			// is it stolen?
 			if (IS_STOLEN(o)) {
 				obj_to_obj(o, corpse);
@@ -1991,7 +1992,7 @@ void process_tower(room_data *room) {
 			to_room = real_shift(room, x, y);
 			
 			if (to_room) {
-				for (ch = ROOM_PEOPLE(to_room); ch; ch = ch->next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(to_room), ch, next_in_room) {
 					if (tower_would_shoot(room, ch)) {
 						CREATE(tvl, struct tower_victim_list, 1);
 						tvl->ch = ch;
@@ -2436,7 +2437,7 @@ bool can_fight(char_data *ch, char_data *victim) {
 	}
 	// is stealing from you
 	if (GET_LOYALTY(ch)) {
-		LL_FOREACH2(victim->carrying, obj, next_content) {
+		DL_FOREACH2(victim->carrying, obj, next_content) {
 			if (IS_STOLEN(obj) && obj->last_empire_id == EMPIRE_VNUM(GET_LOYALTY(ch))) {
 				return TRUE;	// has at least 1 stolen obj in inventory
 			}
@@ -2662,8 +2663,7 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 	}
 
 	// if we got this far, we need to hurt some people
-	for (c = ROOM_PEOPLE(to_room); c; c = next_c) {
-		next_c = c->next_in_room;
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(to_room), c, next_c, next_in_room) {
 		if ((GET_DEXTERITY(c) >= 3 && number(0, GET_DEXTERITY(c) / 3)) || IS_IMMORTAL(c)) {
 			msg_to_char(c, "You leap out of the way!\r\n");
 		}
@@ -2677,9 +2677,8 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 			die(c, c);
 		}
 	}
-
-	for (o = ROOM_CONTENTS(to_room); o; o = next_o) {
-		next_o = o->next_content;
+	
+	DL_FOREACH_SAFE2(ROOM_CONTENTS(to_room), o, next_o, next_content) {
 		if (!number(0, 1)) {
 			extract_obj(o);
 		}
@@ -2772,7 +2771,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		
 		if (VEH_ROOM_LIST(veh)) {
 			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-				LL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
+				DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
 					act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR);
 					if (!IS_NPC(ch)) {
 						log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
@@ -2829,9 +2828,8 @@ void check_auto_assist(char_data *ch) {
 	if (!ch || !FIGHTING(ch)) {
 		return;
 	}
-
-	for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter; ch_iter = next_iter) {
-		next_iter = ch_iter->next_in_room;
+	
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_iter, next_in_room) {
 		iter_master = (ch_iter->master ? ch_iter->master : ch_iter);
 		assist = FALSE;
 		
@@ -3672,9 +3670,11 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 
 	/* Actually killed him! */
 	if (victim != ch && !IS_NPC(victim)) {
-		for (m = ROOM_PEOPLE(IN_ROOM(victim)); m; m = m->next_in_room)
-			if (FIGHTING(m) == victim && !IS_NPC(m))
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(victim)), m, next_in_room) {
+			if (FIGHTING(m) == victim && !IS_NPC(m)) {
 				stop_fighting(m);
+			}
+		}
 	}
 	if (FIGHTING(victim))
 		stop_fighting(victim);
@@ -3905,7 +3905,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	best = NULL;
 	
 	if (!IS_NPC(ch)) {
-		LL_FOREACH2(ch->carrying, ammo, next_content) {
+		DL_FOREACH2(ch->carrying, ammo, next_content) {
 			if (IS_AMMO(ammo) && GET_OBJ_VNUM(ammo) == USING_AMMO(ch) && GET_AMMO_TYPE(ammo) == GET_MISSILE_WEAPON_AMMO_TYPE(weapon)) {
 				if (!best || GET_AMMO_DAMAGE_BONUS(ammo) > GET_AMMO_DAMAGE_BONUS(best)) {
 					best = ammo;	// found a [better] match!
@@ -3915,7 +3915,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	}
 	
 	if (!best) {	// if we didn't find a preferred one
-		for (ammo = ch->carrying; ammo; ammo = ammo->next_content) {
+		DL_FOREACH2(ch->carrying, ammo, next_content) {
 			if (IS_AMMO(ammo) && GET_AMMO_TYPE(ammo) == GET_MISSILE_WEAPON_AMMO_TYPE(weapon)) {
 				if (!best || GET_AMMO_DAMAGE_BONUS(ammo) > GET_AMMO_DAMAGE_BONUS(best)) {
 					best = ammo;

@@ -453,7 +453,7 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 	}
 
 	/* Hidden people are left off the map, even if you sense life */
-	for (c = ROOM_PEOPLE(room); c; c = c->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), c, next_in_room) {
 		if (can_see_player_in_other_room(ch, c)) {
 			CREATE(pc, struct mappc_data, 1);
 			pc->room = room;
@@ -1072,7 +1072,7 @@ void look_in_direction(char_data *ch, int dir) {
 				
 				to_room = ex->room_ptr;
 				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
-					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
+					DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 						if (!AFF_FLAGGED(c, AFF_HIDE | AFF_NO_SEE_IN_ROOM) && CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 							if (last_comma_pos != -1) {
@@ -1083,7 +1083,7 @@ void look_in_direction(char_data *ch, int dir) {
 						}
 					}
 					
-					LL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
+					DL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
 						if (CAN_SEE_VEHICLE(ch, veh)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", get_vehicle_short_desc(veh, ch));
 							if (last_comma_pos != -1) {
@@ -1167,7 +1167,7 @@ void look_in_direction(char_data *ch, int dir) {
 		}
 
 		if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
-			for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 				if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 					bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 					if (last_comma_pos != -1) {
@@ -1178,7 +1178,7 @@ void look_in_direction(char_data *ch, int dir) {
 				}
 			}
 			
-			LL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
+			DL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
 				if (CAN_SEE_VEHICLE(ch, veh)) {
 					bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", get_vehicle_short_desc(veh, ch));
 					if (last_comma_pos != -1) {
@@ -1194,7 +1194,7 @@ void look_in_direction(char_data *ch, int dir) {
 		to_room = real_shift(to_room, shift_dir[dir][0], shift_dir[dir][1]);
 		if (to_room && !ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) && !ROOM_IS_CLOSED(to_room)) {
 			if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
-				for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 					if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 						bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 						if (last_comma_pos != -1) {
@@ -1209,7 +1209,7 @@ void look_in_direction(char_data *ch, int dir) {
 			to_room = real_shift(to_room, shift_dir[dir][0], shift_dir[dir][1]);
 			if (to_room && !ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) && !ROOM_IS_CLOSED(to_room)) {
 				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
-					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
+					DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 						if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 							if (last_comma_pos != -1) {
@@ -1777,8 +1777,8 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			// show mappc
 			if (SHOW_PEOPLE_IN_ROOM(to_room)) {
 				*plrbuf = '\0';
-			
-				for (vict = ROOM_PEOPLE(to_room); vict; vict = vict->next_in_room) {
+				
+				DL_FOREACH2(ROOM_PEOPLE(to_room), vict, next_in_room) {
 					if (can_see_player_in_other_room(ch, vict)) {
 						sprintf(plrbuf + strlen(plrbuf), "%s%s", *plrbuf ? ", " : "", PERS(vict, ch, FALSE));
 					}
@@ -1941,7 +1941,7 @@ void perform_mortal_where(char_data *ch, char *arg) {
 	else {			/* print only FIRST char, not all. */
 		found = NULL;
 		closest = MAP_SIZE;
-		for (i = character_list; i; i = i->next) {
+		DL_FOREACH(character_list, i) {
 			if (i == ch || !IN_ROOM(i) || !CAN_RECOGNIZE(ch, i) || !CAN_SEE(ch, i) || AFF_FLAGGED(i, AFF_NO_WHERE))
 				continue;
 			if (!multi_isname(arg, GET_PC_NAME(i)))
@@ -2060,20 +2060,21 @@ void perform_immort_where(char_data *ch, char *arg) {
 		}
 	}
 	else {
-		for (i = character_list; i; i = i->next) {
+		DL_FOREACH(character_list, i) {
 			if (CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i) && multi_isname(arg, GET_PC_NAME(i))) {
 				found = 1;
 				msg_to_char(ch, "M%3d. %-25s - %s[%d]%s %s\r\n", ++num, GET_NAME(i), (IS_NPC(i) && HAS_TRIGGERS(i)) ? "[TRIG] " : "", GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE));
 			}
 		}
 		num = 0;
-		LL_FOREACH2(vehicle_list, veh, next) {
+		DL_FOREACH(vehicle_list, veh) {
 			if (CAN_SEE_VEHICLE(ch, veh) && multi_isname(arg, VEH_KEYWORDS(veh))) {
 				found = 1;
 				msg_to_char(ch, "V%3d. %-25s - %s[%d]%s %s\r\n", ++num, VEH_SHORT_DESC(veh), (HAS_TRIGGERS(veh) ? "[TRIG] " : ""), GET_ROOM_VNUM(IN_ROOM(veh)), coord_display_room(ch, IN_ROOM(veh), TRUE), get_room_name(IN_ROOM(veh), FALSE));
 			}
 		}
-		for (num = 0, k = object_list; k; k = k->next) {
+		num = 0;
+		DL_FOREACH(object_list, k) {
 			if (CAN_SEE_OBJ(ch, k) && multi_isname(arg, GET_OBJ_KEYWORDS(k))) {
 				found = 1;
 				print_object_location(++num, k, ch, TRUE);
@@ -2153,7 +2154,7 @@ ACMD(do_exits) {
 	// portals
 	if (cmd != -1) {
 		any = FALSE;
-		LL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+		DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
 			if (!IS_PORTAL(obj) || !(to_room = real_room(GET_PORTAL_TARGET_VNUM(obj)))) {
 				continue;
 			}

@@ -197,7 +197,7 @@ void display_statistics_to_char(char_data *ch) {
 
 	// creatures
 	count = 0;
-	for (vict = character_list; vict; vict = vict->next) {
+	DL_FOREACH(character_list, vict) {
 		if (IS_NPC(vict)) {
 			++count;
 		}
@@ -205,11 +205,11 @@ void display_statistics_to_char(char_data *ch) {
 	msg_to_char(ch, "Unique Creatures: %5d     Total Mobs:         %d\r\n", HASH_COUNT(mobile_table), count);
 
 	// objs
-	LL_COUNT(object_list, obj, count);
+	DL_COUNT(object_list, obj, count);
 	msg_to_char(ch, "Unique Objects:   %5d     Total Objects:      %d\r\n", HASH_COUNT(object_table), count);
 	
 	// vehicles
-	LL_COUNT(vehicle_list, veh, count);
+	DL_COUNT(vehicle_list, veh, count);
 	msg_to_char(ch, "Unique Vehicles:  %5d     Total Vehicles:     %d\r\n", HASH_COUNT(vehicle_table), count);
 }
 

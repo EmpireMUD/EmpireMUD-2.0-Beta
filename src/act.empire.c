@@ -109,7 +109,7 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 	vehicle_data *veh;
 	int old_id, new_id;
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_OWNER(veh) != old_emp || VEH_SHIPPING_ID(veh) == -1) {
 			continue;
 		}
@@ -1140,7 +1140,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 	requesters_island = GET_ISLAND_ID(IN_ROOM(to));
 	
 	// count up workforce mobs
-	for (ch_iter = character_list; ch_iter; ch_iter = ch_iter->next) {
+	DL_FOREACH(character_list, ch_iter) {
 		if (!IS_NPC(ch_iter) || GET_LOYALTY(ch_iter) != emp) {
 			continue;
 		}
@@ -2927,7 +2927,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			}
 			else {
 				// try finding a matching vehicle visible in the tile
-				LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+				DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
 					if (!VEH_ICON(veh) || !VEH_IS_COMPLETE(veh)) {
 						continue;
 					}
@@ -4028,8 +4028,8 @@ ACMD(do_efind) {
 		
 		// first, gotta find them all
 		HASH_ITER(hh, world_table, iter, next_iter) {
-			if (ROOM_OWNER(iter) == emp) {			
-				for (obj = ROOM_CONTENTS(iter); obj; obj = obj->next_content) {
+			if (ROOM_OWNER(iter) == emp) {
+				DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
 					if ((all && CAN_WEAR(obj, ITEM_WEAR_TAKE)) || (!all && isname(arg, obj->name))) {
 						add_obj_to_efind(&list, obj, NULL, iter);
 						++total;
@@ -4039,7 +4039,7 @@ ACMD(do_efind) {
 		}
 		
 		// next, vehicles
-		LL_FOREACH(vehicle_list, veh) {
+		DL_FOREACH(vehicle_list, veh) {
 			if (!IN_ROOM(veh)) {
 				continue;
 			}
@@ -4528,14 +4528,14 @@ ACMD(do_enroll) {
 			}
 		
 			// mobs
-			for (mob = character_list; mob; mob = mob->next) {
+			DL_FOREACH(character_list, mob) {
 				if (GET_LOYALTY(mob) == old) {
 					GET_LOYALTY(mob) = e;
 				}
 			}
 			
 			// objs
-			for (obj = object_list; obj; obj = obj->next) {
+			DL_FOREACH(object_list, obj) {
 				if (obj->last_empire_id == EMPIRE_VNUM(old)) {
 					obj->last_empire_id = EMPIRE_VNUM(e);
 				}
@@ -4577,7 +4577,7 @@ ACMD(do_enroll) {
 			convert_empire_shipping(old, e);
 			
 			// vehicles
-			LL_FOREACH_SAFE2(vehicle_list, veh, next_veh, next) {
+			DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 				if (VEH_OWNER(veh) == old) {
 					VEH_OWNER(veh) = e;
 				}
@@ -4682,7 +4682,7 @@ ACMD(do_enroll) {
 		reread_empire_tech(GET_LOYALTY(ch));
 		
 		// need to update quests too: do this AFTER rereading tech
-		LL_FOREACH(character_list, victim) {
+		DL_FOREACH(character_list, victim) {
 			if (!IS_NPC(victim) && GET_LOYALTY(victim) == e) {
 				refresh_all_quests(victim);
 			}
@@ -5085,20 +5085,26 @@ room_data *find_home(char_data *ch) {
 
 ACMD(do_home) {
 	void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
+	void warehouse_inventory(char_data *ch, char *argument, int mode);
+	void warehouse_identify(char_data *ch, char *argument, int mode);
+	void warehouse_retrieve(char_data *ch, char *argument, int mode);
+	void warehouse_store(char_data *ch, char *argument, int mode);
 	
+	char command[MAX_INPUT_LENGTH];
 	struct empire_territory_data *ter;
 	room_data *iter, *next_iter, *home = NULL, *real = HOME_ROOM(IN_ROOM(ch));
 	empire_data *emp = GET_LOYALTY(ch);
-	obj_data *obj;
 	
 	if (IS_NPC(ch)) {
 		return;
 	}
 	
+	argument = any_one_arg(argument, command);
 	skip_spaces(&argument);
 	home = find_home(ch);
 	
-	if (!*argument) {
+	if (!*command) {
+		msg_to_char(ch, "Options: set, unset, inventory, identify, retrieve, store, clear\r\n");
 		if (!home) {
 			msg_to_char(ch, "You have no home set.\r\n");
 		}
@@ -5110,7 +5116,7 @@ ACMD(do_home) {
 			msg_to_char(ch, "Use 'home set' to claim this room.\r\n");
 		}
 	}
-	else if (!str_cmp(argument, "set")) {
+	else if (!str_cmp(command, "set")) {
 		if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED)) {
 			msg_to_char(ch, "You can't home-set while adventure-summoned.\r\n");
 		}
@@ -5126,7 +5132,7 @@ ACMD(do_home) {
 		else if (ROOM_PRIVATE_OWNER(real) != NOBODY) {
 			msg_to_char(ch, "Someone already owns this home.%s\r\n", (GET_RANK(ch) < EMPIRE_NUM_RANKS(emp)) ? "" : "Use 'home clear' to clear it first.");
 		}
-		else if (!has_permission(ch, PRIV_HOMES, IN_ROOM(ch))) {	// after the has-owner check because otherwise the error is misleading
+		else if (!has_permission(ch, PRIV_HOMES, real)) {	// after the has-owner check because otherwise the error is misleading
 			msg_to_char(ch, "You aren't high enough rank to set a home.\r\n");
 		}
 		else if (!GET_BUILDING(real) || GET_BLD_CITIZENS(GET_BUILDING(real)) <= 0) {
@@ -5138,7 +5144,7 @@ ACMD(do_home) {
 		else if (ROOM_AFF_FLAGGED(real, ROOM_AFF_HAS_INSTANCE)) {
 			msg_to_char(ch, "You can't make this your home right now.\r\n");
 		}
-		else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+		else if (!check_in_city_requirement(real, TRUE)) {
 			msg_to_char(ch, "You can't make this your home because it's not in a city.\r\n");
 		}
 		else {
@@ -5173,20 +5179,17 @@ ACMD(do_home) {
 						delete_territory_npc(ter, ter->npcs);
 					}
 				}
-				
-				// TODO consider a trigger like RoomUpdate that passes a var like %update% == homeset
-				if (BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
-					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), iter);
-					load_otrigger(obj);
-				}
 			}
+			
+			GET_LAST_HOME_SET_TIME(ch) = time(0);
+			queue_delayed_update(ch, CDU_SAVE);
 			
 			log_to_empire(emp, ELOG_TERRITORY, "%s has made (%d, %d) %s home", PERS(ch, ch, 1), X_COORD(real), Y_COORD(real), REAL_HSHR(ch));
 			msg_to_char(ch, "You make this your home.\r\n");
 		}
 	}
-	else if (!str_cmp(argument, "clear")) {
-		if (ROOM_PRIVATE_OWNER(IN_ROOM(ch)) == NOBODY) {
+	else if (!str_cmp(command, "clear")) {
+		if (ROOM_PRIVATE_OWNER(real) == NOBODY) {
 			msg_to_char(ch, "This isn't anybody's home.\r\n");
 		}
 		else if (GET_POS(ch) < POS_STANDING) {
@@ -5199,16 +5202,32 @@ ACMD(do_home) {
 			msg_to_char(ch, "You can't take away somebody's home.\r\n");
 		}
 		else {
-			clear_private_owner(ROOM_PRIVATE_OWNER(IN_ROOM(ch)));
+			clear_private_owner(ROOM_PRIVATE_OWNER(real));
 			msg_to_char(ch, "This home's private owner has been cleared.\r\n");
 		}
 	}
-	else if (!str_cmp(argument, "unset")) {
+	else if (!str_cmp(command, "unset")) {
 		clear_private_owner(GET_IDNUM(ch));
 		msg_to_char(ch, "Your home has been unset.\r\n");
 	}
+	else if (is_abbrev(command, "inventory")) {
+		warehouse_inventory(ch, argument, SCMD_HOME);
+	}
+	// all other commands require awakeness
+	else if (GET_POS(ch) < POS_RESTING || FIGHTING(ch)) {
+		msg_to_char(ch, "You can't do that right now.\r\n");
+	}
+	else if (is_abbrev(command, "identify")) {
+		warehouse_identify(ch, argument, SCMD_HOME);
+	}
+	else if (is_abbrev(command, "retrieve")) {
+		warehouse_retrieve(ch, argument, SCMD_HOME);
+	}
+	else if (is_abbrev(command, "store")) {
+		warehouse_store(ch, argument, SCMD_HOME);
+	}
 	else {
-		msg_to_char(ch, "Usage: home [set | unset | clear]\r\n");
+		msg_to_char(ch, "Usage: home [set | unset | clear | inventory | retrieve | store]\r\n");
 	}
 }
 
@@ -5554,7 +5573,7 @@ ACMD(do_inspire) {
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		if (all) {
-			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 				if (ch != vict && !IS_NPC(vict)) {
 					perform_inspire(ch, vict, type);
 				}

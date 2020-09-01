@@ -186,14 +186,14 @@ void greet_memory_mtrigger(char_data *actor) {
 	}
 	if (!valid_dg_target(actor, DG_ALLOW_GODS))
 		return;
-
-	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch->next_in_room) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
 		if (!SCRIPT_MEM(ch) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor)) {
 			continue;
 		}
 		/* find memory line with command only */
 		for (mem = SCRIPT_MEM(ch); mem && SCRIPT_MEM(ch); mem=mem->next) {
-			if (char_script_id(actor) != mem->id) {
+			if (actor->script_id != mem->id) {
 				continue;
 			}
 			if (mem->cmd) {
@@ -246,8 +246,8 @@ int greet_mtrigger(char_data *actor, int dir) {
 	}
 	if (!valid_dg_target(actor, DG_ALLOW_GODS))
 		return TRUE;
-
-	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch->next_in_room) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
 		if (!SCRIPT_CHECK(ch, MTRIG_GREET | MTRIG_GREET_ALL) || (ch == actor)) {
 			continue;
 		}
@@ -286,14 +286,17 @@ void entry_memory_mtrigger(char_data *ch) {
 
 	if (!SCRIPT_MEM(ch))
 		return;
-
-	for (actor = ROOM_PEOPLE(IN_ROOM(ch)); actor && SCRIPT_MEM(ch); actor = actor->next_in_room) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), actor, next_in_room) {
+		if (!SCRIPT_MEM(ch)) {
+			break;
+		}
 		if (IS_IMMORTAL(actor) && (GET_INVIS_LEV(actor) > LVL_MORTAL || PRF_FLAGGED(actor, PRF_WIZHIDE))) {
 			continue;
 		}
 		if (actor!=ch && SCRIPT_MEM(ch)) {
 			for (mem = SCRIPT_MEM(ch); mem && SCRIPT_MEM(ch); mem = mem->next) {
-				if (char_script_id(actor) == mem->id) {
+				if (actor->script_id == mem->id) {
 					struct script_memory *prev;
 					if (mem->cmd) command_interpreter(ch, mem->cmd);
 					else {
@@ -368,7 +371,7 @@ int buy_mtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 		return 1;
 	}
 	
-	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(actor)), ch, ch_next, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(actor)), ch, ch_next, next_in_room) {
 		if (!SCRIPT_CHECK(ch, MTRIG_BUY)) {
 			continue;
 		}
@@ -434,10 +437,8 @@ int command_mtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	/* prevent people we like from becoming trapped :P */
 	if (!valid_dg_target(actor, 0))
 		return 0;
-
-	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch_next) {
-		ch_next = ch->next_in_room;
-
+	
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(actor)), ch, ch_next, next_in_room) {
 		if (SCRIPT_CHECK(ch, MTRIG_COMMAND) && (actor != ch || !AFF_FLAGGED(ch, AFF_ORDERED))) {
 			for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
 				if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
@@ -475,10 +476,8 @@ void speech_mtrigger(char_data *actor, char *str) {
 	char_data *ch, *ch_next;
 	trig_data *t;
 	char buf[MAX_INPUT_LENGTH];
-
-	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch_next) {
-		ch_next = ch->next_in_room;
-
+	
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(actor)), ch, ch_next, next_in_room) {
 		if (SCRIPT_CHECK(ch, MTRIG_SPEECH) && AWAKE(ch) && (actor!=ch)) {
 			for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
 				if (AFF_FLAGGED(ch, AFF_CHARM) && !TRIGGER_CHECK(t, MTRIG_CHARMED)) {
@@ -768,7 +767,7 @@ int leave_mtrigger(char_data *actor, int dir, char *custom_dir) {
 		return 1;
 	}
 	
-	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
 		if (!SCRIPT_CHECK(ch, MTRIG_LEAVE | MTRIG_LEAVE_ALL) || (ch == actor)) {
 			continue;
 		}
@@ -800,8 +799,8 @@ int door_mtrigger(char_data *actor, int subcmd, int dir) {
 	trig_data *t;
 	char_data *ch;
 	char buf[MAX_INPUT_LENGTH];
-
-	for (ch = ROOM_PEOPLE(IN_ROOM(actor)); ch; ch = ch->next_in_room) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
 		if (!SCRIPT_CHECK(ch, MTRIG_DOOR) || !AWAKE(ch) || FIGHTING(ch) || (ch == actor))
 			continue;
 
@@ -994,13 +993,13 @@ int buy_otrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 		}
 	}
 	
-	LL_FOREACH2(actor->carrying, obj, next_content) {
+	DL_FOREACH2(actor->carrying, obj, next_content) {
 		if (!buy_otrig(obj, actor, shopkeeper, buying, cost, currency, OCMD_INVEN)) {
 			return 0;
 		}
 	}
 
-	LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
 		if (!buy_otrig(obj, actor, shopkeeper, buying, cost, currency, OCMD_ROOM)) {
 			return 0;
 		}
@@ -1080,14 +1079,18 @@ int command_otrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	for (i = 0; i < NUM_WEARS; i++)
 		if (cmd_otrig(GET_EQ(actor, i), actor, cmd, argument, OCMD_EQUIP, mode))
 			return 1;
-
-	for (obj = actor->carrying; obj; obj = obj->next_content)
-		if (cmd_otrig(obj, actor, cmd, argument, OCMD_INVEN, mode))
+	
+	DL_FOREACH2(actor->carrying, obj, next_content) {
+		if (cmd_otrig(obj, actor, cmd, argument, OCMD_INVEN, mode)) {
 			return 1;
-
-	for (obj = ROOM_CONTENTS(IN_ROOM(actor)); obj; obj = obj->next_content)
-		if (cmd_otrig(obj, actor, cmd, argument, OCMD_ROOM, mode))
+		}
+	}
+	
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
+		if (cmd_otrig(obj, actor, cmd, argument, OCMD_ROOM, mode)) {
 			return 1;
+		}
+	}
 
 	return 0;
 }
@@ -1301,8 +1304,7 @@ int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir)
 		return 1;
 	}
 	
-	for (obj = room->contents; obj; obj = obj_next) {
-		obj_next = obj->next_content;
+	DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, obj_next, next_content) {
 		if (!SCRIPT_CHECK(obj, OTRIG_LEAVE))
 			continue;
 
@@ -2036,7 +2038,7 @@ int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 		return 1;
 	}
 	
-	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
 		if (!SCRIPT_CHECK(veh, VTRIG_BUY)) {
 			continue;
 		}
@@ -2098,7 +2100,7 @@ int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 		return 0;
 	}
 	
-	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
 		if (SCRIPT_CHECK(veh, VTRIG_COMMAND)) {
 			for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
 				if (!TRIGGER_CHECK(t, VTRIG_COMMAND)) {
@@ -2183,7 +2185,7 @@ int greet_vtrigger(char_data *actor, int dir) {
 		return TRUE;
 	}
 	
-	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
 		if (!SCRIPT_CHECK(veh, VTRIG_GREET)) {
 			continue;
 		}
@@ -2226,7 +2228,7 @@ int leave_vtrigger(char_data *actor, int dir, char *custom_dir) {
 		return 1;
 	}
 	
-	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
 		if (!SCRIPT_CHECK(veh, VTRIG_LEAVE)) {
 			continue;
 		}
@@ -2301,7 +2303,7 @@ void speech_vtrigger(char_data *actor, char *str) {
 	char buf[MAX_INPUT_LENGTH];
 	trig_data *t;
 	
-	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
 		if (SCRIPT_CHECK(veh, VTRIG_SPEECH)) {
 			for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
 				if (!TRIGGER_CHECK(t, VTRIG_SPEECH)) {
@@ -2343,7 +2345,7 @@ int start_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_da
 	// store instance globally to allow %instance.xxx% in scripts
 	quest_instance_global = inst;
 	
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
 		if (!SCRIPT_CHECK(ch, MTRIG_START_QUEST) || (ch == actor)) {
 			continue;
 		}
@@ -2430,7 +2432,7 @@ int start_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_da
 	// store instance globally to allow %instance.xxx% in scripts
 	quest_instance_global = inst;
 	
-	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
 		if (!SCRIPT_CHECK(veh, VTRIG_START_QUEST)) {
 			continue;
 		}
@@ -2519,14 +2521,18 @@ int start_quest_otrigger(char_data *actor, quest_data *quest, struct instance_da
 	for (i = 0; i < NUM_WEARS; i++)
 		if (GET_EQ(actor, i) && !start_quest_otrigger_one(GET_EQ(actor, i), actor, quest, inst))
 			return 0;
-
-	for (obj = actor->carrying; obj; obj = obj->next_content)
-		if (!start_quest_otrigger_one(obj, actor, quest, inst))
+	
+	DL_FOREACH2(actor->carrying, obj, next_content) {
+		if (!start_quest_otrigger_one(obj, actor, quest, inst)) {
 			return 0;
-
-	for (obj = ROOM_CONTENTS(IN_ROOM(actor)); obj; obj = obj->next_content)
-		if (!start_quest_otrigger_one(obj, actor, quest, inst))
+		}
+	}
+	
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
+		if (!start_quest_otrigger_one(obj, actor, quest, inst)) {
 			return 0;
+		}
+	}
 
 	return 1;
 }
@@ -2613,7 +2619,7 @@ int finish_quest_mtrigger(char_data *actor, quest_data *quest, struct instance_d
 	// store instance globally to allow %instance.xxx% in scripts
 	quest_instance_global = inst;
 	
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(actor)), ch, next_in_room) {
 		if (!SCRIPT_CHECK(ch, MTRIG_FINISH_QUEST) || (ch == actor)) {
 			continue;
 		}
@@ -2701,7 +2707,7 @@ int finish_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_d
 	// store instance globally to allow %instance.xxx% in scripts
 	quest_instance_global = inst;
 	
-	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
 		if (!SCRIPT_CHECK(veh, VTRIG_FINISH_QUEST)) {
 			continue;
 		}
@@ -2790,14 +2796,18 @@ int finish_quest_otrigger(char_data *actor, quest_data *quest, struct instance_d
 	for (i = 0; i < NUM_WEARS; i++)
 		if (GET_EQ(actor, i) && !finish_quest_otrigger_one(GET_EQ(actor, i), actor, quest, inst))
 			return 0;
-
-	for (obj = actor->carrying; obj; obj = obj->next_content)
-		if (!finish_quest_otrigger_one(obj, actor, quest, inst))
+	
+	DL_FOREACH2(actor->carrying, obj, next_content) {
+		if (!finish_quest_otrigger_one(obj, actor, quest, inst)) {
 			return 0;
-
-	for (obj = ROOM_CONTENTS(IN_ROOM(actor)); obj; obj = obj->next_content)
-		if (!finish_quest_otrigger_one(obj, actor, quest, inst))
+		}
+	}
+	
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
+		if (!finish_quest_otrigger_one(obj, actor, quest, inst)) {
 			return 0;
+		}
+	}
 
 	return 1;
 }
@@ -2957,7 +2967,7 @@ int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_kil
 	
 	if (killer && killer != dying) {
 		// check characters first:
-		LL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch_iter, next_ch, next_in_room) {
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch_iter, next_ch, next_in_room) {
 			if (EXTRACTED(ch_iter) || IS_DEAD(ch_iter) || !SCRIPT_CHECK(ch_iter, MTRIG_KILL)) {
 				continue;
 			}
@@ -2992,7 +3002,7 @@ int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_kil
 		}
 		
 		// check gear on characters present, IF they are on the killing team:
-		LL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch_iter, next_ch, next_in_room) {
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch_iter, next_ch, next_in_room) {
 			if (EXTRACTED(ch_iter) || IS_DEAD(ch_iter)) {
 				continue;	// cannot benefit if dead
 			}

@@ -223,6 +223,7 @@ extern obj_data *copy_warehouse_obj(obj_data *input);
 void empty_obj_before_extract(obj_data *obj);
 void extract_obj(obj_data *obj);
 extern obj_data *fresh_copy_obj(obj_data *obj, int scale_level);
+extern bool identical_bindings(obj_data *obj_a, obj_data *obj_b);
 extern bool objs_are_identical(obj_data *obj_a, obj_data *obj_b);
 void remove_from_object_list(obj_data *obj);
 
@@ -351,11 +352,9 @@ extern int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_da
 extern int get_number(char **name);
 
 // unique storage handlers
-void add_eus_entry(struct empire_unique_storage *eus, empire_data *emp);
-extern bool delete_unique_storage_by_vnum(empire_data *emp, obj_vnum vnum);
-extern struct empire_unique_storage *find_eus_entry(obj_data *obj, empire_data *emp, room_data *location);
-void remove_eus_entry(struct empire_unique_storage *eus, empire_data *emp);
-void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data *room, bool *full);
+extern bool delete_unique_storage_by_vnum(struct empire_unique_storage **list, obj_vnum vnum);
+extern struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique_storage *list, room_data *location);
+void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, obj_data *obj, empire_data *save_emp, room_data *room, bool *full);
 
 // vehicle handlers
 void extract_vehicle(vehicle_data *veh);

@@ -151,7 +151,7 @@ int top_island_num = -1;	// for number of islands
 // mobs
 char_data *mobile_table = NULL;	// hash table of mobs
 struct player_special_data dummy_mob;	// dummy spec area for mobs
-char_data *character_list = NULL;	// global linked list of chars (including players)
+char_data *character_list = NULL;	// global doubly-linked list of chars (including players)
 char_data *combat_list = NULL;	// head of l-list of fighting chars
 char_data *next_combat_list = NULL;	// used for iteration of combat_list when more than 1 person can be removed from combat in 1 loop iteration
 struct generic_name_data *generic_names = NULL;	// LL of generic name sets
@@ -161,7 +161,7 @@ morph_data *morph_table = NULL;	// master morph hash table
 morph_data *sorted_morphs = NULL;	// alphabetic version // sorted_hh
 
 // objects
-obj_data *object_list = NULL;	// global linked list of objs
+obj_data *object_list = NULL;	// global doubly-linked list of objs
 obj_data *object_table = NULL;	// hash table of objs
 
 // players
@@ -222,7 +222,7 @@ int tips_of_the_day_size = 0;	// size of tip array
 
 // triggers
 trig_data *trigger_table = NULL;	// trigger prototype hash
-trig_data *trigger_list = NULL;	// LL of all attached triggers
+trig_data *trigger_list = NULL;	// DLL of all attached triggers
 trig_data *random_triggers = NULL;	// DLL of live random triggers (next_in_random_triggers, prev_in_random_triggers)
 trig_data *free_trigger_list = NULL;	// LL of triggers to free (next_to_free)
 int max_mob_id = MOB_ID_BASE;	// for unique mob ids
@@ -236,7 +236,7 @@ room_data *dg_owner_room = NULL;
 
 // vehicles
 vehicle_data *vehicle_table = NULL;	// master vehicle hash table
-vehicle_data *vehicle_list = NULL;	// global linked list of vehicles (veh->next)
+vehicle_data *vehicle_list = NULL;	// global doubly-linked list of vehicles (veh->next)
 
 // world / rooms
 room_data *world_table = NULL;	// hash table of the whole world
@@ -304,8 +304,8 @@ void boot_db(void) {
 	void check_learned_empire_crafts();
 	void check_nowhere_einv_all();
 	void check_ruined_cities();
-	void check_sector_times(any_vnum only_sect);
 	void check_version();
+	void check_sector_times(any_vnum only_sect);
 	void delete_old_players();
 	void delete_orphaned_rooms();
 	void expire_old_politics();
@@ -453,7 +453,7 @@ void boot_db(void) {
 	log("Managing world memory.");
 	schedule_map_unloads();
 	update_instance_world_size();
-	
+		
 	// END
 	log("Boot db -- DONE.");
 	boot_time = time(0);
@@ -1786,8 +1786,7 @@ char_data *read_mobile(mob_vnum nr, bool with_triggers) {
 	CREATE(mob, char_data, 1);
 	clear_char(mob);
 	*mob = *proto;
-	mob->next = character_list;
-	character_list = mob;
+	DL_PREPEND(character_list, mob);
 	
 	// safe minimums
 	if (GET_MAX_HEALTH(mob) < 1) {
@@ -1964,6 +1963,7 @@ const char *versions_list[] = {
 	"b5.88b",
 	"b5.94",
 	"b5.99",
+	"b5.102",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2045,7 +2045,7 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 	check_delayed_load(ch);
 	
 	// inventory
-	for (obj = ch->carrying; obj; obj = obj->next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		if ((proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 			obj->proto_script = copy_trig_protos(proto->proto_script);
 			assign_triggers(obj, OBJ_TRIGGER);
@@ -2117,8 +2117,7 @@ PLAYER_UPDATE_FUNC(b3_2_player_gear_disenchant) {
 			extract_obj(obj);
 		}
 	}
-	for (obj = ch->carrying; obj; obj = next_obj) {
-		next_obj = obj->next_content;
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && obj_proto(GET_OBJ_VNUM(obj))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -2171,8 +2170,7 @@ void b3_2_map_and_gear(void) {
 	*/
 	
 	log(" - disenchanting the object list...");
-	for (obj = object_list; obj; obj = next_obj) {
-		next_obj = obj->next;
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -2258,7 +2256,7 @@ void b3_6_einv_fix(void) {
 void b3_11_ship_fix(void) {
 	vehicle_data *veh;
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (IN_ROOM(veh) && VEH_SHIPPING_ID(veh) != -1 && (!GET_BUILDING(IN_ROOM(veh)) || GET_BLD_VNUM(GET_BUILDING(IN_ROOM(veh))) != RTYPE_SHIP_HOLDING_PEN)) {
 			VEH_SHIPPING_ID(veh) = -1;
 		}
@@ -2717,7 +2715,7 @@ void b5_1_global_update(void) {
 	}
 	
 	// live vehicles
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
 			if (res->type == RES_ACTION && res->vnum < 100) {
 				res->vnum += 1000;
@@ -2764,8 +2762,7 @@ PLAYER_UPDATE_FUNC(b5_14_player_superiors) {
 			extract_obj(obj);
 		}
 	}
-	for (obj = ch->carrying; obj; obj = next_obj) {
-		next_obj = obj->next_content;
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR) && obj_proto(GET_OBJ_VNUM(obj))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -2787,8 +2784,7 @@ void b5_14_superior_items(void) {
 	log("Applying b5.14 update...");
 	
 	log(" - refreshing superiors in the object list...");
-	for (obj = object_list; obj; obj = next_obj) {
-		next_obj = obj->next;
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -2925,7 +2921,7 @@ PLAYER_UPDATE_FUNC(b5_23_player_potion_update) {
 			extract_obj(obj);
 		}
 	}
-	LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (IS_POTION(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -2947,7 +2943,7 @@ void b5_23_potion_update(void) {
 	log("Applying b5.23 item update...");
 	
 	log(" - updating the object list...");
-	LL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -2962,7 +2958,8 @@ void b5_23_potion_update(void) {
 				if (GET_OBJ_STORAGE(proto)) {
 					// move to regular einv if now possible
 					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount);
-					remove_eus_entry(eus, emp);
+					LL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
+					free(eus);
 				}
 				else {	// otherwise replace with a fresh copy
 					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
@@ -3008,7 +3005,7 @@ PLAYER_UPDATE_FUNC(b5_24_player_poison_update) {
 			extract_obj(obj);
 		}
 	}
-	LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (IS_POISON(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -3030,7 +3027,7 @@ void b5_24_poison_update(void) {
 	log("Applying b5.24 item update...");
 	
 	log(" - updating the object list...");
-	LL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (IS_POISON(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -3045,7 +3042,8 @@ void b5_24_poison_update(void) {
 				if (GET_OBJ_STORAGE(proto)) {
 					// move to regular einv if now possible
 					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount);
-					remove_eus_entry(eus, emp);
+					LL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
+					free(eus);
 				}
 				else {	// otherwise replace with a fresh copy
 					new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
@@ -3169,6 +3167,7 @@ PLAYER_UPDATE_FUNC(b5_34_player_update) {
 	while (ch->over_time_effects) {
 		dot_remove(ch, ch->over_time_effects);
 	}
+	affect_total(ch);
 }
 
 
@@ -3186,7 +3185,7 @@ void b5_34_mega_update(void) {
 	log("Applying b5.34 progression update...");
 	
 	// remove Spirit of Progress mob
-	LL_FOREACH_SAFE(character_list, mob, next_mob) {
+	DL_FOREACH_SAFE(character_list, mob, next_mob) {
 		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == 10856) {
 			extract_char(mob);
 		}
@@ -3474,7 +3473,7 @@ void b5_48_rope_update(void) {
 	obj_vnum OLD_ROPE = 2035;	// leather rope
 	
 	log("Applying b5.48 update to add ropes to tied mobs...");
-	LL_FOREACH(character_list, mob) {
+	DL_FOREACH(character_list, mob) {
 		if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_TIED)) {
 			GET_ROPE_VNUM(mob) = OLD_ROPE;
 			any = TRUE;
@@ -3564,7 +3563,7 @@ void b5_82_snowman_fix(void) {
 	
 	log("Applying b5.82 snowman fix...");
 	
-	LL_FOREACH_SAFE(character_list, ch, next_ch) {
+	DL_FOREACH_SAFE(character_list, ch, next_ch) {
 		if (!IS_NPC(ch) || GET_MOB_VNUM(ch) != snowman_vnum) {
 			continue;	// wrong mob
 		}
@@ -3696,8 +3695,7 @@ PLAYER_UPDATE_FUNC(b5_86_player_missile_weapons) {
 			extract_obj(obj);
 		}
 	}
-	for (obj = ch->carrying; obj; obj = next_obj) {
-		next_obj = obj->next_content;
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (IS_MISSILE_WEAPON(obj)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -3731,8 +3729,7 @@ void b5_86_update(void) {
 	log("Applying b5.86 update to missile weapons...");
 	
 	log(" - refreshing the object list...");
-	for (obj = object_list; obj; obj = next_obj) {
-		next_obj = obj->next;
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (IS_MISSILE_WEAPON(obj)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -4176,7 +4173,7 @@ void b5_88_maintenance_fix(void) {
 		}
 	}
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		any = FALSE;
 		LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
 			if (res->type == RES_COMPONENT && res->vnum < 100) {
@@ -4401,6 +4398,47 @@ void b5_99_henge_triggers(void) {
 }
 
 
+// b5.102: remove home chests and auto-store private homes
+bool override_home_storage_cap = FALSE;	// this ensures nobody loses items during this patch
+
+void b5_102_home_cleanup(void) {
+	void free_loaded_players();
+	void perform_autostore(obj_data *obj, empire_data *emp, int island);
+	void run_delayed_refresh();
+	
+	room_data *room, *next_room;
+	obj_data *obj, *next_obj;
+	
+	obj_vnum o_HOME_CHEST = 1010;	// the item to remove
+	
+	log("Applying b5.102 update to remove home chests and store home items...");
+	override_home_storage_cap = TRUE;
+	
+	// dump out chests...
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
+		if (GET_OBJ_VNUM(obj) == o_HOME_CHEST) {
+			empty_obj_before_extract(obj);
+			extract_obj(obj);
+		}
+	}
+	
+	// autostore homes
+	HASH_ITER(hh, world_table, room, next_room) {
+		if (ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
+			DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
+				perform_autostore(obj, ROOM_OWNER(room), NO_ISLAND);
+			}
+		}
+	}
+	
+	run_delayed_refresh();
+	free_loaded_players();
+	save_whole_world();
+	
+	override_home_storage_cap = FALSE;
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4478,7 +4516,7 @@ void check_version(void) {
 			
 			log("Applying b2.11 update:");
 			log(" - assigning mob triggers...");
-			for (mob = character_list; mob; mob = mob->next) {
+			DL_FOREACH(character_list, mob) {
 				if (IS_NPC(mob) && (mobpr = mob_proto(GET_MOB_VNUM(mob)))) {
 					mob->proto_script = copy_trig_protos(mobpr->proto_script);
 					assign_triggers(mob, MOB_TRIGGER);
@@ -4486,7 +4524,7 @@ void check_version(void) {
 			}
 			
 			log(" - assigning triggers to object list...");
-			for (obj = object_list; obj; obj = obj->next) {
+			DL_FOREACH(object_list, obj) {
 				if ((objpr = obj_proto(GET_OBJ_VNUM(obj)))) {
 					obj->proto_script = copy_trig_protos(objpr->proto_script);
 					assign_triggers(obj, OBJ_TRIGGER);
@@ -4716,6 +4754,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.99")) {
 			b5_99_henge_triggers();
+		}
+		if (MATCH_VERSION("b5.102")) {
+			b5_102_home_cleanup();
 		}
 	}
 	

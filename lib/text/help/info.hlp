@@ -164,6 +164,9 @@ or cleaned up automatically.
 The auto-store/auto-clean system engages when an item has been left alone for
 three hours, but will not trigger if a player is present.
 
+If items were left in a private home, they will autostore to the player's
+home storage.
+
 If the location is claimed by an empire, NPCs store the items to that empire's
 inventory (if possible). If items can't be stored, they remain on the ground
 (or in their containers) on claimed land. Certain items, like "sea junk", will
@@ -175,9 +178,8 @@ never to be seen again.
 
 Items which can't be picked up, like signs, are not normally affected by this
 system. However, items left inside of vehicles will be stored or cleaned up.
-This also applies to personal chests, if the item is storable.
 
-Bound items and other non-storables are safe to keep in your home or chest.
+See also: HOME
 #
 AXE
 
@@ -211,7 +213,7 @@ equipped it.
 Bound items can never be stored or posted for trade, and you can't drop them
 in territory claimed by other empires. Bound items will disappear from the
 ground if left on unclaimed land, like normal. They are safe to leave longer on
-claimed land (although not forever) or in your private chest (no time limit).
+claimed land (although not forever).
 
 Bind-on-equip items bind when equipped (gear), consumed (drink containers),
 or used (books, patterns, and recipes).
@@ -1050,7 +1052,7 @@ See also: ALTERNATE
 #
 NEARBY
 
-Usage:  nearby [type]
+Usage:  nearby [type/keywords]
 
 This command lists nearby starting locations and cities, with the distances to
 them. This can help you figure out where to found a new city. It can also find
@@ -1059,7 +1061,7 @@ some adventure zones.
 If you have the Navigation ability, this will also include the location.
 
 You can specify what type of thing to look (cities, adventures, starting
-locations) if you want a shorter list.
+locations) if you want a shorter list, or you can specify search terms.
 
 Certain adventures won't show up on 'nearby', usually because of the
 adventure's design.
@@ -1441,7 +1443,7 @@ TOOL TOOLS "TOOL TYPES" "TOOL FLAGS"
 
 You can't complete a task properly without the right tools. Identify an object
 to see if it's a tool. You can equip a tool with the 'use' command, but you
-can also wield or hold some other types of tools. Tools must be equipped to
+can also wear or hold some other types of tools. Tools must be equipped to
 use them (unless they're being used as a resource in a craft).
 
 Types of tools are:

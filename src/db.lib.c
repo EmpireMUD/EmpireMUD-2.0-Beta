@@ -1806,9 +1806,7 @@ void delete_empire(empire_data *emp) {
 	}
 	
 	// update all mobs
-	for (ch = character_list; ch; ch = next_ch) {
-		next_ch = ch->next;
-		
+	DL_FOREACH_SAFE(character_list, ch, next_ch) {
 		// this is "theoretically" just NPCs since we did players already
 		if (GET_LOYALTY(ch) == emp) {
 			GET_LOYALTY(ch) = NULL;
@@ -1820,16 +1818,14 @@ void delete_empire(empire_data *emp) {
 	}
 	
 	// update all objs
-	for (obj = object_list; obj; obj = next_obj) {
-		next_obj = obj->next;
-		
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (obj->last_empire_id == vnum) {
 			obj->last_empire_id = NOTHING;
 		}
 	}
 	
 	// update all vehicles
-	LL_FOREACH_SAFE2(vehicle_list, veh, next_veh, next) {
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		if (VEH_OWNER(veh) == emp) {
 			VEH_OWNER(veh) = NULL;
 			VEH_SHIPPING_ID(veh) = -1;
@@ -1976,6 +1972,7 @@ void free_empire(empire_data *emp) {
 		if (eus->obj) {
 			extract_obj(eus->obj);
 		}
+		free(eus);
 	}
 	EMPIRE_UNIQUE_STORAGE(emp) = NULL;
 	
@@ -2200,6 +2197,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 */
 void load_empire_storage_one(FILE *fl, empire_data *emp) {	
 	extern struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
+	void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
 	
 	int t[10], junk;
 	long l_in;
@@ -2210,6 +2208,8 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	struct empire_storage_data *store;
 	struct theft_log *tft;
 	obj_data *obj, *proto;
+	bool done = FALSE;
+	trig_data *trig;
 	
 	if (!fl || !emp) {
 		return;
@@ -2218,7 +2218,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	// error for later
 	sprintf(buf,"SYSERR: Format error in empire storage for #%d (expecting letter)", EMPIRE_VNUM(emp));
 
-	for (;;) {
+	while (!done) {
 		if (!get_line(fl, line)) {
 			log("%s", buf);
 			exit(1);
@@ -2350,11 +2350,21 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 			}
 
 			case 'S': {	// fin
-				return;
+				done = TRUE;
+				break;
 			}
 			default: {
 				log("%s", buf);
 				exit(1);
+			}
+		}
+	}
+	
+	// ensure random triggers are shut off on unique storage
+	LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+		if (eus->obj && SCRIPT(eus->obj)) {
+			LL_FOREACH(TRIGGERS(SCRIPT(eus->obj)), trig) {
+				remove_trigger_from_global_lists(trig, TRUE);
 			}
 		}
 	}
@@ -3876,14 +3886,14 @@ bool offense_was_seen(char_data *ch, empire_data *emp, room_data *from_room) {
 	descriptor_data *desc;
 	char_data *iter;
 	
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 		if (ch != iter && GET_LOYALTY(iter) == emp && CAN_SEE(iter, ch)) {
 			return TRUE;	// someone here saw it
 		}
 	}
 	
 	if (from_room) {
-		LL_FOREACH2(ROOM_PEOPLE(from_room), iter, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(from_room), iter, next_in_room) {
 			if (ch != iter && GET_LOYALTY(iter) == emp && CAN_SEE(iter, ch)) {
 				return TRUE;	// someone here saw it
 			}
@@ -6202,7 +6212,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 			}
 		}
 		if (ROOM_PEOPLE(room)) {
-			for (mob = ROOM_PEOPLE(room); mob; mob = mob->next_in_room) {
+		    DL_FOREACH2(ROOM_PEOPLE(room), mob, next_in_room) {
 				if (mob && IS_NPC(mob) && GET_MOB_VNUM(mob) != NOTHING && !MOB_FLAGGED(mob, MOB_EMPIRE) && !GET_COMPANION(mob)) {
 					// C M vnum flags rope-vnum
 					fprintf(fl, "C M %d %s %d\n", GET_MOB_VNUM(mob), bitv_to_alpha(MOB_FLAGS(mob)), GET_ROPE_VNUM(mob));

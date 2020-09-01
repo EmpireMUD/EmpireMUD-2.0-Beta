@@ -146,6 +146,7 @@ hours_to_second_bonus_trait 48
 idle_linkdead_rent_time 5
 idle_rent_time 20
 max_capitals_in_name 2
+max_home_store_uniques 300
 max_map_size 12
 max_map_while_moving 5
 max_player_attribute 15

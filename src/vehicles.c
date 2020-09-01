@@ -70,7 +70,7 @@ void abandon_lost_vehicles(void) {
 	vehicle_data *veh;
 	empire_data *emp;
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (!(emp = VEH_OWNER(veh))) {
 			continue;	// only looking to abandon owned vehs
 		}
@@ -117,7 +117,7 @@ int count_harnessed_animals(vehicle_data *veh) {
 void empty_vehicle(vehicle_data *veh) {
 	obj_data *obj, *next_obj;
 	
-	LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 		if (IN_ROOM(veh)) {
 			obj_to_room(obj, IN_ROOM(veh));
 		}
@@ -162,7 +162,7 @@ void fully_empty_vehicle(vehicle_data *veh) {
 	if (VEH_ROOM_LIST(veh)) {
 		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 			// remove people
-			LL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
+			DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
 				act("You are ejected from $V!", FALSE, ch, NULL, veh, TO_CHAR);
 				if (IN_ROOM(veh)) {
 					char_to_room(ch, IN_ROOM(veh));
@@ -177,7 +177,7 @@ void fully_empty_vehicle(vehicle_data *veh) {
 			}
 			
 			// remove items
-			LL_FOREACH_SAFE2(ROOM_CONTENTS(vrl->room), obj, next_obj, next_content) {
+			DL_FOREACH_SAFE2(ROOM_CONTENTS(vrl->room), obj, next_obj, next_content) {
 				if (IN_ROOM(veh)) {
 					obj_to_room(obj, IN_ROOM(veh));
 				}
@@ -187,7 +187,7 @@ void fully_empty_vehicle(vehicle_data *veh) {
 			}
 			
 			// remove other vehicles
-			LL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), iter, next_iter, next_in_room) {
+			DL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), iter, next_iter, next_in_room) {
 				if (IN_ROOM(veh)) {
 					vehicle_to_room(iter, IN_ROOM(veh));
 				}
@@ -304,7 +304,7 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
 		return NULL;
 	}
 	
-	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
 		if (!VEH_ICON(iter) || !*VEH_ICON(iter)) {
 			continue;	// no icon
 		}
@@ -707,7 +707,7 @@ void Crash_save_vehicles(vehicle_data *room_list, FILE *fl) {
 	
 	vehicle_data *iter;
 	
-	LL_FOREACH2(room_list, iter, next_in_room) {
+	DL_FOREACH2(room_list, iter, next_in_room) {
 		store_one_vehicle_to_file(iter, fl);
 	}
 }
@@ -734,7 +734,7 @@ void link_and_check_vehicles(void) {
 	bool found = FALSE;
 	
 	// reverse-link the home-room of vehicles to this one
-	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
 			COMPLEX_DATA(VEH_INTERIOR_HOME_ROOM(veh))->vehicle = veh;
 		}
@@ -927,7 +927,7 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	}
 
 	*veh = *proto;
-	LL_PREPEND2(vehicle_list, veh, next);
+	DL_PREPEND(vehicle_list, veh);
 	
 	// new vehicle setup
 	VEH_OWNER(veh) = NULL;
@@ -1089,7 +1089,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH];
-	obj_data *load_obj, *obj2, *cont_row[MAX_BAG_ROWS];
+	obj_data *load_obj, *obj, *next_obj, *cont_row[MAX_BAG_ROWS];
 	struct vehicle_attached_mob *vam, *last_vam = NULL;
 	int length, iter, i_in[4], location = 0, timer;
 	struct resource_data *res, *last_res = NULL;
@@ -1189,14 +1189,12 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 								GET_AUTOSTORE_TIMER(load_obj) = timer;
 				
 								for (iter = MAX_BAG_ROWS - 1; iter > -location; --iter) {
-									if (cont_row[iter]) {		/* No container, back to vehicle. */
-										for (; cont_row[iter]; cont_row[iter] = obj2) {
-											obj2 = cont_row[iter]->next_content;
-											timer = GET_AUTOSTORE_TIMER(cont_row[iter]);
-											obj_to_vehicle(cont_row[iter], veh);
-											GET_AUTOSTORE_TIMER(cont_row[iter]) = timer;
-										}
-										cont_row[iter] = NULL;
+									// No container, back to vehicle
+									DL_FOREACH_SAFE2(cont_row[iter], obj, next_obj, next_content) {
+										DL_DELETE2(cont_row[iter], obj, prev_content, next_content);
+										timer = GET_AUTOSTORE_TIMER(obj);
+										obj_to_vehicle(obj, veh);
+										GET_AUTOSTORE_TIMER(obj) = timer;
 									}
 								}
 								if (iter == -location && cont_row[iter]) {			/* Content list exists. */
@@ -1204,35 +1202,26 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 										/* Take the item, fill it, and give it back. */
 										obj_from_room(load_obj);
 										load_obj->contains = NULL;
-										for (; cont_row[iter]; cont_row[iter] = obj2) {
-											obj2 = cont_row[iter]->next_content;
-											obj_to_obj(cont_row[iter], load_obj);
+										DL_FOREACH_SAFE2(cont_row[iter], obj, next_obj, next_content) {
+											DL_DELETE2(cont_row[iter], obj, prev_content, next_content);
+											obj_to_obj(obj, load_obj);
 										}
 										timer = GET_AUTOSTORE_TIMER(load_obj);
 										obj_to_vehicle(load_obj, veh);			/* Add to vehicle first. */
 										GET_AUTOSTORE_TIMER(load_obj) = timer;
 									}
 									else {				/* Object isn't container, empty content list. */
-										for (; cont_row[iter]; cont_row[iter] = obj2) {
-											obj2 = cont_row[iter]->next_content;
-											timer = GET_AUTOSTORE_TIMER(cont_row[iter]);
-											obj_to_vehicle(cont_row[iter], veh);
-											GET_AUTOSTORE_TIMER(cont_row[iter]) = timer;
+										DL_FOREACH_SAFE2(cont_row[iter], obj, next_obj, next_content) {
+											DL_DELETE2(cont_row[iter], obj, prev_content, next_content);
+											timer = GET_AUTOSTORE_TIMER(obj);
+											obj_to_vehicle(obj, veh);
+											GET_AUTOSTORE_TIMER(obj) = timer;
 										}
-										cont_row[iter] = NULL;
 									}
 								}
 								if (location < 0 && location >= -MAX_BAG_ROWS) {
 									obj_from_room(load_obj);
-									if ((obj2 = cont_row[-location - 1]) != NULL) {
-										while (obj2->next_content) {
-											obj2 = obj2->next_content;
-										}
-										obj2->next_content = load_obj;
-									}
-									else {
-										cont_row[-location - 1] = load_obj;
-									}
+									DL_APPEND2(cont_row[-location - 1], load_obj, prev_content, next_content);
 								}
 							}
 						}
@@ -1865,7 +1854,7 @@ int run_convert_vehicle_list(void) {
 		convert_vehicle_list = cvd->next;
 		
 		if (cvd->mob && IN_ROOM(cvd->mob)) {
-			LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(cvd->mob)), veh, next_in_room) {
+			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(cvd->mob)), veh, next_in_room) {
 				if (VEH_VNUM(veh) == cvd->vnum && count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
 					harness_mob_to_vehicle(cvd->mob, veh);
 					++changed;
@@ -1905,7 +1894,7 @@ void convert_one_obj_to_vehicle(obj_data *obj) {
 	vehicle_to_room(veh, room);
 	
 	// move inventory
-	LL_FOREACH_SAFE2(obj->contains, obj_iter, next_obj, next_content) {
+	DL_FOREACH_SAFE2(obj->contains, obj_iter, next_obj, next_content) {
 		obj_to_vehicle(obj_iter, veh);
 	}
 	
@@ -1961,7 +1950,7 @@ int convert_to_vehicles(void) {
 	int iter, changed = 0;
 	bool found;
 	
-	LL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		// determine if it's in the list to replace
 		found = FALSE;
 		for (iter = 0; convert_list[iter] != NOTHING && !found; ++iter) {
@@ -2073,7 +2062,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	}
 	
 	// remove live vehicles
-	LL_FOREACH_SAFE(vehicle_list, iter, next_iter) {
+	DL_FOREACH_SAFE(vehicle_list, iter, next_iter) {
 		if (VEH_VNUM(iter) != vnum) {
 			continue;
 		}
@@ -2473,7 +2462,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 	prune_extra_descs(&VEH_EX_DESCS(veh));
 	
 	// update live vehicles
-	LL_FOREACH(vehicle_list, iter) {
+	DL_FOREACH(vehicle_list, iter) {
 		if (VEH_VNUM(iter) != vnum) {
 			continue;
 		}
@@ -2712,7 +2701,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	if (VEH_CONTAINS(veh)) {
 		sprintf(part, "Contents:\tg");
 		found = 0;
-		LL_FOREACH2(VEH_CONTAINS(veh), obj, next_content) {
+		DL_FOREACH2(VEH_CONTAINS(veh), obj, next_content) {
 			sprintf(part + strlen(part), "%s %s", found++ ? "," : "", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
 			if (strlen(part) >= 62) {
 				if (obj->next_content) {

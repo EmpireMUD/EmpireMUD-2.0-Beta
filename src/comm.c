@@ -926,6 +926,7 @@ void heartbeat(int heart_pulse) {
 	void display_automessages();
 	void extract_pending_chars();
 	void free_freeable_triggers();
+	void free_loaded_players();
 	void frequent_combat(int pulse);
 	void generate_adventure_instances();
 	void output_map_to_file();
@@ -1149,6 +1150,8 @@ void heartbeat(int heart_pulse) {
 		if (debug_log && HEARTBEAT(15)) { log("debug 30:\t%lld", microtime()); }
 		run_delayed_refresh();
 		if (debug_log && HEARTBEAT(15)) { log("debug 31:\t%lld", microtime()); }
+		free_loaded_players();	// ensure this comes AFTER run_delayed_refresh
+		if (debug_log && HEARTBEAT(15)) { log("debug 32:\t%lld", microtime()); }
 	}
 
 	/* Every pulse! Don't want them to stink the place up... */
@@ -1174,7 +1177,7 @@ void heartbeat(int heart_pulse) {
 void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, bitvector_t act_flags) {
 	extern bool is_ignoring(char_data *ch, char_data *victim);
 
-	char_data *to = NULL;
+	char_data *to, *list = NULL;
 	bool to_sleeping = FALSE, no_dark = FALSE, is_spammy = FALSE;
 
 	if (!str || !*str) {
@@ -1208,17 +1211,17 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 
 	if (IS_SET(act_flags, TO_NOTVICT | TO_ROOM)) {
 		if (ch && IN_ROOM(ch)) {
-			to = ROOM_PEOPLE(IN_ROOM(ch));
+			list = ROOM_PEOPLE(IN_ROOM(ch));
 		}
 		else if (!IS_SET(act_flags, ACT_VEHICLE_OBJ) && obj && IN_ROOM((obj_data*)obj)) {
-			to = ROOM_PEOPLE(IN_ROOM((obj_data*)obj));
+			list = ROOM_PEOPLE(IN_ROOM((obj_data*)obj));
 		}
 		else if (IS_SET(act_flags, ACT_VEHICLE_OBJ) && obj && IN_ROOM((vehicle_data*)obj)) {
-			to = ROOM_PEOPLE(IN_ROOM((vehicle_data*)obj));
+			list = ROOM_PEOPLE(IN_ROOM((vehicle_data*)obj));
 		}
 		
-		if (to) {
-			for (; to; to = to->next_in_room) {
+		if (list) {
+		    DL_FOREACH2(list, to, next_in_room) {
 				if (!SENDOK(to) || (to == ch))
 					continue;
 				if (IS_SET(act_flags, TO_NOT_IGNORING) && is_ignoring(to, ch)) {
@@ -1662,10 +1665,12 @@ void send_to_room(const char *messg, room_data *room) {
 
 	if (messg == NULL)
 		return;
-
-	for (i = ROOM_PEOPLE(room); i; i = i->next_in_room)
-		if (i->desc)
+	
+	DL_FOREACH2(ROOM_PEOPLE(room), i, next_in_room) {
+		if (i->desc) {
 			SEND_TO_Q(messg, i->desc);
+		}
+	}
 }
 
 
@@ -4122,7 +4127,9 @@ void setup_log(const char *filename, int fd) {
 
 void reboot_recover(void) {
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
+	void free_loaded_players();
 	extern bool global_mute_slash_channel_joins;
+	void run_delayed_refresh();
 
 	char buf[MAX_STRING_LENGTH];
 	descriptor_data *d;
@@ -4134,6 +4141,10 @@ void reboot_recover(void) {
 	char name[MAX_INPUT_LENGTH];
 
 	log("Reboot is recovering players...");
+	
+	// ensure nobody is sitting un-flushed in the queue before loading players
+	run_delayed_refresh();
+	free_loaded_players();
 
 	if (!(fp = fopen(REBOOT_FILE, "r"))) {
 		perror("reboot_recover: fopen");

@@ -253,7 +253,7 @@ WCMD(do_wechoneither) {
 		return;
 	}
 	
-	for (iter = ROOM_PEOPLE(room); iter; iter = iter->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), iter, next_in_room) {
 		if (iter->desc && iter != vict1 && iter != vict2) {
 			sub_write(p, iter, TRUE, TO_CHAR);
 		}
@@ -624,9 +624,8 @@ WCMD(do_wteleport) {
 			wld_log(room, "wteleport all target is itself");
 			return;
 		}
-
-		for (ch = room->people; ch; ch = next_ch) {
-			next_ch = ch->next_in_room;
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 			if (!valid_dg_target(ch, DG_ALLOW_GODS)) 
 				continue;
 			GET_LAST_DIR(ch) = NO_DIR;
@@ -647,9 +646,7 @@ WCMD(do_wteleport) {
 		for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 			// only if it's not the target room, or we'd be here all day
 			if (INST_ROOM(inst, iter) && INST_ROOM(inst, iter) != target) {
-				for (ch = ROOM_PEOPLE(INST_ROOM(inst, iter)); ch; ch = next_ch) {
-					next_ch = ch->next_in_room;
-					
+				DL_FOREACH_SAFE2(ROOM_PEOPLE(INST_ROOM(inst, iter)), ch, next_ch, next_in_room) {
 					if (!valid_dg_target(ch, DG_ALLOW_GODS)) {
 						continue;
 					}
@@ -808,9 +805,7 @@ WCMD(do_wforce) {
 	}
 
 	if (!str_cmp(arg1, "all")) {
-		for (ch = room->people; ch; ch = next_ch) {
-			next_ch = ch->next_in_room;
-
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 			if (valid_dg_target(ch, 0)) {
 				command_interpreter(ch, line);
 			}
@@ -984,14 +979,12 @@ WCMD(do_wpurge) {
 
 	if (!*arg) {
 		/* purge all */
-		for (ch = room->people; ch; ch = next_ch ) {
-			next_ch = ch->next_in_room;
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 			if (IS_NPC(ch))
 				extract_char(ch);
 		}
-
-		for (obj = room->contents; obj; obj = next_obj ) {
-			next_obj = obj->next_content;
+		
+		DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
 			extract_obj(obj);
 		}
 
@@ -1308,9 +1301,7 @@ WCMD(do_waoe) {
 	}
 	
 	level = get_room_scale_level(room, NULL);
-	for (vict = room->people; vict; vict = next_vict) {
-		next_vict = vict->next_in_room;
-		
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(room), vict, next_vict, next_in_room) {
 		// harder to tell friend from foe: hit PCs or people following PCs
 		if (!IS_NPC(vict) || (vict->master && !IS_NPC(vict->master))) {
 			script_damage(vict, NULL, level, type, modifier);
@@ -1474,6 +1465,7 @@ WCMD(do_wrestore) {
 		if (GET_POS(victim) < POS_SLEEPING) {
 			GET_POS(victim) = POS_STANDING;
 		}
+		affect_total(victim);
 		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
 		GET_MOVE(victim) = GET_MAX_MOVE(victim);
 		GET_MANA(victim) = GET_MAX_MANA(victim);

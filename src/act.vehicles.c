@@ -130,7 +130,7 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 	}
 	
 	// otherwise look for ones that match
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_OWNER(veh) != GET_LOYALTY(ch)) {
 			continue;
 		}
@@ -282,7 +282,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	// let's do this:
 	
 	// notify leaving
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch_iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch_iter, next_in_room) {
 		if (ch_iter != VEH_SITTING_ON(veh) && ch_iter->desc) {
 			if (VEH_SITTING_ON(veh)) {
 				sprintf(buf, "$v %s %s with $N %s it.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], IN_OR_ON(veh));
@@ -308,7 +308,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	}
 	
 	// notify arrival
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch_iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch_iter, next_in_room) {
 		if (ch_iter != VEH_SITTING_ON(veh) && ch_iter->desc) {
 			if (VEH_SITTING_ON(veh)) {
 				sprintf(buf, "$v %s in from %s with $N %s it.", mob_move_types[VEH_MOVE_TYPE(veh)], from_dir[get_direction_for_char(ch_iter, dir)], IN_OR_ON(veh));
@@ -356,7 +356,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	// alert whole vessel
 	if (VEH_ROOM_LIST(veh)) {
 		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-			LL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
 				if (ch_iter->desc && ch_iter != VEH_DRIVER(veh)) {
 					snprintf(buf, sizeof(buf), "$V %s %s%s.", mob_move_types[VEH_MOVE_TYPE(veh)], dirs[get_direction_for_char(ch_iter, dir)], coord_display_room(ch_iter, IN_ROOM(veh), FALSE));
 					act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR | TO_SPAMMY);
@@ -683,7 +683,7 @@ void process_driving(char_data *ch) {
 					// alert whole vehicle
 					if (new_dir != dir && VEH_ROOM_LIST(veh)) {
 						LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-							LL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
+							DL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
 								if (ch_iter != ch && ch_iter->desc) {
 									snprintf(buf, sizeof(buf), "$V %s %s.", "turns to the", dirs[get_direction_for_char(ch_iter, new_dir)]);
 									act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR);
@@ -1008,7 +1008,7 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 			msg_to_char(ch, "Get all of what?\r\n");
 			return;
 		}
-		LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+		DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj) && (obj_dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
 				found = TRUE;
 				if (!perform_get_from_vehicle(ch, obj, veh, mode)) {
@@ -1172,7 +1172,7 @@ void do_put_obj_in_vehicle(char_data *ch, vehicle_data *veh, int dotmode, char *
 		}
 	}
 	else {
-		LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+		DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj) && (dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
 				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 					continue;
@@ -1824,7 +1824,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 		if (VEH_ROOM_LIST(veh)) {
 			snprintf(buf, sizeof(buf), "$V %s through $p.", mob_move_types[VEH_MOVE_TYPE(veh)]);
 			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-				LL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch_iter, next_ch, next_in_room) {
+				DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch_iter, next_ch, next_in_room) {
 					give_portal_sickness(ch_iter, portal, was_in, to_room);
 					act(buf, FALSE, ch_iter, portal, veh, TO_CHAR | TO_SPAMMY);
 				}
@@ -1951,7 +1951,7 @@ ACMD(do_drive) {
 		// alert whole vehicle
 		if (!same_dir && VEH_ROOM_LIST(veh)) {
 			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-				LL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(vrl->room), ch_iter, next_in_room) {
 					if (ch_iter != ch && ch_iter->desc) {
 						snprintf(buf, sizeof(buf), "$V %s %s.", (was_driving ? "turns to the" : "begins to move"), dirs[get_direction_for_char(ch_iter, dir)]);
 						act(buf, FALSE, ch_iter, NULL, veh, TO_CHAR);
@@ -2029,7 +2029,7 @@ ACMD(do_fire) {
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 			
 			// message to ch's room
-			LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 				if (vict != ch && vict->desc) {
 					sprintf(buf, "$V fires %s!", dirs[get_direction_for_char(vict, dir)]);
 					act(buf, FALSE, vict, NULL, veh, TO_CHAR);
@@ -2038,7 +2038,7 @@ ACMD(do_fire) {
 			
 			// message to veh's room
 			if (IN_ROOM(veh) != IN_ROOM(ch)) {
-				LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), vict, next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), vict, next_in_room) {
 					if (vict != ch && vict->desc) {
 						sprintf(buf, "$V fires %s!", dirs[get_direction_for_char(vict, dir)]);
 						act(buf, FALSE, vict, NULL, veh, TO_CHAR);
@@ -2259,7 +2259,7 @@ ACMD(do_load_vehicle) {
 		found = FALSE;
 		
 		if (VEH_FLAGGED(cont, VEH_CARRY_MOBS)) {
-			LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_mob, next_in_room) {
+			DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_mob, next_in_room) {
 				if (mob == ch || !IS_NPC(mob)) {
 					continue;
 				}
@@ -2276,7 +2276,7 @@ ACMD(do_load_vehicle) {
 		}
 		
 		if (VEH_FLAGGED(cont, VEH_CARRY_VEHICLES)) {
-			LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
+			DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
 				if (veh == cont || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE | VEH_NO_LOAD_ONTO_VEHICLE)) {
 					continue;
 				}
@@ -2429,7 +2429,7 @@ ACMD(do_scrap) {
 	}
 	else {
 		// seems good... but make sure nobody is working on it
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 			if (IS_NPC(iter) || GET_ACTION(iter) != ACT_GEN_CRAFT) {
 				continue;
 			}
@@ -2531,7 +2531,7 @@ ACMD(do_unload_vehicle) {
 		found = FALSE;
 		
 		if (!GET_ROOM_VEHICLE(IN_ROOM(cont)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_MOBS)) {
-			LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_mob, next_in_room) {
+			DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_mob, next_in_room) {
 				if (mob == ch || !IS_NPC(mob)) {
 					continue;
 				}
@@ -2548,7 +2548,7 @@ ACMD(do_unload_vehicle) {
 		}
 		
 		if (!GET_ROOM_VEHICLE(IN_ROOM(cont)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_VEHICLES)) {
-			LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
+			DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
 				if (veh == cont || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE | VEH_NO_LOAD_ONTO_VEHICLE)) {
 					continue;
 				}

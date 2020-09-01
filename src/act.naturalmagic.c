@@ -282,6 +282,8 @@ ACMD(do_cleanse) {
 			gain_condition(vict, DRUNK, -1 * GET_COND(vict, DRUNK));
 		}
 		
+		affect_total(vict);
+		
 		if (can_gain_exp_from(ch, vict)) {
 			gain_ability_exp(ch, ABIL_CLEANSE, 33.4);
 		}
@@ -775,9 +777,7 @@ ACMD(do_heal) {
 	if (party) {
 		msg_to_char(ch, "You muster up as much mana as you can and send out a shockwave, healing the entire party!\r\n");
 		act("$n draws up as much mana as $e can and sends it out in a shockwave, healing $s entire party!", FALSE, ch, NULL, NULL, TO_ROOM);
-		for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter; ch_iter = next_ch) {
-			next_ch = ch_iter->next_in_room;
-			
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_ch, next_in_room) {
 			if (!IS_DEAD(ch_iter) && in_same_group(ch, ch_iter)) {
 				msg_to_char(ch_iter, "You are healed!\r\n");
 				heal(ch, ch_iter, amount * 0.75);

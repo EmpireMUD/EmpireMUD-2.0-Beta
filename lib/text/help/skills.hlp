@@ -175,12 +175,10 @@ Gather (Scavenging ability)
 Usage:  gather
 Speed boosts:  Faster Chores bonus, Finder ability, Haste
 
-Allows you to gather sticks from the ground. Your skill in this determines
-how many different sticks you can use and thus how quickly you gather enough.
+Allows you to gather sticks from the ground, as well as small saplings. This
+generally works best in the forest.
 
-You can also gather apples in an orchard.
-
-See also: DEPLETION, STICKS, APPLES, ORCHARD, SCAVENGING
+See also: DEPLETION, SAPLINGS, STICKS, SCAVENGING
 #
 HARNESS UNHARNESS
 

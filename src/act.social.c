@@ -160,7 +160,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 	}
 	
 	// clear last act messages for everyone in the room
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 		if (c->desc) {
 			clear_last_act_message(c->desc);
 
@@ -180,7 +180,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 		act(NULLSAFE(SOC_MESSAGE(soc, SOCM_NO_ARG_TO_OTHERS)), SOC_HIDDEN(soc), ch, FALSE, FALSE, TO_ROOM | TO_NOT_IGNORING);
 
 		// fetch and store channel history for the room
-		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (c == ch || !c->desc) {
 				continue;
 			}
@@ -221,7 +221,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 		act(NULLSAFE(SOC_MESSAGE(soc, SOCM_SELF_TO_OTHERS)), SOC_HIDDEN(soc), ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
 
 		// fetch and store channel history for the room
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (c == ch || !c->desc) {
 				continue;
 			}
@@ -270,7 +270,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 			act(NULLSAFE(SOC_MESSAGE(soc, SOCM_TARGETED_TO_VICTIM)), SOC_HIDDEN(soc), ch, NULL, vict, TO_VICT | TO_NOT_IGNORING);
 
 			// fetch and store channel history for the room
-			LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 				if (!c->desc) {
 					continue;
 				}
@@ -289,7 +289,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 	}
 	
 	// clear color codes for people we missed
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 		if (!IS_NPC(c) && c->desc && !c->desc->last_act_message && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
 			send_to_char("\t0", c);
 		}
@@ -372,9 +372,7 @@ ACMD(do_point) {
 			add_to_channel_history(ch, CHANNEL_HISTORY_SAY, ch, buf);
 		}
 		
-		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_vict) {
-			next_vict = vict->next_in_room;
-			
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_vict, next_in_room) {
 			if (vict != ch && CAN_SEE(vict, ch) && AWAKE(vict)) {
 				if (vict->desc) {
 					clear_last_act_message(vict->desc);
@@ -445,7 +443,7 @@ ACMD(do_roll) {
 	}
 	
 	// clear room last-act
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 		if (vict->desc) {
 			clear_last_act_message(vict->desc);
 		}
@@ -502,7 +500,7 @@ ACMD(do_roll) {
 	}
 	
 	// save room last-act
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 		if (vict != ch && vict->desc && vict->desc->last_act_message) {
 			add_to_channel_history(vict, CHANNEL_HISTORY_ROLL, ch, vict->desc->last_act_message);
 		}

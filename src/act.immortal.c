@@ -140,14 +140,13 @@ void decustomize_island(int island_id) {
 * @param empire_data *emp The empire to store it to -- NOT CURRENTLY USED.
 * @param int island The islands to store it to -- NOT CURRENTLY USED.
 */
-static void perform_autostore(obj_data *obj, empire_data *emp, int island) {
+void perform_autostore(obj_data *obj, empire_data *emp, int island) {
 	extern bool check_autostore(obj_data *obj, bool force);
 	
 	obj_data *temp, *next_temp;
 	
 	// store the inside first
-	for (temp = obj->contains; temp; temp = next_temp) {
-		next_temp = temp->next_content;
+	DL_FOREACH_SAFE2(obj->contains, temp, next_temp, next_content) {
 		perform_autostore(temp, emp, island);
 	}
 	
@@ -178,8 +177,8 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	else {
 		strcpy(buf, "$n disappears in a puff of smoke.");
 	}
-
-	for (t = ROOM_PEOPLE(IN_ROOM(ch)); t; t = t->next_in_room) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), t, next_in_room) {
 		if (REAL_NPC(t) || t == ch) {
 			continue;
 		}
@@ -203,8 +202,8 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	else {
 		strcpy(buf, "$n appears with an ear-splitting bang.");
 	}
-
-	for (t = ROOM_PEOPLE(IN_ROOM(ch)); t; t = t->next_in_room) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), t, next_in_room) {
 		if (REAL_NPC(t) || t == ch) {
 			continue;
 		}
@@ -228,8 +227,8 @@ void perform_immort_invis(char_data *ch, int level) {
 
 	if (IS_NPC(ch))
 		return;
-
-	for (tch = ROOM_PEOPLE(IN_ROOM(ch)); tch; tch = tch->next_in_room) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), tch, next_in_room) {
 		if (tch == ch)
 			continue;
 		if (GET_ACCESS_LEVEL(tch) >= GET_INVIS_LEV(ch) && GET_ACCESS_LEVEL(tch) < level)
@@ -2657,15 +2656,15 @@ SHOW(show_piles) {
 	any = FALSE;
 	HASH_ITER(hh, world_table, room, next_room) {
 		count = 0;
-		LL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+		DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
 			++count;
 			
-			LL_FOREACH2(obj->contains, sub, next_content) {
+			DL_FOREACH2(obj->contains, sub, next_content) {
 				++count;
 			}
 		}
-		LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-			LL_FOREACH2(VEH_CONTAINS(veh), sub, next_content) {
+		DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+			DL_FOREACH2(VEH_CONTAINS(veh), sub, next_content) {
 				++count;
 			}
 		}
@@ -3085,7 +3084,7 @@ SHOW(show_stats) {
 	}
 	
 	// count connections, players, mobs
-	for (vict = character_list; vict; vict = vict->next) {
+	DL_FOREACH(character_list, vict) {
 		if (IS_NPC(vict)) {
 			++num_mobs;
 		}
@@ -3098,9 +3097,9 @@ SHOW(show_stats) {
 	}
 	
 	// other counts
-	LL_COUNT(object_list, obj, num_objs);
-	LL_COUNT(vehicle_list, veh, num_vehs);
-	LL_COUNT2(trigger_list, trig, num_trigs, next_in_world);
+	DL_COUNT(object_list, obj, num_objs);
+	DL_COUNT(vehicle_list, veh, num_vehs);
+	DL_COUNT2(trigger_list, trig, num_trigs, next_in_world);
 
 	// count active empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -5284,7 +5283,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 	if (!is_proto) {
 		sprintf(buf, "Carried items: %d/%d; ", IS_CARRYING_N(k), CAN_CARRY_N(k));
-		for (i = 0, j = k->carrying; j; j = j->next_content, i++);
+		DL_COUNT2(k->carrying, j, i, next_content);	// TODO these var names are absurd
 		sprintf(buf + strlen(buf), "Items in: inventory: %d, ", i);
 
 		for (i = 0, i2 = 0; i < NUM_WEARS; i++)
@@ -5942,7 +5941,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 	if (j->contains) {
 		sprintf(buf, "Contents:&g");
-		for (found = 0, j2 = j->contains; j2; j2 = j2->next_content) {
+		found = 0;
+		DL_FOREACH2(j->contains, j2, next_content) {
 			sprintf(buf2, "%s %s", found++ ? "," : "", GET_OBJ_DESC(j2, ch, OBJ_DESC_SHORT));
 			strcat(buf, buf2);
 			if (strlen(buf) >= 62) {
@@ -6131,7 +6131,8 @@ void do_stat_room(char_data *ch) {
 	}
 
 	sprintf(buf, "Chars present:&y");
-	for (found = 0, k = ROOM_PEOPLE(IN_ROOM(ch)); k; k = k->next_in_room) {
+	found = 0;
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), k, next_in_room) {
 		if (!CAN_SEE(ch, k))
 			continue;
 		sprintf(buf2, "%s %s(%s)", found++ ? "," : "", GET_NAME(k), (!IS_NPC(k) ? "PC" : (!IS_MOB(k) ? "NPC" : "MOB")));
@@ -6152,7 +6153,7 @@ void do_stat_room(char_data *ch) {
 	if (ROOM_VEHICLES(IN_ROOM(ch))) {
 		sprintf(buf, "Vehicles:&w");
 		found = 0;
-		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 			if (!CAN_SEE_VEHICLE(ch, veh)) {
 				continue;
 			}
@@ -6177,7 +6178,8 @@ void do_stat_room(char_data *ch) {
 	
 	if (ROOM_CONTENTS(IN_ROOM(ch))) {
 		sprintf(buf, "Contents:&g");
-		for (found = 0, j = ROOM_CONTENTS(IN_ROOM(ch)); j; j = j->next_content) {
+		found = 0;
+		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), j, next_content) {
 			if (!CAN_SEE_OBJ(ch, j))
 				continue;
 			sprintf(buf2, "%s %s", found++ ? "," : "", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT));
@@ -7113,7 +7115,7 @@ ACMD(do_autostore) {
 		else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
 			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM);
 			
-			LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
 			}
 		}
@@ -7127,14 +7129,13 @@ ACMD(do_autostore) {
 	else {			// no argument. clean out the room
 		act("$n gestures...", FALSE, ch, 0, 0, TO_ROOM);
 		send_to_room("The world seems a little cleaner.\r\n", IN_ROOM(ch));
-
-		for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = next_obj) {
-			next_obj = obj->next_content;
+		
+		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
 			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
 		}
 		
-		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
 			}
 		}
@@ -7152,7 +7153,7 @@ ACMD(do_autowiz) {
 ACMD(do_breakreply) {
 	char_data *iter;
 	
-	LL_FOREACH(character_list, iter) {
+	DL_FOREACH(character_list, iter) {
 		if (IS_NPC(iter) || GET_ACCESS_LEVEL(iter) >= GET_ACCESS_LEVEL(ch)) {
 			continue;
 		}
@@ -7436,7 +7437,7 @@ ACMD(do_echo) {
 
 	if (vict) {
 		// clear last act messages for everyone in the room
-		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (c->desc && c != ch && c != vict) {
 				clear_last_act_message(c->desc);
 				
@@ -7449,7 +7450,7 @@ ACMD(do_echo) {
 		act(lbuf, FALSE, ch, obj, vict, TO_NOTVICT | TO_IGNORE_BAD_CODE);
 
 		// fetch and store channel history for the room
-		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (c->desc && c != ch && c != vict && !is_ignoring(c, ch) && c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
 				if (subcmd == SCMD_EMOTE && !IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
@@ -7507,7 +7508,7 @@ ACMD(do_echo) {
 	}
 	else {
 		// clear last act messages for everyone in the room
-		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (c->desc && c != ch) {
 				clear_last_act_message(c->desc);
 							
@@ -7521,7 +7522,7 @@ ACMD(do_echo) {
 		act(lbuf, FALSE, ch, obj, vict, TO_ROOM | TO_NOT_IGNORING | TO_IGNORE_BAD_CODE);
 
 		// fetch and store channel history for the room
-		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (c->desc && c != ch && !is_ignoring(c, ch) && c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc			
 				if (subcmd == SCMD_EMOTE && !IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
@@ -7818,9 +7819,8 @@ ACMD(do_force) {
 	else if (!str_cmp("room", arg)) {
 		send_config_msg(ch, "ok_string");
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s forced room %s to %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)), to_force);
-
-		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_force) {
-			next_force = vict->next_in_room;
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_force, next_in_room) {
 			if (!REAL_NPC(vict) && GET_REAL_LEVEL(vict) >= GET_REAL_LEVEL(ch))
 				continue;
 			sprintf(buf1, "$n has forced you to '%s'.", to_force);
@@ -7967,7 +7967,7 @@ ACMD(do_goto) {
 	
 	// wizhide safety
 	if (!PRF_FLAGGED(ch, PRF_WIZHIDE) && GET_INVIS_LEV(ch) < LVL_START_IMM) {
-		LL_FOREACH2(ROOM_PEOPLE(location), iter, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(location), iter, next_in_room) {
 			if (ch == iter || !IS_IMMORTAL(iter)) {
 				continue;
 			}
@@ -8486,7 +8486,7 @@ ACMD(do_peace) {
 	struct txt_block *inq, *next_inq;
 	char_data *iter, *next_iter;
 	
-	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
 		if (FIGHTING(iter) || GET_POS(iter) == POS_FIGHTING) {
 			stop_fighting(iter);
 		}
@@ -8691,9 +8691,8 @@ ACMD(do_purge) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has purged room %s", GET_REAL_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		act("$n gestures... You are surrounded by scorching flames!", FALSE, ch, 0, 0, TO_ROOM);
 		send_to_room("The world seems a little cleaner.\r\n", IN_ROOM(ch));
-
-		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_v) {
-			next_v = vict->next_in_room;
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_v, next_in_room) {
 			if (REAL_NPC(vict))
 				extract_char(vict);
 		}
@@ -10090,7 +10089,7 @@ ACMD(do_users) {
 	one_argument(argument, arg);
 
 	if (!*host_search) {
-		for (tch = character_list; tch; tch = tch->next) {
+		DL_FOREACH(character_list, tch) {
 			if (IS_NPC(tch) || tch->desc)
 				continue;
 			result = users_output(ch, tch, NULL, name_search, low, high, rp);

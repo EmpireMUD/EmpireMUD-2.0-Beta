@@ -230,8 +230,7 @@ OCMD(do_oforce) {
 		if (!(room = obj_room(obj))) 
 			obj_log(obj, "oforce called by object in no location");
 		else {
-			for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
-				next_ch = ch->next_in_room;
+			DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 				if (valid_dg_target(ch, 0)) {
 					command_interpreter(ch, line);
 				}
@@ -377,7 +376,7 @@ OCMD(do_oechoneither) {
 		return;
 	}
 	
-	for (iter = ROOM_PEOPLE(IN_ROOM(vict1)); iter; iter = iter->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(vict1)), iter, next_in_room) {
 		if (iter->desc && iter != vict1 && iter != vict2) {
 			sub_write(p, iter, TRUE, TO_CHAR);
 		}
@@ -468,6 +467,7 @@ OCMD(do_orestore) {
 		if (GET_POS(victim) < POS_SLEEPING) {
 			GET_POS(victim) = POS_STANDING;
 		}
+		affect_total(victim);
 		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
 		GET_MOVE(victim) = GET_MAX_MOVE(victim);
 		GET_MANA(victim) = GET_MAX_MANA(victim);
@@ -543,7 +543,6 @@ OCMD(do_otimer) {
 OCMD(do_otransform) {
 	char arg[MAX_INPUT_LENGTH];
 	obj_data *o;
-	obj_data tmpobj;
 	char_data *wearer = NULL;
 	int pos = 0;
 
@@ -568,8 +567,10 @@ OCMD(do_otransform) {
 			wearer = obj->worn_by;
 			unequip_char(obj->worn_by, pos);
 		}
+		
+		// NOTE: none of this will work
 
-		/* move new obj info over to old object and delete new obj */
+		/* move new obj info over to old object and delete new obj *
 		memcpy(&tmpobj, o, sizeof(*o));
 		tmpobj.in_room = IN_ROOM(obj);
 		tmpobj.last_empire_id = obj->last_empire_id;
@@ -586,9 +587,8 @@ OCMD(do_otransform) {
 		tmpobj.script_id = obj->script_id;
 		tmpobj.proto_script = obj->proto_script;
 		tmpobj.script = obj->script;
-		tmpobj.next_content = obj->next_content;
-		tmpobj.next = obj->next;
 		memcpy(obj, &tmpobj, sizeof(*obj));
+		*/
 
 		if (wearer) {
 			equip_char(wearer, obj, pos);
@@ -789,14 +789,12 @@ OCMD(do_opurge) {
 	if (!*arg) {
 		/* purge all */
 		if ((rm = obj_room(obj))) {
-			for (ch = ROOM_PEOPLE(rm); ch; ch = next_ch ) {
-				next_ch = ch->next_in_room;
+			DL_FOREACH_SAFE2(ROOM_PEOPLE(rm), ch, next_ch, next_in_room) {
 				if (IS_NPC(ch))
 					extract_char(ch);
 			}
-
-			for (o = ROOM_CONTENTS(rm); o; o = next_obj ) {
-				next_obj = o->next_content;
+			
+			DL_FOREACH_SAFE2(ROOM_CONTENTS(rm), o, next_obj, next_content) {
 				if (o != obj)
 					extract_obj(o);
 			}
@@ -983,9 +981,8 @@ OCMD(do_oteleport) {
 	if (!str_cmp(arg1, "all")) {
 		if (target == orm)
 			obj_log(obj, "oteleport target is itself");
-
-		for (ch = ROOM_PEOPLE(orm); ch; ch = next_ch) {
-			next_ch = ch->next_in_room;
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(orm), ch, next_ch, next_in_room) {
 			if (!valid_dg_target(ch, DG_ALLOW_GODS)) 
 				continue;
 			char_from_room(ch);
@@ -1006,9 +1003,7 @@ OCMD(do_oteleport) {
 		for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 			// only if it's not the target room, or we'd be here all day
 			if (INST_ROOM(inst, iter) && INST_ROOM(inst, iter) != target) {
-				for (ch = ROOM_PEOPLE(INST_ROOM(inst, iter)); ch; ch = next_ch) {
-					next_ch = ch->next_in_room;
-					
+				DL_FOREACH_SAFE2(ROOM_PEOPLE(INST_ROOM(inst, iter)), ch, next_ch, next_in_room) {
 					if (!valid_dg_target(ch, DG_ALLOW_GODS)) {
 						continue;
 					}
@@ -1408,9 +1403,7 @@ OCMD(do_oaoe) {
 	}
 
 	level = get_obj_scale_level(obj, NULL);
-	for (vict = ROOM_PEOPLE(orm); vict; vict = next_vict) {
-		next_vict = vict->next_in_room;
-		
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(orm), vict, next_vict, next_in_room) {
 		// harder to tell friend from foe: hit PCs or people following PCs
 		if (!IS_NPC(vict) || (vict->master && !IS_NPC(vict->master))) {
 			script_damage(vict, NULL, level, type, modifier);

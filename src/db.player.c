@@ -29,6 +29,7 @@
 *   Account DB
 *   Core Player DB
 *   Delayed Update System
+*   loaded_player_hash For Offline Players
 *   Autowiz Wizlist Generator
 *   Helpers
 *   Empire Player Management
@@ -66,6 +67,7 @@ struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
 time_t get_member_timeout_time(time_t created, time_t last_login, double played_hours);
 void purge_bound_items(int idnum);
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch);
+void remove_loaded_player(char_data *ch);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
 int sort_players_by_name(player_index_data *a, player_index_data *b);
 void write_player_delayed_data_to_file(FILE *fl, char_data *ch);
@@ -74,46 +76,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch);
 
  //////////////////////////////////////////////////////////////////////////////
 //// GETTERS /////////////////////////////////////////////////////////////////
-
-/**
-* This has the same purpose as get_player_vis_or_file, but won't screw anything
-* up if the target is online but invisible. You must call store_loaded_char()
-* if is_file == TRUE, or the player won't be stored. If you do NOT wish to save
-* the character, use free_char() instead.
-*
-* @param char *name The player name
-* @param bool *is_file A place to store whether or not we loaded from file
-* @return char_data *ch or NULL
-*/
-char_data *find_or_load_player(char *name, bool *is_file) {
-	char buf[MAX_INPUT_LENGTH+2];
-	player_index_data *index;
-	char_data *ch = NULL;
-	
-	*is_file = FALSE;
-	
-	if ((index = find_player_index_by_name(name))) {
-		if (!(ch = is_playing(index->idnum))) {
-			if ((ch = load_player(index->name, TRUE))) {
-				SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
-				*is_file = TRUE;
-			}
-		}
-	}
-	
-	// not able to find -- look for a player partial match?
-	if (!ch) {
-		sprintf(buf, "0.%s", name);	// add 0. to force player match
-		ch = get_char_world(buf);
-		*is_file = FALSE;
-		if (ch && IS_NPC(ch)) {
-			ch = NULL;	// verify player only
-		}
-	}
-	
-	return ch;
-}
-
 
 /**
 * Look up a player's index entry by idnum.
@@ -153,7 +115,7 @@ player_index_data *find_player_index_by_name(char *name) {
 char_data *find_player_in_room_by_id(room_data *room, int id) {
 	char_data *ch;
 	
-	LL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
 		if (!IS_NPC(ch) && GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
 			return ch;
 		}
@@ -218,8 +180,8 @@ char_data *is_at_menu(int id) {
 */
 char_data *is_playing(int id) {
 	char_data *ch;
-
-	for (ch = character_list; ch; ch = ch->next) {
+	
+	DL_FOREACH(character_list, ch) {
 		if (!IS_NPC(ch) && GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
 			return ch;
 		}
@@ -802,6 +764,7 @@ void free_char(char_data *ch) {
 	struct ability_gain_hook *hook, *next_hook;
 	struct mount_data *mount, *next_mount;
 	struct channel_history_data *history, *next_hist;
+	struct empire_unique_storage *eus, *next_eus;
 	struct player_slash_channel *slash;
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
@@ -817,6 +780,8 @@ void free_char(char_data *ch) {
 	char_data *proto;
 	obj_data *obj;
 	int iter;
+	
+	pause_affect_total = TRUE;
 
 	// in case somehow?
 	if (GROUP(ch)) {
@@ -825,6 +790,11 @@ void free_char(char_data *ch) {
 	
 	// clean up gear/items, if any
 	extract_all_items(ch);
+	
+	// ensure they are not queued for re-freeing
+	if (!IS_NPC(ch)) {
+		remove_loaded_player(ch);
+	}
 
 	if (ch->followers || ch->master) {
 		die_follower(ch);
@@ -1013,6 +983,15 @@ void free_char(char_data *ch) {
 			free(ptech);
 		}
 		
+		// free unique storage
+		LL_FOREACH_SAFE(GET_HOME_STORAGE(ch), eus, next_eus) {
+			if (eus->obj) {
+				extract_obj(eus->obj);
+			}
+			free(eus);
+		}
+		GET_HOME_STORAGE(ch) = NULL;
+		
 		free_player_completed_quests(&GET_COMPLETED_QUESTS(ch));
 		free_player_quests(GET_QUESTS(ch));
 		
@@ -1061,11 +1040,12 @@ void free_char(char_data *ch) {
 	clear_delayed_update(ch);
 
 	/* find_char helper */
-	if (ch->script_id > 0) {
+	if (ch->in_lookup_table) {
 		remove_from_lookup_table(ch->script_id);
 	}
 
 	free(ch);
+	pause_affect_total = FALSE;
 }
 
 
@@ -1144,12 +1124,14 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
+	void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
 	
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH], *read;
-	int account_id = NOTHING, ignore_pos = 0;
+	int account_id = NOTHING, ignore_pos = 0, junk;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
 	struct affected_type *af, *next_af, *af_list = NULL;
+	struct empire_unique_storage *eus, *last_eus = NULL;
 	struct player_quest *plrq, *last_plrq = NULL;
 	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
@@ -1165,12 +1147,13 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct player_event_data *ped;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
+	obj_data *obj, *o, *next_o;
 	struct req_data *task;
 	obj_data **cont_row;
 	account_data *acct;
 	bitvector_t bit_in;
 	bool end = FALSE;
-	obj_data *obj;
+	trig_data *trig;
 	double dbl_in;
 	long l_in[3];
 	char c_in;
@@ -1210,6 +1193,11 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	if ((last_plrq = GET_QUESTS(ch))) {
 		while (last_plrq->next) {
 			last_plrq = last_plrq->next;
+		}
+	}
+	if ((last_eus = GET_HOME_STORAGE(ch))) {
+		while (last_eus->next) {
+			last_eus = last_eus->next;
 		}
 	}
 	
@@ -1650,6 +1638,33 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						DL_APPEND(GET_HISTORY(ch, i_in[0]), hist);
 					}
 				}
+				else if (PFILE_TAG(line, "Home Storage:", length)) {
+					sscanf(line + length + 1, "%d %d %d", &i_in[0], &i_in[1], &i_in[2]);
+					if (!get_line(fl, line) || sscanf(line, "#%d", &i_in[3]) != 1) {
+						log("SYSERR: Invalid Home Storage section of player %s: no obj", name);
+						// possibly just not fatal, if next line gives no problems
+						continue;
+					}
+					
+					obj = Obj_load_from_file(fl, i_in[3], &junk, NULL);
+					if (obj) {
+						remove_from_object_list(obj);	// doesn't really go here right now
+					
+						CREATE(eus, struct empire_unique_storage, 1);
+						eus->island = i_in[0];
+						eus->amount = i_in[1];
+						eus->flags = i_in[2];
+						eus->obj = obj;
+						
+						if (last_eus) {
+							last_eus->next = eus;
+						}
+						else {
+							GET_HOME_STORAGE(ch) = eus;
+						}
+						last_eus = eus;
+					}
+				}
 				BAD_TAG_WARNING(line);
 				break;
 			}
@@ -1722,6 +1737,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "Last Goal Check:", length)) {
 					GET_LAST_GOAL_CHECK(ch) = atol(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Last Home Set:", length)) {
+					GET_LAST_HOME_SET_TIME(ch) = atol(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Last Offense:", length)) {
 					GET_LAST_OFFENSE_SEEN(ch) = atol(line + length + 1);
@@ -2098,6 +2116,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		log("SYSERR: Finished loading playerfile '%s' but did not find password", GET_PC_NAME(ch));
 	}
 	
+	// some systems use this early
+	ch->script_id = GET_IDNUM(ch);
+	
 	// have account?
 	if (normal && !GET_ACCOUNT(ch)) {
 		if (!(acct = find_account(account_id))) {
@@ -2131,7 +2152,24 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		REREAD_EMPIRE_TECH_ON_LOGIN(ch) = (EMPIRE_MEMBERS(GET_LOYALTY(ch)) < 1 || get_member_timeout_time(ch->player.time.birth, ch->prev_logon, ((double)ch->player.time.played) / SECS_PER_REAL_HOUR) <= time(0));
 	}
 	
+	// ensure random triggers are shut off on home storage
+	LL_FOREACH(GET_HOME_STORAGE(ch), eus) {
+		if (eus->obj && SCRIPT(eus->obj)) {
+			LL_FOREACH(TRIGGERS(SCRIPT(eus->obj)), trig) {
+				remove_trigger_from_global_lists(trig, TRUE);
+			}
+		}
+	}
+	
+	// delivery anything left in cont_row
+	for (iter = MAX_BAG_ROWS - 1; iter >= 0; --iter) {
+		DL_FOREACH_SAFE2(cont_row[iter], o, next_o, next_content) {
+			DL_DELETE2(cont_row[iter], o, prev_content, next_content);
+			obj_to_char(o, ch);
+		}
+	}
 	free(cont_row);
+	
 	return ch;
 }
 
@@ -2376,6 +2414,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		
 		affect_remove(ch, af);
 	}
+	
+	affect_total(ch);
 	
 	// reset attributes
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
@@ -2748,6 +2788,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 */
 void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	void Crash_save(obj_data *obj, FILE *fp, int location);
+	void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 	extern struct slash_channel *find_slash_channel_by_id(int id);
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
@@ -2757,6 +2798,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	struct companion_data *compan, *next_compan;
 	struct player_faction_data *pfd, *next_pfd;
 	struct player_event_data *ped, *next_ped;
+	struct empire_unique_storage *eus;
 	struct channel_history_data *hist;
 	struct trig_proto_list *tpro;
 	struct player_eq_set *eq_set;
@@ -2838,10 +2880,20 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 			fprintf(fl, "History: %d %ld\n%s~\n", iter, hist->timestamp, NULLSAFE(hist->message));
 		}
 	}
+	LL_FOREACH(GET_HOME_STORAGE(ch), eus) {
+		if (eus->amount <= 0 || !eus->obj) {
+			continue;	// ??
+		}
+		fprintf(fl, "Home Storage: %d %d %d\n", eus->island, eus->amount, eus->flags);
+		Crash_save_one_obj_to_file(fl, eus->obj, 0);
+	}
 	
 	// 'L'
 	if (GET_LAST_COMPANION(ch) != NOTHING) {
 		fprintf(fl, "Last Companion: %d\n", GET_LAST_COMPANION(ch));
+	}
+	if (GET_LAST_HOME_SET_TIME(ch)) {
+		fprintf(fl, "Last Home Set: %ld\n", GET_LAST_HOME_SET_TIME(ch));
 	}
 	for (lore = GET_LORE(ch); lore; lore = lore->next) {
 		if (lore->text && *lore->text) {
@@ -2940,6 +2992,137 @@ void queue_delayed_update(char_data *ch, bitvector_t type) {
 			HASH_ADD_INT(char_delayed_update_list, id, cdu);
 		}
 		cdu->type |= type;
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// loaded_player_hash FOR OFFLINE PLAYERS //////////////////////////////////
+
+// for find_or_load_player(), tracks players that are kept in a 'loaded' state
+// and are freed up automatically
+struct loaded_player_data {
+	int id;
+	char_data *ch;
+	UT_hash_handle hh;
+};
+
+struct loaded_player_data *loaded_player_hash = NULL;
+
+
+/**
+* Sets a player as 'loaded from file' in the loaded_player_hash, triggering an
+* un-load up to 1 second later.
+*
+* @param char_data *ch The player to add to the loaded_player_hash.
+*/
+void add_loaded_player(char_data *ch) {
+	struct loaded_player_data *lpd;
+	int id;
+	
+	if (!IS_NPC(ch)) {
+		id = GET_IDNUM(ch);
+		HASH_FIND_INT(loaded_player_hash, &id, lpd);
+		if (!lpd) {
+			CREATE(lpd, struct loaded_player_data, 1);
+			lpd->id = id;
+			HASH_ADD_INT(loaded_player_hash, id, lpd);
+		}
+	
+		if (lpd->ch && lpd->ch != ch) {
+			log("SYSERR: add_loaded_player called when a different copy of the same player is already loaded");
+		}
+	
+		lpd->ch = ch;
+	}
+}
+
+
+/**
+* This has the same purpose as get_player_vis_or_file, but won't screw anything
+* up if the target is online but invisible. You can call SAVE_CHAR(ch) like
+* normal. You should call store_loaded_char() if is_file == TRUE, or the player
+* won't be stored. If you do NOT wish to save the character, you can use
+* free_char() instead.
+*
+* If you do not free the character yourself, it will automatically be freed
+* within 1 second. Leaving characters in this state can be advantageous if you
+* expect several functions to load them in sequence.
+*
+* @param char *name The player name
+* @param bool *is_file A place to store whether or not we loaded from file
+* @return char_data *ch or NULL
+*/
+char_data *find_or_load_player(char *name, bool *is_file) {
+	struct loaded_player_data *lpd;
+	char buf[MAX_INPUT_LENGTH+2];
+	player_index_data *index;
+	char_data *ch = NULL;
+	int id;
+	
+	*is_file = FALSE;
+	
+	if ((index = find_player_index_by_name(name))) {
+		if (!(ch = is_playing(index->idnum))) {
+			id = index->idnum;
+			HASH_FIND_INT(loaded_player_hash, &id, lpd);
+			if (lpd) {	// look in the loaded player hash first
+				*is_file = TRUE;
+				ch = lpd->ch;
+			}
+			else if ((ch = load_player(index->name, TRUE))) {
+				SET_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
+				*is_file = TRUE;
+				add_loaded_player(ch);
+			}
+		}
+	}
+	
+	// not able to find -- look for a player partial match?
+	if (!ch) {
+		sprintf(buf, "0.%s", name);	// add 0. to force player match
+		ch = get_char_world(buf);
+		*is_file = FALSE;
+		if (ch && IS_NPC(ch)) {
+			ch = NULL;	// verify player only
+		}
+	}
+	
+	return ch;
+}
+
+
+/**
+* Frees up players who have been left in a 'loaded' state by
+* find_or_load_player().
+*/
+void free_loaded_players(void) {
+	struct loaded_player_data *iter, *next;
+	HASH_ITER(hh, loaded_player_hash, iter, next) {
+		HASH_DEL(loaded_player_hash, iter);
+		free_char(iter->ch);
+		free(iter);
+	}
+}
+
+
+/**
+* Removes a player from the loaded_player_hash without freeing them. Use this
+* if a previously-loaded player logs into the game, or similar.
+*
+* @param char_data *ch The player to remove from the loaded_player_hash.
+*/
+void remove_loaded_player(char_data *ch) {
+	struct loaded_player_data *lpd;
+	int id;
+	
+	if (!IS_NPC(ch)) {
+		id = GET_IDNUM(ch);
+		HASH_FIND_INT(loaded_player_hash, &id, lpd);
+		if (lpd) {
+			HASH_DEL(loaded_player_hash, lpd);
+			free(lpd);
+		}
 	}
 }
 
@@ -3610,6 +3793,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	clean_old_history(ch);
 	reset_combat_meters(ch);
 	GET_COMBAT_METERS(ch).over = TRUE;	// ensure no active meter
+	remove_loaded_player(ch);	// in case they were recently loaded
 	
 	// remove this now
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_KEEP_LAST_LOGIN_INFO);
@@ -3700,10 +3884,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		GET_APPARENT_AGE(ch) = 25;
 
 	// add to lists
-	ch->next = character_list;
-	character_list = ch;
-	ch->script_id = GET_IDNUM(ch);
-	add_to_lookup_table(ch->script_id, (void *)ch);
+	DL_PREPEND(character_list, ch);
+	ch->script_id = GET_IDNUM(ch);	// if not already set
+	if (!ch->in_lookup_table) {
+		add_to_lookup_table(ch->script_id, (void *)ch);
+		ch->in_lookup_table = TRUE;
+	}
 	
 	// place character
 	char_to_room(ch, load_room);
@@ -3835,7 +4021,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// attempt to put them back in a vehicle
 	if (GET_LAST_VEHICLE(ch) != NOTHING) {
-		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 			if (VEH_VNUM(veh) == GET_LAST_VEHICLE(ch) && validate_sit_on_vehicle(ch, veh, FALSE)) {
 				sit_on_vehicle(ch, veh);
 				GET_POS(ch) = POS_SITTING;
@@ -4088,7 +4274,7 @@ void init_player(char_data *ch) {
 void purge_bound_items(int idnum) {
 	obj_data *obj, *next_obj;
 	
-	LL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
 		if (obj->bound_to && obj->bound_to->idnum == idnum && !obj->bound_to->next) {
 			// bound to exactly 1 idnum and it's this one
 			if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
@@ -4114,7 +4300,7 @@ void reset_char(char_data *ch) {
 	IN_ROOM(ch) = NULL;
 	ch->next = NULL;
 	ch->next_fighting = NULL;
-	ch->next_in_room = NULL;
+	ch->next_in_room = ch->prev_in_room = NULL;
 	FIGHTING(ch) = NULL;
 	ch->char_specials.position = POS_STANDING;
 	
@@ -4488,6 +4674,7 @@ bool member_is_timed_out_ch(char_data *ch) {
 * @param bool read_techs if TRUE, will add techs based on players (usually only during startup)
 */
 void read_empire_members(empire_data *only_empire, bool read_techs) {
+	void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_flag);
 	void resort_empires(bool force);
 	bool should_delete_empire(empire_data *emp);
 	
@@ -4564,7 +4751,8 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			}
 		}
 		
-		if (ch && is_file) {
+		if (ch && is_file && !only_empire) {
+			// only free right away if doing all empires -- it lags BADLY otherwise
 			free_char(ch);
 		}
 	}
@@ -4621,6 +4809,8 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	if (!read_techs) {
 		resort_empires(FALSE);
 	}
+	
+	clear_delayed_empire_refresh(only_empire, DELAY_REFRESH_MEMBERS);
 }
 
 
@@ -4747,7 +4937,7 @@ void check_eq_sets(char_data *ch) {
 			}
 		}
 	}
-	LL_FOREACH2(ch->carrying, obj, next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		LL_FOREACH_SAFE(GET_OBJ_EQ_SETS(obj), oset, next_oset) {
 			if (!get_eq_set_by_id(ch, oset->id)) {
 				// not found

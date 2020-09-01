@@ -85,10 +85,12 @@ void check_delayed_load(char_data *ch);
 void clear_delayed_update(char_data *ch);
 void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
+void free_varlist(struct trig_var_data *vd);
 void scale_item_to_level(obj_data *obj, int level);
 
 // locals
 static void add_obj_binding(int idnum, struct obj_binding **list);
+struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 void die_follower(char_data *ch);
 struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
 struct companion_data *has_companion(char_data *ch, any_vnum vnum);
@@ -157,7 +159,7 @@ EVENT_CANCEL_FUNC(cancel_room_expire_event) {
 void affect_from_char(char_data *ch, any_vnum type, bool show_msg) {
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *hjp, *next;
-	bool shown = FALSE;
+	bool shown = FALSE, any = FALSE;
 
 	for (hjp = ch->affected; hjp; hjp = next) {
 		next = hjp->next;
@@ -167,6 +169,7 @@ void affect_from_char(char_data *ch, any_vnum type, bool show_msg) {
 				shown = TRUE;
 			}
 			affect_remove(ch, hjp);
+			any = TRUE;
 		}
 	}
 	
@@ -179,7 +182,12 @@ void affect_from_char(char_data *ch, any_vnum type, bool show_msg) {
 				shown = TRUE;
 			}
 			dot_remove(ch, dot);
+			any = TRUE;
 		}
+	}
+	
+	if (any) {
+		affect_total(ch);
 	}
 }
 
@@ -194,7 +202,7 @@ void affect_from_char(char_data *ch, any_vnum type, bool show_msg) {
 */
 void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool show_msg) {
 	struct affected_type *aff, *next_aff;
-	bool shown = FALSE;
+	bool shown = FALSE, any = FALSE;
 
 	for (aff = ch->affected; aff; aff = next_aff) {
 		next_aff = aff->next;
@@ -204,7 +212,12 @@ void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool sho
 				shown = TRUE;
 			}
 			affect_remove(ch, aff);
+			any = TRUE;
 		}
+	}
+	
+	if (any) {
+		affect_total(ch);
 	}
 }
 
@@ -219,7 +232,7 @@ void affect_from_char_by_apply(char_data *ch, any_vnum type, int apply, bool sho
 */
 void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bits, bool show_msg) {
 	struct affected_type *aff, *next_aff;
-	bool shown = FALSE;
+	bool shown = FALSE, any = FALSE;
 
 	for (aff = ch->affected; aff; aff = next_aff) {
 		next_aff = aff->next;
@@ -229,7 +242,12 @@ void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bit
 				shown = TRUE;
 			}
 			affect_remove(ch, aff);
+			any = TRUE;
 		}
+	}
+	
+	if (any) {
+		affect_total(ch);
 	}
 }
 
@@ -244,7 +262,7 @@ void affect_from_char_by_bitvector(char_data *ch, any_vnum type, bitvector_t bit
 */
 void affect_from_char_by_caster(char_data *ch, any_vnum type, char_data *caster, bool show_msg) {
 	struct affected_type *aff, *next_aff;
-	bool shown = FALSE;
+	bool shown = FALSE, any = FALSE;
 	
 	LL_FOREACH_SAFE(ch->affected, aff, next_aff) {
 		if (aff->type == type && aff->cast_by == CAST_BY_ID(caster)) {
@@ -254,7 +272,12 @@ void affect_from_char_by_caster(char_data *ch, any_vnum type, char_data *caster,
 			}
 			
 			affect_remove(ch, aff);
+			any = TRUE;
 		}
+	}
+	
+	if (any) {
+		affect_total(ch);
 	}
 }
 
@@ -379,6 +402,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 	
 	// affect_to_char seems to duplicate af so we must free it
 	free(af);
+	affect_total(ch);
 }
 
 
@@ -575,6 +599,8 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 * reaches zero). Pointer *af must never be NIL!  Frees mem and calls
 * affect_location_apply
 *
+* You should call affect_total(ch) when you are done removing affects.
+*
 * @param char_data *ch The person to remove the af from.
 * @param struct affected_by *af The affect to remove.
 */
@@ -589,7 +615,6 @@ void affect_remove(char_data *ch, struct affected_type *af) {
 	affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
 	REMOVE_FROM_LIST(af, ch->affected, next);
 	free(af);
-	affect_total(ch);
 }
 
 
@@ -1306,32 +1331,31 @@ void extract_char(char_data *ch) {
  * be its own list, but that would change the '->next' pointer, potentially
  * confusing some code. -gg This doesn't handle recursive extractions. */
 void extract_pending_chars(void) {
-	char_data *vict, *next_vict, *prev_vict;
+	char_data *vict, *next_vict;
 
 	if (extractions_pending < 0) {
 		log("SYSERR: Negative (%d) extractions pending.", extractions_pending);
 	}
-
-	for (vict = character_list, prev_vict = NULL; vict && extractions_pending > 0; vict = next_vict) {
-		next_vict = vict->next;
-
+	
+	DL_FOREACH_SAFE(character_list, vict, next_vict) {
+		// check if done?
+		if (extractions_pending <= 0) {
+			break;
+		}
+		
 		if (MOB_FLAGGED(vict, MOB_EXTRACTED)) {
 			REMOVE_BIT(MOB_FLAGS(vict), MOB_EXTRACTED);
 		}
 		else if (!IS_NPC(vict) && PLR_FLAGGED(vict, PLR_EXTRACTED)) {
 			REMOVE_BIT(PLR_FLAGS(vict), PLR_EXTRACTED);
 		}
-		else {
-			/* Last non-free'd character to continue chain from. */
-			prev_vict = vict;
+		else {	// not extracting
 			continue;
 		}
-
-		if (prev_vict) {
-			prev_vict->next = next_vict;
-		}
-		else {
-			character_list = next_vict;
+		
+		// ensure they're really (probably) in the character list
+		if (character_list && (character_list == vict || vict->prev || vict->next)) {
+			DL_DELETE(character_list, vict);
 		}
 
 		// moving this down below the prev_vict block because ch was still in
@@ -1348,7 +1372,7 @@ void extract_pending_chars(void) {
 		
 		// likely an error -- search for people who need extracting (for next time)
 		extractions_pending = 0;
-		for (vict = character_list; vict; vict = vict->next) {
+		DL_FOREACH(character_list, vict) {
 			if (EXTRACTED(vict)) {
 				++extractions_pending;
 			}
@@ -1474,7 +1498,6 @@ void perform_idle_out(char_data *ch) {
 * @param char_data *ch The character to remove
 */
 void char_from_room(char_data *ch) {
-	char_data *temp;
 	obj_data *obj;
 	int pos;
 
@@ -1493,13 +1516,13 @@ void char_from_room(char_data *ch) {
 			ROOM_LIGHTS(IN_ROOM(ch))--;
 		}
 	}
-	for (obj = ch->carrying; obj; obj = obj->next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(ch))--;
 		}
 	}
-
-	REMOVE_FROM_LIST(ch, ROOM_PEOPLE(IN_ROOM(ch)), next_in_room);
+    
+    DL_DELETE2(ROOM_PEOPLE(IN_ROOM(ch)), ch, prev_in_room, next_in_room);
 	IN_ROOM(ch) = NULL;
 	ch->next_in_room = NULL;
 }
@@ -1536,9 +1559,8 @@ void char_to_room(char_data *ch, room_data *room) {
 		if (IN_ROOM(ch)) {
 			char_from_room(ch);
 		}
-
-		ch->next_in_room = ROOM_PEOPLE(room);
-		ROOM_PEOPLE(room) = ch;
+		
+		DL_PREPEND2(ROOM_PEOPLE(room), ch, prev_in_room, next_in_room);
 		IN_ROOM(ch) = room;
 
 		// update lights
@@ -1547,7 +1569,7 @@ void char_to_room(char_data *ch, room_data *room) {
 				ROOM_LIGHTS(room)++;
 			}
 		}
-		for (obj = ch->carrying; obj; obj = obj->next_content) {
+		DL_FOREACH2(ch->carrying, obj, next_content) {
 			if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
 				ROOM_LIGHTS(room)++;
 			}
@@ -1599,7 +1621,7 @@ char_data *find_closest_char(char_data *ch, char *arg, bool pc_only) {
 		return vict;
 	}
 	
-	LL_FOREACH(character_list, vict) {
+	DL_FOREACH(character_list, vict) {
 		if (pc_only && IS_NPC(vict)) {
 			continue;
 		}
@@ -1631,9 +1653,10 @@ char_data *find_closest_char(char_data *ch, char *arg, bool pc_only) {
 char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum) {
 	char_data *mob, *found = FALSE;
 	
-	for (mob = ROOM_PEOPLE(room); mob && !found; mob = mob->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), mob, next_in_room) {
 		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == vnum) {
 			found = mob;
+			break;
 		}
 	}
 	
@@ -1650,7 +1673,7 @@ char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum) {
 char_data *find_mortal_in_room(room_data *room) {
 	char_data *iter;
 	
-	LL_FOREACH2(ROOM_PEOPLE(room), iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), iter, next_in_room) {
 		if (!IS_NPC(iter) && !IS_IMMORTAL(iter) && !IS_GOD(iter)) {
 			return iter;
 		}
@@ -1677,11 +1700,15 @@ char_data *get_char_room(char *name, room_data *room) {
 	strcpy(tmp, name);
 	if (!(number = get_number(&tmp)))
 		return (NULL);
-
-	for (i = ROOM_PEOPLE(room); i && (j <= number) && !found; i = i->next_in_room) {
-		if (match_char_name(NULL, i, tmp, MATCH_IN_ROOM)) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(room), i, next_in_room) {
+		if (j > number) {
+			break;
+		}
+		else if (match_char_name(NULL, i, tmp, MATCH_IN_ROOM)) {
 			if (++j == number) {
 				found = i;
+				break;
 			}
 		}
 	}
@@ -1712,11 +1739,15 @@ char_data *get_char_room_vis(char_data *ch, char *name) {
 	if ((number = get_number(&tmp)) == 0) {
 		return get_player_vis(ch, tmp, FIND_CHAR_ROOM);
 	}
-
-	for (i = ROOM_PEOPLE(IN_ROOM(ch)); i && j <= number && !found; i = i->next_in_room) {
-		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && match_char_name(ch, i, tmp, MATCH_IN_ROOM)) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), i, next_in_room) {
+		if (j > number) {
+			break;
+		}
+		else if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && match_char_name(ch, i, tmp, MATCH_IN_ROOM)) {
 			if (++j == number) {
 				found = i;
+				break;
 			}
 		}
 	}
@@ -1751,8 +1782,8 @@ char_data *get_char_vis(char_data *ch, char *name, bitvector_t where) {
 		if ((number = get_number(&tmp)) == 0) {
 			return get_player_vis(ch, tmp, where);
 		}
-
-		for (i = character_list; i && (j <= number) && !found; i = i->next) {
+		
+		DL_FOREACH(character_list, i) {
 			if (IS_SET(where, FIND_NPC_ONLY) && !IS_NPC(i)) {	
 				continue;
 			}
@@ -1763,6 +1794,10 @@ char_data *get_char_vis(char_data *ch, char *name, bitvector_t where) {
 			// found
 			if (++j == number) {
 				found = i;
+				break;	// done
+			}
+			else if (j > number) {
+				break;	// somehow
 			}
 		}
 	}
@@ -1781,8 +1816,8 @@ char_data *get_char_vis(char_data *ch, char *name, bitvector_t where) {
 */
 char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 	char_data *i, *found = NULL;
-
-	for (i = character_list; i && !found; i = i->next) {
+	
+	DL_FOREACH(character_list, i) {
 		if (IS_NPC(i))
 			continue;
 		if (IS_SET(flags, FIND_CHAR_ROOM) && !WIZHIDE_OK(ch, i)) {
@@ -1800,6 +1835,7 @@ char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 		}
 		
 		found = i;
+		break;	// done
 	}
 
 	return found;
@@ -1823,11 +1859,15 @@ char_data *get_char_world(char *name) {
 	if ((number = get_number(&tmp)) == 0) {
 		pc_only = TRUE;
 	}
-
-	for (ch = character_list; ch && (pos <= number) && !found; ch = ch->next) {
+	
+	DL_FOREACH(character_list, ch) {
 		if ((!IS_NPC(ch) || !pc_only) && match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
 			if (++pos == number || pc_only) {	// pc_only messes up pos
 				found = ch;
+				break;	// done
+			}
+			else if (pos > number) {
+				break;	// somehow
 			}
 		}
 	}
@@ -1953,7 +1993,7 @@ void cleanup_all_coins(void) {
 	char_data *ch;
 	descriptor_data *desc;
 	
-	for (ch = character_list; ch; ch = ch->next) {
+	DL_FOREACH(character_list, ch) {
 		if (!IS_NPC(ch)) {
 			cleanup_coins(ch);
 		}
@@ -3864,7 +3904,7 @@ bool can_interact_room(room_data *room, int type) {
 		return TRUE;	// simple
 	}
 	
-	LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
 		if (VEH_IS_COMPLETE(veh) && has_interaction(VEH_INTERACTIONS(veh), type)) {
 			return TRUE;
 		}
@@ -4183,7 +4223,7 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	
 	// first, build a list of vehicles that match this interaction type in the room
 	num = 0;
-	LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
 		if (VEH_IS_COMPLETE(veh) && has_interaction(VEH_INTERACTIONS(veh), type)) {
 			CREATE(tvh, struct temp_veh_helper, 1);
 			tvh->veh = veh;
@@ -4691,8 +4731,6 @@ void check_minipets_and_companions(char_data *ch) {
 * @param struct companion_data *cd The companion data to free.
 */
 void free_companion(struct companion_data *cd) {
-	void free_varlist(struct trig_var_data *vd);
-	
 	if (cd) {
 		struct companion_mod *mod, *next_mods;
 		
@@ -5187,8 +5225,7 @@ void perform_mount(char_data *ch, char_data *mount) {
 * @param obj_data *obj The item to add to the global object list.
 */
 void add_to_object_list(obj_data *obj) {
-	obj->next = object_list;
-	object_list = obj;
+	DL_PREPEND(object_list, obj);
 }
 
 
@@ -5271,6 +5308,7 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 		GET_OBJ_VAL(obj, iter) = GET_OBJ_VAL(input, iter);
 	}
 	GET_OBJ_APPLIES(obj) = copy_obj_apply_list(GET_OBJ_APPLIES(input));
+	OBJ_BOUND_TO(obj) = copy_obj_bindings(OBJ_BOUND_TO(input));
 	
 	return obj;
 }
@@ -5287,9 +5325,7 @@ void empty_obj_before_extract(obj_data *obj) {
 	
 	obj_data *jj, *next_thing;
 	
-	for (jj = obj->contains; jj; jj = next_thing) {
-		next_thing = jj->next_content;		/* Next in inventory */
-
+	DL_FOREACH_SAFE2(obj->contains, jj, next_thing, next_content) {
 		if (obj->in_obj) {
 			obj_to_obj(jj, obj->in_obj);
 		}
@@ -5473,6 +5509,50 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 
 
 /**
+* Compare the person/people two objects are bound to.
+*
+* @param obj_data *obj_a The first obj.
+* @param obj_data *obj_b The second obj.
+* @return bool TRUE if the bindings are the same; FALSE if not.
+*/
+bool identical_bindings(obj_data *obj_a, obj_data *obj_b) {
+	void free_obj_binding(struct obj_binding **list);
+	
+	struct obj_binding *a_bind, *b_bind, *b_bind_list, *b_bind_next;
+	bool found;
+	
+	if (!OBJ_BOUND_TO(obj_a) && !OBJ_BOUND_TO(obj_b)) {
+		return TRUE;	// no bindings on either
+	}
+	
+	// compare bindings just like applies
+	b_bind_list = copy_obj_bindings(OBJ_BOUND_TO(obj_b));
+	LL_FOREACH(OBJ_BOUND_TO(obj_a), a_bind) {
+		found = FALSE;
+		LL_FOREACH_SAFE(b_bind_list, b_bind, b_bind_next) {
+			if (a_bind->idnum == b_bind->idnum) {
+				LL_DELETE(b_bind_list, b_bind);
+				found = TRUE;
+				break;
+			}
+		}
+		
+		if (!found) {
+			free_obj_binding(&b_bind_list);	// remaining items
+			return FALSE;
+		}
+	}
+	if (b_bind_list) {	// more things in b_bind_list than a
+		free_obj_binding(&b_bind_list);
+		return FALSE;
+	}
+	
+	// otherwise
+	return TRUE;
+}
+
+
+/**
 * Compares two items for identicallity. These may be highly-customized items.
 * 
 * @param obj_data *obj_a First object to compare.
@@ -5480,7 +5560,7 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 * @return bool TRUE if the two items are functionally identical.
 */
 bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
-	struct obj_apply *a_apply, *b_list, *b_apply, *temp;
+	struct obj_apply *a_apply, *b_list, *b_apply, *b_apply_next, *temp;
 	bool found;
 	int iter;
 	
@@ -5528,12 +5608,16 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 	if (GET_OBJ_ACTION_DESC(obj_a) != GET_OBJ_ACTION_DESC(obj_b) && !str_cmp(GET_OBJ_ACTION_DESC(obj_a), GET_OBJ_ACTION_DESC(obj_b))) {
 		return FALSE;
 	}
+	if (!identical_bindings(obj_a, obj_b)) {
+		return FALSE;
+	}
 	
 	// to compare applies, we're going to copy and delete as we find them
 	b_list = copy_obj_apply_list(GET_OBJ_APPLIES(obj_b));
 	for (a_apply = GET_OBJ_APPLIES(obj_a); a_apply; a_apply = a_apply->next) {
 		found = FALSE;
-		for (b_apply = b_list; b_apply; b_apply = b_apply->next) {
+		for (b_apply = b_list; b_apply; b_apply = b_apply_next) {
+			b_apply_next = b_apply->next;
 			if (a_apply->location == b_apply->location && a_apply->modifier == b_apply->modifier && a_apply->apply_type == b_apply->apply_type) {
 				found = TRUE;
 				REMOVE_FROM_LIST(b_apply, b_list, next);
@@ -5543,7 +5627,7 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 		}
 		
 		if (!found) {
-			free_obj_apply_list(b_list);
+			free_obj_apply_list(b_list);	// remaining items
 			return FALSE;
 		}
 	}
@@ -5563,8 +5647,11 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 * @param obj_data *obj The item to remove from the global object list.
 */
 void remove_from_object_list(obj_data *obj) {
-	obj_data *temp;
-	REMOVE_FROM_LIST(obj, object_list, next);
+	// ensure it's (probably) in the list first
+	if (object_list && (object_list == obj || obj->next || obj->prev)) {
+		DL_DELETE(object_list, obj);
+		obj->prev = obj->next = NULL;
+	}
 }
 
 
@@ -5855,13 +5942,11 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 * @param obj_data *object The item to remove
 */
 void obj_from_char(obj_data *object) {
-	obj_data *temp;
-
 	if (object == NULL) {
 		log("SYSERR: NULL object passed to obj_from_char.");
 	}
 	else {
-		REMOVE_FROM_LIST(object, object->carried_by->carrying, next_content);
+		DL_DELETE2(object->carried_by->carrying, object, prev_content, next_content);
 		object->next_content = NULL;
 
 		IS_CARRYING_N(object->carried_by) -= obj_carry_size(object);
@@ -5884,14 +5969,14 @@ void obj_from_char(obj_data *object) {
 * @param obj_data *obj The object to remove.
 */
 void obj_from_obj(obj_data *obj) {
-	obj_data *temp, *obj_from;
+	obj_data *obj_from;
 
 	if (obj->in_obj == NULL) {
 		log("SYSERR: (%s): trying to illegally extract obj from obj.", __FILE__);
 	}
 	else {
 		obj_from = obj->in_obj;
-		REMOVE_FROM_LIST(obj, obj_from->contains, next_content);
+		DL_DELETE2(obj_from->contains, obj, prev_content, next_content);
 
 		GET_OBJ_CARRYING_N(obj_from) -= obj_carry_size(obj);
 		if (obj_from->carried_by) {
@@ -5913,8 +5998,6 @@ void obj_from_obj(obj_data *obj) {
 * @param obj_data *object The item to remove.
 */
 void obj_from_room(obj_data *object) {
-	obj_data *temp;
-
 	if (!object || !IN_ROOM(object)) {
 		log("SYSERR: NULL object (%p) or obj not in a room (%p) passed to obj_from_room", object, IN_ROOM(object));
 	}
@@ -5923,8 +6006,8 @@ void obj_from_room(obj_data *object) {
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(object))--;
 		}
-
-		REMOVE_FROM_LIST(object, ROOM_CONTENTS(IN_ROOM(object)), next_content);
+		
+		DL_DELETE2(ROOM_CONTENTS(IN_ROOM(object)), object, prev_content, next_content);
 		IN_ROOM(object) = NULL;
 		object->next_content = NULL;
 	}
@@ -5941,7 +6024,7 @@ void obj_from_vehicle(obj_data *object) {
 	else {
 		VEH_LAST_MOVE_TIME(object->in_vehicle) = time(0);	// reset autostore time
 		VEH_CARRYING_N(object->in_vehicle) -= obj_carry_size(object);
-		LL_DELETE2(VEH_CONTAINS(object->in_vehicle), object, next_content);
+		DL_DELETE2(VEH_CONTAINS(object->in_vehicle), object, prev_content, next_content);
 		object->in_vehicle = NULL;
 		object->next_content = NULL;
 	}
@@ -5972,8 +6055,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 	check_obj_in_void(object);
 
 	if (object && ch) {
-		object->next_content = ch->carrying;
-		ch->carrying = object;
+		DL_PREPEND2(ch->carrying, object, prev_content, next_content);
 		object->carried_by = ch;
 		IS_CARRYING_N(ch) += obj_carry_size(object);
 		
@@ -6131,9 +6213,8 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		// clear these now
 		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 		clear_obj_eq_sets(obj);
-
-		obj->next_content = obj_to->contains;
-		obj_to->contains = obj;
+		
+		DL_PREPEND2(obj_to->contains, obj, prev_content, next_content);
 		obj->in_obj = obj_to;
 	}
 }
@@ -6151,10 +6232,8 @@ void obj_to_room(obj_data *object, room_data *room) {
 	}
 	else {
 		check_obj_in_void(object);
-		object->next_content = ROOM_CONTENTS(room);
-		ROOM_CONTENTS(room) = object;
+		DL_PREPEND2(ROOM_CONTENTS(room), object, prev_content, next_content);
 		IN_ROOM(object) = room;
-		object->carried_by = NULL;
 		
 		// check light
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
@@ -6184,7 +6263,7 @@ void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
 	else {
 		check_obj_in_void(object);
 		
-		LL_PREPEND2(VEH_CONTAINS(veh), object, next_content);
+		DL_PREPEND2(VEH_CONTAINS(veh), object, prev_content, next_content);
 		object->in_vehicle = veh;
 		VEH_CARRYING_N(veh) += obj_carry_size(object);
 		
@@ -6457,7 +6536,7 @@ obj_data *get_component_in_list(any_vnum cmp_vnum, obj_data *list, bool *kept) {
 		return NULL;
 	}
 	
-	LL_FOREACH2(list, obj, next_content) {
+	DL_FOREACH2(list, obj, next_content) {
 		if (GET_OBJ_COMPONENT(obj) == cmp_vnum) {
 			// full match
 			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
@@ -6546,10 +6625,11 @@ obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]) 
 */
 obj_data *get_obj_in_list_num(obj_vnum num, obj_data *list) {
 	obj_data *i, *found = NULL;
-
-	for (i = list; i && !found; i = i->next_content) {
+	
+	DL_FOREACH2(list, i, next_content) {
 		if (GET_OBJ_VNUM(i) == num) {
 			found = i;
+			break;
 		}
 	}
 
@@ -6564,10 +6644,11 @@ obj_data *get_obj_in_list_num(obj_vnum num, obj_data *list) {
 */
 obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list) {
 	obj_data *i, *found = NULL;
-
-	for (i = list; i && !found; i = i->next_content) {
+	
+	DL_FOREACH2(list, i, next_content) {
 		if (GET_OBJ_VNUM(i) == vnum) {
 			found = i;
+			break;
 		}
 	}
 
@@ -6595,11 +6676,15 @@ obj_data *get_obj_in_list_vis(char_data *ch, char *name, obj_data *list) {
 	if ((number = get_number(&tmp)) == 0) {
 		return (NULL);
 	}
-
-	for (i = list; i && (j <= number) && !found; i = i->next_content) {
-		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
+	
+	DL_FOREACH2(list, i, next_content) {
+		if (j > number) {
+			break;	// done
+		}
+		else if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
 			if (++j == number) {
 				found = i;
+				break;
 			}
 		}
 	}
@@ -6634,8 +6719,8 @@ obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, obj_
 	if ((number = get_number(&tmp)) == 0) {
 		return (NULL);
 	}
-
-	for (i = list; i; i = i->next_content) {
+	
+	DL_FOREACH2(list, i, next_content) {
 		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
 			if (gave_num) {
 				if (++j == number) {
@@ -6734,10 +6819,14 @@ obj_data *get_obj_vis(char_data *ch, char *name) {
 		return (NULL);
 
 	/* ok.. no luck yet. scan the entire obj list   */
-	for (i = object_list; i && (j <= number) && !found; i = i->next) {
+	DL_FOREACH(object_list, i) {
 		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
 			if (++j == number) {
 				found = i;
+				break;
+			}
+			else if (j > number) {
+				break;	// somehow
 			}
 		}
 	}
@@ -6789,11 +6878,15 @@ obj_data *get_obj_world(char *name) {
 	strcpy(tmp, name);
 	if ((number = get_number(&tmp)) == 0)
 		return (NULL);
-
-	for (i = object_list; i && (j <= number) && !found; i = i->next) {
+	
+	DL_FOREACH(object_list, i) {
 		if (MATCH_ITEM_NAME(tmp, i)) {
 			if (++j == number) {
 				found = i;
+				break;
+			}
+			else if (j > number) {
+				break;	// somehow
 			}
 		}
 	}
@@ -8900,67 +8993,73 @@ bool stored_item_requires_withdraw(obj_data *obj) {
  //////////////////////////////////////////////////////////////////////////////
 //// UNIQUE STORAGE HANDLERS /////////////////////////////////////////////////
 
-
 /**
-* Adds a unique storage entry to an empire and to the global list.
+* Checks if a player can store an item in their home.
 *
-* @param struct empire_unique_storage *eus The item to add.
-* @param empire_data *emp The empire to add storage to.
+* @param char_data *ch The player.
+* @parma obj_data *obj The object to try to store.
+* @param bool message If TRUE, sends its own error message when there's a failure.
+* @param bool *capped A variable to bind to: becomes TRUE if the player has hit the cap -- useful if you're not messaging here.
+* @return bool TRUE if the player can store, FALSE if they're over the limit.
 */
-void add_eus_entry(struct empire_unique_storage *eus, empire_data *emp) {
-	struct empire_unique_storage *temp;
+bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capped) {
+	extern bool override_home_storage_cap;
 	
-	if (!eus || !emp) {
-		return;
-	}
+	struct empire_unique_storage *eus;
+	int count;
 	
-	eus->next = NULL;
+	*capped = FALSE;
 	
-	if ((temp = EMPIRE_UNIQUE_STORAGE(emp))) {
-		while (temp->next) {
-			temp = temp->next;
+	if (!ch || !obj || IS_NPC(ch) || override_home_storage_cap) {
+		if (message) {
+			msg_to_char(ch, "Error trying to store that.\r\n");
 		}
-		temp->next = eus;
-	}
-	else {
-		EMPIRE_UNIQUE_STORAGE(emp) = eus;
+		return FALSE;	// sanity check
 	}
 	
-	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	if (!find_eus_entry(obj, GET_HOME_STORAGE(ch), NULL)) {
+		LL_COUNT(GET_HOME_STORAGE(ch), eus, count);
+		if (count >= config_get_int("max_home_store_uniques")) {
+			*capped = TRUE;
+			if (message) {
+				msg_to_char(ch, "You have already hit the %d-item limit for your home storage.\r\n", config_get_int("max_home_store_uniques"));
+			}
+			return FALSE;
+		}
+	}
+	
+	// appears ok
+	return TRUE;
 }
 
 
 /**
-* Remove items from the empire's storage list by vnum (e.g. if the item was
+* Remove items from the unique item storage list by vnum (e.g. if the item was
 * deleted).
 *
-* @param empire_data *emp The empire to check.
+* @param struct empire_unique_storage **list A pointer to the list to remove it from.
 * @param obj_vnum vnum The object vnum to remove.
 * @return bool TRUE if at least 1 was deleted.
 */
-bool delete_unique_storage_by_vnum(empire_data *emp, obj_vnum vnum) {
+bool delete_unique_storage_by_vnum(struct empire_unique_storage **list, obj_vnum vnum) {
 	struct empire_unique_storage *iter, *next_iter;
 	bool any = FALSE;
 	
-	if (!emp) {
+	if (!list) {
 		return FALSE;
 	}
 	
-	for (iter = EMPIRE_UNIQUE_STORAGE(emp); iter; iter = next_iter) {
-		next_iter = iter->next;
-		
+	LL_FOREACH_SAFE(*list, iter, next_iter) {
 		if (iter->obj && GET_OBJ_VNUM(iter->obj) == vnum) {
 			add_to_object_list(iter->obj);
 			extract_obj(iter->obj);
 			iter->obj = NULL;
-			remove_eus_entry(iter, emp);
+			LL_DELETE(*list, iter);
+			free(iter);
 			any = TRUE;
 		}
 	}
 	
-	if (any) {
-		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-	}
 	return any;
 }
 
@@ -8969,25 +9068,25 @@ bool delete_unique_storage_by_vnum(empire_data *emp, obj_vnum vnum) {
 * Find a matching entry for an object in unique storage.
 *
 * @param obj_data *obj The item to find a matching entry for.
-* @param empire_data *emp The empire to search.
+* @param struct empire_unique_storage **list The unique storage list to search
 * @param room_data *location The room to find matching storage for (optional).
 * @return struct empire_unique_storage* The storage entry, if it exists (or NULL).
 */
-struct empire_unique_storage *find_eus_entry(obj_data *obj, empire_data *emp, room_data *location) {
+struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique_storage *list, room_data *location) {
 	struct empire_unique_storage *iter;
 	
-	if (!emp || !obj) {
+	if (!obj) {
 		return NULL;
 	}
 	
-	for (iter = EMPIRE_UNIQUE_STORAGE(emp); iter; iter = iter->next) {
+	LL_FOREACH(list, iter) {
 		if (location && GET_ISLAND_ID(location) != iter->island) {
 			continue;
 		}
-		if (location && room_has_function_and_city_ok(location, FNC_VAULT) && !IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && !IS_SET(iter->flags, EUS_VAULT) && room_has_function_and_city_ok(location, FNC_VAULT)) {
 			continue;
 		}
-		if (location && !room_has_function_and_city_ok(location, FNC_VAULT) && IS_SET(iter->flags, EUS_VAULT)) {
+		if (location && IS_SET(iter->flags, EUS_VAULT) && !room_has_function_and_city_ok(location, FNC_VAULT)) {
 			continue;
 		}
 		
@@ -9001,43 +9100,29 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, empire_data *emp, ro
 
 
 /**
-* Removes a unique object entry from a local list and from the global list.
-*
-* @param struct empire_unique_storage *eus The item to remove.
-* @param empire_data *emp The empire to remove from.
-*/
-void remove_eus_entry(struct empire_unique_storage *eus, empire_data *emp) {
-	struct empire_unique_storage *temp;
-	
-	if (!eus || !emp) {
-		return;
-	}
-	
-	REMOVE_FROM_LIST(eus, EMPIRE_UNIQUE_STORAGE(emp), next);
-	
-	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
-	free(eus);
-}
-
-
-/**
-* Store a unique item to an empire. The object MAY be extracted.
+* Store a unique item to an empire. The object MAY be extracted. If save_emp
+* is NULL, it assumes you're saving character home storage instead of empire
+* warehouse storage.
 *
 * @param char_data *ch Person doing the storing (may be NULL; sends messages if not).
+* @param struct empire_unique_storage **to_list Where to store it to (empire or home storage).
 * @param obj_data *obj The unique item to store.
-* @param empire_data *emp The empire to store to.
-* @param room_data *room The location being store (for vault flag detection).
+* @param empire_data *save_emp The empire to save, if this is empire storage. If NULL, assumes home storage.
+* @param room_data *room The location being stored (for vault flag detection).
 * @param bool *full A variable to set TRUE if the storage is full and the item can't be stored.
 */
-void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data *room, bool *full) {
+void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, obj_data *obj, empire_data *save_emp, room_data *room, bool *full) {
+	EVENT_CANCEL_FUNC(cancel_wait_event);
 	extern int get_main_island(empire_data *emp);
+	void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
 	
 	struct empire_unique_storage *eus;
 	bool extract = FALSE;
+	trig_data *trig;
 	
 	*full = FALSE;
 	
-	if (!obj || !emp) {
+	if (!obj || !to_list) {
 		return;
 	}
 	
@@ -9051,8 +9136,9 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_CONTENTS) = 0;
 		GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 	}
-
-	if ((eus = find_eus_entry(obj, emp, room))) {
+	
+	// existing eus entry or new one? only passes 'room' if it's an empire; player storage is global
+	if ((eus = find_eus_entry(obj, *to_list, save_emp ? room : NULL))) {
 		// check limits
 		if (eus->amount >= MAX_STORAGE) {
 			*full = TRUE;
@@ -9066,32 +9152,51 @@ void store_unique_item(char_data *ch, obj_data *obj, empire_data *emp, room_data
 	else {
 		// new entry
 		CREATE(eus, struct empire_unique_storage, 1);
-		add_eus_entry(eus, emp);
+		LL_PREPEND(*to_list, eus);
 		check_obj_in_void(obj);
 		eus->obj = obj;
 		eus->amount = 1;
-		eus->island = room ? GET_ISLAND_ID(room) : NO_ISLAND;
-		if (eus->island == NO_ISLAND) {
-			eus->island = get_main_island(emp);
+		eus->island = (save_emp && room) ? GET_ISLAND_ID(room) : NO_ISLAND;
+		if (save_emp && eus->island == NO_ISLAND) {
+			eus->island = get_main_island(save_emp);
 		}
-		if (room && room_has_function_and_city_ok(room, FNC_VAULT)) {
+		if (save_emp && room && room_has_function_and_city_ok(room, FNC_VAULT)) {
 			eus->flags = EUS_VAULT;
 		}
 			
 		// get it out of the object list
 		remove_from_object_list(obj);
+		
+		// cancel running trigs and shut off random trigs
+		if (SCRIPT(obj)) {
+			LL_FOREACH(TRIGGERS(SCRIPT(obj)), trig) {
+				remove_trigger_from_global_lists(trig, TRUE);
+				
+				if (GET_TRIG_WAIT(trig)) {
+					dg_event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
+					GET_TRIG_WAIT(trig) = NULL;
+					GET_TRIG_DEPTH(trig) = 0;
+					free_varlist(GET_TRIG_VARS(trig));
+					GET_TRIG_VARS(trig) = NULL;
+					trig->curr_state = NULL;
+				}
+			}
+		}
 	}
 	
 	if (ch) {
 		act("You store $p.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		act("$n stores $p.", FALSE, ch, obj, NULL, TO_ROOM | TO_QUEUE);
+		queue_delayed_update(ch, CDU_SAVE);
 	}
 	
 	if (extract) {
 		extract_obj(obj);
 	}
 	
-	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
+	if (save_emp) {
+		EMPIRE_NEEDS_STORAGE_SAVE(save_emp) = TRUE;
+	}
 }
 
 
@@ -9314,7 +9419,10 @@ void extract_vehicle(vehicle_data *veh) {
 		unharness_mob_from_vehicle(VEH_ANIMALS(veh), veh);
 	}
 	
-	LL_DELETE2(vehicle_list, veh, next);
+	// ensure it's (probably) in the list first
+	if (vehicle_list && (vehicle_list == veh || veh->prev || veh->next)) {
+		DL_DELETE(vehicle_list, veh);
+	}
 	free_vehicle(veh);
 }
 
@@ -9359,7 +9467,7 @@ void vehicle_from_room(vehicle_data *veh) {
 		return;
 	}
 	
-	LL_DELETE2(ROOM_VEHICLES(IN_ROOM(veh)), veh, next_in_room);
+	DL_DELETE2(ROOM_VEHICLES(IN_ROOM(veh)), veh, prev_in_room, next_in_room);
 	IN_ROOM(veh) = NULL;
 }
 
@@ -9382,7 +9490,7 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 		vehicle_from_room(veh);
 	}
 	
-	LL_PREPEND2(ROOM_VEHICLES(room), veh, next_in_room);
+	DL_PREPEND2(ROOM_VEHICLES(room), veh, prev_in_room, next_in_room);
 	IN_ROOM(veh) = room;
 	VEH_LAST_MOVE_TIME(veh) = time(0);
 	
@@ -9420,7 +9528,7 @@ vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, cha
 		return (NULL);
 	}
 	
-	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
 		if (!isname(tmp, VEH_KEYWORDS(iter))) {
 			continue;
 		}
@@ -9463,7 +9571,7 @@ vehicle_data *get_vehicle_vis(char_data *ch, char *name) {
 		return (NULL);
 	}
 	
-	LL_FOREACH2(vehicle_list, iter, next) {
+	DL_FOREACH(vehicle_list, iter) {
 		if (!isname(tmp, VEH_KEYWORDS(iter))) {
 			continue;
 		}
@@ -9501,7 +9609,7 @@ vehicle_data *get_vehicle_room(room_data *room, char *name) {
 		return (NULL);
 	}
 	
-	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
 		if (!isname(tmp, VEH_KEYWORDS(iter))) {
 			continue;
 		}
@@ -9535,7 +9643,7 @@ vehicle_data *get_vehicle_world(char *name) {
 		return (NULL);
 	}
 	
-	LL_FOREACH2(vehicle_list, iter, next) {
+	DL_FOREACH(vehicle_list, iter) {
 		if (!isname(tmp, VEH_KEYWORDS(iter))) {
 			continue;
 		}

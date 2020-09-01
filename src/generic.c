@@ -1020,7 +1020,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	}
 	
 	// remove from live lists: player currencies
-	LL_FOREACH(character_list, chiter) {
+	DL_FOREACH(character_list, chiter) {
 		if (IS_NPC(chiter)) {
 			continue;
 		}
@@ -1029,12 +1029,23 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 			if (cur->vnum == vnum) {
 				HASH_DEL(GET_CURRENCIES(chiter), cur);
 				free(cur);
+				queue_delayed_update(chiter, CDU_SAVE);
 			}
 		}
+		LL_FOREACH(GET_HOME_STORAGE(chiter), eus) {
+			if (!eus->obj) {
+				continue;
+			}
+			if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(eus->obj) && GET_DRINK_CONTAINER_TYPE(eus->obj) == vnum) {
+				GET_OBJ_VAL(eus->obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
+				queue_delayed_update(chiter, CDU_SAVE);
+			}
+		}
+	
 	}
 	
 	// remove from live lists: drink containers
-	LL_FOREACH(object_list, obj) {
+	DL_FOREACH(object_list, obj) {
 		if (GEN_TYPE(gen) == GENERIC_LIQUID && IS_DRINK_CONTAINER(obj) && GET_DRINK_CONTAINER_TYPE(obj) == vnum) {
 			GET_OBJ_VAL(obj, VAL_DRINK_CONTAINER_TYPE) = LIQ_WATER;
 		}
@@ -1090,7 +1101,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	}
 	
 	// remove from live resource lists: vehicle maintenance
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_NEEDS_RESOURCES(veh)) {
 			remove_thing_from_resource_list(&VEH_NEEDS_RESOURCES(veh), res_type, vnum);
 			
@@ -1399,7 +1410,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 		need_progress_refresh = TRUE;
 	}
 	if (any_quest) {
-		LL_FOREACH_SAFE(character_list, chiter, next_ch) {
+		DL_FOREACH_SAFE(character_list, chiter, next_ch) {
 			if (!IS_NPC(chiter)) {
 				refresh_all_quests(chiter);
 			}

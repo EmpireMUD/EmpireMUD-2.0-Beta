@@ -550,8 +550,7 @@ LIBRARY_SCMD(library_shelve) {
 				send_to_char("You don't seem to be carrying anything.\r\n", ch);
 			}
 			else {
-				for (obj = ch->carrying; obj; obj = next_obj) {
-					next_obj = obj->next_content;
+				DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 					if (!OBJ_FLAGGED(obj, OBJ_KEEP) && IS_BOOK(obj)) {
 						amount += perform_shelve(ch, obj);
 						found = TRUE;
@@ -791,10 +790,11 @@ void process_reading(char_data *ch) {
 	struct paragraph_data *para;
 	int pos;
 	
-	for (obj = ch->carrying; obj && !found; obj = obj->next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		if (IS_BOOK(obj) && GET_BOOK_ID(obj) == GET_ACTION_VNUM(ch, 0)) {
 			found_obj = obj;	// save for later
 			found = TRUE;
+			break;
 		}
 	}
 	

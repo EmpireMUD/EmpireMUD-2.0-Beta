@@ -198,7 +198,7 @@ ACMD(do_maggro) {
 	}
 	
 	// if we got here, we missed the victim -- look for his allies
-	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
 		if (iter == ch || is_fight_ally(ch, iter)) {
 			continue;
 		}
@@ -218,7 +218,7 @@ ACMD(do_maggro) {
 	}
 	
 	// okay, look for a broader target
-	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
 		if (iter == ch || is_fight_ally(ch, iter)) {
 			continue;
 		}
@@ -364,8 +364,7 @@ ACMD(do_mjunk) {
 		return;
 	}
 	else {
-		for (obj = ch->carrying; obj != NULL; obj = obj_next) {
-			obj_next = obj->next_content;
+		DL_FOREACH_SAFE2(ch->carrying, obj, obj_next, next_content) {
 			// "all" or "all.name ?
 			if (arg[3] == '\0' || isname(arg+4, obj->name)) {
 				extract_obj(obj);
@@ -460,8 +459,8 @@ ACMD(do_mechoneither) {
 		mob_log(ch, "mechoneither: vict 2 (%s) does not exist", arg2);
 		return;
 	}
-
-	for (iter = ROOM_PEOPLE(IN_ROOM(vict1)); iter; iter = iter->next_in_room) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(vict1)), iter, next_in_room) {
 		if (iter->desc && iter != vict1 && iter != vict2) {
 			sub_write(p, iter, TRUE, TO_CHAR);
 		}
@@ -923,15 +922,13 @@ ACMD(do_mpurge) {
 		/* 'purge' */
 		char_data *vnext;
 		obj_data *obj_next;
-
-		for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim; victim = vnext) {
-			vnext = victim->next_in_room;
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, vnext, next_in_room) {
 			if (IS_NPC(victim) && victim != ch)
 				extract_char(victim);
 		}
-
-		for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = obj_next) {
-			obj_next = obj->next_content;
+		
+		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, obj_next, next_content) {
 			extract_obj(obj);
 		}
 
@@ -1225,6 +1222,7 @@ ACMD(do_mrestore) {
 		if (GET_POS(victim) < POS_SLEEPING) {
 			GET_POS(victim) = POS_STANDING;
 		}
+		affect_total(victim);
 		GET_HEALTH(victim) = GET_MAX_HEALTH(victim);
 		GET_MOVE(victim) = GET_MAX_MOVE(victim);
 		GET_MANA(victim) = GET_MAX_MANA(victim);
@@ -1291,10 +1289,8 @@ ACMD(do_mteleport) {
 			mob_log(ch, "mteleport all target is itself");
 			return;
 		}
-
-		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_ch) {
-			next_ch = vict->next_in_room;
-
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_ch, next_in_room) {
 			if (valid_dg_target(vict, DG_ALLOW_GODS)) {
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
@@ -1315,9 +1311,7 @@ ACMD(do_mteleport) {
 		for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 			// only if it's not the target room, or we'd be here all day
 			if (INST_ROOM(inst, iter) && INST_ROOM(inst, iter) != target) {
-				for (vict = ROOM_PEOPLE(INST_ROOM(inst, iter)); vict; vict = next_ch) {
-					next_ch = vict->next_in_room;
-					
+			    DL_FOREACH_SAFE2(ROOM_PEOPLE(INST_ROOM(inst, iter)), vict, next_ch, next_in_room) {
 					if (!valid_dg_target(vict, DG_ALLOW_GODS)) {
 						continue;
 					}
@@ -1573,7 +1567,7 @@ ACMD(do_maoe) {
 	modifier = scale_modifier_by_mob(ch, modifier);
 	
 	level = get_approximate_level(ch);
-	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_vict, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_vict, next_in_room) {
 		if (ch == vict) {
 			continue;
 		}
@@ -1868,7 +1862,7 @@ ACMD(do_mforget) {
 	mem = SCRIPT_MEM(ch);
 	prev = NULL;
 	while (mem) {
-		if (mem->id == char_script_id(victim)) {
+		if (mem->id == victim->script_id) {
 			if (mem->cmd)
 				free(mem->cmd);
 			if (prev==NULL) {
@@ -1995,11 +1989,11 @@ ACMD(do_mslay) {
 /* transform into a different mobile */
 ACMD(do_mtransform) {
 	char arg[MAX_INPUT_LENGTH];
-	char_data *m, tmpmob;
-	obj_data *obj[NUM_WEARS];
-	mob_vnum this_vnum = GET_MOB_VNUM(ch);
-	bool keep_attr = TRUE; // new mob keeps the old mob's h/v/m/b
-	int pos, iter;
+	// char_data *m, tmpmob;
+	// obj_data *obj[NUM_WEARS];
+	// mob_vnum this_vnum = GET_MOB_VNUM(ch);
+	// bool keep_attr = TRUE; // new mob keeps the old mob's h/v/m/b
+	// int pos, iter;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -2024,6 +2018,7 @@ ACMD(do_mtransform) {
 	else if (!isdigit(*arg) && *arg != '-')
 		mob_log(ch, "mtransform: bad argument");
 	else {
+		/* none of this will work
 		if (isdigit(*arg))
 			m = read_mobile(atoi(arg), TRUE);
 		else {
@@ -2042,7 +2037,7 @@ ACMD(do_mtransform) {
 		
 		setup_generic_npc(m, GET_LOYALTY(ch), MOB_DYNAMIC_NAME(ch), MOB_DYNAMIC_SEX(ch));
 
-		/* move new obj info over to old object and delete new obj */
+		// move new obj info over to old object and delete new obj
 
 		for (pos = 0; pos < NUM_WEARS; pos++) {
 			if (GET_EQ(ch, pos))
@@ -2051,9 +2046,9 @@ ACMD(do_mtransform) {
 				obj[pos] = NULL;
 		}
 
-		/* put the mob in the same room as ch so extract will work */
+		// put the mob in the same room as ch so extract will work
 		char_to_room(m, IN_ROOM(ch));
-
+		
 		memcpy(&tmpmob, m, sizeof(*m));
 		tmpmob.script_id = ch->script_id;
 		tmpmob.affected = ch->affected;
@@ -2061,9 +2056,6 @@ ACMD(do_mtransform) {
 		tmpmob.proto_script = ch->proto_script;
 		tmpmob.script = ch->script;
 		tmpmob.memory = ch->memory;
-		tmpmob.next_in_room = ch->next_in_room;
-		tmpmob.next = ch->next;
-		tmpmob.next_fighting = ch->next_fighting;
 		tmpmob.followers = ch->followers;
 		tmpmob.master = ch->master;
 		tmpmob.cooldowns = ch->cooldowns;
@@ -2087,6 +2079,7 @@ ACMD(do_mtransform) {
 
 		ch->vnum = this_vnum;
 		extract_char(m);
+		*/
 	}
 }
 

@@ -783,7 +783,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "history", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, SCMD_HISTORY ),
 	SCMD_CMD( "hit", POS_FIGHTING, do_hit, NO_MIN, CTYPE_COMBAT, SCMD_HIT ),
 	SIMPLE_CMD( "hold", POS_RESTING, do_grab, NO_MIN, CTYPE_UTIL ),
-	SIMPLE_CMD( "home", POS_SLEEPING, do_home, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "home", POS_DEAD, do_home, NO_MIN, CTYPE_MOVE ),
 	STANDARD_CMD( "hone", POS_STANDING, do_gen_augment, NO_MIN, NO_GRANTS, AUGMENT_HONE, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "hostile", POS_DEAD, do_hostile, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_HOSTILE ),
 	ABILITY_CMD( "howl", POS_FIGHTING, do_howl, NO_MIN, CTYPE_SKILL, ABIL_HOWL ),
@@ -2197,10 +2197,8 @@ int perform_dupe_check(descriptor_data *d) {
 	 * choose one if one is available (while still deleting the other
 	 * duplicates, though theoretically none should be able to exist).
 	 */
-
-	for (ch = character_list; ch; ch = next_ch) {
-		next_ch = ch->next;
-
+	
+	DL_FOREACH_SAFE(character_list, ch, next_ch) {
 		if (IS_NPC(ch))
 			continue;
 		if (GET_IDNUM(ch) != id)
@@ -2314,8 +2312,10 @@ void nanny(descriptor_data *d, char *arg) {
 	void display_automessages_on_login(char_data *ch);
 	void display_tip_to_char(char_data *ch);
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
+	void free_loaded_players();
 	extern int isbanned(char *hostname);
 	extern int num_earned_bonus_traits(char_data *ch);
+	void run_delayed_refresh();
 	void start_new_character(char_data *ch);
 	extern int Valid_Name(char *newname);
 	
@@ -2338,6 +2338,10 @@ void nanny(descriptor_data *d, char *arg) {
 
 	switch (STATE(d)) {
 		case CON_GET_NAME: {	/* wait for input of name */
+			// ensure no characters are loaded/pending anything before loading one here
+			run_delayed_refresh();
+			free_loaded_players();
+			
 			if (d->character == NULL) {
 				CREATE(d->character, char_data, 1);
 				clear_char(d->character);

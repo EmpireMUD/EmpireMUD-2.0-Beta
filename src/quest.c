@@ -123,7 +123,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 				break;
 			}
 			case QG_MOBILE: {
-				LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 					if (IS_NPC(mob) && GET_MOB_VNUM(mob) == giver->vnum && CAN_SEE(ch, mob)) {
 						*giver_emp = GET_LOYALTY(mob);
 						return TRUE;
@@ -132,13 +132,13 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 				break;
 			}
 			case QG_OBJECT: {
-				LL_FOREACH2(ch->carrying, obj, next_content) {
+				DL_FOREACH2(ch->carrying, obj, next_content) {
 					if (GET_OBJ_VNUM(obj) == giver->vnum && CAN_SEE_OBJ(ch, obj)) {
 						*giver_emp = GET_LOYALTY(ch);
 						return TRUE;
 					}
 				}
-				LL_FOREACH2(ROOM_CONTENTS(loc), obj, next_content) {
+				DL_FOREACH2(ROOM_CONTENTS(loc), obj, next_content) {
 					if (GET_OBJ_VNUM(obj) == giver->vnum && CAN_SEE_OBJ(ch, obj)) {
 						*giver_emp = CAN_WEAR(obj, ITEM_WEAR_TAKE) ? GET_LOYALTY(ch) : ROOM_OWNER(loc);
 						return TRUE;
@@ -153,7 +153,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 				break;
 			}
 			case QG_VEHICLE: {
-				LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+				DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 					if (VEH_VNUM(veh) == giver->vnum && CAN_SEE_VEHICLE(ch, veh)) {
 						*giver_emp = VEH_OWNER(veh);
 						return TRUE;
@@ -219,7 +219,7 @@ int count_crop_variety_in_list(obj_data *list) {
 	};
 	struct tmp_crop_data *tcd, *next_tcd, *hash = NULL;
 	
-	LL_FOREACH2(list, obj, next_content) {
+	DL_FOREACH2(list, obj, next_content) {
 		if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
 			continue;
 		}
@@ -380,7 +380,7 @@ int count_owned_vehicles(empire_data *emp, any_vnum vnum) {
 		return count;
 	}
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
 			continue;
 		}
@@ -411,7 +411,7 @@ int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags) {
 		return count;
 	}
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
 			continue;
 		}
@@ -444,7 +444,7 @@ int count_quest_components(char_data *ch, any_vnum cmp_vnum, bool skip_keep) {
 		return 0;	// no component = nothing to count
 	}
 	
-	LL_FOREACH2(ch->carrying, obj, next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		if (skip_keep && OBJ_FLAGGED(obj, OBJ_KEEP)) {
 			continue;
 		}
@@ -471,7 +471,7 @@ int count_quest_objects(char_data *ch, obj_vnum vnum, bool skip_keep) {
 	obj_data *obj;
 	int count = 0;
 	
-	LL_FOREACH2(ch->carrying, obj, next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		if (GET_OBJ_VNUM(obj) != vnum) {
 			continue;
 		}
@@ -538,7 +538,7 @@ void extract_crop_variety(char_data *ch, int amount) {
 	};
 	struct tmp_crop_data *tcd, *next_tcd, *hash = NULL;
 	
-	LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
 			continue;
 		}
@@ -1201,7 +1201,7 @@ void remove_quest_items(char_data *ch) {
 		}
 	}
 	
-	LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !is_on_quest(ch, GET_OBJ_REQUIRES_QUEST(obj))) {
 			act("You lose $p because you are not on the right quest.", FALSE, ch, obj, NULL, TO_CHAR);
 			extract_obj(obj);
@@ -1234,7 +1234,7 @@ void remove_quest_items_by_quest(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
-	LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (GET_OBJ_REQUIRES_QUEST(obj) == vnum) {
 			extract_obj(obj);
 		}
@@ -1547,7 +1547,7 @@ void update_mob_quest_lookups(mob_vnum vnum) {
 		return;
 	}
 	
-	LL_FOREACH(character_list, mob) {
+	DL_FOREACH(character_list, mob) {
 		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == vnum) {
 			// re-set the pointer
 			MOB_QUEST_LOOKUPS(mob) = MOB_QUEST_LOOKUPS(proto);
@@ -1567,7 +1567,7 @@ void update_veh_quest_lookups(any_vnum vnum) {
 		return;
 	}
 	
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_VNUM(veh) == vnum) {
 			// re-set the pointer
 			VEH_QUEST_LOOKUPS(veh) = VEH_QUEST_LOOKUPS(proto);
@@ -2595,7 +2595,7 @@ void qt_event_start_stop(any_vnum event_vnum) {
 	struct req_data *task;
 	char_data *ch;
 	
-	LL_FOREACH(character_list, ch) {
+	DL_FOREACH(character_list, ch) {
 		if (IS_NPC(ch)) {
 			continue;
 		}
@@ -4612,7 +4612,7 @@ void olc_delete_quest(char_data *ch, any_vnum vnum) {
 	remove_quest_from_table(quest);
 	
 	// look for people on the quest and force a refresh
-	LL_FOREACH(character_list, chiter) {
+	DL_FOREACH(character_list, chiter) {
 		if (IS_NPC(chiter)) {
 			continue;
 		}

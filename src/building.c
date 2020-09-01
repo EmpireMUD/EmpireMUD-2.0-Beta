@@ -166,7 +166,7 @@ void complete_building(room_data *room) {
 	
 	// check mounted people
 	if (!BLD_ALLOWS_MOUNTS(room)) {
-		for (ch = ROOM_PEOPLE(room); ch; ch = ch->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
 			if (IS_RIDING(ch)) {
 				msg_to_char(ch, "You jump down from your mount.\r\n");
 				act("$n jumps down from $s mount.", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -322,7 +322,6 @@ void disassociate_building(room_data *room) {
 	void delete_instance(struct instance_data *inst, bool run_cleanup);
 	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
-	void remove_designate_objects(room_data *room);
 	
 	sector_data *old_sect = SECT(room);
 	bool was_large, junk;
@@ -423,7 +422,6 @@ void disassociate_building(room_data *room) {
 		
 		if (HOME_ROOM(iter) == room && iter != room) {
 			dismantle_wtrigger(iter, NULL, FALSE);
-			remove_designate_objects(iter);
 			
 			// move people and contents
 			while ((temp_ch = ROOM_PEOPLE(iter))) {
@@ -594,7 +592,7 @@ void finish_building(char_data *ch, room_data *room) {
 	
 	msg_to_char(ch, "You complete the construction!\r\n");
 	act("$n has completed the construction!", FALSE, ch, 0, 0, TO_ROOM);
-	for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 		if (!IS_NPC(c) && GET_ACTION(c) == ACT_BUILDING) {
 			// if the player is loyal to the empire building here, gain skill
 			if (!emp || GET_LOYALTY(c) == emp) {
@@ -697,10 +695,8 @@ void herd_animals_out(room_data *location) {
 	// move everything out: the loop is because when 2 animals lead a wagon, next_ch can cause problems
 	do {
 		found_any = FALSE;
-
-		for (ch_iter = ROOM_PEOPLE(location); ch_iter; ch_iter = next_ch) {
-			next_ch = ch_iter->next_in_room;
 		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(location), ch_iter, next_ch, next_in_room) {
 			if (IS_NPC(ch_iter) && IN_ROOM(ch_iter) == location && !ch_iter->desc && !ch_iter->master && !AFF_FLAGGED(ch_iter, AFF_CHARM) && MOB_FLAGGED(ch_iter, MOB_ANIMAL) && GET_POS(ch_iter) >= POS_STANDING && !MOB_FLAGGED(ch_iter, MOB_TIED)) {
 				if (!herd_msg) {
 					act("The animals are herded out of the building...", FALSE, ROOM_PEOPLE(location), NULL, NULL, TO_CHAR | TO_ROOM);
@@ -947,32 +943,6 @@ void process_dismantling(char_data *ch, room_data *room) {
 
 
 /**
-* For do_designate: removes items from the room
-*
-* @param room_data *room The room to check for stray items.
-*/
-void remove_designate_objects(room_data *room) {
-	obj_data *o, *next_o;
-
-	// remove old objects
-	for (o = ROOM_CONTENTS(room); o; o = next_o) {
-		next_o = o->next_content;
-		
-		switch (BUILDING_VNUM(room)) {
-			case RTYPE_BEDROOM: {
-				if (GET_OBJ_VNUM(o) == o_HOME_CHEST) {
-					while (o->contains) {
-						obj_to_room(o->contains, room);
-					}
-					extract_obj(o);
-				}
-			}
-		}
-	}
-}
-
-
-/**
 * This removes an earlier entry (with the same component type) in a built-with
 * list. This is called during maintenance so that the newly-added resource will
 * replace an older one. Call this BEFORE adding the new resource to built-with.
@@ -1102,16 +1072,13 @@ void start_dismantle_building(room_data *loc) {
 		next_room = room->next_interior;
 		
 		if (HOME_ROOM(room) == loc) {
-			remove_designate_objects(room);
 			dismantle_wtrigger(room, NULL, FALSE);
 			delete_room_npcs(room, NULL, TRUE);
-		
-			for (obj = ROOM_CONTENTS(room); obj; obj = next_obj) {
-				next_obj = obj->next_content;
+			
+			DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
 				obj_to_room(obj, loc);
 			}
-			for (targ = ROOM_PEOPLE(room); targ; targ = next_targ) {
-				next_targ = targ->next_in_room;
+			DL_FOREACH_SAFE2(ROOM_PEOPLE(room), targ, next_targ, next_in_room) {
 				GET_LAST_DIR(targ) = NO_DIR;
 				char_from_room(targ);
 				char_to_room(targ, loc);
@@ -1814,7 +1781,6 @@ ACMD(do_designate) {
 	bld_data *bld, *next_bld;
 	char_data *vict;
 	bld_data *type;
-	obj_data *obj;
 	bool found;
 	
 	vehicle_data *veh = NULL;	// if this is set, we're doing a vehicle designate instead of building
@@ -1915,7 +1881,6 @@ ACMD(do_designate) {
 			// redesignate this room
 			new = IN_ROOM(ch);
 			
-			remove_designate_objects(new);
 			if (ROOM_OWNER(home) && (ter = find_territory_entry(ROOM_OWNER(home), new))) {
 				while (ter->npcs) {
 					make_citizen_homeless(ROOM_OWNER(home), ter->npcs);
@@ -1945,17 +1910,6 @@ ACMD(do_designate) {
 			}
 		}
 		
-		// add new objects
-		switch (GET_BLD_VNUM(type)) {
-			case RTYPE_BEDROOM: {
-				if (ROOM_PRIVATE_OWNER(HOME_ROOM(IN_ROOM(ch))) != NOBODY) {
-					obj_to_room((obj = read_object(o_HOME_CHEST, TRUE)), new);
-					load_otrigger(obj);
-				}
-				break;
-			}
-		}
-		
 		set_room_extra_data(new, ROOM_EXTRA_REDESIGNATE_TIME, time(0));
 
 		/* send messages */
@@ -1967,7 +1921,7 @@ ACMD(do_designate) {
 		else {
 			msg_to_char(ch, "You designate the %s %s as %s %s.\r\n", veh ? "area" : "room", dirs[get_direction_for_char(ch, dir)], AN(GET_BLD_NAME(type)), GET_BLD_NAME(type));
 			
-			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 				if (vict != ch && vict->desc) {
 					sprintf(buf, "$n designates the %s %s as %s %s.", veh ? "area" : "room", dirs[get_direction_for_char(vict, dir)], AN(GET_BLD_NAME(type)), GET_BLD_NAME(type));
 					act(buf, FALSE, ch, 0, vict, TO_VICT);

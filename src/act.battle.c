@@ -552,7 +552,7 @@ ACMD(do_kite) {
 	}
 	
 	// look for people hitting me
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 		if (vict == ch || FIGHTING(vict) != ch) {
 			continue;	// not hitting me
 		}
@@ -585,7 +585,7 @@ ACMD(do_kite) {
 	FIGHT_WAIT(ch) = 0;
 	
 	// move people hitting me out
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 		if (vict == ch || FIGHTING(vict) != ch) {
 			continue;	// not hitting me
 		}
@@ -633,9 +633,7 @@ ACMD(do_outrage) {
 		act("$n spins wildly with outrage, hitting everything in sight!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		found = FALSE;
-		for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim && (!found || GET_MOVE(ch) >= add_cost); victim = next_vict) {
-			next_vict = victim->next_in_room;
-			
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
 			if (victim == ch) {
 				continue;	// self
 			}
@@ -668,6 +666,11 @@ ACMD(do_outrage) {
 						gain_ability_exp(ch, ABIL_RESCUE, 15);
 					}
 				}
+				
+				// check if we could add any more, exit early if not
+				if (GET_MOVE(ch) < add_cost) {
+					break;
+				}
 			}
 		}
 		
@@ -692,7 +695,7 @@ ACMD(do_rescue) {
 	if (!*arg) {
 		// no-arg: rescue first group member who is getting hit
 		found = FALSE;
-		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !found; vict = vict->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 			if (vict == ch || !FIGHTING(vict) || IS_NPC(FIGHTING(vict)) || FIGHTING(vict) == ch || !in_same_group(ch, FIGHTING(vict))) {
 				continue;
 			}
@@ -711,7 +714,7 @@ ACMD(do_rescue) {
 			if (can_gain_exp_from(ch, vict)) {
 				gain_ability_exp(ch, ABIL_RESCUE, 15);
 			}
-			break;
+			break;	// only needed one
 		}
 		
 		if (!found) {
@@ -736,8 +739,12 @@ ACMD(do_rescue) {
 		msg_to_char(ch, "You need %d move points to do that.\r\n", cost);
 		return;
 	}
-
-	for (tmp_ch = ROOM_PEOPLE(IN_ROOM(ch)); tmp_ch && (FIGHTING(tmp_ch) != vict); tmp_ch = tmp_ch->next_in_room);
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), tmp_ch, next_in_room) {
+		if (FIGHTING(tmp_ch) == vict) {
+			break;	// found!
+		}
+	}
 
 	if (!tmp_ch) {
 		act("But nobody is fighting $M!", FALSE, ch, 0, vict, TO_CHAR);

@@ -673,7 +673,7 @@ void chore_update(void) {
 				next_ter = global_next_territory_entry;
 			}
 			
-			LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+			DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 				if (VEH_OWNER(veh) == emp) {
 					process_one_vehicle_chore(emp, veh);
 				}
@@ -699,7 +699,7 @@ void deactivate_workforce(empire_data *emp, int island_id, int type) {
 	char_data *mob, *next_mob;
 	
 	if (chore_data[type].mob != NOTHING) {
-		for (mob = character_list; mob; mob = next_mob) {
+		DL_FOREACH_SAFE(character_list, mob, next_mob) {
 			next_mob = mob->next;
 		
 			if (!IS_NPC(mob) || GET_LOYALTY(mob) != emp) {
@@ -736,7 +736,7 @@ void deactivate_workforce_island(empire_data *emp, int island_id) {
 	bool found;
 	int iter;
 	
-	LL_FOREACH_SAFE(character_list, mob, next_mob) {
+	DL_FOREACH_SAFE(character_list, mob, next_mob) {
 		if (!IS_NPC(mob) || GET_LOYALTY(mob) != emp || FIGHTING(mob)) {
 			continue;
 		}
@@ -771,9 +771,7 @@ void deactivate_workforce_room(empire_data *emp, room_data *room) {
 	int iter;
 	bool match;
 	
-	for (mob = ROOM_PEOPLE(room); mob; mob = next_mob) {
-		next_mob = mob->next_in_room;
-		
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(room), mob, next_mob, next_in_room) {
 		if (IS_NPC(mob) && GET_MOB_VNUM(mob) != NOTHING) {
 			// check it's a workforce mob
 			match = FALSE;
@@ -842,7 +840,7 @@ char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum) {
 		return NULL;
 	}
 	
-	for (mob = ROOM_PEOPLE(room); mob; mob = mob->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), mob, next_in_room) {
 		// not our mob
 		if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum) {
 			continue;
@@ -2304,7 +2302,7 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 
 
 void do_chore_minting(empire_data *emp, room_data *room) {
-	struct empire_storage_data *highest, *store, *next_store;
+	struct empire_storage_data *highest = NULL, *store, *next_store;
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_MINTING].mob);
 	int high_amt, limit, islid = GET_ISLAND_ID(room);
 	struct empire_island *eisle = get_empire_island(emp, islid);
@@ -2367,6 +2365,9 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 	}
 	else if (worker) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else if (!highest) {
+		log_workforce_problem(emp, room, CHORE_MINTING, WF_PROB_NO_RESOURCES, FALSE);
 	}
 	else {
 		mark_workforce_delay(emp, room, CHORE_MINTING, WF_PROB_OVER_LIMIT);
@@ -2489,7 +2490,11 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 	bool found;
 
 	// find something shearable
-	for (mob = ROOM_PEOPLE(room); mob && !shearable; mob = mob->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), mob, next_in_room) {
+		if (shearable) {
+			break;	// found 1? exit early
+		}
+		
 		// would its shearing timer be up?
 		if (IS_NPC(mob)) {
 			if (get_cooldown_time(mob, COOLDOWN_SHEAR) > 0) {

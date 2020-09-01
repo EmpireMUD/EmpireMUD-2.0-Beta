@@ -217,7 +217,7 @@ void stop_room_action(room_data *room, int action, int chore) {
 	
 	char_data *c;
 	
-	for (c = ROOM_PEOPLE(room); c; c = c->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), c, next_in_room) {
 		// player actions
 		if (action != NOTHING && !IS_NPC(c) && GET_ACTION(c) == action) {
 			cancel_action(c);
@@ -407,27 +407,40 @@ bool do_crop_forage(char_data *ch) {
 
 
 /**
-* Finds a tool equipped by the character.
+* Finds a tool equipped by the character. Returns the best one.
 *
 * @param char_data *ch The person who might have the tool.
 * @param bitvector_t flags The TOOL_ flags required -- player must have ONE of these flags (see has_all_tools).
 * @return obj_data* The character's equipped tool, or NULL if they have none.
 */
 obj_data *has_tool(char_data *ch, bitvector_t flags) {
-	obj_data *tool;
+	obj_data *tool, *best_tool = NULL;
 	int iter;
 	
-	// list of valid slots (in order of priority; terminate with -1
-	int slots[] = { WEAR_TOOL, WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
+	// prefer tool slot
+	if (GET_EQ(ch, WEAR_TOOL) && TOOL_FLAGGED(GET_EQ(ch, WEAR_TOOL), flags)) {
+		best_tool = GET_EQ(ch, WEAR_TOOL);
+	}
 	
-	for (iter = 0; slots[iter] != -1; ++iter) {
-		tool = GET_EQ(ch, slots[iter]);
-		if (tool && TOOL_FLAGGED(tool, flags)) {
-			return tool;
+	// then check other slots
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (iter == WEAR_TOOL || iter == WEAR_SHARE) {
+			continue;	// skip tool/share slots
+		}
+		if (!(tool = GET_EQ(ch, iter))) {
+			continue;	// no item
+		}
+		if (!TOOL_FLAGGED(tool, flags)) {
+			continue;	// not flagged
+		}
+		
+		// ok! try to see if it's better
+		if (!best_tool || OBJ_FLAGGED(tool, OBJ_SUPERIOR) || (!OBJ_FLAGGED(best_tool, OBJ_SUPERIOR) && GET_OBJ_CURRENT_SCALE_LEVEL(tool) > GET_OBJ_CURRENT_SCALE_LEVEL(best_tool))) {
+			best_tool = tool;	// it seems better
 		}
 	}
 	
-	return NULL;
+	return best_tool;	// if any
 }
 
 
@@ -443,11 +456,18 @@ obj_data *has_all_tools(char_data *ch, bitvector_t flags) {
 	bitvector_t to_find = flags;
 	int iter;
 	
-	// list of valid slots (in order of priority; terminate with -1
-	int slots[] = { WEAR_TOOL, WEAR_WIELD, WEAR_HOLD, WEAR_SHEATH_1, WEAR_SHEATH_2, -1 };
+	// prefer tool slot
+	if (GET_EQ(ch, WEAR_TOOL) && TOOL_FLAGGED(GET_EQ(ch, WEAR_TOOL), flags)) {
+		best_tool = GET_EQ(ch, WEAR_TOOL);
+		REMOVE_BIT(to_find, GET_OBJ_TOOL_FLAGS(best_tool));
+	}
 	
-	for (iter = 0; to_find && slots[iter] != -1; ++iter) {
-		tool = GET_EQ(ch, slots[iter]);
+	for (iter = 0; to_find && iter < NUM_WEARS; ++iter) {
+		if (iter == WEAR_TOOL || iter == WEAR_SHARE) {
+			continue;	// skip tool/share slots
+		}
+		
+		tool = GET_EQ(ch, iter);
 		if (tool && TOOL_FLAGGED(tool, flags)) {
 			// it has 1 or more of the flags (original, not remaining flags): try to see if it's better
 			if (!best_tool || OBJ_FLAGGED(tool, OBJ_SUPERIOR) || (!OBJ_FLAGGED(best_tool, OBJ_SUPERIOR) && GET_OBJ_CURRENT_SCALE_LEVEL(tool) > GET_OBJ_CURRENT_SCALE_LEVEL(best_tool))) {
@@ -1525,7 +1545,7 @@ void process_chop(char_data *ch) {
 		
 		// stoppin choppin -- don't use stop_room_action because we also restart them
 		// (this includes ch)
-		for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter; ch_iter = ch_iter->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 			if (!IS_NPC(ch_iter) && GET_ACTION(ch_iter) == ACT_CHOPPING) {
 				cancel_action(ch_iter);
 				start_chopping(ch_iter);
@@ -1585,7 +1605,7 @@ void process_digging(char_data *ch) {
 	}
 	
 	// look for earthmelders
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 		if (!AFF_FLAGGED(iter, AFF_EARTHMELD)) {
 			continue;
 		}
@@ -1703,7 +1723,7 @@ void process_excavating(char_data *ch) {
 	}
 	
 	// look for earthmelders
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 		if (!AFF_FLAGGED(iter, AFF_EARTHMELD)) {
 			continue;
 		}

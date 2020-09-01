@@ -554,9 +554,7 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	if (check_exits) {
 		// search world for portals that link here
-		for (o = object_list; o; o = next_o) {
-			next_o = o->next;
-		
+		DL_FOREACH_SAFE(object_list, o, next_o) {
 			if (IS_PORTAL(o) && GET_PORTAL_TARGET_VNUM(o) == GET_ROOM_VNUM(room)) {
 				if (IN_ROOM(o) && ROOM_PEOPLE(IN_ROOM(o))) {
 					act("$p closes and vanishes!", FALSE, ROOM_PEOPLE(IN_ROOM(o)), o, NULL, TO_CHAR | TO_ROOM);
@@ -581,7 +579,7 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// get rid of vehicles
-	LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
 		extract_vehicle(veh);
 	}
 	
@@ -595,9 +593,7 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// Remove remaining chars
-	for (c = ROOM_PEOPLE(room); c; c = next_c) {
-		next_c = c->next_in_room;
-		
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(room), c, next_c, next_in_room) {
 		if (!extraction_room) {
 			extraction_room = get_extraction_room();
 		}
@@ -1368,7 +1364,7 @@ void annual_world_update(void) {
 		annual_update_depletions(&ROOM_DEPLETION(room));
 	}
 	
-	LL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		annual_update_vehicle(veh);
 	}
 	
@@ -1559,7 +1555,7 @@ EVENTFUNC(burn_down_event) {
 		if (ROOM_PEOPLE(room)) {
 			act("The building collapses in flames around you!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
-		LL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 			if (!IS_NPC(ch)) {
 				death_log(ch, ch, TYPE_SUFFERING);
 			}
@@ -1587,7 +1583,7 @@ EVENTFUNC(burn_down_event) {
 	disassociate_building(room);
 
 	// Destroy 50% of the objects
-	LL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
 		if (!number(0, 1)) {
 			extract_obj(obj);
 		}
@@ -2554,7 +2550,7 @@ void reread_empire_tech(empire_data *emp) {
 	read_empire_territory(emp, TRUE);
 	
 	// also read vehicles for tech/etc
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (emp && VEH_OWNER(veh) != emp) {
 			continue;	// only checking one
 		}
@@ -2902,9 +2898,7 @@ void check_all_exits(void) {
 	obj_data *o, *next_o;
 	
 	// search world for portals that link to bad rooms
-	for (o = object_list; o; o = next_o) {
-		next_o = o->next;
-		
+	DL_FOREACH_SAFE(object_list, o, next_o) {
 		if (IS_PORTAL(o) && !real_real_room(GET_PORTAL_TARGET_VNUM(o))) {
 			if (IN_ROOM(o) && ROOM_PEOPLE(IN_ROOM(o))) {
 				act("$p closes and vanishes!", FALSE, ROOM_PEOPLE(IN_ROOM(o)), o, NULL, TO_CHAR | TO_ROOM);
@@ -2985,20 +2979,14 @@ EVENTFUNC(check_unload_room) {
 * @param int id The player id to clear rooms for.
 */
 void clear_private_owner(int id) {
-	void remove_designate_objects(room_data *room);
 	room_data *iter, *next_iter;
 	obj_data *obj;
 	
 	// check interior rooms first
 	LL_FOREACH2(interior_room_list, iter, next_interior) {
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(iter)) == id) {
-			// TODO some way to generalize this, please
-			if (BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
-				remove_designate_objects(iter);
-			}
-			
 			// reset autostore timer
-			LL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
+			DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
 				GET_AUTOSTORE_TIMER(obj) = time(0);
 			}
 		}
@@ -3008,14 +2996,9 @@ void clear_private_owner(int id) {
 	HASH_ITER(hh, world_table, iter, next_iter) {
 		if (COMPLEX_DATA(iter) && ROOM_PRIVATE_OWNER(iter) == id) {
 			COMPLEX_DATA(iter)->private_owner = NOBODY;
-		
-			// TODO some way to generalize this, please
-			if (BUILDING_VNUM(iter) == RTYPE_BEDROOM) {
-				remove_designate_objects(iter);
-			}
 			
 			// reset autostore timer
-			LL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
+			DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
 				GET_AUTOSTORE_TIMER(obj) = time(0);
 			}
 		}
@@ -3431,7 +3414,7 @@ void ruin_one_building(room_data *room) {
 	}
 	
 	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
-	LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
 		if (!VEH_OWNER(veh) && !VEH_CONTAINS(veh)) {
 			extract_vehicle(veh);
 		}

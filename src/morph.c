@@ -869,7 +869,7 @@ void olc_delete_morph(char_data *ch, any_vnum vnum) {
 	}
 	
 	// un-morph everyone
-	LL_FOREACH_SAFE(character_list, chiter, next_ch) {
+	DL_FOREACH_SAFE(character_list, chiter, next_ch) {
 		if (IS_MORPHED(chiter) && MORPH_VNUM(GET_MORPH(chiter)) == vnum) {
 			finish_morphing(chiter, NULL);
 		}

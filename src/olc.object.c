@@ -494,7 +494,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	shop_data *shop, *next_shop;
 	empire_data *emp, *next_emp;
 	social_data *soc, *next_soc;
-	char_data *mob, *next_mob;
+	char_data *mob, *next_mob, *chiter;
 	adv_data *adv, *next_adv;
 	bld_data *bld, *next_bld;
 	descriptor_data *desc;
@@ -511,9 +511,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	}
 	
 	// remove live objects: DO THIS FIRST
-	for (obj_iter = object_list; obj_iter; obj_iter = next_obj) {
-		next_obj = obj_iter->next;
-		
+	DL_FOREACH_SAFE(object_list, obj_iter, next_obj) {
 		if (GET_OBJ_VNUM(obj_iter) == vnum) {
 			// this is the removed item
 			
@@ -527,6 +525,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				act("$p has been deleted.", FALSE, ROOM_PEOPLE(IN_ROOM(obj_iter)), obj_iter, NULL, TO_CHAR);
 			}
 			
+			empty_obj_before_extract(obj_iter);
 			extract_obj(obj_iter);
 		}
 	}
@@ -555,8 +554,15 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 	}
 	
+	// remove from home storage
+	DL_FOREACH(character_list, chiter) {
+		if (!IS_NPC(chiter) && delete_unique_storage_by_vnum(&GET_HOME_STORAGE(chiter), vnum)) {
+			queue_delayed_update(chiter, CDU_SAVE);
+		}
+	}
+	
 	// remove from live resource lists: vehicle maintenance
-	LL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_NEEDS_RESOURCES(veh)) {
 			remove_thing_from_resource_list(&VEH_NEEDS_RESOURCES(veh), RES_OBJECT, vnum);
 			
@@ -577,7 +583,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 		}
 		
-		if (delete_unique_storage_by_vnum(emp, vnum)) {
+		if (delete_unique_storage_by_vnum(&EMPIRE_UNIQUE_STORAGE(emp), vnum)) {
 			EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 		}
 		
@@ -1653,6 +1659,7 @@ void save_olc_object(descriptor_data *desc) {
 	struct empire_unique_storage *eus;
 	struct trading_post_data *tpd;
 	empire_data *emp, *next_emp;
+	char_data *chiter;
 	UT_hash_handle hh;
 	
 	// have a place to save it?
@@ -1661,9 +1668,20 @@ void save_olc_object(descriptor_data *desc) {
 	}
 	
 	// update the strings, pointers, and stats on live items
-	for (obj_iter = object_list; obj_iter; obj_iter = obj_iter->next) {
+	DL_FOREACH(object_list, obj_iter) {
 		if (GET_OBJ_VNUM(obj_iter) == vnum) {
 			update_live_obj_from_olc(obj_iter, proto, obj);
+		}
+	}
+	
+	// update objs in home storage
+	DL_FOREACH(character_list, chiter) {
+		if (!IS_NPC(chiter)) {
+			LL_FOREACH(GET_HOME_STORAGE(chiter), eus) {
+				if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
+					update_live_obj_from_olc(eus->obj, proto, obj);
+				}
+			}
 		}
 	}
 	

@@ -4129,6 +4129,8 @@ struct player_special_data {
 	struct minipet_data *minipets;	// collection of summonable pets
 	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
 	struct player_tech *techs;	// techs from abilities
+	struct empire_unique_storage *home_storage;	// items stored in the home
+	time_t last_home_set_time;	// how long ago the player used home-set (blocks home retrieve)
 	
 	// tracking for specific skills
 	byte confused_dir;  // people without Navigation think this dir is north
@@ -4280,12 +4282,13 @@ struct char_data {
 	descriptor_data *desc;	// NULL for mobiles
 
 	int script_id;	// used by DG triggers - unique id
+	bool in_lookup_table;	// if ch is in the script lookup table or not
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 	struct script_memory *memory;	// for mob memory triggers
 
-	char_data *next_in_room;	// For room->people - list
-	char_data *next;	// For either monster or ppl-list
+	char_data *prev_in_room, *next_in_room;	// For room->people - doubly-linked list
+	char_data *prev, *next;	// For character_list (doubly-linked)
 	char_data *next_fighting;	// For fighting list
 	
 	struct follow_type *followers;	// List of chars followers
@@ -5163,8 +5166,8 @@ struct obj_data {
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 
-	obj_data *next_content;	// For 'contains' lists
-	obj_data *next;	// For the object list
+	obj_data *prev_content, *next_content;	// For 'contains' doubly-linked lists
+	obj_data *prev, *next;	// For the object double-linked list
 	
 	bool search_mark;	// for things that iterate over inventory/lists repeatedly
 	
@@ -5499,8 +5502,8 @@ struct vehicle_data {
 	struct script_data *script;	// script info for the object
 	
 	// lists
-	struct vehicle_data *next;	// vehicle_list (global) linked list
-	struct vehicle_data *next_in_room;	// ROOM_VEHICLES(room) linked list
+	struct vehicle_data *prev, *next;	// vehicle_list (global) doubly-linked list
+	struct vehicle_data *prev_in_room, *next_in_room;	// ROOM_VEHICLES(room) doubly-linked list
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;
 	UT_hash_handle hh;	// vehicle_table hash handle
@@ -5591,9 +5594,9 @@ struct room_data {
 	struct trig_proto_list *proto_script;	/* list of default triggers  */
 	struct script_data *script;	/* script info for the room           */
 
-	obj_data *contents;  // start of item list (obj->next_content)
-	char_data *people;  // start of people list (ch->next_in_room)
-	vehicle_data *vehicles;	// start of vehicle list (veh->next_in_room)
+	obj_data *contents;  // start of doubly-linked item list (obj->next_content)
+	char_data *people;  // start of people doubly-linked list (ch->next_in_room, prev_in_room)
+	vehicle_data *vehicles;	// start of doubly-linked vehicle list (veh->next_in_room, prev_in_room)
 	
 	struct reset_com *reset_commands;	// used only during startup
 	struct dg_event *unload_event;	// used for un-loading of live rooms

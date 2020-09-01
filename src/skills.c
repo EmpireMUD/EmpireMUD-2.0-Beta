@@ -275,7 +275,7 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 			break;
 		}
 		case ABIL_MIRRORIMAGE: {
-			LL_FOREACH_SAFE(character_list, mob, next_mob) {
+			DL_FOREACH_SAFE(character_list, mob, next_mob) {
 				if (mob->master == ch && IS_NPC(mob) && GET_MOB_VNUM(mob) == MIRROR_IMAGE_MOB) {
 					act("$n vanishes.", TRUE, mob, NULL, NULL, TO_ROOM);
 					extract_char(mob);
@@ -2509,7 +2509,7 @@ bool has_cooking_fire(char_data *ch) {
 		return TRUE;
 	}
 	
-	for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = obj->next_content) {
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_LIGHT) && !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			return TRUE;
 		}
@@ -3399,7 +3399,7 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 	}
 	
 	// remove from live players
-	LL_FOREACH(character_list, chiter) {
+	DL_FOREACH(character_list, chiter) {
 		found = FALSE;
 		if (IS_NPC(chiter)) {
 			continue;
@@ -3558,7 +3558,7 @@ void save_olc_skill(descriptor_data *desc) {
 	read_ability_requirements();
 	
 	// update all players in case there are new level-0 abilities
-	LL_FOREACH_SAFE(character_list, ch_iter, next_ch) {
+	DL_FOREACH_SAFE(character_list, ch_iter, next_ch) {
 		if (!IS_NPC(ch_iter)) {
 			update_class(ch_iter);
 			give_level_zero_abilities(ch_iter);

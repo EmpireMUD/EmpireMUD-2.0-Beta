@@ -79,24 +79,24 @@ struct quest_temp_list *build_available_quest_list(char_data *ch) {
 	can_get_quest_from_room(ch, IN_ROOM(ch), &quest_list);
 	
 	// search in inventory
-	LL_FOREACH2(ch->carrying, obj, next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		can_get_quest_from_obj(ch, obj, &quest_list);
 	}
 	
 	// objs in room
-	LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 		can_get_quest_from_obj(ch, obj, &quest_list);
 	}
 	
 	// search mobs in room
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 		if (IS_NPC(mob)) {
 			can_get_quest_from_mob(ch, mob, &quest_list);
 		}
 	}
 	
 	// search vehicles in room
-	LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 		can_get_quest_from_vehicle(ch, veh, &quest_list);
 	}
 	

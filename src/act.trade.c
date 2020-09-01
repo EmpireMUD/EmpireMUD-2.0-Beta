@@ -214,7 +214,7 @@ bool find_and_bind(char_data *ch, obj_vnum vnum) {
 	obj_data *search[2] = { ch->carrying, ROOM_CONTENTS(IN_ROOM(ch)) };
 	
 	for (list = 0; list < 2; ++list) {
-		LL_FOREACH2(search[list], iter, next_content) {
+		DL_FOREACH2(search[list], iter, next_content) {
 			if (GET_OBJ_VNUM(iter) != vnum || !bind_ok(iter, ch)) {
 				continue;	// wrong obj
 			}
@@ -320,7 +320,7 @@ vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, bool *any
 	
 	*any = FALSE;
 	
-	LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), iter, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), iter, next_in_room) {
 		// skip finished vehicles
 		if (VEH_IS_COMPLETE(iter)) {
 			continue;
@@ -360,7 +360,7 @@ vehicle_data *find_vehicle_to_resume_by_name(char_data *ch, int craft_type, char
 	
 	*found_craft = NULL;
 	
-	LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 		if (VEH_IS_COMPLETE(veh)) {
 			continue;	// skip finished vehicles
 		}
@@ -400,9 +400,10 @@ vehicle_data *find_vehicle_to_resume_by_name(char_data *ch, int craft_type, char
 obj_data *find_water_container(char_data *ch, obj_data *list) {
 	obj_data *obj, *found = NULL;
 	
-	for (obj = list; !found && obj; obj = obj->next_content) {
+	DL_FOREACH2(list, obj, next_content) {
 		if (IS_DRINK_CONTAINER(obj) && CAN_SEE_OBJ(ch, obj) && GET_DRINK_CONTAINER_TYPE(obj) == LIQ_WATER && GET_DRINK_CONTAINER_CONTENTS(obj) >= (GET_DRINK_CONTAINER_CAPACITY(obj)/2)) {
 			found = obj;
+			break;
 		}
 	}
 	
@@ -508,14 +509,14 @@ obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum) {
 	obj_data *obj;
 	
 	// inv
-	LL_FOREACH2(ch->carrying, obj, next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		if (GET_OBJ_VNUM(obj) == vnum) {
 			return obj;
 		}
 	}
 	
 	// room
-	LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 		if (GET_OBJ_VNUM(obj) == vnum && bind_ok(obj, ch)) {
 			return obj;
 		}
@@ -1053,7 +1054,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		}
 		
 		// stop all actors on this type
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 			if (!IS_NPC(vict) && GET_ACTION(vict) == ACT_GEN_CRAFT && GET_ACTION_VNUM(vict, 0) == GET_CRAFT_VNUM(type)) {
 				GET_ACTION(vict) = ACT_NONE;
 			}

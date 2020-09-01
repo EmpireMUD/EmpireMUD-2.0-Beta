@@ -102,9 +102,10 @@ bool any_players_in_room(room_data *room) {
 	char_data *ch;
 	bool found = FALSE;
 	
-	for (ch = ROOM_PEOPLE(room); !found && ch; ch = ch->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
 		if (!IS_NPC(ch)) {
 			found = TRUE;
+			break;
 		}
 	}
 	
@@ -395,6 +396,26 @@ struct time_info_data *real_time_passed(time_t t2, time_t t1) {
 //// EMPIRE UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Cancels a requested refresh on 1 or more empires.
+*
+* @param empire_data *only_emp Optional: Only remove from one empire (default: NULL = all)
+* @param bitvector_t refresh_flag The DELAY_REFRESH_ flag(s) to remove.
+*/
+void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_flag) {
+	empire_data *emp, *next_emp;
+	
+	if (only_emp) {
+		REMOVE_BIT(EMPIRE_DELAYED_REFRESH(only_emp), refresh_flag);
+	}
+	else {
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			REMOVE_BIT(EMPIRE_DELAYED_REFRESH(emp), refresh_flag);
+		}
+	}
+}
+
+
+/**
 * Checks players and empires for delayed-refresh commands.
 */
 void run_delayed_refresh(void) {
@@ -419,6 +440,7 @@ void run_delayed_refresh(void) {
 		}
 		
 		HASH_DEL(char_delayed_update_list, cdu);
+		free(cdu);
 	}
 
 	
@@ -2519,9 +2541,7 @@ void change_short_desc(char_data *ch, char *str) {
 void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 	char_data *iter, *next_iter;
 	
-	for (iter = character_list; iter; iter = next_iter) {
-		next_iter = iter->next;
-		
+	DL_FOREACH_SAFE(character_list, iter, next_iter) {
 		if (IS_NPC(iter) && iter->master == ch && (only_vnum == NOTHING || GET_MOB_VNUM(iter) == only_vnum)) {
 			if (GET_COMPANION(iter) == ch || AFF_FLAGGED(iter, AFF_CHARM)) {
 				act("$n leaves.", TRUE, iter, NULL, NULL, TO_ROOM);
@@ -3299,7 +3319,7 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 				
 					// up to two places to search
 					for (liter = 0; liter < 2 && res->amount > 0; ++liter) {
-						LL_FOREACH_SAFE2(search_list[liter], obj, next_obj, next_content) {
+						DL_FOREACH_SAFE2(search_list[liter], obj, next_obj, next_content) {
 							// skip keeps
 							if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 								continue;
@@ -3445,7 +3465,7 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 				
 				// up to two places to search
 				for (liter = 0; liter < 2; ++liter) {
-					LL_FOREACH2(search_list[liter], obj, next_content) {
+					DL_FOREACH2(search_list[liter], obj, next_content) {
 						// skip keeps
 						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 							continue;
@@ -3668,7 +3688,7 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 				
 				// up to two places to search for containers to fill
 				for (liter = 0; liter < 2 && remaining > 0; ++liter) {
-					LL_FOREACH2(search_list[liter], obj, next_content) {
+					DL_FOREACH2(search_list[liter], obj, next_content) {
 						if (IS_DRINK_CONTAINER(obj) && (GET_DRINK_CONTAINER_TYPE(obj) == res->vnum || GET_DRINK_CONTAINER_CONTENTS(obj) == 0)) {
 							diff = GET_DRINK_CONTAINER_CAPACITY(obj) - GET_DRINK_CONTAINER_CONTENTS(obj);
 							diff = MIN(remaining, diff);
@@ -3844,7 +3864,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 				
 					// now search the list(s)
 					for (liter = 0; liter < 2 && res->amount > 0; ++liter) {
-						LL_FOREACH2(search_list[liter], obj, next_content) {
+						DL_FOREACH2(search_list[liter], obj, next_content) {
 							if (obj->search_mark) {
 								continue;	// skip already-used items
 							}
@@ -4020,7 +4040,7 @@ void unmark_items_for_char(char_data *ch, bool ground) {
 	search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
 	
 	for (iter = 0; iter < 2; ++iter) {
-		LL_FOREACH2(search_list[iter], obj, next_content) {
+		DL_FOREACH2(search_list[iter], obj, next_content) {
 			obj->search_mark = FALSE;
 		}
 	}
@@ -5847,9 +5867,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 		to_room = NULL;
 	}
 	
-	for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
-		next_ch = ch->next_in_room;
-	
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 		if (!IS_NPC(ch)) {
 			if (!(target = to_room)) {
 				target = find_load_room(ch);
@@ -6107,7 +6125,7 @@ bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
 	bool junk;
 	
 	// check vehicles first
-	LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
 		if (!VEH_IS_COMPLETE(veh)) {
 			continue;
 		}
@@ -6169,7 +6187,7 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 	}
 	
 	// verify there are no disconnected players characters in-game, which might not be saved
-	for (ch = character_list; ch; ch = ch->next) {
+	DL_FOREACH(character_list, ch) {
 		if (!IS_NPC(ch) && !ch->desc) {
 			sprintf(buf, "update_all_players: Unable to update because of linkdead player (%s). Try again later.", GET_NAME(ch));
 			if (to_message) {
@@ -6195,9 +6213,11 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 		
 		// save
 		if (is_file) {
-			store_loaded_char(ch);
-			is_file = FALSE;
-			ch = NULL;
+			SAVE_CHAR(ch);
+			// no longer quick-freeing these; leave them in the queue to free soon
+			// store_loaded_char(ch);
+			// is_file = FALSE;
+			// ch = NULL;
 		}
 		else {
 			queue_delayed_update(ch, CDU_SAVE);

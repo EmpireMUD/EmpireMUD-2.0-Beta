@@ -424,6 +424,16 @@ are:
 
 See also: COMPONENT, DISTILLED HERBS, FIND HERBS, MIX, BREW
 #
+"HESTIAN TRINKET"
+
+Usage:  use hestian
+
+If you have chosen a personal house using the 'home set' command, you can
+teleport back there from almost anywhere by using a hestian trinket. See your
+local potter to make this sacred emblem of the home.
+
+See also: HOME
+#
 "IRIDESCENT BLUE IRIS" "IRIDESCENT IRIS" "BLUE IRIS" IRIS
 
 Iridescent Blue Iris (resource)
@@ -566,14 +576,11 @@ Metal is a category of component that covers all refined metal ores. It is used
 for a huge variety of crafts, most of which call for either a specific metal or
 one of the following metal categories:
 
-poor:           copper and tin ingots
-common:         bronze and iron ingots
-basic:          copper, tin, bronze, and iron ingots
-rare:           silver, gold, imperium and nocturnium ingots
-rare, fine:     silver and gold ingots
-refined:        copper, silver and gold bars
-refined, fine:  silver and gold bars
-hard, rare:     argentine and eventide ingots
+poor metal ingots: copper and tin ingots
+common metal ingots: bronze and iron ingots
+rare metal ingots: nocturnium and imperium ingots (and hardened metal ingots)
+hardened metal ingots: argentine and eventide ingots
+precious metal ingots: silver and gold ingots
 
 Note: Glass ingots are made from sand using the 'craft' command.
 
@@ -1059,7 +1066,7 @@ Building:  {WW}  Warehouse  (Foundations goal)
 
 Command:  warehouse inventory [item keywords]
           warehouse identify <item keywords>
-          warehouse retrieve [number] <item keywords>
+          warehouse retrieve [number] [item keywords]
           warehouse store [number] <item keywords>
 
 While normal resource storage (e.g. the lumber yard) can store many simple
