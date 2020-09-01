@@ -5166,7 +5166,7 @@ struct obj_data {
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct script_data *script;	// script info for the object
 
-	obj_data *next_content;	// For 'contains' lists
+	obj_data *prev_content, *next_content;	// For 'contains' doubly-linked lists
 	obj_data *prev, *next;	// For the object double-linked list
 	
 	bool search_mark;	// for things that iterate over inventory/lists repeatedly
@@ -5594,7 +5594,7 @@ struct room_data {
 	struct trig_proto_list *proto_script;	/* list of default triggers  */
 	struct script_data *script;	/* script info for the room           */
 
-	obj_data *contents;  // start of item list (obj->next_content)
+	obj_data *contents;  // start of doubly-linked item list (obj->next_content)
 	char_data *people;  // start of people list (ch->next_in_room)
 	vehicle_data *vehicles;	// start of vehicle list (veh->next_in_room)
 	

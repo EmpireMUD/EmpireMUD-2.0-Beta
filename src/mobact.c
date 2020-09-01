@@ -822,7 +822,7 @@ void mobile_activity(void) {
 		}
 
 		if (MOB_FLAGGED(ch, MOB_SCAVENGER) && !FIGHTING(ch)) {
-			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = obj->next_content) {
+			DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 				if (GET_OBJ_TYPE(obj) == ITEM_CORPSE && GET_CORPSE_SIZE(obj) <= GET_SIZE(ch) && !number(0, 10)) {
 					act("$n eats $p.", FALSE, ch, obj, NULL, TO_ROOM);
 					empty_obj_before_extract(obj);
@@ -955,9 +955,7 @@ void despawn_mob(char_data *ch) {
 	}
 	
 	// empty inventory and equipment
-	for (obj = ch->carrying; obj != NULL; obj = next_obj) {
-		next_obj = obj->next_content;
-		
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		extract_obj(obj);
 	}
 	

@@ -651,9 +651,10 @@ ACMD(do_collapse) {
 	}
 	
 	// find the reverse portal
-	for (obj = ROOM_CONTENTS(to_room); obj && !reverse; obj = obj->next_content) {
+	DL_FOREACH2(ROOM_CONTENTS(to_room), obj, next_content) {
 		if (GET_PORTAL_TARGET_VNUM(obj) == GET_ROOM_VNUM(IN_ROOM(ch))) {
 			reverse = obj;
+			break;
 		}
 	}
 

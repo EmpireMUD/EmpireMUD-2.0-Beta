@@ -2154,7 +2154,7 @@ ACMD(do_exits) {
 	// portals
 	if (cmd != -1) {
 		any = FALSE;
-		LL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+		DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
 			if (!IS_PORTAL(obj) || !(to_room = real_room(GET_PORTAL_TARGET_VNUM(obj)))) {
 				continue;
 			}

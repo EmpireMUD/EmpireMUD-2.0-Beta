@@ -1670,7 +1670,7 @@ int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum) {
 	
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 		if (INST_ROOM(inst, iter)) {
-			for (obj = ROOM_CONTENTS(INST_ROOM(inst, iter)); obj; obj = obj->next_content) {
+			DL_FOREACH2(ROOM_CONTENTS(INST_ROOM(inst, iter)), obj, next_content) {
 				if (GET_OBJ_VNUM(obj) == vnum) {
 					++count;
 				}
@@ -2527,7 +2527,7 @@ void scale_instance_to_level(struct instance_data *inst, int level) {
 	
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 		if (INST_ROOM(inst, iter)) {
-			for (obj = ROOM_CONTENTS(INST_ROOM(inst, iter)); obj; obj = obj->next_content) {
+			DL_FOREACH2(ROOM_CONTENTS(INST_ROOM(inst, iter)), obj, next_content) {
 				if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) == 0) {
 					scale_item_to_level(obj, level);
 				}

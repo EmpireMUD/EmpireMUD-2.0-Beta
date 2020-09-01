@@ -520,7 +520,7 @@ int find_door(char_data *ch, const char *type, char *dir, const char *cmdname) {
 obj_data *find_back_portal(room_data *in_room, room_data *from_room, obj_data *fallback) {
 	obj_data *objiter;
 	
-	LL_FOREACH2(ROOM_CONTENTS(in_room), objiter, next_content) {
+	DL_FOREACH2(ROOM_CONTENTS(in_room), objiter, next_content) {
 		if (GET_PORTAL_TARGET_VNUM(objiter) == GET_ROOM_VNUM(from_room)) {
 			return objiter;
 		}
@@ -2238,7 +2238,7 @@ ACMD(do_portal) {
 	}
 
 	// check there's not already a portal to there from here
-	for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = obj->next_content) {
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 		if (GET_PORTAL_TARGET_VNUM(obj) == GET_ROOM_VNUM(target)) {
 			msg_to_char(ch, "There is already a portal to that location open here.\r\n");
 			return;

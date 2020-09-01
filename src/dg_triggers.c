@@ -994,13 +994,13 @@ int buy_otrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 		}
 	}
 	
-	LL_FOREACH2(actor->carrying, obj, next_content) {
+	DL_FOREACH2(actor->carrying, obj, next_content) {
 		if (!buy_otrig(obj, actor, shopkeeper, buying, cost, currency, OCMD_INVEN)) {
 			return 0;
 		}
 	}
 
-	LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
 		if (!buy_otrig(obj, actor, shopkeeper, buying, cost, currency, OCMD_ROOM)) {
 			return 0;
 		}
@@ -1080,14 +1080,18 @@ int command_otrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	for (i = 0; i < NUM_WEARS; i++)
 		if (cmd_otrig(GET_EQ(actor, i), actor, cmd, argument, OCMD_EQUIP, mode))
 			return 1;
-
-	for (obj = actor->carrying; obj; obj = obj->next_content)
-		if (cmd_otrig(obj, actor, cmd, argument, OCMD_INVEN, mode))
+	
+	DL_FOREACH2(actor->carrying, obj, next_content) {
+		if (cmd_otrig(obj, actor, cmd, argument, OCMD_INVEN, mode)) {
 			return 1;
-
-	for (obj = ROOM_CONTENTS(IN_ROOM(actor)); obj; obj = obj->next_content)
-		if (cmd_otrig(obj, actor, cmd, argument, OCMD_ROOM, mode))
+		}
+	}
+	
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
+		if (cmd_otrig(obj, actor, cmd, argument, OCMD_ROOM, mode)) {
 			return 1;
+		}
+	}
 
 	return 0;
 }
@@ -1301,8 +1305,7 @@ int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir)
 		return 1;
 	}
 	
-	for (obj = room->contents; obj; obj = obj_next) {
-		obj_next = obj->next_content;
+	DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, obj_next, next_content) {
 		if (!SCRIPT_CHECK(obj, OTRIG_LEAVE))
 			continue;
 
@@ -2519,14 +2522,18 @@ int start_quest_otrigger(char_data *actor, quest_data *quest, struct instance_da
 	for (i = 0; i < NUM_WEARS; i++)
 		if (GET_EQ(actor, i) && !start_quest_otrigger_one(GET_EQ(actor, i), actor, quest, inst))
 			return 0;
-
-	for (obj = actor->carrying; obj; obj = obj->next_content)
-		if (!start_quest_otrigger_one(obj, actor, quest, inst))
+	
+	DL_FOREACH2(actor->carrying, obj, next_content) {
+		if (!start_quest_otrigger_one(obj, actor, quest, inst)) {
 			return 0;
-
-	for (obj = ROOM_CONTENTS(IN_ROOM(actor)); obj; obj = obj->next_content)
-		if (!start_quest_otrigger_one(obj, actor, quest, inst))
+		}
+	}
+	
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
+		if (!start_quest_otrigger_one(obj, actor, quest, inst)) {
 			return 0;
+		}
+	}
 
 	return 1;
 }
@@ -2790,14 +2797,18 @@ int finish_quest_otrigger(char_data *actor, quest_data *quest, struct instance_d
 	for (i = 0; i < NUM_WEARS; i++)
 		if (GET_EQ(actor, i) && !finish_quest_otrigger_one(GET_EQ(actor, i), actor, quest, inst))
 			return 0;
-
-	for (obj = actor->carrying; obj; obj = obj->next_content)
-		if (!finish_quest_otrigger_one(obj, actor, quest, inst))
+	
+	DL_FOREACH2(actor->carrying, obj, next_content) {
+		if (!finish_quest_otrigger_one(obj, actor, quest, inst)) {
 			return 0;
-
-	for (obj = ROOM_CONTENTS(IN_ROOM(actor)); obj; obj = obj->next_content)
-		if (!finish_quest_otrigger_one(obj, actor, quest, inst))
+		}
+	}
+	
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(actor)), obj, next_content) {
+		if (!finish_quest_otrigger_one(obj, actor, quest, inst)) {
 			return 0;
+		}
+	}
 
 	return 1;
 }

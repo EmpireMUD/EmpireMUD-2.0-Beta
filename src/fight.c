@@ -1568,8 +1568,9 @@ obj_data *make_corpse(char_data *ch) {
 	/* transfer character's inventory to the corpse -- ONLY FOR NPCs */
 	if (IS_NPC(ch)) {
 		corpse->contains = ch->carrying;
-		for (o = corpse->contains; o != NULL; o = o->next_content)
+		DL_FOREACH2(corpse->contains, o, next_content) {
 			o->in_obj = corpse;
+		}
 		object_list_no_owner(corpse);
 		
 		/* transfer character's equipment to the corpse */
@@ -1594,16 +1595,14 @@ obj_data *make_corpse(char_data *ch) {
 		ch->carrying = NULL;
 		
 		if (MOB_TAGGED_BY(ch)) {
-			LL_FOREACH2(corpse->contains, o, next_content) {
+			DL_FOREACH2(corpse->contains, o, next_content) {
 				add_production_total_for_tag_list(MOB_TAGGED_BY(ch), GET_OBJ_VNUM(o), 1);
 			}
 		}
 	}
 	else {
 		// not an npc, but check for stolen
-		for (o = ch->carrying; o; o = next_o) {
-			next_o = o->next_content;
-			
+		DL_FOREACH_SAFE2(ch->carrying, o, next_o, next_content) {
 			// is it stolen?
 			if (IS_STOLEN(o)) {
 				obj_to_obj(o, corpse);
@@ -2438,7 +2437,7 @@ bool can_fight(char_data *ch, char_data *victim) {
 	}
 	// is stealing from you
 	if (GET_LOYALTY(ch)) {
-		LL_FOREACH2(victim->carrying, obj, next_content) {
+		DL_FOREACH2(victim->carrying, obj, next_content) {
 			if (IS_STOLEN(obj) && obj->last_empire_id == EMPIRE_VNUM(GET_LOYALTY(ch))) {
 				return TRUE;	// has at least 1 stolen obj in inventory
 			}
@@ -2679,9 +2678,8 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 			die(c, c);
 		}
 	}
-
-	for (o = ROOM_CONTENTS(to_room); o; o = next_o) {
-		next_o = o->next_content;
+	
+	DL_FOREACH_SAFE2(ROOM_CONTENTS(to_room), o, next_o, next_content) {
 		if (!number(0, 1)) {
 			extract_obj(o);
 		}
@@ -3907,7 +3905,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	best = NULL;
 	
 	if (!IS_NPC(ch)) {
-		LL_FOREACH2(ch->carrying, ammo, next_content) {
+		DL_FOREACH2(ch->carrying, ammo, next_content) {
 			if (IS_AMMO(ammo) && GET_OBJ_VNUM(ammo) == USING_AMMO(ch) && GET_AMMO_TYPE(ammo) == GET_MISSILE_WEAPON_AMMO_TYPE(weapon)) {
 				if (!best || GET_AMMO_DAMAGE_BONUS(ammo) > GET_AMMO_DAMAGE_BONUS(best)) {
 					best = ammo;	// found a [better] match!
@@ -3917,7 +3915,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	}
 	
 	if (!best) {	// if we didn't find a preferred one
-		for (ammo = ch->carrying; ammo; ammo = ammo->next_content) {
+		DL_FOREACH2(ch->carrying, ammo, next_content) {
 			if (IS_AMMO(ammo) && GET_AMMO_TYPE(ammo) == GET_MISSILE_WEAPON_AMMO_TYPE(weapon)) {
 				if (!best || GET_AMMO_DAMAGE_BONUS(ammo) > GET_AMMO_DAMAGE_BONUS(best)) {
 					best = ammo;

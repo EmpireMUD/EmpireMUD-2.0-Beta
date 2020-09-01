@@ -4028,8 +4028,8 @@ ACMD(do_efind) {
 		
 		// first, gotta find them all
 		HASH_ITER(hh, world_table, iter, next_iter) {
-			if (ROOM_OWNER(iter) == emp) {			
-				for (obj = ROOM_CONTENTS(iter); obj; obj = obj->next_content) {
+			if (ROOM_OWNER(iter) == emp) {
+				DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
 					if ((all && CAN_WEAR(obj, ITEM_WEAR_TAKE)) || (!all && isname(arg, obj->name))) {
 						add_obj_to_efind(&list, obj, NULL, iter);
 						++total;

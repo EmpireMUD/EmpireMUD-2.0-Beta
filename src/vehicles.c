@@ -117,7 +117,7 @@ int count_harnessed_animals(vehicle_data *veh) {
 void empty_vehicle(vehicle_data *veh) {
 	obj_data *obj, *next_obj;
 	
-	LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 		if (IN_ROOM(veh)) {
 			obj_to_room(obj, IN_ROOM(veh));
 		}
@@ -177,7 +177,7 @@ void fully_empty_vehicle(vehicle_data *veh) {
 			}
 			
 			// remove items
-			LL_FOREACH_SAFE2(ROOM_CONTENTS(vrl->room), obj, next_obj, next_content) {
+			DL_FOREACH_SAFE2(ROOM_CONTENTS(vrl->room), obj, next_obj, next_content) {
 				if (IN_ROOM(veh)) {
 					obj_to_room(obj, IN_ROOM(veh));
 				}
@@ -1089,7 +1089,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH];
-	obj_data *load_obj, *obj2, *cont_row[MAX_BAG_ROWS];
+	obj_data *load_obj, *obj, *next_obj, *cont_row[MAX_BAG_ROWS];
 	struct vehicle_attached_mob *vam, *last_vam = NULL;
 	int length, iter, i_in[4], location = 0, timer;
 	struct resource_data *res, *last_res = NULL;
@@ -1189,14 +1189,12 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 								GET_AUTOSTORE_TIMER(load_obj) = timer;
 				
 								for (iter = MAX_BAG_ROWS - 1; iter > -location; --iter) {
-									if (cont_row[iter]) {		/* No container, back to vehicle. */
-										for (; cont_row[iter]; cont_row[iter] = obj2) {
-											obj2 = cont_row[iter]->next_content;
-											timer = GET_AUTOSTORE_TIMER(cont_row[iter]);
-											obj_to_vehicle(cont_row[iter], veh);
-											GET_AUTOSTORE_TIMER(cont_row[iter]) = timer;
-										}
-										cont_row[iter] = NULL;
+									// No container, back to vehicle
+									DL_FOREACH_SAFE2(cont_row[iter], obj, next_obj, next_content) {
+										DL_DELETE2(cont_row[iter], obj, prev_content, next_content);
+										timer = GET_AUTOSTORE_TIMER(obj);
+										obj_to_vehicle(obj, veh);
+										GET_AUTOSTORE_TIMER(obj) = timer;
 									}
 								}
 								if (iter == -location && cont_row[iter]) {			/* Content list exists. */
@@ -1204,35 +1202,26 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 										/* Take the item, fill it, and give it back. */
 										obj_from_room(load_obj);
 										load_obj->contains = NULL;
-										for (; cont_row[iter]; cont_row[iter] = obj2) {
-											obj2 = cont_row[iter]->next_content;
-											obj_to_obj(cont_row[iter], load_obj);
+										DL_FOREACH_SAFE2(cont_row[iter], obj, next_obj, next_content) {
+											DL_DELETE2(cont_row[iter], obj, prev_content, next_content);
+											obj_to_obj(obj, load_obj);
 										}
 										timer = GET_AUTOSTORE_TIMER(load_obj);
 										obj_to_vehicle(load_obj, veh);			/* Add to vehicle first. */
 										GET_AUTOSTORE_TIMER(load_obj) = timer;
 									}
 									else {				/* Object isn't container, empty content list. */
-										for (; cont_row[iter]; cont_row[iter] = obj2) {
-											obj2 = cont_row[iter]->next_content;
-											timer = GET_AUTOSTORE_TIMER(cont_row[iter]);
-											obj_to_vehicle(cont_row[iter], veh);
-											GET_AUTOSTORE_TIMER(cont_row[iter]) = timer;
+										DL_FOREACH_SAFE2(cont_row[iter], obj, next_obj, next_content) {
+											DL_DELETE2(cont_row[iter], obj, prev_content, next_content);
+											timer = GET_AUTOSTORE_TIMER(obj);
+											obj_to_vehicle(obj, veh);
+											GET_AUTOSTORE_TIMER(obj) = timer;
 										}
-										cont_row[iter] = NULL;
 									}
 								}
 								if (location < 0 && location >= -MAX_BAG_ROWS) {
 									obj_from_room(load_obj);
-									if ((obj2 = cont_row[-location - 1]) != NULL) {
-										while (obj2->next_content) {
-											obj2 = obj2->next_content;
-										}
-										obj2->next_content = load_obj;
-									}
-									else {
-										cont_row[-location - 1] = load_obj;
-									}
+									DL_APPEND2(cont_row[-location - 1], load_obj, prev_content, next_content);
 								}
 							}
 						}
@@ -1905,7 +1894,7 @@ void convert_one_obj_to_vehicle(obj_data *obj) {
 	vehicle_to_room(veh, room);
 	
 	// move inventory
-	LL_FOREACH_SAFE2(obj->contains, obj_iter, next_obj, next_content) {
+	DL_FOREACH_SAFE2(obj->contains, obj_iter, next_obj, next_content) {
 		obj_to_vehicle(obj_iter, veh);
 	}
 	
@@ -2712,7 +2701,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	if (VEH_CONTAINS(veh)) {
 		sprintf(part, "Contents:\tg");
 		found = 0;
-		LL_FOREACH2(VEH_CONTAINS(veh), obj, next_content) {
+		DL_FOREACH2(VEH_CONTAINS(veh), obj, next_content) {
 			sprintf(part + strlen(part), "%s %s", found++ ? "," : "", GET_OBJ_DESC(obj, ch, OBJ_DESC_SHORT));
 			if (strlen(part) >= 62) {
 				if (obj->next_content) {

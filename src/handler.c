@@ -1517,7 +1517,7 @@ void char_from_room(char_data *ch) {
 			ROOM_LIGHTS(IN_ROOM(ch))--;
 		}
 	}
-	for (obj = ch->carrying; obj; obj = obj->next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(ch))--;
 		}
@@ -1571,7 +1571,7 @@ void char_to_room(char_data *ch, room_data *room) {
 				ROOM_LIGHTS(room)++;
 			}
 		}
-		for (obj = ch->carrying; obj; obj = obj->next_content) {
+		DL_FOREACH2(ch->carrying, obj, next_content) {
 			if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
 				ROOM_LIGHTS(room)++;
 			}
@@ -5318,9 +5318,7 @@ void empty_obj_before_extract(obj_data *obj) {
 	
 	obj_data *jj, *next_thing;
 	
-	for (jj = obj->contains; jj; jj = next_thing) {
-		next_thing = jj->next_content;		/* Next in inventory */
-
+	DL_FOREACH_SAFE2(obj->contains, jj, next_thing, next_content) {
 		if (obj->in_obj) {
 			obj_to_obj(jj, obj->in_obj);
 		}
@@ -5937,13 +5935,11 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 * @param obj_data *object The item to remove
 */
 void obj_from_char(obj_data *object) {
-	obj_data *temp;
-
 	if (object == NULL) {
 		log("SYSERR: NULL object passed to obj_from_char.");
 	}
 	else {
-		REMOVE_FROM_LIST(object, object->carried_by->carrying, next_content);
+		DL_DELETE2(object->carried_by->carrying, object, prev_content, next_content);
 		object->next_content = NULL;
 
 		IS_CARRYING_N(object->carried_by) -= obj_carry_size(object);
@@ -5966,14 +5962,14 @@ void obj_from_char(obj_data *object) {
 * @param obj_data *obj The object to remove.
 */
 void obj_from_obj(obj_data *obj) {
-	obj_data *temp, *obj_from;
+	obj_data *obj_from;
 
 	if (obj->in_obj == NULL) {
 		log("SYSERR: (%s): trying to illegally extract obj from obj.", __FILE__);
 	}
 	else {
 		obj_from = obj->in_obj;
-		REMOVE_FROM_LIST(obj, obj_from->contains, next_content);
+		DL_DELETE2(obj_from->contains, obj, prev_content, next_content);
 
 		GET_OBJ_CARRYING_N(obj_from) -= obj_carry_size(obj);
 		if (obj_from->carried_by) {
@@ -5995,8 +5991,6 @@ void obj_from_obj(obj_data *obj) {
 * @param obj_data *object The item to remove.
 */
 void obj_from_room(obj_data *object) {
-	obj_data *temp;
-
 	if (!object || !IN_ROOM(object)) {
 		log("SYSERR: NULL object (%p) or obj not in a room (%p) passed to obj_from_room", object, IN_ROOM(object));
 	}
@@ -6005,8 +5999,8 @@ void obj_from_room(obj_data *object) {
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(object))--;
 		}
-
-		REMOVE_FROM_LIST(object, ROOM_CONTENTS(IN_ROOM(object)), next_content);
+		
+		DL_DELETE2(ROOM_CONTENTS(IN_ROOM(object)), object, prev_content, next_content);
 		IN_ROOM(object) = NULL;
 		object->next_content = NULL;
 	}
@@ -6023,7 +6017,7 @@ void obj_from_vehicle(obj_data *object) {
 	else {
 		VEH_LAST_MOVE_TIME(object->in_vehicle) = time(0);	// reset autostore time
 		VEH_CARRYING_N(object->in_vehicle) -= obj_carry_size(object);
-		LL_DELETE2(VEH_CONTAINS(object->in_vehicle), object, next_content);
+		DL_DELETE2(VEH_CONTAINS(object->in_vehicle), object, prev_content, next_content);
 		object->in_vehicle = NULL;
 		object->next_content = NULL;
 	}
@@ -6054,8 +6048,7 @@ void obj_to_char(obj_data *object, char_data *ch) {
 	check_obj_in_void(object);
 
 	if (object && ch) {
-		object->next_content = ch->carrying;
-		ch->carrying = object;
+		DL_PREPEND2(ch->carrying, object, prev_content, next_content);
 		object->carried_by = ch;
 		IS_CARRYING_N(ch) += obj_carry_size(object);
 		
@@ -6213,9 +6206,8 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		// clear these now
 		REMOVE_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 		clear_obj_eq_sets(obj);
-
-		obj->next_content = obj_to->contains;
-		obj_to->contains = obj;
+		
+		DL_PREPEND2(obj_to->contains, obj, prev_content, next_content);
 		obj->in_obj = obj_to;
 	}
 }
@@ -6233,10 +6225,8 @@ void obj_to_room(obj_data *object, room_data *room) {
 	}
 	else {
 		check_obj_in_void(object);
-		object->next_content = ROOM_CONTENTS(room);
-		ROOM_CONTENTS(room) = object;
+		DL_PREPEND2(ROOM_CONTENTS(room), object, prev_content, next_content);
 		IN_ROOM(object) = room;
-		object->carried_by = NULL;
 		
 		// check light
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
@@ -6266,7 +6256,7 @@ void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
 	else {
 		check_obj_in_void(object);
 		
-		LL_PREPEND2(VEH_CONTAINS(veh), object, next_content);
+		DL_PREPEND2(VEH_CONTAINS(veh), object, prev_content, next_content);
 		object->in_vehicle = veh;
 		VEH_CARRYING_N(veh) += obj_carry_size(object);
 		
@@ -6539,7 +6529,7 @@ obj_data *get_component_in_list(any_vnum cmp_vnum, obj_data *list, bool *kept) {
 		return NULL;
 	}
 	
-	LL_FOREACH2(list, obj, next_content) {
+	DL_FOREACH2(list, obj, next_content) {
 		if (GET_OBJ_COMPONENT(obj) == cmp_vnum) {
 			// full match
 			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
@@ -6628,10 +6618,11 @@ obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]) 
 */
 obj_data *get_obj_in_list_num(obj_vnum num, obj_data *list) {
 	obj_data *i, *found = NULL;
-
-	for (i = list; i && !found; i = i->next_content) {
+	
+	DL_FOREACH2(list, i, next_content) {
 		if (GET_OBJ_VNUM(i) == num) {
 			found = i;
+			break;
 		}
 	}
 
@@ -6646,10 +6637,11 @@ obj_data *get_obj_in_list_num(obj_vnum num, obj_data *list) {
 */
 obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list) {
 	obj_data *i, *found = NULL;
-
-	for (i = list; i && !found; i = i->next_content) {
+	
+	DL_FOREACH2(list, i, next_content) {
 		if (GET_OBJ_VNUM(i) == vnum) {
 			found = i;
+			break;
 		}
 	}
 
@@ -6677,11 +6669,15 @@ obj_data *get_obj_in_list_vis(char_data *ch, char *name, obj_data *list) {
 	if ((number = get_number(&tmp)) == 0) {
 		return (NULL);
 	}
-
-	for (i = list; i && (j <= number) && !found; i = i->next_content) {
-		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
+	
+	DL_FOREACH2(list, i, next_content) {
+		if (j > number) {
+			break;	// done
+		}
+		else if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
 			if (++j == number) {
 				found = i;
+				break;
 			}
 		}
 	}
@@ -6716,8 +6712,8 @@ obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, obj_
 	if ((number = get_number(&tmp)) == 0) {
 		return (NULL);
 	}
-
-	for (i = list; i; i = i->next_content) {
+	
+	DL_FOREACH2(list, i, next_content) {
 		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
 			if (gave_num) {
 				if (++j == number) {

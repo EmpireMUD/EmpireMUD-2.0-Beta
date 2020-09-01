@@ -369,7 +369,7 @@ bool valid_unseen_passing(room_data *room) {
 obj_data *find_poison_by_vnum(obj_data *list, any_vnum vnum) {
 	obj_data *obj, *found = NULL;
 	
-	LL_FOREACH2(list, obj, next_content) {
+	DL_FOREACH2(list, obj, next_content) {
 		if (IS_POISON(obj) && GET_OBJ_VNUM(obj) == vnum) {
 			if (!found || GET_POISON_CHARGES(obj) < GET_POISON_CHARGES(found)) {
 				found = obj;

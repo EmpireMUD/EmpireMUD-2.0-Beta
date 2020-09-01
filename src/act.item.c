@@ -181,7 +181,7 @@ int count_objs_in_room(room_data *room) {
 	int items_in_room = 0;
 	obj_data *search;
 	
-	for (search = ROOM_CONTENTS(room); search; search = search->next_content) {
+	DL_FOREACH2(ROOM_CONTENTS(room), search, next_content) {
 		items_in_room += OBJ_FLAGGED(search, OBJ_LARGE) ? 2 : 1;
 	}
 	
@@ -239,7 +239,7 @@ obj_data *find_lighter_in_list(obj_data *list, bool *had_keep) {
 	
 	*had_keep = FALSE;	// presumably
 	
-	LL_FOREACH2(list, obj, next_content) {
+	DL_FOREACH2(list, obj, next_content) {
 		if (!IS_LIGHTER(obj)) {
 			continue;	// not a lighter
 		}
@@ -940,7 +940,7 @@ int obj_carry_size(obj_data *obj) {
 	}
 	
 	// size of contents
-	for (iter = obj->contains; iter; iter = iter->next_content) {
+	DL_FOREACH2(obj->contains, iter, next_content) {
 		size += obj_carry_size(iter);
 	}
 	
@@ -1696,7 +1696,7 @@ void do_eq_change(char_data *ch, char *argument) {
 	}
 	
 	// now look for items in inventory to equip
-	LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (!(oset = get_obj_eq_set_by_id(obj, eq_set->id))) {
 			continue;	// not in set
 		}
@@ -1746,7 +1746,7 @@ void do_eq_delete(char_data *ch, char *argument) {
 	}
 	
 	// remove set from inventory gear
-	LL_FOREACH2(ch->carrying, obj, next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		remove_obj_from_eq_set(obj, eq_set->id);
 	}
 	
@@ -1849,7 +1849,7 @@ void do_eq_set(char_data *ch, char *argument) {
 	}
 	
 	// remove set from inventory gear
-	LL_FOREACH2(ch->carrying, obj, next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		remove_obj_from_eq_set(obj, set_id);
 	}
 	
@@ -1876,8 +1876,8 @@ obj_data *perform_eq_change_unequip(char_data *ch, int pos) {
 		obj = unequip_char_to_inventory(ch, pos);
 		if (obj && obj->carried_by == ch) {	// e.g. not single-use
 			// move from start of inventory to end
-			LL_DELETE2(ch->carrying, obj, next_content);
-			LL_APPEND2(ch->carrying, obj, next_content);
+			DL_DELETE2(ch->carrying, obj, prev_content, next_content);
+			DL_APPEND2(ch->carrying, obj, prev_content, next_content);
 		}
 		return obj;
 	}
@@ -2013,8 +2013,7 @@ static void get_from_container(char_data *ch, obj_data *cont, char *arg, int mod
 			send_to_char("Get all of what?\r\n", ch);
 			return;
 		}
-		for (obj = cont->contains; obj; obj = next_obj) {
-			next_obj = obj->next_content;
+		DL_FOREACH_SAFE2(cont->contains, obj, next_obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj) && (obj_dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
 				found = 1;
 				if (!perform_get_from_container(ch, obj, cont, mode))
@@ -2145,8 +2144,7 @@ static void get_from_room(char_data *ch, char *arg, int howmany) {
 			send_to_char("Get all of what?\r\n", ch);
 			return;
 		}
-		for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = next_obj) {
-			next_obj = obj->next_content;
+		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj) && (dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
 				found = 1;
 				if (!perform_get_from_room(ch, obj))
@@ -4398,8 +4396,10 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 			msg_to_char(ch, "You don't seem to be carrying anything.\r\n");
 			return;
 		}
-		for (obj = ch->carrying; obj && !full; obj = next_obj) {
-			next_obj = obj->next_content;
+		DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+			if (full) {
+				break;	// early break
+			}
 			
 			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 				kept = TRUE;
@@ -4939,9 +4939,7 @@ ACMD(do_drop) {
 			if (!ch->carrying)
 				send_to_char("You don't seem to be carrying anything.\r\n", ch);
 			else {
-				for (obj = ch->carrying; obj; obj = next_obj) {
-					next_obj = obj->next_content;
-					
+			    DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 					if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 						continue;
 					}
@@ -5276,9 +5274,7 @@ ACMD(do_exchange) {
 		if (dotmode == FIND_ALL) {
 			carrying = IS_CARRYING_N(ch);
 			
-			for (obj = ch->carrying; obj; obj = next_obj) {
-				next_obj = obj->next_content;
-				
+			DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 				if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
 					continue;
 				}
@@ -5389,7 +5385,7 @@ ACMD(do_get) {
 					do_get_from_vehicle(ch, veh, arg1, FIND_OBJ_ROOM, amount);
 				}
 			}
-			for (cont = ch->carrying; cont; cont = cont->next_content) {
+			DL_FOREACH2(ch->carrying, cont, next_content) {
 				if (CAN_SEE_OBJ(ch, cont) && (cont_dotmode == FIND_ALL || isname(arg2, GET_OBJ_KEYWORDS(cont)))) {
 					if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER || IS_CORPSE(cont)) {
 						found = 1;
@@ -5401,7 +5397,7 @@ ACMD(do_get) {
 					}
 				}
 			}
-			for (cont = ROOM_CONTENTS(IN_ROOM(ch)); cont; cont = cont->next_content) {
+			DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), cont, next_content) {
 				if (CAN_SEE_OBJ(ch, cont) && (cont_dotmode == FIND_ALL || isname(arg2, GET_OBJ_KEYWORDS(cont)))) {
 					if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER || IS_CORPSE(cont)) {
 						get_from_container(ch, cont, arg1, FIND_OBJ_ROOM, amount);
@@ -5502,8 +5498,7 @@ ACMD(do_give) {
 			if (!ch->carrying)
 				send_to_char("You don't seem to be holding anything.\r\n", ch);
 			else {
-				for (obj = ch->carrying; obj; obj = next_obj) {
-					next_obj = obj->next_content;
+				DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 					if (CAN_SEE_OBJ(ch, obj) && !OBJ_FLAGGED(obj, OBJ_KEEP) && ((dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj))))) {
 						perform_give(ch, vict, obj);
 						any = TRUE;
@@ -5596,7 +5591,7 @@ ACMD(do_identify) {
 		any = FALSE;
 		
 		// inv
-		LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+		DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 			if (run_identifies_to(ch, &obj, &extract)) {
 				any = TRUE;
 			}
@@ -5607,7 +5602,7 @@ ACMD(do_identify) {
 		
 		// room
 		if (can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-			LL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
+			DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
 				if (run_identifies_to(ch, &obj, &extract)) {
 					any = TRUE;
 				}
@@ -5734,9 +5729,7 @@ ACMD(do_keep) {
 			send_to_char("You don't seem to be carrying anything.\r\n", ch);
 		}
 		else {
-			for (obj = ch->carrying; obj; obj = next_obj) {
-				next_obj = obj->next_content;
-				
+			DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 				if (mode == SCMD_KEEP) {
 					SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 					qt_keep_obj(ch, obj, TRUE);
@@ -6336,8 +6329,7 @@ ACMD(do_put) {
 				}
 			}
 			else {
-				for (obj = ch->carrying; obj; obj = next_obj) {
-					next_obj = obj->next_content;
+				DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 					if (obj != cont && CAN_SEE_OBJ(ch, obj) && (obj_dotmode == FIND_ALL || isname(theobj, GET_OBJ_KEYWORDS(obj)))) {
 						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 							continue;
@@ -6373,9 +6365,11 @@ ACMD(do_remove) {
 	one_argument(argument, arg);
 
 	if (isdigit(*arg)) {
-		for (board = ROOM_CONTENTS(IN_ROOM(ch)); board; board = board->next_content)
-			if (GET_OBJ_TYPE(board) == ITEM_BOARD)
+		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), board, next_content) {
+			if (GET_OBJ_TYPE(board) == ITEM_BOARD) {
 				break;
+			}
+		}
 		if (board && ch->desc) {
 			if (!board_loaded) {
 				init_boards();
@@ -7086,9 +7080,7 @@ ACMD(do_store) {
 			return;
 		}
 		for (iter = 0; iter < 2; ++iter) {
-			for (obj = lists[iter]; obj; obj = next_obj) {
-				next_obj = obj->next_content;
-			
+			DL_FOREACH_SAFE2(lists[iter], obj, next_obj, next_content) {
 				if (!OBJ_FLAGGED(obj, OBJ_KEEP) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), FALSE)) {
 					if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
 						if (store->amount >= MAX_STORAGE) {
@@ -7398,8 +7390,7 @@ ACMD(do_wear) {
 		return;
 	}
 	if (dotmode == FIND_ALL) {
-		for (obj = ch->carrying; obj; obj = next_obj) {
-			next_obj = obj->next_content;
+		DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj) && (where = find_eq_pos(ch, obj, 0)) != NO_WEAR && where < NUM_WEARS && !GET_EQ(ch, where) && can_wear_item(ch, obj, FALSE)) {
 				items_worn++;
 				perform_wear(ch, obj, where);

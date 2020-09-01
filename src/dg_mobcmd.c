@@ -364,8 +364,7 @@ ACMD(do_mjunk) {
 		return;
 	}
 	else {
-		for (obj = ch->carrying; obj != NULL; obj = obj_next) {
-			obj_next = obj->next_content;
+		DL_FOREACH_SAFE2(ch->carrying, obj, obj_next, next_content) {
 			// "all" or "all.name ?
 			if (arg[3] == '\0' || isname(arg+4, obj->name)) {
 				extract_obj(obj);
@@ -929,9 +928,8 @@ ACMD(do_mpurge) {
 			if (IS_NPC(victim) && victim != ch)
 				extract_char(victim);
 		}
-
-		for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = obj_next) {
-			obj_next = obj->next_content;
+		
+		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, obj_next, next_content) {
 			extract_obj(obj);
 		}
 

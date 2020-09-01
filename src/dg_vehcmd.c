@@ -612,9 +612,8 @@ VCMD(do_vpurge) {
 					extract_char(ch);
 				}
 			}
-
-			for (o = ROOM_CONTENTS(rm); o; o = next_obj ) {
-				next_obj = o->next_content;
+			
+			DL_FOREACH_SAFE2(ROOM_CONTENTS(rm), o, next_obj, next_content) {
 				extract_obj(o);
 			}
 		}

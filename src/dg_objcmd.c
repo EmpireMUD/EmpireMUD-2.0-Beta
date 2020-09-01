@@ -544,7 +544,6 @@ OCMD(do_otimer) {
 OCMD(do_otransform) {
 	char arg[MAX_INPUT_LENGTH];
 	obj_data *o;
-	obj_data tmpobj;
 	char_data *wearer = NULL;
 	int pos = 0;
 
@@ -569,8 +568,10 @@ OCMD(do_otransform) {
 			wearer = obj->worn_by;
 			unequip_char(obj->worn_by, pos);
 		}
+		
+		// NOTE: none of this will work
 
-		/* move new obj info over to old object and delete new obj */
+		/* move new obj info over to old object and delete new obj *
 		memcpy(&tmpobj, o, sizeof(*o));
 		tmpobj.in_room = IN_ROOM(obj);
 		tmpobj.last_empire_id = obj->last_empire_id;
@@ -587,9 +588,8 @@ OCMD(do_otransform) {
 		tmpobj.script_id = obj->script_id;
 		tmpobj.proto_script = obj->proto_script;
 		tmpobj.script = obj->script;
-		tmpobj.next_content = obj->next_content;
-		tmpobj.next = obj->next;
 		memcpy(obj, &tmpobj, sizeof(*obj));
+		*/
 
 		if (wearer) {
 			equip_char(wearer, obj, pos);
@@ -795,9 +795,8 @@ OCMD(do_opurge) {
 				if (IS_NPC(ch))
 					extract_char(ch);
 			}
-
-			for (o = ROOM_CONTENTS(rm); o; o = next_obj ) {
-				next_obj = o->next_content;
+			
+			DL_FOREACH_SAFE2(ROOM_CONTENTS(rm), o, next_obj, next_content) {
 				if (o != obj)
 					extract_obj(o);
 			}

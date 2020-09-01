@@ -370,13 +370,17 @@ void look_at_target(char_data *ch, char *arg) {
 	}
 
 	/* Does the argument match an extra desc in the char's inventory? */
-	for (obj = ch->carrying; obj && !found; obj = obj->next_content) {
-		if (CAN_SEE_OBJ(ch, obj))
-			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
-				send_to_char(desc, ch);
-				act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
-				found = TRUE;
+	if (!found) {
+		DL_FOREACH2(ch->carrying, obj, next_content) {
+			if (CAN_SEE_OBJ(ch, obj)) {
+				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
+					send_to_char(desc, ch);
+					act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
+					found = TRUE;
+					break;
+				}
 			}
+		}
 	}
 
 	/* Does the argument match an extra desc in the char's equipment? */
@@ -389,13 +393,18 @@ void look_at_target(char_data *ch, char *arg) {
 			}
 
 	/* Does the argument match an extra desc of an object in the room? */
-	for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj && !found; obj = obj->next_content)
-		if (CAN_SEE_OBJ(ch, obj))
-			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
-				send_to_char(desc, ch);
-				act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
-				found = TRUE;
+	if (!found) {
+		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+			if (CAN_SEE_OBJ(ch, obj)) {
+				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
+					send_to_char(desc, ch);
+					act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
+					found = TRUE;
+					break;
+				}
 			}
+		}
+	}
 
 	// does it match an extra desc of a vehicle here?
 	if (!found && ROOM_VEHICLES(IN_ROOM(ch))) {
@@ -1510,15 +1519,18 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 	obj_data *i, *j = NULL;
 	bool found = FALSE;
 	int num;
-
-	for (i = list; i; i = i->next_content) {
+	
+	DL_FOREACH2(list, i, next_content) {
 		num = 0;
 		
 		if (OBJ_CAN_STACK(i)) {
 			// look for a previous matching item
 			
-			for (j = list; j != i; j = j->next_content) {
-				if (OBJ_CAN_STACK(j) && OBJS_ARE_SAME(i, j)) {
+			DL_FOREACH2(list, j, next_content) {
+				if (j == i) {
+					break;
+				}
+				else if (OBJ_CAN_STACK(j) && OBJS_ARE_SAME(i, j)) {
 					if (GET_OBJ_VNUM(j) == NOTHING) {
 						break;
 					}
@@ -1533,7 +1545,7 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
 			}
 		
 			// determine number
-			for (j = i; j; j = j->next_content) {
+			DL_FOREACH2(i, j, next_content) {
 				if (OBJ_CAN_STACK(j) && OBJS_ARE_SAME(i, j)) {
 					if (GET_OBJ_VNUM(j) == NOTHING) {
 						num++;
@@ -2355,7 +2367,7 @@ ACMD(do_contents) {
 	
 	// verify we can see even 1 obj
 	if (!can_see_anything) {
-		LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj)) {
 				can_see_anything = TRUE;
 				break;	// only need 1
@@ -2858,7 +2870,7 @@ ACMD(do_inventory) {
 		size = snprintf(buf, sizeof(buf), "%s\r\n", heading);
 		count = 0;
 		
-		LL_FOREACH2(ch->carrying, obj, next_content) {
+		DL_FOREACH2(ch->carrying, obj, next_content) {
 			// break out early
 			if (size + 80 > sizeof(buf)) {
 				size += snprintf(buf + size, sizeof(buf) - size, "... and more\r\n");

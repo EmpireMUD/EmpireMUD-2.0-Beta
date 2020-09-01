@@ -449,7 +449,7 @@ void point_update_char(char_data *ch) {
 		// check way over-inventory (2x overburdened)
 		if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
 			found = FALSE;
-			LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+			DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 				if (IS_CARRYING_N(ch) > 2 * GET_LARGEST_INVENTORY(ch)) {
 					if (!found) {
 						found = TRUE;
@@ -1837,7 +1837,7 @@ void autostore_vehicle_contents(vehicle_data *veh) {
 	}
 	
 	// ok we are good to autostore
-	LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 		check_autostore(obj, TRUE);
 	}
 }

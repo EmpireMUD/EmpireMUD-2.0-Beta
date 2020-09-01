@@ -2155,7 +2155,7 @@ ACMD(do_douse) {
 	byte amount;
 	
 	// this loop finds a water container and sets obj
-	LL_FOREACH2(ch->carrying, iter, next_content) {
+	DL_FOREACH2(ch->carrying, iter, next_content) {
 		if (GET_DRINK_CONTAINER_TYPE(iter) == LIQ_WATER && GET_DRINK_CONTAINER_CONTENTS(iter) > 0) {
 			obj = iter;
 			break;

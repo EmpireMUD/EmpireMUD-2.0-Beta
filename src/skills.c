@@ -2509,7 +2509,7 @@ bool has_cooking_fire(char_data *ch) {
 		return TRUE;
 	}
 	
-	for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = obj->next_content) {
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_LIGHT) && !CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			return TRUE;
 		}

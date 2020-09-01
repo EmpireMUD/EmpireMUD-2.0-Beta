@@ -989,9 +989,8 @@ WCMD(do_wpurge) {
 			if (IS_NPC(ch))
 				extract_char(ch);
 		}
-
-		for (obj = room->contents; obj; obj = next_obj ) {
-			next_obj = obj->next_content;
+		
+		DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
 			extract_obj(obj);
 		}
 

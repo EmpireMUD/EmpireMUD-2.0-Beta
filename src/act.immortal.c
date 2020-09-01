@@ -146,8 +146,7 @@ void perform_autostore(obj_data *obj, empire_data *emp, int island) {
 	obj_data *temp, *next_temp;
 	
 	// store the inside first
-	for (temp = obj->contains; temp; temp = next_temp) {
-		next_temp = temp->next_content;
+	DL_FOREACH_SAFE2(obj->contains, temp, next_temp, next_content) {
 		perform_autostore(temp, emp, island);
 	}
 	
@@ -2657,15 +2656,15 @@ SHOW(show_piles) {
 	any = FALSE;
 	HASH_ITER(hh, world_table, room, next_room) {
 		count = 0;
-		LL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+		DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
 			++count;
 			
-			LL_FOREACH2(obj->contains, sub, next_content) {
+			DL_FOREACH2(obj->contains, sub, next_content) {
 				++count;
 			}
 		}
 		LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-			LL_FOREACH2(VEH_CONTAINS(veh), sub, next_content) {
+			DL_FOREACH2(VEH_CONTAINS(veh), sub, next_content) {
 				++count;
 			}
 		}
@@ -5284,7 +5283,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 	if (!is_proto) {
 		sprintf(buf, "Carried items: %d/%d; ", IS_CARRYING_N(k), CAN_CARRY_N(k));
-		for (i = 0, j = k->carrying; j; j = j->next_content, i++);
+		DL_COUNT2(k->carrying, j, i, next_content);	// TODO these var names are absurd
 		sprintf(buf + strlen(buf), "Items in: inventory: %d, ", i);
 
 		for (i = 0, i2 = 0; i < NUM_WEARS; i++)
@@ -5942,7 +5941,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 	if (j->contains) {
 		sprintf(buf, "Contents:&g");
-		for (found = 0, j2 = j->contains; j2; j2 = j2->next_content) {
+		found = 0;
+		DL_FOREACH2(j->contains, j2, next_content) {
 			sprintf(buf2, "%s %s", found++ ? "," : "", GET_OBJ_DESC(j2, ch, OBJ_DESC_SHORT));
 			strcat(buf, buf2);
 			if (strlen(buf) >= 62) {
@@ -6177,7 +6177,8 @@ void do_stat_room(char_data *ch) {
 	
 	if (ROOM_CONTENTS(IN_ROOM(ch))) {
 		sprintf(buf, "Contents:&g");
-		for (found = 0, j = ROOM_CONTENTS(IN_ROOM(ch)); j; j = j->next_content) {
+		found = 0;
+		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), j, next_content) {
 			if (!CAN_SEE_OBJ(ch, j))
 				continue;
 			sprintf(buf2, "%s %s", found++ ? "," : "", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT));
@@ -7113,7 +7114,7 @@ ACMD(do_autostore) {
 		else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
 			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM);
 			
-			LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
 			}
 		}
@@ -7127,14 +7128,13 @@ ACMD(do_autostore) {
 	else {			// no argument. clean out the room
 		act("$n gestures...", FALSE, ch, 0, 0, TO_ROOM);
 		send_to_room("The world seems a little cleaner.\r\n", IN_ROOM(ch));
-
-		for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = next_obj) {
-			next_obj = obj->next_content;
+		
+		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
 			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
 		}
 		
 		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
 			}
 		}

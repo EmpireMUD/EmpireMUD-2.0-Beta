@@ -1008,7 +1008,7 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 			msg_to_char(ch, "Get all of what?\r\n");
 			return;
 		}
-		LL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+		DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj) && (obj_dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
 				found = TRUE;
 				if (!perform_get_from_vehicle(ch, obj, veh, mode)) {
@@ -1172,7 +1172,7 @@ void do_put_obj_in_vehicle(char_data *ch, vehicle_data *veh, int dotmode, char *
 		}
 	}
 	else {
-		LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+		DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj) && (dotmode == FIND_ALL || isname(arg, GET_OBJ_KEYWORDS(obj)))) {
 				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 					continue;

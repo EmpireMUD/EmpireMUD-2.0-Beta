@@ -1585,7 +1585,7 @@ EVENTFUNC(burn_down_event) {
 	disassociate_building(room);
 
 	// Destroy 50% of the objects
-	LL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
 		if (!number(0, 1)) {
 			extract_obj(obj);
 		}
@@ -2988,7 +2988,7 @@ void clear_private_owner(int id) {
 	LL_FOREACH2(interior_room_list, iter, next_interior) {
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(iter)) == id) {
 			// reset autostore timer
-			LL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
+			DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
 				GET_AUTOSTORE_TIMER(obj) = time(0);
 			}
 		}
@@ -3000,7 +3000,7 @@ void clear_private_owner(int id) {
 			COMPLEX_DATA(iter)->private_owner = NOBODY;
 			
 			// reset autostore timer
-			LL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
+			DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
 				GET_AUTOSTORE_TIMER(obj) = time(0);
 			}
 		}

@@ -726,7 +726,7 @@ void auto_equip(char_data *ch, obj_data *obj, int *location) {
 * @param obj_data ***cont_row For putting items back in containers (must be at least MAX_BAG_ROWS long).
 */
 void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row) {
-	obj_data *obj2;
+	obj_data *o, *next_o;
 	int iter;
 	
 	if (!obj || !ch) {
@@ -759,12 +759,10 @@ void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***
 	 */
 	if (location > 0) {		/* Equipped */
 		for (iter = MAX_BAG_ROWS - 1; iter > 0; --iter) {
-			if ((*cont_row)[iter]) {	/* No container, back to inventory. */
-				for (; (*cont_row)[iter]; (*cont_row)[iter] = obj2) {
-					obj2 = (*cont_row)[iter]->next_content;
-					obj_to_char((*cont_row)[iter], ch);
-				}
-				(*cont_row)[iter] = NULL;
+			DL_FOREACH_SAFE2((*cont_row)[iter], o, next_o, next_content) {
+				// No container, back to inventory.
+				DL_DELETE2((*cont_row)[iter], o, prev_content, next_content);
+				obj_to_char(o, ch);
 			}
 		}
 		if ((*cont_row)[0]) {	/* Content list existing. */
@@ -772,29 +770,26 @@ void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***
 				/* Remove object, fill it, equip again. */
 				obj = unequip_char(ch, location - 1);
 				obj->contains = NULL;	/* Should be NULL anyway, but just in case. */
-				for (; (*cont_row)[0]; (*cont_row)[0] = obj2) {
-					obj2 = (*cont_row)[0]->next_content;
-					obj_to_obj((*cont_row)[0], obj);
+				DL_FOREACH_SAFE2((*cont_row)[0], o, next_o, next_content) {
+					DL_DELETE2((*cont_row)[iter], o, prev_content, next_content);
+					obj_to_obj(o, obj);
 				}
 				equip_char(ch, obj, location - 1);
 			}
 			else {			/* Object isn't container, empty the list. */
-				for (; (*cont_row)[0]; (*cont_row)[0] = obj2) {
-					obj2 = (*cont_row)[0]->next_content;
-					obj_to_char((*cont_row)[0], ch);
+				DL_FOREACH_SAFE2((*cont_row)[0], o, next_o, next_content) {
+					DL_DELETE2((*cont_row)[0], o, prev_content, next_content);
+					obj_to_char(o, ch);
 				}
-				(*cont_row)[0] = NULL;
 			}
 		}
 	}
 	else {	/* location <= 0 */
 		for (iter = MAX_BAG_ROWS - 1; iter > -location; --iter) {
-			if ((*cont_row)[iter]) {	/* No container, back to inventory. */
-				for (; (*cont_row)[iter]; (*cont_row)[iter] = obj2) {
-					obj2 = (*cont_row)[iter]->next_content;
-					obj_to_char((*cont_row)[iter], ch);
-				}
-				(*cont_row)[iter] = NULL;
+			// No container, back to inventory.
+			DL_FOREACH_SAFE2((*cont_row)[iter], o, next_o, next_content) {
+				DL_DELETE2((*cont_row)[iter], o, prev_content, next_content);
+				obj_to_char(o, ch);
 			}
 		}
 		if (iter == -location && (*cont_row)[iter]) {	/* Content list exists. */
@@ -802,18 +797,17 @@ void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***
 				/* Take the item, fill it, and give it back. */
 				obj_from_char(obj);
 				obj->contains = NULL;
-				for (; (*cont_row)[iter]; (*cont_row)[iter] = obj2) {
-					obj2 = (*cont_row)[iter]->next_content;
-					obj_to_obj((*cont_row)[iter], obj);
+				DL_FOREACH_SAFE2((*cont_row)[iter], o, next_o, next_content) {
+					DL_DELETE2((*cont_row)[iter], o, prev_content, next_content);
+					obj_to_obj(o, obj);
 				}
 				obj_to_char(obj, ch);	/* Add to inventory first. */
 			}
 			else {	/* Object isn't container, empty content list. */
-				for (; (*cont_row)[iter]; (*cont_row)[iter] = obj2) {
-					obj2 = (*cont_row)[iter]->next_content;
-					obj_to_char((*cont_row)[iter], ch);
+				DL_FOREACH_SAFE2((*cont_row)[iter], o, next_o, next_content) {
+					DL_DELETE2((*cont_row)[iter], o, prev_content, next_content);
+					obj_to_char(o, ch);
 				}
-				(*cont_row)[iter] = NULL;
 			}
 		}
 		if (location < 0 && location >= -MAX_BAG_ROWS) {
@@ -823,15 +817,7 @@ void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***
 			 * the character rented.
 			 */
 			obj_from_char(obj);
-			if ((obj2 = (*cont_row)[-location - 1]) != NULL) {
-				while (obj2->next_content) {
-					obj2 = obj2->next_content;
-				}
-				obj2->next_content = obj;
-			}
-			else {
-				(*cont_row)[-location - 1] = obj;
-			}
+			DL_APPEND2((*cont_row)[-location - 1], obj, prev_content, next_content);
 		}
 	}
 }
@@ -888,7 +874,7 @@ void objpack_load_room(room_data *room) {
 	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	extern vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum);
 
-	obj_data *obj, *obj2, *cont_row[MAX_BAG_ROWS];
+	obj_data *obj, *o, *next_o, *cont_row[MAX_BAG_ROWS];
 	char fname[MAX_STRING_LENGTH], line[MAX_INPUT_LENGTH];
 	int iter, location;
 	vehicle_data *veh;
@@ -942,14 +928,12 @@ void objpack_load_room(room_data *room) {
 				GET_AUTOSTORE_TIMER(obj) = timer;
 				
 				for (iter = MAX_BAG_ROWS - 1; iter > -location; --iter) {
-					if (cont_row[iter]) {		/* No container, back to room. */
-						for (; cont_row[iter]; cont_row[iter] = obj2) {
-							obj2 = cont_row[iter]->next_content;
-							timer = GET_AUTOSTORE_TIMER(cont_row[iter]);
-							obj_to_room(cont_row[iter], room);
-							GET_AUTOSTORE_TIMER(cont_row[iter]) = timer;
-						}
-						cont_row[iter] = NULL;
+					// No container, back to room.
+					DL_FOREACH_SAFE2(cont_row[iter], o, next_o, next_content) {
+						DL_DELETE2(cont_row[iter], o, prev_content, next_content);
+						timer = GET_AUTOSTORE_TIMER(o);
+						obj_to_room(o, room);
+						GET_AUTOSTORE_TIMER(o) = timer;
 					}
 				}
 				if (iter == -location && cont_row[iter]) {			/* Content list exists. */
@@ -957,35 +941,26 @@ void objpack_load_room(room_data *room) {
 						/* Take the item, fill it, and give it back. */
 						obj_from_room(obj);
 						obj->contains = NULL;
-						for (; cont_row[iter]; cont_row[iter] = obj2) {
-							obj2 = cont_row[iter]->next_content;
-							obj_to_obj(cont_row[iter], obj);
+						DL_FOREACH_SAFE2(cont_row[iter], o, next_o, next_content) {
+							DL_DELETE2(cont_row[iter], o, prev_content, next_content);
+							obj_to_obj(o, obj);
 						}
 						timer = GET_AUTOSTORE_TIMER(obj);
 						obj_to_room(obj, room);			/* Add to room first. */
 						GET_AUTOSTORE_TIMER(obj) = timer;
 					}
 					else {				/* Object isn't container, empty content list. */
-						for (; cont_row[iter]; cont_row[iter] = obj2) {
-							obj2 = cont_row[iter]->next_content;
-							timer = GET_AUTOSTORE_TIMER(cont_row[iter]);
-							obj_to_room(cont_row[iter], room);
-							GET_AUTOSTORE_TIMER(cont_row[iter]) = timer;
+						DL_FOREACH_SAFE2(cont_row[iter], o, next_o, next_content) {
+							DL_DELETE2(cont_row[iter], o, prev_content, next_content);
+							timer = GET_AUTOSTORE_TIMER(o);
+							obj_to_room(o, room);
+							GET_AUTOSTORE_TIMER(o) = timer;
 						}
-						cont_row[iter] = NULL;
 					}
 				}
 				if (location < 0 && location >= -MAX_BAG_ROWS) {
 					obj_from_room(obj);
-					if ((obj2 = cont_row[-location - 1]) != NULL) {
-						while (obj2->next_content) {
-							obj2 = obj2->next_content;
-						}
-						obj2->next_content = obj;
-					}
-					else {
-						cont_row[-location - 1] = obj;
-					}
+					DL_APPEND2(cont_row[-location - 1], o, prev_content, next_content);
 				}
 			}
 			else {
@@ -993,14 +968,11 @@ void objpack_load_room(room_data *room) {
 				
 				// item is missing here -- attempt to dump stuff back to the room if pending
 				for (iter = MAX_BAG_ROWS - 1; iter >= 0; --iter) {
-					if (cont_row[iter]) {		/* No container, back to room. */
-						for (; cont_row[iter]; cont_row[iter] = obj2) {
-							obj2 = cont_row[iter]->next_content;
-							timer = GET_AUTOSTORE_TIMER(cont_row[iter]);
-							obj_to_room(cont_row[iter], room);
-							GET_AUTOSTORE_TIMER(cont_row[iter]) = timer;
-						}
-						cont_row[iter] = NULL;
+					DL_FOREACH_SAFE2(cont_row[iter], o, next_o, next_content) {
+						DL_DELETE2(cont_row[iter], o, prev_content, next_content);
+						timer = GET_AUTOSTORE_TIMER(o);
+						obj_to_room(o, room);
+						GET_AUTOSTORE_TIMER(o) = timer;
 					}
 				}
 				

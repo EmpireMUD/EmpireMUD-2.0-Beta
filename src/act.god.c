@@ -236,18 +236,14 @@ ACMD(do_sacrifice) {
 		if (!ch->carrying && (!ROOM_CONTENTS(IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)))
 			msg_to_char(ch, "You don't seem to have anything to sacrifice.\r\n");
 		else {
-			for (obj = ch->carrying; obj; obj = next_obj) {
-				next_obj = obj->next_content;
-				
+			DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 				if (OBJ_FLAGGED(obj, OBJ_KEEP) || !bind_ok(obj, ch)) {
 					continue;
 				}
 				
 				amount += perform_sacrifice(ch, god, obj, TRUE);
 			}
-			for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = next_obj) {
-				next_obj = obj->next_content;
-				
+			DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
 				if (OBJ_FLAGGED(obj, OBJ_KEEP) || !bind_ok(obj, ch)) {
 					continue;
 				}

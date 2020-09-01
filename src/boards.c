@@ -86,11 +86,14 @@ int find_slot(void) {
 int find_board(char_data *ch) {
 	obj_data *obj;
 	int i;
-
-	for (obj = ROOM_CONTENTS(IN_ROOM(ch)); obj; obj = obj->next_content)
-		for (i = 0; i < NUM_OF_BOARDS; i++)
-			if (BOARD_VNUM(i) == GET_OBJ_VNUM(obj))
+	
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+		for (i = 0; i < NUM_OF_BOARDS; i++) {
+			if (BOARD_VNUM(i) == GET_OBJ_VNUM(obj)) {
 				return (i);
+			}
+		}
+	}
 
 	return (-1);
 }
@@ -132,10 +135,12 @@ ACMD(do_write) {
 	}
 	if (!ch->desc)
 		return;
-
-	for (board = ROOM_CONTENTS(IN_ROOM(ch)); board; board = board->next_content)
-		if (GET_OBJ_TYPE(board) == ITEM_BOARD)
+	
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), board, next_content) {
+		if (GET_OBJ_TYPE(board) == ITEM_BOARD) {
 			break;
+		}
+	}
 	if (!board)
 		msg_to_char(ch, "There's no board here.\r\n");
 	else if ((board_type = find_board(ch)) == -1) {
@@ -184,10 +189,12 @@ ACMD(do_read) {
 	}
 	if (!ch->desc)
 		return;
-
-	for (board = ROOM_CONTENTS(IN_ROOM(ch)); board; board = board->next_content)
-		if (GET_OBJ_TYPE(board) == ITEM_BOARD)
+	
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), board, next_content) {
+		if (GET_OBJ_TYPE(board) == ITEM_BOARD) {
 			break;
+		}
+	}
 	if (!board)
 		msg_to_char(ch, "You don't have anything like that to read.\r\n");
 	else if ((board_type = find_board(ch)) == -1) {
@@ -209,10 +216,12 @@ ACMD(do_respond) {
 	}
 	if (!ch->desc)
 		return;
-
-	for (board = ROOM_CONTENTS(IN_ROOM(ch)); board; board = board->next_content)
-		if (GET_OBJ_TYPE(board) == ITEM_BOARD)
+	
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), board, next_content) {
+		if (GET_OBJ_TYPE(board) == ITEM_BOARD) {
 			break;
+		}
+	}
 	if (!board)
 		msg_to_char(ch, "There's no board here.\r\n");
 	else if ((board_type = find_board(ch)) == -1) {

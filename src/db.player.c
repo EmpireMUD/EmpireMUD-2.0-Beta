@@ -1147,13 +1147,13 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct player_event_data *ped;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
+	obj_data *obj, *o, *next_o;
 	struct req_data *task;
 	obj_data **cont_row;
 	account_data *acct;
 	bitvector_t bit_in;
 	bool end = FALSE;
 	trig_data *trig;
-	obj_data *obj;
 	double dbl_in;
 	long l_in[3];
 	char c_in;
@@ -2161,7 +2161,15 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 		}
 	}
 	
+	// delivery anything left in cont_row
+	for (iter = MAX_BAG_ROWS - 1; iter >= 0; --iter) {
+		DL_FOREACH_SAFE2(cont_row[iter], o, next_o, next_content) {
+			DL_DELETE2(cont_row[iter], o, prev_content, next_content);
+			obj_to_char(o, ch);
+		}
+	}
 	free(cont_row);
+	
 	return ch;
 }
 
@@ -4929,7 +4937,7 @@ void check_eq_sets(char_data *ch) {
 			}
 		}
 	}
-	LL_FOREACH2(ch->carrying, obj, next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		LL_FOREACH_SAFE(GET_OBJ_EQ_SETS(obj), oset, next_oset) {
 			if (!get_eq_set_by_id(ch, oset->id)) {
 				// not found

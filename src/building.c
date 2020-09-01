@@ -1076,9 +1076,8 @@ void start_dismantle_building(room_data *loc) {
 		if (HOME_ROOM(room) == loc) {
 			dismantle_wtrigger(room, NULL, FALSE);
 			delete_room_npcs(room, NULL, TRUE);
-		
-			for (obj = ROOM_CONTENTS(room); obj; obj = next_obj) {
-				next_obj = obj->next_content;
+			
+			DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
 				obj_to_room(obj, loc);
 			}
 			for (targ = ROOM_PEOPLE(room); targ; targ = next_targ) {

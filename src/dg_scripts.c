@@ -108,15 +108,19 @@ obj_data *get_obj_in_list(char *name, obj_data *list) {
 
 	if (*name == UID_CHAR) {
 		id = atoi(name + 1);
-
-		for (i = list; i; i = i->next_content)
-			if (id == obj_script_id(i))
+		
+		DL_FOREACH2(list, i, next_content) {
+			if (id == obj_script_id(i)) {
 				return i;
+			}
+		}
 	}
 	else {
-		for (i = list; i; i = i->next_content)
-			if (isname(name, i->name))
+		DL_FOREACH2(list, i, next_content) {
+			if (isname(name, i->name)) {
 				return i;
+			}
+		}
 	}
 
 	return NULL;
@@ -792,14 +796,18 @@ obj_data *get_obj_in_room(room_data *room, char *name) {
 
 	if (*name == UID_CHAR) {
 		id = atoi(name + 1);
-		for (obj = room->contents; obj; obj = obj->next_content)
-			if (id == obj_script_id(obj)) 
+		DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+			if (id == obj_script_id(obj)) {
 				return obj;
+			}
+		}
 	}
 	else {
-		for (obj = room->contents; obj; obj = obj->next_content)
-			if (isname(name, obj->name))
+		DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+			if (isname(name, obj->name)) {
 				return obj;
+			}
+		}
 	}           
 
 	return NULL;
@@ -809,12 +817,15 @@ obj_data *get_obj_in_room(room_data *room, char *name) {
 obj_data *get_obj_by_room(room_data *room, char *name) {
 	obj_data *obj;
 
-	if (*name == UID_CHAR) 
+	if (*name == UID_CHAR) {
 		return find_obj(atoi(name+1), TRUE);
-
-	for (obj = room->contents; obj; obj = obj->next_content)
-		if (isname(name, obj->name))
+	}
+	
+	DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+		if (isname(name, obj->name)) {
 			return obj;
+		}
+	}
 	
 	DL_FOREACH(object_list, obj) {
 		if (isname(name, obj->name)) {
@@ -971,8 +982,8 @@ int item_in_list(char *item, obj_data *list) {
 
 	if (*item == UID_CHAR) {
 		id = atoi(item + 1);
-
-		for (i = list; i; i = i->next_content) {
+		
+		DL_FOREACH2(list, i, next_content) {
 			if (id == obj_script_id(i)) {
 				count ++;
 				break;
@@ -984,8 +995,8 @@ int item_in_list(char *item, obj_data *list) {
 	}
 	else if (is_number(item)) { /* check for vnum */
 		obj_vnum ovnum = atoi(item);
-
-		for (i = list; i; i = i->next_content) {
+		
+		DL_FOREACH2(list, i, next_content) {
 			if (GET_OBJ_VNUM(i) == ovnum) {
 				count++;
 				break;
@@ -996,7 +1007,7 @@ int item_in_list(char *item, obj_data *list) {
 		}
 	}
 	else {
-		for (i = list; i; i = i->next_content) {
+		DL_FOREACH2(list, i, next_content) {
 			if (isname(item, i->name)) {
 				count++;
 				break;
@@ -1507,14 +1518,18 @@ ACMD(do_tattach) {
 	else if (is_abbrev(arg, "object") || is_abbrev(arg, "otr")) {
 		object = (*targ_name == UID_CHAR) ? get_obj(targ_name) : get_obj_vis(ch, targ_name);
 		if (!object) { /* search room for one with this vnum */
-			for (object = ROOM_CONTENTS(IN_ROOM(ch)); object;object=object->next_content) 
-				if (GET_OBJ_VNUM(object) == num_arg)
+			DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), object, next_content) {
+				if (GET_OBJ_VNUM(object) == num_arg) {
 					break;
+				}
+			}
 
 			if (!object) { /* search inventory for one with this vnum */
-				for (object = ch->carrying;object;object=object->next_content) 
-					if (GET_OBJ_VNUM(object) == num_arg)
+				DL_FOREACH2(ch->carrying, object, next_content) {
+					if (GET_OBJ_VNUM(object) == num_arg) {
 						break;
+					}
+				}
 
 				if (!object) {
 					msg_to_char(ch, "That object does not exist.\r\n");
@@ -1795,14 +1810,18 @@ ACMD(do_tdetach) {
 	else if (is_abbrev(arg1, "object") || !str_cmp(arg1, "otr")) {
 		object = (*arg2 == UID_CHAR) ? get_obj(arg2) : get_obj_vis(ch, arg2);
 		if (!object) { /* search room for one with this vnum */
-			for (object = ROOM_CONTENTS(IN_ROOM(ch)); object;object=object->next_content) 
-				if (GET_OBJ_VNUM(object) == num_arg)
+			DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), object, next_content) {
+				if (GET_OBJ_VNUM(object) == num_arg) {
 					break;
+				}
+			}
 
 			if (!object) { /* search inventory for one with this vnum */
-				for (object = ch->carrying;object;object=object->next_content) 
-					if (GET_OBJ_VNUM(object) == num_arg)
+				DL_FOREACH2(ch->carrying, object, next_content) {
+					if (GET_OBJ_VNUM(object) == num_arg) {
 						break;
+					}
+				}
 
 				if (!object) { /* give up */
 					msg_to_char(ch, "No such object around.\r\n");
@@ -3723,7 +3742,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 					else if (!str_cmp(field, "inventory")) {
 						if(subfield && *subfield) {
-							for (obj = c->carrying;obj;obj=obj->next_content) {
+							DL_FOREACH2(c->carrying, obj, next_content) {
 								if(GET_OBJ_VNUM(obj)==atoi(subfield)) {
 									snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(obj)); /* arg given, found */
 									return;
@@ -4530,7 +4549,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (GET_OBJ_TYPE(o) == ITEM_CONTAINER) {
 							obj_vnum snum = (subfield && is_number(subfield)) ? atoi(subfield) : NOTHING;
 							obj_data *item;
-							for (item = o->contains; item; item = item->next_content) {
+							DL_FOREACH2(o->contains, item, next_content) {
 								if (snum != NOTHING) {
 									if (snum == GET_OBJ_VNUM(item))
 										++count;
@@ -4582,15 +4601,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (GET_OBJ_TYPE(o) == ITEM_CONTAINER) {
 							obj_data *item;
 							obj_vnum snum = (subfield && is_number(subfield)) ? atoi(subfield) : NOTHING;
-
-							for (item = o->contains; item && !found; item = item->next_content) {
+							
+							DL_FOREACH2(o->contains, item, next_content) {
 								if (snum != NOTHING) {
-									if (snum == GET_OBJ_VNUM(item)) 
+									if (snum == GET_OBJ_VNUM(item)) {
 										found = TRUE;
+										break;
+									}
 								}
 								else {
-									if (isname(subfield, item->name)) 
+									if (isname(subfield, item->name)) {
 										found = TRUE;
+										break;
+									}
 								}
 							}
 						}
@@ -4922,7 +4945,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "contents")) {
 						if (subfield && *subfield) {
-							for (obj = ROOM_CONTENTS(r); obj; obj = obj->next_content) {
+							DL_FOREACH2(ROOM_CONTENTS(r), obj, next_content) {
 								if (GET_OBJ_VNUM(obj) == atoi(subfield)) {
 									/* arg given, found */
 									snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(obj)); 
@@ -5368,7 +5391,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (VEH_FLAGGED(v, VEH_CONTAINER)) {
 							obj_vnum snum = (subfield && is_number(subfield)) ? atoi(subfield) : NOTHING;
 							obj_data *item;
-							for (item = VEH_CONTAINS(v); item; item = item->next_content) {
+							DL_FOREACH2(VEH_CONTAINS(v), item, next_content) {
 								if (snum != NOTHING) {
 									if (snum == GET_OBJ_VNUM(item)) {
 										++count;
@@ -5464,16 +5487,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (VEH_FLAGGED(v, VEH_CONTAINER)) {
 							obj_data *item;
 							obj_vnum snum = (subfield && is_number(subfield)) ? atoi(subfield) : NOTHING;
-
-							for (item = VEH_CONTAINS(v); item && !found; item = item->next_content) {
+							
+							DL_FOREACH2(VEH_CONTAINS(v), item, next_content) {
 								if (snum != NOTHING) {
 									if (snum == GET_OBJ_VNUM(item)) {
 										found = TRUE;
+										break;
 									}
 								}
 								else {
 									if (isname(subfield, item->name)) {
 										found = TRUE;
+										break;
 									}
 								}
 							}

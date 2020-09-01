@@ -97,7 +97,7 @@ obj_data *find_best_saddle(char_data *ch) {
 	obj_data *obj, *best = NULL;
 	double best_score = 0, this;
 	
-	for (obj = ch->carrying; obj; obj = obj->next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		if (CAN_WEAR(obj, ITEM_WEAR_SADDLE) && can_wear_item(ch, obj, FALSE)) {
 			this = rate_item(obj);
 			

@@ -2045,7 +2045,7 @@ PLAYER_UPDATE_FUNC(b2_11_update_players) {
 	check_delayed_load(ch);
 	
 	// inventory
-	for (obj = ch->carrying; obj; obj = obj->next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		if ((proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 			obj->proto_script = copy_trig_protos(proto->proto_script);
 			assign_triggers(obj, OBJ_TRIGGER);
@@ -2117,8 +2117,7 @@ PLAYER_UPDATE_FUNC(b3_2_player_gear_disenchant) {
 			extract_obj(obj);
 		}
 	}
-	for (obj = ch->carrying; obj; obj = next_obj) {
-		next_obj = obj->next_content;
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_ENCHANTED) && obj_proto(GET_OBJ_VNUM(obj))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -2763,8 +2762,7 @@ PLAYER_UPDATE_FUNC(b5_14_player_superiors) {
 			extract_obj(obj);
 		}
 	}
-	for (obj = ch->carrying; obj; obj = next_obj) {
-		next_obj = obj->next_content;
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (OBJ_FLAGGED(obj, OBJ_SUPERIOR) && obj_proto(GET_OBJ_VNUM(obj))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -2923,7 +2921,7 @@ PLAYER_UPDATE_FUNC(b5_23_player_potion_update) {
 			extract_obj(obj);
 		}
 	}
-	LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (IS_POTION(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -3007,7 +3005,7 @@ PLAYER_UPDATE_FUNC(b5_24_player_poison_update) {
 			extract_obj(obj);
 		}
 	}
-	LL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (IS_POISON(obj) && obj_proto(GET_OBJ_VNUM(obj))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -3697,8 +3695,7 @@ PLAYER_UPDATE_FUNC(b5_86_player_missile_weapons) {
 			extract_obj(obj);
 		}
 	}
-	for (obj = ch->carrying; obj; obj = next_obj) {
-		next_obj = obj->next_content;
+	DL_FOREACH_SAFE2(ch->carrying, obj, next_obj, next_content) {
 		if (IS_MISSILE_WEAPON(obj)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			swap_obj_for_obj(obj, new);
@@ -4428,7 +4425,7 @@ void b5_102_home_cleanup(void) {
 	// autostore homes
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(room)) != NOBODY) {
-			LL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
+			DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
 				perform_autostore(obj, ROOM_OWNER(room), NO_ISLAND);
 			}
 		}

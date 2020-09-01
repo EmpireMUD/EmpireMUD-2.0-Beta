@@ -521,7 +521,7 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 				continue;
 			}
 			
-			LL_FOREACH_SAFE2(ROOM_CONTENTS(INST_ROOM(inst, iter)), obj, next_obj, next_content) {
+			DL_FOREACH_SAFE2(ROOM_CONTENTS(INST_ROOM(inst, iter)), obj, next_obj, next_content) {
 				if (GET_OBJ_VNUM(obj) != vnum) {
 					continue;
 				}

@@ -357,7 +357,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 	}
 	
 	// search in inventory
-	LL_FOREACH2(ch->carrying, obj, next_content) {
+	DL_FOREACH2(ch->carrying, obj, next_content) {
 		if (!CAN_SEE_OBJ(ch, obj)) {
 			continue;
 		}
@@ -369,7 +369,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 	}
 	
 	// objs in room
-	LL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 		if (!CAN_SEE_OBJ(ch, obj)) {
 			continue;
 		}

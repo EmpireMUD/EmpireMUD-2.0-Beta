@@ -3318,7 +3318,7 @@ void extract_resources(char_data *ch, struct resource_data *list, bool ground, s
 				
 					// up to two places to search
 					for (liter = 0; liter < 2 && res->amount > 0; ++liter) {
-						LL_FOREACH_SAFE2(search_list[liter], obj, next_obj, next_content) {
+						DL_FOREACH_SAFE2(search_list[liter], obj, next_obj, next_content) {
 							// skip keeps
 							if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 								continue;
@@ -3464,7 +3464,7 @@ struct resource_data *get_next_resource(char_data *ch, struct resource_data *lis
 				
 				// up to two places to search
 				for (liter = 0; liter < 2; ++liter) {
-					LL_FOREACH2(search_list[liter], obj, next_content) {
+					DL_FOREACH2(search_list[liter], obj, next_content) {
 						// skip keeps
 						if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 							continue;
@@ -3687,7 +3687,7 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 				
 				// up to two places to search for containers to fill
 				for (liter = 0; liter < 2 && remaining > 0; ++liter) {
-					LL_FOREACH2(search_list[liter], obj, next_content) {
+					DL_FOREACH2(search_list[liter], obj, next_content) {
 						if (IS_DRINK_CONTAINER(obj) && (GET_DRINK_CONTAINER_TYPE(obj) == res->vnum || GET_DRINK_CONTAINER_CONTENTS(obj) == 0)) {
 							diff = GET_DRINK_CONTAINER_CAPACITY(obj) - GET_DRINK_CONTAINER_CONTENTS(obj);
 							diff = MIN(remaining, diff);
@@ -3863,7 +3863,7 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 				
 					// now search the list(s)
 					for (liter = 0; liter < 2 && res->amount > 0; ++liter) {
-						LL_FOREACH2(search_list[liter], obj, next_content) {
+						DL_FOREACH2(search_list[liter], obj, next_content) {
 							if (obj->search_mark) {
 								continue;	// skip already-used items
 							}
@@ -4039,7 +4039,7 @@ void unmark_items_for_char(char_data *ch, bool ground) {
 	search_list[1] = ground ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
 	
 	for (iter = 0; iter < 2; ++iter) {
-		LL_FOREACH2(search_list[iter], obj, next_content) {
+		DL_FOREACH2(search_list[iter], obj, next_content) {
 			obj->search_mark = FALSE;
 		}
 	}
