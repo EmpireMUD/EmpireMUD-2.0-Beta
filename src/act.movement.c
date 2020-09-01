@@ -1372,7 +1372,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 			sprintf(buf2, "$n %s %%s.", mob_move_types[move_type]);
 		}
 		if (*buf2 && (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT) || number(0, 4))) {
-			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 				if (vict == ch || !vict->desc) {
 					continue;
 				}
@@ -1440,8 +1440,8 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 		else {	// default:
 			// this leaves a %s for later
 			sprintf(buf2, "$n %s %s from %%s.", mob_move_types[move_type], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
-
-			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
+			
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 				if (vict == ch || !vict->desc) {
 					continue;
 				}
@@ -1780,7 +1780,7 @@ ACMD(do_circle) {
 	// message
 	msg_to_char(ch, "You circle %s.\r\n", dirs[get_direction_for_char(ch, dir)]);
 	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
-		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 			if (vict != ch && vict->desc && CAN_SEE(vict, ch)) {
 				sprintf(buf, "$n circles %s.", dirs[get_direction_for_char(vict, dir)]);
 				act(buf, TRUE, ch, NULL, vict, TO_VICT);
@@ -1822,7 +1822,7 @@ ACMD(do_circle) {
 	
 	// message
 	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
-		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, vict, next_in_room) {
 			if (vict != ch && vict->desc && CAN_SEE(vict, ch)) {
 				sprintf(buf, "$n circles in from %s.", from_dir[get_direction_for_char(vict, dir)]);
 				act(buf, TRUE, ch, NULL, vict, TO_VICT);
@@ -1932,7 +1932,7 @@ ACMD(do_follow) {
 		// check for beckon
 		if (!IS_NPC(ch) && GET_BECKONED_BY(ch) > 0) {
 			leader = NULL;
-			LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
 				if (!REAL_NPC(chiter) && GET_IDNUM(REAL_CHAR(chiter)) == GET_BECKONED_BY(ch)) {
 					leader = chiter;
 					break;

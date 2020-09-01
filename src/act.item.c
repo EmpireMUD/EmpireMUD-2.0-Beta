@@ -1577,7 +1577,7 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 			
 			// log dropping items in front of mortals
 			if (IS_IMMORTAL(ch)) {
-				for (iter = ROOM_PEOPLE(IN_ROOM(ch)); iter; iter = iter->next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 					if (iter != ch && !IS_NPC(iter) && !IS_IMMORTAL(iter)) {
 						syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s drops %s with mortal present (%s) at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_NAME(iter), room_log_identifier(IN_ROOM(ch)));
 						break;
@@ -2956,7 +2956,7 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		}
 		
 		// found docks...
-		LL_FOREACH2(ROOM_VEHICLES(ter->room), veh, next_in_room) {
+		DL_FOREACH2(ROOM_VEHICLES(ter->room), veh, next_in_room) {
 			if (VEH_OWNER(veh) != emp) {
 				continue;
 			}
@@ -3364,7 +3364,7 @@ bool ship_is_empty(vehicle_data *ship) {
 	
 	// check all interior rooms
 	LL_FOREACH(VEH_ROOM_LIST(ship), vrl) {
-		LL_FOREACH2(ROOM_PEOPLE(vrl->room), ch, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(vrl->room), ch, next_in_room) {
 			if (!IS_NPC(ch)) {
 				// not empty!
 				return FALSE;
@@ -5374,7 +5374,7 @@ ACMD(do_get) {
 				send_to_char("Get from all of what?\r\n", ch);
 				return;
 			}
-			LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 				if (CAN_SEE_VEHICLE(ch, veh) && VEH_FLAGGED(veh, VEH_CONTAINER) && (cont_dotmode == FIND_ALL || isname(arg2, VEH_KEYWORDS(veh)))) {
 					found = 1;
 					do_get_from_vehicle(ch, veh, arg1, FIND_OBJ_ROOM, amount);
@@ -6961,7 +6961,7 @@ ACMD(do_split) {
 	
 	// count group members present
 	count = 0;
-	for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 		if (!IS_NPC(vict) && GROUP(vict) && GROUP(vict) == GROUP(ch)) {
 			++count;
 		}
@@ -6988,7 +6988,7 @@ ACMD(do_split) {
 		msg_to_char(ch, "You split %s among %d group member%s.\r\n", money_amount(coin_emp, coin_amt), count, PLURAL(count));
 		sprintf(buf, "$n splits %s among %d group member%s; you receive %d.", money_amount(coin_emp, coin_amt), count, PLURAL(count), split);
 		
-		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 			if (vict != ch && !IS_NPC(vict) && GROUP(vict) && GROUP(vict) == GROUP(ch)) {
 				increase_coins(vict, coin_emp, split);
 				decrease_coins(ch, coin_emp, split);
@@ -7362,9 +7362,10 @@ ACMD(do_wear) {
 	}
 	
 	// check combat
-	for (iter = ROOM_PEOPLE(IN_ROOM(ch)); iter && !fighting_me; iter = iter->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 		if (FIGHTING(iter) == ch) {
 			fighting_me = TRUE;
+			break;
 		}
 	}
 	if (fighting_me || GET_POS(ch) == POS_FIGHTING || FIGHTING(ch)) {

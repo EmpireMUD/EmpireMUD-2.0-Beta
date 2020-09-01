@@ -721,7 +721,7 @@ ACMD(do_hunt) {
 	
 	// count how many people are in the room and also check for a matching animal here
 	count = 0;
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 		++count;
 		
 		if (!IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_ANIMAL)) {
@@ -740,7 +740,7 @@ ACMD(do_hunt) {
 	}
 	
 	// build lists: vehicles
-	LL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
 		if (VEH_SPAWNS(veh)) {
 			CREATE(item, struct hunt_helper, 1);
 			item->list = VEH_SPAWNS(veh);

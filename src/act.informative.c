@@ -408,7 +408,7 @@ void look_at_target(char_data *ch, char *arg) {
 
 	// does it match an extra desc of a vehicle here?
 	if (!found && ROOM_VEHICLES(IN_ROOM(ch))) {
-		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 			if (CAN_SEE_VEHICLE(ch, veh) && (desc = find_exdesc(arg, VEH_EX_DESCS(veh))) != NULL && ++i == fnum) {
 				send_to_char(desc, ch);
 				act("$n looks at $V.", TRUE, ch, NULL, veh, TO_ROOM);
@@ -776,7 +776,7 @@ void display_score_to_char(char_data *ch, char_data *to) {
 */
 void list_char_to_char(char_data *list, char_data *ch) {
 	char_data *i, *j;
-	int c = 1;
+	int c;
 	
 	bool use_mob_stacking = config_get_bool("use_mob_stacking");
 	#define MOB_CAN_STACK(ch)  (use_mob_stacking && !GET_COMPANION(ch) && !GET_LED_BY(ch) && GET_POS(ch) != POS_FIGHTING && !MOB_FLAGGED((ch), MOB_EMPIRE | MOB_TIED | MOB_MOUNTABLE))
@@ -785,23 +785,26 @@ void list_char_to_char(char_data *list, char_data *ch) {
 	if (!list || !ch || !ch->desc) {
 		return;
 	}
-
-	for (i = list; i; i = i->next_in_room, c = 1) {
+	
+	DL_FOREACH2(list, i, next_in_room) {
+		c = 1;
 		if (ch != i) {
 			if (IS_NPC(i) && MOB_CAN_STACK(i)) {
-				for (j = list; j != i; j = j->next_in_room) {
-					if (GET_MOB_VNUM(j) == GET_MOB_VNUM(i) && MOB_CAN_STACK(j) && CAN_SEE(ch, j) && GET_POS(j) == GET_POS(i)) {
+				// check if already showed this mob...
+				DL_FOREACH2(list, j, next_in_room) {
+					if (j == i || (GET_MOB_VNUM(j) == GET_MOB_VNUM(i) && MOB_CAN_STACK(j) && CAN_SEE(ch, j) && GET_POS(j) == GET_POS(i))) {
 						break;
 					}
 				}
 			
 				if (j != i) {
-					continue;
+					continue;	// already showed this mob
 				}
-			
-				for (j = i->next_in_room; j; j = j->next_in_room) {
+				
+				// count duplicates
+				DL_FOREACH2(i->next_in_room, j, next_in_room) {
 					if (GET_MOB_VNUM(j) == GET_MOB_VNUM(i) && MOB_CAN_STACK(j) && CAN_SEE(ch, j) && GET_POS(j) == GET_POS(i)) {
-						c++;
+						++c;
 					}
 				}
 			}
@@ -1162,7 +1165,7 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
 		return;
 	}
 	
-	LL_FOREACH2(list, veh, next_in_room) {
+	DL_FOREACH2(list, veh, next_in_room) {
 		// conditions to show
 		if (!CAN_SEE_VEHICLE(ch, veh)) {
 			continue;	// should we show a "something" ?
@@ -2376,7 +2379,7 @@ ACMD(do_contents) {
 	}
 	// verify we can see even 1 vehicle
 	if (!can_see_anything) {
-		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 			if (CAN_SEE_VEHICLE(ch, veh)) {
 				can_see_anything = TRUE;
 				break;	// only need 1

@@ -106,9 +106,7 @@ void build_instance_exterior(struct instance_data *inst) {
 	}
 	
 	// purge mobs in the room
-	for (mob = ROOM_PEOPLE(INST_LOCATION(inst)); mob; mob = next_mob) {
-		next_mob = mob->next_in_room;
-		
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(INST_LOCATION(inst)), mob, next_mob, next_in_room) {
 		if (IS_NPC(mob)) {
 			extract_char(mob);
 		}
@@ -224,7 +222,7 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	
 	// check for players
 	present = FALSE;
-	LL_FOREACH2(ROOM_PEOPLE(loc), ch, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(loc), ch, next_in_room) {
 		if (!IS_NPC(ch)) {
 			present = TRUE;
 			break;
@@ -758,7 +756,7 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 		}
 	
 		// do not generate instances in front of players
-		for (ch = ROOM_PEOPLE(loc); ch; ch = ch->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(loc), ch, next_in_room) {
 			if (!IS_NPC(ch)) {
 				return FALSE;
 			}
@@ -1097,7 +1095,7 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 		for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 			if (INST_ROOM(inst, iter)) {
 				// get rid of vehicles first (helps relocate players inside)
-				LL_FOREACH_SAFE2(ROOM_VEHICLES(INST_ROOM(inst, iter)), veh, next_veh, next_in_room) {
+				DL_FOREACH_SAFE2(ROOM_VEHICLES(INST_ROOM(inst, iter)), veh, next_veh, next_in_room) {
 					extract_vehicle(veh);
 				}
 	
@@ -1694,7 +1692,7 @@ int count_players_in_instance(struct instance_data *inst, bool count_imms, char_
 	
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 		if (INST_ROOM(inst, iter)) {
-			for (ch = ROOM_PEOPLE(INST_ROOM(inst, iter)); ch; ch = ch->next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(INST_ROOM(inst, iter)), ch, next_in_room) {
 				if (ch != ignore_ch && !IS_NPC(ch) && (count_imms || !IS_IMMORTAL(ch))) {
 					++count;
 				}
@@ -1717,7 +1715,7 @@ int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum) {
 	
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 		if (INST_ROOM(inst, iter)) {
-			LL_FOREACH2(ROOM_VEHICLES(INST_ROOM(inst, iter)), veh, next_in_room) {
+			DL_FOREACH2(ROOM_VEHICLES(INST_ROOM(inst, iter)), veh, next_in_room) {
 				if (VEH_VNUM(veh) == vnum) {
 					++count;
 				}
@@ -2532,7 +2530,7 @@ void scale_instance_to_level(struct instance_data *inst, int level) {
 					scale_item_to_level(obj, level);
 				}
 			}
-			LL_FOREACH2(ROOM_VEHICLES(INST_ROOM(inst, iter)), veh, next_in_room) {
+			DL_FOREACH2(ROOM_VEHICLES(INST_ROOM(inst, iter)), veh, next_in_room) {
 				if (VEH_SCALE_LEVEL(veh) == 0) {
 					scale_vehicle_to_level(veh, level);
 				}

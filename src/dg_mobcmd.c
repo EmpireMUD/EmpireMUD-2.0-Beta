@@ -198,7 +198,7 @@ ACMD(do_maggro) {
 	}
 	
 	// if we got here, we missed the victim -- look for his allies
-	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
 		if (iter == ch || is_fight_ally(ch, iter)) {
 			continue;
 		}
@@ -218,7 +218,7 @@ ACMD(do_maggro) {
 	}
 	
 	// okay, look for a broader target
-	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
 		if (iter == ch || is_fight_ally(ch, iter)) {
 			continue;
 		}
@@ -459,8 +459,8 @@ ACMD(do_mechoneither) {
 		mob_log(ch, "mechoneither: vict 2 (%s) does not exist", arg2);
 		return;
 	}
-
-	for (iter = ROOM_PEOPLE(IN_ROOM(vict1)); iter; iter = iter->next_in_room) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(vict1)), iter, next_in_room) {
 		if (iter->desc && iter != vict1 && iter != vict2) {
 			sub_write(p, iter, TRUE, TO_CHAR);
 		}
@@ -922,9 +922,8 @@ ACMD(do_mpurge) {
 		/* 'purge' */
 		char_data *vnext;
 		obj_data *obj_next;
-
-		for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim; victim = vnext) {
-			vnext = victim->next_in_room;
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, vnext, next_in_room) {
 			if (IS_NPC(victim) && victim != ch)
 				extract_char(victim);
 		}
@@ -1290,10 +1289,8 @@ ACMD(do_mteleport) {
 			mob_log(ch, "mteleport all target is itself");
 			return;
 		}
-
-		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_ch) {
-			next_ch = vict->next_in_room;
-
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_ch, next_in_room) {
 			if (valid_dg_target(vict, DG_ALLOW_GODS)) {
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
@@ -1314,9 +1311,7 @@ ACMD(do_mteleport) {
 		for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 			// only if it's not the target room, or we'd be here all day
 			if (INST_ROOM(inst, iter) && INST_ROOM(inst, iter) != target) {
-				for (vict = ROOM_PEOPLE(INST_ROOM(inst, iter)); vict; vict = next_ch) {
-					next_ch = vict->next_in_room;
-					
+			    DL_FOREACH_SAFE2(ROOM_PEOPLE(INST_ROOM(inst, iter)), vict, next_ch, next_in_room) {
 					if (!valid_dg_target(vict, DG_ALLOW_GODS)) {
 						continue;
 					}
@@ -1572,7 +1567,7 @@ ACMD(do_maoe) {
 	modifier = scale_modifier_by_mob(ch, modifier);
 	
 	level = get_approximate_level(ch);
-	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_vict, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_vict, next_in_room) {
 		if (ch == vict) {
 			continue;
 		}
@@ -1994,11 +1989,11 @@ ACMD(do_mslay) {
 /* transform into a different mobile */
 ACMD(do_mtransform) {
 	char arg[MAX_INPUT_LENGTH];
-	char_data *m, tmpmob;
+	char_data *m; //, tmpmob;
 	obj_data *obj[NUM_WEARS];
-	mob_vnum this_vnum = GET_MOB_VNUM(ch);
+	// mob_vnum this_vnum = GET_MOB_VNUM(ch);
 	bool keep_attr = TRUE; // new mob keeps the old mob's h/v/m/b
-	int pos, iter;
+	int pos; //, iter;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -2052,7 +2047,7 @@ ACMD(do_mtransform) {
 
 		/* put the mob in the same room as ch so extract will work */
 		char_to_room(m, IN_ROOM(ch));
-
+		/* none of this will work
 		memcpy(&tmpmob, m, sizeof(*m));
 		tmpmob.script_id = ch->script_id;
 		tmpmob.affected = ch->affected;
@@ -2060,9 +2055,6 @@ ACMD(do_mtransform) {
 		tmpmob.proto_script = ch->proto_script;
 		tmpmob.script = ch->script;
 		tmpmob.memory = ch->memory;
-		tmpmob.next_in_room = ch->next_in_room;
-		tmpmob.next = ch->next;
-		tmpmob.next_fighting = ch->next_fighting;
 		tmpmob.followers = ch->followers;
 		tmpmob.master = ch->master;
 		tmpmob.cooldowns = ch->cooldowns;
@@ -2086,6 +2078,7 @@ ACMD(do_mtransform) {
 
 		ch->vnum = this_vnum;
 		extract_char(m);
+		*/
 	}
 }
 

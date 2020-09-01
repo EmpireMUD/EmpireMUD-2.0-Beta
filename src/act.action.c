@@ -217,7 +217,7 @@ void stop_room_action(room_data *room, int action, int chore) {
 	
 	char_data *c;
 	
-	for (c = ROOM_PEOPLE(room); c; c = c->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), c, next_in_room) {
 		// player actions
 		if (action != NOTHING && !IS_NPC(c) && GET_ACTION(c) == action) {
 			cancel_action(c);
@@ -1545,7 +1545,7 @@ void process_chop(char_data *ch) {
 		
 		// stoppin choppin -- don't use stop_room_action because we also restart them
 		// (this includes ch)
-		for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter; ch_iter = ch_iter->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 			if (!IS_NPC(ch_iter) && GET_ACTION(ch_iter) == ACT_CHOPPING) {
 				cancel_action(ch_iter);
 				start_chopping(ch_iter);
@@ -1605,7 +1605,7 @@ void process_digging(char_data *ch) {
 	}
 	
 	// look for earthmelders
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 		if (!AFF_FLAGGED(iter, AFF_EARTHMELD)) {
 			continue;
 		}
@@ -1723,7 +1723,7 @@ void process_excavating(char_data *ch) {
 	}
 	
 	// look for earthmelders
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 		if (!AFF_FLAGGED(iter, AFF_EARTHMELD)) {
 			continue;
 		}

@@ -4287,7 +4287,7 @@ struct char_data {
 	struct script_data *script;	// script info for the object
 	struct script_memory *memory;	// for mob memory triggers
 
-	char_data *next_in_room;	// For room->people - list
+	char_data *prev_in_room, *next_in_room;	// For room->people - doubly-linked list
 	char_data *prev, *next;	// For character_list (doubly-linked)
 	char_data *next_fighting;	// For fighting list
 	
@@ -5503,7 +5503,7 @@ struct vehicle_data {
 	
 	// lists
 	struct vehicle_data *prev, *next;	// vehicle_list (global) doubly-linked list
-	struct vehicle_data *next_in_room;	// ROOM_VEHICLES(room) linked list
+	struct vehicle_data *prev_in_room, *next_in_room;	// ROOM_VEHICLES(room) doubly-linked list
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;
 	UT_hash_handle hh;	// vehicle_table hash handle
@@ -5595,8 +5595,8 @@ struct room_data {
 	struct script_data *script;	/* script info for the room           */
 
 	obj_data *contents;  // start of doubly-linked item list (obj->next_content)
-	char_data *people;  // start of people list (ch->next_in_room)
-	vehicle_data *vehicles;	// start of vehicle list (veh->next_in_room)
+	char_data *people;  // start of people doubly-linked list (ch->next_in_room, prev_in_room)
+	vehicle_data *vehicles;	// start of doubly-linked vehicle list (veh->next_in_room, prev_in_room)
 	
 	struct reset_com *reset_commands;	// used only during startup
 	struct dg_event *unload_event;	// used for un-loading of live rooms

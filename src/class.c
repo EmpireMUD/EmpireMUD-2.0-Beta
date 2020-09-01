@@ -236,7 +236,7 @@ bool check_solo_role(char_data *ch) {
 		return TRUE;
 	}
 	
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 		if (iter != ch && !IS_NPC(iter) && !IS_IMMORTAL(iter) && CAN_SEE_NO_DARK(ch, iter) && !is_fight_enemy(ch, iter)) {
 			return FALSE;
 		}

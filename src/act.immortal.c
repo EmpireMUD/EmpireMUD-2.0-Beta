@@ -177,8 +177,8 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	else {
 		strcpy(buf, "$n disappears in a puff of smoke.");
 	}
-
-	for (t = ROOM_PEOPLE(IN_ROOM(ch)); t; t = t->next_in_room) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), t, next_in_room) {
 		if (REAL_NPC(t) || t == ch) {
 			continue;
 		}
@@ -202,8 +202,8 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 	else {
 		strcpy(buf, "$n appears with an ear-splitting bang.");
 	}
-
-	for (t = ROOM_PEOPLE(IN_ROOM(ch)); t; t = t->next_in_room) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), t, next_in_room) {
 		if (REAL_NPC(t) || t == ch) {
 			continue;
 		}
@@ -227,8 +227,8 @@ void perform_immort_invis(char_data *ch, int level) {
 
 	if (IS_NPC(ch))
 		return;
-
-	for (tch = ROOM_PEOPLE(IN_ROOM(ch)); tch; tch = tch->next_in_room) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), tch, next_in_room) {
 		if (tch == ch)
 			continue;
 		if (GET_ACCESS_LEVEL(tch) >= GET_INVIS_LEV(ch) && GET_ACCESS_LEVEL(tch) < level)
@@ -2663,7 +2663,7 @@ SHOW(show_piles) {
 				++count;
 			}
 		}
-		LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
 			DL_FOREACH2(VEH_CONTAINS(veh), sub, next_content) {
 				++count;
 			}
@@ -6131,7 +6131,8 @@ void do_stat_room(char_data *ch) {
 	}
 
 	sprintf(buf, "Chars present:&y");
-	for (found = 0, k = ROOM_PEOPLE(IN_ROOM(ch)); k; k = k->next_in_room) {
+	found = 0;
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), k, next_in_room) {
 		if (!CAN_SEE(ch, k))
 			continue;
 		sprintf(buf2, "%s %s(%s)", found++ ? "," : "", GET_NAME(k), (!IS_NPC(k) ? "PC" : (!IS_MOB(k) ? "NPC" : "MOB")));
@@ -6152,7 +6153,7 @@ void do_stat_room(char_data *ch) {
 	if (ROOM_VEHICLES(IN_ROOM(ch))) {
 		sprintf(buf, "Vehicles:&w");
 		found = 0;
-		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 			if (!CAN_SEE_VEHICLE(ch, veh)) {
 				continue;
 			}
@@ -7133,7 +7134,7 @@ ACMD(do_autostore) {
 			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
 		}
 		
-		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
 			}
@@ -7436,7 +7437,7 @@ ACMD(do_echo) {
 
 	if (vict) {
 		// clear last act messages for everyone in the room
-		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (c->desc && c != ch && c != vict) {
 				clear_last_act_message(c->desc);
 				
@@ -7449,7 +7450,7 @@ ACMD(do_echo) {
 		act(lbuf, FALSE, ch, obj, vict, TO_NOTVICT | TO_IGNORE_BAD_CODE);
 
 		// fetch and store channel history for the room
-		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (c->desc && c != ch && c != vict && !is_ignoring(c, ch) && c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc
 				if (subcmd == SCMD_EMOTE && !IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
@@ -7507,7 +7508,7 @@ ACMD(do_echo) {
 	}
 	else {
 		// clear last act messages for everyone in the room
-		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (c->desc && c != ch) {
 				clear_last_act_message(c->desc);
 							
@@ -7521,7 +7522,7 @@ ACMD(do_echo) {
 		act(lbuf, FALSE, ch, obj, vict, TO_ROOM | TO_NOT_IGNORING | TO_IGNORE_BAD_CODE);
 
 		// fetch and store channel history for the room
-		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (c->desc && c != ch && !is_ignoring(c, ch) && c->desc->last_act_message) {
 				// the message was sent via act(), we can retrieve it from the desc			
 				if (subcmd == SCMD_EMOTE && !IS_NPC(c) && GET_CUSTOM_COLOR(c, CUSTOM_COLOR_EMOTE)) {
@@ -7818,9 +7819,8 @@ ACMD(do_force) {
 	else if (!str_cmp("room", arg)) {
 		send_config_msg(ch, "ok_string");
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s forced room %s to %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)), to_force);
-
-		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_force) {
-			next_force = vict->next_in_room;
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_force, next_in_room) {
 			if (!REAL_NPC(vict) && GET_REAL_LEVEL(vict) >= GET_REAL_LEVEL(ch))
 				continue;
 			sprintf(buf1, "$n has forced you to '%s'.", to_force);
@@ -7967,7 +7967,7 @@ ACMD(do_goto) {
 	
 	// wizhide safety
 	if (!PRF_FLAGGED(ch, PRF_WIZHIDE) && GET_INVIS_LEV(ch) < LVL_START_IMM) {
-		LL_FOREACH2(ROOM_PEOPLE(location), iter, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(location), iter, next_in_room) {
 			if (ch == iter || !IS_IMMORTAL(iter)) {
 				continue;
 			}
@@ -8486,7 +8486,7 @@ ACMD(do_peace) {
 	struct txt_block *inq, *next_inq;
 	char_data *iter, *next_iter;
 	
-	LL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_iter, next_in_room) {
 		if (FIGHTING(iter) || GET_POS(iter) == POS_FIGHTING) {
 			stop_fighting(iter);
 		}
@@ -8691,9 +8691,8 @@ ACMD(do_purge) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has purged room %s", GET_REAL_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 		act("$n gestures... You are surrounded by scorching flames!", FALSE, ch, 0, 0, TO_ROOM);
 		send_to_room("The world seems a little cleaner.\r\n", IN_ROOM(ch));
-
-		for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = next_v) {
-			next_v = vict->next_in_room;
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_v, next_in_room) {
 			if (REAL_NPC(vict))
 				extract_char(vict);
 		}

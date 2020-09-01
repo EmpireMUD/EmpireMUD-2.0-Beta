@@ -344,7 +344,7 @@ char_data *find_minipet(char_data *ch) {
 	char_data *chiter, *found = NULL;
 	
 	// try the room first
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
 		if (IS_MINIPET_OF(chiter, ch)) {
 			found = chiter;
 			break;
@@ -846,13 +846,14 @@ void summon_player(char_data *ch, char *argument) {
 	else {
 		// mostly-valid by now... just a little bit more to check
 		found = FALSE;
-		for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter && !found; ch_iter = ch_iter->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 			if (IS_DEAD(ch_iter) || !ch_iter->desc) {
 				continue;
 			}
 			
 			if (ch_iter != ch && GROUP(ch_iter) == GROUP(ch)) {
 				found = TRUE;
+				break;
 			}
 		}
 		
@@ -1786,7 +1787,7 @@ ACMD(do_beckon) {
 	if (!*arg || !str_cmp(arg, "all")) {
 		any = FALSE;
 		// beckon all
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 			if (vict == ch || is_ignoring(vict, ch) || vict->master) {
 				continue;	// nopes
 			}
@@ -3419,7 +3420,7 @@ ACMD(do_summon) {
 	// count mobs and check limit
 	count = 0;
 	fol_count = 0;
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 		if (IS_NPC(mob)) {
 			++count;
 			

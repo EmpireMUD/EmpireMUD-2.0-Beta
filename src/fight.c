@@ -671,7 +671,7 @@ bool is_fighting(char_data *ch) {
 		return TRUE;
 	}
 	
-	for (iter = ROOM_PEOPLE(IN_ROOM(ch)); iter; iter = iter->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 		if (iter != ch && FIGHTING(iter) == ch) {
 			return TRUE;
 		}
@@ -836,7 +836,7 @@ void stop_combat_no_autokill(char_data *ch) {
 	}
 
 	// look for anybody in the room fighting ch who wouldn't execute:
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 		if (ch_iter != ch && FIGHTING(ch_iter) == ch && !WOULD_EXECUTE(ch_iter, ch)) {
 			stop_fighting(ch_iter);
 		}
@@ -1992,7 +1992,7 @@ void process_tower(room_data *room) {
 			to_room = real_shift(room, x, y);
 			
 			if (to_room) {
-				for (ch = ROOM_PEOPLE(to_room); ch; ch = ch->next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(to_room), ch, next_in_room) {
 					if (tower_would_shoot(room, ch)) {
 						CREATE(tvl, struct tower_victim_list, 1);
 						tvl->ch = ch;
@@ -2663,8 +2663,7 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 	}
 
 	// if we got this far, we need to hurt some people
-	for (c = ROOM_PEOPLE(to_room); c; c = next_c) {
-		next_c = c->next_in_room;
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(to_room), c, next_c, next_in_room) {
 		if ((GET_DEXTERITY(c) >= 3 && number(0, GET_DEXTERITY(c) / 3)) || IS_IMMORTAL(c)) {
 			msg_to_char(c, "You leap out of the way!\r\n");
 		}
@@ -2772,7 +2771,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		
 		if (VEH_ROOM_LIST(veh)) {
 			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-				LL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
+				DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
 					act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR);
 					if (!IS_NPC(ch)) {
 						log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
@@ -2829,9 +2828,8 @@ void check_auto_assist(char_data *ch) {
 	if (!ch || !FIGHTING(ch)) {
 		return;
 	}
-
-	for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter; ch_iter = next_iter) {
-		next_iter = ch_iter->next_in_room;
+	
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_iter, next_in_room) {
 		iter_master = (ch_iter->master ? ch_iter->master : ch_iter);
 		assist = FALSE;
 		
@@ -3672,9 +3670,11 @@ void perform_execute(char_data *ch, char_data *victim, int attacktype, int damty
 
 	/* Actually killed him! */
 	if (victim != ch && !IS_NPC(victim)) {
-		for (m = ROOM_PEOPLE(IN_ROOM(victim)); m; m = m->next_in_room)
-			if (FIGHTING(m) == victim && !IS_NPC(m))
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(victim)), m, next_in_room) {
+			if (FIGHTING(m) == victim && !IS_NPC(m)) {
 				stop_fighting(m);
+			}
+		}
 	}
 	if (FIGHTING(victim))
 		stop_fighting(victim);

@@ -3886,14 +3886,14 @@ bool offense_was_seen(char_data *ch, empire_data *emp, room_data *from_room) {
 	descriptor_data *desc;
 	char_data *iter;
 	
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 		if (ch != iter && GET_LOYALTY(iter) == emp && CAN_SEE(iter, ch)) {
 			return TRUE;	// someone here saw it
 		}
 	}
 	
 	if (from_room) {
-		LL_FOREACH2(ROOM_PEOPLE(from_room), iter, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(from_room), iter, next_in_room) {
 			if (ch != iter && GET_LOYALTY(iter) == emp && CAN_SEE(iter, ch)) {
 				return TRUE;	// someone here saw it
 			}
@@ -6212,7 +6212,7 @@ void write_room_to_file(FILE *fl, room_data *room) {
 			}
 		}
 		if (ROOM_PEOPLE(room)) {
-			for (mob = ROOM_PEOPLE(room); mob; mob = mob->next_in_room) {
+		    DL_FOREACH2(ROOM_PEOPLE(room), mob, next_in_room) {
 				if (mob && IS_NPC(mob) && GET_MOB_VNUM(mob) != NOTHING && !MOB_FLAGGED(mob, MOB_EMPIRE) && !GET_COMPANION(mob)) {
 					// C M vnum flags rope-vnum
 					fprintf(fl, "C M %d %s %d\n", GET_MOB_VNUM(mob), bitv_to_alpha(MOB_FLAGS(mob)), GET_ROPE_VNUM(mob));

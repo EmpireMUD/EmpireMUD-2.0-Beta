@@ -546,9 +546,10 @@ ACMD(do_backstab) {
 	int dam, cost = 15;
 	bool success = FALSE, fighting_me = FALSE;
 	
-	for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !fighting_me; vict = vict->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 		if (FIGHTING(vict) == ch) {
 			fighting_me = TRUE;
+			break;
 		}
 	}
 
@@ -770,9 +771,7 @@ ACMD(do_diversion) {
 			}
 		}
 		
-		for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim; victim = next_vict) {
-			next_vict = victim->next_in_room;
-			
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
 			if (AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
 				continue;
 			}
@@ -864,7 +863,7 @@ ACMD(do_hide) {
 	command_lag(ch, WAIT_ABILITY);
 	
 	if (!npc_access) {	// npcs ignore people present
-		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (c != ch && (c->master != ch || !AFF_FLAGGED(c, AFF_CHARM)) && CAN_SEE(c, ch) && (!IS_NPC(c) || !MOB_FLAGGED(c, MOB_ANIMAL)) && !skill_check(ch, ABIL_HIDE, DIFF_HARD) && !player_tech_skill_check(ch, PTECH_HIDE_UPGRADE, DIFF_MEDIUM)) {
 				msg_to_char(ch, "You can't hide with somebody watching!\r\n");
 				return;
@@ -906,9 +905,7 @@ ACMD(do_howl) {
 		msg_to_char(ch, "You let out a fearsome howl!\r\n");
 		act("$n lets out a bone-chilling howl!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
-		for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim; victim = next_vict) {
-			next_vict = victim->next_in_room;
-			
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
 			if (AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
 				continue;
 			}
@@ -1359,8 +1356,8 @@ ACMD(do_search) {
 	}
 	else {
 		act("$n begins searching around!", TRUE, ch, 0, 0, TO_ROOM);
-
-		for (targ = ROOM_PEOPLE(IN_ROOM(ch)); targ; targ = targ->next_in_room) {
+		
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), targ, next_in_room) {
 			if (ch == targ)
 				continue;
 			
@@ -1428,9 +1425,7 @@ ACMD(do_shadowcage) {
 		msg_to_char(ch, "You shoot webs of pure shadow, forming a tight cage!\r\n");
 		act("$n shoots webs of pure shadow, forming a tight cage!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
-		for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim; victim = next_vict) {
-			next_vict = victim->next_in_room;
-			
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_vict, next_in_room) {
 			if (AFF_FLAGGED(victim, AFF_IMMUNE_STEALTH)) {
 				continue;
 			}

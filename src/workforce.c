@@ -771,9 +771,7 @@ void deactivate_workforce_room(empire_data *emp, room_data *room) {
 	int iter;
 	bool match;
 	
-	for (mob = ROOM_PEOPLE(room); mob; mob = next_mob) {
-		next_mob = mob->next_in_room;
-		
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(room), mob, next_mob, next_in_room) {
 		if (IS_NPC(mob) && GET_MOB_VNUM(mob) != NOTHING) {
 			// check it's a workforce mob
 			match = FALSE;
@@ -842,7 +840,7 @@ char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum) {
 		return NULL;
 	}
 	
-	for (mob = ROOM_PEOPLE(room); mob; mob = mob->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), mob, next_in_room) {
 		// not our mob
 		if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum) {
 			continue;
@@ -2492,7 +2490,11 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 	bool found;
 
 	// find something shearable
-	for (mob = ROOM_PEOPLE(room); mob && !shearable; mob = mob->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), mob, next_in_room) {
+		if (shearable) {
+			break;	// found 1? exit early
+		}
+		
 		// would its shearing timer be up?
 		if (IS_NPC(mob)) {
 			if (get_cooldown_time(mob, COOLDOWN_SHEAR) > 0) {

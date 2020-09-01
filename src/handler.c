@@ -1498,7 +1498,6 @@ void perform_idle_out(char_data *ch) {
 * @param char_data *ch The character to remove
 */
 void char_from_room(char_data *ch) {
-	char_data *temp;
 	obj_data *obj;
 	int pos;
 
@@ -1522,8 +1521,8 @@ void char_from_room(char_data *ch) {
 			ROOM_LIGHTS(IN_ROOM(ch))--;
 		}
 	}
-
-	REMOVE_FROM_LIST(ch, ROOM_PEOPLE(IN_ROOM(ch)), next_in_room);
+    
+    DL_DELETE2(ROOM_PEOPLE(IN_ROOM(ch)), ch, prev_in_room, next_in_room);
 	IN_ROOM(ch) = NULL;
 	ch->next_in_room = NULL;
 }
@@ -1560,9 +1559,8 @@ void char_to_room(char_data *ch, room_data *room) {
 		if (IN_ROOM(ch)) {
 			char_from_room(ch);
 		}
-
-		ch->next_in_room = ROOM_PEOPLE(room);
-		ROOM_PEOPLE(room) = ch;
+		
+		DL_PREPEND2(ROOM_PEOPLE(room), ch, prev_in_room, next_in_room);
 		IN_ROOM(ch) = room;
 
 		// update lights
@@ -1655,9 +1653,10 @@ char_data *find_closest_char(char_data *ch, char *arg, bool pc_only) {
 char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum) {
 	char_data *mob, *found = FALSE;
 	
-	for (mob = ROOM_PEOPLE(room); mob && !found; mob = mob->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), mob, next_in_room) {
 		if (IS_NPC(mob) && GET_MOB_VNUM(mob) == vnum) {
 			found = mob;
+			break;
 		}
 	}
 	
@@ -1674,7 +1673,7 @@ char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum) {
 char_data *find_mortal_in_room(room_data *room) {
 	char_data *iter;
 	
-	LL_FOREACH2(ROOM_PEOPLE(room), iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), iter, next_in_room) {
 		if (!IS_NPC(iter) && !IS_IMMORTAL(iter) && !IS_GOD(iter)) {
 			return iter;
 		}
@@ -1701,11 +1700,15 @@ char_data *get_char_room(char *name, room_data *room) {
 	strcpy(tmp, name);
 	if (!(number = get_number(&tmp)))
 		return (NULL);
-
-	for (i = ROOM_PEOPLE(room); i && (j <= number) && !found; i = i->next_in_room) {
-		if (match_char_name(NULL, i, tmp, MATCH_IN_ROOM)) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(room), i, next_in_room) {
+		if (j > number) {
+			break;
+		}
+		else if (match_char_name(NULL, i, tmp, MATCH_IN_ROOM)) {
 			if (++j == number) {
 				found = i;
+				break;
 			}
 		}
 	}
@@ -1736,11 +1739,15 @@ char_data *get_char_room_vis(char_data *ch, char *name) {
 	if ((number = get_number(&tmp)) == 0) {
 		return get_player_vis(ch, tmp, FIND_CHAR_ROOM);
 	}
-
-	for (i = ROOM_PEOPLE(IN_ROOM(ch)); i && j <= number && !found; i = i->next_in_room) {
-		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && match_char_name(ch, i, tmp, MATCH_IN_ROOM)) {
+	
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), i, next_in_room) {
+		if (j > number) {
+			break;
+		}
+		else if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && match_char_name(ch, i, tmp, MATCH_IN_ROOM)) {
 			if (++j == number) {
 				found = i;
+				break;
 			}
 		}
 	}
@@ -3897,7 +3904,7 @@ bool can_interact_room(room_data *room, int type) {
 		return TRUE;	// simple
 	}
 	
-	LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
 		if (VEH_IS_COMPLETE(veh) && has_interaction(VEH_INTERACTIONS(veh), type)) {
 			return TRUE;
 		}
@@ -4216,7 +4223,7 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	
 	// first, build a list of vehicles that match this interaction type in the room
 	num = 0;
-	LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
 		if (VEH_IS_COMPLETE(veh) && has_interaction(VEH_INTERACTIONS(veh), type)) {
 			CREATE(tvh, struct temp_veh_helper, 1);
 			tvh->veh = veh;
@@ -9460,7 +9467,7 @@ void vehicle_from_room(vehicle_data *veh) {
 		return;
 	}
 	
-	LL_DELETE2(ROOM_VEHICLES(IN_ROOM(veh)), veh, next_in_room);
+	DL_DELETE2(ROOM_VEHICLES(IN_ROOM(veh)), veh, prev_in_room, next_in_room);
 	IN_ROOM(veh) = NULL;
 }
 
@@ -9483,7 +9490,7 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 		vehicle_from_room(veh);
 	}
 	
-	LL_PREPEND2(ROOM_VEHICLES(room), veh, next_in_room);
+	DL_PREPEND2(ROOM_VEHICLES(room), veh, prev_in_room, next_in_room);
 	IN_ROOM(veh) = room;
 	VEH_LAST_MOVE_TIME(veh) = time(0);
 	
@@ -9521,7 +9528,7 @@ vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, cha
 		return (NULL);
 	}
 	
-	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
 		if (!isname(tmp, VEH_KEYWORDS(iter))) {
 			continue;
 		}
@@ -9602,7 +9609,7 @@ vehicle_data *get_vehicle_room(room_data *room, char *name) {
 		return (NULL);
 	}
 	
-	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
 		if (!isname(tmp, VEH_KEYWORDS(iter))) {
 			continue;
 		}

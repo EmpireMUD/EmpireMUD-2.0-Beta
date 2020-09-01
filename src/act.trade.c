@@ -320,7 +320,7 @@ vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, bool *any
 	
 	*any = FALSE;
 	
-	LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), iter, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), iter, next_in_room) {
 		// skip finished vehicles
 		if (VEH_IS_COMPLETE(iter)) {
 			continue;
@@ -360,7 +360,7 @@ vehicle_data *find_vehicle_to_resume_by_name(char_data *ch, int craft_type, char
 	
 	*found_craft = NULL;
 	
-	LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 		if (VEH_IS_COMPLETE(veh)) {
 			continue;	// skip finished vehicles
 		}
@@ -1054,7 +1054,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		}
 		
 		// stop all actors on this type
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 			if (!IS_NPC(vict) && GET_ACTION(vict) == ACT_GEN_CRAFT && GET_ACTION_VNUM(vict, 0) == GET_CRAFT_VNUM(type)) {
 				GET_ACTION(vict) = ACT_NONE;
 			}

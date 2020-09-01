@@ -453,7 +453,7 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 	}
 
 	/* Hidden people are left off the map, even if you sense life */
-	for (c = ROOM_PEOPLE(room); c; c = c->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), c, next_in_room) {
 		if (can_see_player_in_other_room(ch, c)) {
 			CREATE(pc, struct mappc_data, 1);
 			pc->room = room;
@@ -1072,7 +1072,7 @@ void look_in_direction(char_data *ch, int dir) {
 				
 				to_room = ex->room_ptr;
 				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
-					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
+					DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 						if (!AFF_FLAGGED(c, AFF_HIDE | AFF_NO_SEE_IN_ROOM) && CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 							if (last_comma_pos != -1) {
@@ -1083,7 +1083,7 @@ void look_in_direction(char_data *ch, int dir) {
 						}
 					}
 					
-					LL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
+					DL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
 						if (CAN_SEE_VEHICLE(ch, veh)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", get_vehicle_short_desc(veh, ch));
 							if (last_comma_pos != -1) {
@@ -1167,7 +1167,7 @@ void look_in_direction(char_data *ch, int dir) {
 		}
 
 		if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
-			for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 				if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 					bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 					if (last_comma_pos != -1) {
@@ -1178,7 +1178,7 @@ void look_in_direction(char_data *ch, int dir) {
 				}
 			}
 			
-			LL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
+			DL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
 				if (CAN_SEE_VEHICLE(ch, veh)) {
 					bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", get_vehicle_short_desc(veh, ch));
 					if (last_comma_pos != -1) {
@@ -1194,7 +1194,7 @@ void look_in_direction(char_data *ch, int dir) {
 		to_room = real_shift(to_room, shift_dir[dir][0], shift_dir[dir][1]);
 		if (to_room && !ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) && !ROOM_IS_CLOSED(to_room)) {
 			if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
-				for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 					if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 						bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 						if (last_comma_pos != -1) {
@@ -1209,7 +1209,7 @@ void look_in_direction(char_data *ch, int dir) {
 			to_room = real_shift(to_room, shift_dir[dir][0], shift_dir[dir][1]);
 			if (to_room && !ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) && !ROOM_IS_CLOSED(to_room)) {
 				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
-					for (c = ROOM_PEOPLE(to_room); c; c = c->next_in_room) {
+					DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 						if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
 							if (last_comma_pos != -1) {
@@ -1777,8 +1777,8 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			// show mappc
 			if (SHOW_PEOPLE_IN_ROOM(to_room)) {
 				*plrbuf = '\0';
-			
-				for (vict = ROOM_PEOPLE(to_room); vict; vict = vict->next_in_room) {
+				
+				DL_FOREACH2(ROOM_PEOPLE(to_room), vict, next_in_room) {
 					if (can_see_player_in_other_room(ch, vict)) {
 						sprintf(plrbuf + strlen(plrbuf), "%s%s", *plrbuf ? ", " : "", PERS(vict, ch, FALSE));
 					}

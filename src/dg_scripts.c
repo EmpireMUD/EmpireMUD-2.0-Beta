@@ -95,10 +95,8 @@ int trgvar_in_room(room_vnum vnum) {
 		script_log("people.vnum: room does not exist");
 		return (-1);
 	}
-
-	for (ch = ROOM_PEOPLE(room); ch !=NULL; ch = ch->next_in_room)
-		i++;
-
+	
+	DL_COUNT2(ROOM_PEOPLE(room), ch, i, next_in_room);
 	return i;
 }
 
@@ -344,10 +342,13 @@ char_data *get_char_near_obj(obj_data *obj, char *name) {
 	}
 	else {
 		room_data *num;
-		if ((num = obj_room(obj)))
-			for (ch = ROOM_PEOPLE(num); ch; ch = ch->next_in_room) 
-				if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS))
+		if ((num = obj_room(obj))) {
+			DL_FOREACH2(ROOM_PEOPLE(num), ch, next_in_room) {
+				if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS)) {
 					return ch;
+				}
+			}
+		}
 	}
 
 	return NULL;
@@ -384,7 +385,7 @@ char_data *get_char_near_vehicle(vehicle_data *veh, char *name) {
 		}
 		
 		if (IN_ROOM(veh)) {
-			for (ch = ROOM_PEOPLE(IN_ROOM(veh)); ch; ch = ch->next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch, next_in_room) {
 				if (isname(name, GET_PC_NAME(ch)) && valid_dg_target(ch, DG_ALLOW_GODS)) {
 					return ch;
 				}
@@ -410,9 +411,11 @@ char_data *get_char_in_room(room_data *room, char *name) {
 			return ch;
 	}
 	else {
-		for (ch = room->people; ch; ch = ch->next_in_room)
-			if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS))
+		DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
+			if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS)) {
 				return ch;
+			}
+		}
 	}
 
 	return NULL;
@@ -477,9 +480,11 @@ obj_data *get_obj_near_obj(obj_data *obj, char *name) {
 			return i;
 
 		/* check peoples' inventory */
-		for (ch = ROOM_PEOPLE(rm); ch ; ch = ch->next_in_room)
-			if ((i = get_object_in_equip(ch, name)))
+		DL_FOREACH2(ROOM_PEOPLE(rm), ch, next_in_room) {
+			if ((i = get_object_in_equip(ch, name))) {
 				return i;
+			}
+		}
 	}
 	return NULL;
 }
@@ -508,7 +513,7 @@ obj_data *get_obj_near_vehicle(vehicle_data *veh, char *name) {
 		}
 		
 		// check inventories (because get_obj_near_obj does)
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch, next_in_room) {
 			if ((i = get_object_in_equip(ch, name))) {
 				return i;
 			}
@@ -694,7 +699,7 @@ char_data *get_char_by_vehicle(vehicle_data *veh, char *name) {
 		}
 		
 		// try people in the room with the vehicle
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), ch, next_in_room) {
 			if (isname(name, GET_PC_NAME(ch)) && valid_dg_target(ch, DG_ALLOW_GODS)) {
 				return ch;
 			}
@@ -726,9 +731,11 @@ char_data *get_char_by_room(room_data *room, char *name) {
 			return ch;
 	}
 	else {
-		for (ch = room->people; ch; ch = ch->next_in_room)
-			if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS))
+		DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
+			if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS)) {
 				return ch;
+			}
+		}
 		
 		DL_FOREACH(character_list, ch) {
 			if (isname(name, ch->player.name) && valid_dg_target(ch, DG_ALLOW_GODS)) {
@@ -864,7 +871,7 @@ vehicle_data *get_vehicle_by_obj(obj_data *obj, char *name) {
 	}
 	
 	if ((room = obj_room(obj))) {
-		LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+		DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
 			if (isname(name, VEH_KEYWORDS(iter))) {
 				return iter;
 			}
@@ -890,7 +897,7 @@ vehicle_data *get_vehicle_by_room(room_data *room, char *name) {
 		return find_vehicle(atoi(name + 1));
 	}
 
-	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
 		if (isname(name, VEH_KEYWORDS(iter))) {
 			return iter;
 		}
@@ -917,7 +924,7 @@ vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name) {
 		return veh;
 	}
 	if (IN_ROOM(veh)) {
-		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(veh)), iter, next_in_room) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(veh)), iter, next_in_room) {
 			if (isname(name, VEH_KEYWORDS(iter))) {
 				return iter;
 			}
@@ -1494,9 +1501,11 @@ ACMD(do_tattach) {
 	if (is_abbrev(arg, "mobile") || is_abbrev(arg, "mtr")) {
 		victim = (*targ_name == UID_CHAR) ? get_char(targ_name) : get_char_vis(ch, targ_name, FIND_CHAR_WORLD);
 		if (!victim) { /* search room for one with this vnum */
-			for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim;victim=victim->next_in_room) 
-				if (GET_MOB_VNUM(victim) == num_arg)
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_in_room) {
+				if (GET_MOB_VNUM(victim) == num_arg) {
 					break;
+				}
+			}
 
 			if (!victim) {
 				msg_to_char(ch, "That mob does not exist.\r\n");
@@ -1575,7 +1584,7 @@ ACMD(do_tattach) {
 		veh = (*targ_name == UID_CHAR) ? get_vehicle(targ_name) : get_vehicle_vis(ch, targ_name);
 		if (!veh) {
 			// search room for vehicle with matching vnum
-			LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 				if (VEH_VNUM(veh) == num_arg) {
 					break;
 				}
@@ -1800,9 +1809,11 @@ ACMD(do_tdetach) {
 	else if (is_abbrev(arg1, "mobile") || !str_cmp(arg1, "mtr")) {
 		victim = (*arg2 == UID_CHAR) ? get_char(arg2) : get_char_vis(ch, arg2, FIND_CHAR_WORLD);
 		if (!victim) { /* search room for one with this vnum */
-			for (victim = ROOM_PEOPLE(IN_ROOM(ch)); victim;victim=victim->next_in_room) 
-				if (GET_MOB_VNUM(victim) == num_arg)
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_in_room) {
+				if (GET_MOB_VNUM(victim) == num_arg) {
 					break;
+				}
+			}
 
 			if (!victim) {
 				msg_to_char(ch, "No such mobile around.\r\n");
@@ -1857,7 +1868,7 @@ ACMD(do_tdetach) {
 		veh = (*arg2 == UID_CHAR) ? get_vehicle(arg2) : get_vehicle_vis(ch, arg2);
 		if (!veh) {
 			// search room for vehicle with matching vnum
-			LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 				if (VEH_VNUM(veh) == num_arg) {
 					break;
 				}
@@ -2783,7 +2794,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 
 					if (type == MOB_TRIGGER) {
 						ch = (char_data*) go;
-						for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+						DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 							if (c == ch || !CAN_SEE(ch, c) || !valid_dg_target(c, DG_ALLOW_GODS)) {
 								continue;
 							}
@@ -2801,24 +2812,26 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (type == OBJ_TRIGGER) {
-						for (c = ROOM_PEOPLE(obj_room((obj_data*) go)); c; c = c->next_in_room)
+						DL_FOREACH2(ROOM_PEOPLE(obj_room((obj_data*) go)), c, next_in_room) {
 							if (valid_dg_target(c, DG_ALLOW_GODS)) {
 								if (!number(0, count))
 									rndm = c;
 								count++;
 							}
+						}
 					}
 					else if (type == WLD_TRIGGER || type == RMT_TRIGGER || type == BLD_TRIGGER || type == ADV_TRIGGER) {
-						for (c = ((room_data*) go)->people; c; c = c->next_in_room)
+						DL_FOREACH2(ROOM_PEOPLE((room_data*) go), c, next_in_room) {
 							if (valid_dg_target(c, DG_ALLOW_GODS)) {
-
-								if (!number(0, count))
+								if (!number(0, count)) {
 									rndm = c;
+								}
 								count++;
 							}
+						}
 					}
 					else if (type == VEH_TRIGGER) {
-						LL_FOREACH2(ROOM_PEOPLE(IN_ROOM((vehicle_data*)go)), c, next_in_room) {
+						DL_FOREACH2(ROOM_PEOPLE(IN_ROOM((vehicle_data*)go)), c, next_in_room) {
 							if (valid_dg_target(c, DG_ALLOW_GODS)) {
 								if (!number(0, count++)) {
 									rndm = c;
@@ -3985,12 +3998,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "next_in_room")) {
-						char_data *temp_ch;
+						char_data *temp_ch = NULL;
 						
 						// attempt to prevent extracted people from showing in lists
-						temp_ch = c->next_in_room;
-						while (temp_ch && SCRIPT_SHOULD_SKIP_CHAR(temp_ch)) {
-							temp_ch = temp_ch->next_in_room;
+						DL_FOREACH2(c->next_in_room, temp_ch, next_in_room) {
+							if (!SCRIPT_SHOULD_SKIP_CHAR(temp_ch)) {
+								break;
+							}
 						}
 						
 						if (temp_ch) {
@@ -5190,12 +5204,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", any_players_in_room(r) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "people")) {
-						char_data *temp_ch;
+						char_data *temp_ch = NULL;
 				
 						// attempt to prevent extracted people from showing in lists
-						temp_ch = ROOM_PEOPLE(r);
-						while (temp_ch && SCRIPT_SHOULD_SKIP_CHAR(temp_ch)) {
-							temp_ch = temp_ch->next_in_room;
+						DL_FOREACH2(ROOM_PEOPLE(r), temp_ch, next_in_room) {
+							if (!SCRIPT_SHOULD_SKIP_CHAR(temp_ch)) {
+								break;
+							}
 						}
 				
 						if (temp_ch) {

@@ -123,7 +123,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 				break;
 			}
 			case QG_MOBILE: {
-				LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 					if (IS_NPC(mob) && GET_MOB_VNUM(mob) == giver->vnum && CAN_SEE(ch, mob)) {
 						*giver_emp = GET_LOYALTY(mob);
 						return TRUE;
@@ -153,7 +153,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 				break;
 			}
 			case QG_VEHICLE: {
-				LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+				DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 					if (VEH_VNUM(veh) == giver->vnum && CAN_SEE_VEHICLE(ch, veh)) {
 						*giver_emp = VEH_OWNER(veh);
 						return TRUE;

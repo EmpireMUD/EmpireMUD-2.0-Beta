@@ -166,7 +166,7 @@ void complete_building(room_data *room) {
 	
 	// check mounted people
 	if (!BLD_ALLOWS_MOUNTS(room)) {
-		for (ch = ROOM_PEOPLE(room); ch; ch = ch->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
 			if (IS_RIDING(ch)) {
 				msg_to_char(ch, "You jump down from your mount.\r\n");
 				act("$n jumps down from $s mount.", TRUE, ch, NULL, NULL, TO_ROOM);
@@ -592,7 +592,7 @@ void finish_building(char_data *ch, room_data *room) {
 	
 	msg_to_char(ch, "You complete the construction!\r\n");
 	act("$n has completed the construction!", FALSE, ch, 0, 0, TO_ROOM);
-	for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 		if (!IS_NPC(c) && GET_ACTION(c) == ACT_BUILDING) {
 			// if the player is loyal to the empire building here, gain skill
 			if (!emp || GET_LOYALTY(c) == emp) {
@@ -695,10 +695,8 @@ void herd_animals_out(room_data *location) {
 	// move everything out: the loop is because when 2 animals lead a wagon, next_ch can cause problems
 	do {
 		found_any = FALSE;
-
-		for (ch_iter = ROOM_PEOPLE(location); ch_iter; ch_iter = next_ch) {
-			next_ch = ch_iter->next_in_room;
 		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(location), ch_iter, next_ch, next_in_room) {
 			if (IS_NPC(ch_iter) && IN_ROOM(ch_iter) == location && !ch_iter->desc && !ch_iter->master && !AFF_FLAGGED(ch_iter, AFF_CHARM) && MOB_FLAGGED(ch_iter, MOB_ANIMAL) && GET_POS(ch_iter) >= POS_STANDING && !MOB_FLAGGED(ch_iter, MOB_TIED)) {
 				if (!herd_msg) {
 					act("The animals are herded out of the building...", FALSE, ROOM_PEOPLE(location), NULL, NULL, TO_CHAR | TO_ROOM);
@@ -1080,8 +1078,7 @@ void start_dismantle_building(room_data *loc) {
 			DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
 				obj_to_room(obj, loc);
 			}
-			for (targ = ROOM_PEOPLE(room); targ; targ = next_targ) {
-				next_targ = targ->next_in_room;
+			DL_FOREACH_SAFE2(ROOM_PEOPLE(room), targ, next_targ, next_in_room) {
 				GET_LAST_DIR(targ) = NO_DIR;
 				char_from_room(targ);
 				char_to_room(targ, loc);
@@ -1924,7 +1921,7 @@ ACMD(do_designate) {
 		else {
 			msg_to_char(ch, "You designate the %s %s as %s %s.\r\n", veh ? "area" : "room", dirs[get_direction_for_char(ch, dir)], AN(GET_BLD_NAME(type)), GET_BLD_NAME(type));
 			
-			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 				if (vict != ch && vict->desc) {
 					sprintf(buf, "$n designates the %s %s as %s %s.", veh ? "area" : "room", dirs[get_direction_for_char(vict, dir)], AN(GET_BLD_NAME(type)), GET_BLD_NAME(type));
 					act(buf, FALSE, ch, 0, vict, TO_VICT);

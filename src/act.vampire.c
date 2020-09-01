@@ -461,7 +461,7 @@ bool starving_vampire_aggro(char_data *ch) {
 	}
 	
 	if (!victim) {	// not fighting anyone? pick a target
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 			if (ch_iter == ch) {
 				continue;	// self
 			}
@@ -897,9 +897,10 @@ ACMD(do_bite) {
 		
 		// is anybody other than victim fighting me (allows attack bite but not free-bite)
 		in_combat = FALSE;
-		for (ch_iter = ROOM_PEOPLE(IN_ROOM(ch)); ch_iter && !in_combat; ch_iter = ch_iter->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), ch_iter, next_in_room) {
 			if (ch_iter != victim && FIGHTING(ch_iter) == ch) {
 				in_combat = TRUE;
+				break;
 			}
 		}
 		

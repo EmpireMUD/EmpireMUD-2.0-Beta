@@ -115,7 +115,7 @@ player_index_data *find_player_index_by_name(char *name) {
 char_data *find_player_in_room_by_id(room_data *room, int id) {
 	char_data *ch;
 	
-	LL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
 		if (!IS_NPC(ch) && GET_IDNUM(ch) == id && !EXTRACTED(ch)) {
 			return ch;
 		}
@@ -4021,7 +4021,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	// attempt to put them back in a vehicle
 	if (GET_LAST_VEHICLE(ch) != NOTHING) {
-		LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 			if (VEH_VNUM(veh) == GET_LAST_VEHICLE(ch) && validate_sit_on_vehicle(ch, veh, FALSE)) {
 				sit_on_vehicle(ch, veh);
 				GET_POS(ch) = POS_SITTING;
@@ -4300,7 +4300,7 @@ void reset_char(char_data *ch) {
 	IN_ROOM(ch) = NULL;
 	ch->next = NULL;
 	ch->next_fighting = NULL;
-	ch->next_in_room = NULL;
+	ch->next_in_room = ch->prev_in_room = NULL;
 	FIGHTING(ch) = NULL;
 	ch->char_specials.position = POS_STANDING;
 	

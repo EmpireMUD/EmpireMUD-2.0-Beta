@@ -107,10 +107,16 @@ ACMD(do_assist) {
 		/*
 		 * Hit the same enemy the person you're helping is.
 		 */
-		if (FIGHTING(helpee))
+		if (FIGHTING(helpee)){
 			opponent = FIGHTING(helpee);
-		else
-			for (opponent = ROOM_PEOPLE(IN_ROOM(ch)); opponent && (FIGHTING(opponent) != helpee); opponent = opponent->next_in_room);
+		}
+		else {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), opponent, next_in_room) {
+				if (FIGHTING(opponent) == helpee) {
+					break;	// found!
+				}
+			}
+		}
 
 		if (!opponent)
 			act("But nobody is fighting $M!", FALSE, ch, 0, helpee, TO_CHAR);
@@ -635,7 +641,7 @@ ACMD(do_summary) {
 	found = FALSE;
 	*buf = '\0';
 	
-	for (iter = ROOM_PEOPLE(IN_ROOM(ch)); iter; iter = iter->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
 		is_ally = in_same_group(ch, iter) || is_fight_ally(ch, iter);
 		is_enemy = is_fight_enemy(ch, iter);
 		
@@ -824,7 +830,7 @@ ACMD(do_throw) {
 	sprintf(buf, "You throw $p %s as hard as you can!", dirs[get_direction_for_char(ch, dir)]);
 	act(buf, FALSE, ch, obj, 0, TO_CHAR);
 	
-	for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 		if (vict != ch && vict->desc) {
 			sprintf(buf1, "$n throws $p %s as hard as $e can!", dirs[get_direction_for_char(vict, dir)]);
 			act(buf1, TRUE, ch, obj, vict, TO_VICT);
@@ -833,7 +839,7 @@ ACMD(do_throw) {
 
 	obj_to_room(obj, to_room);
 	
-	for (vict = ROOM_PEOPLE(IN_ROOM(obj)); vict; vict = vict->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(obj)), vict, next_in_room) {
 		if (vict->desc) {
 			sprintf(buf, "$p is hurled in from the %s and falls to the ground at your feet!", dirs[get_direction_for_char(vict, rev_dir[dir])]);
 			act(buf, FALSE, vict, obj, 0, TO_CHAR);

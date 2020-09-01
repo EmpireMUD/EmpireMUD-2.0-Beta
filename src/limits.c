@@ -252,7 +252,7 @@ void check_pointless_fight(char_data *mob) {
 	}
 	
 	any = FALSE;
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
 		if (iter == mob || FIGHTING(iter) != mob) {
 			continue;	// only care about people fighting mob
 		}
@@ -268,7 +268,7 @@ void check_pointless_fight(char_data *mob) {
 		stop_fighting(mob);
 		
 		// stop everyone hitting mob
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(mob)), iter, next_in_room) {
 			if (FIGHTING(iter) == mob) {
 				stop_fighting(iter);
 			}
@@ -391,7 +391,7 @@ int limit_crowd_control(char_data *victim, int atype) {
 		return count;
 	}
 	
-	for (iter = ROOM_PEOPLE(IN_ROOM(victim)); iter; iter = iter->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(victim)), iter, next_in_room) {
 		if (iter != victim && affected_by_spell(iter, atype)) {
 			++count;
 			affect_from_char(iter, atype, TRUE);	// sends message
@@ -429,7 +429,7 @@ void point_update_char(char_data *ch) {
 	// check mob crowding (for npcs in stables)
 	if (IS_NPC(ch) && !ch->desc && room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) {
 		count = 1;	// me
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
 			if (ch != chiter && !EXTRACTED(chiter) && IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(ch)) {
 				++count;
 			}
@@ -513,9 +513,11 @@ void point_update_char(char_data *ch) {
 	if (IS_NPC(ch)) {
 		if (GET_POS(ch) >= POS_STUNNED && !FIGHTING(ch) && !GET_FED_ON_BY(ch)) {
 			// verify not fighting at all
-			for (c = ROOM_PEOPLE(IN_ROOM(ch)), found = FALSE; c && !found; c = c->next_in_room) {
+			found = FALSE;
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 				if (FIGHTING(c) == ch) {
 					found = TRUE;
+					break;
 				}
 			}
 			
@@ -904,9 +906,7 @@ void real_update_char(char_data *ch) {
 	
 	// too-many-followers check
 	fol_count = 0;
-	for (room_ch = ROOM_PEOPLE(IN_ROOM(ch)); room_ch; room_ch = next_ch) {
-		next_ch = room_ch->next_in_room;
-		
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), room_ch, next_ch, next_in_room) {
 		// check is npc following ch
 		if (room_ch == ch || room_ch->desc || !IS_NPC(room_ch) || room_ch->master != ch) {
 			continue;
@@ -1646,7 +1646,7 @@ void point_update_obj(obj_data *obj) {
 		if (materials[GET_OBJ_MATERIAL(obj)].floats && (to_room = real_shift(IN_ROOM(obj), shift_dir[WEST][0], shift_dir[WEST][1]))) {
 			if (!number(0, 2) && !ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_IS_CLOSED(to_room)) {
 				// float-west message
-				for (c = ROOM_PEOPLE(IN_ROOM(obj)); c; c = c->next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(obj)), c, next_in_room) {
 					if (c->desc) {
 						sprintf(buf, "$p floats %s.", dirs[get_direction_for_char(c, WEST)]);
 						act(buf, TRUE, c, obj, NULL, TO_CHAR);
@@ -1659,7 +1659,7 @@ void point_update_obj(obj_data *obj) {
 				GET_AUTOSTORE_TIMER(obj) = timer;
 				
 				// floats-in message
-				for (c = ROOM_PEOPLE(IN_ROOM(obj)); c; c = c->next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(obj)), c, next_in_room) {
 					if (c->desc) {
 						sprintf(buf, "$p floats in from %s.", from_dir[get_direction_for_char(c, WEST)]);
 						act(buf, TRUE, c, obj, NULL, TO_CHAR);
@@ -1911,7 +1911,7 @@ bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner) {
 	}
 	
 	// !teleport mob?
-	for (mob = ROOM_PEOPLE(loc); mob; mob = mob->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(loc), mob, next_in_room) {
 		if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_NO_TELEPORT)) {
 			return FALSE;
 		}

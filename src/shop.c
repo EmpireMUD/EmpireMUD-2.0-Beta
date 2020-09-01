@@ -345,7 +345,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 	obj_data *obj;
 	
 	// mobs
-	LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 		if (!IS_NPC(mob) || EXTRACTED(mob) || !CAN_SEE(ch, mob) || FIGHTING(mob) || GET_POS(mob) < POS_RESTING || IS_DEAD(mob)) {
 			continue;
 		}
@@ -381,7 +381,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 	}
 	
 	// vehicles
-	LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
 		if (!CAN_SEE_VEHICLE(ch, veh)) {
 			continue;
 		}

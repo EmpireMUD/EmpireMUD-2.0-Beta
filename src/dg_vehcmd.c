@@ -224,8 +224,7 @@ VCMD(do_vforce) {
 			veh_log(veh, "vforce called by vehicle in no location");
 		}
 		else {
-			for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
-				next_ch = ch->next_in_room;
+			DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 				if (valid_dg_target(ch, 0)) {
 					command_interpreter(ch, line);
 				}
@@ -371,7 +370,7 @@ VCMD(do_vechoneither) {
 		return;
 	}
 	
-	for (iter = ROOM_PEOPLE(IN_ROOM(vict1)); iter; iter = iter->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(vict1)), iter, next_in_room) {
 		if (iter->desc && iter != vict1 && iter != vict2) {
 			sub_write(p, iter, TRUE, TO_CHAR);
 		}
@@ -606,8 +605,7 @@ VCMD(do_vpurge) {
 	if (!*arg) {
 		// purge all
 		if ((rm = IN_ROOM(veh))) {
-			for (ch = ROOM_PEOPLE(rm); ch; ch = next_ch ) {
-				next_ch = ch->next_in_room;
+			DL_FOREACH_SAFE2(ROOM_PEOPLE(rm), ch, next_ch, next_in_room) {
 				if (IS_NPC(ch)) {
 					extract_char(ch);
 				}
@@ -800,9 +798,8 @@ VCMD(do_vteleport) {
 			veh_log(veh, "vteleport target is itself");
 			return;
 		}
-
-		for (ch = ROOM_PEOPLE(orm); ch; ch = next_ch) {
-			next_ch = ch->next_in_room;
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(orm), ch, next_ch, next_in_room) {
 			if (!valid_dg_target(ch, DG_ALLOW_GODS)) 
 				continue;
 			char_from_room(ch);
@@ -823,9 +820,7 @@ VCMD(do_vteleport) {
 		for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 			// only if it's not the target room, or we'd be here all day
 			if (INST_ROOM(inst, iter) && INST_ROOM(inst, iter) != target) {
-				for (ch = ROOM_PEOPLE(INST_ROOM(inst, iter)); ch; ch = next_ch) {
-					next_ch = ch->next_in_room;
-					
+				DL_FOREACH_SAFE2(ROOM_PEOPLE(INST_ROOM(inst, iter)), ch, next_ch, next_in_room) {
 					if (!valid_dg_target(ch, DG_ALLOW_GODS)) {
 						continue;
 					}
@@ -1211,9 +1206,7 @@ VCMD(do_vaoe) {
 	}
 
 	level = get_vehicle_scale_level(veh, NULL);
-	for (vict = ROOM_PEOPLE(orm); vict; vict = next_vict) {
-		next_vict = vict->next_in_room;
-		
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(orm), vict, next_vict, next_in_room) {
 		// harder to tell friend from foe: hit PCs or people following PCs
 		if (!IS_NPC(vict) || (vict->master && !IS_NPC(vict->master))) {
 			script_damage(vict, NULL, level, type, modifier);

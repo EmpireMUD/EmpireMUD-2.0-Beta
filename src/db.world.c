@@ -579,7 +579,7 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// get rid of vehicles
-	LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
 		extract_vehicle(veh);
 	}
 	
@@ -593,9 +593,7 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	
 	// Remove remaining chars
-	for (c = ROOM_PEOPLE(room); c; c = next_c) {
-		next_c = c->next_in_room;
-		
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(room), c, next_c, next_in_room) {
 		if (!extraction_room) {
 			extraction_room = get_extraction_room();
 		}
@@ -1557,7 +1555,7 @@ EVENTFUNC(burn_down_event) {
 		if (ROOM_PEOPLE(room)) {
 			act("The building collapses in flames around you!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
-		LL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 			if (!IS_NPC(ch)) {
 				death_log(ch, ch, TYPE_SUFFERING);
 			}
@@ -3416,7 +3414,7 @@ void ruin_one_building(room_data *room) {
 	}
 	
 	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
-	LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
 		if (!VEH_OWNER(veh) && !VEH_CONTAINS(veh)) {
 			extract_vehicle(veh);
 		}

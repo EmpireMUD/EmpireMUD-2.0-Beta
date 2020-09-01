@@ -650,10 +650,11 @@ void mobile_activity(void) {
 					found = FALSE;
 
 					// look in this room
-					for (vict = ROOM_PEOPLE(IN_ROOM(ch)); !found && vict; vict = vict->next_in_room) {
+					DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 						if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && CAN_SEE(ch, vict) && CAN_RECOGNIZE(ch, vict) && can_fight(ch, vict)) {
 							found = TRUE;
 							engage_combat(ch, vict, FALSE);
+							break;
 						}
 					}
 
@@ -699,10 +700,11 @@ void mobile_activity(void) {
 				for (purs = MOB_PURSUIT(ch); !found && purs; purs = next_purs) {
 					next_purs = purs->next;
 					
-					for (vict = ROOM_PEOPLE(IN_ROOM(ch)); !found && vict; vict = vict->next_in_room) {
+					DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 						if (!IS_NPC(vict) && GET_IDNUM(vict) == purs->idnum && can_fight(ch, vict)) {
 							found = TRUE;
 							engage_combat(ch, vict, FALSE);
+							break;
 						}
 					}
 				}
@@ -723,7 +725,7 @@ void mobile_activity(void) {
 
 		/* Aggressive Mobs */
 		if (!found && MOB_FLAGGED(ch, MOB_AGGRESSIVE) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO))) {
-			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !found; vict = vict->next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 				if (vict == ch) {
 					continue;
 				}
@@ -746,6 +748,7 @@ void mobile_activity(void) {
 				if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
 					hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
 					found = TRUE;
+					break;
 				}
 			}
 		}
@@ -753,7 +756,7 @@ void mobile_activity(void) {
 		// Empire Mobs
 		if (!found && MOB_FLAGGED(ch, MOB_CITYGUARD) && GET_LOYALTY(ch)) {
 			// look for people to assist
-			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !found; vict = vict->next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 				// in a fight?
 				if (vict != ch && (targ = FIGHTING(vict)) && targ != ch && ch->master != targ && (IS_NPC(targ) || GET_ACCESS_LEVEL(targ) < LVL_GOD) && CAN_SEE(ch, targ)) {
 					// matching empire to rescue?
@@ -766,6 +769,7 @@ void mobile_activity(void) {
 									// assist vict
 									engage_combat(ch, targ, FALSE);
 									found = TRUE;
+									break;
 								}
 							}
 						}
@@ -776,7 +780,7 @@ void mobile_activity(void) {
 			// look for people to aggro
 			if (!ISLAND_FLAGGED(IN_ROOM(ch), ISLE_NO_AGGRO)) {
 				chemp = NULL;
-				for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict && !found; vict = vict->next_in_room) {
+				DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 					if (vict == ch) {
 						continue;
 					}
@@ -801,6 +805,7 @@ void mobile_activity(void) {
 										if (!CHECK_MAJESTY(vict) || AFF_FLAGGED(ch, AFF_IMMUNE_VAMPIRE)) {
 											hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
 											found = TRUE;
+											break;
 										}
 									}
 								}
@@ -811,11 +816,13 @@ void mobile_activity(void) {
 					else if (IS_NPC(vict) && MOB_FLAGGED(vict, MOB_AGGRESSIVE) && GET_LOYALTY(ch) != GET_LOYALTY(vict) && can_fight(ch, vict)) {
 						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
 						found = TRUE;
+						break;
 					}
 					// hostility against empire mobs
 					else if (IS_NPC(vict) && GET_LOYALTY(vict) && GET_LOYALTY(vict) != GET_LOYALTY(ch) && empire_is_hostile(GET_LOYALTY(ch), GET_LOYALTY(vict), IN_ROOM(ch))) {
 						hit(ch, vict, GET_EQ(ch, WEAR_WIELD), TRUE);
 						found = TRUE;
+						break;
 					}
 				}
 			}
@@ -862,7 +869,7 @@ void run_mob_echoes(void) {
 		
 		// only the first connected player in the room counts, so multiple players don't lead to spam
 		oops = FALSE;
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
 			if (chiter->desc) {
 				if (chiter != ch) {
 					oops = TRUE;	// not first
@@ -885,7 +892,7 @@ void run_mob_echoes(void) {
 		count = 0;
 		
 		// now find a mob with a valid message
-		LL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), mob, next_in_room) {
 			// things that disqualify the mob
 			if (mob->desc || !IS_NPC(mob) || IS_DEAD(mob) || EXTRACTED(mob) || FIGHTING(mob) || !AWAKE(mob) || MOB_FLAGGED(mob, MOB_TIED | MOB_SILENT) || IS_INJURED(mob, INJ_TIED) || GET_LED_BY(mob)) {
 				continue;
@@ -1125,7 +1132,7 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 	
 		// count creatures in the room; don't spawn rooms that are already populous
 		count = 0;
-		for (ch_iter = ROOM_PEOPLE(room); ch_iter; ch_iter = ch_iter->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(room), ch_iter, next_in_room) {
 			if (IS_NPC(ch_iter)) {
 				++count;
 			}
@@ -1134,7 +1141,7 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 		// normal spawn list
 		if (!only_artisans && count < config_get_int("spawn_limit_per_room")) {
 			// spawn based on vehicles?
-			LL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+			DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
 				if (VEH_SPAWNS(veh)) {
 					count += spawn_one_list(room, VEH_SPAWNS(veh));
 				}

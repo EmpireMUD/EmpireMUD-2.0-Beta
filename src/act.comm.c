@@ -1828,7 +1828,7 @@ ACMD(do_say) {
 		sprintf(string, "$n says,%s '%s\t%%c'\tn", buf1, double_percents(argument));
 		sprintf(recog, "$n ($o) says,%s '%s\t%%c'\tn", buf1, double_percents(argument));
 		
-		for (c = ROOM_PEOPLE(IN_ROOM(ch)); c; c = c->next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), c, next_in_room) {
 			if (REAL_NPC(c) || ch == c || is_ignoring(c, ch))
 				continue;
 			

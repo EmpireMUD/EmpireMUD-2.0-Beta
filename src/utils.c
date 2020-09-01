@@ -102,9 +102,10 @@ bool any_players_in_room(room_data *room) {
 	char_data *ch;
 	bool found = FALSE;
 	
-	for (ch = ROOM_PEOPLE(room); !found && ch; ch = ch->next_in_room) {
+	DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
 		if (!IS_NPC(ch)) {
 			found = TRUE;
+			break;
 		}
 	}
 	
@@ -5866,9 +5867,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 		to_room = NULL;
 	}
 	
-	for (ch = ROOM_PEOPLE(room); ch; ch = next_ch) {
-		next_ch = ch->next_in_room;
-	
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(room), ch, next_ch, next_in_room) {
 		if (!IS_NPC(ch)) {
 			if (!(target = to_room)) {
 				target = find_load_room(ch);
@@ -6126,7 +6125,7 @@ bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
 	bool junk;
 	
 	// check vehicles first
-	LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
 		if (!VEH_IS_COMPLETE(veh)) {
 			continue;
 		}

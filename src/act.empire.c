@@ -2927,7 +2927,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			}
 			else {
 				// try finding a matching vehicle visible in the tile
-				LL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+				DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
 					if (!VEH_ICON(veh) || !VEH_IS_COMPLETE(veh)) {
 						continue;
 					}
@@ -5573,7 +5573,7 @@ ACMD(do_inspire) {
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		if (all) {
-			for (vict = ROOM_PEOPLE(IN_ROOM(ch)); vict; vict = vict->next_in_room) {
+			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 				if (ch != vict && !IS_NPC(vict)) {
 					perform_inspire(ch, vict, type);
 				}

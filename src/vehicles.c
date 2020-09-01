@@ -162,7 +162,7 @@ void fully_empty_vehicle(vehicle_data *veh) {
 	if (VEH_ROOM_LIST(veh)) {
 		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 			// remove people
-			LL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
+			DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
 				act("You are ejected from $V!", FALSE, ch, NULL, veh, TO_CHAR);
 				if (IN_ROOM(veh)) {
 					char_to_room(ch, IN_ROOM(veh));
@@ -187,7 +187,7 @@ void fully_empty_vehicle(vehicle_data *veh) {
 			}
 			
 			// remove other vehicles
-			LL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), iter, next_iter, next_in_room) {
+			DL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), iter, next_iter, next_in_room) {
 				if (IN_ROOM(veh)) {
 					vehicle_to_room(iter, IN_ROOM(veh));
 				}
@@ -304,7 +304,7 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
 		return NULL;
 	}
 	
-	LL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
+	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
 		if (!VEH_ICON(iter) || !*VEH_ICON(iter)) {
 			continue;	// no icon
 		}
@@ -707,7 +707,7 @@ void Crash_save_vehicles(vehicle_data *room_list, FILE *fl) {
 	
 	vehicle_data *iter;
 	
-	LL_FOREACH2(room_list, iter, next_in_room) {
+	DL_FOREACH2(room_list, iter, next_in_room) {
 		store_one_vehicle_to_file(iter, fl);
 	}
 }
@@ -1854,7 +1854,7 @@ int run_convert_vehicle_list(void) {
 		convert_vehicle_list = cvd->next;
 		
 		if (cvd->mob && IN_ROOM(cvd->mob)) {
-			LL_FOREACH2(ROOM_VEHICLES(IN_ROOM(cvd->mob)), veh, next_in_room) {
+			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(cvd->mob)), veh, next_in_room) {
 				if (VEH_VNUM(veh) == cvd->vnum && count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
 					harness_mob_to_vehicle(cvd->mob, veh);
 					++changed;
