@@ -960,7 +960,7 @@ void objpack_load_room(room_data *room) {
 				}
 				if (location < 0 && location >= -MAX_BAG_ROWS) {
 					obj_from_room(obj);
-					DL_APPEND2(cont_row[-location - 1], o, prev_content, next_content);
+					DL_APPEND2(cont_row[-location - 1], obj, prev_content, next_content);
 				}
 			}
 			else {
