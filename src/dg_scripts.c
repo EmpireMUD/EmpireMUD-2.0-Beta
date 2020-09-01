@@ -109,9 +109,11 @@ obj_data *get_obj_in_list(char *name, obj_data *list) {
 	if (*name == UID_CHAR) {
 		id = atoi(name + 1);
 		
-		DL_FOREACH2(list, i, next_content) {
-			if (id == obj_script_id(i)) {
-				return i;
+		if (id > 0) {
+			DL_FOREACH2(list, i, next_content) {
+				if (id == i->script_id) {
+					return i;
+				}
 			}
 		}
 	}
@@ -135,11 +137,16 @@ obj_data *get_object_in_equip(char_data *ch, char *name) {
 
 	if (*name == UID_CHAR) {
 		id = atoi(name + 1);
-
-		for (j = 0; j < NUM_WEARS; j++)
-			if ((obj = GET_EQ(ch, j)))
-				if (id == obj_script_id(obj))
-					return (obj);
+		
+		if (id > 0) {
+			for (j = 0; j < NUM_WEARS; j++) {
+				if ((obj = GET_EQ(ch, j))) {
+					if (id == obj->script_id) {
+						return (obj);
+					}
+				}
+			}
+		}
 	}
 	else if (is_number(name)) {
 		obj_vnum ovnum = atoi(name);
@@ -450,11 +457,13 @@ obj_data *get_obj_near_obj(obj_data *obj, char *name) {
 		if (*name == UID_CHAR) {
 			id = atoi(name + 1);
 
-			if (id == obj_script_id(obj->in_obj))
+			if (id > 0 && id == obj->in_obj->script_id) {
 				return obj->in_obj;
+			}
 		}
-		else if (isname(name, obj->in_obj->name))
+		else if (isname(name, obj->in_obj->name)) {
 			return obj->in_obj;
+		}
 	}   
 	/* or worn ?*/
 	else if (obj->worn_by && (i = get_object_in_equip(obj->worn_by, name)))
@@ -796,9 +805,11 @@ obj_data *get_obj_in_room(room_data *room, char *name) {
 
 	if (*name == UID_CHAR) {
 		id = atoi(name + 1);
-		DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
-			if (id == obj_script_id(obj)) {
-				return obj;
+		if (id > 0) {
+			DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+				if (id == obj->script_id) {
+					return obj;
+				}
 			}
 		}
 	}
@@ -983,13 +994,15 @@ int item_in_list(char *item, obj_data *list) {
 	if (*item == UID_CHAR) {
 		id = atoi(item + 1);
 		
-		DL_FOREACH2(list, i, next_content) {
-			if (id == obj_script_id(i)) {
-				count ++;
-				break;
-			}
-			else if (GET_OBJ_TYPE(i) == ITEM_CONTAINER) {
-				count += item_in_list(item, i->contains);
+		if (id > 0) {
+			DL_FOREACH2(list, i, next_content) {
+				if (id == i->script_id) {
+					++count;
+					break;
+				}
+				else if (GET_OBJ_TYPE(i) == ITEM_CONTAINER) {
+					count += item_in_list(item, i->contains);
+				}
 			}
 		}
 	}
