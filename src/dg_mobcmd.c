@@ -1989,11 +1989,11 @@ ACMD(do_mslay) {
 /* transform into a different mobile */
 ACMD(do_mtransform) {
 	char arg[MAX_INPUT_LENGTH];
-	char_data *m; //, tmpmob;
-	obj_data *obj[NUM_WEARS];
+	// char_data *m, tmpmob;
+	// obj_data *obj[NUM_WEARS];
 	// mob_vnum this_vnum = GET_MOB_VNUM(ch);
-	bool keep_attr = TRUE; // new mob keeps the old mob's h/v/m/b
-	int pos; //, iter;
+	// bool keep_attr = TRUE; // new mob keeps the old mob's h/v/m/b
+	// int pos, iter;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -2018,6 +2018,7 @@ ACMD(do_mtransform) {
 	else if (!isdigit(*arg) && *arg != '-')
 		mob_log(ch, "mtransform: bad argument");
 	else {
+		/* none of this will work
 		if (isdigit(*arg))
 			m = read_mobile(atoi(arg), TRUE);
 		else {
@@ -2036,7 +2037,7 @@ ACMD(do_mtransform) {
 		
 		setup_generic_npc(m, GET_LOYALTY(ch), MOB_DYNAMIC_NAME(ch), MOB_DYNAMIC_SEX(ch));
 
-		/* move new obj info over to old object and delete new obj */
+		// move new obj info over to old object and delete new obj
 
 		for (pos = 0; pos < NUM_WEARS; pos++) {
 			if (GET_EQ(ch, pos))
@@ -2045,9 +2046,9 @@ ACMD(do_mtransform) {
 				obj[pos] = NULL;
 		}
 
-		/* put the mob in the same room as ch so extract will work */
+		// put the mob in the same room as ch so extract will work
 		char_to_room(m, IN_ROOM(ch));
-		/* none of this will work
+		
 		memcpy(&tmpmob, m, sizeof(*m));
 		tmpmob.script_id = ch->script_id;
 		tmpmob.affected = ch->affected;
