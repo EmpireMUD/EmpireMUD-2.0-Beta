@@ -1867,7 +1867,7 @@ ACMD(do_mforget) {
 	mem = SCRIPT_MEM(ch);
 	prev = NULL;
 	while (mem) {
-		if (mem->id == char_script_id(victim)) {
+		if (mem->id == victim->script_id) {
 			if (mem->cmd)
 				free(mem->cmd);
 			if (prev==NULL) {

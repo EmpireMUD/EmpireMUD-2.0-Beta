@@ -193,7 +193,7 @@ void greet_memory_mtrigger(char_data *actor) {
 		}
 		/* find memory line with command only */
 		for (mem = SCRIPT_MEM(ch); mem && SCRIPT_MEM(ch); mem=mem->next) {
-			if (char_script_id(actor) != mem->id) {
+			if (actor->script_id != mem->id) {
 				continue;
 			}
 			if (mem->cmd) {
@@ -293,7 +293,7 @@ void entry_memory_mtrigger(char_data *ch) {
 		}
 		if (actor!=ch && SCRIPT_MEM(ch)) {
 			for (mem = SCRIPT_MEM(ch); mem && SCRIPT_MEM(ch); mem = mem->next) {
-				if (char_script_id(actor) == mem->id) {
+				if (actor->script_id == mem->id) {
 					struct script_memory *prev;
 					if (mem->cmd) command_interpreter(ch, mem->cmd);
 					else {
