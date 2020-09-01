@@ -1822,7 +1822,7 @@ ACMD(do_circle) {
 	
 	// message
 	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
-		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, vict, next_in_room) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
 			if (vict != ch && vict->desc && CAN_SEE(vict, ch)) {
 				sprintf(buf, "$n circles in from %s.", from_dir[get_direction_for_char(vict, dir)]);
 				act(buf, TRUE, ch, NULL, vict, TO_VICT);
