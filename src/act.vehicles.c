@@ -50,7 +50,7 @@ extern int get_north_for_char(char_data *ch);
 extern room_data *get_vehicle_interior(vehicle_data *veh);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 extern bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error);
-extern int perform_move(char_data *ch, int dir, bitvector_t flags);
+extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 void scale_item_to_level(obj_data *obj, int level);
 void skip_run_filler(char **string);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
@@ -348,7 +348,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		LL_FOREACH_SAFE(VEH_SITTING_ON(veh)->followers, fol, next_fol) {
 			if ((IN_ROOM(fol->follower) == was_in) && (GET_POS(fol->follower) >= POS_STANDING)) {
 				act("You follow $N.\r\n", FALSE, fol->follower, NULL, VEH_SITTING_ON(veh), TO_CHAR);
-				perform_move(fol->follower, dir, MOVE_FOLLOW);
+				perform_move(fol->follower, dir, NULL, MOVE_FOLLOW);
 			}
 		}
 	}
@@ -1738,7 +1738,7 @@ ACMD(do_drag) {
 	else {
 		// seems okay enough -- try movement
 		was_in = IN_ROOM(ch);
-		if (!perform_move(ch, dir, NOBITS) || IN_ROOM(ch) == was_in) {
+		if (!perform_move(ch, dir, NULL, NOBITS) || IN_ROOM(ch) == was_in) {
 			// failure here would have sent its own message
 			return;
 		}

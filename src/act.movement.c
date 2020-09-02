@@ -43,12 +43,13 @@ extern const char *mob_move_types[];
 
 // external funcs
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
+extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 void do_unseat_from_vehicle(char_data *ch);
 extern char *get_room_name(room_data *room, bool color);
 
 // local protos
 bool can_enter_room(char_data *ch, room_data *room);
-int perform_move(char_data *ch, int dir, bitvector_t flags);
+int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room, int dir, bitvector_t flags);
 void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room, int dir, bitvector_t flags);
@@ -837,7 +838,7 @@ void process_running(char_data *ch) {
 	dir = confused_dirs[get_north_for_char(ch)][0][dir];
 	
 	// attempt to move
-	if (!perform_move(ch, dir, MOVE_RUN)) {
+	if (!perform_move(ch, dir, NULL, MOVE_RUN)) {
 		done = TRUE;
 	}
 	
@@ -1492,38 +1493,44 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 * New move params as of b5.21 -- converted need_specials_check/mode to bits
 *
 * @param char_data *ch The person trying to move.
-* @param int dir Which dir to go.
+* @param int dir Which dir to go (may be NO_DIR).
+* @param room_data *to_room Optional: The room the player is moving to. (Pass NULL to auto-detect from 'dir'.)
 * @param bitvector_t flags Various MOVE_ flags (interpreter.h)
 * @return int TRUE if the move succeeded, FALSE if not.
 */
-int perform_move(char_data *ch, int dir, bitvector_t flags) {
-	room_data *was_in, *to_room = IN_ROOM(ch);
+int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
+	room_data *was_in;
 	struct room_direction_data *ex;
 	struct follow_type *k, *next;
 	char buf[MAX_STRING_LENGTH];
 
-	if (ch == NULL)
-		return FALSE;
-
-	if ((PLR_FLAGGED(ch, PLR_UNRESTRICT) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_INSIDE(IN_ROOM(ch))) || !ROOM_IS_CLOSED(IN_ROOM(ch))) {
-		if (dir >= NUM_2D_DIRS || dir < 0) {
-			send_to_char("Alas, you cannot go that way...\r\n", ch);
-			return FALSE;
-		}
-		// may produce a NULL
-		to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
+	if (!ch) {
+		return FALSE;	// somehow
 	}
-	else {
-		if (!(ex = find_exit(IN_ROOM(ch), dir)) || !ex->room_ptr) {
-			msg_to_char(ch, "Alas, you cannot go that way...\r\n");
-			return FALSE;
+	
+	// optional: determine the target room: this is slightly different from room_data dir_to_room()
+	if (dir != NO_DIR && !to_room) {
+		if ((PLR_FLAGGED(ch, PLR_UNRESTRICT) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_INSIDE(IN_ROOM(ch))) || !ROOM_IS_CLOSED(IN_ROOM(ch))) {
+			// map movement
+			if (dir >= NUM_2D_DIRS || dir < 0) {
+				send_to_char("Alas, you cannot go that way...\r\n", ch);
+				return FALSE;
+			}
+			// may produce a NULL
+			to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
 		}
-		if (EXIT_FLAGGED(ex, EX_CLOSED) && ex->keyword) {
-			msg_to_char(ch, "The %s is closed.\r\n", fname(ex->keyword));
-			return FALSE;
+		else {	// non-map movement
+			if (!(ex = find_exit(IN_ROOM(ch), dir)) || !ex->room_ptr) {
+				msg_to_char(ch, "Alas, you cannot go that way...\r\n");
+				return FALSE;
+			}
+			if (EXIT_FLAGGED(ex, EX_CLOSED) && ex->keyword) {
+				msg_to_char(ch, "The %s is closed.\r\n", fname(ex->keyword));
+				return FALSE;
+			}
+			to_room = ex->room_ptr;
 		}
-		to_room = ex->room_ptr;
-	}
+	}	// end detect-to_room
 	
 	// safety (and map bounds)
 	if (!to_room) {
@@ -1555,14 +1562,14 @@ int perform_move(char_data *ch, int dir, bitvector_t flags) {
 	}
 	// leading mob (attempt move)
 	if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
-		perform_move(GET_LEADING_MOB(ch), dir, MOVE_LEAD);
+		perform_move(GET_LEADING_MOB(ch), dir, to_room, MOVE_LEAD);
 	}
 
 	for (k = ch->followers; k; k = next) {
 		next = k->next;
 		if ((IN_ROOM(k->follower) == was_in) && (GET_POS(k->follower) >= POS_STANDING)) {
 			act("You follow $N.\r\n", FALSE, k->follower, 0, ch, TO_CHAR);
-			perform_move(k->follower, dir, MOVE_FOLLOW);
+			perform_move(k->follower, dir, to_room, MOVE_FOLLOW);
 		}
 	}
 	return TRUE;
@@ -1994,14 +2001,14 @@ ACMD(do_climb) {
 	else if (dir >= NUM_2D_DIRS) {
 		msg_to_char(ch, "You can't climb that way!\r\n");
 	}
-	else if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
+	else if (!(to_room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
 		msg_to_char(ch, "You can't go that way!\r\n");
 	}
 	else if (!ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH)) {
 		msg_to_char(ch, "You can only climb onto rough terrain.\r\n");
 	}
 	else {
-		perform_move(ch, dir, MOVE_CLIMB);
+		perform_move(ch, dir, NULL, MOVE_CLIMB);
 	}
 }
 
@@ -2192,7 +2199,7 @@ ACMD(do_move) {
 		return;
 	}
 	
-	perform_move(ch, confused_dirs[get_north_for_char(ch)][0][subcmd], NOBITS);
+	perform_move(ch, confused_dirs[get_north_for_char(ch)][0][subcmd], NULL, NOBITS);
 }
 
 
@@ -2648,14 +2655,14 @@ ACMD(do_swim) {
 	else if (dir >= NUM_2D_DIRS) {
 		msg_to_char(ch, "You can't swim that way!\r\n");
 	}
-	else if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
+	else if (!(to_room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
 		msg_to_char(ch, "You can't go that way!\r\n");
 	}
 	else if (!WATER_SECT(to_room) && !WATER_SECT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only swim in the water.\r\n");
 	}
 	else {
-		perform_move(ch, dir, MOVE_SWIM);
+		perform_move(ch, dir, NULL, MOVE_SWIM);
 	}
 }
 

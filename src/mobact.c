@@ -40,7 +40,7 @@ extern struct generic_name_data *generic_names;
 extern struct character_size_data size_data[];
 
 // external funcs
-extern int perform_move(char_data *ch, int dir, bitvector_t flags);
+extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 
 // local protos
 void end_pursuit(char_data *ch, char_data *target);
@@ -573,7 +573,7 @@ bool try_mobile_movement(char_data *ch) {
 						// can't go that way
 					}
 					else if (validate_mobile_move(ch, dir, to_room)) {
-						perform_move(ch, dir, MOVE_WANDER);
+						perform_move(ch, dir, NULL, MOVE_WANDER);
 					}
 				}
 			}
@@ -582,7 +582,7 @@ bool try_mobile_movement(char_data *ch) {
 				to_room = ex->room_ptr;
 				
 				if (to_room && validate_mobile_move(ch, dir, to_room)) {
-					perform_move(ch, dir, MOVE_WANDER);
+					perform_move(ch, dir, NULL, MOVE_WANDER);
 				}
 			}
 		}
@@ -689,7 +689,7 @@ void mobile_activity(void) {
 			}
 			
 			if (dir != NO_DIR && found == TRUE && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED)) {
-				perform_move(ch, dir, MOVE_WANDER);
+				perform_move(ch, dir, NULL, MOVE_WANDER);
 				moved = TRUE;
 			}
 			
