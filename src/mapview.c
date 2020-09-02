@@ -2152,7 +2152,7 @@ ACMD(do_exits) {
 	}
 	
 	// 'exit'
-	if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) && (to_room = get_exit_room(IN_ROOM(ch))) && to_room != IN_ROOM(ch)) {
+	if ((ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) || (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_ROOM(ch) == HOME_ROOM(IN_ROOM(ch)))) && (to_room = get_exit_room(IN_ROOM(ch))) && to_room != IN_ROOM(ch)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", exit_description(ch, to_room, "Exit"));
 	}
 	
