@@ -890,9 +890,10 @@ void skip_run_filler(char **string) {
 * @param int dir A real dir, not a confused dir (may be NO_DIR if portaling, etc).
 * @param room_data *to_room The target room.
 * @param bitvector_t flags MOVE_ flags passed along.
+* @param bool triggers If TRUE, runs leave triggers.
 * @return bool TRUE indicates can-move, FALSE means they were blocked (and received an error).
 */
-bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
+bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags, bool triggers) {
 	room_data *was_in = IN_ROOM(ch);
 	
 	// overrides all move restrictions
@@ -970,7 +971,7 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 	}
 
 	// check leave triggers (ideally this is last)
-	if (!leave_mtrigger(ch, dir, NULL) || !leave_wtrigger(IN_ROOM(ch), ch, dir, NULL) || !leave_vtrigger(ch, dir, NULL) || !leave_otrigger(IN_ROOM(ch), ch, dir, NULL)) {
+	if (triggers && (!leave_mtrigger(ch, dir, NULL) || !leave_wtrigger(IN_ROOM(ch), ch, dir, NULL) || !leave_vtrigger(ch, dir, NULL) || !leave_otrigger(IN_ROOM(ch), ch, dir, NULL))) {
 		// script should have sent message
 		return FALSE;
 	}
@@ -1068,7 +1069,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 		return FALSE;
 	}
 	// this checks if a led MOB can move there using player_can_move -- TODO this seems like an error
-	if (GET_LEADING_MOB(ch) && !GET_LEADING_MOB(ch)->desc && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !char_can_move(GET_LEADING_MOB(ch), dir, to_room, flags | MOVE_LEAD)) {
+	if (GET_LEADING_MOB(ch) && !GET_LEADING_MOB(ch)->desc && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !char_can_move(GET_LEADING_MOB(ch), dir, to_room, flags | MOVE_LEAD, FALSE)) {
 		act("You can't go there while leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
 		return FALSE;
 	}
@@ -1393,7 +1394,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	room_data *was_in = IN_ROOM(ch);
 	
 	// basic move checks -- these send their own messages
-	if (!char_can_move(ch, dir, to_room, flags)) {
+	if (!char_can_move(ch, dir, to_room, flags, TRUE)) {
 		return FALSE;
 	}
 	
@@ -1420,7 +1421,9 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 			return FALSE;
 		}
 	}
-
+	
+	// cancel any 'hide' affects
+	affects_from_char_by_aff_flag(ch, AFF_HIDE, TRUE);
 	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
 	
 	// ACTUAL MOVEMENT
