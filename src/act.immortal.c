@@ -2212,9 +2212,11 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 					add_player_to_account(vict, GET_ACCOUNT(alt));
 
 					if (file) {
-						store_loaded_char(alt);
-						file = FALSE;
-						alt = NULL;
+						SAVE_CHAR(alt);
+						// leave them open to avoid a conflict with who you're setting
+						// store_loaded_char(alt);
+						// file = FALSE;
+						// alt = NULL;
 					}
 					else {
 						queue_delayed_update(alt, CDU_SAVE);
@@ -2226,7 +2228,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 				}
 				
 				if (file && alt) {
-					free_char(alt);
+					// leave the alt open to avoid a conflict with who you're setting
+					// free_char(alt);
 				}
 			}
 			else {
