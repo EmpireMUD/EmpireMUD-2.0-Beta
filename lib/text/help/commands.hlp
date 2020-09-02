@@ -849,6 +849,16 @@ Usage:  toggle extra-spacing [on/off]
 This toggle will insert an extra blank line after your prompt when you type
 any command. This is useful on MUD clients that don't have local echo.
 #
+EXIT
+
+Usage:  exit
+
+This command attempts to exit the building or vehicle you're in, if possible.
+If you can't exit from your current location, it lists the available exits
+from the room you're in (like the EXITS command).
+
+See also: EXITS
+#
 EXITS
 
 Usage:  exits
@@ -856,7 +866,7 @@ Usage:  exits
 Gives you a list of the obvious exits from your location. This includes all
 directions you can walk, disembark, and any portals present.
 
-See also: DIRECTIONS, DISEMBARK, ENTER
+See also: DIRECTIONS, DISEMBARK, ENTER, EXIT
 #
 FACTION FACTIONS REPUTATIONS REP "FACTION REP"
 

@@ -1619,6 +1619,18 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 			act("$n follows you.", TRUE, ch, NULL, ch->master, TO_VICT);
 		}
 	}
+	else if (IS_SET(flags, MOVE_EXIT)) {
+		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
+		if (veh) {
+			act("$n exits $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (GET_BUILDING(HOME_ROOM(from_room))) {
+			snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
+		}
+		else {
+			act("$n exits the building.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+	}
 	else if (dir != NO_DIR) {	// normal move message
 		snprintf(msg, sizeof(msg), "$n %s %s from %%s.", mob_move_types[determine_move_type(ch, to_room)], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
 	}
@@ -1690,6 +1702,18 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	}
 	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master) {
 		snprintf(msg, sizeof(msg), "$n follows %s %%s.", HMHR(ch->master));
+	}
+	else if (IS_SET(flags, MOVE_EXIT)) {
+		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
+		if (veh) {
+			act("$n exits $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (GET_BUILDING(HOME_ROOM(from_room))) {
+			snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
+		}
+		else {
+			act("$n exits a building.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 	}
 	else if (dir != NO_DIR) {	// normal move message
 		snprintf(msg, sizeof(msg), "$n %s %%s.", mob_move_types[determine_move_type(ch, to_room)]);
@@ -2055,6 +2079,34 @@ ACMD(do_enter) {
 	}
 	
 	char_through_portal(ch, portal, FALSE);
+}
+
+
+// this command tries to 'exit' the current vehicle/building, or falls through to 'exits'
+ACMD(do_exit) {
+	ACMD(do_exits);
+	
+	room_data *to_room;
+	
+	// if you can't exit here, passes through to 'exits'
+	if (IS_OUTDOORS(ch) || (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch)))) {
+		do_exits(ch, "", 0, -1);
+		return;
+	}
+	
+	// make sure there's a valid target room
+	if (!(to_room = get_exit_room(IN_ROOM(ch))) || to_room == IN_ROOM(ch)) {
+		msg_to_char(ch, "You can't exit from here.\r\n");
+		return;
+	}
+	
+	// if we got here but aren't standing, alert
+	if (GET_POS(ch) < POS_STANDING) {
+		send_low_pos_msg(ch);
+		return;
+	}
+	
+	perform_move(ch, NO_DIR, to_room, MOVE_EXIT);
 }
 
 

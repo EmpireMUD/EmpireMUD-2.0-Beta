@@ -727,6 +727,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "excavate", POS_STANDING, do_excavate, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "exchange", POS_STANDING, do_exchange, NO_MIN, CTYPE_BUILD ),
 	SIMPLE_CMD( "execute", POS_STANDING, do_execute, NO_MIN, CTYPE_COMBAT ),
+	SIMPLE_CMD( "exit", POS_RESTING, do_exit, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "exits", POS_RESTING, do_exits, NO_MIN, CTYPE_UTIL, -1 ),
 	SCMD_CMD( "export", POS_DEAD, do_import, NO_MIN, CTYPE_UTIL, TRADE_EXPORT ),
 	SIMPLE_CMD( "expel", POS_DEAD, do_expel, NO_MIN, CTYPE_EMPIRE ),
