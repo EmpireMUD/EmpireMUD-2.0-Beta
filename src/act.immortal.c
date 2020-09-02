@@ -4165,7 +4165,8 @@ SHOW(show_account) {
 		}
 		
 		if (loaded_file) {
-			free_char(loaded);
+			// leave them open to be cleaned up later; also loaded may equal plr
+			// free_char(loaded);
 		}
 	}
 	
