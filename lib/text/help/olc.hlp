@@ -2082,6 +2082,7 @@ Available flags:
  !PAINT - cannot be painted
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
+ EXIT - on interior rooms, players can 'exit' (or disembark) to leave from here
  SAIL - can enter this building with a boat
  ITEM-LIMIT - only a certain number of items can be dropped here
  LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here

@@ -218,8 +218,10 @@ INTERACTION_FUNC(pickpocket_interact) {
 
 
 // for do_escape
-void perform_escape(char_data *ch) {	
-	room_data *home, *to_room = NULL;
+void perform_escape(char_data *ch) {
+	extern room_data *get_exit_room(room_data *from_room);
+	
+	room_data *to_room = NULL;
 	
 	// on a boat?
 	if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && (to_room = IN_VEHICLE_IN_ROOM(IN_ROOM(ch))) != IN_ROOM(ch)) {
@@ -235,11 +237,7 @@ void perform_escape(char_data *ch) {
 	else {
 		msg_to_char(ch, "You dive out the window!\r\n");
 		act("$n dives out the window!", TRUE, ch, NULL, NULL, TO_ROOM);
-		
-		home = HOME_ROOM(IN_ROOM(ch));
-		if (BUILDING_ENTRANCE(home) != NO_DIR) {
-			to_room = real_shift(home, shift_dir[rev_dir[BUILDING_ENTRANCE(home)]][0], shift_dir[rev_dir[BUILDING_ENTRANCE(home)]][1]);
-		}
+		to_room = get_exit_room(IN_ROOM(ch));
 	}
 
 	if (!to_room) {

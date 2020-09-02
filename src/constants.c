@@ -2867,7 +2867,7 @@ const char *bld_flags[] = {
 	"!PAINT",
 	"ATTACH-ROAD",
 	"BURNABLE",	// 15
-	"*",
+	"EXIT",
 	"*",
 	"*",
 	"*",

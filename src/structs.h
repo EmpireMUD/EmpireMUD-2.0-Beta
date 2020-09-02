@@ -735,7 +735,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_NO_PAINT  BIT(13)	// cannot be painted
 #define BLD_ATTACH_ROAD  BIT(14)	// building connects to roads on the map
 #define BLD_BURNABLE  BIT(15)	// fire! fire!
-// #define BLD_UNUSED4  BIT(16)
+#define BLD_EXIT  BIT(16)	// for ROOM-flagged interiors, players can 'exit' here
 // #define BLD_UNUSED5  BIT(17)
 // #define BLD_UNUSED6  BIT(18)
 // #define BLD_UNUSED7  BIT(19)

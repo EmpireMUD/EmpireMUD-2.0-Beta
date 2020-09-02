@@ -1390,6 +1390,9 @@ ACMD(do_disembark) {
 	else if (!veh || !(to_room = IN_ROOM(veh))) {
 		msg_to_char(ch, "You can't disembark from here!\r\n");
 	}
+	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN | BLD_EXIT) && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "You cannot disembark from here.\r\n");
+	}
 	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
 	}
