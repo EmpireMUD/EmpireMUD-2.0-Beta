@@ -1785,7 +1785,7 @@ ACMD(do_reply) {
 		 */
 		tch = NULL;
 		DL_FOREACH(character_list, iter) {
-			if (!REAL_NPC(iter) && GET_IDNUM(REAL_CHAR(tch)) == GET_LAST_TELL(ch)) {
+			if (!REAL_NPC(iter) && GET_IDNUM(REAL_CHAR(iter)) == GET_LAST_TELL(ch)) {
 				tch = iter;
 				break;
 			}
