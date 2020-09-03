@@ -332,7 +332,7 @@ if !%actor%
           if %person.is_god% || %person.is_immortal% || %person.health% < 0
             halt
           end
-          %send% %person% &rYou are drowning!
+          %send% %person% # &rYou are drowning!&0
           eval amount (%person.breath%) * (-250)
           %damage% %person% %amount%
         end
@@ -372,7 +372,7 @@ if %instance.mob(12406)% && %actor.has_reputation(12401, Liked)%
 end
 if %actor.varexists(breath)%
   if %actor.breath% < %breath%
-    %send% %actor% You take a deep breath of air, refreshing your air supply.
+    %send% %actor% # You take a deep breath of air, refreshing your air supply.
   end
 end
 remote breath %actor.id%

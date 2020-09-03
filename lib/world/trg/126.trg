@@ -1055,16 +1055,16 @@ if !%actor%
   if %random.10% == 10
     switch %random.4%
       case 1
-        %echo% Something brushes against your leg.
+        %echo% # Something brushes against your leg.
       break
       case 2
-        %echo% You hear a wild screech burble through the water.
+        %echo% # You hear a wild screech burble through the water.
       break
       case 3
-        %echo% Your lungs feel like they might collapse.
+        %echo% # Your lungs feel like they might collapse.
       break
       case 4
-        %echo% You try to swim toward the surface, but something drags you down again.
+        %echo% # You try to swim toward the surface, but something drags you down again.
       break
     done
   end
@@ -1076,7 +1076,7 @@ if !%actor%
           if %person.is_god% || %person.is_immortal% || %person.health% < 0
             halt
           end
-          %send% %person% &rYou are drowning!
+          %send% %person% # &rYou are drowning!&0
           eval amount (%person.breath%) * (-250)
           %damage% %person% %amount%
         end
@@ -1130,7 +1130,7 @@ Air Supply (Grove 2.0)~
 set breath 5
 if %actor.varexists(breath)%
   if %actor.breath% < %breath%
-    %send% %actor% You take a deep breath of air, refreshing your air supply.
+    %send% %actor% # You take a deep breath of air, refreshing your air supply.
   end
 end
 remote breath %actor.id%
