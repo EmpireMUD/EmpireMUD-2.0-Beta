@@ -15,7 +15,7 @@ S
 Walking Hut~
 Inside the Walking Hut~
 &0[  ]~
-1 0 a 0
+1 0 aq 0
 0 1 0 -1
 C
 cook, disembark, sleep~
@@ -38,7 +38,7 @@ S
 Walking Hut Porch~
 The Porch~
 &0[  ]~
-1 0 aHR 0
+1 0 aqHR 0
 0 0 0 -1
 C
 drive, disembark~

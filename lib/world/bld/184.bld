@@ -24,7 +24,7 @@ S
 Strange Chariot~
 Inside the Strange Silver Chariot~
 &0[  ]~
-1 0 a 0
+1 0 aq 0
 0 0 0 -1
 C
 disembark~
@@ -54,7 +54,7 @@ S
 A Massive Chamber~
 A Massive Control Room~
 &0[  ]~
-1 0 a 0
+1 0 aq 0
 0 0 0 -1
 C
 disembark~

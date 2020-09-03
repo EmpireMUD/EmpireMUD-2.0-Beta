@@ -2,7 +2,7 @@
 Helm~
 The Helm~
 ~
-0 0 aHR o
+0 0 aqHR o
 0 0 0 -1
 C
 disembark, sail~
@@ -16,7 +16,7 @@ S
 On Deck~
 On Deck~
 ~
-0 0 aHR 0
+0 0 aqHR 0
 0 0 0 -1
 C
 disembark, sail~
@@ -62,7 +62,7 @@ S
 Forecastle~
 On The Forecastle~
 &0[  ]~
-1 0 aHR q
+1 0 aqHR q
 0 0 0 -1
 C
 disembark, sail~
@@ -90,7 +90,7 @@ S
 Bow~
 On The Bow~
 &0[  ]~
-1 0 aHR o
+1 0 aqHR o
 0 0 0 -1
 C
 disembark, sail~
@@ -118,7 +118,7 @@ S
 On Deck~
 On Deck~
 ~
-0 0 aHR 0
+0 0 aqHR 0
 0 0 0 -1
 C
 disembark, sail~
@@ -199,7 +199,7 @@ S
 Quarterdeck~
 On The Quarterdeck~
 &0[  ]~
-1 0 aHR q
+1 0 aqHR q
 0 0 0 -1
 C
 disembark, sail~
@@ -213,7 +213,7 @@ S
 Stern~
 At The Stern~
 &0[  ]~
-1 0 aHR o
+1 0 aqHR o
 0 0 0 -1
 C
 disembark, sail~
@@ -276,7 +276,7 @@ S
 Inside Wagon~
 Inside the Wagon~
 &0[  ]~
-1 0 a r
+1 0 aq r
 0 0 0 -1
 C
 disembark~
@@ -290,7 +290,7 @@ S
 Wagon Sleeping Area~
 Inside the Wagon~
 &0[  ]~
-1 0 a r
+1 0 aq r
 0 0 0 -1
 C
 disembark, sleep~
@@ -307,7 +307,7 @@ S
 Wagon Cooking Area~
 In the Wagon~
 &0[  ]~
-1 0 a r
+1 0 aq r
 0 0 0 -1
 C
 cook, disembark~
@@ -324,7 +324,7 @@ S
 Carriage~
 In the Carriage~
 &0[  ]~
-1 0 a 0
+1 0 aq 0
 0 0 0 -1
 C
 disembark~
@@ -342,7 +342,7 @@ S
 On Deck~
 On Deck~
 ~
-0 0 aHR 0
+0 0 aqHR 0
 0 1 0 -1
 C
 disembark, sail~
