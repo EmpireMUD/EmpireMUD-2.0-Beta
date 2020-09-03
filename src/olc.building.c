@@ -121,6 +121,10 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Interior room has upgrades-to");
 		problem = TRUE;
 	}
+	if (IS_SET(GET_BLD_FLAGS(bld), BLD_EXIT) && !IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "EXIT flag set without the ROOM flag");
+		problem = TRUE;
+	}
 	
 	// check scripts
 	for (tpl = GET_BLD_SCRIPTS(bld); tpl; tpl = tpl->next) {
