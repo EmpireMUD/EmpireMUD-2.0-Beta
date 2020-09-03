@@ -2128,9 +2128,18 @@ ACMD(do_exits) {
 				}
 			}
 		}
-		// disembark?
-		if (cmd != -1 && (veh = GET_ROOM_VEHICLE(room)) && IN_ROOM(veh)) {
-			size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", exit_description(ch, IN_ROOM(veh), "Disembark"));
+		
+		// can disembark/exit here?
+		if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) || (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_ROOM(ch) == HOME_ROOM(IN_ROOM(ch)))) {
+			// 'disembark'
+			if ((veh = GET_ROOM_VEHICLE(room)) && IN_ROOM(veh)) {
+				// TODO: when (if?) the vehicles-as-buildings go in, also need to check VEH_FLAGGED(veh, VEH_BUILDING) or whatever
+				size += snprintf(buf + size, sizeof(buf) - size, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, IN_ROOM(veh), "Disembark"));
+			}
+			// 'exit'
+			else if ((to_room = get_exit_room(IN_ROOM(ch))) && to_room != IN_ROOM(ch)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, to_room, "Exit"));
+			}
 		}
 	}
 	else {	// out on the map
@@ -2149,11 +2158,6 @@ ACMD(do_exits) {
 				size += strlen(buf2);
 			}
 		}
-	}
-	
-	// 'exit'
-	if ((ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) || (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_ROOM(ch) == HOME_ROOM(IN_ROOM(ch)))) && (to_room = get_exit_room(IN_ROOM(ch))) && to_room != IN_ROOM(ch)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", exit_description(ch, to_room, "Exit"));
 	}
 	
 	msg_to_char(ch, "Obvious exits:\r\n%s", *buf ? buf : " None.\r\n");
