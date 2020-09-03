@@ -13,6 +13,7 @@ dg_affect %actor% INFRA on 300
 Magiterranean Terracrop~
 0 in 100
 ~
+wait 1
 * pick a crop -- use start of time as jan 1, 2015: 1420070400
 * 2628288 seconds in a month
 eval month ((%timestamp% - 1420070400) / 2628288) // 12

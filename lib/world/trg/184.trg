@@ -56,6 +56,7 @@ if !%instance.location%
 end
 set dist %room.distance(%instance.location%)%
 if (%dist% > 2)
+  wait 1
   %echo% %self.name% scrambles into a hole in the dam and returns to %self.hisher% lodge.
   mgoto %instance.location%
   %echo% %self.name% appears from %self.hisher% lodge.

@@ -1318,7 +1318,10 @@ if %self.room.template% == 10146
   mmove
   mmove
 elseif %self.room.distance(%start_room%)% > 20
+  wait 1
+  %echo% %self.name% heads back to the portal.
   mgoto %start_room%
+  %echo% %self.name% arrives.
 end
 ~
 #10176

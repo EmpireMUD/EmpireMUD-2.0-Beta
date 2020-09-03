@@ -503,6 +503,7 @@ if %actor%
   end
 else
   * entry - look for valid target in room
+  wait 1
   set person %room.people%
   while %person%
     * validate

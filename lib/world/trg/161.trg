@@ -303,10 +303,7 @@ hydra leash~
 ~
 set room %self.room%
 if %room.distance(%instance.real_location%)% > 40
-  %echo% %self.name% sinuously twists around and doubles back.
   return 0
-  wait 1
-  %echo% %self.name% sinuously twists around and doubles back.
   halt
 end
 if %room.sector_vnum% != 6
