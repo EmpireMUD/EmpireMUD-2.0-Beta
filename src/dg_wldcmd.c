@@ -110,18 +110,21 @@ void wld_log(room_data *room, const char *format, ...) {
 	va_end(args);
 }
 
-/* sends str to room */
-void act_to_room(char *str, room_data *room, bool use_queue) {
-	/* no one is in the room */
-	if (!room->people)
-		return;
 
-	/*
-	* since you can't use act(..., TO_ROOM) for an room, send it
-	* TO_ROOM and TO_CHAR for some char in the room.
-	* (just dont use $n or you might get strange results)
-	*/
-	act(str, FALSE, room->people, 0, 0, TO_CHAR | TO_ROOM | (use_queue ? TO_QUEUE : 0));
+/**
+* Sends a script message to everyone in the room (formerly act_to_room) using
+* sub_write.
+*
+* @param char *str The message.
+* @param room_data *room The room to send to.
+* @param bool use_queue If TRUE, stacks the message to the queue instead of sending immediately.
+*/
+void sub_write_to_room(char *str, room_data *room, bool use_queue) {
+	char_data *iter;
+	
+	DL_FOREACH2(ROOM_PEOPLE(room), iter, next_in_room) {
+		sub_write(str, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
+	}
 }
 
 
@@ -145,11 +148,10 @@ WCMD(do_wadventurecomplete) {
 
 /* prints the argument to all the rooms aroud the room */
 WCMD(do_wasound) {
-	struct room_direction_data *newexit;
-	bool use_queue;
-	int dir;
+	bool use_queue, map_echo = FALSE;
+	struct room_direction_data *ex;
 	room_data *to_room;
-	bool map_echo = FALSE;
+	int dir;
 
 	use_queue = script_message_should_queue(&argument);
 
@@ -161,18 +163,18 @@ WCMD(do_wasound) {
 	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 		for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
 			if ((to_room = SHIFT_DIR(room, dir))) {
-				act_to_room(argument, to_room, use_queue);
+				sub_write_to_room(argument, to_room, use_queue);
 			}
 		}
 		map_echo = TRUE;
 	}
 
 	if (COMPLEX_DATA(room)) {
-		for (newexit = COMPLEX_DATA(room)->exits; newexit; newexit = newexit->next) {
-			if ((to_room = newexit->room_ptr) && room != to_room) {
+		LL_FOREACH(COMPLEX_DATA(room)->exits, ex) {
+			if ((to_room = ex->room_ptr) && room != to_room) {
 				// this skips rooms already hit by the direction shift
-				if (!map_echo || GET_ROOM_VNUM(to_room) > MAP_SIZE) {
-					act_to_room(argument, to_room, use_queue);
+				if (!map_echo || GET_ROOM_VNUM(to_room) >= MAP_SIZE) {
+					sub_write_to_room(argument, to_room, use_queue);
 				}
 			}
 		}
@@ -224,10 +226,12 @@ WCMD(do_wbuild) {
 WCMD(do_wecho) {
 	bool use_queue = script_message_should_queue(&argument);
 
-	if (!*argument) 
+	if (!*argument) {
 		wld_log(room, "wecho called with no args");
-	else 
-		act_to_room(argument, room, use_queue);
+	}
+	else {
+		sub_write_to_room(argument, room, use_queue);
+	}
 }
 
 
@@ -294,11 +298,13 @@ WCMD(do_wsend) {
 
 
 WCMD(do_wbuildingecho) {
-	room_data *froom, *iter, *home;
-	char room_num[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
+	room_data *froom, *home_room;
+	char room_num[MAX_INPUT_LENGTH], *msg;
+	char_data *iter;
+	bool use_queue;
 
 	msg = any_one_word(argument, room_num);
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*room_num || !*msg)
 		wld_log(room, "wbuildingecho called with too few args");
@@ -306,13 +312,11 @@ WCMD(do_wbuildingecho) {
 		wld_log(room, "wbuildingecho called with bad target");
 	}
 	else {
-		home = HOME_ROOM(froom);
-		sprintf(buf, "%s\r\n", msg);
+		home_room = HOME_ROOM(froom);
 		
-		send_to_room(buf, home);
-		for (iter = interior_room_list; iter; iter = iter->next_interior) {
-			if (HOME_ROOM(iter) == home && iter != home && ROOM_PEOPLE(iter)) {
-				send_to_room(buf, iter);
+		DL_FOREACH(character_list, iter) {
+			if (HOME_ROOM(IN_ROOM(iter)) == home_room) {
+				sub_write(msg, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
 		}
 	}
@@ -321,15 +325,14 @@ WCMD(do_wbuildingecho) {
 
 WCMD(do_wregionecho) {
 	char room_number[MAX_INPUT_LENGTH], radius_arg[MAX_INPUT_LENGTH], *msg;
-	descriptor_data *desc;
+	bool use_queue, indoor_only = FALSE;
 	room_data *center;
 	char_data *targ;
 	int radius;
-	bool indoor_only = FALSE;
 
 	argument = any_one_word(argument, room_number);
 	msg = one_argument(argument, radius_arg);
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*room_number || !*radius_arg || !*msg) {
 		wld_log(room, "wregionecho called with too few args");
@@ -348,21 +351,17 @@ WCMD(do_wregionecho) {
 			indoor_only = TRUE;
 		}
 		
-		if (center) {			
-			for (desc = descriptor_list; desc; desc = desc->next) {
-				if (STATE(desc) != CON_PLAYING || !(targ = desc->character)) {
+		if (center) {
+			DL_FOREACH(character_list, targ) {
+				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
 					continue;
 				}
-				if (NO_LOCATION(IN_ROOM(targ))) {
-					continue;
-				}
-				if (compute_distance(center, IN_ROOM(targ)) > radius) {
+				if (indoor_only && IS_OUTDOORS(targ)) {
 					continue;
 				}
 				
-				if (!indoor_only || IS_OUTDOORS(targ)) {
-					msg_to_desc(desc, "%s\r\n", CAP(msg));
-				}
+				// send
+				sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
 		}
 	}
@@ -372,9 +371,11 @@ WCMD(do_wregionecho) {
 WCMD(do_wvehicleecho) {
 	char targ[MAX_INPUT_LENGTH], *msg;
 	vehicle_data *veh;
+	char_data *iter;
+	bool use_queue;
 
 	msg = any_one_word(argument, targ);
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*targ || !*msg)
 		wld_log(room, "wvehicleecho called with too few args");
@@ -382,7 +383,11 @@ WCMD(do_wvehicleecho) {
 		wld_log(room, "wvehicleecho called with bad target");
 	}
 	else {
-		msg_to_vehicle(veh, FALSE, "%s\r\n", msg);
+		DL_FOREACH(character_list, iter) {
+			if (VEH_SITTING_ON(veh) == iter || GET_ROOM_VEHICLE(IN_ROOM(iter)) == veh) {
+				sub_write(msg, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
+			}
+		}
 	}
 }
 

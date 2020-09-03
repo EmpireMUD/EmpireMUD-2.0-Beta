@@ -74,6 +74,7 @@ void scale_vehicle_to_level(vehicle_data *veh, int level);
 void send_char_pos(char_data *ch, int dam);
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
+void sub_write_to_room(char *str, room_data *room, bool use_queue);
 
 /*
 * Local functions.
@@ -233,11 +234,12 @@ ACMD(do_maggro) {
 }
 
 
-/* prints the argument to all the rooms aroud the mobile */
+/* prints the argument to all the rooms around the mobile */
 ACMD(do_masound) {
 	struct room_direction_data *ex;
-	room_data *was_in_room;
-	bool use_queue;
+	room_data *to_room, *room = IN_ROOM(ch);
+	bool use_queue, map_echo = FALSE;
+	int dir;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -247,24 +249,32 @@ ACMD(do_masound) {
 	if (AFF_FLAGGED(ch, AFF_ORDERED))
 		return;
 
+	use_queue = script_message_should_queue(&argument);
+	
 	if (!*argument) {
 		mob_log(ch, "masound called with no argument");
 		return;
 	}
 
-	use_queue = script_message_should_queue(&argument);
+	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+		for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
+			if ((to_room = SHIFT_DIR(room, dir))) {
+				sub_write_to_room(argument, to_room, use_queue);
+			}
+		}
+		map_echo = TRUE;
+	}
 
-	was_in_room = IN_ROOM(ch);
-	if (COMPLEX_DATA(IN_ROOM(ch))) {
-		for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits; ex; ex = ex->next) {
-			if (ex->room_ptr && ex->room_ptr != was_in_room) {
-				IN_ROOM(ch) = ex->room_ptr;
-				sub_write(argument, ch, TRUE, TO_ROOM | (use_queue ? TO_QUEUE : 0));
+	if (COMPLEX_DATA(room)) {
+		LL_FOREACH(COMPLEX_DATA(room)->exits, ex) {
+			if ((to_room = ex->room_ptr) && room != to_room) {
+				// this skips rooms already hit by the direction shift
+				if (!map_echo || GET_ROOM_VNUM(to_room) >= MAP_SIZE) {
+					sub_write_to_room(argument, to_room, use_queue);
+				}
 			}
 		}
 	}
-
-	IN_ROOM(ch) = was_in_room;
 }
 
 
@@ -535,8 +545,10 @@ ACMD(do_mecho) {
 
 
 ACMD(do_mbuildingecho) {
-	room_data *home_room, *iter;
-	char room_number[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
+	room_data *home_room;
+	char room_number[MAX_INPUT_LENGTH], *msg;
+	char_data *iter;
+	bool use_queue;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -547,7 +559,7 @@ ACMD(do_mbuildingecho) {
 		return;
 
 	msg = any_one_word(argument, room_number);
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*room_number || !*msg) {
 		mob_log(ch, "mbuildingecho called with too few args");
@@ -558,12 +570,9 @@ ACMD(do_mbuildingecho) {
 	else {
 		home_room = HOME_ROOM(home_room);	// right?
 		
-		sprintf(buf, "%s\r\n", msg);
-		
-		send_to_room(buf, home_room);
-		for (iter = interior_room_list; iter; iter = iter->next_interior) {
-			if (HOME_ROOM(iter) == home_room && iter != home_room && ROOM_PEOPLE(iter)) {
-				send_to_room(buf, iter);
+		DL_FOREACH(character_list, iter) {
+			if (HOME_ROOM(IN_ROOM(iter)) == home_room) {
+				sub_write(msg, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
 		}
 	}
@@ -572,11 +581,10 @@ ACMD(do_mbuildingecho) {
 
 ACMD(do_mregionecho) {
 	char room_number[MAX_INPUT_LENGTH], radius_arg[MAX_INPUT_LENGTH], *msg;
-	descriptor_data *desc;
+	bool use_queue, indoor_only = FALSE;
 	room_data *center;
 	char_data *targ;
 	int radius;
-	bool indoor_only = FALSE;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -588,7 +596,7 @@ ACMD(do_mregionecho) {
 
 	argument = any_one_word(argument, room_number);
 	msg = one_argument(argument, radius_arg);
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*room_number || !*radius_arg || !*msg) {
 		mob_log(ch, "mregionecho called with too few args");
@@ -607,21 +615,17 @@ ACMD(do_mregionecho) {
 			indoor_only = TRUE;
 		}
 		
-		if (center) {			
-			for (desc = descriptor_list; desc; desc = desc->next) {
-				if (STATE(desc) != CON_PLAYING || !(targ = desc->character)) {
+		if (center) {
+			DL_FOREACH(character_list, targ) {
+				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
 					continue;
 				}
-				if (NO_LOCATION(IN_ROOM(targ))) {
-					continue;
-				}
-				if (compute_distance(center, IN_ROOM(targ)) > radius) {
+				if (indoor_only && IS_OUTDOORS(targ)) {
 					continue;
 				}
 				
-				if (!indoor_only || IS_OUTDOORS(targ)) {
-					msg_to_desc(desc, "%s\r\n", CAP(msg));
-				}
+				// send
+				sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
 		}
 	}
@@ -631,6 +635,8 @@ ACMD(do_mregionecho) {
 ACMD(do_mvehicleecho) {
 	char targ[MAX_INPUT_LENGTH], *msg;
 	vehicle_data *veh;
+	char_data *iter;
+	bool use_queue;
 
 	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
 		send_config_msg(ch, "huh_string");
@@ -638,7 +644,7 @@ ACMD(do_mvehicleecho) {
 	}
 
 	msg = any_one_word(argument, targ);
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 	
 	if (!*targ || !*msg) {
 		mob_log(ch, "mvehicleecho called with too few args");
@@ -647,7 +653,11 @@ ACMD(do_mvehicleecho) {
 		mob_log(ch, "mvehicleecho called with invalid target");
 	}
 	else {
-		msg_to_vehicle(veh, FALSE, "%s\r\n", msg);
+		DL_FOREACH(character_list, iter) {
+			if (VEH_SITTING_ON(veh) == iter || GET_ROOM_VEHICLE(IN_ROOM(iter)) == veh) {
+				sub_write(msg, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
+			}
+		}
 	}
 }
 

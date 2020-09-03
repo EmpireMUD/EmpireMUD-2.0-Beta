@@ -53,6 +53,7 @@ void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
+void sub_write_to_room(char *str, room_data *room, bool use_queue);
 void vehicle_command_interpreter(vehicle_data *veh, char *argument);
 
 
@@ -249,13 +250,51 @@ VCMD(do_vheal) {	// mmmm, veal
 }
 
 
+/* prints the argument to all the rooms aroud the vehicle */
+VCMD(do_vasound) {
+	bool use_queue, map_echo = FALSE;
+	struct room_direction_data *ex;
+	room_data *to_room, *room = IN_ROOM(veh);
+	int dir;
+
+	use_queue = script_message_should_queue(&argument);
+
+	if (!*argument) {
+		veh_log(veh, "vasound called with no argument");
+		return;
+	}
+
+	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+		for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
+			if ((to_room = SHIFT_DIR(room, dir))) {
+				sub_write_to_room(argument, to_room, use_queue);
+			}
+		}
+		map_echo = TRUE;
+	}
+
+	if (COMPLEX_DATA(room)) {
+		LL_FOREACH(COMPLEX_DATA(room)->exits, ex) {
+			if ((to_room = ex->room_ptr) && room != to_room) {
+				// this skips rooms already hit by the direction shift
+				if (!map_echo || GET_ROOM_VNUM(to_room) >= MAP_SIZE) {
+					sub_write_to_room(argument, to_room, use_queue);
+				}
+			}
+		}
+	}
+}
+
+
 VCMD(do_vbuildingecho) {
-	char room_number[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
-	room_data *froom, *home_room, *iter;
+	char room_number[MAX_INPUT_LENGTH], *msg;
+	room_data *froom, *home_room;
 	room_data *orm = IN_ROOM(veh);
+	char_data *iter;
+	bool use_queue;
 
 	msg = any_one_word(argument, room_number);
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*room_number || !*msg) {
 		veh_log(veh, "vbuildingecho called with too few args");
@@ -264,14 +303,11 @@ VCMD(do_vbuildingecho) {
 		veh_log(veh, "vbuildingecho called with invalid target");
 	}
 	else {
-		home_room = HOME_ROOM(froom);	// right?
+		home_room = HOME_ROOM(froom);
 		
-		sprintf(buf, "%s\r\n", msg);
-		
-		send_to_room(buf, home_room);
-		for (iter = interior_room_list; iter; iter = iter->next_interior) {
-			if (HOME_ROOM(iter) == home_room && iter != home_room && ROOM_PEOPLE(iter)) {
-				send_to_room(buf, iter);
+		DL_FOREACH(character_list, iter) {
+			if (HOME_ROOM(IN_ROOM(iter)) == home_room) {
+				sub_write(msg, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
 		}
 	}
@@ -281,14 +317,13 @@ VCMD(do_vbuildingecho) {
 VCMD(do_vregionecho) {
 	char room_number[MAX_INPUT_LENGTH], radius_arg[MAX_INPUT_LENGTH], *msg;
 	room_data *center, *orm = IN_ROOM(veh);
-	bool indoor_only = FALSE;
-	descriptor_data *desc;
+	bool use_queue, indoor_only = FALSE;
 	char_data *targ;
 	int radius;
 
 	argument = any_one_word(argument, room_number);
 	msg = one_argument(argument, radius_arg);
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*room_number || !*radius_arg || !*msg) {
 		veh_log(veh, "vregionecho called with too few args");
@@ -307,21 +342,17 @@ VCMD(do_vregionecho) {
 			indoor_only = TRUE;
 		}
 		
-		if (center) {			
-			for (desc = descriptor_list; desc; desc = desc->next) {
-				if (STATE(desc) != CON_PLAYING || !(targ = desc->character)) {
+		if (center) {
+			DL_FOREACH(character_list, targ) {
+				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
 					continue;
 				}
-				if (NO_LOCATION(IN_ROOM(targ))) {
-					continue;
-				}
-				if (compute_distance(center, IN_ROOM(targ)) > radius) {
+				if (indoor_only && IS_OUTDOORS(targ)) {
 					continue;
 				}
 				
-				if (!indoor_only || IS_OUTDOORS(targ)) {
-					msg_to_desc(desc, "%s\r\n", CAP(msg));
-				}
+				// send
+				sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
 		}
 	}
@@ -331,9 +362,11 @@ VCMD(do_vregionecho) {
 VCMD(do_vvehicleecho) {
 	char targ[MAX_INPUT_LENGTH], *msg;
 	vehicle_data *v;
+	char_data *iter;
+	bool use_queue;
 
 	msg = any_one_word(argument, targ);
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*targ || !*msg) {
 		veh_log(veh, "vvehicleecho called with too few args");
@@ -342,7 +375,11 @@ VCMD(do_vvehicleecho) {
 		veh_log(veh, "vvehicleecho called with invalid target");
 	}
 	else {
-		msg_to_vehicle(v, FALSE, "%s\r\n", msg);
+		DL_FOREACH(character_list, iter) {
+			if (VEH_SITTING_ON(v) == iter || GET_ROOM_VEHICLE(IN_ROOM(iter)) == v) {
+				sub_write(msg, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
+			}
+		}
 	}
 }
 
@@ -1631,6 +1668,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "aft", do_vmove, AFT },
 
 	{ "vadventurecomplete", do_vadventurecomplete, NO_SCMD },
+	{ "vasound", do_vasound, NO_SCMD },
 	{ "vat", do_vat, NO_SCMD },
 	{ "vbuild", do_vbuild, NO_SCMD },
 	{ "vdoor", do_vdoor, NO_SCMD },
