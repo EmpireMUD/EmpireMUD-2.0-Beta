@@ -200,14 +200,15 @@ OCMD(do_obuild) {
 
 OCMD(do_oecho) {
 	room_data *room;
+	bool use_queue;
 
-	skip_spaces(&argument);
+	use_queue = script_message_should_queue(&argument);
 
 	if (!*argument) 
 		obj_log(obj, "oecho called with no args");
 	else if ((room = obj_room(obj))) {
 		if (ROOM_PEOPLE(room))
-			sub_write(argument, ROOM_PEOPLE(room), TRUE, TO_ROOM | TO_CHAR);
+			sub_write(argument, ROOM_PEOPLE(room), TRUE, TO_ROOM | TO_CHAR | (use_queue ? TO_QUEUE : 0));
 	}
 	else
 		obj_log(obj, "oecho called by object in no location");
@@ -357,10 +358,11 @@ OCMD(do_ovehicleecho) {
 OCMD(do_oechoneither) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	char_data *vict1, *vict2, *iter;
+	bool use_queue;
 	char *p;
 
 	p = two_arguments(argument, arg1, arg2);
-	skip_spaces(&p);
+	use_queue = script_message_should_queue(&p);
 
 	if (!*arg1 || !*arg2 || !*p) {
 		obj_log(obj, "oechoneither called with missing arguments");
@@ -378,7 +380,7 @@ OCMD(do_oechoneither) {
 	
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(vict1)), iter, next_in_room) {
 		if (iter->desc && iter != vict1 && iter != vict2) {
-			sub_write(p, iter, TRUE, TO_CHAR);
+			sub_write(p, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		}
 	}
 }
@@ -495,6 +497,7 @@ OCMD(do_orestore) {
 
 OCMD(do_osend) {
 	char buf[MAX_INPUT_LENGTH], *msg;
+	bool use_queue;
 	char_data *ch;
 
 	msg = any_one_arg(argument, buf);
@@ -504,7 +507,7 @@ OCMD(do_osend) {
 		return;
 	}
 
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*msg) {
 		obj_log(obj, "osend called without a message");
@@ -513,9 +516,9 @@ OCMD(do_osend) {
 
 	if ((ch = get_char_by_obj(obj, buf))) {
 		if (subcmd == SCMD_OSEND)
-			sub_write(msg, ch, TRUE, TO_CHAR);
+			sub_write(msg, ch, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		else if (subcmd == SCMD_OECHOAROUND)
-			sub_write(msg, ch, TRUE, TO_ROOM);
+			sub_write(msg, ch, TRUE, TO_ROOM | (use_queue ? TO_QUEUE : 0));
 	}
 	else
 		obj_log(obj, "no target found for osend");

@@ -109,6 +109,10 @@ See also: %TERRAFORM%, %TERRACROP%
 &c%vehicleecho% <vehicle> <message>&0
    Sends a message to everyone on/in the target vehicle.
 
+Using a # (hash sign) at the start of the message will queue the message, which
+causes it to be sent on a very short delay (after any non-queued messages) and
+any duplicate queued messages are stacked.
+
 NOTE: When used with mobs make sure the mobs can see the players and vehicles,
 i.e not blind, set INFRA.
 

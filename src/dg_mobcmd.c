@@ -237,6 +237,7 @@ ACMD(do_maggro) {
 ACMD(do_masound) {
 	struct room_direction_data *ex;
 	room_data *was_in_room;
+	bool use_queue;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -251,14 +252,14 @@ ACMD(do_masound) {
 		return;
 	}
 
-	skip_spaces(&argument);
+	use_queue = script_message_should_queue(&argument);
 
 	was_in_room = IN_ROOM(ch);
 	if (COMPLEX_DATA(IN_ROOM(ch))) {
 		for (ex = COMPLEX_DATA(IN_ROOM(ch))->exits; ex; ex = ex->next) {
 			if (ex->room_ptr && ex->room_ptr != was_in_room) {
 				IN_ROOM(ch) = ex->room_ptr;
-				sub_write(argument, ch, TRUE, TO_ROOM);
+				sub_write(argument, ch, TRUE, TO_ROOM | (use_queue ? TO_QUEUE : 0));
 			}
 		}
 	}
@@ -382,6 +383,7 @@ ACMD(do_mjunk) {
 ACMD(do_mechoaround) {
 	char arg[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	char_data *victim;
+	bool use_queue;
 	char *p;
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -394,7 +396,7 @@ ACMD(do_mechoaround) {
 	
 	strcpy(temp, argument);	// preserve a copy
 	p = one_argument(temp, arg);
-	skip_spaces(&p);
+	use_queue = script_message_should_queue(&p);
 
 	if (!*arg) {
 		mob_log(ch, "mechoaround called with no argument");
@@ -412,7 +414,7 @@ ACMD(do_mechoaround) {
 		return;
 	}
 
-	sub_write(p, victim, TRUE, TO_ROOM);
+	sub_write(p, victim, TRUE, TO_ROOM | (use_queue ? TO_QUEUE : 0));
 }
 
 
@@ -420,6 +422,7 @@ ACMD(do_mechoaround) {
 ACMD(do_mechoneither) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	char_data *vict1, *vict2, *iter;
+	bool use_queue;
 	char *p;
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -431,7 +434,7 @@ ACMD(do_mechoneither) {
 		return;
 
 	p = two_arguments(argument, arg1, arg2);
-	skip_spaces(&p);
+	use_queue = script_message_should_queue(&p);
 
 	if (!*arg1 || !*arg2 || !*p) {
 		mob_log(ch, "mechoneither called with missing arguments");
@@ -462,7 +465,7 @@ ACMD(do_mechoneither) {
 	
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(vict1)), iter, next_in_room) {
 		if (iter->desc && iter != vict1 && iter != vict2) {
-			sub_write(p, iter, TRUE, TO_CHAR);
+			sub_write(p, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		}
 	}
 }
@@ -472,6 +475,7 @@ ACMD(do_mechoneither) {
 ACMD(do_msend) {
 	char arg[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	char_data *victim;
+	bool use_queue;
 	char *p;
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -484,7 +488,7 @@ ACMD(do_msend) {
 	
 	strcpy(temp, argument);	// preserve this
 	p = one_argument(temp, arg);
-	skip_spaces(&p);
+	use_queue = script_message_should_queue(&p);
 
 	if (!*arg) {
 		mob_log(ch, "msend called with no argument");
@@ -502,12 +506,13 @@ ACMD(do_msend) {
 		return;
 	}
 
-	sub_write(p, victim, TRUE, TO_CHAR);
+	sub_write(p, victim, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 }
 
 
 /* prints the message to the room at large */
 ACMD(do_mecho) {
+	bool use_queue;
 	char *p;
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -523,9 +528,9 @@ ACMD(do_mecho) {
 		return;
 	}
 	p = argument;
-	skip_spaces(&p);
+	use_queue = script_message_should_queue(&p);
 
-	sub_write(p, ch, TRUE, TO_ROOM);
+	sub_write(p, ch, TRUE, TO_ROOM | (use_queue ? TO_QUEUE : 0));
 }
 
 

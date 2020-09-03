@@ -111,7 +111,7 @@ void wld_log(room_data *room, const char *format, ...) {
 }
 
 /* sends str to room */
-void act_to_room(char *str, room_data *room) {
+void act_to_room(char *str, room_data *room, bool use_queue) {
 	/* no one is in the room */
 	if (!room->people)
 		return;
@@ -121,7 +121,7 @@ void act_to_room(char *str, room_data *room) {
 	* TO_ROOM and TO_CHAR for some char in the room.
 	* (just dont use $n or you might get strange results)
 	*/
-	act(str, FALSE, room->people, 0, 0, TO_CHAR | TO_ROOM);
+	act(str, FALSE, room->people, 0, 0, TO_CHAR | TO_ROOM | (use_queue ? TO_QUEUE : 0));
 }
 
 
@@ -146,11 +146,12 @@ WCMD(do_wadventurecomplete) {
 /* prints the argument to all the rooms aroud the room */
 WCMD(do_wasound) {
 	struct room_direction_data *newexit;
+	bool use_queue;
 	int dir;
 	room_data *to_room;
 	bool map_echo = FALSE;
 
-	skip_spaces(&argument);
+	use_queue = script_message_should_queue(&argument);
 
 	if (!*argument) {
 		wld_log(room, "wasound called with no argument");
@@ -160,7 +161,7 @@ WCMD(do_wasound) {
 	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 		for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
 			if ((to_room = SHIFT_DIR(room, dir))) {
-				act_to_room(argument, to_room);
+				act_to_room(argument, to_room, use_queue);
 			}
 		}
 		map_echo = TRUE;
@@ -171,7 +172,7 @@ WCMD(do_wasound) {
 			if ((to_room = newexit->room_ptr) && room != to_room) {
 				// this skips rooms already hit by the direction shift
 				if (!map_echo || GET_ROOM_VNUM(to_room) > MAP_SIZE) {
-					act_to_room(argument, to_room);
+					act_to_room(argument, to_room, use_queue);
 				}
 			}
 		}
@@ -221,12 +222,12 @@ WCMD(do_wbuild) {
 
 
 WCMD(do_wecho) {
-	skip_spaces(&argument);
+	bool use_queue = script_message_should_queue(&argument);
 
 	if (!*argument) 
 		wld_log(room, "wecho called with no args");
 	else 
-		act_to_room(argument, room);
+		act_to_room(argument, room, use_queue);
 }
 
 
@@ -234,10 +235,11 @@ WCMD(do_wecho) {
 WCMD(do_wechoneither) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	char_data *vict1, *vict2, *iter;
+	bool use_queue;
 	char *p;
 
 	p = two_arguments(argument, arg1, arg2);
-	skip_spaces(&p);
+	use_queue = script_message_should_queue(&p);
 
 	if (!*arg1 || !*arg2 || !*p) {
 		wld_log(room, "oechoneither called with missing arguments");
@@ -255,7 +257,7 @@ WCMD(do_wechoneither) {
 	
 	DL_FOREACH2(ROOM_PEOPLE(room), iter, next_in_room) {
 		if (iter->desc && iter != vict1 && iter != vict2) {
-			sub_write(p, iter, TRUE, TO_CHAR);
+			sub_write(p, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		}
 	}
 }
@@ -263,6 +265,7 @@ WCMD(do_wechoneither) {
 
 WCMD(do_wsend) {
 	char buf[MAX_INPUT_LENGTH], *msg;
+	bool use_queue;
 	char_data *ch;
 
 	msg = any_one_arg(argument, buf);
@@ -272,7 +275,7 @@ WCMD(do_wsend) {
 		return;
 	}
 
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*msg) {
 		wld_log(room, "wsend called without a message");
@@ -281,9 +284,9 @@ WCMD(do_wsend) {
 
 	if ((ch = get_char_by_room(room, buf))) {
 		if (subcmd == SCMD_WSEND)
-			sub_write(msg, ch, TRUE, TO_CHAR);
+			sub_write(msg, ch, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		else if (subcmd == SCMD_WECHOAROUND)
-			sub_write(msg, ch, TRUE, TO_ROOM);
+			sub_write(msg, ch, TRUE, TO_ROOM | (use_queue ? TO_QUEUE : 0));
 	}
 	else
 		wld_log(room, "no target found for wsend");

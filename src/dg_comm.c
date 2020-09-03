@@ -46,7 +46,7 @@ char *any_one_name(char *argument, char *first_arg) {
 }
 
 
-void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type[]) {
+void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type[], bool use_queue) {
 	char sb[MAX_STRING_LENGTH];
 	int i, iter;
 
@@ -131,7 +131,12 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 		}
 	}
 	
-	send_to_char(sb, ch);
+	if (use_queue && ch->desc) {
+		stack_simple_msg_to_desc(ch->desc, sb);
+	}
+	else {
+		send_to_char(sb, ch);
+	}
 }
 
 
@@ -205,12 +210,12 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 	tokens[++i] = NULL;
 
 	if (IS_SET(targets, TO_CHAR) && SENDOK(ch) && (AWAKE(ch) || IS_SET(targets, TO_SLEEP)))
-		sub_write_to_char(ch, tokens, otokens, type);
+		sub_write_to_char(ch, tokens, otokens, type, IS_SET(targets, TO_QUEUE) ? TRUE : FALSE);
 
 	if (IS_SET(targets, TO_ROOM)) {
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), to, next_in_room) {
 			if (to != ch && SENDOK(to) && (AWAKE(to) || IS_SET(targets, TO_SLEEP))) {
-				sub_write_to_char(to, tokens, otokens, type);
+				sub_write_to_char(to, tokens, otokens, type, IS_SET(targets, TO_QUEUE) ? TRUE : FALSE);
 			}
 		}
 	}

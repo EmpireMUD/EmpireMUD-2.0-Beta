@@ -797,6 +797,30 @@ bool has_trigger(struct script_data *sc, any_vnum vnum) {
 }
 
 
+/**
+* Checks for the # character at the start of the string, indicating it should
+* go to the queue. This will advance the string past the # and any spaces after
+* it.
+*
+* @param char **string A pointer to the string. The pointer will be advanced.
+* @return bool TRUE if the queue indicator was there, FALSE if not.
+*/
+bool script_message_should_queue(char **string) {
+	bool use_queue = FALSE;
+	
+	if (string) {
+		skip_spaces(string);
+		if (**string == '#') {
+			use_queue = TRUE;
+			++(*string);
+		}
+		skip_spaces(string);
+	}
+	
+	return use_queue;
+}
+
+
 void send_char_pos(char_data *ch, int dam) {
 	switch (GET_POS(ch)) {
 		case POS_MORTALLYW:

@@ -191,7 +191,7 @@ VCMD(do_vbuild) {
 
 
 VCMD(do_vecho) {
-	skip_spaces(&argument);
+	bool use_queue = script_message_should_queue(&argument);
 
 	if (!*argument)  {
 		veh_log(veh, "vecho called with no args");
@@ -201,7 +201,7 @@ VCMD(do_vecho) {
 	}
 	else {
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			sub_write(argument, ROOM_PEOPLE(IN_ROOM(veh)), TRUE, TO_ROOM | TO_CHAR);
+			sub_write(argument, ROOM_PEOPLE(IN_ROOM(veh)), TRUE, TO_ROOM | TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		}
 	}
 }
@@ -351,10 +351,11 @@ VCMD(do_vvehicleecho) {
 VCMD(do_vechoneither) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	char_data *vict1, *vict2, *iter;
+	bool use_queue;
 	char *p;
 
 	p = two_arguments(argument, arg1, arg2);
-	skip_spaces(&p);
+	use_queue = script_message_should_queue(&p);
 
 	if (!*arg1 || !*arg2 || !*p) {
 		veh_log(veh, "vechoneither called with missing arguments");
@@ -372,7 +373,7 @@ VCMD(do_vechoneither) {
 	
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(vict1)), iter, next_in_room) {
 		if (iter->desc && iter != vict1 && iter != vict2) {
-			sub_write(p, iter, TRUE, TO_CHAR);
+			sub_write(p, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		}
 	}
 }
@@ -380,6 +381,7 @@ VCMD(do_vechoneither) {
 
 VCMD(do_vsend) {
 	char buf[MAX_INPUT_LENGTH], *msg;
+	bool use_queue;
 	char_data *ch;
 
 	msg = any_one_arg(argument, buf);
@@ -389,7 +391,7 @@ VCMD(do_vsend) {
 		return;
 	}
 
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*msg) {
 		veh_log(veh, "vsend called without a message");
@@ -398,9 +400,9 @@ VCMD(do_vsend) {
 
 	if ((ch = get_char_by_vehicle(veh, buf))) {
 		if (subcmd == SCMD_VSEND)
-			sub_write(msg, ch, TRUE, TO_CHAR);
+			sub_write(msg, ch, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		else if (subcmd == SCMD_VECHOAROUND)
-			sub_write(msg, ch, TRUE, TO_ROOM);
+			sub_write(msg, ch, TRUE, TO_ROOM | (use_queue ? TO_QUEUE : 0));
 	}
 	else {
 		veh_log(veh, "no target found for vsend");
