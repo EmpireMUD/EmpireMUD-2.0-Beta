@@ -597,7 +597,7 @@ Usage:  disembark
 You can get out of vehicles (such as ships) with the disembark command. In some
 cases, you must do this from the same part of the vehicle where you entered.
 
-See also: BOARD, SAIL, UNLOAD, SHIPS, EXIT
+See also: BOARD, SAIL, UNLOAD, SHIPS, EXITS
 #
 DISMISS
 

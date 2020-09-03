@@ -1381,114 +1381,13 @@ ACMD(do_board) {
 
 ACMD(do_disembark) {
 	vehicle_data *veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
-	room_data *was_in = IN_ROOM(ch), *to_room;
-	struct follow_type *k;
-
-	if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
-		send_config_msg(ch, "need_approval_string");
-	}
-	else if (!veh || !(to_room = IN_ROOM(veh))) {
+	room_data *to_room;
+	
+	if (!veh || !(to_room = IN_ROOM(veh)) || (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't disembark from here!\r\n");
 	}
-	else if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_OPEN | BLD_EXIT) && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch))) {
-		msg_to_char(ch, "You cannot disembark from here.\r\n");
-	}
-	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
-		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
-	}
-	else if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
-		msg_to_char(ch, "You can't disembark here while riding.\r\n");
-	}
 	else {
-		// auto-dismount
-		if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS)) {
-			do_dismount(ch, "", 0, 0);
-		}
-		
-		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
-			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
-		}
-		msg_to_char(ch, "You disembark.\r\n");
-		
-		char_to_room(ch, to_room);
-		qt_visit_room(ch, IN_ROOM(ch));
-		GET_LAST_DIR(ch) = NO_DIR;
-		look_at_room(ch);
-		
-		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
-			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
-		}
-		
-		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
-		entry_memory_mtrigger(ch);
-		greet_mtrigger(ch, NO_DIR);
-		greet_memory_mtrigger(ch);
-		greet_vtrigger(ch, NO_DIR);
-		msdp_update_room(ch);
-		
-		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
-			act("$n is led off.", TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
-			
-			char_to_room(GET_LEADING_MOB(ch), to_room);
-			GET_LAST_DIR(GET_LEADING_MOB(ch)) = NO_DIR;
-			look_at_room(GET_LEADING_MOB(ch));
-			
-			if (!AFF_FLAGGED(GET_LEADING_MOB(ch), AFF_SNEAK)) {
-				act("$n disembarks from $V.", TRUE, GET_LEADING_MOB(ch), NULL, veh, TO_ROOM);
-			}
-			
-			enter_wtrigger(IN_ROOM(GET_LEADING_MOB(ch)), GET_LEADING_MOB(ch), NO_DIR);
-			entry_memory_mtrigger(GET_LEADING_MOB(ch));
-			greet_mtrigger(GET_LEADING_MOB(ch), NO_DIR);
-			greet_memory_mtrigger(GET_LEADING_MOB(ch));
-			greet_vtrigger(GET_LEADING_MOB(ch), NO_DIR);
-		}
-		if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
-			if (ROOM_PEOPLE(was_in)) {
-				act("$v is led behind $M.", TRUE, ROOM_PEOPLE(was_in), GET_LEADING_VEHICLE(ch), ch, TO_CHAR | TO_NOTVICT | ACT_VEHICLE_OBJ);
-			}
-			
-			adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), FALSE);
-			vehicle_to_room(GET_LEADING_VEHICLE(ch), to_room);
-			adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), TRUE);
-			
-			act("$V is led off.", TRUE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
-		}
-
-		for (k = ch->followers; k; k = k->next) {
-			if (IN_ROOM(k->follower) != was_in) {
-				continue;
-			}
-			if (GET_POS(k->follower) < POS_STANDING) {
-				continue;
-			}
-			if (!IS_IMMORTAL(k->follower) && !IS_NPC(k->follower) && IS_CARRYING_N(k->follower) > CAN_CARRY_N(k->follower)) {
-				continue;
-			}
-		
-			act("You follow $N.\r\n", FALSE, k->follower, NULL, ch, TO_CHAR);
-			if (!AFF_FLAGGED(k->follower, AFF_SNEAK)) {
-				act("$n disembarks from $V.", TRUE, k->follower, NULL, veh, TO_ROOM);
-			}
-
-			char_to_room(k->follower, to_room);
-			qt_visit_room(k->follower, IN_ROOM(k->follower));
-			GET_LAST_DIR(k->follower) = NO_DIR;
-			look_at_room(k->follower);
-			
-			if (!AFF_FLAGGED(k->follower, AFF_SNEAK)) {
-				act("$n disembarks from $V.", TRUE, k->follower, NULL, veh, TO_ROOM);
-			}
-			
-			enter_wtrigger(IN_ROOM(k->follower), k->follower, NO_DIR);
-			entry_memory_mtrigger(k->follower);
-			greet_mtrigger(k->follower, NO_DIR);
-			greet_memory_mtrigger(k->follower);
-			greet_vtrigger(k->follower, NO_DIR);
-			msdp_update_room(k->follower);
-		}
-		
-		command_lag(ch, WAIT_OTHER);
+		perform_move(ch, NO_DIR, to_room, MOVE_DISEMBARK);
 	}
 }
 

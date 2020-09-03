@@ -902,10 +902,6 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 		return TRUE;
 	}
 	
-	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
-		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
-		return FALSE;
-	}
 	if (IS_INJURED(ch, INJ_TIED) || GET_HEALTH(ch) < 1) {
 		msg_to_char(ch, "You can't seem to move!\r\n");
 		return FALSE;
@@ -1055,6 +1051,11 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 		}
 	} // end of must-be-a-direction
 	
+	// too much inventory
+	if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+		return FALSE;
+	}
 	// permission check
 	if (ROOM_IS_CLOSED(to_room) && !IS_IMMORTAL(ch) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && (!IS_SET(flags, MOVE_IGNORE) || (ch->master && !IS_NPC(ch) && IS_NPC(ch->master)))) {
 		msg_to_char(ch, "You can't enter a building without permission.\r\n");
@@ -1631,6 +1632,15 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 			act("$n exits the building.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 	}
+	else if (IS_SET(flags, MOVE_DISEMBARK)) {
+		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
+		if (veh) {
+			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else {
+			act("$n disembarks from the vehicle.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+	}
 	else if (dir != NO_DIR) {	// normal move message
 		snprintf(msg, sizeof(msg), "$n %s %s from %%s.", mob_move_types[determine_move_type(ch, to_room)], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
 	}
@@ -1713,6 +1723,15 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 		}
 		else {
 			act("$n exits a building.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+	}
+	else if (IS_SET(flags, MOVE_DISEMBARK)) {
+		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
+		if (veh) {
+			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else {
+			act("$n disembarks from a vehicle.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 	}
 	else if (dir != NO_DIR) {	// normal move message
@@ -2085,28 +2104,23 @@ ACMD(do_enter) {
 // this command tries to 'exit' the current vehicle/building, or falls through to 'exits'
 ACMD(do_exit) {
 	ACMD(do_exits);
-	
 	room_data *to_room;
 	
-	// if you can't exit here, passes through to 'exits'
 	if (IS_OUTDOORS(ch) || (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch)))) {
+		// if you can't exit here, passes through to 'exits'
 		do_exits(ch, "", 0, -1);
-		return;
 	}
-	
-	// make sure there's a valid target room
-	if (!(to_room = get_exit_room(IN_ROOM(ch))) || to_room == IN_ROOM(ch)) {
+	else if (!(to_room = get_exit_room(IN_ROOM(ch))) || to_room == IN_ROOM(ch)) {
+		// no valid target room?
 		msg_to_char(ch, "You can't exit from here.\r\n");
-		return;
 	}
-	
-	// if we got here but aren't standing, alert
-	if (GET_POS(ch) < POS_STANDING) {
+	else if (GET_POS(ch) < POS_STANDING) {
+		// if we got here but aren't standing, alert
 		send_low_pos_msg(ch);
-		return;
 	}
-	
-	perform_move(ch, NO_DIR, to_room, MOVE_EXIT);
+	else {
+		perform_move(ch, NO_DIR, to_room, MOVE_EXIT);
+	}
 }
 
 
