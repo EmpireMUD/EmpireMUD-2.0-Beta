@@ -71,7 +71,7 @@ A Royal Sleeping Wagon~
 1 0 aqH 0
 0 0 0 -1
 C
-disembark, sleep~
+sleep~
 D
    This wagon is darker than the rest, having two layers of heavy curtains and
 tapestries to block the harsh sun. Much of the wagon is filled with a bed fit
@@ -87,7 +87,7 @@ The Galley Wagon~
 1 0 aqH 0
 0 0 0 -1
 C
-cook, disembark~
+cook~
 D
    This wagon has a woodburning stove, a small larder, and some cases of
 provisions. Like the rest of the caravan, this wagon is decked in royal
@@ -103,7 +103,7 @@ Inside the Caravan~
 1 0 aqH 0
 0 1 0 -1
 C
-disembark, mail~
+mail~
 D
    This grand, well-appointed caravan is made up of a series of wagons. Some
 are connected directly, and others have their own team of steeds. This wagon
@@ -121,7 +121,7 @@ On the Deck~
 0 0 aqHR 0
 0 1 0 -1
 C
-disembark, sail~
+sail~
 D
 You're standing on the deck of the heroic galleon.
 ~

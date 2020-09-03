@@ -18,7 +18,7 @@ Inside the Walking Hut~
 1 0 aq 0
 0 1 0 -1
 C
-cook, disembark, sleep~
+cook, sleep~
 D
    The hut is crudely made with rough-hewn planks of exotic tropical wood. The
 ceiling is thatched, but leaking in places. Every plank that makes up the floor
@@ -41,7 +41,7 @@ The Porch~
 1 0 aqHR 0
 0 0 0 -1
 C
-drive, disembark~
+drive~
 D
 You are standing on the porch of the walking hut.
 ~

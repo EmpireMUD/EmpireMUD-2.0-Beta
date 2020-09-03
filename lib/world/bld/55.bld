@@ -5,7 +5,7 @@ The Helm~
 0 0 aqHR o
 0 0 0 -1
 C
-disembark, sail~
+sail~
 D
 You are standing at the helm of the ship, where the captain directs the crew.
 ~
@@ -19,7 +19,7 @@ On Deck~
 0 0 aqHR 0
 0 0 0 -1
 C
-disembark, sail~
+sail~
 D
 You're standing on deck, looking out over this side of the ship.
 ~
@@ -65,7 +65,7 @@ On The Forecastle~
 1 0 aqHR q
 0 0 0 -1
 C
-disembark, sail~
+sail~
 D
 You are standing on the ship's forecastle, overlooking the sea.
 ~
@@ -93,7 +93,7 @@ On The Bow~
 1 0 aqHR o
 0 0 0 -1
 C
-disembark, sail~
+sail~
 D
 You are standing at the bow of the ship.
 ~
@@ -121,7 +121,7 @@ On Deck~
 0 0 aqHR 0
 0 0 0 -1
 C
-disembark, sail~
+sail~
 D
 You're standing on deck, looking out over this side of the ship.
 ~
@@ -202,7 +202,7 @@ On The Quarterdeck~
 1 0 aqHR q
 0 0 0 -1
 C
-disembark, sail~
+sail~
 D
 You are standing on the raised quarterdeck.
 ~
@@ -216,7 +216,7 @@ At The Stern~
 1 0 aqHR o
 0 0 0 -1
 C
-disembark, sail~
+sail~
 D
 You are standing on the raised quarterdeck.
 You are standing at the stern, looking off the back of the ship.
@@ -279,7 +279,7 @@ Inside the Wagon~
 1 0 aq r
 0 0 0 -1
 C
-disembark~
+~
 D
    The base of the wagon is made of sturdy wood, though it rumbles as it rolls
 along the prairie. The cloth covering is supported by tall wooden arches,
@@ -293,7 +293,7 @@ Inside the Wagon~
 1 0 aq r
 0 0 0 -1
 C
-disembark, sleep~
+sleep~
 D
    This part of the wagon is cozy, almost cramped, due to the upholstered
 furniture and plush bed. Everything is firmly attached to the wooden base of
@@ -310,7 +310,7 @@ In the Wagon~
 1 0 aq r
 0 0 0 -1
 C
-cook, disembark~
+cook~
 D
    This tiny corner of the wagon has been fashioned into something of a
 kitchen, with a little iron stove that vents out the back. The cloth canopy
@@ -327,7 +327,7 @@ In the Carriage~
 1 0 aq 0
 0 0 0 -1
 C
-disembark~
+~
 D
    The inside of the carriage is a little cramped, but the upholstered seats
 are made to sit four. The windows are covered in dark curtains to grant you a
@@ -345,7 +345,7 @@ On Deck~
 0 0 aqHR 0
 0 1 0 -1
 C
-disembark, sail~
+sail~
 D
 You're standing on deck, looking out over this side of the ship.
 ~
