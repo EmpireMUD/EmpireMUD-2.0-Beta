@@ -1,0 +1,278 @@
+EmpireMUD 2.0 Coding Information
+
+This document contains information on EmpireMUD code, which is written in C.
+It will not teach you how to program, code, or script anything. However, I hope
+this information will help you make modifications or additions to the EmpireMUD
+code. This is an evolving document and is by no means comprehensive. You can
+contact paul@empiremud.net with questions, requests, or feedback regarding this
+document.
+
+Contents:
+   I. Intro to Lists and Hashes
+  II. Global Lists
+    IIa. The Character List
+    IIb. The Object List
+    IIc. The Vehicle List
+ III. Local Lists
+   IIIa. People in a Room
+   IIIb. Objects in a Room
+   IIIc. Vehicles in a Room
+   IIId. Objects in Inventory
+   IIIe. Objects in Equipment
+   IIIf. Objects in Other Objects
+   IIIg. Objects in Vehicles
+  IV. Prototype Library
+   N. Future Content
+
+
+=============================
+I. Intro to Lists and Hashes
+=============================
+
+EmpireMUD uses the utlist and uthash libraries by Troy D. Hanson and Arthur
+O'Dwyer to manage its linked lists and hash tables. See these two pages for
+refrences:
+	https://troydhanson.github.io/uthash/utlist.html
+	https://troydhanson.github.io/uthash/userguide.html
+
+The best way to figure out how to iterate over a list or hash in the EmpireMUD
+code is to search and see how existing code does it. This document also
+provides a reference for some of the most common lists and hashes in the game.
+
+In general, you can iterate over lists in two ways:
+	LL_FOREACH(list_pointer, iterator_var) {
+		// for lists where you're not removing entries
+	}
+	LL_FOREACH_SAFE(list_pointer, iterator_var, next_iterator_var) {
+		// for lists where you need to remove items
+	}
+
+Most lists are singly linked and use the LL_* family of functions. A few
+important lists are doubly linked (using the DL_* functions) for speed. Doubly
+linked lists can remove entries or append at the end of the list much faster.
+The LL_FOREACH and LL_FOREACH_SAFE iterator macros will work correctly on
+doubly linked lists (although other LL_* functions won't) but you should always
+try to use the correct macro for each list.
+
+Hash table iterators generally look like this:
+	HASH_ITER(hh, hash_table_pointer, iterator_var, next_iterator_var) {
+		...	
+	}
+
+
+=================
+II. Global Lists
+=================
+
+The game maintains global lists for many different things. Most things are
+added to (and removed from) these lists for you when they are loaded or purged.
+These lists contain 'live copies' of mobs/objects/etc -- not the prototypes.
+
+
+IIa. The Character List
+
+NPCs are added to this list when they're loaded and players are added when they
+enter the game. Both are removed from the list when they are extracted with
+extract_char().
+
+To iterate over all characters in the game (PC and NPC alike):
+	char_data *person, *next_person;
+	DL_FOREACH_SAFE(character_list, person, next_person) {
+		// or use DL_FOREACH and omit next_person if you're not deleting
+	}
+
+
+IIb. The Object List
+
+Objects that are in a normal in-game state are in this list. However, objects
+that are stored in the home or warehouse storage are removed. This list is
+managed by these two functions:
+	add_to_object_list()
+	remove_from_object_list()
+
+To iterate over the list of all objects in the game:
+	obj_data *obj, *next_obj;
+	DL_FOREACH_SAFE(object_list, obj, next_obj) {
+		// or use DL_FOREACH and omit next_obj if you're not removing anything
+	}
+
+
+IIc. The Vehicle List
+
+All the vehicles in the world are stored in this list, including incomplete
+ones.
+
+To iterate over all vehicles in the game:
+	vehicle_data *veh, *next_veh;
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		// or use DL_FOREACH and omit next_veh if you're not removing anything
+	}
+
+
+=================
+III. Local Lists
+=================
+
+Individual rooms, mobs, vehicles, and objects contain lists of other things.
+Here are some common lists and how to iterate over them or find things in them.
+
+
+IIIa. People in a Room
+	char_data *person, *next_person;
+	DL_FOREACH2(ROOM_PEOPLE(room), person, next_in_room) {
+		...
+	}
+	DL_FOREACH_SAFE2(ROOM_PEOPLE(room), person, next_person, next_in_room) {
+		...
+	}
+
+
+IIIb. Objects in a Room
+	obj_data *obj, *next_obj;
+	DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+		...
+	}
+	DL_FOREACH_SAFE2(ROOM_CONTENTS(room), obj, next_obj, next_content) {
+		...
+	}
+
+
+IIIc. Vehicles in a Room
+	vehicle_data *veh, *next_veh;
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		...
+	}
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+		...
+	}
+
+
+IIId. Objects in Inventory
+	obj_data *obj, *next_obj;
+	DL_FOREACH2(person->carrying, obj, next_content) {
+		...
+	}
+	DL_FOREACH_SAFE2(person->carrying, obj, next_obj, next_content) {
+		...
+	}
+
+
+IIIe. Objects in Equipment
+	obj_data *obj;
+	int iter;
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if ((obj = GET_EQ(person, iter))) {
+			..
+		}
+	}
+
+
+IIIf. Objects in Other Objects
+	obj_data *obj, *next_obj;
+	DL_FOREACH2(parent_obj->contains, obj, next_content) {
+		...
+	}
+	DL_FOREACH_SAFE2(parent_obj->contains, obj, next_obj, next_content) {
+		...
+	}
+
+
+IIIg. Objects in Vehicles
+	obj_data *obj, *next_obj;
+	DL_FOREACH2(VEH_CONTAINS(veh), obj, next_content) {
+		...
+	}
+	DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
+		...
+	}
+
+
+======================
+IV. Prototype Library
+======================
+
+Prototypes are the "library version" of each mob, object, room template,
+vehicle, and many other types of things. When you create an object with the
+"load" command, you are putting a copy of the prototype into the world.
+Prototypes only change when you edit them with OLC. See HELP OLC for a list
+of types of things you can edit. Each of these things has a hash table of
+prototypes, hashed by ID.
+
+All prototype hash tables essentially work the same. Here are two examples:
+	char_data *mob_proto, *next_mob_proto;
+	HASH_ITER(hh, mobile_table, mob_proto, next_mob_proto) {
+		...
+	}
+	
+	ability_data *abil, *next_abil;
+	HASH_ITER(sorted_hh, sorted_abilities, abil, next_abil) {
+		...
+	}
+
+
+Full list of library tables, with their hash handle variables:
+	ability_data *ability_table;	// (hh)
+	ability_data *sorted_abilities;	// sorted by name (sorted_hh)
+	adv_data *adventure_table;		// (hh)
+	archetype_data *archetype_table;	// (hh)
+	archetype_data *sorted_archetypes;	// by type and name (sorted_hh)
+	augment_data *augment_table;	// (hh)
+	augment_data *sorted_augments;	// by name (sorted_hh)
+	bld_data *building_table;	// (hh)
+	class_data *class_table;	// (hh)
+	class_data *sorted_classes;	// by name (sorted_hh)
+	craft_data *craft_table;	// (hh)
+	craft_data *sorted_crafts;	// by type, ability, and level (sorted_hh)
+	crop_data *crop_table;	// (hh)
+	event_data *event_table;	// (hh)
+	faction_data *faction_table;	// (hh)
+	faction_data *sorted_factions;	// by name (sorted_hh)
+	generic_data *generic_table;	// (hh)
+	generic_data *sorted_generics;	// by type and name (sorted_hh)
+	struct global_data *globals_table;	// (hh)
+	char_data *mobile_table;	// (hh)
+	morph_data *morph_table;	// (hh)
+	morph_data *sorted_morphs;	// by name (sorted_hh)
+	obj_data *object_table;	// (hh)
+	progress_data *progress_table;	// (hh)
+	progress_data *sorted_progress;	// by type and data (sorted_hh)
+	struct quest_data *quest_table;	// (hh)
+	room_template *room_template_table;	// (hh)
+	sector_data *sector_table;	// (hh)
+	shop_data *shop_table;	// (hh)
+	skill_data *skill_table;	// (hh)
+	skill_data *sorted_skills;	// by name (sorted_hh)
+	social_data *social_table;	// (hh)
+	social_data *sorted_socials;	// by name (sorted_hh)
+	trig_data *trigger_table;	// (hh)
+	vehicle_data *vehicle_table;	// (hh)
+
+
+
+==================
+N. Future Content
+==================
+
+An unsorted list of things I'd like to add to this document:
+- Using the in-game config system (could possibly use its own doc)
+- Various lists:
+	// world / rooms
+	room_data *world_table;	// hash table of the whole world
+	room_data *interior_room_list;	// linked list of interior rooms: room->next_interior
+	struct island_info *island_table; // hash table for all the islands
+	struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// master world map
+	struct map_data *land_map;	// linked list of non-ocean
+
+	empire_data *empire_table;	// hash table of empires
+	char_data *character_list;	// global doubly-linked list of chars (including players)
+	char_data *combat_list;	// head of l-list of fighting chars
+	char_data *next_combat_list;	// used for iteration of combat_list when more than 1 person can be removed from combat in 1 loop iteration
+	obj_data *object_list;	// global doubly-linked list of objs
+	trig_data *trigger_list;	// DLL of all attached triggers
+	trig_data *random_triggers;	// DLL of live random triggers (next_in_random_triggers, prev_in_random_triggers)
+	trig_data *free_trigger_list;	// LL of triggers to free (next_to_free)
+	vehicle_data *vehicle_list;	// global doubly-linked list of vehicles (veh->next)
+
+	account_data *account_table;	// hash table of accounts
+	player_index_data *player_table_by_idnum;	// hash table by idnum
+	player_index_data *player_table_by_name;	// hash table by name
