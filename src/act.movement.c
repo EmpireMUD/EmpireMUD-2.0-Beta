@@ -1622,23 +1622,18 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 	}
 	else if (IS_SET(flags, MOVE_EXIT)) {
 		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
-		if (veh) {
+		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
+		if (veh && is_bld) {
 			act("$n exits $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (veh && !is_bld) {
+			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
 		}
 		else if (GET_BUILDING(HOME_ROOM(from_room))) {
 			snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
 		}
 		else {
 			act("$n exits the building.", TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-	}
-	else if (IS_SET(flags, MOVE_DISEMBARK)) {
-		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
-		if (veh) {
-			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
-		}
-		else {
-			act("$n disembarks from the vehicle.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 	}
 	else if (dir != NO_DIR) {	// normal move message
@@ -1715,23 +1710,18 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	}
 	else if (IS_SET(flags, MOVE_EXIT)) {
 		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
-		if (veh) {
+		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
+		if (veh && is_bld) {
 			act("$n exits $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (veh && !is_bld) {
+			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
 		}
 		else if (GET_BUILDING(HOME_ROOM(from_room))) {
 			snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
 		}
 		else {
 			act("$n exits a building.", TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-	}
-	else if (IS_SET(flags, MOVE_DISEMBARK)) {
-		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
-		if (veh) {
-			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
-		}
-		else {
-			act("$n disembarks from a vehicle.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 	}
 	else if (dir != NO_DIR) {	// normal move message

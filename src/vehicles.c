@@ -687,6 +687,14 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "ON-FIRE flag");
 		problem = TRUE;
 	}
+	if (VEH_FLAGGED(veh, VEH_BUILDING) && VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Has both BUILDING flag and at least 1 movement flag");
+		problem = TRUE;
+	}
+	if (VEH_FLAGGED(veh, VEH_BUILDING) && !VEH_FLAGGED(veh, VEH_VISIBLE_IN_DARK)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Has BUILDING flag but not VISIBLE-IN-DARK");
+		problem = TRUE;
+	}
 	
 	problem |= audit_extra_descs(VEH_VNUM(veh), VEH_EX_DESCS(veh), ch);
 	problem |= audit_interactions(VEH_VNUM(veh), VEH_INTERACTIONS(veh), TYPE_ROOM, ch);

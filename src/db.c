@@ -140,7 +140,7 @@ generic_data *sorted_generics = NULL;	// hash table (sorted_hh)
 struct global_data *globals_table = NULL;	// hash table of global_data
 
 // helps
-struct help_index_element *help_table = 0;	// the help table
+struct help_index_element *help_table = 0;	// the help table -- NOT a hash table
 int top_of_helpt = 0;	// top of help index table
 
 // map

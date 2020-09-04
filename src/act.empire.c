@@ -56,7 +56,6 @@ extern const char *trade_mostleast[];
 extern const char *trade_overunder[];
 
 // external funcs
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern bool can_claim(char_data *ch);
 void check_nowhere_einv(empire_data *emp, int new_island);
 extern int city_points_available(empire_data *emp);
@@ -3142,25 +3141,20 @@ void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
 * @param bool confirm If TRUE, the player typed "confirm" as the last arg.
 */
 void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
+	void perform_abandon_vehicle(vehicle_data *veh);
+	
 	empire_data *emp = VEH_OWNER(veh);
 	
 	if (!emp || VEH_OWNER(veh) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You don't even own that.\r\n");
 	}
+	else if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh))) {
+		msg_to_char(ch, "Abandon the whole tile instead.\r\n");
+	}
 	else {
 		act("You abandon $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		act("$n abandons $V.", FALSE, ch, NULL, veh, TO_ROOM);
-		VEH_OWNER(veh) = NULL;
-		
-		if (VEH_INTERIOR_HOME_ROOM(veh)) {
-			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
-		}
-		
-		if (VEH_IS_COMPLETE(veh)) {
-			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
-			et_lose_vehicle(emp, VEH_VNUM(veh));
-			adjust_vehicle_tech(veh, FALSE);
-		}
+		perform_abandon_vehicle(veh);
 	}
 }
 
@@ -3521,6 +3515,8 @@ void do_claim_room(char_data *ch, room_data *room) {
 * @param vehicle_data *veh The vehicle he's trying to claim.
 */
 void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
+	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
+	
 	empire_data *emp = get_or_create_empire(ch);
 	
 	if (VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
@@ -3535,24 +3531,13 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 	else if (VEH_OWNER(veh)) {
 		msg_to_char(ch, "Someone else already owns that.\r\n");
 	}
+	else if (VEH_CLAIMS_WITH_ROOM(veh) && !ROOM_OWNER(IN_ROOM(veh))) {
+		msg_to_char(ch, "Claim the whole tile instead.\r\n");
+	}
 	else {
 		send_config_msg(ch, "ok_string");
 		act("$n claims $V.", FALSE, ch, NULL, veh, TO_ROOM);
-		VEH_OWNER(veh) = emp;
-		VEH_SHIPPING_ID(veh) = -1;
-		
-		if (VEH_INTERIOR_HOME_ROOM(veh)) {
-			if (ROOM_OWNER(VEH_INTERIOR_HOME_ROOM(veh))) {
-				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
-			}
-			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
-		}
-		
-		if (VEH_IS_COMPLETE(veh)) {
-			qt_empire_players(emp, qt_gain_vehicle, VEH_VNUM(veh));
-			et_gain_vehicle(emp, VEH_VNUM(veh));
-			adjust_vehicle_tech(veh, TRUE);
-		}
+		perform_claim_vehicle(veh, emp);
 	}
 }
 

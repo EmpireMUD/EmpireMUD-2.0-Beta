@@ -170,6 +170,7 @@ Buildings (BEDIT):
   have the trigger detach itself upon finishing. It's an unnecessary use of
   processing time and RAM to leave triggers attached if they are guaranteed to 
   never run again.
+- See BUILDING-VEHICLES
 
 Classes (CLASSEDIT):
 - EmpireMUD is not currently using 'classes' at all, but they are still
@@ -487,6 +488,7 @@ Vehicles (VEDIT):
   maintenance set, it will add a "pouch of nails" instead.
 - If a vehicle takes damage that's less than 10% of its hitpoints, it still
   needs repair but doesn't require any additional resources.
+- See BUILDING-VEHICLES
 #d
 "OLC LEVELS" "OLC SCALING" "OLC SCALE"
 
@@ -5788,7 +5790,7 @@ Example:
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
-See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+See also: BUILDING-VEHICLES, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
 OLC-CONTROLS "OLC CONTROLS" "OLC SETFLAGS" "OLC SETMINVNUM" "OLC SETMAXVNUM" "OLC MIN VNUM" "OLC MAX VNUM" "OLC VNUMS" "OLC FLAGS"
 
@@ -6239,7 +6241,7 @@ Example vehicle settings:
  chair: SIT IN DRAGGABLE CAN-PORTAL
  catapult: LEADABLE SIEGE-WEAPONS, animals required: 2
 
-See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+See also: BUILDING-VEHICLES, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
 PROGEDIT "OLC PROGRESSION" "PROGRESSION OLC" "PROGRESS OLC"
 
@@ -7566,6 +7568,26 @@ ription, and look description.
 Object values:
  0 - vnum for the book text (from the book editor)
 #d
+BUILDING-VEHICLES "VEHICLE BUILDINGS" "ROOM BUILDINGS" "BUILDING ROOMS" "BUILDING VEHICLES" "BUILDINGS AS VEHICLES" "VEHICLES AS BUILDINGS" VEHICLE-BUILDINGS
+
+There are two different ways to do buildings:
+- Using the .build editor creates a buliding that replaces a map tile.
+- Using the .vehicle editor with the BUILDING flag creates a building that sits
+  in a map tile like a vehicle.
+
+Most EmpireMUDs will combine the two systems. Some features, like walls and
+fences, work best as whole-tile buildings. Others, like homes, work better as
+vehicle-buildings.
+
+Some important notes:
+- Building-vhicles are only claimed when the whole tile is claimed (unless they
+  have a movement flag like DRIVING, in which case they work like vehicles).
+- Using '%load% vehicle <vnum>' to load a building-vehicle will automatically
+  set its owner to the owner of the room.
+- Be careful using %own% on building-vehicles. It's better to %own% the whole
+  room and let the building-vehicles inside inherit this ownership, rather than
+  setting them separately, which won't affect the room's owner.
+#d
 "COINS ITEM" "COINS OBJECT" "COIN ITEM" "COIN OBJECT"
 
 The COINS type represents a pile of coins and will be converted from an object
@@ -7963,6 +7985,7 @@ Available flags:
  ON-FIRE - currently burning (via the "light" command)
  !LOAD-ONTO-VEHICLE - cannot be loaded onto another vehicle
  VISIBLE-IN-DARK - can be seen at night without a light
+ BUILDING - acts more like a building than a vehicle
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually

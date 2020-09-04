@@ -418,6 +418,8 @@ void do_dg_build(room_data *target, char *argument) {
 void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh) {
 	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	void kill_empire_npc(char_data *ch);
+	void perform_abandon_vehicle(vehicle_data *veh);
+	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	empire_data *owner;
@@ -435,23 +437,11 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 	}
 	if (veh) {
 		if ((owner = VEH_OWNER(veh)) && emp != owner) {
-			VEH_SHIPPING_ID(veh) = -1;
-			if (VEH_INTERIOR_HOME_ROOM(veh)) {
-				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
-			}
-			adjust_vehicle_tech(veh, FALSE);
-			
-			qt_empire_players(owner, qt_lose_vehicle, VEH_VNUM(veh));
-			et_lose_vehicle(owner, VEH_VNUM(veh));
+			perform_abandon_vehicle(veh);
 		}
 		VEH_OWNER(veh) = emp;
-		if (emp && VEH_INTERIOR_HOME_ROOM(veh)) {
-			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
-		}
 		if (emp) {
-			adjust_vehicle_tech(veh, TRUE);
-			qt_empire_players(emp, qt_gain_vehicle, VEH_VNUM(veh));
-			et_gain_vehicle(emp, VEH_VNUM(veh));
+			perform_claim_vehicle(veh, emp);
 		}
 	}
 	if (room) {

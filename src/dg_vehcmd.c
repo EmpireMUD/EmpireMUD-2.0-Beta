@@ -49,6 +49,7 @@ extern vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name);
 extern vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 extern room_data *obj_room(obj_data *obj);
+void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
@@ -1158,6 +1159,11 @@ VCMD(do_dgvload) {
 		else {
 			// hope to inherit
 			scale_vehicle_to_level(vehicle, 0);
+		}
+		
+		// ownership
+		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(room))) {
+			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(room)));
 		}
 		
 		load_vtrigger(vehicle);

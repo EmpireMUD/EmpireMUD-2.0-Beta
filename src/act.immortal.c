@@ -8250,6 +8250,7 @@ ACMD(do_last) {
 
 
 ACMD(do_load) {
+	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	vehicle_data *veh;
@@ -8314,6 +8315,11 @@ ACMD(do_load) {
 		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM);
 		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
 		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		
+		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(IN_ROOM(veh)))) {
+			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(veh))));
+		}
+		
 		load_vtrigger(veh);
 		
 		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {

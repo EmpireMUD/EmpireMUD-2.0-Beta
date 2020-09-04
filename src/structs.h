@@ -2440,6 +2440,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_NO_LOAD_ONTO_VEHICLE  BIT(19)	// t. cannot be loaded onto a vehicle
 #define VEH_VISIBLE_IN_DARK  BIT(20)	// u. can be seen at night
 #define VEH_NO_CLAIM  BIT(21)	// v. cannot be claimed
+#define VEH_BUILDING  BIT(22)	// w. behaves more like a building
 
 // VSPEED_x: indicates the number of speed bonuses this vehicle gives to driving.
 #define VSPEED_VERY_SLOW  0 // No speed bonuses.

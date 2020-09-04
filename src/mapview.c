@@ -2132,8 +2132,7 @@ ACMD(do_exits) {
 		// can disembark/exit here?
 		if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) || (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_ROOM(ch) == HOME_ROOM(IN_ROOM(ch)))) {
 			// 'disembark'
-			if ((veh = GET_ROOM_VEHICLE(room)) && IN_ROOM(veh)) {
-				// TODO: when (if?) the vehicles-as-buildings go in, also need to check VEH_FLAGGED(veh, VEH_BUILDING) or whatever
+			if ((veh = GET_ROOM_VEHICLE(room)) && IN_ROOM(veh) && !VEH_FLAGGED(veh, VEH_BUILDING)) {
 				size += snprintf(buf + size, sizeof(buf) - size, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, IN_ROOM(veh), "Disembark"));
 			}
 			// 'exit'

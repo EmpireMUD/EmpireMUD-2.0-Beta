@@ -312,13 +312,13 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 *
 * @param char_data *ch The person trying to craft a vehicle.
 * @param craft_data *type The craft recipe to match up.
-* @param bool *any Is set to TRUE if there are any unfinished vehicles that don't otherwise match.
+* @param vehicle_data **found_other A variable to bind an existing vehicle to -- if NULL, there are no unfinished vehicles lying around. Otherwise, one will be assigned here.
 * @return vehicle_data* The found vehicle, or NULL if none.
 */
-vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, bool *any) {
-	vehicle_data *iter;
+vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, vehicle_data **found_other) {
+	vehicle_data *iter, *found = NULL;
 	
-	*any = FALSE;
+	*found_other = NULL;
 	
 	DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), iter, next_in_room) {
 		// skip finished vehicles
@@ -326,7 +326,7 @@ vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, bool *any
 			continue;
 		}
 		// there is at least 1 incomplete vehicle here
-		*any = TRUE;
+		found = iter;
 		
 		// right vehicle?
 		if (VEH_VNUM(iter) != GET_CRAFT_OBJECT(type)) {
@@ -340,7 +340,8 @@ vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, bool *any
 		return iter;
 	}
 	
-	return NULL;
+	*found_other = found;	// if any
+	return NULL;	// did not find the one requested
 }
 
 
@@ -1012,15 +1013,15 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	void finish_vehicle_setup(vehicle_data *veh);
 	
-	bool found = FALSE, any = FALSE;
+	bool found = FALSE;
 	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
 	struct resource_data *res;
-	vehicle_data *veh;
+	vehicle_data *veh, *junk;
 	char_data *vict;
 	
 	// basic setup
-	if (!type || !check_can_craft(ch, type) || !(veh = find_finishable_vehicle(ch, type, &any))) {
+	if (!type || !check_can_craft(ch, type) || !(veh = find_finishable_vehicle(ch, type, &junk))) {
 		cancel_gen_craft(ch);
 		return;
 	}
@@ -1460,14 +1461,15 @@ ACMD(do_gen_augment) {
 * @param craft_data *type Pre-selected vehicle craft.
 */
 void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
+	extern bool can_claim(char_data *ch);
 	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	
-	vehicle_data *veh;
+	vehicle_data *veh, *to_craft = NULL, *found_other = NULL;
 	char buf[MAX_STRING_LENGTH];
-	bool any = FALSE;
+	bool junk;
 	
 	// basic sanitation
-	if (!type || !CRAFT_FLAGGED(type, CRAFT_VEHICLE) || !vehicle_proto(GET_CRAFT_OBJECT(type))) {
+	if (!type || !CRAFT_FLAGGED(type, CRAFT_VEHICLE) || !(to_craft = vehicle_proto(GET_CRAFT_OBJECT(type)))) {
 		log("SYSERR: do_gen_craft_vehicle called with invalid vehicle craft %d", type ? GET_CRAFT_VNUM(type) : NOTHING);
 		return;
 	}
@@ -1478,13 +1480,17 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	}
 	
 	// found one to resume
-	if ((veh = find_finishable_vehicle(ch, type, &any))) {
+	if ((veh = find_finishable_vehicle(ch, type, &found_other))) {
 		resume_craft_vehicle(ch, veh, type);
 		return;
 	}
 	
-	if (any) {
-		msg_to_char(ch, "You can't %s that while there's already an unfinished vehicle here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	if (found_other) {
+		msg_to_char(ch, "You can't %s that while %s is unfinished here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command, VEH_SHORT_DESC(found_other));
+		return;
+	}
+	if (VEH_CLAIMS_WITH_ROOM(to_craft) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		msg_to_char(ch, "You can only %s that on a tile you own.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 		return;
 	}
 	
@@ -1496,7 +1502,24 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	SET_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
 	VEH_NEEDS_RESOURCES(veh) = copy_resource_list(GET_CRAFT_RESOURCES(type));
 	if (!VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
-		VEH_OWNER(veh) = GET_LOYALTY(ch);
+		if (VEH_CLAIMS_WITH_ROOM(veh)) {
+			// try to claim the room if unclaimed: can_claim checks total available land, but the outside is check done within this block
+			if (!ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))) && can_claim(ch) && !ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_UNCLAIMABLE)) {
+				empire_data *emp = get_or_create_empire(ch);
+				if (emp) {
+					int ter_type = get_territory_type_for_empire(HOME_ROOM(IN_ROOM(ch)), emp, FALSE, &junk);
+					if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
+						claim_room(HOME_ROOM(IN_ROOM(ch)), emp);
+					}
+				}
+			}
+			
+			// and set the owner to the room owner
+			VEH_OWNER(veh) = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));
+		}
+		else {
+			VEH_OWNER(veh) = GET_LOYALTY(ch);
+		}
 	}
 	VEH_HEALTH(veh) = MAX(1, VEH_MAX_HEALTH(veh) * 0.2);	// start at 20% health, will heal on completion
 	scale_vehicle_to_level(veh, get_craft_scale_level(ch, type));

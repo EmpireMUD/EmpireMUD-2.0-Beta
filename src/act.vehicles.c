@@ -1386,8 +1386,12 @@ ACMD(do_disembark) {
 	if (!veh || !(to_room = IN_ROOM(veh)) || (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't disembark from here!\r\n");
 	}
+	else if (VEH_FLAGGED(veh, VEH_BUILDING)) {
+		msg_to_char(ch, "You can only disembark from vehicles. Try 'exit'.\r\n");
+	}
 	else {
-		perform_move(ch, NO_DIR, to_room, MOVE_DISEMBARK);
+		// shares MOVE_EXIT, which overrides the text with 'disembark' if it's a non-building vehicle
+		perform_move(ch, NO_DIR, to_room, MOVE_EXIT);
 	}
 }
 

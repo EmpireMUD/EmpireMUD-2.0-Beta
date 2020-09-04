@@ -4259,6 +4259,7 @@ const char *vehicle_flags[] = {
 	"!LOAD-ONTO-VEHICLE",
 	"VISIBLE-IN-DARK",	// 20
 	"!CLAIM",
+	"BUILDING",
 	"\n"
 };
 
@@ -4287,6 +4288,7 @@ const char *identify_vehicle_flags[] = {
 	"cannot be loaded onto vehicles",
 	"",	// "VISIBLE-IN-DARK",	// 20
 	"",	// "!CLAIM",
+	"",	// "BUILDING",
 	"\n"
 };
 

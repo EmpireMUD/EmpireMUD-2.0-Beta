@@ -1093,7 +1093,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	size_t size = 0;
 	
 	// pre-description
-	if (VEH_OWNER(veh)) {
+	if (VEH_OWNER(veh) && (VEH_OWNER(veh) != ROOM_OWNER(IN_ROOM(veh)) || !VEH_CLAIMS_WITH_ROOM(veh))) {
 		size += snprintf(buf + size, sizeof(buf) - size, "<%s> ", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
 	}
 	if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {

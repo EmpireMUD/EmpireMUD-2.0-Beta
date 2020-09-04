@@ -43,6 +43,7 @@ extern vehicle_data *get_vehicle(char *name);
 vehicle_data *get_vehicle_by_obj(obj_data *obj, char *name);
 vehicle_data *get_vehicle_near_obj(obj_data *obj, char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
+void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
 void sub_write_to_room(char *str, room_data *room, bool use_queue);
 void die(char_data *ch, char_data *killer);
@@ -1360,6 +1361,11 @@ OCMD(do_dgoload) {
 		else {
 			// hope to inherit
 			scale_vehicle_to_level(veh, 0);
+		}
+		
+		// ownership
+		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(room))) {
+			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(room)));
 		}
 		
 		load_vtrigger(veh);
