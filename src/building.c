@@ -1685,13 +1685,7 @@ ACMD(do_dismantle) {
 	}
 	
 	if (!COMPLEX_DATA(IN_ROOM(ch))) {
-		// nothing dismantlable here: try to fall through to an existing dismantle
-		if ((veh = find_dismantling_vehicle_in_room(IN_ROOM(ch), NOTHING))) {
-			do_dismantle_vehicle(ch, veh);
-			return;
-		}
-		
-		msg_to_char(ch, "You can't dismantle anything here.\r\n");
+		msg_to_char(ch, "You can't start dismantling anything here.\r\n");
 		return;
 	}
 	
