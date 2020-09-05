@@ -2760,7 +2760,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
 		get_resource_display(VEH_NEEDS_RESOURCES(veh), part);
-		size += snprintf(buf + size, sizeof(buf) - size, "%s resources:\r\n%s", VEH_FLAGGED(veh, VEH_DISMANTLING) ? "Dismantle" : "Needs", part);
+		size += snprintf(buf + size, sizeof(buf) - size, "%s resources:\r\n%s", VEH_IS_DISMANTLING(veh) ? "Dismantle" : "Needs", part);
 	}
 	
 	send_to_char(buf, ch);
@@ -2815,7 +2815,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 		if (VEH_IS_COMPLETE(veh)) {
 			msg_to_char(ch, "Maintenance needed: %s\r\n", lbuf);
 		}
-		else if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+		else if (VEH_IS_DISMANTLING(veh)) {
 			msg_to_char(ch, "Remaining to dismantle: %s\r\n", lbuf);
 		}
 		else {

@@ -1021,7 +1021,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	char_data *vict;
 	
 	// basic setup
-	if (!type || !check_can_craft(ch, type) || !(veh = find_finishable_vehicle(ch, type, &junk)) || VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+	if (!type || !check_can_craft(ch, type) || !(veh = find_finishable_vehicle(ch, type, &junk)) || VEH_IS_DISMANTLING(veh)) {
 		cancel_gen_craft(ch);
 		return;
 	}

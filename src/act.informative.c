@@ -1104,7 +1104,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	if (VEH_IS_COMPLETE(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
 	}
-	else if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+	else if (VEH_IS_DISMANTLING(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%s is being dismantled.\r\n", VEH_SHORT_DESC(veh));
 	}
 	else {
