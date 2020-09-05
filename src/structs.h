@@ -1878,6 +1878,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_BURN_AREA		40
 #define ACT_HUNTING			41
 #define ACT_FORAGING		42
+#define ACT_DISMANTLE_VEHICLE  43
 
 // ACTF_x: act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -5500,6 +5501,7 @@ struct vehicle_data {
 	char_data *led_by;	// person leading it
 	char_data *sitting_on;	// person sitting on it
 	char_data *driver;	// person driving it
+	int construction_id;	// temporary id used to resume construction/dismantle
 	
 	// scripting
 	int script_id;	// used by DG triggers - unique id

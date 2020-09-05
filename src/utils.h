@@ -1545,6 +1545,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VEH_ANIMALS(veh)  ((veh)->animals)
 #define VEH_BUILT_WITH(veh)  ((veh)->built_with)
 #define VEH_CARRYING_N(veh)  ((veh)->carrying_n)
+#define VEH_CONSTRUCTION_ID(veh)  ((veh)->construction_id)
 #define VEH_CONTAINS(veh)  ((veh)->contains)
 #define VEH_DRIVER(veh)  ((veh)->driver)
 #define VEH_FLAGS(veh)  ((veh)->flags)
@@ -1590,11 +1591,11 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // helpers
 #define IN_OR_ON(veh)		(VEH_FLAGGED((veh), VEH_IN) ? "in" : "on")
+#define VEH_CLAIMS_WITH_ROOM(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && !VEH_FLAGGED((veh), MOVABLE_VEH_FLAGS))
 #define VEH_FLAGGED(veh, flag)  IS_SET(VEH_FLAGS(veh), (flag))
 #define VEH_IS_COMPLETE(veh)  (!VEH_NEEDS_RESOURCES(veh) || !VEH_FLAGGED((veh), VEH_INCOMPLETE | VEH_DISMANTLING))
 #define VEH_IS_DISMANTLING(veh)  (VEH_FLAGGED((veh), VEH_DISMANTLING))
-
-#define VEH_CLAIMS_WITH_ROOM(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && !VEH_FLAGGED((veh), MOVABLE_VEH_FLAGS))
+#define VEH_OR_BLD(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) ? "building" : "vehicle")
 
 
  //////////////////////////////////////////////////////////////////////////////

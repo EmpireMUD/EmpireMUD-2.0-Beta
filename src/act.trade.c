@@ -312,11 +312,12 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 * Finds an unfinished vehicle in the room that the character can finish.
 *
 * @param char_data *ch The person trying to craft a vehicle.
-* @param craft_data *type The craft recipe to match up.
+* @param craft_data *type Optional: The craft recipe to match up (may be NULL to ignore).
+* @parma int with_id Optional: The vehicle construction id to find (may be NOTHING to ignore).
 * @param vehicle_data **found_other A variable to bind an existing vehicle to -- if NULL, there are no unfinished vehicles lying around. Otherwise, one will be assigned here.
 * @return vehicle_data* The found vehicle, or NULL if none.
 */
-vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, vehicle_data **found_other) {
+vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, int with_id, vehicle_data **found_other) {
 	vehicle_data *iter, *found = NULL;
 	
 	*found_other = NULL;
@@ -330,7 +331,10 @@ vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, vehicle_d
 		found = iter;
 		
 		// right vehicle?
-		if (VEH_VNUM(iter) != GET_CRAFT_OBJECT(type)) {
+		if (type && VEH_VNUM(iter) != GET_CRAFT_OBJECT(type)) {
+			continue;
+		}
+		if (with_id != NOTHING && VEH_CONSTRUCTION_ID(iter) != with_id) {
 			continue;
 		}
 		if (!can_use_vehicle(ch, iter, GUESTS_ALLOWED)) {
@@ -610,6 +614,7 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 	
 	start_action(ch, ACT_GEN_CRAFT, -1);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(craft);
+	GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
 	
 	snprintf(buf, sizeof(buf), "You resume %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
@@ -1019,7 +1024,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	char_data *vict;
 	
 	// basic setup
-	if (!type || !check_can_craft(ch, type) || !(veh = find_finishable_vehicle(ch, type, &junk)) || VEH_IS_DISMANTLING(veh)) {
+	if (!type || !check_can_craft(ch, type) || !(veh = find_finishable_vehicle(ch, NULL, GET_ACTION_VNUM(ch, 1), &junk)) || VEH_IS_DISMANTLING(veh)) {
 		cancel_gen_craft(ch);
 		return;
 	}
@@ -1449,6 +1454,7 @@ ACMD(do_gen_augment) {
 */
 void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	extern bool can_claim(char_data *ch);
+	extern int get_new_vehicle_construction_id();
 	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	
 	vehicle_data *veh, *to_craft = NULL, *found_other = NULL;
@@ -1467,7 +1473,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	}
 	
 	// found one to resume
-	if ((veh = find_finishable_vehicle(ch, type, &found_other))) {
+	if ((veh = find_finishable_vehicle(ch, type, NOTHING, &found_other))) {
 		resume_craft_vehicle(ch, veh, type);
 		return;
 	}
@@ -1510,9 +1516,11 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	}
 	VEH_HEALTH(veh) = MAX(1, VEH_MAX_HEALTH(veh) * 0.2);	// start at 20% health, will heal on completion
 	scale_vehicle_to_level(veh, get_craft_scale_level(ch, type));
+	VEH_CONSTRUCTION_ID(veh) = get_new_vehicle_construction_id();
 	
 	start_action(ch, ACT_GEN_CRAFT, -1);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);
+	GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
 	
 	snprintf(buf, sizeof(buf), "You lay the framework and begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR);

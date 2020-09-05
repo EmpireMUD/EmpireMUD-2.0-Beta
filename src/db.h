@@ -195,7 +195,8 @@
 #define DATA_WORLD_START  2	// timestamp of when the mud first started up
 #define DATA_MAX_PLAYERS_TODAY  3	// players logged in today
 #define DATA_LAST_ISLAND_DESCS  4	// last time island descs regenerated
-#define NUM_DATAS  5
+#define DATA_LAST_CONSTRUCTION_ID  5	// for vehicle construct/dismantle
+#define NUM_DATAS  6
 
 
 // DATYPE_x: types of stored data

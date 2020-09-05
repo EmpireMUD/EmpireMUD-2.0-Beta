@@ -3737,22 +3737,20 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 * Removes some resources from a resource list when dismantling starts, based on
 * the material type and the damage to the building.
 *
-* @param room_data *room The building being dismantled.
+* @param int damage The current amount of damage.
+* @param int max_health The maximum health of the building/vehicle.
 * @param struct resource_data **list The list to halve.
-* @param bool remove_nonrefundables If TRUE, removes entries that cannot be refunded.
 */
-void reduce_dismantle_resources(room_data *room, struct resource_data **list, bool remove_nonrefundables) {
+void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list) {
 	extern const struct material_data materials[NUM_MATERIALS];
 	
 	struct resource_data *res, *next_res;
 	int iter, count, total, remaining;
 	double damage_prc, prc_to_keep;
 	obj_data *proto;
-	bld_data *bld;
 	
 	// determine how damaged the building it -- 1.0+ is VERY damaged, 0 is not damaged at all
-	bld = GET_BUILDING(room);
-	damage_prc = (BUILDING_DAMAGE(room) / MAX(1, bld ? GET_BLD_MAX_DAMAGE(bld) : 1));
+	damage_prc = (damage / MAX(1, max_health));
 	damage_prc = MIN(1.0, damage_prc);	// reduce to 0-1.0 range (1.0 is fully damaged)
 	
 	// we keep a percent of the items based on how damaged it is, in the 20-90% range
@@ -5882,7 +5880,7 @@ void relocate_players(room_data *room, room_data *to_room) {
 			qt_visit_room(ch, IN_ROOM(ch));
 			GET_LAST_DIR(ch) = NO_DIR;
 			look_at_room(ch);
-			act("$n appears in the middle of the room!", TRUE, ch, NULL, NULL, TO_ROOM);
+			act("$n arrives.", TRUE, ch, NULL, NULL, TO_ROOM);
 			enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
 			msdp_update_room(ch);
 		}

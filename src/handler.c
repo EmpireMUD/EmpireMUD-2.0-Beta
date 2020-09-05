@@ -9430,12 +9430,9 @@ int get_number(char **name) {
 * @param vehicle_data *veh The vehicle to extract and free.
 */
 void extract_vehicle(vehicle_data *veh) {
+	void delete_vehicle_interior(vehicle_data *veh);
 	void empty_vehicle(vehicle_data *veh);
-	void relocate_players(room_data *room, room_data *to_room);
 	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
-	
-	struct vehicle_room_list *vrl, *next_vrl;
-	room_data *main_room;
 	
 	if (veh == dg_owner_veh) {
 		dg_owner_purged = 1;
@@ -9447,26 +9444,7 @@ void extract_vehicle(vehicle_data *veh) {
 	}
 	
 	// delete interior
-	if ((main_room = VEH_INTERIOR_HOME_ROOM(veh)) || VEH_ROOM_LIST(veh)) {
-		LL_FOREACH_SAFE(VEH_ROOM_LIST(veh), vrl, next_vrl) {
-			if (vrl->room == main_room) {
-				continue;	// do this one last
-			}
-			
-			if (IN_ROOM(veh)) {
-				relocate_players(vrl->room, IN_ROOM(veh));
-			}
-			delete_room(vrl->room, FALSE);	// MUST check_all_exits later
-		}
-		
-		if (main_room) {
-			if (IN_ROOM(veh)) {
-				relocate_players(main_room, IN_ROOM(veh));
-			}
-			delete_room(main_room, FALSE);
-		}
-		check_all_exits();
-	}
+	delete_vehicle_interior(veh);
 	
 	if (VEH_LED_BY(veh)) {
 		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;

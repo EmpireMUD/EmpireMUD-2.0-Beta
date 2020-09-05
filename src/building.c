@@ -1050,7 +1050,7 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 * @param room_data *loc The location to dismantle.
 */
 void start_dismantle_building(room_data *loc) {
-	void reduce_dismantle_resources(room_data *room, struct resource_data **list, bool remove_nonrefundables);
+	void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
 	
 	struct resource_data *composite_resources = NULL, *crcp, *res, *next_res;
 	room_data *room, *next_room;
@@ -1159,7 +1159,7 @@ void start_dismantle_building(room_data *loc) {
 	}
 	
 	// reduce resource: they don't get it all back
-	reduce_dismantle_resources(loc, &GET_BUILDING_RESOURCES(loc), TRUE);
+	reduce_dismantle_resources(BUILDING_DAMAGE(loc), GET_BUILDING(loc) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(loc)) : 1, &GET_BUILDING_RESOURCES(loc));
 
 	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
@@ -1544,23 +1544,119 @@ ACMD(do_build) {
 }
 
 
-ACMD(do_dismantle) {
-	craft_data *type;
+/**
+* Processes the "dismantle" command when targeting a vehicle. It resumes
+* an in-process dismantle or else it handles the start-dismantle process.
+*
+* @param char_data *ch The player (not NPC).
+* @param vehicle_data *veh The vehicle they targeted.
+*/
+void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
+	extern int count_harnessed_animals(vehicle_data *veh);
+	extern int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
+	void process_dismantle_vehicle(char_data *ch);
+	void start_dismantle_vehicle(vehicle_data *veh);
 	
-	skip_spaces(&argument);
-	if (*argument && !isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
-		msg_to_char(ch, "Dismantle is only used to dismantle buildings. Just type 'dismantle'. (You get this error if you typed an argument.)\r\n");
-		return;
+	if (!ch || !veh || IS_NPC(ch)) {
+		return;	// safety
 	}
+	
+	if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (GET_ACTION(ch) != ACT_NONE) {
+		msg_to_char(ch, "You're kinda busy right now.\r\n");
+	}
+	else if (VEH_IS_DISMANTLING(veh)) {
+		// already being dismantled: RESUME
+		if (can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+			act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$n begins to dismantle $V.\r\n", FALSE, ch, NULL, veh, TO_ROOM);
+			start_action(ch, ACT_DISMANTLE_VEHICLE, 0);
+			GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
+			command_lag(ch, WAIT_OTHER);
+		}
+		else {
+			act("You don't have permission to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+	}
+	else if (WATER_SECT(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't dismantle it in the water.\r\n");
+	}
+	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You can't dismantle a %s you don't own.\r\n", VEH_OR_BLD(veh));
+	}
+	else if (GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE)) {
+		msg_to_char(ch, "You don't have permission to dismantle that.\r\n");
+	}
+	else if (VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
+		msg_to_char(ch, "That cannot be dismantled.\r\n");
+	}
+	else if (VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE)) {
+		msg_to_char(ch, "Turn off no-dismantle before dismantling that %s.\r\n", VEH_OR_BLD(veh));
+	}
+	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		msg_to_char(ch, "You can't dismantle that -- it's on fire!\r\n");
+	}
+	else if (count_harnessed_animals(veh) > 0) {
+		msg_to_char(ch, "You can't dismantle that while animals are harnessed to it.\r\n");
+	}
+	else if (VEH_SITTING_ON(veh)) {
+		msg_to_char(ch, "You can't dismantle it while someone is sitting on it.\r\n");
+	}
+	else if (VEH_LED_BY(veh)) {
+		msg_to_char(ch, "You can't dismantle it while someone is leading it.\r\n");
+	}
+	else if (count_players_in_vehicle(veh, TRUE)) {
+		msg_to_char(ch, "You can't dismantle it while someone is inside.\r\n");
+	}
+	else {
+		// ok: start dismantle
+		act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$n begins to dismantle $V.\r\n", FALSE, ch, NULL, veh, TO_ROOM);
+		
+		start_dismantle_vehicle(veh);
+		start_action(ch, ACT_DISMANTLE_VEHICLE, 0);
+		GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
+		process_dismantle_vehicle(ch);
+		command_lag(ch, WAIT_OTHER);
+	}
+}
+
+
+ACMD(do_dismantle) {
+	extern vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id);
+	
+	vehicle_data *veh;
+	craft_data *type;
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use the dismantle command.\r\n");
 		return;
 	}
 	
+	// fall through to dismantle-vehicle?
+	one_argument(argument, arg);
+	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+		do_dismantle_vehicle(ch, veh);
+		return;
+	}
+	
+	// otherwise args are not welcome
+	if (*arg && !isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
+		msg_to_char(ch, "Dismantle is only used to dismantle buildings. Just type 'dismantle'. (You get this error if you typed an argument.)\r\n");
+		return;
+	}
+	
 	if (GET_ACTION(ch) == ACT_DISMANTLING) {
 		msg_to_char(ch, "You stop dismantling the building.\r\n");
 		act("$n stops dismantling the building.", FALSE, ch, 0, 0, TO_ROOM);
+		GET_ACTION(ch) = ACT_NONE;
+		return;
+	}
+	if (GET_ACTION(ch) == ACT_DISMANTLE_VEHICLE) {
+		msg_to_char(ch, "You stop dismantling.\r\n");
+		act("$n stops dismantling.", FALSE, ch, NULL, NULL, TO_ROOM);
 		GET_ACTION(ch) = ACT_NONE;
 		return;
 	}
@@ -1575,16 +1671,7 @@ ACMD(do_dismantle) {
 		return;
 	}
 	
-	if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
-		msg_to_char(ch, "You need to dismantle from the main room.\r\n");
-		return;
-	}
-	
-	if (IS_BURNING(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't dismantle a burning building!\r\n");
-		return;
-	}
-
+	// resume
 	if (IS_DISMANTLING(IN_ROOM(ch))) {
 		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 			msg_to_char(ch, "You don't have permission to dismantle here.\r\n");
@@ -1598,7 +1685,23 @@ ACMD(do_dismantle) {
 	}
 	
 	if (!COMPLEX_DATA(IN_ROOM(ch))) {
+		// nothing dismantlable here: try to fall through to an existing dismantle
+		if ((veh = find_dismantling_vehicle_in_room(IN_ROOM(ch), NOTHING))) {
+			do_dismantle_vehicle(ch, veh);
+			return;
+		}
+		
 		msg_to_char(ch, "You can't dismantle anything here.\r\n");
+		return;
+	}
+	
+	if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
+		msg_to_char(ch, "You need to dismantle from the main room.\r\n");
+		return;
+	}
+	
+	if (IS_BURNING(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't dismantle a burning building!\r\n");
 		return;
 	}
 	

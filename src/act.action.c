@@ -72,6 +72,7 @@ void process_chop(char_data *ch);
 void process_copying_book(char_data *ch);
 void process_digging(char_data *ch);
 void process_dismantle_action(char_data *ch);
+void process_dismantle_vehicle(char_data *ch);
 void process_escaping(char_data *ch);
 void process_excavating(char_data *ch);
 void process_fillin(char_data *ch);
@@ -153,6 +154,7 @@ const struct action_data_struct action_data[] = {
 	{ "burning", "is preparing to burn the area.", ACTF_FAST_CHORES, process_burn_area, NULL },	// ACT_BURN_AREA
 	{ "hunting", "is low to the ground, hunting.", ACTF_FINDER, process_hunting, NULL },	// ACT_HUNTING
 	{ "foraging", "is looking around for food.", ACTF_ALWAYS_FAST | ACTF_FINDER | ACTF_HASTE, process_foraging, NULL },	// ACT_FORAGING
+	{ "dismantling", "is dismantling something.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_vehicle, NULL },	// ACT_DISMANTLING
 	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
