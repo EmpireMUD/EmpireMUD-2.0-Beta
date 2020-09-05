@@ -948,29 +948,39 @@ void process_dismantling(char_data *ch, room_data *room) {
 * replace an older one. Call this BEFORE adding the new resource to built-with.
 *
 * @param struct resource_data **built_with The room's &GET_BUILT_WITH()
-* @param obj_data *obj The item that was added -- remove something with a matching component type.
+* @param any_vnum component The component type that was added -- remove something with a matching component type.
 */
-void remove_like_component_from_built_with(struct resource_data **built_with, obj_data *obj) {
+void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component) {
+	extern bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
+	
 	struct resource_data *iter, *next;
 	generic_data *my_cmp;
 	obj_data *proto;
 	
-	if (!built_with || !*built_with || !obj || GET_OBJ_COMPONENT(obj) == NOTHING) {
+	if (!built_with || !*built_with || component == NOTHING) {
 		return;	// no work
 	}
 	
-	my_cmp = real_generic(GET_OBJ_COMPONENT(obj));
+	my_cmp = real_generic(component);
 	
 	LL_FOREACH_SAFE(*built_with, iter, next) {
-		// anything with a matching component type (either way) is safe to remove
-		if (iter->type == RES_OBJECT && (proto = obj_proto(iter->vnum)) && GET_OBJ_COMPONENT(proto) != NOTHING && (GET_OBJ_COMPONENT(obj) == GET_OBJ_COMPONENT(proto) || is_component_vnum(obj, GET_OBJ_COMPONENT(proto)) || is_component(proto, my_cmp))) {
-			iter->amount -= 1;
-			if (iter->amount <= 0) {
-				LL_DELETE(*built_with, iter);
-				free(iter);
-			}
-			break;	// only need 1
+		if (iter->type != RES_OBJECT || !(proto = obj_proto(iter->vnum))) {
+			continue;	// no object
 		}
+		if (GET_OBJ_COMPONENT(proto) == NOTHING) {
+			continue;	// not a component
+		}
+		if (GET_OBJ_COMPONENT(proto) != component && !is_component(proto, my_cmp) && !has_generic_relation(GEN_COMPUTED_RELATIONS(my_cmp), GET_OBJ_COMPONENT(proto))) {
+			continue;	// not the right component or related component
+		}
+		
+		// ok:
+		iter->amount -= 1;
+		if (iter->amount <= 0) {
+			LL_DELETE(*built_with, iter);
+			free(iter);
+		}
+		break;	// only need 1
 	}
 }
 

@@ -1117,7 +1117,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is unfinished.\r\n");
 	}
 	*/
-	else if (VEH_NEEDS_RESOURCES(veh) || VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)) {
+	else if (VEH_IS_COMPLETE(veh) && (VEH_NEEDS_RESOURCES(veh) || VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh))) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is in need of repair.\r\n");
 	}
 	

@@ -1034,7 +1034,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	// find and apply something
 	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
 		// take the item; possibly free the res
-		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_CRAFT, veh, NULL);
+		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_CRAFT, veh, &VEH_BUILT_WITH(veh));
 		
 		// experience per resource
 		if (GET_CRAFT_ABILITY(type) != NO_ABIL) {

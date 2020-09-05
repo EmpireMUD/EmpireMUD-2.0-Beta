@@ -71,6 +71,8 @@ bool workforce_is_delayed(empire_data *emp, room_data *room, int chore);
 
 // external functions
 void empire_skillup(empire_data *emp, any_vnum ability, double amount);	// skills.c
+void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component);
+void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 void stop_room_action(room_data *room, int action, int chore);	// act.action.c
 
 // gen_craft protos:
@@ -1473,8 +1475,6 @@ void do_chore_brickmaking(empire_data *emp, room_data *room) {
 void do_chore_building(empire_data *emp, room_data *room, int mode) {
 	void finish_building(char_data *ch, room_data *room);
 	void finish_maintenance(char_data *ch, room_data *room);
-	void remove_like_component_from_built_with(struct resource_data **built_with, obj_data *obj);
-	void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 	
 	char_data *worker = find_chore_worker_in_room(room, chore_data[mode].mob);
 	struct empire_storage_data *store = NULL;
@@ -1519,7 +1519,7 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 			else if (res->type == RES_COMPONENT) {
 				if (mode == CHORE_MAINTENANCE) {
 					// remove an older matching component
-					remove_like_component_from_built_with(&GET_BUILT_WITH(room), obj_proto(res->vnum));
+					remove_like_component_from_built_with(&GET_BUILT_WITH(room), res->vnum);
 				}
 				charge_stored_component(emp, islid, res->vnum, 1, FALSE, TRUE, &GET_BUILT_WITH(room));
 			}
@@ -2634,7 +2634,7 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 	struct resource_data *res;
 	bool can_do = FALSE;
 	
-	if ((res = VEH_NEEDS_RESOURCES(veh))) {
+	if ((res = gOURCES(veh))) {
 		// RES_x: can ONLY do it if it requires an object, component, or action
 		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->keep != UNLIMITED && store->amount > store->keep && store->amount > 0) {
 			can_do = TRUE;
@@ -2654,10 +2654,19 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 		
 		if (res) {
 			if (res->type == RES_OBJECT) {
+				if (mode == CHORE_MAINTENANCE) {
+					// remove an older matching object
+					remove_like_item_from_built_with(&VEH_BUILT_WITH(veh), obj_proto(res->vnum));
+				}
 				charge_stored_resource(emp, islid, res->vnum, 1);
+				add_to_resource_list(&VEH_BUILT_WITH(veh), RES_OBJECT, res->vnum, 1, 1);
 			}
 			else if (res->type == RES_COMPONENT) {
-				charge_stored_component(emp, islid, res->vnum, 1, FALSE, TRUE, NULL);
+				if (mode == CHORE_MAINTENANCE) {
+					// remove an older matching component
+					remove_like_component_from_built_with(&VEH_BUILT_WITH(veh), res->vnum);
+				}
+				charge_stored_component(emp, islid, res->vnum, 1, FALSE, TRUE, &VEH_BUILT_WITH(veh));
 			}
 			// apply it
 			res->amount -= 1;

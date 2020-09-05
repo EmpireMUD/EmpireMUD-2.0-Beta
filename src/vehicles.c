@@ -945,6 +945,7 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	VEH_CARRYING_N(veh) = 0;
 	VEH_ANIMALS(veh) = NULL;
 	VEH_NEEDS_RESOURCES(veh) = NULL;
+	VEH_BUILT_WITH(veh) = NULL;
 	IN_ROOM(veh) = NULL;
 	REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);	// ensure not marked incomplete
 	
@@ -1064,6 +1065,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 		// arg order is backwards-compatible to pre-2.0b3.17
 		fprintf(fl, "Needs-res: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
 	}
+	LL_FOREACH(VEH_BUILT_WITH(veh), res) {
+		fprintf(fl, "Built-with: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
+	}
 	
 	// scripts
 	if (SCRIPT(veh)) {
@@ -1159,6 +1163,22 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						}
 						last_vam = vam;
 					}
+				}
+				break;
+			}
+			case 'B': {
+				if (OBJ_FILE_TAG(line, "Built-with:", length)) {
+					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) != 4) {
+						// unknown number of args?
+						break;
+					}
+					
+					CREATE(res, struct resource_data, 1);
+					res->vnum = i_in[0];
+					res->amount = i_in[1];
+					res->type = i_in[2];
+					res->misc = i_in[3];
+					LL_APPEND(VEH_BUILT_WITH(veh), res);
 				}
 				break;
 			}
@@ -1516,6 +1536,9 @@ void free_vehicle(vehicle_data *veh) {
 	// pointers
 	if (VEH_NEEDS_RESOURCES(veh)) {
 		free_resource_list(VEH_NEEDS_RESOURCES(veh));
+	}
+	if (VEH_BUILT_WITH(veh)) {
+		free_resource_list(VEH_BUILT_WITH(veh));
 	}
 	while ((vam = VEH_ANIMALS(veh))) {
 		VEH_ANIMALS(veh) = vam->next;

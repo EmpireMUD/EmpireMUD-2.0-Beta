@@ -575,6 +575,9 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 				}
 			}
 		}
+		if (VEH_BUILT_WITH(veh)) {
+			remove_thing_from_resource_list(&VEH_BUILT_WITH(veh), RES_OBJECT, vnum);
+		}
 	}
 	
 	// remove from empire inventories and trade -- DO THIS BEFORE REMOVING FROM OBJ TABLE
