@@ -730,6 +730,11 @@ bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message) {
 			msg_to_char(ch, "You can't sit on that!\r\n");
 		}
 	}
+	else if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+		if (message) {
+			msg_to_char(ch, "You can't sit %s because it's being dismantled.\r\n", IN_OR_ON(veh));
+		}
+	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		if (message) {
 			msg_to_char(ch, "You can't sit %s it until it's finished.\r\n", IN_OR_ON(veh));
@@ -1252,6 +1257,9 @@ ACMD(do_board) {
 		// this is a pre-check
 		msg_to_char(ch, "You can't %s that!\r\n", command);
 	}
+	else if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+		msg_to_char(ch, "You can't %s it because it's being dismantled.\r\n", command);
+	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		msg_to_char(ch, "You can't %s it until it's finished.\r\n", command);
 	}
@@ -1443,6 +1451,9 @@ ACMD(do_dispatch) {
 	else if (!VEH_FLAGGED(veh, VEH_SHIPPING)) {
 		msg_to_char(ch, "You can only dispatch shipping vessels.\r\n");
 	}
+	else if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+		msg_to_char(ch, "It's in the middle of being dismantled.\r\n");
+	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		msg_to_char(ch, "It isn't even built yet.\r\n");
 	}
@@ -1610,7 +1621,7 @@ ACMD(do_drag) {
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "You can't drag that around -- it's on fire!\r\n");
 	}
-	else if (!VEH_IS_COMPLETE(veh)) {
+	else if (!VEH_IS_COMPLETE(veh) && !VEH_FLAGGED(veh, VEH_DISMANTLING)) {
 		msg_to_char(ch, "You can't drag that around until it's finished.\r\n");
 	}
 	else if (count_harnessed_animals(veh) > 0) {
@@ -1780,6 +1791,9 @@ ACMD(do_drive) {
 	else if (!VEH_FLAGGED(veh, drive_data[subcmd].flag)) {
 		snprintf(buf, sizeof(buf), "You can't %s $V!", drive_data[subcmd].command);
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+	}
+	else if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+		act("$V isn't going anywhere now that it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		act("$V isn't going anywhere until it's finished.", FALSE, ch, NULL, veh, TO_CHAR);
@@ -2006,6 +2020,9 @@ ACMD(do_harness) {
 	else if (count_harnessed_animals(veh) >= VEH_ANIMALS_REQUIRED(veh)) {
 		msg_to_char(ch, "You can't harness %s animals to it.\r\n", count_harnessed_animals(veh) == 0 ? "any" : "any more");
 	}
+	else if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+		act("You can't harness anything to $V because it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		act("You must finish constructing $V before you can harness anything to it.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
@@ -2099,6 +2116,9 @@ ACMD(do_lead) {
 		if (!VEH_FLAGGED(veh, VEH_LEADABLE)) {
 			act("You can't lead $V!", FALSE, ch, NULL, veh, TO_CHAR);
 		}
+		else if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+			act("You can't lead $V because it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		else if (!VEH_IS_COMPLETE(veh)) {
 			act("You must finish constructing $V before you can lead it.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
@@ -2147,6 +2167,9 @@ ACMD(do_load_vehicle) {
 	}
 	else if (!(cont = get_vehicle_in_room_vis(ch, arg2))) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg2), arg2);
+	}
+	else if (VEH_FLAGGED(cont, VEH_DISMANTLING)) {
+		msg_to_char(ch, "You can't load anything %sto it because it's being dismantled.\r\n", IN_OR_ON(cont));
 	}
 	else if (!VEH_IS_COMPLETE(cont)) {
 		msg_to_char(ch, "You must finish constructing it before anything can be loaded %sto it.\r\n", IN_OR_ON(cont));
@@ -2242,6 +2265,9 @@ ACMD(do_load_vehicle) {
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
 			msg_to_char(ch, "You can't load that %sto vehicles.\r\n", IN_OR_ON(cont));
 		}
+		else if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+			msg_to_char(ch, "You can't load it %sto anything because it's being dismantled.\r\n", IN_OR_ON(cont));
+		}
 		else if (!VEH_IS_COMPLETE(veh)) {
 			msg_to_char(ch, "You must finish constructing it before it can be loaded %sto anything.\r\n", IN_OR_ON(cont));
 		}
@@ -2291,6 +2317,9 @@ ACMD(do_repair) {
 	}
 	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
 		msg_to_char(ch, "You can't repair something that belongs to someone else.\r\n");
+	}
+	else if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+		msg_to_char(ch, "You can't repair vehicles that are being dismantled.\r\n");
 	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		msg_to_char(ch, "You can only repair vehicles that are finished.\r\n");
@@ -2423,6 +2452,9 @@ ACMD(do_unload_vehicle) {
 	else if (!can_use_vehicle(ch, cont, MEMBERS_AND_ALLIES)) {
 		act("You don't have permission to unload $V.", FALSE, ch, NULL, cont, TO_CHAR);
 	}
+	else if (VEH_FLAGGED(cont, VEH_DISMANTLING)) {
+		act("You can't unload anything from $V while it's being dismantled.", FALSE, ch, NULL, cont, TO_CHAR);
+	}
 	else if (!VEH_IS_COMPLETE(cont)) {
 		act("You must finish constructing $V before anything can be unloaded.", FALSE, ch, NULL, cont, TO_CHAR);
 	}
@@ -2509,6 +2541,9 @@ ACMD(do_unload_vehicle) {
 		}
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
 			msg_to_char(ch, "That cannot be unloaded from vehicles.\r\n");
+		}
+		else if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+			msg_to_char(ch, "You can't unload it from anything while it's being dismantled.\r\n");
 		}
 		else if (!VEH_IS_COMPLETE(veh)) {
 			msg_to_char(ch, "You must finish constructing it before it can be unloaded from anything.\r\n");

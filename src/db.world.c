@@ -1292,11 +1292,13 @@ void annual_update_vehicle(vehicle_data *veh) {
 	
 	VEH_HEALTH(veh) -= MAX(1.0, ((double) VEH_MAX_HEALTH(veh) / 10.0));
 	
-	if (VEH_HEALTH(veh) > 0) {
-		// add maintenance
-		old_list = VEH_NEEDS_RESOURCES(veh);
-		VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
-		free_resource_list(old_list);
+	if (VEH_HEALTH(veh) > 0) {	// still alive
+		if (!VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+			// add maintenance (if not dismantling)
+			old_list = VEH_NEEDS_RESOURCES(veh);
+			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
+			free_resource_list(old_list);
+		}
 	}
 	else {	// destroyed
 		// return of 0 prevents the decay

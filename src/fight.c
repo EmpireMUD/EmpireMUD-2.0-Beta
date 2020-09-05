@@ -2725,7 +2725,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 	// not dead yet
 	if (VEH_HEALTH(veh) > 0) {
 		// apply needed maintenance if we did more than 10% damage
-		if (damage >= (VEH_MAX_HEALTH(veh) / 10)) {
+		if (damage >= (VEH_MAX_HEALTH(veh) / 10) && !VEH_FLAGGED(veh, VEH_DISMANTLING)) {
 			old_list = VEH_NEEDS_RESOURCES(veh);
 			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
 			free_resource_list(old_list);

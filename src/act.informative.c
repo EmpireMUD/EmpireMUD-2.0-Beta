@@ -1104,6 +1104,9 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	if (VEH_IS_COMPLETE(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
 	}
+	else if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "%s is being dismantled.\r\n", VEH_SHORT_DESC(veh));
+	}
 	else {
 		size += snprintf(buf + size, sizeof(buf) - size, "%s is under construction.\r\n", VEH_SHORT_DESC(veh));
 	}
@@ -1112,11 +1115,6 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is ON FIRE!\r\n");
 	}
-	/* this is now indicated instead of the long desc
-	if (!VEH_IS_COMPLETE(veh)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "...it is unfinished.\r\n");
-	}
-	*/
 	else if (VEH_IS_COMPLETE(veh) && (VEH_NEEDS_RESOURCES(veh) || VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh))) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is in need of repair.\r\n");
 	}

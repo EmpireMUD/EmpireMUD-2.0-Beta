@@ -663,6 +663,10 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "INCOMPLETE flag");
 		problem = TRUE;
 	}
+	if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "DISMANTLING flag");
+		problem = TRUE;
+	}
 	if (VEH_FLAGGED(veh, VEH_CONTAINER | VEH_SHIPPING) && VEH_CAPACITY(veh) < 1) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "No capacity set when container or shipping flag present");
 		problem = TRUE;
@@ -1065,8 +1069,11 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 		// arg order is backwards-compatible to pre-2.0b3.17
 		fprintf(fl, "Needs-res: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
 	}
-	LL_FOREACH(VEH_BUILT_WITH(veh), res) {
-		fprintf(fl, "Built-with: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
+	if (!VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
+		// only save built-with if it's dismantlable
+		LL_FOREACH(VEH_BUILT_WITH(veh), res) {
+			fprintf(fl, "Built-with: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
+		}
 	}
 	
 	// scripts
@@ -2753,7 +2760,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
 		get_resource_display(VEH_NEEDS_RESOURCES(veh), part);
-		size += snprintf(buf + size, sizeof(buf) - size, "Needs resources:\r\n%s", part);
+		size += snprintf(buf + size, sizeof(buf) - size, "%s resources:\r\n%s", VEH_FLAGGED(veh, VEH_DISMANTLING) ? "Dismantle" : "Needs", part);
 	}
 	
 	send_to_char(buf, ch);
@@ -2807,6 +2814,9 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 		
 		if (VEH_IS_COMPLETE(veh)) {
 			msg_to_char(ch, "Maintenance needed: %s\r\n", lbuf);
+		}
+		else if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+			msg_to_char(ch, "Remaining to dismantle: %s\r\n", lbuf);
 		}
 		else {
 			msg_to_char(ch, "Resources to completion: %s\r\n", lbuf);

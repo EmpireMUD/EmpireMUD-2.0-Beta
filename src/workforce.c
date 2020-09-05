@@ -2634,7 +2634,7 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 	struct resource_data *res;
 	bool can_do = FALSE;
 	
-	if ((res = gOURCES(veh))) {
+	if ((res = VEH_NEEDS_RESOURCES(veh))) {
 		// RES_x: can ONLY do it if it requires an object, component, or action
 		if (res->type == RES_OBJECT && (store = find_stored_resource(emp, islid, res->vnum)) && store->keep != UNLIMITED && store->amount > store->keep && store->amount > 0) {
 			can_do = TRUE;
@@ -2654,19 +2654,21 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 		
 		if (res) {
 			if (res->type == RES_OBJECT) {
-				if (mode == CHORE_MAINTENANCE) {
+				//if (mode == CHORE_MAINTENANCE) {
 					// remove an older matching object
 					remove_like_item_from_built_with(&VEH_BUILT_WITH(veh), obj_proto(res->vnum));
-				}
+				//}
 				charge_stored_resource(emp, islid, res->vnum, 1);
-				add_to_resource_list(&VEH_BUILT_WITH(veh), RES_OBJECT, res->vnum, 1, 1);
+				if (!VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
+					add_to_resource_list(&VEH_BUILT_WITH(veh), RES_OBJECT, res->vnum, 1, 1);
+				}
 			}
 			else if (res->type == RES_COMPONENT) {
-				if (mode == CHORE_MAINTENANCE) {
+				// if (mode == CHORE_MAINTENANCE) {
 					// remove an older matching component
 					remove_like_component_from_built_with(&VEH_BUILT_WITH(veh), res->vnum);
-				}
-				charge_stored_component(emp, islid, res->vnum, 1, FALSE, TRUE, &VEH_BUILT_WITH(veh));
+				//}
+				charge_stored_component(emp, islid, res->vnum, 1, FALSE, TRUE, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
 			}
 			// apply it
 			res->amount -= 1;

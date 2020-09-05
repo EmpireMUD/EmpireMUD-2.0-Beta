@@ -2441,6 +2441,9 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_VISIBLE_IN_DARK  BIT(20)	// u. can be seen at night
 #define VEH_NO_CLAIM  BIT(21)	// v. cannot be claimed
 #define VEH_BUILDING  BIT(22)	// w. behaves more like a building
+#define VEH_NEVER_DISMANTLE  BIT(23)	// x. vehicle cannot be dismantled
+#define VEH_PLAYER_NO_DISMANTLE  BIT(24)	// y. player toggled no-dismantle on
+#define VEH_DISMANTLING  BIT(25)	// z. is being dismantled
 
 // VSPEED_x: indicates the number of speed bonuses this vehicle gives to driving.
 #define VSPEED_VERY_SLOW  0 // No speed bonuses.
@@ -2452,7 +2455,7 @@ typedef struct vehicle_data vehicle_data;
 // The following vehicle flags are saved to file rather than read from the
 // prototype. Flags which are NOT included in this list can be altered with
 // OLC and affect live copies.
-#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE)
+#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE | VEH_PLAYER_NO_DISMANTLE | VEH_DISMANTLING)
 
 // The following vehicle flags indicate a vehicle can move
 #define MOVABLE_VEH_FLAGS  (VEH_DRIVING | VEH_SAILING | VEH_FLYING | VEH_DRAGGABLE | VEH_CAN_PORTAL | VEH_LEADABLE)

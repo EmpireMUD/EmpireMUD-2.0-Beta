@@ -4260,6 +4260,9 @@ const char *vehicle_flags[] = {
 	"VISIBLE-IN-DARK",	// 20
 	"!CLAIM",
 	"BUILDING",
+	"NEVER-DISMANTLE",
+	"*PLAYER-NO-DISMANTLE",
+	"*DISMANTLING",	// 25
 	"\n"
 };
 
@@ -4289,6 +4292,9 @@ const char *identify_vehicle_flags[] = {
 	"",	// "VISIBLE-IN-DARK",	// 20
 	"",	// "!CLAIM",
 	"",	// "BUILDING",
+	"",	// "NEVER-DISMANTLE",
+	"is set no-dismantle",
+	"being dismantled",	// 25
 	"\n"
 };
 

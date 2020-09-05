@@ -1021,7 +1021,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	char_data *vict;
 	
 	// basic setup
-	if (!type || !check_can_craft(ch, type) || !(veh = find_finishable_vehicle(ch, type, &junk))) {
+	if (!type || !check_can_craft(ch, type) || !(veh = find_finishable_vehicle(ch, type, &junk)) || VEH_FLAGGED(veh, VEH_DISMANTLING)) {
 		cancel_gen_craft(ch);
 		return;
 	}
@@ -1034,7 +1034,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	// find and apply something
 	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
 		// take the item; possibly free the res
-		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_CRAFT, veh, &VEH_BUILT_WITH(veh));
+		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_CRAFT, veh, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
 		
 		// experience per resource
 		if (GET_CRAFT_ABILITY(type) != NO_ABIL) {
