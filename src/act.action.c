@@ -39,6 +39,7 @@
 extern const char *tool_flags[];
 
 // external funcs
+void complete_vehicle(vehicle_data *veh);
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
@@ -2632,9 +2633,8 @@ void process_repairing(char_data *ch) {
 	// done?
 	if (!VEH_NEEDS_RESOURCES(veh)) {
 		GET_ACTION(ch) = ACT_NONE;
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
-		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 		act("$V is fully repaired!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+		complete_vehicle(veh);
 	}
 	else if (!found) {
 		GET_ACTION(ch) = ACT_NONE;

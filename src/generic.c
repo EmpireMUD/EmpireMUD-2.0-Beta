@@ -969,8 +969,8 @@ generic_data *create_generic_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_generic(char_data *ch, any_vnum vnum) {
-	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	void complete_building(room_data *room);
+	void complete_vehicle(vehicle_data *veh);
 	void refresh_all_quests(char_data *ch);
 	
 	struct trading_post_data *tpd, *next_tpd;
@@ -1101,17 +1101,12 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	}
 	
 	// remove from live resource lists: vehicle maintenance
-	DL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 		if (VEH_NEEDS_RESOURCES(veh)) {
 			remove_thing_from_resource_list(&VEH_NEEDS_RESOURCES(veh), res_type, vnum);
 			
 			if (!VEH_NEEDS_RESOURCES(veh)) {
-				// removing the resource finished the vehicle
-				if (VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
-					REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
-					adjust_vehicle_tech(veh, TRUE);
-					load_vtrigger(veh);
-				}
+				complete_vehicle(veh);	// this could purge it
 			}
 		}
 	}

@@ -1470,6 +1470,7 @@ VCMD(do_vat)  {
 
 
 VCMD(do_vrestore) {
+	void complete_vehicle(vehicle_data *veh);
 	extern const bool aff_is_bad[];
 	extern const double apply_values[];
 	
@@ -1563,10 +1564,8 @@ VCMD(do_vrestore) {
 		// not sure what to do for objs
 	}
 	if (vtarg) {
-		free_resource_list(VEH_NEEDS_RESOURCES(vtarg));
-		VEH_NEEDS_RESOURCES(vtarg) = NULL;
-		VEH_HEALTH(vtarg) = VEH_MAX_HEALTH(vtarg);
 		REMOVE_BIT(VEH_FLAGS(vtarg), VEH_ON_FIRE);
+		complete_vehicle(vtarg);
 	}
 	if (room) {
 		if (COMPLEX_DATA(room)) {

@@ -1157,6 +1157,7 @@ ACMD(do_mbuild) {
 
 
 ACMD(do_mrestore) {
+	void complete_vehicle(vehicle_data *veh);
 	extern const bool aff_is_bad[];
 	extern const double apply_values[];
 	
@@ -1253,10 +1254,8 @@ ACMD(do_mrestore) {
 		// not sure what to do for objs
 	}
 	if (veh) {
-		free_resource_list(VEH_NEEDS_RESOURCES(veh));
-		VEH_NEEDS_RESOURCES(veh) = NULL;
-		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		complete_vehicle(veh);
 	}
 	if (room) {
 		if (COMPLEX_DATA(room)) {

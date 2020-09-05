@@ -40,6 +40,7 @@ extern struct gen_craft_data_t gen_craft_data[];
 extern const char *tool_flags[];
 
 // external functions
+void complete_vehicle(vehicle_data *veh);
 INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
@@ -1010,9 +1011,6 @@ void finish_gen_craft(char_data *ch) {
 * @param craft_data *type The craft recipe.
 */
 void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
-	void adjust_vehicle_tech(vehicle_data *veh, bool add);
-	void finish_vehicle_setup(vehicle_data *veh);
-	
 	bool found = FALSE;
 	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
@@ -1046,13 +1044,8 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	
 	// done?
 	if (!VEH_NEEDS_RESOURCES(veh)) {
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
-		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 		act("$V is finished!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
-		if (VEH_OWNER(veh)) {
-			qt_empire_players(VEH_OWNER(veh), qt_gain_vehicle, VEH_VNUM(veh));
-			et_gain_vehicle(VEH_OWNER(veh), VEH_VNUM(veh));
-		}
+		complete_vehicle(veh);
 		
 		// stop all actors on this type
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
@@ -1060,12 +1053,6 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 				GET_ACTION(vict) = ACT_NONE;
 			}
 		}
-		
-		if (VEH_OWNER(veh)) {
-			adjust_vehicle_tech(veh, TRUE);
-		}
-		finish_vehicle_setup(veh);
-		load_vtrigger(veh);
 	}
 	else if (!found) {
 		msg_to_char(ch, "You run out of resources and stop %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);

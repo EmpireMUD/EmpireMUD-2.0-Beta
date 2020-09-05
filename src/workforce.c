@@ -2628,6 +2628,8 @@ void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
 
 
 void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
+	void complete_vehicle(vehicle_data *veh);
+	
 	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[CHORE_REPAIR_VEHICLES].mob);
 	struct empire_storage_data *store = NULL;
 	int islid = GET_ISLAND_ID(IN_ROOM(veh));
@@ -2683,8 +2685,7 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 		// check for completion
 		if (!VEH_NEEDS_RESOURCES(veh)) {
 			act("$n finishes repairing $V.", FALSE, worker, NULL, veh, TO_ROOM);
-			REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
-			VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+			complete_vehicle(veh);
 		}
 	}
 	else if (can_do) {
@@ -2694,6 +2695,7 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 	}
 	
 	if (!can_do) {
+		// veh could be purged by this point, but only if can_do was TRUE
 		log_workforce_problem(emp, IN_ROOM(veh), CHORE_REPAIR_VEHICLES, WF_PROB_NO_RESOURCES, FALSE);
 	}
 }

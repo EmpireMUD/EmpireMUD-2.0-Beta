@@ -42,7 +42,7 @@ const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 // local protos
 void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 void clear_vehicle(vehicle_data *veh);
-extern room_data *create_room(room_data *home);
+void finish_dismantle_vehicle(vehicle_data *veh);
 
 // external consts
 extern const char *designate_flags[];
@@ -53,7 +53,9 @@ extern const char *vehicle_flags[];
 extern const char *vehicle_speed_types[];
 
 // external funcs
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
+extern room_data *create_room(room_data *home);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 extern char *show_color_codes(char *string);
 extern bool validate_icon(char *icon);
@@ -709,6 +711,46 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 
 
 /**
+* This is called when a vehicle no longer needs resources. It checks flags and
+* health, and it will also remove the INCOMPLETE flag if present. It can safely
+* be called on vehicles that are done being repaired, too.
+*
+* WARNING: Calling this on a vehicle that is being dismantled will result in
+* it passing to finish_dismantle_vehicle(), which can purge the vehicle.
+*
+* @param vehicle_data *veh The vehicle.
+*/
+void complete_vehicle(vehicle_data *veh) {
+	if (VEH_IS_DISMANTLING(veh)) {
+		// short-circuit out to dismantling
+		finish_dismantle_vehicle(veh);
+		return;
+	}
+	
+	// restore
+	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+	
+	// remove resources
+	free_resource_list(VEH_NEEDS_RESOURCES(veh));
+	VEH_NEEDS_RESOURCES(veh) = NULL;
+	
+	// only if it was incomplete:
+	if (VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
+		
+		if (VEH_OWNER(veh)) {
+			qt_empire_players(VEH_OWNER(veh), qt_gain_vehicle, VEH_VNUM(veh));
+			et_gain_vehicle(VEH_OWNER(veh), VEH_VNUM(veh));
+			adjust_vehicle_tech(veh, TRUE);
+		}
+		
+		finish_vehicle_setup(veh);
+		load_vtrigger(veh);
+	}
+}
+
+
+/**
 * Saves the vehicles list for a room to the room file.
 *
 * @param vehicle_data *room_list The list of vehicles in the room.
@@ -722,6 +764,18 @@ void Crash_save_vehicles(vehicle_data *room_list, FILE *fl) {
 	DL_FOREACH2(room_list, iter, next_in_room) {
 		store_one_vehicle_to_file(iter, fl);
 	}
+}
+
+
+/**
+* Completes the dismantling of a vehicle and extracts it.
+*
+* @param vehicle_data *veh The vehicle.
+*/
+void finish_dismantle_vehicle(vehicle_data *veh) {
+	// ?
+	// messaging
+	extract_vehicle(veh);
 }
 
 
@@ -951,7 +1005,7 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	VEH_NEEDS_RESOURCES(veh) = NULL;
 	VEH_BUILT_WITH(veh) = NULL;
 	IN_ROOM(veh) = NULL;
-	REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);	// ensure not marked incomplete
+	REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE | VEH_DISMANTLING);	// ensure not marked incomplete/dismantle
 	
 	veh->script_id = 0;	// initialize later
 	

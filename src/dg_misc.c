@@ -416,7 +416,6 @@ void do_dg_build(room_data *target, char *argument) {
 * @param vehicle_data *veh Optional: A vehicle whose ownership to change.
 */
 void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh) {
-	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	void kill_empire_npc(char_data *ch);
 	void perform_abandon_vehicle(vehicle_data *veh);
 	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
