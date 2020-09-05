@@ -1571,7 +1571,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 		// already being dismantled: RESUME
 		if (can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
 			act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
-			act("$n begins to dismantle $V.\r\n", FALSE, ch, NULL, veh, TO_ROOM);
+			act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM);
 			start_action(ch, ACT_DISMANTLE_VEHICLE, 0);
 			GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
 			command_lag(ch, WAIT_OTHER);
@@ -1613,7 +1613,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	else {
 		// ok: start dismantle
 		act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n begins to dismantle $V.\r\n", FALSE, ch, NULL, veh, TO_ROOM);
+		act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM);
 		
 		start_dismantle_vehicle(veh);
 		start_action(ch, ACT_DISMANTLE_VEHICLE, 0);
