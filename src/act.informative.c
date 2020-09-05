@@ -1090,7 +1090,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	extern bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
 	
 	char buf[MAX_STRING_LENGTH];
-	size_t size = 0;
+	size_t size = 0, pos;
 	
 	// pre-description
 	if (VEH_OWNER(veh) && (VEH_OWNER(veh) != ROOM_OWNER(IN_ROOM(veh)) || !VEH_CLAIMS_WITH_ROOM(veh))) {
@@ -1105,10 +1105,14 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
 	}
 	else if (VEH_IS_DISMANTLING(veh)) {
+		pos = size;
 		size += snprintf(buf + size, sizeof(buf) - size, "%s is being dismantled.\r\n", VEH_SHORT_DESC(veh));
+		*(buf + pos) = UPPER(*(buf + pos));
 	}
 	else {
+		pos = size;
 		size += snprintf(buf + size, sizeof(buf) - size, "%s is under construction.\r\n", VEH_SHORT_DESC(veh));
+		*(buf + pos) = UPPER(*(buf + pos));
 	}
 	
 	// additional descriptions like what's attached:
