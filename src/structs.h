@@ -1142,7 +1142,7 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_ABANDON_FARMED  23
 #define CHORE_NEXUS_CRYSTALS  24
 #define CHORE_MILLING  25
-#define CHORE_REPAIR_VEHICLES  26
+	#define CHORE_UNUSED  26	// formerly: CHORE_REPAIR_VEHICLES  26, merged with CHORE_MAINTENANCE
 #define CHORE_OILMAKING  27
 #define CHORE_GENERAL  28	// for reporting problems
 #define CHORE_FISHING  29

@@ -123,7 +123,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "abandon-farmed", NOTHING, FALSE },
 	{ "nexus-crystals", APPRENTICE_EXARCH, FALSE },
 	{ "milling", MILL_WORKER, FALSE },
-	{ "repair-vehicles", VEHICLE_REPAIRMAN, FALSE },
+		{ "unused", VEHICLE_REPAIRMAN, TRUE },	// note: formerly repair-vehicles, which merged with maintenance
 	{ "oilmaking", PRESS_WORKER, FALSE },
 	{ "general", NOTHING, TRUE },
 	{ "fishing", FISHERMAN, FALSE },

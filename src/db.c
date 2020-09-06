@@ -1964,6 +1964,7 @@ const char *versions_list[] = {
 	"b5.94",
 	"b5.99",
 	"b5.102",
+	"b5.103",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -4439,6 +4440,23 @@ void b5_102_home_cleanup(void) {
 }
 
 
+// b5.103 removes the REPAIR-VEHICLES workforce chore
+void b5_103_update(void) {
+	void set_workforce_limit_all(empire_data *emp, int chore, int limit);
+	empire_data *emp, *next_emp;
+	
+	const int CHORE_REPAIR_VEHICLES = 26;
+	
+	log("Applying b5.103 update to remove the repair-vehicles workforce chore...");
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// this chore is gone
+		set_workforce_limit_all(emp, CHORE_REPAIR_VEHICLES, 0);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4757,6 +4775,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.102")) {
 			b5_102_home_cleanup();
+		}
+		if (MATCH_VERSION("b5.103")) {
+			b5_103_update();
 		}
 	}
 	
