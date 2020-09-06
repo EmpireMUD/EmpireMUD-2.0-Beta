@@ -324,8 +324,8 @@ vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, int with_
 	
 	DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), iter, next_in_room) {
 		// skip finished vehicles
-		if (VEH_IS_COMPLETE(iter)) {
-			continue;
+		if (!VEH_FLAGGED(iter, VEH_INCOMPLETE)) {
+			continue;	// don't use VEH_IS_COMPLETE as it includes no-resources-needed
 		}
 		// there is at least 1 incomplete vehicle here
 		found = iter;
@@ -1549,6 +1549,8 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 	snprintf(buf, sizeof(buf), "$n lays the framework and begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_ROOM);
+	
+	process_gen_craft_vehicle(ch, type);
 }
 
 
