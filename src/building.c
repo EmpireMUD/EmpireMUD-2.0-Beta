@@ -1586,7 +1586,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	else if (WATER_SECT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't dismantle it in the water.\r\n");
 	}
-	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+	else if (VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You can't dismantle a %s you don't own.\r\n", VEH_OR_BLD(veh));
 	}
 	else if (GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE)) {
