@@ -196,9 +196,6 @@ Crafts (CEDIT):
   spearhead item as a resource to make the craft, too. You'll only be able to
   craft it when the spearhead is in your inventory, but it will consume the
   spearhead when you make it.
-- If you use the requiresobject on a BUILD craft, it will always be consumed
-  when the building is started. This is different from other types of crafts,
-  where the requiresobject is only consumed if it's a "resource" too.
 - Scalable objects should not be used as resources or required objects for
   craft recipes. These items aren't stored, so if they're refunded, they will
   scale to their minimum level and lose any modifications.
@@ -206,6 +203,9 @@ Crafts (CEDIT):
 - There are two ways to require a tool: the <tool> field, which requires you
   have one equipped, or the 'tool' resource type, which requires a tool in
   the player's inventory that can be spent to craft.
+- If you flag a craft TAKE-REQUIRED-OBJ, that object will be refunded if you
+  cancel the craft, or if you dismantle the building/vehicle -- unless the
+  object is flagged 1-USE.
 
 Crops (CROPEDIT):
 - Crop names are always lowercase because they are used to build sentences.
