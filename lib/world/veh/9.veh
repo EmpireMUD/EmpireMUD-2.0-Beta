@@ -149,7 +149,7 @@ There is a wooden canoe here.~
 to the edge of the water, 'sit' in it, and then type 'sail <direction>'.
 ~
 ~
-cfghlnu 3 3 0 0 0 0 0
+cfghlnux 3 3 0 0 0 0 0
 P
 0
 R
@@ -200,7 +200,7 @@ A poorly-constructed raft is floating here.~
 still 'sit' on it and 'sail' it toward land. You can also 'drag' it on land.
 ~
 ~
-cfhlnu 3 2 0 0 0 0 0
+cfhlnux 3 2 0 0 0 0 0
 P
 0
 R

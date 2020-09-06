@@ -6,7 +6,7 @@ A colossal ankle brace encircles the base of the leg.~
 back to its scaffolding for repairs.
 ~
 ~
-uv 19 1000 0 0 0 0 0
+uvx 19 1000 0 0 0 0 0
 P
 2
 T 12524
@@ -21,7 +21,7 @@ made for walking nonetheless. This boot is large enough to hold a single
 person, with room for cargo in the... boot.
 ~
 ~
-befgiu 15 24 200 0 0 0 0
+befgiux 15 24 200 0 0 0 0
 C
 0 200
 P
