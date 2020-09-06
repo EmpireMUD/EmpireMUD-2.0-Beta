@@ -1284,6 +1284,12 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT | CRAFT_SOUP | CRAFT_VEHICLE) || GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
 			continue;
 		}
+		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && CRAFT_FLAGGED(craft, CRAFT_TAKE_REQUIRED_OBJ)) {
+			continue;	// don't allow crafts with TAKE-REQUIRED-OBJ
+		}
+		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !find_stored_resource(emp, islid, GET_CRAFT_REQUIRES_OBJ(craft))) {
+			continue;	// missing required-obj
+		}
 		// pass through validator function
 		if (!validator || !(validator)(emp, room, chore, craft)) {
 			continue;
