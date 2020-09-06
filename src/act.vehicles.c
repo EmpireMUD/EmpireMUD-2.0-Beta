@@ -2345,7 +2345,6 @@ ACMD(do_repair) {
 ACMD(do_scrap) {
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
-	craft_data *craft;
 	char_data *iter;
 	
 	one_argument(argument, arg);
@@ -2365,13 +2364,10 @@ ACMD(do_scrap) {
 	else {
 		// seems good... but make sure nobody is working on it
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
-			if (IS_NPC(iter) || GET_ACTION(iter) != ACT_GEN_CRAFT) {
+			if (IS_NPC(iter) || (GET_ACTION(iter) != ACT_GEN_CRAFT && GET_ACTION(iter) != ACT_DISMANTLE_VEHICLE)) {
 				continue;
 			}
-			if (!(craft = craft_proto(GET_ACTION_VNUM(iter, 0)))) {
-				continue;
-			}
-			if (!CRAFT_FLAGGED(craft, CRAFT_VEHICLE) || GET_CRAFT_OBJECT(craft) != VEH_VNUM(veh)) {
+			if (GET_ACTION_VNUM(iter, 1) != VEH_CONSTRUCTION_ID(veh)) {
 				continue;
 			}
 			

@@ -204,11 +204,23 @@ void empty_vehicle(vehicle_data *veh) {
 * @return craft_data* The craft for that building, or NULL.
 */
 craft_data *find_craft_for_vehicle(vehicle_data *veh) {
-	craft_data *iter, *next_iter;
+	craft_data *craft, *next_craft;
+	any_vnum recipe;
 	
-	HASH_ITER(hh, craft_table, iter, next_iter) {
-		if (IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_VEHICLE) && GET_CRAFT_OBJECT(iter) == VEH_VNUM(veh)) {
-			return iter;
+	if ((recipe = get_vehicle_extra_data(veh, ROOM_EXTRA_BUILD_RECIPE)) > 0 && (craft = craft_proto(recipe))) {
+		return craft;
+	}
+	else {
+		HASH_ITER(hh, craft_table, craft, next_craft) {
+			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT) || !CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+				continue;	// not a valid target
+			}
+			if (GET_CRAFT_OBJECT(craft) != VEH_VNUM(veh)) {
+				continue;
+			}
+		
+			// we have a match!
+			return craft;
 		}
 	}
 	
@@ -1405,6 +1417,7 @@ int sort_vehicles(vehicle_data *a, vehicle_data *b) {
 void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	void Crash_save(obj_data *obj, FILE *fp, int location);
 	
+	struct room_extra_data *red, *next_red;
 	struct vehicle_attached_mob *vam;
 	char temp[MAX_STRING_LENGTH];
 	struct resource_data *res;
@@ -1480,6 +1493,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 		LL_FOREACH(VEH_BUILT_WITH(veh), res) {
 			fprintf(fl, "Built-with: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
 		}
+	}
+	HASH_ITER(hh, VEH_EXTRA_DATA(veh), red, next_red) {
+		fprintf(fl, "Extra-data: %d %d\n", red->type, red->value);
 	}
 	
 	// scripts
@@ -1680,6 +1696,14 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 							extract_vehicle(veh);
 							return NULL;
 						}
+					}
+				}
+				break;
+			}
+			case 'E': {
+				if (OBJ_FILE_TAG(line, "Extra-data:", length)) {
+					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+						set_extra_data(&VEH_EXTRA_DATA(veh), i_in[0], i_in[1]);
 					}
 				}
 				break;
@@ -3100,8 +3124,10 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	extern char *get_room_name(room_data *room, bool color);
 	void script_stat (char_data *ch, struct script_data *sc);
 	void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
+	extern const char *room_extra_types[];
 	
 	char buf[MAX_STRING_LENGTH * 2], part[MAX_STRING_LENGTH];
+	struct room_extra_data *red, *next_red;
 	obj_data *obj;
 	size_t size;
 	int found;
@@ -3200,6 +3226,14 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	send_to_char(buf, ch);
 	show_spawn_summary_to_char(ch, VEH_SPAWNS(veh));
+	
+	if (VEH_EXTRA_DATA(veh)) {
+		msg_to_char(ch, "Extra data:\r\n");
+		HASH_ITER(hh, VEH_EXTRA_DATA(veh), red, next_red) {
+			sprinttype(red->type, room_extra_types, buf);
+			msg_to_char(ch, " %s: %d\r\n", buf, red->value);
+		}
+	}
 	
 	// script info
 	msg_to_char(ch, "Script information:\r\n");

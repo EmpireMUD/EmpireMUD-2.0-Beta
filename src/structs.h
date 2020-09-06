@@ -5502,6 +5502,7 @@ struct vehicle_data {
 	char_data *sitting_on;	// person sitting on it
 	char_data *driver;	// person driving it
 	int construction_id;	// temporary id used to resume construction/dismantle
+	struct room_extra_data *extra_data;	// hash of misc storage
 	
 	// scripting
 	int script_id;	// used by DG triggers - unique id
@@ -5724,7 +5725,7 @@ struct room_direction_data {
 };
 
 
-// for storing misc vals to the room
+// for storing misc vals to the room (or vehicle)
 struct room_extra_data {
 	int type;	// ROOM_EXTRA_
 	int value;

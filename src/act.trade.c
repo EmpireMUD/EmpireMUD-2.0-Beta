@@ -361,7 +361,7 @@ vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, int with_
 * @return vehicle_data* The found vehicle, or NULL if none.
 */
 vehicle_data *find_vehicle_to_resume_by_name(char_data *ch, int craft_type, char *name, craft_data **found_craft) {
-	craft_data *craft, *next_craft;
+	extern craft_data *find_craft_for_vehicle(vehicle_data *veh);
 	vehicle_data *veh;
 	
 	*found_craft = NULL;
@@ -377,22 +377,13 @@ vehicle_data *find_vehicle_to_resume_by_name(char_data *ch, int craft_type, char
 			continue;	// not allowed to work on it
 		}
 		
-		// seems to be a match... now find a matching craft
-		HASH_ITER(hh, craft_table, craft, next_craft) {
-			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT) || !CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
-				continue;	// not a valid target
-			}
-			if (GET_CRAFT_OBJECT(craft) != VEH_VNUM(veh)) {
-				continue;
-			}
-			
-			// we have a match!
-			*found_craft = craft;
-			return veh;
+		// ok: see if we have a craft for it
+		if ((*found_craft = find_craft_for_vehicle(veh))) {
+			return veh;	// and return it if so
 		}
 	}
 	
-	return NULL;
+	return NULL;	// if not
 }
 
 
@@ -1517,6 +1508,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	VEH_HEALTH(veh) = MAX(1, VEH_MAX_HEALTH(veh) * 0.2);	// start at 20% health, will heal on completion
 	scale_vehicle_to_level(veh, get_craft_scale_level(ch, type));
 	VEH_CONSTRUCTION_ID(veh) = get_new_vehicle_construction_id();
+	set_vehicle_extra_data(veh, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
 	
 	start_action(ch, ACT_GEN_CRAFT, -1);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);
