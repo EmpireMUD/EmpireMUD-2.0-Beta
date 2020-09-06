@@ -60,7 +60,8 @@ void do_chore_shearing(empire_data *emp, room_data *room);
 void do_chore_trapping(empire_data *emp, room_data *room);
 
 void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh);
-void vehicle_chore_repair(empire_data *emp, vehicle_data *veh);
+void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore);
+void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh);
 
 // other locals
 int empire_chore_limit(empire_data *emp, int island_id, int chore);
@@ -70,6 +71,7 @@ void mark_workforce_delay(empire_data *emp, room_data *room, int chore, int prob
 bool workforce_is_delayed(empire_data *emp, room_data *room, int chore);
 
 // external functions
+int count_building_vehicles_in_room(room_data *room, empire_data *only_owner);	// vehicles.c
 void empire_skillup(empire_data *emp, any_vnum ability, double amount);	// skills.c
 void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component);
 void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
@@ -320,9 +322,17 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		return;
 	}
 	// REPAIR
-	if (VEH_IS_COMPLETE(veh) && VEH_NEEDS_RESOURCES(veh) && empire_chore_limit(emp, island, CHORE_REPAIR_VEHICLES)) {
-		vehicle_chore_repair(emp, veh);
-		return;	// no further chores while repairing
+	if (VEH_NEEDS_RESOURCES(veh) || !VEH_IS_COMPLETE(veh)) {
+		if (VEH_IS_DISMANTLING(veh) && empire_chore_limit(emp, island, CHORE_BUILDING)) {
+			vehicle_chore_dismantle(emp, veh);
+		}
+		else if (!VEH_IS_COMPLETE(veh) && empire_chore_limit(emp, island, CHORE_BUILDING)) {
+			vehicle_chore_build(emp, veh, CHORE_BUILDING);
+		}
+		else if (empire_chore_limit(emp, island, CHORE_MAINTENANCE)) {
+			vehicle_chore_build(emp, veh, CHORE_MAINTENANCE);
+		}
+		return;	// no further chores while working on the building
 	}
 	
 	// any further chores require no no-work flag
@@ -1769,7 +1779,6 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 				found = TRUE;
 				res->amount -= 1;
 				add_to_empire_storage(emp, GET_ISLAND_ID(room), res->vnum, 1);
-				add_production_total(emp, res->vnum, 1);
 			}
 			
 			// remove res?
@@ -2619,6 +2628,9 @@ void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[CHORE_FIRE_BRIGADE].mob);
 	
 	if (worker && VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		// reset spawn time to prevent despawn
+		MOB_SPAWN_TIME(worker) = time(0);
+		
 		add_empire_needs(emp, GET_ISLAND_ID(IN_ROOM(veh)), ENEED_WORKFORCE, 1);
 		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
 		
@@ -2633,10 +2645,11 @@ void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
 }
 
 
-void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
+// handles both build (CHORE_BUILD) and repair (CHORE_MAINTENANCE)
+void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 	void complete_vehicle(vehicle_data *veh);
 	
-	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[CHORE_REPAIR_VEHICLES].mob);
+	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[chore].mob);
 	struct empire_storage_data *store = NULL;
 	int islid = GET_ISLAND_ID(IN_ROOM(veh));
 	struct resource_data *res;
@@ -2661,21 +2674,24 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 		add_empire_needs(emp, GET_ISLAND_ID(IN_ROOM(veh)), ENEED_WORKFORCE, 1);
 		
 		if (res) {
+			// reset spawn time to prevent despawn
+			MOB_SPAWN_TIME(worker) = time(0);
+			
 			if (res->type == RES_OBJECT) {
-				//if (mode == CHORE_MAINTENANCE) {
+				if (chore == CHORE_MAINTENANCE) {
 					// remove an older matching object
 					remove_like_item_from_built_with(&VEH_BUILT_WITH(veh), obj_proto(res->vnum));
-				//}
+				}
 				charge_stored_resource(emp, islid, res->vnum, 1);
 				if (!VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
 					add_to_resource_list(&VEH_BUILT_WITH(veh), RES_OBJECT, res->vnum, 1, 1);
 				}
 			}
 			else if (res->type == RES_COMPONENT) {
-				// if (mode == CHORE_MAINTENANCE) {
+				if (chore == CHORE_MAINTENANCE) {
 					// remove an older matching component
 					remove_like_component_from_built_with(&VEH_BUILT_WITH(veh), res->vnum);
-				//}
+				}
 				charge_stored_component(emp, islid, res->vnum, 1, FALSE, TRUE, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
 			}
 			// apply it
@@ -2690,18 +2706,112 @@ void vehicle_chore_repair(empire_data *emp, vehicle_data *veh) {
 		
 		// check for completion
 		if (!VEH_NEEDS_RESOURCES(veh)) {
-			act("$n finishes repairing $V.", FALSE, worker, NULL, veh, TO_ROOM);
+			sprintf(buf, "$n finishes %s $V.", (chore == CHORE_MAINTENANCE) ? "repairing" : "constructing");
+			act(buf, FALSE, worker, NULL, veh, TO_ROOM);
 			complete_vehicle(veh);
 		}
 	}
 	else if (can_do) {
-		if ((worker = place_chore_worker(emp, CHORE_REPAIR_VEHICLES, IN_ROOM(veh)))) {
+		if ((worker = place_chore_worker(emp, chore, IN_ROOM(veh)))) {
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// vehicle chore workers should always be marked SPAWNED right away
 		}
 	}
 	
 	if (!can_do) {
 		// veh could be purged by this point, but only if can_do was TRUE
-		log_workforce_problem(emp, IN_ROOM(veh), CHORE_REPAIR_VEHICLES, WF_PROB_NO_RESOURCES, FALSE);
+		log_workforce_problem(emp, IN_ROOM(veh), chore, WF_PROB_NO_RESOURCES, FALSE);
+	}
+}
+
+
+// handles CHORE_BUILD on vehicles that are mid-dismantle
+void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
+	void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
+	
+	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[CHORE_BUILDING].mob);
+	struct resource_data *res, *found_res = NULL;
+	int islid = GET_ISLAND_ID(IN_ROOM(veh));
+	bool can_do = FALSE, found = FALSE;
+	room_data *room = IN_ROOM(veh);
+	char_data *chiter;
+	obj_data *proto;
+	
+	// anything we can dismantle?
+	if (!VEH_NEEDS_RESOURCES(veh)) {
+		can_do = TRUE;
+	}
+	else {
+		LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
+			if (res->type == RES_OBJECT && (proto = obj_proto(res->vnum)) && GET_OBJ_STORAGE(proto)) {
+				can_do = TRUE;
+				found_res = res;
+				break;
+			}
+		}
+	}
+	
+	if (can_do && worker) {
+		add_empire_needs(emp, islid, ENEED_WORKFORCE, 1);
+		
+		if (found_res) {
+			// reset spawn time to prevent despawn
+			MOB_SPAWN_TIME(worker) = time(0);
+			
+			if (found_res->amount > 0) {
+				found = TRUE;
+				found_res->amount -= 1;
+				add_to_empire_storage(emp, islid, found_res->vnum, 1);
+			}
+			
+			// remove res?
+			if (found_res->amount <= 0) {
+				LL_DELETE(VEH_NEEDS_RESOURCES(veh), found_res);
+				free(found_res);
+				found_res = NULL;
+			}
+		}
+		
+		// check for completion
+		if (!VEH_NEEDS_RESOURCES(veh)) {
+			// shut off any player who was working on this dismantle
+			DL_FOREACH2(ROOM_PEOPLE(room), chiter, next_in_room) {
+				if (!IS_NPC(chiter) && (GET_ACTION(chiter) == ACT_DISMANTLE_VEHICLE || GET_ACTION(chiter) == ACT_GEN_CRAFT)) {
+					if (GET_ACTION_VNUM(chiter, 1) == VEH_CONSTRUCTION_ID(veh)) {
+						cancel_action(chiter);
+					}
+				}
+			}
+			// no need to stop worker or other npcs -- npcs working on vehicles have SPAWNED
+			
+			act("$n finishes dismantling $V.", FALSE, worker, NULL, veh, TO_ROOM);
+			
+			// ok, finish dismantle (purges vehicle)
+			finish_dismantle_vehicle(worker, veh);
+			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// in case
+			
+			// auto-abandon?
+			if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && empire_chore_limit(emp, islid, CHORE_ABANDON_DISMANTLED)) {
+				// auto-abandon only if they have no other buildings left
+				if (count_building_vehicles_in_room(room, ROOM_OWNER(room)) == 0) {
+					abandon_room(room);
+				}
+			}
+		}
+
+		if (!found) {
+			// no work remains: ensure despawn
+			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+		}
+	}
+	else if (can_do) {
+		if ((worker = place_chore_worker(emp, CHORE_BUILDING, IN_ROOM(veh)))) {
+			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// vehicle chore workers should always be marked SPAWNED right away
+		}
+	}
+	else if (worker) {
+		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
+	}
+	else {
+		mark_workforce_delay(emp, room, CHORE_BUILDING, NOTHING);
 	}
 }

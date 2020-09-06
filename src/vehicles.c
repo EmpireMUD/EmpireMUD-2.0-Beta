@@ -114,6 +114,28 @@ int count_harnessed_animals(vehicle_data *veh) {
 
 
 /**
+* Counts how many building-vehicles are in the room (testing using the
+* VEH_CLAIMS_WITH_ROOM() macro). Optionally, you can check the owner, too.
+*
+* @param room_data *room The location.
+* @param empire_data *only_owner Optional: Only count ones owned by this person (NULL for any-owner).
+* @return int The number of building-vehicles in the room.
+*/
+int count_building_vehicles_in_room(room_data *room, empire_data *only_owner) {
+	vehicle_data *veh;
+	int count = 0;
+	if (room) {
+		DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+			if (VEH_CLAIMS_WITH_ROOM(veh) && (!only_owner || VEH_OWNER(veh) == only_owner)) {
+				++count;
+			}
+		}
+	}
+	return count;
+}
+
+
+/**
 * Determines how many players are inside a vehicle.
 *
 * @param vehicle_data *veh The vehicle to check.
