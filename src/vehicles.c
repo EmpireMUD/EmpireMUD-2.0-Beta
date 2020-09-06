@@ -2317,7 +2317,7 @@ struct convert_vehicle_data {
 	struct convert_vehicle_data *next;
 };
 
-struct convert_vehicle_data *convert_vehicle_list = NULL;
+struct convert_vehicle_data *list_of_vehicles_to_convert = NULL;
 
 /**
 * Stores data for a mob that was supposed to be attached to a vehicle.
@@ -2328,7 +2328,7 @@ void add_convert_vehicle_data(char_data *mob, any_vnum vnum) {
 	CREATE(cvd, struct convert_vehicle_data, 1);
 	cvd->mob = mob;
 	cvd->vnum = vnum;
-	LL_PREPEND(convert_vehicle_list, cvd);
+	LL_PREPEND(list_of_vehicles_to_convert, cvd);
 }
 
 
@@ -2345,8 +2345,8 @@ int run_convert_vehicle_list(void) {
 	vehicle_data *veh;
 	int changed = 0;
 	
-	while ((cvd = convert_vehicle_list)) {
-		convert_vehicle_list = cvd->next;
+	while ((cvd = list_of_vehicles_to_convert)) {
+		list_of_vehicles_to_convert = cvd->next;
 		
 		if (cvd->mob && IN_ROOM(cvd->mob)) {
 			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(cvd->mob)), veh, next_in_room) {
