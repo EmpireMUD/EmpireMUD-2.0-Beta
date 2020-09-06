@@ -1650,7 +1650,7 @@ ACMD(do_dismantle) {
 	
 	// not a vehicle
 	if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
-		msg_to_char(ch, "Dismantle this %s from outside instead.\r\n", VEH_OR_BLD(veh));
+		msg_to_char(ch, "Dismantle this %s from outside instead.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(IN_ROOM(ch))));
 		return;
 	}
 	
