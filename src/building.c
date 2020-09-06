@@ -44,6 +44,7 @@ INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
 void free_complex_data(struct complex_room_data *data);
+extern craft_data *find_craft_for_vehicle(vehicle_data *veh);
 extern char *get_room_name(room_data *room, bool color);
 extern room_data *create_room(room_data *home);
 extern bool has_learned_craft(char_data *ch, any_vnum vnum);
@@ -1557,6 +1558,8 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	void process_dismantle_vehicle(char_data *ch);
 	void start_dismantle_vehicle(vehicle_data *veh);
 	
+	craft_data *craft;
+	
 	if (!ch || !veh || IS_NPC(ch)) {
 		return;	// safety
 	}
@@ -1588,6 +1591,9 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	else if (GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE)) {
 		msg_to_char(ch, "You don't have permission to dismantle that.\r\n");
+	}
+	else if ((craft = find_craft_for_vehicle(veh)) && GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+		msg_to_char(ch, "You don't have the skill needed to dismantle that properly.\r\n");
 	}
 	else if (VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
 		msg_to_char(ch, "That cannot be dismantled.\r\n");
