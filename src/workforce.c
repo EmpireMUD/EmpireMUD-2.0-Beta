@@ -2729,9 +2729,9 @@ void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 	void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
 	
 	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[CHORE_BUILDING].mob);
+	bool can_do = FALSE, found = FALSE, claims_with_room;
 	struct resource_data *res, *found_res = NULL;
 	int islid = GET_ISLAND_ID(IN_ROOM(veh));
-	bool can_do = FALSE, found = FALSE;
 	room_data *room = IN_ROOM(veh);
 	char_data *chiter;
 	obj_data *proto;
@@ -2783,14 +2783,13 @@ void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 			}
 			// no need to stop worker or other npcs -- npcs working on vehicles have SPAWNED
 			
-			act("$n finishes dismantling $V.", FALSE, worker, NULL, veh, TO_ROOM);
-			
 			// ok, finish dismantle (purges vehicle)
-			finish_dismantle_vehicle(worker, veh);
+			claims_with_room = VEH_CLAIMS_WITH_ROOM(veh);
+			finish_dismantle_vehicle(worker, veh);	// sends own message
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// in case
 			
 			// auto-abandon?
-			if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && empire_chore_limit(emp, islid, CHORE_ABANDON_DISMANTLED)) {
+			if (claims_with_room && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && empire_chore_limit(emp, islid, CHORE_ABANDON_DISMANTLED)) {
 				// auto-abandon only if they have no other buildings left
 				if (count_building_vehicles_in_room(room, ROOM_OWNER(room)) == 0) {
 					abandon_room(room);
