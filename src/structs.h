@@ -1056,6 +1056,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_LEARNED  BIT(16)	// cannot use unless learned
 #define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
 #define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
+#define CRAFT_TAKE_REQUIRED_OBJ  BIT(19)	// causes the craft to take the 'required-obj' when created, if any (and may refund it on dismantle)
 
 // list of above craft flags that require a building in some way
 #define CRAFT_FLAGS_REQUIRING_BUILDINGS  (CRAFT_GLASSBLOWER | CRAFT_CARPENTER | CRAFT_ALCHEMY | CRAFT_SHIPYARD)

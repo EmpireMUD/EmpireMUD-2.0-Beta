@@ -1618,6 +1618,7 @@ const char *craft_flags[] = {
 	"LEARNED",
 	"BY-RIVER",
 	"REMOVE-PRODUCTION",
+	"TAKE-REQUIRED-OBJ",
 	"\n"
 };
 
@@ -1643,6 +1644,7 @@ const char *craft_flag_for_info[] = {
 	"",	// learned
 	"must be by a river",
 	"",	// remove-production
+	"",	// take-required-obj
 	"\n"
 };
 

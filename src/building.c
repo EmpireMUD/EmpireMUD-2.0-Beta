@@ -624,7 +624,7 @@ void finish_dismantle(char_data *ch, room_data *room) {
 	
 	// check for required obj and return it
 	if ((type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL)) || (type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
-		if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && (proto = obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) && !OBJ_FLAGGED(proto, OBJ_SINGLE_USE)) {
+		if (CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ) && GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && (proto = obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) && !OBJ_FLAGGED(proto, OBJ_SINGLE_USE)) {
 			newobj = read_object(GET_CRAFT_REQUIRES_OBJ(type), TRUE);
 			
 			// scale item to minimum level
@@ -645,7 +645,7 @@ void finish_dismantle(char_data *ch, room_data *room) {
 			load_otrigger(newobj);
 		}
 	}
-			
+	
 	disassociate_building(room);
 }
 
@@ -1530,15 +1530,15 @@ ACMD(do_build) {
 	}
 
 	// take away the required item
-	if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj) {
-		act("You use $p.", FALSE, ch, found_obj, 0, TO_CHAR);
+	if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ)) {
+		act("You use $p.", FALSE, ch, found_obj, NULL, TO_CHAR);
 		extract_obj(found_obj);
 	}
 
 	start_action(ch, ACT_BUILDING, 0);
 	msg_to_char(ch, "You start to build %s %s!\r\n", AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
 	sprintf(buf, "$n begins to build %s %s!", AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
-	act(buf, FALSE, ch, 0, 0, TO_ROOM);
+	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	
 	// do a build action now
 	process_build(ch, IN_ROOM(ch), ACT_BUILDING);

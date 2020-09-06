@@ -262,8 +262,8 @@ vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id) {
 * @param vehicle_data *veh The vehicle being dismantled.
 */
 void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
-	// obj_data *newobj, *proto;
-	// craft_data *type;
+	obj_data *newobj, *proto;
+	craft_data *type;
 	char_data *iter;
 	
 	if (ch) {
@@ -284,9 +284,8 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 		}
 	}
 	
-	// check for required obj and return it -- not used for vehicles
-	/*
-	if (IN_ROOM(veh) && (type = find_craft_for_vehicle(veh)) && GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && (proto = obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) && !OBJ_FLAGGED(proto, OBJ_SINGLE_USE)) {
+	// check for required obj and return it
+	if (IN_ROOM(veh) && (type = find_craft_for_vehicle(veh)) && CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ) && GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && (proto = obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) && !OBJ_FLAGGED(proto, OBJ_SINGLE_USE)) {
 		newobj = read_object(GET_CRAFT_REQUIRES_OBJ(type), TRUE);
 		
 		// scale item to minimum level
@@ -306,7 +305,6 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 		}
 		load_otrigger(newobj);
 	}
-	*/
 			
 	extract_vehicle(veh);
 }

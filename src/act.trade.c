@@ -843,6 +843,27 @@ void cancel_gen_craft(char_data *ch) {
 			}
 			load_otrigger(obj);
 		}
+		
+		if (CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ) && GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) {
+			obj = read_object(GET_CRAFT_REQUIRES_OBJ(type), TRUE);
+			
+			// scale item to minimum level
+			scale_item_to_level(obj, 0);
+			
+			if (IS_NPC(ch)) {
+				obj_to_room(obj, IN_ROOM(ch));
+			}
+			else {
+				obj_to_char(obj, ch);
+				act("You get $p.", FALSE, ch, obj, NULL, TO_CHAR);
+				
+				// ensure binding
+				if (OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+					bind_obj_to_player(obj, ch);
+				}
+			}
+			load_otrigger(obj);
+		}
 	}
 	
 	GET_ACTION(ch) = ACT_NONE;
@@ -1450,6 +1471,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	
 	vehicle_data *veh, *to_craft = NULL, *found_other = NULL;
 	char buf[MAX_STRING_LENGTH];
+	obj_data *found_obj = NULL;
 	bool junk;
 	
 	// basic sanitation
@@ -1514,14 +1536,19 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);
 	GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
 	
+	if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING) {
+		find_and_bind(ch, GET_CRAFT_REQUIRES_OBJ(type));
+		
+		if ((found_obj = has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(type))) && CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ)) {
+			act("You use $p.", FALSE, ch, found_obj, NULL, TO_CHAR);
+			extract_obj(found_obj);
+		}
+	}
+	
 	snprintf(buf, sizeof(buf), "You lay the framework and begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 	snprintf(buf, sizeof(buf), "$n lays the framework and begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_ROOM);
-	
-	if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING) {
-		find_and_bind(ch, GET_CRAFT_REQUIRES_OBJ(type));
-	}
 }
 
 
@@ -1726,6 +1753,11 @@ ACMD(do_gen_craft) {
 		// do this BEFORE extract, as it may be extracted
 		if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING) {
 			find_and_bind(ch, GET_CRAFT_REQUIRES_OBJ(type));
+		
+			if (found_obj && CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ)) {
+				act("You use $p.", FALSE, ch, found_obj, NULL, TO_CHAR);
+				extract_obj(found_obj);
+			}
 		}
 		
 		// must call this after start_action() because it stores resources
@@ -1733,7 +1765,7 @@ ACMD(do_gen_craft) {
 		
 		msg_to_char(ch, "You start %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		sprintf(buf, "$n starts %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
-		act(buf, FALSE, ch, 0, 0, TO_ROOM);
+		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 

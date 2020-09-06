@@ -2511,6 +2511,8 @@ Available flags:
  REMOVE-PRODUCTION - removes this craft's resources from empire production
     counts. Used e.g. in smelting copper bars, to prevent smelt/separate loops.
     Does not work on vehicles/buildings.
+ TAKE-REQUIRED-OBJ - takes the 'required object' when you start the craft, and
+    may refund it when dismantled (unless the object is 1-USE)
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d

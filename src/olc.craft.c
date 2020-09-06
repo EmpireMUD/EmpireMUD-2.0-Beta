@@ -76,6 +76,10 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft not named");
 		problem = TRUE;
 	}
+	if (CRAFT_FLAGGED(craft, CRAFT_TAKE_REQUIRED_OBJ) && GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Has TAKE-REQUIRED-OBJ but requires no obj");
+		problem = TRUE;
+	}
 	
 	strcpy(temp, GET_CRAFT_NAME(craft));
 	strtolower(temp);
