@@ -68,7 +68,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "IN-DEVELOPMENT");
 		problem = TRUE;
 	}
-	if (!GET_CRAFT_RESOURCES(craft)) {
+	if (!GET_CRAFT_RESOURCES(craft) && (!CRAFT_FLAGGED(craft, CRAFT_TAKE_REQUIRED_OBJ) || GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING)) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires no resources");
 		problem = TRUE;
 	}
