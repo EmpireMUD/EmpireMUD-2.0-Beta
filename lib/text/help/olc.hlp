@@ -2527,6 +2527,7 @@ Fields:
   &c-flagged&0, &cunflagged&0 - see HELP CEDIT FLAGS
   &c-level -levelover -levelunder&0 - specific level requirement
   &c-quantity -quantityover -quantityunder&0 - specific quantity value
+  &c-requiresobject&0 - requires any object
   &c-time -timeover -timeunder&0 - specific craft time (in action ticks)
 
 Examples:
