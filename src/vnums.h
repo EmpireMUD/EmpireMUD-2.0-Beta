@@ -260,6 +260,7 @@
 #define ATYPE_UNSTUCK  3101
 #define ATYPE_POTION  3102
 #define ATYPE_HUNTED  3103
+#define ATYPE_WORKING  3104
 
 
 // GENERIC_COOLDOWN entires used by the code

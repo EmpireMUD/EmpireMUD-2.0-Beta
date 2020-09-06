@@ -332,7 +332,7 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		else if (empire_chore_limit(emp, island, CHORE_MAINTENANCE)) {
 			vehicle_chore_build(emp, veh, CHORE_MAINTENANCE);
 		}
-		return;	// no further chores while working on the building
+		return;	// no further chores while working on the building (dismantle may even have purged it)
 	}
 	
 	// any further chores require no no-work flag
@@ -625,6 +625,32 @@ bool can_gain_chore_resource_from_interaction(empire_data *emp, room_data *room,
 
 
 /**
+* Marks the empire and/or worker as having done some 'work'.
+*
+* @param empire_data *emp The empire whose workforce it is.
+* @param room_data *room Optional: The location of the work (required for food_need but may be NULL otherwise).
+* @param char_data *worker Optional: The worker NPC: will briefly stun them, and reset their spawn time.
+* @param int food_need Optional: Add to the food 'need' that the empire must pay to continue having a workforce (pass 0 if no-charge). Requires the 'room' var.
+*/
+void charge_workforce(empire_data *emp, room_data *room, char_data *worker, int food_need) {
+	struct affected_type *af;
+	
+	if (food_need && room) {
+		add_empire_needs(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, food_need);
+	}
+	
+	if (worker) {
+		// short stun to prevent re-use
+		af = create_flag_aff(ATYPE_WORKING, 1, AFF_STUNNED, worker);
+		affect_to_char_silent(worker, af);
+		
+		// update spawn time as they are still working (prevent despawn)
+		MOB_SPAWN_TIME(worker) = time(0);
+	}
+}
+
+
+/**
 * This runs once per mud hour to update all empire chores.
 */
 void chore_update(void) {
@@ -840,11 +866,15 @@ int empire_chore_limit(empire_data *emp, int island_id, int chore) {
 * any disabled copies of the worker, it marks them as spawned and does not
 * return them, which should later trigger a new worker to be placed.
 *
+* It will also find an artisan in the room and use that, if there is one. It
+* skips stunned mobs, who are probably doing another chore here.
+*
 * @param room_data *room The location to check.
 * @param mob_vnum vnum The worker vnum to look for.
 * @return char_data* The found mob, or NULL;
 */
 char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum) {
+	any_vnum artisan_vnum = NOTHING;
 	char_data *mob;
 	
 	// does not work if no vnum provided
@@ -852,10 +882,20 @@ char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum) {
 		return NULL;
 	}
 	
+	// can also use an artisan
+	if (GET_BUILDING(room)) {
+		artisan_vnum = GET_BLD_ARTISAN(GET_BUILDING(room));
+	}
+	
 	DL_FOREACH2(ROOM_PEOPLE(room), mob, next_in_room) {
-		// not our mob
-		if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum) {
-			continue;
+		if (!IS_NPC(mob)) {
+			continue;	// player
+		}
+		if (GET_MOB_VNUM(mob) != vnum && (artisan_vnum == NOTHING || GET_MOB_VNUM(mob) != artisan_vnum)) {
+			continue;	// wrong mob
+		}
+		if (AFF_FLAGGED(mob, AFF_STUNNED)) {
+			continue;	// probably doing another chore
 		}
 		
 		// mob is in some way incapacitated -- mark for despawn
@@ -2628,10 +2668,7 @@ void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[CHORE_FIRE_BRIGADE].mob);
 	
 	if (worker && VEH_FLAGGED(veh, VEH_ON_FIRE)) {
-		// reset spawn time to prevent despawn
-		MOB_SPAWN_TIME(worker) = time(0);
-		
-		add_empire_needs(emp, GET_ISLAND_ID(IN_ROOM(veh)), ENEED_WORKFORCE, 1);
+		charge_workforce(emp, IN_ROOM(veh), worker, 1);
 		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
 		
 		act("$n throws a bucket of water to douse the flames!", FALSE, worker, NULL, NULL, TO_ROOM);
@@ -2640,6 +2677,7 @@ void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		if ((worker = place_chore_worker(emp, CHORE_FIRE_BRIGADE, IN_ROOM(veh)))) {
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// vehicle chore workers should always be marked SPAWNED right away
+			charge_workforce(emp, IN_ROOM(veh), worker, 1);
 		}
 	}
 }
@@ -2652,6 +2690,7 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[chore].mob);
 	struct empire_storage_data *store = NULL;
 	int islid = GET_ISLAND_ID(IN_ROOM(veh));
+	char buf[MAX_STRING_LENGTH];
 	struct resource_data *res;
 	bool can_do = FALSE;
 	
@@ -2671,11 +2710,11 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 	}
 	
 	if (worker && can_do) {
-		add_empire_needs(emp, GET_ISLAND_ID(IN_ROOM(veh)), ENEED_WORKFORCE, 1);
+		charge_workforce(emp, IN_ROOM(veh), worker, 1);
 		
 		if (res) {
-			// reset spawn time to prevent despawn
-			MOB_SPAWN_TIME(worker) = time(0);
+			sprintf(buf, "$n works on %s $V.", (chore == CHORE_MAINTENANCE) ? "repairing" : "constructing");
+			act(buf, FALSE, worker, NULL, veh, TO_ROOM);
 			
 			if (res->type == RES_OBJECT) {
 				if (chore == CHORE_MAINTENANCE) {
@@ -2714,6 +2753,7 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 	else if (can_do) {
 		if ((worker = place_chore_worker(emp, chore, IN_ROOM(veh)))) {
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// vehicle chore workers should always be marked SPAWNED right away
+			charge_workforce(emp, IN_ROOM(veh), worker, 1);
 		}
 	}
 	
@@ -2751,11 +2791,10 @@ void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 	}
 	
 	if (can_do && worker) {
-		add_empire_needs(emp, islid, ENEED_WORKFORCE, 1);
+		charge_workforce(emp, room, worker, 1);
 		
 		if (found_res) {
-			// reset spawn time to prevent despawn
-			MOB_SPAWN_TIME(worker) = time(0);
+			act("$n works on dismantling $V.", FALSE, worker, NULL, veh, TO_ROOM);
 			
 			if (found_res->amount > 0) {
 				found = TRUE;
@@ -2805,6 +2844,7 @@ void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 	else if (can_do) {
 		if ((worker = place_chore_worker(emp, CHORE_BUILDING, IN_ROOM(veh)))) {
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// vehicle chore workers should always be marked SPAWNED right away
+			charge_workforce(emp, IN_ROOM(veh), worker, 1);
 		}
 	}
 	else if (worker) {
