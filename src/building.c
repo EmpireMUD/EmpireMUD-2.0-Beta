@@ -1648,6 +1648,12 @@ ACMD(do_dismantle) {
 		return;
 	}
 	
+	// not a vehicle
+	if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+		msg_to_char(ch, "Dismantle this %s from outside instead.\r\n", VEH_OR_BLD(veh));
+		return;
+	}
+	
 	// otherwise args are not welcome
 	if (*arg && !isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
 		msg_to_char(ch, "Dismantle is only used to dismantle buildings. Just type 'dismantle'. (You get this error if you typed an argument.)\r\n");
