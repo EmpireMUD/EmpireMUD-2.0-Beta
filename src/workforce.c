@@ -2713,9 +2713,6 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 		charge_workforce(emp, IN_ROOM(veh), worker, 1);
 		
 		if (res) {
-			sprintf(buf, "$n works on %s $V.", (chore == CHORE_MAINTENANCE) ? "repairing" : "constructing");
-			act(buf, FALSE, worker, NULL, veh, TO_ROOM);
-			
 			if (res->type == RES_OBJECT) {
 				if (chore == CHORE_MAINTENANCE) {
 					// remove an older matching object
@@ -2748,6 +2745,10 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 			sprintf(buf, "$n finishes %s $V.", (chore == CHORE_MAINTENANCE) ? "repairing" : "constructing");
 			act(buf, FALSE, worker, NULL, veh, TO_ROOM);
 			complete_vehicle(veh);
+		}
+		else {
+			sprintf(buf, "$n works on %s $V.", (chore == CHORE_MAINTENANCE) ? "repairing" : "constructing");
+			act(buf, FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY);
 		}
 	}
 	else if (can_do) {
@@ -2794,8 +2795,6 @@ void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 		charge_workforce(emp, room, worker, 1);
 		
 		if (found_res) {
-			act("$n works on dismantling $V.", FALSE, worker, NULL, veh, TO_ROOM);
-			
 			if (found_res->amount > 0) {
 				found = TRUE;
 				found_res->amount -= 1;
@@ -2824,7 +2823,7 @@ void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 			
 			// ok, finish dismantle (purges vehicle)
 			claims_with_room = VEH_CLAIMS_WITH_ROOM(veh);
-			finish_dismantle_vehicle(worker, veh);	// sends own message
+			finish_dismantle_vehicle(worker, veh);	// ** sends own message **
 			SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);	// in case
 			
 			// auto-abandon?
@@ -2834,6 +2833,9 @@ void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 					abandon_room(room);
 				}
 			}
+		}
+		else {	// still working on it
+			act("$n works on dismantling $V.", FALSE, worker, NULL, veh, TO_ROOM | TO_SPAMMY);
 		}
 
 		if (!found) {
