@@ -1308,11 +1308,11 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			last_problem = wf_log->problem;
 			count = 1;
 			while (wf_log && wf_log->next && wf_log->next->chore == last_chore && wf_log->next->problem == last_problem) {
-				++count;
+				count += wf_log->count;
 				wf_log = wf_log->next;	// advance past identical entries
 			}
 			
-			snprintf(line, sizeof(line), " %s: %s (%d)\r\n", chore_data[last_chore].name, wf_problem_types[last_problem], count);
+			snprintf(line, sizeof(line), " %s: %s (x%d)\r\n", chore_data[last_chore].name, wf_problem_types[last_problem], count);
 			
 			if (strlen(line) + size + 16 < sizeof(buf)) {	// reserve space for overflow
 				strcat(buf, line);
