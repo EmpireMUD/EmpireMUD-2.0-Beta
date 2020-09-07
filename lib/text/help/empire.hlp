@@ -253,12 +253,13 @@ See also: DEPOSITORY, EXCHANGE, MINT, VAULT, WITHDRAW
 #
 DIPLOMACY "DIPLOMACY COMMAND"
 
-Usage:  diplomacy <option> <empire>
+Usage:  diplomacy [option] [empire]
         diplomacy cancel <option> <empire>
+        diplomacy <empire>
 
 Engage in politics with another empire. This command is used to offer, accept,
-or demand political relations. You can also cancel open offers. Check the
-empire detail page to see current relationships.
+or demand political relations. You can also cancel open offers. Type this
+command by itself to see your current relations.
 
 If an empire's members are ignoring you, you will not be able to make or accept
 diplomatic offers with them.
@@ -268,12 +269,21 @@ You can only go to war with or steal from an empire if at least one of their
 members is online (you can also steal with a thievery permit).
 
 Options (see help files on each of these commands for more info):
-  Friendly options: &ypeace&0, &ytruce&0, &ynonaggression&0, &yalliance&0
-  Trade relations: &ytrade&0 (help TRADE RELATIONS)
-  Hostile relations: &ydistrust&0, &ythievery&0, &ywar&0
-  Friendly war: &ybattle&0
+ &ypeace&0 - end a war or state of distrust
+ &ytruce&0 - end a war without declaring peace
+ &yalliance&0 - propose or accept a full alliance
+ &ynonaggression&0 - propose or accept a pact of non-aggression
+ &ytrade&0 - propose or accept a trade agreement
+ &ydistrust&0 - declare that your empire distrusts, but is not at war with, another
+ &ywar&0 - declare war on an empire! (incurs a war cost)
+ &ybattle&0 - suggest a friendly war
+ &ythievery&0 - buy permission to steal from an empire! (incurs a war cost)
 
-See also: EMPIRE SCORE, IGNORE, THIEVERY
+Privileged immortals can give an empire name as the first argument of this
+command and perform the command as a member of that empire. Immortals must use
+quotes if the name is more than 1 word.
+
+See also: EMPIRE SCORE, IGNORE, THIEVERY, TRADE RELATIONS, WAR
 #
 "DIPLOMACY BATTLE" "FRIENDLY WAR" "BATTLE WAR" "OFFER BATTLE"
 

@@ -72,6 +72,7 @@ struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct e
 extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 void identify_obj_to_char(obj_data *obj, char_data *ch);
 void refresh_all_quests(char_data *ch);
+void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_with);
 
 // locals
 bool is_affiliated_island(empire_data *emp, int island_id);
@@ -528,34 +529,11 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	extern const char *score_type[];
 	extern const char *techs[];
 	
-	struct empire_political_data *emp_pol;
 	int iter, sub, found_rank, total, type;
-	empire_data *other, *emp_iter, *next_emp;
+	empire_data *emp_iter, *next_emp;
 	bool found, is_own_empire, comma;
 	player_index_data *index;
 	char line[256];
-	
-	// for displaying diplomacy below
-	struct diplomacy_display_data {
-		bitvector_t type;	// DIPL_
-		char *name; // "Offering XXX to empire"
-		char *text;	// "XXX empire, empire, empire"
-		bool offers_only;	// only shows separately if it's an offer
-		bool self_only;	// does not show to others
-	} diplomacy_display[] = {
-		{ DIPL_ALLIED, "an alliance", "Allied with", FALSE, FALSE },
-		{ DIPL_NONAGGR, "a non-aggression pact", "In a non-aggression pact with", FALSE, FALSE },
-		{ DIPL_PEACE, "peace", "At peace with", FALSE, FALSE },
-		{ DIPL_TRUCE, "a truce", "In a truce with", FALSE, FALSE },
-		{ DIPL_DISTRUST, "distrust", "Distrustful of", FALSE, FALSE },
-		{ DIPL_WAR, "battle", "At war with", FALSE, FALSE },
-		{ DIPL_TRADE, "trade", "Trade relations with", TRUE, FALSE },
-		{ DIPL_THIEVERY, "thievery", "Thievery permitted against", FALSE, TRUE },
-		
-		// goes last
-		{ NOTHING, "\n" }
-	};
-	
 	
 	is_own_empire = (GET_LOYALTY(ch) == e) || GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 
@@ -661,13 +639,58 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 			msg_to_char(ch, "Cost to declare war or thievery on this empire: %d coin%s\r\n", war_cost, PLURAL(war_cost));
 		}
 	}
-
-	// diplomacy
-	if (EMPIRE_DIPLOMACY(e)) {
-		msg_to_char(ch, "Diplomatic relations:\r\n");
-	}
 	
-	if (is_own_empire || !EMPIRE_IS_TIMED_OUT(e)) {
+	// show_empire_diplomacy(ch, e, NULL);
+}
+
+
+/**
+* Shows an empire's current diplomatic relations to ch. Only public relations
+* are shown unless ch is in the empire or has elevated access.
+*
+* @param char_data *ch The player viewing.
+* @param emoire_data *emp The empire whose relations to view.
+* @param empire_data *only_with Optional: Only show relations with this empire (pass NULL for all empires).
+*/
+void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_with) {
+	bool is_own_empire = (GET_LOYALTY(ch) == emp || GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
+	struct empire_political_data *emp_pol;
+	empire_data *other, *emp_iter, *next_emp;
+	bool found, any;
+	int iter;
+	
+	// for displaying diplomacy below
+	const struct {
+		bitvector_t type;	// DIPL_
+		char *name; // "Offering XXX to empire"
+		char *text;	// "XXX empire, empire, empire"
+		bool offers_only;	// only shows separately if it's an offer
+		bool self_only;	// does not show to others
+	} diplomacy_display[] = {
+		{ DIPL_ALLIED, "an alliance", "Allied with", FALSE, FALSE },
+		{ DIPL_NONAGGR, "a non-aggression pact", "In a non-aggression pact with", FALSE, FALSE },
+		{ DIPL_PEACE, "peace", "At peace with", FALSE, FALSE },
+		{ DIPL_TRUCE, "a truce", "In a truce with", FALSE, FALSE },
+		{ DIPL_DISTRUST, "distrust", "Distrustful of", FALSE, FALSE },
+		{ DIPL_WAR, "battle", "At war with", FALSE, FALSE },
+		{ DIPL_TRADE, "trade", "Trade relations with", TRUE, FALSE },
+		{ DIPL_THIEVERY, "thievery", "Thievery permitted against", FALSE, TRUE },
+		
+		// goes last
+		{ NOTHING, "\n" }
+	};
+	
+	// header
+	if (only_with) {
+		msg_to_char(ch, "Current diplomatic relations with %s%s\t0:\r\n", EMPIRE_BANNER(only_with), EMPIRE_NAME(only_with));
+	}
+	else {
+		msg_to_char(ch, "Current diplomatic relations:\r\n");
+	}
+	any = FALSE;
+	
+	// most info doesn't show if the empire is timed out (unless it's your own)
+	if (is_own_empire || !EMPIRE_IS_TIMED_OUT(emp)) {
 		// display political information by diplomacy type
 		for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
 			if (diplomacy_display[iter].self_only && !is_own_empire) {
@@ -675,14 +698,14 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 			}
 			if (!diplomacy_display[iter].offers_only) {
 				found = FALSE;
-				for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
-					if (IS_SET(emp_pol->type, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
+				for (emp_pol = EMPIRE_DIPLOMACY(emp); emp_pol; emp_pol = emp_pol->next) {
+					if (IS_SET(emp_pol->type, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id)) && (!only_with || other == only_with) && !EMPIRE_IS_TIMED_OUT(other)) {
 						if (!found) {
 							msg_to_char(ch, "%s ", diplomacy_display[iter].text);
 						}
 				
 						msg_to_char(ch, "%s%s%s&0%s", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other), (IS_SET(emp_pol->type, DIPL_TRADE) ? " (trade)" : ""));
-						found = TRUE;
+						found = any = TRUE;
 					}
 				}
 			
@@ -699,14 +722,14 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 			}
 			
 			found = FALSE;
-			for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
-				if (emp_pol->type == diplomacy_display[iter].type && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
+			for (emp_pol = EMPIRE_DIPLOMACY(emp); emp_pol; emp_pol = emp_pol->next) {
+				if (emp_pol->type == diplomacy_display[iter].type && (other = real_empire(emp_pol->id)) && (!only_with || other == only_with) && !EMPIRE_IS_TIMED_OUT(other)) {
 					if (!found) {
 						msg_to_char(ch, "%s ", diplomacy_display[iter].text);
 					}
 			
 					msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
-					found = TRUE;
+					found = any = TRUE;
 				}
 			}
 		
@@ -718,16 +741,16 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		// now show any open offers
 		for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
 			found = FALSE;
-			for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
+			for (emp_pol = EMPIRE_DIPLOMACY(emp); emp_pol; emp_pol = emp_pol->next) {
 				// only show offers to members
 				if (is_own_empire || (GET_LOYALTY(ch) && EMPIRE_VNUM(GET_LOYALTY(ch)) == emp_pol->id)) {
-					if (IS_SET(emp_pol->offer, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
+					if (IS_SET(emp_pol->offer, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id)) && (!only_with || other == only_with) && !EMPIRE_IS_TIMED_OUT(other)) {
 						if (!found) {
 							msg_to_char(ch, "Offering %s to ", diplomacy_display[iter].name);
 						}
 				
 						msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
-						found = TRUE;
+						found = any = TRUE;
 					}
 				}
 			}
@@ -741,31 +764,40 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	// If it's your own empire, show open offers from others
 	if (is_own_empire) {
 		HASH_ITER(hh, empire_table, emp_iter, next_emp) {
-			if (emp_iter != e) {
-				for (emp_pol = EMPIRE_DIPLOMACY(emp_iter); emp_pol; emp_pol = emp_pol->next) {
-					if (emp_pol->id == EMPIRE_VNUM(e) && emp_pol->offer) {
-						found = FALSE;
-						for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
-							if (IS_SET(emp_pol->offer, diplomacy_display[iter].type)) {
-								// found a valid offer!
-								if (!found) {
-									msg_to_char(ch, "%s%s&0 offers ", EMPIRE_BANNER(emp_iter), EMPIRE_NAME(emp_iter));
-								}
-								
-								msg_to_char(ch, "%s%s", (found ? ", " : ""), diplomacy_display[iter].name);
-								found = TRUE;
+			if (only_with && emp != only_with) {
+				continue;	// skip others
+			}
+			if (emp_iter == emp) {
+				continue;	// skip own
+			}
+			for (emp_pol = EMPIRE_DIPLOMACY(emp_iter); emp_pol; emp_pol = emp_pol->next) {
+				if (emp_pol->id == EMPIRE_VNUM(emp) && emp_pol->offer) {
+					found = FALSE;
+					for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
+						if (IS_SET(emp_pol->offer, diplomacy_display[iter].type)) {
+							// found a valid offer!
+							if (!found) {
+								msg_to_char(ch, "%s%s&0 offers ", EMPIRE_BANNER(emp_iter), EMPIRE_NAME(emp_iter));
 							}
+							
+							msg_to_char(ch, "%s%s", (found ? ", " : ""), diplomacy_display[iter].name);
+							found = any = TRUE;
 						}
-						
-						if (found) {
-							msg_to_char(ch, ".\r\n");
-						}
+					}
+					
+					if (found) {
+						msg_to_char(ch, ".\r\n");
 					}
 				}
 			}
 		}
 	}
+	
+	if (!any) {
+		msg_to_char(ch, " none\r\n");
+	}
 }
+
 
 /**
 * called by do_empire_identify to show eidentify
@@ -3770,10 +3802,11 @@ ACMD(do_deposit) {
 
 
 ACMD(do_diplomacy) {
-	char type_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], ch_log[MAX_STRING_LENGTH], vict_log[MAX_STRING_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], *emp_arg, ch_log[MAX_STRING_LENGTH], vict_log[MAX_STRING_LENGTH];
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	struct empire_political_data *ch_pol = NULL, *vict_pol = NULL;
-	empire_data *ch_emp, *vict_emp;
-	int iter, type, war_cost = 0;
+	empire_data *ch_emp = GET_LOYALTY(ch), *vict_emp;
+	int type, war_cost = 0;
 	bool cancel = FALSE;
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
@@ -3781,25 +3814,25 @@ ACMD(do_diplomacy) {
 		return;
 	}
 	
-	half_chop(argument, type_arg, emp_arg);
-	
-	// check for optional cancel arg
-	if (!str_cmp(type_arg, "cancel")) {
-		cancel = TRUE;
-		strcpy(buf, emp_arg);
-		half_chop(buf, type_arg, emp_arg);
+	// argument parsing
+	emp_arg = any_one_word(argument, type_arg);
+	if (imm_access && get_empire_by_name(type_arg)) {	// optional empire arg for immortals
+		ch_emp = get_empire_by_name(type_arg);
+		argument = emp_arg = any_one_word(emp_arg, type_arg);
 	}
+	if (!str_cmp(type_arg, "cancel")) {	// check for optional cancel arg
+		cancel = TRUE;
+		// shear off the cancel
+		argument = emp_arg = any_one_word(emp_arg, type_arg);
+	}
+	skip_spaces(&argument);	// argument is sometimes used later
+	skip_spaces(&emp_arg);
 	
 	if (!*type_arg) {
-		msg_to_char(ch, "Usage: diplomacy <option> <empire>\r\n");
-		msg_to_char(ch, "       diplomacy cancel <option> <empire>\r\n");
-		msg_to_char(ch, "Options:\r\n");
-		
-		for (iter = 0; *(diplo_option[iter].keywords) != '\n'; ++iter) {
-			msg_to_char(ch, "  \ty%s\t0 - %s\r\n", fname(diplo_option[iter].keywords), diplo_option[iter].desc);
-		}
+		msg_to_char(ch, "Usage: diplomacy [cancel] <option> <empire>\r\n");
+		show_empire_diplomacy(ch, ch_emp, NULL);
 	}
-	else if (!(ch_emp = GET_LOYALTY(ch)) || IS_NPC(ch)) {
+	else if (!ch_emp || IS_NPC(ch)) {
 		msg_to_char(ch, "You can't engage in diplomacy if you're not a member of an empire.\r\n");
 	}
 	
@@ -3807,14 +3840,20 @@ ACMD(do_diplomacy) {
 	else if (EMPIRE_IMM_ONLY(ch_emp)) {
 		msg_to_char(ch, "Empires belonging to immortals cannot engage in diplomacy.\r\n");
 	}
-	else if (GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_DIPLOMACY)) {
+	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_DIPLOMACY)) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have the authority to make diplomatic relations.\r\n");
 	}
 	
 	// option validation
 	else if ((type = find_diplomacy_option(type_arg)) == NOTHING) {
-		msg_to_char(ch, "Unknown option '%s'.\r\n", type_arg);
+		// did they type an empire instead? check full arg
+		if ((vict_emp = get_empire_by_name(argument))) {
+			show_empire_diplomacy(ch, ch_emp, vict_emp);
+		}
+		else {
+			msg_to_char(ch, "Unknown option '%s'.\r\n", type_arg);
+		}
 	}
 	else if (IS_SET(diplo_option[type].flags, DIPF_NOT_MUTUAL_WAR) && config_get_bool("mutual_war_only")) {
 		msg_to_char(ch, "This EmpireMUD does not allow you to unilaterally declare %s.\r\n", fname(diplo_option[type].keywords));
