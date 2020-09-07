@@ -5818,7 +5818,7 @@ ACMD(do_light) {
 		if ((veh = get_vehicle_in_room_vis(ch, arg))) {
 			do_light_vehicle(ch, veh, lighter);
 		}
-		else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
+		else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || !str_cmp(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
 			do_burn_area(ch, subcmd);
 		}
 		else {
