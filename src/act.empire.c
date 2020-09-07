@@ -690,7 +690,7 @@ void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_wi
 		msg_to_char(ch, "Current diplomatic relations with %s:\r\n", EMPIRE_NAME(only_with));
 	}
 	else {
-		msg_to_char(ch, "Current diplomatic relations:\r\n");
+		msg_to_char(ch, "Current diplomatic relations for %s:\r\n", EMPIRE_NAME(emp));
 	}
 	any = FALSE;
 	
