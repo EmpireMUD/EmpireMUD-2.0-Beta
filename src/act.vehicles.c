@@ -804,6 +804,12 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 	else if (!(veh = get_vehicle_in_room_vis(ch, tar_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(tar_arg, VEH_KEYWORDS(veh)))) {
 		msg_to_char(ch, "You don't see that vehicle here.\r\n");
 	}
+	else if (!VEH_FLAGGED(veh, VEH_BUILDING) && !has_player_tech(ch, PTECH_CUSTOMIZE_VEHICLE)) {
+		msg_to_char(ch, "You don't have the right technology to customize that.\r\n");
+	}
+	else if (VEH_FLAGGED(veh, VEH_BUILDING) && !has_player_tech(ch, PTECH_CUSTOMIZE_BUILDING)) {
+		msg_to_char(ch, "You don't have the right technology to customize that.\r\n");
+	}
 	else if (!VEH_FLAGGED(veh, VEH_CUSTOMIZABLE)) {
 		msg_to_char(ch, "You can't customize that!\r\n");
 	}
@@ -814,7 +820,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 	// types:
 	else if (is_abbrev(type_arg, "name")) {
 		if (!*argument) {
-			msg_to_char(ch, "What would you like to name this vehicle (or \"none\")?\r\n");
+			msg_to_char(ch, "What would you like to name this %s (or \"none\")?\r\n", VEH_OR_BLD(veh));
 		}
 		else if (!str_cmp(argument, "none")) {
 			proto = vehicle_proto(VEH_VNUM(veh));
@@ -832,13 +838,13 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 				VEH_LONG_DESC(veh) = VEH_LONG_DESC(proto);
 			}
 			
-			msg_to_char(ch, "The vehicle no longer has a custom name.\r\n");
+			msg_to_char(ch, "The %s no longer has a custom name.\r\n", VEH_OR_BLD(veh));
 		}
 		else if (color_code_length(argument) > 0) {
 			msg_to_char(ch, "You cannot use color codes in custom names.\r\n");
 		}
 		else if (strlen(argument) > 24) {
-			msg_to_char(ch, "That name is too long. Vehicle names may not be over 24 characters.\r\n");
+			msg_to_char(ch, "That name is too long. Names may not be over 24 characters.\r\n");
 		}
 		else {
 			proto = vehicle_proto(VEH_VNUM(veh));
@@ -846,6 +852,9 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			// change short desc
 			if (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
 				free(VEH_SHORT_DESC(veh));
+			}
+			else {
+				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_VEHICLE, 33.4);
 			}
 			VEH_SHORT_DESC(veh) = str_dup(argument);
 			
@@ -870,7 +879,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 	}
 	else if (is_abbrev(type_arg, "longdesc")) {
 		if (!*argument) {
-			msg_to_char(ch, "What would you like to make the long description of this vehicle (or \"none\")?\r\n");
+			msg_to_char(ch, "What would you like to make the long description of this %s (or \"none\")?\r\n", VEH_OR_BLD(veh));
 		}
 		else if (!str_cmp(argument, "none")) {
 			proto = vehicle_proto(VEH_VNUM(veh));
@@ -893,6 +902,9 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			
 			if (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto)) {
 				free(VEH_LONG_DESC(veh));
+			}
+			else {
+				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_VEHICLE, 33.4);
 			}
 			
 			VEH_LONG_DESC(veh) = str_dup(argument);
@@ -924,16 +936,18 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			
 			if (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto)) {
 				// differs from proto
-				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
+				start_string_editor(ch->desc, "description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
 			}
 			else {
 				// has proto's desc
 				VEH_LOOK_DESC(veh) = VEH_LOOK_DESC(proto) ? str_dup(VEH_LOOK_DESC(proto)) : NULL;
-				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
+				start_string_editor(ch->desc, "description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
 				ch->desc->str_on_abort = VEH_LOOK_DESC(proto);
+				
+				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_VEHICLE, 33.4);
 			}
 			
-			act("$n begins editing a vehicle description.", TRUE, ch, 0, 0, TO_ROOM);
+			act("$n begins editing a description.", TRUE, ch, 0, 0, TO_ROOM);
 		}
 		else {
 			msg_to_char(ch, "You must specify whether you want to set or remove the description.\r\n");

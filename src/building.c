@@ -1766,13 +1766,20 @@ ACMD(do_dismantle) {
 
 // called by do_customize
 void do_customize_room(char_data *ch, char *argument) {
+	void do_customize_vehicle(char_data *ch, char *argument);
+	
 	char arg2[MAX_STRING_LENGTH];
 	empire_data *emp = GET_LOYALTY(ch);
+	vehicle_data *veh;
 	
 	half_chop(argument, arg, arg2);
 	
 	if (!ch->desc) {
 		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else if (((veh = get_vehicle_in_room_vis(ch, arg)) || ((veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && isname(arg, VEH_KEYWORDS(veh)))) && VEH_FLAGGED(veh, VEH_BUILDING)) {
+		// pass through to customize-vehicle (probably a building vehicle)
+		do_customize_vehicle(ch, arg2);
 	}
 	else if (!has_player_tech(ch, PTECH_CUSTOMIZE_BUILDING)) {
 		msg_to_char(ch, "You don't have the right ability to customize buildings.\r\n");

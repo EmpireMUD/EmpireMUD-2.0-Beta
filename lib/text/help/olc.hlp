@@ -1079,6 +1079,7 @@ Available techs are:
  &cDrink-Blood-Faster&0 - Vampires drink blood at 2x the speed.
  &cSummon-Materials&0 * - Can use the 'summon materials' command. Supports
     custom pre-retrieve messages using self-to-char and self-to-room.
+ &cCustomize-Vehicle&0 * - Can use 'customize vehicle'.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 
