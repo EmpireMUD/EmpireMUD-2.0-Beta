@@ -2849,6 +2849,6 @@ void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 		SET_BIT(MOB_FLAGS(worker), MOB_SPAWNED);
 	}
 	else {
-		mark_workforce_delay(emp, room, CHORE_BUILDING, NOTHING);
+		log_workforce_problem(emp, room, CHORE_BUILDING, WF_PROB_NO_RESOURCES, FALSE);
 	}
 }
