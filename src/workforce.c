@@ -1103,21 +1103,37 @@ void mark_workforce_delay(empire_data *emp, room_data *room, int chore, int prob
 char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 	
+	struct empire_territory_data *ter;
 	struct empire_npc_data *npc;
 	char_data *mob = NULL;
+	any_vnum artisan_vnum;
 	
 	// nobody to spawn
 	if (chore_data[chore].mob == NOTHING) {
 		return NULL;
 	}
 	
-	if ((npc = find_free_npc_for_chore(emp, room))) {
+	// check if there's an artisan first
+	if (GET_BUILDING(room) && (artisan_vnum = GET_BLD_ARTISAN(GET_BUILDING(room))) && (ter = find_territory_entry(emp, room))) {
+		LL_FOREACH(ter->npcs, npc) {
+			// if there's already an npc->mob, the artisan is presumably busy
+			if (npc->vnum == artisan_vnum && !npc->mob) {
+				mob = spawn_empire_npc_to_room(emp, npc, room, NOTHING);
+				
+				// guarantee SPAWNED flag -- the spawn timer will be reset each time the mob works (charge_workforce), until it's done
+				SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+			}
+		}
+	}
+	
+	// if there was no artisan
+	if (!mob && (npc = find_free_npc_for_chore(emp, room))) {
 		mob = spawn_empire_npc_to_room(emp, npc, room, chore_data[chore].mob);
 		
 		// guarantee SPAWNED flag -- the spawn timer will be reset each time the mob works (charge_workforce), until it's done
 		SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
 	}
-	else {
+	else if (!mob) {
 		log_workforce_problem(emp, room, chore, WF_PROB_NO_WORKERS, FALSE);
 	}
 	
