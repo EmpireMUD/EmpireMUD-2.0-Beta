@@ -1541,7 +1541,7 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 	
 	char_data *worker = find_chore_worker_in_room(room, chore_data[mode].mob);
 	struct empire_storage_data *store = NULL;
-	bool can_do = FALSE, found = FALSE;
+	bool can_do = FALSE;
 	struct resource_data *res = NULL;
 	int islid = GET_ISLAND_ID(room);
 	
@@ -1568,8 +1568,6 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 		charge_workforce(emp, room, worker, 1, NOTHING);
 		
 		if (res) {
-			found = TRUE;
-			
 			if (res->type == RES_OBJECT) {
 				if (mode == CHORE_MAINTENANCE) {
 					// remove an older matching object
@@ -1803,7 +1801,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 	void finish_building(char_data *ch, room_data *room);
 	
 	struct resource_data *res, *next_res;
-	bool can_do = FALSE, found = FALSE;
+	bool can_do = FALSE;
 	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BUILDING].mob);
 	obj_data *proto;
 	
@@ -1823,16 +1821,13 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 	if (can_do && worker) {
 		charge_workforce(emp, room, worker, 1, NOTHING);
 		
-		for (res = BUILDING_RESOURCES(room); res && !found; res = next_res) {
-			next_res = res->next;
-			
+		LL_FOREACH_SAFE(BUILDING_RESOURCES(room), res, next_res) {
 			// can only remove storable obj types
 			if (res->type != RES_OBJECT || !(proto = obj_proto(res->vnum)) || !GET_OBJ_STORAGE(proto)) {
 				continue;
 			}
 			
 			if (res->amount > 0) {
-				found = TRUE;
 				res->amount -= 1;
 				add_to_empire_storage(emp, GET_ISLAND_ID(room), res->vnum, 1);
 			}
