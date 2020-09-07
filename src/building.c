@@ -1599,7 +1599,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 		msg_to_char(ch, "That cannot be dismantled.\r\n");
 	}
 	else if (VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE)) {
-		msg_to_char(ch, "Turn off no-dismantle before dismantling that %s.\r\n", VEH_OR_BLD(veh));
+		msg_to_char(ch, "Turn off no-dismantle before dismantling that %s (see HELP MANAGE).\r\n", VEH_OR_BLD(veh));
 	}
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "You can't dismantle that -- it's on fire!\r\n");
