@@ -4751,6 +4751,7 @@ struct workforce_log {
 	any_vnum loc;	// don't store room itself -- may not be in memory later
 	int chore;	// CHORE_ const
 	int problem;	// WF_PROB_ const
+	int count;	// how many times this apepars in the same spot
 	bool delayed;	// whether this is a delay-repeat or not
 	struct workforce_log *next;
 };

@@ -1017,18 +1017,30 @@ int *get_ordered_chores(void) {
 */
 void log_workforce_problem(empire_data *emp, room_data *room, int chore, int problem, bool is_delay) {
 	struct workforce_log *wf_log;
+	bool found = FALSE;
 	
 	if (!emp || !room) {
 		return;	// safety first
 	}
 	
-	CREATE(wf_log, struct workforce_log, 1);
-	wf_log->loc = GET_ROOM_VNUM(room);
-	wf_log->chore = chore;
-	wf_log->problem = problem;
-	wf_log->delayed = is_delay;
+	LL_FOREACH(EMPIRE_WORKFORCE_LOG(emp), wf_log) {
+		if (wf_log->loc == GET_ROOM_VNUM(room) && wf_log->chore == chore && wf_log->problem == problem) {
+			found = TRUE;
+			++wf_log->count;
+			wf_log->delayed |= is_delay;
+		}
+	}
 	
-	LL_PREPEND(EMPIRE_WORKFORCE_LOG(emp), wf_log);
+	if (!found) {
+		CREATE(wf_log, struct workforce_log, 1);
+		wf_log->loc = GET_ROOM_VNUM(room);
+		wf_log->chore = chore;
+		wf_log->problem = problem;
+		wf_log->delayed = is_delay;
+		wf_log->count = 1;
+		
+		LL_PREPEND(EMPIRE_WORKFORCE_LOG(emp), wf_log);
+	}
 }
 
 

@@ -1209,7 +1209,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	extern const char *wf_problem_types[];
 	
-	char buf[MAX_STRING_LENGTH * 2], unsupplied[MAX_STRING_LENGTH], line[256];
+	char buf[MAX_STRING_LENGTH * 2], unsupplied[MAX_STRING_LENGTH], line[256], mult[256];
 	int iter, only_chore = NOTHING, last_chore, last_problem, count;
 	struct empire_island *isle, *next_isle;
 	struct workforce_log *wf_log;
@@ -1276,8 +1276,16 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			if (only_chore != NOTHING && only_chore != wf_log->chore) {
 				continue;	// wrong chore
 			}
+			
+			// ok, show it:
+			if (wf_log->count > 1) {
+				snprintf(mult, sizeof(mult), " (x%d)", wf_log->count);
+			}
+			else {
+				*mult = '\0';
+			}
 		
-			snprintf(line, sizeof(line), "%s %s: %s%s\r\n", coord_display(ch, MAP_X_COORD(wf_log->loc), MAP_Y_COORD(wf_log->loc), TRUE), chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], wf_log->delayed ? " (delayed)" : "");
+			snprintf(line, sizeof(line), "%s %s: %s%s%s\r\n", coord_display(ch, MAP_X_COORD(wf_log->loc), MAP_Y_COORD(wf_log->loc), TRUE), mult, chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], wf_log->delayed ? " (delayed)" : "");
 			any = TRUE;
 		
 			if (strlen(line) + size + 16 < sizeof(buf)) {	// reserve space for overflow
