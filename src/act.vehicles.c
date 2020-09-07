@@ -2310,52 +2310,6 @@ ACMD(do_load_vehicle) {
 }
 
 
-ACMD(do_repair) {
-	char arg[MAX_INPUT_LENGTH];
-	vehicle_data *veh;
-	
-	one_argument(argument, arg);
-	
-	if (GET_ACTION(ch) == ACT_REPAIRING) {
-		act("You stop repairing.", FALSE, ch, NULL, NULL, TO_CHAR);
-		cancel_action(ch);
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're busy right now.\r\n");
-	}
-	else if (!*arg) {
-		msg_to_char(ch, "Repair what?\r\n");
-	}
-	else if (!(veh = get_vehicle_in_room_vis(ch, arg))) {
-		msg_to_char(ch, "You don't see anything like that here.\r\n");
-	}
-	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
-		msg_to_char(ch, "You can't repair something that belongs to someone else.\r\n");
-	}
-	else if (VEH_IS_DISMANTLING(veh)) {
-		msg_to_char(ch, "You can't repair vehicles that are being dismantled.\r\n");
-	}
-	else if (!VEH_IS_COMPLETE(veh)) {
-		msg_to_char(ch, "You can only repair vehicles that are finished.\r\n");
-	}
-	else if (!VEH_NEEDS_RESOURCES(veh) && VEH_HEALTH(veh) >= VEH_MAX_HEALTH(veh)) {
-		msg_to_char(ch, "It doesn't need repair.\r\n");
-	}
-	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
-		msg_to_char(ch, "You can't repair it while it's on fire!\r\n");
-	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to repair anything here.\r\n");
-	}
-	else {
-		start_action(ch, ACT_REPAIRING, -1);
-		GET_ACTION_VNUM(ch, 0) = veh_script_id(veh);
-		act("You begin to repair $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n begins to repair $V.", FALSE, ch, NULL, veh, TO_ROOM);
-	}
-}
-
-
 ACMD(do_scrap) {
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;

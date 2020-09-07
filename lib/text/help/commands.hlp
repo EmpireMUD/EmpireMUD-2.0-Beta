@@ -1787,18 +1787,24 @@ Examples:
 
 See also: GRAB, HOLD, WEAR, WIELD, SHEATH, DRAW, SWAP
 #
-REPAIR
+REPAIR MAINTAIN MAINTENANCE DISREPAIR
 
-Usage:  repair <vehicle>
+Usage:  repair [vehicle | building]
 Speed boosts:  Faster Chores bonus, haste
 
-This command allows you to repair vehicles that have decayed or been damaged.
-Like building, repair happens one item at a time using materials in your
-inventory or in the room with you.
+Buildings and vehicles fall into disrepair over time, and require various
+resources or actions for maintenance.
 
-Fully repairing a vehicle will restore it to full health.
+This command allows you to repair things that have decayed or been damaged.
+Repair happens one item at a time using materials in your inventory or in the
+room with you.
 
-See also: STOP, WORKFORCE
+Fully repairing a vehicle or building will restore it to full health.
+
+It takes roughly two and a half months (realtime) for things to decay, although
+some buildings (including all unfinished buildings) decay faster.
+
+See also: FINDMAINTENANCE, RUINS, WORKFORCE
 #
 REPLY
 

@@ -755,22 +755,6 @@ Rewards the following buildings:
 
 See also: LUXURIES GOAL, PROGRESS
 #
-MAINTAIN MAINTENANCE DISREPAIR
-
-Usage:  maintain
-
-Buildings fall into disrepair over time. Different buildings require different
-items for maintenance, which are shown beneath the building's description or
-map.
-
-It takes roughly two and a half months (realtime) for buildings to decay,
-although some buildings (and all unfinished buildings) decay faster.
-
-Use findmaintenance to find buildings in need. You can also use workforce to
-maintain your buildings.
-
-See also: FINDMAINTENANCE, RUINS, WORKFORCE
-#
 MANAGE MANAGEMENT "LAND MANAGEMENT" NOWORK NO-WORK NODISMANTLE NO-DISMANTLE PUBLIC PUBLICIZE
 
 Usage:  manage [option] [on/off]

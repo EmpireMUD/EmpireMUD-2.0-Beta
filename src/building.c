@@ -2235,35 +2235,73 @@ ACMD(do_lay) {
 
 
 ACMD(do_maintain) {
-	if (GET_ACTION(ch) == ACT_MAINTENANCE) {
-		act("You stop maintaining the building.", FALSE, ch, NULL, NULL, TO_CHAR);
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh;
+	
+	one_argument(argument, arg);
+	
+	if ((GET_ACTION(ch) == ACT_REPAIR_VEHICLE || GET_ACTION(ch) == ACT_MAINTENANCE) && !*arg) {
+		act("You stop the repairs.", FALSE, ch, NULL, NULL, TO_CHAR);
 		cancel_action(ch);
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You can't perform maintenance here.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy right now.\r\n");
 	}
-	else if (!BUILDING_RESOURCES(IN_ROOM(ch)) && BUILDING_DAMAGE(IN_ROOM(ch)) == 0) {
-		msg_to_char(ch, "It doesn't need any maintenance.\r\n");
+	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+		// MAINTAIN VEHICLE
+		if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
+			msg_to_char(ch, "You can't repair something that belongs to someone else.\r\n");
+		}
+		else if (VEH_IS_DISMANTLING(veh)) {
+			msg_to_char(ch, "You can't repair something that is being dismantled.\r\n");
+		}
+		else if (!VEH_IS_COMPLETE(veh)) {
+			msg_to_char(ch, "You can only repair %ss that are finished.\r\n", VEH_OR_BLD(veh));
+		}
+		else if (!VEH_NEEDS_RESOURCES(veh) && VEH_HEALTH(veh) >= VEH_MAX_HEALTH(veh)) {
+			msg_to_char(ch, "It doesn't need maintenance.\r\n");
+		}
+		else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+			msg_to_char(ch, "You can't repair it while it's on fire!\r\n");
+		}
+		else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+			msg_to_char(ch, "It's too dark to repair anything here.\r\n");
+		}
+		else {
+			start_action(ch, ACT_REPAIR_VEHICLE, -1);
+			GET_ACTION_VNUM(ch, 0) = veh_script_id(veh);
+			act("You begin to repair $V.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$n begins to repair $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		}
 	}
-	else if (IS_INCOMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "Use 'build' to finish the building instead.\r\n");
-	}
-	else if (IS_DISMANTLING(IN_ROOM(ch))) {
-		msg_to_char(ch, "This building is being dismantled. Use 'dismantle' to continue instead.\r\n");
-	}
-	else if (IS_BURNING(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't maintain a building that's on fire!\r\n");
-	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to maintain anything here.\r\n");
+	else if (*arg && !multi_isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
+		msg_to_char(ch, "You don't see that here.\r\n");
 	}
 	else {
-		start_action(ch, ACT_MAINTENANCE, -1);
-		act("You set to work maintaining the building.", FALSE, ch, NULL, NULL, TO_CHAR);
-		act("$n begins maintaining the building.", FALSE, ch, NULL, NULL, TO_ROOM);
+		// MAINTAIN CURRENT ROOM
+		if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+			msg_to_char(ch, "You can't perform maintenance here.\r\n");
+		}
+		else if (!BUILDING_RESOURCES(IN_ROOM(ch)) && BUILDING_DAMAGE(IN_ROOM(ch)) == 0) {
+			msg_to_char(ch, "It doesn't need any maintenance.\r\n");
+		}
+		else if (IS_INCOMPLETE(IN_ROOM(ch))) {
+			msg_to_char(ch, "Use 'build' to finish the building instead.\r\n");
+		}
+		else if (IS_DISMANTLING(IN_ROOM(ch))) {
+			msg_to_char(ch, "This building is being dismantled. Use 'dismantle' to continue instead.\r\n");
+		}
+		else if (IS_BURNING(IN_ROOM(ch))) {
+			msg_to_char(ch, "You can't maintain a building that's on fire!\r\n");
+		}
+		else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+			msg_to_char(ch, "It's too dark to maintain anything here.\r\n");
+		}
+		else {
+			start_action(ch, ACT_MAINTENANCE, -1);
+			act("You set to work maintaining the building.", FALSE, ch, NULL, NULL, TO_CHAR);
+			act("$n begins maintaining the building.", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
 	}
 }
 
