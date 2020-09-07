@@ -266,6 +266,10 @@ void update_actions(void) {
 		}
 		
 		// things which terminate actions
+		if (ACCOUNT_FLAGGED(ch, ACCT_FROZEN)) {
+			cancel_action(ch);
+			continue;
+		}
 		if (action_data[GET_ACTION(ch)].process_function == NULL) {
 			// no way to process this action
 			cancel_action(ch);
