@@ -641,8 +641,8 @@ void charge_workforce(empire_data *emp, room_data *room, char_data *worker, int 
 	
 	if (worker) {
 		// short stun to prevent re-use
-		af = create_flag_aff(ATYPE_WORKING, 1, AFF_STUNNED, worker);
-		affect_to_char_silent(worker, af);
+		// af = create_flag_aff(ATYPE_WORKING, 1, AFF_STUNNED, worker);
+		// affect_to_char_silent(worker, af);
 		
 		// update spawn time as they are still working (prevent despawn)
 		MOB_SPAWN_TIME(worker) = time(0);
@@ -894,8 +894,8 @@ char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum) {
 		if (GET_MOB_VNUM(mob) != vnum && (artisan_vnum == NOTHING || GET_MOB_VNUM(mob) != artisan_vnum)) {
 			continue;	// wrong mob
 		}
-		if (AFF_FLAGGED(mob, AFF_STUNNED)) {
-			continue;	// probably doing another chore
+		if (MOB_SPAWN_TIME(mob) == time(0)) {
+			continue;	// probably just spawned or doing another chore
 		}
 		
 		// mob is in some way incapacitated -- mark for despawn
