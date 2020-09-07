@@ -1235,7 +1235,6 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 		msg_to_char(ch, "- All your workers are working successfully.\r\n");
 		msg_to_char(ch, "- You have no chores active.\r\n");
 		msg_to_char(ch, "- You have no claimed workable land (check nowork settings).\r\n");
-		msg_to_char(ch, "- The game may have rebooted recently and there is no data.\r\n");
 		return;
 	}
 	

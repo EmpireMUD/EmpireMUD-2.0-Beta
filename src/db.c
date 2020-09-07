@@ -306,6 +306,7 @@ void boot_db(void) {
 	void check_ruined_cities();
 	void check_version();
 	void check_sector_times(any_vnum only_sect);
+	void chore_update();
 	void delete_old_players();
 	void delete_orphaned_rooms();
 	void expire_old_politics();
@@ -453,7 +454,10 @@ void boot_db(void) {
 	log("Managing world memory.");
 	schedule_map_unloads();
 	update_instance_world_size();
-		
+	
+	log("Activating workforce.");
+	chore_update();
+	
 	// END
 	log("Boot db -- DONE.");
 	boot_time = time(0);
