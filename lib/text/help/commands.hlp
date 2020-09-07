@@ -1438,6 +1438,8 @@ but nobody will take down an important structure by accident.
 
 This uses the 'build' privilege.
 
+For vehicles, use 'manage <vehicle> no-dismantle'.
+
 See also: MANAGE, PRIVILEGES
 #
 NOREPEAT NO-REPEAT "NO REPEAT"
