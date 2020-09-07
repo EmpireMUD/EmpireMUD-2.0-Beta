@@ -629,6 +629,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	extern const char *bld_on_flags[];
 	extern const bitvector_t bld_on_flags_order[];
 	extern const char *craft_flag_for_info[];
+	extern const char *extra_bits[];
 	extern const char *item_types[];
 	extern const char *wear_bits[];
 	
@@ -639,6 +640,9 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	vehicle_data *veh;
 	obj_data *proto;
 	bld_data *bld;
+	
+	// these flags show on craft info
+	bitvector_t show_flags = OBJ_UNIQUE | OBJ_LIGHT | OBJ_LARGE | OBJ_SLOW | OBJ_FAST | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Get %s info on what?\r\n", gen_craft_data[craft_type].command);
@@ -714,6 +718,18 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 				break;
 			}
 		}	// end 'type' portion of info string
+		
+		// tool flags in info string
+		if (GET_OBJ_TOOL_FLAGS(proto)) {
+			prettier_sprintbit(GET_OBJ_TOOL_FLAGS(proto), tool_flags, part);
+			sprintf(buf + strlen(buf), ", %s", part);
+		}
+		
+		// some extra flags
+		if (GET_OBJ_EXTRA(proto) & show_flags) {
+			prettier_sprintbit(GET_OBJ_EXTRA(proto) & show_flags, extra_bits, part);
+			sprintf(buf + strlen(buf), ", %s", part);
+		}
 		
 		// end info string
 		strcat(buf, ")");
