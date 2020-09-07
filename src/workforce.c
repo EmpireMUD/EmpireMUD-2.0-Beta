@@ -629,22 +629,17 @@ bool can_gain_chore_resource_from_interaction(empire_data *emp, room_data *room,
 *
 * @param empire_data *emp The empire whose workforce it is.
 * @param room_data *room Optional: The location of the work (required for food_need but may be NULL otherwise).
-* @param char_data *worker Optional: The worker NPC: will briefly stun them, and reset their spawn time.
+* @param char_data *worker Optional: The worker NPC: will reset their spawn time.
 * @param int food_need Optional: Add to the food 'need' that the empire must pay to continue having a workforce (pass 0 if no-charge). Requires the 'room' var.
 */
 void charge_workforce(empire_data *emp, room_data *room, char_data *worker, int food_need) {
-	struct affected_type *af;
-	
 	if (food_need && room) {
 		add_empire_needs(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, food_need);
 	}
 	
 	if (worker) {
-		// short stun to prevent re-use
-		// af = create_flag_aff(ATYPE_WORKING, 1, AFF_STUNNED, worker);
-		// affect_to_char_silent(worker, af);
-		
 		// update spawn time as they are still working (prevent despawn)
+		// this also blocks another chore from grabbing them during this cycle
 		MOB_SPAWN_TIME(worker) = time(0);
 	}
 }
@@ -867,7 +862,8 @@ int empire_chore_limit(empire_data *emp, int island_id, int chore) {
 * return them, which should later trigger a new worker to be placed.
 *
 * It will also find an artisan in the room and use that, if there is one. It
-* skips stunned mobs, who are probably doing another chore here.
+* skips mobs whose spawn time is 'now', who are probably doing another chore
+* or just spawned here.
 *
 * @param room_data *room The location to check.
 * @param mob_vnum vnum The worker vnum to look for.
