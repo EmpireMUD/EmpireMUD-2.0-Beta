@@ -2783,7 +2783,7 @@ void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 	void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
 	
 	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[CHORE_BUILDING].mob);
-	bool can_do = FALSE, found = FALSE, claims_with_room;
+	bool can_do = FALSE, claims_with_room;
 	struct resource_data *res, *found_res = NULL;
 	int islid = GET_ISLAND_ID(IN_ROOM(veh));
 	room_data *room = IN_ROOM(veh);
@@ -2809,7 +2809,6 @@ void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 		
 		if (found_res) {
 			if (found_res->amount > 0) {
-				found = TRUE;
 				found_res->amount -= 1;
 				add_to_empire_storage(emp, islid, found_res->vnum, 1);
 			}
