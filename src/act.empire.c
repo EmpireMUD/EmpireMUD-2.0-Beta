@@ -1178,7 +1178,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Working %s citizens:\r\n", EMPIRE_ADJECTIVE(emp));
+	size = snprintf(buf, sizeof(buf), "Working %s citizens (excluding artisans):\r\n", EMPIRE_ADJECTIVE(emp));
 	
 	HASH_ITER(hh, counts, wct, next_wct) {
 		// only bother adding if there's room in the buffer
