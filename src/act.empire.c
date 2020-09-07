@@ -2648,8 +2648,8 @@ struct manage_data_type {
 	char *altname;	// 2nd version to accept, if any (NULL for none)
 	int priv;	// which PRIV_ is needed, if any (NOTHING for none)
 	bool owned_only;	// requires ownership if TRUE
-	bitvector_t roomflag;	// ROOM_ flag to set, if any (NOBITS if not using this)
-	bool flag_home;	// if TRUE, sets the roomflag on the home room
+	bitvector_t flag;	// ROOM_ or VEH_ flag to set, based on type, if any (NOBITS if not using this)
+	bool flag_home;	// if TRUE, sets the roomflag on the home room (does not apply to vehicles)
 	int access_level;	// player level required
 	bitvector_t grant;	// GRANT_ flag to override access_level, if any
 	MANAGE_FUNC(*func);	// callback func (optional)
@@ -2664,6 +2664,15 @@ const struct manage_data_type manage_data[] = {
 	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS, NULL },
 	
 	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS, NULL },
+	
+	{ "\n", NULL, NOTHING, TRUE, NOBITS, FALSE, 0, NOBITS, NULL }	// last
+};
+
+
+// configuration for do_manage_vehicle
+const struct manage_data_type manage_vehicle_data[] = {
+	{ "no-dismantle", "nodismantle", PRIV_BUILD, TRUE, VEH_PLAYER_NO_DISMANTLE, FALSE, 0, NOBITS, NULL },
+	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, VEH_PLAYER_NO_WORK, FALSE, 0, NOBITS, NULL },
 	
 	{ "\n", NULL, NOTHING, TRUE, NOBITS, FALSE, 0, NOBITS, NULL }	// last
 };
@@ -5579,11 +5588,103 @@ ACMD(do_inspire) {
 }
 
 
+void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
+	char buf[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH];
+	int iter, type = NOTHING;
+	bool on;
+	
+	argument = any_one_arg(argument, arg);
+	skip_spaces(&argument);
+	
+	// determine what they typed?
+	if (*arg) {
+		for (iter = 0; *manage_vehicle_data[iter].name != '\n'; ++iter) {
+			if (manage_vehicle_data[iter].access_level > GET_ACCESS_LEVEL(ch) && (manage_vehicle_data[iter].grant == NOBITS || !IS_GRANTED(ch, manage_vehicle_data[iter].grant))) {
+				continue;	// level invalid
+			}
+			if (!is_abbrev(arg, manage_vehicle_data[iter].name) && (!manage_vehicle_data[iter].altname || !*manage_vehicle_data[iter].altname || !is_abbrev(arg, manage_vehicle_data[iter].altname))) {
+				continue;	// not a name match
+			}
+			
+			// found!
+			type = iter;
+			break;
+		}
+	}
+	
+	if (!*arg) {
+		msg_to_char(ch, "Management for %s:\r\n", VEH_SHORT_DESC(veh));
+		
+		for (iter = 0; *manage_vehicle_data[iter].name != '\n'; ++iter) {
+			if (manage_vehicle_data[iter].access_level > GET_ACCESS_LEVEL(ch) && (manage_vehicle_data[iter].grant == NOBITS || !IS_GRANTED(ch, manage_vehicle_data[iter].grant))) {
+				continue;	// level invalid
+			}
+			
+			on = (manage_vehicle_data[iter].flag && VEH_FLAGGED(veh, manage_vehicle_data[iter].flag)) ? TRUE : FALSE;
+			snprintf(buf, sizeof(buf), "%s: %s\t0", manage_vehicle_data[iter].name, on ? "\tgon" : "\troff");
+			msg_to_char(ch, " %s\r\n", CAP(buf));
+		}
+	}
+	else if (type == NOTHING) {
+		msg_to_char(ch, "Unknown management option '%s'.\r\n", arg);
+	}
+	else if (manage_vehicle_data[type].owned_only && (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != VEH_OWNER(veh))) {
+		msg_to_char(ch, "You can only do that on a %s you own.\r\n", VEH_OR_BLD(veh));
+	}
+	else if (manage_vehicle_data[type].priv != NOTHING && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), manage_vehicle_data[type].priv)) {
+		msg_to_char(ch, "You require %s privileges to do that\r\n", priv[manage_vehicle_data[type].priv]);
+	}
+	else {
+		// check for optional on/off arg
+		if (!str_cmp(argument, "on")) {
+			if (manage_vehicle_data[type].flag != NOBITS) {
+				SET_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+			}
+			// else: nothing to do?
+			on = TRUE;
+		}
+		else if (!str_cmp(argument, "off")) {
+			if (manage_vehicle_data[type].flag != NOBITS) {
+				REMOVE_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+			}
+			// else: nothing to do?
+			on = FALSE;
+		}
+		else {	// neither on nor off specified: toggle
+			if (manage_vehicle_data[type].flag != NOBITS) {
+				on = !VEH_FLAGGED(veh, manage_vehicle_data[type].flag);
+				if (on) {
+					SET_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+				}
+				else {	// off
+					REMOVE_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+				}
+			}
+			else {
+				msg_to_char(ch, "Error toggling that management option.\r\n");
+				on = FALSE;	// nothing to do??
+				return;
+			}
+		}
+		
+		msg_to_char(ch, "You turn the %s management option %s for %s.\r\n", manage_vehicle_data[type].name, on ? "on" : "off", VEH_SHORT_DESC(veh));
+		snprintf(buf, sizeof(buf), "$n turns the %s management option %s for %s.", manage_vehicle_data[type].name, on ? "on" : "off", VEH_SHORT_DESC(veh));
+		act(buf, TRUE, ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
+		
+		// callback func (optional)
+		if (manage_vehicle_data[type].func) {
+			(manage_vehicle_data[type].func)(ch, on);
+		}
+	}
+}
+
+
 // manage [option] [on/off] -- uses manage_data (above)
 ACMD(do_manage) {
 	char buf[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH];
 	int iter, type = NOTHING;
 	room_data *flag_room;
+	vehicle_data *veh;
 	bool on;
 	
 	if (IS_NPC(ch)) {
@@ -5593,6 +5694,12 @@ ACMD(do_manage) {
 	
 	argument = any_one_arg(argument, arg);
 	skip_spaces(&argument);
+	
+	// shortcut: manage <vehicle> ...
+	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+		do_manage_vehicle(ch, veh, argument);
+		return;
+	}
 	
 	// determine what they typed?
 	if (*arg) {
@@ -5618,7 +5725,7 @@ ACMD(do_manage) {
 				continue;	// level invalid
 			}
 			
-			on = (manage_data[iter].roomflag && ROOM_AFF_FLAGGED(IN_ROOM(ch), manage_data[iter].roomflag)) ? TRUE : FALSE;
+			on = (manage_data[iter].flag && ROOM_AFF_FLAGGED(IN_ROOM(ch), manage_data[iter].flag)) ? TRUE : FALSE;
 			snprintf(buf, sizeof(buf), "%s: %s\t0", manage_data[iter].name, on ? "\tgon" : "\troff");
 			msg_to_char(ch, " %s\r\n", CAP(buf));
 		}
@@ -5638,31 +5745,31 @@ ACMD(do_manage) {
 		
 		// check for optional on/off arg
 		if (!str_cmp(argument, "on")) {
-			if (manage_data[type].roomflag != NOBITS) {
-				SET_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].roomflag);
-				SET_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].roomflag);
+			if (manage_data[type].flag != NOBITS) {
+				SET_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].flag);
+				SET_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].flag);
 			}
 			// else: nothing to do?
 			on = TRUE;
 		}
 		else if (!str_cmp(argument, "off")) {
-			if (manage_data[type].roomflag != NOBITS) {
-				REMOVE_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].roomflag);
-				REMOVE_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].roomflag);
+			if (manage_data[type].flag != NOBITS) {
+				REMOVE_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].flag);
+				REMOVE_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].flag);
 			}
 			// else: nothing to do?
 			on = FALSE;
 		}
 		else {	// neither on nor off specified: toggle
-			if (manage_data[type].roomflag != NOBITS) {
-				on = !ROOM_AFF_FLAGGED(flag_room, manage_data[type].roomflag);
+			if (manage_data[type].flag != NOBITS) {
+				on = !ROOM_AFF_FLAGGED(flag_room, manage_data[type].flag);
 				if (on) {
-					SET_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].roomflag);
-					SET_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].roomflag);
+					SET_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].flag);
+					SET_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].flag);
 				}
 				else {	// off
-					REMOVE_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].roomflag);
-					REMOVE_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].roomflag);
+					REMOVE_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].flag);
+					REMOVE_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].flag);
 				}
 			}
 			else {

@@ -774,16 +774,21 @@ See also: FINDMAINTENANCE, RUINS, WORKFORCE
 MANAGE MANAGEMENT "LAND MANAGEMENT" NOWORK NO-WORK NODISMANTLE NO-DISMANTLE PUBLIC PUBLICIZE
 
 Usage:  manage [option] [on/off]
+        manage <vehicle> [option] [on/off]
 
 This command allows you to manage land use. You can configure the following
 options:
  &cpublic&0 - Non-members can use the room/building.
  &cno-abandon&0 - The tile cannot be abandoned by accident (or by Workforce).
  &cno-dismantle&0 - The building cannot be dismantled.
- &cno-work&0 - Workforce will not work the tile.
+ &cno-work&0 - Workforce will not work the tile (also applies to vehicles here).
 
 Immortals can also configure additional options:
  &cunclaimable&0 - Players cannot claim the tile.
+
+You can also manage vehicles (as well as buildings that appear like vehicles):
+ &cno-dismantle&0 - The vehicle/building cannot be dismantled.
+ &cno-work&0 - Workforce will not work the vehicle/building.
 #
 MEMBERS MEMBERSHIP "EMPIRE MEMBERS" "EMPIRE MEMBERSHIP" "EMPIRE GREATNESS" "TIMED-OUT" "TIMED OUT" TIMEOUTS "EMPIRE TIMEOUT"
 
