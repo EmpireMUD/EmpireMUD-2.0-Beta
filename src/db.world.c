@@ -68,7 +68,7 @@ void save_and_close_world_file(FILE *fl, int block);
 void setup_start_locations();
 void sort_exits(struct room_direction_data **list);
 void sort_world_table();
-void stop_room_action(room_data *room, int action, int chore);
+void stop_room_action(room_data *room, int action);
 void write_room_to_file(FILE *fl, room_data *room);
 
 // locals
@@ -862,12 +862,12 @@ void perform_burn_room(room_data *room) {
 		
 		change_terrain(room, evo->becomes);
 		
-		stop_room_action(room, ACT_BURN_AREA, NOTHING);
-		stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
-		stop_room_action(room, ACT_PICKING, CHORE_FARMING);
-		stop_room_action(room, ACT_GATHERING, NOTHING);
-		stop_room_action(room, ACT_HARVESTING, NOTHING);
-		stop_room_action(room, ACT_PLANTING, NOTHING);
+		stop_room_action(room, ACT_BURN_AREA);
+		stop_room_action(room, ACT_CHOPPING);
+		stop_room_action(room, ACT_PICKING);
+		stop_room_action(room, ACT_GATHERING);
+		stop_room_action(room, ACT_HARVESTING);
+		stop_room_action(room, ACT_PLANTING);
 	}
 }
 
@@ -976,8 +976,8 @@ void untrench_room(room_data *room) {
 	}
 					
 	// stop BOTH actions -- it's not a trench!
-	stop_room_action(room, ACT_FILLING_IN, NOTHING);
-	stop_room_action(room, ACT_EXCAVATING, NOTHING);
+	stop_room_action(room, ACT_FILLING_IN);
+	stop_room_action(room, ACT_EXCAVATING);
 	
 	map = &(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]);
 	
@@ -1226,10 +1226,10 @@ void annual_update_map_tile(struct map_data *tile) {
 		uncrop_tile(room);
 		
 		// stop all possible chores here since the sector changed
-		stop_room_action(room, ACT_HARVESTING, CHORE_FARMING);
-		stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
-		stop_room_action(room, ACT_PICKING, CHORE_HERB_GARDENING);
-		stop_room_action(room, ACT_GATHERING, NOTHING);
+		stop_room_action(room, ACT_HARVESTING);
+		stop_room_action(room, ACT_CHOPPING);
+		stop_room_action(room, ACT_PICKING);
+		stop_room_action(room, ACT_GATHERING);
 	}
 	
 	// fill in trenches slightly
@@ -1645,8 +1645,8 @@ void start_burning(room_data *room) {
 	schedule_burn_down(room);
 	
 	// ensure no building or dismantling
-	stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
-	stop_room_action(room, ACT_DISMANTLING, CHORE_BUILDING);
+	stop_room_action(room, ACT_BUILDING);
+	stop_room_action(room, ACT_DISMANTLING);
 }
 
 

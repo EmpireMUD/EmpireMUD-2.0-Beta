@@ -1650,7 +1650,7 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 
 void found_city(char_data *ch, empire_data *emp, char *argument) {
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
-	void stop_room_action(room_data *room, int action, int chore);
+	void stop_room_action(room_data *room, int action);
 	extern int highest_start_loc_index;
 	extern int *start_locs;
 	
@@ -1772,14 +1772,14 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	snprintf(buf, sizeof(buf), "$n has founded %s here!", city->name);
 	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	
-	stop_room_action(IN_ROOM(ch), ACT_CHOPPING, CHORE_CHOPPING);
-	stop_room_action(IN_ROOM(ch), ACT_PICKING, CHORE_FARMING);
-	stop_room_action(IN_ROOM(ch), ACT_DIGGING, NOTHING);
-	stop_room_action(IN_ROOM(ch), ACT_EXCAVATING, NOTHING);
-	stop_room_action(IN_ROOM(ch), ACT_FILLING_IN, NOTHING);
-	stop_room_action(IN_ROOM(ch), ACT_GATHERING, NOTHING);
-	stop_room_action(IN_ROOM(ch), ACT_HARVESTING, NOTHING);
-	stop_room_action(IN_ROOM(ch), ACT_PLANTING, NOTHING);
+	stop_room_action(IN_ROOM(ch), ACT_CHOPPING);
+	stop_room_action(IN_ROOM(ch), ACT_PICKING);
+	stop_room_action(IN_ROOM(ch), ACT_DIGGING);
+	stop_room_action(IN_ROOM(ch), ACT_EXCAVATING);
+	stop_room_action(IN_ROOM(ch), ACT_FILLING_IN);
+	stop_room_action(IN_ROOM(ch), ACT_GATHERING);
+	stop_room_action(IN_ROOM(ch), ACT_HARVESTING);
+	stop_room_action(IN_ROOM(ch), ACT_PLANTING);
 	
 	// move einv here if any is lost
 	check_nowhere_einv(emp, GET_ISLAND_ID(IN_ROOM(ch)));

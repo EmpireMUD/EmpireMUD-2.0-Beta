@@ -75,7 +75,7 @@ int count_building_vehicles_in_room(room_data *room, empire_data *only_owner);	/
 void empire_skillup(empire_data *emp, any_vnum ability, double amount);	// skills.c
 void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component);
 void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
-void stop_room_action(room_data *room, int action, int chore);	// act.action.c
+void stop_room_action(room_data *room, int action);	// act.action.c
 
 // gen_craft protos:
 #define CHORE_GEN_CRAFT_VALIDATOR(name)  bool (name)(empire_data *emp, room_data *room, int chore, craft_data *craft)
@@ -1601,11 +1601,11 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 		if (!BUILDING_RESOURCES(room)) {
 			if (mode == CHORE_BUILDING) {
 				finish_building(worker, room);
-				stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
+				stop_room_action(room, ACT_BUILDING);
 			}
 			else if (mode == CHORE_MAINTENANCE) {
 				finish_maintenance(worker, room);
-				stop_room_action(room, ACT_MAINTENANCE, CHORE_MAINTENANCE);
+				stop_room_action(room, ACT_MAINTENANCE);
 			}
 		}
 		else {	// not complete
@@ -1647,7 +1647,7 @@ void do_chore_burn_stumps(empire_data *emp, room_data *room) {
 		}
 		
 		// done
-		stop_room_action(room, ACT_BURN_AREA, CHORE_BURN_STUMPS);
+		stop_room_action(room, ACT_BURN_AREA);
 		
 		if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_CHOPPED)) {
 			abandon_room(room);
@@ -1711,7 +1711,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 				}
 				else {
 					// done
-					stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
+					stop_room_action(room, ACT_CHOPPING);
 					
 					if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_CHOPPED) && (!has_evolution_type(SECT(room), EVO_BURNS_TO) || !empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_BURN_STUMPS))) {
 						abandon_room(room);
@@ -1848,7 +1848,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 			if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_DISMANTLED)) {
 				abandon_room(room);
 			}
-			stop_room_action(room, ACT_DISMANTLING, CHORE_BUILDING);
+			stop_room_action(room, ACT_DISMANTLING);
 		}
 		else {
 			// only send message if someone else is present (don't bother verifying it's a player)
@@ -2078,10 +2078,10 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 					}
 					
 					// stop all possible chores here since the sector changed
-					stop_room_action(room, ACT_HARVESTING, CHORE_FARMING);
-					stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
-					stop_room_action(room, ACT_PICKING, CHORE_HERB_GARDENING);
-					stop_room_action(room, ACT_GATHERING, NOTHING);
+					stop_room_action(room, ACT_HARVESTING);
+					stop_room_action(room, ACT_CHOPPING);
+					stop_room_action(room, ACT_PICKING);
+					stop_room_action(room, ACT_GATHERING);
 				}
 			}
 		}
@@ -2344,7 +2344,7 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 			
 			// check for depletion
 			if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
-				stop_room_action(room, ACT_MINING, CHORE_MINING);
+				stop_room_action(room, ACT_MINING);
 			}
 		}
 		else {

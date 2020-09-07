@@ -3813,7 +3813,7 @@ void b5_86_update(void) {
 // also adds old-growth forests
 void b5_87_crop_and_old_growth(void) {
 	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
-	void stop_room_action(room_data *room, int action, int chore);
+	void stop_room_action(room_data *room, int action);
 	void uncrop_tile(room_data *room);
 	
 	int removed_crop = 0, total_crop = 0, new_og = 0, total_forest = 0;
@@ -3839,10 +3839,10 @@ void b5_87_crop_and_old_growth(void) {
 				uncrop_tile(room);
 				
 				// stop all possible chores here since the sector changed
-				stop_room_action(room, ACT_HARVESTING, CHORE_FARMING);
-				stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
-				stop_room_action(room, ACT_PICKING, CHORE_HERB_GARDENING);
-				stop_room_action(room, ACT_GATHERING, NOTHING);
+				stop_room_action(room, ACT_HARVESTING);
+				stop_room_action(room, ACT_CHOPPING);
+				stop_room_action(room, ACT_PICKING);
+				stop_room_action(room, ACT_GATHERING);
 			}
 		}
 		else if (has_og && GET_SECT_VNUM(map->sector_type) == overgrown_forest && (room = real_room(map->vnum)) && !ROOM_OWNER(room)) {

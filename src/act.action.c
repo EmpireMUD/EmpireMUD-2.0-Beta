@@ -213,21 +213,14 @@ void start_action(char_data *ch, int type, int timer) {
 *
 * @param room_data *room Where.
 * @param int action ACTION_x or NOTHING to not stop actions.
-* @param int chore CHORE_ or NOTHING to not stop workforce.
 */
-void stop_room_action(room_data *room, int action, int chore) {
-	extern struct empire_chore_type chore_data[NUM_CHORES];
-	
+void stop_room_action(room_data *room, int action) {
 	char_data *c;
 	
 	DL_FOREACH2(ROOM_PEOPLE(room), c, next_in_room) {
 		// player actions
 		if (action != NOTHING && !IS_NPC(c) && GET_ACTION(c) == action) {
 			cancel_action(c);
-		}
-		// mob actions
-		if (chore != NOTHING && IS_NPC(c) && GET_MOB_VNUM(c) == chore_data[chore].mob) {
-			SET_BIT(MOB_FLAGS(c), MOB_SPAWNED);
 		}
 	}
 }
@@ -1440,7 +1433,7 @@ void process_burn_area(char_data *ch) {
 		// finished burning
 		perform_burn_room(IN_ROOM(ch));
 		cancel_action(ch);
-		stop_room_action(IN_ROOM(ch), ACT_BURN_AREA, CHORE_BURN_STUMPS);
+		stop_room_action(IN_ROOM(ch), ACT_BURN_AREA);
 		
 		if (lighter) {
 			used_lighter(ch, lighter);
@@ -1554,10 +1547,6 @@ void process_chop(char_data *ch) {
 				start_chopping(ch_iter);
 			}
 		}
-		// but stop npc choppers
-		stop_room_action(IN_ROOM(ch), NOTHING, CHORE_CHOPPING);
-		// and harvesters
-		stop_room_action(IN_ROOM(ch), NOTHING, CHORE_FARMING);
 	}
 }
 
@@ -1720,7 +1709,7 @@ void process_excavating(char_data *ch) {
 				finish_trench(IN_ROOM(ch));
 				
 				// this also stops ch
-				stop_room_action(IN_ROOM(ch), ACT_EXCAVATING, NOTHING);
+				stop_room_action(IN_ROOM(ch), ACT_EXCAVATING);
 			}
 		}
 	}
@@ -2031,7 +2020,7 @@ void process_harvesting(char_data *ch) {
 		remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_HARVEST_PROGRESS);
 
 		// stop all harvesters including ch
-		stop_room_action(IN_ROOM(ch), ACT_HARVESTING, CHORE_FARMING);
+		stop_room_action(IN_ROOM(ch), ACT_HARVESTING);
 		
 		act("You finish harvesting the crop!", FALSE, ch, NULL, NULL, TO_CHAR);
 		act("$n finished harvesting the crop!", FALSE, ch, NULL, NULL, TO_ROOM);
@@ -2211,7 +2200,7 @@ void process_mining(char_data *ch) {
 			
 			// stop all miners
 			if (get_room_extra_data(in_room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
-				stop_room_action(in_room, ACT_MINING, CHORE_MINING);
+				stop_room_action(in_room, ACT_MINING);
 			}
 		}
 	}

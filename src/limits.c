@@ -53,7 +53,6 @@ extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 void scale_item_to_level(obj_data *obj, int level);
-void stop_room_action(room_data *room, int action, int chore);
 
 // locals
 int health_gain(char_data *ch, bool info_only);

@@ -50,7 +50,7 @@ extern room_data *create_room(room_data *home);
 extern bool has_learned_craft(char_data *ch, any_vnum vnum);
 struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 void scale_item_to_level(obj_data *obj, int level);
-void stop_room_action(room_data *room, int action, int chore);
+void stop_room_action(room_data *room, int action);
 
 // external vars
 extern const char *bld_on_flags[];
@@ -149,8 +149,8 @@ void complete_building(room_data *room) {
 	}
 	
 	// stop builders
-	stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
-	stop_room_action(room, ACT_MAINTENANCE, CHORE_MAINTENANCE);
+	stop_room_action(room, ACT_BUILDING);
+	stop_room_action(room, ACT_MAINTENANCE);
 	
 	// remove any remaining resource requirements
 	free_resource_list(GET_BUILDING_RESOURCES(room));
@@ -620,7 +620,7 @@ void finish_dismantle(char_data *ch, room_data *room) {
 	
 	msg_to_char(ch, "You finish dismantling the building.\r\n");
 	act("$n finishes dismantling the building.", FALSE, ch, 0, 0, TO_ROOM);
-	stop_room_action(IN_ROOM(ch), ACT_DISMANTLING, CHORE_BUILDING);
+	stop_room_action(IN_ROOM(ch), ACT_DISMANTLING);
 	
 	// check for required obj and return it
 	if ((type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL)) || (type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
@@ -668,8 +668,8 @@ void finish_maintenance(char_data *ch, room_data *room) {
 	
 	msg_to_char(ch, "You complete the maintenance.\r\n");
 	act("$n has completed the maintenance.", FALSE, ch, NULL, NULL, TO_ROOM);
-	stop_room_action(room, ACT_MAINTENANCE, CHORE_MAINTENANCE);
-	stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
+	stop_room_action(room, ACT_MAINTENANCE);
+	stop_room_action(room, ACT_BUILDING);
 }
 
 
@@ -1171,29 +1171,16 @@ void start_dismantle_building(room_data *loc) {
 		et_lose_building(ROOM_OWNER(loc), GET_BLD_VNUM(GET_BUILDING(loc)));
 	}
 	
-	stop_room_action(loc, ACT_DIGGING, CHORE_DIGGING);
-	stop_room_action(loc, ACT_BUILDING, CHORE_BUILDING);
-	stop_room_action(loc, ACT_MINING, CHORE_MINING);
-	stop_room_action(loc, ACT_MINTING, ACT_MINTING);
-	stop_room_action(loc, ACT_BATHING, NOTHING);
-	stop_room_action(loc, ACT_ESCAPING, NOTHING);
-	stop_room_action(loc, ACT_SAWING, CHORE_SAWING);
-	stop_room_action(loc, ACT_QUARRYING, CHORE_QUARRYING);
-	stop_room_action(loc, ACT_MAINTENANCE, CHORE_MAINTENANCE);
-	stop_room_action(loc, ACT_PICKING, CHORE_HERB_GARDENING);
-	stop_room_action(loc, NOTHING, CHORE_SCRAPING);
-	stop_room_action(loc, NOTHING, CHORE_SMELTING);
-	stop_room_action(loc, NOTHING, CHORE_WEAVING);
-	stop_room_action(loc, NOTHING, CHORE_NAILMAKING);
-	stop_room_action(loc, NOTHING, CHORE_BRICKMAKING);
-	stop_room_action(loc, NOTHING, CHORE_TRAPPING);
-	stop_room_action(loc, NOTHING, CHORE_TANNING);
-	stop_room_action(loc, NOTHING, CHORE_SHEARING);
-	stop_room_action(loc, NOTHING, CHORE_NEXUS_CRYSTALS);
-	stop_room_action(loc, NOTHING, CHORE_MILLING);
-	stop_room_action(loc, NOTHING, CHORE_OILMAKING);
-	stop_room_action(loc, NOTHING, CHORE_BEEKEEPING);
-	stop_room_action(loc, NOTHING, CHORE_GLASSMAKING);
+	stop_room_action(loc, ACT_DIGGING);
+	stop_room_action(loc, ACT_BUILDING);
+	stop_room_action(loc, ACT_MINING);
+	stop_room_action(loc, ACT_MINTING);
+	stop_room_action(loc, ACT_BATHING);
+	stop_room_action(loc, ACT_ESCAPING);
+	stop_room_action(loc, ACT_SAWING);
+	stop_room_action(loc, ACT_QUARRYING);
+	stop_room_action(loc, ACT_MAINTENANCE);
+	stop_room_action(loc, ACT_PICKING);
 }
 
 
