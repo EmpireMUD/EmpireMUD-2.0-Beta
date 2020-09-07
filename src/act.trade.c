@@ -622,8 +622,10 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 * @param int craft_type Whichever CRAFT_TYPE_ the player is using.
 */
 void show_craft_info(char_data *ch, char *argument, int craft_type) {
+	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
+	extern const char *armor_types[NUM_ARMOR_TYPES+1];
 	extern const char *bld_on_flags[];
 	extern const bitvector_t bld_on_flags_order[];
 	extern const char *craft_flag_for_info[];
@@ -681,6 +683,39 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 			prettier_sprintbit(GET_OBJ_AFF_FLAGS(proto), affected_bits, part);
 			sprintf(buf + strlen(buf), ", %s", part);
 		}
+		
+		// ITEM_x: type-based 'craft info'; must start with ", "
+		switch (GET_OBJ_TYPE(proto)) {
+			case ITEM_WEAPON: {
+				sprintf(buf + strlen(buf), ", %s, speed %.2f", attack_hit_info[GET_WEAPON_TYPE(proto)].name, get_weapon_speed(proto));
+				break;
+			}
+			case ITEM_ARMOR: {
+				sprintf(buf + strlen(buf), ", %s armor", armor_types[GET_ARMOR_TYPE(proto)]);
+				break;
+			}
+			case ITEM_MISSILE_WEAPON: {
+				sprintf(buf + strlen(buf), ", %s, speed %.2f", attack_hit_info[GET_MISSILE_WEAPON_TYPE(proto)].name, get_weapon_speed(proto));
+				break;
+			}
+			case ITEM_AMMO: {
+				if (GET_AMMO_QUANTITY(proto) > 1) {
+					sprintf(buf + strlen(buf), ", quantity: %d\r\n", GET_AMMO_QUANTITY(proto));
+				}
+				break;
+			}
+			case ITEM_LIGHTER: {
+				if (GET_LIGHTER_USES(proto) == UNLIMITED) {
+					strcat(buf, ", unlimited");
+				}
+				else {
+					sprintf(buf + strlen(buf), ", %d use%s\r\n", GET_LIGHTER_USES(proto), PLURAL(GET_LIGHTER_USES(proto)));
+				}
+				break;
+			}
+		}	// end 'type' portion of info string
+		
+		// end info string
 		strcat(buf, ")");
 		
 		if (GET_OBJ_MIN_SCALE_LEVEL(proto) > 0 || GET_OBJ_MAX_SCALE_LEVEL(proto) > 0) {
