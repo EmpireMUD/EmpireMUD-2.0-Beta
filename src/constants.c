@@ -4265,6 +4265,7 @@ const char *vehicle_flags[] = {
 	"NEVER-DISMANTLE",
 	"*PLAYER-NO-DISMANTLE",
 	"*DISMANTLING",	// 25
+	"*PLAYER-NO-WORK",
 	"\n"
 };
 
@@ -4297,6 +4298,7 @@ const char *identify_vehicle_flags[] = {
 	"",	// "NEVER-DISMANTLE",
 	"is set no-dismantle",
 	"being dismantled",	// 25
+	"is set no-work",
 	"\n"
 };
 

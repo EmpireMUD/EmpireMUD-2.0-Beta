@@ -2963,6 +2963,7 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 		empire_data *emp = VEH_OWNER(veh);
 		
 		VEH_OWNER(veh) = NULL;
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_PLAYER_NO_WORK | VEH_PLAYER_NO_DISMANTLE);
 	
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
 			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));

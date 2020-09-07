@@ -3295,7 +3295,17 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 	}
 	
 	if (VEH_OWNER(veh)) {
-		msg_to_char(ch, "Owner: %s%s\t0\r\n", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+		msg_to_char(ch, "Owner: %s%s\t0", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+		
+		if (VEH_OWNER(veh) == GET_LOYALTY(ch)) {
+			if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK)) {
+				send_to_char(" (no-work)", ch);
+			}
+			if (VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE)) {
+				send_to_char(" (no-dismantle)", ch);
+			}
+		}
+		send_to_char("\r\n", ch);
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {

@@ -7992,6 +7992,7 @@ Available flags:
  NEVER-DISMANTLE - can never be dismantled
  *PLAYER-NO-DISMANTLE - player has toggled no-dismantle on
  *DISMANTLING - is being dismantled
+ *PLAYER-NO-WORK - player has toggled no-work on
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually

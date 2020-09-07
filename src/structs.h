@@ -2446,6 +2446,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_NEVER_DISMANTLE  BIT(23)	// x. vehicle cannot be dismantled
 #define VEH_PLAYER_NO_DISMANTLE  BIT(24)	// y. player toggled no-dismantle on
 #define VEH_DISMANTLING  BIT(25)	// z. is being dismantled
+#define VEH_PLAYER_NO_WORK  BIT(26)	// A. player has marked it no-work
 
 // VSPEED_x: indicates the number of speed bonuses this vehicle gives to driving.
 #define VSPEED_VERY_SLOW  0 // No speed bonuses.

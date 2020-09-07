@@ -300,6 +300,9 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	if (!emp || !veh || !IN_ROOM(veh)) {
 		return;
 	}
+	if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) && !VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		return;	// skip workforce if no-work AND not-on-fire
+	}
 	if (WATER_SECT(IN_ROOM(veh)) || (island = GET_ISLAND_ID(IN_ROOM(veh))) == NO_ISLAND) {
 		return;
 	}
