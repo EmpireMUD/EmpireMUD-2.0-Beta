@@ -1471,7 +1471,8 @@ Usage:  workforce where
         workforce where here
 
 This command will show you how many of your citizens are working on each
-active workforce chore right now.
+active workforce chore right now. This excludes artisans (like the smith or
+baker), who are always at work.
 
 If you use the "here" argument, it will only check the island you're on.
 
