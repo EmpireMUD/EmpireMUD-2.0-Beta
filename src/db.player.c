@@ -3939,46 +3939,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 	global_mute_slash_channel_joins = FALSE;
 	
-	// free reset?
-	if (RESTORE_ON_LOGIN(ch)) {
-		GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
-		GET_MOVE(ch) = GET_MAX_MOVE(ch);
-		GET_MANA(ch) = GET_MAX_MANA(ch);
-		GET_COND(ch, FULL) = MIN(0, GET_COND(ch, FULL));
-		GET_COND(ch, THIRST) = MIN(0, GET_COND(ch, THIRST));
-		GET_COND(ch, DRUNK) = MIN(0, GET_COND(ch, DRUNK));
-		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
-		
-		// clear deficits
-		for (iter = 0; iter < NUM_POOLS; ++iter) {
-			GET_DEFICIT(ch, iter) = 0;
-		}
-		
-		// check for confusion!
-		GET_CONFUSED_DIR(ch) = number(0, NUM_SIMPLE_DIRS-1);
-		
-		// clear this for long logout
-		GET_RECENT_DEATH_COUNT(ch) = 0;
-		affect_from_char(ch, ATYPE_DEATH_PENALTY, FALSE);
-		
-		RESTORE_ON_LOGIN(ch) = FALSE;
-		clean_lore(ch);
-		clean_player_kills(ch);
-	}
-	else {
-		// ensure not dead
-		GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
-		GET_BLOOD(ch) = MAX(1, GET_BLOOD(ch));
-	}
-	
-	// position must be reset
-	if (AFF_FLAGGED(ch, AFF_EARTHMELD | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
-		GET_POS(ch) = POS_SLEEPING;
-	}
-	else {
-		GET_POS(ch) = POS_STANDING;
-	}
-	
 	// in some cases, we need to re-read tech when the character logs in
 	if ((emp = GET_LOYALTY(ch))) {
 		if (REREAD_EMPIRE_TECH_ON_LOGIN(ch)) {
@@ -4068,6 +4028,47 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	
 	pause_affect_total = FALSE;
 	affect_total(ch);
+	
+	// free reset?
+	if (RESTORE_ON_LOGIN(ch)) {
+		GET_HEALTH(ch) = GET_MAX_HEALTH(ch);
+		GET_MOVE(ch) = GET_MAX_MOVE(ch);
+		GET_MANA(ch) = GET_MAX_MANA(ch);
+		GET_COND(ch, FULL) = MIN(0, GET_COND(ch, FULL));
+		GET_COND(ch, THIRST) = MIN(0, GET_COND(ch, THIRST));
+		GET_COND(ch, DRUNK) = MIN(0, GET_COND(ch, DRUNK));
+		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+		
+		// clear deficits
+		for (iter = 0; iter < NUM_POOLS; ++iter) {
+			GET_DEFICIT(ch, iter) = 0;
+		}
+		
+		// check for confusion!
+		GET_CONFUSED_DIR(ch) = number(0, NUM_SIMPLE_DIRS-1);
+		
+		// clear this for long logout
+		GET_RECENT_DEATH_COUNT(ch) = 0;
+		affect_from_char(ch, ATYPE_DEATH_PENALTY, FALSE);
+		
+		RESTORE_ON_LOGIN(ch) = FALSE;
+		clean_lore(ch);
+		clean_player_kills(ch);
+		affect_total(ch);	// again, in case things changed
+	}
+	else {
+		// ensure not dead
+		GET_HEALTH(ch) = MAX(1, GET_HEALTH(ch));
+		GET_BLOOD(ch) = MAX(1, GET_BLOOD(ch));
+	}
+	
+	// position must be reset
+	if (AFF_FLAGGED(ch, AFF_EARTHMELD | AFF_MUMMIFY | AFF_DEATHSHROUD)) {
+		GET_POS(ch) = POS_SLEEPING;
+	}
+	else {
+		GET_POS(ch) = POS_STANDING;
+	}
 	
 	// reload last companion?
 	if (GET_LAST_COMPANION(ch) != NOTHING && (compan = has_companion(ch, GET_LAST_COMPANION(ch)))) {
