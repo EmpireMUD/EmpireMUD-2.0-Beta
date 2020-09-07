@@ -2096,7 +2096,7 @@ int health_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
-			needed = MAX(GET_MAX_HEALTH(ch), GET_MAX_HEALTH(ch) - GET_HEALTH(ch));
+			needed = MAX(GET_MAX_HEALTH(ch), GET_MAX_HEALTH(ch) - GET_HEALTH(ch)) + GET_HEALTH_DEFICIT(ch);
 			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
@@ -2150,7 +2150,7 @@ int mana_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
-			needed = MAX(GET_MAX_MANA(ch), GET_MAX_MANA(ch) - GET_MANA(ch));
+			needed = MAX(GET_MAX_MANA(ch), GET_MAX_MANA(ch) - GET_MANA(ch)) + GET_MANA_DEFICIT(ch);
 			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
@@ -2192,7 +2192,7 @@ int move_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
-			needed = MAX(GET_MAX_MOVE(ch), GET_MAX_MOVE(ch) - GET_MOVE(ch));
+			needed = MAX(GET_MAX_MOVE(ch), GET_MAX_MOVE(ch) - GET_MOVE(ch)) + GET_MOVE_DEFICIT(ch);
 			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
