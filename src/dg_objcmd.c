@@ -523,7 +523,9 @@ OCMD(do_orestore) {
 	}
 	if (veh) {
 		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
-		complete_vehicle(veh);
+		if (!VEH_IS_DISMANTLING(veh)) {
+			complete_vehicle(veh);
+		}
 	}
 	if (room) {
 		if (COMPLEX_DATA(room)) {

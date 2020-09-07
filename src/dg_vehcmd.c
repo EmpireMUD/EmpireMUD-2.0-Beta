@@ -1565,7 +1565,9 @@ VCMD(do_vrestore) {
 	}
 	if (vtarg) {
 		REMOVE_BIT(VEH_FLAGS(vtarg), VEH_ON_FIRE);
-		complete_vehicle(vtarg);
+		if (!VEH_IS_DISMANTLING(vtarg)) {
+			complete_vehicle(vtarg);
+		}
 	}
 	if (room) {
 		if (COMPLEX_DATA(room)) {

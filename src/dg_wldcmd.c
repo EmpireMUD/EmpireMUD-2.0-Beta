@@ -1490,7 +1490,9 @@ WCMD(do_wrestore) {
 	}
 	if (veh) {
 		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
-		complete_vehicle(veh);
+		if (!VEH_IS_DISMANTLING(veh)) {
+			complete_vehicle(veh);
+		}
 	}
 	if (rtarg) {
 		if (COMPLEX_DATA(rtarg)) {

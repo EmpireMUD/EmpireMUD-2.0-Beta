@@ -8977,11 +8977,13 @@ ACMD(do_rescale) {
 
 ACMD(do_restore) {
 	void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
+	void complete_vehicle(vehicle_data *veh);
 	
 	char name_arg[MAX_INPUT_LENGTH], *type_args, arg[MAX_INPUT_LENGTH], msg[MAX_STRING_LENGTH], types[MAX_STRING_LENGTH];
 	ability_data *abil, *next_abil;
 	skill_data *skill, *next_skill;
 	struct cooldown_data *cool;
+	vehicle_data *veh;
 	empire_data *emp;
 	char_data *vict;
 	int i, iter;
@@ -8997,8 +8999,28 @@ ACMD(do_restore) {
 		return;
 	}
 	else if (!(vict = get_char_vis(ch, name_arg, FIND_CHAR_WORLD))) {
-		send_config_msg(ch, "no_person");
-		return;
+		if ((veh = get_vehicle_vis(ch, name_arg))) {
+			// found vehicle target here
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s at %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(IN_ROOM(ch)));
+			act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR);
+	
+			if (GET_INVIS_LEV(ch) > 1 || PRF_FLAGGED(ch, PRF_WIZHIDE)) {
+				act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM);
+			}
+			else {
+				act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM);
+			}
+			
+			REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+			if (!VEH_IS_DISMANTLING(veh)) {
+				complete_vehicle(veh);
+			}
+			return;
+		}
+		else {	// no target at all
+			send_config_msg(ch, "no_person");
+			return;
+		}
 	}
 	
 	// parse type args
