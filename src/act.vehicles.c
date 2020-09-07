@@ -1062,7 +1062,7 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 	char buf[MAX_STRING_LENGTH];
 	
 	if (IS_NPC(ch)) {
-		msg_to_char(ch, "Mobs can't light vehicles on fire.\r\n");
+		msg_to_char(ch, "Mobs can't light %ss on fire.\r\n", VEH_OR_BLD(veh));
 	}
 	else if (!VEH_FLAGGED(veh, VEH_BURNABLE)) {
 		msg_to_char(ch, "You can't seem to get it to burn.\r\n");
@@ -1071,7 +1071,7 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 		msg_to_char(ch, "It is already on fire!\r\n");
 	}
 	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) != VEH_OWNER(veh) && !has_relationship(GET_LOYALTY(ch), VEH_OWNER(veh), DIPL_WAR)) {
-		msg_to_char(ch, "You can't burn %s vehicles unless you're at war.\r\n", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
+		msg_to_char(ch, "You can't burn %s %ss unless you're at war.\r\n", EMPIRE_ADJECTIVE(VEH_OWNER(veh)), VEH_OR_BLD(veh));
 	}
 	else {
 		snprintf(buf, sizeof(buf), "You %s $V on fire!", (lighter ? "use $p to light" : "light"));
@@ -2269,15 +2269,15 @@ ACMD(do_load_vehicle) {
 		if (veh == cont) {
 			msg_to_char(ch, "You can't load it into itself.\r\n");
 		}
+		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
+			msg_to_char(ch, "You can't load that %sto %ss.\r\n", IN_OR_ON(cont), VEH_OR_BLD(cont));
+		}
 		else if (!VEH_FLAGGED(cont, VEH_CARRY_VEHICLES)) {
-			act("$v won't carry vehicles.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
+			act("$v won't carry that.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
 		}
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
 			snprintf(buf, sizeof(buf), "You can't load $v %sto anything.", IN_OR_ON(cont));
 			act(buf, FALSE, ch, veh, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
-		}
-		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
-			msg_to_char(ch, "You can't load that %sto vehicles.\r\n", IN_OR_ON(cont));
 		}
 		else if (VEH_IS_DISMANTLING(veh)) {
 			msg_to_char(ch, "You can't load it %sto anything because it's being dismantled.\r\n", IN_OR_ON(cont));
@@ -2327,7 +2327,7 @@ ACMD(do_scrap) {
 		msg_to_char(ch, "You can't scrap that! It's not even yours.\r\n");
 	}
 	else if (VEH_IS_COMPLETE(veh)) {
-		msg_to_char(ch, "You can only scrap incomplete vehicles.\r\n");
+		msg_to_char(ch, "You can only scrap incomplete %ss.\r\n", VEH_OR_BLD(veh));
 	}
 	else {
 		// seems good... but make sure nobody is working on it
@@ -2500,11 +2500,11 @@ ACMD(do_unload_vehicle) {
 		if (veh == cont) {
 			msg_to_char(ch, "You can't unload it from itself.\r\n");
 		}
-		else if (GET_ROOM_VEHICLE(IN_ROOM(cont)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_VEHICLES)) {
-			msg_to_char(ch, "You can't unload vehicles here.\r\n");
-		}
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
-			msg_to_char(ch, "That cannot be unloaded from vehicles.\r\n");
+			msg_to_char(ch, "That cannot be unloaded from anything.\r\n");
+		}
+		else if (GET_ROOM_VEHICLE(IN_ROOM(cont)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_VEHICLES)) {
+			msg_to_char(ch, "You can't unload %ss here.\r\n", VEH_OR_BLD(cont));
 		}
 		else if (VEH_IS_DISMANTLING(veh)) {
 			msg_to_char(ch, "You can't unload it from anything while it's being dismantled.\r\n");

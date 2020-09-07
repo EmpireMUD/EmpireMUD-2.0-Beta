@@ -3359,7 +3359,7 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You can only cede the land you're standing on.\r\n");
 	}
 	else if (GET_ROOM_VEHICLE(room)) {
-		msg_to_char(ch, "You can't cede the inside of a vehicle.\r\n");
+		msg_to_char(ch, "You can't cede the inside of a %s.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(room)));
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CEDE)) {
 		// could probably now use has_permission

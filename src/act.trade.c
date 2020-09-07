@@ -634,6 +634,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	struct obj_apply *apply;
 	ability_data *abil;
 	craft_data *craft;
+	vehicle_data *veh;
 	obj_data *proto;
 	bld_data *bld;
 	
@@ -653,7 +654,12 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Builds: %s\r\n", bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
-		msg_to_char(ch, "Creates vehicle: %s\r\n", get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft)));
+		if ((veh = vehicle_proto(GET_CRAFT_OBJECT(craft)))) {
+			msg_to_char(ch, "Creates %s: %s\r\n", VEH_OR_BLD(veh), VEH_SHORT_DESC(veh));
+		}
+		else {
+			msg_to_char(ch, "This craft appears to be broken\r\n");
+		}
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
 		msg_to_char(ch, "Creates liquid: %d unit%s of %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), get_generic_string_by_vnum(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID, GSTR_LIQUID_NAME));
