@@ -2682,7 +2682,8 @@ ACMD(do_minipets) {
 	char output[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct minipet_data *mini, *next_mini;
 	char_data *mob, *to_summon;
-	size_t size, count;
+	size_t size;
+	int count;
 	
 	skip_spaces(&argument);
 	
@@ -2728,6 +2729,14 @@ ACMD(do_minipets) {
 		}
 		else if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 2)) {
 			strcat(output, "\r\n");	// space always reserved for this
+		}
+		
+		if (count) {
+			snprintf(line, sizeof(line), " (%d total)\r\n", count);
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+			}
 		}
 	
 		if (ch->desc) {
