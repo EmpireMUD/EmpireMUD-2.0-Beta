@@ -2045,6 +2045,11 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 			if (get_room_extra_data(room, ROOM_EXTRA_HARVEST_PROGRESS) > 0) {
 				// not done:
 				ewt_mark_for_interactions(emp, room, INTERACT_HARVEST);
+				
+				// only send message if someone else is present (don't bother verifying it's a player)
+				if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
+					act("$n tends the crop...", FALSE, worker, NULL, NULL, TO_ROOM);
+				}
 			}
 			else {	// DONE!
 				remove_room_extra_data(room, ROOM_EXTRA_HARVEST_PROGRESS);
