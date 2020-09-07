@@ -680,9 +680,14 @@ void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_wi
 		{ NOTHING, "\n" }
 	};
 	
+	if (!emp) {
+		msg_to_char(ch, "No diplomatic relations.\r\n");
+		return;
+	}
+	
 	// header
 	if (only_with) {
-		msg_to_char(ch, "Current diplomatic relations with %s%s\t0:\r\n", EMPIRE_BANNER(only_with), EMPIRE_NAME(only_with));
+		msg_to_char(ch, "Current diplomatic relations with %s:\r\n", EMPIRE_NAME(only_with));
 	}
 	else {
 		msg_to_char(ch, "Current diplomatic relations:\r\n");
@@ -3849,7 +3854,7 @@ ACMD(do_diplomacy) {
 	else if ((type = find_diplomacy_option(type_arg)) == NOTHING) {
 		// did they type an empire instead? check full arg
 		if ((vict_emp = get_empire_by_name(argument))) {
-			show_empire_diplomacy(ch, ch_emp, vict_emp);
+			show_empire_diplomacy(ch, vict_emp, NULL);
 		}
 		else {
 			msg_to_char(ch, "Unknown option '%s'.\r\n", type_arg);
