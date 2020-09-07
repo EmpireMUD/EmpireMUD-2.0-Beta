@@ -284,6 +284,8 @@ vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id) {
 * @param vehicle_data *veh The vehicle being dismantled.
 */
 void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
+	extern struct empire_chore_type chore_data[NUM_CHORES];
+	
 	obj_data *newobj, *proto;
 	craft_data *type;
 	char_data *iter;
@@ -298,11 +300,9 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 			if (!IS_NPC(iter) && GET_ACTION(iter) == ACT_DISMANTLE_VEHICLE && GET_ACTION_VNUM(iter, 1) == VEH_CONSTRUCTION_ID(veh)) {
 				cancel_action(iter);
 			}
-			/*
-			else if (IS_NPC(iter) && GET_MOB_VNUM(iter) == chore_data[CHORE_DISMANTLE_VEHICLE].mob) {
+			else if (IS_NPC(iter) && GET_MOB_VNUM(iter) == chore_data[CHORE_BUILDING].mob) {
 				SET_BIT(MOB_FLAGS(iter), MOB_SPAWNED);
 			}
-			*/
 		}
 	}
 	
