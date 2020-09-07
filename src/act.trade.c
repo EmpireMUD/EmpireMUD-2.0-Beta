@@ -687,7 +687,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		// ITEM_x: type-based 'craft info'; must start with ", "
 		switch (GET_OBJ_TYPE(proto)) {
 			case ITEM_WEAPON: {
-				sprintf(buf + strlen(buf), ", %s, speed %.2f", attack_hit_info[GET_WEAPON_TYPE(proto)].name, get_weapon_speed(proto));
+				sprintf(buf + strlen(buf), ", %s attack, speed %.2f", attack_hit_info[GET_WEAPON_TYPE(proto)].name, get_weapon_speed(proto));
 				break;
 			}
 			case ITEM_ARMOR: {
@@ -695,7 +695,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 				break;
 			}
 			case ITEM_MISSILE_WEAPON: {
-				sprintf(buf + strlen(buf), ", %s, speed %.2f", attack_hit_info[GET_MISSILE_WEAPON_TYPE(proto)].name, get_weapon_speed(proto));
+				sprintf(buf + strlen(buf), ", %s attack, speed %.2f", attack_hit_info[GET_MISSILE_WEAPON_TYPE(proto)].name, get_weapon_speed(proto));
 				break;
 			}
 			case ITEM_AMMO: {
