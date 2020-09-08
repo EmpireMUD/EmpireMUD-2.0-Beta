@@ -1527,7 +1527,7 @@ bool check_autostore(obj_data *obj, bool force) {
 		// but this otherwise blocks the item from storing
 		store = FALSE;
 	}
-	else if (is_home && UNIQUE_OBJ_CAN_STORE(obj, TRUE)) {
+	else if (is_home && UNIQUE_OBJ_CAN_STORE(obj, TRUE) && bind_ok_idnum(obj, home_idnum)) {
 		// trigger home storage
 		store = TRUE;
 		unique = TRUE;
