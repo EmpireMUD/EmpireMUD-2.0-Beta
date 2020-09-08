@@ -6972,6 +6972,8 @@ void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
 	any_vnum vnum;
 	size_t size;
 	
+	skip_spaces(&argument);
+	
 	if (isdigit(*argument)) {
 		// usage: workforce limit <amount> <keywords>
 		half_chop(argument, amount_arg, keywords_arg);
