@@ -2472,7 +2472,7 @@ void process_planting(char_data *ch) {
 		msg_to_char(ch, "You have finished planting!\r\n");
 		act("$n finishes planting!", FALSE, ch, 0, 0, TO_ROOM);
 		
-		gain_ability_exp(ch, ABIL_COOK, 30);
+		gain_player_tech_exp(ch, PTECH_PLANT_CROPS, 30);
 		
 		GET_ACTION(ch) = ACT_NONE;
 	}
@@ -3516,6 +3516,9 @@ ACMD(do_plant) {
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't plant.\r\n");
+	}
+	else if (!has_player_tech(ch, PTECH_PLANT_CROPS)) {
+		msg_to_char(ch, "You don't have the right ability to plant crops.\r\n");
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
 		send_config_msg(ch, "need_approval_string");

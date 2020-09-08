@@ -1080,6 +1080,7 @@ Available techs are:
  &cSummon-Materials&0 * - Can use the 'summon materials' command. Supports
     custom pre-retrieve messages using self-to-char and self-to-room.
  &cCustomize-Vehicle&0 * - Can use 'customize vehicle'.
+ &cPlant-Crops&0 * - Can use the 'plant' command.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 
