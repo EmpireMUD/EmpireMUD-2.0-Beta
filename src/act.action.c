@@ -1254,6 +1254,11 @@ void perform_saw(char_data *ch) {
 	room = room_has_function_and_city_ok(IN_ROOM(ch), FNC_SAW);
 	saw = has_tool(ch, TOOL_SAW);
 	
+	if (!has_player_tech(ch, PTECH_SAW_COMMAND)) {
+		msg_to_char(ch, "You don't have the right ability to saw anything.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	if (!room && !saw) {
 		msg_to_char(ch, "You need to use a saw of some kind to do that.\r\n");
 		cancel_action(ch);
@@ -1297,7 +1302,7 @@ void perform_saw(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
 		if (success && proto) {
-			gain_ability_exp(ch, ABIL_PRIMITIVE_CRAFTS, 10);
+			gain_player_tech_exp(ch, PTECH_SAW_COMMAND, 10);
 			
 			// lather, rinse, rescrape
 			do_saw(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -1455,6 +1460,11 @@ void process_chipping(char_data *ch) {
 	obj_data *proto;
 	bool success;
 	
+	if (!has_player_tech(ch, PTECH_CHIP_COMMAND)) {
+		msg_to_char(ch, "You don't have the right ability to chip anything.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	if (!has_tool(ch, TOOL_KNAPPER)) {
 		msg_to_char(ch, "You need to be using a rock or other knapping tool to chip it.\r\n");
 		cancel_action(ch);
@@ -1487,7 +1497,7 @@ void process_chipping(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 
 		if (success) {
-			gain_ability_exp(ch, ABIL_PRIMITIVE_CRAFTS, 25);
+			gain_player_tech_exp(ch, PTECH_CHIP_COMMAND, 25);
 			
 			// repeat! (no -paul) note: keyword-targeting is hard because "chipped flint" also has "flint" as an alias
 			// do_chip(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -2651,6 +2661,11 @@ void process_scraping(char_data *ch) {
 	bool success = FALSE;
 	obj_data *proto;
 	
+	if (!has_player_tech(ch, PTECH_SCRAPE_COMMAND)) {
+		msg_to_char(ch, "You don't have the right ability to scrape anything.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	if (!has_tool(ch, TOOL_AXE | TOOL_KNIFE)) {
 		msg_to_char(ch, "You need to be using a good axe or knife to scrape it.\r\n");
 		cancel_action(ch);
@@ -2693,7 +2708,7 @@ void process_scraping(char_data *ch) {
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
 		if (success && proto) {
-			gain_ability_exp(ch, ABIL_PRIMITIVE_CRAFTS, 10);
+			gain_player_tech_exp(ch, PTECH_SCRAPE_COMMAND, 10);
 			
 			// lather, rinse, rescrape
 			do_scrape(ch, fname(GET_OBJ_KEYWORDS(proto)), 0, 0);
@@ -2914,6 +2929,9 @@ ACMD(do_chip) {
 		msg_to_char(ch, "You stop chipping it.\r\n");
 		act("$n stops chipping.", TRUE, ch, NULL, NULL, TO_ROOM);
 		cancel_action(ch);
+	}
+	else if (!has_player_tech(ch, PTECH_CHIP_COMMAND)) {
+		msg_to_char(ch, "You don't have the right ability to chip anything.\r\n");
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -3705,6 +3723,9 @@ ACMD(do_saw) {
 		act("You stop sawing.", FALSE, ch, NULL, NULL, TO_CHAR);
 		cancel_action(ch);
 	}
+	else if (!has_player_tech(ch, PTECH_SAW_COMMAND)) {
+		msg_to_char(ch, "You don't have the right ability to saw anything.\r\n");
+	}
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
@@ -3757,6 +3778,9 @@ ACMD(do_scrape) {
 	else if (GET_ACTION(ch) == ACT_SCRAPING) {
 		act("You stop scraping.", FALSE, ch, NULL, NULL, TO_CHAR);
 		cancel_action(ch);
+	}
+	else if (!has_player_tech(ch, PTECH_SCRAPE_COMMAND)) {
+		msg_to_char(ch, "You don't have the right ability to scrape anything.\r\n");
 	}
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
