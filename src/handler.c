@@ -5840,17 +5840,17 @@ void bind_obj_to_tag_list(obj_data *obj, struct mob_tag *list) {
 
 
 /**
-* Determines if a player can legally obtain a bound object.
+* Determines if a player-idnum can legally have a bound object.
 *
 * @param obj_data *obj The item to check.
-* @param char_data *ch The player to check.
-* @return bool TRUE if ch can use obj, FALSE if binding prevents it.
+* @param int idnum The player idnum to check.
+* @return bool TRUE if the player can use obj, FALSE if binding prevents it.
 */
-bool bind_ok(obj_data *obj, char_data *ch) {
+bool bind_ok_idnum(obj_data *obj, int idnum) {
 	struct obj_binding *bind;
 	
 	// basic sanity
-	if (!obj || !ch) {
+	if (!obj) {
 		return FALSE;
 	}
 	
@@ -5859,18 +5859,35 @@ bool bind_ok(obj_data *obj, char_data *ch) {
 		return TRUE;
 	}
 	
-	// imm/npc override
-	if (IS_NPC(ch) || IS_IMMORTAL(ch)) {
-		return TRUE;
-	}
-	
-	for (bind = OBJ_BOUND_TO(obj); bind; bind = bind->next) {
-		if (bind->idnum == GET_IDNUM(ch)) {
+	LL_FOREACH(OBJ_BOUND_TO(obj), bind) {
+		if (bind->idnum == idnum) {
 			return TRUE;
 		}
 	}
 	
 	return FALSE;
+}
+
+
+/**
+* Determines if a player can legally obtain a bound object.
+*
+* @param obj_data *obj The item to check.
+* @param char_data *ch The player to check.
+* @return bool TRUE if ch can use obj, FALSE if binding prevents it.
+*/
+bool bind_ok(obj_data *obj, char_data *ch) {
+	// basic sanity
+	if (!obj || !ch) {
+		return FALSE;
+	}
+	
+	// imm/npc override
+	if (IS_NPC(ch) || IS_IMMORTAL(ch)) {
+		return TRUE;
+	}
+	
+	return bind_ok_idnum(obj, GET_IDNUM(ch));
 }
 
 

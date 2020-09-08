@@ -232,6 +232,7 @@ void bind_obj_to_group(obj_data *obj, struct group_data *group);
 void bind_obj_to_player(obj_data *obj, char_data *ch);
 void bind_obj_to_tag_list(obj_data *obj, struct mob_tag *list);
 extern bool bind_ok(obj_data *obj, char_data *ch);
+extern bool bind_ok_idnum(obj_data *obj, int idnum);
 void reduce_obj_binding(obj_data *obj, char_data *player);
 
 // object location handlers
