@@ -1487,6 +1487,9 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	else if (in_veh && VEH_INTERIOR_HOME_ROOM(in_veh) && (home_idnum = ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(in_veh))) != NOBODY) {
 		is_home = TRUE;
 	}
+	else {
+		is_home = FALSE;
+	}
 	
 	// detect owner here
 	if (!emp && in_veh) {
