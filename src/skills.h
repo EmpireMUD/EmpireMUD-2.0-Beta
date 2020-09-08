@@ -263,9 +263,6 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_THORNLASH  285
 #define ABIL_EVASION  286
 #define ABIL_WEAPON_PROFICIENCY  287
-#define ABIL_PRIMITIVE_CRAFTS  288	// has hard-coded gains
-// formerly: #define ABIL_CHORES  290
-// #define ABIL_SCAVENGING  291	// now data-driven
 #define ABIL_BITE  292
 #define ABIL_KITE  294
 #define ABIL_BOWMASTER  295
