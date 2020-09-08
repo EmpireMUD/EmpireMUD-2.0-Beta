@@ -615,6 +615,8 @@ void finish_building(char_data *ch, room_data *room) {
 * @param room_data *room The location that was dismantled.
 */
 void finish_dismantle(char_data *ch, room_data *room) {
+	extern bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
+	
 	obj_data *newobj, *proto;
 	craft_data *type;
 	
@@ -632,6 +634,7 @@ void finish_dismantle(char_data *ch, room_data *room) {
 			
 			if (IS_NPC(ch)) {
 				obj_to_room(newobj, room);
+				check_autostore(newobj, TRUE, ROOM_OWNER(room));
 			}
 			else {
 				obj_to_char(newobj, ch);
@@ -641,8 +644,8 @@ void finish_dismantle(char_data *ch, room_data *room) {
 				if (OBJ_FLAGGED(newobj, OBJ_BIND_FLAGS)) {
 					bind_obj_to_player(newobj, ch);
 				}
+				load_otrigger(newobj);
 			}
-			load_otrigger(newobj);
 		}
 	}
 	
