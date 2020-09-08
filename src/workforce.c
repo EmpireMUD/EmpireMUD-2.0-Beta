@@ -1140,7 +1140,7 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 	}
 	
 	// check if there's an artisan first
-	if (GET_BUILDING(room) && (artisan_vnum = GET_BLD_ARTISAN(GET_BUILDING(room))) && (ter = find_territory_entry(emp, room))) {
+	if (GET_BUILDING(room) && (artisan_vnum = GET_BLD_ARTISAN(GET_BUILDING(room))) != NOTHING && (ter = find_territory_entry(emp, room))) {
 		LL_FOREACH(ter->npcs, npc) {
 			// if there's already an npc->mob, the artisan is presumably busy
 			if (npc->vnum == artisan_vnum && !npc->mob) {
@@ -1148,6 +1148,7 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 				
 				// guarantee SPAWNED flag -- the spawn timer will be reset each time the mob works (charge_workforce), until it's done
 				SET_BIT(MOB_FLAGS(mob), MOB_SPAWNED);
+				break;
 			}
 		}
 	}
@@ -1433,7 +1434,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 			continue;	// missing required-obj
 		}
 		// pass through validator function
-		if (!validator || !(validator)(emp, room, chore, craft)) {
+		if (validator && !(validator)(emp, room, chore, craft)) {
 			continue;
 		}
 		
