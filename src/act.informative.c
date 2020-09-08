@@ -3109,18 +3109,25 @@ ACMD(do_mark) {
 	int dist, dir;
 	room_data *mark;
 	
+	skip_spaces(&argument);
+	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't mark the map.\r\n");
+	}
+	else if (*argument && (!str_cmp(argument, "clear") || !str_cmp(argument, "rem") || !str_cmp(argument, "remove") || !str_cmp(argument, "unset"))) {
+		GET_MARK_LOCATION(ch) = NOWHERE;
+		msg_to_char(ch, "You clear your marked location.\r\n");
 	}
 	else if (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
 		msg_to_char(ch, "You may only mark distances on the map or from the entry room of a building.\r\n");
 	}
 	else {
-		skip_spaces(&argument);
-	
 		if (*argument && !str_cmp(argument, "set")) {
 			GET_MARK_LOCATION(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
 			msg_to_char(ch, "You have marked this location. Use 'mark' again to see the distance to it from any other map location.\r\n");
+		}
+		else if (*argument) {
+			msg_to_char(ch, "Usage: mark [set | clear]\r\n");
 		}
 		else {
 			// report
