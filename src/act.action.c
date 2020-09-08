@@ -3168,6 +3168,7 @@ ACMD(do_fillin) {
 		// already a trench -- just fill in
 		start_action(ch, ACT_FILLING_IN, 0);
 		msg_to_char(ch, "You begin to fill in the trench.\r\n");
+		act("$n begins to fill in the trench.", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		// already finished the trench? start it back to -1 (otherwise, just continue)
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {
