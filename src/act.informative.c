@@ -1090,10 +1090,10 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	extern bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
 	
 	char buf[MAX_STRING_LENGTH];
-	size_t size = 0;
+	size_t size = 0, pos;
 	
 	// pre-description
-	if (VEH_OWNER(veh)) {
+	if (VEH_OWNER(veh) && (VEH_OWNER(veh) != ROOM_OWNER(IN_ROOM(veh)) || !VEH_CLAIMS_WITH_ROOM(veh))) {
 		size += snprintf(buf + size, sizeof(buf) - size, "<%s> ", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
 	}
 	if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
@@ -1104,20 +1104,22 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	if (VEH_IS_COMPLETE(veh)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%s\r\n", VEH_LONG_DESC(veh));
 	}
+	else if (VEH_IS_DISMANTLING(veh)) {
+		pos = size;
+		size += snprintf(buf + size, sizeof(buf) - size, "%s is being dismantled.\r\n", VEH_SHORT_DESC(veh));
+		*(buf + pos) = UPPER(*(buf + pos));
+	}
 	else {
+		pos = size;
 		size += snprintf(buf + size, sizeof(buf) - size, "%s is under construction.\r\n", VEH_SHORT_DESC(veh));
+		*(buf + pos) = UPPER(*(buf + pos));
 	}
 	
 	// additional descriptions like what's attached:
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is ON FIRE!\r\n");
 	}
-	/* this is now indicated instead of the long desc
-	if (!VEH_IS_COMPLETE(veh)) {
-		size += snprintf(buf + size, sizeof(buf) - size, "...it is unfinished.\r\n");
-	}
-	*/
-	else if (VEH_NEEDS_RESOURCES(veh) || VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)) {
+	else if (VEH_IS_COMPLETE(veh) && (VEH_NEEDS_RESOURCES(veh) || VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh))) {
 		size += snprintf(buf + size, sizeof(buf) - size, "...it is in need of repair.\r\n");
 	}
 	
@@ -3107,18 +3109,25 @@ ACMD(do_mark) {
 	int dist, dir;
 	room_data *mark;
 	
+	skip_spaces(&argument);
+	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't mark the map.\r\n");
+	}
+	else if (*argument && (!str_cmp(argument, "clear") || !str_cmp(argument, "rem") || !str_cmp(argument, "remove") || !str_cmp(argument, "unset"))) {
+		GET_MARK_LOCATION(ch) = NOWHERE;
+		msg_to_char(ch, "You clear your marked location.\r\n");
 	}
 	else if (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE) {
 		msg_to_char(ch, "You may only mark distances on the map or from the entry room of a building.\r\n");
 	}
 	else {
-		skip_spaces(&argument);
-	
 		if (*argument && !str_cmp(argument, "set")) {
 			GET_MARK_LOCATION(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
 			msg_to_char(ch, "You have marked this location. Use 'mark' again to see the distance to it from any other map location.\r\n");
+		}
+		else if (*argument) {
+			msg_to_char(ch, "Usage: mark [set | clear]\r\n");
 		}
 		else {
 			// report

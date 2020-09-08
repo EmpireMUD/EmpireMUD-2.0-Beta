@@ -42,6 +42,7 @@ struct stored_data_type stored_data_info[] = {
 	{ "world_start", DATYPE_LONG },	// DATA_WORLD_START
 	{ "max_players_today", DATYPE_INT },	// DATA_MAX_PLAYERS_TODAY
 	{ "last_island_descs", DATYPE_LONG },	// DATA_LAST_ISLAND_DESCS
+	{ "last_construction_id", DATYPE_INT },	// DATA_LAST_CONSTRUCTION_ID
 	
 	{ "\n", NOTHING }	// last
 };

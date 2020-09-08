@@ -574,6 +574,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_NEEDS_LOGS_SAVE(emp)  ((emp)->needs_logs_save)
 #define EMPIRE_NEEDS_STORAGE_SAVE(emp)  ((emp)->needs_storage_save)
 #define EMPIRE_NEXT_TIMEOUT(emp)  ((emp)->next_timeout)
+#define EMPIRE_PRODUCTION_LIMITS(emp)  ((emp)->production_limits)
 #define EMPIRE_PRODUCTION_TOTALS(emp)  ((emp)->production_totals)
 #define EMPIRE_PROGRESS_POINTS(emp, type)  ((emp)->progress_points[(type)])
 #define EMPIRE_PROGRESS_POOL(emp)  EMPIRE_ATTRIBUTE((emp), EATT_PROGRESS_POOL)
@@ -1543,9 +1544,12 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // basic data
 #define VEH_ANIMALS(veh)  ((veh)->animals)
+#define VEH_BUILT_WITH(veh)  ((veh)->built_with)
 #define VEH_CARRYING_N(veh)  ((veh)->carrying_n)
+#define VEH_CONSTRUCTION_ID(veh)  ((veh)->construction_id)
 #define VEH_CONTAINS(veh)  ((veh)->contains)
 #define VEH_DRIVER(veh)  ((veh)->driver)
+#define VEH_EXTRA_DATA(veh)  ((veh)->extra_data)
 #define VEH_FLAGS(veh)  ((veh)->flags)
 #define VEH_HEALTH(veh)  ((veh)->health)
 #define VEH_ICON(veh)  ((veh)->icon)
@@ -1589,8 +1593,11 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // helpers
 #define IN_OR_ON(veh)		(VEH_FLAGGED((veh), VEH_IN) ? "in" : "on")
+#define VEH_CLAIMS_WITH_ROOM(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && !VEH_FLAGGED((veh), MOVABLE_VEH_FLAGS))
 #define VEH_FLAGGED(veh, flag)  IS_SET(VEH_FLAGS(veh), (flag))
-#define VEH_IS_COMPLETE(veh)  (!VEH_NEEDS_RESOURCES(veh) || !VEH_FLAGGED(veh, VEH_INCOMPLETE))
+#define VEH_IS_COMPLETE(veh)  (!VEH_NEEDS_RESOURCES(veh) || !VEH_FLAGGED((veh), VEH_INCOMPLETE | VEH_DISMANTLING))
+#define VEH_IS_DISMANTLING(veh)  (VEH_FLAGGED((veh), VEH_DISMANTLING))
+#define VEH_OR_BLD(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) ? "building" : "vehicle")
 
 
  //////////////////////////////////////////////////////////////////////////////

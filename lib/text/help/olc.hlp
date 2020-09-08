@@ -170,6 +170,7 @@ Buildings (BEDIT):
   have the trigger detach itself upon finishing. It's an unnecessary use of
   processing time and RAM to leave triggers attached if they are guaranteed to 
   never run again.
+- See BUILDING-VEHICLES
 
 Classes (CLASSEDIT):
 - EmpireMUD is not currently using 'classes' at all, but they are still
@@ -195,9 +196,6 @@ Crafts (CEDIT):
   spearhead item as a resource to make the craft, too. You'll only be able to
   craft it when the spearhead is in your inventory, but it will consume the
   spearhead when you make it.
-- If you use the requiresobject on a BUILD craft, it will always be consumed
-  when the building is started. This is different from other types of crafts,
-  where the requiresobject is only consumed if it's a "resource" too.
 - Scalable objects should not be used as resources or required objects for
   craft recipes. These items aren't stored, so if they're refunded, they will
   scale to their minimum level and lose any modifications.
@@ -205,6 +203,9 @@ Crafts (CEDIT):
 - There are two ways to require a tool: the <tool> field, which requires you
   have one equipped, or the 'tool' resource type, which requires a tool in
   the player's inventory that can be spent to craft.
+- If you flag a craft TAKE-REQUIRED-OBJ, that object will be refunded if you
+  cancel the craft, or if you dismantle the building/vehicle -- unless the
+  object is flagged 1-USE.
 
 Crops (CROPEDIT):
 - Crop names are always lowercase because they are used to build sentences.
@@ -487,6 +488,7 @@ Vehicles (VEDIT):
   maintenance set, it will add a "pouch of nails" instead.
 - If a vehicle takes damage that's less than 10% of its hitpoints, it still
   needs repair but doesn't require any additional resources.
+- See BUILDING-VEHICLES
 #d
 "OLC LEVELS" "OLC SCALING" "OLC SCALE"
 
@@ -1077,6 +1079,7 @@ Available techs are:
  &cDrink-Blood-Faster&0 - Vampires drink blood at 2x the speed.
  &cSummon-Materials&0 * - Can use the 'summon materials' command. Supports
     custom pre-retrieve messages using self-to-char and self-to-room.
+ &cCustomize-Vehicle&0 * - Can use 'customize vehicle'.
 
 * Marked techs trigger ability gains on their own without gain hooks.
 
@@ -2082,6 +2085,7 @@ Available flags:
  !PAINT - cannot be painted
  ATTACH-ROAD - on the ascii map, roads attach to this tile like it's a road
  BURNABLE - will catch fire if a fire is placed inside by a hostile empire
+ EXIT - on interior rooms, players can 'exit' (or disembark) to leave from here
  SAIL - can enter this building with a boat
  ITEM-LIMIT - only a certain number of items can be dropped here
  LONG-AUTOSTORE - autostore takes 72 hours instead of 3 here
@@ -2508,6 +2512,8 @@ Available flags:
  REMOVE-PRODUCTION - removes this craft's resources from empire production
     counts. Used e.g. in smelting copper bars, to prevent smelt/separate loops.
     Does not work on vehicles/buildings.
+ TAKE-REQUIRED-OBJ - takes the 'required object' when you start the craft, and
+    may refund it when dismantled (unless the object is 1-USE)
 
 See also: CEDIT TYPE, OLC CRAFTS, OLC REMOVEINDEV
 #d
@@ -2524,6 +2530,7 @@ Fields:
   &c-flagged&0, &cunflagged&0 - see HELP CEDIT FLAGS
   &c-level -levelover -levelunder&0 - specific level requirement
   &c-quantity -quantityover -quantityunder&0 - specific quantity value
+  &c-requiresobject&0 - requires any object
   &c-time -timeover -timeunder&0 - specific craft time (in action ticks)
 
 Examples:
@@ -5787,7 +5794,7 @@ Example:
 
 For notes on the mud's building rules, see HELP BUILDING GUIDE.
 
-See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+See also: BUILDING-VEHICLES, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
 OLC-CONTROLS "OLC CONTROLS" "OLC SETFLAGS" "OLC SETMINVNUM" "OLC SETMAXVNUM" "OLC MIN VNUM" "OLC MAX VNUM" "OLC VNUMS" "OLC FLAGS"
 
@@ -6238,7 +6245,7 @@ Example vehicle settings:
  chair: SIT IN DRAGGABLE CAN-PORTAL
  catapult: LEADABLE SIEGE-WEAPONS, animals required: 2
 
-See also: OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+See also: BUILDING-VEHICLES, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
 #d
 PROGEDIT "OLC PROGRESSION" "PROGRESSION OLC" "PROGRESS OLC"
 
@@ -7565,6 +7572,26 @@ ription, and look description.
 Object values:
  0 - vnum for the book text (from the book editor)
 #d
+BUILDING-VEHICLES "VEHICLE BUILDINGS" "ROOM BUILDINGS" "BUILDING ROOMS" "BUILDING VEHICLES" "BUILDINGS AS VEHICLES" "VEHICLES AS BUILDINGS" VEHICLE-BUILDINGS
+
+There are two different ways to do buildings:
+- Using the .build editor creates a buliding that replaces a map tile.
+- Using the .vehicle editor with the BUILDING flag creates a building that sits
+  in a map tile like a vehicle.
+
+Most EmpireMUDs will combine the two systems. Some features, like walls and
+fences, work best as whole-tile buildings. Others, like homes, work better as
+vehicle-buildings.
+
+Some important notes:
+- Building-vhicles are only claimed when the whole tile is claimed (unless they
+  have a movement flag like DRIVING, in which case they work like vehicles).
+- Using '%load% vehicle <vnum>' to load a building-vehicle will automatically
+  set its owner to the owner of the room.
+- Be careful using %own% on building-vehicles. It's better to %own% the whole
+  room and let the building-vehicles inside inherit this ownership, rather than
+  setting them separately, which won't affect the room's owner.
+#d
 "COINS ITEM" "COINS OBJECT" "COIN ITEM" "COIN OBJECT"
 
 The COINS type represents a pile of coins and will be converted from an object
@@ -7962,6 +7989,11 @@ Available flags:
  ON-FIRE - currently burning (via the "light" command)
  !LOAD-ONTO-VEHICLE - cannot be loaded onto another vehicle
  VISIBLE-IN-DARK - can be seen at night without a light
+ BUILDING - acts more like a building than a vehicle
+ NEVER-DISMANTLE - can never be dismantled
+ *PLAYER-NO-DISMANTLE - player has toggled no-dismantle on
+ *DISMANTLING - is being dismantled
+ *PLAYER-NO-WORK - player has toggled no-work on
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually

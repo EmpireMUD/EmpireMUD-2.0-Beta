@@ -322,6 +322,14 @@ void set_extra_data(struct room_extra_data **list, int type, int value);
 #define remove_room_extra_data(room, type)  remove_extra_data(&ROOM_EXTRA_DATA(room), type)
 #define set_room_extra_data(room, type, value)  set_extra_data(&ROOM_EXTRA_DATA(room), type, value)
 
+// vehicle extra data helpers
+#define add_to_vehicle_extra_data(veh, type, add_value)  add_to_extra_data(&VEH_EXTRA_DATA(veh), type, add_value)
+#define find_vehicle_extra_data(veh, type)  find_extra_data(VEH_EXTRA_DATA(veh), type)
+#define get_vehicle_extra_data(veh, type)  get_extra_data(VEH_EXTRA_DATA(veh), type)
+#define multiply_vehicle_extra_data(veh, type, multiplier)  multiply_extra_data(&VEH_EXTRA_DATA(veh), type, multiplier);
+#define remove_vehicle_extra_data(veh, type)  remove_extra_data(&VEH_EXTRA_DATA(veh), type)
+#define set_vehicle_extra_data(veh, type, value)  set_extra_data(&VEH_EXTRA_DATA(veh), type, value)
+
 // room targeting handlers
 extern room_data *find_target_room(char_data *ch, char *rawroomstr);
 

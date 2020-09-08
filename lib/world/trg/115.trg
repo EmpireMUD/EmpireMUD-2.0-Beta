@@ -510,8 +510,8 @@ end
 if %actor.morph% == 11528
   halt
 end
-%send% %actor% You shrink to tiny size! (type 'morph normal' to return to full size)
-%echoaround% %actor% %actor.name% shrinks to tiny size!
+%send% %actor% # You shrink to tiny size! (type 'morph normal' to return to full size)
+%echoaround% %actor% # %actor.name% shrinks to tiny size!
 %morph% %actor% 11528
 ~
 #11529

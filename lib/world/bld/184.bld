@@ -24,10 +24,10 @@ S
 Strange Chariot~
 Inside the Strange Silver Chariot~
 &0[  ]~
-1 0 a 0
+1 0 aq 0
 0 0 0 -1
 C
-disembark~
+~
 D
    Climbing inside the short silver chariot, you find its plush seats to be
 among the most comfortable you have ever sat upon. The rest of the interior is
@@ -54,10 +54,10 @@ S
 A Massive Chamber~
 A Massive Control Room~
 &0[  ]~
-1 0 a 0
+1 0 aq 0
 0 0 0 -1
 C
-disembark~
+~
 D
    Stepping inside the strange blue box, you find it is much, much bigger on
 the inside. In fact, you step out for a moment and then step inside again to be

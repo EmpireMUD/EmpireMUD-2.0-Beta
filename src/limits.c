@@ -53,7 +53,6 @@ extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 void scale_item_to_level(obj_data *obj, int level);
-void stop_room_action(room_data *room, int action, int chore);
 
 // locals
 int health_gain(char_data *ch, bool info_only);
@@ -2077,7 +2076,7 @@ void gain_condition(char_data *ch, int condition, int value) {
 * @return int How much health to gain per 5 seconds.
 */
 int health_gain(char_data *ch, bool info_only) {
-	double gain, min;
+	double gain, min, needed;
 	
 	// no health gain in combat
 	if (GET_POS(ch) == POS_FIGHTING || FIGHTING(ch) || IS_INJURED(ch, INJ_STAKED | INJ_TIED)) {
@@ -2097,7 +2096,8 @@ int health_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
-			min = round((double) GET_MAX_HEALTH(ch) / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			needed = MAX(GET_MAX_HEALTH(ch), GET_MAX_HEALTH(ch) - GET_HEALTH(ch)) + GET_HEALTH_DEFICIT(ch);
+			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 		
@@ -2119,7 +2119,7 @@ int health_gain(char_data *ch, bool info_only) {
 * @return int How much mana to gain per 5 seconds.
 */
 int mana_gain(char_data *ch, bool info_only) {
-	double gain, min;
+	double gain, min, needed;
 	
 	double solar_power_levels[] = { 2, 2.5, 2.5 };
 	
@@ -2150,7 +2150,8 @@ int mana_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
-			min = round((double) GET_MAX_MANA(ch) / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			needed = MAX(GET_MAX_MANA(ch), GET_MAX_MANA(ch) - GET_MANA(ch)) + GET_MANA_DEFICIT(ch);
+			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 		
@@ -2172,7 +2173,7 @@ int mana_gain(char_data *ch, bool info_only) {
 * @return int How much move to gain per 5 seconds.
 */
 int move_gain(char_data *ch, bool info_only) {
-	double gain, min;
+	double gain, min, needed;
 	
 	if (IS_INJURED(ch, INJ_STAKED | INJ_TIED)) {
 		return 0;
@@ -2191,7 +2192,8 @@ int move_gain(char_data *ch, bool info_only) {
 		}
 		
 		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
-			min = round((double) GET_MAX_MOVE(ch) / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			needed = MAX(GET_MAX_MOVE(ch), GET_MAX_MOVE(ch) - GET_MOVE(ch)) + GET_MOVE_DEFICIT(ch);
+			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 

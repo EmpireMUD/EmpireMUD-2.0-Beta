@@ -253,12 +253,13 @@ See also: DEPOSITORY, EXCHANGE, MINT, VAULT, WITHDRAW
 #
 DIPLOMACY "DIPLOMACY COMMAND"
 
-Usage:  diplomacy <option> <empire>
+Usage:  diplomacy [option] [empire]
         diplomacy cancel <option> <empire>
+        diplomacy <empire>
 
 Engage in politics with another empire. This command is used to offer, accept,
-or demand political relations. You can also cancel open offers. Check the
-empire detail page to see current relationships.
+or demand political relations. You can also cancel open offers. Type this
+command by itself to see your current relations.
 
 If an empire's members are ignoring you, you will not be able to make or accept
 diplomatic offers with them.
@@ -268,12 +269,21 @@ You can only go to war with or steal from an empire if at least one of their
 members is online (you can also steal with a thievery permit).
 
 Options (see help files on each of these commands for more info):
-  Friendly options: &ypeace&0, &ytruce&0, &ynonaggression&0, &yalliance&0
-  Trade relations: &ytrade&0 (help TRADE RELATIONS)
-  Hostile relations: &ydistrust&0, &ythievery&0, &ywar&0
-  Friendly war: &ybattle&0
+ &ypeace&0 - end a war or state of distrust
+ &ytruce&0 - end a war without declaring peace
+ &yalliance&0 - propose or accept a full alliance
+ &ynonaggression&0 - propose or accept a pact of non-aggression
+ &ytrade&0 - propose or accept a trade agreement
+ &ydistrust&0 - declare that your empire distrusts, but is not at war with, another
+ &ywar&0 - declare war on an empire! (incurs a war cost)
+ &ybattle&0 - suggest a friendly war
+ &ythievery&0 - buy permission to steal from an empire! (incurs a war cost)
 
-See also: EMPIRE SCORE, IGNORE, THIEVERY
+Privileged immortals can give an empire name as the first argument of this
+command and perform the command as a member of that empire. Immortals must use
+quotes if the name is more than 1 word.
+
+See also: EMPIRE SCORE, IGNORE, THIEVERY, TRADE RELATIONS, WAR
 #
 "DIPLOMACY BATTLE" "FRIENDLY WAR" "BATTLE WAR" "OFFER BATTLE"
 
@@ -755,35 +765,24 @@ Rewards the following buildings:
 
 See also: LUXURIES GOAL, PROGRESS
 #
-MAINTAIN MAINTENANCE DISREPAIR
-
-Usage:  maintain
-
-Buildings fall into disrepair over time. Different buildings require different
-items for maintenance, which are shown beneath the building's description or
-map.
-
-It takes roughly two and a half months (realtime) for buildings to decay,
-although some buildings (and all unfinished buildings) decay faster.
-
-Use findmaintenance to find buildings in need. You can also use workforce to
-maintain your buildings.
-
-See also: FINDMAINTENANCE, RUINS, WORKFORCE
-#
 MANAGE MANAGEMENT "LAND MANAGEMENT" NOWORK NO-WORK NODISMANTLE NO-DISMANTLE PUBLIC PUBLICIZE
 
 Usage:  manage [option] [on/off]
+        manage <vehicle> [option] [on/off]
 
 This command allows you to manage land use. You can configure the following
 options:
  &cpublic&0 - Non-members can use the room/building.
  &cno-abandon&0 - The tile cannot be abandoned by accident (or by Workforce).
  &cno-dismantle&0 - The building cannot be dismantled.
- &cno-work&0 - Workforce will not work the tile.
+ &cno-work&0 - Workforce will not work the tile (also applies to vehicles here).
 
 Immortals can also configure additional options:
  &cunclaimable&0 - Players cannot claim the tile.
+
+You can also manage vehicles (as well as buildings that appear like vehicles):
+ &cno-dismantle&0 - The vehicle/building cannot be dismantled.
+ &cno-work&0 - Workforce will not work the vehicle/building.
 #
 MEMBERS MEMBERSHIP "EMPIRE MEMBERS" "EMPIRE MEMBERSHIP" "EMPIRE GREATNESS" "TIMED-OUT" "TIMED OUT" TIMEOUTS "EMPIRE TIMEOUT"
 
@@ -1343,6 +1342,7 @@ Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce copy <island name>
         workforce keep [number | all] <item name>
         workforce keep default [number | all | none]
+        workforce limit [amount | none] [keywords]
 
 Once your empire has purchased the Workforce progress reward, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
@@ -1373,9 +1373,10 @@ configuration of another island into the island you are currently in. Using
 Note: Your workforce will only produce resources up to your workforce cap.
 
 See &cHELP WORKFORCE CHORES&0 for a list of all workforce chores with descriptions.
+See &cHELP WORKFORCE LIMIT&0 for information on limiting production
 
 See also: WORKFORCE CHORES, WORKFORCE WHERE, WORKFORCE WHY, NO-WORK,
-          WORKFORCE KEEP, WORKFORCE CAP
+          WORKFORCE KEEP, WORKFORCE CAP, WORKFORCE LIMIT
 #
 "WORKFORCE CAP"
 
@@ -1408,7 +1409,8 @@ Workforce types:
             any building you've started to dismantle. They build using stored
             empire resources, not items on the ground. Workers can't provide
             coins, liquids (like water), or pools (like mana) for building. Any
-            building that requires one of these must be finished manually.
+            building that requires one of these must be finished manually. They
+            will also build or dismantle vehicles.
   &yburn-stumps:&0 Will burn down 'stumps' tiles.
   &ychopping:&0 NPCs will chop down forests and desert groves (Not orchards - 
      use farming without replanting for that).
@@ -1419,7 +1421,7 @@ Workforce types:
   &yfishing:&0 Will catch fish at the fishery. Costs no food.
   &yglassmaking:&0 Turns basic sand into glass ingots at the glass blower.
   &cherb-gardening (skilled):&0 NPCs will gather herbs in gardens.
-  &ymaintenance:&0 NPCs will keep buildings maintained.
+  &ymaintenance:&0 NPCs will keep buildings and vehicles maintained.
   &ymilling:&0 Will mill grains into flour.
   &ymining:&0 NPCs will mine your mines.
   &cminting (skilled):&0 NPCs will mint treasure into coins.
@@ -1428,7 +1430,6 @@ Workforce types:
      requires both Exarch Crafts and Skilled Labor.
   &yoilmaking:&0 Will press oil.
   &yquarrying:&0 NPCs will quarry huge stone blocks at the quarry.
-  &yrepair-vehicles&0: Will keep vehicles maintained.
   &yreplanting:&0 after farming crops, NPCs will replant them.
   &ysawing:&0 NPCs will convert trees into lumber at lumber yards.
   &yscraping:&0 NPCs will convert trees into logs at lumber yards.
@@ -1467,6 +1468,21 @@ Examples:
 
 See also: WORKFORCE
 #
+"WORKFORCE LIMIT" "WORKFORCE LIMITS"
+
+Usage:  workforce limit [keywords]
+        workforce limit <amount | none> <keywords>
+
+This command lets you set production limits on items. No workforce chore will
+produce more than the limited amount of an item.
+
+You can use multiple keywords to try to get the right item. Example:
+> workforce limit 15 large tree
+
+Using this command without an amount lets you search your current limits.
+
+See also: WORKFORCE
+#
 "WORKFORCE NO-WORK" "WORKFORCE NOWORK" NO-WORK NOWORK
 
 Usage:  workforce no-work
@@ -1482,7 +1498,8 @@ Usage:  workforce where
         workforce where here
 
 This command will show you how many of your citizens are working on each
-active workforce chore right now.
+active workforce chore right now. This excludes artisans (like the smith or
+baker), who are always at work.
 
 If you use the "here" argument, it will only check the island you're on.
 

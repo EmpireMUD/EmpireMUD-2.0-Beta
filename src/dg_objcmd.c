@@ -43,7 +43,9 @@ extern vehicle_data *get_vehicle(char *name);
 vehicle_data *get_vehicle_by_obj(obj_data *obj, char *name);
 vehicle_data *get_vehicle_near_obj(obj_data *obj, char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
+void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
+void sub_write_to_room(char *str, room_data *room, bool use_queue);
 void die(char_data *ch, char_data *killer);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
@@ -200,14 +202,15 @@ OCMD(do_obuild) {
 
 OCMD(do_oecho) {
 	room_data *room;
+	bool use_queue;
 
-	skip_spaces(&argument);
+	use_queue = script_message_should_queue(&argument);
 
 	if (!*argument) 
 		obj_log(obj, "oecho called with no args");
 	else if ((room = obj_room(obj))) {
 		if (ROOM_PEOPLE(room))
-			sub_write(argument, ROOM_PEOPLE(room), TRUE, TO_ROOM | TO_CHAR);
+			sub_write(argument, ROOM_PEOPLE(room), TRUE, TO_ROOM | TO_CHAR | (use_queue ? TO_QUEUE : 0));
 	}
 	else
 		obj_log(obj, "oecho called by object in no location");
@@ -255,13 +258,55 @@ OCMD(do_oheal) {
 }
 
 
+/* prints the argument to all the rooms aroud the obj */
+OCMD(do_oasound) {
+	bool use_queue, map_echo = FALSE;
+	struct room_direction_data *ex;
+	room_data *to_room, *room;
+	int dir;
+	
+	if (!(room = obj_room(obj))) {
+		return;	// can't find room
+	}
+
+	use_queue = script_message_should_queue(&argument);
+	
+	if (!*argument) {
+		obj_log(obj, "oasound called with no argument");
+		return;
+	}
+
+	if (GET_ROOM_VNUM(room) < MAP_SIZE) {
+		for (dir = 0; dir < NUM_2D_DIRS; ++dir) {
+			if ((to_room = SHIFT_DIR(room, dir))) {
+				sub_write_to_room(argument, to_room, use_queue);
+			}
+		}
+		map_echo = TRUE;
+	}
+
+	if (COMPLEX_DATA(room)) {
+		LL_FOREACH(COMPLEX_DATA(room)->exits, ex) {
+			if ((to_room = ex->room_ptr) && room != to_room) {
+				// this skips rooms already hit by the direction shift
+				if (!map_echo || GET_ROOM_VNUM(to_room) >= MAP_SIZE) {
+					sub_write_to_room(argument, to_room, use_queue);
+				}
+			}
+		}
+	}
+}
+
+
 OCMD(do_obuildingecho) {
-	room_data *froom, *home_room, *iter;
+	room_data *froom, *home_room;
 	room_data *orm = obj_room(obj);
-	char room_number[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH], *msg;
+	char room_number[MAX_INPUT_LENGTH], *msg;
+	char_data *iter;
+	bool use_queue;
 
 	msg = any_one_word(argument, room_number);
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*room_number || !*msg) {
 		obj_log(obj, "obuildingecho called with too few args");
@@ -270,14 +315,11 @@ OCMD(do_obuildingecho) {
 		obj_log(obj, "obuildingecho called with invalid target");
 	}
 	else {
-		home_room = HOME_ROOM(froom);	// right?
+		home_room = HOME_ROOM(froom);
 		
-		sprintf(buf, "%s\r\n", msg);
-		
-		send_to_room(buf, home_room);
-		for (iter = interior_room_list; iter; iter = iter->next_interior) {
-			if (HOME_ROOM(iter) == home_room && iter != home_room && ROOM_PEOPLE(iter)) {
-				send_to_room(buf, iter);
+		DL_FOREACH(character_list, iter) {
+			if (HOME_ROOM(IN_ROOM(iter)) == home_room) {
+				sub_write(msg, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
 		}
 	}
@@ -286,15 +328,14 @@ OCMD(do_obuildingecho) {
 
 OCMD(do_oregionecho) {
 	char room_number[MAX_INPUT_LENGTH], radius_arg[MAX_INPUT_LENGTH], *msg;
-	descriptor_data *desc;
 	room_data *center, *orm = obj_room(obj);
+	bool use_queue, indoor_only = FALSE;
 	char_data *targ;
 	int radius;
-	bool indoor_only = FALSE;
 
 	argument = any_one_word(argument, room_number);
 	msg = one_argument(argument, radius_arg);
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*room_number || !*radius_arg || !*msg) {
 		obj_log(obj, "oregionecho called with too few args");
@@ -313,21 +354,17 @@ OCMD(do_oregionecho) {
 			indoor_only = TRUE;
 		}
 		
-		if (center) {			
-			for (desc = descriptor_list; desc; desc = desc->next) {
-				if (STATE(desc) != CON_PLAYING || !(targ = desc->character)) {
+		if (center) {
+			DL_FOREACH(character_list, targ) {
+				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
 					continue;
 				}
-				if (NO_LOCATION(IN_ROOM(targ))) {
-					continue;
-				}
-				if (compute_distance(center, IN_ROOM(targ)) > radius) {
+				if (indoor_only && IS_OUTDOORS(targ)) {
 					continue;
 				}
 				
-				if (!indoor_only || IS_OUTDOORS(targ)) {
-					msg_to_desc(desc, "%s\r\n", CAP(msg));
-				}
+				// send
+				sub_write(msg, targ, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 			}
 		}
 	}
@@ -337,9 +374,11 @@ OCMD(do_oregionecho) {
 OCMD(do_ovehicleecho) {
 	char targ[MAX_INPUT_LENGTH], *msg;
 	vehicle_data *veh;
+	char_data *iter;
+	bool use_queue;
 
 	msg = any_one_word(argument, targ);
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*targ || !*msg) {
 		obj_log(obj, "ovehicleecho called with too few args");
@@ -348,7 +387,11 @@ OCMD(do_ovehicleecho) {
 		obj_log(obj, "ovehicleecho called with invalid target");
 	}
 	else {
-		msg_to_vehicle(veh, FALSE, "%s\r\n", msg);
+		DL_FOREACH(character_list, iter) {
+			if (VEH_SITTING_ON(veh) == iter || GET_ROOM_VEHICLE(IN_ROOM(iter)) == veh) {
+				sub_write(msg, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
+			}
+		}
 	}
 }
 
@@ -357,10 +400,11 @@ OCMD(do_ovehicleecho) {
 OCMD(do_oechoneither) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	char_data *vict1, *vict2, *iter;
+	bool use_queue;
 	char *p;
 
 	p = two_arguments(argument, arg1, arg2);
-	skip_spaces(&p);
+	use_queue = script_message_should_queue(&p);
 
 	if (!*arg1 || !*arg2 || !*p) {
 		obj_log(obj, "oechoneither called with missing arguments");
@@ -378,13 +422,14 @@ OCMD(do_oechoneither) {
 	
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(vict1)), iter, next_in_room) {
 		if (iter->desc && iter != vict1 && iter != vict2) {
-			sub_write(p, iter, TRUE, TO_CHAR);
+			sub_write(p, iter, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		}
 	}
 }
 
 
 OCMD(do_orestore) {
+	void complete_vehicle(vehicle_data *veh);
 	extern const bool aff_is_bad[];
 	extern const double apply_values[];
 	
@@ -477,10 +522,10 @@ OCMD(do_orestore) {
 		// not sure what to do for objs
 	}
 	if (veh) {
-		free_resource_list(VEH_NEEDS_RESOURCES(veh));
-		VEH_NEEDS_RESOURCES(veh) = NULL;
-		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		if (!VEH_IS_DISMANTLING(veh)) {
+			complete_vehicle(veh);
+		}
 	}
 	if (room) {
 		if (COMPLEX_DATA(room)) {
@@ -495,6 +540,7 @@ OCMD(do_orestore) {
 
 OCMD(do_osend) {
 	char buf[MAX_INPUT_LENGTH], *msg;
+	bool use_queue;
 	char_data *ch;
 
 	msg = any_one_arg(argument, buf);
@@ -504,7 +550,7 @@ OCMD(do_osend) {
 		return;
 	}
 
-	skip_spaces(&msg);
+	use_queue = script_message_should_queue(&msg);
 
 	if (!*msg) {
 		obj_log(obj, "osend called without a message");
@@ -513,9 +559,9 @@ OCMD(do_osend) {
 
 	if ((ch = get_char_by_obj(obj, buf))) {
 		if (subcmd == SCMD_OSEND)
-			sub_write(msg, ch, TRUE, TO_CHAR);
+			sub_write(msg, ch, TRUE, TO_CHAR | (use_queue ? TO_QUEUE : 0));
 		else if (subcmd == SCMD_OECHOAROUND)
-			sub_write(msg, ch, TRUE, TO_ROOM);
+			sub_write(msg, ch, TRUE, TO_ROOM | (use_queue ? TO_QUEUE : 0));
 	}
 	else
 		obj_log(obj, "no target found for osend");
@@ -1318,6 +1364,11 @@ OCMD(do_dgoload) {
 			scale_vehicle_to_level(veh, 0);
 		}
 		
+		// ownership
+		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(room))) {
+			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(room)));
+		}
+		
 		load_vtrigger(veh);
 	}
 	else {
@@ -1719,6 +1770,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "RESERVED", 0, 0 },/* this must be first -- for specprocs */
 
 	{ "oadventurecomplete", do_oadventurecomplete, NO_SCMD },
+	{ "oasound", do_oasound, NO_SCMD },
 	{ "oat", do_oat, NO_SCMD },
 	{ "obuild", do_obuild, NO_SCMD },
 	{ "odoor", do_odoor, NO_SCMD },

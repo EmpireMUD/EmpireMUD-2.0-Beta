@@ -43,12 +43,16 @@ extern const char *mob_move_types[];
 
 // external funcs
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
+extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 void do_unseat_from_vehicle(char_data *ch);
 extern char *get_room_name(room_data *room, bool color);
 
 // local protos
 bool can_enter_room(char_data *ch, room_data *room);
-int perform_move(char_data *ch, int dir, bitvector_t flags);
+int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
+bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
+void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room, int dir, bitvector_t flags);
+void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room, int dir, bitvector_t flags);
 void skip_run_filler(char **string);
 bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
 
@@ -352,6 +356,41 @@ int count_recent_moves(char_data *ch) {
 }
 
 
+/**
+* Determines the effective move type based on the movement. For example, moving
+* from water to water triggers 'swim' unless flying.
+*
+* @param char_data *ch The person moving.
+* @param room_data *to_room Optional: The target room (may be NULL).
+* @return int A MOB_MOVE_ value to determine what type of movement to show.
+*/
+int determine_move_type(char_data *ch, room_data *to_room) {
+	int type = IS_NPC(ch) ? MOB_MOVE_TYPE(ch) : MOB_MOVE_WALK;
+	
+	// in order of priority
+	if (IS_MORPHED(ch)) {
+		type = MORPH_MOVE_TYPE(GET_MORPH(ch));
+	}
+	else if (AFF_FLAGGED(ch, AFF_FLY) && !IS_NPC(ch)) {
+		// only switch to fly if not an npc
+		type = MOB_MOVE_FLY;
+	}
+	else if (IS_RIDING(ch)) {
+		type = MOB_MOVE_RIDE;
+	}
+	
+	// overrides
+	if (type == MOB_MOVE_WALK && to_room && (WATER_SECT(IN_ROOM(ch)) || WATER_SECT(to_room)) && type != MOB_MOVE_FLY) {
+		type = MOB_MOVE_SWIM;
+	}
+	else if (type == MOB_MOVE_WALK && (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) || ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH)) && type != MOB_MOVE_FLY) {
+		type = MOB_MOVE_CLIMB;
+	}
+	
+	return type;
+}
+
+
 void do_doorcmd(char_data *ch, obj_data *obj, int door, int scmd) {
 	char lbuf[MAX_STRING_LENGTH];
 	room_data *other_room = NULL;
@@ -528,6 +567,37 @@ obj_data *find_back_portal(room_data *in_room, room_data *from_room, obj_data *f
 	
 	// otherwise just use the original one
 	return fallback;
+}
+
+
+/**
+* Determines which room you exit to when you leave the building/vehicle you
+* are currently in. This does not validate if you CAN exit from a room; it
+* returns a room if possible anyway.
+*
+* @param room_data *from_room The room to exit from.
+* @return room_data* The room to exit to, if any.
+*/
+room_data *get_exit_room(room_data *from_room) {
+	room_data *home;
+	
+	if (GET_ROOM_VEHICLE(from_room)) {
+		// vehicles exit to the room they are in
+		return IN_ROOM(GET_ROOM_VEHICLE(from_room));
+	}
+	else if ((home = HOME_ROOM(from_room)) && GET_BUILDING(home)) {
+		if (ROOM_BLD_FLAGGED(home, BLD_OPEN)) {
+			// open buildings exit to the same tile
+			return home;
+		}
+		else if (BUILDING_ENTRANCE(home) != NO_DIR) {
+			// regular building exits out the front
+			return real_shift(home, shift_dir[rev_dir[BUILDING_ENTRANCE(home)]][0], shift_dir[rev_dir[BUILDING_ENTRANCE(home)]][1]);
+		}
+	}
+	
+	// all other cases
+	return NULL;
 }
 
 
@@ -768,7 +838,7 @@ void process_running(char_data *ch) {
 	dir = confused_dirs[get_north_for_char(ch)][0][dir];
 	
 	// attempt to move
-	if (!perform_move(ch, dir, MOVE_RUN)) {
+	if (!perform_move(ch, dir, NULL, MOVE_RUN)) {
 		done = TRUE;
 	}
 	
@@ -814,78 +884,217 @@ void skip_run_filler(char **string) {
 //// MOVE VALIDATORS /////////////////////////////////////////////////////////
 
 /**
-* This determines if a PLAYER can move somewhere. Mobs do not hit this check.
+* This is called by both players and NPCs (unlike player_can_move) and
+* determines if the character can move from their current room to the target.
 *
-* @param char_data *ch The player moving.
-* @param int dir A real dir, not a confused dir.
+* @param char_data *ch The character moving.
+* @param int dir A real dir, not a confused dir (may be NO_DIR if portaling, etc).
 * @param room_data *to_room The target room.
 * @param bitvector_t flags MOVE_ flags passed along.
-* @return int 0 for fail, 1 for success
+* @param bool triggers If TRUE, runs leave triggers.
+* @return bool TRUE indicates can-move, FALSE means they were blocked (and received an error).
 */
-int can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
+bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags, bool triggers) {
+	room_data *was_in = IN_ROOM(ch);
+	
+	// overrides all move restrictions
+	if (PLR_FLAGGED(ch, PLR_UNRESTRICT)) {
+		return TRUE;
+	}
+	
+	if (IS_INJURED(ch, INJ_TIED) || GET_HEALTH(ch) < 1) {
+		msg_to_char(ch, "You can't seem to move!\r\n");
+		return FALSE;
+	}
+	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
+		msg_to_char(ch, "You are entangled and can't move.\r\n");
+		return FALSE;
+	}
+	if (MOB_FLAGGED(ch, MOB_TIED)) {
+		msg_to_char(ch, "You are tied in place.\r\n");
+		return FALSE;
+	}
+	if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && IN_ROOM(ch) == IN_ROOM(ch->master)) {
+		send_to_char("The thought of leaving your master makes you weep.\r\n", ch);
+		act("$n bursts into tears.", FALSE, ch, NULL, NULL, TO_ROOM);
+		return FALSE;
+	}
+	if (GET_FEEDING_FROM(ch) || GET_FED_ON_BY(ch)) {
+		msg_to_char(ch, "You can't seem to move!\r\n");
+		return FALSE;
+	}
+	if (MOB_FLAGGED(ch, MOB_AQUATIC) && !WATER_SECT(to_room) && !EFFECTIVELY_FLYING(ch)) {
+		msg_to_char(ch, "You can't go on land!\r\n");
+		return FALSE;
+	}
+	if (!can_enter_room(ch, to_room)) {	// checks instance limits, etc
+		msg_to_char(ch, "You can't seem to go there. Perhaps it's full.\r\n");
+		return FALSE;
+	}
+	if (GET_LED_BY(ch) && IS_MAP_BUILDING(to_room) && !BLD_ALLOWS_MOUNTS(to_room)) {
+		msg_to_char(ch, "You can't be led there.\r\n");
+		return FALSE;
+	}
+	if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && !IS_SET(flags, MOVE_EARTHMELD) && (ROOM_OWNER(to_room) && GET_LOYALTY(ch) != ROOM_OWNER(to_room)) && IS_COMPLETE(to_room) && !EFFECTIVELY_FLYING(ch)) {
+		msg_to_char(ch, "There is a barrier in your way.\r\n");
+		return FALSE;
+	}
+	
+	// things that require a direction (i.e. player is not portaling)
+	if (dir != NO_DIR) {
+		int reverse = (GET_LAST_DIR(ch) == NO_DIR) ? NORTH : rev_dir[(int) GET_LAST_DIR(ch)];
+		
+		// on a barrier: can only go back last-direction
+		if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER) && IS_COMPLETE(IN_ROOM(ch)) && !IS_SET(flags, MOVE_EARTHMELD) && !EFFECTIVELY_FLYING(ch) && GET_LAST_DIR(ch) != NO_DIR && dir != reverse) {
+			room_data *from_room = real_shift(IN_ROOM(ch), shift_dir[reverse][0], shift_dir[reverse][1]);
+		
+			// ok, we know we're on a wall and trying to go the wrong way. But does the next tile also have this issue?
+			if (from_room && (!ROOM_BLD_FLAGGED(from_room, BLD_BARRIER) || !IS_COMPLETE(from_room) || !can_use_room(ch, from_room, MEMBERS_ONLY))) {
+				msg_to_char(ch, "You are unable to pass. You can only go back %s.\r\n", dirs[get_direction_for_char(ch, reverse)]);
+				return FALSE;
+			}
+		}
+		
+		// unfinished interior room
+		if (IS_INSIDE(IN_ROOM(ch)) && IS_INSIDE(to_room) && !IS_COMPLETE(IN_ROOM(ch)) && GET_LAST_DIR(ch) != NO_DIR && !IS_SET(flags, MOVE_EARTHMELD) && dir != rev_dir[(int) GET_LAST_DIR(ch)]) {
+			msg_to_char(ch, "This room is incomplete. You can only go back %s.\r\n", dirs[get_direction_for_char(ch, rev_dir[(int) GET_LAST_DIR(ch)])]);
+			return FALSE;
+		}
+	}
+	
+	// check player-can-move LAST before triggers
+	if (!IS_NPC(ch) && !player_can_move(ch, dir, to_room, flags)) {
+		return FALSE;
+	}
+
+	// check leave triggers (ideally this is last)
+	if (triggers && (!leave_mtrigger(ch, dir, NULL) || !leave_wtrigger(IN_ROOM(ch), ch, dir, NULL) || !leave_vtrigger(ch, dir, NULL) || !leave_otrigger(IN_ROOM(ch), ch, dir, NULL))) {
+		// script should have sent message
+		return FALSE;
+	}
+	// check that they're still in the same room after leave trigs (prevent teleport crashes)
+	if (IN_ROOM(ch) != was_in) {
+		// script should have sent message
+		return FALSE;
+	}
+	
+	// made it this far: success
+	return TRUE;
+}
+
+
+/**
+* This determines if a PLAYER can move somewhere. Earthmeld overrides this.
+*
+* @param char_data *ch The player moving.
+* @param int dir A real dir, not a confused dir (may be NO_DIR if portaling, etc).
+* @param room_data *to_room The target room.
+* @param bitvector_t flags MOVE_ flags passed along.
+* @return bool TRUE indicates can-move, FALSE means they were blocked (and received an error).
+*/
+bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
 	ACMD(do_dismount);
 	
 	struct affected_type *af;
 	bool needs_help = FALSE;	// this will trigger a free fly effect if stuck
 	
-	if (WATER_SECT(to_room) && !EFFECTIVELY_SWIMMING(ch)) {
-		if (ROOM_IS_CLOSED(IN_ROOM(ch)) && !ROOM_IS_CLOSED(to_room)) {
-			// player may be stuck
-			needs_help = TRUE;
-		}
-		else {
-			send_to_char("You don't know how to swim.\r\n", ch);
-			return 0;
-		}
+	// overrides all player move restrictions
+	if (PLR_FLAGGED(ch, PLR_UNRESTRICT) || IS_SET(flags, MOVE_EARTHMELD)) {
+		return TRUE;
 	}
 	
-	// check auto-swim
-	else if (!IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !PRF_FLAGGED(ch, PRF_AUTOSWIM) && WATER_SECT(to_room) && !WATER_SECT(IN_ROOM(ch)) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!IS_RIDING(ch) || !MOUNT_FLAGGED(ch, MOUNT_AQUATIC)) && !PLR_FLAGGED(ch, PLR_UNRESTRICT)) {
-		msg_to_char(ch, "You must type 'swim' to enter the water.\r\n");
-		return 0;
-	}
+	// checks that only matter if the move is directional (e.g. not a portal)
+	if (dir != NO_DIR) {
+		// to-water checks
+		if (WATER_SECT(to_room)) {
+			if (!EFFECTIVELY_SWIMMING(ch)) {
+				if (ROOM_IS_CLOSED(IN_ROOM(ch)) && !ROOM_IS_CLOSED(to_room)) {
+					// player may be stuck
+					needs_help = TRUE;
+				}
+				else {
+					send_to_char("You don't know how to swim.\r\n", ch);
+					return FALSE;
+				}
+			}
+			// auto-swim ?
+			if (!PRF_FLAGGED(ch, PRF_AUTOSWIM) && !WATER_SECT(IN_ROOM(ch)) && !IS_SET(flags, MOVE_SWIM | MOVE_IGNORE) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (!IS_RIDING(ch) || !MOUNT_FLAGGED(ch, MOUNT_AQUATIC))) {
+				msg_to_char(ch, "You must type 'swim' to enter the water.\r\n");
+				return FALSE;
+			}
+		}
 	
-	// water->mountain
-	if (!PLR_FLAGGED(ch, PLR_UNRESTRICT) && WATER_SECT(IN_ROOM(ch))) {
-		if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !EFFECTIVELY_FLYING(ch)) {
+		// water -> mountain
+		if (WATER_SECT(IN_ROOM(ch)) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !EFFECTIVELY_FLYING(ch)) {
 			send_to_char("You are unable to scale the cliff.\r\n", ch);
-			return 0;
+			return FALSE;
 		}
-	}
-	if (!IS_SET(flags, MOVE_CLIMB | MOVE_IGNORE) && !PRF_FLAGGED(ch, PRF_AUTOCLIMB) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !PLR_FLAGGED(ch, PLR_UNRESTRICT)) {
-		msg_to_char(ch, "You must type 'climb' to enter such rough terrain.\r\n");
-		return 0;
-	}
-	if (!PLR_FLAGGED(ch, PLR_UNRESTRICT) && IS_MAP_BUILDING(to_room) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
-		if (ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES)) {
-			msg_to_char(ch, "You can't enter it from this side. The entrances are from %s and %s.\r\n", from_dir[get_direction_for_char(ch, BUILDING_ENTRANCE(to_room))], from_dir[get_direction_for_char(ch, rev_dir[BUILDING_ENTRANCE(to_room)])]);
+		// mountain climbing
+		if (!PRF_FLAGGED(ch, PRF_AUTOCLIMB) && !IS_SET(flags, MOVE_CLIMB | MOVE_IGNORE) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && !EFFECTIVELY_FLYING(ch) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+			msg_to_char(ch, "You must type 'climb' to enter such rough terrain.\r\n");
+			return FALSE;
 		}
-		else {
-			msg_to_char(ch, "You can't enter it from this side. The entrance is from %s.\r\n", from_dir[get_direction_for_char(ch, BUILDING_ENTRANCE(to_room))]);
+		// rough-to-rough without the ability
+		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && ROOM_HEIGHT(to_room) > ROOM_HEIGHT(IN_ROOM(ch)) && (!IS_RIDING(ch) || !has_player_tech(ch, PTECH_RIDING_UPGRADE)) && !has_player_tech(ch, PTECH_ROUGH_TERRAIN) && !EFFECTIVELY_FLYING(ch)) {
+			msg_to_char(ch, "You don't have the ability to cross such rough terrain.\r\n");
+			return FALSE;
 		}
-		return 0;
+		// entrance direction checks
+		if (IS_MAP_BUILDING(to_room) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
+			if (ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES)) {
+				msg_to_char(ch, "You can't enter it from this side. The entrances are from %s and %s.\r\n", from_dir[get_direction_for_char(ch, BUILDING_ENTRANCE(to_room))], from_dir[get_direction_for_char(ch, rev_dir[BUILDING_ENTRANCE(to_room)])]);
+			}
+			else {
+				msg_to_char(ch, "You can't enter it from this side. The entrance is from %s.\r\n", from_dir[get_direction_for_char(ch, BUILDING_ENTRANCE(to_room))]);
+			}
+			return FALSE;
+		}
+	} // end of must-be-a-direction
+	
+	// too much inventory
+	if (!IS_IMMORTAL(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
+		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+		return FALSE;
 	}
-	if (!IS_IMMORTAL(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && ROOM_IS_CLOSED(to_room) && (!IS_SET(flags, MOVE_IGNORE) || (ch->master && !IS_NPC(ch) && IS_NPC(ch->master)))) {
+	// permission check
+	if (ROOM_IS_CLOSED(to_room) && !IS_IMMORTAL(ch) && !IS_INSIDE(IN_ROOM(ch)) && !ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_ANY_BUILDING(to_room) && !can_use_room(ch, to_room, GUESTS_ALLOWED) && (!IS_SET(flags, MOVE_IGNORE) || (ch->master && !IS_NPC(ch) && IS_NPC(ch->master)))) {
 		msg_to_char(ch, "You can't enter a building without permission.\r\n");
-		return 0;
+		return FALSE;
 	}
+	// no-fly room
+	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY) && EFFECTIVELY_FLYING(ch)) {
+		msg_to_char(ch, "You can't fly there.\r\n");
+		return FALSE;
+	}
+	// check if they can lead a vehicle there -- validate_vehicle_move sends own messages
+	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !validate_vehicle_move(ch, GET_LEADING_VEHICLE(ch), to_room)) {
+		return FALSE;
+	}
+	// this checks if a led MOB can move there using player_can_move -- TODO this seems like an error
+	if (GET_LEADING_MOB(ch) && !GET_LEADING_MOB(ch)->desc && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !char_can_move(GET_LEADING_MOB(ch), dir, to_room, flags | MOVE_LEAD, FALSE)) {
+		act("You can't go there while leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
+		return FALSE;
+	}
+	
+	// things that trigger auto-dismount:
+
 	if (IS_RIDING(ch) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !has_player_tech(ch, PTECH_RIDING_UPGRADE) && !EFFECTIVELY_FLYING(ch)) {
 		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 			do_dismount(ch, "", 0, 0);
 		}
 		else {
 			msg_to_char(ch, "You can't ride on such rough terrain.\r\n");
-			return 0;
+			return FALSE;
 		}
 	}
 	if (IS_RIDING(ch) && DEEP_WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
-		// ATR does not help ocean
+		// Riding-Upgrade does not help ocean
 		if (PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 			do_dismount(ch, "", 0, 0);
 		}
 		else {
 			msg_to_char(ch, "Your mount won't ride into the ocean.\r\n");
-			return 0;
+			return FALSE;
 		}
 	}
 	if (IS_RIDING(ch) && !has_player_tech(ch, PTECH_RIDING_UPGRADE) && WATER_SECT(to_room) && !MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !EFFECTIVELY_FLYING(ch)) {
@@ -894,7 +1103,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
 		}
 		else {
 			msg_to_char(ch, "Your mount won't ride into the water.\r\n");
-			return 0;
+			return FALSE;
 		}
 	}
 	if (IS_RIDING(ch) && MOUNT_FLAGGED(ch, MOUNT_AQUATIC) && !WATER_SECT(to_room) && !IS_WATER_BUILDING(to_room) && !EFFECTIVELY_FLYING(ch)) {
@@ -903,7 +1112,7 @@ int can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
 		}
 		else {
 			msg_to_char(ch, "Your mount won't go onto the land.\r\n");
-			return 0;
+			return FALSE;
 		}
 	}
 	
@@ -914,32 +1123,8 @@ int can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
 		}
 		else {
 			msg_to_char(ch, "You can't ride indoors.\r\n");
-			return 0;
+			return FALSE;
 		}
-	}
-	
-	if (MOB_FLAGGED(ch, MOB_AQUATIC) && !WATER_SECT(to_room) && !EFFECTIVELY_FLYING(ch)) {
-		msg_to_char(ch, "You can't go on land!\r\n");
-		return 0;
-	}
-	
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && ROOM_HEIGHT(to_room) > ROOM_HEIGHT(IN_ROOM(ch)) && (!IS_NPC(ch) || !MOB_FLAGGED(ch, MOB_MOUNTAINWALK)) && (IS_NPC(ch) || !IS_RIDING(ch) || !has_player_tech(ch, PTECH_RIDING_UPGRADE)) && !has_player_tech(ch, PTECH_ROUGH_TERRAIN) && !EFFECTIVELY_FLYING(ch)) {
-		msg_to_char(ch, "You don't have the ability to cross such rough terrain.\r\n");
-		return 0;
-	}
-	
-	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY) && EFFECTIVELY_FLYING(ch)) {
-		msg_to_char(ch, "You can't fly there.\r\n");
-		return 0;
-	}
-	
-	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !validate_vehicle_move(ch, GET_LEADING_VEHICLE(ch), to_room)) {
-		// sends own messages
-		return 0;
-	}
-	if (GET_LEADING_MOB(ch) && !GET_LEADING_MOB(ch)->desc && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !can_move(GET_LEADING_MOB(ch), dir, to_room, flags | MOVE_LEAD)) {
-		act("You can't go there while leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
-		return 0;
 	}
 	
 	// were we stuck though?
@@ -949,7 +1134,8 @@ int can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
 		free(af);
 	}
 	
-	return 1;
+	// success!
+	return TRUE;
 }
 
 
@@ -1145,7 +1331,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	command_lag(ch, WAIT_MOVEMENT);
 	give_portal_sickness(ch, portal, was_in, to_room);
 	
-	// leading vehicle (movement validated by can_move in do_simple_move)
+	// leading vehicle (movement validated by player_can_move in do_simple_move)
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
 		if (ROOM_PEOPLE(was_in)) {
 			snprintf(buf, sizeof(buf), "$V %s through $p.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
@@ -1207,192 +1393,42 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 * @return bool TRUE on success, FALSE on failure
 */
 bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
-	char lbuf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
-	room_data *was_in = IN_ROOM(ch), *from_room;
-	int need_movement, move_type, reverse = (GET_LAST_DIR(ch) == NO_DIR) ? NORTH : rev_dir[(int) GET_LAST_DIR(ch)];
-	char_data *animal = NULL, *vict;
+	room_data *was_in = IN_ROOM(ch);
 	
-	if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
-		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
+	// basic move checks -- these send their own messages
+	if (!char_can_move(ch, dir, to_room, flags, TRUE)) {
 		return FALSE;
 	}
 	
-	if (IS_INJURED(ch, INJ_TIED) || GET_HEALTH(ch) < 1) {
-		msg_to_char(ch, "You can't seem to move!\r\n");
-		return FALSE;
-	}
-	
-	if (MOB_FLAGGED(ch, MOB_TIED)) {
-		msg_to_char(ch, "You are tied in place.\r\n");
-		return FALSE;
-	}
-
-	/* blocked by a leave trigger ? */
-	if (!leave_mtrigger(ch, dir, NULL) || IN_ROOM(ch) != was_in) {
-		/* prevent teleport crashes */
-		return FALSE;
-	}
-	if (!leave_wtrigger(IN_ROOM(ch), ch, dir, NULL) || IN_ROOM(ch) != was_in) {
-		/* prevent teleport crashes */
-		return FALSE;
-	}
-	if (!leave_vtrigger(ch, dir, NULL) || IN_ROOM(ch) != was_in) {
-		/* prevent teleport crashes */
-		return FALSE;
-	}
-	if (!leave_otrigger(IN_ROOM(ch), ch, dir, NULL) || IN_ROOM(ch) != was_in) {
-		/* prevent teleport crashes */
-		return FALSE;
-	}
-
-	/* charmed? */
-	if (AFF_FLAGGED(ch, AFF_CHARM) && ch->master && IN_ROOM(ch) == IN_ROOM(ch->master)) {
-		send_to_char("The thought of leaving your master makes you weep.\r\n", ch);
-		act("$n bursts into tears.", FALSE, ch, 0, 0, TO_ROOM);
-		return FALSE;
-	}
-
-	if (GET_FEEDING_FROM(ch) || GET_FED_ON_BY(ch)) {
-		msg_to_char(ch, "You can't seem to move!\r\n");
-		return FALSE;
-	}
-
-	// move into a barrier at all?
-	if (!IS_SET(flags, MOVE_EARTHMELD) && !REAL_NPC(ch) && (ROOM_OWNER(to_room) && GET_LOYALTY(ch) != ROOM_OWNER(to_room)) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && IS_COMPLETE(to_room) && !EFFECTIVELY_FLYING(ch)) {
-		msg_to_char(ch, "There is a barrier in your way.\r\n");
-		return FALSE;
-	}
-
-	// wall-block: can only go back last-direction
-	if (!IS_SET(flags, MOVE_EARTHMELD) && !REAL_NPC(ch) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && !EFFECTIVELY_FLYING(ch)) {
-		if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_BARRIER) && IS_COMPLETE(IN_ROOM(ch)) && GET_LAST_DIR(ch) != NO_DIR && dir != reverse) {
-			from_room = real_shift(IN_ROOM(ch), shift_dir[reverse][0], shift_dir[reverse][1]);
-			
-			// ok, we know we're on a wall and trying to go the wrong way. But does the next tile also have this issue?
-			if (from_room && (!ROOM_BLD_FLAGGED(from_room, BLD_BARRIER) || !IS_COMPLETE(from_room) || !can_use_room(ch, from_room, MEMBERS_ONLY))) {
-				msg_to_char(ch, "You are unable to pass. You can only go back %s.\r\n", dirs[get_direction_for_char(ch, reverse)]);
-				return FALSE;
-			}
+	// update move types AFTER char_can_move: detect swim and set movement type
+	if (WATER_SECT(to_room) && !EFFECTIVELY_FLYING(ch) && !IS_RIDING(ch) && !IS_SET(flags, MOVE_EARTHMELD)) {
+		if (has_player_tech(ch, PTECH_SWIMMING)) {
+			flags |= MOVE_SWIM;
+		}
+		else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_AQUATIC)) {
+			flags |= MOVE_SWIM;
 		}
 	}
 	
-	// unfinished tunnel
-	if ((BUILDING_VNUM(IN_ROOM(ch)) == BUILDING_TUNNEL || BUILDING_VNUM(IN_ROOM(ch)) == RTYPE_TUNNEL) && GET_LAST_DIR(ch) != NO_DIR && !IS_COMPLETE(IN_ROOM(ch)) && !IS_SET(flags, MOVE_EARTHMELD) && !PLR_FLAGGED(ch, PLR_UNRESTRICT) && dir != rev_dir[(int) GET_LAST_DIR(ch)]) {
-		msg_to_char(ch, "The tunnel is incomplete. You can only go back %s.\r\n", dirs[get_direction_for_char(ch, rev_dir[(int) GET_LAST_DIR(ch)])]);
-		return FALSE;
-	}
-	
-	if (!REAL_NPC(ch) && !IS_SET(flags, MOVE_EARTHMELD) && !can_move(ch, dir, to_room, flags)) {
-		return FALSE;
-	}
-	
-	// detect swim and set movement type
-	if (WATER_SECT(to_room)) {
-		if (!EFFECTIVELY_FLYING(ch) && !IS_RIDING(ch) && !IS_SET(flags, MOVE_EARTHMELD)) {
-			if (has_player_tech(ch, PTECH_SWIMMING)) {
-				flags |= MOVE_SWIM;
-			}
-			else if (IS_NPC(ch) && MOB_FLAGGED(ch, MOB_AQUATIC)) {
-				flags |= MOVE_SWIM;
-			}
-		}
-	}
-	
-	/* move points needed is avg. move loss for src and destination sect type */
-	need_movement = move_cost(ch, IN_ROOM(ch), to_room, dir, flags);
-
-	if (GET_MOVE(ch) < need_movement && !IS_IMMORTAL(ch) && !IS_NPC(ch)) {
-		if (IS_SET(flags, MOVE_FOLLOW) && ch->master)
-			send_to_char("You are too exhausted to follow.\r\n", ch);
-		else
-			send_to_char("You are too exhausted.\r\n", ch);
-
-		return FALSE;
-	}
-
-	if (GET_LED_BY(ch) && IS_MAP_BUILDING(to_room) && !BLD_ALLOWS_MOUNTS(to_room))
-		return FALSE;
+	// movement costs: do not apply to immortals/npcs
+	if (!IS_IMMORTAL(ch) && !IS_NPC(ch)) {
+		// move points needed is avg. move loss for src and destination sect type
+		int need_movement = move_cost(ch, IN_ROOM(ch), to_room, dir, flags);
 		
-	if (AFF_FLAGGED(ch, AFF_ENTANGLED)) {
-		msg_to_char(ch, "You are entangled and can't move.\r\n");
-		return FALSE;
-	}
-
-	if (MOB_FLAGGED(ch, MOB_TIED)) {
-		msg_to_char(ch, "You're tied up.\r\n");
-		return FALSE;
-	}
-	
-	// checks instance limits, etc
-	if (!can_enter_room(ch, to_room)) {
-		msg_to_char(ch, "You can't seem to go there. Perhaps it's full.\r\n");
-		return FALSE;
-	}
-
-	/* Now we know we're allowed to go into the room. */
-	if (!IS_IMMORTAL(ch) && !IS_NPC(ch))
-		GET_MOVE(ch) -= need_movement;
-
-	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
-	
-	// determine real move type
-	move_type = IS_NPC(ch) ? MOB_MOVE_TYPE(ch) : MOB_MOVE_WALK;
-	if (IS_MORPHED(ch)) {
-		move_type = MORPH_MOVE_TYPE(GET_MORPH(ch));
-	}
-	
-	if (AFF_FLAGGED(ch, AFF_FLY) && !IS_MORPHED(ch) && !IS_NPC(ch)) {
-		move_type = MOB_MOVE_FLY;
-	}
-	else if (IS_RIDING(ch)) {
-		move_type = MOB_MOVE_RIDE;
-	}
-	else if (move_type == MOB_MOVE_WALK && (WATER_SECT(IN_ROOM(ch)) || WATER_SECT(to_room)) && move_type != MOB_MOVE_FLY) {
-		move_type = MOB_MOVE_SWIM;
-	}
-	else if (move_type == MOB_MOVE_WALK && (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) || ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH)) && move_type != MOB_MOVE_FLY) {
-		move_type = MOB_MOVE_CLIMB;
-	}
-
-	// leaving message
-	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
-		*buf2 = '\0';
-		
-		if (IS_SET(flags, MOVE_EARTHMELD)) {
-			*buf2 = '\0';	// no message
-		}
-		else if (IS_SET(flags, MOVE_LEAD)) {
-			sprintf(buf2, "%s leads $n with %s.", HSSH(IS_SET(flags, MOVE_LEAD) ? GET_LED_BY(ch) : ch->master), HMHR(IS_SET(flags, MOVE_LEAD) ? GET_LED_BY(ch) : ch->master));
-		}
-		else if (IS_SET(flags, MOVE_FOLLOW)) {
-			sprintf(buf2, "$n follows %s %%s.", HMHR(IS_SET(flags, MOVE_LEAD) ? GET_LED_BY(ch) : ch->master));
+		if (GET_MOVE(ch) >= need_movement) {
+			GET_MOVE(ch) -= need_movement;
 		}
 		else {
-			// this leaves a %s for later
-			sprintf(buf2, "$n %s %%s.", mob_move_types[move_type]);
-		}
-		if (*buf2 && (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT) || number(0, 4))) {
-			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-				if (vict == ch || !vict->desc) {
-					continue;
-				}
-				if (!CAN_SEE(vict, ch) || !WIZHIDE_OK(vict, ch)) {
-					continue;
-				}
-
-				// adjust direction
-				if (strstr(buf2, "%s") != NULL) {
-					sprintf(lbuf, buf2, dirs[get_direction_for_char(vict, dir)]);
-				}
-				else {
-					strcpy(lbuf, buf2);
-				}
-				
-				act(lbuf, TRUE, ch, NULL, vict, TO_VICT);
-			}
+			msg_to_char(ch, "You are too exhausted%s.\r\n", (IS_SET(flags, MOVE_FOLLOW) && ch->master) ? " to follow" : "");
+			return FALSE;
 		}
 	}
-
+	
+	// cancel any 'hide' affects
+	affects_from_char_by_aff_flag(ch, AFF_HIDE, TRUE);
+	REMOVE_BIT(AFF_FLAGS(ch), AFF_HIDE);
+	
+	// ACTUAL MOVEMENT
 	char_from_room(ch);
 	char_to_room(ch, to_room);
 
@@ -1403,66 +1439,10 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 		char_to_room(ch, was_in);
 		return FALSE;
 	}
-
-	// mark the move
-	add_tracks(ch, was_in, dir);
-	mark_move_time(ch);
-
-	GET_LAST_DIR(ch) = dir;
-
-	// cancel some actions on movement
-	if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && !IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ANYWHERE) && GET_ACTION_ROOM(ch) != GET_ROOM_VNUM(IN_ROOM(ch)) && GET_ACTION_ROOM(ch) != NOWHERE) {
-		cancel_action(ch);
-	}
 	
-	command_lag(ch, WAIT_MOVEMENT);
-
-	if (animal) {
-		char_from_room(animal);
-		char_to_room(animal, to_room);
-	}
-	
-	// walks-in messages
-	if (!AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
-		if (IS_SET(flags, MOVE_EARTHMELD)) {
-			// no message
-		}
-		else if (IS_SET(flags, MOVE_LEAD)) {
-			act("$E leads $n behind $M.", TRUE, ch, 0, GET_LED_BY(ch), TO_NOTVICT);
-			act("You lead $n behind you.", TRUE, ch, 0, GET_LED_BY(ch), TO_VICT);
-		}
-		else if (IS_SET(flags, MOVE_FOLLOW)) {
-			act("$n follows $N.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
-			if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
-				act("$n follows you.", TRUE, ch, 0, ch->master, TO_VICT);
-			}
-		}
-		else {	// default:
-			// this leaves a %s for later
-			sprintf(buf2, "$n %s %s from %%s.", mob_move_types[move_type], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
-			
-			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
-				if (vict == ch || !vict->desc) {
-					continue;
-				}
-				if (!CAN_SEE(vict, ch) || !WIZHIDE_OK(vict, ch)) {
-					continue;
-				}
-				
-				// adjust direction
-				if (strstr(buf2, "%s")) {
-					sprintf(lbuf, buf2, from_dir[get_direction_for_char(vict, dir)]);
-				}
-				else {
-					strcpy(lbuf, buf);
-				}
-
-				act(lbuf, TRUE, ch, NULL, vict, TO_VICT);
-			}
-		}
-	}
-	
-	qt_visit_room(ch, IN_ROOM(ch));
+	// MESSAGING: if we made it this far, send the messages
+	send_leave_message(ch, was_in, to_room, dir, flags);
+	send_arrive_message(ch, was_in, to_room, dir, flags);
 
 	// auto-look
 	if (ch->desc != NULL) {
@@ -1473,28 +1453,37 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 			look_at_room(ch);
 		}
 	}
-	if (animal && animal->desc != NULL) {
-		look_at_room(animal);
-	}
-
-	gain_ability_exp_from_moves(ch, was_in, flags);
 	
-	if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_RUNNING && !IS_SET(flags, MOVE_RUN)) {
-		cancel_action(ch);
-	}
-	
-	// trigger section
-	entry_memory_mtrigger(ch);
+	// greet trigger section: this can send the player back
 	if (!greet_mtrigger(ch, dir) || !greet_vtrigger(ch, dir)) {
 		char_from_room(ch);
 		char_to_room(ch, was_in);
 		look_at_room(ch);
 	}
 	else {
+		entry_memory_mtrigger(ch);
 		greet_memory_mtrigger(ch);
 	}
 	
-	msdp_update_room(ch);	// once we're sure we're staying
+	// mark the move, once we're sure we're staying
+	GET_LAST_DIR(ch) = dir;
+	mark_move_time(ch);
+	command_lag(ch, WAIT_MOVEMENT);
+	qt_visit_room(ch, IN_ROOM(ch));
+	if (dir != NO_DIR) {
+		add_tracks(ch, was_in, dir);
+	}
+	gain_ability_exp_from_moves(ch, was_in, flags);
+	msdp_update_room(ch);
+	
+	// cancel some actions on movement
+	if (!IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && !IS_SET(action_data[GET_ACTION(ch)].flags, ACTF_ANYWHERE) && GET_ACTION_ROOM(ch) != GET_ROOM_VNUM(IN_ROOM(ch)) && GET_ACTION_ROOM(ch) != NOWHERE) {
+		cancel_action(ch);
+	}
+	if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_RUNNING && (!IS_SET(flags, MOVE_RUN) || IN_ROOM(ch) != to_room)) {
+		cancel_action(ch);
+	}
+	
 	return TRUE;
 }
 
@@ -1505,38 +1494,44 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 * New move params as of b5.21 -- converted need_specials_check/mode to bits
 *
 * @param char_data *ch The person trying to move.
-* @param int dir Which dir to go.
-* @param bitvector_t flags Various MODE_ flags (interpreter.h)
+* @param int dir Which dir to go (may be NO_DIR).
+* @param room_data *to_room Optional: The room the player is moving to. (Pass NULL to auto-detect from 'dir'.)
+* @param bitvector_t flags Various MOVE_ flags (interpreter.h)
 * @return int TRUE if the move succeeded, FALSE if not.
 */
-int perform_move(char_data *ch, int dir, bitvector_t flags) {
-	room_data *was_in, *to_room = IN_ROOM(ch);
+int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
+	room_data *was_in;
 	struct room_direction_data *ex;
 	struct follow_type *k, *next;
 	char buf[MAX_STRING_LENGTH];
 
-	if (ch == NULL)
-		return FALSE;
-
-	if ((PLR_FLAGGED(ch, PLR_UNRESTRICT) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_INSIDE(IN_ROOM(ch))) || !ROOM_IS_CLOSED(IN_ROOM(ch))) {
-		if (dir >= NUM_2D_DIRS || dir < 0) {
-			send_to_char("Alas, you cannot go that way...\r\n", ch);
-			return FALSE;
-		}
-		// may produce a NULL
-		to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
+	if (!ch) {
+		return FALSE;	// somehow
 	}
-	else {
-		if (!(ex = find_exit(IN_ROOM(ch), dir)) || !ex->room_ptr) {
-			msg_to_char(ch, "Alas, you cannot go that way...\r\n");
-			return FALSE;
+	
+	// optional: determine the target room: this is slightly different from room_data dir_to_room()
+	if (dir != NO_DIR && !to_room) {
+		if ((PLR_FLAGGED(ch, PLR_UNRESTRICT) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_INSIDE(IN_ROOM(ch))) || !ROOM_IS_CLOSED(IN_ROOM(ch))) {
+			// map movement
+			if (dir >= NUM_2D_DIRS || dir < 0) {
+				send_to_char("Alas, you cannot go that way...\r\n", ch);
+				return FALSE;
+			}
+			// may produce a NULL
+			to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
 		}
-		if (EXIT_FLAGGED(ex, EX_CLOSED) && ex->keyword) {
-			msg_to_char(ch, "The %s is closed.\r\n", fname(ex->keyword));
-			return FALSE;
+		else {	// non-map movement
+			if (!(ex = find_exit(IN_ROOM(ch), dir)) || !ex->room_ptr) {
+				msg_to_char(ch, "Alas, you cannot go that way...\r\n");
+				return FALSE;
+			}
+			if (EXIT_FLAGGED(ex, EX_CLOSED) && ex->keyword) {
+				msg_to_char(ch, "The %s is closed.\r\n", fname(ex->keyword));
+				return FALSE;
+			}
+			to_room = ex->room_ptr;
 		}
-		to_room = ex->room_ptr;
-	}
+	}	// end detect-to_room
 	
 	// safety (and map bounds)
 	if (!to_room) {
@@ -1550,7 +1545,7 @@ int perform_move(char_data *ch, int dir, bitvector_t flags) {
 	if (!do_simple_move(ch, dir, to_room, flags))
 		return FALSE;
 	
-	// leading vehicle (movement validated by can_move in do_simple_move)
+	// leading vehicle (movement validated by player_can_move in do_simple_move)
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
 		if (ROOM_PEOPLE(was_in)) {
 			snprintf(buf, sizeof(buf), "$v %s behind $N.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
@@ -1568,17 +1563,197 @@ int perform_move(char_data *ch, int dir, bitvector_t flags) {
 	}
 	// leading mob (attempt move)
 	if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
-		perform_move(GET_LEADING_MOB(ch), dir, MOVE_LEAD);
+		perform_move(GET_LEADING_MOB(ch), dir, to_room, MOVE_LEAD);
 	}
 
 	for (k = ch->followers; k; k = next) {
 		next = k->next;
 		if ((IN_ROOM(k->follower) == was_in) && (GET_POS(k->follower) >= POS_STANDING)) {
 			act("You follow $N.\r\n", FALSE, k->follower, 0, ch, TO_CHAR);
-			perform_move(k->follower, dir, MOVE_FOLLOW);
+			perform_move(k->follower, dir, to_room, MOVE_FOLLOW);
 		}
 	}
 	return TRUE;
+}
+
+
+/**
+* Sends the messages relating to arriving in a room. It will temporarily move
+* the person to the 'to_room' if they aren't there, then move them back.
+*
+* @param char_data *ch The person moving.
+* @param room_data *from_room The room they moved from (pass their current IN_ROOM if you don't have one).
+* @param room_data *to_room The room they are moving to.
+* @param int dir Which dir they moved, if applicable (may be NO_DIR).
+* @param bitvector_t flags Any MOVE_ flags passed along.
+*/
+void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room, int dir, bitvector_t flags) {
+	room_data *cur_room = IN_ROOM(ch);
+	char msg[256], temp[256];
+	char_data *targ;
+	
+	// no work if they can't be seen moving
+	if (AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
+		return;
+	}
+	
+	// move them if needed
+	if (cur_room != to_room) {
+		char_from_room(ch);
+		char_to_room(ch, to_room);
+	}
+	
+	// prepare empty room message
+	*msg = '\0';
+	
+	// prepare message: Leave a %s (%%s) in the message if you want a direction.
+	if (IS_SET(flags, MOVE_EARTHMELD)) {
+		*msg = '\0';	// earthmeld hides all move msgs
+	}
+	else if (IS_SET(flags, MOVE_LEAD) && GET_LED_BY(ch)) {
+		act("$E leads $n behind $M.", TRUE, ch, NULL, GET_LED_BY(ch), TO_NOTVICT);
+		act("You lead $n behind you.", TRUE, ch, NULL, GET_LED_BY(ch), TO_VICT);
+	}
+	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master) {
+		act("$n follows $N.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
+		if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
+			act("$n follows you.", TRUE, ch, NULL, ch->master, TO_VICT);
+		}
+	}
+	else if (IS_SET(flags, MOVE_EXIT)) {
+		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
+		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
+		if (veh && is_bld) {
+			act("$n exits $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (veh && !is_bld) {
+			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (GET_BUILDING(HOME_ROOM(from_room))) {
+			snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
+		}
+		else {
+			act("$n exits the building.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+	}
+	else if (dir != NO_DIR) {	// normal move message
+		snprintf(msg, sizeof(msg), "$n %s %s from %%s.", mob_move_types[determine_move_type(ch, to_room)], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
+	}
+	else {	// move message with no direction?
+		snprintf(msg, sizeof(msg), "$n %s %s.", mob_move_types[determine_move_type(ch, to_room)], (ROOM_IS_CLOSED(IN_ROOM(ch)) ? "in" : "up"));
+	}
+	
+	// process/send the message, if one was set
+	if (*msg) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), targ, next_in_room) {
+			if (targ == ch || !targ->desc || !CAN_SEE(targ, ch) || !WIZHIDE_OK(targ, ch)) {
+				continue;
+			}
+			
+			if (strstr(msg, "%s") != NULL) {
+				// needs direction
+				snprintf(temp, sizeof(temp), msg, from_dir[get_direction_for_char(targ, dir)]);
+				act(temp, TRUE, ch, NULL, targ, TO_VICT);
+			}
+			else {
+				act(msg, TRUE, ch, NULL, targ, TO_VICT);
+			}
+		}
+	}
+	
+	// move them back if we moved them
+	if (IN_ROOM(ch) != cur_room) {
+		char_from_room(ch);
+		char_to_room(ch, cur_room);
+	}
+}
+
+
+/**
+* Sends the messages relating to leaving the room. This can safely be done
+* AFTER scripts have run, when you're sure they can safely move. It will
+* temporarily move the person back to 'from_room' if necessary.
+*
+* Messages are sent to the 'from_room'.
+*
+* @param char_data *ch The person moving.
+* @param room_data *from_room The room they moved from (pass their current IN_ROOM if you don't have one).
+* @param room_data *to_room The room they are moving to.
+* @param int dir Which dir they moved, if applicable (may be NO_DIR).
+* @param bitvector_t flags Any MOVE_ flags passed along.
+*/
+void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room, int dir, bitvector_t flags) {
+	room_data *cur_room = IN_ROOM(ch);
+	char msg[256], temp[256];
+	char_data *targ;
+	
+	// no work if they can't be seen moving
+	if (AFF_FLAGGED(ch, AFF_SNEAK | AFF_NO_SEE_IN_ROOM)) {
+		return;
+	}
+	
+	// move them if needed
+	if (cur_room != from_room) {
+		char_from_room(ch);
+		char_to_room(ch, from_room);
+	}
+	
+	// prepare message: Leave a %s (%%s) in the message if you want a direction.
+	if (IS_SET(flags, MOVE_EARTHMELD)) {
+		*msg = '\0';	// earthmeld hides all move msgs
+	}
+	else if (IS_SET(flags, MOVE_LEAD) && GET_LED_BY(ch)) {
+		snprintf(msg, sizeof(msg), "%s leads $n with %s.", HSSH(GET_LED_BY(ch)), HMHR(GET_LED_BY(ch)));
+	}
+	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master) {
+		snprintf(msg, sizeof(msg), "$n follows %s %%s.", HMHR(ch->master));
+	}
+	else if (IS_SET(flags, MOVE_EXIT)) {
+		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
+		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
+		if (veh && is_bld) {
+			act("$n exits $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (veh && !is_bld) {
+			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (GET_BUILDING(HOME_ROOM(from_room))) {
+			snprintf(msg, sizeof(msg), "$n exits the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(from_room))));
+		}
+		else {
+			act("$n exits a building.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+	}
+	else if (dir != NO_DIR) {	// normal move message
+		snprintf(msg, sizeof(msg), "$n %s %%s.", mob_move_types[determine_move_type(ch, to_room)]);
+	}
+	else {	// move message with no direction?
+		snprintf(msg, sizeof(msg), "$n %s away.", mob_move_types[determine_move_type(ch, to_room)]);
+	}
+	
+	// process/send the message
+	if (*msg) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), targ, next_in_room) {
+			if (targ == ch || !targ->desc || !CAN_SEE(targ, ch) || !WIZHIDE_OK(targ, ch)) {
+				continue;
+			}
+			
+			if (strstr(msg, "%s") != NULL) {
+				// needs direction
+				snprintf(temp, sizeof(temp), msg, dirs[get_direction_for_char(targ, dir)]);
+				act(temp, TRUE, ch, NULL, targ, TO_VICT);
+			}
+			else {
+				act(msg, TRUE, ch, NULL, targ, TO_VICT);
+			}
+		}
+	}
+	
+	// move them back if we moved them
+	if (IN_ROOM(ch) != cur_room) {
+		char_from_room(ch);
+		char_to_room(ch, cur_room);
+	}
 }
 
 
@@ -1859,14 +2034,14 @@ ACMD(do_climb) {
 	else if (dir >= NUM_2D_DIRS) {
 		msg_to_char(ch, "You can't climb that way!\r\n");
 	}
-	else if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
+	else if (!(to_room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
 		msg_to_char(ch, "You can't go that way!\r\n");
 	}
 	else if (!ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH)) {
 		msg_to_char(ch, "You can only climb onto rough terrain.\r\n");
 	}
 	else {
-		perform_move(ch, dir, MOVE_CLIMB);
+		perform_move(ch, dir, NULL, MOVE_CLIMB);
 	}
 }
 
@@ -1913,6 +2088,29 @@ ACMD(do_enter) {
 	}
 	
 	char_through_portal(ch, portal, FALSE);
+}
+
+
+// this command tries to 'exit' the current vehicle/building, or falls through to 'exits'
+ACMD(do_exit) {
+	ACMD(do_exits);
+	room_data *to_room;
+	
+	if (IS_OUTDOORS(ch) || (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch)))) {
+		// if you can't exit here, passes through to 'exits'
+		do_exits(ch, "", 0, -1);
+	}
+	else if (!(to_room = get_exit_room(IN_ROOM(ch))) || to_room == IN_ROOM(ch)) {
+		// no valid target room?
+		msg_to_char(ch, "You can't exit from here.\r\n");
+	}
+	else if (GET_POS(ch) < POS_STANDING) {
+		// if we got here but aren't standing, alert
+		send_low_pos_msg(ch);
+	}
+	else {
+		perform_move(ch, NO_DIR, to_room, MOVE_EXIT);
+	}
 }
 
 
@@ -2057,7 +2255,7 @@ ACMD(do_move) {
 		return;
 	}
 	
-	perform_move(ch, confused_dirs[get_north_for_char(ch)][0][subcmd], NOBITS);
+	perform_move(ch, confused_dirs[get_north_for_char(ch)][0][subcmd], NULL, NOBITS);
 }
 
 
@@ -2513,14 +2711,14 @@ ACMD(do_swim) {
 	else if (dir >= NUM_2D_DIRS) {
 		msg_to_char(ch, "You can't swim that way!\r\n");
 	}
-	else if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
+	else if (!(to_room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
 		msg_to_char(ch, "You can't go that way!\r\n");
 	}
 	else if (!WATER_SECT(to_room) && !WATER_SECT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only swim in the water.\r\n");
 	}
 	else {
-		perform_move(ch, dir, MOVE_SWIM);
+		perform_move(ch, dir, NULL, MOVE_SWIM);
 	}
 }
 

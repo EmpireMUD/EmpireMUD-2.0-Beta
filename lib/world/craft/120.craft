@@ -1,7 +1,7 @@
 #12001
 bindingcircle~
 -1 0
-8 -1 m 1 12001 0
+8 -1 mt 1 12001 0
 B
 12001 be 0
 R
@@ -130,7 +130,7 @@ S
 #12017
 tombofAnat~
 -1 0
-8 -1 0 1 12017 0
+8 -1 t 1 12017 0
 B
 12017 be op
 R
@@ -262,11 +262,9 @@ S
 #12046
 stormcloud of Ba'al Hadad~
 12046 1
-11 -1 n 1 12046 0
+11 -1 nt 1 12046 0
 L
 225
-R
-12046 1 0 0
 S
 #12054
 feast of Ba'al Hadad~

@@ -1932,6 +1932,7 @@ void free_empire(empire_data *emp) {
 	void free_empire_goals(struct empire_goal *hash);
 	void free_empire_completed_goals(struct empire_completed_goal *hash);
 	
+	struct workforce_production_limit *wpl, *next_wpl;
 	struct empire_production_total *egt, *next_egt;
 	struct workforce_delay_chore *wdc, *next_wdc;
 	struct workforce_delay *delay, *next_delay;
@@ -2001,6 +2002,12 @@ void free_empire(empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
 		HASH_DEL(EMPIRE_LEARNED_CRAFTS(emp), pcd);
 		free(pcd);
+	}
+	
+	// free production limits
+	HASH_ITER(hh, EMPIRE_PRODUCTION_LIMITS(emp), wpl, next_wpl) {
+		HASH_DEL(EMPIRE_PRODUCTION_LIMITS(emp), wpl);
+		free(wpl);
 	}
 	
 	// free trades
@@ -2198,6 +2205,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 void load_empire_storage_one(FILE *fl, empire_data *emp) {	
 	extern struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
 	void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
+	void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
 	
 	int t[10], junk;
 	long l_in;
@@ -2224,6 +2232,15 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 			exit(1);
 		}
 		switch (*line) {
+			case 'L': {	// production limit
+				if (sscanf(line, "L %d %d", &t[0], &t[1]) != 2) {
+					log("SYSERR: Workforce limit line L for empire %d was incomplete", EMPIRE_VNUM(emp));
+					exit(1);
+				}
+				
+				set_workforce_production_limit(emp, t[0], t[1]);
+				break;
+			}
 			case 'O': {	// storage
 				if (!get_line(fl, line)) {
 					log("SYSERR: Storage data for empire %d was incomplete", EMPIRE_VNUM(emp));
@@ -3121,6 +3138,7 @@ void write_empire_logs_to_file(FILE *fl, empire_data *emp) {
 * @param empire_data *emp The empire whose storage to save.
 */
 void write_empire_storage_to_file(FILE *fl, empire_data *emp) {	
+	struct workforce_production_limit *wpl, *next_wpl;
 	struct empire_storage_data *store, *next_store;
 	struct empire_production_total *egt, *next_egt;
 	struct empire_island *isle, *next_isle;
@@ -3130,6 +3148,11 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 
 	if (!emp) {
 		return;
+	}
+	
+	// L: production limits
+	HASH_ITER(hh, EMPIRE_PRODUCTION_LIMITS(emp), wpl, next_wpl) {
+		fprintf(fl, "L %d %d\n", wpl->vnum, wpl->limit);
 	}
 	
 	// islands

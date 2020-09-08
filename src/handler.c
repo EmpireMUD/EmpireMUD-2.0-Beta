@@ -80,6 +80,7 @@ const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
 void adjust_building_tech(empire_data *emp, room_data *room, bool add);
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
 EVENT_CANCEL_FUNC(cancel_room_event);
 void check_delayed_load(char_data *ch);
 void clear_delayed_update(char_data *ch);
@@ -94,6 +95,8 @@ struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 void die_follower(char_data *ch);
 struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
 struct companion_data *has_companion(char_data *ch, any_vnum vnum);
+void perform_abandon_vehicle(vehicle_data *veh);
+void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void remove_companion(char_data *ch, any_vnum vnum);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
 void schedule_room_affect_expire(room_data *room, struct affected_type *af);
@@ -2885,6 +2888,7 @@ void perform_abandon_room(room_data *room) {
 	
 	empire_data *emp = ROOM_OWNER(room);
 	struct empire_territory_data *ter;
+	vehicle_data *veh;
 	int ter_type;
 	bool junk;
 	
@@ -2939,6 +2943,38 @@ void perform_abandon_room(room_data *room) {
 	else {	// other building types
 		check_tavern_setup(room);
 	}
+	
+	// update any building-flagged vehicles
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_OWNER(veh) == emp && VEH_CLAIMS_WITH_ROOM(veh)) {
+			perform_abandon_vehicle(veh);
+		}
+	}
+}
+
+
+/**
+* Removes ownership of a vehicle.
+*
+* @param vehicle_data *veh The vehicle to abandon.
+*/
+void perform_abandon_vehicle(vehicle_data *veh) {
+	if (veh) {
+		empire_data *emp = VEH_OWNER(veh);
+		
+		VEH_OWNER(veh) = NULL;
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_PLAYER_NO_WORK | VEH_PLAYER_NO_DISMANTLE);
+	
+		if (VEH_INTERIOR_HOME_ROOM(veh)) {
+			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
+		}
+	
+		if (VEH_IS_COMPLETE(veh) && emp) {
+			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
+			et_lose_vehicle(emp, VEH_VNUM(veh));
+			adjust_vehicle_tech(veh, FALSE);
+		}
+	}
 }
 
 
@@ -2952,6 +2988,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 	
 	struct empire_territory_data *ter;
+	vehicle_data *veh;
 	int ter_type;
 	bool junk;
 	
@@ -2987,6 +3024,44 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	if (ROOM_UNLOAD_EVENT(room)) {
 		dg_event_cancel(ROOM_UNLOAD_EVENT(room), cancel_room_event);
 		ROOM_UNLOAD_EVENT(room) = NULL;
+	}
+	
+	// update any building-flagged vehicles
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (!VEH_OWNER(veh) && VEH_CLAIMS_WITH_ROOM(veh)) {
+			perform_claim_vehicle(veh, emp);
+		}
+	}
+}
+
+
+/**
+* Sets ownership of a vehicle.
+*
+* @param vehicle_data *veh The vehicle to claim.
+* @param empire_data *emp The empire claiming it.
+*/
+void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
+	if (VEH_OWNER(veh)) {
+		perform_abandon_vehicle(veh);
+	}
+	
+	if (emp) {
+		VEH_OWNER(veh) = emp;
+		VEH_SHIPPING_ID(veh) = -1;
+	
+		if (VEH_INTERIOR_HOME_ROOM(veh)) {
+			if (ROOM_OWNER(VEH_INTERIOR_HOME_ROOM(veh)) && ROOM_OWNER(VEH_INTERIOR_HOME_ROOM(veh)) != emp) {
+				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
+			}
+			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
+		}
+	
+		if (VEH_IS_COMPLETE(veh)) {
+			qt_empire_players(emp, qt_gain_vehicle, VEH_VNUM(veh));
+			et_gain_vehicle(emp, VEH_VNUM(veh));
+			adjust_vehicle_tech(veh, TRUE);
+		}
 	}
 }
 
@@ -9356,13 +9431,9 @@ int get_number(char **name) {
 * @param vehicle_data *veh The vehicle to extract and free.
 */
 void extract_vehicle(vehicle_data *veh) {
-	void adjust_vehicle_tech(vehicle_data *veh, bool add);
+	void delete_vehicle_interior(vehicle_data *veh);
 	void empty_vehicle(vehicle_data *veh);
-	void relocate_players(room_data *room, room_data *to_room);
 	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
-	
-	struct vehicle_room_list *vrl, *next_vrl;
-	room_data *main_room;
 	
 	if (veh == dg_owner_veh) {
 		dg_owner_purged = 1;
@@ -9374,26 +9445,7 @@ void extract_vehicle(vehicle_data *veh) {
 	}
 	
 	// delete interior
-	if ((main_room = VEH_INTERIOR_HOME_ROOM(veh)) || VEH_ROOM_LIST(veh)) {
-		LL_FOREACH_SAFE(VEH_ROOM_LIST(veh), vrl, next_vrl) {
-			if (vrl->room == main_room) {
-				continue;	// do this one last
-			}
-			
-			if (IN_ROOM(veh)) {
-				relocate_players(vrl->room, IN_ROOM(veh));
-			}
-			delete_room(vrl->room, FALSE);	// MUST check_all_exits later
-		}
-		
-		if (main_room) {
-			if (IN_ROOM(veh)) {
-				relocate_players(main_room, IN_ROOM(veh));
-			}
-			delete_room(main_room, FALSE);
-		}
-		check_all_exits();
-	}
+	delete_vehicle_interior(veh);
 	
 	if (VEH_LED_BY(veh)) {
 		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;

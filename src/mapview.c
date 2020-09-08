@@ -2092,6 +2092,8 @@ void perform_immort_where(char_data *ch, char *arg) {
 
 // with cmd == -1, this suppresses extra exits
 ACMD(do_exits) {
+	extern room_data *get_exit_room(room_data *from_room);
+	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	struct room_direction_data *ex;
 	room_data *room, *to_room;
@@ -2126,9 +2128,17 @@ ACMD(do_exits) {
 				}
 			}
 		}
-		// disembark?
-		if (cmd != -1 && (veh = GET_ROOM_VEHICLE(room)) && IN_ROOM(veh)) {
-			size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", exit_description(ch, IN_ROOM(veh), "Disembark"));
+		
+		// can disembark/exit here?
+		if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) || (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_ROOM(ch) == HOME_ROOM(IN_ROOM(ch)))) {
+			// 'disembark'
+			if ((veh = GET_ROOM_VEHICLE(room)) && IN_ROOM(veh) && !VEH_FLAGGED(veh, VEH_BUILDING)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, IN_ROOM(veh), "Disembark"));
+			}
+			// 'exit'
+			else if ((to_room = get_exit_room(IN_ROOM(ch))) && to_room != IN_ROOM(ch)) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, to_room, "Exit"));
+			}
 		}
 	}
 	else {	// out on the map

@@ -101,6 +101,13 @@ Return value:  return 0 to prevent the person fron entering*
 This trigger goes off when someone attempts to enter the room. If you want the
 action to occur in the room the character is entering, you must use a wait.
 
+Enter triggers run BEFORE the message for the person entering the room, so if
+it returns 0, that message is not sent. Consider using a # on any echoes/sends
+that should appear after the person enters and auto-looks. For other things
+that should happen after someone enters, consider adding a 'wait 1'; however,
+a wait will keep the script running and prevent it from running for a second
+person until the first one finishes.
+
 Note: Enter triggers can only prevent people from entering the room if they
 enter normally (usually through an exit from another room). People who appear
 magically can't usually be prevented.

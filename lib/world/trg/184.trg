@@ -56,6 +56,7 @@ if !%instance.location%
 end
 set dist %room.distance(%instance.location%)%
 if (%dist% > 2)
+  wait 1
   %echo% %self.name% scrambles into a hole in the dam and returns to %self.hisher% lodge.
   mgoto %instance.location%
   %echo% %self.name% appears from %self.hisher% lodge.
@@ -150,7 +151,7 @@ while %person%
         * Message
         set item %person.inventory(%vnum%)%
         if %item%
-          %send% %person% You discover %item.shortdesc%!
+          %send% %person% # You discover %item.shortdesc%!
         end
       end
       * Chance of a rare mount
@@ -176,7 +177,7 @@ while %person%
       if %vnum% != 0
         %load% obj %vnum% %person% inv
         set item %person.inventory()%
-        %send% %person% You are lucky! You have discovered a rare item: %item.shortdesc%!
+        %send% %person% # You are lucky! You have discovered a rare item: %item.shortdesc%!
       end
     end
     if %person.is_immortal%
@@ -188,7 +189,7 @@ while %person%
         * Message
         set item %person.inventory(%vnum%)%
         if %item%
-          %send% %person% You create %item.shortdesc% for yourself.
+          %send% %person% # You create %item.shortdesc% for yourself.
         end
       end
     end

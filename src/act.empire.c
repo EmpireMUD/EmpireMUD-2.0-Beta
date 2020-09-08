@@ -56,7 +56,6 @@ extern const char *trade_mostleast[];
 extern const char *trade_overunder[];
 
 // external funcs
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern bool can_claim(char_data *ch);
 void check_nowhere_einv(empire_data *emp, int new_island);
 extern int city_points_available(empire_data *emp);
@@ -73,6 +72,7 @@ struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct e
 extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 void identify_obj_to_char(obj_data *obj, char_data *ch);
 void refresh_all_quests(char_data *ch);
+void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_with);
 
 // locals
 bool is_affiliated_island(empire_data *emp, int island_id);
@@ -529,34 +529,11 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	extern const char *score_type[];
 	extern const char *techs[];
 	
-	struct empire_political_data *emp_pol;
 	int iter, sub, found_rank, total, type;
-	empire_data *other, *emp_iter, *next_emp;
+	empire_data *emp_iter, *next_emp;
 	bool found, is_own_empire, comma;
 	player_index_data *index;
 	char line[256];
-	
-	// for displaying diplomacy below
-	struct diplomacy_display_data {
-		bitvector_t type;	// DIPL_
-		char *name; // "Offering XXX to empire"
-		char *text;	// "XXX empire, empire, empire"
-		bool offers_only;	// only shows separately if it's an offer
-		bool self_only;	// does not show to others
-	} diplomacy_display[] = {
-		{ DIPL_ALLIED, "an alliance", "Allied with", FALSE, FALSE },
-		{ DIPL_NONAGGR, "a non-aggression pact", "In a non-aggression pact with", FALSE, FALSE },
-		{ DIPL_PEACE, "peace", "At peace with", FALSE, FALSE },
-		{ DIPL_TRUCE, "a truce", "In a truce with", FALSE, FALSE },
-		{ DIPL_DISTRUST, "distrust", "Distrustful of", FALSE, FALSE },
-		{ DIPL_WAR, "battle", "At war with", FALSE, FALSE },
-		{ DIPL_TRADE, "trade", "Trade relations with", TRUE, FALSE },
-		{ DIPL_THIEVERY, "thievery", "Thievery permitted against", FALSE, TRUE },
-		
-		// goes last
-		{ NOTHING, "\n" }
-	};
-	
 	
 	is_own_empire = (GET_LOYALTY(ch) == e) || GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES);
 
@@ -662,13 +639,63 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 			msg_to_char(ch, "Cost to declare war or thievery on this empire: %d coin%s\r\n", war_cost, PLURAL(war_cost));
 		}
 	}
+	
+	// show_empire_diplomacy(ch, e, NULL);
+}
 
-	// diplomacy
-	if (EMPIRE_DIPLOMACY(e)) {
-		msg_to_char(ch, "Diplomatic relations:\r\n");
+
+/**
+* Shows an empire's current diplomatic relations to ch. Only public relations
+* are shown unless ch is in the empire or has elevated access.
+*
+* @param char_data *ch The player viewing.
+* @param emoire_data *emp The empire whose relations to view.
+* @param empire_data *only_with Optional: Only show relations with this empire (pass NULL for all empires).
+*/
+void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_with) {
+	bool is_own_empire = (GET_LOYALTY(ch) == emp || GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
+	struct empire_political_data *emp_pol;
+	empire_data *other, *emp_iter, *next_emp;
+	bool found, any;
+	int iter;
+	
+	// for displaying diplomacy below
+	const struct {
+		bitvector_t type;	// DIPL_
+		char *name; // "Offering XXX to empire"
+		char *text;	// "XXX empire, empire, empire"
+		bool offers_only;	// only shows separately if it's an offer
+		bool self_only;	// does not show to others
+	} diplomacy_display[] = {
+		{ DIPL_ALLIED, "an alliance", "Allied with", FALSE, FALSE },
+		{ DIPL_NONAGGR, "a non-aggression pact", "In a non-aggression pact with", FALSE, FALSE },
+		{ DIPL_PEACE, "peace", "At peace with", FALSE, FALSE },
+		{ DIPL_TRUCE, "a truce", "In a truce with", FALSE, FALSE },
+		{ DIPL_DISTRUST, "distrust", "Distrustful of", FALSE, FALSE },
+		{ DIPL_WAR, "battle", "At war with", FALSE, FALSE },
+		{ DIPL_TRADE, "trade", "Trade relations with", TRUE, FALSE },
+		{ DIPL_THIEVERY, "thievery", "Thievery permitted against", FALSE, TRUE },
+		
+		// goes last
+		{ NOTHING, "\n" }
+	};
+	
+	if (!emp) {
+		msg_to_char(ch, "No diplomatic relations.\r\n");
+		return;
 	}
 	
-	if (is_own_empire || !EMPIRE_IS_TIMED_OUT(e)) {
+	// header
+	if (only_with) {
+		msg_to_char(ch, "Current diplomatic relations with %s:\r\n", EMPIRE_NAME(only_with));
+	}
+	else {
+		msg_to_char(ch, "Current diplomatic relations for %s:\r\n", EMPIRE_NAME(emp));
+	}
+	any = FALSE;
+	
+	// most info doesn't show if the empire is timed out (unless it's your own)
+	if (is_own_empire || !EMPIRE_IS_TIMED_OUT(emp)) {
 		// display political information by diplomacy type
 		for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
 			if (diplomacy_display[iter].self_only && !is_own_empire) {
@@ -676,14 +703,14 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 			}
 			if (!diplomacy_display[iter].offers_only) {
 				found = FALSE;
-				for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
-					if (IS_SET(emp_pol->type, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
+				for (emp_pol = EMPIRE_DIPLOMACY(emp); emp_pol; emp_pol = emp_pol->next) {
+					if (IS_SET(emp_pol->type, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id)) && (!only_with || other == only_with) && !EMPIRE_IS_TIMED_OUT(other)) {
 						if (!found) {
 							msg_to_char(ch, "%s ", diplomacy_display[iter].text);
 						}
 				
 						msg_to_char(ch, "%s%s%s&0%s", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other), (IS_SET(emp_pol->type, DIPL_TRADE) ? " (trade)" : ""));
-						found = TRUE;
+						found = any = TRUE;
 					}
 				}
 			
@@ -700,14 +727,14 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 			}
 			
 			found = FALSE;
-			for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
-				if (emp_pol->type == diplomacy_display[iter].type && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
+			for (emp_pol = EMPIRE_DIPLOMACY(emp); emp_pol; emp_pol = emp_pol->next) {
+				if (emp_pol->type == diplomacy_display[iter].type && (other = real_empire(emp_pol->id)) && (!only_with || other == only_with) && !EMPIRE_IS_TIMED_OUT(other)) {
 					if (!found) {
 						msg_to_char(ch, "%s ", diplomacy_display[iter].text);
 					}
 			
 					msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
-					found = TRUE;
+					found = any = TRUE;
 				}
 			}
 		
@@ -719,16 +746,16 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 		// now show any open offers
 		for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
 			found = FALSE;
-			for (emp_pol = EMPIRE_DIPLOMACY(e); emp_pol; emp_pol = emp_pol->next) {
+			for (emp_pol = EMPIRE_DIPLOMACY(emp); emp_pol; emp_pol = emp_pol->next) {
 				// only show offers to members
 				if (is_own_empire || (GET_LOYALTY(ch) && EMPIRE_VNUM(GET_LOYALTY(ch)) == emp_pol->id)) {
-					if (IS_SET(emp_pol->offer, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id)) && !EMPIRE_IS_TIMED_OUT(other)) {
+					if (IS_SET(emp_pol->offer, diplomacy_display[iter].type) && (other = real_empire(emp_pol->id)) && (!only_with || other == only_with) && !EMPIRE_IS_TIMED_OUT(other)) {
 						if (!found) {
 							msg_to_char(ch, "Offering %s to ", diplomacy_display[iter].name);
 						}
 				
 						msg_to_char(ch, "%s%s%s&0", (found ? ", " : ""), EMPIRE_BANNER(other), EMPIRE_NAME(other));
-						found = TRUE;
+						found = any = TRUE;
 					}
 				}
 			}
@@ -742,31 +769,40 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	// If it's your own empire, show open offers from others
 	if (is_own_empire) {
 		HASH_ITER(hh, empire_table, emp_iter, next_emp) {
-			if (emp_iter != e) {
-				for (emp_pol = EMPIRE_DIPLOMACY(emp_iter); emp_pol; emp_pol = emp_pol->next) {
-					if (emp_pol->id == EMPIRE_VNUM(e) && emp_pol->offer) {
-						found = FALSE;
-						for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
-							if (IS_SET(emp_pol->offer, diplomacy_display[iter].type)) {
-								// found a valid offer!
-								if (!found) {
-									msg_to_char(ch, "%s%s&0 offers ", EMPIRE_BANNER(emp_iter), EMPIRE_NAME(emp_iter));
-								}
-								
-								msg_to_char(ch, "%s%s", (found ? ", " : ""), diplomacy_display[iter].name);
-								found = TRUE;
+			if (only_with && emp != only_with) {
+				continue;	// skip others
+			}
+			if (emp_iter == emp) {
+				continue;	// skip own
+			}
+			for (emp_pol = EMPIRE_DIPLOMACY(emp_iter); emp_pol; emp_pol = emp_pol->next) {
+				if (emp_pol->id == EMPIRE_VNUM(emp) && emp_pol->offer) {
+					found = FALSE;
+					for (iter = 0; diplomacy_display[iter].type != NOTHING; ++iter) {
+						if (IS_SET(emp_pol->offer, diplomacy_display[iter].type)) {
+							// found a valid offer!
+							if (!found) {
+								msg_to_char(ch, "%s%s&0 offers ", EMPIRE_BANNER(emp_iter), EMPIRE_NAME(emp_iter));
 							}
+							
+							msg_to_char(ch, "%s%s", (found ? ", " : ""), diplomacy_display[iter].name);
+							found = any = TRUE;
 						}
-						
-						if (found) {
-							msg_to_char(ch, ".\r\n");
-						}
+					}
+					
+					if (found) {
+						msg_to_char(ch, ".\r\n");
 					}
 				}
 			}
 		}
 	}
+	
+	if (!any) {
+		msg_to_char(ch, " none\r\n");
+	}
 }
+
 
 /**
 * called by do_empire_identify to show eidentify
@@ -1179,7 +1215,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 		return;
 	}
 	
-	size = snprintf(buf, sizeof(buf), "Working %s citizens:\r\n", EMPIRE_ADJECTIVE(emp));
+	size = snprintf(buf, sizeof(buf), "Working %s citizens (excluding artisans):\r\n", EMPIRE_ADJECTIVE(emp));
 	
 	HASH_ITER(hh, counts, wct, next_wct) {
 		// only bother adding if there's room in the buffer
@@ -1210,7 +1246,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here) {
 void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	extern const char *wf_problem_types[];
 	
-	char buf[MAX_STRING_LENGTH * 2], unsupplied[MAX_STRING_LENGTH], line[256];
+	char buf[MAX_STRING_LENGTH * 2], unsupplied[MAX_STRING_LENGTH], line[256], mult[256];
 	int iter, only_chore = NOTHING, last_chore, last_problem, count;
 	struct empire_island *isle, *next_isle;
 	struct workforce_log *wf_log;
@@ -1236,7 +1272,6 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 		msg_to_char(ch, "- All your workers are working successfully.\r\n");
 		msg_to_char(ch, "- You have no chores active.\r\n");
 		msg_to_char(ch, "- You have no claimed workable land (check nowork settings).\r\n");
-		msg_to_char(ch, "- The game may have rebooted recently and there is no data.\r\n");
 		return;
 	}
 	
@@ -1277,8 +1312,16 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			if (only_chore != NOTHING && only_chore != wf_log->chore) {
 				continue;	// wrong chore
 			}
+			
+			// ok, show it:
+			if (wf_log->count > 1) {
+				snprintf(mult, sizeof(mult), " (x%d)", wf_log->count);
+			}
+			else {
+				*mult = '\0';
+			}
 		
-			snprintf(line, sizeof(line), "%s %s: %s%s\r\n", coord_display(ch, MAP_X_COORD(wf_log->loc), MAP_Y_COORD(wf_log->loc), TRUE), chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], wf_log->delayed ? " (delayed)" : "");
+			snprintf(line, sizeof(line), "%s %s: %s%s%s\r\n", coord_display(ch, MAP_X_COORD(wf_log->loc), MAP_Y_COORD(wf_log->loc), TRUE), chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], mult, wf_log->delayed ? " (delayed)" : "");
 			any = TRUE;
 		
 			if (strlen(line) + size + 16 < sizeof(buf)) {	// reserve space for overflow
@@ -1301,11 +1344,11 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			last_problem = wf_log->problem;
 			count = 1;
 			while (wf_log && wf_log->next && wf_log->next->chore == last_chore && wf_log->next->problem == last_problem) {
-				++count;
+				count += wf_log->count;
 				wf_log = wf_log->next;	// advance past identical entries
 			}
 			
-			snprintf(line, sizeof(line), " %s: %s (%d)\r\n", chore_data[last_chore].name, wf_problem_types[last_problem], count);
+			snprintf(line, sizeof(line), " %s: %s (x%d)\r\n", chore_data[last_chore].name, wf_problem_types[last_problem], count);
 			
 			if (strlen(line) + size + 16 < sizeof(buf)) {	// reserve space for overflow
 				strcat(buf, line);
@@ -1644,7 +1687,7 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 
 void found_city(char_data *ch, empire_data *emp, char *argument) {
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
-	void stop_room_action(room_data *room, int action, int chore);
+	void stop_room_action(room_data *room, int action);
 	extern int highest_start_loc_index;
 	extern int *start_locs;
 	
@@ -1766,14 +1809,14 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 	snprintf(buf, sizeof(buf), "$n has founded %s here!", city->name);
 	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	
-	stop_room_action(IN_ROOM(ch), ACT_CHOPPING, CHORE_CHOPPING);
-	stop_room_action(IN_ROOM(ch), ACT_PICKING, CHORE_FARMING);
-	stop_room_action(IN_ROOM(ch), ACT_DIGGING, NOTHING);
-	stop_room_action(IN_ROOM(ch), ACT_EXCAVATING, NOTHING);
-	stop_room_action(IN_ROOM(ch), ACT_FILLING_IN, NOTHING);
-	stop_room_action(IN_ROOM(ch), ACT_GATHERING, NOTHING);
-	stop_room_action(IN_ROOM(ch), ACT_HARVESTING, NOTHING);
-	stop_room_action(IN_ROOM(ch), ACT_PLANTING, NOTHING);
+	stop_room_action(IN_ROOM(ch), ACT_CHOPPING);
+	stop_room_action(IN_ROOM(ch), ACT_PICKING);
+	stop_room_action(IN_ROOM(ch), ACT_DIGGING);
+	stop_room_action(IN_ROOM(ch), ACT_EXCAVATING);
+	stop_room_action(IN_ROOM(ch), ACT_FILLING_IN);
+	stop_room_action(IN_ROOM(ch), ACT_GATHERING);
+	stop_room_action(IN_ROOM(ch), ACT_HARVESTING);
+	stop_room_action(IN_ROOM(ch), ACT_PLANTING);
 	
 	// move einv here if any is lost
 	check_nowhere_einv(emp, GET_ISLAND_ID(IN_ROOM(ch)));
@@ -2641,8 +2684,8 @@ struct manage_data_type {
 	char *altname;	// 2nd version to accept, if any (NULL for none)
 	int priv;	// which PRIV_ is needed, if any (NOTHING for none)
 	bool owned_only;	// requires ownership if TRUE
-	bitvector_t roomflag;	// ROOM_ flag to set, if any (NOBITS if not using this)
-	bool flag_home;	// if TRUE, sets the roomflag on the home room
+	bitvector_t flag;	// ROOM_ or VEH_ flag to set, based on type, if any (NOBITS if not using this)
+	bool flag_home;	// if TRUE, sets the roomflag on the home room (does not apply to vehicles)
 	int access_level;	// player level required
 	bitvector_t grant;	// GRANT_ flag to override access_level, if any
 	MANAGE_FUNC(*func);	// callback func (optional)
@@ -2657,6 +2700,15 @@ const struct manage_data_type manage_data[] = {
 	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS, NULL },
 	
 	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS, NULL },
+	
+	{ "\n", NULL, NOTHING, TRUE, NOBITS, FALSE, 0, NOBITS, NULL }	// last
+};
+
+
+// configuration for do_manage_vehicle
+const struct manage_data_type manage_vehicle_data[] = {
+	{ "no-dismantle", "nodismantle", PRIV_BUILD, TRUE, VEH_PLAYER_NO_DISMANTLE, FALSE, 0, NOBITS, NULL },
+	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, VEH_PLAYER_NO_WORK, FALSE, 0, NOBITS, NULL },
 	
 	{ "\n", NULL, NOTHING, TRUE, NOBITS, FALSE, 0, NOBITS, NULL }	// last
 };
@@ -3142,25 +3194,20 @@ void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
 * @param bool confirm If TRUE, the player typed "confirm" as the last arg.
 */
 void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
+	void perform_abandon_vehicle(vehicle_data *veh);
+	
 	empire_data *emp = VEH_OWNER(veh);
 	
 	if (!emp || VEH_OWNER(veh) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You don't even own that.\r\n");
 	}
+	else if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh))) {
+		msg_to_char(ch, "Abandon the whole tile instead.\r\n");
+	}
 	else {
 		act("You abandon $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		act("$n abandons $V.", FALSE, ch, NULL, veh, TO_ROOM);
-		VEH_OWNER(veh) = NULL;
-		
-		if (VEH_INTERIOR_HOME_ROOM(veh)) {
-			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
-		}
-		
-		if (VEH_IS_COMPLETE(veh)) {
-			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
-			et_lose_vehicle(emp, VEH_VNUM(veh));
-			adjust_vehicle_tech(veh, FALSE);
-		}
+		perform_abandon_vehicle(veh);
 	}
 }
 
@@ -3348,7 +3395,7 @@ ACMD(do_cede) {
 		msg_to_char(ch, "You can only cede the land you're standing on.\r\n");
 	}
 	else if (GET_ROOM_VEHICLE(room)) {
-		msg_to_char(ch, "You can't cede the inside of a vehicle.\r\n");
+		msg_to_char(ch, "You can't cede the inside of a %s.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(room)));
 	}
 	else if (GET_RANK(ch) < EMPIRE_PRIV(e, PRIV_CEDE)) {
 		// could probably now use has_permission
@@ -3521,6 +3568,8 @@ void do_claim_room(char_data *ch, room_data *room) {
 * @param vehicle_data *veh The vehicle he's trying to claim.
 */
 void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
+	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
+	
 	empire_data *emp = get_or_create_empire(ch);
 	
 	if (VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
@@ -3535,24 +3584,13 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 	else if (VEH_OWNER(veh)) {
 		msg_to_char(ch, "Someone else already owns that.\r\n");
 	}
+	else if (VEH_CLAIMS_WITH_ROOM(veh) && !ROOM_OWNER(IN_ROOM(veh))) {
+		msg_to_char(ch, "Claim the whole tile instead.\r\n");
+	}
 	else {
 		send_config_msg(ch, "ok_string");
 		act("$n claims $V.", FALSE, ch, NULL, veh, TO_ROOM);
-		VEH_OWNER(veh) = emp;
-		VEH_SHIPPING_ID(veh) = -1;
-		
-		if (VEH_INTERIOR_HOME_ROOM(veh)) {
-			if (ROOM_OWNER(VEH_INTERIOR_HOME_ROOM(veh))) {
-				abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
-			}
-			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
-		}
-		
-		if (VEH_IS_COMPLETE(veh)) {
-			qt_empire_players(emp, qt_gain_vehicle, VEH_VNUM(veh));
-			et_gain_vehicle(emp, VEH_VNUM(veh));
-			adjust_vehicle_tech(veh, TRUE);
-		}
+		perform_claim_vehicle(veh, emp);
 	}
 }
 
@@ -3769,10 +3807,11 @@ ACMD(do_deposit) {
 
 
 ACMD(do_diplomacy) {
-	char type_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], ch_log[MAX_STRING_LENGTH], vict_log[MAX_STRING_LENGTH];
+	char type_arg[MAX_INPUT_LENGTH], *emp_arg, ch_log[MAX_STRING_LENGTH], vict_log[MAX_STRING_LENGTH];
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	struct empire_political_data *ch_pol = NULL, *vict_pol = NULL;
-	empire_data *ch_emp, *vict_emp;
-	int iter, type, war_cost = 0;
+	empire_data *ch_emp = GET_LOYALTY(ch), *vict_emp;
+	int type, war_cost = 0;
 	bool cancel = FALSE;
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
@@ -3780,25 +3819,25 @@ ACMD(do_diplomacy) {
 		return;
 	}
 	
-	half_chop(argument, type_arg, emp_arg);
-	
-	// check for optional cancel arg
-	if (!str_cmp(type_arg, "cancel")) {
-		cancel = TRUE;
-		strcpy(buf, emp_arg);
-		half_chop(buf, type_arg, emp_arg);
+	// argument parsing
+	emp_arg = any_one_word(argument, type_arg);
+	if (imm_access && get_empire_by_name(type_arg)) {	// optional empire arg for immortals
+		ch_emp = get_empire_by_name(type_arg);
+		argument = emp_arg = any_one_word(emp_arg, type_arg);
 	}
+	if (!str_cmp(type_arg, "cancel")) {	// check for optional cancel arg
+		cancel = TRUE;
+		// shear off the cancel
+		argument = emp_arg = any_one_word(emp_arg, type_arg);
+	}
+	skip_spaces(&argument);	// argument is sometimes used later
+	skip_spaces(&emp_arg);
 	
 	if (!*type_arg) {
-		msg_to_char(ch, "Usage: diplomacy <option> <empire>\r\n");
-		msg_to_char(ch, "       diplomacy cancel <option> <empire>\r\n");
-		msg_to_char(ch, "Options:\r\n");
-		
-		for (iter = 0; *(diplo_option[iter].keywords) != '\n'; ++iter) {
-			msg_to_char(ch, "  \ty%s\t0 - %s\r\n", fname(diplo_option[iter].keywords), diplo_option[iter].desc);
-		}
+		msg_to_char(ch, "Usage: diplomacy [cancel] <option> <empire>\r\n");
+		show_empire_diplomacy(ch, ch_emp, NULL);
 	}
-	else if (!(ch_emp = GET_LOYALTY(ch)) || IS_NPC(ch)) {
+	else if (!ch_emp || IS_NPC(ch)) {
 		msg_to_char(ch, "You can't engage in diplomacy if you're not a member of an empire.\r\n");
 	}
 	
@@ -3806,14 +3845,20 @@ ACMD(do_diplomacy) {
 	else if (EMPIRE_IMM_ONLY(ch_emp)) {
 		msg_to_char(ch, "Empires belonging to immortals cannot engage in diplomacy.\r\n");
 	}
-	else if (GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_DIPLOMACY)) {
+	else if (!imm_access && GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_DIPLOMACY)) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have the authority to make diplomatic relations.\r\n");
 	}
 	
 	// option validation
 	else if ((type = find_diplomacy_option(type_arg)) == NOTHING) {
-		msg_to_char(ch, "Unknown option '%s'.\r\n", type_arg);
+		// did they type an empire instead? check full arg
+		if ((vict_emp = get_empire_by_name(argument))) {
+			show_empire_diplomacy(ch, vict_emp, NULL);
+		}
+		else {
+			msg_to_char(ch, "Unknown option '%s'.\r\n", type_arg);
+		}
 	}
 	else if (IS_SET(diplo_option[type].flags, DIPF_NOT_MUTUAL_WAR) && config_get_bool("mutual_war_only")) {
 		msg_to_char(ch, "This EmpireMUD does not allow you to unilaterally declare %s.\r\n", fname(diplo_option[type].keywords));
@@ -5586,11 +5631,103 @@ ACMD(do_inspire) {
 }
 
 
+void do_manage_vehicle(char_data *ch, vehicle_data *veh, char *argument) {
+	char buf[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH];
+	int iter, type = NOTHING;
+	bool on;
+	
+	argument = any_one_arg(argument, arg);
+	skip_spaces(&argument);
+	
+	// determine what they typed?
+	if (*arg) {
+		for (iter = 0; *manage_vehicle_data[iter].name != '\n'; ++iter) {
+			if (manage_vehicle_data[iter].access_level > GET_ACCESS_LEVEL(ch) && (manage_vehicle_data[iter].grant == NOBITS || !IS_GRANTED(ch, manage_vehicle_data[iter].grant))) {
+				continue;	// level invalid
+			}
+			if (!is_abbrev(arg, manage_vehicle_data[iter].name) && (!manage_vehicle_data[iter].altname || !*manage_vehicle_data[iter].altname || !is_abbrev(arg, manage_vehicle_data[iter].altname))) {
+				continue;	// not a name match
+			}
+			
+			// found!
+			type = iter;
+			break;
+		}
+	}
+	
+	if (!*arg) {
+		msg_to_char(ch, "Management for %s:\r\n", VEH_SHORT_DESC(veh));
+		
+		for (iter = 0; *manage_vehicle_data[iter].name != '\n'; ++iter) {
+			if (manage_vehicle_data[iter].access_level > GET_ACCESS_LEVEL(ch) && (manage_vehicle_data[iter].grant == NOBITS || !IS_GRANTED(ch, manage_vehicle_data[iter].grant))) {
+				continue;	// level invalid
+			}
+			
+			on = (manage_vehicle_data[iter].flag && VEH_FLAGGED(veh, manage_vehicle_data[iter].flag)) ? TRUE : FALSE;
+			snprintf(buf, sizeof(buf), "%s: %s\t0", manage_vehicle_data[iter].name, on ? "\tgon" : "\troff");
+			msg_to_char(ch, " %s\r\n", CAP(buf));
+		}
+	}
+	else if (type == NOTHING) {
+		msg_to_char(ch, "Unknown management option '%s'.\r\n", arg);
+	}
+	else if (manage_vehicle_data[type].owned_only && (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != VEH_OWNER(veh))) {
+		msg_to_char(ch, "You can only do that on a %s you own.\r\n", VEH_OR_BLD(veh));
+	}
+	else if (manage_vehicle_data[type].priv != NOTHING && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), manage_vehicle_data[type].priv)) {
+		msg_to_char(ch, "You require %s privileges to do that\r\n", priv[manage_vehicle_data[type].priv]);
+	}
+	else {
+		// check for optional on/off arg
+		if (!str_cmp(argument, "on")) {
+			if (manage_vehicle_data[type].flag != NOBITS) {
+				SET_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+			}
+			// else: nothing to do?
+			on = TRUE;
+		}
+		else if (!str_cmp(argument, "off")) {
+			if (manage_vehicle_data[type].flag != NOBITS) {
+				REMOVE_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+			}
+			// else: nothing to do?
+			on = FALSE;
+		}
+		else {	// neither on nor off specified: toggle
+			if (manage_vehicle_data[type].flag != NOBITS) {
+				on = !VEH_FLAGGED(veh, manage_vehicle_data[type].flag);
+				if (on) {
+					SET_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+				}
+				else {	// off
+					REMOVE_BIT(VEH_FLAGS(veh), manage_vehicle_data[type].flag);
+				}
+			}
+			else {
+				msg_to_char(ch, "Error toggling that management option.\r\n");
+				on = FALSE;	// nothing to do??
+				return;
+			}
+		}
+		
+		msg_to_char(ch, "You turn the %s management option %s for %s.\r\n", manage_vehicle_data[type].name, on ? "on" : "off", VEH_SHORT_DESC(veh));
+		snprintf(buf, sizeof(buf), "$n turns the %s management option %s for %s.", manage_vehicle_data[type].name, on ? "on" : "off", VEH_SHORT_DESC(veh));
+		act(buf, TRUE, ch, NULL, NULL, TO_ROOM | TO_NOT_IGNORING);
+		
+		// callback func (optional)
+		if (manage_vehicle_data[type].func) {
+			(manage_vehicle_data[type].func)(ch, on);
+		}
+	}
+}
+
+
 // manage [option] [on/off] -- uses manage_data (above)
 ACMD(do_manage) {
 	char buf[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH];
 	int iter, type = NOTHING;
 	room_data *flag_room;
+	vehicle_data *veh;
 	bool on;
 	
 	if (IS_NPC(ch)) {
@@ -5600,6 +5737,12 @@ ACMD(do_manage) {
 	
 	argument = any_one_arg(argument, arg);
 	skip_spaces(&argument);
+	
+	// shortcut: manage <vehicle> ...
+	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+		do_manage_vehicle(ch, veh, argument);
+		return;
+	}
 	
 	// determine what they typed?
 	if (*arg) {
@@ -5625,7 +5768,7 @@ ACMD(do_manage) {
 				continue;	// level invalid
 			}
 			
-			on = (manage_data[iter].roomflag && ROOM_AFF_FLAGGED(IN_ROOM(ch), manage_data[iter].roomflag)) ? TRUE : FALSE;
+			on = (manage_data[iter].flag && ROOM_AFF_FLAGGED(IN_ROOM(ch), manage_data[iter].flag)) ? TRUE : FALSE;
 			snprintf(buf, sizeof(buf), "%s: %s\t0", manage_data[iter].name, on ? "\tgon" : "\troff");
 			msg_to_char(ch, " %s\r\n", CAP(buf));
 		}
@@ -5645,31 +5788,31 @@ ACMD(do_manage) {
 		
 		// check for optional on/off arg
 		if (!str_cmp(argument, "on")) {
-			if (manage_data[type].roomflag != NOBITS) {
-				SET_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].roomflag);
-				SET_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].roomflag);
+			if (manage_data[type].flag != NOBITS) {
+				SET_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].flag);
+				SET_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].flag);
 			}
 			// else: nothing to do?
 			on = TRUE;
 		}
 		else if (!str_cmp(argument, "off")) {
-			if (manage_data[type].roomflag != NOBITS) {
-				REMOVE_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].roomflag);
-				REMOVE_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].roomflag);
+			if (manage_data[type].flag != NOBITS) {
+				REMOVE_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].flag);
+				REMOVE_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].flag);
 			}
 			// else: nothing to do?
 			on = FALSE;
 		}
 		else {	// neither on nor off specified: toggle
-			if (manage_data[type].roomflag != NOBITS) {
-				on = !ROOM_AFF_FLAGGED(flag_room, manage_data[type].roomflag);
+			if (manage_data[type].flag != NOBITS) {
+				on = !ROOM_AFF_FLAGGED(flag_room, manage_data[type].flag);
 				if (on) {
-					SET_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].roomflag);
-					SET_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].roomflag);
+					SET_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].flag);
+					SET_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].flag);
 				}
 				else {	// off
-					REMOVE_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].roomflag);
-					REMOVE_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].roomflag);
+					REMOVE_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].flag);
+					REMOVE_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].flag);
 				}
 			}
 			else {
@@ -6812,6 +6955,121 @@ ACMD(do_unpublicize) {
 }
 
 
+/**
+* Handler for do_workforce when the args start: workforce limit ...
+*
+* @param char_data *ch The player.
+* @param empire_data *emp The empire.
+* @param char *argument Remaining args after "limit".
+*/
+void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
+	void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
+	
+	char amount_arg[MAX_INPUT_LENGTH], keywords_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], line[256];
+	struct workforce_production_limit *wpl, *next_wpl;
+	int amount, count;
+	obj_data *proto;
+	any_vnum vnum;
+	size_t size;
+	
+	skip_spaces(&argument);
+	
+	if (isdigit(*argument)) {
+		// usage: workforce limit <amount> <keywords>
+		half_chop(argument, amount_arg, keywords_arg);
+		amount = atoi(amount_arg);
+		
+		if (!*keywords_arg) {
+			msg_to_char(ch, "Usage: workforce limit <amount> <keywords>\r\n");
+		}
+		else if ((vnum = get_obj_vnum_by_name(keywords_arg, TRUE)) == NOTHING) {
+			msg_to_char(ch, "Unknown storable item '%s'.\r\n", keywords_arg);
+		}
+		else {
+			set_workforce_production_limit(emp, vnum, amount);
+			msg_to_char(ch, "You set the production limit for %s to %d.\r\n", get_obj_name_by_proto(vnum), amount);
+		}
+		return;	// end of: workforce limit <amount> <keywords>
+	}
+	if (!strn_cmp(argument, "none", 4) || !strn_cmp(argument, "off", 3)) {
+		// usage: workforce limit none <keywords>
+		half_chop(argument, amount_arg, keywords_arg);
+		// amount_arg == "none"
+		
+		if (!*keywords_arg) {
+			msg_to_char(ch, "Usage: workforce limit none <keywords>\r\n");
+		}
+		else if ((vnum = get_obj_vnum_by_name(keywords_arg, TRUE)) == NOTHING) {
+			msg_to_char(ch, "Unknown storable item '%s'.\r\n", keywords_arg);
+		}
+		else {
+			set_workforce_production_limit(emp, vnum, UNLIMITED);
+			msg_to_char(ch, "You turn off the production limit for %s.\r\n", get_obj_name_by_proto(vnum));
+		}
+		return;	// end of: workforce limit none <keywords>
+	}
+	
+	// ok if we got this far, we're just showing the current setup
+	// optional usage: workforce limit [keywords]
+	count = 0;
+	if (*argument) {
+		size = snprintf(buf, sizeof(buf), "Workforce production limits for '%s':\r\n", argument);
+	}
+	else {
+		size = snprintf(buf, sizeof(buf), "Workforce production limits:\r\n");
+	}
+	
+	// iterate...
+	HASH_ITER(hh, EMPIRE_PRODUCTION_LIMITS(emp), wpl, next_wpl) {
+		if (*argument && (!(proto = obj_proto(wpl->vnum)) || !multi_isname(argument, GET_OBJ_KEYWORDS(proto)))) {
+			continue;	// no keyword match
+		}
+		
+		// ok:
+		++count;
+		
+		// build line
+		if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+			snprintf(line, sizeof(line), "[%5d] %s: %d", wpl->vnum, skip_filler(get_obj_name_by_proto(wpl->vnum)), wpl->limit);
+		}
+		else {
+			snprintf(line, sizeof(line), "%s: %d", skip_filler(get_obj_name_by_proto(wpl->vnum)), wpl->limit);
+		}
+		
+		// check for room
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			if (size + strlen(line) + 3 < sizeof(buf)) {
+				size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, " OVERFLOW\r\n");
+				break;
+			}
+		}
+		else {	// not screenreader
+			if (size + 40 < sizeof(buf)) {
+				size += snprintf(buf + size, sizeof(buf) - size, " %-38.38s%s", line, !(count % 2) ? "\r\n" : "");
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, " OVERFLOW\r\n");
+				break;
+			}
+		}
+	}
+	
+	if (!count) {
+		strcat(buf, " no limits set\r\n");	// always room for this
+	}
+	else if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 2) && size + 2 < sizeof(buf)) {
+		strcat(buf, "\r\n");
+	}
+	
+	if (ch->desc) {	// should be guaranteed
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
 ACMD(do_workforce) {
 	extern int *get_ordered_chores();
 	
@@ -6945,6 +7203,9 @@ ACMD(do_workforce) {
 		if (!found) {
 			msg_to_char(ch, "You have nothing by that name stored on this island.\r\n");
 		}
+	}
+	else if (!str_cmp(arg, "lim") || !str_cmp(arg, "limit")) {
+		do_workforce_limit(ch, emp, argument);
 	}
 	else if (is_abbrev(arg, "nowork") || is_abbrev(arg, "no-work")) {
 		// special case: toggle no-work on this tile

@@ -1,14 +1,14 @@
 #5000
 grave~
 -1 0
-8 -1 0 1 2117
+8 -1 t 1 2117 0
 B
 5000 be 0
 S
 #5001
 tent~
 -1 1
-8 -1 0 1 2036
+8 -1 t 1 2036 0
 B
 5001 bde op
 R
@@ -17,7 +17,7 @@ S
 #5002
 rockshelter~
 -1 1
-8 79 0 1 -1
+8 79 0 1 -1 0
 B
 5002 be op
 R
@@ -26,7 +26,7 @@ S
 #5003
 treeshelter~
 -1 1
-8 79 0 1 -1
+8 79 0 1 -1 0
 B
 5003 d op
 R
@@ -35,7 +35,7 @@ S
 #5004
 caveshelter~
 -1 1
-8 79 0 1 -1
+8 79 0 1 -1 0
 B
 5004 c cop
 R
@@ -44,7 +44,7 @@ S
 #5005
 jungleshelter~
 -1 1
-8 79 0 1 -1
+8 79 0 1 -1 0
 B
 5005 g gop
 R
@@ -53,21 +53,21 @@ S
 #5006
 dismantle ruins~
 -1 0
-8 -1 l 1 -1
+8 -1 l 1 -1 0
 B
 5006 0 0
 S
 #5007
 closed ruins dismantle~
 -1 0
-8 -1 l 1 -1
+8 -1 l 1 -1 0
 B
 5007 0 0
 S
 #5008
 tunnel dismantle~
 -1 0
-8 289 l 1 -1
+8 289 l 1 -1 0
 B
 5008 c bdeklmno
 R
@@ -80,7 +80,7 @@ S
 #5010
 flooded ruins dismantle~
 -1 0
-8 -1 l 1 -1
+8 -1 l 1 -1 0
 B
 5010 0 0
 S

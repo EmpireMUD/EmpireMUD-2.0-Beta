@@ -501,10 +501,7 @@ Colossus location updater + leash~
 ~
 eval room %self.room%
 if %room.distance(%instance.real_location%)% > 20
-  %echo% %self.name% hastily backtracks.
   return 0
-  wait 1
-  %echo% %self.name% hastily backtracks.
   halt
 end
 nop %instance.set_location(%room%)%

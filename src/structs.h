@@ -735,7 +735,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_NO_PAINT  BIT(13)	// cannot be painted
 #define BLD_ATTACH_ROAD  BIT(14)	// building connects to roads on the map
 #define BLD_BURNABLE  BIT(15)	// fire! fire!
-// #define BLD_UNUSED4  BIT(16)
+#define BLD_EXIT  BIT(16)	// for ROOM-flagged interiors, players can 'exit' here
 // #define BLD_UNUSED5  BIT(17)
 // #define BLD_UNUSED6  BIT(18)
 // #define BLD_UNUSED7  BIT(19)
@@ -1056,6 +1056,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_LEARNED  BIT(16)	// cannot use unless learned
 #define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
 #define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
+#define CRAFT_TAKE_REQUIRED_OBJ  BIT(19)	// causes the craft to take the 'required-obj' when created, if any (and may refund it on dismantle)
 
 // list of above craft flags that require a building in some way
 #define CRAFT_FLAGS_REQUIRING_BUILDINGS  (CRAFT_GLASSBLOWER | CRAFT_CARPENTER | CRAFT_ALCHEMY | CRAFT_SHIPYARD)
@@ -1141,7 +1142,7 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_ABANDON_FARMED  23
 #define CHORE_NEXUS_CRYSTALS  24
 #define CHORE_MILLING  25
-#define CHORE_REPAIR_VEHICLES  26
+	#define CHORE_UNUSED  26	// formerly: CHORE_REPAIR_VEHICLES  26, merged with CHORE_MAINTENANCE
 #define CHORE_OILMAKING  27
 #define CHORE_GENERAL  28	// for reporting problems
 #define CHORE_FISHING  29
@@ -1847,7 +1848,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_MINTING			9
 #define ACT_FISHING			10
 #define ACT_START_FILLIN	11
-#define ACT_REPAIRING		12
+#define ACT_REPAIR_VEHICLE	12
 #define ACT_CHIPPING		13
 #define ACT_PANNING			14
 #define ACT_MUSIC			15
@@ -1878,6 +1879,7 @@ typedef struct vehicle_data vehicle_data;
 #define ACT_BURN_AREA		40
 #define ACT_HUNTING			41
 #define ACT_FORAGING		42
+#define ACT_DISMANTLE_VEHICLE  43
 
 // ACTF_x: act flags
 #define ACTF_ANYWHERE  BIT(0)	// movement won't break it
@@ -2252,6 +2254,7 @@ typedef struct vehicle_data vehicle_data;
 #define PTECH_QUARRY  75	// can 'quarry'
 #define PTECH_DRINK_BLOOD_FASTER  76	// vampires drink blood at 2x speed
 #define PTECH_SUMMON_MATERIALS  77	// can use the 'summon materials' command
+#define PTECH_CUSTOMIZE_VEHICLE  78	// can use 'customize vehicle'
 
 
 // summon types for oval_summon, ofin_summon, and add_offer
@@ -2440,6 +2443,11 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_NO_LOAD_ONTO_VEHICLE  BIT(19)	// t. cannot be loaded onto a vehicle
 #define VEH_VISIBLE_IN_DARK  BIT(20)	// u. can be seen at night
 #define VEH_NO_CLAIM  BIT(21)	// v. cannot be claimed
+#define VEH_BUILDING  BIT(22)	// w. behaves more like a building
+#define VEH_NEVER_DISMANTLE  BIT(23)	// x. vehicle cannot be dismantled
+#define VEH_PLAYER_NO_DISMANTLE  BIT(24)	// y. player toggled no-dismantle on
+#define VEH_DISMANTLING  BIT(25)	// z. is being dismantled
+#define VEH_PLAYER_NO_WORK  BIT(26)	// A. player has marked it no-work
 
 // VSPEED_x: indicates the number of speed bonuses this vehicle gives to driving.
 #define VSPEED_VERY_SLOW  0 // No speed bonuses.
@@ -2451,7 +2459,7 @@ typedef struct vehicle_data vehicle_data;
 // The following vehicle flags are saved to file rather than read from the
 // prototype. Flags which are NOT included in this list can be altered with
 // OLC and affect live copies.
-#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE)
+#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE | VEH_PLAYER_NO_DISMANTLE | VEH_DISMANTLING)
 
 // The following vehicle flags indicate a vehicle can move
 #define MOVABLE_VEH_FLAGS  (VEH_DRIVING | VEH_SAILING | VEH_FLYING | VEH_DRAGGABLE | VEH_CAN_PORTAL | VEH_LEADABLE)
@@ -4709,6 +4717,14 @@ struct workforce_delay {
 };
 
 
+// lets players prevent production of a certain item
+struct workforce_production_limit {
+	obj_vnum vnum;	// obj vnum
+	int limit;	// 0 = make none (no entry = make all)
+	UT_hash_handle hh;	// EMPIRE_PRODUCTION_LIMITS() hash
+};
+
+
 // for offenses committed against an empire
 struct offense_data {
 	int type;	// OFFENSE_ constant
@@ -4745,6 +4761,7 @@ struct workforce_log {
 	any_vnum loc;	// don't store room itself -- may not be in memory later
 	int chore;	// CHORE_ const
 	int problem;	// WF_PROB_ const
+	int count;	// how many times this apepars in the same spot
 	bool delayed;	// whether this is a delay-repeat or not
 	struct workforce_log *next;
 };
@@ -4790,6 +4807,7 @@ struct empire_data {
 	struct empire_production_total *production_totals;	// totals of items produced by the empire (hash by vnum)
 	struct empire_homeless_citizen *homeless;	// list of homeless npcs
 	struct script_data *script;	// for storing variables
+	struct workforce_production_limit *production_limits;	// limits on what workforce can make
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum
@@ -5485,6 +5503,7 @@ struct vehicle_data {
 	int carrying_n;	// size of contents
 	struct vehicle_attached_mob *animals;	// linked list of mobs attached
 	struct resource_data *needs_resources;	// resources until finished/maintained
+	struct resource_data *built_with;	// resources used to build it
 	room_data *interior_home_room;	// the vehicle's main room
 	struct vehicle_room_list *room_list;	// all interior rooms
 	int inside_rooms;	// how many rooms are inside
@@ -5495,6 +5514,8 @@ struct vehicle_data {
 	char_data *led_by;	// person leading it
 	char_data *sitting_on;	// person sitting on it
 	char_data *driver;	// person driving it
+	int construction_id;	// temporary id used to resume construction/dismantle
+	struct room_extra_data *extra_data;	// hash of misc storage
 	
 	// scripting
 	int script_id;	// used by DG triggers - unique id
@@ -5717,7 +5738,7 @@ struct room_direction_data {
 };
 
 
-// for storing misc vals to the room
+// for storing misc vals to the room (or vehicle)
 struct room_extra_data {
 	int type;	// ROOM_EXTRA_
 	int value;

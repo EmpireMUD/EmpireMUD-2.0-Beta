@@ -272,6 +272,7 @@ struct alias_data {
 #define MOVE_HERD  BIT(6)	// mob being herded
 #define MOVE_WANDER  BIT(7)	// normal mob move
 #define MOVE_RUN  BIT(8)	// running
+#define MOVE_EXIT  BIT(9)	// the 'exit' command
 
 // flags that ignore some move checks
 #define MOVE_IGNORE  (MOVE_LEAD | MOVE_FOLLOW | MOVE_HERD | MOVE_WANDER)

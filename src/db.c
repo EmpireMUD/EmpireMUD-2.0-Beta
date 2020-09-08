@@ -140,7 +140,7 @@ generic_data *sorted_generics = NULL;	// hash table (sorted_hh)
 struct global_data *globals_table = NULL;	// hash table of global_data
 
 // helps
-struct help_index_element *help_table = 0;	// the help table
+struct help_index_element *help_table = 0;	// the help table -- NOT a hash table
 int top_of_helpt = 0;	// top of help index table
 
 // map
@@ -306,6 +306,7 @@ void boot_db(void) {
 	void check_ruined_cities();
 	void check_version();
 	void check_sector_times(any_vnum only_sect);
+	void chore_update();
 	void delete_old_players();
 	void delete_orphaned_rooms();
 	void expire_old_politics();
@@ -453,7 +454,10 @@ void boot_db(void) {
 	log("Managing world memory.");
 	schedule_map_unloads();
 	update_instance_world_size();
-		
+	
+	log("Activating workforce.");
+	chore_update();
+	
 	// END
 	log("Boot db -- DONE.");
 	boot_time = time(0);
@@ -1964,6 +1968,7 @@ const char *versions_list[] = {
 	"b5.94",
 	"b5.99",
 	"b5.102",
+	"b5.103",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -3808,7 +3813,7 @@ void b5_86_update(void) {
 // also adds old-growth forests
 void b5_87_crop_and_old_growth(void) {
 	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
-	void stop_room_action(room_data *room, int action, int chore);
+	void stop_room_action(room_data *room, int action);
 	void uncrop_tile(room_data *room);
 	
 	int removed_crop = 0, total_crop = 0, new_og = 0, total_forest = 0;
@@ -3834,10 +3839,10 @@ void b5_87_crop_and_old_growth(void) {
 				uncrop_tile(room);
 				
 				// stop all possible chores here since the sector changed
-				stop_room_action(room, ACT_HARVESTING, CHORE_FARMING);
-				stop_room_action(room, ACT_CHOPPING, CHORE_CHOPPING);
-				stop_room_action(room, ACT_PICKING, CHORE_HERB_GARDENING);
-				stop_room_action(room, ACT_GATHERING, NOTHING);
+				stop_room_action(room, ACT_HARVESTING);
+				stop_room_action(room, ACT_CHOPPING);
+				stop_room_action(room, ACT_PICKING);
+				stop_room_action(room, ACT_GATHERING);
 			}
 		}
 		else if (has_og && GET_SECT_VNUM(map->sector_type) == overgrown_forest && (room = real_room(map->vnum)) && !ROOM_OWNER(room)) {
@@ -4439,6 +4444,23 @@ void b5_102_home_cleanup(void) {
 }
 
 
+// b5.103 removes the REPAIR-VEHICLES workforce chore
+void b5_103_update(void) {
+	void set_workforce_limit_all(empire_data *emp, int chore, int limit);
+	empire_data *emp, *next_emp;
+	
+	const int CHORE_REPAIR_VEHICLES = 26;
+	
+	log("Applying b5.103 update to remove the repair-vehicles workforce chore...");
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// this chore is gone
+		set_workforce_limit_all(emp, CHORE_REPAIR_VEHICLES, 0);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4757,6 +4779,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.102")) {
 			b5_102_home_cleanup();
+		}
+		if (MATCH_VERSION("b5.103")) {
+			b5_103_update();
 		}
 	}
 	

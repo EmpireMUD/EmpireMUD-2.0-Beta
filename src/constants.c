@@ -869,6 +869,7 @@ const char *player_tech_types[] = {
 	"Quarry",	// 75
 	"Drink-Blood-Faster",
 	"Summon-Materials",
+	"Customize-Vehicle",
 	"\n"
 };
 
@@ -1618,6 +1619,7 @@ const char *craft_flags[] = {
 	"LEARNED",
 	"BY-RIVER",
 	"REMOVE-PRODUCTION",
+	"TAKE-REQUIRED-OBJ",
 	"\n"
 };
 
@@ -1643,6 +1645,7 @@ const char *craft_flag_for_info[] = {
 	"",	// learned
 	"must be by a river",
 	"",	// remove-production
+	"",	// take-required-obj
 	"\n"
 };
 
@@ -2867,7 +2870,7 @@ const char *bld_flags[] = {
 	"!PAINT",
 	"ATTACH-ROAD",
 	"BURNABLE",	// 15
-	"*",
+	"EXIT",
 	"*",
 	"*",
 	"*",
@@ -4259,6 +4262,11 @@ const char *vehicle_flags[] = {
 	"!LOAD-ONTO-VEHICLE",
 	"VISIBLE-IN-DARK",	// 20
 	"!CLAIM",
+	"BUILDING",
+	"NEVER-DISMANTLE",
+	"*PLAYER-NO-DISMANTLE",
+	"*DISMANTLING",	// 25
+	"*PLAYER-NO-WORK",
 	"\n"
 };
 
@@ -4287,6 +4295,11 @@ const char *identify_vehicle_flags[] = {
 	"cannot be loaded onto vehicles",
 	"",	// "VISIBLE-IN-DARK",	// 20
 	"",	// "!CLAIM",
+	"",	// "BUILDING",
+	"",	// "NEVER-DISMANTLE",
+	"is set no-dismantle",
+	"being dismantled",	// 25
+	"is set no-work",
 	"\n"
 };
 

@@ -2212,9 +2212,11 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 					add_player_to_account(vict, GET_ACCOUNT(alt));
 
 					if (file) {
-						store_loaded_char(alt);
-						file = FALSE;
-						alt = NULL;
+						SAVE_CHAR(alt);
+						// leave them open to avoid a conflict with who you're setting
+						// store_loaded_char(alt);
+						// file = FALSE;
+						// alt = NULL;
 					}
 					else {
 						queue_delayed_update(alt, CDU_SAVE);
@@ -2226,7 +2228,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 				}
 				
 				if (file && alt) {
-					free_char(alt);
+					// leave the alt open to avoid a conflict with who you're setting
+					// free_char(alt);
 				}
 			}
 			else {
@@ -8247,6 +8250,7 @@ ACMD(do_last) {
 
 
 ACMD(do_load) {
+	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	vehicle_data *veh;
@@ -8311,6 +8315,11 @@ ACMD(do_load) {
 		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM);
 		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
 		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		
+		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(IN_ROOM(veh)))) {
+			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(veh))));
+		}
+		
 		load_vtrigger(veh);
 		
 		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
@@ -8968,11 +8977,13 @@ ACMD(do_rescale) {
 
 ACMD(do_restore) {
 	void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
+	void complete_vehicle(vehicle_data *veh);
 	
 	char name_arg[MAX_INPUT_LENGTH], *type_args, arg[MAX_INPUT_LENGTH], msg[MAX_STRING_LENGTH], types[MAX_STRING_LENGTH];
 	ability_data *abil, *next_abil;
 	skill_data *skill, *next_skill;
 	struct cooldown_data *cool;
+	vehicle_data *veh;
 	empire_data *emp;
 	char_data *vict;
 	int i, iter;
@@ -8988,8 +8999,28 @@ ACMD(do_restore) {
 		return;
 	}
 	else if (!(vict = get_char_vis(ch, name_arg, FIND_CHAR_WORLD))) {
-		send_config_msg(ch, "no_person");
-		return;
+		if ((veh = get_vehicle_vis(ch, name_arg))) {
+			// found vehicle target here
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s at %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(IN_ROOM(ch)));
+			act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR);
+	
+			if (GET_INVIS_LEV(ch) > 1 || PRF_FLAGGED(ch, PRF_WIZHIDE)) {
+				act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM);
+			}
+			else {
+				act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM);
+			}
+			
+			REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+			if (!VEH_IS_DISMANTLING(veh)) {
+				complete_vehicle(veh);
+			}
+			return;
+		}
+		else {	// no target at all
+			send_config_msg(ch, "no_person");
+			return;
+		}
 	}
 	
 	// parse type args

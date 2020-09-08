@@ -2,10 +2,10 @@
 Smuggler's Deck~
 On the Smuggler's Deck~
 ~
-0 0 aHR 0
+0 0 aqHR 0
 0 0 0 -1
 C
-disembark, sail~
+sail~
 D
 You're standing on the deck of the smuggler's ship.
 ~
@@ -16,10 +16,10 @@ S
 Pirate Deck~
 On the Deck of the Pirate Ship~
 ~
-0 0 aHR 0
+0 0 aqHR 0
 0 0 0 -1
 C
-disembark, sail~
+sail~
 D
 You're standing on the deck of the pirate ship.
 ~

@@ -34,6 +34,8 @@ extern bool world_map_needs_save;
 // external funcs
 void complete_building(room_data *room);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
+void decustomize_room(room_data *room);
+void decustomize_shared_data(struct shared_room_data *shared);
 extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 
 
@@ -351,8 +353,6 @@ OLC_MODULE(mapedit_pass_walls) {
 
 
 OLC_MODULE(mapedit_decustomize) {
-	void decustomize_room(room_data *room);
-	
 	decustomize_room(IN_ROOM(ch));
 	msg_to_char(ch, "All customizations removed on this room/acre.\r\n");
 	world_map_needs_save = TRUE;
@@ -631,6 +631,7 @@ OLC_MODULE(mapedit_naturalize) {
 			
 			// looks good: naturalize it
 			if (room) {
+				decustomize_room(room);
 				change_terrain(room, GET_SECT_VNUM(map->natural_sector));
 				if (ROOM_PEOPLE(room)) {
 					act("The area is naturalized!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
@@ -643,6 +644,7 @@ OLC_MODULE(mapedit_naturalize) {
 				remove_room_extra_data(room, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
 			}
 			else {
+				decustomize_shared_data(map->shared);
 				perform_change_sect(NULL, map, map->natural_sector);
 				perform_change_base_sect(NULL, map, map->natural_sector);
 				
@@ -676,6 +678,7 @@ OLC_MODULE(mapedit_naturalize) {
 	}
 	else {	// normal processing for 1 room
 		map = &(world_map[FLAT_X_COORD(IN_ROOM(ch))][FLAT_Y_COORD(IN_ROOM(ch))]);
+		decustomize_room(IN_ROOM(ch));
 		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(map->natural_sector));
 		if (ROOM_OWNER(IN_ROOM(ch))) {
 			deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));

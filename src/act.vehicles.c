@@ -50,7 +50,7 @@ extern int get_north_for_char(char_data *ch);
 extern room_data *get_vehicle_interior(vehicle_data *veh);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 extern bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error);
-extern int perform_move(char_data *ch, int dir, bitvector_t flags);
+extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 void scale_item_to_level(obj_data *obj, int level);
 void skip_run_filler(char **string);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
@@ -348,7 +348,7 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 		LL_FOREACH_SAFE(VEH_SITTING_ON(veh)->followers, fol, next_fol) {
 			if ((IN_ROOM(fol->follower) == was_in) && (GET_POS(fol->follower) >= POS_STANDING)) {
 				act("You follow $N.\r\n", FALSE, fol->follower, NULL, VEH_SITTING_ON(veh), TO_CHAR);
-				perform_move(fol->follower, dir, MOVE_FOLLOW);
+				perform_move(fol->follower, dir, NULL, MOVE_FOLLOW);
 			}
 		}
 	}
@@ -730,6 +730,11 @@ bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message) {
 			msg_to_char(ch, "You can't sit on that!\r\n");
 		}
 	}
+	else if (VEH_IS_DISMANTLING(veh)) {
+		if (message) {
+			msg_to_char(ch, "You can't sit %s because it's being dismantled.\r\n", IN_OR_ON(veh));
+		}
+	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		if (message) {
 			msg_to_char(ch, "You can't sit %s it until it's finished.\r\n", IN_OR_ON(veh));
@@ -799,6 +804,12 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 	else if (!(veh = get_vehicle_in_room_vis(ch, tar_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(tar_arg, VEH_KEYWORDS(veh)))) {
 		msg_to_char(ch, "You don't see that vehicle here.\r\n");
 	}
+	else if (!VEH_FLAGGED(veh, VEH_BUILDING) && !has_player_tech(ch, PTECH_CUSTOMIZE_VEHICLE)) {
+		msg_to_char(ch, "You don't have the right technology to customize that.\r\n");
+	}
+	else if (VEH_FLAGGED(veh, VEH_BUILDING) && !has_player_tech(ch, PTECH_CUSTOMIZE_BUILDING)) {
+		msg_to_char(ch, "You don't have the right technology to customize that.\r\n");
+	}
 	else if (!VEH_FLAGGED(veh, VEH_CUSTOMIZABLE)) {
 		msg_to_char(ch, "You can't customize that!\r\n");
 	}
@@ -809,7 +820,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 	// types:
 	else if (is_abbrev(type_arg, "name")) {
 		if (!*argument) {
-			msg_to_char(ch, "What would you like to name this vehicle (or \"none\")?\r\n");
+			msg_to_char(ch, "What would you like to name this %s (or \"none\")?\r\n", VEH_OR_BLD(veh));
 		}
 		else if (!str_cmp(argument, "none")) {
 			proto = vehicle_proto(VEH_VNUM(veh));
@@ -827,13 +838,13 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 				VEH_LONG_DESC(veh) = VEH_LONG_DESC(proto);
 			}
 			
-			msg_to_char(ch, "The vehicle no longer has a custom name.\r\n");
+			msg_to_char(ch, "The %s no longer has a custom name.\r\n", VEH_OR_BLD(veh));
 		}
 		else if (color_code_length(argument) > 0) {
 			msg_to_char(ch, "You cannot use color codes in custom names.\r\n");
 		}
 		else if (strlen(argument) > 24) {
-			msg_to_char(ch, "That name is too long. Vehicle names may not be over 24 characters.\r\n");
+			msg_to_char(ch, "That name is too long. Names may not be over 24 characters.\r\n");
 		}
 		else {
 			proto = vehicle_proto(VEH_VNUM(veh));
@@ -841,6 +852,9 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			// change short desc
 			if (!proto || VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
 				free(VEH_SHORT_DESC(veh));
+			}
+			else {
+				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_VEHICLE, 33.4);
 			}
 			VEH_SHORT_DESC(veh) = str_dup(argument);
 			
@@ -865,7 +879,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 	}
 	else if (is_abbrev(type_arg, "longdesc")) {
 		if (!*argument) {
-			msg_to_char(ch, "What would you like to make the long description of this vehicle (or \"none\")?\r\n");
+			msg_to_char(ch, "What would you like to make the long description of this %s (or \"none\")?\r\n", VEH_OR_BLD(veh));
 		}
 		else if (!str_cmp(argument, "none")) {
 			proto = vehicle_proto(VEH_VNUM(veh));
@@ -888,6 +902,9 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			
 			if (!proto || VEH_LONG_DESC(veh) != VEH_LONG_DESC(proto)) {
 				free(VEH_LONG_DESC(veh));
+			}
+			else {
+				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_VEHICLE, 33.4);
 			}
 			
 			VEH_LONG_DESC(veh) = str_dup(argument);
@@ -919,16 +936,18 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 			
 			if (!proto || VEH_LOOK_DESC(veh) != VEH_LOOK_DESC(proto)) {
 				// differs from proto
-				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
+				start_string_editor(ch->desc, "description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
 			}
 			else {
 				// has proto's desc
 				VEH_LOOK_DESC(veh) = VEH_LOOK_DESC(proto) ? str_dup(VEH_LOOK_DESC(proto)) : NULL;
-				start_string_editor(ch->desc, "vehicle description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
+				start_string_editor(ch->desc, "description", &VEH_LOOK_DESC(veh), MAX_ITEM_DESCRIPTION, TRUE);
 				ch->desc->str_on_abort = VEH_LOOK_DESC(proto);
+				
+				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_VEHICLE, 33.4);
 			}
 			
-			act("$n begins editing a vehicle description.", TRUE, ch, 0, 0, TO_ROOM);
+			act("$n begins editing a description.", TRUE, ch, 0, 0, TO_ROOM);
 		}
 		else {
 			msg_to_char(ch, "You must specify whether you want to set or remove the description.\r\n");
@@ -1043,7 +1062,7 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 	char buf[MAX_STRING_LENGTH];
 	
 	if (IS_NPC(ch)) {
-		msg_to_char(ch, "Mobs can't light vehicles on fire.\r\n");
+		msg_to_char(ch, "Mobs can't light %ss on fire.\r\n", VEH_OR_BLD(veh));
 	}
 	else if (!VEH_FLAGGED(veh, VEH_BURNABLE)) {
 		msg_to_char(ch, "You can't seem to get it to burn.\r\n");
@@ -1052,7 +1071,7 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 		msg_to_char(ch, "It is already on fire!\r\n");
 	}
 	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) != VEH_OWNER(veh) && !has_relationship(GET_LOYALTY(ch), VEH_OWNER(veh), DIPL_WAR)) {
-		msg_to_char(ch, "You can't burn %s vehicles unless you're at war.\r\n", EMPIRE_ADJECTIVE(VEH_OWNER(veh)));
+		msg_to_char(ch, "You can't burn %s %ss unless you're at war.\r\n", EMPIRE_ADJECTIVE(VEH_OWNER(veh)), VEH_OR_BLD(veh));
 	}
 	else {
 		snprintf(buf, sizeof(buf), "You %s $V on fire!", (lighter ? "use $p to light" : "light"));
@@ -1252,6 +1271,9 @@ ACMD(do_board) {
 		// this is a pre-check
 		msg_to_char(ch, "You can't %s that!\r\n", command);
 	}
+	else if (VEH_IS_DISMANTLING(veh)) {
+		msg_to_char(ch, "You can't %s it because it's being dismantled.\r\n", command);
+	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		msg_to_char(ch, "You can't %s it until it's finished.\r\n", command);
 	}
@@ -1381,111 +1403,17 @@ ACMD(do_board) {
 
 ACMD(do_disembark) {
 	vehicle_data *veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
-	room_data *was_in = IN_ROOM(ch), *to_room;
-	struct follow_type *k;
-
-	if (!IS_APPROVED(ch) && config_get_bool("travel_approval")) {
-		send_config_msg(ch, "need_approval_string");
-	}
-	else if (!veh || !(to_room = IN_ROOM(veh))) {
+	room_data *to_room;
+	
+	if (!veh || !(to_room = IN_ROOM(veh)) || (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You can't disembark from here!\r\n");
 	}
-	else if (!IS_IMMORTAL(ch) && !IS_NPC(ch) && IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
-		msg_to_char(ch, "You are overburdened and cannot move.\r\n");
-	}
-	else if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
-		msg_to_char(ch, "You can't disembark here while riding.\r\n");
+	else if (VEH_FLAGGED(veh, VEH_BUILDING)) {
+		msg_to_char(ch, "You can only disembark from vehicles. Try 'exit'.\r\n");
 	}
 	else {
-		// auto-dismount
-		if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS)) {
-			do_dismount(ch, "", 0, 0);
-		}
-		
-		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
-			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
-		}
-		msg_to_char(ch, "You disembark.\r\n");
-		
-		char_to_room(ch, to_room);
-		qt_visit_room(ch, IN_ROOM(ch));
-		GET_LAST_DIR(ch) = NO_DIR;
-		look_at_room(ch);
-		
-		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
-			act("$n disembarks from $V.", TRUE, ch, NULL, veh, TO_ROOM);
-		}
-		
-		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
-		entry_memory_mtrigger(ch);
-		greet_mtrigger(ch, NO_DIR);
-		greet_memory_mtrigger(ch);
-		greet_vtrigger(ch, NO_DIR);
-		msdp_update_room(ch);
-		
-		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
-			act("$n is led off.", TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
-			
-			char_to_room(GET_LEADING_MOB(ch), to_room);
-			GET_LAST_DIR(GET_LEADING_MOB(ch)) = NO_DIR;
-			look_at_room(GET_LEADING_MOB(ch));
-			
-			if (!AFF_FLAGGED(GET_LEADING_MOB(ch), AFF_SNEAK)) {
-				act("$n disembarks from $V.", TRUE, GET_LEADING_MOB(ch), NULL, veh, TO_ROOM);
-			}
-			
-			enter_wtrigger(IN_ROOM(GET_LEADING_MOB(ch)), GET_LEADING_MOB(ch), NO_DIR);
-			entry_memory_mtrigger(GET_LEADING_MOB(ch));
-			greet_mtrigger(GET_LEADING_MOB(ch), NO_DIR);
-			greet_memory_mtrigger(GET_LEADING_MOB(ch));
-			greet_vtrigger(GET_LEADING_MOB(ch), NO_DIR);
-		}
-		if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
-			if (ROOM_PEOPLE(was_in)) {
-				act("$v is led behind $M.", TRUE, ROOM_PEOPLE(was_in), GET_LEADING_VEHICLE(ch), ch, TO_CHAR | TO_NOTVICT | ACT_VEHICLE_OBJ);
-			}
-			
-			adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), FALSE);
-			vehicle_to_room(GET_LEADING_VEHICLE(ch), to_room);
-			adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), TRUE);
-			
-			act("$V is led off.", TRUE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
-		}
-
-		for (k = ch->followers; k; k = k->next) {
-			if (IN_ROOM(k->follower) != was_in) {
-				continue;
-			}
-			if (GET_POS(k->follower) < POS_STANDING) {
-				continue;
-			}
-			if (!IS_IMMORTAL(k->follower) && !IS_NPC(k->follower) && IS_CARRYING_N(k->follower) > CAN_CARRY_N(k->follower)) {
-				continue;
-			}
-		
-			act("You follow $N.\r\n", FALSE, k->follower, NULL, ch, TO_CHAR);
-			if (!AFF_FLAGGED(k->follower, AFF_SNEAK)) {
-				act("$n disembarks from $V.", TRUE, k->follower, NULL, veh, TO_ROOM);
-			}
-
-			char_to_room(k->follower, to_room);
-			qt_visit_room(k->follower, IN_ROOM(k->follower));
-			GET_LAST_DIR(k->follower) = NO_DIR;
-			look_at_room(k->follower);
-			
-			if (!AFF_FLAGGED(k->follower, AFF_SNEAK)) {
-				act("$n disembarks from $V.", TRUE, k->follower, NULL, veh, TO_ROOM);
-			}
-			
-			enter_wtrigger(IN_ROOM(k->follower), k->follower, NO_DIR);
-			entry_memory_mtrigger(k->follower);
-			greet_mtrigger(k->follower, NO_DIR);
-			greet_memory_mtrigger(k->follower);
-			greet_vtrigger(k->follower, NO_DIR);
-			msdp_update_room(k->follower);
-		}
-		
-		command_lag(ch, WAIT_OTHER);
+		// shares MOVE_EXIT, which overrides the text with 'disembark' if it's a non-building vehicle
+		perform_move(ch, NO_DIR, to_room, MOVE_EXIT);
 	}
 }
 
@@ -1536,6 +1464,9 @@ ACMD(do_dispatch) {
 	}
 	else if (!VEH_FLAGGED(veh, VEH_SHIPPING)) {
 		msg_to_char(ch, "You can only dispatch shipping vessels.\r\n");
+	}
+	else if (VEH_IS_DISMANTLING(veh)) {
+		msg_to_char(ch, "It's in the middle of being dismantled.\r\n");
 	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		msg_to_char(ch, "It isn't even built yet.\r\n");
@@ -1704,7 +1635,7 @@ ACMD(do_drag) {
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "You can't drag that around -- it's on fire!\r\n");
 	}
-	else if (!VEH_IS_COMPLETE(veh)) {
+	else if (!VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh)) {
 		msg_to_char(ch, "You can't drag that around until it's finished.\r\n");
 	}
 	else if (count_harnessed_animals(veh) > 0) {
@@ -1735,7 +1666,7 @@ ACMD(do_drag) {
 	else {
 		// seems okay enough -- try movement
 		was_in = IN_ROOM(ch);
-		if (!perform_move(ch, dir, NOBITS) || IN_ROOM(ch) == was_in) {
+		if (!perform_move(ch, dir, NULL, NOBITS) || IN_ROOM(ch) == was_in) {
 			// failure here would have sent its own message
 			return;
 		}
@@ -1874,6 +1805,9 @@ ACMD(do_drive) {
 	else if (!VEH_FLAGGED(veh, drive_data[subcmd].flag)) {
 		snprintf(buf, sizeof(buf), "You can't %s $V!", drive_data[subcmd].command);
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+	}
+	else if (VEH_IS_DISMANTLING(veh)) {
+		act("$V isn't going anywhere now that it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		act("$V isn't going anywhere until it's finished.", FALSE, ch, NULL, veh, TO_CHAR);
@@ -2100,6 +2034,9 @@ ACMD(do_harness) {
 	else if (count_harnessed_animals(veh) >= VEH_ANIMALS_REQUIRED(veh)) {
 		msg_to_char(ch, "You can't harness %s animals to it.\r\n", count_harnessed_animals(veh) == 0 ? "any" : "any more");
 	}
+	else if (VEH_IS_DISMANTLING(veh)) {
+		act("You can't harness anything to $V because it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		act("You must finish constructing $V before you can harness anything to it.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
@@ -2193,6 +2130,9 @@ ACMD(do_lead) {
 		if (!VEH_FLAGGED(veh, VEH_LEADABLE)) {
 			act("You can't lead $V!", FALSE, ch, NULL, veh, TO_CHAR);
 		}
+		else if (VEH_IS_DISMANTLING(veh)) {
+			act("You can't lead $V because it's being dismantled.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
 		else if (!VEH_IS_COMPLETE(veh)) {
 			act("You must finish constructing $V before you can lead it.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
@@ -2241,6 +2181,9 @@ ACMD(do_load_vehicle) {
 	}
 	else if (!(cont = get_vehicle_in_room_vis(ch, arg2))) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg2), arg2);
+	}
+	else if (VEH_IS_DISMANTLING(cont)) {
+		msg_to_char(ch, "You can't load anything %sto it because it's being dismantled.\r\n", IN_OR_ON(cont));
 	}
 	else if (!VEH_IS_COMPLETE(cont)) {
 		msg_to_char(ch, "You must finish constructing it before anything can be loaded %sto it.\r\n", IN_OR_ON(cont));
@@ -2326,15 +2269,18 @@ ACMD(do_load_vehicle) {
 		if (veh == cont) {
 			msg_to_char(ch, "You can't load it into itself.\r\n");
 		}
+		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
+			msg_to_char(ch, "You can't load that %sto %ss.\r\n", IN_OR_ON(cont), VEH_OR_BLD(cont));
+		}
 		else if (!VEH_FLAGGED(cont, VEH_CARRY_VEHICLES)) {
-			act("$v won't carry vehicles.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
+			act("$v won't carry that.", FALSE, ch, cont, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
 		}
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
 			snprintf(buf, sizeof(buf), "You can't load $v %sto anything.", IN_OR_ON(cont));
 			act(buf, FALSE, ch, veh, NULL, TO_CHAR | ACT_VEHICLE_OBJ);
 		}
-		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
-			msg_to_char(ch, "You can't load that %sto vehicles.\r\n", IN_OR_ON(cont));
+		else if (VEH_IS_DISMANTLING(veh)) {
+			msg_to_char(ch, "You can't load it %sto anything because it's being dismantled.\r\n", IN_OR_ON(cont));
 		}
 		else if (!VEH_IS_COMPLETE(veh)) {
 			msg_to_char(ch, "You must finish constructing it before it can be loaded %sto anything.\r\n", IN_OR_ON(cont));
@@ -2364,53 +2310,9 @@ ACMD(do_load_vehicle) {
 }
 
 
-ACMD(do_repair) {
-	char arg[MAX_INPUT_LENGTH];
-	vehicle_data *veh;
-	
-	one_argument(argument, arg);
-	
-	if (GET_ACTION(ch) == ACT_REPAIRING) {
-		act("You stop repairing.", FALSE, ch, NULL, NULL, TO_CHAR);
-		cancel_action(ch);
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're busy right now.\r\n");
-	}
-	else if (!*arg) {
-		msg_to_char(ch, "Repair what?\r\n");
-	}
-	else if (!(veh = get_vehicle_in_room_vis(ch, arg))) {
-		msg_to_char(ch, "You don't see anything like that here.\r\n");
-	}
-	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
-		msg_to_char(ch, "You can't repair something that belongs to someone else.\r\n");
-	}
-	else if (!VEH_IS_COMPLETE(veh)) {
-		msg_to_char(ch, "You can only repair vehicles that are finished.\r\n");
-	}
-	else if (!VEH_NEEDS_RESOURCES(veh) && VEH_HEALTH(veh) >= VEH_MAX_HEALTH(veh)) {
-		msg_to_char(ch, "It doesn't need repair.\r\n");
-	}
-	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
-		msg_to_char(ch, "You can't repair it while it's on fire!\r\n");
-	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to repair anything here.\r\n");
-	}
-	else {
-		start_action(ch, ACT_REPAIRING, -1);
-		GET_ACTION_VNUM(ch, 0) = veh_script_id(veh);
-		act("You begin to repair $V.", FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n begins to repair $V.", FALSE, ch, NULL, veh, TO_ROOM);
-	}
-}
-
-
 ACMD(do_scrap) {
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
-	craft_data *craft;
 	char_data *iter;
 	
 	one_argument(argument, arg);
@@ -2425,18 +2327,15 @@ ACMD(do_scrap) {
 		msg_to_char(ch, "You can't scrap that! It's not even yours.\r\n");
 	}
 	else if (VEH_IS_COMPLETE(veh)) {
-		msg_to_char(ch, "You can only scrap incomplete vehicles.\r\n");
+		msg_to_char(ch, "You can only scrap incomplete %ss.\r\n", VEH_OR_BLD(veh));
 	}
 	else {
 		// seems good... but make sure nobody is working on it
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), iter, next_in_room) {
-			if (IS_NPC(iter) || GET_ACTION(iter) != ACT_GEN_CRAFT) {
+			if (IS_NPC(iter) || (GET_ACTION(iter) != ACT_GEN_CRAFT && GET_ACTION(iter) != ACT_DISMANTLE_VEHICLE)) {
 				continue;
 			}
-			if (!(craft = craft_proto(GET_ACTION_VNUM(iter, 0)))) {
-				continue;
-			}
-			if (!CRAFT_FLAGGED(craft, CRAFT_VEHICLE) || GET_CRAFT_OBJECT(craft) != VEH_VNUM(veh)) {
+			if (GET_ACTION_VNUM(iter, 1) != VEH_CONSTRUCTION_ID(veh)) {
 				continue;
 			}
 			
@@ -2516,6 +2415,9 @@ ACMD(do_unload_vehicle) {
 	}
 	else if (!can_use_vehicle(ch, cont, MEMBERS_AND_ALLIES)) {
 		act("You don't have permission to unload $V.", FALSE, ch, NULL, cont, TO_CHAR);
+	}
+	else if (VEH_IS_DISMANTLING(cont)) {
+		act("You can't unload anything from $V while it's being dismantled.", FALSE, ch, NULL, cont, TO_CHAR);
 	}
 	else if (!VEH_IS_COMPLETE(cont)) {
 		act("You must finish constructing $V before anything can be unloaded.", FALSE, ch, NULL, cont, TO_CHAR);
@@ -2598,11 +2500,14 @@ ACMD(do_unload_vehicle) {
 		if (veh == cont) {
 			msg_to_char(ch, "You can't unload it from itself.\r\n");
 		}
-		else if (GET_ROOM_VEHICLE(IN_ROOM(cont)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_VEHICLES)) {
-			msg_to_char(ch, "You can't unload vehicles here.\r\n");
-		}
 		else if (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE)) {
-			msg_to_char(ch, "That cannot be unloaded from vehicles.\r\n");
+			msg_to_char(ch, "That cannot be unloaded from anything.\r\n");
+		}
+		else if (GET_ROOM_VEHICLE(IN_ROOM(cont)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(cont)), VEH_CARRY_VEHICLES)) {
+			msg_to_char(ch, "You can't unload %ss here.\r\n", VEH_OR_BLD(cont));
+		}
+		else if (VEH_IS_DISMANTLING(veh)) {
+			msg_to_char(ch, "You can't unload it from anything while it's being dismantled.\r\n");
 		}
 		else if (!VEH_IS_COMPLETE(veh)) {
 			msg_to_char(ch, "You must finish constructing it before it can be unloaded from anything.\r\n");

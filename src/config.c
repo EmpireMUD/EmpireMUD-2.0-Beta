@@ -253,6 +253,7 @@ void init_inherent_player_techs(void) {
 	// ability for these things
 	set_inherent_ptech(PTECH_CALENDAR);
 	set_inherent_ptech(PTECH_CLOCK);
+	set_inherent_ptech(PTECH_CUSTOMIZE_VEHICLE);
 }
 
 

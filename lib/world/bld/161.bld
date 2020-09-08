@@ -2,10 +2,10 @@
 Bow of the Hydra~
 The Bow of the Hydra Slayer~
 &0[  ]~
-1 0 aHR 0
+1 0 aqHR 0
 0 0 0 -1
 C
-disembark sail~
+sail~
 D
 You stand at the leading head of this hydra-shaped war ship.
 ~
@@ -17,7 +17,7 @@ The Captain's Cabin~
 1 0 aH 0
 0 0 0 -1
 C
-disembark~
+~
 D
    Upon entering the cabin of this ship, it clearly isn't intended for comfort.
 A pair of nets act as beds, two small cupboards hold personal affects, and a

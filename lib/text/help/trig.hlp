@@ -363,6 +363,11 @@ You can return 0 if it shouldn't have gone there and should go back. If you
 want the mob to do something on arrival, you should consider using a short
 wait.
 
+Mob entry triggers run BEFORE the message for the person entering the room, so
+if it returns 0, that message is not sent. Consider using a # on any echoes or
+sends that should appear after the person enters and auto-looks. For other
+things that should happen after someone enters, consider adding a 'wait 1'.
+
 Note: Entry triggers attached to charmed mobs will not fire unless the trigger
    also has the Charmed type.
 

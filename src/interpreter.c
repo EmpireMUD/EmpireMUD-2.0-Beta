@@ -338,7 +338,6 @@ ACMD(do_regenerate);
 ACMD(do_rejuvenate);
 ACMD(do_reload);
 ACMD(do_remove);
-ACMD(do_repair);
 ACMD(do_reply);
 ACMD(do_rescale);
 ACMD(do_rescue);
@@ -727,6 +726,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "excavate", POS_STANDING, do_excavate, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "exchange", POS_STANDING, do_exchange, NO_MIN, CTYPE_BUILD ),
 	SIMPLE_CMD( "execute", POS_STANDING, do_execute, NO_MIN, CTYPE_COMBAT ),
+	SIMPLE_CMD( "exit", POS_RESTING, do_exit, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "exits", POS_RESTING, do_exits, NO_MIN, CTYPE_UTIL, -1 ),
 	SCMD_CMD( "export", POS_DEAD, do_import, NO_MIN, CTYPE_UTIL, TRADE_EXPORT ),
 	SIMPLE_CMD( "expel", POS_DEAD, do_expel, NO_MIN, CTYPE_EMPIRE ),
@@ -931,7 +931,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "reject", POS_DEAD, do_accept, NO_MIN, CTYPE_UTIL, SCMD_REJECT ),
 	GRANT_CMD( "reload", POS_DEAD, do_reload, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RELOAD ),
 	SIMPLE_CMD( "remove", POS_RESTING, do_remove, NO_MIN, CTYPE_COMM ),
-	STANDARD_CMD( "repair", POS_STANDING, do_repair, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
+	STANDARD_CMD( "repair", POS_STANDING, do_maintain, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	GRANT_CMD( "rescale", POS_RESTING, do_rescale, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_RESCALE ),
 	ABILITY_CMD( "rescue", POS_FIGHTING, do_rescue, NO_MIN, CTYPE_COMBAT, ABIL_RESCUE ),
 	SIMPLE_CMD( "respawn", POS_DEAD, do_respawn, NO_MIN, CTYPE_UTIL ),

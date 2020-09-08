@@ -23,10 +23,10 @@ S
 Airdeck~
 On the Airdeck~
 ~
-0 0 aHR 0
+0 0 aqHR 0
 0 0 0 -1
 C
-disembark, pilot~
+pilot~
 D
 You're standing on deck, looking out over this side of the clockwork roc.
 ~
@@ -83,10 +83,10 @@ S
 Roc's Belly~
 The Roc's Belly~
 ~
-0 0 aHR 0
+0 0 aqHR 0
 0 0 0 -1
 C
-disembark, pilot~
+pilot~
 D
 You're standing on the lower observation deck at the bottom of the roc.
 ~

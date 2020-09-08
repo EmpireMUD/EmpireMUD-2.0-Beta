@@ -2,10 +2,8 @@
 Imperial Carriage~
 Inside the Carriage~
 &0[  ]~
-1 0 a 0
+1 0 aq 0
 0 0 0 -1
-C
-disembark~
 D
    This carriage is spacious. Every seat is velvet, and the curtains protect
 your fine skin from the sun. Truly this is how an emperor was meant to ride:
@@ -19,7 +17,7 @@ The Ship's Pigeon Station~
 0 0 aH 0
 0 0 0 -1
 C
-disembark, mail~
+mail~
 D
    This part of this ship is slightly foul, and is devoted mainly to pigeon
 cages. There is a scribe's desk and writing implements, allowing you to send
@@ -37,7 +35,7 @@ The Ship's Forge~
 0 0 aH 0
 0 0 0 -1
 C
-disembark, forge, smelt~
+forge, smelt~
 D
    The walls in this part of the ship are black with soot. It has been
 converted into a forge, although the searing hot pit that is used to smelt and
@@ -53,10 +51,10 @@ S
 Wagon Smithy~
 The Smithy's Wagon~
 &0[  ]~
-1 0 aH 0
+1 0 aqH 0
 0 0 0 -1
 C
-disembark, forge, smelt~
+forge, smelt~
 D
    You have reached the final wagon, which devotes much of its space to
 supplies and spare equipment. There is also an anvil and a hot pit that surely
@@ -70,10 +68,10 @@ S
 Wagon Bedroom~
 A Royal Sleeping Wagon~
 &0[  ]~
-1 0 aH 0
+1 0 aqH 0
 0 0 0 -1
 C
-disembark, sleep~
+sleep~
 D
    This wagon is darker than the rest, having two layers of heavy curtains and
 tapestries to block the harsh sun. Much of the wagon is filled with a bed fit
@@ -86,10 +84,10 @@ S
 Wagon Galley~
 The Galley Wagon~
 &0[  ]~
-1 0 aH 0
+1 0 aqH 0
 0 0 0 -1
 C
-cook, disembark~
+cook~
 D
    This wagon has a woodburning stove, a small larder, and some cases of
 provisions. Like the rest of the caravan, this wagon is decked in royal
@@ -102,10 +100,10 @@ S
 Inside Caravan~
 Inside the Caravan~
 &0[  ]~
-1 0 aH 0
+1 0 aqH 0
 0 1 0 -1
 C
-disembark, mail~
+mail~
 D
    This grand, well-appointed caravan is made up of a series of wagons. Some
 are connected directly, and others have their own team of steeds. This wagon
@@ -120,10 +118,10 @@ S
 On Deck~
 On the Deck~
 ~
-0 0 aHR 0
+0 0 aqHR 0
 0 1 0 -1
 C
-disembark, sail~
+sail~
 D
 You're standing on the deck of the heroic galleon.
 ~

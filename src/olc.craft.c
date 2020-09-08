@@ -68,12 +68,16 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "IN-DEVELOPMENT");
 		problem = TRUE;
 	}
-	if (!GET_CRAFT_RESOURCES(craft)) {
+	if (!GET_CRAFT_RESOURCES(craft) && (!CRAFT_FLAGGED(craft, CRAFT_TAKE_REQUIRED_OBJ) || GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING)) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires no resources");
 		problem = TRUE;
 	}
 	if (!str_cmp(GET_CRAFT_NAME(craft), default_craft_name)) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft not named");
+		problem = TRUE;
+	}
+	if (CRAFT_FLAGGED(craft, CRAFT_TAKE_REQUIRED_OBJ) && GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Has TAKE-REQUIRED-OBJ but requires no obj");
 		problem = TRUE;
 	}
 	
@@ -331,6 +335,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 	int only_type = NOTHING, only_level = NOTHING, only_quantity = NOTHING, only_time = NOTHING;
 	int quantity_over = NOTHING, level_over = NOTHING, time_over = NOTHING;
 	int quantity_under = NOTHING, level_under = NOTHING, time_under = NOTHING;
+	bool requires_obj = FALSE;
 	
 	craft_data *craft, *next_craft;
 	size_t size;
@@ -360,6 +365,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
 		FULLSEARCH_INT("levelsover", level_over, 0, INT_MAX)
 		FULLSEARCH_INT("levelunder", level_under, 0, INT_MAX)
+		FULLSEARCH_BOOL("requiresobject", requires_obj)
 		FULLSEARCH_INT("time", only_time, 0, INT_MAX)
 		FULLSEARCH_INT("timesover", time_over, 0, INT_MAX)
 		FULLSEARCH_INT("timeunder", time_under, 0, INT_MAX)
@@ -378,6 +384,9 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 	
 	// okay now look up crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
+		if (requires_obj && GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING) {
+			continue;
+		}
 		if (only_type != NOTHING && GET_CRAFT_TYPE(craft) != only_type) {
 			continue;
 		}

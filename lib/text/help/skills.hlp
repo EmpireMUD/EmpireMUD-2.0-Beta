@@ -136,13 +136,15 @@ See also: DEPLETION, ROCKS, FLINT, CLAY, FINDER, SHOVEL, SCAVENGING
 #
 DISMANTLE
 
-Usage:  dismantle
+Usage:  dismantle [vehicle | building]
 Speed boosts:  Faster Chores bonus, haste
 
 This command allows you to tear down a building when you're done with it. You
 get back some of the resources you spent to build it depending on the condition
 of the building, although dismantle can only refund items that were used -- it
 can't refund any coins, mana, or liquids that were spent.
+
+You can also dismantle some vehicles.
 
 This requires the 'dismantle' empire privilege, unless you are the person who
 originally built the building.

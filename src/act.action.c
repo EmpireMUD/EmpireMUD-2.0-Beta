@@ -39,6 +39,7 @@
 extern const char *tool_flags[];
 
 // external funcs
+void complete_vehicle(vehicle_data *veh);
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
@@ -71,6 +72,7 @@ void process_chop(char_data *ch);
 void process_copying_book(char_data *ch);
 void process_digging(char_data *ch);
 void process_dismantle_action(char_data *ch);
+void process_dismantle_vehicle(char_data *ch);
 void process_escaping(char_data *ch);
 void process_excavating(char_data *ch);
 void process_fillin(char_data *ch);
@@ -121,7 +123,7 @@ const struct action_data_struct action_data[] = {
 	{ "minting", "is minting coins.", ACTF_ALWAYS_FAST | ACTF_FAST_CHORES, process_minting, cancel_minting },	// ACT_MINTING
 	{ "fishing", "is fishing.", ACTF_SITTING, process_fishing, NULL },	// ACT_FISHING
 	{ "preparing", "is preparing to fill in the trench.", NOBITS, process_start_fillin, NULL },	// ACT_START_FILLIN
-	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIRING
+	{ "repairing", "is doing some repairs.", ACTF_FAST_CHORES | ACTF_HASTE, process_repairing, NULL },	// ACT_REPAIR_VEHICLE
 	{ "chipping", "is chipping flints.", ACTF_FAST_CHORES, process_chipping, cancel_resource_list },	// ACT_CHIPPING
 	{ "panning", "is panning for gold.", ACTF_FINDER, process_panning, NULL },	// ACT_PANNING
 	{ "music", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC
@@ -152,6 +154,7 @@ const struct action_data_struct action_data[] = {
 	{ "burning", "is preparing to burn the area.", ACTF_FAST_CHORES, process_burn_area, NULL },	// ACT_BURN_AREA
 	{ "hunting", "is low to the ground, hunting.", ACTF_FINDER, process_hunting, NULL },	// ACT_HUNTING
 	{ "foraging", "is looking around for food.", ACTF_ALWAYS_FAST | ACTF_FINDER | ACTF_HASTE, process_foraging, NULL },	// ACT_FORAGING
+	{ "dismantling", "is dismantling something.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_vehicle, NULL },	// ACT_DISMANTLING
 	
 	{ "\n", "\n", NOBITS, NULL, NULL }
 };
@@ -210,21 +213,14 @@ void start_action(char_data *ch, int type, int timer) {
 *
 * @param room_data *room Where.
 * @param int action ACTION_x or NOTHING to not stop actions.
-* @param int chore CHORE_ or NOTHING to not stop workforce.
 */
-void stop_room_action(room_data *room, int action, int chore) {
-	extern struct empire_chore_type chore_data[NUM_CHORES];
-	
+void stop_room_action(room_data *room, int action) {
 	char_data *c;
 	
 	DL_FOREACH2(ROOM_PEOPLE(room), c, next_in_room) {
 		// player actions
 		if (action != NOTHING && !IS_NPC(c) && GET_ACTION(c) == action) {
 			cancel_action(c);
-		}
-		// mob actions
-		if (chore != NOTHING && IS_NPC(c) && GET_MOB_VNUM(c) == chore_data[chore].mob) {
-			SET_BIT(MOB_FLAGS(c), MOB_SPAWNED);
 		}
 	}
 }
@@ -270,6 +266,10 @@ void update_actions(void) {
 		}
 		
 		// things which terminate actions
+		if (ACCOUNT_FLAGGED(ch, ACCT_FROZEN)) {
+			cancel_action(ch);
+			continue;
+		}
 		if (action_data[GET_ACTION(ch)].process_function == NULL) {
 			// no way to process this action
 			cancel_action(ch);
@@ -1437,7 +1437,7 @@ void process_burn_area(char_data *ch) {
 		// finished burning
 		perform_burn_room(IN_ROOM(ch));
 		cancel_action(ch);
-		stop_room_action(IN_ROOM(ch), ACT_BURN_AREA, CHORE_BURN_STUMPS);
+		stop_room_action(IN_ROOM(ch), ACT_BURN_AREA);
 		
 		if (lighter) {
 			used_lighter(ch, lighter);
@@ -1551,10 +1551,6 @@ void process_chop(char_data *ch) {
 				start_chopping(ch_iter);
 			}
 		}
-		// but stop npc choppers
-		stop_room_action(IN_ROOM(ch), NOTHING, CHORE_CHOPPING);
-		// and harvesters
-		stop_room_action(IN_ROOM(ch), NOTHING, CHORE_FARMING);
 	}
 }
 
@@ -1717,7 +1713,7 @@ void process_excavating(char_data *ch) {
 				finish_trench(IN_ROOM(ch));
 				
 				// this also stops ch
-				stop_room_action(IN_ROOM(ch), ACT_EXCAVATING, NOTHING);
+				stop_room_action(IN_ROOM(ch), ACT_EXCAVATING);
 			}
 		}
 	}
@@ -2028,7 +2024,7 @@ void process_harvesting(char_data *ch) {
 		remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_HARVEST_PROGRESS);
 
 		// stop all harvesters including ch
-		stop_room_action(IN_ROOM(ch), ACT_HARVESTING, CHORE_FARMING);
+		stop_room_action(IN_ROOM(ch), ACT_HARVESTING);
 		
 		act("You finish harvesting the crop!", FALSE, ch, NULL, NULL, TO_CHAR);
 		act("$n finished harvesting the crop!", FALSE, ch, NULL, NULL, TO_ROOM);
@@ -2208,7 +2204,7 @@ void process_mining(char_data *ch) {
 			
 			// stop all miners
 			if (get_room_extra_data(in_room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
-				stop_room_action(in_room, ACT_MINING, CHORE_MINING);
+				stop_room_action(in_room, ACT_MINING);
 			}
 		}
 	}
@@ -2625,16 +2621,15 @@ void process_repairing(char_data *ch) {
 	// good to repair:
 	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
 		// take the item; possibly free the res
-		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_REPAIR, veh, NULL);
+		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_REPAIR, veh, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
 		found = TRUE;
 	}
 	
 	// done?
 	if (!VEH_NEEDS_RESOURCES(veh)) {
 		GET_ACTION(ch) = ACT_NONE;
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
-		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 		act("$V is fully repaired!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+		complete_vehicle(veh);
 	}
 	else if (!found) {
 		GET_ACTION(ch) = ACT_NONE;
@@ -3173,6 +3168,7 @@ ACMD(do_fillin) {
 		// already a trench -- just fill in
 		start_action(ch, ACT_FILLING_IN, 0);
 		msg_to_char(ch, "You begin to fill in the trench.\r\n");
+		act("$n begins to fill in the trench.", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		// already finished the trench? start it back to -1 (otherwise, just continue)
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS) >= 0) {

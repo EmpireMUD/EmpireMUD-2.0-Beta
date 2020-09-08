@@ -44,12 +44,13 @@ INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
 void free_complex_data(struct complex_room_data *data);
+extern craft_data *find_craft_for_vehicle(vehicle_data *veh);
 extern char *get_room_name(room_data *room, bool color);
 extern room_data *create_room(room_data *home);
 extern bool has_learned_craft(char_data *ch, any_vnum vnum);
 struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 void scale_item_to_level(obj_data *obj, int level);
-void stop_room_action(room_data *room, int action, int chore);
+void stop_room_action(room_data *room, int action);
 
 // external vars
 extern const char *bld_on_flags[];
@@ -148,8 +149,8 @@ void complete_building(room_data *room) {
 	}
 	
 	// stop builders
-	stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
-	stop_room_action(room, ACT_MAINTENANCE, CHORE_MAINTENANCE);
+	stop_room_action(room, ACT_BUILDING);
+	stop_room_action(room, ACT_MAINTENANCE);
 	
 	// remove any remaining resource requirements
 	free_resource_list(GET_BUILDING_RESOURCES(room));
@@ -619,11 +620,11 @@ void finish_dismantle(char_data *ch, room_data *room) {
 	
 	msg_to_char(ch, "You finish dismantling the building.\r\n");
 	act("$n finishes dismantling the building.", FALSE, ch, 0, 0, TO_ROOM);
-	stop_room_action(IN_ROOM(ch), ACT_DISMANTLING, CHORE_BUILDING);
+	stop_room_action(IN_ROOM(ch), ACT_DISMANTLING);
 	
 	// check for required obj and return it
 	if ((type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL)) || (type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
-		if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && (proto = obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) && !OBJ_FLAGGED(proto, OBJ_SINGLE_USE)) {
+		if (CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ) && GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && (proto = obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) && !OBJ_FLAGGED(proto, OBJ_SINGLE_USE)) {
 			newobj = read_object(GET_CRAFT_REQUIRES_OBJ(type), TRUE);
 			
 			// scale item to minimum level
@@ -644,7 +645,7 @@ void finish_dismantle(char_data *ch, room_data *room) {
 			load_otrigger(newobj);
 		}
 	}
-			
+	
 	disassociate_building(room);
 }
 
@@ -667,8 +668,8 @@ void finish_maintenance(char_data *ch, room_data *room) {
 	
 	msg_to_char(ch, "You complete the maintenance.\r\n");
 	act("$n has completed the maintenance.", FALSE, ch, NULL, NULL, TO_ROOM);
-	stop_room_action(room, ACT_MAINTENANCE, CHORE_MAINTENANCE);
-	stop_room_action(room, ACT_BUILDING, CHORE_BUILDING);
+	stop_room_action(room, ACT_MAINTENANCE);
+	stop_room_action(room, ACT_BUILDING);
 }
 
 
@@ -678,7 +679,7 @@ void finish_maintenance(char_data *ch, room_data *room) {
 * @param room_data *location The building's tile.
 */
 void herd_animals_out(room_data *location) {
-	extern int perform_move(char_data *ch, int dir, bitvector_t flags);
+	extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 	
 	char_data *ch_iter, *next_ch;
 	bool found_any, herd_msg = FALSE;
@@ -705,12 +706,12 @@ void herd_animals_out(room_data *location) {
 			
 				// move the mob
 				if ((!to_room || WATER_SECT(to_room)) && to_reverse && ROOM_BLD_FLAGGED(location, BLD_TWO_ENTRANCES)) {
-					if (perform_move(ch_iter, BUILDING_ENTRANCE(location), MOVE_HERD)) {
+					if (perform_move(ch_iter, BUILDING_ENTRANCE(location), NULL, MOVE_HERD)) {
 						found_any = TRUE;
 					}
 				}
 				else if (to_room) {
-					if (perform_move(ch_iter, rev_dir[BUILDING_ENTRANCE(location)], MOVE_HERD)) {
+					if (perform_move(ch_iter, rev_dir[BUILDING_ENTRANCE(location)], NULL, MOVE_HERD)) {
 						found_any = TRUE;
 					}
 				}
@@ -948,29 +949,39 @@ void process_dismantling(char_data *ch, room_data *room) {
 * replace an older one. Call this BEFORE adding the new resource to built-with.
 *
 * @param struct resource_data **built_with The room's &GET_BUILT_WITH()
-* @param obj_data *obj The item that was added -- remove something with a matching component type.
+* @param any_vnum component The component type that was added -- remove something with a matching component type.
 */
-void remove_like_component_from_built_with(struct resource_data **built_with, obj_data *obj) {
+void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component) {
+	extern bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
+	
 	struct resource_data *iter, *next;
 	generic_data *my_cmp;
 	obj_data *proto;
 	
-	if (!built_with || !*built_with || !obj || GET_OBJ_COMPONENT(obj) == NOTHING) {
+	if (!built_with || !*built_with || component == NOTHING) {
 		return;	// no work
 	}
 	
-	my_cmp = real_generic(GET_OBJ_COMPONENT(obj));
+	my_cmp = real_generic(component);
 	
 	LL_FOREACH_SAFE(*built_with, iter, next) {
-		// anything with a matching component type (either way) is safe to remove
-		if (iter->type == RES_OBJECT && (proto = obj_proto(iter->vnum)) && GET_OBJ_COMPONENT(proto) != NOTHING && (GET_OBJ_COMPONENT(obj) == GET_OBJ_COMPONENT(proto) || is_component_vnum(obj, GET_OBJ_COMPONENT(proto)) || is_component(proto, my_cmp))) {
-			iter->amount -= 1;
-			if (iter->amount <= 0) {
-				LL_DELETE(*built_with, iter);
-				free(iter);
-			}
-			break;	// only need 1
+		if (iter->type != RES_OBJECT || !(proto = obj_proto(iter->vnum))) {
+			continue;	// no object
 		}
+		if (GET_OBJ_COMPONENT(proto) == NOTHING) {
+			continue;	// not a component
+		}
+		if (GET_OBJ_COMPONENT(proto) != component && !is_component(proto, my_cmp) && !has_generic_relation(GEN_COMPUTED_RELATIONS(my_cmp), GET_OBJ_COMPONENT(proto))) {
+			continue;	// not the right component or related component
+		}
+		
+		// ok:
+		iter->amount -= 1;
+		if (iter->amount <= 0) {
+			LL_DELETE(*built_with, iter);
+			free(iter);
+		}
+		break;	// only need 1
 	}
 }
 
@@ -1040,7 +1051,7 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 * @param room_data *loc The location to dismantle.
 */
 void start_dismantle_building(room_data *loc) {
-	void reduce_dismantle_resources(room_data *room, struct resource_data **list, bool remove_nonrefundables);
+	void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
 	
 	struct resource_data *composite_resources = NULL, *crcp, *res, *next_res;
 	room_data *room, *next_room;
@@ -1149,7 +1160,7 @@ void start_dismantle_building(room_data *loc) {
 	}
 	
 	// reduce resource: they don't get it all back
-	reduce_dismantle_resources(loc, &GET_BUILDING_RESOURCES(loc), TRUE);
+	reduce_dismantle_resources(BUILDING_DAMAGE(loc), GET_BUILDING(loc) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(loc)) : 1, &GET_BUILDING_RESOURCES(loc));
 
 	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
@@ -1160,29 +1171,16 @@ void start_dismantle_building(room_data *loc) {
 		et_lose_building(ROOM_OWNER(loc), GET_BLD_VNUM(GET_BUILDING(loc)));
 	}
 	
-	stop_room_action(loc, ACT_DIGGING, CHORE_DIGGING);
-	stop_room_action(loc, ACT_BUILDING, CHORE_BUILDING);
-	stop_room_action(loc, ACT_MINING, CHORE_MINING);
-	stop_room_action(loc, ACT_MINTING, ACT_MINTING);
-	stop_room_action(loc, ACT_BATHING, NOTHING);
-	stop_room_action(loc, ACT_ESCAPING, NOTHING);
-	stop_room_action(loc, ACT_SAWING, CHORE_SAWING);
-	stop_room_action(loc, ACT_QUARRYING, CHORE_QUARRYING);
-	stop_room_action(loc, ACT_MAINTENANCE, CHORE_MAINTENANCE);
-	stop_room_action(loc, ACT_PICKING, CHORE_HERB_GARDENING);
-	stop_room_action(loc, NOTHING, CHORE_SCRAPING);
-	stop_room_action(loc, NOTHING, CHORE_SMELTING);
-	stop_room_action(loc, NOTHING, CHORE_WEAVING);
-	stop_room_action(loc, NOTHING, CHORE_NAILMAKING);
-	stop_room_action(loc, NOTHING, CHORE_BRICKMAKING);
-	stop_room_action(loc, NOTHING, CHORE_TRAPPING);
-	stop_room_action(loc, NOTHING, CHORE_TANNING);
-	stop_room_action(loc, NOTHING, CHORE_SHEARING);
-	stop_room_action(loc, NOTHING, CHORE_NEXUS_CRYSTALS);
-	stop_room_action(loc, NOTHING, CHORE_MILLING);
-	stop_room_action(loc, NOTHING, CHORE_OILMAKING);
-	stop_room_action(loc, NOTHING, CHORE_BEEKEEPING);
-	stop_room_action(loc, NOTHING, CHORE_GLASSMAKING);
+	stop_room_action(loc, ACT_DIGGING);
+	stop_room_action(loc, ACT_BUILDING);
+	stop_room_action(loc, ACT_MINING);
+	stop_room_action(loc, ACT_MINTING);
+	stop_room_action(loc, ACT_BATHING);
+	stop_room_action(loc, ACT_ESCAPING);
+	stop_room_action(loc, ACT_SAWING);
+	stop_room_action(loc, ACT_QUARRYING);
+	stop_room_action(loc, ACT_MAINTENANCE);
+	stop_room_action(loc, ACT_PICKING);
 }
 
 
@@ -1519,38 +1517,145 @@ ACMD(do_build) {
 	}
 
 	// take away the required item
-	if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj) {
-		act("You use $p.", FALSE, ch, found_obj, 0, TO_CHAR);
+	if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ)) {
+		act("You use $p.", FALSE, ch, found_obj, NULL, TO_CHAR);
 		extract_obj(found_obj);
 	}
 
 	start_action(ch, ACT_BUILDING, 0);
 	msg_to_char(ch, "You start to build %s %s!\r\n", AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
 	sprintf(buf, "$n begins to build %s %s!", AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
-	act(buf, FALSE, ch, 0, 0, TO_ROOM);
+	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	
 	// do a build action now
 	process_build(ch, IN_ROOM(ch), ACT_BUILDING);
 }
 
 
-ACMD(do_dismantle) {
-	craft_data *type;
+/**
+* Processes the "dismantle" command when targeting a vehicle. It resumes
+* an in-process dismantle or else it handles the start-dismantle process.
+*
+* @param char_data *ch The player (not NPC).
+* @param vehicle_data *veh The vehicle they targeted.
+*/
+void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
+	extern int count_harnessed_animals(vehicle_data *veh);
+	extern int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
+	void process_dismantle_vehicle(char_data *ch);
+	void start_dismantle_vehicle(vehicle_data *veh);
 	
-	skip_spaces(&argument);
-	if (*argument && !isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
-		msg_to_char(ch, "Dismantle is only used to dismantle buildings. Just type 'dismantle'. (You get this error if you typed an argument.)\r\n");
-		return;
+	craft_data *craft;
+	
+	if (!ch || !veh || IS_NPC(ch)) {
+		return;	// safety
 	}
+	
+	if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (GET_ACTION(ch) != ACT_NONE) {
+		msg_to_char(ch, "You're kinda busy right now.\r\n");
+	}
+	else if (VEH_IS_DISMANTLING(veh)) {
+		// already being dismantled: RESUME
+		if (can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+			act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			start_action(ch, ACT_DISMANTLE_VEHICLE, 0);
+			GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
+			command_lag(ch, WAIT_OTHER);
+		}
+		else {
+			act("You don't have permission to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+	}
+	else if (WATER_SECT(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't dismantle it in the water.\r\n");
+	}
+	else if (VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+		msg_to_char(ch, "You can't dismantle a %s you don't own.\r\n", VEH_OR_BLD(veh));
+	}
+	else if (GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE)) {
+		msg_to_char(ch, "You don't have permission to dismantle that.\r\n");
+	}
+	else if ((craft = find_craft_for_vehicle(veh)) && GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+		msg_to_char(ch, "You don't have the skill needed to dismantle that properly.\r\n");
+	}
+	else if (VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
+		msg_to_char(ch, "That cannot be dismantled.\r\n");
+	}
+	else if (VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_DISMANTLE)) {
+		msg_to_char(ch, "Turn off no-dismantle before dismantling that %s (see HELP MANAGE).\r\n", VEH_OR_BLD(veh));
+	}
+	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		msg_to_char(ch, "You can't dismantle that -- it's on fire!\r\n");
+	}
+	else if (count_harnessed_animals(veh) > 0) {
+		msg_to_char(ch, "You can't dismantle that while animals are harnessed to it.\r\n");
+	}
+	else if (VEH_SITTING_ON(veh)) {
+		msg_to_char(ch, "You can't dismantle it while someone is sitting on it.\r\n");
+	}
+	else if (VEH_LED_BY(veh)) {
+		msg_to_char(ch, "You can't dismantle it while someone is leading it.\r\n");
+	}
+	else if (count_players_in_vehicle(veh, TRUE)) {
+		msg_to_char(ch, "You can't dismantle it while someone is inside.\r\n");
+	}
+	else {
+		// ok: start dismantle
+		act("You begin to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$n begins to dismantle $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		
+		start_dismantle_vehicle(veh);
+		start_action(ch, ACT_DISMANTLE_VEHICLE, 0);
+		GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
+		process_dismantle_vehicle(ch);
+		command_lag(ch, WAIT_OTHER);
+	}
+}
+
+
+ACMD(do_dismantle) {
+	extern vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id);
+	
+	vehicle_data *veh;
+	craft_data *type;
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot use the dismantle command.\r\n");
 		return;
 	}
 	
+	// fall through to dismantle-vehicle?
+	one_argument(argument, arg);
+	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+		do_dismantle_vehicle(ch, veh);
+		return;
+	}
+	
+	// not a vehicle
+	if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+		msg_to_char(ch, "Dismantle this %s from outside instead.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(IN_ROOM(ch))));
+		return;
+	}
+	
+	// otherwise args are not welcome
+	if (*arg && !isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
+		msg_to_char(ch, "Dismantle is only used to dismantle buildings. Just type 'dismantle'. (You get this error if you typed an argument.)\r\n");
+		return;
+	}
+	
 	if (GET_ACTION(ch) == ACT_DISMANTLING) {
 		msg_to_char(ch, "You stop dismantling the building.\r\n");
 		act("$n stops dismantling the building.", FALSE, ch, 0, 0, TO_ROOM);
+		GET_ACTION(ch) = ACT_NONE;
+		return;
+	}
+	if (GET_ACTION(ch) == ACT_DISMANTLE_VEHICLE) {
+		msg_to_char(ch, "You stop dismantling.\r\n");
+		act("$n stops dismantling.", FALSE, ch, NULL, NULL, TO_ROOM);
 		GET_ACTION(ch) = ACT_NONE;
 		return;
 	}
@@ -1565,16 +1670,7 @@ ACMD(do_dismantle) {
 		return;
 	}
 	
-	if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
-		msg_to_char(ch, "You need to dismantle from the main room.\r\n");
-		return;
-	}
-	
-	if (IS_BURNING(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't dismantle a burning building!\r\n");
-		return;
-	}
-
+	// resume
 	if (IS_DISMANTLING(IN_ROOM(ch))) {
 		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 			msg_to_char(ch, "You don't have permission to dismantle here.\r\n");
@@ -1588,7 +1684,17 @@ ACMD(do_dismantle) {
 	}
 	
 	if (!COMPLEX_DATA(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't dismantle anything here.\r\n");
+		msg_to_char(ch, "You can't start dismantling anything here.\r\n");
+		return;
+	}
+	
+	if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
+		msg_to_char(ch, "You need to dismantle from the main room.\r\n");
+		return;
+	}
+	
+	if (IS_BURNING(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't dismantle a burning building!\r\n");
 		return;
 	}
 	
@@ -1647,13 +1753,20 @@ ACMD(do_dismantle) {
 
 // called by do_customize
 void do_customize_room(char_data *ch, char *argument) {
+	void do_customize_vehicle(char_data *ch, char *argument);
+	
 	char arg2[MAX_STRING_LENGTH];
 	empire_data *emp = GET_LOYALTY(ch);
+	vehicle_data *veh;
 	
 	half_chop(argument, arg, arg2);
 	
 	if (!ch->desc) {
 		msg_to_char(ch, "You can't do that.\r\n");
+	}
+	else if (((veh = get_vehicle_in_room_vis(ch, arg)) || ((veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && isname(arg, VEH_KEYWORDS(veh)))) && VEH_FLAGGED(veh, VEH_BUILDING)) {
+		// pass through to customize-vehicle (probably a building vehicle)
+		do_customize_vehicle(ch, arg2);
 	}
 	else if (!has_player_tech(ch, PTECH_CUSTOMIZE_BUILDING)) {
 		msg_to_char(ch, "You don't have the right ability to customize buildings.\r\n");
@@ -2109,35 +2222,73 @@ ACMD(do_lay) {
 
 
 ACMD(do_maintain) {
-	if (GET_ACTION(ch) == ACT_MAINTENANCE) {
-		act("You stop maintaining the building.", FALSE, ch, NULL, NULL, TO_CHAR);
+	char arg[MAX_INPUT_LENGTH];
+	vehicle_data *veh;
+	
+	one_argument(argument, arg);
+	
+	if ((GET_ACTION(ch) == ACT_REPAIR_VEHICLE || GET_ACTION(ch) == ACT_MAINTENANCE) && !*arg) {
+		act("You stop the repairs.", FALSE, ch, NULL, NULL, TO_CHAR);
 		cancel_action(ch);
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You can't perform maintenance here.\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy right now.\r\n");
 	}
-	else if (!BUILDING_RESOURCES(IN_ROOM(ch)) && BUILDING_DAMAGE(IN_ROOM(ch)) == 0) {
-		msg_to_char(ch, "It doesn't need any maintenance.\r\n");
+	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+		// MAINTAIN VEHICLE
+		if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
+			msg_to_char(ch, "You can't repair something that belongs to someone else.\r\n");
+		}
+		else if (VEH_IS_DISMANTLING(veh)) {
+			msg_to_char(ch, "You can't repair something that is being dismantled.\r\n");
+		}
+		else if (!VEH_IS_COMPLETE(veh)) {
+			msg_to_char(ch, "You can only repair %ss that are finished.\r\n", VEH_OR_BLD(veh));
+		}
+		else if (!VEH_NEEDS_RESOURCES(veh) && VEH_HEALTH(veh) >= VEH_MAX_HEALTH(veh)) {
+			msg_to_char(ch, "It doesn't need maintenance.\r\n");
+		}
+		else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+			msg_to_char(ch, "You can't repair it while it's on fire!\r\n");
+		}
+		else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+			msg_to_char(ch, "It's too dark to repair anything here.\r\n");
+		}
+		else {
+			start_action(ch, ACT_REPAIR_VEHICLE, -1);
+			GET_ACTION_VNUM(ch, 0) = veh_script_id(veh);
+			act("You begin to repair $V.", FALSE, ch, NULL, veh, TO_CHAR);
+			act("$n begins to repair $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		}
 	}
-	else if (IS_INCOMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "Use 'build' to finish the building instead.\r\n");
-	}
-	else if (IS_DISMANTLING(IN_ROOM(ch))) {
-		msg_to_char(ch, "This building is being dismantled. Use 'dismantle' to continue instead.\r\n");
-	}
-	else if (IS_BURNING(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't maintain a building that's on fire!\r\n");
-	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to maintain anything here.\r\n");
+	else if (*arg && !multi_isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
+		msg_to_char(ch, "You don't see that here.\r\n");
 	}
 	else {
-		start_action(ch, ACT_MAINTENANCE, -1);
-		act("You set to work maintaining the building.", FALSE, ch, NULL, NULL, TO_CHAR);
-		act("$n begins maintaining the building.", FALSE, ch, NULL, NULL, TO_ROOM);
+		// MAINTAIN CURRENT ROOM
+		if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+			msg_to_char(ch, "You can't perform maintenance here.\r\n");
+		}
+		else if (!BUILDING_RESOURCES(IN_ROOM(ch)) && BUILDING_DAMAGE(IN_ROOM(ch)) == 0) {
+			msg_to_char(ch, "It doesn't need any maintenance.\r\n");
+		}
+		else if (IS_INCOMPLETE(IN_ROOM(ch))) {
+			msg_to_char(ch, "Use 'build' to finish the building instead.\r\n");
+		}
+		else if (IS_DISMANTLING(IN_ROOM(ch))) {
+			msg_to_char(ch, "This building is being dismantled. Use 'dismantle' to continue instead.\r\n");
+		}
+		else if (IS_BURNING(IN_ROOM(ch))) {
+			msg_to_char(ch, "You can't maintain a building that's on fire!\r\n");
+		}
+		else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+			msg_to_char(ch, "It's too dark to maintain anything here.\r\n");
+		}
+		else {
+			start_action(ch, ACT_MAINTENANCE, -1);
+			act("You set to work maintaining the building.", FALSE, ch, NULL, NULL, TO_CHAR);
+			act("$n begins maintaining the building.", FALSE, ch, NULL, NULL, TO_ROOM);
+		}
 	}
 }
 

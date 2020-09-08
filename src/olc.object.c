@@ -456,8 +456,8 @@ char *list_one_object(obj_data *obj, bool detail) {
 * @param obj_vnum vnum The vnum to delete.
 */
 void olc_delete_object(char_data *ch, obj_vnum vnum) {
-	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	void complete_building(room_data *room);
+	void complete_vehicle(vehicle_data *veh);
 	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
@@ -562,17 +562,15 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	}
 	
 	// remove from live resource lists: vehicle maintenance
-	DL_FOREACH(vehicle_list, veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		if (VEH_BUILT_WITH(veh)) {
+			remove_thing_from_resource_list(&VEH_BUILT_WITH(veh), RES_OBJECT, vnum);
+		}
 		if (VEH_NEEDS_RESOURCES(veh)) {
 			remove_thing_from_resource_list(&VEH_NEEDS_RESOURCES(veh), RES_OBJECT, vnum);
 			
 			if (!VEH_NEEDS_RESOURCES(veh)) {
-				// removing the resource finished the vehicle
-				if (VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
-					REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
-					adjust_vehicle_tech(veh, TRUE);
-					load_vtrigger(veh);
-				}
+				complete_vehicle(veh);	// this could purge it
 			}
 		}
 	}

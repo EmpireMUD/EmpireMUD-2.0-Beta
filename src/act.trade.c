@@ -40,6 +40,7 @@ extern struct gen_craft_data_t gen_craft_data[];
 extern const char *tool_flags[];
 
 // external functions
+void complete_vehicle(vehicle_data *veh);
 INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
@@ -311,25 +312,29 @@ craft_data *find_best_craft_by_name(char_data *ch, char *argument, int craft_typ
 * Finds an unfinished vehicle in the room that the character can finish.
 *
 * @param char_data *ch The person trying to craft a vehicle.
-* @param craft_data *type The craft recipe to match up.
-* @param bool *any Is set to TRUE if there are any unfinished vehicles that don't otherwise match.
+* @param craft_data *type Optional: The craft recipe to match up (may be NULL to ignore).
+* @parma int with_id Optional: The vehicle construction id to find (may be NOTHING to ignore).
+* @param vehicle_data **found_other A variable to bind an existing vehicle to -- if NULL, there are no unfinished vehicles lying around. Otherwise, one will be assigned here.
 * @return vehicle_data* The found vehicle, or NULL if none.
 */
-vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, bool *any) {
-	vehicle_data *iter;
+vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, int with_id, vehicle_data **found_other) {
+	vehicle_data *iter, *found = NULL;
 	
-	*any = FALSE;
+	*found_other = NULL;
 	
 	DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), iter, next_in_room) {
 		// skip finished vehicles
-		if (VEH_IS_COMPLETE(iter)) {
-			continue;
+		if (!VEH_FLAGGED(iter, VEH_INCOMPLETE)) {
+			continue;	// don't use VEH_IS_COMPLETE as it includes no-resources-needed
 		}
 		// there is at least 1 incomplete vehicle here
-		*any = TRUE;
+		found = iter;
 		
 		// right vehicle?
-		if (VEH_VNUM(iter) != GET_CRAFT_OBJECT(type)) {
+		if (type && VEH_VNUM(iter) != GET_CRAFT_OBJECT(type)) {
+			continue;
+		}
+		if (with_id != NOTHING && VEH_CONSTRUCTION_ID(iter) != with_id) {
 			continue;
 		}
 		if (!can_use_vehicle(ch, iter, GUESTS_ALLOWED)) {
@@ -340,7 +345,8 @@ vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, bool *any
 		return iter;
 	}
 	
-	return NULL;
+	*found_other = found;	// if any
+	return NULL;	// did not find the one requested
 }
 
 
@@ -355,7 +361,7 @@ vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, bool *any
 * @return vehicle_data* The found vehicle, or NULL if none.
 */
 vehicle_data *find_vehicle_to_resume_by_name(char_data *ch, int craft_type, char *name, craft_data **found_craft) {
-	craft_data *craft, *next_craft;
+	extern craft_data *find_craft_for_vehicle(vehicle_data *veh);
 	vehicle_data *veh;
 	
 	*found_craft = NULL;
@@ -371,22 +377,13 @@ vehicle_data *find_vehicle_to_resume_by_name(char_data *ch, int craft_type, char
 			continue;	// not allowed to work on it
 		}
 		
-		// seems to be a match... now find a matching craft
-		HASH_ITER(hh, craft_table, craft, next_craft) {
-			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT) || !CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
-				continue;	// not a valid target
-			}
-			if (GET_CRAFT_OBJECT(craft) != VEH_VNUM(veh)) {
-				continue;
-			}
-			
-			// we have a match!
-			*found_craft = craft;
-			return veh;
+		// ok: see if we have a craft for it
+		if ((*found_craft = find_craft_for_vehicle(veh))) {
+			return veh;	// and return it if so
 		}
 	}
 	
-	return NULL;
+	return NULL;	// if not
 }
 
 
@@ -608,6 +605,7 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 	
 	start_action(ch, ACT_GEN_CRAFT, -1);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(craft);
+	GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
 	
 	snprintf(buf, sizeof(buf), "You resume %s $V.", gen_craft_data[GET_CRAFT_TYPE(craft)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
@@ -624,11 +622,14 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 * @param int craft_type Whichever CRAFT_TYPE_ the player is using.
 */
 void show_craft_info(char_data *ch, char *argument, int craft_type) {
+	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *affected_bits[];
 	extern const char *apply_types[];
+	extern const char *armor_types[NUM_ARMOR_TYPES+1];
 	extern const char *bld_on_flags[];
 	extern const bitvector_t bld_on_flags_order[];
 	extern const char *craft_flag_for_info[];
+	extern const char *extra_bits[];
 	extern const char *item_types[];
 	extern const char *wear_bits[];
 	
@@ -636,8 +637,12 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	struct obj_apply *apply;
 	ability_data *abil;
 	craft_data *craft;
+	vehicle_data *veh;
 	obj_data *proto;
 	bld_data *bld;
+	
+	// these flags show on craft info
+	bitvector_t show_flags = OBJ_UNIQUE | OBJ_LIGHT | OBJ_LARGE | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP;
 	
 	if (!*argument) {
 		msg_to_char(ch, "Get %s info on what?\r\n", gen_craft_data[craft_type].command);
@@ -655,7 +660,12 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 		msg_to_char(ch, "Builds: %s\r\n", bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
-		msg_to_char(ch, "Creates vehicle: %s\r\n", get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft)));
+		if ((veh = vehicle_proto(GET_CRAFT_OBJECT(craft)))) {
+			msg_to_char(ch, "Creates %s: %s\r\n", VEH_OR_BLD(veh), VEH_SHORT_DESC(veh));
+		}
+		else {
+			msg_to_char(ch, "This craft appears to be broken\r\n");
+		}
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
 		msg_to_char(ch, "Creates liquid: %d unit%s of %s\r\n", GET_CRAFT_QUANTITY(craft), PLURAL(GET_CRAFT_QUANTITY(craft)), get_generic_string_by_vnum(GET_CRAFT_OBJECT(craft), GENERIC_LIQUID, GSTR_LIQUID_NAME));
@@ -677,7 +687,53 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 			prettier_sprintbit(GET_OBJ_AFF_FLAGS(proto), affected_bits, part);
 			sprintf(buf + strlen(buf), ", %s", part);
 		}
+		
+		// ITEM_x: type-based 'craft info'; must start with ", "
+		switch (GET_OBJ_TYPE(proto)) {
+			case ITEM_WEAPON: {
+				sprintf(buf + strlen(buf), ", %s attack, speed %.2f", attack_hit_info[GET_WEAPON_TYPE(proto)].name, get_weapon_speed(proto));
+				break;
+			}
+			case ITEM_ARMOR: {
+				sprintf(buf + strlen(buf), ", %s armor", armor_types[GET_ARMOR_TYPE(proto)]);
+				break;
+			}
+			case ITEM_MISSILE_WEAPON: {
+				sprintf(buf + strlen(buf), ", %s attack, speed %.2f", attack_hit_info[GET_MISSILE_WEAPON_TYPE(proto)].name, get_weapon_speed(proto));
+				break;
+			}
+			case ITEM_AMMO: {
+				if (GET_AMMO_QUANTITY(proto) > 1) {
+					sprintf(buf + strlen(buf), ", quantity: %d\r\n", GET_AMMO_QUANTITY(proto));
+				}
+				break;
+			}
+			case ITEM_LIGHTER: {
+				if (GET_LIGHTER_USES(proto) == UNLIMITED) {
+					strcat(buf, ", unlimited");
+				}
+				else {
+					sprintf(buf + strlen(buf), ", %d use%s\r\n", GET_LIGHTER_USES(proto), PLURAL(GET_LIGHTER_USES(proto)));
+				}
+				break;
+			}
+		}	// end 'type' portion of info string
+		
+		// tool flags in info string
+		if (GET_OBJ_TOOL_FLAGS(proto)) {
+			prettier_sprintbit(GET_OBJ_TOOL_FLAGS(proto), tool_flags, part);
+			sprintf(buf + strlen(buf), ", %s", part);
+		}
+		
+		// some extra flags
+		if (GET_OBJ_EXTRA(proto) & show_flags) {
+			prettier_sprintbit(GET_OBJ_EXTRA(proto) & show_flags, extra_bits, part);
+			sprintf(buf + strlen(buf), ", %s", part);
+		}
+		
+		// end info string
 		strcat(buf, ")");
+		strtolower(buf);
 		
 		if (GET_OBJ_MIN_SCALE_LEVEL(proto) > 0 || GET_OBJ_MAX_SCALE_LEVEL(proto) > 0) {
 			sprintf(range, " [%s]", level_range_string(GET_OBJ_MIN_SCALE_LEVEL(proto), GET_OBJ_MAX_SCALE_LEVEL(proto), 0));
@@ -845,6 +901,27 @@ void cancel_gen_craft(char_data *ch) {
 			}
 			load_otrigger(obj);
 		}
+		
+		if (CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ) && GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) {
+			obj = read_object(GET_CRAFT_REQUIRES_OBJ(type), TRUE);
+			
+			// scale item to minimum level
+			scale_item_to_level(obj, 0);
+			
+			if (IS_NPC(ch)) {
+				obj_to_room(obj, IN_ROOM(ch));
+			}
+			else {
+				obj_to_char(obj, ch);
+				act("You get $p.", FALSE, ch, obj, NULL, TO_CHAR);
+				
+				// ensure binding
+				if (OBJ_FLAGGED(obj, OBJ_BIND_FLAGS)) {
+					bind_obj_to_player(obj, ch);
+				}
+			}
+			load_otrigger(obj);
+		}
 	}
 	
 	GET_ACTION(ch) = ACT_NONE;
@@ -1009,18 +1086,15 @@ void finish_gen_craft(char_data *ch) {
 * @param craft_data *type The craft recipe.
 */
 void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
-	void adjust_vehicle_tech(vehicle_data *veh, bool add);
-	void finish_vehicle_setup(vehicle_data *veh);
-	
-	bool found = FALSE, any = FALSE;
+	bool found = FALSE;
 	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
 	struct resource_data *res;
-	vehicle_data *veh;
+	vehicle_data *veh, *junk;
 	char_data *vict;
 	
 	// basic setup
-	if (!type || !check_can_craft(ch, type) || !(veh = find_finishable_vehicle(ch, type, &any))) {
+	if (!type || !check_can_craft(ch, type) || !(veh = find_finishable_vehicle(ch, NULL, GET_ACTION_VNUM(ch, 1), &junk)) || VEH_IS_DISMANTLING(veh)) {
 		cancel_gen_craft(ch);
 		return;
 	}
@@ -1033,7 +1107,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	// find and apply something
 	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
 		// take the item; possibly free the res
-		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_CRAFT, veh, NULL);
+		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_CRAFT, veh, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
 		
 		// experience per resource
 		if (GET_CRAFT_ABILITY(type) != NO_ABIL) {
@@ -1045,13 +1119,8 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	
 	// done?
 	if (!VEH_NEEDS_RESOURCES(veh)) {
-		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
-		VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 		act("$V is finished!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
-		if (VEH_OWNER(veh)) {
-			qt_empire_players(VEH_OWNER(veh), qt_gain_vehicle, VEH_VNUM(veh));
-			et_gain_vehicle(VEH_OWNER(veh), VEH_VNUM(veh));
-		}
+		complete_vehicle(veh);
 		
 		// stop all actors on this type
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_in_room) {
@@ -1059,12 +1128,6 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 				GET_ACTION(vict) = ACT_NONE;
 			}
 		}
-		
-		if (VEH_OWNER(veh)) {
-			adjust_vehicle_tech(veh, TRUE);
-		}
-		finish_vehicle_setup(veh);
-		load_vtrigger(veh);
 	}
 	else if (!found) {
 		msg_to_char(ch, "You run out of resources and stop %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
@@ -1460,14 +1523,17 @@ ACMD(do_gen_augment) {
 * @param craft_data *type Pre-selected vehicle craft.
 */
 void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
+	extern bool can_claim(char_data *ch);
+	extern int get_new_vehicle_construction_id();
 	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	
-	vehicle_data *veh;
+	vehicle_data *veh, *to_craft = NULL, *found_other = NULL;
 	char buf[MAX_STRING_LENGTH];
-	bool any = FALSE;
+	obj_data *found_obj = NULL;
+	bool junk;
 	
 	// basic sanitation
-	if (!type || !CRAFT_FLAGGED(type, CRAFT_VEHICLE) || !vehicle_proto(GET_CRAFT_OBJECT(type))) {
+	if (!type || !CRAFT_FLAGGED(type, CRAFT_VEHICLE) || !(to_craft = vehicle_proto(GET_CRAFT_OBJECT(type)))) {
 		log("SYSERR: do_gen_craft_vehicle called with invalid vehicle craft %d", type ? GET_CRAFT_VNUM(type) : NOTHING);
 		return;
 	}
@@ -1478,13 +1544,17 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	}
 	
 	// found one to resume
-	if ((veh = find_finishable_vehicle(ch, type, &any))) {
+	if ((veh = find_finishable_vehicle(ch, type, NOTHING, &found_other))) {
 		resume_craft_vehicle(ch, veh, type);
 		return;
 	}
 	
-	if (any) {
-		msg_to_char(ch, "You can't %s that while there's already an unfinished vehicle here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+	if (found_other) {
+		msg_to_char(ch, "You can't %s that while %s is unfinished here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command, VEH_SHORT_DESC(found_other));
+		return;
+	}
+	if (VEH_CLAIMS_WITH_ROOM(to_craft) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		msg_to_char(ch, "You can only %s that on a tile you own.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 		return;
 	}
 	
@@ -1496,22 +1566,49 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	SET_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
 	VEH_NEEDS_RESOURCES(veh) = copy_resource_list(GET_CRAFT_RESOURCES(type));
 	if (!VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
-		VEH_OWNER(veh) = GET_LOYALTY(ch);
+		if (VEH_CLAIMS_WITH_ROOM(veh)) {
+			// try to claim the room if unclaimed: can_claim checks total available land, but the outside is check done within this block
+			if (!ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))) && can_claim(ch) && !ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_UNCLAIMABLE)) {
+				empire_data *emp = get_or_create_empire(ch);
+				if (emp) {
+					int ter_type = get_territory_type_for_empire(HOME_ROOM(IN_ROOM(ch)), emp, FALSE, &junk);
+					if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
+						claim_room(HOME_ROOM(IN_ROOM(ch)), emp);
+					}
+				}
+			}
+			
+			// and set the owner to the room owner
+			VEH_OWNER(veh) = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));
+		}
+		else {
+			VEH_OWNER(veh) = GET_LOYALTY(ch);
+		}
 	}
 	VEH_HEALTH(veh) = MAX(1, VEH_MAX_HEALTH(veh) * 0.2);	// start at 20% health, will heal on completion
 	scale_vehicle_to_level(veh, get_craft_scale_level(ch, type));
+	VEH_CONSTRUCTION_ID(veh) = get_new_vehicle_construction_id();
+	set_vehicle_extra_data(veh, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
 	
 	start_action(ch, ACT_GEN_CRAFT, -1);
 	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);
+	GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(veh);
+	
+	if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING) {
+		find_and_bind(ch, GET_CRAFT_REQUIRES_OBJ(type));
+		
+		if ((found_obj = has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(type))) && CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ)) {
+			act("You use $p.", FALSE, ch, found_obj, NULL, TO_CHAR);
+			extract_obj(found_obj);
+		}
+	}
 	
 	snprintf(buf, sizeof(buf), "You lay the framework and begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 	snprintf(buf, sizeof(buf), "$n lays the framework and begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_ROOM);
 	
-	if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING) {
-		find_and_bind(ch, GET_CRAFT_REQUIRES_OBJ(type));
-	}
+	process_gen_craft_vehicle(ch, type);
 }
 
 
@@ -1716,6 +1813,11 @@ ACMD(do_gen_craft) {
 		// do this BEFORE extract, as it may be extracted
 		if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING) {
 			find_and_bind(ch, GET_CRAFT_REQUIRES_OBJ(type));
+		
+			if (found_obj && CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ)) {
+				act("You use $p.", FALSE, ch, found_obj, NULL, TO_CHAR);
+				extract_obj(found_obj);
+			}
 		}
 		
 		// must call this after start_action() because it stores resources
@@ -1723,7 +1825,7 @@ ACMD(do_gen_craft) {
 		
 		msg_to_char(ch, "You start %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		sprintf(buf, "$n starts %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
-		act(buf, FALSE, ch, 0, 0, TO_ROOM);
+		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
 

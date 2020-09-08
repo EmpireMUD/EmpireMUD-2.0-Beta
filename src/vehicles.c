@@ -42,7 +42,9 @@ const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 // local protos
 void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 void clear_vehicle(vehicle_data *veh);
-extern room_data *create_room(room_data *home);
+void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
+int get_new_vehicle_construction_id();
+char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 
 // external consts
 extern const char *designate_flags[];
@@ -53,8 +55,11 @@ extern const char *vehicle_flags[];
 extern const char *vehicle_speed_types[];
 
 // external funcs
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
+extern room_data *create_room(room_data *home);
 void get_resource_display(struct resource_data *list, char *save_buffer);
+void scale_item_to_level(obj_data *obj, int level);
 extern char *show_color_codes(char *string);
 extern bool validate_icon(char *icon);
 
@@ -109,6 +114,91 @@ int count_harnessed_animals(vehicle_data *veh) {
 
 
 /**
+* Counts how many building-vehicles are in the room (testing using the
+* VEH_CLAIMS_WITH_ROOM() macro). Optionally, you can check the owner, too.
+*
+* @param room_data *room The location.
+* @param empire_data *only_owner Optional: Only count ones owned by this person (NULL for any-owner).
+* @return int The number of building-vehicles in the room.
+*/
+int count_building_vehicles_in_room(room_data *room, empire_data *only_owner) {
+	vehicle_data *veh;
+	int count = 0;
+	if (room) {
+		DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+			if (VEH_CLAIMS_WITH_ROOM(veh) && (!only_owner || VEH_OWNER(veh) == only_owner)) {
+				++count;
+			}
+		}
+	}
+	return count;
+}
+
+
+/**
+* Determines how many players are inside a vehicle.
+*
+* @param vehicle_data *veh The vehicle to check.
+* @param bool ignore_invis_imms If TRUE, does not count immortals who can't be seen by players.
+* @return int How many players were inside.
+*/
+int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms) {
+	struct vehicle_room_list *vrl, *next_vrl;
+	char_data *iter;
+	int count = 0;
+	
+	LL_FOREACH_SAFE(VEH_ROOM_LIST(veh), vrl, next_vrl) {
+		DL_FOREACH2(ROOM_PEOPLE(vrl->room), iter, next_in_room) {
+			if (IS_NPC(iter)) {
+				continue;
+			}
+			if (ignore_invis_imms && IS_IMMORTAL(iter) && (GET_INVIS_LEV(iter) > 1 || PRF_FLAGGED(iter, PRF_WIZHIDE))) {
+				continue;
+			}
+			
+			++count;
+		}
+	}
+	
+	return count;
+}
+
+
+/**
+* Deletes the interior rooms of a vehicle e.g. before an extract or dismantle.
+*
+* @param vehicle_data *veh The vehicle whose interior must go.
+*/
+void delete_vehicle_interior(vehicle_data *veh) {
+	void relocate_players(room_data *room, room_data *to_room);
+	
+	struct vehicle_room_list *vrl, *next_vrl;
+	room_data *main_room;
+	
+	if ((main_room = VEH_INTERIOR_HOME_ROOM(veh)) || VEH_ROOM_LIST(veh)) {
+		LL_FOREACH_SAFE(VEH_ROOM_LIST(veh), vrl, next_vrl) {
+			if (vrl->room == main_room) {
+				continue;	// do this one last
+			}
+			
+			if (IN_ROOM(veh)) {
+				relocate_players(vrl->room, IN_ROOM(veh));
+			}
+			delete_room(vrl->room, FALSE);	// MUST check_all_exits later
+		}
+		
+		if (main_room) {
+			if (IN_ROOM(veh)) {
+				relocate_players(main_room, IN_ROOM(veh));
+			}
+			delete_room(main_room, FALSE);
+		}
+		check_all_exits();
+	}
+}
+
+
+/**
 * Empties the contents (items) of a vehicle into the room it's in (if any) or
 * extracts them.
 *
@@ -125,6 +215,120 @@ void empty_vehicle(vehicle_data *veh) {
 			extract_obj(obj);
 		}
 	}
+}
+
+
+/**
+* Finds the craft recipe entry for a given building vehicle.
+*
+* @param room_data *room The building location to find.
+* @param byte type FIND_BUILD_UPGRADE or FIND_BUILD_NORMAL.
+* @return craft_data* The craft for that building, or NULL.
+*/
+craft_data *find_craft_for_vehicle(vehicle_data *veh) {
+	craft_data *craft, *next_craft;
+	any_vnum recipe;
+	
+	if ((recipe = get_vehicle_extra_data(veh, ROOM_EXTRA_BUILD_RECIPE)) > 0 && (craft = craft_proto(recipe))) {
+		return craft;
+	}
+	else {
+		HASH_ITER(hh, craft_table, craft, next_craft) {
+			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT) || !CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+				continue;	// not a valid target
+			}
+			if (GET_CRAFT_OBJECT(craft) != VEH_VNUM(veh)) {
+				continue;
+			}
+		
+			// we have a match!
+			return craft;
+		}
+	}
+	
+	return NULL;	// if none
+}
+
+
+/**
+* Finds a vehicle in the room that is mid-dismantle. Optionally, finds a
+* specific one rather than ANY one.
+*
+* @param room_data *room The room to find the vehicle in.
+* @param int with_id Optional: Find a vehicle with this construction-id (pass NOTHING to find any mid-dismantle vehicle).
+* @return vehicle_data* The found vehicle, if any (otherwise NULL).
+*/
+vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id) {
+	vehicle_data *veh;
+	
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (!VEH_IS_DISMANTLING(veh)) {
+			continue;	// not being dismantled
+		}
+		if (with_id != NOTHING && VEH_CONSTRUCTION_ID(veh) != with_id) {
+			continue;	// wrong id
+		}
+		
+		// found!
+		return veh;
+	}
+	
+	return NULL;	// not found
+}
+
+
+/**
+* Finishes the actual dismantle for a vehicle.
+*
+* @param char_data *ch Optional: The dismantler.
+* @param vehicle_data *veh The vehicle being dismantled.
+*/
+void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
+	extern struct empire_chore_type chore_data[NUM_CHORES];
+	
+	obj_data *newobj, *proto;
+	craft_data *type;
+	char_data *iter;
+	
+	if (ch) {
+		act("You finish dismantling $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$n finishes dismantling $V.", FALSE, ch, NULL, veh, TO_ROOM);
+	}
+	
+	if (IN_ROOM(veh)) {
+		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), iter, next_in_room) {
+			if (!IS_NPC(iter) && GET_ACTION(iter) == ACT_DISMANTLE_VEHICLE && GET_ACTION_VNUM(iter, 1) == VEH_CONSTRUCTION_ID(veh)) {
+				cancel_action(iter);
+			}
+			else if (IS_NPC(iter) && GET_MOB_VNUM(iter) == chore_data[CHORE_BUILDING].mob) {
+				SET_BIT(MOB_FLAGS(iter), MOB_SPAWNED);
+			}
+		}
+	}
+	
+	// check for required obj and return it
+	if (IN_ROOM(veh) && (type = find_craft_for_vehicle(veh)) && CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ) && GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && (proto = obj_proto(GET_CRAFT_REQUIRES_OBJ(type))) && !OBJ_FLAGGED(proto, OBJ_SINGLE_USE)) {
+		newobj = read_object(GET_CRAFT_REQUIRES_OBJ(type), TRUE);
+		
+		// scale item to minimum level
+		scale_item_to_level(newobj, 0);
+		
+		if (!ch || IS_NPC(ch)) {
+			obj_to_room(newobj, IN_ROOM(veh));
+		}
+		else {
+			obj_to_char(newobj, ch);
+			act("You get $p.", FALSE, ch, newobj, 0, TO_CHAR);
+			
+			// ensure binding
+			if (OBJ_FLAGGED(newobj, OBJ_BIND_FLAGS)) {
+				bind_obj_to_player(newobj, ch);
+			}
+		}
+		load_otrigger(newobj);
+	}
+			
+	extract_vehicle(veh);
 }
 
 
@@ -463,6 +667,79 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 
 
 /**
+* Begins the dismantle process on a vehicle including setting its
+* VEH_DISMANTLING flag and its VEH_CONSTRUCTION_ID().
+*
+* @param bool vehicle_data *veh The vehicle to dismantle.
+*/
+void start_dismantle_vehicle(vehicle_data *veh) {
+	void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
+	
+	struct resource_data *res, *next_res;
+	obj_data *proto;
+	
+	// remove from goals/tech
+	if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
+		qt_empire_players(VEH_OWNER(veh), qt_lose_vehicle, VEH_VNUM(veh));
+		et_lose_vehicle(VEH_OWNER(veh), VEH_VNUM(veh));
+		adjust_vehicle_tech(veh, FALSE);
+	}
+	
+	// clear it out
+	fully_empty_vehicle(veh);
+	delete_vehicle_interior(veh);
+	
+	// set up flags
+	SET_BIT(VEH_FLAGS(veh), VEH_DISMANTLING);
+	VEH_CONSTRUCTION_ID(veh) = get_new_vehicle_construction_id();
+	
+	// remove any existing resources remaining to build/maintain
+	if (VEH_NEEDS_RESOURCES(veh)) {
+		free_resource_list(VEH_NEEDS_RESOURCES(veh));
+		VEH_NEEDS_RESOURCES(veh) = NULL;
+	}
+	
+	// set up refundable resources: use the actual materials that built this thing
+	if (VEH_BUILT_WITH(veh)) {
+		VEH_NEEDS_RESOURCES(veh) = VEH_BUILT_WITH(veh);
+		VEH_BUILT_WITH(veh) = NULL;
+	}
+	// remove liquids, etc
+	LL_FOREACH_SAFE(VEH_NEEDS_RESOURCES(veh), res, next_res) {
+		// RES_x: only RES_OBJECT is refundable
+		if (res->type != RES_OBJECT) {
+			LL_DELETE(VEH_NEEDS_RESOURCES(veh), res);
+			free(res);
+		}
+		else {	// is object -- check for single_use
+			if (!(proto = obj_proto(res->vnum)) || OBJ_FLAGGED(proto, OBJ_SINGLE_USE)) {
+				LL_DELETE(VEH_NEEDS_RESOURCES(veh), res);
+				free(res);
+			}
+		}
+	}
+	// reduce resource: they don't get it all back
+	reduce_dismantle_resources(VEH_MAX_HEALTH(veh) - VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), &VEH_NEEDS_RESOURCES(veh));
+	
+	// ensure it has no people/mobs on it
+	if (VEH_LED_BY(veh)) {
+		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
+		VEH_LED_BY(veh) = NULL;
+	}
+	if (VEH_SITTING_ON(veh)) {
+		unseat_char_from_vehicle(VEH_SITTING_ON(veh));
+	}
+	if (VEH_DRIVER(veh)) {
+		GET_DRIVING(VEH_DRIVER(veh)) = NULL;
+		VEH_DRIVER(veh) = NULL;
+	}
+	while (VEH_ANIMALS(veh)) {
+		unharness_mob_from_vehicle(VEH_ANIMALS(veh), veh);
+	}
+}
+
+
+/**
 * Sets a vehicle ablaze!
 *
 * @param vehicle_data *veh The vehicle to ignite.
@@ -663,6 +940,10 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "INCOMPLETE flag");
 		problem = TRUE;
 	}
+	if (VEH_FLAGGED(veh, VEH_DISMANTLING)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "DISMANTLING flag");
+		problem = TRUE;
+	}
 	if (VEH_FLAGGED(veh, VEH_CONTAINER | VEH_SHIPPING) && VEH_CAPACITY(veh) < 1) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "No capacity set when container or shipping flag present");
 		problem = TRUE;
@@ -687,12 +968,63 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "ON-FIRE flag");
 		problem = TRUE;
 	}
+	if (VEH_FLAGGED(veh, VEH_BUILDING) && VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Has both BUILDING flag and at least 1 movement flag");
+		problem = TRUE;
+	}
+	if (VEH_FLAGGED(veh, VEH_BUILDING) && !VEH_FLAGGED(veh, VEH_VISIBLE_IN_DARK)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Has BUILDING flag but not VISIBLE-IN-DARK");
+		problem = TRUE;
+	}
 	
 	problem |= audit_extra_descs(VEH_VNUM(veh), VEH_EX_DESCS(veh), ch);
 	problem |= audit_interactions(VEH_VNUM(veh), VEH_INTERACTIONS(veh), TYPE_ROOM, ch);
 	problem |= audit_spawns(VEH_VNUM(veh), VEH_SPAWNS(veh), ch);
 	
 	return problem;
+}
+
+
+/**
+* This is called when a vehicle no longer needs resources. It checks flags and
+* health, and it will also remove the INCOMPLETE flag if present. It can safely
+* be called on vehicles that are done being repaired, too.
+*
+* WARNING: Calling this on a vehicle that is being dismantled will result in
+* it passing to finish_dismantle_vehicle(), which can purge the vehicle.
+*
+* @param vehicle_data *veh The vehicle.
+*/
+void complete_vehicle(vehicle_data *veh) {
+	if (VEH_IS_DISMANTLING(veh)) {
+		// short-circuit out to dismantling
+		finish_dismantle_vehicle(NULL, veh);
+		return;
+	}
+	
+	// restore
+	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
+	
+	// remove resources
+	free_resource_list(VEH_NEEDS_RESOURCES(veh));
+	VEH_NEEDS_RESOURCES(veh) = NULL;
+	
+	// cancel construction id
+	VEH_CONSTRUCTION_ID(veh) = NOTHING;
+	
+	// only if it was incomplete:
+	if (VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
+		
+		if (VEH_OWNER(veh)) {
+			qt_empire_players(VEH_OWNER(veh), qt_gain_vehicle, VEH_VNUM(veh));
+			et_gain_vehicle(VEH_OWNER(veh), VEH_VNUM(veh));
+			adjust_vehicle_tech(veh, TRUE);
+		}
+		
+		finish_vehicle_setup(veh);
+		load_vtrigger(veh);
+	}
 }
 
 
@@ -902,6 +1234,121 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 
 
 /**
+* Periodic action for character dismantling a vehicle.
+*
+* @param char_data *ch The person doing the dismantling.
+*/
+void process_dismantle_vehicle(char_data *ch) {
+	extern const char *pool_types[];
+	
+	struct resource_data *res, *find_res, *next_res, *copy;
+	char buf[MAX_STRING_LENGTH];
+	vehicle_data *veh;
+	
+	if (!(veh = find_dismantling_vehicle_in_room(IN_ROOM(ch), GET_ACTION_VNUM(ch, 1)))) {
+		cancel_action(ch);	// no vehicle
+		return;
+	}
+	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+		msg_to_char(ch, "You can't dismantle a %s you don't own.\r\n", VEH_OR_BLD(veh));
+		cancel_action(ch);
+		return;
+	}
+	else if (!CAN_SEE_VEHICLE(ch, veh)) {
+		msg_to_char(ch, "You can't dismantle a %s you can't see.\r\n", VEH_OR_BLD(veh));
+		cancel_action(ch);
+		return;
+	}
+	
+	// sometimes zeroes end up in here ... just clear them
+	res = NULL;
+	LL_FOREACH_SAFE(VEH_NEEDS_RESOURCES(veh), find_res, next_res) {
+		// things we can't refund
+		if (find_res->amount <= 0 || find_res->type == RES_COMPONENT) {
+			LL_DELETE(VEH_NEEDS_RESOURCES(veh), find_res);
+			free(find_res);
+			continue;
+		}
+		
+		// we actually only want the last valid thing, so save res now (and overwrite it on the next loop)
+		res = find_res;
+	}
+	
+	// did we find something to refund?
+	if (res) {
+		// RES_x: messaging
+		switch (res->type) {
+			// RES_COMPONENT (stored as obj), RES_ACTION, RES_TOOL (stored as obj), and RES_CURRENCY aren't possible here
+			case RES_OBJECT: {
+				snprintf(buf, sizeof(buf), "You carefully remove %s from $V.", get_obj_name_by_proto(res->vnum));
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				snprintf(buf, sizeof(buf), "$n removes %s from $V.", get_obj_name_by_proto(res->vnum));
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				break;
+			}
+			case RES_LIQUID: {
+				snprintf(buf, sizeof(buf), "You carefully retrieve %d unit%s of %s from $V.", res->amount, PLURAL(res->amount), get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				snprintf(buf, sizeof(buf), "$n retrieves some %s from $V.", get_generic_string_by_vnum(res->vnum, GENERIC_LIQUID, GSTR_LIQUID_NAME));
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				break;
+			}
+			case RES_COINS: {
+				snprintf(buf, sizeof(buf), "You retrieve %s from $V.", money_amount(real_empire(res->vnum), res->amount));
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				snprintf(buf, sizeof(buf), "$n retrieves %s from $V.", res->amount == 1 ? "a coin" : "some coins");
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				break;
+			}
+			case RES_POOL: {
+				snprintf(buf, sizeof(buf), "You regain %d %s point%s from $V.", res->amount, pool_types[res->vnum], PLURAL(res->amount));
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				snprintf(buf, sizeof(buf), "$n retrieves %s from $V.", pool_types[res->vnum]);
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				break;
+			}
+			case RES_CURRENCY: {
+				snprintf(buf, sizeof(buf), "You retrieve %d %s from $V.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				act(buf, FALSE, ch, NULL, veh, TO_CHAR | TO_SPAMMY);
+				snprintf(buf, sizeof(buf), "$n retrieves %d %s from $V.", res->amount, get_generic_string_by_vnum(res->vnum, GENERIC_CURRENCY, WHICH_CURRENCY(res->amount)));
+				act(buf, FALSE, ch, NULL, veh, TO_ROOM | TO_SPAMMY);
+				break;
+			}
+		}
+		
+		// make a copy to pass to give_resources
+		CREATE(copy, struct resource_data, 1);
+		*copy = *res;
+		copy->next = NULL;
+		
+		if (copy->type == RES_OBJECT) {
+			// for items, refund 1 at a time
+			copy->amount = MIN(1, copy->amount);
+			res->amount -= 1;
+		}
+		else {
+			// all other types refund the whole thing
+			res->amount = 0;
+		}
+		
+		// give the thing(s)
+		give_resources(ch, copy, FALSE);
+		free(copy);
+		
+		if (res->amount <= 0) {
+			LL_DELETE(VEH_NEEDS_RESOURCES(veh), res);
+			free(res);
+		}
+	}
+	
+	// done?
+	if (!VEH_NEEDS_RESOURCES(veh)) {
+		finish_dismantle_vehicle(ch, veh);
+	}
+}
+
+
+/**
 * Create a new vehicle from a prototype. You should almost always call this
 * with with_triggers = TRUE.
 *
@@ -937,8 +1384,9 @@ vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers) {
 	VEH_CARRYING_N(veh) = 0;
 	VEH_ANIMALS(veh) = NULL;
 	VEH_NEEDS_RESOURCES(veh) = NULL;
+	VEH_BUILT_WITH(veh) = NULL;
 	IN_ROOM(veh) = NULL;
-	REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);	// ensure not marked incomplete
+	REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE | VEH_DISMANTLING);	// ensure not marked incomplete/dismantle
 	
 	veh->script_id = 0;	// initialize later
 	
@@ -989,6 +1437,7 @@ int sort_vehicles(vehicle_data *a, vehicle_data *b) {
 void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	void Crash_save(obj_data *obj, FILE *fp, int location);
 	
+	struct room_extra_data *red, *next_red;
 	struct vehicle_attached_mob *vam;
 	char temp[MAX_STRING_LENGTH];
 	struct resource_data *res;
@@ -1035,6 +1484,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	if (VEH_INTERIOR_HOME_ROOM(veh)) {
 		fprintf(fl, "Interior-home: %d\n", GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)));
 	}
+	if (VEH_CONSTRUCTION_ID(veh) != NOTHING) {
+		fprintf(fl, "Construction-id: %d\n", VEH_CONSTRUCTION_ID(veh));
+	}
 	if (VEH_CONTAINS(veh)) {
 		fprintf(fl, "Contents:\n");
 		Crash_save(VEH_CONTAINS(veh), fl, LOC_INVENTORY);
@@ -1055,6 +1507,15 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	LL_FOREACH(VEH_NEEDS_RESOURCES(veh), res) {
 		// arg order is backwards-compatible to pre-2.0b3.17
 		fprintf(fl, "Needs-res: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
+	}
+	if (!VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
+		// only save built-with if it's dismantlable
+		LL_FOREACH(VEH_BUILT_WITH(veh), res) {
+			fprintf(fl, "Built-with: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
+		}
+	}
+	HASH_ITER(hh, VEH_EXTRA_DATA(veh), red, next_red) {
+		fprintf(fl, "Extra-data: %d %d\n", red->type, red->value);
 	}
 	
 	// scripts
@@ -1154,8 +1615,29 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 				}
 				break;
 			}
+			case 'B': {
+				if (OBJ_FILE_TAG(line, "Built-with:", length)) {
+					if (sscanf(line + length + 1, "%d %d %d %d", &i_in[0], &i_in[1], &i_in[2], &i_in[3]) != 4) {
+						// unknown number of args?
+						break;
+					}
+					
+					CREATE(res, struct resource_data, 1);
+					res->vnum = i_in[0];
+					res->amount = i_in[1];
+					res->type = i_in[2];
+					res->misc = i_in[3];
+					LL_APPEND(VEH_BUILT_WITH(veh), res);
+				}
+				break;
+			}
 			case 'C': {
-				if (OBJ_FILE_TAG(line, "Contents:", length)) {
+				if (OBJ_FILE_TAG(line, "Construction-id:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						VEH_CONSTRUCTION_ID(veh) = i_in[0];
+					}
+				}
+				else if (OBJ_FILE_TAG(line, "Contents:", length)) {
 					// empty container lists
 					for (iter = 0; iter < MAX_BAG_ROWS; iter++) {
 						cont_row[iter] = NULL;
@@ -1234,6 +1716,14 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 							extract_vehicle(veh);
 							return NULL;
 						}
+					}
+				}
+				break;
+			}
+			case 'E': {
+				if (OBJ_FILE_TAG(line, "Extra-data:", length)) {
+					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+						set_extra_data(&VEH_EXTRA_DATA(veh), i_in[0], i_in[1]);
 					}
 				}
 				break;
@@ -1470,6 +1960,7 @@ void clear_vehicle(vehicle_data *veh) {
 	
 	// attributes init
 	VEH_INTERIOR_ROOM_VNUM(veh) = NOTHING;
+	VEH_CONSTRUCTION_ID(veh) = NOTHING;
 	
 	// Since we've wiped out the attributes above, we need to set the speed to the default of VSPEED_NORMAL (two bonuses).
 	VEH_SPEED_BONUSES(veh) = VSPEED_NORMAL;
@@ -1509,6 +2000,9 @@ void free_vehicle(vehicle_data *veh) {
 	if (VEH_NEEDS_RESOURCES(veh)) {
 		free_resource_list(VEH_NEEDS_RESOURCES(veh));
 	}
+	if (VEH_BUILT_WITH(veh)) {
+		free_resource_list(VEH_BUILT_WITH(veh));
+	}
 	while ((vam = VEH_ANIMALS(veh))) {
 		VEH_ANIMALS(veh) = vam->next;
 		free(vam);
@@ -1545,6 +2039,29 @@ void free_vehicle(vehicle_data *veh) {
 	}
 	
 	free(veh);
+}
+
+
+/**
+* Increments the last construction id by 1 and returns it, for use on a vehicle
+* that's being constructed or dismantled. If it hits max-int, it wraps back to
+* zero. The chances of a conflict doing this are VERY low since these are
+* usually short-lived ids and it would take billions of vehicles to create a
+* collision.
+*
+* @return int A new construction id.
+*/
+int get_new_vehicle_construction_id(void) {
+	int id = data_get_int(DATA_LAST_CONSTRUCTION_ID);
+	
+	if (id < INT_MAX) {
+		++id;
+	}
+	else {
+		id = 0;
+	}
+	data_set_int(DATA_LAST_CONSTRUCTION_ID, id);
+	return id;
 }
 
 
@@ -1822,7 +2339,7 @@ struct convert_vehicle_data {
 	struct convert_vehicle_data *next;
 };
 
-struct convert_vehicle_data *convert_vehicle_list = NULL;
+struct convert_vehicle_data *list_of_vehicles_to_convert = NULL;
 
 /**
 * Stores data for a mob that was supposed to be attached to a vehicle.
@@ -1833,7 +2350,7 @@ void add_convert_vehicle_data(char_data *mob, any_vnum vnum) {
 	CREATE(cvd, struct convert_vehicle_data, 1);
 	cvd->mob = mob;
 	cvd->vnum = vnum;
-	LL_PREPEND(convert_vehicle_list, cvd);
+	LL_PREPEND(list_of_vehicles_to_convert, cvd);
 }
 
 
@@ -1850,8 +2367,8 @@ int run_convert_vehicle_list(void) {
 	vehicle_data *veh;
 	int changed = 0;
 	
-	while ((cvd = convert_vehicle_list)) {
-		convert_vehicle_list = cvd->next;
+	while ((cvd = list_of_vehicles_to_convert)) {
+		list_of_vehicles_to_convert = cvd->next;
 		
 		if (cvd->mob && IN_ROOM(cvd->mob)) {
 			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(cvd->mob)), veh, next_in_room) {
@@ -2627,8 +3144,10 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	extern char *get_room_name(room_data *room, bool color);
 	void script_stat (char_data *ch, struct script_data *sc);
 	void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
+	extern const char *room_extra_types[];
 	
 	char buf[MAX_STRING_LENGTH * 2], part[MAX_STRING_LENGTH];
+	struct room_extra_data *red, *next_red;
 	obj_data *obj;
 	size_t size;
 	int found;
@@ -2722,11 +3241,19 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
 		get_resource_display(VEH_NEEDS_RESOURCES(veh), part);
-		size += snprintf(buf + size, sizeof(buf) - size, "Needs resources:\r\n%s", part);
+		size += snprintf(buf + size, sizeof(buf) - size, "%s resources:\r\n%s", VEH_IS_DISMANTLING(veh) ? "Dismantle" : "Needs", part);
 	}
 	
 	send_to_char(buf, ch);
 	show_spawn_summary_to_char(ch, VEH_SPAWNS(veh));
+	
+	if (VEH_EXTRA_DATA(veh)) {
+		msg_to_char(ch, "Extra data:\r\n");
+		HASH_ITER(hh, VEH_EXTRA_DATA(veh), red, next_red) {
+			sprinttype(red->type, room_extra_types, buf);
+			msg_to_char(ch, " %s: %d\r\n", buf, red->value);
+		}
+	}
 	
 	// script info
 	msg_to_char(ch, "Script information:\r\n");
@@ -2768,7 +3295,17 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 	}
 	
 	if (VEH_OWNER(veh)) {
-		msg_to_char(ch, "Owner: %s%s\t0\r\n", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+		msg_to_char(ch, "Owner: %s%s\t0", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+		
+		if (VEH_OWNER(veh) == GET_LOYALTY(ch)) {
+			if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK)) {
+				send_to_char(" (no-work)", ch);
+			}
+			if (VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE)) {
+				send_to_char(" (no-dismantle)", ch);
+			}
+		}
+		send_to_char("\r\n", ch);
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
@@ -2776,6 +3313,9 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 		
 		if (VEH_IS_COMPLETE(veh)) {
 			msg_to_char(ch, "Maintenance needed: %s\r\n", lbuf);
+		}
+		else if (VEH_IS_DISMANTLING(veh)) {
+			msg_to_char(ch, "Remaining to dismantle: %s\r\n", lbuf);
 		}
 		else {
 			msg_to_char(ch, "Resources to completion: %s\r\n", lbuf);

@@ -34,6 +34,7 @@ end
 Atlasian Tortoise location updater~
 0 i 100
 ~
+wait 1
 set room %self.room%
 nop %instance.set_location(%room%)%
 %regionecho% %room% -7 The footfalls of %self.name% shake the earth as %self.heshe% moves to %room.coords%.
@@ -1268,6 +1269,7 @@ Plant dragon tree~
 ~
 set room %self.room%
 if %room.sector_vnum% == 4
+  wait 1
   %echo% A great dragon tree suddenly springs from the ground nearby, eclipsing the surrounding forest!
   %terraform% %room% 18294
   %purge% %self%

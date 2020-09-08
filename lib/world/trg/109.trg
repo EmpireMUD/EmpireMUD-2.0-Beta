@@ -534,8 +534,6 @@ Muck Dragon updater + leash~
 eval room %self.room%
 if (%room.sector% != Swamp && %room.sector% != Marsh && %room.sector% != River && %room.sector% != Lake)
   return 0
-  wait 1
-  %echo% %self.name% hastily backtracks.
   halt
 end
 nop %instance.set_location(%room%)%
