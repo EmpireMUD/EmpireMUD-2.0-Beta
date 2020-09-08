@@ -1542,6 +1542,10 @@ bool check_autostore(obj_data *obj, bool force) {
 		store = TRUE;
 		// DON'T mark unique -- we are just junking it
 	}
+	else if (is_home) {
+		// all other items in homes are junk
+		store = TRUE;
+	}
 	
 	// do we even bother?
 	if (!store) {
