@@ -484,7 +484,11 @@ S
 #288
 Primitive Crafts~
 0 203 1.00 0 0
+D 1 81 0
+D 1 80 0
+D 1 82 0
 T a 0
+T e 0
 S
 #289
 Build~
@@ -509,7 +513,9 @@ S
 #293
 Cook~
 0 -1 1.00 0 0
+D 1 79 0
 T a 0
+T e 0
 S
 #294
 Kite~
