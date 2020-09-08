@@ -73,6 +73,7 @@ bool workforce_is_delayed(empire_data *emp, room_data *room, int chore);
 // external functions
 int count_building_vehicles_in_room(room_data *room, empire_data *only_owner);	// vehicles.c
 void empire_skillup(empire_data *emp, any_vnum ability, double amount);	// skills.c
+int get_workforce_production_limit(empire_data *emp, obj_vnum vnum);
 void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component);
 void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 void stop_room_action(room_data *room, int action);	// act.action.c
@@ -505,7 +506,7 @@ static void ewt_mark_for_interactions(empire_data *emp, room_data *room, int int
 */
 static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore, obj_vnum vnum) {
 	struct empire_workforce_tracker_island *isle;
-	int island_id, max, glob_max;
+	int island_id, max, glob_max, limit;
 	struct empire_workforce_tracker *tt;
 	struct empire_island *emp_isle;
 	obj_data *proto;
@@ -522,8 +523,14 @@ static bool can_gain_chore_resource(empire_data *emp, room_data *loc, int chore,
 	island_id = GET_ISLAND_ID(loc);
 	isle = ewt_find_island(tt, island_id);
 	
-	max = config_get_int("max_chore_resource_per_member") * EMPIRE_MEMBERS(emp);
-	max += EMPIRE_ATTRIBUTE(emp, EATT_WORKFORCE_CAP);
+	// check manual production limit
+	if ((limit = get_workforce_production_limit(emp, vnum)) != UNLIMITED) {
+		max = limit;
+	}
+	else {
+		max = config_get_int("max_chore_resource_per_member") * EMPIRE_MEMBERS(emp);
+		max += EMPIRE_ATTRIBUTE(emp, EATT_WORKFORCE_CAP);
+	}
 	
 	glob_max = max;	// does not change
 	
@@ -1014,6 +1021,25 @@ int *get_ordered_chores(void) {
 
 
 /**
+* Return the current limit for an item's production. -1 means no-limit.
+*
+* @param empire_data *emp The empire.
+* @param obj_vnum vnum The object to get the limit for.
+* @return int UNLIMITED for no limit, otherwise the maximum number the empire can have before it stops producing more.
+*/
+int get_workforce_production_limit(empire_data *emp, obj_vnum vnum) {
+	struct workforce_production_limit *wpl;
+	
+	HASH_FIND_INT(EMPIRE_PRODUCTION_LIMITS(emp), &vnum, wpl);
+	if (wpl) {
+		return wpl->limit;
+	}
+	
+	return UNLIMITED;	// no entry
+}
+
+
+/**
 * Mark the reason workforce couldn't work a given spot this time (logs are
 * freed every time workforce runs).
 *
@@ -1138,6 +1164,40 @@ char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
 	}
 	
 	return mob;
+}
+
+
+/**
+* Sets the workforce production limit for an item.
+*
+* @param empire_data *emp The empire.
+* @param obj_vnum vnum The object to set the limit for.
+* @param int amount The amount to set it to, or UNLIMITED for unlimited (deletes the entry).
+*/
+void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount) {
+	struct workforce_production_limit *wpl;
+	
+	HASH_FIND_INT(EMPIRE_PRODUCTION_LIMITS(emp), &vnum, wpl);
+
+	// add if missing
+	if (!wpl && amount != UNLIMITED) {
+		CREATE(wpl, struct workforce_production_limit, 1);
+		wpl->vnum = vnum;
+		HASH_ADD_INT(EMPIRE_PRODUCTION_LIMITS(emp), vnum, wpl);
+	}
+	
+	// update if needed
+	if (wpl) {
+		wpl->limit = amount;
+	}
+	
+	// delete if needed
+	if (wpl && amount == UNLIMITED) {
+		HASH_DEL(EMPIRE_PRODUCTION_LIMITS(emp), wpl);
+		free(wpl);
+	}
+	
+	EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 }
 
 

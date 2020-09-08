@@ -4717,6 +4717,14 @@ struct workforce_delay {
 };
 
 
+// lets players prevent production of a certain item
+struct workforce_production_limit {
+	obj_vnum vnum;	// obj vnum
+	int limit;	// 0 = make none (no entry = make all)
+	UT_hash_handle hh;	// EMPIRE_PRODUCTION_LIMITS() hash
+};
+
+
 // for offenses committed against an empire
 struct offense_data {
 	int type;	// OFFENSE_ constant
@@ -4799,6 +4807,7 @@ struct empire_data {
 	struct empire_production_total *production_totals;	// totals of items produced by the empire (hash by vnum)
 	struct empire_homeless_citizen *homeless;	// list of homeless npcs
 	struct script_data *script;	// for storing variables
+	struct workforce_production_limit *production_limits;	// limits on what workforce can make
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum

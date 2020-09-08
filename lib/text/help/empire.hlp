@@ -1342,6 +1342,7 @@ Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce copy <island name>
         workforce keep [number | all] <item name>
         workforce keep default [number | all | none]
+        workforce limit [amount | none] [keywords]
 
 Once your empire has purchased the Workforce progress reward, the empire's
 citizens (NPCs) will start performing simple tasks for the empire. You can
@@ -1372,9 +1373,10 @@ configuration of another island into the island you are currently in. Using
 Note: Your workforce will only produce resources up to your workforce cap.
 
 See &cHELP WORKFORCE CHORES&0 for a list of all workforce chores with descriptions.
+See &cHELP WORKFORCE LIMIT&0 for information on limiting production
 
 See also: WORKFORCE CHORES, WORKFORCE WHERE, WORKFORCE WHY, NO-WORK,
-          WORKFORCE KEEP, WORKFORCE CAP
+          WORKFORCE KEEP, WORKFORCE CAP, WORKFORCE LIMIT
 #
 "WORKFORCE CAP"
 
@@ -1463,6 +1465,21 @@ Examples:
  > workforce keep all gold bar
  > workforce keep 200 spruce lumber
  > workforce keep default 1
+
+See also: WORKFORCE
+#
+"WORKFORCE LIMIT" "WORKFORCE LIMITS"
+
+Usage:  workforce limit [keywords]
+        workforce limit <amount | none> <keywords>
+
+This command lets you set production limits on items. No workforce chore will
+produce more than the limited amount of an item.
+
+You can use multiple keywords to try to get the right item. Example:
+> workforce limit 15 large tree
+
+Using this command without an amount lets you search your current limits.
 
 See also: WORKFORCE
 #

@@ -6955,6 +6955,119 @@ ACMD(do_unpublicize) {
 }
 
 
+/**
+* Handler for do_workforce when the args start: workforce limit ...
+*
+* @param char_data *ch The player.
+* @param empire_data *emp The empire.
+* @param char *argument Remaining args after "limit".
+*/
+void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
+	void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
+	
+	char amount_arg[MAX_INPUT_LENGTH], keywords_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], line[256];
+	struct workforce_production_limit *wpl, *next_wpl;
+	int amount, count;
+	obj_data *proto;
+	any_vnum vnum;
+	size_t size;
+	
+	if (isdigit(*argument)) {
+		// usage: workforce limit <amount> <keywords>
+		half_chop(argument, amount_arg, keywords_arg);
+		amount = atoi(amount_arg);
+		
+		if (!*keywords_arg) {
+			msg_to_char(ch, "Usage: workforce limit <amount> <keywords>\r\n");
+		}
+		else if ((vnum = get_obj_vnum_by_name(keywords_arg, TRUE)) == NOTHING) {
+			msg_to_char(ch, "Unknown storable item '%s'.\r\n", keywords_arg);
+		}
+		else {
+			set_workforce_production_limit(emp, vnum, amount);
+			msg_to_char(ch, "You set the production limit for %s to %d.\r\n", get_obj_name_by_proto(vnum), amount);
+		}
+		return;	// end of: workforce limit <amount> <keywords>
+	}
+	if (!strn_cmp(argument, "none", 4) || !strn_cmp(argument, "off", 3)) {
+		// usage: workforce limit none <keywords>
+		half_chop(argument, amount_arg, keywords_arg);
+		// amount_arg == "none"
+		
+		if (!*keywords_arg) {
+			msg_to_char(ch, "Usage: workforce limit none <keywords>\r\n");
+		}
+		else if ((vnum = get_obj_vnum_by_name(keywords_arg, TRUE)) == NOTHING) {
+			msg_to_char(ch, "Unknown storable item '%s'.\r\n", keywords_arg);
+		}
+		else {
+			set_workforce_production_limit(emp, vnum, UNLIMITED);
+			msg_to_char(ch, "You turn off the production limit for %s.\r\n", get_obj_name_by_proto(vnum));
+		}
+		return;	// end of: workforce limit none <keywords>
+	}
+	
+	// ok if we got this far, we're just showing the current setup
+	// optional usage: workforce limit [keywords]
+	count = 0;
+	if (*argument) {
+		size = snprintf(buf, sizeof(buf), "Workforce production limits for '%s':\r\n", argument);
+	}
+	else {
+		size = snprintf(buf, sizeof(buf), "Workforce production limits:\r\n");
+	}
+	
+	// iterate...
+	HASH_ITER(hh, EMPIRE_PRODUCTION_LIMITS(emp), wpl, next_wpl) {
+		if (*argument && (!(proto = obj_proto(wpl->vnum)) || !multi_isname(argument, GET_OBJ_KEYWORDS(proto)))) {
+			continue;	// no keyword match
+		}
+		
+		// ok:
+		++count;
+		
+		// build line
+		if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+			snprintf(line, sizeof(line), "[%5d] %s: %d", wpl->vnum, skip_filler(get_obj_name_by_proto(wpl->vnum)), wpl->limit);
+		}
+		else {
+			snprintf(line, sizeof(line), "%s: %d", skip_filler(get_obj_name_by_proto(wpl->vnum)), wpl->limit);
+		}
+		
+		// check for room
+		if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+			if (size + strlen(line) + 3 < sizeof(buf)) {
+				size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, " OVERFLOW\r\n");
+				break;
+			}
+		}
+		else {	// not screenreader
+			if (size + 40 < sizeof(buf)) {
+				size += snprintf(buf + size, sizeof(buf) - size, " %-38.38s%s", line, !(count % 2) ? "\r\n" : "");
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, " OVERFLOW\r\n");
+				break;
+			}
+		}
+	}
+	
+	if (!count) {
+		strcat(buf, " no limits set\r\n");	// always room for this
+	}
+	else if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 2) && size + 2 < sizeof(buf)) {
+		strcat(buf, "\r\n");
+	}
+	
+	if (ch->desc) {	// should be guaranteed
+		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
 ACMD(do_workforce) {
 	extern int *get_ordered_chores();
 	
@@ -7088,6 +7201,9 @@ ACMD(do_workforce) {
 		if (!found) {
 			msg_to_char(ch, "You have nothing by that name stored on this island.\r\n");
 		}
+	}
+	else if (!str_cmp(arg, "lim") || !str_cmp(arg, "limit")) {
+		do_workforce_limit(ch, emp, argument);
 	}
 	else if (is_abbrev(arg, "nowork") || is_abbrev(arg, "no-work")) {
 		// special case: toggle no-work on this tile
