@@ -1932,7 +1932,7 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 		else {
 			// only send message if someone else is present (don't bother verifying it's a player)
 			if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
-				act("$n works on dismantling the building", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+				act("$n works on dismantling the building.", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
 			}
 		}
 	}

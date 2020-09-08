@@ -870,6 +870,10 @@ const char *player_tech_types[] = {
 	"Drink-Blood-Faster",
 	"Summon-Materials",
 	"Customize-Vehicle",
+	"Plant-Crops",
+	"Chip-Command",	// 80
+	"Saw-Command",
+	"Scrape-Command",
 	"\n"
 };
 

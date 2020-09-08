@@ -3263,6 +3263,24 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "1");
 						}
 					}
+					else if (!str_cmp(field, "can_see")) {
+						vehicle_data *vtarg;
+						char_data *ctarg;
+						obj_data *otarg;
+						
+						if (subfield && (ctarg = get_char_room_vis(c, subfield))) {
+							snprintf(str, slen, "%d", CAN_SEE(c, ctarg) ? 1 : 0);
+						}
+						else if (subfield && (otarg = get_obj_vis(c, subfield))) {
+							snprintf(str, slen, "%d", CAN_SEE_OBJ(c, otarg) ? 1 : 0);
+						}
+						else if (subfield && (vtarg = get_vehicle_vis(c, subfield))) {
+							snprintf(str, slen, "%d", CAN_SEE_VEHICLE(c, vtarg) ? 1 : 0);
+						}
+						else {
+							snprintf(str, slen, "0");
+						}
+					}
 					else if (!str_cmp(field, "can_teleport_room")) {
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						snprintf(str, slen, "%d", (troom && can_teleport_to(c, troom, TRUE)) ? 1 : 0);

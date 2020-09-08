@@ -1449,14 +1449,15 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 *
 * @param obj_data *obj The item to check/store.
 * @param bool force If TRUE, ignores timers and players present and stores all storables.
+* @param empire_data *override_emp Optional: If not NULL, will store to this empire.
 * @return bool TRUE if the item is still in the world, FALSE if it was extracted
 */
-bool check_autostore(obj_data *obj, bool force) {
+bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	void check_delayed_load(char_data *ch);
 	extern int get_main_island(empire_data *emp);
 	
 	player_index_data *index;
-	empire_data *emp = NULL;
+	empire_data *emp = override_emp;
 	char_data *loaded_ch;
 	vehicle_data *in_veh;
 	room_data *real_loc;
@@ -1485,6 +1486,9 @@ bool check_autostore(obj_data *obj, bool force) {
 	}
 	else if (in_veh && VEH_INTERIOR_HOME_ROOM(in_veh) && (home_idnum = ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(in_veh))) != NOBODY) {
 		is_home = TRUE;
+	}
+	else {
+		is_home = FALSE;
 	}
 	
 	// detect owner here
@@ -1527,7 +1531,7 @@ bool check_autostore(obj_data *obj, bool force) {
 		// but this otherwise blocks the item from storing
 		store = FALSE;
 	}
-	else if (is_home && UNIQUE_OBJ_CAN_STORE(obj, TRUE)) {
+	else if (is_home && UNIQUE_OBJ_CAN_STORE(obj, TRUE) && bind_ok_idnum(obj, home_idnum)) {
 		// trigger home storage
 		store = TRUE;
 		unique = TRUE;
@@ -1541,6 +1545,10 @@ bool check_autostore(obj_data *obj, bool force) {
 		// room owned, item is bound, not a private home, but not storable? junk it
 		store = TRUE;
 		// DON'T mark unique -- we are just junking it
+	}
+	else if (is_home) {
+		// all other items in homes are junk
+		store = TRUE;
 	}
 	
 	// do we even bother?
@@ -1752,7 +1760,7 @@ void point_update_obj(obj_data *obj) {
 	}
 	
 	// 2nd type of timer: the autostore timer (keeps the world clean of litter)
-	if (!check_autostore(obj, FALSE)) {
+	if (!check_autostore(obj, FALSE, NULL)) {
 		return;
 	}
 }
@@ -1837,7 +1845,7 @@ void autostore_vehicle_contents(vehicle_data *veh) {
 	
 	// ok we are good to autostore
 	DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
-		check_autostore(obj, TRUE);
+		check_autostore(obj, TRUE, VEH_OWNER(veh));
 	}
 }
 

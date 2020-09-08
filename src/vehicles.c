@@ -284,6 +284,7 @@ vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id) {
 * @param vehicle_data *veh The vehicle being dismantled.
 */
 void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
+	extern bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
 	extern struct empire_chore_type chore_data[NUM_CHORES];
 	
 	obj_data *newobj, *proto;
@@ -315,6 +316,7 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 		
 		if (!ch || IS_NPC(ch)) {
 			obj_to_room(newobj, IN_ROOM(veh));
+			check_autostore(newobj, TRUE, VEH_OWNER(veh));
 		}
 		else {
 			obj_to_char(newobj, ch);
@@ -324,8 +326,8 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 			if (OBJ_FLAGGED(newobj, OBJ_BIND_FLAGS)) {
 				bind_obj_to_player(newobj, ch);
 			}
+			load_otrigger(newobj);
 		}
-		load_otrigger(newobj);
 	}
 			
 	extract_vehicle(veh);

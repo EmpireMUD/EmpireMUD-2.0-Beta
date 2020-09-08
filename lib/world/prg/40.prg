@@ -51,75 +51,73 @@ an enchanted forest for your empire. Be sure to claim the forest right away,
 because a mysterious cult of necrovandals is known to destroy unclaimed magical
 forests. Completing this goal earns your empire more territory per greatness.
 ~
-5 4 0 5 d
+6 4 0 5 d
 K 5 5
 W
-25 604 0 1
+34 604 0 6
 S
 #4011
 Enchanted Forest~
    A single tree does not a forest make. Carefully tend and grow your enchanted
-forest by keeping it surrounded by claimed Plains tiles, and by allowing it to
-grow rather than chopping it down. Do this until you have 10 tiles of
-fully-grown enchanted forests. Of course, you could always scour the Earth for
-9 more crystal seeds and start your forests that way.
+forest by keeping it surrounded by claimed Plains tiles, and allowing it to
+grow rather than chopping it down. You'll need to grow your forest to produce
+enough magewood to complete this goal.
 ~
-3 4 0 15 0
+4 4 0 15 0
 K 7 5
 P 4010
 W
-25 604 0 10
+34 604 0 100
 S
 #4012
 Witchwood~
-   Though your empire has no need for a larger enchanted forest, you feel
-strangely compelled to let the forest grow ever larger. Remember to keep the
-tiles around your enchanted forest clear and claimed, and don't over-chop the
-enchanted forest. To complete this goal, you must have 50 fully-grown enchanted
-forest tiles all at once.
+   Through careful management of your land, you can produce yet more of the
+prized magewood from your enchanted forests. Grow your forest larger and
+carefully chop down and saw enough of it to produce 750 stellar magewood.
 ~
-5 4 0 25 0
+7 4 0 25 0
 K 7 5
 P 4011
 W
-25 604 0 50
+34 604 0 750
 S
 #4013
 The Magic Grows~
-   Only the most powerful empires achieve truly large enchanted forests. Keep
-growing your forest until it reaches a staggering 100 map tiles. All 100 tiles
-must be fully-grown enchanted forests to complete this goal.
+   Only the most powerful empires achieve the level of greatness it takes to
+manage a large enchanted forest and produce 2000 stellar magewood. Accomplish
+this and bards will tell the tale of your empire for ages to come.
 ~
-4 4 0 50 0
+5 4 0 50 0
 K 7 50
 P 4012
 W
-25 604 0 100
+34 604 0 2000
 S
 #4014
 Rowling in the Forest~
-   Grow, claim, and control 500 tiles of enchanted forests to achieve this
-monumental goal. This task will take time, care, patience, and a lot of
-territory. But if you achieve it, your empire will see a level of greatness to
-which most people dare not aspire.
-~
-6 4 0 50 0
-K 7 50
-P 4013
-W
-25 604 0 500
-S
-#4015
-Magic to Make the Sanest Man Go Mad~
-   Few empires ever stand in the shadow of the prestige required to grow an
-enchanted forest to 1000 tiles. Grow, claim, and tend the forest to this
-immense size and achieve renown to last a thousand years.
+   Continue to grow your enchanted forest beyond all reason as you succumb to
+its magnetic magenta mysteries. Carefully chop trees from the center of your
+forest as it grows at the edges, until you have produced an incredible 5000
+stellar magewood.
 ~
 7 4 0 50 0
 K 7 50
+P 4013
+W
+34 604 0 5000
+S
+#4015
+Magic to Make the Sanest Man Go Mad~
+   Few empires ever stand in the shadow of the prestige required to produce
+10,000 stellar magewood. Grow, claim, and tend your enchanted forest to become
+the greatest producer of magewood the world has ever seen and achieve renown to
+last a thousand years.
+~
+8 4 0 50 0
+K 7 50
 P 4014
 W
-25 604 0 1000
+34 604 0 10000
 S
 #4020
 Savings~
