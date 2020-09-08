@@ -873,7 +873,7 @@ const char *player_tech_types[] = {
 	"Plant-Crops",
 	"Chip-Command",	// 80
 	"Saw-Command",
-	"Scrape-Command"
+	"Scrape-Command",
 	"\n"
 };
 
