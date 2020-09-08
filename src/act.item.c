@@ -1095,6 +1095,12 @@ static void perform_wear(char_data *ch, obj_data *obj, int where) {
 		return;
 	}
 	
+	// check bindings
+	if (!bind_ok(obj, ch)) {
+		act("$p is bound to someone else.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+		return;
+	}
+	
 	// position cascade (ring 1/2, etc)
 	if (GET_EQ(ch, where) && wear_data[where].cascade_pos != NO_WEAR) {
 		where = wear_data[where].cascade_pos;
