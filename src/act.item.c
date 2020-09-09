@@ -774,7 +774,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		size = line_size = snprintf(lbuf, sizeof(lbuf), "Allows: ");
 		any = FALSE;
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
-			if (GET_CRAFT_REQUIRES_OBJ(craft) == GET_OBJ_VNUM(obj)) {
+			if (GET_CRAFT_REQUIRES_OBJ(craft) == GET_OBJ_VNUM(obj) && !CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT | CRAFT_DISMANTLE_ONLY | CRAFT_UPGRADE)) {
 				part_size = snprintf(part, sizeof(part), "%s %s", gen_craft_data[GET_CRAFT_TYPE(craft)].command, GET_CRAFT_NAME(craft));
 			
 				if (line_size + part_size + 2 >= 80 && part_size < 75 && any) {

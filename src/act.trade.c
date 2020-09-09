@@ -83,7 +83,7 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	
 	// some setup
 	craft_veh = CRAFT_IS_VEHICLE(type) ? vehicle_proto(GET_CRAFT_OBJECT(type)) : NULL;
-	makes_building = (CRAFT_IS_BUILDING(type) || (craft_veh && VEH_CLAIMS_WITH_ROOM(craft_veh)));
+	makes_building = (CRAFT_IS_BUILDING(type) || (craft_veh && VEH_FLAGGED(craft_veh, VEH_BUILDING)));
 	
 	// attribute-based checks
 	if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {

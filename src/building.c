@@ -1370,7 +1370,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	else if (VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You can't dismantle a %s you don't own.\r\n", VEH_OR_BLD(veh));
 	}
-	else if (GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE)) {
+	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE)) {
 		msg_to_char(ch, "You don't have permission to dismantle that.\r\n");
 	}
 	else if ((craft = find_craft_for_vehicle(veh)) && GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
