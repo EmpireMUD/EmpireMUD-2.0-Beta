@@ -2039,6 +2039,47 @@ char *any_one_word(char *argument, char *first_arg) {
 
 
 /**
+* Breaks a string into two parts: the last word, and the rest of the words.
+*
+* @param char *string The input string.
+* @param char *most_args All the words in 'string' except the last one (empty if string was empty).
+* @param char *last_arg The last word in 'string' IF it had more than one.
+*/
+void chop_last_arg(char *string, char *most_args, char *last_arg) {
+	int end_pos;
+	
+	*most_args = *last_arg = '\0';
+	
+	if (!string || !*string) {
+		return;	// no work
+	}
+	
+	// first trim trailing spaces
+	for (end_pos = strlen(string) - 1; end_pos >= 0 && isspace(string[end_pos]); --end_pos) {
+		string[end_pos] = '\0';
+	}
+	
+	// end_pos is still the end of the string: now rewind to look for previous space
+	for (; end_pos >= 0 && !isspace(string[end_pos]); --end_pos);
+	
+	// did we find it?
+	if (end_pos > 0) {
+		strcpy(last_arg, string + end_pos + 1);
+		strncpy(most_args, string, end_pos);
+		most_args[end_pos] = '\0';
+		
+		// then trim trailing spaces (in case of multiple spaces between args)
+		for (--end_pos; end_pos >= 0 && isspace(most_args[end_pos]); --end_pos) {
+			most_args[end_pos] = '\0';
+		}
+	}
+	else {	// didn't find a space: probably only 1 arg
+		strcpy(most_args, string);
+	}
+}
+
+
+/**
 * Function to separate a string into two comma-separated args. It is otherwise
 * similar to half_chop().
 *

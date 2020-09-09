@@ -1652,6 +1652,7 @@ extern bool has_relationship(empire_data *emp, empire_data *fremp, bitvector_t d
 // interpreter utils from utils.c
 extern char *any_one_arg(char *argument, char *first_arg);
 extern char *any_one_word(char *argument, char *first_arg);
+void chop_last_arg(char *string, char *most_args, char *last_arg);
 void comma_args(char *string, char *arg1, char *arg2);
 extern int fill_word(char *argument);
 void half_chop(char *string, char *arg1, char *arg2);

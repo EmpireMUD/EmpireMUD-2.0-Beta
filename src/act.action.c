@@ -115,7 +115,7 @@ const struct action_data_struct action_data[] = {
 	{ "digging", "is digging at the ground.", ACTF_SHOVEL | ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_digging, NULL },	// ACT_DIGGING
 	{ "gathering", "is gathering plant material.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gathering, NULL },	// ACT_GATHERING
 	{ "chopping", "is chopping down trees.", ACTF_HASTE | ACTF_FAST_CHORES, process_chop, NULL },	// ACT_CHOPPING
-	{ "building", "is hard at work building.", ACTF_HASTE | ACTF_FAST_CHORES, process_build_action, NULL },	// ACT_BUILDING
+	{ "building", "is hard at work building.", ACTF_HASTE | ACTF_FAST_CHORES, process_build_action, NULL },	//  ACT_BUILDING (for any type of craft)
 	{ "dismantling", "is dismantling the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_action, NULL },	// ACT_DISMANTLING
 	{ "harvesting", "is harvesting the crop.", ACTF_HASTE | ACTF_FAST_CHORES, process_harvesting, NULL },	// ACT_HARVESTING
 	{ "planting", "is planting seeds.", ACTF_HASTE | ACTF_FAST_CHORES, process_planting, NULL },	// ACT_PLANTING
@@ -1369,7 +1369,6 @@ void process_build_action(char_data *ch) {
 	
 	char buf1[MAX_STRING_LENGTH];
 	craft_data *type = NULL;
-	int count, total;
 	
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to keep working here.\r\n");
@@ -1391,10 +1390,7 @@ void process_build_action(char_data *ch) {
 		}
 	}
 
-	total = 1;	// number of materials to attach in one go (add things that speed up building)
-	for (count = 0; count < total && GET_ACTION(ch) == ACT_BUILDING; ++count) {
-		process_build(ch, IN_ROOM(ch), ACT_BUILDING);
-	}
+	process_build(ch, IN_ROOM(ch), ACT_BUILDING);
 }
 
 

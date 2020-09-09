@@ -33,6 +33,8 @@
 */
 
 // locals
+void herd_animals_out(room_data *location);
+bool is_entrance(room_data *room);
 void process_build(char_data *ch, room_data *room, int act_type);
 void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
@@ -58,6 +60,7 @@ extern const bitvector_t bld_on_flags_order[];
 extern const bool can_designate_dir[NUM_OF_DIRS];
 extern const bool can_designate_dir_vehicle[NUM_OF_DIRS];
 extern const char *dirs[];
+extern struct gen_craft_data_t gen_craft_data[];
 extern int rev_dir[];
 extern const char *tool_flags[];
 
@@ -109,6 +112,117 @@ bool can_build_on(room_data *room, bitvector_t flags) {
 
 
 /**
+* Checks the location and direction the player is trying to craft/build
+* a map building or a building-vehicle. This function sends error messages if
+* it fails.
+*
+* @param char_data *ch The person trying to build/craft.
+* @param craft_data *type A craft that makes a building or vehicle-building.
+* @param int dir The direction that the character provided (may be NO_DIR or an invalid dir).
+* @param bool *bld_is_closed A variable to bind whether or not the building is a 'closed' one (may be NULL).
+* @param bool *bld_needs_reverse A variable to bind whether or not there needs to be a reverse exit (may be NULL).
+* @return bool TRUE if it's ok to proceed; FALSE it if sent an error message and failed.
+*/
+bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool *bld_is_closed, bool *bld_needs_reverse) {
+	bool is_closed, needs_facing, needs_reverse;
+	room_data *to_room = NULL, *to_rev = NULL;
+	vehicle_data *make_veh = NULL;
+	char buf[MAX_STRING_LENGTH];
+	bld_data *to_build = NULL;
+	
+	char *command = gen_craft_data[GET_CRAFT_TYPE(type)].command;
+	
+	// init vars
+	if (bld_is_closed) {
+		*bld_is_closed = FALSE;
+	}
+	if (bld_needs_reverse) {
+		*bld_needs_reverse = FALSE;
+	}
+	
+	// ensure we have something to make
+	if (CRAFT_IS_VEHICLE(type) && !(make_veh = vehicle_proto(GET_CRAFT_OBJECT(type)))) {
+		msg_to_char(ch, "That is not yet implemented.\r\n");
+		return FALSE;
+	}
+	if (CRAFT_IS_BUILDING(type) && !(to_build = building_proto(GET_CRAFT_BUILD_TYPE(type)))) {
+		msg_to_char(ch, "That is not yet implemented.\r\n");
+		return FALSE;
+	}
+	if (!make_veh && !to_build) {
+		// not trying to make a vehicle or building? no need for this
+		return TRUE;
+	}
+	
+	// setup
+	is_closed = to_build && !IS_SET(GET_BLD_FLAGS(to_build), BLD_OPEN);
+	needs_facing = (GET_CRAFT_BUILD_FACING(type) != NOBITS) || is_closed;
+	needs_reverse = needs_facing && to_build && IS_SET(GET_BLD_FLAGS(to_build), BLD_TWO_ENTRANCES);
+	
+	// checks
+	if ((is_closed || needs_facing) && (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE || !IS_OUTDOORS(ch))) {
+		msg_to_char(ch, "You can only %s that out on the map.\r\n", command);
+		return FALSE;
+	}
+	if (GET_CRAFT_BUILD_ON(type) && !can_build_on(IN_ROOM(ch), GET_CRAFT_BUILD_ON(type))) {
+		ordered_sprintbit(GET_CRAFT_BUILD_ON(type), bld_on_flags, bld_on_flags_order, TRUE, buf);
+		msg_to_char(ch, "You need to %s on: %s\r\n", command, buf);
+		return FALSE;
+	}
+	if (to_build && !GET_CRAFT_BUILD_ON(type)) {
+		msg_to_char(ch, "You can't %s that anywhere.\r\n", command);
+		return FALSE;
+	}
+	if ((is_closed || (to_build || IS_SET(GET_BLD_FLAGS(to_build), BLD_BARRIER))) && is_entrance(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't %s that in front of a building entrance.\r\n", command);
+		return FALSE;
+	}
+	
+	// check facing dirs
+	if (needs_facing) {
+		if (dir == NO_DIR) {
+			msg_to_char(ch, "Which direction would you like to %s it facing?\r\n", command);
+			return FALSE;
+		}
+		if (dir >= NUM_2D_DIRS) {
+			msg_to_char(ch, "You can't face it that direction.\r\n");
+			return FALSE;
+		}
+		if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
+			msg_to_char(ch, "You can't face it that direction.\r\n");
+			return FALSE;
+		}
+		if (!can_build_on(to_room, GET_CRAFT_BUILD_FACING(type))) {
+			ordered_sprintbit(GET_CRAFT_BUILD_FACING(type), bld_on_flags, bld_on_flags_order, TRUE, buf);
+			msg_to_char(ch, "You need to %s it facing: %s\r\n", command, buf);
+			return FALSE;
+		}
+	}	// end facing checks
+	
+	if (needs_reverse) {
+		to_rev = real_shift(IN_ROOM(ch), shift_dir[rev_dir[dir]][0], shift_dir[rev_dir[dir]][1]);
+
+		if (!to_rev || !can_build_on(to_rev, GET_CRAFT_BUILD_FACING(type))) {
+			ordered_sprintbit(GET_CRAFT_BUILD_FACING(type), bld_on_flags, bld_on_flags_order, TRUE, buf);
+			msg_to_char(ch, "You need to %s it with the reverse side facing: %s\r\n", command, buf);
+			return FALSE;
+		}
+	}
+	
+	// bind those variables to pass back
+	if (bld_is_closed) {
+		*bld_is_closed = is_closed;
+	}
+	if (bld_needs_reverse) {
+		*bld_needs_reverse = needs_reverse;
+	}
+	
+	// if we got this far, it should be ok
+	return TRUE;
+}
+
+
+/**
 * This creates a resource list that is a merged copy of two lists. You will
 * need to free_resource_list() on the result when done with it.
 *
@@ -138,8 +252,6 @@ struct resource_data *combine_resources(struct resource_data *combine_a, struct 
 * @param room_data *room The room to complete.
 */
 void complete_building(room_data *room) {
-	void herd_animals_out(room_data *location);
-	
 	char_data *ch;
 	empire_data *emp;
 	
@@ -1213,327 +1325,6 @@ char *vnum_to_interlink(room_vnum vnum) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// MAIN BUILDING COMMANDS //////////////////////////////////////////////////
-
-ACMD(do_build) {
-	extern bool find_and_bind(char_data *ch, obj_vnum vnum);
-	extern int get_crafting_level(char_data *ch);
-	void show_craft_info(char_data *ch, char *argument, int craft_types);
-	
-	char buf1[MAX_STRING_LENGTH];
-	room_data *to_room = NULL, *to_rev = NULL;
-	any_vnum missing_abil = NO_ABIL;
-	obj_data *found_obj = NULL;
-	empire_data *e = NULL;
-	int dir = NORTH, ter_type;
-	craft_data *iter, *next_iter, *type = NULL, *abbrev_match = NULL;
-	bool found = FALSE, found_any, this_line, is_closed, needs_facing, needs_reverse;
-	bool junk, wait;
-	
-	// rules for ch building a given craft
-	#define CHAR_CAN_BUILD_BASIC(ch, ttype)  (CRAFT_IS_BUILDING(ttype) && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)))
-	#define CHAR_CAN_BUILD_LEARNED(ch, ttype)  (!IS_SET(GET_CRAFT_FLAGS(ttype), CRAFT_LEARNED) || has_learned_craft(ch, GET_CRAFT_VNUM(ttype)))
-	#define CHAR_CAN_BUILD_ABIL(ch, ttype)  (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype))))
-	#define CHAR_CAN_BUILD_REQOBJ(ch, ttype)  (GET_CRAFT_REQUIRES_OBJ(ttype) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(ttype), ch->carrying))
-	// all rules combined:
-	#define CHAR_CAN_BUILD(ch, ttype)  (CHAR_CAN_BUILD_BASIC(ch, ttype) && CHAR_CAN_BUILD_LEARNED(ch, ttype) && CHAR_CAN_BUILD_ABIL(ch, ttype) && CHAR_CAN_BUILD_REQOBJ(ch, ttype))
-	
-	skip_spaces(&argument);
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot use the build command.\r\n");
-		return;
-	}
-	if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
-		send_config_msg(ch, "need_approval_string");
-		return;
-	}
-	
-	argument = any_one_word(argument, arg);
-	skip_spaces(&argument);
-	
-	// optional info arg
-	if (!str_cmp(arg, "info")) {
-		show_craft_info(ch, argument, CRAFT_TYPE_BUILD);
-		return;
-	}
-	// all other functions require standing
-	if (GET_POS(ch) < POS_STANDING) {
-		send_low_pos_msg(ch);
-		return;
-	}
-	if (*arg && GET_BUILDING(IN_ROOM(ch)) && IS_INCOMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "To continue working on this building, just type 'build' with no argument.\r\n");
-		return;
-	}
-	
-	// this figures out if the argument was a build recipe
-	if (*arg) {
-		HASH_ITER(sorted_hh, sorted_crafts, iter, next_iter) {
-			if (!CHAR_CAN_BUILD_BASIC(ch, iter)) {
-				continue;	// basic checks first
-			}
-			if (!is_abbrev(arg, GET_CRAFT_NAME(iter))) {
-				continue;	// preliminary arg test saves some lookups
-			}
-			
-			// ok, probably a match: test if they can build it
-			if (CHAR_CAN_BUILD(ch, iter)) {
-				if (!str_cmp(arg, GET_CRAFT_NAME(iter))) {
-					type = iter;
-					break;
-				}
-				else if (!abbrev_match && is_abbrev(arg, GET_CRAFT_NAME(iter))) {
-					abbrev_match = iter;
-				}
-			}
-			else if (!CHAR_CAN_BUILD_ABIL(ch, iter) && CHAR_CAN_BUILD_LEARNED(ch, iter) && CHAR_CAN_BUILD_REQOBJ(ch, iter)) {
-				// if ONLY missing the ability
-				missing_abil = GET_CRAFT_ABILITY(iter);
-			}
-		}
-	}
-	
-	// prefer exact matches
-	if (!type && abbrev_match) {
-		type = abbrev_match;
-	}
-	
-	// find the required-to-build obj if there is one
-	if (type && GET_CRAFT_REQUIRES_OBJ(type) != NOTHING) {
-		found_obj = get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(type), ch->carrying);
-	}
-	
-	if (!type && missing_abil != NOTHING) {
-		msg_to_char(ch, "You need the %s ability to build that.\r\n", get_ability_name_by_vnum(missing_abil));
-	}
-	else if (!*arg || !type) {
-		/* Cancel building */
-		if (GET_ACTION(ch) == ACT_BUILDING) {
-			msg_to_char(ch, "You stop building.\r\n");
-			act("$n stops building.", FALSE, ch, 0, 0, TO_ROOM);
-			GET_ACTION(ch) = ACT_NONE;
-		}
-		
-		/* Continue building */
-		else if (IS_INCOMPLETE(IN_ROOM(ch))) {
-			if (GET_ACTION(ch) != ACT_NONE) {
-				msg_to_char(ch, "You're kinda busy right now.\r\n");
-			}
-			else if (IS_BURNING(IN_ROOM(ch))) {
-				msg_to_char(ch, "You can't work on a burning building!\r\n");
-			}
-			else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-				msg_to_char(ch, "It's too dark to work on the building.\r\n");
-			}
-			else {
-				start_action(ch, ACT_BUILDING, 0);
-				msg_to_char(ch, "You start building.\r\n");
-				act("$n starts building.", FALSE, ch, 0, 0, TO_ROOM);
-			}
-		}
-		
-		// needs maintenance instead of build?
-		else if (IS_COMPLETE(IN_ROOM(ch)) && BUILDING_RESOURCES(IN_ROOM(ch))) {
-			msg_to_char(ch, "Use 'maintain' to repair the building.\r\n");
-		}
-		
-		// is being dismantled
-		else if (IS_DISMANTLING(IN_ROOM(ch))) {
-			msg_to_char(ch, "The building is being dismantled, you can't rebuild it now.\r\n");
-		}
-		
-		/* Send output */
-		else {
-			if (*arg) {
-				msg_to_char(ch, "You don't know how to build '%s'.\r\n", arg);
-			}
-			else {
-				msg_to_char(ch, "Usage: build <structure> [direction]\r\n");
-				msg_to_char(ch, "       build info <structure>\r\n");
-			}
-			msg_to_char(ch, "You know how to build:\r\n");
-			this_line = FALSE;
-			found_any = FALSE;
-			*buf = '\0';
-		
-			HASH_ITER(sorted_hh, sorted_crafts, iter, next_iter) {
-				if (CHAR_CAN_BUILD(ch, iter)) {
-					if (strlen(buf) + strlen(GET_CRAFT_NAME(iter)) + 2 >= 80) {
-						this_line = FALSE;
-						msg_to_char(ch, "%s\r\n", buf);
-						*buf = '\0';
-					}
-					sprintf(buf + strlen(buf), "%s%s", (this_line ? ", " : " "), GET_CRAFT_NAME(iter));
-					this_line = TRUE;
-					found_any = TRUE;
-				}
-			}
-			if (!found_any) {
-				msg_to_char(ch, " nothing\r\n");
-			}
-			else if (this_line) {
-				msg_to_char(ch, "%s\r\n", buf);
-			}
-		}
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're already busy.\r\n");
-	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait)) {
-		msg_to_char(ch, "You can only build that in a city%s.\r\n", wait ? " (this city was founded too recently)" : "");
-	}
-	else if (CRAFT_FLAGGED(type, CRAFT_BY_RIVER) && !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1)) {
-		msg_to_char(ch, "You must build that next to a river.\r\n");
-	}
-	else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type))) {
-		msg_to_char(ch, "You don't have the skill to erect that structure.\r\n");
-	}
-	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
-		msg_to_char(ch, "You need to have a crafting level of %d to build that.\r\n", GET_CRAFT_MIN_LEVEL(type));
-	}
-	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
-		msg_to_char(ch, "You can't build on unclaimable land.\r\n");
-	}
-	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
-		msg_to_char(ch, "You can't build here until the adventure is gone.\r\n");
-	}
-	else if (!can_build_or_claim_at_war(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't build here while at war with the empire that controls this area.\r\n");
-	}
-	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !found_obj) {
-		msg_to_char(ch, "You need to have %s to build that.\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(type)));
-	}
-	else if (!(e = get_or_create_empire(ch)) && FALSE) {
-		msg_to_char(ch, "You will never see this line, it's only here to set up an empire!\r\n");
-	}
-	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch))) {
-		msg_to_char(ch, "You don't have permission to build anything.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
-		msg_to_char(ch, "You don't have permission to build here.\r\n");
-	}
-	else if (!can_build_on(IN_ROOM(ch), GET_CRAFT_BUILD_ON(type))) {
-		ordered_sprintbit(GET_CRAFT_BUILD_ON(type), bld_on_flags, bld_on_flags_order, TRUE, buf);
-		msg_to_char(ch, "You need to build on: %s\r\n", buf);
-	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to build anything here.\r\n");
-	}
-	else if (GET_CRAFT_BUILD_TYPE(type) == NOTHING || !building_proto(GET_CRAFT_BUILD_TYPE(type))) {
-		msg_to_char(ch, "That build recipe is not implemented.\r\n");
-	}
-	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && !consume_otrigger(found_obj, ch, OCMD_BUILD, NULL)) {
-		return;	// the trigger should send its own message if it prevented this
-	}
-	else if (GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
-		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
-		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
-			msg_to_char(ch, "You need the following tools to build that: %s\r\n", buf1);
-		}
-		else {
-			msg_to_char(ch, "You need %s %s to build that.\r\n", AN(buf1), buf1);
-		}
-	}
-	else {
-		found = TRUE;
-	}
-
-	/* 'found' is used for clean viewing */
-	if (!found)
-		return;
-
-	is_closed = !IS_SET(GET_BLD_FLAGS(building_proto(GET_CRAFT_BUILD_TYPE(type))), BLD_OPEN);
-	needs_facing = (GET_CRAFT_BUILD_FACING(type) != NOBITS) || is_closed;
-	needs_reverse = needs_facing && IS_SET(GET_BLD_FLAGS(building_proto(GET_CRAFT_BUILD_TYPE(type))), BLD_TWO_ENTRANCES);
-
-	if ((is_closed || IS_SET(GET_BLD_FLAGS(building_proto(GET_CRAFT_BUILD_TYPE(type))), BLD_BARRIER)) && is_entrance(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't build in front of an entrance.\r\n");
-		return;
-	}
-
-	if (needs_facing) {
-		if (!*argument || (dir = parse_direction(ch, argument)) == NO_DIR) {
-			msg_to_char(ch, "Which direction would you like to face this building?\r\n");
-			return;
-		}
-				
-		// must be a flat map direction
-		if (dir >= NUM_2D_DIRS) {
-			msg_to_char(ch, "You can't face it that direction.\r\n");
-			return;
-		}
-
-		if (!(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
-			msg_to_char(ch, "You can't face it that direction.\r\n");
-			return;
-		}
-
-		if (!can_build_on(to_room, GET_CRAFT_BUILD_FACING(type))) {
-			ordered_sprintbit(GET_CRAFT_BUILD_FACING(type), bld_on_flags, bld_on_flags_order, TRUE, buf);
-			msg_to_char(ch, "You need to build facing: %s\r\n", buf);
-			return;
-		}
-	}
-	
-	if (needs_reverse) {
-		to_rev = real_shift(IN_ROOM(ch), shift_dir[rev_dir[dir]][0], shift_dir[rev_dir[dir]][1]);
-
-		if (!to_rev || !can_build_on(to_rev, GET_CRAFT_BUILD_FACING(type))) {
-			ordered_sprintbit(GET_CRAFT_BUILD_FACING(type), bld_on_flags, bld_on_flags_order, TRUE, buf);
-			msg_to_char(ch, "You need to build with the reverse side facing: %s\r\n", buf);
-			return;
-		}
-	}
-		
-	// begin setup
-	construct_building(IN_ROOM(ch), GET_CRAFT_BUILD_TYPE(type));
-	set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
-	if (!IS_NPC(ch)) {
-		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
-	}
-	
-	special_building_setup(ch, IN_ROOM(ch));
-	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
-	SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
-	GET_BUILDING_RESOURCES(IN_ROOM(ch)) = copy_resource_list(GET_CRAFT_RESOURCES(type));
-	
-	// can_claim checks total available land, but the outside is check done within this block
-	if (!ROOM_OWNER(IN_ROOM(ch)) && can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
-		if (e || (e = get_or_create_empire(ch))) {
-			ter_type = get_territory_type_for_empire(IN_ROOM(ch), e, FALSE, &junk);
-			if (EMPIRE_TERRITORY(e, ter_type) < land_can_claim(e, ter_type)) {
-				claim_room(IN_ROOM(ch), e);
-			}
-		}
-	}
-
-	// closed buildings
-	if (is_closed) {
-		create_exit(IN_ROOM(ch), to_room, dir, FALSE);
-		if (needs_reverse) {
-			create_exit(IN_ROOM(ch), to_rev, rev_dir[dir], FALSE);
-		}
-
-		// entrance is the direction you type TO ENTER, so it's the reverse of the facing dir
-		COMPLEX_DATA(IN_ROOM(ch))->entrance = rev_dir[dir];
-		herd_animals_out(IN_ROOM(ch));
-	}
-
-	// take away the required item
-	if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && found_obj && CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ)) {
-		act("You use $p.", FALSE, ch, found_obj, NULL, TO_CHAR);
-		extract_obj(found_obj);
-	}
-
-	start_action(ch, ACT_BUILDING, 0);
-	msg_to_char(ch, "You start to build %s %s!\r\n", AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
-	sprintf(buf, "$n begins to build %s %s!", AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
-	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
-	
-	// do a build action now
-	process_build(ch, IN_ROOM(ch), ACT_BUILDING);
-}
-
 
 /**
 * Processes the "dismantle" command when targeting a vehicle. It resumes
