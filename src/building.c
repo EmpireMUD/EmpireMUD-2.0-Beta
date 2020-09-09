@@ -173,7 +173,7 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 		msg_to_char(ch, "You can't %s that anywhere.\r\n", command);
 		return FALSE;
 	}
-	if ((is_closed || (to_build || IS_SET(GET_BLD_FLAGS(to_build), BLD_BARRIER))) && is_entrance(IN_ROOM(ch))) {
+	if ((is_closed || (to_build && IS_SET(GET_BLD_FLAGS(to_build), BLD_BARRIER))) && is_entrance(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't %s that in front of a building entrance.\r\n", command);
 		return FALSE;
 	}
