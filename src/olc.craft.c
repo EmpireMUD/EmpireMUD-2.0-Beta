@@ -653,12 +653,6 @@ void olc_show_craft(char_data *ch) {
 			strcpy(lbuf, GET_BLD_NAME(building_proto(GET_CRAFT_BUILD_TYPE(craft))));
 		}
 		sprintf(buf + strlen(buf), "<%sbuilds\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_CRAFT_BUILD_TYPE(craft), NOTHING), GET_CRAFT_BUILD_TYPE(craft), lbuf);
-		
-		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf1);
-		sprintf(buf + strlen(buf), "<%sbuildon\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_BUILD_ON(craft), NOBITS), buf1);
-		
-		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, buf1);
-		sprintf(buf + strlen(buf), "<%sbuildfacing\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_BUILD_FACING(craft), NOBITS), buf1);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
 		sprintf(buf + strlen(buf), "<%sliquid\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_CRAFT_OBJECT(craft), NOTHING), GET_CRAFT_OBJECT(craft), get_generic_name_by_vnum(GET_CRAFT_OBJECT(craft)));
@@ -674,6 +668,14 @@ void olc_show_craft(char_data *ch) {
 		obj_data *proto = obj_proto(GET_CRAFT_OBJECT(craft));
 		sprintf(buf + strlen(buf), "<%screates\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_CRAFT_OBJECT(craft), NOTHING), GET_CRAFT_OBJECT(craft), !proto ? "nothing" : GET_OBJ_SHORT_DESC(proto));
 		sprintf(buf + strlen(buf), "<%squantity\t0> x%d\r\n", OLC_LABEL_VAL(GET_CRAFT_QUANTITY(craft), 0), GET_CRAFT_QUANTITY(craft));
+	}
+	
+	if (CRAFT_IS_BUILDING(craft) || CRAFT_IS_VEHICLE(craft)) {
+		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf1);
+		sprintf(buf + strlen(buf), "<%sbuildon\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_BUILD_ON(craft), NOBITS), buf1);
+		
+		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, buf1);
+		sprintf(buf + strlen(buf), "<%sbuildfacing\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_BUILD_FACING(craft), NOBITS), buf1);
 	}
 	
 	// ability required
