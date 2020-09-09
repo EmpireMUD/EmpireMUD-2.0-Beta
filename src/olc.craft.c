@@ -753,8 +753,8 @@ OLC_MODULE(cedit_ability) {
 OLC_MODULE(cedit_buildfacing) {	
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	
-	if (!CRAFT_IS_BUILDING(craft)) {
-		msg_to_char(ch, "You can only set that property on a building.\r\n");
+	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft) && !GET_CRAFT_BUILD_FACING(craft)) {
+		msg_to_char(ch, "You can only set that property on a building or vehicle.\r\n");
 	}
 	else {
 		GET_CRAFT_BUILD_FACING(craft) = olc_process_flag(ch, argument, "build-facing", "buildfacing", bld_on_flags, GET_CRAFT_BUILD_FACING(craft));
@@ -765,8 +765,8 @@ OLC_MODULE(cedit_buildfacing) {
 OLC_MODULE(cedit_buildon) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	
-	if (!CRAFT_IS_BUILDING(craft)) {
-		msg_to_char(ch, "You can only set that property on a building.\r\n");
+	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft) && !GET_CRAFT_BUILD_ON(craft)) {
+		msg_to_char(ch, "You can only set that property on a building or vehicle.\r\n");
 	}
 	else {
 		GET_CRAFT_BUILD_ON(craft) = olc_process_flag(ch, argument, "build-on", "buildon", bld_on_flags, GET_CRAFT_BUILD_ON(craft));
