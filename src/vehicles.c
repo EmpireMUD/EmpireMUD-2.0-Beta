@@ -234,7 +234,7 @@ craft_data *find_craft_for_vehicle(vehicle_data *veh) {
 	}
 	else {
 		HASH_ITER(hh, craft_table, craft, next_craft) {
-			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT) || !CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT) || !CRAFT_IS_VEHICLE(craft)) {
 				continue;	// not a valid target
 			}
 			if (GET_CRAFT_OBJECT(craft) != VEH_VNUM(veh)) {
@@ -1150,7 +1150,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	
 	// crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
-		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
+		if (CRAFT_IS_VEHICLE(craft) && GET_CRAFT_OBJECT(craft) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}
@@ -2602,7 +2602,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	// update crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		found = FALSE;
-		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
+		if (CRAFT_IS_VEHICLE(craft) && GET_CRAFT_OBJECT(craft) == vnum) {
 			GET_CRAFT_OBJECT(craft) = NOTHING;
 			found = TRUE;
 		}
@@ -2670,7 +2670,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	LL_FOREACH(descriptor_list, desc) {
 		if (GET_OLC_CRAFT(desc)) {
 			found = FALSE;
-			if (CRAFT_FLAGGED(GET_OLC_CRAFT(desc), CRAFT_VEHICLE) && GET_OLC_CRAFT(desc)->object == vnum) {
+			if (CRAFT_IS_VEHICLE(GET_OLC_CRAFT(desc)) && GET_OLC_CRAFT(desc)->object == vnum) {
 				GET_OLC_CRAFT(desc)->object = NOTHING;
 				found = TRUE;
 			}

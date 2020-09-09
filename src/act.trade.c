@@ -655,11 +655,11 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	
 	msg_to_char(ch, "Information for %s:\r\n", GET_CRAFT_NAME(craft));
 	
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+	if (CRAFT_IS_BUILDING(craft)) {
 		bld = building_proto(GET_CRAFT_BUILD_TYPE(craft));
 		msg_to_char(ch, "Builds: %s\r\n", bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 	}
-	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+	else if (CRAFT_IS_VEHICLE(craft)) {
 		if ((veh = vehicle_proto(GET_CRAFT_OBJECT(craft)))) {
 			msg_to_char(ch, "Creates %s: %s\r\n", VEH_OR_BLD(veh), VEH_SHORT_DESC(veh));
 		}
@@ -777,7 +777,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	prettier_sprintbit(GET_CRAFT_FLAGS(craft), craft_flag_for_info, part);
 	msg_to_char(ch, "Notes: %s\r\n", part);
 	
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+	if (CRAFT_IS_BUILDING(craft)) {
 		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "Build on: %s\r\n", buf);
 		if (GET_CRAFT_BUILD_FACING(craft)) {
@@ -881,7 +881,7 @@ void cancel_gen_craft(char_data *ch) {
 	craft_data *type = craft_proto(GET_ACTION_VNUM(ch, 0));
 	obj_data *obj;
 	
-	if (type && !CRAFT_FLAGGED(type, CRAFT_VEHICLE)) {
+	if (type && !CRAFT_IS_VEHICLE(type)) {
 		// refund the real resources they used
 		give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
 		free_resource_list(GET_ACTION_RESOURCES(ch));
@@ -939,7 +939,7 @@ craft_data *find_craft_for_obj_vnum(obj_vnum vnum) {
 	craft_data *iter, *next_iter;
 	
 	HASH_ITER(hh, craft_table, iter, next_iter) {
-		if (!IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_SOUP | CRAFT_VEHICLE) && GET_CRAFT_TYPE(iter) != CRAFT_TYPE_BUILD && GET_CRAFT_OBJECT(iter) == vnum) {
+		if (!IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_SOUP) && !CRAFT_IS_VEHICLE(iter) && !CRAFT_IS_BUILDING(iter) && GET_CRAFT_OBJECT(iter) == vnum) {
 			return iter;
 		}
 	}
@@ -963,8 +963,8 @@ void finish_gen_craft(char_data *ch) {
 	
 	GET_ACTION(ch) = ACT_NONE;
 
-	// basic sanity checking (vehicles are finished elsewhere
-	if (!type || CRAFT_FLAGGED(type, CRAFT_VEHICLE)) {
+	// basic sanity checking (vehicles are finished elsewhere)
+	if (!type || CRAFT_IS_VEHICLE(type) || CRAFT_IS_BUILDING(type)) {
 		return;
 	}
 	
@@ -1154,7 +1154,7 @@ void process_gen_craft(char_data *ch) {
 	}
 	
 	// pass off control entirely for a vehicle craft
-	if (CRAFT_FLAGGED(type, CRAFT_VEHICLE)) {
+	if (CRAFT_IS_VEHICLE(type)) {
 		process_gen_craft_vehicle(ch, type);
 		return;
 	}
@@ -1533,7 +1533,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	bool junk;
 	
 	// basic sanitation
-	if (!type || !CRAFT_FLAGGED(type, CRAFT_VEHICLE) || !(to_craft = vehicle_proto(GET_CRAFT_OBJECT(type)))) {
+	if (!type || !CRAFT_IS_VEHICLE(type) || !(to_craft = vehicle_proto(GET_CRAFT_OBJECT(type)))) {
 		log("SYSERR: do_gen_craft_vehicle called with invalid vehicle craft %d", type ? GET_CRAFT_VNUM(type) : NOTHING);
 		return;
 	}
@@ -1766,7 +1766,7 @@ ACMD(do_gen_craft) {
 	else if (!check_can_craft(ch, type)) {
 		// sends its own messages
 	}
-	else if (CRAFT_FLAGGED(type, CRAFT_VEHICLE)) {
+	else if (CRAFT_IS_VEHICLE(type)) {
 		// vehicles pass off at this point
 		do_gen_craft_vehicle(ch, type);
 	}

@@ -1426,7 +1426,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 	crafts_found = 0;
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		// must be a live recipe; must make an item
-		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT | CRAFT_SOUP | CRAFT_VEHICLE) || GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT | CRAFT_SOUP) || CRAFT_IS_VEHICLE(craft) || CRAFT_IS_BUILDING(craft)) {
 			continue;
 		}
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && CRAFT_FLAGGED(craft, CRAFT_TAKE_REQUIRED_OBJ)) {

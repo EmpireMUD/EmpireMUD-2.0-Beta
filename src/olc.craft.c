@@ -94,7 +94,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 	}
 	
 	// different types of crafts
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {	// buildings only
+	if (CRAFT_IS_BUILDING(craft)) {	// buildings only
 		if (GET_CRAFT_BUILD_TYPE(craft) == NOTHING || !(bld = building_proto(GET_CRAFT_BUILD_TYPE(craft)))) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft makes nothing");
 			problem = TRUE;
@@ -120,7 +120,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			problem = TRUE;
 		}
 	}
-	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {	// vehicles only
+	else if (CRAFT_IS_VEHICLE(craft)) {	// vehicles only
 		if (GET_CRAFT_OBJECT(craft) == NOTHING || !vehicle_proto(GET_CRAFT_OBJECT(craft))) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft makes nothing");
 			problem = TRUE;
@@ -145,14 +145,14 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		}
 	}
 	
-	count = (CRAFT_FLAGGED(craft, CRAFT_SOUP) ? 1 : 0) + (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) ? 1 : 0) + ((GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) ? 1 : 0);
+	count = (CRAFT_FLAGGED(craft, CRAFT_SOUP) ? 1 : 0) + (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) ? 1 : 0) + ((GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD || CRAFT_FLAGGED(craft, CRAFT_BUILDING)) ? 1 : 0);
 	if (count > 1) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Unusual combination of SOUP, VEHICLE, BUILD");
 		problem = TRUE;
 	}
 	
 	// anything not a building
-	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD) {
+	if (!CRAFT_IS_BUILDING(craft)) {
 		if (GET_CRAFT_QUANTITY(craft) == 0) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates 0 quantity");
 			problem = TRUE;
@@ -645,7 +645,7 @@ void olc_show_craft(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sname\t0> %s\r\n", OLC_LABEL_STR(GET_CRAFT_NAME(craft), default_craft_name), GET_CRAFT_NAME(craft));
 	sprintf(buf + strlen(buf), "<%stype\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_TYPE(craft), 0), craft_types[GET_CRAFT_TYPE(craft)]);
 	
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+	if (CRAFT_IS_BUILDING(craft)) {
 		if (GET_CRAFT_BUILD_TYPE(craft) == NOTHING || !building_proto(GET_CRAFT_BUILD_TYPE(craft))) {
 			strcpy(lbuf, "nothing");
 		}
@@ -664,7 +664,7 @@ void olc_show_craft(char_data *ch) {
 		sprintf(buf + strlen(buf), "<%sliquid\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_CRAFT_OBJECT(craft), NOTHING), GET_CRAFT_OBJECT(craft), get_generic_name_by_vnum(GET_CRAFT_OBJECT(craft)));
 		sprintf(buf + strlen(buf), "<%svolume\t0> %d drink%s\r\n", OLC_LABEL_VAL(GET_CRAFT_QUANTITY(craft), 0), GET_CRAFT_QUANTITY(craft), (GET_CRAFT_QUANTITY(craft) != 1 ? "s" : ""));
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_VEHICLE)) {
+	else if (CRAFT_IS_VEHICLE(craft)) {
 		vehicle_data *proto = vehicle_proto(GET_CRAFT_OBJECT(craft));
 		sprintf(buf + strlen(buf), "<%screates\t0> [%d] %s\r\n", OLC_LABEL_VAL(GET_CRAFT_OBJECT(craft), NOTHING), GET_CRAFT_OBJECT(craft), !proto ? "nothing" : VEH_SHORT_DESC(proto));
 	
@@ -690,7 +690,7 @@ void olc_show_craft(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "<%slevelrequired\t0> %d\r\n", OLC_LABEL_VAL(GET_CRAFT_MIN_LEVEL(craft), 0), GET_CRAFT_MIN_LEVEL(craft));
 
-	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft)) {
 		seconds = (GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME);
 		sprintf(buf + strlen(buf), "<%stime\t0> %d action tick%s (%d:%02d)\r\n", OLC_LABEL_VAL(GET_CRAFT_TIME(craft), 1), GET_CRAFT_TIME(craft), (GET_CRAFT_TIME(craft) != 1 ? "s" : ""), seconds / 60, seconds % 60);
 	}
@@ -751,7 +751,7 @@ OLC_MODULE(cedit_ability) {
 OLC_MODULE(cedit_buildfacing) {	
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	
-	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD) {
+	if (!CRAFT_IS_BUILDING(craft)) {
 		msg_to_char(ch, "You can only set that property on a building.\r\n");
 	}
 	else {
@@ -763,7 +763,7 @@ OLC_MODULE(cedit_buildfacing) {
 OLC_MODULE(cedit_buildon) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	
-	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD) {
+	if (!CRAFT_IS_BUILDING(craft)) {
 		msg_to_char(ch, "You can only set that property on a building.\r\n");
 	}
 	else {
@@ -776,7 +776,7 @@ OLC_MODULE(cedit_builds) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	any_vnum old_b;
 	
-	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD) {
+	if (!CRAFT_IS_BUILDING(craft)) {
 		msg_to_char(ch, "You can only set that property on a building.\r\n");
 		return;
 	}
@@ -804,10 +804,10 @@ OLC_MODULE(cedit_creates) {
 	if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
 		msg_to_char(ch, "You can't set that property on a soup.\r\n");
 	}
-	else if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+	else if (CRAFT_IS_BUILDING(craft)) {
 		msg_to_char(ch, "You can't set that property on a building.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_VEHICLE)) {
+	else if (CRAFT_IS_VEHICLE(craft)) {
 		GET_CRAFT_OBJECT(craft) = olc_process_number(ch, argument, "vehicle vnum", "creates", 0, MAX_VNUM, GET_CRAFT_OBJECT(craft));
 		if (!vehicle_proto(GET_CRAFT_OBJECT(craft))) {
 			GET_CRAFT_OBJECT(craft) = old;
@@ -833,11 +833,11 @@ OLC_MODULE(cedit_creates) {
 OLC_MODULE(cedit_flags) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	bool had_in_dev = IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) ? TRUE : FALSE;
-	bitvector_t has_flags, had_flags = GET_CRAFT_FLAGS(craft) & (CRAFT_VEHICLE | CRAFT_SOUP);
+	bitvector_t has_flags, had_flags = GET_CRAFT_FLAGS(craft) & (CRAFT_VEHICLE | CRAFT_SOUP | CRAFT_BUILDING);
 	
 	GET_CRAFT_FLAGS(craft) = olc_process_flag(ch, argument, "craft", "flags", craft_flags, GET_CRAFT_FLAGS(craft));
 	
-	has_flags = GET_CRAFT_FLAGS(craft) & (CRAFT_VEHICLE | CRAFT_SOUP);
+	has_flags = GET_CRAFT_FLAGS(craft) & (CRAFT_VEHICLE | CRAFT_SOUP | CRAFT_BUILDING);
 	if (has_flags != had_flags) {
 		// clear these when vehicle/soup flags are added/removed
 		GET_CRAFT_QUANTITY(craft) = 1;
@@ -862,7 +862,7 @@ OLC_MODULE(cedit_liquid) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	any_vnum old;
 	
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD || !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
+	if (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
 		msg_to_char(ch, "You can only set the liquid type on a soup.\r\n");
 	}
 	else {
@@ -892,10 +892,10 @@ OLC_MODULE(cedit_quantity) {
 	if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
 		msg_to_char(ch, "You can't set that on a soup.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_VEHICLE)) {
+	else if (CRAFT_IS_VEHICLE(craft)) {
 		msg_to_char(ch, "You can't set that on a vehicle craft.\r\n");
 	}
-	else if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+	else if (CRAFT_IS_BUILDING(craft)) {
 		msg_to_char(ch, "You can't set that property on a building.\r\n");
 	}
 	else {
@@ -940,10 +940,10 @@ OLC_MODULE(cedit_resource) {
 OLC_MODULE(cedit_time) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+	if (CRAFT_IS_BUILDING(craft)) {
 		msg_to_char(ch, "You can't set that property on a building.\r\n");
 	}
-	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+	else if (CRAFT_IS_VEHICLE(craft)) {
 		msg_to_char(ch, "You can't set that property on a vehicle craft.\r\n");
 	}
 	else {
@@ -967,7 +967,7 @@ OLC_MODULE(cedit_type) {
 	// things that reset when type is changed
 	if (GET_CRAFT_TYPE(craft) != old) {
 		// if it changed to or from build, clear all the things that toggle for build
-		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD || old == CRAFT_TYPE_BUILD) {
+		if (CRAFT_IS_BUILDING(craft) || old == CRAFT_TYPE_BUILD) {
 			GET_CRAFT_OBJECT(craft) = NOTHING;
 			GET_CRAFT_QUANTITY(craft) = 0;
 			GET_CRAFT_TIME(craft) = 1;
@@ -983,7 +983,7 @@ OLC_MODULE(cedit_type) {
 OLC_MODULE(cedit_volume) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD || !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
+	if (!IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP)) {
 		msg_to_char(ch, "You can only set the drink volume on a soup.\r\n");
 	}
 	else {

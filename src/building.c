@@ -478,7 +478,7 @@ craft_data *find_build_craft(bld_vnum build_type) {
 	craft_data *iter, *next_iter;
 	
 	HASH_ITER(hh, craft_table, iter, next_iter) {
-		if (GET_CRAFT_TYPE(iter) == CRAFT_TYPE_BUILD && GET_CRAFT_BUILD_TYPE(iter) == build_type) {
+		if (CRAFT_IS_BUILDING(iter) && GET_CRAFT_BUILD_TYPE(iter) == build_type) {
 			return iter;
 		}
 	}
@@ -1230,7 +1230,7 @@ ACMD(do_build) {
 	bool junk, wait;
 	
 	// rules for ch building a given craft
-	#define CHAR_CAN_BUILD_BASIC(ch, ttype)  (GET_CRAFT_TYPE((ttype)) == CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)))
+	#define CHAR_CAN_BUILD_BASIC(ch, ttype)  (CRAFT_IS_BUILDING(ttype) && !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY) && (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS((ttype)), CRAFT_IN_DEVELOPMENT)))
 	#define CHAR_CAN_BUILD_LEARNED(ch, ttype)  (!IS_SET(GET_CRAFT_FLAGS(ttype), CRAFT_LEARNED) || has_learned_craft(ch, GET_CRAFT_VNUM(ttype)))
 	#define CHAR_CAN_BUILD_ABIL(ch, ttype)  (GET_CRAFT_ABILITY((ttype)) == NO_ABIL || has_ability((ch), GET_CRAFT_ABILITY((ttype))))
 	#define CHAR_CAN_BUILD_REQOBJ(ch, ttype)  (GET_CRAFT_REQUIRES_OBJ(ttype) == NOTHING || get_obj_in_list_vnum(GET_CRAFT_REQUIRES_OBJ(ttype), ch->carrying))
@@ -2600,7 +2600,7 @@ ACMD(do_upgrade) {
 		// ok, we know it's upgradeable and they have permission... now locate the upgrade craft...
 		type = NULL;
 		HASH_ITER(hh, craft_table, iter, next_iter) {
-			if (GET_CRAFT_TYPE(iter) == CRAFT_TYPE_BUILD && IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_UPGRADE) && GET_CRAFT_BUILD_TYPE(iter) == GET_BLD_VNUM(found_bld)) {
+			if (CRAFT_IS_BUILDING(iter) && IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_UPGRADE) && GET_CRAFT_BUILD_TYPE(iter) == GET_BLD_VNUM(found_bld)) {
 				if (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_IN_DEVELOPMENT)) {
 					type = iter;
 					break;

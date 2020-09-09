@@ -778,7 +778,7 @@ void check_for_bad_buildings(void) {
 	
 	// check craft "build" recipes: disable
 	HASH_ITER(hh, craft_table, craft, next_craft) {
-		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD && !building_proto(GET_CRAFT_BUILD_TYPE(craft))) {
+		if (CRAFT_IS_BUILDING(craft) && !building_proto(GET_CRAFT_BUILD_TYPE(craft))) {
 			GET_CRAFT_BUILD_TYPE(craft) = NOTHING;
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
 			log(" disabling craft %d for bad building type", GET_CRAFT_VNUM(craft));
@@ -789,7 +789,7 @@ void check_for_bad_buildings(void) {
 	// check craft recipes of people using olc: disable and warn
 	for (dd = descriptor_list; dd; dd = dd->next) {
 		if (GET_OLC_TYPE(dd) == OLC_CRAFT && GET_OLC_CRAFT(dd)) {
-			if (GET_OLC_CRAFT(dd)->type == CRAFT_TYPE_BUILD && !building_proto(GET_OLC_CRAFT(dd)->build_type)) {
+			if (CRAFT_IS_BUILDING(GET_OLC_CRAFT(dd)) && !building_proto(GET_OLC_CRAFT(dd)->build_type)) {
 				GET_OLC_CRAFT(dd)->build_type = NOTHING;
 				SET_BIT(GET_OLC_CRAFT(dd)->flags, CRAFT_IN_DEVELOPMENT);
 				msg_to_desc(dd, "&RYou are editing a craft recipe whose building has been deleted. Building type removed.&0\r\n");

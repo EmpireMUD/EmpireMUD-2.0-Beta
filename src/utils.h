@@ -466,6 +466,8 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_CRAFT_VNUM(craft)  ((craft)->vnum)
 
 #define CRAFT_FLAGGED(cr, flg)  (IS_SET(GET_CRAFT_FLAGS(cr), (flg)) ? TRUE : FALSE)
+#define CRAFT_IS_BUILDING(craft)  ((GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD || CRAFT_FLAGGED(craft, CRAFT_BUILDING)) && !CRAFT_IS_VEHICLE(craft))
+#define CRAFT_IS_VEHICLE(craft)  CRAFT_FLAGGED((craft), CRAFT_VEHICLE)	// vehicle overrides building
 
 
  //////////////////////////////////////////////////////////////////////////////

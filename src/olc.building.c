@@ -421,7 +421,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	
 	// crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
-		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD && GET_CRAFT_BUILD_TYPE(craft) == vnum) {
+		if (CRAFT_IS_BUILDING(craft) && GET_CRAFT_BUILD_TYPE(craft) == vnum) {
 			GET_CRAFT_BUILD_TYPE(craft) = NOTHING;
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
@@ -513,7 +513,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 			}
 		}
 		if (GET_OLC_CRAFT(desc)) {
-			if (GET_OLC_CRAFT(desc)->type == CRAFT_TYPE_BUILD && GET_OLC_CRAFT(desc)->build_type == vnum) {
+			if (CRAFT_IS_BUILDING(GET_OLC_CRAFT(desc)) && GET_OLC_CRAFT(desc)->build_type == vnum) {
 				GET_OLC_CRAFT(desc)->build_type = NOTHING;
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
 				msg_to_desc(desc, "The building built by the craft you're editing was deleted.\r\n");
@@ -855,7 +855,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
-		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD && GET_CRAFT_BUILD_TYPE(craft) == vnum) {
+		if (CRAFT_IS_BUILDING(craft) && GET_CRAFT_BUILD_TYPE(craft) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 		}

@@ -1038,7 +1038,7 @@ typedef struct vehicle_data vehicle_data;
 
 // CRAFT_x: Craft Flags for do_gen_craft
 #define CRAFT_POTTERY  BIT(0)  // bonus at pottery; requires fire
-	#define CRAFT_UNUSED0  BIT(1)  // formerly "requires apiary tech"
+#define CRAFT_BUILDING  BIT(1)  // makes a building (on any craft type; BUILD type automatically counts as this)
 	#define CRAFT_UNUSED1  BIT(2)  // formerly "requires glassblowing tech"
 #define CRAFT_GLASSBLOWER  BIT(3)  // requires glassblower building
 #define CRAFT_CARPENTER  BIT(4)  // requires carpenter building

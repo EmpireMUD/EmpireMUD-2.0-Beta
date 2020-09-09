@@ -5444,11 +5444,11 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	
 	msg_to_char(ch, "Name: '&y%s&0', Vnum: [&g%d&0], Type: &c%s&0\r\n", GET_CRAFT_NAME(craft), GET_CRAFT_VNUM(craft), craft_types[GET_CRAFT_TYPE(craft)]);
 	
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+	if (CRAFT_IS_BUILDING(craft)) {
 		bld = building_proto(GET_CRAFT_BUILD_TYPE(craft));
 		msg_to_char(ch, "Builds: [&c%d&0] %s\r\n", GET_CRAFT_BUILD_TYPE(craft), bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 	}
-	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+	else if (CRAFT_IS_VEHICLE(craft)) {
 		msg_to_char(ch, "Creates Vehicle: [&c%d&0] %s\r\n", GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft))));
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
@@ -5464,7 +5464,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	}
 	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0", buf, GET_CRAFT_MIN_LEVEL(craft));
 	
-	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft)) {
 		seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
 		msg_to_char(ch, ", Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
 	}
@@ -5478,7 +5478,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, buf);
 	msg_to_char(ch, "Requires tool: &y%s&0\r\n", buf);
 	
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+	if (CRAFT_IS_BUILDING(craft)) {
 		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "Build on: &g%s&0\r\n", buf);
 		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
