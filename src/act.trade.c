@@ -1853,19 +1853,26 @@ ACMD(do_gen_craft) {
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
 				continue;	// not learned
 			}
-			// do this last because it records if they are just missing an ability
-			if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
-				missing_abil = GET_CRAFT_ABILITY(craft);
-				continue;	// missing ability
-			}
 			
 			// match so far...
 			if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (*short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
+				// do this last because it records if they are just missing an ability
+				if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+					missing_abil = GET_CRAFT_ABILITY(craft);
+					continue;	// missing ability
+				}
+				
 				// exact match!
 				type = craft;
 				break;
 			}
 			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (*short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
+				// do this last because it records if they are just missing an ability
+				if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+					missing_abil = GET_CRAFT_ABILITY(craft);
+					continue;	// missing ability
+				}
+				
 				// found! maybe
 				abbrev_match = craft;
 			}

@@ -1743,6 +1743,12 @@ ACMD(do_designate) {
 	else if (!ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't designate rooms here!\r\n");
 	}
+	else if (maxrooms <= 0) {
+		msg_to_char(ch, "You can't designate here.\r\n");
+	}
+	else if (subcmd == SCMD_DESIGNATE && hasrooms >= maxrooms) {
+		msg_to_char(ch, "There's no more free space.\r\n");
+	}
 	else if (subcmd == SCMD_DESIGNATE && ((dir = parse_direction(ch, arg)) == NO_DIR || !(veh_dirs ? can_designate_dir_vehicle[dir] : can_designate_dir[dir]))) {
 		msg_to_char(ch, "Invalid direction.\r\n");
 		msg_to_char(ch, "Usage: %s <room>\r\n", subcmd == SCMD_REDESIGNATE ? "redesignate" : "designate <direction>");
@@ -1766,14 +1772,8 @@ ACMD(do_designate) {
 	else if (subcmd == SCMD_REDESIGNATE && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_REDESIGNATE_TIME) + (config_get_int("redesignate_time") * SECS_PER_REAL_MIN) > time(0)) {
 		msg_to_char(ch, "You can't redesignate this %s so soon.\r\n", veh ? "part" : "room");
 	}
-	else if (maxrooms <= 0) {
-		msg_to_char(ch, "You can't designate here.\r\n");
-	}
 	else if (subcmd == SCMD_DESIGNATE && (ex = find_exit(IN_ROOM(ch), dir)) && ex->room_ptr) {
 		msg_to_char(ch, "There is already a room that direction.\r\n");
-	}
-	else if (subcmd == SCMD_DESIGNATE && hasrooms >= maxrooms) {
-		msg_to_char(ch, "There's no more free space.\r\n");
 	}
 	else if (GET_BLD_DESIGNATE_FLAGS(type) == NOBITS) {
 		msg_to_char(ch, "You can't designate that type of room!\r\n");
