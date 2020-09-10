@@ -842,6 +842,7 @@ OLC_MODULE(cedit_flags) {
 		// clear these when vehicle/soup flags are added/removed
 		GET_CRAFT_QUANTITY(craft) = 1;
 		GET_CRAFT_OBJECT(craft) = NOTHING;
+		GET_CRAFT_BUILD_TYPE(craft) = NOTHING;
 	}
 	
 	// validate removal of CRAFT_IN_DEVELOPMENT
@@ -960,22 +961,19 @@ OLC_MODULE(cedit_tools) {
 
 OLC_MODULE(cedit_type) {
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
-	int old = GET_CRAFT_TYPE(craft);
+	bool was_bld = CRAFT_IS_BUILDING(craft) ? TRUE : FALSE;
 	
 	GET_CRAFT_TYPE(craft) = olc_process_type(ch, argument, "type", "type", craft_types, GET_CRAFT_TYPE(craft));
 	
-	// things that reset when type is changed
-	if (GET_CRAFT_TYPE(craft) != old) {
-		// if it changed to or from build, clear all the things that toggle for build
-		if (CRAFT_IS_BUILDING(craft) || old == CRAFT_TYPE_BUILD) {
-			GET_CRAFT_OBJECT(craft) = NOTHING;
-			GET_CRAFT_QUANTITY(craft) = 0;
-			GET_CRAFT_TIME(craft) = 1;
-			GET_CRAFT_BUILD_TYPE(craft) = NOTHING;
-			GET_CRAFT_BUILD_ON(craft) = NOBITS;
-			GET_CRAFT_BUILD_FACING(craft) = NOBITS;
-			REMOVE_BIT(GET_CRAFT_FLAGS(craft), CRAFT_SOUP | CRAFT_VEHICLE);
-		}
+	// things that reset when type is changed to or from a building
+	if ((was_bld && !CRAFT_IS_BUILDING(craft)) || (!was_bld && CRAFT_IS_BUILDING(craft))) {
+		GET_CRAFT_OBJECT(craft) = NOTHING;
+		GET_CRAFT_QUANTITY(craft) = 1;
+		GET_CRAFT_TIME(craft) = 1;
+		GET_CRAFT_BUILD_TYPE(craft) = NOTHING;
+		GET_CRAFT_BUILD_ON(craft) = NOBITS;
+		GET_CRAFT_BUILD_FACING(craft) = NOBITS;
+		REMOVE_BIT(GET_CRAFT_FLAGS(craft), CRAFT_SOUP);
 	}
 }
 
