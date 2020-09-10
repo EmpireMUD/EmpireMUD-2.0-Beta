@@ -3043,6 +3043,8 @@ const char *evo_types[] = {
 	"HARVEST-TO",
 	"DEFAULT-HARVEST-TO",
 	"TIMED",	// 20
+	"OWNED",
+	"UNOWNED",
 	"\n"
 };
 
@@ -3070,6 +3072,8 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// harvest-to
 	EVO_VAL_NONE,	// default-harvest-to
 	EVO_VAL_NUMBER,	// timed (minutes)
+	EVO_VAL_NONE,	// owned
+	EVO_VAL_NONE,	// unowned
 };
 
 
@@ -3096,6 +3100,8 @@ bool evo_is_over_time[] = {
 	FALSE,	// harvest-to
 	FALSE,	// default-harvest-to
 	TRUE,	// timed
+	TRUE,	// owned
+	TRUE,	// unowned
 };
 
 

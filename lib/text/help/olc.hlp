@@ -6884,6 +6884,8 @@ Available types ([value] isn't used unless specified):
  &cDEFAULT-HARVEST-TO&0 - Becomes this sector if a crop is removed and there's
     no stored previous sector to return to.
  &cTIMED&0 - Occurs after the given number of minutes.
+ &cOWNED&0 - Evolves if the tile is claimed.
+ &cUNOWNED&0 - Evolves if the tile is not claimed.
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28

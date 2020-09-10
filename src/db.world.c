@@ -3830,7 +3830,7 @@ void load_world_map_from_file(void) {
 	struct map_data *map, *last = NULL;
 	struct depletion_data *dep;
 	struct track_data *track;
-	int var[7], x, y;
+	int var[8], x, y;
 	long l_in;
 	FILE *fl;
 	
@@ -3877,10 +3877,13 @@ void load_world_map_from_file(void) {
 		
 		// new room
 		if (isdigit(*line)) {
-			// x y island sect base natural crop
-			if (sscanf(line, "%d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6]) != 7) {
-				log("Encountered bad line in world map file: %s", line);
-				continue;
+			// x y island sect base natural crop misc
+			if (sscanf(line, "%d %d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6], &var[7]) != 8) {
+				var[7] = 0;	// backwards-compatible on the misc
+				if (sscanf(line, "%d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6]) != 7) {
+					log("Encountered bad line in world map file: %s", line);
+					continue;
+				}
 			}
 			if (var[0] < 0 || var[0] >= MAP_WIDTH || var[1] < 0 || var[1] >= MAP_HEIGHT) {
 				log("Encountered bad location in world map file: (%d, %d)", var[0], var[1]);
@@ -3905,6 +3908,7 @@ void load_world_map_from_file(void) {
 			map->base_sector = sector_proto(var[4]);
 			map->natural_sector = sector_proto(var[5]);
 			map->crop_type = crop_proto(var[6]);
+			// var[7] is ignored -- this is misc keys for the evolve.c utility
 			
 			last = map;	// store in case of more data
 		}
@@ -4008,7 +4012,9 @@ void save_world_map_to_file(void) {
 	struct track_data *track, *next_track;
 	struct map_data *iter;
 	long now = time(0);
+	room_data *room;
 	FILE *fl;
+	int misc;
 	
 	int tracks_lifespan = config_get_int("tracks_lifespan");
 	
@@ -4032,8 +4038,14 @@ void save_world_map_to_file(void) {
 			}
 		}
 		
-		// SAVE: x y island sect base natural crop
-		fprintf(fl, "%d %d %d %d %d %d %d\n", MAP_X_COORD(iter->vnum), MAP_Y_COORD(iter->vnum), iter->shared->island_id, (iter->sector_type ? GET_SECT_VNUM(iter->sector_type) : -1), (iter->base_sector ? GET_SECT_VNUM(iter->base_sector) : -1), (iter->natural_sector ? GET_SECT_VNUM(iter->natural_sector) : -1), (iter->crop_type ? GET_CROP_VNUM(iter->crop_type) : -1));
+		// misc is some extra flags we pass to the evolver here, and is not really read back in by the MUD
+		misc = 0;
+		if ((room = real_real_room(iter->vnum)) && ROOM_OWNER(room)) {
+			misc |= EVOLVER_OWNED;
+		}
+		
+		// SAVE: x y island sect base natural crop misc
+		fprintf(fl, "%d %d %d %d %d %d %d %d\n", MAP_X_COORD(iter->vnum), MAP_Y_COORD(iter->vnum), iter->shared->island_id, (iter->sector_type ? GET_SECT_VNUM(iter->sector_type) : -1), (iter->base_sector ? GET_SECT_VNUM(iter->base_sector) : -1), (iter->natural_sector ? GET_SECT_VNUM(iter->natural_sector) : -1), (iter->crop_type ? GET_CROP_VNUM(iter->crop_type) : -1), misc);
 		write_shared_room_data(fl, iter->shared);
 	}
 	

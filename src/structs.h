@@ -322,6 +322,10 @@ typedef struct vehicle_data vehicle_data;
 #define BAN_ALL  3
 
 
+// EVOLVER_x: flags passed through to evolve.c
+#define EVOLVER_OWNED  BIT(0)	// tile is owned
+
+
 // for modify.c
 #define FORMAT_INDENT	BIT(0)
 
@@ -2585,7 +2589,9 @@ typedef struct vehicle_data vehicle_data;
 #define EVO_HARVEST_TO  18	// always harvests to a specific sector type (no matter what it was when planted)
 #define EVO_DEFAULT_HARVEST_TO  19	// sect it becomes when harvested/cleared IF no data exists
 #define EVO_TIMED  20	// evolves after a certain number of minutes
-#define NUM_EVOS  21	// total
+#define EVO_OWNED  21	// evolves if owned
+#define EVO_UNOWNED  22	// evolves if un-owned
+#define NUM_EVOS  23	// total
 
 // EVO_VAL_x: evolution value types
 #define EVO_VAL_NONE  0
