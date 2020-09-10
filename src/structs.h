@@ -5558,6 +5558,7 @@ struct vehicle_attribute_data {
 	struct extra_descr_data *ex_description;	// extra descriptions
 	struct interaction_item *interactions;	// interaction items
 	struct spawn_info *spawns;	// linked list of spawn data
+	bitvector_t room_affects;	// ROOM_AFF_ flags applied to the room while veh is here
 	bitvector_t functions;	// FNC_ flags offered to the room the vehicle is in
 	int fame;	// how much fame it adds to the empire
 	int military;	// how much it adds to the military pool

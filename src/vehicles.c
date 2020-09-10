@@ -51,6 +51,7 @@ extern const char *designate_flags[];
 extern const char *function_flags[];
 extern const char *interact_types[];
 extern const char *mob_move_types[];
+extern const char *room_aff_bits[];
 extern const char *vehicle_flags[];
 extern const char *vehicle_speed_types[];
 
@@ -2270,7 +2271,7 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
-	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
 	struct spawn_info *spawn;
 	
 	if (!fl || !veh) {
@@ -2289,10 +2290,11 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	fprintf(fl, "%s~\n", temp);
 	fprintf(fl, "%s~\n", NULLSAFE(VEH_ICON(veh)));
 	
-	// 6. flags move_type maxhealth capacity animals_required functions fame military size
+	// 6. flags move_type maxhealth capacity animals_required functions fame military size room-affects
 	strcpy(temp, bitv_to_alpha(VEH_FLAGS(veh)));
 	strcpy(temp2, bitv_to_alpha(VEH_FUNCTIONS(veh)));
-	fprintf(fl, "%s %d %d %d %d %s %d %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh), VEH_SIZE(veh));
+	strcpy(temp3, bitv_to_alpha(VEH_ROOM_AFFECTS(veh)));
+	fprintf(fl, "%s %d %d %d %d %s %d %d %d %s\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh), VEH_SIZE(veh), temp3);
 	
 	// C: scaling
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0 || VEH_MAX_SCALE_LEVEL(veh) > 0) {
@@ -2762,7 +2764,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	int count;
 	
 	char only_icon[MAX_INPUT_LENGTH];
-	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS;
+	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;
 	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS;
 	int only_animals = NOTHING, only_cap = NOTHING, cap_over = NOTHING, cap_under = NOTHING;
 	int only_fame = NOTHING, fame_over = NOTHING, fame_under = NOTHING, only_speed = NOTHING;
@@ -2794,6 +2796,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		}
 		
 		// else-ifs defined in olc.h process these args:
+		FULLSEARCH_FLAGS("affects", only_affs, room_aff_bits)
 		FULLSEARCH_INT("animalsrequired", only_animals, 0, INT_MAX)
 		FULLSEARCH_BOOL("anyanimalsrequired", needs_animals)
 		FULLSEARCH_INT("capacity", only_cap, 0, INT_MAX)
@@ -2837,6 +2840,9 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	
 	// okay now look up items
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		if (only_affs != NOBITS && (VEH_ROOM_AFFECTS(veh) & only_affs) != only_affs) {
+			continue;
+		}
 		if (only_animals != NOTHING && VEH_ANIMALS_REQUIRED(veh) != only_animals) {
 			continue;
 		}
@@ -3417,6 +3423,9 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh));
 	sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
 	
+	sprintbit(VEH_ROOM_AFFECTS(veh), room_aff_bits, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(VEH_ROOM_AFFECTS(veh), NOBITS), lbuf);
+	
 	sprintbit(VEH_FUNCTIONS(veh), function_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(VEH_FUNCTIONS(veh), NOBITS), lbuf);
 	
@@ -3484,6 +3493,12 @@ int vnum_vehicle(char *searchname, char_data *ch) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// OLC MODULES /////////////////////////////////////////////////////////////
+
+OLC_MODULE(vedit_affects) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_ROOM_AFFECTS(veh) = olc_process_flag(ch, argument, "affect", "affects", room_aff_bits, VEH_ROOM_AFFECTS(veh));
+}
+
 
 OLC_MODULE(vedit_animalsrequired) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);

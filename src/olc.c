@@ -477,6 +477,7 @@ OLC_MODULE(tedit_string);
 OLC_MODULE(tedit_types);
 
 // vehicle modules
+OLC_MODULE(vedit_affects);
 OLC_MODULE(vedit_animalsrequired);
 OLC_MODULE(vedit_capacity);
 OLC_MODULE(vedit_designate);
@@ -1078,6 +1079,7 @@ const struct olc_command_data olc_data[] = {
 	{ "types", tedit_types, OLC_TRIGGER, OLC_CF_EDITOR },
 	
 	// vehicle commands
+	{ "affects", vedit_affects, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "animalsrequired", vedit_animalsrequired, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "capacity", vedit_capacity, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "designate", vedit_designate, OLC_VEHICLE, OLC_CF_EDITOR },

@@ -1906,13 +1906,14 @@ Usually an augment should be locked down to just one wear flag.
 
 See also: OEDIT WEAR, OLC AUGMENTS
 #d
-"BEDIT AFFECTS" "REDIT AFFECTS"
+"BEDIT AFFECTS" "REDIT AFFECTS" "VEDIT AFFECTS"
 
 Usage:  .affects [add | remove] <flags>
 
 Each building (or room template) type may have a default set of room affect
 flags. These are added to the building tile when built, or are present on a
-room that is instantiated from a room template.
+room that is instantiated from a room template. Vehicles that have these flags
+apply the flags to any room they're in.
 
 Available affects:
  DARK - magically dark and the map tile shows as blank
