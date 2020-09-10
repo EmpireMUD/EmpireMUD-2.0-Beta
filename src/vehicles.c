@@ -2097,7 +2097,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	void parse_interaction(char *line, struct interaction_item **list, char *error_part);
 	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 
-	char line[256], error[256], str_in[256], str_in2[256];
+	char line[256], error[256], str_in[256], str_in2[256], str_in3[256];
 	struct spawn_info *spawn;
 	vehicle_data *veh, *find;
 	double dbl_in;
@@ -2129,8 +2129,9 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 		log("SYSERR: Missing line 6 of %s", error);
 		exit(1);
 	}
-	if (sscanf(line, "%s %d %d %d %d %s %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6]) != 9) {
-		int_in[6] = 0;	// backwards-compatible: size
+	if (sscanf(line, "%s %d %d %d %d %s %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6], str_in3) != 10) {
+		int_in[6] = 0;	// b5.104 backwards-compatible: size
+		strcpy(str_in3, "0");	// affects
 		
 		if (sscanf(line, "%s %d %d %d %d %s %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5]) != 8) {
 			strcpy(str_in2, "0");	// backwards-compatible: functions
@@ -2153,6 +2154,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_FAME(veh) = int_in[4];
 	VEH_MILITARY(veh) = int_in[5];
 	VEH_SIZE(veh) = int_in[6];
+	VEH_ROOM_AFFECTS(veh) = asciiflag_conv(str_in3);
 	
 	// optionals
 	for (;;) {
