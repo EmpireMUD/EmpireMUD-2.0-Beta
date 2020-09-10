@@ -58,7 +58,6 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
 	bld_data *bld = NULL;
-	int count;
 
 	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL && !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires no object, ability, or recipe");
@@ -145,9 +144,8 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		}
 	}
 	
-	count = (CRAFT_FLAGGED(craft, CRAFT_SOUP) ? 1 : 0) + (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) ? 1 : 0) + ((GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD || CRAFT_FLAGGED(craft, CRAFT_BUILDING)) ? 1 : 0);
-	if (count > 1) {
-		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Unusual combination of SOUP, VEHICLE, BUILD");
+	if (CRAFT_FLAGGED(craft, CRAFT_SOUP) && (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) || GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD || CRAFT_FLAGGED(craft, CRAFT_BUILDING))) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Unusual combination of SOUP and VEHICLE or BUILD");
 		problem = TRUE;
 	}
 	
