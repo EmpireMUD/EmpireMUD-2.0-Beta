@@ -1819,11 +1819,18 @@ ACMD(do_gen_craft) {
 	}
 	
 	// optional leading number
-	if ((num = atoi(argument)) > 0) {
+	if (isdigit(*argument) > 0) {
 		half_chop(argument, buf, arg);
-		num = MAX(1, atoi(buf));
+		if (is_number(buf)) {
+			// really a number
+			num = MAX(1, atoi(buf));
+		}
+		else {	// not a number -- restore whole argument
+			num = 1;
+			strcpy(arg, argument);
+		}
 	}
-	else {
+	else {	// no leading number
 		num = 1;
 		strcpy(arg, argument);
 	}
