@@ -8030,6 +8030,7 @@ Fields:
   &c-military -militaryover -militaryunder&0 - specific military value
   &c-movetype&0 - see HELP VEDIT MOVETYPE
   &c-rooms -roomsover -roomsunder&0 - specific extra rooms value
+  &c-sizeunder -sizeover&0 - check a range of sizes (inclusive)
   &c-speed&0 - see HELP VEDIT SPEED
 
 Examples:

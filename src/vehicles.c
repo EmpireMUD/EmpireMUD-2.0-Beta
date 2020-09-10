@@ -1429,7 +1429,7 @@ int sort_vehicles(vehicle_data *a, vehicle_data *b) {
 
 
 /**
-* write_one_vehicle_to_file: Write a vehicle to a tagged save file. Vehicle
+* store_one_vehicle_to_file: Write a vehicle to a tagged save file. Vehicle
 * tags start with %VNUM instead of #VNUM because they may co-exist with items
 * in the file.
 *
@@ -1447,7 +1447,7 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	vehicle_data *proto;
 	
 	if (!fl || !veh) {
-		log("SYSERR: write_one_vehicle_to_file called without %s", fl ? "vehicle" : "file");
+		log("SYSERR: store_one_vehicle_to_file called without %s", fl ? "vehicle" : "file");
 		return;
 	}
 	
@@ -2105,19 +2105,23 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_LOOK_DESC(veh) = fread_string(fl, error);
 	VEH_ICON(veh) = fread_string(fl, error);
 	
-	// line 6: flags move_type maxhealth capacity animals_required functions fame military
+	// line 6: flags move_type maxhealth capacity animals_required functions fame military size
 	if (!get_line(fl, line)) {
 		log("SYSERR: Missing line 6 of %s", error);
 		exit(1);
 	}
-	if (sscanf(line, "%s %d %d %d %d %s %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5]) != 8) {
-		strcpy(str_in2, "0");	// backwards-compatible: functions
-		int_in[4] = 0;	// fame
-		int_in[5] = 0;	// military
+	if (sscanf(line, "%s %d %d %d %d %s %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6]) != 9) {
+		int_in[6] = 0;	// backwards-compatible: size
 		
-		if (sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
-			log("SYSERR: Format error in line 6 of %s", error);
-			exit(1);
+		if (sscanf(line, "%s %d %d %d %d %s %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5]) != 8) {
+			strcpy(str_in2, "0");	// backwards-compatible: functions
+			int_in[4] = 0;	// fame
+			int_in[5] = 0;	// military
+		
+			if (sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
+				log("SYSERR: Format error in line 6 of %s", error);
+				exit(1);
+			}
 		}
 	}
 	
@@ -2129,6 +2133,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_FUNCTIONS(veh) = asciiflag_conv(str_in2);
 	VEH_FAME(veh) = int_in[4];
 	VEH_MILITARY(veh) = int_in[5];
+	VEH_SIZE(veh) = int_in[6];
 	
 	// optionals
 	for (;;) {
@@ -2266,10 +2271,10 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	fprintf(fl, "%s~\n", temp);
 	fprintf(fl, "%s~\n", NULLSAFE(VEH_ICON(veh)));
 	
-	// 6. flags move_type maxhealth capacity animals_required functions fame military
+	// 6. flags move_type maxhealth capacity animals_required functions fame military size
 	strcpy(temp, bitv_to_alpha(VEH_FLAGS(veh)));
 	strcpy(temp2, bitv_to_alpha(VEH_FUNCTIONS(veh)));
-	fprintf(fl, "%s %d %d %d %d %s %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh));
+	fprintf(fl, "%s %d %d %d %d %s %d %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh), VEH_SIZE(veh));
 	
 	// C: scaling
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0 || VEH_MAX_SCALE_LEVEL(veh) > 0) {
@@ -2746,6 +2751,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	int only_hitpoints = NOTHING, hitpoints_over = NOTHING, hitpoints_under = NOTHING, only_level = NOTHING;
 	int only_military = NOTHING, military_over = NOTHING, military_under = NOTHING;
 	int only_rooms = NOTHING, rooms_over = NOTHING, rooms_under = NOTHING, only_move = NOTHING;
+	int size_under = NOTHING, size_over = NOTHING;
 	bool needs_animals = FALSE;
 	
 	struct interaction_item *inter;
@@ -2796,6 +2802,8 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_INT("military", only_military, 0, INT_MAX)
 		FULLSEARCH_INT("militaryover", military_over, 0, INT_MAX)
 		FULLSEARCH_INT("militaryunder", military_under, 0, INT_MAX)
+		FULLSEARCH_INT("sizeover", size_over, 0, INT_MAX)
+		FULLSEARCH_INT("sizeunder", size_under, 0, INT_MAX)
 		FULLSEARCH_LIST("speed", only_speed, vehicle_speed_types)
 		
 		else {	// not sure what to do with it? treat it like a keyword
@@ -2898,6 +2906,12 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 			continue;
 		}
 		if (rooms_under != NOTHING && (VEH_MAX_ROOMS(veh) > rooms_under || VEH_MAX_ROOMS(veh) == 0)) {
+			continue;
+		}
+		if (size_over != NOTHING && VEH_SIZE(veh) < size_over) {
+			continue;
+		}
+		if (size_under != NOTHING && VEH_SIZE(veh) > size_under) {
 			continue;
 		}
 		if (only_speed != NOTHING && VEH_SPEED_BONUSES(veh) != only_speed) {
@@ -3182,7 +3196,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	// stats lines
 	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
-	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0], Speed: [\ty%s\t0]\r\n", VEH_FAME(veh), VEH_MILITARY(veh), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
+	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0], Speed: [\ty%s\t0], Size: [\tc%d\t0]\r\n", VEH_FAME(veh), VEH_MILITARY(veh), vehicle_speed_types[VEH_SPEED_BONUSES(veh)], VEH_SIZE(veh));
 	
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
@@ -3361,7 +3375,7 @@ void olc_show_vehicle(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "<%shitpoints\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_HEALTH(veh), 1), VEH_MAX_HEALTH(veh));
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(VEH_MOVE_TYPE(veh), 0), mob_move_types[VEH_MOVE_TYPE(veh)]);
-	sprintf(buf + strlen(buf), "<%sspeed\t0> %s\r\n", OLC_LABEL_VAL(VEH_SPEED_BONUSES(veh), VSPEED_NORMAL), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
+	sprintf(buf + strlen(buf), "<%sspeed\t0> %s, <%ssize\t0> %d\r\n", OLC_LABEL_VAL(VEH_SPEED_BONUSES(veh), VSPEED_NORMAL), vehicle_speed_types[VEH_SPEED_BONUSES(veh)], OLC_LABEL_VAL(VEH_SIZE(veh), 0), VEH_SIZE(veh));
 	sprintf(buf + strlen(buf), "<%scapacity\t0> %d item%s\r\n", OLC_LABEL_VAL(VEH_CAPACITY(veh), 0), VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)));
 	sprintf(buf + strlen(buf), "<%sanimalsrequired\t0> %d\r\n", OLC_LABEL_VAL(VEH_ANIMALS_REQUIRED(veh), 0), VEH_ANIMALS_REQUIRED(veh));
 	
@@ -3634,6 +3648,12 @@ OLC_MODULE(vedit_script) {
 OLC_MODULE(vedit_shortdescription) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	olc_process_string(ch, argument, "short description", &VEH_SHORT_DESC(veh));
+}
+
+
+OLC_MODULE(vedit_size) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_SIZE(veh) = olc_process_number(ch, argument, "size", "size", 0, config_get_int("vehicle_size_per_tile"), VEH_SIZE(veh));
 }
 
 

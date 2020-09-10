@@ -5548,6 +5548,7 @@ struct vehicle_attribute_data {
 	bitvector_t designate_flags;	// DES_ flags
 	struct resource_data *yearly_maintenance;
 	int veh_move_speed;  // VSPEED_ for driving action speed
+	int size;	// vehicle size
 	struct extra_descr_data *ex_description;	// extra descriptions
 	struct interaction_item *interactions;	// interaction items
 	struct spawn_info *spawns;	// linked list of spawn data
