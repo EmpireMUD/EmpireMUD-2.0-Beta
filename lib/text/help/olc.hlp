@@ -7588,6 +7588,13 @@ Most EmpireMUDs will combine the two systems. Some features, like walls and
 fences, work best as whole-tile buildings. Others, like homes, work better as
 vehicle-buildings.
 
+Traits usually set on building-vehicles:
+- Size: By default, rooms hold up to 4 total size.
+- BUILDING flag: Counts as a build (required).
+- !BUILDING flag: Keeps this building from being put in another building.
+- VISIBLE-IN-DARK flag: Allows players to see it in the dark.
+- Icon: Causes it to show up on the map.
+
 Some important notes:
 - Building-vhicles are only claimed when the whole tile is claimed (unless they
   have a movement flag like DRIVING, in which case they work like vehicles).
