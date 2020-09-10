@@ -212,12 +212,13 @@ CAVESHELTER "CAVE SHELTER"
 
 &y^&0O&y/\&0  Cave Shelter  (Find Shelter ability)
 
-Chameleon:  &y/\/\&0
+Usage:  build cave shelter
+        enter shelter
 
 You can quickly build a shelter to protect yourself from nasty surprises
 while you sleep.
 
-When you're done with the shelter, be sure to dismantle and abandon it.
+When you're done with the shelter, be sure to dismantle it.
 #
 CELESTIALFORGE "CELESTIAL FORGE" SHATTER SHARD SHARDS
 
@@ -581,12 +582,13 @@ JUNGLESHELTER "JUNGLE SHELTER"
 
 &G^c^^&0  Jungle Shelter  (Find Shelter ability)
 
-Chameleon:  &G^^^^&0
+Usage:  build jungle shelter
+        enter shelter
 
 You can quickly build a shelter to protect yourself from nasty surprises
 while you sleep.
 
-When you're done with the shelter, be sure to dismantle and abandon it.
+When you're done with the shelter, be sure to dismantle it.
 #
 LARGEHOUSE "LARGE HOUSE"
 
@@ -838,12 +840,13 @@ ROCKSHELTER "ROCK SHELTER"
 
 .c..  Rock Shelter  (Find Shelter ability)
 
-Chameleon:  &g....&0 or &Y....&0
+Usage:  build rock shelter
+        enter shelter
 
 You can quickly build a shelter to protect yourself from nasty surprises
 while you sleep.
 
-When you're done with the shelter, be sure to dismantle and abandon it.
+When you're done with the shelter, be sure to abandon it.
 #
 SANDPIT "SAND PIT"
 
@@ -1191,12 +1194,13 @@ TREESHELTER "TREE SHELTER"
 
 &g^&0T&g^^&0  Tree Shelter  (Find Shelter ability)
 
-Chameleon:  &g^^^^&0
+Usage:  build tree shelter
+        enter shelter
 
 You can quickly build a shelter to protect yourself from nasty surprises
 while you sleep.
 
-When you're done with the shelter, be sure to dismantle and abandon it.
+When you're done with the shelter, be sure to dismantle it.
 #
 "TROPHY ROOM"
 

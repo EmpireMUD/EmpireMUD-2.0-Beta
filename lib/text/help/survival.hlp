@@ -69,19 +69,19 @@ Find Shelter (Survival ability)
 
 This skill allows you to find quick shelter in any environment. The shelters
 show up on your "build" list but require no materials. When you're done with
-the shelter, be sure to dismantle and abandon it.
+the shelter, be sure to dismantle it.
 
 Shelters boost regeneration while sleeping.
 
 Gains experience when you build a shelter.
 
 You can build the following shelters:
-  &y^&0O&y/\&0  caveshelter (mountains)
-  &G^c^^&0  jungleshelter (jungle)
-  .c..  rockshelter (plains, desert)
-  &g^&0T&g^^&0  treeshelter (forest)
+  cave shelter (mountains)
+  jungle shelter (jungle)
+  rock shelter (plains, desert)
+  tree shelter (forest)
 
-See also: BUILD, DISMANTLE, ABANDON
+See also: BUILD, DISMANTLE
 #
 FINDER
 

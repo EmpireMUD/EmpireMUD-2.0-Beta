@@ -1688,7 +1688,7 @@ ACMD(do_designate) {
 	bld_data *bld, *next_bld;
 	char_data *vict;
 	bld_data *type;
-	bool found;
+	bool found, veh_dirs;
 	
 	vehicle_data *veh = NULL;	// if this is set, we're doing a vehicle designate instead of building
 	bitvector_t valid_des_flags = NOBITS;
@@ -1710,6 +1710,7 @@ ACMD(do_designate) {
 	maxrooms = veh ? VEH_MAX_ROOMS(veh) : BLD_MAX_ROOMS(home);
 	valid_des_flags = veh ? VEH_DESIGNATE_FLAGS(veh) : (GET_BUILDING(home) ? GET_BLD_DESIGNATE_FLAGS(GET_BUILDING(home)) : NOBITS);
 	hasrooms = veh ? VEH_INSIDE_ROOMS(veh) : GET_INSIDE_ROOMS(home);
+	veh_dirs = veh && (!VEH_FLAGGED(veh, VEH_BUILDING) || VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS));
 
 	if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -1742,7 +1743,7 @@ ACMD(do_designate) {
 	else if (!ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't designate rooms here!\r\n");
 	}
-	else if (subcmd == SCMD_DESIGNATE && ((dir = parse_direction(ch, arg)) == NO_DIR || !(veh ? can_designate_dir_vehicle[dir] : can_designate_dir[dir]))) {
+	else if (subcmd == SCMD_DESIGNATE && ((dir = parse_direction(ch, arg)) == NO_DIR || !(veh_dirs ? can_designate_dir_vehicle[dir] : can_designate_dir[dir]))) {
 		msg_to_char(ch, "Invalid direction.\r\n");
 		msg_to_char(ch, "Usage: %s <room>\r\n", subcmd == SCMD_REDESIGNATE ? "redesignate" : "designate <direction>");
 	}
