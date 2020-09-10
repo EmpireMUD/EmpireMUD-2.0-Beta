@@ -15,27 +15,27 @@ R
 5001 3 5 0
 S
 #5002
-rockshelter~
+rockshelter dismantle~
 -1 1
-8 79 0 1 -1 0
+8 79 l 1 -1 0
 B
 5002 be op
 R
 5002 3 5 0
 S
 #5003
-treeshelter~
+treeshelter dismantle~
 -1 1
-8 79 0 1 -1 0
+8 79 l 1 -1 0
 B
 5003 d op
 R
 5003 3 5 0
 S
 #5004
-caveshelter~
+caveshelter dismantle~
 -1 1
-8 79 0 1 -1 0
+8 79 l 1 -1 0
 B
 5004 c cop
 R
@@ -92,5 +92,41 @@ B
 5001 bdejln 0
 R
 5001 2 5 0
+S
+#5012
+rock shelter~
+5012 1
+8 79 n 1 -1 0
+B
+5002 be 0
+R
+5002 2 5 0
+S
+#5013
+tree shelter~
+5013 1
+8 79 n 1 -1 0
+B
+5003 dn 0
+R
+5003 2 5 0
+S
+#5014
+cave shelter~
+5014 1
+8 79 n 1 -1 0
+B
+5004 c p
+R
+5004 2 5 0
+S
+#5015
+jungleshelter~
+5015 1
+8 79 n 1 -1 0
+B
+5005 g 0
+R
+5005 2 5 0
 S
 $

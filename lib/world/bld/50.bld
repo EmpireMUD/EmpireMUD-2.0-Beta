@@ -202,4 +202,69 @@ much material as necessary so that it can be taken down and carried in a pack.
 F
 d
 S
+#5012
+Rock Shelter~
+A Rock Shelter~
+.&0c&?..~
+2 0 aR 0
+0 0 0 -1
+C
+sleep~
+D
+   This is a small shelter made from a rock outcropping on the hillside and
+protected from the wind by a mat of debris. It's small and it's not very com-
+fortable, but it's still shelter.
+~
+F
+d
+S
+#5013
+Tree Shelter~
+A Tree Shelter~
+^&0T&?^^~
+2 0 aR 0
+0 0 0 -1
+C
+sleep~
+D
+   You've found shelter high in the branches of a tree, protected from the wind
+and weather by thick branches. It's not a large shelter and it isn't very com-
+fortable, but it's still shelter.
+~
+F
+d
+S
+#5014
+Cave Shelter~
+A Cave Shelter~
+^&0O&?/\~
+2 0 aR 0
+0 0 0 -1
+C
+sleep~
+D
+   This small cave looks like it was originally hollowed out by an animal, but
+it's large enough for you to stand. A fallen rock covers most of the entrance
+and protects you from the elements. The ground isn't comfortable, but it's still
+a safe place to stay.
+~
+F
+d
+S
+#5015
+Jungle Shelter~
+A Shelter in the Jungle~
+&G^c^^~
+2 0 aR 0
+0 0 0 -1
+C
+sleep~
+D
+   This tiny shelter has been scraped together from vines and leaves to provide
+some protection from the hungry animals of the jungle. The trees also give
+ample shade and protection from the elements.
+~
+F
+d
+S
 $

@@ -13,4 +13,67 @@ P
 R
 1003 1 5 0
 S
+#5012
+shelter rocks large~
+a rock shelter~
+A shelter has been built between some large rocks.~
+The small shelter has been made from a rock outcropping on the hillside.
+~
+~
+hvw 19 2 0 0 0 0 0
+D
+5012 0 0
+P
+2
+R
+1004 1 5 0
+S
+#5013
+shelter trees~
+a tree shelter~
+A shelter has been built up in the trees.~
+   The shelter is hidden high in the branches of a tree, protecting it fmor the
+wind and weather.
+~
+~
+hvw 19 2 0 0 0 0 0
+D
+5013 0 0
+P
+2
+R
+1004 1 5 0
+S
+#5014
+shelter cave small~
+a cave shelter~
+Someone has made a shelter in a small cave.~
+   This small cave looks like it was hollowed out by an animal, but it has been
+converted into a shelter.
+~
+~
+hvw 19 2 0 0 0 0 0
+D
+5014 0 0
+P
+2
+R
+1004 1 5 0
+S
+#5015
+shelter tiny jungle~
+a jungle shelter~
+A tiny shelter has been assembled from vines and leaves.~
+   This tiny shelter has been scraped together from vines and leaves to provide
+some protection from the hungry animals of the jungle.
+~
+~
+hvw 19 2 0 0 0 0 0
+D
+5015 0 0
+P
+2
+R
+1004 1 5 0
+S
 $
