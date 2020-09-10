@@ -102,10 +102,6 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates building with different vnum");
 			problem = TRUE;
 		}
-		if (IS_SET(GET_CRAFT_BUILD_ON(craft), BLD_ON_FLAT_TERRAIN | BLD_FACING_CROP | BLD_FACING_OPEN_BUILDING | BLD_ANY_FOREST)) {
-			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Building has invalid build-on flags!");
-			problem = TRUE;
-		}
 		if (bld && !CRAFT_FLAGGED(craft, CRAFT_IN_CITY_ONLY) && (IS_SET(GET_BLD_FLAGS(bld), BLD_IN_CITY_ONLY) || IS_SET(GET_BLD_FUNCTIONS(bld), FNC_IN_CITY_ONLY))) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Missing in-city-only flag on craft (already set on building or building functions)");
 			problem = TRUE;
@@ -114,8 +110,12 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Possible unnecessary in-city-only flag (not set on building or building functions)");
 			problem = TRUE;
 		}
-		if (IS_SET(GET_CRAFT_BUILD_ON(craft), BLD_ON_BASE_TERRAIN_ALLOWED)) {
-			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Builds on base-terrain-allowed -- this is not allowed in the buildon field");
+		if (GET_CRAFT_QUANTITY(craft) > 1) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Building craft with quantity > 1");
+			problem = TRUE;
+		}
+		if (GET_CRAFT_TIME(craft) > 1) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Building craft with time set");
 			problem = TRUE;
 		}
 	}
@@ -126,6 +126,14 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		}
 		if (GET_CRAFT_OBJECT(craft) != NOTHING && GET_CRAFT_OBJECT(craft) != GET_CRAFT_VNUM(craft)) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates vehicle with different vnum");
+			problem = TRUE;
+		}
+		if (GET_CRAFT_QUANTITY(craft) > 1) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Vehicle craft with quantity > 1");
+			problem = TRUE;
+		}
+		if (GET_CRAFT_TIME(craft) > 1) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Vehicle craft with time set");
 			problem = TRUE;
 		}
 	}
@@ -144,8 +152,20 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		}
 	}
 	
+	if (GET_CRAFT_BUILD_ON(craft) && IS_SET(GET_CRAFT_BUILD_ON(craft), BLD_ON_FLAT_TERRAIN | BLD_FACING_CROP | BLD_FACING_OPEN_BUILDING | BLD_ANY_FOREST)) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft has invalid build-on flags!");
+		problem = TRUE;
+	}
+	if (GET_CRAFT_BUILD_ON(craft) && IS_SET(GET_CRAFT_BUILD_ON(craft), BLD_ON_BASE_TERRAIN_ALLOWED)) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Builds on base-terrain-allowed -- this is not allowed in the buildon field");
+		problem = TRUE;
+	}
 	if (CRAFT_FLAGGED(craft, CRAFT_SOUP) && (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) || GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD || CRAFT_FLAGGED(craft, CRAFT_BUILDING))) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Unusual combination of SOUP and VEHICLE or BUILD");
+		problem = TRUE;
+	}
+	if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && CRAFT_FLAGGED(craft, CRAFT_BUILDING)) {
+		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft has both VEHICLE and BUILDING flags");
 		problem = TRUE;
 	}
 	
