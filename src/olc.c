@@ -498,6 +498,7 @@ OLC_MODULE(vedit_minlevel);
 OLC_MODULE(vedit_movetype);
 OLC_MODULE(vedit_resource);
 OLC_MODULE(vedit_script);
+OLC_MODULE(vedit_size);
 OLC_MODULE(vedit_shortdescription);
 OLC_MODULE(vedit_spawns);
 OLC_MODULE(vedit_speed);
@@ -1099,6 +1100,7 @@ const struct olc_command_data olc_data[] = {
 	{ "resource", vedit_resource, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "script", vedit_script, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "shortdescription", vedit_shortdescription, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "size", vedit_size, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "spawns", vedit_spawns, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "speed", vedit_speed, OLC_VEHICLE, OLC_CF_EDITOR },
 	

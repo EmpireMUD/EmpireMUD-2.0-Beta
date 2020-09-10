@@ -8235,6 +8235,16 @@ Examples:
 
 See also: VEDIT KEYWORDS, VEDIT LONG DESCRIPTION, OLC VEHICLES
 #d
+"VEDIT SIZE" "VEHICLE SIZE"
+
+Usage:  .size <number>
+
+The SIZE trait determines how many vehicles can fit into a room together. For
+vehicles that can move, this is usually 0. For building-vehicles, it is almost
+always higher than 0.
+
+By default, the total size of vehicles in a room cannot be greater than 4.
+#d
 "VEDIT SPEED"
 
 Usage:  .speed
