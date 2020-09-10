@@ -431,11 +431,11 @@ S
 block butcher dragonsflame flame~
 a dragonsflame butcher block~
 A dragonsflame butcher block is smouldering here.~
-   This butcher block is hot to the touch. You can use it to 'build butchertent
-<direction>' to make a building that is a stable with a cooking fire. Like
-regular stables, animals can be stored in it.
+   This butcher block is hot to the touch. You can use it to 'build butcher
+tent' to make a building that is a stable with a cooking fire. Like regular
+stables, animals can be stored in it.
 ~
-3 e a 0 2
+3 e a 0 3
 0 0 0
 1 0
 R
@@ -873,8 +873,8 @@ A
 7 1 0
 C
 50 50
-I 26 801 100.00 1  # DECAYS-TO: a jar
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+I 26 801 100.00 1  # DECAYS-TO: a glass jar
+I 27 801 100.00 1  # CONSUMES-TO: a glass jar
 R
 5606 0
 R

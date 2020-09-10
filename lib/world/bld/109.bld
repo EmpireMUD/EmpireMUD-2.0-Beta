@@ -81,6 +81,27 @@ R
 1002 1 5 0
 T 10926
 S
+#10927
+Butcher Tent~
+The Butcher Tent~
+&r{BB}~
+48 0 abgR 0
+0 0 0 -1
+C
+(functions as a stable with a cooking fire)~
+D
+   The tent is made from red dragon hides, but it could as easily be red from
+the blood of animals slaughtered here. There's a pen for fresh animals that's
+half in the tent, and half outside. The center of the tent has a roasting pit
+and a cooking fire.
+~
+F
+wGL
+U
+1 5119
+U
+1 5111
+S
 #10950
 Hole~
 A Hole in the Muck~

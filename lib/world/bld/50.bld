@@ -186,4 +186,20 @@ Some Flooded Ruins~
 C
 dismantle~
 S
+#5011
+Tent~
+A Small Tent~
+[  ]~
+2 0 aR 0
+0 0 0 -1
+C
+sleep~
+D
+   You are inside a tent made of animal hides. It's not large, but it provides
+good shelter from the sun, wind and rain. The tent is sparse, made of only as
+much material as necessary so that it can be taken down and carried in a pack.
+~
+F
+d
+S
 $

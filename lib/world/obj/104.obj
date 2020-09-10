@@ -942,13 +942,13 @@ A crumpled, bundled war tent is lying here.~
 The tent can be taken down and set up again, but will require some additional
 materials each time.
 
-Usage: build goblinwartent <direction>
+Usage: build goblin war tent
 Designatable rooms: forge, bedroom, store room, kitchen
 Rooms: 2
 Citizens: 1
 Features: cooking fire
 ~
-3 e a 0 5
+3 e a 0 6
 0 0 0
 7 0
 S
@@ -976,10 +976,10 @@ A goblin lab tent is folded up on the ground.~
 lumber and nails to set up each time. Goblins often make use of portable build-
 ings, as they hate to settle down for long periods of time.
 
-Usage: build goblinlabtent <direction>
+Usage: build goblin lab tent
 Features: cooking fire, alchemy
 ~
-3 e a 0 4
+3 e a 0 5
 0 0 0
 7 0
 S
