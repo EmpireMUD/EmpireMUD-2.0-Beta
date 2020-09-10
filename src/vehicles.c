@@ -767,6 +767,24 @@ void start_vehicle_burning(vehicle_data *veh) {
 
 
 /**
+* Determines the total size of all vehicles in the room.
+*
+* @param room_data *room The room to check.
+* @return int The total size of vehicles there.
+*/
+int total_vehicle_size_in_room(room_data *room) {
+	vehicle_data *veh;
+	int size = 0;
+	
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		size += VEH_SIZE(veh);
+	}
+	
+	return size;
+}
+
+
+/**
 * Unharnesses a mob and loads it back into the game. If it fails to load the
 * mob, it will still remove 'vam' from the animals list.
 *

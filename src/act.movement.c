@@ -46,6 +46,7 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 void do_unseat_from_vehicle(char_data *ch);
 extern char *get_room_name(room_data *room, bool color);
+extern int total_vehicle_size_in_room(room_data *room);
 
 // local protos
 bool can_enter_room(char_data *ch, room_data *room);
@@ -1215,6 +1216,14 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 		if (ch) {
 			snprintf(buf, sizeof(buf), "You need to harness %d animal%s to $V before it can move.", VEH_ANIMALS_REQUIRED(veh), PLURAL(VEH_ANIMALS_REQUIRED(veh)));
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		return FALSE;
+	}
+	
+	// check size limits
+	if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+		if (ch) {
+			act("There is already too much there for $V to go there.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
 		return FALSE;
 	}

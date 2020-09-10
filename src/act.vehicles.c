@@ -53,6 +53,7 @@ extern bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, in
 extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 void scale_item_to_level(obj_data *obj, int level);
 void skip_run_filler(char **string);
+extern int total_vehicle_size_in_room(room_data *room);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 extern bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
@@ -1575,6 +1576,9 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 	else if (GET_ROOM_VEHICLE(to_room) && (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES))) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
+	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+		act("There is already too much on the other side of $p to drag $V there.", FALSE, ch, portal, veh, TO_CHAR);
+	}
 	else {
 		was_in = IN_ROOM(ch);
 		char_through_portal(ch, portal, FALSE);
@@ -1662,6 +1666,9 @@ ACMD(do_drag) {
 	}
 	else if (ROOM_IS_CLOSED(to_room) && VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
+	}
+	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+		act("There is already too much there to drag $V there.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	else {
 		// seems okay enough -- try movement

@@ -53,6 +53,7 @@ extern bool has_learned_craft(char_data *ch, any_vnum vnum);
 struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 void scale_item_to_level(obj_data *obj, int level);
 void stop_room_action(room_data *room, int action);
+extern int total_vehicle_size_in_room(room_data *room);
 
 // external vars
 extern const char *bld_on_flags[];
@@ -126,7 +127,7 @@ bool can_build_on(room_data *room, bitvector_t flags) {
 bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool *bld_is_closed, bool *bld_needs_reverse) {
 	bool is_closed, needs_facing, needs_reverse;
 	room_data *to_room = NULL, *to_rev = NULL;
-	vehicle_data *make_veh = NULL;
+	vehicle_data *make_veh = NULL, *veh_iter;
 	char buf[MAX_STRING_LENGTH];
 	bld_data *to_build = NULL;
 	
@@ -176,6 +177,31 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 	if ((is_closed || (to_build && IS_SET(GET_BLD_FLAGS(to_build), BLD_BARRIER))) && is_entrance(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't %s that in front of a building entrance.\r\n", command);
 		return FALSE;
+	}
+	
+	// vehicle size/location checks
+	if (make_veh && GET_BUILDING(IN_ROOM(ch)) && VEH_FLAGGED(make_veh, VEH_NO_BUILDING)) {
+		msg_to_char(ch, "You can't %s that in a building.\r\n", command);
+		return FALSE;
+	}
+	if (make_veh && GET_ROOM_VEHICLE(IN_ROOM(ch)) && (VEH_FLAGGED(make_veh, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_CARRY_VEHICLES))) {
+		msg_to_char(ch, "You can't %s that in here.\r\n", command);
+		return FALSE;
+	}
+	if (make_veh && VEH_SIZE(make_veh) > 0 && total_vehicle_size_in_room(IN_ROOM(ch)) + VEH_SIZE(make_veh) > config_get_int("vehicle_size_per_tile")) {
+		msg_to_char(ch, "This area is already too full to %s that.\r\n", command);
+		return FALSE;
+	}
+	
+	// buildings around vehicles
+	if (to_build) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh_iter, next_in_room) {
+			if (VEH_FLAGGED(veh_iter, VEH_NO_BUILDING)) {
+				sprintf(buf, "You can't %s that around $V.", command);
+				act(buf, FALSE, ch, NULL, veh_iter, TO_CHAR);
+				return FALSE;
+			}
+		}
 	}
 	
 	// check facing dirs
