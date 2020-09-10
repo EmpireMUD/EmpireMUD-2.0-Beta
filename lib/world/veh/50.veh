@@ -5,7 +5,7 @@ A small tent has been set up here.~
 The tent is made of animal hides. Use 'enter tent' to get inside.
 ~
 ~
-huvw 19 2 0 0 0 0 0
+hmuvw 19 2 0 0 0 0 0 1
 D
 5011 0 0
 P
@@ -20,7 +20,7 @@ A shelter has been built between some large rocks.~
 The small shelter has been made from a rock outcropping on the hillside.
 ~
 ~
-hvw 19 2 0 0 0 0 0
+hmvw 19 2 0 0 0 0 0 4
 D
 5012 0 0
 P
@@ -36,7 +36,7 @@ A shelter has been built up in the trees.~
 wind and weather.
 ~
 ~
-hvw 19 2 0 0 0 0 0
+hmvw 19 2 0 0 0 0 0 4
 D
 5013 0 0
 P
@@ -52,7 +52,7 @@ Someone has made a shelter in a small cave.~
 converted into a shelter.
 ~
 ~
-hvw 19 2 0 0 0 0 0
+hmvw 19 2 0 0 0 0 0 4
 D
 5014 0 0
 P
@@ -68,7 +68,7 @@ A tiny shelter has been assembled from vines and leaves.~
 some protection from the hungry animals of the jungle.
 ~
 ~
-hvw 19 2 0 0 0 0 0
+hmvw 19 2 0 0 0 0 0 4
 D
 5015 0 0
 P
