@@ -6,9 +6,9 @@ B
 5000 be 0
 S
 #5001
-tent~
+tent dismantle~
 -1 1
-8 -1 t 1 2036 0
+8 -1 lt 1 2036 0
 B
 5001 bde op
 R
@@ -83,5 +83,14 @@ flooded ruins dismantle~
 8 -1 l 1 -1 0
 B
 5010 0 0
+S
+#5011
+tent~
+5011 1
+8 -1 nt 1 2036 0
+B
+5001 bdejln 0
+R
+5001 2 5 0
 S
 $
