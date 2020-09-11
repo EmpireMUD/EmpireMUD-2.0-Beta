@@ -3070,6 +3070,8 @@ void save_olc_vehicle(descriptor_data *desc) {
 		if (VEH_HEALTH(iter) > VEH_MAX_HEALTH(iter)) {
 			VEH_HEALTH(iter) = VEH_MAX_HEALTH(iter);
 		}
+		
+		affect_total_room(IN_ROOM(iter));
 	}
 	
 	// free prototype strings and pointers
@@ -3236,8 +3238,11 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
+	sprintbit(VEH_ROOM_AFFECTS(veh), room_aff_bits, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Affects: \tc%s\t0\r\n", part);
+	
 	sprintbit(VEH_FUNCTIONS(veh), function_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Functions: \tc%s\t0\r\n", part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Functions: \tg%s\t0\r\n", part);
 	
 	if (VEH_INTERACTIONS(veh)) {
 		send_to_char("Interactions:\r\n", ch);
