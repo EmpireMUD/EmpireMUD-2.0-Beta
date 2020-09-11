@@ -2810,7 +2810,7 @@ void show_tavern_status(char_data *ch) {
 // for do_findmaintenance and do_territory
 struct find_territory_node {
 	room_data *loc;
-	vehicle_data *veh;	// optional: person scanned for a vehicle
+	char *details;	// optional string with vehicles, etc
 	int count;
 	
 	struct find_territory_node *next;
@@ -2901,13 +2901,14 @@ void scan_for_tile(char_data *ch, char *argument) {
 
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
-	char output[MAX_STRING_LENGTH], line[128], info[256];
+	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH];
 	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
 	room_data *map, *room;
 	size_t size, lsize;
 	crop_data *crop;
 	bool ok, claimed, unclaimed, foreign, adventures;
+	size_t vsize;
 	
 	skip_spaces(&argument);
 	
@@ -2953,6 +2954,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			// validate tile
 			ok = FALSE;
 			scanned_veh = NULL;
+			*veh_string = '\0';
 			if (claimed && ROOM_OWNER(room)) {
 				ok = TRUE;
 			}
@@ -2979,10 +2981,14 @@ void scan_for_tile(char_data *ch, char *argument) {
 			}
 			else {
 				// try finding a matching vehicle visible in the tile
+				vsize = 0;
 				if (!ROOM_IS_CLOSED(room)) {
 					DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-						if (!VEH_ICON(veh) || !VEH_IS_COMPLETE(veh)) {
-							continue;
+						if (!VEH_ICON(veh)) {
+							continue;	// no icon = no scan
+						}
+						if (!VEH_IS_COMPLETE(veh) && VEH_SIZE(veh) < 1) {
+							continue;	// incomplete and small
 						}
 						if (!CAN_SEE_VEHICLE(ch, veh)) {
 							continue;
@@ -2991,10 +2997,19 @@ void scan_for_tile(char_data *ch, char *argument) {
 							continue;
 						}
 					
-						// found a vehicle match (only need 1)
+						// found a vehicle match but limit what we show
+						if (VEH_FLAGGED(veh, VEH_BUILDING)) {
+							vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)));
+						}
+						else if (!scanned_veh || VEH_SIZE(veh) > VEH_SIZE(scanned_veh)) {	// not a building -- save?
+							scanned_veh = veh;
+						}
 						ok = TRUE;
-						scanned_veh = veh;
-						break;
+					}
+					
+					if (vsize == 0 && scanned_veh) {
+						// found a vehicle to show
+						snprintf(veh_string, sizeof(veh_string), "%s", skip_filler(VEH_SHORT_DESC(veh)));
 					}
 				}
 			}
@@ -3003,7 +3018,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 				CREATE(node, struct find_territory_node, 1);
 				node->loc = room;
 				node->count = 1;
-				node->veh = scanned_veh;	// if any
+				node->details = *veh_string ? str_dup(veh_string) : NULL;	// if any
 				LL_PREPEND(node_list, node);
 			}
 		}
@@ -3034,8 +3049,8 @@ void scan_for_tile(char_data *ch, char *argument) {
 				// distance and direction
 				lsize = snprintf(line, sizeof(line), "%2d %s: ", dist, (dir == NO_DIR ? "away" : (PRF_FLAGGED(ch, PRF_SCREEN_READER) ? dirs[dir] : alt_dirs[dir])));
 				
-				if (node->veh) {	// scanned for vehicle
-					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s: %s", (GET_BUILDING(node->loc) ? GET_BLD_NAME(GET_BUILDING(node->loc)) : GET_SECT_NAME(SECT(node->loc))), skip_filler(VEH_SHORT_DESC(node->veh)));
+				if (node->details) {
+					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s: %s", (GET_BUILDING(node->loc) ? GET_BLD_NAME(GET_BUILDING(node->loc)) : GET_SECT_NAME(SECT(node->loc))), node->details);
 				}
 				else {	// not a vehicle
 					lsize += snprintf(line + lsize, sizeof(line) - lsize, "%s", get_room_name(node->loc, FALSE));
