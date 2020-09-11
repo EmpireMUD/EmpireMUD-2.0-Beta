@@ -2994,7 +2994,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 						if (!CAN_SEE_VEHICLE(ch, veh)) {
 							continue;
 						}
-						if (vehicle_is_chameleon(veh, IN_ROOM(ch))) {
+						if (vehicle_is_chameleon(veh, IN_ROOM(ch)) && !IS_IMMORTAL(ch) && (!GET_LOYALTY(ch) || VEH_OWNER(veh) != GET_LOYALTY(ch))) {
 							continue;	// can't see from here
 						}
 						if (!multi_isname(argument, VEH_KEYWORDS(veh))) {
