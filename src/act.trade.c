@@ -1723,10 +1723,10 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 	
 	// ok: new vehicle craft setup
 	veh = read_vehicle(GET_CRAFT_OBJECT(type), TRUE);
+	SET_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);	// set incomplete before putting in the room
 	vehicle_to_room(veh, IN_ROOM(ch));
 	
 	// additional setup
-	SET_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
 	VEH_NEEDS_RESOURCES(veh) = copy_resource_list(GET_CRAFT_RESOURCES(type));
 	if (!VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
 		if (VEH_CLAIMS_WITH_ROOM(veh)) {
