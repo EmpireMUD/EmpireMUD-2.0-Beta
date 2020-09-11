@@ -739,7 +739,7 @@ void fill_trench(room_data *room) {
 	struct evolution_data *evo;
 	sector_data *sect;
 	
-	if ((evo = get_evolution_by_type(SECT(room), EVO_TRENCH_FULL)) != NULL) {
+	if ((evo = get_evolution_by_type(SECT(room), EVO_TRENCH_FULL)) != NULL && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE)) {
 		if (ROOM_PEOPLE(room)) {
 			sect = sector_proto(evo->becomes);
 			sprintf(lbuf, "The trench is full! It is now %s %s!", sect ? AN(GET_SECT_NAME(sect)) : "something", sect ? GET_SECT_NAME(sect) : "else");
@@ -3347,7 +3347,7 @@ void grow_crop(struct map_data *map) {
 	remove_extra_data(&map->shared->extra_data, ROOM_EXTRA_SEED_TIME);
 	
 	// nothing to grow
-	if (!SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA) || !(evo = get_evolution_by_type(map->sector_type, EVO_CROP_GROWS)) || !(becomes = sector_proto(evo->becomes))) {
+	if (IS_SET(map->shared->affects, ROOM_AFF_NO_EVOLVE) || !SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA) || !(evo = get_evolution_by_type(map->sector_type, EVO_CROP_GROWS)) || !(becomes = sector_proto(evo->becomes))) {
 		return;
 	}
 	

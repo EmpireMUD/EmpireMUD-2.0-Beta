@@ -529,6 +529,9 @@ bool validate_burn_area(char_data *ch, int subcmd) {
 	if (!has_evolution_type(SECT(IN_ROOM(ch)), EVO_BURNS_TO)) {
 		msg_to_char(ch, "You can't %s this type of area.\r\n", cmdname[subcmd]);
 	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+		msg_to_char(ch, "You can't burn the area right now.\r\n");
+	}
 	else if (!objless && !lighter) {
 		// nothing to light it with
 		if (kept) {
@@ -3123,6 +3126,9 @@ ACMD(do_excavate) {
 	else if (!(evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_TRENCH_START))) {
 		msg_to_char(ch, "You can't excavate a trench here.\r\n");
 	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+		msg_to_char(ch, "You can't excavate here right now.\r\n");
+	}
 	else if (is_entrance(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't excavate a trench in front of an entrance.\r\n");
 	}
@@ -3573,6 +3579,9 @@ ACMD(do_plant) {
 	}
 	else if (!(evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_PLANTS_TO))) {
 		msg_to_char(ch, "Nothing can be planted here.\r\n");
+	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+		msg_to_char(ch, "You can't plant here right now.\r\n");
 	}
 	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, SECT(IN_ROOM(ch)))) {
 		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
