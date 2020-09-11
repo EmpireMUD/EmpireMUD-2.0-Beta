@@ -1291,7 +1291,7 @@ ACMD(do_board) {
 		msg_to_char(ch, "You can't %s it while leading an animal.\r\n", command);
 	}
 	else if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !VEH_FLAGGED(veh, VEH_CARRY_VEHICLES)) {
-		msg_to_char(ch, "You can't %s it while leading another vehicle.\r\n", command);
+		msg_to_char(ch, "You can't %s it while leading a vehicle.\r\n", command);
 	}
 	else if (GET_LEADING_VEHICLE(ch) && (VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(veh, VEH_CARRY_VEHICLES))) {
 		act("You can't lead $V in there.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
