@@ -1700,6 +1700,10 @@ void process_excavating(char_data *ch) {
 			msg_to_char(ch, "You no longer have permission to excavate here.\r\n");
 			cancel_action(ch);
 		}
+		else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+			msg_to_char(ch, "You can't excavate here right now.\r\n");
+			cancel_action(ch);
+		}
 		else {
 			// count up toward zero
 			add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, 1);
@@ -1772,6 +1776,10 @@ void process_fillin(char_data *ch) {
 		}
 		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You no longer have permission to fill in here.\r\n");
+			cancel_action(ch);
+		}
+		else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+			msg_to_char(ch, "You can't fill in here right now.\r\n");
 			cancel_action(ch);
 		}
 		else {
@@ -3208,6 +3216,9 @@ ACMD(do_fillin) {
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		// 2nd check: members only to start new fillin
 		msg_to_char(ch, "You don't have permission to fill in here!\r\n");
+	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+		msg_to_char(ch, "You can't fill in here right now.\r\n");
 	}
 	else {
 		// always takes 1 minute
