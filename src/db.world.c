@@ -1956,6 +1956,7 @@ void startup_room_reset(void) {
 	room_data *room, *next_room;
 
 	HASH_ITER(hh, world_table, room, next_room) {
+		affect_total_room(room);
 		if (room->reset_commands) {
 			reset_one_room(room);
 		}
