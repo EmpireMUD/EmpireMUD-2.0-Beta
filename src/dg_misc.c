@@ -817,7 +817,7 @@ void send_char_pos(char_data *ch, int dam) {
 			msg_to_char(ch, "You're stunned, but will probably regain consciousness again.\r\n");
 			break;
 		case POS_DEAD:
-			act("$n is dead!  R.I.P.", FALSE, ch, 0, 0, TO_ROOM);
+			//act("$n is dead!  R.I.P.", FALSE, ch, 0, 0, TO_ROOM);
 			send_to_char("You are dead!  Sorry...\r\n", ch);
 			break;
 		default:                        /* >= POSITION SLEEPING */
