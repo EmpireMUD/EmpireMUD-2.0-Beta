@@ -4319,6 +4319,7 @@ const char *identify_vehicle_flags[] = {
 // VEH_CUSTOM_x: custom message types
 const char *veh_custom_types[] = {
 	"ruins-to-room",	// 0
+	"climate-change-to-room",
 };
 
 

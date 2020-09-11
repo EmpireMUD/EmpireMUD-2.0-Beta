@@ -7961,7 +7961,8 @@ If you set more than one message of the same type, one will be chosen at
 random each time.
 
 Message types:
- &cruins-to-room&0 - Shown when it falls into ruins (from decay or bad climate).
+ &cruins-to-room&0 - Shown when it falls into ruins (from decay).
+ &cclimate-change-to-room&0 - Shown when ruined due to climate flag change.
 
 See also: OLC VEHICLES, DOLLAR SIGN CODES
 #d

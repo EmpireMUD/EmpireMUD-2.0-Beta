@@ -115,11 +115,13 @@ void abandon_lost_vehicles(void) {
 */
 void check_vehicle_climate_change(room_data *room) {
 	vehicle_data *veh, *next_veh;
+	char *msg;
 	
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
 		if (!vehicle_allows_climate(veh, IN_ROOM(veh))) {
 			// this will extract it (usually)
-			ruin_vehicle(veh, "$V falls into ruin!");
+			msg = veh_get_custom_message(veh, VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM);
+			ruin_vehicle(veh, msg ? msg : "$V falls into ruin!");
 		}
 	}
 }
@@ -893,7 +895,7 @@ bool vehicle_allows_climate(vehicle_data *veh, room_data *room) {
 	}
 	
 	// determine which climate to use
-	if (IS_MAP_BUILDING(room)) {
+	if (IS_MAP_BUILDING(room) || IS_ROAD(room)) {
 		// open map buildings use base sect
 		climate = GET_SECT_CLIMATE(BASE_SECT(room));
 	}

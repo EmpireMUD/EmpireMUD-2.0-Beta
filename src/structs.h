@@ -2459,6 +2459,7 @@ typedef struct vehicle_data vehicle_data;
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin
+#define VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM 1	// sent when the vehicle is destroyed by climate flags
 
 
 // VSPEED_x: indicates the number of speed bonuses this vehicle gives to driving.

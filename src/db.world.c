@@ -1284,6 +1284,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 	
 	static struct resource_data *default_res = NULL;
 	struct resource_data *old_list;
+	char *msg;
 	
 	// resources if it doesn't have its own
 	if (!default_res) {
@@ -1306,7 +1307,8 @@ void annual_update_vehicle(vehicle_data *veh) {
 		}
 	}
 	else {	// destroyed
-		ruin_vehicle(veh, "$V crumbles from disrepair!");
+		msg = veh_get_custom_message(veh, VEH_CUSTOM_RUINS_TO_ROOM);
+		ruin_vehicle(veh, msg ? msg : "$V crumbles from disrepair!");
 	}
 }
 
