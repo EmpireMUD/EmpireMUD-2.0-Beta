@@ -893,15 +893,15 @@ void affect_total_room(room_data *room) {
 		SET_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
 	}
 	
-	// flags from vehicles
+	// flags from vehicles: don't use VEH_IS_COMPLETE because this is often called before setup is done on that
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (VEH_IS_COMPLETE(veh)) {
+		if (!VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
 			SET_BIT(ROOM_AFF_FLAGS(room), VEH_ROOM_AFFECTS(veh));
 		}
 	}
 	
-	// flags from building
-	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
+	// flags from building: don't use IS_COMPLETE because this function may be called before resources are added
+	if (GET_BUILDING(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_INCOMPLETE)) {
 		SET_BIT(ROOM_AFF_FLAGS(room), GET_BLD_BASE_AFFECTS(GET_BUILDING(room)));
 	}
 	
