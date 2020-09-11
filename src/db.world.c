@@ -146,6 +146,7 @@ void change_chop_territory(room_data *room) {
 * @param sector_vnum sect Any sector vnum
 */
 void change_terrain(room_data *room, sector_vnum sect) {
+	void check_vehicle_climate_change(room_data *room);
 	void lock_icon(room_data *room, struct icon_data *use_icon);
 	
 	sector_data *old_sect = SECT(room), *st = sector_proto(sect);
