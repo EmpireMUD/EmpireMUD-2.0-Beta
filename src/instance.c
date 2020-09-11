@@ -136,18 +136,19 @@ void build_instance_exterior(struct instance_data *inst) {
 			
 			// set these so it can be cleaned up later
 			SET_BIT(ROOM_BASE_FLAGS(INST_LOCATION(inst)), ROOM_AFF_TEMPORARY);
-			SET_BIT(ROOM_AFF_FLAGS(INST_LOCATION(inst)), ROOM_AFF_TEMPORARY);			
 			break;
 		}
 	}
 	
 	// small tweaks to room
 	SET_BIT(ROOM_BASE_FLAGS(INST_LOCATION(inst)), ROOM_AFF_HAS_INSTANCE);
-	SET_BIT(ROOM_AFF_FLAGS(INST_LOCATION(inst)), ROOM_AFF_HAS_INSTANCE);
+	affect_total_room(INST_LOCATION(inst));
 	
 	// and the home room
-	SET_BIT(ROOM_BASE_FLAGS(HOME_ROOM(INST_LOCATION(inst))), ROOM_AFF_HAS_INSTANCE);
-	SET_BIT(ROOM_AFF_FLAGS(HOME_ROOM(INST_LOCATION(inst))), ROOM_AFF_HAS_INSTANCE);
+	if (HOME_ROOM(INST_LOCATION(inst)) != INST_LOCATION(inst)) {
+		SET_BIT(ROOM_BASE_FLAGS(HOME_ROOM(INST_LOCATION(inst))), ROOM_AFF_HAS_INSTANCE);
+		affect_total_room(HOME_ROOM(INST_LOCATION(inst)));
+	}
 }
 
 
@@ -430,8 +431,7 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 	sect = sector_proto(config_get_int("default_adventure_sect"));
 	perform_change_sect(room, NULL, sect);
 	perform_change_base_sect(room, NULL, sect);
-	SET_BIT(ROOM_BASE_FLAGS(room), GET_RMT_BASE_AFFECTS(rmt) | default_affs);
-	SET_BIT(ROOM_AFF_FLAGS(room), GET_RMT_BASE_AFFECTS(rmt) | default_affs);
+	SET_BIT(ROOM_BASE_FLAGS(room), default_affs);
 	
 	// copy proto script
 	room->proto_script = copy_trig_protos(GET_RMT_SCRIPTS(rmt));
@@ -441,6 +441,7 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 	
 	// exits and spawns are not done here
 	
+	affect_total_room(room);
 	return room;
 }
 
@@ -1435,11 +1436,13 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool 
 		
 	// remove instance flags AFTER the script
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
-	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_HAS_INSTANCE);
+	affect_total_room(room);
 
 	// and the home room
-	REMOVE_BIT(ROOM_BASE_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
-	REMOVE_BIT(ROOM_AFF_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
+	if (HOME_ROOM(room) != room) {
+		REMOVE_BIT(ROOM_BASE_FLAGS(HOME_ROOM(room)), ROOM_AFF_HAS_INSTANCE);
+		affect_total_room(HOME_ROOM(room));
+	}
 	
 	// exits to it will be cleaned up by delete_room
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_TEMPORARY)) {
@@ -2020,16 +2023,16 @@ void remove_instance_fake_loc(struct instance_data *inst) {
 	// remove fake-instance flag (if needed)
 	if (INST_FAKE_LOC(inst) && ROOM_AFF_FLAGGED(INST_FAKE_LOC(inst), ROOM_AFF_FAKE_INSTANCE)) {
 		REMOVE_BIT(ROOM_BASE_FLAGS(INST_FAKE_LOC(inst)), ROOM_AFF_FAKE_INSTANCE);
-		REMOVE_BIT(ROOM_AFF_FLAGS(INST_FAKE_LOC(inst)), ROOM_AFF_FAKE_INSTANCE);
 		
 		// see if the flag needs to be re-added (check all instances to see if one is still here)
 		LL_FOREACH(instance_list, i_iter) {
 			if (i_iter != inst && INST_FAKE_LOC(i_iter) == INST_FAKE_LOC(inst)) {
 				SET_BIT(ROOM_BASE_FLAGS(INST_FAKE_LOC(i_iter)), ROOM_AFF_FAKE_INSTANCE);
-				SET_BIT(ROOM_AFF_FLAGS(INST_FAKE_LOC(i_iter)), ROOM_AFF_FAKE_INSTANCE);
 				break;	// any 1 will do
 			}
 		}
+		
+		affect_total_room(INST_FAKE_LOC(inst));
 	}
 	
 	// reset fake loc to real loc
@@ -2071,7 +2074,7 @@ void set_instance_fake_loc(struct instance_data *inst, room_data *loc) {
 	if (INST_FAKE_LOC(inst) != INST_LOCATION(inst)) {
 		// add fake-instance flag if needed
 		SET_BIT(ROOM_BASE_FLAGS(INST_FAKE_LOC(inst)), ROOM_AFF_FAKE_INSTANCE);
-		SET_BIT(ROOM_AFF_FLAGS(INST_FAKE_LOC(inst)), ROOM_AFF_FAKE_INSTANCE);
+		affect_total_room(INST_FAKE_LOC(inst));
 	}
 	
 	// update interior
@@ -2373,7 +2376,7 @@ static void renum_instances(void) {
 	// remove all fake-loc flags first (avoids stray flags lingering forever)
 	HASH_ITER(hh, world_table, room, next_room) {
 		REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_FAKE_INSTANCE);
-		REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_FAKE_INSTANCE);
+		// affect_total_room(room); // not needed here
 	}
 	
 	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
@@ -2385,7 +2388,7 @@ static void renum_instances(void) {
 		// ensure fake-loc flag is set
 		if (INST_FAKE_LOC(inst) && INST_FAKE_LOC(inst) != INST_LOCATION(inst)) {
 			SET_BIT(ROOM_BASE_FLAGS(INST_FAKE_LOC(inst)), ROOM_AFF_FAKE_INSTANCE);
-			SET_BIT(ROOM_AFF_FLAGS(INST_FAKE_LOC(inst)), ROOM_AFF_FAKE_INSTANCE);
+			affect_total_room(INST_FAKE_LOC(inst));
 		}
 		
 		// attach pointers

@@ -883,10 +883,31 @@ void affect_total(char_data *ch) {
 */
 void affect_total_room(room_data *room) {
 	struct affected_type *af;
+	vehicle_data *veh;
 	
+	// reset to base
 	ROOM_AFF_FLAGS(room) = ROOM_BASE_FLAGS(room);
+	
+	// flags from affs
 	LL_FOREACH(ROOM_AFFECTS(room), af) {
 		SET_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
+	}
+	
+	// flags from vehicles
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_IS_COMPLETE(veh)) {
+			SET_BIT(ROOM_AFF_FLAGS(room), VEH_ROOM_AFFECTS(veh));
+		}
+	}
+	
+	// flags from building
+	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
+		SET_BIT(ROOM_AFF_FLAGS(room), GET_BLD_BASE_AFFECTS(GET_BUILDING(room)));
+	}
+	
+	// flags from template
+	if (GET_ROOM_TEMPLATE(room)) {
+		SET_BIT(ROOM_AFF_FLAGS(room), GET_RMT_BASE_AFFECTS(GET_ROOM_TEMPLATE(room)));
 	}
 }
 
@@ -2925,7 +2946,6 @@ void perform_abandon_room(room_data *room) {
 	ROOM_OWNER(room) = NULL;
 
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK | ROOM_AFF_NO_ABANDON);
-	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK | ROOM_AFF_NO_ABANDON);
 
 	if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
 		COMPLEX_DATA(room)->private_owner = NOBODY;
@@ -2950,6 +2970,8 @@ void perform_abandon_room(room_data *room) {
 			perform_abandon_vehicle(veh);
 		}
 	}
+	
+	affect_total_room(room);
 }
 
 
@@ -8168,12 +8190,6 @@ void detach_building_from_room(room_data *room) {
 		}
 	}
 	
-	// remove building affs
-	if (GET_BLD_BASE_AFFECTS(bld)) {
-		REMOVE_BIT(ROOM_BASE_FLAGS(room), GET_BLD_BASE_AFFECTS(bld));
-		REMOVE_BIT(ROOM_AFF_FLAGS(room), GET_BLD_BASE_AFFECTS(bld));
-	}
-	
 	if (SCRIPT(room)) {
 		any = FALSE;
 		LL_FOREACH_SAFE(TRIGGERS(SCRIPT(room)), trig, next_trig) {
@@ -9531,13 +9547,17 @@ void unseat_char_from_vehicle(char_data *ch) {
 * @param vehicle_data *veh The vehicle to remove from its room.
 */
 void vehicle_from_room(vehicle_data *veh) {
-	if (!veh || !IN_ROOM(veh)) {
+	room_data *was_in;
+	
+	if (!veh || !(was_in = IN_ROOM(veh))) {
 		log("SYSERR: NULL vehicle (%p) or vehicle not in a room (%p) passed to vehicle_from_room", veh, IN_ROOM(veh));
 		return;
 	}
 	
-	DL_DELETE2(ROOM_VEHICLES(IN_ROOM(veh)), veh, prev_in_room, next_in_room);
+	DL_DELETE2(ROOM_VEHICLES(was_in), veh, prev_in_room, next_in_room);
 	IN_ROOM(veh) = NULL;
+	
+	affect_total_room(was_in);
 }
 
 
@@ -9568,8 +9588,9 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 		GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(room);
 		GET_ISLAND(vrl->room) = GET_ISLAND(room);
 		GET_MAP_LOC(vrl->room) = GET_MAP_LOC(room);
-	
 	}
+	
+	affect_total_room(room);
 }
 
 

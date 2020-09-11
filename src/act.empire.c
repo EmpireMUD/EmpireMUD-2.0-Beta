@@ -5791,16 +5791,16 @@ ACMD(do_manage) {
 		// check for optional on/off arg
 		if (!str_cmp(argument, "on")) {
 			if (manage_data[type].flag != NOBITS) {
-				SET_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].flag);
 				SET_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].flag);
+				affect_total_room(flag_room);
 			}
 			// else: nothing to do?
 			on = TRUE;
 		}
 		else if (!str_cmp(argument, "off")) {
 			if (manage_data[type].flag != NOBITS) {
-				REMOVE_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].flag);
 				REMOVE_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].flag);
+				affect_total_room(flag_room);
 			}
 			// else: nothing to do?
 			on = FALSE;
@@ -5809,12 +5809,12 @@ ACMD(do_manage) {
 			if (manage_data[type].flag != NOBITS) {
 				on = !ROOM_AFF_FLAGGED(flag_room, manage_data[type].flag);
 				if (on) {
-					SET_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].flag);
 					SET_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].flag);
+					affect_total_room(flag_room);
 				}
 				else {	// off
-					REMOVE_BIT(ROOM_AFF_FLAGS(flag_room), manage_data[type].flag);
 					REMOVE_BIT(ROOM_BASE_FLAGS(flag_room), manage_data[type].flag);
+					affect_total_room(flag_room);
 				}
 			}
 			else {
@@ -6560,13 +6560,13 @@ ACMD(do_publicize) {
 		msg_to_char(ch, "You don't have permission to do that.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_PUBLIC)) {
-		REMOVE_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_PUBLIC);
 		REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_PUBLIC);
+		affect_total_room(IN_ROOM(ch));
 		msg_to_char(ch, "This area is no longer public.\r\n");
 	}
 	else {
-		SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_PUBLIC);
 		SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_PUBLIC);
+		affect_total_room(IN_ROOM(ch));
 		msg_to_char(ch, "This area is now public.\r\n");
 	}
 }
@@ -6948,8 +6948,8 @@ ACMD(do_unpublicize) {
 	else {
 		HASH_ITER(hh, world_table, iter, next_iter) {
 			if (ROOM_AFF_FLAGGED(iter, ROOM_AFF_PUBLIC) && ROOM_OWNER(iter) == e) {
-				REMOVE_BIT(ROOM_AFF_FLAGS(iter), ROOM_AFF_PUBLIC);
 				REMOVE_BIT(ROOM_BASE_FLAGS(iter), ROOM_AFF_PUBLIC);
+				affect_total_room(iter);
 			}
 		}
 		msg_to_char(ch, "All public status for this empire's buildings has been renounced.\r\n");
@@ -7215,13 +7215,13 @@ ACMD(do_workforce) {
 			msg_to_char(ch, "Your empire doesn't own this tile anyway.\r\n");
 		}
 		else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WORK)) {
-			REMOVE_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_NO_WORK);
 			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_NO_WORK);
+			affect_total_room(IN_ROOM(ch));
 			msg_to_char(ch, "Workforce will now be able to work this tile.\r\n");
 		}
 		else {
-			SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_NO_WORK);
 			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_NO_WORK);
+			affect_total_room(IN_ROOM(ch));
 			msg_to_char(ch, "Workforce will no longer work this tile.\r\n");
 			deactivate_workforce_room(emp, IN_ROOM(ch));
 		}

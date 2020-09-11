@@ -298,8 +298,8 @@ void complete_building(room_data *room) {
 	COMPLEX_DATA(room)->damage = 0;
 	
 	// remove incomplete
-	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_INCOMPLETE);
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_INCOMPLETE);
+	affect_total_room(room);
 	
 	complete_wtrigger(room);
 	
@@ -325,6 +325,8 @@ void complete_building(room_data *room) {
 			et_gain_building(emp, GET_BLD_VNUM(GET_BUILDING(room)));
 		}
 	}
+	
+	affect_total_room(room);
 }
 
 
@@ -356,9 +358,6 @@ void construct_building(room_data *room, bld_vnum type) {
 	
 	// set actual data
 	attach_building_to_room(building_proto(type), room, TRUE);
-	
-	SET_BIT(ROOM_BASE_FLAGS(room), BLD_BASE_AFFECTS(room));
-	SET_BIT(ROOM_AFF_FLAGS(room), BLD_BASE_AFFECTS(room));
 	
 	// check for territory updates
 	if (ROOM_OWNER(room) && was_large != ROOM_BLD_FLAGGED(room, BLD_LARGE_CITY_RADIUS)) {
@@ -411,14 +410,14 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 	setup_tunnel_entrance(ch, entrance, dir);
 	GET_BUILDING_RESOURCES(entrance) = copy_resource_list(resources);
 	SET_BIT(ROOM_BASE_FLAGS(entrance), ROOM_AFF_INCOMPLETE);
-	SET_BIT(ROOM_AFF_FLAGS(entrance), ROOM_AFF_INCOMPLETE);
+	affect_total_room(entrance);
 	create_exit(entrance, IN_ROOM(ch), rev_dir[dir], FALSE);
 
 	// exit
 	setup_tunnel_entrance(ch, exit, rev_dir[dir]);
 	GET_BUILDING_RESOURCES(exit) = copy_resource_list(resources);
 	SET_BIT(ROOM_BASE_FLAGS(exit), ROOM_AFF_INCOMPLETE);
-	SET_BIT(ROOM_AFF_FLAGS(exit), ROOM_AFF_INCOMPLETE);
+	affect_total_room(exit);
 	to_room = real_shift(exit, shift_dir[dir][0], shift_dir[dir][1]);
 	create_exit(exit, to_room, dir, FALSE);
 
@@ -428,7 +427,7 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 		attach_building_to_room(building_proto(RTYPE_TUNNEL), new_room, TRUE);
 		GET_BUILDING_RESOURCES(new_room) = copy_resource_list(resources);
 		SET_BIT(ROOM_BASE_FLAGS(new_room), ROOM_AFF_INCOMPLETE);
-		SET_BIT(ROOM_AFF_FLAGS(new_room), ROOM_AFF_INCOMPLETE);
+		affect_total_room(new_room);
 
 		create_exit(last_room, new_room, dir, TRUE);
 		
@@ -496,7 +495,7 @@ void disassociate_building(room_data *room) {
 	
 	// remove bits including dismantle
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT);
-	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT);
+	affect_total_room(room);
 	
 	// TODO should do an affect-total here in case any of those were also added by an affect?
 
@@ -1174,7 +1173,7 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 	construct_building(room, BUILDING_TUNNEL);
 		
 	SET_BIT(ROOM_BASE_FLAGS(room), tunnel_flags);
-	SET_BIT(ROOM_AFF_FLAGS(room), tunnel_flags);
+	affect_total_room(room);
 	COMPLEX_DATA(room)->entrance = dir;
 	if (emp && can_claim(ch) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
 		ter_type = get_territory_type_for_empire(room, emp, FALSE, &junk);
@@ -1303,8 +1302,8 @@ void start_dismantle_building(room_data *loc) {
 	// reduce resource: they don't get it all back
 	reduce_dismantle_resources(BUILDING_DAMAGE(loc), GET_BUILDING(loc) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(loc)) : 1, &GET_BUILDING_RESOURCES(loc));
 
-	SET_BIT(ROOM_AFF_FLAGS(loc), ROOM_AFF_DISMANTLING);
 	SET_BIT(ROOM_BASE_FLAGS(loc), ROOM_AFF_DISMANTLING);
+	affect_total_room(loc);
 	delete_room_npcs(loc, NULL, TRUE);
 	
 	if (loc && ROOM_OWNER(loc) && GET_BUILDING(loc) && complete) {
@@ -1322,6 +1321,8 @@ void start_dismantle_building(room_data *loc) {
 	stop_room_action(loc, ACT_QUARRYING);
 	stop_room_action(loc, ACT_MAINTENANCE);
 	stop_room_action(loc, ACT_PICKING);
+	
+	affect_total_room(loc);
 }
 
 
@@ -2128,13 +2129,13 @@ ACMD(do_nodismantle) {
 		msg_to_char(ch, "You don't have permission to do that.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(HOME_ROOM(IN_ROOM(ch)), ROOM_AFF_NO_DISMANTLE)) {
-		REMOVE_BIT(ROOM_AFF_FLAGS(HOME_ROOM(IN_ROOM(ch))), ROOM_AFF_NO_DISMANTLE);
 		REMOVE_BIT(ROOM_BASE_FLAGS(HOME_ROOM(IN_ROOM(ch))), ROOM_AFF_NO_DISMANTLE);
+		affect_total_room(HOME_ROOM(IN_ROOM(ch)));
 		msg_to_char(ch, "This building can now be dismantled.\r\n");
 	}
 	else {
-		SET_BIT(ROOM_AFF_FLAGS(HOME_ROOM(IN_ROOM(ch))), ROOM_AFF_NO_DISMANTLE);
 		SET_BIT(ROOM_BASE_FLAGS(HOME_ROOM(IN_ROOM(ch))), ROOM_AFF_NO_DISMANTLE);
+		affect_total_room(HOME_ROOM(IN_ROOM(ch)));
 		msg_to_char(ch, "This building can no longer be dismantled.\r\n");
 	}
 }
@@ -2194,13 +2195,13 @@ ACMD(do_paint) {
 		
 		if (ROOM_PAINT_COLOR(IN_ROOM(ch)) == GET_PAINT_COLOR(paint)) {
 			// same color -- brighten it
-			SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
 			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+			affect_total_room(IN_ROOM(ch));
 		}
 		else {
 			// different color -- remove bright
-			REMOVE_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
 			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+			affect_total_room(IN_ROOM(ch));
 		}
 		
 		// update color
@@ -2331,8 +2332,8 @@ ACMD(do_unpaint) {
 		act("$n strips the paint from the building!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
 		COMPLEX_DATA(IN_ROOM(ch))->paint_color = 0;
-		REMOVE_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
 		REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
+		affect_total_room(IN_ROOM(ch));
 		
 		command_lag(ch, WAIT_ABILITY);
 	}
@@ -2447,7 +2448,7 @@ ACMD(do_upgrade) {
 			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(type)), IN_ROOM(ch), TRUE);
 			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
 			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
-			SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
+			affect_total_room(IN_ROOM(ch));
 			GET_BUILDING_RESOURCES(IN_ROOM(ch)) = copy_resource_list(GET_CRAFT_RESOURCES(type));
 
 			msg_to_char(ch, "You begin to upgrade the building.\r\n");

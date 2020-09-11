@@ -434,8 +434,8 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	room = create_room(NULL);
 	attach_building_to_room(bld, room, TRUE);
 	COMPLEX_DATA(room)->home_room = NULL;
-	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_IN_VEHICLE);
 	SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_IN_VEHICLE);
+	affect_total_room(room);
 	
 	// attach
 	COMPLEX_DATA(room)->vehicle = veh;
@@ -739,6 +739,8 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 	while (VEH_ANIMALS(veh)) {
 		unharness_mob_from_vehicle(VEH_ANIMALS(veh), veh);
 	}
+	
+	affect_total_room(IN_ROOM(veh));
 }
 
 
@@ -1046,6 +1048,8 @@ void complete_vehicle(vehicle_data *veh) {
 		finish_vehicle_setup(veh);
 		load_vtrigger(veh);
 	}
+	
+	affect_total_room(IN_ROOM(veh));
 }
 
 
@@ -2462,8 +2466,8 @@ void convert_one_obj_to_vehicle(obj_data *obj) {
 				// apply vehicle aff
 				LL_FOREACH2(interior_room_list, room_iter, next_interior) {
 					if (room_iter == main_room || HOME_ROOM(room_iter) == main_room) {
-						SET_BIT(ROOM_AFF_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
 						SET_BIT(ROOM_BASE_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
+						affect_total_room(room_iter);
 					}
 				}
 			}
@@ -2531,8 +2535,8 @@ void b3_8_ship_update(void) {
 	
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_SHIP_PRESENT)) {
-			REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_SHIP_PRESENT);
 			REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_SHIP_PRESENT);
+			affect_total_room(room);
 			++changed;
 		}
 	}

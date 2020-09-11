@@ -316,13 +316,13 @@ OLC_MODULE(mapedit_unclaimable) {
 			if (to && GET_ISLAND_ID(to) != NO_ISLAND) {
 				any_land = TRUE;
 				if (set) {
-					SET_BIT(ROOM_AFF_FLAGS(to), ROOM_AFF_UNCLAIMABLE);
 					SET_BIT(ROOM_BASE_FLAGS(to), ROOM_AFF_UNCLAIMABLE);
+					affect_total_room(to);
 					abandon_room(to);
 				}
 				else {
-					REMOVE_BIT(ROOM_AFF_FLAGS(to), ROOM_AFF_UNCLAIMABLE);
 					REMOVE_BIT(ROOM_BASE_FLAGS(to), ROOM_AFF_UNCLAIMABLE);
+					affect_total_room(to);
 				}
 			}
 		}

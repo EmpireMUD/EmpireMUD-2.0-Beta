@@ -1646,7 +1646,7 @@ void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
 	
 	special_building_setup(ch, IN_ROOM(ch));
 	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
-	SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
+	affect_total_room(IN_ROOM(ch));
 	GET_BUILDING_RESOURCES(IN_ROOM(ch)) = copy_resource_list(GET_CRAFT_RESOURCES(type));
 	
 	// can_claim checks total available land, but the outside is check done within this block

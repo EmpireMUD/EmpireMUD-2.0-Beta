@@ -2155,8 +2155,8 @@ void b3_2_map_and_gear(void) {
 		// player-made
 		if (IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE)) {
 			// remove the bits
-			REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_PLAYER_MADE);
 			REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+			affect_total_room(room);
 		
 			// update the natural sector
 			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
@@ -2416,7 +2416,7 @@ void b4_15_building_update(void) {
 		// add INCOMPLETE aff
 		if (BUILDING_RESOURCES(room) && !IS_DISMANTLING(room)) {
 			SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_INCOMPLETE);
-			SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_INCOMPLETE);
+			affect_total_room(room);
 		}
 		
 		// convert maintenance
@@ -2852,10 +2852,9 @@ void b5_19_world_fix(void) {
 		}
 		else {	// has a building -- look for errors
 			flags = flags_to_wipe;
-			REMOVE_BIT(flags, GET_BLD_BASE_AFFECTS(bld));
 			if (flags) {	// do not remove flags the building actually uses
 				REMOVE_BIT(ROOM_BASE_FLAGS(room), flags);
-				REMOVE_BIT(ROOM_AFF_FLAGS(room), flags);
+				affect_total_room(room);
 			}
 			affect_total_room(room);
 		}

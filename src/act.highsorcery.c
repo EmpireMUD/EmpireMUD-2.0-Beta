@@ -1500,8 +1500,8 @@ RITUAL_FINISH_FUNC(perform_chant_of_illusions) {
 		return;
 	}
 	
-	SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_CHAMELEON);
 	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_CHAMELEON);
+	affect_total_room(IN_ROOM(ch));
 	msg_to_char(ch, "As you finish the chant, the road is cloaked in illusion!\r\n");
 }
 
@@ -1774,8 +1774,8 @@ RITUAL_FINISH_FUNC(perform_ritual_of_defense) {
 	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_FLY)) {
 		gain_ability_exp(ch, ABIL_RITUAL_OF_DEFENSE, 25);
 	}
-	SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_NO_FLY);
 	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_NO_FLY);
+	affect_total_room(IN_ROOM(ch));
 }
 
 
