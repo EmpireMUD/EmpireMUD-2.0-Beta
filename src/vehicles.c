@@ -1138,6 +1138,9 @@ void complete_vehicle(vehicle_data *veh) {
 	}
 	
 	affect_total_room(IN_ROOM(veh));
+	
+	// build the interior
+	get_vehicle_interior(veh);
 }
 
 
