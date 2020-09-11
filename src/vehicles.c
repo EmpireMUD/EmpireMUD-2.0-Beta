@@ -1134,13 +1134,15 @@ void complete_vehicle(vehicle_data *veh) {
 		}
 		
 		finish_vehicle_setup(veh);
+		
+		// build the interior
+		get_vehicle_interior(veh);
+		
+		// run triggers
 		load_vtrigger(veh);
 	}
 	
 	affect_total_room(IN_ROOM(veh));
-	
-	// build the interior
-	get_vehicle_interior(veh);
 }
 
 
