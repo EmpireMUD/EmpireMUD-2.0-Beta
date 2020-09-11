@@ -2788,7 +2788,7 @@ void process_start_fillin(char_data *ch) {
 		msg_to_char(ch, "You block off the water and begin to fill in the trench.\r\n");
 		
 		// set it up
-		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(old_sect));
+		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(old_sect), NOTHING);
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, -1);
 	}
 	else {
@@ -3152,7 +3152,7 @@ ACMD(do_excavate) {
 
 		// Set up the trench
 		orig = SECT(IN_ROOM(ch));
-		change_terrain(IN_ROOM(ch), evo->becomes);
+		change_terrain(IN_ROOM(ch), evo->becomes, NOTHING);
 		
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, config_get_int("trench_initial_value"));
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR, GET_SECT_VNUM(orig));
@@ -3606,8 +3606,7 @@ ACMD(do_plant) {
 	}
 	else {
 		original = SECT(IN_ROOM(ch));
-		change_terrain(IN_ROOM(ch), evo->becomes);
-		change_base_sector(IN_ROOM(ch), original);
+		change_terrain(IN_ROOM(ch), evo->becomes, GET_SECT_VNUM(original));
 		
 		// don't use GET_FOOD_CROP_TYPE because not all plantables are food
 		set_crop_type(IN_ROOM(ch), cp);

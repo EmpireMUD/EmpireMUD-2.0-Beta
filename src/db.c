@@ -2313,7 +2313,7 @@ void b3_15_crop_update(void) {
 		else if (map->sector_type->vnum == SECT_JUNGLE && number(1, 100) <= JUNGLE_PERCENT) {
 			// transform jungle
 			if (room || (room = real_room(map->vnum))) {
-				change_terrain(room, SECT_JUNGLE_FIELD);	// picks own crop
+				change_terrain(room, SECT_JUNGLE_FIELD, NOTHING);	// picks own crop
 			}
 		}
 	}
@@ -3849,7 +3849,7 @@ void b5_87_crop_and_old_growth(void) {
 			if (!number(0, 9)) {
 				// 10% chance of becoming old-growth now
 				++new_og;
-				change_terrain(real_room(map->vnum), old_growth);
+				change_terrain(real_room(map->vnum), old_growth, NOTHING);
 			}
 			else {
 				// otherwise, back-date their sector time 3-4 weeks
@@ -3921,13 +3921,13 @@ void b5_88_irrigation_repair(void) {
 		
 		if (map->sector_type && b588_TARGET_SECT(GET_SECT_VNUM(map->sector_type))) {
 			++fixed_current;
-			change_terrain(real_room(map->vnum), GET_SECT_VNUM(map->natural_sector));
+			change_terrain(real_room(map->vnum), GET_SECT_VNUM(map->natural_sector), NOTHING);
 			// log(" - current: %d (%d, %d)", map->vnum, MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 		}
 		else if (map->base_sector && b588_TARGET_SECT(GET_SECT_VNUM(map->base_sector))) {
 			if (map->crop_type) {	// crop with bad base: remove crop
 				++fixed_current;
-				change_terrain(real_room(map->vnum), GET_SECT_VNUM(map->natural_sector));
+				change_terrain(real_room(map->vnum), GET_SECT_VNUM(map->natural_sector), NOTHING);
 				// log(" - current (crop): %d (%d, %d)", map->vnum, MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else {	// no crop -- only need to fix base

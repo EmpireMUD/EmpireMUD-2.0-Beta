@@ -1528,10 +1528,7 @@ RITUAL_FINISH_FUNC(perform_chant_of_nature) {
 		msg_to_char(ch, "As you chant, the plants around you grow with amazing speed!\r\n");
 		act("As $n chants, the plants around $m grow with amazing speed!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
-		change_terrain(IN_ROOM(ch), evo->becomes);
-		if (preserve) {
-			change_base_sector(IN_ROOM(ch), preserve);
-		}
+		change_terrain(IN_ROOM(ch), evo->becomes, preserve ? GET_SECT_VNUM(preserve) : NOTHING);
 		
 		remove_depletion(IN_ROOM(ch), DPLTN_PICK);
 		remove_depletion(IN_ROOM(ch), DPLTN_FORAGE);

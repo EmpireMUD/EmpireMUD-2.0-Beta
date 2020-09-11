@@ -359,7 +359,7 @@ void construct_building(room_data *room, bld_vnum type) {
 	was_ter = ROOM_OWNER(room) ? get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, &junk) : TER_FRONTIER;
 	
 	sect = SECT(room);
-	change_terrain(room, config_get_int("default_building_sect"));
+	change_terrain(room, config_get_int("default_building_sect"), NOTHING);
 	change_base_sector(room, sect);
 	
 	// set actual data
@@ -2026,10 +2026,7 @@ ACMD(do_lay) {
 		}
 				
 		// change it over
-		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(road_sect));
-		
-		// preserve this for un-laying the road (disassociate_building)
-		change_base_sector(IN_ROOM(ch), original_sect);
+		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(road_sect), GET_SECT_VNUM(original_sect));
 		
 		// log charged resources
 		if (charged) {

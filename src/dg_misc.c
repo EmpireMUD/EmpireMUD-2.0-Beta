@@ -693,7 +693,7 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 		return;
 	}
 	else {
-		change_terrain(target, GET_SECT_VNUM(sect));
+		change_terrain(target, GET_SECT_VNUM(sect), NOTHING);
 		set_crop_type(target, cp);
 		
 		remove_depletion(target, DPLTN_PICK);
@@ -725,20 +725,12 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 void do_dg_terraform(room_data *target, sector_data *sect) {
 	void finish_trench(room_data *room);
 	
-	sector_data *old_sect;
-	
 	if (!target || !sect) {
 		return;
 	}
 	
-	old_sect = BASE_SECT(target);
-	
-	change_terrain(target, GET_SECT_VNUM(sect));
-	
 	// preserve old original sect for roads -- TODO this is a special-case
-	if (IS_ROAD(target)) {
-		change_base_sector(target, old_sect);
-	}
+	change_terrain(target, GET_SECT_VNUM(sect), IS_ROAD(target) ? GET_SECT_VNUM(BASE_SECT(target)) : NOTHING);
 	
 	remove_depletion(target, DPLTN_PICK);
 	remove_depletion(target, DPLTN_FORAGE);

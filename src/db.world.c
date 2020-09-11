@@ -129,7 +129,7 @@ void change_chop_territory(room_data *room) {
 	}
 	else if ((evo = get_evolution_by_type(SECT(room), EVO_CHOPPED_DOWN))) {
 		// normal case
-		change_terrain(room, evo->becomes);
+		change_terrain(room, evo->becomes, NOTHING);
 	}
 	else {
 		// it's actually okay to call this on an unchoppable room... just mark it more depleted
@@ -144,12 +144,13 @@ void change_chop_territory(room_data *room) {
 *
 * @param room_data *room The room to change.
 * @param sector_vnum sect Any sector vnum
+* @param sector_vnum base_sect Optional: Sets the base sector, too. (pass NOTHING to set it the same as sect)
 */
-void change_terrain(room_data *room, sector_vnum sect) {
+void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 	void check_vehicle_climate_change(room_data *room);
 	void lock_icon(room_data *room, struct icon_data *use_icon);
 	
-	sector_data *old_sect = SECT(room), *st = sector_proto(sect);
+	sector_data *old_sect = SECT(room), *st = sector_proto(sect), *base;
 	struct map_data *map, *temp;
 	crop_data *new_crop = NULL;
 	empire_data *emp;
@@ -162,6 +163,11 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	if (!st) {
 		log("SYSERR: change_terrain called with invalid sector vnum %d", sect);
 		return;
+	}
+	
+	base = sector_proto(base_sect);
+	if (!base) {
+		base = st;
 	}
 	
 	// tear down any building data and customizations
@@ -189,7 +195,7 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	
 	// change sect
 	perform_change_sect(room, NULL, st);
-	perform_change_base_sect(room, NULL, st);
+	perform_change_base_sect(room, NULL, base);
 	
 	// need to determine a crop?
 	if (!new_crop && SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
@@ -749,7 +755,7 @@ void fill_trench(room_data *room) {
 			sprintf(lbuf, "The trench is full! It is now %s %s!", sect ? AN(GET_SECT_NAME(sect)) : "something", sect ? GET_SECT_NAME(sect) : "else");
 			act(lbuf, FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 		}
-		change_terrain(room, evo->becomes);
+		change_terrain(room, evo->becomes, NOTHING);
 		remove_room_extra_data(room, ROOM_EXTRA_TRENCH_FILL_TIME);
 	}
 }
@@ -864,7 +870,7 @@ void perform_burn_room(room_data *room) {
 			act(buf, FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
 		
-		change_terrain(room, evo->becomes);
+		change_terrain(room, evo->becomes, NOTHING);
 		
 		stop_room_action(room, ACT_BURN_AREA);
 		stop_room_action(room, ACT_CHOPPING);
@@ -952,7 +958,7 @@ void uncrop_tile(room_data *room) {
 	}
 	
 	// ok: now change it
-	change_terrain(room, GET_SECT_VNUM(to_sect));
+	change_terrain(room, GET_SECT_VNUM(to_sect), NOTHING);
 	
 	if (ROOM_PEOPLE(room)) {
 		strcpy(name, GET_SECT_NAME(to_sect));
@@ -999,7 +1005,7 @@ void untrench_room(room_data *room) {
 	}
 	
 	if (to_sect) {
-		change_terrain(room, GET_SECT_VNUM(to_sect));
+		change_terrain(room, GET_SECT_VNUM(to_sect), NOTHING);
 	}
 	
 	remove_room_extra_data(room, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
@@ -1262,7 +1268,7 @@ void annual_update_map_tile(struct map_data *tile) {
 			room = real_room(tile->vnum);	// neeed room in memory
 		}
 		
-		change_terrain(room, GET_SECT_VNUM(old_sect));
+		change_terrain(room, GET_SECT_VNUM(old_sect), NOTHING);
 		set_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS, -1);
 	}
 	
@@ -1427,7 +1433,7 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 			act("The area returns to nature!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
 		decustomize_room(room);
-		change_terrain(room, GET_SECT_VNUM(tile->natural_sector));
+		change_terrain(room, GET_SECT_VNUM(tile->natural_sector), NOTHING);
 		
 		// no longer need this
 		remove_room_extra_data(room, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
@@ -2677,13 +2683,8 @@ bool import_one_evo(room_vnum loc, sector_vnum old_sect, sector_vnum new_sect) {
 	}
 	*/
 	
-	// seems ok...
-	change_terrain(room, new_sect);
-	
-	// If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
-	if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && BASE_SECT(room) == SECT(room)) {
-		change_base_sector(room, sector_proto(old_sect));
-	}
+	// seems ok... If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
+	change_terrain(room, new_sect, (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && BASE_SECT(room) == SECT(room)) ? old_sect : NOTHING);
 	
 	// deactivate workforce if the room type changed
 	if (ROOM_OWNER(room)) {

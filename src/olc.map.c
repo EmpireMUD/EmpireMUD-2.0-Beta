@@ -181,7 +181,7 @@ OLC_MODULE(mapedit_terrain) {
 		
 		if (sect) {
 			msg_to_char(ch, "This room is now %s %s.\r\n", AN(GET_SECT_NAME(sect)), GET_SECT_NAME(sect));
-			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
+			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect), NOTHING);
 			if (ROOM_OWNER(IN_ROOM(ch))) {
 				deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 			}
@@ -193,7 +193,7 @@ OLC_MODULE(mapedit_terrain) {
 			}
 			else {
 				msg_to_char(ch, "This room is now %s.\r\n", GET_CROP_NAME(cp));
-				change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
+				change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect), NOTHING);
 				set_crop_type(IN_ROOM(ch), cp);
 				if (ROOM_OWNER(IN_ROOM(ch))) {
 					deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
@@ -249,10 +249,7 @@ OLC_MODULE(mapedit_grow) {
 		msg_to_char(ch, "You cause the room to grow around you.\r\n");
 		act("$n causes the room to grow around you.", FALSE, ch, NULL, NULL, TO_ROOM);
 		
-		change_terrain(IN_ROOM(ch), evo->becomes);
-		if (preserve) {
-			change_base_sector(IN_ROOM(ch), preserve);
-		}
+		change_terrain(IN_ROOM(ch), evo->becomes, preserve ? GET_SECT_VNUM(preserve) : NOTHING);
 		
 		remove_depletion(IN_ROOM(ch), DPLTN_PICK);
 		remove_depletion(IN_ROOM(ch), DPLTN_FORAGE);
@@ -635,7 +632,7 @@ OLC_MODULE(mapedit_naturalize) {
 					act("The area is naturalized!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
 				decustomize_room(room);
-				change_terrain(room, GET_SECT_VNUM(map->natural_sector));
+				change_terrain(room, GET_SECT_VNUM(map->natural_sector), NOTHING);
 				if (ROOM_OWNER(room)) {
 					deactivate_workforce_room(ROOM_OWNER(room), room);
 				}
@@ -679,7 +676,7 @@ OLC_MODULE(mapedit_naturalize) {
 	else {	// normal processing for 1 room
 		map = &(world_map[FLAT_X_COORD(IN_ROOM(ch))][FLAT_Y_COORD(IN_ROOM(ch))]);
 		decustomize_room(IN_ROOM(ch));
-		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(map->natural_sector));
+		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(map->natural_sector), NOTHING);
 		if (ROOM_OWNER(IN_ROOM(ch))) {
 			deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 		}
