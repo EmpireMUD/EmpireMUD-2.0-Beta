@@ -4320,6 +4320,7 @@ const char *identify_vehicle_flags[] = {
 const char *veh_custom_types[] = {
 	"ruins-to-room",	// 0
 	"climate-change-to-room",
+	"\n"
 };
 
 
