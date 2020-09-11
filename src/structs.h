@@ -2457,6 +2457,10 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_DISMANTLING  BIT(25)	// z. is being dismantled
 #define VEH_PLAYER_NO_WORK  BIT(26)	// A. player has marked it no-work
 
+// VEH_CUSTOM_x: custom message types
+#define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin
+
+
 // VSPEED_x: indicates the number of speed bonuses this vehicle gives to driving.
 #define VSPEED_VERY_SLOW  0 // No speed bonuses.
 #define VSPEED_SLOW       1 // One speed bonus.
@@ -5561,10 +5565,11 @@ struct vehicle_attribute_data {
 	struct spawn_info *spawns;	// linked list of spawn data
 	bitvector_t room_affects;	// ROOM_AFF_ flags applied to the room while veh is here
 	bitvector_t functions;	// FNC_ flags offered to the room the vehicle is in
-	bitvector_t require_climate;	// CLIM_ flags required for this vehicle to enter a room
+	bitvector_t requires_climate;	// CLIM_ flags required for this vehicle to enter a room
 	bitvector_t forbid_climate;	// CLIM_ flags that block this vehicle from entering
 	int fame;	// how much fame it adds to the empire
 	int military;	// how much it adds to the military pool
+	struct custom_message *custom_msgs;	// any custom messages
 };
 
 

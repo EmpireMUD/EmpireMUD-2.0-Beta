@@ -4316,6 +4316,12 @@ const char *identify_vehicle_flags[] = {
 };
 
 
+// VEH_CUSTOM_x: custom message types
+const char *veh_custom_types[] = {
+	"ruins-to-room",	// 0
+};
+
+
 // VSPEED_x: Vehicle speed classes
 const char *vehicle_speed_types[] = {
 	"Very Slow",

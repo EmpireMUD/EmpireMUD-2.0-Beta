@@ -56,6 +56,7 @@ extern const char *function_flags[];
 extern const char *interact_types[];
 extern const char *mob_move_types[];
 extern const char *room_aff_bits[];
+extern const char *veh_custom_types[];
 extern const char *vehicle_flags[];
 extern const char *vehicle_speed_types[];
 
@@ -902,7 +903,7 @@ bool vehicle_allows_climate(vehicle_data *veh, room_data *room) {
 	}
 	
 	// compare
-	if (VEH_REQUIRE_CLIMATE(veh) && !(VEH_REQUIRE_CLIMATE(veh) & climate)) {
+	if (VEH_REQUIRES_CLIMATE(veh) && !(VEH_REQUIRES_CLIMATE(veh) & climate)) {
 		return FALSE;	// required climate type is missing
 	}
 	if (VEH_FORBID_CLIMATE(veh) && (VEH_FORBID_CLIMATE(veh) & climate)) {
@@ -2085,6 +2086,8 @@ void clear_vehicle(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle data to free.
 */
 void free_vehicle(vehicle_data *veh) {
+	void free_custom_messages(struct custom_message *mes);
+	
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
 	struct vehicle_attached_mob *vam;
 	struct spawn_info *spawn;
@@ -2144,6 +2147,9 @@ void free_vehicle(vehicle_data *veh) {
 				free(spawn);
 			}
 		}
+		if (VEH_CUSTOM_MSGS(veh) && (!proto || VEH_CUSTOM_MSGS(veh) != VEH_CUSTOM_MSGS(proto))) {
+			free_custom_messages(VEH_CUSTOM_MSGS(veh));
+		}
 		
 		free(veh->attributes);
 	}
@@ -2182,6 +2188,7 @@ int get_new_vehicle_construction_id(void) {
 * @param any_vnum vnum The vehicle vnum
 */
 void parse_vehicle(FILE *fl, any_vnum vnum) {
+	void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 	void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 	void parse_interaction(char *line, struct interaction_item **list, char *error_part);
 	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
@@ -2281,13 +2288,17 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				parse_interaction(line, &VEH_INTERACTIONS(veh), error);
 				break;
 			}
+			case 'K': {	// custom messages
+				parse_custom_message(fl, &VEH_CUSTOM_MSGS(veh), error);
+				break;
+			}
 			case 'L': {	// climate require/forbids
 				if (sscanf(line, "L %s %s", str_in, str_in2) != 2) {
 					log("SYSERR: Format error in L line of %s", error);
 					exit(1);
 				}
 				
-				VEH_REQUIRE_CLIMATE(veh) = asciiflag_conv(str_in);
+				VEH_REQUIRES_CLIMATE(veh) = asciiflag_conv(str_in);
 				VEH_FORBID_CLIMATE(veh) = asciiflag_conv(str_in2);
 				break;
 			}
@@ -2366,6 +2377,7 @@ void write_vehicle_index(FILE *fl) {
 * @param vehicle_data *veh The thing to save.
 */
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
+	void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 	void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 	void write_interactions_to_file(FILE *fl, struct interaction_item *list);
 	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
@@ -2414,9 +2426,12 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	// I: interactions
 	write_interactions_to_file(fl, VEH_INTERACTIONS(veh));
 	
+	// K: custom messages
+	write_custom_messages_to_file(fl, 'K', VEH_CUSTOM_MSGS(veh));
+	
 	// L: climate restrictions
-	if (VEH_REQUIRE_CLIMATE(veh) || VEH_FORBID_CLIMATE(veh)) {
-		strcpy(temp, bitv_to_alpha(VEH_REQUIRE_CLIMATE(veh)));
+	if (VEH_REQUIRES_CLIMATE(veh) || VEH_FORBID_CLIMATE(veh)) {
+		strcpy(temp, bitv_to_alpha(VEH_REQUIRES_CLIMATE(veh)));
 		strcpy(temp2, bitv_to_alpha(VEH_FORBID_CLIMATE(veh)));
 		fprintf(fl, "L %s %s\n", temp, temp2);
 	}
@@ -2872,13 +2887,14 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	
 	char only_icon[MAX_INPUT_LENGTH];
 	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;
-	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS;
+	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS, find_custom = NOBITS, found_custom = NOBITS;
 	int only_animals = NOTHING, only_cap = NOTHING, cap_over = NOTHING, cap_under = NOTHING;
 	int only_fame = NOTHING, fame_over = NOTHING, fame_under = NOTHING, only_speed = NOTHING;
 	int only_hitpoints = NOTHING, hitpoints_over = NOTHING, hitpoints_under = NOTHING, only_level = NOTHING;
 	int only_military = NOTHING, military_over = NOTHING, military_under = NOTHING;
 	int only_rooms = NOTHING, rooms_over = NOTHING, rooms_under = NOTHING, only_move = NOTHING;
 	int size_under = NOTHING, size_over = NOTHING;
+	struct custom_message *cust;
 	bool needs_animals = FALSE;
 	
 	struct interaction_item *inter;
@@ -2909,6 +2925,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_INT("capacity", only_cap, 0, INT_MAX)
 		FULLSEARCH_INT("capacityover", cap_over, 0, INT_MAX)
 		FULLSEARCH_INT("capacityunder", cap_under, 0, INT_MAX)
+		FULLSEARCH_FLAGS("custom", find_custom, veh_custom_types)
 		FULLSEARCH_FLAGS("designate", only_designate, designate_flags)
 		FULLSEARCH_INT("fame", only_fame, 0, INT_MAX)
 		FULLSEARCH_INT("fameover", fame_over, 0, INT_MAX)
@@ -3048,8 +3065,17 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		if (only_speed != NOTHING && VEH_SPEED_BONUSES(veh) != only_speed) {
 			continue;
 		}
+		if (find_custom) {	// look up its custom messages
+			found_custom = NOBITS;
+			LL_FOREACH(VEH_CUSTOM_MSGS(veh), cust) {
+				found_custom |= BIT(cust->type);
+			}
+			if ((find_custom & found_custom) != find_custom) {
+				continue;
+			}
+		}
 		
-		if (*find_keywords && !multi_isname(find_keywords, VEH_KEYWORDS(veh)) && !multi_isname(find_keywords, VEH_LONG_DESC(veh)) && !multi_isname(find_keywords, VEH_LOOK_DESC(veh)) && !multi_isname(find_keywords, VEH_SHORT_DESC(veh)) && !search_extra_descs(find_keywords, VEH_EX_DESCS(veh))) {
+		if (*find_keywords && !multi_isname(find_keywords, VEH_KEYWORDS(veh)) && !multi_isname(find_keywords, VEH_LONG_DESC(veh)) && !multi_isname(find_keywords, VEH_LOOK_DESC(veh)) && !multi_isname(find_keywords, VEH_SHORT_DESC(veh)) && !search_extra_descs(find_keywords, VEH_EX_DESCS(veh)) && !search_custom_messages(find_keywords, VEH_CUSTOM_MSGS(veh))) {
 			continue;
 		}
 		
@@ -3297,6 +3323,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	char buf[MAX_STRING_LENGTH * 2], part[MAX_STRING_LENGTH];
 	struct room_extra_data *red, *next_red;
+	struct custom_message *custm;
 	obj_data *obj;
 	size_t size;
 	int found;
@@ -3345,8 +3372,8 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	sprintbit(VEH_FUNCTIONS(veh), function_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Functions: \tg%s\t0\r\n", part);
 	
-	ordered_sprintbit(VEH_REQUIRE_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, part);
-	size += snprintf(buf + size, sizeof(buf) - size, "Require climate: \tc%s\t0\r\n", part);
+	ordered_sprintbit(VEH_REQUIRES_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Requires climate: \tc%s\t0\r\n", part);
 	ordered_sprintbit(VEH_FORBID_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, part);
 	size += snprintf(buf + size, sizeof(buf) - size, "Forbid climate: \tg%s\t0\r\n", part);
 	
@@ -3399,6 +3426,14 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	if (VEH_NEEDS_RESOURCES(veh)) {
 		get_resource_display(VEH_NEEDS_RESOURCES(veh), part);
 		size += snprintf(buf + size, sizeof(buf) - size, "%s resources:\r\n%s", VEH_IS_DISMANTLING(veh) ? "Dismantle" : "Needs", part);
+	}
+	
+	if (VEH_CUSTOM_MSGS(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Custom messages:\r\n");
+		
+		LL_FOREACH(VEH_CUSTOM_MSGS(veh), custm) {
+			size += snprintf(buf + size, sizeof(buf) - size, " %s: %s\r\n", veh_custom_types[custm->type], custm->msg);
+		}
 	}
 	
 	send_to_char(buf, ch);
@@ -3494,6 +3529,7 @@ void olc_show_vehicle(char_data *ch) {
 	
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	struct custom_message *custm;
 	struct spawn_info *spawn;
 	int count;
 	
@@ -3546,8 +3582,8 @@ void olc_show_vehicle(char_data *ch) {
 	sprintbit(VEH_FUNCTIONS(veh), function_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(VEH_FUNCTIONS(veh), NOBITS), lbuf);
 	
-	ordered_sprintbit(VEH_REQUIRE_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, lbuf);
-	sprintf(buf + strlen(buf), "<%srequireclimate\t0> %s\r\n", OLC_LABEL_VAL(VEH_REQUIRE_CLIMATE(veh), NOBITS), lbuf);
+	ordered_sprintbit(VEH_REQUIRES_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, lbuf);
+	sprintf(buf + strlen(buf), "<%srequireclimate\t0> %s\r\n", OLC_LABEL_VAL(VEH_REQUIRES_CLIMATE(veh), NOBITS), lbuf);
 	ordered_sprintbit(VEH_FORBID_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, lbuf);
 	sprintf(buf + strlen(buf), "<%sforbidclimate\t0> %s\r\n", OLC_LABEL_VAL(VEH_FORBID_CLIMATE(veh), NOBITS), lbuf);
 	
@@ -3569,6 +3605,13 @@ void olc_show_vehicle(char_data *ch) {
 	if (VEH_YEARLY_MAINTENANCE(veh)) {
 		get_resource_display(VEH_YEARLY_MAINTENANCE(veh), lbuf);
 		strcat(buf, lbuf);
+	}
+	
+	// custom messages
+	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(VEH_CUSTOM_MSGS(veh)));
+	count = 0;
+	LL_FOREACH(VEH_CUSTOM_MSGS(veh), custm) {
+		sprintf(buf + strlen(buf), " \ty%d\t0. [%s] %s\r\n", ++count, veh_custom_types[custm->type], custm->msg);
 	}
 	
 	// scripts
@@ -3633,6 +3676,15 @@ OLC_MODULE(vedit_capacity) {
 	VEH_CAPACITY(veh) = olc_process_number(ch, argument, "capacity", "capacity", 0, 10000, VEH_CAPACITY(veh));
 }
 
+
+OLC_MODULE(vedit_custom) {
+	void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	
+	olc_process_custom_messages(ch, argument, &VEH_CUSTOM_MSGS(veh), veh_custom_types);
+}
+
+
 OLC_MODULE(vedit_speed) {
 	// TODO: move this into alphabetic order on some future major version
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
@@ -3672,7 +3724,7 @@ OLC_MODULE(vedit_flags) {
 
 OLC_MODULE(vedit_forbidclimate) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
-	VEH_FORBID_CLIMATE(veh) = olc_process_flag(ch, argument, "forbidden climate", "forbidclimate", climate_flags, VEH_FORBID_CLIMATE(veh));
+	VEH_FORBID_CLIMATE(veh) = olc_process_flag(ch, argument, "climate", "forbidclimate", climate_flags, VEH_FORBID_CLIMATE(veh));
 }
 
 
@@ -3793,9 +3845,9 @@ OLC_MODULE(vedit_movetype) {
 }
 
 
-OLC_MODULE(vedit_requireclimate) {
+OLC_MODULE(vedit_requiresclimate) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
-	VEH_REQUIRE_CLIMATE(veh) = olc_process_flag(ch, argument, "required climate", "requireclimate", climate_flags, VEH_REQUIRE_CLIMATE(veh));
+	VEH_REQUIRES_CLIMATE(veh) = olc_process_flag(ch, argument, "climate", "requiresclimate", climate_flags, VEH_REQUIRES_CLIMATE(veh));
 }
 
 

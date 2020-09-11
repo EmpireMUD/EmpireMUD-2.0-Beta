@@ -7949,6 +7949,22 @@ total of all items inside.
 
 See also: VEDIT FLAGS, OLC VEHICLES
 #d
+"VEDIT CUSTOM" "VEDIT CUSTOM MESSAGES"
+
+Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
+        .custom remove <number | all>
+
+You can set custom messages on vehicles.
+
+If you set more than one message of the same type, one will be chosen at
+random each time.
+
+Message types:
+ &cruins-to-room&0 - Shown when it falls into ruins (from decay or bad climate).
+
+See also: OLC VEHICLES, DOLLAR SIGN CODES
+#d
 "VEDIT DESIGNATE" "DESIGNATE FLAGS"
 
 Usage:  .designate [add | remove] <flags>
@@ -8022,10 +8038,10 @@ commands.
 
 See also: OLC VEHICLES
 #d
-"VEDIT FORBIDCLIMATE" "VEDIT FORBID CLIMATE" "VEDIT REQUIRECLIMATE" "VEDIT REQUIRE CLIMATE"
+"VEDIT FORBIDCLIMATE" "VEDIT FORBID CLIMATE" "VEDIT REQUIRESCLIMATE" "VEDIT REQUIRES CLIMATE"
 
 Usage:  .forbidclimate [add | remove] <flags>
-        .requireclimate [add | remove] <flags>
+        .requiresclimate [add | remove] <flags>
 
 If a vehicle has required/forbidden climate types, it affects where the
 vehicle can move (or even exist). If a vehicle is outside of these climates,

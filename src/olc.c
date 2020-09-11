@@ -480,6 +480,7 @@ OLC_MODULE(tedit_types);
 OLC_MODULE(vedit_affects);
 OLC_MODULE(vedit_animalsrequired);
 OLC_MODULE(vedit_capacity);
+OLC_MODULE(vedit_custom);
 OLC_MODULE(vedit_designate);
 OLC_MODULE(vedit_extra_desc);
 OLC_MODULE(vedit_extrarooms);
@@ -498,7 +499,7 @@ OLC_MODULE(vedit_maxlevel);
 OLC_MODULE(vedit_military);
 OLC_MODULE(vedit_minlevel);
 OLC_MODULE(vedit_movetype);
-OLC_MODULE(vedit_requireclimate);
+OLC_MODULE(vedit_requiresclimate);
 OLC_MODULE(vedit_resource);
 OLC_MODULE(vedit_script);
 OLC_MODULE(vedit_size);
@@ -1084,6 +1085,7 @@ const struct olc_command_data olc_data[] = {
 	{ "affects", vedit_affects, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "animalsrequired", vedit_animalsrequired, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "capacity", vedit_capacity, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "custom", vedit_custom, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "designate", vedit_designate, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "extra", vedit_extra_desc, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "extrarooms", vedit_extrarooms, OLC_VEHICLE, OLC_CF_EDITOR },
@@ -1102,7 +1104,7 @@ const struct olc_command_data olc_data[] = {
 	{ "military", vedit_military, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "minlevel", vedit_minlevel, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "movetype", vedit_movetype, OLC_VEHICLE, OLC_CF_EDITOR },
-	{ "requireclimate", vedit_requireclimate, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "requiresclimate", vedit_requiresclimate, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "resource", vedit_resource, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "script", vedit_script, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "shortdescription", vedit_shortdescription, OLC_VEHICLE, OLC_CF_EDITOR },

@@ -1577,6 +1577,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 // attribute (non-instanced) data
 #define VEH_ANIMALS_REQUIRED(veh)  ((veh)->attributes->animals_required)
 #define VEH_CAPACITY(veh)  ((veh)->attributes->capacity)
+#define VEH_CUSTOM_MSGS(veh)  ((veh)->attributes->custom_msgs)
 #define VEH_DESIGNATE_FLAGS(veh)  ((veh)->attributes->designate_flags)
 #define VEH_EX_DESCS(veh)  ((veh)->attributes->ex_description)
 #define VEH_FAME(veh)  ((veh)->attributes->fame)
@@ -1590,7 +1591,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VEH_MILITARY(veh)  ((veh)->attributes->military)
 #define VEH_MIN_SCALE_LEVEL(veh)  ((veh)->attributes->min_scale_level)
 #define VEH_MOVE_TYPE(veh)  ((veh)->attributes->move_type)
-#define VEH_REQUIRE_CLIMATE(veh)  ((veh)->attributes->require_climate)
+#define VEH_REQUIRES_CLIMATE(veh)  ((veh)->attributes->requires_climate)
 #define VEH_ROOM_AFFECTS(veh)  ((veh)->attributes->room_affects)
 #define VEH_YEARLY_MAINTENANCE(veh)  ((veh)->attributes->yearly_maintenance)
 #define VEH_SIZE(veh)  ((veh)->attributes->size)
