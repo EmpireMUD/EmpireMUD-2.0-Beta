@@ -2462,6 +2462,7 @@ The following flags are available:
  &cestuary&0 - where the river meets the sea
  &clake&0 - a lake tile
  &cbase-terrain-allowed&0 - *** do not use for buildon
+ &croad&0 - *** only use for vehicles, not real buildings
 
 See also: CEDIT BUILDFACING, OLC CRAFTS
 #d

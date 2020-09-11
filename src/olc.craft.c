@@ -118,6 +118,10 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Building craft with time set");
 			problem = TRUE;
 		}
+		if (IS_SET(GET_CRAFT_BUILD_ON(craft), BLD_ON_ROAD)) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Building has 'road' build-on flag; this should only be used for vehicles and building-vehicles");
+			problem = TRUE;
+		}
 	}
 	else if (CRAFT_IS_VEHICLE(craft)) {	// vehicles only
 		if (GET_CRAFT_OBJECT(craft) == NOTHING || !vehicle_proto(GET_CRAFT_OBJECT(craft))) {

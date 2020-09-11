@@ -797,6 +797,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_LAKE  BIT(20)
 #define BLD_ON_BASE_TERRAIN_ALLOWED  BIT(21)	// for facing-only, allows the base sector to match
 #define BLD_ON_GIANT_TREE  BIT(22)
+#define BLD_ON_ROAD  BIT(23)	// use on vehicles but not buildings
 
 
 // BLD_REL_x: relationships with other buildings

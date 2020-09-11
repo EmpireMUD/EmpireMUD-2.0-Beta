@@ -2816,6 +2816,7 @@ const char *bld_on_flags[] = {
 	"lake",	// 20
 	"base-terrain-allowed",
 	"giant-tree",
+	"road",
 	"\n"
 };
 
@@ -2848,6 +2849,7 @@ const bitvector_t bld_on_flags_order[] = {
 	BLD_ON_LAKE,
 	
 	// end modifiers
+	BLD_ON_ROAD,
 	BLD_ON_FLAT_TERRAIN,
 	BLD_FACING_OPEN_BUILDING,
 	BLD_ON_BASE_TERRAIN_ALLOWED,
