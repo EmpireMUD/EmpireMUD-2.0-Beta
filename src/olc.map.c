@@ -180,8 +180,8 @@ OLC_MODULE(mapedit_terrain) {
 		}
 		
 		if (sect) {
-			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
 			msg_to_char(ch, "This room is now %s %s.\r\n", AN(GET_SECT_NAME(sect)), GET_SECT_NAME(sect));
+			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
 			if (ROOM_OWNER(IN_ROOM(ch))) {
 				deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 			}
@@ -192,9 +192,9 @@ OLC_MODULE(mapedit_terrain) {
 				return;
 			}
 			else {
+				msg_to_char(ch, "This room is now %s.\r\n", GET_CROP_NAME(cp));
 				change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
 				set_crop_type(IN_ROOM(ch), cp);
-				msg_to_char(ch, "This room is now %s.\r\n", GET_CROP_NAME(cp));
 				if (ROOM_OWNER(IN_ROOM(ch))) {
 					deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 				}
@@ -631,11 +631,11 @@ OLC_MODULE(mapedit_naturalize) {
 			
 			// looks good: naturalize it
 			if (room) {
-				decustomize_room(room);
-				change_terrain(room, GET_SECT_VNUM(map->natural_sector));
 				if (ROOM_PEOPLE(room)) {
 					act("The area is naturalized!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
+				decustomize_room(room);
+				change_terrain(room, GET_SECT_VNUM(map->natural_sector));
 				if (ROOM_OWNER(room)) {
 					deactivate_workforce_room(ROOM_OWNER(room), room);
 				}

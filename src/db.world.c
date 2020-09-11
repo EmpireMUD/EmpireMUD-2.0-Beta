@@ -1421,11 +1421,11 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 	
 	// looks good: naturalize it
 	if (room) {
-		decustomize_room(room);
-		change_terrain(room, GET_SECT_VNUM(tile->natural_sector));
 		if (ROOM_PEOPLE(room)) {
 			act("The area returns to nature!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
+		decustomize_room(room);
+		change_terrain(room, GET_SECT_VNUM(tile->natural_sector));
 		
 		// no longer need this
 		remove_room_extra_data(room, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
