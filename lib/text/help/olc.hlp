@@ -8022,6 +8022,26 @@ commands.
 
 See also: OLC VEHICLES
 #d
+"VEDIT FORBIDCLIMATE" "VEDIT FORBID CLIMATE" "VEDIT REQUIRECLIMATE" "VEDIT REQUIRE CLIMATE"
+
+Usage:  .forbidclimate [add | remove] <flags>
+        .requireclimate [add | remove] <flags>
+
+If a vehicle has required/forbidden climate types, it affects where the
+vehicle can move (or even exist). If a vehicle is outside of these climates,
+it will be destroyed. Any movement out of these climates is blocked.
+
+Required climates are ones that must be present for the vehicle to enter.
+Forbidden climates are ones the vehicle cannot enter. If you don't set either
+type of climate flags on the vehicle, it is allowed to go anywhere.
+
+Vehicles can always go into the inside of a building/vehicle (if their other
+flags permit it) regardless of climate settings.
+
+On the map, open buildings count as the sector they were built on.
+
+See also: CLIMATE FLAGS
+#d
 "VEDIT FULLSEARCH"
 
 Usage:  .veh fullsearch -<field> <argument> <...>

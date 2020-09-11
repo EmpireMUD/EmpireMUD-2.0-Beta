@@ -5561,6 +5561,8 @@ struct vehicle_attribute_data {
 	struct spawn_info *spawns;	// linked list of spawn data
 	bitvector_t room_affects;	// ROOM_AFF_ flags applied to the room while veh is here
 	bitvector_t functions;	// FNC_ flags offered to the room the vehicle is in
+	bitvector_t require_climate;	// CLIM_ flags required for this vehicle to enter a room
+	bitvector_t forbid_climate;	// CLIM_ flags that block this vehicle from entering
 	int fame;	// how much fame it adds to the empire
 	int military;	// how much it adds to the military pool
 };

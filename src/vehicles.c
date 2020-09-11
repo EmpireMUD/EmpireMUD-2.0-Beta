@@ -47,6 +47,8 @@ int get_new_vehicle_construction_id();
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 
 // external consts
+extern const char *climate_flags[];
+extern const bitvector_t climate_flags_order[];
 extern const char *designate_flags[];
 extern const char *function_flags[];
 extern const char *interact_types[];
@@ -2196,7 +2198,16 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				parse_interaction(line, &VEH_INTERACTIONS(veh), error);
 				break;
 			}
-			
+			case 'L': {	// climate require/forbids
+				if (sscanf(line, "L %s %s", str_in, str_in2) != 2) {
+					log("SYSERR: Format error in L line of %s", error);
+					exit(1);
+				}
+				
+				VEH_REQUIRE_CLIMATE(veh) = asciiflag_conv(str_in);
+				VEH_FORBID_CLIMATE(veh) = asciiflag_conv(str_in2);
+				break;
+			}
 			case 'M': {	// mob spawn
 				if (!get_line(fl, line) || sscanf(line, "%d %lf %s", &int_in[0], &dbl_in, str_in) != 3) {
 					log("SYSERR: Format error in M line of %s", error);
@@ -2319,6 +2330,13 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	
 	// I: interactions
 	write_interactions_to_file(fl, VEH_INTERACTIONS(veh));
+	
+	// L: climate restrictions
+	if (VEH_REQUIRE_CLIMATE(veh) || VEH_FORBID_CLIMATE(veh)) {
+		strcpy(temp, bitv_to_alpha(VEH_REQUIRE_CLIMATE(veh)));
+		strcpy(temp2, bitv_to_alpha(VEH_FORBID_CLIMATE(veh)));
+		fprintf(fl, "L %s %s\n", temp, temp2);
+	}
 	
 	// 'M': mob spawns
 	LL_FOREACH(VEH_SPAWNS(veh), spawn) {
@@ -3244,6 +3262,11 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	sprintbit(VEH_FUNCTIONS(veh), function_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Functions: \tg%s\t0\r\n", part);
 	
+	ordered_sprintbit(VEH_REQUIRE_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Require climate: \tc%s\t0\r\n", part);
+	ordered_sprintbit(VEH_FORBID_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Forbid climate: \tg%s\t0\r\n", part);
+	
 	if (VEH_INTERACTIONS(veh)) {
 		send_to_char("Interactions:\r\n", ch);
 		get_interaction_display(VEH_INTERACTIONS(veh), part);
@@ -3440,6 +3463,11 @@ void olc_show_vehicle(char_data *ch) {
 	sprintbit(VEH_FUNCTIONS(veh), function_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(VEH_FUNCTIONS(veh), NOBITS), lbuf);
 	
+	ordered_sprintbit(VEH_REQUIRE_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, lbuf);
+	sprintf(buf + strlen(buf), "<%srequireclimate\t0> %s\r\n", OLC_LABEL_VAL(VEH_REQUIRE_CLIMATE(veh), NOBITS), lbuf);
+	ordered_sprintbit(VEH_FORBID_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, lbuf);
+	sprintf(buf + strlen(buf), "<%sforbidclimate\t0> %s\r\n", OLC_LABEL_VAL(VEH_FORBID_CLIMATE(veh), NOBITS), lbuf);
+	
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(VEH_EX_DESCS(veh)));
 	if (VEH_EX_DESCS(veh)) {
@@ -3559,6 +3587,12 @@ OLC_MODULE(vedit_flags) {
 }
 
 
+OLC_MODULE(vedit_forbidclimate) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_FORBID_CLIMATE(veh) = olc_process_flag(ch, argument, "forbidden climate", "forbidclimate", climate_flags, VEH_FORBID_CLIMATE(veh));
+}
+
+
 OLC_MODULE(vedit_functions) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_FUNCTIONS(veh) = olc_process_flag(ch, argument, "function", "functions", function_flags, VEH_FUNCTIONS(veh));
@@ -3673,6 +3707,12 @@ OLC_MODULE(vedit_minlevel) {
 OLC_MODULE(vedit_movetype) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_MOVE_TYPE(veh) = olc_process_type(ch, argument, "move type", "movetype", mob_move_types, VEH_MOVE_TYPE(veh));
+}
+
+
+OLC_MODULE(vedit_requireclimate) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_REQUIRE_CLIMATE(veh) = olc_process_flag(ch, argument, "required climate", "requireclimate", climate_flags, VEH_REQUIRE_CLIMATE(veh));
 }
 
 
