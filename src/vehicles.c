@@ -520,16 +520,18 @@ struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char 
 
 /**
 * Finds a vehicle that will be shown in the room. The vehicle must have an icon
-* to qualify for this, and must also be complete. Vehicles in buildings are
-* never shown. Only the first valid vehicle is returned.
+* to qualify for this, and must also either be complete or be size > 0.
+* Vehicles in buildings are never shown. Only the largest valid vehicle is
+* returned.
 *
 * @param char_data *ch The player looking.
 * @param room_data *room The room to check.
 * @return vehicle_data* A vehicle to show, if any (NULL if not).
 */
 vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
-	vehicle_data *iter, *in_veh;
+	vehicle_data *iter, *in_veh, *found = NULL;
 	bool is_on_vehicle = ((in_veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && room == IN_ROOM(in_veh));
+	int found_size = -1;
 	
 	// we don't show vehicles in buildings or closed tiles (unless the player is on a vehicle in that room, in which case we override)
 	if (!is_on_vehicle && (IS_ANY_BUILDING(room) || ROOM_IS_CLOSED(room))) {
@@ -540,16 +542,18 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
 		if (!VEH_ICON(iter) || !*VEH_ICON(iter)) {
 			continue;	// no icon
 		}
-		if (!VEH_IS_COMPLETE(iter)) {
-			continue;	// skip incomplete
+		if (!VEH_IS_COMPLETE(iter) && VEH_SIZE(iter) < 1) {
+			continue;	// skip incomplete unless it has size
 		}
 		
-		// we'll show the first match
-		return iter;
+		// valid to show! only if first/bigger
+		if (!found || VEH_SIZE(iter) > found_size) {
+			found = iter;
+			found_size = VEH_SIZE(iter);
+		}
 	}
 	
-	// nothing found
-	return NULL;
+	return found;	// if any
 }
 
 
