@@ -2457,6 +2457,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_PLAYER_NO_DISMANTLE  BIT(24)	// y. player toggled no-dismantle on
 #define VEH_DISMANTLING  BIT(25)	// z. is being dismantled
 #define VEH_PLAYER_NO_WORK  BIT(26)	// A. player has marked it no-work
+#define VEH_CHAMELEON  BIT(27)	// B. vehicle's icon isn't visible at a distance
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin
@@ -2473,7 +2474,7 @@ typedef struct vehicle_data vehicle_data;
 // The following vehicle flags are saved to file rather than read from the
 // prototype. Flags which are NOT included in this list can be altered with
 // OLC and affect live copies.
-#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE | VEH_PLAYER_NO_DISMANTLE | VEH_DISMANTLING)
+#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE | VEH_PLAYER_NO_DISMANTLE | VEH_DISMANTLING | VEH_CHAMELEON)
 
 // The following vehicle flags indicate a vehicle can move
 #define MOVABLE_VEH_FLAGS  (VEH_DRIVING | VEH_SAILING | VEH_FLYING | VEH_DRAGGABLE | VEH_CAN_PORTAL | VEH_LEADABLE)

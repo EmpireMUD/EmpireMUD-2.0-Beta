@@ -529,6 +529,8 @@ struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char 
 * @return vehicle_data* A vehicle to show, if any (NULL if not).
 */
 vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
+	extern bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
+	
 	vehicle_data *iter, *in_veh, *found = NULL;
 	bool is_on_vehicle = ((in_veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && room == IN_ROOM(in_veh));
 	int found_size = -1;
@@ -544,6 +546,9 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
 		}
 		if (!VEH_IS_COMPLETE(iter) && VEH_SIZE(iter) < 1) {
 			continue;	// skip incomplete unless it has size
+		}
+		if (vehicle_is_chameleon(iter, IN_ROOM(ch))) {
+			continue;	// can't see from here
 		}
 		
 		// valid to show! only if first/bigger
@@ -928,6 +933,30 @@ bool vehicle_allows_climate(vehicle_data *veh, room_data *room) {
 	
 	// otherwise, we made it!
 	return TRUE;
+}
+
+
+/**
+* Determines if a vehicle can be seen at a distance or not, using the chameleon
+* flag and whether or not the vehicle is complete.
+*
+* @param vehicle_data *veh The vehicle.
+* @param room_data *from Where it's being viewed from (to compute distance).
+* @return bool TRUE if the vehicle should be hidden, FALSE if not.
+*/
+bool vehicle_is_chameleon(vehicle_data *veh, room_data *from) {
+	if (!veh || !from || !IN_ROOM(veh)) {
+		return FALSE;	// safety
+	}
+	if (!VEH_IS_COMPLETE(veh) || VEH_NEEDS_RESOURCES(veh)) {
+		return FALSE;	// incomplete or unrepaired vehicles are not chameleon
+	}
+	if (!VEH_FLAGGED(veh, VEH_CHAMELEON) && (!IN_ROOM(veh) || !ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON))) {
+		return FALSE;	// missing chameleon flags
+	}
+	
+	// ok chameleon: now check distance
+	return (compute_distance(from, IN_ROOM(veh)) >= 2);
 }
 
 

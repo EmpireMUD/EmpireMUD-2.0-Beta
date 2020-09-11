@@ -4281,6 +4281,7 @@ const char *vehicle_flags[] = {
 	"*PLAYER-NO-DISMANTLE",
 	"*DISMANTLING",	// 25
 	"*PLAYER-NO-WORK",
+	"CHAMELEON",
 	"\n"
 };
 
@@ -4314,6 +4315,7 @@ const char *identify_vehicle_flags[] = {
 	"is set no-dismantle",
 	"being dismantled",	// 25
 	"is set no-work",
+	"chameleon",
 	"\n"
 };
 

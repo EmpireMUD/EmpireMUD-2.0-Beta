@@ -2898,6 +2898,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 	void get_informative_tile_string(char_data *ch, room_data *room, char *buffer);
 	extern int get_map_radius(char_data *ch);
 	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
+	extern bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
 
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
@@ -2992,6 +2993,9 @@ void scan_for_tile(char_data *ch, char *argument) {
 						}
 						if (!CAN_SEE_VEHICLE(ch, veh)) {
 							continue;
+						}
+						if (vehicle_is_chameleon(veh, IN_ROOM(ch))) {
+							continue;	// can't see from here
 						}
 						if (!multi_isname(argument, VEH_KEYWORDS(veh))) {
 							continue;
