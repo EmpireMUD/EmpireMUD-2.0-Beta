@@ -819,6 +819,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "lead", POS_STANDING, do_lead, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "learn", POS_STANDING, do_learn, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "learned", POS_DEAD, do_learned, NO_MIN, CTYPE_UTIL ),
+	SIMPLE_CMD( "leave", POS_STANDING, do_exit, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "light", POS_SITTING, do_light, NO_MIN, CTYPE_UTIL, SCMD_LIGHT ),
 	SIMPLE_CMD( "list", POS_SITTING, do_list, NO_MIN, CTYPE_UTIL ),
 	STANDARD_CMD( "lightningbolt", POS_FIGHTING, do_damage_spell, NO_MIN, NO_GRANTS, ABIL_LIGHTNINGBOLT, CTYPE_COMBAT, NOBITS, ABIL_LIGHTNINGBOLT ),
