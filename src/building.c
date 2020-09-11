@@ -125,6 +125,8 @@ bool can_build_on(room_data *room, bitvector_t flags) {
 * @return bool TRUE if it's ok to proceed; FALSE it if sent an error message and failed.
 */
 bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool *bld_is_closed, bool *bld_needs_reverse) {
+	extern bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
+	
 	bool is_closed, needs_facing, needs_reverse;
 	room_data *to_room = NULL, *to_rev = NULL;
 	vehicle_data *make_veh = NULL, *veh_iter;
@@ -190,6 +192,10 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 	}
 	if (make_veh && VEH_SIZE(make_veh) > 0 && total_vehicle_size_in_room(IN_ROOM(ch)) + VEH_SIZE(make_veh) > config_get_int("vehicle_size_per_tile")) {
 		msg_to_char(ch, "This area is already too full to %s that.\r\n", command);
+		return FALSE;
+	}
+	if (make_veh && !vehicle_allows_climate(make_veh, to_room)) {
+		msg_to_char(ch, "You can't %s %s here.\r\n", command, VEH_SHORT_DESC(make_veh));
 		return FALSE;
 	}
 	

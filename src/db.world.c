@@ -250,6 +250,9 @@ void change_terrain(room_data *room, sector_vnum sect) {
 		qt_empire_players(emp, qt_gain_tile_sector, GET_SECT_VNUM(st));
 		et_gain_tile_sector(emp, GET_SECT_VNUM(st));
 	}
+	
+	// lastly, see if any vehicles died from this
+	check_vehicle_climate_change(room);
 }
 
 
@@ -1276,6 +1279,7 @@ void annual_update_map_tile(struct map_data *tile) {
 */
 void annual_update_vehicle(vehicle_data *veh) {
 	void fully_empty_vehicle(vehicle_data *veh);
+	void ruin_vehicle(vehicle_data *veh, char *message);
 	
 	static struct resource_data *default_res = NULL;
 	struct resource_data *old_list;
@@ -1301,17 +1305,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 		}
 	}
 	else {	// destroyed
-		// return of 0 prevents the decay
-		if (!destroy_vtrigger(veh)) {
-			VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
-			return;
-		}
-		
-		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V crumbles from disrepair!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
-		}
-		fully_empty_vehicle(veh);
-		extract_vehicle(veh);
+		ruin_vehicle(veh, "$V crumbles from disrepair!");
 	}
 }
 

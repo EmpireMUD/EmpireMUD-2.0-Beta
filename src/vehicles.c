@@ -44,7 +44,9 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 void clear_vehicle(vehicle_data *veh);
 void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
 int get_new_vehicle_construction_id();
+void ruin_vehicle(vehicle_data *veh, char *message);
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
+bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 
 // external consts
 extern const char *climate_flags[];
@@ -99,6 +101,24 @@ void abandon_lost_vehicles(void) {
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
 			et_lose_vehicle(emp, VEH_VNUM(veh));
+		}
+	}
+}
+
+
+/**
+* Checks the allowed-climates on every vehicle in the room. This should be
+* called if the terrain changes.
+*
+* @param room_data *room The room to check vehicles in.
+*/
+void check_vehicle_climate_change(room_data *room) {
+	vehicle_data *veh, *next_veh;
+	
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+		if (!vehicle_allows_climate(veh, IN_ROOM(veh))) {
+			// this will extract it (usually)
+			ruin_vehicle(veh, "$V falls into ruin!");
 		}
 	}
 }
@@ -633,6 +653,27 @@ char *list_harnessed_mobs(vehicle_data *veh) {
 
 
 /**
+* Destroys a vehicle from disrepair or invalid location. A destroy trigger
+* on the vehicle can prevent this.
+*
+* @param vehicle_data *veh The vehicle (will usually be extracted).
+* @param char *message Optional: An act string (using $V for the vehicle) to send to the room. (NULL for none)
+*/
+void ruin_vehicle(vehicle_data *veh, char *message) {
+	if (!destroy_vtrigger(veh)) {
+		VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
+		return;
+	}
+	
+	if (message && ROOM_PEOPLE(IN_ROOM(veh))) {
+		act(message, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+	}
+	fully_empty_vehicle(veh);
+	extract_vehicle(veh);
+}
+
+
+/**
 * @param vehicle_data *veh The vehicle to scale.
 * @param int level What level to scale it to (passing 0 will trigger auto-detection).
 */
@@ -828,6 +869,48 @@ char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_
 	
 	free(vam);
 	return mob;
+}
+
+
+/**
+* Determines if a vehicle is allowed to be in a room based on climate. This
+* only applies on the map. Open map buildings use the base sector; interiors
+* are always allowed.
+*
+* @param vehicle_data *veh The vehicle to test.
+* @param room_data *room What room to check for climate.
+* @return bool TRUE if the vehicle allows it; FALSE if not.
+*/
+bool vehicle_allows_climate(vehicle_data *veh, room_data *room) {
+	bitvector_t climate = NOBITS;
+	
+	if (!veh || !room) {
+		return TRUE;	// junk in, junk out
+	}
+	if (ROOM_IS_CLOSED(room)) {
+		return TRUE;	// closed rooms always allowed
+	}
+	
+	// determine which climate to use
+	if (IS_MAP_BUILDING(room)) {
+		// open map buildings use base sect
+		climate = GET_SECT_CLIMATE(BASE_SECT(room));
+	}
+	else {
+		// all other tiles use regular sect
+		climate = GET_SECT_CLIMATE(SECT(room));
+	}
+	
+	// compare
+	if (VEH_REQUIRE_CLIMATE(veh) && !(VEH_REQUIRE_CLIMATE(veh) & climate)) {
+		return FALSE;	// required climate type is missing
+	}
+	if (VEH_FORBID_CLIMATE(veh) && (VEH_FORBID_CLIMATE(veh) & climate)) {
+		return FALSE;	// has a forbidden climate type
+	}
+	
+	// otherwise, we made it!
+	return TRUE;
 }
 
 

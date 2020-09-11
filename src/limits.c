@@ -1857,14 +1857,21 @@ void autostore_vehicle_contents(vehicle_data *veh) {
 */
 void point_update_vehicle(vehicle_data *veh) {
 	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
+	void ruin_vehicle(vehicle_data *veh, char *message);
+	bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 	
 	// autostore
 	if ((time(0) - VEH_LAST_MOVE_TIME(veh)) > (config_get_int("autostore_time") * SECS_PER_REAL_MIN)) {
 		autostore_vehicle_contents(veh);
 	}
 
-	// burny burny burny! (do this last)
+	if (!vehicle_allows_climate(veh, IN_ROOM(veh))) {
+		// this will extract it (usually)
+		ruin_vehicle(veh, "$V falls into ruin!");
+		return;
+	}
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		// burny burny burny!
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			act("The flames roar as they envelop $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}

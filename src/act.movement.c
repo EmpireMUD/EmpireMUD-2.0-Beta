@@ -1200,6 +1200,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_
 * @return bool TRUE if the player's vehicle can move there, FALSE if not.
 */
 bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room) {
+	extern bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 	extern int count_harnessed_animals(vehicle_data *veh);
 
 	char buf[MAX_STRING_LENGTH];
@@ -1251,6 +1252,12 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 			}
 			return FALSE;
 		}
+	}
+	
+	// climate checks
+	if (!vehicle_allows_climate(veh, to_room)) {
+		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
+		return FALSE;
 	}
 	
 	// barrier?
