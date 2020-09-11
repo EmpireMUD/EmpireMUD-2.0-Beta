@@ -663,6 +663,10 @@ char *list_harnessed_mobs(vehicle_data *veh) {
 * @param char *message Optional: An act string (using $V for the vehicle) to send to the room. (NULL for none)
 */
 void ruin_vehicle(vehicle_data *veh, char *message) {
+	void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
+	
+	struct vehicle_room_list *vrl;
+	
 	if (!destroy_vtrigger(veh)) {
 		VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
 		return;
@@ -671,6 +675,12 @@ void ruin_vehicle(vehicle_data *veh, char *message) {
 	if (message && ROOM_PEOPLE(IN_ROOM(veh))) {
 		act(message, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 	}
+	
+	// delete the NPCs who live here first so they don't do an 'ejected-then-leave'
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		delete_room_npcs(vrl->room, NULL, TRUE);
+	}
+	
 	fully_empty_vehicle(veh);
 	extract_vehicle(veh);
 }
