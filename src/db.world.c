@@ -3976,7 +3976,7 @@ void load_world_map_from_file(void) {
 					track->timestamp = l_in;
 					track->dir = var[2];
 					
-					LL_PREPEND(last->shared->tracks, track);
+					DL_PREPEND(last->shared->tracks, track);
 					break;
 				}
 				case 'Z': {	// extra data
@@ -4030,9 +4030,9 @@ void save_world_map_to_file(void) {
 	// only bother with ones that aren't base ocean
 	for (iter = land_map; iter; iter = iter->next) {
 		// free some junk while we're here anyway
-		LL_FOREACH_SAFE(iter->shared->tracks, track, next_track) {
+		DL_FOREACH_SAFE(iter->shared->tracks, track, next_track) {
 			if (now - track->timestamp > tracks_lifespan * SECS_PER_REAL_MIN) {
-				LL_DELETE(iter->shared->tracks, track);
+				DL_DELETE(iter->shared->tracks, track);
 				free(track);
 			}
 		}

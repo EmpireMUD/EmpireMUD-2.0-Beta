@@ -895,8 +895,8 @@ ACMD(do_track) {
 	else if (ABILITY_TRIGGERS(ch, NULL, NULL, ABIL_TRACK)) {
 		return;
 	}
-
-	for (track = ROOM_TRACKS(IN_ROOM(ch)); !found && track; track = track->next) {
+	
+	DL_FOREACH(ROOM_TRACKS(IN_ROOM(ch)), track) {
 		// skip already-expired tracks
 		if (time(0) - track->timestamp > tracks_lifespan * SECS_PER_REAL_MIN) {
 			continue;
@@ -907,11 +907,13 @@ ACMD(do_track) {
 			if (isname(arg, GET_PC_NAME(vict)) || isname(arg, PERS(vict, vict, 0)) || isname(arg, PERS(vict, vict, 1)) || (!IS_NPC(vict) && GET_LASTNAME(vict) && isname(arg, GET_LASTNAME(vict)))) {
 				found = TRUE;
 				dir = track->dir;
+				break;
 			}
 		}
 		else if (track->mob_num != NOTHING && (proto = mob_proto(track->mob_num)) && isname(arg, GET_PC_NAME(proto))) {
 			found = TRUE;
 			dir = track->dir;
+			break;
 		}
 	}
 	

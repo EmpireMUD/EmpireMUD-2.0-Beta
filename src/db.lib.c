@@ -6146,7 +6146,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				track->timestamp = l_in;
 				track->dir = t[2];
 				
-				LL_PREPEND(ROOM_TRACKS(room), track);
+				DL_PREPEND(ROOM_TRACKS(room), track);
 				break;
 			}
 			
@@ -9366,7 +9366,7 @@ void free_shared_room_data(struct shared_room_data *data) {
 	struct room_extra_data *room_ex, *next_room_ex;
 	struct stored_event *ev, *next_ev;
 	struct depletion_data *dep;
-	struct track_data *track;
+	struct track_data *track, *next_track;
 	
 	if (data->name) {
 		free(data->name);
@@ -9386,8 +9386,7 @@ void free_shared_room_data(struct shared_room_data *data) {
 		HASH_DEL(data->extra_data, room_ex);
 		free(room_ex);
 	}
-	while ((track = data->tracks)) {
-		data->tracks = track->next;
+	DL_FOREACH_SAFE(data->tracks, track, next_track) {
 		free(track);
 	}
 	
@@ -9723,9 +9722,9 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	}
 	
 	// Y tracks
-	LL_FOREACH_SAFE(dat->tracks, track, next_track) {
+	DL_FOREACH_SAFE(dat->tracks, track, next_track) {
 		if (now - track->timestamp > SECS_PER_REAL_HOUR) {
-			LL_DELETE(dat->tracks, track);
+			DL_DELETE(dat->tracks, track);
 			free(track);
 		}
 		else {

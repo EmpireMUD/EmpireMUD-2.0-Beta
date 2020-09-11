@@ -130,8 +130,7 @@ void add_tracks(char_data *ch, room_data *room, byte dir) {
 				track->player_id = GET_IDNUM(ch);
 			}
 			
-			track->next = ROOM_TRACKS(room);
-			ROOM_TRACKS(room) = track;
+			DL_PREPEND(ROOM_TRACKS(room), track);
 		}
 	}
 }

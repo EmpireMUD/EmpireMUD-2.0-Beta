@@ -5777,7 +5777,7 @@ struct track_data {
 	time_t timestamp;	// when
 	byte dir;	// which way
 	
-	struct track_data *next;
+	struct track_data *next, *prev;	// doubly-linked list
 };
 
 
