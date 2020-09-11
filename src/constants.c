@@ -3336,6 +3336,7 @@ const char *room_aff_bits[] = {
 	"!ABANDON",
 	"REPEL-NPCS",	// 20
 	"REPEL-ANIMALS",
+	"NO-WORKFORCE-EVOS",
 	"\n"
 };
 

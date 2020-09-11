@@ -1928,6 +1928,7 @@ Available affects:
  !ABANDON - cannot be abandoned (managed by empires)
  REPEL-NPCS - npcs won't wander in
  REPEL-ANIMALS - animal npcs won't wander in
+ NO-WORKFORCE-EVOS - workforce won't do chores that would change the tile type
 
 Some affects are managed by live data and commands (do not set affects with *):
  *HAS-INSTANCE - an adventure is linked here
@@ -7598,6 +7599,8 @@ Traits usually set on building-vehicles:
 - !BUILDING flag: Keeps this building from being put in another building.
 - VISIBLE-IN-DARK flag: Allows players to see it in the dark.
 - Icon: Causes it to show up on the map.
+- NO-WORKFORCE-EVOS affect: Workforce won't do chores that would change the
+  tile type (chopping, etc). For treehouses or similar.
 
 Some important notes:
 - Building-vhicles are only claimed when the whole tile is claimed (unless they
