@@ -156,7 +156,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 		}
 	}
 	
-	if (GET_CRAFT_BUILD_ON(craft) && IS_SET(GET_CRAFT_BUILD_ON(craft), BLD_ON_FLAT_TERRAIN | BLD_FACING_CROP | BLD_FACING_OPEN_BUILDING | BLD_ANY_FOREST)) {
+	if (GET_CRAFT_BUILD_ON(craft) && IS_SET(GET_CRAFT_BUILD_ON(craft), BLD_ON_FLAT_TERRAIN | BLD_FACING_CROP | BLD_FACING_OPEN_BUILDING)) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft has invalid build-on flags!");
 		problem = TRUE;
 	}
