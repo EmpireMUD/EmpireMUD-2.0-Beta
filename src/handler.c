@@ -893,11 +893,9 @@ void affect_total_room(room_data *room) {
 		SET_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
 	}
 	
-	// flags from vehicles: don't use VEH_IS_COMPLETE because this is often called before setup is done on that
+	// flags from vehicles: do this even if incomplete
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (!VEH_FLAGGED(veh, VEH_INCOMPLETE)) {
-			SET_BIT(ROOM_AFF_FLAGS(room), VEH_ROOM_AFFECTS(veh));
-		}
+		SET_BIT(ROOM_AFF_FLAGS(room), VEH_ROOM_AFFECTS(veh));
 	}
 	
 	// flags from building: don't use IS_COMPLETE because this function may be called before resources are added
