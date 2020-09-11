@@ -1913,7 +1913,8 @@ Usage:  .affects [add | remove] <flags>
 Each building (or room template) type may have a default set of room affect
 flags. These are added to the building tile when built, or are present on a
 room that is instantiated from a room template. Vehicles that have these flags
-apply the flags to any room they're in.
+apply the flags to any room they're in. The building or vehicle must be
+complete.
 
 Available affects:
  DARK - magically dark and the map tile shows as blank

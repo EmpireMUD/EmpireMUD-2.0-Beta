@@ -644,6 +644,9 @@ void start_chopping(char_data *ch) {
 	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_CHOP) >= config_get_int("chop_depletion")) {
 		msg_to_char(ch, "There's nothing left here to chop.\r\n");
 	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
+		msg_to_char(ch, "You can't chop here right now.\r\n");
+	}
 	else {
 		start_action(ch, ACT_CHOPPING, 0);
 		
@@ -2986,7 +2989,7 @@ ACMD(do_chop) {
 	else if (!CAN_CHOP_ROOM(IN_ROOM(ch))) {
 		send_to_char("You can't really chop anything down here.\r\n", ch);
 	}
-	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
 		msg_to_char(ch, "You can't chop here right now.\r\n");
 	}
 	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
