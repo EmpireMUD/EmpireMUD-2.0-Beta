@@ -267,6 +267,8 @@ extern bool has_custom_message(struct custom_message *list, int type);
 #define obj_has_custom_message(obj, type)  has_custom_message(GET_OBJ_CUSTOM_MSGS(obj), type)
 #define abil_get_custom_message(abil, type)  get_custom_message(ABIL_CUSTOM_MSGS(abil), type)
 #define abil_has_custom_message(abil, type)  has_custom_message(ABIL_CUSTOM_MSGS(abil), type)
+#define veh_get_custom_message(veh, type)  get_custom_message(VEH_CUSTOM_MSGS(veh), type)
+#define veh_has_custom_message(veh, type)  has_custom_message(VEH_CUSTOM_MSGS(veh), type)
 
 // object targeting handlers
 extern obj_data *get_component_in_list(any_vnum cmp_vnum, obj_data *list, bool *kept);
