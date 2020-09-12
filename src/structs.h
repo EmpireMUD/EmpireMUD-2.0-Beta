@@ -2458,6 +2458,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_DISMANTLING  BIT(25)	// z. is being dismantled
 #define VEH_PLAYER_NO_WORK  BIT(26)	// A. player has marked it no-work
 #define VEH_CHAMELEON  BIT(27)	// B. vehicle's icon isn't visible at a distance
+#define VEH_INTERLINK  BIT(28)	// C. rooms can be interlinked with nearby interlink-flagged vehicles or rooms
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin

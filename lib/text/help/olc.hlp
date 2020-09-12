@@ -8033,6 +8033,7 @@ Available flags:
  *DISMANTLING - is being dismantled
  *PLAYER-NO-WORK - player has toggled no-work on
  CHAMELEON - vehicle cannot be seen at a distance (when in good repair)
+ INTERLINK - rooms can be interlinked with other interlink-flagged places
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually

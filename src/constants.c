@@ -4282,6 +4282,7 @@ const char *vehicle_flags[] = {
 	"*DISMANTLING",	// 25
 	"*PLAYER-NO-WORK",
 	"CHAMELEON",
+	"INTERLINK",
 	"\n"
 };
 
@@ -4316,6 +4317,7 @@ const char *identify_vehicle_flags[] = {
 	"being dismantled",	// 25
 	"is set no-work",
 	"chameleon",
+	"can interlink",
 	"\n"
 };
 
