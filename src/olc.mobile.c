@@ -856,7 +856,7 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 		}
 		
 		if (any) {
-			size += snprintf(buf + size, sizeof(buf) - size, "BDG [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+			size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 		}
 	}
 	

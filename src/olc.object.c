@@ -865,6 +865,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), RES_OBJECT, vnum);
+		found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_OBJ, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
@@ -1074,8 +1075,9 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_VEHICLE(desc)) {
 			found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), RES_OBJECT, vnum);
+			found |= delete_from_interaction_list(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), TYPE_OBJ, vnum);
 			if (found) {
-				msg_to_char(desc->character, "One of the objects used for maintenance for the vehicle you're editing was deleted.\r\n");
+				msg_to_char(desc->character, "One of the objects used on the vehicle you're editing was deleted.\r\n");
 			}
 		}
 	}
@@ -1352,7 +1354,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "BDG [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
 		for (res = GET_BLD_YEARLY_MAINTENANCE(bld); res && !any; res = res->next) {
@@ -1583,6 +1585,14 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			}
+		}
+		LL_FOREACH(VEH_INTERACTIONS(veh), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				break;
 			}
 		}
 	}

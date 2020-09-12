@@ -57,6 +57,7 @@ extern const bitvector_t climate_flags_order[];
 extern const char *designate_flags[];
 extern const char *function_flags[];
 extern const char *interact_types[];
+extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *mob_move_types[];
 extern const char *room_aff_bits[];
 extern const char *veh_custom_types[];
@@ -1437,6 +1438,8 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh = vehicle_proto(vnum);
+	vehicle_data *veh_iter, *next_veh_iter;
+	struct interaction_item *inter;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -1444,6 +1447,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
 	struct adventure_spawn *asp;
+	bld_data *bld, *next_bld;
 	int size, found;
 	bool any;
 	
@@ -1454,6 +1458,21 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of vehicle %d (%s):\r\n", vnum, VEH_SHORT_DESC(veh));
+	
+	// buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		any = FALSE;
+		LL_FOREACH(GET_BLD_INTERACTIONS(bld), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_VEH && inter->vnum == vnum) {
+				any = TRUE;
+				break;
+			}
+		}
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+		}
+	}
 	
 	// crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
@@ -1528,6 +1547,21 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh_iter, next_veh_iter) {
+		any = FALSE;
+		LL_FOREACH(VEH_INTERACTIONS(veh_iter), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_VEH && inter->vnum == vnum) {
+				any = TRUE;
+				break;
+			}
+		}
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 		}
 	}
 	
@@ -2906,6 +2940,7 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
+	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
@@ -2917,6 +2952,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
+	bld_data *bld, *next_bld;
 	descriptor_data *desc;
 	bool found;
 	
@@ -2943,6 +2979,14 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	// save index and vehicle file now
 	save_index(DB_BOOT_VEH);
 	save_library_file_for_vnum(DB_BOOT_VEH, vnum);
+	
+	// update buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_VEH, vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+		}
+	}
 	
 	// update crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
@@ -3011,8 +3055,22 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update vehicles
+	HASH_ITER(hh, vehicle_table, iter, next_iter) {
+		found = delete_from_interaction_list(&VEH_INTERACTIONS(iter), TYPE_VEH, vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(iter));
+		}
+	}
+	
 	// olc editor updates
 	LL_FOREACH(descriptor_list, desc) {
+		if (GET_OLC_BUILDING(desc)) {
+			found |= delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_VEH, vnum);
+			if (found) {
+				msg_to_char(desc->character, "One of the vehicles used in the building you're editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_CRAFT(desc)) {
 			found = FALSE;
 			if (CRAFT_IS_VEHICLE(GET_OLC_CRAFT(desc)) && GET_OLC_CRAFT(desc)->object == vnum) {
@@ -3062,6 +3120,12 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(SOC_FLAGS(GET_OLC_SOCIAL(desc)), SOC_IN_DEVELOPMENT);
 				msg_to_desc(desc, "A vehicle required by the social you are editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_VEHICLE(desc)) {
+			found = delete_from_interaction_list(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), TYPE_VEH, vnum);
+			if (found) {
+				msg_to_char(desc->character, "One of the vehicles used on the vehicle you're editing was deleted.\r\n");
 			}
 		}
 	}

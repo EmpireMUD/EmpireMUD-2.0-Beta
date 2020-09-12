@@ -35,6 +35,7 @@ extern const char *bld_relationship_types[];
 extern const char *designate_flags[];
 extern const char *function_flags[];
 extern const char *interact_types[];
+extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 extern const char *room_aff_bits[];
 extern const char *spawn_flags[];
@@ -341,6 +342,7 @@ char *list_one_building(bld_data *bld, bool detail) {
 */
 void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	void check_for_bad_buildings();
+	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
@@ -413,7 +415,10 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	
 	// buildings
 	HASH_ITER(hh, building_table, biter, next_biter) {
-		if (delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(biter), vnum)) {
+		found = delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(biter), vnum);
+		found |= delete_from_interaction_list(&GET_BLD_INTERACTIONS(biter), TYPE_BLD, vnum);
+		
+		if (found) {
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(biter));
 		}
 	}
@@ -488,8 +493,14 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		found = FALSE;
 		if (VEH_INTERIOR_ROOM_VNUM(veh) == vnum) {
 			VEH_INTERIOR_ROOM_VNUM(veh) = NOTHING;
+			found |= TRUE;
+		}
+		found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_BLD, vnum);
+		
+		if (found) {
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
 	}
@@ -507,7 +518,9 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 			}
 		}
 		if (GET_OLC_BUILDING(desc)) {
-			if (delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), vnum)) {
+			found = delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), vnum);
+			found |= delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_BLD, vnum);
+			if (found) {
 				msg_to_desc(desc, "A building related to the building you're editing was deleted.\r\n");
 			}
 		}
@@ -571,8 +584,12 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
+			found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_BLD, vnum);
 			if (VEH_INTERIOR_ROOM_VNUM(GET_OLC_VEHICLE(desc)) == vnum) {
 				VEH_INTERIOR_ROOM_VNUM(GET_OLC_VEHICLE(desc)) = NOTHING;
+				found |= TRUE;
+			}
+			if (found) {
 				msg_to_desc(desc, "The interior home room building for the the vehicle you're editing was deleted.\r\n");
 			}
 		}
@@ -796,6 +813,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	char buf[MAX_STRING_LENGTH];
 	bld_data *proto = building_proto(vnum);
 	struct adventure_link_rule *link;
+	struct interaction_item *inter;
 	struct obj_storage_type *store;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
@@ -840,12 +858,22 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		if (size >= sizeof(buf)) {
 			break;
 		}
-		LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
-			if (relat->vnum == vnum) {
-				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+		any = FALSE;
+		LL_FOREACH(GET_BLD_INTERACTIONS(bld), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == vnum) {
+				any = TRUE;
 				break;
 			}
+		}
+		LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
+			if (relat->vnum == vnum) {
+				any = TRUE;
+				break;
+			}
+		}
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 		}
 	}
 	
@@ -926,6 +954,15 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		if (VEH_INTERIOR_ROOM_VNUM(veh) == vnum) {
+			any = TRUE;
+		}
+		LL_FOREACH(VEH_INTERACTIONS(veh), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == vnum) {
+				any = TRUE;
+				break;
+			}
+		}
+		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
 		}
