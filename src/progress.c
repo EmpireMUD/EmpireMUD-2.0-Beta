@@ -53,6 +53,7 @@ extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 extern int count_owned_homes(empire_data *emp);;
 extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
+extern int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs);
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
 void get_requirement_display(struct req_data *list, char *save_buffer);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
@@ -941,6 +942,10 @@ void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
 				task->current = count_owned_vehicles_by_flags(emp, task->misc);
 				break;
 			}
+			case REQ_OWN_VEHICLE_FUNCTION: {
+				task->current = count_owned_vehicles_by_function(emp, task->misc);
+				break;
+			}
 			case REQ_GET_COINS: {
 				task->current = EMPIRE_COINS(emp);
 				break;
@@ -1342,6 +1347,16 @@ void et_gain_vehicle(empire_data *emp, any_vnum vnum) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
+			else if (task->type == REQ_OWN_VEHICLE_FUNCTION && (veh = vehicle_proto(vnum)) && !VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+				// non-building vehs
+				++task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (veh = vehicle_proto(vnum)) && VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+				// building vehs
+				++task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
 		}
 	}
 }
@@ -1524,6 +1539,22 @@ void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 				task->current = MAX(task->current, 0);
 			}
 			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
+				--task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+				
+				// check min
+				task->current = MAX(task->current, 0);
+			}
+			else if (task->type == REQ_OWN_VEHICLE_FUNCTION && (veh = vehicle_proto(vnum)) && !VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+				// non-building vehs
+				--task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+				
+				// check min
+				task->current = MAX(task->current, 0);
+			}
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (veh = vehicle_proto(vnum)) && VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+				// building vehs
 				--task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				

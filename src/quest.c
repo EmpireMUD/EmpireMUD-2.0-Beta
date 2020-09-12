@@ -286,6 +286,7 @@ int count_owned_buildings(empire_data *emp, bld_vnum vnum) {
 int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags) {
 	struct empire_territory_data *ter, *next_ter;
 	int count = 0;	// ah ah ah
+	vehicle_data *veh;
 	
 	if (!emp || flags == NOBITS) {
 		return count;
@@ -296,6 +297,22 @@ int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags) {
 			continue;
 		}
 		if ((GET_BLD_FUNCTIONS(GET_BUILDING(ter->room)) & flags) != flags) {
+			continue;
+		}
+		
+		// found
+		++count;
+	}
+
+	// also count building-vehicles
+	DL_FOREACH(vehicle_list, veh) {
+		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
+			continue;
+		}
+		if (!VEH_FLAGGED(veh, VEH_BUILDING)) {
+			continue;	// only count buildings
+		}
+		if ((VEH_FUNCTIONS(veh) & flags) != flags) {
 			continue;
 		}
 		
@@ -416,6 +433,41 @@ int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags) {
 			continue;
 		}
 		if ((VEH_FLAGS(veh) & flags) != flags) {
+			continue;
+		}
+		
+		// found
+		++count;
+	}
+	
+	return count;
+}
+
+
+/**
+* Number of vehicles with specific flag(s) owned by an empire. This does not
+* count BUILDING vehicles.
+*
+* @param empire_data *emp Any empire.
+* @param bitvector_t funcs The function flag(s) to match (all flags must be present).
+* @return int The number of completed vehicles that match, owned by emp.
+*/
+int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs) {
+	vehicle_data *veh;
+	int count = 0;
+	
+	if (!emp || funcs == NOBITS) {
+		return count;
+	}
+	
+	DL_FOREACH(vehicle_list, veh) {
+		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
+			continue;
+		}
+		if (VEH_FLAGGED(veh, VEH_BUILDING)) {
+			continue;	// does not count buildings
+		}
+		if ((VEH_FUNCTIONS(veh) & funcs) != funcs) {
 			continue;
 		}
 		
@@ -971,6 +1023,10 @@ void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq) {
 			}
 			case REQ_OWN_VEHICLE_FLAGGED: {
 				task->current = count_owned_vehicles_by_flags(GET_LOYALTY(ch), task->misc);
+				break;
+			}
+			case REQ_OWN_VEHICLE_FUNCTION: {
+				task->current = count_owned_vehicles_by_function(GET_LOYALTY(ch), task->misc);
 				break;
 			}
 			case REQ_SKILL_LEVEL_OVER: {
@@ -2698,6 +2754,14 @@ void qt_gain_vehicle(char_data *ch, any_vnum vnum) {
 			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				++task->current;
 			}
+			else if (task->type == REQ_OWN_VEHICLE_FUNCTION && (veh = vehicle_proto(vnum)) && !VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+				// non-building vehicle
+				++task->current;
+			}
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (veh = vehicle_proto(vnum)) && VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+				// building vehicle
+				++task->current;
+			}
 		}
 	}
 }
@@ -2940,6 +3004,14 @@ void qt_lose_vehicle(char_data *ch, any_vnum vnum) {
 				--task->current;
 			}
 			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
+				--task->current;
+			}
+			else if (task->type == REQ_OWN_VEHICLE_FUNCTION && (veh = vehicle_proto(vnum)) && !VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+				// non-building vehicle
+				--task->current;
+			}
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (veh = vehicle_proto(vnum)) && VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+				// building vehicle
 				--task->current;
 			}
 			

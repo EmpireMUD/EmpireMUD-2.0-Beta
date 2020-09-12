@@ -4081,6 +4081,7 @@ const char *requirement_types[] = {
 	"EVENT-NOT-RUNNING",
 	"LEVEL-UNDER",
 	"LEVEL-OVER",
+	"OWN-VEHICLE-FUNCTION",	// 40
 	"\n",
 };
 

@@ -5156,7 +5156,8 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			need_bld = TRUE;
 			break;
 		}
-		case REQ_OWN_BUILDING_FUNCTION: {
+		case REQ_OWN_BUILDING_FUNCTION:
+		case REQ_OWN_VEHICLE_FUNCTION: {
 			need_func_flags = TRUE;
 			break;
 		}

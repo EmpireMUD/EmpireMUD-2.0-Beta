@@ -7435,6 +7435,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
 	extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 	extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
+	extern int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs);
 	extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 	
@@ -7544,6 +7545,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 			}
 			case REQ_OWN_VEHICLE_FLAGGED: {
 				if (!GET_LOYALTY(ch) || count_owned_vehicles_by_flags(GET_LOYALTY(ch), req->misc) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_OWN_VEHICLE_FUNCTION: {
+				if (!GET_LOYALTY(ch) || count_owned_vehicles_by_function(GET_LOYALTY(ch), req->misc) < req->needed) {
 					ok = FALSE;
 				}
 				break;
@@ -7772,6 +7779,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 	
 	char vnum[256], lbuf[256];
 	static char output[256];
+	vehicle_data *vproto;
 	
 	*output = '\0';
 	if (!req) {
@@ -7837,13 +7845,20 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		case REQ_OWN_VEHICLE: {
-			snprintf(output, sizeof(output), "Own %dx vehicle%s: %s%s", req->needed, PLURAL(req->needed), vnum, get_vehicle_name_by_proto(req->vnum));
+			vproto = vehicle_proto(req->vnum);
+			snprintf(output, sizeof(output), "Own %dx %s%s: %s%s", req->needed, PLURAL(req->needed), vnum, vproto ? VEH_OR_BLD(vproto) : "vehicle", vproto ? VEH_SHORT_DESC(vproto) : "unknown");
 			break;
 		}
 		case REQ_OWN_VEHICLE_FLAGGED: {
 			sprintbit(req->misc, vehicle_flags, lbuf, TRUE);
 			// does not show vnum
 			snprintf(output, sizeof(output), "Own %dx vehicle%s flagged: %s", req->needed, PLURAL(req->needed), lbuf);
+			break;
+		}
+		case REQ_OWN_VEHICLE_FUNCTION: {
+			sprintbit(req->misc, function_flags, lbuf, TRUE);
+			// does not show vnum
+			snprintf(output, sizeof(output), "Own %dx vehicle%s with: %s", req->needed, PLURAL(req->needed), lbuf);
 			break;
 		}
 		case REQ_SKILL_LEVEL_OVER: {
