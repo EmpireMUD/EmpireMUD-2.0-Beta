@@ -1232,10 +1232,12 @@ void Crash_save_vehicles(vehicle_data *veh, FILE *fl) {
 	void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl);
 	
 	// store next first so the order is right on reboot
-	if (veh->next_in_room) {
+	if (veh && veh->next_in_room) {
 		Crash_save_vehicles(veh->next_in_room, fl);
 	}
-	store_one_vehicle_to_file(veh, fl);
+	if (veh) {
+		store_one_vehicle_to_file(veh, fl);
+	}
 }
 
 

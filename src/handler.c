@@ -9553,6 +9553,7 @@ void vehicle_from_room(vehicle_data *veh) {
 	}
 	
 	DL_DELETE2(ROOM_VEHICLES(was_in), veh, prev_in_room, next_in_room);
+	veh->next_in_room = veh->prev_in_room = NULL;
 	IN_ROOM(veh) = NULL;
 	
 	affect_total_room(was_in);
