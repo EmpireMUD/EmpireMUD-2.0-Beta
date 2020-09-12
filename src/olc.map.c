@@ -483,7 +483,7 @@ OLC_MODULE(mapedit_ruin) {
 		msg_to_char(ch, "You don't see that here.\r\n");
 	}
 	else if (GET_ROOM_VNUM(room) >= MAP_SIZE || !GET_BUILDING(room)) {
-		msg_to_char(ch, "You can only ruin map buildings.\r\n");
+		msg_to_char(ch, "You can only ruin map buildings and vehicles.\r\n");
 	}
 	else {
 		msg_to_char(ch, "Ok.\r\n");
