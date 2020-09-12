@@ -169,7 +169,7 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 	}
 	if (GET_CRAFT_BUILD_ON(type) && !can_build_on(IN_ROOM(ch), GET_CRAFT_BUILD_ON(type))) {
 		ordered_sprintbit(GET_CRAFT_BUILD_ON(type), bld_on_flags, bld_on_flags_order, TRUE, buf);
-		msg_to_char(ch, "You need to %s on: %s\r\n", command, buf);
+		msg_to_char(ch, "You need to %s %s on: %s\r\n", command, GET_CRAFT_NAME(type), buf);
 		return FALSE;
 	}
 	if (to_build && !GET_CRAFT_BUILD_ON(type)) {
@@ -226,7 +226,7 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 		}
 		if (!can_build_on(to_room, GET_CRAFT_BUILD_FACING(type))) {
 			ordered_sprintbit(GET_CRAFT_BUILD_FACING(type), bld_on_flags, bld_on_flags_order, TRUE, buf);
-			msg_to_char(ch, "You need to %s it facing: %s\r\n", command, buf);
+			msg_to_char(ch, "You need to %s %s facing: %s\r\n", command, GET_CRAFT_NAME(type), buf);
 			return FALSE;
 		}
 	}	// end facing checks
