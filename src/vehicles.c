@@ -1217,19 +1217,20 @@ void complete_vehicle(vehicle_data *veh) {
 
 
 /**
-* Saves the vehicles list for a room to the room file.
+* Saves the vehicles list for a room to the room file. This is called
+* recursively to save in reverse-order and thus load in correct order.
 *
-* @param vehicle_data *room_list The list of vehicles in the room.
+* @param vehicle_data *veh The vehicle to save.
 * @param FILE *fl The file open for writing.
 */
-void Crash_save_vehicles(vehicle_data *room_list, FILE *fl) {
+void Crash_save_vehicles(vehicle_data *veh, FILE *fl) {
 	void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl);
 	
-	vehicle_data *iter;
-	
-	DL_FOREACH2(room_list, iter, next_in_room) {
-		store_one_vehicle_to_file(iter, fl);
+	// store next first so the order is right on reboot
+	if (veh->next_in_room) {
+		Crash_save_vehicles(veh->next_in_room, fl);
 	}
+	store_one_vehicle_to_file(veh, fl);
 }
 
 
