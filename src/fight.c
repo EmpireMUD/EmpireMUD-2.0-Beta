@@ -832,6 +832,8 @@ static char *replace_fight_string(const char *str, const char *weapon_first, con
 * @param vehicle_data *by_vehicle Optional: Which vehicle gets credit for the damage, if any.
 */
 void siege_kill_vehicle_occupants(vehicle_data *veh, char_data *attacker, vehicle_data *by_vehicle) {
+	ACMD(do_respawn);
+	
 	struct vehicle_room_list *vrl;
 	vehicle_data *iter;
 	char_data *ch, *next_ch;
@@ -851,6 +853,11 @@ void siege_kill_vehicle_occupants(vehicle_data *veh, char_data *attacker, vehicl
 			}
 			run_kill_triggers(ch, attacker, by_vehicle);
 			die(ch, ch);
+			
+			// room is being destroyed -- respawn right away
+			if (!IS_NPC(ch) && IS_DEAD(ch)) {
+				do_respawn(ch, "", 0, 0);
+			}
 		}
 	}
 }
