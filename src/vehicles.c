@@ -3070,7 +3070,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	// olc editor updates
 	LL_FOREACH(descriptor_list, desc) {
 		if (GET_OLC_BUILDING(desc)) {
-			found |= delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_VEH, vnum);
+			found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_VEH, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the vehicles used in the building you're editing was deleted.\r\n");
 			}
