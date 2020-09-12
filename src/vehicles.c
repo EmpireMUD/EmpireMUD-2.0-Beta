@@ -401,6 +401,7 @@ void fully_empty_vehicle(vehicle_data *veh) {
 					vehicle_to_room(iter, IN_ROOM(veh));
 				}
 				else {
+					vehicle_from_room(iter);
 					extract_vehicle(iter);
 				}
 			}
