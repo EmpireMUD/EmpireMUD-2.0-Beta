@@ -2808,7 +2808,7 @@ void qt_gain_vehicle(char_data *ch, vehicle_data *veh) {
 				// building vehicle
 				++task->current;
 			}
-			else if (task->type == REQ_OWN_HOMES && VEH_INTERIOR_HOME_ROOM(veh) && GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh)) && GET_BLD_CITIZENS(GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) > 0) {
+			else if (task->type == REQ_OWN_HOMES && VEH_FLAGGED(veh, VEH_BUILDING) && VEH_INTERIOR_HOME_ROOM(veh) && GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh)) && GET_BLD_CITIZENS(GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) > 0) {
 				++task->current;
 			}
 		}
@@ -3062,7 +3062,7 @@ void qt_lose_vehicle(char_data *ch, vehicle_data *veh) {
 				// building vehicle
 				--task->current;
 			}
-			else if (task->type == REQ_OWN_HOMES && VEH_INTERIOR_HOME_ROOM(veh) && GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh)) && GET_BLD_CITIZENS(GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) > 0) {
+			else if (task->type == REQ_OWN_HOMES && VEH_FLAGGED(veh, VEH_BUILDING) && VEH_INTERIOR_HOME_ROOM(veh) && GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh)) && GET_BLD_CITIZENS(GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) > 0) {
 				--task->current;
 			}
 			
