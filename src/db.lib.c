@@ -4629,8 +4629,8 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 */
 void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
 	extern char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
+	extern const char *get_interaction_target(int type, any_vnum vnum);
 	extern const char *interact_types[];
-	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
 	struct interaction_item *interact;
 	struct interact_restriction *res;
@@ -4642,7 +4642,7 @@ void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
 			fprintf(fl, " %c", interact->exclusion_code);
 		}
 		
-		fprintf(fl, "  # %s: %s\n", interact_types[interact->type], (interact_vnum_types[interact->type] == TYPE_MOB) ? get_mob_name_by_proto(interact->vnum, FALSE) : get_obj_name_by_proto(interact->vnum));
+		fprintf(fl, "  # %s: %s\n", interact_types[interact->type], get_interaction_target(interact->type, interact->vnum));
 		
 		// restrictions?
 		LL_FOREACH(interact->restrictions, res) {

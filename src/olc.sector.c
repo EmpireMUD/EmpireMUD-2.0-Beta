@@ -36,7 +36,6 @@ extern const bitvector_t climate_flags_order[];
 extern const char *evo_types[];
 extern const int evo_val_types[NUM_EVOS];
 extern const char *interact_types[];
-extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *mapout_color_names[];
 extern const char *sector_flags[];
 extern const char *spawn_flags[];

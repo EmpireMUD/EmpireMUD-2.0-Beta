@@ -4336,6 +4336,8 @@ Room/vehicle interaction types:
  &cFISH&0 - Things that can be found by fishing here.
  &cPAN&0 - Things that can be found by panning here.
  &cQUARRY&0 - Things you can find by quarrying here.
+ &cRUINS-TO-BLD&0 - What type of ruins building appears here when it's ruined.
+ &CRUINS-TO_VEH&0 - What type of ruins vehicle appears here when it's ruined.
 
 The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
 than 1, the percent is only checked once for the entire quantity. If you want

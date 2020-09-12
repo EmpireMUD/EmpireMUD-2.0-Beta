@@ -3953,6 +3953,8 @@ const char *interact_types[] = {
 	"DECAYS-TO",
 	"CONSUMES-TO",
 	"IDENTIFIES-TO",
+	"RUINS-TO-BLD",
+	"RUINS-TO-VEH",	// 30
 	"\n"
 };
 
@@ -3988,6 +3990,8 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// decays-to
 	TYPE_OBJ,	// consumes-to
 	TYPE_OBJ,	// IDENTIFIES-TO
+	TYPE_ROOM,	// RUINS-TO-BLD
+	TYPE_ROOM,	// RUINS-TO-VEH
 };
 
 
@@ -4022,6 +4026,8 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// decays-to
 	TYPE_OBJ,	// consumes-to
 	TYPE_OBJ,	// IDENTIFIES-TO
+	TYPE_BLD,	// RUINS-TO-BLD
+	TYPE_VEH,	// RUINS-TO-VEH
 };
 
 

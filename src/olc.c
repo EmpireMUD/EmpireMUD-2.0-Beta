@@ -4179,6 +4179,35 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 
 
 /**
+* Shows the target of an interaction by type,vnum.
+*
+* @param int type A TYPE_ flag like TYPE_OBJ.
+* @param any_vnum vnum The thing of that type.
+* @return char* A string for the name of that object.
+*/
+const char *get_interaction_target(int type, any_vnum vnum) {
+	// TYPE_x: interaction display
+	switch (interact_vnum_types[type]) {
+		case TYPE_MOB: {
+			return skip_filler(get_mob_name_by_proto(vnum, FALSE));
+		}
+		case TYPE_OBJ: {
+			return skip_filler(get_obj_name_by_proto(vnum));
+		}
+		case TYPE_BLD: {
+			return skip_filler(get_bld_name_by_proto(vnum));
+		}
+		case TYPE_VEH: {
+			return skip_filler(get_vehicle_name_by_proto(vnum));
+		}
+		default: {
+			return "unknown";
+		}
+	}
+}
+
+
+/**
 * Displays the interactions data from a given list.
 *
 * @param struct interaction_item *list Pointer to the start of a list of interactions.
@@ -4186,22 +4215,14 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 */
 void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 	extern const char *interact_types[];
-	extern const byte interact_vnum_types[NUM_INTERACTS];
 
 	struct interaction_item *interact;
-	char lbuf[MAX_STRING_LENGTH];
 	int count = 0;
 	
 	*save_buffer = '\0';
 	
 	for (interact = list; interact; interact = interact->next) {
-		if (interact_vnum_types[interact->type] == TYPE_MOB) {
-			strcpy(lbuf, skip_filler(get_mob_name_by_proto(interact->vnum, FALSE)));
-		}
-		else {
-			strcpy(lbuf, skip_filler(get_obj_name_by_proto(interact->vnum)));
-		}
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %dx %s (%d) %.2f%%", ++count, interact_types[interact->type], interact->quantity, lbuf, interact->vnum, interact->percent);
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %dx %s (%d) %.2f%%", ++count, interact_types[interact->type], interact->quantity, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
 		if (isalpha(interact->exclusion_code)) {
 			sprintf(save_buffer + strlen(save_buffer), " (%c)", interact->exclusion_code);
 		}
@@ -6730,7 +6751,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove %s: %dx %s %.2f%%\r\n", interact_types[interact->type], interact->quantity, (interact_vnum_types[interact->type] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(interact->vnum, FALSE)) : skip_filler(get_obj_name_by_proto(interact->vnum))), interact->percent);
+					msg_to_char(ch, "You remove %s: %dx %s %.2f%%\r\n", interact_types[interact->type], interact->quantity, get_interaction_target(interact->type, interact->vnum), interact->percent);
 					REMOVE_FROM_LIST(interact, *list, next);
 					free(interact);
 				}
@@ -6835,6 +6856,12 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		else if (interact_vnum_types[loc] == TYPE_OBJ && !obj_proto(vnum)) {
 			msg_to_char(ch, "Invalid object vnum %d.\r\n", vnum);
 		}
+		else if (interact_vnum_types[loc] == TYPE_BLD && !building_proto(vnum)) {
+			msg_to_char(ch, "Invalid building vnum %d.\r\n", vnum);
+		}
+		else if (interact_vnum_types[loc] == TYPE_VEH && !vehicle_proto(vnum)) {
+			msg_to_char(ch, "Invalid vehicle vnum %d.\r\n", vnum);
+		}
 		else if (num < 1 || num >= 1000) {
 			msg_to_char(ch, "You must choose a quantity between 1 and 1000.\r\n");
 		}
@@ -6865,7 +6892,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			}
 
 			sort_interactions(list);
-			msg_to_char(ch, "You add %s: %dx %s %.2f%%", interact_types[loc], num, (interact_vnum_types[loc] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(vnum, FALSE)) : skip_filler(get_obj_name_by_proto(vnum))), prc);
+			msg_to_char(ch, "You add %s: %dx %s %.2f%%", interact_types[loc], num, get_interaction_target(loc, vnum), prc);
 			if (exc) {
 				msg_to_char(ch, " (%c)", exc);
 			}
@@ -6929,9 +6956,15 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			else if (interact_vnum_types[change->type] == TYPE_OBJ && !obj_proto(vnum)) {
 				msg_to_char(ch, "Invalid object vnum %d.\r\n", vnum);
 			}
+			else if (interact_vnum_types[change->type] == TYPE_BLD && !building_proto(vnum)) {
+				msg_to_char(ch, "Invalid building vnum %d.\r\n", vnum);
+			}
+			else if (interact_vnum_types[change->type] == TYPE_VEH && !vehicle_proto(vnum)) {
+				msg_to_char(ch, "Invalid vehicle vnum %d.\r\n", vnum);
+			}
 			else {
 				change->vnum = vnum;
-				msg_to_char(ch, "Interaction %d vnum changed to [%d] %s.\r\n", atoi(arg2), vnum, (interact_vnum_types[change->type] == TYPE_MOB) ? get_mob_name_by_proto(vnum, FALSE) : get_obj_name_by_proto(vnum));
+				msg_to_char(ch, "Interaction %d vnum changed to [%d] %s.\r\n", atoi(arg2), vnum, get_interaction_target(change->type, vnum));
 			}
 		}
 		else if (is_abbrev(arg3, "percent")) {

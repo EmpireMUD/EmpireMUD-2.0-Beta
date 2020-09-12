@@ -205,6 +205,8 @@
 #define TYPE_MOB  1
 #define TYPE_ROOM  2
 #define TYPE_MINE_DATA  3
+#define TYPE_BLD  4
+#define TYPE_VEH  5
 
 
 // basic types
@@ -379,7 +381,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_DECAYS_TO  26
 #define INTERACT_CONSUMES_TO  27
 #define INTERACT_IDENTIFIES_TO  28
-#define NUM_INTERACTS  29
+#define INTERACT_RUINS_TO_BLD  29
+#define INTERACT_RUINS_TO_VEH  30
+#define NUM_INTERACTS  31
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions

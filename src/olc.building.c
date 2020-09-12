@@ -35,7 +35,6 @@ extern const char *bld_relationship_types[];
 extern const char *designate_flags[];
 extern const char *function_flags[];
 extern const char *interact_types[];
-extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 extern const char *room_aff_bits[];
 extern const char *spawn_flags[];
