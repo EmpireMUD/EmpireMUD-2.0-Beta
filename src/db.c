@@ -802,7 +802,7 @@ void check_for_bad_buildings(void) {
 		for (store = GET_OBJ_STORAGE(obj); store; store = next_store) {
 			next_store = store->next;
 			
-			if (store->building_type != NOTHING && !building_proto(store->building_type)) {
+			if (store->type == TYPE_ROOM && store->vnum != NOTHING && !building_proto(store->vnum)) {
 				REMOVE_FROM_LIST(store, obj->proto_data->storage, next);
 				free(store);
 				log(" removing storage for obj %d for bad building type", obj->vnum);
@@ -817,7 +817,7 @@ void check_for_bad_buildings(void) {
 			for (store = GET_OBJ_STORAGE(GET_OLC_OBJECT(dd)); store; store = next_store) {
 				next_store = store->next;
 			
-				if (store->building_type != NOTHING && !building_proto(store->building_type)) {
+				if (store->type == TYPE_ROOM && store->vnum != NOTHING && !building_proto(store->vnum)) {
 					REMOVE_FROM_LIST(store, GET_OLC_OBJECT(dd)->proto_data->storage, next);
 					free(store);
 					msg_to_desc(dd, "&RYou are editing an object whose storage building has been deleted. Building type removed.&0\r\n");

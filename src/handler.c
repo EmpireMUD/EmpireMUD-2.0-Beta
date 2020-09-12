@@ -8944,6 +8944,7 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 	struct obj_storage_type *store;
 	bld_data *bld = GET_BUILDING(loc);
 	bool has_stores_like = (bld ? (count_bld_relations(bld, BLD_REL_STORES_LIKE) > 0) : FALSE);
+	vehicle_data *veh;
 	
 	if (!bld) {
 		return FALSE;	// shortcut
@@ -8957,12 +8958,27 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 		return TRUE; // As long as it can be stored anywhere, it can be stored here.
 	}
 	
-	for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {
-		if (store->building_type == BUILDING_VNUM(loc)) {
-			return TRUE;
+	LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
+		// TYPE_x: storage locations
+		if (store->type == TYPE_ROOM) {
+			// building storage
+			if (store->vnum == BUILDING_VNUM(loc)) {
+				return TRUE;
+			}
+			else if (has_stores_like && bld_has_relation(bld, BLD_REL_STORES_LIKE, store->vnum)) {
+				return TRUE;
+			}
 		}
-		else if (has_stores_like && bld_has_relation(bld, BLD_REL_STORES_LIKE, store->building_type)) {
-			return TRUE;
+		else if (store->type == TYPE_VEH) {
+			// vehicle storage
+			if ((veh = GET_ROOM_VEHICLE(loc)) && store->vnum == VEH_VNUM(veh)) {
+				return TRUE;	// in right vehicle
+			}
+			DL_FOREACH2(ROOM_VEHICLES(loc), veh, next_in_room) {
+				if (store->vnum == VEH_VNUM(veh)) {
+					return TRUE;	// vehicle here
+				}
+			}
 		}
 	}
 	

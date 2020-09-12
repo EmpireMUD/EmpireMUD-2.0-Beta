@@ -4705,7 +4705,7 @@ SHOW(show_storage) {
 			ok = FALSE;
 		
 			for (store = GET_OBJ_STORAGE(obj); store && !ok; store = store->next) {
-				if (store->building_type == building_type) {
+				if (store->type == TYPE_ROOM && store->vnum == building_type) {
 					ok = TRUE;
 				}
 			}
@@ -5015,9 +5015,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	extern const char *bld_flags[];
 	extern const char *designate_flags[];
 	
-	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
-	struct obj_storage_type *store;
-	obj_data *obj, *next_obj;
+	char lbuf[MAX_STRING_LENGTH];
 	
 	msg_to_char(ch, "Building VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_BLD_VNUM(bdg), GET_BLD_NAME(bdg));
 	
@@ -5082,32 +5080,8 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 		msg_to_char(ch, "Yearly maintenance:\r\n%s", buf);
 	}
 	
-	// storage? reverse-lookup
-	*buf = '\0';
-	*line = '\0';
-	HASH_ITER(hh, object_table, obj, next_obj) {
-		for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {
-			if (store->building_type == GET_BLD_VNUM(bdg)) {
-				sprintf(buf1, " %s", GET_OBJ_SHORT_DESC(obj));
-				if (*line || *buf) {
-					strcat(line, ",");
-				}
-				if (strlen(line) + strlen(buf1) > 78) {
-					strcat(line, "\r\n");
-					strcat(buf, line);
-					*line = '\0';
-				}
-				strcat(line, buf1);
-				break;
-			}
-		}
-	}
-	if (*buf || *line) {
-		msg_to_char(ch, "Storable items:\r\n%s%s%s", buf, line, (*line ? "\r\n" : ""));
-	}
-	
-	get_script_display(GET_BLD_SCRIPTS(bdg), line);
-	msg_to_char(ch, "Scripts:\r\n%s", line);
+	get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
+	msg_to_char(ch, "Scripts:\r\n%s", lbuf);
 	
 	show_spawn_summary_to_char(ch, GET_BLD_SPAWNS(bdg));
 }
@@ -5982,8 +5956,18 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		msg_to_char(ch, "Storage locations:");
 		
 		found = 0;
-		for (store = GET_OBJ_STORAGE(j); store; store = store->next) {			
-			msg_to_char(ch, "%s%s", (found++ > 0 ? ", " : " "), GET_BLD_NAME(building_proto(store->building_type)));
+		LL_FOREACH(GET_OBJ_STORAGE(j), store) {
+			// TYPE_x: storage type
+			if (store->type == TYPE_ROOM) {
+				msg_to_char(ch, "%s[B%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_bld_name_by_proto(store->vnum));
+			}
+			else if (store->type == TYPE_VEH) {
+				msg_to_char(ch, "%s[V%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_vehicle_name_by_proto(store->vnum));
+			}
+			else {
+				// none?
+				continue;
+			}
 			
 			if (store->flags) {
 				sprintbit(store->flags, storage_bits, buf2, TRUE);

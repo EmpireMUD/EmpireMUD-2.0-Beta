@@ -5541,13 +5541,22 @@ void parse_object(FILE *obj_f, int nr) {
 			}
 			
 			case 'R': {
-				if (!get_line(obj_f, line) || sscanf(line, "%d %s", t, f1) != 2) {
-					log("SYSERR: Format error in 'R' Field, %s", buf2);
+				if (!get_line(obj_f, line)) {
+					log("SYSERR: Missing 'R' field, %s", buf2);
 					exit(1);
+				}
+				if (sscanf(line, "%d %d %s", &t[0], &t[1], f1) != 3) {
+					t[0] = TYPE_ROOM;	// backwards-compatible
+					
+					if (sscanf(line, "%d %s", &t[1], f1) != 2) {
+						log("SYSERR: Format error in 'R' field, %s", buf2);
+						exit(1);
+					}
 				}
 				
 				CREATE(store, struct obj_storage_type, 1);
-				store->building_type = t[0];
+				store->type = t[0];
+				store->vnum = t[1];
 				store->flags = asciiflag_conv(f1);
 				store->next = NULL;
 				
@@ -5659,7 +5668,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	// R: storage
 	for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {
 		fprintf(fl, "R\n");
-		fprintf(fl, "%d %s\n", store->building_type, bitv_to_alpha(store->flags));
+		fprintf(fl, "%d %d %s\n", store->type, store->vnum, bitv_to_alpha(store->flags));
 	}
 	
 	// T, V: triggers

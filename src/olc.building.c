@@ -435,7 +435,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	// obj storage
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		LL_FOREACH_SAFE(GET_OBJ_STORAGE(obj), store, next_store) {
-			if (store->building_type == vnum) {
+			if (store->type == TYPE_ROOM && store->vnum == vnum) {
 				LL_DELETE(obj->proto_data->storage, store);
 				free(store);
 				save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
@@ -534,7 +534,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		if (GET_OLC_OBJECT(desc)) {
 			found = FALSE;
 			LL_FOREACH_SAFE(GET_OBJ_STORAGE(GET_OLC_OBJECT(desc)), store, next_store) {
-				if (store->building_type == vnum) {
+				if (store->type == TYPE_ROOM && store->vnum == vnum) {
 					LL_DELETE(GET_OLC_OBJECT(desc)->proto_data->storage, store);
 					free(store);
 					if (!found) {
@@ -895,7 +895,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		}
 		any = FALSE;
 		for (store = GET_OBJ_STORAGE(obj); store && !any; store = store->next) {
-			if (store->building_type == vnum) {
+			if (store->type == TYPE_ROOM && store->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));

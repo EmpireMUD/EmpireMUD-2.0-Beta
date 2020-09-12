@@ -2089,7 +2089,6 @@ void olc_show_object(char_data *ch) {
 	struct custom_message *ocm;
 	struct obj_apply *apply;
 	int count, minutes;
-	bld_data *bld;
 	
 	if (!obj) {
 		return;
@@ -2171,11 +2170,16 @@ void olc_show_object(char_data *ch) {
 	// storage
 	sprintf(buf + strlen(buf), "Storage: <%sstorage\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_STORAGE(obj)));
 	count = 0;
-	for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {
-		bld = building_proto(store->building_type);
-		
+	LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
 		sprintbit(store->flags, storage_bits, buf2, TRUE);
-		sprintf(buf + strlen(buf), " \ty%d\t0. [%d] %s ( %s)\r\n", ++count, GET_BLD_VNUM(bld), GET_BLD_NAME(bld), buf2);
+		
+		// TYPE_x: storage type
+		if (store->type == TYPE_ROOM) {
+			sprintf(buf + strlen(buf), " \ty%d\t0. [B%d] %s ( %s)\r\n", ++count, store->vnum, get_bld_name_by_proto(store->vnum), buf2);
+		}
+		else if (store->type == TYPE_VEH) {
+			sprintf(buf + strlen(buf), " \ty%d\t0. [V%d] %s ( %s)\r\n", ++count, store->vnum, get_vehicle_name_by_proto(store->vnum), buf2);
+		}
 	}
 	
 	// custom messages
@@ -3058,9 +3062,8 @@ OLC_MODULE(oedit_storage) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *flagarg;
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	int loc, num, iter;
-	struct obj_storage_type *store, *change, *temp;
-	bld_vnum bld;
+	int loc, num, iter, mode;
+	struct obj_storage_type *store, *change;
 	bool found;
 	
 	// arg1 arg2
@@ -3086,10 +3089,17 @@ OLC_MODULE(oedit_storage) {
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove the storage in the %s.\r\n", GET_BLD_NAME(building_proto(store->building_type)));
+					// TYPE_x: storage types
+					if (store->type == TYPE_ROOM) {
+						msg_to_char(ch, "You remove the storage in the %s.\r\n", get_bld_name_by_proto(store->vnum));
+					}
+					else if (store->type == TYPE_VEH) {
+						msg_to_char(ch, "You remove the storage in %s.\r\n", get_vehicle_name_by_proto(store->vnum));
+					}
 					
-					REMOVE_FROM_LIST(store, obj->proto_data->storage, next);
+					LL_DELETE(obj->proto_data->storage, store);
 					free(store);
+					break;
 				}
 			}
 			
@@ -3099,36 +3109,39 @@ OLC_MODULE(oedit_storage) {
 		}
 	}
 	else if (is_abbrev(arg1, "add")) {
-		flagarg = any_one_word(arg2, arg);
-		bld = atoi(arg);
+		half_chop(arg2, type_arg, arg);
+		flagarg = any_one_word(arg, val_arg);
 		
 		// flagarg MAY contain space-separated flags
 		
-		if (!*arg || !isdigit(*arg)) {
-			msg_to_char(ch, "Usage: storage add <building/room> [flags]\r\n");
+		// types
+		if (is_abbrev(type_arg, "building") || is_abbrev(type_arg, "room")) {
+			mode = TYPE_ROOM;
 		}
-		else if (!building_proto(bld)) {
-			msg_to_char(ch, "Invalid building vnum '%s'.\r\n", arg);
+		else if (is_abbrev(type_arg, "vehicle")) {
+			mode = TYPE_VEH;
+		}
+		else {
+			mode = -1;
+		}
+		
+		num = atoi(val_arg);
+		
+		if (!*type_arg || !*val_arg || !isdigit(*val_arg) || mode == -1) {
+			msg_to_char(ch, "Usage: storage add <building | vehicle> <vnum> [flags]\r\n");
+		}
+		else if (mode == TYPE_ROOM && !building_proto(num)) {
+			msg_to_char(ch, "Invalid building vnum '%s'.\r\n", val_arg);
+		}
+		else if (mode == TYPE_VEH && !vehicle_proto(num)) {
+			msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", val_arg);
 		}
 		else {
 			CREATE(store, struct obj_storage_type, 1);
-			
-			store->building_type = bld;
-			
+			store->type = mode;
+			store->vnum = num;
 			store->flags = 0;
-			store->next = NULL;
-			
-			// append to end
-			if (GET_OBJ_STORAGE(obj)) {
-				temp = GET_OBJ_STORAGE(obj);
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = store;
-			}
-			else {
-				obj->proto_data->storage = store;
-			}
+			LL_APPEND(obj->proto_data->storage, store);
 			
 			// process flags as space-separated string
 			while (*flagarg) {
@@ -3140,7 +3153,14 @@ OLC_MODULE(oedit_storage) {
 			}
 			
 			sprintbit(store->flags, storage_bits, buf1, TRUE);
-			msg_to_char(ch, "You add storage in the %s with flags: %s\r\n", GET_BLD_NAME(building_proto(store->building_type)), buf1);
+			
+			// TYPE_x: storage types
+			if (mode == TYPE_ROOM) {
+				msg_to_char(ch, "You add storage in the %s with flags: %s\r\n", get_bld_name_by_proto(num), buf1);
+			}
+			else if (mode == TYPE_VEH) {
+				msg_to_char(ch, "You add storage in %s with flags: %s\r\n", get_vehicle_name_by_proto(num), buf1);
+			}
 		}
 	}
 	else if (is_abbrev(arg1, "change")) {
@@ -3148,7 +3168,7 @@ OLC_MODULE(oedit_storage) {
 		half_chop(arg1, type_arg, val_arg);
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
-			msg_to_char(ch, "Usage: storage change <number> <building | flags> <value>\r\n");
+			msg_to_char(ch, "Usage: storage change <number> flags <value>\r\n");
 			return;
 		}
 		
@@ -3165,26 +3185,16 @@ OLC_MODULE(oedit_storage) {
 		if (!change) {
 			msg_to_char(ch, "Invalid storage number.\r\n");
 		}
-		else if (is_abbrev(type_arg, "building") || is_abbrev(type_arg, "room")) {
-			bld = atoi(val_arg);
-			if (!isdigit(*val_arg) || !building_proto(bld)) {
-				msg_to_char(ch, "Invalid building vnum '%s'.\r\n", val_arg);
-			}
-			else {
-				change->building_type = bld;
-				msg_to_char(ch, "Storage %d changed to building %d (%s).\r\n", atoi(num_arg), bld, GET_BLD_NAME(building_proto(bld)));
-			}
-		}
 		else if (is_abbrev(type_arg, "flags")) {
 			change->flags = olc_process_flag(ch, val_arg, "storage", "storage change flags", storage_bits, change->flags);
 		}
 		else {
-			msg_to_char(ch, "You can only change the building/room or flags.\r\n");
+			msg_to_char(ch, "You can only change the flags.\r\n");
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: storage add <building/room> [flags]\r\n");
-		msg_to_char(ch, "Usage: storage change <number> <building | flags> <value>\r\n");
+		msg_to_char(ch, "Usage: storage add <building | vehicle> <vnum> [flags]\r\n");
+		msg_to_char(ch, "Usage: storage change <number> flags <value>\r\n");
 		msg_to_char(ch, "Usage: storage remove <number | all>\r\n");
 		msg_to_char(ch, "Available flags:\r\n");
 		
