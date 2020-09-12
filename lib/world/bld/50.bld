@@ -121,17 +121,18 @@ R
 1004 1 5 0
 S
 #5006
-Small Ruins~
-Some Decaying Ruins~
+Ruins~
+The Ruins of #n~
 &y/&0..&y\~
 3 -1 di 0
 0 0 0 -1
 C
 dismantle~
+T 5006
 S
 #5007
-Large Ruins~
-Some Decaying Ruins~
+Ruins~
+The Ruins of a #n~
 &y/&0..&y\~
 3 -1 eiR 0
 0 0 0 -1
@@ -142,6 +143,7 @@ D
 offer any real protection from the elements, and the piles of debris are
 infested with rats. This is the sort of place that attracts trouble.
 ~
+T 5007
 S
 #5008
 Tunnel~
@@ -176,11 +178,11 @@ The City Center~
 ????~
 1000 0 do 0
 0 0 0 -1
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 S
 #5010
 Flooded Ruins~
-Some Flooded Ruins~
+The Flooded Ruins of #n~
 &?~&0|\&?~~
 3 -1 diDQ 0
 0 0 0 -1
