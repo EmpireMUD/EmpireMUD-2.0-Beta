@@ -1226,7 +1226,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Designate flags set but vehicle has no interior");
 		problem = TRUE;
 	}
-	if (!VEH_YEARLY_MAINTENANCE(veh)) {
+	if (!VEH_YEARLY_MAINTENANCE(veh) && !VEH_FLAGGED(veh, VEH_IS_RUINS)) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Requires no maintenance");
 		problem = TRUE;
 	}

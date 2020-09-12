@@ -109,7 +109,7 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "2ND-TERRITORY flag on a non-designated building");
 		problem = TRUE;
 	}
-	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && !GET_BLD_YEARLY_MAINTENANCE(bld)) {
+	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM | BLD_IS_RUINS) && !GET_BLD_YEARLY_MAINTENANCE(bld)) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Requires no maintenance");
 		problem = TRUE;
 	}
