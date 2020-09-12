@@ -3924,7 +3924,6 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 									break;
 								}
 								case RES_COMPONENT: {
-									// TODO: future version of this could prefer 'basic' components on pass 1
 									if (GET_OBJ_COMPONENT(obj) == res->vnum || is_component_vnum(obj, res->vnum)) {
 										--res->amount;
 										obj->search_mark = TRUE;
