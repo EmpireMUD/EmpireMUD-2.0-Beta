@@ -399,6 +399,16 @@ void fully_empty_vehicle(vehicle_data *veh) {
 	
 	if (VEH_ROOM_LIST(veh)) {
 		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+			// remove other vehicles
+			DL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), iter, next_iter, next_in_room) {
+				if (IN_ROOM(veh)) {
+					vehicle_to_room(iter, IN_ROOM(veh));
+				}
+				else {
+					extract_vehicle(iter);
+				}
+			}
+			
 			// remove people
 			DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
 				act("You are ejected from $V!", FALSE, ch, NULL, veh, TO_CHAR);
@@ -421,16 +431,6 @@ void fully_empty_vehicle(vehicle_data *veh) {
 				}
 				else {
 					extract_obj(obj);
-				}
-			}
-			
-			// remove other vehicles
-			DL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), iter, next_iter, next_in_room) {
-				if (IN_ROOM(veh)) {
-					vehicle_to_room(iter, IN_ROOM(veh));
-				}
-				else {
-					extract_vehicle(iter);
 				}
 			}
 		}
