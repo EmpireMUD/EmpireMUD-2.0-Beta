@@ -3438,7 +3438,7 @@ void ruin_one_building(room_data *room) {
 	}
 	
 	// create ruins building
-	if (bld && !IS_SET(GET_BLD_FLAGS(bld), BLD_NO_RUINS)) {
+	if (bld /* && !IS_SET(GET_BLD_FLAGS(bld), BLD_NO_RUINS) */) {
 		// verify closed status and find a room to exit to
 		if (closed) {
 			to_room = SHIFT_DIR(room, rev_dir[dir]);

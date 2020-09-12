@@ -735,7 +735,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_INTERLINK  BIT(5)	// can be interlinked
 #define BLD_HERD  BIT(6)	// can herd
 #define BLD_DEDICATE  BIT(7)	// can be dedicated to a player
-#define BLD_NO_RUINS  BIT(8)	// building leaves no corpse
+#define BLD_IS_RUINS  BIT(8)	// building counts as ruins
 #define BLD_NO_NPC  BIT(9)	// mobs won't walk in
 #define BLD_BARRIER  BIT(10)	// can only go back the direction you came
 #define BLD_IN_CITY_ONLY  BIT(11)	// can only be used in-city
@@ -2463,6 +2463,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_PLAYER_NO_WORK  BIT(26)	// A. player has marked it no-work
 #define VEH_CHAMELEON  BIT(27)	// B. vehicle's icon isn't visible at a distance
 #define VEH_INTERLINK  BIT(28)	// C. rooms can be interlinked with nearby interlink-flagged vehicles or rooms
+#define VEH_IS_RUINS  BIT(29)	// D. counts as ruins for cities/decay
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin

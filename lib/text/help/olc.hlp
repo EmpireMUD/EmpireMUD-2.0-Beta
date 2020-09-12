@@ -2084,7 +2084,7 @@ Available flags:
  HERD - mobs can be herded into this building
  DEDICATE - can be dedicated to a patron god or player, which adds "of Name"
     to the room title
- !RUINS - building leaves no ruins when it decays
+ IS-RUINS - counts as ruins (affects cities and decay)
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
  IN-CITY-ONLY - can only be used if in an established city
@@ -8039,6 +8039,7 @@ Available flags:
  *PLAYER-NO-WORK - player has toggled no-work on
  CHAMELEON - vehicle cannot be seen at a distance (when in good repair)
  INTERLINK - rooms can be interlinked with other interlink-flagged places
+ IS-RUINS - counts as ruins for city status and building decay
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually

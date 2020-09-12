@@ -2869,7 +2869,7 @@ const char *bld_flags[] = {
 	"INTERLINK",	// 5
 	"HERD",
 	"DEDICATE",
-	"!RUINS",
+	"IS-RUINS",
 	"!NPC",
 	"BARRIER",	// 10
 	"IN-CITY-ONLY",
@@ -4289,6 +4289,7 @@ const char *vehicle_flags[] = {
 	"*PLAYER-NO-WORK",
 	"CHAMELEON",
 	"INTERLINK",
+	"IS-RUINS",
 	"\n"
 };
 
@@ -4324,6 +4325,7 @@ const char *identify_vehicle_flags[] = {
 	"is set no-work",
 	"chameleon",
 	"can interlink",
+	"is ruined",
 	"\n"
 };
 
