@@ -5315,6 +5315,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "title")) {
+						snprintf(str, slen, "%s", get_room_name(r, FALSE));
+					}
 					break;
 				}
 				case 'u': {	// room.u*
