@@ -3522,7 +3522,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter, bool force
 			npc = create_empire_npc(emp, artisan, homeless->sex, homeless->name, ter);
 			remove_homeless_citizen(emp, homeless);
 		}
-		else if (ter->population_timer <= 0) {
+		else if (force || ter->population_timer <= 0) {
 			sex = number(SEX_MALE, SEX_FEMALE);
 			proto = mob_proto(artisan);
 			npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter);
@@ -3544,7 +3544,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter, bool force
 			npc = create_empire_npc(emp, homeless->vnum, homeless->sex, homeless->name, ter);
 			remove_homeless_citizen(emp, homeless);
 		}
-		else if (ter->population_timer <= 0) {
+		else if (force || ter->population_timer <= 0) {
 			proto = mob_proto(citizen);
 			npc = create_empire_npc(emp, citizen, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter);
 		}
