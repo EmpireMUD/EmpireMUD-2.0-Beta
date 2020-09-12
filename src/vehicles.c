@@ -718,15 +718,23 @@ INTERACTION_FUNC(ruin_vehicle_interaction) {
 	if (strstr(VEH_KEYWORDS(ruin), "#n")) {
 		to_free = (!proto || VEH_KEYWORDS(ruin) != VEH_KEYWORDS(proto)) ? VEH_KEYWORDS(ruin) : NULL;
 		VEH_KEYWORDS(ruin) = str_replace("#n", VEH_SHORT_DESC(inter_veh), VEH_KEYWORDS(ruin));
-
+		if (to_free) {
+			free(to_free);
+		}
 	}
 	if (strstr(VEH_SHORT_DESC(ruin), "#n")) {
 		to_free = (!proto || VEH_SHORT_DESC(ruin) != VEH_SHORT_DESC(proto)) ? VEH_SHORT_DESC(ruin) : NULL;
 		VEH_SHORT_DESC(ruin) = str_replace("#n", VEH_SHORT_DESC(inter_veh), VEH_SHORT_DESC(ruin));
+		if (to_free) {
+			free(to_free);
+		}
 	}
 	if (strstr(VEH_LONG_DESC(ruin), "#n")) {
 		to_free = (!proto || VEH_LONG_DESC(ruin) != VEH_LONG_DESC(proto)) ? VEH_LONG_DESC(ruin) : NULL;
 		VEH_LONG_DESC(ruin) = str_replace("#n", VEH_SHORT_DESC(inter_veh), VEH_LONG_DESC(ruin));
+		if (to_free) {
+			free(to_free);
+		}
 	}
 	
 	load_vtrigger(ruin);
