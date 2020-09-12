@@ -359,7 +359,7 @@ int count_owned_homes(empire_data *emp) {
 		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
 			continue;
 		}
-		if (!VEH_FLAGGED(veh, VEH_BUILDING) && VEH_INTERIOR_HOME_ROOM(veh) && GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) {
+		if (!VEH_FLAGGED(veh, VEH_BUILDING) || !VEH_INTERIOR_HOME_ROOM(veh) || !GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) {
 			continue;	// only count buildings with interiors
 		}
 		if (GET_BLD_CITIZENS(GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) < 1) {
