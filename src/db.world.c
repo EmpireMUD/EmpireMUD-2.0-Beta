@@ -3457,6 +3457,15 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	}
 	construct_building(inter_room, interaction->vnum);
 	COMPLEX_DATA(inter_room)->entrance = dir;
+	
+	// custom naming if #n is present (before complete_building)
+	if (strstr(GET_BLD_TITLE(proto), "#n")) {
+		if (ROOM_CUSTOM_NAME(inter_room)) {
+			free(ROOM_CUSTOM_NAME(inter_room));
+		}
+		ROOM_CUSTOM_NAME(inter_room) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a Building", GET_BLD_TITLE(proto));
+	}
+	
 	complete_building(inter_room);
 	
 	if (ROOM_IS_CLOSED(inter_room)) {
@@ -3475,14 +3484,6 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 				free(res);
 			}
 		}
-	}
-	
-	// custom naming if #n is present
-	if (strstr(GET_BLD_TITLE(proto), "#n")) {
-		if (ROOM_CUSTOM_NAME(inter_room)) {
-			free(ROOM_CUSTOM_NAME(inter_room));
-		}
-		ROOM_CUSTOM_NAME(inter_room) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a Building", GET_BLD_TITLE(proto));
 	}
 	
 	return TRUE;
