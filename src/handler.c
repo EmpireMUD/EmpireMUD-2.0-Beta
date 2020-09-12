@@ -2734,7 +2734,7 @@ void abandon_room(room_data *room) {
 	
 	// inside
 	LL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
-		if (HOME_ROOM(iter) == home) {
+		if (iter != home && HOME_ROOM(iter) == home) {
 			perform_abandon_room(iter);
 		}
 	}
@@ -2761,7 +2761,7 @@ void claim_room(room_data *room, empire_data *emp) {
 	perform_claim_room(home, emp);
 	
 	LL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
-		if (HOME_ROOM(iter) == home) {
+		if (iter != home && HOME_ROOM(iter) == home) {
 			perform_claim_room(iter, emp);
 		}
 	}
