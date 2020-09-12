@@ -2746,7 +2746,7 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 */
 bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle) {
 	void adjust_vehicle_tech(vehicle_data *veh, bool add);
-	void fully_empty_vehicle(vehicle_data *veh);
+	void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
 
 	static struct resource_data *default_res = NULL;
 	struct resource_data *old_list;
@@ -2834,7 +2834,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		}
 		
 		vehicle_from_room(veh);	// remove from room first to destroy anything inside
-		fully_empty_vehicle(veh);
+		fully_empty_vehicle(veh, NULL);
 		
 		if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
 			qt_empire_players(VEH_OWNER(veh), qt_lose_vehicle, VEH_VNUM(veh));

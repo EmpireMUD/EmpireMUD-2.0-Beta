@@ -1285,7 +1285,6 @@ void annual_update_map_tile(struct map_data *tile) {
 * Runs an annual update (mainly, maintenance) on the vehicle.
 */
 void annual_update_vehicle(vehicle_data *veh) {
-	void fully_empty_vehicle(vehicle_data *veh);
 	void ruin_vehicle(vehicle_data *veh, char *message);
 	
 	static struct resource_data *default_res = NULL;

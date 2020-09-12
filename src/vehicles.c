@@ -390,8 +390,9 @@ void finish_vehicle_setup(vehicle_data *veh) {
 * if possible.
 *
 * @param vehicle_data *veh The vehicle to empty.
+* @param room_data *to_room Optional: Where to send things (extracts them instead if this is NULL).
 */
-void fully_empty_vehicle(vehicle_data *veh) {
+void fully_empty_vehicle(vehicle_data *veh, room_data *to_room) {
 	vehicle_data *iter, *next_iter;
 	struct vehicle_room_list *vrl;
 	obj_data *obj, *next_obj;
@@ -401,8 +402,8 @@ void fully_empty_vehicle(vehicle_data *veh) {
 		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 			// remove other vehicles
 			DL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), iter, next_iter, next_in_room) {
-				if (IN_ROOM(veh)) {
-					vehicle_to_room(iter, IN_ROOM(veh));
+				if (to_room) {
+					vehicle_to_room(iter, to_room);
 				}
 				else {
 					vehicle_from_room(iter);
@@ -413,8 +414,8 @@ void fully_empty_vehicle(vehicle_data *veh) {
 			// remove people
 			DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
 				act("You are ejected from $V!", FALSE, ch, NULL, veh, TO_CHAR);
-				if (IN_ROOM(veh)) {
-					char_to_room(ch, IN_ROOM(veh));
+				if (to_room) {
+					char_to_room(ch, to_room);
 					qt_visit_room(ch, IN_ROOM(ch));
 					look_at_room(ch);
 					act("$n is ejected from $V!", TRUE, ch, NULL, veh, TO_ROOM);
@@ -427,8 +428,8 @@ void fully_empty_vehicle(vehicle_data *veh) {
 			
 			// remove items
 			DL_FOREACH_SAFE2(ROOM_CONTENTS(vrl->room), obj, next_obj, next_content) {
-				if (IN_ROOM(veh)) {
-					obj_to_room(obj, IN_ROOM(veh));
+				if (to_room) {
+					obj_to_room(obj, to_room);
 				}
 				else {
 					extract_obj(obj);
@@ -674,8 +675,10 @@ char *list_harnessed_mobs(vehicle_data *veh) {
 INTERACTION_FUNC(ruin_vehicle_interaction) {
 	room_data *room = inter_room ? inter_room : (inter_veh ? IN_ROOM(inter_veh) : NULL);
 	struct resource_data *res, *next_res, *save = NULL;
-	vehicle_data *ruin, *proto;
+	vehicle_data *ruin, *proto, *veh_iter, *next_veh;
+	struct vehicle_room_list *vrl;
 	double save_resources;
+	room_data *inside;
 	char *to_free;
 	
 	if (!inter_veh || !room || !(proto = vehicle_proto(interaction->vnum))) {
@@ -686,8 +689,23 @@ INTERACTION_FUNC(ruin_vehicle_interaction) {
 	vehicle_to_room(ruin, room);
 	scale_vehicle_to_level(ruin, VEH_SCALE_LEVEL(inter_veh));	// attempt auto-detect of level
 	
+	// transfer ownership
 	if (VEH_CLAIMS_WITH_ROOM(ruin) && ROOM_OWNER(HOME_ROOM(room))) {
 		perform_claim_vehicle(ruin, ROOM_OWNER(HOME_ROOM(room)));
+	}
+	
+	// move contents
+	if ((inside = get_vehicle_interior(ruin))) {
+		LL_FOREACH(VEH_ROOM_LIST(inter_veh), vrl) {
+			// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
+			DL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), veh_iter, next_veh, next_in_room) {
+				if (!VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
+					ruin_vehicle(veh_iter, "$V falls into ruin.");
+				}
+			}
+		}
+		
+		fully_empty_vehicle(inter_veh, inside);
 	}
 	
 	// move resources...
@@ -771,7 +789,7 @@ void ruin_vehicle(vehicle_data *veh, char *message) {
 	// ruins
 	run_interactions(NULL, VEH_INTERACTIONS(veh), INTERACT_RUINS_TO_VEH, IN_ROOM(veh), NULL, NULL, veh, ruin_vehicle_interaction);
 	
-	fully_empty_vehicle(veh);
+	fully_empty_vehicle(veh, IN_ROOM(veh));
 	extract_vehicle(veh);
 }
 
@@ -835,7 +853,7 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 	}
 	
 	// clear it out
-	fully_empty_vehicle(veh);
+	fully_empty_vehicle(veh, IN_ROOM(veh));
 	delete_vehicle_interior(veh);
 	
 	// set up flags
