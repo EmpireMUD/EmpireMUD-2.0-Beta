@@ -1621,7 +1621,7 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 	// prepare empty room message
 	*msg = '\0';
 	
-	// prepare message: Leave a %s (%%s) in the message if you want a direction.
+	// MOVE_x: prepare message: Leave a %s (%%s) in the message if you want a direction.
 	if (IS_SET(flags, MOVE_EARTHMELD)) {
 		*msg = '\0';	// earthmeld hides all move msgs
 	}
@@ -1633,6 +1633,22 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 		act("$n follows $N.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
 		if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
 			act("$n follows you.", TRUE, ch, NULL, ch->master, TO_VICT);
+		}
+	}
+	else if (IS_SET(flags, MOVE_ENTER_VEH)) {
+		vehicle_data *veh = GET_ROOM_VEHICLE(to_room);
+		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
+		if (veh && is_bld) {
+			act("$n enters $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (veh && !is_bld) {
+			act("$n boards $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (GET_BUILDING(HOME_ROOM(to_room))) {
+			snprintf(msg, sizeof(msg), "$n enters the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(to_room))));
+		}
+		else {
+			act("$n enters the building.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 	}
 	else if (IS_SET(flags, MOVE_EXIT)) {
@@ -1713,7 +1729,7 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 		char_to_room(ch, from_room);
 	}
 	
-	// prepare message: Leave a %s (%%s) in the message if you want a direction.
+	// MOVE_x: prepare message: Leave a %s (%%s) in the message if you want a direction.
 	if (IS_SET(flags, MOVE_EARTHMELD)) {
 		*msg = '\0';	// earthmeld hides all move msgs
 	}
@@ -1722,6 +1738,22 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	}
 	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master) {
 		snprintf(msg, sizeof(msg), "$n follows %s %%s.", HMHR(ch->master));
+	}
+	else if (IS_SET(flags, MOVE_ENTER_VEH)) {
+		vehicle_data *veh = GET_ROOM_VEHICLE(to_room);
+		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
+		if (veh && is_bld) {
+			act("$n enters $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (veh && !is_bld) {
+			act("$n boards $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (GET_BUILDING(HOME_ROOM(to_room))) {
+			snprintf(msg, sizeof(msg), "$n enters the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(to_room))));
+		}
+		else {
+			act("$n enters the building.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 	}
 	else if (IS_SET(flags, MOVE_EXIT)) {
 		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
@@ -2111,7 +2143,7 @@ ACMD(do_exit) {
 	ACMD(do_exits);
 	room_data *to_room;
 	
-	if (IS_OUTDOORS(ch) || (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch)))) {
+	if (IS_OUTDOORS(ch) || !ROOM_CAN_EXIT(IN_ROOM(ch))) {
 		// if you can't exit here, passes through to 'exits'
 		do_exits(ch, "", 0, -1);
 	}

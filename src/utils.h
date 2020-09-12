@@ -1374,6 +1374,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ISLAND_FLAGGED(room, flag)  (GET_ISLAND(room) ? IS_SET(GET_ISLAND(room)->flags, (flag)) : FALSE)
 #define MAGIC_DARKNESS(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_DARK))
 #define NO_LOCATION(room)  (RMT_FLAGGED(room, RMT_NO_LOCATION) || RMT_FLAGGED(IN_VEHICLE_IN_ROOM(room), RMT_NO_LOCATION))
+#define ROOM_CAN_EXIT(room)  (ROOM_BLD_FLAGGED((room), BLD_EXIT) || (GET_ROOM_VEHICLE(room) && room == HOME_ROOM(room)))
 #define ROOM_CAN_MINE(room)  (ROOM_SECT_FLAGGED((room), SECTF_CAN_MINE) || room_has_function_and_city_ok((room), FNC_MINE) || (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_CAN_MINE)))
 #define ROOM_IS_CLOSED(room)  (IS_INSIDE(room) || IS_ADVENTURE_ROOM(room) || (IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN) && (IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED))))
 #define SHOW_PEOPLE_IN_ROOM(room)  (!ROOM_IS_CLOSED(room) && !ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION))

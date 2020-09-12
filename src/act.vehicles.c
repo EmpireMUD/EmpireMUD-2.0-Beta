@@ -1246,10 +1246,9 @@ void do_unseat_from_vehicle(char_data *ch) {
 
 ACMD(do_board) {
 	char *command = (subcmd == SCMD_ENTER ? "enter" : "board");
-	room_data *was_in = IN_ROOM(ch), *to_room;
+	room_data *to_room;
 	char buf[MAX_STRING_LENGTH];
 	struct vehicle_data *veh;
-	struct follow_type *k;
 
 	one_argument(argument, arg);
 
@@ -1285,120 +1284,8 @@ ACMD(do_board) {
 	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
 		msg_to_char(ch, "You don't have permission to %s it.\r\n", command);
 	}
-	else if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
-		msg_to_char(ch, "You can't %s that while riding.\r\n", command);
-	}
-	else if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !VEH_FLAGGED(veh, VEH_CARRY_MOBS)) {
-		msg_to_char(ch, "You can't %s it while leading an animal.\r\n", command);
-	}
-	else if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !VEH_FLAGGED(veh, VEH_CARRY_VEHICLES)) {
-		msg_to_char(ch, "You can't %s it while leading a vehicle.\r\n", command);
-	}
-	else if (GET_LEADING_VEHICLE(ch) && (VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(veh, VEH_CARRY_VEHICLES))) {
-		act("You can't lead $V in there.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
-	}
 	else {
-		// auto-dismount
-		if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS)) {
-			do_dismount(ch, "", 0, 0);
-		}
-		
-		// move ch: out-message
-		snprintf(buf, sizeof(buf), "You %s $V.", command);
-		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
-		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
-			snprintf(buf, sizeof(buf), "$n %ss $V.", command);
-			act(buf, TRUE, ch, NULL, veh, TO_ROOM);
-		}
-		
-		// move ch
-		char_to_room(ch, to_room);
-		qt_visit_room(ch, IN_ROOM(ch));
-		GET_LAST_DIR(ch) = NO_DIR;
-		look_at_room(ch);
-		
-		// move ch: in-message
-		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
-			snprintf(buf, sizeof(buf), "$n %ss.", command);
-			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-		
-		// move ch: triggers
-		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
-		entry_memory_mtrigger(ch);
-		greet_mtrigger(ch, NO_DIR);
-		greet_memory_mtrigger(ch);
-		greet_vtrigger(ch, NO_DIR);
-		msdp_update_room(ch);
-		
-		// leading-mob
-		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
-			if (!AFF_FLAGGED(GET_LEADING_MOB(ch), AFF_SNEAK)) {
-				act("$n follows $N.", TRUE, GET_LEADING_MOB(ch), NULL, ch, TO_NOTVICT);
-			}
-			
-			char_to_room(GET_LEADING_MOB(ch), to_room);
-			GET_LAST_DIR(GET_LEADING_MOB(ch)) = NO_DIR;
-			look_at_room(GET_LEADING_MOB(ch));
-			
-			if (!AFF_FLAGGED(GET_LEADING_MOB(ch), AFF_SNEAK)) {
-				snprintf(buf, sizeof(buf), "$n %ss.", command);
-				act(buf, TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
-			}
-			
-			enter_wtrigger(IN_ROOM(GET_LEADING_MOB(ch)), GET_LEADING_MOB(ch), NO_DIR);
-			entry_memory_mtrigger(GET_LEADING_MOB(ch));
-			greet_mtrigger(GET_LEADING_MOB(ch), NO_DIR);
-			greet_memory_mtrigger(GET_LEADING_MOB(ch));
-			greet_vtrigger(GET_LEADING_MOB(ch), NO_DIR);
-		}
-		
-		// leading-vehicle
-		if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
-			if (ROOM_PEOPLE(was_in)) {
-				act("$v is led behind $M.", TRUE, ROOM_PEOPLE(was_in), GET_LEADING_VEHICLE(ch), ch, TO_CHAR | TO_NOTVICT | ACT_VEHICLE_OBJ);
-			}
-			
-			adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), FALSE);
-			vehicle_to_room(GET_LEADING_VEHICLE(ch), to_room);
-			adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), TRUE);
-			
-			act("$V is led in.", TRUE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
-		}
-		
-		// followers?
-		for (k = ch->followers; k; k = k->next) {
-			if (IN_ROOM(k->follower) != was_in) {
-				continue;
-			}
-			if (GET_POS(k->follower) < POS_STANDING) {
-				continue;
-			}
-			if (!IS_IMMORTAL(k->follower) && !IS_NPC(k->follower) && IS_CARRYING_N(k->follower) > CAN_CARRY_N(k->follower)) {
-				continue;
-			}
-		
-			act("You follow $N.\r\n", FALSE, k->follower, NULL, ch, TO_CHAR);
-			snprintf(buf, sizeof(buf), "$n %ss $V.", command);
-			act(buf, TRUE, k->follower, NULL, veh, TO_ROOM);
-
-			char_to_room(k->follower, to_room);
-			qt_visit_room(k->follower, IN_ROOM(k->follower));
-			GET_LAST_DIR(k->follower) = NO_DIR;
-			look_at_room(k->follower);
-			
-			snprintf(buf, sizeof(buf), "$n %ss.", command);
-			act(buf, TRUE, k->follower, NULL, NULL, TO_ROOM);
-			
-			enter_wtrigger(IN_ROOM(k->follower), k->follower, NO_DIR);
-			entry_memory_mtrigger(k->follower);
-			greet_mtrigger(k->follower, NO_DIR);
-			greet_memory_mtrigger(k->follower);
-			greet_vtrigger(k->follower, NO_DIR);
-			msdp_update_room(k->follower);	// once we're sure we're staying
-		}
-		
-		command_lag(ch, WAIT_OTHER);
+		perform_move(ch, NO_DIR, to_room, MOVE_ENTER_VEH);
 	}
 }
 
@@ -1407,7 +1294,7 @@ ACMD(do_disembark) {
 	vehicle_data *veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
 	room_data *to_room;
 	
-	if (!veh || !(to_room = IN_ROOM(veh)) || (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch)))) {
+	if (!veh || !(to_room = IN_ROOM(veh)) || !ROOM_CAN_EXIT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't disembark from here!\r\n");
 	}
 	else if (VEH_FLAGGED(veh, VEH_BUILDING)) {
