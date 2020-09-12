@@ -1729,6 +1729,9 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 		char_to_room(ch, from_room);
 	}
 	
+	// prepare empty room message
+	*msg = '\0';
+	
 	// MOVE_x: prepare message: Leave a %s (%%s) in the message if you want a direction.
 	if (IS_SET(flags, MOVE_EARTHMELD)) {
 		*msg = '\0';	// earthmeld hides all move msgs
