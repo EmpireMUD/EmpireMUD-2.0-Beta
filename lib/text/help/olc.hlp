@@ -4071,9 +4071,10 @@ See also: MAP OLC, OLC BUILDINGS
 #d
 "MAPEDIT RUINS"
 
-Usage:  .map ruin
+Usage:  .map ruin [vehicle]
 
-This command will reduce a map building to ruins.
+This command will reduce the map building you're in to ruins, or will do the
+same to a vehicle you target.
 #d
 "MAPEDIT TERRAIN"
 

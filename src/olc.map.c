@@ -469,10 +469,20 @@ OLC_MODULE(mapedit_room_description) {
 
 OLC_MODULE(mapedit_ruin) {
 	void ruin_one_building(room_data *room);	// db.world.c
-
-	room_data *room = HOME_ROOM(IN_ROOM(ch));
+	void ruin_vehicle(vehicle_data *veh, char *message);	// vehicles.c
 	
-	if (GET_ROOM_VNUM(room) >= MAP_SIZE || !GET_BUILDING(room)) {
+	room_data *room = HOME_ROOM(IN_ROOM(ch));
+	vehicle_data *veh;
+	
+	one_argument(argument, arg);
+	
+	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+		ruin_vehicle(veh, "$V is ruined.");
+	}
+	else if (*arg) {
+		msg_to_char(ch, "You don't see that here.\r\n");
+	}
+	else if (GET_ROOM_VNUM(room) >= MAP_SIZE || !GET_BUILDING(room)) {
 		msg_to_char(ch, "You can only ruin map buildings.\r\n");
 	}
 	else {
