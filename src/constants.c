@@ -3371,30 +3371,6 @@ const char *room_extra_types[] = {
 };
 
 
-// used for BUILDING_RUINS_CLOSED
-const char *closed_ruins_icons[NUM_RUINS_ICONS] = {
-	"..&0/]",
-	"&0[\\&?..",
-	"&0|\\&?..",
-	"..&0/|",
-	".&0-&?.&0]",
-	"&0[&?.&0-&?.",
-	"&0[&?__&0]"
-};
-
-
-// used for BUILDING_RUINS_OPEN
-const char *open_ruins_icons[NUM_RUINS_ICONS] = {
-	".&0_i&?.",
-	".&0[.&?.",
-	".&0.v&?.",
-	".&0/]&?.",
-	".&0(\\&?.",
-	".&0}\\.",
-	"&0..}&?."
-};
-
-
 // SECTF_x
 const char *sector_flags[] = {
 	"LOCK-ICON",	// 0

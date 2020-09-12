@@ -948,6 +948,7 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 	room_data *to_room, *center = city->location;
 	int radius = city_type[city->type].radius;
 	bool found_building = FALSE;
+	vehicle_data *veh;
 	int x, y;
 	
 	for (x = -1 * radius; x <= radius && !found_building; ++x) {
@@ -963,9 +964,16 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 				
 				if (to_room && ROOM_OWNER(to_room) == emp) {
 					// is any building, and isn't ruins?
-					// TODO: maybe need a ruins flag, as we are up to 3 ruins
-					if (IS_ANY_BUILDING(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_DISREPAIR) && BUILDING_VNUM(to_room) != BUILDING_RUINS_OPEN && BUILDING_VNUM(to_room) != BUILDING_RUINS_FLOODED && BUILDING_VNUM(to_room) != BUILDING_RUINS_CLOSED) {
+					if (IS_ANY_BUILDING(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_DISREPAIR) && !ROOM_BLD_FLAGGED(to_room, BLD_IS_RUINS)) {
 						found_building = TRUE;
+					}
+					else {	// check for building-vehicles
+						DL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
+							if (VEH_OWNER(veh) == emp && VEH_FLAGGED(veh, VEH_BUILDING) && !VEH_FLAGGED(veh, VEH_IS_RUINS)) {
+								found_building = TRUE;
+								break;
+							}
+						}
 					}
 				}
 			}

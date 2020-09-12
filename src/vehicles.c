@@ -679,7 +679,7 @@ char *list_harnessed_mobs(vehicle_data *veh) {
 * ignoring interaction quantity, and transfers built-with resources and
 * contents.
 */
-INTERACTION_FUNC(ruin_vehicle_interaction) {
+INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 	room_data *room = inter_room ? inter_room : (inter_veh ? IN_ROOM(inter_veh) : NULL);
 	struct resource_data *res, *next_res, *save = NULL;
 	vehicle_data *ruin, *proto, *veh_iter, *next_veh;
@@ -765,7 +765,7 @@ INTERACTION_FUNC(ruin_vehicle_interaction) {
 	}
 	
 	load_vtrigger(ruin);
-	return FALSE;
+	return TRUE;
 }
 
 
@@ -800,7 +800,7 @@ void ruin_vehicle(vehicle_data *veh, char *message) {
 	}
 	
 	// ruins
-	run_interactions(NULL, VEH_INTERACTIONS(veh), INTERACT_RUINS_TO_VEH, IN_ROOM(veh), NULL, NULL, veh, ruin_vehicle_interaction);
+	run_interactions(NULL, VEH_INTERACTIONS(veh), INTERACT_RUINS_TO_VEH, IN_ROOM(veh), NULL, NULL, veh, ruin_vehicle_to_vehicle_interaction);
 	
 	fully_empty_vehicle(veh, IN_ROOM(veh));
 	extract_vehicle(veh);

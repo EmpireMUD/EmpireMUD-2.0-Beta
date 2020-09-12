@@ -2667,7 +2667,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_TAVERN_TYPE  4
 #define ROOM_EXTRA_TAVERN_BREWING_TIME  5
 #define ROOM_EXTRA_TAVERN_AVAILABLE_TIME  6
-#define ROOM_EXTRA_RUINS_ICON  7
+	#define ROOM_EXTRA_UNUSED  7	// formerly ruins-icon
 #define ROOM_EXTRA_CHOP_PROGRESS  8
 #define ROOM_EXTRA_TRENCH_PROGRESS  9
 #define ROOM_EXTRA_HARVEST_PROGRESS  10
@@ -2682,11 +2682,6 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR  19	// for un-trenching correctly
 #define ROOM_EXTRA_ORIGINAL_BUILDER  20	// person who started the building
 #define ROOM_EXTRA_SECTOR_TIME  21	// when it became this sector type (for types with a timed evo)
-
-
-// number of different appearances
-#define NUM_RUINS_ICONS  7
-#define NUM_SWAMP_DISPLAYS  4
 
 
  //////////////////////////////////////////////////////////////////////////////

@@ -1168,7 +1168,7 @@ void annual_update_map_tile(struct map_data *tile) {
 	
 	// updates that only matter if there's a room:
 	if (room) {
-		if (IS_RUINS(room)) {
+		if (ROOM_BLD_FLAGGED(room, BLD_IS_RUINS)) {
 			// roughly 2 real years for average chance for ruins to be gone
 			if (!number(0, 89)) {
 				disassociate_building(room);
@@ -1304,7 +1304,14 @@ void annual_update_vehicle(vehicle_data *veh) {
 	VEH_HEALTH(veh) -= MAX(1.0, ((double) VEH_MAX_HEALTH(veh) / 10.0));
 	
 	if (VEH_HEALTH(veh) > 0) {	// still alive
-		if (!VEH_IS_DISMANTLING(veh)) {
+		if (VEH_FLAGGED(veh, VEH_IS_RUINS)) {
+			// chance of ruining ruins: roughly 2 real years for average chance for ruins to be gone
+			if (!number(0, 89)) {
+				msg = veh_get_custom_message(veh, VEH_CUSTOM_RUINS_TO_ROOM);
+				ruin_vehicle(veh, msg ? msg : "$V finally crumbles to dust!");
+			}
+		}
+		else if (!VEH_IS_DISMANTLING(veh)) {
 			// add maintenance (if not dismantling)
 			old_list = VEH_NEEDS_RESOURCES(veh);
 			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
@@ -3395,6 +3402,215 @@ void init_room(room_data *room, room_vnum vnum) {
 	room->people = NULL;
 }
 
+/**
+* Interaction function for building-ruins-to-building. This replaces the
+* building, ignoring interaction quantity, and transfers built-with resources
+* and contents.
+*/
+INTERACTION_FUNC(ruin_building_to_building_interaction) {
+	extern room_data *get_vehicle_interior(vehicle_data *veh);
+	void scale_vehicle_to_level(vehicle_data *veh, int level);
+	
+	struct resource_data *res, *next_res, *save = NULL;
+	vehicle_data *veh_iter, *next_veh;
+	room_data *to_room = NULL;
+	bld_data *old_bld, *proto;
+	double save_resources;
+	int dir;
+	
+	if (!inter_room || !(proto = building_proto(interaction->vnum)) || GET_ROOM_VNUM(inter_room) >= MAP_SIZE) {
+		return FALSE;	// safety: only works on the map
+	}
+	
+	// save data
+	old_bld = GET_BUILDING(inter_room);
+	dir = BUILDING_ENTRANCE(inter_room);
+	
+	// move resources...
+	if (GET_BUILT_WITH(inter_room)) {
+		save = GET_BUILT_WITH(inter_room);
+		GET_BUILT_WITH(inter_room) = NULL;
+	}
+	else if (IS_DISMANTLING(inter_room)) {
+		save = GET_BUILDING_RESOURCES(inter_room);
+		GET_BUILDING_RESOURCES(inter_room) = NULL;
+	}
+	
+	// abandon first -- this will take care of accessory rooms, too
+	abandon_room(inter_room);
+	disassociate_building(inter_room);
+	
+	if (ROOM_PEOPLE(inter_room)) {	// messaging to anyone left
+		act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(inter_room), NULL, NULL, TO_CHAR | TO_ROOM);
+	}
+	
+	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(inter_room), veh_iter, next_veh, next_in_room) {
+		if (!VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
+			extract_vehicle(veh_iter);
+		}
+	}
+	
+	if (!IS_SET(GET_BLD_FLAGS(proto), BLD_OPEN)) {
+		// closed ruins
+		to_room = SHIFT_DIR(inter_room, rev_dir[dir]);
+	}
+	construct_building(inter_room, interaction->vnum);
+	COMPLEX_DATA(inter_room)->entrance = dir;
+	complete_building(inter_room);
+	
+	if (ROOM_IS_CLOSED(inter_room)) {
+		create_exit(inter_room, to_room, rev_dir[dir], FALSE);
+	}
+
+	// reattach built-with (if any) and reduce it to 5-20%
+	if (save) {
+		save_resources = number(5, 20) / 100.0;
+		GET_BUILT_WITH(inter_room) = save;
+		LL_FOREACH_SAFE(GET_BUILT_WITH(inter_room), res, next_res) {
+			res->amount = ceil(res->amount * save_resources);
+		
+			if (res->amount <= 0) {	// delete if empty
+				LL_DELETE(GET_BUILT_WITH(inter_room), res);
+				free(res);
+			}
+		}
+	}
+	
+	// custom naming if #n is present
+	if (strstr(GET_BLD_TITLE(proto), "#n")) {
+		if (ROOM_CUSTOM_NAME(inter_room)) {
+			free(ROOM_CUSTOM_NAME(inter_room));
+		}
+		ROOM_CUSTOM_NAME(inter_room) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a Building", GET_BLD_TITLE(proto));
+	}
+	
+	return TRUE;
+}
+
+
+/**
+* Interaction function for building-ruins-to-vehicle. This loads a new vehicle,
+* ignoring interaction quantity, and transfers built-with resources and
+* contents.
+*/
+INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
+	extern room_data *get_vehicle_interior(vehicle_data *veh);
+	void scale_vehicle_to_level(vehicle_data *veh, int level);
+	
+	struct resource_data *res, *next_res, *save = NULL;
+	vehicle_data *ruin, *proto, *veh_iter, *next_veh;
+	obj_data *obj_iter, *next_obj;
+	char_data *ch_iter, *next_ch;
+	double save_resources;
+	bld_data *old_bld;
+	room_data *inside;
+	char *to_free;
+	
+	if (!inter_room || !(proto = vehicle_proto(interaction->vnum)) || GET_ROOM_VNUM(inter_room) >= MAP_SIZE) {
+		return FALSE;	// safety: only works on the map
+	}
+	
+	old_bld = GET_BUILDING(inter_room);
+	ruin = read_vehicle(interaction->vnum, TRUE);
+	vehicle_to_room(ruin, inter_room);
+	scale_vehicle_to_level(ruin, 1);	// minimum available level
+	
+	// do not transfer ownership -- ruins never default to 'claimed'
+	
+	// move contents
+	if ((inside = get_vehicle_interior(ruin))) {
+		// move applicable vehicles
+		if (VEH_FLAGGED(ruin, VEH_CARRY_VEHICLES)) {
+			DL_FOREACH_SAFE2(ROOM_VEHICLES(inter_room), veh_iter, next_veh, next_in_room) {
+				if (veh_iter != ruin && !VEH_FLAGGED(veh_iter, VEH_NO_LOAD_ONTO_VEHICLE)) {
+					vehicle_from_room(veh_iter);
+					vehicle_to_room(veh_iter, inside);
+				}
+			}
+		}
+		// move all mobs/players
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(inter_room), ch_iter, next_ch, next_in_room) {
+			char_from_room(ch_iter);
+			char_to_room(ch_iter, inside);
+		}
+		// and objs
+		DL_FOREACH_SAFE2(ROOM_CONTENTS(inter_room), obj_iter, next_obj, next_content) {
+			obj_from_room(obj_iter);
+			obj_to_room(obj_iter, inside);
+		}
+		
+		if (ROOM_PEOPLE(inside)) {
+			act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(inside), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+	}
+	
+	// move resources...
+	if (GET_BUILT_WITH(inter_room)) {
+		save = GET_BUILT_WITH(inter_room);
+		GET_BUILT_WITH(inter_room) = NULL;
+	}
+	else if (IS_DISMANTLING(inter_room)) {
+		save = GET_BUILDING_RESOURCES(inter_room);
+		GET_BUILDING_RESOURCES(inter_room) = NULL;
+	}
+	
+	// abandon first -- this will take care of accessory rooms, too
+	abandon_room(inter_room);
+	disassociate_building(inter_room);
+	
+	if (ROOM_PEOPLE(inter_room)) {	// messaging to anyone left
+		act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(inter_room), NULL, NULL, TO_CHAR | TO_ROOM);
+	}
+	
+	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(inter_room), veh_iter, next_veh, next_in_room) {
+		if (veh_iter != ruin && !VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
+			extract_vehicle(veh_iter);
+		}
+	}
+	
+	// reattach built-with (if any) and reduce it to 5-20%
+	if (save) {
+		save_resources = number(5, 20) / 100.0;
+		VEH_BUILT_WITH(ruin) = save;
+		LL_FOREACH_SAFE(VEH_BUILT_WITH(ruin), res, next_res) {
+			res->amount = ceil(res->amount * save_resources);
+			
+			if (res->amount <= 0) {	// delete if empty
+				LL_DELETE(VEH_BUILT_WITH(ruin), res);
+				free(res);
+			}
+		}
+	}
+	
+	// custom naming if #n is present
+	if (strstr(VEH_KEYWORDS(ruin), "#n")) {
+		to_free = (!proto || VEH_KEYWORDS(ruin) != VEH_KEYWORDS(proto)) ? VEH_KEYWORDS(ruin) : NULL;
+		VEH_KEYWORDS(ruin) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a building", VEH_KEYWORDS(ruin));
+		if (to_free) {
+			free(to_free);
+		}
+	}
+	if (strstr(VEH_SHORT_DESC(ruin), "#n")) {
+		to_free = (!proto || VEH_SHORT_DESC(ruin) != VEH_SHORT_DESC(proto)) ? VEH_SHORT_DESC(ruin) : NULL;
+		VEH_SHORT_DESC(ruin) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a building", VEH_SHORT_DESC(ruin));
+		if (to_free) {
+			free(to_free);
+		}
+	}
+	if (strstr(VEH_LONG_DESC(ruin), "#n")) {
+		to_free = (!proto || VEH_LONG_DESC(ruin) != VEH_LONG_DESC(proto)) ? VEH_LONG_DESC(ruin) : NULL;
+		VEH_LONG_DESC(ruin) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a building", VEH_LONG_DESC(ruin));
+		if (to_free) {
+			free(to_free);
+		}
+	}
+	
+	load_vtrigger(ruin);
+	return TRUE;
+}
+
 
 /**
 * Replaces a building with ruins.
@@ -3402,94 +3618,30 @@ void init_room(room_data *room, room_vnum vnum) {
 * @param room_data *room The location of the building.
 */
 void ruin_one_building(room_data *room) {
-	bool closed = ROOM_IS_CLOSED(room) ? TRUE : FALSE;
-	struct resource_data *res, *next_res, *save = NULL;
 	bld_data *bld = GET_BUILDING(room);
-	int dir = BUILDING_ENTRANCE(room);
 	vehicle_data *veh, *next_veh;
-	char buf[MAX_STRING_LENGTH];
-	double save_resources;
-	room_data *to_room;
-	bld_vnum type;
 	
-	// save the resource list for later
-	if (GET_BUILT_WITH(room)) {
-		save = GET_BUILT_WITH(room);
-		GET_BUILT_WITH(room) = NULL;
+	if (bld && run_interactions(NULL, GET_BLD_INTERACTIONS(bld), INTERACT_RUINS_TO_VEH, room, NULL, NULL, NULL, ruin_building_to_vehicle_interaction)) {
+		// succesfully ruined to a vehicle
 	}
-	else if (IS_DISMANTLING(room)) {
-		save = GET_BUILDING_RESOURCES(room);
-		GET_BUILDING_RESOURCES(room) = NULL;
+	else if (bld && run_interactions(NULL, GET_BLD_INTERACTIONS(bld), INTERACT_RUINS_TO_BLD, room, NULL, NULL, NULL, ruin_building_to_building_interaction)) {
+		// succesfully ruined to a vehicle
 	}
+	else {	// failed to run a ruins interaction	
+		// abandon first -- this will take care of accessory rooms, too
+		abandon_room(room);
+		disassociate_building(room);
 	
-	// abandon first -- this will take care of accessory rooms, too
-	abandon_room(room);
-	disassociate_building(room);
-	
-	if (ROOM_PEOPLE(room)) {
-		act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
-	}
-	
-	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
-	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-		if (!VEH_OWNER(veh) && !VEH_CONTAINS(veh)) {
-			extract_vehicle(veh);
+		if (ROOM_PEOPLE(room)) {
+			act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
-	}
 	
-	// create ruins building
-	if (bld /* && !IS_SET(GET_BLD_FLAGS(bld), BLD_NO_RUINS) */) {
-		// verify closed status and find a room to exit to
-		if (closed) {
-			to_room = SHIFT_DIR(room, rev_dir[dir]);
-			if (!to_room) {
-				closed = FALSE;
+		// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
+		DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+			if (!VEH_OWNER(veh) && !VEH_CONTAINS(veh)) {
+				extract_vehicle(veh);
 			}
 		}
-		
-		// basic setup
-		if (SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)) {
-			type = BUILDING_RUINS_FLOODED;
-		}
-		else if (closed) {
-			type = BUILDING_RUINS_CLOSED;
-		}
-		else {
-			type = BUILDING_RUINS_OPEN;
-		}
-		construct_building(room, type);
-		COMPLEX_DATA(room)->entrance = dir;
-		
-		// make the exit
-		if (closed && to_room) {
-			create_exit(room, to_room, rev_dir[dir], FALSE);
-		}
-		
-		// customized ruins
-		sprintf(buf, "The Ruins of %s %s", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
-		if (ROOM_CUSTOM_NAME(room)) {
-			free(ROOM_CUSTOM_NAME(room));
-		}
-		ROOM_CUSTOM_NAME(room) = str_dup(buf);
-		set_room_extra_data(room, ROOM_EXTRA_RUINS_ICON, number(0, NUM_RUINS_ICONS-1));
-		
-		// run completion on the ruins
-		complete_building(room);
-		
-		// reattach built-with (if any) and reduce it to 5-20%
-		save_resources = number(5, 20) / 100.0;
-		GET_BUILT_WITH(room) = save;
-		LL_FOREACH_SAFE(GET_BUILT_WITH(room), res, next_res) {
-			res->amount = ceil(res->amount * save_resources);
-			
-			if (res->amount <= 0) {	// delete if empty
-				LL_DELETE(GET_BUILT_WITH(room), res);
-				free(res);
-			}
-		}
-	}
-	else if (save) {
-		free_resource_list(save);
 	}
 }
 

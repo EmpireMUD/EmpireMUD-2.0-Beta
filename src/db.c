@@ -1969,6 +1969,7 @@ const char *versions_list[] = {
 	"b5.99",
 	"b5.102",
 	"b5.103",
+	"b5.104",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -4460,6 +4461,20 @@ void b5_103_update(void) {
 }
 
 
+// b5.104 removes the ROOM_EXTRA_RUINS_ICON data
+void b5_104_update(void) {
+	struct map_data *map;
+	
+	const int ROOM_EXTRA_RUINS_ICON = 7;
+	
+	log("Applying b5.104 update to remove old data...");
+	
+	LL_FOREACH(land_map, map) {
+		remove_extra_data(&map->shared->extra_data, ROOM_EXTRA_RUINS_ICON);
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4781,6 +4796,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.103")) {
 			b5_103_update();
+		}
+		if (MATCH_VERSION("b5.104")) {
+			b5_104_update();
 		}
 	}
 	

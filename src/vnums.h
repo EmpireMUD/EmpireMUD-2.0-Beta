@@ -26,11 +26,8 @@
 // NOTE: many of these are used just for spawn data and if we could do that in
 // file instead of code, these would not be needed
 
-#define BUILDING_RUINS_OPEN  5006	// custom icons and db.world.c
-#define BUILDING_RUINS_CLOSED  5007	// custom icons and db.world.c
 #define BUILDING_TUNNEL  5008  // building.c
 #define BUILDING_CITY_CENTER  5009
-#define BUILDING_RUINS_FLOODED  5010	// water ruins
 
 #define BUILDING_FENCE  5112
 #define BUILDING_GATE  5113

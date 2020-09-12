@@ -1250,8 +1250,6 @@ void look_in_direction(char_data *ch, int dir) {
 * @param bitvector_t options Will recolor the tile if TRUE
 */
 static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, room_data *to_room, bitvector_t options) {
-	extern const char *closed_ruins_icons[NUM_RUINS_ICONS];
-	extern const char *open_ruins_icons[NUM_RUINS_ICONS];
 	extern int get_north_for_char(char_data *ch);
 	extern int get_direction_for_char(char_data *ch, int dir);
 	extern struct city_metadata_type city_type[];
@@ -1431,14 +1429,6 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		else {
 			strcat(buf, "[  ]");
 		}
-	}
-	else if (BUILDING_VNUM(to_room) == BUILDING_RUINS_CLOSED) {
-		// TODO could add variable icons system like sectors use, or a "custom ruins icon" to Building data
-		strcat(buf, closed_ruins_icons[get_room_extra_data(to_room, ROOM_EXTRA_RUINS_ICON)]);
-	}
-	else if (BUILDING_VNUM(to_room) == BUILDING_RUINS_OPEN) {
-		// TODO could add variable icons system like sectors use, or a "custom ruins icon" to Building data
-		strcat(buf, open_ruins_icons[get_room_extra_data(to_room, ROOM_EXTRA_RUINS_ICON)]);
 	}
 	else if (IS_MAP_BUILDING(to_room) && GET_BUILDING(to_room)) {
 		strcat(buf, GET_BLD_ICON(GET_BUILDING(to_room)));
