@@ -402,7 +402,7 @@ bool run_identifies_to(char_data *ch, obj_data **obj, bool *extract) {
 	first_inv = ch->carrying;
 	first_room = ROOM_CONTENTS(IN_ROOM(ch));
 	
-	if (run_interactions(ch, GET_OBJ_INTERACTIONS(*obj), INTERACT_IDENTIFIES_TO, IN_ROOM(ch), NULL, *obj, identifies_to_interact)) {
+	if (run_interactions(ch, GET_OBJ_INTERACTIONS(*obj), INTERACT_IDENTIFIES_TO, IN_ROOM(ch), NULL, *obj, NULL, identifies_to_interact)) {
 		result = TRUE;
 		
 		if (GET_LOYALTY(ch)) {
@@ -4620,7 +4620,7 @@ ACMD(do_combine) {
 	}
 	else {
 		// will extract no matter what happens here
-		if (!run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE, IN_ROOM(ch), NULL, obj, combine_obj_interact)) {
+		if (!run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE, IN_ROOM(ch), NULL, obj, NULL, combine_obj_interact)) {
 			act("You fail to combine $p.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		command_lag(ch, WAIT_OTHER);
@@ -5169,7 +5169,7 @@ ACMD(do_eat) {
 	
 	// 7. cleanup
 	if (extract) {
-		run_interactions(ch, GET_OBJ_INTERACTIONS(food), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, food, consumes_or_decays_interact);
+		run_interactions(ch, GET_OBJ_INTERACTIONS(food), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, food, NULL, consumes_or_decays_interact);
 		extract_obj(food);
 	}
 	else {
@@ -5860,7 +5860,7 @@ ACMD(do_light) {
 		
 		// will extract no matter what happens here
 		empty_obj_before_extract(obj);
-		run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, light_obj_interact);
+		run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, NULL, light_obj_interact);
 		extract_obj(obj);
 		command_lag(ch, WAIT_OTHER);
 		
@@ -6659,7 +6659,7 @@ ACMD(do_seed) {
 		msg_to_char(ch, "It has already been seeded.\r\n");
 	}
 	else {		
-		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEED, IN_ROOM(ch), NULL, obj, seed_obj_interact)) {
+		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEED, IN_ROOM(ch), NULL, obj, NULL, seed_obj_interact)) {
 			if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
 				extract_obj(obj);
 			}
@@ -6691,7 +6691,7 @@ ACMD(do_separate) {
 		msg_to_char(ch, "You can't separate that!\r\n");
 	}
 	else {		
-		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
+		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, NULL, separate_obj_interact)) {
 			if (GET_LOYALTY(ch)) {
 				// subtract old item from empire counts
 				add_production_total(GET_LOYALTY(ch), GET_OBJ_VNUM(obj), -1);

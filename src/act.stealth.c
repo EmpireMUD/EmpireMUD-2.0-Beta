@@ -436,7 +436,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 		}
 		
 		if (GET_POISON_CHARGES(obj) <= 0) {
-			run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, consumes_or_decays_interact);
+			run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
 			extract_obj(obj);
 		}
 		return 0;
@@ -447,7 +447,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 		}
 		if (!number(0, 2)) {
 			if (GET_POISON_CHARGES(obj) <= 0) {
-				run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, consumes_or_decays_interact);
+				run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
 				extract_obj(obj);
 			}
 			return 0;
@@ -504,7 +504,7 @@ int apply_poison(char_data *ch, char_data *vict) {
 	// fire a consume trigger but it can't block execution here
 	if (consume_otrigger(obj, ch, OCMD_POISON, (!EXTRACTED(vict) && !IS_DEAD(vict)) ? vict : NULL)) {
 		if (GET_POISON_CHARGES(obj) <= 0) {
-			run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, consumes_or_decays_interact);
+			run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
 			extract_obj(obj);
 		}
 	}
@@ -1159,7 +1159,7 @@ ACMD(do_pickpocket) {
 			act("You pick $N's pocket...", FALSE, ch, NULL, vict, TO_CHAR);
 
 			// any will tell us if we got at least 1 item (also sends messages)
-			any = run_interactions(ch, vict->interactions, INTERACT_PICKPOCKET, IN_ROOM(ch), vict, NULL, pickpocket_interact);
+			any = run_interactions(ch, vict->interactions, INTERACT_PICKPOCKET, IN_ROOM(ch), vict, NULL, NULL, pickpocket_interact);
 			any |= run_global_mob_interactions(ch, vict, INTERACT_PICKPOCKET, pickpocket_interact);
 			
 			if (coins > 0) {

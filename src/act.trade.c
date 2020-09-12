@@ -1124,7 +1124,7 @@ void finish_gen_craft(char_data *ch) {
 			temp_obj = read_object(res->vnum, FALSE);
 			obj_to_char(temp_obj, ch);
 			for (iter = 0; iter < res->amount; ++iter) {
-				run_interactions(ch, GET_OBJ_INTERACTIONS(temp_obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, temp_obj, consumes_or_decays_interact);
+				run_interactions(ch, GET_OBJ_INTERACTIONS(temp_obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, temp_obj, NULL, consumes_or_decays_interact);
 			}
 			extract_obj(temp_obj);
 		}
@@ -2686,7 +2686,7 @@ ACMD(do_tame) {
 		act("$n tries to tame you...", FALSE, ch, NULL, mob, TO_VICT);
 		act("$n tries to tame $N...", FALSE, ch, NULL, mob, TO_NOTVICT);
 		
-		any = run_interactions(ch, mob->interactions, INTERACT_TAME, IN_ROOM(ch), mob, NULL, tame_interact);
+		any = run_interactions(ch, mob->interactions, INTERACT_TAME, IN_ROOM(ch), mob, NULL, NULL, tame_interact);
 		
 		if (any) {
 			gain_player_tech_exp(ch, PTECH_TAME, 50);

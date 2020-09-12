@@ -4207,7 +4207,7 @@ bool meets_interaction_restrictions(struct interact_restriction *list, char_data
 
 GLB_FUNCTION(run_global_mob_interactions_func) {
 	struct glb_mob_interact_bean *data = (struct glb_mob_interact_bean*)other_data;
-	run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), data->type, IN_ROOM(ch), data->mob, NULL, data->func);
+	run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), data->type, IN_ROOM(ch), data->mob, NULL, NULL, data->func);
 }
 
 
@@ -4254,10 +4254,11 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 * @param room_data *inter_room For room interactions, the room.
 * @param char_data *inter_mob For mob interactions, the mob.
 * @param obj_data *inter_item For item interactions, the item.
+* @param vehicle_data *inter_veh For vehicle interactions, the vehicle.
 * @param INTERACTION_FUNC(*func) A function pointer that runs each successful interaction (func returns TRUE if an interaction happens; FALSE if it aborts)
 * @return bool TRUE if any interactions ran successfully, FALSE if not.
 */
-bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func)) {
+bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, vehicle_data *inter_veh, INTERACTION_FUNC(*func)) {
 	struct interact_exclusion_data *exclusion = NULL;
 	struct interaction_item *interact;
 	struct interact_restriction *res;
@@ -4267,7 +4268,7 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 		if (interact->type == type && meets_interaction_restrictions(interact->restrictions, ch, ch ? GET_LOYALTY(ch) : NULL, inter_mob, inter_item) && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent)) {
 			if (func) {
 				// run function
-				success |= (func)(ch, interact, inter_room, inter_mob, inter_item);
+				success |= (func)(ch, interact, inter_room, inter_mob, inter_item, inter_veh);
 				
 				// skill gains?
 				if (ch && !IS_NPC(ch)) {
@@ -4336,7 +4337,7 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	// now, try vehicles in random order...
 	DL_FOREACH_SAFE(list, tvh, next_tvh) {
 		if (!success) {
-			success |= run_interactions(ch, VEH_INTERACTIONS(tvh->veh), type, room, NULL, NULL, func);
+			success |= run_interactions(ch, VEH_INTERACTIONS(tvh->veh), type, room, NULL, NULL, tvh->veh, func);
 		}
 		DL_DELETE(list, tvh);
 		free(tvh);	// clean up
@@ -4344,22 +4345,22 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	
 	// building first
 	if (!success && GET_BUILDING(room)) {
-		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type, room, NULL, NULL, func);
+		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type, room, NULL, NULL, NULL, func);
 	}
 	
 	// crop second
 	if (!success && (crop = ROOM_CROP(room))) {
-		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, func);
+		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, NULL, func);
 	}
 	
 	// rmt third
 	if (!success && GET_ROOM_TEMPLATE(room)) {
-		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type, room, NULL, NULL, func);
+		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type, room, NULL, NULL, NULL, func);
 	}
 	
 	// sector fourth
 	if (!success) {
-		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(room)), type, room, NULL, NULL, func);
+		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(room)), type, room, NULL, NULL, NULL, func);
 	}
 	
 	return success;

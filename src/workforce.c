@@ -2038,7 +2038,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 		charge_workforce(emp, room, worker, 1, NOTHING, 0);
 		einv_interaction_chore_type = chore;
 		
-		if (run_interactions(worker, GET_OBJ_INTERACTIONS(found_proto), interact_type, room, worker, found_proto, one_einv_interaction_chore) && found_store) {
+		if (run_interactions(worker, GET_OBJ_INTERACTIONS(found_proto), interact_type, room, worker, found_proto, NULL, one_einv_interaction_chore) && found_store) {
 			charge_stored_resource(emp, islid, found_store->vnum, 1);
 		}
 		
@@ -2419,7 +2419,7 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 		// not able to ewt_mark_resource_worker() until we're inside the interact
 		if (worker) {
 			charge_workforce(emp, room, worker, 1, NOTHING, 0);
-			run_interactions(worker, GET_GLOBAL_INTERACTIONS(mine), INTERACT_MINE, room, worker, NULL, one_mining_chore);
+			run_interactions(worker, GET_GLOBAL_INTERACTIONS(mine), INTERACT_MINE, room, worker, NULL, NULL, one_mining_chore);
 			
 			// check for depletion
 			if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {

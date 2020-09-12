@@ -1528,7 +1528,7 @@ void drop_loot(char_data *mob, char_data *killer) {
 	}
 
 	// find and drop loot
-	run_interactions(mob, mob->interactions, INTERACT_LOOT, IN_ROOM(mob), mob, NULL, loot_interact);
+	run_interactions(mob, mob->interactions, INTERACT_LOOT, IN_ROOM(mob), mob, NULL, NULL, loot_interact);
 	run_global_mob_interactions(mob, mob, INTERACT_LOOT, loot_interact);
 	
 	// coins?
@@ -4105,7 +4105,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	// ammo countdown/extract (only if the ammo wasn't extracted by a script)
 	if (purge && best) {
 		if (GET_AMMO_QUANTITY(best) <= 0) {
-			run_interactions(ch, GET_OBJ_INTERACTIONS(best), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, best, consumes_or_decays_interact);
+			run_interactions(ch, GET_OBJ_INTERACTIONS(best), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, best, NULL, consumes_or_decays_interact);
 			extract_obj(best);
 		}
 	}

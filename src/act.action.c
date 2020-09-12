@@ -398,7 +398,7 @@ bool do_crop_forage(char_data *ch) {
 	}
 	
 	if ((crop = get_potential_crop_for_location(IN_ROOM(ch), TRUE))) {
-		return run_interactions(ch, GET_CROP_INTERACTIONS(crop), INTERACT_FORAGE, IN_ROOM(ch), NULL, NULL, finish_foraging);
+		return run_interactions(ch, GET_CROP_INTERACTIONS(crop), INTERACT_FORAGE, IN_ROOM(ch), NULL, NULL, NULL, finish_foraging);
 	}
 	else {
 		return FALSE;	// no crop
@@ -1293,7 +1293,7 @@ void perform_saw(char_data *ch) {
 			act("You finish sawing $p.", FALSE, ch, proto, NULL, TO_CHAR);
 			act("$n finishes sawing $p.", TRUE, ch, proto, NULL, TO_ROOM);
 			
-			success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_SAW, IN_ROOM(ch), NULL, proto, finish_scraping);
+			success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_SAW, IN_ROOM(ch), NULL, proto, NULL, finish_scraping);
 		}
 		
 		if (!success && !proto) {
@@ -1494,7 +1494,7 @@ void process_chipping(char_data *ch) {
 		act("$n finishes chipping $p!", TRUE, ch, proto, NULL, TO_ROOM);
 		GET_ACTION(ch) = ACT_NONE;
 		
-		success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_CHIP, IN_ROOM(ch), NULL, proto, finish_scraping);
+		success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_CHIP, IN_ROOM(ch), NULL, proto, NULL, finish_scraping);
 		free_resource_list(GET_ACTION_RESOURCES(ch));
 		GET_ACTION_RESOURCES(ch) = NULL;
 
@@ -2208,7 +2208,7 @@ void process_mining(char_data *ch) {
 			}
 			
 			// attempt to mine it
-			success = run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), INTERACT_MINE, IN_ROOM(ch), NULL, NULL, finish_mining);
+			success = run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), INTERACT_MINE, IN_ROOM(ch), NULL, NULL, NULL, finish_mining);
 			
 			if (success && in_room == IN_ROOM(ch)) {
 				// skillups
@@ -2703,7 +2703,7 @@ void process_scraping(char_data *ch) {
 			act("You finish scraping off $p.", FALSE, ch, proto, NULL, TO_CHAR);
 			act("$n finishes scraping off $p.", TRUE, ch, proto, NULL, TO_ROOM);
 			
-			success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_SCRAPE, IN_ROOM(ch), NULL, proto, finish_scraping);
+			success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_SCRAPE, IN_ROOM(ch), NULL, proto, NULL, finish_scraping);
 		}
 		
 		if (!success && !proto) {
@@ -2857,7 +2857,7 @@ void process_tanning(char_data *ch) {
 
 		GET_ACTION(ch) = ACT_NONE;
 		
-		success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_TAN, IN_ROOM(ch), NULL, proto, finish_scraping);
+		success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_TAN, IN_ROOM(ch), NULL, proto, NULL, finish_scraping);
 		free_resource_list(GET_ACTION_RESOURCES(ch));
 		GET_ACTION_RESOURCES(ch) = NULL;
 		

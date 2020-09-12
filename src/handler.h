@@ -46,7 +46,7 @@
 
 
 // for the interaction handlers (returns TRUE if the character performs the interaction; FALSE if it aborts)
-#define INTERACTION_FUNC(name)	bool (name)(char_data *ch, struct interaction_item *interaction, room_data *inter_room, char_data *inter_mob, obj_data *inter_item)
+#define INTERACTION_FUNC(name)	bool (name)(char_data *ch, struct interaction_item *interaction, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, vehicle_data *inter_veh)
 
 
 // global function types -- for run_globals
@@ -196,7 +196,7 @@ void free_exclusion_data(struct interact_exclusion_data *list);
 extern bool has_interaction(struct interaction_item *list, int type);
 extern bool meets_interaction_restrictions(struct interact_restriction *list, char_data *ch, empire_data *emp, char_data *inter_mob, obj_data *inter_item);
 extern bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func));
-extern bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func));
+extern bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, vehicle_data *inter_veh, INTERACTION_FUNC(*func));
 extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func));
 
 // lore handlers

@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -45,6 +47,7 @@ void clear_vehicle(vehicle_data *veh);
 void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
 int get_new_vehicle_construction_id();
 void ruin_vehicle(vehicle_data *veh, char *message);
+void scale_vehicle_to_level(vehicle_data *veh, int level);
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 
@@ -65,6 +68,7 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 extern room_data *create_room(room_data *home);
 void get_resource_display(struct resource_data *list, char *save_buffer);
+void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void scale_item_to_level(obj_data *obj, int level);
 extern char *show_color_codes(char *string);
 extern bool validate_icon(char *icon);
@@ -667,6 +671,69 @@ char *list_harnessed_mobs(vehicle_data *veh) {
 }
 
 
+INTERACTION_FUNC(ruin_vehicle_interaction) {
+	room_data *room = inter_room ? inter_room : (inter_veh ? IN_ROOM(inter_veh) : NULL);
+	struct resource_data *res, *next_res, *save = NULL;
+	vehicle_data *ruin, *proto;
+	double save_resources;
+	char *to_free;
+	
+	if (!inter_veh || !room || !(proto = vehicle_proto(interaction->vnum))) {
+		return FALSE;	// safety
+	}
+	
+	ruin = read_vehicle(interaction->vnum, TRUE);
+	vehicle_to_room(ruin, room);
+	scale_vehicle_to_level(ruin, VEH_SCALE_LEVEL(inter_veh));	// attempt auto-detect of level
+	
+	if (VEH_CLAIMS_WITH_ROOM(ruin) && ROOM_OWNER(HOME_ROOM(room))) {
+		perform_claim_vehicle(ruin, ROOM_OWNER(HOME_ROOM(room)));
+	}
+	
+	// move resources...
+	if (VEH_BUILT_WITH(inter_veh)) {
+		save = VEH_BUILT_WITH(inter_veh);
+		VEH_BUILT_WITH(inter_veh) = NULL;
+	}
+	else if (VEH_IS_DISMANTLING(inter_veh)) {
+		save = VEH_NEEDS_RESOURCES(inter_veh);
+		VEH_NEEDS_RESOURCES(inter_veh) = NULL;
+	}
+	
+	// reattach built-with (if any) and reduce it to 5-20%
+	if (save) {
+		save_resources = number(5, 20) / 100.0;
+		VEH_BUILT_WITH(ruin) = save;
+		LL_FOREACH_SAFE(VEH_BUILT_WITH(ruin), res, next_res) {
+			res->amount = ceil(res->amount * save_resources);
+			
+			if (res->amount <= 0) {	// delete if empty
+				LL_DELETE(VEH_BUILT_WITH(ruin), res);
+				free(res);
+			}
+		}
+	}
+	
+	// custom naming if #n is present
+	if (strstr(VEH_KEYWORDS(ruin), "#n")) {
+		to_free = (!proto || VEH_KEYWORDS(ruin) != VEH_KEYWORDS(proto)) ? VEH_KEYWORDS(ruin) : NULL;
+		VEH_KEYWORDS(ruin) = str_replace("#n", VEH_SHORT_DESC(inter_veh), VEH_KEYWORDS(ruin));
+
+	}
+	if (strstr(VEH_SHORT_DESC(ruin), "#n")) {
+		to_free = (!proto || VEH_SHORT_DESC(ruin) != VEH_SHORT_DESC(proto)) ? VEH_SHORT_DESC(ruin) : NULL;
+		VEH_SHORT_DESC(ruin) = str_replace("#n", VEH_SHORT_DESC(inter_veh), VEH_SHORT_DESC(ruin));
+	}
+	if (strstr(VEH_LONG_DESC(ruin), "#n")) {
+		to_free = (!proto || VEH_LONG_DESC(ruin) != VEH_LONG_DESC(proto)) ? VEH_LONG_DESC(ruin) : NULL;
+		VEH_LONG_DESC(ruin) = str_replace("#n", VEH_SHORT_DESC(inter_veh), VEH_LONG_DESC(ruin));
+	}
+	
+	load_vtrigger(ruin);
+	return FALSE;
+}
+
+
 /**
 * Destroys a vehicle from disrepair or invalid location. A destroy trigger
 * on the vehicle can prevent this.
@@ -692,6 +759,9 @@ void ruin_vehicle(vehicle_data *veh, char *message) {
 	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 		delete_room_npcs(vrl->room, NULL, TRUE);
 	}
+	
+	// ruins
+	run_interactions(NULL, VEH_INTERACTIONS(veh), INTERACT_RUINS_TO_VEH, IN_ROOM(veh), NULL, NULL, veh, ruin_vehicle_interaction);
 	
 	fully_empty_vehicle(veh);
 	extract_vehicle(veh);
