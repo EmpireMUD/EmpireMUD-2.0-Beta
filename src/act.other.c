@@ -2614,6 +2614,7 @@ ACMD(do_group) {
 
 ACMD(do_herd) {
 	extern room_data *get_exit_room(room_data *from_room);
+	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	
 	char mob_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH];
 	vehicle_data *into_veh;
@@ -2685,14 +2686,14 @@ ACMD(do_herd) {
 	
 	// herd into vehicle
 	else if ((into_veh = get_vehicle_in_room_vis(ch, dir_arg))) {
-		if (!VEH_FLAGGED(into_veh, VEH_CARRY_MOBS) || !VEH_INTERIOR_HOME_ROOM(into_veh)) {
+		if (!VEH_FLAGGED(into_veh, VEH_CARRY_MOBS) || !(to_room = get_vehicle_interior(into_veh))) {
 			msg_to_char(ch, "You can't herd anything into that.\r\n");
 		}
 		else if (!VEH_IS_COMPLETE(into_veh)) {
 		    msg_to_char(ch, "You can't herd anything into a %s that isn't complete.\r\n", VEH_OR_BLD(into_veh));
 		}
 		else {
-			perform_herd(ch, victim, VEH_INTERIOR_HOME_ROOM(into_veh), NO_DIR, into_veh);
+			perform_herd(ch, victim, to_room, NO_DIR, into_veh);
 		}
 	}
 	

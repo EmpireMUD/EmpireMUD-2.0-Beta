@@ -1283,6 +1283,22 @@ ACMD(do_board) {
 	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
 		msg_to_char(ch, "You don't have permission to %s it.\r\n", command);
 	}
+	
+	// riding/leading checks
+	else if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
+		msg_to_char(ch, "You can't %s that while riding.\r\n", command);
+	}
+	else if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !VEH_FLAGGED(veh, VEH_CARRY_MOBS)) {
+		msg_to_char(ch, "You can't %s it while leading an animal.\r\n", command);
+	}
+	else if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !VEH_FLAGGED(veh, VEH_CARRY_VEHICLES)) {
+		msg_to_char(ch, "You can't %s it while leading a vehicle.\r\n", command);
+	}
+	else if (GET_LEADING_VEHICLE(ch) && VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_NO_LOAD_ONTO_VEHICLE)) {
+		act("You can't lead $V in there.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
+	}
+	
+	// ok:
 	else {
 		perform_move(ch, NO_DIR, to_room, MOVE_ENTER_VEH);
 	}
