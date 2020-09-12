@@ -218,7 +218,7 @@ See also: IDENTIFY, PLANT
 #
 HERD HERDING
 
-Usage:  herd <animal> <direction>
+Usage:  herd <animal> <direction | vehicle | building | out>
 
 This command is useful in herding animals into stables or out of the way. For
 mountable creatures or ones that are pulling carts, try 'lead' instead.
