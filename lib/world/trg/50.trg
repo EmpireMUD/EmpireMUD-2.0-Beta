@@ -26,6 +26,9 @@ switch %random.7%
     %mod% %room% icon &0..}&?.
   break
 done
+if %room.title% ~= #n
+  %mod% %room% title Some Decaying Ruins
+end
 detach 5006 %room.id%
 ~
 #5007
@@ -56,6 +59,18 @@ switch %random.7%
     %mod% %room% icon &0[&?.&0-&?.
   break
 done
+if %room.title% ~= #n
+  %mod% %room% title Some Decaying Ruins
+end
 detach 5007 %room.id%
+~
+#5010
+Flooded Ruins Name Fixer~
+2 n 100
+~
+if %room.title% ~= #n
+  %mod% %room% title Some Flooded Ruins
+end
+detach 5010 %room.id%
 ~
 $
