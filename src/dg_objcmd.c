@@ -1199,6 +1199,7 @@ OCMD(do_oterraform) {
 
 OCMD(do_dgoload) {
 	struct obj_binding *copy_obj_bindings(struct obj_binding *from);
+	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -1362,6 +1363,8 @@ OCMD(do_dgoload) {
 			// hope to inherit
 			scale_vehicle_to_level(veh, 0);
 		}
+		
+		get_vehicle_interior(veh);	// ensure inside is loaded
 		
 		// ownership
 		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(room))) {

@@ -667,7 +667,9 @@ ACMD(do_mvehicleecho) {
 * lets the mobile load an item or mobile.  All items
 * are loaded into inventory, unless it is NO-TAKE. 
 */
-ACMD(do_mload) {	
+ACMD(do_mload) {
+	extern room_data *get_vehicle_interior(vehicle_data *veh);
+	
 	struct instance_data *inst = get_instance_by_mob(ch);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	int number = 0;
@@ -846,6 +848,8 @@ ACMD(do_mload) {
 			// hope to inherit
 			scale_vehicle_to_level(veh, 0);
 		}
+		
+		get_vehicle_interior(veh);	// ensure inside is loaded
 		
 		// ownership
 		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(IN_ROOM(veh)))) {

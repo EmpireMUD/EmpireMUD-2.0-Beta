@@ -8250,6 +8250,7 @@ ACMD(do_last) {
 
 
 ACMD(do_load) {
+	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
@@ -8312,6 +8313,7 @@ ACMD(do_load) {
 		veh = read_vehicle(number, TRUE);
 		vehicle_to_room(veh, IN_ROOM(ch));
 		scale_vehicle_to_level(veh, 0);	// attempt auto-detect of level
+		get_vehicle_interior(veh);	// ensure inside is loaded
 		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM);
 		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
 		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
