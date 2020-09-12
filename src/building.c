@@ -502,8 +502,6 @@ void disassociate_building(room_data *room) {
 	// remove bits including dismantle
 	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT);
 	affect_total_room(room);
-	
-	// TODO should do an affect-total here in case any of those were also added by an affect?
 
 	// free up the customs
 	decustomize_room(room);

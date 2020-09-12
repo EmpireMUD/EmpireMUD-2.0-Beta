@@ -1836,8 +1836,6 @@ void reset_one_room(room_data *room) {
 				
 				GET_ROPE_VNUM(mob) = reset->arg2;
 				
-				// TODO: should we really be running a load trigger? (it shouldn't matter since it's loaded with no scripts, but this is not really a new load) -paul oct 10, 2018
-				load_mtrigger(mob);
 				tmob = mob;
 				break;
 			}

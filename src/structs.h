@@ -2629,8 +2629,6 @@ typedef struct vehicle_data vehicle_data;
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
 // in a "permanent" way, set the room's base_affects as well as its current
 // affects.
-// TODO this system could be cleaned up by adding an affect_total_room that
-// applies permanent affects to the room's current affects on its own.
 #define ROOM_AFF_DARK  BIT(0)	// a. Torches don't work
 #define ROOM_AFF_SILENT  BIT(1)	// b. Can't speak/hear
 #define ROOM_AFF_HAS_INSTANCE  BIT(2)	// c. an instance is linked here

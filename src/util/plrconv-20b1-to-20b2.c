@@ -186,7 +186,7 @@ struct b1_player_special_data_saved {
 	byte spare1;
 	byte spare2;
 	byte spare3;
-	byte promo_id;	// entry in the promo_codes table -- TODO move up to an int in beta2, and remove int casts in various places
+	byte promo_id;
 	
 	ubyte spare5;
 	ubyte spare6;
@@ -202,7 +202,7 @@ struct b1_player_special_data_saved {
 	
 	int spare15;
 	int spare16;
-	int health_deficit;	// TODO in beta2, move these to an array with the pools
+	int health_deficit;
 	int move_deficit;
 	int mana_deficit;
 	

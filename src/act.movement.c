@@ -1070,7 +1070,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !validate_vehicle_move(ch, GET_LEADING_VEHICLE(ch), to_room)) {
 		return FALSE;
 	}
-	// this checks if a led MOB can move there using player_can_move -- TODO this seems like an error
+	// this checks if a led MOB can move there
 	if (GET_LEADING_MOB(ch) && !GET_LEADING_MOB(ch)->desc && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !char_can_move(GET_LEADING_MOB(ch), dir, to_room, flags | MOVE_LEAD, FALSE)) {
 		act("You can't go there while leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
 		return FALSE;

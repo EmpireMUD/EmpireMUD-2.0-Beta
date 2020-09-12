@@ -729,7 +729,7 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 		return;
 	}
 	
-	// preserve old original sect for roads -- TODO this is a special-case
+	// preserve old original sect for roads -- TODO this is a special-case, also in .map terrain
 	change_terrain(target, GET_SECT_VNUM(sect), IS_ROAD(target) ? GET_SECT_VNUM(BASE_SECT(target)) : NOTHING);
 	
 	remove_depletion(target, DPLTN_PICK);

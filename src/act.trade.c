@@ -2005,19 +2005,16 @@ ACMD(do_gen_craft) {
 		msg_to_char(ch, "You're busy right now.\r\n");
 	}
 	else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type))) {
-		// TODO: I believe this is unreachable
+		// this should be unreachable
 		msg_to_char(ch, "You need to buy the %s ability to %s that.\r\n", get_ability_name_by_vnum(GET_CRAFT_ABILITY(type)), gen_craft_data[GET_CRAFT_TYPE(type)].command);
-		msg_to_char(ch, "TEST: can you see this message.\r\n");
 	}
 	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !(found_obj = has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(type)))) {
-		// TODO: I believe this is unreachable: but it DOES set found-obj
+		// this block is unreachable but the found_obj is set in the if()
 		msg_to_char(ch, "You need %s to %s that.\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(type)), gen_craft_data[GET_CRAFT_TYPE(type)].command);
-		msg_to_char(ch, "TEST: can you see this message.\r\n");
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(type))) {
-		// TODO: I believe this is unreachable
+		// this should be unreachable
 		msg_to_char(ch, "You have not learned that recipe.\r\n");
-		msg_to_char(ch, "TEST: can you see this message.\r\n");
 	}
 	else if (!check_can_craft(ch, type)) {
 		// sends its own messages

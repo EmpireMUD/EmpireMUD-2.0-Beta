@@ -181,7 +181,8 @@ OLC_MODULE(mapedit_terrain) {
 		
 		if (sect) {
 			msg_to_char(ch, "This room is now %s %s.\r\n", AN(GET_SECT_NAME(sect)), GET_SECT_NAME(sect));
-			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect), NOTHING);
+			// TODO: special-cased to preserve sect for roads, consider a flag like SECTF_PRESERVE_BASE
+			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect), SECT_FLAGGED(sect, SECTF_IS_ROAD) ? GET_SECT_VNUM(old_sect) : NOTHING);
 			if (ROOM_OWNER(IN_ROOM(ch))) {
 				deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 			}
@@ -199,11 +200,6 @@ OLC_MODULE(mapedit_terrain) {
 					deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 				}
 			}
-		}
-				
-		// preserve old original sect for roads -- TODO this is a special-case
-		if (IS_ROAD(IN_ROOM(ch))) {
-			change_base_sector(IN_ROOM(ch), old_sect);
 		}
 		
 		if (sect && SECT_FLAGGED(sect, SECTF_IS_TRENCH)) {
