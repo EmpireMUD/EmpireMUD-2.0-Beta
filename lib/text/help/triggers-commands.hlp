@@ -512,9 +512,9 @@ Supported fields are:
  Mobs: keywords, longdesc, sex, shortdesc
  Objects: keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
           append-lookdesc-noformat
- Vehicles: keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
+ Vehicles: icon, keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
           append-lookdesc-noformat
- Rooms: title, description, append-description, append-desc-noformat
+ Rooms: icon, title, description, append-description, append-desc-noformat
 
 Appending to descriptions triggers string formatting. Using the 'noformat'
 version will prevent this.

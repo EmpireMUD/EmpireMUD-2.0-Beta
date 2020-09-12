@@ -1192,6 +1192,7 @@ void script_modify(char *argument) {
 	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
 	extern char *get_room_description(room_data *room);
 	extern vehicle_data *get_vehicle(char *name);
+	extern bool validate_icon(char *icon);
 	extern const char *genders[];
 	extern bool world_map_needs_save;
 	
@@ -1334,6 +1335,17 @@ void script_modify(char *argument) {
 		if (SHARED_DATA(room) == &ocean_shared_data) {
 			script_log("%%mod%% cannot be used on Ocean rooms");
 		}
+		else if (is_abbrev(field_arg, "icon")) {
+			if (!validate_icon(value)) {
+				script_log("%%mod%% called with invalid room icon '%s'", value);
+			}
+			else {
+				if (ROOM_CUSTOM_ICON(room)) {
+					free(ROOM_CUSTOM_ICON(room));
+				}
+				ROOM_CUSTOM_ICON(room) = clear ? NULL : str_dup(value);
+			}
+		}
 		else if (is_abbrev(field_arg, "name") || is_abbrev(field_arg, "title")) {
 			if (ROOM_CUSTOM_NAME(room)) {
 				free(ROOM_CUSTOM_NAME(room));
@@ -1383,7 +1395,26 @@ void script_modify(char *argument) {
 	else if ((veh = get_vehicle(targ_arg))) {
 		v_proto = vehicle_proto(VEH_VNUM(veh));
 		
-		if (is_abbrev(field_arg, "keywords")) {
+		if (is_abbrev(field_arg, "icon")) {
+			if (!validate_icon(value)) {
+				script_log("%%mod%% called with invalid vehicle icon '%s'", value);
+			}
+			else {
+				if (VEH_ICON(veh) && (!v_proto || VEH_ICON(veh) != VEH_ICON(v_proto))) {
+					free(VEH_ICON(veh));
+				}
+				if (clear) {
+					VEH_ICON(veh) = VEH_ICON(v_proto);
+				}
+				else if (!str_cmp(value, "none")) {
+					VEH_ICON(veh) = NULL;
+				}
+				else {
+					VEH_ICON(veh) = str_dup(value);
+				}
+			}
+		}
+		else if (is_abbrev(field_arg, "keywords")) {
 			if (VEH_KEYWORDS(veh) && (!v_proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(v_proto))) {
 				free(VEH_KEYWORDS(veh));
 			}
