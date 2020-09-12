@@ -43,7 +43,6 @@ extern const char *mob_move_types[];
 
 // external funcs
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
-extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 void do_unseat_from_vehicle(char_data *ch);
 extern char *get_room_name(room_data *room, bool color);
 extern int total_vehicle_size_in_room(room_data *room);

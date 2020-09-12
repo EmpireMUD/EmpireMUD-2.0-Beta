@@ -533,6 +533,7 @@ extern vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
 
 // world
 void check_all_exits();
+extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern struct room_direction_data *create_exit(room_data *from, room_data *to, int dir, bool back);
 void delete_room(room_data *room, bool check_exits);
 extern room_data *world_table;

@@ -40,7 +40,6 @@ extern const char *tool_flags[];
 
 // external funcs
 void complete_vehicle(vehicle_data *veh);
-extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 extern char *get_mine_type_name(room_data *room);

@@ -44,7 +44,6 @@ extern const int rev_dir[];
 ACMD(do_dismount);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern int count_harnessed_animals(vehicle_data *veh);
-extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
 extern int get_north_for_char(char_data *ch);
 extern room_data *get_vehicle_interior(vehicle_data *veh);

@@ -560,6 +560,57 @@ void perform_alternate(char_data *old, char_data *new) {
 
 
 /**
+* Final destination checks and work for 'herd'/.
+* 
+* @param char_data *ch The herder.
+* @param char_data *mob The thing being herded.
+* @param room_data *to_room The target room.
+* @param int dir Optional: The direction, if applicable (doesn't apply in and out of vehicles; pass NO_DIR for this).
+* @param vehicle_data *into_veh Optional: The vehicle being herded into (pass NULL if n/a).
+*/
+void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, vehicle_data *into_veh) {
+	extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
+	
+	room_data *was_in;
+	
+	if (!mob || !to_room) {
+		msg_to_char(ch, "Herd failed for unknown reason.\r\n");
+	}
+	
+	// validation
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) && !MOB_FLAGGED(mob, MOB_AQUATIC)) {
+		msg_to_char(ch, "You can't herd it into the water.\r\n");
+	}
+	else if (ROOM_BLD_FLAGGED(to_room, BLD_BARRIER)) {
+		msg_to_char(ch, "You find it impossible to herd anything there.\r\n");
+	}
+	else if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !MOB_FLAGGED(mob, MOB_MOUNTAINWALK)) {
+		msg_to_char(ch, "You find it impossible to herd it into that terrain.\r\n");
+	}
+	else if (ROOM_IS_CLOSED(to_room) && !ROOM_BLD_FLAGGED(to_room, BLD_HERD))
+		msg_to_char(ch, "You can't herd an animal in there.\r\n");
+	else {
+		was_in = IN_ROOM(ch);
+		
+		if (perform_move(mob, dir, to_room, MOVE_HERD)) {
+			act("You skillfully herd $N.", FALSE, ch, NULL, mob, TO_CHAR);
+			act("$n skillfully herds $N.", FALSE, ch, NULL, mob, TO_ROOM);
+			
+			// only attempt to move ch if they weren't moved already (e.g. by following)
+			if (IN_ROOM(ch) == was_in && !perform_move(ch, dir, to_room, NOBITS)) {
+				char_to_room(mob, IN_ROOM(ch));
+			}
+			gain_player_tech_exp(ch, PTECH_HERD, 5);
+		}
+		else {
+			act("You try to herd $N, but $E refuses to move!", FALSE, ch, NULL, mob, TO_CHAR);
+			act("$n tries to herd $N away, but $E refuses to move!", FALSE, ch, NULL, mob, TO_ROOM);
+		}
+	}
+}
+
+
+/**
 * Attempts to summon 1 mob. This does some final checks if you pass the
 * 'checks' var, which only needs to happen once if you're summoning several of
 * something.
@@ -2550,27 +2601,38 @@ ACMD(do_group) {
 
 
 ACMD(do_herd) {
-	extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
-	extern const int rev_dir[];
-
-	struct room_direction_data *ex = NULL;
+	extern room_data *get_exit_room(room_data *from_room);
+	
+	char mob_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH];
+	vehicle_data *into_veh;
+	room_data *to_room;
 	char_data *victim;
 	int dir;
-	room_data *to_room, *was_in;
 
-	two_arguments(argument, arg, buf);
+	two_arguments(argument, mob_arg, dir_arg);
 
 	if (IS_NPC(ch))
 		return;
 	else if (!has_player_tech(ch, PTECH_HERD)) {
 		msg_to_char(ch, "You don't have the correct ability to herd animals.\r\n");
 	}
-	else if (IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't herd anything in an adventure.\r\n");
-	}
-	else if (!*arg || !*buf)
+	else if (!*mob_arg || !*dir_arg) {
 		msg_to_char(ch, "Who do you want to herd, and which direction?\r\n");
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	}
+	
+	// location checks
+	else if (ROOM_IS_CLOSED(IN_ROOM(ch)) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to herd here.\r\n");
+	}
+	else if (IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't herd anything here.\r\n");
+	}
+	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN)) {
+		msg_to_char(ch, "You find it difficult to do that here.\r\n");
+	}
+	
+	// determine/validate target
+	else if (!(victim = get_char_vis(ch, mob_arg, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (victim == ch)
 		msg_to_char(ch, "You can't herd yourself.\r\n");
@@ -2582,52 +2644,49 @@ ACMD(do_herd) {
 	else if (GET_POS(victim) < POS_STANDING || MOB_FLAGGED(victim, MOB_TIED)) {
 		act("You can't herd $M right now.", FALSE, ch, NULL, victim, TO_CHAR);
 	}
-	else if ((dir = parse_direction(ch, buf)) == NO_DIR || !(to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1])))
-		msg_to_char(ch, "That's not a direction!\r\n");
-	else if (!ROOM_IS_CLOSED(IN_ROOM(ch)) && dir >= NUM_2D_DIRS) {
-		msg_to_char(ch, "You can't herd anything in that direction.\r\n");
-	}
-	else if (COMPLEX_DATA(IN_ROOM(ch)) && ROOM_IS_CLOSED(IN_ROOM(ch)) && (!(ex = find_exit(IN_ROOM(ch), dir)) || !(to_room = ex->room_ptr) || !CAN_GO(ch, ex))) {
-		msg_to_char(ch, "You can't herd anything in that direction.\r\n");
-	}
-	else if (ROOM_IS_CLOSED(IN_ROOM(ch)) && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED))
-		msg_to_char(ch, "You don't have permission to herd here.\r\n");
-	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_OCEAN)) {
-		msg_to_char(ch, "You find it difficult to do that here.\r\n");
+	else if (GET_LED_BY(victim) && IN_ROOM(GET_LED_BY(victim)) == IN_ROOM(victim)) {
+		msg_to_char(ch, "You can't herd someone who is being led by someone else.\r\n");
 	}
 	else if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && !MOB_FLAGGED(victim, MOB_MOUNTAINWALK)) {
 		msg_to_char(ch, "You find it difficult to do that here.\r\n");
 	}
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED(to_room, BLD_BARRIER)) {
-		msg_to_char(ch, "You find it difficult to herd anything in that direction.\r\n");
-	}
-	else if (ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && !MOB_FLAGGED(victim, MOB_MOUNTAINWALK)) {
-		msg_to_char(ch, "You find it difficult to herd anything in that direction.\r\n");
-	}
-	else if (GET_LED_BY(victim) && IN_ROOM(GET_LED_BY(victim)) == IN_ROOM(victim))
-		msg_to_char(ch, "You can't herd someone who is being led by someone else.\r\n");
-	else if (ROOM_IS_CLOSED(to_room) && !ROOM_BLD_FLAGGED(to_room, BLD_HERD))
-		msg_to_char(ch, "You can't herd an animal into a building.\r\n");
-	else if (ROOM_IS_CLOSED(to_room) && (!ex || !CAN_GO(ch, ex)) && !IS_INSIDE(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
-		msg_to_char(ch, "You can only herd an animal through the entrance.\r\n");
-	}
-	else {
-		was_in = IN_ROOM(ch);
-		
-		if (perform_move(victim, dir, NULL, MOVE_HERD)) {
-			act("You skillfully herd $N.", FALSE, ch, 0, victim, TO_CHAR);
-			act("$n skillfully herds $N.", FALSE, ch, 0, victim, TO_ROOM);
-			
-			// only attempt to move ch if they weren't moved already (e.g. by following)
-			if (IN_ROOM(ch) == was_in && !perform_move(ch, dir, NULL, NOBITS)) {
-				char_to_room(victim, IN_ROOM(ch));
-			}
-			gain_player_tech_exp(ch, PTECH_HERD, 5);
+	
+	// herd out of vehicle:
+	else if (!str_cmp(dir_arg, "out") || !str_cmp(dir_arg, "exit") || !str_cmp(dir_arg, "outside")) {
+		if (IS_OUTDOORS(ch) || !ROOM_CAN_EXIT(IN_ROOM(ch)) || !(to_room = get_exit_room(IN_ROOM(ch)))) {
+			msg_to_char(ch, "There's no exit here to herd anybody out of.\r\n");
 		}
 		else {
-			act("You try to herd $N, but $E refuses to move!", FALSE, ch, 0, victim, TO_CHAR);
-			act("$n tries to herd $N away, but $E refuses to move!", FALSE, ch, 0, victim, TO_ROOM);
+			perform_herd(ch, victim, to_room, NO_DIR, NULL);
 		}
+	}
+	
+	// herd in a direction:
+	else if ((dir = parse_direction(ch, dir_arg)) != NO_DIR) {
+		if (!(to_room = dir_to_room(IN_ROOM(ch), dir, FALSE))) {
+			msg_to_char(ch, "You can't herd anything in that direction.\r\n");
+		}
+		else {
+			perform_herd(ch, victim, to_room, dir, NULL);
+		}
+	}
+	
+	// herd into vehicle
+	else if ((into_veh = get_vehicle_in_room_vis(ch, dir_arg))) {
+		if (!VEH_FLAGGED(into_veh, VEH_CARRY_MOBS) || !VEH_INTERIOR_HOME_ROOM(into_veh)) {
+			msg_to_char(ch, "You can't herd anything into that.\r\n");
+		}
+		else if (!VEH_IS_COMPLETE(into_veh)) {
+		    msg_to_char(ch, "You can't herd anything into a %s that isn't complete.\r\n", VEH_OR_BLD(into_veh));
+		}
+		else {
+			perform_herd(ch, victim, VEH_INTERIOR_HOME_ROOM(into_veh), NO_DIR, into_veh);
+		}
+	}
+	
+	// no valid target
+	else {
+		msg_to_char(ch, "Usage: herd <animal> <direction | vehicle | building | out>\r\n");
 	}
 }
 
