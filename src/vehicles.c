@@ -695,10 +695,12 @@ INTERACTION_FUNC(ruin_vehicle_interaction) {
 	vehicle_to_room(ruin, room);
 	scale_vehicle_to_level(ruin, VEH_SCALE_LEVEL(inter_veh));	// attempt auto-detect of level
 	
-	// transfer ownership
+	// do not transfer ownership -- ruins never default to 'claimed'
+	/*
 	if (VEH_CLAIMS_WITH_ROOM(ruin) && ROOM_OWNER(HOME_ROOM(room))) {
 		perform_claim_vehicle(ruin, ROOM_OWNER(HOME_ROOM(room)));
 	}
+	*/
 	
 	// move contents
 	if ((inside = get_vehicle_interior(ruin))) {
@@ -768,7 +770,8 @@ INTERACTION_FUNC(ruin_vehicle_interaction) {
 
 /**
 * Destroys a vehicle from disrepair or invalid location. A destroy trigger
-* on the vehicle can prevent this.
+* on the vehicle can prevent this. If it was a building-vehicle and is the last
+* one in the room, the room will also auto-abandon.
 *
 * @param vehicle_data *veh The vehicle (will usually be extracted).
 * @param char *message Optional: An act string (using $V for the vehicle) to send to the room. (NULL for none)
@@ -776,6 +779,9 @@ INTERACTION_FUNC(ruin_vehicle_interaction) {
 void ruin_vehicle(vehicle_data *veh, char *message) {
 	void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
 	
+	bool was_bld = VEH_FLAGGED(veh, VEH_BUILDING) ? TRUE : FALSE;
+	empire_data *emp = VEH_OWNER(veh);
+	room_data *room = IN_ROOM(veh);
 	struct vehicle_room_list *vrl;
 	
 	if (!destroy_vtrigger(veh)) {
@@ -797,6 +803,11 @@ void ruin_vehicle(vehicle_data *veh, char *message) {
 	
 	fully_empty_vehicle(veh, IN_ROOM(veh));
 	extract_vehicle(veh);
+	
+	// auto-abandon if it was the last building-vehicle and was ruined
+	if (was_bld && room && emp && count_building_vehicles_in_room(room, emp) == 0) {
+		abandon_room(room);
+	}
 }
 
 
