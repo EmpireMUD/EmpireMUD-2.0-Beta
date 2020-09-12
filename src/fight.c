@@ -56,6 +56,7 @@ void scale_item_to_level(obj_data *obj, int level);
 
 // locals
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
+obj_data *die(char_data *ch, char_data *killer);
 void drop_loot(char_data *mob, char_data *killer);
 int get_block_rating(char_data *ch, bool can_gain_skill);
 int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
@@ -819,6 +820,39 @@ static char *replace_fight_string(const char *str, const char *weapon_first, con
 	}
 
 	return (buf);
+}
+
+
+/**
+* Sends proper deaths and death messages to the people inside a vehicle, and
+* any nested vehicles inside of it.
+*
+* @param vehicle_data *veh The vehicle.
+* @param char_data *attacker Optional: The person sieging (may be NULL, used for offenses).
+* @param vehicle_data *by_vehicle Optional: Which vehicle gets credit for the damage, if any.
+*/
+void siege_kill_vehicle_occupants(vehicle_data *veh, char_data *attacker, vehicle_data *by_vehicle) {
+	struct vehicle_room_list *vrl;
+	vehicle_data *iter;
+	char_data *ch, *next_ch;
+	
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		// nested vehicles
+		DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+			siege_kill_vehicle_occupants(iter, attacker, by_vehicle);
+		}
+		
+		// then people in here
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
+			act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR);
+			if (!IS_NPC(ch)) {
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
+			}
+			run_kill_triggers(ch, attacker, by_vehicle);
+			die(ch, ch);
+		}
+	}
 }
 
 
@@ -2702,8 +2736,6 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 
 	static struct resource_data *default_res = NULL;
 	struct resource_data *old_list;
-	struct vehicle_room_list *vrl;
-	char_data *ch, *next_ch;
 	
 	// resources if it doesn't have its own
 	if (!default_res) {
@@ -2769,19 +2801,9 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 			}
 		}
 		
-		if (VEH_ROOM_LIST(veh)) {
-			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-				DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
-					act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR);
-					if (!IS_NPC(ch)) {
-						log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
-						syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
-					}
-					run_kill_triggers(ch, attacker, by_vehicle);
-					die(ch, ch);
-				}
-			}
-		}
+		// kill everyone inside
+		siege_kill_vehicle_occupants(veh, attacker, by_vehicle);
+		
 		if (VEH_SITTING_ON(veh)) {
 			act("You are killed as $V is destroyed!", FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
 			if (!IS_NPC(VEH_SITTING_ON(veh))) {
