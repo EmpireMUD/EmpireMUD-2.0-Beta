@@ -3170,11 +3170,15 @@ void sort_territory_node_list_by_distance(room_data *from, struct find_territory
 * @param bool confirm If TRUE, the player typed "confirm" as the last arg.
 */
 void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	crop_data *cp;
 	
-	if (!ROOM_OWNER(room) || ROOM_OWNER(room) != GET_LOYALTY(ch)) {
+	if ((!ROOM_OWNER(room) || ROOM_OWNER(room) != GET_LOYALTY(ch)) && !imm_access) {
 		msg_to_char(ch, "You don't even own the area.\r\n");
 	}
+	else if (!ROOM_OWNER(room)) {
+		msg_to_char(ch, "Nobody owns it.\r\n");
+		}
 	else if (IS_CITY_CENTER(room)) {
 		msg_to_char(ch, "You can't abandon a city center that way -- use \"city abandon\".\r\n");
 	}
@@ -3191,15 +3195,28 @@ void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
 		msg_to_char(ch, "That %s crop might be valuable. You must use 'abandon <target> confirm' to abandon it.\r\n", GET_CROP_NAME(cp));
 	}
 	else {
+		if (GET_LOYALTY(ch) != ROOM_OWNER(room)) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s abandoned tile owned by %s at %s", GET_NAME(ch), EMPIRE_NAME(ROOM_OWNER(room)), room_log_identifier(IN_ROOM(ch)));
+		}
 		if (room != IN_ROOM(ch)) {
 			msg_to_char(ch, "%s%s abandoned.\r\n", get_room_name(room, FALSE), coord_display_room(ch, room, FALSE));
 			if (ROOM_PEOPLE(room)) {
-				act("$N abandons $S claim to this area.", FALSE, ROOM_PEOPLE(room), NULL, ch, TO_CHAR | TO_ROOM);
+				if (GET_LOYALTY(ch) == ROOM_OWNER(room)) {
+					act("$N abandons $S claim to this area.", FALSE, ROOM_PEOPLE(room), NULL, ch, TO_CHAR | TO_ROOM);
+				}
+				else {
+					act("This area has been abandoned.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+				}
 			}
 		}
 		else {
 			msg_to_char(ch, "Territory abandoned.\r\n");
-			act("$n abandons $s claim to this area.", FALSE, ch, NULL, NULL, TO_ROOM);
+			if (GET_LOYALTY(ch) == ROOM_OWNER(room)) {
+				act("$n abandons $s claim to this area.", FALSE, ch, NULL, NULL, TO_ROOM);
+			}
+			else {
+				act("This area has been abandoned.", FALSE, ch, NULL, NULL, TO_ROOM);
+			}
 		}
 		
 		abandon_room(room);
@@ -3215,17 +3232,24 @@ void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
 * @param bool confirm If TRUE, the player typed "confirm" as the last arg.
 */
 void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	void perform_abandon_vehicle(vehicle_data *veh);
 	
 	empire_data *emp = VEH_OWNER(veh);
 	
-	if (!emp || VEH_OWNER(veh) != GET_LOYALTY(ch)) {
+	if ((!emp || VEH_OWNER(veh) != GET_LOYALTY(ch)) && !imm_access) {
 		msg_to_char(ch, "You don't even own that.\r\n");
+	}
+	else if (!VEH_OWNER(veh)) {
+		msg_to_char(ch, "Nobody owns that.\r\n");
 	}
 	else if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh))) {
 		msg_to_char(ch, "Abandon the whole tile instead.\r\n");
 	}
 	else {
+		if (GET_LOYALTY(ch) != VEH_OWNER(veh)) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s abandoned %s owned by %s at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(VEH_OWNER(veh)), room_log_identifier(IN_ROOM(ch)));
+		}
 		act("You abandon $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		act("$n abandons $V.", FALSE, ch, NULL, veh, TO_ROOM);
 		perform_abandon_vehicle(veh);
@@ -3234,6 +3258,7 @@ void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 
 
 ACMD(do_abandon) {
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
 	room_data *room = IN_ROOM(ch);
@@ -3254,10 +3279,10 @@ ACMD(do_abandon) {
 	else if (FIGHTING(ch)) {
 		msg_to_char(ch, "You're too busy fighting!\r\n");
 	}
-	else if (!GET_LOYALTY(ch)) {
+	else if (!GET_LOYALTY(ch) && !imm_access) {
 		msg_to_char(ch, "You're not part of an empire.\r\n");
 	}
-	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CEDE)) {
+	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CEDE) && !imm_access) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}

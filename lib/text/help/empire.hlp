@@ -32,6 +32,8 @@ If you use 'manage' to set a tile as no-abandon, you must add the 'confirm'
 to abandon it. Workforce chores like abandon-chopped will not abandon these
 tiles.
 
+Privileged immortals can abandon rooms and vehicles they do not own.
+
 See also: CEDE, CLAIM, MANAGE, PRIVILEGE, PUBLICIZE
 #
 ALLIANCE "DIPLOMACY ALLIANCE" ALLY ALLIES ALLIED
