@@ -1739,8 +1739,11 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	else if (IS_SET(flags, MOVE_LEAD) && GET_LED_BY(ch)) {
 		snprintf(msg, sizeof(msg), "%s leads $n with %s.", HSSH(GET_LED_BY(ch)), HMHR(GET_LED_BY(ch)));
 	}
-	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master) {
+	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master && dir != NO_DIR) {
 		snprintf(msg, sizeof(msg), "$n follows %s %%s.", HMHR(ch->master));
+	}
+	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master) {
+		act("$n follows $M.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
 	}
 	else if (IS_SET(flags, MOVE_ENTER_VEH)) {
 		vehicle_data *veh = GET_ROOM_VEHICLE(to_room);
