@@ -6771,7 +6771,7 @@ Available tasks:
  &cGET-COINS&0 - Player must get some miscellaneous coins.
  &cCAN-GAIN-SKILL&0 - Player is able to gain a point in a skill.
  &cCROP-VARIETY&0 - Needs produce from a number of different crops.
- &cOWN-HOMES&0 - Empire must have enough citizen homes.
+ &cOWN-HOMES&0 - Empire must have enough citizen homes (in buildings).
  &cOWN-SECTOR&0 - Empire must own enough tiles of this sector type.
  &cEMPIRE-WEALTH&0 - Empire must have a certain amount of wealth.
  &cEMPIRE-FAME&0 - Empire must have a certain amount of fame.

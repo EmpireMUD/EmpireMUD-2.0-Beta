@@ -333,6 +333,7 @@ int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags) {
 int count_owned_homes(empire_data *emp) {
 	struct empire_territory_data *ter, *next_ter;
 	int count = 0;	// ah ah ah
+	vehicle_data *veh;
 	
 	if (!emp) {
 		return count;
@@ -346,6 +347,22 @@ int count_owned_homes(empire_data *emp) {
 			continue;	// don't count interiors
 		}
 		if (GET_BLD_CITIZENS(GET_BUILDING(ter->room)) < 1) {
+			continue;	// must have a citizen
+		}
+		
+		// found
+		++count;
+	}
+	
+	// check vehicles too
+	DL_FOREACH(vehicle_list, veh) {
+		if (!VEH_IS_COMPLETE(veh) || VEH_OWNER(veh) != emp) {
+			continue;
+		}
+		if (!VEH_FLAGGED(veh, VEH_BUILDING) && VEH_INTERIOR_HOME_ROOM(veh) && GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) {
+			continue;	// only count buildings with interiors
+		}
+		if (GET_BLD_CITIZENS(GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) < 1) {
 			continue;	// must have a citizen
 		}
 		
@@ -2512,7 +2529,7 @@ void qt_empire_greatness(char_data *ch, any_vnum amount) {
 
 /**
 * This can be used to call several different qt functions on all members of
-* an empire online.
+* an empire online, for types that need a vnum.
 *
 * @param empire_data *emp The empire to call the function on.
 * @param void (*func)(char_data *ch, any_vnum vnum) The function to call.
@@ -2536,6 +2553,36 @@ void qt_empire_players(empire_data *emp, void (*func)(char_data *ch, any_vnum vn
 		
 		// call it
 		(func)(ch, vnum);
+	}
+}
+
+
+/**
+* This can be used to call several different qt functions on all members of
+* an empire online, for types that need a vehicle.
+*
+* @param empire_data *emp The empire to call the function on.
+* @param void (*func)(char_data *ch, vehicle_data *veh) The function to call.
+* @param vehicle_data *veh The vehicle to pass to the function.
+*/
+void qt_empire_players_vehicle(empire_data *emp, void (*func)(char_data *ch, vehicle_data *veh), vehicle_data *veh) {
+	descriptor_data *desc;
+	char_data *ch;
+	
+	if (!emp || !func || !veh) {
+		return;
+	}
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || !(ch = desc->character)) {
+			continue;
+		}
+		if (GET_LOYALTY(ch) != emp) {
+			continue;
+		}
+		
+		// call it
+		(func)(ch, veh);
 	}
 }
 
@@ -2735,12 +2782,11 @@ void qt_gain_tile_sector(char_data *ch, sector_vnum vnum) {
 * Quest Tracker: ch gets a vehicle
 *
 * @param char_data *ch The player.
-* @param any_vnum vnum The vehicle vnum.
+* @param vehicle_data *veh The vehicle to gain.
 */
-void qt_gain_vehicle(char_data *ch, any_vnum vnum) {
+void qt_gain_vehicle(char_data *ch, vehicle_data *veh) {
 	struct player_quest *pq;
 	struct req_data *task;
-	vehicle_data *veh;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -2748,18 +2794,21 @@ void qt_gain_vehicle(char_data *ch, any_vnum vnum) {
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
-			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
+			if (task->type == REQ_OWN_VEHICLE && task->vnum == VEH_VNUM(veh)) {
 				++task->current;
 			}
-			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				++task->current;
 			}
-			else if (task->type == REQ_OWN_VEHICLE_FUNCTION && (veh = vehicle_proto(vnum)) && !VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_VEHICLE_FUNCTION && !VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
 				// non-building vehicle
 				++task->current;
 			}
-			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (veh = vehicle_proto(vnum)) && VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
 				// building vehicle
+				++task->current;
+			}
+			else if (task->type == REQ_OWN_HOMES && VEH_INTERIOR_HOME_ROOM(veh) && GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh)) && GET_BLD_CITIZENS(GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) > 0) {
 				++task->current;
 			}
 		}
@@ -2987,12 +3036,11 @@ void qt_lose_tile_sector(char_data *ch, sector_vnum vnum) {
 * Quest Tracker: ch loses a vehicle
 *
 * @param char_data *ch The player.
-* @param any_vnum vnum The vehicle vnum.
+* @param vehicle_data *veh The vehicle to lose.
 */
-void qt_lose_vehicle(char_data *ch, any_vnum vnum) {
+void qt_lose_vehicle(char_data *ch, vehicle_data *veh) {
 	struct player_quest *pq;
 	struct req_data *task;
-	vehicle_data *veh;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -3000,18 +3048,21 @@ void qt_lose_vehicle(char_data *ch, any_vnum vnum) {
 	
 	LL_FOREACH(GET_QUESTS(ch), pq) {
 		LL_FOREACH(pq->tracker, task) {
-			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
+			if (task->type == REQ_OWN_VEHICLE && task->vnum == VEH_VNUM(veh)) {
 				--task->current;
 			}
-			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				--task->current;
 			}
-			else if (task->type == REQ_OWN_VEHICLE_FUNCTION && (veh = vehicle_proto(vnum)) && !VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_VEHICLE_FUNCTION && !VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
 				// non-building vehicle
 				--task->current;
 			}
-			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (veh = vehicle_proto(vnum)) && VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
 				// building vehicle
+				--task->current;
+			}
+			else if (task->type == REQ_OWN_HOMES && VEH_INTERIOR_HOME_ROOM(veh) && GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh)) && GET_BLD_CITIZENS(GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) > 0) {
 				--task->current;
 			}
 			

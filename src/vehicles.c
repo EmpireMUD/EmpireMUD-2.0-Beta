@@ -105,8 +105,8 @@ void abandon_lost_vehicles(void) {
 		}
 		
 		if (VEH_IS_COMPLETE(veh)) {
-			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
-			et_lose_vehicle(emp, VEH_VNUM(veh));
+			qt_empire_players_vehicle(emp, qt_lose_vehicle, veh);
+			et_lose_vehicle(emp, veh);
 		}
 	}
 }
@@ -865,8 +865,8 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 	
 	// remove from goals/tech
 	if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
-		qt_empire_players(VEH_OWNER(veh), qt_lose_vehicle, VEH_VNUM(veh));
-		et_lose_vehicle(VEH_OWNER(veh), VEH_VNUM(veh));
+		qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
+		et_lose_vehicle(VEH_OWNER(veh), veh);
 		adjust_vehicle_tech(veh, FALSE);
 	}
 	
@@ -1321,8 +1321,8 @@ void complete_vehicle(vehicle_data *veh) {
 		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
 		
 		if (VEH_OWNER(veh)) {
-			qt_empire_players(VEH_OWNER(veh), qt_gain_vehicle, VEH_VNUM(veh));
-			et_gain_vehicle(VEH_OWNER(veh), VEH_VNUM(veh));
+			qt_empire_players_vehicle(VEH_OWNER(veh), qt_gain_vehicle, veh);
+			et_gain_vehicle(VEH_OWNER(veh), veh);
 			adjust_vehicle_tech(veh, TRUE);
 		}
 		

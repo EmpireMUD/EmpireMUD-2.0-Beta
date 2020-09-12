@@ -2837,8 +2837,8 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		fully_empty_vehicle(veh, NULL);
 		
 		if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
-			qt_empire_players(VEH_OWNER(veh), qt_lose_vehicle, VEH_VNUM(veh));
-			et_lose_vehicle(VEH_OWNER(veh), VEH_VNUM(veh));
+			qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
+			et_lose_vehicle(VEH_OWNER(veh), veh);
 		}
 		
 		extract_vehicle(veh);

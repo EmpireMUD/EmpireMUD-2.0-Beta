@@ -2990,8 +2990,8 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 		}
 	
 		if (VEH_IS_COMPLETE(veh) && emp) {
-			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
-			et_lose_vehicle(emp, VEH_VNUM(veh));
+			qt_empire_players_vehicle(emp, qt_lose_vehicle, veh);
+			et_lose_vehicle(emp, veh);
 			adjust_vehicle_tech(veh, FALSE);
 		}
 	}
@@ -3078,8 +3078,8 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 		}
 	
 		if (VEH_IS_COMPLETE(veh)) {
-			qt_empire_players(emp, qt_gain_vehicle, VEH_VNUM(veh));
-			et_gain_vehicle(emp, VEH_VNUM(veh));
+			qt_empire_players_vehicle(emp, qt_gain_vehicle, veh);
+			et_gain_vehicle(emp, veh);
 			adjust_vehicle_tech(veh, TRUE);
 		}
 	}

@@ -1330,30 +1330,33 @@ void et_gain_tile_sector(empire_data *emp, sector_vnum vnum) {
 * Empire Tracker: empire gets a vehicle
 *
 * @param empire_data *emp The empire.
-* @param any_vnum vnum The vehicle vnum.
+* @param vehicle_data *veh The vehicle to gain.
 */
-void et_gain_vehicle(empire_data *emp, any_vnum vnum) {
+void et_gain_vehicle(empire_data *emp, vehicle_data *veh) {
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
-	vehicle_data *veh;
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
-			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
+			if (task->type == REQ_OWN_VEHICLE && task->vnum == VEH_VNUM(veh)) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
-			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
-			else if (task->type == REQ_OWN_VEHICLE_FUNCTION && (veh = vehicle_proto(vnum)) && !VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_VEHICLE_FUNCTION && !VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
 				// non-building vehs
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
-			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (veh = vehicle_proto(vnum)) && VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
 				// building vehs
+				++task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+			}
+			else if (task->type == REQ_OWN_HOMES && VEH_INTERIOR_HOME_ROOM(veh) && GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh)) && GET_BLD_CITIZENS(GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) > 0) {
 				++task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 			}
@@ -1522,30 +1525,29 @@ void et_lose_tile_sector(empire_data *emp, sector_vnum vnum) {
 * Empire Tracker: empire gets a building
 *
 * @param empire_data *emp The empire.
-* @param any_vnum vnum The vehicle vnum.
+* @param vehicle_data *veh The vehicle to lose.
 */
-void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
+void et_lose_vehicle(empire_data *emp, vehicle_data *veh) {
 	struct empire_goal *goal, *next_goal;
 	struct req_data *task;
-	vehicle_data *veh;
 	
 	HASH_ITER(hh, EMPIRE_GOALS(emp), goal, next_goal) {
 		LL_FOREACH(goal->tracker, task) {
-			if (task->type == REQ_OWN_VEHICLE && task->vnum == vnum) {
+			if (task->type == REQ_OWN_VEHICLE && task->vnum == VEH_VNUM(veh)) {
 				--task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
 				// check min
 				task->current = MAX(task->current, 0);
 			}
-			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (veh = vehicle_proto(vnum)) && (VEH_FLAGS(veh) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_VEHICLE_FLAGGED && (VEH_FLAGS(veh) & task->misc) == task->misc) {
 				--task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
 				// check min
 				task->current = MAX(task->current, 0);
 			}
-			else if (task->type == REQ_OWN_VEHICLE_FUNCTION && (veh = vehicle_proto(vnum)) && !VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_VEHICLE_FUNCTION && !VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
 				// non-building vehs
 				--task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
@@ -1553,8 +1555,15 @@ void et_lose_vehicle(empire_data *emp, any_vnum vnum) {
 				// check min
 				task->current = MAX(task->current, 0);
 			}
-			else if (task->type == REQ_OWN_BUILDING_FUNCTION && (veh = vehicle_proto(vnum)) && VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
+			else if (task->type == REQ_OWN_BUILDING_FUNCTION && VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_FUNCTIONS(veh) & task->misc) == task->misc) {
 				// building vehs
+				--task->current;
+				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
+				
+				// check min
+				task->current = MAX(task->current, 0);
+			}
+			else if (task->type == REQ_OWN_HOMES && VEH_INTERIOR_HOME_ROOM(veh) && GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh)) && GET_BLD_CITIZENS(GET_BUILDING(VEH_INTERIOR_HOME_ROOM(veh))) > 0) {
 				--task->current;
 				TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_GOAL_COMPLETE);
 				
