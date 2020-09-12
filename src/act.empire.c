@@ -3556,16 +3556,17 @@ ACMD(do_city) {
 *
 * @param char_data *ch The player trying to claim.
 * @param room_data *room The room he's trying to claim.
+* @param empire_data *emp The empire to claim it for.
 */
-void do_claim_room(char_data *ch, room_data *room) {
-	empire_data *emp = get_or_create_empire(ch);
+void do_claim_room(char_data *ch, room_data *room, empire_data *emp) {
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	bool junk;
 	
 	if (!emp) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	}
 	else if (ROOM_OWNER(room) == emp) {
-		msg_to_char(ch, "Your empire already owns this area.\r\n");
+		msg_to_char(ch, "The empire already owns this area.\r\n");
 	}
 	else if (IS_CITY_CENTER(room)) {
 		msg_to_char(ch, "You can't claim a city center.\r\n");
@@ -3582,26 +3583,35 @@ void do_claim_room(char_data *ch, room_data *room) {
 	else if (!IS_IMMORTAL(ch) && !can_claim(ch)) {
 		msg_to_char(ch, "You can't claim any more land.\r\n");
 	}
-	else if (!can_build_or_claim_at_war(ch, room)) {
+	else if (!can_build_or_claim_at_war(ch, room) && !imm_access) {
 		msg_to_char(ch, "You can't claim while at war with the empire that controls this area.\r\n");
 	}
-	else if (!IS_IMMORTAL(ch) && get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_OUTSKIRTS && EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) >= OUTSKIRTS_CLAIMS_AVAILABLE(emp)) {
+	else if (!imm_access && get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_OUTSKIRTS && EMPIRE_TERRITORY(emp, TER_OUTSKIRTS) >= OUTSKIRTS_CLAIMS_AVAILABLE(emp)) {
 		msg_to_char(ch, "You can't claim the area because you're over the %d%% of your territory that can be on the outskirts of cities.\r\n", (int)(100 * config_get_double("land_outside_city_modifier")));
 	}
-	else if (!IS_IMMORTAL(ch) && get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_FRONTIER && EMPIRE_TERRITORY(emp, TER_FRONTIER) >= land_can_claim(emp, TER_FRONTIER)) {
+	else if (!imm_access && get_territory_type_for_empire(room, emp, FALSE, &junk) == TER_FRONTIER && EMPIRE_TERRITORY(emp, TER_FRONTIER) >= land_can_claim(emp, TER_FRONTIER)) {
 		msg_to_char(ch, "You can't claim the area because you're over the %d%% of your territory that can be on the frontier.\r\n", (int)(100 * config_get_double("land_frontier_modifier")));
 	}
-	else if (EMPIRE_ADMIN_FLAGGED(emp, EADM_CITY_CLAIMS_ONLY) && get_territory_type_for_empire(room, emp, FALSE, &junk) != TER_CITY) {
+	else if (!imm_access && EMPIRE_ADMIN_FLAGGED(emp, EADM_CITY_CLAIMS_ONLY) && get_territory_type_for_empire(room, emp, FALSE, &junk) != TER_CITY) {
 		msg_to_char(ch, "Your empire is forbidden from claiming outside of a city.\r\n");
 	}
 	else {
 		send_config_msg(ch, "ok_string");
-		if (room == IN_ROOM(ch)) {
-			act("$n stakes a claim to this area.", FALSE, ch, NULL, NULL, TO_ROOM);
+		if (emp == GET_LOYALTY(ch)) {
+			if (room == IN_ROOM(ch)) {
+				act("$n stakes a claim to this area.", FALSE, ch, NULL, NULL, TO_ROOM);
+			}
+			else if (ROOM_PEOPLE(room)) {
+				act("$N stakes a claim to this area.", FALSE, ROOM_PEOPLE(room), NULL, ch, TO_CHAR | TO_ROOM);
+			}
 		}
-		else if (ROOM_PEOPLE(room)) {
-			act("$N stakes a claim to this area.", FALSE, ROOM_PEOPLE(room), NULL, ch, TO_CHAR | TO_ROOM);
+		else {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s claimed a tile for %s at %s", GET_NAME(ch), EMPIRE_NAME(emp), room_log_identifier(IN_ROOM(ch)));
+			if (ROOM_PEOPLE(room)) {
+				act("This area is now claimed.", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
+			}
 		}
+		
 		claim_room(room, emp);
 	}
 }
@@ -3612,11 +3622,10 @@ void do_claim_room(char_data *ch, room_data *room) {
 *
 * @param char_data *ch The player trying to claim.
 * @param vehicle_data *veh The vehicle he's trying to claim.
+* @param empire_data *emp The empire to claim it for.
 */
-void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
+void do_claim_vehicle(char_data *ch, vehicle_data *veh, empire_data *emp) {
 	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
-	
-	empire_data *emp = get_or_create_empire(ch);
 	
 	if (VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
 		msg_to_char(ch, "That cannot be claimed.\r\n");
@@ -3625,7 +3634,7 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	}
 	else if (VEH_OWNER(veh) == emp) {
-		msg_to_char(ch, "Your empire already owns that.\r\n");
+		msg_to_char(ch, "The empire already owns that.\r\n");
 	}
 	else if (VEH_OWNER(veh)) {
 		msg_to_char(ch, "Someone else already owns that.\r\n");
@@ -3635,21 +3644,58 @@ void do_claim_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	else {
 		send_config_msg(ch, "ok_string");
-		act("$n claims $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		if (GET_LOYALTY(ch) != emp) {
+			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has claimed %s for %s at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), EMPIRE_NAME(emp), room_log_identifier(IN_ROOM(ch)));
+			act("$V is now claimed.", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+		}
+		else {
+			act("$n claims $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		}
 		perform_claim_vehicle(veh, emp);
 	}
 }
 
 
 ACMD(do_claim) {
-	char arg[MAX_INPUT_LENGTH];
+	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
+	empire_data *emp = NULL;
+	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *remain;
 	vehicle_data *veh;
 
 	if (IS_NPC(ch)) {
 		return;
 	}
 	
-	one_argument(argument, arg);
+	// arg processing for: claim [target] [empire, if immortal]
+	skip_spaces(&argument);
+	if (*argument == '"') {	// probably an empire name
+		any_one_word(argument, arg2);
+		remain = arg2;
+		*arg = '\0';
+	}
+	else {
+		remain = one_argument(argument, arg);
+		skip_spaces(&remain);
+		if (*remain == '"') {	// quotes around name
+			any_one_word(remain, arg2);
+			remain = arg2;
+		}
+	}
+	
+	// look for optional empire
+	if (imm_access && *argument) {
+		if (!get_vehicle_in_room_vis(ch, arg) && (emp = get_empire_by_name(argument))) {
+			// found empire; used full arg; clear out args
+			*arg = '\0';
+		}
+		else if (*remain && (emp = get_empire_by_name(remain))) {
+			// found empire in the remain; keep arg
+		}
+		else {
+			// auto-detect
+			emp = NULL;
+		}
+	}
 	
 	if (!IS_APPROVED(ch) && config_get_bool("manage_empire_approval")) {
 		send_config_msg(ch, "need_approval_string");
@@ -3657,24 +3703,24 @@ ACMD(do_claim) {
 	else if (FIGHTING(ch)) {
 		msg_to_char(ch, "You're too busy fighting!\r\n");
 	}
-	else if (!get_or_create_empire(ch)) {
+	else if (!emp && !(emp = get_or_create_empire(ch))) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	}
-	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CLAIM)) {
+	else if (GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_CLAIM) && !imm_access) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to claim for the empire.\r\n");
 	}
 	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
-		do_claim_vehicle(ch, veh);
+		do_claim_vehicle(ch, veh, emp);
 	}
 	else if (*arg) {
 		msg_to_char(ch, "You don't see that to claim.\r\n");
 	}
 	else if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
-		do_claim_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)));
+		do_claim_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), emp);
 	}
 	else {
-		do_claim_room(ch, IN_ROOM(ch));
+		do_claim_room(ch, IN_ROOM(ch), emp);
 	}
 }
 

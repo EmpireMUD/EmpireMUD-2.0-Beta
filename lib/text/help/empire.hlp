@@ -177,6 +177,9 @@ to claim vehicles.
 You can't claim land that's inside another empire's city radius while at war
 with that empire.
 
+Privileged immortals can claim land/vehicles for other empires by giving the
+empire name as the last arg.
+
 See also: PRIVILEGE, ABANDON, CEDE, PUBLICIZE, TERRITORY
 #
 DEDICATE
