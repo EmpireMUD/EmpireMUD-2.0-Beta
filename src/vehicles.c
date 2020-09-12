@@ -235,13 +235,14 @@ void delete_vehicle_interior(vehicle_data *veh) {
 * extracts them.
 *
 * @param vehicle_data *veh The vehicle to empty.
+* @param room_data *to_room If not NULL, empties the vehicle contents to that room. Extracts them if NULL.
 */
-void empty_vehicle(vehicle_data *veh) {
+void empty_vehicle(vehicle_data *veh, room_data *to_room) {
 	obj_data *obj, *next_obj;
 	
 	DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
-		if (IN_ROOM(veh)) {
-			obj_to_room(obj, IN_ROOM(veh));
+		if (to_room) {
+			obj_to_room(obj, to_room);
 		}
 		else {
 			extract_obj(obj);
@@ -439,7 +440,7 @@ void fully_empty_vehicle(vehicle_data *veh, room_data *to_room) {
 	}
 	
 	// dump contents
-	empty_vehicle(veh);
+	empty_vehicle(veh, to_room);
 }
 
 
@@ -672,6 +673,11 @@ char *list_harnessed_mobs(vehicle_data *veh) {
 }
 
 
+/**
+* Interaction function for vehicle-ruins-to-vehicle. This loads a new vehicle,
+* ignoring interaction quantity, and transfers built-with resources and
+* contents.
+*/
 INTERACTION_FUNC(ruin_vehicle_interaction) {
 	room_data *room = inter_room ? inter_room : (inter_veh ? IN_ROOM(inter_veh) : NULL);
 	struct resource_data *res, *next_res, *save = NULL;
@@ -2301,7 +2307,7 @@ void free_vehicle(vehicle_data *veh) {
 		VEH_ANIMALS(veh) = vam->next;
 		free(vam);
 	}
-	empty_vehicle(veh);
+	empty_vehicle(veh, NULL);
 	
 	// free any assigned scripts and vars
 	if (SCRIPT(veh)) {

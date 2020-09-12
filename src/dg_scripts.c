@@ -5469,8 +5469,8 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						*str = '\0';
 					}
 					else if (!str_cmp(field, "dump_objects")) {
-						void empty_vehicle(vehicle_data *veh);
-						empty_vehicle(v);
+						void empty_vehicle(vehicle_data *veh, room_data *to_room);
+						empty_vehicle(v, IN_ROOM(v));
 						*str = '\0';
 					}
 					break;

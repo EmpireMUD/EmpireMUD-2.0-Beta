@@ -9464,7 +9464,7 @@ int get_number(char **name) {
 */
 void extract_vehicle(vehicle_data *veh) {
 	void delete_vehicle_interior(vehicle_data *veh);
-	void empty_vehicle(vehicle_data *veh);
+	void empty_vehicle(vehicle_data *veh, room_data *to_room);
 	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 	
 	if (veh == dg_owner_veh) {
@@ -9496,7 +9496,7 @@ void extract_vehicle(vehicle_data *veh) {
 	}
 	
 	// dump contents (this will extract them since it's not in a room)
-	empty_vehicle(veh);
+	empty_vehicle(veh, NULL);
 	
 	// remove animals: doing this without the vehicle in a room will not spawn the mobs
 	while (VEH_ANIMALS(veh)) {
