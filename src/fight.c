@@ -830,10 +830,11 @@ static char *replace_fight_string(const char *str, const char *weapon_first, con
 * @param vehicle_data *veh The vehicle.
 * @param char_data *attacker Optional: The person sieging (may be NULL, used for offenses).
 * @param vehicle_data *by_vehicle Optional: Which vehicle gets credit for the damage, if any.
+* @param room_data *bodies_to_room Optional: If not NULL, dead players are relocated here.
 */
-void siege_kill_vehicle_occupants(vehicle_data *veh, char_data *attacker, vehicle_data *by_vehicle) {
+void siege_kill_vehicle_occupants(vehicle_data *veh, char_data *attacker, vehicle_data *by_vehicle, room_data *bodies_to_room) {
 	ACMD(do_respawn);
-	
+
 	struct vehicle_room_list *vrl;
 	vehicle_data *iter;
 	char_data *ch, *next_ch;
@@ -841,7 +842,7 @@ void siege_kill_vehicle_occupants(vehicle_data *veh, char_data *attacker, vehicl
 	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
 		// nested vehicles
 		DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
-			siege_kill_vehicle_occupants(iter, attacker, by_vehicle);
+			siege_kill_vehicle_occupants(iter, attacker, by_vehicle, bodies_to_room);
 		}
 		
 		// then people in here
@@ -856,7 +857,13 @@ void siege_kill_vehicle_occupants(vehicle_data *veh, char_data *attacker, vehicl
 			
 			// room is being destroyed -- respawn right away
 			if (!IS_NPC(ch) && IS_DEAD(ch)) {
-				do_respawn(ch, "", 0, 0);
+				if (bodies_to_room) {	// move body
+					char_from_room(ch);
+					char_to_room(ch, bodies_to_room);
+				}
+				else {	// attempt to force a respawn to get them out
+					do_respawn(ch, "", 0, 0);
+				}
 			}
 		}
 	}
@@ -2809,7 +2816,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		}
 		
 		// kill everyone inside
-		siege_kill_vehicle_occupants(veh, attacker, by_vehicle);
+		siege_kill_vehicle_occupants(veh, attacker, by_vehicle, IN_ROOM(veh));
 		
 		if (VEH_SITTING_ON(veh)) {
 			act("You are killed as $V is destroyed!", FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
