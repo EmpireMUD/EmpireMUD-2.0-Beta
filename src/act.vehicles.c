@@ -1271,6 +1271,9 @@ ACMD(do_board) {
 		// this is a pre-check
 		msg_to_char(ch, "You can't %s that!\r\n", command);
 	}
+	else if (subcmd != SCMD_ENTER && VEH_FLAGGED(veh, VEH_BUILDING)) {
+		msg_to_char(ch, "You can only board vehicles. Use 'enter' instead.\r\n");
+	}
 	else if (VEH_IS_DISMANTLING(veh)) {
 		msg_to_char(ch, "You can't %s it because it's being dismantled.\r\n", command);
 	}
