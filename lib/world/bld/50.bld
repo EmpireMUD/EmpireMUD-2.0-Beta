@@ -2,7 +2,7 @@
 Grave~
 A Lone Grave~
 ..&0x&?.~
-4 0 dip 0
+4 0 dp 0
 0 0 0 -1
 C
 tomb~
@@ -25,7 +25,7 @@ S
 Tent~
 A Tent~
 .&0/\&?.~
-2 0 ip 0
+2 0 p 0
 0 0 0 -1
 C
 abandon, dismantle, sleep~
@@ -43,7 +43,7 @@ S
 Rock Shelter~
 A Rock Shelter~
 .&0c&?..~
-2 0 ipR 0
+2 0 pR 0
 0 0 0 -1
 A
 d
@@ -63,7 +63,7 @@ S
 Tree Shelter~
 A Tree Shelter~
 ^&0T&?^^~
-2 0 ipR 0
+2 0 pR 0
 0 0 0 -1
 A
 d
@@ -83,7 +83,7 @@ S
 Cave Shelter~
 A Cave Shelter~
 ^&0O&?/\~
-2 0 ipR 0
+2 0 pR 0
 0 0 0 -1
 A
 d
@@ -104,7 +104,7 @@ S
 Jungle Shelter~
 A Shelter in the Jungle~
 &G^c^^~
-2 0 ipR 0
+2 0 pR 0
 0 0 0 -1
 A
 d
@@ -147,7 +147,7 @@ S
 Tunnel~
 A Tunnel~
 /&0OO&?\~
-128 0 befgi 0
+128 0 befg 0
 0 0 0 -1
 D
    The tunnel is cold and damp, but is the fastest way from one side of the
@@ -176,6 +176,7 @@ The City Center~
 ????~
 1000 0 do 0
 0 0 0 -1
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
 S
 #5010
 Flooded Ruins~

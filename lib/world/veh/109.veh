@@ -5,9 +5,10 @@ A red dragonhide butcher tent is standing here.~
 The tent is made from red dragon hides.
 ~
 &r{BB}~
-mquw 19 48 0 0 0 1 0 2 0
+mquw 19 48 0 0 0 1 0 2 fw
 D
 10927 0 0
+L kmr 0
 P
 2
 R

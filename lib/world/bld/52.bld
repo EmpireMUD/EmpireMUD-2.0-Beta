@@ -14,6 +14,7 @@ holes in the floor and vents through specially-made chimneys.
 ~
 F
 hv
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 M
 241 15.00 ce
 R
@@ -42,6 +43,7 @@ It looks like someone drew the story of a hero's epic birth, rise, and fall.
 ~
 F
 B
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 R
 1002 1 5 0
 R
@@ -62,6 +64,7 @@ direction. Surely whoever is buried here has brought glory to the empire.
 ~
 F
 B
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 M
 9189 2.00 0
 M
@@ -87,6 +90,7 @@ splendor of a mountain king. You cannot tell how deep the hall delves into the
 mountainside, but the shafts of light that cut through the ceiling hint that
 this place is astonishingly large.
 ~
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 R
 6000 2 1 0
 R
@@ -103,6 +107,7 @@ D
 stone alcoves to house its soldiers. Still, for a mountain empire that must
 always be at the ready, it provides a warm home for the soldiers.
 ~
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 R
 6075 2 1 0
 S
@@ -118,6 +123,7 @@ extending from the stone. It's cold up here, but the lodge traps warm air
 enough that as you look out the window, the only chill you feel is from gazing
 at the snowy mountaintops.
 ~
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 R
 6790 1 1 0
 R
@@ -129,6 +135,7 @@ A Boardwalk Over the Shallows~
 &a~&0--&a~~
 16 0 dm 0
 0 0 0 -1
+I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 6015 1 1 0
 R
@@ -146,9 +153,10 @@ C
 fish~
 F
 FI
-I 21 1311 25.00 1 f  # FISH: a spotted eel
-I 21 1313 25.00 1 f  # FISH: a bright red leaping fish
-I 21 1312 100.00 1 f  # FISH: a speckled trout
+I 21 1311 25.00 1 f  # FISH: spotted eel
+I 21 1313 25.00 1 f  # FISH: bright red leaping fish
+I 21 1312 100.00 1 f  # FISH: speckled trout
+I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 1002 1 5 0
 R
@@ -164,9 +172,10 @@ C
 fish~
 F
 FI
-I 21 1314 25.00 1 f  # FISH: a fat catfish
-I 21 1315 25.00 1 f  # FISH: a yellow perch
-I 21 1312 100.00 1 f  # FISH: a speckled trout
+I 21 1314 25.00 1 f  # FISH: fat catfish
+I 21 1315 25.00 1 f  # FISH: yellow perch
+I 21 1312 100.00 1 f  # FISH: speckled trout
+I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 1002 1 5 0
 R
@@ -182,6 +191,7 @@ C
 store (any storable item)~
 F
 J
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
 R
 6000 1 1 0
 R
@@ -195,6 +205,7 @@ A Seed Silo~
 0 0 0 -1
 C
 inventory, retrieve, store~
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
 R
 1002 1 5 0
 R
@@ -210,9 +221,10 @@ C
 dig~
 F
 f
-I 5 100 4.00 1 x  # DIG: a rock
-I 5 102 4.00 1 x  # DIG: a flint stone
-I 5 107 92.00 1 x  # DIG: a bag of sand
+I 5 100 4.00 1 x  # DIG: rock
+I 5 102 4.00 1 x  # DIG: flint stone
+I 5 107 92.00 1 x  # DIG: bag of sand
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
 R
 1000 1 5 0
 S
