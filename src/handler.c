@@ -9566,7 +9566,7 @@ void vehicle_from_room(vehicle_data *veh) {
 * @param room_data *room The room to put it in.
 */
 void vehicle_to_room(vehicle_data *veh, room_data *room) {
-	struct vehicle_room_list *vrl;
+	void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);
 	
 	if (!veh || !room) {
 		log("SYSERR: Illegal value(s) passed to vehicle_to_room. (Room %p, vehicle %p)", room, veh);
@@ -9580,14 +9580,7 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	DL_PREPEND2(ROOM_VEHICLES(room), veh, prev_in_room, next_in_room);
 	IN_ROOM(veh) = room;
 	VEH_LAST_MOVE_TIME(veh) = time(0);
-	
-	// update island ids
-	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-		GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(room);
-		GET_ISLAND(vrl->room) = GET_ISLAND(room);
-		GET_MAP_LOC(vrl->room) = GET_MAP_LOC(room);
-	}
-	
+	update_vehicle_island_and_loc(veh, room);
 	affect_total_room(room);
 }
 

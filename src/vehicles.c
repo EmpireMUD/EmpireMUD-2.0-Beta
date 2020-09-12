@@ -170,6 +170,7 @@ int count_building_vehicles_in_room(room_data *room, empire_data *only_owner) {
 */
 int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms) {
 	struct vehicle_room_list *vrl, *next_vrl;
+	vehicle_data *viter;
 	char_data *iter;
 	int count = 0;
 	
@@ -183,6 +184,11 @@ int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms) {
 			}
 			
 			++count;
+		}
+		
+		// check nested vehicles
+		DL_FOREACH2(ROOM_VEHICLES(vrl->room), viter, next_in_room) {
+			count += count_players_in_vehicle(viter, ignore_invis_imms);
 		}
 	}
 	
@@ -895,6 +901,33 @@ char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_
 
 
 /**
+* Updates the island/id and map location for the rooms inside a vehicle.
+*
+* @param vehicle_data *veh Which vehicle to update.
+* @param room_data *loc Where the vehicle is.
+*/
+void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc) {
+	struct vehicle_room_list *vrl;
+	vehicle_data *iter;
+	
+	if (!veh) {
+		return;
+	}
+	
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(loc);
+		GET_ISLAND(vrl->room) = GET_ISLAND(loc);
+		GET_MAP_LOC(vrl->room) = GET_MAP_LOC(loc);
+		
+		// check vehicles inside and cascade
+		DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+			update_vehicle_island_and_loc(iter, loc);
+		}
+	}
+}
+
+
+/**
 * Determines if a vehicle is allowed to be in a room based on climate. This
 * only applies on the map. Open map buildings use the base sector; interiors
 * are always allowed.
@@ -977,9 +1010,7 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 	
 	// initial island data
 	if (IN_ROOM(veh)) {
-		GET_ISLAND_ID(room) = GET_ISLAND_ID(IN_ROOM(veh));
-		GET_ISLAND(room) = GET_ISLAND(IN_ROOM(veh));
-		GET_MAP_LOC(room) = GET_MAP_LOC(IN_ROOM(veh));
+		update_vehicle_island_and_loc(veh, IN_ROOM(veh));
 	}
 }
 

@@ -3351,6 +3351,7 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 */
 bool ship_is_empty(vehicle_data *ship) {
 	struct vehicle_room_list *vrl;
+	vehicle_data *iter;
 	char_data *ch;
 	
 	if (!ship) {
@@ -3370,10 +3371,18 @@ bool ship_is_empty(vehicle_data *ship) {
 	
 	// check all interior rooms
 	LL_FOREACH(VEH_ROOM_LIST(ship), vrl) {
+		// people
 		DL_FOREACH2(ROOM_PEOPLE(vrl->room), ch, next_in_room) {
 			if (!IS_NPC(ch)) {
 				// not empty!
 				return FALSE;
+			}
+		}
+		
+		// check nested vehicles recursively
+		DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+			if (!ship_is_empty(iter)) {
+				return FALSE;	// not empty
 			}
 		}
 	}
