@@ -213,16 +213,12 @@ void delete_vehicle_interior(vehicle_data *veh) {
 				continue;	// do this one last
 			}
 			
-			if (IN_ROOM(veh)) {
-				relocate_players(vrl->room, IN_ROOM(veh));
-			}
+			relocate_players(vrl->room, IN_ROOM(veh));
 			delete_room(vrl->room, FALSE);	// MUST check_all_exits later
 		}
 		
 		if (main_room) {
-			if (IN_ROOM(veh)) {
-				relocate_players(main_room, IN_ROOM(veh));
-			}
+			relocate_players(main_room, IN_ROOM(veh));
 			delete_room(main_room, FALSE);
 		}
 		check_all_exits();
