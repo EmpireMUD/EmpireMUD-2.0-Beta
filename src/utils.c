@@ -1365,8 +1365,12 @@ bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 	if (VEH_OWNER(veh) == emp) {
 		return TRUE;
 	}
-	// public + guests
+	// public + guests: use interior room to determine publicness
 	if (interior && ROOM_AFF_FLAGGED(interior, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
+		return TRUE;
+	}
+	// no interior + guests: use the tile it's on, if the owner is the same as the vehicle
+	if (!interior && IN_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh)) == VEH_OWNER(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
 		return TRUE;
 	}
 	// check allies
