@@ -1143,7 +1143,9 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 	
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bld_data *interior = building_proto(VEH_INTERIOR_ROOM_VNUM(veh));
-	bool problem = FALSE;
+	struct obj_storage_type *store;
+	obj_data *obj, *next_obj;
+	bool any, problem = FALSE;
 	
 	if (!str_cmp(VEH_KEYWORDS(veh), default_vehicle_keywords)) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Keywords not set");
@@ -1282,6 +1284,22 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 	if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_RUINS_TO_BLD)) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Has RUINS-TO-BLD interaction; this won't work on vehicles");
 		problem = TRUE;
+	}
+	
+	// check for storage on moving vehicles
+	if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
+		any = FALSE;
+		HASH_ITER(hh, object_table, obj, next_obj) {
+			if (any) {
+				break;
+			}
+			LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
+				if (store->type == TYPE_VEH && store->vnum == VEH_VNUM(veh)) {
+					olc_audit_msg(ch, VEH_VNUM(veh), "At least 1 object stores to moving vehicle: %d %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+					problem = any = TRUE;
+				}
+			}
+		}
 	}
 	
 	problem |= audit_extra_descs(VEH_VNUM(veh), VEH_EX_DESCS(veh), ch);

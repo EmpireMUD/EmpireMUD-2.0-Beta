@@ -488,6 +488,7 @@ Vehicles (VEDIT):
   maintenance set, it will add a "pouch of nails" instead.
 - If a vehicle takes damage that's less than 10% of its hitpoints, it still
   needs repair but doesn't require any additional resources.
+- You should generally avoid putting object storage on moving vehicles.
 - See BUILDING-VEHICLES
 #d
 "OLC LEVELS" "OLC SCALING" "OLC SCALE"
@@ -5430,6 +5431,9 @@ Usage:  .storage add <building | vehicle> <vnum> [flags]
 
 This command lets you set where an object may be stored. An object type may
 have any number of storage locations.
+
+You should generally avoid putting storage on moving vehicles -- it is intended
+for stationary vehicles and building-vehicles.
 
 Available flags:
  WITHDRAW - This item requires the "withdraw" empire privilege.
