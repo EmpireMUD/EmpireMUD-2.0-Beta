@@ -2363,7 +2363,7 @@ void do_import_remove(char_data *ch, empire_data *emp, char *argument, int subcm
 
 // lists curent import/exports for do_import
 void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd) {
-	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], coin_conv[256], indicator[256], over_part[256];
+	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], coin_conv[256], indicator[256], over_part[256];
 	empire_data *partner = NULL, *use_emp = emp;
 	struct empire_trade_data *trade;
 	int haveamt, count = 0, use_type = subcmd;
@@ -2430,11 +2430,11 @@ void do_import_list(char_data *ch, empire_data *emp, char *argument, int subcmd)
 			}
 			
 			snprintf(line, sizeof(line), " &c%s&0 for %s&y%.1f%s&0 coin%s%s%s\r\n", GET_OBJ_SHORT_DESC(proto), trade_mostleast[use_type], trade->cost, coin_conv, (trade->cost != 1.0 ? "s" : ""), over_part, indicator);
-			if (strlen(buf) + strlen(line) < MAX_STRING_LENGTH + 12) {
+			if (strlen(buf) + strlen(line) < sizeof(buf) - 12) {
 				strcat(buf, line);
 			}
 			else {
-				strcat(buf, " and more\r\n");	// strcat: OK (+12 saved room)
+				strcat(buf, " and more\r\n");	// strcat: OK (-12 saved room)
 			}
 		}
 	}
