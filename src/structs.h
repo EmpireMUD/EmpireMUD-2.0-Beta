@@ -1318,6 +1318,10 @@ typedef struct vehicle_data vehicle_data;
 #define WF_PROB_OUT_OF_CITY  6	// building requires in-city
 
 
+// for tracking playtime
+#define PLAYTIME_WEEKS_TO_TRACK  4	// playtime determined by past 4 weeks
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// EVENT DEFINES ///////////////////////////////////////////////////////////
 

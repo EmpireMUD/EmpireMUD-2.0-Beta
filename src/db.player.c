@@ -4592,25 +4592,25 @@ void track_empire_playtime(empire_data *emp, int add_seconds) {
 
 /**
 * Collates the empire's playtime tracker into total playtime (in seconds) for
-* each of the last 4 weeks.
+* each of the last N weeks, based on PLAYTIME_WEEKS_TO_TRACK. Most recent week
+* is first.
 *
 * The output of this function should be copied if you need to keep it; it is a
 * static int array and calling it on another empire will lose your original
 * values.
 *
 * @param empire_data *emp The empire.
-* @return int* An array of 4 ints: playtime totals (seconds) for current week, last week, 3 weeks ago, 4 weeks ago
+* @return int* An array of ints, of size PLAYTIME_WEEKS_TO_TRACK, starting with the current week and moving backwards.
 */
-int *get_last_four_weeks_playtime(empire_data *emp) {
-	#define weeks_playtime_NUM_WEEKS  4	// simplify updates with define
+int *summarize_weekly_playtime(empire_data *emp) {
 	struct empire_playtime_tracker *ept, *next;
-	static int data[weeks_playtime_NUM_WEEKS];
+	static int data[PLAYTIME_WEEKS_TO_TRACK];
 	int iter, pos, cur;
 	
 	// prep first
 	cur = DAILY_CYCLE_DAY;
 	HASH_SORT(EMPIRE_PLAYTIME_TRACKER(emp), sort_playtime_tracker);
-	for (iter = 0; iter < weeks_playtime_NUM_WEEKS; ++iter) {
+	for (iter = 0; iter < PLAYTIME_WEEKS_TO_TRACK; ++iter) {
 		data[iter] = 0;
 	}
 	
@@ -4618,7 +4618,7 @@ int *get_last_four_weeks_playtime(empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_PLAYTIME_TRACKER(emp), ept, next) {
 		pos = (int)((cur - ept->cycle) / 7);
 		
-		if (pos < weeks_playtime_NUM_WEEKS) {
+		if (pos < PLAYTIME_WEEKS_TO_TRACK) {
 			SAFE_ADD(data[pos], ept->playtime_secs, 0, INT_MAX, FALSE);
 		}
 		else {	// otherwise delete old data now

@@ -5513,7 +5513,7 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 * @param empire_data *emp The empire.
 */
 void do_stat_empire(char_data *ch, empire_data *emp) {
-	extern int *get_last_four_weeks_playtime(empire_data *emp);
+	extern int *summarize_weekly_playtime(empire_data *emp);
 	extern int get_total_score(empire_data *emp);
 	void script_stat (char_data *ch, struct script_data *sc);
 	
@@ -5541,10 +5541,10 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	msg_to_char(ch, "%s%s\t0, Adjective: [%s%s\t0], VNum: [\tc%5d\t0]\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), EMPIRE_VNUM(emp));
 	msg_to_char(ch, "Leader: [\ty%s\t0], Created: [\ty%-24.24s\t0], Score/rank: [\tc%d #%d\t0]\r\n", (index = find_player_index_by_idnum(EMPIRE_LEADER(emp))) ? index->fullname : "UNKNOWN", ctime(&EMPIRE_CREATE_TIME(emp)), get_total_score(emp), found_rank);
 	
-	ptime = get_last_four_weeks_playtime(emp);
-	msg_to_char(ch, "Last 4 weeks playtime: ");
-	for (iter = 0; iter < 4; ++iter) {
-		msg_to_char(ch, "%s%s%s", (iter > 0 ? ", " : ""), simple_time_since(time(0) - ptime[iter]), (iter == 3 ? "\r\n" : ""));
+	ptime = summarize_weekly_playtime(emp);
+	msg_to_char(ch, "Last %d weeks playtime: ", PLAYTIME_WEEKS_TO_TRACK);
+	for (iter = 0; iter < PLAYTIME_WEEKS_TO_TRACK; ++iter) {
+		msg_to_char(ch, "%s%s%s", (iter > 0 ? ", " : ""), simple_time_since(time(0) - ptime[iter]), (iter == (PLAYTIME_WEEKS_TO_TRACK-1) ? "\r\n" : ""));
 	}
 	
 	sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, line, TRUE);
