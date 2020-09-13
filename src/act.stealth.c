@@ -1625,7 +1625,7 @@ ACMD(do_sneak) {
 
 
 ACMD(do_steal) {
-	bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp);
+	bool show_local_einv(char_data *ch, room_data *room, bool thief_mode);
 	void read_vault(empire_data *emp);
 	
 	struct empire_storage_data *store, *next_store;
@@ -1658,7 +1658,7 @@ ACMD(do_steal) {
 		msg_to_char(ch, "You can't steal from a building which was ceded to an empire but never used by that empire.\r\n");
 	}
 	else if (!*arg) {
-		if (!(inventory_store_building(ch, IN_ROOM(ch), emp))) {
+		if (!(show_local_einv(ch, IN_ROOM(ch), TRUE))) {
 			msg_to_char(ch, "Nothing is stored here.\r\n");
 		}
 	}
@@ -1670,7 +1670,7 @@ ACMD(do_steal) {
 			
 			proto = store->proto;
 			
-			if (proto && obj_can_be_retrieved(proto, IN_ROOM(ch)) && isname(arg, GET_OBJ_KEYWORDS(proto))) {
+			if (proto && obj_can_be_retrieved(proto, IN_ROOM(ch), NULL) && isname(arg, GET_OBJ_KEYWORDS(proto))) {
 				found = TRUE;
 				
 				if (stored_item_requires_withdraw(proto) && !has_player_tech(ch, PTECH_STEAL_UPGRADE)) {

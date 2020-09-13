@@ -8937,13 +8937,17 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping)
 /**
 * @param obj_data *obj The item to check
 * @param room_data *loc The world location you want to store it in
+* @param empire_data *by_emp Optional: Check if the empire would have permission to do it here. (Pass NULL to skip this check entirely, e.g. when stealing.)
 * @param retrieval_mode bool TRUE if we're retrieving, FALSE if we're storing
 * @return bool TRUE if the object can be stored here; otherwise FALSE
 */
-bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
+bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool retrieval_mode) {
 	struct obj_storage_type *store;
 	bld_data *bld = GET_BUILDING(loc);
 	vehicle_data *veh;
+	
+	bool use_room = (!by_emp || emp_can_use_room(by_emp, loc, GUESTS_ALLOWED));
+	bool bld_ok = use_room && (!by_emp || !ROOM_OWNER(loc) || by_emp == ROOM_OWNER(loc) || has_relationship(by_emp, ROOM_OWNER(loc), DIPL_TRADE));
 	
 	// We skip this check in retrieval mode, since STORE_ALL does not function for retrieval.
 	if (!retrieval_mode && GET_OBJ_STORAGE(obj) && room_has_function_and_city_ok(loc, FNC_STORE_ALL)) {
@@ -8952,7 +8956,7 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 	
 	// TYPE_x: storage locations
 	LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
-		if (bld) {
+		if (bld && bld_ok) {
 			if (store->type == TYPE_BLD && (store->vnum == GET_BLD_VNUM(bld) || bld_has_relation(bld, BLD_REL_STORES_LIKE_BLD, store->vnum))) {
 				return TRUE;
 			}
@@ -8963,7 +8967,7 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 		
 		// check in-veh: storage doesn't work from here
 		/*
-		if ((veh = GET_ROOM_VEHICLE(loc))) {
+		if ((veh = GET_ROOM_VEHICLE(loc)) && (!by_emp || !VEH_OWNER(veh) || by_emp == VEH_OWNER(veh) || (emp_can_use_vehicle(by_emp, veh, GUESTS_ALLOWED) && has_relationship(by_emp, VEH_OWNER(veh), DIPL_TRADE)))) {
 			if (store->type == TYPE_VEH && (store->vnum == VEH_VNUM(veh) || veh_has_relation(veh, BLD_REL_STORES_LIKE_VEH, store->vnum))) {
 				return TRUE;
 			}
@@ -8975,6 +8979,13 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 		
 		// vehicles in room
 		DL_FOREACH2(ROOM_VEHICLES(loc), veh, next_in_room) {
+			if (by_emp && VEH_OWNER(veh) && by_emp != VEH_OWNER(veh) && (!emp_can_use_vehicle(by_emp, veh, GUESTS_ALLOWED) || !has_relationship(by_emp, VEH_OWNER(veh), DIPL_TRADE))) {
+				continue;	// no permission for veh
+			}
+			if (by_emp && !VEH_OWNER(veh) && ROOM_OWNER(loc) && by_emp != ROOM_OWNER(loc) && (!use_room || !has_relationship(by_emp, ROOM_OWNER(loc), DIPL_TRADE))) {
+				continue;	// unowned vehicles inherit room permission
+			}
+			
 			if (store->type == TYPE_VEH && (store->vnum == VEH_VNUM(veh) || veh_has_relation(veh, BLD_REL_STORES_LIKE_VEH, store->vnum))) {
 				return TRUE;
 			}
@@ -8985,15 +8996,6 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 	}
 	
 	return FALSE;
-}
-
-/**
- * @param obj_data *obj The item to check
- * @param room_data *loc The world location you want to retrieve it from
- * @return bool TRUE if the object can be retrieved from here; otherwise FALSE
- */
-bool obj_can_be_retrieved(obj_data *obj, room_data *loc) {
-	return obj_can_be_stored(obj, loc, TRUE);
 }
 
 

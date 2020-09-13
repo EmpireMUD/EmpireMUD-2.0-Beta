@@ -6543,7 +6543,7 @@ ACMD(do_retrieve) {
 	/* they hit "ret all" */
 	if (!str_cmp(objname, "all")) {
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if ((objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch))) {
+			if ((objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch), GET_LOYALTY(ch))) {
 				if (stored_item_requires_withdraw(objn) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
 					msg_to_char(ch, "You don't have permission to withdraw that!\r\n");
 					return;
@@ -6567,7 +6567,7 @@ ACMD(do_retrieve) {
 				break;
 			}
 			
-			if ((objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch))) {
+			if ((objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch), GET_LOYALTY(ch))) {
 				if (multi_isname(objname, GET_OBJ_KEYWORDS(objn)) && (++pos == number)) {
 					found = 1;
 					
@@ -7122,7 +7122,7 @@ ACMD(do_store) {
 		}
 		for (iter = 0; iter < 2; ++iter) {
 			DL_FOREACH_SAFE2(lists[iter], obj, next_obj, next_content) {
-				if (!OBJ_FLAGGED(obj, OBJ_KEEP) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), FALSE)) {
+				if (!OBJ_FLAGGED(obj, OBJ_KEEP) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), GET_LOYALTY(ch), FALSE)) {
 					if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
 						if (store->amount >= MAX_STORAGE) {
 							full = 1;
@@ -7168,7 +7168,7 @@ ACMD(do_store) {
 				next_obj = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch)));
 			}
 			
-			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), FALSE)) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), GET_LOYALTY(ch), FALSE)) {
 				if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
 					if (store->amount >= MAX_STORAGE) {
 						full = 1;
