@@ -5222,7 +5222,7 @@ struct eq_set_obj {
 
 // for where an item can be stored
 struct obj_storage_type {
-	int type;	// TYPE_ROOM or TYPE_VEH
+	int type;	// TYPE_BLD or TYPE_VEH
 	any_vnum vnum;	// building/vehicle vnum
 	int flags;	// STORAGE_x
 	

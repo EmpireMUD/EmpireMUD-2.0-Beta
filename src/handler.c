@@ -8960,7 +8960,7 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 	
 	LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
 		// TYPE_x: storage locations
-		if (store->type == TYPE_ROOM) {
+		if (store->type == TYPE_BLD) {
 			// building storage
 			if (store->vnum == BUILDING_VNUM(loc)) {
 				return TRUE;

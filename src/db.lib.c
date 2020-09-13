@@ -5546,7 +5546,7 @@ void parse_object(FILE *obj_f, int nr) {
 					exit(1);
 				}
 				if (sscanf(line, "%d %d %s", &t[0], &t[1], f1) != 3) {
-					t[0] = TYPE_ROOM;	// backwards-compatible
+					t[0] = TYPE_BLD;	// backwards-compatible
 					
 					if (sscanf(line, "%d %s", &t[1], f1) != 2) {
 						log("SYSERR: Format error in 'R' field, %s", buf2);

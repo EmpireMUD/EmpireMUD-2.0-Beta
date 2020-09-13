@@ -522,7 +522,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 
 	if (GET_OBJ_STORAGE(obj) && !OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
 		LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
-			if (store->type == TYPE_ROOM && (bld = building_proto(store->vnum))) {
+			if (store->type == TYPE_BLD && (bld = building_proto(store->vnum))) {
 				add_vnum_hash(&bld_vhash, GET_BLD_VNUM(bld), 1);
 				
 				// check stores-like relations

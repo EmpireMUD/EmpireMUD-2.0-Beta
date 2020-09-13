@@ -499,6 +499,7 @@ OLC_MODULE(vedit_maxlevel);
 OLC_MODULE(vedit_military);
 OLC_MODULE(vedit_minlevel);
 OLC_MODULE(vedit_movetype);
+OLC_MODULE(vedit_relations);
 OLC_MODULE(vedit_requiresclimate);
 OLC_MODULE(vedit_resource);
 OLC_MODULE(vedit_script);
@@ -1104,6 +1105,7 @@ const struct olc_command_data olc_data[] = {
 	{ "military", vedit_military, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "minlevel", vedit_minlevel, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "movetype", vedit_movetype, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "relations", vedit_relations, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "requiresclimate", vedit_requiresclimate, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "resource", vedit_resource, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "script", vedit_script, OLC_VEHICLE, OLC_CF_EDITOR },
@@ -5448,6 +5450,170 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	
 	// all good
 	return TRUE;
+}
+
+
+/**
+* Processing for bld/veh relations.
+*
+* @param char_data *ch The player using OLC.
+* @param char *argument The full argument after the command.
+* @param struct bld_relation **list A pointer to the list we're adding/changing.
+*/
+void olc_process_relations(char_data *ch, char *argument, struct bld_relation **list) {
+	void free_bld_relations(struct bld_relation *list);
+	void smart_copy_bld_relations(struct bld_relation **to_list, struct bld_relation *from_list);
+	extern const char *bld_relationship_types[];
+	extern const int bld_relationship_vnum_types[];
+	
+	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
+	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct bld_relation *relat, *iter, *copyfrom;
+	int findtype, num, rtype;
+	any_vnum vnum;
+	bool found, none;
+	
+	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
+	
+	if (is_abbrev(cmd_arg, "copy")) {
+		// usage: qedit starts/ends copy <from type> <from vnum> <starts/ends>
+		argument = any_one_arg(argument, type_arg);	// just "building" for now
+		argument = any_one_arg(argument, vnum_arg);	// any vnum for that type
+		argument = any_one_arg(argument, field_arg);	// starts/ends
+		
+		if (!*type_arg || !*vnum_arg) {
+			msg_to_char(ch, "Usage: relations copy <from type> <from vnum> [starts | ends]\r\n");
+		}
+		else if ((findtype = find_olc_type(type_arg)) == 0) {
+			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
+		}
+		else if (!isdigit(*vnum_arg)) {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			msg_to_char(ch, "Copy from which %s?\r\n", buf);
+		}
+		else if ((vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum.\r\n");
+		}
+		else {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			copyfrom = NULL;
+			none = FALSE;
+			
+			switch (findtype) {
+				case OLC_BUILDING: {
+					bld_data *from_bld = building_proto(vnum);
+					if (from_bld) {
+						copyfrom = GET_BLD_RELATIONS(from_bld);
+						none = copyfrom ? FALSE : TRUE;
+					}
+					break;
+				}
+				case OLC_VEHICLE: {
+					vehicle_data *from_veh = vehicle_proto(vnum);
+					if (from_veh) {
+						copyfrom = VEH_RELATIONS(from_veh);
+						none = copyfrom ? FALSE : TRUE;
+					}
+					break;
+				}
+				default: {
+					msg_to_char(ch, "You can't copy relations from %ss.\r\n", buf);
+					return;
+				}
+			}
+			
+			if (none) {
+				msg_to_char(ch, "No relations to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
+				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
+			}
+			else {
+				smart_copy_bld_relations(list, copyfrom);
+				msg_to_char(ch, "Copied relations from %s %d.\r\n", buf, vnum);
+			}
+		}
+	}	// end 'copy'
+	else if (is_abbrev(cmd_arg, "remove")) {
+		// usage: qedit starts|ends remove <number | all>
+		skip_spaces(&argument);	// only arg is number
+		
+		if (!*argument) {
+			msg_to_char(ch, "Remove which relation (number)?\r\n");
+		}
+		else if (!str_cmp(argument, "all")) {
+			free_bld_relations(*list);
+			*list = NULL;
+			msg_to_char(ch, "You remove all the relations.\r\n");
+		}
+		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
+			msg_to_char(ch, "Invalid relation number.\r\n");
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH(*list, iter) {
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove the relation info for %s %d.\r\n", bld_relationship_types[iter->type], iter->vnum);
+					LL_DELETE(*list, iter);
+					free(iter);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid relation number.\r\n");
+			}
+		}
+	}	// end 'remove'
+	else if (is_abbrev(cmd_arg, "add")) {
+		// usage: qedit starts|ends add <type> <vnum>
+		argument = any_one_arg(argument, type_arg);
+		argument = any_one_arg(argument, vnum_arg);
+		
+		if (!*type_arg || !*vnum_arg) {
+			msg_to_char(ch, "Usage: relations add <type> <vnum>\r\n");
+		}
+		else if ((rtype = search_block(type_arg, bld_relationship_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
+		}
+		else if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum '%s'.\r\n", vnum_arg);
+		}
+		else if (bld_relationship_vnum_types[rtype] == TYPE_BLD && !building_proto(vnum)) {
+			msg_to_char(ch, "Unable to find building %d.\r\n", vnum);
+			return;
+		}
+		else if (bld_relationship_vnum_types[rtype] == TYPE_VEH && !vehicle_proto(vnum)) {
+			msg_to_char(ch, "Unable to find vehicle %d.\r\n", vnum);
+			return;
+		}
+		else {
+			// success
+			CREATE(relat, struct bld_relation, 1);
+			relat->type = rtype;
+			relat->vnum = vnum;
+			
+			LL_APPEND(*list, relat);
+			
+			switch (bld_relationship_vnum_types[rtype]) {
+				case TYPE_BLD: {
+					msg_to_char(ch, "You add %s relation: [%d] %s\r\n", bld_relationship_types[rtype], vnum, get_bld_name_by_proto(vnum));
+					break;
+				}
+				case TYPE_VEH: {
+					msg_to_char(ch, "You add %s relation: [%d] %s\r\n", bld_relationship_types[rtype], vnum, get_vehicle_name_by_proto(vnum));
+					break;
+				}
+			}
+		}
+	}	// end 'add'
+	else {
+		msg_to_char(ch, "Usage: relation add <type> <vnum>\r\n");
+		msg_to_char(ch, "Usage: relation copy <from type> <from vnum> [starts/ends]\r\n");
+		msg_to_char(ch, "Usage: relation remove <number | all>\r\n");
+	}
 }
 
 

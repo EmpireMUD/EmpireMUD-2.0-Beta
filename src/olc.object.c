@@ -2174,7 +2174,7 @@ void olc_show_object(char_data *ch) {
 		sprintbit(store->flags, storage_bits, buf2, TRUE);
 		
 		// TYPE_x: storage type
-		if (store->type == TYPE_ROOM) {
+		if (store->type == TYPE_BLD) {
 			sprintf(buf + strlen(buf), " \ty%d\t0. [B%d] %s ( %s)\r\n", ++count, store->vnum, get_bld_name_by_proto(store->vnum), buf2);
 		}
 		else if (store->type == TYPE_VEH) {
@@ -3090,7 +3090,7 @@ OLC_MODULE(oedit_storage) {
 					found = TRUE;
 					
 					// TYPE_x: storage types
-					if (store->type == TYPE_ROOM) {
+					if (store->type == TYPE_BLD) {
 						msg_to_char(ch, "You remove the storage in the %s.\r\n", get_bld_name_by_proto(store->vnum));
 					}
 					else if (store->type == TYPE_VEH) {
@@ -3116,7 +3116,7 @@ OLC_MODULE(oedit_storage) {
 		
 		// types
 		if (is_abbrev(type_arg, "building") || is_abbrev(type_arg, "room")) {
-			mode = TYPE_ROOM;
+			mode = TYPE_BLD;
 		}
 		else if (is_abbrev(type_arg, "vehicle")) {
 			mode = TYPE_VEH;
@@ -3130,7 +3130,7 @@ OLC_MODULE(oedit_storage) {
 		if (!*type_arg || !*val_arg || !isdigit(*val_arg) || mode == -1) {
 			msg_to_char(ch, "Usage: storage add <building | vehicle> <vnum> [flags]\r\n");
 		}
-		else if (mode == TYPE_ROOM && !building_proto(num)) {
+		else if (mode == TYPE_BLD && !building_proto(num)) {
 			msg_to_char(ch, "Invalid building vnum '%s'.\r\n", val_arg);
 		}
 		else if (mode == TYPE_VEH && !vehicle_proto(num)) {
@@ -3155,7 +3155,7 @@ OLC_MODULE(oedit_storage) {
 			sprintbit(store->flags, storage_bits, buf1, TRUE);
 			
 			// TYPE_x: storage types
-			if (mode == TYPE_ROOM) {
+			if (mode == TYPE_BLD) {
 				msg_to_char(ch, "You add storage in the %s with flags: %s\r\n", get_bld_name_by_proto(num), buf1);
 			}
 			else if (mode == TYPE_VEH) {

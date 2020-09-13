@@ -4705,7 +4705,7 @@ SHOW(show_storage) {
 			ok = FALSE;
 		
 			for (store = GET_OBJ_STORAGE(obj); store && !ok; store = store->next) {
-				if (store->type == TYPE_ROOM && store->vnum == building_type) {
+				if (store->type == TYPE_BLD && store->vnum == building_type) {
 					ok = TRUE;
 				}
 			}
@@ -5958,7 +5958,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		found = 0;
 		LL_FOREACH(GET_OBJ_STORAGE(j), store) {
 			// TYPE_x: storage type
-			if (store->type == TYPE_ROOM) {
+			if (store->type == TYPE_BLD) {
 				msg_to_char(ch, "%s[B%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_bld_name_by_proto(store->vnum));
 			}
 			else if (store->type == TYPE_VEH) {

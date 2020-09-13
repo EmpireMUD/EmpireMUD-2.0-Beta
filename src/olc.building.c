@@ -293,15 +293,16 @@ bool delete_bld_relation_by_type_and_vnum(struct bld_relation **list, int type, 
 * relate to is deleted -- without regard to type.
 *
 * @param struct bld_relation **list The list to remove from.
+* @param int type The relation type;
 * @param bld_vnum vnum The vnum to remove.
 * @return bool TRUE if any relations were deleted, FALSE if not
 */
-bool delete_bld_relation_by_vnum(struct bld_relation **list, bld_vnum vnum) {
+bool delete_bld_relation_by_vnum(struct bld_relation **list, int type, bld_vnum vnum) {
 	struct bld_relation *relat, *next_relat;
 	bool found = FALSE;
 	
 	LL_FOREACH_SAFE(*list, relat, next_relat) {
-		if (relat->vnum == vnum) {
+		if (relat->type == type && relat->vnum == vnum) {
 			found = TRUE;
 			LL_DELETE(*list, relat);
 			free(relat);
@@ -439,7 +440,8 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	
 	// buildings
 	HASH_ITER(hh, building_table, biter, next_biter) {
-		found = delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(biter), vnum);
+		found = delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(biter), BLD_REL_UPGRADES_TO, vnum);
+		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(biter), BLD_REL_STORES_LIKE_BLD, vnum);
 		found |= delete_from_interaction_list(&GET_BLD_INTERACTIONS(biter), TYPE_BLD, vnum);
 		
 		if (found) {
@@ -459,7 +461,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	// obj storage
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		LL_FOREACH_SAFE(GET_OBJ_STORAGE(obj), store, next_store) {
-			if (store->type == TYPE_ROOM && store->vnum == vnum) {
+			if (store->type == TYPE_BLD && store->vnum == vnum) {
 				LL_DELETE(obj->proto_data->storage, store);
 				free(store);
 				save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
@@ -523,6 +525,8 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 			found |= TRUE;
 		}
 		found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_BLD, vnum);
+		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(veh), BLD_REL_UPGRADES_TO, vnum);
+		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(veh), BLD_REL_STORES_LIKE_BLD, vnum);
 		
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
@@ -542,7 +546,8 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 			}
 		}
 		if (GET_OLC_BUILDING(desc)) {
-			found = delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), vnum);
+			found = delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_UPGRADES_TO, vnum);
+			found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_STORES_LIKE_BLD, vnum);
 			found |= delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_BLD, vnum);
 			if (found) {
 				msg_to_desc(desc, "A building related to the building you're editing was deleted.\r\n");
@@ -558,7 +563,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		if (GET_OLC_OBJECT(desc)) {
 			found = FALSE;
 			LL_FOREACH_SAFE(GET_OBJ_STORAGE(GET_OLC_OBJECT(desc)), store, next_store) {
-				if (store->type == TYPE_ROOM && store->vnum == vnum) {
+				if (store->type == TYPE_BLD && store->vnum == vnum) {
 					LL_DELETE(GET_OLC_OBJECT(desc)->proto_data->storage, store);
 					free(store);
 					if (!found) {
@@ -608,7 +613,9 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 			}
 		}
 		if (GET_OLC_VEHICLE(desc)) {
-			found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_BLD, vnum);
+			found = delete_from_interaction_list(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), TYPE_BLD, vnum);
+			found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(GET_OLC_VEHICLE(desc)), BLD_REL_UPGRADES_TO, vnum);
+			found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(GET_OLC_VEHICLE(desc)), BLD_REL_STORES_LIKE_BLD, vnum);
 			if (VEH_INTERIOR_ROOM_VNUM(GET_OLC_VEHICLE(desc)) == vnum) {
 				VEH_INTERIOR_ROOM_VNUM(GET_OLC_VEHICLE(desc)) = NOTHING;
 				found |= TRUE;
@@ -890,10 +897,14 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 			}
 		}
 		LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
-			if (relat->vnum == vnum) {
-				any = TRUE;
-				break;
+			if (relat->type != BLD_REL_UPGRADES_TO && relat->type != BLD_REL_STORES_LIKE_BLD) {
+				continue;
 			}
+			if (relat->vnum != vnum) {
+				continue;
+			}
+			any = TRUE;
+			break;
 		}
 		if (any) {
 			++found;
@@ -919,7 +930,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 		}
 		any = FALSE;
 		for (store = GET_OBJ_STORAGE(obj); store && !any; store = store->next) {
-			if (store->type == TYPE_ROOM && store->vnum == vnum) {
+			if (store->type == TYPE_BLD && store->vnum == vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
@@ -985,6 +996,16 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 				any = TRUE;
 				break;
 			}
+		}
+		LL_FOREACH(VEH_RELATIONS(veh), relat) {
+			if (relat->type != BLD_REL_UPGRADES_TO && relat->type != BLD_REL_STORES_LIKE_BLD) {
+				continue;
+			}
+			if (relat->vnum != vnum) {
+				continue;
+			}
+			any = TRUE;
+			break;
 		}
 		if (any) {
 			++found;
@@ -1307,7 +1328,19 @@ void get_bld_relations_display(struct bld_relation *list, char *save_buffer) {
 	
 	*save_buffer = '\0';
 	LL_FOREACH(list, relat) {
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: [%5d] %s\r\n", ++count, bld_relationship_types[relat->type], relat->vnum, get_bld_name_by_proto(relat->vnum));
+		// BLD_REL_x
+		switch (relat->type) {
+			case BLD_REL_STORES_LIKE_VEH: {
+				sprintf(save_buffer + strlen(save_buffer), "%2d. %s: [%5d] %s\r\n", ++count, bld_relationship_types[relat->type], relat->vnum, get_vehicle_name_by_proto(relat->vnum));
+				break;
+			}
+			case BLD_REL_UPGRADES_TO:
+			case BLD_REL_STORES_LIKE_BLD:
+			default: {
+				sprintf(save_buffer + strlen(save_buffer), "%2d. %s: [%5d] %s\r\n", ++count, bld_relationship_types[relat->type], relat->vnum, get_bld_name_by_proto(relat->vnum));
+				break;
+			}
+		}
 	}
 	
 	if (count == 0) {
@@ -1484,177 +1517,9 @@ OLC_MODULE(bedit_name) {
 
 
 OLC_MODULE(bedit_relations) {
+	void olc_process_requirements(char_data *ch, char *argument, struct bld_relation **list);
 	bld_data *bld = GET_OLC_BUILDING(ch->desc);
-	struct bld_relation **list = &GET_BLD_RELATIONS(bld);
-	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
-	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
-	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-	struct bld_relation *relat, *iter, *change, *copyfrom;
-	int findtype, num, rtype;
-	any_vnum vnum;
-	bool found, none;
-	
-	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
-	
-	if (is_abbrev(cmd_arg, "copy")) {
-		// usage: qedit starts/ends copy <from type> <from vnum> <starts/ends>
-		argument = any_one_arg(argument, type_arg);	// just "building" for now
-		argument = any_one_arg(argument, vnum_arg);	// any vnum for that type
-		argument = any_one_arg(argument, field_arg);	// starts/ends
-		
-		if (!*type_arg || !*vnum_arg) {
-			msg_to_char(ch, "Usage: relation copy <from type> <from vnum> [starts | ends]\r\n");
-		}
-		else if ((findtype = find_olc_type(type_arg)) == 0) {
-			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
-		}
-		else if (!isdigit(*vnum_arg)) {
-			sprintbit(findtype, olc_type_bits, buf, FALSE);
-			msg_to_char(ch, "Copy from which %s?\r\n", buf);
-		}
-		else if ((vnum = atoi(vnum_arg)) < 0) {
-			msg_to_char(ch, "Invalid vnum.\r\n");
-		}
-		else {
-			sprintbit(findtype, olc_type_bits, buf, FALSE);
-			copyfrom = NULL;
-			none = FALSE;
-			
-			switch (findtype) {
-				case OLC_BUILDING: {
-					bld_data *from_bld = building_proto(vnum);
-					if (from_bld) {
-						copyfrom = GET_BLD_RELATIONS(from_bld);
-						none = copyfrom ? FALSE : TRUE;
-					}
-					break;
-				}
-				default: {
-					msg_to_char(ch, "You can't copy relations from %ss.\r\n", buf);
-					return;
-				}
-			}
-			
-			if (none) {
-				msg_to_char(ch, "No relations to copy from that.\r\n");
-			}
-			else if (!copyfrom) {
-				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
-			}
-			else {
-				smart_copy_bld_relations(list, copyfrom);
-				msg_to_char(ch, "Copied relations from %s %d.\r\n", buf, vnum);
-			}
-		}
-	}	// end 'copy'
-	else if (is_abbrev(cmd_arg, "remove")) {
-		// usage: qedit starts|ends remove <number | all>
-		skip_spaces(&argument);	// only arg is number
-		
-		if (!*argument) {
-			msg_to_char(ch, "Remove which relation (number)?\r\n");
-		}
-		else if (!str_cmp(argument, "all")) {
-			free_bld_relations(*list);
-			*list = NULL;
-			msg_to_char(ch, "You remove all the relations.\r\n");
-		}
-		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
-			msg_to_char(ch, "Invalid relation number.\r\n");
-		}
-		else {
-			found = FALSE;
-			LL_FOREACH(*list, iter) {
-				if (--num == 0) {
-					found = TRUE;
-					
-					msg_to_char(ch, "You remove the relation info for %s %d.\r\n", bld_relationship_types[iter->type], iter->vnum);
-					LL_DELETE(*list, iter);
-					free(iter);
-					break;
-				}
-			}
-			
-			if (!found) {
-				msg_to_char(ch, "Invalid relation number.\r\n");
-			}
-		}
-	}	// end 'remove'
-	else if (is_abbrev(cmd_arg, "add")) {
-		// usage: qedit starts|ends add <type> <vnum>
-		argument = any_one_arg(argument, type_arg);
-		argument = any_one_arg(argument, vnum_arg);
-		
-		if (!*type_arg || !*vnum_arg) {
-			msg_to_char(ch, "Usage: relation add <type> <vnum>\r\n");
-		}
-		else if ((rtype = search_block(type_arg, bld_relationship_types, FALSE)) == NOTHING) {
-			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
-		}
-		else if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-			msg_to_char(ch, "Invalid vnum '%s'.\r\n", vnum_arg);
-		}
-		else if (!building_proto(vnum)) {
-			msg_to_char(ch, "Unable to find building %d.\r\n", vnum);
-			return;
-		}
-		else {
-			// success
-			CREATE(relat, struct bld_relation, 1);
-			relat->type = rtype;
-			relat->vnum = vnum;
-			
-			LL_APPEND(*list, relat);
-			msg_to_char(ch, "You add %s relation: [%d] %s\r\n", bld_relationship_types[rtype], vnum, get_bld_name_by_proto(vnum));
-		}
-	}	// end 'add'
-	else if (is_abbrev(cmd_arg, "change")) {
-		// usage: qedit starts|ends change <number> vnum <number>
-		argument = any_one_arg(argument, num_arg);
-		argument = any_one_arg(argument, field_arg);
-		argument = any_one_arg(argument, vnum_arg);
-		
-		if (!*num_arg || !isdigit(*num_arg) || !*field_arg || !*vnum_arg) {
-			msg_to_char(ch, "Usage: relation change <number> vnum <value>\r\n");
-			return;
-		}
-		
-		// find which one to change
-		num = atoi(num_arg);
-		change = NULL;
-		LL_FOREACH(*list, iter) {
-			if (--num == 0) {
-				change = iter;
-				break;
-			}
-		}
-		
-		if (!change) {
-			msg_to_char(ch, "Invalid relation number.\r\n");
-		}
-		else if (is_abbrev(field_arg, "vnum")) {
-			if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
-				msg_to_char(ch, "Invalid vnum '%s'.\r\n", vnum_arg);
-				return;
-			}
-			if (!building_proto(vnum)) {
-				msg_to_char(ch, "Unable to find building %d.\r\n", vnum);
-				return;
-			}
-			
-			change->vnum = vnum;
-			msg_to_char(ch, "Changed relation %d to: [%d] %s\r\n", atoi(num_arg), vnum, get_bld_name_by_proto(vnum));
-		}
-		else {
-			msg_to_char(ch, "You can only change the vnum.\r\n");
-		}
-	}	// end 'change'
-	else {
-		msg_to_char(ch, "Usage: relation add <type> <vnum>\r\n");
-		msg_to_char(ch, "Usage: relation change <number> vnum <value>\r\n");
-		msg_to_char(ch, "Usage: relation copy <from type> <from vnum> [starts/ends]\r\n");
-		msg_to_char(ch, "Usage: relation remove <number | all>\r\n");
-	}
+	olc_process_requirements(ch, argument, &GET_BLD_RELATIONS(bld));
 }
 
 
