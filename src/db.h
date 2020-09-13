@@ -196,7 +196,8 @@
 #define DATA_MAX_PLAYERS_TODAY  3	// players logged in today
 #define DATA_LAST_ISLAND_DESCS  4	// last time island descs regenerated
 #define DATA_LAST_CONSTRUCTION_ID  5	// for vehicle construct/dismantle
-#define NUM_DATAS  6
+#define DATA_START_PLAYTIME_TRACKING  6	// when we started tracking empire playtime (prevents accidental deletes)
+#define NUM_DATAS  7
 
 
 // DATYPE_x: types of stored data
