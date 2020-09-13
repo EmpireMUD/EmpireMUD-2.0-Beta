@@ -2441,6 +2441,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_trade_data *trade, *last_trade = NULL;
 	struct empire_goal *egoal, *last_egoal = NULL;
 	struct empire_homeless_citizen *ehc;
+	struct empire_playtime_tracker *ept;
 	struct empire_completed_goal *ecg;
 	struct player_craft_data *pcd;
 	struct empire_log_data *elog;
@@ -2772,9 +2773,29 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				if (!get_line(fl, line)) {
 					log("SYSERR: Expecting privilege number for empire %d, but file ended!", vnum);
 					exit(1);
-					}
+				}
 				sscanf(line, "%d", t);
 				emp->priv[j] = MAX(1, MIN(emp->num_ranks, t[0]));
+				break;
+			}
+			case 'Q': {	// multi-purpose
+				switch (*(line+1)) {	// check next letter
+					case 'P': {	// playtime tracker
+						if (sscanf(line, "QP %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Bad QP line in empire %d: %s", vnum, line);
+							exit(1);
+						}
+						
+						HASH_FIND_INT(EMPIRE_PLAYTIME_TRACKER(emp), &t[0], ept);
+						if (!ept) {
+							CREATE(ept, struct empire_playtime_tracker, 1);
+							ept->cycle = t[0];
+							HASH_ADD_INT(EMPIRE_PLAYTIME_TRACKER(emp), cycle, ept);
+						}
+						ept->playtime_secs = t[1];
+						break;
+					}
+				}	// end 'Q' sub-sections
 				break;
 			}
 			case 'R': {	// rank name
@@ -2924,6 +2945,7 @@ PLAYER_UPDATE_FUNC(send_all_players_to_nowhere) {
 * @param empire_data *emp The empire to save.
 */
 void write_empire_to_file(FILE *fl, empire_data *emp) {
+	struct empire_playtime_tracker *ept, *next_ept;
 	struct empire_island *isle, *next_isle;
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter, *next_ter;
@@ -3041,6 +3063,8 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 		}
 	}
 	
+	// avoid L (used by empire logs)
+	
 	// M: MOTD
 	if (EMPIRE_MOTD(emp) && *EMPIRE_MOTD(emp)) {
 		char temp[MAX_MOTD_LENGTH + 12];
@@ -3051,12 +3075,17 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	}
 	
 	// avoid N (NPCs, below)
-	// avoid L (used by empire logs)
 	// avoid O (used by empire storage)
 
 	// P: privs
 	for (iter = 0; iter < NUM_PRIVILEGES; ++iter)
 		fprintf(fl, "P%d\n%d\n", iter, EMPIRE_PRIV(emp, iter));
+	
+	// Q: multi-purpose data
+	// QP: playtime trackers
+	HASH_ITER(hh, EMPIRE_PLAYTIME_TRACKER(emp), ept, next_ept) {
+		fprintf(fl, "QP %d %d\n", ept->cycle, ept->playtime_secs);
+	}
 	
 	// R: ranks
 	for (iter = 0; iter < emp->num_ranks; ++iter)

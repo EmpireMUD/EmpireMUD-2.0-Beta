@@ -576,6 +576,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_NEEDS_LOGS_SAVE(emp)  ((emp)->needs_logs_save)
 #define EMPIRE_NEEDS_STORAGE_SAVE(emp)  ((emp)->needs_storage_save)
 #define EMPIRE_NEXT_TIMEOUT(emp)  ((emp)->next_timeout)
+#define EMPIRE_PLAYTIME_TRACKER(emp)  ((emp)->playtime_tracker)
 #define EMPIRE_PRODUCTION_LIMITS(emp)  ((emp)->production_limits)
 #define EMPIRE_PRODUCTION_TOTALS(emp)  ((emp)->production_totals)
 #define EMPIRE_PROGRESS_POINTS(emp, type)  ((emp)->progress_points[(type)])
@@ -1883,6 +1884,9 @@ extern char *get_vehicle_name_by_proto(obj_vnum vnum);
 
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS UTILS /////////////////////////////////////////////////////
+
+// unique int for each 'daily cycle' (used for experience, scripting, etc)
+#define DAILY_CYCLE_DAY  (1 + (long)((data_get_long(DATA_DAILY_CYCLE) - data_get_long(DATA_WORLD_START)) / SECS_PER_REAL_DAY))
 
 // for the easy-update system
 #define PLAYER_UPDATE_FUNC(name)  void (name)(char_data *ch, bool is_file)

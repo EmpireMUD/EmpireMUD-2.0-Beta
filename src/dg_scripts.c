@@ -2372,7 +2372,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				snprintf(str, slen, "%c%s", cmd_prefix[type], script_commands[num]);
 			}
 			else if (!str_cmp(var, "dailycycle")) {
-				snprintf(str, slen, "%ld", 1 + ((data_get_long(DATA_DAILY_CYCLE) - data_get_long(DATA_WORLD_START)) / SECS_PER_REAL_DAY));
+				snprintf(str, slen, "%ld", DAILY_CYCLE_DAY);
 				return;
 			}
 			else if (!str_cmp(var, "event")) {

@@ -4553,6 +4553,14 @@ struct empire_completed_goal {
 };
 
 
+// tracks how much an empire is actually playing
+struct empire_playtime_tracker {
+	int cycle;	// hash key: using DAILY_CYCLE_DAY
+	int playtime_secs;	// total playtime in seconds
+	UT_hash_handle hh;
+};
+
+
 // permanent counts of totals of items accumulated by the empire, for use in progress goals/quests
 struct empire_production_total {
 	obj_vnum vnum;	// which item
@@ -4827,6 +4835,7 @@ struct empire_data {
 	struct empire_homeless_citizen *homeless;	// list of homeless npcs
 	struct script_data *script;	// for storing variables
 	struct workforce_production_limit *production_limits;	// limits on what workforce can make
+	struct empire_playtime_tracker *playtime_tracker;	// tracks real gameplay
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum

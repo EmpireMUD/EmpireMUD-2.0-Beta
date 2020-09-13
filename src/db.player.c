@@ -32,6 +32,7 @@
 *   loaded_player_hash For Offline Players
 *   Autowiz Wizlist Generator
 *   Helpers
+*   Playtime Tracking
 *   Empire Player Management
 *   Equipment Sets
 *   Promo Codes
@@ -70,6 +71,8 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 void remove_loaded_player(char_data *ch);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
 int sort_players_by_name(player_index_data *a, player_index_data *b);
+void track_empire_playtime(empire_data *emp, int add_seconds);
+void update_played_time(char_data *ch);
 void write_player_delayed_data_to_file(FILE *fl, char_data *ch);
 void write_player_primary_data_to_file(FILE *fl, char_data *ch);
 
@@ -2451,8 +2454,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Last Logon: %ld\n", ch->prev_logon);
 	}
 	else {
-		ch->player.time.played += (int)(time(0) - ch->player.time.logon);
-		ch->player.time.logon = time(0);	// reset this first
+		update_played_time(ch);
 		fprintf(fl, "Last Host: %s\n", ch->desc ? ch->desc->host : NULLSAFE(ch->prev_host));
 		fprintf(fl, "Last Logon: %ld\n", ch->player.time.logon);
 	}
@@ -4534,6 +4536,99 @@ void start_new_character(char_data *ch) {
 	
 	// prevent a repeat
 	REMOVE_BIT(PLR_FLAGS(ch), PLR_NEEDS_NEWBIE_SETUP);
+}
+
+
+/**
+* Updates the total playtime on a character, generally called when saving (but
+* can safely be called any time.
+*
+* @param char_data *ch The player.
+*/
+void update_played_time(char_data *ch) {
+	int amt = (int)(time(0) - ch->player.time.logon);
+	ch->player.time.played += amt;
+	ch->player.time.logon = time(0);	// reset this now
+	
+	// track to empire
+	if (!IS_NPC(ch) && GET_LOYALTY(ch)) {
+		track_empire_playtime(GET_LOYALTY(ch), amt);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// PLAYTIME TRACKING ///////////////////////////////////////////////////////
+
+// sorts newest-first based on DAILY_CYCLE_DAY
+int sort_playtime_tracker(struct empire_playtime_tracker *a, struct empire_playtime_tracker *b) {
+	return b->cycle - a->cycle;
+}
+
+
+/**
+* Called whenever a player's playtime is updated to also update the empire's
+* daily playtime.
+*
+* @param empire_data *emp The empire.
+* @param int add_seconds Amount of time to add, in seconds.
+*/
+void track_empire_playtime(empire_data *emp, int add_seconds) {
+	struct empire_playtime_tracker *ept;
+	int cycle = DAILY_CYCLE_DAY;
+	
+	if (emp && add_seconds > 0) {
+		HASH_FIND_INT(EMPIRE_PLAYTIME_TRACKER(emp), &cycle, ept);
+		if (!ept) {	// create if needed
+			CREATE(ept, struct empire_playtime_tracker, 1);
+			ept->cycle = cycle;
+			HASH_ADD_INT(EMPIRE_PLAYTIME_TRACKER(emp), cycle, ept);
+		}
+		SAFE_ADD(ept->playtime_secs, add_seconds, 0, INT_MAX, FALSE);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+}
+
+
+/**
+* Collates the empire's playtime tracker into total playtime (in seconds) for
+* each of the last 4 weeks.
+*
+* The output of this function should be copied if you need to keep it; it is a
+* static int array and calling it on another empire will lose your original
+* values.
+*
+* @param empire_data *emp The empire.
+* @return int* An array of 4 ints: playtime totals (seconds) for current week, last week, 3 weeks ago, 4 weeks ago
+*/
+int *get_last_four_weeks_playtime(empire_data *emp) {
+	#define weeks_playtime_NUM_WEEKS  4	// simplify updates with define
+	struct empire_playtime_tracker *ept, *next;
+	static int data[weeks_playtime_NUM_WEEKS];
+	int iter, pos, cur;
+	
+	// prep first
+	cur = DAILY_CYCLE_DAY;
+	HASH_SORT(EMPIRE_PLAYTIME_TRACKER(emp), sort_playtime_tracker);
+	for (iter = 0; iter < weeks_playtime_NUM_WEEKS; ++iter) {
+		data[iter] = 0;
+	}
+	
+	// collect data
+	HASH_ITER(hh, EMPIRE_PLAYTIME_TRACKER(emp), ept, next) {
+		pos = (int)((cur - ept->cycle) / 7);
+		
+		if (pos < weeks_playtime_NUM_WEEKS) {
+			SAFE_ADD(data[pos], ept->playtime_secs, 0, INT_MAX, FALSE);
+		}
+		else {	// otherwise delete old data now
+			HASH_DEL(EMPIRE_PLAYTIME_TRACKER(emp), ept);
+			free(ept);
+			continue;
+		}
+	}
+	
+	return data;
 }
 
 
