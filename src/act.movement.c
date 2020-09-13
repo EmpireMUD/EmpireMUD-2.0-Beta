@@ -1231,10 +1231,10 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	// closed building checks
 	if (!IS_ADVENTURE_ROOM(IN_ROOM(veh)) && IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
 		// vehicle allows a vehicle in if flagged for it; buildings require ALLOW-MOUNTS instead
-		veh_allows_veh = (GET_ROOM_VEHICLE(to_room) ? VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES) : BLD_ALLOWS_MOUNTS(to_room));
-		veh_allows_veh_home = (GET_ROOM_VEHICLE(HOME_ROOM(to_room)) ? VEH_FLAGGED(GET_ROOM_VEHICLE(HOME_ROOM(to_room)), VEH_CARRY_VEHICLES) : BLD_ALLOWS_MOUNTS(HOME_ROOM(to_room)));
+		veh_allows_veh = (GET_ROOM_VEHICLE(to_room) ? VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES) : BLD_ALLOWS_MOUNTS(to_room)) ? TRUE : FALSE;
+		veh_allows_veh_home = (GET_ROOM_VEHICLE(HOME_ROOM(to_room)) ? VEH_FLAGGED(GET_ROOM_VEHICLE(HOME_ROOM(to_room)), VEH_CARRY_VEHICLES) : BLD_ALLOWS_MOUNTS(HOME_ROOM(to_room))) ? TRUE : FALSE;
 		// based on where we're going, compares veh's own !BUILDING or !LOAD-IN-VEHICLE flags
-		veh_can_go_in = ((GET_ROOM_VEHICLE(to_room) && !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_BUILDING)) ? !VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE) : !VEH_FLAGGED(veh, VEH_NO_BUILDING));
+		veh_can_go_in = ((GET_ROOM_VEHICLE(to_room) && !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_BUILDING)) ? !VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE) : !VEH_FLAGGED(veh, VEH_NO_BUILDING)) ? TRUE : FALSE;
 		
 		// prevent entering from outside if mounts are not allowed
 		if ((!veh_can_go_in || !veh_allows_veh) && !IS_INSIDE(IN_ROOM(veh)) && !ROOM_IS_CLOSED(IN_ROOM(veh))) {
