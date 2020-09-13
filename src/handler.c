@@ -8961,7 +8961,8 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 			}
 		}
 		
-		// check in-veh
+		// check in-veh: storage doesn't work from here
+		/*
 		if ((veh = GET_ROOM_VEHICLE(loc))) {
 			if (store->type == TYPE_VEH && (store->vnum == VEH_VNUM(veh) || veh_has_relation(veh, BLD_REL_STORES_LIKE_VEH, store->vnum))) {
 				return TRUE;
@@ -8970,6 +8971,7 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 				return TRUE;
 			}
 		}
+		*/
 		
 		// vehicles in room
 		DL_FOREACH2(ROOM_VEHICLES(loc), veh, next_in_room) {
