@@ -8943,38 +8943,41 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping)
 bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 	struct obj_storage_type *store;
 	bld_data *bld = GET_BUILDING(loc);
-	bool has_stores_like = (bld ? (count_bld_relations(bld, BLD_REL_STORES_LIKE_BLD) > 0) : FALSE);
 	vehicle_data *veh;
-	
-	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
-		return FALSE;	// quest items don't store
-	}
 	
 	// We skip this check in retrieval mode, since STORE_ALL does not function for retrieval.
 	if (!retrieval_mode && GET_OBJ_STORAGE(obj) && room_has_function_and_city_ok(loc, FNC_STORE_ALL)) {
 		return TRUE; // As long as it can be stored anywhere, it can be stored here.
 	}
 	
+	// TYPE_x: storage locations
 	LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
-		// TYPE_x: storage locations
-		if (store->type == TYPE_BLD) {
-			// building storage
-			if (store->vnum == BUILDING_VNUM(loc)) {
+		if (bld) {
+			if (store->type == TYPE_BLD && (store->vnum == GET_BLD_VNUM(bld) || bld_has_relation(bld, BLD_REL_STORES_LIKE_BLD, store->vnum))) {
 				return TRUE;
 			}
-			else if (bld && has_stores_like && bld_has_relation(bld, BLD_REL_STORES_LIKE_BLD, store->vnum)) {
+			else if (store->type == TYPE_VEH && bld_has_relation(bld, BLD_REL_STORES_LIKE_VEH, store->vnum)) {
 				return TRUE;
 			}
 		}
-		else if (store->type == TYPE_VEH) {
-			// vehicle storage
-			if ((veh = GET_ROOM_VEHICLE(loc)) && (store->vnum == VEH_VNUM(veh) || veh_has_relation(veh, BLD_REL_STORES_LIKE_VEH, store->vnum))) {
-				return TRUE;	// in right vehicle
+		
+		// check in-veh
+		if ((veh = GET_ROOM_VEHICLE(loc))) {
+			if (store->type == TYPE_VEH && (store->vnum == VEH_VNUM(veh) || veh_has_relation(veh, BLD_REL_STORES_LIKE_VEH, store->vnum))) {
+				return TRUE;
 			}
-			DL_FOREACH2(ROOM_VEHICLES(loc), veh, next_in_room) {
-				if (store->vnum == VEH_VNUM(veh) || veh_has_relation(veh, BLD_REL_STORES_LIKE_VEH, store->vnum)) {
-					return TRUE;	// vehicle here
-				}
+			else if (store->type == TYPE_BLD && veh_has_relation(veh, BLD_REL_STORES_LIKE_BLD, store->vnum)) {
+				return TRUE;
+			}
+		}
+		
+		// vehicles in room
+		DL_FOREACH2(ROOM_VEHICLES(loc), veh, next_in_room) {
+			if (store->type == TYPE_VEH && (store->vnum == VEH_VNUM(veh) || veh_has_relation(veh, BLD_REL_STORES_LIKE_VEH, store->vnum))) {
+				return TRUE;
+			}
+			else if (store->type == TYPE_BLD && veh_has_relation(veh, BLD_REL_STORES_LIKE_BLD, store->vnum)) {
+				return TRUE;
 			}
 		}
 	}
