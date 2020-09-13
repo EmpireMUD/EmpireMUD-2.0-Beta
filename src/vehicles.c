@@ -3590,6 +3590,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 	free_custom_messages(VEH_CUSTOM_MSGS(proto));
 	if (VEH_RELATIONS(proto)) {
 		free_bld_relations(VEH_RELATIONS(proto));
+		VEH_RELATIONS(proto) = NULL;
 	}
 	
 	// free old script?
