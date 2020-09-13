@@ -146,14 +146,14 @@ bool audit_building(bld_data *bld, char_data *ch) {
 
 
 /**
-* Determines if a building has a specific relationship with another building.
+* Determines if a building has a specific relationship with a building/vehicle.
 *
 * @param bld_data *bld The building to test.
 * @param int type The BLD_REL_ type to look for.
-* @param bld_vnum vnum The building vnum we're looking for.
+* @param any_vnum vnum The vnum we're looking for.
 * @return bool TRUE if there is a relationship of that type; FALSE if not.
 */
-bool bld_has_relation(bld_data *bld, int type, bld_vnum vnum) {
+bool bld_has_relation(bld_data *bld, int type, any_vnum vnum) {
 	struct bld_relation *relat;
 
 	if (!bld || !GET_BLD_RELATIONS(bld)) {
@@ -161,6 +161,30 @@ bool bld_has_relation(bld_data *bld, int type, bld_vnum vnum) {
 	}
 	
 	LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
+		if (relat->type == type && relat->vnum == vnum) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+
+/**
+* Determines if a vehicle has a specific relationship with a building/vehicle.
+*
+* @param vehicle_data *veh The vehicle to test.
+* @param int type The BLD_REL_ type to look for.
+* @param any_vnum vnum The vnum we're looking for.
+* @return bool TRUE if there is a relationship of that type; FALSE if not.
+*/
+bool veh_has_relation(vehicle_data *veh, int type, any_vnum vnum) {
+	struct bld_relation *relat;
+
+	if (!veh || !VEH_RELATIONS(veh)) {
+		return FALSE;	// sanity/shortcut
+	}
+	
+	LL_FOREACH(VEH_RELATIONS(veh), relat) {
 		if (relat->type == type && relat->vnum == vnum) {
 			return TRUE;
 		}

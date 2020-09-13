@@ -8943,7 +8943,7 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping)
 bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 	struct obj_storage_type *store;
 	bld_data *bld = GET_BUILDING(loc);
-	bool has_stores_like = (bld ? (count_bld_relations(bld, BLD_REL_STORES_LIKE) > 0) : FALSE);
+	bool has_stores_like = (bld ? (count_bld_relations(bld, BLD_REL_STORES_LIKE_BLD) > 0) : FALSE);
 	vehicle_data *veh;
 	
 	if (!bld) {
@@ -8965,17 +8965,17 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 			if (store->vnum == BUILDING_VNUM(loc)) {
 				return TRUE;
 			}
-			else if (has_stores_like && bld_has_relation(bld, BLD_REL_STORES_LIKE, store->vnum)) {
+			else if (has_stores_like && bld_has_relation(bld, BLD_REL_STORES_LIKE_BLD, store->vnum)) {
 				return TRUE;
 			}
 		}
 		else if (store->type == TYPE_VEH) {
 			// vehicle storage
-			if ((veh = GET_ROOM_VEHICLE(loc)) && store->vnum == VEH_VNUM(veh)) {
+			if ((veh = GET_ROOM_VEHICLE(loc)) && (store->vnum == VEH_VNUM(veh) || veh_has_relation(veh, BLD_REL_STORES_LIKE_VEH, store->vnum))) {
 				return TRUE;	// in right vehicle
 			}
 			DL_FOREACH2(ROOM_VEHICLES(loc), veh, next_in_room) {
-				if (store->vnum == VEH_VNUM(veh)) {
+				if (store->vnum == VEH_VNUM(veh) || veh_has_relation(veh, BLD_REL_STORES_LIKE_VEH, store->vnum)) {
 					return TRUE;	// vehicle here
 				}
 			}

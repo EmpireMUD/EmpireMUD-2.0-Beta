@@ -2322,6 +2322,7 @@ void clear_vehicle(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle data to free.
 */
 void free_vehicle(vehicle_data *veh) {
+	void free_bld_relations(struct bld_relation *list);
 	void free_custom_messages(struct custom_message *mes);
 	
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
@@ -2386,6 +2387,9 @@ void free_vehicle(vehicle_data *veh) {
 		if (VEH_CUSTOM_MSGS(veh) && (!proto || VEH_CUSTOM_MSGS(veh) != VEH_CUSTOM_MSGS(proto))) {
 			free_custom_messages(VEH_CUSTOM_MSGS(veh));
 		}
+		if (VEH_RELATIONS(veh) && (!proto || VEH_RELATIONS(veh) != VEH_RELATIONS(proto))) {
+			free_bld_relations(VEH_RELATIONS(veh));
+		}
 		
 		free(veh->attributes);
 	}
@@ -2430,6 +2434,7 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 
 	char line[256], error[256], str_in[256], str_in2[256], str_in3[256];
+	struct bld_relation *relat;
 	struct spawn_info *spawn;
 	vehicle_data *veh, *find;
 	double dbl_in;
@@ -2573,6 +2578,23 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				break;
 			}
 			
+			case 'U': {	// relation
+				if (!get_line(fl, line)) {
+					log("SYSERR: Missing U line of %s", error);
+					exit(1);
+				}
+				if (sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
+					log("SYSERR: Format error in U line of %s", error);
+					exit(1);
+				}
+				
+				CREATE(relat, struct bld_relation, 1);
+				relat->type = int_in[0];
+				relat->vnum = int_in[1];
+				LL_APPEND(VEH_RELATIONS(veh), relat);
+				break;
+			}
+			
 			// end
 			case 'S': {
 				return;
@@ -2620,6 +2642,7 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
+	struct bld_relation *relat;
 	struct spawn_info *spawn;
 	
 	if (!fl || !veh) {
@@ -2685,6 +2708,11 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	
 	// T, V: triggers
 	write_trig_protos_to_file(fl, 'T', veh->proto_script);
+	
+	// U: relations
+	LL_FOREACH(VEH_RELATIONS(veh), relat) {
+		fprintf(fl, "U\n%d %d\n", relat->type, relat->vnum);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -3523,6 +3551,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 * @return vehicle_data* The copied vehicle.
 */
 vehicle_data *setup_olc_vehicle(vehicle_data *input) {
+	extern struct bld_relation *copy_bld_relations(struct bld_relation *input_list);
 	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
 	
 	vehicle_data *new;
@@ -3550,6 +3579,8 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		VEH_EX_DESCS(new) = copy_extra_descs(VEH_EX_DESCS(input));
 		VEH_INTERACTIONS(new) = copy_interaction_list(VEH_INTERACTIONS(input));
 		VEH_SPAWNS(new) = copy_spawn_list(VEH_SPAWNS(input));
+		VEH_CUSTOM_MSGS(new) = copy_custom_messages(VEH_CUSTOM_MSGS(input));
+		VEH_RELATIONS(new) = VEH_RELATIONS(input) ? copy_bld_relations(VEH_RELATIONS(input)) : NULL;
 		
 		// copy scripts
 		SCRIPT(new) = NULL;

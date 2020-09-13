@@ -528,8 +528,15 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 				// check stores-like relations
 				HASH_ITER(hh, building_table, bld_iter, next_bld) {
 					LL_FOREACH(GET_BLD_RELATIONS(bld_iter), relat) {
-						if (relat->type == BLD_REL_STORES_LIKE && relat->vnum == GET_BLD_VNUM(bld)) {
+						if (relat->type == BLD_REL_STORES_LIKE_BLD && relat->vnum == GET_BLD_VNUM(bld)) {
 							add_vnum_hash(&bld_vhash, GET_BLD_VNUM(bld_iter), 1);
+						}
+					}
+				}
+				HASH_ITER(hh, vehicle_table, veh_iter, next_veh) {
+					LL_FOREACH(VEH_RELATIONS(veh_iter), relat) {
+						if (relat->type == BLD_REL_STORES_LIKE_BLD && relat->vnum == GET_BLD_VNUM(bld)) {
+							add_vnum_hash(&veh_vhash, VEH_VNUM(veh_iter), 1);
 						}
 					}
 				}
@@ -538,15 +545,20 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 				add_vnum_hash(&veh_vhash, VEH_VNUM(veh), 1);
 				
 				// check stores-like relations
-				/*
+				HASH_ITER(hh, building_table, bld_iter, next_bld) {
+					LL_FOREACH(GET_BLD_RELATIONS(bld_iter), relat) {
+						if (relat->type == BLD_REL_STORES_LIKE_VEH && relat->vnum == VEH_VNUM(veh)) {
+							add_vnum_hash(&bld_vhash, GET_BLD_VNUM(bld_iter), 1);
+						}
+					}
+				}
 				HASH_ITER(hh, vehicle_table, veh_iter, next_veh) {
 					LL_FOREACH(VEH_RELATIONS(veh_iter), relat) {
-						if (relat->type == BLD_REL_STORES_LIKE && relat->vnum == VEH_VNUM(veh)) {
+						if (relat->type == BLD_REL_STORES_LIKE_VEH && relat->vnum == VEH_VNUM(veh)) {
 							add_vnum_hash(&veh_vhash, VEH_VNUM(veh_iter), 1);
 						}
 					}
 				}
-				*/
 			}
 		}
 		

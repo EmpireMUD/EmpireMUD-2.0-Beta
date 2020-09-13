@@ -2916,7 +2916,8 @@ const char *bld_flags[] = {
 // BLD_REL_x: relationships with other buildings
 const char *bld_relationship_types[] = {
 	"UPGRADES-TO",
-	"STORES-LIKE",
+	"STORES-LIKE-BLD",
+	"STORES-LIKE-VEH",
 	"\n"
 };
 

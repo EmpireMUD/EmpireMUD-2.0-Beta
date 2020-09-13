@@ -1591,6 +1591,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VEH_MILITARY(veh)  ((veh)->attributes->military)
 #define VEH_MIN_SCALE_LEVEL(veh)  ((veh)->attributes->min_scale_level)
 #define VEH_MOVE_TYPE(veh)  ((veh)->attributes->move_type)
+#define VEH_RELATIONS(veh)  ((veh)->attributes->relations)
 #define VEH_REQUIRES_CLIMATE(veh)  ((veh)->attributes->requires_climate)
 #define VEH_ROOM_AFFECTS(veh)  ((veh)->attributes->room_affects)
 #define VEH_YEARLY_MAINTENANCE(veh)  ((veh)->attributes->yearly_maintenance)
@@ -1822,6 +1823,7 @@ extern const char *get_morph_desc(char_data *ch, bool long_desc_if_true);
 
 // utils from olc.building.c
 extern bool bld_has_relation(bld_data *bld, int type, bld_vnum vnum);
+extern bool veh_has_relation(vehicle_data *veh, int type, any_vnum vnum);
 extern int count_bld_relations(bld_data *bld, int type);
 extern char *get_bld_name_by_proto(bld_vnum vnum);
 

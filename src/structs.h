@@ -807,7 +807,8 @@ typedef struct vehicle_data vehicle_data;
 
 // BLD_REL_x: relationships with other buildings
 #define BLD_REL_UPGRADES_TO  0	// upgrades to another building type
-#define BLD_REL_STORES_LIKE  1	// acts like another building for storage locations
+#define BLD_REL_STORES_LIKE_BLD  1	// acts like another building for storage locations
+#define BLD_REL_STORES_LIKE_VEH  2	// acts like another building for storage locations
 
 
 // tavern types
@@ -3570,7 +3571,7 @@ struct bld_data {
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct resource_data *yearly_maintenance;	// needed each year
-	struct bld_relation *relations;	// links to other buildings
+	struct bld_relation *relations;	// links to buildings/vehicles
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
@@ -3580,10 +3581,10 @@ struct bld_data {
 };
 
 
-// for relationships between buildings
+// for relationships between buildings/vehicles
 struct bld_relation {
 	int type;	// BLD_REL_
-	bld_vnum vnum;	// building vnum
+	any_vnum vnum;	// relevant vnum
 	
 	struct bld_relation *next;
 };
@@ -5574,6 +5575,7 @@ struct vehicle_attribute_data {
 	int fame;	// how much fame it adds to the empire
 	int military;	// how much it adds to the military pool
 	struct custom_message *custom_msgs;	// any custom messages
+	struct bld_relation *relations;	// links to buildings/vehicles
 };
 
 

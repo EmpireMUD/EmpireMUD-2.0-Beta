@@ -2280,8 +2280,9 @@ Relations link this building to other buildings in various ways:
 
 Available relationship types:
  &cUPGRADES-TO&0 - This building can be upgraded to that type.
- &cSTORES-LIKE&0 - Anything that can be stored there can be stored here.
-                      (this does not include warehouses; use function flags)
+ &cSTORES-LIKE-BLD&0 - Anything that can be stored there can be stored here.
+                       (this does not include warehouses; use function flags)
+ &cSTORES-LIKE-VEH&0 - Anything that can be stored there can be stored here.
 
 See also: OLC BUILDINGS
 #d
