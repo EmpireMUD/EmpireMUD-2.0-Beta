@@ -1934,6 +1934,7 @@ void free_empire(empire_data *emp) {
 	
 	struct workforce_production_limit *wpl, *next_wpl;
 	struct empire_production_total *egt, *next_egt;
+	struct empire_playtime_tracker *ept, *next_ept;
 	struct workforce_delay_chore *wdc, *next_wdc;
 	struct workforce_delay *delay, *next_delay;
 	struct empire_island *isle, *next_isle;
@@ -2002,6 +2003,12 @@ void free_empire(empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
 		HASH_DEL(EMPIRE_LEARNED_CRAFTS(emp), pcd);
 		free(pcd);
+	}
+	
+	// free playtime trackers
+	HASH_ITER(hh, EMPIRE_PLAYTIME_TRACKER(emp), ept, next_ept) {
+		HASH_DEL(EMPIRE_PLAYTIME_TRACKER(emp), ept);
+		free(ept);
 	}
 	
 	// free production limits

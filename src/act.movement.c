@@ -1202,6 +1202,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	extern int count_harnessed_animals(vehicle_data *veh);
 
 	char buf[MAX_STRING_LENGTH];
+	bool veh_allows_veh, veh_allows_veh_home, veh_can_go_in;
 	
 	if (!VEH_IS_COMPLETE(veh)) {
 		if (ch) {
@@ -1229,15 +1230,21 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	
 	// closed building checks
 	if (!IS_ADVENTURE_ROOM(IN_ROOM(veh)) && IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
+		// vehicle allows a vehicle in if flagged for it; buildings require ALLOW-MOUNTS instead
+		veh_allows_veh = (GET_ROOM_VEHICLE(to_room) ? VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES) : BLD_ALLOWS_MOUNTS(to_room));
+		veh_allows_veh_home = (GET_ROOM_VEHICLE(HOME_ROOM(to_room)) ? VEH_FLAGGED(GET_ROOM_VEHICLE(HOME_ROOM(to_room)), VEH_CARRY_VEHICLES) : BLD_ALLOWS_MOUNTS(HOME_ROOM(to_room)));
+		// based on where we're going, compares veh's own !BUILDING or !LOAD-IN-VEHICLE flags
+		veh_can_go_in = ((GET_ROOM_VEHICLE(to_room) && !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_BUILDING)) ? !VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE) : !VEH_FLAGGED(veh, VEH_NO_BUILDING));
+		
 		// prevent entering from outside if mounts are not allowed
-		if ((VEH_FLAGGED(veh, VEH_NO_BUILDING) || !BLD_ALLOWS_MOUNTS(to_room)) && !IS_INSIDE(IN_ROOM(veh)) && !ROOM_IS_CLOSED(IN_ROOM(veh))) {
+		if ((!veh_can_go_in || !veh_allows_veh) && !IS_INSIDE(IN_ROOM(veh)) && !ROOM_IS_CLOSED(IN_ROOM(veh))) {
 			if (ch) {
 				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
 			}
 			return FALSE;
 		}
 		// prevent moving from an allowed building to a disallowed building (usually due to interlink)
-		if (HOME_ROOM(to_room) != to_room && HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(veh)) && !BLD_ALLOWS_MOUNTS(to_room) && !BLD_ALLOWS_MOUNTS(HOME_ROOM(to_room))) {
+		if (HOME_ROOM(to_room) != to_room && HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(veh)) && !veh_allows_veh && !veh_allows_veh_home) {
 			if (ch) {
 				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
 			}
