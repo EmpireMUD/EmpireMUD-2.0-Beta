@@ -2269,20 +2269,20 @@ room title is "A Foul-Smelling Outhouse", the name should be "Outhouse".
 
 See also: BEDIT TITLE, OLC BUILDINGS, TERRITORY, VNUM
 #d
-"BEDIT RELATIONS" "BEDIT RELATIONSHIPS"
+"BEDIT RELATIONS" "BEDIT RELATIONSHIPS" "VEDIT RELATIONS" "VEDIT RELATIONSHIPS"
 
 Usage:  .relation add <type> <vnum>
-        .relation change <number> vnum <value>
         .relation copy building <from vnum>
         .relation remove <number | all>
 
-Relations link this building to other buildings in various ways:
+Relations link this building/vehicle to other buildings/vehicles in various
+ways:
 
 Available relationship types:
  &cUPGRADES-TO&0 - This building can be upgraded to that type.
  &cSTORES-LIKE-BLD&0 - Anything that can be stored there can be stored here.
-                       (this does not include warehouses; use function flags)
  &cSTORES-LIKE-VEH&0 - Anything that can be stored there can be stored here.
+                  (stores-like does not include warehouses; use function flags)
 
 See also: OLC BUILDINGS
 #d

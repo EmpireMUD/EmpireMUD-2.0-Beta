@@ -4678,49 +4678,80 @@ SHOW(show_workforce) {
 }
 
 
+// show storage <building | vehicle> <vnum>
 SHOW(show_storage) {
-	extern bld_data *get_building_by_name(char *name, bool room_only);
-	
+	char arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
-	bld_vnum building_type = NOTHING;
+	vehicle_data *find_veh = NULL;
+	bld_data *find_bld = NULL;
 	obj_data *obj, *next_obj;
-	bld_data *bld;
-	int total;
+	size_t size, lsize;
+	int count;
 	bool ok;
-
-	if (*argument) {
-		if ((bld = get_building_by_name(argument, FALSE))) {
-			building_type = GET_BLD_VNUM(bld);
-		}
+	
+	two_arguments(argument, arg, arg2);
+	
+	if (!*arg || !*arg2 || !is_number(arg2)) {
+		msg_to_char(ch, "Usage: show storage <building | vehicle> <vnum>\r\n");
+	}
+	else if (is_abbrev(arg, "building") && !(find_bld = building_proto(atoi(arg2)))) {
+		msg_to_char(ch, "Unknown building '%s'.\r\n", arg2);
+	}
+	else if (is_abbrev(arg, "vehicle") && !(find_veh = vehicle_proto(atoi(arg2)))) {
+		msg_to_char(ch, "Unknown vehicle '%s'.\r\n", arg2);
+	}
+	else if (!find_bld && !find_veh) {
+		msg_to_char(ch, "Usage: show storage <building | vehicle> <vnum>\r\n");
 	}
 	else {
-		building_type = BUILDING_VNUM(IN_ROOM(ch));
-	}
-	
-	strcpy(buf, "Objects that can be stored here:\r\n");
-	
-	total = 0;
-	if (building_type != NOTHING) {
+		// ok to show: init string/size
+		if (find_bld) {
+			size = snprintf(buf, sizeof(buf), "Objects that can be stored in a %s:\r\n", GET_BLD_NAME(find_bld));
+		}
+		else if (find_veh) {
+			size = snprintf(buf, sizeof(buf), "Objects that can be stored in %s:\r\n", VEH_SHORT_DESC(find_veh));
+		}
+		else {
+			size = snprintf(buf, sizeof(buf), "Objects that can be stored there:\r\n");
+		}
+		
+		count = 0;
 		HASH_ITER(hh, object_table, obj, next_obj) {
 			ok = FALSE;
-		
-			for (store = GET_OBJ_STORAGE(obj); store && !ok; store = store->next) {
-				if (store->type == TYPE_BLD && store->vnum == building_type) {
+			
+			// check storage
+			LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
+				if (find_bld && store->type == TYPE_BLD && store->vnum == GET_BLD_VNUM(find_bld)) {
 					ok = TRUE;
+					break;
+				}
+				else if (find_veh && store->type == TYPE_VEH && store->vnum == VEH_VNUM(find_veh)) {
+					ok = TRUE;
+					break;
 				}
 			}
 		
 			if (ok) {
-				sprintf(buf + strlen(buf), " %2d. [%5d] %s\r\n", ++total, GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+				++count;
+				lsize = snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+				
+				if (size + lsize < sizeof(buf)) {
+					strcat(buf, line);
+					size += lsize;
+				}
+				else {
+					snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+					break;
+				}
 			}
 		}
+		
+		if (count == 0) {
+			strcat(buf, " none\r\n");	// always room
+		}
+		
+		page_string(ch->desc, buf, TRUE);
 	}
-	
-	if (total == 0) {
-		strcat(buf, " none\r\n");
-	}
-	
-	page_string(ch->desc, buf, TRUE);
 }
 
 

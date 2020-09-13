@@ -1338,10 +1338,10 @@ Lists all possible starting locations, including name and coordinates.
 #e
 "SHOW STORAGE"
 
-Usage:  show storage [building name]
+Usage:  show storage <building | vehicle> <vnum>
 
-Lists objects which store in the named building, or the current building if none
-is specified. Takes a name, not a virtual number.
+Lists objects which store in the building or vehicle. This does not include
+stores-like relationships, only items actually set to store there.
 #e
 "SHOW TECHNOLOGY"
 
