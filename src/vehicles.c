@@ -3743,15 +3743,13 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	size += snprintf(buf + size, sizeof(buf) - size, "Forbid climate: \tg%s\t0\r\n", part);
 	
 	if (VEH_INTERACTIONS(veh)) {
-		send_to_char("Interactions:\r\n", ch);
 		get_interaction_display(VEH_INTERACTIONS(veh), part);
-		strcat(buf, part);
-		size += strlen(part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Interactions:\r\n%s", part);
 	}
 	
 	if (VEH_RELATIONS(veh)) {
 		get_bld_relations_display(VEH_RELATIONS(veh), part);
-		msg_to_char(ch, "Relations:\r\n%s", part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Relations:\r\n%s", part);
 	}
 	
 	if (VEH_YEARLY_MAINTENANCE(veh)) {
