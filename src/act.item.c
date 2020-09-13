@@ -568,7 +568,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s", (found++ > 0 ? ", " : " "), get_bld_name_by_proto(vhash_iter->vnum));
 		}
 		HASH_ITER(hh, veh_vhash, vhash_iter, vhash_next) {
-			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s", (found++ > 0 ? ", " : " "), get_vehicle_name_by_proto(vhash_iter->vnum));
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s", (found++ > 0 ? ", " : " "), skip_filler(get_vehicle_name_by_proto(vhash_iter->vnum)));
 		}
 		free_vnum_hash(&bld_vhash);
 		free_vnum_hash(&veh_vhash);

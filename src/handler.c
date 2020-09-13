@@ -8946,9 +8946,6 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 	bool has_stores_like = (bld ? (count_bld_relations(bld, BLD_REL_STORES_LIKE_BLD) > 0) : FALSE);
 	vehicle_data *veh;
 	
-	if (!bld) {
-		return FALSE;	// shortcut
-	}
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
 		return FALSE;	// quest items don't store
 	}
@@ -8965,7 +8962,7 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
 			if (store->vnum == BUILDING_VNUM(loc)) {
 				return TRUE;
 			}
-			else if (has_stores_like && bld_has_relation(bld, BLD_REL_STORES_LIKE_BLD, store->vnum)) {
+			else if (bld && has_stores_like && bld_has_relation(bld, BLD_REL_STORES_LIKE_BLD, store->vnum)) {
 				return TRUE;
 			}
 		}
