@@ -4224,9 +4224,9 @@ OLC_MODULE(vedit_movetype) {
 
 
 OLC_MODULE(vedit_relations) {
-	void olc_process_requirements(char_data *ch, char *argument, struct bld_relation **list);
+	void olc_process_relations(char_data *ch, char *argument, struct bld_relation **list);
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
-	olc_process_requirements(ch, argument, &VEH_RELATIONS(veh));
+	olc_process_relations(ch, argument, &VEH_RELATIONS(veh));
 }
 
 

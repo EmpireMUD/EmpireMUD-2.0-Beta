@@ -1517,9 +1517,9 @@ OLC_MODULE(bedit_name) {
 
 
 OLC_MODULE(bedit_relations) {
-	void olc_process_requirements(char_data *ch, char *argument, struct bld_relation **list);
+	void olc_process_relations(char_data *ch, char *argument, struct bld_relation **list);
 	bld_data *bld = GET_OLC_BUILDING(ch->desc);
-	olc_process_requirements(ch, argument, &GET_BLD_RELATIONS(bld));
+	olc_process_relations(ch, argument, &GET_BLD_RELATIONS(bld));
 }
 
 
