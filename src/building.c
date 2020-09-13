@@ -1394,20 +1394,20 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 			act("You don't have permission to dismantle $V.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
 	}
-	else if (WATER_SECT(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't dismantle it in the water.\r\n");
+	else if (VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
+		msg_to_char(ch, "That cannot be dismantled.\r\n");
 	}
 	else if (VEH_OWNER(veh) && VEH_OWNER(veh) != GET_LOYALTY(ch)) {
 		msg_to_char(ch, "You can't dismantle a %s you don't own.\r\n", VEH_OR_BLD(veh));
+	}
+	else if (WATER_SECT(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't dismantle it in the water.\r\n");
 	}
 	else if (VEH_OWNER(veh) && GET_LOYALTY(ch) && GET_RANK(ch) < EMPIRE_PRIV(GET_LOYALTY(ch), PRIV_DISMANTLE)) {
 		msg_to_char(ch, "You don't have permission to dismantle that.\r\n");
 	}
 	else if ((craft = find_craft_for_vehicle(veh)) && GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
 		msg_to_char(ch, "You don't have the skill needed to dismantle that properly.\r\n");
-	}
-	else if (VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE)) {
-		msg_to_char(ch, "That cannot be dismantled.\r\n");
 	}
 	else if (VEH_FLAGGED(veh, VEH_PLAYER_NO_DISMANTLE) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_DISMANTLE)) {
 		msg_to_char(ch, "Turn off no-dismantle before dismantling that %s (see HELP MANAGE).\r\n", VEH_OR_BLD(veh));
