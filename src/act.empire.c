@@ -2951,7 +2951,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			}
 			
 			// chameleon check
-			if (!IS_IMMORTAL(ch) && (!GET_LOYALTY(ch) || ROOM_OWNER(room) != GET_LOYALTY(ch)) && CHECK_CHAMELEON(map, room)) {
+			if (!PRF_FLAGGED(ch, PRF_HOLYLIGHT) && (!GET_LOYALTY(ch) || ROOM_OWNER(room) != GET_LOYALTY(ch)) && CHECK_CHAMELEON(map, room)) {
 				continue;	// just don't show it
 			}
 			
@@ -2997,7 +2997,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 						if (!CAN_SEE_VEHICLE(ch, veh)) {
 							continue;
 						}
-						if (vehicle_is_chameleon(veh, IN_ROOM(ch)) && !IS_IMMORTAL(ch) && (!GET_LOYALTY(ch) || VEH_OWNER(veh) != GET_LOYALTY(ch))) {
+						if (vehicle_is_chameleon(veh, IN_ROOM(ch)) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT) && (!GET_LOYALTY(ch) || VEH_OWNER(veh) != GET_LOYALTY(ch))) {
 							continue;	// can't see from here
 						}
 						if (!multi_isname(argument, VEH_KEYWORDS(veh))) {
@@ -6471,7 +6471,7 @@ ACMD(do_progress) {
 	}
 	else if ((prg = find_current_progress_goal_by_name(emp, argument)) || (prg = find_progress_goal_by_name(argument)) || (!str_cmp(arg, "info") && ((prg = find_current_progress_goal_by_name(emp, arg2)) || (prg = find_progress_goal_by_name(arg2))))) {
 		// show 1 goal
-		if (IS_IMMORTAL(ch)) {
+		if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
 			sprintf(vstr, "[%d] ", PRG_VNUM(prg));
 		}
 		else {

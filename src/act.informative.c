@@ -1063,7 +1063,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		}
 	if (!IS_NPC(i) && GET_ACTION(i) == ACT_MORPHING)
 		act("...$e is undergoing a hideous transformation!", FALSE, i, 0, ch, TO_VICT);
-	if ((IS_MORPHED(i) || IS_DISGUISED(i)) && (IS_IMMORTAL(ch) || CAN_RECOGNIZE(ch, i))) {
+	if ((IS_MORPHED(i) || IS_DISGUISED(i)) && (PRF_FLAGGED(ch, PRF_HOLYLIGHT) || CAN_RECOGNIZE(ch, i))) {
 		act("...this appears to be $o.", FALSE, i, 0, ch, TO_VICT);
 	}
 	
@@ -1198,7 +1198,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	if (!i || !ch || !ch->desc)
 		return;
 	
-	disguise = !IS_IMMORTAL(ch) && (IS_DISGUISED(i) || (IS_MORPHED(i) && CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)));
+	disguise = !PRF_FLAGGED(ch, PRF_HOLYLIGHT) && (IS_DISGUISED(i) || (IS_MORPHED(i) && CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)));
 	
 	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i) && has_ability(i, ABIL_CONCEALMENT)) {
 		show_eq = FALSE;
