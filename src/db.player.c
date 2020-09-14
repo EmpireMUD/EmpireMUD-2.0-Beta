@@ -74,6 +74,8 @@ void remove_loaded_player(char_data *ch);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
 int sort_players_by_name(player_index_data *a, player_index_data *b);
 void track_empire_playtime(empire_data *emp, int add_seconds);
+void update_empire_members_and_greatness(empire_data *emp);
+void update_member_data(char_data *ch);
 void update_played_time(char_data *ch);
 void write_player_delayed_data_to_file(FILE *fl, char_data *ch);
 void write_player_primary_data_to_file(FILE *fl, char_data *ch);
@@ -4077,6 +4079,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// reload last companion?
 	if (GET_LAST_COMPANION(ch) != NOTHING && (compan = has_companion(ch, GET_LAST_COMPANION(ch)))) {
 		load_companion_mob(ch, compan);
+	}
+	
+	// ensure these are fresh
+	if (GET_LOYALTY(ch)) {
+		update_member_data(ch);
+		update_empire_members_and_greatness(GET_LOYALTY(ch));
 	}
 }
 

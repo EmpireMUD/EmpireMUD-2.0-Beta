@@ -452,7 +452,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			break;
 		case APPLY_GREATNESS: {
 			SAFE_ADD(GET_GREATNESS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
-			if (!IS_NPC(ch) && GET_LOYALTY(ch)) {
+			if (!IS_NPC(ch) && GET_LOYALTY(ch) && IN_ROOM(ch)) {
 				update_member_data(ch);
 				TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
 			}
@@ -864,7 +864,7 @@ void affect_total(char_data *ch) {
 	GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
 	
 	// check greatness thresholds
-	if (!IS_NPC(ch) && GET_GREATNESS(ch) != greatness && GET_LOYALTY(ch)) {
+	if (!IS_NPC(ch) && GET_GREATNESS(ch) != greatness && GET_LOYALTY(ch) && IN_ROOM(ch)) {
 		update_member_data(ch);
 		TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
 	}
