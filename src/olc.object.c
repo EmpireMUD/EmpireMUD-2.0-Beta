@@ -1105,6 +1105,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	bitvector_t only_tools = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
 	int only_weapontype = NOTHING;
+	bool only_storable = FALSE, not_storable = FALSE;
 	struct interaction_item *inter;
 	struct custom_message *cust;
 	obj_data *obj, *next_obj;
@@ -1137,9 +1138,11 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
 		FULLSEARCH_LIST("material", only_mat, (const char **)olc_material_list)
+		FULLSEARCH_BOOL("storable", only_storable)
 		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
 		FULLSEARCH_LIST("type", only_type, item_types)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, extra_bits)
+		FULLSEARCH_BOOL("unstorable", not_storable)
 		FULLSEARCH_FUNC("weapontype", only_weapontype, get_attack_type_by_name(val_arg))
 		FULLSEARCH_FLAGS("wear", only_worn, wear_bits)
 		FULLSEARCH_FLAGS("worn", only_worn, wear_bits)
@@ -1164,6 +1167,12 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 			if (GET_OBJ_MIN_SCALE_LEVEL(obj) != 0 && only_level < GET_OBJ_MIN_SCALE_LEVEL(obj)) {
 				continue;
 			}
+		}
+		if (only_storable && !GET_OBJ_STORAGE(obj)) {
+			continue;
+		}
+		if (not_storable && GET_OBJ_STORAGE(obj)) {
+			continue;
 		}
 		if (only_type != NOTHING && GET_OBJ_TYPE(obj) != only_type) {
 			continue;

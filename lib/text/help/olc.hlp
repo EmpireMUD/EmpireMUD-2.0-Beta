@@ -5253,6 +5253,7 @@ Fields:
      (note: will not account for objects whose levels are inherited from mobs
      or adventures, see ADVEDIT CASCADE for help)
   &c-material&0 - see OEDIT MATERIAL
+  &c-storable -unstorable&0 - Only get objects with or without storage sites.
   &c-tools&0 - see HELP OEDIT TOOLS
   &c-type&0 - see HELP OEDIT TYPE
   &c-weapontype&0 - see HELP OEDIT WEAPONTYPE
