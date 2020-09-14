@@ -2482,10 +2482,11 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 	}
 	
 	if (worker && can_do) {
-		charge_workforce(emp, room, worker, 1, NOTHING, 0);
 		
 		// did we find anything at all?
 		if (highest) {
+			charge_workforce(emp, room, worker, 1, NOTHING, 0);
+			
 			// let's only do this every ~4 hours
 			if (!number(0, 3)) {
 				// only send message if someone else is present (don't bother verifying it's a player)
