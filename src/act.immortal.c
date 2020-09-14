@@ -5713,6 +5713,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 void do_stat_object(char_data *ch, obj_data *j) {
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern const char *container_bits[];
+	extern const char *corpse_flags[];
 	extern const char *obj_custom_types[];
 	extern const char *storage_bits[];
 	extern double get_base_dps(obj_data *weapon);
@@ -5864,6 +5865,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 				msg_to_char(ch, "unknown\r\n");
 			}
 			
+			sprintbit(GET_CORPSE_FLAGS(j), corpse_flags, buf, TRUE);
+			msg_to_char(ch, "Corpse flags: %s\r\n", buf);
 			msg_to_char(ch, "Corpse size: %s\r\n", size_types[GET_CORPSE_SIZE(j)]);
 			break;
 		case ITEM_COINS: {

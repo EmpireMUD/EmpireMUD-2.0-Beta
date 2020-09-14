@@ -2465,6 +2465,16 @@ const char *container_bits[] = {
 };
 
 
+// CORPSE_x: Corpse flags
+const char *corpse_flags[] = {
+	"EATEN",	// 0
+	"SKINNED",
+	"HUMAN",
+	"NO-LOOT"
+	"\n"
+};
+
+
 /* level of fullness for drink containers */
 const char *fullness[] = {
 	"less than half ",
