@@ -2127,7 +2127,7 @@ void send_login_motd(descriptor_data *desc, int bad_pws) {
 	}
 
 	/* Check previous logon */
-	if (desc->character->prev_host) {
+	if (desc->character->prev_host && desc->character->prev_logon > 0) {
 		sprintf(buf, "Your last login was on %6.10s from %s.\r\n", ctime(&desc->character->prev_logon), desc->character->prev_host);
 		SEND_TO_Q(buf, desc);
 	}
