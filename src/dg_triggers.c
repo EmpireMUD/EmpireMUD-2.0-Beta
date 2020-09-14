@@ -1992,7 +1992,10 @@ bool check_command_trigger(char_data *actor, char *cmd, char *argument, int mode
 	int cont = 0;
 	
 	if (!IS_NPC(actor) && ACCOUNT_FLAGGED(actor, ACCT_FROZEN)) {
-		return cont;
+		return cont;	// frozen players
+	}
+	if (IS_DEAD(actor)) {
+		return cont;	// dead people
 	}
 	
 	// never override the toggle command for immortals
