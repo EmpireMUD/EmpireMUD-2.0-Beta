@@ -42,6 +42,7 @@ extern const char *from_dir[];
 extern const char *mob_move_types[];
 
 // external funcs
+ACMD(do_dismount);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void do_unseat_from_vehicle(char_data *ch);
 extern char *get_room_name(room_data *room, bool color);
@@ -992,8 +993,6 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 * @return bool TRUE indicates can-move, FALSE means they were blocked (and received an error).
 */
 bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
-	ACMD(do_dismount);
-	
 	struct affected_type *af;
 	bool needs_help = FALSE;	// this will trigger a free fly effect if stuck
 	
@@ -2649,10 +2648,13 @@ ACMD(do_sit) {
 
 	switch (GET_POS(ch)) {
 		case POS_STANDING: {
-			if (IS_RIDING(ch)) {
+			if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 				msg_to_char(ch, "You can't do any more sitting while mounted.\r\n");
 			}
 			else if (!*arg) {
+				if (IS_RIDING(ch)) {
+					do_dismount(ch, "", 0, 0);
+				}
 				send_to_char("You sit down.\r\n", ch);
 				act("$n sits down.", FALSE, ch, 0, 0, TO_ROOM);
 				GET_POS(ch) = POS_SITTING;
