@@ -2490,7 +2490,7 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 		// vnum is valid (obj was a throwaway)
 		HASH_ITER(hh, empire_table, iter, next_iter) {
 			// success! now, are they importing/exporting it?
-			if (!(trade = find_trade_entry(iter, find_type, vnum))) {
+			if (EMPIRE_IS_TIMED_OUT(iter) || !(trade = find_trade_entry(iter, find_type, vnum))) {
 				continue;
 			}
 			
