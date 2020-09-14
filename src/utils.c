@@ -423,6 +423,7 @@ void run_delayed_refresh(void) {
 	extern int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island);
 	void count_quest_tasks(struct req_data *list, int *complete, int *total);
 	void refresh_passive_buffs(char_data *ch);
+	void update_empire_members_and_greatness(empire_data *emp);
 	extern struct char_delayed_update *char_delayed_update_list;
 	
 	struct char_delayed_update *cdu, *next_cdu;
@@ -479,6 +480,9 @@ void run_delayed_refresh(void) {
 			}
 			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MEMBERS)) {
 				read_empire_members(emp, FALSE);
+			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_GREATNESS)) {
+				update_empire_members_and_greatness(emp);
 			}
 			
 			// clear this

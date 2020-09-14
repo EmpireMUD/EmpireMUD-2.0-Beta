@@ -1102,6 +1102,7 @@ typedef struct vehicle_data vehicle_data;
 #define DELAY_REFRESH_CROP_VARIETY  BIT(0)	// refreshes specific progress goals
 #define DELAY_REFRESH_GOAL_COMPLETE  BIT(1)	// checks for finished progress
 #define DELAY_REFRESH_MEMBERS  BIT(2)	// re-reads empire member data
+#define DELAY_REFRESH_GREATNESS  BIT(3)	// refreshes members-and-greatness
 
 
 // EADM_x: empire admin flags

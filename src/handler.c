@@ -88,7 +88,6 @@ void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
 void free_varlist(struct trig_var_data *vd);
 void scale_item_to_level(obj_data *obj, int level);
-void update_empire_members_and_greatness(empire_data *emp);
 void update_member_data(char_data *ch);
 
 // locals
@@ -455,7 +454,7 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_GREATNESS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			if (!IS_NPC(ch) && GET_LOYALTY(ch)) {
 				update_member_data(ch);
-				update_empire_members_and_greatness(GET_LOYALTY(ch));
+				TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
 			}
 			break;
 		}
@@ -867,7 +866,7 @@ void affect_total(char_data *ch) {
 	// check greatness thresholds
 	if (!IS_NPC(ch) && GET_GREATNESS(ch) != greatness && GET_LOYALTY(ch)) {
 		update_member_data(ch);
-		update_empire_members_and_greatness(GET_LOYALTY(ch));
+		TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
 	}
 }
 
