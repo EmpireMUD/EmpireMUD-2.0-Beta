@@ -5,12 +5,14 @@ Some fibers are scattered here.~
    You aren't sure what these fibers came from, but you might be able to use
 them for crafting.
 ~
-3 0 a 0 2
+3 0 a 0 3
 0 0 0
 0 0
+C
+1 1
 O+ 1 6400
 R
-5137 0
+4 5137 0
 S
 #6401
 fibers soft~
@@ -19,12 +21,14 @@ Some soft fibers are scattered here.~
    You aren't sure what these fibers came from, but you might be able to use
 them for crafting.
 ~
-3 0 a 0 3
+3 0 a 0 4
 0 0 0
 0 0
+C
+1 1
 O+ 1 6401
 R
-5137 0
+4 5137 0
 S
 #6402
 fibers stiff~
@@ -33,12 +37,14 @@ Some stiff fibers are scattered here.~
    You aren't sure what these fibers came from, but you might be able to use
 them for crafting.
 ~
-3 0 a 0 5
+3 0 a 0 6
 0 0 0
 0 0
+C
+1 1
 O+ 1 6402
 R
-5118 0
+4 5118 0
 S
 #6420
 fibers plant~
@@ -47,12 +53,14 @@ Some plant fibers are lying on the ground.~
    You aren't sure what these fibers came from, but you might be able to use
 them for crafting.
 ~
-3 0 a 0 4
+3 0 a 0 5
 0 0 0
 0 0
+C
+1 1
 O+ 1 6420
 R
-5118 0
+4 5118 0
 S
 #6421
 fibers plant soft~
@@ -61,12 +69,14 @@ Some soft plant fibers are lying on the ground.~
    You aren't sure what these fibers came from, but you might be able to use
 them for crafting.
 ~
-3 0 a 0 4
+3 0 a 0 5
 0 0 0
 0 0
+C
+1 1
 O+ 1 6421
 R
-5118 0
+4 5118 0
 S
 #6422
 fibers plant stiff~
@@ -75,12 +85,14 @@ Some stiff plant fibers are lying on the ground.~
    You aren't sure what these fibers came from, but you might be able to use
 them for crafting.
 ~
-3 0 a 0 5
+3 0 a 0 6
 0 0 0
 0 0
+C
+1 1
 O+ 1 6422
 R
-5118 0
+4 5118 0
 S
 #6423
 sticks~
@@ -88,12 +100,14 @@ some sticks~
 Some sticks are lying on the ground.~
 These sticks could be used for various crafts.
 ~
-3 0 a 0 7
+3 0 a 0 8
 0 0 0
 0 0
+C
+1 1
 O+ 1 6423
 R
-5118 0
+4 5118 0
 S
 #6440
 fibers animal~
@@ -102,12 +116,14 @@ Some animal fibers are lying here.~
    You aren't sure what these fibers came from, but you might be able to use
 them for crafting.
 ~
-3 0 a 0 4
+3 0 a 0 5
 0 0 0
 7 0
+C
+1 1
 O+ 1 6440
 R
-5137 0
+4 5137 0
 S
 #6441
 wool~
@@ -115,12 +131,14 @@ some wool~
 Some wool is piled on the ground.~
 You can weave the wool into cloth.
 ~
-3 0 a 0 7
+3 0 a 0 8
 0 0 0
 7 0
+C
+1 1
 O+ 1 6441
 R
-5137 0
+4 5137 0
 S
 #6443
 feather feathers large~
@@ -128,11 +146,13 @@ a large feather~
 A large feather is standing out of the ground.~
 This feather is so large you could almost stuff a pillow with it alone.
 ~
-3 0 a 0 10
+3 0 a 0 11
 0 0 0
 7 0
+C
+1 1
 O+ 1 6443
 R
-5137 0
+4 5137 0
 S
 $

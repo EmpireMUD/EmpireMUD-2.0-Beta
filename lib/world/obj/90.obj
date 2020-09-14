@@ -5,13 +5,15 @@ A wolf's fur is hanging here.~
    This wolf fur is in fine condition and could be used as-is or tanned into
 leather.
 ~
-3 e a 0 5
+3 e a 0 6
 0 0 0
 7 0
-I 18 1357 100.00 1  # TAN: a large piece of leather
+C
+1 1
+I 18 1357 100.00 1  # TAN: large piece of leather
 O+ 1 6550
 R
-5120 0
+4 5120 0
 S
 #9007
 antler antlers deer fine~
@@ -19,12 +21,14 @@ a fine deer antler~
 A fine deer antler is lying on the ground.~
 The antler has 5 points and must have come from a good-sized buck.
 ~
-3 e a 0 3
+3 e a 0 4
 0 0 0
 14 0
+C
+1 1
 O+ 1 6561
 R
-5120 0
+4 5120 0
 S
 #9009
 horseshoe shoe~
@@ -56,12 +60,14 @@ A fine tiger pelt is lying here.~
    This brilliant orange and black pelt can only have come from the largest
 jungle predator -- the tiger!
 ~
-3 0 a 0 5
+3 0 a 0 6
 0 0 0
 7 0
+C
+1 1
 O+ 1 6550
 R
-5120 0
+4 5120 0
 S
 #9019
 meat slab shark~
@@ -70,12 +76,14 @@ A slab of shark meat is rotting on the ground.~
    The shark meat has begun to ferment. You could cook it into dried shark
 meat.
 ~
-3 0 a 0 4
+3 0 a 0 5
 0 0 0
 7 24
+C
+1 1
 O+ 1 6203
 R
-5119 0
+4 5119 0
 S
 #9025
 feathers bird~
@@ -91,7 +99,7 @@ C
 1 1
 O+ 1 6442
 R
-5137 0
+4 5137 0
 S
 #9030
 head mighty beast severed~
@@ -162,11 +170,13 @@ A unicorn horn is sticking out of the ground.~
    This thin, spiralled horn is the stuff of legends. If it's real, it could
 fetch a lot of money.
 ~
-15 0 a 0 2
+15 0 a 0 3
 16 0 0
 14 0
+C
+100 100
 R
-5193 a
+4 5193 a
 S
 #9042
 letter smith undelivered~
@@ -214,11 +224,13 @@ A pair of jackalope antlers are lying here.~
    These antlers may resemble tiny deer antlers, but they are clearly from a
 legendary jackalope.
 ~
-15 0 a 0 3
+15 0 a 0 4
 16 0 0
 14 0
+C
+100 100
 R
-5193 a
+4 5193 a
 S
 #9056
 hide hides furs sasquatch~
@@ -226,12 +238,14 @@ a sasquatch hide~
 A sasquatch hide is draped here.~
 This huge hide could be from none other than the sasquatch!
 ~
-15 0 a 0 6
+15 0 a 0 7
 16 0 0
 7 0
+C
+100 100
 O+ 1 6551
 R
-5193 a
+4 5193 a
 S
 #9057
 fur furs yeti luxurious~
@@ -240,12 +254,14 @@ A luxurious yeti fur is draping here.~
    This huge, white fur could only have come from the elusive yeti. It must be
 worth its weight in gold!
 ~
-15 0 a 0 7
+15 0 a 0 8
 16 0 0
 7 0
+C
+100 100
 O+ 1 6551
 R
-5193 a
+4 5193 a
 S
 #9058
 tusk tusks mammoth enormous~
@@ -254,12 +270,14 @@ An enormous mammoth tusk is standing here.~
    The tusk is larger, longer, and curvier than any elephant's tusk. It can
 only have come from a mammoth, the rarest of the giant beasts.
 ~
-15 e a 0 7
+15 e a 0 8
 16 0 0
 14 0
+C
+100 100
 O+ 1 6563
 R
-5193 a
+4 5193 a
 S
 #9060
 hoard dragon's dragons gold green~
@@ -269,11 +287,13 @@ A hoard of gold has spilled onto the floor.~
 across the land. Each piece has long claw marks or signs of fire, both
 resulting from its time in a dragon's hoard.
 ~
-15 0 a 0 4
+15 0 a 0 5
 16 0 0
 4 0
+C
+100 100
 R
-5193 a
+4 5193 a
 S
 #9062
 purse mermaid's mermaids~
@@ -283,11 +303,13 @@ A mermaid's purse has been dropped here.~
 There doesn't seem to be a way to open it, but it feels like there are pearls
 inside. These purses are known to come from mermaids who swim in deep waters.
 ~
-15 0 a 0 4
+15 0 a 0 5
 16 0 0
 7 0
+C
+100 100
 R
-5193 a
+4 5193 a
 S
 #9064
 wineskin skin seeping~

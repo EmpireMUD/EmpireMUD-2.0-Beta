@@ -4,10 +4,12 @@ some magic lumber~
 Some magic lumber is stacked here.~
 This lumber is imbued with magic.
 ~
-3 e a 0 9
+3 e a 0 10
 0 0 0
 0 0
-I 11 617 100.00 1  # LIGHT: a magical fire
+C
+1 1
+I 11 617 100.00 1  # LIGHT: magical fire
 M
 0
 You place $p in midair, where it seems to float.~
@@ -22,7 +24,7 @@ M
 $n attaches $p in midair, where it seems to float.~
 O+ 1 6001
 R
-5118 0
+4 5118 0
 S
 #6002
 lumber fine~
@@ -30,10 +32,12 @@ some fine lumber~
 Some fine lumber is stacked here.~
 This is high-quality lumber, perfect for building or crafting fine things.
 ~
-3 e a 0 11
+3 e a 0 12
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
+C
+1 1
+I 11 1002 100.00 1  # LIGHT: roaring fire
 M
 0
 You position $p and tie it in place.~
@@ -48,7 +52,7 @@ M
 $n positions $p on the frame of $V.~
 O+ 1 6002
 R
-5118 0
+4 5118 0
 S
 #6011
 tree small~
@@ -58,14 +62,16 @@ A small tree has fallen here.~
 thick enough to make a dugout canoe. You could probably still get some lumber
 out of it.
 ~
-3 e a 0 10
+3 e a 0 11
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
-I 17 125 100.00 1  # SAW: a stack of lumber
+C
+1 1
+I 11 1002 100.00 1  # LIGHT: roaring fire
+I 17 125 100.00 1  # SAW: stack of lumber
 O+ 1 6011
 R
-5118 0
+4 5118 0
 S
 #6012
 tree trees rare~
@@ -74,12 +80,14 @@ A rare tree is lying here.~
    You can use a sharp tool to scrape a tree until it's a log, or craft it
 into a canoe.
 ~
-3 e a 0 9
+3 e a 0 10
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
-I 16 124 100.00 1  # SCRAPE: a heavy log
-I 17 125 100.00 2  # SAW: a stack of lumber
+C
+1 1
+I 11 1002 100.00 1  # LIGHT: roaring fire
+I 16 124 100.00 1  # SCRAPE: heavy log
+I 17 125 100.00 2  # SAW: stack of lumber
 M
 7
 $n carves out a tree for $V.~
@@ -88,7 +96,7 @@ M
 You carve out a tree for $V.~
 O+ 1 6012
 R
-5118 0
+4 5118 0
 S
 #6015
 pillar pillars~
@@ -96,9 +104,11 @@ a pillar~
 A pillar is lying here.~
 Pillars are used for all kinds of construction projects.
 ~
-3 e a 0 8
+3 e a 0 9
 0 0 0
 0 0
+C
+1 1
 M
 7
 $n hoists $p onto $V.~
@@ -107,7 +117,7 @@ M
 You hoist $p onto $V.~
 O+ 1 6015
 R
-5118 0
+4 5118 0
 S
 #6016
 pillar pillars fine~
@@ -115,9 +125,11 @@ a fine pillar~
 A fine pillar is lying here.~
 Pillars are used for all kinds of construction projects.
 ~
-3 e a 0 9
+3 e a 0 10
 0 0 0
 0 0
+C
+1 1
 M
 7
 $n hoists $p onto $V.~
@@ -126,7 +138,7 @@ M
 You hoist $p onto $V.~
 O+ 1 6016
 R
-5118 0
+4 5118 0
 S
 #6017
 pillar pillars large~
@@ -135,9 +147,11 @@ A large pillar is lying here.~
    Pillars are used for all kinds of construction projects. Pillars of this
 size are also used as masts for ships.
 ~
-3 e a 0 11
+3 e a 0 12
 0 0 0
 0 0
+C
+1 1
 M
 7
 $n hoists $p onto $V.~
@@ -146,7 +160,7 @@ M
 You hoist $p onto $V.~
 O+ 1 6017
 R
-5118 0
+4 5118 0
 S
 #6025
 sapling saplings~
@@ -154,12 +168,14 @@ a sapling~
 A sapling is lying here.~
 This sapling is long and straight, perfect for many crafts or buildings.
 ~
-3 0 a 0 5
+3 0 a 0 6
 0 0 0
 0 0
+C
+1 1
 O+ 1 6025
 R
-5118 0
+4 5118 0
 S
 #6026
 sapling saplings fine~
@@ -168,12 +184,14 @@ A fine sapling is lying here.~
    This sapling is long and straight, perfect for many crafts or buildings. It
 is of high quality.
 ~
-3 0 a 0 6
+3 0 a 0 7
 0 0 0
 0 0
+C
+1 1
 O+ 1 6026
 R
-5118 0
+4 5118 0
 S
 #6075
 block blocks~
@@ -181,9 +199,11 @@ a block~
 A block is sitting here.~
 This block could be used for building.
 ~
-3 e a 0 8
+3 e a 0 9
 0 0 0
 1 0
+C
+1 1
 M
 0
 You heave $p into place.~
@@ -192,7 +212,7 @@ M
 $n heaves $p into place.~
 O+ 1 6075
 R
-5117 0
+4 5117 0
 S
 #6077
 block blocks large~
@@ -200,9 +220,11 @@ a large block~
 A large block is sitting here.~
 This block could be used for building.
 ~
-3 e a 0 7
+3 e a 0 8
 0 0 0
 1 0
+C
+1 1
 M
 0
 You heave $p into place.~
@@ -211,6 +233,6 @@ M
 $n heaves $p into place.~
 O+ 1 6077
 R
-5117 0
+4 5117 0
 S
 $

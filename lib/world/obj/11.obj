@@ -178,11 +178,13 @@ an imperium spike~
 An imperium spike is sitting on the ground.~
 The imperium spike can be used for the Ritual of Defense.
 ~
-1 h ano h 3
+1 h ano h 4
 0 3 8
 2 0
+C
+1 1
 R
-5164 0
+4 5164 0
 S
 #1115
 crystal nexus~
@@ -191,11 +193,13 @@ A nexus crystal is lying here.~
    The nexus crystal is a small, fiery gem that is used to build certain
 magical buildings.
 ~
-3 0 a 0 3
+3 0 a 0 4
 0 0 0
 8 0
+C
+1 1
 R
-5164 0
+4 5164 0
 S
 #1116
 staff bloodstaff veined~
@@ -242,11 +246,13 @@ a nocturnium spike~
 A nocturnium spike is stamped into the ground.~
 The nocturnium spike can be used for the Chant of Illusions.
 ~
-1 h ano h 4
+1 h ano h 5
 0 3 8
 2 0
+C
+1 1
 R
-5164 0
+4 5164 0
 S
 #1120
 maul bloodmaul~
