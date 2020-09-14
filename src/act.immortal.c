@@ -99,6 +99,8 @@ extern char *show_color_codes(char *string);
 extern int stats_get_crop_count(crop_data *cp);
 extern int stats_get_sector_count(sector_data *sect);
 void update_class(char_data *ch);
+void update_empire_members_and_greatness(empire_data *emp);
+void update_member_data(char_data *ch);
 void update_world_count();
 
 // locals
@@ -1630,8 +1632,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		affect_total(vict);
 		if (emp) {
-			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
-			et_change_greatness(emp);
+			update_member_data(vict);
+			update_empire_members_and_greatness(emp);
 		}
 	}
 	else if SET_CASE("intelligence") {

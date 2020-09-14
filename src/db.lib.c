@@ -1644,6 +1644,8 @@ empire_data *create_empire(char_data *ch) {
 	extern bool check_unique_empire_name(empire_data *for_emp, char *name);
 	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	void resort_empires(bool force);
+	void update_empire_members_and_greatness(empire_data *emp);
+	void update_member_data(char_data *ch);
 
 	archetype_data *arch;
 	char colorcode[10], name[MAX_STRING_LENGTH];
@@ -1729,6 +1731,10 @@ empire_data *create_empire(char_data *ch) {
 
 	// this is a good time to sort and rank
 	resort_empires(FALSE);
+	
+	// and member data
+	update_member_data(ch);
+	update_empire_members_and_greatness(emp);
 	
 	return emp;
 }
@@ -1931,6 +1937,7 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 void free_empire(empire_data *emp) {
 	void free_empire_goals(struct empire_goal *hash);
 	void free_empire_completed_goals(struct empire_completed_goal *hash);
+	void free_member_data(empire_data *emp);
 	
 	struct workforce_production_limit *wpl, *next_wpl;
 	struct empire_production_total *egt, *next_egt;
@@ -2109,6 +2116,7 @@ void free_empire(empire_data *emp) {
 		}
 	}
 	ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));
+	free_member_data(emp);
 	
 	if (SCRIPT(emp)) {
 		extract_script(emp, EMP_TRIGGER);

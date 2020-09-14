@@ -3785,9 +3785,6 @@ struct player_index_data {
 	int rank;	// empire rank
 	char *last_host;	// last known host
 	
-	bool contributing_greatness;	// whether or not this alt is currently contributing greatness to their empire
-	int greatness_threshold;	// level at which this alt would start/stop contributing greatness
-	
 	UT_hash_handle idnum_hh;	// player_table_by_idnum
 	UT_hash_handle name_hh;	// player_table_by_name
 };
@@ -4632,6 +4629,23 @@ struct empire_log_data {
 };
 
 
+// non-saving shortcut of member data
+struct empire_member_account {
+	int id;	// player account id
+	struct empire_member_data *list;
+	UT_hash_handle hh;	// EMPIRE_MEMBER_ACCOUNTS(), hashed by id
+};
+
+
+// non-saving shortcut of member data
+struct empire_member_data {
+	int id;	// player character idnum
+	int greatness;	// greatness of character
+	time_t timeout_at;	// timestamp when they did/will time out
+	UT_hash_handle hh;	// empire_member_account->list, hashed by id
+};
+
+
 // data related to what an empire needs (on an island)
 struct empire_needs {
 	int type;	// ENEED_ const
@@ -4870,6 +4884,7 @@ struct empire_data {
 	int min_level;	// minimum level in the empire
 	int max_level;	// maximum level in the empire
 	bitvector_t delayed_refresh;	// things that are requesting an update
+	struct empire_member_account *member_accounts;	// tracks greatness/etc
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them

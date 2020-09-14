@@ -568,6 +568,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_WEALTH(emp)  ((emp)->wealth)
 #define EMPIRE_POPULATION(emp)  ((emp)->population)
 #define EMPIRE_LEARNED_CRAFTS(emp)  ((emp)->learned_crafts)
+#define EMPIRE_MEMBER_ACCOUNTS(emp)  ((emp)->member_accounts)
 #define EMPIRE_MILITARY(emp)  ((emp)->military)
 #define EMPIRE_MAX_LEVEL(emp)  ((emp)->max_level)
 #define EMPIRE_MIN_LEVEL(emp)  ((emp)->min_level)

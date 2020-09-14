@@ -88,6 +88,8 @@ void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
 void free_varlist(struct trig_var_data *vd);
 void scale_item_to_level(obj_data *obj, int level);
+void update_empire_members_and_greatness(empire_data *emp);
+void update_member_data(char_data *ch);
 
 // locals
 static void add_obj_binding(int idnum, struct obj_binding **list);
@@ -450,12 +452,11 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_CHARISMA(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			break;
 		case APPLY_GREATNESS: {
-			player_index_data *index;
-			if (!IS_NPC(ch) && GET_LOYALTY(ch) && (index = find_player_index_by_idnum(GET_IDNUM(ch))) && index->contributing_greatness) {
-				EMPIRE_GREATNESS(GET_LOYALTY(ch)) += mod;
-				et_change_greatness(GET_LOYALTY(ch));
-			}
 			SAFE_ADD(GET_GREATNESS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
+			if (!IS_NPC(ch) && GET_LOYALTY(ch)) {
+				update_member_data(ch);
+				update_empire_members_and_greatness(GET_LOYALTY(ch));
+			}
 			break;
 		}
 		case APPLY_INTELLIGENCE:
@@ -736,11 +737,9 @@ void affect_total(char_data *ch) {
 	extern const int base_player_pools[NUM_POOLS];
 
 	struct affected_type *af;
-	player_index_data *index;
 	int i, iter, level;
-	empire_data *emp = GET_LOYALTY(ch);
 	struct obj_apply *apply;
-	int health, move, mana;
+	int health, move, mana, greatness;
 	
 	int pool_bonus_amount = config_get_int("pool_bonus_amount");
 	
@@ -754,6 +753,7 @@ void affect_total(char_data *ch) {
 	move = GET_MOVE(ch);
 	mana = GET_MANA(ch);
 	level = get_approximate_level(ch);
+	greatness = GET_GREATNESS(ch);
 	
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
@@ -865,13 +865,9 @@ void affect_total(char_data *ch) {
 	GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
 	
 	// check greatness thresholds
-	if (!IS_NPC(ch) && emp && (index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
-		if (index->contributing_greatness && GET_GREATNESS(ch) < index->greatness_threshold) {
-			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
-		}
-		else if (!index->contributing_greatness && GET_GREATNESS(ch) > index->greatness_threshold) {
-			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
-		}
+	if (!IS_NPC(ch) && GET_GREATNESS(ch) != greatness && GET_LOYALTY(ch)) {
+		update_member_data(ch);
+		update_empire_members_and_greatness(GET_LOYALTY(ch));
 	}
 }
 

@@ -62,6 +62,7 @@ extern int city_points_available(empire_data *emp);
 void clear_private_owner(int id);
 void deactivate_workforce(empire_data *emp, int island_id, int type);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
+void delete_member_data(char_data *ch, empire_data *from_emp);
 extern bool empire_can_claim(empire_data *emp);
 extern bool empire_is_ignoring(empire_data *emp, char_data *victim);
 extern int get_main_island(empire_data *emp);
@@ -73,6 +74,8 @@ extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, c
 void identify_obj_to_char(obj_data *obj, char_data *ch);
 void refresh_all_quests(char_data *ch);
 void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_with);
+void update_empire_members_and_greatness(empire_data *emp);
+void update_member_data(char_data *ch);
 
 // locals
 bool is_affiliated_island(empire_data *emp, int island_id);
@@ -3740,6 +3743,7 @@ ACMD(do_defect) {
 	else if (GET_IDNUM(ch) == EMPIRE_LEADER(e))
 		msg_to_char(ch, "The leader can't defect!\r\n");
 	else {
+		delete_member_data(ch, GET_LOYALTY(ch));
 		GET_LOYALTY(ch) = NULL;
 		add_cooldown(ch, COOLDOWN_LEFT_EMPIRE, 2 * SECS_PER_REAL_HOUR);
 		queue_delayed_update(ch, CDU_SAVE);
@@ -4619,6 +4623,7 @@ ACMD(do_enroll) {
 		add_lore(targ, LORE_JOIN_EMPIRE, "Honorably accepted into %s%s&0", EMPIRE_BANNER(e), EMPIRE_NAME(e));
 		
 		SAVE_CHAR(targ);
+		update_member_data(targ);
 		
 		// TODO split this out into a "merge empires" func
 
@@ -4647,6 +4652,7 @@ ACMD(do_enroll) {
 					GET_LOYALTY(victim) = e;
 					GET_RANK(victim) = 1;
 					update_player_index(index, victim);
+					update_member_data(victim);
 					SAVE_CHAR(victim);
 				}
 				else if ((victim = find_or_load_player(index->name, &sub_file))) {
@@ -4655,6 +4661,7 @@ ACMD(do_enroll) {
 					GET_LOYALTY(victim) = e;
 					GET_RANK(victim) = 1;
 					update_player_index(index, victim);
+					update_member_data(victim);
 					if (sub_file && victim != targ) {
 						store_loaded_char(victim);
 					}
@@ -4826,6 +4833,7 @@ ACMD(do_enroll) {
 		}
 			
 		// update goal trackers: AFTER rereading tech
+		update_empire_members_and_greatness(e);
 		refresh_empire_goals(e, NOTHING);
 		
 		save_empire(e, TRUE);
@@ -5037,6 +5045,7 @@ ACMD(do_expel) {
 	else if (EMPIRE_LEADER(e) == GET_IDNUM(targ))
 		msg_to_char(ch, "You can't expel the leader!\r\n");
 	else {
+		delete_member_data(targ, e);
 		GET_LOYALTY(targ) = NULL;
 		add_cooldown(targ, COOLDOWN_LEFT_EMPIRE, 2 * SECS_PER_REAL_HOUR);
 		clear_private_owner(GET_IDNUM(targ));
