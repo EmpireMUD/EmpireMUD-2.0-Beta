@@ -324,6 +324,11 @@ typedef struct vehicle_data vehicle_data;
 #define BAN_ALL  3
 
 
+// CONF_FLAG_x: config system flags
+#define CONF_FLAG_DEPRECATED  BIT(0)
+// limit: 15, struct config_type
+
+
 // EVOLVER_x: flags passed through to evolve.c
 #define EVOLVER_OWNED  BIT(0)	// tile is owned
 
@@ -2846,6 +2851,7 @@ struct config_type {
 	CONFIG_HANDLER(*show_func);
 	CONFIG_HANDLER(*edit_func);
 	void *custom_data;
+	sh_int config_flags;	// set in init_config_system
 	
 	UT_hash_handle hh;	// config_table hash
 };

@@ -1660,6 +1660,26 @@ void init_config_custom(char *key, CONFIG_HANDLER(*show_func), CONFIG_HANDLER(*e
 }
 
 
+/**
+* Marks flags on configs that need them.
+*
+* @param char *key The config key to update (must already be set up).
+* @param bitvector_t Any CONF_FLAG_ to add.
+*/
+void init_config_flags(char *key, bitvector_t flags) {
+	struct config_type *cnf;
+	
+	HASH_FIND_STR(config_table, key, cnf);
+	if (!cnf) {
+		log("SYSERR: init_config_custom: %s: no key found", key);
+		return;
+	}
+	
+	// add data
+	cnf->config_flags |= flags;
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CONFIG SYSTEM: SETUP ////////////////////////////////////////////////////
 
@@ -1750,13 +1770,8 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "trench_initial_value", CONFTYPE_INT, "negative starting value for excavate -- done when it counts up to 0");
 	init_config(CONFIG_ACTIONS, "trench_gain_from_rain", CONFTYPE_INT, "amount of rain water per room update added to a trench");
 	init_config(CONFIG_ACTIONS, "trench_fill_time", CONFTYPE_INT, "seconds before a trench is full");
-	init_config(CONFIG_ACTIONS, "max_chore_resource", CONFTYPE_INT, "deprecated: do not set");
 	init_config(CONFIG_ACTIONS, "max_chore_resource_over_total", CONFTYPE_INT, "how much of a resource workers will gather if over the total cap");
 	init_config(CONFIG_ACTIONS, "max_chore_resource_per_member", CONFTYPE_INT, "workforce resource cap per member");
-	init_config(CONFIG_ACTIONS, "max_chore_resource_skilled", CONFTYPE_INT, "deprecated: do not set");
-	
-	// TODO: deprecated
-	init_config(CONFIG_ACTIONS, "trench_full_value", CONFTYPE_INT, "deprecated: do not set");
 
 	// cities
 	init_config(CONFIG_CITY, "players_per_city_point", CONFTYPE_INT, "how many members you need to earn each city point");
@@ -1771,9 +1786,6 @@ void init_config_system(void) {
 	init_config(CONFIG_CITY, "disrepair_limit_unfinished", CONFTYPE_INT, "years of disrepair before unfinished buildings collapse");
 	init_config(CONFIG_CITY, "max_out_of_city_portal", CONFTYPE_INT, "maximum distance a portal can travel outside of a city");
 	init_config(CONFIG_CITY, "minutes_to_full_city", CONFTYPE_INT, "time it takes for a city to count for in-city-only tasks");
-	
-	init_config(CONFIG_CITY, "bonus_city_point_techs", CONFTYPE_INT, "deprecated: do not set");
-	init_config(CONFIG_CITY, "bonus_city_point_wealth", CONFTYPE_INT, "deprecated: do not set");
 
 	// empire
 	init_config(CONFIG_EMPIRE, "homeless_citizen_speed", CONFTYPE_INT, "tiles of movement per real minute, for migrating homeless");
@@ -1796,9 +1808,6 @@ void init_config_system(void) {
 	init_config(CONFIG_EMPIRE, "whole_empire_timeout", CONFTYPE_INT, "days to empire appearing idle");
 	init_config(CONFIG_EMPIRE, "empire_log_ttl", CONFTYPE_INT, "how many days elogs last");
 	init_config(CONFIG_EMPIRE, "redesignate_time", CONFTYPE_INT, "minutes until you can redesignate a room again");
-
-	init_config(CONFIG_EMPIRE, "land_per_tech", CONFTYPE_INT, "deprecated: do not set");
-	init_config(CONFIG_EMPIRE, "land_per_wealth", CONFTYPE_DOUBLE, "deprecated: do not set");
 
 	// items
 	init_config(CONFIG_MOBS, "auto_update_items", CONFTYPE_BOOL, "uses item version numbers to automatically update items");
@@ -1919,14 +1928,8 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "interlink_distance", CONFTYPE_INT, "how far apart two interlinked buildings can be");
 	init_config(CONFIG_WORLD, "interlink_river_limit", CONFTYPE_INT, "how many intervening tiles may be river");
 	init_config(CONFIG_WORLD, "interlink_mountain_limit", CONFTYPE_INT, "how many intervening tiles may be mountain");
-	init_config(CONFIG_WORLD, "generic_facing", CONFTYPE_BITVECTOR, "deprecated: do not set");
 	init_config(CONFIG_WORLD, "newbie_adventure_cap", CONFTYPE_INT, "highest adventure min-level that can spawn on newbie islands");
-	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "deprecated: do not set");
-	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "deprecated: do not set");
 	init_config(CONFIG_WORLD, "vehicle_size_per_tile", CONFTYPE_INT, "maximum total vehicle size on any map tile");
-	
-	// TODO note: deprecated
-	init_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT, "deprecated: do not set");
 	
 	// TODO sector types should be audited on startup to ensure they exist -pc
 	init_config(CONFIG_WORLD, "default_building_sect", CONFTYPE_INT, "vnum of sector used by build command");
@@ -1937,7 +1940,30 @@ void init_config_system(void) {
 		init_config_custom("default_adventure_sect", config_show_sector, config_edit_sector, NULL);
 	init_config(CONFIG_WORLD, "default_land_sect", CONFTYPE_INT, "vnum of sector for basic land");
 		init_config_custom("default_land_sect", config_show_sector, config_edit_sector, NULL);
-
+	
+	// deprecated configs: no longer used/shown
+	init_config(CONFIG_ACTIONS, "max_chore_resource", CONFTYPE_INT, "deprecated: do not set");
+		init_config_flags("max_chore_resource", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_ACTIONS, "max_chore_resource_skilled", CONFTYPE_INT, "deprecated: do not set");
+		init_config_flags("max_chore_resource_skilled", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_ACTIONS, "trench_full_value", CONFTYPE_INT, "deprecated: do not set");
+		init_config_flags("trench_full_value", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_CITY, "bonus_city_point_techs", CONFTYPE_INT, "deprecated: do not set");
+		init_config_flags("bonus_city_point_techs", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_CITY, "bonus_city_point_wealth", CONFTYPE_INT, "deprecated: do not set");
+		init_config_flags("bonus_city_point_wealth", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_EMPIRE, "land_per_tech", CONFTYPE_INT, "deprecated: do not set");
+		init_config_flags("land_per_tech", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_EMPIRE, "land_per_wealth", CONFTYPE_DOUBLE, "deprecated: do not set");
+		init_config_flags("land_per_wealth", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_WORLD, "generic_facing", CONFTYPE_BITVECTOR, "deprecated: do not set");
+		init_config_flags("generic_facing", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_WORLD, "arctic_percent", CONFTYPE_DOUBLE, "deprecated: do not set");
+		init_config_flags("arctic_percent", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_WORLD, "tropics_percent", CONFTYPE_DOUBLE, "deprecated: do not set");
+		init_config_flags("tropics_percent", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_WORLD, "ocean_pool_size", CONFTYPE_INT, "deprecated: do not set");
+		init_config_flags("ocean_pool_size", CONF_FLAG_DEPRECATED);
 
 	// last
 	load_config_system_from_file();
@@ -1980,7 +2006,7 @@ ACMD(do_config) {
 		// only set given: display that set
 		size = snprintf(output, sizeof(output), "%s configs:\r\n", config_groups[set]);
 		HASH_ITER(hh, config_table, cnf, next_cnf) {
-			if (cnf->set != set) {
+			if (cnf->set != set || IS_SET(cnf->config_flags, CONF_FLAG_DEPRECATED)) {
 				continue;
 			}
 			
