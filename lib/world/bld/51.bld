@@ -13,7 +13,7 @@ much protection against the elements.
 ~
 F
 d
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 R
@@ -33,7 +33,7 @@ down. It is, however, still susceptible to fire.
 ~
 F
 d
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 R
@@ -51,7 +51,7 @@ and the ceiling offers superb protection from the rain. It's also warmer in
 here than outside because the better construction traps heat. Even the ground
 is planked with wood to trap in heat.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1003 1 5 0
 R
@@ -70,7 +70,7 @@ burned down, but provides little defense against invaders.
 ~
 F
 d
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1000 1 5 0
 R
@@ -88,7 +88,7 @@ desert's finest structures. It endures all seasons and conditions and is
 difficult to destroy. It is the favored home of the desert-dwellers as
 pueblos can be very large.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 R
@@ -106,7 +106,7 @@ rivals the pueblos of the desert and the houses of the plains both in
 magnitude and design. In fact, it is nearly indestructible, save for an act
 of god.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1003 1 5 0
 R
@@ -122,7 +122,7 @@ C
 drink, fill~
 F
 F
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1000 2 5 0
 S
@@ -166,7 +166,7 @@ useful shape. The metal is then cooled in water.
 ~
 F
 hv
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 241 15.00 ce
 R
@@ -190,7 +190,7 @@ from wheat and other dry grains.
 ~
 F
 n
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 234 10.00 ce
 R
@@ -214,7 +214,7 @@ riversides and then sculpted and heated in the kiln.
 ~
 F
 rGL
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 241 15.00 ce
 R
@@ -238,7 +238,7 @@ managing woolen animals.
 ~
 F
 w
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 233 10.00 ce
 M
@@ -286,7 +286,7 @@ apples and other fruit are lined up on the tables around the room. There are
 shelves lining the walls of this building for storing jars and cans of
 assorted fruit. Some empty jars have been left on one of the tables.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 R
@@ -307,7 +307,7 @@ the storage. The foundry helps empires to clean up their untidy land.
 ~
 F
 v
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1009 1 5 0
 R
@@ -329,7 +329,7 @@ the bottom of each slatted wall is a small door that can be opened for access
 to the grains that are stored here. A large rat is munching on some stray
 corn kernels.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 R
@@ -351,7 +351,7 @@ There are make-shift carts sitting around full of rock and large storage bins
 are scattered all around the place. A pick that's so worn it looks more like
 a mace is lying at your feet.
 ~
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 2 5 0
 S
@@ -372,7 +372,7 @@ scattered around your feet.
 ~
 F
 t
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 2 5 0
 S
@@ -393,7 +393,7 @@ ready to cook with them.
 ~
 F
 G
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 R
@@ -414,7 +414,7 @@ there are skins being stretched and dried, and piles of prepared skins.
 ~
 F
 z
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 241 15.00 ce
 R
@@ -436,7 +436,7 @@ place to stack your stakes and handles. There's even a bin marked 'spare
 trinkets'. The shed is more or less just thrown together, but it serves its
 purpose.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 R
@@ -455,7 +455,7 @@ f
 I 5 102 9.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 23 105 100.00 1  # QUARRY: huge stone block
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1000 1 5 0
 S
@@ -470,7 +470,7 @@ dig~
 F
 f
 I 5 101 100.00 1 X  # DIG: lump of clay
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1000 1 5 0
 S
@@ -486,7 +486,7 @@ beams and ceiling are made from wood, most of the house is stone. This offers
 protection from fire, a feature which lesser buildings could never produce.
 The house seems somehow colder, though. Nevertheless, it is very inviting.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1003 1 5 0
 R
@@ -504,7 +504,7 @@ creating a very strong, very protective structure. This house is tall and
 robust, capable of supporting an entire family or more. It is ideal for the
 head of a plantation or as the seat of a small empire.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 1 1 0
 R
@@ -524,7 +524,7 @@ shrouded from the world below and very difficult to spot. It is a favorite
 hideout of the forest-dwellers, though easily found by those who know what to
 look for.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6790 1 1 0
 R
@@ -544,7 +544,7 @@ structure which rivals any on the ground. Its fatal flaw is that it is made
 of wood and easily burnt, but it has the advantage of being very difficult to
 spot from afar.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 1 1 0
 R
@@ -564,7 +564,7 @@ of underground tunnels which rival land-based structures both in size and
 elegance. The entrance is easily obscured and difficult to find, except at
 night when light spills out.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6015 1 1 0
 R
@@ -581,7 +581,7 @@ D
 desert and plains both in complexity and durability. Nearly indestructible,
 this is a mountain dweller's dream fortress.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6015 1 1 0
 R
@@ -604,7 +604,7 @@ tables.
 ~
 F
 aG
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 241 15.00 ce
 R
@@ -618,6 +618,8 @@ An Apiary~
 &0{BB}~
 10 0 pR 0
 0 0 0 218
+C
+retrieve, store~
 D
    The room is hot and you begin sweating as soon as you enter. Bees swarm
 around you, and the scents of pollen and sweet honey permeate the air.
@@ -625,7 +627,7 @@ Several unused hives have been dismantled, and are resting against the wall.
 ~
 F
 b
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 241 15.00 ce
 R
@@ -649,7 +651,7 @@ makes your mouth water with envy of the person who ate them.
 ~
 F
 GL
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 241 15.00 ce
 R
@@ -687,7 +689,7 @@ furniture, as well as other things.
 ~
 F
 e
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 1 1 0
 R
@@ -709,7 +711,7 @@ glass is air-cooled. Using water would shatter it.
 ~
 F
 i
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 241 15.00 ce
 R
@@ -733,7 +735,7 @@ number of pigeons -- a clear indication the post is well-tended.
 ~
 F
 m
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 9193 5.00 c
 M
@@ -759,7 +761,7 @@ started quilting them into a blanket.
 ~
 F
 y
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 241 15.00 ce
 R
@@ -784,7 +786,7 @@ has the scent of home, and you feel the urge to have a seat and join in.
 ~
 F
 A
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 242 20.00 ce
 M
@@ -830,7 +832,7 @@ many different and curious items.
 ~
 F
 E
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 R
@@ -853,7 +855,7 @@ A Statue~
 0 0 0 -1
 C
 dedicate~
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1001 1 5 0
 R
@@ -867,7 +869,7 @@ A Stone Henge~
 0 0 0 -1
 C
 chant druids~
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 243 30.00 c
 R
@@ -883,7 +885,7 @@ A Gigantic Megalith~
 .&0||&?.~
 48 1 d 0
 0 0 0 -1
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1001 1 5 0
 R
@@ -899,7 +901,7 @@ C
 tomb~
 F
 B
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 9189 2.00 0
 M
@@ -938,7 +940,7 @@ influential, or else very popular.
 ~
 F
 B
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 9189 2.00 0
 M
@@ -966,7 +968,7 @@ itself, a small stick figure atop an altar, is stained with the blood of many
 sacrifices. That same activity leaves a horrid stench in the air, but that
 stench is what attracts patron gods.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 R
@@ -986,7 +988,7 @@ fine stone. At its center, an altar receives sacrifices to the gods. Many
 have died upon the altar, and streams of dried blood run off the sides and
 down into the earth below.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 244 20.00 c
 R
@@ -1011,7 +1013,7 @@ you gaze up its towering shelves.
 ~
 F
 l
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 9198 2.00 0
 R
@@ -1033,7 +1035,7 @@ from its ceremonial chamber, a viewer can see for miles. A column of steps
 cascades down from the top, where the temple altar is surprisingly clean, a
 state mandated by any god worthy of a temple of such stature.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 244 20.00 c
 R
@@ -1060,7 +1062,7 @@ breaks the seal on the door.
 ~
 F
 B
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 9191 2.00 0
 M
@@ -1248,7 +1250,7 @@ every wall are fresh skins hanging to dry. The pungent smell of the smoking
 meat and drying leather leaves a hollow feeling in your stomach, and your mouth
 begins to water.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 9194 5.00 c
 M
@@ -1274,7 +1276,7 @@ water to the bathing pools.
 ~
 F
 cF
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 236 10.00 ce
 M
@@ -1294,7 +1296,7 @@ C
 drink, fill~
 F
 F
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6075 1 1 0
 S
@@ -1314,7 +1316,7 @@ gems, and worn pestles cover the stone tables that sit around the room. A tall,
 winding staircase leads to the top of the tower, although you can't tell what
 is supporting the stairs.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 237 20.00 ce
 R
@@ -1341,7 +1343,7 @@ E
 portcullis gate~
 The portcullis is massive. It must take 5 men to close it.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 2 1 0
 R
@@ -1359,7 +1361,7 @@ decorated with the best gold available. The Great Hall is often one of the most
 important parts of the castle as it shows the wealth of the monarch. It also
 leads to the throne room.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 2 1 0
 R
@@ -1382,7 +1384,7 @@ upgraded by typing upgrade here.
 ~
 F
 j
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 251 5.00 ce
 R
@@ -1409,7 +1411,7 @@ upgraded by typing upgrade here again.
 ~
 F
 j
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 251 5.00 ce
 R
@@ -1433,7 +1435,7 @@ against invasion. Hopefully, it will be enough defense.
 ~
 F
 j
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 251 5.00 ce
 R
@@ -1455,7 +1457,7 @@ dwellers on the run. They provide quick shelter and warmth to passers-by in
 need. The outpost is erected of stone and carved in the mountain itself,
 making it very durable and safe.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 252 33.00 c
 R
@@ -1473,7 +1475,7 @@ sleeping quarters are lined with cots and hammocks, and the scent of roasted
 meat wafts from the kitchen at all hours. So long as the troops are well-fed
 and well-trained, there is little need for the empire to fear.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6075 2 1 0
 S
@@ -1489,7 +1491,7 @@ with the blood of overworked soldiers. This is the place where the empire's
 finest troops hone their combat skills and square off against each other for
 pride and glory, lest they be unprepared when war comes.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6075 2 1 0
 S
@@ -1504,7 +1506,7 @@ D
 return home to a safe place. While not effective against thieves and
 infiltrators, it prevents access by common men and animals.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 251 33.00 ce
 R
@@ -1518,7 +1520,7 @@ A Stone Wall~
 @U&#VV@V~
 32 0 djkn 0
 0 0 0 -1
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6075 1 1 0
 R
@@ -1533,7 +1535,7 @@ Intentionally Left Blank~
 D
 This is a placeholder because craft 5175 is used for great walls.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 S
 #5176
 River Gate~
@@ -1640,7 +1642,7 @@ missing. The mills are quite worn, but they still churn out coins by the pound.
 ~
 F
 p
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 254 100.00 e
 M
@@ -1669,7 +1671,7 @@ reads 'No Bartering'.
 ~
 F
 C
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 1 1 0
 R
@@ -1693,7 +1695,7 @@ and silver of all shapes and sizes.
 ~
 F
 D
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 254 33.00 c
 R
@@ -1721,7 +1723,7 @@ power that flows through this place.
 ~
 F
 q
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6075 1 1 0
 R
@@ -1739,7 +1741,7 @@ repair, and you have trouble believing anybody still lives here. The facade
 is fading and the entryway is faded from the sun. The hallway leads back into
 the house, though it looks very dark and uninviting.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 235 10.00 c
 R
@@ -1764,7 +1766,7 @@ ground, which basks in the sunlight. Beyond that is the dark passage into the
 burrow, which goes at such an angle that the sunlight doesn't penetrate it. A
 hollow echo follows you through the passage.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 235 10.00 c
 R
@@ -1788,7 +1790,7 @@ the parts where the ceilings are intact, there are no windows and the caked
 sides don't spill any light. This makes the interior very dark and very
 uncomfortable.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 235 10.00 c
 R
@@ -1813,7 +1815,7 @@ its halls, and years of emptiness. When you call, there is no echo. Either
 the cave expands forever, or something is consuming the noise within. A cool
 breeze flows from inside, sending the hair on your neck to full attention.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 235 10.00 c
 R
@@ -1834,7 +1836,7 @@ C
 summon player <name>~
 F
 xK
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6075 1 1 0
 R
@@ -1846,7 +1848,7 @@ A Draining Oasis~
 .&c__&?.~
 4 0 dp 0
 0 0 0 -1
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1005 1 5 0
 R
@@ -1868,7 +1870,7 @@ heavy stone press in the other corner extracts the precious oil.
 ~
 F
 s
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 1 1 0
 R
@@ -1889,7 +1891,7 @@ this room is fairly large -- at least, before the shelves. It appears to be a
 collection of the spoils of many an adventure, though you can barely see it as
 the dusty air blocks what little light sneaks in between the relics.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 R
@@ -1936,7 +1938,7 @@ sweating instantly, unable to escape the powerful furnace.
 ~
 F
 hv
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6075 2 1 0
 R
@@ -2003,7 +2005,7 @@ C
 drink, fill~
 F
 F
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1000 2 5 0
 S

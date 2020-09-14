@@ -9,7 +9,7 @@ Magiterranean.
 6 0 a 0 7
 1 0 0
 7 48
-I 14 10501 100.00 4 x  # COMBINE: a handful of glowkra pods
+I 14 10501 100.00 4 x  # COMBINE: handful of glowkra pods
 M
 5
 $n pops a glowing seedpod into $s mouth.~
@@ -29,9 +29,9 @@ This strange crop is surely the work of the mad druids of the Magiterranean.
 6 b a 0 7
 12 10500 0
 7 168
-I 15 10500 100.00 4 x  # SEPARATE: a glowkra pod
+I 15 10500 100.00 4 x  # SEPARATE: glowkra pod
 R
-5114 0
+4 5114 0
 S
 #10502
 jar pickled glowkra pickles~
@@ -47,8 +47,8 @@ B
 c
 C
 0 10
-I 26 801 100.00 1  # DECAYS-TO: a glass jar
-I 27 801 100.00 1  # CONSUMES-TO: a glass jar
+I 26 801 100.00 1  # DECAYS-TO: glass jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 M
 4
 You pop a glowing pod into your mouth from $p.~
@@ -56,7 +56,7 @@ M
 5
 $n pops a glowing pod into $s mouth from $p.~
 R
-5114 0
+4 5114 0
 S
 #10503
 gumbo glowkra seafood plate~
@@ -89,7 +89,7 @@ Craft (Jewelry): dragonstooth sceptre
 0 10502 0
 14 0
 R
-5164 0
+4 5164 0
 S
 #10505
 sceptre dragonstooth~
@@ -122,7 +122,7 @@ light snack.
 C
 0 1
 R
-5210 0
+4 5210 0
 S
 #10507
 spadebrush bundle~
@@ -138,7 +138,7 @@ Craft (requires Basic Crafts): spadebrush shovel
 0 0 0
 0 336
 R
-5116 0
+4 5116 0
 S
 #10508
 shovel spadebrush~
@@ -152,9 +152,9 @@ This shovel is made from the mystical spadebrush plant.
 C
 25 25
 R
-5121 0
+4 5121 0
 R
-5610 0
+4 5610 0
 S
 #10509
 seeds bladegrass handful~
@@ -167,7 +167,7 @@ bladegrass in temperate climates. But good luck eating them.
 0 10503 0
 2 168
 R
-5210 0
+4 5210 0
 S
 #10510
 bladegrass bushel~
@@ -184,7 +184,7 @@ Craft (Archery): bladegrass arrows
 0 0 0
 2 0
 R
-5116 0
+4 5116 0
 S
 #10511
 ironflour sack~
@@ -201,19 +201,19 @@ Bake (no skill required): ironbread
 0 0 0
 2 0
 R
-5109 0
+4 5109 0
 R
-5606 0
+4 5606 0
 S
 #10512
 ration ironbread~
 an ironbread ration~
 An ironbread ration has been dropped here.~
-   This hard bread is cooked, or perhaps forged, from magi-netically engineered
+   This hard bread is baked, or perhaps forged, from magi-netically engineered
 ironflour, using the ancient cooking techniques of the Dwarves! It keeps for
 months and is rich in iron. Actually, it might even be made of iron.
 ~
-6 0 a 0 7
+6 0 a 0 8
 120 0 0
 2 0
 M
@@ -229,7 +229,7 @@ M
 5
 $n bites into $p with a sound like tearing metal.~
 R
-5606 0
+4 5606 0
 S
 #10513
 gemfruit unripe~
@@ -242,7 +242,7 @@ soft and underripe, but possibly edible.
 6 0 0
 7 48
 R
-5114 0
+4 5114 0
 S
 #10514
 gemfruits sparkling basket~
@@ -269,7 +269,7 @@ You trip while looking at the mushroom.
 7 48
 B
 u
-I 14 10516 100.00 4 x  # COMBINE: a basket of magic mushrooms
+I 14 10516 100.00 4 x  # COMBINE: basket of magic mushrooms
 M
 4
 You chew $p until your mouth is dry, and suddenly you don't feel so good...~
@@ -288,12 +288,12 @@ Brew (Healing Elixirs): magic mushroom potion
 7 168
 B
 u
-I 15 10515 100.00 4 x  # SEPARATE: a magic mushroom
+I 15 10515 100.00 4 x  # SEPARATE: magic mushroom
 M
 4
 You chew $p until your mouth is dry, and suddenly you don't feel so good...~
 R
-5606 0
+4 5606 0
 S
 #10517
 potion magic mushroom~
@@ -306,10 +306,10 @@ This foul-smelling mana potion is made from magic mushrooms.
 8 0
 C
 150 150
-I 26 800 100.00 1  # DECAYS-TO: a glass flask
-I 27 800 100.00 1  # CONSUMES-TO: a glass flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 T 1254
 S
 #10518
@@ -336,7 +336,7 @@ Cook: figgy pudding
 24 10506 0
 7 168
 R
-5114 0
+4 5114 0
 S
 #10520
 pudding figgy~
@@ -374,7 +374,7 @@ M
 4
 You eat $p. The figs are surprisingly moist.~
 R
-5606 0
+4 5606 0
 S
 #10523
 beans magic handful~
@@ -413,7 +413,7 @@ Craft (Master Craftsman, level 150): spade-axe
 0 10508 0
 2 168
 R
-5116 0
+4 5116 0
 S
 #10526
 chopper axeroot~
@@ -429,9 +429,9 @@ foods program.
 C
 50 50
 R
-5121 0
+4 5121 0
 R
-5610 0
+4 5610 0
 S
 #10527
 spade-axe axe~
@@ -478,7 +478,7 @@ Type 'use pod' to summon a temporary puppy pet.
 0 10509 0
 0 336
 R
-5111 0
+4 5111 0
 T 10506
 S
 #10530
@@ -506,7 +506,7 @@ magi-netically engineered by a group of druids to grow natural tools.
 6 10510 0
 0 48
 R
-5114 0
+4 5114 0
 S
 #10532
 stalk pickthorn~
@@ -522,7 +522,7 @@ Craft (Master Craftsman, level 150): pick-and-pan
 0 0 0
 0 0
 R
-5118 0
+4 5118 0
 S
 #10533
 pick thorn~
@@ -538,9 +538,9 @@ Magiterranean druids come up with next?
 C
 50 50
 R
-5121 0
+4 5121 0
 R
-5610 0
+4 5610 0
 S
 #10534
 pick-and-pan pan~
@@ -568,7 +568,7 @@ and will grow carnivorous flora to attack invaders.
 7 168
 O+ 1 6424
 R
-5111 0
+4 5111 0
 S
 #10536
 ashes~
@@ -589,10 +589,10 @@ Beanstalks work as pillars in place of logs.
 3 e a 0 4
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 11 1002 100.00 1  # LIGHT: roaring fire
 O+ 1 6015
 R
-5118 0
+4 5118 0
 S
 #10550
 portal frosty arch ice~
@@ -618,7 +618,7 @@ intermixed in the bunch, so you could also plant them.
 7 168
 O+ 1 6132
 R
-5114 0
+4 5114 0
 S
 #10552
 berries brambleberries arctic~
@@ -647,7 +647,7 @@ A
 C
 1 1
 R
-5606 0
+4 5606 0
 S
 #10554
 runes strange glacier~
@@ -700,14 +700,14 @@ of winter about it.
 3 e a 0 6
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
-I 16 10560 100.00 1  # SCRAPE: a spruce post
-I 16 121 25.00 7 s  # SCRAPE: some sticks and leaves
-I 16 121 25.00 6 s  # SCRAPE: some sticks and leaves
-I 16 121 25.00 8 s  # SCRAPE: some sticks and leaves
-I 16 121 25.00 5 s  # SCRAPE: some sticks and leaves
-I 17 10559 50.00 2 L  # SAW: some fresh spruce lumber
-I 17 10559 50.00 3 L  # SAW: some fresh spruce lumber
+I 11 1002 100.00 1  # LIGHT: roaring fire
+I 16 10560 100.00 1  # SCRAPE: spruce post
+I 16 121 25.00 7 s  # SCRAPE: sticks and leaves
+I 16 121 25.00 6 s  # SCRAPE: sticks and leaves
+I 16 121 25.00 8 s  # SCRAPE: sticks and leaves
+I 16 121 25.00 5 s  # SCRAPE: sticks and leaves
+I 17 10559 50.00 2 L  # SAW: fresh spruce lumber
+I 17 10559 50.00 3 L  # SAW: fresh spruce lumber
 M
 7
 $n carves out a tree for $V.~
@@ -716,7 +716,7 @@ M
 You carve out a tree for $V.~
 O+ 1 6010
 R
-5118 0
+4 5118 0
 S
 #10559
 lumber spruce fresh~
@@ -728,7 +728,7 @@ construction.
 3 e a 0 5
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 11 1002 100.00 1  # LIGHT: roaring fire
 M
 0
 You position some lumber and tie it in place.~
@@ -743,9 +743,9 @@ M
 $n positions some lumber on the frame of $V.~
 O+ 1 6000
 R
-5118 0
+4 5118 0
 R
-5134 0
+4 5134 0
 S
 #10560
 post spruce~
@@ -756,8 +756,8 @@ This post is made from fresh spruce wood, and can be used in construction.
 3 e a 0 6
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
-I 17 10559 100.00 1  # SAW: some fresh spruce lumber
+I 11 1002 100.00 1  # LIGHT: roaring fire
+I 17 10559 100.00 1  # SAW: fresh spruce lumber
 M
 7
 $n hoists a post onto $V.~
@@ -766,7 +766,7 @@ M
 You hoist a post onto $V.~
 O+ 1 6015
 R
-5118 0
+4 5118 0
 S
 #10561
 ferns frost bouquet~

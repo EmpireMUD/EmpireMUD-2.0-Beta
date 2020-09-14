@@ -106,8 +106,14 @@ end
 undead blocking~
 0 s 100
 ~
-%send% %actor% %self.name% won't let you pass!
-return 0
+if %actor.is_pc%
+  if %actor.can_see(%self%)%
+    %send% %actor% %self.name% won't let you pass!
+  else
+    mkill %actor%
+  end
+  return 0
+end
 ~
 #16007
 skeletal combat~
@@ -256,14 +262,17 @@ entering the adventure~
 1 c 4
 enter~
 if %actor.obj_target(%arg%)% == %self%
+  if %actor.completed_quest_instance(16039)%
+    %send% %actor% You have already fed the invasion. You have no more business here.
+    halt
+  end
   if %actor.inventory(16021)%
     return 0
-    wait 0.5
     %purge% %actor.inventory(16021)%
     %send% %actor% The disc of solidified blood melts as it touches the barier and allows you to pass.
   else
     %send% %actor% You bounce off of a magical barier. Seems there's a key of some sort needed to get through.
-%echoaround% %actor% You watch %actor.name% flatten %actor.hisher% nose against a magical barier.
+    %echoaround% %actor% You watch %actor.name% flatten %actor.hisher% nose against a magical barier.
     return 1
   end
 else
@@ -277,10 +286,8 @@ drops blood disc~
 if !%actor.inventory(16021)%
   %load% obj 16021 %actor% inv
   %send% %actor% As you deal the final blow, you find a disc of solidified blood and slip it into your pocket.
-  halt
 else
   %send% %actor% The solidified disc of blood you carry pulses in response to the death, but there is no change.
-  halt
 end
 ~
 #16023
@@ -312,16 +319,18 @@ if %actor.is_pc%
   %send% %actor% A vampire scout tells you, 'You won't get far! Sooner or later, I will kill you!'
   wait 2 sec
   mhunt %actor%
-else
-  halt
 end
 ~
 #16026
 wandering vamps~
 0 n 100
 ~
-%echo% A vampire appears from the shadows and flashes out through the arch.
+%echo% %self.name% appears from the shadows and flashes out through the arch.
 mgoto %instance.location%
+mmove
+mmove
+mmove
+mmove
 mmove
 mmove
 mmove
@@ -344,14 +353,12 @@ end
 ~
 #16028
 tripping in the cave~
-2 g 60
+2 g 70
 ~
-wait 1
-if %actor.is_flying%
+if !%actor.is_flying% && %actor.is_pc%
   %echoaround% %actor% %actor.name% trips on the uneven ground and hits the dirt.
   %send% %actor% Your foot catches on something and you drop to the ground.
-  wait 1
-  dg_affect %actor% stunned on 2
+  dg_affect %actor% stunned on 6
 end
 ~
 #16029
@@ -360,38 +367,29 @@ illusion magic~
 ~
 switch %random.5%
   case 1
-    set dead_char %random.char%
-    wait 1
+    set dead_char %random.enemy%
     %send% %dead_char% A lightning bolt comes down from the roof and sends your rings flying.
-    %echoaround% %dead_char% A lightningbolt strikes %dead_char.name% and blows their rings off their hands.
-    wait 1
-    unset dead_char
+    %echoaround% %dead_char% A lightningbolt strikes %dead_char.name% and blows %dead_char.hisher% rings off %dead_char.hisher% hands!
   break
   case 2
     %echo% All of the exits brick over as the vampire smirks.
     say This chamber will be your tomb.
   break
   case 3
-    set dead_char %random.char%
-    wait 1
+    set dead_char %random.enemy%
     dg_affect %dead_char% stoned on 180
     %send% %dead_char% A flash from the illusionist's hand forces you to shut your eyes and when you open them again, the world doesn't quite look the same.
     %echoaround% %dead_char% A flash of light strikes %dead_char.name% with no visible affect.
-    wait 1
-    unset dead_char
   break
   case 4
-    set dead_char %random.char%
-    wait 1
+    set dead_char %random.enemy%
     %send% %dead_char% A blade spins out of no where and carves a line across your throat.
-    %echoaround% %dead_char% A blade comes flying through the air and opens %dead_char%'s throat.
+    %echoaround% %dead_char% A blade comes flying through the air and opens %dead_char.name%'s throat.
     wait 3 sec
     %send% %dead_char% Blood sprays all down your front.
     %echoaround% %dead_char% Blood sprays all down %dead_char.hisher% front.
     wait 2 sec
     %echo% The mess vanishes, wound and all.
-    wait 1
-    unset dead_char
   break
   case 5
     %echo% Blood begins to fill the room as %self.name% floats up to the ceiling.
@@ -411,8 +409,13 @@ attach 16031 %self.room.id%
 eval newroom %self.room.template% + 8
 %door% %self.room% down room i%newroom%
 %door% i%newroom% up room %self.room%
-wait 1
-unset newroom
+set person %self.room.people%
+while %person%
+  if %person.is_pc% && %person.empire%
+    nop %person.empire.start_progress(16020)%
+  end
+  set person %person.next_in_room%
+done
 ~
 #16031
 remove the illusionist's exits~
@@ -432,16 +435,24 @@ illusionist in random room~
 ~
 eval random_room %random.8% + 16021
 mgoto i%random_room%
-wait 2
-unset random_room
-detach 16032 %self.id%
 ~
 #16033
 vampire blocking~
 0 s 100
 ~
-%send% %actor% %self.name% won't let you pass!
-return 0
+set room_var %self.room%
+eval move_dir %%room_var.%direction%(room)%%
+if %actor.vampire%
+  if !%move_dir% || %move_dir.template% < %room_var.template%
+    %echo% %self.name% says, "By all means %actor.name%, go with my blessing."
+  else
+    %echo% %self.name% says, "I'm sorry %actor.name%, but even being a fellow vampire, I may not let you pass."
+    return 0
+  end
+else
+  %echo% %self.name% says, "Good try %actor.name%, but you won't be making it out of this chamber alive."
+  return 0
+end
 ~
 #16034
 vampire alchemist combat~
@@ -451,10 +462,10 @@ vampire alchemist combat~
 ~
 #16035
 tile password set~
-2 c 0
-test~
+2 f 100
+~
 if %tile_row% == 5
-%door% %self% north purge
+  %door% %self% north purge
 end
 if %tile_row% >> 1
   unset tile_row
@@ -540,12 +551,10 @@ set tile_password %tile_password.cdr%
 set step_tile3 %tile_password.car%
 set tile_password %tile_password.cdr%
 set step_tile4 %tile_password.car%
-unset tile_password
 global step_tile1
 global step_tile2
 global step_tile3
 global step_tile4
-%echo% t1 %step_tile1%, t2 %step_tile2%, t3 %step_tile3%, t4 %step_tile4%.
 ~
 #16036
 stepping on tiles~
@@ -620,5 +629,6 @@ if %tile_row% == 4
     halt
   end
 end
+%echo% domino forgot a fail message, but you didn't get it right, try again.
 ~
 $
