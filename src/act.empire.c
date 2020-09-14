@@ -2031,7 +2031,7 @@ void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool 
 				to_room = real_shift(cityloc, x, y);
 			
 				// check ownership
-				if (to_room && ROOM_OWNER(to_room) == emp) {
+				if (to_room && ROOM_OWNER(to_room) == emp && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_ABANDON)) {
 					// warning: never abandon things that are still within another city
 					if (get_territory_type_for_empire(to_room, emp, FALSE, &junk) != TER_CITY) {
 						// check if ACTUALLY within the abandoned city
