@@ -7,11 +7,13 @@ it catches the light. Legend says that if a sorcerer were to enchant a seed
 like this with a prismatic crystal, it would grow into an entire enchanted
 forest. To enchant the seed, use 'enchant seed'. This requires Enchant Tools.
 ~
-3 0 a 0 5
+3 0 a 0 6
 0 0 0
 12 0
+C
+1 1
 R
-5164 0
+4 5164 0
 T 600
 S
 #601
@@ -36,12 +38,14 @@ A prismatic crystal sparkles on the ground.~
    This small gem shimmers with every color of the rainbow, casting fanciful
 shadows all around. Magical gems like this one are used in many skilled crafts.
 ~
-3 l a 0 3
+3 l a 0 4
 0 0 0
 12 0
+C
+1 1
 O+ 1 6601
 R
-5164 0
+4 5164 0
 S
 #603
 enchanted-tree tree trees enchanted~
@@ -51,14 +55,16 @@ An enchanted tree is lying here, leaking mana from its stump.~
 these trees is used in certain advanced crafts, to bring magical properties to
 highly skilled artifacts.
 ~
-3 e a 0 10
+3 e a 0 11
 0 0 0
 0 0
-I 11 617 100.00 1  # LIGHT: a magical fire
-I 17 604 100.00 2  # SAW: some stellar magewood
+C
+1 1
+I 11 617 100.00 1  # LIGHT: magical fire
+I 17 604 100.00 2  # SAW: stellar magewood
 O+ 1 6012
 R
-5118 0
+4 5118 0
 S
 #604
 magewood wood stellar pile~
@@ -68,10 +74,12 @@ A pile of magewood is lying here.~
 from its ends, forming a cool mist on the ground. Magewood is used in some
 highly skilled crafts.
 ~
-3 el a 0 9
+3 el a 0 10
 0 0 0
 0 0
-I 11 617 100.00 1  # LIGHT: a magical fire
+C
+1 1
+I 11 617 100.00 1  # LIGHT: magical fire
 M
 0
 You place $p in midair, where it seems to float.~
@@ -86,7 +94,7 @@ M
 $n attaches $p in midair, where it seems to float.~
 O+ 1 6001
 R
-5118 0
+4 5118 0
 S
 #605
 wood dead pile~
@@ -123,13 +131,15 @@ The shimmering hide of a magical beast is lying here.~
    Light breaks apart into rainbows as it passes near this magical skin, making
 it hard to tell what color it really is.
 ~
-3 0 a 0 5
+3 0 a 0 6
 0 0 0
 7 0
-I 18 608 100.00 1 t  # TAN: a piece of shimmering leather
+C
+1 1
+I 18 608 100.00 1 t  # TAN: piece of shimmering leather
 O+ 1 6510
 R
-5120 0
+4 5120 0
 S
 #608
 shimmering-leather leathers shimmering piece~
@@ -139,12 +149,14 @@ A large piece of shimmering leather is lying here.~
 softly with iridescent light. While pretty, it's mostly only useful for the
 same things as ordinary leather.
 ~
-3 0 a 0 4
+3 0 a 0 5
 0 0 0
 7 0
+C
+1 1
 O+ 1 6530
 R
-5120 0
+4 5120 0
 S
 #609
 moonstone-ore moonstone ore chunk majestic~
@@ -154,12 +166,14 @@ A majestic chunk of moonstone ore is lying here.~
 On its own, it is too soft to make tools or weapons. But if smelted with other
 rare metals, it creates the incredible alloys called argentine and eventide.
 ~
-3 l a 0 7
+3 l a 0 8
 0 0 0
 1 0
+C
+1 1
 O+ 1 6701
 R
-5115 0
+4 5115 0
 S
 #610
 argentine-ingot argentine ingots~
@@ -169,12 +183,14 @@ An argentine ingot is stacked here.~
 Argentine ingots are used to create incredibly powerful weapons and armors.
 This metal is notoriously difficult to work with, and requires great skill.
 ~
-3 l a 0 4
+3 l a 0 5
 0 0 0
 2 0
+C
+1 1
 O+ 1 6740
 R
-5115 0
+4 5115 0
 S
 #611
 eventide-ingot ingots eventide~
@@ -186,12 +202,14 @@ used to forge powerful magical weapons, and the metal is sometimes spun into
 thread to stitch robes for the greatest sorcerers. Eventide is unusually
 difficult to forge, and requires incredible skill.
 ~
-3 l a 0 4
+3 l a 0 5
 0 0 0
 2 0
+C
+1 1
 O+ 1 6740
 R
-5115 0
+4 5115 0
 S
 #612
 cloth sparkfiber bolt~
@@ -207,7 +225,7 @@ craftsmen.
 11 0
 O+ 1 6810
 R
-5137 0
+4 5137 0
 S
 #613
 cloth bolt manasilk silk~
@@ -217,12 +235,14 @@ A bolt of manasilk cloth has been left here.~
 your rough hands don't catch on it. This magical cloth is used to make armor
 and clothing for the greatest healers, by highly skilled craftsmen.
 ~
-3 l a 0 6
+3 l a 0 7
 0 0 0
 11 0
+C
+1 1
 O+ 1 6810
 R
-5137 0
+4 5137 0
 S
 #614
 briar-hide hide briar pile leathers~
@@ -232,12 +252,14 @@ A pile of briar hide is precariously stacked here.~
 the outside becomes spiny and sharp. This type of leather is used to make great
 armors, by the most skilled craftsmen.
 ~
-3 l a 0 3
+3 l a 0 4
 0 0 0
 7 0
+C
+1 1
 O+ 1 6531
 R
-5120 0
+4 5120 0
 S
 #615
 absinthian-leather leather absinthian pile leathers~
@@ -247,12 +269,14 @@ A pile of absinthian leather seethes on the ground.~
 mere presence gives onlookers a bitter taste. This fine leather is used to make
 vitriolic weapons and armor, by skilled craftsmen.
 ~
-3 l a 0 4
+3 l a 0 5
 0 0 0
 7 0
+C
+1 1
 O+ 1 6531
 R
-5120 0
+4 5120 0
 S
 #616
 handle handles elegant~
@@ -268,7 +292,7 @@ C
 1 1
 O+ 1 6851
 R
-5121 0
+4 5121 0
 S
 #617
 fire magical magenta~
@@ -289,14 +313,16 @@ A weirdwood tree has fallen here, leaking mana from its stump.~
 from these trees is used in certain advanced crafts, to bring magical
 properties to highly skilled artifacts.
 ~
-3 e a 0 12
+3 e a 0 13
 0 0 0
 0 0
-I 11 617 100.00 1  # LIGHT: a magical fire
-I 17 619 100.00 2  # SAW: some empyreal magewood
+C
+1 1
+I 11 617 100.00 1  # LIGHT: magical fire
+I 17 619 100.00 2  # SAW: empyreal magewood
 O+ 1 6012
 R
-5118 0
+4 5118 0
 S
 #619
 magewood wood empyreal pile~
@@ -306,10 +332,12 @@ A pile of empyreal magewood is stacked here.~
 forest. Mana seeps from its ends forming a cool blue mist on the ground.
 Magewood is used in some highly skilled crafts.
 ~
-3 el a 0 10
+3 el a 0 11
 0 0 0
 0 0
-I 11 617 100.00 1  # LIGHT: a magical fire
+C
+1 1
+I 11 617 100.00 1  # LIGHT: magical fire
 M
 0
 You place $p in midair, where it seems to float.~
@@ -324,7 +352,7 @@ M
 $n attaches $p in midair, where it seems to float.~
 O+ 1 6001
 R
-5118 0
+4 5118 0
 S
 #620
 bottle brass~

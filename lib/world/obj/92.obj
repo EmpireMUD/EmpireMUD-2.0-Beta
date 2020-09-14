@@ -5,11 +5,13 @@ A pirate's chest is sitting here.~
    This old wooden chest has a skull and crossbones carved into the lid. The
 gold inside comes from many nations, each certainly also missing a ship.
 ~
-15 e a 0 2
+15 e a 0 3
 100 0 0
 4 0
+C
+1 1
 R
-5611 0
+4 5611 0
 S
 #9212
 fur furs red bright~
@@ -17,12 +19,14 @@ a bright red fur~
 A bright red fur has been left here.~
 This fur is a deep shade of red, with a red striped tail.
 ~
-3 0 a 0 5
+3 0 a 0 6
 0 0 0
 7 0
+C
+1 1
 O+ 1 6541
 R
-5120 0
+4 5120 0
 S
 #9213
 hide furs black white~
@@ -31,12 +35,14 @@ A black and white hide is folded here.~
    This huge fur is all black and white. It must have come from a magnificent
 animal.
 ~
-3 0 a 0 6
+3 0 a 0 7
 0 0 0
 7 0
+C
+1 1
 O+ 1 6550
 R
-5120 0
+4 5120 0
 S
 #9219
 acorn golden~
@@ -46,11 +52,13 @@ A golden acorn is lying here.~
 squirrel got it, and it doesn't look like it would grow into a tree, but it
 would certainly look good in your vault.
 ~
-15 0 a 0 2
+15 0 a 0 3
 3 0 0
 4 0
+C
+100 100
 R
-5611 a
+4 5611 a
 S
 #9234
 wool sack yak~
@@ -58,11 +66,13 @@ a sack of yak wool~
 A sack of yak wool is sitting here.~
 You can weave 'yak wool cloth' from this. It's just as good as any other wool.
 ~
-3 0 a 0 8
+3 0 a 0 9
 0 0 0
 7 0
+C
+1 1
 O+ 1 6441
 R
-5137 0
+4 5137 0
 S
 $

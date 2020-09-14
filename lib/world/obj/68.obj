@@ -4,9 +4,11 @@ a bolt of cloth~
 A bolt of cloth is lying on the ground.~
 This simple cloth is used to sew clothing.
 ~
-3 0 a 0 8
+3 0 a 0 9
 0 0 0
 11 0
+C
+1 1
 M
 6
 You hang some cloth on $V.~
@@ -15,7 +17,7 @@ M
 $n hangs some cloth on $V.~
 O+ 1 6800
 R
-5137 0
+4 5137 0
 S
 #6810
 cloth magic bolt~
@@ -23,9 +25,11 @@ a bolt of magic cloth~
 A bolt of magic cloth is glowing on the ground.~
 This glowing cloth is used to sew magical garments.
 ~
-3 0 a 0 9
+3 0 a 0 10
 0 0 0
 11 0
+C
+1 1
 M
 6
 You hang some magic cloth on $V.~
@@ -34,7 +38,7 @@ M
 $n hangs some magic cloth on $V.~
 O+ 1 6810
 R
-5137 0
+4 5137 0
 S
 #6830
 glass~
@@ -43,12 +47,14 @@ Some glass is scattered here.~
    This glass is broken and probably can't be used for much in its current
 state, but you may be able to craft with it.
 ~
-3 0 a 0 9
+3 0 a 0 10
 0 0 0
 8 0
+C
+1 1
 O+ 1 6830
 R
-5135 0
+4 5135 0
 S
 #6851
 handle magic~
@@ -64,7 +70,7 @@ C
 1 1
 O+ 1 6851
 R
-5121 0
+4 5121 0
 S
 #6870
 cord length~
@@ -73,9 +79,11 @@ A length of cord is looped on the ground.~
    This small cord could be used to bind things, though it isn't large enough
 or sturdy enough for heavy use.
 ~
-3 0 a 0 9
+3 0 a 0 10
 0 0 0
 0 0
+C
+1 1
 M
 6
 You attach $p to $V.~
@@ -90,9 +98,9 @@ M
 $n ties things up with $p.~
 O+ 1 6870
 R
-5121 0
+4 5121 0
 R
-5610 0
+4 5610 0
 S
 #6890
 paint~
@@ -107,7 +115,7 @@ C
 1 1
 O+ 1 6890
 R
-1401 0
+4 1401 0
 S
 #6891
 wax~
@@ -115,11 +123,13 @@ some wax~
 Some wax is piled here.~
 Wax can be crafted into a candle or other small things.
 ~
-3 0 a 0 6
+3 0 a 0 7
 0 0 0
 9 100
+C
+1 1
 O+ 1 6891
 R
-5121 0
+4 5121 0
 S
 $

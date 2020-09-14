@@ -4,9 +4,11 @@ a handful of whitegrass~
 A handful of picked whitegrass is on the ground.~
 Whitegrass is an herb used to make potions.
 ~
-3 l a 0 4
+3 l a 0 5
 0 0 0
 0 0
+C
+1 1
 M
 0
 You plant some whitegrass in a bed of moss.~
@@ -15,7 +17,7 @@ M
 $n plants some whitegrass in a bed of moss.~
 O+ 1 6650
 R
-5130 0
+4 5130 0
 S
 #1201
 fiveleaf leaf herbs sack~
@@ -23,9 +25,11 @@ a sack of fiveleaf~
 A sack of fiveleaf is lying on the ground.~
 Fiveleaf is an herb used to make potions.
 ~
-3 l a 0 5
+3 l a 0 6
 0 0 0
 0 0
+C
+1 1
 M
 0
 You plant some fiveleaf cuttings and tie them to stakes.~
@@ -34,7 +38,7 @@ M
 $n plants some fiveleaf cuttings and ties them to stakes.~
 O+ 1 6650
 R
-5130 0
+4 5130 0
 S
 #1202
 redthorn thorn twig herbs~
@@ -42,9 +46,11 @@ a twig of redthorn~
 A twig of redthorn has been dropped here.~
 Redthorn is an herb used to make potions.
 ~
-3 l a 0 4
+3 l a 0 5
 0 0 0
 0 0
+C
+1 1
 M
 0
 You plant a twig of redthorn and pour some water around it.~
@@ -53,7 +59,7 @@ M
 $n plants a twig of redthorn and pours some water around it.~
 O+ 1 6650
 R
-5130 0
+4 5130 0
 S
 #1203
 magewhisper whisper sepals herbs pile~
@@ -61,9 +67,11 @@ some magewhisper sepals~
 A pile of magewhisper sepals sits on the ground.~
 Magewhisper is an herb used to make potions.
 ~
-3 l a 0 4
+3 l a 0 5
 0 0 0
 0 0
+C
+1 1
 M
 0
 You sprinkle shredded magewhisper sepals over fertilizer and watch as stems instantly begin to grow.~
@@ -72,7 +80,7 @@ M
 $n sprinkles shredded magewhisper sepals over fertilizer. You watch as stems instantly begin to grow.~
 O+ 1 6650
 R
-5130 0
+4 5130 0
 S
 #1204
 daggerbite bite frond herbs~
@@ -80,9 +88,11 @@ a daggerbite frond~
 A daggerbite frond has been left here.~
 Daggerbite is an herb used to make potions.
 ~
-3 l a 0 4
+3 l a 0 5
 0 0 0
 0 0
+C
+1 1
 M
 0
 You plant a frond of daggerbite in some sand.~
@@ -91,7 +101,7 @@ M
 $n plants a frond of daggerbite in some sand.~
 O+ 1 6650
 R
-5130 0
+4 5130 0
 S
 #1205
 bileberries bileberry berries berry noxious herbs~
@@ -99,9 +109,11 @@ some bileberries~
 Some noxious bileberries are lying on the ground.~
 Bileberries are an herb used to make potions.
 ~
-3 l a 0 4
+3 l a 0 5
 0 0 0
 0 0
+C
+1 1
 M
 0
 You plant some bileberries on a raft of twigs.~
@@ -110,7 +122,7 @@ M
 $n plants some bileberries on a raft of twigs.~
 O+ 1 6650
 R
-5130 0
+4 5130 0
 S
 #1206
 iris blue iridescent gems~
@@ -118,12 +130,14 @@ an iridescent blue iris~
 An iridescent iris is growing here.~
 The iridescent flower can be used in certain crafts and enchantments.
 ~
-3 l a 0 5
+3 l a 0 6
 0 0 0
 0 0
+C
+1 1
 O+ 1 6600
 R
-5164 0
+4 5164 0
 S
 #1210
 jar whitegrass distilled herbs~
@@ -131,14 +145,16 @@ a jar of distilled whitegrass~
 A jar of distilled whitegrass has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 0 5
+3 0 a 0 6
 0 0 0
 8 0
-I 26 801 100.00 1  # DECAYS-TO: a jar
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+C
+1 1
+I 26 801 100.00 1  # DECAYS-TO: glass jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6651
 R
-5130 0
+4 5130 0
 S
 #1211
 jar resin fiveleaf leaf herbs~
@@ -146,14 +162,16 @@ a jar of fiveleaf resin~
 A jar of fiveleaf resin has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 0 7
+3 0 a 0 8
 0 0 0
 8 0
-I 26 801 100.00 1  # DECAYS-TO: a jar
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+C
+1 1
+I 26 801 100.00 1  # DECAYS-TO: glass jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6651
 R
-5130 0
+4 5130 0
 S
 #1212
 jar extract redthorn thorn herbs~
@@ -161,14 +179,16 @@ a jar of redthorn extract~
 A jar of redthorn extract has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 0 8
+3 0 a 0 9
 0 0 0
 8 0
-I 26 801 100.00 1  # DECAYS-TO: a jar
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+C
+1 1
+I 26 801 100.00 1  # DECAYS-TO: glass jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6651
 R
-5130 0
+4 5130 0
 S
 #1213
 jar essence magewhisper whisper herbs~
@@ -176,14 +196,16 @@ a jar of magewhisper essence~
 A jar of magewhisper essence has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 0 8
+3 0 a 0 9
 0 0 0
 8 0
-I 26 801 100.00 1  # DECAYS-TO: a jar
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+C
+1 1
+I 26 801 100.00 1  # DECAYS-TO: glass jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6651
 R
-5130 0
+4 5130 0
 S
 #1214
 jar daggerbite bite concentrated herbs~
@@ -191,14 +213,16 @@ a jar of concentrated daggerbite~
 A jar of concentrated daggerbite has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 0 9
+3 0 a 0 10
 0 0 0
 8 0
-I 26 801 100.00 1  # DECAYS-TO: a jar
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+C
+1 1
+I 26 801 100.00 1  # DECAYS-TO: glass jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6651
 R
-5130 0
+4 5130 0
 S
 #1215
 jar bileberry berry juice herbs~
@@ -206,14 +230,16 @@ a jar of bileberry juice~
 A jar of bileberry juice has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-25 0 a 0 12
+25 0 a 0 13
 -1 0 -1
 8 0
-I 26 801 100.00 1  # DECAYS-TO: a jar
-I 27 801 100.00 1  # CONSUMES-TO: a jar
+C
+1 1
+I 26 801 100.00 1  # DECAYS-TO: glass jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 O+ 1 6651
 R
-5130 0
+4 5130 0
 S
 #1250
 potion healing healing-potion~
@@ -227,10 +253,10 @@ A healing potion is sitting on the ground.~
 8 0
 C
 75 75
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 T 1250
 S
 #1251
@@ -246,10 +272,10 @@ A
 3 1 0
 C
 75 75
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #1252
 potion stamina stamina-potion~
@@ -263,10 +289,10 @@ alias for 'quaff stamina-potion' to make sure you target the right potion.
 8 0
 C
 75 75
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 T 1252
 S
 #1253
@@ -282,10 +308,10 @@ A
 6 1 0
 C
 75 75
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #1254
 potion mana mana-potion~
@@ -299,10 +325,10 @@ A mana potion is sitting on the ground.~
 8 0
 C
 75 75
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 T 1254
 S
 #1255
@@ -318,10 +344,10 @@ A
 7 1 0
 C
 75 75
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #1256
 potion strength~
@@ -336,10 +362,10 @@ A
 1 1 0
 C
 75 75
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #1257
 potion dexterity~
@@ -354,10 +380,10 @@ A
 2 1 0
 C
 75 75
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #1258
 potion charisma~
@@ -372,10 +398,10 @@ A
 4 1 0
 C
 75 75
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #1259
 potion intelligence~
@@ -390,10 +416,10 @@ A
 8 1 0
 C
 75 75
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #1260
 potion wits~
@@ -408,10 +434,10 @@ A
 9 1 0
 C
 75 75
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #1261
 potion armor~
@@ -426,10 +452,10 @@ A
 12 1 0
 C
 100 100
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #1262
 potion haste~
@@ -444,10 +470,10 @@ B
 q
 C
 100 100
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #1263
 potion blocking~
@@ -462,10 +488,10 @@ A
 13 1 0
 C
 100 100
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #1264
 vial poison searing~
@@ -478,10 +504,10 @@ Use this poison to enhance your attacks.
 8 0
 C
 100 100
-I 26 808 100.00 1  # DECAYS-TO: a vial
-I 27 808 100.00 1  # CONSUMES-TO: a vial
+I 26 808 100.00 1  # DECAYS-TO: glass vial
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
 R
-5130 0
+4 5130 0
 T 1264
 S
 #1265
@@ -497,10 +523,10 @@ A
 15 -1 0
 C
 100 100
-I 26 808 100.00 1  # DECAYS-TO: a vial
-I 27 808 100.00 1  # CONSUMES-TO: a vial
+I 26 808 100.00 1  # DECAYS-TO: glass vial
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
 R
-5130 0
+4 5130 0
 S
 #1266
 vial poison exhaustion~
@@ -515,10 +541,10 @@ A
 11 -1 0
 C
 100 100
-I 26 808 100.00 1  # DECAYS-TO: a vial
-I 27 808 100.00 1  # CONSUMES-TO: a vial
+I 26 808 100.00 1  # DECAYS-TO: glass vial
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
 R
-5130 0
+4 5130 0
 S
 #1267
 vial poison braindrain drain~
@@ -533,10 +559,10 @@ A
 16 -1 0
 C
 100 100
-I 26 808 100.00 1  # DECAYS-TO: a vial
-I 27 808 100.00 1  # CONSUMES-TO: a vial
+I 26 808 100.00 1  # DECAYS-TO: glass vial
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
 R
-5130 0
+4 5130 0
 S
 #1268
 vial poison strength~
@@ -551,10 +577,10 @@ A
 1 -1 0
 C
 100 100
-I 26 808 100.00 1  # DECAYS-TO: a vial
-I 27 808 100.00 1  # CONSUMES-TO: a vial
+I 26 808 100.00 1  # DECAYS-TO: glass vial
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
 R
-5130 0
+4 5130 0
 S
 #1269
 vial poison dexterity~
@@ -569,10 +595,10 @@ A
 2 -1 0
 C
 100 100
-I 26 808 100.00 1  # DECAYS-TO: a vial
-I 27 808 100.00 1  # CONSUMES-TO: a vial
+I 26 808 100.00 1  # DECAYS-TO: glass vial
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
 R
-5130 0
+4 5130 0
 S
 #1270
 vial poison charisma~
@@ -587,10 +613,10 @@ A
 4 -1 0
 C
 100 100
-I 26 808 100.00 1  # DECAYS-TO: a vial
-I 27 808 100.00 1  # CONSUMES-TO: a vial
+I 26 808 100.00 1  # DECAYS-TO: glass vial
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
 R
-5130 0
+4 5130 0
 S
 #1271
 vial poison intelligence~
@@ -605,10 +631,10 @@ A
 8 -1 0
 C
 100 100
-I 26 808 100.00 1  # DECAYS-TO: a vial
-I 27 808 100.00 1  # CONSUMES-TO: a vial
+I 26 808 100.00 1  # DECAYS-TO: glass vial
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
 R
-5130 0
+4 5130 0
 S
 #1272
 vial poison wits~
@@ -623,10 +649,10 @@ A
 9 -1 0
 C
 100 100
-I 26 808 100.00 1  # DECAYS-TO: a vial
-I 27 808 100.00 1  # CONSUMES-TO: a vial
+I 26 808 100.00 1  # DECAYS-TO: glass vial
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
 R
-5130 0
+4 5130 0
 S
 #1273
 vial poison pain~
@@ -639,10 +665,10 @@ Use this poison to enhance your attacks.
 8 0
 C
 100 100
-I 26 808 100.00 1  # DECAYS-TO: a vial
-I 27 808 100.00 1  # CONSUMES-TO: a vial
+I 26 808 100.00 1  # DECAYS-TO: glass vial
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
 R
-5130 0
+4 5130 0
 T 1273
 S
 #1274
@@ -658,10 +684,10 @@ B
 s
 C
 100 100
-I 26 808 100.00 1  # DECAYS-TO: a vial
-I 27 808 100.00 1  # CONSUMES-TO: a vial
+I 26 808 100.00 1  # DECAYS-TO: glass vial
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
 R
-5130 0
+4 5130 0
 S
 #1275
 vial poison heartstop~
@@ -676,10 +702,10 @@ B
 v
 C
 100 100
-I 26 808 100.00 1  # DECAYS-TO: a vial
-I 27 808 100.00 1  # CONSUMES-TO: a vial
+I 26 808 100.00 1  # DECAYS-TO: glass vial
+I 27 808 100.00 1  # CONSUMES-TO: glass vial
 R
-5130 0
+4 5130 0
 S
 #1280
 elixir healing healing-elixir~
@@ -693,10 +719,10 @@ A healing elixir is sitting here.~
 8 0
 C
 100 100
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 T 1250
 S
 #1281
@@ -712,10 +738,10 @@ A
 3 1 0
 C
 100 100
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #1282
 elixir stamina stamina-elixir~
@@ -729,10 +755,10 @@ alias for 'quaff stamina-elixir' to make sure you target the right potion.
 8 0
 C
 100 100
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 T 1252
 S
 #1283
@@ -748,10 +774,10 @@ A
 6 1 0
 C
 100 100
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 #1284
 elixir mana mana-elixir~
@@ -765,10 +791,10 @@ A mana elixir is lying here.~
 8 0
 C
 100 100
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 T 1254
 S
 #1285
@@ -784,9 +810,9 @@ A
 7 1 0
 C
 100 100
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 S
 $

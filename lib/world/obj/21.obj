@@ -11,9 +11,9 @@ scraping logs, and general crafts.
 C
 1 1
 R
-5121 0
+4 5121 0
 R
-5610 0
+4 5610 0
 S
 #2101
 axe woodsman's woodsmans~
@@ -229,13 +229,15 @@ a shovel~
 A shovel is stamped into the ground.~
 A shovel helps you dig or excavate faster.
 ~
-1 ehl ano o 2
+1 ehl ano o 3
 0 4 5
 13 0
+C
+1 1
 R
-5121 0
+4 5121 0
 R
-5610 0
+4 5610 0
 S
 #2119
 pan metal~
@@ -243,13 +245,15 @@ a metal pan~
 A pan has been left here.~
 You can pan at the edge of the river to look for gold.
 ~
-3 l ao i 2
+3 l ao i 3
 0 0 0
 13 0
+C
+1 1
 R
-5121 0
+4 5121 0
 R
-5610 0
+4 5610 0
 S
 #2120
 ring silver small~
@@ -257,11 +261,13 @@ a small silver ring~
 A small, silver ring is lying on the ground.~
 It's a nice silver ring.
 ~
-2 0 ab 0 1
+2 0 ab 0 3
 0 0 0
 3 0
+C
+50 50
 R
-5617 0
+4 5617 0
 S
 #2121
 earrings silver pair~
@@ -269,11 +275,13 @@ a pair of silver earrings~
 A pair of earrings is lying on the ground.~
 They're a nice pair of earrings.
 ~
-2 0 am 0 1
+2 0 am 0 2
 0 0 0
 3 0
+C
+50 50
 R
-5617 0
+4 5617 0
 S
 #2122
 ring gold sparkling small~
@@ -281,13 +289,15 @@ a sparkling gold ring~
 A small ring is lying on the ground.~
 It's a sparkling gold ring.
 ~
-2 0 ab 0 1
+2 0 ab 0 2
 0 0 0
 4 0
 A
 4 1 0
+C
+50 50
 R
-5617 0
+4 5617 0
 S
 #2123
 earrings gold sparkling pair~
@@ -295,13 +305,15 @@ a pair of sparkling earrings~
 A pair of gold earrings is lying on the ground.~
 These are a nice pair of gold earrings.
 ~
-2 0 am 0 1
+2 0 am 0 2
 0 0 0
 4 0
 A
 4 1 0
+C
+50 50
 R
-5617 0
+4 5617 0
 S
 #2124
 ring golden engagement~
@@ -309,13 +321,15 @@ a golden engagement ring~
 A golden engagement ring is lying on the ground.~
 This is a brilliant golden engagement ring.
 ~
-2 o ab 0 1
+2 o ab 0 2
 0 0 0
 4 0
 A
 4 1 0
+C
+50 50
 R
-5617 0
+4 5617 0
 S
 #2125
 band golden wedding ring~
@@ -323,13 +337,15 @@ a golden wedding band~
 A golden wedding band was dropped here!~
 This is a golden wedding band.
 ~
-2 o ab 0 1
+2 o ab 0 2
 0 0 0
 4 0
 A
 4 1 0
+C
+50 50
 R
-5617 0
+4 5617 0
 S
 #2126
 bracelets silver pair~
@@ -337,11 +353,13 @@ silver bracelets~
 A pair of silver bracelets is lying here.~
 These fine silver bracelets accent any costume.
 ~
-2 0 aj 0 1
+2 0 aj 0 2
 -1 -1 -1
 3 0
+C
+50 50
 R
-5617 0
+4 5617 0
 S
 #2127
 bracelets gold pair~
@@ -349,13 +367,15 @@ gold bracelets~
 A pair of gold bracelets is lying here.~
 These gold bracelets look amazing with your shoes.
 ~
-2 0 aj 0 2
+2 0 aj 0 3
 -1 -1 -1
 4 0
 A
 4 1 0
+C
+50 50
 R
-5617 0
+4 5617 0
 S
 #2128
 crown golden~
@@ -363,13 +383,15 @@ a golden crown~
 A golden crown has fallen here.~
 The crown shines and sparkles.
 ~
-2 o ae 0 1
+2 o ae 0 2
 0 0 0
 4 0
 A
 5 1 0
+C
+50 50
 R
-5617 0
+4 5617 0
 S
 #2129
 spear long~
@@ -439,9 +461,9 @@ M
 7
 $n attaches an anchor to $V.~
 R
-5153 0
+4 5153 0
 R
-5154 0
+4 5154 0
 S
 #2134
 cannon ship's~
@@ -461,9 +483,9 @@ M
 7
 $n hoists a cannon onto $V!~
 R
-5153 0
+4 5153 0
 R
-5154 0
+4 5154 0
 S
 #2135
 shot heavy ball~
@@ -477,7 +499,7 @@ Heavy shot is used by catapults and cannons.
 C
 1 1
 R
-5121 0
+4 5121 0
 S
 #2136
 bottle gourd~
@@ -492,9 +514,9 @@ water. Type 'fill bottle' near the river or at an oasis to refill it.
 C
 1 1
 R
-5121 0
+4 5121 0
 R
-5610 0
+4 5610 0
 S
 #2137
 knife obsidian~
@@ -559,7 +581,7 @@ C
 1 1
 O+ 1 6850
 R
-5121 0
+4 5121 0
 S
 #2141
 sickle flint~
@@ -574,7 +596,7 @@ spearheads embedded in it like teeth. It can be used to harvest.
 C
 1 1
 R
-5121 0
+4 5121 0
 S
 #2142
 sickle~
@@ -612,9 +634,9 @@ saw trees into lumber anywhere. 'Use' the saw to equip it as a tool.
 C
 1 1
 R
-5121 0
+4 5121 0
 R
-5118 0
+4 5118 0
 S
 #2145
 kit needles feather sewing~
@@ -631,11 +653,11 @@ Trade skill.
 C
 1 1
 R
-5137 0
+4 5137 0
 R
-5121 0
+4 5121 0
 R
-5610 0
+4 5610 0
 S
 #2146
 kit fine sewing~
@@ -686,13 +708,15 @@ A guard whistle is lying here.~
 your established cities. Be sure to use it on a claimed tile.
 Usage: use guardwhistle (Requires Jewelry ability)
 ~
-3 o a 0 5
+3 o a 0 6
 204 0 0
 2 0
+C
+50 50
 R
-5121 0
+4 5121 0
 R
-5610 0
+4 5610 0
 T 2149
 S
 $

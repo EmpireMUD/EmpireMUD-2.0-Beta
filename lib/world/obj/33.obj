@@ -12,7 +12,7 @@ A
 C
 1 1
 R
-5619 0
+4 5619 0
 S
 #3301
 pie apple warm~
@@ -28,7 +28,7 @@ A
 C
 1 1
 R
-5606 0
+4 5606 0
 S
 #3302
 pie peach glistening~
@@ -44,7 +44,7 @@ A
 C
 1 1
 R
-5606 0
+4 5606 0
 S
 #3303
 pie cherry rich~
@@ -60,7 +60,7 @@ A
 C
 1 1
 R
-5606 0
+4 5606 0
 S
 #3304
 apple candied~
@@ -72,7 +72,7 @@ The candied apple looks delicious!
 24 0 0
 7 336
 R
-5606 0
+4 5606 0
 S
 #3305
 casserole steaming~
@@ -89,7 +89,7 @@ C
 1 1
 O+ 1 6242
 R
-5619 0
+4 5619 0
 S
 #3306
 jerky pouch~
@@ -105,7 +105,7 @@ A
 C
 1 1
 R
-5619 0
+4 5619 0
 S
 #3307
 cornmeal meal sack~
@@ -113,14 +113,16 @@ a sack of cornmeal~
 A sack of cornmeal is sitting here.~
 The cornmeal can be cooked into various foods.
 ~
-3 0 a 0 2
+3 0 a 0 3
 0 0 0
 7 168
+C
+1 1
 O+ 1 6300
 R
-5109 0
+4 5109 0
 R
-5606 0
+4 5606 0
 S
 #3308
 tortilla~
@@ -132,7 +134,7 @@ The tortilla would make a good snack.
 6 0 0
 7 336
 R
-5619 0
+4 5619 0
 S
 #3309
 burrito~
@@ -149,7 +151,7 @@ C
 1 1
 O+ 1 6240
 R
-5619 0
+4 5619 0
 S
 #3310
 mushroom shroom wood ear~
@@ -161,7 +163,7 @@ The mushroom looks good enough to eat, somehow.
 6 0 0
 7 48
 R
-5606 0
+4 5606 0
 S
 #3311
 oil oils olive jar~
@@ -174,11 +176,11 @@ The olive oil looks rich.
 6 168
 O+ 1 6322
 R
-5134 0
+4 5134 0
 R
-5606 0
+4 5606 0
 R
-5192 0
+4 5192 0
 S
 #3312
 flour sack~
@@ -186,14 +188,16 @@ a sack of flour~
 A sack of flour is sitting on the ground.~
 Flour is used to bake bread.
 ~
-3 l a 0 2
+3 l a 0 3
 0 0 0
 7 168
+C
+1 1
 O+ 1 6300
 R
-5109 0
+4 5109 0
 R
-5606 0
+4 5606 0
 S
 #3313
 bread loaf~
@@ -211,7 +215,7 @@ A
 C
 1 1
 R
-5606 0
+4 5606 0
 S
 #3314
 rice fried bowl~
@@ -231,7 +235,7 @@ M
 You blow on $p and eat a mouthful.~
 O+ 1 6240
 R
-5619 0
+4 5619 0
 S
 #3315
 pork salted steaming slab~
@@ -254,7 +258,7 @@ M
 5
 $n tears off a hunk of $p and chews contentedly.~
 R
-5619 0
+4 5619 0
 S
 #3316
 chicken vegetables meal plate~
@@ -285,7 +289,7 @@ M
 You tear off a piece of chicken and take a good bite.~
 O+ 1 6242
 R
-5619 0
+4 5619 0
 S
 #3317
 sandwich ham cheese~
@@ -311,7 +315,7 @@ M
 $n chomps down on $p.~
 O+ 1 6240
 R
-5619 0
+4 5619 0
 S
 #3318
 bowl fruit~
@@ -345,7 +349,7 @@ M
 5
 $n gets a plump peach and takes a bite. As $e does so juice runs down $s chin.~
 R
-5619 0
+4 5619 0
 S
 #3319
 plate chicken pears orange~
@@ -372,7 +376,7 @@ M
 You seperate a piece of pear, taste it and finding it good eat it whole.~
 O+ 1 6242
 R
-5619 0
+4 5619 0
 S
 #3320
 sausages hefty linked couple~
@@ -395,7 +399,7 @@ M
 4
 You almost choke as you gasp at the spiciness from $p.~
 R
-5619 0
+4 5619 0
 S
 #3321
 biscuit road over-sized~
@@ -420,7 +424,7 @@ M
 5
 $n tries to take a bite of $p but decides to just chew on it for a while.~
 R
-5619 0
+4 5619 0
 S
 #3322
 plate fried mushrooms chicken rice~
@@ -444,7 +448,7 @@ M
 $n scoops up some chicken and rice with a bit of mushroom and pops it into $s mouth~
 O+ 1 6242
 R
-5619 0
+4 5619 0
 S
 #3323
 pie pumpkin rich~
@@ -460,7 +464,7 @@ A
 C
 1 1
 R
-5606 0
+4 5606 0
 S
 #3324
 tart blackberry flaky~
@@ -479,7 +483,7 @@ M
 5
 $n takes a bite of $p, as you watch a thin stream of blackberry juice runs down $s chin.~
 R
-5619 0
+4 5619 0
 S
 #3325
 flatbread nutty squash piece~
@@ -502,7 +506,7 @@ M
 5
 $n rolls up $p and bites off a good sized piece.~
 R
-5619 0
+4 5619 0
 S
 #3326
 plate roast delicious hot vegetables~
@@ -526,7 +530,7 @@ M
 $n scoops up some vegetables with $s roast and eats them.~
 O+ 1 6242
 R
-5619 0
+4 5619 0
 S
 #3327
 plate fish poached vegetables~
@@ -551,7 +555,7 @@ M
 $n makes a delighted noise as he savors the taste of $p.~
 O+ 1 6242
 R
-5619 0
+4 5619 0
 S
 #3328
 plate catfish hushpuppies fried~
@@ -575,7 +579,7 @@ M
 $n slices off a piece of catfish and pops it into $s mouth, followed quickly by a hush puppy.~
 O+ 1 6242
 R
-5619 0
+4 5619 0
 S
 #3329
 meat fillet roast~
@@ -589,7 +593,7 @@ better than it would have raw.
 7 96
 O+ 1 6220
 R
-5619 0
+4 5619 0
 S
 #3330
 pie banana~
@@ -605,7 +609,7 @@ A
 C
 1 1
 R
-5606 0
+4 5606 0
 S
 #3331
 bread banana loaf~
@@ -621,7 +625,7 @@ A
 C
 1 1
 R
-5606 0
+4 5606 0
 S
 #3332
 spray pepper vial glass~
@@ -635,7 +639,7 @@ This small glass vial is filled with a bright red fluid that sizzles slightly.
 C
 125 125
 R
-5130 0
+4 5130 0
 T 1273
 S
 #3333
@@ -652,7 +656,7 @@ A
 C
 1 1
 R
-5619 0
+4 5619 0
 S
 #3334
 pouch dried potato slices~
@@ -665,9 +669,9 @@ adventure.
 48 0 0
 7 336
 R
-5606 0
+4 5606 0
 R
-5619 0
+4 5619 0
 S
 #3335
 prunes pouch~
@@ -683,9 +687,9 @@ A
 C
 1 1
 R
-5619 0
+4 5619 0
 R
-5606 0
+4 5606 0
 S
 #3336
 pie plum~
@@ -697,7 +701,7 @@ This plum pie looks delicious.
 48 0 0
 7 336
 R
-5606 0
+4 5606 0
 S
 #3337
 pie strawberry~
@@ -713,7 +717,7 @@ A
 C
 1 1
 R
-5606 0
+4 5606 0
 S
 #3338
 jam strawberry jar~
@@ -728,12 +732,12 @@ A
 7 1 0
 C
 1 1
-I 26 801 100.00 1  # DECAYS-TO: a glass jar
-I 27 801 100.00 1  # CONSUMES-TO: a glass jar
+I 26 801 100.00 1  # DECAYS-TO: glass jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 R
-5606 0
+4 5606 0
 R
-5619 0
+4 5619 0
 S
 #3339
 mango candied~
@@ -745,7 +749,7 @@ The candied mango looks delicious!
 24 0 0
 7 336
 R
-5606 0
+4 5606 0
 S
 #3340
 pie blueberry~
@@ -761,7 +765,7 @@ A
 C
 1 1
 R
-5606 0
+4 5606 0
 S
 #3341
 jam blueberry jar~
@@ -776,12 +780,12 @@ A
 16 1 0
 C
 1 1
-I 26 801 100.00 1  # DECAYS-TO: a glass jar
-I 27 801 100.00 1  # CONSUMES-TO: a glass jar
+I 26 801 100.00 1  # DECAYS-TO: glass jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 R
-5619 0
+4 5619 0
 R
-5606 0
+4 5606 0
 S
 #3342
 straw bale~
@@ -790,15 +794,17 @@ A bale of straw sits on the ground.~
    Straw is the byproduct of growing grains like barley, oats, rice, rye, and
 wheat. It has been used since ancient times in crafting and construction.
 ~
-3 l a 0 1
+3 l a 0 2
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
+C
+1 1
+I 11 1002 100.00 1  # LIGHT: roaring fire
 O+ 1 6422
 R
-5118 0
+4 5118 0
 R
-5116 0
+4 5116 0
 S
 #3343
 oatmeal sack~
@@ -806,15 +812,17 @@ a sack of oatmeal~
 A sack of oatmeal has been left on the ground.~
 Oatmeal can be baked into nourishing cakes.
 ~
-3 0 a 0 6
+3 0 a 0 7
 0 0 0
 7 0
+C
+1 1
 R
-5116 0
+4 5116 0
 R
-5109 0
+4 5109 0
 R
-5606 0
+4 5606 0
 S
 #3344
 cake oat flat~
@@ -830,7 +838,7 @@ A
 C
 1 1
 R
-5606 0
+4 5606 0
 S
 #3345
 meatloaf loaf hearty~
@@ -1163,18 +1171,20 @@ There is a jar of lettuce seed oil here.~
    The jar has a sacred seal on top, as the oil inside is primarily used in
 ceremonies. It is made from the pressed seeds of the lettuce plant.
 ~
-3 l a 0 7
+3 l a 0 8
 0 0 0
 6 168
+C
+1 1
 O+ 1 6321
 R
-5134 0
+4 5134 0
 R
-5192 0
+4 5192 0
 R
-5148 0
+4 5148 0
 R
-5150 0
+4 5150 0
 S
 #3363
 salad fresh~
@@ -1197,7 +1207,7 @@ M
 5
 $n crunches on a fresh salad.~
 R
-5606 0
+4 5606 0
 S
 #3364
 oil oils coconut jar~
@@ -1205,14 +1215,16 @@ a jar of coconut oil~
 A jar of coconut oil is sitting on the ground.~
 The coconut oil inside the jar is a rich yellow-orange color.
 ~
-3 0 a 0 8
+3 0 a 0 9
 0 0 0
 6 168
+C
+1 1
 O+ 1 6320
 R
-5606 0
+4 5606 0
 R
-5192 0
+4 5192 0
 S
 #3365
 meat shark dried~
@@ -1230,7 +1242,7 @@ C
 1 1
 O+ 1 6220
 R
-5619 0
+4 5619 0
 S
 #3366
 kernels toasted~
@@ -1278,14 +1290,16 @@ a small sack of sugar~
 A small sack of sugar has been left here.~
 You can use sugar for cooking.
 ~
-6 0 a 0 3
+6 0 a 0 4
 1 0 0
 0 168
+C
+1 1
 O+ 1 6340
 R
-5109 0
+4 5109 0
 R
-5606 0
+4 5606 0
 S
 #3371
 bread garlic loaf~
@@ -1301,7 +1315,7 @@ A
 C
 1 1
 R
-5606 0
+4 5606 0
 S
 #3372
 lemon candied~
@@ -1317,7 +1331,7 @@ A
 C
 1 1
 R
-5606 0
+4 5606 0
 S
 #3373
 jar pickles~
@@ -1331,9 +1345,9 @@ solution.
 7 336
 A
 16 1 0
-I 26 801 100.00 1  # DECAYS-TO: a glass jar
-I 27 801 100.00 1  # CONSUMES-TO: a glass jar
+I 26 801 100.00 1  # DECAYS-TO: glass jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 R
-5606 0
+4 5606 0
 S
 $

@@ -14,11 +14,13 @@ an earthenware pot~
 An earthenware pot is lying here, slightly cracked.~
 You can carry water in the pot.
 ~
-5 0 a 0 3
+5 0 a 0 4
 24 0 0
 6 0
+C
+1 1
 R
-5606 0
+4 5606 0
 S
 #254
 vessel earthenware~
@@ -26,13 +28,15 @@ an earthenware vessel~
 An earthenware vessel has been left here.~
 The vessel looks like it would hold a lot of water.
 ~
-5 0 a 0 3
+5 0 a 0 4
 56 0 0
 6 0
+C
+1 1
 R
-5121 0
+4 5121 0
 R
-5606 0
+4 5606 0
 S
 #256
 trinket trinkets hestian~
@@ -41,13 +45,15 @@ A hestian trinket is sitting on the ground.~
    You can use the trinket to teleport home. Use the home command to set your
 home.
 ~
-3 0 a 0 1
+3 0 a 0 2
 0 0 0
 6 0
+C
+1 1
 R
-5121 0
+4 5121 0
 R
-5610 0
+4 5610 0
 T 256
 S
 #257
@@ -57,9 +63,11 @@ Some bricks are piled on the ground.~
    These bricks have been made from fired clay, with holes in the middle to
 reduce the weight. You can use the bricks for building.
 ~
-3 el a 0 5
+3 el a 0 6
 0 0 0
 6 0
+C
+1 1
 M
 0
 You put down a layer of bricks.~
@@ -68,7 +76,7 @@ M
 $n puts down a layer of bricks.~
 O+ 1 6076
 R
-5117 0
+4 5117 0
 S
 #258
 pipe peace~
@@ -78,11 +86,13 @@ A peace pipe is lying on the ground.~
 looks like you could type 'smoke' to use it.
 Usage:  smoke <herb>
 ~
-3 0 a 0 2
+3 0 a 0 3
 0 0 0
 6 0
+C
+1 1
 R
-5610 0
+4 5610 0
 T 258
 S
 #259
@@ -137,13 +147,15 @@ a trinket of conveyance~
 A trinket of conveyance seems to have been dropped here.~
 You can use this trinket to teleport to a random starting location.
 ~
-3 0 a 0 1
+3 0 a 0 2
 0 0 0
 6 0
+C
+1 1
 R
-5121 0
+4 5121 0
 R
-5610 0
+4 5610 0
 T 262
 S
 #263
