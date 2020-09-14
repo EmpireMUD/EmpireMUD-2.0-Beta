@@ -1685,7 +1685,7 @@ void stop_burning(room_data *room) {
 int city_points_available(empire_data *emp) {
 	int points = 0;
 	
-	if (emp) {
+	if (emp && EMPIRE_MEMBERS(emp) > 0) {
 		points = 1;
 		points += ((EMPIRE_MEMBERS(emp) - 1) / config_get_int("players_per_city_point"));
 		points += EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS);
