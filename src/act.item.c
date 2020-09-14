@@ -6488,10 +6488,17 @@ ACMD(do_retrieve) {
 		msg_to_char(ch, "You aren't high enough rank to retrieve from the empire inventory.\r\n");
 		return;
 	}
-	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE))) {
+	// requires room-use permission even if retrieving from a moving storage vehicle
+	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You are not allowed to retrieve anything here (it isn't public).\r\n");
+		return;
+	}
+	/* don't check relationship here -- it is checked in obj_can_be_retrieved
+	if (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE)) {
 		msg_to_char(ch, "You need to establish a trade pact to retrieve anything here.\r\n");
 		return;
 	}
+	*/
 	if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(isle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You can't retrieve anything here.\r\n");
 		return;
@@ -7062,10 +7069,16 @@ ACMD(do_store) {
 		msg_to_char(ch, "You can't store or retrieve resources unless you're a member of an empire.\r\n");
 		return;
 	}
-	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE))) {
+	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You are not allowed to store anything here (it isn't public).\r\n");
+		return;
+	}
+	/* don't check relationship here -- it is checked in obj_can_be_retrieved
+	if (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE)) {
 		msg_to_char(ch, "You need to establish a trade pact to store your things here.\r\n");
 		return;
 	}
+	*/
 	if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This storage building must be in a city to use it.\r\n");
 		return;
