@@ -2482,9 +2482,7 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 	}
 	
 	if (worker && can_do) {
-		
-		// did we find anything at all?
-		if (highest) {
+		if (highest) {	// did we find anything at all?
 			charge_workforce(emp, room, worker, 1, NOTHING, 0);
 			
 			// let's only do this every ~4 hours
