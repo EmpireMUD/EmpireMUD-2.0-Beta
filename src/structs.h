@@ -1320,7 +1320,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // for tracking playtime
-#define PLAYTIME_WEEKS_TO_TRACK  4	// playtime determined by past 4 weeks
+#define PLAYTIME_WEEKS_TO_TRACK  12	// playtime determined by past 12 weeks
 
 
  //////////////////////////////////////////////////////////////////////////////
