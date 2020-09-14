@@ -3268,13 +3268,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						char_data *ctarg;
 						obj_data *otarg;
 						
-						if (subfield && (ctarg = get_char_room_vis(c, subfield))) {
+						if (subfield && (ctarg = get_char(subfield))) {
 							snprintf(str, slen, "%d", CAN_SEE(c, ctarg) ? 1 : 0);
 						}
-						else if (subfield && (otarg = get_obj_vis(c, subfield))) {
+						else if (subfield && (otarg = get_obj(subfield))) {
 							snprintf(str, slen, "%d", CAN_SEE_OBJ(c, otarg) ? 1 : 0);
 						}
-						else if (subfield && (vtarg = get_vehicle_vis(c, subfield))) {
+						else if (subfield && (vtarg = get_vehicle(subfield))) {
 							snprintf(str, slen, "%d", CAN_SEE_VEHICLE(c, vtarg) ? 1 : 0);
 						}
 						else {
