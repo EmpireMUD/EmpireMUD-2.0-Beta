@@ -1551,7 +1551,7 @@ void city_traits(char_data *ch, empire_data *emp, char *argument) {
 void claim_city(char_data *ch, empire_data *emp, char *argument) {
 	char arg1[MAX_INPUT_LENGTH];
 	struct empire_city_data *city;
-	int x, y, radius;
+	int x, y, radius, x_dist, y_dist, x_pos, y_pos;
 	room_data *iter, *next_iter, *to_room, *center, *home;
 	bool found = FALSE, all = FALSE, junk;
 	int len;
@@ -1602,27 +1602,40 @@ void claim_city(char_data *ch, empire_data *emp, char *argument) {
 
 	center = city->location;
 	radius = city_type[city->type].radius;
-	for (x = -1 * radius; x <= radius; ++x) {
-		for (y = -1 * radius; y <= radius && empire_can_claim(emp); ++y) {
-			to_room = real_shift(center, x, y);
+	
+	// this will claim from the inside-out rather than left-to-right
+	for (x_dist = 0; x_dist <= radius; ++x_dist) {
+		for (x_pos = 0; x_pos <= 1; ++x_pos) {
+			// for both -x and +x
+			x = x_dist * (x_pos ? 1 : -1);
 			
-			if (!to_room || compute_distance(center, to_room) > radius) {
-				continue;
-			}
-			if (ROOM_OWNER(to_room) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_HAS_INSTANCE)) {
-				continue;
-			}
-			if (ROOM_SECT_FLAGGED(to_room, SECTF_NO_CLAIM)) {
-				continue;
-			}
-			if (get_territory_type_for_empire(to_room, emp, FALSE, &junk) != TER_CITY) {
-				continue;	// wouldn't be in-city (checks corners and islands)
-			}
-			
-			// ok...
-			if (all || (SECT(to_room) != BASE_SECT(to_room))) {
-				found = TRUE;
-				claim_room(to_room, emp);
+			for (y_dist = 0; y_dist <= radius; ++y_dist) {
+				for (y_pos = 0; y_pos <= 1 && empire_can_claim(emp); ++y_pos) {
+					// for both -y and +y
+					y = y_dist * (y_pos ? 1 : -1);
+					
+					// determine room
+					to_room = real_shift(center, x, y);
+					
+					if (!to_room || compute_distance(center, to_room) > radius) {
+						continue;
+					}
+					if (ROOM_OWNER(to_room) || ROOM_AFF_FLAGGED(to_room, ROOM_AFF_HAS_INSTANCE)) {
+						continue;
+					}
+					if (ROOM_SECT_FLAGGED(to_room, SECTF_NO_CLAIM)) {
+						continue;
+					}
+					if (get_territory_type_for_empire(to_room, emp, FALSE, &junk) != TER_CITY) {
+						continue;	// wouldn't be in-city (checks corners and islands)
+					}
+					
+					// ok...
+					if (all || (SECT(to_room) != BASE_SECT(to_room))) {
+						found = TRUE;
+						claim_room(to_room, emp);
+					}
+				}
 			}
 		}
 	}
