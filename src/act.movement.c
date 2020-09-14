@@ -1033,7 +1033,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 			return FALSE;
 		}
 		// rough-to-rough without the ability
-		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && ROOM_HEIGHT(to_room) > ROOM_HEIGHT(IN_ROOM(ch)) && (!IS_RIDING(ch) || !has_player_tech(ch, PTECH_RIDING_UPGRADE)) && !has_player_tech(ch, PTECH_ROUGH_TERRAIN) && !EFFECTIVELY_FLYING(ch)) {
+		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && ROOM_HEIGHT(to_room) >= ROOM_HEIGHT(IN_ROOM(ch)) && (!IS_RIDING(ch) || !has_player_tech(ch, PTECH_RIDING_UPGRADE)) && !has_player_tech(ch, PTECH_ROUGH_TERRAIN) && !EFFECTIVELY_FLYING(ch)) {
 			msg_to_char(ch, "You don't have the ability to cross such rough terrain.\r\n");
 			return FALSE;
 		}
