@@ -1685,10 +1685,13 @@ void stop_burning(room_data *room) {
 int city_points_available(empire_data *emp) {
 	int points = 0;
 	
-	if (emp && EMPIRE_MEMBERS(emp) > 0) {
-		points = 1;
-		points += ((EMPIRE_MEMBERS(emp) - 1) / config_get_int("players_per_city_point"));
-		points += EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS);
+	if (emp) {
+		// only get points if members are active
+		if (EMPIRE_MEMBERS(emp) > 0) {
+			points = 1;
+			points += ((EMPIRE_MEMBERS(emp) - 1) / config_get_int("players_per_city_point"));
+			points += EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS);
+		}
 
 		// minus any used points
 		points -= count_city_points_used(emp);
