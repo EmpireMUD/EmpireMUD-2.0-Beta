@@ -474,7 +474,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	crop_data *cp;
 	int found;
 	double rating;
-	bool any;
+	bool any, library;
 		
 	// sanity / don't bother
 	if (!obj || !ch || !ch->desc) {
@@ -580,13 +580,19 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		send_to_char(temp, ch);
 		free(temp);
 	}
+	
+	// other storage
+	library = (IS_BOOK(obj) && book_proto(GET_BOOK_ID(obj)));
 	if (UNIQUE_OBJ_CAN_STORE(obj, FALSE)) {
-		msg_to_char(ch, "Storage location: Home, Warehouse\r\n");
+		msg_to_char(ch, "Storage location: Home, Warehouse%s\r\n", (library ? ", Library" : ""));
 	}
 	else if (UNIQUE_OBJ_CAN_STORE(obj, TRUE)) {
-		msg_to_char(ch, "Storage location: Home\r\n");
+		msg_to_char(ch, "Storage location: Home%s\r\n", (library ? ", Library" : ""));
 	}
-	if (OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
+	else if (library) {
+		msg_to_char(ch, "Storage location: Library\r\n");
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
 		msg_to_char(ch, "Storage location: none (modified object)\r\n");
 	}
 
