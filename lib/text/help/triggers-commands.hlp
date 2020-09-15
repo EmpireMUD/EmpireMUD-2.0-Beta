@@ -276,6 +276,7 @@ Adds a scaled DoT -- Damage-Over-Time -- effect to the target.
 The affect vnum arg is optional, and requires a # if you're going to use it.
 For example, #3001 uses the "fly" generic affect.
 
+The modifier is a percent of the scaled damage, where 100 is the normal level.
 You can optionally specify a damage type (physical, magical, fire, poison,
 direct).
 
