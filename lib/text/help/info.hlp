@@ -347,11 +347,13 @@ the Touch of Flame ability, you don't need a fire at all.
 
 See also: DOUSE, LIGHT, TOUCH OF FLAME
 #
-CHAMELEON
+CHAMELEON CAMOUFLAGE
 
 The "chameleon" trait is the property of some buildings to be invisible at a
 distance. Instead of seeing the building and its owner's banner, you see only
 normal terrain.
+
+Some of the buildings with this trait can be found with: helpsearch chameleon
 #
 CHANNEL CHANNELS SHOUT /OOC /NEWBIE /RECRUIT /TRADE /DEATH /GRATS /PROGRESS /EVENTS
 
