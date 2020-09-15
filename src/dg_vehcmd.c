@@ -42,6 +42,7 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void die(char_data *ch, char_data *killer);
 extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
+extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name);
 extern room_data *get_room(room_data *ref, char *name);
 extern vehicle_data *get_vehicle(char *name);
@@ -87,12 +88,11 @@ struct vehicle_command_info {
 int get_vehicle_scale_level(vehicle_data *veh, char_data *targ) {
 	struct instance_data *inst;
 	int level = 1;
-	room_data *orm = IN_ROOM(veh);
 	
 	if (VEH_SCALE_LEVEL(veh) > 0) {
 		level = VEH_SCALE_LEVEL(veh);
 	}
-	else if (orm && COMPLEX_DATA(orm) && (inst = COMPLEX_DATA(orm)->instance)) {
+	else if ((inst = get_instance_by_id(VEH_INSTANCE_ID(veh)))) {
 		if (INST_LEVEL(inst)) {
 			level = INST_LEVEL(inst);
 		}
@@ -141,6 +141,9 @@ VCMD(do_vadventurecomplete) {
 	struct instance_data *inst;
 	
 	inst = quest_instance_global;
+	if (!inst) {
+		inst = get_instance_by_id(VEH_INSTANCE_ID(veh));
+	}
 	if (!inst) {
 		inst = room ? find_instance_by_room(room, FALSE, TRUE) : NULL;
 	}
@@ -663,6 +666,9 @@ VCMD(do_vpurge) {
 		room_data *room = IN_ROOM(veh);
 		struct instance_data *inst = quest_instance_global;
 		if (!inst) {
+			inst = get_instance_by_id(VEH_INSTANCE_ID(veh));
+		}
+		if (!inst) {
 			inst = room ? find_instance_by_room(room, FALSE, TRUE) : NULL;
 		}
 		if (!inst) {
@@ -851,7 +857,7 @@ VCMD(do_vteleport) {
 	}
 	else if (!str_cmp(arg1, "adventure")) {
 		// teleport all players in the adventure
-		if (!orm || !(inst = find_instance_by_room(orm, FALSE, TRUE))) {
+		if (!orm || (!(inst = get_instance_by_id(VEH_INSTANCE_ID(veh))) && !(inst = find_instance_by_room(orm, FALSE, TRUE)))) {
 			veh_log(veh, "vteleport: 'adventure' mode called outside any adventure");
 			return;
 		}
@@ -1623,7 +1629,7 @@ VCMD(do_vscale) {
 	if (!str_cmp(arg, "instance")) {
 		void scale_instance_to_level(struct instance_data *inst, int level);
 		struct instance_data *inst;
-		if ((inst = find_instance_by_room(IN_ROOM(veh), FALSE, TRUE))) {
+		if ((inst = get_instance_by_id(VEH_INSTANCE_ID(veh))) || (inst = find_instance_by_room(IN_ROOM(veh), FALSE, TRUE))) {
 			scale_instance_to_level(inst, level);
 		}
 	}

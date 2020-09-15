@@ -2623,11 +2623,6 @@ void scale_instance_to_level(struct instance_data *inst, int level) {
 					scale_item_to_level(obj, level);
 				}
 			}
-			DL_FOREACH2(ROOM_VEHICLES(INST_ROOM(inst, iter)), veh, next_in_room) {
-				if (VEH_SCALE_LEVEL(veh) == 0) {
-					scale_vehicle_to_level(veh, level);
-				}
-			}
 		}
 	}
 	
@@ -2635,6 +2630,13 @@ void scale_instance_to_level(struct instance_data *inst, int level) {
 		if (IS_NPC(ch) && MOB_INSTANCE_ID(ch) == INST_ID(inst) && GET_CURRENT_SCALE_LEVEL(ch) != level) {
 			GET_CURRENT_SCALE_LEVEL(ch) = 0;	// force override on level
 			scale_mob_to_level(ch, level);
+		}
+	}
+	
+	DL_FOREACH(vehicle_list, veh) {
+		if (VEH_INSTANCE_ID(veh) == INST_ID(inst) && VEH_SCALE_LEVEL(veh) != level) {
+			VEH_SCALE_LEVEL(veh) = 0;	// force override on level
+			scale_vehicle_to_level(veh, level);
 		}
 	}
 }

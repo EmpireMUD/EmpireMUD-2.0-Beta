@@ -71,6 +71,7 @@ extern room_data *create_room(room_data *home);
 void free_bld_relations(struct bld_relation *list);
 void free_custom_messages(struct custom_message *mes);
 void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
+extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void scale_item_to_level(obj_data *obj, int level);
@@ -823,16 +824,14 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 	struct instance_data *inst = NULL;
 	
 	// detect level if we weren't given a strong level
-	if (!level) {
-		if (IN_ROOM(veh) && (inst = ROOM_INSTANCE(IN_ROOM(veh)))) {
-			if (INST_LEVEL(inst) > 0) {
-				level = INST_LEVEL(inst);
-			}
+	if (!level && (inst = get_instance_by_id(VEH_INSTANCE_ID(veh)))) {
+		if (INST_LEVEL(inst) > 0) {
+			level = INST_LEVEL(inst);
 		}
 	}
 	
 	// outside constraints
-	if (inst || (IN_ROOM(veh) && (inst = ROOM_INSTANCE(IN_ROOM(veh))))) {
+	if (inst) {
 		if (GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)) > 0) {
 			level = MAX(level, GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)));
 		}

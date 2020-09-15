@@ -1899,7 +1899,7 @@ bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_t
 		}
 		
 		// success
-		inst = (IN_ROOM(veh) ? find_instance_by_room(IN_ROOM(veh), FALSE, TRUE) : NULL);
+		inst = (VEH_INSTANCE_ID(veh) != NOTHING ? get_instance_by_id(VEH_INSTANCE_ID(veh)) : NULL);
 		
 		// pre-reqs?
 		if (char_meets_prereqs(ch, ql->quest, inst)) {
