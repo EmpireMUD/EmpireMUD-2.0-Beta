@@ -386,6 +386,7 @@ char *get_one_perk_display(struct progress_perk *perk, bool show_vnums) {
 	switch (perk->type) {
 		case PRG_PERK_TECH: {
 			sprinttype(perk->value, techs, save_buffer);
+			strcat(save_buffer, " (tech)");
 			break;
 		}
 		case PRG_PERK_CITY_POINTS: {
