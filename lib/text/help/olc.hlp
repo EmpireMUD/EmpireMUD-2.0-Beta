@@ -3836,6 +3836,8 @@ Scaling based on item types:
  ammo - the "damage" value
  pack - the "capacity" value
 
+The following attributes never scale: greatness, age, crafting, blood-upkeep
+
 Applies and item values of 0 are ignored and do not get any points assigned.
 
 See also: OLC LEVELS
