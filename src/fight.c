@@ -3006,7 +3006,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	}
 	
 	// look for an instance to lock (before running triggers)
-	if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch)) && (inst = COMPLEX_DATA(IN_ROOM(ch))->instance)) {
+	if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE))) {
 		if (ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_LOCK_LEVEL_ON_COMBAT) && !IS_IMMORTAL(ch)) {
 			lock_instance_level(IN_ROOM(ch), determine_best_scale_level(ch, TRUE));
 		}
@@ -3387,7 +3387,7 @@ int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	cur_speed = get_combat_speed(ch, weapon ? weapon->worn_on : WEAR_WIELD);
 	
 	// look for an instance to lock (before running triggers)
-	if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch)) && (inst = COMPLEX_DATA(IN_ROOM(ch))->instance)) {
+	if (!IS_NPC(ch) && IS_ADVENTURE_ROOM(IN_ROOM(ch)) && (inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE)))) {
 		if (ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_LOCK_LEVEL_ON_COMBAT) && !IS_IMMORTAL(ch)) {
 			lock_instance_level(IN_ROOM(ch), determine_best_scale_level(ch, TRUE));
 		}

@@ -677,8 +677,8 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 	else if (is_abbrev(cmd_arg, "start")) {
 		if (!is_on_quest(vict, QUEST_VNUM(quest))) {
 			void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
-			if (!inst && room && COMPLEX_DATA(room)) {
-				inst = COMPLEX_DATA(room)->instance;
+			if (!inst && room) {
+				inst = find_instance_by_room(room, TRUE, TRUE);
 			}
 			start_quest(vict, quest, inst);
 		}

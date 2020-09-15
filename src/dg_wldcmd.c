@@ -79,7 +79,7 @@ int get_room_scale_level(room_data *room, char_data *targ) {
 	struct instance_data *inst;
 	int level = 1;
 	
-	if (COMPLEX_DATA(room) && (inst = COMPLEX_DATA(room)->instance)) {
+	if ((inst = find_instance_by_room(room, FALSE, TRUE)))) {
 		if (INST_LEVEL(inst)) {
 			level = INST_LEVEL(inst);
 		}
@@ -1079,8 +1079,8 @@ WCMD(do_wload) {
 		mob = read_mobile(number, TRUE);
 		
 		// store instance id
-		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-			MOB_INSTANCE_ID(mob) = INST_ID(COMPLEX_DATA(room)->instance);
+		if ((inst = find_instance_by_room(room, FALSE, TRUE))) {
+			MOB_INSTANCE_ID(mob) = INST_ID(inst);
 			if (MOB_INSTANCE_ID(mob) != NOTHING) {
 				add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
 			}
@@ -1090,9 +1090,9 @@ WCMD(do_wload) {
 			scale_mob_to_level(mob, atoi(target));
 			SET_BIT(MOB_FLAGS(mob), MOB_NO_RESCALE);
 		}
-		else if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance && INST_LEVEL(COMPLEX_DATA(room)->instance) > 0) {
+		else if (inst && INST_LEVEL(inst) > 0) {
 			// instance level-locked
-			scale_mob_to_level(mob, INST_LEVEL(COMPLEX_DATA(room)->instance));
+			scale_mob_to_level(mob, INST_LEVEL(inst));
 		}
 		
 		char_to_room(mob, room);
@@ -1190,8 +1190,8 @@ WCMD(do_wload) {
 			return;
 		}
 		veh = read_vehicle(number, TRUE);
-		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-			VEH_INSTANCE_ID(veh) = INST_ID(COMPLEX_DATA(room)->instance);
+		if ((inst = find_instance_by_room(room, FALSE, TRUE))) {
+			VEH_INSTANCE_ID(veh) = INST_ID(inst);
 		}
 		
 		if (*target && isdigit(*target)) {

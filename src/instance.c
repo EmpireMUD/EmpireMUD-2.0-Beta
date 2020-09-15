@@ -2248,6 +2248,11 @@ struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom
 		return COMPLEX_DATA(room)->instance;
 	}
 	
+	// check in vehicle
+	if (GET_ROOM_VEHICLE(room) && (inst = get_instance_by_id(VEH_INSTANCE_ID(GET_ROOM_VEHICLE(room))))) {
+		return inst;
+	}
+	
 	// check if it's the location for one
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE | ROOM_AFF_FAKE_INSTANCE) || (check_homeroom && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_HAS_INSTANCE))) {
 		LL_FOREACH(instance_list, inst) {

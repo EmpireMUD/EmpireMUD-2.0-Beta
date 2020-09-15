@@ -86,7 +86,7 @@ int get_obj_scale_level(obj_data *obj, char_data *targ) {
 	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
 		level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 	}
-	else if (orm && COMPLEX_DATA(orm) && (inst = COMPLEX_DATA(orm)->instance)) {
+	else if (orm && (inst = find_instance_by_room(orm, FALSE, FALSE))) {
 		if (INST_LEVEL(inst)) {
 			level = INST_LEVEL(inst);
 		}
@@ -1234,10 +1234,10 @@ OCMD(do_oload) {
 			return;
 		}
 		mob = read_mobile(number, TRUE);
-		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-			MOB_INSTANCE_ID(mob) = INST_ID(COMPLEX_DATA(room)->instance);
+		if ((inst = find_instance_by_room(room, FALSE, TRUE))) {
+			MOB_INSTANCE_ID(mob) = INST_ID(inst);
 			if (MOB_INSTANCE_ID(mob) != NOTHING) {
-				add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
+				add_instance_mob(inst, GET_MOB_VNUM(mob));
 			}
 		}
 		char_to_room(mob, room);
@@ -1349,8 +1349,8 @@ OCMD(do_oload) {
 			return;
 		}
 		veh = read_vehicle(number, TRUE);
-		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-			VEH_INSTANCE_ID(veh) = INST_ID(COMPLEX_DATA(room)->instance);
+		if ((inst = find_instance_by_room(room, FALSE, TRUE))) {
+			VEH_INSTANCE_ID(veh) = INST_ID(inst);
 		}
 		vehicle_to_room(veh, room);
 		

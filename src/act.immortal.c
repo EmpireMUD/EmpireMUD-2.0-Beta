@@ -9572,6 +9572,7 @@ ACMD(do_snoop) {
 
 
 ACMD(do_stat) {
+	struct instance_data *inst;
 	char_data *victim = NULL;
 	vehicle_data *veh;
 	empire_data *emp;
@@ -9590,8 +9591,8 @@ ACMD(do_stat) {
 		do_stat_room(ch);
 	}
 	else if (!strn_cmp(buf1, "adventure", 3) && is_abbrev(buf1, "adventure")) {
-		if (COMPLEX_DATA(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch))->instance) {
-			do_stat_adventure(ch, INST_ADVENTURE(COMPLEX_DATA(IN_ROOM(ch))->instance));
+		if ((inst = find_instance_by_room(IN_ROOM(ch), TRUE, TRUE))) {
+			do_stat_adventure(ch, INST_ADVENTURE(inst));
 		}
 		else {
 			msg_to_char(ch, "You are not in an adventure zone.\r\n");
