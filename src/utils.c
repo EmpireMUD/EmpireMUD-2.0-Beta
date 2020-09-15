@@ -5584,30 +5584,32 @@ bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with
 bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance) {
 	int x, y;
 	room_data *shift, *real;
-	bool found = FALSE;
 	
 	if (!(real = (GET_MAP_LOC(room) ? real_room(GET_MAP_LOC(room)->vnum) : NULL))) {	// no map location
 		return FALSE;
 	}
 	
-	for (x = -1 * distance; x <= distance && !found; ++x) {
-		for (y = -1 * distance; y <= distance && !found; ++y) {
+	for (x = -1 * distance; x <= distance; ++x) {
+		for (y = -1 * distance; y <= distance; ++y) {
 			if (!(shift = real_shift(real, x, y))) {
 				continue;	// no room
 			}
 			if (with_flags && !ROOM_SECT_FLAGGED(shift, with_flags) && !IS_SET(GET_SECT_FLAGS(BASE_SECT(shift)), with_flags)) {
 				continue;	// missing with-flags
 			}
-			
 			if (without_flags && (ROOM_SECT_FLAGGED(shift, without_flags) || IS_SET(GET_SECT_FLAGS(BASE_SECT(shift)), without_flags))) {
-				if (compute_distance(room, shift) <= distance) {
-					found = TRUE;
-				}
+				continue;
 			}
+			if (compute_distance(room, shift) > distance) {
+				continue;
+			}
+			
+			// found!
+			return TRUE;
 		}
 	}
 	
-	return found;
+	return FALSE; // not found
 }
 
 
