@@ -1408,7 +1408,7 @@ void script_stat (char_data *ch, struct script_data *sc) {
 void do_sstat_room(char_data *ch) {
 	room_data *rm = IN_ROOM(ch);
 
-	msg_to_char(ch, "Script information:\r\n");
+	msg_to_char(ch, "Script information (id %d):\r\n", rm->script_id);
 	if (!SCRIPT(rm)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;
@@ -1419,7 +1419,7 @@ void do_sstat_room(char_data *ch) {
 
 
 void do_sstat_object(char_data *ch, obj_data *j) {
-	msg_to_char(ch, "Script information:\r\n");
+	msg_to_char(ch, "Script information (id %d):\r\n", j->script_id);
 	if (!SCRIPT(j)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;
@@ -1430,7 +1430,7 @@ void do_sstat_object(char_data *ch, obj_data *j) {
 
 
 void do_sstat_character(char_data *ch, char_data *k) {
-	msg_to_char(ch, "Script information:\r\n");
+	msg_to_char(ch, "Script information (id %d):\r\n", k->script_id);
 	if (!SCRIPT(k)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;

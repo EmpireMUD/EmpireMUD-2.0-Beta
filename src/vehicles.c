@@ -3834,7 +3834,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	// script info
-	msg_to_char(ch, "Script information:\r\n");
+	msg_to_char(ch, "Script information (id %d):\r\n", veh->script_id);
 	if (SCRIPT(veh)) {
 		script_stat(ch, SCRIPT(veh));
 	}
