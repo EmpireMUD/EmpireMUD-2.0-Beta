@@ -1794,7 +1794,7 @@ bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_l
 	bool dailies;
 	int iter;
 	
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch) || !IS_COMPLETE(room)) {
 		return FALSE;
 	}
 	
@@ -1867,7 +1867,7 @@ bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_t
 	bool any = FALSE;
 	bool dailies;
 	
-	if (IS_NPC(ch) || !VEH_QUEST_LOOKUPS(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
+	if (IS_NPC(ch) || !VEH_IS_COMPLETE(veh) || !VEH_QUEST_LOOKUPS(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
 		return FALSE;
 	}
 	
