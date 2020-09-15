@@ -2942,7 +2942,7 @@ ACMD(do_morph) {
 		if (full) {
 			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
 		}
-		else if (count % 2 && size + 2 < sizeof(buf)) {
+		else if (count % 2 && size + 2 < sizeof(buf) && !PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
 			strcat(buf, "\r\n");
 		}
 		
