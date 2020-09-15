@@ -851,4 +851,6 @@ ACMD(do_throw) {
 		strcpy(buf, room_log_identifier(to_room));	// store one in a buf because it can't show 2 different locations in 1 line
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s threw %s from %s to %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), room_log_identifier(IN_ROOM(ch)), buf);
 	}
+	
+	command_lag(ch, WAIT_COMBAT_ABILITY);
 }
