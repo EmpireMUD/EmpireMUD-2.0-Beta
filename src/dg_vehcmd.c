@@ -1434,6 +1434,7 @@ VCMD(do_vdoor) {
 
 VCMD(do_vat)  {
 	char location[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	struct instance_data *inst;
 	vehicle_data *vehicle;
 	room_data *room = NULL, *was_in;
 
@@ -1444,7 +1445,13 @@ VCMD(do_vat)  {
 		return;
 	}
 
-	if ((was_in = IN_ROOM(veh))) {
+
+	// special case for use of i### room-template targeting when veh is outside its instance
+	if (location[0] == 'i' && isdigit(location[1]) && VEH_INSTANCE_ID(veh) != NOTHING && (inst = real_instance(VEH_INSTANCE_ID(veh))) && INST_START(inst)) {
+		// I know that's a lot to check but we want i###-targeting to work when a mob wanders out -pc 4/13/2015
+		room = get_room(INST_START(inst), location);
+	}
+	else if ((was_in = IN_ROOM(veh))) {
 		room = get_room(was_in, location);
 	}
 	else if (isdigit(*location)) {

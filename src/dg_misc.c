@@ -635,6 +635,7 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 			vehicle_data *veh = (vehicle_data*)go;
 			room = IN_ROOM(veh);
 			emp = VEH_OWNER(veh);
+			inst = get_instance_by_id(VEH_INSTANCE_ID(veh));
 			if (!vict) {
 				vict = get_char_near_vehicle(veh, vict_arg);
 			}
