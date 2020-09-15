@@ -469,7 +469,10 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 * @param char *argument The arguments passed to "%purge% instance".
 */
 void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) {
+	void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
+	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	vehicle_data *veh, *next_veh;
 	char_data *mob, *next_mob;
 	obj_data *obj, *next_obj;
 	any_vnum vnum;
@@ -525,6 +528,23 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 				}
 				extract_obj(obj);
 			}
+		}
+	}
+	else if (is_abbrev(arg1, "vehicle")) {
+		DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+			if (VEH_VNUM(veh) != vnum || VEH_INSTANCE_ID(veh) != INST_ID(inst)) {
+				continue;
+			}
+			
+			// found
+			if (*argument && ROOM_PEOPLE(IN_ROOM(veh))) {
+				act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			}
+			if (veh == owner) {
+				dg_owner_purged = 1;
+			}
+			empty_instance_vehicle(inst, veh, IN_ROOM(veh));
+			extract_vehicle(veh);
 		}
 	}
 	else {
