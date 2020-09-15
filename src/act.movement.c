@@ -1038,7 +1038,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 			return FALSE;
 		}
 		// entrance direction checks
-		if (IS_MAP_BUILDING(to_room) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
+		if (!ROOM_IS_CLOSED(IN_ROOM(ch)) && IS_MAP_BUILDING(to_room) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
 			if (ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES)) {
 				msg_to_char(ch, "You can't enter it from this side. The entrances are from %s and %s.\r\n", from_dir[get_direction_for_char(ch, BUILDING_ENTRANCE(to_room))], from_dir[get_direction_for_char(ch, rev_dir[BUILDING_ENTRANCE(to_room)])]);
 			}
