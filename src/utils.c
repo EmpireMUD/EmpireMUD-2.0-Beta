@@ -5572,7 +5572,8 @@ bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with
 
 
 /**
-* This determines if room is close enough to a sect with certain flags.
+* This determines if room is close enough to a sect with certain flags. It also
+* checks the base sector, e.g. if a road or bridge is over the flagged sect.
 *
 * @param room_data *room The location to check.
 * @param bitvector_t with_flags The bits that the sect MUST have (returns true if any 1 is set).
@@ -5591,8 +5592,14 @@ bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t wi
 	
 	for (x = -1 * distance; x <= distance && !found; ++x) {
 		for (y = -1 * distance; y <= distance && !found; ++y) {
-			shift = real_shift(real, x, y);
-			if (shift && (with_flags == NOBITS || ROOM_SECT_FLAGGED(shift, with_flags)) && (without_flags == NOBITS || !ROOM_SECT_FLAGGED(shift, without_flags))) {
+			if (!(shift = real_shift(real, x, y))) {
+				continue;	// no room
+			}
+			if (with_flags && !ROOM_SECT_FLAGGED(shift, with_flags) && !IS_SET(GET_SECT_FLAGS(BASE_SECT(shift)), with_flags)) {
+				continue;	// missing with-flags
+			}
+			
+			if (without_flags && (ROOM_SECT_FLAGGED(shift, without_flags) || IS_SET(GET_SECT_FLAGS(BASE_SECT(shift)), without_flags))) {
 				if (compute_distance(room, shift) <= distance) {
 					found = TRUE;
 				}
