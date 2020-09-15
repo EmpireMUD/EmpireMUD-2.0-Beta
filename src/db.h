@@ -196,7 +196,8 @@
 #define DATA_MAX_PLAYERS_TODAY  3	// players logged in today
 #define DATA_LAST_ISLAND_DESCS  4	// last time island descs regenerated
 #define DATA_LAST_CONSTRUCTION_ID  5	// for vehicle construct/dismantle
-#define NUM_DATAS  6
+#define DATA_START_PLAYTIME_TRACKING  6	// when we started tracking empire playtime (prevents accidental deletes)
+#define NUM_DATAS  7
 
 
 // DATYPE_x: types of stored data
@@ -244,7 +245,7 @@ void save_library_file_for_vnum(int type, any_vnum vnum);
 
 // world processors
 void change_base_sector(room_data *room, sector_data *sect);
-void change_terrain(room_data *room, sector_vnum sect);
+void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect);
 void construct_building(room_data *room, bld_vnum type);
 void disassociate_building(room_data *room);
 void set_crop_type(room_data *room, crop_data *cp);
@@ -533,6 +534,7 @@ extern vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
 
 // world
 void check_all_exits();
+extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern struct room_direction_data *create_exit(room_data *from, room_data *to, int dir, bool back);
 void delete_room(room_data *room, bool check_exits);
 extern room_data *world_table;

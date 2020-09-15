@@ -6,45 +6,45 @@ B
 5000 be 0
 S
 #5001
-tent~
+tent dismantle~
 -1 1
-8 -1 t 1 2036 0
+8 -1 lt 1 2036 0
 B
 5001 bde op
 R
 5001 3 5 0
 S
 #5002
-rockshelter~
+rockshelter dismantle~
 -1 1
-8 79 0 1 -1 0
+8 79 l 1 -1 0
 B
 5002 be op
 R
 5002 3 5 0
 S
 #5003
-treeshelter~
+treeshelter dismantle~
 -1 1
-8 79 0 1 -1 0
+8 79 l 1 -1 0
 B
 5003 d op
 R
 5003 3 5 0
 S
 #5004
-caveshelter~
+caveshelter dismantle~
 -1 1
-8 79 0 1 -1 0
+8 79 l 1 -1 0
 B
 5004 c cop
 R
 5004 3 5 0
 S
 #5005
-jungleshelter~
+jungleshelter dismantle~
 -1 1
-8 79 0 1 -1 0
+8 79 l 1 -1 0
 B
 5005 g gop
 R
@@ -83,5 +83,50 @@ flooded ruins dismantle~
 8 -1 l 1 -1 0
 B
 5010 0 0
+S
+#5011
+tent~
+5011 1
+8 -1 nt 1 2036 0
+B
+5001 bdejlnx 0
+R
+5001 2 5 0
+S
+#5012
+rock shelter~
+5012 1
+8 79 n 1 -1 0
+B
+5002 be 0
+R
+5002 2 5 0
+S
+#5013
+tree shelter~
+5013 1
+8 79 n 1 -1 0
+B
+5003 dn 0
+R
+5003 2 5 0
+S
+#5014
+cave shelter~
+5014 1
+8 79 n 1 -1 0
+B
+5004 c 0
+R
+5004 2 5 0
+S
+#5015
+jungle shelter~
+5015 1
+8 79 n 1 -1 0
+B
+5005 g 0
+R
+5005 2 5 0
 S
 $

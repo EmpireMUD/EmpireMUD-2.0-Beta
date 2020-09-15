@@ -32,6 +32,8 @@
 *   loaded_player_hash For Offline Players
 *   Autowiz Wizlist Generator
 *   Helpers
+*   Playtime Tracking
+*   Empire Member/Greatness Tracking
 *   Empire Player Management
 *   Equipment Sets
 *   Promo Codes
@@ -61,15 +63,21 @@ void update_class(char_data *ch);
 void check_eq_sets(char_data *ch);
 void clear_delayed_update(char_data *ch);
 void clear_player(char_data *ch);
+void delete_member_data(char_data *ch, empire_data *from_emp);
 void delete_player_character(char_data *ch);
 void free_player_eq_set(struct player_eq_set *eq_set);
 struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
+time_t get_member_timeout_ch(char_data *ch);
 time_t get_member_timeout_time(time_t created, time_t last_login, double played_hours);
 void purge_bound_items(int idnum);
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch);
 void remove_loaded_player(char_data *ch);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
 int sort_players_by_name(player_index_data *a, player_index_data *b);
+void track_empire_playtime(empire_data *emp, int add_seconds);
+void update_empire_members_and_greatness(empire_data *emp);
+void update_member_data(char_data *ch);
+void update_played_time(char_data *ch);
 void write_player_delayed_data_to_file(FILE *fl, char_data *ch);
 void write_player_primary_data_to_file(FILE *fl, char_data *ch);
 
@@ -2451,8 +2459,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Last Logon: %ld\n", ch->prev_logon);
 	}
 	else {
-		ch->player.time.played += (int)(time(0) - ch->player.time.logon);
-		ch->player.time.logon = time(0);	// reset this first
+		update_played_time(ch);
 		fprintf(fl, "Last Host: %s\n", ch->desc ? ch->desc->host : NULLSAFE(ch->prev_host));
 		fprintf(fl, "Last Logon: %ld\n", ch->player.time.logon);
 	}
@@ -3720,6 +3727,7 @@ void delete_player_character(char_data *ch) {
 		log_to_empire(emp, ELOG_MEMBERS, "%s has left the empire", PERS(ch, ch, TRUE));
 		GET_LOYALTY(ch) = NULL;
 		GET_RANK(ch) = 0;
+		delete_member_data(ch, emp);
 	}
 	
 	// remove account and player index
@@ -4073,6 +4081,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// reload last companion?
 	if (GET_LAST_COMPANION(ch) != NOTHING && (compan = has_companion(ch, GET_LAST_COMPANION(ch)))) {
 		load_companion_mob(ch, compan);
+	}
+	
+	// ensure these are fresh
+	if (GET_LOYALTY(ch)) {
+		update_member_data(ch);
+		update_empire_members_and_greatness(GET_LOYALTY(ch));
 	}
 }
 
@@ -4537,55 +4551,289 @@ void start_new_character(char_data *ch) {
 }
 
 
+/**
+* Updates the total playtime on a character, generally called when saving (but
+* can safely be called any time.
+*
+* @param char_data *ch The player.
+*/
+void update_played_time(char_data *ch) {
+	int amt = (int)(time(0) - ch->player.time.logon);
+	ch->player.time.played += amt;
+	ch->player.time.logon = time(0);	// reset this now
+	
+	// track to empire
+	if (!IS_NPC(ch) && GET_LOYALTY(ch)) {
+		track_empire_playtime(GET_LOYALTY(ch), amt);
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
-//// EMPIRE PLAYER MANAGEMENT ////////////////////////////////////////////////
+//// PLAYTIME TRACKING ///////////////////////////////////////////////////////
 
-// tracks players in an empire to determine which one contributes greatness
-struct empire_member_reader_data {
-	empire_data *empire;
-	int account_id;
-	int player_id;
-	int greatness;
-	struct empire_member_reader_data *next;
-};
-
-
-// simple sorter for the member-reading data
-int sort_emrd(struct empire_member_reader_data *a, struct empire_member_reader_data *b) {
-	if (EMPIRE_VNUM(a->empire) != EMPIRE_VNUM(b->empire)) {
-		return EMPIRE_VNUM(a->empire) - EMPIRE_VNUM(b->empire);
-	}
-	if (a->account_id != b->account_id) {
-		return a->account_id - b->account_id;
-	}
-	if (a->greatness != b->greatness) {
-		return b->greatness - a->greatness;
-	}
-	return a->player_id - b->player_id;
+// sorts newest-first based on DAILY_CYCLE_DAY
+int sort_playtime_tracker(struct empire_playtime_tracker *a, struct empire_playtime_tracker *b) {
+	return b->cycle - a->cycle;
 }
 
 
 /**
-* Add a given user's data to the account list on the empire member reader data
+* Called whenever a player's playtime is updated to also update the empire's
+* daily playtime.
 *
-* @param struct empire_member_reader_data **list A pointer to the existing list.
-* @param int empire which empire entry the player is in
-* @param int account_id which account id the player has
-* @param int player_id the id of the player contributing
-* @param int greatness the player's greatness
+* @param empire_data *emp The empire.
+* @param int add_seconds Amount of time to add, in seconds.
 */
-void add_to_emrd_list(struct empire_member_reader_data **list, empire_data *empire, int account_id, int player_id, int greatness) {
-	struct empire_member_reader_data *emrd;
+void track_empire_playtime(empire_data *emp, int add_seconds) {
+	struct empire_playtime_tracker *ept;
+	int cycle = DAILY_CYCLE_DAY;
 	
-	CREATE(emrd, struct empire_member_reader_data, 1);
-	emrd->empire = empire;
-	emrd->account_id = account_id;
-	emrd->player_id = player_id;
-	emrd->greatness = greatness;
-	
-	LL_INSERT_INORDER(*list, emrd, sort_emrd);
+	if (emp && add_seconds > 0) {
+		HASH_FIND_INT(EMPIRE_PLAYTIME_TRACKER(emp), &cycle, ept);
+		if (!ept) {	// create if needed
+			CREATE(ept, struct empire_playtime_tracker, 1);
+			ept->cycle = cycle;
+			HASH_ADD_INT(EMPIRE_PLAYTIME_TRACKER(emp), cycle, ept);
+		}
+		SAFE_ADD(ept->playtime_secs, add_seconds, 0, INT_MAX, FALSE);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
 }
 
+
+/**
+* Collates the empire's playtime tracker into total playtime (in seconds) for
+* each of the last N weeks, based on PLAYTIME_WEEKS_TO_TRACK. Most recent week
+* is first.
+*
+* The output of this function should be copied if you need to keep it; it is a
+* static int array and calling it on another empire will lose your original
+* values.
+*
+* @param empire_data *emp The empire.
+* @return int* An array of ints, of size PLAYTIME_WEEKS_TO_TRACK, starting with the current week and moving backwards.
+*/
+int *summarize_weekly_playtime(empire_data *emp) {
+	struct empire_playtime_tracker *ept, *next;
+	static int data[PLAYTIME_WEEKS_TO_TRACK];
+	int iter, pos, cur;
+	
+	// prep first
+	cur = DAILY_CYCLE_DAY;
+	HASH_SORT(EMPIRE_PLAYTIME_TRACKER(emp), sort_playtime_tracker);
+	for (iter = 0; iter < PLAYTIME_WEEKS_TO_TRACK; ++iter) {
+		data[iter] = 0;
+	}
+	
+	// collect data
+	HASH_ITER(hh, EMPIRE_PLAYTIME_TRACKER(emp), ept, next) {
+		pos = (int)((cur - ept->cycle) / 7);
+		
+		if (pos < PLAYTIME_WEEKS_TO_TRACK) {
+			SAFE_ADD(data[pos], ept->playtime_secs, 0, INT_MAX, FALSE);
+		}
+		else {	// otherwise delete old data now
+			HASH_DEL(EMPIRE_PLAYTIME_TRACKER(emp), ept);
+			free(ept);
+			continue;
+		}
+	}
+	
+	return data;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EMPIRE MEMBER/GREATNESS TRACKING ////////////////////////////////////////
+
+// This system keeps greatness (and other data) organized by account/character
+
+/**
+* Find/add a member account in an empire.
+*
+* @param empire_data *emp The empire.
+* @param int id The account id.
+* @param bool add_if_missing Will attempt to create the item.
+* @return struct empire_member_account* The account entry, if possible. Otherwise NULL.
+*/
+struct empire_member_account *get_member_account(empire_data *emp, int id, bool add_if_missing) {
+	struct empire_member_account *emma;
+	
+	// safety
+	if (!emp || !id) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(EMPIRE_MEMBER_ACCOUNTS(emp), &id, emma);
+	if (!emma && add_if_missing) {
+		CREATE(emma, struct empire_member_account, 1);
+		emma->id = id;
+		HASH_ADD_INT(EMPIRE_MEMBER_ACCOUNTS(emp), id, emma);
+	}
+	
+	return emma;	// if any
+}
+
+
+/**
+* Find/add a character entry in an empire's account entry.
+*
+* @param struct empire_member_account *mem_acct The account entry from an empire.
+* @param int id The player id.
+* @param bool add_if_missing Will attempt to create the item.
+* @return struct empire_member_data* The character entry, if possible. Otherwise NULL.
+*/
+struct empire_member_data *get_member_account_player(struct empire_member_account *mem_acct, int id, bool add_if_missing) {
+	struct empire_member_data *emda;
+	
+	// safety
+	if (!mem_acct || !id) {
+		return NULL;
+	}
+	
+	HASH_FIND_INT(mem_acct->list, &id, emda);
+	if (!emda && add_if_missing) {
+		CREATE(emda, struct empire_member_data, 1);
+		emda->id = id;
+		HASH_ADD_INT(mem_acct->list, id, emda);
+	}
+	
+	return emda;
+}
+
+
+/**
+* Deletes the data for a character from an empire's member/account list.
+*
+* @param char_data *ch The character to remove.
+* @param empire_data *from_emp The empire to remove them from.
+*/
+void delete_member_data(char_data *ch, empire_data *from_emp) {
+	struct empire_member_account *acct;
+	struct empire_member_data *data;
+	
+	if (!ch || IS_NPC(ch) || !from_emp || !GET_ACCOUNT(ch)) {
+		return;	// safety first
+	}
+	
+	if ((acct = get_member_account(from_emp, GET_ACCOUNT(ch)->id, FALSE))) {
+		// delete player
+		if ((data = get_member_account_player(acct, GET_IDNUM(ch), FALSE))) {
+			HASH_DEL(acct->list, data);
+			free(data);
+		}
+		
+		// any players left?
+		if (!acct->list) {
+			HASH_DEL(EMPIRE_MEMBER_ACCOUNTS(from_emp), acct);
+			free(acct);
+		}
+	}
+}
+
+
+/**
+* Frees the EMPIRE_MEMBER_ACCOUNTS.
+*
+* @param empire_data *emp The empire.
+*/
+void free_member_data(empire_data *emp) {
+	struct empire_member_account *acct, *next_acct;
+	struct empire_member_data *data, *next_data;
+	
+	HASH_ITER(hh, EMPIRE_MEMBER_ACCOUNTS(emp), acct, next_acct) {
+		HASH_ITER(hh, acct->list, data, next_data) {
+			HASH_DEL(acct->list, data);
+			free(data);
+		}
+		
+		HASH_DEL(EMPIRE_MEMBER_ACCOUNTS(emp), acct);
+		free(acct);
+	}
+}
+
+
+/**
+* Updates an empire's members and greatness count.
+*
+* @param empire_data *emp The empire.
+*/
+void update_empire_members_and_greatness(empire_data *emp) {
+	int best, old, greatness = 0, members = 0, total = 0;
+	struct empire_member_account *acct, *next_acct;
+	struct empire_member_data *data, *next_data;
+	time_t curtime = time(0);
+	bool any;
+	
+	if (!emp) {
+		return;	// safety
+	}
+	
+	old = EMPIRE_GREATNESS(emp);
+	
+	HASH_ITER(hh, EMPIRE_MEMBER_ACCOUNTS(emp), acct, next_acct) {
+		best = 0;
+		any = FALSE;
+		HASH_ITER(hh, acct->list, data, next_data) {
+			// always update total
+			++total;
+			
+			// stop here if timed out
+			if (data->timeout_at <= curtime) {
+				continue;
+			}
+			
+			// ok:
+			any = TRUE;
+			
+			// update greatness
+			if (data->greatness > best) {
+				best = data->greatness;
+			}
+		}
+		
+		if (any || best > 0) {	// found an active member
+			greatness += best;
+			++members;
+		}
+	}
+	
+	EMPIRE_GREATNESS(emp) = greatness;
+	EMPIRE_MEMBERS(emp) = members;
+	EMPIRE_TOTAL_MEMBER_COUNT(emp) = total;
+	
+	if (greatness != old) {
+		et_change_greatness(emp);
+	}
+}
+
+
+/**
+* Updates the empire member data for a character, to be called if their
+* greatness changes (or any trait tracked by this).
+*
+* @param char_data *ch The character to update.
+*/
+void update_member_data(char_data *ch) {
+	struct empire_member_account *acct;
+	struct empire_member_data *data;
+	
+	if (!ch || IS_NPC(ch) || !GET_LOYALTY(ch) || !GET_ACCOUNT(ch)) {
+		return;	// safety first
+	}
+	
+	if ((acct = get_member_account(GET_LOYALTY(ch), GET_ACCOUNT(ch)->id, TRUE))) {
+		if ((data = get_member_account_player(acct, GET_IDNUM(ch), TRUE))) {
+			data->timeout_at = get_member_timeout_ch(ch);
+			data->greatness = GET_GREATNESS(ch);
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EMPIRE PLAYER MANAGEMENT ////////////////////////////////////////////////
 
 /**
 * Determines when an empire member is timed out based on his playtime, creation
@@ -4679,19 +4927,17 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	void resort_empires(bool force);
 	bool should_delete_empire(empire_data *emp);
 	
-	struct empire_member_reader_data *account_list = NULL, *emrd;
 	player_index_data *index, *next_index;
 	empire_data *e, *emp, *next_emp;
 	char_data *ch;
 	time_t logon, curtime = time(0), timeout;
 	bool is_file;
-	int level, last_account, last_empire, acct_greatness;
+	int level;
 
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (!only_empire || emp == only_empire) {
 			EMPIRE_TOTAL_MEMBER_COUNT(emp) = 0;
 			EMPIRE_MEMBERS(emp) = 0;
-			EMPIRE_GREATNESS(emp) = 0;
 			EMPIRE_TOTAL_PLAYTIME(emp) = 0;
 			EMPIRE_LAST_LOGON(emp) = 0;
 			EMPIRE_IMM_ONLY(emp) = 0;
@@ -4725,14 +4971,13 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			}
 			
 			// always
+			update_member_data(ch);
 			EMPIRE_TOTAL_MEMBER_COUNT(e) += 1;
 			
 			// only count players who have logged on in recent history
 			timeout = get_member_timeout_ch(ch);
 			
 			if (!is_file || timeout > curtime) {
-				add_to_emrd_list(&account_list, e, GET_ACCOUNT(ch)->id, GET_IDNUM(ch), GET_GREATNESS(ch));
-				
 				// not account-restricted
 				EMPIRE_TOTAL_PLAYTIME(e) += (ch->player.time.played / SECS_PER_REAL_HOUR);
 				level = is_file ? GET_HIGHEST_KNOWN_LEVEL(ch) : (int) GET_COMPUTED_LEVEL(ch);
@@ -4758,41 +5003,14 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		}
 	}
 	
-	// vars for processing accounts
-	last_account = -1;
-	last_empire = -1;
-	acct_greatness = 0;
-	
-	// this list is pre-sorted by account, then greatness (descending), then player id
-	while ((emrd = account_list)) {
-		index = find_player_index_by_idnum(emrd->player_id);
-		if (last_account != emrd->account_id || last_empire != EMPIRE_VNUM(emrd->empire)) {
-			// found a new account/empire: the first player is always the highest greatness
-			last_account = emrd->account_id;
-			last_empire = EMPIRE_VNUM(emrd->empire);
-			acct_greatness = emrd->greatness;
-			
-			EMPIRE_MEMBERS(emrd->empire) += 1;
-			EMPIRE_GREATNESS(emrd->empire) += emrd->greatness;
-			index->contributing_greatness = TRUE;
-			
-			// will re-calculate if it drops below this
-			index->greatness_threshold = (emrd->next && emrd->next->empire == emrd->empire) ? emrd->next->greatness : 0;
-		}
-		else {	// same account again
-			index->contributing_greatness = FALSE;
-			
-			// will re-calculate if it rises above this
-			index->greatness_threshold = acct_greatness;
+	// final updates
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// refresh first
+		if (!only_empire || emp == only_empire) {
+			update_empire_members_and_greatness(emp);
 		}
 		
-		// free data
-		account_list = emrd->next;
-		free(emrd);
-	}
-	
-	// delete emptypires
-	HASH_ITER(hh, empire_table, emp, next_emp) {
+		// delete emptypires
 		if ((!only_empire || emp == only_empire) && should_delete_empire(emp)) {
 			delete_empire(emp);
 			
@@ -4800,9 +5018,6 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			if (only_empire) {
 				break;
 			}
-		}
-		else if (!only_empire || emp == only_empire) {	// refresh
-			et_change_greatness(emp);
 		}
 	}
 	

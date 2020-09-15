@@ -1063,7 +1063,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		}
 	if (!IS_NPC(i) && GET_ACTION(i) == ACT_MORPHING)
 		act("...$e is undergoing a hideous transformation!", FALSE, i, 0, ch, TO_VICT);
-	if ((IS_MORPHED(i) || IS_DISGUISED(i)) && (IS_IMMORTAL(ch) || CAN_RECOGNIZE(ch, i))) {
+	if ((IS_MORPHED(i) || IS_DISGUISED(i)) && (PRF_FLAGGED(ch, PRF_HOLYLIGHT) || CAN_RECOGNIZE(ch, i))) {
 		act("...this appears to be $o.", FALSE, i, 0, ch, TO_VICT);
 	}
 	
@@ -1198,7 +1198,7 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 	if (!i || !ch || !ch->desc)
 		return;
 	
-	disguise = !IS_IMMORTAL(ch) && (IS_DISGUISED(i) || (IS_MORPHED(i) && CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)));
+	disguise = !PRF_FLAGGED(ch, PRF_HOLYLIGHT) && (IS_DISGUISED(i) || (IS_MORPHED(i) && CHAR_MORPH_FLAGGED(i, MORPHF_ANIMAL)));
 	
 	if (show_eq && ch != i && !IS_IMMORTAL(ch) && !IS_NPC(i) && has_ability(i, ABIL_CONCEALMENT)) {
 		show_eq = FALSE;
@@ -1469,52 +1469,6 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
 
 
 /**
-* This is always called by do_inventory to show what's stored here. If nothing
-* is stored, no message is sent.
-*
-* @param char_data *ch The person checking inventory.
-* @param room_data *room The room they are checking.
-* @param empire_data *emp An empire.
-* @return bool TRUE if any items were shown at all, otherwise FALSE
-*/
-bool inventory_store_building(char_data *ch, room_data *room, empire_data *emp) {
-	char buf[MAX_STRING_LENGTH];
-	bool found = FALSE;
-	struct empire_storage_data *store, *next_store;
-	struct empire_island *eisle;
-	obj_data *proto;
-
-	/* Must be in an empire */
-	if (!emp) {
-		return found;
-	}
-	
-	eisle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch)));
-	
-	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
-		msg_to_char(ch, "\r\nVault: %.1f coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(emp), (EMPIRE_COINS(emp) != 1.0 ? "s" : ""), EMPIRE_WEALTH(emp), (int) GET_TOTAL_WEALTH(emp));
-	}
-	
-	HASH_ITER(hh, eisle->store, store, next_store) {
-		if ((proto = store->proto)) {
-			if (obj_can_be_retrieved(proto, room)) {
-				if (!found) {
-					snprintf(buf, sizeof(buf), "\r\n%s inventory available here:\r\n", EMPIRE_ADJECTIVE(emp));
-					CAP(buf + 2);
-					msg_to_char(ch, "%s", buf);
-				}
-				
-				show_one_stored_item_to_char(ch, emp, store, FALSE);
-				found = TRUE;
-			}
-		}
-	}
-	
-	return found;
-}
-
-
-/**
 * @param obj_data *list the objects to show
 * @param char_data *ch the person to show it to
 * @param int mode OBJ_DESC_x
@@ -1734,6 +1688,79 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 
 
 /**
+* Shows empire inventory available in the room, based on building/vehicles
+* present. This is the character's own empire UNLESS 'thief_mode' is set,
+* in which case it shows any empire with storage present.
+*
+* @param char_data *ch The person looking at storage.
+* @param room_data *room The location (will include vehicles in the room too).
+* @param bool thief_mode If TRUE, indicates ownership and shows other empires' things.
+* @return bool TRUE if any items were shown at all; otherwise FALSE.
+*/
+bool show_local_einv(char_data *ch, room_data *room, bool thief_mode) {
+	struct vnum_hash *vhash = NULL, *vhash_iter, *vhash_next;
+	empire_data *own_empire = GET_LOYALTY(ch), *emp;
+	struct empire_storage_data *store, *next_store;
+	struct empire_island *eisle;
+	bool found_one, found_any;
+	vehicle_data *veh;
+	
+	if (!thief_mode && !own_empire) {
+		return FALSE;	// no empire - nothing to show
+	}
+	
+	// show vault info first (own empire only; ignores thief mode)
+	if (own_empire == ROOM_OWNER(room) && room_has_function_and_city_ok(room, FNC_VAULT)) {
+		msg_to_char(ch, "\r\nVault: %.1f coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(own_empire), (EMPIRE_COINS(own_empire) != 1.0 ? "s" : ""), EMPIRE_WEALTH(own_empire), (int) GET_TOTAL_WEALTH(own_empire));
+	}
+	
+	// build a list of empires to check here
+	if (thief_mode) {
+		if (ROOM_OWNER(room)) {
+			add_vnum_hash(&vhash, EMPIRE_VNUM(ROOM_OWNER(room)), 1);
+		}
+		DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+			if (VEH_OWNER(veh)) {
+				add_vnum_hash(&vhash, EMPIRE_VNUM(VEH_OWNER(veh)), 1);
+			}
+		}
+	}
+	else {
+		add_vnum_hash(&vhash, EMPIRE_VNUM(own_empire), 1);
+	}
+	
+	// determines return val
+	found_any = FALSE;
+	
+	// iterate over empire list
+	HASH_ITER(hh, vhash, vhash_iter, vhash_next) {
+		if (!(emp = real_empire(vhash_iter->vnum))) {
+			continue;	// should be impossible
+		}
+		
+		// look for storage here
+		found_one = FALSE;
+		eisle = get_empire_island(emp, GET_ISLAND_ID(room));
+		HASH_ITER(hh, eisle->store, store, next_store) {
+			if (store->proto && obj_can_be_retrieved(store->proto, room, thief_mode ? NULL : own_empire)) {
+				if (!found_one) {
+					snprintf(buf, sizeof(buf), "%s inventory available here:\t0\r\n", EMPIRE_ADJECTIVE(emp));
+					CAP(buf);
+					msg_to_char(ch, "\r\n%s%s", EMPIRE_BANNER(emp), buf);
+				}
+			
+				show_one_stored_item_to_char(ch, emp, store, FALSE);
+				found_one = found_any = TRUE;
+			}
+		}
+	}
+	
+	free_vnum_hash(&vhash);
+	return found_any;
+}
+
+
+/**
 * display one stored item to ch
 *
 * @param char_data *ch Person to show it to.
@@ -1742,27 +1769,28 @@ char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
 * @param bool show_zero Forces an amount of 0, in case this is only being shown for the "total" reference and there are actually 0 here.
 */
 void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero) {
+	bool show_own_data = (GET_LOYALTY(ch) == emp || GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	int total = get_total_stored_count(emp, store->vnum, TRUE);
 	char lbuf[MAX_INPUT_LENGTH], keepstr[256];
 	
-	if (total > store->amount || show_zero) {
+	if (show_own_data && (total > store->amount || show_zero)) {
 		sprintf(lbuf, " (%d total)", total);
 	}
 	else {
 		*lbuf = '\0';
 	}
 	
-	if (store->keep == UNLIMITED) {
+	if (show_own_data && store->keep == UNLIMITED) {
 		strcpy(keepstr, " (keep)");
 	}
-	else if (store->keep > 0) {
+	else if (show_own_data && store->keep > 0) {
 		snprintf(keepstr, sizeof(keepstr), " (keep %d)", store->keep);
 	}
 	else {
 		*keepstr = '\0';
 	}
 	
-	msg_to_char(ch, "(%4d) %s%s%s\r\n", (show_zero ? 0 : store->amount), get_obj_name_by_proto(store->vnum), keepstr, lbuf);
+	msg_to_char(ch, "(%4d) %s%s%s\r\n", (show_zero ? 0 : store->amount), store->proto ? GET_OBJ_SHORT_DESC(store->proto) : get_obj_name_by_proto(store->vnum), keepstr, lbuf);
 }
 
 
@@ -2755,12 +2783,10 @@ ACMD(do_helpsearch) {
 }
 
 
-ACMD(do_inventory) {
+ACMD(do_inventory) {	
 	skip_spaces(&argument);
 	
 	if (!*argument) {	// no-arg: traditional inventory
-		empire_data *ch_emp, *room_emp;
-		
 		if (!IS_NPC(ch)) {
 			do_coins(ch, "", 0, FALSE);
 		}
@@ -2768,13 +2794,8 @@ ACMD(do_inventory) {
 		msg_to_char(ch, "You are carrying %d/%d items:\r\n", IS_CARRYING_N(ch), CAN_CARRY_N(ch));
 		list_obj_to_char(ch->carrying, ch, OBJ_DESC_INVENTORY, TRUE);
 
-		if (IS_COMPLETE(IN_ROOM(ch)) && GET_LOYALTY(ch) && can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-			ch_emp = GET_LOYALTY(ch);
-			room_emp = ROOM_OWNER(IN_ROOM(ch));
-			
-			if (!room_emp || ch_emp == room_emp || has_relationship(ch_emp, room_emp, DIPL_TRADE)) {
-				inventory_store_building(ch, IN_ROOM(ch), ch_emp);
-			}
+		if (GET_LOYALTY(ch)) {
+			show_local_einv(ch, IN_ROOM(ch), FALSE);
 		}
 	}
 	else {	// advanced inventory

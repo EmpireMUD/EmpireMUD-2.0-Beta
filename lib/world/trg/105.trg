@@ -591,9 +591,9 @@ switch %random.3%
     * Applies heal-over-time to self, damage-over-time to tank
     * Normal/Hard: 50% DoT, level/20 HoT
     * Group/Boss: 100% DoT, level/10 HoT
-    %echo% %self.name% reaches into the cold, violet flames, and %self.hisher% wounds start to close...
     %send% %actor% &r%self.name% lashes out at you with a whip of violet fire, which clings to you and draws your heat away!
     %echoaround% %actor% %self.name% lashes out at %actor.name% with a whip of violet fire! %actor.name% bursts into cold violet flames!
+    %echo% %self.name% reaches into the cold, violet flames, and %self.hisher% wounds start to close...
     if %heroic_mode%
       %dot% #10559 %actor% 100 20 magical
       eval magnitude %actor.level%/10

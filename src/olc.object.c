@@ -699,7 +699,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		found = FALSE;
-		if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP | CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
+		if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft) && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP) && GET_CRAFT_OBJECT(craft) == vnum) {
 			GET_CRAFT_OBJECT(craft) = NOTHING;
 			found = TRUE;
 		}
@@ -865,6 +865,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	// update vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(veh), RES_OBJECT, vnum);
+		found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_OBJ, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(veh));
 		}
@@ -939,7 +940,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_CRAFT(desc)) {
 			found = FALSE;
-			if (GET_OLC_CRAFT(desc)->type != CRAFT_TYPE_BUILD && !IS_SET(GET_OLC_CRAFT(desc)->flags, CRAFT_SOUP | CRAFT_VEHICLE) && GET_OLC_CRAFT(desc)->object == vnum) {
+			if (!CRAFT_IS_BUILDING(GET_OLC_CRAFT(desc)) && !CRAFT_IS_VEHICLE(GET_OLC_CRAFT(desc)) && !IS_SET(GET_OLC_CRAFT(desc)->flags, CRAFT_SOUP) && GET_OLC_CRAFT(desc)->object == vnum) {
 				GET_OLC_CRAFT(desc)->object = NOTHING;
 				found = TRUE;
 			}
@@ -1074,8 +1075,9 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		}
 		if (GET_OLC_VEHICLE(desc)) {
 			found = remove_thing_from_resource_list(&VEH_YEARLY_MAINTENANCE(GET_OLC_VEHICLE(desc)), RES_OBJECT, vnum);
+			found |= delete_from_interaction_list(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), TYPE_OBJ, vnum);
 			if (found) {
-				msg_to_char(desc->character, "One of the objects used for maintenance for the vehicle you're editing was deleted.\r\n");
+				msg_to_char(desc->character, "One of the objects used on the vehicle you're editing was deleted.\r\n");
 			}
 		}
 	}
@@ -1103,6 +1105,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 	bitvector_t only_tools = NOBITS;
 	int count, only_level = NOTHING, only_type = NOTHING, only_mat = NOTHING;
 	int only_weapontype = NOTHING;
+	bool only_storable = FALSE, not_storable = FALSE;
 	struct interaction_item *inter;
 	struct custom_message *cust;
 	obj_data *obj, *next_obj;
@@ -1135,9 +1138,11 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 		FULLSEARCH_FLAGS("interaction", find_interacts, interact_types)
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
 		FULLSEARCH_LIST("material", only_mat, (const char **)olc_material_list)
+		FULLSEARCH_BOOL("storable", only_storable)
 		FULLSEARCH_FLAGS("tools", only_tools, tool_flags)
 		FULLSEARCH_LIST("type", only_type, item_types)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, extra_bits)
+		FULLSEARCH_BOOL("unstorable", not_storable)
 		FULLSEARCH_FUNC("weapontype", only_weapontype, get_attack_type_by_name(val_arg))
 		FULLSEARCH_FLAGS("wear", only_worn, wear_bits)
 		FULLSEARCH_FLAGS("worn", only_worn, wear_bits)
@@ -1162,6 +1167,12 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 			if (GET_OBJ_MIN_SCALE_LEVEL(obj) != 0 && only_level < GET_OBJ_MIN_SCALE_LEVEL(obj)) {
 				continue;
 			}
+		}
+		if (only_storable && !GET_OBJ_STORAGE(obj)) {
+			continue;
+		}
+		if (not_storable && GET_OBJ_STORAGE(obj)) {
+			continue;
 		}
 		if (only_type != NOTHING && GET_OBJ_TYPE(obj) != only_type) {
 			continue;
@@ -1352,7 +1363,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
 				any = TRUE;
 				++found;
-				size += snprintf(buf + size, sizeof(buf) - size, "BDG [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+				size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
 			}
 		}
 		for (res = GET_BLD_YEARLY_MAINTENANCE(bld); res && !any; res = res->next) {
@@ -1367,7 +1378,7 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	// crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		any = FALSE;
-		if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP | CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
+		if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft) && !IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_SOUP) && GET_CRAFT_OBJECT(craft) == vnum) {
 			any = TRUE;
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
@@ -1583,6 +1594,14 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 				any = TRUE;
 				++found;
 				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			}
+		}
+		LL_FOREACH(VEH_INTERACTIONS(veh), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_OBJ && inter->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				break;
 			}
 		}
 	}
@@ -2079,7 +2098,6 @@ void olc_show_object(char_data *ch) {
 	struct custom_message *ocm;
 	struct obj_apply *apply;
 	int count, minutes;
-	bld_data *bld;
 	
 	if (!obj) {
 		return;
@@ -2161,11 +2179,16 @@ void olc_show_object(char_data *ch) {
 	// storage
 	sprintf(buf + strlen(buf), "Storage: <%sstorage\t0>\r\n", OLC_LABEL_PTR(GET_OBJ_STORAGE(obj)));
 	count = 0;
-	for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {
-		bld = building_proto(store->building_type);
-		
+	LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
 		sprintbit(store->flags, storage_bits, buf2, TRUE);
-		sprintf(buf + strlen(buf), " \ty%d\t0. [%d] %s ( %s)\r\n", ++count, GET_BLD_VNUM(bld), GET_BLD_NAME(bld), buf2);
+		
+		// TYPE_x: storage type
+		if (store->type == TYPE_BLD) {
+			sprintf(buf + strlen(buf), " \ty%d\t0. [B%d] %s ( %s)\r\n", ++count, store->vnum, get_bld_name_by_proto(store->vnum), buf2);
+		}
+		else if (store->type == TYPE_VEH) {
+			sprintf(buf + strlen(buf), " \ty%d\t0. [V%d] %s ( %s)\r\n", ++count, store->vnum, get_vehicle_name_by_proto(store->vnum), buf2);
+		}
 	}
 	
 	// custom messages
@@ -3048,9 +3071,8 @@ OLC_MODULE(oedit_storage) {
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *flagarg;
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	int loc, num, iter;
-	struct obj_storage_type *store, *change, *temp;
-	bld_vnum bld;
+	int loc, num, iter, mode;
+	struct obj_storage_type *store, *change;
 	bool found;
 	
 	// arg1 arg2
@@ -3076,10 +3098,17 @@ OLC_MODULE(oedit_storage) {
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove the storage in the %s.\r\n", GET_BLD_NAME(building_proto(store->building_type)));
+					// TYPE_x: storage types
+					if (store->type == TYPE_BLD) {
+						msg_to_char(ch, "You remove the storage in the %s.\r\n", get_bld_name_by_proto(store->vnum));
+					}
+					else if (store->type == TYPE_VEH) {
+						msg_to_char(ch, "You remove the storage in %s.\r\n", get_vehicle_name_by_proto(store->vnum));
+					}
 					
-					REMOVE_FROM_LIST(store, obj->proto_data->storage, next);
+					LL_DELETE(obj->proto_data->storage, store);
 					free(store);
+					break;
 				}
 			}
 			
@@ -3089,36 +3118,39 @@ OLC_MODULE(oedit_storage) {
 		}
 	}
 	else if (is_abbrev(arg1, "add")) {
-		flagarg = any_one_word(arg2, arg);
-		bld = atoi(arg);
+		half_chop(arg2, type_arg, arg);
+		flagarg = any_one_word(arg, val_arg);
 		
 		// flagarg MAY contain space-separated flags
 		
-		if (!*arg || !isdigit(*arg)) {
-			msg_to_char(ch, "Usage: storage add <building/room> [flags]\r\n");
+		// types
+		if (is_abbrev(type_arg, "building") || is_abbrev(type_arg, "room")) {
+			mode = TYPE_BLD;
 		}
-		else if (!building_proto(bld)) {
-			msg_to_char(ch, "Invalid building vnum '%s'.\r\n", arg);
+		else if (is_abbrev(type_arg, "vehicle")) {
+			mode = TYPE_VEH;
+		}
+		else {
+			mode = -1;
+		}
+		
+		num = atoi(val_arg);
+		
+		if (!*type_arg || !*val_arg || !isdigit(*val_arg) || mode == -1) {
+			msg_to_char(ch, "Usage: storage add <building | vehicle> <vnum> [flags]\r\n");
+		}
+		else if (mode == TYPE_BLD && !building_proto(num)) {
+			msg_to_char(ch, "Invalid building vnum '%s'.\r\n", val_arg);
+		}
+		else if (mode == TYPE_VEH && !vehicle_proto(num)) {
+			msg_to_char(ch, "Invalid vehicle vnum '%s'.\r\n", val_arg);
 		}
 		else {
 			CREATE(store, struct obj_storage_type, 1);
-			
-			store->building_type = bld;
-			
+			store->type = mode;
+			store->vnum = num;
 			store->flags = 0;
-			store->next = NULL;
-			
-			// append to end
-			if (GET_OBJ_STORAGE(obj)) {
-				temp = GET_OBJ_STORAGE(obj);
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = store;
-			}
-			else {
-				obj->proto_data->storage = store;
-			}
+			LL_APPEND(obj->proto_data->storage, store);
 			
 			// process flags as space-separated string
 			while (*flagarg) {
@@ -3130,7 +3162,14 @@ OLC_MODULE(oedit_storage) {
 			}
 			
 			sprintbit(store->flags, storage_bits, buf1, TRUE);
-			msg_to_char(ch, "You add storage in the %s with flags: %s\r\n", GET_BLD_NAME(building_proto(store->building_type)), buf1);
+			
+			// TYPE_x: storage types
+			if (mode == TYPE_BLD) {
+				msg_to_char(ch, "You add storage in the %s with flags: %s\r\n", get_bld_name_by_proto(num), buf1);
+			}
+			else if (mode == TYPE_VEH) {
+				msg_to_char(ch, "You add storage in %s with flags: %s\r\n", get_vehicle_name_by_proto(num), buf1);
+			}
 		}
 	}
 	else if (is_abbrev(arg1, "change")) {
@@ -3138,7 +3177,7 @@ OLC_MODULE(oedit_storage) {
 		half_chop(arg1, type_arg, val_arg);
 		
 		if (!*num_arg || !isdigit(*num_arg) || !*type_arg || !*val_arg) {
-			msg_to_char(ch, "Usage: storage change <number> <building | flags> <value>\r\n");
+			msg_to_char(ch, "Usage: storage change <number> flags <value>\r\n");
 			return;
 		}
 		
@@ -3155,26 +3194,16 @@ OLC_MODULE(oedit_storage) {
 		if (!change) {
 			msg_to_char(ch, "Invalid storage number.\r\n");
 		}
-		else if (is_abbrev(type_arg, "building") || is_abbrev(type_arg, "room")) {
-			bld = atoi(val_arg);
-			if (!isdigit(*val_arg) || !building_proto(bld)) {
-				msg_to_char(ch, "Invalid building vnum '%s'.\r\n", val_arg);
-			}
-			else {
-				change->building_type = bld;
-				msg_to_char(ch, "Storage %d changed to building %d (%s).\r\n", atoi(num_arg), bld, GET_BLD_NAME(building_proto(bld)));
-			}
-		}
 		else if (is_abbrev(type_arg, "flags")) {
 			change->flags = olc_process_flag(ch, val_arg, "storage", "storage change flags", storage_bits, change->flags);
 		}
 		else {
-			msg_to_char(ch, "You can only change the building/room or flags.\r\n");
+			msg_to_char(ch, "You can only change the flags.\r\n");
 		}
 	}
 	else {
-		msg_to_char(ch, "Usage: storage add <building/room> [flags]\r\n");
-		msg_to_char(ch, "Usage: storage change <number> <building | flags> <value>\r\n");
+		msg_to_char(ch, "Usage: storage add <building | vehicle> <vnum> [flags]\r\n");
+		msg_to_char(ch, "Usage: storage change <number> flags <value>\r\n");
 		msg_to_char(ch, "Usage: storage remove <number | all>\r\n");
 		msg_to_char(ch, "Available flags:\r\n");
 		

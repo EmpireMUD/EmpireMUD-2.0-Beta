@@ -1408,7 +1408,7 @@ void script_stat (char_data *ch, struct script_data *sc) {
 void do_sstat_room(char_data *ch) {
 	room_data *rm = IN_ROOM(ch);
 
-	msg_to_char(ch, "Script information:\r\n");
+	msg_to_char(ch, "Script information (id %d):\r\n", room_script_id(rm));
 	if (!SCRIPT(rm)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;
@@ -1419,7 +1419,7 @@ void do_sstat_room(char_data *ch) {
 
 
 void do_sstat_object(char_data *ch, obj_data *j) {
-	msg_to_char(ch, "Script information:\r\n");
+	msg_to_char(ch, "Script information (id %d):\r\n", j->script_id);
 	if (!SCRIPT(j)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;
@@ -1430,7 +1430,7 @@ void do_sstat_object(char_data *ch, obj_data *j) {
 
 
 void do_sstat_character(char_data *ch, char_data *k) {
-	msg_to_char(ch, "Script information:\r\n");
+	msg_to_char(ch, "Script information (id %d):\r\n", k->script_id);
 	if (!SCRIPT(k)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;
@@ -2372,7 +2372,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				snprintf(str, slen, "%c%s", cmd_prefix[type], script_commands[num]);
 			}
 			else if (!str_cmp(var, "dailycycle")) {
-				snprintf(str, slen, "%ld", 1 + ((data_get_long(DATA_DAILY_CYCLE) - data_get_long(DATA_WORLD_START)) / SECS_PER_REAL_DAY));
+				snprintf(str, slen, "%ld", DAILY_CYCLE_DAY);
 				return;
 			}
 			else if (!str_cmp(var, "event")) {
@@ -3268,13 +3268,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						char_data *ctarg;
 						obj_data *otarg;
 						
-						if (subfield && (ctarg = get_char_room_vis(c, subfield))) {
+						if (subfield && (ctarg = get_char(subfield))) {
 							snprintf(str, slen, "%d", CAN_SEE(c, ctarg) ? 1 : 0);
 						}
-						else if (subfield && (otarg = get_obj_vis(c, subfield))) {
+						else if (subfield && (otarg = get_obj(subfield))) {
 							snprintf(str, slen, "%d", CAN_SEE_OBJ(c, otarg) ? 1 : 0);
 						}
-						else if (subfield && (vtarg = get_vehicle_vis(c, subfield))) {
+						else if (subfield && (vtarg = get_vehicle(subfield))) {
 							snprintf(str, slen, "%d", CAN_SEE_VEHICLE(c, vtarg) ? 1 : 0);
 						}
 						else {
@@ -5315,6 +5315,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "title")) {
+						snprintf(str, slen, "%s", get_room_name(r, FALSE));
+					}
 					break;
 				}
 				case 'u': {	// room.u*
@@ -5464,13 +5467,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "dump")) {
-						void fully_empty_vehicle(vehicle_data *veh);
-						fully_empty_vehicle(v);
+						void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
+						fully_empty_vehicle(v, IN_ROOM(v));
 						*str = '\0';
 					}
 					else if (!str_cmp(field, "dump_objects")) {
-						void empty_vehicle(vehicle_data *veh);
-						empty_vehicle(v);
+						void empty_vehicle(vehicle_data *veh, room_data *to_room);
+						empty_vehicle(v, IN_ROOM(v));
 						*str = '\0';
 					}
 					break;

@@ -732,6 +732,8 @@ $n pretends to be a vampire and bites at your neck.~
 M5
 You don't see them here.~
 M6
-You can't very well bite yourself.~
+You bite yourself on the arm. Ouch!~
+M7
+$n bites $mself on the arm.~
 S
 $

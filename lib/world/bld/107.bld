@@ -52,7 +52,7 @@ S
 Goblin Gravesite~
 A Shoddy Goblin Gravesite~
 ..&yx&?.~
-2 -1 dip 0
+2 -1 dp 0
 0 0 0 -1
 F
 B
@@ -64,7 +64,7 @@ S
 Fog Bank~
 A Fog Bank~
 &w****~
-1 0 di 0
+1 0 d 0
 0 0 0 -1
 A
 dk
@@ -74,7 +74,7 @@ S
 Dust Storm~
 A Dust Storm~
 &T****~
-1 0 di 0
+1 0 d 0
 0 0 0 -1
 A
 dk
@@ -84,7 +84,7 @@ S
 Tree of Knowledge~
 The Tree of Knowledge~
 &g^&t||&g^~
-4 0 di 0
+4 0 d 0
 0 0 0 -1
 C
 pick~
@@ -98,7 +98,7 @@ S
 Tree of Knowledge~
 The Tree of Knowledge~
 &l^||^~
-4 0 di 0
+4 0 d 0
 0 0 0 -1
 C
 pick~

@@ -135,9 +135,14 @@ bool valid_empire_name(char *newname) {
 		ok = FALSE;
 	}
 	
+	// check alpha
+	if (!isalpha(*newname)) {
+		ok = FALSE;
+	}
+	
 	// check fill/reserved
 	strcpy(tempname, newname);
-	if (fill_word(tempname) || reserved_word(tempname)) {
+	if (ok && (fill_word(tempname) || reserved_word(tempname))) {
 		ok = FALSE;
 	}
 	

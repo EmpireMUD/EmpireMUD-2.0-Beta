@@ -1002,7 +1002,7 @@ ACMD(do_quaff) {
 
 		apply_potion(obj, ch);
 		
-		run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, consumes_or_decays_interact);
+		run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, obj, NULL, consumes_or_decays_interact);
 		extract_obj(obj);
 	}	
 }

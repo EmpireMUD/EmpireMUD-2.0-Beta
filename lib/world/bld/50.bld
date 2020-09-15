@@ -2,7 +2,7 @@
 Grave~
 A Lone Grave~
 ..&0x&?.~
-4 0 dip 0
+4 0 dp 0
 0 0 0 -1
 C
 tomb~
@@ -25,7 +25,7 @@ S
 Tent~
 A Tent~
 .&0/\&?.~
-2 0 ip 0
+2 0 p 0
 0 0 0 -1
 C
 abandon, dismantle, sleep~
@@ -43,7 +43,7 @@ S
 Rock Shelter~
 A Rock Shelter~
 .&0c&?..~
-2 0 ipR 0
+2 0 pR 0
 0 0 0 -1
 A
 d
@@ -63,7 +63,7 @@ S
 Tree Shelter~
 A Tree Shelter~
 ^&0T&?^^~
-2 0 ipR 0
+2 0 pR 0
 0 0 0 -1
 A
 d
@@ -83,7 +83,7 @@ S
 Cave Shelter~
 A Cave Shelter~
 ^&0O&?/\~
-2 0 ipR 0
+2 0 pR 0
 0 0 0 -1
 A
 d
@@ -104,7 +104,7 @@ S
 Jungle Shelter~
 A Shelter in the Jungle~
 &G^c^^~
-2 0 ipR 0
+2 0 pR 0
 0 0 0 -1
 A
 d
@@ -121,17 +121,18 @@ R
 1004 1 5 0
 S
 #5006
-Small Ruins~
-Some Decaying Ruins~
+Ruins~
+The Ruins of #n~
 &y/&0..&y\~
 3 -1 di 0
 0 0 0 -1
 C
 dismantle~
+T 5006
 S
 #5007
-Large Ruins~
-Some Decaying Ruins~
+Ruins~
+The Ruins of a #n~
 &y/&0..&y\~
 3 -1 eiR 0
 0 0 0 -1
@@ -142,12 +143,13 @@ D
 offer any real protection from the elements, and the piles of debris are
 infested with rats. This is the sort of place that attracts trouble.
 ~
+T 5007
 S
 #5008
 Tunnel~
 A Tunnel~
 /&0OO&?\~
-128 0 befgi 0
+128 0 befg 0
 0 0 0 -1
 D
    The tunnel is cold and damp, but is the fastest way from one side of the
@@ -176,14 +178,97 @@ The City Center~
 ????~
 1000 0 do 0
 0 0 0 -1
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 S
 #5010
 Flooded Ruins~
-Some Flooded Ruins~
+The Flooded Ruins of #n~
 &?~&0|\&?~~
 3 -1 diDQ 0
 0 0 0 -1
 C
 dismantle~
+T 5010
+S
+#5011
+Tent~
+A Small Tent~
+[  ]~
+2 0 aR 0
+0 0 0 -1
+C
+sleep~
+D
+   You are inside a tent made of animal hides. It's not large, but it provides
+good shelter from the sun, wind and rain. The tent is sparse, made of only as
+much material as necessary so that it can be taken down and carried in a pack.
+~
+F
+d
+S
+#5012
+Rock Shelter~
+A Rock Shelter~
+.&0c&?..~
+2 0 aR 0
+0 0 0 -1
+C
+sleep~
+D
+   This is a small shelter made from a rock outcropping on the hillside and
+protected from the wind by a mat of debris. It's small and it's not very com-
+fortable, but it's still shelter.
+~
+F
+d
+S
+#5013
+Tree Shelter~
+A Tree Shelter~
+^&0T&?^^~
+2 0 aR 0
+0 0 0 -1
+C
+sleep~
+D
+   You've found shelter high in the branches of a tree, protected from the wind
+and weather by thick branches. It's not a large shelter and it isn't very com-
+fortable, but it's still shelter.
+~
+F
+d
+S
+#5014
+Cave Shelter~
+A Cave Shelter~
+^&0O&?/\~
+2 0 aR 0
+0 0 0 -1
+C
+sleep~
+D
+   This small cave looks like it was originally hollowed out by an animal, but
+it's large enough for you to stand. A fallen rock covers most of the entrance
+and protects you from the elements. The ground isn't comfortable, but it's still
+a safe place to stay.
+~
+F
+d
+S
+#5015
+Jungle Shelter~
+A Shelter in the Jungle~
+&G^c^^~
+2 0 aR 0
+0 0 0 -1
+C
+sleep~
+D
+   This tiny shelter has been scraped together from vines and leaves to provide
+some protection from the hungry animals of the jungle. The trees also give
+ample shade and protection from the elements.
+~
+F
+d
 S
 $

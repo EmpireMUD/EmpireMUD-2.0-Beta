@@ -778,7 +778,7 @@ void check_for_bad_buildings(void) {
 	
 	// check craft "build" recipes: disable
 	HASH_ITER(hh, craft_table, craft, next_craft) {
-		if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD && !building_proto(GET_CRAFT_BUILD_TYPE(craft))) {
+		if (CRAFT_IS_BUILDING(craft) && !building_proto(GET_CRAFT_BUILD_TYPE(craft))) {
 			GET_CRAFT_BUILD_TYPE(craft) = NOTHING;
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
 			log(" disabling craft %d for bad building type", GET_CRAFT_VNUM(craft));
@@ -789,7 +789,7 @@ void check_for_bad_buildings(void) {
 	// check craft recipes of people using olc: disable and warn
 	for (dd = descriptor_list; dd; dd = dd->next) {
 		if (GET_OLC_TYPE(dd) == OLC_CRAFT && GET_OLC_CRAFT(dd)) {
-			if (GET_OLC_CRAFT(dd)->type == CRAFT_TYPE_BUILD && !building_proto(GET_OLC_CRAFT(dd)->build_type)) {
+			if (CRAFT_IS_BUILDING(GET_OLC_CRAFT(dd)) && !building_proto(GET_OLC_CRAFT(dd)->build_type)) {
 				GET_OLC_CRAFT(dd)->build_type = NOTHING;
 				SET_BIT(GET_OLC_CRAFT(dd)->flags, CRAFT_IN_DEVELOPMENT);
 				msg_to_desc(dd, "&RYou are editing a craft recipe whose building has been deleted. Building type removed.&0\r\n");
@@ -802,7 +802,7 @@ void check_for_bad_buildings(void) {
 		for (store = GET_OBJ_STORAGE(obj); store; store = next_store) {
 			next_store = store->next;
 			
-			if (store->building_type != NOTHING && !building_proto(store->building_type)) {
+			if (store->type == TYPE_BLD && store->vnum != NOTHING && !building_proto(store->vnum)) {
 				REMOVE_FROM_LIST(store, obj->proto_data->storage, next);
 				free(store);
 				log(" removing storage for obj %d for bad building type", obj->vnum);
@@ -817,7 +817,7 @@ void check_for_bad_buildings(void) {
 			for (store = GET_OBJ_STORAGE(GET_OLC_OBJECT(dd)); store; store = next_store) {
 				next_store = store->next;
 			
-				if (store->building_type != NOTHING && !building_proto(store->building_type)) {
+				if (store->type == TYPE_BLD && store->vnum != NOTHING && !building_proto(store->vnum)) {
 					REMOVE_FROM_LIST(store, GET_OLC_OBJECT(dd)->proto_data->storage, next);
 					free(store);
 					msg_to_desc(dd, "&RYou are editing an object whose storage building has been deleted. Building type removed.&0\r\n");
@@ -1969,6 +1969,7 @@ const char *versions_list[] = {
 	"b5.99",
 	"b5.102",
 	"b5.103",
+	"b5.104",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2155,8 +2156,8 @@ void b3_2_map_and_gear(void) {
 		// player-made
 		if (IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE)) {
 			// remove the bits
-			REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_PLAYER_MADE);
 			REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PLAYER_MADE);
+			affect_total_room(room);
 		
 			// update the natural sector
 			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
@@ -2313,7 +2314,7 @@ void b3_15_crop_update(void) {
 		else if (map->sector_type->vnum == SECT_JUNGLE && number(1, 100) <= JUNGLE_PERCENT) {
 			// transform jungle
 			if (room || (room = real_room(map->vnum))) {
-				change_terrain(room, SECT_JUNGLE_FIELD);	// picks own crop
+				change_terrain(room, SECT_JUNGLE_FIELD, NOTHING);	// picks own crop
 			}
 		}
 	}
@@ -2416,7 +2417,7 @@ void b4_15_building_update(void) {
 		// add INCOMPLETE aff
 		if (BUILDING_RESOURCES(room) && !IS_DISMANTLING(room)) {
 			SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_INCOMPLETE);
-			SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_INCOMPLETE);
+			affect_total_room(room);
 		}
 		
 		// convert maintenance
@@ -2852,10 +2853,9 @@ void b5_19_world_fix(void) {
 		}
 		else {	// has a building -- look for errors
 			flags = flags_to_wipe;
-			REMOVE_BIT(flags, GET_BLD_BASE_AFFECTS(bld));
 			if (flags) {	// do not remove flags the building actually uses
 				REMOVE_BIT(ROOM_BASE_FLAGS(room), flags);
-				REMOVE_BIT(ROOM_AFF_FLAGS(room), flags);
+				affect_total_room(room);
 			}
 			affect_total_room(room);
 		}
@@ -3850,7 +3850,7 @@ void b5_87_crop_and_old_growth(void) {
 			if (!number(0, 9)) {
 				// 10% chance of becoming old-growth now
 				++new_og;
-				change_terrain(real_room(map->vnum), old_growth);
+				change_terrain(real_room(map->vnum), old_growth, NOTHING);
 			}
 			else {
 				// otherwise, back-date their sector time 3-4 weeks
@@ -3922,13 +3922,13 @@ void b5_88_irrigation_repair(void) {
 		
 		if (map->sector_type && b588_TARGET_SECT(GET_SECT_VNUM(map->sector_type))) {
 			++fixed_current;
-			change_terrain(real_room(map->vnum), GET_SECT_VNUM(map->natural_sector));
+			change_terrain(real_room(map->vnum), GET_SECT_VNUM(map->natural_sector), NOTHING);
 			// log(" - current: %d (%d, %d)", map->vnum, MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 		}
 		else if (map->base_sector && b588_TARGET_SECT(GET_SECT_VNUM(map->base_sector))) {
 			if (map->crop_type) {	// crop with bad base: remove crop
 				++fixed_current;
-				change_terrain(real_room(map->vnum), GET_SECT_VNUM(map->natural_sector));
+				change_terrain(real_room(map->vnum), GET_SECT_VNUM(map->natural_sector), NOTHING);
 				// log(" - current (crop): %d (%d, %d)", map->vnum, MAP_X_COORD(map->vnum), MAP_Y_COORD(map->vnum));
 			}
 			else {	// no crop -- only need to fix base
@@ -4461,6 +4461,20 @@ void b5_103_update(void) {
 }
 
 
+// b5.104 removes the ROOM_EXTRA_RUINS_ICON data
+void b5_104_update(void) {
+	struct map_data *map;
+	
+	const int ROOM_EXTRA_RUINS_ICON = 7;
+	
+	log("Applying b5.104 update to remove old data...");
+	
+	LL_FOREACH(land_map, map) {
+		remove_extra_data(&map->shared->extra_data, ROOM_EXTRA_RUINS_ICON);
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4782,6 +4796,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.103")) {
 			b5_103_update();
+		}
+		if (MATCH_VERSION("b5.104")) {
+			b5_104_update();
 		}
 	}
 	

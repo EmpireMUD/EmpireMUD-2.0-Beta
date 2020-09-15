@@ -6,6 +6,7 @@ An Adventurer Statue~
 0 0 0 -1
 C
 dedicate~
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
 R
 1001 1 5 0
 R
@@ -15,7 +16,7 @@ S
 Pixy House~
 In a Tiny Pixy House~
 @.@.&P'&?@.~
-96 10 inHR efgm
+96 10 nHR efgm
 10 1 0 -1
 D
    You shrink to miniature size as you enter the tiny pixy house, which doesn't

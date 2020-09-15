@@ -12,6 +12,7 @@ The Binding Circle~
 &0{**}~
 96 5 bdl 0
 0 0 0 -1
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
 R
 12001 1 5 0
 S
@@ -31,6 +32,7 @@ a past no one remembers.
 ~
 F
 B
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 M
 12017 33.00 0
 R

@@ -180,8 +180,9 @@ OLC_MODULE(mapedit_terrain) {
 		}
 		
 		if (sect) {
-			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
 			msg_to_char(ch, "This room is now %s %s.\r\n", AN(GET_SECT_NAME(sect)), GET_SECT_NAME(sect));
+			// TODO: special-cased to preserve sect for roads, consider a flag like SECTF_PRESERVE_BASE
+			change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect), SECT_FLAGGED(sect, SECTF_IS_ROAD) ? GET_SECT_VNUM(old_sect) : NOTHING);
 			if (ROOM_OWNER(IN_ROOM(ch))) {
 				deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 			}
@@ -192,18 +193,13 @@ OLC_MODULE(mapedit_terrain) {
 				return;
 			}
 			else {
-				change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect));
-				set_crop_type(IN_ROOM(ch), cp);
 				msg_to_char(ch, "This room is now %s.\r\n", GET_CROP_NAME(cp));
+				change_terrain(IN_ROOM(ch), GET_SECT_VNUM(sect), NOTHING);
+				set_crop_type(IN_ROOM(ch), cp);
 				if (ROOM_OWNER(IN_ROOM(ch))) {
 					deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 				}
 			}
-		}
-				
-		// preserve old original sect for roads -- TODO this is a special-case
-		if (IS_ROAD(IN_ROOM(ch))) {
-			change_base_sector(IN_ROOM(ch), old_sect);
 		}
 		
 		if (sect && SECT_FLAGGED(sect, SECTF_IS_TRENCH)) {
@@ -249,10 +245,7 @@ OLC_MODULE(mapedit_grow) {
 		msg_to_char(ch, "You cause the room to grow around you.\r\n");
 		act("$n causes the room to grow around you.", FALSE, ch, NULL, NULL, TO_ROOM);
 		
-		change_terrain(IN_ROOM(ch), evo->becomes);
-		if (preserve) {
-			change_base_sector(IN_ROOM(ch), preserve);
-		}
+		change_terrain(IN_ROOM(ch), evo->becomes, preserve ? GET_SECT_VNUM(preserve) : NOTHING);
 		
 		remove_depletion(IN_ROOM(ch), DPLTN_PICK);
 		remove_depletion(IN_ROOM(ch), DPLTN_FORAGE);
@@ -316,13 +309,13 @@ OLC_MODULE(mapedit_unclaimable) {
 			if (to && GET_ISLAND_ID(to) != NO_ISLAND) {
 				any_land = TRUE;
 				if (set) {
-					SET_BIT(ROOM_AFF_FLAGS(to), ROOM_AFF_UNCLAIMABLE);
 					SET_BIT(ROOM_BASE_FLAGS(to), ROOM_AFF_UNCLAIMABLE);
+					affect_total_room(to);
 					abandon_room(to);
 				}
 				else {
-					REMOVE_BIT(ROOM_AFF_FLAGS(to), ROOM_AFF_UNCLAIMABLE);
 					REMOVE_BIT(ROOM_BASE_FLAGS(to), ROOM_AFF_UNCLAIMABLE);
+					affect_total_room(to);
 				}
 			}
 		}
@@ -472,15 +465,30 @@ OLC_MODULE(mapedit_room_description) {
 
 OLC_MODULE(mapedit_ruin) {
 	void ruin_one_building(room_data *room);	// db.world.c
-
-	room_data *room = HOME_ROOM(IN_ROOM(ch));
+	void ruin_vehicle(vehicle_data *veh, char *message);	// vehicles.c
 	
-	if (GET_ROOM_VNUM(room) >= MAP_SIZE || !GET_BUILDING(room)) {
-		msg_to_char(ch, "You can only ruin map buildings.\r\n");
+	room_data *room = HOME_ROOM(IN_ROOM(ch));
+	vehicle_data *veh;
+	
+	one_argument(argument, arg);
+	
+	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+		ruin_vehicle(veh, "$V is ruined.");
 	}
-	else {
-		msg_to_char(ch, "Ok.\r\n");
-		ruin_one_building(room);
+	else if (*arg) {
+		msg_to_char(ch, "You don't see that here.\r\n");
+	}
+	else if (GET_ROOM_VNUM(room) >= MAP_SIZE || !GET_BUILDING(room)) {
+		msg_to_char(ch, "You can only ruin map buildings and vehicles.\r\n");
+	}
+	else 
+		msg_to_char(ch, "Ok.\r\n");{
+		if (IS_CITY_CENTER(room)) {
+			disassociate_building(room);
+		}
+		else {
+			ruin_one_building(room);
+		}
 	}
 }
 
@@ -631,11 +639,11 @@ OLC_MODULE(mapedit_naturalize) {
 			
 			// looks good: naturalize it
 			if (room) {
-				decustomize_room(room);
-				change_terrain(room, GET_SECT_VNUM(map->natural_sector));
 				if (ROOM_PEOPLE(room)) {
 					act("The area is naturalized!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
+				decustomize_room(room);
+				change_terrain(room, GET_SECT_VNUM(map->natural_sector), NOTHING);
 				if (ROOM_OWNER(room)) {
 					deactivate_workforce_room(ROOM_OWNER(room), room);
 				}
@@ -679,7 +687,7 @@ OLC_MODULE(mapedit_naturalize) {
 	else {	// normal processing for 1 room
 		map = &(world_map[FLAT_X_COORD(IN_ROOM(ch))][FLAT_Y_COORD(IN_ROOM(ch))]);
 		decustomize_room(IN_ROOM(ch));
-		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(map->natural_sector));
+		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(map->natural_sector), NOTHING);
 		if (ROOM_OWNER(IN_ROOM(ch))) {
 			deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 		}

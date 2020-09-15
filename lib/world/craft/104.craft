@@ -2,6 +2,8 @@
 violet leopard shawl~
 10456 1
 4 199 q 25 -1 0
+B
+0 0 0
 R
 6550 6 1 0
 R
@@ -15,6 +17,8 @@ S
 wildfire gloves~
 10457 1
 4 199 q 25 -1 0
+B
+0 0 0
 R
 10013 6 0 0
 R
@@ -28,6 +32,8 @@ S
 rat-fur cloak~
 10462 1
 4 182 q 25 -1 0
+B
+0 0 0
 R
 6530 6 1 0
 R
@@ -41,6 +47,8 @@ S
 wooden gauntlets~
 10463 1
 2 182 q 25 -1 f
+B
+0 0 0
 R
 6000 2 1 0
 R
@@ -54,6 +62,8 @@ S
 mesh cloak~
 10468 1
 1 197 q 25 -1 0
+B
+0 0 0
 R
 6720 8 1 0
 R
@@ -67,6 +77,8 @@ S
 heavy goblin gauntlets~
 10469 1
 1 197 q 25 -1 0
+B
+0 0 0
 R
 6720 8 1 0
 R
@@ -77,9 +89,9 @@ R
 104 4 0 0
 S
 #10479
-goblinwartent~
+goblinwartent dismantle~
 -1 0
-8 289 t 1 10479 0
+8 289 lt 1 10479 0
 B
 10479 be op
 R
@@ -99,9 +111,9 @@ R
 3200 1 0 0
 S
 #10481
-goblinlabtent~
+goblinlabtent dismantle~
 -1 0
-8 289 t 1 10481 0
+8 289 lt 1 10481 0
 B
 10481 be op
 R
@@ -119,5 +131,29 @@ R
 6077 3 1 0
 R
 6050 10 1 0
+S
+#10483
+goblin war tent~
+10483 1
+8 289 nt 1 10479 0
+B
+10479 bex 0
+R
+6000 8 1 0
+R
+6790 2 1 0
+R
+6720 8 1 0
+S
+#10484
+goblin lab tent~
+10484 1
+8 289 nt 1 10481 0
+B
+10481 bex 0
+R
+6000 4 1 0
+R
+6790 1 1 0
 S
 $

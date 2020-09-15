@@ -99,6 +99,8 @@ extern char *show_color_codes(char *string);
 extern int stats_get_crop_count(crop_data *cp);
 extern int stats_get_sector_count(sector_data *sect);
 void update_class(char_data *ch);
+void update_empire_members_and_greatness(empire_data *emp);
+void update_member_data(char_data *ch);
 void update_world_count();
 
 // locals
@@ -1630,8 +1632,8 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		
 		affect_total(vict);
 		if (emp) {
-			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
-			et_change_greatness(emp);
+			update_member_data(vict);
+			update_empire_members_and_greatness(emp);
 		}
 	}
 	else if SET_CASE("intelligence") {
@@ -4678,49 +4680,80 @@ SHOW(show_workforce) {
 }
 
 
+// show storage <building | vehicle> <vnum>
 SHOW(show_storage) {
-	extern bld_data *get_building_by_name(char *name, bool room_only);
-	
+	char arg2[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct obj_storage_type *store;
-	bld_vnum building_type = NOTHING;
+	vehicle_data *find_veh = NULL;
+	bld_data *find_bld = NULL;
 	obj_data *obj, *next_obj;
-	bld_data *bld;
-	int total;
+	size_t size, lsize;
+	int count;
 	bool ok;
-
-	if (*argument) {
-		if ((bld = get_building_by_name(argument, FALSE))) {
-			building_type = GET_BLD_VNUM(bld);
-		}
+	
+	two_arguments(argument, arg, arg2);
+	
+	if (!*arg || !*arg2 || !is_number(arg2)) {
+		msg_to_char(ch, "Usage: show storage <building | vehicle> <vnum>\r\n");
+	}
+	else if (is_abbrev(arg, "building") && !(find_bld = building_proto(atoi(arg2)))) {
+		msg_to_char(ch, "Unknown building '%s'.\r\n", arg2);
+	}
+	else if (is_abbrev(arg, "vehicle") && !(find_veh = vehicle_proto(atoi(arg2)))) {
+		msg_to_char(ch, "Unknown vehicle '%s'.\r\n", arg2);
+	}
+	else if (!find_bld && !find_veh) {
+		msg_to_char(ch, "Usage: show storage <building | vehicle> <vnum>\r\n");
 	}
 	else {
-		building_type = BUILDING_VNUM(IN_ROOM(ch));
-	}
-	
-	strcpy(buf, "Objects that can be stored here:\r\n");
-	
-	total = 0;
-	if (building_type != NOTHING) {
+		// ok to show: init string/size
+		if (find_bld) {
+			size = snprintf(buf, sizeof(buf), "Objects that can be stored in a %s:\r\n", GET_BLD_NAME(find_bld));
+		}
+		else if (find_veh) {
+			size = snprintf(buf, sizeof(buf), "Objects that can be stored in %s:\r\n", VEH_SHORT_DESC(find_veh));
+		}
+		else {
+			size = snprintf(buf, sizeof(buf), "Objects that can be stored there:\r\n");
+		}
+		
+		count = 0;
 		HASH_ITER(hh, object_table, obj, next_obj) {
 			ok = FALSE;
-		
-			for (store = GET_OBJ_STORAGE(obj); store && !ok; store = store->next) {
-				if (store->building_type == building_type) {
+			
+			// check storage
+			LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
+				if (find_bld && store->type == TYPE_BLD && store->vnum == GET_BLD_VNUM(find_bld)) {
 					ok = TRUE;
+					break;
+				}
+				else if (find_veh && store->type == TYPE_VEH && store->vnum == VEH_VNUM(find_veh)) {
+					ok = TRUE;
+					break;
 				}
 			}
 		
 			if (ok) {
-				sprintf(buf + strlen(buf), " %2d. [%5d] %s\r\n", ++total, GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+				++count;
+				lsize = snprintf(line, sizeof(line), "[%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+				
+				if (size + lsize < sizeof(buf)) {
+					strcat(buf, line);
+					size += lsize;
+				}
+				else {
+					snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+					break;
+				}
 			}
 		}
+		
+		if (count == 0) {
+			strcat(buf, " none\r\n");	// always room
+		}
+		
+		page_string(ch->desc, buf, TRUE);
 	}
-	
-	if (total == 0) {
-		strcat(buf, " none\r\n");
-	}
-	
-	page_string(ch->desc, buf, TRUE);
 }
 
 
@@ -5015,9 +5048,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 	extern const char *bld_flags[];
 	extern const char *designate_flags[];
 	
-	char line[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
-	struct obj_storage_type *store;
-	obj_data *obj, *next_obj;
+	char lbuf[MAX_STRING_LENGTH];
 	
 	msg_to_char(ch, "Building VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_BLD_VNUM(bdg), GET_BLD_NAME(bdg));
 	
@@ -5082,32 +5113,8 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 		msg_to_char(ch, "Yearly maintenance:\r\n%s", buf);
 	}
 	
-	// storage? reverse-lookup
-	*buf = '\0';
-	*line = '\0';
-	HASH_ITER(hh, object_table, obj, next_obj) {
-		for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {
-			if (store->building_type == GET_BLD_VNUM(bdg)) {
-				sprintf(buf1, " %s", GET_OBJ_SHORT_DESC(obj));
-				if (*line || *buf) {
-					strcat(line, ",");
-				}
-				if (strlen(line) + strlen(buf1) > 78) {
-					strcat(line, "\r\n");
-					strcat(buf, line);
-					*line = '\0';
-				}
-				strcat(line, buf1);
-				break;
-			}
-		}
-	}
-	if (*buf || *line) {
-		msg_to_char(ch, "Storable items:\r\n%s%s%s", buf, line, (*line ? "\r\n" : ""));
-	}
-	
-	get_script_display(GET_BLD_SCRIPTS(bdg), line);
-	msg_to_char(ch, "Scripts:\r\n%s", line);
+	get_script_display(GET_BLD_SCRIPTS(bdg), lbuf);
+	msg_to_char(ch, "Scripts:\r\n%s", lbuf);
 	
 	show_spawn_summary_to_char(ch, GET_BLD_SPAWNS(bdg));
 }
@@ -5154,7 +5161,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 	sprinttype(GET_REAL_SEX(k), genders, buf);
 	CAP(buf);
-	sprintf(buf2, " %s '&y%s&0'  IDNum: [%5d], In room [%5d]\r\n", (!IS_NPC(k) ? "PC" : (!IS_MOB(k) ? "NPC" : "MOB")), GET_NAME(k), GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
+	sprintf(buf2, " %s '&y%s&0'  IDNum: [%5d], In room [%5d]\r\n", (!IS_NPC(k) ? "PC" : (!IS_MOB(k) ? "NPC" : "MOB")), GET_NAME(k), IS_NPC(k) ? k->script_id : GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
 	send_to_char(strcat(buf, buf2), ch);
 	
 	if (!IS_NPC(k) && GET_ACCOUNT(k)) {
@@ -5444,11 +5451,11 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	
 	msg_to_char(ch, "Name: '&y%s&0', Vnum: [&g%d&0], Type: &c%s&0\r\n", GET_CRAFT_NAME(craft), GET_CRAFT_VNUM(craft), craft_types[GET_CRAFT_TYPE(craft)]);
 	
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+	if (CRAFT_IS_BUILDING(craft)) {
 		bld = building_proto(GET_CRAFT_BUILD_TYPE(craft));
 		msg_to_char(ch, "Builds: [&c%d&0] %s\r\n", GET_CRAFT_BUILD_TYPE(craft), bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 	}
-	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+	else if (CRAFT_IS_VEHICLE(craft)) {
 		msg_to_char(ch, "Creates Vehicle: [&c%d&0] %s\r\n", GET_CRAFT_OBJECT(craft), (GET_CRAFT_OBJECT(craft) == NOTHING ? "NOTHING" : get_vehicle_name_by_proto(GET_CRAFT_OBJECT(craft))));
 	}
 	else if (CRAFT_FLAGGED(craft, CRAFT_SOUP)) {
@@ -5464,7 +5471,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	}
 	msg_to_char(ch, "Ability: &y%s&0, Level: &g%d&0", buf, GET_CRAFT_MIN_LEVEL(craft));
 	
-	if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_BUILD && !CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+	if (!CRAFT_IS_BUILDING(craft) && !CRAFT_IS_VEHICLE(craft)) {
 		seconds = GET_CRAFT_TIME(craft) * ACTION_CYCLE_TIME;
 		msg_to_char(ch, ", Time: [&g%d action tick%s&0 | &g%d:%02d&0]\r\n", GET_CRAFT_TIME(craft), PLURAL(GET_CRAFT_TIME(craft)), seconds / SECS_PER_REAL_MIN, seconds % SECS_PER_REAL_MIN);
 	}
@@ -5478,7 +5485,7 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, buf);
 	msg_to_char(ch, "Requires tool: &y%s&0\r\n", buf);
 	
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+	if (CRAFT_IS_BUILDING(craft) || CRAFT_IS_VEHICLE(craft)) {
 		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "Build on: &g%s&0\r\n", buf);
 		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
@@ -5539,6 +5546,7 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 * @param empire_data *emp The empire.
 */
 void do_stat_empire(char_data *ch, empire_data *emp) {
+	extern int *summarize_weekly_playtime(empire_data *emp);
 	extern int get_total_score(empire_data *emp);
 	void script_stat (char_data *ch, struct script_data *sc);
 	
@@ -5549,7 +5557,7 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	extern const char *techs[];
 	
 	empire_data *emp_iter, *next_emp;
-	int iter, found_rank, total, len;
+	int iter, found_rank, total, len, *ptime;
 	player_index_data *index;
 	char line[256];
 	bool any;
@@ -5565,6 +5573,12 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 	
 	msg_to_char(ch, "%s%s\t0, Adjective: [%s%s\t0], VNum: [\tc%5d\t0]\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp), EMPIRE_VNUM(emp));
 	msg_to_char(ch, "Leader: [\ty%s\t0], Created: [\ty%-24.24s\t0], Score/rank: [\tc%d #%d\t0]\r\n", (index = find_player_index_by_idnum(EMPIRE_LEADER(emp))) ? index->fullname : "UNKNOWN", ctime(&EMPIRE_CREATE_TIME(emp)), get_total_score(emp), found_rank);
+	
+	ptime = summarize_weekly_playtime(emp);
+	msg_to_char(ch, "Last %d weeks playtime: ", PLAYTIME_WEEKS_TO_TRACK);
+	for (iter = 0; iter < PLAYTIME_WEEKS_TO_TRACK; ++iter) {
+		msg_to_char(ch, "%s%s%s", (iter > 0 ? ", " : ""), simple_time_since(time(0) - ptime[iter]), (iter == (PLAYTIME_WEEKS_TO_TRACK-1) ? "\r\n" : ""));
+	}
 	
 	sprintbit(EMPIRE_ADMIN_FLAGS(emp), empire_admin_flags, line, TRUE);
 	msg_to_char(ch, "Admin flags: \tg%s\t0\r\n", line);
@@ -5699,6 +5713,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 void do_stat_object(char_data *ch, obj_data *j) {
 	extern const struct material_data materials[NUM_MATERIALS];
 	extern const char *container_bits[];
+	extern const char *corpse_flags[];
 	extern const char *obj_custom_types[];
 	extern const char *storage_bits[];
 	extern double get_base_dps(obj_data *weapon);
@@ -5717,7 +5732,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	crop_data *cp;
 	bool any;
 
-	msg_to_char(ch, "Name: '&y%s&0', Aliases: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
+	msg_to_char(ch, "Name: '&y%s&0', Keywords: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
 
 	if (GET_OBJ_CURRENT_SCALE_LEVEL(j) > 0) {
 		sprintf(buf, " (%d)", GET_OBJ_CURRENT_SCALE_LEVEL(j));
@@ -5850,6 +5865,8 @@ void do_stat_object(char_data *ch, obj_data *j) {
 				msg_to_char(ch, "unknown\r\n");
 			}
 			
+			sprintbit(GET_CORPSE_FLAGS(j), corpse_flags, buf, TRUE);
+			msg_to_char(ch, "Corpse flags: %s\r\n", buf);
 			msg_to_char(ch, "Corpse size: %s\r\n", size_types[GET_CORPSE_SIZE(j)]);
 			break;
 		case ITEM_COINS: {
@@ -5982,8 +5999,18 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		msg_to_char(ch, "Storage locations:");
 		
 		found = 0;
-		for (store = GET_OBJ_STORAGE(j); store; store = store->next) {			
-			msg_to_char(ch, "%s%s", (found++ > 0 ? ", " : " "), GET_BLD_NAME(building_proto(store->building_type)));
+		LL_FOREACH(GET_OBJ_STORAGE(j), store) {
+			// TYPE_x: storage type
+			if (store->type == TYPE_BLD) {
+				msg_to_char(ch, "%s[B%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_bld_name_by_proto(store->vnum));
+			}
+			else if (store->type == TYPE_VEH) {
+				msg_to_char(ch, "%s[V%d] %s", (found++ > 0 ? ", " : " "), store->vnum, get_vehicle_name_by_proto(store->vnum));
+			}
+			else {
+				// none?
+				continue;
+			}
 			
 			if (store->flags) {
 				sprintbit(store->flags, storage_bits, buf2, TRUE);
@@ -6795,7 +6822,7 @@ ACMD(do_advance) {
 
 	GET_ACCESS_LEVEL(victim) = newlevel;
 	GET_IMMORTAL_LEVEL(victim) = GET_ACCESS_LEVEL(victim) > LVL_MORTAL ? (LVL_TOP - GET_ACCESS_LEVEL(victim)) : -1;
-	queue_delayed_update(victim, CDU_SAVE);
+	SAVE_CHAR(victim);
 	check_autowiz(victim);
 }
 
@@ -8250,6 +8277,7 @@ ACMD(do_last) {
 
 
 ACMD(do_load) {
+	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
@@ -8312,6 +8340,7 @@ ACMD(do_load) {
 		veh = read_vehicle(number, TRUE);
 		vehicle_to_room(veh, IN_ROOM(ch));
 		scale_vehicle_to_level(veh, 0);	// attempt auto-detect of level
+		get_vehicle_interior(veh);	// ensure inside is loaded
 		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM);
 		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
 		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
@@ -8764,7 +8793,7 @@ ACMD(do_reboot) {
 		else if (!str_cmp(arg, "now")) {
 			reboot_control.immediate = TRUE;
 		}
-		else if ((type = search_block(arg, shutdown_types, FALSE)) != NOTHING) {
+		else if ((type = search_block(arg, shutdown_types, TRUE)) != NOTHING) {
 			reboot_control.level = type;
 		}
 		else {
@@ -9198,6 +9227,11 @@ ACMD(do_restore) {
 		sprintf(msg + strlen(msg), "%s!", types);
 	}
 	act(msg, FALSE, vict, NULL, ch, TO_CHAR);
+	
+	// show 3rd-party message in some cases
+	if (all || health || moves || mana || blood || dots) {
+		act("$n is restored!", TRUE, vict, NULL, NULL, TO_CHAR);
+	}
 }
 
 

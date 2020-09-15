@@ -32,6 +32,8 @@ If you use 'manage' to set a tile as no-abandon, you must add the 'confirm'
 to abandon it. Workforce chores like abandon-chopped will not abandon these
 tiles.
 
+Privileged immortals can abandon rooms and vehicles they do not own.
+
 See also: CEDE, CLAIM, MANAGE, PRIVILEGE, PUBLICIZE
 #
 ALLIANCE "DIPLOMACY ALLIANCE" ALLY ALLIES ALLIED
@@ -174,6 +176,9 @@ to claim vehicles.
 
 You can't claim land that's inside another empire's city radius while at war
 with that empire.
+
+Privileged immortals can claim land/vehicles for other empires by giving the
+empire name as the last arg.
 
 See also: PRIVILEGE, ABANDON, CEDE, PUBLICIZE, TERRITORY
 #

@@ -43,6 +43,7 @@ struct stored_data_type stored_data_info[] = {
 	{ "max_players_today", DATYPE_INT },	// DATA_MAX_PLAYERS_TODAY
 	{ "last_island_descs", DATYPE_LONG },	// DATA_LAST_ISLAND_DESCS
 	{ "last_construction_id", DATYPE_INT },	// DATA_LAST_CONSTRUCTION_ID
+	{ "start_playtime_tracking", DATYPE_LONG },	// DATA_START_PLAYTIME_TRACKING
 	
 	{ "\n", NOTHING }	// last
 };
@@ -50,6 +51,16 @@ struct stored_data_type stored_data_info[] = {
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Any data in the table that needs to be updated at startup can be done here:
+*/
+void check_data_table(void) {
+	// set this as the start time if not yet set: prevents timing out old empires on existing muds
+	if (data_get_long(DATA_START_PLAYTIME_TRACKING) == 0) {
+		data_set_long(DATA_START_PLAYTIME_TRACKING, time(0));
+	}
+}
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -286,6 +297,7 @@ void load_data_table(void) {
 	// aaand read from file	
 	if (!(fl = fopen(DATA_FILE, "r"))) {
 		// no config exists
+		check_data_table();
 		return;
 	}
 	
@@ -361,4 +373,5 @@ void load_data_table(void) {
 	}
 	
 	fclose(fl);
+	check_data_table();
 }

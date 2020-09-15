@@ -3,7 +3,7 @@ goblin necromancer necrogoblin~
 the necrogoblin~
 The goblin necromancer is chanting here.
 ~
-125 200 dxB cd 2
+125 200 dxBE cd 2
 1 0 0 20
 D
    The translucent flesh of this goblin is stretched over a skeleton with
@@ -148,7 +148,7 @@ plant skeletal skeleton~
 the skeletal plant~
 A skeleton with leaves for flesh and vines for veins sways here.
 ~
-125 200 bdhxzA cwABG 2
+125 200 bdhxzAE cwABG 2
 2 0 0 15
 D
    This clearly female goblin skeleton stands dressed in an astrakhan cloak and

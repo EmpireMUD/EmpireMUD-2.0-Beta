@@ -51,6 +51,7 @@ struct map_t {
 	sector_vnum sector_type, base_sector, natural_sector;
 	bitvector_t affects;
 	struct room_extra_data *extra;
+	bitvector_t flags;	// EVOLVER_ flags
 	
 	struct map_t *next;	// next in land
 };
@@ -129,6 +130,12 @@ void evolve_one(struct map_t *tile) {
 	become = NOTHING;
 	
 	// run some evolutions!
+	if (become == NOTHING && IS_SET(tile->flags, EVOLVER_OWNED) && (evo = get_evo_by_type(tile->sector_type, EVO_OWNED))) {
+		become = evo->becomes;
+	}
+	if (become == NOTHING && !IS_SET(tile->flags, EVOLVER_OWNED) && (evo = get_evo_by_type(tile->sector_type, EVO_UNOWNED))) {
+		become = evo->becomes;
+	}
 	if (become == NOTHING && (evo = get_evo_by_type(tile->sector_type, EVO_TIMED)) && time(0) > get_sector_time(tile) + evo->value * SECS_PER_REAL_MIN) {
 		become = evo->becomes;
 	}
@@ -691,7 +698,7 @@ void load_base_map(void) {
 	char line[256], line2[256], error_buf[MAX_STRING_LENGTH], *tmp;
 	struct map_t *map, *last = NULL, *last_land = NULL;
 	struct room_extra_data *red;
-	int var[7], x, y, type;
+	int var[8], x, y, type;
 	FILE *fl;
 	
 	// init
@@ -703,6 +710,7 @@ void load_base_map(void) {
 			world[x][y].sector_type = BASIC_OCEAN;
 			world[x][y].base_sector = BASIC_OCEAN;
 			world[x][y].natural_sector = BASIC_OCEAN;
+			world[x][y].flags = NOBITS;
 			world[x][y].next = NULL;
 		}
 	}
@@ -722,10 +730,13 @@ void load_base_map(void) {
 		
 		// new room
 		if (isdigit(*line)) {
-			// x y island sect base natural crop
-			if (sscanf(line, "%d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6]) != 7) {
-				log("Encountered bad line in world map file: %s", line);
-				continue;
+			// x y island sect base natural crop evolver-flags
+			if (sscanf(line, "%d %d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6], &var[7]) != 8) {
+				var[7] = NOBITS;	// backwards-compatible without misc evolver-flags
+				if (sscanf(line, "%d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6]) != 7) {
+					log("Encountered bad line in world map file: %s", line);
+					continue;
+				}
 			}
 			if (var[0] < 0 || var[0] >= MAP_WIDTH || var[1] < 0 || var[1] >= MAP_HEIGHT) {
 				log("Encountered bad location in world map file: (%d, %d)", var[0], var[1]);
@@ -740,6 +751,7 @@ void load_base_map(void) {
 			map->base_sector = var[4];
 			map->natural_sector = var[5];
 			// map->crop_type = var[6];
+			map->flags = var[7];
 			
 			// add to land map?
 			if (map->sector_type != BASIC_OCEAN) {

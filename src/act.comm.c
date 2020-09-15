@@ -1296,7 +1296,7 @@ ACMD(do_slash_channel) {
 			// announce it (this also messages the player)
 			if (!global_mute_slash_channel_joins) {
 				// announce to channel members
-				if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+				if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO) && !ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
 					announce_to_slash_channel(chan, ch, "%s has joined the channel", PERS(ch, ch, TRUE));
 				}
 				// if player wouldn't see their own join announce
@@ -1325,7 +1325,7 @@ ACMD(do_slash_channel) {
 				free(slash);
 			}
 			
-			if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+			if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO) && !ACCOUNT_FLAGGED(ch, ACCT_MUTED)) {
 				announce_to_slash_channel(chan, ch, "%s has left the channel", PERS(ch, ch, TRUE));
 			}
 		}

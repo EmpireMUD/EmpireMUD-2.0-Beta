@@ -37,15 +37,19 @@
 extern const struct augment_type_data augment_info[];
 extern const char *craft_types[];
 extern struct gen_craft_data_t gen_craft_data[];
+extern const int rev_dir[];
 extern const char *tool_flags[];
 
 // external functions
+extern bool can_claim(char_data *ch);
+extern bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool *bld_is_closed, bool *bld_needs_reverse);
 void complete_vehicle(vehicle_data *veh);
 INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 extern bool has_cooking_fire(char_data *ch);
 extern bool has_learned_craft(char_data *ch, any_vnum vnum);
+void process_build(char_data *ch, room_data *room, int act_type);
 void scale_item_to_level(obj_data *obj, int level);
 extern bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bool send_messages);
 
@@ -55,6 +59,7 @@ bool can_refashion(char_data *ch);
 ACMD(do_gen_craft);
 craft_data *find_craft_for_obj_vnum(obj_vnum vnum);
 obj_data *find_water_container(char_data *ch, obj_data *list);
+int get_crafting_level(char_data *ch);
 obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 
 
@@ -71,17 +76,32 @@ obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 */
 bool check_can_craft(char_data *ch, craft_data *type) {
 	char buf1[MAX_STRING_LENGTH];
-	bool wait, room_wait;
+	vehicle_data *craft_veh;
+	bool wait, room_wait, makes_building;
+	
+	char *command = gen_craft_data[GET_CRAFT_TYPE(type)].command;
+	
+	// some setup
+	craft_veh = CRAFT_IS_VEHICLE(type) ? vehicle_proto(GET_CRAFT_OBJECT(type)) : NULL;
+	makes_building = (CRAFT_IS_BUILDING(type) || (craft_veh && VEH_FLAGGED(craft_veh, VEH_BUILDING)));
+	
+	// attribute-based checks
+	if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
+		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), command);
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to %s anything.\r\n", command);
+	}
 	
 	// type checks
-	if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !has_tool(ch, TOOL_GRINDING_STONE) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_MILL)) {
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !has_tool(ch, TOOL_GRINDING_STONE) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_MILL)) {
 		msg_to_char(ch, "You need to be in a mill or have a grinding stone to do that.\r\n");
 	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_PRESS)) {
 		msg_to_char(ch, "You need a press to do that.\r\n");
 	}
 	else if (CRAFT_FLAGGED(type, CRAFT_BY_RIVER) && (!IS_OUTDOORS(ch) || !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1))) {
-		msg_to_char(ch, "You must be next to a river to do that.\r\n");
+		msg_to_char(ch, "You must be next to a river to %s that.\r\n", command);
 	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !can_forge(ch)) {
 		// sends its own message
@@ -93,15 +113,29 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 		msg_to_char(ch, "You need a loom to do that.\r\n");
 	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_SMELT)) {
-		msg_to_char(ch, "You can't %s here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		msg_to_char(ch, "You can't %s here.\r\n", command);
 	}
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_BAKE && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_OVEN)) {
-		msg_to_char(ch, "You need an oven to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		msg_to_char(ch, "You need an oven to %s that.\r\n", command);
+	}
+	
+	// building type checks
+	else if (makes_building && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
+		msg_to_char(ch, "You can't %s that on unclaimable land.\r\n", command);
+	}
+	else if (makes_building && ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
+		msg_to_char(ch, "You can't %s here until the adventure is gone.\r\n", command);
+	}
+	else if (makes_building && !can_build_or_claim_at_war(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't %s that here while at war with the empire that controls this area.\r\n", command);
+	}
+	else if (makes_building && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !has_permission(ch, PRIV_BUILD, IN_ROOM(ch)))) {
+		msg_to_char(ch, "You don't have permission to %s that here.\r\n", command);
 	}
 	
 	// flag checks
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
-		msg_to_char(ch, "You can only make that in a city%s.\r\n", (wait || room_wait) ? " (this city was founded too recently)" : "");
+		msg_to_char(ch, "You can only %s that in one of your cities%s.\r\n", command, (wait || room_wait) ? " (this city was founded too recently)" : "");
 	}
 	else if ((GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS || GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER | CRAFT_SHIPYARD | CRAFT_GLASSBLOWER)) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "You can't do that here because this building isn't in a city.\r\n");
@@ -113,25 +147,20 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 		msg_to_char(ch, "You need a good fire to do that.\r\n");
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_CARPENTER)) {
-		msg_to_char(ch, "You need to %s that at the carpenter!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		msg_to_char(ch, "You need to %s that at the carpenter!\r\n", command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHIPYARD) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_SHIPYARD)) {
-		msg_to_char(ch, "You need to %s that at the shipyard!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		msg_to_char(ch, "You need to %s that at the shipyard!\r\n", command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_BLD_UPGRADED) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_UPGRADED)) {
-		msg_to_char(ch, "The building needs to be upgraded to %s that!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		msg_to_char(ch, "The building needs to be upgraded to %s that!\r\n", command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_GLASSBLOWER) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_GLASSBLOWER)) {
-		msg_to_char(ch, "You need to %s that at the glassblower!\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		msg_to_char(ch, "You need to %s that at the glassblower!\r\n", command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP) && !find_water_container(ch, ch->carrying) && !find_water_container(ch, ROOM_CONTENTS(IN_ROOM(ch)))) {
-		msg_to_char(ch, "You need a container of water to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		msg_to_char(ch, "You need a container of water to %s that.\r\n", command);
 	}
-	/* alchemy formerly required the alchemist OR glassblowing tech. That tech was removed, now it just needs flasks.
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_ALCHEMY) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_ALCHEMIST) && !has_tech_available(ch, TECH_GLASSBLOWING)) {
-		// sends its own messages -- needs glassblowing unless in alchemist room
-	}
-	*/
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FLAGS_REQUIRING_BUILDINGS) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
@@ -141,10 +170,10 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (GET_CRAFT_REQUIRES_TOOL(type) && !has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type))) {
 		prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(type), tool_flags, buf1);
 		if (count_bits(GET_CRAFT_REQUIRES_TOOL(type)) > 1) {
-			msg_to_char(ch, "You need the to equip following tools to %s that: %s\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command, buf1);
+			msg_to_char(ch, "You need the to equip following tools to %s that: %s\r\n", command, buf1);
 		}
 		else {
-			msg_to_char(ch, "You need to equip %s %s to %s that.\r\n", AN(buf1), buf1, gen_craft_data[GET_CRAFT_TYPE(type)].command);
+			msg_to_char(ch, "You need to equip %s %s to %s that.\r\n", AN(buf1), buf1, command);
 		}
 	}
 	
@@ -513,9 +542,11 @@ obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum) {
 	}
 	
 	// room
-	DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
-		if (GET_OBJ_VNUM(obj) == vnum && bind_ok(obj, ch)) {
-			return obj;
+	if (can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
+			if (GET_OBJ_VNUM(obj) == vnum && bind_ok(obj, ch)) {
+				return obj;
+			}
 		}
 	}
 	
@@ -590,6 +621,34 @@ bool obj_has_apply_type(obj_data *obj, int apply_type) {
 
 
 /**
+* Resumes working on an incomplete building.
+*
+* @param char_data *ch The player.
+* @param craft_data *craft The craft recipe for the building.
+*/
+void resume_craft_building(char_data *ch, craft_data *craft) {
+	char buf[MAX_STRING_LENGTH];
+	
+	if (!ch || IS_NPC(ch) || !craft || !IS_INCOMPLETE(IN_ROOM(ch))) {
+		return;
+	}
+	
+	// ensure they CAN resume
+	if (GET_ACTION(ch) != ACT_NONE) {
+		msg_to_char(ch, "You are already doing something.\r\n");
+		return;
+	}
+	
+	start_action(ch, ACT_BUILDING, 0);
+	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(craft);
+	
+	msg_to_char(ch, "You go back to work on the %s!\r\n", GET_CRAFT_NAME(craft));
+	sprintf(buf, "$n goes back to work on the %s!", GET_CRAFT_NAME(craft));
+	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+}
+
+
+/**
 * Resumes working on an incomplete vehicle.
 *
 * @param char_data *ch The player.
@@ -600,6 +659,12 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 	char buf[MAX_STRING_LENGTH];
 	
 	if (!ch || IS_NPC(ch) || !veh || !craft) {
+		return;
+	}
+	
+	// ensure they CAN resume
+	if (GET_ACTION(ch) != ACT_NONE) {
+		msg_to_char(ch, "You are already doing something.\r\n");
 		return;
 	}
 	
@@ -655,11 +720,11 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	
 	msg_to_char(ch, "Information for %s:\r\n", GET_CRAFT_NAME(craft));
 	
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+	if (CRAFT_IS_BUILDING(craft)) {
 		bld = building_proto(GET_CRAFT_BUILD_TYPE(craft));
 		msg_to_char(ch, "Builds: %s\r\n", bld ? GET_BLD_NAME(bld) : "UNKNOWN");
 	}
-	else if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+	else if (CRAFT_IS_VEHICLE(craft)) {
 		if ((veh = vehicle_proto(GET_CRAFT_OBJECT(craft)))) {
 			msg_to_char(ch, "Creates %s: %s\r\n", VEH_OR_BLD(veh), VEH_SHORT_DESC(veh));
 		}
@@ -777,7 +842,7 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	prettier_sprintbit(GET_CRAFT_FLAGS(craft), craft_flag_for_info, part);
 	msg_to_char(ch, "Notes: %s\r\n", part);
 	
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+	if (CRAFT_IS_BUILDING(craft)) {
 		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "Build on: %s\r\n", buf);
 		if (GET_CRAFT_BUILD_FACING(craft)) {
@@ -861,10 +926,8 @@ struct gen_craft_data_t gen_craft_data[] = {
 	{ "mill", "milling", NOBITS, { "You grind the millstone, making %s...", "$n grinds the millstone, making %s...", "$n grinds the millstone, making %s." } },
 	{ "brew", "brewing", NOBITS, { "You stir the potion and infuse it with mana...", "$n stirs the potion...", "$n stirs a potion." } },
 	{ "mix", "mixing", NOBITS, { "The poison bubbles as you stir it...", "$n stirs the bubbling poison...", "$n stirs a bubbling poison." } },
-	
-	// build is special and doesn't use do_gen_craft, so doesn't really use this data
-	{ "build", "building", NOBITS, { "You work on the building...", "$n works on the building...", "$n is working on the building." } },
-	
+									// note: build does not use the message strings
+	{ "build", "building", NOBITS, { "You work on building the %s...", "$n works on the building the %s...", "$n is building the %s." } },
 	{ "weave", "weaving", NOBITS, { "You carefully weave the %s...", "$n carefully weaves the %s...", "$n is weaving %s." } },
 	
 	{ "workforce", "producing", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is working dilligently." } },	// not used by players
@@ -881,7 +944,7 @@ void cancel_gen_craft(char_data *ch) {
 	craft_data *type = craft_proto(GET_ACTION_VNUM(ch, 0));
 	obj_data *obj;
 	
-	if (type && !CRAFT_FLAGGED(type, CRAFT_VEHICLE)) {
+	if (type && !CRAFT_IS_VEHICLE(type)) {
 		// refund the real resources they used
 		give_resources(ch, GET_ACTION_RESOURCES(ch), FALSE);
 		free_resource_list(GET_ACTION_RESOURCES(ch));
@@ -939,7 +1002,7 @@ craft_data *find_craft_for_obj_vnum(obj_vnum vnum) {
 	craft_data *iter, *next_iter;
 	
 	HASH_ITER(hh, craft_table, iter, next_iter) {
-		if (!IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_SOUP | CRAFT_VEHICLE) && GET_CRAFT_TYPE(iter) != CRAFT_TYPE_BUILD && GET_CRAFT_OBJECT(iter) == vnum) {
+		if (!IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_SOUP) && !CRAFT_IS_VEHICLE(iter) && !CRAFT_IS_BUILDING(iter) && GET_CRAFT_OBJECT(iter) == vnum) {
 			return iter;
 		}
 	}
@@ -963,8 +1026,8 @@ void finish_gen_craft(char_data *ch) {
 	
 	GET_ACTION(ch) = ACT_NONE;
 
-	// basic sanity checking (vehicles are finished elsewhere
-	if (!type || CRAFT_FLAGGED(type, CRAFT_VEHICLE)) {
+	// basic sanity checking (vehicles are finished elsewhere)
+	if (!type || CRAFT_IS_VEHICLE(type) || CRAFT_IS_BUILDING(type)) {
 		return;
 	}
 	
@@ -1061,7 +1124,7 @@ void finish_gen_craft(char_data *ch) {
 			temp_obj = read_object(res->vnum, FALSE);
 			obj_to_char(temp_obj, ch);
 			for (iter = 0; iter < res->amount; ++iter) {
-				run_interactions(ch, GET_OBJ_INTERACTIONS(temp_obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, temp_obj, consumes_or_decays_interact);
+				run_interactions(ch, GET_OBJ_INTERACTIONS(temp_obj), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, temp_obj, NULL, consumes_or_decays_interact);
 			}
 			extract_obj(temp_obj);
 		}
@@ -1154,8 +1217,12 @@ void process_gen_craft(char_data *ch) {
 	}
 	
 	// pass off control entirely for a vehicle craft
-	if (CRAFT_FLAGGED(type, CRAFT_VEHICLE)) {
+	if (CRAFT_IS_VEHICLE(type)) {
 		process_gen_craft_vehicle(ch, type);
+		return;
+	}
+	else if (CRAFT_IS_BUILDING(type)) {
+		process_build(ch, IN_ROOM(ch), ACT_BUILDING);
 		return;
 	}
 	
@@ -1517,13 +1584,115 @@ ACMD(do_gen_augment) {
 
 
 /**
+* Sub-processor for making a map building.
+*
+* @param char_data *ch The player trying to make the building.
+* @param craft_data *type Pre-selected building craft (CRAFT_IS_BUILDING == TRUE).
+* @param int dir The direction specified by the player (may be NO_DIR or an invalid dir).
+*/
+void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
+	void herd_animals_out(room_data *location);
+	void special_building_setup(char_data *ch, room_data *room);
+	
+	bool junk, is_closed, needs_reverse;
+	char buf[MAX_STRING_LENGTH];
+	room_data *to_room, *to_rev;
+	obj_data *found_obj;
+	bld_data *to_build;
+	int ter_type;
+	
+	char *command = (type ? gen_craft_data[GET_CRAFT_TYPE(type)].command : "make");
+
+	// basic sanitation
+	if (!type || !CRAFT_IS_BUILDING(type) || !(to_build = building_proto(GET_CRAFT_BUILD_TYPE(type)))) {
+		log("SYSERR: do_gen_craft_building called with invalid building craft %d", type ? GET_CRAFT_VNUM(type) : NOTHING);
+		msg_to_char(ch, "That is not yet implemented.\r\n");
+		return;
+	}
+	
+	// found-obj has been pre-validated so if we need it, it must exist here
+	found_obj = (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING ? has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(type)) : NULL);
+	
+	// validate
+	if (!check_build_location_and_dir(ch, type, dir, &is_closed, &needs_reverse)) {
+		return;	// sends own messages
+	}
+	else if (found_obj && !consume_otrigger(found_obj, ch, OCMD_BUILD, NULL)) {
+		return;	// the trigger should send its own message if it prevented this
+	}
+	
+	// ok: ready to build
+	
+	// bind or take the obj
+	if (found_obj) {
+		if (CRAFT_FLAGGED(type, CRAFT_TAKE_REQUIRED_OBJ)) {
+			act("You use $p.", FALSE, ch, found_obj, NULL, TO_CHAR);
+			extract_obj(found_obj);
+		}
+		else if (OBJ_BOUND_TO(found_obj)) {
+			reduce_obj_binding(found_obj, ch);
+		}
+		else {	// not yet bound
+			bind_obj_to_player(found_obj, ch);
+		}
+	}
+	
+	// setup
+	construct_building(IN_ROOM(ch), GET_CRAFT_BUILD_TYPE(type));
+	set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
+	if (!IS_NPC(ch)) {
+		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
+	}
+	
+	special_building_setup(ch, IN_ROOM(ch));
+	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
+	affect_total_room(IN_ROOM(ch));
+	GET_BUILDING_RESOURCES(IN_ROOM(ch)) = copy_resource_list(GET_CRAFT_RESOURCES(type));
+	
+	// can_claim checks total available land, but the outside is check done within this block
+	if (!ROOM_OWNER(IN_ROOM(ch)) && can_claim(ch) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
+		empire_data *emp = get_or_create_empire(ch);
+		if (emp) {
+			ter_type = get_territory_type_for_empire(IN_ROOM(ch), emp, FALSE, &junk);
+			if (EMPIRE_TERRITORY(emp, ter_type) < land_can_claim(emp, ter_type)) {
+				claim_room(IN_ROOM(ch), emp);
+			}
+		}
+	}
+	
+	// closed buildings: to_room was really pre-validated in check_build_location_and_dir
+	if (is_closed && (to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]))) {
+		create_exit(IN_ROOM(ch), to_room, dir, FALSE);
+		// to_rev was pre-validated as well
+		if (needs_reverse && (to_rev = real_shift(IN_ROOM(ch), shift_dir[rev_dir[dir]][0], shift_dir[rev_dir[dir]][1]))) {
+			create_exit(IN_ROOM(ch), to_rev, rev_dir[dir], FALSE);
+		}
+		
+		// entrance is the direction you type TO ENTER, so it's the reverse of the facing dir
+		COMPLEX_DATA(IN_ROOM(ch))->entrance = rev_dir[dir];
+		herd_animals_out(IN_ROOM(ch));
+	}
+	
+	start_action(ch, ACT_BUILDING, 0);
+	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(type);
+	
+	msg_to_char(ch, "You start to %s %s %s!\r\n", command, AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
+	sprintf(buf, "$n begins to %s %s %s!", command, AN(GET_CRAFT_NAME(type)), GET_CRAFT_NAME(type));
+	act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+	
+	// do a build action now
+	process_build(ch, IN_ROOM(ch), ACT_BUILDING);
+}
+
+
+/**
 * Sub-processor for crafting a vehicle.
 *
 * @param char_data *ch The player trying to craft the vehicle.
 * @param craft_data *type Pre-selected vehicle craft.
+* @param int dir Optional: If the player specified a direction (may by NO_DIR or an invalid dir for the craft).
 */
-void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
-	extern bool can_claim(char_data *ch);
+void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 	extern int get_new_vehicle_construction_id();
 	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	
@@ -1533,13 +1702,9 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	bool junk;
 	
 	// basic sanitation
-	if (!type || !CRAFT_FLAGGED(type, CRAFT_VEHICLE) || !(to_craft = vehicle_proto(GET_CRAFT_OBJECT(type)))) {
+	if (!type || !CRAFT_IS_VEHICLE(type) || !(to_craft = vehicle_proto(GET_CRAFT_OBJECT(type)))) {
 		log("SYSERR: do_gen_craft_vehicle called with invalid vehicle craft %d", type ? GET_CRAFT_VNUM(type) : NOTHING);
-		return;
-	}
-	
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to %s anything.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
+		msg_to_char(ch, "That is not yet implemented.\r\n");
 		return;
 	}
 	
@@ -1548,22 +1713,20 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		resume_craft_vehicle(ch, veh, type);
 		return;
 	}
-	
 	if (found_other) {
 		msg_to_char(ch, "You can't %s that while %s is unfinished here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command, VEH_SHORT_DESC(found_other));
 		return;
 	}
-	if (VEH_CLAIMS_WITH_ROOM(to_craft) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-		msg_to_char(ch, "You can only %s that on a tile you own.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
-		return;
+	if (!check_build_location_and_dir(ch, type, dir, NULL, NULL)) {
+		return;	// sends own messages
 	}
 	
-	// new vehicle craft setup
+	// ok: new vehicle craft setup
 	veh = read_vehicle(GET_CRAFT_OBJECT(type), TRUE);
+	SET_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);	// set incomplete before putting in the room
 	vehicle_to_room(veh, IN_ROOM(ch));
 	
 	// additional setup
-	SET_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
 	VEH_NEEDS_RESOURCES(veh) = copy_resource_list(GET_CRAFT_RESOURCES(type));
 	if (!VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
 		if (VEH_CLAIMS_WITH_ROOM(veh)) {
@@ -1613,22 +1776,32 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type) {
 
 
 // subcmd must be CRAFT_TYPE_
-ACMD(do_gen_craft) {	
-	int timer, num = 1;
-	bool this_line, found;
+ACMD(do_gen_craft) {
+	extern craft_data *find_building_list_entry(room_data *room, byte type);
+	
+	char short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[256];
+	int count, timer, num = 1, dir = NO_DIR;
 	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL;
 	vehicle_data *veh;
 	bool is_master;
 	obj_data *found_obj = NULL, *drinkcon = NULL;
+	any_vnum missing_abil = NO_ABIL;
 	ability_data *cft_abil;
+	size_t size, lsize;
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't craft.\r\n");
 		return;
 	}
-	if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
-		send_config_msg(ch, "need_approval_string");
-		return;
+	if (!IS_APPROVED(ch)) {
+		if (subcmd == CRAFT_TYPE_BUILD && config_get_bool("build_approval")) {
+			send_config_msg(ch, "need_approval_string");
+			return;
+		}
+		else if (subcmd != CRAFT_TYPE_BUILD && config_get_bool("craft_approval")) {
+			send_config_msg(ch, "need_approval_string");
+			return;
+		}
 	}
 	
 	skip_spaces(&argument);
@@ -1646,26 +1819,40 @@ ACMD(do_gen_craft) {
 	}
 	
 	// optional leading number
-	if ((num = atoi(argument)) > 0) {
+	if (isdigit(*argument) > 0) {
 		half_chop(argument, buf, arg);
-		num = MAX(1, atoi(buf));
+		if (is_number(buf)) {
+			// really a number
+			num = MAX(1, atoi(buf));
+		}
+		else {	// not a number -- restore whole argument
+			num = 1;
+			strcpy(arg, argument);
+		}
 	}
-	else {
+	else {	// no leading number
 		num = 1;
 		strcpy(arg, argument);
 	}
 	
 	// if there was an arg, find a matching craft_table entry (type)
 	if (*arg) {
+		// attempt to split out a direction in case the craft makes a building
+		chop_last_arg(arg, short_arg, last_arg);
+		if (*last_arg && (dir = parse_direction(ch, last_arg)) == NO_DIR) {
+			// wasn't a direction: don't use short/last arg
+			*short_arg = *last_arg = '\0';
+		}
+		
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
 			if (GET_CRAFT_TYPE(craft) != subcmd) {
 				continue;	// wrong craft type
-			}	
+			}
+			if (CRAFT_FLAGGED(craft, CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY)) {
+				continue;	// never allow these flags
+			}
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 				continue;	// in-dev
-			}
-			if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
-				continue;	// missing ability
 			}
 			if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && !has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(craft))) {
 				continue;	// missing requiresobj
@@ -1675,12 +1862,24 @@ ACMD(do_gen_craft) {
 			}
 			
 			// match so far...
-			if (!str_cmp(arg, GET_CRAFT_NAME(craft))) {
+			if (!str_cmp(arg, GET_CRAFT_NAME(craft)) || (*short_arg && !str_cmp(short_arg, GET_CRAFT_NAME(craft)))) {
+				// do this last because it records if they are just missing an ability
+				if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+					missing_abil = GET_CRAFT_ABILITY(craft);
+					continue;	// missing ability
+				}
+				
 				// exact match!
 				type = craft;
 				break;
 			}
-			else if (!abbrev_match && is_abbrev(arg, GET_CRAFT_NAME(craft))) {
+			else if (!abbrev_match && (is_abbrev(arg, GET_CRAFT_NAME(craft)) || (*short_arg && is_abbrev(short_arg, GET_CRAFT_NAME(craft))))) {
+				// do this last because it records if they are just missing an ability
+				if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
+					missing_abil = GET_CRAFT_ABILITY(craft);
+					continue;	// missing ability
+				}
+				
 				// found! maybe
 				abbrev_match = craft;
 			}
@@ -1690,26 +1889,47 @@ ACMD(do_gen_craft) {
 		if (!type) {
 			type = abbrev_match;
 		}
-	}
-
+	}	// end arg-processing
+	
+	// preliminary checks
 	if (subcmd == CRAFT_TYPE_ERROR) {
 		msg_to_char(ch, "This command is not yet implemented.\r\n");
 	}
 	else if (*arg && (veh = find_vehicle_to_resume_by_name(ch, subcmd, arg, &find_type))) {
 		// attempting to resume a vehicle by name
-		if (GET_ACTION(ch) != ACT_NONE) {
-			msg_to_char(ch, "You are already doing something.\r\n");
+		resume_craft_vehicle(ch, veh, find_type);
+	}
+	else if (*arg && IS_INCOMPLETE(IN_ROOM(ch)) && type && CRAFT_IS_BUILDING(type) && GET_BUILDING(IN_ROOM(ch)) && GET_CRAFT_BUILD_TYPE(type) == GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch)))) {
+		// attempting to resume a building by name
+		resume_craft_building(ch, type);
+	}
+	else if (*arg && !type && missing_abil != NO_ABIL) {
+		// found no match but there was an almost-match with an ability requirement
+		msg_to_char(ch, "You need the %s ability to %s that.\r\n", get_ability_name_by_vnum(missing_abil), gen_craft_data[subcmd].command);
+	}
+	else if (*arg && !type) {
+		// found no match
+		msg_to_char(ch, "Unknown %s. Type '%s' by itself to see a list of what you can %s.\r\n", gen_craft_data[subcmd].command, gen_craft_data[subcmd].command, gen_craft_data[subcmd].command);
+	}
+	else if (!*arg && subcmd == CRAFT_TYPE_BUILD && IS_INCOMPLETE(IN_ROOM(ch))) {
+		// 'build' no-arg in an incomplete building: resume
+		if (IS_BURNING(IN_ROOM(ch))) {
+			msg_to_char(ch, "You can't work on a burning building!\r\n");
+		}
+		else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+			msg_to_char(ch, "It's too dark to work on the building.\r\n");
+		}
+		else if (!(find_type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL)) && !(find_type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {
+			msg_to_char(ch, "It doesn't seem possible to continue the construction.\r\n");
 		}
 		else {
-			resume_craft_vehicle(ch, veh, find_type);
+			resume_craft_building(ch, find_type);
 		}
 	}
-	else if (!*arg || !type) {
+	else if (!*arg) {	// main no-arg: master craft list
 		// master craft list
-		msg_to_char(ch, "What would you like to %s? You know how to make:\r\n", gen_craft_data[subcmd].command);
-		this_line = FALSE;
-		found = FALSE;
-		*buf = '\0';
+		size = snprintf(buf, sizeof(buf), "You know how to %s:\r\n", gen_craft_data[subcmd].command);
+		count = 0;
 		
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
 			if (GET_CRAFT_TYPE(craft) != subcmd) {
@@ -1717,6 +1937,9 @@ ACMD(do_gen_craft) {
 			}
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT) && !IS_IMMORTAL(ch)) {
 				continue;	// in-dev
+			}
+			if (CRAFT_FLAGGED(craft, CRAFT_UPGRADE | CRAFT_DISMANTLE_ONLY)) {
+				continue;	// never allow these flags
 			}
 			if (GET_CRAFT_ABILITY(craft) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(craft))) {
 				continue;	// no abil
@@ -1729,52 +1952,86 @@ ACMD(do_gen_craft) {
 			}
 			
 			// valid:
-			if (strlen(buf) + strlen(GET_CRAFT_NAME(craft)) + 2 >= 80) {
-				this_line = FALSE;
-				msg_to_char(ch, "%s\r\n", buf);
-				*buf = '\0';
+			++count;
+			if (PRF_FLAGGED(ch, PRF_ROOMFLAGS)) {
+				lsize = snprintf(line, sizeof(line), "[%5d] %s", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
 			}
-			sprintf(buf + strlen(buf), "%s%s", (this_line ? ", " : " "), GET_CRAFT_NAME(craft));
-			this_line = TRUE;
-			found = TRUE;
+			else {
+				lsize = snprintf(line, sizeof(line), "%s", GET_CRAFT_NAME(craft));
+			}
+			
+			// screenreader and non-screenreader add it differently
+			if (PRF_FLAGGED(ch, PRF_SCREEN_READER)) {
+				if (size + lsize + 2 < sizeof(buf)) {
+					strcat(buf, line);
+					strcat(buf, "\r\n");
+					size += lsize + 2;
+				}
+				else {
+					snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+					break;
+				}
+			}
+			else {	// non-screenreader
+				if ((count % 2) && lsize <= 38 && (size + MAX(40, lsize)) < sizeof(buf)) {
+					// left column
+					size += snprintf(buf + size, sizeof(buf) - size, "%-38.38s ", line);
+				}
+				else if (size + lsize + 2 < sizeof(buf)) {
+					// right column or wide left column
+					strcat(buf, line);
+					strcat(buf, "\r\n");
+					size += lsize + 2;
+				}
+				else {
+					snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+					break;
+				}
+			}
+		}	// end loop
+		if (!count) {
+			strcat(buf, " nothing\r\n");	// always room here
 		}
-		if (!found) {
-			msg_to_char(ch, " nothing\r\n");
+		else if (!PRF_FLAGGED(ch, PRF_SCREEN_READER) && (count % 2)) {
+			strcat(buf, "\r\n");
 		}
-		else if (this_line) {
-			msg_to_char(ch, "%s\r\n", buf);
+		
+		// and show it
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
 		}
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy right now.\r\n");
 	}
 	else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type))) {
+		// this should be unreachable
 		msg_to_char(ch, "You need to buy the %s ability to %s that.\r\n", get_ability_name_by_vnum(GET_CRAFT_ABILITY(type)), gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
-	else if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
-		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), gen_craft_data[GET_CRAFT_TYPE(type)].command);
-	}
 	else if (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING && !(found_obj = has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(type)))) {
-		msg_to_char(ch, "You need %s to make that.\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(type)));
+		// this block is unreachable but the found_obj is set in the if()
+		msg_to_char(ch, "You need %s to %s that.\r\n", get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(type)), gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(type))) {
+		// this should be unreachable
 		msg_to_char(ch, "You have not learned that recipe.\r\n");
-	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to %s anything.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
 	}
 	else if (!check_can_craft(ch, type)) {
 		// sends its own messages
 	}
-	else if (CRAFT_FLAGGED(type, CRAFT_VEHICLE)) {
+	else if (CRAFT_IS_VEHICLE(type)) {
 		// vehicles pass off at this point
-		do_gen_craft_vehicle(ch, type);
+		do_gen_craft_vehicle(ch, type, dir);
 	}
+	else if (CRAFT_IS_BUILDING(type)) {
+		// pass off buildings
+		do_gen_craft_building(ch, type, dir);
+	}
+	
+	// regular object-type craft (or soup)
 	else if (IS_CARRYING_N(ch) > CAN_CARRY_N(ch)) {
 		msg_to_char(ch, "You can't %s anything while overburdened.\r\n", gen_craft_data[subcmd].command);
 	}
-	
-	// regular craft
 	else if (!has_resources(ch, GET_CRAFT_RESOURCES(type), can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED), TRUE)) {
 		// this sends its own message ("You need X more of ...")
 		//msg_to_char(ch, "You don't have the resources to %s that.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command);
@@ -2426,7 +2683,7 @@ ACMD(do_tame) {
 		act("$n tries to tame you...", FALSE, ch, NULL, mob, TO_VICT);
 		act("$n tries to tame $N...", FALSE, ch, NULL, mob, TO_NOTVICT);
 		
-		any = run_interactions(ch, mob->interactions, INTERACT_TAME, IN_ROOM(ch), mob, NULL, tame_interact);
+		any = run_interactions(ch, mob->interactions, INTERACT_TAME, IN_ROOM(ch), mob, NULL, NULL, tame_interact);
 		
 		if (any) {
 			gain_player_tech_exp(ch, PTECH_TAME, 50);

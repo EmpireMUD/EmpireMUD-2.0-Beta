@@ -423,6 +423,7 @@ void run_delayed_refresh(void) {
 	extern int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island);
 	void count_quest_tasks(struct req_data *list, int *complete, int *total);
 	void refresh_passive_buffs(char_data *ch);
+	void update_empire_members_and_greatness(empire_data *emp);
 	extern struct char_delayed_update *char_delayed_update_list;
 	
 	struct char_delayed_update *cdu, *next_cdu;
@@ -479,6 +480,9 @@ void run_delayed_refresh(void) {
 			}
 			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_MEMBERS)) {
 				read_empire_members(emp, FALSE);
+			}
+			if (IS_SET(EMPIRE_DELAYED_REFRESH(emp), DELAY_REFRESH_GREATNESS)) {
+				update_empire_members_and_greatness(emp);
 			}
 			
 			// clear this
@@ -1365,8 +1369,12 @@ bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 	if (VEH_OWNER(veh) == emp) {
 		return TRUE;
 	}
-	// public + guests
+	// public + guests: use interior room to determine publicness
 	if (interior && ROOM_AFF_FLAGGED(interior, ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
+		return TRUE;
+	}
+	// no interior + guests: use the tile it's on, if the owner is the same as the vehicle
+	if (!interior && IN_ROOM(veh) && ROOM_OWNER(IN_ROOM(veh)) == VEH_OWNER(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_PUBLIC) && mode == GUESTS_ALLOWED) {
 		return TRUE;
 	}
 	// check allies
@@ -2035,6 +2043,47 @@ char *any_one_word(char *argument, char *first_arg) {
 	*first_arg = '\0';
 
 	return (argument);
+}
+
+
+/**
+* Breaks a string into two parts: the last word, and the rest of the words.
+*
+* @param char *string The input string.
+* @param char *most_args All the words in 'string' except the last one (empty if string was empty).
+* @param char *last_arg The last word in 'string' IF it had more than one.
+*/
+void chop_last_arg(char *string, char *most_args, char *last_arg) {
+	int end_pos;
+	
+	*most_args = *last_arg = '\0';
+	
+	if (!string || !*string) {
+		return;	// no work
+	}
+	
+	// first trim trailing spaces
+	for (end_pos = strlen(string) - 1; end_pos >= 0 && isspace(string[end_pos]); --end_pos) {
+		string[end_pos] = '\0';
+	}
+	
+	// end_pos is still the end of the string: now rewind to look for previous space
+	for (; end_pos >= 0 && !isspace(string[end_pos]); --end_pos);
+	
+	// did we find it?
+	if (end_pos > 0) {
+		strcpy(last_arg, string + end_pos + 1);
+		strncpy(most_args, string, end_pos);
+		most_args[end_pos] = '\0';
+		
+		// then trim trailing spaces (in case of multiple spaces between args)
+		for (--end_pos; end_pos >= 0 && isspace(most_args[end_pos]); --end_pos) {
+			most_args[end_pos] = '\0';
+		}
+	}
+	else {	// didn't find a space: probably only 1 arg
+		strcpy(most_args, string);
+	}
 }
 
 
@@ -3883,7 +3932,6 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 									break;
 								}
 								case RES_COMPONENT: {
-									// TODO: future version of this could prefer 'basic' components on pass 1
 									if (GET_OBJ_COMPONENT(obj) == res->vnum || is_component_vnum(obj, res->vnum)) {
 										--res->amount;
 										obj->search_mark = TRUE;
@@ -5524,7 +5572,8 @@ bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with
 
 
 /**
-* This determines if room is close enough to a sect with certain flags.
+* This determines if room is close enough to a sect with certain flags. It also
+* checks the base sector, e.g. if a road or bridge is over the flagged sect.
 *
 * @param room_data *room The location to check.
 * @param bitvector_t with_flags The bits that the sect MUST have (returns true if any 1 is set).
@@ -5535,24 +5584,32 @@ bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with
 bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance) {
 	int x, y;
 	room_data *shift, *real;
-	bool found = FALSE;
 	
 	if (!(real = (GET_MAP_LOC(room) ? real_room(GET_MAP_LOC(room)->vnum) : NULL))) {	// no map location
 		return FALSE;
 	}
 	
-	for (x = -1 * distance; x <= distance && !found; ++x) {
-		for (y = -1 * distance; y <= distance && !found; ++y) {
-			shift = real_shift(real, x, y);
-			if (shift && (with_flags == NOBITS || ROOM_SECT_FLAGGED(shift, with_flags)) && (without_flags == NOBITS || !ROOM_SECT_FLAGGED(shift, without_flags))) {
-				if (compute_distance(room, shift) <= distance) {
-					found = TRUE;
-				}
+	for (x = -1 * distance; x <= distance; ++x) {
+		for (y = -1 * distance; y <= distance; ++y) {
+			if (!(shift = real_shift(real, x, y))) {
+				continue;	// no room
 			}
+			if (with_flags && !ROOM_SECT_FLAGGED(shift, with_flags) && !IS_SET(GET_SECT_FLAGS(BASE_SECT(shift)), with_flags)) {
+				continue;	// missing with-flags
+			}
+			if (without_flags && (ROOM_SECT_FLAGGED(shift, without_flags) || IS_SET(GET_SECT_FLAGS(BASE_SECT(shift)), without_flags))) {
+				continue;
+			}
+			if (compute_distance(room, shift) > distance) {
+				continue;
+			}
+			
+			// found!
+			return TRUE;
 		}
 	}
 	
-	return found;
+	return FALSE; // not found
 }
 
 

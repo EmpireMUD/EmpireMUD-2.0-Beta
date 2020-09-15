@@ -88,6 +88,7 @@ void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
 void free_varlist(struct trig_var_data *vd);
 void scale_item_to_level(obj_data *obj, int level);
+void update_member_data(char_data *ch);
 
 // locals
 static void add_obj_binding(int idnum, struct obj_binding **list);
@@ -450,12 +451,11 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_CHARISMA(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			break;
 		case APPLY_GREATNESS: {
-			player_index_data *index;
-			if (!IS_NPC(ch) && GET_LOYALTY(ch) && (index = find_player_index_by_idnum(GET_IDNUM(ch))) && index->contributing_greatness) {
-				EMPIRE_GREATNESS(GET_LOYALTY(ch)) += mod;
-				et_change_greatness(GET_LOYALTY(ch));
-			}
 			SAFE_ADD(GET_GREATNESS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
+			if (!IS_NPC(ch) && GET_LOYALTY(ch) && IN_ROOM(ch)) {
+				update_member_data(ch);
+				TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
+			}
 			break;
 		}
 		case APPLY_INTELLIGENCE:
@@ -736,11 +736,9 @@ void affect_total(char_data *ch) {
 	extern const int base_player_pools[NUM_POOLS];
 
 	struct affected_type *af;
-	player_index_data *index;
 	int i, iter, level;
-	empire_data *emp = GET_LOYALTY(ch);
 	struct obj_apply *apply;
-	int health, move, mana;
+	int health, move, mana, greatness;
 	
 	int pool_bonus_amount = config_get_int("pool_bonus_amount");
 	
@@ -754,6 +752,7 @@ void affect_total(char_data *ch) {
 	move = GET_MOVE(ch);
 	mana = GET_MANA(ch);
 	level = get_approximate_level(ch);
+	greatness = GET_GREATNESS(ch);
 	
 	for (i = 0; i < NUM_WEARS; i++) {
 		if (GET_EQ(ch, i) && wear_data[i].count_stats) {
@@ -865,13 +864,9 @@ void affect_total(char_data *ch) {
 	GET_MAX_POOL(ch, BLOOD) = GET_MAX_BLOOD(ch);
 	
 	// check greatness thresholds
-	if (!IS_NPC(ch) && emp && (index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
-		if (index->contributing_greatness && GET_GREATNESS(ch) < index->greatness_threshold) {
-			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
-		}
-		else if (!index->contributing_greatness && GET_GREATNESS(ch) > index->greatness_threshold) {
-			TRIGGER_DELAYED_REFRESH(emp, DELAY_REFRESH_MEMBERS);
-		}
+	if (!IS_NPC(ch) && GET_GREATNESS(ch) != greatness && GET_LOYALTY(ch) && IN_ROOM(ch)) {
+		update_member_data(ch);
+		TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
 	}
 }
 
@@ -883,10 +878,29 @@ void affect_total(char_data *ch) {
 */
 void affect_total_room(room_data *room) {
 	struct affected_type *af;
+	vehicle_data *veh;
 	
+	// reset to base
 	ROOM_AFF_FLAGS(room) = ROOM_BASE_FLAGS(room);
+	
+	// flags from affs
 	LL_FOREACH(ROOM_AFFECTS(room), af) {
 		SET_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
+	}
+	
+	// flags from vehicles: do this even if incomplete
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		SET_BIT(ROOM_AFF_FLAGS(room), VEH_ROOM_AFFECTS(veh));
+	}
+	
+	// flags from building: don't use IS_COMPLETE because this function may be called before resources are added
+	if (GET_BUILDING(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_INCOMPLETE)) {
+		SET_BIT(ROOM_AFF_FLAGS(room), GET_BLD_BASE_AFFECTS(GET_BUILDING(room)));
+	}
+	
+	// flags from template
+	if (GET_ROOM_TEMPLATE(room)) {
+		SET_BIT(ROOM_AFF_FLAGS(room), GET_RMT_BASE_AFFECTS(GET_ROOM_TEMPLATE(room)));
 	}
 }
 
@@ -2715,7 +2729,7 @@ void abandon_room(room_data *room) {
 	
 	// inside
 	LL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
-		if (HOME_ROOM(iter) == home) {
+		if (iter != home && HOME_ROOM(iter) == home) {
 			perform_abandon_room(iter);
 		}
 	}
@@ -2742,7 +2756,7 @@ void claim_room(room_data *room, empire_data *emp) {
 	perform_claim_room(home, emp);
 	
 	LL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
-		if (HOME_ROOM(iter) == home) {
+		if (iter != home && HOME_ROOM(iter) == home) {
 			perform_claim_room(iter, emp);
 		}
 	}
@@ -2924,8 +2938,7 @@ void perform_abandon_room(room_data *room) {
 	
 	ROOM_OWNER(room) = NULL;
 
-	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK | ROOM_AFF_NO_ABANDON);
-	REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK | ROOM_AFF_NO_ABANDON);
+	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_PUBLIC | ROOM_AFF_NO_WORK | ROOM_AFF_NO_ABANDON | ROOM_AFF_NO_DISMANTLE);
 
 	if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
 		COMPLEX_DATA(room)->private_owner = NOBODY;
@@ -2950,6 +2963,8 @@ void perform_abandon_room(room_data *room) {
 			perform_abandon_vehicle(veh);
 		}
 	}
+	
+	affect_total_room(room);
 }
 
 
@@ -2970,8 +2985,8 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 		}
 	
 		if (VEH_IS_COMPLETE(veh) && emp) {
-			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
-			et_lose_vehicle(emp, VEH_VNUM(veh));
+			qt_empire_players_vehicle(emp, qt_lose_vehicle, veh);
+			et_lose_vehicle(emp, veh);
 			adjust_vehicle_tech(veh, FALSE);
 		}
 	}
@@ -3058,8 +3073,8 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 		}
 	
 		if (VEH_IS_COMPLETE(veh)) {
-			qt_empire_players(emp, qt_gain_vehicle, VEH_VNUM(veh));
-			et_gain_vehicle(emp, VEH_VNUM(veh));
+			qt_empire_players_vehicle(emp, qt_gain_vehicle, veh);
+			et_gain_vehicle(emp, veh);
 			adjust_vehicle_tech(veh, TRUE);
 		}
 	}
@@ -4187,7 +4202,7 @@ bool meets_interaction_restrictions(struct interact_restriction *list, char_data
 
 GLB_FUNCTION(run_global_mob_interactions_func) {
 	struct glb_mob_interact_bean *data = (struct glb_mob_interact_bean*)other_data;
-	run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), data->type, IN_ROOM(ch), data->mob, NULL, data->func);
+	run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), data->type, IN_ROOM(ch), data->mob, NULL, NULL, data->func);
 }
 
 
@@ -4234,10 +4249,11 @@ bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERA
 * @param room_data *inter_room For room interactions, the room.
 * @param char_data *inter_mob For mob interactions, the mob.
 * @param obj_data *inter_item For item interactions, the item.
+* @param vehicle_data *inter_veh For vehicle interactions, the vehicle.
 * @param INTERACTION_FUNC(*func) A function pointer that runs each successful interaction (func returns TRUE if an interaction happens; FALSE if it aborts)
 * @return bool TRUE if any interactions ran successfully, FALSE if not.
 */
-bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func)) {
+bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, vehicle_data *inter_veh, INTERACTION_FUNC(*func)) {
 	struct interact_exclusion_data *exclusion = NULL;
 	struct interaction_item *interact;
 	struct interact_restriction *res;
@@ -4247,7 +4263,7 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 		if (interact->type == type && meets_interaction_restrictions(interact->restrictions, ch, ch ? GET_LOYALTY(ch) : NULL, inter_mob, inter_item) && check_exclusion_set(&exclusion, interact->exclusion_code, interact->percent)) {
 			if (func) {
 				// run function
-				success |= (func)(ch, interact, inter_room, inter_mob, inter_item);
+				success |= (func)(ch, interact, inter_room, inter_mob, inter_item, inter_veh);
 				
 				// skill gains?
 				if (ch && !IS_NPC(ch)) {
@@ -4316,7 +4332,7 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	// now, try vehicles in random order...
 	DL_FOREACH_SAFE(list, tvh, next_tvh) {
 		if (!success) {
-			success |= run_interactions(ch, VEH_INTERACTIONS(tvh->veh), type, room, NULL, NULL, func);
+			success |= run_interactions(ch, VEH_INTERACTIONS(tvh->veh), type, room, NULL, NULL, tvh->veh, func);
 		}
 		DL_DELETE(list, tvh);
 		free(tvh);	// clean up
@@ -4324,22 +4340,22 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	
 	// building first
 	if (!success && GET_BUILDING(room)) {
-		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type, room, NULL, NULL, func);
+		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type, room, NULL, NULL, NULL, func);
 	}
 	
 	// crop second
 	if (!success && (crop = ROOM_CROP(room))) {
-		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, func);
+		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, NULL, func);
 	}
 	
 	// rmt third
 	if (!success && GET_ROOM_TEMPLATE(room)) {
-		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type, room, NULL, NULL, func);
+		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type, room, NULL, NULL, NULL, func);
 	}
 	
 	// sector fourth
 	if (!success) {
-		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(room)), type, room, NULL, NULL, func);
+		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(room)), type, room, NULL, NULL, NULL, func);
 	}
 	
 	return success;
@@ -6835,6 +6851,55 @@ obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, obj_
 
 
 /**
+* Finds an object the char can see in any list (ch->carrying, etc), with a
+* preference for one that has a given object type. However, if the player
+* gave a specific object using a number (2.tree) this will ignore the type
+* request.
+*
+* @param char_data *ch The person who's looking.
+* @param char *name The target argument.
+* @param obj_data *list The list to search.
+* @return int obj_type Any ITEM_ to prefer on a matching object.
+* @return obj_data *The item found, or NULL. May or may not have the type.
+*/
+obj_data *get_obj_in_list_vis_prefer_type(char_data *ch, char *name, obj_data *list, int obj_type) {
+	obj_data *i, *backup = NULL;
+	int j = 0, number;
+	char tmpname[MAX_INPUT_LENGTH];
+	char *tmp = tmpname;
+	bool gave_num;
+
+	strcpy(tmp, name);
+	gave_num = isdigit(*name) ? TRUE : FALSE;
+	
+	// 0.x does not target items
+	if ((number = get_number(&tmp)) == 0) {
+		return (NULL);
+	}
+	
+	DL_FOREACH2(list, i, next_content) {
+		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
+			if (gave_num) {
+				if (++j == number) {
+					return i;
+				}
+			}
+			else {	// did not give a number
+				if (GET_OBJ_TYPE(i) == obj_type) {
+					return i;	// perfect match
+				}
+				else if (!backup) {
+					backup = i;	// missing interaction but otherwise a match
+				}
+			}
+		}
+	}
+
+	return backup;
+}
+
+
+/**
 * Gets the position of a piece of equipment the character is using, by name.
 *
 * @param char_data *ch The person who's looking.
@@ -7414,6 +7479,7 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
 	extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 	extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
+	extern int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs);
 	extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 	
@@ -7523,6 +7589,12 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 			}
 			case REQ_OWN_VEHICLE_FLAGGED: {
 				if (!GET_LOYALTY(ch) || count_owned_vehicles_by_flags(GET_LOYALTY(ch), req->misc) < req->needed) {
+					ok = FALSE;
+				}
+				break;
+			}
+			case REQ_OWN_VEHICLE_FUNCTION: {
+				if (!GET_LOYALTY(ch) || count_owned_vehicles_by_function(GET_LOYALTY(ch), req->misc) < req->needed) {
 					ok = FALSE;
 				}
 				break;
@@ -7751,6 +7823,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 	
 	char vnum[256], lbuf[256];
 	static char output[256];
+	vehicle_data *vproto;
 	
 	*output = '\0';
 	if (!req) {
@@ -7816,13 +7889,20 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 			break;
 		}
 		case REQ_OWN_VEHICLE: {
-			snprintf(output, sizeof(output), "Own %dx vehicle%s: %s%s", req->needed, PLURAL(req->needed), vnum, get_vehicle_name_by_proto(req->vnum));
+			vproto = vehicle_proto(req->vnum);
+			snprintf(output, sizeof(output), "Own %dx %s%s: %s%s", req->needed, PLURAL(req->needed), vnum, vproto ? VEH_OR_BLD(vproto) : "vehicle", vproto ? VEH_SHORT_DESC(vproto) : "unknown");
 			break;
 		}
 		case REQ_OWN_VEHICLE_FLAGGED: {
 			sprintbit(req->misc, vehicle_flags, lbuf, TRUE);
 			// does not show vnum
 			snprintf(output, sizeof(output), "Own %dx vehicle%s flagged: %s", req->needed, PLURAL(req->needed), lbuf);
+			break;
+		}
+		case REQ_OWN_VEHICLE_FUNCTION: {
+			sprintbit(req->misc, function_flags, lbuf, TRUE);
+			// does not show vnum
+			snprintf(output, sizeof(output), "Own %dx vehicle%s with: %s", req->needed, PLURAL(req->needed), lbuf);
 			break;
 		}
 		case REQ_SKILL_LEVEL_OVER: {
@@ -8166,12 +8246,6 @@ void detach_building_from_room(room_data *room) {
 			LL_DELETE(room->proto_script, tpl);
 			free(tpl);
 		}
-	}
-	
-	// remove building affs
-	if (GET_BLD_BASE_AFFECTS(bld)) {
-		REMOVE_BIT(ROOM_BASE_FLAGS(room), GET_BLD_BASE_AFFECTS(bld));
-		REMOVE_BIT(ROOM_AFF_FLAGS(room), GET_BLD_BASE_AFFECTS(bld));
 	}
 	
 	if (SCRIPT(room)) {
@@ -8907,45 +8981,65 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping)
 /**
 * @param obj_data *obj The item to check
 * @param room_data *loc The world location you want to store it in
+* @param empire_data *by_emp Optional: Check if the empire would have permission to do it here. (Pass NULL to skip this check entirely, e.g. when stealing.)
 * @param retrieval_mode bool TRUE if we're retrieving, FALSE if we're storing
 * @return bool TRUE if the object can be stored here; otherwise FALSE
 */
-bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode) {
+bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool retrieval_mode) {
 	struct obj_storage_type *store;
 	bld_data *bld = GET_BUILDING(loc);
-	bool has_stores_like = (bld ? (count_bld_relations(bld, BLD_REL_STORES_LIKE) > 0) : FALSE);
+	vehicle_data *veh;
 	
-	if (!bld) {
-		return FALSE;	// shortcut
-	}
-	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING) {
-		return FALSE;	// quest items don't store
-	}
+	bool use_room = (!by_emp || emp_can_use_room(by_emp, loc, GUESTS_ALLOWED));
+	bool bld_ok = use_room && (!by_emp || !ROOM_OWNER(loc) || by_emp == ROOM_OWNER(loc) || has_relationship(by_emp, ROOM_OWNER(loc), DIPL_TRADE));
 	
 	// We skip this check in retrieval mode, since STORE_ALL does not function for retrieval.
 	if (!retrieval_mode && GET_OBJ_STORAGE(obj) && room_has_function_and_city_ok(loc, FNC_STORE_ALL)) {
 		return TRUE; // As long as it can be stored anywhere, it can be stored here.
 	}
 	
-	for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {
-		if (store->building_type == BUILDING_VNUM(loc)) {
-			return TRUE;
+	// TYPE_x: storage locations
+	LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
+		if (bld && bld_ok) {
+			if (store->type == TYPE_BLD && (store->vnum == GET_BLD_VNUM(bld) || bld_has_relation(bld, BLD_REL_STORES_LIKE_BLD, store->vnum))) {
+				return TRUE;
+			}
+			else if (store->type == TYPE_VEH && bld_has_relation(bld, BLD_REL_STORES_LIKE_VEH, store->vnum)) {
+				return TRUE;
+			}
 		}
-		else if (has_stores_like && bld_has_relation(bld, BLD_REL_STORES_LIKE, store->building_type)) {
-			return TRUE;
+		
+		// check in-veh: storage doesn't work from here
+		/*
+		if ((veh = GET_ROOM_VEHICLE(loc)) && (!by_emp || !VEH_OWNER(veh) || by_emp == VEH_OWNER(veh) || (emp_can_use_vehicle(by_emp, veh, GUESTS_ALLOWED) && has_relationship(by_emp, VEH_OWNER(veh), DIPL_TRADE)))) {
+			if (store->type == TYPE_VEH && (store->vnum == VEH_VNUM(veh) || veh_has_relation(veh, BLD_REL_STORES_LIKE_VEH, store->vnum))) {
+				return TRUE;
+			}
+			else if (store->type == TYPE_BLD && veh_has_relation(veh, BLD_REL_STORES_LIKE_BLD, store->vnum)) {
+				return TRUE;
+			}
+		}
+		*/
+		
+		// vehicles in room
+		DL_FOREACH2(ROOM_VEHICLES(loc), veh, next_in_room) {
+			if (by_emp && VEH_OWNER(veh) && by_emp != VEH_OWNER(veh) && (!emp_can_use_vehicle(by_emp, veh, GUESTS_ALLOWED) || !has_relationship(by_emp, VEH_OWNER(veh), DIPL_TRADE))) {
+				continue;	// no permission for veh
+			}
+			if (by_emp && !VEH_OWNER(veh) && ROOM_OWNER(loc) && by_emp != ROOM_OWNER(loc) && (!use_room || !has_relationship(by_emp, ROOM_OWNER(loc), DIPL_TRADE))) {
+				continue;	// unowned vehicles inherit room permission
+			}
+			
+			if (store->type == TYPE_VEH && (store->vnum == VEH_VNUM(veh) || veh_has_relation(veh, BLD_REL_STORES_LIKE_VEH, store->vnum))) {
+				return TRUE;
+			}
+			else if (store->type == TYPE_BLD && veh_has_relation(veh, BLD_REL_STORES_LIKE_BLD, store->vnum)) {
+				return TRUE;
+			}
 		}
 	}
 	
 	return FALSE;
-}
-
-/**
- * @param obj_data *obj The item to check
- * @param room_data *loc The world location you want to retrieve it from
- * @return bool TRUE if the object can be retrieved from here; otherwise FALSE
- */
-bool obj_can_be_retrieved(obj_data *obj, room_data *loc) {
-	return obj_can_be_stored(obj, loc, TRUE);
 }
 
 
@@ -9449,7 +9543,7 @@ int get_number(char **name) {
 */
 void extract_vehicle(vehicle_data *veh) {
 	void delete_vehicle_interior(vehicle_data *veh);
-	void empty_vehicle(vehicle_data *veh);
+	void empty_vehicle(vehicle_data *veh, room_data *to_room);
 	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 	
 	if (veh == dg_owner_veh) {
@@ -9481,7 +9575,7 @@ void extract_vehicle(vehicle_data *veh) {
 	}
 	
 	// dump contents (this will extract them since it's not in a room)
-	empty_vehicle(veh);
+	empty_vehicle(veh, NULL);
 	
 	// remove animals: doing this without the vehicle in a room will not spawn the mobs
 	while (VEH_ANIMALS(veh)) {
@@ -9531,13 +9625,18 @@ void unseat_char_from_vehicle(char_data *ch) {
 * @param vehicle_data *veh The vehicle to remove from its room.
 */
 void vehicle_from_room(vehicle_data *veh) {
-	if (!veh || !IN_ROOM(veh)) {
+	room_data *was_in;
+	
+	if (!veh || !(was_in = IN_ROOM(veh))) {
 		log("SYSERR: NULL vehicle (%p) or vehicle not in a room (%p) passed to vehicle_from_room", veh, IN_ROOM(veh));
 		return;
 	}
 	
-	DL_DELETE2(ROOM_VEHICLES(IN_ROOM(veh)), veh, prev_in_room, next_in_room);
+	DL_DELETE2(ROOM_VEHICLES(was_in), veh, prev_in_room, next_in_room);
+	veh->next_in_room = veh->prev_in_room = NULL;
 	IN_ROOM(veh) = NULL;
+	
+	affect_total_room(was_in);
 }
 
 
@@ -9548,7 +9647,7 @@ void vehicle_from_room(vehicle_data *veh) {
 * @param room_data *room The room to put it in.
 */
 void vehicle_to_room(vehicle_data *veh, room_data *room) {
-	struct vehicle_room_list *vrl;
+	void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);
 	
 	if (!veh || !room) {
 		log("SYSERR: Illegal value(s) passed to vehicle_to_room. (Room %p, vehicle %p)", room, veh);
@@ -9562,14 +9661,8 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	DL_PREPEND2(ROOM_VEHICLES(room), veh, prev_in_room, next_in_room);
 	IN_ROOM(veh) = room;
 	VEH_LAST_MOVE_TIME(veh) = time(0);
-	
-	// update island ids
-	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-		GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(room);
-		GET_ISLAND(vrl->room) = GET_ISLAND(room);
-		GET_MAP_LOC(vrl->room) = GET_MAP_LOC(room);
-	
-	}
+	update_vehicle_island_and_loc(veh, room);
+	affect_total_room(room);
 }
 
 

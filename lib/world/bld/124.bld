@@ -36,6 +36,7 @@ C
 board, load, unload~
 F
 g
+I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 M
 12426 100.00 c
 R
@@ -55,6 +56,7 @@ C
 board, load, unload~
 F
 g
+I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 M
 12426 100.00 c
 R

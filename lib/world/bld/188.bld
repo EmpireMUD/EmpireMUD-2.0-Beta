@@ -11,6 +11,7 @@ across the room. The air is a little too cold, and as you watch your breath
 condense, you think you catch the reflection of someone moving out of the
 corner of your eye.
 ~
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 R
 18828 2 5 0
 R
@@ -78,6 +79,7 @@ dust is visible on their gleaming lids.
 ~
 F
 B
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 R
 1002 1 5 0
 S

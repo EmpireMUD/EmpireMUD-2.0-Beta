@@ -589,7 +589,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	// options
 	bool ship_partial = IS_SET(options, LRR_SHIP_PARTIAL) ? TRUE : FALSE;
 	bool look_out = IS_SET(options, LRR_LOOK_OUT) ? TRUE : FALSE;
-	bool has_ship = GET_ROOM_VEHICLE(IN_ROOM(ch)) ? TRUE : FALSE;
+	bool has_ship = (GET_ROOM_VEHICLE(IN_ROOM(ch)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_BUILDING)) ? TRUE : FALSE;
 	bool show_on_ship = has_ship && ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT);
 	bool show_title = !show_on_ship || ship_partial || look_out;
 
@@ -1250,8 +1250,6 @@ void look_in_direction(char_data *ch, int dir) {
 * @param bitvector_t options Will recolor the tile if TRUE
 */
 static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, room_data *to_room, bitvector_t options) {
-	extern const char *closed_ruins_icons[NUM_RUINS_ICONS];
-	extern const char *open_ruins_icons[NUM_RUINS_ICONS];
 	extern int get_north_for_char(char_data *ch);
 	extern int get_direction_for_char(char_data *ch, int dir);
 	extern struct city_metadata_type city_type[];
@@ -1431,14 +1429,6 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		else {
 			strcat(buf, "[  ]");
 		}
-	}
-	else if (BUILDING_VNUM(to_room) == BUILDING_RUINS_CLOSED) {
-		// TODO could add variable icons system like sectors use, or a "custom ruins icon" to Building data
-		strcat(buf, closed_ruins_icons[get_room_extra_data(to_room, ROOM_EXTRA_RUINS_ICON)]);
-	}
-	else if (BUILDING_VNUM(to_room) == BUILDING_RUINS_OPEN) {
-		// TODO could add variable icons system like sectors use, or a "custom ruins icon" to Building data
-		strcat(buf, open_ruins_icons[get_room_extra_data(to_room, ROOM_EXTRA_RUINS_ICON)]);
 	}
 	else if (IS_MAP_BUILDING(to_room) && GET_BUILDING(to_room)) {
 		strcat(buf, GET_BLD_ICON(GET_BUILDING(to_room)));
@@ -2050,10 +2040,17 @@ void perform_immort_where(char_data *ch, char *arg) {
 				i = (d->original ? d->original : d->character);
 				if (i && CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i)) {
 					if (d->original) {
-						msg_to_char(ch, "%-20s - [%d]%s %s (in %s)\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(d->character), TRUE), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
+						msg_to_char(ch, "%-20s - [%d]%s %s (in %s)", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(d->character), TRUE), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
 					}
 					else {
-						msg_to_char(ch, "%-20s - [%d]%s %s\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE));
+						msg_to_char(ch, "%-20s - [%d]%s %s", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE));
+					}
+					
+					if (ROOM_INSTANCE(IN_ROOM(d->character))) {
+						msg_to_char(ch, " (%s)\r\n", GET_ADV_NAME(INST_ADVENTURE(ROOM_INSTANCE(IN_ROOM(d->character)))));
+					}
+					else {
+						send_to_char("\r\n", ch);
 					}
 				}
 			}
@@ -2130,7 +2127,7 @@ ACMD(do_exits) {
 		}
 		
 		// can disembark/exit here?
-		if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) || (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_ROOM(ch) == HOME_ROOM(IN_ROOM(ch)))) {
+		if (ROOM_CAN_EXIT(IN_ROOM(ch))) {
 			// 'disembark'
 			if ((veh = GET_ROOM_VEHICLE(room)) && IN_ROOM(veh) && !VEH_FLAGGED(veh, VEH_BUILDING)) {
 				size += snprintf(buf + size, sizeof(buf) - size, "%s%s\r\n", (cmd != -1 ? " " : ""), exit_description(ch, IN_ROOM(veh), "Disembark"));

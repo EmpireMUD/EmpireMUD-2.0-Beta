@@ -458,10 +458,17 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	bool ok = FALSE;
 	
 	// sect- and ability-based determinations
-	if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_REPEL_NPCS)) {
+	if (ROOM_PRIVATE_OWNER(to_room) != NOBODY) {
+		ok = FALSE;
+	}
+	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_REPEL_NPCS)) {
 		ok = FALSE;
 	}
 	else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_REPEL_ANIMALS) && MOB_FLAGGED(mob, MOB_ANIMAL)) {
+		ok = FALSE;
+	}
+	else if (ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC) && IS_COMPLETE(to_room)) {
+		// nope
 		ok = FALSE;
 	}
 	else if (SECT_FLAGGED(sect, SECTF_IS_ROAD) && !MOB_FLAGGED(mob, MOB_AQUATIC) && move_type != MOB_MOVE_SWIM) {
@@ -469,10 +476,6 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 	}
 	else if (AFF_FLAGGED(mob, AFF_FLY)) {
 		ok = TRUE;
-	}
-	else if (ROOM_BLD_FLAGGED(to_room, BLD_NO_NPC) && IS_COMPLETE(to_room)) {
-		// nope
-		ok = FALSE;
 	}
 	else if (SECT_FLAGGED(sect, SECTF_ROUGH)) {
 		if (move_type == MOB_MOVE_CLIMB || MOB_FLAGGED(mob, MOB_MOUNTAINWALK)) {
@@ -508,7 +511,7 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 * building or room.
 *
 * @param char_data *ch The mobile
-* @param int dir Which direction (NORTH, etc)
+* @param int dir Which direction (NORTH, etc); may be NO_DIR
 * @param room_data *to_room The destination
 * @return TRUE if the move is valid, FALSE otherwise
 */
@@ -553,38 +556,80 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
 * @return bool TRUE if the mobile moved successfully
 */
 bool try_mobile_movement(char_data *ch) {
+	ACMD(do_exit);
+	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	extern const int rev_dir[];
 	
-	int dir;
-	room_data *to_room, *was_in = IN_ROOM(ch);
+	int dir, count;
+	room_data *to_room, *temp_room, *was_in = IN_ROOM(ch);
 	struct room_direction_data *ex;
-
-	// first if() limits animals to outside movement only -- they won't move once indoors
-	if (!MOB_FLAGGED(ch, MOB_ANIMAL) || IS_ADVENTURE_ROOM(IN_ROOM(ch)) || !ROOM_IS_CLOSED(IN_ROOM(ch))) {
-		// randomly choose a direction (this checks COMPLEX_DATA() because we want the chance of moving slightly higher indoors, as there are fewer exits)
-		if ((dir = number(0, 40 / (COMPLEX_DATA(IN_ROOM(ch)) ? 2 : 1))) < NUM_2D_DIRS) {
-			if (IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
-				// map movement:
-				to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
-				
-				if (to_room && mob_can_move_to_sect(ch, to_room) && ROOM_PRIVATE_OWNER(to_room) == NOBODY) {
-					// check building and entrances
-					if ((!ROOM_BLD_FLAGGED(to_room, BLD_OPEN) && !IS_COMPLETE(to_room)) || (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_INSIDE(IN_ROOM(ch)) && ROOM_IS_CLOSED(to_room) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir]))) {
-						// can't go that way
-					}
-					else if (validate_mobile_move(ch, dir, to_room)) {
-						perform_move(ch, dir, NULL, MOVE_WANDER);
-					}
-				}
+	vehicle_data *veh;
+	
+	// animals don't move indoors
+	if (MOB_FLAGGED(ch, MOB_ANIMAL) && ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		return FALSE;
+	}
+	
+	// 40% random chance to attempt a move indoors or 20% outdoors
+	if (number(1, 100) > 20 * (COMPLEX_DATA(IN_ROOM(ch)) ? 2 : 1)) {
+		return FALSE;
+	}
+	
+	// pick a random direction
+	dir = number(-1, NUM_2D_DIRS-1);
+	
+	// -1 will attempt to enter/exit a vehicle instead
+	if (dir == -1 && ROOM_CAN_EXIT(IN_ROOM(ch))) {
+		do_exit(ch, "", 0, 0);
+	}
+	else if (dir == -1) {	// look for a vehicle to enter
+		to_room = NULL;
+		count = 0;
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (!VEH_IS_COMPLETE(veh)) {
+				continue; // incomplete
 			}
-			else if (COMPLEX_DATA(IN_ROOM(ch)) && (ex = find_exit(IN_ROOM(ch), dir)) && CAN_GO(ch, ex)) {
-				// indoor movement
-				to_room = ex->room_ptr;
-				
-				if (to_room && validate_mobile_move(ch, dir, to_room)) {
-					perform_move(ch, dir, NULL, MOVE_WANDER);
-				}
+			if (!VEH_FLAGGED(veh, VEH_BUILDING)) {
+				continue;	// buildings only (not vehicles)
 			}
+			if (!(temp_room = get_vehicle_interior(veh))) {
+				continue; // no interior
+			}
+			if (!mob_can_move_to_sect(ch, temp_room) || !validate_mobile_move(ch, NO_DIR, temp_room)) {
+				continue;	// won't go there
+			}
+			
+			// seems ok: pick one at random
+			if (!number(0, count++)) {
+				to_room = temp_room;
+			}
+		}
+		
+		// did we find one?
+		if (to_room) {
+			perform_move(ch, NO_DIR, to_room, MOVE_ENTER_VEH);
+		}
+	}	// end attempt enter/exit
+	else if (IS_OUTDOORS(ch) && !IS_ADVENTURE_ROOM(IN_ROOM(ch))) {
+		// map movement:
+		to_room = real_shift(IN_ROOM(ch), shift_dir[dir][0], shift_dir[dir][1]);
+		
+		if (to_room && mob_can_move_to_sect(ch, to_room)) {
+			// check building and entrances
+			if ((!ROOM_BLD_FLAGGED(to_room, BLD_OPEN) && !IS_COMPLETE(to_room)) || (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) && !IS_INSIDE(IN_ROOM(ch)) && ROOM_IS_CLOSED(to_room) && BUILDING_ENTRANCE(to_room) != dir && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir]))) {
+				// can't go that way
+			}
+			else if (validate_mobile_move(ch, dir, to_room)) {
+				perform_move(ch, dir, to_room, MOVE_WANDER);
+			}
+		}
+	}
+	else if (COMPLEX_DATA(IN_ROOM(ch)) && (ex = find_exit(IN_ROOM(ch), dir)) && CAN_GO(ch, ex)) {
+		// indoor movement
+		to_room = ex->room_ptr;
+		
+		if (to_room && mob_can_move_to_sect(ch, to_room) && validate_mobile_move(ch, dir, to_room)) {
+			perform_move(ch, dir, to_room, MOVE_WANDER);
 		}
 	}
 
@@ -659,11 +704,12 @@ void mobile_activity(void) {
 					}
 
 					// track to next room
-					for (track = ROOM_TRACKS(IN_ROOM(ch)); !found && track; track = track->next) {
+					DL_FOREACH(ROOM_TRACKS(IN_ROOM(ch)), track) {
 						// don't bother checking track lifespan here -- just let mobs follow it till it gets removed
 						if (track->player_id == purs->idnum) {
 							found = TRUE;
 							dir = track->dir;
+							break;
 						}
 					}
 					

@@ -40,7 +40,6 @@ extern const char *tool_flags[];
 
 // external funcs
 void complete_vehicle(vehicle_data *veh);
-extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 extern char *get_mine_type_name(room_data *room);
@@ -115,7 +114,7 @@ const struct action_data_struct action_data[] = {
 	{ "digging", "is digging at the ground.", ACTF_SHOVEL | ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_digging, NULL },	// ACT_DIGGING
 	{ "gathering", "is gathering plant material.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gathering, NULL },	// ACT_GATHERING
 	{ "chopping", "is chopping down trees.", ACTF_HASTE | ACTF_FAST_CHORES, process_chop, NULL },	// ACT_CHOPPING
-	{ "building", "is hard at work building.", ACTF_HASTE | ACTF_FAST_CHORES, process_build_action, NULL },	// ACT_BUILDING
+	{ "building", "is hard at work building.", ACTF_HASTE | ACTF_FAST_CHORES, process_build_action, NULL },	//  ACT_BUILDING (for any type of craft)
 	{ "dismantling", "is dismantling the building.", ACTF_HASTE | ACTF_FAST_CHORES, process_dismantle_action, NULL },	// ACT_DISMANTLING
 	{ "harvesting", "is harvesting the crop.", ACTF_HASTE | ACTF_FAST_CHORES, process_harvesting, NULL },	// ACT_HARVESTING
 	{ "planting", "is planting seeds.", ACTF_HASTE | ACTF_FAST_CHORES, process_planting, NULL },	// ACT_PLANTING
@@ -398,7 +397,7 @@ bool do_crop_forage(char_data *ch) {
 	}
 	
 	if ((crop = get_potential_crop_for_location(IN_ROOM(ch), TRUE))) {
-		return run_interactions(ch, GET_CROP_INTERACTIONS(crop), INTERACT_FORAGE, IN_ROOM(ch), NULL, NULL, finish_foraging);
+		return run_interactions(ch, GET_CROP_INTERACTIONS(crop), INTERACT_FORAGE, IN_ROOM(ch), NULL, NULL, NULL, finish_foraging);
 	}
 	else {
 		return FALSE;	// no crop
@@ -529,6 +528,9 @@ bool validate_burn_area(char_data *ch, int subcmd) {
 	if (!has_evolution_type(SECT(IN_ROOM(ch)), EVO_BURNS_TO)) {
 		msg_to_char(ch, "You can't %s this type of area.\r\n", cmdname[subcmd]);
 	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+		msg_to_char(ch, "You can't burn the area right now.\r\n");
+	}
 	else if (!objless && !lighter) {
 		// nothing to light it with
 		if (kept) {
@@ -643,6 +645,9 @@ void start_chopping(char_data *ch) {
 	}
 	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_CHOP) >= config_get_int("chop_depletion")) {
 		msg_to_char(ch, "There's nothing left here to chop.\r\n");
+	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
+		msg_to_char(ch, "You can't chop here right now.\r\n");
 	}
 	else {
 		start_action(ch, ACT_CHOPPING, 0);
@@ -1287,7 +1292,7 @@ void perform_saw(char_data *ch) {
 			act("You finish sawing $p.", FALSE, ch, proto, NULL, TO_CHAR);
 			act("$n finishes sawing $p.", TRUE, ch, proto, NULL, TO_ROOM);
 			
-			success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_SAW, IN_ROOM(ch), NULL, proto, finish_scraping);
+			success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_SAW, IN_ROOM(ch), NULL, proto, NULL, finish_scraping);
 		}
 		
 		if (!success && !proto) {
@@ -1369,7 +1374,6 @@ void process_build_action(char_data *ch) {
 	
 	char buf1[MAX_STRING_LENGTH];
 	craft_data *type = NULL;
-	int count, total;
 	
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to keep working here.\r\n");
@@ -1391,10 +1395,7 @@ void process_build_action(char_data *ch) {
 		}
 	}
 
-	total = 1;	// number of materials to attach in one go (add things that speed up building)
-	for (count = 0; count < total && GET_ACTION(ch) == ACT_BUILDING; ++count) {
-		process_build(ch, IN_ROOM(ch), ACT_BUILDING);
-	}
+	process_build(ch, IN_ROOM(ch), ACT_BUILDING);
 }
 
 
@@ -1492,7 +1493,7 @@ void process_chipping(char_data *ch) {
 		act("$n finishes chipping $p!", TRUE, ch, proto, NULL, TO_ROOM);
 		GET_ACTION(ch) = ACT_NONE;
 		
-		success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_CHIP, IN_ROOM(ch), NULL, proto, finish_scraping);
+		success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_CHIP, IN_ROOM(ch), NULL, proto, NULL, finish_scraping);
 		free_resource_list(GET_ACTION_RESOURCES(ch));
 		GET_ACTION_RESOURCES(ch) = NULL;
 
@@ -1698,6 +1699,10 @@ void process_excavating(char_data *ch) {
 			msg_to_char(ch, "You no longer have permission to excavate here.\r\n");
 			cancel_action(ch);
 		}
+		else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+			msg_to_char(ch, "You can't excavate here right now.\r\n");
+			cancel_action(ch);
+		}
 		else {
 			// count up toward zero
 			add_to_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, 1);
@@ -1770,6 +1775,10 @@ void process_fillin(char_data *ch) {
 		}
 		else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You no longer have permission to fill in here.\r\n");
+			cancel_action(ch);
+		}
+		else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+			msg_to_char(ch, "You can't fill in here right now.\r\n");
 			cancel_action(ch);
 		}
 		else {
@@ -2198,7 +2207,7 @@ void process_mining(char_data *ch) {
 			}
 			
 			// attempt to mine it
-			success = run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), INTERACT_MINE, IN_ROOM(ch), NULL, NULL, finish_mining);
+			success = run_interactions(ch, GET_GLOBAL_INTERACTIONS(glb), INTERACT_MINE, IN_ROOM(ch), NULL, NULL, NULL, finish_mining);
 			
 			if (success && in_room == IN_ROOM(ch)) {
 				// skillups
@@ -2496,6 +2505,12 @@ void process_planting(char_data *ch) {
 */
 void process_prospecting(char_data *ch) {
 	void init_mine(room_data *room, char_data *ch, empire_data *emp);
+	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark for you to keep prospecting.\r\n");
+		cancel_action(ch);
+		return;
+	}
 		
 	// simple decrement
 	GET_ACTION_TIMER(ch) -= 1;
@@ -2693,7 +2708,7 @@ void process_scraping(char_data *ch) {
 			act("You finish scraping off $p.", FALSE, ch, proto, NULL, TO_CHAR);
 			act("$n finishes scraping off $p.", TRUE, ch, proto, NULL, TO_ROOM);
 			
-			success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_SCRAPE, IN_ROOM(ch), NULL, proto, finish_scraping);
+			success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_SCRAPE, IN_ROOM(ch), NULL, proto, NULL, finish_scraping);
 		}
 		
 		if (!success && !proto) {
@@ -2778,7 +2793,7 @@ void process_start_fillin(char_data *ch) {
 		msg_to_char(ch, "You block off the water and begin to fill in the trench.\r\n");
 		
 		// set it up
-		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(old_sect));
+		change_terrain(IN_ROOM(ch), GET_SECT_VNUM(old_sect), NOTHING);
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, -1);
 	}
 	else {
@@ -2847,7 +2862,7 @@ void process_tanning(char_data *ch) {
 
 		GET_ACTION(ch) = ACT_NONE;
 		
-		success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_TAN, IN_ROOM(ch), NULL, proto, finish_scraping);
+		success = run_interactions(ch, GET_OBJ_INTERACTIONS(proto), INTERACT_TAN, IN_ROOM(ch), NULL, proto, NULL, finish_scraping);
 		free_resource_list(GET_ACTION_RESOURCES(ch));
 		GET_ACTION_RESOURCES(ch) = NULL;
 		
@@ -2987,10 +3002,14 @@ ACMD(do_chop) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
+	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) && IS_OUTDOORS(ch) && has_interaction(GET_SECT_INTERACTIONS(BASE_SECT(IN_ROOM(ch))), INTERACT_CHOP)) {
+		// variant of can't-chop where it's blocked by something other than the base sector
+		send_to_char("You can't really chop anything here right now.\r\n", ch);
+	}
 	else if (!CAN_CHOP_ROOM(IN_ROOM(ch))) {
 		send_to_char("You can't really chop anything down here.\r\n", ch);
 	}
-	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE)) {
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
 		msg_to_char(ch, "You can't chop here right now.\r\n");
 	}
 	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
@@ -3124,6 +3143,9 @@ ACMD(do_excavate) {
 	else if (!(evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_TRENCH_START))) {
 		msg_to_char(ch, "You can't excavate a trench here.\r\n");
 	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+		msg_to_char(ch, "You can't excavate here right now.\r\n");
+	}
 	else if (is_entrance(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't excavate a trench in front of an entrance.\r\n");
 	}
@@ -3139,7 +3161,7 @@ ACMD(do_excavate) {
 
 		// Set up the trench
 		orig = SECT(IN_ROOM(ch));
-		change_terrain(IN_ROOM(ch), evo->becomes);
+		change_terrain(IN_ROOM(ch), evo->becomes, NOTHING);
 		
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_PROGRESS, config_get_int("trench_initial_value"));
 		set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR, GET_SECT_VNUM(orig));
@@ -3203,6 +3225,9 @@ ACMD(do_fillin) {
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		// 2nd check: members only to start new fillin
 		msg_to_char(ch, "You don't have permission to fill in here!\r\n");
+	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+		msg_to_char(ch, "You can't fill in here right now.\r\n");
 	}
 	else {
 		// always takes 1 minute
@@ -3575,6 +3600,9 @@ ACMD(do_plant) {
 	else if (!(evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_PLANTS_TO))) {
 		msg_to_char(ch, "Nothing can be planted here.\r\n");
 	}
+	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
+		msg_to_char(ch, "You can't plant here right now.\r\n");
+	}
 	else if (!MATCH_CROP_SECTOR_CLIMATE(cp, SECT(IN_ROOM(ch)))) {
 		if (CROP_FLAGGED(cp, CROPF_ANY_LISTED_CLIMATE)) {
 			ordered_sprintbit(GET_CROP_CLIMATE(cp), climate_flags, climate_flags_order, TRUE, buf);
@@ -3587,8 +3615,7 @@ ACMD(do_plant) {
 	}
 	else {
 		original = SECT(IN_ROOM(ch));
-		change_terrain(IN_ROOM(ch), evo->becomes);
-		change_base_sector(IN_ROOM(ch), original);
+		change_terrain(IN_ROOM(ch), evo->becomes, GET_SECT_VNUM(original));
 		
 		// don't use GET_FOOD_CROP_TYPE because not all plantables are food
 		set_crop_type(IN_ROOM(ch), cp);
@@ -3659,6 +3686,9 @@ ACMD(do_prospect) {
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to prospect here.\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark for you to prospect.\r\n");
 	}
 	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) > 0 && GET_LOYALTY(ch) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
 		msg_to_char(ch, "You see evidence that someone has already prospected this area...\r\n");

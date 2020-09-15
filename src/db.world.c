@@ -129,7 +129,7 @@ void change_chop_territory(room_data *room) {
 	}
 	else if ((evo = get_evolution_by_type(SECT(room), EVO_CHOPPED_DOWN))) {
 		// normal case
-		change_terrain(room, evo->becomes);
+		change_terrain(room, evo->becomes, NOTHING);
 	}
 	else {
 		// it's actually okay to call this on an unchoppable room... just mark it more depleted
@@ -144,11 +144,13 @@ void change_chop_territory(room_data *room) {
 *
 * @param room_data *room The room to change.
 * @param sector_vnum sect Any sector vnum
+* @param sector_vnum base_sect Optional: Sets the base sector, too. (pass NOTHING to set it the same as sect)
 */
-void change_terrain(room_data *room, sector_vnum sect) {
+void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
+	void check_vehicle_climate_change(room_data *room);
 	void lock_icon(room_data *room, struct icon_data *use_icon);
 	
-	sector_data *old_sect = SECT(room), *st = sector_proto(sect);
+	sector_data *old_sect = SECT(room), *st = sector_proto(sect), *base;
 	struct map_data *map, *temp;
 	crop_data *new_crop = NULL;
 	empire_data *emp;
@@ -161,6 +163,11 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	if (!st) {
 		log("SYSERR: change_terrain called with invalid sector vnum %d", sect);
 		return;
+	}
+	
+	base = sector_proto(base_sect);
+	if (!base) {
+		base = st;
 	}
 	
 	// tear down any building data and customizations
@@ -188,7 +195,7 @@ void change_terrain(room_data *room, sector_vnum sect) {
 	
 	// change sect
 	perform_change_sect(room, NULL, st);
-	perform_change_base_sect(room, NULL, st);
+	perform_change_base_sect(room, NULL, base);
 	
 	// need to determine a crop?
 	if (!new_crop && SECT_FLAGGED(st, SECTF_HAS_CROP_DATA) && !ROOM_CROP(room)) {
@@ -250,6 +257,9 @@ void change_terrain(room_data *room, sector_vnum sect) {
 		qt_empire_players(emp, qt_gain_tile_sector, GET_SECT_VNUM(st));
 		et_gain_tile_sector(emp, GET_SECT_VNUM(st));
 	}
+	
+	// lastly, see if any vehicles died from this
+	check_vehicle_climate_change(room);
 }
 
 
@@ -739,13 +749,13 @@ void fill_trench(room_data *room) {
 	struct evolution_data *evo;
 	sector_data *sect;
 	
-	if ((evo = get_evolution_by_type(SECT(room), EVO_TRENCH_FULL)) != NULL) {
+	if ((evo = get_evolution_by_type(SECT(room), EVO_TRENCH_FULL)) != NULL && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE)) {
 		if (ROOM_PEOPLE(room)) {
 			sect = sector_proto(evo->becomes);
 			sprintf(lbuf, "The trench is full! It is now %s %s!", sect ? AN(GET_SECT_NAME(sect)) : "something", sect ? GET_SECT_NAME(sect) : "else");
 			act(lbuf, FALSE, ROOM_PEOPLE(room), 0, 0, TO_CHAR | TO_ROOM);
 		}
-		change_terrain(room, evo->becomes);
+		change_terrain(room, evo->becomes, NOTHING);
 		remove_room_extra_data(room, ROOM_EXTRA_TRENCH_FILL_TIME);
 	}
 }
@@ -860,7 +870,7 @@ void perform_burn_room(room_data *room) {
 			act(buf, FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
 		
-		change_terrain(room, evo->becomes);
+		change_terrain(room, evo->becomes, NOTHING);
 		
 		stop_room_action(room, ACT_BURN_AREA);
 		stop_room_action(room, ACT_CHOPPING);
@@ -948,7 +958,7 @@ void uncrop_tile(room_data *room) {
 	}
 	
 	// ok: now change it
-	change_terrain(room, GET_SECT_VNUM(to_sect));
+	change_terrain(room, GET_SECT_VNUM(to_sect), NOTHING);
 	
 	if (ROOM_PEOPLE(room)) {
 		strcpy(name, GET_SECT_NAME(to_sect));
@@ -995,7 +1005,7 @@ void untrench_room(room_data *room) {
 	}
 	
 	if (to_sect) {
-		change_terrain(room, GET_SECT_VNUM(to_sect));
+		change_terrain(room, GET_SECT_VNUM(to_sect), NOTHING);
 	}
 	
 	remove_room_extra_data(room, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
@@ -1158,7 +1168,7 @@ void annual_update_map_tile(struct map_data *tile) {
 	
 	// updates that only matter if there's a room:
 	if (room) {
-		if (IS_RUINS(room)) {
+		if (ROOM_BLD_FLAGGED(room, BLD_IS_RUINS)) {
 			// roughly 2 real years for average chance for ruins to be gone
 			if (!number(0, 89)) {
 				disassociate_building(room);
@@ -1258,7 +1268,7 @@ void annual_update_map_tile(struct map_data *tile) {
 			room = real_room(tile->vnum);	// neeed room in memory
 		}
 		
-		change_terrain(room, GET_SECT_VNUM(old_sect));
+		change_terrain(room, GET_SECT_VNUM(old_sect), NOTHING);
 		set_room_extra_data(room, ROOM_EXTRA_TRENCH_PROGRESS, -1);
 	}
 	
@@ -1275,10 +1285,11 @@ void annual_update_map_tile(struct map_data *tile) {
 * Runs an annual update (mainly, maintenance) on the vehicle.
 */
 void annual_update_vehicle(vehicle_data *veh) {
-	void fully_empty_vehicle(vehicle_data *veh);
+	void ruin_vehicle(vehicle_data *veh, char *message);
 	
 	static struct resource_data *default_res = NULL;
 	struct resource_data *old_list;
+	char *msg;
 	
 	// resources if it doesn't have its own
 	if (!default_res) {
@@ -1293,7 +1304,14 @@ void annual_update_vehicle(vehicle_data *veh) {
 	VEH_HEALTH(veh) -= MAX(1.0, ((double) VEH_MAX_HEALTH(veh) / 10.0));
 	
 	if (VEH_HEALTH(veh) > 0) {	// still alive
-		if (!VEH_IS_DISMANTLING(veh)) {
+		if (VEH_FLAGGED(veh, VEH_IS_RUINS)) {
+			// chance of ruining ruins: roughly 2 real years for average chance for ruins to be gone
+			if (!number(0, 89)) {
+				msg = veh_get_custom_message(veh, VEH_CUSTOM_RUINS_TO_ROOM);
+				ruin_vehicle(veh, msg ? msg : "$V finally crumbles to dust!");
+			}
+		}
+		else if (!VEH_IS_DISMANTLING(veh)) {
 			// add maintenance (if not dismantling)
 			old_list = VEH_NEEDS_RESOURCES(veh);
 			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
@@ -1301,17 +1319,8 @@ void annual_update_vehicle(vehicle_data *veh) {
 		}
 	}
 	else {	// destroyed
-		// return of 0 prevents the decay
-		if (!destroy_vtrigger(veh)) {
-			VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
-			return;
-		}
-		
-		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V crumbles from disrepair!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
-		}
-		fully_empty_vehicle(veh);
-		extract_vehicle(veh);
+		msg = veh_get_custom_message(veh, VEH_CUSTOM_RUINS_TO_ROOM);
+		ruin_vehicle(veh, msg ? msg : "$V crumbles from disrepair!");
 	}
 }
 
@@ -1426,11 +1435,11 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 	
 	// looks good: naturalize it
 	if (room) {
-		decustomize_room(room);
-		change_terrain(room, GET_SECT_VNUM(tile->natural_sector));
 		if (ROOM_PEOPLE(room)) {
 			act("The area returns to nature!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
+		decustomize_room(room);
+		change_terrain(room, GET_SECT_VNUM(tile->natural_sector), NOTHING);
 		
 		// no longer need this
 		remove_room_extra_data(room, ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR);
@@ -1677,9 +1686,12 @@ int city_points_available(empire_data *emp) {
 	int points = 0;
 	
 	if (emp) {
-		points = 1;
-		points += ((EMPIRE_MEMBERS(emp) - 1) / config_get_int("players_per_city_point"));
-		points += EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS);
+		// only get points if members are active
+		if (EMPIRE_MEMBERS(emp) > 0) {
+			points = 1;
+			points += ((EMPIRE_MEMBERS(emp) - 1) / config_get_int("players_per_city_point"));
+			points += EMPIRE_ATTRIBUTE(emp, EATT_BONUS_CITY_POINTS);
+		}
 
 		// minus any used points
 		points -= count_city_points_used(emp);
@@ -1827,8 +1839,6 @@ void reset_one_room(room_data *room) {
 				
 				GET_ROPE_VNUM(mob) = reset->arg2;
 				
-				// TODO: should we really be running a load trigger? (it shouldn't matter since it's loaded with no scripts, but this is not really a new load) -paul oct 10, 2018
-				load_mtrigger(mob);
 				tmob = mob;
 				break;
 			}
@@ -1956,6 +1966,7 @@ void startup_room_reset(void) {
 	room_data *room, *next_room;
 
 	HASH_ITER(hh, world_table, room, next_room) {
+		affect_total_room(room);
 		if (room->reset_commands) {
 			reset_one_room(room);
 		}
@@ -2679,13 +2690,8 @@ bool import_one_evo(room_vnum loc, sector_vnum old_sect, sector_vnum new_sect) {
 	}
 	*/
 	
-	// seems ok...
-	change_terrain(room, new_sect);
-	
-	// If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
-	if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && BASE_SECT(room) == SECT(room)) {
-		change_base_sector(room, sector_proto(old_sect));
-	}
+	// seems ok... If the new sector has crop data, we should store the original (e.g. a desert that randomly grows into a crop)
+	change_terrain(room, new_sect, (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && BASE_SECT(room) == SECT(room)) ? old_sect : NOTHING);
 	
 	// deactivate workforce if the room type changed
 	if (ROOM_OWNER(room)) {
@@ -3346,7 +3352,7 @@ void grow_crop(struct map_data *map) {
 	remove_extra_data(&map->shared->extra_data, ROOM_EXTRA_SEED_TIME);
 	
 	// nothing to grow
-	if (!SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA) || !(evo = get_evolution_by_type(map->sector_type, EVO_CROP_GROWS)) || !(becomes = sector_proto(evo->becomes))) {
+	if (IS_SET(map->shared->affects, ROOM_AFF_NO_EVOLVE) || !SECT_FLAGGED(map->sector_type, SECTF_HAS_CROP_DATA) || !(evo = get_evolution_by_type(map->sector_type, EVO_CROP_GROWS)) || !(becomes = sector_proto(evo->becomes))) {
 		return;
 	}
 	
@@ -3397,6 +3403,216 @@ void init_room(room_data *room, room_vnum vnum) {
 	room->people = NULL;
 }
 
+/**
+* Interaction function for building-ruins-to-building. This replaces the
+* building, ignoring interaction quantity, and transfers built-with resources
+* and contents.
+*/
+INTERACTION_FUNC(ruin_building_to_building_interaction) {
+	extern room_data *get_vehicle_interior(vehicle_data *veh);
+	void scale_vehicle_to_level(vehicle_data *veh, int level);
+	
+	struct resource_data *res, *next_res, *save = NULL;
+	vehicle_data *veh_iter, *next_veh;
+	room_data *to_room = NULL;
+	bld_data *old_bld, *proto;
+	double save_resources;
+	int dir;
+	
+	if (!inter_room || !(proto = building_proto(interaction->vnum)) || GET_ROOM_VNUM(inter_room) >= MAP_SIZE) {
+		return FALSE;	// safety: only works on the map
+	}
+	
+	// save data
+	old_bld = GET_BUILDING(inter_room);
+	dir = BUILDING_ENTRANCE(inter_room);
+	
+	// move resources...
+	if (GET_BUILT_WITH(inter_room)) {
+		save = GET_BUILT_WITH(inter_room);
+		GET_BUILT_WITH(inter_room) = NULL;
+	}
+	else if (IS_DISMANTLING(inter_room)) {
+		save = GET_BUILDING_RESOURCES(inter_room);
+		GET_BUILDING_RESOURCES(inter_room) = NULL;
+	}
+	
+	// abandon first -- this will take care of accessory rooms, too
+	abandon_room(inter_room);
+	disassociate_building(inter_room);
+	
+	if (ROOM_PEOPLE(inter_room)) {	// messaging to anyone left
+		act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(inter_room), NULL, NULL, TO_CHAR | TO_ROOM);
+	}
+	
+	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(inter_room), veh_iter, next_veh, next_in_room) {
+		if (!VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
+			extract_vehicle(veh_iter);
+		}
+	}
+	
+	if (!IS_SET(GET_BLD_FLAGS(proto), BLD_OPEN)) {
+		// closed ruins
+		to_room = SHIFT_DIR(inter_room, rev_dir[dir]);
+	}
+	construct_building(inter_room, interaction->vnum);
+	COMPLEX_DATA(inter_room)->entrance = dir;
+	
+	// custom naming if #n is present (before complete_building)
+	if (strstr(GET_BLD_TITLE(proto), "#n")) {
+		if (ROOM_CUSTOM_NAME(inter_room)) {
+			free(ROOM_CUSTOM_NAME(inter_room));
+		}
+		ROOM_CUSTOM_NAME(inter_room) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a Building", GET_BLD_TITLE(proto));
+	}
+	
+	complete_building(inter_room);
+	
+	if (ROOM_IS_CLOSED(inter_room)) {
+		create_exit(inter_room, to_room, rev_dir[dir], FALSE);
+	}
+
+	// reattach built-with (if any) and reduce it to 5-20%
+	if (save) {
+		save_resources = number(5, 20) / 100.0;
+		GET_BUILT_WITH(inter_room) = save;
+		LL_FOREACH_SAFE(GET_BUILT_WITH(inter_room), res, next_res) {
+			res->amount = ceil(res->amount * save_resources);
+		
+			if (res->amount <= 0) {	// delete if empty
+				LL_DELETE(GET_BUILT_WITH(inter_room), res);
+				free(res);
+			}
+		}
+	}
+	
+	return TRUE;
+}
+
+
+/**
+* Interaction function for building-ruins-to-vehicle. This loads a new vehicle,
+* ignoring interaction quantity, and transfers built-with resources and
+* contents.
+*/
+INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
+	extern room_data *get_vehicle_interior(vehicle_data *veh);
+	void scale_vehicle_to_level(vehicle_data *veh, int level);
+	
+	struct resource_data *res, *next_res, *save = NULL;
+	vehicle_data *ruin, *proto, *veh_iter, *next_veh;
+	obj_data *obj_iter, *next_obj;
+	char_data *ch_iter, *next_ch;
+	double save_resources;
+	bld_data *old_bld;
+	room_data *inside;
+	char *to_free;
+	
+	if (!inter_room || !(proto = vehicle_proto(interaction->vnum)) || GET_ROOM_VNUM(inter_room) >= MAP_SIZE) {
+		return FALSE;	// safety: only works on the map
+	}
+	
+	old_bld = GET_BUILDING(inter_room);
+	ruin = read_vehicle(interaction->vnum, TRUE);
+	vehicle_to_room(ruin, inter_room);
+	scale_vehicle_to_level(ruin, 1);	// minimum available level
+	
+	// do not transfer ownership -- ruins never default to 'claimed'
+	
+	// move contents
+	if ((inside = get_vehicle_interior(ruin))) {
+		// move applicable vehicles
+		if (VEH_FLAGGED(ruin, VEH_CARRY_VEHICLES)) {
+			DL_FOREACH_SAFE2(ROOM_VEHICLES(inter_room), veh_iter, next_veh, next_in_room) {
+				if (veh_iter != ruin && !VEH_FLAGGED(veh_iter, VEH_NO_LOAD_ONTO_VEHICLE)) {
+					vehicle_from_room(veh_iter);
+					vehicle_to_room(veh_iter, inside);
+				}
+			}
+		}
+		// move all mobs/players
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(inter_room), ch_iter, next_ch, next_in_room) {
+			char_from_room(ch_iter);
+			char_to_room(ch_iter, inside);
+		}
+		// and objs
+		DL_FOREACH_SAFE2(ROOM_CONTENTS(inter_room), obj_iter, next_obj, next_content) {
+			obj_from_room(obj_iter);
+			obj_to_room(obj_iter, inside);
+		}
+		
+		if (ROOM_PEOPLE(inside)) {
+			act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(inside), NULL, NULL, TO_CHAR | TO_ROOM);
+		}
+	}
+	
+	// move resources...
+	if (GET_BUILT_WITH(inter_room)) {
+		save = GET_BUILT_WITH(inter_room);
+		GET_BUILT_WITH(inter_room) = NULL;
+	}
+	else if (IS_DISMANTLING(inter_room)) {
+		save = GET_BUILDING_RESOURCES(inter_room);
+		GET_BUILDING_RESOURCES(inter_room) = NULL;
+	}
+	
+	// abandon first -- this will take care of accessory rooms, too
+	abandon_room(inter_room);
+	disassociate_building(inter_room);
+	
+	if (ROOM_PEOPLE(inter_room)) {	// messaging to anyone left
+		act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(inter_room), NULL, NULL, TO_CHAR | TO_ROOM);
+	}
+	
+	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(inter_room), veh_iter, next_veh, next_in_room) {
+		if (veh_iter != ruin && !VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
+			extract_vehicle(veh_iter);
+		}
+	}
+	
+	// reattach built-with (if any) and reduce it to 5-20%
+	if (save) {
+		save_resources = number(5, 20) / 100.0;
+		VEH_BUILT_WITH(ruin) = save;
+		LL_FOREACH_SAFE(VEH_BUILT_WITH(ruin), res, next_res) {
+			res->amount = ceil(res->amount * save_resources);
+			
+			if (res->amount <= 0) {	// delete if empty
+				LL_DELETE(VEH_BUILT_WITH(ruin), res);
+				free(res);
+			}
+		}
+	}
+	
+	// custom naming if #n is present
+	if (strstr(VEH_KEYWORDS(ruin), "#n")) {
+		to_free = (!proto || VEH_KEYWORDS(ruin) != VEH_KEYWORDS(proto)) ? VEH_KEYWORDS(ruin) : NULL;
+		VEH_KEYWORDS(ruin) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a building", VEH_KEYWORDS(ruin));
+		if (to_free) {
+			free(to_free);
+		}
+	}
+	if (strstr(VEH_SHORT_DESC(ruin), "#n")) {
+		to_free = (!proto || VEH_SHORT_DESC(ruin) != VEH_SHORT_DESC(proto)) ? VEH_SHORT_DESC(ruin) : NULL;
+		VEH_SHORT_DESC(ruin) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a building", VEH_SHORT_DESC(ruin));
+		if (to_free) {
+			free(to_free);
+		}
+	}
+	if (strstr(VEH_LONG_DESC(ruin), "#n")) {
+		to_free = (!proto || VEH_LONG_DESC(ruin) != VEH_LONG_DESC(proto)) ? VEH_LONG_DESC(ruin) : NULL;
+		VEH_LONG_DESC(ruin) = str_replace("#n", old_bld ? GET_BLD_NAME(old_bld) : "a building", VEH_LONG_DESC(ruin));
+		if (to_free) {
+			free(to_free);
+		}
+	}
+	
+	load_vtrigger(ruin);
+	return TRUE;
+}
+
 
 /**
 * Replaces a building with ruins.
@@ -3404,94 +3620,30 @@ void init_room(room_data *room, room_vnum vnum) {
 * @param room_data *room The location of the building.
 */
 void ruin_one_building(room_data *room) {
-	bool closed = ROOM_IS_CLOSED(room) ? TRUE : FALSE;
-	struct resource_data *res, *next_res, *save = NULL;
 	bld_data *bld = GET_BUILDING(room);
-	int dir = BUILDING_ENTRANCE(room);
 	vehicle_data *veh, *next_veh;
-	char buf[MAX_STRING_LENGTH];
-	double save_resources;
-	room_data *to_room;
-	bld_vnum type;
 	
-	// save the resource list for later
-	if (GET_BUILT_WITH(room)) {
-		save = GET_BUILT_WITH(room);
-		GET_BUILT_WITH(room) = NULL;
+	if (bld && run_interactions(NULL, GET_BLD_INTERACTIONS(bld), INTERACT_RUINS_TO_VEH, room, NULL, NULL, NULL, ruin_building_to_vehicle_interaction)) {
+		// succesfully ruined to a vehicle
 	}
-	else if (IS_DISMANTLING(room)) {
-		save = GET_BUILDING_RESOURCES(room);
-		GET_BUILDING_RESOURCES(room) = NULL;
+	else if (bld && run_interactions(NULL, GET_BLD_INTERACTIONS(bld), INTERACT_RUINS_TO_BLD, room, NULL, NULL, NULL, ruin_building_to_building_interaction)) {
+		// succesfully ruined to a vehicle
 	}
+	else {	// failed to run a ruins interaction	
+		// abandon first -- this will take care of accessory rooms, too
+		abandon_room(room);
+		disassociate_building(room);
 	
-	// abandon first -- this will take care of accessory rooms, too
-	abandon_room(room);
-	disassociate_building(room);
-	
-	if (ROOM_PEOPLE(room)) {
-		act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
-	}
-	
-	// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
-	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-		if (!VEH_OWNER(veh) && !VEH_CONTAINS(veh)) {
-			extract_vehicle(veh);
+		if (ROOM_PEOPLE(room)) {
+			act("The building around you crumbles to ruin!", FALSE, ROOM_PEOPLE(room), NULL, NULL, TO_CHAR | TO_ROOM);
 		}
-	}
 	
-	// create ruins building
-	if (bld && !IS_SET(GET_BLD_FLAGS(bld), BLD_NO_RUINS)) {
-		// verify closed status and find a room to exit to
-		if (closed) {
-			to_room = SHIFT_DIR(room, rev_dir[dir]);
-			if (!to_room) {
-				closed = FALSE;
+		// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
+		DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+			if (!VEH_OWNER(veh) && !VEH_CONTAINS(veh)) {
+				extract_vehicle(veh);
 			}
 		}
-		
-		// basic setup
-		if (SECT_FLAGGED(BASE_SECT(room), SECTF_FRESH_WATER | SECTF_OCEAN)) {
-			type = BUILDING_RUINS_FLOODED;
-		}
-		else if (closed) {
-			type = BUILDING_RUINS_CLOSED;
-		}
-		else {
-			type = BUILDING_RUINS_OPEN;
-		}
-		construct_building(room, type);
-		COMPLEX_DATA(room)->entrance = dir;
-		
-		// make the exit
-		if (closed && to_room) {
-			create_exit(room, to_room, rev_dir[dir], FALSE);
-		}
-		
-		// customized ruins
-		sprintf(buf, "The Ruins of %s %s", AN(GET_BLD_NAME(bld)), GET_BLD_NAME(bld));
-		if (ROOM_CUSTOM_NAME(room)) {
-			free(ROOM_CUSTOM_NAME(room));
-		}
-		ROOM_CUSTOM_NAME(room) = str_dup(buf);
-		set_room_extra_data(room, ROOM_EXTRA_RUINS_ICON, number(0, NUM_RUINS_ICONS-1));
-		
-		// run completion on the ruins
-		complete_building(room);
-		
-		// reattach built-with (if any) and reduce it to 5-20%
-		save_resources = number(5, 20) / 100.0;
-		GET_BUILT_WITH(room) = save;
-		LL_FOREACH_SAFE(GET_BUILT_WITH(room), res, next_res) {
-			res->amount = ceil(res->amount * save_resources);
-			
-			if (res->amount <= 0) {	// delete if empty
-				LL_DELETE(GET_BUILT_WITH(room), res);
-				free(res);
-			}
-		}
-	}
-	else if (save) {
-		free_resource_list(save);
 	}
 }
 
@@ -3830,7 +3982,7 @@ void load_world_map_from_file(void) {
 	struct map_data *map, *last = NULL;
 	struct depletion_data *dep;
 	struct track_data *track;
-	int var[7], x, y;
+	int var[8], x, y;
 	long l_in;
 	FILE *fl;
 	
@@ -3877,10 +4029,13 @@ void load_world_map_from_file(void) {
 		
 		// new room
 		if (isdigit(*line)) {
-			// x y island sect base natural crop
-			if (sscanf(line, "%d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6]) != 7) {
-				log("Encountered bad line in world map file: %s", line);
-				continue;
+			// x y island sect base natural crop misc
+			if (sscanf(line, "%d %d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6], &var[7]) != 8) {
+				var[7] = 0;	// backwards-compatible on the misc
+				if (sscanf(line, "%d %d %d %d %d %d %d", &var[0], &var[1], &var[2], &var[3], &var[4], &var[5], &var[6]) != 7) {
+					log("Encountered bad line in world map file: %s", line);
+					continue;
+				}
 			}
 			if (var[0] < 0 || var[0] >= MAP_WIDTH || var[1] < 0 || var[1] >= MAP_HEIGHT) {
 				log("Encountered bad location in world map file: (%d, %d)", var[0], var[1]);
@@ -3905,6 +4060,7 @@ void load_world_map_from_file(void) {
 			map->base_sector = sector_proto(var[4]);
 			map->natural_sector = sector_proto(var[5]);
 			map->crop_type = crop_proto(var[6]);
+			// var[7] is ignored -- this is misc keys for the evolve.c utility
 			
 			last = map;	// store in case of more data
 		}
@@ -3973,7 +4129,7 @@ void load_world_map_from_file(void) {
 					track->timestamp = l_in;
 					track->dir = var[2];
 					
-					LL_PREPEND(last->shared->tracks, track);
+					DL_PREPEND(last->shared->tracks, track);
 					break;
 				}
 				case 'Z': {	// extra data
@@ -4008,7 +4164,9 @@ void save_world_map_to_file(void) {
 	struct track_data *track, *next_track;
 	struct map_data *iter;
 	long now = time(0);
+	room_data *room;
 	FILE *fl;
+	int misc;
 	
 	int tracks_lifespan = config_get_int("tracks_lifespan");
 	
@@ -4025,15 +4183,21 @@ void save_world_map_to_file(void) {
 	// only bother with ones that aren't base ocean
 	for (iter = land_map; iter; iter = iter->next) {
 		// free some junk while we're here anyway
-		LL_FOREACH_SAFE(iter->shared->tracks, track, next_track) {
+		DL_FOREACH_SAFE(iter->shared->tracks, track, next_track) {
 			if (now - track->timestamp > tracks_lifespan * SECS_PER_REAL_MIN) {
-				LL_DELETE(iter->shared->tracks, track);
+				DL_DELETE(iter->shared->tracks, track);
 				free(track);
 			}
 		}
 		
-		// SAVE: x y island sect base natural crop
-		fprintf(fl, "%d %d %d %d %d %d %d\n", MAP_X_COORD(iter->vnum), MAP_Y_COORD(iter->vnum), iter->shared->island_id, (iter->sector_type ? GET_SECT_VNUM(iter->sector_type) : -1), (iter->base_sector ? GET_SECT_VNUM(iter->base_sector) : -1), (iter->natural_sector ? GET_SECT_VNUM(iter->natural_sector) : -1), (iter->crop_type ? GET_CROP_VNUM(iter->crop_type) : -1));
+		// misc is some extra flags we pass to the evolver here, and is not really read back in by the MUD
+		misc = 0;
+		if ((room = real_real_room(iter->vnum)) && ROOM_OWNER(room)) {
+			misc |= EVOLVER_OWNED;
+		}
+		
+		// SAVE: x y island sect base natural crop misc
+		fprintf(fl, "%d %d %d %d %d %d %d %d\n", MAP_X_COORD(iter->vnum), MAP_Y_COORD(iter->vnum), iter->shared->island_id, (iter->sector_type ? GET_SECT_VNUM(iter->sector_type) : -1), (iter->base_sector ? GET_SECT_VNUM(iter->base_sector) : -1), (iter->natural_sector ? GET_SECT_VNUM(iter->natural_sector) : -1), (iter->crop_type ? GET_CROP_VNUM(iter->crop_type) : -1), misc);
 		write_shared_room_data(fl, iter->shared);
 	}
 	

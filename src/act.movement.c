@@ -42,10 +42,11 @@ extern const char *from_dir[];
 extern const char *mob_move_types[];
 
 // external funcs
+ACMD(do_dismount);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
-extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 void do_unseat_from_vehicle(char_data *ch);
 extern char *get_room_name(room_data *room, bool color);
+extern int total_vehicle_size_in_room(room_data *room);
 
 // local protos
 bool can_enter_room(char_data *ch, room_data *room);
@@ -129,8 +130,7 @@ void add_tracks(char_data *ch, room_data *room, byte dir) {
 				track->player_id = GET_IDNUM(ch);
 			}
 			
-			track->next = ROOM_TRACKS(room);
-			ROOM_TRACKS(room) = track;
+			DL_PREPEND(ROOM_TRACKS(room), track);
 		}
 	}
 }
@@ -956,7 +956,7 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 		}
 		
 		// unfinished interior room
-		if (IS_INSIDE(IN_ROOM(ch)) && IS_INSIDE(to_room) && !IS_COMPLETE(IN_ROOM(ch)) && GET_LAST_DIR(ch) != NO_DIR && !IS_SET(flags, MOVE_EARTHMELD) && dir != rev_dir[(int) GET_LAST_DIR(ch)]) {
+		if (ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_COMPLETE(IN_ROOM(ch)) && GET_LAST_DIR(ch) != NO_DIR && !IS_SET(flags, MOVE_EARTHMELD) && dir != rev_dir[(int) GET_LAST_DIR(ch)]) {
 			msg_to_char(ch, "This room is incomplete. You can only go back %s.\r\n", dirs[get_direction_for_char(ch, rev_dir[(int) GET_LAST_DIR(ch)])]);
 			return FALSE;
 		}
@@ -993,8 +993,6 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 * @return bool TRUE indicates can-move, FALSE means they were blocked (and received an error).
 */
 bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) {
-	ACMD(do_dismount);
-	
 	struct affected_type *af;
 	bool needs_help = FALSE;	// this will trigger a free fly effect if stuck
 	
@@ -1035,12 +1033,12 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 			return FALSE;
 		}
 		// rough-to-rough without the ability
-		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && ROOM_HEIGHT(to_room) > ROOM_HEIGHT(IN_ROOM(ch)) && (!IS_RIDING(ch) || !has_player_tech(ch, PTECH_RIDING_UPGRADE)) && !has_player_tech(ch, PTECH_ROUGH_TERRAIN) && !EFFECTIVELY_FLYING(ch)) {
+		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_ROUGH) && ROOM_SECT_FLAGGED(to_room, SECTF_ROUGH) && ROOM_HEIGHT(to_room) >= ROOM_HEIGHT(IN_ROOM(ch)) && (!IS_RIDING(ch) || !has_player_tech(ch, PTECH_RIDING_UPGRADE)) && !has_player_tech(ch, PTECH_ROUGH_TERRAIN) && !EFFECTIVELY_FLYING(ch)) {
 			msg_to_char(ch, "You don't have the ability to cross such rough terrain.\r\n");
 			return FALSE;
 		}
 		// entrance direction checks
-		if (IS_MAP_BUILDING(to_room) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
+		if (!ROOM_IS_CLOSED(IN_ROOM(ch)) && IS_MAP_BUILDING(to_room) && !IS_INSIDE(IN_ROOM(ch)) && !IS_ADVENTURE_ROOM(IN_ROOM(ch)) && BUILDING_ENTRANCE(to_room) != dir && ROOM_IS_CLOSED(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || BUILDING_ENTRANCE(to_room) != rev_dir[dir])) {
 			if (ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES)) {
 				msg_to_char(ch, "You can't enter it from this side. The entrances are from %s and %s.\r\n", from_dir[get_direction_for_char(ch, BUILDING_ENTRANCE(to_room))], from_dir[get_direction_for_char(ch, rev_dir[BUILDING_ENTRANCE(to_room)])]);
 			}
@@ -1070,7 +1068,7 @@ bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t fla
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !validate_vehicle_move(ch, GET_LEADING_VEHICLE(ch), to_room)) {
 		return FALSE;
 	}
-	// this checks if a led MOB can move there using player_can_move -- TODO this seems like an error
+	// this checks if a led MOB can move there
 	if (GET_LEADING_MOB(ch) && !GET_LEADING_MOB(ch)->desc && IN_ROOM(GET_LEADING_MOB(ch)) == IN_ROOM(ch) && !char_can_move(GET_LEADING_MOB(ch), dir, to_room, flags | MOVE_LEAD, FALSE)) {
 		act("You can't go there while leading $N.", FALSE, ch, NULL, GET_LEADING_MOB(ch), TO_CHAR);
 		return FALSE;
@@ -1199,9 +1197,11 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_
 * @return bool TRUE if the player's vehicle can move there, FALSE if not.
 */
 bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room) {
+	extern bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 	extern int count_harnessed_animals(vehicle_data *veh);
 
 	char buf[MAX_STRING_LENGTH];
+	bool veh_allows_veh, veh_allows_veh_home, veh_can_go_in;
 	
 	if (!VEH_IS_COMPLETE(veh)) {
 		if (ch) {
@@ -1219,17 +1219,31 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 		return FALSE;
 	}
 	
+	// check size limits
+	if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+		if (ch) {
+			act("There is already too much there for $V to go there.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		return FALSE;
+	}
+	
 	// closed building checks
 	if (!IS_ADVENTURE_ROOM(IN_ROOM(veh)) && IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
+		// vehicle allows a vehicle in if flagged for it; buildings require ALLOW-MOUNTS instead
+		veh_allows_veh = (GET_ROOM_VEHICLE(to_room) ? VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES) : BLD_ALLOWS_MOUNTS(to_room)) ? TRUE : FALSE;
+		veh_allows_veh_home = (GET_ROOM_VEHICLE(HOME_ROOM(to_room)) ? VEH_FLAGGED(GET_ROOM_VEHICLE(HOME_ROOM(to_room)), VEH_CARRY_VEHICLES) : BLD_ALLOWS_MOUNTS(HOME_ROOM(to_room))) ? TRUE : FALSE;
+		// based on where we're going, compares veh's own !BUILDING or !LOAD-IN-VEHICLE flags
+		veh_can_go_in = ((GET_ROOM_VEHICLE(to_room) && !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_BUILDING)) ? !VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE) : !VEH_FLAGGED(veh, VEH_NO_BUILDING)) ? TRUE : FALSE;
+		
 		// prevent entering from outside if mounts are not allowed
-		if ((VEH_FLAGGED(veh, VEH_NO_BUILDING) || !BLD_ALLOWS_MOUNTS(to_room)) && !IS_INSIDE(IN_ROOM(veh)) && !ROOM_IS_CLOSED(IN_ROOM(veh))) {
+		if ((!veh_can_go_in || !veh_allows_veh) && !IS_INSIDE(IN_ROOM(veh)) && !ROOM_IS_CLOSED(IN_ROOM(veh))) {
 			if (ch) {
 				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
 			}
 			return FALSE;
 		}
 		// prevent moving from an allowed building to a disallowed building (usually due to interlink)
-		if (HOME_ROOM(to_room) != to_room && HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(veh)) && !BLD_ALLOWS_MOUNTS(to_room) && !BLD_ALLOWS_MOUNTS(HOME_ROOM(to_room))) {
+		if (HOME_ROOM(to_room) != to_room && HOME_ROOM(to_room) != HOME_ROOM(IN_ROOM(veh)) && !veh_allows_veh && !veh_allows_veh_home) {
 			if (ch) {
 				act("$V can't go in there.", FALSE, ch, NULL, veh, TO_CHAR);
 			}
@@ -1242,6 +1256,12 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 			}
 			return FALSE;
 		}
+	}
+	
+	// climate checks
+	if (!vehicle_allows_climate(veh, to_room)) {
+		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
+		return FALSE;
 	}
 	
 	// barrier?
@@ -1606,7 +1626,7 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 	// prepare empty room message
 	*msg = '\0';
 	
-	// prepare message: Leave a %s (%%s) in the message if you want a direction.
+	// MOVE_x: prepare message: Leave a %s (%%s) in the message if you want a direction.
 	if (IS_SET(flags, MOVE_EARTHMELD)) {
 		*msg = '\0';	// earthmeld hides all move msgs
 	}
@@ -1618,6 +1638,22 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 		act("$n follows $N.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
 		if (CAN_SEE(ch->master, ch) && WIZHIDE_OK(ch->master, ch)) {
 			act("$n follows you.", TRUE, ch, NULL, ch->master, TO_VICT);
+		}
+	}
+	else if (IS_SET(flags, MOVE_ENTER_VEH)) {
+		vehicle_data *veh = GET_ROOM_VEHICLE(to_room);
+		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
+		if (veh && is_bld) {
+			act("$n enters $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (veh && !is_bld) {
+			act("$n boards $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (GET_BUILDING(HOME_ROOM(to_room))) {
+			snprintf(msg, sizeof(msg), "$n enters the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(to_room))));
+		}
+		else {
+			act("$n enters the building.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 	}
 	else if (IS_SET(flags, MOVE_EXIT)) {
@@ -1698,15 +1734,37 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 		char_to_room(ch, from_room);
 	}
 	
-	// prepare message: Leave a %s (%%s) in the message if you want a direction.
+	// prepare empty room message
+	*msg = '\0';
+	
+	// MOVE_x: prepare message: Leave a %s (%%s) in the message if you want a direction.
 	if (IS_SET(flags, MOVE_EARTHMELD)) {
 		*msg = '\0';	// earthmeld hides all move msgs
 	}
 	else if (IS_SET(flags, MOVE_LEAD) && GET_LED_BY(ch)) {
 		snprintf(msg, sizeof(msg), "%s leads $n with %s.", HSSH(GET_LED_BY(ch)), HMHR(GET_LED_BY(ch)));
 	}
-	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master) {
+	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master && dir != NO_DIR) {
 		snprintf(msg, sizeof(msg), "$n follows %s %%s.", HMHR(ch->master));
+	}
+	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master) {
+		act("$n follows $M.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
+	}
+	else if (IS_SET(flags, MOVE_ENTER_VEH)) {
+		vehicle_data *veh = GET_ROOM_VEHICLE(to_room);
+		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
+		if (veh && is_bld) {
+			act("$n enters $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (veh && !is_bld) {
+			act("$n boards $V.", TRUE, ch, NULL, veh, TO_ROOM);
+		}
+		else if (GET_BUILDING(HOME_ROOM(to_room))) {
+			snprintf(msg, sizeof(msg), "$n enters the %s.", GET_BLD_NAME(GET_BUILDING(HOME_ROOM(to_room))));
+		}
+		else {
+			act("$n enters the building.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 	}
 	else if (IS_SET(flags, MOVE_EXIT)) {
 		vehicle_data *veh = GET_ROOM_VEHICLE(from_room);
@@ -2096,7 +2154,7 @@ ACMD(do_exit) {
 	ACMD(do_exits);
 	room_data *to_room;
 	
-	if (IS_OUTDOORS(ch) || (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch)))) {
+	if (IS_OUTDOORS(ch) || !ROOM_CAN_EXIT(IN_ROOM(ch))) {
 		// if you can't exit here, passes through to 'exits'
 		do_exits(ch, "", 0, -1);
 	}
@@ -2590,10 +2648,13 @@ ACMD(do_sit) {
 
 	switch (GET_POS(ch)) {
 		case POS_STANDING: {
-			if (IS_RIDING(ch)) {
+			if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 				msg_to_char(ch, "You can't do any more sitting while mounted.\r\n");
 			}
 			else if (!*arg) {
+				if (IS_RIDING(ch)) {
+					do_dismount(ch, "", 0, 0);
+				}
 				send_to_char("You sit down.\r\n", ch);
 				act("$n sits down.", FALSE, ch, 0, 0, TO_ROOM);
 				GET_POS(ch) = POS_SITTING;

@@ -160,7 +160,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	}
 	
 	// DO FIRST: crops (never blocked by workforce starvation)
-	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && CHORE_ACTIVE(CHORE_FARMING) && !IS_BURNING(room)) {
+	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE | ROOM_AFF_NO_WORKFORCE_EVOS) && CHORE_ACTIVE(CHORE_FARMING) && !IS_BURNING(room)) {
 		do_chore_farming(emp, room);
 		return;
 	}
@@ -185,13 +185,13 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	}
 	
 	// burnable sects
-	if (CHORE_ACTIVE(CHORE_BURN_STUMPS) && has_evolution_type(SECT(room), EVO_BURNS_TO)) {
+	if (CHORE_ACTIVE(CHORE_BURN_STUMPS) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE | ROOM_AFF_NO_WORKFORCE_EVOS) && has_evolution_type(SECT(room), EVO_BURNS_TO)) {
 		do_chore_burn_stumps(emp, room);
 		return;
 	}
 	
 	// All choppables -- except crops, which are handled by farming
-	if (CHORE_ACTIVE(CHORE_CHOPPING) && !ROOM_CROP(room) && (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || CAN_INTERACT_ROOM_NO_VEH((room), INTERACT_CHOP))) {
+	if (CHORE_ACTIVE(CHORE_CHOPPING) && !ROOM_CROP(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE | ROOM_AFF_NO_WORKFORCE_EVOS) && (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || CAN_INTERACT_ROOM_NO_VEH((room), INTERACT_CHOP))) {
 		do_chore_chopping(emp, room);
 		return;
 	}
@@ -1426,7 +1426,7 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
 	crafts_found = 0;
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		// must be a live recipe; must make an item
-		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT | CRAFT_SOUP | CRAFT_VEHICLE) || GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT | CRAFT_SOUP) || CRAFT_IS_VEHICLE(craft) || CRAFT_IS_BUILDING(craft)) {
 			continue;
 		}
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && CRAFT_FLAGGED(craft, CRAFT_TAKE_REQUIRED_OBJ)) {
@@ -2038,7 +2038,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int
 		charge_workforce(emp, room, worker, 1, NOTHING, 0);
 		einv_interaction_chore_type = chore;
 		
-		if (run_interactions(worker, GET_OBJ_INTERACTIONS(found_proto), interact_type, room, worker, found_proto, one_einv_interaction_chore) && found_store) {
+		if (run_interactions(worker, GET_OBJ_INTERACTIONS(found_proto), interact_type, room, worker, found_proto, NULL, one_einv_interaction_chore) && found_store) {
 			charge_stored_resource(emp, islid, found_store->vnum, 1);
 		}
 		
@@ -2419,7 +2419,7 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 		// not able to ewt_mark_resource_worker() until we're inside the interact
 		if (worker) {
 			charge_workforce(emp, room, worker, 1, NOTHING, 0);
-			run_interactions(worker, GET_GLOBAL_INTERACTIONS(mine), INTERACT_MINE, room, worker, NULL, one_mining_chore);
+			run_interactions(worker, GET_GLOBAL_INTERACTIONS(mine), INTERACT_MINE, room, worker, NULL, NULL, one_mining_chore);
 			
 			// check for depletion
 			if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
@@ -2482,10 +2482,9 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 	}
 	
 	if (worker && can_do) {
-		charge_workforce(emp, room, worker, 1, NOTHING, 0);
-		
-		// did we find anything at all?
-		if (highest) {
+		if (highest) {	// did we find anything at all?
+			charge_workforce(emp, room, worker, 1, NOTHING, 0);
+			
 			// let's only do this every ~4 hours
 			if (!number(0, 3)) {
 				// only send message if someone else is present (don't bother verifying it's a player)

@@ -56,6 +56,7 @@ void scale_item_to_level(obj_data *obj, int level);
 
 // locals
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
+obj_data *die(char_data *ch, char_data *killer);
 void drop_loot(char_data *mob, char_data *killer);
 int get_block_rating(char_data *ch, bool can_gain_skill);
 int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
@@ -823,6 +824,53 @@ static char *replace_fight_string(const char *str, const char *weapon_first, con
 
 
 /**
+* Sends proper deaths and death messages to the people inside a vehicle, and
+* any nested vehicles inside of it.
+*
+* @param vehicle_data *veh The vehicle.
+* @param char_data *attacker Optional: The person sieging (may be NULL, used for offenses).
+* @param vehicle_data *by_vehicle Optional: Which vehicle gets credit for the damage, if any.
+* @param room_data *bodies_to_room Optional: If not NULL, dead players are relocated here.
+*/
+void siege_kill_vehicle_occupants(vehicle_data *veh, char_data *attacker, vehicle_data *by_vehicle, room_data *bodies_to_room) {
+	ACMD(do_respawn);
+
+	struct vehicle_room_list *vrl;
+	vehicle_data *iter;
+	char_data *ch, *next_ch;
+	
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		// nested vehicles
+		DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+			siege_kill_vehicle_occupants(iter, attacker, by_vehicle, bodies_to_room);
+		}
+		
+		// then people in here
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
+			act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR);
+			if (!IS_NPC(ch)) {
+				log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
+				syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
+			}
+			run_kill_triggers(ch, attacker, by_vehicle);
+			die(ch, ch);
+			
+			// room is being destroyed -- respawn right away
+			if (!IS_NPC(ch) && IS_DEAD(ch)) {
+				if (bodies_to_room) {	// move body
+					char_from_room(ch);
+					char_to_room(ch, bodies_to_room);
+				}
+				else {	// attempt to force a respawn to get them out
+					do_respawn(ch, "", 0, 0);
+				}
+			}
+		}
+	}
+}
+
+
+/**
 * Pulls a character out of combat and stops every non-autokill person from
 * hitting him/her.
 *
@@ -1480,7 +1528,7 @@ void drop_loot(char_data *mob, char_data *killer) {
 	}
 
 	// find and drop loot
-	run_interactions(mob, mob->interactions, INTERACT_LOOT, IN_ROOM(mob), mob, NULL, loot_interact);
+	run_interactions(mob, mob->interactions, INTERACT_LOOT, IN_ROOM(mob), mob, NULL, NULL, loot_interact);
 	run_global_mob_interactions(mob, mob, INTERACT_LOOT, loot_interact);
 	
 	// coins?
@@ -2698,12 +2746,10 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 */
 bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle) {
 	void adjust_vehicle_tech(vehicle_data *veh, bool add);
-	void fully_empty_vehicle(vehicle_data *veh);
+	void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
 
 	static struct resource_data *default_res = NULL;
 	struct resource_data *old_list;
-	struct vehicle_room_list *vrl;
-	char_data *ch, *next_ch;
 	
 	// resources if it doesn't have its own
 	if (!default_res) {
@@ -2769,19 +2815,9 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 			}
 		}
 		
-		if (VEH_ROOM_LIST(veh)) {
-			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-				DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
-					act("You are killed as $V is destroyed!", FALSE, ch, NULL, veh, TO_CHAR);
-					if (!IS_NPC(ch)) {
-						log_to_slash_channel_by_name(DEATH_LOG_CHANNEL, ch, "%s has been killed by siege damage at (%d, %d)!", PERS(ch, ch, TRUE), X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)));
-						syslog(SYS_DEATH, 0, TRUE, "DEATH: %s has been killed by siege damage at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
-					}
-					run_kill_triggers(ch, attacker, by_vehicle);
-					die(ch, ch);
-				}
-			}
-		}
+		// kill everyone inside
+		siege_kill_vehicle_occupants(veh, attacker, by_vehicle, IN_ROOM(veh));
+		
 		if (VEH_SITTING_ON(veh)) {
 			act("You are killed as $V is destroyed!", FALSE, VEH_SITTING_ON(veh), NULL, veh, TO_CHAR);
 			if (!IS_NPC(VEH_SITTING_ON(veh))) {
@@ -2798,11 +2834,11 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		}
 		
 		vehicle_from_room(veh);	// remove from room first to destroy anything inside
-		fully_empty_vehicle(veh);
+		fully_empty_vehicle(veh, NULL);
 		
 		if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
-			qt_empire_players(VEH_OWNER(veh), qt_lose_vehicle, VEH_VNUM(veh));
-			et_lose_vehicle(VEH_OWNER(veh), VEH_VNUM(veh));
+			qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
+			et_lose_vehicle(VEH_OWNER(veh), veh);
 		}
 		
 		extract_vehicle(veh);
@@ -4069,7 +4105,7 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 	// ammo countdown/extract (only if the ammo wasn't extracted by a script)
 	if (purge && best) {
 		if (GET_AMMO_QUANTITY(best) <= 0) {
-			run_interactions(ch, GET_OBJ_INTERACTIONS(best), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, best, consumes_or_decays_interact);
+			run_interactions(ch, GET_OBJ_INTERACTIONS(best), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, best, NULL, consumes_or_decays_interact);
 			extract_obj(best);
 		}
 	}

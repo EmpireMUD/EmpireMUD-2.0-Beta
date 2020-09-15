@@ -1138,7 +1138,7 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	strcpy(temp2, bitv_to_alpha(GET_CRAFT_REQUIRES_TOOL(craft)));
 	fprintf(fl, "%d %d %s %d %d %s\n", GET_CRAFT_TYPE(craft), GET_CRAFT_ABILITY(craft), temp1, GET_CRAFT_TIME(craft), GET_CRAFT_REQUIRES_OBJ(craft), temp2);
 	
-	if (GET_CRAFT_TYPE(craft) == CRAFT_TYPE_BUILD) {
+	if (CRAFT_IS_BUILDING(craft) || GET_CRAFT_BUILD_TYPE(craft) != NOTHING || GET_CRAFT_BUILD_ON(craft) || GET_CRAFT_BUILD_FACING(craft)) {
 		strcpy(temp1, bitv_to_alpha(GET_CRAFT_BUILD_ON(craft)));
 		strcpy(temp2, bitv_to_alpha(GET_CRAFT_BUILD_FACING(craft)));
 		
@@ -1644,6 +1644,8 @@ empire_data *create_empire(char_data *ch) {
 	extern bool check_unique_empire_name(empire_data *for_emp, char *name);
 	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	void resort_empires(bool force);
+	void update_empire_members_and_greatness(empire_data *emp);
+	void update_member_data(char_data *ch);
 
 	archetype_data *arch;
 	char colorcode[10], name[MAX_STRING_LENGTH];
@@ -1729,6 +1731,10 @@ empire_data *create_empire(char_data *ch) {
 
 	// this is a good time to sort and rank
 	resort_empires(FALSE);
+	
+	// and member data
+	update_member_data(ch);
+	update_empire_members_and_greatness(emp);
 	
 	return emp;
 }
@@ -1931,9 +1937,11 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 void free_empire(empire_data *emp) {
 	void free_empire_goals(struct empire_goal *hash);
 	void free_empire_completed_goals(struct empire_completed_goal *hash);
+	void free_member_data(empire_data *emp);
 	
 	struct workforce_production_limit *wpl, *next_wpl;
 	struct empire_production_total *egt, *next_egt;
+	struct empire_playtime_tracker *ept, *next_ept;
 	struct workforce_delay_chore *wdc, *next_wdc;
 	struct workforce_delay *delay, *next_delay;
 	struct empire_island *isle, *next_isle;
@@ -2002,6 +2010,12 @@ void free_empire(empire_data *emp) {
 	HASH_ITER(hh, EMPIRE_LEARNED_CRAFTS(emp), pcd, next_pcd) {
 		HASH_DEL(EMPIRE_LEARNED_CRAFTS(emp), pcd);
 		free(pcd);
+	}
+	
+	// free playtime trackers
+	HASH_ITER(hh, EMPIRE_PLAYTIME_TRACKER(emp), ept, next_ept) {
+		HASH_DEL(EMPIRE_PLAYTIME_TRACKER(emp), ept);
+		free(ept);
 	}
 	
 	// free production limits
@@ -2102,6 +2116,7 @@ void free_empire(empire_data *emp) {
 		}
 	}
 	ewt_free_tracker(&EMPIRE_WORKFORCE_TRACKER(emp));
+	free_member_data(emp);
 	
 	if (SCRIPT(emp)) {
 		extract_script(emp, EMP_TRIGGER);
@@ -2441,6 +2456,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	struct empire_trade_data *trade, *last_trade = NULL;
 	struct empire_goal *egoal, *last_egoal = NULL;
 	struct empire_homeless_citizen *ehc;
+	struct empire_playtime_tracker *ept;
 	struct empire_completed_goal *ecg;
 	struct player_craft_data *pcd;
 	struct empire_log_data *elog;
@@ -2772,9 +2788,29 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				if (!get_line(fl, line)) {
 					log("SYSERR: Expecting privilege number for empire %d, but file ended!", vnum);
 					exit(1);
-					}
+				}
 				sscanf(line, "%d", t);
 				emp->priv[j] = MAX(1, MIN(emp->num_ranks, t[0]));
+				break;
+			}
+			case 'Q': {	// multi-purpose
+				switch (*(line+1)) {	// check next letter
+					case 'P': {	// playtime tracker
+						if (sscanf(line, "QP %d %d", &t[0], &t[1]) != 2) {
+							log("SYSERR: Bad QP line in empire %d: %s", vnum, line);
+							exit(1);
+						}
+						
+						HASH_FIND_INT(EMPIRE_PLAYTIME_TRACKER(emp), &t[0], ept);
+						if (!ept) {
+							CREATE(ept, struct empire_playtime_tracker, 1);
+							ept->cycle = t[0];
+							HASH_ADD_INT(EMPIRE_PLAYTIME_TRACKER(emp), cycle, ept);
+						}
+						ept->playtime_secs = t[1];
+						break;
+					}
+				}	// end 'Q' sub-sections
 				break;
 			}
 			case 'R': {	// rank name
@@ -2924,6 +2960,7 @@ PLAYER_UPDATE_FUNC(send_all_players_to_nowhere) {
 * @param empire_data *emp The empire to save.
 */
 void write_empire_to_file(FILE *fl, empire_data *emp) {
+	struct empire_playtime_tracker *ept, *next_ept;
 	struct empire_island *isle, *next_isle;
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter, *next_ter;
@@ -3041,6 +3078,8 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 		}
 	}
 	
+	// avoid L (used by empire logs)
+	
 	// M: MOTD
 	if (EMPIRE_MOTD(emp) && *EMPIRE_MOTD(emp)) {
 		char temp[MAX_MOTD_LENGTH + 12];
@@ -3051,12 +3090,17 @@ void write_empire_to_file(FILE *fl, empire_data *emp) {
 	}
 	
 	// avoid N (NPCs, below)
-	// avoid L (used by empire logs)
 	// avoid O (used by empire storage)
 
 	// P: privs
 	for (iter = 0; iter < NUM_PRIVILEGES; ++iter)
 		fprintf(fl, "P%d\n%d\n", iter, EMPIRE_PRIV(emp, iter));
+	
+	// Q: multi-purpose data
+	// QP: playtime trackers
+	HASH_ITER(hh, EMPIRE_PLAYTIME_TRACKER(emp), ept, next_ept) {
+		fprintf(fl, "QP %d %d\n", ept->cycle, ept->playtime_secs);
+	}
 	
 	// R: ranks
 	for (iter = 0; iter < emp->num_ranks; ++iter)
@@ -3522,7 +3566,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter, bool force
 			npc = create_empire_npc(emp, artisan, homeless->sex, homeless->name, ter);
 			remove_homeless_citizen(emp, homeless);
 		}
-		else if (ter->population_timer <= 0) {
+		else if (force || ter->population_timer <= 0) {
 			sex = number(SEX_MALE, SEX_FEMALE);
 			proto = mob_proto(artisan);
 			npc = create_empire_npc(emp, artisan, sex, pick_generic_name(proto ? MOB_NAME_SET(proto) : 0, sex), ter);
@@ -3544,7 +3588,7 @@ void populate_npc(room_data *room, struct empire_territory_data *ter, bool force
 			npc = create_empire_npc(emp, homeless->vnum, homeless->sex, homeless->name, ter);
 			remove_homeless_citizen(emp, homeless);
 		}
-		else if (ter->population_timer <= 0) {
+		else if (force || ter->population_timer <= 0) {
 			proto = mob_proto(citizen);
 			npc = create_empire_npc(emp, citizen, sex, pick_generic_name(MOB_NAME_SET(proto), sex), ter);
 		}
@@ -4629,8 +4673,8 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 */
 void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
 	extern char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
+	extern const char *get_interaction_target(int type, any_vnum vnum);
 	extern const char *interact_types[];
-	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
 	struct interaction_item *interact;
 	struct interact_restriction *res;
@@ -4642,7 +4686,7 @@ void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
 			fprintf(fl, " %c", interact->exclusion_code);
 		}
 		
-		fprintf(fl, "  # %s: %s\n", interact_types[interact->type], (interact_vnum_types[interact->type] == TYPE_MOB) ? get_mob_name_by_proto(interact->vnum, FALSE) : get_obj_name_by_proto(interact->vnum));
+		fprintf(fl, "  # %s: %s\n", interact_types[interact->type], get_interaction_target(interact->type, interact->vnum));
 		
 		// restrictions?
 		LL_FOREACH(interact->restrictions, res) {
@@ -5541,13 +5585,22 @@ void parse_object(FILE *obj_f, int nr) {
 			}
 			
 			case 'R': {
-				if (!get_line(obj_f, line) || sscanf(line, "%d %s", t, f1) != 2) {
-					log("SYSERR: Format error in 'R' Field, %s", buf2);
+				if (!get_line(obj_f, line)) {
+					log("SYSERR: Missing 'R' field, %s", buf2);
 					exit(1);
+				}
+				if (sscanf(line, "%d %d %s", &t[0], &t[1], f1) != 3) {
+					t[0] = TYPE_BLD;	// backwards-compatible
+					
+					if (sscanf(line, "%d %s", &t[1], f1) != 2) {
+						log("SYSERR: Format error in 'R' field, %s", buf2);
+						exit(1);
+					}
 				}
 				
 				CREATE(store, struct obj_storage_type, 1);
-				store->building_type = t[0];
+				store->type = t[0];
+				store->vnum = t[1];
 				store->flags = asciiflag_conv(f1);
 				store->next = NULL;
 				
@@ -5659,7 +5712,7 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 	// R: storage
 	for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {
 		fprintf(fl, "R\n");
-		fprintf(fl, "%d %s\n", store->building_type, bitv_to_alpha(store->flags));
+		fprintf(fl, "%d %d %s\n", store->type, store->vnum, bitv_to_alpha(store->flags));
 	}
 	
 	// T, V: triggers
@@ -6146,7 +6199,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				track->timestamp = l_in;
 				track->dir = t[2];
 				
-				LL_PREPEND(ROOM_TRACKS(room), track);
+				DL_PREPEND(ROOM_TRACKS(room), track);
 				break;
 			}
 			
@@ -9366,7 +9419,7 @@ void free_shared_room_data(struct shared_room_data *data) {
 	struct room_extra_data *room_ex, *next_room_ex;
 	struct stored_event *ev, *next_ev;
 	struct depletion_data *dep;
-	struct track_data *track;
+	struct track_data *track, *next_track;
 	
 	if (data->name) {
 		free(data->name);
@@ -9386,8 +9439,7 @@ void free_shared_room_data(struct shared_room_data *data) {
 		HASH_DEL(data->extra_data, room_ex);
 		free(room_ex);
 	}
-	while ((track = data->tracks)) {
-		data->tracks = track->next;
+	DL_FOREACH_SAFE(data->tracks, track, next_track) {
 		free(track);
 	}
 	
@@ -9723,9 +9775,9 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	}
 	
 	// Y tracks
-	LL_FOREACH_SAFE(dat->tracks, track, next_track) {
+	DL_FOREACH_SAFE(dat->tracks, track, next_track) {
 		if (now - track->timestamp > SECS_PER_REAL_HOUR) {
-			LL_DELETE(dat->tracks, track);
+			DL_DELETE(dat->tracks, track);
 			free(track);
 		}
 		else {

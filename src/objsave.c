@@ -835,7 +835,7 @@ void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***
 * @param room_data *room The world location whose objects we are saving.
 */
 bool objpack_save_room(room_data *room) {
-	void Crash_save_vehicles(vehicle_data *room_list, FILE *fl);
+	void Crash_save_vehicles(vehicle_data *veh, FILE *fl);
 	
 	char filename[MAX_INPUT_LENGTH], tempname[MAX_INPUT_LENGTH];
 	FILE *fp;

@@ -198,13 +198,13 @@ struct b2_player_special_data_saved {
 	sh_int spare11;
 	sh_int spare12;
 	sh_int spare13;
-	sh_int last_known_level;	// set on save/quit/alt -- TODO next pconvert, move this up with highest_known_level
+	sh_int last_known_level;	// set on save/quit/alt
 	
 	int spare15;
 	int spare16;
 	int spare17;
 	int spare18;
-	int recent_level_time;	// no longer used, but may have data set if you ran b2.9 or earlier -- TODO should be removed in the b2->b3 pconvert
+	int recent_level_time;	// no longer used, but may have data set if you ran b2.9 or earlier
 	
 	double spare20;
 	double spare21;
@@ -212,7 +212,7 @@ struct b2_player_special_data_saved {
 	double spare23;
 	double spare24;
 	
-	// WARNING: in 2.0b1-b2, these were erroneously initialized to -1 -- TODO next pconvert, fix any spares from 25-34 that are misinitialized
+	// WARNING: in 2.0b1-b2, these were erroneously initialized to -1
 	bitvector_t spare25; 
 	bitvector_t spare26;
 	bitvector_t spare27;
@@ -224,7 +224,7 @@ struct b2_player_special_data_saved {
 	any_vnum spare31;
 	any_vnum spare32;
 	any_vnum adventure_summon_return_location;	// where to send a player back to if they're outside an adventure
-	any_vnum adventure_summon_return_map;	// map check location for the return loc -- TODO next pconvert, move both of these up
+	any_vnum adventure_summon_return_map;	// map check location for the return loc
 };
 
 struct b2_affected_type {

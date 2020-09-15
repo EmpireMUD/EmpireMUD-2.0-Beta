@@ -1500,8 +1500,8 @@ RITUAL_FINISH_FUNC(perform_chant_of_illusions) {
 		return;
 	}
 	
-	SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_CHAMELEON);
 	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_CHAMELEON);
+	affect_total_room(IN_ROOM(ch));
 	msg_to_char(ch, "As you finish the chant, the road is cloaked in illusion!\r\n");
 }
 
@@ -1521,17 +1521,14 @@ RITUAL_FINISH_FUNC(perform_chant_of_nature) {
 	struct evolution_data *evo;
 	
 	// percentage is checked in the evolution data
-	if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH))) {
+	if ((evo = get_evolution_by_type(SECT(IN_ROOM(ch)), EVO_MAGIC_GROWTH)) && !ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_EVOLVE)) {
 		preserve = (BASE_SECT(IN_ROOM(ch)) != SECT(IN_ROOM(ch))) ? BASE_SECT(IN_ROOM(ch)) : NULL;
 		
 		// messaging
 		msg_to_char(ch, "As you chant, the plants around you grow with amazing speed!\r\n");
 		act("As $n chants, the plants around $m grow with amazing speed!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
-		change_terrain(IN_ROOM(ch), evo->becomes);
-		if (preserve) {
-			change_base_sector(IN_ROOM(ch), preserve);
-		}
+		change_terrain(IN_ROOM(ch), evo->becomes, preserve ? GET_SECT_VNUM(preserve) : NOTHING);
 		
 		remove_depletion(IN_ROOM(ch), DPLTN_PICK);
 		remove_depletion(IN_ROOM(ch), DPLTN_FORAGE);
@@ -1774,8 +1771,8 @@ RITUAL_FINISH_FUNC(perform_ritual_of_defense) {
 	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_FLY)) {
 		gain_ability_exp(ch, ABIL_RITUAL_OF_DEFENSE, 25);
 	}
-	SET_BIT(ROOM_AFF_FLAGS(IN_ROOM(ch)), ROOM_AFF_NO_FLY);
 	SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_NO_FLY);
+	affect_total_room(IN_ROOM(ch));
 }
 
 
@@ -2004,7 +2001,7 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 	int dist, iter;
 	int x, y;
 	
-	#define CAN_DEVASTATE(room)  (((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) && has_permission(ch, PRIV_HARVEST, room)) || (CAN_CHOP_ROOM(room) && has_permission(ch, PRIV_CHOP, room) && get_depletion((room), DPLTN_CHOP) < config_get_int("chop_depletion"))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE))
+	#define CAN_DEVASTATE(room)  (((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) && has_permission(ch, PRIV_HARVEST, room)) || (CAN_CHOP_ROOM(room) && has_permission(ch, PRIV_CHOP, room) && get_depletion((room), DPLTN_CHOP) < config_get_int("chop_depletion"))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE))
 	#define DEVASTATE_RANGE  3	// tiles
 
 	// check this room

@@ -46,7 +46,7 @@
 
 
 // for the interaction handlers (returns TRUE if the character performs the interaction; FALSE if it aborts)
-#define INTERACTION_FUNC(name)	bool (name)(char_data *ch, struct interaction_item *interaction, room_data *inter_room, char_data *inter_mob, obj_data *inter_item)
+#define INTERACTION_FUNC(name)	bool (name)(char_data *ch, struct interaction_item *interaction, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, vehicle_data *inter_veh)
 
 
 // global function types -- for run_globals
@@ -196,7 +196,7 @@ void free_exclusion_data(struct interact_exclusion_data *list);
 extern bool has_interaction(struct interaction_item *list, int type);
 extern bool meets_interaction_restrictions(struct interact_restriction *list, char_data *ch, empire_data *emp, char_data *inter_mob, obj_data *inter_item);
 extern bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func));
-extern bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, INTERACTION_FUNC(*func));
+extern bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, vehicle_data *inter_veh, INTERACTION_FUNC(*func));
 extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func));
 
 // lore handlers
@@ -267,6 +267,8 @@ extern bool has_custom_message(struct custom_message *list, int type);
 #define obj_has_custom_message(obj, type)  has_custom_message(GET_OBJ_CUSTOM_MSGS(obj), type)
 #define abil_get_custom_message(abil, type)  get_custom_message(ABIL_CUSTOM_MSGS(abil), type)
 #define abil_has_custom_message(abil, type)  has_custom_message(ABIL_CUSTOM_MSGS(abil), type)
+#define veh_get_custom_message(veh, type)  get_custom_message(VEH_CUSTOM_MSGS(veh), type)
+#define veh_has_custom_message(veh, type)  has_custom_message(VEH_CUSTOM_MSGS(veh), type)
 
 // object targeting handlers
 extern obj_data *get_component_in_list(any_vnum cmp_vnum, obj_data *list, bool *kept);
@@ -276,6 +278,7 @@ extern obj_data *get_obj_in_list_num(int num, obj_data *list);
 extern obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list);
 extern obj_data *get_obj_in_list_vis(char_data *ch, char *name, obj_data *list);
 extern obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, obj_data *list, int interact_type);
+extern obj_data *get_obj_in_list_vis_prefer_type(char_data *ch, char *name, obj_data *list, int obj_type);
 extern int get_obj_pos_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]);
 extern obj_vnum get_obj_vnum_by_name(char *name, bool storable_only);
 extern obj_data *get_obj_vis(char_data *ch, char *name);
@@ -349,8 +352,8 @@ extern bool empire_can_afford_component(empire_data *emp, int island, any_vnum c
 extern struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
 extern struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
 extern int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping);
-extern bool obj_can_be_stored(obj_data *obj, room_data *loc, bool retrieval_mode);
-extern bool obj_can_be_retrieved(obj_data *obj, room_data *loc);
+extern bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool retrieval_mode);
+#define obj_can_be_retrieved(obj, loc, by_emp)  obj_can_be_stored((obj), (loc), (by_emp), TRUE)
 extern bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen);
 extern int store_resource(char_data *ch, empire_data *emp, obj_data *obj);
 extern bool stored_item_requires_withdraw(obj_data *obj);

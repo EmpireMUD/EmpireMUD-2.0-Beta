@@ -26,6 +26,7 @@ and a cooking fire.
 ~
 F
 wGL
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 R
 1003 1 5 0
 U
@@ -45,6 +46,7 @@ large. Someone has built a door just inside, and the landing is decorated like
 a front porch. It looks like someone has made this cave into a house. Colossal
 claw marks just beyond the porch suggest a dragon once called this cave home.
 ~
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 R
 1002 1 5 0
 S
@@ -56,6 +58,7 @@ A Dragonslayer Statue~
 0 0 0 -1
 C
 dedicate~
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
 R
 1001 1 5 0
 T 10925
@@ -77,9 +80,31 @@ laboratory.
 ~
 F
 l
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 R
 1002 1 5 0
 T 10926
+S
+#10927
+Butcher Tent~
+The Butcher Tent~
+&r{BB}~
+48 0 abgR 0
+0 0 0 -1
+C
+(functions as a stable with a cooking fire)~
+D
+   The tent is made from red dragon hides, but it could as easily be red from
+the blood of animals slaughtered here. There's a pen for fresh animals that's
+half in the tent, and half outside. The center of the tent has a roasting pit
+and a cooking fire.
+~
+F
+wGL
+U
+1 5119
+U
+1 5111
 S
 #10950
 Hole~
@@ -89,6 +114,7 @@ A Hole in the Muck~
 0 0 0 -1
 C
 adventure~
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
 S
 #10965
 Giant Hovel~
@@ -123,6 +149,7 @@ A Giant's Causeway~
 &wnnnn~
 124 0 dD 0
 0 0 0 -1
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
 R
 10973 1 5 0
 S
@@ -139,6 +166,7 @@ re-patched to keep the weather at bay. It's not dissimilar from other hovels
 you've seen, save for the size, which is enormous. A hovel made for a single
 giant can easily sleep a family of eight.
 ~
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 R
 6015 1 1 0
 R
@@ -150,6 +178,7 @@ A Giant Stone Head~
 &w(oo)~
 124 1 d 0
 0 0 0 -1
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
 R
 10975 1 5 0
 S
@@ -216,6 +245,7 @@ held together by little more than mana and willpower. Everything from the
 shelves to the books are half-sundered. But on the bright side, the massive
 crack in the wall lets in a lot of light.
 ~
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 R
 6000 1 1 0
 R
@@ -238,6 +268,7 @@ that it has been hollowed out to form a beautiful home. The walls and floor are
 spongy white, and the ceiling is red with white spots. The windows let in a
 surprising amount of light.
 ~
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
 R
 1007 1 5 0
 S

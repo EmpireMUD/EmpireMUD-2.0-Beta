@@ -603,7 +603,7 @@ Get 2 small leather:
  1. Kill small animals like squirrels, meerkats, or rabbits.
  2. Skin the corpses using a knife.
  3. Tan the small skins.
-Get 2 piles of clay:
+Get 2 lumps of clay:
  1. Dig in temperate terrain (fields and forests), or
  2. Build a claypit and dig there.
     (hint: build info claypit)
@@ -615,7 +615,7 @@ Return to Horation when you have all the items.
    Horation examines the materials you collected, and determines them to be
 correct.
 ~
-29 0 0 25 -1
+30 0 0 25 -1
 A
 1 10826
 P

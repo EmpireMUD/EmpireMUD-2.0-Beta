@@ -513,7 +513,6 @@ WCMD(do_wdoor) {
 WCMD(do_wsiege) {
 	void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
 	extern bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
-	extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
 	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
 	
@@ -1051,6 +1050,7 @@ WCMD(do_wquest) {
 
 /* loads a mobile or object into the room */
 WCMD(do_wload) {
+	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -1200,6 +1200,7 @@ WCMD(do_wload) {
 		}
 		
 		vehicle_to_room(veh, room);
+		get_vehicle_interior(veh);	// ensure inside is loaded
 		// ownership
 		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(room))) {
 			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(room)));

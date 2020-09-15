@@ -73,8 +73,8 @@ room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 		++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(from));
 		COMPLEX_DATA(new)->vehicle = GET_ROOM_VEHICLE(from);
 		add_room_to_vehicle(new, GET_ROOM_VEHICLE(from));
-		SET_BIT(ROOM_AFF_FLAGS(new), ROOM_AFF_IN_VEHICLE);
 		SET_BIT(ROOM_BASE_FLAGS(new), ROOM_AFF_IN_VEHICLE);
+		affect_total_room(new);
 	}
 	
 	if (ROOM_OWNER(home)) {
@@ -693,7 +693,7 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 		return;
 	}
 	else {
-		change_terrain(target, GET_SECT_VNUM(sect));
+		change_terrain(target, GET_SECT_VNUM(sect), NOTHING);
 		set_crop_type(target, cp);
 		
 		remove_depletion(target, DPLTN_PICK);
@@ -725,20 +725,12 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 void do_dg_terraform(room_data *target, sector_data *sect) {
 	void finish_trench(room_data *room);
 	
-	sector_data *old_sect;
-	
 	if (!target || !sect) {
 		return;
 	}
 	
-	old_sect = BASE_SECT(target);
-	
-	change_terrain(target, GET_SECT_VNUM(sect));
-	
-	// preserve old original sect for roads -- TODO this is a special-case
-	if (IS_ROAD(target)) {
-		change_base_sector(target, old_sect);
-	}
+	// preserve old original sect for roads -- TODO this is a special-case, also in .map terrain
+	change_terrain(target, GET_SECT_VNUM(sect), IS_ROAD(target) ? GET_SECT_VNUM(BASE_SECT(target)) : NOTHING);
 	
 	remove_depletion(target, DPLTN_PICK);
 	remove_depletion(target, DPLTN_FORAGE);
@@ -825,7 +817,7 @@ void send_char_pos(char_data *ch, int dam) {
 			msg_to_char(ch, "You're stunned, but will probably regain consciousness again.\r\n");
 			break;
 		case POS_DEAD:
-			act("$n is dead!  R.I.P.", FALSE, ch, 0, 0, TO_ROOM);
+			//act("$n is dead!  R.I.P.", FALSE, ch, 0, 0, TO_ROOM);
 			send_to_char("You are dead!  Sorry...\r\n", ch);
 			break;
 		default:                        /* >= POSITION SLEEPING */
@@ -1200,6 +1192,7 @@ void script_modify(char *argument) {
 	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
 	extern char *get_room_description(room_data *room);
 	extern vehicle_data *get_vehicle(char *name);
+	extern bool validate_icon(char *icon);
 	extern const char *genders[];
 	extern bool world_map_needs_save;
 	
@@ -1342,6 +1335,17 @@ void script_modify(char *argument) {
 		if (SHARED_DATA(room) == &ocean_shared_data) {
 			script_log("%%mod%% cannot be used on Ocean rooms");
 		}
+		else if (is_abbrev(field_arg, "icon")) {
+			if (!clear && !str_cmp(value, "none") && !validate_icon(value)) {
+				script_log("%%mod%% called with invalid room icon '%s'", value);
+			}
+			else {
+				if (ROOM_CUSTOM_ICON(room)) {
+					free(ROOM_CUSTOM_ICON(room));
+				}
+				ROOM_CUSTOM_ICON(room) = (clear || !str_cmp(value, "none")) ? NULL : str_dup(value);
+			}
+		}
 		else if (is_abbrev(field_arg, "name") || is_abbrev(field_arg, "title")) {
 			if (ROOM_CUSTOM_NAME(room)) {
 				free(ROOM_CUSTOM_NAME(room));
@@ -1391,7 +1395,26 @@ void script_modify(char *argument) {
 	else if ((veh = get_vehicle(targ_arg))) {
 		v_proto = vehicle_proto(VEH_VNUM(veh));
 		
-		if (is_abbrev(field_arg, "keywords")) {
+		if (is_abbrev(field_arg, "icon")) {
+			if (!clear && !str_cmp(value, "none") && !validate_icon(value)) {
+				script_log("%%mod%% called with invalid vehicle icon '%s'", value);
+			}
+			else {
+				if (VEH_ICON(veh) && (!v_proto || VEH_ICON(veh) != VEH_ICON(v_proto))) {
+					free(VEH_ICON(veh));
+				}
+				if (clear) {
+					VEH_ICON(veh) = VEH_ICON(v_proto);
+				}
+				else if (!str_cmp(value, "none")) {
+					VEH_ICON(veh) = NULL;
+				}
+				else {
+					VEH_ICON(veh) = str_dup(value);
+				}
+			}
+		}
+		else if (is_abbrev(field_arg, "keywords")) {
 			if (VEH_KEYWORDS(veh) && (!v_proto || VEH_KEYWORDS(veh) != VEH_KEYWORDS(v_proto))) {
 				free(VEH_KEYWORDS(veh));
 			}

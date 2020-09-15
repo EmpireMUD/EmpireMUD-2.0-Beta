@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -44,13 +46,21 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 void clear_vehicle(vehicle_data *veh);
 void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
 int get_new_vehicle_construction_id();
+void ruin_vehicle(vehicle_data *veh, char *message);
+void scale_vehicle_to_level(vehicle_data *veh, int level);
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
+bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 
 // external consts
+extern const char *climate_flags[];
+extern const bitvector_t climate_flags_order[];
 extern const char *designate_flags[];
 extern const char *function_flags[];
 extern const char *interact_types[];
+extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *mob_move_types[];
+extern const char *room_aff_bits[];
+extern const char *veh_custom_types[];
 extern const char *vehicle_flags[];
 extern const char *vehicle_speed_types[];
 
@@ -58,7 +68,11 @@ extern const char *vehicle_speed_types[];
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 extern room_data *create_room(room_data *home);
+void free_bld_relations(struct bld_relation *list);
+void free_custom_messages(struct custom_message *mes);
+void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
 void get_resource_display(struct resource_data *list, char *save_buffer);
+void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void scale_item_to_level(obj_data *obj, int level);
 extern char *show_color_codes(char *string);
 extern bool validate_icon(char *icon);
@@ -94,8 +108,28 @@ void abandon_lost_vehicles(void) {
 		}
 		
 		if (VEH_IS_COMPLETE(veh)) {
-			qt_empire_players(emp, qt_lose_vehicle, VEH_VNUM(veh));
-			et_lose_vehicle(emp, VEH_VNUM(veh));
+			qt_empire_players_vehicle(emp, qt_lose_vehicle, veh);
+			et_lose_vehicle(emp, veh);
+		}
+	}
+}
+
+
+/**
+* Checks the allowed-climates on every vehicle in the room. This should be
+* called if the terrain changes.
+*
+* @param room_data *room The room to check vehicles in.
+*/
+void check_vehicle_climate_change(room_data *room) {
+	vehicle_data *veh, *next_veh;
+	char *msg;
+	
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+		if (!vehicle_allows_climate(veh, IN_ROOM(veh))) {
+			// this will extract it (usually)
+			msg = veh_get_custom_message(veh, VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM);
+			ruin_vehicle(veh, msg ? msg : "$V falls into ruin!");
 		}
 	}
 }
@@ -144,6 +178,7 @@ int count_building_vehicles_in_room(room_data *room, empire_data *only_owner) {
 */
 int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms) {
 	struct vehicle_room_list *vrl, *next_vrl;
+	vehicle_data *viter;
 	char_data *iter;
 	int count = 0;
 	
@@ -157,6 +192,11 @@ int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms) {
 			}
 			
 			++count;
+		}
+		
+		// check nested vehicles
+		DL_FOREACH2(ROOM_VEHICLES(vrl->room), viter, next_in_room) {
+			count += count_players_in_vehicle(viter, ignore_invis_imms);
 		}
 	}
 	
@@ -181,16 +221,12 @@ void delete_vehicle_interior(vehicle_data *veh) {
 				continue;	// do this one last
 			}
 			
-			if (IN_ROOM(veh)) {
-				relocate_players(vrl->room, IN_ROOM(veh));
-			}
+			relocate_players(vrl->room, IN_ROOM(veh));
 			delete_room(vrl->room, FALSE);	// MUST check_all_exits later
 		}
 		
 		if (main_room) {
-			if (IN_ROOM(veh)) {
-				relocate_players(main_room, IN_ROOM(veh));
-			}
+			relocate_players(main_room, IN_ROOM(veh));
 			delete_room(main_room, FALSE);
 		}
 		check_all_exits();
@@ -203,13 +239,14 @@ void delete_vehicle_interior(vehicle_data *veh) {
 * extracts them.
 *
 * @param vehicle_data *veh The vehicle to empty.
+* @param room_data *to_room If not NULL, empties the vehicle contents to that room. Extracts them if NULL.
 */
-void empty_vehicle(vehicle_data *veh) {
+void empty_vehicle(vehicle_data *veh, room_data *to_room) {
 	obj_data *obj, *next_obj;
 	
 	DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
-		if (IN_ROOM(veh)) {
-			obj_to_room(obj, IN_ROOM(veh));
+		if (to_room) {
+			obj_to_room(obj, to_room);
 		}
 		else {
 			extract_obj(obj);
@@ -234,7 +271,7 @@ craft_data *find_craft_for_vehicle(vehicle_data *veh) {
 	}
 	else {
 		HASH_ITER(hh, craft_table, craft, next_craft) {
-			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT) || !CRAFT_FLAGGED(craft, CRAFT_VEHICLE)) {
+			if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT) || !CRAFT_IS_VEHICLE(craft)) {
 				continue;	// not a valid target
 			}
 			if (GET_CRAFT_OBJECT(craft) != VEH_VNUM(veh)) {
@@ -358,8 +395,9 @@ void finish_vehicle_setup(vehicle_data *veh) {
 * if possible.
 *
 * @param vehicle_data *veh The vehicle to empty.
+* @param room_data *to_room Optional: Where to send things (extracts them instead if this is NULL).
 */
-void fully_empty_vehicle(vehicle_data *veh) {
+void fully_empty_vehicle(vehicle_data *veh, room_data *to_room) {
 	vehicle_data *iter, *next_iter;
 	struct vehicle_room_list *vrl;
 	obj_data *obj, *next_obj;
@@ -367,11 +405,22 @@ void fully_empty_vehicle(vehicle_data *veh) {
 	
 	if (VEH_ROOM_LIST(veh)) {
 		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+			// remove other vehicles
+			DL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), iter, next_iter, next_in_room) {
+				if (to_room) {
+					vehicle_to_room(iter, to_room);
+				}
+				else {
+					vehicle_from_room(iter);
+					extract_vehicle(iter);
+				}
+			}
+			
 			// remove people
 			DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
 				act("You are ejected from $V!", FALSE, ch, NULL, veh, TO_CHAR);
-				if (IN_ROOM(veh)) {
-					char_to_room(ch, IN_ROOM(veh));
+				if (to_room) {
+					char_to_room(ch, to_room);
 					qt_visit_room(ch, IN_ROOM(ch));
 					look_at_room(ch);
 					act("$n is ejected from $V!", TRUE, ch, NULL, veh, TO_ROOM);
@@ -384,28 +433,18 @@ void fully_empty_vehicle(vehicle_data *veh) {
 			
 			// remove items
 			DL_FOREACH_SAFE2(ROOM_CONTENTS(vrl->room), obj, next_obj, next_content) {
-				if (IN_ROOM(veh)) {
-					obj_to_room(obj, IN_ROOM(veh));
+				if (to_room) {
+					obj_to_room(obj, to_room);
 				}
 				else {
 					extract_obj(obj);
-				}
-			}
-			
-			// remove other vehicles
-			DL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), iter, next_iter, next_in_room) {
-				if (IN_ROOM(veh)) {
-					vehicle_to_room(iter, IN_ROOM(veh));
-				}
-				else {
-					extract_vehicle(iter);
 				}
 			}
 		}
 	}
 	
 	// dump contents
-	empty_vehicle(veh);
+	empty_vehicle(veh, to_room);
 }
 
 
@@ -433,8 +472,8 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	room = create_room(NULL);
 	attach_building_to_room(bld, room, TRUE);
 	COMPLEX_DATA(room)->home_room = NULL;
-	SET_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_IN_VEHICLE);
 	SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_IN_VEHICLE);
+	affect_total_room(room);
 	
 	// attach
 	COMPLEX_DATA(room)->vehicle = veh;
@@ -494,16 +533,20 @@ struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char 
 
 /**
 * Finds a vehicle that will be shown in the room. The vehicle must have an icon
-* to qualify for this, and must also be complete. Vehicles in buildings are
-* never shown. Only the first valid vehicle is returned.
+* to qualify for this, and must also either be complete or be size > 0.
+* Vehicles in buildings are never shown. Only the largest valid vehicle is
+* returned.
 *
 * @param char_data *ch The player looking.
 * @param room_data *room The room to check.
 * @return vehicle_data* A vehicle to show, if any (NULL if not).
 */
 vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
-	vehicle_data *iter, *in_veh;
+	extern bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
+	
+	vehicle_data *iter, *in_veh, *found = NULL;
 	bool is_on_vehicle = ((in_veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && room == IN_ROOM(in_veh));
+	int found_size = -1;
 	
 	// we don't show vehicles in buildings or closed tiles (unless the player is on a vehicle in that room, in which case we override)
 	if (!is_on_vehicle && (IS_ANY_BUILDING(room) || ROOM_IS_CLOSED(room))) {
@@ -514,16 +557,21 @@ vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
 		if (!VEH_ICON(iter) || !*VEH_ICON(iter)) {
 			continue;	// no icon
 		}
-		if (!VEH_IS_COMPLETE(iter)) {
-			continue;	// skip incomplete
+		if (!VEH_IS_COMPLETE(iter) && VEH_SIZE(iter) < 1) {
+			continue;	// skip incomplete unless it has size
+		}
+		if (vehicle_is_chameleon(iter, IN_ROOM(ch))) {
+			continue;	// can't see from here
 		}
 		
-		// we'll show the first match
-		return iter;
+		// valid to show! only if first/bigger
+		if (!found || VEH_SIZE(iter) > found_size) {
+			found = iter;
+			found_size = VEH_SIZE(iter);
+		}
 	}
 	
-	// nothing found
-	return NULL;
+	return found;	// if any
 }
 
 
@@ -630,6 +678,144 @@ char *list_harnessed_mobs(vehicle_data *veh) {
 
 
 /**
+* Interaction function for vehicle-ruins-to-vehicle. This loads a new vehicle,
+* ignoring interaction quantity, and transfers built-with resources and
+* contents.
+*/
+INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
+	room_data *room = inter_room ? inter_room : (inter_veh ? IN_ROOM(inter_veh) : NULL);
+	struct resource_data *res, *next_res, *save = NULL;
+	vehicle_data *ruin, *proto, *veh_iter, *next_veh;
+	struct vehicle_room_list *vrl;
+	double save_resources;
+	room_data *inside;
+	char *to_free;
+	
+	if (!inter_veh || !room || !(proto = vehicle_proto(interaction->vnum))) {
+		return FALSE;	// safety
+	}
+	
+	ruin = read_vehicle(interaction->vnum, TRUE);
+	vehicle_to_room(ruin, room);
+	scale_vehicle_to_level(ruin, VEH_SCALE_LEVEL(inter_veh));	// attempt auto-detect of level
+	
+	// do not transfer ownership -- ruins never default to 'claimed'
+	/*
+	if (VEH_CLAIMS_WITH_ROOM(ruin) && ROOM_OWNER(HOME_ROOM(room))) {
+		perform_claim_vehicle(ruin, ROOM_OWNER(HOME_ROOM(room)));
+	}
+	*/
+	
+	// move contents
+	if ((inside = get_vehicle_interior(ruin))) {
+		LL_FOREACH(VEH_ROOM_LIST(inter_veh), vrl) {
+			// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
+			DL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), veh_iter, next_veh, next_in_room) {
+				if (!VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
+					ruin_vehicle(veh_iter, "$V falls into ruin.");
+				}
+			}
+		}
+		
+		fully_empty_vehicle(inter_veh, inside);
+	}
+	
+	// move resources...
+	if (VEH_BUILT_WITH(inter_veh)) {
+		save = VEH_BUILT_WITH(inter_veh);
+		VEH_BUILT_WITH(inter_veh) = NULL;
+	}
+	else if (VEH_IS_DISMANTLING(inter_veh)) {
+		save = VEH_NEEDS_RESOURCES(inter_veh);
+		VEH_NEEDS_RESOURCES(inter_veh) = NULL;
+	}
+	
+	// reattach built-with (if any) and reduce it to 5-20%
+	if (save) {
+		save_resources = number(5, 20) / 100.0;
+		VEH_BUILT_WITH(ruin) = save;
+		LL_FOREACH_SAFE(VEH_BUILT_WITH(ruin), res, next_res) {
+			res->amount = ceil(res->amount * save_resources);
+			
+			if (res->amount <= 0) {	// delete if empty
+				LL_DELETE(VEH_BUILT_WITH(ruin), res);
+				free(res);
+			}
+		}
+	}
+	
+	// custom naming if #n is present
+	if (strstr(VEH_KEYWORDS(ruin), "#n")) {
+		to_free = (!proto || VEH_KEYWORDS(ruin) != VEH_KEYWORDS(proto)) ? VEH_KEYWORDS(ruin) : NULL;
+		VEH_KEYWORDS(ruin) = str_replace("#n", VEH_SHORT_DESC(inter_veh), VEH_KEYWORDS(ruin));
+		if (to_free) {
+			free(to_free);
+		}
+	}
+	if (strstr(VEH_SHORT_DESC(ruin), "#n")) {
+		to_free = (!proto || VEH_SHORT_DESC(ruin) != VEH_SHORT_DESC(proto)) ? VEH_SHORT_DESC(ruin) : NULL;
+		VEH_SHORT_DESC(ruin) = str_replace("#n", VEH_SHORT_DESC(inter_veh), VEH_SHORT_DESC(ruin));
+		if (to_free) {
+			free(to_free);
+		}
+	}
+	if (strstr(VEH_LONG_DESC(ruin), "#n")) {
+		to_free = (!proto || VEH_LONG_DESC(ruin) != VEH_LONG_DESC(proto)) ? VEH_LONG_DESC(ruin) : NULL;
+		VEH_LONG_DESC(ruin) = str_replace("#n", VEH_SHORT_DESC(inter_veh), VEH_LONG_DESC(ruin));
+		if (to_free) {
+			free(to_free);
+		}
+	}
+	
+	load_vtrigger(ruin);
+	return TRUE;
+}
+
+
+/**
+* Destroys a vehicle from disrepair or invalid location. A destroy trigger
+* on the vehicle can prevent this. If it was a building-vehicle and is the last
+* one in the room, the room will also auto-abandon.
+*
+* @param vehicle_data *veh The vehicle (will usually be extracted).
+* @param char *message Optional: An act string (using $V for the vehicle) to send to the room. (NULL for none)
+*/
+void ruin_vehicle(vehicle_data *veh, char *message) {
+	void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
+	
+	bool was_bld = VEH_FLAGGED(veh, VEH_BUILDING) ? TRUE : FALSE;
+	empire_data *emp = VEH_OWNER(veh);
+	room_data *room = IN_ROOM(veh);
+	struct vehicle_room_list *vrl;
+	
+	if (!destroy_vtrigger(veh)) {
+		VEH_HEALTH(veh) = MAX(1, VEH_HEALTH(veh));	// ensure health
+		return;
+	}
+	
+	if (message && ROOM_PEOPLE(IN_ROOM(veh))) {
+		act(message, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+	}
+	
+	// delete the NPCs who live here first so they don't do an 'ejected-then-leave'
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		delete_room_npcs(vrl->room, NULL, TRUE);
+	}
+	
+	// ruins
+	run_interactions(NULL, VEH_INTERACTIONS(veh), INTERACT_RUINS_TO_VEH, IN_ROOM(veh), NULL, NULL, veh, ruin_vehicle_to_vehicle_interaction);
+	
+	fully_empty_vehicle(veh, IN_ROOM(veh));
+	extract_vehicle(veh);
+	
+	// auto-abandon if it was the last building-vehicle and was ruined
+	if (was_bld && room && emp && count_building_vehicles_in_room(room, emp) == 0) {
+		abandon_room(room);
+	}
+}
+
+
+/**
 * @param vehicle_data *veh The vehicle to scale.
 * @param int level What level to scale it to (passing 0 will trigger auto-detection).
 */
@@ -682,13 +868,13 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 	
 	// remove from goals/tech
 	if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
-		qt_empire_players(VEH_OWNER(veh), qt_lose_vehicle, VEH_VNUM(veh));
-		et_lose_vehicle(VEH_OWNER(veh), VEH_VNUM(veh));
+		qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
+		et_lose_vehicle(VEH_OWNER(veh), veh);
 		adjust_vehicle_tech(veh, FALSE);
 	}
 	
 	// clear it out
-	fully_empty_vehicle(veh);
+	fully_empty_vehicle(veh, IN_ROOM(veh));
 	delete_vehicle_interior(veh);
 	
 	// set up flags
@@ -738,6 +924,8 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 	while (VEH_ANIMALS(veh)) {
 		unharness_mob_from_vehicle(VEH_ANIMALS(veh), veh);
 	}
+	
+	affect_total_room(IN_ROOM(veh));
 }
 
 
@@ -763,6 +951,24 @@ void start_vehicle_burning(vehicle_data *veh) {
 		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
 		VEH_LED_BY(veh) = NULL;
 	}
+}
+
+
+/**
+* Determines the total size of all vehicles in the room.
+*
+* @param room_data *room The room to check.
+* @return int The total size of vehicles there.
+*/
+int total_vehicle_size_in_room(room_data *room) {
+	vehicle_data *veh;
+	int size = 0;
+	
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		size += VEH_SIZE(veh);
+	}
+	
+	return size;
 }
 
 
@@ -808,6 +1014,99 @@ char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_
 }
 
 
+/**
+* Updates the island/id and map location for the rooms inside a vehicle.
+*
+* @param vehicle_data *veh Which vehicle to update.
+* @param room_data *loc Where the vehicle is.
+*/
+void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc) {
+	struct vehicle_room_list *vrl;
+	vehicle_data *iter;
+	
+	if (!veh) {
+		return;
+	}
+	
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		GET_ISLAND_ID(vrl->room) = GET_ISLAND_ID(loc);
+		GET_ISLAND(vrl->room) = GET_ISLAND(loc);
+		GET_MAP_LOC(vrl->room) = GET_MAP_LOC(loc);
+		
+		// check vehicles inside and cascade
+		DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+			update_vehicle_island_and_loc(iter, loc);
+		}
+	}
+}
+
+
+/**
+* Determines if a vehicle is allowed to be in a room based on climate. This
+* only applies on the map. Open map buildings use the base sector; interiors
+* are always allowed.
+*
+* @param vehicle_data *veh The vehicle to test.
+* @param room_data *room What room to check for climate.
+* @return bool TRUE if the vehicle allows it; FALSE if not.
+*/
+bool vehicle_allows_climate(vehicle_data *veh, room_data *room) {
+	bitvector_t climate = NOBITS;
+	
+	if (!veh || !room) {
+		return TRUE;	// junk in, junk out
+	}
+	if (ROOM_IS_CLOSED(room)) {
+		return TRUE;	// closed rooms always allowed
+	}
+	
+	// determine which climate to use
+	if (IS_MAP_BUILDING(room) || IS_ROAD(room)) {
+		// open map buildings use base sect
+		climate = GET_SECT_CLIMATE(BASE_SECT(room));
+	}
+	else {
+		// all other tiles use regular sect
+		climate = GET_SECT_CLIMATE(SECT(room));
+	}
+	
+	// compare
+	if (VEH_REQUIRES_CLIMATE(veh) && !(VEH_REQUIRES_CLIMATE(veh) & climate)) {
+		return FALSE;	// required climate type is missing
+	}
+	if (VEH_FORBID_CLIMATE(veh) && (VEH_FORBID_CLIMATE(veh) & climate)) {
+		return FALSE;	// has a forbidden climate type
+	}
+	
+	// otherwise, we made it!
+	return TRUE;
+}
+
+
+/**
+* Determines if a vehicle can be seen at a distance or not, using the chameleon
+* flag and whether or not the vehicle is complete.
+*
+* @param vehicle_data *veh The vehicle.
+* @param room_data *from Where it's being viewed from (to compute distance).
+* @return bool TRUE if the vehicle should be hidden, FALSE if not.
+*/
+bool vehicle_is_chameleon(vehicle_data *veh, room_data *from) {
+	if (!veh || !from || !IN_ROOM(veh)) {
+		return FALSE;	// safety
+	}
+	if (!VEH_IS_COMPLETE(veh) || VEH_NEEDS_RESOURCES(veh)) {
+		return FALSE;	// incomplete or unrepaired vehicles are not chameleon
+	}
+	if (!VEH_FLAGGED(veh, VEH_CHAMELEON) && (!IN_ROOM(veh) || !ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON))) {
+		return FALSE;	// missing chameleon flags
+	}
+	
+	// ok chameleon: now check distance
+	return (compute_distance(from, IN_ROOM(veh)) >= 2);
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 
@@ -825,9 +1124,7 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 	
 	// initial island data
 	if (IN_ROOM(veh)) {
-		GET_ISLAND_ID(room) = GET_ISLAND_ID(IN_ROOM(veh));
-		GET_ISLAND(room) = GET_ISLAND(IN_ROOM(veh));
-		GET_MAP_LOC(room) = GET_MAP_LOC(IN_ROOM(veh));
+		update_vehicle_island_and_loc(veh, IN_ROOM(veh));
 	}
 }
 
@@ -846,7 +1143,9 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 	
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bld_data *interior = building_proto(VEH_INTERIOR_ROOM_VNUM(veh));
-	bool problem = FALSE;
+	struct obj_storage_type *store;
+	obj_data *obj, *next_obj;
+	bool any, problem = FALSE;
 	
 	if (!str_cmp(VEH_KEYWORDS(veh), default_vehicle_keywords)) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Keywords not set");
@@ -932,7 +1231,7 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Designate flags set but vehicle has no interior");
 		problem = TRUE;
 	}
-	if (!VEH_YEARLY_MAINTENANCE(veh)) {
+	if (!VEH_YEARLY_MAINTENANCE(veh) && !VEH_FLAGGED(veh, VEH_IS_RUINS)) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Requires no maintenance");
 		problem = TRUE;
 	}
@@ -978,6 +1277,30 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Has BUILDING flag but not VISIBLE-IN-DARK");
 		problem = TRUE;
 	}
+	if (VEH_FLAGGED(veh, VEH_INTERLINK) && (!VEH_FLAGGED(veh, VEH_BUILDING) || VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS))) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Has INTERLINK but is not a stationary building");
+		problem = TRUE;
+	}
+	if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_RUINS_TO_BLD)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Has RUINS-TO-BLD interaction; this won't work on vehicles");
+		problem = TRUE;
+	}
+	
+	// check for storage on moving vehicles
+	if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
+		any = FALSE;
+		HASH_ITER(hh, object_table, obj, next_obj) {
+			if (any) {
+				break;
+			}
+			LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
+				if (store->type == TYPE_VEH && store->vnum == VEH_VNUM(veh)) {
+					olc_audit_msg(ch, VEH_VNUM(veh), "At least 1 object stores to moving vehicle: %d %s", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+					problem = any = TRUE;
+				}
+			}
+		}
+	}
 	
 	problem |= audit_extra_descs(VEH_VNUM(veh), VEH_EX_DESCS(veh), ch);
 	problem |= audit_interactions(VEH_VNUM(veh), VEH_INTERACTIONS(veh), TYPE_ROOM, ch);
@@ -1019,30 +1342,40 @@ void complete_vehicle(vehicle_data *veh) {
 		REMOVE_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);
 		
 		if (VEH_OWNER(veh)) {
-			qt_empire_players(VEH_OWNER(veh), qt_gain_vehicle, VEH_VNUM(veh));
-			et_gain_vehicle(VEH_OWNER(veh), VEH_VNUM(veh));
+			qt_empire_players_vehicle(VEH_OWNER(veh), qt_gain_vehicle, veh);
+			et_gain_vehicle(VEH_OWNER(veh), veh);
 			adjust_vehicle_tech(veh, TRUE);
 		}
 		
 		finish_vehicle_setup(veh);
+		
+		// build the interior
+		get_vehicle_interior(veh);
+		
+		// run triggers
 		load_vtrigger(veh);
 	}
+	
+	affect_total_room(IN_ROOM(veh));
 }
 
 
 /**
-* Saves the vehicles list for a room to the room file.
+* Saves the vehicles list for a room to the room file. This is called
+* recursively to save in reverse-order and thus load in correct order.
 *
-* @param vehicle_data *room_list The list of vehicles in the room.
+* @param vehicle_data *veh The vehicle to save.
 * @param FILE *fl The file open for writing.
 */
-void Crash_save_vehicles(vehicle_data *room_list, FILE *fl) {
+void Crash_save_vehicles(vehicle_data *veh, FILE *fl) {
 	void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl);
 	
-	vehicle_data *iter;
-	
-	DL_FOREACH2(room_list, iter, next_in_room) {
-		store_one_vehicle_to_file(iter, fl);
+	// store next first so the order is right on reboot
+	if (veh && veh->next_in_room) {
+		Crash_save_vehicles(veh->next_in_room, fl);
+	}
+	if (veh) {
+		store_one_vehicle_to_file(veh, fl);
 	}
 }
 
@@ -1130,6 +1463,9 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh = vehicle_proto(vnum);
+	vehicle_data *veh_iter, *next_veh_iter;
+	struct obj_storage_type *store;
+	struct interaction_item *inter;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -1137,6 +1473,9 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
 	struct adventure_spawn *asp;
+	struct bld_relation *relat;
+	bld_data *bld, *next_bld;
+	obj_data *obj, *next_obj;
 	int size, found;
 	bool any;
 	
@@ -1148,11 +1487,51 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	found = 0;
 	size = snprintf(buf, sizeof(buf), "Occurrences of vehicle %d (%s):\r\n", vnum, VEH_SHORT_DESC(veh));
 	
+	// buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		any = FALSE;
+		LL_FOREACH(GET_BLD_INTERACTIONS(bld), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_VEH && inter->vnum == vnum) {
+				any = TRUE;
+				break;
+			}
+		}
+		LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
+			if (relat->type != BLD_REL_STORES_LIKE_VEH || relat->vnum != vnum) {
+				continue;
+			}
+			any = TRUE;
+			break;
+		}
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "BLD [%5d] %s\r\n", GET_BLD_VNUM(bld), GET_BLD_NAME(bld));
+		}
+	}
+	
 	// crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
-		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		if (CRAFT_IS_VEHICLE(craft) && GET_CRAFT_OBJECT(craft) == vnum) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "CFT [%5d] %s\r\n", GET_CRAFT_VNUM(craft), GET_CRAFT_NAME(craft));
+		}
+	}
+	
+	// obj storage
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (size >= sizeof(buf)) {
+			break;
+		}
+		any = FALSE;
+		for (store = GET_OBJ_STORAGE(obj); store && !any; store = store->next) {
+			if (store->type == TYPE_VEH && store->vnum == vnum) {
+				any = TRUE;
+				++found;
+				size += snprintf(buf + size, sizeof(buf) - size, "OBJ [%5d] %s\r\n", GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+			}
 		}
 	}
 	
@@ -1221,6 +1600,28 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 		if (any) {
 			++found;
 			size += snprintf(buf + size, sizeof(buf) - size, "SOC [%5d] %s\r\n", SOC_VNUM(soc), SOC_NAME(soc));
+		}
+	}
+	
+	// vehicles
+	HASH_ITER(hh, vehicle_table, veh_iter, next_veh_iter) {
+		any = FALSE;
+		LL_FOREACH(VEH_INTERACTIONS(veh_iter), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_VEH && inter->vnum == vnum) {
+				any = TRUE;
+				break;
+			}
+		}
+		LL_FOREACH(VEH_RELATIONS(veh_iter), relat) {
+			if (relat->type != BLD_REL_STORES_LIKE_VEH || relat->vnum != vnum) {
+				continue;
+			}
+			any = TRUE;
+			break;
+		}
+		if (any) {
+			++found;
+			size += snprintf(buf + size, sizeof(buf) - size, "VEH [%5d] %s\r\n", VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 		}
 	}
 	
@@ -1429,7 +1830,7 @@ int sort_vehicles(vehicle_data *a, vehicle_data *b) {
 
 
 /**
-* write_one_vehicle_to_file: Write a vehicle to a tagged save file. Vehicle
+* store_one_vehicle_to_file: Write a vehicle to a tagged save file. Vehicle
 * tags start with %VNUM instead of #VNUM because they may co-exist with items
 * in the file.
 *
@@ -1447,7 +1848,7 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	vehicle_data *proto;
 	
 	if (!fl || !veh) {
-		log("SYSERR: write_one_vehicle_to_file called without %s", fl ? "vehicle" : "file");
+		log("SYSERR: store_one_vehicle_to_file called without %s", fl ? "vehicle" : "file");
 		return;
 	}
 	
@@ -2009,7 +2410,7 @@ void free_vehicle(vehicle_data *veh) {
 		VEH_ANIMALS(veh) = vam->next;
 		free(vam);
 	}
-	empty_vehicle(veh);
+	empty_vehicle(veh, NULL);
 	
 	// free any assigned scripts and vars
 	if (SCRIPT(veh)) {
@@ -2035,6 +2436,12 @@ void free_vehicle(vehicle_data *veh) {
 				VEH_SPAWNS(veh) = spawn->next;
 				free(spawn);
 			}
+		}
+		if (VEH_CUSTOM_MSGS(veh) && (!proto || VEH_CUSTOM_MSGS(veh) != VEH_CUSTOM_MSGS(proto))) {
+			free_custom_messages(VEH_CUSTOM_MSGS(veh));
+		}
+		if (VEH_RELATIONS(veh) && (!proto || VEH_RELATIONS(veh) != VEH_RELATIONS(proto))) {
+			free_bld_relations(VEH_RELATIONS(veh));
 		}
 		
 		free(veh->attributes);
@@ -2074,11 +2481,13 @@ int get_new_vehicle_construction_id(void) {
 * @param any_vnum vnum The vehicle vnum
 */
 void parse_vehicle(FILE *fl, any_vnum vnum) {
+	void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 	void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 	void parse_interaction(char *line, struct interaction_item **list, char *error_part);
 	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 
-	char line[256], error[256], str_in[256], str_in2[256];
+	char line[256], error[256], str_in[256], str_in2[256], str_in3[256];
+	struct bld_relation *relat;
 	struct spawn_info *spawn;
 	vehicle_data *veh, *find;
 	double dbl_in;
@@ -2105,19 +2514,24 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_LOOK_DESC(veh) = fread_string(fl, error);
 	VEH_ICON(veh) = fread_string(fl, error);
 	
-	// line 6: flags move_type maxhealth capacity animals_required functions fame military
+	// line 6: flags move_type maxhealth capacity animals_required functions fame military size
 	if (!get_line(fl, line)) {
 		log("SYSERR: Missing line 6 of %s", error);
 		exit(1);
 	}
-	if (sscanf(line, "%s %d %d %d %d %s %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5]) != 8) {
-		strcpy(str_in2, "0");	// backwards-compatible: functions
-		int_in[4] = 0;	// fame
-		int_in[5] = 0;	// military
+	if (sscanf(line, "%s %d %d %d %d %s %d %d %d %s", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5], &int_in[6], str_in3) != 10) {
+		int_in[6] = 0;	// b5.104 backwards-compatible: size
+		strcpy(str_in3, "0");	// affects
 		
-		if (sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
-			log("SYSERR: Format error in line 6 of %s", error);
-			exit(1);
+		if (sscanf(line, "%s %d %d %d %d %s %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3], str_in2, &int_in[4], &int_in[5]) != 8) {
+			strcpy(str_in2, "0");	// backwards-compatible: functions
+			int_in[4] = 0;	// fame
+			int_in[5] = 0;	// military
+		
+			if (sscanf(line, "%s %d %d %d %d", str_in, &int_in[0], &int_in[1], &int_in[2], &int_in[3]) != 5) {
+				log("SYSERR: Format error in line 6 of %s", error);
+				exit(1);
+			}
 		}
 	}
 	
@@ -2129,6 +2543,8 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 	VEH_FUNCTIONS(veh) = asciiflag_conv(str_in2);
 	VEH_FAME(veh) = int_in[4];
 	VEH_MILITARY(veh) = int_in[5];
+	VEH_SIZE(veh) = int_in[6];
+	VEH_ROOM_AFFECTS(veh) = asciiflag_conv(str_in3);
 	
 	// optionals
 	for (;;) {
@@ -2166,7 +2582,20 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 				parse_interaction(line, &VEH_INTERACTIONS(veh), error);
 				break;
 			}
-			
+			case 'K': {	// custom messages
+				parse_custom_message(fl, &VEH_CUSTOM_MSGS(veh), error);
+				break;
+			}
+			case 'L': {	// climate require/forbids
+				if (sscanf(line, "L %s %s", str_in, str_in2) != 2) {
+					log("SYSERR: Format error in L line of %s", error);
+					exit(1);
+				}
+				
+				VEH_REQUIRES_CLIMATE(veh) = asciiflag_conv(str_in);
+				VEH_FORBID_CLIMATE(veh) = asciiflag_conv(str_in2);
+				break;
+			}
 			case 'M': {	// mob spawn
 				if (!get_line(fl, line) || sscanf(line, "%d %lf %s", &int_in[0], &dbl_in, str_in) != 3) {
 					log("SYSERR: Format error in M line of %s", error);
@@ -2199,6 +2628,23 @@ void parse_vehicle(FILE *fl, any_vnum vnum) {
 			
 			case 'T': {	// trigger
 				parse_trig_proto(line, &(veh->proto_script), error);
+				break;
+			}
+			
+			case 'U': {	// relation
+				if (!get_line(fl, line)) {
+					log("SYSERR: Missing U line of %s", error);
+					exit(1);
+				}
+				if (sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
+					log("SYSERR: Format error in U line of %s", error);
+					exit(1);
+				}
+				
+				CREATE(relat, struct bld_relation, 1);
+				relat->type = int_in[0];
+				relat->vnum = int_in[1];
+				LL_APPEND(VEH_RELATIONS(veh), relat);
 				break;
 			}
 			
@@ -2242,12 +2688,14 @@ void write_vehicle_index(FILE *fl) {
 * @param vehicle_data *veh The thing to save.
 */
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
+	void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 	void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 	void write_interactions_to_file(FILE *fl, struct interaction_item *list);
 	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
-	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
+	struct bld_relation *relat;
 	struct spawn_info *spawn;
 	
 	if (!fl || !veh) {
@@ -2266,10 +2714,11 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	fprintf(fl, "%s~\n", temp);
 	fprintf(fl, "%s~\n", NULLSAFE(VEH_ICON(veh)));
 	
-	// 6. flags move_type maxhealth capacity animals_required functions fame military
+	// 6. flags move_type maxhealth capacity animals_required functions fame military size room-affects
 	strcpy(temp, bitv_to_alpha(VEH_FLAGS(veh)));
 	strcpy(temp2, bitv_to_alpha(VEH_FUNCTIONS(veh)));
-	fprintf(fl, "%s %d %d %d %d %s %d %d\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh));
+	strcpy(temp3, bitv_to_alpha(VEH_ROOM_AFFECTS(veh)));
+	fprintf(fl, "%s %d %d %d %d %s %d %d %d %s\n", temp, VEH_MOVE_TYPE(veh), VEH_MAX_HEALTH(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), temp2, VEH_FAME(veh), VEH_MILITARY(veh), VEH_SIZE(veh), temp3);
 	
 	// C: scaling
 	if (VEH_MIN_SCALE_LEVEL(veh) > 0 || VEH_MAX_SCALE_LEVEL(veh) > 0) {
@@ -2289,6 +2738,16 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	// I: interactions
 	write_interactions_to_file(fl, VEH_INTERACTIONS(veh));
 	
+	// K: custom messages
+	write_custom_messages_to_file(fl, 'K', VEH_CUSTOM_MSGS(veh));
+	
+	// L: climate restrictions
+	if (VEH_REQUIRES_CLIMATE(veh) || VEH_FORBID_CLIMATE(veh)) {
+		strcpy(temp, bitv_to_alpha(VEH_REQUIRES_CLIMATE(veh)));
+		strcpy(temp2, bitv_to_alpha(VEH_FORBID_CLIMATE(veh)));
+		fprintf(fl, "L %s %s\n", temp, temp2);
+	}
+	
 	// 'M': mob spawns
 	LL_FOREACH(VEH_SPAWNS(veh), spawn) {
 		fprintf(fl, "M\n%d %.2f %s\n", spawn->vnum, spawn->percent, bitv_to_alpha(spawn->flags));
@@ -2302,6 +2761,11 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	
 	// T, V: triggers
 	write_trig_protos_to_file(fl, 'T', veh->proto_script);
+	
+	// U: relations
+	LL_FOREACH(VEH_RELATIONS(veh), relat) {
+		fprintf(fl, "U\n%d %d\n", relat->type, relat->vnum);
+	}
 	
 	// end
 	fprintf(fl, "S\n");
@@ -2435,8 +2899,8 @@ void convert_one_obj_to_vehicle(obj_data *obj) {
 				// apply vehicle aff
 				LL_FOREACH2(interior_room_list, room_iter, next_interior) {
 					if (room_iter == main_room || HOME_ROOM(room_iter) == main_room) {
-						SET_BIT(ROOM_AFF_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
 						SET_BIT(ROOM_BASE_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
+						affect_total_room(room_iter);
 					}
 				}
 			}
@@ -2504,8 +2968,8 @@ void b3_8_ship_update(void) {
 	
 	HASH_ITER(hh, world_table, room, next_room) {
 		if (IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_SHIP_PRESENT)) {
-			REMOVE_BIT(ROOM_AFF_FLAGS(room), ROOM_AFF_SHIP_PRESENT);
 			REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_SHIP_PRESENT);
+			affect_total_room(room);
 			++changed;
 		}
 	}
@@ -2561,10 +3025,13 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
+	extern bool delete_bld_relation_by_vnum(struct bld_relation **list, int type, bld_vnum vnum);
+	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	
+	struct obj_storage_type *store, *next_store;
 	vehicle_data *veh, *iter, *next_iter;
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
@@ -2572,6 +3039,8 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	room_template *rmt, *next_rmt;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
+	bld_data *bld, *next_bld;
+	obj_data *obj, *next_obj;
 	descriptor_data *desc;
 	bool found;
 	
@@ -2599,10 +3068,19 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	save_index(DB_BOOT_VEH);
 	save_library_file_for_vnum(DB_BOOT_VEH, vnum);
 	
+	// update buildings
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_VEH, vnum);
+		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_STORES_LIKE_VEH, vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
+		}
+	}
+	
 	// update crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		found = FALSE;
-		if (CRAFT_FLAGGED(craft, CRAFT_VEHICLE) && GET_CRAFT_OBJECT(craft) == vnum) {
+		if (CRAFT_IS_VEHICLE(craft) && GET_CRAFT_OBJECT(craft) == vnum) {
 			GET_CRAFT_OBJECT(craft) = NOTHING;
 			found = TRUE;
 		}
@@ -2610,6 +3088,17 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		if (found) {
 			SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_CRAFT, GET_CRAFT_VNUM(craft));
+		}
+	}
+	
+	// obj storage
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		LL_FOREACH_SAFE(GET_OBJ_STORAGE(obj), store, next_store) {
+			if (store->type == TYPE_VEH && store->vnum == vnum) {
+				LL_DELETE(obj->proto_data->storage, store);
+				free(store);
+				save_library_file_for_vnum(DB_BOOT_OBJ, GET_OBJ_VNUM(obj));
+			}
 		}
 	}
 	
@@ -2666,11 +3155,27 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 	}
 	
+	// update vehicles
+	HASH_ITER(hh, vehicle_table, iter, next_iter) {
+		found = delete_from_interaction_list(&VEH_INTERACTIONS(iter), TYPE_VEH, vnum);
+		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_STORES_LIKE_VEH, vnum);
+		if (found) {
+			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(iter));
+		}
+	}
+	
 	// olc editor updates
 	LL_FOREACH(descriptor_list, desc) {
+		if (GET_OLC_BUILDING(desc)) {
+			found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_VEH, vnum);
+			found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_STORES_LIKE_VEH, vnum);
+			if (found) {
+				msg_to_char(desc->character, "One of the vehicles used in the building you're editing was deleted.\r\n");
+			}
+		}
 		if (GET_OLC_CRAFT(desc)) {
 			found = FALSE;
-			if (CRAFT_FLAGGED(GET_OLC_CRAFT(desc), CRAFT_VEHICLE) && GET_OLC_CRAFT(desc)->object == vnum) {
+			if (CRAFT_IS_VEHICLE(GET_OLC_CRAFT(desc)) && GET_OLC_CRAFT(desc)->object == vnum) {
 				GET_OLC_CRAFT(desc)->object = NOTHING;
 				found = TRUE;
 			}
@@ -2678,6 +3183,19 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 			if (found) {
 				SET_BIT(GET_OLC_CRAFT(desc)->flags, CRAFT_IN_DEVELOPMENT);
 				msg_to_char(desc->character, "The vehicle made by the craft you're editing was deleted.\r\n");
+			}
+		}
+		if (GET_OLC_OBJECT(desc)) {
+			found = FALSE;
+			LL_FOREACH_SAFE(GET_OBJ_STORAGE(GET_OLC_OBJECT(desc)), store, next_store) {
+				if (store->type == TYPE_VEH && store->vnum == vnum) {
+					LL_DELETE(GET_OLC_OBJECT(desc)->proto_data->storage, store);
+					free(store);
+					if (!found) {
+						msg_to_desc(desc, "A storage location for the the object you're editing was deleted.\r\n");
+						found = TRUE;
+					}
+				}
 			}
 		}
 		if (GET_OLC_PROGRESS(desc)) {
@@ -2719,6 +3237,13 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 				msg_to_desc(desc, "A vehicle required by the social you are editing was deleted.\r\n");
 			}
 		}
+		if (GET_OLC_VEHICLE(desc)) {
+			found = delete_from_interaction_list(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), TYPE_VEH, vnum);
+			found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(GET_OLC_VEHICLE(desc)), BLD_REL_STORES_LIKE_VEH, vnum);
+			if (found) {
+				msg_to_char(desc->character, "One of the vehicles used on the vehicle you're editing was deleted.\r\n");
+			}
+		}
 	}
 	
 	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "OLC: %s has deleted vehicle %d", GET_NAME(ch), vnum);
@@ -2739,13 +3264,15 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	int count;
 	
 	char only_icon[MAX_INPUT_LENGTH];
-	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS;
-	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS;
+	bitvector_t only_designate = NOBITS, only_flags = NOBITS, only_functions = NOBITS, only_affs = NOBITS;
+	bitvector_t find_interacts = NOBITS, not_flagged = NOBITS, found_interacts = NOBITS, find_custom = NOBITS, found_custom = NOBITS;
 	int only_animals = NOTHING, only_cap = NOTHING, cap_over = NOTHING, cap_under = NOTHING;
 	int only_fame = NOTHING, fame_over = NOTHING, fame_under = NOTHING, only_speed = NOTHING;
 	int only_hitpoints = NOTHING, hitpoints_over = NOTHING, hitpoints_under = NOTHING, only_level = NOTHING;
 	int only_military = NOTHING, military_over = NOTHING, military_under = NOTHING;
 	int only_rooms = NOTHING, rooms_over = NOTHING, rooms_under = NOTHING, only_move = NOTHING;
+	int size_under = NOTHING, size_over = NOTHING;
+	struct custom_message *cust;
 	bool needs_animals = FALSE;
 	
 	struct interaction_item *inter;
@@ -2770,11 +3297,13 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		}
 		
 		// else-ifs defined in olc.h process these args:
+		FULLSEARCH_FLAGS("affects", only_affs, room_aff_bits)
 		FULLSEARCH_INT("animalsrequired", only_animals, 0, INT_MAX)
 		FULLSEARCH_BOOL("anyanimalsrequired", needs_animals)
 		FULLSEARCH_INT("capacity", only_cap, 0, INT_MAX)
 		FULLSEARCH_INT("capacityover", cap_over, 0, INT_MAX)
 		FULLSEARCH_INT("capacityunder", cap_under, 0, INT_MAX)
+		FULLSEARCH_FLAGS("custom", find_custom, veh_custom_types)
 		FULLSEARCH_FLAGS("designate", only_designate, designate_flags)
 		FULLSEARCH_INT("fame", only_fame, 0, INT_MAX)
 		FULLSEARCH_INT("fameover", fame_over, 0, INT_MAX)
@@ -2796,6 +3325,8 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		FULLSEARCH_INT("military", only_military, 0, INT_MAX)
 		FULLSEARCH_INT("militaryover", military_over, 0, INT_MAX)
 		FULLSEARCH_INT("militaryunder", military_under, 0, INT_MAX)
+		FULLSEARCH_INT("sizeover", size_over, 0, INT_MAX)
+		FULLSEARCH_INT("sizeunder", size_under, 0, INT_MAX)
 		FULLSEARCH_LIST("speed", only_speed, vehicle_speed_types)
 		
 		else {	// not sure what to do with it? treat it like a keyword
@@ -2811,6 +3342,9 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 	
 	// okay now look up items
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		if (only_affs != NOBITS && (VEH_ROOM_AFFECTS(veh) & only_affs) != only_affs) {
+			continue;
+		}
 		if (only_animals != NOTHING && VEH_ANIMALS_REQUIRED(veh) != only_animals) {
 			continue;
 		}
@@ -2900,11 +3434,26 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		if (rooms_under != NOTHING && (VEH_MAX_ROOMS(veh) > rooms_under || VEH_MAX_ROOMS(veh) == 0)) {
 			continue;
 		}
+		if (size_over != NOTHING && VEH_SIZE(veh) < size_over) {
+			continue;
+		}
+		if (size_under != NOTHING && VEH_SIZE(veh) > size_under) {
+			continue;
+		}
 		if (only_speed != NOTHING && VEH_SPEED_BONUSES(veh) != only_speed) {
 			continue;
 		}
+		if (find_custom) {	// look up its custom messages
+			found_custom = NOBITS;
+			LL_FOREACH(VEH_CUSTOM_MSGS(veh), cust) {
+				found_custom |= BIT(cust->type);
+			}
+			if ((find_custom & found_custom) != find_custom) {
+				continue;
+			}
+		}
 		
-		if (*find_keywords && !multi_isname(find_keywords, VEH_KEYWORDS(veh)) && !multi_isname(find_keywords, VEH_LONG_DESC(veh)) && !multi_isname(find_keywords, VEH_LOOK_DESC(veh)) && !multi_isname(find_keywords, VEH_SHORT_DESC(veh)) && !search_extra_descs(find_keywords, VEH_EX_DESCS(veh))) {
+		if (*find_keywords && !multi_isname(find_keywords, VEH_KEYWORDS(veh)) && !multi_isname(find_keywords, VEH_LONG_DESC(veh)) && !multi_isname(find_keywords, VEH_LOOK_DESC(veh)) && !multi_isname(find_keywords, VEH_SHORT_DESC(veh)) && !search_extra_descs(find_keywords, VEH_EX_DESCS(veh)) && !search_custom_messages(find_keywords, VEH_CUSTOM_MSGS(veh))) {
 			continue;
 		}
 		
@@ -3026,6 +3575,8 @@ void save_olc_vehicle(descriptor_data *desc) {
 		if (VEH_HEALTH(iter) > VEH_MAX_HEALTH(iter)) {
 			VEH_HEALTH(iter) = VEH_MAX_HEALTH(iter);
 		}
+		
+		affect_total_room(IN_ROOM(iter));
 	}
 	
 	// free prototype strings and pointers
@@ -3053,6 +3604,8 @@ void save_olc_vehicle(descriptor_data *desc) {
 		free(spawn);
 	}
 	free_extra_descs(&VEH_EX_DESCS(proto));
+	free_custom_messages(VEH_CUSTOM_MSGS(proto));
+	free_bld_relations(VEH_RELATIONS(proto));
 	free(proto->attributes);
 	
 	// free old script?
@@ -3084,6 +3637,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 * @return vehicle_data* The copied vehicle.
 */
 vehicle_data *setup_olc_vehicle(vehicle_data *input) {
+	extern struct bld_relation *copy_bld_relations(struct bld_relation *input_list);
 	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
 	
 	vehicle_data *new;
@@ -3111,6 +3665,8 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 		VEH_EX_DESCS(new) = copy_extra_descs(VEH_EX_DESCS(input));
 		VEH_INTERACTIONS(new) = copy_interaction_list(VEH_INTERACTIONS(input));
 		VEH_SPAWNS(new) = copy_spawn_list(VEH_SPAWNS(input));
+		VEH_CUSTOM_MSGS(new) = copy_custom_messages(VEH_CUSTOM_MSGS(input));
+		VEH_RELATIONS(new) = VEH_RELATIONS(input) ? copy_bld_relations(VEH_RELATIONS(input)) : NULL;
 		
 		// copy scripts
 		SCRIPT(new) = NULL;
@@ -3150,6 +3706,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	char buf[MAX_STRING_LENGTH * 2], part[MAX_STRING_LENGTH];
 	struct room_extra_data *red, *next_red;
+	struct custom_message *custm;
 	obj_data *obj;
 	size_t size;
 	int found;
@@ -3182,7 +3739,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	
 	// stats lines
 	size += snprintf(buf + size, sizeof(buf) - size, "Health: [\tc%d\t0/\tc%d\t0], Capacity: [\tc%d\t0/\tc%d\t0], Animals Req: [\tc%d\t0], Move Type: [\ty%s\t0]\r\n", (int) VEH_HEALTH(veh), VEH_MAX_HEALTH(veh), VEH_CARRYING_N(veh), VEH_CAPACITY(veh), VEH_ANIMALS_REQUIRED(veh), mob_move_types[VEH_MOVE_TYPE(veh)]);
-	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0], Speed: [\ty%s\t0]\r\n", VEH_FAME(veh), VEH_MILITARY(veh), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
+	size += snprintf(buf + size, sizeof(buf) - size, "Fame: [\tc%d\t0], Military: [\tc%d\t0], Speed: [\ty%s\t0], Size: [\tc%d\t0]\r\n", VEH_FAME(veh), VEH_MILITARY(veh), vehicle_speed_types[VEH_SPEED_BONUSES(veh)], VEH_SIZE(veh));
 	
 	if (VEH_INTERIOR_ROOM_VNUM(veh) != NOTHING || VEH_MAX_ROOMS(veh) || VEH_DESIGNATE_FLAGS(veh)) {
 		sprintbit(VEH_DESIGNATE_FLAGS(veh), designate_flags, part, TRUE);
@@ -3192,14 +3749,25 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	sprintbit(VEH_FLAGS(veh), vehicle_flags, part, TRUE);
 	size += snprintf(buf + size, sizeof(buf) - size, "Flags: \tg%s\t0\r\n", part);
 	
+	sprintbit(VEH_ROOM_AFFECTS(veh), room_aff_bits, part, TRUE);
+	size += snprintf(buf + size, sizeof(buf) - size, "Affects: \tc%s\t0\r\n", part);
+	
 	sprintbit(VEH_FUNCTIONS(veh), function_flags, part, TRUE);
-	size += snprintf(buf + size, sizeof(buf) - size, "Functions: \tc%s\t0\r\n", part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Functions: \tg%s\t0\r\n", part);
+	
+	ordered_sprintbit(VEH_REQUIRES_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Requires climate: \tc%s\t0\r\n", part);
+	ordered_sprintbit(VEH_FORBID_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, part);
+	size += snprintf(buf + size, sizeof(buf) - size, "Forbid climate: \tg%s\t0\r\n", part);
 	
 	if (VEH_INTERACTIONS(veh)) {
-		send_to_char("Interactions:\r\n", ch);
 		get_interaction_display(VEH_INTERACTIONS(veh), part);
-		strcat(buf, part);
-		size += strlen(part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Interactions:\r\n%s", part);
+	}
+	
+	if (VEH_RELATIONS(veh)) {
+		get_bld_relations_display(VEH_RELATIONS(veh), part);
+		size += snprintf(buf + size, sizeof(buf) - size, "Relations:\r\n%s", part);
 	}
 	
 	if (VEH_YEARLY_MAINTENANCE(veh)) {
@@ -3246,6 +3814,14 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "%s resources:\r\n%s", VEH_IS_DISMANTLING(veh) ? "Dismantle" : "Needs", part);
 	}
 	
+	if (VEH_CUSTOM_MSGS(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Custom messages:\r\n");
+		
+		LL_FOREACH(VEH_CUSTOM_MSGS(veh), custm) {
+			size += snprintf(buf + size, sizeof(buf) - size, " %s: %s\r\n", veh_custom_types[custm->type], custm->msg);
+		}
+	}
+	
 	send_to_char(buf, ch);
 	show_spawn_summary_to_char(ch, VEH_SPAWNS(veh));
 	
@@ -3258,7 +3834,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	// script info
-	msg_to_char(ch, "Script information:\r\n");
+	msg_to_char(ch, "Script information (id %d):\r\n", veh->script_id);
 	if (SCRIPT(veh)) {
 		script_stat(ch, SCRIPT(veh));
 	}
@@ -3339,6 +3915,7 @@ void olc_show_vehicle(char_data *ch) {
 	
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
+	struct custom_message *custm;
 	struct spawn_info *spawn;
 	int count;
 	
@@ -3361,7 +3938,7 @@ void olc_show_vehicle(char_data *ch) {
 	
 	sprintf(buf + strlen(buf), "<%shitpoints\t0> %d\r\n", OLC_LABEL_VAL(VEH_MAX_HEALTH(veh), 1), VEH_MAX_HEALTH(veh));
 	sprintf(buf + strlen(buf), "<%smovetype\t0> %s\r\n", OLC_LABEL_VAL(VEH_MOVE_TYPE(veh), 0), mob_move_types[VEH_MOVE_TYPE(veh)]);
-	sprintf(buf + strlen(buf), "<%sspeed\t0> %s\r\n", OLC_LABEL_VAL(VEH_SPEED_BONUSES(veh), VSPEED_NORMAL), vehicle_speed_types[VEH_SPEED_BONUSES(veh)]);
+	sprintf(buf + strlen(buf), "<%sspeed\t0> %s, <%ssize\t0> %d\r\n", OLC_LABEL_VAL(VEH_SPEED_BONUSES(veh), VSPEED_NORMAL), vehicle_speed_types[VEH_SPEED_BONUSES(veh)], OLC_LABEL_VAL(VEH_SIZE(veh), 0), VEH_SIZE(veh));
 	sprintf(buf + strlen(buf), "<%scapacity\t0> %d item%s\r\n", OLC_LABEL_VAL(VEH_CAPACITY(veh), 0), VEH_CAPACITY(veh), PLURAL(VEH_CAPACITY(veh)));
 	sprintf(buf + strlen(buf), "<%sanimalsrequired\t0> %d\r\n", OLC_LABEL_VAL(VEH_ANIMALS_REQUIRED(veh), 0), VEH_ANIMALS_REQUIRED(veh));
 	
@@ -3385,8 +3962,16 @@ void olc_show_vehicle(char_data *ch) {
 	sprintf(buf + strlen(buf), "<%sfame\t0> %d\r\n", OLC_LABEL_VAL(VEH_FAME(veh), 0), VEH_FAME(veh));
 	sprintf(buf + strlen(buf), "<%smilitary\t0> %d\r\n", OLC_LABEL_VAL(VEH_MILITARY(veh), 0), VEH_MILITARY(veh));
 	
+	sprintbit(VEH_ROOM_AFFECTS(veh), room_aff_bits, lbuf, TRUE);
+	sprintf(buf + strlen(buf), "<%saffects\t0> %s\r\n", OLC_LABEL_VAL(VEH_ROOM_AFFECTS(veh), NOBITS), lbuf);
+	
 	sprintbit(VEH_FUNCTIONS(veh), function_flags, lbuf, TRUE);
 	sprintf(buf + strlen(buf), "<%sfunctions\t0> %s\r\n", OLC_LABEL_VAL(VEH_FUNCTIONS(veh), NOBITS), lbuf);
+	
+	ordered_sprintbit(VEH_REQUIRES_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, lbuf);
+	sprintf(buf + strlen(buf), "<%srequiresclimate\t0> %s\r\n", OLC_LABEL_VAL(VEH_REQUIRES_CLIMATE(veh), NOBITS), lbuf);
+	ordered_sprintbit(VEH_FORBID_CLIMATE(veh), climate_flags, climate_flags_order, FALSE, lbuf);
+	sprintf(buf + strlen(buf), "<%sforbidclimate\t0> %s\r\n", OLC_LABEL_VAL(VEH_FORBID_CLIMATE(veh), NOBITS), lbuf);
 	
 	// exdesc
 	sprintf(buf + strlen(buf), "Extra descriptions: <%sextra\t0>\r\n", OLC_LABEL_PTR(VEH_EX_DESCS(veh)));
@@ -3401,11 +3986,24 @@ void olc_show_vehicle(char_data *ch) {
 		strcat(buf, lbuf);
 	}
 	
+	sprintf(buf + strlen(buf), "Relationships: <%srelations\t0>\r\n", OLC_LABEL_PTR(VEH_RELATIONS(veh)));
+	if (VEH_RELATIONS(veh)) {
+		get_bld_relations_display(VEH_RELATIONS(veh), lbuf);
+		strcat(buf, lbuf);
+	}
+	
 	// maintenance resources
 	sprintf(buf + strlen(buf), "Yearly maintenance resources required: <%sresource\t0>\r\n", OLC_LABEL_PTR(VEH_YEARLY_MAINTENANCE(veh)));
 	if (VEH_YEARLY_MAINTENANCE(veh)) {
 		get_resource_display(VEH_YEARLY_MAINTENANCE(veh), lbuf);
 		strcat(buf, lbuf);
+	}
+	
+	// custom messages
+	sprintf(buf + strlen(buf), "Custom messages: <%scustom\t0>\r\n", OLC_LABEL_PTR(VEH_CUSTOM_MSGS(veh)));
+	count = 0;
+	LL_FOREACH(VEH_CUSTOM_MSGS(veh), custm) {
+		sprintf(buf + strlen(buf), " \ty%d\t0. [%s] %s\r\n", ++count, veh_custom_types[custm->type], custm->msg);
 	}
 	
 	// scripts
@@ -3453,6 +4051,12 @@ int vnum_vehicle(char *searchname, char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// OLC MODULES /////////////////////////////////////////////////////////////
 
+OLC_MODULE(vedit_affects) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_ROOM_AFFECTS(veh) = olc_process_flag(ch, argument, "affect", "affects", room_aff_bits, VEH_ROOM_AFFECTS(veh));
+}
+
+
 OLC_MODULE(vedit_animalsrequired) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_ANIMALS_REQUIRED(veh) = olc_process_number(ch, argument, "animals required", "animalsrequired", 0, 100, VEH_ANIMALS_REQUIRED(veh));
@@ -3463,6 +4067,15 @@ OLC_MODULE(vedit_capacity) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_CAPACITY(veh) = olc_process_number(ch, argument, "capacity", "capacity", 0, 10000, VEH_CAPACITY(veh));
 }
+
+
+OLC_MODULE(vedit_custom) {
+	void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	
+	olc_process_custom_messages(ch, argument, &VEH_CUSTOM_MSGS(veh), veh_custom_types);
+}
+
 
 OLC_MODULE(vedit_speed) {
 	// TODO: move this into alphabetic order on some future major version
@@ -3498,6 +4111,12 @@ OLC_MODULE(vedit_fame) {
 OLC_MODULE(vedit_flags) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	VEH_FLAGS(veh) = olc_process_flag(ch, argument, "vehicle", "flags", vehicle_flags, VEH_FLAGS(veh));
+}
+
+
+OLC_MODULE(vedit_forbidclimate) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_FORBID_CLIMATE(veh) = olc_process_flag(ch, argument, "climate", "forbidclimate", climate_flags, VEH_FORBID_CLIMATE(veh));
 }
 
 
@@ -3618,6 +4237,19 @@ OLC_MODULE(vedit_movetype) {
 }
 
 
+OLC_MODULE(vedit_relations) {
+	void olc_process_relations(char_data *ch, char *argument, struct bld_relation **list);
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	olc_process_relations(ch, argument, &VEH_RELATIONS(veh));
+}
+
+
+OLC_MODULE(vedit_requiresclimate) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_REQUIRES_CLIMATE(veh) = olc_process_flag(ch, argument, "climate", "requiresclimate", climate_flags, VEH_REQUIRES_CLIMATE(veh));
+}
+
+
 OLC_MODULE(vedit_resource) {
 	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
@@ -3634,6 +4266,12 @@ OLC_MODULE(vedit_script) {
 OLC_MODULE(vedit_shortdescription) {
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	olc_process_string(ch, argument, "short description", &VEH_SHORT_DESC(veh));
+}
+
+
+OLC_MODULE(vedit_size) {
+	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
+	VEH_SIZE(veh) = olc_process_number(ch, argument, "size", "size", 0, config_get_int("vehicle_size_per_tile"), VEH_SIZE(veh));
 }
 
 

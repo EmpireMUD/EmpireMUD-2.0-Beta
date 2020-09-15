@@ -182,7 +182,7 @@ int count_objs_in_room(room_data *room) {
 	obj_data *search;
 	
 	DL_FOREACH2(ROOM_CONTENTS(room), search, next_content) {
-		items_in_room += OBJ_FLAGGED(search, OBJ_LARGE) ? 2 : 1;
+		items_in_room += obj_carry_size(search);
 	}
 	
 	return items_in_room;
@@ -402,7 +402,7 @@ bool run_identifies_to(char_data *ch, obj_data **obj, bool *extract) {
 	first_inv = ch->carrying;
 	first_room = ROOM_CONTENTS(IN_ROOM(ch));
 	
-	if (run_interactions(ch, GET_OBJ_INTERACTIONS(*obj), INTERACT_IDENTIFIES_TO, IN_ROOM(ch), NULL, *obj, identifies_to_interact)) {
+	if (run_interactions(ch, GET_OBJ_INTERACTIONS(*obj), INTERACT_IDENTIFIES_TO, IN_ROOM(ch), NULL, *obj, NULL, identifies_to_interact)) {
 		result = TRUE;
 		
 		if (GET_LOYALTY(ch)) {
@@ -456,7 +456,8 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *tool_flags[];
 	extern const char *wear_bits[];
 
-	struct vnum_hash *vhash = NULL, *vhash_iter, *vhash_next;
+	struct vnum_hash *bld_vhash = NULL, *veh_vhash = NULL, *vhash_iter, *vhash_next;
+	vehicle_data *veh, *veh_iter, *next_veh;
 	bld_data *bld, *bld_iter, *next_bld;
 	struct obj_storage_type *store;
 	craft_data *craft, *next_craft;
@@ -473,7 +474,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	crop_data *cp;
 	int found;
 	double rating;
-	bool any;
+	bool any, library;
 		
 	// sanity / don't bother
 	if (!obj || !ch || !ch->desc) {
@@ -520,15 +521,41 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	}
 
 	if (GET_OBJ_STORAGE(obj) && !OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
-		for (store = GET_OBJ_STORAGE(obj); store; store = store->next) {			
-			if ((bld = building_proto(store->building_type))) {
-				add_vnum_hash(&vhash, GET_BLD_VNUM(bld), 1);
+		LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
+			if (store->type == TYPE_BLD && (bld = building_proto(store->vnum))) {
+				add_vnum_hash(&bld_vhash, GET_BLD_VNUM(bld), 1);
 				
 				// check stores-like relations
 				HASH_ITER(hh, building_table, bld_iter, next_bld) {
 					LL_FOREACH(GET_BLD_RELATIONS(bld_iter), relat) {
-						if (relat->type == BLD_REL_STORES_LIKE && relat->vnum == GET_BLD_VNUM(bld)) {
-							add_vnum_hash(&vhash, GET_BLD_VNUM(bld_iter), 1);
+						if (relat->type == BLD_REL_STORES_LIKE_BLD && relat->vnum == GET_BLD_VNUM(bld)) {
+							add_vnum_hash(&bld_vhash, GET_BLD_VNUM(bld_iter), 1);
+						}
+					}
+				}
+				HASH_ITER(hh, vehicle_table, veh_iter, next_veh) {
+					LL_FOREACH(VEH_RELATIONS(veh_iter), relat) {
+						if (relat->type == BLD_REL_STORES_LIKE_BLD && relat->vnum == GET_BLD_VNUM(bld)) {
+							add_vnum_hash(&veh_vhash, VEH_VNUM(veh_iter), 1);
+						}
+					}
+				}
+			}
+			else if (store->type == TYPE_VEH && (veh = vehicle_proto(store->vnum))) {
+				add_vnum_hash(&veh_vhash, VEH_VNUM(veh), 1);
+				
+				// check stores-like relations
+				HASH_ITER(hh, building_table, bld_iter, next_bld) {
+					LL_FOREACH(GET_BLD_RELATIONS(bld_iter), relat) {
+						if (relat->type == BLD_REL_STORES_LIKE_VEH && relat->vnum == VEH_VNUM(veh)) {
+							add_vnum_hash(&bld_vhash, GET_BLD_VNUM(bld_iter), 1);
+						}
+					}
+				}
+				HASH_ITER(hh, vehicle_table, veh_iter, next_veh) {
+					LL_FOREACH(VEH_RELATIONS(veh_iter), relat) {
+						if (relat->type == BLD_REL_STORES_LIKE_VEH && relat->vnum == VEH_VNUM(veh)) {
+							add_vnum_hash(&veh_vhash, VEH_VNUM(veh_iter), 1);
 						}
 					}
 				}
@@ -537,10 +564,14 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		
 		snprintf(lbuf, sizeof(lbuf), "Storage locations:");
 		found = 0;
-		HASH_ITER(hh, vhash, vhash_iter, vhash_next) {
+		HASH_ITER(hh, bld_vhash, vhash_iter, vhash_next) {
 			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s", (found++ > 0 ? ", " : " "), get_bld_name_by_proto(vhash_iter->vnum));
 		}
-		free_vnum_hash(&vhash);
+		HASH_ITER(hh, veh_vhash, vhash_iter, vhash_next) {
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s", (found++ > 0 ? ", " : " "), skip_filler(get_vehicle_name_by_proto(vhash_iter->vnum)));
+		}
+		free_vnum_hash(&bld_vhash);
+		free_vnum_hash(&veh_vhash);
 		if (strlen(lbuf) < sizeof(lbuf) + 2) {
 			strcat(lbuf, "\r\n");
 		}
@@ -549,13 +580,19 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		send_to_char(temp, ch);
 		free(temp);
 	}
+	
+	// other storage
+	library = (IS_BOOK(obj) && book_proto(GET_BOOK_ID(obj)));
 	if (UNIQUE_OBJ_CAN_STORE(obj, FALSE)) {
-		msg_to_char(ch, "Storage location: Home, Warehouse\r\n");
+		msg_to_char(ch, "Storage location: Home, Warehouse%s\r\n", (library ? ", Library" : ""));
 	}
 	else if (UNIQUE_OBJ_CAN_STORE(obj, TRUE)) {
-		msg_to_char(ch, "Storage location: Home\r\n");
+		msg_to_char(ch, "Storage location: Home%s\r\n", (library ? ", Library" : ""));
 	}
-	if (OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
+	else if (library) {
+		msg_to_char(ch, "Storage location: Library\r\n");
+	}
+	else if (OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
 		msg_to_char(ch, "Storage location: none (modified object)\r\n");
 	}
 
@@ -774,7 +811,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		size = line_size = snprintf(lbuf, sizeof(lbuf), "Allows: ");
 		any = FALSE;
 		HASH_ITER(sorted_hh, sorted_crafts, craft, next_craft) {
-			if (GET_CRAFT_REQUIRES_OBJ(craft) == GET_OBJ_VNUM(obj)) {
+			if (GET_CRAFT_REQUIRES_OBJ(craft) == GET_OBJ_VNUM(obj) && !CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT | CRAFT_DISMANTLE_ONLY | CRAFT_UPGRADE)) {
 				part_size = snprintf(part, sizeof(part), "%s %s", gen_craft_data[GET_CRAFT_TYPE(craft)].command, GET_CRAFT_NAME(craft));
 			
 				if (line_size + part_size + 2 >= 80 && part_size < 75 && any) {
@@ -1495,7 +1532,7 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	
 	// count items
 	if (mode != SCMD_JUNK && need_capacity) {
-		size = (OBJ_FLAGGED(obj, OBJ_LARGE) ? 2 : 1);
+		size = obj_carry_size(obj);
 		if ((size + count_objs_in_room(IN_ROOM(ch))) > config_get_int("room_item_limit")) {
 			msg_to_char(ch, "You can't drop any more items here.\r\n");
 			return -1;
@@ -3351,6 +3388,7 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 */
 bool ship_is_empty(vehicle_data *ship) {
 	struct vehicle_room_list *vrl;
+	vehicle_data *iter;
 	char_data *ch;
 	
 	if (!ship) {
@@ -3370,10 +3408,18 @@ bool ship_is_empty(vehicle_data *ship) {
 	
 	// check all interior rooms
 	LL_FOREACH(VEH_ROOM_LIST(ship), vrl) {
+		// people
 		DL_FOREACH2(ROOM_PEOPLE(vrl->room), ch, next_in_room) {
 			if (!IS_NPC(ch)) {
 				// not empty!
 				return FALSE;
+			}
+		}
+		
+		// check nested vehicles recursively
+		DL_FOREACH2(ROOM_VEHICLES(vrl->room), iter, next_in_room) {
+			if (!ship_is_empty(iter)) {
+				return FALSE;	// not empty
 			}
 		}
 	}
@@ -4611,7 +4657,7 @@ ACMD(do_combine) {
 	}
 	else {
 		// will extract no matter what happens here
-		if (!run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE, IN_ROOM(ch), NULL, obj, combine_obj_interact)) {
+		if (!run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE, IN_ROOM(ch), NULL, obj, NULL, combine_obj_interact)) {
 			act("You fail to combine $p.", FALSE, ch, obj, NULL, TO_CHAR);
 		}
 		command_lag(ch, WAIT_OTHER);
@@ -5160,7 +5206,7 @@ ACMD(do_eat) {
 	
 	// 7. cleanup
 	if (extract) {
-		run_interactions(ch, GET_OBJ_INTERACTIONS(food), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, food, consumes_or_decays_interact);
+		run_interactions(ch, GET_OBJ_INTERACTIONS(food), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, food, NULL, consumes_or_decays_interact);
 		extract_obj(food);
 	}
 	else {
@@ -5851,7 +5897,7 @@ ACMD(do_light) {
 		
 		// will extract no matter what happens here
 		empty_obj_before_extract(obj);
-		run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, light_obj_interact);
+		run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_LIGHT, IN_ROOM(ch), NULL, obj, NULL, light_obj_interact);
 		extract_obj(obj);
 		command_lag(ch, WAIT_OTHER);
 		
@@ -6448,10 +6494,17 @@ ACMD(do_retrieve) {
 		msg_to_char(ch, "You aren't high enough rank to retrieve from the empire inventory.\r\n");
 		return;
 	}
-	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE))) {
+	// requires room-use permission even if retrieving from a moving storage vehicle
+	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You are not allowed to retrieve anything here (it isn't public).\r\n");
+		return;
+	}
+	/* don't check relationship here -- it is checked in obj_can_be_retrieved
+	if (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE)) {
 		msg_to_char(ch, "You need to establish a trade pact to retrieve anything here.\r\n");
 		return;
 	}
+	*/
 	if (GET_ISLAND_ID(IN_ROOM(ch)) == NO_ISLAND || !(isle = get_empire_island(emp, GET_ISLAND_ID(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You can't retrieve anything here.\r\n");
 		return;
@@ -6503,7 +6556,7 @@ ACMD(do_retrieve) {
 	/* they hit "ret all" */
 	if (!str_cmp(objname, "all")) {
 		HASH_ITER(hh, isle->store, store, next_store) {
-			if ((objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch))) {
+			if ((objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch), GET_LOYALTY(ch))) {
 				if (stored_item_requires_withdraw(objn) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
 					msg_to_char(ch, "You don't have permission to withdraw that!\r\n");
 					return;
@@ -6527,7 +6580,7 @@ ACMD(do_retrieve) {
 				break;
 			}
 			
-			if ((objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch))) {
+			if ((objn = store->proto) && obj_can_be_retrieved(objn, IN_ROOM(ch), GET_LOYALTY(ch))) {
 				if (multi_isname(objname, GET_OBJ_KEYWORDS(objn)) && (++pos == number)) {
 					found = 1;
 					
@@ -6650,7 +6703,7 @@ ACMD(do_seed) {
 		msg_to_char(ch, "It has already been seeded.\r\n");
 	}
 	else {		
-		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEED, IN_ROOM(ch), NULL, obj, seed_obj_interact)) {
+		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEED, IN_ROOM(ch), NULL, obj, NULL, seed_obj_interact)) {
 			if (OBJ_FLAGGED(obj, OBJ_SINGLE_USE)) {
 				extract_obj(obj);
 			}
@@ -6682,7 +6735,7 @@ ACMD(do_separate) {
 		msg_to_char(ch, "You can't separate that!\r\n");
 	}
 	else {		
-		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, separate_obj_interact)) {
+		if (run_interactions(ch, GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE, IN_ROOM(ch), NULL, obj, NULL, separate_obj_interact)) {
 			if (GET_LOYALTY(ch)) {
 				// subtract old item from empire counts
 				add_production_total(GET_LOYALTY(ch), GET_OBJ_VNUM(obj), -1);
@@ -7022,10 +7075,16 @@ ACMD(do_store) {
 		msg_to_char(ch, "You can't store or retrieve resources unless you're a member of an empire.\r\n");
 		return;
 	}
-	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE))) {
+	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You are not allowed to store anything here (it isn't public).\r\n");
+		return;
+	}
+	/* don't check relationship here -- it is checked in obj_can_be_retrieved
+	if (room_emp && emp != room_emp && !has_relationship(emp, room_emp, DIPL_TRADE)) {
 		msg_to_char(ch, "You need to establish a trade pact to store your things here.\r\n");
 		return;
 	}
+	*/
 	if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This storage building must be in a city to use it.\r\n");
 		return;
@@ -7082,7 +7141,7 @@ ACMD(do_store) {
 		}
 		for (iter = 0; iter < 2; ++iter) {
 			DL_FOREACH_SAFE2(lists[iter], obj, next_obj, next_content) {
-				if (!OBJ_FLAGGED(obj, OBJ_KEEP) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), FALSE)) {
+				if (!OBJ_FLAGGED(obj, OBJ_KEEP) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), GET_LOYALTY(ch), FALSE)) {
 					if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
 						if (store->amount >= MAX_STORAGE) {
 							full = 1;
@@ -7128,7 +7187,7 @@ ACMD(do_store) {
 				next_obj = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch)));
 			}
 			
-			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), FALSE)) {
+			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), GET_LOYALTY(ch), FALSE)) {
 				if ((store = find_stored_resource(emp, GET_ISLAND_ID(IN_ROOM(ch)), GET_OBJ_VNUM(obj)))) {
 					if (store->amount >= MAX_STORAGE) {
 						full = 1;

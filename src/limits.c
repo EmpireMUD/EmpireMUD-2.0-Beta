@@ -948,6 +948,7 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 	room_data *to_room, *center = city->location;
 	int radius = city_type[city->type].radius;
 	bool found_building = FALSE;
+	vehicle_data *veh;
 	int x, y;
 	
 	for (x = -1 * radius; x <= radius && !found_building; ++x) {
@@ -963,9 +964,16 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 				
 				if (to_room && ROOM_OWNER(to_room) == emp) {
 					// is any building, and isn't ruins?
-					// TODO: maybe need a ruins flag, as we are up to 3 ruins
-					if (IS_ANY_BUILDING(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_DISREPAIR) && BUILDING_VNUM(to_room) != BUILDING_RUINS_OPEN && BUILDING_VNUM(to_room) != BUILDING_RUINS_FLOODED && BUILDING_VNUM(to_room) != BUILDING_RUINS_CLOSED) {
+					if (IS_ANY_BUILDING(to_room) && !ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_DISREPAIR) && !ROOM_BLD_FLAGGED(to_room, BLD_IS_RUINS)) {
 						found_building = TRUE;
+					}
+					else {	// check for building-vehicles
+						DL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
+							if (VEH_OWNER(veh) == emp && VEH_FLAGGED(veh, VEH_BUILDING) && !VEH_FLAGGED(veh, VEH_IS_RUINS)) {
+								found_building = TRUE;
+								break;
+							}
+						}
 					}
 				}
 			}
@@ -1751,7 +1759,7 @@ void point_update_obj(obj_data *obj) {
 			}
 			
 			// decays-to
-			run_interactions(NULL, GET_OBJ_INTERACTIONS(obj), INTERACT_DECAYS_TO, obj_room(obj), NULL, obj, consumes_or_decays_interact);
+			run_interactions(NULL, GET_OBJ_INTERACTIONS(obj), INTERACT_DECAYS_TO, obj_room(obj), NULL, obj, NULL, consumes_or_decays_interact);
 			
 			empty_obj_before_extract(obj);
 			extract_obj(obj);
@@ -1857,14 +1865,24 @@ void autostore_vehicle_contents(vehicle_data *veh) {
 */
 void point_update_vehicle(vehicle_data *veh) {
 	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
+	void ruin_vehicle(vehicle_data *veh, char *message);
+	bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
+	
+	char *msg;
 	
 	// autostore
 	if ((time(0) - VEH_LAST_MOVE_TIME(veh)) > (config_get_int("autostore_time") * SECS_PER_REAL_MIN)) {
 		autostore_vehicle_contents(veh);
 	}
 
-	// burny burny burny! (do this last)
+	if (!vehicle_allows_climate(veh, IN_ROOM(veh))) {
+		// this will extract it (usually)
+		msg = veh_get_custom_message(veh, VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM);
+		ruin_vehicle(veh, msg ? msg : "$V falls into ruin!");
+		return;
+	}
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		// burny burny burny!
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			act("The flames roar as they envelop $V!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}

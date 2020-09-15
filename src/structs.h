@@ -205,6 +205,8 @@
 #define TYPE_MOB  1
 #define TYPE_ROOM  2
 #define TYPE_MINE_DATA  3
+#define TYPE_BLD  4
+#define TYPE_VEH  5
 
 
 // basic types
@@ -322,6 +324,15 @@ typedef struct vehicle_data vehicle_data;
 #define BAN_ALL  3
 
 
+// CONF_FLAG_x: config system flags
+#define CONF_FLAG_DEPRECATED  BIT(0)
+// limit: 15, struct config_type
+
+
+// EVOLVER_x: flags passed through to evolve.c
+#define EVOLVER_OWNED  BIT(0)	// tile is owned
+
+
 // for modify.c
 #define FORMAT_INDENT	BIT(0)
 
@@ -375,7 +386,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_DECAYS_TO  26
 #define INTERACT_CONSUMES_TO  27
 #define INTERACT_IDENTIFIES_TO  28
-#define NUM_INTERACTS  29
+#define INTERACT_RUINS_TO_BLD  29
+#define INTERACT_RUINS_TO_VEH  30
+#define NUM_INTERACTS  31
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
@@ -434,6 +447,7 @@ typedef struct vehicle_data vehicle_data;
 #define REQ_EVENT_NOT_RUNNING  37
 #define REQ_LEVEL_UNDER  38
 #define REQ_LEVEL_OVER  39
+#define REQ_OWN_VEHICLE_FUNCTION  40
 
 
 // REQ_AMT_x: How numbers displayed for different REQ_ types
@@ -727,7 +741,7 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_INTERLINK  BIT(5)	// can be interlinked
 #define BLD_HERD  BIT(6)	// can herd
 #define BLD_DEDICATE  BIT(7)	// can be dedicated to a player
-#define BLD_NO_RUINS  BIT(8)	// building leaves no corpse
+#define BLD_IS_RUINS  BIT(8)	// building counts as ruins
 #define BLD_NO_NPC  BIT(9)	// mobs won't walk in
 #define BLD_BARRIER  BIT(10)	// can only go back the direction you came
 #define BLD_IN_CITY_ONLY  BIT(11)	// can only be used in-city
@@ -769,7 +783,7 @@ typedef struct vehicle_data vehicle_data;
 // #define BLD_UNUSED26  BIT(47)
 
 
-// BLD_ON_x: Terrain flags for do_build -- these match up with build_on flags for building crafts
+// BLD_ON_x: Terrain flags for building crafts -- these match up with build_on flags for building crafts
 #define BLD_ON_WATER  BIT(0)
 #define BLD_ON_PLAINS  BIT(1)
 #define BLD_ON_MOUNTAIN  BIT(2)
@@ -793,11 +807,13 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_LAKE  BIT(20)
 #define BLD_ON_BASE_TERRAIN_ALLOWED  BIT(21)	// for facing-only, allows the base sector to match
 #define BLD_ON_GIANT_TREE  BIT(22)
+#define BLD_ON_ROAD  BIT(23)	// use on vehicles but not buildings
 
 
 // BLD_REL_x: relationships with other buildings
 #define BLD_REL_UPGRADES_TO  0	// upgrades to another building type
-#define BLD_REL_STORES_LIKE  1	// acts like another building for storage locations
+#define BLD_REL_STORES_LIKE_BLD  1	// acts like another building for storage locations
+#define BLD_REL_STORES_LIKE_VEH  2	// acts like another building for storage locations
 
 
 // tavern types
@@ -832,7 +848,7 @@ typedef struct vehicle_data vehicle_data;
 
 // FNC_x: function flags (for buildings)
 #define FNC_ALCHEMIST  BIT(0)	// can brew and mix here
-#define FNC_APIARY  BIT(1)	// no current use
+#define FNC_APIARY  BIT(1)	// beekeeping chore
 #define FNC_BATHS  BIT(2)	// can use the bathe command here
 #define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
 #define FNC_CARPENTER  BIT(4)	// required by some crafts
@@ -1038,7 +1054,7 @@ typedef struct vehicle_data vehicle_data;
 
 // CRAFT_x: Craft Flags for do_gen_craft
 #define CRAFT_POTTERY  BIT(0)  // bonus at pottery; requires fire
-	#define CRAFT_UNUSED0  BIT(1)  // formerly "requires apiary tech"
+#define CRAFT_BUILDING  BIT(1)  // makes a building (on any craft type; BUILD type automatically counts as this)
 	#define CRAFT_UNUSED1  BIT(2)  // formerly "requires glassblowing tech"
 #define CRAFT_GLASSBLOWER  BIT(3)  // requires glassblower building
 #define CRAFT_CARPENTER  BIT(4)  // requires carpenter building
@@ -1091,6 +1107,7 @@ typedef struct vehicle_data vehicle_data;
 #define DELAY_REFRESH_CROP_VARIETY  BIT(0)	// refreshes specific progress goals
 #define DELAY_REFRESH_GOAL_COMPLETE  BIT(1)	// checks for finished progress
 #define DELAY_REFRESH_MEMBERS  BIT(2)	// re-reads empire member data
+#define DELAY_REFRESH_GREATNESS  BIT(3)	// refreshes members-and-greatness
 
 
 // EADM_x: empire admin flags
@@ -1305,6 +1322,10 @@ typedef struct vehicle_data vehicle_data;
 #define WF_PROB_ALREADY_SHEARED  4	// mob sheared too recently
 #define WF_PROB_DELAYED  5	// delayed by a previous failure
 #define WF_PROB_OUT_OF_CITY  6	// building requires in-city
+
+
+// for tracking playtime
+#define PLAYTIME_WEEKS_TO_TRACK  12	// playtime determined by past 12 weeks
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2060,6 +2081,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_PEACE  BIT(40)
 #define GRANT_UNPROGRESS  BIT(41)
 #define GRANT_EVENTS  BIT(42)
+#define GRANT_TRIGGERS  BIT(43)
 
 
 // Lore types
@@ -2452,6 +2474,14 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_PLAYER_NO_DISMANTLE  BIT(24)	// y. player toggled no-dismantle on
 #define VEH_DISMANTLING  BIT(25)	// z. is being dismantled
 #define VEH_PLAYER_NO_WORK  BIT(26)	// A. player has marked it no-work
+#define VEH_CHAMELEON  BIT(27)	// B. vehicle's icon isn't visible at a distance
+#define VEH_INTERLINK  BIT(28)	// C. rooms can be interlinked with nearby interlink-flagged vehicles or rooms
+#define VEH_IS_RUINS  BIT(29)	// D. counts as ruins for cities/decay
+
+// VEH_CUSTOM_x: custom message types
+#define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin
+#define VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM 1	// sent when the vehicle is destroyed by climate flags
+
 
 // VSPEED_x: indicates the number of speed bonuses this vehicle gives to driving.
 #define VSPEED_VERY_SLOW  0 // No speed bonuses.
@@ -2463,7 +2493,7 @@ typedef struct vehicle_data vehicle_data;
 // The following vehicle flags are saved to file rather than read from the
 // prototype. Flags which are NOT included in this list can be altered with
 // OLC and affect live copies.
-#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE | VEH_PLAYER_NO_DISMANTLE | VEH_DISMANTLING)
+#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE | VEH_PLAYER_NO_DISMANTLE | VEH_DISMANTLING | VEH_CHAMELEON)
 
 // The following vehicle flags indicate a vehicle can move
 #define MOVABLE_VEH_FLAGS  (VEH_DRIVING | VEH_SAILING | VEH_FLYING | VEH_DRAGGABLE | VEH_CAN_PORTAL | VEH_LEADABLE)
@@ -2585,7 +2615,9 @@ typedef struct vehicle_data vehicle_data;
 #define EVO_HARVEST_TO  18	// always harvests to a specific sector type (no matter what it was when planted)
 #define EVO_DEFAULT_HARVEST_TO  19	// sect it becomes when harvested/cleared IF no data exists
 #define EVO_TIMED  20	// evolves after a certain number of minutes
-#define NUM_EVOS  21	// total
+#define EVO_OWNED  21	// evolves if owned
+#define EVO_UNOWNED  22	// evolves if un-owned
+#define NUM_EVOS  23	// total
 
 // EVO_VAL_x: evolution value types
 #define EVO_VAL_NONE  0
@@ -2610,8 +2642,6 @@ typedef struct vehicle_data vehicle_data;
 // ROOM_AFF_x: Room affects -- these are similar to room flags, but if you want to set them
 // in a "permanent" way, set the room's base_affects as well as its current
 // affects.
-// TODO this system could be cleaned up by adding an affect_total_room that
-// applies permanent affects to the room's current affects on its own.
 #define ROOM_AFF_DARK  BIT(0)	// a. Torches don't work
 #define ROOM_AFF_SILENT  BIT(1)	// b. Can't speak/hear
 #define ROOM_AFF_HAS_INSTANCE  BIT(2)	// c. an instance is linked here
@@ -2633,7 +2663,8 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_FAKE_INSTANCE  BIT(18)	// s. room is a fake_loc for an instance
 #define ROOM_AFF_NO_ABANDON  BIT(19)	// t. cannot abandon by accident
 #define ROOM_AFF_REPEL_NPCS  BIT(20)	// u. all npcs are prevented from wandering in
-#define ROOM_AFF_REPEL_ANIMALS  BIT(21)	// u. animals are prevented from wandering in
+#define ROOM_AFF_REPEL_ANIMALS  BIT(21)	// v. animals are prevented from wandering in
+#define ROOM_AFF_NO_WORKFORCE_EVOS  BIT(22)	// w. workforce chores that would evolve the tile don't run
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
@@ -2647,7 +2678,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_TAVERN_TYPE  4
 #define ROOM_EXTRA_TAVERN_BREWING_TIME  5
 #define ROOM_EXTRA_TAVERN_AVAILABLE_TIME  6
-#define ROOM_EXTRA_RUINS_ICON  7
+	#define ROOM_EXTRA_UNUSED  7	// formerly ruins-icon
 #define ROOM_EXTRA_CHOP_PROGRESS  8
 #define ROOM_EXTRA_TRENCH_PROGRESS  9
 #define ROOM_EXTRA_HARVEST_PROGRESS  10
@@ -2662,11 +2693,6 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_TRENCH_ORIGINAL_SECTOR  19	// for un-trenching correctly
 #define ROOM_EXTRA_ORIGINAL_BUILDER  20	// person who started the building
 #define ROOM_EXTRA_SECTOR_TIME  21	// when it became this sector type (for types with a timed evo)
-
-
-// number of different appearances
-#define NUM_RUINS_ICONS  7
-#define NUM_SWAMP_DISPLAYS  4
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2826,6 +2852,7 @@ struct config_type {
 	CONFIG_HANDLER(*show_func);
 	CONFIG_HANDLER(*edit_func);
 	void *custom_data;
+	sh_int config_flags;	// set in init_config_system
 	
 	UT_hash_handle hh;	// config_table hash
 };
@@ -3556,7 +3583,7 @@ struct bld_data {
 	struct interaction_item *interactions;	// interaction items
 	struct trig_proto_list *proto_script;	// list of default triggers
 	struct resource_data *yearly_maintenance;	// needed each year
-	struct bld_relation *relations;	// links to other buildings
+	struct bld_relation *relations;	// links to buildings/vehicles
 	
 	// live data (not saved, not freed)
 	struct quest_lookup *quest_lookups;
@@ -3566,10 +3593,10 @@ struct bld_data {
 };
 
 
-// for relationships between buildings
+// for relationships between buildings/vehicles
 struct bld_relation {
 	int type;	// BLD_REL_
-	bld_vnum vnum;	// building vnum
+	any_vnum vnum;	// relevant vnum
 	
 	struct bld_relation *next;
 };
@@ -3765,9 +3792,6 @@ struct player_index_data {
 	empire_data *loyalty;	// empire, if any
 	int rank;	// empire rank
 	char *last_host;	// last known host
-	
-	bool contributing_greatness;	// whether or not this alt is currently contributing greatness to their empire
-	int greatness_threshold;	// level at which this alt would start/stop contributing greatness
 	
 	UT_hash_handle idnum_hh;	// player_table_by_idnum
 	UT_hash_handle name_hh;	// player_table_by_name
@@ -4538,6 +4562,14 @@ struct empire_completed_goal {
 };
 
 
+// tracks how much an empire is actually playing
+struct empire_playtime_tracker {
+	int cycle;	// hash key: using DAILY_CYCLE_DAY
+	int playtime_secs;	// total playtime in seconds
+	UT_hash_handle hh;
+};
+
+
 // permanent counts of totals of items accumulated by the empire, for use in progress goals/quests
 struct empire_production_total {
 	obj_vnum vnum;	// which item
@@ -4602,6 +4634,23 @@ struct empire_log_data {
 	char *string;
 	
 	struct empire_log_data *next;
+};
+
+
+// non-saving shortcut of member data
+struct empire_member_account {
+	int id;	// player account id
+	struct empire_member_data *list;
+	UT_hash_handle hh;	// EMPIRE_MEMBER_ACCOUNTS(), hashed by id
+};
+
+
+// non-saving shortcut of member data
+struct empire_member_data {
+	int id;	// player character idnum
+	int greatness;	// greatness of character
+	time_t timeout_at;	// timestamp when they did/will time out
+	UT_hash_handle hh;	// empire_member_account->list, hashed by id
 };
 
 
@@ -4812,6 +4861,7 @@ struct empire_data {
 	struct empire_homeless_citizen *homeless;	// list of homeless npcs
 	struct script_data *script;	// for storing variables
 	struct workforce_production_limit *production_limits;	// limits on what workforce can make
+	struct empire_playtime_tracker *playtime_tracker;	// tracks real gameplay
 	
 	// unsaved data
 	struct empire_territory_data *territory_list;	// hash table by vnum
@@ -4842,6 +4892,7 @@ struct empire_data {
 	int min_level;	// minimum level in the empire
 	int max_level;	// maximum level in the empire
 	bitvector_t delayed_refresh;	// things that are requesting an update
+	struct empire_member_account *member_accounts;	// tracks greatness/etc
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them
@@ -5207,7 +5258,8 @@ struct eq_set_obj {
 
 // for where an item can be stored
 struct obj_storage_type {
-	bld_vnum building_type;	// building vnum
+	int type;	// TYPE_BLD or TYPE_VEH
+	any_vnum vnum;	// building/vehicle vnum
 	int flags;	// STORAGE_x
 	
 	struct obj_storage_type *next;
@@ -5548,12 +5600,18 @@ struct vehicle_attribute_data {
 	bitvector_t designate_flags;	// DES_ flags
 	struct resource_data *yearly_maintenance;
 	int veh_move_speed;  // VSPEED_ for driving action speed
+	int size;	// vehicle size
 	struct extra_descr_data *ex_description;	// extra descriptions
 	struct interaction_item *interactions;	// interaction items
 	struct spawn_info *spawns;	// linked list of spawn data
+	bitvector_t room_affects;	// ROOM_AFF_ flags applied to the room while veh is here
 	bitvector_t functions;	// FNC_ flags offered to the room the vehicle is in
+	bitvector_t requires_climate;	// CLIM_ flags required for this vehicle to enter a room
+	bitvector_t forbid_climate;	// CLIM_ flags that block this vehicle from entering
 	int fame;	// how much fame it adds to the empire
 	int military;	// how much it adds to the military pool
+	struct custom_message *custom_msgs;	// any custom messages
+	struct bld_relation *relations;	// links to buildings/vehicles
 };
 
 
@@ -5759,7 +5817,7 @@ struct track_data {
 	time_t timestamp;	// when
 	byte dir;	// which way
 	
-	struct track_data *next;
+	struct track_data *next, *prev;	// doubly-linked list
 };
 
 

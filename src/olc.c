@@ -477,13 +477,16 @@ OLC_MODULE(tedit_string);
 OLC_MODULE(tedit_types);
 
 // vehicle modules
+OLC_MODULE(vedit_affects);
 OLC_MODULE(vedit_animalsrequired);
 OLC_MODULE(vedit_capacity);
+OLC_MODULE(vedit_custom);
 OLC_MODULE(vedit_designate);
 OLC_MODULE(vedit_extra_desc);
 OLC_MODULE(vedit_extrarooms);
 OLC_MODULE(vedit_fame);
 OLC_MODULE(vedit_flags);
+OLC_MODULE(vedit_forbidclimate);
 OLC_MODULE(vedit_functions);
 OLC_MODULE(vedit_hitpoints);
 OLC_MODULE(vedit_icon);
@@ -496,8 +499,11 @@ OLC_MODULE(vedit_maxlevel);
 OLC_MODULE(vedit_military);
 OLC_MODULE(vedit_minlevel);
 OLC_MODULE(vedit_movetype);
+OLC_MODULE(vedit_relations);
+OLC_MODULE(vedit_requiresclimate);
 OLC_MODULE(vedit_resource);
 OLC_MODULE(vedit_script);
+OLC_MODULE(vedit_size);
 OLC_MODULE(vedit_shortdescription);
 OLC_MODULE(vedit_spawns);
 OLC_MODULE(vedit_speed);
@@ -1077,13 +1083,16 @@ const struct olc_command_data olc_data[] = {
 	{ "types", tedit_types, OLC_TRIGGER, OLC_CF_EDITOR },
 	
 	// vehicle commands
+	{ "affects", vedit_affects, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "animalsrequired", vedit_animalsrequired, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "capacity", vedit_capacity, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "custom", vedit_custom, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "designate", vedit_designate, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "extra", vedit_extra_desc, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "extrarooms", vedit_extrarooms, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "fame", vedit_fame, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "flags", vedit_flags, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "forbidclimate", vedit_forbidclimate, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "functions", vedit_functions, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "hitpoints", vedit_hitpoints, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "icon", vedit_icon, OLC_VEHICLE, OLC_CF_EDITOR },
@@ -1096,9 +1105,12 @@ const struct olc_command_data olc_data[] = {
 	{ "military", vedit_military, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "minlevel", vedit_minlevel, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "movetype", vedit_movetype, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "relations", vedit_relations, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "requiresclimate", vedit_requiresclimate, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "resource", vedit_resource, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "script", vedit_script, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "shortdescription", vedit_shortdescription, OLC_VEHICLE, OLC_CF_EDITOR },
+	{ "size", vedit_size, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "spawns", vedit_spawns, OLC_VEHICLE, OLC_CF_EDITOR },
 	{ "speed", vedit_speed, OLC_VEHICLE, OLC_CF_EDITOR },
 	
@@ -4169,6 +4181,35 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 
 
 /**
+* Shows the target of an interaction by type,vnum.
+*
+* @param int type A TYPE_ flag like TYPE_OBJ.
+* @param any_vnum vnum The thing of that type.
+* @return char* A string for the name of that object.
+*/
+const char *get_interaction_target(int type, any_vnum vnum) {
+	// TYPE_x: interaction display
+	switch (interact_vnum_types[type]) {
+		case TYPE_MOB: {
+			return skip_filler(get_mob_name_by_proto(vnum, FALSE));
+		}
+		case TYPE_OBJ: {
+			return skip_filler(get_obj_name_by_proto(vnum));
+		}
+		case TYPE_BLD: {
+			return skip_filler(get_bld_name_by_proto(vnum));
+		}
+		case TYPE_VEH: {
+			return skip_filler(get_vehicle_name_by_proto(vnum));
+		}
+		default: {
+			return "unknown";
+		}
+	}
+}
+
+
+/**
 * Displays the interactions data from a given list.
 *
 * @param struct interaction_item *list Pointer to the start of a list of interactions.
@@ -4176,22 +4217,14 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 */
 void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 	extern const char *interact_types[];
-	extern const byte interact_vnum_types[NUM_INTERACTS];
 
 	struct interaction_item *interact;
-	char lbuf[MAX_STRING_LENGTH];
 	int count = 0;
 	
 	*save_buffer = '\0';
 	
 	for (interact = list; interact; interact = interact->next) {
-		if (interact_vnum_types[interact->type] == TYPE_MOB) {
-			strcpy(lbuf, skip_filler(get_mob_name_by_proto(interact->vnum, FALSE)));
-		}
-		else {
-			strcpy(lbuf, skip_filler(get_obj_name_by_proto(interact->vnum)));
-		}
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %dx %s (%d) %.2f%%", ++count, interact_types[interact->type], interact->quantity, lbuf, interact->vnum, interact->percent);
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %dx %s (%d) %.2f%%", ++count, interact_types[interact->type], interact->quantity, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
 		if (isalpha(interact->exclusion_code)) {
 			sprintf(save_buffer + strlen(save_buffer), " (%c)", interact->exclusion_code);
 		}
@@ -5125,7 +5158,8 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 			need_bld = TRUE;
 			break;
 		}
-		case REQ_OWN_BUILDING_FUNCTION: {
+		case REQ_OWN_BUILDING_FUNCTION:
+		case REQ_OWN_VEHICLE_FUNCTION: {
 			need_func_flags = TRUE;
 			break;
 		}
@@ -5416,6 +5450,170 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 	
 	// all good
 	return TRUE;
+}
+
+
+/**
+* Processing for bld/veh relations.
+*
+* @param char_data *ch The player using OLC.
+* @param char *argument The full argument after the command.
+* @param struct bld_relation **list A pointer to the list we're adding/changing.
+*/
+void olc_process_relations(char_data *ch, char *argument, struct bld_relation **list) {
+	void free_bld_relations(struct bld_relation *list);
+	void smart_copy_bld_relations(struct bld_relation **to_list, struct bld_relation *from_list);
+	extern const char *bld_relationship_types[];
+	extern const int bld_relationship_vnum_types[];
+	
+	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
+	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	struct bld_relation *relat, *iter, *copyfrom;
+	int findtype, num, rtype;
+	any_vnum vnum;
+	bool found, none;
+	
+	argument = any_one_arg(argument, cmd_arg);	// add/remove/change/copy
+	
+	if (is_abbrev(cmd_arg, "copy")) {
+		// usage: qedit starts/ends copy <from type> <from vnum> <starts/ends>
+		argument = any_one_arg(argument, type_arg);	// just "building" for now
+		argument = any_one_arg(argument, vnum_arg);	// any vnum for that type
+		argument = any_one_arg(argument, field_arg);	// starts/ends
+		
+		if (!*type_arg || !*vnum_arg) {
+			msg_to_char(ch, "Usage: relations copy <from type> <from vnum> [starts | ends]\r\n");
+		}
+		else if ((findtype = find_olc_type(type_arg)) == 0) {
+			msg_to_char(ch, "Unknown olc type '%s'.\r\n", type_arg);
+		}
+		else if (!isdigit(*vnum_arg)) {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			msg_to_char(ch, "Copy from which %s?\r\n", buf);
+		}
+		else if ((vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum.\r\n");
+		}
+		else {
+			sprintbit(findtype, olc_type_bits, buf, FALSE);
+			copyfrom = NULL;
+			none = FALSE;
+			
+			switch (findtype) {
+				case OLC_BUILDING: {
+					bld_data *from_bld = building_proto(vnum);
+					if (from_bld) {
+						copyfrom = GET_BLD_RELATIONS(from_bld);
+						none = copyfrom ? FALSE : TRUE;
+					}
+					break;
+				}
+				case OLC_VEHICLE: {
+					vehicle_data *from_veh = vehicle_proto(vnum);
+					if (from_veh) {
+						copyfrom = VEH_RELATIONS(from_veh);
+						none = copyfrom ? FALSE : TRUE;
+					}
+					break;
+				}
+				default: {
+					msg_to_char(ch, "You can't copy relations from %ss.\r\n", buf);
+					return;
+				}
+			}
+			
+			if (none) {
+				msg_to_char(ch, "No relations to copy from that.\r\n");
+			}
+			else if (!copyfrom) {
+				msg_to_char(ch, "Invalid %s vnum '%s'.\r\n", buf, vnum_arg);
+			}
+			else {
+				smart_copy_bld_relations(list, copyfrom);
+				msg_to_char(ch, "Copied relations from %s %d.\r\n", buf, vnum);
+			}
+		}
+	}	// end 'copy'
+	else if (is_abbrev(cmd_arg, "remove")) {
+		// usage: qedit starts|ends remove <number | all>
+		skip_spaces(&argument);	// only arg is number
+		
+		if (!*argument) {
+			msg_to_char(ch, "Remove which relation (number)?\r\n");
+		}
+		else if (!str_cmp(argument, "all")) {
+			free_bld_relations(*list);
+			*list = NULL;
+			msg_to_char(ch, "You remove all the relations.\r\n");
+		}
+		else if (!isdigit(*argument) || (num = atoi(argument)) < 1) {
+			msg_to_char(ch, "Invalid relation number.\r\n");
+		}
+		else {
+			found = FALSE;
+			LL_FOREACH(*list, iter) {
+				if (--num == 0) {
+					found = TRUE;
+					
+					msg_to_char(ch, "You remove the relation info for %s %d.\r\n", bld_relationship_types[iter->type], iter->vnum);
+					LL_DELETE(*list, iter);
+					free(iter);
+					break;
+				}
+			}
+			
+			if (!found) {
+				msg_to_char(ch, "Invalid relation number.\r\n");
+			}
+		}
+	}	// end 'remove'
+	else if (is_abbrev(cmd_arg, "add")) {
+		// usage: qedit starts|ends add <type> <vnum>
+		argument = any_one_arg(argument, type_arg);
+		argument = any_one_arg(argument, vnum_arg);
+		
+		if (!*type_arg || !*vnum_arg) {
+			msg_to_char(ch, "Usage: relations add <type> <vnum>\r\n");
+		}
+		else if ((rtype = search_block(type_arg, bld_relationship_types, FALSE)) == NOTHING) {
+			msg_to_char(ch, "Invalid type '%s'.\r\n", type_arg);
+		}
+		else if (!isdigit(*vnum_arg) || (vnum = atoi(vnum_arg)) < 0) {
+			msg_to_char(ch, "Invalid vnum '%s'.\r\n", vnum_arg);
+		}
+		else if (bld_relationship_vnum_types[rtype] == TYPE_BLD && !building_proto(vnum)) {
+			msg_to_char(ch, "Unable to find building %d.\r\n", vnum);
+			return;
+		}
+		else if (bld_relationship_vnum_types[rtype] == TYPE_VEH && !vehicle_proto(vnum)) {
+			msg_to_char(ch, "Unable to find vehicle %d.\r\n", vnum);
+			return;
+		}
+		else {
+			// success
+			CREATE(relat, struct bld_relation, 1);
+			relat->type = rtype;
+			relat->vnum = vnum;
+			
+			LL_APPEND(*list, relat);
+			
+			switch (bld_relationship_vnum_types[rtype]) {
+				case TYPE_BLD: {
+					msg_to_char(ch, "You add %s relation: [%d] %s\r\n", bld_relationship_types[rtype], vnum, get_bld_name_by_proto(vnum));
+					break;
+				}
+				case TYPE_VEH: {
+					msg_to_char(ch, "You add %s relation: [%d] %s\r\n", bld_relationship_types[rtype], vnum, get_vehicle_name_by_proto(vnum));
+					break;
+				}
+			}
+		}
+	}	// end 'add'
+	else {
+		msg_to_char(ch, "Usage: relation add <type> <vnum>\r\n");
+		msg_to_char(ch, "Usage: relation copy <from type> <from vnum> [starts/ends]\r\n");
+		msg_to_char(ch, "Usage: relation remove <number | all>\r\n");
+	}
 }
 
 
@@ -6720,7 +6918,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				if (--num == 0) {
 					found = TRUE;
 					
-					msg_to_char(ch, "You remove %s: %dx %s %.2f%%\r\n", interact_types[interact->type], interact->quantity, (interact_vnum_types[interact->type] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(interact->vnum, FALSE)) : skip_filler(get_obj_name_by_proto(interact->vnum))), interact->percent);
+					msg_to_char(ch, "You remove %s: %dx %s %.2f%%\r\n", interact_types[interact->type], interact->quantity, get_interaction_target(interact->type, interact->vnum), interact->percent);
 					REMOVE_FROM_LIST(interact, *list, next);
 					free(interact);
 				}
@@ -6825,6 +7023,12 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		else if (interact_vnum_types[loc] == TYPE_OBJ && !obj_proto(vnum)) {
 			msg_to_char(ch, "Invalid object vnum %d.\r\n", vnum);
 		}
+		else if (interact_vnum_types[loc] == TYPE_BLD && !building_proto(vnum)) {
+			msg_to_char(ch, "Invalid building vnum %d.\r\n", vnum);
+		}
+		else if (interact_vnum_types[loc] == TYPE_VEH && !vehicle_proto(vnum)) {
+			msg_to_char(ch, "Invalid vehicle vnum %d.\r\n", vnum);
+		}
 		else if (num < 1 || num >= 1000) {
 			msg_to_char(ch, "You must choose a quantity between 1 and 1000.\r\n");
 		}
@@ -6855,7 +7059,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			}
 
 			sort_interactions(list);
-			msg_to_char(ch, "You add %s: %dx %s %.2f%%", interact_types[loc], num, (interact_vnum_types[loc] == TYPE_MOB ? skip_filler(get_mob_name_by_proto(vnum, FALSE)) : skip_filler(get_obj_name_by_proto(vnum))), prc);
+			msg_to_char(ch, "You add %s: %dx %s %.2f%%", interact_types[loc], num, get_interaction_target(loc, vnum), prc);
 			if (exc) {
 				msg_to_char(ch, " (%c)", exc);
 			}
@@ -6919,9 +7123,15 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			else if (interact_vnum_types[change->type] == TYPE_OBJ && !obj_proto(vnum)) {
 				msg_to_char(ch, "Invalid object vnum %d.\r\n", vnum);
 			}
+			else if (interact_vnum_types[change->type] == TYPE_BLD && !building_proto(vnum)) {
+				msg_to_char(ch, "Invalid building vnum %d.\r\n", vnum);
+			}
+			else if (interact_vnum_types[change->type] == TYPE_VEH && !vehicle_proto(vnum)) {
+				msg_to_char(ch, "Invalid vehicle vnum %d.\r\n", vnum);
+			}
 			else {
 				change->vnum = vnum;
-				msg_to_char(ch, "Interaction %d vnum changed to [%d] %s.\r\n", atoi(arg2), vnum, (interact_vnum_types[change->type] == TYPE_MOB) ? get_mob_name_by_proto(vnum, FALSE) : get_obj_name_by_proto(vnum));
+				msg_to_char(ch, "Interaction %d vnum changed to [%d] %s.\r\n", atoi(arg2), vnum, get_interaction_target(change->type, vnum));
 			}
 		}
 		else if (is_abbrev(arg3, "percent")) {

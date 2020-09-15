@@ -2,6 +2,8 @@
 cabin tent~
 9173 1
 4 182 0 8 9180 0
+B
+0 0 0
 R
 9180 16 0 0
 R
@@ -11,22 +13,35 @@ S
 reindeer antler dagger~
 9176 1
 1 196 0 32 9175 0
+B
+0 0 0
 R
 9175 1 0 0
 R
 177 2 0 0
 S
 #9180
-cabintent~
+cabintent dismantle~
 -1 1
-8 -1 t 1 9173 0
+8 -1 lt 1 9173 0
 B
 9180 bde op
+S
+#9181
+cabin tent~
+9181 1
+8 -1 nt 1 9173 0
+B
+9180 bdejlnx 0
+R
+5001 2 5 0
 S
 #9182
 wolverine fur cap~
 9182 1
 4 182 0 12 9181 0
+B
+0 0 0
 R
 9181 1 0 0
 R
@@ -36,6 +51,8 @@ S
 polar bear cloak~
 9183 1
 4 182 0 12 9177 0
+B
+0 0 0
 R
 9177 1 0 0
 R
@@ -45,6 +62,8 @@ S
 sealskin leggings~
 9186 1
 4 182 0 12 9185 0
+B
+0 0 0
 R
 9185 1 0 0
 R

@@ -44,7 +44,6 @@ extern const int rev_dir[];
 ACMD(do_dismount);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern int count_harnessed_animals(vehicle_data *veh);
-extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
 extern int get_north_for_char(char_data *ch);
 extern room_data *get_vehicle_interior(vehicle_data *veh);
@@ -53,9 +52,11 @@ extern bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, in
 extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 void scale_item_to_level(obj_data *obj, int level);
 void skip_run_filler(char **string);
+extern int total_vehicle_size_in_room(room_data *room);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 extern bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
+bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 
 // local data
 struct {
@@ -1244,10 +1245,9 @@ void do_unseat_from_vehicle(char_data *ch) {
 
 ACMD(do_board) {
 	char *command = (subcmd == SCMD_ENTER ? "enter" : "board");
-	room_data *was_in = IN_ROOM(ch), *to_room;
+	room_data *to_room;
 	char buf[MAX_STRING_LENGTH];
 	struct vehicle_data *veh;
-	struct follow_type *k;
 
 	one_argument(argument, arg);
 
@@ -1271,6 +1271,9 @@ ACMD(do_board) {
 		// this is a pre-check
 		msg_to_char(ch, "You can't %s that!\r\n", command);
 	}
+	else if (subcmd != SCMD_ENTER && VEH_FLAGGED(veh, VEH_BUILDING)) {
+		msg_to_char(ch, "You can only board vehicles. Use 'enter' instead.\r\n");
+	}
 	else if (VEH_IS_DISMANTLING(veh)) {
 		msg_to_char(ch, "You can't %s it because it's being dismantled.\r\n", command);
 	}
@@ -1283,6 +1286,8 @@ ACMD(do_board) {
 	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
 		msg_to_char(ch, "You don't have permission to %s it.\r\n", command);
 	}
+	
+	// riding/leading checks
 	else if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 		msg_to_char(ch, "You can't %s that while riding.\r\n", command);
 	}
@@ -1290,113 +1295,15 @@ ACMD(do_board) {
 		msg_to_char(ch, "You can't %s it while leading an animal.\r\n", command);
 	}
 	else if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == IN_ROOM(ch) && !VEH_FLAGGED(veh, VEH_CARRY_VEHICLES)) {
-		msg_to_char(ch, "You can't %s it while leading another vehicle.\r\n", command);
+		msg_to_char(ch, "You can't %s it while leading a vehicle.\r\n", command);
 	}
-	else if (GET_LEADING_VEHICLE(ch) && (VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(veh, VEH_CARRY_VEHICLES))) {
+	else if (GET_LEADING_VEHICLE(ch) && VEH_FLAGGED(GET_LEADING_VEHICLE(ch), VEH_NO_LOAD_ONTO_VEHICLE)) {
 		act("You can't lead $V in there.", FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);
 	}
+	
+	// ok:
 	else {
-		// auto-dismount
-		if (IS_RIDING(ch) && !ROOM_BLD_FLAGGED(to_room, BLD_ALLOW_MOUNTS)) {
-			do_dismount(ch, "", 0, 0);
-		}
-		
-		// move ch: out-message
-		snprintf(buf, sizeof(buf), "You %s $V.", command);
-		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
-		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
-			snprintf(buf, sizeof(buf), "$n %ss $V.", command);
-			act(buf, TRUE, ch, NULL, veh, TO_ROOM);
-		}
-		
-		// move ch
-		char_to_room(ch, to_room);
-		qt_visit_room(ch, IN_ROOM(ch));
-		GET_LAST_DIR(ch) = NO_DIR;
-		look_at_room(ch);
-		
-		// move ch: in-message
-		if (!AFF_FLAGGED(ch, AFF_SNEAK)) {
-			snprintf(buf, sizeof(buf), "$n %ss.", command);
-			act(buf, TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-		
-		// move ch: triggers
-		enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
-		entry_memory_mtrigger(ch);
-		greet_mtrigger(ch, NO_DIR);
-		greet_memory_mtrigger(ch);
-		greet_vtrigger(ch, NO_DIR);
-		msdp_update_room(ch);
-		
-		// leading-mob
-		if (GET_LEADING_MOB(ch) && IN_ROOM(GET_LEADING_MOB(ch)) == was_in) {
-			if (!AFF_FLAGGED(GET_LEADING_MOB(ch), AFF_SNEAK)) {
-				act("$n follows $N.", TRUE, GET_LEADING_MOB(ch), NULL, ch, TO_NOTVICT);
-			}
-			
-			char_to_room(GET_LEADING_MOB(ch), to_room);
-			GET_LAST_DIR(GET_LEADING_MOB(ch)) = NO_DIR;
-			look_at_room(GET_LEADING_MOB(ch));
-			
-			if (!AFF_FLAGGED(GET_LEADING_MOB(ch), AFF_SNEAK)) {
-				snprintf(buf, sizeof(buf), "$n %ss.", command);
-				act(buf, TRUE, GET_LEADING_MOB(ch), NULL, NULL, TO_ROOM);
-			}
-			
-			enter_wtrigger(IN_ROOM(GET_LEADING_MOB(ch)), GET_LEADING_MOB(ch), NO_DIR);
-			entry_memory_mtrigger(GET_LEADING_MOB(ch));
-			greet_mtrigger(GET_LEADING_MOB(ch), NO_DIR);
-			greet_memory_mtrigger(GET_LEADING_MOB(ch));
-			greet_vtrigger(GET_LEADING_MOB(ch), NO_DIR);
-		}
-		
-		// leading-vehicle
-		if (GET_LEADING_VEHICLE(ch) && IN_ROOM(GET_LEADING_VEHICLE(ch)) == was_in) {
-			if (ROOM_PEOPLE(was_in)) {
-				act("$v is led behind $M.", TRUE, ROOM_PEOPLE(was_in), GET_LEADING_VEHICLE(ch), ch, TO_CHAR | TO_NOTVICT | ACT_VEHICLE_OBJ);
-			}
-			
-			adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), FALSE);
-			vehicle_to_room(GET_LEADING_VEHICLE(ch), to_room);
-			adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), TRUE);
-			
-			act("$V is led in.", TRUE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
-		}
-		
-		// followers?
-		for (k = ch->followers; k; k = k->next) {
-			if (IN_ROOM(k->follower) != was_in) {
-				continue;
-			}
-			if (GET_POS(k->follower) < POS_STANDING) {
-				continue;
-			}
-			if (!IS_IMMORTAL(k->follower) && !IS_NPC(k->follower) && IS_CARRYING_N(k->follower) > CAN_CARRY_N(k->follower)) {
-				continue;
-			}
-		
-			act("You follow $N.\r\n", FALSE, k->follower, NULL, ch, TO_CHAR);
-			snprintf(buf, sizeof(buf), "$n %ss $V.", command);
-			act(buf, TRUE, k->follower, NULL, veh, TO_ROOM);
-
-			char_to_room(k->follower, to_room);
-			qt_visit_room(k->follower, IN_ROOM(k->follower));
-			GET_LAST_DIR(k->follower) = NO_DIR;
-			look_at_room(k->follower);
-			
-			snprintf(buf, sizeof(buf), "$n %ss.", command);
-			act(buf, TRUE, k->follower, NULL, NULL, TO_ROOM);
-			
-			enter_wtrigger(IN_ROOM(k->follower), k->follower, NO_DIR);
-			entry_memory_mtrigger(k->follower);
-			greet_mtrigger(k->follower, NO_DIR);
-			greet_memory_mtrigger(k->follower);
-			greet_vtrigger(k->follower, NO_DIR);
-			msdp_update_room(k->follower);	// once we're sure we're staying
-		}
-		
-		command_lag(ch, WAIT_OTHER);
+		perform_move(ch, NO_DIR, to_room, MOVE_ENTER_VEH);
 	}
 }
 
@@ -1405,7 +1312,7 @@ ACMD(do_disembark) {
 	vehicle_data *veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
 	room_data *to_room;
 	
-	if (!veh || !(to_room = IN_ROOM(veh)) || (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_EXIT) && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch)))) {
+	if (!veh || !(to_room = IN_ROOM(veh)) || !ROOM_CAN_EXIT(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't disembark from here!\r\n");
 	}
 	else if (VEH_FLAGGED(veh, VEH_BUILDING)) {
@@ -1575,6 +1482,12 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 	else if (GET_ROOM_VEHICLE(to_room) && (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES))) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
+	else if (!vehicle_allows_climate(veh, to_room)) {
+		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
+	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+		act("There is already too much on the other side of $p to drag $V there.", FALSE, ch, portal, veh, TO_CHAR);
+	}
 	else {
 		was_in = IN_ROOM(ch);
 		char_through_portal(ch, portal, FALSE);
@@ -1662,6 +1575,12 @@ ACMD(do_drag) {
 	}
 	else if (ROOM_IS_CLOSED(to_room) && VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
+	}
+	else if (!vehicle_allows_climate(veh, to_room)) {
+		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
+	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
+		act("There is already too much there to drag $V there.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	else {
 		// seems okay enough -- try movement
@@ -1770,10 +1689,10 @@ ACMD(do_drive) {
 	char buf[MAX_STRING_LENGTH];
 	struct vehicle_room_list *vrl;
 	bool was_driving, same_dir, dir_only;
-	char_data *ch_iter;
 	vehicle_data *veh;
+	char_data *ch_iter;
 	obj_data *portal;
-	int dir, dist = -1;
+	int dir = NO_DIR, dist = -1;
 	
 	skip_run_filler(&argument);
 	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word, and is a direction
@@ -1838,18 +1757,16 @@ ACMD(do_drive) {
 	else if (!*argument) {
 		msg_to_char(ch, "You must specify a path to %s using a combination of directions and distances.\r\n", drive_data[subcmd].command);
 	}
-	else if (!strchr(argument, ' ') && (dir = parse_direction(ch, argument)) == NO_DIR) {
-		if ((portal = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
-			do_drive_through_portal(ch, veh, portal, subcmd);
-		}
-		else {
-			msg_to_char(ch, "'%s' isn't a direction you can %s.\r\n", argument, drive_data[subcmd].command);
-		}
+	else if (strlen(argument) > 2 && (portal = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
+		do_drive_through_portal(ch, veh, portal, subcmd);
 	}
 	else if (!dir_only && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
 		// sends own error
 	}
-	else if (!dir_only && (dir == -1 || dir == DIR_RANDOM)) {
+	else if (dir == NO_DIR && (dir = parse_direction(ch, argument)) == NO_DIR) {
+		msg_to_char(ch, "'%s' isn't a direction you can %s.\r\n", argument, drive_data[subcmd].command);
+	}
+	else if (!dir_only && (dir == NO_DIR || dir == DIR_RANDOM)) {
 		msg_to_char(ch, "Invalid path string.\r\n");
 	}
 	else if (dir == DIR_RANDOM || !dir_to_room(IN_ROOM(veh), dir, FALSE) || (subcmd != SCMD_PILOT && !is_flat_dir[dir])) {

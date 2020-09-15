@@ -488,6 +488,7 @@ Vehicles (VEDIT):
   maintenance set, it will add a "pouch of nails" instead.
 - If a vehicle takes damage that's less than 10% of its hitpoints, it still
   needs repair but doesn't require any additional resources.
+- You should generally avoid putting object storage on moving vehicles.
 - See BUILDING-VEHICLES
 #d
 "OLC LEVELS" "OLC SCALING" "OLC SCALE"
@@ -1906,13 +1907,15 @@ Usually an augment should be locked down to just one wear flag.
 
 See also: OEDIT WEAR, OLC AUGMENTS
 #d
-"BEDIT AFFECTS" "REDIT AFFECTS"
+"BEDIT AFFECTS" "REDIT AFFECTS" "VEDIT AFFECTS"
 
 Usage:  .affects [add | remove] <flags>
 
 Each building (or room template) type may have a default set of room affect
 flags. These are added to the building tile when built, or are present on a
-room that is instantiated from a room template.
+room that is instantiated from a room template. Vehicles that have these flags
+apply the flags to any room they're in. The building or vehicle must be
+complete.
 
 Available affects:
  DARK - magically dark and the map tile shows as blank
@@ -1926,6 +1929,7 @@ Available affects:
  !ABANDON - cannot be abandoned (managed by empires)
  REPEL-NPCS - npcs won't wander in
  REPEL-ANIMALS - animal npcs won't wander in
+ NO-WORKFORCE-EVOS - workforce won't do chores that would change the tile type
 
 Some affects are managed by live data and commands (do not set affects with *):
  *HAS-INSTANCE - an adventure is linked here
@@ -2081,7 +2085,7 @@ Available flags:
  HERD - mobs can be herded into this building
  DEDICATE - can be dedicated to a patron god or player, which adds "of Name"
     to the room title
- !RUINS - building leaves no ruins when it decays
+ IS-RUINS - counts as ruins (affects cities and decay)
  !NPC - mobs won't enter this building
  BARRIER - can only go back the way you came, unless flying
  IN-CITY-ONLY - can only be used if in an established city
@@ -2266,19 +2270,20 @@ room title is "A Foul-Smelling Outhouse", the name should be "Outhouse".
 
 See also: BEDIT TITLE, OLC BUILDINGS, TERRITORY, VNUM
 #d
-"BEDIT RELATIONS" "BEDIT RELATIONSHIPS"
+"BEDIT RELATIONS" "BEDIT RELATIONSHIPS" "VEDIT RELATIONS" "VEDIT RELATIONSHIPS"
 
 Usage:  .relation add <type> <vnum>
-        .relation change <number> vnum <value>
         .relation copy building <from vnum>
         .relation remove <number | all>
 
-Relations link this building to other buildings in various ways:
+Relations link this building/vehicle to other buildings/vehicles in various
+ways:
 
 Available relationship types:
  &cUPGRADES-TO&0 - This building can be upgraded to that type.
- &cSTORES-LIKE&0 - Anything that can be stored there can be stored here.
-                      (this does not include warehouses; use function flags)
+ &cSTORES-LIKE-BLD&0 - Anything that can be stored there can be stored here.
+ &cSTORES-LIKE-VEH&0 - Anything that can be stored there can be stored here.
+                  (stores-like does not include warehouses; use function flags)
 
 See also: OLC BUILDINGS
 #d
@@ -2459,6 +2464,7 @@ The following flags are available:
  &cestuary&0 - where the river meets the sea
  &clake&0 - a lake tile
  &cbase-terrain-allowed&0 - *** do not use for buildon
+ &croad&0 - *** only use for vehicles, not real buildings
 
 See also: CEDIT BUILDFACING, OLC CRAFTS
 #d
@@ -2497,6 +2503,7 @@ live, at which point it becomes available to players who have the right skill.
 
 Available flags:
  POTTERY - always requires cooking fire, goes faster at potter's hut
+ BUILDING - makes a building (not needed on the BUILD craft type)
  GLASSBLOWER - requires being at glassblower building
  CARPENTER - requires being at a carpenter building
  ALCHEMY - requires cooking fire or alchemist/laboratory
@@ -3829,6 +3836,8 @@ Scaling based on item types:
  ammo - the "damage" value
  pack - the "capacity" value
 
+The following attributes never scale: greatness, age, crafting, blood-upkeep
+
 Applies and item values of 0 are ignored and do not get any points assigned.
 
 See also: OLC LEVELS
@@ -4066,9 +4075,10 @@ See also: MAP OLC, OLC BUILDINGS
 #d
 "MAPEDIT RUINS"
 
-Usage:  .map ruin
+Usage:  .map ruin [vehicle]
 
-This command will reduce a map building to ruins.
+This command will reduce the map building you're in to ruins, or will do the
+same to a vehicle you target.
 #d
 "MAPEDIT TERRAIN"
 
@@ -4330,6 +4340,12 @@ Room/vehicle interaction types:
  &cFISH&0 - Things that can be found by fishing here.
  &cPAN&0 - Things that can be found by panning here.
  &cQUARRY&0 - Things you can find by quarrying here.
+ &cRUINS-TO-BLD&0 - What type of ruins building appears here when it's ruined.
+   Only works on buildings, not vehicles. Quantity is ignored. Use #n in the
+   room title to indicate the name of the lost building.
+ &CRUINS-TO-VEH&0 - What type of ruins vehicle appears here when it's ruined.
+   May use #n in the keywords and short/long desc to indicate the name of the
+   building/vehicle that was ruined. Quantity is ignored.
 
 The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
 than 1, the percent is only checked once for the entire quantity. If you want
@@ -5239,6 +5255,7 @@ Fields:
      (note: will not account for objects whose levels are inherited from mobs
      or adventures, see ADVEDIT CASCADE for help)
   &c-material&0 - see OEDIT MATERIAL
+  &c-storable -unstorable&0 - Only get objects with or without storage sites.
   &c-tools&0 - see HELP OEDIT TOOLS
   &c-type&0 - see HELP OEDIT TYPE
   &c-weapontype&0 - see HELP OEDIT WEAPONTYPE
@@ -5411,12 +5428,15 @@ See also: OLC OBJECTS
 #d
 "OEDIT STORAGE"
 
-Usage:  .storage add <building vnum> [flags]
-        .storage change <number> <building | flags> <value>
+Usage:  .storage add <building | vehicle> <vnum> [flags]
+        .storage change <number> flags <value>
         .storage remove <number | all>
 
 This command lets you set where an object may be stored. An object type may
 have any number of storage locations.
+
+You should generally avoid putting storage on moving vehicles -- it is intended
+for stationary vehicles and building-vehicles.
 
 Available flags:
  WITHDRAW - This item requires the "withdraw" empire privilege.
@@ -6739,9 +6759,10 @@ Available tasks:
  &cNOT-COMPLETED-QUEST&0 - Has not completed a certain quest.
  &cNOT-ON-QUEST&0 - Is not currently on a certain quest.
  &cOWN-BUILDING&0 - Empire has a certain building.
- &cOWN-BUILDING-FUNCTION&0^ - Empire has a building with a given function flag.
- &cOWN-VEHICLE&0 - Empire has a certain vehicle.
- &cOWN-VEHICLE-FLAGGED&0^ - Empire has a vehicle with specific flags.
+ &cOWN-BUILDING-FUNCTION&0^ - Empire has a building (or building-vehicle) with a given function flag.
+ &cOWN-VEHICLE&0 - Empire has a certain vehicle (or building-vehicle).
+ &cOWN-VEHICLE-FLAGGED&0^ - Empire has a vehicle (including building-vehicles) with specific flags.
+ &cOWN-VEHICLE-FUNCTION&0^ - Empire has a non-building vehicle with specific functions.
  &cSKILL-LEVEL-OVER&0 - Player has a certain skill at least this high.
  &cSKILL-LEVEL-UNDER&0 - Player has a certain skill no higher than this.
  &cTRIGGERED &r*&0&0 - Activated by a %quest% command in a trigger.
@@ -6758,7 +6779,7 @@ Available tasks:
  &cGET-COINS&0 - Player must get some miscellaneous coins.
  &cCAN-GAIN-SKILL&0 - Player is able to gain a point in a skill.
  &cCROP-VARIETY&0 - Needs produce from a number of different crops.
- &cOWN-HOMES&0 - Empire must have enough citizen homes.
+ &cOWN-HOMES&0 - Empire must have enough citizen homes (in buildings).
  &cOWN-SECTOR&0 - Empire must own enough tiles of this sector type.
  &cEMPIRE-WEALTH&0 - Empire must have a certain amount of wealth.
  &cEMPIRE-FAME&0 - Empire must have a certain amount of fame.
@@ -6883,6 +6904,8 @@ Available types ([value] isn't used unless specified):
  &cDEFAULT-HARVEST-TO&0 - Becomes this sector if a crop is removed and there's
     no stored previous sector to return to.
  &cTIMED&0 - Occurs after the given number of minutes.
+ &cOWNED&0 - Evolves if the tile is claimed.
+ &cUNOWNED&0 - Evolves if the tile is not claimed.
 
 Examples:
  Jungle: .evolution add CHOPPED-DOWN 1 50% 28
@@ -7587,6 +7610,15 @@ Most EmpireMUDs will combine the two systems. Some features, like walls and
 fences, work best as whole-tile buildings. Others, like homes, work better as
 vehicle-buildings.
 
+Traits usually set on building-vehicles:
+- Size: By default, rooms hold up to 4 total size.
+- BUILDING flag: Counts as a build (required).
+- !BUILDING flag: Keeps this building from being put in another building.
+- VISIBLE-IN-DARK flag: Allows players to see it in the dark.
+- Icon: Causes it to show up on the map.
+- NO-WORKFORCE-EVOS affect: Workforce won't do chores that would change the
+  tile type (chopping, etc). For treehouses or similar.
+
 Some important notes:
 - Building-vhicles are only claimed when the whole tile is claimed (unless they
   have a movement flag like DRIVING, in which case they work like vehicles).
@@ -7934,6 +7966,23 @@ total of all items inside.
 
 See also: VEDIT FLAGS, OLC VEHICLES
 #d
+"VEDIT CUSTOM" "VEDIT CUSTOM MESSAGES"
+
+Usage:  .custom add <type> <message>
+        .custom change <number> <type | message> <value>
+        .custom remove <number | all>
+
+You can set custom messages on vehicles.
+
+If you set more than one message of the same type, one will be chosen at
+random each time.
+
+Message types:
+ &cruins-to-room&0 - Shown when it falls into ruins (from decay).
+ &cclimate-change-to-room&0 - Shown when ruined due to climate flag change.
+
+See also: OLC VEHICLES, DOLLAR SIGN CODES
+#d
 "VEDIT DESIGNATE" "DESIGNATE FLAGS"
 
 Usage:  .designate [add | remove] <flags>
@@ -7998,6 +8047,9 @@ Available flags:
  *PLAYER-NO-DISMANTLE - player has toggled no-dismantle on
  *DISMANTLING - is being dismantled
  *PLAYER-NO-WORK - player has toggled no-work on
+ CHAMELEON - vehicle cannot be seen at a distance (when in good repair)
+ INTERLINK - rooms can be interlinked with other interlink-flagged places
+ IS-RUINS - counts as ruins for city status and building decay
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually
@@ -8006,6 +8058,26 @@ than one of these flags can be moved on any valid terrain with any of those
 commands.
 
 See also: OLC VEHICLES
+#d
+"VEDIT FORBIDCLIMATE" "VEDIT FORBID CLIMATE" "VEDIT REQUIRESCLIMATE" "VEDIT REQUIRES CLIMATE"
+
+Usage:  .forbidclimate [add | remove] <flags>
+        .requiresclimate [add | remove] <flags>
+
+If a vehicle has required/forbidden climate types, it affects where the
+vehicle can move (or even exist). If a vehicle is outside of these climates,
+it will be destroyed. Any movement out of these climates is blocked.
+
+Required climates are ones that must be present for the vehicle to enter.
+Forbidden climates are ones the vehicle cannot enter. If you don't set either
+type of climate flags on the vehicle, it is allowed to go anywhere.
+
+Vehicles can always go into the inside of a building/vehicle (if their other
+flags permit it) regardless of climate settings.
+
+On the map, open buildings count as the sector they were built on.
+
+See also: CLIMATE FLAGS
 #d
 "VEDIT FULLSEARCH"
 
@@ -8029,6 +8101,7 @@ Fields:
   &c-military -militaryover -militaryunder&0 - specific military value
   &c-movetype&0 - see HELP VEDIT MOVETYPE
   &c-rooms -roomsover -roomsunder&0 - specific extra rooms value
+  &c-sizeunder -sizeover&0 - check a range of sizes (inclusive)
   &c-speed&0 - see HELP VEDIT SPEED
 
 Examples:
@@ -8232,6 +8305,16 @@ Examples:
  the Enterprise
 
 See also: VEDIT KEYWORDS, VEDIT LONG DESCRIPTION, OLC VEHICLES
+#d
+"VEDIT SIZE" "VEHICLE SIZE"
+
+Usage:  .size <number>
+
+The SIZE trait determines how many vehicles can fit into a room together. For
+vehicles that can move, this is usually 0. For building-vehicles, it is almost
+always higher than 0.
+
+By default, the total size of vehicles in a room cannot be greater than 4.
 #d
 "VEDIT SPEED"
 

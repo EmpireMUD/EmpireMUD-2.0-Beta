@@ -4,12 +4,14 @@ some raw meat~
 Someone has left some raw meat here.~
 The meat doesn't look very fresh. Perhaps you should cook it.
 ~
-3 0 a 0 5
+3 0 a 0 6
 0 0 0
 7 24
+C
+1 1
 O+ 1 6200
 R
-5119 0
+4 5119 0
 S
 #6203
 fish raw~
@@ -17,12 +19,14 @@ some raw fish~
 Someone has left some raw fish here.~
 This fish can be cooked or eaten.
 ~
-6 0 a 0 4
+6 0 a 0 5
 24 0 0
 7 168
+C
+1 1
 O+ 1 6203
 R
-5119 0
+4 5119 0
 S
 #6220
 meat meats cooked~
@@ -31,14 +35,16 @@ Someone has left some cooked meat here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 6
+6 0 a 0 7
 24 0 0
 7 96
+C
+1 1
 O+ 1 6220
 R
-5619 0
+4 5619 0
 R
-5119 0
+4 5119 0
 S
 #6221
 poultry cooked~
@@ -47,14 +53,16 @@ Someone has left some cooked poultry here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 6
+6 0 a 0 7
 24 0 0
 7 96
+C
+1 1
 O+ 1 6221
 R
-5619 0
+4 5619 0
 R
-5119 0
+4 5119 0
 S
 #6222
 pork cooked~
@@ -63,14 +71,16 @@ Someone has left some cooked pork here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 7
+6 0 a 0 8
 24 0 0
 7 96
+C
+1 1
 O+ 1 6222
 R
-5619 0
+4 5619 0
 R
-5119 0
+4 5119 0
 S
 #6223
 fish cooked~
@@ -79,14 +89,16 @@ Someone has left some cooked fish here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 8
+6 0 a 0 9
 24 0 0
 7 96
+C
+1 1
 O+ 1 6223
 R
-5619 0
+4 5619 0
 R
-5119 0
+4 5119 0
 S
 #6224
 meat meats cooked red~
@@ -95,14 +107,16 @@ Someone has left some cooked red meat here.~
    There's no way to tell what sort of animal this came from, but at least it's
 been cooked.
 ~
-6 0 a 0 10
+6 0 a 0 11
 24 0 0
 7 96
+C
+1 1
 O+ 1 6224
 R
-5619 0
+4 5619 0
 R
-5119 0
+4 5119 0
 S
 #6240
 meal cooked~
@@ -110,12 +124,14 @@ a cooked meal~
 A cooked meal has been left here.~
 This meal looks good enough to eat!
 ~
-6 0 a 0 9
+6 0 a 0 10
 24 0 0
 7 96
+C
+1 1
 O+ 1 6240
 R
-5619 0
+4 5619 0
 S
 #6241
 meal cooked vegetarian~
@@ -123,12 +139,14 @@ a cooked vegetarian meal~
 A cooked vegetarian meal has been left here.~
 This meal looks good enough to eat!
 ~
-6 0 a 0 7
+6 0 a 0 8
 24 0 0
 7 96
+C
+1 1
 O+ 1 6241
 R
-5619 0
+4 5619 0
 S
 #6242
 meal cooked meat~
@@ -136,11 +154,13 @@ a meal of cooked meat~
 A meal of cooked meat has been left here.~
 This meal looks good enough to eat!
 ~
-6 0 a 0 8
+6 0 a 0 9
 24 0 0
 7 96
+C
+1 1
 O+ 1 6242
 R
-5619 0
+4 5619 0
 S
 $

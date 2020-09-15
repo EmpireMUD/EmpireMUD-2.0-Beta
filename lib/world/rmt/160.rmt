@@ -25,7 +25,7 @@ A Hollowed Out Cavern~
 clear feel of empty space that was absent before. All around, those same tracks
 from before can be seen, moving back and forth across the floor.
 ~
-bg 0 0
+b 0 0
 D8
 ~
 0 16000
@@ -52,7 +52,7 @@ here a dragon's tooth embedded in the skull of some animal, there vines growing
 through a skeleton in mimicry of a circulatory system. It seems someone has
 been trying to use nature magic to resurrect the long since dead.
 ~
-bg 0 0
+b 0 0
 D14
 ~
 0 16001
@@ -74,7 +74,7 @@ and leads further down into the ground. Far less tracks can be found here, and
 only half of them are the strange looking ones from before. Other noticeable
 tracks are clearly from goblin feet.
 ~
-bg 0 0
+b 0 0
 D14
 ~
 0 16001
@@ -99,7 +99,7 @@ become. It almost seems as though someone worked from underground up. The
 abnormal tracks are almost completely gone from the floor now, and just the
 goblin footsteps show up as signs of constant passage.
 ~
-bg 0 0
+b 0 0
 D3
 ~
 0 16003
@@ -125,7 +125,7 @@ finding tracks on the floor, because it is made of some sort of smoothed stone.
 The walls are striped by supports and even the ceiling shows signs of some
 solid workmanship.
 ~
-bdg 0 0
+bd 0 0
 D3
 ~
 0 16004
@@ -145,7 +145,7 @@ An almost tangible cloud of wrongness blankets the room. The scent of blood is
 strong, and probably could be felt too, if you were willing to place a hand on
 the ritual stones.
 ~
-bg a 0
+b a 0
 D2
 ~
 0 16007
@@ -166,7 +166,7 @@ The Goblin's Chambers~
 to be several runic languages. Years of work are clearly displayed in the
 writing alone, but also in the tomes littering the floor.
 ~
-bg 0 0
+b 0 0
 D0
 ~
 0 16006
@@ -194,7 +194,7 @@ The Goblin's Chambers~
 to be several runic languages. Years of work are clearly displayed in the
 writing alone, but also in the tomes littering the floor.
 ~
-bg 0 0
+b 0 0
 D3
 ~
 0 16007
@@ -219,7 +219,7 @@ The Goblin's Chambers~
 to be several runic languages. Years of work are clearly displayed in the
 writing alone, but also in the tomes littering the floor.
 ~
-bg 0 0
+b 0 0
 D3
 ~
 0 16006

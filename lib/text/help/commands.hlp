@@ -849,9 +849,10 @@ Usage:  toggle extra-spacing [on/off]
 This toggle will insert an extra blank line after your prompt when you type
 any command. This is useful on MUD clients that don't have local echo.
 #
-EXIT
+EXIT LEAVE
 
 Usage:  exit
+        leave
 
 This command attempts to exit the building or vehicle you're in, if possible.
 If you can't exit from your current location, it lists the available exits
@@ -1261,6 +1262,7 @@ See also: RECIPES, PATTERNS, PROGRESS
 LOAD LOADVEHICLE "LOAD VEHICLE" BOATLOAD "BOAT LOAD"
 
 Usage:  load <mob | vehicle | all> <onto vehicle>
+Immortals use:  loadvehicle <mob | vehicle | all> <onto vehicle>
 
 This command allows you to load animals and vehicles onto other vehicles, such
 as ships. To store items in vehicles, use "put <item> <vehicle>" instead.

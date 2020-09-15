@@ -578,6 +578,7 @@ const char *grant_bits[] = {
 	"peace",	// 40
 	"unprogress",
 	"events",
+	"triggers",
 	"\n"
 };
 
@@ -1605,7 +1606,7 @@ struct character_size_data size_data[] = {
 // CRAFT_x (1/2): flag names
 const char *craft_flags[] = {
 	"POTTERY",
-	"*",	// former apiaries tech
+	"BUILDING",
 	"*",	// former glass-tech
 	"GLASSBLOWER",
 	"CARPENTER",
@@ -1650,6 +1651,7 @@ const char *craft_flag_for_info[] = {
 	"must be by a river",
 	"",	// remove-production
 	"",	// take-required-obj
+	"",
 	"\n"
 };
 
@@ -2464,6 +2466,16 @@ const char *container_bits[] = {
 };
 
 
+// CORPSE_x: Corpse flags
+const char *corpse_flags[] = {
+	"EATEN",	// 0
+	"SKINNED",
+	"HUMAN",
+	"NO-LOOT"
+	"\n"
+};
+
+
 /* level of fullness for drink containers */
 const char *fullness[] = {
 	"less than half ",
@@ -2815,6 +2827,7 @@ const char *bld_on_flags[] = {
 	"lake",	// 20
 	"base-terrain-allowed",
 	"giant-tree",
+	"road",
 	"\n"
 };
 
@@ -2847,6 +2860,7 @@ const bitvector_t bld_on_flags_order[] = {
 	BLD_ON_LAKE,
 	
 	// end modifiers
+	BLD_ON_ROAD,
 	BLD_ON_FLAT_TERRAIN,
 	BLD_FACING_OPEN_BUILDING,
 	BLD_ON_BASE_TERRAIN_ALLOWED,
@@ -2866,7 +2880,7 @@ const char *bld_flags[] = {
 	"INTERLINK",	// 5
 	"HERD",
 	"DEDICATE",
-	"!RUINS",
+	"IS-RUINS",
 	"!NPC",
 	"BARRIER",	// 10
 	"IN-CITY-ONLY",
@@ -2910,11 +2924,20 @@ const char *bld_flags[] = {
 };
 
 
-// BLD_REL_x: relationships with other buildings
+// BLD_REL_x (1/2): relationships with other buildings
 const char *bld_relationship_types[] = {
 	"UPGRADES-TO",
-	"STORES-LIKE",
+	"STORES-LIKE-BLD",
+	"STORES-LIKE-VEH",
 	"\n"
+};
+
+
+// BLD_REL_x (2/2): vnum types
+const int bld_relationship_vnum_types[] = {
+	TYPE_BLD,	// "UPGRADES-TO",
+	TYPE_BLD,	// "STORES-LIKE-BLD",
+	TYPE_VEH,	// "STORES-LIKE-VEH",
 };
 
 
@@ -3042,6 +3065,8 @@ const char *evo_types[] = {
 	"HARVEST-TO",
 	"DEFAULT-HARVEST-TO",
 	"TIMED",	// 20
+	"OWNED",
+	"UNOWNED",
 	"\n"
 };
 
@@ -3069,6 +3094,8 @@ const int evo_val_types[NUM_EVOS] = {
 	EVO_VAL_NONE,	// harvest-to
 	EVO_VAL_NONE,	// default-harvest-to
 	EVO_VAL_NUMBER,	// timed (minutes)
+	EVO_VAL_NONE,	// owned
+	EVO_VAL_NONE,	// unowned
 };
 
 
@@ -3095,6 +3122,8 @@ bool evo_is_over_time[] = {
 	FALSE,	// harvest-to
 	FALSE,	// default-harvest-to
 	TRUE,	// timed
+	TRUE,	// owned
+	TRUE,	// unowned
 };
 
 
@@ -3329,6 +3358,7 @@ const char *room_aff_bits[] = {
 	"!ABANDON",
 	"REPEL-NPCS",	// 20
 	"REPEL-ANIMALS",
+	"NO-WORKFORCE-EVOS",
 	"\n"
 };
 
@@ -3358,30 +3388,6 @@ const char *room_extra_types[] = {
 	"original builder",	// 20
 	"sector time",
 	"\n"
-};
-
-
-// used for BUILDING_RUINS_CLOSED
-const char *closed_ruins_icons[NUM_RUINS_ICONS] = {
-	"..&0/]",
-	"&0[\\&?..",
-	"&0|\\&?..",
-	"..&0/|",
-	".&0-&?.&0]",
-	"&0[&?.&0-&?.",
-	"&0[&?__&0]"
-};
-
-
-// used for BUILDING_RUINS_OPEN
-const char *open_ruins_icons[NUM_RUINS_ICONS] = {
-	".&0_i&?.",
-	".&0[.&?.",
-	".&0.v&?.",
-	".&0/]&?.",
-	".&0(\\&?.",
-	".&0}\\.",
-	"&0..}&?."
 };
 
 
@@ -3943,6 +3949,8 @@ const char *interact_types[] = {
 	"DECAYS-TO",
 	"CONSUMES-TO",
 	"IDENTIFIES-TO",
+	"RUINS-TO-BLD",
+	"RUINS-TO-VEH",	// 30
 	"\n"
 };
 
@@ -3978,6 +3986,8 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// decays-to
 	TYPE_OBJ,	// consumes-to
 	TYPE_OBJ,	// IDENTIFIES-TO
+	TYPE_ROOM,	// RUINS-TO-BLD
+	TYPE_ROOM,	// RUINS-TO-VEH
 };
 
 
@@ -4012,6 +4022,8 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// decays-to
 	TYPE_OBJ,	// consumes-to
 	TYPE_OBJ,	// IDENTIFIES-TO
+	TYPE_BLD,	// RUINS-TO-BLD
+	TYPE_VEH,	// RUINS-TO-VEH
 };
 
 
@@ -4089,6 +4101,7 @@ const char *requirement_types[] = {
 	"EVENT-NOT-RUNNING",
 	"LEVEL-UNDER",
 	"LEVEL-OVER",
+	"OWN-VEHICLE-FUNCTION",	// 40
 	"\n",
 };
 
@@ -4271,6 +4284,9 @@ const char *vehicle_flags[] = {
 	"*PLAYER-NO-DISMANTLE",
 	"*DISMANTLING",	// 25
 	"*PLAYER-NO-WORK",
+	"CHAMELEON",
+	"INTERLINK",
+	"IS-RUINS",
 	"\n"
 };
 
@@ -4304,6 +4320,17 @@ const char *identify_vehicle_flags[] = {
 	"is set no-dismantle",
 	"being dismantled",	// 25
 	"is set no-work",
+	"chameleon",
+	"can interlink",
+	"is ruined",
+	"\n"
+};
+
+
+// VEH_CUSTOM_x: custom message types
+const char *veh_custom_types[] = {
+	"ruins-to-room",	// 0
+	"climate-change-to-room",
 	"\n"
 };
 
