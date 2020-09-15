@@ -1692,7 +1692,7 @@ ACMD(do_drive) {
 	char_data *ch_iter;
 	vehicle_data *veh;
 	obj_data *portal;
-	int dir, dist = -1;
+	int dir = NO_DIR, dist = -1;
 	
 	skip_run_filler(&argument);
 	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word, and is a direction
@@ -1757,18 +1757,16 @@ ACMD(do_drive) {
 	else if (!*argument) {
 		msg_to_char(ch, "You must specify a path to %s using a combination of directions and distances.\r\n", drive_data[subcmd].command);
 	}
-	else if (!strchr(argument, ' ') && (dir = parse_direction(ch, argument)) == NO_DIR) {
-		if ((portal = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
-			do_drive_through_portal(ch, veh, portal, subcmd);
-		}
-		else {
-			msg_to_char(ch, "'%s' isn't a direction you can %s.\r\n", argument, drive_data[subcmd].command);
-		}
+	if (strlen(argument) > 2 && (portal = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
+		do_drive_through_portal(ch, veh, portal, subcmd);
 	}
 	else if (!dir_only && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
 		// sends own error
 	}
-	else if (!dir_only && (dir == -1 || dir == DIR_RANDOM)) {
+	else if (dir == NO_DIR && (dir = parse_direction(ch, argument)) == NO_DIR) {
+		msg_to_char(ch, "'%s' isn't a direction you can %s.\r\n", argument, drive_data[subcmd].command);
+	}
+	else if (!dir_only && (dir == NO_DIR || dir == DIR_RANDOM)) {
 		msg_to_char(ch, "Invalid path string.\r\n");
 	}
 	else if (dir == DIR_RANDOM || !dir_to_room(IN_ROOM(veh), dir, FALSE) || (subcmd != SCMD_PILOT && !is_flat_dir[dir])) {
