@@ -2019,7 +2019,12 @@ struct instance_data *get_instance_for_script(int go_type, void *go) {
 				break;
 			}
 			case VEH_TRIGGER: {
-				inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE, TRUE);
+				if (VEH_INSTANCE_ID((vehicle_data*)go) != NOTHING) {
+					inst = get_instance_by_id(VEH_INSTANCE_ID((vehicle_data*)go));
+				}
+				if (!inst) {
+					find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE, TRUE);
+				}
 				break;
 			}
 			case EMP_TRIGGER:

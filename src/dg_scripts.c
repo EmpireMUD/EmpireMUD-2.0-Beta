@@ -5622,6 +5622,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "level")) {
 						snprintf(str, slen, "%d", VEH_SCALE_LEVEL(v));
 					}
+					else if (!str_cmp(field, "link_instance")) {
+						struct instance_data *inst;
+						if (VEH_INSTANCE_ID(v) != NOTHING) {
+							VEH_INSTANCE_ID(v) = NOTHING;
+						}
+						if ((inst = find_instance_by_room(IN_ROOM(v), FALSE, TRUE))) {
+							VEH_INSTANCE_ID(v) = inst->id;
+						}
+						*str = '\0';
+					}
 					break;
 				}
 				case 'm': {	// veh.m*
@@ -6810,6 +6820,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 	char arg[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH];
 	char uid[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
+	vehicle_data *veh;
 	char_data *mob;
 
 	*uid = '\0';
@@ -6939,8 +6950,8 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 					}
 					break;
 				case VEH_TRIGGER: {
-					r = IN_ROOM((vehicle_data*)go);
-					if (*name == 'i' && isdigit(*(name+1)) && (inst = find_instance_by_room(r, FALSE, TRUE))) {
+					veh = (vehicle_data*)go;
+					if (*name == 'i' && isdigit(*(name+1)) && VEH_INSTANCE_ID(veh) != NOTHING && (inst = get_instance_by_id(VEH_INSTANCE_ID(veh)))) {
 						// instance lookup
 						r = find_room_template_in_instance(inst, atoi(name+1));
 					}
