@@ -6822,7 +6822,7 @@ ACMD(do_advance) {
 
 	GET_ACCESS_LEVEL(victim) = newlevel;
 	GET_IMMORTAL_LEVEL(victim) = GET_ACCESS_LEVEL(victim) > LVL_MORTAL ? (LVL_TOP - GET_ACCESS_LEVEL(victim)) : -1;
-	queue_delayed_update(victim, CDU_SAVE);
+	SAVE_CHAR(victim);
 	check_autowiz(victim);
 }
 
