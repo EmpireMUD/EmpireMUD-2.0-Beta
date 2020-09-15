@@ -869,8 +869,16 @@ ACMD(do_bite) {
 		// uid-targeting can hit people in other rooms
 		send_config_msg(ch, "no_person");
 	}
-	else if (ch == victim)
-		msg_to_char(ch, "That seems a bit redundant...\r\n");
+	else if (ch == victim) {
+		// try to pass through to social if targeting self
+		if ((soc = find_social(ch, "bite", TRUE))) {
+			// perform a bite social if possible (pass through args)
+			perform_social(ch, soc, argument);
+		}
+		else {	// social not available?
+			send_config_msg(ch, "must_be_vampire");
+		}
+	}
 	else if (GET_FED_ON_BY(victim))
 		msg_to_char(ch, "Sorry, somebody beat you to it.\r\n");
 	else if (IS_GOD(victim) || IS_IMMORTAL(victim))
