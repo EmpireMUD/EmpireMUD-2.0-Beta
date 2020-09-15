@@ -1885,7 +1885,13 @@ ACMD(do_interlink) {
 	
 	half_chop(argument, arg, arg2);
 	
-	if (!*arg || !*arg2) {
+	if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_INTERLINK)) {
+		msg_to_char(ch, "This %s cannot be interlinked.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(IN_ROOM(ch))));
+	}
+	else if (!GET_ROOM_VEHICLE(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(HOME_ROOM(IN_ROOM(ch)), BLD_INTERLINK)) {
+		msg_to_char(ch, "This building cannot be interlinked.\r\n");
+	}
+	else if (!*arg || !*arg2) {
 		msg_to_char(ch, "Usage: interlink <direction> <room code>\r\n");
 		
 		if (IS_INSIDE(IN_ROOM(ch))) {
@@ -1897,12 +1903,6 @@ ACMD(do_interlink) {
 	}
 	else if (!IS_INSIDE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only interlink the additional interior rooms of buildings.\r\n");
-	}
-	else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_INTERLINK)) {
-		msg_to_char(ch, "This %s cannot be interlinked.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(IN_ROOM(ch))));
-	}
-	else if (!GET_ROOM_VEHICLE(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(HOME_ROOM(IN_ROOM(ch)), BLD_INTERLINK)) {
-		msg_to_char(ch, "This building cannot be interlinked.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You must finish building the room before you can interlink it.\r\n");
