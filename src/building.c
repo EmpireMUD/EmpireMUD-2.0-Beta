@@ -1888,7 +1888,7 @@ ACMD(do_interlink) {
 	if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_INTERLINK)) {
 		msg_to_char(ch, "This %s cannot be interlinked.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(IN_ROOM(ch))));
 	}
-	else if (!GET_ROOM_VEHICLE(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(HOME_ROOM(IN_ROOM(ch)), BLD_INTERLINK)) {
+	else if (!GET_ROOM_VEHICLE(IN_ROOM(ch)) && !GET_BUILDING(IN_ROOM(ch)) && !ROOM_BLD_FLAGGED(HOME_ROOM(IN_ROOM(ch)), BLD_INTERLINK)) {
 		msg_to_char(ch, "This building cannot be interlinked.\r\n");
 	}
 	else if (!*arg || !*arg2) {
