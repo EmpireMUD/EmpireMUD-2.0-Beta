@@ -818,7 +818,7 @@ ACMD(do_throw) {
 		return;
 	}
 	if (ROOM_BLD_FLAGGED(to_room, BLD_ITEM_LIMIT)) {
-		int size = (OBJ_FLAGGED(obj, OBJ_LARGE) ? 2 : 1);
+		int size = obj_carry_size(obj);
 		if ((size + count_objs_in_room(to_room)) > config_get_int("room_item_limit")) {
 			msg_to_char(ch, "You can't throw any more items there.\r\n");
 			return;

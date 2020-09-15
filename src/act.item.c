@@ -182,7 +182,7 @@ int count_objs_in_room(room_data *room) {
 	obj_data *search;
 	
 	DL_FOREACH2(ROOM_CONTENTS(room), search, next_content) {
-		items_in_room += OBJ_FLAGGED(search, OBJ_LARGE) ? 2 : 1;
+		items_in_room += obj_carry_size(search);
 	}
 	
 	return items_in_room;
@@ -1532,7 +1532,7 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	
 	// count items
 	if (mode != SCMD_JUNK && need_capacity) {
-		size = (OBJ_FLAGGED(obj, OBJ_LARGE) ? 2 : 1);
+		size = obj_carry_size(obj);
 		if ((size + count_objs_in_room(IN_ROOM(ch))) > config_get_int("room_item_limit")) {
 			msg_to_char(ch, "You can't drop any more items here.\r\n");
 			return -1;
