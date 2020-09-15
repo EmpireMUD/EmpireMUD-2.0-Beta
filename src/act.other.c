@@ -3394,7 +3394,7 @@ ACMD(do_skin) {
 	}
 	else if (!*arg)
 		msg_to_char(ch, "What would you like to skin?\r\n");
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_type(ch, arg, ch->carrying, ITEM_CORPSE)) && !(obj = get_obj_in_list_vis_prefer_type(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), ITEM_CORPSE))) {
 		// no object found: try mobs in the room
 		if ((vict = get_char_room_vis(ch, arg))) {
 			act("You need to kill $M first.", FALSE, ch, NULL, vict, TO_CHAR);
