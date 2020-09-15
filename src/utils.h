@@ -1558,6 +1558,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VEH_HEALTH(veh)  ((veh)->health)
 #define VEH_ICON(veh)  ((veh)->icon)
 #define VEH_INSIDE_ROOMS(veh)  ((veh)->inside_rooms)
+#define VEH_INSTANCE_ID(veh)  ((veh)->instance_id)
 #define VEH_INTERIOR_HOME_ROOM(veh)  ((veh)->interior_home_room)
 #define VEH_KEYWORDS(veh)  ((veh)->keywords)
 #define VEH_LAST_FIRE_TIME(veh)  ((veh)->last_fire_time)

@@ -1271,6 +1271,7 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 				case ADV_SPAWN_VEH: {
 					if (vehicle_proto(spawn->vnum) && count_vehicles_in_instance(inst, spawn->vnum) < spawn->limit) {
 						veh = read_vehicle(spawn->vnum, TRUE);
+						VEH_INSTANCE_ID(veh) = INST_ID(inst);
 						vehicle_to_room(veh, room);
 						if (INST_LEVEL(inst) > 0) {
 							scale_vehicle_to_level(veh, INST_LEVEL(inst));

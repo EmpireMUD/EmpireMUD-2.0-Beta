@@ -120,6 +120,9 @@ When using field  - The variable returns:
 &cshortdesc&0 - The vehicle's short description (the name the players see).
 &csitting_in&0 - The person who's sitting in/on the vehicle, if any.
 &cunharness&0 - Detaches all mobs that were harnessed to it.
+&cunlink_instance&0 - Disconnects the vehicle from any adventure, meaning it
+   will not be cleaned up when the instance closes (e.g. player gets to keep
+   a vehicle that was loaded inside an instance).
 &cvarexists()&0 - Returns 1 if global variable in subfield exists, 0 if not.
 &cvnum&0 - The vehicle's vnum.
 

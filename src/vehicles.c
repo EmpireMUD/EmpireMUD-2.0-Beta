@@ -1884,6 +1884,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	if (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)) {
 		fprintf(fl, "Health: %.2f\n", VEH_HEALTH(veh));
 	}
+	if (VEH_INSTANCE_ID(veh) != NOTHING) {
+		fprintf(fl, "Instance-id: %d\n", VEH_INSTANCE_ID(veh));
+	}
 	if (VEH_INTERIOR_HOME_ROOM(veh)) {
 		fprintf(fl, "Interior-home: %d\n", GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)));
 	}
@@ -2160,6 +2163,11 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					}
 					VEH_ICON(veh) = fread_string(fl, error);
 				}
+				else if (OBJ_FILE_TAG(line, "Instance-id:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						VEH_INSTANCE_ID(veh) = i_in[0];
+					}
+				}
 				else if (OBJ_FILE_TAG(line, "Interior-home:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
 						VEH_INTERIOR_HOME_ROOM(veh) = real_room(i_in[0]);
@@ -2364,8 +2372,7 @@ void clear_vehicle(vehicle_data *veh) {
 	// attributes init
 	VEH_INTERIOR_ROOM_VNUM(veh) = NOTHING;
 	VEH_CONSTRUCTION_ID(veh) = NOTHING;
-	
-	// Since we've wiped out the attributes above, we need to set the speed to the default of VSPEED_NORMAL (two bonuses).
+	VEH_INSTANCE_ID(veh) = NOTHING;
 	VEH_SPEED_BONUSES(veh) = VSPEED_NORMAL;
 }
 

@@ -5686,6 +5686,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						*str = '\0';
 					}
+					else if (!str_cmp(field, "unlink_instance")) {
+						VEH_INSTANCE_ID(v) = NOTHING;
+						*str = '\0';
+					}
 					break;
 				}
 				case 'v': {	// veh.v*

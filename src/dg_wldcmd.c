@@ -1190,6 +1190,9 @@ WCMD(do_wload) {
 			return;
 		}
 		veh = read_vehicle(number, TRUE);
+		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
+			VEH_INSTANCE_ID(veh) = INST_ID(COMPLEX_DATA(room)->instance);
+		}
 		
 		if (*target && isdigit(*target)) {
 			scale_vehicle_to_level(veh, atoi(target));

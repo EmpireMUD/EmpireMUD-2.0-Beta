@@ -834,6 +834,7 @@ ACMD(do_mload) {
 			return;
 		}
 		veh = read_vehicle(number, TRUE);
+		VEH_INSTANCE_ID(veh) = MOB_INSTANCE_ID(ch);
 		vehicle_to_room(veh, IN_ROOM(ch));
 		
 		if (*target && isdigit(*target)) {

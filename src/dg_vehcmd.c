@@ -1008,7 +1008,8 @@ VCMD(do_vterraform) {
 }
 
 
-VCMD(do_dgvload) {
+VCMD(do_vload) {
+	extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
@@ -1035,7 +1036,7 @@ VCMD(do_dgvload) {
 		return;
 	}
 	
-	inst = find_instance_by_room(room, FALSE, TRUE);
+	inst = get_instance_by_id(VEH_INSTANCE_ID(veh));
 	
 	if (is_abbrev(arg1, "mobile")) {
 		if (!mob_proto(number)) {
@@ -1043,11 +1044,9 @@ VCMD(do_dgvload) {
 			return;
 		}
 		mob = read_mobile(number, TRUE);
-		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-			MOB_INSTANCE_ID(mob) = INST_ID(COMPLEX_DATA(room)->instance);
-			if (MOB_INSTANCE_ID(mob) != NOTHING) {
-				add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
-			}
+		MOB_INSTANCE_ID(mob) = VEH_INSTANCE_ID(veh);
+		if (MOB_INSTANCE_ID(mob) != NOTHING) {
+			add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
 		}
 		char_to_room(mob, room);
 		setup_generic_npc(mob, NULL, NOTHING, NOTHING);
@@ -1147,6 +1146,7 @@ VCMD(do_dgvload) {
 			return;
 		}
 		vehicle = read_vehicle(number, TRUE);
+		VEH_INSTANCE_ID(vehicle) = VEH_INSTANCE_ID(veh);
 		vehicle_to_room(vehicle, room);
 		
 		if (target && *target && isdigit(*target)) {
@@ -1161,11 +1161,11 @@ VCMD(do_dgvload) {
 			scale_vehicle_to_level(vehicle, 0);
 		}
 		
-		get_vehicle_interior(veh);	// ensure inside is loaded
+		get_vehicle_interior(vehicle);	// ensure inside is loaded
 		
 		// ownership
-		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(room))) {
-			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(room)));
+		if (VEH_CLAIMS_WITH_ROOM(vehicle) && ROOM_OWNER(HOME_ROOM(room))) {
+			perform_claim_vehicle(vehicle, ROOM_OWNER(HOME_ROOM(room)));
 		}
 		
 		load_vtrigger(vehicle);
@@ -1689,7 +1689,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "vechoneither", do_vechoneither, NO_SCMD },
 	{ "vforce", do_vforce, NO_SCMD },
 	{ "vheal", do_vheal, NO_SCMD },
-	{ "vload", do_dgvload, NO_SCMD },
+	{ "vload", do_vload, NO_SCMD },
 	{ "vmod", do_vmod, NO_SCMD },
 	{ "vmorph", do_vmorph, NO_SCMD },
 	{ "vpurge", do_vpurge, NO_SCMD },

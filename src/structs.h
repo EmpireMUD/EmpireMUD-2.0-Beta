@@ -5572,6 +5572,7 @@ struct vehicle_data {
 	char_data *driver;	// person driving it
 	int construction_id;	// temporary id used to resume construction/dismantle
 	struct room_extra_data *extra_data;	// hash of misc storage
+	any_vnum instance_id;	// adventure instance the vehicle belongs to, or NOTHING if none
 	
 	// scripting
 	int script_id;	// used by DG triggers - unique id

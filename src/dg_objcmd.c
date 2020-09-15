@@ -1197,7 +1197,7 @@ OCMD(do_oterraform) {
 }
 
 
-OCMD(do_dgoload) {
+OCMD(do_oload) {
 	struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
@@ -1224,9 +1224,8 @@ OCMD(do_dgoload) {
 		obj_log(obj, "oload: object in no location trying to load");
 		return;
 	}
-	
-	if (obj_room(obj)) {
-		inst = find_instance_by_room(obj_room(obj), FALSE, TRUE);
+	else {
+		inst = find_instance_by_room(room, FALSE, TRUE);
 	}
 
 	if (is_abbrev(arg1, "mobile")) {
@@ -1350,6 +1349,9 @@ OCMD(do_dgoload) {
 			return;
 		}
 		veh = read_vehicle(number, TRUE);
+		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
+			VEH_INSTANCE_ID(veh) = INST_ID(COMPLEX_DATA(room)->instance);
+		}
 		vehicle_to_room(veh, room);
 		
 		if (target && *target && isdigit(*target)) {
@@ -1784,7 +1786,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "oechoneither", do_oechoneither, NO_SCMD },
 	{ "oforce", do_oforce, NO_SCMD },
 	{ "oheal", do_oheal, NO_SCMD },
-	{ "oload", do_dgoload, NO_SCMD },
+	{ "oload", do_oload, NO_SCMD },
 	{ "omod", do_omod, NO_SCMD },
 	{ "omorph", do_omorph, NO_SCMD },
 	{ "oown", do_oown, NO_SCMD },
