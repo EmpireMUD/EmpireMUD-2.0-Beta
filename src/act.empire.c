@@ -3718,6 +3718,9 @@ ACMD(do_claim) {
 	else if (FIGHTING(ch)) {
 		msg_to_char(ch, "You're too busy fighting!\r\n");
 	}
+	else if (!emp && !GET_LOYALTY(ch) && PRF_FLAGGED(ch, PRF_NOEMPIRE)) {
+		msg_to_char(ch, "You must toggle no-empire off to claim land.\r\n");
+	}
 	else if (!emp && !(emp = get_or_create_empire(ch))) {
 		msg_to_char(ch, "You don't belong to any empire.\r\n");
 	}
