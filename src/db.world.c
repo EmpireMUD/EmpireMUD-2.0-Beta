@@ -1354,7 +1354,7 @@ void annual_world_update(void) {
 					if (IS_RIDING(d->character)) {
 						perform_dismount(d->character);
 					}
-					write_to_descriptor(d->descriptor, "You're knocked to the ground!\r\n");
+					write_to_descriptor(d->descriptor, "You're knocked to the ground!\r\n\r\n");
 					act("$n is knocked to the ground!", TRUE, d->character, NULL, NULL, TO_ROOM);
 					GET_POS(d->character) = POS_SITTING;
 				}
