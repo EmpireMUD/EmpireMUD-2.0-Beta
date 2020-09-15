@@ -952,7 +952,7 @@ everyone else, stat them to see variables.
 Examples:
   vdelete has_solved_quest 5351
 
-To determine the player ID, stat player:
+To determine the player/mob ID, stat them:
   > stat file test
   Male PC 'Test'  IDNum: [ 3531], In room [    0]
 
