@@ -9227,6 +9227,11 @@ ACMD(do_restore) {
 		sprintf(msg + strlen(msg), "%s!", types);
 	}
 	act(msg, FALSE, vict, NULL, ch, TO_CHAR);
+	
+	// show 3rd-party message in some cases
+	if (all || health || moves || mana || blood || dots) {
+		act("$n is restored!", TRUE, vict, NULL, NULL, TO_CHAR);
+	}
 }
 
 
