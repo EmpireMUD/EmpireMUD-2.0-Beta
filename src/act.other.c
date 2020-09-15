@@ -2876,10 +2876,14 @@ ACMD(do_morph) {
 	void finish_morphing(char_data *ch, morph_data *morph);
 	extern bool morph_affinity_ok(room_data *location, morph_data *morph);
 	
+	char buf[MAX_STRING_LENGTH], line[256];
 	morph_data *morph, *next_morph;
+	bool full = FALSE;
 	double multiplier;
 	obj_data *obj;
 	bool normal, fast;
+	size_t size, lsize;
+	int count;
 	char *tmp;
 	
 	// safety first: mobs must use %morph%
@@ -2891,7 +2895,8 @@ ACMD(do_morph) {
 	skip_spaces(&argument);
 	
 	if (!*argument) {
-		msg_to_char(ch, "You know the following morphs: normal");
+		count = 1;	// counting 'normal'
+		size = snprintf(buf, sizeof(buf), "You know the following morphs:\r\n %-38.38s%s", "normal", PRF_FLAGGED(ch, PRF_SCREEN_READER) ? "\r\n" : "");
 		
 		HASH_ITER(hh, morph_table, morph, next_morph) {
 			if (MORPH_FLAGGED(morph, MORPHF_IN_DEVELOPMENT | MORPHF_SCRIPT_ONLY)) {
@@ -2904,17 +2909,46 @@ ACMD(do_morph) {
 				continue;
 			}
 			
+			// build info line
+			++count;
 			if (strstr(MORPH_SHORT_DESC(morph), "#n")) {
 				tmp = str_replace("#n", PERS(ch, ch, TRUE), MORPH_SHORT_DESC(morph));
-				msg_to_char(ch, ", %s", tmp);
+				lsize = snprintf(line, sizeof(line), "%s", tmp);
 				free(tmp);	// allocated by str_replace
 			}
 			else { // no #n
-				msg_to_char(ch, ", %s", skip_filler(MORPH_SHORT_DESC(morph)));
+				lsize = snprintf(line, sizeof(line), "%s", skip_filler(MORPH_SHORT_DESC(morph)));
+			}
+			
+			// append
+			if (PRF_FLAGGED(ch, PRF_SCREEN_READER) || !(count % 2) || lsize > 38) {
+				if (size + lsize + 3 < sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, " %s\r\n", line);
+				}
+				else {
+					full = TRUE;
+				}
+			}
+			else {
+				if (size + 39 < sizeof(buf)) {
+					size += snprintf(buf + size, sizeof(buf) - size, " %-38.38s", line);
+				}
+				else {
+					full = TRUE;
+				}
 			}
 		}
 		
-		msg_to_char(ch, "\r\n");
+		if (full) {
+			snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+		}
+		else if (count % 2 && size + 2 < sizeof(buf)) {
+			strcat(buf, "\r\n");
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
 		return;
 	} // end no-argument
 	
