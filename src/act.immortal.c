@@ -8793,7 +8793,7 @@ ACMD(do_reboot) {
 		else if (!str_cmp(arg, "now")) {
 			reboot_control.immediate = TRUE;
 		}
-		else if ((type = search_block(arg, shutdown_types, FALSE)) != NOTHING) {
+		else if ((type = search_block(arg, shutdown_types, TRUE)) != NOTHING) {
 			reboot_control.level = type;
 		}
 		else {
