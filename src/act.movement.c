@@ -956,7 +956,7 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 		}
 		
 		// unfinished interior room
-		if (ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_COMPLETE(IN_ROOM(ch)) && GET_LAST_DIR(ch) != NO_DIR && !IS_SET(flags, MOVE_EARTHMELD) && dir != rev_dir[(int) GET_LAST_DIR(ch)]) {
+		if (ROOM_IS_CLOSED(IN_ROOM(ch)) && !IS_COMPLETE(IN_ROOM(ch)) && GET_LAST_DIR(ch) != NO_DIR && !IS_SET(flags, MOVE_EARTHMELD) && dir != rev_dir[(int) GET_LAST_DIR(ch)] && dir_to_room(IN_ROOM(ch), rev_dir[(int) GET_LAST_DIR(ch)], FALSE)) {
 			msg_to_char(ch, "This room is incomplete. You can only go back %s.\r\n", dirs[get_direction_for_char(ch, rev_dir[(int) GET_LAST_DIR(ch)])]);
 			return FALSE;
 		}
