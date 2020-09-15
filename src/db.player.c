@@ -63,6 +63,7 @@ void update_class(char_data *ch);
 void check_eq_sets(char_data *ch);
 void clear_delayed_update(char_data *ch);
 void clear_player(char_data *ch);
+void delete_member_data(char_data *ch, empire_data *from_emp);
 void delete_player_character(char_data *ch);
 void free_player_eq_set(struct player_eq_set *eq_set);
 struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
@@ -3726,6 +3727,7 @@ void delete_player_character(char_data *ch) {
 		log_to_empire(emp, ELOG_MEMBERS, "%s has left the empire", PERS(ch, ch, TRUE));
 		GET_LOYALTY(ch) = NULL;
 		GET_RANK(ch) = 0;
+		delete_member_data(ch, emp);
 	}
 	
 	// remove account and player index
