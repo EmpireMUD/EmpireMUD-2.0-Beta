@@ -2996,6 +2996,10 @@ ACMD(do_chop) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		send_to_char("You're already busy.\r\n", ch);
 	}
+	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) && IS_OUTDOORS(ch) && has_interaction(GET_SECT_INTERACTIONS(BASE_SECT(IN_ROOM(ch))), INTERACT_CHOP)) {
+		// variant of can't-chop where it's blocked by something other than the base sector
+		send_to_char("You can't really chop anything here right now.\r\n", ch);
+	}
 	else if (!CAN_CHOP_ROOM(IN_ROOM(ch))) {
 		send_to_char("You can't really chop anything down here.\r\n", ch);
 	}
