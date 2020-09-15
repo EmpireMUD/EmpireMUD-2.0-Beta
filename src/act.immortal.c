@@ -5732,7 +5732,7 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	crop_data *cp;
 	bool any;
 
-	msg_to_char(ch, "Name: '&y%s&0', Keywords: %s, Script Id: [%d]\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j), j->script_id);
+	msg_to_char(ch, "Name: '&y%s&0', Keywords: %s\r\n", GET_OBJ_DESC(j, ch, OBJ_DESC_SHORT), GET_OBJ_KEYWORDS(j));
 
 	if (GET_OBJ_CURRENT_SCALE_LEVEL(j) > 0) {
 		sprintf(buf, " (%d)", GET_OBJ_CURRENT_SCALE_LEVEL(j));

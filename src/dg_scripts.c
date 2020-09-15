@@ -1408,7 +1408,7 @@ void script_stat (char_data *ch, struct script_data *sc) {
 void do_sstat_room(char_data *ch) {
 	room_data *rm = IN_ROOM(ch);
 
-	msg_to_char(ch, "Script information (id %d):\r\n", rm->script_id);
+	msg_to_char(ch, "Script information (id %d):\r\n", room_script_id(rm));
 	if (!SCRIPT(rm)) {
 		msg_to_char(ch, "  None.\r\n");
 		return;
