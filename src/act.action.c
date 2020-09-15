@@ -2505,6 +2505,12 @@ void process_planting(char_data *ch) {
 */
 void process_prospecting(char_data *ch) {
 	void init_mine(room_data *room, char_data *ch, empire_data *emp);
+	
+	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark for you to keep prospecting.\r\n");
+		cancel_action(ch);
+		return;
+	}
 		
 	// simple decrement
 	GET_ACTION_TIMER(ch) -= 1;
@@ -3680,6 +3686,9 @@ ACMD(do_prospect) {
 	}
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to prospect here.\r\n");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark for you to prospect.\r\n");
 	}
 	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) > 0 && GET_LOYALTY(ch) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
 		msg_to_char(ch, "You see evidence that someone has already prospected this area...\r\n");
