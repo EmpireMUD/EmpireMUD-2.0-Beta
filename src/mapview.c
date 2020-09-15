@@ -2047,7 +2047,7 @@ void perform_immort_where(char_data *ch, char *arg) {
 					}
 					
 					if (ROOM_INSTANCE(IN_ROOM(d->character))) {
-						msg_to_char(ch, " (%s)", GET_ADV_NAME(INST_ADVENTURE(ROOM_INSTANCE(IN_ROOM(d->character)))));
+						msg_to_char(ch, " (%s)\r\n", GET_ADV_NAME(INST_ADVENTURE(ROOM_INSTANCE(IN_ROOM(d->character)))));
 					}
 					else {
 						send_to_char("\r\n", ch);
