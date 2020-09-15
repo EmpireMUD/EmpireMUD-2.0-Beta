@@ -3028,7 +3028,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 					
 					if (vsize == 0 && scanned_veh) {
 						// found a vehicle to show
-						snprintf(veh_string, sizeof(veh_string), "%s", skip_filler(VEH_SHORT_DESC(veh)));
+						snprintf(veh_string, sizeof(veh_string), "%s", skip_filler(VEH_SHORT_DESC(scanned_veh)));
 					}
 				}
 			}
