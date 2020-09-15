@@ -2081,6 +2081,7 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_PEACE  BIT(40)
 #define GRANT_UNPROGRESS  BIT(41)
 #define GRANT_EVENTS  BIT(42)
+#define GRANT_TRIGGERS  BIT(43)
 
 
 // Lore types

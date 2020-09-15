@@ -1024,6 +1024,8 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "tan", POS_STANDING, do_tan, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "taste", POS_RESTING, do_eat, NO_MIN, CTYPE_UTIL, SCMD_TASTE ),
 	STANDARD_CMD( "tavern", POS_STANDING, do_tavern, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_EMPIRE, CMD_NO_ANIMALS, NO_ABIL ),
+	GRANT_CMD( "tattach", POS_DEAD, do_tattach, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TRIGGERS ),
+	GRANT_CMD( "tdetach", POS_DEAD, do_tdetach, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TRIGGERS ),
 	GRANT_CMD( "tedit", POS_DEAD, do_tedit, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TEDIT ),
 	SCMD_CMD( "teleport", POS_STANDING, do_goto, LVL_GOD, CTYPE_IMMORTAL, SCMD_TELEPORT ),
 	SCMD_CMD( "tellhistory", POS_DEAD, do_history, NO_MIN, CTYPE_COMM, SCMD_TELL_HISTORY ),
@@ -1071,6 +1073,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "visible", POS_RESTING, do_visible, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "vnum", POS_DEAD, do_vnum, LVL_START_IMM, CTYPE_IMMORTAL, GRANT_OLC ),
 	GRANT_CMD( "vstat", POS_DEAD, do_vstat, LVL_START_IMM, CTYPE_IMMORTAL, GRANT_OLC ),
+	GRANT_CMD( "vdelete", POS_DEAD, do_vdelete, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_TRIGGERS ),
 
 	SIMPLE_CMD( "wake", POS_SLEEPING, do_wake, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "warehouse", POS_DEAD, do_warehouse, NO_MIN, CTYPE_MOVE ),
@@ -1100,9 +1103,6 @@ cpp_extern const struct command_info cmd_info[] = {
 	{ ",", POS_DEAD, do_string_editor, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_UTIL, NOBITS, NO_ABIL },
 	
 	/* DG trigger commands */
-	STANDARD_CMD( "tattach", POS_DEAD, do_tattach, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	STANDARD_CMD( "tdetach", POS_DEAD, do_tdetach, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY, NO_ABIL ),
-	SIMPLE_CMD( "vdelete", POS_DEAD, do_vdelete, LVL_CIMPL, CTYPE_IMMORTAL ),
 	STANDARD_CMD( "madventurecomplete", POS_DEAD, do_madventurecomplete, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "maggro", POS_RESTING, do_maggro, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),
 	STANDARD_CMD( "masound", POS_DEAD, do_masound, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_IMMORTAL, CMD_IMM_OR_MOB_ONLY | CMD_STAY_HIDDEN, NO_ABIL ),

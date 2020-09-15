@@ -780,6 +780,9 @@ command, are executed.
 #d
 TATTACH
 
+Disambiguation: This is the immortal trigger attachment command. For the
+                scripting command, see &yATTACH&0.
+
 Usage:  attach mob <trigger vnum> <mob name> [location]
         attach obj <trigger vnum> <obj name> [location]
         attach room <trigger vnum> <room vnum> [location]
@@ -801,13 +804,18 @@ Examples:
   tattach room 14500 14520 - Attaches room trigger 14500 to room 14520.
   tattach mob 1332 santa   - Attaches mob trigger 1332 to mob 1308 (santa).
   tattach obj 1480 sword   - Attaches obj trigger 1480 to a sword. 
-  tattach veh 952 %boat%   - Attach trigger 952 to the %boat% vehicle.
+  tattach veh 952 boat   - Attach trigger 952 to a boat vehicle.
 
 Note: You cannot attach triggers to empires.
+
+This command is grantable under the 'triggers' grant.
 
 See also: TDETACH, TRIG-ATTACH, TRIG-DETACH, OLC, TRIGEDIT, STAT
 #d
 TDETACH
+
+Disambiguation: This is the immortal trigger detachment command. For the
+                scripting command, see &yDETACH&0.
 
 Usage:  tdetach [mob|obj|vehicle] <target name> <trigger name/vnum | all>
         tdetach room <target vnum | .> <trigger name/vnum | all>
@@ -829,6 +837,8 @@ Examples:
   tdetach sword 1300       - detach trigger 1300 from sword.
   tdetach obj sword 1300   - You guessed it - same as above.
   tdetach sword all        - detach all triggers from the sword.
+
+This command is grantable under the 'triggers' grant.
 
 See also: TATTACH, TRIG-DETACH, TRIG-ATTACH, OLC, TRIGEDIT, STAT
 #d
@@ -936,7 +946,8 @@ VDELETE
 Usage:  vdelete <variablename> <id>
 
 Use this to remove a variable from either mob, room, obj, vehicle, empire, or
-player.
+player. You can see variables on a player with 'show variables <name>'. For
+everyone else, stat them to see variables.
 
 Examples:
   vdelete has_solved_quest 5351
@@ -945,7 +956,9 @@ To determine the player ID, stat player:
   > stat file test
   Male PC 'Test'  IDNum: [ 3531], In room [    0]
 
-See also: REMOTE, RDELETE
+This command is grantable under the 'triggers' grant.
+
+See also: REMOTE, RDELETE, SHOW VARIABLES
 #d
 WAIT WAITUNTIL WAIT-UNTIL PAUSE TRIGEDIT-TIMING TIMING
 

@@ -578,6 +578,7 @@ const char *grant_bits[] = {
 	"peace",	// 40
 	"unprogress",
 	"events",
+	"triggers",
 	"\n"
 };
 

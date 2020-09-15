@@ -151,7 +151,7 @@ struct tedit_struct tedit_option[] = {
 	{ "motd", LVL_GOD, &motd, MAX_MOTD_LENGTH, MOTD_FILE },
 	{ "imotd", LVL_GOD, &imotd, MAX_MOTD_LENGTH, IMOTD_FILE },
 	{ "info", LVL_GOD, &info, 8192, INFO_FILE },
-	{ "news", LVL_GOD, &news, 8192, NEWS_FILE },
+	{ "news", LVL_GOD, &news, 16000, NEWS_FILE },
 
 	{ "\n", 0, NULL, 0, NULL }
 };
