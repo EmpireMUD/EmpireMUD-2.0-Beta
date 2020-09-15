@@ -38,6 +38,7 @@ extern const int rev_dir[];
 extern int size_of_world;
 
 // external funcs
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
@@ -52,7 +53,9 @@ int count_mobs_in_instance(struct instance_data *inst, mob_vnum vnum);
 int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
 int count_players_in_instance(struct instance_data *inst, bool include_imms, char_data *ignore_ch);
 int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum);
+void despawn_instance_vehicles(struct instance_data *inst);
 static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
+void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
 struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
@@ -1134,6 +1137,9 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 		}
 	}
 	
+	// delete vehicles
+	despawn_instance_vehicles(inst);
+	
 	// remove rooms
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 		if (INST_ROOM(inst, iter)) {
@@ -1186,6 +1192,84 @@ int delete_all_instances(adv_data *adv) {
 	}
 	
 	return count;
+}
+
+
+/**
+* Called when an instance closes to delete all its vehicles.
+*
+* @param struct instance_data *inst The vehicle to delete.
+*/
+void despawn_instance_vehicles(struct instance_data *inst) {
+	vehicle_data *veh, *next_veh;
+	
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		if (VEH_INSTANCE_ID(veh) != INST_ID(inst)) {
+			continue;	// not ours
+		}
+		
+		// people leading/sitting on it will be unleashed by extract_vehicle
+		
+		// empty insides / recursively relocate players
+		empty_instance_vehicle(inst, veh, IN_ROOM(veh));
+		
+		if (ROOM_PEOPLE(IN_ROOM(veh))) {
+			act("$V is gone.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		}
+		extract_vehicle(veh);
+	}
+}
+
+
+/**
+* Attempts to empty players, non-linked mobs, and non-linked vehicles; leaves
+* everything else. This is called when an instance cleans up.
+*
+* @param struct instance_data *inst The instance stuff belonged to.
+* @param vehicle_data *veh The vehicle to empty.
+* @param room_data *to_room Where to empty it to.
+*/
+void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room) {
+	struct vehicle_room_list *vrl;
+	vehicle_data *inner, *next_inner;
+	char_data *ch, *next_ch;
+	
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		DL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), inner, next_inner, next_in_room) {
+			if (VEH_INSTANCE_ID(inner) == INST_ID(inst)) {
+				// recurse!
+				empty_instance_vehicle(inst, inner, to_room);
+				// don't delete the vehicle here -- it can be extracted later
+			}
+			else {
+				// not attached -- move it
+				adjust_vehicle_tech(inner, FALSE);
+				vehicle_from_room(inner);
+				vehicle_to_room(inner, to_room);
+				adjust_vehicle_tech(inner, TRUE);
+				
+				// don't announce
+				/*
+				if (ROOM_PEOPLE(to_room)) {
+					act("$V arrives.", FALSE, ROOM_PEOPLE(to_room), NULL, NULL, TO_CHAR | TO_ROOM);
+				}
+				*/
+			}
+		}
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
+			if (!IS_NPC(ch) || MOB_INSTANCE_ID(ch) != INST_ID(inst)) {
+				// move
+				char_from_room(ch);
+				char_to_room(ch, to_room);
+				GET_LAST_DIR(ch) = NO_DIR;
+				look_at_room(ch);
+				
+				// and announce
+				act("$n arrives.", TRUE, ch, NULL, NULL, TO_ROOM);
+			}
+		}
+	}
 }
 
 
