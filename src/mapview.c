@@ -2040,10 +2040,17 @@ void perform_immort_where(char_data *ch, char *arg) {
 				i = (d->original ? d->original : d->character);
 				if (i && CAN_SEE(ch, i) && IN_ROOM(i) && WIZHIDE_OK(ch, i)) {
 					if (d->original) {
-						msg_to_char(ch, "%-20s - [%d]%s %s (in %s)\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(d->character), TRUE), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
+						msg_to_char(ch, "%-20s - [%d]%s %s (in %s)", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(d->character), TRUE), get_room_name(IN_ROOM(d->character), FALSE), GET_NAME(d->character));
 					}
 					else {
-						msg_to_char(ch, "%-20s - [%d]%s %s\r\n", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE));
+						msg_to_char(ch, "%-20s - [%d]%s %s", GET_NAME(i), GET_ROOM_VNUM(IN_ROOM(i)), coord_display_room(ch, IN_ROOM(i), TRUE), get_room_name(IN_ROOM(i), FALSE));
+					}
+					
+					if (ROOM_INSTANCE(IN_ROOM(d->character))) {
+						msg_to_char(ch, " (%s)", GET_ADV_NAME(INST_ADVENTURE(ROOM_INSTANCE(IN_ROOM(d->character)))));
+					}
+					else {
+						send_to_char("\r\n", ch);
 					}
 				}
 			}
