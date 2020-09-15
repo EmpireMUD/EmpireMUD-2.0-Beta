@@ -526,7 +526,7 @@ void do_mount_swap(char_data *ch, char *argument) {
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_butcher) {
-	char_data *proto;
+	char_data *proto, *vict;
 	obj_data *corpse;
 	
 	one_argument(argument, arg);
@@ -544,7 +544,11 @@ ACMD(do_butcher) {
 		corpse = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)));
 	}
 	
-	if (!corpse) {
+	if (!corpse && (vict = get_char_room_vis(ch, arg))) {
+		// no object found but matched a mob in the room
+		act("You need to kill $M first.", FALSE, ch, NULL, vict, TO_CHAR);
+	}
+	else if (!corpse) {
 		msg_to_char(ch, "You don't see a %s here.\r\n", arg);
 	}
 	else if (!IS_CORPSE(corpse)) {

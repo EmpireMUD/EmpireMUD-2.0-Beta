@@ -3351,7 +3351,7 @@ ACMD(do_shear) {
 
 ACMD(do_skin) {
 	obj_data *obj;
-	char_data *proto;
+	char_data *proto, *vict;
 
 	one_argument(argument, arg);
 
@@ -3360,8 +3360,15 @@ ACMD(do_skin) {
 	}
 	else if (!*arg)
 		msg_to_char(ch, "What would you like to skin?\r\n");
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))
-		msg_to_char(ch, "You don't seem to have anything like that.\r\n");
+	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		// no object found: try mobs in the room
+		if ((vict = get_char_room_vis(ch, arg))) {
+			act("You need to kill $M first.", FALSE, ch, NULL, vict, TO_CHAR);
+		}
+		else {
+			msg_to_char(ch, "You don't seem to have anything like that.\r\n");
+		}
+	}
 	else if (!IS_CORPSE(obj))
 		msg_to_char(ch, "You can only skin corpses.\r\n");
 	else if (GET_CORPSE_NPC_VNUM(obj) == NOTHING || !(proto = mob_proto(GET_CORPSE_NPC_VNUM(obj)))) {
