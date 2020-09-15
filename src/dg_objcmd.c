@@ -329,7 +329,7 @@ OCMD(do_obuildingecho) {
 OCMD(do_oregionecho) {
 	char room_number[MAX_INPUT_LENGTH], radius_arg[MAX_INPUT_LENGTH], *msg;
 	room_data *center, *orm = obj_room(obj);
-	bool use_queue, indoor_only = FALSE;
+	bool use_queue, outdoor_only = FALSE;
 	char_data *targ;
 	int radius;
 
@@ -351,7 +351,7 @@ OCMD(do_oregionecho) {
 		radius = atoi(radius_arg);
 		if (radius < 0) {
 			radius = -radius;
-			indoor_only = TRUE;
+			outdoor_only = TRUE;
 		}
 		
 		if (center) {
@@ -359,7 +359,7 @@ OCMD(do_oregionecho) {
 				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
 					continue;
 				}
-				if (indoor_only && IS_OUTDOORS(targ)) {
+				if (outdoor_only && !IS_OUTDOORS(targ)) {
 					continue;
 				}
 				

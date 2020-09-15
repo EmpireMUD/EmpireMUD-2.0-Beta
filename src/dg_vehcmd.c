@@ -318,7 +318,7 @@ VCMD(do_vbuildingecho) {
 VCMD(do_vregionecho) {
 	char room_number[MAX_INPUT_LENGTH], radius_arg[MAX_INPUT_LENGTH], *msg;
 	room_data *center, *orm = IN_ROOM(veh);
-	bool use_queue, indoor_only = FALSE;
+	bool use_queue, outdoor_only = FALSE;
 	char_data *targ;
 	int radius;
 
@@ -340,7 +340,7 @@ VCMD(do_vregionecho) {
 		radius = atoi(radius_arg);
 		if (radius < 0) {
 			radius = -radius;
-			indoor_only = TRUE;
+			outdoor_only = TRUE;
 		}
 		
 		if (center) {
@@ -348,7 +348,7 @@ VCMD(do_vregionecho) {
 				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
 					continue;
 				}
-				if (indoor_only && IS_OUTDOORS(targ)) {
+				if (outdoor_only && !IS_OUTDOORS(targ)) {
 					continue;
 				}
 				
@@ -892,7 +892,7 @@ VCMD(do_vteleport) {
 			adjust_vehicle_tech(v, FALSE);
 			vehicle_from_room(v);
 			vehicle_to_room(v, target);
-			adjust_vehicle_tech(v, FALSE);
+			adjust_vehicle_tech(v, TRUE);
 			entry_vtrigger(v);
 		}
 		else if ((obj = get_obj_by_vehicle(veh, arg1))) {

@@ -326,7 +326,7 @@ WCMD(do_wbuildingecho) {
 
 WCMD(do_wregionecho) {
 	char room_number[MAX_INPUT_LENGTH], radius_arg[MAX_INPUT_LENGTH], *msg;
-	bool use_queue, indoor_only = FALSE;
+	bool use_queue, outdoor_only = FALSE;
 	room_data *center;
 	char_data *targ;
 	int radius;
@@ -349,7 +349,7 @@ WCMD(do_wregionecho) {
 		radius = atoi(radius_arg);
 		if (radius < 0) {
 			radius = -radius;
-			indoor_only = TRUE;
+			outdoor_only = TRUE;
 		}
 		
 		if (center) {
@@ -357,7 +357,7 @@ WCMD(do_wregionecho) {
 				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
 					continue;
 				}
-				if (indoor_only && IS_OUTDOORS(targ)) {
+				if (outdoor_only && !IS_OUTDOORS(targ)) {
 					continue;
 				}
 				
