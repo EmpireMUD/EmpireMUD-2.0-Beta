@@ -1689,8 +1689,8 @@ ACMD(do_drive) {
 	char buf[MAX_STRING_LENGTH];
 	struct vehicle_room_list *vrl;
 	bool was_driving, same_dir, dir_only;
-	char_data *ch_iter;
 	vehicle_data *veh;
+	char_data *ch_iter;
 	obj_data *portal;
 	int dir = NO_DIR, dist = -1;
 	
@@ -1757,7 +1757,7 @@ ACMD(do_drive) {
 	else if (!*argument) {
 		msg_to_char(ch, "You must specify a path to %s using a combination of directions and distances.\r\n", drive_data[subcmd].command);
 	}
-	if (strlen(argument) > 2 && (portal = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
+	else if (strlen(argument) > 2 && (portal = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
 		do_drive_through_portal(ch, veh, portal, subcmd);
 	}
 	else if (!dir_only && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
