@@ -1959,7 +1959,7 @@ ACMD(do_gen_craft) {
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
 				continue;	// not learned
 			}
-			if (*arg && !is_abbrev(arg, GET_CRAFT_NAME(craft)) && (!*short_arg || !is_abbrev(short_arg, GET_CRAFT_NAME(craft)))) {
+			if (*arg && !multi_isname(arg, GET_CRAFT_NAME(craft)) && (!*short_arg || !multi_isname(short_arg, GET_CRAFT_NAME(craft)))) {
 				continue;	// search exclusion
 			}
 			
