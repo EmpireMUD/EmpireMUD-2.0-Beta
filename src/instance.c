@@ -39,6 +39,7 @@ extern int size_of_world;
 
 // external funcs
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
+extern int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
@@ -1710,8 +1711,6 @@ bool check_outside_fights(struct instance_data *inst) {
 * @return bool TRUE if it's okay to despawn; FALSE if instance vehicles are in use.
 */
 bool check_outside_vehicles(struct instance_data *inst) {
-	extern int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
-	
 	vehicle_data *veh;
 	
 	DL_FOREACH(vehicle_list, veh) {
@@ -1807,6 +1806,7 @@ int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum) {
 */
 int count_players_in_instance(struct instance_data *inst, bool count_imms, char_data *ignore_ch) {
 	int iter, count = 0;
+	vehicle_data *veh;
 	char_data *ch;
 	
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
@@ -1815,6 +1815,10 @@ int count_players_in_instance(struct instance_data *inst, bool count_imms, char_
 				if (ch != ignore_ch && !IS_NPC(ch) && (count_imms || !IS_IMMORTAL(ch))) {
 					++count;
 				}
+			}
+			
+			DL_FOREACH2(ROOM_VEHICLES(INST_ROOM(inst, iter)), veh, next_in_room) {
+				count += count_players_in_vehicle(veh, count_imms);
 			}
 		}
 	}
