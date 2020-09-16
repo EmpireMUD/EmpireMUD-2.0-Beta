@@ -109,6 +109,7 @@ Basic Crafts (Trade ability)
 
 Command:  craft [number] <item>
           craft info <item>
+          craft list <keywords>
 
 All crafting abilities train when you complete recipes that require them.
 Crafting is faster if you have the Master Craftsman ability.
@@ -214,6 +215,7 @@ Cook (Trade ability)
 
 Command:  cook [number] <item>
           cook info <item>
+          cook list <keywords>
 
 Speed boosts:  Faster Chores bonus
 
@@ -258,6 +260,7 @@ CRAFT CRAFTS
 
 Command:  craft [number] <item>
           craft info <item>
+          craft list <keywords>
 
 You can craft many types of items, from pottery to woodworking to arrows.
 All crafting abilities train when you finish recipes that require them.
@@ -427,6 +430,7 @@ Building:  (FF)  Forge  (Build ability)
 Tool:  hammer
 Commands:  forge [number] <item>
            forge info <item>
+           forge list <keywords>
 
 Forging is done in a forge using iron ingots. Almost all metallic armor and
 weapons are created at a forge, with varying levels of skill. Iron, silver,
@@ -969,6 +973,7 @@ SEW SEWING
 Sew (Trade ability)
 Command:  sew [number] <item>
           sew info <item>
+          sew list <keywords>
 Requires:  sewing kit or a tailor building
 
 The art of sewing is one of the oldest and simplest trade skills, but it also
@@ -1016,6 +1021,7 @@ Building:  &b~&0()&b~&0  Shipyard (Seafarers goal)
            &b~&0[]&b~&0  Upgraded Shipyard (Great Shipyard goal)
 Commands:  manufacture <ship>
            manufacture info <ship>
+           manufacture list <keywords>
 
 Ships can be constructed via the manufacture command. This can only be done at
 a shipyard, and the vessel can be sailed to a dock when finished. You can also

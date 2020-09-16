@@ -326,6 +326,7 @@ BUILD BUILDING "BUILD COMMAND"
 
 Usage:  build <building> [direction]
         build info <building>
+        build list <keywords>
 
 Speed boosts:  Faster Chores bonus, haste
 

@@ -1783,7 +1783,7 @@ ACMD(do_gen_craft) {
 	int count, timer, num = 1, dir = NO_DIR;
 	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL;
 	vehicle_data *veh;
-	bool is_master;
+	bool is_master, list_only = FALSE;
 	obj_data *found_obj = NULL, *drinkcon = NULL;
 	any_vnum missing_abil = NO_ABIL;
 	ability_data *cft_abil;
@@ -1812,8 +1812,16 @@ ACMD(do_gen_craft) {
 		show_craft_info(ch, argument, subcmd);
 		return;
 	}
+	
+	// optional 'list' arg to search craftables
+	if (!strn_cmp(argument, "list ", 5)) {
+		argument = any_one_arg(argument, arg);
+		list_only = TRUE;
+		// keep going
+	}
+	
 	// all other functions require standing
-	if (GET_POS(ch) < POS_STANDING) {
+	if (*argument && !list_only && GET_POS(ch) < POS_STANDING) {
 		send_low_pos_msg(ch);
 		return;
 	}
@@ -1836,7 +1844,7 @@ ACMD(do_gen_craft) {
 	}
 	
 	// if there was an arg, find a matching craft_table entry (type)
-	if (*arg) {
+	if (*arg && !list_only) {
 		// attempt to split out a direction in case the craft makes a building
 		chop_last_arg(arg, short_arg, last_arg);
 		if (*last_arg && (dir = parse_direction(ch, last_arg)) == NO_DIR) {
@@ -1895,23 +1903,23 @@ ACMD(do_gen_craft) {
 	if (subcmd == CRAFT_TYPE_ERROR) {
 		msg_to_char(ch, "This command is not yet implemented.\r\n");
 	}
-	else if (*arg && (veh = find_vehicle_to_resume_by_name(ch, subcmd, arg, &find_type))) {
+	else if (*arg && !list_only && (veh = find_vehicle_to_resume_by_name(ch, subcmd, arg, &find_type))) {
 		// attempting to resume a vehicle by name
 		resume_craft_vehicle(ch, veh, find_type);
 	}
-	else if (*arg && IS_INCOMPLETE(IN_ROOM(ch)) && type && CRAFT_IS_BUILDING(type) && GET_BUILDING(IN_ROOM(ch)) && GET_CRAFT_BUILD_TYPE(type) == GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch)))) {
+	else if (*arg && !list_only && IS_INCOMPLETE(IN_ROOM(ch)) && type && CRAFT_IS_BUILDING(type) && GET_BUILDING(IN_ROOM(ch)) && GET_CRAFT_BUILD_TYPE(type) == GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch)))) {
 		// attempting to resume a building by name
 		resume_craft_building(ch, type);
 	}
-	else if (*arg && !type && missing_abil != NO_ABIL) {
+	else if (*arg && !list_only && !type && missing_abil != NO_ABIL) {
 		// found no match but there was an almost-match with an ability requirement
 		msg_to_char(ch, "You need the %s ability to %s that.\r\n", get_ability_name_by_vnum(missing_abil), gen_craft_data[subcmd].command);
 	}
-	else if (*arg && !type) {
+	else if (*arg && !list_only && !type) {
 		// found no match
 		msg_to_char(ch, "Unknown %s. Type '%s' by itself to see a list of what you can %s.\r\n", gen_craft_data[subcmd].command, gen_craft_data[subcmd].command, gen_craft_data[subcmd].command);
 	}
-	else if (!*arg && subcmd == CRAFT_TYPE_BUILD && IS_INCOMPLETE(IN_ROOM(ch))) {
+	else if (!*arg && !list_only && subcmd == CRAFT_TYPE_BUILD && IS_INCOMPLETE(IN_ROOM(ch))) {
 		// 'build' no-arg in an incomplete building: resume
 		if (IS_BURNING(IN_ROOM(ch))) {
 			msg_to_char(ch, "You can't work on a burning building!\r\n");
@@ -1926,7 +1934,7 @@ ACMD(do_gen_craft) {
 			resume_craft_building(ch, find_type);
 		}
 	}
-	else if (!*arg) {	// main no-arg: master craft list
+	else if (!*arg || list_only) {	// main no-arg (or list-only): master craft list
 		// master craft list
 		size = snprintf(buf, sizeof(buf), "You know how to %s:\r\n", gen_craft_data[subcmd].command);
 		count = 0;
@@ -1949,6 +1957,9 @@ ACMD(do_gen_craft) {
 			}
 			if (IS_SET(GET_CRAFT_FLAGS(craft), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(craft))) {
 				continue;	// not learned
+			}
+			if (*arg && !is_abbrev(arg, GET_CRAFT_NAME(craft))) {
+				continue;	// search exclusion
 			}
 			
 			// valid:
