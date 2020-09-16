@@ -54,7 +54,6 @@ void check_delayed_load(char_data *ch);
 extern bool check_scaling(char_data *mob, char_data *attacker);
 extern bool check_vampire_sun(char_data *ch, bool message);
 extern bool despawn_companion(char_data *ch, mob_vnum vnum);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 extern int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);

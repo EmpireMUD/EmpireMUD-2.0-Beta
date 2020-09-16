@@ -501,7 +501,6 @@ room_data *create_room(room_data *home) {
 */
 void delete_room(room_data *room, bool check_exits) {
 	EVENT_CANCEL_FUNC(cancel_room_expire_event);
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 	void relocate_players(room_data *room, room_data *to_room);
 	void remove_instance_fake_loc(struct instance_data *inst);

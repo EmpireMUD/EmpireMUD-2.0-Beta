@@ -1555,7 +1555,6 @@ void char_to_room(char_data *ch, room_data *room) {
 	void check_instance_is_loaded(struct instance_data *inst);
 	void check_island_levels(room_data *location, int level);
 	extern int determine_best_scale_level(char_data *ch, bool check_group);
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	extern int lock_instance_level(room_data *room, int level);
 	void spawn_mobs_from_center(room_data *center);
 	

@@ -291,7 +291,6 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 */
 bool can_enter_room(char_data *ch, room_data *room) {
 	extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	
 	struct instance_data *inst;
 	

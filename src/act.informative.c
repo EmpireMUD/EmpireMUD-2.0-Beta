@@ -53,7 +53,6 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external functions
 void clear_recent_moves(char_data *ch);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern char *get_room_name(room_data *room, bool color);
 extern char *list_harnessed_mobs(vehicle_data *veh);
 void look_at_vehicle(vehicle_data *veh, char_data *ch);

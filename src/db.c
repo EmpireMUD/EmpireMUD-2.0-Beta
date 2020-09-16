@@ -723,7 +723,6 @@ void add_trd_owner(room_vnum vnum, empire_vnum owner) {
 * startup and should also be called any time a building is deleted.
 */
 void check_for_bad_buildings(void) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	void unlink_instance_entrance(room_data *room, bool run_cleanup);
 	extern const char *bld_relationship_types[];
 

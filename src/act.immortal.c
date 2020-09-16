@@ -80,7 +80,6 @@ void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd);	// act.item.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 extern struct generic_name_data *get_best_name_list(int name_set, int sex);
 extern int get_highest_access_level(account_data *acct);

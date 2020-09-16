@@ -48,6 +48,7 @@ extern int stats_get_sector_count(sector_data *sect);
 // locals
 bool can_instance(adv_data *adv);
 bool check_outside_fights(struct instance_data *inst);
+bool check_outside_vehicles(struct instance_data *inst);
 int count_instances(adv_data *adv);
 int count_mobs_in_instance(struct instance_data *inst, mob_vnum vnum);
 int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
@@ -56,7 +57,6 @@ int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum);
 void despawn_instance_vehicles(struct instance_data *inst);
 static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
 void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
-struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
@@ -1434,7 +1434,7 @@ void prune_instances(void) {
 		// look for completed or orphaned instances
 		if (!INST_ADVENTURE(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!INST_START(inst) && !delayed) || !INST_LOCATION(inst) || (INST_SIZE(inst) == 0 && !delayed) || (rule && (INST_CREATED(inst) + 60 * rule->value) < time(0)) || (evt_run && !find_running_event_by_vnum(evt_run->value))) {
 			// well, only if empty
-			if (count_players_in_instance(inst, TRUE, NULL) == 0 && (!ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_CHECK_OUTSIDE_FIGHTS) || check_outside_fights(inst))) {
+			if (count_players_in_instance(inst, TRUE, NULL) == 0 && (!ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_CHECK_OUTSIDE_FIGHTS) || check_outside_fights(inst)) && check_outside_vehicles(inst)) {
 				delete_instance(inst, TRUE);
 				save = TRUE;
 			}
@@ -1696,6 +1696,37 @@ bool check_outside_fights(struct instance_data *inst) {
 		}
 		
 		return FALSE;	// oops: we found a mob from the instance, fighting
+	}
+	
+	return TRUE;	// safe
+}
+
+
+/**
+* Checks if any vehicle controlled by the instance is outside but still in use
+* by players.
+*
+* @param struct instance_data *inst The instance to check.
+* @return bool TRUE if it's okay to despawn; FALSE if instance vehicles are in use.
+*/
+bool check_outside_vehicles(struct instance_data *inst) {
+	extern int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
+	
+	vehicle_data *veh;
+	
+	DL_FOREACH(vehicle_list, veh) {
+		if (!IN_ROOM(veh) || (COMPLEX_DATA(IN_ROOM(veh)) && COMPLEX_DATA(IN_ROOM(veh))->instance == inst)) {
+			continue;	// vehicle is in no room or is in the instance
+		}
+		if (VEH_INSTANCE_ID(veh) != INST_ID(inst)) {
+			continue;	// not from instance
+		}
+		if (!VEH_LED_BY(veh) && !VEH_SITTING_ON(veh) && count_players_in_vehicle(veh, TRUE) < 1) {
+			continue;	// not currently in use
+		}
+		
+		// if we got here, the vehicle is in use
+		return FALSE;
 	}
 	
 	return TRUE;	// safe

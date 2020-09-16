@@ -36,7 +36,6 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void send_char_pos(char_data *ch, int dam);
 void die(char_data *ch, char_data *killer);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 char_data *get_char_by_room(room_data *room, char *name);
 room_data *get_room(room_data *ref, char *name);
 obj_data *get_obj_by_room(room_data *room, char *name);
@@ -79,7 +78,7 @@ int get_room_scale_level(room_data *room, char_data *targ) {
 	struct instance_data *inst;
 	int level = 1;
 	
-	if ((inst = find_instance_by_room(room, FALSE, TRUE)))) {
+	if ((inst = find_instance_by_room(room, FALSE, TRUE))) {
 		if (INST_LEVEL(inst)) {
 			level = INST_LEVEL(inst);
 		}

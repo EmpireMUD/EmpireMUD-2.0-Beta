@@ -431,6 +431,7 @@ void update_pos(char_data *victim);
 
 // instance.c
 void add_instance_mob(struct instance_data *inst, mob_vnum vnum);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *real_instance(any_vnum instance_id);
 void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum);
 

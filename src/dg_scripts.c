@@ -62,7 +62,6 @@ void check_for_eligible_goals(empire_data *emp);	// progress.c
 extern int count_harnessed_animals(vehicle_data *veh);
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
 extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct instance_data *get_instance_for_script(int go_type, void *go);
 extern char *get_room_name(room_data *room, bool color);

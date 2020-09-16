@@ -58,7 +58,6 @@ extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 extern struct req_data *copy_requirements(struct req_data *from);
 extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 void drop_quest(char_data *ch, struct player_quest *pq);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_requirement_display(struct req_data *list, char *save_buffer);
