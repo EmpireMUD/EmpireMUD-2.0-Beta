@@ -1553,6 +1553,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VEH_CARRYING_N(veh)  ((veh)->carrying_n)
 #define VEH_CONSTRUCTION_ID(veh)  ((veh)->construction_id)
 #define VEH_CONTAINS(veh)  ((veh)->contains)
+#define VEH_DEPLETION(veh)  ((veh)->depletion)
 #define VEH_DRIVER(veh)  ((veh)->driver)
 #define VEH_EXTRA_DATA(veh)  ((veh)->extra_data)
 #define VEH_FLAGS(veh)  ((veh)->flags)

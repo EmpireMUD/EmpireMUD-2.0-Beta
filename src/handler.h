@@ -300,7 +300,11 @@ void free_requirements(struct req_data *list);
 
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);
-extern int get_depletion(room_data *room, int type);
+#define add_vehicle_depletion(veh, type, multiple)  perform_add_depletion(&VEH_DEPLETION(veh), (type), (multiple))
+extern int get_depletion_amount(struct depletion_data *list, int type);
+#define get_depletion(room, type)  get_depletion_amount(ROOM_DEPLETION(room), (type))
+#define get_depletion_vehicle(veh, type)  get_depletion_amount(VEH_DEPLETION(veh), (type))
+void perform_add_depletion(struct depletion_data **list, int type, bool multiple);
 void remove_depletion_from_list(struct depletion_data **list, int type);
 void remove_depletion(room_data *room, int type);
 void set_depletion(room_data *room, int type, int value);

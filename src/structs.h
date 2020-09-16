@@ -5558,6 +5558,7 @@ struct vehicle_data {
 	obj_data *contains;	// contains objects
 	int carrying_n;	// size of contents
 	struct vehicle_attached_mob *animals;	// linked list of mobs attached
+	struct depletion_data *depletion;	// resource depletions tied to the vehicle
 	struct resource_data *needs_resources;	// resources until finished/maintained
 	struct resource_data *built_with;	// resources used to build it
 	room_data *interior_home_room;	// the vehicle's main room

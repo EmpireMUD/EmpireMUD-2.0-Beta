@@ -1295,6 +1295,9 @@ void annual_update_vehicle(vehicle_data *veh) {
 		add_to_resource_list(&default_res, RES_OBJECT, o_NAILS, 1, 0);
 	}
 	
+	// non-damage stuff:
+	annual_update_depletions(&VEH_DEPLETION(veh));
+	
 	// does not take annual damage (unless incomplete)
 	if (!VEH_YEARLY_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh)) {
 		return;

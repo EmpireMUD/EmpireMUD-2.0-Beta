@@ -1842,6 +1842,7 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	struct room_extra_data *red, *next_red;
 	struct vehicle_attached_mob *vam;
 	char temp[MAX_STRING_LENGTH];
+	struct depletion_data *dep;
 	struct resource_data *res;
 	struct trig_var_data *tvd;
 	vehicle_data *proto;
@@ -1918,6 +1919,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 		LL_FOREACH(VEH_BUILT_WITH(veh), res) {
 			fprintf(fl, "Built-with: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
 		}
+	}
+	LL_FOREACH(VEH_DEPLETION(veh), dep) {
+		fprintf(fl, "Depletion: %d %d\n", dep->type, dep->count);
 	}
 	HASH_ITER(hh, VEH_EXTRA_DATA(veh), red, next_red) {
 		fprintf(fl, "Extra-data: %d %d\n", red->type, red->value);
@@ -2121,6 +2125,18 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 							extract_vehicle(veh);
 							return NULL;
 						}
+					}
+				}
+				break;
+			}
+			case 'D': {
+				if (OBJ_FILE_TAG(line, "Depletion:", length)) {
+					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+						struct depletion_data *dep;
+						CREATE(dep, struct depletion_data, 1);
+						dep->type = i_in[0];
+						dep->count = i_in[1];
+						LL_PREPEND(VEH_DEPLETION(veh), dep);
 					}
 				}
 				break;
@@ -2386,6 +2402,7 @@ void clear_vehicle(vehicle_data *veh) {
 void free_vehicle(vehicle_data *veh) {
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
 	struct vehicle_attached_mob *vam;
+	struct depletion_data *dep;
 	struct spawn_info *spawn;
 	
 	// strings
@@ -2415,6 +2432,10 @@ void free_vehicle(vehicle_data *veh) {
 	while ((vam = VEH_ANIMALS(veh))) {
 		VEH_ANIMALS(veh) = vam->next;
 		free(vam);
+	}
+	while ((dep = VEH_DEPLETION(veh))) {
+		VEH_DEPLETION(veh) = dep->next;
+		free(dep);
 	}
 	empty_vehicle(veh, NULL);
 	
@@ -3708,13 +3729,16 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	extern char *get_room_name(room_data *room, bool color);
 	void script_stat (char_data *ch, struct script_data *sc);
 	void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
+	extern const char *depletion_type[NUM_DEPLETION_TYPES];
 	extern const char *room_extra_types[];
 	
 	char buf[MAX_STRING_LENGTH * 2], part[MAX_STRING_LENGTH];
 	struct room_extra_data *red, *next_red;
 	struct custom_message *custm;
+	struct depletion_data *dep;
 	obj_data *obj;
 	size_t size;
+	bool comma;
 	int found;
 	
 	if (!veh) {
@@ -3791,6 +3815,19 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "In room: %s, Led by: %s, ", get_room_name(IN_ROOM(veh), FALSE), VEH_LED_BY(veh) ? PERS(VEH_LED_BY(veh), ch, TRUE) : "nobody");
 		size += snprintf(buf + size, sizeof(buf) - size, "Sitting on: %s, ", VEH_SITTING_ON(veh) ? PERS(VEH_SITTING_ON(veh), ch, TRUE) : "nobody");
 		size += snprintf(buf + size, sizeof(buf) - size, "Driven by: %s\r\n", VEH_DRIVER(veh) ? PERS(VEH_DRIVER(veh), ch, TRUE) : "nobody");
+	}
+	
+	if (VEH_DEPLETION(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Depletion: ");
+		
+		comma = FALSE;
+		for (dep = ROOM_DEPLETION(IN_ROOM(ch)); dep; dep = dep->next) {
+			if (dep->type < NUM_DEPLETION_TYPES) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%s%s (%d)", comma ? ", " : "", depletion_type[dep->type], dep->count);
+				comma = TRUE;
+			}
+		}
+		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 	}
 	
 	if (VEH_CONTAINS(veh)) {

@@ -8046,18 +8046,54 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 * @param bool multiple if TRUE, chance to add more than 1
 */
 void add_depletion(room_data *room, int type, bool multiple) {
-	struct depletion_data *dep;
-	bool found = FALSE;
-	
 	// shortcut: oceans are undepletable
 	if (SHARED_DATA(room) == &ocean_shared_data) {
 		return;
 	}
+	perform_add_depletion(&ROOM_DEPLETION(room), type, multiple);
+}
+
+
+/**
+* @param struct depletion_data *list List of depletions.
+* @param int type DPLTN_
+* @return int The depletion counter on that resource in that room.
+*/
+int get_depletion_amount(struct depletion_data *list, int type) {
+	struct depletion_data *dep;
 	
-	for (dep = ROOM_DEPLETION(room); dep && !found; dep = dep->next) {
+	LL_FOREACH(list, dep) {
+		if (dep->type == type) {
+			return dep->count;
+		}
+	}
+	
+	return 0;	// none
+}
+
+
+
+/**
+* Add to a depletion counter.
+*
+* @param struct depletion_data **list The set of depletions to add to.
+* @param int type DPLTN_
+* @param bool multiple if TRUE, chance to add more than 1
+*/
+void perform_add_depletion(struct depletion_data **list, int type, bool multiple) {
+	struct depletion_data *dep;
+	bool found = FALSE;
+	
+	if (!list) {
+		return;
+	}
+	
+	// find existing
+	LL_FOREACH(*list, dep) {
 		if (dep->type == type) {
 			dep->count += 1 + ((multiple && !number(0, 3)) ? 1 : 0);
 			found = TRUE;
+			break;
 		}
 	}
 	
@@ -8065,30 +8101,10 @@ void add_depletion(room_data *room, int type, bool multiple) {
 		CREATE(dep, struct depletion_data, 1);
 		dep->type = type;
 		dep->count = 1 + ((multiple && !number(0, 3)) ? 1 : 0);;
-		
-		dep->next = ROOM_DEPLETION(room);
-		ROOM_DEPLETION(room) = dep;
+		LL_PREPEND(*list, dep);
 	}
 }
 
-
-/**
-* @param room_data *room which location e.g. IN_ROOM(ch)
-* @param int type DPLTN_
-* @return int The depletion counter on that resource in that room.
-*/
-int get_depletion(room_data *room, int type) {
-	struct depletion_data *dep;
-	int found = 0;
-	
-	for (dep = ROOM_DEPLETION(room); dep && !found; dep = dep->next) {
-		if (dep->type == type) {
-			found = dep->count;
-		}
-	}
-	
-	return found;
-}
 
 
 /**
