@@ -6171,6 +6171,9 @@ unsigned long long microtime(void) {
 * in-city requirements. (If the room does not have BLD_IN_CITY_ONLY, this only
 * checks the function.)
 *
+* Note: If a player has no empire, they generally pass the for_emp part of this
+* test and you should still check use-permission separately, too.
+*
 * @param empire_data *for_emp Optional: Which empire wants to use the functions. If NULL, no empire/owner check is made.
 * @param room_data *room The room to check.
 * @param bitvector_t fnc_flag Any FNC_ flag.
