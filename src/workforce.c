@@ -220,11 +220,11 @@ void process_one_chore(empire_data *emp, room_data *room) {
 			do_chore_gardening(emp, room);
 		}
 	
-		if (room_has_function_and_city_ok(room, FNC_MINT) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_MINTING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_MINT) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_MINTING)) {
 			do_chore_minting(emp, room);
 		}
 		
-		if (room_has_function_and_city_ok(room, FNC_MINE)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_MINE)) {
 			if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
 				if (CHORE_ACTIVE(CHORE_MINING)) {
 					do_chore_mining(emp, room);
@@ -236,52 +236,52 @@ void process_one_chore(empire_data *emp, room_data *room) {
 			}
 		}
 		
-		if (room_has_function_and_city_ok(room, FNC_POTTER) && CHORE_ACTIVE(CHORE_BRICKMAKING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_POTTER) && CHORE_ACTIVE(CHORE_BRICKMAKING)) {
 			do_chore_brickmaking(emp, room);
 		}
-		if (room_has_function_and_city_ok(room, FNC_SMELT) && CHORE_ACTIVE(CHORE_SMELTING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_SMELT) && CHORE_ACTIVE(CHORE_SMELTING)) {
 			do_chore_gen_craft(emp, room, CHORE_SMELTING, chore_smelting, FALSE);
 		}
-		if (room_has_function_and_city_ok(room, FNC_TAILOR) && CHORE_ACTIVE(CHORE_WEAVING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_TAILOR) && CHORE_ACTIVE(CHORE_WEAVING)) {
 			do_chore_gen_craft(emp, room, CHORE_WEAVING, chore_weaving, FALSE);
 		}
-		if (room_has_function_and_city_ok(room, FNC_FORGE) && CHORE_ACTIVE(CHORE_NAILMAKING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_FORGE) && CHORE_ACTIVE(CHORE_NAILMAKING)) {
 			do_chore_nailmaking(emp, room);
 		}
-		if (room_has_function_and_city_ok(room, FNC_SAW) && CHORE_ACTIVE(CHORE_SCRAPING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_SAW) && CHORE_ACTIVE(CHORE_SCRAPING)) {
 			do_chore_einv_interaction(emp, room, CHORE_SCRAPING, INTERACT_SCRAPE);
 		}
-		if (room_has_function_and_city_ok(room, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
 			do_chore_digging(emp, room);
 		}
-		if (room_has_function_and_city_ok(room, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
 			do_chore_fishing(emp, room);
 		}
-		if (room_has_function_and_city_ok(room, FNC_APIARY) && CHORE_ACTIVE(CHORE_BEEKEEPING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_APIARY) && CHORE_ACTIVE(CHORE_BEEKEEPING)) {
 			do_chore_beekeeping(emp, room);
 		}
-		if (room_has_function_and_city_ok(room, FNC_GLASSBLOWER) && CHORE_ACTIVE(CHORE_GLASSMAKING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_GLASSBLOWER) && CHORE_ACTIVE(CHORE_GLASSMAKING)) {
 			do_chore_glassmaking(emp, room);
 		}
 		if (BUILDING_VNUM(room) == BUILDING_TRAPPERS_POST && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_TRAPPING)) {
 			do_chore_trapping(emp, room);
 		}
-		if (room_has_function_and_city_ok(room, FNC_TANNERY) && CHORE_ACTIVE(CHORE_TANNING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_TANNERY) && CHORE_ACTIVE(CHORE_TANNING)) {
 			do_chore_einv_interaction(emp, room, CHORE_TANNING, INTERACT_TAN);
 		}
-		if (room_has_function_and_city_ok(room, FNC_STABLE) && CHORE_ACTIVE(CHORE_SHEARING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_STABLE) && CHORE_ACTIVE(CHORE_SHEARING)) {
 			do_chore_shearing(emp, room);
 		}
 		if (CHORE_ACTIVE(CHORE_QUARRYING) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_QUARRY)) {
 			do_chore_quarrying(emp, room);
 		}
-		if (room_has_function_and_city_ok(room, FNC_SAW) && CHORE_ACTIVE(CHORE_SAWING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_SAW) && CHORE_ACTIVE(CHORE_SAWING)) {
 			do_chore_einv_interaction(emp, room, CHORE_SAWING, INTERACT_SAW);
 		}
-		if (room_has_function_and_city_ok(room, FNC_MILL) && CHORE_ACTIVE(CHORE_MILLING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_MILL) && CHORE_ACTIVE(CHORE_MILLING)) {
 			do_chore_gen_craft(emp, room, CHORE_MILLING, chore_milling, FALSE);
 		}
-		if (room_has_function_and_city_ok(room, FNC_PRESS) && CHORE_ACTIVE(CHORE_OILMAKING)) {
+		if (room_has_function_and_city_ok(emp, room, FNC_PRESS) && CHORE_ACTIVE(CHORE_OILMAKING)) {
 			do_chore_gen_craft(emp, room, CHORE_OILMAKING, chore_pressing, FALSE);
 		}
 		if (BUILDING_VNUM(room) == RTYPE_SORCERER_TOWER && check_in_city_requirement(room, TRUE) && CHORE_ACTIVE(CHORE_NEXUS_CRYSTALS) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_HAS_TECH(emp, TECH_EXARCH_CRAFTS)) {

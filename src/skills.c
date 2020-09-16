@@ -2505,7 +2505,7 @@ bool has_cooking_fire(char_data *ch) {
 		return TRUE;
 	}
 
-	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_COOKING_FIRE)) {	
+	if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_COOKING_FIRE)) {	
 		return TRUE;
 	}
 	

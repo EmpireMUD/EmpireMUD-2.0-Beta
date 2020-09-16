@@ -2807,7 +2807,7 @@ void show_tavern_status(char_data *ch) {
 	msg_to_char(ch, "Your taverns:\r\n");
 	
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
-		if (room_has_function_and_city_ok(ter->room, FNC_TAVERN)) {
+		if (room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TAVERN)) {
 			found = TRUE;
 			msg_to_char(ch, "%s %s: %s\r\n", coord_display_room(ch, ter->room, FALSE), get_room_name(ter->room, FALSE), tavern_data[get_room_extra_data(ter->room, ROOM_EXTRA_TAVERN_TYPE)].name);
 		}
@@ -3338,7 +3338,7 @@ ACMD(do_barde) {
 	if (!has_player_tech(ch, PTECH_BARDE)) {
 		msg_to_char(ch, "You don't have the correct ability to barde animals.\r\n");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) {
+	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_STABLE)) {
 		msg_to_char(ch, "You must barde animals in the stable.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -3874,7 +3874,7 @@ ACMD(do_deposit) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't deposit anything.\r\n");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
+	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "You can only deposit coins in a vault.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
@@ -5504,7 +5504,7 @@ ACMD(do_tavern) {
 		}
 	}
 	
-	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAVERN)) {
+	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAVERN)) {
 		show_tavern_status(ch);
 		msg_to_char(ch, "You can only change what's being brewed while actually in the tavern.\r\n");
 	}
@@ -5581,7 +5581,7 @@ ACMD(do_tomb) {
 		if (tomb && !can_use_room(ch, tomb, GUESTS_ALLOWED)) {
 			msg_to_char(ch, "You no longer have access to that tomb because it's owned by %s.\r\n", ROOM_OWNER(tomb) ? EMPIRE_NAME(ROOM_OWNER(tomb)) : "someone else");
 		}
-		if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_TOMB)) {
+		if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TOMB)) {
 			msg_to_char(ch, "Use 'tomb set' to change your tomb to this room.\r\n");
 		}
 	}
@@ -5595,7 +5595,7 @@ ACMD(do_tomb) {
 		else if (!GET_LOYALTY(ch) || GET_LOYALTY(ch) != ROOM_OWNER(IN_ROOM(ch))) {
 			msg_to_char(ch, "You need to own a building to make it your tomb.\r\n");
 		}
-		else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_TOMB)) {
+		else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TOMB)) {
 			msg_to_char(ch, "You can't make this place your tomb!\r\n");
 		}
 		else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -7452,7 +7452,7 @@ ACMD(do_withdraw) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't withdraw anything.\r\n");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
+	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_VAULT)) {
 		msg_to_char(ch, "You can only withdraw coins in a vault.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {

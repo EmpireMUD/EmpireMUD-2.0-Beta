@@ -2089,7 +2089,7 @@ void update_guard_towers(void) {
 		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, ter_next) {
 			tower = ter->room;
 			
-			if (room_has_function_and_city_ok(tower, FNC_GUARD_TOWER)) {
+			if (room_has_function_and_city_ok(NULL, tower, FNC_GUARD_TOWER)) {
 				process_tower(tower);
 			}
 		}

@@ -84,10 +84,11 @@ const char *interlink_codes[11] = { "AX", "RB",	"UN", "DD", "WZ", "FG", "VI", "Q
 */
 void special_building_setup(char_data *ch, room_data *room) {
 	void init_mine(room_data *room, char_data *ch, empire_data *emp);
-		
+	empire_data *emp = ROOM_OWNER(room) ? ROOM_OWNER(room) : (ch ? GET_LOYALTY(ch) : NULL);
+	
 	// mine data
-	if (room_has_function_and_city_ok(room, FNC_MINE)) {
-		init_mine(room, ch, ROOM_OWNER(room) ? ROOM_OWNER(room) : (ch ? GET_LOYALTY(ch) : NULL));
+	if (room_has_function_and_city_ok(emp, room, FNC_MINE)) {
+		init_mine(room, ch, emp);
 	}
 }
 

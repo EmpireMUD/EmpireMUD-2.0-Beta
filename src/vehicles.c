@@ -385,7 +385,7 @@ void finish_vehicle_setup(vehicle_data *veh) {
 	}
 	
 	// mine setup
-	if (room_has_function_and_city_ok(IN_ROOM(veh), FNC_MINE)) {
+	if (room_has_function_and_city_ok(VEH_OWNER(veh), IN_ROOM(veh), FNC_MINE)) {
 		init_mine(IN_ROOM(veh), NULL, VEH_OWNER(veh));
 	}
 }

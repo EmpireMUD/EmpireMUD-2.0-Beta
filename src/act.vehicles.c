@@ -149,7 +149,7 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 		}
 		
 		// ensure in docks if we're finding it remotely
-		if (!IN_ROOM(veh) || !room_has_function_and_city_ok(IN_ROOM(veh), FNC_DOCKS)) {
+		if (!IN_ROOM(veh) || !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(veh), FNC_DOCKS)) {
 			continue;
 		}
 		if (GET_ISLAND_ID(IN_ROOM(veh)) != island) {
@@ -1398,7 +1398,7 @@ ACMD(do_dispatch) {
 	else if (!(to_isle = get_island_by_name(ch, isle_arg)) && !(to_isle = get_island_by_coords(isle_arg))) {
 		msg_to_char(ch, "Unknown target island \"%s\".\r\n", isle_arg);
 	}
-	else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(veh)) && room_has_function_and_city_ok(IN_ROOM(veh), FNC_DOCKS)) {
+	else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(veh)) && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(veh), FNC_DOCKS)) {
 		msg_to_char(ch, "It is already docked on that island.\r\n");
 	}
 	else if (!find_docks(GET_LOYALTY(ch), to_isle->id)) {

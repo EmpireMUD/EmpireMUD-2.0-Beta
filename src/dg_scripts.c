@@ -5143,7 +5143,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, function_flags, FALSE);
 							if (pos != NOTHING) {
-								snprintf(str, slen, "%d", room_has_function_and_city_ok(r, BIT(pos)) ? 1 : 0);
+								snprintf(str, slen, "%d", room_has_function_and_city_ok(NULL, r, BIT(pos)) ? 1 : 0);
 							}
 							else {
 								snprintf(str, slen, "0");

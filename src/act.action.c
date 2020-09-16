@@ -709,7 +709,7 @@ void start_foraging(char_data *ch) {
 void start_mining(char_data *ch) {
 	int mining_timer = config_get_int("mining_timer");
 	
-	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
+	if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) > 0) {
 			start_action(ch, ACT_MINING, mining_timer);
 			
@@ -1256,7 +1256,7 @@ void perform_saw(char_data *ch) {
 	obj_data *proto, *saw;
 	
 	// check both of these because they both have bonuses
-	room = room_has_function_and_city_ok(IN_ROOM(ch), FNC_SAW);
+	room = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_SAW);
 	saw = has_tool(ch, TOOL_SAW);
 	
 	if (!has_player_tech(ch, PTECH_SAW_COMMAND)) {
@@ -2176,7 +2176,7 @@ void process_mining(char_data *ch) {
 			cancel_action(ch);
 			break;
 		}
-		if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
+		if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
 			msg_to_char(ch, "You can't mine here.\r\n");
 			cancel_action(ch);
 			break;
@@ -2848,7 +2848,7 @@ void process_tanning(char_data *ch) {
 		return;
 	}
 	
-	GET_ACTION_TIMER(ch) -= (room_has_function_and_city_ok(IN_ROOM(ch), FNC_TANNERY) ? 4 : 1);
+	GET_ACTION_TIMER(ch) -= (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TANNERY) ? 4 : 1);
 	
 	// need the prototype
 	if (!(proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
@@ -2919,7 +2919,7 @@ ACMD(do_bathe) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
+	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
 		msg_to_char(ch, "You can't bathe here!\r\n");
 	}
 	else {
@@ -3378,7 +3378,7 @@ ACMD(do_mine) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
+	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
 		msg_to_char(ch, "This isn't a mine.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
@@ -3431,7 +3431,7 @@ ACMD(do_mint) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINT)) {
+	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINT)) {
 		msg_to_char(ch, "You can't mint anything here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -3759,7 +3759,7 @@ ACMD(do_saw) {
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!(saw = has_tool(ch, TOOL_SAW)) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_SAW)) {
+	else if (!(saw = has_tool(ch, TOOL_SAW)) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_SAW)) {
 		msg_to_char(ch, "You need to use a saw of some kind to do that.\r\n");
 	}
 	else if (!saw && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {

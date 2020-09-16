@@ -1272,7 +1272,7 @@ void annual_update_map_tile(struct map_data *tile) {
 	}
 	
 	// clean mine data from anything that's not currently a mine
-	if (!room || !room_has_function_and_city_ok(room, FNC_MINE)) {
+	if (!room || !room_has_function_and_city_ok(NULL, room, FNC_MINE)) {
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_GLB_VNUM);
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT);
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
@@ -2186,7 +2186,7 @@ EVENTFUNC(tavern_update) {
 	room = data->room;
 	
 	// still a tavern?
-	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(room, FNC_TAVERN)) {
+	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(NULL, room, FNC_TAVERN)) {
 		// remove data and cancel event
 		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
 		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
@@ -2240,7 +2240,7 @@ void check_tavern_setup(room_data *room) {
 	struct room_event_data *data;
 	struct dg_event *ev;
 	
-	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(room, FNC_TAVERN)) {
+	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(NULL, room, FNC_TAVERN)) {
 		// not a tavern or not set up
 		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
 		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);

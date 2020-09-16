@@ -158,7 +158,7 @@ struct temp_portal_data *build_portal_list_near(char_data *ch, room_data *origin
 		if (!all_portals && !ROOM_OWNER(room)) {
 			continue;	// only show unowned on all
 		}
-		if (!IS_COMPLETE(room) || !room_has_function_and_city_ok(room, FNC_PORTAL)) {
+		if (!IS_COMPLETE(room) || !room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_PORTAL)) {
 			continue;	// not a portal
 		}
 		if (!can_use_room(ch, room, all_portals ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES)) {
@@ -2467,7 +2467,11 @@ ACMD(do_portal) {
 		msg_to_char(ch, "You don't have permission to open portals here.\r\n");
 		return;
 	}
-	if (!all_access && (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_PORTAL) || !room_has_function_and_city_ok(target, FNC_PORTAL))) {
+	if (!all_access && !can_use_room(ch, target, GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to open a portal to that location.\r\n");
+		return;
+	}
+	if (!all_access && (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_PORTAL) || !room_has_function_and_city_ok(GET_LOYALTY(ch), target, FNC_PORTAL))) {
 		msg_to_char(ch, "You can only open portals between portal buildings.\r\n");
 		return;
 	}
@@ -2481,10 +2485,6 @@ ACMD(do_portal) {
 	}
 	if (!all_access && (!check_in_city_requirement(IN_ROOM(ch), TRUE) || !check_in_city_requirement(target, TRUE))) {
 		msg_to_char(ch, "You can't open that portal because of one the locations must be in a city, and isn't.\r\n");
-		return;
-	}
-	if (!all_access && !can_use_room(ch, target, GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to open a portal to that location.\r\n");
 		return;
 	}
 	if (!has_player_tech(ch, PTECH_PORTAL_UPGRADE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(target)) {

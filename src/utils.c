@@ -5517,7 +5517,7 @@ room_data *find_load_room(char_data *ch) {
 	bool veh_ok;
 	
 	// preferred graveyard?
-	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch))) && room_has_function_and_city_ok(rl, FNC_TOMB) && can_use_room(ch, rl, GUESTS_ALLOWED) && !IS_BURNING(rl)) {
+	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch))) && room_has_function_and_city_ok(GET_LOYALTY(ch), rl, FNC_TOMB) && can_use_room(ch, rl, GUESTS_ALLOWED) && !IS_BURNING(rl)) {
 		// check that we're not somewhere illegal (vehicle in enemy territory)
 		veh_ok = GET_MAP_LOC(rl) && (map = real_room(GET_MAP_LOC(rl)->vnum)) && can_use_room(ch, map, GUESTS_ALLOWED);
 		
@@ -5533,7 +5533,7 @@ room_data *find_load_room(char_data *ch) {
 		island = GET_ISLAND_ID(rl);
 		found = NULL;
 		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)), ter, next_ter) {
-			if (room_has_function_and_city_ok(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !IS_BURNING(ter->room)) {
+			if (room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !IS_BURNING(ter->room)) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;
@@ -6171,16 +6171,20 @@ unsigned long long microtime(void) {
 * in-city requirements. (If the room does not have BLD_IN_CITY_ONLY, this only
 * checks the function.)
 *
+* @param empire_data *for_emp Optional: Which empire wants to use the functions. If NULL, no empire/owner check is made.
 * @param room_data *room The room to check.
 * @param bitvector_t fnc_flag Any FNC_ flag.
 * @return bool TRUE if the room has the function and passed the city check, FALSE if not.
 */
-bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
+bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvector_t fnc_flag) {
 	vehicle_data *veh;
 	bool junk;
 	
 	// check vehicles first
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (for_emp && VEH_OWNER(veh) && VEH_OWNER(veh) != for_emp && !emp_can_use_vehicle(for_emp, veh, GUESTS_ALLOWED)) {
+			continue;
+		}
 		if (!VEH_IS_COMPLETE(veh)) {
 			continue;
 		}
@@ -6196,6 +6200,9 @@ bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
 	}
 	
 	// otherwise check the room itself
+	if (for_emp && ROOM_OWNER(room) && ROOM_OWNER(room) != for_emp && !emp_can_use_room(for_emp, room, GUESTS_ALLOWED)) {
+		return FALSE;	// ownership failed
+	}
 	if (!HAS_FUNCTION(room, fnc_flag) || !IS_COMPLETE(room)) {
 		return FALSE;
 	}

@@ -259,7 +259,7 @@ void get_informative_tile_string(char_data *ch, room_data *room, char *buffer) {
 	else if (HAS_MINOR_DISREPAIR(room)) {
 		sprintf(buffer + strlen(buffer), "%sdisrepair", *buffer ? ", " :"");
 	}
-	if (IS_COMPLETE(room) && room_has_function_and_city_ok(room, FNC_MINE)) {
+	if (IS_COMPLETE(room) && room_has_function_and_city_ok(NULL, room, FNC_MINE)) {
 		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
 			sprintf(buffer + strlen(buffer), "%shas ore", *buffer ? ", " :"");
 		}
@@ -981,11 +981,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		}
 	}
 	
-	if (room_has_function_and_city_ok(room, FNC_TAVERN) && IS_COMPLETE(room)) {
+	if (room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_TAVERN) && IS_COMPLETE(room)) {
 		msg_to_char(ch, "The tavern has %s on tap.\r\n", tavern_data[get_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE)].name);
 	}
 
-	if (room_has_function_and_city_ok(room, FNC_MINE) && IS_COMPLETE(room)) {
+	if (room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_MINE) && IS_COMPLETE(room)) {
 		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
 			msg_to_char(ch, "This mine is depleted.\r\n");
 		}
@@ -1565,7 +1565,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			else if (HAS_MINOR_DISREPAIR(to_room)) {
 				strcpy(buf2, "&m");
 			}
-			else if (room_has_function_and_city_ok(to_room, FNC_MINE)) {
+			else if (room_has_function_and_city_ok(NULL, to_room, FNC_MINE)) {
 				if (get_room_extra_data(to_room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
 					strcpy(buf2, "&g");
 				}

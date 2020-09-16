@@ -94,10 +94,10 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	}
 	
 	// type checks
-	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !has_tool(ch, TOOL_GRINDING_STONE) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_MILL)) {
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !has_tool(ch, TOOL_GRINDING_STONE) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MILL)) {
 		msg_to_char(ch, "You need to be in a mill or have a grinding stone to do that.\r\n");
 	}
-	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_PRESS)) {
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_PRESS)) {
 		msg_to_char(ch, "You need a press to do that.\r\n");
 	}
 	else if (CRAFT_FLAGGED(type, CRAFT_BY_RIVER) && (!IS_OUTDOORS(ch) || !find_flagged_sect_within_distance_from_char(ch, SECTF_FRESH_WATER, NOBITS, 1))) {
@@ -106,16 +106,16 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE && !can_forge(ch)) {
 		// sends its own message
 	}
-	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SEW && !has_tool(ch, TOOL_SEWING_KIT) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR)) {
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SEW && !has_tool(ch, TOOL_SEWING_KIT) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAILOR)) {
 		msg_to_char(ch, "You need to equip a sewing kit to make that, or sew it at a tailor.\r\n");
 	}
-	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR) && !has_tool(ch, TOOL_LOOM)) {
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAILOR) && !has_tool(ch, TOOL_LOOM)) {
 		msg_to_char(ch, "You need a loom to do that.\r\n");
 	}
-	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_SMELT)) {
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_SMELT)) {
 		msg_to_char(ch, "You can't %s here.\r\n", command);
 	}
-	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_BAKE && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_OVEN)) {
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_BAKE && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_OVEN)) {
 		msg_to_char(ch, "You need an oven to %s that.\r\n", command);
 	}
 	
@@ -146,16 +146,16 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FIRE | CRAFT_ALCHEMY) && !has_cooking_fire(ch)) {
 		msg_to_char(ch, "You need a good fire to do that.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_CARPENTER)) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_CARPENTER)) {
 		msg_to_char(ch, "You need to %s that at the carpenter!\r\n", command);
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHIPYARD) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_SHIPYARD)) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHIPYARD) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_SHIPYARD)) {
 		msg_to_char(ch, "You need to %s that at the shipyard!\r\n", command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_BLD_UPGRADED) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_UPGRADED)) {
 		msg_to_char(ch, "The building needs to be upgraded to %s that!\r\n", command);
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_GLASSBLOWER) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_GLASSBLOWER)) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_GLASSBLOWER) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_GLASSBLOWER)) {
 		msg_to_char(ch, "You need to %s that at the glassblower!\r\n", command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP) && !find_water_container(ch, ch->carrying) && !find_water_container(ch, ROOM_CONTENTS(IN_ROOM(ch)))) {
@@ -201,10 +201,10 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 bool can_forge(char_data *ch) {
 	bool ok = FALSE;
 	
-	if (!IS_IMMORTAL(ch) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_FORGE)) {
+	if (!IS_IMMORTAL(ch) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_FORGE)) {
 		msg_to_char(ch, "You need to be in a forge to do that.\r\n");
 	}
-	else if (!IS_IMMORTAL(ch) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_FORGE)) {
+	else if (!IS_IMMORTAL(ch) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_FORGE)) {
 		msg_to_char(ch, "This forge only works if it's in a city.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -1231,15 +1231,15 @@ void process_gen_craft(char_data *ch) {
 		// can_forge sends its own message
 		cancel_gen_craft(ch);
 	}
-	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SEW && !(weapon = has_tool(ch, TOOL_SEWING_KIT)) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR)) {
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_SEW && !(weapon = has_tool(ch, TOOL_SEWING_KIT)) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAILOR)) {
 		msg_to_char(ch, "You need to equip a sewing kit to sew this, or sew it at a tailor.\r\n");
 		cancel_gen_craft(ch);
 	}
-	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR) && !has_tool(ch, TOOL_LOOM)) {
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAILOR) && !has_tool(ch, TOOL_LOOM)) {
 		msg_to_char(ch, "You need a loom to keep weaving.\r\n");
 		cancel_gen_craft(ch);
 	}
-	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !(has_mill = room_has_function_and_city_ok(IN_ROOM(ch), FNC_MILL)) &&  !has_tool(ch, TOOL_GRINDING_STONE)) {
+	else if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL && !(has_mill = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MILL)) &&  !has_tool(ch, TOOL_GRINDING_STONE)) {
 		msg_to_char(ch, "You need to be in a mill or have a grinding stone to do keep milling.\r\n");
 		cancel_gen_craft(ch);
 	}
@@ -1267,7 +1267,7 @@ void process_gen_craft(char_data *ch) {
 		}
 		
 		// tailor bonus for weave
-		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) {
+		if (GET_CRAFT_TYPE(type) == CRAFT_TYPE_WEAVE && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAILOR) && IS_COMPLETE(IN_ROOM(ch))) {
 			GET_ACTION_TIMER(ch) -= 3;
 		}
 
@@ -1322,7 +1322,7 @@ const struct {
 bool can_refashion(char_data *ch) {
 	bool ok = FALSE;
 	
-	if (!IS_IMMORTAL(ch) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAILOR)) {
+	if (!IS_IMMORTAL(ch) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAILOR)) {
 		msg_to_char(ch, "You need to be at the tailor to do that.\r\n");
 	}
 	else if (!IS_IMMORTAL(ch) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
@@ -2059,7 +2059,7 @@ ACMD(do_gen_craft) {
 		timer = GET_CRAFT_TIME(type);
 		
 		// potter building bonus	
-		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && room_has_function_and_city_ok(IN_ROOM(ch), FNC_POTTER) && IS_COMPLETE(IN_ROOM(ch))) {
+		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_POTTER) && IS_COMPLETE(IN_ROOM(ch))) {
 			timer /= 4;
 		}
 		

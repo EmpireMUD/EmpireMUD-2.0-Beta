@@ -8993,7 +8993,7 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool 
 	bool bld_ok = use_room && (!by_emp || !ROOM_OWNER(loc) || by_emp == ROOM_OWNER(loc) || has_relationship(by_emp, ROOM_OWNER(loc), DIPL_TRADE));
 	
 	// We skip this check in retrieval mode, since STORE_ALL does not function for retrieval.
-	if (!retrieval_mode && GET_OBJ_STORAGE(obj) && room_has_function_and_city_ok(loc, FNC_STORE_ALL)) {
+	if (!retrieval_mode && GET_OBJ_STORAGE(obj) && room_has_function_and_city_ok(NULL, loc, FNC_STORE_ALL)) {
 		return TRUE; // As long as it can be stored anywhere, it can be stored here.
 	}
 	
@@ -9268,10 +9268,10 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique
 		if (location && GET_ISLAND_ID(location) != iter->island) {
 			continue;
 		}
-		if (location && !IS_SET(iter->flags, EUS_VAULT) && room_has_function_and_city_ok(location, FNC_VAULT)) {
+		if (location && !IS_SET(iter->flags, EUS_VAULT) && room_has_function_and_city_ok(NULL, location, FNC_VAULT)) {
 			continue;
 		}
-		if (location && IS_SET(iter->flags, EUS_VAULT) && !room_has_function_and_city_ok(location, FNC_VAULT)) {
+		if (location && IS_SET(iter->flags, EUS_VAULT) && !room_has_function_and_city_ok(NULL, location, FNC_VAULT)) {
 			continue;
 		}
 		
@@ -9345,7 +9345,7 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 		if (save_emp && eus->island == NO_ISLAND) {
 			eus->island = get_main_island(save_emp);
 		}
-		if (save_emp && room && room_has_function_and_city_ok(room, FNC_VAULT)) {
+		if (save_emp && room && room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_VAULT)) {
 			eus->flags = EUS_VAULT;
 		}
 			

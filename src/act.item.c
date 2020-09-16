@@ -2407,7 +2407,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 	int liquid = LIQ_WATER;
 	int timer = UNLIMITED;
 
-	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAVERN)) {
+	if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAVERN)) {
 		liquid = tavern_data[get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE)].liquid;
 	}
 	
@@ -2421,7 +2421,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 		return;
 	}
 	
-	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_DRINK_WATER)) {
+	if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER)) {
 		if (!IS_COMPLETE(IN_ROOM(ch))) {
 			msg_to_char(ch, "You can't fill your water until it's finished being built.\r\n");
 			return;
@@ -2429,7 +2429,7 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 		act("You gently fill $p with water.", FALSE, ch, obj, 0, TO_CHAR);
 		act("$n gently fills $p with water.", TRUE, ch, obj, 0, TO_ROOM);
 	}
-	else if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_TAVERN)) {
+	else if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TAVERN)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_TAVERN_TYPE) == 0 || !IS_COMPLETE(IN_ROOM(ch))) {
 			msg_to_char(ch, "This tavern has nothing on tap.\r\n");
 			return;
@@ -2955,7 +2955,7 @@ room_data *find_docks(empire_data *emp, int island_id) {
 		if (GET_ISLAND_ID(ter->room) != island_id) {
 			continue;
 		}
-		if (!room_has_function_and_city_ok(ter->room, FNC_DOCKS)) {
+		if (!room_has_function_and_city_ok(emp, ter->room, FNC_DOCKS)) {
 			continue;
 		}
 		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
@@ -2991,7 +2991,7 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		if (GET_ISLAND_ID(ter->room) != shipd->from_island) {
 			continue;
 		}
-		if (!room_has_function_and_city_ok(ter->room, FNC_DOCKS)) {
+		if (!room_has_function_and_city_ok(emp, ter->room, FNC_DOCKS)) {
 			continue;
 		}
 		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
@@ -4111,7 +4111,7 @@ void warehouse_identify(char_data *ch, char *argument, int mode) {
 	}
 	
 	// access permission
-	if (!home_mode && !imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+	if (!home_mode && !imm_access && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
 		msg_to_char(ch, "You can't do that here.\r\n");
 		return;
 	}
@@ -4213,7 +4213,7 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 	}
 	else {	// warehouse mode
 		// access permission
-		if (!imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+		if (!imm_access && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
 			msg_to_char(ch, "You can't do that here.\r\n");
 			return;
 		}
@@ -4225,11 +4225,11 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 			msg_to_char(ch, "You don't have permission to do that here.\r\n");
 			return;
 		}
-		if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
+		if (!imm_access && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
 			msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 			return;
 		}
-		if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE, IN_ROOM(ch))) {
+		if (!imm_access && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_WAREHOUSE) && !has_permission(ch, PRIV_WAREHOUSE, IN_ROOM(ch))) {
 			msg_to_char(ch, "You don't have permission to withdraw items here.\r\n");
 			return;
 		}
@@ -4294,7 +4294,7 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 		}
 		
 		// vault permission was pre-validated, but they have to be in one to use it
-		if (IS_SET(iter->flags, EUS_VAULT) && !imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT)) {
+		if (IS_SET(iter->flags, EUS_VAULT) && !imm_access && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_VAULT)) {
 			msg_to_char(ch, "You need to be in a vault to retrieve %s.\r\n", GET_OBJ_SHORT_DESC(iter->obj));
 			return;
 		}
@@ -4391,7 +4391,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 	}
 	else {	// warehouse mode
 		use_emp = GET_LOYALTY(ch);
-		if (!imm_access && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+		if (!imm_access && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
 			msg_to_char(ch, "You can't do that here.\r\n");
 			return;
 		}
@@ -4403,7 +4403,7 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 			msg_to_char(ch, "You don't have permission to do that here.\r\n");
 			return;
 		}
-		if (!imm_access && room_has_function_and_city_ok(IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
+		if (!imm_access && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_VAULT) && !has_permission(ch, PRIV_WITHDRAW, IN_ROOM(ch))) {
 			msg_to_char(ch, "You don't have permission to store items here.\r\n");
 			return;
 		}
@@ -4745,7 +4745,7 @@ ACMD(do_drink) {
 	if (!*arg) {
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK))
 			type = drink_ROOM;
-		else if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_DRINK_WATER)) {
+		else if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER)) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;
 			}
@@ -4760,7 +4760,7 @@ ACMD(do_drink) {
 	}
 
 	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))) {
-		if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(arg, "water") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)))) {
+		if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(arg, "water") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)))) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;
 			}
@@ -5264,7 +5264,7 @@ ACMD(do_exchange) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs can't exchange anything.\r\n");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINT | FNC_VAULT)) {
+	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINT | FNC_VAULT)) {
 		msg_to_char(ch, "You can't exchange treasure for coins here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -6153,7 +6153,7 @@ ACMD(do_pour) {
 			return;
 		}
 		if (!*arg2) {		/* no 2nd argument */
-			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (room_has_function_and_city_ok(IN_ROOM(ch), FNC_DRINK_WATER | FNC_TAVERN) && IS_COMPLETE(IN_ROOM(ch)))) {
+			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK) || find_flagged_sect_within_distance_from_char(ch, SECTF_DRINK, NOBITS, 1) || (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER | FNC_TAVERN) && IS_COMPLETE(IN_ROOM(ch)))) {
 				fill_from_room(ch, to_obj);
 				return;
 			}
@@ -6175,7 +6175,7 @@ ACMD(do_pour) {
 				return;
 			}
 		}
-		if ((is_abbrev(arg2, "water") || isname(arg2, get_room_name(IN_ROOM(ch), FALSE))) && room_has_function_and_city_ok(IN_ROOM(ch), FNC_DRINK_WATER)) {
+		if ((is_abbrev(arg2, "water") || isname(arg2, get_room_name(IN_ROOM(ch), FALSE))) && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER)) {
 			fill_from_room(ch, to_obj);
 			return;
 		}
@@ -6602,7 +6602,7 @@ ACMD(do_retrieve) {
 		}
 
 		if (!found) {
-			if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+			if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
 				// pass control to warehouse func
 				sprintf(buf, "retrieve %s", original);
 				do_warehouse(ch, buf, 0, 0);
@@ -7157,7 +7157,7 @@ ACMD(do_store) {
 			if (full) {
 				msg_to_char(ch, "It's full.\r\n");
 			}
-			else if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+			else if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
 				// pass control to warehouse func
 				sprintf(buf, "store %s", argument);
 				do_warehouse(ch, buf, 0, 0);
@@ -7204,7 +7204,7 @@ ACMD(do_store) {
 			if (full) {
 				msg_to_char(ch, "It's full.\r\n");
 			}
-			else if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
+			else if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_WAREHOUSE | FNC_VAULT)) {
 				// pass control to warehouse func
 				sprintf(buf, "store %s", argument);
 				do_warehouse(ch, buf, 0, 0);
@@ -7275,7 +7275,7 @@ ACMD(do_trade) {
 	else if (is_abbrev(command, "check")) {
 		trade_check(ch, argument);
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_TRADING_POST) && !IS_IMMORTAL(ch)) {
+	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TRADING_POST) && !IS_IMMORTAL(ch)) {
 		msg_to_char(ch, "You can't trade here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch)) && !IS_IMMORTAL(ch)) {
