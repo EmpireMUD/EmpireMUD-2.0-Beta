@@ -1548,6 +1548,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // basic data
 #define VEH_ANIMALS(veh)  ((veh)->animals)
+#define VEH_ARTISAN(veh)  NOTHING	// for future use
 #define VEH_BUILT_WITH(veh)  ((veh)->built_with)
 #define VEH_CARRYING_N(veh)  ((veh)->carrying_n)
 #define VEH_CONSTRUCTION_ID(veh)  ((veh)->construction_id)
@@ -1783,6 +1784,7 @@ extern sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector
 extern char *simple_time_since(time_t when);
 extern unsigned long long microtime(void);
 extern bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvector_t fnc_flag);
+extern bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 
 // utils from abilities.c
 void add_ability_gain_hook(char_data *ch, ability_data *abil);

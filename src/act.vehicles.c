@@ -1326,7 +1326,7 @@ ACMD(do_disembark) {
 
 
 ACMD(do_dispatch) {
-	extern char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum);
+	extern char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_data *veh, mob_vnum vnum);
 	extern room_data *find_docks(empire_data *emp, int island_id);
 	extern struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc);
 	extern int find_free_shipping_id(empire_data *emp);
@@ -1407,7 +1407,7 @@ ACMD(do_dispatch) {
 	
 	// ready ready go
 	else {
-		if (!(worker = find_chore_worker_in_room(IN_ROOM(veh), OVERSEER))) {
+		if (!(worker = find_chore_worker_in_room(GET_LOYALTY(ch), IN_ROOM(veh), veh, OVERSEER))) {
 			if ((npc = find_free_npc_for_chore(GET_LOYALTY(ch), IN_ROOM(veh)))) {
 				worker = spawn_empire_npc_to_room(GET_LOYALTY(ch), npc, IN_ROOM(veh), OVERSEER);
 			}

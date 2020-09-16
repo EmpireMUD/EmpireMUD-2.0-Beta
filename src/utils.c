@@ -6168,7 +6168,7 @@ unsigned long long microtime(void) {
 
 /**
 * Determines if a room both has a function flag, and passes any necessary
-* in-city requirements. (If the room does not have BLD_IN_CITY_ONLY, this only
+* in-city requirements. (If the room does not have FNC_IN_CITY_ONLY, this only
 * checks the function.)
 *
 * Note: If a player has no empire, they generally pass the for_emp part of this
@@ -6215,6 +6215,47 @@ bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvec
 	
 	// oh okay
 	return TRUE;
+}
+
+
+/**
+* Determines if a vehicle both has a function flag, and passes any necessary
+* in-city requirements. (If it does not have FNC_IN_CITY_ONLY, this only
+* checks the function.)
+*
+* A vehicle that is not owned cannot be in-city. The vehicle must be in the
+* radius of its owner's city, and not on land claimed by another empire.
+*
+* @param vehicle_data *veh The vehicle to test.
+* @param bitvector_t fnc_flag Any FNC_ flag.
+* @return bool TRUE if the vehicle has the function and passed the city check, FALSE if not.
+*/
+bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag) {
+	empire_data *emp = VEH_OWNER(veh);
+	room_data *room = IN_ROOM(veh);
+	bool junk;
+	
+	if (!VEH_IS_COMPLETE(veh) || !IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
+		return FALSE;	// no function
+	}
+	if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS) && IS_SET(fnc_flag, IMMOBILE_FNCS)) {
+		return FALSE;	// exclude certain functions on movable vehicles (functions that require room data)
+	}
+	
+	// for checks that do require in-city
+	if (IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY)) {
+		if (!emp) {
+			return FALSE;	// no owner = cannot be in-city
+		}
+		if (ROOM_OWNER(room) && ROOM_OWNER(room) != emp) {
+			return FALSE;	// someone else's claim is not in our city
+		}
+		if (get_territory_type_for_empire(room, emp, TRUE, &junk) != TER_CITY) {
+			return FALSE;	// not in-city for us either
+		}
+	}
+	
+	return TRUE;	// if we made it this far
 }
 
 

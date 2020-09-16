@@ -38,26 +38,26 @@
 struct empire_territory_data *global_next_territory_entry = NULL;
 
 // protos
-void do_chore_beekeeping(empire_data *emp, room_data *room);
-void do_chore_brickmaking(empire_data *emp, room_data *room);
+void do_chore_beekeeping(empire_data *emp, room_data *room, vehicle_data *veh);
+void do_chore_brickmaking(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_building(empire_data *emp, room_data *room, int mode);
 void do_chore_burn_stumps(empire_data *emp, room_data *room);
 void do_chore_chopping(empire_data *emp, room_data *room);
-void do_chore_digging(empire_data *emp, room_data *room);
+void do_chore_digging(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_dismantle(empire_data *emp, room_data *room);
-void do_chore_dismantle_mines(empire_data *emp, room_data *room);
-void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int interact_type);
+void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *veh);
+void do_chore_einv_interaction(empire_data *emp, room_data *room, vehicle_data *veh, int chore, int interact_type);
 void do_chore_farming(empire_data *emp, room_data *room);
-void do_chore_fishing(empire_data *emp, room_data *room);
+void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_fire_brigade(empire_data *emp, room_data *room);
-void do_chore_gardening(empire_data *emp, room_data *room);
-void do_chore_glassmaking(empire_data *emp, room_data *room);
-void do_chore_mining(empire_data *emp, room_data *room);
-void do_chore_minting(empire_data *emp, room_data *room);
-void do_chore_nailmaking(empire_data *emp, room_data *room);
-void do_chore_quarrying(empire_data *emp, room_data *room);
-void do_chore_shearing(empire_data *emp, room_data *room);
-void do_chore_trapping(empire_data *emp, room_data *room);
+void do_chore_gardening(empire_data *emp, room_data *room, vehicle_data *veh);
+void do_chore_glassmaking(empire_data *emp, room_data *room, vehicle_data *veh);
+void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh);
+void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh);
+void do_chore_nailmaking(empire_data *emp, room_data *room, vehicle_data *veh);
+void do_chore_quarrying(empire_data *emp, room_data *room, vehicle_data *veh);
+void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh);
+void do_chore_trapping(empire_data *emp, room_data *room, vehicle_data *veh);
 
 void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh);
 void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore);
@@ -86,14 +86,15 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_pressing);
 CHORE_GEN_CRAFT_VALIDATOR(chore_smelting);
 CHORE_GEN_CRAFT_VALIDATOR(chore_weaving);
 
-void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator), bool is_skilled);
+void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator), bool is_skilled);
 
 
  /////////////////////////////////////////////////////////////////////////////
 //// DATA ///////////////////////////////////////////////////////////////////
 
-#define MIN_WORKER_POS  POS_SITTING	// minimum position for a worker to be used (otherwise it will spawn another worker)
+#define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0 && !workforce_is_delayed(emp, room, (chore)))
 
+#define MIN_WORKER_POS  POS_SITTING	// minimum position for a worker to be used (otherwise it will spawn another worker)
 
 // CHORE_x
 struct empire_chore_type chore_data[NUM_CHORES] = {
@@ -151,8 +152,6 @@ int einv_interaction_chore_type = 0;
 */
 void process_one_chore(empire_data *emp, room_data *room) {
 	int island = GET_ISLAND_ID(room);	// just look this up once
-	
-	#define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0 && !workforce_is_delayed(emp, room, (chore)))
 	
 	// wait wait don't work here (unless burning)
 	if ((ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK | ROOM_AFF_HAS_INSTANCE)) && !IS_BURNING(room)) {
@@ -217,75 +216,75 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		
 		// this covers all the herbs
 		if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_HERB_GARDENING) && IS_ANY_BUILDING(room) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PICK)) {
-			do_chore_gardening(emp, room);
+			do_chore_gardening(emp, room, NULL);
 		}
 	
 		if (room_has_function_and_city_ok(emp, room, FNC_MINT) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_MINTING)) {
-			do_chore_minting(emp, room);
+			do_chore_minting(emp, room, NULL);
 		}
 		
 		if (room_has_function_and_city_ok(emp, room, FNC_MINE)) {
 			if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
 				if (CHORE_ACTIVE(CHORE_MINING)) {
-					do_chore_mining(emp, room);
+					do_chore_mining(emp, room, NULL);
 				}
 			}
 			else if (IS_MAP_BUILDING(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE) && CHORE_ACTIVE(CHORE_DISMANTLE_MINES)) {
 				// no ore left
-				do_chore_dismantle_mines(emp, room);
+				do_chore_dismantle_mines(emp, room, NULL);
 			}
 		}
 		
 		if (room_has_function_and_city_ok(emp, room, FNC_POTTER) && CHORE_ACTIVE(CHORE_BRICKMAKING)) {
-			do_chore_brickmaking(emp, room);
+			do_chore_brickmaking(emp, room, NULL);
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_SMELT) && CHORE_ACTIVE(CHORE_SMELTING)) {
-			do_chore_gen_craft(emp, room, CHORE_SMELTING, chore_smelting, FALSE);
+			do_chore_gen_craft(emp, room, NULL, CHORE_SMELTING, chore_smelting, FALSE);
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_TAILOR) && CHORE_ACTIVE(CHORE_WEAVING)) {
-			do_chore_gen_craft(emp, room, CHORE_WEAVING, chore_weaving, FALSE);
+			do_chore_gen_craft(emp, room, NULL, CHORE_WEAVING, chore_weaving, FALSE);
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_FORGE) && CHORE_ACTIVE(CHORE_NAILMAKING)) {
-			do_chore_nailmaking(emp, room);
+			do_chore_nailmaking(emp, room, NULL);
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_SAW) && CHORE_ACTIVE(CHORE_SCRAPING)) {
-			do_chore_einv_interaction(emp, room, CHORE_SCRAPING, INTERACT_SCRAPE);
+			do_chore_einv_interaction(emp, room, NULL, CHORE_SCRAPING, INTERACT_SCRAPE);
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
-			do_chore_digging(emp, room);
+			do_chore_digging(emp, room, NULL);
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
-			do_chore_fishing(emp, room);
+			do_chore_fishing(emp, room, NULL);
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_APIARY) && CHORE_ACTIVE(CHORE_BEEKEEPING)) {
-			do_chore_beekeeping(emp, room);
+			do_chore_beekeeping(emp, room, NULL);
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_GLASSBLOWER) && CHORE_ACTIVE(CHORE_GLASSMAKING)) {
-			do_chore_glassmaking(emp, room);
+			do_chore_glassmaking(emp, room, NULL);
 		}
 		if (BUILDING_VNUM(room) == BUILDING_TRAPPERS_POST && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_TRAPPING)) {
-			do_chore_trapping(emp, room);
+			do_chore_trapping(emp, room, NULL);
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_TANNERY) && CHORE_ACTIVE(CHORE_TANNING)) {
-			do_chore_einv_interaction(emp, room, CHORE_TANNING, INTERACT_TAN);
+			do_chore_einv_interaction(emp, room, NULL, CHORE_TANNING, INTERACT_TAN);
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_STABLE) && CHORE_ACTIVE(CHORE_SHEARING)) {
-			do_chore_shearing(emp, room);
+			do_chore_shearing(emp, room, NULL);
 		}
 		if (CHORE_ACTIVE(CHORE_QUARRYING) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_QUARRY)) {
-			do_chore_quarrying(emp, room);
+			do_chore_quarrying(emp, room, NULL);
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_SAW) && CHORE_ACTIVE(CHORE_SAWING)) {
-			do_chore_einv_interaction(emp, room, CHORE_SAWING, INTERACT_SAW);
+			do_chore_einv_interaction(emp, room, NULL, CHORE_SAWING, INTERACT_SAW);
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_MILL) && CHORE_ACTIVE(CHORE_MILLING)) {
-			do_chore_gen_craft(emp, room, CHORE_MILLING, chore_milling, FALSE);
+			do_chore_gen_craft(emp, room, NULL, CHORE_MILLING, chore_milling, FALSE);
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_PRESS) && CHORE_ACTIVE(CHORE_OILMAKING)) {
-			do_chore_gen_craft(emp, room, CHORE_OILMAKING, chore_pressing, FALSE);
+			do_chore_gen_craft(emp, room, NULL, CHORE_OILMAKING, chore_pressing, FALSE);
 		}
 		if (BUILDING_VNUM(room) == RTYPE_SORCERER_TOWER && check_in_city_requirement(room, TRUE) && CHORE_ACTIVE(CHORE_NEXUS_CRYSTALS) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_HAS_TECH(emp, TECH_EXARCH_CRAFTS)) {
-			do_chore_gen_craft(emp, room, CHORE_NEXUS_CRYSTALS, chore_nexus_crystals, TRUE);
+			do_chore_gen_craft(emp, room, NULL, CHORE_NEXUS_CRYSTALS, chore_nexus_crystals, TRUE);
 		}
 	}
 }
@@ -295,37 +294,38 @@ void process_one_chore(empire_data *emp, room_data *room) {
 * Runs a single vehicle-related chore
 */
 void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
+	room_data *room = IN_ROOM(veh);
 	int island;
 	
+	bool on_fire = VEH_FLAGGED(veh, VEH_ON_FIRE);
+	
 	// basic safety and sanitation
-	if (!emp || !veh || !IN_ROOM(veh)) {
+	if (!emp || !veh || !room) {
 		return;
 	}
-	if ((VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)) && !VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+	if ((VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || (VEH_FLAGGED(veh, VEH_BUILDING) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK))) && !on_fire) {
 		return;	// skip workforce if no-work AND not-on-fire
 	}
-	if (WATER_SECT(IN_ROOM(veh)) || (island = GET_ISLAND_ID(IN_ROOM(veh))) == NO_ISLAND) {
-		return;
+	if (WATER_SECT(room) || (island = GET_ISLAND_ID(room)) == NO_ISLAND) {
+		return;	// no outside work on water tiles
 	}
-	if (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)) {
-		return;
+	if (ROOM_OWNER(room) && ROOM_OWNER(room) != emp && !on_fire && !has_relationship(emp, ROOM_OWNER(room), DIPL_ALLIED)) {
+		return;	// cannot work in non-allied empires
 	}
-	if (ROOM_OWNER(IN_ROOM(veh)) && ROOM_OWNER(IN_ROOM(veh)) != emp && !has_relationship(emp, ROOM_OWNER(IN_ROOM(veh)), DIPL_ALLIED)) {
-		return;
-	}
-	if (empire_has_needs_status(emp, GET_ISLAND_ID(IN_ROOM(veh)), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED)) {
+	if (empire_has_needs_status(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED)) {
 		return;	// starving
 	}
 	
+	// priority chores:
+	
 	// FIRE
-	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+	if (on_fire) {
 		if (empire_chore_limit(emp, island, CHORE_FIRE_BRIGADE)) {
 			vehicle_chore_fire_brigade(emp, veh);
 		}
-		// prevent other chores from firing while burning
-		return;
+		return;	// prevent other chores from firing while burning
 	}
-	// REPAIR
+	// BUILDING/REPAIR
 	if (VEH_NEEDS_RESOURCES(veh) || !VEH_IS_COMPLETE(veh)) {
 		if (VEH_IS_DISMANTLING(veh) && empire_chore_limit(emp, island, CHORE_BUILDING)) {
 			vehicle_chore_dismantle(emp, veh);
@@ -339,9 +339,13 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		return;	// no further chores while working on the building (dismantle may even have purged it)
 	}
 	
-	// any further chores require no no-work flag
-	if (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK)) {
-		return;
+	// artisinal chores:
+	
+	// skilled labor chores:
+	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
+		if (CHORE_ACTIVE(CHORE_HERB_GARDENING) && has_interaction(VEH_INTERACTIONS(veh), INTERACT_PICK)) {
+			do_chore_gardening(emp, room, veh);
+		}
 	}
 }
 
@@ -877,18 +881,20 @@ int empire_chore_limit(empire_data *emp, int island_id, int chore) {
 
 /**
 * Looks for a matching worker in the room who can also do chores. If it finds
-* any disabled copies of the worker, it marks them as spawned and does not
-* return them, which should later trigger a new worker to be placed.
+* any disabled copies of the worker, it skips them, which will likely trigger
+* a new worker to be placed.
 *
 * It will also find an artisan in the room and use that, if there is one. It
 * skips mobs whose spawn time is 'now', who are probably doing another chore
 * or just spawned here.
 *
+* @param empire_data *emp Whose worker (not necssarily the same as the room owner).
 * @param room_data *room The location to check.
+* @param vehicle_data *veh Optional: If it's a vehicle chore, this will look for a vehicle artisan. (NULL for not-a-vehicle-chore.)
 * @param mob_vnum vnum The worker vnum to look for.
 * @return char_data* The found mob, or NULL;
 */
-char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum) {
+char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_data *veh, mob_vnum vnum) {
 	any_vnum artisan_vnum = NOTHING;
 	char_data *mob;
 	
@@ -898,13 +904,16 @@ char_data *find_chore_worker_in_room(room_data *room, mob_vnum vnum) {
 	}
 	
 	// can also use an artisan
-	if (GET_BUILDING(room)) {
+	if (veh) {
+		artisan_vnum = VEH_ARTISAN(veh);
+	}
+	else if (GET_BUILDING(room)) {
 		artisan_vnum = GET_BLD_ARTISAN(GET_BUILDING(room));
 	}
 	
 	DL_FOREACH2(ROOM_PEOPLE(room), mob, next_in_room) {
-		if (!IS_NPC(mob)) {
-			continue;	// player
+		if (!IS_NPC(mob) || GET_LOYALTY(mob) != emp) {
+			continue;	// player or wrong empire
 		}
 		if (GET_MOB_VNUM(mob) != vnum && (artisan_vnum == NOTHING || GET_MOB_VNUM(mob) != artisan_vnum)) {
 			continue;	// wrong mob
@@ -1405,15 +1414,16 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_weaving) {
 *
 * @param empire_data *emp The empire doing the chore.
 * @param room_data *room The room the chore is in.
+* @param vehicle_data *veh Optional: If it's a vehicle chore, not a room chore. (NULL for not-a-vehicle-chore.)
 * @param int chore CHORE_ const for this chore.
 * @param CHORE_GEN_CRAFT_VALIDATOR *validator A function that validates a craft.
 * @param bool is_skilled If TRUE, gains exp for Skilled Labor.
 */
-void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator), bool is_skilled) {
+void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator), bool is_skilled) {
 	extern struct gen_craft_data_t gen_craft_data[];
 	
 	struct empire_storage_data *store = NULL;
-	char_data *worker = find_chore_worker_in_room(room, chore_data[chore].mob);
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[chore].mob);
 	bool any_over_limit = FALSE, any_no_res = FALSE, done_any = FALSE;
 	craft_data *craft, *next_craft, *do_craft = NULL;
 	int islid = GET_ISLAND_ID(room);
@@ -1526,8 +1536,8 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, int chore, CHORE_GEN_
  /////////////////////////////////////////////////////////////////////////////
 //// CHORE FUNCTIONS ////////////////////////////////////////////////////////
 
-void do_chore_beekeeping(empire_data *emp, room_data *room) {
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BEEKEEPING].mob);
+void do_chore_beekeeping(empire_data *emp, room_data *room, vehicle_data *veh) {
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_BEEKEEPING].mob);
 	int islid = GET_ISLAND_ID(room);
 	bool can_gain_honeycomb = can_gain_chore_resource(emp, room, CHORE_BEEKEEPING, o_HONEYCOMB);
 	bool can_gain_wax = can_gain_chore_resource(emp, room, CHORE_BEEKEEPING, o_BEESWAX);
@@ -1575,8 +1585,8 @@ void do_chore_beekeeping(empire_data *emp, room_data *room) {
 }
 
 
-void do_chore_brickmaking(empire_data *emp, room_data *room) {
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BRICKMAKING].mob);
+void do_chore_brickmaking(empire_data *emp, room_data *room, vehicle_data *veh) {
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_BRICKMAKING].mob);
 	int islid = GET_ISLAND_ID(room);
 	bool can_gain = can_gain_chore_resource(emp, room, CHORE_BRICKMAKING, o_BRICKS);
 	bool has_clay = empire_can_afford_component(emp, islid, COMP_CLAY, 2, FALSE, TRUE);
@@ -1611,7 +1621,7 @@ void do_chore_brickmaking(empire_data *emp, room_data *room) {
 
 
 /**
-* This is used for both building and maintenance.
+* This is used by non-vehicles for both building and maintenance.
 *
 * @param empire_data *emp Which empire is doing the chore.
 * @param room_data *room Which room to build/maintain
@@ -1621,7 +1631,7 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 	void finish_building(char_data *ch, room_data *room);
 	void finish_maintenance(char_data *ch, room_data *room);
 	
-	char_data *worker = find_chore_worker_in_room(room, chore_data[mode].mob);
+	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[mode].mob);
 	struct empire_storage_data *store = NULL;
 	bool can_do = FALSE;
 	struct resource_data *res = NULL;
@@ -1712,10 +1722,10 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 void do_chore_burn_stumps(empire_data *emp, room_data *room) {
 	void perform_burn_room(room_data *room);
 	
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BURN_STUMPS].mob);
+	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_BURN_STUMPS].mob);
 	
 	if (!worker) {	// as a backup, use a chopper if present
-		worker = find_chore_worker_in_room(room, chore_data[CHORE_CHOPPING].mob);
+		worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_CHOPPING].mob);
 	}
 	
 	if (worker) {	// always just 1 tick
@@ -1764,7 +1774,7 @@ INTERACTION_FUNC(one_chop_chore) {
 void do_chore_chopping(empire_data *emp, room_data *room) {
 	extern void change_chop_territory(room_data *room);
 	
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_CHOPPING].mob);
+	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_CHOPPING].mob);
 	bool depleted = (get_depletion(room, DPLTN_CHOP) >= config_get_int("chop_depletion"));
 	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_CHOPPING, INTERACT_CHOP);
 	bool can_do = !depleted && can_gain;
@@ -1846,8 +1856,8 @@ INTERACTION_FUNC(one_dig_chore) {
 }
 
 
-void do_chore_digging(empire_data *emp, room_data *room) {	
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_DIGGING].mob);
+void do_chore_digging(empire_data *emp, room_data *room, vehicle_data *veh) {	
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_DIGGING].mob);
 	bool depleted = (get_depletion(room, DPLTN_DIG) >= DEPLETION_LIMIT(room)) ? TRUE : FALSE;
 	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_DIGGING, INTERACT_DIG);
 	bool can_do = !depleted && can_gain;
@@ -1878,13 +1888,14 @@ void do_chore_digging(empire_data *emp, room_data *room) {
 }
 
 
+// for non-vehicles
 void do_chore_dismantle(empire_data *emp, room_data *room) {
 	void finish_dismantle(char_data *ch, room_data *room);
 	void finish_building(char_data *ch, room_data *room);
 	
 	struct resource_data *res, *next_res;
 	bool can_do = FALSE;
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_BUILDING].mob);
+	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_BUILDING].mob);
 	obj_data *proto;
 	
 	// anything we can dismantle?
@@ -1947,14 +1958,14 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 }
 
 
-void do_chore_dismantle_mines(empire_data *emp, room_data *room) {
+void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *veh) {
 	void start_dismantle_building(room_data *loc);
 	
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_DISMANTLE_MINES].mob);
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_DISMANTLE_MINES].mob);
 	bool can_do = IS_COMPLETE(room);
 	
 	if (!worker) {	// as a backup, use a miner if present
-		worker = find_chore_worker_in_room(room, chore_data[CHORE_MINING].mob);
+		worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_MINING].mob);
 	}
 	
 	if (worker && can_do) {
@@ -2000,8 +2011,8 @@ INTERACTION_FUNC(one_einv_interaction_chore) {
 * @param int chore Which CHORE_ it is.
 * @param int interact_type Which INTERACT_ to run on items in the einv.
 */
-void do_chore_einv_interaction(empire_data *emp, room_data *room, int chore, int interact_type) {
-	char_data *worker = find_chore_worker_in_room(room, chore_data[chore].mob);
+void do_chore_einv_interaction(empire_data *emp, room_data *room, vehicle_data *veh, int chore, int interact_type) {
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[chore].mob);
 	struct empire_storage_data *store, *next_store, *found_store = NULL;
 	obj_data *proto, *found_proto = NULL;
 	int islid = GET_ISLAND_ID(room);
@@ -2102,7 +2113,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 	void schedule_crop_growth(struct map_data *map);
 	void uncrop_tile(room_data *room);
 	
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_FARMING].mob);
+	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_FARMING].mob);
 	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_FARMING, INTERACT_HARVEST);
 	sector_data *old_sect;
 	
@@ -2202,8 +2213,8 @@ INTERACTION_FUNC(one_fishing_chore) {
 }
 
 
-void do_chore_fishing(empire_data *emp, room_data *room) {	
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_FISHING].mob);
+void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh) {	
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_FISHING].mob);
 	bool depleted = (get_depletion(room, DPLTN_FISH) >= DEPLETION_LIMIT(room)) ? TRUE : FALSE;
 	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_FISHING, INTERACT_FISH);
 	bool can_do = !depleted && can_gain;
@@ -2235,10 +2246,11 @@ void do_chore_fishing(empire_data *emp, room_data *room) {
 }
 
 
+// for non-vehicles
 void do_chore_fire_brigade(empire_data *emp, room_data *room) {
 	void stop_burning(room_data *room);
 	
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_FIRE_BRIGADE].mob);
+	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_FIRE_BRIGADE].mob);
 	int total_ticks, per_hour;
 	
 	if (worker && IS_BURNING(room)) {
@@ -2287,10 +2299,10 @@ INTERACTION_FUNC(one_gardening_chore) {
 }
 
 
-void do_chore_gardening(empire_data *emp, room_data *room) {
+void do_chore_gardening(empire_data *emp, room_data *room, vehicle_data *veh) {
 	int garden_depletion = config_get_int("garden_depletion");
 	
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_HERB_GARDENING].mob);
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_HERB_GARDENING].mob);
 	bool depleted = (get_depletion(room, DPLTN_PICK) >= garden_depletion);
 	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_HERB_GARDENING, INTERACT_PICK);
 	bool can_do = !depleted && can_gain;
@@ -2322,8 +2334,8 @@ void do_chore_gardening(empire_data *emp, room_data *room) {
 
 
 // converts 2 basic sand to 1 glass ingot
-void do_chore_glassmaking(empire_data *emp, room_data *room) {
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_GLASSMAKING].mob);
+void do_chore_glassmaking(empire_data *emp, room_data *room, vehicle_data *veh) {
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_GLASSMAKING].mob);
 	int islid = GET_ISLAND_ID(room);
 	bool can_gain = can_gain_chore_resource(emp, room, CHORE_GLASSMAKING, o_GLASS_INGOT);
 	struct empire_storage_data *sand = find_stored_resource(emp, islid, o_SAND);
@@ -2408,8 +2420,8 @@ INTERACTION_FUNC(one_mining_chore) {
 }
 
 
-void do_chore_mining(empire_data *emp, room_data *room) {
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_MINING].mob);
+void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh) {
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_MINING].mob);
 	struct global_data *mine = global_proto(get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM));
 	bool depleted = (!mine || GET_GLOBAL_TYPE(mine) != GLOBAL_MINE_DATA || get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0);
 	bool can_gain = can_gain_chore_resource_from_interaction_list(emp, room, CHORE_MINING, GET_GLOBAL_INTERACTIONS(mine), INTERACT_MINE, TRUE);
@@ -2446,9 +2458,9 @@ void do_chore_mining(empire_data *emp, room_data *room) {
 }
 
 
-void do_chore_minting(empire_data *emp, room_data *room) {
+void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 	struct empire_storage_data *highest = NULL, *store, *next_store;
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_MINTING].mob);
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_MINTING].mob);
 	int high_amt, limit, islid = GET_ISLAND_ID(room);
 	struct empire_island *eisle = get_empire_island(emp, islid);
 	bool can_do = TRUE;
@@ -2520,8 +2532,8 @@ void do_chore_minting(empire_data *emp, room_data *room) {
 }
 
 
-void do_chore_nailmaking(empire_data *emp, room_data *room) {
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_NAILMAKING].mob);
+void do_chore_nailmaking(empire_data *emp, room_data *room, vehicle_data *veh) {
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_NAILMAKING].mob);
 	int islid = GET_ISLAND_ID(room);
 	bool can_gain = can_gain_chore_resource(emp, room, CHORE_NAILMAKING, o_NAILS);
 	bool has_metal = empire_can_afford_component(emp, islid, COMP_COMMON_METAL, 1, FALSE, TRUE);
@@ -2576,8 +2588,8 @@ INTERACTION_FUNC(one_quarry_chore) {
 }
 
 
-void do_chore_quarrying(empire_data *emp, room_data *room) {
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_QUARRYING].mob);
+void do_chore_quarrying(empire_data *emp, room_data *room, vehicle_data *veh) {
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_QUARRYING].mob);
 	bool depleted = (get_depletion(room, DPLTN_QUARRY) >= config_get_int("common_depletion")) ? TRUE : FALSE;
 	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_QUARRYING, INTERACT_QUARRY);
 	bool can_do = !depleted && can_gain;
@@ -2625,10 +2637,10 @@ void do_chore_quarrying(empire_data *emp, room_data *room) {
 }
 
 
-void do_chore_shearing(empire_data *emp, room_data *room) {
+void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 	int shear_growth_time = config_get_int("shear_growth_time");
 	
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_SHEARING].mob);
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_SHEARING].mob);
 	char_data *mob, *shearable = NULL;
 	
 	bool any_over_limit = FALSE, any_already_sheared = FALSE, done_any = FALSE;
@@ -2713,10 +2725,10 @@ void do_chore_shearing(empire_data *emp, room_data *room) {
 }
 
 
-void do_chore_trapping(empire_data *emp, room_data *room) {
+void do_chore_trapping(empire_data *emp, room_data *room, vehicle_data *veh) {
 	int short_depletion = config_get_int("short_depletion");
 	
-	char_data *worker = find_chore_worker_in_room(room, chore_data[CHORE_TRAPPING].mob);
+	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_TRAPPING].mob);
 	obj_vnum vnum = number(0, 1) ? o_SMALL_SKIN : o_LARGE_SKIN;
 	bool depleted = get_depletion(room, DPLTN_TRAPPING) >= short_depletion ? TRUE : FALSE;
 	bool can_gain = can_gain_chore_resource(emp, room, CHORE_TRAPPING, vnum);
@@ -2766,7 +2778,7 @@ void do_chore_trapping(empire_data *emp, room_data *room) {
 //// VEHICLE CHORE FUNCTIONS ////////////////////////////////////////////////
 
 void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
-	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[CHORE_FIRE_BRIGADE].mob);
+	char_data *worker = find_chore_worker_in_room(emp, IN_ROOM(veh), veh, chore_data[CHORE_FIRE_BRIGADE].mob);
 	
 	if (worker && VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		charge_workforce(emp, IN_ROOM(veh), worker, 1, NOTHING, 0);
@@ -2787,7 +2799,7 @@ void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
 void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 	void complete_vehicle(vehicle_data *veh);
 	
-	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[chore].mob);
+	char_data *worker = find_chore_worker_in_room(emp, IN_ROOM(veh), veh, chore_data[chore].mob);
 	struct empire_storage_data *store = NULL;
 	int islid = GET_ISLAND_ID(IN_ROOM(veh));
 	char buf[MAX_STRING_LENGTH];
@@ -2868,7 +2880,7 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
 	void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
 	
-	char_data *worker = find_chore_worker_in_room(IN_ROOM(veh), chore_data[CHORE_BUILDING].mob);
+	char_data *worker = find_chore_worker_in_room(emp, IN_ROOM(veh), veh, chore_data[CHORE_BUILDING].mob);
 	bool can_do = FALSE, claims_with_room;
 	struct resource_data *res, *found_res = NULL;
 	int islid = GET_ISLAND_ID(IN_ROOM(veh));
