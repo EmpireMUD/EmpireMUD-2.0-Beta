@@ -144,7 +144,7 @@ S
 D
 The blacksmith owns and maintains the forge.
 ~
-I 4 2105 100.00 1  # LOOT: a hammer
+I 4 2105 100.00 1  # LOOT: hammer
 S
 #213
 #n stablemaster master~
@@ -167,7 +167,7 @@ S
 D
 The baker owns and runs this little shop.
 ~
-I 4 3313 100.00 2  # LOOT: a loaf of bread
+I 4 3313 100.00 2  # LOOT: loaf of bread
 S
 #215
 #n glassblower blower~
@@ -378,11 +378,11 @@ D
    The High Sorcerer looks out from the tower, surveying the city they have
 sworn to protect.
 ~
-I 4 1107 10.00 1  # LOOT: a wooden staff
-I 4 1206 10.00 1 X  # LOOT: an iridescent blue iris
-I 4 103 10.00 1 X  # LOOT: a yellow lightning stone
-I 4 104 10.00 1 X  # LOOT: a red bloodstone
-I 4 1300 10.00 1 X  # LOOT: a glowing green seashell
+I 4 1107 10.00 1  # LOOT: wooden staff
+I 4 1206 10.00 1 X  # LOOT: iridescent blue iris
+I 4 103 10.00 1 X  # LOOT: yellow lightning stone
+I 4 104 10.00 1 X  # LOOT: red bloodstone
+I 4 1300 10.00 1 X  # LOOT: glowing green seashell
 S
 #229
 #n repairman~
@@ -486,11 +486,11 @@ D
    The sorcerer is dressed in the city's finery and carrying a small stack of
 books.
 ~
-I 4 1107 10.00 1  # LOOT: a wooden staff
-I 4 1206 10.00 1 X  # LOOT: an iridescent blue iris
-I 4 103 10.00 1 X  # LOOT: a yellow lightning stone
-I 4 104 10.00 1 X  # LOOT: a red bloodstone
-I 4 1300 10.00 1 X  # LOOT: a glowing green seashell
+I 4 1107 10.00 1  # LOOT: wooden staff
+I 4 1206 10.00 1 X  # LOOT: iridescent blue iris
+I 4 103 10.00 1 X  # LOOT: yellow lightning stone
+I 4 104 10.00 1 X  # LOOT: red bloodstone
+I 4 1300 10.00 1 X  # LOOT: glowing green seashell
 S
 #238
 diplomat foreign~
@@ -557,7 +557,7 @@ A druid is chanting here.
 D
 The druid is wearing a long, brown cloak with the hood over his head.
 ~
-I 4 1107 10.00 1  # LOOT: a wooden staff
+I 4 1107 10.00 1  # LOOT: wooden staff
 S
 #244
 priest~
@@ -569,7 +569,7 @@ The priest is standing here.
 D
 The priest is dressed all in white, and welcomes you with open arms.
 ~
-I 4 1107 10.00 1  # LOOT: a wooden staff
+I 4 1107 10.00 1  # LOOT: wooden staff
 S
 #245
 knight court~
@@ -582,10 +582,10 @@ D
    The court night is wearing his best-looking armor, though not necessarily
 his best.
 ~
-I 4 2202 10.00 1  # LOOT: an arming sword
-I 4 2210 10.00 1  # LOOT: a mace
+I 4 2202 10.00 1  # LOOT: arming sword
+I 4 2210 10.00 1  # LOOT: mace
 I 4 2310 10.00 1  # LOOT: splint vambraces
-I 4 2315 10.00 1  # LOOT: a kite shield
+I 4 2315 10.00 1  # LOOT: kite shield
 S
 #246
 highwayman~
@@ -597,13 +597,13 @@ A highwayman is lurking in the shadows.
 D
 The highwayman is looking right at your coinpurse!
 ~
-I 4 2300 10.00 1  # LOOT: a leather breastplate
-I 4 2301 10.00 1  # LOOT: a leather helm
+I 4 2300 10.00 1  # LOOT: leather breastplate
+I 4 2301 10.00 1  # LOOT: leather helm
 I 4 2302 10.00 1  # LOOT: leather vambraces
 I 4 2306 10.00 1  # LOOT: leather shoes
-I 4 2120 1.00 1  # LOOT: a small silver ring
-I 4 2122 0.25 1  # LOOT: a sparkling gold ring
-I 4 2208 10.00 1 W  # LOOT: a dagger
+I 4 2120 1.00 1  # LOOT: small silver ring
+I 4 2122 0.25 1  # LOOT: sparkling gold ring
+I 4 2208 10.00 1 W  # LOOT: dagger
 S
 #247
 boy lost~
@@ -628,10 +628,10 @@ D
 The knight is lightly armored and looks travel-weary.
 ~
 I 4 2310 10.00 1  # LOOT: splint vambraces
-I 4 2315 10.00 1  # LOOT: a kite shield
-I 4 2309 10.00 1  # LOOT: a mail coif
-I 4 2210 10.00 1 W  # LOOT: a mace
-I 4 2202 10.00 1 W  # LOOT: an arming sword
+I 4 2315 10.00 1  # LOOT: kite shield
+I 4 2309 10.00 1  # LOOT: mail coif
+I 4 2210 10.00 1 W  # LOOT: mace
+I 4 2202 10.00 1 W  # LOOT: arming sword
 S
 #249
 sailor lost~
@@ -643,7 +643,7 @@ A lost sailor is sitting on a raft.
 D
 The sailor is adrift on a small raft.
 ~
-I 4 900 100.00 1  # LOOT: a shoddy raft
+I 4 900 100.00 1  # LOOT: shoddy raft
 S
 #250
 wizard rogue~
@@ -656,11 +656,11 @@ D
    The wizard isn't dressed in the colors of any school of magic you're
 familiar with. He also doesn't look very friendly!
 ~
-I 4 1107 10.00 1  # LOOT: a wooden staff
-I 4 1206 10.00 1 X  # LOOT: an iridescent blue iris
-I 4 103 10.00 1 X  # LOOT: a yellow lightning stone
-I 4 104 10.00 1 X  # LOOT: a red bloodstone
-I 4 1300 10.00 1 X  # LOOT: a glowing green seashell
+I 4 1107 10.00 1  # LOOT: wooden staff
+I 4 1206 10.00 1 X  # LOOT: iridescent blue iris
+I 4 103 10.00 1 X  # LOOT: yellow lightning stone
+I 4 104 10.00 1 X  # LOOT: red bloodstone
+I 4 1300 10.00 1 X  # LOOT: glowing green seashell
 S
 #251
 guard cityguard #n~
@@ -672,10 +672,10 @@ A city guard is standing here.
 D
 This dutiful guard stands watch over the city.
 ~
-I 4 2202 10.00 1  # LOOT: an arming sword
-I 4 2210 10.00 1  # LOOT: a mace
+I 4 2202 10.00 1  # LOOT: arming sword
+I 4 2210 10.00 1  # LOOT: mace
 I 4 2310 10.00 1  # LOOT: splint vambraces
-I 4 2315 10.00 1  # LOOT: a kite shield
+I 4 2315 10.00 1  # LOOT: kite shield
 T 251
 T 250
 S
@@ -689,10 +689,10 @@ An outguard from #e is standing here.
 D
 The outguard is guarding the empire's frontier.
 ~
-I 4 2202 10.00 1  # LOOT: an arming sword
-I 4 2210 10.00 1  # LOOT: a mace
+I 4 2202 10.00 1  # LOOT: arming sword
+I 4 2210 10.00 1  # LOOT: mace
 I 4 2302 10.00 1  # LOOT: leather vambraces
-I 4 2315 10.00 1  # LOOT: a kite shield
+I 4 2315 10.00 1  # LOOT: kite shield
 S
 #253
 scout #a #n~
@@ -704,10 +704,10 @@ A #a scout is standing here.
 D
 The scout is keeping an eye on the frontier.
 ~
-I 4 2202 10.00 1  # LOOT: an arming sword
-I 4 2210 10.00 1  # LOOT: a mace
+I 4 2202 10.00 1  # LOOT: arming sword
+I 4 2210 10.00 1  # LOOT: mace
 I 4 2302 10.00 1  # LOOT: leather vambraces
-I 4 909 10.00 1  # LOOT: a short bow
+I 4 909 10.00 1  # LOOT: short bow
 S
 #254
 imperial guard #n~
@@ -719,10 +719,10 @@ An imperial guard is standing here.
 D
 The imperial guard is protecting the empire's most important assets.
 ~
-I 4 2202 10.00 1  # LOOT: an arming sword
-I 4 2210 10.00 1  # LOOT: a mace
+I 4 2202 10.00 1  # LOOT: arming sword
+I 4 2210 10.00 1  # LOOT: mace
 I 4 2310 10.00 1  # LOOT: splint vambraces
-I 4 2315 10.00 1  # LOOT: a kite shield
+I 4 2315 10.00 1  # LOOT: kite shield
 T 250
 T 251
 S
@@ -835,7 +835,7 @@ A bootlegger is standing here.
 D
 The bootlegger is trying to smuggle a cask of illegal ale through the swamp.
 ~
-I 4 2115 50.00 1  # LOOT: a cask
+I 4 2115 50.00 1  # LOOT: cask
 S
 #265
 #n~
@@ -1036,6 +1036,17 @@ glassmaker #n~
 1 0 0 12
 D
 This citizen is making glass ingots for the glassblower. (workforce glassmaking)
+~
+S
+#283
+#n apprentice~
+#n~
+#n is working as an apprentice.
+~
+20 50 bdqv 0 3
+1 0 0 6
+D
+This citizen appears to be making something. (workforce crafting)
 ~
 S
 $
