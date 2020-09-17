@@ -229,7 +229,7 @@ void random_encounter(char_data *ch) {
 		return;
 	}
 
-	run_room_interactions(ch, IN_ROOM(ch), INTERACT_ENCOUNTER, run_one_encounter);
+	run_room_interactions(ch, IN_ROOM(ch), INTERACT_ENCOUNTER, NULL, run_one_encounter);
 }
 
 

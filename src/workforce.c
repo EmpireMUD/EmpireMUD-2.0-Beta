@@ -354,10 +354,29 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		}
 	}
 	
-	// unskilled chores
+	// unskilled chores:
 	if (vehicle_has_function_and_city_ok(veh, FNC_POTTER) && CHORE_ACTIVE(CHORE_BRICKMAKING)) {
 		do_chore_brickmaking(emp, room, veh);
 	}
+	
+	// gen-craft chores:
+	if (vehicle_has_function_and_city_ok(veh, FNC_SMELT) && CHORE_ACTIVE(CHORE_SMELTING)) {
+		do_chore_gen_craft(emp, room, veh, CHORE_SMELTING, chore_smelting, FALSE);
+	}
+	if (vehicle_has_function_and_city_ok(veh, FNC_TAILOR) && CHORE_ACTIVE(CHORE_WEAVING)) {
+		do_chore_gen_craft(emp, room, veh, CHORE_WEAVING, chore_weaving, FALSE);
+	}
+	if (vehicle_has_function_and_city_ok(veh, FNC_MILL) && CHORE_ACTIVE(CHORE_MILLING)) {
+		do_chore_gen_craft(emp, room, veh, CHORE_MILLING, chore_milling, FALSE);
+	}
+	if (vehicle_has_function_and_city_ok(veh, FNC_PRESS) && CHORE_ACTIVE(CHORE_OILMAKING)) {
+		do_chore_gen_craft(emp, room, veh, CHORE_OILMAKING, chore_pressing, FALSE);
+	}
+	/*
+	if (BUILDING_VNUM(room) == RTYPE_SORCERER_TOWER && check_in_city_requirement(room, TRUE) && CHORE_ACTIVE(CHORE_NEXUS_CRYSTALS) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_HAS_TECH(emp, TECH_EXARCH_CRAFTS)) {
+		do_chore_gen_craft(emp, room, veh, CHORE_NEXUS_CRYSTALS, chore_nexus_crystals, TRUE);
+	}
+	*/
 }
 
 
@@ -1767,7 +1786,7 @@ void do_chore_burn_stumps(empire_data *emp, room_data *room) {
 
 
 INTERACTION_FUNC(one_chop_chore) {
-	empire_data *emp = ROOM_OWNER(inter_room);
+	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	char buf[MAX_STRING_LENGTH];
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_CHOPPING, interaction->vnum)) {
@@ -1808,7 +1827,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 			add_to_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS, -1);
 			if (get_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS) == 0) {
 				// finished!
-				run_room_interactions(worker, room, INTERACT_CHOP, one_chop_chore);
+				run_room_interactions(worker, room, INTERACT_CHOP, NULL, one_chop_chore);
 				change_chop_territory(room);
 				
 				if (CAN_CHOP_ROOM(room)) {
@@ -1852,7 +1871,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 
 
 INTERACTION_FUNC(one_dig_chore) {
-	empire_data *emp = ROOM_OWNER(inter_room);
+	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	char buf[MAX_STRING_LENGTH];
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_DIGGING, interaction->vnum)) {
@@ -1882,7 +1901,7 @@ void do_chore_digging(empire_data *emp, room_data *room, vehicle_data *veh) {
 		// not able to ewt_mark_resource_worker() until we're inside the interact
 		if (worker) {
 			charge_workforce(emp, room, worker, 1, NOTHING, 0);
-			run_room_interactions(worker, room, INTERACT_DIG, one_dig_chore);
+			run_room_interactions(worker, room, INTERACT_DIG, veh, one_dig_chore);
 		}
 		else {
 			if ((worker = place_chore_worker(emp, CHORE_DIGGING, room))) {
@@ -2000,7 +2019,7 @@ void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *v
 
 
 INTERACTION_FUNC(one_einv_interaction_chore) {
-	empire_data *emp = ROOM_OWNER(inter_room);
+	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	char buf[MAX_STRING_LENGTH];
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, einv_interaction_chore_type, interaction->vnum)) {
@@ -2024,6 +2043,7 @@ INTERACTION_FUNC(one_einv_interaction_chore) {
 *
 * @param empire_data *emp The empire doing the chore.
 * @param room_data *room The location of the chore.
+* @param vehicle_data *veh Optional: If it's a vehicle chore, not a room chore. (NULL for not-a-vehicle-chore.)
 * @param int chore Which CHORE_ it is.
 * @param int interact_type Which INTERACT_ to run on items in the einv.
 */
@@ -2065,7 +2085,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, vehicle_data *
 		charge_workforce(emp, room, worker, 1, NOTHING, 0);
 		einv_interaction_chore_type = chore;
 		
-		if (run_interactions(worker, GET_OBJ_INTERACTIONS(found_proto), interact_type, room, worker, found_proto, NULL, one_einv_interaction_chore) && found_store) {
+		if (run_interactions(worker, GET_OBJ_INTERACTIONS(found_proto), interact_type, room, worker, found_proto, veh, one_einv_interaction_chore) && found_store) {
 			charge_stored_resource(emp, islid, found_store->vnum, 1);
 		}
 		
@@ -2094,7 +2114,7 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, vehicle_data *
 
 
 INTERACTION_FUNC(one_farming_chore) {
-	empire_data *emp = ROOM_OWNER(inter_room);
+	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	obj_data *proto = obj_proto(interaction->vnum);
 	int amt;
 	
@@ -2159,7 +2179,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 			}
 			else {	// DONE!
 				remove_room_extra_data(room, ROOM_EXTRA_HARVEST_PROGRESS);
-				run_room_interactions(worker, room, INTERACT_HARVEST, one_farming_chore);
+				run_room_interactions(worker, room, INTERACT_HARVEST, NULL, one_farming_chore);
 				
 				// only change to seeded if it's not an orchard OR if it's over-picked			
 				if (!ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) || get_depletion(room, DPLTN_PICK) >= config_get_int("short_depletion")) {
@@ -2209,7 +2229,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 
 
 INTERACTION_FUNC(one_fishing_chore) {
-	empire_data *emp = ROOM_OWNER(inter_room);
+	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	char buf[MAX_STRING_LENGTH];
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_FISHING, interaction->vnum)) {
@@ -2241,7 +2261,7 @@ void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh) {
 		
 		// not able to ewt_mark_resource_worker() until we're inside the interact
 		if (worker) {
-			run_room_interactions(worker, room, INTERACT_FISH, one_fishing_chore);
+			run_room_interactions(worker, room, INTERACT_FISH, veh, one_fishing_chore);
 		}
 		else {
 			if ((worker = place_chore_worker(emp, CHORE_FISHING, room))) {
@@ -2336,7 +2356,7 @@ void do_chore_gardening(empire_data *emp, room_data *room, vehicle_data *veh) {
 			run_interactions(worker, VEH_INTERACTIONS(veh), INTERACT_PICK, room, NULL, NULL, veh, one_gardening_chore);
 		}
 		else {
-			run_room_interactions(worker, room, INTERACT_PICK, one_gardening_chore);
+			run_room_interactions(worker, room, INTERACT_PICK, veh, one_gardening_chore);
 		}
 	}
 	else if (can_do && !worker) {
@@ -2392,7 +2412,7 @@ void do_chore_glassmaking(empire_data *emp, room_data *room, vehicle_data *veh) 
 
 
 INTERACTION_FUNC(one_mining_chore) {
-	empire_data *emp = ROOM_OWNER(inter_room);
+	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	struct global_data *mine;
 	obj_data *proto;
 	
@@ -2452,7 +2472,7 @@ void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh) {
 		// not able to ewt_mark_resource_worker() until we're inside the interact
 		if (worker) {
 			charge_workforce(emp, room, worker, 1, NOTHING, 0);
-			run_interactions(worker, GET_GLOBAL_INTERACTIONS(mine), INTERACT_MINE, room, worker, NULL, NULL, one_mining_chore);
+			run_interactions(worker, GET_GLOBAL_INTERACTIONS(mine), INTERACT_MINE, room, worker, NULL, veh, one_mining_chore);
 			
 			// check for depletion
 			if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
@@ -2594,7 +2614,7 @@ void do_chore_nailmaking(empire_data *emp, room_data *room, vehicle_data *veh) {
 
 
 INTERACTION_FUNC(one_quarry_chore) {
-	empire_data *emp = ROOM_OWNER(inter_room);
+	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	char buf[MAX_STRING_LENGTH];
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_QUARRYING, interaction->vnum)) {
@@ -2630,7 +2650,7 @@ void do_chore_quarrying(empire_data *emp, room_data *room, vehicle_data *veh) {
 			
 			add_to_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS, -1);
 			if (get_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS) == 0) {
-				if (run_room_interactions(worker, room, INTERACT_QUARRY, one_quarry_chore)) {
+				if (run_room_interactions(worker, room, INTERACT_QUARRY, veh, one_quarry_chore)) {
 					add_depletion(room, DPLTN_QUARRY, TRUE);
 				}
 			}

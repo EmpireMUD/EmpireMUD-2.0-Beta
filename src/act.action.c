@@ -1540,7 +1540,7 @@ void process_chop(char_data *ch) {
 		
 		// run interacts for items only if not depleted
 		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP) < config_get_int("chop_depletion")) {
-			got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, finish_chopping);
+			got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, NULL, finish_chopping);
 		}
 		
 		if (!got_any) {
@@ -1589,7 +1589,7 @@ void process_digging(char_data *ch) {
 		GET_ACTION(ch) = ACT_NONE;
 		in_room = IN_ROOM(ch);
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, finish_digging)) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, NULL, finish_digging)) {
 			// success
 			gain_player_tech_exp(ch, PTECH_DIG, 10);
 		
@@ -1872,7 +1872,7 @@ void process_fishing(char_data *ch) {
 	else {
 		// SUCCESS
 		msg_to_char(ch, "A fish darts past you...\r\n");
-		success = run_room_interactions(ch, room, INTERACT_FISH, finish_fishing);
+		success = run_room_interactions(ch, room, INTERACT_FISH, NULL, finish_fishing);
 		
 		if (success) {
 			add_depletion(room, DPLTN_FISH, TRUE);
@@ -1933,7 +1933,7 @@ void process_foraging(char_data *ch) {
 			act("$n stops looking for things to eat as $e comes up empty-handed.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 		else {	// success
-			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, finish_foraging)) {
+			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, NULL, finish_foraging)) {
 				gain_player_tech_exp(ch, PTECH_FORAGE, 10);
 				found = TRUE;
 			}
@@ -1975,7 +1975,7 @@ void process_gathering(char_data *ch) {
 			GET_ACTION(ch) = ACT_NONE;
 		}
 		else {
-			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_GATHER, finish_gathering)) {
+			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_GATHER, NULL, finish_gathering)) {
 				// check repeatability
 				if (can_interact_room(IN_ROOM(ch), INTERACT_GATHER)) {
 					GET_ACTION_TIMER(ch) = gather_base_timer;
@@ -2048,7 +2048,7 @@ void process_harvesting(char_data *ch) {
 		act("You finish harvesting the crop!", FALSE, ch, NULL, NULL, TO_CHAR);
 		act("$n finished harvesting the crop!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
-		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting)) {
+		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, NULL, finish_harvesting)) {
 			// skillups
 			gain_player_tech_exp(ch, PTECH_HARVEST, 30);
 			gain_player_tech_exp(ch, PTECH_HARVEST_UPGRADE, 5);
@@ -2362,7 +2362,7 @@ void process_panning(char_data *ch) {
 			
 			// pan will silently fail if depleted
 			if (get_depletion(room, DPLTN_PAN) <= config_get_int("short_depletion")) {
-				success = run_room_interactions(ch, room, INTERACT_PAN, finish_panning);
+				success = run_room_interactions(ch, room, INTERACT_PAN, NULL, finish_panning);
 			}
 			
 			if (success) {
@@ -2416,13 +2416,13 @@ void process_picking(char_data *ch) {
 			act("$n stops looking for things to pick as $e comes up empty-handed.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 		else {
-			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_PICK, finish_picking)) {
+			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_PICK, NULL, finish_picking)) {
 				gain_player_tech_exp(ch, PTECH_PICK, 10);
 				found = TRUE;
 			}
 			else if (can_interact_room(IN_ROOM(ch), INTERACT_HARVEST) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD))) {
 				// only orchards allow pick -- and only run this if we hit no herbs at all
-				if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_picking)) {
+				if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, NULL, finish_picking)) {
 					gain_player_tech_exp(ch, PTECH_PICK, 10);
 					found = TRUE;
 				}
@@ -2598,7 +2598,7 @@ void process_quarrying(char_data *ch) {
 		in_room = IN_ROOM(ch);
 		GET_ACTION(ch) = ACT_NONE;
 		
-		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_QUARRY, finish_quarrying)) {
+		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_QUARRY, NULL, finish_quarrying)) {
 			gain_player_tech_exp(ch, PTECH_QUARRY, 25);
 		
 			add_depletion(IN_ROOM(ch), DPLTN_QUARRY, TRUE);

@@ -4289,16 +4289,17 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 
 
 /**
-* Runs all interactions for a room (sect, crop, building; as applicable).
-* They run from most-specific to least: bdg -> crop -> sect
+* Runs all interactions for a room (sect, crop, building, vehicle; as
+* applicable). They run from most-specific to least: veh -> bdg -> crop -> sect
 *
 * @param char_data *ch The actor.
 * @param room_data *room The location to run on.
 * @param int type Any INTERACT_ const.
+* @param vehicle_data *inter_veh Optional: Will pass this vehicle to any interaction func, and won't call other vehicles' interactions if set. (Pass NULL if not applicable.)
 * @param INTERACTION_FUNC(*func) A function pointer that runs each successful interaction (func returns TRUE if an interaction happens; FALSE if it aborts)
 * @return bool TRUE if any interactions ran successfully, FALSE if not.
 */
-bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func)) {
+bool run_room_interactions(char_data *ch, room_data *room, int type, vehicle_data *inter_veh, INTERACTION_FUNC(*func)) {
 	vehicle_data *veh;
 	crop_data *crop;
 	bool success;
@@ -4314,6 +4315,9 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	// first, build a list of vehicles that match this interaction type in the room
 	num = 0;
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (inter_veh && veh != inter_veh) {
+			continue;	// if they provided an inter_veh, skip other vehicles
+		}
 		if (VEH_IS_COMPLETE(veh) && has_interaction(VEH_INTERACTIONS(veh), type)) {
 			CREATE(tvh, struct temp_veh_helper, 1);
 			tvh->veh = veh;
@@ -4339,22 +4343,22 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	
 	// building first
 	if (!success && GET_BUILDING(room)) {
-		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type, room, NULL, NULL, NULL, func);
+		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type, room, NULL, NULL, inter_veh, func);
 	}
 	
 	// crop second
 	if (!success && (crop = ROOM_CROP(room))) {
-		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, NULL, func);
+		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, inter_veh, func);
 	}
 	
 	// rmt third
 	if (!success && GET_ROOM_TEMPLATE(room)) {
-		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type, room, NULL, NULL, NULL, func);
+		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type, room, NULL, NULL, inter_veh, func);
 	}
 	
 	// sector fourth
 	if (!success) {
-		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(room)), type, room, NULL, NULL, NULL, func);
+		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(room)), type, room, NULL, NULL, inter_veh, func);
 	}
 	
 	return success;
