@@ -1010,7 +1010,7 @@ void init_craft(craft_data *craft) {
 * @param craft_vnum vnum The craft vnum
 */
 void parse_craft(FILE *fl, craft_vnum vnum) {
-	char line[256], str_in[256], str_in2[256];
+	char line[256], str_in[256], str_in2[256], str_in3[256];
 	craft_data *craft, *find;
 	int int_in[4];
 	
@@ -1045,11 +1045,14 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 		log("SYSERR: Missing line 3 of craft recipe #%d", vnum);
 		exit(1);
 	}
-	if (sscanf(line, "%d %d %s %d %d %s", int_in, int_in + 1, str_in, int_in + 2, int_in + 3, str_in2) != 6) {
-		strcpy(str_in2, "0");	// backwards-compatible with missing requires-tool
-		if (sscanf(line, "%d %d %s %d %d", int_in, int_in + 1, str_in, int_in + 2, int_in + 3) != 5) {
-			log("SYSERR: Format error in line 3 of craft recipe #%d", vnum);
-			exit(1);
+	if (sscanf(line, "%d %d %s %d %d %s %s", int_in, int_in + 1, str_in, int_in + 2, int_in + 3, str_in2, str_in3) != 7) {
+		strcpy(str_in3, "0");	// backwards-compative with missing requires-function
+		if (sscanf(line, "%d %d %s %d %d %s", int_in, int_in + 1, str_in, int_in + 2, int_in + 3, str_in2) != 6) {
+			strcpy(str_in2, "0");	// backwards-compatible with missing requires-tool
+			if (sscanf(line, "%d %d %s %d %d", int_in, int_in + 1, str_in, int_in + 2, int_in + 3) != 5) {
+				log("SYSERR: Format error in line 3 of craft recipe #%d", vnum);
+				exit(1);
+			}
 		}
 	}
 	
@@ -1059,6 +1062,7 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 	GET_CRAFT_TIME(craft) = int_in[2];
 	GET_CRAFT_REQUIRES_OBJ(craft) = int_in[3];
 	GET_CRAFT_REQUIRES_TOOL(craft) = asciiflag_conv(str_in2);
+	GET_CRAFT_REQUIRES_FUNCTION(craft) = asciiflag_conv(str_in3);
 	
 	// optionals
 
@@ -1122,7 +1126,7 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 * @param craft_data *craft The thing to save.
 */
 void write_craft_to_file(FILE *fl, craft_data *craft) {
-	char temp1[256], temp2[256];
+	char temp1[256], temp2[256], temp3[256];
 	
 	if (!fl || !craft) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_craft_to_file called without %s", !fl ? "file" : "craft");
@@ -1136,7 +1140,8 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	
 	strcpy(temp1, bitv_to_alpha(GET_CRAFT_FLAGS(craft)));
 	strcpy(temp2, bitv_to_alpha(GET_CRAFT_REQUIRES_TOOL(craft)));
-	fprintf(fl, "%d %d %s %d %d %s\n", GET_CRAFT_TYPE(craft), GET_CRAFT_ABILITY(craft), temp1, GET_CRAFT_TIME(craft), GET_CRAFT_REQUIRES_OBJ(craft), temp2);
+	strcpy(temp3, bitv_to_alpha(GET_CRAFT_REQUIRES_FUNCTION(craft)));
+	fprintf(fl, "%d %d %s %d %d %s %s\n", GET_CRAFT_TYPE(craft), GET_CRAFT_ABILITY(craft), temp1, GET_CRAFT_TIME(craft), GET_CRAFT_REQUIRES_OBJ(craft), temp2, temp3);
 	
 	if (CRAFT_IS_BUILDING(craft) || GET_CRAFT_BUILD_TYPE(craft) != NOTHING || GET_CRAFT_BUILD_ON(craft) || GET_CRAFT_BUILD_FACING(craft)) {
 		strcpy(temp1, bitv_to_alpha(GET_CRAFT_BUILD_ON(craft)));

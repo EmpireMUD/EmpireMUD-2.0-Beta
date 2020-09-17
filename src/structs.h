@@ -885,6 +885,8 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_STORE_ALL BIT(35) // anything can be stored here (does not allow retrieval)
 #define FNC_IN_CITY_ONLY  BIT(36)	// functions only work in-city
 #define FNC_OVEN  BIT(37)	// for cooking
+#define FNC_MAGIC_WORKFSHOP  BIT(38)	// no code purpose but can be used for workforce
+#define FNC_TRAPPER  BIT(39)	// no code purpose but can be used for workforce
 
 // These function flags don't work on movable vehicles (they require room data)
 #define IMMOBILE_FNCS  (FNC_MINE | FNC_TAVERN | FNC_TOMB | FNC_LIBRARY)
@@ -4408,6 +4410,7 @@ struct craft_data {
 	
 	bitvector_t requires_tool;	// any TOOL_ flags required to make this
 	obj_vnum requires_obj;	// only shows up if you have the item
+	bitvector_t requires_function;	// FNC_
 	struct resource_data *resources;	// linked list
 	
 	UT_hash_handle hh;	// craft_table hash

@@ -36,6 +36,7 @@
 // external vars
 extern const struct augment_type_data augment_info[];
 extern const char *craft_types[];
+extern const char *function_flags[];
 extern struct gen_craft_data_t gen_craft_data[];
 extern const int rev_dir[];
 extern const char *tool_flags[];
@@ -163,6 +164,10 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FLAGS_REQUIRING_BUILDINGS) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This building must be in a city to use it.\r\n");
+	}
+	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
+		sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags, buf1, TRUE);
+		msg_to_char(ch, "To %s that, you must be somewhere with: %s\r\n", buf1, command);
 	}
 	// end flag checks
 	
@@ -1249,6 +1254,10 @@ void process_gen_craft(char_data *ch) {
 	}
 	else if (GET_CRAFT_REQUIRES_TOOL(type) && !(tool = has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type)))) {
 		msg_to_char(ch, "You aren't using the right tool to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+	}
+	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
+		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags, buf1);
+		msg_to_char(ch, "You can't keep %s without being somewhere with: %s\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, buf1);
 	}
 	else {
 		GET_ACTION_TIMER(ch) -= 1;

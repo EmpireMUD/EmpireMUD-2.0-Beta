@@ -3167,6 +3167,8 @@ const char *function_flags[] = {
 	"STORE-ALL", // 35
 	"IN-CITY-ONLY",
 	"OVEN",
+	"MAGIC-WORKSHOP",
+	"TRAPPER",
 	"\n"
 };
 

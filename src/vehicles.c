@@ -1280,6 +1280,13 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Has INTERLINK but is not a stationary building");
 		problem = TRUE;
 	}
+	
+	// functions
+	if (IS_SET(VEH_FUNCTIONS(veh), IMMOBILE_FNCS) && VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Has non-movable functions on a movable vehicle");
+		problem = TRUE;
+	}
+	
 	if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_RUINS_TO_BLD)) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Has RUINS-TO-BLD interaction; this won't work on vehicles");
 		problem = TRUE;

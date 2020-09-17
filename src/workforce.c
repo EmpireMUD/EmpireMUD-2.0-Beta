@@ -2336,7 +2336,7 @@ INTERACTION_FUNC(one_fishing_chore) {
 void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh) {	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_FISHING].mob);
 	bool depleted = (GET_CHORE_DEPLETION(DPLTN_FISH) >= (veh ? config_get_int("common_depletion") : DEPLETION_LIMIT(room))) ? TRUE : FALSE;
-	bool can_gain = veh ? can_gain_chore_resource_from_interaction_list(emp, room, CHORE_FISHING, VEH_INTERACTIONS(veh), INTERACT_FISH, FALSE) ? can_gain_chore_resource_from_interaction(emp, room, CHORE_FISHING, INTERACT_FISH);
+	bool can_gain = veh ? can_gain_chore_resource_from_interaction_list(emp, room, CHORE_FISHING, VEH_INTERACTIONS(veh), INTERACT_FISH, FALSE) : can_gain_chore_resource_from_interaction(emp, room, CHORE_FISHING, INTERACT_FISH);
 	bool can_do = !depleted && can_gain;
 	
 	if (can_do && worker) {

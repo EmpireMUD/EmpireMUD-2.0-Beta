@@ -5484,6 +5484,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, buf);
 	msg_to_char(ch, "Requires tool: &y%s&0\r\n", buf);
 	
+	sprintbit(GET_CRAFT_REQUIRES_FUNCTION(craft), function_flags, buf, TRUE);
+	msg_to_char(ch, "Requires Functions: \tg%s\t0\r\n", buf);
+	
 	if (CRAFT_IS_BUILDING(craft) || CRAFT_IS_VEHICLE(craft)) {
 		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "Build on: &g%s&0\r\n", buf);

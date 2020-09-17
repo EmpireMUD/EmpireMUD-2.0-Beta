@@ -2142,13 +2142,15 @@ other OLC types. For example, to find all buildings that have a certain artisan
 vnum, use ".mob search 12345", which will search the artisan vnum field on all
 buildings for that mob.
 #d
-"BEDIT FUNCTIONS" "REDIT FUNCTIONS" "VEDIT FUNCTIONS" "FUNCTION FLAGS"
+"BEDIT FUNCTIONS" "REDIT FUNCTIONS" "VEDIT FUNCTIONS" "FUNCTION FLAGS" "CEDIT REQUIRESFUNCTION" "CEDIT REQUIRES FUNCTION"
 
-Usage:  .flags [add | remove] <flags>
+Usage:  .function [add | remove] <flags>
+        .requiresfunction [add | remove] <flags>
 
 The function flags determine what chores, actions, and other tasks happen at
 that building or room template. For vehicles, it applies to people in the same
-room as the vehicle.
+room as the vehicle. For crafts, the 'requiresfunction' field requires that
+the craft be made at a location with that function.
 
 Available functions:
  ALCHEMIST - can brew and mix here
@@ -2191,11 +2193,13 @@ Available functions:
    Note: scripts cannot check this by itself using %room.function()%; use the
    IN-CITY-ONLY building flag instead
  OVEN - allows baking
+ MAGIC-WORKSHOP - no code functions, but can be used for workforce
+ TRAPPER - no code functions, but can be used for workforce
  
 &r* Note:&0 Functions marked with &r*&0 cannot be used on moving vehicles, only
 buildings and stationary vehicles.
 
-See also: OLC BUILDINGS, OLC ROOM TEMPLATES, OLC VEHICLES
+See also: OLC BUILDINGS, OLC CRAFTS, OLC ROOM TEMPLATES, OLC VEHICLES
 #d
 "BEDIT HITPOINTS" "BEDIT HEALTH"
 
@@ -2670,14 +2674,15 @@ Available types are:
  FORGE - requires a hammer and a forge building
  CRAFT
  COOK
- SEW
+ SEW - requires a sewing kit
  MILL - requires mill building, quantity doubled by Master Farmer ability
  BREW - potions
  MIX - poisons
  BUILD - used with the build command
  WEAVE - requires loom or tailor
- WORKFORCE - has specific code interactions, but no player command
- MANUFACTURE - for shipbuilding
+ WORKFORCE - set requires-function flags and workforce will pick up this task
+   at the associated building
+ MANUFACTURE
  BAKE - requires a bakery or oven
 
 Note: The SOUP and VEHICLE craft flags both also modify the recipe.
