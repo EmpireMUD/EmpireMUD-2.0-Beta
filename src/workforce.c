@@ -352,11 +352,22 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		if (vehicle_has_function_and_city_ok(veh, FNC_MINT) && CHORE_ACTIVE(CHORE_MINTING)) {
 			do_chore_minting(emp, room, veh);
 		}
+		/*
+		if (BUILDING_VNUM(room) == BUILDING_TRAPPERS_POST && CHORE_ACTIVE(CHORE_TRAPPING)) {
+			do_chore_trapping(emp, room);
+		}
+		*/
 	}
 	
 	// unskilled chores:
+	if (vehicle_has_function_and_city_ok(veh, FNC_APIARY) && CHORE_ACTIVE(CHORE_BEEKEEPING)) {
+		do_chore_beekeeping(emp, room, veh);
+	}
 	if (vehicle_has_function_and_city_ok(veh, FNC_POTTER) && CHORE_ACTIVE(CHORE_BRICKMAKING)) {
 		do_chore_brickmaking(emp, room, veh);
+	}
+	if (vehicle_has_function_and_city_ok(veh, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
+		do_chore_digging(emp, room, veh);
 	}
 	
 	// gen-craft chores:
@@ -377,6 +388,17 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		do_chore_gen_craft(emp, room, veh, CHORE_NEXUS_CRYSTALS, chore_nexus_crystals, TRUE);
 	}
 	*/
+	
+	// object interaction chores:
+	if (vehicle_has_function_and_city_ok(veh, FNC_SAW) && CHORE_ACTIVE(CHORE_SAWING)) {
+		do_chore_einv_interaction(emp, room, veh, CHORE_SAWING, INTERACT_SAW);
+	}
+	if (vehicle_has_function_and_city_ok(veh, FNC_SAW) && CHORE_ACTIVE(CHORE_SCRAPING)) {
+		do_chore_einv_interaction(emp, room, veh, CHORE_SCRAPING, INTERACT_SCRAPE);
+	}
+	if (vehicle_has_function_and_city_ok(veh, FNC_TANNERY) && CHORE_ACTIVE(CHORE_TANNING)) {
+		do_chore_einv_interaction(emp, room, veh, CHORE_TANNING, INTERACT_TAN);
+	}
 }
 
 
@@ -1566,6 +1588,11 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
  /////////////////////////////////////////////////////////////////////////////
 //// CHORE FUNCTIONS ////////////////////////////////////////////////////////
 
+/**
+* @param empire_data *emp The empire for the chore.
+* @param room_data *room The location of the chore.
+* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+*/
 void do_chore_beekeeping(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_BEEKEEPING].mob);
 	int islid = GET_ISLAND_ID(room);
@@ -1878,7 +1905,7 @@ INTERACTION_FUNC(one_dig_chore) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, interaction->quantity);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
 		add_production_total(emp, interaction->vnum, interaction->quantity);
-		add_depletion(inter_room, DPLTN_DIG, TRUE);
+		ADD_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_DIG, TRUE);
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
 			sprintf(buf, "$n digs up %s.", get_obj_name_by_proto(interaction->vnum));
@@ -1891,17 +1918,27 @@ INTERACTION_FUNC(one_dig_chore) {
 }
 
 
+/**
+* @param empire_data *emp The empire for the chore.
+* @param room_data *room The location of the chore.
+* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+*/
 void do_chore_digging(empire_data *emp, room_data *room, vehicle_data *veh) {	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_DIGGING].mob);
-	bool depleted = (get_depletion(room, DPLTN_DIG) >= DEPLETION_LIMIT(room)) ? TRUE : FALSE;
-	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_DIGGING, INTERACT_DIG);
+	bool depleted = (GET_CHORE_DEPLETION(DPLTN_DIG) >= (veh ? config_get_int("common_depletion") : DEPLETION_LIMIT(room))) ? TRUE : FALSE;
+	bool can_gain = veh ? can_gain_chore_resource_from_interaction_list(emp, room, CHORE_DIGGING, VEH_INTERACTIONS(veh), INTERACT_DIG, FALSE) : can_gain_chore_resource_from_interaction(emp, room, CHORE_DIGGING, INTERACT_DIG);
 	bool can_do = !depleted && can_gain;
 	
-	if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_DIG) && can_do) {
+	if (can_do) {
 		// not able to ewt_mark_resource_worker() until we're inside the interact
 		if (worker) {
 			charge_workforce(emp, room, worker, 1, NOTHING, 0);
-			run_room_interactions(worker, room, INTERACT_DIG, veh, one_dig_chore);
+			if (veh) {
+				run_interactions(worker, VEH_INTERACTIONS(veh), INTERACT_DIG, room, worker, NULL, veh, one_dig_chore);
+			}
+			else {	// non-vehicle
+				run_room_interactions(worker, room, INTERACT_DIG, veh, one_dig_chore);
+			}
 		}
 		else {
 			if ((worker = place_chore_worker(emp, CHORE_DIGGING, room))) {
@@ -2236,7 +2273,7 @@ INTERACTION_FUNC(one_fishing_chore) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, interaction->quantity);
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
 		add_production_total(emp, interaction->vnum, interaction->quantity);
-		add_depletion(inter_room, DPLTN_FISH, TRUE);
+		ADD_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_FISH, TRUE);
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
 			sprintf(buf, "$n catches %s.", get_obj_name_by_proto(interaction->vnum));
@@ -2251,7 +2288,7 @@ INTERACTION_FUNC(one_fishing_chore) {
 
 void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh) {	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_FISHING].mob);
-	bool depleted = (get_depletion(room, DPLTN_FISH) >= DEPLETION_LIMIT(room)) ? TRUE : FALSE;
+	bool depleted = (GET_CHORE_DEPLETION(DPLTN_FISH) >= (veh ? config_get_int("common_depletion") : DEPLETION_LIMIT(room))) ? TRUE : FALSE;
 	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_FISHING, INTERACT_FISH);
 	bool can_do = !depleted && can_gain;
 	
@@ -2636,7 +2673,7 @@ INTERACTION_FUNC(one_quarry_chore) {
 
 void do_chore_quarrying(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_QUARRYING].mob);
-	bool depleted = (get_depletion(room, DPLTN_QUARRY) >= config_get_int("common_depletion")) ? TRUE : FALSE;
+	bool depleted = (GET_CHORE_DEPLETION(DPLTN_QUARRY) >= config_get_int("common_depletion")) ? TRUE : FALSE;
 	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_QUARRYING, INTERACT_QUARRY);
 	bool can_do = !depleted && can_gain;
 	
@@ -2651,7 +2688,7 @@ void do_chore_quarrying(empire_data *emp, room_data *room, vehicle_data *veh) {
 			add_to_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS, -1);
 			if (get_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS) == 0) {
 				if (run_room_interactions(worker, room, INTERACT_QUARRY, veh, one_quarry_chore)) {
-					add_depletion(room, DPLTN_QUARRY, TRUE);
+					ADD_CHORE_DEPLETION(room, veh, DPLTN_QUARRY, TRUE);
 				}
 			}
 			else {
@@ -2776,7 +2813,7 @@ void do_chore_trapping(empire_data *emp, room_data *room, vehicle_data *veh) {
 	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_TRAPPING].mob);
 	obj_vnum vnum = number(0, 1) ? o_SMALL_SKIN : o_LARGE_SKIN;
-	bool depleted = get_depletion(room, DPLTN_TRAPPING) >= short_depletion ? TRUE : FALSE;
+	bool depleted = GET_CHORE_DEPLETION(DPLTN_TRAPPING) >= short_depletion ? TRUE : FALSE;
 	bool can_gain = can_gain_chore_resource(emp, room, CHORE_TRAPPING, vnum);
 	bool can_do = !depleted && can_gain;
 	
@@ -2787,7 +2824,7 @@ void do_chore_trapping(empire_data *emp, room_data *room, vehicle_data *veh) {
 		if (!number(0, 23)) {
 			add_to_empire_storage(emp, GET_ISLAND_ID(room), vnum, 1);
 			add_production_total(emp, vnum, 1);
-			add_depletion(room, DPLTN_TRAPPING, TRUE);
+			ADD_CHORE_DEPLETION(room, veh, DPLTN_TRAPPING, TRUE);
 			
 			// only send message if someone else is present (don't bother verifying it's a player)
 			if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
