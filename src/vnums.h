@@ -150,7 +150,7 @@
 #define SAWYER  256
 #define SMELTER  257
 #define WEAVER  258
-#define STONECUTTER  259
+#define STONECUTTER  259	// unused now
 #define NAILMAKER  260	// unused now
 #define BRICKMAKER  261	// unused now
 #define GARDENER  262

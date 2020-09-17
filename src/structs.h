@@ -388,7 +388,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_IDENTIFIES_TO  28
 #define INTERACT_RUINS_TO_BLD  29
 #define INTERACT_RUINS_TO_VEH  30
-#define NUM_INTERACTS  31
+#define INTERACT_PRODUCTION  31
+#define INTERACT_SKILLED_LABOR  32
+#define NUM_INTERACTS  33
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
@@ -886,7 +888,6 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_IN_CITY_ONLY  BIT(36)	// functions only work in-city
 #define FNC_OVEN  BIT(37)	// for cooking
 #define FNC_MAGIC_WORKFSHOP  BIT(38)	// no code purpose but can be used for workforce
-#define FNC_TRAPPER  BIT(39)	// no code purpose but can be used for workforce
 
 // These function flags don't work on movable vehicles (they require room data)
 #define IMMOBILE_FNCS  (FNC_MINE | FNC_TAVERN | FNC_TOMB | FNC_LIBRARY)
@@ -1143,7 +1144,7 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_SCRAPING  8
 #define CHORE_SMELTING  9
 #define CHORE_WEAVING  10
-#define CHORE_QUARRYING  11
+#define CHORE_PRODUCTION  11
 #define CHORE_CRAFTING  12	// formerly nailmaking, brickmaking, glassmaking
 	#define CHORE_UNUSED1  13
 #define CHORE_ABANDON_DISMANTLED  14
@@ -2589,7 +2590,8 @@ typedef struct vehicle_data vehicle_data;
 #define DPLTN_TRAPPING  7
 #define DPLTN_CHOP  8
 #define DPLTN_HUNT  9
-#define NUM_DEPLETION_TYPES  10	// total
+#define DPLTN_PRODUCTION  10
+#define NUM_DEPLETION_TYPES  11	// total
 
 
 // EVO_x: world evolutions

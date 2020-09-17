@@ -4349,9 +4349,13 @@ Room/vehicle interaction types:
  &cRUINS-TO-BLD&0 - What type of ruins building appears here when it's ruined.
    Only works on buildings, not vehicles. Quantity is ignored. Use #n in the
    room title to indicate the name of the lost building.
- &CRUINS-TO-VEH&0 - What type of ruins vehicle appears here when it's ruined.
+ &cRUINS-TO-VEH&0 - What type of ruins vehicle appears here when it's ruined.
    May use #n in the keywords and short/long desc to indicate the name of the
    building/vehicle that was ruined. Quantity is ignored.
+ &cPRODUCTION&0 - Workforce will produce it (on a building or vehicle only).
+   Production is 1 at a time; quantity is used as the depletion limit.
+ &cSKILLED-LABOR&0 - Workforce will produce it with Skilled Labor (bld/veh only).
+   Production is 1 at a time; quantity is used as the depletion limit.
 
 The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
 than 1, the percent is only checked once for the entire quantity. If you want

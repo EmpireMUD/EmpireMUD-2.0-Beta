@@ -3014,7 +3014,8 @@ const char *depletion_type[NUM_DEPLETION_TYPES] = {
 	"pan",
 	"trapping",
 	"chop",
-	"hunt"
+	"hunt",
+	"production",
 };
 
 
@@ -3168,7 +3169,6 @@ const char *function_flags[] = {
 	"IN-CITY-ONLY",
 	"OVEN",
 	"MAGIC-WORKSHOP",
-	"TRAPPER",
 	"\n"
 };
 
@@ -3214,7 +3214,6 @@ const char *function_flags_long[] = {
 	"",	// in-city-only?
 	"somewhere with an oven",
 	"in a magic workshop",
-	"at a trapper",
 	"\n"
 };
 
@@ -3999,6 +3998,8 @@ const char *interact_types[] = {
 	"IDENTIFIES-TO",
 	"RUINS-TO-BLD",
 	"RUINS-TO-VEH",	// 30
+	"PRODUCTION",
+	"SKILLED-LABOR",
 	"\n"
 };
 
@@ -4036,6 +4037,8 @@ const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// IDENTIFIES-TO
 	TYPE_ROOM,	// RUINS-TO-BLD
 	TYPE_ROOM,	// RUINS-TO-VEH
+	TYPE_ROOM,	// PRODUCTION
+	TYPE_ROOM,	// SKILLED-LABOR
 };
 
 
@@ -4072,6 +4075,8 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,	// IDENTIFIES-TO
 	TYPE_BLD,	// RUINS-TO-BLD
 	TYPE_VEH,	// RUINS-TO-VEH
+	TYPE_OBJ,	// PRODUCTION
+	TYPE_OBJ,	// SKILLED-LABOR
 };
 
 
