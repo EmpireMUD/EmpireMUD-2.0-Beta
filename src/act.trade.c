@@ -138,32 +138,20 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
 		msg_to_char(ch, "You can only %s that in one of your cities%s.\r\n", command, (wait || room_wait) ? " (this city was founded too recently)" : "");
 	}
-	else if ((GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS || GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER | CRAFT_SHIPYARD | CRAFT_GLASSBLOWER)) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
+	else if ((GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS || GET_CRAFT_TYPE(type) == CRAFT_TYPE_FORGE || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "You can't do that here because this building isn't in a city.\r\n");
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_POTTERY) && !has_cooking_fire(ch)) {
 		msg_to_char(ch, "You need a fire to bake the clay.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FIRE | CRAFT_ALCHEMY) && !has_cooking_fire(ch)) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FIRE) && !has_cooking_fire(ch)) {
 		msg_to_char(ch, "You need a good fire to do that.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_CARPENTER)) {
-		msg_to_char(ch, "You need to %s that at the carpenter!\r\n", command);
-	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHIPYARD) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_SHIPYARD)) {
-		msg_to_char(ch, "You need to %s that at the shipyard!\r\n", command);
-	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_BLD_UPGRADED) && !ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_UPGRADED)) {
+	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_BLD_UPGRADED) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_UPGRADED) || !IS_COMPLETE(IN_ROOM(ch)))) {
 		msg_to_char(ch, "The building needs to be upgraded to %s that!\r\n", command);
-	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_GLASSBLOWER) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_GLASSBLOWER)) {
-		msg_to_char(ch, "You need to %s that at the glassblower!\r\n", command);
 	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP) && !find_water_container(ch, ch->carrying) && !find_water_container(ch, ROOM_CONTENTS(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need a container of water to %s that.\r\n", command);
-	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FLAGS_REQUIRING_BUILDINGS) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "This building must be in a city to use it.\r\n");
 	}
 	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
 		sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags, buf1, TRUE);
@@ -183,7 +171,7 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	}
 	
 	// types that require the building be complete
-	else if (!IS_COMPLETE(IN_ROOM(ch)) && (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SHIPYARD) || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_BLD_UPGRADED) || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_GLASSBLOWER) || IS_SET(GET_CRAFT_FLAGS(type), CRAFT_CARPENTER) || GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS)) {
+	else if (!IS_COMPLETE(IN_ROOM(ch)) && (GET_CRAFT_TYPE(type) == CRAFT_TYPE_MILL || GET_CRAFT_TYPE(type) == CRAFT_TYPE_SMELT || GET_CRAFT_TYPE(type) == CRAFT_TYPE_PRESS)) {
 		msg_to_char(ch, "You must complete the building first.\r\n");
 	}
 	

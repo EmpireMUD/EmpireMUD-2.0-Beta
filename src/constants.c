@@ -1608,9 +1608,9 @@ const char *craft_flags[] = {
 	"POTTERY",
 	"BUILDING",
 	"SKILLED-LABOR",
-	"GLASSBLOWER",
-	"CARPENTER",
-	"ALCHEMY",
+	"*",	// formerly glassblower (now uses a function)
+	"*",	// formerly carpenter (now uses a function)
+	"*",	// formerly alchemy (identical to FIRE)
 	"*",	// formerly sharp-tool
 	"FIRE",
 	"SOUP",
@@ -1619,7 +1619,7 @@ const char *craft_flags[] = {
 	"DISMANTLE-ONLY",
 	"IN-CITY-ONLY",
 	"VEHICLE",
-	"SHIPYARD",
+	"*",	// formerly shipyard (now uses a function)
 	"BLD-UPGRADED",
 	"LEARNED",
 	"BY-RIVER",
@@ -1634,9 +1634,9 @@ const char *craft_flag_for_info[] = {
 	"pottery",
 	"",	// building
 	"",	// skilled labor
-	"requires glassblower building",
-	"requires carpenter building",
-	"alchemy",
+	"",
+	"",
+	"",
 	"",
 	"requires fire",
 	"",	// soup
@@ -1645,8 +1645,8 @@ const char *craft_flag_for_info[] = {
 	"",	// dismantle-only
 	"in-city only",
 	"",	// vehicle
-	"requires shipyard",
-	"requires upgrade",
+	"",
+	"requires upgraded building",
 	"",	// learned
 	"must be by a river",
 	"",	// remove-production

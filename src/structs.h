@@ -1058,9 +1058,9 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_POTTERY  BIT(0)  // bonus at pottery; requires fire
 #define CRAFT_BUILDING  BIT(1)  // makes a building (on any craft type; BUILD type automatically counts as this)
 #define CRAFT_SKILLED_LABOR  BIT(2)  // workforce can only produce this if the empire has skilled labor
-#define CRAFT_GLASSBLOWER  BIT(3)  // requires glassblower building
-#define CRAFT_CARPENTER  BIT(4)  // requires carpenter building
-#define CRAFT_ALCHEMY  BIT(5)  // requires access to glass/alchemist and fire
+	#define CRAFT_UNUSED1  BIT(3)  // formerly glassblower (which now uses a function)
+	#define CRAFT_UNUSED2  BIT(4)  // formerly carpenter (now using function)
+	#define CRAFT_UNUSED3  BIT(5)  // formerly alchemist (which ultimately was the same as FIRE)
 	#define CRAFT_UNUSED  BIT(6)  // formerly sharp-tool/knife (now uses requires-tool)
 #define CRAFT_FIRE  BIT(7)  // requires any fire source
 #define CRAFT_SOUP  BIT(8)  // is a soup: requires a container of water, and the "object" property is a liquid id
@@ -1069,15 +1069,12 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_DISMANTLE_ONLY  BIT(11)	// build: building can be dismantled but not built
 #define CRAFT_IN_CITY_ONLY  BIT(12)	// craft/building must be inside a city
 #define CRAFT_VEHICLE  BIT(13)	// creates a vehicle instead of an object
-#define CRAFT_SHIPYARD  BIT(14)	// requires a shipyard
+	#define CRAFT_UNUSED5  BIT(14)	// formerly shipyard (now uses a function)
 #define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
 #define CRAFT_LEARNED  BIT(16)	// cannot use unless learned
 #define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
 #define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
 #define CRAFT_TAKE_REQUIRED_OBJ  BIT(19)	// causes the craft to take the 'required-obj' when created, if any (and may refund it on dismantle)
-
-// list of above craft flags that require a building in some way
-#define CRAFT_FLAGS_REQUIRING_BUILDINGS  (CRAFT_GLASSBLOWER | CRAFT_CARPENTER | CRAFT_ALCHEMY | CRAFT_SHIPYARD)
 
 // For find_building_list_entry
 #define FIND_BUILD_NORMAL  0
