@@ -2508,6 +2508,7 @@ live, at which point it becomes available to players who have the right skill.
 Available flags:
  POTTERY - always requires cooking fire, goes faster at potter's hut
  BUILDING - makes a building (not needed on the BUILD craft type)
+ SKILLED-LABOR - workforce cannot work this craft unless you have Skilled Labor
  GLASSBLOWER - requires being at glassblower building
  CARPENTER - requires being at a carpenter building
  ALCHEMY - requires cooking fire or alchemist/laboratory

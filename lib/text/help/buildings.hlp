@@ -350,11 +350,12 @@ See also: BUILD
 
 This building is a fully-stocked magic workshop. You can store and retrieve
 the same items as the Tower of Sorcery, you can weave magical cloth, and your
-empire's workforce will craft nexus stones here.
+empire's workforce will craft nexus stones here (if your empire has Skilled
+Labor).
 
 This building must be inside one of your cities.
 
-See also: WORKFORCE CRAFTING
+See also: WORKFORCE CRAFTING, SKILLED LABOR
 #
 GRAVE GRAVES "GRAVE MARKER"
 

@@ -1607,7 +1607,7 @@ struct character_size_data size_data[] = {
 const char *craft_flags[] = {
 	"POTTERY",
 	"BUILDING",
-	"*",	// former glass-tech
+	"SKILLED-LABOR",
 	"GLASSBLOWER",
 	"CARPENTER",
 	"ALCHEMY",
@@ -1632,8 +1632,8 @@ const char *craft_flags[] = {
 // CRAFT_x (2/2): how flags that show up on "craft info"
 const char *craft_flag_for_info[] = {
 	"pottery",
-	"",
-	"",
+	"",	// building
+	"",	// skilled labor
 	"requires glassblower building",
 	"requires carpenter building",
 	"alchemy",

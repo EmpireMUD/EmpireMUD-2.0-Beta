@@ -1517,6 +1517,9 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
 		if (CRAFT_FLAGGED(craft, CRAFT_IN_DEVELOPMENT | CRAFT_SOUP) || CRAFT_IS_VEHICLE(craft) || CRAFT_IS_BUILDING(craft)) {
 			continue;
 		}
+		if (CRAFT_FLAGGED(craft, CRAFT_SKILLED_LABOR) && !EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
+			continue;	// need skillz
+		}
 		if (GET_CRAFT_REQUIRES_OBJ(craft) != NOTHING && CRAFT_FLAGGED(craft, CRAFT_TAKE_REQUIRED_OBJ)) {
 			continue;	// don't allow crafts with TAKE-REQUIRED-OBJ
 		}
@@ -1633,6 +1636,9 @@ void workforce_crafting_chores(empire_data *emp, room_data *room, vehicle_data *
 		}
 		if (GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WORKFORCE || !GET_CRAFT_REQUIRES_FUNCTION(craft)) {
 			continue;	// not workforce or no location configured
+		}
+		if (CRAFT_FLAGGED(craft, CRAFT_SKILLED_LABOR) && !EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
+			continue;	// need skillz
 		}
 		if (!veh && !room_has_function_and_city_ok(emp, room, GET_CRAFT_REQUIRES_FUNCTION(craft))) {
 			continue;	// room-based chore missing function
