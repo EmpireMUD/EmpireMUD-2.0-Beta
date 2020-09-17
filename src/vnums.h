@@ -120,7 +120,7 @@
 #define COMP_PILLAR  6015	// for 'tunnel'
 #define COMP_ROCK  6050	// for 'lay' (road)
 #define COMP_CLAY  6090	// for workforce bricks
-#define COMP_COMMON_METAL  6720	// for 'barde' and workforce nailmaking
+#define COMP_COMMON_METAL  6720	// for 'barde'
 #define COMP_NAILS  6790	// for 'tunnel'
 #define COMP_ROPE  6880	// for 'tie'
 
@@ -153,7 +153,7 @@
 #define SMELTER  257
 #define WEAVER  258
 #define STONECUTTER  259
-#define NAILMAKER  260
+#define NAILMAKER  260	// unused now
 #define BRICKMAKER  261
 #define GARDENER  262
 #define FIRE_BRIGADE  265
@@ -171,6 +171,7 @@
 #define FISHERMAN  279
 #define BEEKEEPER  281
 #define GLASSMAKER  282
+#define WORKFORCE_APPRENTICE  283
 
 
  //////////////////////////////////////////////////////////////////////////////

@@ -1430,7 +1430,7 @@ Workforce types:
   &ymilling:&0 Will mill grains into flour.
   &ymining:&0 NPCs will mine your mines.
   &cminting (skilled):&0 NPCs will mint treasure into coins.
-  &ynailmaking:&0 NPCs will forge pouches of nails at the forge.
+  &ycrafting:&0 NPCs will make certain crafts (see WORKFORCE CRAFTING).
   &cnexus-crystal (skilled):&0 Will make nexus crystals at the sorcery tower;
      requires both Exarch Crafts and Skilled Labor.
   &yoilmaking:&0 Will press oil.

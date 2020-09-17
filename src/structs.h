@@ -1147,7 +1147,7 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_SMELTING  9
 #define CHORE_WEAVING  10
 #define CHORE_QUARRYING  11
-#define CHORE_NAILMAKING  12
+#define CHORE_CRAFTING  12
 #define CHORE_BRICKMAKING  13
 #define CHORE_ABANDON_DISMANTLED  14
 #define CHORE_HERB_GARDENING  15
