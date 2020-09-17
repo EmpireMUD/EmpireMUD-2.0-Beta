@@ -14,7 +14,7 @@ holes in the floor and vents through specially-made chimneys.
 ~
 F
 hv
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 241 15.00 ce
 R
@@ -43,7 +43,7 @@ It looks like someone drew the story of a hero's epic birth, rise, and fall.
 ~
 F
 B
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 R
@@ -64,7 +64,7 @@ direction. Surely whoever is buried here has brought glory to the empire.
 ~
 F
 B
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 9189 2.00 0
 M
@@ -90,7 +90,7 @@ splendor of a mountain king. You cannot tell how deep the hall delves into the
 mountainside, but the shafts of light that cut through the ceiling hint that
 this place is astonishingly large.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 2 1 0
 R
@@ -107,7 +107,7 @@ D
 stone alcoves to house its soldiers. Still, for a mountain empire that must
 always be at the ready, it provides a warm home for the soldiers.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6075 2 1 0
 S
@@ -123,7 +123,7 @@ extending from the stone. It's cold up here, but the lodge traps warm air
 enough that as you look out the window, the only chill you feel is from gazing
 at the snowy mountaintops.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6790 1 1 0
 R
@@ -191,7 +191,7 @@ C
 store (any storable item)~
 F
 J
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 1 1 0
 R
@@ -205,7 +205,7 @@ A Seed Silo~
 0 0 0 -1
 C
 inventory, retrieve, store~
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 R
@@ -224,8 +224,32 @@ f
 I 5 100 4.00 1 x  # DIG: rock
 I 5 102 4.00 1 x  # DIG: flint stone
 I 5 107 92.00 1 x  # DIG: bag of sand
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1000 1 5 0
+S
+#5212
+Exarch Workshop~
+The Exarch's Workshop~
+&0[EX]~
+10 0 R 0
+0 0 0 -1
+C
+retrieve, store, weave~
+D
+   A violet fire crackles and sputters in the hearth of this eclectic workshop.
+The drapes are made from magical fabrics, but other bits of furniture are
+draped in magical fabric as well. The Exarch who runs this shop is not
+particularly tidy.
+~
+F
+yGKM
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
+R
+6000 1 1 0
+R
+6790 1 1 0
+U
+1 5164
 S
 $
