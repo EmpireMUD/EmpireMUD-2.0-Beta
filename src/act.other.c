@@ -3465,7 +3465,7 @@ ACMD(do_summon) {
 		return;
 	}
 	if (!IS_NPC(ch) && *arg && is_abbrev(arg, "player")) {
-		summon_player(ch, argument);
+		summon_player(ch, arg2);
 		return;
 	}
 	
