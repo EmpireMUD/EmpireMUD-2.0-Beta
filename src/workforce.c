@@ -2702,14 +2702,14 @@ INTERACTION_FUNC(one_production_chore) {
 	char buf[MAX_STRING_LENGTH];
 	
 	// make sure this item isn't depleted
-	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_PRODUCTION) >= interaction->vnum) {
+	if (emp && GET_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_PRODUCTION) >= interaction->quantity) {
 		return FALSE;
 	}
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_PRODUCTION, interaction->vnum)) {
-		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, interaction->quantity);
-		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
-		add_production_total(emp, interaction->vnum, interaction->quantity);
+		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, 1);
+		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, 1);
+		add_production_total(emp, interaction->vnum, 1);
 		
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
