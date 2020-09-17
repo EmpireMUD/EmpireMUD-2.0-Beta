@@ -111,6 +111,10 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Possible unnecessary in-city-only flag (not set on building or building functions)");
 			problem = TRUE;
 		}
+		if (bld && !GET_CRAFT_BUILD_FACING(craft) && !IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN)) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Missing build-facing");
+			problem = TRUE;
+		}
 		if (GET_CRAFT_QUANTITY(craft) > 1) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Building craft with quantity > 1");
 			problem = TRUE;
