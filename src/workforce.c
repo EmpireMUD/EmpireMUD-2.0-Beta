@@ -369,6 +369,9 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	if (vehicle_has_function_and_city_ok(veh, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
 		do_chore_digging(emp, room, veh);
 	}
+	if (vehicle_has_function_and_city_ok(veh, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
+		do_chore_fishing(emp, room, veh);
+	}
 	if (vehicle_has_function_and_city_ok(veh, FNC_GLASSBLOWER) && CHORE_ACTIVE(CHORE_GLASSMAKING)) {
 		do_chore_glassmaking(emp, room, veh);
 	}
@@ -400,7 +403,7 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	
 	// vehicle interaction chores
 	if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_QUARRY) && CHORE_ACTIVE(CHORE_QUARRYING)) {
-		do_chore_quarrying(emp, room);
+		do_chore_quarrying(emp, room, veh);
 	}
 	
 	// object interaction chores:
@@ -2325,27 +2328,32 @@ INTERACTION_FUNC(one_fishing_chore) {
 }
 
 
+/**
+* @param empire_data *emp The empire for the chore.
+* @param room_data *room The location of the chore.
+* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+*/
 void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh) {	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_FISHING].mob);
 	bool depleted = (GET_CHORE_DEPLETION(DPLTN_FISH) >= (veh ? config_get_int("common_depletion") : DEPLETION_LIMIT(room))) ? TRUE : FALSE;
-	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_FISHING, INTERACT_FISH);
+	bool can_gain = veh ? can_gain_chore_resource_from_interaction_list(emp, room, CHORE_FISHING, VEH_INTERACTIONS(veh), INTERACT_FISH, FALSE) ? can_gain_chore_resource_from_interaction(emp, room, CHORE_FISHING, INTERACT_FISH);
 	bool can_do = !depleted && can_gain;
 	
-	if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_FISH) && can_do) {
+	if (can_do && worker) {
+		// not able to ewt_mark_resource_worker() until we're inside the interact
 		// fishing is free
 		charge_workforce(emp, room, worker, 0, NOTHING, 0);
-		
-		// not able to ewt_mark_resource_worker() until we're inside the interact
-		if (worker) {
-			run_room_interactions(worker, room, INTERACT_FISH, veh, one_fishing_chore);
+		if (veh) {
+			run_interactions(worker, VEH_INTERACTIONS(veh), INTERACT_FISH, room, NULL, NULL, veh, one_fishing_chore);
 		}
 		else {
-			if ((worker = place_chore_worker(emp, CHORE_FISHING, room))) {
-				ewt_mark_for_interactions(emp, room, INTERACT_FISH);
-			}
+			run_room_interactions(worker, room, INTERACT_FISH, veh, one_fishing_chore);
 		}
 	}
-	else if (!worker) {
+	else if ((worker = place_chore_worker(emp, CHORE_FISHING, room))) {
+		ewt_mark_for_interactions(emp, room, INTERACT_FISH);
+	}
+	else {
 		mark_workforce_delay(emp, room, CHORE_FISHING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
 	}
 	
