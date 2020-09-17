@@ -359,7 +359,7 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		*/
 	}
 	
-	// unskilled chores:
+	// function chores:
 	if (vehicle_has_function_and_city_ok(veh, FNC_APIARY) && CHORE_ACTIVE(CHORE_BEEKEEPING)) {
 		do_chore_beekeeping(emp, room, veh);
 	}
@@ -374,9 +374,6 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	}
 	if (vehicle_has_function_and_city_ok(veh, FNC_FORGE) && CHORE_ACTIVE(CHORE_NAILMAKING)) {
 		do_chore_nailmaking(emp, room, veh);
-	}
-	if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_QUARRY) && CHORE_ACTIVE(CHORE_QUARRYING)) {
-		do_chore_quarrying(emp, room);
 	}
 	if (vehicle_has_function_and_city_ok(veh, FNC_STABLE) && CHORE_ACTIVE(CHORE_SHEARING)) {
 		do_chore_shearing(emp, room, veh);
@@ -400,6 +397,11 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		do_chore_gen_craft(emp, room, veh, CHORE_NEXUS_CRYSTALS, chore_nexus_crystals, TRUE);
 	}
 	*/
+	
+	// vehicle interaction chores
+	if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_QUARRY) && CHORE_ACTIVE(CHORE_QUARRYING)) {
+		do_chore_quarrying(emp, room);
+	}
 	
 	// object interaction chores:
 	if (vehicle_has_function_and_city_ok(veh, FNC_SAW) && CHORE_ACTIVE(CHORE_SAWING)) {
@@ -2714,8 +2716,13 @@ INTERACTION_FUNC(one_quarry_chore) {
 		
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
-			sprintf(buf, "$n cuts %s from the quarry.", get_obj_name_by_proto(interaction->vnum));
-			act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+			if (inter_veh) {
+				sprintf(buf, "$n cuts %s from $V.", get_obj_name_by_proto(interaction->vnum));
+			}
+			else {
+				sprintf(buf, "$n cuts %s from the quarry.", get_obj_name_by_proto(interaction->vnum));
+			}
+			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE);
 		}
 		return TRUE;
 	}
@@ -2724,23 +2731,32 @@ INTERACTION_FUNC(one_quarry_chore) {
 }
 
 
+/**
+* @param empire_data *emp The empire for the chore.
+* @param room_data *room The location of the chore.
+* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+*/
 void do_chore_quarrying(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_QUARRYING].mob);
 	bool depleted = (GET_CHORE_DEPLETION(DPLTN_QUARRY) >= config_get_int("common_depletion")) ? TRUE : FALSE;
 	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_QUARRYING, INTERACT_QUARRY);
+	struct room_extra_data **extra_data = veh ? &VEH_EXTRA_DATA(veh) : &ROOM_EXTRA_DATA(room);
 	bool can_do = !depleted && can_gain;
 	
 	if (worker && can_do) {
-		if (get_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS) <= 0) {
-			set_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS, 24);
+		if (get_extra_data(*extra_data, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS) <= 0) {
+			set_extra_data(extra_data, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS, 24);
 			ewt_mark_for_interactions(emp, room, INTERACT_QUARRY);
 		}
 		else {
 			charge_workforce(emp, room, worker, 1, NOTHING, 0);
 			
-			add_to_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS, -1);
-			if (get_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS) == 0) {
-				if (run_room_interactions(worker, room, INTERACT_QUARRY, veh, one_quarry_chore)) {
+			add_to_extra_data(extra_data, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS, -1);
+			if (get_extra_data(*extra_data, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS) == 0) {
+				if (veh && run_interactions(worker, VEH_INTERACTIONS(veh), INTERACT_QUARRY, room, NULL, NULL, veh, one_quarry_chore)) {
+					ADD_CHORE_DEPLETION(room, veh, DPLTN_QUARRY, TRUE);
+				}
+				else if (!veh && run_room_interactions(worker, room, INTERACT_QUARRY, veh, one_quarry_chore)) {
 					ADD_CHORE_DEPLETION(room, veh, DPLTN_QUARRY, TRUE);
 				}
 			}
