@@ -1210,7 +1210,6 @@ Available technologies are:
  - Master Portals: the empire's portals have unlimited range
  - Skilled Labor: the workforce can perform even more chores
  - Trade Routes: lets you set up trade with other empires
- - Exarch Crafts: your workforce can craft nexus crystals
  - Deep Mines: Mines will be 50% deeper than normal.
  - Rare Metals: Mines can have rare metals.
  - Bonus Experience: Empire members get +5 bonus experience each day.
@@ -1409,7 +1408,6 @@ Workforce types:
   &yabandon-dismantled:&0 NPCs will abandon a tile when they finish dismantling.
   &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
   &ybeekeeping:&0 Will produce honey and wax the apiary.
-  &ybrickmaking:&0 NPCs will make bricks at the potter.
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
             any building you've started to dismantle. They build using stored
             empire resources, not items on the ground. Workers can't provide
@@ -1419,20 +1417,17 @@ Workforce types:
   &yburn-stumps:&0 Will burn down 'stumps' tiles.
   &ychopping:&0 NPCs will chop down forests and desert groves (Not orchards - 
      use farming without replanting for that).
+  &ycrafting:&0 NPCs will make certain crafts (see WORKFORCE CRAFTING).
   &ydigging:&0 NPCs will dig for in any quarry, clay pit, or sand pit.
   &ydismantle-mines:&0 mines will be dismantled when empty.
   &yfarming:&0 NPCs will harvest crops. Costs no food.
   &yfire-brigade:&0 NPCs will put out fires.
   &yfishing:&0 Will catch fish at the fishery. Costs no food.
-  &yglassmaking:&0 Turns basic sand into glass ingots at the glass blower.
   &cherb-gardening (skilled):&0 NPCs will gather herbs in gardens.
   &ymaintenance:&0 NPCs will keep buildings and vehicles maintained.
   &ymilling:&0 Will mill grains into flour.
   &ymining:&0 NPCs will mine your mines.
   &cminting (skilled):&0 NPCs will mint treasure into coins.
-  &ycrafting:&0 NPCs will make certain crafts (see WORKFORCE CRAFTING).
-  &cnexus-crystal (skilled):&0 Will make nexus crystals at the sorcery tower;
-     requires both Exarch Crafts and Skilled Labor.
   &yoilmaking:&0 Will press oil.
   &yquarrying:&0 NPCs will quarry huge stone blocks at the quarry.
   &yreplanting:&0 after farming crops, NPCs will replant them.
@@ -1447,7 +1442,20 @@ Workforce types:
 Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores
 tend to cost more food.
 
-See also: ABANDON, EXARCH CRAFTS, WORKFORCE
+See also: ABANDON, WORKFORCE
+#
+"WORKFORCE CRAFTING" "WORKFORCE CRAFTS"
+
+The 'crafting' chore instructs your workforce to produce certain items. If you
+want to use this chore, but turn off specific items, use 'workforce limit' on
+those items.
+
+Common things produced by this:
+ Forge: nails
+ Potter: bricks
+ Glass blower: glass ingots
+
+See also: WORKFORCE CHORES, WORKFORCE LIMIT
 #
 "WORKFORCE KEEP"
 
