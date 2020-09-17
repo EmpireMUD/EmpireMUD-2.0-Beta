@@ -158,7 +158,7 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags_long, buf1);
 		str = buf1;
 		if ((ptr = strrchr(str, ','))) {
-			msg_to_char(ch, "You must be %-*.*s or%sto %s that.\r\n", (int)(ptr-str), (int)(ptr-str), str, ptr+1, command);
+			msg_to_char(ch, "You must be %-*.*s or%sto %s that.\r\n", (int)(ptr-str+1), (int)(ptr-str+1), str, ptr+1, command);
 		}
 		else {	// no comma
 			msg_to_char(ch, "You must be %sto %s that.\r\n", buf1, command);
@@ -1256,7 +1256,7 @@ void process_gen_craft(char_data *ch) {
 		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags_long, buf);
 		str = buf;
 		if ((ptr = strrchr(str, ','))) {
-			msg_to_char(ch, "You must be %-*.*s or%sto keep %s that.\r\n", (int)(ptr-str), (int)(ptr-str), str, ptr+1, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+			msg_to_char(ch, "You must be %-*.*s or%sto keep %s that.\r\n", (int)(ptr-str+1), (int)(ptr-str+1), str, ptr+1, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		}
 		else {	// no comma
 			msg_to_char(ch, "You must be %sto keep %s that.\r\n", buf, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
