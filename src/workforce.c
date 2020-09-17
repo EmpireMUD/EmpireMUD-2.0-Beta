@@ -92,8 +92,6 @@ void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, in
  /////////////////////////////////////////////////////////////////////////////
 //// DATA ///////////////////////////////////////////////////////////////////
 
-#define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0 && !workforce_is_delayed(emp, room, (chore)))
-
 #define MIN_WORKER_POS  POS_SITTING	// minimum position for a worker to be used (otherwise it will spawn another worker)
 
 // CHORE_x
@@ -137,6 +135,11 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 
 // global for which chore type might be running
 int einv_interaction_chore_type = 0;
+
+
+#define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0 && !workforce_is_delayed(emp, room, (chore)))
+#define GET_CHORE_DEPLETION(type)  (veh ? get_vehicle_depletion(veh, (type)) : get_depletion(room, (type)))
+#define ADD_CHORE_DEPLETION(room, veh, type, multiple)  { if (veh) { add_vehicle_depletion((veh), (type), (multiple)); } else { add_depletion((room), (type), (multiple)); } }
 
 
  /////////////////////////////////////////////////////////////////////////////
@@ -343,9 +346,17 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	
 	// skilled labor chores:
 	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
-		if (CHORE_ACTIVE(CHORE_HERB_GARDENING) && has_interaction(VEH_INTERACTIONS(veh), INTERACT_PICK)) {
+		if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_PICK) && CHORE_ACTIVE(CHORE_HERB_GARDENING)) {
 			do_chore_gardening(emp, room, veh);
 		}
+		if (vehicle_has_function_and_city_ok(veh, FNC_MINT) && CHORE_ACTIVE(CHORE_MINTING)) {
+			do_chore_minting(emp, room, veh);
+		}
+	}
+	
+	// unskilled chores
+	if (vehicle_has_function_and_city_ok(veh, FNC_POTTER) && CHORE_ACTIVE(CHORE_BRICKMAKING)) {
+		do_chore_brickmaking(emp, room, veh);
 	}
 }
 
@@ -1585,6 +1596,11 @@ void do_chore_beekeeping(empire_data *emp, room_data *room, vehicle_data *veh) {
 }
 
 
+/**
+* @param empire_data *emp The empire for the chore.
+* @param room_data *room The location of the chore.
+* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+*/
 void do_chore_brickmaking(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_BRICKMAKING].mob);
 	int islid = GET_ISLAND_ID(room);
@@ -2278,15 +2294,16 @@ void do_chore_fire_brigade(empire_data *emp, room_data *room) {
 }
 
 
+// supports vehicles if inter_veh is set
 INTERACTION_FUNC(one_gardening_chore) {
-	empire_data *emp = ROOM_OWNER(inter_room);
+	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
 	
 	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_HERB_GARDENING, interaction->vnum)) {
 		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, interaction->quantity);
 		
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
 		add_production_total(emp, interaction->vnum, interaction->quantity);
-		add_depletion(inter_room, DPLTN_PICK, TRUE);
+		ADD_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_PICK, TRUE);
 
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
@@ -2299,35 +2316,39 @@ INTERACTION_FUNC(one_gardening_chore) {
 }
 
 
+/**
+* @param empire_data *emp The empire for the chore.
+* @param room_data *room The location of the chore.
+* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+*/
 void do_chore_gardening(empire_data *emp, room_data *room, vehicle_data *veh) {
 	int garden_depletion = config_get_int("garden_depletion");
 	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_HERB_GARDENING].mob);
-	bool depleted = (get_depletion(room, DPLTN_PICK) >= garden_depletion);
+	bool depleted = (GET_CHORE_DEPLETION(DPLTN_PICK) >= garden_depletion);
 	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_HERB_GARDENING, INTERACT_PICK);
 	bool can_do = !depleted && can_gain;
 	
-	if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PICK) && can_do) {
+	if (can_do && worker) {
 		// not able to ewt_mark_resource_worker() until inside the interaction
-		if (worker) {
-			charge_workforce(emp, room, worker, 2, NOTHING, 0);
-			run_room_interactions(worker, room, INTERACT_PICK, one_gardening_chore);
+		charge_workforce(emp, room, worker, 2, NOTHING, 0);
+		if (veh) {
+			run_interactions(worker, VEH_INTERACTIONS(veh), INTERACT_PICK, room, NULL, NULL, veh, one_gardening_chore);
 		}
 		else {
-			if ((worker = place_chore_worker(emp, CHORE_HERB_GARDENING, room))) {
-				ewt_mark_for_interactions(emp, room, INTERACT_PICK);
-				charge_workforce(emp, room, worker, 2, NOTHING, 0);
-			}
+			run_room_interactions(worker, room, INTERACT_PICK, one_gardening_chore);
 		}
 	}
-	else if (!worker) {
-		mark_workforce_delay(emp, room, CHORE_HERB_GARDENING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
+	else if (can_do && !worker) {
+		if ((worker = place_chore_worker(emp, CHORE_HERB_GARDENING, room))) {
+			ewt_mark_for_interactions(emp, room, INTERACT_PICK);
+			charge_workforce(emp, room, worker, 2, NOTHING, 0);
+		}
 	}
-	
-	if (depleted) {
+	else if (depleted) {
 		log_workforce_problem(emp, room, CHORE_HERB_GARDENING, WF_PROB_DEPLETED, FALSE);
 	}
-	if (!can_gain) {
+	else if (!can_gain) {
 		log_workforce_problem(emp, room, CHORE_HERB_GARDENING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
@@ -2458,6 +2479,11 @@ void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh) {
 }
 
 
+/**
+* @param empire_data *emp The empire for the chore.
+* @param room_data *room The location of the chore.
+* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+*/
 void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 	struct empire_storage_data *highest = NULL, *store, *next_store;
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_MINTING].mob);
