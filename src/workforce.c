@@ -369,6 +369,18 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	if (vehicle_has_function_and_city_ok(veh, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
 		do_chore_digging(emp, room, veh);
 	}
+	if (vehicle_has_function_and_city_ok(veh, FNC_GLASSBLOWER) && CHORE_ACTIVE(CHORE_GLASSMAKING)) {
+		do_chore_glassmaking(emp, room, veh);
+	}
+	if (vehicle_has_function_and_city_ok(veh, FNC_FORGE) && CHORE_ACTIVE(CHORE_NAILMAKING)) {
+		do_chore_nailmaking(emp, room, veh);
+	}
+	if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_QUARRY) && CHORE_ACTIVE(CHORE_QUARRYING)) {
+		do_chore_quarrying(emp, room);
+	}
+	if (vehicle_has_function_and_city_ok(veh, FNC_STABLE) && CHORE_ACTIVE(CHORE_SHEARING)) {
+		do_chore_shearing(emp, room, veh);
+	}
 	
 	// gen-craft chores:
 	if (vehicle_has_function_and_city_ok(veh, FNC_SMELT) && CHORE_ACTIVE(CHORE_SMELTING)) {
@@ -398,6 +410,19 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	}
 	if (vehicle_has_function_and_city_ok(veh, FNC_TANNERY) && CHORE_ACTIVE(CHORE_TANNING)) {
 		do_chore_einv_interaction(emp, room, veh, CHORE_TANNING, INTERACT_TAN);
+	}
+	
+	// mining
+	if (vehicle_has_function_and_city_ok(veh, FNC_MINE)) {
+		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
+			if (CHORE_ACTIVE(CHORE_MINING)) {
+				do_chore_mining(emp, room, veh);
+			}
+		}
+		else if (!VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE | VEH_PLAYER_NO_DISMANTLE) && CHORE_ACTIVE(CHORE_DISMANTLE_MINES)) {
+			// no ore left
+			do_chore_dismantle_mines(emp, room, veh);
+		}
 	}
 }
 
@@ -2030,19 +2055,31 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 }
 
 
+/**
+* @param empire_data *emp The empire for the chore.
+* @param room_data *room The location of the chore.
+* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+*/
 void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *veh) {
 	void start_dismantle_building(room_data *loc);
+	void start_dismantle_vehicle(vehicle_data *veh);
 	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_DISMANTLE_MINES].mob);
-	bool can_do = IS_COMPLETE(room);
+	bool can_do = veh ? VEH_IS_COMPLETE(veh) : IS_COMPLETE(room);
 	
 	if (!worker) {	// as a backup, use a miner if present
 		worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_MINING].mob);
 	}
 	
 	if (worker && can_do) {
-		start_dismantle_building(room);
-		act("$n begins to dismantle the building.", FALSE, worker, NULL, NULL, TO_ROOM);
+		if (veh) {
+			act("$n begins to dismantle $V.", FALSE, worker, NULL, veh, TO_ROOM);
+			start_dismantle_vehicle(veh);
+		}
+		else {
+			act("$n begins to dismantle the building.", FALSE, worker, NULL, NULL, TO_ROOM);
+			start_dismantle_building(room);
+		}
 	}
 	else if (can_do) {
 		if ((worker = place_chore_worker(emp, CHORE_DISMANTLE_MINES, room))) {
@@ -2411,7 +2448,13 @@ void do_chore_gardening(empire_data *emp, room_data *room, vehicle_data *veh) {
 }
 
 
-// converts 2 basic sand to 1 glass ingot
+/**
+* Converts 2 basic sand to 1 glass ingot.
+* 
+* @param empire_data *emp The empire for the chore.
+* @param room_data *room The location of the chore.
+* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+*/
 void do_chore_glassmaking(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_GLASSMAKING].mob);
 	int islid = GET_ISLAND_ID(room);
@@ -2498,6 +2541,11 @@ INTERACTION_FUNC(one_mining_chore) {
 }
 
 
+/**
+* @param empire_data *emp The empire for the chore.
+* @param room_data *room The location of the chore.
+* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+*/
 void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_MINING].mob);
 	struct global_data *mine = global_proto(get_room_extra_data(room, ROOM_EXTRA_MINE_GLB_VNUM));
@@ -2615,6 +2663,11 @@ void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh) {
 }
 
 
+/**
+* @param empire_data *emp The empire for the chore.
+* @param room_data *room The location of the chore.
+* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+*/
 void do_chore_nailmaking(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_NAILMAKING].mob);
 	int islid = GET_ISLAND_ID(room);
@@ -2720,6 +2773,11 @@ void do_chore_quarrying(empire_data *emp, room_data *room, vehicle_data *veh) {
 }
 
 
+/**
+* @param empire_data *emp The empire for the chore.
+* @param room_data *room The location of the chore.
+* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
+*/
 void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 	int shear_growth_time = config_get_int("shear_growth_time");
 	
