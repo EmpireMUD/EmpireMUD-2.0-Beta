@@ -1147,8 +1147,8 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_SMELTING  9
 #define CHORE_WEAVING  10
 #define CHORE_QUARRYING  11
-#define CHORE_CRAFTING  12
-#define CHORE_BRICKMAKING  13
+#define CHORE_CRAFTING  12	// formerly nailmaking, brickmaking, glassmaking
+	#define CHORE_UNUSED1  13
 #define CHORE_ABANDON_DISMANTLED  14
 #define CHORE_HERB_GARDENING  15
 #define CHORE_FIRE_BRIGADE  16
@@ -1159,15 +1159,15 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_DISMANTLE_MINES  21
 #define CHORE_ABANDON_CHOPPED  22
 #define CHORE_ABANDON_FARMED  23
-#define CHORE_NEXUS_CRYSTALS  24
+	#define CHORE_UNUSED2  24
 #define CHORE_MILLING  25
-	#define CHORE_UNUSED  26	// formerly: CHORE_REPAIR_VEHICLES  26, merged with CHORE_MAINTENANCE
+	#define CHORE_UNUSED3  26	// formerly: CHORE_REPAIR_VEHICLES  26, merged with CHORE_MAINTENANCE
 #define CHORE_OILMAKING  27
 #define CHORE_GENERAL  28	// for reporting problems
 #define CHORE_FISHING  29
 #define CHORE_BURN_STUMPS  30
 #define CHORE_BEEKEEPING  31
-#define CHORE_GLASSMAKING  32
+	#define CHORE_UNUSED4  32
 #define NUM_CHORES  33		// total
 
 
@@ -1274,7 +1274,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // TECH_x: Technologies
-	#define TECH_UNUSED  0	// formerly glassblowing
+	#define TECH_UNUSED0  0	// formerly glassblowing
 #define TECH_CITY_LIGHTS  1
 #define TECH_LOCKS  2
 	#define TECH_UNUSED1  3	// formerly apiaries
@@ -1286,7 +1286,7 @@ typedef struct vehicle_data vehicle_data;
 #define TECH_MASTER_PORTALS  9
 #define TECH_SKILLED_LABOR  10
 #define TECH_TRADE_ROUTES  11
-#define TECH_EXARCH_CRAFTS  12
+	#define TECH_UNUSED  12	// formerly exarch crafts
 #define TECH_DEEP_MINES  13
 #define TECH_RARE_METALS  14
 #define TECH_BONUS_EXPERIENCE  15

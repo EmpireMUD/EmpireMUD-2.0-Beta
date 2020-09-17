@@ -533,9 +533,6 @@ void add_ability(char_data *ch, ability_data *abil, bool reset_levels) {
 void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add) {
 	int mod = (add ? 1 : -1);
 	
-	if (has_ability(ch, ABIL_EXARCH_CRAFTS)) {
-		EMPIRE_TECH(emp, TECH_EXARCH_CRAFTS) += mod;
-	}
 	if (has_ability(ch, ABIL_PORTAL_MAGIC)) {
 		EMPIRE_TECH(emp, TECH_PORTALS) += mod;
 	}

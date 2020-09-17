@@ -60,7 +60,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 	bool problem = FALSE;
 	bld_data *bld = NULL;
 
-	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL && !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL && !CRAFT_FLAGGED(craft, CRAFT_LEARNED) && GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WORKFORCE) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires no object, ability, or recipe");
 		problem = TRUE;
 	}
@@ -151,7 +151,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft makes nothing");
 			problem = TRUE;
 		}
-		if (GET_CRAFT_OBJECT(craft) != NOTHING && GET_CRAFT_OBJECT(craft) != GET_CRAFT_VNUM(craft)) {
+		if (GET_CRAFT_OBJECT(craft) != NOTHING && GET_CRAFT_OBJECT(craft) != GET_CRAFT_VNUM(craft) && GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WORKFORCE) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates item with different vnum");
 			problem = TRUE;
 		}

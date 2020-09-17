@@ -39,7 +39,6 @@ struct empire_territory_data *global_next_territory_entry = NULL;
 
 // protos
 void do_chore_beekeeping(empire_data *emp, room_data *room, vehicle_data *veh);
-void do_chore_brickmaking(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_building(empire_data *emp, room_data *room, int mode);
 void do_chore_burn_stumps(empire_data *emp, room_data *room);
 void do_chore_chopping(empire_data *emp, room_data *room);
@@ -51,7 +50,6 @@ void do_chore_farming(empire_data *emp, room_data *room);
 void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_fire_brigade(empire_data *emp, room_data *room);
 void do_chore_gardening(empire_data *emp, room_data *room, vehicle_data *veh);
-void do_chore_glassmaking(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_quarrying(empire_data *emp, room_data *room, vehicle_data *veh);
@@ -80,7 +78,6 @@ void stop_room_action(room_data *room, int action);	// act.action.c
 
 // gen_craft protos:
 #define CHORE_GEN_CRAFT_VALIDATOR(name)  bool (name)(empire_data *emp, room_data *room, vehicle_data *veh, int chore, craft_data *craft)
-CHORE_GEN_CRAFT_VALIDATOR(chore_nexus_crystals);
 CHORE_GEN_CRAFT_VALIDATOR(chore_milling);
 CHORE_GEN_CRAFT_VALIDATOR(chore_pressing);
 CHORE_GEN_CRAFT_VALIDATOR(chore_smelting);
@@ -111,7 +108,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "weaving", WEAVER, FALSE },
 	{ "quarrying", STONECUTTER, FALSE },
 	{ "crafting", WORKFORCE_APPRENTICE, FALSE },
-	{ "brickmaking", BRICKMAKER, FALSE },
+		{ "unused", BRICKMAKER, TRUE },
 	{ "abandon-dismantled", NOTHING, FALSE },
 	{ "herb-gardening", GARDENER, FALSE },
 	{ "fire-brigade", FIRE_BRIGADE, FALSE },
@@ -122,7 +119,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "dismantle-mines", MINE_SUPERVISOR, FALSE },
 	{ "abandon-chopped", NOTHING, FALSE },
 	{ "abandon-farmed", NOTHING, FALSE },
-	{ "nexus-crystals", APPRENTICE_EXARCH, FALSE },
+		{ "unused", APPRENTICE_EXARCH, TRUE },
 	{ "milling", MILL_WORKER, FALSE },
 		{ "unused", VEHICLE_REPAIRMAN, TRUE },	// note: formerly repair-vehicles, which merged with maintenance
 	{ "oilmaking", PRESS_WORKER, FALSE },
@@ -130,7 +127,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "fishing", FISHERMAN, FALSE },
 	{ "burn-stumps", STUMP_BURNER, FALSE },
 	{ "beekeeping", BEEKEEPER, FALSE },
-	{ "glassmaking", GLASSMAKER, FALSE },
+		{ "unused", GLASSMAKER, TRUE },
 };
 
 
@@ -239,9 +236,6 @@ void process_one_chore(empire_data *emp, room_data *room) {
 			}
 		}
 		
-		if (room_has_function_and_city_ok(emp, room, FNC_POTTER) && CHORE_ACTIVE(CHORE_BRICKMAKING)) {
-			do_chore_brickmaking(emp, room, NULL);
-		}
 		if (room_has_function_and_city_ok(emp, room, FNC_SMELT) && CHORE_ACTIVE(CHORE_SMELTING)) {
 			do_chore_gen_craft(emp, room, NULL, CHORE_SMELTING, chore_smelting, FALSE);
 		}
@@ -259,9 +253,6 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_APIARY) && CHORE_ACTIVE(CHORE_BEEKEEPING)) {
 			do_chore_beekeeping(emp, room, NULL);
-		}
-		if (room_has_function_and_city_ok(emp, room, FNC_GLASSBLOWER) && CHORE_ACTIVE(CHORE_GLASSMAKING)) {
-			do_chore_glassmaking(emp, room, NULL);
 		}
 		if (BUILDING_VNUM(room) == BUILDING_TRAPPERS_POST && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_TRAPPING)) {
 			do_chore_trapping(emp, room, NULL);
@@ -283,9 +274,6 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		}
 		if (room_has_function_and_city_ok(emp, room, FNC_PRESS) && CHORE_ACTIVE(CHORE_OILMAKING)) {
 			do_chore_gen_craft(emp, room, NULL, CHORE_OILMAKING, chore_pressing, FALSE);
-		}
-		if (BUILDING_VNUM(room) == RTYPE_SORCERER_TOWER && check_in_city_requirement(room, TRUE) && CHORE_ACTIVE(CHORE_NEXUS_CRYSTALS) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_HAS_TECH(emp, TECH_EXARCH_CRAFTS)) {
-			do_chore_gen_craft(emp, room, NULL, CHORE_NEXUS_CRYSTALS, chore_nexus_crystals, TRUE);
 		}
 		
 		// and misc crafting
@@ -364,17 +352,11 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	if (vehicle_has_function_and_city_ok(veh, FNC_APIARY) && CHORE_ACTIVE(CHORE_BEEKEEPING)) {
 		do_chore_beekeeping(emp, room, veh);
 	}
-	if (vehicle_has_function_and_city_ok(veh, FNC_POTTER) && CHORE_ACTIVE(CHORE_BRICKMAKING)) {
-		do_chore_brickmaking(emp, room, veh);
-	}
 	if (vehicle_has_function_and_city_ok(veh, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
 		do_chore_digging(emp, room, veh);
 	}
 	if (vehicle_has_function_and_city_ok(veh, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
 		do_chore_fishing(emp, room, veh);
-	}
-	if (vehicle_has_function_and_city_ok(veh, FNC_GLASSBLOWER) && CHORE_ACTIVE(CHORE_GLASSMAKING)) {
-		do_chore_glassmaking(emp, room, veh);
 	}
 	if (vehicle_has_function_and_city_ok(veh, FNC_STABLE) && CHORE_ACTIVE(CHORE_SHEARING)) {
 		do_chore_shearing(emp, room, veh);
@@ -393,11 +375,6 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	if (vehicle_has_function_and_city_ok(veh, FNC_PRESS) && CHORE_ACTIVE(CHORE_OILMAKING)) {
 		do_chore_gen_craft(emp, room, veh, CHORE_OILMAKING, chore_pressing, FALSE);
 	}
-	/*
-	if (BUILDING_VNUM(room) == RTYPE_SORCERER_TOWER && check_in_city_requirement(room, TRUE) && CHORE_ACTIVE(CHORE_NEXUS_CRYSTALS) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && EMPIRE_HAS_TECH(emp, TECH_EXARCH_CRAFTS)) {
-		do_chore_gen_craft(emp, room, veh, CHORE_NEXUS_CRYSTALS, chore_nexus_crystals, TRUE);
-	}
-	*/
 	
 	// vehicle interaction chores
 	if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_QUARRY) && CHORE_ACTIVE(CHORE_QUARRYING)) {
@@ -1368,25 +1345,6 @@ bool workforce_is_delayed(empire_data *emp, room_data *room, int chore) {
 * @param craft_data *craft The craft to validate.
 * @return bool TRUE if this workforce chore can work this craft, FALSE if not
 */
-CHORE_GEN_CRAFT_VALIDATOR(chore_nexus_crystals) {
-	if (GET_CRAFT_OBJECT(craft) != o_NEXUS_CRYSTAL) {
-		return FALSE;
-	}
-	// success
-	return TRUE;
-}
-
-
-/**
-* Function passed to do_chore_gen_craft()
-*
-* @param empire_data *emp The empire doing the chore.
-* @param room_data *room The room the chore is in.
-* @param vehicle_data *veh Optional: If it's a vehicle chore, not a room chore. (NULL for not-a-vehicle-chore.)
-* @param int chore CHORE_ const for this chore.
-* @param craft_data *craft The craft to validate.
-* @return bool TRUE if this workforce chore can work this craft, FALSE if not
-*/
 CHORE_GEN_CRAFT_VALIDATOR(chore_milling) {
 	ability_data *abil;
 	
@@ -1748,46 +1706,6 @@ void do_chore_beekeeping(empire_data *emp, room_data *room, vehicle_data *veh) {
 	
 	if (!can_do) {
 		log_workforce_problem(emp, room, CHORE_BEEKEEPING, WF_PROB_OVER_LIMIT, FALSE);
-	}
-}
-
-
-/**
-* @param empire_data *emp The empire for the chore.
-* @param room_data *room The location of the chore.
-* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
-*/
-void do_chore_brickmaking(empire_data *emp, room_data *room, vehicle_data *veh) {
-	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_BRICKMAKING].mob);
-	int islid = GET_ISLAND_ID(room);
-	bool can_gain = can_gain_chore_resource(emp, room, CHORE_BRICKMAKING, o_BRICKS);
-	bool has_clay = empire_can_afford_component(emp, islid, COMP_CLAY, 2, FALSE, TRUE);
-	bool can_do = can_gain && has_clay;
-	
-	if (worker && can_do) {
-		charge_workforce(emp, room, worker, 1, o_BRICKS, 1);
-		
-		charge_stored_component(emp, islid, COMP_CLAY, 2, FALSE, TRUE, NULL);
-		add_to_empire_storage(emp, islid, o_BRICKS, 1);
-		add_production_total(emp, o_BRICKS, 1);
-		
-		act("$n finishes a pile of bricks.", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
-	}
-	else if (can_do) {
-		// place worker
-		if ((worker = place_chore_worker(emp, CHORE_BRICKMAKING, room))) {
-			charge_workforce(emp, room, worker, 1, o_BRICKS, 1);
-		}
-	}
-	else if (!worker) {
-		mark_workforce_delay(emp, room, CHORE_BRICKMAKING, !has_clay ? WF_PROB_NO_RESOURCES : WF_PROB_OVER_LIMIT);
-	}
-	
-	if (!has_clay) {
-		log_workforce_problem(emp, room, CHORE_BRICKMAKING, WF_PROB_NO_RESOURCES, FALSE);
-	}
-	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_BRICKMAKING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 
@@ -2534,49 +2452,6 @@ void do_chore_gardening(empire_data *emp, room_data *room, vehicle_data *veh) {
 	}
 	else if (!can_gain) {
 		log_workforce_problem(emp, room, CHORE_HERB_GARDENING, WF_PROB_OVER_LIMIT, FALSE);
-	}
-}
-
-
-/**
-* Converts 2 basic sand to 1 glass ingot.
-* 
-* @param empire_data *emp The empire for the chore.
-* @param room_data *room The location of the chore.
-* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
-*/
-void do_chore_glassmaking(empire_data *emp, room_data *room, vehicle_data *veh) {
-	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_GLASSMAKING].mob);
-	int islid = GET_ISLAND_ID(room);
-	bool can_gain = can_gain_chore_resource(emp, room, CHORE_GLASSMAKING, o_GLASS_INGOT);
-	struct empire_storage_data *sand = find_stored_resource(emp, islid, o_SAND);
-	bool has_sand = (sand && sand->amount >= 2);
-	bool can_do = can_gain && has_sand;
-	
-	if (worker && can_do) {
-		charge_workforce(emp, room, worker, 1, o_GLASS_INGOT, 1);
-		
-		charge_stored_resource(emp, islid, o_SAND, 2);
-		add_to_empire_storage(emp, islid, o_GLASS_INGOT, 1);
-		add_production_total(emp, o_GLASS_INGOT, 1);
-		
-		act("$n finishes a glass ingot and sets it to cool.", FALSE, worker, NULL, NULL, TO_ROOM);
-	}
-	else if (can_do) {
-		// place worker
-		if ((worker = place_chore_worker(emp, CHORE_GLASSMAKING, room))) {
-			charge_workforce(emp, room, worker, 1, o_GLASS_INGOT, 1);
-		}
-	}
-	else if (!worker) {
-		mark_workforce_delay(emp, room, CHORE_GLASSMAKING, !has_sand ? WF_PROB_NO_RESOURCES : WF_PROB_OVER_LIMIT);
-	}
-	
-	if (!has_sand) {
-		log_workforce_problem(emp, room, CHORE_GLASSMAKING, WF_PROB_NO_RESOURCES, FALSE);
-	}
-	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_GLASSMAKING, WF_PROB_OVER_LIMIT, FALSE);
 	}
 }
 

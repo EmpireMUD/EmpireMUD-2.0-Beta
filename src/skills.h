@@ -229,7 +229,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define ABIL_SHADOW_JAB  237
 #define ABIL_ANCESTRAL_HEALING  239
 #define ABIL_CONFER  240
-#define ABIL_EXARCH_CRAFTS  248
+// #define ABIL_EXARCH_CRAFTS  248
 // #define ABIL_GRIFFIN  250
 // #define ABIL_DIRE_WOLF  251
 // #define ABIL_MOON_RABBIT  252

@@ -1840,7 +1840,7 @@ const char *techs[] = {
 	"Master Portals",
 	"Skilled Labor",
 	"Trade Routes",
-	"Exarch Crafts",
+	"*",
 	"Deep Mines",
 	"Rare Metals",
 	"Bonus Experience",

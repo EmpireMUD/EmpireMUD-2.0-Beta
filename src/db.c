@@ -1969,6 +1969,7 @@ const char *versions_list[] = {
 	"b5.102",
 	"b5.103",
 	"b5.104",
+	"b5.105",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -4474,6 +4475,26 @@ void b5_104_update(void) {
 }
 
 
+// b5.105 modifies workforce configs due to chore changes
+void b5_105_update(void) {
+	void set_workforce_limit_all(empire_data *emp, int chore, int limit);
+	empire_data *emp, *next_emp;
+	
+	int CHORE_BRICKMAKING = 13;
+	int CHORE_NEXUS_CRYSTALS = 24;
+	int CHORE_GLASSMAKING = 32;
+	
+	log("Applying b5.105 update to shut off old workforce chores...");
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		set_workforce_limit_all(emp, CHORE_BRICKMAKING, 0);
+		set_workforce_limit_all(emp, CHORE_NEXUS_CRYSTALS, 0);
+		set_workforce_limit_all(emp, CHORE_GLASSMAKING, 0);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4798,6 +4819,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.104")) {
 			b5_104_update();
+		}
+		if (MATCH_VERSION("b5.105")) {
+			b5_105_update();
 		}
 	}
 	

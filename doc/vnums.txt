@@ -4,7 +4,7 @@ blocks that are currently in use.
 
    0  Boards
  100  misc natural resources
- 200  Empire NPCs
+ 200  Empire NPCs and workforce crafts
   50  clay/pottery items
  300  Barded mount mobs
  400  High Sorcery mobs

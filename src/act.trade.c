@@ -935,7 +935,7 @@ struct gen_craft_data_t gen_craft_data[] = {
 	{ "build", "building", NOBITS, { "You work on building the %s...", "$n works on the building the %s...", "$n is building the %s." } },
 	{ "weave", "weaving", NOBITS, { "You carefully weave the %s...", "$n carefully weaves the %s...", "$n is weaving %s." } },
 	
-	{ "workforce", "producing", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is working dilligently." } },	// not used by players
+	{ "workforce", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is working dilligently." } },	// not used by players
 	
 	{ "manufacture", "manufacturing", NOBITS, { "You carefully manufacture the %s...", "$n carefully manufactures the %s...", "$n is manufacturing %s." } },
 	{ "smelt", "smelting", ACTF_FAST_CHORES, { "You smelt the %s in the fire...", "$n smelts the %s in the fire...", "$n is smelting %s." } },

@@ -47,7 +47,6 @@
 
 // Room building vnums
 #define RTYPE_SHIP_HOLDING_PEN  5509	// for the shipping system's storage room
-#define RTYPE_SORCERER_TOWER  5511
 #define RTYPE_EXTRACTION_PIT  5523	// a place to keep chars when they are pending extraction
 
 #define RTYPE_TUNNEL  5612	// for mine complex, tunnel
@@ -95,7 +94,6 @@
 // Skill tree items
 #define o_PORTAL  1100  // could probably safely generate a NOTHING item
 #define o_IMPERIUM_SPIKE  1114
-#define o_NEXUS_CRYSTAL  1115
 #define o_NOCTURNIUM_SPIKE  1119
 
 // herbs
@@ -154,7 +152,7 @@
 #define WEAVER  258
 #define STONECUTTER  259
 #define NAILMAKER  260	// unused now
-#define BRICKMAKER  261
+#define BRICKMAKER  261	// unused now
 #define GARDENER  262
 #define FIRE_BRIGADE  265
 #define TRAPPER  266
@@ -162,7 +160,7 @@
 #define SHEARER  268
 #define COIN_MAKER  269
 #define DOCKWORKER  270
-#define APPRENTICE_EXARCH  271
+#define APPRENTICE_EXARCH  271	// unused now
 #define MILL_WORKER  272
 #define VEHICLE_REPAIRMAN  273
 #define OVERSEER  274
@@ -170,7 +168,7 @@
 #define MINE_SUPERVISOR  277
 #define FISHERMAN  279
 #define BEEKEEPER  281
-#define GLASSMAKER  282
+#define GLASSMAKER  282	// unused now
 #define WORKFORCE_APPRENTICE  283
 
 
