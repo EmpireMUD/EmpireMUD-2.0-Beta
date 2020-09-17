@@ -2434,7 +2434,7 @@ void do_chore_gardening(empire_data *emp, room_data *room, vehicle_data *veh) {
 	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_HERB_GARDENING].mob);
 	bool depleted = (GET_CHORE_DEPLETION(DPLTN_PICK) >= garden_depletion);
-	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_HERB_GARDENING, INTERACT_PICK);
+	bool can_gain = veh ? can_gain_chore_resource_from_interaction_list(emp, room, CHORE_HERB_GARDENING, VEH_INTERACTIONS(veh), INTERACT_PICK, FALSE) : can_gain_chore_resource_from_interaction(emp, room, CHORE_HERB_GARDENING, INTERACT_PICK);
 	bool can_do = !depleted && can_gain;
 	
 	if (can_do && worker) {
@@ -2668,7 +2668,7 @@ INTERACTION_FUNC(one_quarry_chore) {
 void do_chore_quarrying(empire_data *emp, room_data *room, vehicle_data *veh) {
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_QUARRYING].mob);
 	bool depleted = (GET_CHORE_DEPLETION(DPLTN_QUARRY) >= config_get_int("common_depletion")) ? TRUE : FALSE;
-	bool can_gain = can_gain_chore_resource_from_interaction(emp, room, CHORE_QUARRYING, INTERACT_QUARRY);
+	bool can_gain = veh ? can_gain_chore_resource_from_interaction_list(emp, room, CHORE_QUARRYING, VEH_INTERACTIONS(veh), INTERACT_QUARRY, FALSE) : can_gain_chore_resource_from_interaction(emp, room, CHORE_QUARRYING, INTERACT_QUARRY);
 	struct room_extra_data **extra_data = veh ? &VEH_EXTRA_DATA(veh) : &ROOM_EXTRA_DATA(room);
 	bool can_do = !depleted && can_gain;
 	

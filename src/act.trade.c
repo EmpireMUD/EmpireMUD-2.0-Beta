@@ -37,6 +37,7 @@
 extern const struct augment_type_data augment_info[];
 extern const char *craft_types[];
 extern const char *function_flags[];
+extern const char *function_flags_long[];
 extern struct gen_craft_data_t gen_craft_data[];
 extern const int rev_dir[];
 extern const char *tool_flags[];
@@ -76,7 +77,7 @@ obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 * @return bool TRUE if okay, FALSE if not.
 */
 bool check_can_craft(char_data *ch, craft_data *type) {
-	char buf1[MAX_STRING_LENGTH];
+	char buf1[MAX_STRING_LENGTH], *str, *ptr;
 	vehicle_data *craft_veh;
 	bool wait, room_wait, makes_building;
 	
@@ -154,8 +155,16 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 		msg_to_char(ch, "You need a container of water to %s that.\r\n", command);
 	}
 	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
-		sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags, buf1, TRUE);
-		msg_to_char(ch, "To %s that, you must be somewhere with: %s\r\n", buf1, command);
+		sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags_long, buf1, TRUE);
+		msg_to_char(ch, "You must be %s to %s that.\r\n", buf1, command);
+		str = buf1;
+		if ((ptr = strrchr(str, ','))) {
+			msg_to_char(ch, "You must be %-*.*s or%s to %s that.\r\n", (int)(ptr-str), (int)(ptr-str), str, ptr+1, command);
+		}
+		else {	// no comma
+			msg_to_char(ch, "You must be %s to %s that.\r\n", buf1, command);
+		}
+	
 	}
 	// end flag checks
 	
@@ -1200,6 +1209,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 * @param char_data *ch The actor.
 */
 void process_gen_craft(char_data *ch) {
+	char buf[MAX_STRING_LENGTH], *str, *ptr;
 	obj_data *weapon = NULL, *tool = NULL;
 	craft_data *type = craft_proto(GET_ACTION_VNUM(ch, 0));
 	bool has_mill = FALSE;
@@ -1244,8 +1254,14 @@ void process_gen_craft(char_data *ch) {
 		msg_to_char(ch, "You aren't using the right tool to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	}
 	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
-		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags, buf1);
-		msg_to_char(ch, "You can't keep %s without being somewhere with: %s\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb, buf1);
+		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags_long, buf);
+		str = buf;
+		if ((ptr = strrchr(str, ','))) {
+			msg_to_char(ch, "You must be %-*.*s or%s to keep %s that.\r\n", (int)(ptr-str), (int)(ptr-str), str, ptr+1, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		}
+		else {	// no comma
+			msg_to_char(ch, "You must be %s to keep %s that.\r\n", buf, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		}
 	}
 	else {
 		GET_ACTION_TIMER(ch) -= 1;

@@ -3127,9 +3127,9 @@ bool evo_is_over_time[] = {
 };
 
 
-// FNC_x: function flags (for buildings)
+// FNC_x (1/2): function flags (for buildings)
 const char *function_flags[] = {
-	"ALCHEMIST",
+	"ALCHEMIST",	// 0
 	"APIARY",
 	"BATHS",
 	"BEDROOM",
@@ -3169,6 +3169,52 @@ const char *function_flags[] = {
 	"OVEN",
 	"MAGIC-WORKSHOP",
 	"TRAPPER",
+	"\n"
+};
+
+
+// FNC_x (2/2): explainers, usually shown as "You must be %s to craft that."
+const char *function_flags_long[] = {
+	"at an alchemist",	// 0
+	"in an apiary",
+	"at the baths",
+	"in a bedroom",
+	"at a carpenter",
+	"somewhere that can be dug",	// 5
+	"at the docks",
+	"at a forge",
+	"at a glassblower",
+	"at a guard tower",
+	"at a henge",	// 10
+	"in a library",
+	"at a post box",
+	"at a mill",
+	"in a mine",
+	"at a mint",	// 15
+	"at a portal",
+	"at a potter",
+	"at a press",
+	"somewhere that saws",
+	"at a shipyard",	// 20
+	"at a foundry",
+	"in a stable",
+	"somewhere you can summon players",
+	"at a tailor",
+	"at a tannery",	// 25
+	"in a tavern",
+	"in a tomb",
+	"at a trading post",
+	"in a vault",
+	"in a warehouse",	// 30
+	"somewhere with drinking water",
+	"somewhere with a cooking fire",
+	"somewhere that extends nearby",
+	"in a fishery",
+	"at a depository", // 35
+	"",	// in-city-only?
+	"somewhere with an oven",
+	"in a magic workshop",
+	"at a trapper",
 	"\n"
 };
 
