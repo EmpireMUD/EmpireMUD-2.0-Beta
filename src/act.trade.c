@@ -155,7 +155,7 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 		msg_to_char(ch, "You need a container of water to %s that.\r\n", command);
 	}
 	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
-		sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags_long, buf1, TRUE);
+		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags_long, buf1);
 		str = buf1;
 		if ((ptr = strrchr(str, ','))) {
 			msg_to_char(ch, "You must be %-*.*s or%sto %s that.\r\n", (int)(ptr-str), (int)(ptr-str), str, ptr+1, command);
