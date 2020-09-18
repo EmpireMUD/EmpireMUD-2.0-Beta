@@ -2633,7 +2633,7 @@ void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, i
 		}
 	}
 	else if (!worker) {
-		mark_workforce_delay(emp, room, CHORE_PRODUCTION, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
+		// mark_workforce_delay(emp, room, CHORE_PRODUCTION, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
 	}
 	
 	if (depleted) {

@@ -1341,7 +1341,7 @@ Skilled Labor (goal)
 
 Usage:  workforce [chore] [on | off | <limit>] [island name | all]
         workforce no-work
-        workforce where [here]
+        workforce where [chore | here]
         workforce why [chore | location | here]
         workforce copy <island name>
         workforce keep [number | all] <item name>
@@ -1520,7 +1520,7 @@ See also: WORKFORCE CHORES, WORKFORCE LIMIT, SKILLED LABOR
 #
 "WORKFORCE WHERE"
 
-Usage:  workforce where
+Usage:  workforce where [chore]
         workforce where here
 
 This command will show you how many of your citizens are working on each
