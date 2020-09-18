@@ -9365,7 +9365,7 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 		if (save_emp && eus->island == NO_ISLAND) {
 			eus->island = get_main_island(save_emp);
 		}
-		if (save_emp && room && room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_VAULT)) {
+		if (save_emp && room && room_has_function_and_city_ok(ch ? GET_LOYALTY(ch) : ROOM_OWNER(room), room, FNC_VAULT)) {
 			eus->flags = EUS_VAULT;
 		}
 			
