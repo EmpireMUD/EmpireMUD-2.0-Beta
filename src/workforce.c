@@ -272,6 +272,9 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		if (room_has_function_and_city_ok(emp, room, FNC_PRESS) && CHORE_ACTIVE(CHORE_OILMAKING)) {
 			do_chore_gen_craft(emp, room, NULL, CHORE_OILMAKING, chore_pressing, FALSE);
 		}
+		if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_PRODUCTION) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_SKILLED_LABOR)) {
+			do_chore_production(emp, room, NULL, INTERACT_SKILLED_LABOR);
+		}
 		if (CHORE_ACTIVE(CHORE_PRODUCTION) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PRODUCTION)) {
 			do_chore_production(emp, room, NULL, INTERACT_PRODUCTION);
 		}
@@ -340,6 +343,9 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		}
 		if (vehicle_has_function_and_city_ok(veh, FNC_MINT) && CHORE_ACTIVE(CHORE_MINTING)) {
 			do_chore_minting(emp, room, veh);
+		}
+		if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_PRODUCTION)) {
+			do_chore_production(emp, room, veh, INTERACT_SKILLED_LABOR);
 		}
 		/*
 		if (BUILDING_VNUM(room) == BUILDING_TRAPPERS_POST && CHORE_ACTIVE(CHORE_TRAPPING)) {
