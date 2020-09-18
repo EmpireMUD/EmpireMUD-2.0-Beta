@@ -1180,7 +1180,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 	skip_spaces(&argument);
 	if (*argument) {
 		for (iter = 0, only_chore = NOTHING; iter < NUM_CHORES && only_chore == NOTHING; ++iter) {
-			if (!chore_data[iter].hidden && is_abbrev(arg, chore_data[iter].name)) {
+			if (!chore_data[iter].hidden && is_abbrev(argument, chore_data[iter].name)) {
 				only_chore = iter;
 			}
 		}
