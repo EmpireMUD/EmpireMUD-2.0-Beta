@@ -763,6 +763,7 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 	remove_depletion(target, DPLTN_TRAPPING);
 	remove_depletion(target, DPLTN_CHOP);
 	remove_depletion(target, DPLTN_HUNT);
+	remove_depletion(target, DPLTN_PRODUCTION);
 	
 	if (ROOM_OWNER(target)) {
 		void deactivate_workforce_room(empire_data *emp, room_data *room);

@@ -54,7 +54,6 @@ void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, int interact_type);
 void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh);
-void do_chore_trapping(empire_data *emp, room_data *room, vehicle_data *veh);
 
 void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh);
 void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore);
@@ -112,7 +111,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "abandon-dismantled", NOTHING, FALSE },
 	{ "herb-gardening", GARDENER, FALSE },
 	{ "fire-brigade", FIRE_BRIGADE, FALSE },
-	{ "trapping", TRAPPER, FALSE },
+		{ "unused", TRAPPER, TRUE },
 	{ "tanning", TANNER, FALSE },
 	{ "shearing", SHEARER, FALSE },
 	{ "minting", COIN_MAKER, FALSE },
@@ -254,9 +253,6 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		if (room_has_function_and_city_ok(emp, room, FNC_APIARY) && CHORE_ACTIVE(CHORE_BEEKEEPING)) {
 			do_chore_beekeeping(emp, room, NULL);
 		}
-		if (BUILDING_VNUM(room) == BUILDING_TRAPPERS_POST && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_TRAPPING)) {
-			do_chore_trapping(emp, room, NULL);
-		}
 		if (room_has_function_and_city_ok(emp, room, FNC_TANNERY) && CHORE_ACTIVE(CHORE_TANNING)) {
 			do_chore_einv_interaction(emp, room, NULL, CHORE_TANNING, INTERACT_TAN);
 		}
@@ -347,11 +343,6 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_PRODUCTION)) {
 			do_chore_production(emp, room, veh, INTERACT_SKILLED_LABOR);
 		}
-		/*
-		if (BUILDING_VNUM(room) == BUILDING_TRAPPERS_POST && CHORE_ACTIVE(CHORE_TRAPPING)) {
-			do_chore_trapping(emp, room);
-		}
-		*/
 	}
 	
 	// function chores:
@@ -2869,55 +2860,6 @@ void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh) {
 	}
 	
 	free_exclusion_data(excl);
-}
-
-
-void do_chore_trapping(empire_data *emp, room_data *room, vehicle_data *veh) {
-	int short_depletion = config_get_int("short_depletion");
-	
-	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_TRAPPING].mob);
-	obj_vnum vnum = number(0, 1) ? o_SMALL_SKIN : o_LARGE_SKIN;
-	bool depleted = GET_CHORE_DEPLETION(room, veh, DPLTN_TRAPPING) >= short_depletion ? TRUE : FALSE;
-	bool can_gain = can_gain_chore_resource(emp, room, CHORE_TRAPPING, vnum);
-	bool can_do = !depleted && can_gain;
-	
-	if (worker && can_do) {
-		charge_workforce(emp, room, worker, 1, vnum, 1);
-		
-		// roughly 1 skin per game day
-		if (!number(0, 23)) {
-			add_to_empire_storage(emp, GET_ISLAND_ID(room), vnum, 1);
-			add_production_total(emp, vnum, 1);
-			ADD_CHORE_DEPLETION(room, veh, DPLTN_TRAPPING, TRUE);
-			
-			// only send message if someone else is present (don't bother verifying it's a player)
-			if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
-				act("$n collects a skin.", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
-			}
-		}
-		else {
-			// only send message if someone else is present (don't bother verifying it's a player)
-			if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
-				act("$n checks the traps...", FALSE, worker, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
-			}
-		}
-	}
-	else if (can_do) {
-		// place worker
-		if ((worker = place_chore_worker(emp, CHORE_TRAPPING, room))) {
-			charge_workforce(emp, room, worker, 1, vnum, 1);
-		}
-	}
-	else if (!worker) {
-		mark_workforce_delay(emp, room, CHORE_TRAPPING, depleted ? WF_PROB_DEPLETED : WF_PROB_OVER_LIMIT);
-	}
-	
-	if (depleted) {
-		log_workforce_problem(emp, room, CHORE_TRAPPING, WF_PROB_DEPLETED, FALSE);
-	}
-	if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_TRAPPING, WF_PROB_OVER_LIMIT, FALSE);
-	}
 }
 
 

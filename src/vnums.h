@@ -103,10 +103,6 @@
 #define o_GLOWING_SEASHELL  1300
 #define o_NAILS  1306
 
-// skins
-#define o_SMALL_SKIN  1350	// TODO: trapper's post could use a room interaction like TRAPPING
-#define o_LARGE_SKIN  1351
-
 // for catapults/ships
 #define o_HEAVY_SHOT  2135	// TODO: This could be a material or item type
 
@@ -155,7 +151,7 @@
 #define BRICKMAKER  261	// unused now
 #define GARDENER  262
 #define FIRE_BRIGADE  265
-#define TRAPPER  266
+#define TRAPPER  266	// unused now
 #define TANNER  267
 #define SHEARER  268
 #define COIN_MAKER  269
@@ -181,7 +177,6 @@
 
 // GENERIC_AFFECTS (ATYPE_x) for affects/dots
 #define ATYPE_FLY  3001
-#define ATYPE_ENTRANCEMENT  3002
 #define ATYPE_DARKNESS  3003
 #define ATYPE_POISON  3004
 #define ATYPE_BOOST  3005
@@ -190,7 +185,6 @@
 #define ATYPE_MANASHIELD  3008
 #define ATYPE_EARTHMELD  3010
 #define ATYPE_MUMMIFY  3011
-#define ATYPE_BESTOW_VIGOR  3013	// NOTE: not used
 #define ATYPE_COLORBURST  3015
 #define ATYPE_HEARTSTOP  3016
 #define ATYPE_PHOENIX_RITE  3017

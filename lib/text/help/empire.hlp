@@ -1436,7 +1436,6 @@ Workforce types:
   &yshearing:&0 NPCs will shear animals in stables.
   &ysmelting:&0 NPCs will smelt ore and precious metals at foundries.
   &ytanning:&0 NPCs will tan skins into leather.
-  &ctrapping (skilled):&0 NPCs will gather skins at trapper's posts.
   &yweaving:&0 NPCs will convert cotton to cloth at the tailor.
   
 Items marked (skilled) require the Skilled Labor goal. Skilled Labor chores

@@ -1168,7 +1168,10 @@ TRAPPERSPOST "TRAPPERS POST" "TRAPPING POST" "TRAPPER'S POST"
 
 The trapper's post is a place where trappers come to trade their skins. This
 building is required in order for your workforce to gather skins. Trapper's
-Posts become depleted like any other resource.
+Posts become depleted like any other resource, and will refresh at the end of
+the year.
+
+You need Skilled Labor for your workers to work this building.
 
 See also: DEPLETION, WORKFORCE, SKILLED LABOR
 #
