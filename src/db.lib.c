@@ -1143,7 +1143,7 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	strcpy(temp3, bitv_to_alpha(GET_CRAFT_REQUIRES_FUNCTION(craft)));
 	fprintf(fl, "%d %d %s %d %d %s %s\n", GET_CRAFT_TYPE(craft), GET_CRAFT_ABILITY(craft), temp1, GET_CRAFT_TIME(craft), GET_CRAFT_REQUIRES_OBJ(craft), temp2, temp3);
 	
-	if (CRAFT_IS_BUILDING(craft) || GET_CRAFT_BUILD_TYPE(craft) != NOTHING || GET_CRAFT_BUILD_ON(craft) || GET_CRAFT_BUILD_FACING(craft)) {
+	if (CRAFT_IS_BUILDING(craft) || GET_CRAFT_BUILD_TYPE(craft) > 0 || GET_CRAFT_BUILD_ON(craft) || GET_CRAFT_BUILD_FACING(craft)) {
 		strcpy(temp1, bitv_to_alpha(GET_CRAFT_BUILD_ON(craft)));
 		strcpy(temp2, bitv_to_alpha(GET_CRAFT_BUILD_FACING(craft)));
 		
