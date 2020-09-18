@@ -2349,7 +2349,7 @@ void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh) {
 			run_room_interactions(worker, room, INTERACT_FISH, veh, one_fishing_chore);
 		}
 	}
-	else if ((worker = place_chore_worker(emp, CHORE_FISHING, room))) {
+	else if (can_do && (worker = place_chore_worker(emp, CHORE_FISHING, room))) {
 		ewt_mark_for_interactions(emp, room, INTERACT_FISH);
 	}
 	else {
