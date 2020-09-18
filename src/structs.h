@@ -850,7 +850,7 @@ typedef struct vehicle_data vehicle_data;
 
 // FNC_x: function flags (for buildings)
 #define FNC_ALCHEMIST  BIT(0)	// can brew and mix here
-#define FNC_APIARY  BIT(1)	// beekeeping chore
+#define FNC_APIARY  BIT(1)	// no curreny use
 #define FNC_BATHS  BIT(2)	// can use the bathe command here
 #define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
 #define FNC_CARPENTER  BIT(4)	// required by some crafts
@@ -1164,7 +1164,7 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_GENERAL  28	// for reporting problems
 #define CHORE_FISHING  29
 #define CHORE_BURN_STUMPS  30
-#define CHORE_BEEKEEPING  31
+	#define CHORE_UNUSED_B  31
 	#define CHORE_UNUSED4  32
 #define NUM_CHORES  33		// total
 

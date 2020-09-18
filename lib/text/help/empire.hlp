@@ -1407,7 +1407,6 @@ Workforce types:
   &yabandon-chopped:&0 NPCs will abandon a tile when they finish chopping.
   &yabandon-dismantled:&0 NPCs will abandon a tile when they finish dismantling.
   &yabandon-farmed:&0 NPCs will abandon a tile when they finish farming.
-  &ybeekeeping:&0 Will produce honey and wax the apiary.
   &ybuilding:&0 NPCs will build any building that has been started, or dismantle
             any building you've started to dismantle. They build using stored
             empire resources, not items on the ground. Workers can't provide
@@ -1429,7 +1428,7 @@ Workforce types:
   &ymining:&0 NPCs will mine your mines.
   &cminting (skilled):&0 NPCs will mint treasure into coins.
   &yoilmaking:&0 Will press oil.
-  &yquarrying:&0 NPCs will quarry huge stone blocks at the quarry.
+  &yproduction:&0 NPCs will produce resources at various buildings.
   &yreplanting:&0 after farming crops, NPCs will replant them.
   &ysawing:&0 NPCs will convert trees into lumber at lumber yards.
   &yscraping:&0 NPCs will convert trees into logs at lumber yards.
@@ -1503,6 +1502,20 @@ This command toggles workforce for the map location you're standing on.
 Citizens will not perform any chores at that location.
 
 See also: WORKFORCE
+#
+"WORKFORCE PRODUCTION"
+
+The 'production' chore instructs your workforce to produce resources at some of
+your buildings. If you want to use this chore, but turn off specific items, use
+'workforce limit' on those items.
+
+Common things produced by this:
+ Quarry: stone blocks
+
+Skilled labor also produces:
+ Trapper's Post: skins
+
+See also: WORKFORCE CHORES, WORKFORCE LIMIT, SKILLED LABOR
 #
 "WORKFORCE WHERE"
 

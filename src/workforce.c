@@ -38,7 +38,6 @@
 struct empire_territory_data *global_next_territory_entry = NULL;
 
 // protos
-void do_chore_beekeeping(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_building(empire_data *emp, room_data *room, int mode);
 void do_chore_burn_stumps(empire_data *emp, room_data *room);
 void do_chore_chopping(empire_data *emp, room_data *room);
@@ -125,7 +124,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "general", NOTHING, TRUE },
 	{ "fishing", FISHERMAN, FALSE },
 	{ "burn-stumps", STUMP_BURNER, FALSE },
-	{ "beekeeping", BEEKEEPER, FALSE },
+		{ "unused", BEEKEEPER, FALSE },
 		{ "unused", GLASSMAKER, TRUE },
 };
 
@@ -250,9 +249,6 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		if (room_has_function_and_city_ok(emp, room, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
 			do_chore_fishing(emp, room, NULL);
 		}
-		if (room_has_function_and_city_ok(emp, room, FNC_APIARY) && CHORE_ACTIVE(CHORE_BEEKEEPING)) {
-			do_chore_beekeeping(emp, room, NULL);
-		}
 		if (room_has_function_and_city_ok(emp, room, FNC_TANNERY) && CHORE_ACTIVE(CHORE_TANNING)) {
 			do_chore_einv_interaction(emp, room, NULL, CHORE_TANNING, INTERACT_TAN);
 		}
@@ -346,9 +342,6 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	}
 	
 	// function chores:
-	if (vehicle_has_function_and_city_ok(veh, FNC_APIARY) && CHORE_ACTIVE(CHORE_BEEKEEPING)) {
-		do_chore_beekeeping(emp, room, veh);
-	}
 	if (vehicle_has_function_and_city_ok(veh, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
 		do_chore_digging(emp, room, veh);
 	}
@@ -1721,60 +1714,6 @@ void workforce_crafting_chores(empire_data *emp, room_data *room, vehicle_data *
 
  /////////////////////////////////////////////////////////////////////////////
 //// CHORE FUNCTIONS ////////////////////////////////////////////////////////
-
-/**
-* @param empire_data *emp The empire for the chore.
-* @param room_data *room The location of the chore.
-* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
-*/
-void do_chore_beekeeping(empire_data *emp, room_data *room, vehicle_data *veh) {
-	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_BEEKEEPING].mob);
-	int islid = GET_ISLAND_ID(room);
-	bool can_gain_honeycomb = can_gain_chore_resource(emp, room, CHORE_BEEKEEPING, o_HONEYCOMB);
-	bool can_gain_wax = can_gain_chore_resource(emp, room, CHORE_BEEKEEPING, o_BEESWAX);
-	bool can_do = can_gain_honeycomb || can_gain_wax;
-	
-	if (worker && can_do) {
-		// eats constantly even though it only produces periodically
-		charge_workforce(emp, room, worker, 1, NOTHING, 0);
-		
-		// these produce slowly
-		if (can_gain_honeycomb && !number(0, 23)) {
-			ewt_mark_resource_worker(emp, room, o_HONEYCOMB, 1);
-			add_to_empire_storage(emp, islid, o_HONEYCOMB, 1);
-			add_production_total(emp, o_HONEYCOMB, 1);
-		}
-		if (can_gain_wax && !number(0, 23)) {
-			ewt_mark_resource_worker(emp, room, o_BEESWAX, 1);
-			add_to_empire_storage(emp, islid, o_BEESWAX, 1);
-			add_production_total(emp, o_BEESWAX, 1);
-		}
-		
-		// only send message if someone else is present (don't bother verifying it's a player)
-		if (ROOM_PEOPLE(IN_ROOM(worker))->next_in_room) {
-			act("$n tends the bees.", FALSE, worker, NULL, NULL, TO_ROOM | TO_QUEUE | TO_SPAMMY);
-		}
-	}
-	else if (can_do) {
-		// place worker
-		if ((worker = place_chore_worker(emp, CHORE_BEEKEEPING, room))) {
-			if (can_gain_honeycomb) {
-				ewt_mark_resource_worker(emp, room, o_HONEYCOMB, 1);
-			}
-			if (can_gain_wax) {
-				ewt_mark_resource_worker(emp, room, o_BEESWAX, 1);
-			}
-		}
-	}
-	else if (!worker) {
-		mark_workforce_delay(emp, room, CHORE_BEEKEEPING, WF_PROB_OVER_LIMIT);
-	}
-	
-	if (!can_do) {
-		log_workforce_problem(emp, room, CHORE_BEEKEEPING, WF_PROB_OVER_LIMIT, FALSE);
-	}
-}
-
 
 /**
 * This is used by non-vehicles for both building and maintenance.

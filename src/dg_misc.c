@@ -727,6 +727,7 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 		remove_depletion(target, DPLTN_TRAPPING);
 		remove_depletion(target, DPLTN_CHOP);
 		remove_depletion(target, DPLTN_HUNT);
+		remove_depletion(target, DPLTN_PRODUCTION);
 		
 		if (ROOM_OWNER(target)) {
 			void deactivate_workforce_room(empire_data *emp, room_data *room);
