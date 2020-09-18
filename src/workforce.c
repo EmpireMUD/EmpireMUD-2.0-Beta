@@ -103,7 +103,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "scraping", SCRAPER, FALSE },
 	{ "smelting", SMELTER, FALSE },
 	{ "weaving", WEAVER, FALSE },
-	{ "production", PRODUCTION_APPRENTICE, FALSE },
+	{ "production", PRODUCTION_ASSISTANT, FALSE },
 	{ "crafting", CRAFTING_APPRENTICE, FALSE },
 		{ "unused", BRICKMAKER, TRUE },
 	{ "abandon-dismantled", NOTHING, FALSE },
@@ -123,7 +123,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "general", NOTHING, TRUE },
 	{ "fishing", FISHERMAN, FALSE },
 	{ "burn-stumps", STUMP_BURNER, FALSE },
-		{ "unused", BEEKEEPER, FALSE },
+		{ "unused", BEEKEEPER, TRUE },
 		{ "unused", GLASSMAKER, TRUE },
 };
 
