@@ -4433,8 +4433,10 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 			problem = TRUE;
 		}
 		
-		// store for later
-		max_quantity = MAX(max_quantity, iter->quantity);
+		// store quantity for later except chores that are often high
+		if (iter->type != INTERACT_PRODUCTION && iter->type != INTERACT_SKILLED_LABOR) {
+			max_quantity = MAX(max_quantity, iter->quantity);
+		}
 		
 		// track cumulative percent
 		if (iter->exclusion_code) {

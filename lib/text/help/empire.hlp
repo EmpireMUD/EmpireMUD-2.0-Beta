@@ -1422,7 +1422,6 @@ Workforce types:
   &yfarming:&0 NPCs will harvest crops. Costs no food.
   &yfire-brigade:&0 NPCs will put out fires.
   &yfishing:&0 Will catch fish at the fishery. Costs no food.
-  &cherb-gardening (skilled):&0 NPCs will gather herbs in gardens.
   &ymaintenance:&0 NPCs will keep buildings and vehicles maintained.
   &ymilling:&0 Will mill grains into flour.
   &ymining:&0 NPCs will mine your mines.
@@ -1513,6 +1512,7 @@ Common things produced by this:
  Quarry: stone blocks
 
 Skilled labor also produces:
+ Herb Gardens: various herbs
  Trapper's Post: skins
 
 See also: WORKFORCE CHORES, WORKFORCE LIMIT, SKILLED LABOR

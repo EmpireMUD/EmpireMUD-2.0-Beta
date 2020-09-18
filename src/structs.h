@@ -850,7 +850,7 @@ typedef struct vehicle_data vehicle_data;
 
 // FNC_x: function flags (for buildings)
 #define FNC_ALCHEMIST  BIT(0)	// can brew and mix here
-#define FNC_APIARY  BIT(1)	// no curreny use
+	#define FNC_UNUSED  BIT(1)	// formerly 'apiary'
 #define FNC_BATHS  BIT(2)	// can use the bathe command here
 #define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
 #define FNC_CARPENTER  BIT(4)	// required by some crafts
@@ -1144,11 +1144,11 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_SCRAPING  8
 #define CHORE_SMELTING  9
 #define CHORE_WEAVING  10
-#define CHORE_PRODUCTION  11	// formerly quarry, trapping
+#define CHORE_PRODUCTION  11	// formerly quarry, trapping, beekeeping, herb-gardening
 #define CHORE_CRAFTING  12	// formerly nailmaking, brickmaking, glassmaking
 	#define CHORE_UNUSED1  13
 #define CHORE_ABANDON_DISMANTLED  14
-#define CHORE_HERB_GARDENING  15
+	#define CHORE_UNUSED_C  15
 #define CHORE_FIRE_BRIGADE  16
 	#define CHORE_UNUSED_A  17
 #define CHORE_TANNING  18
@@ -2683,7 +2683,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_CHOP_PROGRESS  8
 #define ROOM_EXTRA_TRENCH_PROGRESS  9
 #define ROOM_EXTRA_HARVEST_PROGRESS  10
-#define ROOM_EXTRA_GARDEN_WORKFORCE_PROGRESS  11
+	#define ROOM_EXTRA_GARDEN_WORKFORCE_PROGRESS  11	// deprecated
 	#define ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS  12	// deprecated
 #define ROOM_EXTRA_BUILD_RECIPE  13
 #define ROOM_EXTRA_FOUND_TIME  14

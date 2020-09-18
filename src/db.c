@@ -4483,6 +4483,9 @@ void b5_105_update(void) {
 	int CHORE_BRICKMAKING = 13;
 	int CHORE_NEXUS_CRYSTALS = 24;
 	int CHORE_GLASSMAKING = 32;
+	int CHORE_TRAPPING = 17;
+	int CHORE_BEEKEEPING = 31;
+	int CHORE_HERB_GARDENING = 15;
 	
 	log("Applying b5.105 update to shut off old workforce chores...");
 	
@@ -4490,6 +4493,9 @@ void b5_105_update(void) {
 		set_workforce_limit_all(emp, CHORE_BRICKMAKING, 0);
 		set_workforce_limit_all(emp, CHORE_NEXUS_CRYSTALS, 0);
 		set_workforce_limit_all(emp, CHORE_GLASSMAKING, 0);
+		set_workforce_limit_all(emp, CHORE_TRAPPING, 0);
+		set_workforce_limit_all(emp, CHORE_BEEKEEPING, 0);
+		set_workforce_limit_all(emp, CHORE_HERB_GARDENING, 0);
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	}
 }

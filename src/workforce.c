@@ -48,7 +48,6 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, vehicle_data *
 void do_chore_farming(empire_data *emp, room_data *room);
 void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_fire_brigade(empire_data *emp, room_data *room);
-void do_chore_gardening(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, int interact_type);
@@ -108,7 +107,7 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "crafting", WORKFORCE_APPRENTICE, FALSE },
 		{ "unused", BRICKMAKER, TRUE },
 	{ "abandon-dismantled", NOTHING, FALSE },
-	{ "herb-gardening", GARDENER, FALSE },
+		{ "unused", GARDENER, TRUE },
 	{ "fire-brigade", FIRE_BRIGADE, FALSE },
 		{ "unused", TRAPPER, TRUE },
 	{ "tanning", TANNER, FALSE },
@@ -211,11 +210,6 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	if (IS_COMPLETE(room)) {
 		if ((BUILDING_DAMAGE(room) > 0 || BUILDING_RESOURCES(room)) && HOME_ROOM(room) == room && CHORE_ACTIVE(CHORE_MAINTENANCE)) {
 			do_chore_building(emp, room, CHORE_MAINTENANCE);
-		}
-		
-		// this covers all the herbs
-		if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_HERB_GARDENING) && IS_ANY_BUILDING(room) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PICK)) {
-			do_chore_gardening(emp, room, NULL);
 		}
 	
 		if (room_has_function_and_city_ok(emp, room, FNC_MINT) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_MINTING)) {
@@ -330,9 +324,6 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	
 	// skilled labor chores:
 	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
-		if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_PICK) && CHORE_ACTIVE(CHORE_HERB_GARDENING)) {
-			do_chore_gardening(emp, room, veh);
-		}
 		if (vehicle_has_function_and_city_ok(veh, FNC_MINT) && CHORE_ACTIVE(CHORE_MINTING)) {
 			do_chore_minting(emp, room, veh);
 		}
@@ -2398,66 +2389,6 @@ void do_chore_fire_brigade(empire_data *emp, room_data *room) {
 		}
 	}
 	// never mark delay on this
-}
-
-
-// supports vehicles if inter_veh is set
-INTERACTION_FUNC(one_gardening_chore) {
-	empire_data *emp = inter_veh ? VEH_OWNER(inter_veh) : ROOM_OWNER(inter_room);
-	
-	if (emp && can_gain_chore_resource(emp, inter_room, CHORE_HERB_GARDENING, interaction->vnum)) {
-		ewt_mark_resource_worker(emp, inter_room, interaction->vnum, interaction->quantity);
-		
-		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, interaction->quantity);
-		add_production_total(emp, interaction->vnum, interaction->quantity);
-		ADD_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_PICK, TRUE);
-
-		// only send message if someone else is present (don't bother verifying it's a player)
-		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
-			act("$n picks an herb and carefully hangs it to dry.", FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
-		}
-		return TRUE;
-	}
-	
-	return FALSE;
-}
-
-
-/**
-* @param empire_data *emp The empire for the chore.
-* @param room_data *room The location of the chore.
-* @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
-*/
-void do_chore_gardening(empire_data *emp, room_data *room, vehicle_data *veh) {
-	int garden_depletion = config_get_int("garden_depletion");
-	
-	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_HERB_GARDENING].mob);
-	bool depleted = (GET_CHORE_DEPLETION(room, veh, DPLTN_PICK) >= garden_depletion);
-	bool can_gain = veh ? can_gain_chore_resource_from_interaction_list(emp, room, CHORE_HERB_GARDENING, VEH_INTERACTIONS(veh), INTERACT_PICK, FALSE) : can_gain_chore_resource_from_interaction_room(emp, room, CHORE_HERB_GARDENING, INTERACT_PICK);
-	bool can_do = !depleted && can_gain;
-	
-	if (can_do && worker) {
-		// not able to ewt_mark_resource_worker() until inside the interaction
-		charge_workforce(emp, room, worker, 2, NOTHING, 0);
-		if (veh) {
-			run_interactions(worker, VEH_INTERACTIONS(veh), INTERACT_PICK, room, NULL, NULL, veh, one_gardening_chore);
-		}
-		else {
-			run_room_interactions(worker, room, INTERACT_PICK, veh, one_gardening_chore);
-		}
-	}
-	else if (can_do && !worker) {
-		if ((worker = place_chore_worker(emp, CHORE_HERB_GARDENING, room))) {
-			ewt_mark_for_interactions(emp, room, INTERACT_PICK);
-			charge_workforce(emp, room, worker, 2, NOTHING, 0);
-		}
-	}
-	else if (depleted) {
-		log_workforce_problem(emp, room, CHORE_HERB_GARDENING, WF_PROB_DEPLETED, FALSE);
-	}
-	else if (!can_gain) {
-		log_workforce_problem(emp, room, CHORE_HERB_GARDENING, WF_PROB_OVER_LIMIT, FALSE);
-	}
 }
 
 

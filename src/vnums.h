@@ -76,10 +76,6 @@
 // clay
 #define o_BRICKS  257	// TODO: create a workforce brickmaking ability/craft
 
-// glassmaking chore -- TODO this should probably be configured somewhere in-game too
-#define o_SAND  107
-#define o_GLASS_INGOT  108
-
 // Wood crafts
 #define o_STAKE  915	// could be a flag
 #define o_BLANK_SIGN  918
@@ -145,7 +141,7 @@
 #define STONECUTTER  259	// unused now
 #define NAILMAKER  260	// unused now
 #define BRICKMAKER  261	// unused now
-#define GARDENER  262
+#define GARDENER  262	// unused now
 #define FIRE_BRIGADE  265
 #define TRAPPER  266	// unused now
 #define TANNER  267

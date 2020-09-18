@@ -542,7 +542,6 @@ void disassociate_building(room_data *room) {
 	
 	// some extra data safely clears now
 	remove_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING);
-	remove_room_extra_data(room, ROOM_EXTRA_GARDEN_WORKFORCE_PROGRESS);
 	remove_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS);
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
