@@ -508,7 +508,13 @@ static void ewt_mark_for_interaction_list(empire_data *emp, room_data *location,
 	LL_FOREACH(list, interact) {
 		// should this be checking meets_interaction_restrictions() ?
 		if (interact->type == interaction_type) {
-			ewt_mark_resource_worker(emp, location, interact->vnum, interact->quantity);
+			if (interact->type == INTERACT_PRODUCTION || interact->type == INTERACT_SKILLED_LABOR) {
+				// 1 at a time
+				ewt_mark_resource_worker(emp, location, interact->vnum, 1);
+			}
+			else {
+				ewt_mark_resource_worker(emp, location, interact->vnum, interact->quantity);
+			}
 		}
 	}
 }
