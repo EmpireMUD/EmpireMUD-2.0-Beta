@@ -627,8 +627,8 @@ around you, and the scents of pollen and sweet honey permeate the air.
 Several unused hives have been dismantled, and are resting against the wall.
 ~
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
-I 31 3069 5.00 250  # PRODUCTION: honeycomb
-I 31 850 5.00 250  # PRODUCTION: beeswax
+I 31 3069 5.00 440  # PRODUCTION: honeycomb
+I 31 850 5.00 440  # PRODUCTION: beeswax
 M
 241 15.00 ce
 R

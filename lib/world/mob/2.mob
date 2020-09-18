@@ -1044,9 +1044,21 @@ S
 #n is working as an apprentice.
 ~
 20 50 bdqv 0 3
-1 0 0 6
+0 0 0 6
 D
 This citizen appears to be making something. (workforce crafting)
+~
+S
+#284
+#n assistant~
+#n~
+#n is assisting with some work.
+~
+20 50 bdqv 0 3
+0 0 0 1
+D
+   This citizen appears to be producing resources for the empire. (workforce
+production)
 ~
 S
 $
