@@ -157,7 +157,8 @@
 #define FISHERMAN  279
 #define BEEKEEPER  281	// unused now
 #define GLASSMAKER  282	// unused now
-#define WORKFORCE_APPRENTICE  283
+#define CRAFTING_APPRENTICE  283
+#define PRODUCTION_ASSISTANT  284
 
 
  //////////////////////////////////////////////////////////////////////////////

@@ -103,8 +103,8 @@ struct empire_chore_type chore_data[NUM_CHORES] = {
 	{ "scraping", SCRAPER, FALSE },
 	{ "smelting", SMELTER, FALSE },
 	{ "weaving", WEAVER, FALSE },
-	{ "production", WORKFORCE_APPRENTICE, FALSE },
-	{ "crafting", WORKFORCE_APPRENTICE, FALSE },
+	{ "production", PRODUCTION_APPRENTICE, FALSE },
+	{ "crafting", CRAFTING_APPRENTICE, FALSE },
 		{ "unused", BRICKMAKER, TRUE },
 	{ "abandon-dismantled", NOTHING, FALSE },
 		{ "unused", GARDENER, TRUE },
@@ -1932,8 +1932,13 @@ INTERACTION_FUNC(one_dig_chore) {
 		ADD_CHORE_DEPLETION(inter_room, inter_veh, DPLTN_DIG, TRUE);
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
-			sprintf(buf, "$n digs up %s.", get_obj_name_by_proto(interaction->vnum));
-			act(buf, FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY | TO_QUEUE);
+			if (inter_veh) {
+				sprintf(buf, "$n digs up %s from $V.", get_obj_name_by_proto(interaction->vnum));
+			}
+			else {
+				sprintf(buf, "$n digs up %s.", get_obj_name_by_proto(interaction->vnum));
+			}
+			act(buf, FALSE, ch, NULL, inter_veh, TO_ROOM | TO_SPAMMY | TO_QUEUE);
 		}
 		return TRUE;
 	}
