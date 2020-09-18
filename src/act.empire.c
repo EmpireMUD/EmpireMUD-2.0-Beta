@@ -1209,7 +1209,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 			
 			// found
 			++total;
-			lsize = snprintf(line, sizeof(line), " %s %s: %s\r\n", coord_display_room(to, IN_ROOM(ch_iter), TRUE), get_room_name(IN_ROOM(ch_iter), FALSE), GET_SHORT_DESC(ch_iter));
+			lsize = snprintf(line, sizeof(line), "%s %s: %s\r\n", coord_display_room(to, IN_ROOM(ch_iter), TRUE), skip_filler(get_room_name(IN_ROOM(ch_iter), FALSE)), GET_SHORT_DESC(ch_iter));
 			if (size + lsize < sizeof(buf)) {
 				strcat(buf, line);
 				size += lsize;
@@ -1301,7 +1301,7 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 	extern const char *wf_problem_types[];
 	
-	char buf[MAX_STRING_LENGTH * 2], unsupplied[MAX_STRING_LENGTH], line[256], mult[256];
+	char buf[MAX_STRING_LENGTH * 2], unsupplied[MAX_STRING_LENGTH], line[256], mult[256], rname[256];
 	int iter, only_chore = NOTHING, last_chore, last_problem, count;
 	struct empire_island *isle, *next_isle;
 	struct workforce_log *wf_log;
@@ -1375,8 +1375,15 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 			else {
 				*mult = '\0';
 			}
+			
+			if (only_chore != NOTHING) {
+				 snprintf(rname, sizeof(rname), "%s: ", skip_filler(get_room_name(real_room(wf_log->loc), FALSE)));
+			}
+			else {
+				*rname = '\0';
+			}
 		
-			snprintf(line, sizeof(line), "%s %s: %s%s%s\r\n", coord_display(ch, MAP_X_COORD(wf_log->loc), MAP_Y_COORD(wf_log->loc), TRUE), chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], mult, wf_log->delayed ? " (delayed)" : "");
+			snprintf(line, sizeof(line), "%s %s%s: %s%s%s\r\n", coord_display(ch, MAP_X_COORD(wf_log->loc), MAP_Y_COORD(wf_log->loc), TRUE), rname, chore_data[wf_log->chore].name, wf_problem_types[wf_log->problem], mult, wf_log->delayed ? " (delayed)" : "");
 			any = TRUE;
 		
 			if (strlen(line) + size + 16 < sizeof(buf)) {	// reserve space for overflow
