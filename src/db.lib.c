@@ -997,6 +997,7 @@ void init_craft(craft_data *craft) {
 	
 	// clear/default some stuff
 	GET_CRAFT_OBJECT(craft) = NOTHING;
+	GET_CRAFT_BUILD_TYPE(craft) = NOTHING;
 	GET_CRAFT_REQUIRES_OBJ(craft) = NOTHING;
 	GET_CRAFT_QUANTITY(craft) = 1;
 	GET_CRAFT_TIME(craft) = 1;
