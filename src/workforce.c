@@ -136,6 +136,9 @@ int einv_interaction_chore_type = 0;
 #define GET_CHORE_DEPLETION(room, veh, type)  ((veh) ? get_vehicle_depletion((veh), (type)) : get_depletion((room), (type)))
 #define ADD_CHORE_DEPLETION(room, veh, type, multiple)  { if (veh) { add_vehicle_depletion((veh), (type), (multiple)); } else { add_depletion((room), (type), (multiple)); } }
 
+// these two interactions have high 'quantity' but only give out 1 at a time
+#define ONE_AT_A_TIME_INTERACT(type)  ((type) == INTERACT_PRODUCTION || (type) == INTERACT_SKILLED_LABOR)
+
 
  /////////////////////////////////////////////////////////////////////////////
 //// MASTER CHORE CONTROL ///////////////////////////////////////////////////
@@ -515,7 +518,7 @@ static void ewt_mark_for_interaction_list(empire_data *emp, room_data *location,
 	LL_FOREACH(list, interact) {
 		// should this be checking meets_interaction_restrictions() ?
 		if (interact->type == interaction_type) {
-			if (interact->type == INTERACT_PRODUCTION || interact->type == INTERACT_SKILLED_LABOR) {
+			if (ONE_AT_A_TIME_INTERACT(interact->type)) {
 				// 1 at a time
 				ewt_mark_resource_worker(emp, location, interact->vnum, 1);
 			}
