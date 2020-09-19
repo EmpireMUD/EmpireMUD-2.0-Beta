@@ -1214,10 +1214,18 @@ void despawn_instance_vehicles(struct instance_data *inst) {
 		// empty insides / recursively relocate players
 		empty_instance_vehicle(inst, veh, IN_ROOM(veh));
 		
-		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V is gone.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+		// call destroy trig: if it returns 0, we won't try to echo
+		// but this purge CANNOT be prevented by the trigger
+		if (destroy_vtrigger(veh)) {		
+			if (ROOM_PEOPLE(IN_ROOM(veh))) {
+				act("$V is gone.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			}
 		}
-		extract_vehicle(veh);
+		
+		// ensure the trigger didn't purge it
+		if (!dg_owner_purged) {
+			extract_vehicle(veh);
+		}
 	}
 }
 
