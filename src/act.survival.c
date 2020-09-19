@@ -939,6 +939,10 @@ ACMD(do_track) {
 			snprintf(buf, sizeof(buf), "You find a trail heading %sto $V!", IN_OR_ON(veh));
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 		}
+		else if ((veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && IN_ROOM(veh) && GET_ROOM_VNUM(IN_ROOM(veh)) == track_to_room) {
+			snprintf(buf, sizeof(buf), "You find a trail heading %s of $V!", VEH_FLAGGED(veh, VEH_IN) ? "out" : "off");
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		}
 
 		gain_ability_exp(ch, ABIL_TRACK, 20);
 	}

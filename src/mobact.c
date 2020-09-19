@@ -743,8 +743,12 @@ void mobile_activity(void) {
 					perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_ENTER_PORTAL | MOVE_WANDER);
 					moved = TRUE;
 				}
-				else if (track_to_room && find_vehicle_in_room_with_interior(IN_ROOM(ch), track_to_room)) {
+				else if (track_to_room != NOWHERE && find_vehicle_in_room_with_interior(IN_ROOM(ch), track_to_room)) {
 					perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_ENTER_VEH | MOVE_WANDER);
+					moved = TRUE;
+				}
+				else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))) && GET_ROOM_VNUM(IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch)))) == track_to_room) {
+					perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_EXIT | MOVE_WANDER);
 					moved = TRUE;
 				}
 				else if (dir != NO_DIR) {
