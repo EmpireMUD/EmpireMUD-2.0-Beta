@@ -3091,7 +3091,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 					
 					if (vsize == 0 && scanned_veh) {
 						// found a vehicle to show
-						if (!VEH_OWNER(veh) || VEH_CLAIMS_WITH_ROOM(veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
+						if (!VEH_OWNER(scanned_veh) || VEH_CLAIMS_WITH_ROOM(scanned_veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
 							snprintf(veh_string, sizeof(veh_string), "%s", skip_filler(VEH_SHORT_DESC(scanned_veh)));
 						}
 						else {
