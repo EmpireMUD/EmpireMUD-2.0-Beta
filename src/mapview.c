@@ -303,7 +303,7 @@ void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool 
 	else if (unfinished) {
 		sprintf(buffer + strlen(buffer), "%sunfinished", *buffer ? ", " :"");
 	}
-	if (major_disrepair) {
+	else if (major_disrepair) {
 		sprintf(buffer + strlen(buffer), "%sbad disrepair", *buffer ? ", " :"");
 	}
 	else if (minor_disrepair) {
@@ -1597,7 +1597,12 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			}
 		}
 		else if (PRF_FLAGGED(ch, PRF_INFORMATIVE) && !show_dark) {
-			sprintf(buf, "%s%s", get_informative_color_room(ch, to_room), buf1);
+			if (show_veh) {
+				sprintf(buf, "%s%s", get_informative_color_veh(ch, show_veh), buf1);
+			}
+			else {
+				sprintf(buf, "%s%s", get_informative_color_room(ch, to_room), buf1);
+			}
 		}
 		else if (painted && !show_dark) {
 			strcpy(col_buf, paint_colors[ROOM_PAINT_COLOR(to_room)]);
