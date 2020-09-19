@@ -2,8 +2,6 @@
 zephyr cattail seeds~
 11008 1
 5 198 0 6 11009 0 0
-B
-0 0 0
 R
 11009 1 0 0
 S
@@ -11,8 +9,6 @@ S
 zephyr salve~
 11016 1
 5 198 0 3 11015 0 0
-B
-0 0 0
 R
 11015 2 0 0
 S
@@ -20,8 +16,6 @@ S
 downy rucksack~
 11024 1
 4 199 q 10 -1 0 0
-B
-0 0 0
 R
 11014 3 0 0
 R
@@ -35,8 +29,6 @@ S
 feathered saddle~
 11026 1
 4 182 q 10 -1 0 0
-B
-0 0 0
 R
 11014 3 0 0
 R
@@ -52,8 +44,6 @@ S
 roc earrings~
 11028 1
 1 54 q 8 -1 0 0
-B
-0 0 0
 R
 11014 6 0 0
 R
@@ -67,8 +57,6 @@ S
 magnificent feathered headdress~
 11030 1
 2 -1 0 12 11031 0 0
-B
-0 0 0
 L
 100
 R
@@ -86,8 +74,6 @@ S
 wings of Daedalus~
 11032 1
 2 203 q 10 -1 f 0
-B
-0 0 0
 R
 11014 1 0 0
 R
@@ -100,9 +86,7 @@ S
 #11034
 clockwork roc~
 11034 1
-11 61 nt 1 11034 0 u
-B
-0 0 0
+11 61 nt 1 11034 c u
 R
 6000 70 1 0
 R
@@ -120,8 +104,6 @@ S
 feathered arm guards~
 11035 1
 4 182 q 24 -1 0 0
-B
-0 0 0
 R
 11014 3 0 0
 R
@@ -135,8 +117,6 @@ S
 stonefeather arm plates~
 11037 1
 1 197 q 24 -1 0 0
-B
-0 0 0
 R
 11014 3 0 0
 R
@@ -152,8 +132,6 @@ S
 roc feather sleeves~
 11039 1
 4 199 q 24 -1 0 0
-B
-0 0 0
 R
 11014 3 0 0
 R
@@ -169,8 +147,6 @@ S
 downy white sleeves~
 11041 1
 4 199 q 24 -1 0 0
-B
-0 0 0
 R
 11014 3 0 0
 R
@@ -186,8 +162,6 @@ S
 razor feather gauntlets~
 11043 1
 4 182 q 24 -1 0 0
-B
-0 0 0
 R
 11014 3 0 0
 R
@@ -201,8 +175,6 @@ S
 feathered imperium gauntlets~
 11045 1
 1 197 q 24 -1 0 0
-B
-0 0 0
 R
 11014 3 0 0
 R
@@ -218,8 +190,6 @@ S
 wondrous feather gloves~
 11047 1
 4 199 q 24 -1 0 0
-B
-0 0 0
 R
 11014 3 0 0
 R
@@ -235,8 +205,6 @@ S
 roc quill finger caps~
 11049 1
 4 199 q 24 -1 0 0
-B
-0 0 0
 R
 11014 3 0 0
 R
@@ -251,7 +219,7 @@ S
 #11051
 rocdome~
 -1 1
-8 300 t 1 11051 0 0
+8 300 t 1 11051 c 0
 B
 11051 bce cop
 R
@@ -265,8 +233,6 @@ S
 warm hatchling blankets~
 11055 1
 4 55 0 4 11054 0 0
-B
-0 0 0
 R
 6800 3 1 0
 S
@@ -274,8 +240,6 @@ S
 nesting material~
 11056 1
 2 58 0 4 11054 f 0
-B
-0 0 0
 R
 6400 10 1 0
 R
@@ -284,9 +248,7 @@ S
 #11057
 protective nest trap~
 11057 1
-1 51 0 4 11054 0 0
-B
-0 0 0
+1 51 0 4 11054 c 0
 R
 6720 6 1 0
 R

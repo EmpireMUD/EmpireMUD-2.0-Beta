@@ -1,9 +1,7 @@
 #12501
 colossal ankle brace~
 12501 1
-11 -1 nt 1 12501 0 0
-B
-0 0 0
+11 -1 nt 1 12501 c 0
 R
 6720 12 1 0
 R
@@ -17,17 +15,13 @@ S
 little brass cannonballs~
 12508 1
 2 51 q 4 -1 0 0
-B
-0 0 0
 R
 6720 6 1 0
 S
 #12513
 clockwork boot~
 12513 1
-11 203 nt 40 12513 0 e
-B
-0 0 0
+11 203 nt 40 12513 c e
 R
 6000 16 1 0
 R
@@ -47,8 +41,6 @@ S
 clockwork wristplate~
 12529 1
 1 197 q 12 -1 0 0
-B
-0 0 0
 R
 12505 1 0 0
 R
@@ -68,8 +60,6 @@ S
 cogwheel bangles~
 12531 1
 1 54 q 12 -1 0 0
-B
-0 0 0
 R
 12505 1 0 0
 R
@@ -87,8 +77,6 @@ S
 oil-soaked band~
 12533 1
 4 199 q 12 -1 0 0
-B
-0 0 0
 R
 12505 1 0 0
 R
@@ -108,8 +96,6 @@ S
 black powder wristband~
 12535 1
 2 203 hq 12 -1 0 0
-B
-0 0 0
 R
 12505 1 0 0
 R
@@ -129,8 +115,6 @@ S
 clockwork shield~
 12537 1
 1 197 q 12 -1 0 0
-B
-0 0 0
 R
 12505 1 0 0
 R
@@ -150,8 +134,6 @@ S
 brass pendulum~
 12539 1
 1 203 q 12 -1 0 0
-B
-0 0 0
 R
 12505 1 0 0
 R
@@ -171,8 +153,6 @@ S
 enchanted bedknob~
 12541 1
 1 203 q 12 -1 0 0
-B
-0 0 0
 R
 12505 1 0 0
 R
@@ -192,8 +172,6 @@ S
 clockwork wristblade~
 12543 1
 1 196 q 12 -1 0 0
-B
-0 0 0
 R
 12505 1 0 0
 R
@@ -213,8 +191,6 @@ S
 colossal shield~
 12545 1
 1 197 q 12 -1 0 0
-B
-0 0 0
 R
 12505 1 0 0
 R

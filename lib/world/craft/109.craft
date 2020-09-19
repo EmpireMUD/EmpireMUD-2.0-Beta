@@ -2,8 +2,6 @@
 dragon roast~
 10908 1
 14 293 0 4 10907 0 0
-B
-0 0 0
 R
 10907 1 0 0
 R
@@ -13,8 +11,6 @@ S
 roast dragon feast~
 10909 1
 3 271 h 6 10907 f 0
-B
-0 0 0
 R
 10907 2 0 0
 R
@@ -24,8 +20,6 @@ S
 dragonsteel warhammer~
 10910 1
 1 10900 q 12 -1 0 0
-B
-0 0 0
 R
 10903 1 0 0
 R
@@ -41,8 +35,6 @@ S
 dragonsteel claymore~
 10911 1
 1 10900 q 12 -1 0 0
-B
-0 0 0
 R
 10903 1 0 0
 R
@@ -58,8 +50,6 @@ S
 dragonbone mace~
 10912 1
 1 10900 q 12 -1 0 0
-B
-0 0 0
 R
 10903 3 0 0
 R
@@ -75,8 +65,6 @@ S
 draconic wand~
 10913 1
 2 10902 q 12 -1 f 0
-B
-0 0 0
 R
 10903 2 0 0
 R
@@ -92,8 +80,6 @@ S
 dragonbone staff~
 10914 1
 2 10902 q 12 -1 f 0
-B
-0 0 0
 R
 10903 4 0 0
 R
@@ -107,8 +93,6 @@ S
 dragonbone wristblade~
 10915 1
 1 10900 q 12 -1 0 0
-B
-0 0 0
 R
 10928 4 0 0
 R
@@ -124,8 +108,6 @@ S
 dragonbone tower shield~
 10916 1
 1 10900 q 12 -1 0 0
-B
-0 0 0
 R
 10903 4 0 0
 R
@@ -139,8 +121,6 @@ S
 red dragon charm~
 10917 1
 2 10902 q 12 -1 f 0
-B
-0 0 0
 R
 10903 3 0 0
 R
@@ -154,8 +134,6 @@ S
 dragonkind tome~
 10918 1
 2 10902 q 12 -1 f 0
-B
-0 0 0
 R
 10903 1 0 0
 R
@@ -171,8 +149,6 @@ S
 crimson dragon girdle~
 10919 1
 4 10903 q 12 -1 0 0
-B
-0 0 0
 R
 10928 4 0 0
 R
@@ -186,8 +162,6 @@ S
 burning dragonsteel waistband~
 10920 1
 4 10903 q 12 -1 0 0
-B
-0 0 0
 R
 10928 4 0 0
 R
@@ -201,8 +175,6 @@ S
 flaming draconic cincture~
 10921 1
 4 10901 q 12 -1 0 0
-B
-0 0 0
 R
 10903 2 0 0
 R
@@ -216,8 +188,6 @@ S
 burning dragoncloth sash~
 10922 1
 4 10901 q 12 -1 0 0
-B
-0 0 0
 R
 10903 2 0 0
 R
@@ -230,7 +200,7 @@ S
 #10923
 butchertent dismantle~
 -1 1
-8 300 lt 1 10923 0 0
+8 300 lt 1 10923 c 0
 B
 10923 bce op
 R
@@ -243,7 +213,7 @@ S
 #10924
 dragoncave~
 -1 1
-8 300 t 1 10924 0 0
+8 300 t 1 10924 c 0
 B
 10924 c cop
 R
@@ -258,7 +228,7 @@ S
 #10925
 dragonstatue~
 -1 1
-8 300 t 1 10925 0 0
+8 300 t 1 10925 c 0
 B
 10925 bce 0
 R
@@ -271,7 +241,7 @@ S
 #10926
 dragonlibrary~
 -1 1
-8 300 t 1 10926 0 0
+8 300 t 1 10926 c 0
 B
 10926 bce op
 R
@@ -285,15 +255,13 @@ S
 dragon cloth~
 10927 1
 9 55 0 12 -1 0 0
-B
-0 0 0
 R
 10902 1 0 0
 S
 #10928
 butcher tent~
 10927 1
-8 300 nt 1 10923 0 0
+8 300 nt 1 10923 c 0
 B
 10923 bcex 0
 R
@@ -307,8 +275,6 @@ S
 dragonsteel ingot~
 10929 1
 12 198 0 4 10903 0 0
-B
-0 0 0
 R
 10903 1 0 0
 S
@@ -316,8 +282,6 @@ S
 magnificent dragon bracelets~
 10946 1
 4 10903 q 12 -1 0 0
-B
-0 0 0
 R
 10928 4 0 0
 R
@@ -331,8 +295,6 @@ S
 cranberry jelly~
 10957 1
 3 293 h 3 10956 0 0
-B
-0 0 0
 R
 10956 1 0 0
 R
@@ -346,8 +308,6 @@ S
 cranbread~
 10958 1
 14 293 0 6 10956 0 0
-B
-0 0 0
 R
 6300 2 1 0
 R
@@ -356,7 +316,7 @@ S
 #10972
 giantscauseway~
 -1 1
-8 300 q 1 -1 0 0
+8 300 q 1 -1 c 0
 B
 10972 f op
 R
@@ -417,9 +377,7 @@ S
 #10993
 magicycle~
 10993 1
-11 264 nt 1 10993 0 e
-B
-0 0 0
+11 264 nt 1 10993 c e
 R
 6001 40 1 0
 R
