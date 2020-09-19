@@ -456,7 +456,7 @@ I 5 102 9.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
 I 23 105 100.00 1  # QUARRY: huge stone block
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
-I 31 105 100.00 125  # PRODUCTION: huge stone block
+I 31 105 10.00 125  # PRODUCTION: huge stone block
 R
 1000 1 5 0
 S

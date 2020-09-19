@@ -28,13 +28,13 @@ a bunch of carrots~
 There are a bunch of carrots scattered across the ground.~
 You can eat carrots, or plant them.
 ~
-6 bl a 0 5
+6 bgl a 0 6
 12 11100 0
 7 168
-I 15 11103 100.00 4 x  # SEPARATE: a carrot
+I 15 11103 100.00 4 x  # SEPARATE: carrot
 O+ 1 6152
 R
-5606 0
+4 5606 0
 S
 #11103
 carrot~
@@ -42,10 +42,10 @@ a carrot~
 Someone dropped a large carrot here.~
 This is just one carrot, so it's not enough to plant, but it tastes good.
 ~
-6 0 a 0 6
+6 g a 0 7
 1 0 0
 7 48
-I 14 11102 100.00 4 x  # COMBINE: a bunch of carrots
+I 14 11102 100.00 4 x  # COMBINE: bunch of carrots
 O+ 1 6142
 S
 #11104
@@ -54,13 +54,13 @@ a bunch of blackberries~
 There are a bunch of blackberries scattered across the ground.~
 You can eat blackberries, or plant them.
 ~
-6 bl a 0 5
+6 bgl a 0 6
 12 11101 0
 7 168
-I 15 11105 100.00 4 x  # SEPARATE: a few blackberries
+I 15 11105 100.00 4 x  # SEPARATE: few blackberries
 O+ 1 6132
 R
-5114 0
+4 5114 0
 S
 #11105
 blackberries loose berries~
@@ -68,10 +68,10 @@ a few blackberries~
 There are a few loose blackberries here.~
 This is just a few blackberries, so they're not enough to plant, but they taste good.
 ~
-6 0 a 0 5
+6 g a 0 6
 1 0 0
 7 48
-I 14 11104 100.00 4 x  # COMBINE: a bunch of blackberries
+I 14 11104 100.00 4 x  # COMBINE: bunch of blackberries
 O+ 1 6122
 S
 #11106
@@ -80,13 +80,13 @@ some juicy pears~
 There are some juicy pears scattered across the ground.~
 You can eat pears, or plant them.
 ~
-6 bl a 0 5
+6 bgl a 0 6
 12 11102 0
 7 168
-I 15 11107 100.00 4 x  # SEPARATE: a ripe pear
+I 15 11107 100.00 4 x  # SEPARATE: ripe pear
 O+ 1 6132
 R
-5114 0
+4 5114 0
 S
 #11107
 pear ripe~
@@ -94,10 +94,10 @@ a ripe pear~
 Someone has dropped a ripe pear nearby.~
 This is just one pear, so it's not enough to plant, but it tastes good.
 ~
-6 0 a 0 6
+6 g a 0 7
 2 0 0
 7 48
-I 14 11106 100.00 4 x  # COMBINE: some juicy pears
+I 14 11106 100.00 4 x  # COMBINE: juicy pears
 O+ 1 6122
 S
 #11108
@@ -154,7 +154,7 @@ This small pouch of viper venom could come in handy.
 C
 125 125
 R
-5193 0
+4 5193 0
 T 1273
 S
 #11112
@@ -171,7 +171,7 @@ A
 C
 125 125
 R
-5193 0
+4 5193 0
 S
 #11113
 stone glowing green serpent~
@@ -187,9 +187,9 @@ Forge (Jewelry): skink amulet (tank neck)
 0 0 0
 12 0
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #11114
 cape scarlet-feathered feathered~
@@ -420,9 +420,9 @@ Forge (Imperial Armors): opal carapace buckler
 0 0 0
 14 0
 R
-5621 0
+4 5621 0
 R
-5193 0
+4 5193 0
 S
 #11134
 hunk jeweled slag~
@@ -436,7 +436,7 @@ jewels!
 16 0 0
 4 0
 R
-5611 a
+4 5611 a
 S
 #11135
 collar titanaconda~
@@ -482,7 +482,7 @@ You can eat the meat raw... or cook it.
 6 0 0
 7 24
 R
-5119 0
+4 5119 0
 S
 #11138
 branch staff wooden~
@@ -603,11 +603,11 @@ Sew (Imperial Armors): titanaconda scale trousers
 0 0 0
 7 0
 R
-5120 0
+4 5120 0
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #11146
 titanaconda coat~

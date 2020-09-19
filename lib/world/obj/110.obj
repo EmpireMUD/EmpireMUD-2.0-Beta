@@ -42,7 +42,7 @@ M
 $n looks surprised at how good a half-digested giant lobster tastes as $e eats it.~
 O+ 1 6203
 R
-5119 0
+4 5119 0
 S
 #11003
 carcass dolphin~
@@ -63,7 +63,7 @@ M
 $n makes a sour face as $e eats a half-digested dolphin.~
 O+ 1 6200
 R
-5119 0
+4 5119 0
 S
 #11005
 talon golden~
@@ -111,7 +111,7 @@ reagent that can be milled into a burnt zephyr salve.
 3 0 a 0 7
 0 0 0
 0 0
-I 11 11015 100.00 1  # LIGHT: a burnt zephyr cattail
+I 11 11015 100.00 1  # LIGHT: burnt zephyr cattail
 O+ 1 6421
 S
 #11010
@@ -133,12 +133,12 @@ An eggplant is sitting on the ground.~
    This large, fresh eggplant is a deep aubergine purple. Eggplants this large
 are prized at market, as few dishes require more than one.
 ~
-6 b a 0 10
+6 bg a 0 11
 8 11011 0
 7 168
 O+ 1 6152
 R
-5114 0
+4 5114 0
 S
 #11012
 eggplant tiny~
@@ -147,7 +147,7 @@ A tiny eggplant is lying on the ground.~
    This little eggplant is already a nice deep purple color, but it's barely
 the size of a tomato.
 ~
-6 0 a 0 11
+6 g a 0 12
 2 0 0
 7 48
 O+ 1 6142
@@ -165,9 +165,9 @@ nothing.
 7 0
 O+ 1 6443
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #11014
 feather glowing stone~
@@ -182,9 +182,9 @@ light.
 0 0
 O+ 1 6600
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #11015
 cattail tail burnt zephyr~

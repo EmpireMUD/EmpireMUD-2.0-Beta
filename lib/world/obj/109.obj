@@ -22,9 +22,9 @@ it can be used to make powerful equipment.
 I 18 10928 100.00 1 x  # TAN: tough dragon leather
 O+ 1 6511
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #10903
 bone dragon colossal~
@@ -39,9 +39,9 @@ trees in that pack of yours.
 14 0
 O+ 1 6565
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #10904
 egg serpent crimson~
@@ -92,7 +92,7 @@ roast dragon feast and boost the party's damage significantly.
 7 288
 O+ 1 6204
 R
-5119 0
+4 5119 0
 S
 #10908
 roast dragon meat~
@@ -111,9 +111,9 @@ M
 $n nearly chokes on a huge bite of $p.~
 O+ 1 6224
 R
-5619 0
+4 5619 0
 R
-5119 0
+4 5119 0
 S
 #10909
 feast roast dragon~
@@ -439,9 +439,9 @@ stables, animals can be stored in it.
 0 0 0
 1 0
 R
-5621 0
+4 5621 0
 R
-5193 0
+4 5193 0
 S
 #10924
 hearth dragonstone stone~
@@ -455,9 +455,9 @@ the mountainside. You need the Luxury ability to start building it.
 0 0 0
 1 0
 R
-5621 0
+4 5621 0
 R
-5193 0
+4 5193 0
 S
 #10925
 ruby dragonseye dragon's eye~
@@ -470,9 +470,9 @@ make a great statue with 'build dragonstatue'. Statues add fame to the empire.
 0 0 0
 12 0
 R
-5621 0
+4 5621 0
 R
-5193 0
+4 5193 0
 S
 #10926
 pen dragonquill quill~
@@ -486,9 +486,9 @@ great decoration in a magnificent library. Type 'build dragonlibrary
 0 0 0
 1 0
 R
-5621 0
+4 5621 0
 R
-5193 0
+4 5193 0
 S
 #10927
 cloth dragon bolt~
@@ -502,12 +502,12 @@ original dragon hide state.
 3 e a 0 8
 0 0 0
 7 0
-I 11 10902 100.00 1 x  # LIGHT: a red dragon hide
+I 11 10902 100.00 1 x  # LIGHT: red dragon hide
 O+ 1 6810
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #10928
 leather dragon tough~
@@ -520,12 +520,12 @@ return it to its original dragon hide state.
 3 e a 0 8
 0 0 0
 7 0
-I 11 10902 100.00 1 x  # LIGHT: a red dragon hide
+I 11 10902 100.00 1 x  # LIGHT: red dragon hide
 O+ 1 6531
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #10929
 ingot dragonsteel steel~
@@ -539,12 +539,12 @@ original dragon bone state.
 3 e a 0 8
 0 0 0
 14 0
-I 11 10903 100.00 1 x  # LIGHT: a colossal dragon bone
+I 11 10903 100.00 1 x  # LIGHT: colossal dragon bone
 O+ 1 6760
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #10930
 victory sense~
@@ -716,9 +716,9 @@ stored in this type of stone is used to craft legendary weapons and armor.
 C
 1 1
 R
-5611 a
+4 5611 a
 R
-5193 a
+4 5193 a
 S
 #10945
 hoard dragon's dragons red~
@@ -791,7 +791,7 @@ coins to cups and crowns.
 32 0 0
 4 0
 R
-5611 a
+4 5611 a
 S
 #10952
 book draconomicon ancient~
@@ -805,7 +805,7 @@ make out its words. But it's also worth its weight in gold.
 48 0 0
 7 0
 R
-5611 a
+4 5611 a
 S
 #10953
 princess golden petrified~
@@ -819,7 +819,7 @@ what they say: A good princess is worth her weight in gold.
 64 0 0
 4 0
 R
-5611 a
+4 5611 a
 S
 #10954
 seeds bag red tiny~
@@ -852,12 +852,12 @@ They're tart, but they should cook up into something delicious.
 You can cook: cranberry jelly
 You can bake: cranbread
 ~
-3 b a 0 8
+3 bg a 0 9
 0 10956 0
 7 168
 O+ 1 6133
 R
-5114 0
+4 5114 0
 S
 #10957
 jelly jar cranberry~
@@ -873,12 +873,12 @@ A
 7 1 0
 C
 50 50
-I 26 801 100.00 1  # DECAYS-TO: a glass jar
-I 27 801 100.00 1  # CONSUMES-TO: a glass jar
+I 26 801 100.00 1  # DECAYS-TO: glass jar
+I 27 801 100.00 1  # CONSUMES-TO: glass jar
 R
-5606 0
+4 5606 0
 R
-5619 0
+4 5619 0
 S
 #10958
 cranbread bread loaf~
@@ -894,7 +894,7 @@ A
 C
 50 50
 R
-5606 0
+4 5606 0
 S
 #10959
 skin dragon molted moulted mountainous~
@@ -971,7 +971,7 @@ This single giant coin is almost as big as your head!
 8 0 0
 4 0
 R
-5611 a
+4 5611 a
 S
 #10969
 goose golden~
@@ -984,7 +984,7 @@ goose that was turned to gold. Either way, it's worth its weight in gold now.
 16 0 0
 4 0
 R
-5611 a
+4 5611 a
 S
 #10970
 harp golden~
@@ -998,7 +998,7 @@ be pure. The harp is also quite large. Perhaps it was made by giants?
 24 0 0
 4 0
 R
-5611 a
+4 5611 a
 T 10970
 S
 #10971
@@ -1036,10 +1036,10 @@ hold up the roof of a mine or be sawn into lumber.
 0 0
 C
 100 100
-I 17 125 100.00 8  # SAW: a stack of lumber
+I 17 125 100.00 8  # SAW: stack of lumber
 O+ 1 6015
 R
-5193 0
+4 5193 0
 S
 #10974
 schematic giant hovel~
@@ -1086,7 +1086,7 @@ you. It has the faint smell of rotten eggs.
 1 0
 O+ 1 6600
 R
-5164 0
+4 5164 0
 S
 #10983
 orb crystal pure~
@@ -1100,7 +1100,7 @@ spellcasters for their clarity.
 16 0 0
 8 0
 R
-5611 a
+4 5611 a
 S
 #10984
 skull crystal~
@@ -1114,7 +1114,7 @@ and are sought out by powerful spellcasters the world over.
 24 0 0
 8 0
 R
-5611 a
+4 5611 a
 S
 #10986
 ember eternal flame~

@@ -53,7 +53,7 @@ mind going forward.
 6 0 0
 3 0
 R
-5611 a
+4 5611 a
 S
 #16004
 dagger blade rib bone~
@@ -90,16 +90,16 @@ happens? And of course, you could always light it on fire.
 0 0
 C
 1 1
-I 11 1002 100.00 1  # LIGHT: a roaring fire
-I 16 16003 0.01 1  # SCRAPE: a silver skull
-I 16 16007 90.00 1 s  # SCRAPE: a bag of bone dust
-I 16 16007 10.00 2 s  # SCRAPE: a bag of bone dust
-I 17 16006 100.00 2  # SAW: a long bone
-I 17 16006 40.00 2  # SAW: a long bone
-I 17 16006 5.00 2  # SAW: a long bone
-I 17 16006 0.10 2  # SAW: a long bone
+I 11 1002 100.00 1  # LIGHT: roaring fire
+I 16 16003 0.01 1  # SCRAPE: silver skull
+I 16 16007 90.00 1 s  # SCRAPE: bag of bone dust
+I 16 16007 10.00 2 s  # SCRAPE: bag of bone dust
+I 17 16006 100.00 2  # SAW: long bone
+I 17 16006 40.00 2  # SAW: long bone
+I 17 16006 5.00 2  # SAW: long bone
+I 17 16006 0.10 2  # SAW: long bone
 R
-5118 0
+4 5118 0
 S
 #16006
 bone long~
@@ -114,10 +114,10 @@ reasonable replacement for a stick, if just a bit creepy.
 0 0
 C
 1 1
-I 11 184 100.00 1  # LIGHT: a torch
+I 11 184 100.00 1  # LIGHT: torch
 O+ 1 6025
 R
-5118 0
+4 5118 0
 S
 #16007
 bag bone dust~
@@ -217,7 +217,7 @@ Implant this into mountable creatures to activate the tooth's magic.
 C
 1 1
 R
-5164 0
+4 5164 0
 T 16009
 S
 #16012

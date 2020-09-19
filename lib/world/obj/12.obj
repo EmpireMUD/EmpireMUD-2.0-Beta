@@ -4,7 +4,7 @@ a handful of whitegrass~
 A handful of picked whitegrass is on the ground.~
 Whitegrass is an herb used to make potions.
 ~
-3 l a 0 5
+3 gl a 0 6
 0 0 0
 0 0
 C
@@ -25,7 +25,7 @@ a sack of fiveleaf~
 A sack of fiveleaf is lying on the ground.~
 Fiveleaf is an herb used to make potions.
 ~
-3 l a 0 6
+3 gl a 0 7
 0 0 0
 0 0
 C
@@ -46,7 +46,7 @@ a twig of redthorn~
 A twig of redthorn has been dropped here.~
 Redthorn is an herb used to make potions.
 ~
-3 l a 0 5
+3 gl a 0 6
 0 0 0
 0 0
 C
@@ -67,7 +67,7 @@ some magewhisper sepals~
 A pile of magewhisper sepals sits on the ground.~
 Magewhisper is an herb used to make potions.
 ~
-3 l a 0 5
+3 gl a 0 6
 0 0 0
 0 0
 C
@@ -88,7 +88,7 @@ a daggerbite frond~
 A daggerbite frond has been left here.~
 Daggerbite is an herb used to make potions.
 ~
-3 l a 0 5
+3 gl a 0 6
 0 0 0
 0 0
 C
@@ -109,7 +109,7 @@ some bileberries~
 Some noxious bileberries are lying on the ground.~
 Bileberries are an herb used to make potions.
 ~
-3 l a 0 5
+3 gl a 0 6
 0 0 0
 0 0
 C
@@ -145,7 +145,7 @@ a jar of distilled whitegrass~
 A jar of distilled whitegrass has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 0 6
+3 g a 0 7
 0 0 0
 8 0
 C
@@ -162,7 +162,7 @@ a jar of fiveleaf resin~
 A jar of fiveleaf resin has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 0 8
+3 g a 0 9
 0 0 0
 8 0
 C
@@ -179,7 +179,7 @@ a jar of redthorn extract~
 A jar of redthorn extract has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 0 9
+3 g a 0 10
 0 0 0
 8 0
 C
@@ -196,7 +196,7 @@ a jar of magewhisper essence~
 A jar of magewhisper essence has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 0 9
+3 g a 0 10
 0 0 0
 8 0
 C
@@ -213,7 +213,7 @@ a jar of concentrated daggerbite~
 A jar of concentrated daggerbite has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-3 0 a 0 10
+3 g a 0 11
 0 0 0
 8 0
 C
@@ -230,7 +230,7 @@ a jar of bileberry juice~
 A jar of bileberry juice has been left here.~
 This is a distilled herb used to brew advanced potions.
 ~
-25 0 a 0 13
+25 g a 0 14
 -1 0 -1
 8 0
 C

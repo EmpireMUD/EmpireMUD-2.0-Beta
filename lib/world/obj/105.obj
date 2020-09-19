@@ -613,7 +613,7 @@ A bunch of rhubarb is piled on the ground.~
    These rhubarb stems are bright red, and fresh. There are some seeds
 intermixed in the bunch, so you could also plant them.
 ~
-6 b a 0 6
+6 bg a 0 7
 12 10551 0
 7 168
 O+ 1 6132
@@ -626,7 +626,7 @@ some arctic brambleberries~
 Some arctic brambleberries are scattered on the ground.~
 You can eat the berries.
 ~
-6 0 a 0 5
+6 g a 0 6
 2 0 0
 7 48
 O+ 1 6122

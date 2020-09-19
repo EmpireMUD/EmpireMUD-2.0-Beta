@@ -4,7 +4,7 @@ a little edible plant~
 A little edible plant is lying on the ground.~
 This looks like you could eat it, but you're not sure what it is.
 ~
-6 0 a 0 3
+6 g a 0 4
 1 0 0
 7 48
 O+ 1 6100
@@ -16,7 +16,7 @@ Some edible plants have been left here.~
    There's a good amount of edible plant material here, although you can't
 identify any of it.
 ~
-6 0 a 0 4
+6 g a 0 5
 12 0 0
 7 48
 C
@@ -31,7 +31,7 @@ a little fruit~
 A little fruit is lying on the ground.~
 This looks like you could eat it, but you're not sure what it is.
 ~
-6 0 a 0 2
+6 g a 0 3
 1 0 0
 7 48
 O+ 1 6120
@@ -42,7 +42,7 @@ a small magic fruit~
 A small magic fruit is lying here.~
 This little fruit glows with magical power.
 ~
-6 0 a 0 4
+6 g a 0 5
 1 0 0
 7 48
 O+ 1 6121
@@ -53,7 +53,7 @@ a small temperate fruit~
 A small temperate fruit is lying on the ground.~
 This fruit looks like it was grown in a temperate region.
 ~
-6 0 a 0 3
+6 g a 0 4
 1 0 0
 7 48
 O+ 1 6122
@@ -64,7 +64,7 @@ a small tropical fruit~
 A small tropical fruit is lying on the ground.~
 This fruit looks like it was grown in a tropical region.
 ~
-6 0 a 0 4
+6 g a 0 5
 1 0 0
 7 48
 O+ 1 6123
@@ -75,7 +75,7 @@ a small desert fruit~
 A small desert fruit is lying on the ground.~
 This fruit looks like it was grown in a desert region.
 ~
-6 0 a 0 5
+6 g a 0 6
 1 0 0
 7 48
 O+ 1 6124
@@ -87,7 +87,7 @@ Some fresh fruit is scattered on the ground.~
    There's a fair amount of fruit here, although you're not exactly sure what
 any of it is.
 ~
-6 0 a 0 4
+6 g a 0 5
 12 0 0
 7 48
 C
@@ -102,7 +102,7 @@ some magic fruit~
 Some magic fruit is floating near the ground.~
 This fruit hovers near the ground, glowing. You're not really sure what it is.
 ~
-6 0 a 0 5
+6 g a 0 6
 12 0 0
 7 48
 C
@@ -117,7 +117,7 @@ some temperate fruit~
 Some temperate fruit is piled on the ground.~
 This fruit looks like it comes from a temperate region.
 ~
-6 0 a 0 6
+6 g a 0 7
 12 0 0
 7 48
 C
@@ -132,7 +132,7 @@ some tropical fruit~
 Some tropical fruit is piled on the ground.~
 This fruit looks like it comes from a tropical region.
 ~
-6 0 a 0 7
+6 g a 0 8
 12 0 0
 7 48
 C
@@ -147,7 +147,7 @@ some desert fruit~
 Some desert fruit is piled on the ground.~
 This fruit looks like it comes from a desert region.
 ~
-6 0 a 0 9
+6 g a 0 10
 12 0 0
 7 48
 C
@@ -162,7 +162,7 @@ a small vegetable~
 A small vegetable is lying here.~
 This looks like you could eat it, but you're not sure what it is.
 ~
-6 0 a 0 3
+6 g a 0 4
 1 0 0
 7 48
 O+ 1 6140
@@ -173,7 +173,7 @@ a small magic vegetable~
 A small magic vegetable is lying here.~
 This unidentifiable little vegetable is glowing!
 ~
-6 0 a 0 4
+6 g a 0 5
 1 0 0
 7 48
 O+ 1 6141
@@ -184,7 +184,7 @@ a small temperate vegetable~
 A small temperate vegetable is lying here.~
 This vegetable looks like it was grown somewhere temperate.
 ~
-6 0 a 0 5
+6 g a 0 6
 1 0 0
 7 48
 O+ 1 6142
@@ -195,7 +195,7 @@ a small tropical vegetable~
 A small tropical vegetable is lying here.~
 This vegetable looks like it was grown somewhere tropical.
 ~
-6 0 a 0 6
+6 g a 0 7
 1 0 0
 7 48
 O+ 1 6143
@@ -206,7 +206,7 @@ a small desert vegetable~
 A small desert vegetable is lying here.~
 This vegetable looks like it was grown somewhere arid.
 ~
-6 0 a 0 7
+6 g a 0 8
 1 0 0
 7 48
 O+ 1 6144
@@ -218,7 +218,7 @@ A bunch of vegetables are lying here.~
    There's a good amount of edible plant material here, although you can't
 identify any of it.
 ~
-6 0 a 0 4
+6 g a 0 5
 12 0 0
 7 48
 C
@@ -233,7 +233,7 @@ a bunch of magic vegetables~
 A bunch of magic vegetables are lying here.~
 These plants are glowing! You could make a fair amount of food from this.
 ~
-6 0 a 0 5
+6 g a 0 6
 12 0 0
 7 48
 C
@@ -248,7 +248,7 @@ a bunch of temperate vegetables~
 A bunch of temperate vegetables are lying here.~
 These vegetables look like they were grown somewhere temperate.
 ~
-6 0 a 0 6
+6 g a 0 7
 12 0 0
 7 48
 C
@@ -263,7 +263,7 @@ a bunch of tropical vegetables~
 A bunch of tropical vegetables are lying here.~
 These vegetables look like they were grown somewhere tropical.
 ~
-6 0 a 0 7
+6 g a 0 8
 12 0 0
 7 48
 C
@@ -278,7 +278,7 @@ a bunch of desert vegetables~
 A bunch of desert vegetables are lying here.~
 These vegetables look like they were grown somewhere warm.
 ~
-6 0 a 0 8
+6 g a 0 9
 12 0 0
 7 48
 C
@@ -304,7 +304,7 @@ a bunch of grain~
 A bunch of grain is lying here.~
 You're not sure what this grain is but it doesn't look like you can eat it.
 ~
-3 0 a 0 6
+3 g a 0 7
 0 0 0
 0 1152
 C
