@@ -1351,6 +1351,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	// update visit and last-dir
 	qt_visit_room(ch, to_room);
 	GET_LAST_DIR(ch) = NO_DIR;
+	add_tracks(ch, was_in, NO_DIR, IN_ROOM(ch));
 	
 	// see if there's a different portal on the other end
 	use_portal = find_back_portal(to_room, was_in, portal);
