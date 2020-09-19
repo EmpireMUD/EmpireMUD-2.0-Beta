@@ -1786,7 +1786,12 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			
 			// show ships
 			if ((show_veh = find_vehicle_to_show(ch, to_room))) {
-				sprintf(roombuf + strlen(roombuf), " <%s>", skip_filler(get_vehicle_short_desc(show_veh, ch)));
+				if (VEH_OWNER(show_veh)) {
+					sprintf(roombuf + strlen(roombuf), " <%s: %s>", EMPIRE_ADJECTIVE(VEH_OWNER(show_veh)), skip_filler(get_vehicle_short_desc(show_veh, ch)));
+				}
+				else {
+					sprintf(roombuf + strlen(roombuf), " <%s>", skip_filler(get_vehicle_short_desc(show_veh, ch)));
+				}
 			}
 			
 			// show ownership (political)
