@@ -4305,10 +4305,10 @@ ACMD(do_efind) {
 				}
 				
 				if (eg->obj) {
-					size += snprintf(buf + size, sizeof(buf) - size, "%s", get_obj_desc(eg->obj, ch, OBJ_DESC_SHORT));
+					size += snprintf(buf + size, sizeof(buf) - size, "%s", skip_filler(get_obj_desc(eg->obj, ch, OBJ_DESC_SHORT)));
 				}
 				else if (eg->veh) {
-					size += snprintf(buf + size, sizeof(buf) - size, "%s", get_vehicle_short_desc(eg->veh, ch));
+					size += snprintf(buf + size, sizeof(buf) - size, "%s", skip_filler(VEH_SHORT_DESC(eg->veh)));
 				}
 				free(eg);
 			}
