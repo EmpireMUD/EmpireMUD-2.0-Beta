@@ -1542,7 +1542,10 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 				*buf2 = '\0';
 			}
 			
-			if (emp && (!hidden || emp == GET_LOYALTY(ch))) {
+			if (show_veh && !VEH_FLAGGED(show_veh, VEH_NO_CLAIM)) {
+				sprintf(buf, "%s%s%s", (VEH_OWNER(show_veh) && EMPIRE_BANNER(VEH_OWNER(show_veh))) ? EMPIRE_BANNER(VEH_OWNER(show_veh)) : "&0", buf2, buf1);
+			}
+			else if (emp && (!hidden || emp == GET_LOYALTY(ch))) {
 				sprintf(buf, "%s%s%s", EMPIRE_BANNER(emp) ? EMPIRE_BANNER(emp) : "&0", buf2, buf1);
 			}
 			else {
