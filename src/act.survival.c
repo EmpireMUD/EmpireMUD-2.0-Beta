@@ -873,12 +873,18 @@ ACMD(do_mount) {
 
 
 ACMD(do_track) {
+	extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
+	extern vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum interior_room);
 	extern const char *dirs[];
 	
+	char buf[MAX_STRING_LENGTH];
+	room_vnum track_to_room = NOWHERE;
 	char_data *vict, *proto;
 	struct track_data *track;
 	bool found = FALSE;
+	vehicle_data *veh;
 	byte dir = NO_DIR;
+	obj_data *portal;
 	
 	int tracks_lifespan = config_get_int("tracks_lifespan");
 	
@@ -910,18 +916,30 @@ ACMD(do_track) {
 			if (isname(arg, GET_PC_NAME(vict)) || isname(arg, PERS(vict, vict, 0)) || isname(arg, PERS(vict, vict, 1)) || (!IS_NPC(vict) && GET_LASTNAME(vict) && isname(arg, GET_LASTNAME(vict)))) {
 				found = TRUE;
 				dir = track->dir;
+				track_to_room = track->to_room;
 				break;
 			}
 		}
 		else if (track->mob_num != NOTHING && (proto = mob_proto(track->mob_num)) && isname(arg, GET_PC_NAME(proto))) {
 			found = TRUE;
 			dir = track->dir;
+			track_to_room = track->to_room;
 			break;
 		}
 	}
 	
 	if (found) {
-		msg_to_char(ch, "You find a trail heading %s!\r\n", dirs[get_direction_for_char(ch, dir)]);
+		if (dir != NO_DIR) {
+			msg_to_char(ch, "You find a trail heading %s!\r\n", dirs[get_direction_for_char(ch, dir)]);
+		}
+		else if ((portal = find_portal_in_room_targetting(IN_ROOM(ch), track_to_room))) {
+			act("You find a trail heading through $p!", FALSE, ch, portal, NULL, TO_CHAR);
+		}
+		else if ((veh = find_vehicle_in_room_with_interior(IN_ROOM(ch), track_to_room))) {
+			snprintf(buf, sizeof(buf), "You find a trail heading %sto $V!", IN_OR_ON(veh));
+			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
+		}
+
 		gain_ability_exp(ch, ABIL_TRACK, 20);
 	}
 	else {

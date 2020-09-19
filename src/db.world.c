@@ -4120,9 +4120,16 @@ void load_world_map_from_file(void) {
 					break;
 				}
 				case 'Y': {	// tracks
-					if (!get_line(fl, line2) || sscanf(line2, "%d %d %ld %d", &var[0], &var[1], &l_in, &var[2]) != 4) {
-						log("SYSERR: Bad formatting in Y section of map tile #%d", last->vnum);
+					if (!get_line(fl, line2)) {
+						log("SYSERR: Missing Y section of map tile #%d", last->vnum);
 						exit(1);
+					}
+					if (sscanf(line2, "%d %d %ld %d %d", &var[0], &var[1], &l_in, &var[2], &var[3]) != 5) {
+						var[3] = NOWHERE;	// to_room: backwards-compatible with old version
+						if (sscanf(line2, "%d %d %ld %d", &var[0], &var[1], &l_in, &var[2]) != 4) {
+							log("SYSERR: Bad formatting in Y section of map tile #%d", last->vnum);
+							exit(1);
+						}
 					}
 					
 					CREATE(track, struct track_data, 1);
@@ -4130,6 +4137,7 @@ void load_world_map_from_file(void) {
 					track->mob_num = var[1];
 					track->timestamp = l_in;
 					track->dir = var[2];
+					track->to_room = var[3];
 					
 					DL_PREPEND(last->shared->tracks, track);
 					break;

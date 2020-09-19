@@ -5820,7 +5820,8 @@ struct track_data {
 	mob_vnum mob_num;	// mob or NOTHING
 	
 	time_t timestamp;	// when
-	byte dir;	// which way
+	byte dir;	// which way (may be NO_DIR)
+	room_vnum to_room;	// for tracks that enter portals/vehicles
 	
 	struct track_data *next, *prev;	// doubly-linked list
 };

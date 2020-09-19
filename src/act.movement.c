@@ -101,9 +101,10 @@ int sort_temp_portal_data(struct temp_portal_data *a, struct temp_portal_data *b
 /**
 * @param char_data *ch the person leaving tracks
 * @param room_data *room the location of the tracks
-* @param byte dir the direction the person went
+* @param byte dir the direction the person went (if any)
+* @param room_data *to_room for non-directional exits, helps the mob pursue
 */
-void add_tracks(char_data *ch, room_data *room, byte dir) {
+void add_tracks(char_data *ch, room_data *room, byte dir, room_data *to_room) {
 	extern bool valid_no_trace(room_data *room);
 	extern bool valid_unseen_passing(room_data *room);
 	
@@ -121,6 +122,7 @@ void add_tracks(char_data *ch, room_data *room, byte dir) {
 		
 			track->timestamp = time(0);
 			track->dir = dir;
+			track->to_room = to_room ? GET_ROOM_VNUM(to_room) : NOWHERE;
 		
 			if (IS_NPC(ch)) {
 				track->mob_num = GET_MOB_VNUM(ch);
@@ -1496,9 +1498,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	mark_move_time(ch);
 	command_lag(ch, WAIT_MOVEMENT);
 	qt_visit_room(ch, IN_ROOM(ch));
-	if (dir != NO_DIR) {
-		add_tracks(ch, was_in, dir);
-	}
+	add_tracks(ch, was_in, dir, IN_ROOM(ch));
 	gain_ability_exp_from_moves(ch, was_in, flags);
 	msdp_update_room(ch);
 	

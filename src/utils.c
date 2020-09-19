@@ -2756,6 +2756,26 @@ char *get_mob_name_by_proto(mob_vnum vnum, bool replace_placeholders) {
 //// OBJECT UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Finds a portal in the room with a given destination.
+*
+* @param room_data *room The room to start in.
+* @param room_vnum to_room The destination to look for.
+* @return obj_data* The portal that leads there, if any. Otherwise, NULL.
+*/
+obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room) {
+	obj_data *obj;
+	
+	DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+		if (IS_PORTAL(obj) && GET_PORTAL_TARGET_VNUM(obj) == to_room) {
+			return obj;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
 * Quick way to turn a vnum into a name, safely.
 *
 * @param obj_vnum vnum The vnum to look up.

@@ -6194,9 +6194,16 @@ void parse_room(FILE *fl, room_vnum vnum) {
 			}
 			
 			case 'Y': {	// tracks
-				if (!get_line(fl, line2) || sscanf(line2, "%d %d %ld %d", &t[0], &t[1], &l_in, &t[2]) != 4) {
-					log("SYSERR: Bad formatting in Y section of room #%d", vnum);
+				if (!get_line(fl, line2)) {
+					log("SYSERR: Missing Y section of room #%d", vnum);
 					exit(1);
+				}
+				if (sscanf(line2, "%d %d %ld %d %d", &t[0], &t[1], &l_in, &t[2], &t[3]) != 5) {
+					t[3] = NOWHERE;	// to_room: backwards-compatible with old version
+					if (sscanf(line2, "%d %d %ld %d", &t[0], &t[1], &l_in, &t[2]) != 4) {
+						log("SYSERR: Bad formatting in Y section of room #%d", vnum);
+						exit(1);
+					}
 				}
 				
 				CREATE(track, struct track_data, 1);
@@ -6204,6 +6211,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				track->mob_num = t[1];
 				track->timestamp = l_in;
 				track->dir = t[2];
+				track->to_room = t[3];
 				
 				DL_PREPEND(ROOM_TRACKS(room), track);
 				break;
@@ -9787,7 +9795,7 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 			free(track);
 		}
 		else {
-			fprintf(fl, "Y\n%d %d %ld %d\n", track->player_id, track->mob_num, track->timestamp, track->dir);
+			fprintf(fl, "Y\n%d %d %ld %d %d\n", track->player_id, track->mob_num, track->timestamp, track->dir, track->to_room);
 		}
 	}
 

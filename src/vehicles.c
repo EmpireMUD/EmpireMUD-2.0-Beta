@@ -316,6 +316,26 @@ vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id) {
 
 
 /**
+* Finds a vehicle in the room with a interior vnum.
+*
+* @param room_data *room The room to start in.
+* @param room_vnum interior_room The interior room to check for.
+* @return vehicle_data* The vehicle with that interior, if any. Otherwise, NULL.
+*/
+vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum interior_room) {
+	vehicle_data *veh;
+	
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_INTERIOR_HOME_ROOM(veh) && GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)) == interior_room) {
+			return veh;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
 * Finishes the actual dismantle for a vehicle.
 *
 * @param char_data *ch Optional: The dismantler.
