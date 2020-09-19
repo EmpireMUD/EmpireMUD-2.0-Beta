@@ -476,8 +476,11 @@ ACMD(do_roll) {
 		}
 	}
 	else {
-		msg_to_char(ch, "You roll %dd%d and get: %d\r\n", num, size, total);
-		// local hist
+		snprintf(buf, sizeof(buf), "You roll %dd%d and get: %d\r\n", num, size, total);
+		send_to_char(buf, ch);
+		if (ch->desc) {
+			add_to_channel_history(ch, CHANNEL_HISTORY_ROLL, ch, buf);
+		}
 		
 		snprintf(buf, sizeof(buf), "$n rolls %dd%d and gets: %d", num, size, total);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
