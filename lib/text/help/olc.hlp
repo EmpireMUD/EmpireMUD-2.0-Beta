@@ -8052,6 +8052,7 @@ Available flags:
  ON-FIRE - currently burning (via the "light" command)
  !LOAD-ONTO-VEHICLE - cannot be loaded onto another vehicle
  VISIBLE-IN-DARK - can be seen at night without a light
+ !CLAIM - cannot be claimed
  BUILDING - acts more like a building than a vehicle
  NEVER-DISMANTLE - can never be dismantled
  *PLAYER-NO-DISMANTLE - player has toggled no-dismantle on

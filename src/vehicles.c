@@ -1288,6 +1288,10 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "ON-FIRE flag");
 		problem = TRUE;
 	}
+	if (VEH_FLAGGED(veh, VEH_NO_CLAIM) && IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Has !CLAIM flag but IN-CITY-ONLY function; will never function");
+		problem = TRUE;
+	}
 	if (VEH_FLAGGED(veh, VEH_BUILDING) && VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Has both BUILDING flag and at least 1 movement flag");
 		problem = TRUE;
