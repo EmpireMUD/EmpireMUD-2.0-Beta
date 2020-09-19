@@ -1255,6 +1255,8 @@ void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_
 					act("$V arrives.", FALSE, ROOM_PEOPLE(to_room), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
 				*/
+				
+				entry_vtrigger(inner);
 			}
 		}
 		
@@ -1268,6 +1270,13 @@ void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_
 				
 				// and announce
 				act("$n arrives.", TRUE, ch, NULL, NULL, TO_ROOM);
+				
+				entry_mtrigger(ch);
+				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+				greet_mtrigger(ch, NO_DIR);
+				greet_vtrigger(ch, NO_DIR);
+				entry_memory_mtrigger(ch);
+				greet_memory_mtrigger(ch);
 			}
 		}
 	}
