@@ -3080,7 +3080,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)));
 							}
 							else {
-								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s\t0 %s", *veh_string ? ", " : "", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_ADJECTIVE(VEH_OWNER(veh)), skip_filler(VEH_SHORT_DESC(veh)));
+								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s %s\t0", *veh_string ? ", " : "", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_ADJECTIVE(VEH_OWNER(veh)), skip_filler(VEH_SHORT_DESC(veh)));
 							}
 						}
 						else if (!scanned_veh || VEH_SIZE(veh) > VEH_SIZE(scanned_veh)) {	// not a building -- save?
@@ -3095,7 +3095,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 							snprintf(veh_string, sizeof(veh_string), "%s", skip_filler(VEH_SHORT_DESC(scanned_veh)));
 						}
 						else {
-							snprintf(veh_string, sizeof(veh_string), "%s%s\t0 %s", EMPIRE_BANNER(VEH_OWNER(scanned_veh)), EMPIRE_ADJECTIVE(VEH_OWNER(scanned_veh)), skip_filler(VEH_SHORT_DESC(scanned_veh)));
+							snprintf(veh_string, sizeof(veh_string), "%s%s %s\t0", EMPIRE_BANNER(VEH_OWNER(scanned_veh)), EMPIRE_ADJECTIVE(VEH_OWNER(scanned_veh)), skip_filler(VEH_SHORT_DESC(scanned_veh)));
 						}
 					}
 				}
