@@ -238,39 +238,84 @@ struct icon_data *get_icon_from_set(struct icon_data *set, int type) {
 
 
 /**
-* Gets basic info about the tile to be shown on 'toggle informative' displays.
+* Gets a color string based on a series of conditions.
 *
-* @param char_data *ch Optional: The person looking (for immortal-only data).
-* @param room_data *room The location to check.
-* @param char *buffer A string to store the result to.
+* @param char_data *ch Optional: Player observing (may be NULL; determines chameleon view).
+* @param bool dismantling
+* @param bool unfinished
+* @param bool major_disrepair
+* @param bool minor_disrepair
+* @param int mine_view 0 = not a mine, 1 = mine with ore, -1 = mine with no ore
+* @param bool no_work
+* @param bool chameleon
+* @return char* The color code.
 */
-void get_informative_tile_string(char_data *ch, room_data *room, char *buffer) {
+char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool no_work, bool chameleon) {
+	if (chameleon) {
+		return "\ty";
+	}
+	else if (dismantling) {
+		return "\tC";
+	}
+	else if (unfinished) {
+		return "\tc";
+	}
+	else if (major_disrepair) {
+		return "\tr";
+	}
+	else if (minor_disrepair) {
+		return "\tm";
+	}
+	else if (mine_view > 0) {
+		return "\tg";
+	}
+	else if (mine_view < 0) {
+		return "\tr";
+	}
+	else if (no_work) {
+		return "\tB";
+	}
+	else {
+		return "\t0";
+	}
+}
+
+
+/**
+* Gets a string of text based on a series of conditions.
+*
+* @param char_data *ch Optional: Player observing (may be NULL; determines chameleon view).
+* @param char *buffer A string for the output (MAX_STRING_LENGTH).
+* @param bool dismantling
+* @param bool unfinished
+* @param bool major_disrepair
+* @param bool minor_disrepair
+* @param int mine_view 0 = not a mine, 1 = mine with ore, -1 = mine with no ore
+* @param bool no_work
+* @param bool chameleon
+*/
+void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool no_work, bool chameleon) {
 	*buffer = '\0';
 
-	if (IS_DISMANTLING(room)) {
+	if (dismantling) {
 		sprintf(buffer + strlen(buffer), "%sdismantling", *buffer ? ", " : "");
 	}
-	else if (!IS_COMPLETE(room)) {
+	else if (unfinished) {
 		sprintf(buffer + strlen(buffer), "%sunfinished", *buffer ? ", " :"");
 	}
-	if (HAS_MAJOR_DISREPAIR(room)) {
+	if (major_disrepair) {
 		sprintf(buffer + strlen(buffer), "%sbad disrepair", *buffer ? ", " :"");
 	}
-	else if (HAS_MINOR_DISREPAIR(room)) {
+	else if (minor_disrepair) {
 		sprintf(buffer + strlen(buffer), "%sdisrepair", *buffer ? ", " :"");
 	}
-	if (IS_COMPLETE(room) && room_has_function_and_city_ok(NULL, room, FNC_MINE)) {
-		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
-			sprintf(buffer + strlen(buffer), "%shas ore", *buffer ? ", " :"");
-		}
-		else {
-			sprintf(buffer + strlen(buffer), "%sdepleted", *buffer ? ", " :"");
-		}
+	if (mine_view != 0) {
+		sprintf(buffer + strlen(buffer), "%s%s", *buffer ? ", " :"", mine_view > 0 ? "has ore" : "depleted");
 	}
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) {
+	if (no_work) {
 		sprintf(buffer + strlen(buffer), "%sno-work", *buffer ? ", " :"");
 	}
-	if (ch && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)) {
+	if (chameleon) {
 		sprintf(buffer + strlen(buffer), "%schameleon", *buffer ? ", " :"");
 	}
 }
@@ -1553,37 +1598,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			}
 		}
 		else if (PRF_FLAGGED(ch, PRF_INFORMATIVE) && !show_dark) {
-			if (IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && distance(FLAT_X_COORD(map_loc), FLAT_Y_COORD(map_loc), FLAT_X_COORD(map_to_room), FLAT_Y_COORD(map_to_room)) > 2) {
-				strcpy(buf2, "&y");
-			}
-			else if (IS_DISMANTLING(to_room)) {
-				strcpy(buf2, "&C");
-			}
-			else if (!IS_COMPLETE(to_room)) {
-				strcpy(buf2, "&c");
-			}
-			else if (HAS_MAJOR_DISREPAIR(to_room)) {
-				strcpy(buf2, "&r");
-			}
-			else if (HAS_MINOR_DISREPAIR(to_room)) {
-				strcpy(buf2, "&m");
-			}
-			else if (room_has_function_and_city_ok(NULL, to_room, FNC_MINE)) {
-				if (get_room_extra_data(to_room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
-					strcpy(buf2, "&g");
-				}
-				else {
-					strcpy(buf2, "&r");
-				}
-			}
-			else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_WORK)) {
-				strcpy(buf2, "&B");
-			}
-			else {
-				strcpy(buf2, "&0");
-			}
-			
-			sprintf(buf, "%s%s", buf2, buf1);
+			sprintf(buf, "%s%s", get_informative_color_room(ch, to_room), buf1);
 		}
 		else if (painted && !show_dark) {
 			strcpy(col_buf, paint_colors[ROOM_PAINT_COLOR(to_room)]);
@@ -1786,7 +1801,11 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			
 			// show ships
 			if ((show_veh = find_vehicle_to_show(ch, to_room))) {
-				if (VEH_OWNER(show_veh) && !VEH_CLAIMS_WITH_ROOM(show_veh) && PRF_FLAGGED(ch, PRF_POLITICAL)) {
+				if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+					get_informative_vehicle_string(ch, show_veh, infobuf);
+					sprintf(roombuf + strlen(roombuf), " <%s: %s>", skip_filler(get_vehicle_short_desc(show_veh, ch)), infobuf);
+				}
+				else if (VEH_OWNER(show_veh) && !VEH_CLAIMS_WITH_ROOM(show_veh) && PRF_FLAGGED(ch, PRF_POLITICAL)) {
 					sprintf(roombuf + strlen(roombuf), " <%s %s>", EMPIRE_ADJECTIVE(VEH_OWNER(show_veh)), skip_filler(get_vehicle_short_desc(show_veh, ch)));
 				}
 				else {

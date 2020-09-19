@@ -2968,14 +2968,13 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 */
 void scan_for_tile(char_data *ch, char *argument) {
 	extern byte distance_can_see(char_data *ch);
-	void get_informative_tile_string(char_data *ch, room_data *room, char *buffer);
 	extern int get_map_radius(char_data *ch);
 	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
 	extern bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
 
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
-	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH];
+	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
 	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
 	room_data *map, *room;
@@ -3076,7 +3075,11 @@ void scan_for_tile(char_data *ch, char *argument) {
 					
 						// found a vehicle match but limit what we show
 						if (VEH_FLAGGED(veh, VEH_BUILDING)) {
-							if (!VEH_OWNER(veh) || VEH_CLAIMS_WITH_ROOM(veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
+							if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+								get_informative_vehicle_string(ch, veh, temp);
+								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s: %s", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)), temp);
+							}
+							else if (!VEH_OWNER(veh) || VEH_CLAIMS_WITH_ROOM(veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
 								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)));
 							}
 							else {
