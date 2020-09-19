@@ -1807,7 +1807,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			if ((show_veh = find_vehicle_to_show(ch, to_room))) {
 				if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
 					get_informative_vehicle_string(ch, show_veh, infobuf);
-					sprintf(roombuf + strlen(roombuf), " <%s: %s>", skip_filler(get_vehicle_short_desc(show_veh, ch)), infobuf);
+					sprintf(roombuf + strlen(roombuf), " <%s%s%s>", skip_filler(get_vehicle_short_desc(show_veh, ch)), *infobuf ? ": " :"", infobuf);
 				}
 				else if (VEH_OWNER(show_veh) && !VEH_CLAIMS_WITH_ROOM(show_veh) && PRF_FLAGGED(ch, PRF_POLITICAL)) {
 					sprintf(roombuf + strlen(roombuf), " <%s %s>", EMPIRE_ADJECTIVE(VEH_OWNER(show_veh)), skip_filler(get_vehicle_short_desc(show_veh, ch)));

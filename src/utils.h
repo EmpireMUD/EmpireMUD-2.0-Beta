@@ -1612,7 +1612,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VEH_HAS_MINOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_minor") / 100)))
 #define VEH_HAS_MAJOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_major") / 100)))
 #define VEH_IS_COMPLETE(veh)  (!VEH_NEEDS_RESOURCES(veh) || !VEH_FLAGGED((veh), VEH_INCOMPLETE | VEH_DISMANTLING))
-#define VEH_IS_DISMANTLING(veh)  (VEH_FLAGGED((veh), VEH_DISMANTLING))
+#define VEH_IS_DISMANTLING(veh)  (VEH_FLAGGED((veh), VEH_DISMANTLING) ? TRUE : FALSE)
 #define VEH_OR_BLD(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) ? "building" : "vehicle")
 
 

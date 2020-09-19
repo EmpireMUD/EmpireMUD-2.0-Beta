@@ -3077,7 +3077,12 @@ void scan_for_tile(char_data *ch, char *argument) {
 						if (VEH_FLAGGED(veh, VEH_BUILDING)) {
 							if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
 								get_informative_vehicle_string(ch, veh, temp);
-								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s [%s]", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)), temp);
+								if (*temp) {
+									vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s [%s]", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)), temp);
+								}
+								else {
+									vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)));
+								}
 							}
 							else if (!VEH_OWNER(veh) || VEH_CLAIMS_WITH_ROOM(veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
 								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)));
