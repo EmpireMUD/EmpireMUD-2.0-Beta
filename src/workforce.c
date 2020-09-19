@@ -151,122 +151,136 @@ int einv_interaction_chore_type = 0;
 void process_one_chore(empire_data *emp, room_data *room) {
 	int island = GET_ISLAND_ID(room);	// just look this up once
 	
-	// wait wait don't work here (unless burning)
-	if ((ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK | ROOM_AFF_HAS_INSTANCE)) && !IS_BURNING(room)) {
-		return;
+	// basic vars that determine what we do:
+	bool no_work = ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK);
+	bool has_instance = ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE);
+	bool starving = empire_has_needs_status(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED);
+	
+	// THING 1: burning
+	if (IS_BURNING(room)) {
+		if (!starving && CHORE_ACTIVE(CHORE_FIRE_BRIGADE)) {
+			do_chore_fire_brigade(emp, room);
+		}
+		return;	// blocks all other chores
+	}
+	if (no_work) {
+		return;	// only burning overrides no-work
 	}
 	
-	// DO FIRST: crops (never blocked by workforce starvation)
+	// THING 2: crops/fishing (never blocked by workforce starvation)
 	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE | ROOM_AFF_NO_WORKFORCE_EVOS) && CHORE_ACTIVE(CHORE_FARMING) && !IS_BURNING(room)) {
-		do_chore_farming(emp, room);
-		return;
+		if (!has_instance || CHORE_ACTIVE(CHORE_REPLANTING)) {
+			// work farming while an instance is present ONLY if replanting is on
+			do_chore_farming(emp, room);
+		}
+	}
+	if (IS_COMPLETE(room) && room_has_function_and_city_ok(emp, room, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
+		do_chore_fishing(emp, room, NULL);
+	}
+	if (starving) {
+		return;	// done
 	}
 	
-	// DO SECOND: exit early if starving
-	if (empire_has_needs_status(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED)) {
-		return;
-	}
-	
-	// DO THIRD: all other chores
-	
-	// fire!
-	if (IS_BURNING(room) && CHORE_ACTIVE(CHORE_FIRE_BRIGADE)) {
-		do_chore_fire_brigade(emp, room);
-		return;
-	}
-	
-	// everything other than fire: doesn't meet in-city requirement on building
-	if (!check_in_city_requirement(room, TRUE)) {
-		log_workforce_problem(emp, room, CHORE_GENERAL, WF_PROB_OUT_OF_CITY, FALSE);
-		return;
-	}
-	
-	// burnable sects
-	if (CHORE_ACTIVE(CHORE_BURN_STUMPS) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE | ROOM_AFF_NO_WORKFORCE_EVOS) && has_evolution_type(SECT(room), EVO_BURNS_TO)) {
-		do_chore_burn_stumps(emp, room);
-		return;
-	}
-	
-	// All choppables -- except crops, which are handled by farming
-	if (CHORE_ACTIVE(CHORE_CHOPPING) && !ROOM_CROP(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE | ROOM_AFF_NO_WORKFORCE_EVOS) && (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || CAN_INTERACT_ROOM_NO_VEH((room), INTERACT_CHOP))) {
-		do_chore_chopping(emp, room);
-		return;
-	}
-	
-	// building
+	// THING 3: BUILDING/MAINTENANCE (these block further chores)
 	if ((IS_INCOMPLETE(room) || IS_DISMANTLING(room)) && CHORE_ACTIVE(CHORE_BUILDING)) {
 		if (!IS_DISMANTLING(room)) {
 			do_chore_building(emp, room, CHORE_BUILDING);
 		}
-		else {
+		else if (!has_instance) {
+			// dismantle blocked by instance
 			do_chore_dismantle(emp, room);
 		}
 		
 		// do not trigger other actions in the same room in 1 cycle
 		return;
 	}
+	if (IS_COMPLETE(room) && (BUILDING_DAMAGE(room) > 0 || BUILDING_RESOURCES(room)) && HOME_ROOM(room) == room && CHORE_ACTIVE(CHORE_MAINTENANCE)) {
+		do_chore_building(emp, room, CHORE_MAINTENANCE);
+		return;	// no further work while undergoing maintenance
+	}
 	
-	// buildings
-	if (IS_COMPLETE(room)) {
-		if ((BUILDING_DAMAGE(room) > 0 || BUILDING_RESOURCES(room)) && HOME_ROOM(room) == room && CHORE_ACTIVE(CHORE_MAINTENANCE)) {
-			do_chore_building(emp, room, CHORE_MAINTENANCE);
-		}
+	// THING 4: IN-CITY CHECK and NO-INSTANCE: everything else must pass this to run
+	// NOTE: Further chores can use HAS_FUNCTION instead of room_has_function_and_city_ok
+	if (!check_in_city_requirement(room, TRUE)) {
+		log_workforce_problem(emp, room, CHORE_GENERAL, WF_PROB_OUT_OF_CITY, FALSE);
+		return;
+	}
+	if (has_instance) {	// everything else is blocked by an instance
+		log_workforce_problem(emp, room, CHORE_GENERAL, WF_PROB_ADVENTURE_PRESENT, FALSE);
+		return;
+	}
 	
-		if (room_has_function_and_city_ok(emp, room, FNC_MINT) && EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_MINTING)) {
+	// THING 5: Outdoor/non-building chores
+	if (CHORE_ACTIVE(CHORE_BURN_STUMPS) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE | ROOM_AFF_NO_WORKFORCE_EVOS) && has_evolution_type(SECT(room), EVO_BURNS_TO)) {
+		do_chore_burn_stumps(emp, room);
+		return;
+	}
+	if (CHORE_ACTIVE(CHORE_CHOPPING) && !ROOM_CROP(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_EVOLVE | ROOM_AFF_NO_WORKFORCE_EVOS) && (has_evolution_type(SECT(room), EVO_CHOPPED_DOWN) || CAN_INTERACT_ROOM_NO_VEH((room), INTERACT_CHOP))) {
+		// All choppables -- except crops, which are handled by farming
+		do_chore_chopping(emp, room);
+		return;
+	}
+	
+	// THING 6: all other chores (would be blocked by incompleteness)
+	if (!IS_COMPLETE(room)) {
+		return;
+	}
+	
+	// skilled labor
+	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
+		if (HAS_FUNCTION(room, FNC_MINT) && CHORE_ACTIVE(CHORE_MINTING)) {
 			do_chore_minting(emp, room, NULL);
 		}
-		
-		if (room_has_function_and_city_ok(emp, room, FNC_MINE)) {
-			if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
-				if (CHORE_ACTIVE(CHORE_MINING)) {
-					do_chore_mining(emp, room, NULL);
-				}
-			}
-			else if (IS_MAP_BUILDING(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE) && CHORE_ACTIVE(CHORE_DISMANTLE_MINES)) {
-				// no ore left
-				do_chore_dismantle_mines(emp, room, NULL);
-			}
-		}
-		
-		if (room_has_function_and_city_ok(emp, room, FNC_SMELT) && CHORE_ACTIVE(CHORE_SMELTING)) {
-			do_chore_gen_craft(emp, room, NULL, CHORE_SMELTING, chore_smelting, FALSE);
-		}
-		if (room_has_function_and_city_ok(emp, room, FNC_TAILOR) && CHORE_ACTIVE(CHORE_WEAVING)) {
-			do_chore_gen_craft(emp, room, NULL, CHORE_WEAVING, chore_weaving, FALSE);
-		}
-		if (room_has_function_and_city_ok(emp, room, FNC_SAW) && CHORE_ACTIVE(CHORE_SCRAPING)) {
-			do_chore_einv_interaction(emp, room, NULL, CHORE_SCRAPING, INTERACT_SCRAPE);
-		}
-		if (room_has_function_and_city_ok(emp, room, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
-			do_chore_digging(emp, room, NULL);
-		}
-		if (room_has_function_and_city_ok(emp, room, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
-			do_chore_fishing(emp, room, NULL);
-		}
-		if (room_has_function_and_city_ok(emp, room, FNC_TANNERY) && CHORE_ACTIVE(CHORE_TANNING)) {
-			do_chore_einv_interaction(emp, room, NULL, CHORE_TANNING, INTERACT_TAN);
-		}
-		if (room_has_function_and_city_ok(emp, room, FNC_STABLE) && CHORE_ACTIVE(CHORE_SHEARING)) {
-			do_chore_shearing(emp, room, NULL);
-		}
-		if (room_has_function_and_city_ok(emp, room, FNC_SAW) && CHORE_ACTIVE(CHORE_SAWING)) {
-			do_chore_einv_interaction(emp, room, NULL, CHORE_SAWING, INTERACT_SAW);
-		}
-		if (room_has_function_and_city_ok(emp, room, FNC_MILL) && CHORE_ACTIVE(CHORE_MILLING)) {
-			do_chore_gen_craft(emp, room, NULL, CHORE_MILLING, chore_milling, FALSE);
-		}
-		if (room_has_function_and_city_ok(emp, room, FNC_PRESS) && CHORE_ACTIVE(CHORE_OILMAKING)) {
-			do_chore_gen_craft(emp, room, NULL, CHORE_OILMAKING, chore_pressing, FALSE);
-		}
-		if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR) && CHORE_ACTIVE(CHORE_PRODUCTION) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_SKILLED_LABOR)) {
+		if (CHORE_ACTIVE(CHORE_PRODUCTION) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_SKILLED_LABOR)) {
 			do_chore_production(emp, room, NULL, INTERACT_SKILLED_LABOR);
 		}
-		if (CHORE_ACTIVE(CHORE_PRODUCTION) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PRODUCTION)) {
-			do_chore_production(emp, room, NULL, INTERACT_PRODUCTION);
+	}
+	
+	// function chores
+	if (HAS_FUNCTION(room, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
+		do_chore_digging(emp, room, NULL);
+	}
+	if (HAS_FUNCTION(room, FNC_STABLE) && CHORE_ACTIVE(CHORE_SHEARING)) {
+		do_chore_shearing(emp, room, NULL);
+	}
+	if (HAS_FUNCTION(room, FNC_MINE)) {
+		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 && CHORE_ACTIVE(CHORE_MINING)) {
+			do_chore_mining(emp, room, NULL);
 		}
-		
-		// and misc crafting
-		workforce_crafting_chores(emp, room, NULL);
+		else if (IS_MAP_BUILDING(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE) && CHORE_ACTIVE(CHORE_DISMANTLE_MINES)) {
+			do_chore_dismantle_mines(emp, room, NULL);	// no ore left
+		}
+	}
+	
+	// gen-craft chores
+	workforce_crafting_chores(emp, room, NULL);
+	if (HAS_FUNCTION(room, FNC_MILL) && CHORE_ACTIVE(CHORE_MILLING)) {
+		do_chore_gen_craft(emp, room, NULL, CHORE_MILLING, chore_milling, FALSE);
+	}
+	if (HAS_FUNCTION(room, FNC_PRESS) && CHORE_ACTIVE(CHORE_OILMAKING)) {
+		do_chore_gen_craft(emp, room, NULL, CHORE_OILMAKING, chore_pressing, FALSE);
+	}
+	if (HAS_FUNCTION(room, FNC_SMELT) && CHORE_ACTIVE(CHORE_SMELTING)) {
+		do_chore_gen_craft(emp, room, NULL, CHORE_SMELTING, chore_smelting, FALSE);
+	}
+	if (HAS_FUNCTION(room, FNC_TAILOR) && CHORE_ACTIVE(CHORE_WEAVING)) {
+		do_chore_gen_craft(emp, room, NULL, CHORE_WEAVING, chore_weaving, FALSE);
+	}
+	
+	// room interaction chores
+	if (CHORE_ACTIVE(CHORE_PRODUCTION) && CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PRODUCTION)) {
+		do_chore_production(emp, room, NULL, INTERACT_PRODUCTION);
+	}
+	
+	// obj interaction chores
+	if (HAS_FUNCTION(room, FNC_SAW) && CHORE_ACTIVE(CHORE_SCRAPING)) {
+		do_chore_einv_interaction(emp, room, NULL, CHORE_SCRAPING, INTERACT_SCRAPE);
+	}
+	if (HAS_FUNCTION(room, FNC_TANNERY) && CHORE_ACTIVE(CHORE_TANNING)) {
+		do_chore_einv_interaction(emp, room, NULL, CHORE_TANNING, INTERACT_TAN);
+	}
+	if (HAS_FUNCTION(room, FNC_SAW) && CHORE_ACTIVE(CHORE_SAWING)) {
+		do_chore_einv_interaction(emp, room, NULL, CHORE_SAWING, INTERACT_SAW);
 	}
 }
 
@@ -278,35 +292,38 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	room_data *room = IN_ROOM(veh);
 	int island;
 	
+	// basic vars that determine what we do:
 	bool on_fire = VEH_FLAGGED(veh, VEH_ON_FIRE);
+	bool starving = empire_has_needs_status(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED);
 	
-	// basic safety and sanitation
-	if (!emp || !veh || !room) {
-		return;
-	}
+	// basic checks
 	if ((VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || (VEH_FLAGGED(veh, VEH_BUILDING) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK))) && !on_fire) {
 		return;	// skip workforce if no-work AND not-on-fire
 	}
-	if (WATER_SECT(room) || (island = GET_ISLAND_ID(room)) == NO_ISLAND) {
-		return;	// no outside work on water tiles
+	if ((island = GET_ISLAND_ID(room)) == NO_ISLAND) {
+		return;	// no outside work off-island
 	}
 	if (ROOM_OWNER(room) && ROOM_OWNER(room) != emp && !on_fire && !has_relationship(emp, ROOM_OWNER(room), DIPL_ALLIED)) {
 		return;	// cannot work in non-allied empires
 	}
-	if (empire_has_needs_status(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED)) {
-		return;	// starving
-	}
 	
-	// priority chores:
-	
-	// FIRE
+	// PART 1: burning
 	if (on_fire) {
-		if (empire_chore_limit(emp, island, CHORE_FIRE_BRIGADE)) {
+		if (!starving && empire_chore_limit(emp, island, CHORE_FIRE_BRIGADE)) {
 			vehicle_chore_fire_brigade(emp, veh);
 		}
 		return;	// prevent other chores from firing while burning
 	}
-	// BUILDING/REPAIR
+	
+	// PART 2: chores that happen even if starving (food chores)
+	if (!on_fire && vehicle_has_function_and_city_ok(veh, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
+		do_chore_fishing(emp, room, veh);
+	}
+	if (starving) {
+		return;	// STARVATION: blocks further chores
+	}
+	
+	// PART 3: BUILDING/REPAIR
 	if (VEH_NEEDS_RESOURCES(veh) || !VEH_IS_COMPLETE(veh)) {
 		if (VEH_IS_DISMANTLING(veh) && empire_chore_limit(emp, island, CHORE_BUILDING)) {
 			vehicle_chore_dismantle(emp, veh);
@@ -320,7 +337,7 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		return;	// no further chores while working on the building (dismantle may even have purged it)
 	}
 	
-	// artisinal chores:
+	// PART 4: other chores (unlike room chores, you must check city status with vehicle_has_function_and_city_ok)
 	
 	// skilled labor chores:
 	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
@@ -336,14 +353,20 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	if (vehicle_has_function_and_city_ok(veh, FNC_DIGGING) && CHORE_ACTIVE(CHORE_DIGGING)) {
 		do_chore_digging(emp, room, veh);
 	}
-	if (vehicle_has_function_and_city_ok(veh, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
-		do_chore_fishing(emp, room, veh);
-	}
 	if (vehicle_has_function_and_city_ok(veh, FNC_STABLE) && CHORE_ACTIVE(CHORE_SHEARING)) {
 		do_chore_shearing(emp, room, veh);
 	}
+	if (vehicle_has_function_and_city_ok(veh, FNC_MINE)) {
+		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 && CHORE_ACTIVE(CHORE_MINING)) {
+			do_chore_mining(emp, room, veh);
+		}
+		else if (!VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE | VEH_PLAYER_NO_DISMANTLE) && CHORE_ACTIVE(CHORE_DISMANTLE_MINES)) {
+			do_chore_dismantle_mines(emp, room, veh);	// no ore left
+		}
+	}
 	
 	// gen-craft chores:
+	workforce_crafting_chores(emp, room, veh);
 	if (vehicle_has_function_and_city_ok(veh, FNC_SMELT) && CHORE_ACTIVE(CHORE_SMELTING)) {
 		do_chore_gen_craft(emp, room, veh, CHORE_SMELTING, chore_smelting, FALSE);
 	}
@@ -372,22 +395,6 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	if (vehicle_has_function_and_city_ok(veh, FNC_TANNERY) && CHORE_ACTIVE(CHORE_TANNING)) {
 		do_chore_einv_interaction(emp, room, veh, CHORE_TANNING, INTERACT_TAN);
 	}
-	
-	// mining
-	if (vehicle_has_function_and_city_ok(veh, FNC_MINE)) {
-		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
-			if (CHORE_ACTIVE(CHORE_MINING)) {
-				do_chore_mining(emp, room, veh);
-			}
-		}
-		else if (!VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE | VEH_PLAYER_NO_DISMANTLE) && CHORE_ACTIVE(CHORE_DISMANTLE_MINES)) {
-			// no ore left
-			do_chore_dismantle_mines(emp, room, veh);
-		}
-	}
-	
-	// and misc crafting:
-	workforce_crafting_chores(emp, room, veh);
 }
 
 

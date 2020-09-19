@@ -1933,6 +1933,7 @@ const char *wf_problem_types[] = {
 	"already sheared",
 	"delayed",
 	"out of city",
+	"adventure present",
 	"\n"
 };
 
