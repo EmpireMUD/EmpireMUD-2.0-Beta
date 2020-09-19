@@ -3378,20 +3378,17 @@ ACMD(do_mine) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
+	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to mine here.\r\n");
+	}
 	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
 		msg_to_char(ch, "This isn't a mine.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This mine only works in a city.\r\n");
 	}
-	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "You can't mine here because it's not in a city.\r\n");
-	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "The mine shafts aren't finished yet.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to mine here.\r\n");
 	}
 	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0) {
 		msg_to_char(ch, "The mine is depleted, you find nothing of use.\r\n");
