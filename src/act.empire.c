@@ -5230,7 +5230,7 @@ ACMD(do_findmaintenance) {
 	if (find_room) {
 		show_resource_list(BUILDING_RESOURCES(find_room), partial);
 		// note: shows coords regardless of navigation
-		msg_to_char(ch, "Maintenance needed for %s (%d, %d): %s\r\n", get_room_name(find_room, FALSE), X_COORD(find_room), Y_COORD(find_room), partial);
+		msg_to_char(ch, "Maintenance needed for %s%s: %s\r\n", get_room_name(find_room, FALSE), coord_display_room(ch, find_room, FALSE), partial);
 		return;
 	}
 	
@@ -5327,7 +5327,7 @@ ACMD(do_findmaintenance) {
 		full = FALSE;
 		LL_FOREACH_SAFE(node_list, node, next_node) {
 			if (!full) {
-				lsize = snprintf(partial, sizeof(partial), "%s%s", coord_display_room(ch, node->loc, TRUE), node->details ? node->details : skip_filler(get_room_name(node->loc, FALSE)));
+				lsize = snprintf(partial, sizeof(partial), "%s %s", coord_display_room(ch, node->loc, TRUE), node->details ? node->details : skip_filler(get_room_name(node->loc, FALSE)));
 				if (node->count > 1) {
 					lsize += snprintf(partial + lsize, sizeof(partial) - lsize, " (%+d nearby)", node->count);
 				}
