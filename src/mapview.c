@@ -1309,7 +1309,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	crop_data *cp = ROOM_CROP(to_room);
 	sector_data *st, *base_sect = BASE_SECT(to_room);
 	char *base_color, *str;
-	room_data *map_loc, *map_to_room;
+	room_data *map_loc;
 	vehicle_data *show_veh = NULL;
 	
 	// options
@@ -1331,7 +1331,6 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	
 	// detect map locations
 	map_loc = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL);
-	map_to_room = (GET_MAP_LOC(to_room) ? real_room(GET_MAP_LOC(to_room)->vnum) : NULL);
 
 	// detect base icon
 	base_icon = get_icon_from_set(GET_SECT_ICONS(base_sect), tileset);
