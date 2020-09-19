@@ -2199,7 +2199,8 @@ Available functions:
 &r* Note:&0 Functions marked with &r*&0 cannot be used on moving vehicles, only
 buildings and stationary vehicles.
 
-See also: OLC BUILDINGS, OLC CRAFTS, OLC ROOM TEMPLATES, OLC VEHICLES
+See also: OLC BUILDINGS, OLC CRAFTS, OLC ROOM TEMPLATES, OLC VEHICLES,
+  OLC WORKFORCE
 #d
 "BEDIT HITPOINTS" "BEDIT HEALTH"
 
@@ -2688,7 +2689,7 @@ Available types are:
 
 Note: The SOUP and VEHICLE craft flags both also modify the recipe.
 
-See also: CEDIT FLAGS, CEDIT REQUIRESABILITY, OLC CRAFTS
+See also: CEDIT FLAGS, CEDIT REQUIRESABILITY, OLC CRAFTS, OLC WORKFORCE
 #d
 "CEDIT VOLUME"
 
@@ -4393,7 +4394,8 @@ Example of possible multiple results from shear:
  2. SHEAR: 1x some wool 50.00%
  3. SHEAR: 1x some wool 5.00%
 
-See also: OLC BUILDINGS, OLC CROPS, OLC MOBILES, OLC SECTORS, OLC VEHICLES
+See also: OLC BUILDINGS, OLC CROPS, OLC MOBILES, OLC SECTORS, OLC VEHICLES,
+  PRODUCTION INTERACTION, OLC WORKFORCE
 #d
 "MEDIT KEYWORDS"
 
@@ -6280,6 +6282,40 @@ Example vehicle settings:
  catapult: LEADABLE SIEGE-WEAPONS, animals required: 2
 
 See also: BUILDING-VEHICLES, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC WORKFORCE" "WORKFORCE OLC"
+
+There are several ways to make an empire's workforce work a building:
+- DIGGING function flag with DIG interactions
+- FISHING function flag with FISH interactions
+- MILL function (milling)
+- MINE function - building must be on a can-mine tile; interactions come from
+  the mine-data global, see HELP MINE DATA GLOBAL
+- MINT function (minting)
+- PRESS function (oilmaking)
+- PRODUCTION/SKILLED-LABOR interactions: see HELP PRODUCTION INTERACTION
+- SAW function (sawing, scraping)
+- SMELT function (smelting)
+- STABLE function (shearing)
+- TAILOR function (weaving)
+- TANNERY function (tanning)
+- Any craft with the WORKFORCE type and "requiresfunction" set will work at
+  buildings with a matching function (crafting).
+#d
+"PRODUCTION INTERACTION" "SKILLED-LABOR INTERACTION" "SKILLED LABOR INTERACTION"
+
+Workforce will work any claimed building or vehicle with a PRODUCTION or
+SKILLED-LABOR interaction on it. Both of these run under the "production"
+chore.
+
+The interaction's "quantity" is the depletion limit; workforce will produce the
+item 1 at a time. Depletions are slightly random; set this number 25% higher
+than the amount you want the player to get per year. All production on a single
+tile or building will share the same depletion counter.
+
+The interaction's "percentage" is the chance per hour to produce the item.
+
+See also: INTERACTIONS, OLC WORKFORCE
 #d
 PROGEDIT "OLC PROGRESSION" "PROGRESSION OLC" "PROGRESS OLC"
 
