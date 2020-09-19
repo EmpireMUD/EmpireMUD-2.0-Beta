@@ -359,6 +359,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 	int count;
 	
 	bitvector_t only_flags = NOBITS, not_flagged = NOBITS, only_tools = NOBITS, only_functions = NOBITS;
+	bitvector_t only_buildon = NOBITS, only_buildfacing = NOBITS;
 	int only_type = NOTHING, only_level = NOTHING, only_quantity = NOTHING, only_time = NOTHING;
 	int quantity_over = NOTHING, level_over = NOTHING, time_over = NOTHING;
 	int quantity_under = NOTHING, level_under = NOTHING, time_under = NOTHING;
@@ -383,6 +384,8 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		}
 		
 		FULLSEARCH_LIST("type", only_type, craft_types)
+		FULLSEARCH_FLAGS("buildon", only_buildon, bld_on_flags)
+		FULLSEARCH_FLAGS("buildfacing", only_buildfacing, bld_on_flags)
 		FULLSEARCH_FLAGS("flags", only_flags, craft_flags)
 		FULLSEARCH_FLAGS("flagged", only_flags, craft_flags)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, craft_flags)
@@ -413,6 +416,12 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 	// okay now look up crafts
 	HASH_ITER(hh, craft_table, craft, next_craft) {
 		if (requires_obj && GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING) {
+			continue;
+		}
+		if (only_buildon != NOBITS && (GET_CRAFT_BUILD_ON(craft) & only_buildon) != only_buildon) {
+			continue;
+		}
+		if (only_buildfacing != NOBITS && (GET_CRAFT_BUILD_FACING(craft) & only_buildfacing) != only_buildfacing) {
 			continue;
 		}
 		if (only_type != NOTHING && GET_CRAFT_TYPE(craft) != only_type) {
