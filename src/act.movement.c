@@ -1649,11 +1649,12 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 	}
 	else if (IS_SET(flags, MOVE_ENTER_PORTAL)) {
 		obj_data *portal = find_portal_in_room_targetting(from_room, GET_ROOM_VNUM(to_room));
-		if (portal) {
-			act("$n steps into $p.", TRUE, ch, portal, NULL, TO_ROOM);
+		obj_data *use_portal = find_back_portal(to_room, from_room, portal);
+		if (use_portal) {
+			act("$n appears from $p!", TRUE, ch, use_portal, NULL, TO_ROOM);
 		}
 		else {
-			act("$n steps into a portal.", TRUE, ch, NULL, NULL, TO_ROOM);
+			act("$n appears from a portal.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 	}
 	else if (IS_SET(flags, MOVE_ENTER_VEH)) {
