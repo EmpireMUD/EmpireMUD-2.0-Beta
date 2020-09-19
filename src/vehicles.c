@@ -954,6 +954,26 @@ void start_vehicle_burning(vehicle_data *veh) {
 
 
 /**
+* Determines the total number of vehicles in the room that don't have a size.
+*
+* @param room_data *room The room to check.
+* @return int The total number of size-zero vehicles there.
+*/
+int total_small_vehicles_in_room(room_data *room) {
+	vehicle_data *veh;
+	int count = 0;
+	
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_SIZE(veh) == 0) {
+			++count;
+		}
+	}
+	
+	return count;
+}
+
+
+/**
 * Determines the total size of all vehicles in the room.
 *
 * @param room_data *room The room to check.

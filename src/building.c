@@ -53,6 +53,7 @@ extern bool has_learned_craft(char_data *ch, any_vnum vnum);
 struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 void scale_item_to_level(obj_data *obj, int level);
 void stop_room_action(room_data *room, int action);
+extern int total_small_vehicles_in_room(room_data *room);
 extern int total_vehicle_size_in_room(room_data *room);
 
 // external vars
@@ -192,6 +193,10 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 		return FALSE;
 	}
 	if (make_veh && VEH_SIZE(make_veh) > 0 && total_vehicle_size_in_room(IN_ROOM(ch)) + VEH_SIZE(make_veh) > config_get_int("vehicle_size_per_tile")) {
+		msg_to_char(ch, "This area is already too full to %s that.\r\n", command);
+		return FALSE;
+	}
+	if (make_veh && VEH_SIZE(make_veh) == 0 && total_small_vehicles_in_room(IN_ROOM(ch)) >= config_get_int("vehicle_max_per_tile")) {
 		msg_to_char(ch, "This area is already too full to %s that.\r\n", command);
 		return FALSE;
 	}
