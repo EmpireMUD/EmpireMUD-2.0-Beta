@@ -1423,7 +1423,7 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 		}
 	}
 	
-	if (any) {
+	if (any || *unsupplied) {
 		page_string(ch->desc, buf, TRUE);
 	}
 	else {
