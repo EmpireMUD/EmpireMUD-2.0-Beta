@@ -2930,10 +2930,10 @@ static struct find_territory_node *find_nearby_territory_node(room_data *room, s
 */
 struct find_territory_node *reduce_territory_node_list(struct find_territory_node *list) {
 	struct find_territory_node *node, *next_node, *find, *temp;
-	int size = 10;
+	int size = 5;
 	
-	// iterate until there are no more than 44 nodes
-	while (count_node_list(list) > 44) {
+	// iterate until there are no more than 350 nodes
+	while (count_node_list(list) > 350) {
 		for (node = list; node && node->next; node = next_node) {
 			next_node = node->next;
 			
@@ -5165,14 +5165,17 @@ ACMD(do_expel) {
 ACMD(do_findmaintenance) {
 	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 	
-	char arg[MAX_INPUT_LENGTH], partial[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH], *ptr;
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH*4], partial[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH], *ptr;
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	struct resource_data *old_res, *total_list = NULL;
 	struct island_info *find_island = NULL;
 	empire_data *emp = GET_LOYALTY(ch);
 	struct empire_territory_data *ter, *next_ter;
 	room_data *find_room = NULL;
-	int total = 0;
+	vehicle_data *veh;
+	int bld_total = 0, veh_total = 0;
+	size_t size, lsize;
+	bool full;
 	
 	if (!ch->desc || IS_NPC(ch)) {
 		return;
@@ -5245,7 +5248,7 @@ ACMD(do_findmaintenance) {
 		}
 		
 		// validated
-		++total;
+		++bld_total;
 		
 		// ok, what are we looking for (resource list or node list?)
 		if (find_island) {
@@ -5257,26 +5260,93 @@ ACMD(do_findmaintenance) {
 			CREATE(node, struct find_territory_node, 1);
 			node->loc = ter->room;
 			node->count = 1;
-			node->next = node_list;
-			node_list = node;
+			LL_PREPEND(node_list, node);
+		}
+	}
+	
+	// check all vehicles
+	DL_FOREACH(vehicle_list, veh) {
+		if (VEH_OWNER(veh) != emp) {
+			continue;	// wrong owner
+		}
+		if (find_island && !VEH_NEEDS_RESOURCES(veh)) {
+			continue;	// only looking for resource lists
+		}
+		if (VEH_HEALTH(veh) >= VEH_MAX_HEALTH(veh) && (VEH_IS_DISMANTLING(veh) || !VEH_IS_COMPLETE(veh) || !VEH_NEEDS_RESOURCES(veh))) {
+			continue;	// not damaged or in 'maintenance' state
+		}
+		if (find_island && GET_ISLAND(IN_ROOM(veh)) != find_island) {
+			continue;
+		}
+		
+		// validated
+		if (VEH_FLAGGED(veh, VEH_BUILDING)) {
+			++bld_total;
+		}
+		else {
+			++veh_total;
+		}
+		
+		if (find_island) {	// looking for resource list
+			old_res = total_list;
+			total_list = combine_resources(total_list, VEH_NEEDS_RESOURCES(veh));
+			free_resource_list(old_res);
+		}
+		else {	// looking for node list
+			CREATE(node, struct find_territory_node, 1);
+			node->loc = IN_ROOM(veh);
+			snprintf(partial, sizeof(partial), "%s", skip_filler(VEH_SHORT_DESC(veh)));
+			node->details = str_dup(partial);
+			node->count = 1;
+			LL_PREPEND(node_list, node);
 		}
 	}
 	
 	// okay, now what to display
 	if (find_island) {
+		*temp = '\0';
+		if (bld_total > 0) {
+			snprintf(temp, sizeof(temp), "%d building%s", bld_total, PLURAL(bld_total));
+		}
+		if (veh_total > 0) {
+			snprintf(temp, sizeof(temp), "%s%d vehicle%s", (*temp ? " and " : ""), veh_total, PLURAL(veh_total));
+		}
+		if (!*temp) {
+			strcpy(temp, "buildings");
+		}
+		
 		show_resource_list(total_list, partial);
-		msg_to_char(ch, "Maintenance needed for %d building%s on %s: %s\r\n", total, PLURAL(total), find_island->name, total_list ? partial : "none");
+		msg_to_char(ch, "Maintenance needed for %s on %s: %s\r\n", temp, find_island->name, total_list ? partial : "none");
 		free_resource_list(total_list);
 	}
 	else if (node_list) {
 		node_list = reduce_territory_node_list(node_list);
-		sprintf(buf, "%d location%s needing maintenance:\r\n", total, PLURAL(total));
+		size = snprintf(buf, sizeof(buf), "%d location%s needing maintenance:\r\n", bld_total + veh_total, PLURAL(bld_total + veh_total));
 		
 		// display and free the nodes
-		for (node = node_list; node; node = next_node) {
-			next_node = node->next;
-			// note: shows coords regardless of naviation
-			sprintf(buf + strlen(buf), "%2d building%s near%s (%*d, %*d) %s\r\n", node->count, (node->count != 1 ? "s" : ""), (node->count == 1 ? " " : ""), X_PRECISION, X_COORD(node->loc), Y_PRECISION, Y_COORD(node->loc), get_room_name(node->loc, FALSE));
+		full = FALSE;
+		LL_FOREACH_SAFE(node_list, node, next_node) {
+			if (!full) {
+				lsize = snprintf(partial, sizeof(partial), "%s%s", coord_display_room(ch, node->loc, TRUE), node->details ? node->details : skip_filler(get_room_name(node->loc, FALSE)));
+				if (node->count > 1) {
+					lsize += snprintf(partial + lsize, sizeof(partial) - lsize, " (%+d nearby)", node->count);
+				}
+				
+				// append?
+				if (size + lsize + 2 < sizeof(buf)) {
+					strcat(buf, partial);
+					strcat(buf, "\r\n");
+					size += lsize + 2;
+				}
+				else {
+					full = TRUE;
+					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+				}
+			}
+			
+			if (node->details) {
+				free(node->details);
+			}
 			free(node);
 		}
 		
@@ -5284,7 +5354,7 @@ ACMD(do_findmaintenance) {
 		page_string(ch->desc, buf, TRUE);
 	}
 	else {
-		msg_to_char(ch, "No buildings were found that needed maintenance.\r\n");
+		msg_to_char(ch, "Nothing was found that needed maintenance.\r\n");
 	}
 }
 
@@ -6977,11 +7047,12 @@ ACMD(do_roster) {
 
 
 ACMD(do_territory) {
-	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], *ptr;
+	char search_str[MAX_INPUT_LENGTH], exclude_str[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH*4], line[256], *ptr;
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	empire_data *emp = GET_LOYALTY(ch);
 	room_data *iter, *next_iter;
-	bool outside_only = TRUE, outskirts_only = FALSE, frontier_only = FALSE, ok, junk;
+	bool outside_only = TRUE, outskirts_only = FALSE, frontier_only = FALSE, ok, junk, full;
+	size_t size, lsize;
 	int total;
 	crop_data *crop = NULL;
 	char *remain;
@@ -7089,25 +7160,42 @@ ACMD(do_territory) {
 		node_list = reduce_territory_node_list(node_list);
 	
 		if (!*argument) {
-			sprintf(buf, "%s%s&0 territory outside of cities:\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp));
+			size = snprintf(buf, sizeof(buf), "%s%s&0 territory outside of cities:\r\n", EMPIRE_BANNER(emp), EMPIRE_ADJECTIVE(emp));
 		}
 		else {
-			sprintf(buf, "'%s' tiles owned by %s%s&0:\r\n", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+			size = snprintf(buf, sizeof(buf), "'%s' tiles owned by %s%s&0:\r\n", argument, EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
 			CAP(buf);
 		}
 		
 		// display and free the nodes
 		total = 0;
-		for (node = node_list; node; node = next_node) {
-			next_node = node->next;
+		full = FALSE;
+		LL_FOREACH_SAFE(node_list, node, next_node) {
 			total += node->count;
 			
-			sprintf(buf + strlen(buf), "%2d tile%s near%s %s\r\n", node->count, (node->count != 1 ? "s" : ""), coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+			if (!full) {
+				lsize = snprintf(line, sizeof(line), "%2d tile%s near%s %s\r\n", node->count, (node->count != 1 ? "s" : ""), coord_display_room(ch, node->loc, TRUE), get_room_name(node->loc, FALSE));
+				
+				if (size + lsize < sizeof(buf)) {
+					strcat(buf, line);
+					size += lsize;
+				}
+				else {
+					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+					full = TRUE;
+				}
+			}
+			
+			if (node->details) {
+				free(node->details);
+			}
 			free(node);
 		}
 		
 		node_list = NULL;
-		sprintf(buf + strlen(buf), "Total: %d\r\n", total);
+		if (!full) {
+			size += snprintf(buf +  size, sizeof(buf) - size, "Total: %d\r\n", total);
+		}
 		page_string(ch->desc, buf, TRUE);
 	}
 	else {
