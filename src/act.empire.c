@@ -3091,7 +3091,12 @@ void scan_for_tile(char_data *ch, char *argument) {
 					
 					if (vsize == 0 && scanned_veh) {
 						// found a vehicle to show
-						snprintf(veh_string, sizeof(veh_string), "%s", skip_filler(VEH_SHORT_DESC(scanned_veh)));
+						if (!VEH_OWNER(veh) || VEH_CLAIMS_WITH_ROOM(veh)) {
+							snprintf(veh_string, sizeof(veh_string), "%s", skip_filler(VEH_SHORT_DESC(scanned_veh)));
+						}
+						else {
+							snprintf(veh_string, sizeof(veh_string), "%s%s", EMPIRE_ADJECTIVE(VEH_OWNER(scanned_veh)), skip_filler(VEH_SHORT_DESC(scanned_veh)));
+						}
 					}
 				}
 			}
