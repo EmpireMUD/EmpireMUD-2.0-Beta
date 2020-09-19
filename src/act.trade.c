@@ -52,6 +52,7 @@ extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 extern bool has_cooking_fire(char_data *ch);
 extern bool has_learned_craft(char_data *ch, any_vnum vnum);
 void process_build(char_data *ch, room_data *room, int act_type);
+void process_build_action(char_data *ch);
 void scale_item_to_level(obj_data *obj, int level);
 extern bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bool send_messages);
 
@@ -1224,7 +1225,7 @@ void process_gen_craft(char_data *ch) {
 		return;
 	}
 	else if (CRAFT_IS_BUILDING(type)) {
-		process_build(ch, IN_ROOM(ch), ACT_BUILDING);
+		process_build_action(ch);
 		return;
 	}
 	

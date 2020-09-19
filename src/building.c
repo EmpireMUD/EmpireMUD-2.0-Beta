@@ -206,7 +206,7 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 	}
 	
 	// buildings around vehicles
-	if (to_build) {
+	if (to_build && !IS_SET(GET_BLD_FLAGS(to_build), BLD_OPEN)) {
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh_iter, next_in_room) {
 			if (VEH_FLAGGED(veh_iter, VEH_NO_BUILDING)) {
 				sprintf(buf, "You can't %s that around $V.", command);
