@@ -152,8 +152,8 @@ void process_one_chore(empire_data *emp, room_data *room) {
 	int island = GET_ISLAND_ID(room);	// just look this up once
 	
 	// basic vars that determine what we do:
-	bool no_work = ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK);
-	bool has_instance = ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE);
+	bool no_work = ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK) ? TRUE : FALSE;
+	bool has_instance = ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) ? TRUE : FALSE;
 	bool starving = empire_has_needs_status(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED);
 	
 	// THING 1: burning
@@ -293,7 +293,7 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	int island;
 	
 	// basic vars that determine what we do:
-	bool on_fire = VEH_FLAGGED(veh, VEH_ON_FIRE);
+	bool on_fire = VEH_FLAGGED(veh, VEH_ON_FIRE) ? TRUE : FALSE;
 	bool starving = empire_has_needs_status(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED);
 	
 	// basic checks
