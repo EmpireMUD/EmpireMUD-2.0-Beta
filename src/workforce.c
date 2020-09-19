@@ -250,7 +250,7 @@ void process_one_chore(empire_data *emp, room_data *room) {
 		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 && CHORE_ACTIVE(CHORE_MINING)) {
 			do_chore_mining(emp, room, NULL);
 		}
-		else if (IS_MAP_BUILDING(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE) && CHORE_ACTIVE(CHORE_DISMANTLE_MINES)) {
+		else if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0 && IS_MAP_BUILDING(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_DISMANTLE) && CHORE_ACTIVE(CHORE_DISMANTLE_MINES)) {
 			do_chore_dismantle_mines(emp, room, NULL);	// no ore left
 		}
 	}
@@ -363,7 +363,7 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 && CHORE_ACTIVE(CHORE_MINING)) {
 			do_chore_mining(emp, room, veh);
 		}
-		else if (!VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE | VEH_PLAYER_NO_DISMANTLE) && CHORE_ACTIVE(CHORE_DISMANTLE_MINES)) {
+		else if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0 && !VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE | VEH_PLAYER_NO_DISMANTLE) && CHORE_ACTIVE(CHORE_DISMANTLE_MINES)) {
 			do_chore_dismantle_mines(emp, room, veh);	// no ore left
 		}
 	}
