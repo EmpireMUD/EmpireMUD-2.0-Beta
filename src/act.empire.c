@@ -5309,7 +5309,7 @@ ACMD(do_findmaintenance) {
 			snprintf(temp, sizeof(temp), "%d building%s", bld_total, PLURAL(bld_total));
 		}
 		if (veh_total > 0) {
-			snprintf(temp, sizeof(temp), "%s%d vehicle%s", (*temp ? " and " : ""), veh_total, PLURAL(veh_total));
+			snprintf(temp + strlen(temp), sizeof(temp) - strlen(temp), "%s%d vehicle%s", (*temp ? " and " : ""), veh_total, PLURAL(veh_total));
 		}
 		if (!*temp) {
 			strcpy(temp, "buildings");
