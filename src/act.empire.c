@@ -3076,7 +3076,12 @@ void scan_for_tile(char_data *ch, char *argument) {
 					
 						// found a vehicle match but limit what we show
 						if (VEH_FLAGGED(veh, VEH_BUILDING)) {
-							vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)));
+							if (!VEH_OWNER(veh) || VEH_CLAIMS_WITH_ROOM(veh)) {
+								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)));
+							}
+							else {
+								vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s", *veh_string ? ", " : "", EMPIRE_ADJECTIVE(VEH_OWNER(veh)), skip_filler(VEH_SHORT_DESC(veh)));
+							}
 						}
 						else if (!scanned_veh || VEH_SIZE(veh) > VEH_SIZE(scanned_veh)) {	// not a building -- save?
 							scanned_veh = veh;
