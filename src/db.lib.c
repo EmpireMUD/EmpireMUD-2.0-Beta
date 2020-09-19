@@ -6213,7 +6213,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				track->dir = t[2];
 				track->to_room = t[3];
 				
-				DL_PREPEND(ROOM_TRACKS(room), track);
+				DL_APPEND(ROOM_TRACKS(room), track);
 				break;
 			}
 			

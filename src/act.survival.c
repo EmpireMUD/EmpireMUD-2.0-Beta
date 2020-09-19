@@ -933,7 +933,7 @@ ACMD(do_track) {
 			msg_to_char(ch, "You find a trail heading %s!\r\n", dirs[get_direction_for_char(ch, dir)]);
 		}
 		else if ((portal = find_portal_in_room_targetting(IN_ROOM(ch), track_to_room))) {
-			act("You find a trail heading through $p!", FALSE, ch, portal, NULL, TO_CHAR);
+			act("You find a trail heading into $p!", FALSE, ch, portal, NULL, TO_CHAR);
 		}
 		else if ((veh = find_vehicle_in_room_with_interior(IN_ROOM(ch), track_to_room))) {
 			snprintf(buf, sizeof(buf), "You find a trail heading %sto $V!", IN_OR_ON(veh));

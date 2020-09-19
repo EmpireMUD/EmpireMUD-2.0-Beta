@@ -4139,7 +4139,7 @@ void load_world_map_from_file(void) {
 					track->dir = var[2];
 					track->to_room = var[3];
 					
-					DL_PREPEND(last->shared->tracks, track);
+					DL_APPEND(last->shared->tracks, track);
 					break;
 				}
 				case 'Z': {	// extra data
