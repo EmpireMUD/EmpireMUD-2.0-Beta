@@ -1708,6 +1708,7 @@ void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
 void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 	extern int get_new_vehicle_construction_id();
 	void scale_vehicle_to_level(vehicle_data *veh, int level);
+	void special_vehicle_setup(char_data *ch, vehicle_data *veh);
 	
 	vehicle_data *veh, *to_craft = NULL, *found_other = NULL;
 	char buf[MAX_STRING_LENGTH];
@@ -1738,6 +1739,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 	veh = read_vehicle(GET_CRAFT_OBJECT(type), TRUE);
 	SET_BIT(VEH_FLAGS(veh), VEH_INCOMPLETE);	// set incomplete before putting in the room
 	vehicle_to_room(veh, IN_ROOM(ch));
+	special_vehicle_setup(ch, veh);
 	
 	// additional setup
 	VEH_NEEDS_RESOURCES(veh) = copy_resource_list(GET_CRAFT_RESOURCES(type));

@@ -50,6 +50,7 @@ extern craft_data *find_craft_for_vehicle(vehicle_data *veh);
 extern char *get_room_name(room_data *room, bool color);
 extern room_data *create_room(room_data *home);
 extern bool has_learned_craft(char_data *ch, any_vnum vnum);
+void init_mine(room_data *room, char_data *ch, empire_data *emp);
 struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 void scale_item_to_level(obj_data *obj, int level);
 void stop_room_action(room_data *room, int action);
@@ -84,11 +85,28 @@ const char *interlink_codes[11] = { "AX", "RB",	"UN", "DD", "WZ", "FG", "VI", "Q
 * @param room_data *room The location to set up.
 */
 void special_building_setup(char_data *ch, room_data *room) {
-	void init_mine(room_data *room, char_data *ch, empire_data *emp);
 	empire_data *emp = ROOM_OWNER(room) ? ROOM_OWNER(room) : (ch ? GET_LOYALTY(ch) : NULL);
 	
 	// mine data
 	if (room_has_function_and_city_ok(emp, room, FNC_MINE)) {
+		init_mine(room, ch, emp);
+	}
+}
+
+
+/**
+* Any special handling room handling when a new vehicle is set up
+* (at start of build):
+*
+* @param char_data *ch The builder (OPTIONAL: for skill setup)
+* @param vehicle_data *veh The vehicle to set up.
+*/
+void special_vehicle_setup(char_data *ch, vehicle_data *veh) {
+	room_data *room = IN_ROOM(veh);
+	empire_data *emp = ROOM_OWNER(room) ? ROOM_OWNER(room) : (VEH_OWNER(veh) ? VEH_OWNER(veh) : (ch ? GET_LOYALTY(ch) : NULL));
+	
+	// mine data
+	if (IS_SET(VEH_FUNCTIONS(veh), FNC_MINE)) {
 		init_mine(room, ch, emp);
 	}
 }
