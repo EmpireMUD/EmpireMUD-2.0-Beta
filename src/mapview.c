@@ -1265,7 +1265,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	sector_data *st, *base_sect = BASE_SECT(to_room);
 	char *base_color, *str;
 	room_data *map_loc, *map_to_room;
-	vehicle_data *show_veh;
+	vehicle_data *show_veh = NULL;
 	
 	// options
 	bool show_dark = IS_SET(options, LRR_SHOW_DARK) ? TRUE : FALSE;
