@@ -643,7 +643,7 @@ void start_chopping(char_data *ch) {
 	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to chop here.\r\n");
 	}
-	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_CHOP) >= config_get_int("chop_depletion")) {
+	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_CHOP, FALSE) >= config_get_int("chop_depletion")) {
 		msg_to_char(ch, "There's nothing left here to chop.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
@@ -765,7 +765,7 @@ void start_picking(char_data *ch) {
 */
 void start_quarrying(char_data *ch) {	
 	if (can_interact_room(IN_ROOM(ch), INTERACT_QUARRY) && IS_COMPLETE(IN_ROOM(ch))) {
-		if (get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_QUARRY, FALSE) >= config_get_int("common_depletion")) {
 			msg_to_char(ch, "There's not enough left to quarry here.\r\n");
 		}
 		else {
@@ -823,7 +823,7 @@ INTERACTION_FUNC(finish_digging) {
 	int num;
 	
 	// depleted? (uses rock for all types except clay)
-	if (get_depletion(inter_room, DPLTN_DIG) >= DEPLETION_LIMIT(inter_room)) {
+	if (get_depletion(inter_room, DPLTN_DIG, FALSE) >= DEPLETION_LIMIT(inter_room)) {
 		msg_to_char(ch, "The ground is too hard and there doesn't seem to be anything useful to dig up here.\r\n");
 		return FALSE;
 	}
@@ -1545,7 +1545,7 @@ void process_chop(char_data *ch) {
 		remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS);
 		
 		// run interacts for items only if not depleted
-		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP) < config_get_int("chop_depletion")) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP, FALSE) < config_get_int("chop_depletion")) {
 			got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, NULL, finish_chopping);
 		}
 		
@@ -1595,7 +1595,7 @@ void process_digging(char_data *ch) {
 		GET_ACTION(ch) = ACT_NONE;
 		in_room = IN_ROOM(ch);
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, NULL, finish_digging)) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_DIG, FALSE) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, NULL, finish_digging)) {
 			// success
 			gain_player_tech_exp(ch, PTECH_DIG, 10);
 		
@@ -1871,7 +1871,7 @@ void process_fishing(char_data *ch) {
 			}
 		}
 	}
-	else if (get_depletion(room, DPLTN_FISH) >= DEPLETION_LIMIT(room)) {
+	else if (get_depletion(room, DPLTN_FISH, FALSE) >= DEPLETION_LIMIT(room)) {
 		msg_to_char(ch, "You just don't seem to be able to catch anything here.\r\n");
 		GET_ACTION(ch) = ACT_NONE;
 	}
@@ -1934,7 +1934,7 @@ void process_foraging(char_data *ch) {
 			return;
 		}
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE) >= forage_depletion) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE, FALSE) >= forage_depletion) {
 			msg_to_char(ch, "You can't find anything left to eat here.\r\n");
 			act("$n stops looking for things to eat as $e comes up empty-handed.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
@@ -1976,7 +1976,7 @@ void process_gathering(char_data *ch) {
 		
 	// done ?
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER) >= gather_depletion) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER, FALSE) >= gather_depletion) {
 			msg_to_char(ch, "There's nothing good left to gather here.\r\n");
 			GET_ACTION(ch) = ACT_NONE;
 		}
@@ -2094,7 +2094,7 @@ void process_hunting(char_data *ch) {
 	if (number(1, 10000) <= chance_times_100) {
 		// found it!
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_HUNT) >= config_get_int("short_depletion")) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_HUNT, FALSE) >= config_get_int("short_depletion")) {
 			// late check for depletion: make them hunt first
 			msg_to_char(ch, "You don't seem to be able to find any. Maybe this area has been hunted to depletion.\r\n");
 			GET_ACTION(ch) = ACT_NONE;
@@ -2377,7 +2377,7 @@ void process_panning(char_data *ch) {
 			GET_ACTION(ch) = ACT_NONE;
 			
 			// pan will silently fail if depleted
-			if (get_depletion(room, DPLTN_PAN) <= config_get_int("short_depletion")) {
+			if (get_depletion(room, DPLTN_PAN, FALSE) <= config_get_int("short_depletion")) {
 				success = run_room_interactions(ch, room, INTERACT_PAN, NULL, finish_panning);
 			}
 			
@@ -2432,7 +2432,7 @@ void process_picking(char_data *ch) {
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		GET_ACTION(ch) = ACT_NONE;
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_PICK) >= (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CROP) ? pick_depletion : (IS_ANY_BUILDING(IN_ROOM(ch)) ? garden_depletion : config_get_int("common_depletion")))) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_PICK, FALSE) >= (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CROP) ? pick_depletion : (IS_ANY_BUILDING(IN_ROOM(ch)) ? garden_depletion : config_get_int("common_depletion")))) {
 			msg_to_char(ch, "You can't find anything here left to pick.\r\n");
 			act("$n stops looking for things to pick as $e comes up empty-handed.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
@@ -2576,7 +2576,7 @@ void process_prospecting(char_data *ch) {
 void process_quarrying(char_data *ch) {
 	room_data *in_room;
 	
-	if (!can_interact_room(IN_ROOM(ch), INTERACT_QUARRY) || !IS_COMPLETE(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
+	if (!can_interact_room(IN_ROOM(ch), INTERACT_QUARRY) || !IS_COMPLETE(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_QUARRY, FALSE) >= config_get_int("common_depletion")) {
 		msg_to_char(ch, "You can't quarry anything here.\r\n");
 		cancel_action(ch);
 		return;

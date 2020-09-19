@@ -8059,20 +8059,41 @@ void add_depletion(room_data *room, int type, bool multiple) {
 
 
 /**
+* Fetch a depletion amount. In normal cases, it returns the requested type
+* PLUS the production depletion, as production applies to all types. If you
+* request production, it will add the next-highest type. Or pass only_type=TRUE
+* to skip this part.
+*
 * @param struct depletion_data *list List of depletions.
 * @param int type DPLTN_
+* @param bool only_type Normally this function combines 'production' depletion with the requested type, unless only_type is TRUE.
 * @return int The depletion counter on that resource in that room.
 */
-int get_depletion_amount(struct depletion_data *list, int type) {
+int get_depletion_amount(struct depletion_data *list, int type, bool only_type) {
 	struct depletion_data *dep;
+	int amount = 0, highest = 0;
 	
 	LL_FOREACH(list, dep) {
-		if (dep->type == type) {
+		if (only_type && dep->type == type) {
+			// shortcut
 			return dep->count;
+		}
+		else if (!only_type && type == DPLTN_PRODUCTION) {
+			// requesting 'production' will add the next-highest too
+			if (dep->type == DPLTN_PRODUCTION) {
+				amount += dep->count;
+			}
+			else if (dep->count > highest) {
+				highest = dep->count;
+			}
+		}
+		else if (!only_type && (dep->type == type || dep->type == DPLTN_PRODUCTION)) {
+			// requested a non-production type and will also add production to that
+			amount += dep->count;
 		}
 	}
 	
-	return 0;	// none
+	return amount + highest;
 }
 
 

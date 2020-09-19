@@ -133,7 +133,7 @@ int einv_interaction_chore_type = 0;
 
 
 #define CHORE_ACTIVE(chore)  (empire_chore_limit(emp, island, (chore)) != 0 && !workforce_is_delayed(emp, room, (chore)))
-#define GET_CHORE_DEPLETION(room, veh, type)  ((veh) ? get_vehicle_depletion((veh), (type)) : get_depletion((room), (type)))
+#define GET_CHORE_DEPLETION(room, veh, type)  ((veh) ? get_vehicle_depletion((veh), (type), FALSE) : get_depletion((room), (type), FALSE))
 #define ADD_CHORE_DEPLETION(room, veh, type, multiple)  { if (veh) { add_vehicle_depletion((veh), (type), (multiple)); } else { add_depletion((room), (type), (multiple)); } }
 
 // these two interactions have high 'quantity' but only give out 1 at a time
@@ -1877,7 +1877,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 	extern void change_chop_territory(room_data *room);
 	
 	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_CHOPPING].mob);
-	bool depleted = (get_depletion(room, DPLTN_CHOP) >= config_get_int("chop_depletion"));
+	bool depleted = (get_depletion(room, DPLTN_CHOP, FALSE) >= config_get_int("chop_depletion"));
 	bool can_gain = can_gain_chore_resource_from_interaction_room(emp, room, CHORE_CHOPPING, INTERACT_CHOP);
 	bool can_do = !depleted && can_gain;
 	
@@ -2276,7 +2276,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 				run_room_interactions(worker, room, INTERACT_HARVEST, NULL, one_farming_chore);
 				
 				// only change to seeded if it's not an orchard OR if it's over-picked			
-				if (!ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) || get_depletion(room, DPLTN_PICK) >= config_get_int("short_depletion")) {
+				if (!ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) || get_depletion(room, DPLTN_PICK, FALSE) >= config_get_int("short_depletion")) {
 					if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_REPLANTING) && (old_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_CROP_GROWS))) {
 						// sly-convert back to what it was grown from ... not using change_terrain
 						perform_change_sect(room, NULL, old_sect);
