@@ -1150,7 +1150,7 @@ INTERACTION_FUNC(finish_picking) {
 	}
 		
 	// re-start
-	if (in_room == IN_ROOM(ch)) {
+	if (in_room == IN_ROOM(ch) && IS_OUTDOORS(ch)) {
 		start_picking(ch);
 	}
 	
@@ -1326,6 +1326,12 @@ void perform_saw(char_data *ch) {
 * @param char_data *ch The bather.
 */
 void process_bathing(char_data *ch) {
+	// can still bathe here?
+	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
+		cancel_action(ch);
+		return;
+	}
+	
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		// finish
 		msg_to_char(ch, "You finish bathing and climb out of the water to dry off.\r\n");
@@ -2163,6 +2169,11 @@ void process_mining(char_data *ch) {
 	obj_data *tool;
 	bool success;
 	
+	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
+		msg_to_char(ch, "You can't mine here.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to finish mining.\r\n");
 		cancel_action(ch);
@@ -2245,6 +2256,11 @@ void process_minting(char_data *ch) {
 	
 	if (!emp) {
 		msg_to_char(ch, "The mint no longer belongs to any empire and can't be used to make coin.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINT)) {
+		msg_to_char(ch, "You can't mint anything here.\r\n");
 		cancel_action(ch);
 		return;
 	}
@@ -2396,6 +2412,11 @@ void process_picking(char_data *ch) {
 	}
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to pick anything.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You aren't allowed to pick anything here.\r\n");
 		cancel_action(ch);
 		return;
 	}
