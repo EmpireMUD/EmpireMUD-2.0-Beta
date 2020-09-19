@@ -45,6 +45,7 @@ extern const char *mob_move_types[];
 ACMD(do_dismount);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void do_unseat_from_vehicle(char_data *ch);
+extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
 extern char *get_room_name(room_data *room, bool color);
 extern int total_small_vehicles_in_room(room_data *room);
 extern int total_vehicle_size_in_room(room_data *room);
@@ -1646,6 +1647,15 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 			act("$n follows you.", TRUE, ch, NULL, ch->master, TO_VICT);
 		}
 	}
+	else if (IS_SET(flags, MOVE_ENTER_PORTAL)) {
+		obj_data *portal = find_portal_in_room_targetting(from_room, GET_ROOM_VNUM(to_room));
+		if (portal) {
+			act("$n steps into $p.", TRUE, ch, portal, NULL, TO_ROOM);
+		}
+		else {
+			act("$n steps into a portal.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+	}
 	else if (IS_SET(flags, MOVE_ENTER_VEH)) {
 		vehicle_data *veh = GET_ROOM_VEHICLE(to_room);
 		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
@@ -1755,6 +1765,15 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	}
 	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master) {
 		act("$n follows $M.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
+	}
+	else if (IS_SET(flags, MOVE_ENTER_PORTAL)) {
+		obj_data *portal = find_portal_in_room_targetting(from_room, GET_ROOM_VNUM(to_room));
+		if (portal) {
+			act("$n steps into $p.", TRUE, ch, portal, NULL, TO_ROOM);
+		}
+		else {
+			act("$n steps into a portal.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 	}
 	else if (IS_SET(flags, MOVE_ENTER_VEH)) {
 		vehicle_data *veh = GET_ROOM_VEHICLE(to_room);
