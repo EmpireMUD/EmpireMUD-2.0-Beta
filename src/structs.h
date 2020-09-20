@@ -2885,6 +2885,27 @@ struct file_lookup_struct {
 };
 
 
+// for do_gen_interact_room, act.actions.c
+struct gen_interact_data_t {
+	int interact;	// INTERACT_ type
+	int action;	// ACT_ type
+	char *command;	// 'quarry'
+	char *verb;	// 'quarrying'
+	int timer;	// number of action ticks
+	int ptech;	// required ptech (may be NOTHING)
+	int depletion;	// DPLTN_ type (may be NOTHING)
+	char *depletion_config;	// an 'int' key for the config system like "common_depletion" (may be null)
+	char *approval_config;	// a 'bool' key for the config system like "gather_approval" (may be null)
+	struct {	// for all strings, index 0 is to-char and index 1 is to-room
+		char *start[2];	// shown at start-action
+		char *finish[2];	// shown when resource is gained (unless there's a custom message), may contain $p
+		char *empty;	// char-only, shown at the end if there's nothing they can get
+		int random_frequency;	// 1-100% chance to see a message per tick
+		char *random_tick[10][2];
+	} msg;
+};
+
+
 // generic name system
 struct generic_name_data {
 	int name_set;	// NAMES_x const
