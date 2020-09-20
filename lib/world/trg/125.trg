@@ -642,6 +642,7 @@ Delayed Completer~
 ankle brace completion~
 5 n 100
 ~
+nop %self.link_instance%
 if !%instance.real_location%
   %echo% %self.name% vanishes uselessly.
   %purge% %self%
