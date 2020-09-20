@@ -1894,7 +1894,7 @@ void do_chore_chopping(empire_data *emp, room_data *room) {
 			add_to_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS, -1);
 			if (get_room_extra_data(room, ROOM_EXTRA_CHOP_PROGRESS) == 0) {
 				// finished!
-				run_room_interactions(worker, room, INTERACT_CHOP, NULL, one_chop_chore);
+				run_room_interactions(worker, room, INTERACT_CHOP, NULL, NOTHING, one_chop_chore);
 				change_chop_territory(room);
 				
 				if (CAN_CHOP_ROOM(room)) {
@@ -1982,7 +1982,7 @@ void do_chore_digging(empire_data *emp, room_data *room, vehicle_data *veh) {
 				run_interactions(worker, VEH_INTERACTIONS(veh), INTERACT_DIG, room, worker, NULL, veh, one_dig_chore);
 			}
 			else {	// non-vehicle
-				run_room_interactions(worker, room, INTERACT_DIG, veh, one_dig_chore);
+				run_room_interactions(worker, room, INTERACT_DIG, veh, NOTHING, one_dig_chore);
 			}
 		}
 		else {
@@ -2273,7 +2273,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 			}
 			else {	// DONE!
 				remove_room_extra_data(room, ROOM_EXTRA_HARVEST_PROGRESS);
-				run_room_interactions(worker, room, INTERACT_HARVEST, NULL, one_farming_chore);
+				run_room_interactions(worker, room, INTERACT_HARVEST, NULL, NOTHING, one_farming_chore);
 				
 				// only change to seeded if it's not an orchard OR if it's over-picked			
 				if (!ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) || get_depletion(room, DPLTN_PICK, FALSE) >= config_get_int("short_depletion")) {
@@ -2362,7 +2362,7 @@ void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh) {
 			run_interactions(worker, VEH_INTERACTIONS(veh), INTERACT_FISH, room, NULL, NULL, veh, one_fishing_chore);
 		}
 		else {
-			run_room_interactions(worker, room, INTERACT_FISH, veh, one_fishing_chore);
+			run_room_interactions(worker, room, INTERACT_FISH, veh, NOTHING, one_fishing_chore);
 		}
 	}
 	else if (can_do && (worker = place_chore_worker(emp, CHORE_FISHING, room))) {
@@ -2637,7 +2637,7 @@ void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, i
 		if (veh && run_interactions(worker, VEH_INTERACTIONS(veh), interact_type, room, NULL, NULL, veh, one_production_chore)) {
 			ADD_CHORE_DEPLETION(room, veh, DPLTN_PRODUCTION, TRUE);
 		}
-		else if (!veh && run_room_interactions(worker, room, interact_type, veh, one_production_chore)) {
+		else if (!veh && run_room_interactions(worker, room, interact_type, veh, NOTHING, one_production_chore)) {
 			ADD_CHORE_DEPLETION(room, veh, DPLTN_PRODUCTION, TRUE);
 		}
 	}

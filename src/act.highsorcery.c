@@ -2032,12 +2032,12 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 	// SUCCESS: distribute resources
 	if (to_room) {
 		if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
-			run_room_interactions(ch, to_room, INTERACT_HARVEST, NULL, devastate_crop);
-			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, devastate_trees);
+			run_room_interactions(ch, to_room, INTERACT_HARVEST, NULL, MEMBERS_ONLY, devastate_crop);
+			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
 			uncrop_tile(to_room);
 		}
 		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP, FALSE) < config_get_int("chop_depletion")) {
-			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, devastate_trees);
+			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
 			change_chop_territory(to_room);
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(to_room))) {

@@ -1290,7 +1290,10 @@ bool can_claim(char_data *ch) {
 */
 bool can_use_room(char_data *ch, room_data *room, int mode) {
 	room_data *homeroom = HOME_ROOM(room);
-
+	
+	if (mode == NOTHING) {
+		return TRUE;	// nothing asked, nothing checked
+	}
 	// no owner?
 	if (!ROOM_OWNER(homeroom)) {
 		return TRUE;
@@ -1323,10 +1326,13 @@ bool can_use_room(char_data *ch, room_data *room, int mode) {
 */
 bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 	room_data *homeroom = HOME_ROOM(room);
-
+	
 	// unclaimable always denies MEMBERS_x
 	if (mode != GUESTS_ALLOWED && ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
 		return FALSE;
+	}
+	if (mode == NOTHING) {
+		return TRUE;	// nothing asked, nothing checked
 	}
 	// no owner?
 	if (!ROOM_OWNER(homeroom)) {
@@ -1361,6 +1367,9 @@ bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 	room_data *interior = VEH_INTERIOR_HOME_ROOM(veh);	// if any
 	
+	if (mode == NOTHING) {
+		return TRUE;	// nothing asked, nothing checked
+	}
 	// no owner?
 	if (!VEH_OWNER(veh)) {
 		return TRUE;
