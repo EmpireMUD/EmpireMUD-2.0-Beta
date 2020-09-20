@@ -1185,6 +1185,8 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	// done?
 	if (!VEH_NEEDS_RESOURCES(veh)) {
 		act("$V is finished!", FALSE, ch, NULL, veh, TO_CHAR | TO_ROOM);
+		
+		// WARNING: complete_vehicle runs triggers that could purge the vehicle
 		complete_vehicle(veh);
 		
 		// stop all actors on this type

@@ -1366,7 +1366,8 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 * be called on vehicles that are done being repaired, too.
 *
 * WARNING: Calling this on a vehicle that is being dismantled will result in
-* it passing to finish_dismantle_vehicle(), which can purge the vehicle.
+* it passing to finish_dismantle_vehicle(), which can purge the vehicle. Load
+* triggers could also purge it.
 *
 * @param vehicle_data *veh The vehicle.
 */
@@ -1404,6 +1405,10 @@ void complete_vehicle(vehicle_data *veh) {
 		
 		// run triggers
 		load_vtrigger(veh);
+		if (dg_owner_purged) {
+			// prevent crashes here
+			return;
+		}
 	}
 	
 	affect_total_room(IN_ROOM(veh));
