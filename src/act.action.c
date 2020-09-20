@@ -3854,6 +3854,80 @@ const struct gen_interact_data_t *get_interact_data_by_action(int act_type) {
 
 
 /**
+* Looks for available non-depleted interactions.
+*
+* @param char_data *ch The player trying to gen-interact.
+* @param room_data *room The location.
+* @param const struct gen_interact_data_t *data 
+* @return bool TRUE if you can, FALSE if not (messages when false).
+*/ 
+bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_interact_data_t *data) {
+	bool can_room_but_no_permit = FALSE, can_room_but_depleted = FALSE, no_guest_room = FALSE;
+	vehicle_data *can_veh_but_no_permit = NULL, *can_veh_but_depleted = NULL;
+	char buf[MAX_STRING_LENGTH];
+	vehicle_data *veh;
+	
+	if (!ch || !data) {
+		return FALSE;	// safety-only; this should be impossible
+	}
+	
+	// check room first
+	if (SECT_CAN_INTERACT_ROOM(room, data->interact) || BLD_CAN_INTERACT_ROOM(room, data->interact) || RMT_CAN_INTERACT_ROOM(room, data->interact) || CROP_CAN_INTERACT_ROOM(room, data->interact)) {
+		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			can_room_but_no_permit = TRUE;	// error later
+		}
+		else if (data->depletion != NOTHING && data->depletion_config && *(data->depletion_config) && get_depletion(room, data->depletion, FALSE) >= config_get_int(data->depletion_config)) {
+			can_room_but_depleted = TRUE;	// error later
+		}
+		else {
+			return TRUE;	// room passed basic checks
+		}
+	}
+	
+	no_guest_room = !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED);
+	
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (!VEH_IS_COMPLETE(veh) || !has_interaction(VEH_INTERACTIONS(veh), data->interact)) {
+			continue;	// can't act on veh at all
+		}
+		else if (no_guest_room || !can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+			can_veh_but_no_permit = veh;
+			continue;
+		}
+		else if (data->depletion != NOTHING && data->depletion_config && *(data->depletion_config) && get_vehicle_depletion(veh, data->depletion, FALSE) >= config_get_int(data->depletion_config)) {
+			can_veh_but_depleted = veh;
+			continue;
+		}
+		else {
+			return TRUE;	// success!
+		}
+	}
+	
+	// if the room or any vehicle was valid, it already returned. Otherwise look for an error:
+	if (can_room_but_depleted || can_veh_but_depleted) {
+		msg_to_char(ch, "There's not enough left to %s here.\r\n", data->command);
+	}
+	else if (can_room_but_no_permit) {
+		msg_to_char(ch, "You don't have permission to %s here.\r\n", data->command);
+	}
+	else if (can_veh_but_no_permit && no_guest_room) {
+		snprintf(buf, sizeof(buf), "You can't %s $V because someone else owns this area.", data->command);
+		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR);
+	}
+	else if (can_veh_but_no_permit) {
+		snprintf(buf, sizeof(buf), "You don't have permission to %s $V.", data->command);
+		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR);
+	}
+	else {
+		msg_to_char(ch, "You can't %s here.\r\n", data->command);
+	}
+	
+	// reached end
+	return FALSE;
+}
+
+
+/**
 * Determines if you can (still) perform a do_gen_interact_room task.
 *
 * @param char_data *ch The player.
@@ -3873,9 +3947,8 @@ bool validate_gen_interact_room(char_data *ch, const struct gen_interact_data_t 
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to %s anything here.\r\n", data->command);
 	}
-	else if (!can_interact_room(IN_ROOM(ch), data->interact)) {
-		// TODO: check interacts/permission on room and vehicles both; also check room/veh is complete
-		msg_to_char(ch, "There's nothing you can %s here.\r\n", data->command);
+	else if (!can_gen_interact_room(ch, IN_ROOM(ch), data)) {
+		// sends own messages
 	}
 	else if (data->depletion != NOTHING && data->depletion_config && *(data->depletion_config) && get_depletion(IN_ROOM(ch), data->depletion, FALSE) >= config_get_int(data->depletion_config)) {
 		msg_to_char(ch, "There's not enough left to %s here.\r\n", data->command);
@@ -3953,8 +4026,8 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 * @param const struct gen_interact_data_t *data A pointer to the gen_interact_data[].
 */
 void start_gen_interact_room(char_data *ch, const struct gen_interact_data_t *data) {
-	if (!data || !can_interact_room(IN_ROOM(ch), data->interact)) {
-		// fail silently: can only happen on repeat-action
+	if (!data || !can_gen_interact_room(ch, IN_ROOM(ch), data)) {
+		// fails silently if !data but that shouldn't even be possible; messages otherwise
 		return;
 	}
 	
