@@ -550,6 +550,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_BASE_TECH(emp, num)  ((emp)->base_tech[(num)])
 #define EMPIRE_CITY_OVERAGE_WARNING_TIME(emp)  ((emp)->city_overage_warning_time)
 #define EMPIRE_DELAYED_REFRESH(emp)  ((emp)->delayed_refresh)
+#define EMPIRE_DROPPED_ITEMS(emp)  ((emp)->dropped_items)
 #define EMPIRE_NUM_RANKS(emp)  ((emp)->num_ranks)
 #define EMPIRE_RANK(emp, num)  ((emp)->rank[(num)])
 #define EMPIRE_FRONTIER_TRAITS(emp)  ((emp)->frontier_traits)

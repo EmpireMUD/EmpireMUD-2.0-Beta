@@ -37,6 +37,7 @@
 *   Cooldown Handlers
 *   Currency Handlers
 *   Empire Handlers
+*   Empire Dropped Item Handlers
 *   Empire Production Total Handlers
 *   Empire Needs Handlers
 *   Empire Targeting Handlers
@@ -3076,6 +3077,168 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 			qt_empire_players_vehicle(emp, qt_gain_vehicle, veh);
 			et_gain_vehicle(emp, veh);
 			adjust_vehicle_tech(veh, TRUE);
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EMPIRE DROPPED ITEM HANDLERS ////////////////////////////////////////////
+
+/**
+* Adds 1 to the dropped-item count for the empire.
+*
+* @param empire_data *emp The empire.
+* @param obj_data *obj The dropped item.
+*/
+void add_dropped_item(empire_data *emp, obj_data *obj) {
+	struct empire_dropped_item *edi;
+	obj_vnum vnum = GET_OBJ_VNUM(obj);
+	HASH_FIND_INT(EMPIRE_DROPPED_ITEMS(emp), &vnum, edi);
+	if (!edi) {
+		CREATE(edi, struct empire_dropped_item, 1);
+		edi->vnum = vnum;
+		HASH_ADD_INT(EMPIRE_DROPPED_ITEMS(emp), vnum, edi);
+	}
+	++edi->count;
+}
+
+
+/**
+* For objects that might be nested inside something, finds the top owner and
+* adds to the dropped-items count.
+*
+* @param obj_data *obj The object.
+* @param empire_data *only_emp Optional: Only update 1 empire. (NULL for all)
+*/
+void add_dropped_item_anywhere(obj_data *obj, empire_data *only_if_emp) {
+	obj_data *top = obj;
+	
+	// un-nest
+	while (top->in_obj) {
+		top = top->in_obj;
+	}
+	
+	if (top->in_vehicle && VEH_OWNER(top->in_vehicle) && (!only_if_emp || VEH_OWNER(top->in_vehicle) == only_if_emp)) {
+		add_dropped_item(VEH_OWNER(top->in_vehicle), top);
+	}
+	else if (IN_ROOM(top) && ROOM_OWNER(IN_ROOM(top)) && (!only_if_emp || ROOM_OWNER(IN_ROOM(top)) == only_if_emp)) {
+		add_dropped_item(ROOM_OWNER(IN_ROOM(top)), top);
+	}
+}
+
+
+/**
+* Adds a whole list of dropped-items to the empire, e.g. when a room or
+* vehicle is claimed.
+*
+* @param empire_data *emp The empire.
+* @param obj_data *list The content list (ROOM_CONTENTS, VEH_CONTAINS, etc).
+*/
+void add_dropped_item_list(empire_data *emp, obj_data *list) {
+	obj_data *obj;
+	if (emp) {
+		DL_FOREACH2(list, obj, next_content) {
+			add_dropped_item(emp, obj);
+		}
+	}
+}
+
+
+/**
+* Gets the number of dropped items with a given vnum in the empire.
+*
+* @param empire_data *emp The empire.
+* @param obj_vnum vnum The item to get a count for.
+* @return int The number of that item dropped around the empire.
+*/
+int count_dropped_items(empire_data *emp, obj_vnum vnum) {
+	struct empire_dropped_item *edi;
+	HASH_FIND_INT(EMPIRE_DROPPED_ITEMS(emp), &vnum, edi);
+	return edi ? edi->count : 0;
+}
+
+
+/**
+* Frees a set of empire-dropped-items.
+*
+* @param struct empire_dropped_item **list A pointer to the hash to free.
+*/
+void free_dropped_items(struct empire_dropped_item **list) {
+	struct empire_dropped_item *iter, *next;
+	if (list) {
+		HASH_ITER(hh, *list, iter, next) {
+			HASH_DEL(*list, iter);
+			free(iter);
+		}
+	}
+}
+
+
+/**
+* Refreshes the EMPIRE_DROPPED_ITEMS() counts for 1 (or all) empire(s).
+*
+* @param empire_data *only_emp Optional: Only update 1 empire. (NULL for all)
+*/
+void refresh_empire_dropped_items(empire_data *only_emp) {
+	empire_data *emp, *next_emp;
+	obj_data *obj;
+	
+	if (only_emp) {
+		free_dropped_items(&EMPIRE_DROPPED_ITEMS(only_emp));
+	}
+	else {
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			free_dropped_items(&EMPIRE_DROPPED_ITEMS(emp));
+		}
+	}
+	
+	DL_FOREACH(object_list, obj) {
+		if (obj->in_vehicle && VEH_OWNER(obj->in_vehicle) && (!only_emp || VEH_OWNER(obj->in_vehicle) == only_emp)) {
+			add_dropped_item(VEH_OWNER(obj->in_vehicle), obj);
+		}
+		else if (IN_ROOM(obj) && ROOM_OWNER(IN_ROOM(obj)) && (!only_emp || ROOM_OWNER(IN_ROOM(obj)) == only_emp)) {
+			add_dropped_item(ROOM_OWNER(IN_ROOM(obj)), obj);
+		}
+		else {	// try to un-nest it
+			add_dropped_item_anywhere(obj, only_emp);
+		}
+	}
+}
+
+
+/**
+* Removes 1 from the dropped-item count for the empire.
+*
+* @param empire_data *emp The empire.
+* @param obj_data *obj The dropped item.
+*/
+void remove_dropped_item(empire_data *emp, obj_data *obj) {
+	struct empire_dropped_item *edi;
+	obj_vnum vnum = GET_OBJ_VNUM(obj);
+	HASH_FIND_INT(EMPIRE_DROPPED_ITEMS(emp), &vnum, edi);
+	if (edi) {
+		--edi->count;
+		if (edi->count <= 0) {
+			HASH_DEL(EMPIRE_DROPPED_ITEMS(emp), edi);
+			free(edi);
+		}
+	}
+}
+
+
+/**
+* Removes a whole list of dropped-items from the empire, e.g. when a room or
+* vehicle is abandoned.
+*
+* @param empire_data *emp The empire.
+* @param obj_data *list The content list (ROOM_CONTENTS, VEH_CONTAINS, etc).
+*/
+void remove_dropped_item_list(empire_data *emp, obj_data *list) {
+	obj_data *obj;
+	if (emp) {
+		DL_FOREACH2(list, obj, next_content) {
+			remove_dropped_item(emp, obj);
 		}
 	}
 }

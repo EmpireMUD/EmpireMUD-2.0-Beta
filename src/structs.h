@@ -4585,6 +4585,14 @@ struct empire_completed_goal {
 };
 
 
+// hash of items dropped around the empire (blocks workforce cheating)
+struct empire_dropped_item {
+	obj_vnum vnum;
+	int count;
+	UT_hash_handle hh;	// EMPIRE_DROPPED_ITEMS()
+};
+
+
 // tracks how much an empire is actually playing
 struct empire_playtime_tracker {
 	int cycle;	// hash key: using DAILY_CYCLE_DAY
@@ -4916,6 +4924,7 @@ struct empire_data {
 	int max_level;	// maximum level in the empire
 	bitvector_t delayed_refresh;	// things that are requesting an update
 	struct empire_member_account *member_accounts;	// tracks greatness/etc
+	struct empire_dropped_item *dropped_items;	// hash (by vnum) of items dropped in the empire
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them
