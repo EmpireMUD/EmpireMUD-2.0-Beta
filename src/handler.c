@@ -4421,7 +4421,7 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, vehicle_dat
 	}
 	
 	// building first
-	if (!success && GET_BUILDING(room) && (access_type == NOTHING || !ch || can_use_room(ch, room, access_type))) {
+	if (!success && GET_BUILDING(room) && IS_COMPLETE(room) && (access_type == NOTHING || !ch || can_use_room(ch, room, access_type))) {
 		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type, room, NULL, NULL, inter_veh, func);
 	}
 	
