@@ -2193,10 +2193,12 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 	void uncrop_tile(room_data *room);
 	
 	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_FARMING].mob);
-	bool can_gain = can_gain_chore_resource_from_interaction_room(emp, room, CHORE_FARMING, INTERACT_HARVEST);
+	bool can_gain = FALSE;
 	sector_data *old_sect;
 	
-	if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_HARVEST) && can_gain) {
+	if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_HARVEST) && can_gain_chore_resource_from_interaction_room(emp, room, CHORE_FARMING, INTERACT_HARVEST)) {
+		can_gain = TRUE;
+		
 		// HARVEST mode: all at once; not able to ewt_mark_resource_worker() until we're inside the interact
 		if (worker) {
 			// farming is free
@@ -2259,7 +2261,8 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 			}
 		}
 	}
-	else if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PICK) && can_gain) {
+	else if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PICK) && can_gain_chore_resource_from_interaction_room(emp, room, CHORE_FARMING, INTERACT_PICK)) {
+		can_gain = TRUE;
 		// PICK mode: 1 at a time; not able to ewt_mark_resource_worker() until we're inside the interact
 		if (worker) {
 			// farming is free
