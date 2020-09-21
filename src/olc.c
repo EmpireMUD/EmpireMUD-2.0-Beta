@@ -511,6 +511,7 @@ OLC_MODULE(vedit_speed);
 
 
 // externs
+extern const bool interact_one_at_a_time[NUM_INTERACTS];
 extern const char *interact_types[];
 extern const int interact_attach_types[NUM_INTERACTS];
 extern const byte interact_vnum_types[NUM_INTERACTS];
@@ -4221,12 +4222,20 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 	extern const char *interact_types[];
 
 	struct interaction_item *interact;
+	char quant[16];
 	int count = 0;
 	
 	*save_buffer = '\0';
 	
 	for (interact = list; interact; interact = interact->next) {
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %dx %s (%d) %.2f%%", ++count, interact_types[interact->type], interact->quantity, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
+		if (interact_one_at_a_time[interact->type]) {
+			snprintf(quant, sizeof(quant), "%d-max", interact->quantity);
+		}
+		else {
+			snprintf(quant, sizeof(quant), "%dx", interact->quantity);
+		}
+		
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s %s (%d) %.2f%%", ++count, interact_types[interact->type], quant, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
 		if (isalpha(interact->exclusion_code)) {
 			sprintf(save_buffer + strlen(save_buffer), " (%c)", interact->exclusion_code);
 		}
@@ -4410,8 +4419,6 @@ bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch) {
-	extern const bool interact_one_at_a_time[NUM_INTERACTS];
-	
 	struct interaction_item *iter;
 	bool problem = FALSE;
 	int code, type, max_quantity = 0, min_q_1_at_a_time = -1;
