@@ -4115,7 +4115,7 @@ int get_interaction_depletion_room(char_data *ch, empire_data *emp, room_data *r
 		this = get_interaction_depletion(ch, emp, GET_CROP_INTERACTIONS(cp), interaction_type, require_storable);
 		highest = MAX(highest, this);
 	}
-	if (GET_BUILDING(room)) {
+	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
 		this = get_interaction_depletion(ch, emp, GET_BLD_INTERACTIONS(GET_BUILDING(room)), interaction_type, require_storable);
 		highest = MAX(highest, this);
 	}
