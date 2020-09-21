@@ -3756,7 +3756,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 	
 	// if the room or any vehicle was valid, it already returned. Otherwise look for an error:
 	if (can_room_but_depleted || can_veh_but_depleted) {
-		msg_to_char(ch, "There's not enough left to %s here.\r\n", data->command);
+		msg_to_char(ch, "There's nothing to %s here.\r\n", data->command);
 	}
 	else if (can_room_but_no_permit) {
 		msg_to_char(ch, "You don't have permission to %s here.\r\n", data->command);
