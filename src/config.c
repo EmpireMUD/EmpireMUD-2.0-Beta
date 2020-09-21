@@ -1754,14 +1754,11 @@ void init_config_system(void) {
 	init_config(CONFIG_ACTIONS, "harvest_timer", CONFTYPE_INT, "ticks to harvest a crop, modified by Dexterity, double for orchards");
 	init_config(CONFIG_ACTIONS, "mining_timer", CONFTYPE_INT, "weapon damage to mine 1 ore");
 	init_config(CONFIG_ACTIONS, "panning_timer", CONFTYPE_INT, "ticks to pan one time");
-	init_config(CONFIG_ACTIONS, "pick_base_timer", CONFTYPE_INT, "ticks, cut in half by Finder");
 	init_config(CONFIG_ACTIONS, "planting_base_timer", CONFTYPE_INT, "in seconds; planting reduces it by half up to 3 times");
 	init_config(CONFIG_ACTIONS, "tan_timer", CONFTYPE_INT, "ticks to tan skin, reduced by location");
 	init_config(CONFIG_ACTIONS, "chop_depletion", CONFTYPE_INT, "number of times you can chop a tile that has no chop evolution");
 	init_config(CONFIG_ACTIONS, "common_depletion", CONFTYPE_INT, "amount of resources you get from 1 tile");
-	init_config(CONFIG_ACTIONS, "garden_depletion", CONFTYPE_INT, "depletion from a garden tile");
 	init_config(CONFIG_ACTIONS, "gather_depletion", CONFTYPE_INT, "depletion from gathering");
-	init_config(CONFIG_ACTIONS, "pick_depletion", CONFTYPE_INT, "depletion from picking");
 	init_config(CONFIG_ACTIONS, "short_depletion", CONFTYPE_INT, "depletion from forage, etc");
 	init_config(CONFIG_ACTIONS, "high_depletion", CONFTYPE_INT, "depletion in buildings with HIGH-DEPLETION");
 	init_config(CONFIG_ACTIONS, "shear_growth_time", CONFTYPE_INT, "real hours to regrow wool");
@@ -1943,6 +1940,12 @@ void init_config_system(void) {
 		init_config_custom("default_land_sect", config_show_sector, config_edit_sector, NULL);
 	
 	// deprecated configs: no longer used/shown
+	init_config(CONFIG_ACTIONS, "pick_base_timer", CONFTYPE_INT, "deprecated: do not set");
+		init_config_flags("pick_base_timer", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_ACTIONS, "garden_depletion", CONFTYPE_INT, "deprecated: do not set");
+		init_config_flags("garden_depletion", CONF_FLAG_DEPRECATED);
+	init_config(CONFIG_ACTIONS, "pick_depletion", CONFTYPE_INT, "deprecated: do not set");
+		init_config_flags("pick_depletion", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_ACTIONS, "max_chore_resource", CONFTYPE_INT, "deprecated: do not set");
 		init_config_flags("max_chore_resource", CONF_FLAG_DEPRECATED);
 	init_config(CONFIG_ACTIONS, "max_chore_resource_skilled", CONFTYPE_INT, "deprecated: do not set");

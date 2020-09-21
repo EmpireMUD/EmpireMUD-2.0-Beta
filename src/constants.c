@@ -3369,10 +3369,6 @@ const char banner_to_mapout_token[][2] = {
 };
 
 
-// special command list just for orchards
-const char *orchard_commands = "chop, dig, gather, pick";
-
-
 // ROAD_x
 const char *road_types[] = {
 	"ROAD",

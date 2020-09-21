@@ -2162,8 +2162,8 @@ INTERACTION_FUNC(one_farming_chore) {
 		add_to_empire_storage(emp, GET_ISLAND_ID(inter_room), interaction->vnum, amt);
 		add_production_total(emp, interaction->vnum, amt);
 		
-		// add depletion only if orchard
-		if (ROOM_CROP_FLAGGED(inter_room, CROPF_IS_ORCHARD)) {
+		// add depletion only if 'pick' (INTERACT_HARVEST doesn't use it)
+		if (interaction->type == INTERACT_PICK) {
 			while (amt-- > 0) {
 				add_depletion(inter_room, DPLTN_PICK, TRUE);
 			}
@@ -2171,7 +2171,12 @@ INTERACTION_FUNC(one_farming_chore) {
 
 		// only send message if someone else is present (don't bother verifying it's a player)
 		if (ROOM_PEOPLE(IN_ROOM(ch))->next_in_room) {
-			sprintf(buf, "$n finishes harvesting the %s.", GET_CROP_NAME(ROOM_CROP(inter_room)));
+			if (interaction->type == INTERACT_PICK) {
+				sprintf(buf, "$n picks %s.", get_obj_name_by_proto(interaction->vnum));
+			}
+			else {
+				sprintf(buf, "$n finishes harvesting the %s.", GET_CROP_NAME(ROOM_CROP(inter_room)));
+			}
 			act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		}
 		return TRUE;
@@ -2181,6 +2186,7 @@ INTERACTION_FUNC(one_farming_chore) {
 }
 
 
+// handles harvest/pick (preferring harvest)
 void do_chore_farming(empire_data *emp, room_data *room) {
 	void check_terrain_height(room_data *room);
 	void schedule_crop_growth(struct map_data *map);
@@ -2191,7 +2197,7 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 	sector_data *old_sect;
 	
 	if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_HARVEST) && can_gain) {
-		// not able to ewt_mark_resource_worker() until we're inside the interact
+		// HARVEST mode: all at once; not able to ewt_mark_resource_worker() until we're inside the interact
 		if (worker) {
 			// farming is free
 			charge_workforce(emp, room, worker, 0, NOTHING, 0);
@@ -2218,39 +2224,80 @@ void do_chore_farming(empire_data *emp, room_data *room) {
 				remove_room_extra_data(room, ROOM_EXTRA_HARVEST_PROGRESS);
 				run_room_interactions(worker, room, INTERACT_HARVEST, NULL, NOTHING, one_farming_chore);
 				
-				// only change to seeded if it's not an orchard OR if it's over-picked			
-				if (!ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD) || get_depletion(room, DPLTN_PICK, FALSE) >= config_get_int("short_depletion")) {
-					if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_REPLANTING) && (old_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_CROP_GROWS))) {
-						// sly-convert back to what it was grown from ... not using change_terrain
-						perform_change_sect(room, NULL, old_sect);
-						check_terrain_height(room);
-				
-						// we are keeping the original sect the same as it was; set the time to one game day
-						set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, time(0) + (24 * SECS_PER_MUD_HOUR));
-						if (GET_MAP_LOC(room)) {
-							schedule_crop_growth(GET_MAP_LOC(room));
-						}
+				// now change to seeded or uncrop:
+				if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_REPLANTING) && (old_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_CROP_GROWS))) {
+					// sly-convert back to what it was grown from ... not using change_terrain
+					perform_change_sect(room, NULL, old_sect);
+					check_terrain_height(room);
+			
+					// we are keeping the original sect the same as it was; set the time to one game day
+					set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, time(0) + (24 * SECS_PER_MUD_HOUR));
+					if (GET_MAP_LOC(room)) {
+						schedule_crop_growth(GET_MAP_LOC(room));
 					}
-					else {
-						// change to base sect
-						uncrop_tile(room);
-						
-						if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_FARMED)) {
-							abandon_room(room);
-						}
-					}
-					
-					// stop all possible chores here since the sector changed
-					stop_room_action(room, ACT_HARVESTING);
-					stop_room_action(room, ACT_CHOPPING);
-					stop_room_action(room, ACT_PICKING);
-					stop_room_action(room, ACT_GATHERING);
 				}
+				else {
+					// change to base sect
+					uncrop_tile(room);
+					
+					if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_FARMED)) {
+						abandon_room(room);
+					}
+				}
+				
+				// stop all possible chores here since the sector changed
+				stop_room_action(room, ACT_HARVESTING);
+				stop_room_action(room, ACT_CHOPPING);
+				stop_room_action(room, ACT_PICKING);
+				stop_room_action(room, ACT_GATHERING);
 			}
 		}
 		else {
 			if ((worker = place_chore_worker(emp, CHORE_FARMING, room))) {
 				ewt_mark_for_interactions(emp, room, INTERACT_HARVEST);
+				charge_workforce(emp, room, worker, 0, NOTHING, 0);
+			}
+		}
+	}
+	else if (CAN_INTERACT_ROOM_NO_VEH(room, INTERACT_PICK) && can_gain) {
+		// PICK mode: 1 at a time; not able to ewt_mark_resource_worker() until we're inside the interact
+		if (worker) {
+			// farming is free
+			charge_workforce(emp, room, worker, 0, NOTHING, 0);
+			run_room_interactions(worker, room, INTERACT_PICK, NULL, NOTHING, one_farming_chore);
+			
+			// only change to seeded if it's over-picked			
+			if (get_depletion(room, DPLTN_PICK, FALSE) >= get_interaction_depletion_room(NULL, emp, room, INTERACT_PICK, TRUE)) {
+				if (empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_REPLANTING) && (old_sect = reverse_lookup_evolution_for_sector(SECT(room), EVO_CROP_GROWS))) {
+					// sly-convert back to what it was grown from ... not using change_terrain
+					perform_change_sect(room, NULL, old_sect);
+					check_terrain_height(room);
+			
+					// we are keeping the original sect the same as it was; set the time to one game day
+					set_room_extra_data(room, ROOM_EXTRA_SEED_TIME, time(0) + (24 * SECS_PER_MUD_HOUR));
+					if (GET_MAP_LOC(room)) {
+						schedule_crop_growth(GET_MAP_LOC(room));
+					}
+				}
+				else {
+					// change to base sect
+					uncrop_tile(room);
+					
+					if (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_ABANDON) && empire_chore_limit(emp, GET_ISLAND_ID(room), CHORE_ABANDON_FARMED)) {
+						abandon_room(room);
+					}
+				}
+				
+				// stop all possible chores here since the sector changed
+				stop_room_action(room, ACT_HARVESTING);
+				stop_room_action(room, ACT_CHOPPING);
+				stop_room_action(room, ACT_PICKING);
+				stop_room_action(room, ACT_GATHERING);
+			}
+		}
+		else {
+			if ((worker = place_chore_worker(emp, CHORE_FARMING, room))) {
+				ewt_mark_for_interactions(emp, room, INTERACT_PICK);
 				charge_workforce(emp, room, worker, 0, NOTHING, 0);
 			}
 		}

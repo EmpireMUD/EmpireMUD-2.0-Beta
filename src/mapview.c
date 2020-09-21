@@ -73,7 +73,6 @@ struct mappc_data_container {
 // external vars
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
-extern const char *orchard_commands;
 
 // external funcs
 void replace_question_color(char *input, char *color, char *output);
@@ -935,11 +934,29 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			msg_to_char(ch, "Commands: &c%s&0\r\n", GET_BLD_COMMANDS(GET_BUILDING(room)));
 		}
 	}
-	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD)) {
-		msg_to_char(ch, "Commands: &c%s&0\r\n", orchard_commands);
-	}
 	else if (GET_SECT_COMMANDS(SECT(room)) && *GET_SECT_COMMANDS(SECT(room))) {
 		msg_to_char(ch, "Commands: &c%s&0\r\n", GET_SECT_COMMANDS(SECT(room)));
+	}
+	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP)) {
+		*locbuf = '\0';
+		if (can_interact_room(IN_ROOM(ch), INTERACT_CHOP)) {
+			sprintf(locbuf + strlen(locbuf), "%schop", (*locbuf ? ", " : ""));
+		}
+		if (can_interact_room(IN_ROOM(ch), INTERACT_DIG)) {
+			sprintf(locbuf + strlen(locbuf), "%sdip", (*locbuf ? ", " : ""));
+		}
+		if (can_interact_room(IN_ROOM(ch), INTERACT_GATHER)) {
+			sprintf(locbuf + strlen(locbuf), "%sgarther", (*locbuf ? ", " : ""));
+		}
+		if (can_interact_room(IN_ROOM(ch), INTERACT_HARVEST)) {
+			sprintf(locbuf + strlen(locbuf), "%sharvest", (*locbuf ? ", " : ""));
+		}
+		if (can_interact_room(IN_ROOM(ch), INTERACT_PICK)) {
+			sprintf(locbuf + strlen(locbuf), "%spick", (*locbuf ? ", " : ""));
+		}
+		if (*locbuf) {
+			msg_to_char(ch, "Commands: &c%s&0\r\n", locbuf);
+		}
 	}
 	
 	// used from here on
