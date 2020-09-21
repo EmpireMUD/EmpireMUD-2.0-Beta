@@ -3404,7 +3404,6 @@ ACMD(do_plant) {
 		
 		// temporarily deplete seeded rooms
 		set_depletion(IN_ROOM(ch), DPLTN_FORAGE, config_get_int("short_depletion"));
-		set_depletion(IN_ROOM(ch), DPLTN_PICK, config_get_int("pick_depletion"));
 		
 		extract_obj(obj);
 		
