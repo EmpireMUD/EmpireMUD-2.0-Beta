@@ -4111,7 +4111,7 @@ int get_interaction_depletion_room(char_data *ch, empire_data *emp, room_data *r
 	}
 	
 	highest = get_interaction_depletion(ch, emp, GET_SECT_INTERACTIONS(SECT(room)), interaction_type, require_storable);
-	if ((cp = ROOM_CROP(room))) {
+	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
 		this = get_interaction_depletion(ch, emp, GET_CROP_INTERACTIONS(cp), interaction_type, require_storable);
 		highest = MAX(highest, this);
 	}
@@ -4426,7 +4426,7 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, vehicle_dat
 	}
 	
 	// crop second
-	if (!success && (crop = ROOM_CROP(room)) && (access_type == NOTHING || !ch || can_use_room(ch, room, access_type))) {
+	if (!success && ROOM_SECT_FLAGGED(room, SECTF_CROP) && (crop = ROOM_CROP(room)) && (access_type == NOTHING || !ch || can_use_room(ch, room, access_type))) {
 		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, inter_veh, func);
 	}
 	
