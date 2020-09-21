@@ -76,6 +76,7 @@
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern int get_north_for_char(char_data *ch);
 extern struct complex_room_data *init_complex_data();
+extern const bool interact_one_at_a_time[NUM_INTERACTS];
 const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
@@ -4046,6 +4047,80 @@ bool check_exclusion_set(struct interact_exclusion_data **set, char code, double
 	
 	// just in case
 	return FALSE;
+}
+
+
+/**
+* Gets the highest available depletion level amongst matching interactions in
+* the list. This mainly returns the highest 'quantity' from a
+* interact_one_at_a_time[] interaction, or else common_depletion.
+*
+* @param char_data *ch Optional: The actor, to determine interaction restrictions. (may be NULL)
+* @param empire_data *emp Optional: The empire, to determine interaction restrictions. (may be NULL)
+* @param struct interaction_item *list The list of interactions to check.
+* @param int interaction_type Any type, but interact_one_at_a_time types are the main purpose here.
+* @return int The depletion cap.
+*/
+int get_interaction_depletion(char_data *ch, empire_data *emp, struct interaction_item *list, int interaction_type, bool require_storable) {
+	struct interaction_item *interact;
+	obj_data *proto;
+	int highest = 0;
+	
+	if (!interact_one_at_a_time[interaction_type]) {
+		return config_get_int("common_depletion");
+	}
+	
+	// for one-at-a-time chores, look for the highest depletion
+	LL_FOREACH(list, interact) {
+		if (interact->type != interaction_type) {
+			continue;
+		}
+		if (require_storable && (!(proto = obj_proto(interact->vnum)) || !GET_OBJ_STORAGE(proto))) {
+			continue;	// MUST be storable
+		}
+		if (!meets_interaction_restrictions(interact->restrictions, ch, emp, NULL, NULL)) {
+			continue;
+		}
+		
+		// found valid interaction
+		if (interact->quantity > highest) {
+			highest = interact->quantity;
+		}
+	}
+	
+	return highest;
+}
+
+
+/**
+* Checks all the room interactions (crop etc) to find the highest depletion.
+* 
+*
+* @param char_data *ch Optional: The actor, to determine interaction restrictions. (may be NULL)
+* @param empire_data *emp Optional: The empire, to determine interaction restrictions. (may be NULL)
+* @param room_data *room The room whose sector/crop/building to check for interaction caps.
+* @param int interaction_type Any type, but interact_one_at_a_time types are the main purpose here.
+* @return int The depletion cap.
+*/
+int get_interaction_depletion_room(char_data *ch, empire_data *emp, room_data *room, int interaction_type, bool require_storable) {
+	crop_data *cp;
+	int this, highest = 0;
+	
+	if (!interact_one_at_a_time[interaction_type]) {
+		return config_get_int("common_depletion");	// shortcut
+	}
+	
+	highest = get_interaction_depletion(ch, emp, GET_SECT_INTERACTIONS(SECT(room)), interaction_type, require_storable);
+	if ((cp = ROOM_CROP(room))) {
+		this = get_interaction_depletion(ch, emp, GET_CROP_INTERACTIONS(cp), interaction_type, require_storable);
+		highest = MAX(highest, this);
+	}
+	if (GET_BUILDING(room)) {
+		this = get_interaction_depletion(ch, emp, GET_BLD_INTERACTIONS(GET_BUILDING(room)), interaction_type, require_storable);
+		highest = MAX(highest, this);
+	}
+	
+	return highest;
 }
 
 

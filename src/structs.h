@@ -2894,7 +2894,6 @@ struct gen_interact_data_t {
 	int timer;	// number of action ticks
 	int ptech;	// required ptech (may be NOTHING)
 	int depletion;	// DPLTN_ type (may be NOTHING)
-	char *depletion_config;	// an 'int' key for the config system like "common_depletion" (may be null)
 	char *approval_config;	// a 'bool' key for the config system like "gather_approval" (may be null)
 	struct {	// for all strings, index 0 is to-char and index 1 is to-room
 		char *start[2];	// shown at start-action

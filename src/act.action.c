@@ -89,7 +89,6 @@ void process_minting(char_data *ch);
 void process_morphing(char_data *ch);
 void process_music(char_data *ch);
 void process_panning(char_data *ch);
-void process_picking(char_data *ch);
 void process_planting(char_data *ch);
 void process_prospecting(char_data *ch);
 void process_reading(char_data *ch);
@@ -129,7 +128,7 @@ const struct action_data_struct action_data[] = {
 	{ "music", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC
 	{ "excavating", "is excavating a trench.", ACTF_HASTE | ACTF_FAST_CHORES | ACTF_FAST_EXCAVATE, process_excavating, NULL },	// ACT_EXCAVATING
 	{ "siring", "is hunched over.", NOBITS, process_siring, cancel_siring },	// ACT_SIRING
-	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_picking, NULL },	// ACT_PICKING
+	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_PICKING
 	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, cancel_morphing },	// ACT_MORPHING
 	{ "scraping", "is scraping something off.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_resource_list },	// ACT_SCRAPING
 	{ "bathing", "is bathing in the water.", NOBITS, process_bathing, NULL },	// ACT_BATHING
@@ -163,7 +162,7 @@ const struct action_data_struct action_data[] = {
 // INTERACT_x: interactions that are processed by do_gen_interact_room
 const struct gen_interact_data_t gen_interact_data[] = {
 	// { interact, action, command, verb, timer
-	//	ptech, depletion, depletion_config, approval_config
+	//	ptech, depletion, approval_config
 	//	{ { start-to-char, start-to-room }, { finish-to-char, finish-to-room },
 	//		empty-to-char
 	//		chance-of-random-tick-msg,
@@ -174,8 +173,18 @@ const struct gen_interact_data_t gen_interact_data[] = {
 	#define END_RANDOM_TICK_MSGS  { NULL, NULL }
 	#define NO_RANDOM_TICK_MSGS  { END_RANDOM_TICK_MSGS }
 	
+	{ INTERACT_PICK, ACT_PICKING, "pick", "picking", 4,
+		PTECH_PICK, DPLTN_PICK, "gather_approval",
+		{ /* start msg */ { "You start looking for something to pick.", "$n starts looking for something to pick." },
+		/* finish msg */ { "You find $p!", "$n finds $p!" },
+		/* empty msg */ "You can't find anything here left to pick.",
+		100, { // random tick messages:
+			{ "You look around for something nice to pick...", "$n looks around for something to pick." },
+			END_RANDOM_TICK_MSGS
+		}}
+	},
 	{ INTERACT_QUARRY, ACT_QUARRYING, "quarry", "quarrying", 12,
-		PTECH_QUARRY, DPLTN_QUARRY, "common_depletion", "gather_approval",
+		PTECH_QUARRY, DPLTN_QUARRY, "gather_approval",
 		{ /* start msg */ { "You begin to work the quarry.", "$n begins to work the quarry." },
 		/* finish msg */ { "You give the plug drill one final swing and pry loose $p!", "$n hits the plug drill hard with a hammer and pries loose $p!" },
 		/* empty msg */ "You don't seem to find anything of use.",
@@ -187,7 +196,7 @@ const struct gen_interact_data_t gen_interact_data[] = {
 		}}
 	},
 	
-	{ -1, -1, "\n", "\n", 0, NOTHING, NOTHING, NULL, NULL, { { NULL, NULL }, { NULL, NULL }, NULL, 0, NO_RANDOM_TICK_MSGS } }	// last
+	{ -1, -1, "\n", "\n", 0, NOTHING, NOTHING, NULL, { { NULL, NULL }, { NULL, NULL }, NULL, 0, NO_RANDOM_TICK_MSGS } }	// last
 };
 
 
@@ -776,19 +785,6 @@ void start_panning(char_data *ch, int dir) {
 }
 
 
-/**
-* begins the "pick" action
-*
-* @param char_data *ch The prospective picker.
-*/
-void start_picking(char_data *ch) {
-	int pick_base_timer = config_get_int("pick_base_timer");
-	
-	start_action(ch, ACT_PICKING, pick_base_timer);
-	send_to_char("You begin looking around.\r\n", ch);
-}
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// ACTION FINISHERS ////////////////////////////////////////////////////////
 
@@ -1117,53 +1113,6 @@ INTERACTION_FUNC(finish_panning) {
 		
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
 		act(cust ? cust : "$n finds $p!", FALSE, ch, obj, NULL, TO_ROOM);
-	}
-	
-	return TRUE;
-}
-
-
-INTERACTION_FUNC(finish_picking) {
-	obj_data *obj = NULL;
-	room_data *in_room = IN_ROOM(ch);
-	obj_vnum vnum = interaction->vnum;
-	int iter, num = interaction->quantity;
-	char *cust;
-
-	// give objs
-	for (iter = 0; iter < num; ++iter) {
-		obj = read_object(vnum, TRUE);
-		scale_item_to_level(obj, 1);	// minimum level
-		obj_to_char_or_room(obj, ch);
-		add_depletion(inter_room, DPLTN_PICK, TRUE);
-		load_otrigger(obj);
-	}
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), vnum, num);
-	}
-	
-	if (obj) {
-		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
-		if (num > 1) {
-			sprintf(buf, "%s (x%d)", cust ? cust : "You find $p!", num);
-			act(buf, FALSE, ch, obj, 0, TO_CHAR);
-		}
-		else {
-			act(cust ? cust : "You find $p!", FALSE, ch, obj, 0, TO_CHAR);
-		}
-		
-		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
-		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
-	}
-	else {
-		msg_to_char(ch, "You find nothing.\r\n");
-	}
-		
-	// re-start
-	if (in_room == IN_ROOM(ch) && IS_OUTDOORS(ch)) {
-		start_picking(ch);
 	}
 	
 	return TRUE;
@@ -2371,69 +2320,6 @@ void process_panning(char_data *ch) {
 
 
 /**
-* Tick updates for picking.
-*
-* @param char_data *ch The picker.
-*/
-void process_picking(char_data *ch) {	
-	bool found = FALSE;
-	
-	int garden_depletion = config_get_int("garden_depletion");
-	int pick_depletion = config_get_int("pick_depletion");
-	
-	if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't pick anything in an incomplete building.\r\n");
-		cancel_action(ch);
-		return;
-	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to pick anything.\r\n");
-		cancel_action(ch);
-		return;
-	}
-	if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You aren't allowed to pick anything here.\r\n");
-		cancel_action(ch);
-		return;
-	}
-	
-	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-		send_to_char("You look around for something nice to pick...\r\n", ch);
-	}
-	// no room message
-
-	// decrement
-	GET_ACTION_TIMER(ch) -= 1;
-		
-	if (GET_ACTION_TIMER(ch) <= 0) {
-		GET_ACTION(ch) = ACT_NONE;
-		
-		if (get_depletion(IN_ROOM(ch), DPLTN_PICK, FALSE) >= (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CROP) ? pick_depletion : (IS_ANY_BUILDING(IN_ROOM(ch)) ? garden_depletion : config_get_int("common_depletion")))) {
-			msg_to_char(ch, "You can't find anything here left to pick.\r\n");
-			act("$n stops looking for things to pick as $e comes up empty-handed.", TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-		else {
-			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_PICK, NULL, GUESTS_ALLOWED, finish_picking)) {
-				gain_player_tech_exp(ch, PTECH_PICK, 10);
-				found = TRUE;
-			}
-			else if (can_interact_room(IN_ROOM(ch), INTERACT_HARVEST) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD))) {
-				// only orchards allow pick -- and only run this if we hit no herbs at all
-				if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, NULL, GUESTS_ALLOWED, finish_picking)) {
-					gain_player_tech_exp(ch, PTECH_PICK, 10);
-					found = TRUE;
-				}
-			}
-			
-			if (!found) {
-				msg_to_char(ch, "You couldn't find anything to pick here.\r\n");
-			}
-		}
-	}
-}
-
-
-/**
 * Tick update for plant action.
 *
 * @param char_data *ch The planter.
@@ -3436,42 +3322,6 @@ ACMD(do_pan) {
 }
 
 
-ACMD(do_pick) {
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot pick.\r\n");
-	}
-	else if (GET_ACTION(ch) == ACT_PICKING) {
-		send_to_char("You stop searching.\r\n", ch);
-		act("$n stops looking around.", TRUE, ch, 0, 0, TO_ROOM);
-		cancel_action(ch);
-	}
-	else if (!has_player_tech(ch, PTECH_PICK)) {
-		msg_to_char(ch, "You don't have the correct ability to pick anything.\r\n");
-	}
-	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
-		send_config_msg(ch, "need_approval_string");
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		send_to_char("You're already busy.\r\n", ch);
-	}
-	else if (!IS_OUTDOORS(ch)) {
-		send_to_char("You can only pick things outdoors!\r\n", ch);
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to pick anything here.\r\n");
-	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't pick anything in an incomplete building.\r\n");
-	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to pick anything here.\r\n");
-	}
-	else {
-		start_picking(ch);
-	}
-}
-
-
 ACMD(do_plant) {
 	extern const char *climate_flags[];
 	extern const bitvector_t climate_flags_order[];
@@ -3876,7 +3726,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 			can_room_but_no_permit = TRUE;	// error later
 		}
-		else if (data->depletion != NOTHING && data->depletion_config && *(data->depletion_config) && get_depletion(room, data->depletion, FALSE) >= config_get_int(data->depletion_config)) {
+		else if (data->depletion && get_depletion(room, data->depletion, FALSE) >= get_interaction_depletion_room(ch, GET_LOYALTY(ch), room, data->interact, FALSE)) {
 			can_room_but_depleted = TRUE;	// error later
 		}
 		else {
@@ -3894,7 +3744,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 			can_veh_but_no_permit = veh;
 			continue;
 		}
-		else if (data->depletion != NOTHING && data->depletion_config && *(data->depletion_config) && get_vehicle_depletion(veh, data->depletion, FALSE) >= config_get_int(data->depletion_config)) {
+		else if (data->depletion != NOTHING && get_vehicle_depletion(veh, data->depletion, FALSE) >= get_interaction_depletion(ch, GET_LOYALTY(ch), VEH_INTERACTIONS(veh), data->interact, FALSE)) {
 			can_veh_but_depleted = veh;
 			continue;
 		}
@@ -4075,7 +3925,7 @@ void process_gen_interact_room(char_data *ch) {
 			in_room = IN_ROOM(ch);
 			
 			if (data->ptech) {
-				gain_player_tech_exp(ch, data->ptech, 25);
+				gain_player_tech_exp(ch, data->ptech, 10);
 			}
 			
 			// character is still there? repeat

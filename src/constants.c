@@ -3966,7 +3966,7 @@ const char *global_flags[] = {
 };
 
 
-// INTERACT_x (1/3): names of interactions
+// INTERACT_x (1/4): names of interactions
 const char *interact_types[] = {
 	"BUTCHER",	// 0
 	"SKIN",
@@ -4005,7 +4005,7 @@ const char *interact_types[] = {
 };
 
 
-// INTERACT_x (2/3): what type of thing has this interaction
+// INTERACT_x (2/4): what type of thing has this interaction
 const int interact_attach_types[NUM_INTERACTS] = {
 	TYPE_MOB,
 	TYPE_MOB,
@@ -4043,7 +4043,7 @@ const int interact_attach_types[NUM_INTERACTS] = {
 };
 
 
-// INTERACT_x (3/3): type of thing represented by interact->vnum
+// INTERACT_x (3/4): type of thing represented by interact->vnum
 const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_OBJ,
 	TYPE_OBJ,
@@ -4078,6 +4078,46 @@ const byte interact_vnum_types[NUM_INTERACTS] = {
 	TYPE_VEH,	// RUINS-TO-VEH
 	TYPE_OBJ,	// PRODUCTION
 	TYPE_OBJ,	// SKILLED-LABOR
+};
+
+
+// INTERACT_x (4/4): some interactions give you 1 at a time and use 'quantity' as their depletion cap
+// WARNING: Currently, only actions performed through do_gen_interact_room() or workforce support this.
+// Conceptually, this will ONLY work for room/vehicle interactions unless you put depletions/counters on objects and mobs.
+const bool interact_one_at_a_time[NUM_INTERACTS] = {
+	FALSE,	// BUTCHER  -- definitely cannot support this
+	FALSE,	// SKIN  -- definitely cannot support this
+	FALSE,	// SHEAR  -- definitely cannot support this
+	FALSE,	// BARDE  -- definitely cannot support this
+	FALSE,	// LOOT  -- definitely cannot support this
+	FALSE,	// DIG
+	FALSE,	// FORAGE
+	TRUE,	// PICK
+	FALSE,	// HARVEST  -- PROBABLY cannot support this
+	FALSE,	// GATHER
+	FALSE,	// ENCOUNTER  -- definitely cannot support this
+	FALSE,	// LIGHT  -- definitely cannot support this
+	FALSE,	// PICKPOCKET  -- definitely cannot support this
+	FALSE,	// MINE  -- definitely cannot support this
+	FALSE,	// COMBINE  -- definitely cannot support this
+	FALSE,	// SEPARATE  -- definitely cannot support this
+	FALSE,	// SCRAPE  -- definitely cannot support this
+	FALSE,	// SAW  -- definitely cannot support this
+	FALSE,	// TAN  -- definitely cannot support this
+	FALSE,	// CHIP  -- definitely cannot support this
+	FALSE,	// CHOP
+	FALSE,	// FISH
+	FALSE,	// PAN
+	FALSE,	// QUARRY
+	FALSE,	// TAME  -- definitely cannot support this
+	FALSE,	// SEED  -- definitely cannot support this
+	FALSE,	// DECAYS_TO  -- definitely cannot support this
+	FALSE,	// CONSUMES_TO  -- definitely cannot support this
+	FALSE,	// IDENTIFIES_TO  -- definitely cannot support this
+	FALSE,	// RUINS_TO_BLD  -- definitely cannot support this
+	FALSE,	// RUINS_TO_VEH  -- definitely cannot support this
+	TRUE,	// PRODUCTION
+	TRUE,	// SKILLED_LABOR
 };
 
 
