@@ -4410,6 +4410,8 @@ bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch) {
+	extern const bool interact_one_at_a_time[NUM_INTERACTS];
+	
 	struct interaction_item *iter;
 	bool problem = FALSE;
 	int code, type, max_quantity = 0;
@@ -4434,7 +4436,7 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 		}
 		
 		// store quantity for later except chores that are often high
-		if (iter->type != INTERACT_PRODUCTION && iter->type != INTERACT_SKILLED_LABOR) {
+		if (!interact_one_at_a_time[iter->type]) {
 			max_quantity = MAX(max_quantity, iter->quantity);
 		}
 		
