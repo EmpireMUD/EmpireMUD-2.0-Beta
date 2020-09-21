@@ -214,10 +214,9 @@ Crops (CROPEDIT):
 - The map region only matters if the crop grows in the wild (no !WILD flag).
 - Crops should have a FORAGE interaction for a small single food item.
 - Crops should have a HARVEST interaction for a plantable large item.
-- The HARVEST interaction on orchards actually uses the pick command. You
-  should usually use a 1x item for this interaction.
-- Orchard crops need a CHOP interaction if they will give trees. Orchards are
-  still choppable without this, though.
+- Use the PICK interaction on orchards, with quantity equal to the depletion
+  limit, and the HARVEST interaction everything else with normal quantities.
+- Orchard crops need a CHOP interaction if they will give trees.
 - Players foraging on any tile have a chance to find the forage item from any
   wild crop in the area, if they get nothing back from the sector's own forage
   list.
@@ -2886,7 +2885,7 @@ Crop flags determine some various properties about crops.
 
 Available flags:
  REQUIRES-WATER - Can only be planted within 4 tiles of fresh water
- ORCHARD - Uses 'pick' instead of 'harvest', shows the orchard commands list, can be chopped down
+ ORCHARD - Uses 'pick' instead of 'harvest'
  !WILD - Won't spawn in the wild
  NEWBIE-ONLY - Only spawns on newbie islands (can be planted anywhere)
  !NEWBIE - Does not spawn on newbie islands
@@ -4341,7 +4340,7 @@ Room/vehicle interaction types:
    gets nothing from a sector's forage list, they may also receive a forage
    item from any wild crop that grows in the area.
  &cPICK&0 - Items found when picking.
- &cHARVEST&0 - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
+ &cHARVEST&0 - Items received when harvesting a crop.
  &cGATHER&0 - Items received from the gather action.
  &cENCOUNTER&0 - Hostile mob loaded when a random encounter triggers.
  &cCHOP&0 - Things that can be found when chopping here.
@@ -5914,7 +5913,7 @@ detail of a crop, including what it produces.
 
 You should set the FORAGE and HARVEST interactions on a crop, usually with a
 1x quantity and 100% chance. Orchard-type crops should also usually have a
-GATHER interaction.
+GATHER interaction and use PICK instead of HARVEST.
 
 All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on any of these commands by typing:
@@ -6899,10 +6898,8 @@ The commands list is usually put in alphabetic order to look cleaner and less
 scattered. The whole list is displayed in cyan, so you should not include any
 color codes in the commands list.
 
-For sectors with the CROP flag combined with a crop with the ORCHARD flag,
-the orchard command list is shown instead of the default. For all other crops,
-the sector's command list is used. For buildings, the commands list from the
-building data is used instead.
+Crop tiles will auto-generate their command lists if no sector commands are
+set. For buildings, the commands list from the building data is used instead.
 
 See also: OLC SECTORS
 #d
