@@ -108,10 +108,6 @@ bool audit_crop(crop_data *cp, char_data *ch) {
 		olc_audit_msg(ch, GET_CROP_VNUM(cp), "Climate not set");
 		problem = TRUE;
 	}
-	if (!GET_CROP_SPAWNS(cp)) {
-		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No spawns set");
-		problem = TRUE;
-	}
 	
 	if (!has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST) && !has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_PICK)) {
 		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No HARVEST or PICK");

@@ -4414,7 +4414,7 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 	
 	struct interaction_item *iter;
 	bool problem = FALSE;
-	int code, type, max_quantity = 0;
+	int code, type, max_quantity = 0, min_q_1_at_a_time = -1;
 	
 	struct audint_t {
 		int code;
@@ -4438,6 +4438,9 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 		// store quantity for later except chores that are often high
 		if (!interact_one_at_a_time[iter->type]) {
 			max_quantity = MAX(max_quantity, iter->quantity);
+		}
+		else if (min_q_1_at_a_time == -1 || min_q_1_at_a_time > iter->quantity) {
+			min_q_1_at_a_time = iter->quantity;
 		}
 		
 		// track cumulative percent
@@ -4476,6 +4479,10 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 	
 	if (max_quantity > 10) {
 		olc_audit_msg(ch, vnum, "Interaction has unusually high quantity %d", max_quantity);
+		problem = TRUE;
+	}
+	if (min_q_1_at_a_time != -1 && min_q_1_at_a_time < 10) {
+		olc_audit_msg(ch, vnum, "One-at-a-time interaction has unusually low quantity %d", min_q_1_at_a_time);
 		problem = TRUE;
 	}
 	
