@@ -89,10 +89,12 @@ void clear_delayed_update(char_data *ch);
 void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
 void free_varlist(struct trig_var_data *vd);
+void remove_dropped_item_list(empire_data *emp, obj_data *list);
 void scale_item_to_level(obj_data *obj, int level);
 void update_member_data(char_data *ch);
 
 // locals
+void add_dropped_item_list(empire_data *emp, obj_data *list);
 static void add_obj_binding(int idnum, struct obj_binding **list);
 struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 void die_follower(char_data *ch);
@@ -3086,7 +3088,7 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 //// EMPIRE DROPPED ITEM HANDLERS ////////////////////////////////////////////
 
 /**
-* Adds 1 to the dropped-item count for the empire.
+* Adds 1 to the dropped-item count for the empire. Cascades to contained objs.
 *
 * @param empire_data *emp The empire.
 * @param obj_data *obj The dropped item.
@@ -3101,6 +3103,10 @@ void add_dropped_item(empire_data *emp, obj_data *obj) {
 		HASH_ADD_INT(EMPIRE_DROPPED_ITEMS(emp), vnum, edi);
 	}
 	++edi->count;
+	
+	if (obj->contains) {
+		add_dropped_item_list(emp, obj->contains);
+	}
 }
 
 
@@ -3120,10 +3126,10 @@ void add_dropped_item_anywhere(obj_data *obj, empire_data *only_if_emp) {
 	}
 	
 	if (top->in_vehicle && VEH_OWNER(top->in_vehicle) && (!only_if_emp || VEH_OWNER(top->in_vehicle) == only_if_emp)) {
-		add_dropped_item(VEH_OWNER(top->in_vehicle), top);
+		add_dropped_item(VEH_OWNER(top->in_vehicle), obj);
 	}
 	else if (IN_ROOM(top) && ROOM_OWNER(IN_ROOM(top)) && (!only_if_emp || ROOM_OWNER(IN_ROOM(top)) == only_if_emp)) {
-		add_dropped_item(ROOM_OWNER(IN_ROOM(top)), top);
+		add_dropped_item(ROOM_OWNER(IN_ROOM(top)), obj);
 	}
 }
 
@@ -3200,15 +3206,14 @@ void refresh_empire_dropped_items(empire_data *only_emp) {
 		else if (IN_ROOM(obj) && ROOM_OWNER(IN_ROOM(obj)) && (!only_emp || ROOM_OWNER(IN_ROOM(obj)) == only_emp)) {
 			add_dropped_item(ROOM_OWNER(IN_ROOM(obj)), obj);
 		}
-		else {	// try to un-nest it
-			add_dropped_item_anywhere(obj, only_emp);
-		}
+		// only items directly in these places are added; everything else is hit by the cascade
 	}
 }
 
 
 /**
-* Removes 1 from the dropped-item count for the empire.
+* Removes 1 from the dropped-item count for the empire. Cascades to contained
+* items.
 *
 * @param empire_data *emp The empire.
 * @param obj_data *obj The dropped item.
@@ -3223,6 +3228,32 @@ void remove_dropped_item(empire_data *emp, obj_data *obj) {
 			HASH_DEL(EMPIRE_DROPPED_ITEMS(emp), edi);
 			free(edi);
 		}
+	}
+	if (obj->contains) {
+		remove_dropped_item_list(emp, obj->contains);
+	}
+}
+
+
+/**
+* For objects that might be nested inside something, finds the top owner and
+* removes from the dropped-items count.
+*
+* @param obj_data *obj The object.
+*/
+void remove_dropped_item_anywhere(obj_data *obj) {
+	obj_data *top = obj;
+	
+	// un-nest
+	while (top->in_obj) {
+		top = top->in_obj;
+	}
+	
+	if (top->in_vehicle && VEH_OWNER(top->in_vehicle)) {
+		remove_dropped_item(VEH_OWNER(top->in_vehicle), obj);
+	}
+	else if (IN_ROOM(top) && ROOM_OWNER(IN_ROOM(top))) {
+		remove_dropped_item(ROOM_OWNER(IN_ROOM(top)), obj);
 	}
 }
 
