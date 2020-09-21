@@ -37,6 +37,7 @@
 */
 
 // external vars
+extern const bool interact_one_at_a_time[NUM_INTERACTS];
 extern const char *tool_flags[];
 
 // external funcs
@@ -3811,15 +3812,17 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 	char buf[MAX_STRING_LENGTH];
 	obj_data *obj = NULL;
 	char *cust;
-	int num;
+	int num, amount;
 	
 	// safety check
 	if (!data) {
 		return FALSE;
 	}
 	
+	amount = interact_one_at_a_time[interaction->type] ? 1 : interaction->quantity;
+	
 	// give items
-	for (num = 0; num < interaction->quantity; ++num) {
+	for (num = 0; num < amount; ++num) {
 		obj = read_object(interaction->vnum, TRUE);
 		scale_item_to_level(obj, 1);	// minimum level
 		obj_to_char_or_room(obj, ch);
@@ -3828,7 +3831,7 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 	
 	// mark gained
 	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, amount);
 	}
 	
 	// check depletion
@@ -3844,8 +3847,8 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 	if (obj) {
 		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
 		if (cust || data->msg.finish[0]) {
-			if (interaction->quantity > 1) {
-				sprintf(buf, "%s (x%d)", cust ? cust : data->msg.finish[0], interaction->quantity);
+			if (amount > 1) {
+				sprintf(buf, "%s (x%d)", cust ? cust : data->msg.finish[0], amount);
 			}
 			else {
 				strcpy(buf, cust ? cust : data->msg.finish[0]);
