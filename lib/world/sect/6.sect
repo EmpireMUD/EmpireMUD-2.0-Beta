@@ -42,13 +42,15 @@ D4
 &C~
 E
 4 0 0.40 602
-I 5 103 2.00 1 d  # DIG: a yellow lightning stone
-I 5 104 2.00 1 d  # DIG: a red bloodstone
-I 5 1300 2.00 1 d  # DIG: a glowing green seashell
-I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
-I 5 102 9.00 1 d  # DIG: a flint stone
-I 5 100 83.00 1 d  # DIG: a rock
-I 6 606 100.00 1  # FORAGE: a handful of elderberries
+E
+22 0 50.00 605
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
 M
 602 100.00 d
 S
@@ -86,14 +88,16 @@ E
 0 0 100.00 601
 E
 4 0 0.40 603
-I 5 103 2.00 1 d  # DIG: a yellow lightning stone
-I 5 104 2.00 1 d  # DIG: a red bloodstone
-I 5 1300 2.00 1 d  # DIG: a glowing green seashell
-I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
-I 5 102 9.00 1 d  # DIG: a flint stone
-I 5 100 83.00 1 d  # DIG: a rock
-I 6 606 100.00 1  # FORAGE: a handful of elderberries
-I 20 603 100.00 1  # CHOP: an enchanted tree
+E
+22 0 50.00 605
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 20 603 100.00 1  # CHOP: enchanted tree
 M
 9151 3.33 c
 M
@@ -163,14 +167,16 @@ E
 17 40 0.10 602
 E
 17 50 0.10 602
-I 5 103 2.00 1 d  # DIG: a yellow lightning stone
-I 5 104 2.00 1 d  # DIG: a red bloodstone
-I 5 1300 2.00 1 d  # DIG: a glowing green seashell
-I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
-I 5 102 9.00 1 d  # DIG: a flint stone
-I 5 100 83.00 1 d  # DIG: a rock
-I 6 606 100.00 1  # FORAGE: a handful of elderberries
-I 20 603 100.00 1  # CHOP: an enchanted tree
+E
+22 0 50.00 605
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 20 603 100.00 1  # CHOP: enchanted tree
 M
 602 100.00 d
 M
@@ -394,14 +400,16 @@ E
 17 40 0.30 602
 E
 17 50 0.30 602
-I 5 103 2.00 1 d  # DIG: a yellow lightning stone
-I 5 104 2.00 1 d  # DIG: a red bloodstone
-I 5 1300 2.00 1 d  # DIG: a glowing green seashell
-I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
-I 5 102 9.00 1 d  # DIG: a flint stone
-I 5 100 83.00 1 d  # DIG: a rock
-I 6 606 100.00 1  # FORAGE: a handful of elderberries
-I 20 603 100.00 1  # CHOP: an enchanted tree
+E
+22 0 50.00 605
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 20 603 100.00 1  # CHOP: enchanted tree
 M
 602 100.00 d
 M
@@ -479,10 +487,10 @@ E
 4 0 0.80 1
 E
 9 0 50.00 3
-I 5 102 9.00 1 d  # DIG: a flint stone
-I 5 100 91.00 1 d  # DIG: a rock
-I 6 3015 75.00 1  # FORAGE: some red berries
-I 20 605 100.00 3 c  # CHOP: a pile of dead wood
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 91.00 1 d  # DIG: rock
+I 6 3015 75.00 1  # FORAGE: red berries
+I 20 605 100.00 3 c  # CHOP: pile of dead wood
 S
 #610
 Weirdwood Saplings~
@@ -549,13 +557,15 @@ D4
 &y~
 E
 4 0 0.40 612
-I 5 103 2.00 1 d  # DIG: a yellow lightning stone
-I 5 104 2.00 1 d  # DIG: a red bloodstone
-I 5 1300 2.00 1 d  # DIG: a glowing green seashell
-I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
-I 5 102 9.00 1 d  # DIG: a flint stone
-I 5 100 83.00 1 d  # DIG: a rock
-I 6 606 100.00 1  # FORAGE: a handful of elderberries
+E
+22 0 50.00 615
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
 M
 602 100.00 d
 S
@@ -593,14 +603,16 @@ E
 0 0 100.00 611
 E
 4 0 0.40 613
-I 5 103 2.00 1 d  # DIG: a yellow lightning stone
-I 5 104 2.00 1 d  # DIG: a red bloodstone
-I 5 1300 2.00 1 d  # DIG: a glowing green seashell
-I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
-I 5 102 9.00 1 d  # DIG: a flint stone
-I 5 100 83.00 1 d  # DIG: a rock
-I 6 606 100.00 1  # FORAGE: a handful of elderberries
-I 20 618 100.00 1  # CHOP: a weirdwood tree
+E
+22 0 50.00 615
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 20 618 100.00 1  # CHOP: weirdwood tree
 M
 602 100.00 d
 M
@@ -734,14 +746,16 @@ E
 17 51 0.10 612
 E
 17 70 0.10 612
-I 5 103 2.00 1 d  # DIG: a yellow lightning stone
-I 5 104 2.00 1 d  # DIG: a red bloodstone
-I 5 1300 2.00 1 d  # DIG: a glowing green seashell
-I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
-I 5 102 9.00 1 d  # DIG: a flint stone
-I 5 100 83.00 1 d  # DIG: a rock
-I 6 606 100.00 1  # FORAGE: a handful of elderberries
-I 20 618 100.00 1  # CHOP: a weirdwood tree
+E
+22 0 50.00 615
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 20 618 100.00 1  # CHOP: weirdwood tree
 M
 602 100.00 d
 M
@@ -923,14 +937,16 @@ E
 17 70 0.30 612
 E
 17 21 0.50 616
-I 5 103 2.00 1 d  # DIG: a yellow lightning stone
-I 5 104 2.00 1 d  # DIG: a red bloodstone
-I 5 1300 2.00 1 d  # DIG: a glowing green seashell
-I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
-I 5 102 9.00 1 d  # DIG: a flint stone
-I 5 100 83.00 1 d  # DIG: a rock
-I 6 606 100.00 1  # FORAGE: a handful of elderberries
-I 20 618 100.00 1  # CHOP: a weirdwood tree
+E
+22 0 50.00 615
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 20 618 100.00 1  # CHOP: weirdwood tree
 M
 602 100.00 d
 M
@@ -1012,10 +1028,10 @@ E
 4 0 0.80 25
 E
 9 0 50.00 26
-I 5 102 9.00 1 d  # DIG: a flint stone
-I 5 100 91.00 1 d  # DIG: a rock
-I 6 3016 75.00 1  # FORAGE: a handful of dates
-I 20 605 100.00 3 c  # CHOP: a pile of dead wood
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 91.00 1 d  # DIG: rock
+I 6 3016 75.00 1  # FORAGE: handful of dates
+I 20 605 100.00 3 c  # CHOP: pile of dead wood
 S
 #616
 Enchanted Oasis~
@@ -1037,21 +1053,23 @@ D4
 &y~
 E
 10 614 5.00 21
-I 5 103 2.00 1 d  # DIG: a yellow lightning stone
-I 5 104 2.00 1 d  # DIG: a red bloodstone
-I 5 1300 2.00 1 d  # DIG: a glowing green seashell
-I 5 1206 2.00 1 d  # DIG: an iridescent blue iris
-I 5 102 9.00 1 d  # DIG: a flint stone
-I 5 100 83.00 1 d  # DIG: a rock
-I 6 606 100.00 1  # FORAGE: a handful of elderberries
-I 7 103 2.00 1 p  # PICK: a yellow lightning stone
-I 7 104 2.00 1 p  # PICK: a red bloodstone
-I 7 1206 2.00 1 p  # PICK: an iridescent blue iris
-I 7 1300 2.00 1 p  # PICK: a glowing green seashell
-I 7 1203 100.00 1 p  # PICK: some magewhisper sepals
+E
+22 0 50.00 21
+I 5 103 2.00 1 d  # DIG: yellow lightning stone
+I 5 104 2.00 1 d  # DIG: red bloodstone
+I 5 1300 2.00 1 d  # DIG: glowing green seashell
+I 5 1206 2.00 1 d  # DIG: iridescent blue iris
+I 5 102 9.00 1 d  # DIG: flint stone
+I 5 100 83.00 1 d  # DIG: rock
+I 6 606 100.00 1  # FORAGE: handful of elderberries
+I 7 103 2.00 125 p  # PICK: yellow lightning stone
+I 7 104 2.00 125 p  # PICK: red bloodstone
+I 7 1206 2.00 125 p  # PICK: iridescent blue iris
+I 7 1300 2.00 125 p  # PICK: glowing green seashell
+I 7 1203 100.00 125 p  # PICK: magewhisper sepals
 I+ 0 70  # Ability: Find Herbs
-I 7 123 100.00 1 p  # PICK: a small flower
-I 20 618 100.00 1  # CHOP: a weirdwood tree
+I 7 123 100.00 125 p  # PICK: small flower
+I 20 618 100.00 1  # CHOP: weirdwood tree
 M
 602 100.00 d
 M

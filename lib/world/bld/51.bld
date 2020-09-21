@@ -454,7 +454,7 @@ F
 f
 I 5 102 9.00 1 X  # DIG: flint stone
 I 5 100 100.00 1 X  # DIG: rock
-I 23 105 100.00 1  # QUARRY: huge stone block
+I 23 105 100.00 125  # QUARRY: huge stone block
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 I 31 105 10.00 125  # PRODUCTION: huge stone block
 R
@@ -1566,7 +1566,7 @@ A Terraced Garden~
 0 0 0 -1
 C
 pick~
-I 7 1202 100.00 1  # PICK: twig of redthorn
+I 7 1202 100.00 440  # PICK: twig of redthorn
 I 32 1202 100.00 440  # SKILLED-LABOR: twig of redthorn
 R
 6000 1 1 0
@@ -1581,7 +1581,7 @@ A Garden Made of Rafts~
 0 0 0 -1
 C
 pick~
-I 7 1205 100.00 1  # PICK: bileberries
+I 7 1205 100.00 440  # PICK: bileberries
 I 32 1205 100.00 440  # SKILLED-LABOR: bileberries
 R
 6000 1 1 0
@@ -1596,8 +1596,8 @@ An Oasis Garden~
 0 0 0 -1
 C
 pick~
-I 7 1204 50.00 1 X  # PICK: daggerbite frond
-I 7 1203 50.00 1 X  # PICK: magewhisper sepals
+I 7 1204 50.00 440 X  # PICK: daggerbite frond
+I 7 1203 50.00 440 X  # PICK: magewhisper sepals
 I 32 1204 50.00 440 s  # SKILLED-LABOR: daggerbite frond
 I 32 1203 50.00 440 s  # SKILLED-LABOR: magewhisper sepals
 R
@@ -1613,7 +1613,7 @@ An Estuary Garden~
 0 0 0 -1
 C
 pick~
-I 7 1200 100.00 1  # PICK: handful of whitegrass
+I 7 1200 100.00 440  # PICK: handful of whitegrass
 I 32 1200 100.00 440  # SKILLED-LABOR: handful of whitegrass
 R
 6000 1 1 0
@@ -1628,7 +1628,7 @@ A Shady Garden~
 0 0 0 -1
 C
 pick~
-I 7 1201 100.00 1  # PICK: sack of fiveleaf
+I 7 1201 100.00 440  # PICK: sack of fiveleaf
 I 32 1201 100.00 440  # SKILLED-LABOR: sack of fiveleaf
 R
 6000 1 1 0
