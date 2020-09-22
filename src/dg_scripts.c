@@ -62,7 +62,6 @@ void check_for_eligible_goals(empire_data *emp);	// progress.c
 extern int count_harnessed_animals(vehicle_data *veh);
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
 extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct instance_data *get_instance_for_script(int go_type, void *go);
 extern char *get_room_name(room_data *room, bool color);
@@ -5144,7 +5143,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, function_flags, FALSE);
 							if (pos != NOTHING) {
-								snprintf(str, slen, "%d", room_has_function_and_city_ok(r, BIT(pos)) ? 1 : 0);
+								snprintf(str, slen, "%d", room_has_function_and_city_ok(NULL, r, BIT(pos)) ? 1 : 0);
 							}
 							else {
 								snprintf(str, slen, "0");
@@ -5622,6 +5621,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "level")) {
 						snprintf(str, slen, "%d", VEH_SCALE_LEVEL(v));
 					}
+					else if (!str_cmp(field, "link_instance")) {
+						struct instance_data *inst;
+						if (VEH_INSTANCE_ID(v) != NOTHING) {
+							VEH_INSTANCE_ID(v) = NOTHING;
+						}
+						if ((inst = find_instance_by_room(IN_ROOM(v), FALSE, TRUE))) {
+							VEH_INSTANCE_ID(v) = inst->id;
+						}
+						*str = '\0';
+					}
 					break;
 				}
 				case 'm': {	// veh.m*
@@ -5684,6 +5693,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						while (VEH_ANIMALS(v)) {
 							unharness_mob_from_vehicle(VEH_ANIMALS(v), v);
 						}
+						*str = '\0';
+					}
+					else if (!str_cmp(field, "unlink_instance")) {
+						VEH_INSTANCE_ID(v) = NOTHING;
 						*str = '\0';
 					}
 					break;
@@ -6806,6 +6819,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 	char arg[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH];
 	char uid[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	struct instance_data *inst;
+	vehicle_data *veh;
 	char_data *mob;
 
 	*uid = '\0';
@@ -6935,8 +6949,8 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 					}
 					break;
 				case VEH_TRIGGER: {
-					r = IN_ROOM((vehicle_data*)go);
-					if (*name == 'i' && isdigit(*(name+1)) && (inst = find_instance_by_room(r, FALSE, TRUE))) {
+					veh = (vehicle_data*)go;
+					if (*name == 'i' && isdigit(*(name+1)) && VEH_INSTANCE_ID(veh) != NOTHING && (inst = get_instance_by_id(VEH_INSTANCE_ID(veh)))) {
 						// instance lookup
 						r = find_room_template_in_instance(inst, atoi(name+1));
 					}

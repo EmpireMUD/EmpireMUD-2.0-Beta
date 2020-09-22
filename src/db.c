@@ -723,7 +723,6 @@ void add_trd_owner(room_vnum vnum, empire_vnum owner) {
 * startup and should also be called any time a building is deleted.
 */
 void check_for_bad_buildings(void) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	void unlink_instance_entrance(room_data *room, bool run_cleanup);
 	extern const char *bld_relationship_types[];
 
@@ -1970,6 +1969,7 @@ const char *versions_list[] = {
 	"b5.102",
 	"b5.103",
 	"b5.104",
+	"b5.105",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -2674,7 +2674,7 @@ void b5_1_global_update(void) {
 		}
 		
 		// delete 'em
-		LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 			if (INST_ADVENTURE(inst) == adv) {
 				delete_instance(inst, FALSE);
 			}
@@ -3197,7 +3197,7 @@ void b5_34_mega_update(void) {
 	}
 	
 	// remove all instances of adventure 50 (was shut off by this patch)
-	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		if (INST_ADVENTURE(inst) && GET_ADV_VNUM(INST_ADVENTURE(inst)) == 50) {
 			delete_instance(inst, TRUE);
 		}
@@ -3339,7 +3339,7 @@ void b5_37_progress_update(void) {
 	}
 	
 	// remove all instances of adventure 12600 (force respawn to attach trigger)
-	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		if (INST_ADVENTURE(inst) && GET_ADV_VNUM(INST_ADVENTURE(inst)) == 12600) {
 			delete_instance(inst, TRUE);
 		}
@@ -3354,7 +3354,7 @@ void b5_38_grove_update(void) {
 	log("Applying b5.38 update...");
 	
 	// remove all instances of adventure 100 (it's now in-dev)
-	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		if (INST_ADVENTURE(inst) && GET_ADV_VNUM(INST_ADVENTURE(inst)) == 100) {
 			delete_instance(inst, TRUE);
 		}
@@ -3448,7 +3448,7 @@ void b5_47_mine_update(void) {
 	
 	// clear mines
 	LL_FOREACH(land_map, tile) {
-		if (!(room = real_real_room(tile->vnum)) || !room_has_function_and_city_ok(room, FNC_MINE)) {
+		if (!(room = real_real_room(tile->vnum)) || !room_has_function_and_city_ok(ROOM_OWNER(room), room, FNC_MINE)) {
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_GLB_VNUM);
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT);
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
@@ -4475,6 +4475,32 @@ void b5_104_update(void) {
 }
 
 
+// b5.105 modifies workforce configs due to chore changes
+void b5_105_update(void) {
+	void set_workforce_limit_all(empire_data *emp, int chore, int limit);
+	empire_data *emp, *next_emp;
+	
+	int CHORE_BRICKMAKING = 13;
+	int CHORE_NEXUS_CRYSTALS = 24;
+	int CHORE_GLASSMAKING = 32;
+	int CHORE_TRAPPING = 17;
+	int CHORE_BEEKEEPING = 31;
+	int CHORE_HERB_GARDENING = 15;
+	
+	log("Applying b5.105 update to shut off old workforce chores...");
+	
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		set_workforce_limit_all(emp, CHORE_BRICKMAKING, 0);
+		set_workforce_limit_all(emp, CHORE_NEXUS_CRYSTALS, 0);
+		set_workforce_limit_all(emp, CHORE_GLASSMAKING, 0);
+		set_workforce_limit_all(emp, CHORE_TRAPPING, 0);
+		set_workforce_limit_all(emp, CHORE_BEEKEEPING, 0);
+		set_workforce_limit_all(emp, CHORE_HERB_GARDENING, 0);
+		EMPIRE_NEEDS_SAVE(emp) = TRUE;
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4799,6 +4825,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.104")) {
 			b5_104_update();
+		}
+		if (MATCH_VERSION("b5.105")) {
+			b5_105_update();
 		}
 	}
 	

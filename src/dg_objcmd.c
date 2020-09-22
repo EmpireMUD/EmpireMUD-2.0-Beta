@@ -35,7 +35,6 @@ extern struct instance_data *quest_instance_global;
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void obj_command_interpreter(obj_data *obj, char *argument);
 void send_char_pos(char_data *ch, int dam);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 char_data *get_char_by_obj(obj_data *obj, char *name);
 obj_data *get_obj_by_obj(obj_data *obj, char *name);
 room_data *get_room(room_data *ref, char *name);
@@ -86,7 +85,7 @@ int get_obj_scale_level(obj_data *obj, char_data *targ) {
 	if (GET_OBJ_CURRENT_SCALE_LEVEL(obj) > 0) {
 		level = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
 	}
-	else if (orm && COMPLEX_DATA(orm) && (inst = COMPLEX_DATA(orm)->instance)) {
+	else if (orm && (inst = find_instance_by_room(orm, FALSE, FALSE))) {
 		if (INST_LEVEL(inst)) {
 			level = INST_LEVEL(inst);
 		}
@@ -329,7 +328,7 @@ OCMD(do_obuildingecho) {
 OCMD(do_oregionecho) {
 	char room_number[MAX_INPUT_LENGTH], radius_arg[MAX_INPUT_LENGTH], *msg;
 	room_data *center, *orm = obj_room(obj);
-	bool use_queue, indoor_only = FALSE;
+	bool use_queue, outdoor_only = FALSE;
 	char_data *targ;
 	int radius;
 
@@ -351,7 +350,7 @@ OCMD(do_oregionecho) {
 		radius = atoi(radius_arg);
 		if (radius < 0) {
 			radius = -radius;
-			indoor_only = TRUE;
+			outdoor_only = TRUE;
 		}
 		
 		if (center) {
@@ -359,7 +358,7 @@ OCMD(do_oregionecho) {
 				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
 					continue;
 				}
-				if (indoor_only && IS_OUTDOORS(targ)) {
+				if (outdoor_only && !IS_OUTDOORS(targ)) {
 					continue;
 				}
 				
@@ -1197,7 +1196,7 @@ OCMD(do_oterraform) {
 }
 
 
-OCMD(do_dgoload) {
+OCMD(do_oload) {
 	struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
@@ -1224,9 +1223,8 @@ OCMD(do_dgoload) {
 		obj_log(obj, "oload: object in no location trying to load");
 		return;
 	}
-	
-	if (obj_room(obj)) {
-		inst = find_instance_by_room(obj_room(obj), FALSE, TRUE);
+	else {
+		inst = find_instance_by_room(room, FALSE, TRUE);
 	}
 
 	if (is_abbrev(arg1, "mobile")) {
@@ -1235,10 +1233,10 @@ OCMD(do_dgoload) {
 			return;
 		}
 		mob = read_mobile(number, TRUE);
-		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-			MOB_INSTANCE_ID(mob) = INST_ID(COMPLEX_DATA(room)->instance);
+		if ((inst = find_instance_by_room(room, FALSE, TRUE))) {
+			MOB_INSTANCE_ID(mob) = INST_ID(inst);
 			if (MOB_INSTANCE_ID(mob) != NOTHING) {
-				add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
+				add_instance_mob(inst, GET_MOB_VNUM(mob));
 			}
 		}
 		char_to_room(mob, room);
@@ -1350,6 +1348,9 @@ OCMD(do_dgoload) {
 			return;
 		}
 		veh = read_vehicle(number, TRUE);
+		if ((inst = find_instance_by_room(room, FALSE, TRUE))) {
+			VEH_INSTANCE_ID(veh) = INST_ID(inst);
+		}
 		vehicle_to_room(veh, room);
 		
 		if (target && *target && isdigit(*target)) {
@@ -1784,7 +1785,7 @@ const struct obj_command_info obj_cmd_info[] = {
 	{ "oechoneither", do_oechoneither, NO_SCMD },
 	{ "oforce", do_oforce, NO_SCMD },
 	{ "oheal", do_oheal, NO_SCMD },
-	{ "oload", do_dgoload, NO_SCMD },
+	{ "oload", do_oload, NO_SCMD },
 	{ "omod", do_omod, NO_SCMD },
 	{ "omorph", do_omorph, NO_SCMD },
 	{ "oown", do_oown, NO_SCMD },

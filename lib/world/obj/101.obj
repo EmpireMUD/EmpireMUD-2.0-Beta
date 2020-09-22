@@ -439,12 +439,12 @@ Bright red saguaro fruits are strewn around on the ground.~
    These red fruits are spiny, and have already started to split open. A ripe
 fruit aroma wafts up from the basket, so they won't keep long before rotting.
 ~
-6 b a 0 8
+6 bg a 0 9
 12 10146 0
 7 168
 O+ 1 6134
 R
-5114 0
+4 5114 0
 S
 #10147
 fruit spiny red~
@@ -452,7 +452,7 @@ a spiny red fruit~
 A spiny red fruit is lying on the ground.~
 This strange, spiny fruit has a sweet, earthy flavor.
 ~
-6 0 a 0 6
+6 g a 0 7
 1 0 0
 7 48
 O+ 1 6124
@@ -467,7 +467,7 @@ dried, they are both strong and flexible, and well-suited to building.
 3 e a 0 5
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 11 1002 100.00 1  # LIGHT: roaring fire
 M
 0
 You position some saguaro ribs and tie them in place.~
@@ -482,7 +482,7 @@ M
 $n puts some saguaro ribs in place and ties them down.~
 O+ 1 6000
 R
-5118 0
+4 5118 0
 S
 #10149
 saguarocactus cactus saguaro fallen~
@@ -495,9 +495,9 @@ could saw out the ribs.
 3 e a 0 6
 0 0 0
 0 0
-I 17 10148 100.00 1  # SAW: a pile of saguaro ribs
+I 17 10148 100.00 1  # SAW: pile of saguaro ribs
 R
-5118 0
+4 5118 0
 S
 #10150
 lumber mesquite~
@@ -508,7 +508,7 @@ The mesquite lumber is small, but plentiful.
 3 e a 0 7
 0 0 0
 0 0
-I 11 10145 100.00 1  # LIGHT: a mesquite fire
+I 11 10145 100.00 1  # LIGHT: mesquite fire
 M
 0
 You hoist some mesquite lumber into position.~
@@ -523,7 +523,7 @@ M
 $n hoists some mesquite lumber onto $V.~
 O+ 1 6000
 R
-5118 0
+4 5118 0
 S
 #10151
 tree mesquite scraggly~
@@ -535,16 +535,16 @@ fresh desert scent, and would be good for cooking meat.
 3 e a 0 10
 0 0 0
 0 0
-I 11 10145 100.00 1  # LIGHT: a mesquite fire
-I 17 10150 100.00 1  # SAW: some mesquite lumber
-I 17 132 20.00 1 s  # SAW: some thorny branches
-I 17 132 20.00 2 s  # SAW: some thorny branches
-I 17 132 20.00 3 s  # SAW: some thorny branches
-I 17 132 20.00 4 s  # SAW: some thorny branches
-I 17 132 20.00 5 s  # SAW: some thorny branches
+I 11 10145 100.00 1  # LIGHT: mesquite fire
+I 17 10150 100.00 1  # SAW: mesquite lumber
+I 17 132 20.00 1 s  # SAW: thorny branches
+I 17 132 20.00 2 s  # SAW: thorny branches
+I 17 132 20.00 3 s  # SAW: thorny branches
+I 17 132 20.00 4 s  # SAW: thorny branches
+I 17 132 20.00 5 s  # SAW: thorny branches
 O+ 1 6011
 R
-5118 0
+4 5118 0
 S
 #10152
 pods mesquite handful~
@@ -558,7 +558,7 @@ sweet taste, but aren't very filling.
 0 0
 O+ 1 6180
 R
-5210 0
+4 5210 0
 S
 #10153
 basket pears alligator~
@@ -568,13 +568,13 @@ A basket of alligator pears is sitting here.~
 dark, bumpy, rigid skin. The inside of the fruit is bright green, with a giant
 seed. They aren't sweet, but have a creamy texture.
 ~
-6 b a 0 8
+6 bg a 0 9
 12 10153 0
 7 168
-I 15 10154 100.00 4 x  # SEPARATE: a ripe alligator pear
+I 15 10154 100.00 4 x  # SEPARATE: ripe alligator pear
 O+ 1 6154
 R
-5619 0
+4 5619 0
 S
 #10154
 pear ripe alligator~
@@ -583,10 +583,10 @@ An alligator pear is lying on the ground.~
    The alligator pear has a bumpy, black skin. But the inside is bright green
 and creamy.
 ~
-6 0 a 0 6
+6 g a 0 7
 2 0 0
 7 48
-I 14 10153 100.00 4 x  # COMBINE: a basket of alligator pears
+I 14 10153 100.00 4 x  # COMBINE: basket of alligator pears
 O+ 1 6144
 S
 #10155
@@ -595,10 +595,10 @@ a basket of limes~
 Someone has dropped a basket of limes on the ground.~
 The limes are small, but bright green. You can eat limes, or plant them.
 ~
-6 b a 0 8
+6 bg a 0 9
 12 10155 0
 7 168
-I 15 10156 100.00 4 e  # SEPARATE: a single ripe lime
+I 15 10156 100.00 4 e  # SEPARATE: single ripe lime
 M
 4
 You wince as you eat $p.~
@@ -607,7 +607,7 @@ M
 $n winces as $e eats $p.~
 O+ 1 6134
 R
-5114 0
+4 5114 0
 S
 #10156
 lime single ripe~
@@ -615,10 +615,10 @@ a single ripe lime~
 A single ripe lime has been forgotten.~
 This is just a single ripe lime that might provide a little substance.
 ~
-6 0 a 0 6
+6 g a 0 7
 1 0 0
 7 48
-I 14 10155 100.00 4 e  # COMBINE: a basket of limes
+I 14 10155 100.00 4 e  # COMBINE: basket of limes
 M
 4
 You wince as you eat $p.~
@@ -634,7 +634,7 @@ A maroon firemelon is rolling around on the ground.~
    This firemelon has a deep maroon hue, striped by brighter red. The melon is
 warm to the touch, and smells like cinnamon.
 ~
-6 bem a 0 12
+6 begm a 0 13
 12 10157 0
 7 336
 A
@@ -646,7 +646,7 @@ M
 You eat the firemelon and feel a burning in your stomach.~
 O+ 1 6134
 R
-5114 0
+4 5114 0
 S
 #10158
 melon firemelon crimson~
@@ -655,7 +655,7 @@ A crimson firemelon is rolling around on the ground.~
    This firemelon has a bright crimson hue, striped by darker red. The melon is
 warm to the touch, and smells like cinnamon.
 ~
-6 bem a 0 13
+6 begm a 0 14
 12 10157 0
 7 336
 A
@@ -667,7 +667,7 @@ M
 You eat the firemelon and feel a burning in your stomach.~
 O+ 1 6134
 R
-5114 0
+4 5114 0
 S
 #10159
 branch cactus teddybear~
@@ -747,7 +747,7 @@ the mesquite tree, which grows in the driest deserts.
 7 168
 O+ 1 6300
 R
-5109 0
+4 5109 0
 S
 #10165
 totem mule~
@@ -849,10 +849,10 @@ than the underlying structure.
 3 e a 0 2
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
+I 11 1002 100.00 1  # LIGHT: roaring fire
 O+ 1 6025
 R
-5118 0
+4 5118 0
 S
 #10171
 cactus saguaro huge~

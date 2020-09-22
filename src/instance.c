@@ -38,6 +38,8 @@ extern const int rev_dir[];
 extern int size_of_world;
 
 // external funcs
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
+extern int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
@@ -47,13 +49,15 @@ extern int stats_get_sector_count(sector_data *sect);
 // locals
 bool can_instance(adv_data *adv);
 bool check_outside_fights(struct instance_data *inst);
+bool check_outside_vehicles(struct instance_data *inst);
 int count_instances(adv_data *adv);
 int count_mobs_in_instance(struct instance_data *inst, mob_vnum vnum);
 int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
 int count_players_in_instance(struct instance_data *inst, bool include_imms, char_data *ignore_ch);
 int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum);
+void despawn_instance_vehicles(struct instance_data *inst);
 static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
-struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
+void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
@@ -66,7 +70,7 @@ void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool 
 
 
 // local globals
-struct instance_data *instance_list = NULL;	// global instance list
+struct instance_data *instance_list = NULL;	// doubly-linked global instance list
 bool instance_save_wait = FALSE;	// prevents repeated instance saving
 struct instance_data *quest_instance_global = NULL;	// passes instances through to some quest triggers
 
@@ -162,7 +166,7 @@ void build_instance_exterior(struct instance_data *inst) {
 * @return struct instance_data* A pointer to the new instance, or NULL on failure.
 */
 struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir) {
-	struct instance_data *inst, *temp;
+	struct instance_data *inst;
 	char_data *ch;
 	int rotation;
 	bool present;
@@ -183,15 +187,7 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	INST_ADVENTURE(inst) = adv;
 	
 	// append to end of list
-	if ((temp = instance_list)) {
-		while (temp->next) {
-			temp = temp->next;
-		}
-		temp->next = inst;
-	}
-	else {
-		instance_list = inst;
-	}
+	DL_APPEND(instance_list, inst);
 	
 	if (ADVENTURE_FLAGGED(adv, ADV_ROTATABLE)) {
 		if (dir != NO_DIR && dir != DIR_RANDOM) {
@@ -652,7 +648,7 @@ bool validate_linking_limits(adv_data *adv, room_data *loc, struct map_data *map
 		switch (rule->type) {
 			case ADV_LINK_NOT_NEAR_SELF: {
 				// adventure cannot link within X tiles of itself
-				LL_FOREACH(instance_list, inst) {
+				DL_FOREACH(instance_list, inst) {
 					if (GET_ADV_VNUM(INST_ADVENTURE(inst)) != GET_ADV_VNUM(adv)) {
 						continue;
 					}
@@ -1075,7 +1071,6 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	struct instance_mob *im, *next_im;
 	struct adventure_link_rule *rule;
 	vehicle_data *veh, *next_veh;
-	struct instance_data *temp;
 	char_data *mob, *next_mob;
 	room_data *room, *extraction_room;
 	int iter;
@@ -1134,6 +1129,9 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 		}
 	}
 	
+	// delete vehicles
+	despawn_instance_vehicles(inst);
+	
 	// remove rooms
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 		if (INST_ROOM(inst, iter)) {
@@ -1145,7 +1143,7 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	check_all_exits();
 	
 	// remove from list AFTER removing rooms
-	REMOVE_FROM_LIST(inst, instance_list, next);
+	DL_DELETE(instance_list, inst);
 	if (inst->room) {
 		free(inst->room);
 	}
@@ -1178,7 +1176,7 @@ int delete_all_instances(adv_data *adv) {
 	struct instance_data *inst, *next_inst;
 	int count = 0;
 	
-	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		if (INST_ADVENTURE(inst) == adv) {
 			delete_instance(inst, TRUE);
 			++count;
@@ -1186,6 +1184,101 @@ int delete_all_instances(adv_data *adv) {
 	}
 	
 	return count;
+}
+
+
+/**
+* Called when an instance closes to delete all its vehicles.
+*
+* @param struct instance_data *inst The vehicle to delete.
+*/
+void despawn_instance_vehicles(struct instance_data *inst) {
+	vehicle_data *veh, *next_veh;
+	
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		if (VEH_INSTANCE_ID(veh) != INST_ID(inst)) {
+			continue;	// not ours
+		}
+		
+		// people leading/sitting on it will be unleashed by extract_vehicle
+		
+		// empty insides / recursively relocate players
+		empty_instance_vehicle(inst, veh, IN_ROOM(veh));
+		
+		// call destroy trig: if it returns 0, we won't try to echo
+		// but this purge CANNOT be prevented by the trigger
+		if (destroy_vtrigger(veh)) {		
+			if (ROOM_PEOPLE(IN_ROOM(veh))) {
+				act("$V is gone.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			}
+		}
+		
+		// ensure the trigger didn't purge it
+		if (!dg_owner_purged) {
+			extract_vehicle(veh);
+		}
+	}
+}
+
+
+/**
+* Attempts to empty players, non-linked mobs, and non-linked vehicles; leaves
+* everything else. This is called when an instance cleans up.
+*
+* @param struct instance_data *inst The instance stuff belonged to.
+* @param vehicle_data *veh The vehicle to empty.
+* @param room_data *to_room Where to empty it to.
+*/
+void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room) {
+	struct vehicle_room_list *vrl;
+	vehicle_data *inner, *next_inner;
+	char_data *ch, *next_ch;
+	
+	LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+		DL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), inner, next_inner, next_in_room) {
+			if (VEH_INSTANCE_ID(inner) == INST_ID(inst)) {
+				// recurse!
+				empty_instance_vehicle(inst, inner, to_room);
+				// don't delete the vehicle here -- it can be extracted later
+			}
+			else {
+				// not attached -- move it
+				adjust_vehicle_tech(inner, FALSE);
+				vehicle_from_room(inner);
+				vehicle_to_room(inner, to_room);
+				adjust_vehicle_tech(inner, TRUE);
+				
+				// don't announce
+				/*
+				if (ROOM_PEOPLE(to_room)) {
+					act("$V arrives.", FALSE, ROOM_PEOPLE(to_room), NULL, NULL, TO_CHAR | TO_ROOM);
+				}
+				*/
+				
+				entry_vtrigger(inner);
+			}
+		}
+		
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(vrl->room), ch, next_ch, next_in_room) {
+			if (!IS_NPC(ch) || MOB_INSTANCE_ID(ch) != INST_ID(inst)) {
+				// move
+				char_from_room(ch);
+				char_to_room(ch, to_room);
+				GET_LAST_DIR(ch) = NO_DIR;
+				look_at_room(ch);
+				
+				// and announce
+				act("$n arrives.", TRUE, ch, NULL, NULL, TO_ROOM);
+				
+				entry_mtrigger(ch);
+				enter_wtrigger(IN_ROOM(ch), ch, NO_DIR);
+				greet_mtrigger(ch, NO_DIR);
+				greet_vtrigger(ch, NO_DIR);
+				entry_memory_mtrigger(ch);
+				greet_memory_mtrigger(ch);
+			}
+		}
+	}
 }
 
 
@@ -1271,6 +1364,7 @@ static void reset_instance_room(struct instance_data *inst, room_data *room) {
 				case ADV_SPAWN_VEH: {
 					if (vehicle_proto(spawn->vnum) && count_vehicles_in_instance(inst, spawn->vnum) < spawn->limit) {
 						veh = read_vehicle(spawn->vnum, TRUE);
+						VEH_INSTANCE_ID(veh) = INST_ID(inst);
 						vehicle_to_room(veh, room);
 						if (INST_LEVEL(inst) > 0) {
 							scale_vehicle_to_level(veh, INST_LEVEL(inst));
@@ -1312,7 +1406,7 @@ void reset_instance(struct instance_data *inst) {
 void reset_instances(void) {
 	struct instance_data *inst;
 	
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		// never reset?
 		if (INSTANCE_FLAGGED(inst, INST_COMPLETED) || GET_ADV_RESET_TIME(INST_ADVENTURE(inst)) <= 0) {
 			continue;
@@ -1341,7 +1435,7 @@ void prune_instances(void) {
 	room_data *room, *next_room;
 	
 	// look for dead instances
-	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		rule = get_link_rule_by_type(INST_ADVENTURE(inst), ADV_LINK_TIME_LIMIT);
 		evt_run = get_link_rule_by_type(INST_ADVENTURE(inst), ADV_LINK_EVENT_RUNNING);
 		delayed = IS_SET(INST_FLAGS(inst), INST_NEEDS_LOAD) ? TRUE : FALSE;
@@ -1349,7 +1443,7 @@ void prune_instances(void) {
 		// look for completed or orphaned instances
 		if (!INST_ADVENTURE(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED) || (!INST_START(inst) && !delayed) || !INST_LOCATION(inst) || (INST_SIZE(inst) == 0 && !delayed) || (rule && (INST_CREATED(inst) + 60 * rule->value) < time(0)) || (evt_run && !find_running_event_by_vnum(evt_run->value))) {
 			// well, only if empty
-			if (count_players_in_instance(inst, TRUE, NULL) == 0 && (!ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_CHECK_OUTSIDE_FIGHTS) || check_outside_fights(inst))) {
+			if (count_players_in_instance(inst, TRUE, NULL) == 0 && (!ADVENTURE_FLAGGED(INST_ADVENTURE(inst), ADV_CHECK_OUTSIDE_FIGHTS) || check_outside_fights(inst)) && check_outside_vehicles(inst)) {
 				delete_instance(inst, TRUE);
 				save = TRUE;
 			}
@@ -1618,6 +1712,35 @@ bool check_outside_fights(struct instance_data *inst) {
 
 
 /**
+* Checks if any vehicle controlled by the instance is outside but still in use
+* by players.
+*
+* @param struct instance_data *inst The instance to check.
+* @return bool TRUE if it's okay to despawn; FALSE if instance vehicles are in use.
+*/
+bool check_outside_vehicles(struct instance_data *inst) {
+	vehicle_data *veh;
+	
+	DL_FOREACH(vehicle_list, veh) {
+		if (!IN_ROOM(veh) || (COMPLEX_DATA(IN_ROOM(veh)) && COMPLEX_DATA(IN_ROOM(veh))->instance == inst)) {
+			continue;	// vehicle is in no room or is in the instance
+		}
+		if (VEH_INSTANCE_ID(veh) != INST_ID(inst)) {
+			continue;	// not from instance
+		}
+		if (!VEH_LED_BY(veh) && !VEH_SITTING_ON(veh) && count_players_in_vehicle(veh, TRUE) < 1) {
+			continue;	// not currently in use
+		}
+		
+		// if we got here, the vehicle is in use
+		return FALSE;
+	}
+	
+	return TRUE;	// safe
+}
+
+
+/**
 * @param adv_data *adv The adventure to count.
 * @return int The number of active instances of that adventure.
 */
@@ -1625,7 +1748,7 @@ int count_instances(adv_data *adv) {
 	struct instance_data *inst;
 	int count = 0;
 	
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		if (INST_ADVENTURE(inst) == adv && !INSTANCE_FLAGGED(inst, INST_COMPLETED)) {
 			++count;
 		}
@@ -1691,6 +1814,7 @@ int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum) {
 */
 int count_players_in_instance(struct instance_data *inst, bool count_imms, char_data *ignore_ch) {
 	int iter, count = 0;
+	vehicle_data *veh;
 	char_data *ch;
 	
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
@@ -1699,6 +1823,10 @@ int count_players_in_instance(struct instance_data *inst, bool count_imms, char_
 				if (ch != ignore_ch && !IS_NPC(ch) && (count_imms || !IS_IMMORTAL(ch))) {
 					++count;
 				}
+			}
+			
+			DL_FOREACH2(ROOM_VEHICLES(INST_ROOM(inst, iter)), veh, next_in_room) {
+				count += count_players_in_vehicle(veh, count_imms);
 			}
 		}
 	}
@@ -1751,7 +1879,7 @@ room_data *find_nearest_adventure(room_data *from, rmt_vnum vnum) {
 		return NULL;	// does not work if no map loc
 	}
 	
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		if (INST_ADVENTURE(inst) != adv) {
 			continue;	// wrong adv
 		}
@@ -1798,7 +1926,7 @@ room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum) {
 		return NULL;	// does not work if no map loc
 	}
 	
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		if (INST_ADVENTURE(inst) != adv) {
 			continue;	// wrong adv
 		}
@@ -1857,7 +1985,7 @@ room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum v
 struct instance_data *get_instance_by_id(any_vnum instance_id) {
 	struct instance_data *inst;
 	
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		if (INST_ID(inst) == instance_id) {
 			return inst;
 		}
@@ -1934,7 +2062,12 @@ struct instance_data *get_instance_for_script(int go_type, void *go) {
 				break;
 			}
 			case VEH_TRIGGER: {
-				inst = find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE, TRUE);
+				if (VEH_INSTANCE_ID((vehicle_data*)go) != NOTHING) {
+					inst = get_instance_by_id(VEH_INSTANCE_ID((vehicle_data*)go));
+				}
+				if (!inst) {
+					find_instance_by_room(IN_ROOM((vehicle_data*)go), FALSE, TRUE);
+				}
 				break;
 			}
 			case EMP_TRIGGER:
@@ -1957,7 +2090,7 @@ any_vnum get_new_instance_id(void) {
 	any_vnum top_id = -1;
 	bool found;
 	
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		top_id = MAX(top_id, INST_ID(inst));
 	}
 	
@@ -1968,7 +2101,7 @@ any_vnum get_new_instance_id(void) {
 		// need to find a lower id available: this only fails if there are more than MAX_INT instances
 		for (top_id = 0;; ++top_id) {
 			found = FALSE;
-			LL_FOREACH(instance_list, inst) {
+			DL_FOREACH(instance_list, inst) {
 				if (INST_ID(inst) == top_id) {
 					found = TRUE;
 					break;	// only need 1
@@ -1997,7 +2130,7 @@ struct instance_data *real_instance(any_vnum instance_id) {
 		return NULL;
 	}
 	
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		if (INST_ID(inst) == instance_id) {
 			return inst;
 		}
@@ -2025,7 +2158,7 @@ void remove_instance_fake_loc(struct instance_data *inst) {
 		REMOVE_BIT(ROOM_BASE_FLAGS(INST_FAKE_LOC(inst)), ROOM_AFF_FAKE_INSTANCE);
 		
 		// see if the flag needs to be re-added (check all instances to see if one is still here)
-		LL_FOREACH(instance_list, i_iter) {
+		DL_FOREACH(instance_list, i_iter) {
 			if (i_iter != inst && INST_FAKE_LOC(i_iter) == INST_FAKE_LOC(inst)) {
 				SET_BIT(ROOM_BASE_FLAGS(INST_FAKE_LOC(i_iter)), ROOM_AFF_FAKE_INSTANCE);
 				break;	// any 1 will do
@@ -2158,9 +2291,14 @@ struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom
 		return COMPLEX_DATA(room)->instance;
 	}
 	
+	// check in vehicle
+	if (GET_ROOM_VEHICLE(room) && (inst = get_instance_by_id(VEH_INSTANCE_ID(GET_ROOM_VEHICLE(room))))) {
+		return inst;
+	}
+	
 	// check if it's the location for one
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE | ROOM_AFF_FAKE_INSTANCE) || (check_homeroom && ROOM_AFF_FLAGGED(HOME_ROOM(room), ROOM_AFF_HAS_INSTANCE))) {
-		LL_FOREACH(instance_list, inst) {
+		DL_FOREACH(instance_list, inst) {
 			if (INST_LOCATION(inst) == room || (check_homeroom && HOME_ROOM(INST_LOCATION(inst)) == room)) {
 				return inst;	// real loc
 			}
@@ -2379,7 +2517,7 @@ static void renum_instances(void) {
 		// affect_total_room(room); // not needed here
 	}
 	
-	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		// ensure fake_loc is set
 		if (!INST_FAKE_LOC(inst)) {
 			INST_FAKE_LOC(inst) = INST_LOCATION(inst);
@@ -2417,7 +2555,7 @@ static void renum_instances(void) {
 * Reads all instances from file.
 */
 void load_instances(void) {
-	struct instance_data *inst, *last_inst = NULL;
+	struct instance_data *inst;
 	char line[256];
 	FILE *fl;
 	
@@ -2430,14 +2568,7 @@ void load_instances(void) {
 	while (get_line(fl, line)) {
 		if (*line == '#') {
 			inst = load_one_instance(fl, atoi(line+1));
-			
-			if (last_inst) {
-				last_inst->next = inst;
-			}
-			else {
-				instance_list = inst;
-			}
-			last_inst = inst;
+			DL_APPEND(instance_list, inst);
 		}
 		else if (*line == '$') {
 			// done;
@@ -2473,7 +2604,7 @@ void save_instances(void) {
 		return;
 	}
 
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		fprintf(fl, "#%d\n", INST_ID(inst));
 		fprintf(fl, "%d %d %d %s %d\n", GET_ADV_VNUM(INST_ADVENTURE(inst)), INST_LOCATION(inst) ? GET_ROOM_VNUM(INST_LOCATION(inst)) : NOWHERE, INST_START(inst) ? GET_ROOM_VNUM(INST_START(inst)) : NOWHERE, bitv_to_alpha(INST_FLAGS(inst)), INST_FAKE_LOC(inst) ? GET_ROOM_VNUM(INST_FAKE_LOC(inst)) : NOWHERE);
 		fprintf(fl, "%d %ld %ld\n", INST_LEVEL(inst), INST_CREATED(inst), INST_LAST_RESET(inst));
@@ -2533,11 +2664,6 @@ void scale_instance_to_level(struct instance_data *inst, int level) {
 					scale_item_to_level(obj, level);
 				}
 			}
-			DL_FOREACH2(ROOM_VEHICLES(INST_ROOM(inst, iter)), veh, next_in_room) {
-				if (VEH_SCALE_LEVEL(veh) == 0) {
-					scale_vehicle_to_level(veh, level);
-				}
-			}
 		}
 	}
 	
@@ -2545,6 +2671,13 @@ void scale_instance_to_level(struct instance_data *inst, int level) {
 		if (IS_NPC(ch) && MOB_INSTANCE_ID(ch) == INST_ID(inst) && GET_CURRENT_SCALE_LEVEL(ch) != level) {
 			GET_CURRENT_SCALE_LEVEL(ch) = 0;	// force override on level
 			scale_mob_to_level(ch, level);
+		}
+	}
+	
+	DL_FOREACH(vehicle_list, veh) {
+		if (VEH_INSTANCE_ID(veh) == INST_ID(inst) && VEH_SCALE_LEVEL(veh) != level) {
+			VEH_SCALE_LEVEL(veh) = 0;	// force override on level
+			scale_vehicle_to_level(veh, level);
 		}
 	}
 }

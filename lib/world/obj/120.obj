@@ -47,9 +47,9 @@ valuable, to the right person.
 1 0 0
 2 0
 R
-5621 0
+4 5621 0
 R
-5193 0
+4 5193 0
 S
 #12004
 chain golden old god Anat~
@@ -408,9 +408,9 @@ valuable, to the right person.
 1 0 0
 2 0
 R
-5621 0
+4 5621 0
 R
-5193 0
+4 5193 0
 S
 #12034
 ring bronze bull ba'al baal hadad~
@@ -728,12 +728,12 @@ A bag of dates is stacked here.~
    Sweet dates like these have been grown for thousands of years, as they
 flourish in warm areas. You can eat these dates or plant them.
 ~
-6 b a 0 6
+6 bg a 0 7
 12 12052 0
 7 168
 O+ 1 6134
 R
-5114 0
+4 5114 0
 S
 #12053
 seeds jar date palm~
@@ -747,7 +747,7 @@ fertile desert.
 0 12052 0
 7 168
 R
-5210 0
+4 5210 0
 S
 #12054
 feast ba'al baal hadad~

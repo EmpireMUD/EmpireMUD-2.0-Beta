@@ -33,9 +33,11 @@
 *   Action Finishers
 *   Action Processes
 *   Action Commands
+*   Generic Interactions: do_gen_interact_room
 */
 
 // external vars
+extern const bool interact_one_at_a_time[NUM_INTERACTS];
 extern const char *tool_flags[];
 
 // external funcs
@@ -79,6 +81,7 @@ void process_fishing(char_data *ch);
 void process_foraging(char_data *ch);
 void process_gathering(char_data *ch);
 void process_gen_craft(char_data *ch);
+void process_gen_interact_room(char_data *ch);
 void process_harvesting(char_data *ch);
 void process_hunting(char_data *ch);
 void process_maintenance(char_data *ch);
@@ -87,10 +90,8 @@ void process_minting(char_data *ch);
 void process_morphing(char_data *ch);
 void process_music(char_data *ch);
 void process_panning(char_data *ch);
-void process_picking(char_data *ch);
 void process_planting(char_data *ch);
 void process_prospecting(char_data *ch);
-void process_quarrying(char_data *ch);
 void process_reading(char_data *ch);
 void process_reclaim(char_data *ch);
 void process_repairing(char_data *ch);
@@ -108,7 +109,7 @@ INTERACTION_FUNC(finish_foraging);
  //////////////////////////////////////////////////////////////////////////////
 //// CONTROL DATA ////////////////////////////////////////////////////////////
 
-// ACT_x
+// ACT_x: master data for all chores
 const struct action_data_struct action_data[] = {
 	{ "", "", NOBITS, NULL, NULL },	// ACT_NONE
 	{ "digging", "is digging at the ground.", ACTF_SHOVEL | ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_digging, NULL },	// ACT_DIGGING
@@ -128,7 +129,7 @@ const struct action_data_struct action_data[] = {
 	{ "music", "is playing soothing music.", ACTF_ANYWHERE | ACTF_HASTE, process_music, NULL },	// ACT_MUSIC
 	{ "excavating", "is excavating a trench.", ACTF_HASTE | ACTF_FAST_CHORES | ACTF_FAST_EXCAVATE, process_excavating, NULL },	// ACT_EXCAVATING
 	{ "siring", "is hunched over.", NOBITS, process_siring, cancel_siring },	// ACT_SIRING
-	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_picking, NULL },	// ACT_PICKING
+	{ "picking", "is looking around at the ground.", ACTF_FINDER | ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_PICKING
 	{ "morphing", "is morphing and changing shape!", ACTF_ANYWHERE, process_morphing, cancel_morphing },	// ACT_MORPHING
 	{ "scraping", "is scraping something off.", ACTF_HASTE | ACTF_FAST_CHORES, process_scraping, cancel_resource_list },	// ACT_SCRAPING
 	{ "bathing", "is bathing in the water.", NOBITS, process_bathing, NULL },	// ACT_BATHING
@@ -140,7 +141,7 @@ const struct action_data_struct action_data[] = {
 	{ "running", "runs past you.", ACTF_ALWAYS_FAST | ACTF_EVEN_FASTER | ACTF_FASTER_BONUS | ACTF_ANYWHERE, process_running, cancel_movement_string },	// unused
 	{ "ritual", "is performing an arcane ritual.", NOBITS, perform_ritual, NULL },	// ACT_RITUAL
 	{ "sawing", "is sawing something.", ACTF_HASTE | ACTF_FAST_CHORES, perform_saw, cancel_resource_list },	// ACT_SAWING
-	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_quarrying, NULL },	// ACT_QUARRYING
+	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_QUARRYING
 	{ "driving", "is driving.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_DRIVING
 	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_resource_list },	// ACT_TANNING
 	{ "reading", "is reading a book.", ACTF_SITTING, process_reading, NULL },	// ACT_READING
@@ -159,9 +160,49 @@ const struct action_data_struct action_data[] = {
 };
 
 
+// INTERACT_x: interactions that are processed by do_gen_interact_room
+const struct gen_interact_data_t gen_interact_data[] = {
+	// { interact, action, command, verb, timer
+	//	ptech, depletion, approval_config
+	//	{ { start-to-char, start-to-room }, { finish-to-char, finish-to-room },
+	//		empty-to-char
+	//		chance-of-random-tick-msg,
+	//		{ { random-to-char, random-to-room }, ..., END_RANDOM_TICK_MSGS
+	//	} }
+	// }
+	
+	#define END_RANDOM_TICK_MSGS  { NULL, NULL }
+	#define NO_RANDOM_TICK_MSGS  { END_RANDOM_TICK_MSGS }
+	
+	{ INTERACT_PICK, ACT_PICKING, "pick", "picking", 4,
+		PTECH_PICK, DPLTN_PICK, "gather_approval",
+		{ /* start msg */ { "You start looking for something to pick.", "$n starts looking for something to pick." },
+		/* finish msg */ { "You find $p!", "$n finds $p!" },
+		/* empty msg */ "You can't find anything here left to pick.",
+		100, { // random tick messages:
+			{ "You look around for something nice to pick...", "$n looks around for something to pick." },
+			END_RANDOM_TICK_MSGS
+		}}
+	},
+	{ INTERACT_QUARRY, ACT_QUARRYING, "quarry", "quarrying", 12,
+		PTECH_QUARRY, DPLTN_QUARRY, "gather_approval",
+		{ /* start msg */ { "You begin to work the quarry.", "$n begins to work the quarry." },
+		/* finish msg */ { "You give the plug drill one final swing and pry loose $p!", "$n hits the plug drill hard with a hammer and pries loose $p!" },
+		/* empty msg */ "You don't seem to find anything of use.",
+		30, { // random tick messages:
+			{ "You slip some shims into cracks in the stone.", "$n slips some shims into cracks in the stone." },
+			{ "You brush dust out of the cracks in the stone.", "$n brushes dust out of the cracks in the stone." },
+			{ "You hammer a plug drill into the stone.", "$n hammers a plug drill into the stone." },
+			END_RANDOM_TICK_MSGS
+		}}
+	},
+	
+	{ -1, -1, "\n", "\n", 0, NOTHING, NOTHING, NULL, { { NULL, NULL }, { NULL, NULL }, NULL, 0, NO_RANDOM_TICK_MSGS } }	// last
+};
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// CORE ACTION FUNCTIONS ///////////////////////////////////////////////////
-
 
 /**
 * Ends the character's current timed action prematurely.
@@ -643,7 +684,7 @@ void start_chopping(char_data *ch) {
 	if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to chop here.\r\n");
 	}
-	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_CHOP) >= config_get_int("chop_depletion")) {
+	else if (!CAN_CHOP_ROOM(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_CHOP, FALSE) >= config_get_int("chop_depletion")) {
 		msg_to_char(ch, "There's nothing left here to chop.\r\n");
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE)) {
@@ -709,7 +750,7 @@ void start_foraging(char_data *ch) {
 void start_mining(char_data *ch) {
 	int mining_timer = config_get_int("mining_timer");
 	
-	if (room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
+	if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) > 0) {
 			start_action(ch, ACT_MINING, mining_timer);
 			
@@ -741,38 +782,6 @@ void start_panning(char_data *ch, int dir) {
 		
 		msg_to_char(ch, "You kneel down and begin panning.\r\n");
 		act("$n kneels down and begins panning.", TRUE, ch, NULL, NULL, TO_ROOM);
-	}
-}
-
-
-/**
-* begins the "pick" action
-*
-* @param char_data *ch The prospective picker.
-*/
-void start_picking(char_data *ch) {
-	int pick_base_timer = config_get_int("pick_base_timer");
-	
-	start_action(ch, ACT_PICKING, pick_base_timer);
-	send_to_char("You begin looking around.\r\n", ch);
-}
-
-
-/**
-* Begin to quarry.
-*
-* @param char_data *ch The player who is to quarry.
-*/
-void start_quarrying(char_data *ch) {	
-	if (can_interact_room(IN_ROOM(ch), INTERACT_QUARRY) && IS_COMPLETE(IN_ROOM(ch))) {
-		if (get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
-			msg_to_char(ch, "There's not enough left to quarry here.\r\n");
-		}
-		else {
-			start_action(ch, ACT_QUARRYING, 12);
-			send_to_char("You begin to work the quarry.\r\n", ch);
-			act("$n begins to work the quarry.", TRUE, ch, 0, 0, TO_ROOM);
-		}
 	}
 }
 
@@ -823,7 +832,7 @@ INTERACTION_FUNC(finish_digging) {
 	int num;
 	
 	// depleted? (uses rock for all types except clay)
-	if (get_depletion(inter_room, DPLTN_DIG) >= DEPLETION_LIMIT(inter_room)) {
+	if (get_depletion(inter_room, DPLTN_DIG, FALSE) >= DEPLETION_LIMIT(inter_room)) {
 		msg_to_char(ch, "The ground is too hard and there doesn't seem to be anything useful to dig up here.\r\n");
 		return FALSE;
 	}
@@ -1111,89 +1120,6 @@ INTERACTION_FUNC(finish_panning) {
 }
 
 
-INTERACTION_FUNC(finish_picking) {
-	obj_data *obj = NULL;
-	room_data *in_room = IN_ROOM(ch);
-	obj_vnum vnum = interaction->vnum;
-	int iter, num = interaction->quantity;
-	char *cust;
-
-	// give objs
-	for (iter = 0; iter < num; ++iter) {
-		obj = read_object(vnum, TRUE);
-		scale_item_to_level(obj, 1);	// minimum level
-		obj_to_char_or_room(obj, ch);
-		add_depletion(inter_room, DPLTN_PICK, TRUE);
-		load_otrigger(obj);
-	}
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), vnum, num);
-	}
-	
-	if (obj) {
-		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
-		if (num > 1) {
-			sprintf(buf, "%s (x%d)", cust ? cust : "You find $p!", num);
-			act(buf, FALSE, ch, obj, 0, TO_CHAR);
-		}
-		else {
-			act(cust ? cust : "You find $p!", FALSE, ch, obj, 0, TO_CHAR);
-		}
-		
-		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
-		act(cust ? cust : "$n finds $p!", TRUE, ch, obj, 0, TO_ROOM);
-	}
-	else {
-		msg_to_char(ch, "You find nothing.\r\n");
-	}
-		
-	// re-start
-	if (in_room == IN_ROOM(ch)) {
-		start_picking(ch);
-	}
-	
-	return TRUE;
-}
-
-
-INTERACTION_FUNC(finish_quarrying) {
-	char buf[MAX_STRING_LENGTH];
-	obj_data *obj = NULL;
-	char *cust;
-	int num;
-	
-	for (num = 0; num < interaction->quantity; ++num) {
-		obj = read_object(interaction->vnum, TRUE);
-		scale_item_to_level(obj, 1);	// minimum level
-		obj_to_char_or_room(obj, ch);
-		load_otrigger(obj);
-	}
-	
-	// mark gained
-	if (GET_LOYALTY(ch)) {
-		add_production_total(GET_LOYALTY(ch), interaction->vnum, interaction->quantity);
-	}
-	
-	if (obj) {
-		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
-		if (interaction->quantity > 1) {
-			sprintf(buf, "%s (x%d)", cust ? cust : "You give the plug drill one final swing and pry loose $p!", interaction->quantity);
-		}
-		else {
-			strcpy(buf, cust ? cust : "You give the plug drill one final swing and pry loose $p!");
-		}
-		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-		
-		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
-		act(cust ? cust : "$n hits the plug drill hard with a hammer and pries loose $p!", FALSE, ch, obj, NULL, TO_ROOM);
-	}
-	
-	return TRUE;
-}
-
-
 // also used for sawing, tanning, chipping
 INTERACTION_FUNC(finish_scraping) {
 	obj_vnum vnum = interaction->vnum;
@@ -1256,7 +1182,7 @@ void perform_saw(char_data *ch) {
 	obj_data *proto, *saw;
 	
 	// check both of these because they both have bonuses
-	room = room_has_function_and_city_ok(IN_ROOM(ch), FNC_SAW);
+	room = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_SAW);
 	saw = has_tool(ch, TOOL_SAW);
 	
 	if (!has_player_tech(ch, PTECH_SAW_COMMAND)) {
@@ -1326,6 +1252,12 @@ void perform_saw(char_data *ch) {
 * @param char_data *ch The bather.
 */
 void process_bathing(char_data *ch) {
+	// can still bathe here?
+	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
+		cancel_action(ch);
+		return;
+	}
+	
 	if (GET_ACTION_TIMER(ch) <= 0) {
 		// finish
 		msg_to_char(ch, "You finish bathing and climb out of the water to dry off.\r\n");
@@ -1539,8 +1471,8 @@ void process_chop(char_data *ch) {
 		remove_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_CHOP_PROGRESS);
 		
 		// run interacts for items only if not depleted
-		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP) < config_get_int("chop_depletion")) {
-			got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, finish_chopping);
+		if (get_depletion(IN_ROOM(ch), DPLTN_CHOP, FALSE) < config_get_int("chop_depletion")) {
+			got_any = run_room_interactions(ch, IN_ROOM(ch), INTERACT_CHOP, NULL, GUESTS_ALLOWED, finish_chopping);
 		}
 		
 		if (!got_any) {
@@ -1589,7 +1521,7 @@ void process_digging(char_data *ch) {
 		GET_ACTION(ch) = ACT_NONE;
 		in_room = IN_ROOM(ch);
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_DIG) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, finish_digging)) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_DIG, FALSE) < DEPLETION_LIMIT(IN_ROOM(ch)) && run_room_interactions(ch, IN_ROOM(ch), INTERACT_DIG, NULL, GUESTS_ALLOWED, finish_digging)) {
 			// success
 			gain_player_tech_exp(ch, PTECH_DIG, 10);
 		
@@ -1865,14 +1797,14 @@ void process_fishing(char_data *ch) {
 			}
 		}
 	}
-	else if (get_depletion(room, DPLTN_FISH) >= DEPLETION_LIMIT(room)) {
+	else if (get_depletion(room, DPLTN_FISH, FALSE) >= DEPLETION_LIMIT(room)) {
 		msg_to_char(ch, "You just don't seem to be able to catch anything here.\r\n");
 		GET_ACTION(ch) = ACT_NONE;
 	}
 	else {
 		// SUCCESS
 		msg_to_char(ch, "A fish darts past you...\r\n");
-		success = run_room_interactions(ch, room, INTERACT_FISH, finish_fishing);
+		success = run_room_interactions(ch, room, INTERACT_FISH, NULL, GUESTS_ALLOWED, finish_fishing);
 		
 		if (success) {
 			add_depletion(room, DPLTN_FISH, TRUE);
@@ -1928,12 +1860,12 @@ void process_foraging(char_data *ch) {
 			return;
 		}
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE) >= forage_depletion) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_FORAGE, FALSE) >= forage_depletion) {
 			msg_to_char(ch, "You can't find anything left to eat here.\r\n");
 			act("$n stops looking for things to eat as $e comes up empty-handed.", TRUE, ch, NULL, NULL, TO_ROOM);
 		}
 		else {	// success
-			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, finish_foraging)) {
+			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_FORAGE, NULL, GUESTS_ALLOWED, finish_foraging)) {
 				gain_player_tech_exp(ch, PTECH_FORAGE, 10);
 				found = TRUE;
 			}
@@ -1970,12 +1902,12 @@ void process_gathering(char_data *ch) {
 		
 	// done ?
 	if (GET_ACTION_TIMER(ch) <= 0) {
-		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER) >= gather_depletion) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_GATHER, FALSE) >= gather_depletion) {
 			msg_to_char(ch, "There's nothing good left to gather here.\r\n");
 			GET_ACTION(ch) = ACT_NONE;
 		}
 		else {
-			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_GATHER, finish_gathering)) {
+			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_GATHER, NULL, GUESTS_ALLOWED, finish_gathering)) {
 				// check repeatability
 				if (can_interact_room(IN_ROOM(ch), INTERACT_GATHER)) {
 					GET_ACTION_TIMER(ch) = gather_base_timer;
@@ -1999,7 +1931,7 @@ void process_gathering(char_data *ch) {
 * @param char_data *ch The harvester.
 */
 void process_harvesting(char_data *ch) {
-	if (!ROOM_CROP(IN_ROOM(ch))) {
+	if (!ROOM_CROP(IN_ROOM(ch)) || !can_interact_room(IN_ROOM(ch), INTERACT_HARVEST)) {
 		msg_to_char(ch, "There's nothing left to harvest here.\r\n");
 		cancel_action(ch);
 		return;
@@ -2048,7 +1980,7 @@ void process_harvesting(char_data *ch) {
 		act("You finish harvesting the crop!", FALSE, ch, NULL, NULL, TO_CHAR);
 		act("$n finished harvesting the crop!", FALSE, ch, NULL, NULL, TO_ROOM);
 		
-		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_harvesting)) {
+		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, NULL, GUESTS_ALLOWED, finish_harvesting)) {
 			// skillups
 			gain_player_tech_exp(ch, PTECH_HARVEST, 30);
 			gain_player_tech_exp(ch, PTECH_HARVEST_UPGRADE, 5);
@@ -2088,7 +2020,7 @@ void process_hunting(char_data *ch) {
 	if (number(1, 10000) <= chance_times_100) {
 		// found it!
 		
-		if (get_depletion(IN_ROOM(ch), DPLTN_HUNT) >= config_get_int("short_depletion")) {
+		if (get_depletion(IN_ROOM(ch), DPLTN_HUNT, FALSE) >= config_get_int("short_depletion")) {
 			// late check for depletion: make them hunt first
 			msg_to_char(ch, "You don't seem to be able to find any. Maybe this area has been hunted to depletion.\r\n");
 			GET_ACTION(ch) = ACT_NONE;
@@ -2163,6 +2095,11 @@ void process_mining(char_data *ch) {
 	obj_data *tool;
 	bool success;
 	
+	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
+		msg_to_char(ch, "You can't mine here.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to finish mining.\r\n");
 		cancel_action(ch);
@@ -2176,7 +2113,7 @@ void process_mining(char_data *ch) {
 			cancel_action(ch);
 			break;
 		}
-		if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
+		if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
 			msg_to_char(ch, "You can't mine here.\r\n");
 			cancel_action(ch);
 			break;
@@ -2245,6 +2182,11 @@ void process_minting(char_data *ch) {
 	
 	if (!emp) {
 		msg_to_char(ch, "The mint no longer belongs to any empire and can't be used to make coin.\r\n");
+		cancel_action(ch);
+		return;
+	}
+	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINT)) {
+		msg_to_char(ch, "You can't mint anything here.\r\n");
 		cancel_action(ch);
 		return;
 	}
@@ -2361,8 +2303,8 @@ void process_panning(char_data *ch) {
 			GET_ACTION(ch) = ACT_NONE;
 			
 			// pan will silently fail if depleted
-			if (get_depletion(room, DPLTN_PAN) <= config_get_int("short_depletion")) {
-				success = run_room_interactions(ch, room, INTERACT_PAN, finish_panning);
+			if (get_depletion(room, DPLTN_PAN, FALSE) <= config_get_int("short_depletion")) {
+				success = run_room_interactions(ch, room, INTERACT_PAN, NULL, GUESTS_ALLOWED, finish_panning);
 			}
 			
 			if (success) {
@@ -2373,64 +2315,6 @@ void process_panning(char_data *ch) {
 			}
 			
 			start_panning(ch, dir);
-		}
-	}
-}
-
-
-/**
-* Tick updates for picking.
-*
-* @param char_data *ch The picker.
-*/
-void process_picking(char_data *ch) {	
-	bool found = FALSE;
-	
-	int garden_depletion = config_get_int("garden_depletion");
-	int pick_depletion = config_get_int("pick_depletion");
-	
-	if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't pick anything in an incomplete building.\r\n");
-		cancel_action(ch);
-		return;
-	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to pick anything.\r\n");
-		cancel_action(ch);
-		return;
-	}
-	
-	if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-		send_to_char("You look around for something nice to pick...\r\n", ch);
-	}
-	// no room message
-
-	// decrement
-	GET_ACTION_TIMER(ch) -= 1;
-		
-	if (GET_ACTION_TIMER(ch) <= 0) {
-		GET_ACTION(ch) = ACT_NONE;
-		
-		if (get_depletion(IN_ROOM(ch), DPLTN_PICK) >= (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CROP) ? pick_depletion : (IS_ANY_BUILDING(IN_ROOM(ch)) ? garden_depletion : config_get_int("common_depletion")))) {
-			msg_to_char(ch, "You can't find anything here left to pick.\r\n");
-			act("$n stops looking for things to pick as $e comes up empty-handed.", TRUE, ch, NULL, NULL, TO_ROOM);
-		}
-		else {
-			if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_PICK, finish_picking)) {
-				gain_player_tech_exp(ch, PTECH_PICK, 10);
-				found = TRUE;
-			}
-			else if (can_interact_room(IN_ROOM(ch), INTERACT_HARVEST) && (IS_ADVENTURE_ROOM(IN_ROOM(ch)) || ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD))) {
-				// only orchards allow pick -- and only run this if we hit no herbs at all
-				if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_HARVEST, finish_picking)) {
-					gain_player_tech_exp(ch, PTECH_PICK, 10);
-					found = TRUE;
-				}
-			}
-			
-			if (!found) {
-				msg_to_char(ch, "You couldn't find anything to pick here.\r\n");
-			}
 		}
 	}
 }
@@ -2542,74 +2426,6 @@ void process_prospecting(char_data *ch) {
 			show_prospect_result(ch, IN_ROOM(ch));
 			act("$n finishes prospecting.", TRUE, ch, NULL, NULL, TO_ROOM);
 			break;
-		}
-	}
-}
-
-
-/**
-* The ol' quarry ticker.
-*
-* @param char_data *ch The quarrior.
-*/
-void process_quarrying(char_data *ch) {
-	room_data *in_room;
-	
-	if (!can_interact_room(IN_ROOM(ch), INTERACT_QUARRY) || !IS_COMPLETE(IN_ROOM(ch)) || get_depletion(IN_ROOM(ch), DPLTN_QUARRY) >= config_get_int("common_depletion")) {
-		msg_to_char(ch, "You can't quarry anything here.\r\n");
-		cancel_action(ch);
-		return;
-	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to finish quarrying.\r\n");
-		cancel_action(ch);
-		return;
-	}
-	
-	GET_ACTION_TIMER(ch) -= 1;
-		
-	if (GET_ACTION_TIMER(ch) > 0) {
-		// tick messages
-		switch (number(0, 9)) {
-			case 0: {
-				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					send_to_char("You slip some shims into cracks in the stone.\r\n", ch);
-				}
-				act("$n slips some shims into cracks in the stone.", FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
-				break;
-			}
-			case 1: {
-				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					send_to_char("You brush dust out of the cracks in the stone.\r\n", ch);
-				}
-				act("$n brushes dust out of the cracks in the stone.", FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
-				break;
-			}
-			case 2: {
-				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
-					send_to_char("You hammer a plug drill into the stone.\r\n", ch);
-				}
-				act("$n hammers a plug drill into the stone.", FALSE, ch, 0, 0, TO_ROOM | TO_SPAMMY);
-				break;
-			}
-		}
-	}
-	else {	// done
-		in_room = IN_ROOM(ch);
-		GET_ACTION(ch) = ACT_NONE;
-		
-		if (run_room_interactions(ch, IN_ROOM(ch), INTERACT_QUARRY, finish_quarrying)) {
-			gain_player_tech_exp(ch, PTECH_QUARRY, 25);
-		
-			add_depletion(IN_ROOM(ch), DPLTN_QUARRY, TRUE);
-			
-			// character is still there?
-			if (IN_ROOM(ch) == in_room && GET_ACTION(ch) == ACT_NONE) {
-				start_quarrying(ch);
-			}
-		}
-		else {
-			msg_to_char(ch, "You don't seem to find anything of use.\r\n");
 		}
 	}
 }
@@ -2848,7 +2664,7 @@ void process_tanning(char_data *ch) {
 		return;
 	}
 	
-	GET_ACTION_TIMER(ch) -= (room_has_function_and_city_ok(IN_ROOM(ch), FNC_TANNERY) ? 4 : 1);
+	GET_ACTION_TIMER(ch) -= (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_TANNERY) ? 4 : 1);
 	
 	// need the prototype
 	if (!(proto = obj_proto(GET_ACTION_VNUM(ch, 0)))) {
@@ -2919,7 +2735,7 @@ ACMD(do_bathe) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're a bit busy right now.\r\n");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
+	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BATHS) && !ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_FRESH_WATER | SECTF_SHALLOW_WATER)) {
 		msg_to_char(ch, "You can't bathe here!\r\n");
 	}
 	else {
@@ -3315,7 +3131,12 @@ ACMD(do_harvest) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (GET_ACTION(ch) == ACT_HARVESTING) {
-		msg_to_char(ch, "You stop harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
+		if (ROOM_CROP(IN_ROOM(ch))) {
+			msg_to_char(ch, "You stop harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
+		}
+		else {
+			msg_to_char(ch, "You stop harvesting.\r\n");
+		}
 		act("$n stops harvesting.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
@@ -3331,11 +3152,8 @@ ACMD(do_harvest) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You are already busy doing something else.\r\n");
 	}
-	else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CROP)) {
-		msg_to_char(ch, "You can't harvest anything here!\r\n");
-	}
-	else if (ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD)) {
-		msg_to_char(ch, "You can't harvest the orchard. Use pick or chop.\r\n");
+	else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CROP) || !can_interact_room(IN_ROOM(ch), INTERACT_HARVEST)) {
+		msg_to_char(ch, "You can't harvest anything here!%s\r\n", ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD) ? " (try pick or chop)" : "");
 	}
 	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to harvest this crop.\r\n");
@@ -3378,20 +3196,17 @@ ACMD(do_mine) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
+	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		msg_to_char(ch, "You don't have permission to mine here.\r\n");
+	}
+	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
 		msg_to_char(ch, "This isn't a mine.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "This mine only works in a city.\r\n");
 	}
-	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-		msg_to_char(ch, "You can't mine here because it's not in a city.\r\n");
-	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "The mine shafts aren't finished yet.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to mine here.\r\n");
 	}
 	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_AMOUNT) <= 0) {
 		msg_to_char(ch, "The mine is depleted, you find nothing of use.\r\n");
@@ -3431,7 +3246,7 @@ ACMD(do_mint) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy doing something else right now.\r\n");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINT)) {
+	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINT)) {
 		msg_to_char(ch, "You can't mint anything here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -3506,42 +3321,6 @@ ACMD(do_pan) {
 	}
 	else {
 		start_panning(ch, dir);
-	}
-}
-
-
-ACMD(do_pick) {
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot pick.\r\n");
-	}
-	else if (GET_ACTION(ch) == ACT_PICKING) {
-		send_to_char("You stop searching.\r\n", ch);
-		act("$n stops looking around.", TRUE, ch, 0, 0, TO_ROOM);
-		cancel_action(ch);
-	}
-	else if (!has_player_tech(ch, PTECH_PICK)) {
-		msg_to_char(ch, "You don't have the correct ability to pick anything.\r\n");
-	}
-	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
-		send_config_msg(ch, "need_approval_string");
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		send_to_char("You're already busy.\r\n", ch);
-	}
-	else if (!IS_OUTDOORS(ch)) {
-		send_to_char("You can only pick things outdoors!\r\n", ch);
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to pick anything here.\r\n");
-	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't pick anything in an incomplete building.\r\n");
-	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to pick anything here.\r\n");
-	}
-	else {
-		start_picking(ch);
 	}
 }
 
@@ -3625,10 +3404,6 @@ ACMD(do_plant) {
 			schedule_crop_growth(GET_MAP_LOC(IN_ROOM(ch)));
 		}
 		
-		// temporarily deplete seeded rooms
-		set_depletion(IN_ROOM(ch), DPLTN_FORAGE, config_get_int("short_depletion"));
-		set_depletion(IN_ROOM(ch), DPLTN_PICK, config_get_int("pick_depletion"));
-		
 		extract_obj(obj);
 		
 		start_action(ch, ACT_PLANTING, 4);
@@ -3705,42 +3480,6 @@ ACMD(do_prospect) {
 }
 
 
-ACMD(do_quarry) {
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot quarry.\r\n");
-	}
-	else if (GET_ACTION(ch) == ACT_QUARRYING) {
-		send_to_char("You stop quarrying.\r\n", ch);
-		act("$n stops quarrying.", FALSE, ch, 0, 0, TO_ROOM);
-		cancel_action(ch);
-	}
-	else if (!has_player_tech(ch, PTECH_QUARRY)) {
-		msg_to_char(ch, "You don't have the correct ability to quarry anything.\r\n");
-	}
-	else if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
-		send_config_msg(ch, "need_approval_string");
-	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		send_to_char("You're already busy.\r\n", ch);
-	}
-	else if (!can_interact_room(IN_ROOM(ch), INTERACT_QUARRY)) {
-		send_to_char("You can't quarry here.\r\n", ch);
-	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't quarry until it's finished!\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to quarry here.\r\n");
-	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
-		msg_to_char(ch, "It's too dark to quarry anything here.\r\n");
-	}
-	else {
-		start_quarrying(ch);
-	}
-}
-
-
 ACMD(do_saw) {
 	obj_data *obj, *saw;
 
@@ -3759,7 +3498,7 @@ ACMD(do_saw) {
 	else if (!IS_APPROVED(ch) && config_get_bool("craft_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!(saw = has_tool(ch, TOOL_SAW)) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_SAW)) {
+	else if (!(saw = has_tool(ch, TOOL_SAW)) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_SAW)) {
 		msg_to_char(ch, "You need to use a saw of some kind to do that.\r\n");
 	}
 	else if (!saw && !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
@@ -3915,5 +3654,322 @@ ACMD(do_tan) {
 		act("$n begins to tan $p.", FALSE, ch, obj, NULL, TO_ROOM);
 
 		extract_obj(obj);
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// GENERIC INTERACTIONS: do_gen_interact_room //////////////////////////////
+/**
+* This system uses the gen_interact_data config array to manage chores that
+* meet these critera:
+* - have a timed action using an ACT_ type
+* - gather/produce a resource using an INTERACT_ type
+*/
+
+
+/**
+* Get a gen_interact_data[] entry by type.
+*
+* @param int interact_type Any INTERACT_ type.
+* @return const struct gen_interact_data_t* The gen_interact_data entry.
+*/
+const struct gen_interact_data_t *get_interact_data_by_type(int interact_type) {
+	int iter;
+	for (iter = 0; gen_interact_data[iter].interact != -1; ++iter) {
+		if (gen_interact_data[iter].interact == interact_type) {
+			return &gen_interact_data[iter];
+		}
+	}
+	return NULL;	// not found
+}
+
+
+/**
+* Get a gen_interact_data[] entry by action.
+*
+* @param int act_type Any ACT_ type.
+* @return const struct gen_interact_data_t* The gen_interact_data entry.
+*/
+const struct gen_interact_data_t *get_interact_data_by_action(int act_type) {
+	int iter;
+	for (iter = 0; gen_interact_data[iter].interact != -1; ++iter) {
+		if (gen_interact_data[iter].action == act_type) {
+			return &gen_interact_data[iter];
+		}
+	}
+	return NULL;	// not found
+}
+
+
+/**
+* Looks for available non-depleted interactions.
+*
+* @param char_data *ch The player trying to gen-interact.
+* @param room_data *room The location.
+* @param const struct gen_interact_data_t *data 
+* @return bool TRUE if you can, FALSE if not (messages when false).
+*/ 
+bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_interact_data_t *data) {
+	bool can_room_but_no_permit = FALSE, can_room_but_depleted = FALSE, no_guest_room = FALSE;
+	vehicle_data *can_veh_but_no_permit = NULL, *can_veh_but_depleted = NULL;
+	char buf[MAX_STRING_LENGTH];
+	vehicle_data *veh;
+	
+	if (!ch || !data) {
+		return FALSE;	// safety-only; this should be impossible
+	}
+	
+	// check room first
+	if (SECT_CAN_INTERACT_ROOM(room, data->interact) || BLD_CAN_INTERACT_ROOM(room, data->interact) || RMT_CAN_INTERACT_ROOM(room, data->interact) || CROP_CAN_INTERACT_ROOM(room, data->interact)) {
+		if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+			can_room_but_no_permit = TRUE;	// error later
+		}
+		else if (data->depletion && get_depletion(room, data->depletion, FALSE) >= get_interaction_depletion_room(ch, GET_LOYALTY(ch), room, data->interact, FALSE)) {
+			can_room_but_depleted = TRUE;	// error later
+		}
+		else {
+			return TRUE;	// room passed basic checks
+		}
+	}
+	
+	no_guest_room = !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED);
+	
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (!VEH_IS_COMPLETE(veh) || !has_interaction(VEH_INTERACTIONS(veh), data->interact)) {
+			continue;	// can't act on veh at all
+		}
+		else if (no_guest_room || !can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
+			can_veh_but_no_permit = veh;
+			continue;
+		}
+		else if (data->depletion != NOTHING && get_vehicle_depletion(veh, data->depletion, FALSE) >= get_interaction_depletion(ch, GET_LOYALTY(ch), VEH_INTERACTIONS(veh), data->interact, FALSE)) {
+			can_veh_but_depleted = veh;
+			continue;
+		}
+		else {
+			return TRUE;	// success!
+		}
+	}
+	
+	// if the room or any vehicle was valid, it already returned. Otherwise look for an error:
+	if (can_room_but_depleted || can_veh_but_depleted) {
+		msg_to_char(ch, "There's nothing to %s here.\r\n", data->command);
+	}
+	else if (can_room_but_no_permit) {
+		msg_to_char(ch, "You don't have permission to %s here.\r\n", data->command);
+	}
+	else if (can_veh_but_no_permit && no_guest_room) {
+		snprintf(buf, sizeof(buf), "You can't %s $V because someone else owns this area.", data->command);
+		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR);
+	}
+	else if (can_veh_but_no_permit) {
+		snprintf(buf, sizeof(buf), "You don't have permission to %s $V.", data->command);
+		act(buf, FALSE, ch, NULL, can_veh_but_no_permit, TO_CHAR);
+	}
+	else {
+		msg_to_char(ch, "You can't %s here.\r\n", data->command);
+	}
+	
+	// reached end
+	return FALSE;
+}
+
+
+/**
+* Determines if you can (still) perform a do_gen_interact_room task.
+*
+* @param char_data *ch The player.
+* @param const struct gen_interact_data_t *data Pointer to the gen_interact_data[] entry.
+* @return bool TRUE if it's ok to proceed, FALSE if it sent an error message.
+*/
+bool validate_gen_interact_room(char_data *ch, const struct gen_interact_data_t *data) {
+	if (data->ptech != NOTHING && !has_player_tech(ch, data->ptech)) {
+		msg_to_char(ch, "You don't have the correct ability to %s.\r\n", data->command);
+	}
+	else if (data->approval_config && *(data->approval_config) && !IS_APPROVED(ch) && config_get_bool(data->approval_config)) {
+		send_config_msg(ch, "need_approval_string");
+	}
+	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		msg_to_char(ch, "It's too dark to %s anything here.\r\n", data->command);
+	}
+	else if (!can_gen_interact_room(ch, IN_ROOM(ch), data)) {
+		// sends own messages
+	}
+	else {
+		return TRUE;	// safe!
+	}
+	
+	return FALSE;	// if we got here
+}
+
+
+// note: still need GET_ACTION in here
+INTERACTION_FUNC(finish_gen_interact_room) {
+	const struct gen_interact_data_t *data = get_interact_data_by_action(GET_ACTION(ch));
+	char buf[MAX_STRING_LENGTH];
+	obj_data *obj = NULL;
+	char *cust;
+	int num, amount;
+	
+	// safety check
+	if (!data) {
+		return FALSE;
+	}
+	
+	amount = interact_one_at_a_time[interaction->type] ? 1 : interaction->quantity;
+	
+	// give items
+	for (num = 0; num < amount; ++num) {
+		obj = read_object(interaction->vnum, TRUE);
+		scale_item_to_level(obj, 1);	// minimum level
+		obj_to_char_or_room(obj, ch);
+		load_otrigger(obj);
+	}
+	
+	// mark gained
+	if (GET_LOYALTY(ch)) {
+		add_production_total(GET_LOYALTY(ch), interaction->vnum, amount);
+	}
+	
+	// check depletion
+	if (data->depletion) {
+		if (inter_veh) {
+			add_vehicle_depletion(inter_veh, data->depletion, TRUE);
+		}
+		else {
+			add_depletion(inter_room ? inter_room : IN_ROOM(ch), data->depletion, TRUE);
+		}
+	}
+	
+	if (obj) {
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_CHAR);
+		if (cust || data->msg.finish[0]) {
+			if (amount > 1) {
+				sprintf(buf, "%s (x%d)", cust ? cust : data->msg.finish[0], amount);
+			}
+			else {
+				strcpy(buf, cust ? cust : data->msg.finish[0]);
+			}
+			act(buf, FALSE, ch, obj, NULL, TO_CHAR);
+		}
+		
+		cust = obj_get_custom_message(obj, OBJ_CUSTOM_RESOURCE_TO_ROOM);
+		if (cust || data->msg.finish[1]) {
+			act(cust ? cust : data->msg.finish[1], FALSE, ch, obj, NULL, TO_ROOM);
+		}
+	}
+	
+	return TRUE;
+}
+
+
+/**
+* Begins a do_gen_interact_room action.
+*
+* @param char_data *ch A player with permission to interact here.
+* @param const struct gen_interact_data_t *data A pointer to the gen_interact_data[].
+*/
+void start_gen_interact_room(char_data *ch, const struct gen_interact_data_t *data) {
+	if (!data || !can_gen_interact_room(ch, IN_ROOM(ch), data)) {
+		// fails silently if !data but that shouldn't even be possible; messages otherwise
+		return;
+	}
+	
+	start_action(ch, data->action, data->timer);
+	if (data->msg.start[0]) {
+		msg_to_char(ch, "%s\r\n", data->msg.start[0]);
+	}
+	if (data->msg.start[1]) {
+		act(data->msg.start[1], FALSE, ch, NULL, NULL, TO_ROOM);
+	}
+}
+
+
+/**
+* Ticker function for do_gen_interact_room.
+*
+* @param char_data *ch The person doing the interaction.
+*/
+void process_gen_interact_room(char_data *ch) {
+	const struct gen_interact_data_t *data = get_interact_data_by_action(GET_ACTION(ch));
+	room_data *in_room;
+	int count, pos;
+	
+	if (!data || !validate_gen_interact_room(ch, data)) {
+		cancel_action(ch);
+		return;
+	}
+	
+	GET_ACTION_TIMER(ch) -= 1;
+	
+	if (GET_ACTION_TIMER(ch) > 0) {
+		// still going: tick messages
+		if (data->msg.random_tick[0][0] && number(1, 100) <= data->msg.random_frequency) {
+			for (count = 0; data->msg.random_tick[count][0] != NULL; ++count);
+			if (count > 0) {
+				pos = number(0, count-1);
+				if (!PRF_FLAGGED(ch, PRF_NOSPAM)) {
+					msg_to_char(ch, "%s\r\n", data->msg.random_tick[pos][0]);
+				}
+				if (data->msg.random_tick[pos][1]) {
+					act(data->msg.random_tick[pos][1], FALSE, ch, NULL, NULL, TO_ROOM | TO_SPAMMY);
+				}
+			}
+		}
+	}
+	else {	// done
+		// do not un-set GET_ACTION before running interactions
+		
+		if (run_room_interactions(ch, IN_ROOM(ch), data->interact, NULL, MEMBERS_ONLY, finish_gen_interact_room)) {
+			GET_ACTION(ch) = ACT_NONE;
+			in_room = IN_ROOM(ch);
+			
+			if (data->ptech) {
+				gain_player_tech_exp(ch, data->ptech, 10);
+			}
+			
+			// character is still there? repeat
+			if (IN_ROOM(ch) == in_room && GET_ACTION(ch) == ACT_NONE) {
+				start_gen_interact_room(ch, data);
+			}
+		}
+		else if (data->msg.empty && *(data->msg.empty)) {
+			GET_ACTION(ch) = ACT_NONE;
+			msg_to_char(ch, "%s\r\n", data->msg.empty);
+		}
+		else {
+			GET_ACTION(ch) = ACT_NONE;
+			msg_to_char(ch, "You find nothing.\r\n");
+		}
+	}
+}
+
+
+// subcommand is an INTERACT_ type
+ACMD(do_gen_interact_room) {
+	const struct gen_interact_data_t *data;
+	char buf[MAX_STRING_LENGTH];
+	
+	if (!(data = get_interact_data_by_type(subcmd))) {
+		msg_to_char(ch, "This command is not yet implemented.\r\n");
+	}
+	else if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot do this.\r\n");
+	}
+	else if (GET_ACTION(ch) == data->action) {
+		msg_to_char(ch, "You stop %s.\r\n", data->verb);
+		snprintf(buf, sizeof(buf), "$n stops %s.", data->verb);
+		act(buf, FALSE, ch, 0, 0, TO_ROOM);
+		cancel_action(ch);
+	}
+	else if (GET_ACTION(ch) != ACT_NONE) {
+		send_to_char("You're already busy.\r\n", ch);
+	}
+	else if (!validate_gen_interact_room(ch, data)) {
+		// sends own message
+	}
+	else {
+		start_gen_interact_room(ch, data);
 	}
 }

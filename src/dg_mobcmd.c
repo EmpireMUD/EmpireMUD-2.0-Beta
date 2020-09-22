@@ -582,7 +582,7 @@ ACMD(do_mbuildingecho) {
 
 ACMD(do_mregionecho) {
 	char room_number[MAX_INPUT_LENGTH], radius_arg[MAX_INPUT_LENGTH], *msg;
-	bool use_queue, indoor_only = FALSE;
+	bool use_queue, outdoor_only = FALSE;
 	room_data *center;
 	char_data *targ;
 	int radius;
@@ -613,7 +613,7 @@ ACMD(do_mregionecho) {
 		radius = atoi(radius_arg);
 		if (radius < 0) {
 			radius = -radius;
-			indoor_only = TRUE;
+			outdoor_only = TRUE;
 		}
 		
 		if (center) {
@@ -621,7 +621,7 @@ ACMD(do_mregionecho) {
 				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
 					continue;
 				}
-				if (indoor_only && IS_OUTDOORS(targ)) {
+				if (outdoor_only && !IS_OUTDOORS(targ)) {
 					continue;
 				}
 				
@@ -834,6 +834,7 @@ ACMD(do_mload) {
 			return;
 		}
 		veh = read_vehicle(number, TRUE);
+		VEH_INSTANCE_ID(veh) = MOB_INSTANCE_ID(ch);
 		vehicle_to_room(veh, IN_ROOM(ch));
 		
 		if (*target && isdigit(*target)) {

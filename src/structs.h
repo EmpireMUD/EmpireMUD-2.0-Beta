@@ -388,7 +388,9 @@ typedef struct vehicle_data vehicle_data;
 #define INTERACT_IDENTIFIES_TO  28
 #define INTERACT_RUINS_TO_BLD  29
 #define INTERACT_RUINS_TO_VEH  30
-#define NUM_INTERACTS  31
+#define INTERACT_PRODUCTION  31
+#define INTERACT_SKILLED_LABOR  32
+#define NUM_INTERACTS  33
 
 
 // INTERACT_RESTRICT_x: types of interaction restrictions
@@ -848,7 +850,7 @@ typedef struct vehicle_data vehicle_data;
 
 // FNC_x: function flags (for buildings)
 #define FNC_ALCHEMIST  BIT(0)	// can brew and mix here
-#define FNC_APIARY  BIT(1)	// beekeeping chore
+	#define FNC_UNUSED  BIT(1)	// formerly 'apiary'
 #define FNC_BATHS  BIT(2)	// can use the bathe command here
 #define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
 #define FNC_CARPENTER  BIT(4)	// required by some crafts
@@ -885,6 +887,7 @@ typedef struct vehicle_data vehicle_data;
 #define FNC_STORE_ALL BIT(35) // anything can be stored here (does not allow retrieval)
 #define FNC_IN_CITY_ONLY  BIT(36)	// functions only work in-city
 #define FNC_OVEN  BIT(37)	// for cooking
+#define FNC_MAGIC_WORKFSHOP  BIT(38)	// no code purpose but can be used for workforce
 
 // These function flags don't work on movable vehicles (they require room data)
 #define IMMOBILE_FNCS  (FNC_MINE | FNC_TAVERN | FNC_TOMB | FNC_LIBRARY)
@@ -1055,10 +1058,10 @@ typedef struct vehicle_data vehicle_data;
 // CRAFT_x: Craft Flags for do_gen_craft
 #define CRAFT_POTTERY  BIT(0)  // bonus at pottery; requires fire
 #define CRAFT_BUILDING  BIT(1)  // makes a building (on any craft type; BUILD type automatically counts as this)
-	#define CRAFT_UNUSED1  BIT(2)  // formerly "requires glassblowing tech"
-#define CRAFT_GLASSBLOWER  BIT(3)  // requires glassblower building
-#define CRAFT_CARPENTER  BIT(4)  // requires carpenter building
-#define CRAFT_ALCHEMY  BIT(5)  // requires access to glass/alchemist and fire
+#define CRAFT_SKILLED_LABOR  BIT(2)  // workforce can only produce this if the empire has skilled labor
+	#define CRAFT_UNUSED1  BIT(3)  // formerly glassblower (which now uses a function)
+	#define CRAFT_UNUSED2  BIT(4)  // formerly carpenter (now using function)
+	#define CRAFT_UNUSED3  BIT(5)  // formerly alchemist (which ultimately was the same as FIRE)
 	#define CRAFT_UNUSED  BIT(6)  // formerly sharp-tool/knife (now uses requires-tool)
 #define CRAFT_FIRE  BIT(7)  // requires any fire source
 #define CRAFT_SOUP  BIT(8)  // is a soup: requires a container of water, and the "object" property is a liquid id
@@ -1067,15 +1070,12 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_DISMANTLE_ONLY  BIT(11)	// build: building can be dismantled but not built
 #define CRAFT_IN_CITY_ONLY  BIT(12)	// craft/building must be inside a city
 #define CRAFT_VEHICLE  BIT(13)	// creates a vehicle instead of an object
-#define CRAFT_SHIPYARD  BIT(14)	// requires a shipyard
+	#define CRAFT_UNUSED5  BIT(14)	// formerly shipyard (now uses a function)
 #define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
 #define CRAFT_LEARNED  BIT(16)	// cannot use unless learned
 #define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
 #define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
 #define CRAFT_TAKE_REQUIRED_OBJ  BIT(19)	// causes the craft to take the 'required-obj' when created, if any (and may refund it on dismantle)
-
-// list of above craft flags that require a building in some way
-#define CRAFT_FLAGS_REQUIRING_BUILDINGS  (CRAFT_GLASSBLOWER | CRAFT_CARPENTER | CRAFT_ALCHEMY | CRAFT_SHIPYARD)
 
 // For find_building_list_entry
 #define FIND_BUILD_NORMAL  0
@@ -1144,28 +1144,28 @@ typedef struct vehicle_data vehicle_data;
 #define CHORE_SCRAPING  8
 #define CHORE_SMELTING  9
 #define CHORE_WEAVING  10
-#define CHORE_QUARRYING  11
-#define CHORE_NAILMAKING  12
-#define CHORE_BRICKMAKING  13
+#define CHORE_PRODUCTION  11	// formerly quarry, trapping, beekeeping, herb-gardening
+#define CHORE_CRAFTING  12	// formerly nailmaking, brickmaking, glassmaking
+	#define CHORE_UNUSED1  13
 #define CHORE_ABANDON_DISMANTLED  14
-#define CHORE_HERB_GARDENING  15
+	#define CHORE_UNUSED_C  15
 #define CHORE_FIRE_BRIGADE  16
-#define CHORE_TRAPPING  17
+	#define CHORE_UNUSED_A  17
 #define CHORE_TANNING  18
 #define CHORE_SHEARING  19
 #define CHORE_MINTING  20
 #define CHORE_DISMANTLE_MINES  21
 #define CHORE_ABANDON_CHOPPED  22
 #define CHORE_ABANDON_FARMED  23
-#define CHORE_NEXUS_CRYSTALS  24
+	#define CHORE_UNUSED2  24
 #define CHORE_MILLING  25
-	#define CHORE_UNUSED  26	// formerly: CHORE_REPAIR_VEHICLES  26, merged with CHORE_MAINTENANCE
+	#define CHORE_UNUSED3  26	// formerly: CHORE_REPAIR_VEHICLES  26, merged with CHORE_MAINTENANCE
 #define CHORE_OILMAKING  27
 #define CHORE_GENERAL  28	// for reporting problems
 #define CHORE_FISHING  29
 #define CHORE_BURN_STUMPS  30
-#define CHORE_BEEKEEPING  31
-#define CHORE_GLASSMAKING  32
+	#define CHORE_UNUSED_B  31
+	#define CHORE_UNUSED4  32
 #define NUM_CHORES  33		// total
 
 
@@ -1272,7 +1272,7 @@ typedef struct vehicle_data vehicle_data;
 
 
 // TECH_x: Technologies
-	#define TECH_UNUSED  0	// formerly glassblowing
+	#define TECH_UNUSED0  0	// formerly glassblowing
 #define TECH_CITY_LIGHTS  1
 #define TECH_LOCKS  2
 	#define TECH_UNUSED1  3	// formerly apiaries
@@ -1284,7 +1284,7 @@ typedef struct vehicle_data vehicle_data;
 #define TECH_MASTER_PORTALS  9
 #define TECH_SKILLED_LABOR  10
 #define TECH_TRADE_ROUTES  11
-#define TECH_EXARCH_CRAFTS  12
+	#define TECH_UNUSED  12	// formerly exarch crafts
 #define TECH_DEEP_MINES  13
 #define TECH_RARE_METALS  14
 #define TECH_BONUS_EXPERIENCE  15
@@ -1322,6 +1322,7 @@ typedef struct vehicle_data vehicle_data;
 #define WF_PROB_ALREADY_SHEARED  4	// mob sheared too recently
 #define WF_PROB_DELAYED  5	// delayed by a previous failure
 #define WF_PROB_OUT_OF_CITY  6	// building requires in-city
+#define WF_PROB_ADVENTURE_PRESENT  7	// blocked by adventure instance
 
 
 // for tracking playtime
@@ -2590,7 +2591,8 @@ typedef struct vehicle_data vehicle_data;
 #define DPLTN_TRAPPING  7
 #define DPLTN_CHOP  8
 #define DPLTN_HUNT  9
-#define NUM_DEPLETION_TYPES  10	// total
+#define DPLTN_PRODUCTION  10
+#define NUM_DEPLETION_TYPES  11	// total
 
 
 // EVO_x: world evolutions
@@ -2682,8 +2684,8 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_CHOP_PROGRESS  8
 #define ROOM_EXTRA_TRENCH_PROGRESS  9
 #define ROOM_EXTRA_HARVEST_PROGRESS  10
-#define ROOM_EXTRA_GARDEN_WORKFORCE_PROGRESS  11
-#define ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS  12
+	#define ROOM_EXTRA_GARDEN_WORKFORCE_PROGRESS  11	// deprecated
+	#define ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS  12	// deprecated
 #define ROOM_EXTRA_BUILD_RECIPE  13
 #define ROOM_EXTRA_FOUND_TIME  14
 #define ROOM_EXTRA_REDESIGNATE_TIME  15
@@ -2880,6 +2882,26 @@ struct file_lookup_struct {
 	char *cmd;
 	int level;
 	char *file;
+};
+
+
+// for do_gen_interact_room, act.actions.c
+struct gen_interact_data_t {
+	int interact;	// INTERACT_ type
+	int action;	// ACT_ type
+	char *command;	// 'quarry'
+	char *verb;	// 'quarrying'
+	int timer;	// number of action ticks
+	int ptech;	// required ptech (may be NOTHING)
+	int depletion;	// DPLTN_ type (may be NOTHING)
+	char *approval_config;	// a 'bool' key for the config system like "gather_approval" (may be null)
+	struct {	// for all strings, index 0 is to-char and index 1 is to-room
+		char *start[2];	// shown at start-action
+		char *finish[2];	// shown when resource is gained (unless there's a custom message), may contain $p
+		char *empty;	// char-only, shown at the end if there's nothing they can get
+		int random_frequency;	// 1-100% chance to see a message per tick
+		char *random_tick[10][2];
+	} msg;
 };
 
 
@@ -3387,6 +3409,7 @@ struct instance_data {
 	struct instance_mob *mob_counts;	// hash table (hh)
 	bool cleanup;	// TRUE if the instance is expired and mid-cleanup
 	
+	struct instance_data *prev;
 	struct instance_data *next;
 };
 
@@ -4408,6 +4431,7 @@ struct craft_data {
 	
 	bitvector_t requires_tool;	// any TOOL_ flags required to make this
 	obj_vnum requires_obj;	// only shows up if you have the item
+	bitvector_t requires_function;	// FNC_
 	struct resource_data *resources;	// linked list
 	
 	UT_hash_handle hh;	// craft_table hash
@@ -4559,6 +4583,14 @@ struct empire_completed_goal {
 	time_t when;
 	
 	UT_hash_handle hh;	// stored in empire's hash table
+};
+
+
+// hash of items dropped around the empire (blocks workforce cheating)
+struct empire_dropped_item {
+	obj_vnum vnum;
+	int count;
+	UT_hash_handle hh;	// EMPIRE_DROPPED_ITEMS()
 };
 
 
@@ -4893,6 +4925,7 @@ struct empire_data {
 	int max_level;	// maximum level in the empire
 	bitvector_t delayed_refresh;	// things that are requesting an update
 	struct empire_member_account *member_accounts;	// tracks greatness/etc
+	struct empire_dropped_item *dropped_items;	// hash (by vnum) of items dropped in the empire
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them
@@ -5558,6 +5591,7 @@ struct vehicle_data {
 	obj_data *contains;	// contains objects
 	int carrying_n;	// size of contents
 	struct vehicle_attached_mob *animals;	// linked list of mobs attached
+	struct depletion_data *depletion;	// resource depletions tied to the vehicle
 	struct resource_data *needs_resources;	// resources until finished/maintained
 	struct resource_data *built_with;	// resources used to build it
 	room_data *interior_home_room;	// the vehicle's main room
@@ -5572,6 +5606,7 @@ struct vehicle_data {
 	char_data *driver;	// person driving it
 	int construction_id;	// temporary id used to resume construction/dismantle
 	struct room_extra_data *extra_data;	// hash of misc storage
+	any_vnum instance_id;	// adventure instance the vehicle belongs to, or NOTHING if none
 	
 	// scripting
 	int script_id;	// used by DG triggers - unique id
@@ -5815,7 +5850,8 @@ struct track_data {
 	mob_vnum mob_num;	// mob or NOTHING
 	
 	time_t timestamp;	// when
-	byte dir;	// which way
+	byte dir;	// which way (may be NO_DIR)
+	room_vnum to_room;	// for tracks that enter portals/vehicles
 	
 	struct track_data *next, *prev;	// doubly-linked list
 };

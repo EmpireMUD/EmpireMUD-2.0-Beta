@@ -383,12 +383,12 @@ A pineapple is sitting on the ground.~
    You can eat this succulent tropical fruit, or plant it. You'll have to plant
 it on partially-cleared jungle.
 ~
-6 bl a 0 4
+6 bgl a 0 5
 12 10225 0
 7 168
 O+ 1 6133
 R
-5114 0
+4 5114 0
 S
 #10227
 agave heart~
@@ -400,7 +400,7 @@ You can eat this heart of the agave plant, or replant it.
 12 10226 0
 7 168
 R
-5116 0
+4 5116 0
 S
 #10228
 pads cactus stack~
@@ -413,7 +413,7 @@ used to plant more.
 6 10227 0
 7 168
 R
-5114 0
+4 5114 0
 S
 #10229
 fruit cactus~
@@ -435,7 +435,7 @@ The aloe leaves might be made into something soothing.
 0 10228 0
 7 0
 R
-5130 0
+4 5130 0
 S
 #10231
 dandelions desert~
@@ -629,10 +629,10 @@ Quaff this swirling greenish potion to regain health.
 8 0
 C
 150 150
-I 26 800 100.00 1  # DECAYS-TO: a flask
-I 27 800 100.00 1  # CONSUMES-TO: a flask
+I 26 800 100.00 1  # DECAYS-TO: glass flask
+I 27 800 100.00 1  # CONSUMES-TO: glass flask
 R
-5130 0
+4 5130 0
 T 1250
 S
 #10245
@@ -678,9 +678,9 @@ patterns purchased from the Portal to the Primeval adventure.
 0 0 0
 14 0
 R
-5621 0
+4 5621 0
 R
-5193 0
+4 5193 0
 S
 #10253
 bottle essence terror~
@@ -693,9 +693,9 @@ the dawn of time from a flying creature who truly embodies the concept.
 0 0 0
 8 0
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #10254
 gem stunning violet~
@@ -708,9 +708,9 @@ can be used in some kind of crafting recipe.
 0 0 0
 10 0
 R
-5621 0
+4 5621 0
 R
-5193 0
+4 5193 0
 S
 #10255
 bracelet dracosaur bone~
@@ -797,7 +797,7 @@ This branch is thick with sap, and looks like it would make a good torch.
 3 0 ao 0 1
 0 0 0
 0 0
-I 11 10262 100.00 1 X  # LIGHT: a lit branch
+I 11 10262 100.00 1 X  # LIGHT: lit branch
 S
 #10262
 branch lit burning~
@@ -843,11 +843,11 @@ patterns from the Portal to the Primeval adventure.
 0 0 0
 7 0
 R
-5120 0
+4 5120 0
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #10267
 tooth dracosaur serrated~
@@ -861,11 +861,11 @@ this, if you bought the patterns from the Portal to the Primeval adventure.
 0 0 0
 14 0
 R
-5120 0
+4 5120 0
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #10268
 axe bone primordial~

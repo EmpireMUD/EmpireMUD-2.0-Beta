@@ -1290,7 +1290,10 @@ bool can_claim(char_data *ch) {
 */
 bool can_use_room(char_data *ch, room_data *room, int mode) {
 	room_data *homeroom = HOME_ROOM(room);
-
+	
+	if (mode == NOTHING) {
+		return TRUE;	// nothing asked, nothing checked
+	}
 	// no owner?
 	if (!ROOM_OWNER(homeroom)) {
 		return TRUE;
@@ -1323,10 +1326,13 @@ bool can_use_room(char_data *ch, room_data *room, int mode) {
 */
 bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 	room_data *homeroom = HOME_ROOM(room);
-
+	
 	// unclaimable always denies MEMBERS_x
 	if (mode != GUESTS_ALLOWED && ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) {
 		return FALSE;
+	}
+	if (mode == NOTHING) {
+		return TRUE;	// nothing asked, nothing checked
 	}
 	// no owner?
 	if (!ROOM_OWNER(homeroom)) {
@@ -1361,6 +1367,9 @@ bool emp_can_use_room(empire_data *emp, room_data *room, int mode) {
 bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode) {
 	room_data *interior = VEH_INTERIOR_HOME_ROOM(veh);	// if any
 	
+	if (mode == NOTHING) {
+		return TRUE;	// nothing asked, nothing checked
+	}
 	// no owner?
 	if (!VEH_OWNER(veh)) {
 		return TRUE;
@@ -2754,6 +2763,26 @@ char *get_mob_name_by_proto(mob_vnum vnum, bool replace_placeholders) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// OBJECT UTILS ////////////////////////////////////////////////////////////
+
+/**
+* Finds a portal in the room with a given destination.
+*
+* @param room_data *room The room to start in.
+* @param room_vnum to_room The destination to look for.
+* @return obj_data* The portal that leads there, if any. Otherwise, NULL.
+*/
+obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room) {
+	obj_data *obj;
+	
+	DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+		if (IS_PORTAL(obj) && GET_PORTAL_TARGET_VNUM(obj) == to_room) {
+			return obj;
+		}
+	}
+	
+	return NULL;
+}
+
 
 /**
 * Quick way to turn a vnum into a name, safely.
@@ -5517,7 +5546,7 @@ room_data *find_load_room(char_data *ch) {
 	bool veh_ok;
 	
 	// preferred graveyard?
-	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch))) && room_has_function_and_city_ok(rl, FNC_TOMB) && can_use_room(ch, rl, GUESTS_ALLOWED) && !IS_BURNING(rl)) {
+	if (!IS_NPC(ch) && (rl = real_room(GET_TOMB_ROOM(ch))) && room_has_function_and_city_ok(GET_LOYALTY(ch), rl, FNC_TOMB) && can_use_room(ch, rl, GUESTS_ALLOWED) && !IS_BURNING(rl)) {
 		// check that we're not somewhere illegal (vehicle in enemy territory)
 		veh_ok = GET_MAP_LOC(rl) && (map = real_room(GET_MAP_LOC(rl)->vnum)) && can_use_room(ch, map, GUESTS_ALLOWED);
 		
@@ -5533,7 +5562,7 @@ room_data *find_load_room(char_data *ch) {
 		island = GET_ISLAND_ID(rl);
 		found = NULL;
 		HASH_ITER(hh, EMPIRE_TERRITORY_LIST(GET_LOYALTY(ch)), ter, next_ter) {
-			if (room_has_function_and_city_ok(ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !IS_BURNING(ter->room)) {
+			if (room_has_function_and_city_ok(GET_LOYALTY(ch), ter->room, FNC_TOMB) && IS_COMPLETE(ter->room) && GET_ISLAND_ID(ter->room) == island && !IS_BURNING(ter->room)) {
 				// pick at random if more than 1
 				if (!number(0, num_found++) || !found) {
 					found = ter->room;
@@ -6168,19 +6197,26 @@ unsigned long long microtime(void) {
 
 /**
 * Determines if a room both has a function flag, and passes any necessary
-* in-city requirements. (If the room does not have BLD_IN_CITY_ONLY, this only
+* in-city requirements. (If the room does not have FNC_IN_CITY_ONLY, this only
 * checks the function.)
 *
+* Note: If a player has no empire, they generally pass the for_emp part of this
+* test and you should still check use-permission separately, too.
+*
+* @param empire_data *for_emp Optional: Which empire wants to use the functions. If NULL, no empire/owner check is made.
 * @param room_data *room The room to check.
 * @param bitvector_t fnc_flag Any FNC_ flag.
 * @return bool TRUE if the room has the function and passed the city check, FALSE if not.
 */
-bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
+bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvector_t fnc_flag) {
 	vehicle_data *veh;
 	bool junk;
 	
 	// check vehicles first
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (for_emp && VEH_OWNER(veh) && VEH_OWNER(veh) != for_emp && !emp_can_use_vehicle(for_emp, veh, GUESTS_ALLOWED)) {
+			continue;
+		}
 		if (!VEH_IS_COMPLETE(veh)) {
 			continue;
 		}
@@ -6196,6 +6232,9 @@ bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
 	}
 	
 	// otherwise check the room itself
+	if (for_emp && ROOM_OWNER(room) && ROOM_OWNER(room) != for_emp && !emp_can_use_room(for_emp, room, GUESTS_ALLOWED)) {
+		return FALSE;	// ownership failed
+	}
 	if (!HAS_FUNCTION(room, fnc_flag) || !IS_COMPLETE(room)) {
 		return FALSE;
 	}
@@ -6205,6 +6244,47 @@ bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag) {
 	
 	// oh okay
 	return TRUE;
+}
+
+
+/**
+* Determines if a vehicle both has a function flag, and passes any necessary
+* in-city requirements. (If it does not have FNC_IN_CITY_ONLY, this only
+* checks the function.)
+*
+* A vehicle that is not owned cannot be in-city. The vehicle must be in the
+* radius of its owner's city, and not on land claimed by another empire.
+*
+* @param vehicle_data *veh The vehicle to test.
+* @param bitvector_t fnc_flag Any FNC_ flag.
+* @return bool TRUE if the vehicle has the function and passed the city check, FALSE if not.
+*/
+bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag) {
+	empire_data *emp = VEH_OWNER(veh);
+	room_data *room = IN_ROOM(veh);
+	bool junk;
+	
+	if (!VEH_IS_COMPLETE(veh) || !IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
+		return FALSE;	// no function
+	}
+	if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS) && IS_SET(fnc_flag, IMMOBILE_FNCS)) {
+		return FALSE;	// exclude certain functions on movable vehicles (functions that require room data)
+	}
+	
+	// for checks that do require in-city
+	if (IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY)) {
+		if (!emp) {
+			return FALSE;	// no owner = cannot be in-city
+		}
+		if (ROOM_OWNER(room) && ROOM_OWNER(room) != emp) {
+			return FALSE;	// someone else's claim is not in our city
+		}
+		if (get_territory_type_for_empire(room, emp, TRUE, &junk) != TER_CITY) {
+			return FALSE;	// not in-city for us either
+		}
+	}
+	
+	return TRUE;	// if we made it this far
 }
 
 

@@ -1,7 +1,9 @@
 #2500
 imperial raiment of the bear~
 2500 1
-4 199 q 42 -1 0
+4 199 q 42 -1 0 0
+B
+0 0 0
 L
 100
 R
@@ -22,7 +24,9 @@ S
 #2502
 imperial bear cowl~
 2502 1
-4 199 q 42 -1 0
+4 199 q 42 -1 0 0
+B
+0 0 0
 L
 100
 R
@@ -39,7 +43,9 @@ S
 #2504
 imperial bearclaw armband~
 2504 1
-4 199 q 42 -1 0
+4 199 q 42 -1 0 0
+B
+0 0 0
 L
 100
 R
@@ -56,7 +62,9 @@ S
 #2506
 imperial totem of the bear~
 2506 1
-2 203 aq 42 -1 0
+2 203 aq 42 -1 0 0
+B
+0 0 0
 L
 100
 R
@@ -69,7 +77,9 @@ S
 #2508
 heroic unicorn armor~
 2508 1
-4 199 q 42 -1 0
+4 199 q 42 -1 0 0
+B
+0 0 0
 L
 200
 R
@@ -86,7 +96,9 @@ S
 #2510
 heroic unicorn circlet~
 2510 1
-4 199 q 42 -1 0
+4 199 q 42 -1 0 0
+B
+0 0 0
 L
 200
 R
@@ -99,7 +111,9 @@ S
 #2512
 heroic strands of unicorn's blessing~
 2512 1
-4 199 q 42 -1 0
+4 199 q 42 -1 0 0
+B
+0 0 0
 L
 200
 R
@@ -112,7 +126,9 @@ S
 #2514
 heroic unicorn wand of healing~
 2514 1
-2 196 aq 42 -1 0
+2 196 aq 42 -1 0 0
+B
+0 0 0
 L
 200
 R
@@ -127,7 +143,9 @@ S
 #2516
 imperial medicament potion~
 2516 1
-6 124 fq 3 -1 0
+6 124 hq 3 -1 0 0
+B
+0 0 0
 L
 175
 R

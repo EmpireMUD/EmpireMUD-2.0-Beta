@@ -62,10 +62,8 @@ bool audit_crop(crop_data *cp, char_data *ch) {
 	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
 	extern const char *icon_types[];
 	
-	struct interaction_item *inter;
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
-	bool harv, forage;
 	adv_data *adv;
 	int iter;
 	
@@ -110,26 +108,21 @@ bool audit_crop(crop_data *cp, char_data *ch) {
 		olc_audit_msg(ch, GET_CROP_VNUM(cp), "Climate not set");
 		problem = TRUE;
 	}
-	if (!GET_CROP_SPAWNS(cp)) {
-		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No spawns set");
-		problem = TRUE;
-	}
 	
-	harv = forage = FALSE;
-	LL_FOREACH(GET_CROP_INTERACTIONS(cp), inter) {
-		if (inter->type == INTERACT_HARVEST) {
-			harv = TRUE;
-		}
-		else if (inter->type == INTERACT_FORAGE) {
-			forage = TRUE;
-		}
-	}
-	if (!harv) {
-		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No HARVEST");
+	if (!has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST) && !has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_PICK)) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No HARVEST or PICK");
 		problem = TRUE;
 	}
-	if (!forage) {
+	if (!has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_FORAGE)) {
 		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No FORAGE");
+		problem = TRUE;
+	}
+	if (CROP_FLAGGED(cp, CROPF_IS_ORCHARD) && !has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_CHOP)) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No CHOP interaction on ORCHARD");
+		problem = TRUE;
+	}
+	if (CROP_FLAGGED(cp, CROPF_IS_ORCHARD) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "ORCHARD has HARVEST interaction (should be PICK)");
 		problem = TRUE;
 	}
 	

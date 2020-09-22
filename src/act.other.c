@@ -54,7 +54,6 @@ void check_delayed_load(char_data *ch);
 extern bool check_scaling(char_data *mob, char_data *attacker);
 extern bool check_vampire_sun(char_data *ch, bool message);
 extern bool despawn_companion(char_data *ch, mob_vnum vnum);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 extern int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
@@ -873,7 +872,7 @@ void summon_player(char_data *ch, char *argument) {
 	
 	one_argument(argument, arg);
 	
-	if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_SUMMON_PLAYER)) {
+	if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_SUMMON_PLAYER)) {
 		msg_to_char(ch, "You can't summon players here.\r\n");
 	}
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
@@ -2714,7 +2713,7 @@ ACMD(do_milk) {
 	if (!has_player_tech(ch, PTECH_MILK)) {
 		msg_to_char(ch, "You don't have the correct ability to milk animals.\r\n");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE))
+	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_STABLE))
 		msg_to_char(ch, "You can't milk animals here!\r\n");
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to finish building the stable before you can milk anything.\r\n");
@@ -3339,7 +3338,7 @@ ACMD(do_shear) {
 	else if (!has_player_tech(ch, PTECH_SHEAR)) {
 		msg_to_char(ch, "You don't have the correct ability to shear animals.\r\n");
 	}
-	else if (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) {
+	else if (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_STABLE)) {
 		msg_to_char(ch, "You need to be in a stable to shear anything.\r\n");
 	}
 	else if (!check_in_city_requirement(IN_ROOM(ch), TRUE)) {
@@ -3466,7 +3465,7 @@ ACMD(do_summon) {
 		return;
 	}
 	if (!IS_NPC(ch) && *arg && is_abbrev(arg, "player")) {
-		summon_player(ch, argument);
+		summon_player(ch, arg2);
 		return;
 	}
 	

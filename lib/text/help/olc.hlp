@@ -214,10 +214,9 @@ Crops (CROPEDIT):
 - The map region only matters if the crop grows in the wild (no !WILD flag).
 - Crops should have a FORAGE interaction for a small single food item.
 - Crops should have a HARVEST interaction for a plantable large item.
-- The HARVEST interaction on orchards actually uses the pick command. You
-  should usually use a 1x item for this interaction.
-- Orchard crops need a CHOP interaction if they will give trees. Orchards are
-  still choppable without this, though.
+- Use the PICK interaction on orchards, with quantity equal to the depletion
+  limit, and the HARVEST interaction everything else with normal quantities.
+- Orchard crops need a CHOP interaction if they will give trees.
 - Players foraging on any tile have a chance to find the forage item from any
   wild crop in the area, if they get nothing back from the sector's own forage
   list.
@@ -2142,17 +2141,19 @@ other OLC types. For example, to find all buildings that have a certain artisan
 vnum, use ".mob search 12345", which will search the artisan vnum field on all
 buildings for that mob.
 #d
-"BEDIT FUNCTIONS" "REDIT FUNCTIONS" "VEDIT FUNCTIONS" "FUNCTION FLAGS"
+"BEDIT FUNCTIONS" "REDIT FUNCTIONS" "VEDIT FUNCTIONS" "FUNCTION FLAGS" "CEDIT REQUIRESFUNCTION" "CEDIT REQUIRES FUNCTION"
 
-Usage:  .flags [add | remove] <flags>
+Usage:  .function [add | remove] <flags>
+        .requiresfunction [add | remove] <flags>
 
 The function flags determine what chores, actions, and other tasks happen at
 that building or room template. For vehicles, it applies to people in the same
-room as the vehicle.
+room as the vehicle. For crafts, the 'requiresfunction' field requires that
+the craft be made at a location with that function.
 
 Available functions:
  ALCHEMIST - can brew and mix here
- APIARY - houses bees (required for beekeeping workforce)
+ APIARY - no current use
  BATHS - can use the bathe command here
  BEDROOM - boosts regen while sleeping
  CARPENTER - required by some crafts
@@ -2191,11 +2192,14 @@ Available functions:
    Note: scripts cannot check this by itself using %room.function()%; use the
    IN-CITY-ONLY building flag instead
  OVEN - allows baking
+ MAGIC-WORKSHOP - no code functions, but can be used for workforce
+ TRAPPER - no code functions, but can be used for workforce
  
 &r* Note:&0 Functions marked with &r*&0 cannot be used on moving vehicles, only
 buildings and stationary vehicles.
 
-See also: OLC BUILDINGS, OLC ROOM TEMPLATES, OLC VEHICLES
+See also: OLC BUILDINGS, OLC CRAFTS, OLC ROOM TEMPLATES, OLC VEHICLES,
+  OLC WORKFORCE
 #d
 "BEDIT HITPOINTS" "BEDIT HEALTH"
 
@@ -2504,6 +2508,7 @@ live, at which point it becomes available to players who have the right skill.
 Available flags:
  POTTERY - always requires cooking fire, goes faster at potter's hut
  BUILDING - makes a building (not needed on the BUILD craft type)
+ SKILLED-LABOR - workforce cannot work this craft unless you have Skilled Labor
  GLASSBLOWER - requires being at glassblower building
  CARPENTER - requires being at a carpenter building
  ALCHEMY - requires cooking fire or alchemist/laboratory
@@ -2538,6 +2543,7 @@ dash (-) are matched to the craft's name.
 
 Fields:
   &c-type&0 - see HELP CEDIT TYPE
+  &c-buildon&0, &c-buildfacing&0 - see HELP CEDIT BUILDON
   &c-flagged&0, &cunflagged&0 - see HELP CEDIT FLAGS
   &c-level -levelover -levelunder&0 - specific level requirement
   &c-quantity -quantityover -quantityunder&0 - specific quantity value
@@ -2670,19 +2676,20 @@ Available types are:
  FORGE - requires a hammer and a forge building
  CRAFT
  COOK
- SEW
+ SEW - requires a sewing kit
  MILL - requires mill building, quantity doubled by Master Farmer ability
  BREW - potions
  MIX - poisons
  BUILD - used with the build command
  WEAVE - requires loom or tailor
- WORKFORCE - has specific code interactions, but no player command
- MANUFACTURE - for shipbuilding
+ WORKFORCE - set requires-function flags and workforce will pick up this task
+   at the associated building
+ MANUFACTURE
  BAKE - requires a bakery or oven
 
 Note: The SOUP and VEHICLE craft flags both also modify the recipe.
 
-See also: CEDIT FLAGS, CEDIT REQUIRESABILITY, OLC CRAFTS
+See also: CEDIT FLAGS, CEDIT REQUIRESABILITY, OLC CRAFTS, OLC WORKFORCE
 #d
 "CEDIT VOLUME"
 
@@ -2878,7 +2885,7 @@ Crop flags determine some various properties about crops.
 
 Available flags:
  REQUIRES-WATER - Can only be planted within 4 tiles of fresh water
- ORCHARD - Uses 'pick' instead of 'harvest', shows the orchard commands list, can be chopped down
+ ORCHARD - Uses 'pick' instead of 'harvest'
  !WILD - Won't spawn in the wild
  NEWBIE-ONLY - Only spawns on newbie islands (can be planted anywhere)
  !NEWBIE - Does not spawn on newbie islands
@@ -4332,20 +4339,28 @@ Room/vehicle interaction types:
  &cFORAGE&0 - Items received when using the Forage ability. Note that if the player
    gets nothing from a sector's forage list, they may also receive a forage
    item from any wild crop that grows in the area.
- &cPICK&0 - Items found when picking.
- &cHARVEST&0 - Items received when harvesting a crop, OR when picking in an ORCHARD crop.
+ &cPICK&0 * - Items found when picking.
+ &cHARVEST&0 - Items received when harvesting a crop.
  &cGATHER&0 - Items received from the gather action.
  &cENCOUNTER&0 - Hostile mob loaded when a random encounter triggers.
  &cCHOP&0 - Things that can be found when chopping here.
  &cFISH&0 - Things that can be found by fishing here.
  &cPAN&0 - Things that can be found by panning here.
- &cQUARRY&0 - Things you can find by quarrying here.
+ &cQUARRY&0 * - Things you can find by quarrying here.
  &cRUINS-TO-BLD&0 - What type of ruins building appears here when it's ruined.
    Only works on buildings, not vehicles. Quantity is ignored. Use #n in the
    room title to indicate the name of the lost building.
- &CRUINS-TO-VEH&0 - What type of ruins vehicle appears here when it's ruined.
+ &cRUINS-TO-VEH&0 - What type of ruins vehicle appears here when it's ruined.
    May use #n in the keywords and short/long desc to indicate the name of the
    building/vehicle that was ruined. Quantity is ignored.
+ &cPRODUCTION&0 * - Workforce will produce it (on a building or vehicle only).
+   Production is 1 at a time; quantity is used as the depletion limit.
+ &cSKILLED-LABOR&0 * - Workforce will produce it with Skilled Labor (bld/veh only).
+   Production is 1 at a time; quantity is used as the depletion limit.
+
+* Room interactions marked with an asterisk are 'one-at-a-time' interactions,
+  where the 'quantity' field is used as the maximum depletion, and players (or
+  workforce) receive 1 item at a time rather than the full quantity at once.
 
 The percent may be anywhere from 0.01 to 100.00 and if the quantity is greater
 than 1, the percent is only checked once for the entire quantity. If you want
@@ -4383,7 +4398,8 @@ Example of possible multiple results from shear:
  2. SHEAR: 1x some wool 50.00%
  3. SHEAR: 1x some wool 5.00%
 
-See also: OLC BUILDINGS, OLC CROPS, OLC MOBILES, OLC SECTORS, OLC VEHICLES
+See also: OLC BUILDINGS, OLC CROPS, OLC MOBILES, OLC SECTORS, OLC VEHICLES,
+  PRODUCTION INTERACTION, OLC WORKFORCE
 #d
 "MEDIT KEYWORDS"
 
@@ -5901,7 +5917,7 @@ detail of a crop, including what it produces.
 
 You should set the FORAGE and HARVEST interactions on a crop, usually with a
 1x quantity and 100% chance. Orchard-type crops should also usually have a
-GATHER interaction.
+GATHER interaction and use PICK instead of HARVEST.
 
 All commands in the editor are highlighted in yellow/green and placed inside
 <angle braces>. You can get help on any of these commands by typing:
@@ -6270,6 +6286,40 @@ Example vehicle settings:
  catapult: LEADABLE SIEGE-WEAPONS, animals required: 2
 
 See also: BUILDING-VEHICLES, OLC, OLC ABORT, OLC EDIT, OLC EDITOR, OLC SAVE
+#d
+"OLC WORKFORCE" "WORKFORCE OLC"
+
+There are several ways to make an empire's workforce work a building:
+- DIGGING function flag with DIG interactions
+- FISHING function flag with FISH interactions
+- MILL function (milling)
+- MINE function - building must be on a can-mine tile; interactions come from
+  the mine-data global, see HELP MINE DATA GLOBAL
+- MINT function (minting)
+- PRESS function (oilmaking)
+- PRODUCTION/SKILLED-LABOR interactions: see HELP PRODUCTION INTERACTION
+- SAW function (sawing, scraping)
+- SMELT function (smelting)
+- STABLE function (shearing)
+- TAILOR function (weaving)
+- TANNERY function (tanning)
+- Any craft with the WORKFORCE type and "requiresfunction" set will work at
+  buildings with a matching function (crafting).
+#d
+"PRODUCTION INTERACTION" "SKILLED-LABOR INTERACTION" "SKILLED LABOR INTERACTION"
+
+Workforce will work any claimed building or vehicle with a PRODUCTION or
+SKILLED-LABOR interaction on it. Both of these run under the "production"
+chore.
+
+The interaction's "quantity" is the depletion limit; workforce will produce the
+item 1 at a time. Depletions are slightly random; set this number 25% higher
+than the amount you want the player to get per year. All production on a single
+tile or building will share the same depletion counter.
+
+The interaction's "percentage" is the chance per hour to produce the item.
+
+See also: INTERACTIONS, OLC WORKFORCE
 #d
 PROGEDIT "OLC PROGRESSION" "PROGRESSION OLC" "PROGRESS OLC"
 
@@ -6852,10 +6902,8 @@ The commands list is usually put in alphabetic order to look cleaner and less
 scattered. The whole list is displayed in cyan, so you should not include any
 color codes in the commands list.
 
-For sectors with the CROP flag combined with a crop with the ORCHARD flag,
-the orchard command list is shown instead of the default. For all other crops,
-the sector's command list is used. For buildings, the commands list from the
-building data is used instead.
+Crop tiles will auto-generate their command lists if no sector commands are
+set. For buildings, the commands list from the building data is used instead.
 
 See also: OLC SECTORS
 #d
@@ -7612,12 +7660,16 @@ vehicle-buildings.
 
 Traits usually set on building-vehicles:
 - Size: By default, rooms hold up to 4 total size.
-- BUILDING flag: Counts as a build (required).
+- BUILDING and IN flags: Counts as a building (required), uses "in" strings.
 - !BUILDING flag: Keeps this building from being put in another building.
 - VISIBLE-IN-DARK flag: Allows players to see it in the dark.
 - Icon: Causes it to show up on the map.
 - NO-WORKFORCE-EVOS affect: Workforce won't do chores that would change the
   tile type (chopping, etc). For treehouses or similar.
+
+Optional flags:
+- CARRY-MOBS on the vehicle and HERD on the interior room: To herd animals
+  inside, you need both these flags.
 
 Some important notes:
 - Building-vhicles are only claimed when the whole tile is claimed (unless they
@@ -8042,6 +8094,7 @@ Available flags:
  ON-FIRE - currently burning (via the "light" command)
  !LOAD-ONTO-VEHICLE - cannot be loaded onto another vehicle
  VISIBLE-IN-DARK - can be seen at night without a light
+ !CLAIM - cannot be claimed
  BUILDING - acts more like a building than a vehicle
  NEVER-DISMANTLE - can never be dismantled
  *PLAYER-NO-DISMANTLE - player has toggled no-dismantle on

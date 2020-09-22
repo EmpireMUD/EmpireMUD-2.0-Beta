@@ -47,7 +47,6 @@
 
 // Room building vnums
 #define RTYPE_SHIP_HOLDING_PEN  5509	// for the shipping system's storage room
-#define RTYPE_SORCERER_TOWER  5511
 #define RTYPE_EXTRACTION_PIT  5523	// a place to keep chars when they are pending extraction
 
 #define RTYPE_TUNNEL  5612	// for mine complex, tunnel
@@ -77,14 +76,6 @@
 // clay
 #define o_BRICKS  257	// TODO: create a workforce brickmaking ability/craft
 
-// beekeeping chore -- TODO figure out how to make a generic workforce system where these are data on the room
-#define o_BEESWAX  850
-#define o_HONEYCOMB  3069
-
-// glassmaking chore -- TODO this should probably be configured somewhere in-game too
-#define o_SAND  107
-#define o_GLASS_INGOT  108
-
 // Wood crafts
 #define o_STAKE  915	// could be a flag
 #define o_BLANK_SIGN  918
@@ -95,7 +86,6 @@
 // Skill tree items
 #define o_PORTAL  1100  // could probably safely generate a NOTHING item
 #define o_IMPERIUM_SPIKE  1114
-#define o_NEXUS_CRYSTAL  1115
 #define o_NOCTURNIUM_SPIKE  1119
 
 // herbs
@@ -104,10 +94,6 @@
 // misc stuff
 #define o_GLOWING_SEASHELL  1300
 #define o_NAILS  1306
-
-// skins
-#define o_SMALL_SKIN  1350	// TODO: trapper's post could use a room interaction like TRAPPING
-#define o_LARGE_SKIN  1351
 
 // for catapults/ships
 #define o_HEAVY_SHOT  2135	// TODO: This could be a material or item type
@@ -120,7 +106,7 @@
 #define COMP_PILLAR  6015	// for 'tunnel'
 #define COMP_ROCK  6050	// for 'lay' (road)
 #define COMP_CLAY  6090	// for workforce bricks
-#define COMP_COMMON_METAL  6720	// for 'barde' and workforce nailmaking
+#define COMP_COMMON_METAL  6720	// for 'barde'
 #define COMP_NAILS  6790	// for 'tunnel'
 #define COMP_ROPE  6880	// for 'tie'
 
@@ -152,25 +138,27 @@
 #define SAWYER  256
 #define SMELTER  257
 #define WEAVER  258
-#define STONECUTTER  259
-#define NAILMAKER  260
-#define BRICKMAKER  261
-#define GARDENER  262
+#define STONECUTTER  259	// unused now
+#define NAILMAKER  260	// unused now
+#define BRICKMAKER  261	// unused now
+#define GARDENER  262	// unused now
 #define FIRE_BRIGADE  265
-#define TRAPPER  266
+#define TRAPPER  266	// unused now
 #define TANNER  267
 #define SHEARER  268
 #define COIN_MAKER  269
 #define DOCKWORKER  270
-#define APPRENTICE_EXARCH  271
+#define APPRENTICE_EXARCH  271	// unused now
 #define MILL_WORKER  272
 #define VEHICLE_REPAIRMAN  273
 #define OVERSEER  274
 #define PRESS_WORKER  276
 #define MINE_SUPERVISOR  277
 #define FISHERMAN  279
-#define BEEKEEPER  281
-#define GLASSMAKER  282
+#define BEEKEEPER  281	// unused now
+#define GLASSMAKER  282	// unused now
+#define CRAFTING_APPRENTICE  283
+#define PRODUCTION_ASSISTANT  284
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -182,7 +170,6 @@
 
 // GENERIC_AFFECTS (ATYPE_x) for affects/dots
 #define ATYPE_FLY  3001
-#define ATYPE_ENTRANCEMENT  3002
 #define ATYPE_DARKNESS  3003
 #define ATYPE_POISON  3004
 #define ATYPE_BOOST  3005
@@ -191,7 +178,6 @@
 #define ATYPE_MANASHIELD  3008
 #define ATYPE_EARTHMELD  3010
 #define ATYPE_MUMMIFY  3011
-#define ATYPE_BESTOW_VIGOR  3013	// NOTE: not used
 #define ATYPE_COLORBURST  3015
 #define ATYPE_HEARTSTOP  3016
 #define ATYPE_PHOENIX_RITE  3017

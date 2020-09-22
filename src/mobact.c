@@ -229,7 +229,7 @@ void random_encounter(char_data *ch) {
 		return;
 	}
 
-	run_room_interactions(ch, IN_ROOM(ch), INTERACT_ENCOUNTER, run_one_encounter);
+	run_room_interactions(ch, IN_ROOM(ch), INTERACT_ENCOUNTER, NULL, NOTHING, run_one_encounter);
 }
 
 
@@ -645,11 +645,14 @@ bool try_mobile_movement(char_data *ch) {
 * Main cycle of mob activity (iterates over character list).
 */
 void mobile_activity(void) {
+	extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
+	extern vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum interior_room);
 	extern bool catch_up_mobs;
 	
 	register char_data *ch, *next_ch, *vict, *targ, *m;
 	struct track_data *track;
 	struct pursuit_data *purs, *next_purs, *temp;
+	room_vnum track_to_room = NOWHERE;
 	obj_data *obj;
 	int found, dir = NO_DIR;
 	empire_data *chemp, *victemp;
@@ -709,6 +712,7 @@ void mobile_activity(void) {
 						if (track->player_id == purs->idnum) {
 							found = TRUE;
 							dir = track->dir;
+							track_to_room = track->to_room;
 							break;
 						}
 					}
@@ -734,9 +738,23 @@ void mobile_activity(void) {
 				}
 			}
 			
-			if (dir != NO_DIR && found == TRUE && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED)) {
-				perform_move(ch, dir, NULL, MOVE_WANDER);
-				moved = TRUE;
+			if ((dir != NO_DIR || track_to_room != NOWHERE) && found == TRUE && !AFF_FLAGGED(ch, AFF_CHARM | AFF_ENTANGLED)) {
+				if (track_to_room && find_portal_in_room_targetting(IN_ROOM(ch), track_to_room)) {
+					perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_ENTER_PORTAL | MOVE_WANDER);
+					moved = TRUE;
+				}
+				else if (track_to_room != NOWHERE && find_vehicle_in_room_with_interior(IN_ROOM(ch), track_to_room)) {
+					perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_ENTER_VEH | MOVE_WANDER);
+					moved = TRUE;
+				}
+				else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch))) && GET_ROOM_VNUM(IN_ROOM(GET_ROOM_VEHICLE(IN_ROOM(ch)))) == track_to_room) {
+					perform_move(ch, NO_DIR, real_room(track_to_room), MOVE_EXIT | MOVE_WANDER);
+					moved = TRUE;
+				}
+				else if (dir != NO_DIR) {
+					perform_move(ch, dir, NULL, MOVE_WANDER);
+					moved = TRUE;
+				}
 			}
 			
 			// look for target again

@@ -16,7 +16,7 @@ APIARY APIARIES
 {BB}  Apiary  (Beekeeping goal)
 
 Apiaries are used as hives for raising domestic bees. They produce honey and
-wax for the empire. You must enable the 'beekeeping' workforce option to
+wax for the empire. You must enable the 'production' workforce option to
 function.
 
 See also: BEEHIVE, WORKFORCE
@@ -339,12 +339,23 @@ Exarch Crafts
 Trade Synergy Ability: 100 High Sorcery
 
 This ability allows you to build the following buildings:
-  ..&C*&0. astralnexus
+  ..&C*&0.  astralnexus
+  [EX]  exarch workshop - allows workforce to make nexus crystals, in-city only
 
-Allows the following workforce options:
-  nexus-crystals - Also requires the Skilled Labor goal
+See also: BUILD
+#
+"EXARCH'S WORKSHOP" "EXARCHS WORKSHOP" "EXARCH WORKSHOP"
 
-See also: BUILD, SKILLED LABOR
+[EX]  Exarch's Workshop  (Exarch Crafts ability)
+
+This building is a fully-stocked magic workshop. You can store and retrieve
+the same items as the Tower of Sorcery, you can weave magical cloth, and your
+empire's workforce will craft nexus stones here (if your empire has Skilled
+Labor).
+
+This building must be inside one of your cities.
+
+See also: WORKFORCE CRAFTING, SKILLED LABOR
 #
 GRAVE GRAVES "GRAVE MARKER"
 
@@ -1157,7 +1168,10 @@ TRAPPERSPOST "TRAPPERS POST" "TRAPPING POST" "TRAPPER'S POST"
 
 The trapper's post is a place where trappers come to trade their skins. This
 building is required in order for your workforce to gather skins. Trapper's
-Posts become depleted like any other resource.
+Posts become depleted like any other resource, and will refresh at the end of
+the year.
+
+You need Skilled Labor for your workers to work this building.
 
 See also: DEPLETION, WORKFORCE, SKILLED LABOR
 #

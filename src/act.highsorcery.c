@@ -2001,7 +2001,7 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 	int dist, iter;
 	int x, y;
 	
-	#define CAN_DEVASTATE(room)  (((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) && has_permission(ch, PRIV_HARVEST, room)) || (CAN_CHOP_ROOM(room) && has_permission(ch, PRIV_CHOP, room) && get_depletion((room), DPLTN_CHOP) < config_get_int("chop_depletion"))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE))
+	#define CAN_DEVASTATE(room)  (((ROOM_SECT_FLAGGED((room), SECTF_HAS_CROP_DATA) && has_permission(ch, PRIV_HARVEST, room)) || (CAN_CHOP_ROOM(room) && has_permission(ch, PRIV_CHOP, room) && get_depletion((room), DPLTN_CHOP, FALSE) < config_get_int("chop_depletion"))) && !ROOM_AFF_FLAGGED((room), ROOM_AFF_HAS_INSTANCE | ROOM_AFF_NO_EVOLVE))
 	#define DEVASTATE_RANGE  3	// tiles
 
 	// check this room
@@ -2032,12 +2032,12 @@ RITUAL_FINISH_FUNC(perform_devastation_ritual) {
 	// SUCCESS: distribute resources
 	if (to_room) {
 		if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room)) && has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
-			run_room_interactions(ch, to_room, INTERACT_HARVEST, devastate_crop);
-			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
+			run_room_interactions(ch, to_room, INTERACT_HARVEST, NULL, MEMBERS_ONLY, devastate_crop);
+			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
 			uncrop_tile(to_room);
 		}
-		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP) < config_get_int("chop_depletion")) {
-			run_room_interactions(ch, to_room, INTERACT_CHOP, devastate_trees);
+		else if (CAN_CHOP_ROOM(to_room) && get_depletion(to_room, DPLTN_CHOP, FALSE) < config_get_int("chop_depletion")) {
+			run_room_interactions(ch, to_room, INTERACT_CHOP, NULL, MEMBERS_ONLY, devastate_trees);
 			change_chop_territory(to_room);
 		}
 		else if (ROOM_SECT_FLAGGED(to_room, SECTF_HAS_CROP_DATA) && (cp = ROOM_CROP(to_room))) {

@@ -52,7 +52,7 @@ something even better.
 7 24
 O+ 1 6203
 R
-5119 0
+4 5119 0
 S
 #12405
 rock large suspicious path~
@@ -84,7 +84,7 @@ some seaweed~
 Some seaweed is piled here.~
 The seaweed is a bit slimy, but edible.
 ~
-6 0 a 0 3
+6 g a 0 4
 4 0 0
 0 72
 O+ 1 6150
@@ -124,7 +124,7 @@ A
 C
 1 1
 R
-5619 0
+4 5619 0
 S
 #12411
 garb pirate dread~
@@ -313,9 +313,9 @@ M
 7
 $n smiles like a goblin as $e begins work on the goblin hulk.~
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #12425
 sails dread goblin~
@@ -342,9 +342,9 @@ M
 7
 $n hangs dread goblin sails and begins work on a ship.~
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #12426
 plans dock cliffside~
@@ -630,7 +630,7 @@ M
 5
 $n grimmaces as $e crunches on a seaweed salad.~
 R
-5606 0
+4 5606 0
 S
 #12443
 monster sea spawner~
@@ -889,9 +889,9 @@ really just appears to be expensive dirt.
 0 0 0
 1 0
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #12461
 rock suspicious~

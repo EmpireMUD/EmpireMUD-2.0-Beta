@@ -40,8 +40,8 @@ extern struct instance_data *quest_instance_global;
 // external functions
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void die(char_data *ch, char_data *killer);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
+extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name);
 extern room_data *get_room(room_data *ref, char *name);
 extern vehicle_data *get_vehicle(char *name);
@@ -87,12 +87,11 @@ struct vehicle_command_info {
 int get_vehicle_scale_level(vehicle_data *veh, char_data *targ) {
 	struct instance_data *inst;
 	int level = 1;
-	room_data *orm = IN_ROOM(veh);
 	
 	if (VEH_SCALE_LEVEL(veh) > 0) {
 		level = VEH_SCALE_LEVEL(veh);
 	}
-	else if (orm && COMPLEX_DATA(orm) && (inst = COMPLEX_DATA(orm)->instance)) {
+	else if ((inst = get_instance_by_id(VEH_INSTANCE_ID(veh)))) {
 		if (INST_LEVEL(inst)) {
 			level = INST_LEVEL(inst);
 		}
@@ -141,6 +140,9 @@ VCMD(do_vadventurecomplete) {
 	struct instance_data *inst;
 	
 	inst = quest_instance_global;
+	if (!inst) {
+		inst = get_instance_by_id(VEH_INSTANCE_ID(veh));
+	}
 	if (!inst) {
 		inst = room ? find_instance_by_room(room, FALSE, TRUE) : NULL;
 	}
@@ -318,7 +320,7 @@ VCMD(do_vbuildingecho) {
 VCMD(do_vregionecho) {
 	char room_number[MAX_INPUT_LENGTH], radius_arg[MAX_INPUT_LENGTH], *msg;
 	room_data *center, *orm = IN_ROOM(veh);
-	bool use_queue, indoor_only = FALSE;
+	bool use_queue, outdoor_only = FALSE;
 	char_data *targ;
 	int radius;
 
@@ -340,7 +342,7 @@ VCMD(do_vregionecho) {
 		radius = atoi(radius_arg);
 		if (radius < 0) {
 			radius = -radius;
-			indoor_only = TRUE;
+			outdoor_only = TRUE;
 		}
 		
 		if (center) {
@@ -348,7 +350,7 @@ VCMD(do_vregionecho) {
 				if (NO_LOCATION(IN_ROOM(targ)) || compute_distance(center, IN_ROOM(targ)) > radius) {
 					continue;
 				}
-				if (indoor_only && IS_OUTDOORS(targ)) {
+				if (outdoor_only && !IS_OUTDOORS(targ)) {
 					continue;
 				}
 				
@@ -663,6 +665,9 @@ VCMD(do_vpurge) {
 		room_data *room = IN_ROOM(veh);
 		struct instance_data *inst = quest_instance_global;
 		if (!inst) {
+			inst = get_instance_by_id(VEH_INSTANCE_ID(veh));
+		}
+		if (!inst) {
 			inst = room ? find_instance_by_room(room, FALSE, TRUE) : NULL;
 		}
 		if (!inst) {
@@ -851,7 +856,7 @@ VCMD(do_vteleport) {
 	}
 	else if (!str_cmp(arg1, "adventure")) {
 		// teleport all players in the adventure
-		if (!orm || !(inst = find_instance_by_room(orm, FALSE, TRUE))) {
+		if (!orm || (!(inst = get_instance_by_id(VEH_INSTANCE_ID(veh))) && !(inst = find_instance_by_room(orm, FALSE, TRUE)))) {
 			veh_log(veh, "vteleport: 'adventure' mode called outside any adventure");
 			return;
 		}
@@ -892,7 +897,7 @@ VCMD(do_vteleport) {
 			adjust_vehicle_tech(v, FALSE);
 			vehicle_from_room(v);
 			vehicle_to_room(v, target);
-			adjust_vehicle_tech(v, FALSE);
+			adjust_vehicle_tech(v, TRUE);
 			entry_vtrigger(v);
 		}
 		else if ((obj = get_obj_by_vehicle(veh, arg1))) {
@@ -1008,7 +1013,8 @@ VCMD(do_vterraform) {
 }
 
 
-VCMD(do_dgvload) {
+VCMD(do_vload) {
+	extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
@@ -1035,7 +1041,7 @@ VCMD(do_dgvload) {
 		return;
 	}
 	
-	inst = find_instance_by_room(room, FALSE, TRUE);
+	inst = get_instance_by_id(VEH_INSTANCE_ID(veh));
 	
 	if (is_abbrev(arg1, "mobile")) {
 		if (!mob_proto(number)) {
@@ -1043,11 +1049,9 @@ VCMD(do_dgvload) {
 			return;
 		}
 		mob = read_mobile(number, TRUE);
-		if (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance) {
-			MOB_INSTANCE_ID(mob) = INST_ID(COMPLEX_DATA(room)->instance);
-			if (MOB_INSTANCE_ID(mob) != NOTHING) {
-				add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
-			}
+		MOB_INSTANCE_ID(mob) = VEH_INSTANCE_ID(veh);
+		if (MOB_INSTANCE_ID(mob) != NOTHING) {
+			add_instance_mob(real_instance(MOB_INSTANCE_ID(mob)), GET_MOB_VNUM(mob));
 		}
 		char_to_room(mob, room);
 		setup_generic_npc(mob, NULL, NOTHING, NOTHING);
@@ -1147,6 +1151,7 @@ VCMD(do_dgvload) {
 			return;
 		}
 		vehicle = read_vehicle(number, TRUE);
+		VEH_INSTANCE_ID(vehicle) = VEH_INSTANCE_ID(veh);
 		vehicle_to_room(vehicle, room);
 		
 		if (target && *target && isdigit(*target)) {
@@ -1161,11 +1166,11 @@ VCMD(do_dgvload) {
 			scale_vehicle_to_level(vehicle, 0);
 		}
 		
-		get_vehicle_interior(veh);	// ensure inside is loaded
+		get_vehicle_interior(vehicle);	// ensure inside is loaded
 		
 		// ownership
-		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(room))) {
-			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(room)));
+		if (VEH_CLAIMS_WITH_ROOM(vehicle) && ROOM_OWNER(HOME_ROOM(room))) {
+			perform_claim_vehicle(vehicle, ROOM_OWNER(HOME_ROOM(room)));
 		}
 		
 		load_vtrigger(vehicle);
@@ -1434,6 +1439,7 @@ VCMD(do_vdoor) {
 
 VCMD(do_vat)  {
 	char location[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	struct instance_data *inst;
 	vehicle_data *vehicle;
 	room_data *room = NULL, *was_in;
 
@@ -1444,7 +1450,13 @@ VCMD(do_vat)  {
 		return;
 	}
 
-	if ((was_in = IN_ROOM(veh))) {
+
+	// special case for use of i### room-template targeting when veh is outside its instance
+	if (location[0] == 'i' && isdigit(location[1]) && VEH_INSTANCE_ID(veh) != NOTHING && (inst = real_instance(VEH_INSTANCE_ID(veh))) && INST_START(inst)) {
+		// I know that's a lot to check but we want i###-targeting to work when a mob wanders out -pc 4/13/2015
+		room = get_room(INST_START(inst), location);
+	}
+	else if ((was_in = IN_ROOM(veh))) {
 		room = get_room(was_in, location);
 	}
 	else if (isdigit(*location)) {
@@ -1616,7 +1628,7 @@ VCMD(do_vscale) {
 	if (!str_cmp(arg, "instance")) {
 		void scale_instance_to_level(struct instance_data *inst, int level);
 		struct instance_data *inst;
-		if ((inst = find_instance_by_room(IN_ROOM(veh), FALSE, TRUE))) {
+		if ((inst = get_instance_by_id(VEH_INSTANCE_ID(veh))) || (inst = find_instance_by_room(IN_ROOM(veh), FALSE, TRUE))) {
 			scale_instance_to_level(inst, level);
 		}
 	}
@@ -1689,7 +1701,7 @@ const struct vehicle_command_info veh_cmd_info[] = {
 	{ "vechoneither", do_vechoneither, NO_SCMD },
 	{ "vforce", do_vforce, NO_SCMD },
 	{ "vheal", do_vheal, NO_SCMD },
-	{ "vload", do_dgvload, NO_SCMD },
+	{ "vload", do_vload, NO_SCMD },
 	{ "vmod", do_vmod, NO_SCMD },
 	{ "vmorph", do_vmorph, NO_SCMD },
 	{ "vpurge", do_vpurge, NO_SCMD },

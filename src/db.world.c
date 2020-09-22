@@ -123,8 +123,8 @@ void change_base_sector(room_data *room, sector_data *sect) {
 void change_chop_territory(room_data *room) {
 	struct evolution_data *evo;
 	
-	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD)) {
-		// TODO: This is a special case for orchards
+	if (ROOM_SECT_FLAGGED(room, SECTF_CROP)) {
+		// chopping a crop un-crops it
 		uncrop_tile(room);
 	}
 	else if ((evo = get_evolution_by_type(SECT(room), EVO_CHOPPED_DOWN))) {
@@ -501,7 +501,6 @@ room_data *create_room(room_data *home) {
 */
 void delete_room(room_data *room, bool check_exits) {
 	EVENT_CANCEL_FUNC(cancel_room_expire_event);
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 	void relocate_players(room_data *room, room_data *to_room);
 	void remove_instance_fake_loc(struct instance_data *inst);
@@ -697,7 +696,7 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	// update instances (if it wasn't deleted already earlier)
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE | ROOM_AFF_FAKE_INSTANCE) || (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance)) {
-		LL_FOREACH(instance_list, inst) {
+		DL_FOREACH(instance_list, inst) {
 			if (INST_LOCATION(inst) == room) {
 				SET_BIT(INST_FLAGS(inst), INST_COMPLETED);
 				INST_LOCATION(inst) = NULL;
@@ -1273,7 +1272,7 @@ void annual_update_map_tile(struct map_data *tile) {
 	}
 	
 	// clean mine data from anything that's not currently a mine
-	if (!room || !room_has_function_and_city_ok(room, FNC_MINE)) {
+	if (!room || !room_has_function_and_city_ok(NULL, room, FNC_MINE)) {
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_GLB_VNUM);
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT);
 		remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
@@ -1295,6 +1294,9 @@ void annual_update_vehicle(vehicle_data *veh) {
 	if (!default_res) {
 		add_to_resource_list(&default_res, RES_OBJECT, o_NAILS, 1, 0);
 	}
+	
+	// non-damage stuff:
+	annual_update_depletions(&VEH_DEPLETION(veh));
 	
 	// does not take annual damage (unless incomplete)
 	if (!VEH_YEARLY_MAINTENANCE(veh) && VEH_IS_COMPLETE(veh)) {
@@ -1354,7 +1356,7 @@ void annual_world_update(void) {
 					if (IS_RIDING(d->character)) {
 						perform_dismount(d->character);
 					}
-					write_to_descriptor(d->descriptor, "You're knocked to the ground!\r\n");
+					write_to_descriptor(d->descriptor, "You're knocked to the ground!\r\n\r\n");
 					act("$n is knocked to the ground!", TRUE, d->character, NULL, NULL, TO_ROOM);
 					GET_POS(d->character) = POS_SITTING;
 				}
@@ -2187,7 +2189,7 @@ EVENTFUNC(tavern_update) {
 	room = data->room;
 	
 	// still a tavern?
-	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(room, FNC_TAVERN)) {
+	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(NULL, room, FNC_TAVERN)) {
 		// remove data and cancel event
 		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
 		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
@@ -2241,7 +2243,7 @@ void check_tavern_setup(room_data *room) {
 	struct room_event_data *data;
 	struct dg_event *ev;
 	
-	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(room, FNC_TAVERN)) {
+	if (!ROOM_OWNER(room) || !room_has_function_and_city_ok(NULL, room, FNC_TAVERN)) {
 		// not a tavern or not set up
 		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
 		remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
@@ -4118,9 +4120,16 @@ void load_world_map_from_file(void) {
 					break;
 				}
 				case 'Y': {	// tracks
-					if (!get_line(fl, line2) || sscanf(line2, "%d %d %ld %d", &var[0], &var[1], &l_in, &var[2]) != 4) {
-						log("SYSERR: Bad formatting in Y section of map tile #%d", last->vnum);
+					if (!get_line(fl, line2)) {
+						log("SYSERR: Missing Y section of map tile #%d", last->vnum);
 						exit(1);
+					}
+					if (sscanf(line2, "%d %d %ld %d %d", &var[0], &var[1], &l_in, &var[2], &var[3]) != 5) {
+						var[3] = NOWHERE;	// to_room: backwards-compatible with old version
+						if (sscanf(line2, "%d %d %ld %d", &var[0], &var[1], &l_in, &var[2]) != 4) {
+							log("SYSERR: Bad formatting in Y section of map tile #%d", last->vnum);
+							exit(1);
+						}
 					}
 					
 					CREATE(track, struct track_data, 1);
@@ -4128,8 +4137,9 @@ void load_world_map_from_file(void) {
 					track->mob_num = var[1];
 					track->timestamp = l_in;
 					track->dir = var[2];
+					track->to_room = var[3];
 					
-					DL_PREPEND(last->shared->tracks, track);
+					DL_APPEND(last->shared->tracks, track);
 					break;
 				}
 				case 'Z': {	// extra data

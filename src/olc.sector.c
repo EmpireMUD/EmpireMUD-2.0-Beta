@@ -98,10 +98,6 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Climate not set");
 		problem = TRUE;
 	}
-	if (!GET_SECT_SPAWNS(sect)) {
-		olc_audit_msg(ch, GET_SECT_VNUM(sect), "No spawns set");
-		problem = TRUE;
-	}
 	if (GET_SECT_MAPOUT(sect) == 0) {
 		olc_audit_msg(ch, GET_SECT_VNUM(sect), "Mapout color not set (or set to starting location)");
 		problem = TRUE;

@@ -459,6 +459,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define GET_CRAFT_OBJECT(craft)  ((craft)->object)
 #define GET_CRAFT_QUANTITY(craft)  ((craft)->quantity)
 #define GET_CRAFT_REQUIRES_OBJ(craft)  ((craft)->requires_obj)
+#define GET_CRAFT_REQUIRES_FUNCTION(craft)  ((craft)->requires_function)
 #define GET_CRAFT_REQUIRES_TOOL(craft)  ((craft)->requires_tool)
 #define GET_CRAFT_RESOURCES(craft)  ((craft)->resources)
 #define GET_CRAFT_TIME(craft)  ((craft)->time)
@@ -549,6 +550,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define EMPIRE_BASE_TECH(emp, num)  ((emp)->base_tech[(num)])
 #define EMPIRE_CITY_OVERAGE_WARNING_TIME(emp)  ((emp)->city_overage_warning_time)
 #define EMPIRE_DELAYED_REFRESH(emp)  ((emp)->delayed_refresh)
+#define EMPIRE_DROPPED_ITEMS(emp)  ((emp)->dropped_items)
 #define EMPIRE_NUM_RANKS(emp)  ((emp)->num_ranks)
 #define EMPIRE_RANK(emp, num)  ((emp)->rank[(num)])
 #define EMPIRE_FRONTIER_TRAITS(emp)  ((emp)->frontier_traits)
@@ -1376,7 +1378,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define MAGIC_DARKNESS(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_DARK))
 #define NO_LOCATION(room)  (RMT_FLAGGED(room, RMT_NO_LOCATION) || RMT_FLAGGED(IN_VEHICLE_IN_ROOM(room), RMT_NO_LOCATION))
 #define ROOM_CAN_EXIT(room)  (ROOM_BLD_FLAGGED((room), BLD_EXIT) || (GET_ROOM_VEHICLE(room) && room == HOME_ROOM(room)))
-#define ROOM_CAN_MINE(room)  (ROOM_SECT_FLAGGED((room), SECTF_CAN_MINE) || room_has_function_and_city_ok((room), FNC_MINE) || (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_CAN_MINE)))
+#define ROOM_CAN_MINE(room)  (ROOM_SECT_FLAGGED((room), SECTF_CAN_MINE) || room_has_function_and_city_ok(ROOM_OWNER(room), (room), FNC_MINE) || (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_CAN_MINE)))
 #define ROOM_IS_CLOSED(room)  (IS_INSIDE(room) || IS_ADVENTURE_ROOM(room) || (IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN) && (IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED))))
 #define SHOW_PEOPLE_IN_ROOM(room)  (!ROOM_IS_CLOSED(room) && !ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION))
 #define WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room)  (RMT_FLAGGED((room), RMT_LIGHT) || IS_ANY_BUILDING(room) || !IS_DARK(room) || adjacent_room_is_light(room))
@@ -1548,16 +1550,19 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // basic data
 #define VEH_ANIMALS(veh)  ((veh)->animals)
+#define VEH_ARTISAN(veh)  NOTHING	// for future use
 #define VEH_BUILT_WITH(veh)  ((veh)->built_with)
 #define VEH_CARRYING_N(veh)  ((veh)->carrying_n)
 #define VEH_CONSTRUCTION_ID(veh)  ((veh)->construction_id)
 #define VEH_CONTAINS(veh)  ((veh)->contains)
+#define VEH_DEPLETION(veh)  ((veh)->depletion)
 #define VEH_DRIVER(veh)  ((veh)->driver)
 #define VEH_EXTRA_DATA(veh)  ((veh)->extra_data)
 #define VEH_FLAGS(veh)  ((veh)->flags)
 #define VEH_HEALTH(veh)  ((veh)->health)
 #define VEH_ICON(veh)  ((veh)->icon)
 #define VEH_INSIDE_ROOMS(veh)  ((veh)->inside_rooms)
+#define VEH_INSTANCE_ID(veh)  ((veh)->instance_id)
 #define VEH_INTERIOR_HOME_ROOM(veh)  ((veh)->interior_home_room)
 #define VEH_KEYWORDS(veh)  ((veh)->keywords)
 #define VEH_LAST_FIRE_TIME(veh)  ((veh)->last_fire_time)
@@ -1605,8 +1610,10 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define IN_OR_ON(veh)		(VEH_FLAGGED((veh), VEH_IN) ? "in" : "on")
 #define VEH_CLAIMS_WITH_ROOM(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && !VEH_FLAGGED((veh), MOVABLE_VEH_FLAGS | VEH_NO_CLAIM))
 #define VEH_FLAGGED(veh, flag)  IS_SET(VEH_FLAGS(veh), (flag))
+#define VEH_HAS_MINOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_minor") / 100)))
+#define VEH_HAS_MAJOR_DISREPAIR(veh)  (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh) && (VEH_HEALTH(veh) <= (VEH_MAX_HEALTH(veh) * config_get_int("disrepair_major") / 100)))
 #define VEH_IS_COMPLETE(veh)  (!VEH_NEEDS_RESOURCES(veh) || !VEH_FLAGGED((veh), VEH_INCOMPLETE | VEH_DISMANTLING))
-#define VEH_IS_DISMANTLING(veh)  (VEH_FLAGGED((veh), VEH_DISMANTLING))
+#define VEH_IS_DISMANTLING(veh)  (VEH_FLAGGED((veh), VEH_DISMANTLING) ? TRUE : FALSE)
 #define VEH_OR_BLD(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) ? "building" : "vehicle")
 
 
@@ -1781,7 +1788,8 @@ extern sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector
 // misc functions from utils.c
 extern char *simple_time_since(time_t when);
 extern unsigned long long microtime(void);
-extern bool room_has_function_and_city_ok(room_data *room, bitvector_t fnc_flag);
+extern bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvector_t fnc_flag);
+extern bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 
 // utils from abilities.c
 void add_ability_gain_hook(char_data *ch, ability_data *abil);
@@ -1819,6 +1827,15 @@ void gain_condition(char_data *ch, int condition, int value);
 extern bool adjacent_room_is_light(room_data *room);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
+
+void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool no_work, bool chameleon);
+#define get_informative_tile_string(ch, room, buffer)  get_informative_string((ch), (buffer), IS_DISMANTLING(room), !IS_COMPLETE(room), HAS_MAJOR_DISREPAIR(room), HAS_MINOR_DISREPAIR(room), (IS_COMPLETE(room) && HAS_FUNCTION(room, FNC_MINE)) ? (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0, ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_WORK), ((ch) && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED((room), ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)))
+#define get_informative_vehicle_string(ch, veh, buffer)  get_informative_string((ch), (buffer), VEH_IS_DISMANTLING(veh), !VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh), VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), room_has_function_and_city_ok(VEH_OWNER(veh), IN_ROOM(veh), FNC_MINE) ? (get_room_extra_data(IN_ROOM(veh), ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0, VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK) || (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)))
+
+extern char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool no_work, bool chameleon);
+#define get_informative_color_room(ch, room)  get_informative_color((ch), IS_DISMANTLING(room), !IS_COMPLETE(room), HAS_MAJOR_DISREPAIR(room), HAS_MINOR_DISREPAIR(room), (IS_COMPLETE(room) && HAS_FUNCTION(room, FNC_MINE)) ? (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0, ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK), ch && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room) && distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(room), Y_COORD(room)) > 2)
+#define get_informative_color_veh(ch, veh)  get_informative_color((ch), VEH_IS_DISMANTLING(veh), !VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh), VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), room_has_function_and_city_ok(VEH_OWNER(veh), IN_ROOM(veh), FNC_MINE) ? (get_room_extra_data(IN_ROOM(veh), ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0, VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK) || (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)) && distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh))) > 2)
+
 
 // utils from morph.c
 extern const char *get_morph_desc(char_data *ch, bool long_desc_if_true);

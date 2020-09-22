@@ -469,7 +469,10 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 * @param char *argument The arguments passed to "%purge% instance".
 */
 void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) {
+	void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
+	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	vehicle_data *veh, *next_veh;
 	char_data *mob, *next_mob;
 	obj_data *obj, *next_obj;
 	any_vnum vnum;
@@ -525,6 +528,23 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 				}
 				extract_obj(obj);
 			}
+		}
+	}
+	else if (is_abbrev(arg1, "vehicle")) {
+		DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+			if (VEH_VNUM(veh) != vnum || VEH_INSTANCE_ID(veh) != INST_ID(inst)) {
+				continue;
+			}
+			
+			// found
+			if (*argument && ROOM_PEOPLE(IN_ROOM(veh))) {
+				act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			}
+			if (veh == owner) {
+				dg_owner_purged = 1;
+			}
+			empty_instance_vehicle(inst, veh, IN_ROOM(veh));
+			extract_vehicle(veh);
 		}
 	}
 	else {
@@ -615,6 +635,7 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 			vehicle_data *veh = (vehicle_data*)go;
 			room = IN_ROOM(veh);
 			emp = VEH_OWNER(veh);
+			inst = get_instance_by_id(VEH_INSTANCE_ID(veh));
 			if (!vict) {
 				vict = get_char_near_vehicle(veh, vict_arg);
 			}
@@ -656,8 +677,8 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 	else if (is_abbrev(cmd_arg, "start")) {
 		if (!is_on_quest(vict, QUEST_VNUM(quest))) {
 			void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
-			if (!inst && room && COMPLEX_DATA(room)) {
-				inst = COMPLEX_DATA(room)->instance;
+			if (!inst && room) {
+				inst = find_instance_by_room(room, TRUE, TRUE);
 			}
 			start_quest(vict, quest, inst);
 		}
@@ -706,6 +727,7 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 		remove_depletion(target, DPLTN_TRAPPING);
 		remove_depletion(target, DPLTN_CHOP);
 		remove_depletion(target, DPLTN_HUNT);
+		remove_depletion(target, DPLTN_PRODUCTION);
 		
 		if (ROOM_OWNER(target)) {
 			void deactivate_workforce_room(empire_data *emp, room_data *room);
@@ -742,6 +764,7 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 	remove_depletion(target, DPLTN_TRAPPING);
 	remove_depletion(target, DPLTN_CHOP);
 	remove_depletion(target, DPLTN_HUNT);
+	remove_depletion(target, DPLTN_PRODUCTION);
 	
 	if (ROOM_OWNER(target)) {
 		void deactivate_workforce_room(empire_data *emp, room_data *room);

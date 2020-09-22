@@ -238,7 +238,6 @@ inline void empire_sleep(struct timeval *timeout) {
 * @param char_data *ch The player to update (no effect if no descriptor).
 */
 void msdp_update_room(char_data *ch) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	extern char *get_room_name(room_data *room, bool color);
 	extern const char *alt_dirs[];
 	

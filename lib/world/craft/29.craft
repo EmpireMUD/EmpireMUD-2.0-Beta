@@ -1,7 +1,7 @@
 #2900
 imperial traveling pack~
 2900 1
-4 182 q 42 -1 0
+4 182 q 42 -1 0 0
 L
 100
 R
@@ -14,7 +14,7 @@ S
 #2902
 prismatic imperial pack~
 2902 1
-4 182 q 42 -1 0
+4 182 q 42 -1 0 0
 L
 100
 R
@@ -37,7 +37,7 @@ S
 #2904
 winged imperial shoes~
 2904 1
-4 182 q 42 -1 0
+4 182 q 42 -1 0 0
 L
 100
 R
@@ -50,7 +50,7 @@ S
 #2906
 imperial griffin egg~
 2906 1
-1 54 q 42 -1 0
+1 54 q 42 -1 0 0
 L
 100
 R
@@ -67,7 +67,7 @@ S
 #2908
 imperial carriage~
 2908 1
-2 264 enq 48 -1 0
+2 264 nq 48 -1 c e
 L
 100
 R
@@ -86,7 +86,7 @@ S
 #2910
 heroic adventuring pack~
 2910 1
-4 182 q 42 -1 0
+4 182 q 42 -1 0 0
 L
 200
 R
@@ -99,7 +99,7 @@ S
 #2912
 heroic boots of seven strides~
 2912 1
-4 182 q 42 -1 0
+4 182 q 42 -1 0 0
 L
 200
 R
@@ -112,7 +112,7 @@ S
 #2914
 heroic changeling stone~
 2914 1
-1 54 q 42 -1 0
+1 54 q 42 -1 0 0
 L
 200
 R
@@ -125,7 +125,7 @@ S
 #2916
 heroic caravan~
 2916 1
-2 264 enq 1 -1 0
+2 264 nq 1 -1 c e
 L
 200
 R
@@ -148,7 +148,7 @@ S
 #2917
 heroic galleon~
 2917 1
-11 61 knoq 1 -1 0
+11 61 npq 1 -1 c u
 L
 200
 R
@@ -175,7 +175,7 @@ S
 #2918
 imperial healing potion~
 2918 1
-6 113 fq 3 -1 0
+6 113 hq 3 -1 0 0
 L
 175
 R
@@ -188,7 +188,7 @@ S
 #2920
 imperial stamina potion~
 2920 1
-6 113 fq 3 -1 0
+6 113 hq 3 -1 0 0
 L
 175
 R
@@ -203,7 +203,7 @@ S
 #2922
 imperial mana potion~
 2922 1
-6 113 fq 3 -1 0
+6 113 hq 3 -1 0 0
 L
 175
 R
@@ -218,7 +218,7 @@ S
 #2924
 imperial wayfarer's potion~
 2924 1
-6 124 fq 3 -1 0
+6 124 hq 3 -1 0 0
 L
 175
 R
@@ -233,7 +233,7 @@ S
 #2926
 imperial hex-purging potion~
 2926 1
-6 124 fq 3 -1 0
+6 124 hq 3 -1 0 0
 L
 175
 R

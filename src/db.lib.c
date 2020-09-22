@@ -997,6 +997,7 @@ void init_craft(craft_data *craft) {
 	
 	// clear/default some stuff
 	GET_CRAFT_OBJECT(craft) = NOTHING;
+	GET_CRAFT_BUILD_TYPE(craft) = NOTHING;
 	GET_CRAFT_REQUIRES_OBJ(craft) = NOTHING;
 	GET_CRAFT_QUANTITY(craft) = 1;
 	GET_CRAFT_TIME(craft) = 1;
@@ -1010,7 +1011,7 @@ void init_craft(craft_data *craft) {
 * @param craft_vnum vnum The craft vnum
 */
 void parse_craft(FILE *fl, craft_vnum vnum) {
-	char line[256], str_in[256], str_in2[256];
+	char line[256], str_in[256], str_in2[256], str_in3[256];
 	craft_data *craft, *find;
 	int int_in[4];
 	
@@ -1045,11 +1046,14 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 		log("SYSERR: Missing line 3 of craft recipe #%d", vnum);
 		exit(1);
 	}
-	if (sscanf(line, "%d %d %s %d %d %s", int_in, int_in + 1, str_in, int_in + 2, int_in + 3, str_in2) != 6) {
-		strcpy(str_in2, "0");	// backwards-compatible with missing requires-tool
-		if (sscanf(line, "%d %d %s %d %d", int_in, int_in + 1, str_in, int_in + 2, int_in + 3) != 5) {
-			log("SYSERR: Format error in line 3 of craft recipe #%d", vnum);
-			exit(1);
+	if (sscanf(line, "%d %d %s %d %d %s %s", int_in, int_in + 1, str_in, int_in + 2, int_in + 3, str_in2, str_in3) != 7) {
+		strcpy(str_in3, "0");	// backwards-compative with missing requires-function
+		if (sscanf(line, "%d %d %s %d %d %s", int_in, int_in + 1, str_in, int_in + 2, int_in + 3, str_in2) != 6) {
+			strcpy(str_in2, "0");	// backwards-compatible with missing requires-tool
+			if (sscanf(line, "%d %d %s %d %d", int_in, int_in + 1, str_in, int_in + 2, int_in + 3) != 5) {
+				log("SYSERR: Format error in line 3 of craft recipe #%d", vnum);
+				exit(1);
+			}
 		}
 	}
 	
@@ -1059,6 +1063,7 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 	GET_CRAFT_TIME(craft) = int_in[2];
 	GET_CRAFT_REQUIRES_OBJ(craft) = int_in[3];
 	GET_CRAFT_REQUIRES_TOOL(craft) = asciiflag_conv(str_in2);
+	GET_CRAFT_REQUIRES_FUNCTION(craft) = asciiflag_conv(str_in3);
 	
 	// optionals
 
@@ -1122,7 +1127,7 @@ void parse_craft(FILE *fl, craft_vnum vnum) {
 * @param craft_data *craft The thing to save.
 */
 void write_craft_to_file(FILE *fl, craft_data *craft) {
-	char temp1[256], temp2[256];
+	char temp1[256], temp2[256], temp3[256];
 	
 	if (!fl || !craft) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: write_craft_to_file called without %s", !fl ? "file" : "craft");
@@ -1136,9 +1141,10 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 	
 	strcpy(temp1, bitv_to_alpha(GET_CRAFT_FLAGS(craft)));
 	strcpy(temp2, bitv_to_alpha(GET_CRAFT_REQUIRES_TOOL(craft)));
-	fprintf(fl, "%d %d %s %d %d %s\n", GET_CRAFT_TYPE(craft), GET_CRAFT_ABILITY(craft), temp1, GET_CRAFT_TIME(craft), GET_CRAFT_REQUIRES_OBJ(craft), temp2);
+	strcpy(temp3, bitv_to_alpha(GET_CRAFT_REQUIRES_FUNCTION(craft)));
+	fprintf(fl, "%d %d %s %d %d %s %s\n", GET_CRAFT_TYPE(craft), GET_CRAFT_ABILITY(craft), temp1, GET_CRAFT_TIME(craft), GET_CRAFT_REQUIRES_OBJ(craft), temp2, temp3);
 	
-	if (CRAFT_IS_BUILDING(craft) || GET_CRAFT_BUILD_TYPE(craft) != NOTHING || GET_CRAFT_BUILD_ON(craft) || GET_CRAFT_BUILD_FACING(craft)) {
+	if (CRAFT_IS_BUILDING(craft) || GET_CRAFT_BUILD_TYPE(craft) > 0 || GET_CRAFT_BUILD_ON(craft) || GET_CRAFT_BUILD_FACING(craft)) {
 		strcpy(temp1, bitv_to_alpha(GET_CRAFT_BUILD_ON(craft)));
 		strcpy(temp2, bitv_to_alpha(GET_CRAFT_BUILD_FACING(craft)));
 		
@@ -1460,14 +1466,14 @@ void check_for_new_map(void) {
 	log("DETECT NEW WORLD MAP -- Clearing empire islands and player locations...");
 	
 	// ensure no instances in the instance list-- their locations SHOULD be all gone anyway
-	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		if (inst->room) {
 			free(inst->room);
 		}
 		if (INST_MOB_COUNTS(inst)) {
 			free(INST_MOB_COUNTS(inst));
 		}
-		LL_DELETE(instance_list, inst);
+		DL_DELETE(instance_list, inst);
 		free(inst);
 	}
 	
@@ -1935,6 +1941,7 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 * @param empire_data *emp The empire to free
 */
 void free_empire(empire_data *emp) {
+	void free_dropped_items(struct empire_dropped_item **list);
 	void free_empire_goals(struct empire_goal *hash);
 	void free_empire_completed_goals(struct empire_completed_goal *hash);
 	void free_member_data(empire_data *emp);
@@ -2085,6 +2092,7 @@ void free_empire(empire_data *emp) {
 		free(wf_log);
 	}
 	
+	free_dropped_items(&EMPIRE_DROPPED_ITEMS(emp));
 	free_theft_logs(EMPIRE_THEFT_LOGS(emp));
 	
 	// free gathered totals
@@ -6188,9 +6196,16 @@ void parse_room(FILE *fl, room_vnum vnum) {
 			}
 			
 			case 'Y': {	// tracks
-				if (!get_line(fl, line2) || sscanf(line2, "%d %d %ld %d", &t[0], &t[1], &l_in, &t[2]) != 4) {
-					log("SYSERR: Bad formatting in Y section of room #%d", vnum);
+				if (!get_line(fl, line2)) {
+					log("SYSERR: Missing Y section of room #%d", vnum);
 					exit(1);
+				}
+				if (sscanf(line2, "%d %d %ld %d %d", &t[0], &t[1], &l_in, &t[2], &t[3]) != 5) {
+					t[3] = NOWHERE;	// to_room: backwards-compatible with old version
+					if (sscanf(line2, "%d %d %ld %d", &t[0], &t[1], &l_in, &t[2]) != 4) {
+						log("SYSERR: Bad formatting in Y section of room #%d", vnum);
+						exit(1);
+					}
 				}
 				
 				CREATE(track, struct track_data, 1);
@@ -6198,8 +6213,9 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				track->mob_num = t[1];
 				track->timestamp = l_in;
 				track->dir = t[2];
+				track->to_room = t[3];
 				
-				DL_PREPEND(ROOM_TRACKS(room), track);
+				DL_APPEND(ROOM_TRACKS(room), track);
 				break;
 			}
 			
@@ -9781,7 +9797,7 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 			free(track);
 		}
 		else {
-			fprintf(fl, "Y\n%d %d %ld %d\n", track->player_id, track->mob_num, track->timestamp, track->dir);
+			fprintf(fl, "Y\n%d %d %ld %d %d\n", track->player_id, track->mob_num, track->timestamp, track->dir, track->to_room);
 		}
 	}
 

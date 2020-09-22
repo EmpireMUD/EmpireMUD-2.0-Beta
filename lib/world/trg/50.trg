@@ -17,10 +17,10 @@ switch %random.7%
     %mod% %room% icon .&0/]&?.
   break
   case 5
-    %mod% %room% icon .&0(\\&?.
+    %mod% %room% icon .&0(\&?.
   break
   case 6
-    %mod% %room% icon .&0}\\.
+    %mod% %room% icon .&0}\.
   break
   case 7
     %mod% %room% icon &0..}&?.
@@ -41,10 +41,10 @@ switch %random.7%
     %mod% %room% icon ..&0/]
   break
   case 2
-    %mod% %room% icon &0[\\&?..
+    %mod% %room% icon &0[\&?..
   break
   case 3
-    %mod% %room% icon &0|\\&?..
+    %mod% %room% icon &0|\&?..
   break
   case 4
     %mod% %room% icon &0[&?__&0]

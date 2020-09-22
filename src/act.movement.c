@@ -45,7 +45,9 @@ extern const char *mob_move_types[];
 ACMD(do_dismount);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void do_unseat_from_vehicle(char_data *ch);
+extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
 extern char *get_room_name(room_data *room, bool color);
+extern int total_small_vehicles_in_room(room_data *room);
 extern int total_vehicle_size_in_room(room_data *room);
 
 // local protos
@@ -100,9 +102,10 @@ int sort_temp_portal_data(struct temp_portal_data *a, struct temp_portal_data *b
 /**
 * @param char_data *ch the person leaving tracks
 * @param room_data *room the location of the tracks
-* @param byte dir the direction the person went
+* @param byte dir the direction the person went (if any)
+* @param room_data *to_room for non-directional exits, helps the mob pursue
 */
-void add_tracks(char_data *ch, room_data *room, byte dir) {
+void add_tracks(char_data *ch, room_data *room, byte dir, room_data *to_room) {
 	extern bool valid_no_trace(room_data *room);
 	extern bool valid_unseen_passing(room_data *room);
 	
@@ -120,6 +123,7 @@ void add_tracks(char_data *ch, room_data *room, byte dir) {
 		
 			track->timestamp = time(0);
 			track->dir = dir;
+			track->to_room = to_room ? GET_ROOM_VNUM(to_room) : NOWHERE;
 		
 			if (IS_NPC(ch)) {
 				track->mob_num = GET_MOB_VNUM(ch);
@@ -158,7 +162,7 @@ struct temp_portal_data *build_portal_list_near(char_data *ch, room_data *origin
 		if (!all_portals && !ROOM_OWNER(room)) {
 			continue;	// only show unowned on all
 		}
-		if (!IS_COMPLETE(room) || !room_has_function_and_city_ok(room, FNC_PORTAL)) {
+		if (!IS_COMPLETE(room) || !room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_PORTAL)) {
 			continue;	// not a portal
 		}
 		if (!can_use_room(ch, room, all_portals ? GUESTS_ALLOWED : MEMBERS_AND_ALLIES)) {
@@ -291,7 +295,6 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 */
 bool can_enter_room(char_data *ch, room_data *room) {
 	extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	
 	struct instance_data *inst;
 	
@@ -1226,6 +1229,12 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 		}
 		return FALSE;
 	}
+	else if (VEH_SIZE(veh) == 0 && total_small_vehicles_in_room(to_room) >= config_get_int("vehicle_max_per_tile")) {
+		if (ch) {
+			act("$V cannot go there because it's too full already.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		return FALSE;
+	}
 	
 	// closed building checks
 	if (!IS_ADVENTURE_ROOM(IN_ROOM(veh)) && IS_ANY_BUILDING(to_room) && ROOM_IS_CLOSED(to_room)) {
@@ -1342,6 +1351,7 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 	// update visit and last-dir
 	qt_visit_room(ch, to_room);
 	GET_LAST_DIR(ch) = NO_DIR;
+	add_tracks(ch, was_in, NO_DIR, IN_ROOM(ch));
 	
 	// see if there's a different portal on the other end
 	use_portal = find_back_portal(to_room, was_in, portal);
@@ -1490,9 +1500,7 @@ bool do_simple_move(char_data *ch, int dir, room_data *to_room, bitvector_t flag
 	mark_move_time(ch);
 	command_lag(ch, WAIT_MOVEMENT);
 	qt_visit_room(ch, IN_ROOM(ch));
-	if (dir != NO_DIR) {
-		add_tracks(ch, was_in, dir);
-	}
+	add_tracks(ch, was_in, dir, IN_ROOM(ch));
 	gain_ability_exp_from_moves(ch, was_in, flags);
 	msdp_update_room(ch);
 	
@@ -1640,6 +1648,16 @@ void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room
 			act("$n follows you.", TRUE, ch, NULL, ch->master, TO_VICT);
 		}
 	}
+	else if (IS_SET(flags, MOVE_ENTER_PORTAL)) {
+		obj_data *portal = find_portal_in_room_targetting(from_room, GET_ROOM_VNUM(to_room));
+		obj_data *use_portal = find_back_portal(to_room, from_room, portal);
+		if (use_portal) {
+			act("$n appears from $p!", TRUE, ch, use_portal, NULL, TO_ROOM);
+		}
+		else {
+			act("$n appears from a portal.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+	}
 	else if (IS_SET(flags, MOVE_ENTER_VEH)) {
 		vehicle_data *veh = GET_ROOM_VEHICLE(to_room);
 		bool is_bld = (!veh || VEH_FLAGGED(veh, VEH_BUILDING));
@@ -1749,6 +1767,15 @@ void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room,
 	}
 	else if (IS_SET(flags, MOVE_FOLLOW) && ch->master) {
 		act("$n follows $M.", TRUE, ch, NULL, ch->master, TO_NOTVICT);
+	}
+	else if (IS_SET(flags, MOVE_ENTER_PORTAL)) {
+		obj_data *portal = find_portal_in_room_targetting(from_room, GET_ROOM_VNUM(to_room));
+		if (portal) {
+			act("$n steps into $p.", TRUE, ch, portal, NULL, TO_ROOM);
+		}
+		else {
+			act("$n steps into a portal.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
 	}
 	else if (IS_SET(flags, MOVE_ENTER_VEH)) {
 		vehicle_data *veh = GET_ROOM_VEHICLE(to_room);
@@ -2468,7 +2495,11 @@ ACMD(do_portal) {
 		msg_to_char(ch, "You don't have permission to open portals here.\r\n");
 		return;
 	}
-	if (!all_access && (!room_has_function_and_city_ok(IN_ROOM(ch), FNC_PORTAL) || !room_has_function_and_city_ok(target, FNC_PORTAL))) {
+	if (!all_access && !can_use_room(ch, target, GUESTS_ALLOWED)) {
+		msg_to_char(ch, "You don't have permission to open a portal to that location.\r\n");
+		return;
+	}
+	if (!all_access && (!room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_PORTAL) || !room_has_function_and_city_ok(GET_LOYALTY(ch), target, FNC_PORTAL))) {
 		msg_to_char(ch, "You can only open portals between portal buildings.\r\n");
 		return;
 	}
@@ -2482,10 +2513,6 @@ ACMD(do_portal) {
 	}
 	if (!all_access && (!check_in_city_requirement(IN_ROOM(ch), TRUE) || !check_in_city_requirement(target, TRUE))) {
 		msg_to_char(ch, "You can't open that portal because of one the locations must be in a city, and isn't.\r\n");
-		return;
-	}
-	if (!all_access && !can_use_room(ch, target, GUESTS_ALLOWED)) {
-		msg_to_char(ch, "You don't have permission to open a portal to that location.\r\n");
 		return;
 	}
 	if (!has_player_tech(ch, PTECH_PORTAL_UPGRADE) && (!GET_LOYALTY(ch) || !EMPIRE_HAS_TECH(GET_LOYALTY(ch), TECH_MASTER_PORTALS)) && GET_ISLAND(IN_ROOM(ch)) != GET_ISLAND(target)) {

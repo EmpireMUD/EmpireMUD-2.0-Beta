@@ -132,6 +132,7 @@ BREW
 
 Usage:  brew [number] <potion>
         brew info <potion>
+        brew list <keywords>
 
 This command allows you to brew potions of various types, if you have the
 correct potions abilities from Natural Magic.

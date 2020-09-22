@@ -1085,6 +1085,7 @@ components Immort   Shows all items matching a generic component vnum.
 crops      Immort   Shows tile counts for all the crops (vnum/name optional).
 currency   Immort   Shows coins and adventure currencies for a player.
 dailycycle Immort   Shows daily quests with a given cycle id.
+dropped    Immort   Shows all items an empire has on the ground.
 factions   Immort   Shows a player's faction levels.
 homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
@@ -1170,6 +1171,16 @@ Usage:  show dailycycle <number>
 This command will find all daily quests that share a certain cycle id.
 
 See also:  QEDIT DAILYCYCLE
+#e
+"SHOW DROPPED" "SHOW DROPPED ITEMS"
+
+Usage:  show dropped <empire>
+
+Shows the recorded counts of items on the ground in the empire. These items
+count towards the 'total' on the einventory command. You can refresh them
+with 'util rescan [empire].
+
+See also: EINVENTORY
 #e
 "SHOW FACTIONS"
 
@@ -1626,6 +1637,7 @@ Available utilities:
  &credoislands&0 - Renumbers all the islands (requires confirmation; may rearrange
     empire inventories).
  &crescan <empire | all>&0 - Rereads territory and members, which can fix issues.
+    Also re-scans items on the ground (SHOW DROPPED).
  &cresetbuildingtriggers <vnum | all>&0 - Reattaches triggers to buildings/rooms,
     e.g. if you made a change in OLC and want live buildings updated.
  &cstrlen&0 - Give various measures of string length.

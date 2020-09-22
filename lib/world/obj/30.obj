@@ -16,7 +16,7 @@ Someone dropped a green apple here.~
 want in a snack. If you want to plant your own orchard, however, you'll need to
 collect a few apples and then combine them to make a whole bunch.
 ~
-6 0 a 0 5
+6 g a 0 6
 2 0 0
 7 48
 I 14 3002 100.00 4 x  # COMBINE: bunch of apples
@@ -28,7 +28,7 @@ a bunch of apples~
 There are a bunch of apples scattered across the ground.~
 You can eat apples, or plant them.
 ~
-6 bl a 0 7
+6 bgl a 0 8
 12 13 0
 7 168
 C
@@ -57,7 +57,7 @@ There is a basket of peaches on the ground.~
    The peaches have the fragrant aroma of the harvest. You can eat them, plant
 them, or store them in the cannery.
 ~
-6 bl a 0 7
+6 bgl a 0 8
 12 6 0
 7 168
 C
@@ -73,7 +73,7 @@ a bushel of corn~
 A bushel of corn has been left on the ground.~
 You can eat corn, or plant it.
 ~
-6 bl a 0 3
+6 bgl a 0 4
 24 2 0
 7 168
 C
@@ -90,7 +90,7 @@ Someone dropped a peach here.~
 plant an orchard. Combine several peaches to make a whole basket if you want to
 plant them.
 ~
-6 0 a 0 9
+6 g a 0 10
 2 0 0
 7 48
 I 14 3004 100.00 4 x  # COMBINE: basket of peaches
@@ -104,7 +104,7 @@ Someone dropped a couple red cherries here.~
 so, but you could also combine them into a whole bag to have enough to plant
 some cherry trees.
 ~
-6 0 a 0 6
+6 g a 0 7
 2 0 0
 7 48
 I 14 3008 100.00 4 x  # COMBINE: bag of cherries
@@ -117,7 +117,7 @@ There is a bag of cherries on the ground.~
    These plump red cherries would make a perfect snack. You could also store
 them at the cannery or use them to plant an orchard.
 ~
-6 bl a 0 6
+6 bgl a 0 7
 12 7 0
 7 168
 C
@@ -135,7 +135,7 @@ An orange is lying here.~
 orange, but if you combine several oranges to make a whole sack, you could
 plant that.
 ~
-6 0 a 0 5
+6 g a 0 6
 2 0 0
 7 48
 I 14 3010 100.00 4 x  # COMBINE: sack of oranges
@@ -147,7 +147,7 @@ a sack of oranges~
 A sack of oranges is sitting here.~
 This prize sack of oranges can be eaten or planted.
 ~
-6 bl a 0 6
+6 bgl a 0 7
 12 8 0
 7 168
 C
@@ -163,7 +163,7 @@ a sack of dried rice~
 A sack of dried rice is sitting on the ground.~
 Rice can be planted near rivers.
 ~
-3 bl a 0 3
+3 bgl a 0 4
 0 9 0
 7 168
 C
@@ -214,7 +214,7 @@ some red berries~
 There are some red berries on the ground.~
 You can eat the berries. However, you don't seem to be able to plant them.
 ~
-6 0 a 0 4
+6 g a 0 5
 1 0 0
 7 48
 O+ 1 6120
@@ -225,7 +225,7 @@ a handful of dates~
 There is about a handful of dates on the ground.~
 The dates look good enough to eat.
 ~
-6 0 a 0 3
+6 g a 0 4
 1 0 0
 7 48
 O+ 1 6120
@@ -236,7 +236,7 @@ a plump fig~
 A plump fig is rolling around on the ground.~
 The fig looks good enough to eat.
 ~
-6 0 a 0 3
+6 g a 0 4
 6 0 0
 7 48
 O+ 1 6122
@@ -249,7 +249,7 @@ A couple of green olives have been dropped here.~
 This also isn't enough olives to plant an orchard, but you could combine them
 with more olives to get enough to plant.
 ~
-3 0 a 0 8
+3 g a 0 9
 0 0 0
 7 48
 I 14 3019 100.00 4 x  # COMBINE: basket of olives
@@ -262,7 +262,7 @@ A basket of fresh olives is sitting on the ground.~
    The raw olives are far too bitter to eat, but they can be pressed into oil,
 or used as a vegetable. You can also plant them.
 ~
-3 bl a 0 8
+3 bgl a 0 9
 0 10 0
 7 168
 C
@@ -280,7 +280,7 @@ Some green peas have been dropped here.~
 here to plant a pea crop, but you could combine them with more peas to make a
 whole basket for planting.
 ~
-6 0 a 0 5
+6 g a 0 6
 2 0 0
 7 48
 I 14 3021 100.00 4 x  # COMBINE: basket of peas
@@ -296,7 +296,7 @@ pea crop These delicious green peas are still in their pods. You can eat them
 just like this, or cook something with them, or even plant them to start your
 own pea crop.
 ~
-6 bl a 0 6
+6 bgl a 0 7
 12 11 0
 7 168
 C
@@ -313,7 +313,7 @@ A yellow squash is lying on the ground.~
    This nice summer squash looks good enough to eat! But if you want to plant a
 squash crop, combine it with a few more to get a basket of squash first.
 ~
-6 0 a 0 5
+6 g a 0 6
 2 0 0
 7 48
 I 14 3023 100.00 4 x  # COMBINE: basket of squash
@@ -325,7 +325,7 @@ a basket of squash~
 A basket full of squash is sitting on the ground.~
 The yellow squash are fresh. You could eat them or plant them.
 ~
-6 bl a 0 8
+6 bgl a 0 9
 12 12 0
 7 168
 C
@@ -345,7 +345,7 @@ There is an unripe plantain on the ground.~
 If you combine several of them, you can fill a whole basket of plantains, which
 would be enough to plant your own crop.
 ~
-6 0 a 0 5
+6 g a 0 6
 1 0 0
 7 48
 I 14 3025 100.00 4 x  # COMBINE: basket of plantains
@@ -358,7 +358,7 @@ A basket of plantains is sitting here.~
    These starchy plantains can be eaten raw, cooked as a vegetable, or planted
 to start your own crop.
 ~
-6 bl a 0 6
+6 bgl a 0 7
 12 14 0
 7 168
 C
@@ -374,7 +374,7 @@ a basket of tomatoes~
 There is a basket of tomatoes on the ground.~
 You can eat tomatoes, or plant them.
 ~
-6 bl a 0 10
+6 bgl a 0 11
 12 3000 0
 7 168
 C
@@ -392,7 +392,7 @@ Someone dropped a ripe tomato here.~
 snack, or combine a few of them to get a basket of tomatoes and have enough to
 plant a crop of them.
 ~
-6 0 a 0 8
+6 g a 0 9
 1 0 0
 7 48
 I 14 3026 100.00 4 e  # COMBINE: basket of tomatoes
@@ -404,7 +404,7 @@ a bunch of bananas~
 There is a bunch of bananas on the ground.~
 You can eat bananas, or plant them.
 ~
-6 bl a 0 8
+6 bgl a 0 9
 12 3001 0
 7 168
 C
@@ -422,7 +422,7 @@ Someone has dropped a ripe yellow banana.~
 but it's not enough to plant a crop of them. Combine a few bananas to get an
 entire bunch, and you could plant that.
 ~
-6 0 a 0 7
+6 g a 0 8
 1 0 0
 7 48
 I 14 3028 100.00 4 e  # COMBINE: bunch of bananas
@@ -464,7 +464,7 @@ a bunch of grapes~
 There is a bunch of grapes on the ground.~
 You can eat grapes, or plant them.
 ~
-6 bl a 0 10
+6 bgl a 0 11
 12 3003 0
 7 168
 C
@@ -482,7 +482,7 @@ Someone has dropped a few grapes.~
 grapes here to plant a crop of them, but they still make a good snack. Combine
 more grapes to get an entire bunch, which you could plant.
 ~
-6 0 a 0 8
+6 g a 0 9
 2 0 0
 7 48
 I 14 3032 100.00 4 e  # COMBINE: bunch of grapes
@@ -494,7 +494,7 @@ a basket of peppers~
 There is a basket of peppers on the ground.~
 You can plant peppers, cook food or brew them into poisons.
 ~
-3 bl a 0 14
+3 bgl a 0 15
 0 3004 0
 7 168
 C
@@ -512,7 +512,7 @@ Someone dropped a ripe pepper here.~
 zing to it. Try combining a few of them to have a basket of peppers you can
 plant.
 ~
-6 0 a 0 6
+6 g a 0 7
 1 0 0
 7 48
 I 14 3034 100.00 4 e  # COMBINE: basket of peppers
@@ -526,7 +526,7 @@ There is a sack of potatoes on the ground.~
 good raw.
 Cook: baked potatoes
 ~
-3 bl a 0 12
+3 bgl a 0 13
 0 3005 0
 7 168
 C
@@ -542,7 +542,7 @@ a basket of plums~
 There is a basket of plums on the ground.~
 You can eat plums, or plant them.
 ~
-6 bl a 0 9
+6 bgl a 0 10
 12 3006 0
 7 168
 C
@@ -560,7 +560,7 @@ Someone dropped a ripe plum here.~
 eat it as a snack, or combine it with more plums to make a full basket, which
 could be planted.
 ~
-6 0 a 0 8
+6 g a 0 9
 1 0 0
 7 48
 I 14 3037 100.00 4 x  # COMBINE: basket of plums
@@ -572,7 +572,7 @@ a basket of strawberries~
 A basket of ripe strawberries is on the ground.~
 You can eat strawberries, or plant them.
 ~
-6 bl a 0 10
+6 bgl a 0 11
 12 3007 0
 7 168
 C
@@ -590,7 +590,7 @@ A couple of strawberries has been left here.~
 tastes good. You could combine a few of these to make a full basket of
 strawberries, which you could plant.
 ~
-6 0 a 0 7
+6 g a 0 8
 1 0 0
 7 48
 I 14 3039 100.00 4 e  # COMBINE: basket of strawberries
@@ -602,7 +602,7 @@ a basket of mangoes~
 A basket of mangoes is on the ground.~
 You can eat mangoes, or plant them.
 ~
-6 bl a 0 12
+6 bgl a 0 13
 12 3008 0
 7 168
 C
@@ -620,7 +620,7 @@ A single ripe mango has been dropped on the ground.~
 Combine a few of them into a basket of mangoes and you'd have enough to plant
 your own crop.
 ~
-6 0 a 0 7
+6 g a 0 8
 2 0 0
 7 48
 I 14 3041 100.00 4 e  # COMBINE: basket of mangoes
@@ -632,7 +632,7 @@ a basket of blueberries~
 A basket of blueberries is on the ground.~
 You can eat blueberries, or plant them.
 ~
-6 bl a 0 10
+6 bgl a 0 11
 12 3009 0
 7 168
 C
@@ -650,7 +650,7 @@ A handful of blueberries has been scattered on the ground.~
 also combine a few of these to make a basket of blueberries, which would be
 enough to plant a crop.
 ~
-6 0 a 0 6
+6 g a 0 7
 1 0 0
 7 48
 I 14 3043 100.00 4 e  # COMBINE: basket of blueberries
@@ -676,7 +676,7 @@ a sack of oats~
 A sack of oats has been dropped on the ground.~
 Oats can be milled into oatmeal.
 ~
-3 bl a 0 7
+3 bgl a 0 8
 0 3015 0
 7 168
 C
@@ -692,7 +692,7 @@ A large ripe watermelon is on the ground.~
    This large ripe watermelon looks like it would make a good snack. You could
 also seed it and grow your own.
 ~
-6 l a 0 8
+6 gl a 0 9
 6 0 0
 7 336
 C
@@ -769,7 +769,7 @@ A green calabash is lying here.~
    The calabash, also called a bottle gourd, has a mild flavor. This one isn't
 ripe enough to dry into a bottle, but it might satisfy your hunger.
 ~
-6 0 a 0 7
+6 g a 0 8
 2 0 0
 7 12
 O+ 1 6142
@@ -783,7 +783,7 @@ A sack of fresh calabash gourds is hanging here.~
 calabash is cultivated worldwide for its use as a bottle gourd. If you leave
 this sack out to dry, you could craft it into a bottle.
 ~
-6 el a 0 9
+6 egl a 0 10
 12 0 0
 7 132
 C
@@ -922,7 +922,7 @@ else combine a few of them to get an entire sack of potatoes, which could be
 planted.
 Cook: baked potato
 ~
-3 0 a 0 2
+3 g a 0 3
 0 0 0
 0 168
 I 14 3036 100.00 4  # COMBINE: sack of potatoes
@@ -935,7 +935,7 @@ There are some red berries on the ground.~
    These red berries are strange, but they taste fresh and sweet, so they
 should make a good snack. You could also try planting them.
 ~
-6 b a 0 4
+6 bg a 0 5
 1 3011 0
 7 48
 O+ 1 6120
@@ -959,7 +959,7 @@ A small watermelon is lying here.~
    This little watermelon might be big enough to eat! You could also seed it
 and plant some more.
 ~
-6 0 a 0 7
+6 g a 0 8
 2 3016 0
 7 336
 I 25 3068 100.00 1  # SEED: watermelon seeds
@@ -1008,7 +1008,7 @@ a basket of apricots~
 Someone has dropped a basket of apricots.~
 You can eat apricots, or plant them.
 ~
-6 bl a 0 10
+6 bgl a 0 11
 12 3070 0
 7 168
 C
@@ -1025,7 +1025,7 @@ A couple of apricots have been scattered on the ground.~
    These apricots have a fresh, summery taste. Combine a few of them into a
 basket of apricots and you'll have enough to plant your own orchard.
 ~
-6 0 a 0 6
+6 g a 0 7
 2 0 0
 7 48
 I 14 3070 100.00 4 e  # COMBINE: basket of apricots
@@ -1063,7 +1063,7 @@ a basket of garlic~
 A basket of garlic has been dropped on the ground.~
 You can eat garlic, or plant it.
 ~
-6 bl a 0 8
+6 bgl a 0 9
 4 3074 0
 7 168
 C
@@ -1082,7 +1082,7 @@ A clove of garlic has been dropped on the ground.~
    This clove of garlic has a fresh, pungent taste to it. Combine a few cloves
 into a basket of garlic and you'll have enough to plant your own crop.
 ~
-6 0 a 0 5
+6 g a 0 6
 1 0 0
 7 48
 I 14 3074 100.00 4 e  # COMBINE: basket of garlic
@@ -1094,7 +1094,7 @@ a basket of lemons~
 A basket of lemons has been dropped here.~
 You can eat lemons, or plant them.
 ~
-6 bl a 0 7
+6 bgl a 0 8
 4 3076 0
 7 168
 C
@@ -1112,7 +1112,7 @@ A single ripe lemon is on the ground.~
 a few of them into a basket of lemons, you might have enough to plant an
 orchard of them.
 ~
-6 0 a 0 5
+6 g a 0 6
 1 0 0
 7 48
 I 14 3076 100.00 4 e  # COMBINE: basket of lemons
@@ -1124,7 +1124,7 @@ a basket of cucumbers~
 Someone has dropped a basket of cucumbers on the ground.~
 Cucumbers can be planted, eaten, or made into pickles.
 ~
-6 bl a 0 10
+6 bgl a 0 11
 6 3078 0
 7 168
 C
@@ -1141,7 +1141,7 @@ A single ripe cucumber is ready to eat.~
    This little cucumber tastes fresh and ripe. If you combined a few of these
 into a basket of cucumbers, you'd have enough to plant a field of them.
 ~
-6 0 a 0 5
+6 g a 0 6
 1 0 0
 0 48
 I 14 3078 100.00 4 e  # COMBINE: basket of cucumbers

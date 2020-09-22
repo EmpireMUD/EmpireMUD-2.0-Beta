@@ -34,6 +34,7 @@ extern const char *bld_on_flags[];
 extern const bitvector_t bld_on_flags_order[];
 extern const char *craft_flags[];
 extern const char *craft_types[];
+extern const char *function_flags[];
 extern const char *road_types[];
 extern const char *tool_flags[];
 
@@ -59,7 +60,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 	bool problem = FALSE;
 	bld_data *bld = NULL;
 
-	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL && !CRAFT_FLAGGED(craft, CRAFT_LEARNED)) {
+	if (GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING && GET_CRAFT_ABILITY(craft) == NO_ABIL && !CRAFT_FLAGGED(craft, CRAFT_LEARNED) && GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WORKFORCE) {
 		olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft requires no object, ability, or recipe");
 		problem = TRUE;
 	}
@@ -110,6 +111,10 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Possible unnecessary in-city-only flag (not set on building or building functions)");
 			problem = TRUE;
 		}
+		if (bld && !GET_CRAFT_BUILD_FACING(craft) && !IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN)) {
+			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Missing build-facing");
+			problem = TRUE;
+		}
 		if (GET_CRAFT_QUANTITY(craft) > 1) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Building craft with quantity > 1");
 			problem = TRUE;
@@ -150,7 +155,7 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft makes nothing");
 			problem = TRUE;
 		}
-		if (GET_CRAFT_OBJECT(craft) != NOTHING && GET_CRAFT_OBJECT(craft) != GET_CRAFT_VNUM(craft)) {
+		if (GET_CRAFT_OBJECT(craft) != NOTHING && GET_CRAFT_OBJECT(craft) != GET_CRAFT_VNUM(craft) && GET_CRAFT_TYPE(craft) != CRAFT_TYPE_WORKFORCE) {
 			olc_audit_msg(ch, GET_CRAFT_VNUM(craft), "Craft creates item with different vnum");
 			problem = TRUE;
 		}
@@ -353,7 +358,8 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	int count;
 	
-	bitvector_t only_flags = NOBITS, not_flagged = NOBITS, only_tools = NOBITS;
+	bitvector_t only_flags = NOBITS, not_flagged = NOBITS, only_tools = NOBITS, only_functions = NOBITS;
+	bitvector_t only_buildon = NOBITS, only_buildfacing = NOBITS;
 	int only_type = NOTHING, only_level = NOTHING, only_quantity = NOTHING, only_time = NOTHING;
 	int quantity_over = NOTHING, level_over = NOTHING, time_over = NOTHING;
 	int quantity_under = NOTHING, level_under = NOTHING, time_under = NOTHING;
@@ -378,6 +384,8 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		}
 		
 		FULLSEARCH_LIST("type", only_type, craft_types)
+		FULLSEARCH_FLAGS("buildon", only_buildon, bld_on_flags)
+		FULLSEARCH_FLAGS("buildfacing", only_buildfacing, bld_on_flags)
 		FULLSEARCH_FLAGS("flags", only_flags, craft_flags)
 		FULLSEARCH_FLAGS("flagged", only_flags, craft_flags)
 		FULLSEARCH_FLAGS("unflagged", not_flagged, craft_flags)
@@ -387,6 +395,7 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		FULLSEARCH_INT("level", only_level, 0, INT_MAX)
 		FULLSEARCH_INT("levelsover", level_over, 0, INT_MAX)
 		FULLSEARCH_INT("levelunder", level_under, 0, INT_MAX)
+		FULLSEARCH_FLAGS("requiresfunction", only_functions, function_flags)
 		FULLSEARCH_BOOL("requiresobject", requires_obj)
 		FULLSEARCH_INT("time", only_time, 0, INT_MAX)
 		FULLSEARCH_INT("timesover", time_over, 0, INT_MAX)
@@ -409,6 +418,12 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 		if (requires_obj && GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING) {
 			continue;
 		}
+		if (only_buildon != NOBITS && (GET_CRAFT_BUILD_ON(craft) & only_buildon) != only_buildon) {
+			continue;
+		}
+		if (only_buildfacing != NOBITS && (GET_CRAFT_BUILD_FACING(craft) & only_buildfacing) != only_buildfacing) {
+			continue;
+		}
 		if (only_type != NOTHING && GET_CRAFT_TYPE(craft) != only_type) {
 			continue;
 		}
@@ -416,6 +431,9 @@ void olc_fullsearch_craft(char_data *ch, char *argument) {
 			continue;
 		}
 		if (only_flags != NOBITS && (GET_CRAFT_FLAGS(craft) & only_flags) != only_flags) {
+			continue;
+		}
+		if (only_functions != NOBITS && (GET_CRAFT_REQUIRES_FUNCTION(craft) & only_functions) != only_functions) {
 			continue;
 		}
 		if (only_quantity != NOTHING && GET_CRAFT_QUANTITY(craft) != only_quantity) {
@@ -725,6 +743,9 @@ void olc_show_craft(char_data *ch) {
 	sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, buf1, TRUE);
 	sprintf(buf + strlen(buf), "<%stools\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_TOOL(craft), NOBITS), buf1);
 	
+	sprintbit(GET_CRAFT_REQUIRES_FUNCTION(craft), function_flags, buf1, TRUE);
+	sprintf(buf + strlen(buf), "<%srequiresfunction\t0> %s\r\n", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_FUNCTION(craft), NOBITS), buf1);
+	
 	sprintf(buf + strlen(buf), "<%srequiresobject\t0> %d - %s\r\n", OLC_LABEL_VAL(GET_CRAFT_REQUIRES_OBJ(craft), NOTHING), GET_CRAFT_REQUIRES_OBJ(craft), GET_CRAFT_REQUIRES_OBJ(craft) == NOTHING ? "none" : get_obj_name_by_proto(GET_CRAFT_REQUIRES_OBJ(craft)));
 
 	// resources
@@ -874,6 +895,12 @@ OLC_MODULE(cedit_flags) {
 		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
 		SET_BIT(GET_CRAFT_FLAGS(craft), CRAFT_IN_DEVELOPMENT);
 	}
+}
+
+
+OLC_MODULE(cedit_functions) {
+	craft_data *craft = GET_OLC_CRAFT(ch->desc);
+	GET_CRAFT_REQUIRES_FUNCTION(craft) = olc_process_flag(ch, argument, "function", "requiresfunction", function_flags, GET_CRAFT_REQUIRES_FUNCTION(craft));
 }
 
 

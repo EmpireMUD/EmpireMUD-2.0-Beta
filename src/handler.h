@@ -193,11 +193,13 @@ extern bool can_interact_room(room_data *room, int type);
 extern bool check_exclusion_set(struct interact_exclusion_data **set, char code, double percent);
 extern struct interact_exclusion_data *find_exclusion_data(struct interact_exclusion_data **set, char code);
 void free_exclusion_data(struct interact_exclusion_data *list);
+extern int get_interaction_depletion(char_data *ch, empire_data *emp, struct interaction_item *list, int interaction_type, bool require_storable);
+extern int get_interaction_depletion_room(char_data *ch, empire_data *emp, room_data *room, int interaction_type, bool require_storable);
 extern bool has_interaction(struct interaction_item *list, int type);
 extern bool meets_interaction_restrictions(struct interact_restriction *list, char_data *ch, empire_data *emp, char_data *inter_mob, obj_data *inter_item);
 extern bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func));
 extern bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, vehicle_data *inter_veh, INTERACTION_FUNC(*func));
-extern bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func));
+extern bool run_room_interactions(char_data *ch, room_data *room, int type, vehicle_data *inter_veh, int access_type, INTERACTION_FUNC(*func));
 
 // lore handlers
 void add_lore(char_data *ch, int type, const char *str, ...) __attribute__((format(printf, 3, 4)));
@@ -300,7 +302,11 @@ void free_requirements(struct req_data *list);
 
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);
-extern int get_depletion(room_data *room, int type);
+#define add_vehicle_depletion(veh, type, multiple)  perform_add_depletion(&VEH_DEPLETION(veh), (type), (multiple))
+extern int get_depletion_amount(struct depletion_data *list, int type, bool only_type);
+#define get_depletion(room, type, only_type)  get_depletion_amount(ROOM_DEPLETION(room), (type), (only_type))
+#define get_vehicle_depletion(veh, type, only_type)  get_depletion_amount(VEH_DEPLETION(veh), (type), (only_type))
+void perform_add_depletion(struct depletion_data **list, int type, bool multiple);
 void remove_depletion_from_list(struct depletion_data **list, int type);
 void remove_depletion(room_data *room, int type);
 void set_depletion(room_data *room, int type, int value);
@@ -431,6 +437,7 @@ void update_pos(char_data *victim);
 
 // instance.c
 void add_instance_mob(struct instance_data *inst, mob_vnum vnum);
+extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *real_instance(any_vnum instance_id);
 void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum);
 

@@ -205,7 +205,7 @@ ACMD(do_mail) {
 		}
 	}
 	else if (is_abbrev(arg, "send")) {
-		if (!IS_IMMORTAL(ch) && !room_has_function_and_city_ok(IN_ROOM(ch), FNC_MAIL)) {
+		if (!IS_IMMORTAL(ch) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MAIL)) {
 			msg_to_char(ch, "You can only send mail from a pigeon post.\r\n");
 		}
 		else if (!IS_IMMORTAL(ch) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
@@ -213,9 +213,6 @@ ACMD(do_mail) {
 		}
 		else if (!IS_IMMORTAL(ch) && !IS_COMPLETE(IN_ROOM(ch))) {
 			msg_to_char(ch, "Complete the building first.\r\n");
-		}
-		else if (!IS_IMMORTAL(ch) && !check_in_city_requirement(IN_ROOM(ch), TRUE)) {
-			msg_to_char(ch, "This building must be in a city to use it.\r\n");
 		}
 		else if (!ch->desc) {
 			msg_to_char(ch, "You can't do that.\r\n");

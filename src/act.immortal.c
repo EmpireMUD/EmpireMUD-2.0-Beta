@@ -80,7 +80,6 @@ void clear_char_abilities(char_data *ch, any_vnum skill);
 void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd);	// act.item.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 extern struct generic_name_data *get_best_name_list(int name_set, int sex);
 extern int get_highest_access_level(account_data *acct);
@@ -828,6 +827,7 @@ ADMIN_UTIL(util_redo_islands) {
 
 
 ADMIN_UTIL(util_rescan) {
+	void refresh_empire_dropped_items(empire_data *only_emp);
 	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	
 	empire_data *emp;
@@ -841,6 +841,7 @@ ADMIN_UTIL(util_rescan) {
 	else if (!str_cmp(argument, "all")) {
 		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning all empires");
 		reread_empire_tech(NULL);
+		refresh_empire_dropped_items(NULL);
 		send_config_msg(ch, "ok_string");
 	}
 	else if (!(emp = get_empire_by_name(argument))) {
@@ -850,6 +851,7 @@ ADMIN_UTIL(util_rescan) {
 		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning empire: %s", EMPIRE_NAME(emp));
 		reread_empire_tech(emp);
 		refresh_empire_goals(emp, NOTHING);
+		refresh_empire_dropped_items(emp);
 		send_config_msg(ch, "ok_string");
 	}
 }
@@ -1040,7 +1042,7 @@ void do_instance_delete(char_data *ch, char *argument) {
 		return;
 	}
 	
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		if (--num == 0) {
 			if ((loc = INST_LOCATION(inst))) {
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted an instance of %s at %s", GET_REAL_NAME(ch), GET_ADV_NAME(INST_ADVENTURE(inst)), room_log_identifier(loc));
@@ -1087,7 +1089,7 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 		}
 	}
 	
-	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		if (all || INST_ADVENTURE(inst) == adv) {
 			++count;
 			delete_instance(inst, TRUE);
@@ -1115,7 +1117,7 @@ void do_instance_info(char_data *ch, char *argument) {
 		return;
 	}
 	
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		if (--num == 0) {
 			msg_to_char(ch, "\tcInstance %d: [%d] %s\t0\r\n", atoi(argument), GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)));
 			
@@ -1238,7 +1240,7 @@ void do_instance_list(char_data *ch, char *argument) {
 	
 	*buf = '\0';
 	
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		// num is out of the total instances, not just ones shown
 		++num;
 		
@@ -1273,7 +1275,7 @@ void do_instance_nearby(char_data *ch, char *argument) {
 	size = snprintf(buf, sizeof(buf), "Instances within %d tiles:\r\n", distance);
 	
 	if (loc) {	// skip work if no map location found
-		LL_FOREACH(instance_list, inst) {
+		DL_FOREACH(instance_list, inst) {
 			++num;
 		
 			inst_loc = INST_FAKE_LOC(inst);
@@ -1306,7 +1308,7 @@ void do_instance_reset(char_data *ch, char *argument) {
 			return;
 		}
 	
-		LL_FOREACH(instance_list, inst) {
+		DL_FOREACH(instance_list, inst) {
 			if (--num == 0) {
 				loc = INST_FAKE_LOC(inst);
 				reset_instance(inst);
@@ -3071,9 +3073,10 @@ SHOW(show_stats) {
 	extern struct help_index_element *help_table;
 	
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
-	int num_trigs = 0, num_goals = 0, num_rewards = 0, num_mort_helps = 0, num_imm_helps = 0;
+	int num_trigs = 0, num_goals = 0, num_rewards = 0, num_mort_helps = 0, num_imm_helps = 0, num_inst = 0;
 	progress_data *prg, *next_prg;
 	empire_data *emp, *next_emp;
+	struct instance_data *inst;
 	descriptor_data *desc;
 	vehicle_data *veh;
 	char_data *vict;
@@ -3105,6 +3108,7 @@ SHOW(show_stats) {
 	DL_COUNT(object_list, obj, num_objs);
 	DL_COUNT(vehicle_list, veh, num_vehs);
 	DL_COUNT2(trigger_list, trig, num_trigs, next_in_world);
+	DL_COUNT(instance_list, inst, num_inst);
 
 	// count active empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -3161,7 +3165,7 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d classes          %6d skills\r\n", HASH_COUNT(class_table), HASH_COUNT(skill_table));
 	msg_to_char(ch, "  %6d abilities        %6d factions\r\n", HASH_COUNT(ability_table), HASH_COUNT(faction_table));
 	msg_to_char(ch, "  %6d globals          %6d morphs\r\n", HASH_COUNT(globals_table), HASH_COUNT(morph_table));
-	msg_to_char(ch, "  %6d events           \r\n", HASH_COUNT(event_table));
+	msg_to_char(ch, "  %6d events           %6d adventure instances\r\n", HASH_COUNT(event_table), num_inst);
 	msg_to_char(ch, "  %6d socials          %6d generics\r\n", HASH_COUNT(social_table), HASH_COUNT(generic_table));
 	msg_to_char(ch, "  %6d progress goals   %6d progress rewards\r\n", num_goals, num_rewards);
 	msg_to_char(ch, "  %6d shops\r\n", HASH_COUNT(shop_table));
@@ -3595,6 +3599,51 @@ SHOW(show_dailycycle) {
 			}
 			
 			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s\r\n", QUEST_VNUM(qst), QUEST_NAME(qst), QUEST_DAILY_ACTIVE(qst) ? " (active)" : "");
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+}
+
+
+// + help file
+SHOW(show_dropped_items) {
+	struct empire_dropped_item *edi, *next;
+	char buf[MAX_STRING_LENGTH], line[256];
+	empire_data *emp;
+	size_t size, lsize;
+	int count;
+	
+	skip_spaces(&argument);
+	if (!*argument) {
+		msg_to_char(ch, "Usage: show dropped <empire>\r\n");
+	}
+	else if (!(emp = get_empire_by_name(argument))) {
+		msg_to_char(ch, "Unknown empire '%s'.\r\n", argument);
+	}
+	else {
+		size = snprintf(buf, sizeof(buf), "Dropped items for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		count = 0;
+		HASH_ITER(hh, EMPIRE_DROPPED_ITEMS(emp), edi, next) {
+			lsize = snprintf(line, sizeof(line), "(%d) [%d] %s\r\n", edi->count, edi->vnum, get_obj_name_by_proto(edi->vnum));
+			SAFE_ADD(count, edi->count, 0, INT_MAX, FALSE);
+			
+			if (size + lsize < sizeof(buf)) {
+				strcat(buf, line);
+				size += lsize;
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+				break;
+			}
+		}
+		if (!count) {
+			strcat(buf, " none\r\n");	// always room if !count
+		}
+		else if (size + 15 < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "(%d total)\r\n", count);
 		}
 		
 		if (ch->desc) {
@@ -5485,6 +5534,9 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 	prettier_sprintbit(GET_CRAFT_REQUIRES_TOOL(craft), tool_flags, buf);
 	msg_to_char(ch, "Requires tool: &y%s&0\r\n", buf);
 	
+	sprintbit(GET_CRAFT_REQUIRES_FUNCTION(craft), function_flags, buf, TRUE);
+	msg_to_char(ch, "Requires Functions: \tg%s\t0\r\n", buf);
+	
 	if (CRAFT_IS_BUILDING(craft) || CRAFT_IS_VEHICLE(craft)) {
 		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "Build on: &g%s&0\r\n", buf);
@@ -6140,7 +6192,7 @@ void do_stat_room(char_data *ch) {
 		msg_to_char(ch, "%s, Damage: %d/%d\r\n", buf2, (int) BUILDING_DAMAGE(home), GET_BUILDING(home) ? GET_BLD_MAX_DAMAGE(GET_BUILDING(home)) : 0);
 	}
 
-	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || room_has_function_and_city_ok(IN_ROOM(ch), FNC_MINE)) {
+	if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CAN_MINE) || room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_MINE)) {
 		if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) <= 0 || !(glb = global_proto(get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM))) || GET_GLOBAL_TYPE(glb) != GLOBAL_MINE_DATA) {
 			msg_to_char(ch, "This area is unmined.\r\n");
 		}
@@ -6151,7 +6203,7 @@ void do_stat_room(char_data *ch) {
 	
 	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE))) {
 		num = 0;
-		LL_FOREACH(instance_list, inst_iter) {
+		DL_FOREACH(instance_list, inst_iter) {
 			++num;
 			if (inst_iter == inst) {
 				break;
@@ -8053,7 +8105,7 @@ ACMD(do_instance) {
 	
 	if (!*arg) {
 		count = 0;
-		LL_FOREACH(instance_list, inst) {
+		DL_FOREACH(instance_list, inst) {
 			++count;
 		}
 		
@@ -9401,6 +9453,7 @@ ACMD(do_show) {
 		{ "buildings", LVL_START_IMM, show_buildings },
 		{ "commons", LVL_ASST, show_commons },
 		{ "crops", LVL_START_IMM, show_crops },
+		{ "dropped", LVL_START_IMM, show_dropped_items },
 		{ "players", LVL_START_IMM, show_players },
 		{ "terrain", LVL_START_IMM, show_terrain },
 		{ "account", LVL_TO_SEE_ACCOUNTS, show_account },
@@ -9572,6 +9625,7 @@ ACMD(do_snoop) {
 
 
 ACMD(do_stat) {
+	struct instance_data *inst;
 	char_data *victim = NULL;
 	vehicle_data *veh;
 	empire_data *emp;
@@ -9590,8 +9644,8 @@ ACMD(do_stat) {
 		do_stat_room(ch);
 	}
 	else if (!strn_cmp(buf1, "adventure", 3) && is_abbrev(buf1, "adventure")) {
-		if (COMPLEX_DATA(IN_ROOM(ch)) && COMPLEX_DATA(IN_ROOM(ch))->instance) {
-			do_stat_adventure(ch, INST_ADVENTURE(COMPLEX_DATA(IN_ROOM(ch))->instance));
+		if ((inst = find_instance_by_room(IN_ROOM(ch), TRUE, TRUE))) {
+			do_stat_adventure(ch, INST_ADVENTURE(inst));
 		}
 		else {
 			msg_to_char(ch, "You are not in an adventure zone.\r\n");

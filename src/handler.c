@@ -37,6 +37,7 @@
 *   Cooldown Handlers
 *   Currency Handlers
 *   Empire Handlers
+*   Empire Dropped Item Handlers
 *   Empire Production Total Handlers
 *   Empire Needs Handlers
 *   Empire Targeting Handlers
@@ -76,6 +77,7 @@
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern int get_north_for_char(char_data *ch);
 extern struct complex_room_data *init_complex_data();
+extern const bool interact_one_at_a_time[NUM_INTERACTS];
 const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
@@ -91,6 +93,9 @@ void scale_item_to_level(obj_data *obj, int level);
 void update_member_data(char_data *ch);
 
 // locals
+void add_dropped_item(empire_data *emp, obj_data *obj);
+void add_dropped_item_anywhere(obj_data *obj, empire_data *only_if_emp);
+void add_dropped_item_list(empire_data *emp, obj_data *list);
 static void add_obj_binding(int idnum, struct obj_binding **list);
 struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 void die_follower(char_data *ch);
@@ -99,6 +104,9 @@ struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 void perform_abandon_vehicle(vehicle_data *veh);
 void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void remove_companion(char_data *ch, any_vnum vnum);
+void remove_dropped_item(empire_data *emp, obj_data *obj);
+void remove_dropped_item_anywhere(obj_data *obj);
+void remove_dropped_item_list(empire_data *emp, obj_data *list);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
 void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 
@@ -423,7 +431,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {
-	int diff, orig;
+	int diff, orig, grt;
 	
 	if (add) {
 		SET_BIT(AFF_FLAGS(ch), bitv);
@@ -453,7 +461,11 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		case APPLY_GREATNESS: {
 			SAFE_ADD(GET_GREATNESS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			if (!IS_NPC(ch) && GET_LOYALTY(ch) && IN_ROOM(ch)) {
-				update_member_data(ch);
+				grt = GET_GREATNESS(ch);	// store temporarily
+				GET_GREATNESS(ch) = MIN(grt, att_max(ch));
+				GET_GREATNESS(ch) = MAX(0, GET_GREATNESS(ch));
+				update_member_data(ch);	// update empire
+				GET_GREATNESS(ch) = grt;	// restore to what it just was
 				TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
 			}
 			break;
@@ -1555,7 +1567,6 @@ void char_to_room(char_data *ch, room_data *room) {
 	void check_instance_is_loaded(struct instance_data *inst);
 	void check_island_levels(room_data *location, int level);
 	extern int determine_best_scale_level(char_data *ch, bool check_group);
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	extern int lock_instance_level(room_data *room, int level);
 	void spawn_mobs_from_center(room_data *center);
 	
@@ -2934,6 +2945,8 @@ void perform_abandon_room(room_data *room) {
 			qt_empire_players(emp, qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
 			et_lose_building(emp, GET_BLD_VNUM(GET_BUILDING(room)));
 		}
+		
+		remove_dropped_item_list(emp, ROOM_CONTENTS(room));
 	}
 	
 	ROOM_OWNER(room) = NULL;
@@ -2988,6 +3001,10 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 			qt_empire_players_vehicle(emp, qt_lose_vehicle, veh);
 			et_lose_vehicle(emp, veh);
 			adjust_vehicle_tech(veh, FALSE);
+		}
+		
+		if (emp) {
+			remove_dropped_item_list(emp, VEH_CONTAINS(veh));
 		}
 	}
 }
@@ -3047,6 +3064,8 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 			perform_claim_vehicle(veh, emp);
 		}
 	}
+	
+	add_dropped_item_list(emp, ROOM_CONTENTS(room));
 }
 
 
@@ -3076,6 +3095,199 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 			qt_empire_players_vehicle(emp, qt_gain_vehicle, veh);
 			et_gain_vehicle(emp, veh);
 			adjust_vehicle_tech(veh, TRUE);
+		}
+		
+		add_dropped_item_list(emp, VEH_CONTAINS(veh));
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// EMPIRE DROPPED ITEM HANDLERS ////////////////////////////////////////////
+
+/**
+* Adds 1 to the dropped-item count for the empire. Cascades to contained objs.
+*
+* @param empire_data *emp The empire.
+* @param obj_data *obj The dropped item.
+*/
+void add_dropped_item(empire_data *emp, obj_data *obj) {
+	struct empire_dropped_item *edi;
+	obj_vnum vnum = GET_OBJ_VNUM(obj);
+	HASH_FIND_INT(EMPIRE_DROPPED_ITEMS(emp), &vnum, edi);
+	if (!edi) {
+		CREATE(edi, struct empire_dropped_item, 1);
+		edi->vnum = vnum;
+		HASH_ADD_INT(EMPIRE_DROPPED_ITEMS(emp), vnum, edi);
+	}
+	++edi->count;
+	
+	if (obj->contains) {
+		add_dropped_item_list(emp, obj->contains);
+	}
+}
+
+
+/**
+* For objects that might be nested inside something, finds the top owner and
+* adds to the dropped-items count.
+*
+* @param obj_data *obj The object.
+* @param empire_data *only_emp Optional: Only update 1 empire. (NULL for all)
+*/
+void add_dropped_item_anywhere(obj_data *obj, empire_data *only_if_emp) {
+	obj_data *top = obj;
+	
+	// un-nest
+	while (top->in_obj) {
+		top = top->in_obj;
+	}
+	
+	if (top->in_vehicle && VEH_OWNER(top->in_vehicle) && (!only_if_emp || VEH_OWNER(top->in_vehicle) == only_if_emp)) {
+		add_dropped_item(VEH_OWNER(top->in_vehicle), obj);
+	}
+	else if (IN_ROOM(top) && ROOM_OWNER(IN_ROOM(top)) && (!only_if_emp || ROOM_OWNER(IN_ROOM(top)) == only_if_emp)) {
+		add_dropped_item(ROOM_OWNER(IN_ROOM(top)), obj);
+	}
+}
+
+
+/**
+* Adds a whole list of dropped-items to the empire, e.g. when a room or
+* vehicle is claimed.
+*
+* @param empire_data *emp The empire.
+* @param obj_data *list The content list (ROOM_CONTENTS, VEH_CONTAINS, etc).
+*/
+void add_dropped_item_list(empire_data *emp, obj_data *list) {
+	obj_data *obj;
+	if (emp) {
+		DL_FOREACH2(list, obj, next_content) {
+			add_dropped_item(emp, obj);
+		}
+	}
+}
+
+
+/**
+* Gets the number of dropped items with a given vnum in the empire.
+*
+* @param empire_data *emp The empire.
+* @param obj_vnum vnum The item to get a count for.
+* @return int The number of that item dropped around the empire.
+*/
+int count_dropped_items(empire_data *emp, obj_vnum vnum) {
+	struct empire_dropped_item *edi;
+	HASH_FIND_INT(EMPIRE_DROPPED_ITEMS(emp), &vnum, edi);
+	return edi ? edi->count : 0;
+}
+
+
+/**
+* Frees a set of empire-dropped-items.
+*
+* @param struct empire_dropped_item **list A pointer to the hash to free.
+*/
+void free_dropped_items(struct empire_dropped_item **list) {
+	struct empire_dropped_item *iter, *next;
+	if (list) {
+		HASH_ITER(hh, *list, iter, next) {
+			HASH_DEL(*list, iter);
+			free(iter);
+		}
+	}
+}
+
+
+/**
+* Refreshes the EMPIRE_DROPPED_ITEMS() counts for 1 (or all) empire(s).
+*
+* @param empire_data *only_emp Optional: Only update 1 empire. (NULL for all)
+*/
+void refresh_empire_dropped_items(empire_data *only_emp) {
+	empire_data *emp, *next_emp;
+	obj_data *obj;
+	
+	if (only_emp) {
+		free_dropped_items(&EMPIRE_DROPPED_ITEMS(only_emp));
+	}
+	else {
+		HASH_ITER(hh, empire_table, emp, next_emp) {
+			free_dropped_items(&EMPIRE_DROPPED_ITEMS(emp));
+		}
+	}
+	
+	DL_FOREACH(object_list, obj) {
+		if (obj->in_vehicle && VEH_OWNER(obj->in_vehicle) && (!only_emp || VEH_OWNER(obj->in_vehicle) == only_emp)) {
+			add_dropped_item(VEH_OWNER(obj->in_vehicle), obj);
+		}
+		else if (IN_ROOM(obj) && ROOM_OWNER(IN_ROOM(obj)) && (!only_emp || ROOM_OWNER(IN_ROOM(obj)) == only_emp)) {
+			add_dropped_item(ROOM_OWNER(IN_ROOM(obj)), obj);
+		}
+		// only items directly in these places are added; everything else is hit by the cascade
+	}
+}
+
+
+/**
+* Removes 1 from the dropped-item count for the empire. Cascades to contained
+* items.
+*
+* @param empire_data *emp The empire.
+* @param obj_data *obj The dropped item.
+*/
+void remove_dropped_item(empire_data *emp, obj_data *obj) {
+	struct empire_dropped_item *edi;
+	obj_vnum vnum = GET_OBJ_VNUM(obj);
+	HASH_FIND_INT(EMPIRE_DROPPED_ITEMS(emp), &vnum, edi);
+	if (edi) {
+		--edi->count;
+		if (edi->count <= 0) {
+			HASH_DEL(EMPIRE_DROPPED_ITEMS(emp), edi);
+			free(edi);
+		}
+	}
+	if (obj->contains) {
+		remove_dropped_item_list(emp, obj->contains);
+	}
+}
+
+
+/**
+* For objects that might be nested inside something, finds the top owner and
+* removes from the dropped-items count.
+*
+* @param obj_data *obj The object.
+*/
+void remove_dropped_item_anywhere(obj_data *obj) {
+	obj_data *top = obj;
+	
+	// un-nest
+	while (top->in_obj) {
+		top = top->in_obj;
+	}
+	
+	if (top->in_vehicle && VEH_OWNER(top->in_vehicle)) {
+		remove_dropped_item(VEH_OWNER(top->in_vehicle), obj);
+	}
+	else if (IN_ROOM(top) && ROOM_OWNER(IN_ROOM(top))) {
+		remove_dropped_item(ROOM_OWNER(IN_ROOM(top)), obj);
+	}
+}
+
+
+/**
+* Removes a whole list of dropped-items from the empire, e.g. when a room or
+* vehicle is abandoned.
+*
+* @param empire_data *emp The empire.
+* @param obj_data *list The content list (ROOM_CONTENTS, VEH_CONTAINS, etc).
+*/
+void remove_dropped_item_list(empire_data *emp, obj_data *list) {
+	obj_data *obj;
+	if (emp) {
+		DL_FOREACH2(list, obj, next_content) {
+			remove_dropped_item(emp, obj);
 		}
 	}
 }
@@ -4051,6 +4263,80 @@ bool check_exclusion_set(struct interact_exclusion_data **set, char code, double
 
 
 /**
+* Gets the highest available depletion level amongst matching interactions in
+* the list. This mainly returns the highest 'quantity' from a
+* interact_one_at_a_time[] interaction, or else common_depletion.
+*
+* @param char_data *ch Optional: The actor, to determine interaction restrictions. (may be NULL)
+* @param empire_data *emp Optional: The empire, to determine interaction restrictions. (may be NULL)
+* @param struct interaction_item *list The list of interactions to check.
+* @param int interaction_type Any type, but interact_one_at_a_time types are the main purpose here.
+* @return int The depletion cap.
+*/
+int get_interaction_depletion(char_data *ch, empire_data *emp, struct interaction_item *list, int interaction_type, bool require_storable) {
+	struct interaction_item *interact;
+	obj_data *proto;
+	int highest = 0;
+	
+	if (!interact_one_at_a_time[interaction_type]) {
+		return config_get_int("common_depletion");
+	}
+	
+	// for one-at-a-time chores, look for the highest depletion
+	LL_FOREACH(list, interact) {
+		if (interact->type != interaction_type) {
+			continue;
+		}
+		if (require_storable && (!(proto = obj_proto(interact->vnum)) || !GET_OBJ_STORAGE(proto))) {
+			continue;	// MUST be storable
+		}
+		if (!meets_interaction_restrictions(interact->restrictions, ch, emp, NULL, NULL)) {
+			continue;
+		}
+		
+		// found valid interaction
+		if (interact->quantity > highest) {
+			highest = interact->quantity;
+		}
+	}
+	
+	return highest;
+}
+
+
+/**
+* Checks all the room interactions (crop etc) to find the highest depletion.
+* 
+*
+* @param char_data *ch Optional: The actor, to determine interaction restrictions. (may be NULL)
+* @param empire_data *emp Optional: The empire, to determine interaction restrictions. (may be NULL)
+* @param room_data *room The room whose sector/crop/building to check for interaction caps.
+* @param int interaction_type Any type, but interact_one_at_a_time types are the main purpose here.
+* @return int The depletion cap.
+*/
+int get_interaction_depletion_room(char_data *ch, empire_data *emp, room_data *room, int interaction_type, bool require_storable) {
+	crop_data *cp;
+	int this, highest = 0;
+	
+	if (!interact_one_at_a_time[interaction_type]) {
+		return config_get_int("common_depletion");	// shortcut
+	}
+	
+	highest = get_interaction_depletion(ch, emp, GET_SECT_INTERACTIONS(SECT(room)), interaction_type, require_storable);
+	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && (cp = ROOM_CROP(room))) {
+		this = get_interaction_depletion(ch, emp, GET_CROP_INTERACTIONS(cp), interaction_type, require_storable);
+		highest = MAX(highest, this);
+	}
+	if (GET_BUILDING(room) && IS_COMPLETE(room)) {
+		this = get_interaction_depletion(ch, emp, GET_BLD_INTERACTIONS(GET_BUILDING(room)), interaction_type, require_storable);
+		highest = MAX(highest, this);
+	}
+	
+	return highest;
+}
+
+
+/**
 * Finds (or creates) an exclusion entry for a given code. Exclusion codes must
 * be single letters.
 *
@@ -4290,16 +4576,18 @@ bool run_interactions(char_data *ch, struct interaction_item *run_list, int type
 
 
 /**
-* Runs all interactions for a room (sect, crop, building; as applicable).
-* They run from most-specific to least: bdg -> crop -> sect
+* Runs all interactions for a room (sect, crop, building, vehicle; as
+* applicable). They run from most-specific to least: veh -> bdg -> crop -> sect
 *
 * @param char_data *ch The actor.
 * @param room_data *room The location to run on.
 * @param int type Any INTERACT_ const.
+* @param vehicle_data *inter_veh Optional: Will pass this vehicle to any interaction func, and won't call other vehicles' interactions if set. (Pass NULL if not applicable.)
+* @param int access_type GUESTS_ALLOWED, MEMBERS_ONLY, etc; use NOTHING to skip this
 * @param INTERACTION_FUNC(*func) A function pointer that runs each successful interaction (func returns TRUE if an interaction happens; FALSE if it aborts)
 * @return bool TRUE if any interactions ran successfully, FALSE if not.
 */
-bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION_FUNC(*func)) {
+bool run_room_interactions(char_data *ch, room_data *room, int type, vehicle_data *inter_veh, int access_type, INTERACTION_FUNC(*func)) {
 	vehicle_data *veh;
 	crop_data *crop;
 	bool success;
@@ -4315,6 +4603,12 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	// first, build a list of vehicles that match this interaction type in the room
 	num = 0;
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (inter_veh && veh != inter_veh) {
+			continue;	// if they provided an inter_veh, skip other vehicles
+		}
+		if (access_type != NOTHING && ch && !can_use_vehicle(ch, veh, access_type)) {
+			continue;	// no permission
+		}
 		if (VEH_IS_COMPLETE(veh) && has_interaction(VEH_INTERACTIONS(veh), type)) {
 			CREATE(tvh, struct temp_veh_helper, 1);
 			tvh->veh = veh;
@@ -4339,23 +4633,23 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, INTERACTION
 	}
 	
 	// building first
-	if (!success && GET_BUILDING(room)) {
-		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type, room, NULL, NULL, NULL, func);
+	if (!success && GET_BUILDING(room) && IS_COMPLETE(room) && (access_type == NOTHING || !ch || can_use_room(ch, room, access_type))) {
+		success |= run_interactions(ch, GET_BLD_INTERACTIONS(GET_BUILDING(room)), type, room, NULL, NULL, inter_veh, func);
 	}
 	
 	// crop second
-	if (!success && (crop = ROOM_CROP(room))) {
-		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, NULL, func);
+	if (!success && ROOM_SECT_FLAGGED(room, SECTF_CROP) && (crop = ROOM_CROP(room)) && (access_type == NOTHING || !ch || can_use_room(ch, room, access_type))) {
+		success |= run_interactions(ch, GET_CROP_INTERACTIONS(crop), type, room, NULL, NULL, inter_veh, func);
 	}
 	
 	// rmt third
-	if (!success && GET_ROOM_TEMPLATE(room)) {
-		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type, room, NULL, NULL, NULL, func);
+	if (!success && GET_ROOM_TEMPLATE(room) && (access_type == NOTHING || !ch || can_use_room(ch, room, access_type))) {
+		success |= run_interactions(ch, GET_RMT_INTERACTIONS(GET_ROOM_TEMPLATE(room)), type, room, NULL, NULL, inter_veh, func);
 	}
 	
 	// sector fourth
-	if (!success) {
-		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(room)), type, room, NULL, NULL, NULL, func);
+	if (!success && (access_type == NOTHING || !ch || can_use_room(ch, room, access_type))) {
+		success |= run_interactions(ch, GET_SECT_INTERACTIONS(SECT(room)), type, room, NULL, NULL, inter_veh, func);
 	}
 	
 	return success;
@@ -6083,6 +6377,8 @@ void obj_from_obj(obj_data *obj) {
 		log("SYSERR: (%s): trying to illegally extract obj from obj.", __FILE__);
 	}
 	else {
+		remove_dropped_item_anywhere(obj);
+		
 		obj_from = obj->in_obj;
 		DL_DELETE2(obj_from->contains, obj, prev_content, next_content);
 
@@ -6114,6 +6410,9 @@ void obj_from_room(obj_data *object) {
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(object))--;
 		}
+		if (ROOM_OWNER(IN_ROOM(object))) {
+			remove_dropped_item(ROOM_OWNER(IN_ROOM(object)), object);
+		}
 		
 		DL_DELETE2(ROOM_CONTENTS(IN_ROOM(object)), object, prev_content, next_content);
 		IN_ROOM(object) = NULL;
@@ -6130,6 +6429,9 @@ void obj_from_vehicle(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a vehicle (%p) passed to obj_from_vehicle", object, object->in_vehicle);
 	}
 	else {
+		if (VEH_OWNER(object->in_vehicle)) {
+			remove_dropped_item(VEH_OWNER(object->in_vehicle), object);
+		}
 		VEH_LAST_MOVE_TIME(object->in_vehicle) = time(0);	// reset autostore time
 		VEH_CARRYING_N(object->in_vehicle) -= obj_carry_size(object);
 		DL_DELETE2(VEH_CONTAINS(object->in_vehicle), object, prev_content, next_content);
@@ -6324,6 +6626,8 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		
 		DL_PREPEND2(obj_to->contains, obj, prev_content, next_content);
 		obj->in_obj = obj_to;
+		
+		add_dropped_item_anywhere(obj, NULL);
 	}
 }
 
@@ -6354,6 +6658,10 @@ void obj_to_room(obj_data *object, room_data *room) {
 
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(object) = time(0);
+		
+		if (ROOM_OWNER(room)) {
+			add_dropped_item(ROOM_OWNER(room), object);
+		}
 	}
 }
 
@@ -6381,6 +6689,10 @@ void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
 		
 		// set the timer here; actual rules for it are in limits.c
 		VEH_LAST_MOVE_TIME(veh) = GET_AUTOSTORE_TIMER(object) = time(0);
+		
+		if (VEH_OWNER(veh)) {
+			add_dropped_item(VEH_OWNER(veh), object);
+		}
 	}
 }
 
@@ -8047,18 +8359,75 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 * @param bool multiple if TRUE, chance to add more than 1
 */
 void add_depletion(room_data *room, int type, bool multiple) {
-	struct depletion_data *dep;
-	bool found = FALSE;
-	
 	// shortcut: oceans are undepletable
 	if (SHARED_DATA(room) == &ocean_shared_data) {
 		return;
 	}
+	perform_add_depletion(&ROOM_DEPLETION(room), type, multiple);
+}
+
+
+/**
+* Fetch a depletion amount. In normal cases, it returns the requested type
+* PLUS the production depletion, as production applies to all types. If you
+* request production, it will add the next-highest type. Or pass only_type=TRUE
+* to skip this part.
+*
+* @param struct depletion_data *list List of depletions.
+* @param int type DPLTN_
+* @param bool only_type Normally this function combines 'production' depletion with the requested type, unless only_type is TRUE.
+* @return int The depletion counter on that resource in that room.
+*/
+int get_depletion_amount(struct depletion_data *list, int type, bool only_type) {
+	struct depletion_data *dep;
+	int amount = 0, highest = 0;
 	
-	for (dep = ROOM_DEPLETION(room); dep && !found; dep = dep->next) {
+	LL_FOREACH(list, dep) {
+		if (only_type && dep->type == type) {
+			// shortcut
+			return dep->count;
+		}
+		else if (!only_type && type == DPLTN_PRODUCTION) {
+			// requesting 'production' will add the next-highest too
+			if (dep->type == DPLTN_PRODUCTION) {
+				amount += dep->count;
+			}
+			else if (dep->count > highest) {
+				highest = dep->count;
+			}
+		}
+		else if (!only_type && (dep->type == type || dep->type == DPLTN_PRODUCTION)) {
+			// requested a non-production type and will also add production to that
+			amount += dep->count;
+		}
+	}
+	
+	return amount + highest;
+}
+
+
+
+/**
+* Add to a depletion counter.
+*
+* @param struct depletion_data **list The set of depletions to add to.
+* @param int type DPLTN_
+* @param bool multiple if TRUE, chance to add more than 1
+*/
+void perform_add_depletion(struct depletion_data **list, int type, bool multiple) {
+	struct depletion_data *dep;
+	bool found = FALSE;
+	
+	if (!list) {
+		return;
+	}
+	
+	// find existing
+	LL_FOREACH(*list, dep) {
 		if (dep->type == type) {
 			dep->count += 1 + ((multiple && !number(0, 3)) ? 1 : 0);
 			found = TRUE;
+			break;
 		}
 	}
 	
@@ -8066,30 +8435,10 @@ void add_depletion(room_data *room, int type, bool multiple) {
 		CREATE(dep, struct depletion_data, 1);
 		dep->type = type;
 		dep->count = 1 + ((multiple && !number(0, 3)) ? 1 : 0);;
-		
-		dep->next = ROOM_DEPLETION(room);
-		ROOM_DEPLETION(room) = dep;
+		LL_PREPEND(*list, dep);
 	}
 }
 
-
-/**
-* @param room_data *room which location e.g. IN_ROOM(ch)
-* @param int type DPLTN_
-* @return int The depletion counter on that resource in that room.
-*/
-int get_depletion(room_data *room, int type) {
-	struct depletion_data *dep;
-	int found = 0;
-	
-	for (dep = ROOM_DEPLETION(room); dep && !found; dep = dep->next) {
-		if (dep->type == type) {
-			found = dep->count;
-		}
-	}
-	
-	return found;
-}
 
 
 /**
@@ -8994,7 +9343,7 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool 
 	bool bld_ok = use_room && (!by_emp || !ROOM_OWNER(loc) || by_emp == ROOM_OWNER(loc) || has_relationship(by_emp, ROOM_OWNER(loc), DIPL_TRADE));
 	
 	// We skip this check in retrieval mode, since STORE_ALL does not function for retrieval.
-	if (!retrieval_mode && GET_OBJ_STORAGE(obj) && room_has_function_and_city_ok(loc, FNC_STORE_ALL)) {
+	if (!retrieval_mode && GET_OBJ_STORAGE(obj) && room_has_function_and_city_ok(NULL, loc, FNC_STORE_ALL)) {
 		return TRUE; // As long as it can be stored anywhere, it can be stored here.
 	}
 	
@@ -9269,10 +9618,10 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique
 		if (location && GET_ISLAND_ID(location) != iter->island) {
 			continue;
 		}
-		if (location && !IS_SET(iter->flags, EUS_VAULT) && room_has_function_and_city_ok(location, FNC_VAULT)) {
+		if (location && !IS_SET(iter->flags, EUS_VAULT) && room_has_function_and_city_ok(NULL, location, FNC_VAULT)) {
 			continue;
 		}
-		if (location && IS_SET(iter->flags, EUS_VAULT) && !room_has_function_and_city_ok(location, FNC_VAULT)) {
+		if (location && IS_SET(iter->flags, EUS_VAULT) && !room_has_function_and_city_ok(NULL, location, FNC_VAULT)) {
 			continue;
 		}
 		
@@ -9346,7 +9695,7 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 		if (save_emp && eus->island == NO_ISLAND) {
 			eus->island = get_main_island(save_emp);
 		}
-		if (save_emp && room && room_has_function_and_city_ok(room, FNC_VAULT)) {
+		if (save_emp && room && room_has_function_and_city_ok(ch ? GET_LOYALTY(ch) : ROOM_OWNER(room), room, FNC_VAULT)) {
 			eus->flags = EUS_VAULT;
 		}
 			

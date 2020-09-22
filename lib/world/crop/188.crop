@@ -33,10 +33,10 @@ D0
 D0
 &to&?^^^~
 &Y~
-I 6 18843 100.00 1  # FORAGE: a piece of caramel
-I 8 18842 100.00 1  # HARVEST: a tray of candy apples
-I 9 121 100.00 1  # GATHER: some sticks and leaves
-I 20 18845 100.00 1  # CHOP: a dead tree
+I 6 18843 100.00 1  # FORAGE: piece of caramel
+I 7 18842 100.00 14  # PICK: tray of candy apples
+I 9 121 100.00 1  # GATHER: sticks and leaves
+I 20 18845 100.00 1  # CHOP: dead tree
 M
 18842 10.00 a
 M

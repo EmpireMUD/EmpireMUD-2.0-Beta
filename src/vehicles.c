@@ -71,6 +71,7 @@ extern room_data *create_room(room_data *home);
 void free_bld_relations(struct bld_relation *list);
 void free_custom_messages(struct custom_message *mes);
 void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
+extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void scale_item_to_level(obj_data *obj, int level);
@@ -315,6 +316,26 @@ vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id) {
 
 
 /**
+* Finds a vehicle in the room with a interior vnum.
+*
+* @param room_data *room The room to start in.
+* @param room_vnum interior_room The interior room to check for.
+* @return vehicle_data* The vehicle with that interior, if any. Otherwise, NULL.
+*/
+vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum interior_room) {
+	vehicle_data *veh;
+	
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_INTERIOR_HOME_ROOM(veh) && GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)) == interior_room) {
+			return veh;
+		}
+	}
+	
+	return NULL;
+}
+
+
+/**
 * Finishes the actual dismantle for a vehicle.
 *
 * @param char_data *ch Optional: The dismantler.
@@ -384,8 +405,8 @@ void finish_vehicle_setup(vehicle_data *veh) {
 	}
 	
 	// mine setup
-	if (room_has_function_and_city_ok(IN_ROOM(veh), FNC_MINE)) {
-		init_mine(IN_ROOM(veh), NULL, VEH_OWNER(veh));
+	if (room_has_function_and_city_ok(VEH_OWNER(veh), IN_ROOM(veh), FNC_MINE)) {
+		init_mine(IN_ROOM(veh), NULL, VEH_OWNER(veh) ? VEH_OWNER(veh) : ROOM_OWNER(IN_ROOM(veh)));
 	}
 }
 
@@ -823,16 +844,14 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 	struct instance_data *inst = NULL;
 	
 	// detect level if we weren't given a strong level
-	if (!level) {
-		if (IN_ROOM(veh) && (inst = ROOM_INSTANCE(IN_ROOM(veh)))) {
-			if (INST_LEVEL(inst) > 0) {
-				level = INST_LEVEL(inst);
-			}
+	if (!level && (inst = get_instance_by_id(VEH_INSTANCE_ID(veh)))) {
+		if (INST_LEVEL(inst) > 0) {
+			level = INST_LEVEL(inst);
 		}
 	}
 	
 	// outside constraints
-	if (inst || (IN_ROOM(veh) && (inst = ROOM_INSTANCE(IN_ROOM(veh))))) {
+	if (inst) {
 		if (GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)) > 0) {
 			level = MAX(level, GET_ADV_MIN_LEVEL(INST_ADVENTURE(inst)));
 		}
@@ -951,6 +970,26 @@ void start_vehicle_burning(vehicle_data *veh) {
 		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
 		VEH_LED_BY(veh) = NULL;
 	}
+}
+
+
+/**
+* Determines the total number of vehicles in the room that don't have a size.
+*
+* @param room_data *room The room to check.
+* @return int The total number of size-zero vehicles there.
+*/
+int total_small_vehicles_in_room(room_data *room) {
+	vehicle_data *veh;
+	int count = 0;
+	
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_SIZE(veh) == 0) {
+			++count;
+		}
+	}
+	
+	return count;
 }
 
 
@@ -1269,6 +1308,10 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "ON-FIRE flag");
 		problem = TRUE;
 	}
+	if (VEH_FLAGGED(veh, VEH_NO_CLAIM) && IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Has !CLAIM flag but IN-CITY-ONLY function; will never function");
+		problem = TRUE;
+	}
 	if (VEH_FLAGGED(veh, VEH_BUILDING) && VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Has both BUILDING flag and at least 1 movement flag");
 		problem = TRUE;
@@ -1281,6 +1324,13 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Has INTERLINK but is not a stationary building");
 		problem = TRUE;
 	}
+	
+	// functions
+	if (IS_SET(VEH_FUNCTIONS(veh), IMMOBILE_FNCS) && VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "Has non-movable functions on a movable vehicle");
+		problem = TRUE;
+	}
+	
 	if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_RUINS_TO_BLD)) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Has RUINS-TO-BLD interaction; this won't work on vehicles");
 		problem = TRUE;
@@ -1848,6 +1898,7 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	struct room_extra_data *red, *next_red;
 	struct vehicle_attached_mob *vam;
 	char temp[MAX_STRING_LENGTH];
+	struct depletion_data *dep;
 	struct resource_data *res;
 	struct trig_var_data *tvd;
 	vehicle_data *proto;
@@ -1889,6 +1940,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	if (VEH_HEALTH(veh) < VEH_MAX_HEALTH(veh)) {
 		fprintf(fl, "Health: %.2f\n", VEH_HEALTH(veh));
 	}
+	if (VEH_INSTANCE_ID(veh) != NOTHING) {
+		fprintf(fl, "Instance-id: %d\n", VEH_INSTANCE_ID(veh));
+	}
 	if (VEH_INTERIOR_HOME_ROOM(veh)) {
 		fprintf(fl, "Interior-home: %d\n", GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)));
 	}
@@ -1921,6 +1975,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 		LL_FOREACH(VEH_BUILT_WITH(veh), res) {
 			fprintf(fl, "Built-with: %d %d %d %d\n", res->vnum, res->amount, res->type, res->misc);
 		}
+	}
+	LL_FOREACH(VEH_DEPLETION(veh), dep) {
+		fprintf(fl, "Depletion: %d %d\n", dep->type, dep->count);
 	}
 	HASH_ITER(hh, VEH_EXTRA_DATA(veh), red, next_red) {
 		fprintf(fl, "Extra-data: %d %d\n", red->type, red->value);
@@ -2128,6 +2185,18 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 				}
 				break;
 			}
+			case 'D': {
+				if (OBJ_FILE_TAG(line, "Depletion:", length)) {
+					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
+						struct depletion_data *dep;
+						CREATE(dep, struct depletion_data, 1);
+						dep->type = i_in[0];
+						dep->count = i_in[1];
+						LL_PREPEND(VEH_DEPLETION(veh), dep);
+					}
+				}
+				break;
+			}
 			case 'E': {
 				if (OBJ_FILE_TAG(line, "Extra-data:", length)) {
 					if (sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]) == 2) {
@@ -2164,6 +2233,11 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						free(VEH_ICON(veh));
 					}
 					VEH_ICON(veh) = fread_string(fl, error);
+				}
+				else if (OBJ_FILE_TAG(line, "Instance-id:", length)) {
+					if (sscanf(line + length + 1, "%d", &i_in[0])) {
+						VEH_INSTANCE_ID(veh) = i_in[0];
+					}
 				}
 				else if (OBJ_FILE_TAG(line, "Interior-home:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
@@ -2369,8 +2443,7 @@ void clear_vehicle(vehicle_data *veh) {
 	// attributes init
 	VEH_INTERIOR_ROOM_VNUM(veh) = NOTHING;
 	VEH_CONSTRUCTION_ID(veh) = NOTHING;
-	
-	// Since we've wiped out the attributes above, we need to set the speed to the default of VSPEED_NORMAL (two bonuses).
+	VEH_INSTANCE_ID(veh) = NOTHING;
 	VEH_SPEED_BONUSES(veh) = VSPEED_NORMAL;
 }
 
@@ -2385,6 +2458,7 @@ void clear_vehicle(vehicle_data *veh) {
 void free_vehicle(vehicle_data *veh) {
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
 	struct vehicle_attached_mob *vam;
+	struct depletion_data *dep;
 	struct spawn_info *spawn;
 	
 	// strings
@@ -2414,6 +2488,10 @@ void free_vehicle(vehicle_data *veh) {
 	while ((vam = VEH_ANIMALS(veh))) {
 		VEH_ANIMALS(veh) = vam->next;
 		free(vam);
+	}
+	while ((dep = VEH_DEPLETION(veh))) {
+		VEH_DEPLETION(veh) = dep->next;
+		free(dep);
 	}
 	empty_vehicle(veh, NULL);
 	
@@ -3707,13 +3785,16 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	extern char *get_room_name(room_data *room, bool color);
 	void script_stat (char_data *ch, struct script_data *sc);
 	void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
+	extern const char *depletion_type[NUM_DEPLETION_TYPES];
 	extern const char *room_extra_types[];
 	
 	char buf[MAX_STRING_LENGTH * 2], part[MAX_STRING_LENGTH];
 	struct room_extra_data *red, *next_red;
 	struct custom_message *custm;
+	struct depletion_data *dep;
 	obj_data *obj;
 	size_t size;
+	bool comma;
 	int found;
 	
 	if (!veh) {
@@ -3790,6 +3871,19 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "In room: %s, Led by: %s, ", get_room_name(IN_ROOM(veh), FALSE), VEH_LED_BY(veh) ? PERS(VEH_LED_BY(veh), ch, TRUE) : "nobody");
 		size += snprintf(buf + size, sizeof(buf) - size, "Sitting on: %s, ", VEH_SITTING_ON(veh) ? PERS(VEH_SITTING_ON(veh), ch, TRUE) : "nobody");
 		size += snprintf(buf + size, sizeof(buf) - size, "Driven by: %s\r\n", VEH_DRIVER(veh) ? PERS(VEH_DRIVER(veh), ch, TRUE) : "nobody");
+	}
+	
+	if (VEH_DEPLETION(veh)) {
+		size += snprintf(buf + size, sizeof(buf) - size, "Depletion: ");
+		
+		comma = FALSE;
+		for (dep = ROOM_DEPLETION(IN_ROOM(ch)); dep; dep = dep->next) {
+			if (dep->type < NUM_DEPLETION_TYPES) {
+				size += snprintf(buf + size, sizeof(buf) - size, "%s%s (%d)", comma ? ", " : "", depletion_type[dep->type], dep->count);
+				comma = TRUE;
+			}
+		}
+		size += snprintf(buf + size, sizeof(buf) - size, "\r\n");
 	}
 	
 	if (VEH_CONTAINS(veh)) {

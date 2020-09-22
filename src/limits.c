@@ -47,7 +47,6 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 // external funcs
 extern obj_data *die(char_data *ch, char_data *killer);
 void death_log(char_data *ch, char_data *killer, int type);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
@@ -426,7 +425,7 @@ void point_update_char(char_data *ch) {
 	}
 	
 	// check mob crowding (for npcs in stables)
-	if (IS_NPC(ch) && !ch->desc && room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) {
+	if (IS_NPC(ch) && !ch->desc && room_has_function_and_city_ok(NULL, IN_ROOM(ch), FNC_STABLE)) {
 		count = 1;	// me
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), chiter, next_in_room) {
 			if (ch != chiter && !EXTRACTED(chiter) && IS_NPC(chiter) && GET_MOB_VNUM(chiter) == GET_MOB_VNUM(ch)) {
@@ -483,7 +482,7 @@ void point_update_char(char_data *ch) {
 	}
 	
 	// check spawned
-	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !room_has_function_and_city_ok(IN_ROOM(ch), FNC_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN)) {
+	if (REAL_NPC(ch) && !ch->desc && MOB_FLAGGED(ch, MOB_SPAWNED) && (!MOB_FLAGGED(ch, MOB_ANIMAL) || !room_has_function_and_city_ok(NULL, IN_ROOM(ch), FNC_STABLE)) && MOB_SPAWN_TIME(ch) < (time(0) - config_get_int("mob_spawn_interval") * SECS_PER_REAL_MIN)) {
 		if (!GET_LED_BY(ch) && !GET_LEADING_MOB(ch) && !GET_LEADING_VEHICLE(ch) && !MOB_FLAGGED(ch, MOB_TIED)) {
 			if (distance_to_nearest_player(IN_ROOM(ch)) > config_get_int("mob_despawn_radius")) {
 				despawn_mob(ch);
@@ -2123,7 +2122,7 @@ int health_gain(char_data *ch, bool info_only) {
 		
 		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 			needed = MAX(GET_MAX_HEALTH(ch), GET_MAX_HEALTH(ch) - GET_HEALTH(ch)) + GET_HEALTH_DEFICIT(ch);
-			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 		
@@ -2177,7 +2176,7 @@ int mana_gain(char_data *ch, bool info_only) {
 		
 		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 			needed = MAX(GET_MAX_MANA(ch), GET_MAX_MANA(ch) - GET_MANA(ch)) + GET_MANA_DEFICIT(ch);
-			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 		
@@ -2219,7 +2218,7 @@ int move_gain(char_data *ch, bool info_only) {
 		
 		if (GET_POS(ch) == POS_SLEEPING && !AFF_FLAGGED(ch, AFF_EARTHMELD)) {
 			needed = MAX(GET_MAX_MOVE(ch), GET_MAX_MOVE(ch) - GET_MOVE(ch)) + GET_MOVE_DEFICIT(ch);
-			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
+			min = round(needed / ((double) config_get_int("max_sleeping_regen_time") / (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_BEDROOM) ? 2.0 : 1.0) / SECS_PER_REAL_UPDATE));
 			gain = MAX(gain, min);
 		}
 

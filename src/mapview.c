@@ -73,7 +73,6 @@ struct mappc_data_container {
 // external vars
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
-extern const char *orchard_commands;
 
 // external funcs
 void replace_question_color(char *input, char *color, char *output);
@@ -238,39 +237,84 @@ struct icon_data *get_icon_from_set(struct icon_data *set, int type) {
 
 
 /**
-* Gets basic info about the tile to be shown on 'toggle informative' displays.
+* Gets a color string based on a series of conditions.
 *
-* @param char_data *ch Optional: The person looking (for immortal-only data).
-* @param room_data *room The location to check.
-* @param char *buffer A string to store the result to.
+* @param char_data *ch Optional: Player observing (may be NULL; determines chameleon view).
+* @param bool dismantling
+* @param bool unfinished
+* @param bool major_disrepair
+* @param bool minor_disrepair
+* @param int mine_view 0 = not a mine, 1 = mine with ore, -1 = mine with no ore
+* @param bool no_work
+* @param bool chameleon
+* @return char* The color code.
 */
-void get_informative_tile_string(char_data *ch, room_data *room, char *buffer) {
+char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool no_work, bool chameleon) {
+	if (chameleon) {
+		return "\ty";
+	}
+	else if (dismantling) {
+		return "\tC";
+	}
+	else if (unfinished) {
+		return "\tc";
+	}
+	else if (major_disrepair) {
+		return "\tr";
+	}
+	else if (minor_disrepair) {
+		return "\tm";
+	}
+	else if (mine_view > 0) {
+		return "\tg";
+	}
+	else if (mine_view < 0) {
+		return "\tr";
+	}
+	else if (no_work) {
+		return "\tB";
+	}
+	else {
+		return "\t0";
+	}
+}
+
+
+/**
+* Gets a string of text based on a series of conditions.
+*
+* @param char_data *ch Optional: Player observing (may be NULL; determines chameleon view).
+* @param char *buffer A string for the output (MAX_STRING_LENGTH).
+* @param bool dismantling
+* @param bool unfinished
+* @param bool major_disrepair
+* @param bool minor_disrepair
+* @param int mine_view 0 = not a mine, 1 = mine with ore, -1 = mine with no ore
+* @param bool no_work
+* @param bool chameleon
+*/
+void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool no_work, bool chameleon) {
 	*buffer = '\0';
 
-	if (IS_DISMANTLING(room)) {
+	if (dismantling) {
 		sprintf(buffer + strlen(buffer), "%sdismantling", *buffer ? ", " : "");
 	}
-	else if (!IS_COMPLETE(room)) {
+	else if (unfinished) {
 		sprintf(buffer + strlen(buffer), "%sunfinished", *buffer ? ", " :"");
 	}
-	if (HAS_MAJOR_DISREPAIR(room)) {
+	else if (major_disrepair) {
 		sprintf(buffer + strlen(buffer), "%sbad disrepair", *buffer ? ", " :"");
 	}
-	else if (HAS_MINOR_DISREPAIR(room)) {
+	else if (minor_disrepair) {
 		sprintf(buffer + strlen(buffer), "%sdisrepair", *buffer ? ", " :"");
 	}
-	if (IS_COMPLETE(room) && room_has_function_and_city_ok(room, FNC_MINE)) {
-		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
-			sprintf(buffer + strlen(buffer), "%shas ore", *buffer ? ", " :"");
-		}
-		else {
-			sprintf(buffer + strlen(buffer), "%sdepleted", *buffer ? ", " :"");
-		}
+	if (mine_view != 0) {
+		sprintf(buffer + strlen(buffer), "%s%s", *buffer ? ", " :"", mine_view > 0 ? "has ore" : "depleted");
 	}
-	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK)) {
+	if (no_work) {
 		sprintf(buffer + strlen(buffer), "%sno-work", *buffer ? ", " :"");
 	}
-	if (ch && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)) {
+	if (chameleon) {
 		sprintf(buffer + strlen(buffer), "%schameleon", *buffer ? ", " :"");
 	}
 }
@@ -553,7 +597,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	extern bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
 	extern bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
 	extern const char *color_by_difficulty(char_data *ch, int level);
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
 	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 	void list_char_to_char(char_data *list, char_data *ch);
@@ -891,11 +934,29 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			msg_to_char(ch, "Commands: &c%s&0\r\n", GET_BLD_COMMANDS(GET_BUILDING(room)));
 		}
 	}
-	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD)) {
-		msg_to_char(ch, "Commands: &c%s&0\r\n", orchard_commands);
-	}
 	else if (GET_SECT_COMMANDS(SECT(room)) && *GET_SECT_COMMANDS(SECT(room))) {
 		msg_to_char(ch, "Commands: &c%s&0\r\n", GET_SECT_COMMANDS(SECT(room)));
+	}
+	else if (ROOM_SECT_FLAGGED(room, SECTF_CROP)) {
+		*locbuf = '\0';
+		if (can_interact_room(IN_ROOM(ch), INTERACT_CHOP)) {
+			sprintf(locbuf + strlen(locbuf), "%schop", (*locbuf ? ", " : ""));
+		}
+		if (can_interact_room(IN_ROOM(ch), INTERACT_DIG)) {
+			sprintf(locbuf + strlen(locbuf), "%sdip", (*locbuf ? ", " : ""));
+		}
+		if (can_interact_room(IN_ROOM(ch), INTERACT_GATHER)) {
+			sprintf(locbuf + strlen(locbuf), "%sgarther", (*locbuf ? ", " : ""));
+		}
+		if (can_interact_room(IN_ROOM(ch), INTERACT_HARVEST)) {
+			sprintf(locbuf + strlen(locbuf), "%sharvest", (*locbuf ? ", " : ""));
+		}
+		if (can_interact_room(IN_ROOM(ch), INTERACT_PICK)) {
+			sprintf(locbuf + strlen(locbuf), "%spick", (*locbuf ? ", " : ""));
+		}
+		if (*locbuf) {
+			msg_to_char(ch, "Commands: &c%s&0\r\n", locbuf);
+		}
 	}
 	
 	// used from here on
@@ -982,11 +1043,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		}
 	}
 	
-	if (room_has_function_and_city_ok(room, FNC_TAVERN) && IS_COMPLETE(room)) {
+	if (room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_TAVERN) && IS_COMPLETE(room)) {
 		msg_to_char(ch, "The tavern has %s on tap.\r\n", tavern_data[get_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE)].name);
 	}
 
-	if (room_has_function_and_city_ok(room, FNC_MINE) && IS_COMPLETE(room)) {
+	if (room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_MINE) && IS_COMPLETE(room)) {
 		if (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) <= 0) {
 			msg_to_char(ch, "This mine is depleted.\r\n");
 		}
@@ -1265,8 +1326,8 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	crop_data *cp = ROOM_CROP(to_room);
 	sector_data *st, *base_sect = BASE_SECT(to_room);
 	char *base_color, *str;
-	room_data *map_loc, *map_to_room;
-	vehicle_data *show_veh;
+	room_data *map_loc;
+	vehicle_data *show_veh = NULL;
 	
 	// options
 	bool show_dark = IS_SET(options, LRR_SHOW_DARK) ? TRUE : FALSE;
@@ -1287,7 +1348,6 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	
 	// detect map locations
 	map_loc = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL);
-	map_to_room = (GET_MAP_LOC(to_room) ? real_room(GET_MAP_LOC(to_room)->vnum) : NULL);
 
 	// detect base icon
 	base_icon = get_icon_from_set(GET_SECT_ICONS(base_sect), tileset);
@@ -1543,7 +1603,10 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 				*buf2 = '\0';
 			}
 			
-			if (emp && (!hidden || emp == GET_LOYALTY(ch))) {
+			if (show_veh && !VEH_FLAGGED(show_veh, VEH_NO_CLAIM)) {
+				sprintf(buf, "%s%s%s", (VEH_OWNER(show_veh) && EMPIRE_BANNER(VEH_OWNER(show_veh))) ? EMPIRE_BANNER(VEH_OWNER(show_veh)) : "&0", buf2, buf1);
+			}
+			else if (emp && (!hidden || emp == GET_LOYALTY(ch))) {
 				sprintf(buf, "%s%s%s", EMPIRE_BANNER(emp) ? EMPIRE_BANNER(emp) : "&0", buf2, buf1);
 			}
 			else {
@@ -1551,37 +1614,12 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			}
 		}
 		else if (PRF_FLAGGED(ch, PRF_INFORMATIVE) && !show_dark) {
-			if (IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && distance(FLAT_X_COORD(map_loc), FLAT_Y_COORD(map_loc), FLAT_X_COORD(map_to_room), FLAT_Y_COORD(map_to_room)) > 2) {
-				strcpy(buf2, "&y");
-			}
-			else if (IS_DISMANTLING(to_room)) {
-				strcpy(buf2, "&C");
-			}
-			else if (!IS_COMPLETE(to_room)) {
-				strcpy(buf2, "&c");
-			}
-			else if (HAS_MAJOR_DISREPAIR(to_room)) {
-				strcpy(buf2, "&r");
-			}
-			else if (HAS_MINOR_DISREPAIR(to_room)) {
-				strcpy(buf2, "&m");
-			}
-			else if (room_has_function_and_city_ok(to_room, FNC_MINE)) {
-				if (get_room_extra_data(to_room, ROOM_EXTRA_MINE_AMOUNT) > 0) {
-					strcpy(buf2, "&g");
-				}
-				else {
-					strcpy(buf2, "&r");
-				}
-			}
-			else if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_WORK)) {
-				strcpy(buf2, "&B");
+			if (show_veh) {
+				sprintf(buf, "%s%s", get_informative_color_veh(ch, show_veh), buf1);
 			}
 			else {
-				strcpy(buf2, "&0");
+				sprintf(buf, "%s%s", get_informative_color_room(ch, to_room), buf1);
 			}
-			
-			sprintf(buf, "%s%s", buf2, buf1);
 		}
 		else if (painted && !show_dark) {
 			strcpy(col_buf, paint_colors[ROOM_PAINT_COLOR(to_room)]);
@@ -1784,7 +1822,16 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			
 			// show ships
 			if ((show_veh = find_vehicle_to_show(ch, to_room))) {
-				sprintf(roombuf + strlen(roombuf), " <%s>", skip_filler(get_vehicle_short_desc(show_veh, ch)));
+				if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+					get_informative_vehicle_string(ch, show_veh, infobuf);
+					sprintf(roombuf + strlen(roombuf), " <%s%s%s>", skip_filler(get_vehicle_short_desc(show_veh, ch)), *infobuf ? ": " :"", infobuf);
+				}
+				else if (VEH_OWNER(show_veh) && !VEH_CLAIMS_WITH_ROOM(show_veh) && PRF_FLAGGED(ch, PRF_POLITICAL)) {
+					sprintf(roombuf + strlen(roombuf), " <%s %s>", EMPIRE_ADJECTIVE(VEH_OWNER(show_veh)), skip_filler(get_vehicle_short_desc(show_veh, ch)));
+				}
+				else {
+					sprintf(roombuf + strlen(roombuf), " <%s>", skip_filler(get_vehicle_short_desc(show_veh, ch)));
+				}
 			}
 			
 			// show ownership (political)
@@ -1871,7 +1918,6 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 //// WHERE FUNCTIONS /////////////////////////////////////////////////////////
 
 void perform_mortal_where(char_data *ch, char *arg) {
-	extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 	extern bool valid_no_trace(room_data *room);
 	extern bool valid_unseen_passing(room_data *room);
 	

@@ -165,6 +165,7 @@ OLC_MODULE(cedit_buildon);
 OLC_MODULE(cedit_builds);
 OLC_MODULE(cedit_creates);
 OLC_MODULE(cedit_flags);
+OLC_MODULE(cedit_functions);
 OLC_MODULE(cedit_levelrequired);
 OLC_MODULE(cedit_liquid);
 OLC_MODULE(cedit_name);
@@ -510,6 +511,7 @@ OLC_MODULE(vedit_speed);
 
 
 // externs
+extern const bool interact_one_at_a_time[NUM_INTERACTS];
 extern const char *interact_types[];
 extern const int interact_attach_types[NUM_INTERACTS];
 extern const byte interact_vnum_types[NUM_INTERACTS];
@@ -766,6 +768,7 @@ const struct olc_command_data olc_data[] = {
 	{ "name", cedit_name, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "quantity", cedit_quantity, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "requiresability", cedit_ability, OLC_CRAFT, OLC_CF_EDITOR },
+	{ "requiresfunction", cedit_functions, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "requiresobject", cedit_requiresobject, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "resource", cedit_resource, OLC_CRAFT, OLC_CF_EDITOR },
 	{ "time", cedit_time, OLC_CRAFT, OLC_CF_EDITOR },
@@ -4219,12 +4222,20 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer) {
 	extern const char *interact_types[];
 
 	struct interaction_item *interact;
+	char quant[16];
 	int count = 0;
 	
 	*save_buffer = '\0';
 	
 	for (interact = list; interact; interact = interact->next) {
-		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %dx %s (%d) %.2f%%", ++count, interact_types[interact->type], interact->quantity, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
+		if (interact_one_at_a_time[interact->type]) {
+			snprintf(quant, sizeof(quant), "%d-max", interact->quantity);
+		}
+		else {
+			snprintf(quant, sizeof(quant), "%dx", interact->quantity);
+		}
+		
+		sprintf(save_buffer + strlen(save_buffer), "%2d. %s: %s %s (%d) %.2f%%", ++count, interact_types[interact->type], quant, get_interaction_target(interact->type, interact->vnum), interact->vnum, interact->percent);
 		if (isalpha(interact->exclusion_code)) {
 			sprintf(save_buffer + strlen(save_buffer), " (%c)", interact->exclusion_code);
 		}
@@ -4410,7 +4421,7 @@ bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *
 bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch) {
 	struct interaction_item *iter;
 	bool problem = FALSE;
-	int code, type, max_quantity = 0;
+	int code, type, max_quantity = 0, min_q_1_at_a_time = -1;
 	
 	struct audint_t {
 		int code;
@@ -4431,8 +4442,13 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 			problem = TRUE;
 		}
 		
-		// store for later
-		max_quantity = MAX(max_quantity, iter->quantity);
+		// store quantity for later except chores that are often high
+		if (!interact_one_at_a_time[iter->type]) {
+			max_quantity = MAX(max_quantity, iter->quantity);
+		}
+		else if (min_q_1_at_a_time == -1 || min_q_1_at_a_time > iter->quantity) {
+			min_q_1_at_a_time = iter->quantity;
+		}
 		
 		// track cumulative percent
 		if (iter->exclusion_code) {
@@ -4470,6 +4486,10 @@ bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach
 	
 	if (max_quantity > 10) {
 		olc_audit_msg(ch, vnum, "Interaction has unusually high quantity %d", max_quantity);
+		problem = TRUE;
+	}
+	if (min_q_1_at_a_time != -1 && min_q_1_at_a_time < 10) {
+		olc_audit_msg(ch, vnum, "One-at-a-time interaction has unusually low quantity %d", min_q_1_at_a_time);
 		problem = TRUE;
 	}
 	

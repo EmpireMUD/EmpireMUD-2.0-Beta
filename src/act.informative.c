@@ -53,7 +53,6 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external functions
 void clear_recent_moves(char_data *ch);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
 extern char *get_room_name(room_data *room, bool color);
 extern char *list_harnessed_mobs(vehicle_data *veh);
 void look_at_vehicle(vehicle_data *veh, char_data *ch);
@@ -1710,7 +1709,7 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode) {
 	}
 	
 	// show vault info first (own empire only; ignores thief mode)
-	if (own_empire == ROOM_OWNER(room) && room_has_function_and_city_ok(room, FNC_VAULT)) {
+	if (own_empire == ROOM_OWNER(room) && room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_VAULT)) {
 		msg_to_char(ch, "\r\nVault: %.1f coin%s, %d treasure (%d total)\r\n", EMPIRE_COINS(own_empire), (EMPIRE_COINS(own_empire) != 1.0 ? "s" : ""), EMPIRE_WEALTH(own_empire), (int) GET_TOTAL_WEALTH(own_empire));
 	}
 	
@@ -3276,7 +3275,7 @@ ACMD(do_nearby) {
 	extern int highest_start_loc_index;
 	extern int *start_locs;
 	
-	int max_dist = room_has_function_and_city_ok(IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
+	int max_dist = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
 	
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
@@ -3376,7 +3375,7 @@ ACMD(do_nearby) {
 	
 	// check instances
 	if (adventures) {
-		LL_FOREACH(instance_list, inst) {
+		DL_FOREACH(instance_list, inst) {
 			glb = NULL;	// init this now -- used later
 			
 			if (!INST_FAKE_LOC(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {

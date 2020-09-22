@@ -21,9 +21,9 @@ this swamp water to empower her magical items.
 0 0 0
 8 0
 R
-5193 0
+4 5193 0
 R
-5621 0
+4 5621 0
 S
 #19003
 swamp hag loot replacer~
@@ -620,7 +620,7 @@ You have a handful of small, round seeds. They can be used to plant okra.
 7 576
 O+ 1 6181
 R
-5210 0
+4 5210 0
 S
 #19042
 pods okra bunch~
@@ -629,12 +629,12 @@ A bunch of okra pods are lying here.~
    The okra pods are odd little green plants, but are delicious when cooked.
 You could use them to make gumbo or fried okra.
 ~
-6 0 a 0 7
+6 g a 0 8
 4 3017 0
 7 168
 O+ 1 6153
 R
-5606 0
+4 5606 0
 S
 #19043
 gumbo bowl hearty~
