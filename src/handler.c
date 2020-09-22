@@ -431,7 +431,7 @@ void affect_join(char_data *ch, struct affected_type *af, int flags) {
 * @param bool add if TRUE, applies this effect; if FALSE, removes it
 */
 void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool add) {
-	int diff, orig;
+	int diff, orig, grt;
 	
 	if (add) {
 		SET_BIT(AFF_FLAGS(ch), bitv);
@@ -461,7 +461,11 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 		case APPLY_GREATNESS: {
 			SAFE_ADD(GET_GREATNESS(ch), mod, SHRT_MIN, SHRT_MAX, TRUE);
 			if (!IS_NPC(ch) && GET_LOYALTY(ch) && IN_ROOM(ch)) {
-				update_member_data(ch);
+				grt = GET_GREATNESS(ch);	// store temporarily
+				GET_GREATNESS(ch) = MIN(grt, att_max(ch));
+				GET_GREATNESS(ch) = MAX(0, GET_GREATNESS(ch));
+				update_member_data(ch);	// update empire
+				GET_GREATNESS(ch) = grt;	// restore to what it just was
 				TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
 			}
 			break;
