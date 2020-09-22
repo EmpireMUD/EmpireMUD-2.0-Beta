@@ -5229,7 +5229,7 @@ Available flags:
  HARD-DROP - was dropped by a HARD mob (CAUTION: it will set this itself when dropped as loot)
  GROUP-DROP - was dropped by a GROUP mob (CAUTION: it will set this itself when dropped as loot)
  GENERIC-DROP - never receives the HARD-DROP/GROUP-DROP flags
- !STORE - cannot be stored (this is usually toggled on by scripts)
+ !STORE - can't be stored (or home/warehouse stored), can be toggled by scripts
  SEEDED - has already been seeded with the 'seed' command
 
 See also: BINDING, OLC OBJECTS
