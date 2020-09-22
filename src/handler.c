@@ -89,11 +89,12 @@ void clear_delayed_update(char_data *ch);
 void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
 void free_varlist(struct trig_var_data *vd);
-void remove_dropped_item_list(empire_data *emp, obj_data *list);
 void scale_item_to_level(obj_data *obj, int level);
 void update_member_data(char_data *ch);
 
 // locals
+void add_dropped_item(empire_data *emp, obj_data *obj);
+void add_dropped_item_anywhere(obj_data *obj, empire_data *only_if_emp);
 void add_dropped_item_list(empire_data *emp, obj_data *list);
 static void add_obj_binding(int idnum, struct obj_binding **list);
 struct obj_binding *copy_obj_bindings(struct obj_binding *from);
@@ -103,6 +104,9 @@ struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 void perform_abandon_vehicle(vehicle_data *veh);
 void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void remove_companion(char_data *ch, any_vnum vnum);
+void remove_dropped_item(empire_data *emp, obj_data *obj);
+void remove_dropped_item_anywhere(obj_data *obj);
+void remove_dropped_item_list(empire_data *emp, obj_data *list);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
 void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 
@@ -2937,6 +2941,8 @@ void perform_abandon_room(room_data *room) {
 			qt_empire_players(emp, qt_lose_building, GET_BLD_VNUM(GET_BUILDING(room)));
 			et_lose_building(emp, GET_BLD_VNUM(GET_BUILDING(room)));
 		}
+		
+		remove_dropped_item_list(emp, ROOM_CONTENTS(room));
 	}
 	
 	ROOM_OWNER(room) = NULL;
@@ -2991,6 +2997,10 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 			qt_empire_players_vehicle(emp, qt_lose_vehicle, veh);
 			et_lose_vehicle(emp, veh);
 			adjust_vehicle_tech(veh, FALSE);
+		}
+		
+		if (emp) {
+			remove_dropped_item_list(emp, VEH_CONTAINS(veh));
 		}
 	}
 }
@@ -3050,6 +3060,8 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 			perform_claim_vehicle(veh, emp);
 		}
 	}
+	
+	add_dropped_item_list(emp, ROOM_CONTENTS(room));
 }
 
 
@@ -3080,6 +3092,8 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 			et_gain_vehicle(emp, veh);
 			adjust_vehicle_tech(veh, TRUE);
 		}
+		
+		add_dropped_item_list(emp, VEH_CONTAINS(veh));
 	}
 }
 
@@ -6359,6 +6373,8 @@ void obj_from_obj(obj_data *obj) {
 		log("SYSERR: (%s): trying to illegally extract obj from obj.", __FILE__);
 	}
 	else {
+		remove_dropped_item_anywhere(obj);
+		
 		obj_from = obj->in_obj;
 		DL_DELETE2(obj_from->contains, obj, prev_content, next_content);
 
@@ -6390,6 +6406,9 @@ void obj_from_room(obj_data *object) {
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
 			ROOM_LIGHTS(IN_ROOM(object))--;
 		}
+		if (ROOM_OWNER(IN_ROOM(object))) {
+			remove_dropped_item(ROOM_OWNER(IN_ROOM(object)), object);
+		}
 		
 		DL_DELETE2(ROOM_CONTENTS(IN_ROOM(object)), object, prev_content, next_content);
 		IN_ROOM(object) = NULL;
@@ -6406,6 +6425,9 @@ void obj_from_vehicle(obj_data *object) {
 		log("SYSERR: NULL object (%p) or obj not in a vehicle (%p) passed to obj_from_vehicle", object, object->in_vehicle);
 	}
 	else {
+		if (VEH_OWNER(object->in_vehicle)) {
+			remove_dropped_item(VEH_OWNER(object->in_vehicle), object);
+		}
 		VEH_LAST_MOVE_TIME(object->in_vehicle) = time(0);	// reset autostore time
 		VEH_CARRYING_N(object->in_vehicle) -= obj_carry_size(object);
 		DL_DELETE2(VEH_CONTAINS(object->in_vehicle), object, prev_content, next_content);
@@ -6600,6 +6622,8 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		
 		DL_PREPEND2(obj_to->contains, obj, prev_content, next_content);
 		obj->in_obj = obj_to;
+		
+		add_dropped_item_anywhere(obj, NULL);
 	}
 }
 
@@ -6630,6 +6654,10 @@ void obj_to_room(obj_data *object, room_data *room) {
 
 		// set the timer here; actual rules for it are in limits.c
 		GET_AUTOSTORE_TIMER(object) = time(0);
+		
+		if (ROOM_OWNER(room)) {
+			add_dropped_item(ROOM_OWNER(room), object);
+		}
 	}
 }
 
@@ -6657,6 +6685,10 @@ void obj_to_vehicle(obj_data *object, vehicle_data *veh) {
 		
 		// set the timer here; actual rules for it are in limits.c
 		VEH_LAST_MOVE_TIME(veh) = GET_AUTOSTORE_TIMER(object) = time(0);
+		
+		if (VEH_OWNER(veh)) {
+			add_dropped_item(VEH_OWNER(veh), object);
+		}
 	}
 }
 

@@ -1941,6 +1941,7 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 * @param empire_data *emp The empire to free
 */
 void free_empire(empire_data *emp) {
+	void free_dropped_items(struct empire_dropped_item **list);
 	void free_empire_goals(struct empire_goal *hash);
 	void free_empire_completed_goals(struct empire_completed_goal *hash);
 	void free_member_data(empire_data *emp);
@@ -2091,6 +2092,7 @@ void free_empire(empire_data *emp) {
 		free(wf_log);
 	}
 	
+	free_dropped_items(&EMPIRE_DROPPED_ITEMS(emp));
 	free_theft_logs(EMPIRE_THEFT_LOGS(emp));
 	
 	// free gathered totals

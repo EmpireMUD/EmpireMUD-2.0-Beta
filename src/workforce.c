@@ -67,6 +67,7 @@ bool workforce_is_delayed(empire_data *emp, room_data *room, int chore);
 
 // external functions
 int count_building_vehicles_in_room(room_data *room, empire_data *only_owner);	// vehicles.c
+extern int count_dropped_items(empire_data *emp, obj_vnum vnum);
 void empire_skillup(empire_data *emp, any_vnum ability, double amount);	// skills.c
 int get_workforce_production_limit(empire_data *emp, obj_vnum vnum);
 void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component);
@@ -470,6 +471,9 @@ static struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_v
 				}
 			}
 		}
+		
+		// aaand dropped items
+		SAFE_ADD(tt->total_amount, count_dropped_items(emp, vnum), 0, INT_MAX, FALSE);
 	}
 	
 	return tt;

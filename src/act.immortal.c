@@ -827,6 +827,7 @@ ADMIN_UTIL(util_redo_islands) {
 
 
 ADMIN_UTIL(util_rescan) {
+	void refresh_empire_dropped_items(empire_data *only_emp);
 	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	
 	empire_data *emp;
@@ -840,6 +841,7 @@ ADMIN_UTIL(util_rescan) {
 	else if (!str_cmp(argument, "all")) {
 		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning all empires");
 		reread_empire_tech(NULL);
+		refresh_empire_dropped_items(NULL);
 		send_config_msg(ch, "ok_string");
 	}
 	else if (!(emp = get_empire_by_name(argument))) {
@@ -849,6 +851,7 @@ ADMIN_UTIL(util_rescan) {
 		syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "Rescanning empire: %s", EMPIRE_NAME(emp));
 		reread_empire_tech(emp);
 		refresh_empire_goals(emp, NOTHING);
+		refresh_empire_dropped_items(emp);
 		send_config_msg(ch, "ok_string");
 	}
 }
@@ -3594,6 +3597,51 @@ SHOW(show_dailycycle) {
 			}
 			
 			size += snprintf(buf + size, sizeof(buf) - size, "[%5d] %s%s\r\n", QUEST_VNUM(qst), QUEST_NAME(qst), QUEST_DAILY_ACTIVE(qst) ? " (active)" : "");
+		}
+		
+		if (ch->desc) {
+			page_string(ch->desc, buf, TRUE);
+		}
+	}
+}
+
+
+// + help file
+SHOW(show_dropped_items) {
+	struct empire_dropped_item *edi, *next;
+	char buf[MAX_STRING_LENGTH], line[256];
+	empire_data *emp;
+	size_t size, lsize;
+	int count;
+	
+	skip_spaces(&argument);
+	if (!*argument) {
+		msg_to_char(ch, "Usage: show dropped <empire>\r\n");
+	}
+	else if (!(emp = get_empire_by_name(argument))) {
+		msg_to_char(ch, "Unknown empire '%s'.\r\n", argument);
+	}
+	else {
+		size = snprintf(buf, sizeof(buf), "Dropped items for %s%s\t0:\r\n", EMPIRE_BANNER(emp), EMPIRE_NAME(emp));
+		count = 0;
+		HASH_ITER(hh, EMPIRE_DROPPED_ITEMS(emp), edi, next) {
+			lsize = snprintf(line, sizeof(line), "(%d) [%d] %s\r\n", edi->count, edi->vnum, get_obj_name_by_proto(edi->vnum));
+			SAFE_ADD(count, edi->count, 0, INT_MAX, FALSE);
+			
+			if (size + lsize < sizeof(buf)) {
+				strcat(buf, line);
+				size += lsize;
+			}
+			else {
+				size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
+				break;
+			}
+		}
+		if (!count) {
+			strcat(buf, " none\r\n");	// always room if !count
+		}
+		else if (size + 15 < sizeof(buf)) {
+			size += snprintf(buf + size, sizeof(buf) - size, "(%d total)\r\n", count);
 		}
 		
 		if (ch->desc) {
@@ -9403,6 +9451,7 @@ ACMD(do_show) {
 		{ "buildings", LVL_START_IMM, show_buildings },
 		{ "commons", LVL_ASST, show_commons },
 		{ "crops", LVL_START_IMM, show_crops },
+		{ "dropped", LVL_START_IMM, show_dropped_items },
 		{ "players", LVL_START_IMM, show_players },
 		{ "terrain", LVL_START_IMM, show_terrain },
 		{ "account", LVL_TO_SEE_ACCOUNTS, show_account },

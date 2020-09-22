@@ -60,6 +60,7 @@ extern bool can_claim(char_data *ch);
 void check_nowhere_einv(empire_data *emp, int new_island);
 extern int city_points_available(empire_data *emp);
 void clear_private_owner(int id);
+extern int count_dropped_items(empire_data *emp, obj_vnum vnum);
 void deactivate_workforce(empire_data *emp, int island_id, int type);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
 void delete_member_data(char_data *ch, empire_data *from_emp);
@@ -969,7 +970,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 		HASH_FIND_INT(list, &vnum, einv);
 		
 		if (einv) {	// have this?
-			einv->total += shipd->amount;
+			SAFE_ADD(einv->total, shipd->amount, 0, INT_MAX, FALSE);
 		}
 		else if (all) {	// add an entry
 			CREATE(einv, struct einv_type, 1);
@@ -977,6 +978,11 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 			einv->total = shipd->amount;
 			HASH_ADD_INT(list, vnum, einv);
 		}
+	}
+	
+	// apply dropped items
+	HASH_ITER(hh, list, einv, next_einv) {
+		SAFE_ADD(einv->total, count_dropped_items(emp, einv->vnum), 0, INT_MAX, FALSE);
 	}
 	
 	HASH_SORT(list, sort_einv_list);
