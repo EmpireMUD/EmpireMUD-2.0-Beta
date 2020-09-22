@@ -117,6 +117,10 @@ bool audit_crop(crop_data *cp, char_data *ch) {
 		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No FORAGE");
 		problem = TRUE;
 	}
+	if (CROP_FLAGGED(cp, CROPF_IS_ORCHARD) && !has_interaction(GET_CROP_INTERACTIONS(cp), INTERACT_HARVEST)) {
+		olc_audit_msg(ch, GET_CROP_VNUM(cp), "No CHOP interaction on ORCHARD");
+		problem = TRUE;
+	}
 	
 	problem |= audit_interactions(GET_CROP_VNUM(cp), GET_CROP_INTERACTIONS(cp), TYPE_ROOM, ch);
 	problem |= audit_spawns(GET_CROP_VNUM(cp), GET_CROP_SPAWNS(cp), ch);
