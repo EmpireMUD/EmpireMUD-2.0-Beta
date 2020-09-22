@@ -268,7 +268,7 @@ All crafting abilities train when you finish recipes that require them.
 See also: CRAFT INFO, CRAFTING LEVEL, RESOURCES, KEEP, RECIPES, POTTERY,
 PRIMITIVE CRAFTS, WOODWORKING
 #
-"CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO" "BAKE INFO" "WEAVE INFO"
+"CRAFT INFO" "FORGE INFO" "SEW INFO" "BUILD INFO" "MANUFACTURE INFO" "COOK INFO" "BAKE INFO" "WEAVE INFO" "MAKE INFO"
 
 Usage:  <verb> info <recipe name>
 
@@ -283,7 +283,7 @@ its pattern in your inventory.
 For build, this also shows where you can build the building.
 For recipes from patterns, this also shows the level range of the recipe.
 
-See also; RESOURCES, SCALABLE CRAFTS, PATTERNS
+See also: RESOURCES, SCALABLE CRAFTS, PATTERNS
 #
 "CUSTOMIZE BUILDING"
 

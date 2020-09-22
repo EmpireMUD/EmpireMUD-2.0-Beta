@@ -2686,6 +2686,7 @@ Available types are:
    at the associated building
  MANUFACTURE
  BAKE - requires a bakery or oven
+ MAKE
 
 Note: The SOUP and VEHICLE craft flags both also modify the recipe.
 
