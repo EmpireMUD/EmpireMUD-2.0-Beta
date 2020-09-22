@@ -1042,7 +1042,7 @@ void do_instance_delete(char_data *ch, char *argument) {
 		return;
 	}
 	
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		if (--num == 0) {
 			if ((loc = INST_LOCATION(inst))) {
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted an instance of %s at %s", GET_REAL_NAME(ch), GET_ADV_NAME(INST_ADVENTURE(inst)), room_log_identifier(loc));
@@ -1089,7 +1089,7 @@ void do_instance_delete_all(char_data *ch, char *argument) {
 		}
 	}
 	
-	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		if (all || INST_ADVENTURE(inst) == adv) {
 			++count;
 			delete_instance(inst, TRUE);
@@ -1117,7 +1117,7 @@ void do_instance_info(char_data *ch, char *argument) {
 		return;
 	}
 	
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		if (--num == 0) {
 			msg_to_char(ch, "\tcInstance %d: [%d] %s\t0\r\n", atoi(argument), GET_ADV_VNUM(INST_ADVENTURE(inst)), GET_ADV_NAME(INST_ADVENTURE(inst)));
 			
@@ -1240,7 +1240,7 @@ void do_instance_list(char_data *ch, char *argument) {
 	
 	*buf = '\0';
 	
-	LL_FOREACH(instance_list, inst) {
+	DL_FOREACH(instance_list, inst) {
 		// num is out of the total instances, not just ones shown
 		++num;
 		
@@ -1275,7 +1275,7 @@ void do_instance_nearby(char_data *ch, char *argument) {
 	size = snprintf(buf, sizeof(buf), "Instances within %d tiles:\r\n", distance);
 	
 	if (loc) {	// skip work if no map location found
-		LL_FOREACH(instance_list, inst) {
+		DL_FOREACH(instance_list, inst) {
 			++num;
 		
 			inst_loc = INST_FAKE_LOC(inst);
@@ -1308,7 +1308,7 @@ void do_instance_reset(char_data *ch, char *argument) {
 			return;
 		}
 	
-		LL_FOREACH(instance_list, inst) {
+		DL_FOREACH(instance_list, inst) {
 			if (--num == 0) {
 				loc = INST_FAKE_LOC(inst);
 				reset_instance(inst);
@@ -3108,7 +3108,7 @@ SHOW(show_stats) {
 	DL_COUNT(object_list, obj, num_objs);
 	DL_COUNT(vehicle_list, veh, num_vehs);
 	DL_COUNT2(trigger_list, trig, num_trigs, next_in_world);
-	LL_COUNT(instance_list, inst, num_inst);
+	DL_COUNT(instance_list, inst, num_inst);
 
 	// count active empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -6203,7 +6203,7 @@ void do_stat_room(char_data *ch) {
 	
 	if ((inst = find_instance_by_room(IN_ROOM(ch), FALSE, TRUE))) {
 		num = 0;
-		LL_FOREACH(instance_list, inst_iter) {
+		DL_FOREACH(instance_list, inst_iter) {
 			++num;
 			if (inst_iter == inst) {
 				break;
@@ -8105,7 +8105,7 @@ ACMD(do_instance) {
 	
 	if (!*arg) {
 		count = 0;
-		LL_FOREACH(instance_list, inst) {
+		DL_FOREACH(instance_list, inst) {
 			++count;
 		}
 		

@@ -2674,7 +2674,7 @@ void b5_1_global_update(void) {
 		}
 		
 		// delete 'em
-		LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+		DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 			if (INST_ADVENTURE(inst) == adv) {
 				delete_instance(inst, FALSE);
 			}
@@ -3197,7 +3197,7 @@ void b5_34_mega_update(void) {
 	}
 	
 	// remove all instances of adventure 50 (was shut off by this patch)
-	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		if (INST_ADVENTURE(inst) && GET_ADV_VNUM(INST_ADVENTURE(inst)) == 50) {
 			delete_instance(inst, TRUE);
 		}
@@ -3339,7 +3339,7 @@ void b5_37_progress_update(void) {
 	}
 	
 	// remove all instances of adventure 12600 (force respawn to attach trigger)
-	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		if (INST_ADVENTURE(inst) && GET_ADV_VNUM(INST_ADVENTURE(inst)) == 12600) {
 			delete_instance(inst, TRUE);
 		}
@@ -3354,7 +3354,7 @@ void b5_38_grove_update(void) {
 	log("Applying b5.38 update...");
 	
 	// remove all instances of adventure 100 (it's now in-dev)
-	LL_FOREACH_SAFE(instance_list, inst, next_inst) {
+	DL_FOREACH_SAFE(instance_list, inst, next_inst) {
 		if (INST_ADVENTURE(inst) && GET_ADV_VNUM(INST_ADVENTURE(inst)) == 100) {
 			delete_instance(inst, TRUE);
 		}

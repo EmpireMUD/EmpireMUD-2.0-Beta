@@ -696,7 +696,7 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	// update instances (if it wasn't deleted already earlier)
 	if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE | ROOM_AFF_FAKE_INSTANCE) || (COMPLEX_DATA(room) && COMPLEX_DATA(room)->instance)) {
-		LL_FOREACH(instance_list, inst) {
+		DL_FOREACH(instance_list, inst) {
 			if (INST_LOCATION(inst) == room) {
 				SET_BIT(INST_FLAGS(inst), INST_COMPLETED);
 				INST_LOCATION(inst) = NULL;

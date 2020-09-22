@@ -3375,7 +3375,7 @@ ACMD(do_nearby) {
 	
 	// check instances
 	if (adventures) {
-		LL_FOREACH(instance_list, inst) {
+		DL_FOREACH(instance_list, inst) {
 			glb = NULL;	// init this now -- used later
 			
 			if (!INST_FAKE_LOC(inst) || INSTANCE_FLAGGED(inst, INST_COMPLETED)) {

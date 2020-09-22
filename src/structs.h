@@ -3409,6 +3409,7 @@ struct instance_data {
 	struct instance_mob *mob_counts;	// hash table (hh)
 	bool cleanup;	// TRUE if the instance is expired and mid-cleanup
 	
+	struct instance_data *prev;
 	struct instance_data *next;
 };
 
