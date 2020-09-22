@@ -3404,9 +3404,6 @@ ACMD(do_plant) {
 			schedule_crop_growth(GET_MAP_LOC(IN_ROOM(ch)));
 		}
 		
-		// temporarily deplete seeded rooms
-		set_depletion(IN_ROOM(ch), DPLTN_FORAGE, config_get_int("short_depletion"));
-		
 		extract_obj(obj);
 		
 		start_action(ch, ACT_PLANTING, 4);
