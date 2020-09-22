@@ -3073,9 +3073,10 @@ SHOW(show_stats) {
 	extern struct help_index_element *help_table;
 	
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
-	int num_trigs = 0, num_goals = 0, num_rewards = 0, num_mort_helps = 0, num_imm_helps = 0;
+	int num_trigs = 0, num_goals = 0, num_rewards = 0, num_mort_helps = 0, num_imm_helps = 0, num_inst = 0;
 	progress_data *prg, *next_prg;
 	empire_data *emp, *next_emp;
+	struct instance_data *inst;
 	descriptor_data *desc;
 	vehicle_data *veh;
 	char_data *vict;
@@ -3107,6 +3108,7 @@ SHOW(show_stats) {
 	DL_COUNT(object_list, obj, num_objs);
 	DL_COUNT(vehicle_list, veh, num_vehs);
 	DL_COUNT2(trigger_list, trig, num_trigs, next_in_world);
+	LL_COUNT(instance_list, inst, num_inst);
 
 	// count active empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -3163,7 +3165,7 @@ SHOW(show_stats) {
 	msg_to_char(ch, "  %6d classes          %6d skills\r\n", HASH_COUNT(class_table), HASH_COUNT(skill_table));
 	msg_to_char(ch, "  %6d abilities        %6d factions\r\n", HASH_COUNT(ability_table), HASH_COUNT(faction_table));
 	msg_to_char(ch, "  %6d globals          %6d morphs\r\n", HASH_COUNT(globals_table), HASH_COUNT(morph_table));
-	msg_to_char(ch, "  %6d events           \r\n", HASH_COUNT(event_table));
+	msg_to_char(ch, "  %6d events           %6d adventure instances\r\n", HASH_COUNT(event_table), num_inst);
 	msg_to_char(ch, "  %6d socials          %6d generics\r\n", HASH_COUNT(social_table), HASH_COUNT(generic_table));
 	msg_to_char(ch, "  %6d progress goals   %6d progress rewards\r\n", num_goals, num_rewards);
 	msg_to_char(ch, "  %6d shops\r\n", HASH_COUNT(shop_table));
