@@ -1931,7 +1931,7 @@ void process_gathering(char_data *ch) {
 * @param char_data *ch The harvester.
 */
 void process_harvesting(char_data *ch) {
-	if (!ROOM_CROP(IN_ROOM(ch))) {
+	if (!ROOM_CROP(IN_ROOM(ch)) || !can_interact_room(IN_ROOM(ch), INTERACT_HARVEST)) {
 		msg_to_char(ch, "There's nothing left to harvest here.\r\n");
 		cancel_action(ch);
 		return;
@@ -3131,7 +3131,12 @@ ACMD(do_harvest) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
 	else if (GET_ACTION(ch) == ACT_HARVESTING) {
-		msg_to_char(ch, "You stop harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
+		if (ROOM_CROP(IN_ROOM(ch))) {
+			msg_to_char(ch, "You stop harvesting the %s.\r\n", GET_CROP_NAME(ROOM_CROP(IN_ROOM(ch))));
+		}
+		else {
+			msg_to_char(ch, "You stop harvesting.\r\n");
+		}
 		act("$n stops harvesting.\r\n", FALSE, ch, 0, 0, TO_ROOM);
 		cancel_action(ch);
 	}
@@ -3147,11 +3152,8 @@ ACMD(do_harvest) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You are already busy doing something else.\r\n");
 	}
-	else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CROP)) {
-		msg_to_char(ch, "You can't harvest anything here!\r\n");
-	}
-	else if (ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD)) {
-		msg_to_char(ch, "You can't harvest the orchard. Use pick or chop.\r\n");
+	else if (!ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_CROP) || !can_interact_room(IN_ROOM(ch), INTERACT_HARVEST)) {
+		msg_to_char(ch, "You can't harvest anything here!%s\r\n", ROOM_CROP_FLAGGED(IN_ROOM(ch), CROPF_IS_ORCHARD) ? " (try pick or chop)" : "");
 	}
 	else if (!ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE) && !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 		msg_to_char(ch, "You don't have permission to harvest this crop.\r\n");

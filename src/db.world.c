@@ -123,8 +123,8 @@ void change_base_sector(room_data *room, sector_data *sect) {
 void change_chop_territory(room_data *room) {
 	struct evolution_data *evo;
 	
-	if (ROOM_SECT_FLAGGED(room, SECTF_CROP) && ROOM_CROP_FLAGGED(room, CROPF_IS_ORCHARD)) {
-		// TODO: This is a special case for orchards
+	if (ROOM_SECT_FLAGGED(room, SECTF_CROP)) {
+		// chopping a crop un-crops it
 		uncrop_tile(room);
 	}
 	else if ((evo = get_evolution_by_type(SECT(room), EVO_CHOPPED_DOWN))) {
