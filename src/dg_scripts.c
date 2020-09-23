@@ -2902,6 +2902,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "0");
 						}
 					}
+					else if (!str_cmp(field, "action")) {
+						extern const struct action_data_struct action_data[];
+						extern struct gen_craft_data_t gen_craft_data[];
+						if (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) {
+							strcpy(str, "");	// none
+						}
+						else if (GET_ACTION(c) == ACT_GEN_CRAFT) {
+							craft_data *ctype = craft_proto(GET_ACTION_VNUM(c, 0));
+							snprintf(str, slen, "%s", gen_craft_data[GET_CRAFT_TYPE(ctype)].verb);
+						}
+						else {
+							snprintf(str, slen, "%s", action_data[GET_ACTION(c)].name);
+						}
+					}
 					
 					else if (!str_cmp(field, "add_companion")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
