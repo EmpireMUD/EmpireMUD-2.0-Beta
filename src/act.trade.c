@@ -939,6 +939,7 @@ struct gen_craft_data_t gen_craft_data[] = {
 	{ "press", "pressing", NOBITS, { "You press the %s...", "$n presses the %s...", "$n is working the press." } },
 	
 	{ "bake", "baking", ACTF_FAST_CHORES, { "You wait for the %s to bake...", "$n waits for the %s to bake...", "$n is baking %s." } },
+	{ "make", "making", NOBITS, { "You work on the %s...", "$n works on the %s...", "$n is making a %s." } },
 };
 
 

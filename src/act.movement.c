@@ -681,13 +681,14 @@ void mark_move_time(char_data *ch) {
 * @return bool TRUE if a dir/dist was found, FALSE if it failed (errored).
 */
 bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error) {
-	char word[MAX_INPUT_LENGTH], *tmp;
+	char copy[MAX_INPUT_LENGTH], word[MAX_INPUT_LENGTH], *tmp;
 	int pos, found_dir = -1, found_dist = -1, start_word, end_word, one_dir;
 	int mode;
 	
 	*dir = *dist = -1;	// default/dummy
 	
-	tmp = string;	// do not modify string until the end
+	strcpy(copy, string);	// copy the string as we will overwrite it
+	tmp = copy;	// will copy back over 'string' at the end
 	skip_run_filler(&tmp);
 	
 	#define PNDFS_NO_MODE  0

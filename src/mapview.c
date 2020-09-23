@@ -946,7 +946,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			sprintf(locbuf + strlen(locbuf), "%sdip", (*locbuf ? ", " : ""));
 		}
 		if (can_interact_room(IN_ROOM(ch), INTERACT_GATHER)) {
-			sprintf(locbuf + strlen(locbuf), "%sgarther", (*locbuf ? ", " : ""));
+			sprintf(locbuf + strlen(locbuf), "%sgather", (*locbuf ? ", " : ""));
 		}
 		if (can_interact_room(IN_ROOM(ch), INTERACT_HARVEST)) {
 			sprintf(locbuf + strlen(locbuf), "%sharvest", (*locbuf ? ", " : ""));

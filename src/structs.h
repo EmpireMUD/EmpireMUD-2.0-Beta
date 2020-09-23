@@ -1053,6 +1053,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_TYPE_SMELT  12
 #define CRAFT_TYPE_PRESS  13
 #define CRAFT_TYPE_BAKE  14
+#define CRAFT_TYPE_MAKE  15
 
 
 // CRAFT_x: Craft Flags for do_gen_craft

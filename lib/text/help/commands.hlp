@@ -1294,6 +1294,17 @@ To see what's inside a container (i.e. a corpse) use LOOK IN <object>.
 
 See also: GET, MAP, READ, TAKE, SURVEY, CONTENTS, MAPSCAN
 #
+MAKE
+
+Usage:  make [number] <thing>
+        make info <thing>
+        make list <keywords>
+
+Make is a crafting command. There are no basic recipes that use 'make', but
+perhaps you can find something that does.
+
+See also: MAKE INFO, RECIPES
+#
 MAP "MAP COMMAND"
 
 Usage:  map [distance]

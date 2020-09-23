@@ -184,10 +184,6 @@ bool audit_object(obj_data *obj, char_data *ch) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Scalable object has no bind flags");
 		problem = TRUE;
 	}
-	if (OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
-		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Object has !STORE - this flag is meaningless on a prototype");
-		problem = TRUE;
-	}
 	if (CAN_WEAR(obj, ITEM_WEAR_WIELD) && !IS_WEAPON(obj)) {
 		olc_audit_msg(ch, GET_OBJ_VNUM(obj), "Wieldable item is not a weapon");
 		problem = TRUE;

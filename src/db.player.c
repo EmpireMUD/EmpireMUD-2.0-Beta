@@ -3986,17 +3986,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 			msg_to_char(ch, "\trYou are stunned for %d second%s because you logged in in hostile territory.\r\n", duration, PLURAL(duration));
 		}
 	}
-	
-	// attempt to put them back in a vehicle
-	if (GET_LAST_VEHICLE(ch) != NOTHING) {
-		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (VEH_VNUM(veh) == GET_LAST_VEHICLE(ch) && validate_sit_on_vehicle(ch, veh, FALSE)) {
-				sit_on_vehicle(ch, veh);
-				GET_POS(ch) = POS_SITTING;
-				break;	// only need 1
-			}
-		}
-	}
 
 	// script/trigger stuff
 	greet_mtrigger(ch, NO_DIR);
@@ -4076,6 +4065,17 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	}
 	else {
 		GET_POS(ch) = POS_STANDING;
+	}
+	
+	// attempt to put them back in a vehicle
+	if (GET_LAST_VEHICLE(ch) != NOTHING) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (VEH_VNUM(veh) == GET_LAST_VEHICLE(ch) && !VEH_SITTING_ON(veh) && validate_sit_on_vehicle(ch, veh, FALSE)) {
+				sit_on_vehicle(ch, veh);
+				GET_POS(ch) = POS_SITTING;
+				break;	// only need 1
+			}
+		}
 	}
 	
 	// reload last companion?
