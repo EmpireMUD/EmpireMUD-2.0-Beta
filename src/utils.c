@@ -57,6 +57,7 @@ extern const char *tool_flags[];
 // external funcs
 void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
+void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 void remove_companion_mod(struct companion_data **companion, int type);
 void scale_item_to_level(obj_data *obj, int level);
@@ -2478,8 +2479,9 @@ void change_long_desc(char_data *ch, char *str) {
 *
 * @parma char_data *ch The mob.
 * @param char *str The new look desc (will be copied). Pass NULL to set it back to the prototype.
+* @param bool format If TRUE, formats the whole description as a paragraph.
 */
-void change_look_desc(char_data *ch, char *str) {
+void change_look_desc(char_data *ch, char *str, bool format) {
 	struct companion_data *cd;
 	char_data *proto;
 	
@@ -2495,7 +2497,20 @@ void change_look_desc(char_data *ch, char *str) {
 		if (!proto || GET_LOOK_DESC(ch) != GET_LOOK_DESC(proto)) {
 			free(GET_LOOK_DESC(ch));
 		}
-		GET_LOOK_DESC(ch) = str_dup(str);
+		
+		// check for trailing \r\n
+		if (str[strlen(str)-1] == '\n') {
+			GET_LOOK_DESC(ch) = str_dup(str);
+		}
+		else {
+			char temp[MAX_STRING_LENGTH];
+			snprintf(temp, sizeof(temp), "%s\r\n", str);
+			GET_LOOK_DESC(ch) = str_dup(temp);
+		}
+		
+		if (format) {
+			format_text(&GET_LOOK_DESC(ch), (strlen(GET_LOOK_DESC(ch)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+		}
 		
 		// update companion data
 		if (GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
@@ -2512,6 +2527,49 @@ void change_look_desc(char_data *ch, char *str) {
 		// delete companion data
 		if (GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
 			remove_companion_mod(&cd, CMOD_LOOK_DESC);
+			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
+		}
+	}
+}
+
+
+/**
+* Processes a change to a mob's look desc -- it will append text to the
+* existing text. This may also update it in additional places, such as stored
+* companion data.
+*
+* @parma char_data *ch The mob.
+* @param char *str The new look desc to append (text will be copied).
+* @param bool format If TRUE, formats the whole description as a paragraph.
+*/
+void change_look_desc_append(char_data *ch, char *str, bool format) {
+	char temp[MAX_STRING_LENGTH];
+	struct companion_data *cd;
+	char_data *proto;
+	
+	if (!ch || !IS_NPC(ch) || !str || !*str) {
+		return;	// no work
+	}
+	
+	proto = mob_proto(GET_MOB_VNUM(ch));
+	
+	// the change
+	if (str && *str) {
+		snprintf(temp, sizeof(temp), "%s%s%s", NULLSAFE(GET_LOOK_DESC(ch)), NULLSAFE(str), (str[strlen(str)-1] == '\n' ? "" : "\r\n"));
+
+		ch->customized = TRUE;
+		if (!proto || GET_LOOK_DESC(ch) != GET_LOOK_DESC(proto)) {
+			free(GET_LOOK_DESC(ch));
+		}
+		GET_LOOK_DESC(ch) = str_dup(temp);
+		
+		if (format) {
+			format_text(&GET_LOOK_DESC(ch), (strlen(GET_LOOK_DESC(ch)) > 80 ? FORMAT_INDENT : 0), NULL, MAX_STRING_LENGTH);
+		}
+		
+		// update companion data
+		if (GET_COMPANION(ch) && (cd = has_companion(GET_COMPANION(ch), GET_MOB_VNUM(ch)))) {
+			add_companion_mod(cd, CMOD_LOOK_DESC, 0, str);
 			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
 		}
 	}

@@ -1207,6 +1207,8 @@ void script_heal(void *thing, int type, char *argument) {
 void script_modify(char *argument) {
 	void change_keywords(char_data *ch, char *str);
 	void change_long_desc(char_data *ch, char *str);
+	void change_look_desc(char_data *ch, char *str, bool format);
+	void change_look_desc_append(char_data *ch, char *str, bool format);
 	void change_sex(char_data *ch, int sex);
 	void change_short_desc(char_data *ch, char *str);
 	extern bool despawn_companion(char_data *ch, mob_vnum vnum);
@@ -1222,7 +1224,7 @@ void script_modify(char *argument) {
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
 	vehicle_data *veh = NULL, *v_proto;
 	struct companion_data *cd;
-	char_data *mob = NULL;
+	char_data *mob = NULL, *m_proto;
 	obj_data *obj = NULL, *o_proto;
 	room_data *room = NULL;
 	bool clear;
@@ -1245,6 +1247,8 @@ void script_modify(char *argument) {
 	
 	// CHARACTER MODE
 	if ((mob = get_char(targ_arg))) {
+		m_proto = mob_proto(GET_MOB_VNUM(mob));	// maybe
+		
 		// player-targetable mods first
 		if (is_abbrev(field_arg, "companion")) {
 			if (!IS_NPC(mob)) {
@@ -1270,6 +1274,26 @@ void script_modify(char *argument) {
 		else if (is_abbrev(field_arg, "longdescription")) {
 			strcat(value, "\r\n");	// required by long descs
 			change_long_desc(mob, clear ? NULL : value);
+		}
+		else if (is_abbrev(field_arg, "lookdescription")) {	// SETS the lookdescription
+			strcat(value, "\r\n");	// required by look descs
+			change_look_desc(mob, clear ? NULL : value, TRUE);
+		}
+		else if (is_abbrev(field_arg, "append-lookdescription")) {	// ADDS TO THE END OF the lookdescription
+			if (strlen(NULLSAFE(GET_LOOK_DESC(mob))) + strlen(value) + 2 > MAX_PLAYER_DESCRIPTION) {
+				script_log("%%mod%% append-description: obj lookdescription length is too long (%d max)", MAX_PLAYER_DESCRIPTION);
+			}
+			else {
+				change_look_desc_append(mob, value, TRUE);
+			}
+		}
+		else if (is_abbrev(field_arg, "append-lookdesc-noformat")) {	// ADDS TO THE END OF the lookdescription without formatting
+			if (strlen(NULLSAFE(GET_LOOK_DESC(mob))) + strlen(value) + 2 > MAX_PLAYER_DESCRIPTION) {
+				script_log("%%mod%% append-description: obj lookdescription length is too long (%d max)", MAX_PLAYER_DESCRIPTION);
+			}
+			else {
+				change_look_desc_append(mob, value, FALSE);
+			}
 		}
 		else if (is_abbrev(field_arg, "sex")) {
 			if ((pos = search_block(value, genders, FALSE)) != NOTHING) {
