@@ -2582,6 +2582,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(str, slen, "%d", time_info.month + 1);
 				else if (!str_cmp(field, "year"))
 					snprintf(str, slen, "%d", time_info.year);
+				else if (!str_cmp(field, "day_of_year")) {
+					snprintf(str, slen, "%d", (time_info.month * 30) + time_info.day + 1);
+				}
 				else
 					*str = '\0';
 				return;
