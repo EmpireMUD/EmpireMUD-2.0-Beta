@@ -5215,6 +5215,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'm': {	// room.m*
+					if (!str_cmp(field, "max_citizens")) {
+						snprintf(str, slen, "%d", GET_BUILDING(HOME_ROOM(r)) ? GET_BLD_CITIZENS(GET_BUILDING(HOME_ROOM(r))) : 0);
+					}
+					break;
+				}
 				case 'n': {	// room.n*
 					if (!str_cmp(field, "name")) {
 						snprintf(str, slen, "%s",  get_room_name(r, FALSE));

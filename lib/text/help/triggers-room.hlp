@@ -187,6 +187,7 @@ When using field - The variable returns:
 &cin_city(true)&0 - Like in_city but also checks the one-hour city wait time.
 &cin_vehicle&0 - The vehicle the room is inside of, if any.
 &cis_outdoors&0 - True if it's on the map, in an outdoor adventure, etc.
+&cmax_citizens&0 - If a building, the max number of citizens who can live here.
 &cname&0 - The name of the room.
 &cpeople&0 - The id of the first character in the room, or an empty return.
 &cplayers_present&0 - True if there's at least 1 player in the room.
