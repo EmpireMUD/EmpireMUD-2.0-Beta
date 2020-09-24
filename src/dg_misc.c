@@ -1224,7 +1224,7 @@ void script_modify(char *argument) {
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
 	vehicle_data *veh = NULL, *v_proto;
 	struct companion_data *cd;
-	char_data *mob = NULL, *m_proto;
+	char_data *mob = NULL;
 	obj_data *obj = NULL, *o_proto;
 	room_data *room = NULL;
 	bool clear;
@@ -1247,8 +1247,6 @@ void script_modify(char *argument) {
 	
 	// CHARACTER MODE
 	if ((mob = get_char(targ_arg))) {
-		m_proto = mob_proto(GET_MOB_VNUM(mob));	// maybe
-		
 		// player-targetable mods first
 		if (is_abbrev(field_arg, "companion")) {
 			if (!IS_NPC(mob)) {
