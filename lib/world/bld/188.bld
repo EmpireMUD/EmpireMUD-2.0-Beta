@@ -11,7 +11,7 @@ across the room. The air is a little too cold, and as you watch your breath
 condense, you think you catch the reflection of someone moving out of the
 corner of your eye.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 18828 2 5 0
 R
@@ -79,8 +79,201 @@ dust is visible on their gleaming lids.
 ~
 F
 B
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
+S
+#18892
+Ossuary~
+An Underground Ossuary~
+&0[  ]~
+1 0 aq 0
+0 0 0 -1
+C
+tomb, sleep~
+D
+   The staircase descends into an ossuary filled with the bones of the dead. 
+One wall is lined with skulls, another with ribcages. The domed ceiling is made
+from interlocked femurs, and looking up at it is enough to send a chill down
+your spine. There's a hidden door under the stairs.
+~
+E
+door hidden~
+It appears to lead outside.
+~
+E
+skulls~
+The skulls seem to be staring at you.
+~
+F
+dB
+M
+18892 100.00 0
+S
+#18893
+Attic Bedroom~
+The Attic Bedroom~
+&0[  ]~
+1 0 aR 0
+0 0 0 -1
+C
+sleep~
+D
+   The attic's low, sloping ceilings force you to stoop. It's musty, but nicely
+appointed with velvet curtains and antique furniture. A small, dusty window
+lets you look out over the surroundings, but only if you get close enough to
+see through the haze.
+~
+E
+trunk corner~
+There's an old trunk in the corner but you can't get it open.
+~
+F
+d
+M
+18893 100.00 0
+S
+#18894
+Grand Staircase~
+The Grand Staircase~
+&0[  ]~
+1 0 a 0
+0 0 0 -1
+D
+   The center of the mansion is devoted to a grand staircase wide enough to
+march a full legion. At the top and bottom it links to smaller staircases
+leading to the attic and the basement.
+~
+M
+18894 100.00 0
+S
+#18895
+Library~
+The Library~
+&0[  ]~
+1 0 a 0
+0 0 0 -1
+C
+library, bookedit~
+D
+   The east wing of the mansion is a rather impressive library, filled to the
+ceiling with books. However, each time you pick up a book, you find it written
+in a different language that you cannot read. The shelves are covered in an
+inch of dust, but each time you blow the dust away, it settles back onto the
+same spot.
+~
+E
+books~
+None of the books seem to be in a language you can read.
+~
+E
+desk~
+   There's a note on the desk, but it's not in a language you can read. It is,
+however, written in blood.
+~
+E
+note~
+You can't read the note but it seems to be written in blood.
+~
+F
+l
+M
+18895 100.00 0
+S
+#18896
+Gallery~
+The Gallery~
+&0[  ]~
+1 0 a 0
+0 0 0 -1
+D
+   The west wing of the mansion is devoted to the gallery, filled with
+paintings, busts, and statues of long-dead residents. Opposite these works of
+art, the windows have been permanently covered with velvet drapes so that no
+sunlight enters the candle-lit room.
+~
+E
+paintings~
+The eyes of the paintings seem to follow you as you move about the room.
+~
+E
+busts~
+   The eyes of the busts seem to follow you as you move about the room. When
+you turn your back, you swear for a moment that you can hear one singing.
+~
+E
+statues~
+One of the statue looks like an angel with its face in its hands, weeping.
+~
+E
+windows drapes~
+The velvet drapes are closed, and you cannot seem to open them.
+~
+M
+18896 100.00 0
+S
+#18897
+Pumpkin Coach~
+In the Pumpkin Coach~
+&0[  ]~
+1 0 aq 0
+0 0 0 -1
+D
+   This elegant coach, being made from an enchanted pumpkin, has a rounded roof
+ending in a green stem at the top. The interior is surprisingly well-appointed
+and clean, although it retains the faint smell of pumpkin.
+~
+S
+#18898
+Pumpkin Coach~
+In the Pumpkin Coach~
+&0[  ]~
+1 0 aq 0
+0 0 0 -1
+D
+   This elegant coach, being made from an enchanted pumpkin, has a rounded roof
+ending in a green stem at the top. The interior is surprisingly well-appointed
+and clean, although it retains the faint smell of pumpkin. Although you can
+feel the coach tilt a little as it flies, the ride is surprisingly pleasant.
+~
+S
+#18899
+Stretching Room~
+The Stretching Room~
+&0[  ]~
+1 0 a 0
+0 1 0 -1
+D
+   This cobwebbed parlour might be called the stretching room because it's a
+place to stretch, put your feet up on a footstool, and chat about the ghastly
+state of the kingdom. Or perhaps it's because of the walls, which seem to
+stretch upward forever toward a ceiling that seems ever more distant. A coat
+rack stands near the door.
+~
+E
+ceiling up~
+It gives you vertigo to watch the ceiling recede.
+~
+E
+walls~
+   The vertically-striped wallpaper only makes the ceiling look that much
+further away. Well, it also makes the interior designer look tacky.
+~
+E
+cobwebs~
+You would think someone would have dusted before you got here.
+~
+E
+coatrack rack~
+   On further inspection, this isn't a coat rack at all. It's the other kind of
+rack.
+~
+E
+paintings~
+The paintings seem to watch you move.
+~
+M
+18899 100.00 0
+T 18899
 S
 $

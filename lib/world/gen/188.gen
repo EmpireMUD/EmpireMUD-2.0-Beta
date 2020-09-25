@@ -92,4 +92,71 @@ ghoul whistle~
 T0
 Your ghoul whistle cooldown has ended.~
 S
+#18854
+picking candy~
+3 0
+0 0 0 0
+S
+#18887
+flowers for the dead~
+4 0
+0 0 0 0
+T0
+The flower pollen seems to have faded.~
+T2
+The pollen from the flowers shimmers around you, tinkling like bells.~
+T3
+The pollen from the flowers shimmers around $n, tinkling like bells.~
+S
+#18890
+bibbidy~
+2 0
+0 0 0 0
+T0
+You shout, 'Bibbidy...'~
+T1
+$n shouts, 'Bibbidy...'~
+T2
+You shout, 'Bibbidy...'~
+T3
+$n shouts, 'Bibbidy...'~
+T4
+You shout, 'Bibbidy...'~
+T5
+$n shouts, 'Bibbidy...'~
+S
+#18891
+bobbidy~
+2 0
+0 0 0 0
+T0
+You shout, 'Bobbidy...'~
+T1
+$n shouts, 'Bobbidy...'~
+T2
+You shout, 'Bobbidy...'~
+T3
+$n shouts, 'Bobbidy...'~
+T4
+You shout, 'Bobbidy...'~
+T5
+$n shouts, 'Bobbidy...'~
+S
+#18892
+boo~
+2 0
+0 0 0 0
+T0
+You shout, 'Boo!'~
+T1
+$n shouts, 'Boo!'~
+T2
+You shout, 'Boo!'~
+T3
+$n shouts, 'Boo!'~
+T4
+You shout, 'Boo!'~
+T5
+$n shouts, 'Boo!'~
+S
 $

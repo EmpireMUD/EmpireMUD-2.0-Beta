@@ -334,9 +334,10 @@ A costume trunk is sitting here.~
    This trunk is filled with odds and ends to quickly put together a good
 costume. Type 'costume <citizen>' to put a costume onto a friendly citizen.
 ~
-3 ep a 0 4
+3 ep a 0 5
 18812 0 0
 0 0
+Q 18819
 T 18819
 S
 #18820
@@ -445,12 +446,25 @@ S
 manor unearthly deed~
 the deed to an unearthly manor~
 The deed to an unearthly manor is here.~
-This deed allows you to build the 'unearthlymanor' house.
+This deed allows you to build the 'unearthly manor' house.
 ~
-3 g a 0 3
+3 g a 0 4
 0 0 0
 0 0
 Q 18828
+S
+#18829
+bag goody goodie~
+a goody bag~
+A goody bag has been dropped here.~
+   This little goody bag feels like it might have something inside! Type 'open
+goody' to find out what's in there. But be sure to open it before the event
+ends, or you'll miss out.
+~
+3 p a 0 5
+0 0 0
+11 0
+T 18829
 S
 #18830
 shield bone glowing~
@@ -460,7 +474,7 @@ A glowing bone shield is resting on the ground.~
 filaments. The entire thing emits a strange orange glow, barely visible in
 daylight but overpowering at night.
 ~
-23 emp ao 0 1
+23 emp ao 0 3
 0 0 0
 14 0
 A
@@ -469,8 +483,8 @@ A
 13 4 0
 A
 18 4 0
-C
-0 275
+A
+5 1 6
 S
 #18831
 shield batwing wing leather~
@@ -481,7 +495,7 @@ it is somehow strong enough to repel a mace. The whole shield has been crafted
 into the shape of a single large bat wing, and gives a faint violet glow in the
 dark.
 ~
-23 emp ao 0 2
+23 emp ao 0 3
 0 0 0
 7 0
 A
@@ -490,8 +504,8 @@ A
 13 3 0
 A
 17 3 0
-C
-0 275
+A
+5 1 6
 S
 #18832
 talon cats cat's black~
@@ -502,7 +516,7 @@ larger with magic. Leather wrapped around the top forms a sort of handle, and
 the talon has been hardened with some black metal that glows red in faint
 light.
 ~
-1 mp ao f 5
+1 mp ao f 6
 0 3 4
 14 0
 A
@@ -513,8 +527,8 @@ A
 2 1 0
 A
 9 1 0
-C
-0 275
+A
+5 1 6
 S
 #18833
 tome nightmare empire~
@@ -524,7 +538,7 @@ The Tome of the Nightmare Empire is hidden in the corner.~
 arcane magic. In bright light, the book emits a black glow as it devours stray
 beams of light and leaves only nightmares in their place.
 ~
-3 emp ao 0 5
+3 emp ao 0 6
 0 0 0
 14 0
 A
@@ -535,8 +549,8 @@ A
 2 1 0
 A
 9 1 0
-C
-0 275
+A
+5 1 6
 S
 #18834
 skull valor~
@@ -547,15 +561,15 @@ point. The lower jaw is missing, and the flesh is long gone. But the faint red
 glow that pulses from the skull gives you the feeling that you could kill
 anyone.
 ~
-3 mp ao 0 6
+3 mp ao 0 7
 0 0 0
 14 0
 A
 2 1 0
 A
 17 6 0
-C
-0 275
+A
+5 1 6
 S
 #18835
 gourd flaming~
@@ -565,7 +579,7 @@ A flaming gourd burns brightly on the ground.~
 wildfire placed in its mouth. It emits a pale yellow light, clearly visible in
 darkness, though it casts no light on the room.
 ~
-3 emp ao 0 7
+3 emp ao 0 8
 0 0 0
 7 0
 A
@@ -574,8 +588,8 @@ A
 7 3 0
 A
 23 4 0
-C
-0 275
+A
+5 1 6
 S
 #18836
 bag candy oversized sized~
@@ -585,11 +599,9 @@ An oversized candy bag has been dropped here.~
 hold enough candy to last the winter. If only you could enchant it to hold even
 more...
 ~
-24 emp ar 0 3
+24 emp ar 0 4
 1 0 0
 11 0
-C
-0 275
 S
 #18837
 saddle headless centaurs centaur's~
@@ -599,15 +611,29 @@ The headless centaur's saddle is lying here.~
 bleeds every time it rides into battle. It is said this saddle was once used to
 ride a headless centaur in the Great War.
 ~
-2 emp as 0 2
+2 emp as 0 3
 0 0 0
 2 0
 A
 11 5 0
 A
 6 1 0
-C
-0 275
+S
+#18838
+ectoplasm vial swirling~
+a vial of swirling ectoplasm~
+A vial of ectoplasm is lying here.~
+   This little glass vial is filled with a swirling orange and green liquid
+that can only be ectoplasm. This strange substance is said to come from the
+spirit world. It purportedly alters anything it comes in contact with. You can
+use it to upgrade the plague doctor mask, oversized candy bag, ghastly
+shackles, or haunted mask.
+Usage:  upgrade <item>
+~
+3 p a 0 3
+0 0 0
+8 0
+T 18838
 S
 #18839
 whistle headless horse~
@@ -650,12 +676,12 @@ A tray of candy apples is sitting on the ground.~
 irresistible. Through some strange magic, the apples actually grow this way on
 the tree. Perhaps some clever mage has cross-bred them with caramels.
 ~
-6 b a 0 6
+6 bg a 0 7
 36 18842 0
 7 168
 O+ 1 6131
 R
-5114 0
+4 5114 0
 S
 #18843
 caramel piece~
@@ -689,11 +715,11 @@ still get some good lumber out of it.
 3 e a 0 5
 0 0 0
 0 0
-I 11 1002 100.00 1  # LIGHT: a roaring fire
-I 17 125 100.00 2  # SAW: a stack of lumber
+I 11 1002 100.00 1  # LIGHT: roaring fire
+I 17 125 100.00 2  # SAW: stack of lumber
 O+ 1 6010
 R
-5118 0
+4 5118 0
 S
 #18846
 seeds candy~
@@ -721,11 +747,13 @@ forms, if you have the right skills:
 
 You must take off the mask to use these morphs.
 ~
-2 p ae 0 3
+2 mp ae 0 4
 0 0 0
 0 0
 A
 5 1 0
+A
+5 1 3
 S
 #18849
 dead spirits~
@@ -741,10 +769,10 @@ S
 instructions offering metal~
 the metal offering instructions~
 The metal offering instructions are lying here.~
-   Take 10x (common metal) to 'offer' at 5 different tombs to complete this
-quest. Common metals include iron and bronze ingots.
+   Take 10x (common metal ingots) to 'offer' at 5 different tombs to complete
+this quest. Common metals include iron and bronze ingots.
 ~
-3 0 a 0 8
+3 0 a 0 9
 5 0 0
 0 0
 Q 18829
@@ -754,10 +782,10 @@ S
 instructions offering block~
 the block offering instructions~
 The block offering instructions are lying here.~
-   Take 10x (block) to 'offer' at 5 different tombs to complete this quest.
+   Take 10x (blocks) to 'offer' at 5 different tombs to complete this quest.
 You can use stone blocks or piles of bricks for the offerings.
 ~
-3 0 a 0 9
+3 0 a 0 10
 5 0 0
 0 0
 Q 18830
@@ -767,10 +795,10 @@ S
 instructions rock offering~
 the rock offering instructions~
 The rock offering instructions are lying here.~
-   Take 10x (rock) to 'offer' at 5 different tombs to complete this quest. Any
-generic rock, including flint and obsidian, will work.
+   Take 10x (rocks) to 'offer' at 5 different tombs to complete this quest.
+Any generic rock, including flint and obsidian, will work.
 ~
-3 0 a 0 11
+3 0 a 0 12
 5 0 0
 0 0
 Q 18831
@@ -780,14 +808,501 @@ S
 instructions offering fiber~
 the fiber offering instructions~
 The fiber offering instructions are lying here.~
-   Take 10x (plant fiber) to 'offer' at 5 different tombs to complete this
+   Take 10x (plant fibers) to 'offer' at 5 different tombs to complete this
 quest. Common types of plant fiber are straw, sticks, leaves, branches, vines,
 and cotton.
 ~
-3 0 a 0 10
+3 0 a 0 11
 5 0 0
 0 0
 Q 18832
 T 18848
+S
+#18854
+bag grab~
+a grab bag~
+A simple grab bag is folded over here.~
+   From the squared off bottom, to the folded over top, this bag is completely
+boring to look at. But you know that it is where you'll be hiding your
+pickpocketed candy from the citizens of your empire.
+~
+3 k a 0 2
+0 0 0
+11 0
+C
+1 1
+Q 18854
+T 18854
+S
+#18855
+candy fresh picked~
+some freshly picked candy~
+A small pack of freshly picked candy waits to be eaten.~
+   Doesn't quite matter to you what kind, and it isn't likely the spirit will
+care either. Just as long as you have five packs to turn in.
+~
+6 k a 0 1
+0 0 0
+7 0
+C
+1 1
+Q 18854
+S
+#18856
+mirror magic~
+a magic mirror~
+A mirror, clearly coated in magic, floats around face height.~
+   If you're seeing this, then report it to the immortals. This should be
+hidden text.
+~
+3 k a 0 3
+0 0 0
+10 0
+C
+1 1
+Q 18856
+T 18856
+S
+#18857
+bucket bobbing~
+apple bobbing bucket~
+The apple-bobbing bucket is set up here waiting for players.~
+   This wooden bucket is on the larger side and filled with water and apples.
+* challenge <player>
+* bob bucket
+~
+3 z a 0 6
+0 0 0
+0 0
+C
+1 1
+T 18857
+T 18858
+T 18859
+T 18860
+S
+#18869
+sheet music~
+sheet music~
+A sheet of haunting music is folded here.~
+   Carefully hand drawn on a scroll of velum skin, there's music to play a
+haunting melody with nearly any instrument.
+~
+3 0 a 0 4
+0 0 0
+7 0
+C
+1 1
+Q 18869
+T 18869
+S
+#18870
+sheet music~
+sheet music~
+A sheet of haunting music is folded here.~
+   Carefully hand drawn on a scroll of velum skin, there's music to play a
+haunting melody with nearly any instrument.
+~
+3 0 a 0 5
+0 0 0
+7 0
+C
+1 1
+Q 18870
+T 18869
+S
+#18871
+sheet music~
+sheet music~
+A sheet of haunting music is folded here.~
+   Carefully hand drawn on a scroll of velum skin, there's music to play a
+haunting melody with nearly any instrument.
+~
+3 0 a 0 5
+0 0 0
+7 0
+C
+1 1
+Q 18871
+T 18869
+S
+#18877
+xylophone rib cage~
+a rib cage xylophone~
+A rib cage xylophone has been set up here.~
+   This macabre instrument seems to be made from rib bones. On looking closer,
+you think they're probably human rib bones and it makes you worry about the
+small ones. A few taps at the xylophone release a haunting, ethereal sound. 
+The music it makes might be macabre enough to make even dead men danse.
+   Hold the xylophone and type 'play' to use it.
+~
+22 0 ao 0 2
+0 0 0
+0 0
+M
+2
+The rib cage xylophone releases melodic groans as you strike its bars.~
+M
+3
+A rib cage xylophone releases melodic groans as $n strikes its bars.~
+M
+2
+Eerie music fills the air as you play $p.~
+M
+3
+Eerie music fills the air as $n plays $p.~
+M
+2
+A chill runs up your spine as you play $p.~
+M
+3
+A chill runs up your spine as $n plays $p.~
+M
+2
+As you play the rib cage xylophone, you can almost feel the spirits dancing around you.~
+M
+3
+The melodic tones of $n's rib cage xylophone remind you that you, too, will die.~
+S
+#18878
+vial ooze magi-genic magigenic~
+a vial of magi-genic ooze~
+A vial of magi-genic ooze is lying here.~
+   The contents of this vile vial are so purely purile that you're not sure
+what to make of them. The vial's label claims this ooze can make certain mounts
+fly. You can use it on your headless horse or giant tarantula. You must already
+have one of these as a mount, and you must be at a stable.
+Usage:  use ooze <headless horse OR giant tarantula>
+~
+3 p a 0 1
+0 0 0
+8 0
+T 18878
+S
+#18879
+whistle tarantula~
+a tarantula whistle~
+A tarantula whistle is lying here.~
+   Using this whistle will summon a giant tarantula mount. If it's as hairy as
+the whistle, you're not sure you want to see it.
+~
+3 p a 0 7
+18879 0 0
+14 0
+T 9910
+S
+#18880
+parchment old~
+an old parchment~
+An old parchment is lying here.~
+   This old parchment will be perfect for painting your grandmother. The only
+problem is you need to find her spirit first. Head to her tomb (or any tomb,
+really) and type 'invoke ancestor'. Afterwards, head to your family home (or
+any home, really) and type 'paint spirit'.
+~
+3 p a 0 1
+0 0 0
+0 0
+C
+1 1
+Q 18880
+T 18880
+S
+#18881
+portrait grandmother~
+a portrait of grandmother~
+A portrait of grandmother is lying here.~
+   The portrait is of an elegant elderly woman in a mauve dress, standing in
+her family home. It's obvious the artist took great care in creating this
+loving image.
+~
+3 p a 0 2
+0 0 0
+0 0
+C
+1 1
+Q 18880
+T 18881
+S
+#18882
+portrait grandmother~
+a portrait of grandmother~
+A portrait of grandmother has been placed on the tomb.~
+   The portrait has been careful placed atop an old tomb, surrounded by
+marigolds. The portrait is of an elegant elderly woman in a mauve dress,
+standing in her family home. It's obvious the artist took great care in
+creating this loving image.
+~
+3 0 0 0 2
+0 0 0
+0 576
+C
+1 1
+M
+18
+$p crumbles to dust and blows away.~
+S
+#18883
+shackles ghastly set~
+ghastly shackles~
+A set of ghastly shackles are hanging in thin air.~
+   These shackles seem at once to be both solid iron and ethereal smoke. But
+when you wear them, you feel a phantasmal lightness. And for some reason, you
+keep seeing ghosts.
+~
+2 mp aj 0 1
+0 0 0
+2 0
+A
+19 1 0
+A
+11 1 0
+A
+6 2 0
+A
+5 1 3
+M
+12
+$n seems to fade in and out like a ghost.~
+S
+#18884
+mask doctor plague~
+a plague doctor mask~
+A plague doctor mask is lying on the ground.~
+   This eccentric leather mask has been fashioned in the shape of a large beak,
+to make the wearer look like a vulture. Smoked glass lenses block the wearer's
+eyes but amplify the impression that you are looking at an enormous bird. It is
+said these masks protect you from disease, because birds are commonly known to
+be immune to the plague.
+~
+2 mp ae 0 6
+0 0 0
+11 0
+A
+5 1 0
+A
+5 1 3
+T 18884
+S
+#18885
+whistle well-stitched stitched~
+a well-stitched whistle~
+A well-stitched whistle is lying here.~
+This whistle grants to a zombie terrier mini-pet. Use the whistle to get it.
+~
+19 p a 0 5
+18885 0 0
+2 0
+S
+#18886
+coins copper roll~
+a roll of copper coins~
+A roll of copper coins is lying here.~
+It looks like someone rolled 10 worthless coins in a little wrapper.
+~
+15 0 a 0 2
+1 0 0
+2 0
+R
+4 5611 a
+S
+#18887
+marigold lovely~
+a lovely marigold~
+A lovely marigold has been dropped on the ground.~
+   This little yellowish-orange flower has a beautiful maze of petals across
+its top, in the shape of a little ball. These flowers are often used in rituals
+of remembrance for the dead.
+~
+3 p a 0 2
+0 0 0
+0 1024
+C
+1 1
+T 18887
+S
+#18888
+chrysanthemum mum elegant~
+an elegant chrysanthemum~
+An elegant chrysanthemum is lying here.~
+   This large, showy flower is the chrysanthemum, or mum. Its many long,
+curving petals give it an elegant appearance that stands out even at a
+distance. These flowers are often placed on graves in remembrance of the dead.
+~
+3 p a 0 3
+0 0 0
+0 1024
+C
+1 1
+T 18887
+S
+#18889
+rose black single~
+a single black rose~
+A black rose has fallen on the ground.~
+   This thorny rose is nearly pure black, with a deep reddish-purple hue in
+bright light. Though roses symbolize many thing, from love to respect, this
+black rose represents only death.
+~
+3 p a 0 4
+0 0 0
+0 1024
+C
+1 1
+T 18887
+S
+#18890
+pumpkin large~
+a large pumpkin~
+A large pumpkin is sitting on the ground.~
+   This orange pumpkin is as big as your head -- maybe bigger! The bottom is
+slightly bruised, and there's still some dirt on the pumpkin from its time in
+the garden. At the top, the long vertical ridges on the pumpkin converge at a
+short green stem. You can craft a jack-o-lantern or bake a roast pumpkin from
+this.
+~
+6 bg a 0 12
+12 18890 0
+7 168
+C
+1 1
+I 25 18891 100.00 2  # SEED: bunch of pumpkin seeds
+O+ 1 6152
+R
+4 5606 0
+R
+4 5610 0
+S
+#18891
+seeds pumpkin bunch~
+a bunch of pumpkin seeds~
+Some pumpkin seeds are scattered here.~
+The oval seeds are pale and tough. Try baking roast pumpkin seeds.
+~
+3 b a 0 10
+0 18890 0
+7 1152
+C
+1 1
+R
+4 5210 0
+S
+#18892
+blossom pumpkin~
+a pumpkin blossom~
+A pumpkin blossom has fallen here.~
+   This large yellow flower has a certain elegance that smaller flowers never
+achieve, like a little blossom wearing a flowing dress. You've heard that some
+people eat these flowers.
+~
+6 g a 0 1
+1 0 0
+0 48
+C
+1 1
+O+ 1 6142
+S
+#18893
+pumpkin roast~
+a roast pumpkin~
+A roast pumpkin is lying here.~
+   The pumpkin has taken on a dark orange color -- almost brown. It's mushy,
+but tastes a lot better than it did fresh.
+~
+6 gm a 0 12
+24 18890 0
+7 1680
+A
+19 1 0
+C
+50 50
+O+ 1 6241
+S
+#18894
+seeds roasted pumpkin~
+some roasted pumpkin seeds~
+Some roast pumpkin seeds have been dropped here.~
+These seeds have been roasted and they taste great.
+~
+6 m a 0 11
+0 0 0
+0 1680
+A
+11 1 0
+C
+50 50
+S
+#18895
+jack-o-lantern lantern jackolantern unlit~
+an unlit jack-o-lantern~
+An unlit jack-o-lantern is sitting here.~
+   This big orange pumpkin has been cut to look like a face, and an unlit
+candle has been placed inside.
+~
+3 0 ao 0 4
+0 0 0
+7 168
+C
+1 1
+I 11 18896 100.00 1  # LIGHT: lit jack-o-lantern
+R
+4 5121 0
+R
+4 5610 0
+R
+4 5606 0
+S
+#18896
+jack-o-lantern lantern jackolantern lit~
+a lit jack-o-lantern~
+A lit jack-o-lantern is casting an eerie light.~
+   This big orange pumpkin has been carved to look like a face. A bright candle
+inside casts a spooky light all around you.
+~
+3 c ao 0 4
+0 0 0
+7 36
+C
+1 1
+S
+#18897
+spell parchment pumpkin coach~
+the pumpkin coach spell~
+A parchment is lying on the ground with the spell for a pumpkin coach.~
+   This little scrap of parchment contains an amazing spell which can make an
+ordinary pumpkin large enough to create an elegant traveling coach.
+Usage:  make pumpkin coach
+~
+3 p a 0 4
+0 0 0
+0 0
+S
+#18898
+spell parchment pumpkin coach flying~
+the flying pumpkin coach spell~
+A parchment is lying on the ground with the spell for a flying pumpkin coach.~
+This amazing spell will allow a pumpkin coach to fly!
+Usage:  enchant coach
+~
+3 p a 0 6
+0 0 0
+0 0
+T 18898
+S
+#18899
+snowglobe globe haunted~
+a haunted snowglobe~
+A haunted snowglobe is lying here.~
+   The snowglobe depicts an old-style mansion, with tall columns at the front
+and a manicured garden. The snow which falls perpetually inside the globe is,
+on closer inspection, ash. And the grass around the little mansion appears to
+be dead. Etched into the snowglobe's base are the words 'build haunted
+mansion'.
+~
+3 p a 0 2
+0 0 0
+8 0
+C
+1 1
 S
 $

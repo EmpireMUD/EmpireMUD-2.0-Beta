@@ -1,0 +1,45 @@
+#18800
+Halloween of the Dead~
+   Hey all you crazy ghosts and goblins, it's time for another Halloween! From
+October 1 to November 2, you'll find pieces of candy when you kill mobs
+anywhere in the world. Each type of candy starts a daily quest that will earn
+you points toward this event. There's a fixed number of points available, so be
+sure to grab them all each day!
+~
+   That's all for this Halloween, ghosts and ghouls, but don't worry: the
+winter holiday is just around the corner. And you'll definitely see the
+headless centaur again next year.
+~
+~
+11 0 0 1 400 47520 -1
+R 1 1 2 11501 1
+R 1 1 2 18898 1
+R 1 1 2 18838 1
+R 1 1 2 11514 1
+R 1 25 2 18878 1
+R 1 25 2 18838 1
+R 1 25 2 11514 1
+R 2 25 2 11502 1
+R 1 50 2 18838 1
+R 1 50 2 11513 1
+T 10 0 2 11513 1
+T 20 0 2 263 1
+T 30 0 2 11513 1
+T 50 0 2 18891 1
+T 80 0 2 11513 1
+T 100 0 2 18897 1
+T 150 0 2 11513 1
+T 200 0 2 11513 1
+T 250 0 2 18818 1
+T 300 0 2 18884 1
+T 350 0 2 11513 1
+T 400 0 2 18877 1
+T 450 0 2 11514 1
+T 500 0 2 18836 1
+T 550 0 2 11514 1
+T 600 0 2 11514 1
+T 650 0 2 18883 1
+T 700 0 2 11503 1
+T 750 0 2 18899 1
+S
+$

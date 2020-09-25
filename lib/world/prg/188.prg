@@ -14,4 +14,16 @@ W
 W
 7 18844 0 1 a
 S
+#18829
+You Chose 'Treat'~
+   Between the various members of your empire, you have collected a hundred
+goody bags! Hope they're as fun to open as they were to collect.
+~
+1 4 0 5 ad
+K 7 5
+W
+36 18800 0 1 a
+W
+34 18829 0 100 a
+S
 $
