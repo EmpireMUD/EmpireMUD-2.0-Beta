@@ -2151,6 +2151,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 				HASH_DEL(GET_MOUNT_LIST(vict), mentry);
 				free(mentry);
 				sprintf(output, "%s: removed mount %d %s.", GET_NAME(vict), GET_MOB_VNUM(mount), GET_SHORT_DESC(mount));
+				if (GET_MOUNT_VNUM(vict) == GET_MOB_VNUM(mount)) {
+					GET_MOUNT_VNUM(vict) = NOTHING;
+				}
 			}
 			else {
 				msg_to_char(ch, "%s does not have that mount.\r\n", GET_NAME(vict));

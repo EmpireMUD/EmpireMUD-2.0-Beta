@@ -184,7 +184,7 @@ void do_mount_current(char_data *ch) {
 	if (IS_RIDING(ch)) {
 		msg_to_char(ch, "You're already mounted.\r\n");
 	}
-	else if (GET_MOUNT_VNUM(ch) == NOTHING || !mob_proto(GET_MOUNT_VNUM(ch))) {
+	else if (GET_MOUNT_VNUM(ch) == NOTHING || !find_mount_data(ch, GET_MOUNT_VNUM(ch)) || !mob_proto(GET_MOUNT_VNUM(ch))) {
 		msg_to_char(ch, "You don't have a current mount set.\r\n");
 	}
 	else if (IS_MORPHED(ch)) {

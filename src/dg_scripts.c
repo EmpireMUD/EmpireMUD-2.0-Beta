@@ -4224,8 +4224,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							
 							// unmount first?
 							if (GET_MOUNT_VNUM(c) == atoi(subfield)) {
-								ACMD(do_dismount);
-								do_dismount(c, "", 0, 0);
+								if (IS_RIDING(c)) {
+									ACMD(do_dismount);
+									do_dismount(c, "", 0, 0);
+								}
+								GET_MOUNT_VNUM(c) = NOTHING;
 							}
 							
 							// remove data
