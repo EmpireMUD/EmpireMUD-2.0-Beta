@@ -1479,7 +1479,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 						i = temp;
 					}
 					else {
-						i = "an empire";
+						i = "imperial";
 					}
 					break;
 				}
@@ -1490,7 +1490,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 						i = temp;
 					}
 					else {
-						i = "an empire";
+						i = "imperial";
 					}
 					break;
 				}
