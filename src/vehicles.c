@@ -1331,6 +1331,10 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		problem = TRUE;
 	}
 	
+	if (!has_interaction(VEH_INTERACTIONS(veh), INTERACT_RUINS_TO_VEH)) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "No RUINS-TO-VEH interactions");
+		problem = TRUE;
+	}
 	if (has_interaction(VEH_INTERACTIONS(veh), INTERACT_RUINS_TO_BLD)) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "Has RUINS-TO-BLD interaction; this won't work on vehicles");
 		problem = TRUE;
