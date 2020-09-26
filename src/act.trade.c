@@ -1255,6 +1255,7 @@ void process_gen_craft(char_data *ch) {
 	}
 	else if (GET_CRAFT_REQUIRES_TOOL(type) && !(tool = has_all_tools(ch, GET_CRAFT_REQUIRES_TOOL(type)))) {
 		msg_to_char(ch, "You aren't using the right tool to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		cancel_gen_craft(ch);
 	}
 	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
 		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags_long, buf);
@@ -1265,6 +1266,7 @@ void process_gen_craft(char_data *ch) {
 		else {	// no comma
 			msg_to_char(ch, "You must be %s to keep %s that.\r\n", buf, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		}
+		cancel_gen_craft(ch);
 	}
 	else {
 		GET_ACTION_TIMER(ch) -= 1;
