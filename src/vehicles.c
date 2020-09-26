@@ -3971,7 +3971,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	
-	if (VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto)) {
+	if (proto && VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto) && !strchr(VEH_SHORT_DESC(proto), '#')) {
 		msg_to_char(ch, "Type: %s\r\n", skip_filler(VEH_SHORT_DESC(proto)));
 	}
 	
