@@ -8426,7 +8426,7 @@ If you are going to use the worn-as-armor wear location, or are planning to
 give the item good stats, you should usually be using the ARMOR item type
 instead.
 #d
-"DOLLAR SIGN CODES" "DOLLARSIGN CODES" $$ $$n $$e $$v $$m $$p $$o $$p $$v
+"DOLLAR SIGN CODES" "DOLLARSIGN CODES" $$ $$n $$e $$v $$m $$p $$o $$p $$v $$k $$l
 
 EmpireMUD uses the so-called dollar sign codes in a function called act(),
 which is used to send action text to people in the game. Usually this only
@@ -8439,6 +8439,8 @@ Player variables:
  $e - he/she/it for the actor           $E - he/she/it for 2nd person
  $m - him/her/it for the actor          $M - him/her/it for 2nd person
  $s - his/her/its for the actor         $S - his/her/its for 2nd person
+ $l - empire name for the actor         $L - empire name for the 2nd person
+ $k - empire adjective for actor        $K - empire adjective for 2nd person
 
 Item variables:
  $p - short desc for the 1st item       $P - short desc for the 2nd item
