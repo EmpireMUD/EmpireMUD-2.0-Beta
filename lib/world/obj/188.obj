@@ -32,7 +32,7 @@ like someone might have dropped it, so it might be a bit dodgy. These candies
 start some of the daily Halloween quests -- look for more types of candy to
 find more quests.
 ~
-6 m a 0 9
+6 m a 0 10
 24 0 0
 0 72
 A
@@ -45,7 +45,6 @@ You savor $p but begin to feel dodgy.~
 M
 5
 $n savors $p.~
-T 18800
 S
 #18803
 candy bonkers~
@@ -54,7 +53,7 @@ Some candy bonkers are on the ground.~
    This candy sure packs a punch. These candies start some of the daily
 Halloween quests -- look for more types of candy to find more quests.
 ~
-6 m a 0 7
+6 m a 0 8
 24 0 0
 0 72
 A
@@ -67,7 +66,6 @@ You pop $p in your mouth.~
 M
 5
 $n pops $p in $s mouth.~
-T 18800
 S
 #18804
 smarties handfull~
@@ -77,14 +75,13 @@ A handful of smarties have been scattered here.~
 of the daily Halloween quests -- look for more types of candy to find more
 quests.
 ~
-6 m a 0 7
+6 m a 0 8
 24 0 0
 0 72
 A
 7 1 0
 C
 1 1
-T 18800
 S
 #18805
 candy bar fullsize full-size~
@@ -94,14 +91,13 @@ A full-size candy bar has been foolishly left behind.~
 These candies start some of the daily Halloween quests -- look for more types
 of candy to find more quests.
 ~
-6 m a 0 7
+6 m a 0 8
 24 0 0
 0 72
 A
 4 1 0
 C
 1 1
-T 18800
 S
 #18806
 candy stolen~
@@ -111,14 +107,13 @@ Some stolen candy has been dropped here.~
 start some of the daily Halloween quests -- look for more types of candy to
 find more quests.
 ~
-6 m a 0 7
+6 m a 0 8
 24 0 0
 0 72
 A
 19 1 0
 C
 1 1
-T 18800
 S
 #18807
 sticks pixy~
@@ -128,14 +123,13 @@ Some pixy sticks are lying on the ground.~
 start some of the daily Halloween quests -- look for more types of candy to
 find more quests.
 ~
-6 m a 0 7
+6 m a 0 8
 24 0 0
 0 72
 A
 6 1 0
 C
 1 1
-T 18800
 S
 #18808
 heads demon sour~
@@ -145,14 +139,13 @@ Some sour demon heads have been scattered here.~
 part is merely a coating, though. These candies start some of the daily
 Halloween quests -- look for more types of candy to find more quests.
 ~
-6 m a 0 7
+6 m a 0 8
 24 0 0
 0 72
 A
 20 1 0
 C
 1 1
-T 18800
 S
 #18809
 stoppers goblin everlasting lasting~
@@ -162,14 +155,13 @@ Some everlasting goblin stoppers are scattered on the ground.~
 These candies start some of the daily Halloween quests -- look for more types
 of candy to find more quests.
 ~
-6 m a 0 9
+6 m a 0 10
 24 0 0
 0 72
 A
 21 1 0
 C
 1 1
-T 18800
 S
 #18810
 candy fireball ball manatomic atomic~
@@ -178,7 +170,7 @@ A manatomic fireball candy is hovering here.~
    This candy is bright red and ready to explode! These candies start some of
 the daily Halloween quests -- look for more types of candy to find more quests.
 ~
-6 m a 0 9
+6 m a 0 10
 24 0 0
 0 72
 A
@@ -191,7 +183,6 @@ Smoke comes out of $n's ears as $e eats a manatomic fireball.~
 M
 4
 You feel as if smoke comes out of your ears as you eat $p.~
-T 18800
 S
 #18811
 wafers necro~
@@ -201,15 +192,13 @@ Some necro wafers are rotting on the ground.~
 start some of the daily Halloween quests -- look for more types of candy to
 find more quests.
 ~
-6 m a 0 10
+6 m a 0 11
 24 0 0
 0 72
 A
 23 1 0
 C
 1 1
-T 18800
-T 18800
 S
 #18812
 costume ghost~
@@ -914,12 +903,12 @@ T 18869
 S
 #18871
 sheet music~
-sheet music~
-A sheet of haunting music is folded here.~
+a medical report~
+A medical report about a headless centaur's victim is folded here.~
    Carefully hand drawn on a scroll of velum skin, there's music to play a
 haunting melody with nearly any instrument.
 ~
-3 0 a 0 5
+3 0 a 0 6
 0 0 0
 7 0
 C

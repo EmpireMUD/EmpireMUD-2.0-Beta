@@ -2,6 +2,9 @@
 Summon ghost with candy~
 1 c 2
 sacrifice~
+* This is no longer used as of Oct 2020
+return 0
+halt
 * discard arguments after the first
 set arg %arg.car%
 if %actor.obj_target(%arg%)% != %self%
@@ -897,11 +900,11 @@ if %target.empire% != %actor.empire%
   return 0
   halt
 end
-if (%target.vnum% < 200 || %target.vnum% > 203)
+if %target.mob_flagged(*PICKPOCKETED)%
   return 0
   halt
 end
-if %target.mob_flagged(*PICKPOCKETED)%
+if !%target.mob_flagged(human)%
   return 0
   halt
 end
@@ -932,7 +935,6 @@ if %stealth_roll% > 10
   %send% %actor% You find %item.shortdesc%!
   return 1
 else
-  %send% %actor% It doesn't seem like %target.name% has any candy.
   return 0
 end
 if %actor.quest_finished(18854)%
@@ -1335,37 +1337,35 @@ set actor %self.carried_by%
 if %actor.action% == playing
   switch %questid%
     case 18869
-      if !%actor.room.in_city%
-        set music_score %self.music_score%
-        set roll %random.100%
-        if %music_score% >= %roll%
-          set person %self.room.people%
-          while %person%
+      set music_score %self.music_score%
+      set roll %random.100%
+      if %music_score% >= %roll%
+        set person %self.room.people%
+        while %person%
+          if %actor.empire% != %person.empire%
             if !%person.mob_flagged(animal)%
               if %person.mob_flagged(hard)% || %person.mob_flagged(group)%
                 set target %person%
                 unset person
               end
             end
-            set person %person.next_in_room%
-          done
-          if !%target%
-            %send% %actor% You don't notice anyone here dangerous enough to soothe.
-            halt
-          else
-            %force% %target% madventurecomplete
-            wait 1
-            %force% %target% say Well, it isn't the Transylvania Twist, but it will do.
-            %echo% %target.name% starts to energetically monster mash away from you.
-            %purge% %target%
-            %quest% %actor% trigger %questid%
           end
+          set person %person.next_in_room%
+        done
+        if !%target%
+          %send% %actor% You don't notice anyone here dangerous enough to soothe.
+          halt
         else
-          eval music_score %music_score% + 25
-          remote music_score %self.id%
+          %force% %target% madventurecomplete
+          wait 1
+          %force% %target% say Well, it isn't the Transylvania Twist, but it will do.
+          %echo% %target.name% starts to energetically monster mash away from you.
+          %purge% %target%
+          %quest% %actor% trigger %questid%
         end
       else
-        %send% %actor% You really would rather not try soothing the souls of anyone loyal to your empire, just in case.
+        eval music_score %music_score% + 25
+        remote music_score %self.id%
       end
     break
     case 18870

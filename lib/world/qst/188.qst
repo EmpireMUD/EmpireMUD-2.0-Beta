@@ -368,7 +368,7 @@ S
 #18857
 Halloween: Bobbing for Apples~
    You're going to need to interact with another player this time. The spirits
-gift you with an apple bobbing bucket, and now its time to have some fun. 
+gift you with an apple bobbing bucket, and now its time to have some fun.
 Challenge another player to an apple bobbing contest and get the biggest one to
 complete this quest.
 ~
@@ -392,15 +392,16 @@ W
 S
 #18869
 Halloween: Songs for the Deaths Yet to Come~
-   It's been said that music soothes the soul. Now you can prove it. Take this
+It's been said that music soothes the soul. Now you can prove it. Take this
 haunting sheet music and play for something threatening until they accept the
 pacification and leave. Look for something that would take more than one
-adventurer to defeat in combat, otherwise it'll be a waste of your time.
+adventurer to defeat in combat, otherwise it'll be a waste of your time. Of
+course, you also want to be sure you aren't weakening your empire either.
 ~
    Seems that music really can soothe the savage soul... Or at least failing
 that, it can get them dancing!
 ~
-10 e 0 0 -1
+11 e 0 0 -1
 A
 2 18806
 A
