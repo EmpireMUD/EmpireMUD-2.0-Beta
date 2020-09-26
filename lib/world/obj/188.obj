@@ -871,7 +871,7 @@ The apple-bobbing bucket is set up here waiting for players.~
 * challenge <player>
 * bob bucket
 ~
-3 z a 0 6
+3 z a 0 7
 0 0 0
 0 0
 C
@@ -926,13 +926,25 @@ C
 Q 18871
 T 18869
 S
+#18876
+block butcher's butchers reddened~
+a reddened butcher's block~
+A reddened butcher's block has been dropped here.~
+   This hefty piece of wood has more than a few scars where it has nearly been
+split with a cleaver, and the color is suspiciously red. Use this block to
+build a 'slaughterhouse'.
+~
+3 p a 0 1
+0 0 0
+0 0
+S
 #18877
 xylophone rib cage~
 a rib cage xylophone~
 A rib cage xylophone has been set up here.~
    This macabre instrument seems to be made from rib bones. On looking closer,
 you think they're probably human rib bones and it makes you worry about the
-small ones. A few taps at the xylophone release a haunting, ethereal sound. 
+small ones. A few taps at the xylophone release a haunting, ethereal sound.
 The music it makes might be macabre enough to make even dead men danse.
    Hold the xylophone and type 'play' to use it.
 ~
@@ -1112,9 +1124,10 @@ a lovely marigold~
 A lovely marigold has been dropped on the ground.~
    This little yellowish-orange flower has a beautiful maze of petals across
 its top, in the shape of a little ball. These flowers are often used in rituals
-of remembrance for the dead.
+of remembrance for the dead. Drop the marigold at a grave and perhaps something
+special will happen.
 ~
-3 p a 0 2
+3 p a 0 3
 0 0 0
 0 1024
 C
@@ -1128,8 +1141,9 @@ An elegant chrysanthemum is lying here.~
    This large, showy flower is the chrysanthemum, or mum. Its many long,
 curving petals give it an elegant appearance that stands out even at a
 distance. These flowers are often placed on graves in remembrance of the dead.
+Drop the chrysanthemum at a grave and see what happens.
 ~
-3 p a 0 3
+3 p a 0 4
 0 0 0
 0 1024
 C
@@ -1142,9 +1156,10 @@ a single black rose~
 A black rose has fallen on the ground.~
    This thorny rose is nearly pure black, with a deep reddish-purple hue in
 bright light. Though roses symbolize many thing, from love to respect, this
-black rose represents only death.
+black rose represents only death. Drop the rose at a grave and perhaps
+something unexpected will happen.
 ~
-3 p a 0 4
+3 p a 0 5
 0 0 0
 0 1024
 C

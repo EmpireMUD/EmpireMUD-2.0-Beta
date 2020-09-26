@@ -11,7 +11,7 @@ winter holiday is just around the corner. And you'll definitely see the
 headless centaur again next year.
 ~
 ~
-11 0 0 1 400 47520 -1
+12 0 0 1 400 47520 -1
 R 1 1 2 11501 1
 R 1 1 2 18898 1
 R 1 1 2 18838 1
@@ -20,6 +20,7 @@ R 1 25 2 18878 1
 R 1 25 2 18838 1
 R 1 25 2 11514 1
 R 2 25 2 11502 1
+R 1 50 2 18876 1
 R 1 50 2 18838 1
 R 1 50 2 11513 1
 T 10 0 2 11513 1

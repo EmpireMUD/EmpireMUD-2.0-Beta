@@ -83,6 +83,24 @@ I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 S
+#18876
+Slaughterhouse~
+The Slaughterhouse~
+&0[  ]~
+1 0 ag 0
+0 0 0 18877
+C
+retrieve, store~
+D
+   The inside of the slaughterhouse has a faintly nauseating smell. The walls
+have been striped with red until they nearly look plaid, and every instrument
+and work surface has taken on a deep reddish hue.
+~
+M
+18876 100.00 0
+U
+1 5119
+S
 #18892
 Ossuary~
 An Underground Ossuary~
@@ -92,7 +110,7 @@ An Underground Ossuary~
 C
 tomb, sleep~
 D
-   The staircase descends into an ossuary filled with the bones of the dead. 
+   The staircase descends into an ossuary filled with the bones of the dead.
 One wall is lined with skulls, another with ribcages. The domed ceiling is made
 from interlocked femurs, and looking up at it is enough to send a chill down
 your spine. There's a hidden door under the stairs.

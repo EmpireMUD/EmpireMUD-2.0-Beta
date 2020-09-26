@@ -597,46 +597,10 @@ if !%vnum%
   %send% %actor% You can only use %self.shortdesc% inside a house.
   halt
 end
-switch %vnum%
-  case 5100
-    * Hut
-  break
-  case 5103
-    * Mud Hut
-  break
-  case 5157
-    * Swamp Hut
-  break
-  case 5102
-    * Small house
-  break
-  case 5101
-    * Cabin
-  break
-  case 5104
-    * Pueblo
-  break
-  case 5124
-    * Stone house
-  break
-  case 5125
-    * Large house
-  break
-  case 5127
-  break
-  case 5128
-  break
-  case 5129
-  break
-  case 5159
-  break
-  case 5158
-  break
-  default
-    %send% %actor% You can only use %self.shortdesc% inside a house.
-    halt
-  break
-done
+if %room.max_citizens% < 1
+  %send% %actor% You can only use %self.shortdesc% inside a house.
+  halt
+end
 %send% %actor% You start applying %self.shortdesc% to the walls of the building...
 %echoaround% %actor% %actor.name% starts applying %self.shortdesc% to the walls of the building...
 wait 1 sec
@@ -1128,13 +1092,22 @@ if %cmd% == challenge
   %echoneither% %actor% %target% You see %actor.pc_name% challenge %target.pc_name% to an apple bobbing contest!
 end
 if %cmd% == accept
+  set owner %self.owner%
   set challenged %self.challenged%
+  if !%arg%
+    %send% %actor% If you meant to accept the apple bobbing challenge, then type 'accept %owner.pc_name%'.
+    return 0
+    halt
+  end
+  if %arg% != %owner.pc_name%
+    return 0
+    halt
+  end
   if %actor% != %challenged%
     %send% %actor% You weren't the one being challenged.
     return 1
     halt
   end
-  set owner %self.owner%
   if !%owner.on_quest(18857)%
     %send% %actor% You here spirits whisper, '%owner.pc_name% should no longer have this.'
     %echo% The %self.shortdesc% vanishes in a puff of smoke!
@@ -1157,19 +1130,79 @@ end
 #18858
 apple bobbing bob~
 1 c 4
+bob~
+if !(%actor.obj_target(%arg%)% == %self%)
+  %send% %actor% You can only bob in the %self.shortdesc%.
+  return 1
+  halt
+end
+if !%self.varexists(turn)%
+  %send% %actor% A challenge must be offered and accepted before anyone can bob for apples from this %self.shortdesc%.
+  return 1
+  halt
+end
+if %actor% != %self.turn%
+  %send% %actor% It isn't your turn right now.
+  return 1
+  halt
+end
+if %self.varexists(same_round)%
+  %send% %actor% Let the water calm a bit first.
+  return 1
+  halt
+end
+%send% %actor% You dip your head into the water of the bucket and start looking for an apple.
+%echoaround% %actor% %actor.pc_name% sticks %actor.hisher% head into the bucket and starts looking for an apple.
+set start_bob %timestamp%
+remote start_bob %self.id%
+set timer_running 1
+remote timer_running %self.id%
+set same_round 1
+remote same_round %self.id%
+wait 10 s
+if %self.varexists(timer_running)%
+  %send% %actor% You can't hold your breath much longer! You need to 'stand' soon!
+end
+wait 4 s
+if %self.varexists(timer_running)%
+  set turn %self.turn%
+  %send% %turn% You can't hold your breath any longer and pull your head out of the water.
+  %echoaround% %turn% %turn.pc_name% suddenly pulls %turn.hisher% head out of the water gasping for air!
+  rdelete timer_running %self.id%
+  %send% %turn% Try again? And maybe, make sure you stand up before you can no longer hold your breath.
+end
+rdelete same_round %self.id%
+~
+#18859
+apple bobbing bucket was left behind~
+1 b 100
+~
+if %self.carried_by%
+  set actor %self.carried_by%
+  if !%actor.on_quest(18857)%
+    %send% %actor% The %self.shortdesc% vanishes from your arms in a poof of smoke!
+    %purge% %self%
+    halt
+  end
+end
+set person %self.room.people%
+set owner %self.owner%
+while %person%
+  if %person% == %owner%
+    halt
+  end
+  set person %person.next_in_room%
+done
+%echo% The %self.shortdesc% vanishes in a poof of smoke!
+%purge% %self%
+~
+#18860
+bobbing please stand up~
+1 c 4
 bob stand~
 if %cmd% == bob
   if !(%actor.obj_target(%arg%)% == %self%)
-    return 0
-    halt
-  end
-  if !%self.varexists(turn)%
-    %send% %actor% A challenge must be offered and accepted before anyone can bob for apples from this %self.shortdesc%.
-    return 1
-    halt
-  end
-  if %self.varexists(same_round)%
-    %send% %actor% Let the water calm a bit first.
+    %send% %actor% You can only bob for apples in the %self.shortdesc%.
     return 1
     halt
   end
@@ -1178,20 +1211,29 @@ if %cmd% == bob
     return 1
     halt
   end
-  %send% %actor% You dip your head into the water of the bucket and start looking for an apple.
-  %echoaround% %actor% %actor.pc_name% sticks %actor.hisher% head into the bucket and starts looking for an apple.
-  set start_bob %timestamp%
-  remote start_bob %self.id%
-  set timer_running 1
-  remote timer_running %self.id%
+  if %self.varexists(same_round)%
+    %send% %actor% Let the water calm a bit first.
+    return 1
+    halt
+  end
 end
 if %cmd% == stand
   if %actor% != %turn%
     return 0
     halt
   end
+  if !%self.varexists(timer_running)%
+    return 0
+    halt
+  end
+  return 1
   rdelete timer_running %self.id%
   eval time %timestamp% - %self.start_bob%
+  if %time% == 0
+    %echoaround% %actor% %actor.pc_name% stands back up immediately with no apple in %actor.hisher% mouth.
+    return 1
+    halt
+  end
   switch %time%
     case 1
       set apple_val 1
@@ -1260,6 +1302,7 @@ if %cmd% == stand
       %send% %actor% You win!
       %echoaround% %actor% %actor.pc_name% wins!
       %quest% %actor% finish 18857
+      %purge% %self%
     elseif %ow_apple% < %ch_apple%
       %send% %actor% You've lost this time.
       %echoaround% %actor% %self.challenged.pc_name% wins!
@@ -1271,60 +1314,6 @@ if %cmd% == stand
     rdelete challenged %self.id%
   end
 end
-~
-#18859
-apple bobbing bucket was left behind~
-1 b 100
-~
-if %self.carried_by%
-  set actor %self.carried_by%
-  if !%actor.on_quest(18857)%
-    %send% %actor% The %self.shortdesc% vanishes from your arms in a poof of smoke!
-    %purge% %self%
-    halt
-  end
-end
-set person %self.room.people%
-set owner %self.owner%
-while %person%
-  if %person% == %owner%
-    halt
-  end
-  set person %person.next_in_room%
-done
-%echo% The %self.shortdesc% vanishes in a poof of smoke!
-%purge% %self%
-~
-#18860
-can't bob forever~
-1 c 4
-bob~
-%echo% the timer is running.
-if !%self.varexists(turn)%
-  return 1
-  halt
-end
-if %actor% != %self.turn%
-  return 1
-  halt
-end
-set same_round 1
-remote same_round %self.id%
-wait 13 s
-if %self.varexists(timer_running)%
-  set turn %self.turn%
-  %send% %turn% You can't hold your breath any longer and pull your head out of the water.
-  %echoaround% %turn% %turn.pc_name% suddenly pulls %turn.hisher% head out of the water gasping for air!
-  rdelete timer_running %self.id%
-  if %turn% == %self.challenged%
-    set ch_apple 0
-    remote ch_apple %self.id%
-  elseif %turn% == %self.owner%
-    set ow_apple 0
-    remote ow_apple %self.id%
-  end
-end
-rdelete same_round %self.id%
 ~
 #18869
 play them off johny~
@@ -1505,6 +1494,7 @@ wait 1
 %echo% A chill comes over you as %self.name% fades into view.
 set day_count %dailycycle%
 remote day_count %self.id%
+%own% %self% %self.room.empire%
 ~
 #18872
 ghostly citizen might expire~

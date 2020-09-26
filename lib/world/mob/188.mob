@@ -318,13 +318,52 @@ ghost friendly~
 a friendly ghost~
 A ghost with a friendly looking smile hovers above the ground.
 ~
-1 1 bdh cdmn 3
+1 1 bdh cmn 3
 0 0 0 15
 D
 Other than a friendly smile, there isn't much to see about this spirit.
 ~
+M
+3
+Aah, the sun is finally down. That's much better.~
+M
+4
+You watch as the sun fades $n into near invisibility.~
+M
+1
+I always did enjoy being a member of $l.~
+M
+0
+$n attempts to continue its living routine.~
+M
+2
+The sun is hard on us spirits but I wouldn't give this up for anything.~
 T 18871
 T 18872
+S
+#18876
+pig~
+a pig~
+A pig is leashed to keep it from fleeing.
+~
+5 15 bdjo 0 3
+0 0 0 9
+D
+   This fat pig seems ready for market. It's surprisingly clean. Perhaps
+someone already washed it off.
+~
+I 0 3201 100.00 2  # BUTCHER: slab of pork
+S
+#18877
+#n butcher~
+#n Butcher~
+#n is sharpening a cleaver.
+~
+20 50 bdqv 0 3
+0 1 0 2
+D
+The butcher's face is disturbed by a vicious grin.
+~
 S
 #18878
 tarantula hawk giant~

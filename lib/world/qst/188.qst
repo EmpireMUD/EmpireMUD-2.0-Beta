@@ -367,11 +367,14 @@ W
 S
 #18857
 Halloween: Bobbing for Apples~
-This quest has no description.
+   You're going to need to interact with another player this time. The spirits
+gift you with an apple bobbing bucket, and now its time to have some fun. 
+Challenge another player to an apple bobbing contest and get the biggest one to
+complete this quest.
 ~
-You have completed the quest.
+Good job finding the bigger apple. Hopefully you had some fun doing it.
 ~
-8 e 0 0 -1
+9 e 0 0 -1
 A
 2 18806
 A
@@ -449,12 +452,12 @@ adventurer to defeat in combat, otherwise it'll be a waste of your time.
 ~
 That was a relief! Your song prevented any combat from happening here.
 ~
-10 e 0 0 -1
+11 e 0 0 -1
 A
 2 18806
 A
 2 18811
-D 18869
+D 18870
 P
 36 18800 0 1
 R
