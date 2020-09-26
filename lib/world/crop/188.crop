@@ -46,4 +46,62 @@ M
 M
 18845 5.00 a
 S
+#18890
+pumpkins~
+A Pumpkin Patch~
+23 j ac
+0 100 0 100
+D0
+xwvu~
+&g~
+D0
+uxwv~
+&g~
+D0
+vuxw~
+&g~
+D0
+wvux~
+&g~
+D0
+xwv&oo~
+&g~
+D0
+&oo&?xwv~
+&g~
+D0
+v&oo&?xw~
+&g~
+D0
+wv&oo&?x~
+&g~
+D0
+xw&oo&?u~
+&g~
+D0
+uxw&oo~
+&g~
+D0
+&oo&?uxw~
+&g~
+D0
+w&oo&?ux~
+&g~
+D0
+xw&ooo~
+&g~
+D0
+&oo&?xw&oo~
+&g~
+D0
+&ooo&?xw~
+&g~
+D0
+w&ooo&?x~
+&g~
+I 6 18892 100.00 1  # FORAGE: pumpkin blossom
+I 8 18890 100.00 5  # HARVEST: large pumpkin
+M
+18890 2.00 a
+S
 $

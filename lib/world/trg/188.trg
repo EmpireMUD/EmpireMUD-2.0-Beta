@@ -1731,7 +1731,7 @@ Ancestor's Offering: Despawn Ghost~
 if !%self.varexists(halloween_timer)%
   set halloween_timer %timestamp%
   remote halloween_timer %self.id%
-else if (%timestamp% - %self.halloween_timer%) > 43200
+elseif (%timestamp% - %self.halloween_timer%) > 43200
   * 12 hours have passed
   %echo% %self.name% returns to the realm of the dead.
   %purge% %self%
