@@ -1127,7 +1127,7 @@ ACMD(do_pickpocket) {
 	else if (ch_emp && vict_emp && GET_RANK(ch) < EMPIRE_PRIV(ch_emp, PRIV_STEALTH) && !has_relationship(ch_emp, vict_emp, DIPL_WAR | DIPL_THIEVERY)) {
 		msg_to_char(ch, "You don't have permission to steal that -- you could start a war!\r\n");
 	}
-	else if (ch_emp && vict_emp && !PRF_FLAGGED(ch, PRF_STEALTHABLE) && !has_relationship(ch_emp, vict_emp, DIPL_WAR | DIPL_THIEVERY)) {
+	else if (ch_emp && vict_emp && ch_emp != vict_emp && !PRF_FLAGGED(ch, PRF_STEALTHABLE) && !has_relationship(ch_emp, vict_emp, DIPL_WAR | DIPL_THIEVERY)) {
 		msg_to_char(ch, "You cannot pickpocket that target because your 'stealthable' toggle is off.\r\n");
 	}
 	else if (FIGHTING(vict)) {
