@@ -322,6 +322,7 @@ Some of the rewards include:
  flying pumpkin coach spell - make your pumpkin coach fly
  vial of swirling ectoplasm - upgrade some of the reward items
  vial of magi-genic ooze - upgrade one of your Halloween mounts to fly
+ reddened butcher's block - builds a slaughterhouse
 
 Game admins: You must enable global 18802 by removing its IN-DEV flag to turn
 on the Halloween candy drops, and disable that global when the holiday is over.

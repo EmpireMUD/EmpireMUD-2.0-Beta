@@ -5657,6 +5657,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						*str = '\0';
 					}
+					else if (!str_cmp(field, "longdesc")) {
+						snprintf(str, slen, "%s", VEH_LONG_DESC(v));
+						strip_crlf(str);	// may have trailing \r\n
+					}
 					break;
 				}
 				case 'm': {	// veh.m*
