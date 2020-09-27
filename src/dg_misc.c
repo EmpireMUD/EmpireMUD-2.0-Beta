@@ -1381,7 +1381,7 @@ void script_modify(char *argument) {
 			script_log("%%mod%% cannot be used on Ocean rooms");
 		}
 		else if (is_abbrev(field_arg, "icon")) {
-			if (!clear && !str_cmp(value, "none") && !validate_icon(value)) {
+			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
 				script_log("%%mod%% called with invalid room icon '%s'", value);
 			}
 			else {
@@ -1441,7 +1441,7 @@ void script_modify(char *argument) {
 		v_proto = vehicle_proto(VEH_VNUM(veh));
 		
 		if (is_abbrev(field_arg, "icon")) {
-			if (!clear && !str_cmp(value, "none") && !validate_icon(value)) {
+			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
 				script_log("%%mod%% called with invalid vehicle icon '%s'", value);
 			}
 			else {
