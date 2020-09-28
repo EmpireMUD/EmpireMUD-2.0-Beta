@@ -125,7 +125,7 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "EXIT flag set without the ROOM flag");
 		problem = TRUE;
 	}
-	if (!has_interaction(GET_BLD_INTERACTIONS(bld), INTERACT_RUINS_TO_BLD) && !has_interaction(GET_BLD_INTERACTIONS(bld), INTERACT_RUINS_TO_VEH)) {
+	if (!IS_SET(GET_BLD_FLAGS(bld), BLD_IS_RUINS) && !has_interaction(GET_BLD_INTERACTIONS(bld), INTERACT_RUINS_TO_BLD) && !has_interaction(GET_BLD_INTERACTIONS(bld), INTERACT_RUINS_TO_VEH)) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "No RUINS-TO-* interactions");
 		problem = TRUE;
 	}
