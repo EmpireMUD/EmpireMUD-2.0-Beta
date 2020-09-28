@@ -2,8 +2,9 @@
 grave empty~
 an empty grave~
 A grave lies empty here.~
+Something must have come out of the grave.
 ~
-3 0 0 0 1
+3 0 0 0 2
 0 0 0
 1 24
 S
@@ -825,14 +826,14 @@ Q 18854
 T 18854
 S
 #18855
-candy fresh picked~
+candy freshly picked pack small~
 some freshly picked candy~
 A small pack of freshly picked candy waits to be eaten.~
    Doesn't quite matter to you what kind, and it isn't likely the spirit will
 care either. Just as long as you have five packs to turn in.
 ~
-6 k a 0 1
-0 0 0
+6 k a 0 3
+1 0 0
 7 0
 C
 1 1
@@ -854,14 +855,14 @@ Q 18856
 T 18856
 S
 #18857
-bucket bobbing~
+bucket apple-bobbing bobbing~
 apple bobbing bucket~
 The apple-bobbing bucket is set up here waiting for players.~
    This wooden bucket is on the larger side and filled with water and apples.
 * challenge <player>
 * bob bucket
 ~
-3 z a 0 7
+3 z a 0 8
 0 0 0
 0 0
 C
@@ -902,18 +903,19 @@ Q 18870
 T 18869
 S
 #18871
-sheet music~
+report medical~
 a medical report~
 A medical report about a headless centaur's victim is folded here.~
-   Carefully hand drawn on a scroll of velum skin, there's music to play a
-haunting melody with nearly any instrument.
+   The report makes it look like the centaur's victim doesn't have much time
+left.
+Type: build medical tent
 ~
-3 0 a 0 6
+3 0 a 0 7
 0 0 0
 7 0
 C
 1 1
-Q 18871
+Q 18873
 T 18869
 S
 #18873
@@ -1246,8 +1248,8 @@ some roasted pumpkin seeds~
 Some roast pumpkin seeds have been dropped here.~
 These seeds have been roasted and they taste great.
 ~
-6 m a 0 11
-0 0 0
+6 m a 0 13
+6 0 0
 0 1680
 A
 11 1 0
