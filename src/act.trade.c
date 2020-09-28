@@ -844,13 +844,13 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	prettier_sprintbit(GET_CRAFT_FLAGS(craft), craft_flag_for_info, part);
 	msg_to_char(ch, "Notes: %s\r\n", part);
 	
-	if (CRAFT_IS_BUILDING(craft)) {
+	if (GET_CRAFT_BUILD_ON(craft)) {
 		ordered_sprintbit(GET_CRAFT_BUILD_ON(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "Build on: %s\r\n", buf);
-		if (GET_CRAFT_BUILD_FACING(craft)) {
-			ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
-			msg_to_char(ch, "Build facing: %s\r\n", buf);
-		}
+	}
+	if (GET_CRAFT_BUILD_FACING(craft)) {
+		ordered_sprintbit(GET_CRAFT_BUILD_FACING(craft), bld_on_flags, bld_on_flags_order, TRUE, buf);
+		msg_to_char(ch, "Build facing: %s\r\n", buf);
 	}
 	
 	show_resource_list(GET_CRAFT_RESOURCES(craft), buf);
