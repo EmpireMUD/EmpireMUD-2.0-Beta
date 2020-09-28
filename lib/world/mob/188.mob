@@ -341,6 +341,28 @@ The sun is hard on us spirits but I wouldn't give this up for anything.~
 T 18871
 T 18872
 S
+#18873
+victim centaur headless~
+the headless centaur's victim~
+The headless centaur's latest victim lays on the ground dying.
+~
+1 1 bdv nD 3
+1 0 0 15
+D
+   This adventurer has been badly wounded by his fight with the headless
+centaur. Clearly, he wasn't ready for such a battle. You should ease his
+suffering until he passes on. Perhaps by playing some music?
+~
+M
+0
+$n growns pitifully.~
+M
+0
+$n hisses through $s teeth in pain.~
+M
+0
+%n shutters as $s muscles lock up.~
+S
 #18876
 pig~
 a pig~

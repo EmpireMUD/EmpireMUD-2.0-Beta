@@ -916,6 +916,23 @@ C
 Q 18871
 T 18869
 S
+#18873
+report medical~
+a medical report~
+A medical report about a headless centaur's victim is folded here.~
+   The medical information makes it quite clear that this particular victim of
+the headless centaur isn't going to be making it. As a final act of compassion
+for the dying adventurer, build a medical tent at the tomb he chose to summon
+the centaur and failed to defeat it. Then soothe the fallen adventurer into his
+final rest by playing some music.
+~
+3 0 a 0 9
+0 0 0
+7 0
+C
+1 1
+Q 18872
+S
 #18876
 block butcher's butchers reddened~
 a reddened butcher's block~

@@ -967,6 +967,10 @@ E
 7 5 2.00 29
 E
 15 0 1.00 34
+E
+17 4 0.50 27
+E
+17 90 0.70 27
 I 6 3017 75.00 1  # FORAGE: plump fig
 I 9 133 100.00 1  # GATHER: tangle of vines
 I 20 128 100.00 1  # CHOP: massive jungle tree

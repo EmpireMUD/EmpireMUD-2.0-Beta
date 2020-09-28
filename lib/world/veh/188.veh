@@ -1,3 +1,19 @@
+#18873
+tent medical~
+a medical tent~
+A simple and hastely thrown together medical tent has been erected.~
+   Little more than a few large skins and some saplings, this nevertheless does
+hide the latest victim of the headless centaur from sight.
+~
+~
+uw 19 5 0 0 0 0 0 1 0
+C
+1 1
+D
+18873 0 0
+P
+2
+S
 #18876
 slaughterhouse house~
 a slaughterhouse~
@@ -27,7 +43,7 @@ people inside. To that, someone has affixed wheels and axles, creating an
 elegant coach the likes of which few have witnessed.
 ~
 ~
-bfo 19 24 0 2 0 0 0 0 0
+bfox 19 24 0 2 0 0 0 0 0
 D
 18897 0 0
 P
@@ -47,7 +63,7 @@ A pumpkin coach hovers above you, slowly flapping giant bat wings.~
 flies effortlessly through the air on giant bat wings.
 ~
 ~
-dfo 2 24 0 2 0 0 0 0 0
+dfox 2 24 0 2 0 0 0 0 0
 D
 18898 0 0
 P

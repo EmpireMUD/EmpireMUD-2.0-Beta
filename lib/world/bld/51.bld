@@ -1509,7 +1509,7 @@ D
 return home to a safe place. While not effective against thieves and
 infiltrators, it prevents access by common men and animals.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
+I 29 5017 100.00 1 r  # RUINS-TO-BLD: Gatehouse Ruins
 M
 251 33.00 ce
 R

@@ -102,11 +102,11 @@ flowers for the dead~
 4 0
 0 0 0 0
 T0
-The flower pollen seems to have faded.~
+The flower pollen fades from you.~
 T2
-The pollen from the flowers shimmers around you, tinkling like bells.~
+The pollen from the flower shimmers and swirls around you, tinkling like bells.~
 T3
-The pollen from the flowers shimmers around $n, tinkling like bells.~
+The pollen from the flower shimmers and swirls around $n, tinkling like bells.~
 S
 #18890
 bibbidy~

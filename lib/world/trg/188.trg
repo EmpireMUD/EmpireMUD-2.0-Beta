@@ -435,8 +435,8 @@ switch %questvnum%
   case 18870
     %load% obj 18870 %actor% inv
   break
-  case 18871
-    %load% obj 18871 %actor% inv
+  case 18873
+    %load% obj 18873 %actor% inv
   break
   case 18880
     %load% obj 18880 %actor% inv
@@ -1497,7 +1497,7 @@ remote day_count %self.id%
 %own% %self% %self.room.empire%
 ~
 #18872
-ghostly citizen might expire~
+ghost can't stick around forever~
 0 ab 10
 ~
 if %self.varexists(day_count)%
@@ -1506,6 +1506,27 @@ if %self.varexists(day_count)%
   end
 end
 %echo% %self.name% whispers, 'Thank you for this time to make peace.' And then fades away.
+%purge% %self%
+~
+#18873
+play the victim to death~
+0 b 50
+~
+%echo% the actor var is %actor%.
+set person %self.room.people%
+while %person%
+  if %person.action% == playing
+    if %person.on_quest(18873)%
+      %quest% %person% finish 18873
+      set actor %person%
+    end
+  end
+done
+if !%actor%
+  return 1
+  halt
+end
+%echo% %self.shortdesc% loses all tention in %self.hisher% body and you feel its time to leave.
 %purge% %self%
 ~
 #18878
@@ -1835,11 +1856,6 @@ if (%coach.sitting_in% || %coach.led_by%)
   halt
 end
 * READY:
-if %coach.contents%
-  %send% %actor% You empty out %coach.shortdesc%...
-  %echoaround% %actor% %actor.name% empties out %coach.shortdesc%...
-  nop %coach.dump%
-end
 if %coach.animals_harnessed% > 1
   %send% %actor% You unharness the animals from %coach.shortdesc%...
   %echoaround% %actor% %actor.name% unharnesses the animals from %coach.shortdesc%...
@@ -1849,6 +1865,11 @@ elseif %coach.animals_harnessed% > 0
   %echoaround% %actor% %actor.name% unharnesses the animal from %coach.shortdesc%...
   nop %coach.unharness%
 end
+if %coach.contents%
+  %send% %actor% You empty out %coach.shortdesc%...
+  %echoaround% %actor% %actor.name% empties out %coach.shortdesc%...
+end
+nop %coach.dump%
 %load% veh 18898
 set upgr %self.room.vehicles%
 if %upgr.vnum% == 18898
