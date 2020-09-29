@@ -2657,7 +2657,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (GET_MOVEMENT_STRING(ch)) {
 		strcpy(temp, GET_MOVEMENT_STRING(ch));
-		temp[245] = '\0';	// ensure not longer than this (we would not be able to load it)
+		temp[MAX_MOVEMENT_STRING] = '\0';	// ensure not longer than this (we would not be able to load it)
 		fprintf(fl, "Mvstring: %s\n", temp);
 	}
 	
