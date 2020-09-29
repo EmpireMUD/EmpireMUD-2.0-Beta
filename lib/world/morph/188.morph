@@ -4,6 +4,9 @@ a ghostly citizen~
 A ghost hovers before you; you can see its legs beneath the sheet.~
 b 15 30 0 0 3
 0 0 -1 -1
+D
+One of your citizens appears to be wearing a sheet with eye-holes.
+~
 S
 #18813
 citizen pirate~
@@ -11,6 +14,9 @@ a pirate citizen~
 A pirate citizen hobbles around on a fake peg leg.~
 b 15 16 0 0 3
 0 0 -1 -1
+D
+This citizen is wearing an eye patch, a big hat, and a fake peg leg.
+~
 S
 #18814
 citizen princess~
@@ -18,6 +24,9 @@ a princess citizen~
 A citizen in a cheap princess gown stands before you.~
 b 15 0 0 0 3
 0 0 -1 -1
+D
+This citizen certainly looks elegant.
+~
 S
 #18815
 citizen green witchy~
@@ -25,6 +34,9 @@ a witchy citizen~
 A green citizen in a black robe and pointed hat cackles at you.~
 b 15 2 0 0 3
 0 0 -1 -1
+D
+This poor citizen has been painted green!
+~
 S
 #18816
 citizen skeletal skeleton~
@@ -32,6 +44,10 @@ a skeletal citizen~
 A skeletal citizen stands before you, adjusting its mask.~
 b 15 0 0 0 3
 0 0 -1 -1
+D
+   The citizen is wearing a black costume with bones over it to give the
+appearance of a skeleton.
+~
 S
 #18817
 citizen wizard~
@@ -39,6 +55,10 @@ a wizard~
 A citizen dressed as a wizard hastily adjusts his fake beard.~
 b 15 0 0 0 3
 0 0 -1 -1
+D
+   The citizen is wearing a large, infested fake beard. It certainly gives that
+'hermit wizard' look.
+~
 S
 #18821
 toad confused~
@@ -46,6 +66,9 @@ a toad~
 A confused toad hops around helplessly.~
 b 15 15 0 0 1
 0 0 -1 -1
+D
+The toad seems to be trying to kiss you, to no avail.
+~
 S
 #18827
 dracula~
@@ -53,6 +76,10 @@ Dracula~
 Dracula stands beneath a cloud of bats, fangs bared.~
 d 9 0 0 0 3
 0 0 -1 18827
+D
+   It's basically how you'd expect Dracula to look: big pointy fangs, deep
+window's peak, and what we'll politely refer to as a unique sense of fashion.
+~
 S
 #18847
 bat vampire~
@@ -72,6 +99,10 @@ A
 8 -2
 A
 26 1
+D
+   This tiny bat swoops so close to you that you can feel its wing-beats
+against your hair.
+~
 S
 #18848
 wolf rabid~
@@ -89,6 +120,10 @@ A
 8 -1
 A
 26 1
+D
+   The wolf's ears are pulled back and it's snarling so hard its mouth is
+foaming.
+~
 S
 #18849
 scorpion giant~
@@ -104,6 +139,9 @@ A
 1 -1
 A
 8 -1
+D
+For a giant scorpion, it's still quite small.
+~
 S
 #18850
 badger~
@@ -119,6 +157,10 @@ A
 1 -1
 A
 8 -1
+D
+   The badger -- nature's plow -- digs furiously at the ground, stopping only
+briefly to listen for its quarry scurrying through tunnels below.
+~
 S
 #18851
 anaconda giant~
@@ -134,6 +176,11 @@ A
 1 -1
 A
 8 -1
+D
+   The snake is as long as a boat, and as big around as a dog. It's capable of
+strangling an ox with its powerful muscles, and can unhinge its jaw to swallow
+one, too.
+~
 S
 #18852
 goblin mischievous~
@@ -141,5 +188,8 @@ a goblin~
 A mischievous goblin dances around you.~
 0 15 7 100 0 2
 1 25 -1 18847
+D
+This little goblin is up to no good.
+~
 S
 $
