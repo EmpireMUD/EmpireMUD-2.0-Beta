@@ -2780,6 +2780,13 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		GET_DEFICIT(ch, iter) = deficit[iter];
 	}
 	
+	// # save equipment
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (GET_EQ(ch, iter)) {
+			Crash_save(GET_EQ(ch, iter), fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
+		}
+	}
+	
 	// resume affect totals and run it
 	pause_affect_total = FALSE;
 	affect_total(ch);	// not 100% sure this function needs this, but at least now it only does it once -pc 4/22/18
@@ -2941,11 +2948,6 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// '#'
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter)) {
-			Crash_save(GET_EQ(ch, iter), fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
-		}
-	}
 	Crash_save(ch->carrying, fl, LOC_INVENTORY);
 	
 	// END DELAY-LOADED SECTION

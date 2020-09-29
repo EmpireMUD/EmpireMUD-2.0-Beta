@@ -6406,11 +6406,9 @@ void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func)) {
 		
 		// save
 		if (is_file) {
-			SAVE_CHAR(ch);
-			// no longer quick-freeing these; leave them in the queue to free soon
-			// store_loaded_char(ch);
-			// is_file = FALSE;
-			// ch = NULL;
+			store_loaded_char(ch);
+			is_file = FALSE;
+			ch = NULL;
 		}
 		else {
 			queue_delayed_update(ch, CDU_SAVE);

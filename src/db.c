@@ -4502,7 +4502,13 @@ void b5_105_update(void) {
 }
 
 
-// b5.106 fixes some icon errors: a recent patch allowed icons to have too many backslashes
+// b5.106 (1/2) loads players and re-saves them to move equipment to the delay file
+PLAYER_UPDATE_FUNC(b5_106_players) {
+	check_delayed_load(ch);
+}
+
+
+// b5.106 (2/2) fixes some icon errors: a recent patch allowed icons to have too many backslashes
 void b5_106_update(void) {
 	struct map_data *map;
 	int iter, diff;
@@ -4523,6 +4529,9 @@ void b5_106_update(void) {
 			}
 		}
 	}
+	
+	log("Applying b5.106 update to re-save all players with equipment in the main save...");
+	update_all_players(NULL, b5_106_players);
 }
 
 
