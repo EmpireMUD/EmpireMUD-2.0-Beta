@@ -2742,6 +2742,13 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Using Poison: %d\n", USING_POISON(ch));
 	}
 	
+	// # save equipment
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (char_eq[iter]) {
+			Crash_save(char_eq[iter], fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
+		}
+	}
+	
 	// END PLAYER FILE
 	fprintf(fl, "End Player File\n");
 	
@@ -2778,13 +2785,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	for (iter = 0; iter < NUM_POOLS; ++iter) {
 		GET_CURRENT_POOL(ch, iter) = pool[iter];
 		GET_DEFICIT(ch, iter) = deficit[iter];
-	}
-	
-	// # save equipment
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter)) {
-			Crash_save(GET_EQ(ch, iter), fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
-		}
 	}
 	
 	// resume affect totals and run it
