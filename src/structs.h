@@ -2545,6 +2545,8 @@ typedef struct vehicle_data vehicle_data;
 
 #define UP  8
 #define DOWN  9
+#define NUM_NATURAL_DIRS  10	// set of dirs
+
 #define FORE  10
 #define STARBOARD  11
 #define PORT  12
