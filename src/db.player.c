@@ -4954,9 +4954,9 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			continue;
 		}
 		
-		// new way of loading data
+		// load the player unless they're in-game
 		if ((ch = find_or_load_player(index->name, &is_file))) {
-			check_delayed_load(ch);
+			// check_delayed_load(ch);	// no longer need this as equipment is in the main file
 			affect_total(ch);
 		}
 		
