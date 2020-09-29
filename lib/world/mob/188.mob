@@ -344,7 +344,7 @@ S
 #18873
 victim headless centaur's centaurs~
 the headless centaur's victim~
-The headless centaur's latest victim lays on the ground dying.
+The latest victim of the headless centaur's lays on the ground dying.
 ~
 1 1 bdv nD 3
 1 0 0 15
@@ -358,10 +358,10 @@ M
 $n growns pitifully.~
 M
 0
-$n hisses through $s teeth in pain.~
+$n hisses in pain through $s teeth.~
 M
 0
-%n shutters as $s muscles lock up.~
+$n shudders as $s muscles lock up.~
 S
 #18876
 pig~
@@ -408,7 +408,7 @@ A giant tarantula menaces you with its hairy legs.
 0 0 8 9
 D
    This is among the largest spiders you have ever seen -- and you shudder to
-remember the others.
+remember the others. Perhaps you can ride it.
 ~
 S
 #18880
@@ -449,7 +449,7 @@ M
 Have you married yet, dear?~
 M
 1
-Back when Grandpa and I were courting, the world was a lot simpler.~
+Back when Grandpa and I were courting, the world was a lot simpler and nobody went on adventures.~
 M
 1
 You look like you could use a haircut.~
@@ -461,7 +461,7 @@ M
 You can almost smell $n's favorite perfume.~
 M
 0
-$n fades away into nostalgia for a moment.~
+$n fades into nostalgia for a moment.~
 T 18882
 S
 #18885
