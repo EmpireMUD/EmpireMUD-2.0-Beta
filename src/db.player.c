@@ -1679,6 +1679,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 			case 'I': {
 				if (PFILE_TAG(line, "Idnum:", length)) {
 					GET_IDNUM(ch) = atoi(line + length + 1);
+					
+					// assign this immediately
+					ch->script_id = GET_IDNUM(ch);
 				}
 				else if (PFILE_TAG(line, "Ignore:", length)) {
 					if (ignore_pos < MAX_IGNORES) {
@@ -2123,9 +2126,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	if (!GET_PASSWD(ch) || !*GET_PASSWD(ch)) {
 		log("SYSERR: Finished loading playerfile '%s' but did not find password", GET_PC_NAME(ch));
 	}
-	
-	// some systems use this early
-	ch->script_id = GET_IDNUM(ch);
 	
 	// have account?
 	if (normal && !GET_ACCOUNT(ch)) {
