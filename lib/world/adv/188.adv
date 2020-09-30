@@ -1,21 +1,26 @@
 #18800
 Halloween Candy Quests~
-Paul Clarke and Owen Morris~
-   This adventure contains mobs, items, and quests for the Halloween season. 
+EmpireMUD Staff~
+   This adventure contains mobs, items, and quests for the Halloween season.
 It does not have instances. Instead, players find the content in the form of
-candies dropped by all mobs in the game.
+candies dropped by all mobs in the game. Start daily quests from these candies
+and earn up to 50 points per day.
 
+We don't believe botting would help in this event, but we still ask players not
+to 'bot' the Halloween quests.
+ 
 To activate Halloween content:
  .global edit 18802
  .flag remove in-dev
  .save
-
-To deactivate Halloween content:
+ .event start 18800 -- do this at the very start of October 1
+ 
+To deactivate Halloween content (after 33 days when the event ends):
  .global edit 18802
  .flag add in-dev
  .save
 ~
 18800 18899 0-0
-1 30 a 0
+0 30 a 0
 S
 $

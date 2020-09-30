@@ -510,7 +510,8 @@ automatically format itself.
 
 Supported fields are:
  Players: companion <vnum | none>
- Mobs: keywords, longdesc, sex, shortdesc
+ Mobs: keywords, longdesc, sex, shortdesc, lookdesc, append-lookdesc,
+          append-lookdesc-noformat **
  Objects: keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
           append-lookdesc-noformat
  Vehicles: icon, keywords, longdesc, shortdesc, lookdesc, append-lookdesc,
@@ -519,6 +520,8 @@ Supported fields are:
 
 Appending to descriptions triggers string formatting. Using the 'noformat'
 version will prevent this.
+
+** NOTE: Regular mobs do not save lookdescs to file (except companions).
 
 &rWARNING&0: Each line of a script can be no longer than 255 characters.
 #d

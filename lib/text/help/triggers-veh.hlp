@@ -116,6 +116,7 @@ When using field  - The variable returns:
 &clevel&0 - What level the vehicle is scaled to.
 &clink_instance&0 - Marks this vehicle as belonging to the adventure instance of
    the room it's currently in.
+&clongdesc&0 - The vehicle's long description.
 &cmaxhealth&0 - Maximum health of the vehicle.
 &cmaxrooms&0 - Maximum added rooms (not counting the base interior room).
 &cmovetype&0 - The verb for the vehicle's movement (like "sails").

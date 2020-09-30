@@ -1,3 +1,31 @@
+#5006
+ruins #n~
+the ruins of #n~
+The ruins of #n are crumbling here.~
+It seems to have fallen into disrepair.
+~
+@.&0(\&?@.~
+muwD 19 3 0 0 0 -1 0 1 0
+P
+2
+T 5009
+S
+#5007
+ruins #n~
+the ruins of #n~
+The ruins of #n are crumbling here.~
+   Whatever this building used to be, it is in ruins now. The walls no longer
+offer any real protection from the elements, and the piles of debris are
+infested with rats. This is the sort of place that attracts trouble.
+~
+@.@.&0/]~
+muwD 19 3 0 0 0 -1 0 2 0
+D
+5016 0 0
+P
+2
+T 5009
+S
 #5011
 tent small~
 a small tent~

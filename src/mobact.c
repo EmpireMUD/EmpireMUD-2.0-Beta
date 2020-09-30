@@ -1147,6 +1147,7 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 	
 	room_data *iter, *next_iter, *home;
 	struct empire_territory_data *ter;
+	struct vehicle_room_list *vrl;
 	vehicle_data *veh, *next_veh;
 	struct empire_npc_data *npc;
 	char_data *ch_iter;
@@ -1160,6 +1161,13 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 	// safety first
 	if (!room) {
 		return;
+	}
+	
+	// start recursively inside vehicles
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+			spawn_one_room(vrl->room, only_artisans);
+		}
 	}
 	
 	artisan = (GET_BUILDING(room) ? GET_BLD_ARTISAN(GET_BUILDING(room)) : NOTHING);

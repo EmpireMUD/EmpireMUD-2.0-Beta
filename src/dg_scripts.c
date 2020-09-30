@@ -2582,6 +2582,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(str, slen, "%d", time_info.month + 1);
 				else if (!str_cmp(field, "year"))
 					snprintf(str, slen, "%d", time_info.year);
+				else if (!str_cmp(field, "day_of_year")) {
+					snprintf(str, slen, "%d", (time_info.month * 30) + time_info.day + 1);
+				}
 				else
 					*str = '\0';
 				return;
@@ -2900,6 +2903,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							snprintf(str, slen, "0");
+						}
+					}
+					else if (!str_cmp(field, "action")) {
+						extern const struct action_data_struct action_data[];
+						extern struct gen_craft_data_t gen_craft_data[];
+						if (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) {
+							strcpy(str, "");	// none
+						}
+						else if (GET_ACTION(c) == ACT_GEN_CRAFT) {
+							craft_data *ctype = craft_proto(GET_ACTION_VNUM(c, 0));
+							snprintf(str, slen, "%s", gen_craft_data[GET_CRAFT_TYPE(ctype)].verb);
+						}
+						else {
+							snprintf(str, slen, "%s", action_data[GET_ACTION(c)].name);
 						}
 					}
 					
@@ -4207,8 +4224,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							
 							// unmount first?
 							if (GET_MOUNT_VNUM(c) == atoi(subfield)) {
-								ACMD(do_dismount);
-								do_dismount(c, "", 0, 0);
+								if (IS_RIDING(c)) {
+									ACMD(do_dismount);
+									do_dismount(c, "", 0, 0);
+								}
+								GET_MOUNT_VNUM(c) = NOTHING;
 							}
 							
 							// remove data
@@ -5201,6 +5221,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					break;
 				}
+				case 'm': {	// room.m*
+					if (!str_cmp(field, "max_citizens")) {
+						snprintf(str, slen, "%d", GET_BUILDING(HOME_ROOM(r)) ? GET_BLD_CITIZENS(GET_BUILDING(HOME_ROOM(r))) : 0);
+					}
+					break;
+				}
 				case 'n': {	// room.n*
 					if (!str_cmp(field, "name")) {
 						snprintf(str, slen, "%s",  get_room_name(r, FALSE));
@@ -5630,6 +5656,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							VEH_INSTANCE_ID(v) = inst->id;
 						}
 						*str = '\0';
+					}
+					else if (!str_cmp(field, "longdesc")) {
+						snprintf(str, slen, "%s", VEH_LONG_DESC(v));
+						strip_crlf(str);	// may have trailing \r\n
 					}
 					break;
 				}

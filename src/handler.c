@@ -8202,7 +8202,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_OWN_VEHICLE: {
 			vproto = vehicle_proto(req->vnum);
-			snprintf(output, sizeof(output), "Own %dx %s%s: %s%s", req->needed, PLURAL(req->needed), vnum, vproto ? VEH_OR_BLD(vproto) : "vehicle", vproto ? VEH_SHORT_DESC(vproto) : "unknown");
+			snprintf(output, sizeof(output), "Own %dx %s%s: %s%s", req->needed, vproto ? VEH_OR_BLD(vproto) : "vehicle", PLURAL(req->needed), vnum, vproto ? VEH_SHORT_DESC(vproto) : "unknown");
 			break;
 		}
 		case REQ_OWN_VEHICLE_FLAGGED: {
@@ -9295,10 +9295,10 @@ struct empire_storage_data *find_stored_resource(empire_data *emp, int island, o
 *
 * @param empire_data *emp The empire to check.
 * @param obj_vnum vnum The item to look for.
-* @param bool count_shipping If TRUE, also count items in the shipping system.
+* @param bool count_secondary If TRUE, also count items in the shipping system and items on the ground.
 * @return int The total number the empire has stored.
 */
-int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping) {
+int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_secondary) {
 	struct empire_island *isle, *next_isle;
 	struct empire_storage_data *sto;
 	struct shipping_data *shipd;
@@ -9315,12 +9315,14 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping)
 		}
 	}
 	
-	if (count_shipping) {
+	if (count_secondary) {
 		for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
 			if (shipd->vnum == vnum) {
 				SAFE_ADD(count, shipd->amount, 0, INT_MAX, FALSE);
 			}
 		}
+		
+		SAFE_ADD(count, count_dropped_items(emp, vnum), 0, INT_MAX, FALSE);
 	}
 	
 	return count;

@@ -1,0 +1,104 @@
+#18873
+tent medical~
+a medical tent~
+A simple and hastely thrown together medical tent has been erected.~
+   Little more than a few large skins and some saplings, this nevertheless does
+hide the latest victim of the headless centaur from sight.
+~
+~
+gmuw 19 2 0 0 0 0 0 1 0
+C
+1 1
+D
+18873 0 0
+P
+2
+S
+#18876
+slaughterhouse house~
+a slaughterhouse~
+There is a slaughterhouse here.~
+   The slaughterhouse is a shoddy wooden structure with no windows. The side of
+the door is permanently stained red, as is the ground around the sides of the
+building.
+~
+&0|SH\~
+ghmquw 19 10 0 0 0 0 0 1 w
+D
+18876 0 0
+I 30 5007 100.00 1  # RUINS-TO-VEH: ruins of #n
+P
+2
+R
+6000 1 1 0
+R
+6790 1 1 0
+S
+#18897
+coach pumpkin~
+a pumpkin coach~
+A pumpkin coach has stopped here.~
+   A magnificent orange pumpkin has been enchanted to be large enough to hold
+people inside. To that, someone has affixed wheels and axles, creating an
+elegant coach the likes of which few have witnessed.
+~
+~
+bfx 19 24 0 2 0 0 0 0 0
+D
+18897 0 0
+P
+2
+R
+18890 1 5 0
+R
+18891 1 5 0
+R
+18892 1 5 0
+S
+#18898
+coach pumpkin flying~
+a flying pumpkin coach~
+A pumpkin coach hovers above you, slowly flapping giant bat wings.~
+   This incredible flying vehicle appears to be a large, enchanted pumpkin! It
+flies effortlessly through the air on giant bat wings.
+~
+~
+dfx 2 24 0 2 0 0 0 0 0
+D
+18898 0 0
+P
+2
+R
+18890 1 5 0
+R
+18891 1 5 0
+R
+18892 1 5 0
+S
+#18899
+mansion haunted~
+the haunted mansion~
+You find yourself in front of a haunted mansion.~
+   The mansion is built in an older style, with columns that look out of place
+-- or out of time. Though the mansion looks habitable, the grass around its
+base seems to be dying.
+~
+&w|^^|~
+gmuwC 19 48 0 0 0 0 0 4 vw
+C
+0 100
+D
+18899 10 demn
+E
+grass~
+You wonder what's killing the grass.
+~
+I 30 5007 100.00 1  # RUINS-TO-VEH: ruins of #n
+P
+2
+R
+6000 1 1 0
+R
+6790 1 1 0
+S
+$

@@ -357,7 +357,7 @@ extern bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
 extern bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool include_kept, bool basic_only);
 extern struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
 extern struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
-extern int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_shipping);
+extern int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_secondary);
 extern bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool retrieval_mode);
 #define obj_can_be_retrieved(obj, loc, by_emp)  obj_can_be_stored((obj), (loc), (by_emp), TRUE)
 extern bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen);

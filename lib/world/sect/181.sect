@@ -1,7 +1,7 @@
 #18100
 Stumps~
 A Field of Stumps~
-'.' 10 j 2 d p
+'.' 10 jr 2 d p
 C
 dig, chop~
 D1
@@ -29,20 +29,20 @@ D4
 ..&t.&?.~
 &0~
 E
-0 0 100.00 0
-E
 4 0 0.20 1
 E
 4 0 100.00 36
 E
 9 0 50.00 1
-I 5 102 9.00 1 X  # DIG: a flint stone
-I 5 101 15.00 1 X  # DIG: a lump of clay
-I 5 100 100.00 1 X  # DIG: a rock
-I 6 3013 75.00 1  # FORAGE: a handful of nuts
-I 20 121 25.00 4 a  # CHOP: some sticks and leaves
-I 20 121 25.00 6 a  # CHOP: some sticks and leaves
-I 20 121 25.00 10 a  # CHOP: some sticks and leaves
-I 20 121 25.00 14 a  # CHOP: some sticks and leaves
+E
+16 0 100.00 0
+I 5 102 9.00 1 X  # DIG: flint stone
+I 5 101 15.00 1 X  # DIG: lump of clay
+I 5 100 100.00 1 X  # DIG: rock
+I 6 3013 75.00 1  # FORAGE: handful of nuts
+I 20 121 25.00 4 a  # CHOP: sticks and leaves
+I 20 121 25.00 6 a  # CHOP: sticks and leaves
+I 20 121 25.00 10 a  # CHOP: sticks and leaves
+I 20 121 25.00 14 a  # CHOP: sticks and leaves
 S
 $

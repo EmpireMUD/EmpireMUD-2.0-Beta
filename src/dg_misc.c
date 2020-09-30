@@ -1207,6 +1207,8 @@ void script_heal(void *thing, int type, char *argument) {
 void script_modify(char *argument) {
 	void change_keywords(char_data *ch, char *str);
 	void change_long_desc(char_data *ch, char *str);
+	void change_look_desc(char_data *ch, char *str, bool format);
+	void change_look_desc_append(char_data *ch, char *str, bool format);
 	void change_sex(char_data *ch, int sex);
 	void change_short_desc(char_data *ch, char *str);
 	extern bool despawn_companion(char_data *ch, mob_vnum vnum);
@@ -1270,6 +1272,26 @@ void script_modify(char *argument) {
 		else if (is_abbrev(field_arg, "longdescription")) {
 			strcat(value, "\r\n");	// required by long descs
 			change_long_desc(mob, clear ? NULL : value);
+		}
+		else if (is_abbrev(field_arg, "lookdescription")) {	// SETS the lookdescription
+			strcat(value, "\r\n");	// required by look descs
+			change_look_desc(mob, clear ? NULL : value, TRUE);
+		}
+		else if (is_abbrev(field_arg, "append-lookdescription")) {	// ADDS TO THE END OF the lookdescription
+			if (strlen(NULLSAFE(GET_LOOK_DESC(mob))) + strlen(value) + 2 > MAX_PLAYER_DESCRIPTION) {
+				script_log("%%mod%% append-description: obj lookdescription length is too long (%d max)", MAX_PLAYER_DESCRIPTION);
+			}
+			else {
+				change_look_desc_append(mob, value, TRUE);
+			}
+		}
+		else if (is_abbrev(field_arg, "append-lookdesc-noformat")) {	// ADDS TO THE END OF the lookdescription without formatting
+			if (strlen(NULLSAFE(GET_LOOK_DESC(mob))) + strlen(value) + 2 > MAX_PLAYER_DESCRIPTION) {
+				script_log("%%mod%% append-description: obj lookdescription length is too long (%d max)", MAX_PLAYER_DESCRIPTION);
+			}
+			else {
+				change_look_desc_append(mob, value, FALSE);
+			}
 		}
 		else if (is_abbrev(field_arg, "sex")) {
 			if ((pos = search_block(value, genders, FALSE)) != NOTHING) {
@@ -1359,7 +1381,7 @@ void script_modify(char *argument) {
 			script_log("%%mod%% cannot be used on Ocean rooms");
 		}
 		else if (is_abbrev(field_arg, "icon")) {
-			if (!clear && !str_cmp(value, "none") && !validate_icon(value)) {
+			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
 				script_log("%%mod%% called with invalid room icon '%s'", value);
 			}
 			else {
@@ -1419,7 +1441,7 @@ void script_modify(char *argument) {
 		v_proto = vehicle_proto(VEH_VNUM(veh));
 		
 		if (is_abbrev(field_arg, "icon")) {
-			if (!clear && !str_cmp(value, "none") && !validate_icon(value)) {
+			if (!clear && str_cmp(value, "none") && !validate_icon(value)) {
 				script_log("%%mod%% called with invalid vehicle icon '%s'", value);
 			}
 			else {

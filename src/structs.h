@@ -2545,6 +2545,8 @@ typedef struct vehicle_data vehicle_data;
 
 #define UP  8
 #define DOWN  9
+#define NUM_NATURAL_DIRS  10	// set of dirs
+
 #define FORE  10
 #define STARBOARD  11
 #define PORT  12
@@ -2723,6 +2725,7 @@ typedef struct vehicle_data vehicle_data;
 #define MAX_MAIL_SIZE  4096	// arbitrary
 #define MAX_MESSAGES  100	// fight.c
 #define MAX_MOTD_LENGTH  4000	// eedit.c, configs
+#define MAX_MOVEMENT_STRING  245	// any longer and it cannot be read from file
 #define MAX_NAME_LENGTH  20
 #define MAX_NOTES  8000
 #define MAX_OBJ_AFFECT  6

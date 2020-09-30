@@ -64,6 +64,72 @@ if %room.title% ~= #n
 end
 detach 5007 %room.id%
 ~
+#5009
+Ruins icons for vehicle-buildings~
+5 n 100
+~
+* Random ruins icons
+if %self.vnum% == 5006
+  * open-style ruins
+  switch %random.7%
+    case 1
+      %mod% %self% icon .&0_i&?.
+    break
+    case 2
+      %mod% %self% icon .&0[.&?.
+    break
+    case 3
+      %mod% %self% icon .&0.v&?.
+    break
+    case 4
+      %mod% %self% icon .&0/]&?.
+    break
+    case 5
+      %mod% %self% icon .&0(\&?.
+    break
+    case 6
+      %mod% %self% icon .&0}\.
+    break
+    case 7
+      %mod% %self% icon &0..}&?.
+    break
+  done
+else
+  switch %random.7%
+    case 1
+      %mod% %self% icon ..&0/]
+    break
+    case 2
+      %mod% %self% icon &0[\&?..
+    break
+    case 3
+      %mod% %self% icon &0|\&?..
+    break
+    case 4
+      %mod% %room% icon &0[&?__&0]
+    break
+    case 5
+      %mod% %self% icon ..&0/]
+    break
+    case 6
+      %mod% %self% icon .&0-&?.&0]
+    break
+    case 7
+      %mod% %self% icon &0[&?.&0-&?.
+    break
+  done
+end
+if %self.shortdesc% ~= #n
+  %mod% %self% shortdesc some decaying ruins
+end
+if %self.longdesc% ~= #n
+  %mod% %self% longdesc Some decaying ruins are crumbling here.
+end
+if %self.keywords% ~= #n
+  %mod% %self% keywords ruins decaying
+end
+detach 5009 %self.id%
+~
 #5010
 Flooded Ruins Name Fixer~
 2 n 100

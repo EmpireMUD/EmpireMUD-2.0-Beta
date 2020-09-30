@@ -301,27 +301,33 @@ The guildleader sells:
   the tortoiseshell ring of mettle - 100-200 tank ring (Esteemed)
   an imperium-clad whistle - land mount (Liked)
 #
-HALLOWEEN CANDY "HALLOWEEN CANDY" "RESTLESS SPIRIT"
+HALLOWEEN CANDY "HALLOWEEN CANDY" "HALLOWEEN OF THE DEAD"
 
-The Halloween game content is available during the month of October and offers
-daily quests to earn fun rewards. Each quest requires that you have achieved
-level 50 in its skill, and quests are available for several different skills.
+The Halloween of the Dead event is available during the month of October
+(ending November 2) and offers daily quests to earn fun rewards. Some quests
+are only available if you have the right skill.
 
 You can start all the quests from halloween candy items that you find by
-killing mobs anywhere in the world. Sacrifice any piece of candy at an enclosed
-'tomb' building to summon the restless spirit.
+killing mobs anywhere in the world. 
 
-The restless spirit sells:
-  a ghoul whistle  (6 trick tokens) - a mini-pet
-  a headless horse whistle  (6 trick tokens) - a mount
-  a nightmare whistle  (18 trick tokens) - a flying mount
-  some candy seeds  (12 trick tokens) - plants a crop
-  a costume kit  (12 trick tokens) - allows you to sew costumes
-  a mausoleum cornerstone  (18 trick tokens) - a large tomb building
-  a haunted mask  (18 trick tokens) - new morphs (some require skills)
+Some of the rewards include:
+ bunch of pumpkin seeds - try planting them
+ pumpkin coach spell - make a new vehicle from a pumpkin
+ costume kit - sew fun costumes
+ plague doctor mask - headgear with +Greatness
+ rib cage xylophone - play spooky music
+ oversized candy bag - a large pack
+ ghastly shackles - for people who are shackled to their work
+ haunted snowglobe - build the mansion that's depicted in the globe
+ flying pumpkin coach spell - make your pumpkin coach fly
+ vial of swirling ectoplasm - upgrade some of the reward items
+ vial of magi-genic ooze - upgrade one of your Halloween mounts to fly
+ reddened butcher's block - builds a slaughterhouse
 
 Game admins: You must enable global 18802 by removing its IN-DEV flag to turn
 on the Halloween candy drops, and disable that global when the holiday is over.
+Start event 18800 at the beginning of October 1; it runs 33 days (to end at the
+end of November 2).
 #
 "LOST TEMPLE" "JUNGLE TEMPLE" "THE LOST TEMPLE"
 

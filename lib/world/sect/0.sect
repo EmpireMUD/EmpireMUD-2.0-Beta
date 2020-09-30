@@ -62,7 +62,7 @@ S
 #1
 Light Forest~
 A Light Forest~
-'.' 14 jq 2 dl np
+'.' 14 jqr 2 dl np
 C
 chop, dig, gather, pick~
 D1
@@ -900,7 +900,7 @@ S
 #27
 Partial Jungle~
 The Jungle, Partially Cleared~
-'^' 12 lq 6 d g
+'^' 12 lqr 6 d g
 C
 chop, gather~
 D1
@@ -967,6 +967,10 @@ E
 7 5 2.00 29
 E
 15 0 1.00 34
+E
+17 4 0.50 27
+E
+17 90 0.70 27
 I 6 3017 75.00 1  # FORAGE: plump fig
 I 9 133 100.00 1  # GATHER: tangle of vines
 I 20 128 100.00 1  # CHOP: massive jungle tree
@@ -1116,7 +1120,7 @@ S
 #36
 Stumps~
 A Field of Stumps~
-'.' 10 j 2 dl bp
+'.' 10 jr 2 dl bp
 C
 burn stumps, dig~
 D1
@@ -1165,7 +1169,7 @@ S
 #37
 Small Copse~
 A Small Copse~
-'.' 13 j 2 d p
+'.' 13 jr 2 d p
 C
 chop, dig~
 D1
@@ -1205,7 +1209,7 @@ S
 #38
 Copse~
 A Copse of Young Trees~
-'w' 13 j 3 dl p
+'w' 13 jr 3 dl p
 C
 chop, dig~
 D1
@@ -1245,7 +1249,7 @@ S
 #39
 Forest Edge~
 The Edge of the Forest~
-'w' 13 j 2 d np
+'w' 13 jr 2 d np
 C
 chop, dig~
 D1
@@ -1447,7 +1451,7 @@ S
 #44
 Light Riverbank Forest~
 Some Trees on the Riverbank~
-'.' 14 jqv 2 dl nps
+'.' 14 jqrv 2 dl nps
 C
 chop, dig, gather, pick~
 D1
@@ -1551,7 +1555,7 @@ S
 #46
 Stumped Riverbank~
 Some Stumps on the Riverbank~
-'.' 10 jv 1 dl bps
+'.' 10 jrv 1 dl bps
 C
 burn stumps, dig, pick~
 D1
@@ -1588,7 +1592,7 @@ S
 #47
 Riverside Copse~
 A Copse on the Riverbank~
-'w' 13 jv 3 d p
+'w' 13 jrv 3 d p
 C
 chop, dig, pick~
 D1
@@ -1771,7 +1775,7 @@ S
 #54
 Shoreside Tree~
 A Tree by the Shore~
-'.' 14 js 2 dl npr
+'.' 14 jrs 2 dl npr
 C
 chop, dig, gather, pick~
 D1
@@ -1927,7 +1931,7 @@ S
 #59
 Seaside Stumps~
 Some Stumps Along the Shore~
-'.' 10 js 2 dl bpr
+'.' 10 jrs 2 dl bpr
 C
 burn stumps, dig, pick~
 D1
@@ -1977,7 +1981,7 @@ S
 #60
 Seaside Copse~
 A Small Copse by the Sea~
-'w' 13 js 2 dl pr
+'w' 13 jrs 2 dl pr
 C
 chop, dig, pick~
 D1
@@ -2028,7 +2032,7 @@ S
 #61
 Jungle Stumps~
 A Densely Vined Field of Stumps~
-'.' 10 l 3 dl p
+'.' 10 lr 3 dl p
 C
 burn stumps~
 D1
@@ -2115,7 +2119,7 @@ S
 #63
 Seaside Jungle Stumps~
 Amidst Tropical Stumps on the Seaside~
-'.' 10 ls 3 dl pr
+'.' 10 lrs 3 dl pr
 C
 burn stumps, pick~
 D0
@@ -2144,7 +2148,7 @@ S
 #64
 Seaside Jungle Copse~
 A Copse in the Jungle by the Sea~
-'w' 13 ls 6 d pr
+'w' 13 lrs 6 d pr
 C
 chop, pick~
 D0
@@ -2176,7 +2180,7 @@ S
 #65
 Jungle Edge~
 The Edge of the Jungle~
-'w' 13 l 5 d 0
+'w' 13 lr 5 d 0
 C
 chop~
 D0
@@ -2336,7 +2340,7 @@ S
 #73
 Irrigated Stumps~
 Some Stumps on the Irrigated Plain~
-'.' 10 jkv 2 dl bp
+'.' 10 jkrv 2 dl bp
 C
 burn stumps, dig, pick~
 D1
@@ -2386,7 +2390,7 @@ S
 #74
 Irrigated Copse~
 An Irrigated Copse~
-'w' 13 jkv 3 d p
+'w' 13 jkrv 3 d p
 C
 chop, dig, pick~
 D1
@@ -2433,7 +2437,7 @@ S
 #75
 Irrigated Jungle Stumps~
 A Marshy Field of Stumps~
-'.' 10 klv 3 dl p
+'.' 10 klrv 3 dl p
 C
 chop, dig, pick~
 D0

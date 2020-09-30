@@ -8,29 +8,24 @@ complete when you defeat the horse man.
 To summon the horse man: use lantern <normal | hard | group | boss>
 ~
    You have defeated the headless horse man and saved the local villagers from
-his reign of terror. You have earned a trick token, which you can use to buy
-gifts from the restless spirit.
+his reins of terror. You have earned a goody bag!
 ~
-11 e 0 0 -1
+19 e 0 0 -1
 A
 2 18803
 A
 2 18811
 P
-9 0 0 50
+36 18800 0 1 a
 R
-8 18800 1
+9 18800 10
 R
-0 0 1
+2 18829 1
 T 18820
 W
 12 5144 0 1 a
 W
 3 18801 0 1 a
-Z
-1 18800
-Z
-2 18800
 S
 #18819
 Halloween: Costume the Town~
@@ -39,31 +34,28 @@ droll, and this is hardly the season for droll. Take this empty trunk and use
 the sewing pattern on the side to sew the 'Halloween costume trunk'. Once
 you've made the costumes, type 'costume <citizen>' to use the trunk on 6 of
 your citizens and deck them out in festive costumes.
-   Sacrifice any piece of Halloween candy at an enclosed tomb to summon the
-restless spirit, where you can turn in this quest and buy rewards.
 ~
    Your citizens are costumed and now the holiday festivities can begin! You
-have earned a trick token, which you can use to buy gifts from the restless
-spirit.
+have earned a goody bag!
 ~
-11 de 0 0 -1
+18 de 0 0 -1
 A
 2 18806
 A
 2 18811
 P
-9 6 0 50
+9 6 0 1 a
+P
+36 18800 0 1 a
 R
-8 18800 1
+9 18800 10
 R
-0 0 1
+2 18829 1
 T 18820
 W
 2 18819 0 1 a
 W
 11 0 0 1 a
-Z
-1 18800
 S
 #18821
 Halloween: Citizens Will Be Toad~
@@ -71,29 +63,27 @@ Halloween: Citizens Will Be Toad~
 in the air. Take this warty wand and type 'polymorph <citizen>' to turn 4 of
 your citizens into toads. Don't worry, it's all in good fun. They'll be back to
 normal in no time.
-   Sacrifice any piece of Halloween candy at an enclosed tomb to summon the
-restless spirit, where you can turn in this quest and buy rewards.
 ~
    As the croaking of toads fades from your ears, you smile to yourself and
-think of the holiday joy you've brought to your city. You have earned a trick
-token, which you can use to buy gifts from the restless spirit.
+think of the holiday joy you've brought to your city. You have earned a goody
+bag!
 ~
-8 e 0 0 -1
+15 e 0 0 -1
 A
 2 18810
 A
 2 18805
 P
-9 3 0 50
+36 18800 0 1 a
+P
+9 3 0 1 a
 R
-8 18800 1
+9 18800 10
 R
-0 0 1
+2 18829 1
 T 18820
 W
 11 0 0 1
-Z
-1 18800
 S
 #18823
 Halloween: A City Aghast~
@@ -103,57 +93,53 @@ surely reunited many people with their dead loved ones. Tonight, it is time to
 reunite the dead with the living. Go to the center of your city and type
 'ritual spirits' to perform this powerful ritual and return the dead to the
 world of the living.
-   Sacrifice any piece of Halloween candy at an enclosed tomb to summon the
-restless spirit, where you can turn in this quest and buy rewards.
 ~
    Now everyone seems to be getting into the 'spirit' of the holiday! You have
-earned a trick token, which you can use to buy gifts from the restless spirit.
+earned a goody bag!
 ~
-7 e 0 0 -1
+14 e 0 0 -1
 A
 2 18804
 A
 2 18809
 P
-9 2 0 50
+36 18800 0 1 a
+P
+9 2 0 1 a
 R
-8 18800 1
+9 18800 10
 R
-0 0 1
+2 18829 1
 T 18820
 W
 11 0 0 1
-Z
-1 18800
 S
 #18824
 Halloween: A Traditional Bog Roll~
    A restless spirit appears to tell you: This time of year, the spirit of
 mischief is in the air. Take this bog roll and use it to paper some houses in
 your city. Type 'use roll' to spread the Halloween cheer to three houses.
-   Sacrifice any piece of Halloween candy at an enclosed tomb to summon the
-restless spirit, where you can turn in this quest and buy rewards.
 ~
    Now that you've redecorated the city, everyone is getting into the holiday
-spirit! You have earned a trick token, which you can use to buy gifts from the
-restless spirit.
+spirit! You have earned a goody bag!
 ~
-7 e 0 0 -1
+14 e 0 0 -1
 A
 2 18805
 A
 2 18802
+D 18824
 P
-9 4 0 50
+36 18800 0 1 a
+P
+9 4 0 1 a
 R
-8 18800 1
+9 18800 10
 R
-0 0 1
+2 18829 1
 T 18820
 W
 11 0 0 1
-Z
-1 18800
 S
 #18827
 Halloween: Get the Blood Pumping~
@@ -164,177 +150,339 @@ peak of freshness for this bloodthirsty holiday, morph yourself into the
 dreaded Dracula and scare five of your citizens. That should really get the
 blood pumping.
    First 'morph Dracula' then 'scare <citizen>' to complete this quest.
-   Sacrifice any piece of Halloween candy at an enclosed tomb to summon the
-restless spirit, where you can turn in this quest and buy rewards.
 ~
-   The citizens' hearts are definitely pumping now. You have earned a trick
-token, which you can use to buy gifts from the restless spirit.
+   The citizens' hearts are definitely pumping now. You have earned a goody
+bag!
 ~
-7 e 0 0 -1
+14 e 0 0 -1
 A
 2 18808
 A
 2 18806
 P
-9 7 0 50
+36 18800 0 1 a
+P
+9 7 0 1 a
 R
-8 18800 1
+9 18800 10
 R
-0 0 1
+2 18829 1
 T 18820
 W
 11 0 0 1
-Z
-1 18800
 S
 #18828
 Halloween: House of 100 Corpses~
-   The Halloween season is upon us and in order to welcome the influx of
-witches, goblins, ghosts, and ghouls, you must build a proper haunted house.
-Take this deed and build the 'unearthlymanor' in one of your cities.
-   Sacrifice any piece of Halloween candy at an enclosed tomb to summon the
-restless spirit, where you can turn in this quest and buy rewards.
+   Your grandmother may be see-through, but she's holding a real deed to some
+family land. Take the deed and build the 'unearthly manor', for the sake of
+your family. But Grandmother refuses to say if the manor will keep the spirits
+out, or if it's the thing that will release them.
 ~
-   Now that you have a haunted house, you should be able to appease the spirits
-of the dead.
+Hopefully building that unearthly manor will appease the spirits of the dead.
 ~
-6 0 0 0 -1
+8 0 0 0 -1
 A
-1 18800
-P
-9 6 0 50
+1 18881
 R
-0 0 1
-R
-8 18800 2
+2 18829 1
 T 18820
 W
 7 18828 0 1
 Z
-1 18800
+0 18828
 S
 #18829
 Halloween: Appease the Spirits~
    An emperor's work does not end at death. Instead, they go on to build great
 kingdoms and monuments in the next world. You must appease the spirits of the
-dead by making offerings at 5 different tombs. Bring 10x (common metal) to each
-tomb and type 'offer'. Look at the offering instructions for more details.
-   Sacrifice any piece of Halloween candy at an enclosed tomb to summon the
-restless spirit, where you can turn in this quest and buy rewards.
+dead by making offerings at 5 different tombs. Bring 10x (common metal ingots)
+to each tomb and type 'offer'. Look at the offering instructions for more
+details.
 ~
 You have appeased the spirits of the dead for today.
 ~
-6 e 0 0 -1
+15 e 0 0 -1
 A
 2 18807
 A
 2 18803
 D 18829
 P
-0 18828 0 1 a
-P
-9 6 0 50 a
+36 18800 0 1 a
 R
-8 18800 1
+9 18800 10
 R
-0 0 1
+2 18829 1
 T 18820
 W
 11 0 0 1
-Z
-1 18800
 S
 #18830
 Halloween: Appease the Spirits~
    An emperor's work does not end at death. Instead, they go on to build great
 kingdoms and monuments in the next world. You must appease the spirits of the
-dead by making offerings at 5 different tombs. Bring 10x (block) to each tomb
+dead by making offerings at 5 different tombs. Bring 10x (blocks) to each tomb
 and type 'offer'. Look at the offering instructions for more details.
-   Sacrifice any piece of Halloween candy at an enclosed tomb to summon the
-restless spirit, where you can turn in this quest and buy rewards.
 ~
 You have appeased the spirits of the dead for today.
 ~
-7 e 0 0 -1
+15 e 0 0 -1
 A
 2 18807
 A
 2 18803
 D 18829
 P
-0 18828 0 1 a
-P
-9 6 0 50 a
+36 18800 0 1 a
 R
-8 18800 1
+9 18800 10
 R
-0 0 1
+2 18829 1
 T 18820
 W
 11 0 0 1
-Z
-1 18800
 S
 #18831
 Halloween: Appease the Spirits~
    An emperor's work does not end at death. Instead, they go on to build great
 kingdoms and monuments in the next world. You must appease the spirits of the
-dead by making offerings at 5 different tombs. Bring 10x (rock) to each tomb
+dead by making offerings at 5 different tombs. Bring 10x (rocks) to each tomb
 and type 'offer'. Look at the offering instructions for more details.
-   Sacrifice any piece of Halloween candy at an enclosed tomb to summon the
-restless spirit, where you can turn in this quest and buy rewards.
 ~
 You have appeased the spirits of the dead for today.
 ~
-7 e 0 0 -1
+15 e 0 0 -1
 A
 2 18807
 A
 2 18803
 D 18829
 P
-0 18828 0 1 a
-P
-9 6 0 50 a
+36 18800 0 1 a
 R
-8 18800 1
+9 18800 10
 R
-0 0 1
+2 18829 1
 T 18820
 W
 11 0 0 1
-Z
-1 18800
 S
 #18832
 Halloween: Appease the Spirits~
    An emperor's work does not end at death. Instead, they go on to build great
 kingdoms and monuments in the next world. You must appease the spirits of the
-dead by making offerings at 5 different tombs. Bring 10x (plant fiber) to each
+dead by making offerings at 5 different tombs. Bring 10x (plant fibers) to each
 tomb and type 'offer'. Look at the offering instructions for more details.
-   Sacrifice any piece of Halloween candy at an enclosed tomb to summon the
-restless spirit, where you can turn in this quest and buy rewards.
 ~
 You have appeased the spirits of the dead for today.
 ~
-8 e 0 0 -1
+16 e 0 0 -1
 A
 2 18807
 A
 2 18803
 D 18829
 P
-0 18828 0 1 a
-P
-9 6 0 50 a
+36 18800 0 1 a
 R
-8 18800 1
+9 18800 10
 R
-0 0 1
+2 18829 1
 T 18820
 W
 11 0 0 1
-Z
-1 18800
+S
+#18854
+Halloween: Pick or Treat~
+   The halloween spirits are bound to the graveyards, and thus can't go around
+collecting their own candy. Obviously, you aren't going to want to give up your
+own candy. Pickpocket five citizens of your empire for some special treats to
+gift to the spirits.
+~
+The spirits take your freshly stolen candy and grin as they vanish, one by one.
+~
+14 de 0 0 -1
+A
+2 18802
+A
+2 18805
+D 18824
+P
+9 4 0 1 a
+P
+36 18800 0 1 a
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W
+2 18855 0 5
+S
+#18856
+Halloween: Magic Mirror~
+   The spirits grow bored and want some form of entertainment. They gift you
+with a magical mirror that captures reflections within itself. Dress in five
+different outfits to give them five reflections to observe and break up the
+tedium of seeing the same old unchanging spirits.
+   Simply wear a clothing item and look at the mirror.
+~
+   The spirits are highly amused at the various looks you have captured in the
+reflections and thank you for the entertainment.
+~
+11 e 0 0 -1
+A
+2 18806
+A
+2 18807
+D 18856
+P
+36 18800 0 1
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W
+11 0 0 1
+S
+#18857
+Halloween: Bobbing for Apples~
+   You're going to need to interact with another player this time. The spirits
+gift you with an apple bobbing bucket, and now its time to have some fun.
+Challenge another player to an apple bobbing contest and get the biggest one to
+complete this quest.
+   Put the bucket on the ground, type 'challenge <player>', then 'bob bucket.
+~
+Good job finding the bigger apple. Hopefully you had some fun doing it.
+~
+10 e 0 0 -1
+A
+2 18806
+A
+2 18807
+D 18856
+P
+36 18800 0 1
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W
+11 0 0 1
+S
+#18869
+Halloween: Songs for the Deaths Yet to Come~
+   It's been said that music soothes the soul. Now you can prove it. Take this
+haunting sheet music and play it for someone threatening, until they accept the
+pacification and leave. Look for someone who would take more than one
+adventurer to defeat in combat, otherwise it'll be a waste of your time. Of
+course, you also want to be sure you aren't weakening your empire, so the
+target can't be a member.
+~
+   Seems that music really can soothe the savage soul... Or at least, failing
+that, it can get them dancing!
+~
+12 e 0 0 -1
+A
+2 18809
+A
+2 18808
+D 18870
+P
+36 18800 0 1
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W
+11 0 0 1
+S
+#18870
+Halloween: Songs for the Dead~
+   You've heard tales of music being able to call back the spirits of fallen
+empire-mates from beyond. You can't be sure if it's true until you try for
+yourself. Play some music and call back five fallen members of the empire to
+share in the merriment. You need to do this in one of your cities.
+~
+   You've done it! You have actually managed to call five fallen empire-mates
+back for a brief time. Surely their loved ones will be greatful for the chance
+to make their peace now.
+~
+11 e 0 0 -1
+A
+2 18809
+A
+2 18808
+D 18870
+P
+36 18800 0 1
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W
+11 0 0 1
+S
+#18873
+Halloween: Songs for the Dying~
+   The headless centaur is particularly vicious in how he wounds his victims
+and then leaves them dying on the ground. In pain and watched by the one who
+put them into this condition, adventurers are demoralized. You might not be
+able to help with them surviving the battle, but you can at least shield this
+latest victim from view and ease the fallen adventurer into the afterlife by
+playing some music.
+   Build the 'medical tent' and then play some music for the poor soul within.
+~
+   The latest victim has passed peacefully. Now, you should probably go take
+care of that headless centaur!
+~
+16 ae 0 0 -1
+A
+2 18809
+A
+2 18808
+P
+36 18800 0 1
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W
+11 0 0 1
+S
+#18880
+Halloween: Ancestor's Offering~
+   During Halloween, the spirits of the dead can get closer to the world of the
+living than any other time. However, they are only allowed to truly walk in
+this world if their portrait is placed on an altar at their tomb. You're
+suddenly flooded with memories of your grandmother, who you haven't thought of
+in many months. You grab a scrap of old parchment and resolve to invoke her
+spirit.
+   Head to your grandmother's tomb (or any tomb, really) and type 'invoke
+ancestor'. Afterwards, head to your family home (or any home) and type
+'paint spirit'. Once you have the portrait of your grandmother, return to the
+tomb and type 'place portrait'. That should be enough to summon her.
+~
+Your grandmother is here once again, if only for a while.
+~
+10 e 0 0 -1
+A
+2 18804
+A
+2 18810
+P
+36 18800 0 1
+R
+9 18800 10
+R
+2 18829 1
+T 18820
+W
+11 0 0 1
 S
 $

@@ -1679,6 +1679,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 			case 'I': {
 				if (PFILE_TAG(line, "Idnum:", length)) {
 					GET_IDNUM(ch) = atoi(line + length + 1);
+					
+					// assign this immediately
+					ch->script_id = GET_IDNUM(ch);
 				}
 				else if (PFILE_TAG(line, "Ignore:", length)) {
 					if (ignore_pos < MAX_IGNORES) {
@@ -2123,9 +2126,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	if (!GET_PASSWD(ch) || !*GET_PASSWD(ch)) {
 		log("SYSERR: Finished loading playerfile '%s' but did not find password", GET_PC_NAME(ch));
 	}
-	
-	// some systems use this early
-	ch->script_id = GET_IDNUM(ch);
 	
 	// have account?
 	if (normal && !GET_ACCOUNT(ch)) {
@@ -2657,7 +2657,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (GET_MOVEMENT_STRING(ch)) {
 		strcpy(temp, GET_MOVEMENT_STRING(ch));
-		temp[245] = '\0';	// ensure not longer than this (we would not be able to load it)
+		temp[MAX_MOVEMENT_STRING] = '\0';	// ensure not longer than this (we would not be able to load it)
 		fprintf(fl, "Mvstring: %s\n", temp);
 	}
 	
@@ -2740,6 +2740,13 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (USING_POISON(ch) != NOTHING) {
 		fprintf(fl, "Using Poison: %d\n", USING_POISON(ch));
+	}
+	
+	// # save equipment
+	for (iter = 0; iter < NUM_WEARS; ++iter) {
+		if (char_eq[iter]) {
+			Crash_save(char_eq[iter], fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
+		}
 	}
 	
 	// END PLAYER FILE
@@ -2941,11 +2948,6 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	}
 	
 	// '#'
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (GET_EQ(ch, iter)) {
-			Crash_save(GET_EQ(ch, iter), fl, iter + 1);	// save at iter+1 because 0 == LOC_INVENTORY
-		}
-	}
 	Crash_save(ch->carrying, fl, LOC_INVENTORY);
 	
 	// END DELAY-LOADED SECTION
@@ -4952,9 +4954,9 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 			continue;
 		}
 		
-		// new way of loading data
+		// load the player unless they're in-game
 		if ((ch = find_or_load_player(index->name, &is_file))) {
-			check_delayed_load(ch);
+			// check_delayed_load(ch);	// no longer need this as equipment is in the main file
 			affect_total(ch);
 		}
 		

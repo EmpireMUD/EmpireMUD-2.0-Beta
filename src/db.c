@@ -1970,6 +1970,7 @@ const char *versions_list[] = {
 	"b5.103",
 	"b5.104",
 	"b5.105",
+	"b5.106",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -4501,6 +4502,39 @@ void b5_105_update(void) {
 }
 
 
+// b5.106 (1/2) loads players and re-saves them to move equipment to the delay file
+PLAYER_UPDATE_FUNC(b5_106_players) {
+	check_delayed_load(ch);
+}
+
+
+// b5.106 (2/2) fixes some icon errors: a recent patch allowed icons to have too many backslashes
+void b5_106_update(void) {
+	struct map_data *map;
+	int iter, diff;
+	char *icon;
+	
+	log("Applying b5.106 update to fix ruins icons...");
+	
+	LL_FOREACH(land_map, map) {
+		if ((icon = map->shared->icon) && color_strlen(icon) > 4 && strstr(icon, "\\\\")) {
+			// reduce double-slashes
+			for (iter = diff = 0; iter <= strlen(icon); ++iter) {
+				if (icon[iter] == '\\' && icon[iter+1] == '\\') {
+					++diff;	// causes a skip
+				}
+				else if (iter > 0 && diff > 0) {	// copy backwards
+					icon[iter-diff] = icon[iter];
+				}
+			}
+		}
+	}
+	
+	log("Applying b5.106 update to re-save all players with equipment in the main save...");
+	update_all_players(NULL, b5_106_players);
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4828,6 +4862,9 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.105")) {
 			b5_105_update();
+		}
+		if (MATCH_VERSION("b5.106")) {
+			b5_106_update();
 		}
 	}
 	

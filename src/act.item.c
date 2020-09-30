@@ -895,7 +895,7 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 		msg_to_char(ch, "Owner: %s%s\t0\r\n", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
 	}
 	
-	msg_to_char(ch, "Type: %s\r\n", skip_filler(proto ? VEH_SHORT_DESC(proto) : VEH_SHORT_DESC(veh)));
+	msg_to_char(ch, "Type: %s\r\n", skip_filler((proto && !strchr(VEH_SHORT_DESC(proto), '#')) ? VEH_SHORT_DESC(proto) : VEH_SHORT_DESC(veh)));
 	msg_to_char(ch, "Level: %d\r\n", VEH_SCALE_LEVEL(veh));
 	
 	prettier_sprintbit(VEH_FLAGS(veh), identify_vehicle_flags, buf);

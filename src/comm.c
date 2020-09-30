@@ -1372,7 +1372,7 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 	extern bool is_fight_ally(char_data *ch, char_data *frenemy);
 	
 	const char *i = NULL;
-	char *buf, lbuf[MAX_STRING_LENGTH], *dg_arg = NULL;
+	char *buf, lbuf[MAX_STRING_LENGTH], *dg_arg = NULL, temp[MAX_STRING_LENGTH];
 	bool real_ch = FALSE, real_vict = FALSE;
 	char_data *dg_victim = NULL;
 	obj_data *dg_target = NULL;
@@ -1473,6 +1473,48 @@ void perform_act(const char *orig, char_data *ch, const void *obj, const void *v
 					dg_victim = (char_data*) vict_obj;
 					real_vict = TRUE;
 					break;
+				case 'k': {	// loyalty/empire adjective of $n
+					if (GET_LOYALTY(ch)) {
+						snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
+						i = temp;
+					}
+					else {
+						i = "imperial";
+					}
+					break;
+				}
+				case 'K': {	// loyalty/empire adjective of $N
+					dg_victim = (char_data*) vict_obj;
+					if (dg_victim && GET_LOYALTY(dg_victim)) {
+						snprintf(temp, sizeof(temp), "%s", EMPIRE_ADJECTIVE(GET_LOYALTY(dg_victim)));
+						i = temp;
+					}
+					else {
+						i = "imperial";
+					}
+					break;
+				}
+				case 'l': {	// loyalty/empire name of $n
+					if (GET_LOYALTY(ch)) {
+						snprintf(temp, sizeof(temp), "%s", EMPIRE_NAME(GET_LOYALTY(ch)));
+						i = temp;
+					}
+					else {
+						i = "an empire";
+					}
+					break;
+				}
+				case 'L': {	// loyalty/empire name of $N
+					dg_victim = (char_data*) vict_obj;
+					if (dg_victim && GET_LOYALTY(dg_victim)) {
+						snprintf(temp, sizeof(temp), "%s", EMPIRE_NAME(GET_LOYALTY(dg_victim)));
+						i = temp;
+					}
+					else {
+						i = "an empire";
+					}
+					break;
+				}
 				case 'm':
 					i = real_ch ? REAL_HMHR(ch) : HMHR(ch);
 					break;
