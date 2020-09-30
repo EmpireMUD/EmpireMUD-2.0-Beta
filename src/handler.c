@@ -8202,7 +8202,7 @@ char *requirement_string(struct req_data *req, bool show_vnums) {
 		}
 		case REQ_OWN_VEHICLE: {
 			vproto = vehicle_proto(req->vnum);
-			snprintf(output, sizeof(output), "Own %dx %s%s: %s%s", req->needed, PLURAL(req->needed), vnum, vproto ? VEH_OR_BLD(vproto) : "vehicle", vproto ? VEH_SHORT_DESC(vproto) : "unknown");
+			snprintf(output, sizeof(output), "Own %dx %s%s: %s%s", req->needed, vproto ? VEH_OR_BLD(vproto) : "vehicle", PLURAL(req->needed), vnum, vproto ? VEH_SHORT_DESC(vproto) : "unknown");
 			break;
 		}
 		case REQ_OWN_VEHICLE_FLAGGED: {
