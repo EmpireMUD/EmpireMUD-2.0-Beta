@@ -944,7 +944,7 @@ end
 #18856
 look in magic mirror~
 1 c 2
-look~
+look examine~
 if !%actor.on_quest(18856)%
   %send% %actor% %self.shortdesc%? What about %self.shortdesc%?
   %purge% %self%
@@ -1505,7 +1505,11 @@ if %self.varexists(day_count)%
     halt
   end
 end
-%echo% %self.name% whispers, 'Thank you for this time to make peace.' And then fades away.
+if %self.vnum% == 18881
+  %echo% %self.name% returns to the realm of the dead.
+else
+  %echo% %self.name% whipsers, 'Thank you for this time to make peace,' and then fades away.
+end
 %purge% %self%
 ~
 #18873
@@ -1719,6 +1723,8 @@ if %new.vnum% == 18881%
   %mod% %new% shortdesc Grandmother %halloween_grandma%
   %mod% %new% longdesc The spirit of Grandmother %halloween_grandma% is standing here.
   %own% %new% %actor.empire%
+  set day_count %dailycycle%
+  remote day_count %new.id%
   * messaging
   %send% %actor% You place %self.shortdesc% on the tomb with care...
   %echoaround% %actor% %actor.name% carefully places %self.shortdesc% on a tomb...
@@ -1734,19 +1740,6 @@ if %old%
   %purge% %old%
 end
 %quest% %actor% finish 18880
-~
-#18882
-Ancestor's Offering: Despawn Ghost~
-0 ab 25
-~
-if !%self.varexists(halloween_timer)%
-  set halloween_timer %timestamp%
-  remote halloween_timer %self.id%
-elseif (%timestamp% - %self.halloween_timer%) > 43200
-  * 12 hours have passed
-  %echo% %self.name% returns to the realm of the dead.
-  %purge% %self%
-end
 ~
 #18884
 Plague Doctor Mask: Coughers abound~

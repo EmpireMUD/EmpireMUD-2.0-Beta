@@ -14,6 +14,18 @@ W
 W
 7 18844 0 1 a
 S
+#18801
+Halloween of the Dead~
+   Halloween comes but once a year, so we celebrate it with a month of revelry.
+Show your holiday spirit by collecting candy and completing quests, and earn
+this progress reward for your empire by winning the haunted snowglobe (750
+threshold points), then use it to build the haunted mansion!
+~
+2 4 0 5 c
+K 7 5
+W
+8 18899 0 1
+S
 #18829
 You Chose 'Treat'~
    Between the various members of your empire, you have collected a hundred
