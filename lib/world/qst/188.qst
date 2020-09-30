@@ -294,13 +294,12 @@ W
 S
 #18854
 Halloween: Pick or Treat~
-   The halloween spirits are bound to the graveyards and thus, can't go around
+   The halloween spirits are bound to the graveyards, and thus can't go around
 collecting their own candy. Obviously, you aren't going to want to give up your
-own candy. Pickpocket five citizens of your empire for some packages to gift to
-the spirits.
+own candy. Pickpocket five citizens of your empire for some special treats to
+gift to the spirits.
 ~
-   The spirits take your freshly stolen candy and grin as they vanish, one by
-one.
+The spirits take your freshly stolen candy and grin as they vanish, one by one.
 ~
 14 de 0 0 -1
 A
@@ -326,7 +325,7 @@ Halloween: Magic Mirror~
 with a magical mirror that captures reflections within itself. Dress in five
 different outfits to give them five reflections to observe and break up the
 tedium of seeing the same old unchanging spirits.
-Simply wear a clothing item and look at the mirror.
+   Simply wear a clothing item and look at the mirror.
 ~
    The spirits are highly amused at the various looks you have captured in the
 reflections and thank you for the entertainment.
@@ -353,6 +352,7 @@ Halloween: Bobbing for Apples~
 gift you with an apple bobbing bucket, and now its time to have some fun.
 Challenge another player to an apple bobbing contest and get the biggest one to
 complete this quest.
+   Put the bucket on the ground, type 'challenge <player>', then 'bob bucket.
 ~
 Good job finding the bigger apple. Hopefully you had some fun doing it.
 ~
@@ -374,13 +374,14 @@ W
 S
 #18869
 Halloween: Songs for the Deaths Yet to Come~
-It's been said that music soothes the soul. Now you can prove it. Take this
-haunting sheet music and play for something threatening until they accept the
-pacification and leave. Look for something that would take more than one
+   It's been said that music soothes the soul. Now you can prove it. Take this
+haunting sheet music and play it for someone threatening, until they accept the
+pacification and leave. Look for someone who would take more than one
 adventurer to defeat in combat, otherwise it'll be a waste of your time. Of
-course, you also want to be sure you aren't weakening your empire either.
+course, you also want to be sure you aren't weakening your empire, so the
+target can't be a member.
 ~
-   Seems that music really can soothe the savage soul... Or at least failing
+   Seems that music really can soothe the savage soul... Or at least, failing
 that, it can get them dancing!
 ~
 12 e 0 0 -1
@@ -400,15 +401,15 @@ W
 11 0 0 1
 S
 #18870
-Halloween: Music, a Magic Beyond All We do Here~
-   There's been talk recently about music being able to call back the spirits
-of fallen empire mates. You can't be sure if its true until you try for
-yourself. Play music and call back five fallen members of the empire to share
-in the merriment.
+Halloween: Songs for the Dead~
+   You've heard tales of music being able to call back the spirits of fallen
+empire-mates from beyond. You can't be sure if it's true until you try for
+yourself. Play some music and call back five fallen members of the empire to
+share in the merriment. You need to do this in one of your cities.
 ~
-   You've done it! You have actually managed to call five fallen empire mates
+   You've done it! You have actually managed to call five fallen empire-mates
 back for a brief time. Surely their loved ones will be greatful for the chance
-to make their piece now.
+to make their peace now.
 ~
 11 e 0 0 -1
 A
@@ -429,12 +430,12 @@ S
 #18873
 Halloween: Songs for the Dying~
    The headless centaur is particularly vicious in how he wounds his victims
-and then leaves them dying on the ground. In pain, and watched by the one who
+and then leaves them dying on the ground. In pain and watched by the one who
 put them into this condition, adventurers are demoralized. You might not be
-able to help with them surviving the battle, but you can at least shield his
-latest victim from view and relax the fallen adventurer into the afterlife by
+able to help with them surviving the battle, but you can at least shield this
+latest victim from view and ease the fallen adventurer into the afterlife by
 playing some music.
-type 'build medical tent'
+   Build the 'medical tent' and then play some music for the poor soul within.
 ~
    The latest victim has passed peacefully. Now, you should probably go take
 care of that headless centaur!

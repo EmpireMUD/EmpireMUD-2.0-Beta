@@ -1035,7 +1035,7 @@ switch %clothing_count%
     set clothing5 %clothing.shortdesc%
     remote clothing5 %self.id%
     %quest% %actor% trigger 18856
-    set build_up %self.clothing1%, the second %self.clothing2%, the third %self.clothing3%, the fourth %self.clothing4%, and the lateest %self.clothing5%.
+    set build_up %self.clothing1%, the second %self.clothing2%, the third %self.clothing3%, the fourth %self.clothing4%, and the latest %self.clothing5%.
   break
 done
 %send% %actor% In the background of %self.shortdesc% you see %clothing_count% shadowy %shadows% %build_up%

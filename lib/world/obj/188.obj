@@ -411,8 +411,8 @@ S
 whistle psychic~
 a psychic whistle~
 A whistle that's slightly psychic has been left here.~
-This whistle can summon a noncombat companion!
-Type 'use whistle' to summon it.
+This whistle can grant you a mini-pet!
+Type 'use whistle' to get it.
 ~
 19 p a 0 5
 18826 0 0
@@ -652,8 +652,8 @@ S
 whistle ghoul~
 a ghoul whistle~
 A ghoul whistle has been dropped here.~
-This whistle can summon a noncombat pet!
-Type 'use whistle' to summon it.
+This whistle can grant you a mini-pet!
+Type 'use whistle' to get it.
 ~
 19 p a 0 5
 18841 0 0
@@ -813,7 +813,7 @@ S
 bag grab~
 a grab bag~
 A simple grab bag is folded over here.~
-   From the squared off bottom, to the folded over top, this bag is completely
+   From the squared-off bottom, to the folded-over top, this bag is completely
 boring to look at. But you know that it is where you'll be hiding your
 pickpocketed candy from the citizens of your empire.
 ~
@@ -829,8 +829,8 @@ S
 candy freshly picked pack small~
 some freshly picked candy~
 A small pack of freshly picked candy waits to be eaten.~
-   Doesn't quite matter to you what kind, and it isn't likely the spirit will
-care either. Just as long as you have five packs to turn in.
+   Doesn't quite matter to you what kind of candy it is, and it isn't likely
+the spirits will care either. Just so long as you have five packs to turn in.
 ~
 6 k a 0 3
 1 0 0
@@ -857,10 +857,10 @@ S
 #18857
 bucket apple-bobbing bobbing~
 apple bobbing bucket~
-The apple-bobbing bucket is set up here waiting for players.~
-   This wooden bucket is on the larger side and filled with water and apples.
-* challenge <player>
-* bob bucket
+The apple-bobbing bucket is set up here, waiting for players.~
+This wooden bucket is on the larger side and filled with water and apples.
+Type:  challenge <player>
+Then type:   bob bucket
 ~
 3 z a 0 8
 0 0 0
@@ -874,9 +874,9 @@ T 18860
 S
 #18869
 sheet music~
-sheet music~
+some sheet music~
 A sheet of haunting music is folded here.~
-   Carefully hand drawn on a scroll of velum skin, there's music to play a
+   Carefully hand-drawn on a scroll of velum skin, there's music to play a
 haunting melody with nearly any instrument.
 ~
 3 0 a 0 4
@@ -889,9 +889,9 @@ T 18869
 S
 #18870
 sheet music~
-sheet music~
+some sheet music~
 A sheet of haunting music is folded here.~
-   Carefully hand drawn on a scroll of velum skin, there's music to play a
+   Carefully hand-drawn on a scroll of velum skin, there's music to play a
 haunting melody with nearly any instrument.
 ~
 3 0 a 0 5
@@ -905,10 +905,10 @@ S
 #18871
 report medical~
 a medical report~
-A medical report about a headless centaur's victim is folded here.~
+A medical report about a victim of the headless centaur is folded here.~
    The report makes it look like the centaur's victim doesn't have much time
 left.
-Type: build medical tent
+Type:  build medical tent
 ~
 3 0 a 0 7
 0 0 0
@@ -921,10 +921,10 @@ S
 #18873
 report medical~
 a medical report~
-A medical report about a headless centaur's victim is folded here.~
+A medical report about a victim of the headless centaur is folded here.~
    The medical information makes it quite clear that this particular victim of
 the headless centaur isn't going to be making it. As a final act of compassion
-for the dying adventurer, build a medical tent at the tomb he chose to summon
+for the dying adventurer, build a 'medical tent' at the tomb he chose to summon
 the centaur and failed to defeat it. Then soothe the fallen adventurer into his
 final rest by playing some music.
 ~
@@ -992,7 +992,7 @@ A vial of magi-genic ooze is lying here.~
    The contents of this vile vial are so purely purile that you're not sure
 what to make of them. The vial's label claims this ooze can make certain mounts
 fly. You can use it on your headless horse or giant tarantula. You must already
-have one of these as a mount, and you must be at a stable.
+have one of these in your mount list, and you must be at a stable.
 Usage:  use ooze <headless horse OR giant tarantula>
 ~
 3 p a 0 1
@@ -1065,7 +1065,7 @@ $p crumbles to dust and blows away.~
 S
 #18883
 shackles ghastly set~
-ghastly shackles~
+a set of ghastly shackles~
 A set of ghastly shackles are hanging in thin air.~
    These shackles seem at once to be both solid iron and ethereal smoke. But
 when you wear them, you feel a phantasmal lightness. And for some reason, you
@@ -1128,7 +1128,7 @@ R
 4 5611 a
 S
 #18887
-marigold lovely~
+marigold lovely flower~
 a lovely marigold~
 A lovely marigold has been dropped on the ground.~
    This little yellowish-orange flower has a beautiful maze of petals across
@@ -1144,7 +1144,7 @@ C
 T 18887
 S
 #18888
-chrysanthemum mum elegant~
+chrysanthemum mum elegant flower~
 an elegant chrysanthemum~
 An elegant chrysanthemum is lying here.~
    This large, showy flower is the chrysanthemum, or mum. Its many long,
@@ -1160,7 +1160,7 @@ C
 T 18887
 S
 #18889
-rose black single~
+rose black single flower~
 a single black rose~
 A black rose has fallen on the ground.~
    This thorny rose is nearly pure black, with a deep reddish-purple hue in
