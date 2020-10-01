@@ -330,7 +330,7 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 	struct pathfind_node *node, *end_node;
 	struct map_data *to_map;
 	room_data *to_room;
-	int dir, end_dir;
+	int dir;
 	
 	// shortcut for safety
 	if (!start || !end || start == end || !validator) {
@@ -355,7 +355,6 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 	}
 	
 	end_node = NULL;
-	end_dir = NO_DIR;
 	
 	// do the thing
 	DL_FOREACH(controller->nodes, node) {
@@ -382,7 +381,6 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 			// ok: is it the end loc?
 			if ((to_room && to_room == end) || (to_map && to_map->vnum == GET_ROOM_VNUM(end))) {
 				end_node = node;
-				end_dir = dir;
 				break;
 			}
 			
