@@ -3091,6 +3091,31 @@ struct offer_data {
 };
 
 
+// pathfind.c: one step in the path
+struct pathfind_node {
+	room_data *inside_room;	// if it's an interior, this is the current room
+	struct map_data *map_loc;	// if it's on the map, this is the current loc
+	
+	int cur_dir;	// last direction moved
+	int cur_dist;	// number of times it was moved
+	
+	char string[MAX_MOVEMENT_STRING + 1];	// move string so far (usually excludes cur_dir/cur_dist)
+	
+	struct pathfind_node *prev, *next;	// doubly-linked list
+};
+
+
+// pathfind.c: handles the data for pathfinding
+struct pathfind_controller {
+	room_data *start;	// start pos
+	room_data *end;	// destination
+	
+	int key;	// initialized with get_pathfind_key()
+	
+	struct pathfind_node *nodes;	// doubly-linked list of nodes
+};
+
+
 // for ad tracking and special promotions
 struct promo_code_list {
 	char *code;
@@ -5712,6 +5737,7 @@ struct room_data {
 	struct affected_type *af;  // room affects
 	
 	time_t last_spawn_time;  // used to spawn npcs
+	ubyte pathfind_key;	// for the pathfidning system
 	
 	struct trig_proto_list *proto_script;	/* list of default triggers  */
 	struct script_data *script;	/* script info for the room           */
@@ -5872,6 +5898,8 @@ struct map_data {
 	
 	struct shared_room_data *shared;	// for map tiles' room_data*, they point to this
 	crop_data *crop_type;	// possible crop type
+	
+	ubyte pathfind_key;	// for the pathfinding system
 	
 	// lists
 	struct map_data *next_in_sect;	// LL of all map locations of a given sect

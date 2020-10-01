@@ -371,6 +371,7 @@ ADMIN_UTIL(util_diminish);
 ADMIN_UTIL(util_evolve);
 ADMIN_UTIL(util_exportcsv);
 ADMIN_UTIL(util_islandsize);
+ADMIN_UTIL(util_pathtest);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
@@ -394,6 +395,7 @@ struct {
 	{ "evolve", LVL_CIMPL, util_evolve },
 	{ "exportcsv", LVL_CIMPL, util_exportcsv },
 	{ "islandsize", LVL_START_IMM, util_islandsize },
+	{ "pathtest", LVL_START_IMM, util_pathtest },
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
@@ -702,6 +704,31 @@ ADMIN_UTIL(util_islandsize) {
 	
 	if (ch->desc) {
 		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+ADMIN_UTIL(util_pathtest) {
+	extern char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*validator));
+	PATHFIND_VALIDATOR(pathfind_road);
+	
+	unsigned long long timer;
+	room_data *to_room;
+	char *path;
+	
+	one_word(argument, arg);
+	
+	timer = microtime();
+	
+	if (!(to_room = find_target_room(ch, arg))) {
+		msg_to_char(ch, "Unknown target: %s\r\n", arg);
+	}
+	else if (!(path = get_pathfind_string(IN_ROOM(ch), to_room, pathfind_road))) {
+		msg_to_char(ch, "Unable to find a valid path there.\r\n");
+	}
+	else {
+		msg_to_char(ch, "Road path found: %s\r\n", path);
+		msg_to_char(ch, "Start: %lld, end: %lld, difference: %lld\r\n", timer, microtime(), microtime()-timer);
 	}
 }
 

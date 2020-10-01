@@ -1310,6 +1310,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_LIGHTS(room)  ((room)->light)
 #define BASE_SECT(room)  ((room)->base_sector)
 #define ROOM_OWNER(room)  ((room)->owner)
+#define ROOM_PATHFIND_KEY(room)  ((room)->pathfind_key)
 #define ROOM_PEOPLE(room)  ((room)->people)
 #define ROOM_UNLOAD_EVENT(room)  ((room)->unload_event)
 #define ROOM_VEHICLES(room)  ((room)->vehicles)

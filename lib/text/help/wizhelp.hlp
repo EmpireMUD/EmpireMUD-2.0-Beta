@@ -1630,6 +1630,7 @@ Available utilities:
  &cevolve&0 - Triggers map evolutions (just like a normal day), see EVOLVER.
  &cexportcsv&0 - Output a csv file with some game data.
  &cislandsize&0 - Counts and displays tile counts for all islands.
+ &cpathtest&0 - Test function for the pathfinding code.
  &cplayerdump&0 - Outputs a data file with tab-separated lines for all players with
     account, playtime, and host.
  &crandtest [number] [size]&0 - Generates a large number of random numbers, and

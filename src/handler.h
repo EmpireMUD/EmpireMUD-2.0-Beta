@@ -54,6 +54,20 @@
 #define GLB_FUNCTION(name)		void (name)(struct global_data *glb, char_data *ch, void *other_data)
 
 
+/**
+* Validates a location for the pathfinding system.
+*
+* This must be implemented for both 'room' and 'map', as only 1 of those is set
+* each time it's called.
+*
+* @param room_data *room Optional: An interior room (if this is NULL, map will be set instead).
+* @param struct map_data *map Optional: A map room if outdoors (if this is NULL, room will be set instead).
+* @param struct pathfind_controller *controller The pathfinding controller and all its data.
+* @return bool TRUE if the room/map is ok, FALSE if not.
+*/
+#define PATHFIND_VALIDATOR(name)  bool (name)(room_data *room, struct map_data *map, struct pathfind_controller *controller)
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// HANDLER MACROS //////////////////////////////////////////////////////////
 
