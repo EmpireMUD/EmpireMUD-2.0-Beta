@@ -57,6 +57,26 @@ bool pathfind_get_dir(room_data *from_room, struct map_data *from_map, int dir, 
 */
 
 
+// example: validator for ships
+PATHFIND_VALIDATOR(pathfind_ocean) {
+	room_data *find;
+	
+	if (room) {
+		return (ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED(room, BLD_SAIL)) ? TRUE : FALSE;
+	}
+	else if (map) {
+		if (SECT_FLAGGED(map->sector_type, SECTF_FRESH_WATER | SECTF_OCEAN)) {
+			return TRUE;	// true ocean
+		}
+		else if ((find = real_real_room(map->vnum)) && ROOM_BLD_FLAGGED(find, BLD_SAIL)) {
+			return TRUE;	// docks
+		}
+	}
+	
+	return FALSE;	// all other cases
+}
+
+
 // example: validator for following roads
 PATHFIND_VALIDATOR(pathfind_road) {
 	room_data *find;

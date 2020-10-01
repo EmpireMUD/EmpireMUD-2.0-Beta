@@ -710,7 +710,7 @@ ADMIN_UTIL(util_islandsize) {
 
 ADMIN_UTIL(util_pathtest) {
 	extern char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*validator));
-	PATHFIND_VALIDATOR(pathfind_road);
+	PATHFIND_VALIDATOR(pathfind_ocean);
 	
 	unsigned long long timer;
 	room_data *to_room;
@@ -723,11 +723,11 @@ ADMIN_UTIL(util_pathtest) {
 	if (!(to_room = find_target_room(ch, arg))) {
 		msg_to_char(ch, "Unknown target: %s\r\n", arg);
 	}
-	else if (!(path = get_pathfind_string(IN_ROOM(ch), to_room, pathfind_road))) {
+	else if (!(path = get_pathfind_string(IN_ROOM(ch), to_room, pathfind_ocean))) {
 		msg_to_char(ch, "Unable to find a valid path there.\r\n");
 	}
 	else {
-		msg_to_char(ch, "Road path found: %s\r\n", path);
+		msg_to_char(ch, "Ocean path found: %s\r\n", path);
 		msg_to_char(ch, "Start: %lld, end: %lld, difference: %lld\r\n", timer, microtime(), microtime()-timer);
 	}
 }
