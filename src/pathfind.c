@@ -177,6 +177,8 @@ bool build_pathfind_string(struct pathfind_node *end_node, char *buffer) {
 	for (node = end_node; node; node = node->parent) {
 		// detect dir changes; we only need the distances on those
 		if (node->cur_dir != last_dir) {
+			last_dir = node->cur_dir;
+			
 			CREATE(bps, struct bps_string_part, 1);
 			bps->size = (byte)snprintf(bps->str, sizeof(bps->str), "%d%s", node->cur_dist, alt_dirs[node->cur_dir]);
 			
