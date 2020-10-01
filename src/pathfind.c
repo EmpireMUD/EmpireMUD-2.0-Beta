@@ -105,12 +105,13 @@ PATHFIND_VALIDATOR(pathfind_road) {
 * @param struct map_data *map_tile Optional: If it's on the map, this is the loc. (NULL if interior)
 * @oaram int dir Optional: Which direction from the previous tile. (NO_DIR for the first tile)
 * @param struct pathfind_node *from_node Optional: The previous node on the path -- will copy its path-so-far (may be NULL for the first tile)
+* @return struct pathfind_node* The new node, if added. (May be NULL.)
 */
-void add_pathfind_node(struct pathfind_controller *controller, room_data *inside_room, struct map_data *map_tile, struct pathfind_node *from_node, int dir) {
+struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, room_data *inside_room, struct map_data *map_tile, struct pathfind_node *from_node, int dir) {
 	struct pathfind_node *node;
 	
 	if (!controller || (!inside_room && !map_tile)) {
-		return;	// no work?
+		return NULL;	// no work?
 	}
 	
 	CREATE(node, struct pathfind_node, 1);
@@ -146,6 +147,7 @@ void add_pathfind_node(struct pathfind_controller *controller, room_data *inside
 	
 	// and append
 	DL_APPEND(controller->nodes, node);
+	return node;
 }
 
 
@@ -166,7 +168,7 @@ bool build_pathfind_string(struct pathfind_node *end_node, char *buffer) {
 	struct bps_string_part {
 		char str[16];	// one direction (!)
 		byte size;
-		struct bps_string_part *prev, *next;	// DLL
+		struct bps_string_part *next;	// linked list
 	} *bps, *next_bps, *bps_list = NULL;
 	
 	// init string
@@ -176,19 +178,19 @@ bool build_pathfind_string(struct pathfind_node *end_node, char *buffer) {
 	// build parts in reverse order (since we can only go from end_node->parent)
 	for (node = end_node; node; node = node->parent) {
 		// detect dir changes; we only need the distances on those
-		if (node->cur_dir != last_dir) {
+		if (node->cur_dir != last_dir && node->cur_dir != NO_DIR) {
 			last_dir = node->cur_dir;
 			
 			CREATE(bps, struct bps_string_part, 1);
 			bps->size = (byte)snprintf(bps->str, sizeof(bps->str), "%d%s", node->cur_dist, alt_dirs[node->cur_dir]);
 			
-			// now APPEND it to the list, since we're building backwards
-			DL_APPEND(bps_list, bps);
+			// now PREPEND it to the list, since we're building backwards
+			LL_PREPEND(bps_list, bps);
 		}
 	}
 	
 	// now build the final string
-	DL_FOREACH_SAFE(bps_list, bps, next_bps) {
+	LL_FOREACH_SAFE(bps_list, bps, next_bps) {
 		if (!full && size + bps->size < MAX_MOVEMENT_STRING) {
 			strcat(buffer, bps->str);
 		}
@@ -380,7 +382,7 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 			
 			// ok: is it the end loc?
 			if ((to_room && to_room == end) || (to_map && to_map->vnum == GET_ROOM_VNUM(end))) {
-				end_node = node;
+				end_node = add_pathfind_node(controller, to_room, to_map, node, dir);
 				break;
 			}
 			
