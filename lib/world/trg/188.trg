@@ -324,6 +324,10 @@ if %self.val0% == 0
   %send% %actor% You are out of costumes.
   halt
 end
+if %actor.cooldown(18819)% > 0
+  %send %actor% You need to wait %actor.cooldown(18819)% more seconds to do that again.
+  halt
+end
 if !%arg%
   %send% %actor% Whom?
   eval costumes_left 18818-%self.val0%
@@ -370,6 +374,7 @@ else
     %quest% %actor% finish 18819
   else
     nop %self.val0(%costume_vnum%)%
+    nop %actor.set_cooldown(18819,30)%
   end
 end
 ~
@@ -451,6 +456,10 @@ if %self.val0% == 0
   %send% %actor% %self.shortdesc% is out of charges.
   halt
 end
+if %actor.cooldown(18821)% > 0
+  %send %actor% You need to wait %actor.cooldown(18821)% more seconds to do that again.
+  halt
+end
 if !%arg%
   %send% %actor% Whom?
   halt
@@ -484,8 +493,10 @@ else
   if %charges% == 0
     %quest% %actor% trigger 18821
     %quest% %actor% finish 18821
+  else
+    nop %self.val0(%charges%)%
+    nop %actor.set_cooldown(18821,30)%
   end
-  nop %self.val0(%charges%)%
 end
 ~
 #18822
@@ -586,6 +597,10 @@ if %self.val0% < 1
   %send% %actor% %self.shortdesc% has run out.
   halt
 end
+if %actor.cooldown(18824)% > 0
+  %send %actor% You need to wait %actor.cooldown(18824)% more seconds to do that again.
+  halt
+end
 set room %self.room%
 set item %room.contents%
 while %item%
@@ -629,9 +644,11 @@ else
     %send% %actor% %self.shortdesc% runs out!
     %quest% %actor% trigger 18824
     %quest% %actor% finish 18824
+  else
+    eval charges %charges% - 1
+    nop %self.val0(%charges%)%
+    nop %actor.set_cooldown(18824,30)%
   end
-  eval charges %charges% - 1
-  nop %self.val0(%charges%)%
 end
 ~
 #18827
@@ -641,6 +658,10 @@ scare~
 if %actor.morph% != 18827
   * Only in Dracula morph
   return 0
+  halt
+end
+if %actor.cooldown(18827)% > 0
+  %send %actor% You need to wait %actor.cooldown(18827)% more seconds to do that again.
   halt
 end
 if !%arg%
@@ -675,8 +696,10 @@ else
     %send% %actor% You have scared enough citizens... but you can keep going if you want to.
     %quest% %actor% trigger 18827
     %quest% %actor% finish 18827
+  else
+    nop %self.val0(%times%)%
+    nop %actor.set_cooldown(18827,30)%
   end
-  nop %self.val0(%times%)%
 end
 ~
 #18828
@@ -819,21 +842,25 @@ switch %self.vnum%
     set component_base 6720
     set sacrifice_amount 10
     set display_str 10x common metal
+    set qvnum 18829
   break
   case 18851
     set component_base 6075
     set sacrifice_amount 10
     set display_str 10x block
+    set qvnum 18830
   break
   case 18852
     set component_base 6050
     set sacrifice_amount 10
     set display_str 10x rock
+    set qvnum 18831
   break
   case 18853
     set component_base 6420
     set sacrifice_amount 10
     set display_str 10x plant fibers
+    set qvnum 18832
   break
 done
 set found_grave 0
@@ -855,7 +882,7 @@ if %found_grave%
 end
 set sacrifices_left %self.val0%
 if %sacrifices_left% < 1
-  %send% %actor% You have already appeased the spirits of the dead. Return and hand in the quest.
+  %send% %actor% You have already appeased the spirits of the dead.
   halt
 end
 * actual sacrifice
@@ -868,16 +895,11 @@ end
 nop %actor.charge_component(%component_base%, %sacrifice_amount%)%
 eval sacrifices_left %sacrifices_left% - 1
 nop %self.val0(%sacrifices_left%)%
-if %sacrifices_left% == 0
-  set first_quest 18828
-  set last_quest 18832
-  while %first_quest% <= %last_quest%
-    %quest% %actor% trigger %first_quest%
-    %quest% %actor% finish %first_quest%
-    eval first_quest %first_quest% + 1
-  done
-end
 %load% obj 18849 room
+if %sacrifices_left% == 0
+  %quest% %actor% trigger %qvnum%
+  %quest% %actor% finish %qvnum%
+end
 ~
 #18854
 pick or treat action~
@@ -1530,7 +1552,7 @@ if !%actor%
   return 1
   halt
 end
-%echo% %self.shortdesc% loses all tention in %self.hisher% body and you feel its time to leave.
+%echo% %self.shortdesc% loses all tension in %self.hisher% body and you feel its time to leave.
 %purge% %self%
 ~
 #18878
