@@ -383,7 +383,7 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 		
 		// did we make it?
 		if (success) {
-			strcpy(output, node->string);
+			strcpy(output, end_node->string);
 		}
 		free(end_node);
 	}
