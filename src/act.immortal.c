@@ -746,7 +746,7 @@ ADMIN_UTIL(util_pathtest) {
 	}
 	else {
 		msg_to_char(ch, "Path found: %s\r\n", path);
-		msg_to_char(ch, "Time: %f seconds\r\n", microtime()-timer / 1000000.0);
+		msg_to_char(ch, "Time: %f seconds\r\n", (microtime()-timer) / 1000000.0);
 	}
 }
 
