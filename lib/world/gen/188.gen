@@ -26,12 +26,40 @@ neck chop~
 T0
 You are no longer bleeding from the headless centaur's neck chop.~
 S
+#18819
+costume citizen~
+3 0
+0 0 0 0
+T0
+You can now costume another citizen.~
+S
+#18821
+toad citizen~
+3 0
+0 0 0 0
+T0
+You can now toad another citizen.~
+S
+#18824
+bogroll house~
+3 0
+0 0 0 0
+T0
+You can now bogroll another house.~
+S
 #18826
 psychic whistle~
 3 0
 0 0 0 0
 T0
 Your psychic whistle cooldown has ended.~
+S
+#18827
+scare citizen~
+3 0
+0 0 0 0
+T0
+You can now scare another citizen.~
 S
 #18828
 perform exorcism~
