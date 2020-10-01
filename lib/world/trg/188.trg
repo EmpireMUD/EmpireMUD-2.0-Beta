@@ -325,7 +325,7 @@ if %self.val0% == 0
   halt
 end
 if %actor.cooldown(18819)% > 0
-  %send %actor% You need to wait %actor.cooldown(18819)% more seconds to do that again.
+  %send% %actor% You need to wait %actor.cooldown(18819)% more seconds to do that again.
   halt
 end
 if !%arg%
@@ -457,7 +457,7 @@ if %self.val0% == 0
   halt
 end
 if %actor.cooldown(18821)% > 0
-  %send %actor% You need to wait %actor.cooldown(18821)% more seconds to do that again.
+  %send% %actor% You need to wait %actor.cooldown(18821)% more seconds to do that again.
   halt
 end
 if !%arg%
@@ -598,7 +598,7 @@ if %self.val0% < 1
   halt
 end
 if %actor.cooldown(18824)% > 0
-  %send %actor% You need to wait %actor.cooldown(18824)% more seconds to do that again.
+  %send% %actor% You need to wait %actor.cooldown(18824)% more seconds to do that again.
   halt
 end
 set room %self.room%
@@ -661,7 +661,7 @@ if %actor.morph% != 18827
   halt
 end
 if %actor.cooldown(18827)% > 0
-  %send %actor% You need to wait %actor.cooldown(18827)% more seconds to do that again.
+  %send% %actor% You need to wait %actor.cooldown(18827)% more seconds to do that again.
   halt
 end
 if !%arg%
