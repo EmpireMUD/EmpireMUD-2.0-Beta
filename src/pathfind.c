@@ -302,6 +302,7 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 	CREATE(controller, struct pathfind_controller, 1);
 	controller->start = start;
 	controller->end = end;
+	controller->key = get_pathfind_key();
 	
 	// start pathing
 	if (GET_ROOM_VNUM(start) < MAP_SIZE && !ROOM_IS_CLOSED(start) && GET_MAP_LOC(start)) {	// on the map
