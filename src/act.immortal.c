@@ -709,25 +709,43 @@ ADMIN_UTIL(util_islandsize) {
 
 
 ADMIN_UTIL(util_pathtest) {
-	extern char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*validator));
+	extern char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*validator), int step_limit);
 	PATHFIND_VALIDATOR(pathfind_ocean);
+	PATHFIND_VALIDATOR(pathfind_road);
 	
 	unsigned long long timer;
+	PATHFIND_VALIDATOR(*vdr);
 	room_data *to_room;
 	char *path;
 	
-	one_word(argument, arg);
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	// find validator
+	if (*argument && is_abbrev(argument, "roads")) {
+		vdr = pathfind_road;
+	}
+	else if (*argument && is_abbrev(argument, "ocean")) {
+		vdr = pathfind_ocean;
+	}
+	else {
+		msg_to_char(ch, "Usage: util pathtest <room> <ocean | road>\r\n");
+		return;
+	}
 	
 	timer = microtime();
 	
-	if (!(to_room = find_target_room(ch, arg))) {
+	if (!*arg || !*argument) {
+		msg_to_char(ch, "Usage: util pathtest <room> <ocean | road>\r\n");
+	}
+	else if (!(to_room = find_target_room(ch, arg))) {
 		msg_to_char(ch, "Unknown target: %s\r\n", arg);
 	}
-	else if (!(path = get_pathfind_string(IN_ROOM(ch), to_room, pathfind_ocean))) {
+	else if (!(path = get_pathfind_string(IN_ROOM(ch), to_room, vdr, 1000))) {
 		msg_to_char(ch, "Unable to find a valid path there.\r\n");
 	}
 	else {
-		msg_to_char(ch, "Ocean path found: %s\r\n", path);
+		msg_to_char(ch, "Path found: %s\r\n", path);
 		msg_to_char(ch, "Start: %lld, end: %lld, difference: %lld\r\n", timer, microtime(), microtime()-timer);
 	}
 }

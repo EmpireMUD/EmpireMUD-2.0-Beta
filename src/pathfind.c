@@ -35,7 +35,6 @@ extern const char *alt_dirs[];
 extern const int rev_dir[];
 
 // local protos
-bool append_move_string(char *string, int dir, int dist);
 bool pathfind_get_dir(room_data *from_room, struct map_data *from_map, int dir, room_data **to_room, struct map_data **to_map);
 
 
@@ -125,23 +124,18 @@ void add_pathfind_node(struct pathfind_controller *controller, room_data *inside
 	}
 	
 	if (from_node) {
+		node->parent = from_node;
+		node->steps = from_node->steps + 1;
 		node->cur_dir = from_node->cur_dir;
 		node->cur_dist = from_node->cur_dist;
-		strcpy(node->string, from_node->string);
 	}
 	else {
+		node->steps = 1;
 		node->cur_dir = NO_DIR;
-		*(node->string) = '\0';
 	}
 	
 	// check if it changed directions
 	if (dir != node->cur_dir) {
-		if (!append_move_string(node->string, node->cur_dir, node->cur_dist)) {
-			// path too long -- this path fails
-			free(node);
-			return;
-		}
-		
 		// reset
 		node->cur_dir = dir;
 		node->cur_dist = 1;
@@ -156,33 +150,58 @@ void add_pathfind_node(struct pathfind_controller *controller, room_data *inside
 
 
 /**
-* Dumps a dir/dist to the end of a movement string.
+* Builds a pathfinding string from a set of nodes, starting from the successful
+* end node.
 *
-* @param char *string The current move string, in a buffer at least MAX_MOVEMENT_STRING long.
-* @param int dir The direction to add.
-* @param int dist The distance to add.
-* @return bool TRUE if we successfully added, FALSE if the string was full.
+* @param struct pathfind_node *end_node The final node in the path.
+* @param char *buffer A string buffer of at least MAX_MOVEMENT_STRING+1 in length.
+* @return bool TRUE if it managed to build a string, even an empty one. FALSE if the string ended up too long.
 */
-bool append_move_string(char *string, int dir, int dist) {
-	char temp[16];
-	size_t add;
+bool build_pathfind_string(struct pathfind_node *end_node, char *buffer) {
+	struct pathfind_node *node;
+	int last_dir = NO_DIR;
+	bool full = FALSE;
+	int size;
 	
-	// prepare string
-	if (dir != NO_DIR) {
-		add = snprintf(temp, sizeof(temp), "%d%s", dist, alt_dirs[dir]);
-	}
-	else {
-		add = 0;
-		*temp = '\0';
+	struct bps_string_part {
+		char str[16];	// one direction (!)
+		byte size;
+		struct bps_string_part *prev, *next;	// DLL
+	} *bps, *next_bps, *bps_list = NULL;
+	
+	// init string
+	*buffer = '\0';
+	size = 0;
+	
+	// build parts in reverse order (since we can only go from end_node->parent)
+	for (node = end_node; node; node = node->parent) {
+		// detect dir changes; we only need the distances on those
+		if (node->cur_dir != last_dir) {
+			CREATE(bps, struct bps_string_part, 1);
+			bps->size = (byte)snprintf(bps->str, sizeof(bps->str), "%d%s", node->cur_dist, alt_dirs[node->cur_dir]);
+			
+			// now APPEND it to the list, since we're building backwards
+			DL_APPEND(bps_list, bps);
+		}
 	}
 	
-	if (strlen(string) + add > MAX_MOVEMENT_STRING) {
-		return FALSE;
+	// now build the final string
+	DL_FOREACH_SAFE(bps_list, bps, next_bps) {
+		if (!full && size + bps->size < MAX_MOVEMENT_STRING) {
+			strcat(buffer, bps->str);
+		}
+		else {
+			full = TRUE;
+		}
+		free(bps);
 	}
-	else {
-		strcat(string, temp);
-		return TRUE;
+	
+	// clear the string (no valid string) if full
+	if (full) {
+		*buffer = '\0';
 	}
+	
+	return !full;
 }
 
 
@@ -300,16 +319,16 @@ bool pathfind_get_dir(room_data *from_room, struct map_data *from_map, int dir, 
 * @param room_data *start The start room.
 * @param room_data *end The end room.
 * @param PATHFIND_VALIDATOR(*validator) Function pointer for validating each room.
+* @param int step_limit Maximum number of steps allowed.
 * @return char* A movement string (like "2n3w") or NULL if not found.
 */
-char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*validator)) {
+char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*validator), int step_limit) {
 	struct pathfind_controller *controller;
 	static char output[MAX_STRING_LENGTH];
 	struct pathfind_node *node, *end_node;
 	struct map_data *to_map;
 	room_data *to_room;
 	int dir, end_dir;
-	bool success;
 	
 	// shortcut for safety
 	if (!start || !end || start == end || !validator) {
@@ -323,6 +342,7 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 	controller->start = start;
 	controller->end = end;
 	controller->key = get_pathfind_key();
+	controller->limit = step_limit;
 	
 	// start pathing
 	if (GET_ROOM_VNUM(start) < MAP_SIZE && !ROOM_IS_CLOSED(start) && GET_MAP_LOC(start)) {	// on the map
@@ -336,9 +356,10 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 	end_dir = NO_DIR;
 	
 	// do the thing
-	while ((node = controller->nodes) && !end_node) {
-		// pop it
-		DL_DELETE(controller->nodes, node);
+	DL_FOREACH(controller->nodes, node) {
+		if (end_node || node->steps > controller->limit) {
+			break;	// exit early if we found the end or passed the limit
+		}
 		
 		// check dirs from this node
 		for (dir = 0; dir < (node->inside_room ? NUM_NATURAL_DIRS : NUM_2D_DIRS) && !end_node; ++dir) {
@@ -378,34 +399,11 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 			// ok: queue it
 			add_pathfind_node(controller, to_room, to_map, node, dir);
 		}
-		
-		// usually free here
-		if (node != end_node) {
-			free(node);
-		}
 	}
 	
-	// did we find the end? if so, it's no longer in controller->nodes and has not been freed
+	// did we find the end?
 	if (end_node) {
-		success = FALSE;	// unless otherwise stated
-		
-		if (end_dir != NO_DIR && end_dir == end_node->cur_dir) {
-			// same dir
-			success = append_move_string(end_node->string, end_dir, end_node->cur_dist + 1);
-		}
-		else if (end_dir != NO_DIR) {
-			// different dir: append old dir and 
-			success = append_move_string(end_node->string, end_node->cur_dir, end_node->cur_dist);
-			if (success) {
-				success = append_move_string(end_node->string, end_dir, 1);
-			}
-		}
-		
-		// did we make it?
-		if (success) {
-			strcpy(output, end_node->string);
-		}
-		free(end_node);
+		build_pathfind_string(end_node, output);
 	}
 	
 	// free the controller (and any remaining nodes)

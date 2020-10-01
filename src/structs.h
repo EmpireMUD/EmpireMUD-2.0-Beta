@@ -3095,11 +3095,11 @@ struct offer_data {
 struct pathfind_node {
 	room_data *inside_room;	// if it's an interior, this is the current room
 	struct map_data *map_loc;	// if it's on the map, this is the current loc
+	struct pathfind_node *parent;	// last node in the path
 	
+	int steps;	// total steps taken
 	int cur_dir;	// last direction moved
 	int cur_dist;	// number of times it was moved
-	
-	char string[MAX_MOVEMENT_STRING + 1];	// move string so far (usually excludes cur_dir/cur_dist)
 	
 	struct pathfind_node *prev, *next;	// doubly-linked list
 };
@@ -3109,6 +3109,7 @@ struct pathfind_node {
 struct pathfind_controller {
 	room_data *start;	// start pos
 	room_data *end;	// destination
+	int limit;	// max number of steps
 	
 	int key;	// initialized with get_pathfind_key()
 	
