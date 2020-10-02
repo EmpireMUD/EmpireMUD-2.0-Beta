@@ -143,7 +143,13 @@ PATHFIND_VALIDATOR(pathfind_road) {
 */
 struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, room_data *inside_room, struct map_data *map_tile, struct pathfind_node *from_node, int dir) {
 	struct pathfind_node *node, *iter;
+	static double sqrt2 = 0.0;
 	bool found;
+	
+	// compute this once:
+	if (sqrt2 < 1.0) {
+		sqrt2 = sqrt(2.0);
+	}
 	
 	if (!controller || (!inside_room && !map_tile)) {
 		return NULL;	// no work?
@@ -163,12 +169,12 @@ struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, 
 	
 	if (from_node) {
 		node->parent = from_node;
-		node->steps = from_node->steps + 1;
+		node->steps = from_node->steps + (dir < NUM_SIMPLE_DIRS ? 1.0 : sqrt2);
 		node->cur_dir = from_node->cur_dir;
 		node->cur_dist = from_node->cur_dist;
 	}
 	else {
-		node->steps = 1;
+		node->steps = (dir < NUM_SIMPLE_DIRS ? 1.0 : sqrt2);
 		node->cur_dir = NO_DIR;
 	}
 	
