@@ -2660,7 +2660,7 @@ ACMD(do_run) {
 	}
 	
 	// did they request a path?
-	else if (path_to_room && !(found_path = get_pathfind_string(IN_ROOM(ch), path_to_room, pathfind_road, 1500))) {
+	else if (path_to_room && !(found_path = get_pathfind_string(IN_ROOM(ch), path_to_room, pathfind_road, 3000))) {
 		msg_to_char(ch, "Unable to find a route to that location (it may be too far or there may not be a road to it).\r\n");
 	}
 	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {

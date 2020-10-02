@@ -3097,7 +3097,7 @@ struct pathfind_node {
 	struct map_data *map_loc;	// if it's on the map, this is the current loc
 	struct pathfind_node *parent;	// last node in the path
 	
-	int steps;	// total steps taken
+	double steps;	// total steps taken (diagonals are slightly higher cost)
 	int cur_dir;	// last direction moved
 	int cur_dist;	// number of times it was moved
 	

@@ -71,9 +71,9 @@ struct {
 	PATHFIND_VALIDATOR(*pathfinder);	// if it can target coords
 	int pathfind_limit;	// maximum distance
 } drive_data[] = {
-	{ "drive", "driving", ACT_DRIVING, VEH_DRIVING, pathfind_road, 2000 },	// SCMD_DRIVE
-	{ "sail", "sailing", ACT_SAILING, VEH_SAILING, pathfind_ocean, 1500 },	// SCMD_SAIL
-	{ "pilot", "piloting", ACT_PILOTING, VEH_FLYING, pathfind_pilot, 1500 },	// SCMD_PILOT
+	{ "drive", "driving", ACT_DRIVING, VEH_DRIVING, pathfind_road, 3000 },	// SCMD_DRIVE
+	{ "sail", "sailing", ACT_SAILING, VEH_SAILING, pathfind_ocean, 3000 },	// SCMD_SAIL
+	{ "pilot", "piloting", ACT_PILOTING, VEH_FLYING, pathfind_pilot, 3000 },	// SCMD_PILOT
 };
 
 

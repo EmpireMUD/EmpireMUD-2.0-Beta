@@ -142,12 +142,12 @@ struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, 
 	
 	if (from_node) {
 		node->parent = from_node;
-		node->steps = from_node->steps + 1;
+		node->steps = from_node->steps + (dir < NUM_SIMPLE_DIRS ? 1.0 : 1.41);
 		node->cur_dir = from_node->cur_dir;
 		node->cur_dist = from_node->cur_dist;
 	}
 	else {
-		node->steps = 1;
+		node->steps = (dir < NUM_SIMPLE_DIRS ? 1.0 : 1.41);
 		node->cur_dir = NO_DIR;
 	}
 	
