@@ -133,11 +133,11 @@ struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, 
 	// store locations
 	if (map_tile) {
 		node->map_loc = map_tile;
-		node->estimate = compute_map_distance(MAP_X_COORD(map_tile->vnum), MAP_Y_COORD(map_tile->vnum), controller->end_x, controller->end_y);
+		node->estimate = compute_map_distance(MAP_X_COORD(map_tile->vnum), MAP_Y_COORD(map_tile->vnum), controller->end_x, controller->end_y) + (from_node ? node->steps : 0);
 	}
 	else if (inside_room) {
 		node->inside_room = inside_room;
-		node->estimate = compute_map_distance(X_COORD(inside_room), Y_COORD(inside_room), controller->end_x, controller->end_y);
+		node->estimate = compute_map_distance(X_COORD(inside_room), Y_COORD(inside_room), controller->end_x, controller->end_y) + (from_node ? node->steps : 0);
 	}
 	
 	if (from_node) {
