@@ -745,7 +745,7 @@ ADMIN_UTIL(util_pathtest) {
 	else if (!(to_room = find_target_room(ch, arg))) {
 		msg_to_char(ch, "Unknown target: %s\r\n", arg);
 	}
-	else if (!(path = get_pathfind_string(IN_ROOM(ch), to_room, vdr, 3000))) {
+	else if (!(path = get_pathfind_string(IN_ROOM(ch), to_room, vdr, 1500))) {
 		msg_to_char(ch, "Unable to find a valid path there.\r\n");
 	}
 	else {
