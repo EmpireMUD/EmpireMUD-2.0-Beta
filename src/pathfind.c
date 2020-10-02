@@ -404,7 +404,7 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 		// check dirs from this node
 		for (pass = 0; pass < 1; ++pass) {
 			// on first pass, only checking the same dir as last time (prefer same direction)
-			for (dir = (pass ? 0 : node->cur_dir); (pass ? (dir < (node->inside_room ? NUM_NATURAL_DIRS : NUM_2D_DIRS)) : (dir == node->cur_dir)) && !end_node; ++dir) {
+			for (dir = (pass ? 0 : node->cur_dir); ((pass && (dir < (node->inside_room ? NUM_NATURAL_DIRS : NUM_2D_DIRS))) || (!pass && (dir == node->cur_dir))) && !end_node; ++dir) {
 				if (pass && dir == node->cur_dir) {
 					continue;	// already tried this dir
 				}
