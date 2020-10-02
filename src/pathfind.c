@@ -392,7 +392,7 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 	end_node = NULL;
 	
 	// do the thing
-	DL_FOREACH(controller->nodes, node) {
+	while ((node = controller->nodes)) {
 		// pop node off and move it to the free_nodes list now
 		DL_DELETE(controller->nodes, node);
 		DL_PREPEND(controller->free_nodes, node);
