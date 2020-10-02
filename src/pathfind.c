@@ -151,9 +151,6 @@ struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, 
 		node->cur_dir = NO_DIR;
 	}
 	
-	// add previous steps to estimate for total steps
-	node->estimate += node->steps;
-	
 	// check if it changed directions
 	if (dir != node->cur_dir) {
 		// reset
@@ -167,7 +164,7 @@ struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, 
 	// insert in-order
 	found = FALSE;
 	DL_FOREACH(controller->nodes, iter) {
-		if (node->estimate < iter->estimate) {
+		if (node->estimate + node->steps < iter->estimate + iter->steps) {
 			DL_PREPEND_ELEM(controller->nodes, iter, node);
 			found = TRUE;
 			break;
