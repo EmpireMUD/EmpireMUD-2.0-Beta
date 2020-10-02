@@ -133,11 +133,11 @@ struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, 
 	// store locations
 	if (map_tile) {
 		node->map_loc = map_tile;
-		node->estimate = compute_map_distance(MAP_X_COORD(map_tile->vnum), MAP_Y_COORD(map_tile->vnum), controller->end_x, controller->end_y) + (from_node ? node->steps : 0);
+		node->estimate = compute_map_distance(MAP_X_COORD(map_tile->vnum), MAP_Y_COORD(map_tile->vnum), controller->end_x, controller->end_y) + (from_node ? node->steps : 0.0);
 	}
 	else if (inside_room) {
 		node->inside_room = inside_room;
-		node->estimate = compute_map_distance(X_COORD(inside_room), Y_COORD(inside_room), controller->end_x, controller->end_y) + (from_node ? node->steps : 0);
+		node->estimate = compute_map_distance(X_COORD(inside_room), Y_COORD(inside_room), controller->end_x, controller->end_y) + (from_node ? node->steps : 0.0);
 	}
 	
 	if (from_node) {
@@ -363,7 +363,7 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 	struct pathfind_node *node, *end_node;
 	struct map_data *to_map;
 	room_data *to_room;
-	int dir, pass;
+	int dir;
 	
 	// shortcut for safety
 	if (!start || !end || start == end || !validator) {
@@ -401,58 +401,41 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 			break;	// exit early if we found the end or passed the limit
 		}
 		
-		/*
-		// check dirs from this node:
-		// - pass 0 is only the preivous dir (all things being equal, queues it first to create shorter path strings)
-		// - pass 1 is all other dirs
-		for (pass = 0; pass < 2; ++pass) {
-			// on first pass, only checking the same dir as last time (prefer same direction)
-			// admittedly this for() is slightly ugly, but it prevents code duplication here -pc
-			for (dir = (pass ? 0 : node->cur_dir); ((pass && (dir < (node->inside_room ? NUM_NATURAL_DIRS : NUM_2D_DIRS))) || (!pass && (dir == node->cur_dir))) && !end_node; ++dir) {
-				if (pass && dir == node->cur_dir) {
-					continue;	// already tried this dir
-				}
-				else if (dir == NO_DIR) {
-					continue;	// skippable (probably 1st pass on 1st tile)
-				}
-				*/
-		
-			for (dir = 0; dir < (node->inside_room ? NUM_NATURAL_DIRS : NUM_2D_DIRS) && !end_node; ++dir) {{
-				// preliminary checks
-				if (!pathfind_get_dir(node->inside_room, node->map_loc, dir, &to_room, &to_map)) {
-					continue;	// nothing in that dir
-				}
-				if (to_room && ROOM_PATHFIND_KEY(to_room) == controller->key) {
-					continue;	// already checked: inside
-				}
-				if (to_map && to_map->pathfind_key == controller->key) {
-					continue;	// already checked: map
-				}
-				if (to_room && ROOM_IS_CLOSED(to_room) && (!node->inside_room || !ROOM_IS_CLOSED(node->inside_room)) && dir != BUILDING_ENTRANCE(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || dir != rev_dir[BUILDING_ENTRANCE(to_room)])) {
-					continue;	// invalid entrance dir for map building
-				}
-			
-				// ok: is it the end loc?
-				if ((to_room && to_room == end) || (to_map && to_map->vnum == GET_ROOM_VNUM(end))) {
-					end_node = add_pathfind_node(controller, to_room, to_map, node, dir);
-					break;
-				}
-			
-				// ok: mark it then check the validator
-				if (to_room) {
-					ROOM_PATHFIND_KEY(to_room) = controller->key;
-				}
-				else if (to_map) {
-					to_map->pathfind_key = controller->key;
-				}
-			
-				if (!validator(to_room, to_map, controller)) {
-					continue;	// failed validator
-				}
-			
-				// ok: queue it
-				add_pathfind_node(controller, to_room, to_map, node, dir);
+		for (dir = 0; dir < (node->inside_room ? NUM_NATURAL_DIRS : NUM_2D_DIRS) && !end_node; ++dir) {
+			// preliminary checks
+			if (!pathfind_get_dir(node->inside_room, node->map_loc, dir, &to_room, &to_map)) {
+				continue;	// nothing in that dir
 			}
+			if (to_room && ROOM_PATHFIND_KEY(to_room) == controller->key) {
+				continue;	// already checked: inside
+			}
+			if (to_map && to_map->pathfind_key == controller->key) {
+				continue;	// already checked: map
+			}
+			if (to_room && ROOM_IS_CLOSED(to_room) && (!node->inside_room || !ROOM_IS_CLOSED(node->inside_room)) && dir != BUILDING_ENTRANCE(to_room) && (!ROOM_BLD_FLAGGED(to_room, BLD_TWO_ENTRANCES) || dir != rev_dir[BUILDING_ENTRANCE(to_room)])) {
+				continue;	// invalid entrance dir for map building
+			}
+		
+			// ok: is it the end loc?
+			if ((to_room && to_room == end) || (to_map && to_map->vnum == GET_ROOM_VNUM(end))) {
+				end_node = add_pathfind_node(controller, to_room, to_map, node, dir);
+				break;
+			}
+		
+			// ok: mark it then check the validator
+			if (to_room) {
+				ROOM_PATHFIND_KEY(to_room) = controller->key;
+			}
+			else if (to_map) {
+				to_map->pathfind_key = controller->key;
+			}
+		
+			if (!validator(to_room, to_map, controller)) {
+				continue;	// failed validator
+			}
+		
+			// ok: queue it
+			add_pathfind_node(controller, to_room, to_map, node, dir);
 		}
 	}
 	
