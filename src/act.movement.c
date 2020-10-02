@@ -2617,11 +2617,17 @@ ACMD(do_rest) {
 
 
 ACMD(do_run) {
+	extern char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*validator), int step_limit);
+	PATHFIND_VALIDATOR(pathfind_road);
+	
+	room_data *path_to_room;
+	char *found_path = NULL;
 	int dir, dist = -1;
 	bool dir_only;
 
 	skip_run_filler(&argument);
 	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word
+	path_to_room = (*argument && HAS_NAVIGATION(ch)) ? parse_room_from_coords(argument) : NULL;	// maybe
 	
 	// basics
 	if (IS_NPC(ch)) {
@@ -2641,16 +2647,24 @@ ACMD(do_run) {
 	else if (!*argument) {
 		msg_to_char(ch, "You must specify the path to run using directions and distances.\r\n");
 	}
-	else if (!dir_only && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
+	else if (!dir_only && !path_to_room && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
 		// sent its own error message
 	}
-	else if (!dir_only && (dir == -1 || dir == DIR_RANDOM)) {
+	else if (!dir_only && !path_to_room && (dir == -1 || dir == DIR_RANDOM)) {
 		msg_to_char(ch, "Invalid path string.\r\n");
 	}
 	
 	// optional direction-only parsing
-	else if (dir_only && ((dir = parse_direction(ch, argument)) == NO_DIR || dir == DIR_RANDOM)) {
+	else if (dir_only && !path_to_room && ((dir = parse_direction(ch, argument)) == NO_DIR || dir == DIR_RANDOM)) {
 		msg_to_char(ch, "Invalid direction '%s'.\r\n", argument);
+	}
+	
+	// did they request a path?
+	else if (path_to_room && !(found_path = get_pathfind_string(IN_ROOM(ch), path_to_room, pathfind_road, 1500))) {
+		msg_to_char(ch, "Unable to find a route to that location (it may be too far or there may not be a road to it).\r\n");
+	}
+	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {
+		msg_to_char(ch, "Unable to find a route to that location (it may be too far or there may not be a road to it).\r\n");
 	}
 	
 	else {
@@ -2664,7 +2678,7 @@ ACMD(do_run) {
 		if (GET_MOVEMENT_STRING(ch)) {
 			free(GET_MOVEMENT_STRING(ch));
 		}
-		GET_MOVEMENT_STRING(ch) = dir_only ? NULL : str_dup(argument);
+		GET_MOVEMENT_STRING(ch) = found_path ? str_dup(found_path) : (dir_only ? NULL : str_dup(argument));
 		
 		msg_to_char(ch, "You start running %s...\r\n", dirs[get_direction_for_char(ch, dir)]);
 	}

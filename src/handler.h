@@ -356,6 +356,7 @@ void set_extra_data(struct room_extra_data **list, int type, int value);
 
 // room targeting handlers
 extern room_data *find_target_room(char_data *ch, char *rawroomstr);
+extern room_data *parse_room_from_coords(char *string);
 
 // sector handlers
 extern bool check_evolution_percent(struct evolution_data *evo);
