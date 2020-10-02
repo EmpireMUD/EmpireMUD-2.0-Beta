@@ -74,7 +74,7 @@ struct {
 } drive_data[] = {
 	{ "drive", "driving", ACT_DRIVING, VEH_DRIVING, pathfind_road, NOTHING, 2000 },	// SCMD_DRIVE
 	{ "sail", "sailing", ACT_SAILING, VEH_SAILING, pathfind_ocean, COOLDOWN_SAIL_PATHFINDING, 1500 },	// SCMD_SAIL
-	{ "pilot", "piloting", ACT_PILOTING, VEH_FLYING, pathfind_pilot, COOLDOWN_PILOT_PATHFINDING, 500 },	// SCMD_PILOT
+	{ "pilot", "piloting", ACT_PILOTING, VEH_FLYING, pathfind_pilot, COOLDOWN_PILOT_PATHFINDING, 800 },	// SCMD_PILOT
 };
 
 
@@ -1794,7 +1794,7 @@ ACMD(do_drive) {
 	else if (path_to_room && drive_data[subcmd].pathfind_cooldown != NOTHING && get_cooldown_time(ch, drive_data[subcmd].pathfind_cooldown) > 0) {
 		msg_to_char(ch, "You must wait %d more second%s to %s by coordinates again.\r\n", get_cooldown_time(ch, drive_data[subcmd].pathfind_cooldown), PLURAL(get_cooldown_time(ch, drive_data[subcmd].pathfind_cooldown)), drive_data[subcmd].command);
 	}
-	else if (path_to_room && !(found_path = get_pathfind_string(IN_ROOM(ch), path_to_room, drive_data[subcmd].pathfinder, drive_data[subcmd].pathfind_limit))) {
+	else if (path_to_room && !(found_path = get_pathfind_string(IN_ROOM(veh), path_to_room, drive_data[subcmd].pathfinder, drive_data[subcmd].pathfind_limit))) {
 		msg_to_char(ch, "Unable to find a valid route to that location.\r\n");
 	}
 	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {
