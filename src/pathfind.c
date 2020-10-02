@@ -82,11 +82,26 @@ PATHFIND_VALIDATOR(pathfind_ocean) {
 
 // example: validator for piloting air vehicles
 PATHFIND_VALIDATOR(pathfind_pilot) {
+	room_data *find;
+	
 	if (room) {
-		return (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_FLY) && !ROOM_IS_CLOSED(room)) ? TRUE : FALSE;
+		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_FLY)) {
+			return FALSE;	// cannot fly there
+		}
+		if (!ROOM_IS_CLOSED(room) || ROOM_BLD_FLAGGED(room, BLD_ATTACH_ROAD)) {
+			return (ch && ROOM_IS_CLOSED(room)) ? can_use_room(ch, room, GUESTS_ALLOWED) : TRUE;
+		}
 	}
 	else if (map) {
-		return !IS_SET(map->shared->affects, ROOM_AFF_NO_FLY) ? TRUE : FALSE;
+		if (IS_SET(map->shared->affects, ROOM_AFF_NO_FLY)) {
+			return FALSE;	// can't fly there
+		}
+		if (!(find = real_real_room(map->vnum))) {
+			return TRUE;	// no real-real-room means not a building so we're ok now
+		}
+		if (!ROOM_IS_CLOSED(find) || ROOM_BLD_FLAGGED(find, BLD_ATTACH_ROAD)) {
+			return (ch && ROOM_IS_CLOSED(find)) ? can_use_room(ch, find, GUESTS_ALLOWED) : TRUE;	// attach-road
+		}
 	}
 	
 	return FALSE;	// all other cases?
