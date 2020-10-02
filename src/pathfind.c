@@ -164,7 +164,7 @@ struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, 
 	// insert in-order
 	found = FALSE;
 	DL_FOREACH(controller->nodes, iter) {
-		if (node->estimate + node->steps < iter->estimate + iter->steps) {
+		if (node->estimate < iter->estimate) {
 			DL_PREPEND_ELEM(controller->nodes, iter, node);
 			found = TRUE;
 			break;
