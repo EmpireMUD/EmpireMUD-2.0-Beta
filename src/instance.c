@@ -658,7 +658,7 @@ bool validate_linking_limits(adv_data *adv, room_data *loc, struct map_data *map
 					}
 					
 					// check distance
-					if (INST_LOCATION(inst) && compute_map_distance(X_COORD(INST_LOCATION(inst)), Y_COORD(INST_LOCATION(inst)), (loc ? X_COORD(loc) : MAP_X_COORD(map->vnum)), (loc ? Y_COORD(loc) : MAP_Y_COORD(map->vnum))) <= rule->value) {
+					if (INST_LOCATION(inst) && (int)compute_map_distance(X_COORD(INST_LOCATION(inst)), Y_COORD(INST_LOCATION(inst)), (loc ? X_COORD(loc) : MAP_X_COORD(map->vnum)), (loc ? Y_COORD(loc) : MAP_Y_COORD(map->vnum))) <= rule->value) {
 						// NO! Too close.
 						return FALSE;
 					}

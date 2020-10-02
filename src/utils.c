@@ -5367,9 +5367,9 @@ bool check_sunny(room_data *room) {
 * @param int y1  coordinate
 * @param int x2 second
 * @param int y2  coordinate
-* @return int distance
+* @return double distance
 */
-int compute_map_distance(int x1, int y1, int x2, int y2) {
+double compute_map_distance(int x1, int y1, int x2, int y2) {
 	int dx = x1 - x2;
 	int dy = y1 - y2;
 	int dist;
@@ -5403,9 +5403,7 @@ int compute_map_distance(int x1, int y1, int x2, int y2) {
 	}
 	
 	dist = (dx * dx + dy * dy);
-	dist = (int) sqrt(dist);
-	
-	return dist;
+	return sqrt(dist);
 }
 
 

@@ -3101,7 +3101,7 @@ struct pathfind_node {
 	int cur_dir;	// last direction moved
 	int cur_dist;	// number of times it was moved
 	
-	int estimate;	// estimated distance, for prioritizing
+	double estimate;	// estimated distance, for prioritizing
 	
 	struct pathfind_node *prev, *next;	// doubly-linked list
 };
