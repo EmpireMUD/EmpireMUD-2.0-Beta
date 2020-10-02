@@ -62,10 +62,12 @@
 *
 * @param room_data *room Optional: An interior room (if this is NULL, map will be set instead).
 * @param struct map_data *map Optional: A map room if outdoors (if this is NULL, room will be set instead).
+* @param char_data *ch Optional: Player trying to find the path (may be NULL).
+* @param vehicle_data *veh Optional: Vehicle trying to find the paath (may be NULL).
 * @param struct pathfind_controller *controller The pathfinding controller and all its data.
 * @return bool TRUE if the room/map is ok, FALSE if not.
 */
-#define PATHFIND_VALIDATOR(name)  bool (name)(room_data *room, struct map_data *map, struct pathfind_controller *controller)
+#define PATHFIND_VALIDATOR(name)  bool (name)(room_data *room, struct map_data *map, char_data *ch, vehicle_data *veh, struct pathfind_controller *controller)
 
 
  //////////////////////////////////////////////////////////////////////////////

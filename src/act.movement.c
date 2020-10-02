@@ -2617,7 +2617,7 @@ ACMD(do_rest) {
 
 
 ACMD(do_run) {
-	extern char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*validator), int step_limit);
+	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator), int step_limit);
 	PATHFIND_VALIDATOR(pathfind_road);
 	
 	room_data *path_to_room;
@@ -2660,7 +2660,7 @@ ACMD(do_run) {
 	}
 	
 	// did they request a path?
-	else if (path_to_room && !(found_path = get_pathfind_string(IN_ROOM(ch), path_to_room, pathfind_road, 1500))) {
+	else if (path_to_room && !(found_path = get_pathfind_string(IN_ROOM(ch), path_to_room, ch, NULL, pathfind_road, 1500))) {
 		msg_to_char(ch, "Unable to find a route to that location (it may be too far or there may not be a road to it).\r\n");
 	}
 	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {

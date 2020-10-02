@@ -47,10 +47,12 @@ bool pathfind_get_dir(room_data *from_room, struct map_data *from_map, int dir, 
 * This must be implemented for both 'room' and 'map', as only 1 of those is set
 * each time it's called.
 *
-* #define PATHFIND_VALIDATOR(name)  bool (name)(room_data *room, struct map_data *map, struct pathfind_controller *controller)
+* #define PATHFIND_VALIDATOR(name)  bool (name)(room_data *room, struct map_data *map, char_data *ch, vehicle_data *veh, struct pathfind_controller *controller)
 *
 * @param room_data *room Optional: An interior room (if this is NULL, map will be set instead).
 * @param struct map_data *map Optional: A map room if outdoors (if this is NULL, room will be set instead).
+* @param char_data *ch Optional: Player trying to find the path (may be NULL).
+* @param vehicle_data *veh Optional: Vehicle trying to find the paath (may be NULL).
 * @param struct pathfind_controller *controller The pathfinding controller and all its data.
 * @return bool TRUE if the room/map is ok, FALSE if not.
 */
@@ -353,11 +355,13 @@ bool pathfind_get_dir(room_data *from_room, struct map_data *from_map, int dir, 
 *
 * @param room_data *start The start room.
 * @param room_data *end The end room.
+* @param char_data *ch Optional: Player trying to find the path (may be NULL).
+* @param vehicle_data *veh Optional: Vehicle trying to find the paath (may be NULL).
 * @param PATHFIND_VALIDATOR(*validator) Function pointer for validating each room.
 * @param int step_limit Maximum number of steps allowed.
 * @return char* A movement string (like "2n3w") or NULL if not found.
 */
-char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*validator), int step_limit) {
+char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator), int step_limit) {
 	struct pathfind_controller *controller;
 	static char output[MAX_STRING_LENGTH];
 	struct pathfind_node *node, *end_node;
@@ -430,7 +434,7 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 				to_map->pathfind_key = controller->key;
 			}
 		
-			if (!validator(to_room, to_map, controller)) {
+			if (!validator(to_room, to_map, ch, veh, controller)) {
 				continue;	// failed validator
 			}
 		
