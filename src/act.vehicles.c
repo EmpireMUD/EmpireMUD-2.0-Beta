@@ -43,6 +43,7 @@ extern const int rev_dir[];
 // external funcs
 ACMD(do_dismount);
 PATHFIND_VALIDATOR(pathfind_ocean);
+PATHFIND_VALIDATOR(pathfind_pilot);
 PATHFIND_VALIDATOR(pathfind_road);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern int count_harnessed_animals(vehicle_data *veh);
@@ -69,10 +70,11 @@ struct {
 	bitvector_t flag;	// required VEH_ flag
 	PATHFIND_VALIDATOR(*pathfinder);	// if it can target coords
 	any_vnum pathfind_cooldown;	// optional cooldown for pathfinding (or NOTHING)
+	int pathfind_limit;	// maximum distance
 } drive_data[] = {
-	{ "drive", "driving", ACT_DRIVING, VEH_DRIVING, pathfind_road, NOTHING },	// SCMD_DRIVE
-	{ "sail", "sailing", ACT_SAILING, VEH_SAILING, pathfind_ocean, COOLDOWN_SAIL_PATHFINDING },	// SCMD_SAIL
-	{ "pilot", "piloting", ACT_PILOTING, VEH_FLYING, NULL, NOTHING },	// SCMD_PILOT
+	{ "drive", "driving", ACT_DRIVING, VEH_DRIVING, pathfind_road, NOTHING, 2000 },	// SCMD_DRIVE
+	{ "sail", "sailing", ACT_SAILING, VEH_SAILING, pathfind_ocean, COOLDOWN_SAIL_PATHFINDING, 1500 },	// SCMD_SAIL
+	{ "pilot", "piloting", ACT_PILOTING, VEH_FLYING, pathfind_pilot, COOLDOWN_PILOT_PATHFINDING, 500 },	// SCMD_PILOT
 };
 
 
@@ -1792,7 +1794,7 @@ ACMD(do_drive) {
 	else if (path_to_room && drive_data[subcmd].pathfind_cooldown != NOTHING && get_cooldown_time(ch, drive_data[subcmd].pathfind_cooldown) > 0) {
 		msg_to_char(ch, "You must wait %d more second%s to %s by coordinates again.\r\n", get_cooldown_time(ch, drive_data[subcmd].pathfind_cooldown), PLURAL(get_cooldown_time(ch, drive_data[subcmd].pathfind_cooldown)), drive_data[subcmd].command);
 	}
-	else if (path_to_room && !(found_path = get_pathfind_string(IN_ROOM(ch), path_to_room, drive_data[subcmd].pathfinder, 1500))) {
+	else if (path_to_room && !(found_path = get_pathfind_string(IN_ROOM(ch), path_to_room, drive_data[subcmd].pathfinder, drive_data[subcmd].pathfind_limit))) {
 		msg_to_char(ch, "Unable to find a valid route to that location.\r\n");
 	}
 	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {
@@ -1821,7 +1823,7 @@ ACMD(do_drive) {
 		GET_MOVEMENT_STRING(ch) = found_path ? str_dup(found_path) : (dir_only ? NULL : str_dup(argument));
 		
 		if (found_path && drive_data[subcmd].pathfind_cooldown != NOTHING) {
-			add_cooldown(ch, drive_data[subcmd].pathfind_cooldown, 60);
+			add_cooldown(ch, drive_data[subcmd].pathfind_cooldown, 30);
 		}
 		
 		GET_DRIVING(ch) = veh;

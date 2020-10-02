@@ -1956,7 +1956,8 @@ order.
 
 If you specify coordinates, the following restrictions apply:
 - drive requires continuous roads (including tunnels, gatehouses, etc)
-- sail can only use coordinates once per minute
+- sail can only use coordinates once per 30 seconds, maximum of 1500 tiles
+- pilot can only use coordinates once per 30 seconds, maximum of 500 tiles
 
 Examples:
  > drive east
