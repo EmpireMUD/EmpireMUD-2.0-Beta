@@ -401,6 +401,7 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 			break;	// exit early if we found the end or passed the limit
 		}
 		
+		/*
 		// check dirs from this node:
 		// - pass 0 is only the preivous dir (all things being equal, queues it first to create shorter path strings)
 		// - pass 1 is all other dirs
@@ -414,6 +415,9 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 				else if (dir == NO_DIR) {
 					continue;	// skippable (probably 1st pass on 1st tile)
 				}
+				*/
+		
+			for (dir = 0; dir < (node->inside_room ? NUM_NATURAL_DIRS : NUM_2D_DIRS) && !end_node; ++dir) {{
 				// preliminary checks
 				if (!pathfind_get_dir(node->inside_room, node->map_loc, dir, &to_room, &to_map)) {
 					continue;	// nothing in that dir
