@@ -121,7 +121,8 @@ PATHFIND_VALIDATOR(pathfind_road) {
 * @return struct pathfind_node* The new node, if added. (May be NULL.)
 */
 struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, room_data *inside_room, struct map_data *map_tile, struct pathfind_node *from_node, int dir) {
-	struct pathfind_node *node;
+	struct pathfind_node *node, *iter;
+	bool found;
 	
 	if (!controller || (!inside_room && !map_tile)) {
 		return NULL;	// no work?
@@ -132,9 +133,11 @@ struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, 
 	// store locations
 	if (map_tile) {
 		node->map_loc = map_tile;
+		node->estimate = compute_map_distance(MAP_X_COORD(map_tile->vnum), MAP_Y_COORD(map_tile->vnum), controller->end_x, controller->end_y);
 	}
 	else if (inside_room) {
 		node->inside_room = inside_room;
+		node->estimate = compute_map_distance(X_COORD(inside_room), Y_COORD(inside_room), controller->end_x, controller->end_y);
 	}
 	
 	if (from_node) {
@@ -157,9 +160,20 @@ struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, 
 	else if (dir != NO_DIR) {	// same direction
 		++(node->cur_dist);
 	}
+		
+	// insert in-order
+	found = FALSE;
+	DL_FOREACH(controller->nodes, iter) {
+		if (iter->estimate > node->estimate) {
+			DL_PREPEND_ELEM(controller->nodes, iter, node);
+			found = TRUE;
+			break;
+		}
+	}
+	if (!found) {
+		DL_APPEND(controller->nodes, node);
+	}
 	
-	// and append
-	DL_APPEND(controller->nodes, node);
 	return node;
 }
 
@@ -229,6 +243,10 @@ void free_pathfind_controller(struct pathfind_controller *pc) {
 	struct pathfind_node *node, *next;
 	
 	DL_FOREACH_SAFE(pc->nodes, node, next) {
+		free(node);
+	}
+	
+	DL_FOREACH_SAFE(pc->free_nodes, node, next) {
 		free(node);
 	}
 	
@@ -358,6 +376,8 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 	CREATE(controller, struct pathfind_controller, 1);
 	controller->start = start;
 	controller->end = end;
+	controller->end_x = X_COORD(end);
+	controller->end_y = Y_COORD(end);
 	controller->key = get_pathfind_key();
 	controller->limit = step_limit;
 	
@@ -373,6 +393,10 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 	
 	// do the thing
 	DL_FOREACH(controller->nodes, node) {
+		// pop node off and move it to the free_nodes list now
+		DL_DELETE(controller->nodes, node);
+		DL_PREPEND(controller->free_nodes, node);
+		
 		if (end_node || node->steps > controller->limit) {
 			break;	// exit early if we found the end or passed the limit
 		}

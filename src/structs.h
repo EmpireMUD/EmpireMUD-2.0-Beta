@@ -3101,6 +3101,8 @@ struct pathfind_node {
 	int cur_dir;	// last direction moved
 	int cur_dist;	// number of times it was moved
 	
+	int estimate;	// estimated distance, for prioritizing
+	
 	struct pathfind_node *prev, *next;	// doubly-linked list
 };
 
@@ -3109,11 +3111,14 @@ struct pathfind_node {
 struct pathfind_controller {
 	room_data *start;	// start pos
 	room_data *end;	// destination
+	int end_x, end_y;	// target coordinates (prevent repeat lookups)
+	
 	int limit;	// max number of steps
 	
 	int key;	// initialized with get_pathfind_key()
 	
-	struct pathfind_node *nodes;	// doubly-linked list of nodes
+	struct pathfind_node *nodes;	// doubly-linked list of nodes to check
+	struct pathfind_node *free_nodes;	// doubly-linked list of nodes that have been checked
 };
 
 
