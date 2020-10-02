@@ -63,14 +63,16 @@ PATHFIND_VALIDATOR(pathfind_ocean) {
 	room_data *find;
 	
 	if (room) {
-		return (ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED(room, BLD_SAIL)) ? TRUE : FALSE;
+		if (ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED(room, BLD_SAIL)) {
+			return (ch && ROOM_IS_CLOSED(room)) ? can_use_room(ch, room, GUESTS_ALLOWED) : TRUE;
+		}
 	}
 	else if (map) {
 		if (SECT_FLAGGED(map->sector_type, SECTF_FRESH_WATER | SECTF_OCEAN)) {
 			return TRUE;	// true ocean
 		}
 		else if ((find = real_real_room(map->vnum)) && ROOM_BLD_FLAGGED(find, BLD_SAIL)) {
-			return TRUE;	// docks
+			return (ch && ROOM_IS_CLOSED(find)) ? can_use_room(ch, find, GUESTS_ALLOWED) : TRUE;	// sailable
 		}
 	}
 	
@@ -96,14 +98,16 @@ PATHFIND_VALIDATOR(pathfind_road) {
 	room_data *find;
 	
 	if (room) {
-		return (IS_ROAD(room) || ROOM_BLD_FLAGGED(room, BLD_ATTACH_ROAD)) ? TRUE : FALSE;
+		if (IS_ROAD(room) || ROOM_BLD_FLAGGED(room, BLD_ATTACH_ROAD)) {
+			return (ch && ROOM_IS_CLOSED(room)) ? can_use_room(ch, room, GUESTS_ALLOWED) : TRUE;
+		}
 	}
 	else if (map) {
 		if (SECT_FLAGGED(map->sector_type, SECTF_IS_ROAD)) {
 			return TRUE;	// true road
 		}
 		else if ((find = real_real_room(map->vnum)) && ROOM_BLD_FLAGGED(find, BLD_ATTACH_ROAD)) {
-			return TRUE;	// attach-road
+			return (ch && ROOM_IS_CLOSED(find)) ? can_use_room(ch, find, GUESTS_ALLOWED) : TRUE;	// attach-road
 		}
 	}
 	
