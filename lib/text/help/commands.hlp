@@ -1963,6 +1963,7 @@ Examples:
  > drive east
  > sail 3e 4n 7nw
  > pilot east 3, north 4, northwest 7
+ > drive (415,780)
 
 Many vehicles cannot move through portals.
 
