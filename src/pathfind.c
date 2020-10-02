@@ -401,9 +401,12 @@ char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*
 			break;	// exit early if we found the end or passed the limit
 		}
 		
-		// check dirs from this node: pass 0 is only the preivous dir; pass 1 is all other dirs
+		// check dirs from this node:
+		// - pass 0 is only the preivous dir (all things being equal, queues it first to create shorter path strings)
+		// - pass 1 is all other dirs
 		for (pass = 0; pass < 2; ++pass) {
 			// on first pass, only checking the same dir as last time (prefer same direction)
+			// admittedly this for() is slightly ugly, but it prevents code duplication here -pc
 			for (dir = (pass ? 0 : node->cur_dir); ((pass && (dir < (node->inside_room ? NUM_NATURAL_DIRS : NUM_2D_DIRS))) || (!pass && (dir == node->cur_dir))) && !end_node; ++dir) {
 				if (pass && dir == node->cur_dir) {
 					continue;	// already tried this dir
