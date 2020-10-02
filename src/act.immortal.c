@@ -711,6 +711,7 @@ ADMIN_UTIL(util_islandsize) {
 ADMIN_UTIL(util_pathtest) {
 	extern char *get_pathfind_string(room_data *start, room_data *end, PATHFIND_VALIDATOR(*validator), int step_limit);
 	PATHFIND_VALIDATOR(pathfind_ocean);
+	PATHFIND_VALIDATOR(pathfind_pilot);
 	PATHFIND_VALIDATOR(pathfind_road);
 	
 	unsigned long long timer;
@@ -728,15 +729,18 @@ ADMIN_UTIL(util_pathtest) {
 	else if (*argument && is_abbrev(argument, "ocean")) {
 		vdr = pathfind_ocean;
 	}
+	else if (*argument && is_abbrev(argument, "pilot")) {
+		vdr = pathfind_pilot;
+	}
 	else {
-		msg_to_char(ch, "Usage: util pathtest <room> <ocean | road>\r\n");
+		msg_to_char(ch, "Usage: util pathtest <room> <ocean | road | pilot>\r\n");
 		return;
 	}
 	
 	timer = microtime();
 	
 	if (!*arg || !*argument) {
-		msg_to_char(ch, "Usage: util pathtest <room> <ocean | road>\r\n");
+		msg_to_char(ch, "Usage: util pathtest <room> <ocean | road | pilot>\r\n");
 	}
 	else if (!(to_room = find_target_room(ch, arg))) {
 		msg_to_char(ch, "Unknown target: %s\r\n", arg);

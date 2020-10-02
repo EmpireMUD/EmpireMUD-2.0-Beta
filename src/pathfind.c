@@ -76,6 +76,19 @@ PATHFIND_VALIDATOR(pathfind_ocean) {
 }
 
 
+// example: validator for piloting air vehicles
+PATHFIND_VALIDATOR(pathfind_pilot) {
+	if (room) {
+		return (!ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_FLY) && !ROOM_IS_CLOSED(room)) ? TRUE : FALSE;
+	}
+	else if (map) {
+		return !IS_SET(map->shared->affects, ROOM_AFF_NO_FLY) ? TRUE : FALSE;
+	}
+	
+	return FALSE;	// all other cases?
+}
+
+
 // example: validator for following roads
 PATHFIND_VALIDATOR(pathfind_road) {
 	room_data *find;
