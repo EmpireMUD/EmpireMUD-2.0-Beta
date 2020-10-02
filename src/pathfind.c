@@ -154,11 +154,11 @@ struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, 
 	// store locations
 	if (map_tile) {
 		node->map_loc = map_tile;
-		node->estimate = compute_map_distance(MAP_X_COORD(map_tile->vnum), MAP_Y_COORD(map_tile->vnum), controller->end_x, controller->end_y) + (from_node ? node->steps : 0.0);
+		node->estimate = compute_map_distance(MAP_X_COORD(map_tile->vnum), MAP_Y_COORD(map_tile->vnum), controller->end_x, controller->end_y) + (from_node ? from_node->steps : 0.0) + 1.0;
 	}
 	else if (inside_room) {
 		node->inside_room = inside_room;
-		node->estimate = compute_map_distance(X_COORD(inside_room), Y_COORD(inside_room), controller->end_x, controller->end_y) + (from_node ? node->steps : 0.0);
+		node->estimate = compute_map_distance(X_COORD(inside_room), Y_COORD(inside_room), controller->end_x, controller->end_y) + (from_node ? from_node->steps : 0.0) + 1.0;
 	}
 	
 	if (from_node) {
@@ -384,9 +384,10 @@ char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehic
 	struct pathfind_controller *controller;
 	static char output[MAX_STRING_LENGTH];
 	struct pathfind_node *node, *end_node;
+	unsigned long long start_time;
 	struct map_data *to_map;
 	room_data *to_room;
-	int dir;
+	int dir, count;
 	
 	// shortcut for safety
 	if (!start || !end || start == end || !validator) {
@@ -404,6 +405,14 @@ char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehic
 	controller->key = get_pathfind_key();
 	controller->limit = step_limit;
 	
+	start_time = microtime();
+	
+	// if it couldn't pathfind to the end, bug out early rather than waste time
+	if (!validator(end, NULL, ch, veh, controller)) {
+		free_pathfind_controller(controller);
+		return NULL;
+	}
+	
 	// start pathing
 	if (GET_ROOM_VNUM(start) < MAP_SIZE && !ROOM_IS_CLOSED(start) && GET_MAP_LOC(start)) {	// on the map
 		add_pathfind_node(controller, NULL, GET_MAP_LOC(start), NULL, NO_DIR);
@@ -413,6 +422,7 @@ char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehic
 	}
 	
 	end_node = NULL;
+	count = 0;
 	
 	// do the thing
 	while ((node = controller->nodes)) {
@@ -459,6 +469,13 @@ char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehic
 		
 			// ok: queue it
 			add_pathfind_node(controller, to_room, to_map, node, dir);
+		}
+		
+		// check time limit every 100 nodes: stop after 0.25 seconds
+		if ((++count % 100) == 0) {
+			if (microtime() - start_time > 250000) {
+				break;
+			}
 		}
 	}
 	
