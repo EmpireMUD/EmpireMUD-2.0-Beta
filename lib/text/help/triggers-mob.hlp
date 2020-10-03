@@ -343,6 +343,13 @@ For each type, there is a help file named &yMTRIG <type>&0.
 
 All mob scripts provide the &c%self%&0 variable.
 
+Names and pronouns:
+&c~%person%&0 - name, someone, your
+&c|%person%&0 - name's, someone's, your
+&c&&%person%&0 - he/she/it, you
+&c*%person%&0 - him/her/it, you
+&c^%person%&0 - his/her/its, your
+
 When using field  - The variable returns:
 &cability(name)&0 - Returns whether or not the player knows the ability.
 &caction&0 - For players, the current timed action (e.g. crafting, digging).
