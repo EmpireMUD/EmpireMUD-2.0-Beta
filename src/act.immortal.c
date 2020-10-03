@@ -5352,8 +5352,12 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 	sprinttype(GET_REAL_SEX(k), genders, buf);
 	CAP(buf);
-	sprintf(buf2, " %s '&y%s&0'  Lastname [%s], IDNum: [%5d], In room [%5d]\r\n", (!IS_NPC(k) ? "PC" : (!IS_MOB(k) ? "NPC" : "MOB")), GET_NAME(k), (!IS_NPC(k) && GET_CURRENT_LASTNAME(k)) ? GET_CURRENT_LASTNAME(k) : "none", IS_NPC(k) ? k->script_id : GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
-	send_to_char(strcat(buf, buf2), ch);
+	if (!IS_NPC(k)) {
+		msg_to_char(ch, "%s PC '\ty%s\t0', Lastname '\ty%s\t0', IDNum: [%5d], In room [%5d]\r\n", buf, GET_NAME(k), GET_CURRENT_LASTNAME(k) ? GET_CURRENT_LASTNAME(k) : "none", GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
+	}
+	else {	// mob
+		msg_to_char(ch, "%s %s '\ty%s\t0', ID: [%5d], In room [%5d]\r\n", buf, (!IS_MOB(k) ? "NPC" : "MOB"), GET_NAME(k), k->script_id, IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
+	}
 	
 	if (!IS_NPC(k) && GET_ACCOUNT(k)) {
 		if (GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
