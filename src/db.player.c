@@ -29,6 +29,7 @@
 *   Account DB
 *   Core Player DB
 *   Delayed Update System
+*   Lastname Handlers
 *   loaded_player_hash For Offline Players
 *   Autowiz Wizlist Generator
 *   Helpers
@@ -69,6 +70,7 @@ void free_player_eq_set(struct player_eq_set *eq_set);
 struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
 time_t get_member_timeout_ch(char_data *ch);
 time_t get_member_timeout_time(time_t created, time_t last_login, double played_hours);
+bool has_lastname(char_data *ch, char *name);
 void purge_bound_items(int idnum);
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch);
 void remove_loaded_player(char_data *ch);
@@ -777,6 +779,7 @@ void free_char(char_data *ch) {
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
 	struct minipet_data *mini, *next_mini;
+	struct player_lastname *lastn;
 	struct player_eq_set *eq_set;
 	struct pursuit_data *purs;
 	struct player_tech *ptech;
@@ -923,6 +926,14 @@ void free_char(char_data *ch) {
 		while ((a = GET_ALIASES(ch)) != NULL) {
 			GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
 			free_alias(a);
+		}
+		
+		while ((lastn = GET_LASTNAME_LIST(ch))) {
+			GET_LASTNAME_LIST(ch) = lastn->next;
+			if (lastn->name) {
+				free(lastn->name);
+			}
+			free(lastn);
 		}
 		
 		while ((offer = GET_OFFERS(ch))) {
@@ -3014,6 +3025,121 @@ void queue_delayed_update(char_data *ch, bitvector_t type) {
 		}
 		cdu->type |= type;
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// LASTNAME HANDLERS ///////////////////////////////////////////////////////
+
+/**
+* Grants a lastname to a player's list.
+*
+* @param char_data *ch The player.
+* @param char *name The lastname to add to the list.
+*/
+void add_lastname(char_data *ch, char *name) {
+	struct player_lastname *lastn;
+	
+	if (!ch || IS_NPC(ch) || !name || !*name) {
+		return;	// no work
+	}
+	if (has_lastname(ch, name)) {
+		return;	// already has it
+	}
+	
+	CREATE(lastn, struct player_lastname, 1);
+	lastn->name = str_dup(name);
+	LL_PREPEND(GET_LASTNAME_LIST(ch), lastn);
+	queue_delayed_update(ch, CDU_SAVE);
+}
+
+
+/**
+* Changes a player's personal lastname. If it's also their current lastname,
+* that is updated as well.
+*
+* @param char_data *ch The player.
+* @param char *name The name to set it to (may be NULL).
+*/
+void change_personal_lastname(char_data *ch, char *name) {
+	bool also_current = FALSE;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;	// no player no work
+	}
+	
+	// free old name
+	if (GET_PERSONAL_LASTNAME(ch)) {
+		if (GET_CURRENT_LASTNAME(ch) && !str_cmp(GET_PERSONAL_LASTNAME(ch), GET_CURRENT_LASTNAME(ch))) {
+			free(GET_CURRENT_LASTNAME(ch));
+			also_current = TRUE;
+		}
+		free(GET_PERSONAL_LASTNAME(ch));
+	}
+	
+	GET_PERSONAL_LASTNAME(ch) = name ? str_dup(name) : NULL;
+	if (also_current) {
+		GET_CURRENT_LASTNAME(ch) = name ? str_dup(name) : NULL;
+	}
+	
+	queue_delayed_update(ch, CDU_SAVE);
+}
+
+
+/**
+* Check the player's lastname list for a name.
+*
+* @param char_data *ch A player.
+* @param char *name The name to look for (not case sensitive).
+* @return bool TRUE if the player has the name, FALSE if not.
+*/
+bool has_lastname(char_data *ch, char *name) {
+	struct player_lastname *lastn;
+	
+	if (!ch || IS_NPC(ch) || !name) {
+		return FALSE;	// safety first
+	}
+	
+	LL_FOREACH(GET_LASTNAME_LIST(ch), lastn) {
+		if (lastn->name && !str_cmp(lastn->name, name)) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;	// if not
+}
+
+
+/**
+* Removes a name from a player's lastname list, if present.
+*
+* @param char_data *ch A player.
+* @param char *name The name to remove (not case sensitive).
+*/
+void remove_lastname(char_data *ch, char *name) {
+	struct player_lastname *lastn, *next;
+	
+	if (!ch || IS_NPC(ch) || !name) {
+		return;	// safety first
+	}
+	
+	// shut off current lastname if it matches
+	if (GET_CURRENT_LASTNAME(ch) && !str_cmp(GET_CURRENT_LASTNAME(ch), name)) {
+		free(GET_CURRENT_LASTNAME(ch));
+		GET_CURRENT_LASTNAME(ch) = NULL;
+	}
+	
+	LL_FOREACH_SAFE(GET_LASTNAME_LIST(ch), lastn, next) {
+		if (!lastn->name || !str_cmp(lastn->name, name)) {
+			if (lastn->name) {
+				free(lastn->name);
+			}
+			LL_DELETE(GET_LASTNAME_LIST(ch), lastn);
+			free(lastn);
+		}
+	}
+	
+	queue_delayed_update(ch, CDU_SAVE);
 }
 
 

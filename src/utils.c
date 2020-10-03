@@ -2577,38 +2577,6 @@ void change_look_desc_append(char_data *ch, char *str, bool format) {
 
 
 /**
-* Changes a player's personal lastname. If it's also their current lastname,
-* that is updated as well.
-*
-* @param char_data *ch The player.
-* @param char *name The name to set it to (may be NULL).
-*/
-void change_personal_lastname(char_data *ch, char *name) {
-	bool also_current = FALSE;
-	
-	if (!ch || IS_NPC(ch)) {
-		return;	// no player no work
-	}
-	
-	// free old name
-	if (GET_PERSONAL_LASTNAME(ch)) {
-		if (GET_CURRENT_LASTNAME(ch) && !str_cmp(GET_PERSONAL_LASTNAME(ch), GET_CURRENT_LASTNAME(ch))) {
-			free(GET_CURRENT_LASTNAME(ch));
-			also_current = TRUE;
-		}
-		free(GET_PERSONAL_LASTNAME(ch));
-	}
-	
-	GET_PERSONAL_LASTNAME(ch) = name ? str_dup(name) : NULL;
-	if (also_current) {
-		GET_CURRENT_LASTNAME(ch) = name ? str_dup(name) : NULL;
-	}
-	
-	queue_delayed_update(ch, CDU_SAVE);
-}
-
-
-/**
 * Processes a change to a character/mob's sex. This may also update it in
 * additional places, such as stored companion data.
 *

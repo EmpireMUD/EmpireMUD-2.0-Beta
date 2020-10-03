@@ -3828,6 +3828,13 @@ struct companion_mod {
 };
 
 
+// players have a collection of lastnames
+struct player_lastname {
+	char *name;
+	struct player_lastname *next;	// linked list: GET_LASTNAME_LIST(ch)
+};
+
+
 // track who/when a player has been killed by another player
 struct pk_data {
 	int killed_alt;	// id of which alt died
@@ -4169,6 +4176,7 @@ struct player_special_data {
 	struct player_currency *currencies;	// hash table of adventure currencies
 	struct alias_data *aliases;	// Character's aliases
 	struct player_eq_set *eq_sets;	// player's saved equipment sets
+	struct player_lastname *lastname_list;	// linked list of lastnames
 	struct offer_data *offers;	// various offers for do_accept/reject
 	struct player_slash_channel *slash_channels;	// channels the player is on
 	struct slash_channel *load_slash_channels;	// temporary storage between load and join

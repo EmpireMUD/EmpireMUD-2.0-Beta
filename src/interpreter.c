@@ -247,6 +247,7 @@ ACMD(do_kite);
 
 ACMD(do_land);
 ACMD(do_last);
+ACMD(do_lastname);
 ACMD(do_lay);
 ACMD(do_lead);
 ACMD(do_learn);
@@ -815,6 +816,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "lay", POS_STANDING, do_lay, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "land", POS_FIGHTING, do_land, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "last", POS_DEAD, do_last, LVL_START_IMM, CTYPE_IMMORTAL ),
+	SIMPLE_CMD( "lastname", POS_DEAD, do_lastname, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "lead", POS_STANDING, do_lead, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "learn", POS_STANDING, do_learn, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "learned", POS_DEAD, do_learned, NO_MIN, CTYPE_UTIL ),
