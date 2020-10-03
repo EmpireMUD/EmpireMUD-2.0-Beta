@@ -4620,7 +4620,7 @@ SHOW(show_lastnames) {
 		
 		if (GET_PERSONAL_LASTNAME(plr)) {
 			cur = !str_cmp(GET_PERSONAL_LASTNAME(plr), GET_CURRENT_LASTNAME(plr));
-			size += snprintf(output, sizeof(output), "%s%2d. %s (personal)%s\r\n", (cur ? "\tg" : ""), ++count, GET_PERSONAL_LASTNAME(plr), (cur ? " (current)\t0" : ""));
+			size += snprintf(output + size, sizeof(output) - size, "%s%2d. %s (personal)%s\r\n", (cur ? "\tg" : ""), ++count, GET_PERSONAL_LASTNAME(plr), (cur ? " (current)\t0" : ""));
 		}
 		
 		LL_FOREACH(GET_LASTNAME_LIST(plr), lastn) {

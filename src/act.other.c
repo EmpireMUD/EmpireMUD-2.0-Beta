@@ -2786,7 +2786,7 @@ ACMD(do_lastname) {
 		
 			if (GET_PERSONAL_LASTNAME(ch)) {
 				++count;
-				size += snprintf(output, sizeof(output), " %s (personal)\r\n", GET_PERSONAL_LASTNAME(ch));
+				size += snprintf(output + size, sizeof(output) - size, " %s (personal)\r\n", GET_PERSONAL_LASTNAME(ch));
 			}
 		
 			LL_FOREACH(GET_LASTNAME_LIST(ch), lastn) {
