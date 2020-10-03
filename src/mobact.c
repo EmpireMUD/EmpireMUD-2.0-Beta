@@ -579,7 +579,7 @@ bool try_mobile_movement(char_data *ch) {
 	dir = number(-1, NUM_2D_DIRS-1);
 	
 	// -1 will attempt to enter/exit a vehicle instead
-	if (dir == -1 && ROOM_CAN_EXIT(IN_ROOM(ch)) && (!GET_ROOM_VEHICLE(IN_ROOM(ch)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch), VEH_BUILDING)))) {
+	if (dir == -1 && ROOM_CAN_EXIT(IN_ROOM(ch)) && (!GET_ROOM_VEHICLE(IN_ROOM(ch)) || VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_BUILDING))) {
 		do_exit(ch, "", 0, 0);
 	}
 	else if (dir == -1) {	// look for a vehicle to enter
