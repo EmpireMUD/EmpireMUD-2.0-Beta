@@ -1909,6 +1909,9 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
     	else {
 			change_personal_lastname(vict, val_arg);
+			if (!GET_CURRENT_LASTNAME(vict) && GET_PERSONAL_LASTNAME(vict)) {
+				GET_CURRENT_LASTNAME(vict) = str_dup(GET_PERSONAL_LASTNAME(vict));
+			}
     		sprintf(output, "%s's last name is now: %s", GET_NAME(vict), GET_PERSONAL_LASTNAME(vict));
 		}
 	}
