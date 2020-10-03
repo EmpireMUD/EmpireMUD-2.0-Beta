@@ -1971,6 +1971,7 @@ const char *versions_list[] = {
 	"b5.104",
 	"b5.105",
 	"b5.106",
+	"b5.107",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -4535,6 +4536,14 @@ void b5_106_update(void) {
 }
 
 
+// b5.107 copies players' personal lastname to current lastname (new split feature)
+PLAYER_UPDATE_FUNC(b5_107_players) {
+	if (GET_PERSONAL_LASTNAME(ch) && !GET_CURRENT_LASTNAME(ch)) {
+		GET_CURRENT_LASTNAME(ch) = str_dup(GET_PERSONAL_LASTNAME(ch));
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4865,6 +4874,10 @@ void check_version(void) {
 		}
 		if (MATCH_VERSION("b5.106")) {
 			b5_106_update();
+		}
+		if (MATCH_VERSION("b5.107")) {
+			log("Applying b5.107 update to move lastname data...");
+			update_all_players(NULL, b5_107_players);
 		}
 	}
 	
