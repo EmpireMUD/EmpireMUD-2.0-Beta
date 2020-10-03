@@ -374,7 +374,7 @@ if %actor.level% < 20
   return 0
   halt
 end
-%echo% %self.name% yells a Battlecry and throws himself at you.
+%echo% ~%self% yells a Battlecry and throws himself at you.
 mkill %actor%
 #d
 %HEAL% OHEAL MHEAL WHEAL VHEAL
@@ -945,7 +945,7 @@ found there, from the script.
 Example:
 * in this example we have a var %testvar% we no longer need:
 set testvar hops happily along
-%echo% %self.name% %testvar%
+%echo% ~%self% %testvar%
 unset testvar
 * please note - if we had made the var global, that would be gone instead.
 

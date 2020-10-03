@@ -307,7 +307,7 @@ if %object.vnum% == 1300
   wait 1 sec
   say Thank you, %actor.name%
   %send% %actor% %self.name% gives you a gold piece.
-  %echoaround% %actor% %actor.name% is rewarded for his valor.
+  %echoaround% %actor% ~%actor% is rewarded for ^%actor% valor.
   nop %actor.give_coins(1)%
   wait 5 sec
   %purge% obj 1300
