@@ -1777,9 +1777,9 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					GET_LAST_OFFENSE_SEEN(ch) = atol(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Lastname List:", length)) {
-					if (sscanf(line + length + 1, "%s~", str_in) == 1 && *str_in) {
+					if (*(line + length + 1)) {
 						CREATE(lastn, struct player_lastname, 1);
-						lastn->name = str_dup(str_in);
+						lastn->name = str_dup(line + length + 1);
 						LL_APPEND(GET_LASTNAME_LIST(ch), lastn);
 					}
 				}
@@ -2943,7 +2943,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	}
 	LL_FOREACH(GET_LASTNAME_LIST(ch), lastn) {
 		if (lastn->name) {
-			fprintf(fl, "Lastname List: %s~\n", lastn->name);
+			fprintf(fl, "Lastname List: %s\n", lastn->name);
 		}
 	}
 	for (lore = GET_LORE(ch); lore; lore = lore->next) {
