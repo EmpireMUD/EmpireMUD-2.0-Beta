@@ -1806,7 +1806,7 @@ void prompt_creation(descriptor_data *d) {
 		case CON_QLAST_NAME: {
 			if (!IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_SET_AT_CREATION)) {
 				// not allowed to set a lastname at creation
-				next_creation_step(d);
+				set_creation_state(d, CON_QSEX);
 				break;
 			}
 			
