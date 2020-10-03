@@ -2088,7 +2088,7 @@ typedef struct vehicle_data vehicle_data;
 
 // LASTNAME_x: config players lastname_mode: determines how players get last names
 #define LASTNAME_SET_AT_CREATION  BIT(0)	// a. player chooses during creation menus
-#define LASTNAME_SET_ANY_TIME  BIT(1)	// b. player can change with 'lastname change'
+#define LASTNAME_CHANGE_ANY_TIME  BIT(1)	// b. player can change with 'lastname change'
 #define LASTNAME_CHOOSE_FROM_LIST  BIT(2)	// c. player can choose from the namelist
 
 

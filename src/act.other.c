@@ -2722,7 +2722,7 @@ ACMD(do_lastname) {
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot do this.\r\n");
 	}
-	else if (!IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_SET_ANY_TIME | LASTNAME_CHOOSE_FROM_LIST)) {
+	else if (!IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHANGE_ANY_TIME | LASTNAME_CHOOSE_FROM_LIST)) {
 		// not allowed to pick
 		if (GET_CURRENT_LASTNAME(ch)) {
 			msg_to_char(ch, "Your lastname is: %s\r\n", GET_CURRENT_LASTNAME(ch));
@@ -2733,7 +2733,7 @@ ACMD(do_lastname) {
 	}
 	else if (!*argument) {	// no arg
 		// usage?
-		if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_SET_ANY_TIME)) {
+		if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHANGE_ANY_TIME)) {
 			msg_to_char(ch, "Usage: lastname [change | list] [name]\r\n");
 		}
 		else if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
@@ -2750,7 +2750,7 @@ ACMD(do_lastname) {
 	}
 	else if (is_abbrev(arg1, "change")) {
 		// player wants to change their self-chosen lastname
-		if (!IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_SET_ANY_TIME)) {
+		if (!IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHANGE_ANY_TIME)) {
 			msg_to_char(ch, "You cannot %s your own lastname.\r\n", GET_PERSONAL_LASTNAME(ch) ? "change" : "choose");
 		}
 		else if (!*arg2) {
@@ -2775,7 +2775,7 @@ ACMD(do_lastname) {
 			syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "%s has changed personal lastname to: %s", GET_NAME(ch), GET_PERSONAL_LASTNAME(ch));
 		}
 	}
-	else if (is_abbrev(arg1, "list")) {
+	else if (is_abbrev(arg1, "list") && IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
 		if (!GET_PERSONAL_LASTNAME(ch) && !GET_LASTNAME_LIST(ch)) {
 			msg_to_char(ch, "You don't have any lastnames to list.\r\n");
 		}

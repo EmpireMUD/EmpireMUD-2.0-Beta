@@ -338,7 +338,7 @@ const char *config_types[] = {
 // LASTNAME_x: config players lastname_mode: determines how players get last names
 const char *lastname_modes[] = {
 	"set-at-creation",
-	"set-any-time",
+	"change-any-time",
 	"choose-from-list",
 	"\n"
 };
