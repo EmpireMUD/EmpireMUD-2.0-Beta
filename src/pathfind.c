@@ -134,6 +134,7 @@ PATHFIND_VALIDATOR(pathfind_road) {
 		}
 		else if (!(find = real_real_room(map->vnum)) || !ROOM_BLD_FLAGGED(find, BLD_ATTACH_ROAD)) {
 			return FALSE;	// not a building that we can use
+		}
 		else if (!ROOM_IS_CLOSED(find) || CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, find, GUESTS_ALLOWED)) {
 			return TRUE;	// open-road building or closed and free to pass
 		}
