@@ -57,6 +57,7 @@ bool pathfind_get_dir(room_data *from_room, struct map_data *from_map, int dir, 
 * @return bool TRUE if the room/map is ok, FALSE if not.
 */
 
+#define CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, room, mode)  (!ROOM_OWNER(room) || ((ch) && can_use_room((ch), (room), (mode))) || ((veh) && VEH_OWNER(veh) && emp_can_use_room(VEH_OWNER(veh), (room), (mode))))
 
 // example: validator for ships
 PATHFIND_VALIDATOR(pathfind_ocean) {
@@ -64,7 +65,9 @@ PATHFIND_VALIDATOR(pathfind_ocean) {
 	
 	if (room) {
 		if (ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED(room, BLD_SAIL)) {
-			return (ch && ROOM_IS_CLOSED(room)) ? can_use_room(ch, room, GUESTS_ALLOWED) : TRUE;
+			if (!ROOM_IS_CLOSED(room) || CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, room, GUESTS_ALLOWED)) {
+				return TRUE;	// free to pass through
+			}
 		}
 	}
 	else if (map) {
@@ -72,7 +75,9 @@ PATHFIND_VALIDATOR(pathfind_ocean) {
 			return TRUE;	// true ocean
 		}
 		else if ((find = real_real_room(map->vnum)) && ROOM_BLD_FLAGGED(find, BLD_SAIL)) {
-			return (ch && ROOM_IS_CLOSED(find)) ? can_use_room(ch, find, GUESTS_ALLOWED) : TRUE;	// sailable
+			if (!ROOM_IS_CLOSED(find) || !CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, find, GUESTS_ALLOWED)) {
+				return TRUE;	// free to pass through
+			}
 		}
 	}
 	
@@ -88,8 +93,8 @@ PATHFIND_VALIDATOR(pathfind_pilot) {
 		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_FLY)) {
 			return FALSE;	// cannot fly there
 		}
-		if (!ROOM_IS_CLOSED(room) || ROOM_BLD_FLAGGED(room, BLD_ATTACH_ROAD)) {
-			return (ch && ROOM_IS_CLOSED(room)) ? can_use_room(ch, room, GUESTS_ALLOWED) : TRUE;
+		if (!ROOM_IS_CLOSED(room) || (ROOM_BLD_FLAGGED(room, BLD_ATTACH_ROAD) && CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, room, GUESTS_ALLOWED))) {
+			return TRUE;	// free to pass
 		}
 	}
 	else if (map) {
@@ -99,8 +104,8 @@ PATHFIND_VALIDATOR(pathfind_pilot) {
 		if (!(find = real_real_room(map->vnum))) {
 			return TRUE;	// no real-real-room means not a building so we're ok now
 		}
-		if (!ROOM_IS_CLOSED(find) || ROOM_BLD_FLAGGED(find, BLD_ATTACH_ROAD)) {
-			return (ch && ROOM_IS_CLOSED(find)) ? can_use_room(ch, find, GUESTS_ALLOWED) : TRUE;	// attach-road
+		if (!ROOM_IS_CLOSED(find) || (ROOM_BLD_FLAGGED(find, BLD_ATTACH_ROAD) && CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, find, GUESTS_ALLOWED))) {
+			return TRUE; // free to pass
 		}
 	}
 	
@@ -113,16 +118,24 @@ PATHFIND_VALIDATOR(pathfind_road) {
 	room_data *find;
 	
 	if (room) {
-		if (IS_ROAD(room) || ROOM_BLD_FLAGGED(room, BLD_ATTACH_ROAD)) {
-			return (ch && ROOM_IS_CLOSED(room)) ? can_use_room(ch, room, GUESTS_ALLOWED) : TRUE;
+		if (IS_ROAD(room)) {
+			return TRUE;	// real road
+		}
+		else if (!ROOM_BLD_FLAGGED(room, BLD_ATTACH_ROAD)) {
+			return FALSE;	// not a road-building
+		}
+		else if (!ROOM_IS_CLOSED(room) || CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, room, GUESTS_ALLOWED)) {
+			return TRUE;	// open-road building or closed and free to pass
 		}
 	}
 	else if (map) {
 		if (SECT_FLAGGED(map->sector_type, SECTF_IS_ROAD)) {
 			return TRUE;	// true road
 		}
-		else if ((find = real_real_room(map->vnum)) && ROOM_BLD_FLAGGED(find, BLD_ATTACH_ROAD)) {
-			return (ch && ROOM_IS_CLOSED(find)) ? can_use_room(ch, find, GUESTS_ALLOWED) : TRUE;	// attach-road
+		else if (!(find = real_real_room(map->vnum)) || !ROOM_BLD_FLAGGED(find, BLD_ATTACH_ROAD)) {
+			return FALSE;	// not a building that we can use
+		else if (!ROOM_IS_CLOSED(find) || CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, find, GUESTS_ALLOWED)) {
+			return TRUE;	// open-road building or closed and free to pass
 		}
 	}
 	
@@ -146,7 +159,7 @@ struct pathfind_node *add_pathfind_node(struct pathfind_controller *controller, 
 	static double sqrt2 = 0.0;
 	bool found;
 	
-	// compute this once:
+	// compute this once (for diagonal moves)
 	if (sqrt2 < 1.0) {
 		sqrt2 = sqrt(2.0);
 	}
@@ -383,10 +396,9 @@ bool pathfind_get_dir(room_data *from_room, struct map_data *from_map, int dir, 
 * @param char_data *ch Optional: Player trying to find the path (may be NULL).
 * @param vehicle_data *veh Optional: Vehicle trying to find the paath (may be NULL).
 * @param PATHFIND_VALIDATOR(*validator) Function pointer for validating each room.
-* @param int step_limit Maximum number of steps allowed.
 * @return char* A movement string (like "2n3w") or NULL if not found.
 */
-char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator), int step_limit) {
+char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator)) {
 	struct pathfind_controller *controller;
 	static char output[MAX_STRING_LENGTH];
 	struct pathfind_node *node, *end_node;
@@ -409,7 +421,6 @@ char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehic
 	controller->end_x = X_COORD(end);
 	controller->end_y = Y_COORD(end);
 	controller->key = get_pathfind_key();
-	controller->limit = step_limit;
 	
 	start_time = microtime();
 	
@@ -436,8 +447,8 @@ char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehic
 		DL_DELETE(controller->nodes, node);
 		DL_PREPEND(controller->free_nodes, node);
 		
-		if (end_node || node->steps > controller->limit) {
-			break;	// exit early if we found the end or passed the limit
+		if (end_node) {
+			break;	// exit early if we found the end
 		}
 		
 		for (dir = 0; dir < (node->inside_room ? NUM_NATURAL_DIRS : NUM_2D_DIRS) && !end_node; ++dir) {
