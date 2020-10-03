@@ -1876,21 +1876,18 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		vict->player.time.birth = time(0) - ((value - 17) * SECS_PER_MUD_YEAR);
 	}
 	else if SET_CASE("lastname") {
+		void change_personal_lastname(char_data *ch, char *name);
 		if (!*val_arg) {
 			msg_to_char(ch, "Set the last name to what (or \"off\")?\r\n");
 			return 0;
 		}
 		else if (!strcmp(val_arg, "off") || !strcmp(val_arg, "none")) {
-			if (GET_LASTNAME(vict) != NULL)
-				free(GET_LASTNAME(vict));
-			GET_LASTNAME(vict) = NULL;
+			change_personal_lastname(vict, NULL);
     		sprintf(output, "%s no longer has a last name.", GET_NAME(vict));
 		}
     	else {
-			if (GET_LASTNAME(vict) != NULL)
-				free(GET_LASTNAME(vict));
-			GET_LASTNAME(vict) = str_dup(val_arg);
-    		sprintf(output, "%s's last name is now: %s", GET_NAME(vict), GET_LASTNAME(vict));
+			change_personal_lastname(vict, val_arg);
+    		sprintf(output, "%s's last name is now: %s", GET_NAME(vict), GET_PERSONAL_LASTNAME(vict));
 		}
 	}
 	else if SET_CASE("bonustrait") {

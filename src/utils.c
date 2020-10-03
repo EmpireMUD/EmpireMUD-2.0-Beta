@@ -365,8 +365,8 @@ const char *PERS(char_data *ch, char_data *vict, bool real) {
 	}
 
 	strcpy(output, GET_NAME(ch));
-	if (!IS_NPC(ch) && GET_LASTNAME(ch)) {
-		sprintf(output + strlen(output), " %s", GET_LASTNAME(ch));
+	if (!IS_NPC(ch) && GET_CURRENT_LASTNAME(ch)) {
+		sprintf(output + strlen(output), " %s", GET_CURRENT_LASTNAME(ch));
 	}
 
 	return output;
@@ -2573,6 +2573,38 @@ void change_look_desc_append(char_data *ch, char *str, bool format) {
 			queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
 		}
 	}
+}
+
+
+/**
+* Changes a player's personal lastname. If it's also their current lastname,
+* that is updated as well.
+*
+* @param char_data *ch The player.
+* @param char *name The name to set it to (may be NULL).
+*/
+void change_personal_lastname(char_data *ch, char *name) {
+	bool also_current = FALSE;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;	// no player no work
+	}
+	
+	// free old name
+	if (GET_PERSONAL_LASTNAME(ch)) {
+		if (GET_CURRENT_LASTNAME(ch) && !str_cmp(GET_PERSONAL_LASTNAME(ch), GET_CURRENT_LASTNAME(ch))) {
+			free(GET_CURRENT_LASTNAME(ch));
+			also_current = TRUE;
+		}
+		free(GET_PERSONAL_LASTNAME(ch));
+	}
+	
+	GET_PERSONAL_LASTNAME(ch) = name ? str_dup(name) : NULL;
+	if (also_current) {
+		GET_CURRENT_LASTNAME(ch) = name ? str_dup(name) : NULL;
+	}
+	
+	queue_delayed_update(ch, CDU_SAVE);
 }
 
 

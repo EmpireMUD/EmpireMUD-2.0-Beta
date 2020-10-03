@@ -1446,7 +1446,7 @@ bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t f
 	if (recognize && isname(name, GET_PC_NAME(target))) {
 		return TRUE;	// name/kw match
 	}
-	else if (recognize && !IS_NPC(target) && GET_LASTNAME(target) && isname(name, GET_LASTNAME(target))) {
+	else if (recognize && !IS_NPC(target) && GET_CURRENT_LASTNAME(target) && isname(name, GET_CURRENT_LASTNAME(target))) {
 		return TRUE;	// lastname match
 	}
 	else if (IS_MORPHED(target) && isname(name, MORPH_KEYWORDS(GET_MORPH(target)))) {

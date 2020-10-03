@@ -1816,7 +1816,7 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_CLAST_NAME: {
-			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? ", GET_PC_NAME(d->character), GET_LASTNAME(d->character), (UPPER(*GET_LASTNAME(d->character)) != *GET_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "");
+			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? ", GET_PC_NAME(d->character), GET_PERSONAL_LASTNAME(d->character), (UPPER(*GET_PERSONAL_LASTNAME(d->character)) != *GET_PERSONAL_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "");
 			break;
 		}
 		case CON_QSEX: {
@@ -2308,6 +2308,7 @@ int _parse_name(char *arg, char *name) {
 * Master "socket nanny" for processing menu input.
 */
 void nanny(descriptor_data *d, char *arg) {
+	void change_personal_lastname(char_data *ch, char *name);
 	void check_delayed_load(char_data *ch);
 	void display_automessages_on_login(char_data *ch);
 	void display_tip_to_char(char_data *ch);
@@ -2563,7 +2564,7 @@ void nanny(descriptor_data *d, char *arg) {
 				set_creation_state(d, CON_SLAST_NAME);
 			}
 			else if (UPPER(*arg) == 'N') {
-				GET_LASTNAME(d->character) = NULL;
+				change_personal_lastname(d->character, NULL);
 				set_creation_state(d, CON_QSEX);
 				break;
 			}
@@ -2623,11 +2624,10 @@ void nanny(descriptor_data *d, char *arg) {
 				return;
 			}
 			else {
-				if (GET_LASTNAME(d->character)) {
-					free(GET_LASTNAME(d->character));
+				change_personal_lastname(d->character, tmp_name);
+				if (GET_PERSONAL_LASTNAME(d->character) && !GET_CURRENT_LASTNAME(d->character)) {
+					GET_CURRENT_LASTNAME(d->character) = str_dup(GET_PERSONAL_LASTNAME(d->character));
 				}
-
-				GET_LASTNAME(d->character) = str_dup(tmp_name);
 				next_creation_step(d);
 			}
 			break;
@@ -2639,8 +2639,7 @@ void nanny(descriptor_data *d, char *arg) {
 			}
 			else if (UPPER(*arg) == 'N') {
 				SEND_TO_Q("Okay, what IS it, then? ", d);
-				free(GET_LASTNAME(d->character));
-				GET_LASTNAME(d->character) = NULL;
+				change_personal_lastname(d->character, NULL);
 				STATE(d) = CON_SLAST_NAME;
 			}
 			else {

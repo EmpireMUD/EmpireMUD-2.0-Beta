@@ -861,8 +861,11 @@ void free_char(char_data *ch) {
 
 	// This is really just players, but I suppose a mob COULD have it ...
 	if (ch->player_specials != NULL && ch->player_specials != &dummy_mob) {		
-		if (GET_LASTNAME(ch)) {
-			free(GET_LASTNAME(ch));
+		if (GET_CURRENT_LASTNAME(ch)) {
+			free(GET_CURRENT_LASTNAME(ch));
+		}
+		if (GET_PERSONAL_LASTNAME(ch)) {
+			free(GET_PERSONAL_LASTNAME(ch));
 		}
 		if (GET_TITLE(ch)) {
 			free(GET_TITLE(ch));
@@ -1490,6 +1493,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 					GET_CREATION_HOST(ch) = str_dup(trim(line + length + 1));
 				}
+				else if (PFILE_TAG(line, "Current Lastname:", length)) {
+					if (GET_CURRENT_LASTNAME(ch)) {
+						free(GET_CURRENT_LASTNAME(ch));
+					}
+					GET_CURRENT_LASTNAME(ch) = str_dup(trim(line + length + 1));
+				}
 				else if (PFILE_TAG(line, "Current Pool:", length)) {
 					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, pool_types, TRUE)) != NOTHING) {
@@ -1705,10 +1714,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					GET_LARGEST_INVENTORY(ch) = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Lastname:", length)) {
-					if (GET_LASTNAME(ch)) {
-						free(GET_LASTNAME(ch));
+					if (GET_PERSONAL_LASTNAME(ch)) {
+						free(GET_PERSONAL_LASTNAME(ch));
 					}
-					GET_LASTNAME(ch) = str_dup(trim(line + length + 1));
+					GET_PERSONAL_LASTNAME(ch) = str_dup(trim(line + length + 1));
 				}
 				else if (PFILE_TAG(line, "Last Host:", length)) {
 					if (ch->prev_host) {
@@ -2547,6 +2556,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_CREATION_HOST(ch)) {
 		fprintf(fl, "Creation Host: %s\n", GET_CREATION_HOST(ch));
 	}
+	if (GET_CURRENT_LASTNAME(ch)) {
+		fprintf(fl, "Current Lastname: %s\n", GET_CURRENT_LASTNAME(ch));
+	}
 	HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
 		fprintf(fl, "Currency: %d %d\n", cur->vnum, cur->amount);
 	}
@@ -2624,8 +2636,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Last Vehicle: %d\n", IN_ROOM(ch) ? VEH_VNUM(GET_SITTING_ON(ch)) : GET_LAST_VEHICLE(ch));
 	}
 	fprintf(fl, "Last Offense: %ld\n", GET_LAST_OFFENSE_SEEN(ch));
-	if (GET_LASTNAME(ch)) {
-		fprintf(fl, "Lastname: %s\n", GET_LASTNAME(ch));
+	if (GET_PERSONAL_LASTNAME(ch)) {
+		fprintf(fl, "Lastname: %s\n", GET_PERSONAL_LASTNAME(ch));
 	}
 	HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
 		fprintf(fl, "Learned Craft: %d\n", pcd->vnum);

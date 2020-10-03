@@ -3884,7 +3884,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'l': {	// char.l*
 					if (!str_cmp(field, "lastname")) {
-						snprintf(str, slen, "%s", IS_NPC(c) ? "" : GET_LASTNAME(c)); 
+						snprintf(str, slen, "%s", IS_NPC(c) ? "" : GET_CURRENT_LASTNAME(c)); 
 					}
 					else if (!str_cmp(field, "last_move_dir")) {
 						snprintf(str, slen, "%s", GET_LAST_DIR(c) != NO_DIR ? dirs[GET_LAST_DIR(c)] : "");
