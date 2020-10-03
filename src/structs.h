@@ -3113,8 +3113,6 @@ struct pathfind_controller {
 	room_data *end;	// destination
 	int end_x, end_y;	// target coordinates (prevent repeat lookups)
 	
-	int limit;	// max number of steps
-	
 	int key;	// initialized with get_pathfind_key()
 	
 	struct pathfind_node *nodes;	// doubly-linked list of nodes to check
@@ -4131,7 +4129,8 @@ struct player_special_data {
 	any_vnum last_companion;	// if the player has a companion out, this triggers a re-summon
 	
 	// character strings
-	char *lastname;	// Last name
+	char *personal_lastname;	// Lastname written by the player themselves
+	char *current_lastname;		// Lastname the player is currently using
 	char *title;	// shown on 'who'/'whois'
 	char *prompt;	// custom prompt
 	char *fight_prompt;	// fight prompt
