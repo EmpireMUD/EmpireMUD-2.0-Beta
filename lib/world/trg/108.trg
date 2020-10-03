@@ -61,7 +61,7 @@ if !%emp%
   halt
 end
 if %actor.empire% != %emp%
-  %send% %actor% Only members of ~%emp% can use %self.shortdesc%.
+  %send% %actor% Only members of %emp.name% can use %self.shortdesc%.
   return 0
   halt
 end

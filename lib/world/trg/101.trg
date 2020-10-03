@@ -193,7 +193,7 @@ end
 %load% mob 10108 ally
 makeuid hound mob black-haired
 if %hound%
-  echo %hound.name% appears!
+  %echo% ~%hound% appears!
   %force% %hound% %aggro% %actor%
 end
 set hound 1
