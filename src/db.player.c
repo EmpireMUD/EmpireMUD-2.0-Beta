@@ -1167,6 +1167,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct player_skill_data *skdata;
 	int length, i_in[7], iter, num, val;
 	struct player_event_data *ped;
+	struct player_lastname *lastn;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
 	obj_data *obj, *o, *next_o;
@@ -1774,6 +1775,13 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "Last Offense:", length)) {
 					GET_LAST_OFFENSE_SEEN(ch) = atol(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Lastname List:", length)) {
+					if (sscanf(line + length + 1, "%s~", str_in) == 1 && *str_in) {
+						CREATE(lastn, struct player_lastname, 1);
+						lastn->name = str_dup(str_in);
+						LL_APPEND(GET_LASTNAME_LIST(ch), lastn);
+					}
 				}
 				else if (PFILE_TAG(line, "Learned Craft:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
@@ -2837,6 +2845,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	struct player_event_data *ped, *next_ped;
 	struct empire_unique_storage *eus;
 	struct channel_history_data *hist;
+	struct player_lastname *lastn;
 	struct trig_proto_list *tpro;
 	struct player_eq_set *eq_set;
 	struct companion_mod *cmod;
@@ -2931,6 +2940,11 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	}
 	if (GET_LAST_HOME_SET_TIME(ch)) {
 		fprintf(fl, "Last Home Set: %ld\n", GET_LAST_HOME_SET_TIME(ch));
+	}
+	LL_FOREACH(GET_LASTNAME_LIST(ch), lastn) {
+		if (lastn->name) {
+			fprintf(fl, "Lastname List: %s~\n", lastn->name);
+		}
 	}
 	for (lore = GET_LORE(ch); lore; lore = lore->next) {
 		if (lore->text && *lore->text) {
