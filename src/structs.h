@@ -2086,6 +2086,12 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_TRIGGERS  BIT(43)
 
 
+// LASTNAME_x: config players lastname_mode: determines how players get last names
+#define LASTNAME_SET_AT_CREATION  BIT(0)	// a. player chooses during creation menus
+#define LASTNAME_SET_ANY_TIME  BIT(1)	// b. player can change with 'lastname change'
+#define LASTNAME_CHOOSE_FROM_LIST  BIT(2)	// c. player can choose from the namelist
+
+
 // Lore types
 #define LORE_JOIN_EMPIRE		0
 #define LORE_DEFECT_EMPIRE		1

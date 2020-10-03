@@ -335,6 +335,15 @@ const char *config_types[] = {
 };
 
 
+// LASTNAME_x: config players lastname_mode: determines how players get last names
+const char *lastname_modes[] = {
+	"set-at-creation",
+	"set-any-time",
+	"choose-from-list",
+	"\n"
+};
+
+
 // WHO_LIST_SORT_x: config game who_list_sort [type]
 const char *who_list_sort_types[] = {
 	"role-then-level",
@@ -1612,7 +1621,11 @@ void init_config(int set, char *key, int type, char *description) {
 			cnf->edit_func = config_edit_long_string;
 			break;
 		}
-		case CONFTYPE_BITVECTOR:
+		case CONFTYPE_BITVECTOR: {
+			cnf->show_func = config_show_bitvector;
+			cnf->edit_func = config_edit_bitvector;
+			break;
+		}
 		case CONFTYPE_INT_ARRAY:
 		default: {
 			// currently requires a custom handler
@@ -1847,6 +1860,8 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "exp_level_difference", CONFTYPE_INT, "levels a player can have above a mob and still gain exp from it");
 	init_config(CONFIG_PLAYERS, "hours_to_first_bonus_trait", CONFTYPE_INT, "how much playtime to get the first bonus trait");
 	init_config(CONFIG_PLAYERS, "hours_to_second_bonus_trait", CONFTYPE_INT, "how much playtime to get the second bonus trait");
+	init_config(CONFIG_PLAYERS, "lastname_mode", CONFTYPE_BITVECTOR, "how players choose their lastname, if at all");
+		init_config_custom("lastname_mode", config_show_bitvector, config_edit_bitvector, lastname_modes);
 	init_config(CONFIG_PLAYERS, "pool_bonus_amount", CONFTYPE_INT, "bonus trait amount for health/move/mana, multiplied by (level/25)");
 	init_config(CONFIG_PLAYERS, "num_daily_skill_points", CONFTYPE_INT, "easy skillups per day");
 	init_config(CONFIG_PLAYERS, "num_bonus_trait_daily_skills", CONFTYPE_INT, "bonus trait for skillups");
@@ -1978,7 +1993,7 @@ void init_config_system(void) {
 //// CONFIG SYSTEM: COMMAND //////////////////////////////////////////////////
 
 ACMD(do_config) {
-	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], setarg[MAX_INPUT_LENGTH], keyarg[MAX_INPUT_LENGTH];
+	char output[MAX_STRING_LENGTH*2], line[MAX_STRING_LENGTH], setarg[MAX_INPUT_LENGTH], keyarg[MAX_INPUT_LENGTH], part[MAX_INPUT_LENGTH];
 	struct config_type *cnf, *next_cnf;
 	int set, iter, size, lsize;
 	bool verbose;
@@ -2018,7 +2033,13 @@ ACMD(do_config) {
 			lsize = 0;
 			switch (cnf->type) {
 				case CONFTYPE_BITVECTOR: {
-					lsize = snprintf(line, sizeof(line), "%s", bitv_to_alpha(cnf->data.bitvector_val));
+					if (cnf->custom_data) {
+						sprintbit(cnf->data.bitvector_val, (const char **)cnf->custom_data, part, TRUE);
+					}
+					else {
+						strcpy(part, bitv_to_alpha(cnf->data.bitvector_val));
+					}
+					lsize = snprintf(line, sizeof(line), "%s", part);
 					break;
 				}
 				case CONFTYPE_BOOL: {
