@@ -1952,12 +1952,10 @@ are the pilot).
 
 You can either specify a direction by itself, coordinates, or a path. Paths
 must be pairs of directions and distances which your character will move in
-order.
-
-If you specify coordinates, the following restrictions apply:
-- drive requires continuous roads (including tunnels, gatehouses, etc)
-- sail can only use coordinates once per 30 seconds, maximum of 1500 tiles
-- pilot can only use coordinates once per 30 seconds, maximum of 800 tiles
+order. If you specify coordinates, drive requires continuous roads (including
+gatehouses and tunnels) and sail requires continuous water (including buildings
+you can sail through, like bridges). If automatic pathfinding takes too long or
+creates too complex a path, it will fail.
 
 Examples:
  > drive east
