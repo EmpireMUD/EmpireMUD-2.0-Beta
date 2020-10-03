@@ -1225,7 +1225,7 @@ See also: FLY
 #
 LASTNAME "LAST NAME"
 
-Usage:  lastname [list | change] [name]
+Usage:  lastname [list | change] [name | none]
 
 &clastname&0  (by itself)
    Shows your current lastname.
@@ -1233,11 +1233,11 @@ Usage:  lastname [list | change] [name]
 &clastname list [keywords]&0
    List the lastnames you have available. You can filter by keywords.
 
-&clastname <name>&0
+&clastname <name | none>&0
    Change your name to one in your list of lastnames (if this feature is
    enabled).
 
-&clastname change <name>&0
+&clastname change <name | none>&0
    Change your personal lastname -- the one you usually pick during character
    creation. (If this feature is enabled.)
 #

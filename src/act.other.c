@@ -2734,13 +2734,13 @@ ACMD(do_lastname) {
 	else if (!*argument) {	// no arg
 		// usage?
 		if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHANGE_ANY_TIME) && IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
-			msg_to_char(ch, "Usage: lastname [change | list] [name]\r\n");
+			msg_to_char(ch, "Usage: lastname [change | list] [name | none]\r\n");
 		}
 		else if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHANGE_ANY_TIME)) {
-			msg_to_char(ch, "Usage: lastname [change] [name]\r\n");
+			msg_to_char(ch, "Usage: lastname [change] [name | none]\r\n");
 		}
 		else if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
-			msg_to_char(ch, "Usage: lastname [list] [name]\r\n");
+			msg_to_char(ch, "Usage: lastname [list] [name | none]\r\n");
 		}
 		
 		// and show current
@@ -2826,6 +2826,17 @@ ACMD(do_lastname) {
 		}
 	}
 	else if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
+		if (!str_cmp(argument, "none")) {
+			// just shutting it off?
+			if (GET_CURRENT_LASTNAME(ch)) {
+				free(GET_CURRENT_LASTNAME(ch));
+			}
+			GET_CURRENT_LASTNAME(ch) = NULL;
+			queue_delayed_update(ch, CDU_SAVE);
+			msg_to_char(ch, "You stop using a lastname.\r\n");
+			return;
+		}
+		
 		// set current lastname (using whole arg)
 		best = exact = NULL;
 		
