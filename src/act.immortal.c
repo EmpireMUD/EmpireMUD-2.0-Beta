@@ -709,7 +709,7 @@ ADMIN_UTIL(util_islandsize) {
 
 
 ADMIN_UTIL(util_pathtest) {
-	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator), int step_limit);
+	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
 	PATHFIND_VALIDATOR(pathfind_ocean);
 	PATHFIND_VALIDATOR(pathfind_pilot);
 	PATHFIND_VALIDATOR(pathfind_road);
@@ -745,7 +745,7 @@ ADMIN_UTIL(util_pathtest) {
 	else if (!(to_room = find_target_room(ch, arg))) {
 		msg_to_char(ch, "Unknown target: %s\r\n", arg);
 	}
-	else if (!(path = get_pathfind_string(IN_ROOM(ch), to_room, ch, NULL, vdr, 1500))) {
+	else if (!(path = get_pathfind_string(IN_ROOM(ch), to_room, ch, NULL, vdr))) {
 		msg_to_char(ch, "Unable to find a valid path there.\r\n");
 	}
 	else {

@@ -69,11 +69,10 @@ struct {
 	int action;	// ACT_
 	bitvector_t flag;	// required VEH_ flag
 	PATHFIND_VALIDATOR(*pathfinder);	// if it can target coords
-	int pathfind_limit;	// maximum distance
 } drive_data[] = {
-	{ "drive", "driving", ACT_DRIVING, VEH_DRIVING, pathfind_road, 2000 },	// SCMD_DRIVE
-	{ "sail", "sailing", ACT_SAILING, VEH_SAILING, pathfind_ocean, 1500 },	// SCMD_SAIL
-	{ "pilot", "piloting", ACT_PILOTING, VEH_FLYING, pathfind_pilot, 1500 },	// SCMD_PILOT
+	{ "drive", "driving", ACT_DRIVING, VEH_DRIVING, pathfind_road },	// SCMD_DRIVE
+	{ "sail", "sailing", ACT_SAILING, VEH_SAILING, pathfind_ocean },	// SCMD_SAIL
+	{ "pilot", "piloting", ACT_PILOTING, VEH_FLYING, pathfind_pilot },	// SCMD_PILOT
 };
 
 
@@ -1698,7 +1697,7 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 
 // do_sail, do_pilot (search hints)
 ACMD(do_drive) {
-	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator), int step_limit);
+	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
 	
 	char buf[MAX_STRING_LENGTH], *found_path = NULL;
 	struct vehicle_room_list *vrl;
@@ -1790,7 +1789,7 @@ ACMD(do_drive) {
 	else if (path_to_room && !drive_data[subcmd].pathfinder) {
 		msg_to_char(ch, "You can't %s by coordinates.\r\n", drive_data[subcmd].command);
 	}
-	else if (path_to_room && !(found_path = get_pathfind_string(IN_ROOM(veh), path_to_room, ch, veh, drive_data[subcmd].pathfinder, drive_data[subcmd].pathfind_limit))) {
+	else if (path_to_room && !(found_path = get_pathfind_string(IN_ROOM(veh), path_to_room, ch, veh, drive_data[subcmd].pathfinder))) {
 		msg_to_char(ch, "Unable to find a valid route to that location.\r\n");
 	}
 	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {
