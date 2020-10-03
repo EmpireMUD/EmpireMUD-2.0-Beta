@@ -2934,7 +2934,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						
 						strcpy(str, "0");
 					}
-					
+					else if (!str_cmp(field, "add_lastname")) {
+						void add_lastname(char_data *ch, char *name);
+						if (subfield && *subfield && !IS_NPC(c)) {
+							add_lastname(c, subfield);
+						}
+						strcpy(str, "0");
+					}
 					else if (!str_cmp(field, "add_learned")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
 							void add_learned_craft(char_data *ch, any_vnum vnum);
@@ -3662,6 +3668,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						else
 							snprintf(str, slen, "%d", char_has_item(subfield, c));
 					}
+					else if (!str_cmp(field, "has_lastname")) {
+						extern bool has_lastname(char_data *ch, char *name);
+						if (subfield && *subfield && !IS_NPC(c)) {
+							snprintf(str, slen, "%d", has_lastname(c, subfield) ? 1 : 0);
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
 					else if (!str_cmp(field, "has_minipet")) {
 						extern bool has_minipet(char_data *ch, any_vnum vnum);
 						
@@ -4200,6 +4215,13 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							remove_companion(c, atoi(subfield));
 						}
 						
+						strcpy(str, "0");
+					}
+					else if (!str_cmp(field, "remove_lastname")) {
+						void remove_lastname(char_data *ch, char *name);
+						if (subfield && *subfield && !IS_NPC(c)) {
+							remove_lastname(c, subfield);
+						}
 						strcpy(str, "0");
 					}
 					else if (!str_cmp(field, "remove_learned")) {
