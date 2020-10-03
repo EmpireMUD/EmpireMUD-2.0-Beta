@@ -37,7 +37,7 @@ char *any_one_name(char *argument, char *first_arg) {
 	}
 
 	/* Find length of first word */
-	for (arg = first_arg; *argument && !isspace(*argument) && (!ispunct(*argument) || *argument == '#' || *argument == '-'); arg++, argument++) {
+	for (arg = first_arg; *argument && !isspace(*argument) && (!ispunct(*argument) || *argument == UID_CHAR || *argument == '#' || *argument == '-'); arg++, argument++) {
 		*arg = LOWER(*argument);
 	}
 	*arg = '\0';
@@ -85,7 +85,6 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 					strcat(sb,HSHR((char_data*) otokens[i]));
 				break;
 			}
-			/*
 			case '&': {
 				if (!otokens[i] || !CAN_SEE(ch, (char_data*) otokens[i]))
 					strcat(sb,"it");
@@ -95,7 +94,6 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 					strcat(sb,HSSH((char_data*) otokens[i]));
 				break;
 			}
-			*/
 			case '*': {
 				if (!otokens[i] || !CAN_SEE(ch, (char_data*) otokens[i]))
 					strcat(sb,"it");
@@ -160,7 +158,7 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 			case '~':
 			case '|':
 			case '^':
-			// case '&':	// removed this because it conflicts with color codes
+			case '&':	// removed this because it conflicts with color codes
 			case '*': {
 				/* get char_data, move to next token */
 				type[i] = *p;
