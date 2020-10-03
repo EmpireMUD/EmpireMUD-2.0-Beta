@@ -4565,6 +4565,74 @@ SHOW(show_produced) {
 }
 
 
+SHOW(show_lastnames) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct player_lastname *lastn;
+	bool file = FALSE, cur;
+	char_data *plr = NULL;
+	size_t size;
+	int count;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show lastnames <player> [keywords]\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		check_delayed_load(plr);
+		
+		count = 0;
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Lastnames matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Lastnames for %s:\r\n", GET_NAME(plr));
+		}
+		
+		if (GET_PERSONAL_LASTNAME(plr)) {
+			cur = !str_cmp(GET_PERSONAL_LASTNAME(plr), GET_CURRENT_LASTNAME(plr));
+			size += snprintf(output, sizeof(output), "%s%2d. %s (personal)%s\r\n", (cur ? "\tg" : ""), ++count, GET_PERSONAL_LASTNAME(plr), (cur ? " (current)\t0" : ""));
+		}
+		
+		LL_FOREACH(GET_LASTNAME_LIST(plr), lastn) {
+			if (*argument && !multi_isname(argument, lastn->name)) {
+				continue;	// searched
+			}
+		
+			// show it
+			cur = !str_cmp(NULLSAFE(lastn->name), GET_CURRENT_LASTNAME(plr));
+			snprintf(line, sizeof(line), "%s%2d. %s%s\r\n", (cur ? "\tg" : ""), ++count, NULLSAFE(lastn->name), (cur ? " (current)\t0" : ""));
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, " none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_learned) {
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct player_craft_data *pcd, *next_pcd;
@@ -9538,6 +9606,7 @@ ACMD(do_show) {
 		{ "olc", LVL_START_IMM, show_olc },
 		{ "homeless", LVL_START_IMM, show_homeless },
 		{ "companions", LVL_START_IMM, show_companions },
+		{ "lastnames", LVL_START_IMM, show_lastnames },
 
 		// last
 		{ "\n", 0, NULL }

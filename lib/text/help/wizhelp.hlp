@@ -1090,6 +1090,7 @@ factions   Immort   Shows a player's faction levels.
 homeless   Immort   Shows the homeless citizen list for an empire.
 ignoring   Immort   Shows you who a player has on their ignore list.
 islands    Immort   Shows you which island ids have empire storage (for MOVEEINV).
+lastnames  Immort   Shows target player's lastname list.
 learned    Immort   Shows you learned recipes.
 minipets   Immort   Shows you mini-pets collected by a player.
 mounts     Immort   Shows you mounts owned by a player.
@@ -1217,6 +1218,14 @@ an empire's leaderboard rank in place of its name, but not vnum.
 
 See also: ISLANDS, MOVEEINV
 #e
+"SHOW LASTNAMES" "SHOW LAST NAMES"
+
+Usage:  show lastnames <player> [search phrase]
+
+Shows you a player's list of last names.
+
+See also: SET LASTNAME
+#
 "SHOW LEARNED"
 
 Usage:  show learned <player | empire> [search phrase]
