@@ -2733,8 +2733,11 @@ ACMD(do_lastname) {
 	}
 	else if (!*argument) {	// no arg
 		// usage?
-		if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHANGE_ANY_TIME)) {
+		if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHANGE_ANY_TIME) && IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
 			msg_to_char(ch, "Usage: lastname [change | list] [name]\r\n");
+		}
+		else if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHANGE_ANY_TIME)) {
+			msg_to_char(ch, "Usage: lastname [change] [name]\r\n");
 		}
 		else if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
 			msg_to_char(ch, "Usage: lastname [list] [name]\r\n");
