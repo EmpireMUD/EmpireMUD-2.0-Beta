@@ -158,14 +158,21 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 			case '~':
 			case '|':
 			case '^':
-			case '&':	// removed this because it conflicts with color codes
+			case '&':
 			case '*': {
-				/* get char_data, move to next token */
-				type[i] = *p;
-				*s = '\0';
-				p = any_one_name(++p, name);
-				otokens[i] = find_invis ? get_char_in_room(IN_ROOM(ch), name) : get_char_room_vis(ch, name);
-				tokens[++i] = ++s;
+				if (*(p+1) != *p) {
+					/* get char_data, move to next token */
+					type[i] = *p;
+					*s = '\0';
+					p = any_one_name(++p, name);
+					otokens[i] = find_invis ? get_char_in_room(IN_ROOM(ch), name) : get_char_room_vis(ch, name);
+					tokens[++i] = ++s;
+				}
+				else {
+					// double symbols are ignored
+					++p;
+					*s++ = *p++;
+				}
 				break;
 			}
 
