@@ -18,13 +18,13 @@ if %chance% == 10
     eval select %select% - 10
     set prev_name %master.name%
     %morph% %master% %select%
-    %echoaround% %master% %self.name% morphs %prev_name% into %master.name%!
-    %send% %master% %self.name% morphs you into %master.name%!
+    %echoaround% %master% ~%self% morphs %prev_name% into ~%master%!
+    %send% %master% ~%self% morphs you into ~%master%!
     halt
   end
 end
 %morph% %self% %select%
-%echo% %prev_name% morphs into %self.name%!
+%echo% %prev_name% morphs into ~%self%!
 ~
 #2916
 Heroic Caravan Setup~

@@ -21,8 +21,8 @@ elseif %target.fighting%
   %send% %actor% You can't trap someone who is fighting.
   halt
 else
-  %send% %actor% You capture %target.name% with %self.shortdesc%!
-  %echoneither% %actor% %target% %actor.name% captures %target.name% with %self.shortdesc%!
+  %send% %actor% You capture ~%target% with %self.shortdesc%!
+  %echoneither% %actor% %target% ~%actor% captures ~%target% with %self.shortdesc%!
   * Essences have the same vnum as the mob
   %load% obj %target.vnum% %actor% inv
   set obj %actor.inventory%
@@ -39,8 +39,8 @@ if %self.cooldown(12605)%
   halt
 end
 nop %self.set_cooldown(12605, 20)%
-%send% %actor% %self.name% burrows into the ground and starts shifting through the earth towards you!
-%echoaround% %actor% %self.name% burrows into the ground and starts shifting through the earth towards %actor.name%!
+%send% %actor% ~%self% burrows into the ground and starts shifting through the earth towards you!
+%echoaround% %actor% ~%self% burrows into the ground and starts shifting through the earth towards ~%actor%!
 %echo% (Type 'stomp' to interrupt it.)
 set running 1
 remote running %self.id%
@@ -60,8 +60,8 @@ if %success% || %self.room% != %actor.room%
   nop %self.remove_mob_flag(NO-ATTACK)%
   dg_affect #12601 %self% off
 else
-  %send% %actor% %self.name% bursts from the ground beneath your feet, knocking you over!
-  %echoaround% %actor% %self.name% bursts from the ground beneath %actor.name%'s feet, knocking %actor.himher% over!
+  %send% %actor% ~%self% bursts from the ground beneath your feet, knocking you over!
+  %echoaround% %actor% ~%self% bursts from the ground beneath |%actor% feet, knocking *%actor% over!
   %damage% %actor% 75 physical
   dg_affect #12606 %actor% STUNNED on 5
   nop %self.remove_mob_flag(NO-ATTACK)%
@@ -76,7 +76,7 @@ if %self.cooldown(12605)%
   halt
 end
 nop %self.set_cooldown(12605, 20)%
-%echo% %self.name% grabs a handful of soil from the ground and crushes it in %self.hisher% fist!
+%echo% ~%self% grabs a handful of soil from the ground and crushes it in ^%self% fist!
 %load% mob 12605 ally
 %echo% A floating ember is formed!
 ~
@@ -88,8 +88,8 @@ if %self.cooldown(12605)%
   halt
 end
 nop %self.set_cooldown(12605, 20)%
-%send% %actor% %self.name% whips up a cloud of dust and launches it into your face, blinding you!
-%echoaround% %actor% %self.name% whips up a cloud of dust and launches it into %actor.name%'s face, blinding %actor.himher%!
+%send% %actor% ~%self% whips up a cloud of dust and launches it into your face, blinding you!
+%echoaround% %actor% ~%self% whips up a cloud of dust and launches it into |%actor% face, blinding *%actor%!
 dg_affect #12603 %actor% BLIND on 5
 ~
 #12604
@@ -100,14 +100,14 @@ if %self.cooldown(12605)%
   halt
 end
 nop %self.set_cooldown(12605, 20)%
-%send% %actor% %self.name% surges forward and envelops you!
-%echoaround% %actor% %self.name% surges forward and envelops %actor.name%!
+%send% %actor% ~%self% surges forward and envelops you!
+%echoaround% %actor% ~%self% surges forward and envelops ~%actor%!
 %send% %actor% (Type 'struggle' to break free.)
 dg_affect #12604 %actor% HARD-STUNNED on 20
 dg_affect #12607 %self% HARD-STUNNED on 20
 while %actor.affect(12604)%
-  %send% %actor% %self.name% pummels and crushes you!
-  %echoaround% %actor% %self.name% pummels and crushes %actor.name%!
+  %send% %actor% ~%self% pummels and crushes you!
+  %echoaround% %actor% ~%self% pummels and crushes ~%actor%!
   %damage% %actor% 50 physical
   %send% %actor% (Type 'struggle' to break free.)
   wait 5 sec
@@ -168,21 +168,21 @@ if !%self.running% || %self.success%
   %send% %actor% You don't need to do that right now.
   halt
 end
-%send% %actor% You stomp down on %self.name%, interrupting %self.hisher% burrowing charge and stunning %self.himher%.
-%echoaround% %actor% %actor.name% stomps down on %self.name%, interrupting %self.hisher% burrowing charge and stunning %self.himher%.
+%send% %actor% You stomp down on ~%self%, interrupting ^%self% burrowing charge and stunning *%self%.
+%echoaround% %actor% ~%actor% stomps down on ~%self%, interrupting ^%self% burrowing charge and stunning *%self%.
 set success 1
 remote success %self.id%
 dg_affect #12606 %self% STUNNED on 5
 nop %self.remove_mob_flag(NO-ATTACK)%
 dg_affect #12601 %self% off
-%echo% %self.name% emerges from the earth, dazed.
+%echo% ~%self% emerges from the earth, dazed.
 ~
 #12608
 Ember: Attack~
 0 k 100
 ~
-%send% %actor% %self.name% shoots a small bolt of fire at you.
-%echoaround% %actor% %self.name% shoots a small bolt of fire at %actor.name%.
+%send% %actor% ~%self% shoots a small bolt of fire at you.
+%echoaround% %actor% ~%self% shoots a small bolt of fire at ~%actor%.
 %damage% %actor% 25
 ~
 #12609
@@ -216,15 +216,15 @@ else
 end
 eval struggle_counter %struggle_counter% + 1
 if %struggle_counter% >= %break_free_at%
-  %send% %actor% You break free of %self.name%'s grip!
-  %echoaround% %actor% %actor.name% breaks free of %self.name%'s grip!
+  %send% %actor% You break free of |%self% grip!
+  %echoaround% %actor% ~%actor% breaks free of |%self% grip!
   dg_affect #12604 %actor% off
   dg_affect #12607 %self% off
   rdelete struggle_counter %actor.id%
   halt
 else
   %send% %actor% You struggle against your bindings, but fail to break free.
-  %echoaround% %actor% %actor.name% struggles against %actor.hisher% bindings!
+  %echoaround% %actor% ~%actor% struggles against ^%actor% bindings!
   remote struggle_counter %actor.id%
   halt
 end
@@ -233,7 +233,7 @@ end
 Give rejection~
 0 j 100
 ~
-%send% %actor% Don't give the item to %self.name%, use 'quest finish <quest name>' instead (or 'quest finish all').
+%send% %actor% Don't give the item to ~%self%, use 'quest finish <quest name>' instead (or 'quest finish all').
 return 0
 ~
 #12650
@@ -266,7 +266,7 @@ if %actor_clothes%
     halt
   end
 end
-%send% %actor% %self.name% bars your way.
+%send% %actor% ~%self% bars your way.
 return 0
 ~
 #12651
@@ -294,11 +294,11 @@ while %person%
     * You get a token, and you get a token, and YOU get a token!
     if %self.mob_flagged(HARD)%
       nop %person.give_currency(12650, 2)%
-      %send% %person% As %self.name% dies, 2 %currency.12650(2)% fall to the ground!
+      %send% %person% As ~%self% dies, 2 %currency.12650(2)% fall to the ground!
       %send% %person% You take them.
     else
       nop %person.give_currency(12650, 1)%
-      %send% %person% As %self.name% dies, a %currency.12650(1)% falls to the ground!
+      %send% %person% As ~%self% dies, a %currency.12650(1)% falls to the ground!
       %send% %person% You take the newly created token.
     end
   end
@@ -395,7 +395,7 @@ while %person%
 done
 %scale% instance %level%
 %send% %actor% %self.shortdesc% parts before you.
-%echoaround% %actor% %self.shortdesc% parts before %actor.name%.
+%echoaround% %actor% %self.shortdesc% parts before ~%actor%.
 set newroom i12652
 if !%result%
   * global var not found
@@ -533,19 +533,19 @@ if %target.on_quest(12650)% || %target.ability(Hide)% || %clothes_valid%
   wait 2
   switch %self.vnum%
     case 12659
-      %send% %target% You spot %self.name% swimming around nearby...
-      %echoaround% %target% You spot %self.name% swimming around nearby...
+      %send% %target% You spot ~%self% swimming around nearby...
+      %echoaround% %target% You spot ~%self% swimming around nearby...
     break
     case 12658
-      %send% %target% You spot %self.name% clinging to the ceiling of the tunnel...
-      %echoaround% %target% You spot %self.name% clinging to the ceiling of the tunnel...
+      %send% %target% You spot ~%self% clinging to the ceiling of the tunnel...
+      %echoaround% %target% You spot ~%self% clinging to the ceiling of the tunnel...
     break
     default
-      %send% %target% You spot %self.name% in the branches of a tree nearby...
-      %echoaround% %target% You spot %self.name% in the branches of a tree nearby...
+      %send% %target% You spot ~%self% in the branches of a tree nearby...
+      %echoaround% %target% You spot ~%self% in the branches of a tree nearby...
     break
   done
-  * %echo% %self.name% does not react to your presence.
+  * %echo% ~%self% does not react to your presence.
   halt
 end
 visible
@@ -555,16 +555,16 @@ if %target.room% != %self.room% || %self.disabled% || %self.fighting%
 end
 switch %self.vnum%
   case 12659
-    %send% %target% You spot %self.name% swimming around above you...
-    %echoaround% %target% You spot %self.name% swimming around above %target.name%...
+    %send% %target% You spot ~%self% swimming around above you...
+    %echoaround% %target% You spot ~%self% swimming around above ~%target%...
   break
   case 12658
-    %send% %target% You spot %self.name% clinging to the ceiling above you...
-    %echoaround% %target% You spot %self.name% clinging to the ceiling above %target.name%...
+    %send% %target% You spot ~%self% clinging to the ceiling above you...
+    %echoaround% %target% You spot ~%self% clinging to the ceiling above ~%target%...
   break
   default
-    %send% %target% You spot %self.name% in the branches of a tree above you...
-    %echoaround% %target% You spot %self.name% in the branches of a tree above %target.name%...
+    %send% %target% You spot ~%self% in the branches of a tree above you...
+    %echoaround% %target% You spot ~%self% in the branches of a tree above ~%target%...
   break
 done
 wait 3 sec
@@ -573,16 +573,16 @@ if %target.room% != %self.room% || %self.disabled% || %self.fighting%
 end
 switch %self.vnum%
   case 12659
-    %send% %target% %self.name% swims down and attacks you!
-    %echoaround% %target% %self.name% swims down and attacks %target.name%!
+    %send% %target% ~%self% swims down and attacks you!
+    %echoaround% %target% ~%self% swims down and attacks ~%target%!
   break
   case 12658
-    %echoaround% %target% %self.name% drops from the ceiling and attacks %target.name%!
-    %send% %target% %self.name% drops from the ceiling and attacks you!
+    %echoaround% %target% ~%self% drops from the ceiling and attacks ~%target%!
+    %send% %target% ~%self% drops from the ceiling and attacks you!
   break
   default
-    %echoaround% %target% %self.name% leaps down and attacks %target.name%!
-    %send% %target% %self.name% leaps down and attacks you!
+    %echoaround% %target% ~%self% leaps down and attacks ~%target%!
+    %send% %target% ~%self% leaps down and attacks you!
   break
 done
 %aggro% %target%
@@ -615,8 +615,8 @@ if %self.cooldown(12657)%
 end
 nop %self.set_cooldown(12657, 30)%
 * Nasty bite: low damage over time
-%send% %actor% %self.name% snaps %self.hisher% teeth and takes off a piece of your skin!
-%echoaround% %actor% %self.name% snaps %self.hisher% teeth at %actor.name% and takes off a piece of %actor.hisher% skin!
+%send% %actor% ~%self% snaps ^%self% teeth and takes off a piece of your skin!
+%echoaround% %actor% ~%self% snaps ^%self% teeth at ~%actor% and takes off a piece of ^%actor% skin!
 %damage% %actor% 50 physical
 %dot% #12658 %actor% 100 30 physical
 ~
@@ -628,7 +628,7 @@ if %self.cooldown(12657)%
   halt
 end
 nop %self.set_cooldown(12657, 30)%
-%echo% %self.name% glows faintly with magical vitality, and %self.hisher% wounds start to close.
+%echo% ~%self% glows faintly with magical vitality, and ^%self% wounds start to close.
 eval amount (%level%/10) + 1
 dg_affect #12659 %self% HEAL-OVER-TIME %amount% 30
 ~
@@ -643,12 +643,12 @@ nop %self.set_cooldown(12657, 30)%
 wait 1 sec
 dg_affect #12670 %self% HARD-STUNNED on 5
 if %actor.trigger_counterspell%
-  %send% %actor% %self.name% launches a bolt of fire at you, but your counterspell blocks it completely.
-  %echoaround% %actor% %self.name% launches a bolt of fire at %actor.name%, but it fizzles out in the air in front of %actor.himher%.
+  %send% %actor% ~%self% launches a bolt of fire at you, but your counterspell blocks it completely.
+  %echoaround% %actor% ~%self% launches a bolt of fire at ~%actor%, but it fizzles out in the air in front of *%actor%.
   halt
 else
-  %send% %actor% &&r%self.name% thrusts out %self.hisher% hand at you, and blasts you with a bolt of searing flames!
-  %echoaround% %actor% %self.name% thrusts out %self.hisher% hand at %actor.name%, and blasts %actor.himher% with a bolt of searing flames!
+  %send% %actor% &&r~%self% thrusts out ^%self% hand at you, and blasts you with a bolt of searing flames!
+  %echoaround% %actor% ~%self% thrusts out ^%self% hand at ~%actor%, and blasts *%actor% with a bolt of searing flames!
   %damage% %actor% 100 fire
   %dot% #12660 %actor% 150 15 fire
 end
@@ -674,11 +674,11 @@ wait 1
 set old_name %self.name%
 if !%self.morph%
   %morph% %self% 12662
-  %send% %actor% %old_name%'s robe drops to the ground as you try to fight %self.himher%, and %self.name% scrambles out, attacking you!
-  %echoaround% %actor% %old_name%'s robe drops to the ground as %actor.name% tries to fight %self.himher%, and %self.name% scrambles out, attacking %actor.himher%!
+  %send% %actor% %old_name%'s robe drops to the ground as you try to fight *%self%, and ~%self% scrambles out, attacking you!
+  %echoaround% %actor% %old_name%'s robe drops to the ground as ~%actor% tries to fight *%self%, and ~%self% scrambles out, attacking *%actor%!
 else
-  %send% %actor% %self.name% nips at your ankles, drawing blood!
-  %echoaround% %actor% %self.name% nips at %actor.name%'s ankles, drawing blood!
+  %send% %actor% ~%self% nips at your ankles, drawing blood!
+  %echoaround% %actor% ~%self% nips at |%actor% ankles, drawing blood!
   %damage% %actor% 25 physical
   %dot% #12662 %actor% 25 10 physical
 end
@@ -694,11 +694,11 @@ nop %self.set_cooldown(12657, 30)%
 if !%self.morph%
   set current %self.name%
   %morph% %self% 12663
-  %echo% %current% rapidly morphs into %self.name%!
+  %echo% %current% rapidly morphs into ~%self%!
 end
 wait 1 sec
-%send% %actor% &&r%self.name% sinks %self.hisher% teeth into your leg!
-%echoaround% %actor% %self.name% sinks %self.hisher% teeth into %actor.name%'s leg!
+%send% %actor% &&r~%self% sinks ^%self% teeth into your leg!
+%echoaround% %actor% ~%self% sinks ^%self% teeth into |%actor% leg!
 %damage% %actor% 100 physical
 ~
 #12664
@@ -713,16 +713,16 @@ dg_affect #12670 %self% HARD-STUNNED on 5
 if %self.morph%
   set current %self.name%
   %morph% %self% normal
-  %echo% %current% rapidly morphs into %self.name%!
+  %echo% %current% rapidly morphs into ~%self%!
 end
 wait 1 sec
 if %actor.trigger_counterspell%
-  %send% %actor% %self.name% gestures, and earthen claws burst from the soil, dissolving as they meet your counterspell!
-  %echoaround% %actor% %self.name% gestures, and earthen claws burst from the soil, dissolving as they near %actor.name%!
+  %send% %actor% ~%self% gestures, and earthen claws burst from the soil, dissolving as they meet your counterspell!
+  %echoaround% %actor% ~%self% gestures, and earthen claws burst from the soil, dissolving as they near ~%actor%!
   halt
 else
-  %send% %actor% &&r%self.name% gestures, and earthen claws burst from the soil, tearing into you!
-  %echoaround% %actor% &&r%self.name% gestures, and earthen claws burst from the soil, tearing into %actor.name%!
+  %send% %actor% &&r~%self% gestures, and earthen claws burst from the soil, tearing into you!
+  %echoaround% %actor% &&r~%self% gestures, and earthen claws burst from the soil, tearing into ~%actor%!
   %damage% %actor% 50 physical
   eval scale %self.level%/15 + 1
   dg_affect #12664 %actor% RESIST-PHYSICAL -%scale% 15
@@ -733,8 +733,8 @@ Archdruid: Grand Fireball~
 0 k 50
 ~
 if %self.affect(12666)%
-  %send% %actor% &&rThe flames wreathing %self.name%'s staff burn you as %self.heshe% swings at you!
-  %echoaround% %actor% The flames wreathing %self.name%'s staff burn %actor.name% as %self.name% swings at %actor.himher%!
+  %send% %actor% &&rThe flames wreathing |%self% staff burn you as &%self% swings at you!
+  %echoaround% %actor% The flames wreathing |%self% staff burn ~%actor% as ~%self% swings at *%actor%!
   %damage% %actor% 50 fire
 end
 if %self.cooldown(12657)%
@@ -743,25 +743,25 @@ end
 nop %self.set_cooldown(12657, 30)%
 wait 1 sec
 dg_affect #12670 %self% HARD-STUNNED on 20
-%echo% %self.name% stakes %self.hisher% staff into the ground and begins chanting...
+%echo% ~%self% stakes ^%self% staff into the ground and begins chanting...
 wait 5 sec
-%echo% The bonfire flickers and dims as a glowing light builds in %self.name%'s cupped hands...
+%echo% The bonfire flickers and dims as a glowing light builds in |%self% cupped hands...
 wait 5 sec
-%echo% %self.name% holds %self.hisher% hands skyward, and the growing radiance of the large fireball held in %self.hisher% hands eclipses the dimming bonfire...
+%echo% ~%self% holds ^%self% hands skyward, and the growing radiance of the large fireball held in ^%self% hands eclipses the dimming bonfire...
 wait 5 sec
 set actor %self.fighting%
 if !%actor%
-  %echo% %self.name% discharges the fireball in a blinding flare of light!
+  %echo% ~%self% discharges the fireball in a blinding flare of light!
   halt
 end
-%send% %actor% %self.name% hurls the grand fireball at you!
-%echoaround% %actor% %self.name% hurls the grand fireball at %actor.name%!
+%send% %actor% ~%self% hurls the grand fireball at you!
+%echoaround% %actor% ~%self% hurls the grand fireball at ~%actor%!
 if %actor.trigger_counterspell%
   %send% %actor% The fireball strikes your counterspell and explodes with a fiery roar!
-  %echoaround% %actor% The fireball explodes in front of %actor.name% with a fiery roar!
+  %echoaround% %actor% The fireball explodes in front of ~%actor% with a fiery roar!
 else
   %send% %actor% &&rThe fireball crashes into you and explodes, bowling you over!
-  %echoaround% %actor% The fireball crashes into %actor.name% and explodes, bowling %actor.himher% over!
+  %echoaround% %actor% The fireball crashes into ~%actor% and explodes, bowling *%actor% over!
   dg_affect #12665 %actor% STUNNED on 5
   %damage% %actor% 300 fire
 end
@@ -773,8 +773,8 @@ Archdruid: Ignite Weapon~
 0 k 100
 ~
 if %self.affect(12666)%
-  %send% %actor% &&rThe flames wreathing %self.name%'s staff burn you as %self.heshe% swings at you!
-  %echoaround% %actor% The flames wreathing %self.name%'s staff burn %actor.name% as %self.name% swings at %actor.himher%!
+  %send% %actor% &&rThe flames wreathing |%self% staff burn you as &%self% swings at you!
+  %echoaround% %actor% The flames wreathing |%self% staff burn ~%actor% as ~%self% swings at *%actor%!
   %damage% %actor% 50 fire
 end
 if %self.cooldown(12657)%
@@ -782,7 +782,7 @@ if %self.cooldown(12657)%
 end
 nop %self.set_cooldown(12657, 30)%
 wait 1 sec
-%echo% %self.name% thrusts %self.hisher% staff skyward!
+%echo% ~%self% thrusts ^%self% staff skyward!
 dg_affect #12666 %self% SLOW on 15
 ~
 #12667
@@ -796,11 +796,11 @@ nop %self.set_cooldown(12657, 30)%
 if !%self.morph%
   set current %self.name%
   %morph% %self% 12667
-  %echo% %current% rapidly morphs into %self.name% and takes flight!
+  %echo% %current% rapidly morphs into ~%self% and takes flight!
   wait 1 sec
 end
-%send% %actor% &&r%self.name% swoops down and knocks your weapon from your hand!
-%echoaround% %actor% %self.name% swoops down and knocks %actor.name%'s weapon from %actor.hisher% hand!
+%send% %actor% &&r~%self% swoops down and knocks your weapon from your hand!
+%echoaround% %actor% ~%self% swoops down and knocks |%actor% weapon from ^%actor% hand!
 %damage% %actor% 5 physical
 dg_affect #12667 %actor% DISARM on 5
 ~
@@ -816,10 +816,10 @@ dg_affect #12670 %self% HARD-STUNNED on 5
 if %self.morph%
   set current %self.name%
   %morph% %self% normal
-  %echo% %current% lands and rapidly morphs into %self.name%!
+  %echo% %current% lands and rapidly morphs into ~%self%!
   wait 1 sec
 end
-%echo% %self.name% gestures, and a sudden squall of wind knocks you off-balance!
+%echo% ~%self% gestures, and a sudden squall of wind knocks you off-balance!
 set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
@@ -833,8 +833,8 @@ Turtle Druid: Morph~
 0 k 50
 ~
 if %self.aff_flagged(IMMUNE-DAMAGE)% && %random.4% == 4
-  %echo% %self.name% has retreated into %self.hisher% shell.
-  %echo% &&YYou could 'stomp' on %self.hisher% shell to draw %self.himher% out.
+  %echo% ~%self% has retreated into ^%self% shell.
+  %echo% &&YYou could 'stomp' on ^%self% shell to draw *%self% out.
   halt
 end
 if %self.cooldown(12657)%
@@ -844,11 +844,11 @@ nop %self.set_cooldown(12657, 30)%
 if !%self.morph%
   set current %self.name%
   %morph% %self% 12666
-  %echo% %current% rapidly morphs into %self.name%!
+  %echo% %current% rapidly morphs into ~%self%!
   wait 1 sec
 end
-%echo% %self.name% retreats into the safety of %self.hisher% hard shell.
-%echo% &&YYou could 'stomp' on %self.hisher% shell to draw %self.himher% out.
+%echo% ~%self% retreats into the safety of ^%self% hard shell.
+%echo% &&YYou could 'stomp' on ^%self% shell to draw *%self% out.
 dg_affect #12669 %self% IMMUNE-DAMAGE on -1
 nop %self.add_mob_flag(NO-ATTACK)%
 ~
@@ -858,8 +858,8 @@ Turtle Druid: Riptide~
 ~
 if %self.cooldown(12657)%
   if %self.affect(12669) && %random.4% == 4
-    %echo% %self.name% has retreated into %self.hisher% shell.
-    %echo% &&YYou could 'stomp' on %self.hisher% shell to draw %self.himher% out.
+    %echo% ~%self% has retreated into ^%self% shell.
+    %echo% &&YYou could 'stomp' on ^%self% shell to draw *%self% out.
     halt
   end
   halt
@@ -870,22 +870,22 @@ if %self.morph%
   set current %self.name%
   %morph% %self% normal
   if %self.affect(12669)%
-    %echo% %self.name% emerges from %self.hisher% shell.
+    %echo% ~%self% emerges from ^%self% shell.
     nop %self.remove_mob_flag(NO-ATTACK)%
     dg_affect #12669 %self% off
   end
-  %echo% %current% rapidly morphs into %self.name%!
+  %echo% %current% rapidly morphs into ~%self%!
   wait 1 sec
 end
-%echo% %self.name% moves %self.hisher% arms in sweeping motions, stirring up the water into a riptide!
+%echo% ~%self% moves ^%self% arms in sweeping motions, stirring up the water into a riptide!
 set cycle 1
 while %cycle% <= 3
   wait 5 sec
-  %echo% &&r%self.name%'s riptide pummels you violently!
+  %echo% &&r|%self% riptide pummels you violently!
   %aoe% 40 physical
   eval cycle %cycle% + 1
 done
-%echo% %self.name%'s riptide dissipates.
+%echo% |%self% riptide dissipates.
 ~
 #12671
 Stomp turtle druid~
@@ -895,8 +895,8 @@ if !%self.affect(12669)%
   %send% %actor% You don't need to do that right now.
   halt
 end
-%send% %actor% You stomp down on %self.name%'s shell, and %self.heshe% emerges, dazed.
-%echoaround% %actor% %actor.name% stomps down on %self.name%'s shell, and %self.heshe% emerges, dazed.
+%send% %actor% You stomp down on |%self% shell, and &%self% emerges, dazed.
+%echoaround% %actor% ~%actor% stomps down on |%self% shell, and &%self% emerges, dazed.
 dg_affect #12669 %self% off
 nop %self.remove_mob_flag(NO-ATTACK)%
 dg_affect #12671 %self% HARD-STUNNED on 5
@@ -938,7 +938,7 @@ while %cycles_left% >= 0
   if (%actor.room% != %room%) || !%sector_valid% || %already_done% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing) || %rage_spirit_here%
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < 5
-      %echoaround% %actor% %actor.name%'s chant is interrupted.
+      %echoaround% %actor% |%actor% chant is interrupted.
       %send% %actor% Your chant is interrupted.
     elseif %rage_spirit_here%
       %send% %actor% You can't perform the chant while the spirit of rage is here!
@@ -959,15 +959,15 @@ while %cycles_left% >= 0
   * Fake ritual messages
   switch %cycles_left%
     case 5
-      %echoaround% %actor% %actor.name% closes %actor.hisher% eyes and starts a peaceful chant...
+      %echoaround% %actor% ~%actor% closes ^%actor% eyes and starts a peaceful chant...
       %send% %actor% You clutch the totem of tranquility and begin to chant...
     break
     case 4
-      %echoaround% %actor% %actor.name% sways as %actor.heshe% whispers strange words...
+      %echoaround% %actor% ~%actor% sways as &%actor% whispers strange words...
       %send% %actor% You sway as you whisper the words of the tranquil chant...
     break
     case 3
-      %echoaround% %actor% %actor.name%'s totem of tranquility takes on a soft white glow, and the area around it seems to cool...
+      %echoaround% %actor% |%actor% totem of tranquility takes on a soft white glow, and the area around it seems to cool...
       %send% %actor% Your totem of tranquility takes on a soft white glow, and the area around it seems to cool...
     break
     case 2
@@ -975,12 +975,12 @@ while %cycles_left% >= 0
       %send% %actor% A peaceful feeling fills the area...
     break
     case 1
-      %echoaround% %actor% %actor.name% whispers into the air, and the feeling of tranquility spreads...
+      %echoaround% %actor% ~%actor% whispers into the air, and the feeling of tranquility spreads...
       %send% %actor% You whisper into the air, and the feeling of tranquility spreads...
     break
     case 0
       if %random.2% == 2
-        %echoaround% %actor% %actor.name%'s chant is interrupted as a spirit of rage materializes in front of %actor.himher%!
+        %echoaround% %actor% |%actor% chant is interrupted as a spirit of rage materializes in front of *%actor%!
         %send% %actor% Your chant is interrupted as a spirit of rage materializes in front of you!
         %load% mob 12686 %instance.level%
         set spirit %self.room.people%
@@ -993,7 +993,7 @@ while %cycles_left% >= 0
         %echo% A voice in your head whispers, 'Tell it to %correct_word%!'
         halt
       end
-      %echoaround% %actor% %actor.name% completes %actor.hisher% chant, and the area is tranquilized!
+      %echoaround% %actor% ~%actor% completes ^%actor% chant, and the area is tranquilized!
       %send% %actor% You complete your chant, and the area is tranquilized!
       %load% obj 12674 %room%
       set person %room.people%
@@ -1003,7 +1003,7 @@ while %cycles_left% >= 0
           %purge% %person% $n slinks away.
         elseif %person.vnum% >= 12650 && %person.vnum% <= 12657 || %person.vnum% == 12663
           dg_affect #12673 %person% !ATTACK on -1
-          %echo% %person.name% looks pacified.
+          %echo% ~%person% looks pacified.
           if %person.vnum% >= 12654 && %person.vnum% <= 12657
             set give_token 1
           end
@@ -1162,7 +1162,7 @@ if %actor.level% < 50
   halt
 end
 %send% %actor% You apply %self.shortdesc% to %target.shortdesc%...
-%echoaround% %actor% %actor.name% applies %self.shortdesc% to %target.shortdesc%...
+%echoaround% %actor% ~%actor% applies %self.shortdesc% to %target.shortdesc%...
 %echo% As the oil soaks in, %target.shortdesc% takes on a faint glow and earthy smell... and looks a LOT more powerful.
 nop %target.flag(SUPERIOR)%
 %scale% %target% 75
@@ -1212,7 +1212,7 @@ else
   else
     %send% %actor% There is a Magiterranean Grove %distance% %plural% to the %direction%.
   end
-  %echoaround% %actor% %actor.name% holds %self.shortdesc% aloft...
+  %echoaround% %actor% ~%actor% holds %self.shortdesc% aloft...
 end
 ~
 #12679
@@ -1291,15 +1291,15 @@ if %self.cooldown(12657)%
 end
 nop %self.set_cooldown(12657, 30)%
 dg_affect #12670 %self% HARD-STUNNED on 5
-%send% %actor% %self.name% flicks %self.hisher% wrist and launches a blast of pressurized water at you!
-%echoaround% %actor% %self.name% flicks %self.hisher% wrist and launches a blast of pressurized water at %actor.name%!
+%send% %actor% ~%self% flicks ^%self% wrist and launches a blast of pressurized water at you!
+%echoaround% %actor% ~%self% flicks ^%self% wrist and launches a blast of pressurized water at ~%actor%!
 if %actor.trigger_counterspell%
   %send% %actor% The water blast hits your counterspell and dissipates.
-  %echoaround% %actor% The water blast dissipates in front of %actor.name%.
+  %echoaround% %actor% The water blast dissipates in front of ~%actor%.
   halt
 else
   %send% %actor% &&rThe water blast crashes into you, sending you spinning!
-  %echoaround% %actor% The water blast crashes into %actor.name%, sending %actor.himher% spinning!
+  %echoaround% %actor% The water blast crashes into ~%actor%, sending *%actor% spinning!
   %damage% %actor% 150 physical
 end
 ~
@@ -1330,7 +1330,7 @@ while %iterator% <= 4
   eval iterator %iterator% + 1
 done
 if %success% && !%failure%
-  %echo% %self.name% begins to calm, and fades from view.
+  %echo% ~%self% begins to calm, and fades from view.
   %echo% The area is tranquilized!
   set room %self.room%
   %load% obj 12674 %room%
@@ -1341,7 +1341,7 @@ if %success% && !%failure%
       %purge% %person% $n slinks away.
     elseif %person.vnum% >= 12650 && %person.vnum% <= 12657 || %person.vnum% == 12663
       dg_affect #12673 %person% !ATTACK on -1
-      %echo% %person.name% looks pacified.
+      %echo% ~%person% looks pacified.
       if %person.vnum% >= 12654 && %person.vnum% <= 12657
         set give_token 1
       end
@@ -1377,8 +1377,8 @@ if %success% && !%failure%
   done
   %purge% %self%
 else
-  %send% %actor% &&r%self.name% attacks you with a painful bolt of crimson light, and flies off into the trees!
-  %echoaround% %actor% %self.name% attacks %actor.name% with a bolt of crimson light, and flies off into the trees!
+  %send% %actor% &&r~%self% attacks you with a painful bolt of crimson light, and flies off into the trees!
+  %echoaround% %actor% ~%self% attacks ~%actor% with a bolt of crimson light, and flies off into the trees!
   %damage% %actor% 200 magical
   %purge% %self%
 end
@@ -1390,7 +1390,7 @@ Grove rage spirit time limit~
 wait 6 sec
 %echo% A voice in your head urges, 'Say it out loud!'
 wait 8 sec
-%echo% &&r%self.name% releases a painful surge of crimson energy and flies off into the trees, looking furious!
+%echo% &&r~%self% releases a painful surge of crimson energy and flies off into the trees, looking furious!
 %aoe% 150 magical
 %purge% %self%
 ~

@@ -16,11 +16,11 @@ if (!%instance.location% || %room.template% != 10900)
 end
 set room %instance.location%
 * Teleport out of the cave
-%echo% %self.name% vanishes!
+%echo% ~%self% vanishes!
 set outside_dir %room.exit_dir%
 eval outside %%room.%outside_dir%(room)%%
 mgoto %outside%
-%echo% %self.name% flees from the cave.
+%echo% ~%self% flees from the cave.
 * Move around a bit
 mmove
 mmove
@@ -41,7 +41,7 @@ end
 set room %self.room%
 if %room.distance(%start_room%)% > 30
   * Stop wandering
-  %echo% %self.name% stops wandering around.
+  %echo% ~%self% stops wandering around.
   nop %self.add_mob_flag(SENTINEL)%
   * If we're in a building, exit it
   if %room.exit_dir%
@@ -105,11 +105,11 @@ if %enrage_counter% > %soft_enrage_rounds%
   end
   * Enrage messages
   if %enrage_counter% == %soft_enrage_rounds%
-    %echo% %self.name%'s eyes glow with fury! You'd better hurry up and kill %self.himher%!
+    %echo% |%self% eyes glow with fury! You'd better hurry up and kill *%self%!
   end
   if %enrage_counter% == %hard_enrage_rounds%
-    %echo% %self.name% takes to the air, letting out a fearsome roar!
-    %regionecho% %self.room% 5 %self.name%'s roar shakes the ground!
+    %echo% ~%self% takes to the air, letting out a fearsome roar!
+    %regionecho% %self.room% 5 |%self% roar shakes the ground!
   end
 end
 remote enrage_counter %self.id%
@@ -117,12 +117,12 @@ remote enrage_counter %self.id%
 if %enraged%
   if %enraged% == 2
     * This should wipe out even a pretty determined party in a couple of shots
-    %echo% %self.name% unleashes a torrent of flame upon %self.hisher% foes from above!
+    %echo% ~%self% unleashes a torrent of flame upon ^%self% foes from above!
     %aoe% 1000 direct
   end
   * Don't always show the message or it would be even spammier
   if %random.4% == 4
-    %echo% %self.name%'s eyes glow with white-hot rage!
+    %echo% |%self% eyes glow with white-hot rage!
   end
   dg_affect %self% BONUS-PHYSICAL 5 3600
 end
@@ -135,23 +135,23 @@ end
 switch %random.4%
   * Searing burns on tank
   case 1
-    %send% %actor% &&r%self.name% spits fire at you, causing searing burns!&&0
-    %echoaround% %actor% %self.name% spits fire at %actor.name%, causing searing burns!
+    %send% %actor% &&r~%self% spits fire at you, causing searing burns!&&0
+    %echoaround% %actor% ~%self% spits fire at ~%actor%, causing searing burns!
     %dot% %actor% 200 60 fire
     %damage% %actor% 150 fire
   break
   * Flame wave AoE
   case 2
-    %echo% %self.name% begins puffing smoke and spinning in circles!
+    %echo% ~%self% begins puffing smoke and spinning in circles!
     * Give the healer (if any) time to prepare for group heals
     wait 3 sec
-    %echo% &&r%self.name% unleashes a flame wave!&&0
+    %echo% &&r~%self% unleashes a flame wave!&&0
     %aoe% 75 fire
   break
   * Traumatic burns on tank
   case 3
-    %send% %actor% &&r%self.name% spits fire at you, causing traumatic burns!&&0
-    %echoaround% %actor% %self.name% spits fire at %actor.name%, causing traumatic burns!
+    %send% %actor% &&r~%self% spits fire at you, causing traumatic burns!&&0
+    %echoaround% %actor% ~%self% spits fire at ~%actor%, causing traumatic burns!
     %dot% %actor% 500 15 fire
     %damage% %actor% 50 fire
   break
@@ -159,8 +159,8 @@ switch %random.4%
   case 4
     set target %random.enemy%
     if (%target%)
-      %send% %target% &&r%self.name% uses %self.hisher% tail to hurl a rock at you, stunning you momentarily!&&0
-      %echoaround% %target% %self.name% hurls a rock at %target.name% with %self.hisher% tail, stunning %target.himher% momentarily!
+      %send% %target% &&r~%self% uses ^%self% tail to hurl a rock at you, stunning you momentarily!&&0
+      %echoaround% %target% ~%self% hurls a rock at ~%target% with ^%self% tail, stunning *%target% momentarily!
       dg_affect %target% HARD-STUNNED on 10
       %damage% %target% 150 physical
     end
@@ -194,16 +194,16 @@ if %self.fighting%
 end
 switch %random.4%
   case 1
-    %echo% %self.name% coils around her hoard.
+    %echo% ~%self% coils around her hoard.
   break
   case 2
-    %echo% Wisps of smoke trail from %self.name%'s nostrils.
+    %echo% Wisps of smoke trail from |%self% nostrils.
   break
   case 3
-    %echo% %self.name% picks a scorched tower shield out of her teeth.
+    %echo% ~%self% picks a scorched tower shield out of her teeth.
   break
   case 4
-    %echo% The cave shakes as %self.name% grumbles something that sounds like 'vivor'.
+    %echo% The cave shakes as ~%self% grumbles something that sounds like 'vivor'.
   break
 done
 ~
@@ -219,10 +219,10 @@ if !%self.fighting% && %self.varexists(enrage_counter)%
     halt
   end
   if %self.aff_flagged(!SEE)%
-    %echo% %self.name% returns.
+    %echo% ~%self% returns.
   end
   %load% mob %self.vnum%
-  %echo% %self.name% settles down to rest.
+  %echo% ~%self% settles down to rest.
   %purge% %self%
 end
 ~
@@ -231,7 +231,7 @@ No Leave During Combat - must fight~
 0 s 100
 ~
 if %self.fighting%
-  %send% %actor% You cannot flee during the combat with %actor.name%!
+  %send% %actor% You cannot flee during the combat with ~%actor%!
   return 0
   halt
 end
@@ -258,10 +258,10 @@ if %enrage_counter% > %soft_enrage_rounds%
   end
   * Enrage messages
   if %enrage_counter% == %soft_enrage_rounds%
-    %echo% %self.name%'s screams and attacks with great ferocity! You'd better hurry up and kill %self.himher%!
+    %echo% |%self% screams and attacks with great ferocity! You'd better hurry up and kill *%self%!
   end
   if %enrage_counter% == %hard_enrage_rounds%
-    %echo% %self.name%, seeing that nothing is working, looks for an escape route!
+    %echo% ~%self%, seeing that nothing is working, looks for an escape route!
   end
 end
 remote enrage_counter %self.id%
@@ -270,20 +270,20 @@ if %enraged%
   if %enraged% == 2
     * Pretend to flee
     if %self.aff_flagged(HARD-STUNNED)%
-      %echo% %self.name% shakes his head and recovers from stunning!
+      %echo% ~%self% shakes his head and recovers from stunning!
     end
     if %self.aff_flagged(ENTANGLED)%
-      %echo% %self.name% breaks free of the vines entangling him!
+      %echo% ~%self% breaks free of the vines entangling him!
     end
-    %echo% %self.name% tries to flee...
-    %echo% %self.name% runs behind a large stalagmite and disappears!
+    %echo% ~%self% tries to flee...
+    %echo% ~%self% runs behind a large stalagmite and disappears!
     %restore% %self%
     dg_affect %self% !ATTACK on 300
     dg_affect %self% !SEE on -1
   end
   * Don't always show the message or it would be even spammier
   if %random.4% == 4
-    %echo% %self.name% swings his sword with strength born of terror!
+    %echo% ~%self% swings his sword with strength born of terror!
   end
   dg_affect %self% BONUS-PHYSICAL 5 3600
 end
@@ -312,17 +312,17 @@ switch %random.4%
   break
   * AoE
   case 2
-    %echo% %self.name% starts spinning in circles!
+    %echo% ~%self% starts spinning in circles!
     * Give the healer (if any) time to prepare for group heals
     wait 3 sec
-    %echo% %self.name% swings his sword with wild abandon!
+    %echo% ~%self% swings his sword with wild abandon!
     %aoe% 75 physical
   break
   * Stun on tank
   case 3
     set target %actor%
-    %send% %target% %self.name% trips you and bashes you with the pommel of %self.hisher% sword, stunning you!
-    %echoaround% %target% %self.name% trips %target.name% and bashes %target.himher% with the pommel of %self.hisher% sword, stunning %target.himher% momentarily!
+    %send% %target% ~%self% trips you and bashes you with the pommel of ^%self% sword, stunning you!
+    %echoaround% %target% ~%self% trips ~%target% and bashes *%target% with the pommel of ^%self% sword, stunning *%target% momentarily!
     dg_affect %target% HARD-STUNNED on 15
     %damage% %target% 75 physical
   break
@@ -371,13 +371,13 @@ if %self.fighting%
 end
 switch %random.4%
   case 1
-    %echo% %self.name% mumbles, 'I just don't think I was cut out to do the fighting part.'
+    %echo% ~%self% mumbles, 'I just don't think I was cut out to do the fighting part.'
   break
   case 2
-    %echo% %self.name% polishes some tokens with an oil cloth.
+    %echo% ~%self% polishes some tokens with an oil cloth.
   break
   case 3
-    %echo% %self.name% proudly shows you a list of dragons whose deaths he has been partially responsible for.
+    %echo% ~%self% proudly shows you a list of dragons whose deaths he has been partially responsible for.
   break
   case 4
     say Mama said there'd be dragons like this...
@@ -390,10 +390,10 @@ Bangles the thief environmental~
 ~
 switch %random.4%
   case 1
-    %echo% You can see the back half of %self.name% sticking out of the shadows.
+    %echo% You can see the back half of ~%self% sticking out of the shadows.
   break
   case 2
-    %echo% %self.name% curses under his breath as he steps on a large, dry twig.
+    %echo% ~%self% curses under his breath as he steps on a large, dry twig.
   break
   case 3
     say It's two for one on dragon's hoards, eh?
@@ -408,7 +408,7 @@ Delayed spawn announcement~
 0 n 100
 ~
 wait 2
-%echo% %self.name% arrives!
+%echo% ~%self% arrives!
 ~
 #10915
 Colossal crimson dragon fake pickpocket~
@@ -424,11 +424,11 @@ if %actor.inventory(10945)%
 end
 if %actor.on_quest(10902)%
   if %self.level%-%actor.level% > 50
-    %send% %actor% You're not high enough level to steal from %self.name%! It'd just eat you.
+    %send% %actor% You're not high enough level to steal from ~%self%! It'd just eat you.
     return 0
     halt
   end
-  %send% %actor% You pick %self.name%'s pocket...
+  %send% %actor% You pick |%self% pocket...
   %load% obj 10945 %actor% inv
   set item %actor.inventory()%
   %send% %actor% You find %item.shortdesc%!
@@ -444,10 +444,10 @@ if (%actor.is_npc% || %actor.nohassle% || %actor.on_quest(10900)% || %self.aff_f
   halt
 end
 if %actor.aff_flagged(SNEAK)%
-  %send% %actor% You sneak away from %self.name%.
+  %send% %actor% You sneak away from ~%self%.
   halt
 end
-%send% %actor% You can't seem to get away from %self.name%!
+%send% %actor% You can't seem to get away from ~%self%!
 return 0
 ~
 #10920
@@ -570,7 +570,7 @@ if %self.cooldown(10950)%
   halt
 end
 nop %self.set_cooldown(10950, 30)%
-%echo% %self.name% shakes its body violently, spraying clumps of sticky mud flying in all directions!
+%echo% ~%self% shakes its body violently, spraying clumps of sticky mud flying in all directions!
 set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
@@ -590,11 +590,11 @@ nop %self.set_cooldown(10950, 30)%
 wait 1 sec
 dg_affect #10959 %self% HARD-STUNNED on 20
 dg_affect #10959 %self% IMMUNE-DAMAGE on 20
-%echo% %self.name% dives into the marshy water and vanishes from view!
+%echo% ~%self% dives into the marshy water and vanishes from view!
 wait 3 sec
 %send% %actor% The swampy ground shifts beneath your feet!
 %send% %actor% ('leap' out of the way!)
-%echoaround% %actor% The ground shifts beneath %actor.name%'s feet!
+%echoaround% %actor% The ground shifts beneath |%actor% feet!
 set target %actor.id%
 remote target %self.id%
 wait 9 sec
@@ -604,11 +604,11 @@ end
 rdelete target %self.id%
 rdelete success %self.id%
 if %success%
-  %send% %actor% %self.name% bursts from the swampy ground, narrowly missing you!
-  %echoaround% %actor% %self.name% bursts from the swampy ground, narrowly missing %actor.name%!
+  %send% %actor% ~%self% bursts from the swampy ground, narrowly missing you!
+  %echoaround% %actor% ~%self% bursts from the swampy ground, narrowly missing ~%actor%!
 else
-  %send% %actor% &&r%self.name% bursts from the swampy ground beneath your feet, sending you flying!
-  %send% %actor% %self.name% bursts from the swampy ground beneath %actor.name%'s feet, sending %actor.himher% flying!
+  %send% %actor% &&r~%self% bursts from the swampy ground beneath your feet, sending you flying!
+  %send% %actor% ~%self% bursts from the swampy ground beneath |%actor% feet, sending *%actor% flying!
   %damage% %actor% 200 physical
   dg_affect #10957 %actor% HARD-STUNNED on 10
 end
@@ -622,7 +622,7 @@ if %self.cooldown(10950)%
   halt
 end
 nop %self.set_cooldown(10950, 30)%
-%echo% &&r%self.name% opens %self.hisher% mouth wide and exhales a cloud of noxious vapor!
+%echo% &&r~%self% opens ^%self% mouth wide and exhales a cloud of noxious vapor!
 set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
@@ -650,7 +650,7 @@ end
 set success 1
 remote success %self.id%
 %send% %actor% You desperately leap to one side!
-%echoaround% %actor% %actor.name% desperately leaps to one side!
+%echoaround% %actor% ~%actor% desperately leaps to one side!
 ~
 #10965
 Hill Giant delayed despawn~
@@ -726,14 +726,14 @@ if %self.cooldown(10966)%
   halt
 end
 nop %self.set_cooldown(10966, 30)%
-%echo% %self.name% grabs a small boulder from the ground nearby and hefts it!
+%echo% ~%self% grabs a small boulder from the ground nearby and hefts it!
 %echo% &&YYou'd better duck!&&0
 set running 1
 remote running %self.id%
 wait 10 sec
 set running 0
 remote running %self.id%
-%echo% %self.name% hurls the boulder forward and lets it fly!
+%echo% ~%self% hurls the boulder forward and lets it fly!
 set room %self.room%
 set person %room.people%
 while %person%
@@ -750,12 +750,12 @@ while %person%
     end
     if %command% != duck
       %send% %person% &&rYou are knocked to the ground by the flying boulder!
-      %echoaround% %person% %person.name% is knocked to the ground by the flying boulder!
+      %echoaround% %person% ~%person% is knocked to the ground by the flying boulder!
       %damage% %person% 150 physical
       dg_affect #10967 %person% STUNNED on 5
     else
       %send% %person% You throw yourself to the ground, and the boulder flies over your head!
-      %echoaround% %person% %person.name% throws %person.himher%self to the ground!
+      %echoaround% %person% ~%person% throws *%person%self to the ground!
     end
   end
   set person %person.next_in_room%
@@ -769,14 +769,14 @@ if %self.cooldown(10966)%
   halt
 end
 nop %self.set_cooldown(10966, 30)%
-%echo% %self.name% raises %self.hisher% club for an overhead smash!
+%echo% ~%self% raises ^%self% club for an overhead smash!
 %echo% &&YYou'd better dive out of the way!&&0
 set running 1
 remote running %self.id%
 wait 10 sec
 set running 0
 remote running %self.id%
-%echo% %self.name% slams %self.hisher% club down!
+%echo% ~%self% slams ^%self% club down!
 set room %self.room%
 set person %room.people%
 while %person%
@@ -792,12 +792,12 @@ while %person%
     end
     if %command% != dive
       %send% %person% &&rYou are smashed to the ground by the force of the blow!
-      %echoaround% %person% %person.name% is smashed to the ground by the force of the blow!
+      %echoaround% %person% ~%person% is smashed to the ground by the force of the blow!
       %damage% %person% 150 physical
       dg_affect #10967 %person% STUNNED on 5
     else
       %send% %person% You dive to the side, and the club slams into the ground where you were standing!
-      %echoaround% %person% %person.name% dives out of the way!
+      %echoaround% %person% ~%person% dives out of the way!
     end
   end
   set person %person.next_in_room%
@@ -811,14 +811,14 @@ if %self.cooldown(10966)%
   halt
 end
 nop %self.set_cooldown(10966, 30)%
-%echo% %self.name% lifts %self.hisher% foot high, preparing for a powerful stomp...
+%echo% ~%self% lifts ^%self% foot high, preparing for a powerful stomp...
 %echo% &&YYou'd better jump!&&0
 set running 1
 remote running %self.id%
 wait 10 sec
 set running 0
 remote running %self.id%
-%echo% %self.name% stomps %self.hisher% foot down, sending a powerful tremor through the ground!
+%echo% ~%self% stomps ^%self% foot down, sending a powerful tremor through the ground!
 set room %self.room%
 set person %room.people%
 while %person%
@@ -834,12 +834,12 @@ while %person%
     end
     if %command% != jump
       %send% %person% &&rYou are knocked off your feet by the ground tremor!&&0
-      %echoaround% %person% %person.name% is knocked to the ground!
+      %echoaround% %person% ~%person% is knocked to the ground!
       dg_affect #10967 %person% HARD-STUNNED on 5
       dg_affect #10968 %person% DODGE -20 15
     else
       %send% %person% You leap into the air as the ground shakes below you, avoiding the tremor!
-      %echoaround% %person% %person.name% leaps into the air, avoiding the tremor!
+      %echoaround% %person% ~%person% leaps into the air, avoiding the tremor!
     end
   end
   set person %person.next_in_room%
@@ -864,14 +864,14 @@ end
 if duck /= %cmd%
   set command_%actor.id% duck
   %send% %actor% You stand your ground and prepare to duck...
-  %echoaround% %actor% %actor.name% stands %actor.hisher% ground and prepares to duck...
+  %echoaround% %actor% ~%actor% stands ^%actor% ground and prepares to duck...
 elseif dive /= %cmd%
   %send% %actor% You tense and prepare to dive to one side...
-  %echoaround% %actor% %actor.name% tenses, preparing to dive out of the way...
+  %echoaround% %actor% ~%actor% tenses, preparing to dive out of the way...
   set command_%actor.id% dive
 elseif jump /= %cmd%
   %send% %actor% You crouch and prepare to jump into the air...
-  %echoaroud% %actor% %actor.name% crouches and prepares to jump into the air...
+  %echoaroud% %actor% ~%actor% crouches and prepares to jump into the air...
   set command_%actor.id% jump
 end
 remote command_%actor.id% %self.id%
@@ -920,12 +920,12 @@ if %self.vnum% == 10983 || %self.vnum% == 10984
     set spell_broken 0
     if %victim.morph% == 10992
       if !%spell_broken%
-        %echo% As %self.name% dies, %self.hisher% spell is broken!
+        %echo% As ~%self% dies, ^%self% spell is broken!
       end
       set spell_broken 1
       set prev_name %victim.name%
       morph %victim% normal
-      %echoaround% %victim% %prev_name% suddenly turns into %victim.name%!
+      %echoaround% %victim% %prev_name% suddenly turns into ~%victim%!
       %send% %victim% You suddenly return to your normal form!
       dg_affect #10992 %victim% off
     end
@@ -986,38 +986,38 @@ nop %self.set_cooldown(10981, 30)%
 if %self.affect(3021)%
   dg_affect #3021 %self% off
 else
-  %echo% %self.name% flickers momentarily with a blue-white aura.
+  %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
 wait 1 sec
-%echo% %self.name% opens a tiny portal and reaches inside...
+%echo% ~%self% opens a tiny portal and reaches inside...
 if !%self.varexists(rare_summon_done)%
   if %random.10% == 10
     set rare_summon_done 1
     remote rare_summon_done %self.id%
-    %send% %actor% %self.name% withdraws a silver ingot and hurls it at you!
+    %send% %actor% ~%self% withdraws a silver ingot and hurls it at you!
     %send% %actor% The silver ingot falls to the ground at your feet.
-    %echoaround% %actor% %self.name% withdraws a silver ingot and hurls it at %actor.name%!
-    %echoaround% %actor% The silver ingot falls to the ground at %actor.hisher% feet.
-    %echo% %self.name% mutters a series of increasingly profane curses.
+    %echoaround% %actor% ~%self% withdraws a silver ingot and hurls it at ~%actor%!
+    %echoaround% %actor% The silver ingot falls to the ground at ^%actor% feet.
+    %echo% ~%self% mutters a series of increasingly profane curses.
     %load% obj 170 room
     halt
   end
 end
 switch %random.2%
   case 1
-    %send% %actor% %self.name% withdraws a rock and hurls it at you!
+    %send% %actor% ~%self% withdraws a rock and hurls it at you!
     %send% %actor% &&rThe rock bounces off your head, stunning you!
-    %echoaround% %actor% %self.name% withdraws a rock and hurls it at %actor.name%!
-    %echoaround% %actor% The rock bounces off %actor.hisher% head, and %actor.heshe% staggers!
+    %echoaround% %actor% ~%self% withdraws a rock and hurls it at ~%actor%!
+    %echoaround% %actor% The rock bounces off ^%actor% head, and &%actor% staggers!
     %damage% %actor% 50 physical
     dg_affect #10984 %actor% STUNNED on 5
   break
   case 2
-    %send% %actor% %self.name% withdraws a throwing dagger and hurls it at you!
+    %send% %actor% ~%self% withdraws a throwing dagger and hurls it at you!
     %send% %actor% &&rThe dagger hits you in the shoulder, opening a bleeding wound!
-    %echoaround% %actor% %self.name% withdraws a small dagger and hurls it at %actor.name%!
-    %echoaround% %actor% The dagger hits %actor.himher% in the shoulder, drawing blood!
+    %echoaround% %actor% ~%self% withdraws a small dagger and hurls it at ~%actor%!
+    %echoaround% %actor% The dagger hits *%actor% in the shoulder, drawing blood!
     %damage% %actor% 50 physical
     %dot% #10985 %actor% 100 15 physical
   break
@@ -1034,19 +1034,19 @@ nop %self.set_cooldown(10981, 30)%
 if %self.affect(3021)%
   dg_affect #3021 %self% off
 else
-  %echo% %self.name% flickers momentarily with a blue-white aura.
+  %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
 wait 1 sec
 if %actor.trigger_counterspell%
-  %send% %actor% %self.name% shouts some kind of hex at you, but your counterspell dispels it!
-  %echoaround% %actor% %self.name% shouts some kind of hex at %actor.name%, but nothing seems to happen!
+  %send% %actor% ~%self% shouts some kind of hex at you, but your counterspell dispels it!
+  %echoaround% %actor% ~%self% shouts some kind of hex at ~%actor%, but nothing seems to happen!
 else
-  %echoaround% %actor% %self.name% shouts some kind of hex at %actor.name%, who seems weakened!
-  %send% %actor% %self.name% shouts something at you, and you feel your energy drain away!
+  %echoaround% %actor% ~%self% shouts some kind of hex at ~%actor%, who seems weakened!
+  %send% %actor% ~%self% shouts something at you, and you feel your energy drain away!
   %damage% %actor% 25 magical
   dg_affect #10986 %actor% SLOW on 15
-  %echo% %self.name% suddenly fights with renewed strength!
+  %echo% ~%self% suddenly fights with renewed strength!
   dg_affect #10986 %self% HASTE on 15
 end
 ~
@@ -1061,25 +1061,25 @@ nop %self.set_cooldown(10981, 30)%
 if %self.affect(3021)%
   dg_affect #3021 %self% off
 else
-  %echo% %self.name% flickers momentarily with a blue-white aura.
+  %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
 wait 1 sec
-%echo% %self.name% begins drawing mana to %self.himher%self...
-%echo% (You should 'interrupt' %self.hisher% ritual.)
+%echo% ~%self% begins drawing mana to *%self%self...
+%echo% (You should 'interrupt' ^%self% ritual.)
 set ritual_active 1
 remote ritual_active %self.id%
 wait 5 sec
 if !%self.ritual_active%
   halt
 end
-%echo% %self.name% concentrates %self.hisher% power into a whip of crackling flames!
+%echo% ~%self% concentrates ^%self% power into a whip of crackling flames!
 wait 5 sec
 if !%self.ritual_active%
   halt
 end
-%send% %actor% &&r%self.name% cracks the blazing whip at you, blowing you off your feet!
-%echoaround% %actor% %self.name% cracks the blazing whip at %actor.name%, blowing %actor.himher% off %actor.hisher% feet!
+%send% %actor% &&r~%self% cracks the blazing whip at you, blowing you off your feet!
+%echoaround% %actor% ~%self% cracks the blazing whip at ~%actor%, blowing *%actor% off ^%actor% feet!
 if %actor.trigger_counterspell%
   %send% %actor% The fiery whip crashes through your counterspell unimpeded, breaking it!
 end
@@ -1096,8 +1096,8 @@ end
 if !%self.ritual_active%
   %send% %actor% You don't need to do that right now.
 end
-%send% %actor% You trip %self.name%, interrupting %self.hisher% ritual.
-%echoaround% %actor% %actor.name% trips %self.name%, interrupting %self.hisher% ritual.
+%send% %actor% You trip ~%self%, interrupting ^%self% ritual.
+%echoaround% %actor% ~%actor% trips ~%self%, interrupting ^%self% ritual.
 set ritual_active 0
 remote ritual_active %self.id%
 ~
@@ -1112,17 +1112,17 @@ nop %self.set_cooldown(10981, 30)%
 if %self.affect(3021)%
   dg_affect #3021 %self% off
 else
-  %echo% %self.name% flickers momentarily with a blue-white aura.
+  %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
 wait 1 sec
 if !%self.morph%
   set current %self.name%
   %morph% %self% 10988
-  %echo% %current% rapidly morphs into %self.name%!
+  %echo% %current% rapidly morphs into ~%self%!
   wait 1 sec
 end
-%echo% &&r%self.name% goes berserk, claws flailing in all directions!
+%echo% &&r~%self% goes berserk, claws flailing in all directions!
 %damage% %actor% 75 physical
 %aoe% 25 physical
 ~
@@ -1137,31 +1137,31 @@ nop %self.set_cooldown(10981, 30)%
 if %self.affect(3021)%
   dg_affect #3021 %self% off
 else
-  %echo% %self.name% flickers momentarily with a blue-white aura.
+  %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
 wait 1 sec
 if %self.morph%
   set current %self.name%
   %morph% %self% normal
-  %echo% %current% rapidly morphs into %self.name%!
+  %echo% %current% rapidly morphs into ~%self%!
   wait 1 sec
 end
-%echo% %self.name% makes a sweeping skyward gesture with both arms!
+%echo% ~%self% makes a sweeping skyward gesture with both arms!
 if %actor.trigger_counterspell%
   %send% %actor% The dust around your feet swirls gently in a circle, then your counterspell stops it.
-  %echoaround% %actor% The dust around %actor.name%'s feet swirls gently in a circle, then stops.
+  %echoaround% %actor% The dust around |%actor% feet swirls gently in a circle, then stops.
 else
   dg_affect #10982 %self% HARD-STUNNED on 10
   %send% %actor% &&rA swirling dust devil abruptly envelops you and hurls you into the air!
-  %echoaround% %actor% A swirling dust devil abruptly envelops %actor.name% and hurls %actor.himher% into the air!
+  %echoaround% %actor% A swirling dust devil abruptly envelops ~%actor% and hurls *%actor% into the air!
   %damage% %actor% 50 magical
   dg_affect #10990 %actor% HARD-STUNNED on 10
   wait 5 sec
   if %actor.affect(10990)%
-    %echo% %self.name% slams %self.hisher% fist into the earth!
+    %echo% ~%self% slams ^%self% fist into the earth!
     %send% %actor% &&rA gust of wind suddenly hurls you downward!
-    %echoaround% %actor% %actor.name% is abruptly hurled downward!
+    %echoaround% %actor% ~%actor% is abruptly hurled downward!
     dg_affect #10990 %actor% off
     %damage% %actor% 100 physical
   end
@@ -1179,17 +1179,17 @@ nop %self.set_cooldown(10981, 30)%
 if %self.affect(3021)%
   dg_affect #3021 %self% off
 else
-  %echo% %self.name% flickers momentarily with a blue-white aura.
+  %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
 wait 1 sec
 if %self.morph%
   set current %self.name%
   %morph% %self% normal
-  %echo% %current% rapidly morphs into %self.name%!
+  %echo% %current% rapidly morphs into ~%self%!
   wait 1 sec
 end
-%echo% %self.name% slams %self.hisher% hands to the earth, fingers spread!
+%echo% ~%self% slams ^%self% hands to the earth, fingers spread!
 %echo% A thick cloud of dust explodes outward, filling the area and obscuring your vision!
 set person %self.room.people%
 while %person%
@@ -1219,16 +1219,16 @@ nop %self.set_cooldown(10981, 30)%
 if %self.affect(3021)%
   dg_affect #3021 %self% off
 else
-  %echo% %self.name% flickers momentarily with a blue-white aura.
+  %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
 wait 1 sec
 say Don't think of this as ruining your chances for a date. Think of it as your only chance to kiss a princess!
 wait 2 sec
-%echo% %self.name% snaps %self.hisher% fingers!
+%echo% ~%self% snaps ^%self% fingers!
 set actor %self.fighting%
 if !%actor% || %actor.morph% == 10992
-  %echo% %self.name% looks confused.
+  %echo% ~%self% looks confused.
   halt
 end
 if %actor.trigger_counterspell%
@@ -1237,14 +1237,14 @@ if %actor.trigger_counterspell%
 end
 set prev_name %actor.name%
 %morph% %actor% 10992
-%send% %actor% You are abruptly transformed into %actor.name%!
-%echoaround% %actor% %prev_name% is abruptly transformed into %actor.name%!
+%send% %actor% You are abruptly transformed into ~%actor%!
+%echoaround% %actor% %prev_name% is abruptly transformed into ~%actor%!
 dg_affect #10992 %actor% HARD-STUNNED on 20
 wait 15 sec
 if %actor.morph% == 10992
   set prev_name %actor.name%
   %morph% %actor% normal
-  %echoaround% %actor% %prev_name% slowly shifts back into %actor.name%.
+  %echoaround% %actor% %prev_name% slowly shifts back into ~%actor%.
   %send% %actor% Your form returns to normal.
   dg_affect #10992 %actor% off
 end
@@ -1260,15 +1260,15 @@ nop %self.set_cooldown(10981, 30)%
 if %self.affect(3021)%
   dg_affect #3021 %self% off
 else
-  %echo% %self.name% flickers momentarily with a blue-white aura.
+  %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
 wait 1 sec
 if !%actor% || !%self.fighting%
   halt
 end
-%send% %actor% &&r%self.name% pulls out a gnarled wooden staff and smacks you over the head with it!
-%echoaround% %actor% %self.name% pulls out a gnarled wooden staff and smacks %actor.name% over the head with it!
+%send% %actor% &&r~%self% pulls out a gnarled wooden staff and smacks you over the head with it!
+%echoaround% %actor% ~%self% pulls out a gnarled wooden staff and smacks ~%actor% over the head with it!
 %damage% %actor% 25 physical
 if %actor.trigger_counterspell%
   %send% %actor% Your counterspell protects you from the staff's enchantment.
@@ -1289,7 +1289,7 @@ nop %self.set_cooldown(10981, 30)%
 if %self.affect(3021)%
   dg_affect #3021 %self% off
 else
-  %echo% %self.name% flickers momentarily with a blue-white aura.
+  %echo% ~%self% flickers momentarily with a blue-white aura.
 end
 dg_affect #3021 %self% RESIST-MAGICAL 1 35
 wait 1 sec
@@ -1302,14 +1302,14 @@ if !%actor.is_pc%
     set person %person.next_in_room%
   done
 end
-%send% %actor% %self.name% pulls out a small wand and points it at you.
-%echoaround% %actor% %self.name% pulls out a small wand and points it at %actor.name%.
+%send% %actor% ~%self% pulls out a small wand and points it at you.
+%echoaround% %actor% ~%self% pulls out a small wand and points it at ~%actor%.
 say Expelliarmus!
 if %actor.trigger_counterspell%
   %send% %actor% Your weapon twitches in your hand, then stops.
 else
   %send% %actor% Your weapon flies out of your hand!
-  %echoaround% %actor% %actor.name%'s weapon flies out of %actor.hisher% hand!
+  %echoaround% %actor% |%actor% weapon flies out of ^%actor% hand!
   dg_affect #10995 %actor% DISARM on 20
 end
 ~
@@ -1324,9 +1324,9 @@ wait 4
 if %victim.morph% == 10992
   set prev_name %victim.name%
   morph %victim% normal
-  %send% %actor% As you kiss %prev_name%, it suddenly turns into %victim.name%!
-  %send% %victim% As %actor.name% kisses you, you suddenly return to your normal form!
-  %echoneither% %actor% %victim% As %actor.name% kisses %prev_name%, it suddenly transforms into %victim.name%!
+  %send% %actor% As you kiss %prev_name%, it suddenly turns into ~%victim%!
+  %send% %victim% As ~%actor% kisses you, you suddenly return to your normal form!
+  %echoneither% %actor% %victim% As ~%actor% kisses %prev_name%, it suddenly transforms into ~%victim%!
   dg_affect #10992 %victim% off
 end
 ~
@@ -1339,23 +1339,23 @@ if !%self.master%
 end
 switch %random.4%
   case 1
-    %echo% %self.name% flips to a page marked 'Grooming' and begins to glow...
+    %echo% ~%self% flips to a page marked 'Grooming' and begins to glow...
     %send% %self.master% A blue light flies toward you, straightening your hair!
     %echoaround% %self.master% A blue light flies toward %self.master.name% and suddenly %self.master.hisher% hair straightens itself!
   break
   case 2
-    %echo% %self.name% flips to a page marked 'Hygiene' and begins to glow...
+    %echo% ~%self% flips to a page marked 'Hygiene' and begins to glow...
     %send% %self.master% A white light flies into your mouth, polishing your teeth!
     %echoaround% %self.master% A white light flies toward %self.master.name%, into %self.master.hisher% mouth, and polishing %self.master.hisher% teeth!
   break
   case 3
-    %echo% %self.name% flips to a page marked 'Food' and begins to glow...
+    %echo% ~%self% flips to a page marked 'Food' and begins to glow...
     %send% %self.master% A yellow light flies into your hand, revealing a chocolate frog!
     %echoaround% %self.master% A yellow light flies into %self.master.name%'s hand, revealing a chocolate frog!
     %load% obj 10998 %self.master% inv
   break
   case 4
-    %echo% %self.name% flips to a page marked 'Smudges' and begins to glow...
+    %echo% ~%self% flips to a page marked 'Smudges' and begins to glow...
     %send% %self.master% A green light flies toward you, removing a smudge of dirt from your face!
     %echoaround% %self.master% A green light flies toward %self.master.name%, removing a smudge of dirt from %self.master.hisher% face!
   break

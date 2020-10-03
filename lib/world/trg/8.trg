@@ -7,7 +7,7 @@ if %actor.obj_target(%arg%)% != %self%
   halt
 end
 %send% %actor% You look into %self.shortdesc%, but it's too tarnished to see a good reflection.
-%echoaround% %actor% %actor.name% looks into %self.shortdesc%.
+%echoaround% %actor% ~%actor% looks into %self.shortdesc%.
 ~
 #806
 Looking Glass reflection~
@@ -18,7 +18,7 @@ if %actor.obj_target(%arg%)% != %self%
   halt
 end
 %send% %actor% You look into %self.shortdesc%...
-%echoaround% %actor% %actor.name% looks into %self.shortdesc%.
+%echoaround% %actor% ~%actor% looks into %self.shortdesc%.
 if %actor.plr_flagged(VAMPIRE)%
   %send% %actor% You don't seem to have a reflection.
 else
@@ -32,7 +32,7 @@ while %ch%
       %send% %actor% &&0
       set any 1
     end
-    %send% %actor% Over your shoulder, you notice that %ch.name% has no reflection.
+    %send% %actor% Over your shoulder, you notice that ~%ch% has no reflection.
   end
   set ch %ch.next_in_room%
 done

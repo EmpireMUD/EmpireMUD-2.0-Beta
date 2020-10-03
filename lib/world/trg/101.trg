@@ -24,16 +24,16 @@ Swamp Hag passive~
 * This script is no longer used. It was replaced by custom strings.
 switch %random.4%
   case 1
-    %echo% %self.name% rocks in %self.hisher% chair.
+    %echo% ~%self% rocks in ^%self% chair.
   break
   case 2
-    %echo% %self.name% grinds a pile of bones using a huge mortar and pestle.
+    %echo% ~%self% grinds a pile of bones using a huge mortar and pestle.
   break
   case 3
-    %echo% %self.name% plucks out one of %self.hisher% eyes, cleans it on %self.hisher% shirt, then pops it back in.
+    %echo% ~%self% plucks out one of ^%self% eyes, cleans it on ^%self% shirt, then pops it back in.
   break
   case 4
-    %echo% %self.name% gurgles the words, Something wicked this way is.
+    %echo% ~%self% gurgles the words, Something wicked this way is.
   break
 done
 ~
@@ -46,28 +46,28 @@ if !%actor.affect(blind)%
 else
   switch %random.4%
     case 1
-      %send% %actor% %self.name% swings %self.hisher% pestle into the side of your head!
-      %echoaround% %actor% %self.name% swings %self.hisher% pestle into the side of %actor.name%s head!
+      %send% %actor% ~%self% swings ^%self% pestle into the side of your head!
+      %echoaround% %actor% ~%self% swings ^%self% pestle into the side of ~%actor%s head!
       dg_affect %actor% STUNNED on 10
       %damage% %actor% 25
     break
     case 2
-      %echo% %self.name% reaches under the bed and opens a cage
+      %echo% ~%self% reaches under the bed and opens a cage
       wait 1 sec
       %load% mob 10101 ally
       makeuid rat mob rat
       if %rat%
-        %echo% %rat.name% scurries out from a cage!
+        %echo% ~%rat% scurries out from a cage!
         %force% %rat% %aggro% %actor%
       end
     break
     case 3
-      %send% %actor% %self.name% hexes you!
-      %echoaround% %actor% %self.name% hexes %actor.name%!
+      %send% %actor% ~%self% hexes you!
+      %echoaround% %actor% ~%self% hexes ~%actor%!
       dg_affect %actor% SLOW on 30
     break
     case 4
-      %echo% %self.name% begins swinging %self.hisher% pestle wildly!
+      %echo% ~%self% begins swinging ^%self% pestle wildly!
       wait 20
       %echo% Everyone is hit by the pestle!
       %aoe% 100 physical
@@ -103,9 +103,9 @@ Swamp Rat combat~
 0 k 15
 ~
 wait 10
-%echo% %self.name% bites deep!
+%echo% ~%self% bites deep!
 %send% %actor% You don't feel so good...
-%echoaround% %actor% %actor.name% doesnt look so good...
+%echoaround% %actor% ~%actor% doesnt look so good...
 %dot% %actor% 200 30
 ~
 #10105
@@ -119,7 +119,7 @@ elseif !%actor.affect(blind)% && %random.2% == 2
 else
   wait 10
   %send% %actor% Berk's dagger seems to have left some poison in your system!
-  %echoaround% %actor% %actor.name% looks as if %actor.heshe%'s been poisoned!
+  %echoaround% %actor% ~%actor% looks as if &%actor%'s been poisoned!
   * 1 or both poison effects:
   switch %random.3%
     case 1
@@ -148,7 +148,7 @@ else
   switch %random.3%
     case 1
       %send% %actor% Jorr raises her hand over the fire and it whips toward you, causing painful burns!
-      %echoaround% %actor% Jorr raises her hand over the fire and it whips toward %actor.name%, causing painful burns!
+      %echoaround% %actor% Jorr raises her hand over the fire and it whips toward ~%actor%, causing painful burns!
       %dot% %actor% 100 15 fire
       %damage %actor% 30 fire
     break
@@ -209,8 +209,8 @@ switch %random.3%
     set ch %self.room.people%
     while %ch%
       if %self.is_enemy(%ch%)% && %ch.maxmana% > %actor.maxmana%
-        %send% %ch% %self.name% is coming for you!
-        %echoaround% %ch% %self.name% runs for %ch.name%!
+        %send% %ch% ~%self% is coming for you!
+        %echoaround% %ch% ~%self% runs for ~%ch%!
         %aggro% %ch%
         halt
       end
@@ -218,13 +218,13 @@ switch %random.3%
     done
   break
   case 2
-    %send% %actor% %self.name% sinks her teeth into your leg! You don't feel so good.
-    %echoaround% %actor% %self.name% sinks her teeth into %actor.name%'s leg! %actor.name% doesn't look so good.
+    %send% %actor% ~%self% sinks her teeth into your leg! You don't feel so good.
+    %echoaround% %actor% ~%self% sinks her teeth into |%actor% leg! ~%actor% doesn't look so good.
     dg_affect %actor% MAX-MANA -100 10
   break
   case 3
-    %send% %actor% %self.name% sinks her teeth into your leg! You don't feel so good.
-    %echoaround% %actor% %self.name% sinks her teeth into %actor.name%'s leg! %actor.name% doesn't look so good.
+    %send% %actor% ~%self% sinks her teeth into your leg! You don't feel so good.
+    %echoaround% %actor% ~%self% sinks her teeth into |%actor% leg! ~%actor% doesn't look so good.
     dg_affect %actor% MANA-REGEN -5 20
   break
 done
@@ -259,7 +259,7 @@ Sly combat~
 0 k 10
 ~
 %send% %actor% Sly's shadow stretches out and grabs at you...
-%echoaround% %actor% Sly's shadow stretches out and grabs at %actor.name%...
+%echoaround% %actor% Sly's shadow stretches out and grabs at ~%actor%...
 dg_affect %actor% STUNNED on 10
 wait 2 sec
 %send% %actor% The shadows grasp and pull at you!
@@ -278,7 +278,7 @@ wait 10
 %echo% Chiv sinks into the shadows...
 wait 30
 %send% %actor% Chiv appears behind you and sinks her dagger into your back!
-%echoaround% %actor% Chiv appears behind %actor.name% and sinks her dagger into %actor.hisher% back!
+%echoaround% %actor% Chiv appears behind ~%actor% and sinks her dagger into ^%actor% back!
 %dot% %actor% 50 15 physical
 %damage% %actor% 150 physical
 ~
@@ -455,27 +455,27 @@ Cactus combat~
 ~
 switch %random.3%
   case 1
-    %send% %actor% %self.name% brushes against you, leaving lots of painful spines stuck in you!
-    %echoaround% %actor% %self.name% brushes against %actor.name%, leaving spines stuck in %actor.himher%!
+    %send% %actor% ~%self% brushes against you, leaving lots of painful spines stuck in you!
+    %echoaround% %actor% ~%self% brushes against ~%actor%, leaving spines stuck in *%actor%!
     %damage% %actor% 10 physical
     %dot% %actor% 50 30 physical 3
   break
   case 2
-    %echo% %self.name% puffs up like an angry cat, summoning miniature storm clouds!
+    %echo% ~%self% puffs up like an angry cat, summoning miniature storm clouds!
     wait 1 sec
     if %actor% && (%actor.room% == %self.room%)
       %send% %actor% A torrent of water strikes you in the face, briefly blinding you!
-      %echoaround% %actor% A torrent of water strikes %actor.name% in the face!
+      %echoaround% %actor% A torrent of water strikes ~%actor% in the face!
       dg_affect %actor% BLIND on 10
     else
       halt
     end
   break
   case 3
-    %echo% %self.name%'s spines ripple!
+    %echo% |%self% spines ripple!
     wait 1 sec
     if %actor% && (%actor.room% == %self.room%)
-      %echo% %self.name% regrows slightly.
+      %echo% ~%self% regrows slightly.
       %damage% %self% -25
     else
       halt
@@ -503,7 +503,7 @@ else
     if %person.vnum% >= 10140 && %person.vnum% <= 10142
       eval count %count% + 1
       if %count% >= 2 || %random.2% == 2
-        %echo% %self.name% turns back into an ordinary cactus.
+        %echo% ~%self% turns back into an ordinary cactus.
         %purge% %self%
         halt
       end
@@ -522,14 +522,14 @@ wait 2
 if %target.room% != %self.room% || %self.disabled% || %self.fighting%
   halt
 end
-%send% %target% %self.name% moves menacingly towards you...
-%echoaround% %target% %self.name% moves menacingly towards %target.name%...
+%send% %target% ~%self% moves menacingly towards you...
+%echoaround% %target% ~%self% moves menacingly towards ~%target%...
 wait 1 sec
 if %target.room% != %self.room% || %self.disabled% || %self.fighting%
   halt
 end
-%echoaround% %target% %self.name% attacks %target.name%!
-%send% %target% %self.name% attacks you!
+%echoaround% %target% ~%self% attacks ~%target%!
+%send% %target% ~%self% attacks you!
 %aggro% %target%
 ~
 #10142
@@ -582,28 +582,28 @@ Saguaro treant combat~
 ~
 switch %random.4%
   case 1
-    %send% %actor% %self.name% brushes an arm against you, leaving dozens of painful spines behind!
-    %echoaround% %actor% %self.name% brushes an arm against %actor.name%, leaving behind dozens of spines!
+    %send% %actor% ~%self% brushes an arm against you, leaving dozens of painful spines behind!
+    %echoaround% %actor% ~%self% brushes an arm against ~%actor%, leaving behind dozens of spines!
     %dot% %actor% 20 30 physical 10
     %dot% %actor% 20 30 physical 10
   break
   case 2
-    %echo% %self.name%'s spines ripple, and storm clouds form overhead.
+    %echo% |%self% spines ripple, and storm clouds form overhead.
     wait 1 sec
     %send% %actor% You are struck by lightning!
-    %echoaround% %actor% %actor.name% is struck by lightning!
+    %echoaround% %actor% ~%actor% is struck by lightning!
     %damage% %actor% 75 magical
   break
   case 3
-    %echo% %self.name% puffs up like an angry cat, and monsoon clouds form overhead.
+    %echo% ~%self% puffs up like an angry cat, and monsoon clouds form overhead.
     wait 1 sec
     %send% %actor% The clouds burst, turning the ground beneath your feet into mud and slowing you down!
-    %echoaround% %actor% The clouds burst, turning the ground beneath %actor.name%'s feet into mud and slowing %actor.himher% down!
+    %echoaround% %actor% The clouds burst, turning the ground beneath |%actor% feet into mud and slowing *%actor% down!
     dg_affect %actor% SLOW on 30
   break
   case 4
-    %send% %actor% %self.name% clubs you painfully with an arm, leaving stinging spines stuck into you!
-    %echoaround% %actor% %self.name% clubs %actor.name% with an arm, leaving several spines stuck in %actor.himher%!
+    %send% %actor% ~%self% clubs you painfully with an arm, leaving stinging spines stuck into you!
+    %echoaround% %actor% ~%self% clubs ~%actor% with an arm, leaving several spines stuck in *%actor%!
     %damage% %actor% 25 physical
     %dot% %actor% 20 30 physical 10
   break
@@ -651,7 +651,7 @@ while %cycles_left% >= 0
   if (%actor.room% != %room%) || !%actor.canuseroom_member(%room%)% || !%sector_valid% || %cloud_present% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < 5
-      %echoaround% %actor% %actor.name%'s chant is interrupted.
+      %echoaround% %actor% |%actor% chant is interrupted.
       %send% %actor% Your chant is interrupted.
     elseif !%actor.canuseroom_member(%room%)%
       %send% %actor% You don't have permission to use the monsoon chant here.
@@ -668,27 +668,27 @@ while %cycles_left% >= 0
   * Fake ritual messages
   switch %cycles_left%
     case 5
-      %echoaround% %actor% %actor.name% pulls out a toad-shaped totem and begins to chant...
+      %echoaround% %actor% ~%actor% pulls out a toad-shaped totem and begins to chant...
       %send% %actor% You pull out your monsoon totem and begin to chant...
     break
     case 4
-      %echoaround% %actor% %actor.name% sways as %actor.heshe% whispers strange words into the air...
+      %echoaround% %actor% ~%actor% sways as &%actor% whispers strange words into the air...
       %send% %actor% You sway as you whisper the words of the monsoon chant...
     break
     case 3
-      %echoaround% %actor% %actor.name%'s monsoon totem takes on a soft green glow, and the air around it seems to crackle...
+      %echoaround% %actor% |%actor% monsoon totem takes on a soft green glow, and the air around it seems to crackle...
       %send% %actor% Your monsoon totem takes on a soft green glow, and the air around it crackles with electricity...
     break
     case 2
-      %echoaround% %actor% A tiny raincloud forms in the air around %actor.name%'s monsoon totem...
+      %echoaround% %actor% A tiny raincloud forms in the air around |%actor% monsoon totem...
       %send% %actor% A tiny raincloud forms in the air around your monsoon totem...
     break
     case 1
-      %echoaround% %actor% %actor.name% whispers into the raincloud, which grows dark and begins to rise...
+      %echoaround% %actor% ~%actor% whispers into the raincloud, which grows dark and begins to rise...
       %send% %actor% You whisper ancient words of power into the raincloud as it grows dark and begins to rise...
     break
     case 0
-      %echoaround% %actor% %actor.name% completes %actor.hisher% chant, and the raincloud fills the sky!
+      %echoaround% %actor% ~%actor% completes ^%actor% chant, and the raincloud fills the sky!
       %send% %actor% You complete your chant, and the raincloud fills the sky!
       %echo% Thunder rolls across the sky as heavy drops of rain begin to fall.
       %load% obj 10144 %room%
@@ -702,7 +702,7 @@ while %cycles_left% >= 0
         %quest% %actor% trigger 10147
         %send% %actor% You have finished quenching the cacti, and should return to the druid.
         %send% %actor% Your monsoon totem splinters and breaks!
-        %echoaround% %actor% %actor.name%'s ironwood totem splinters and breaks!
+        %echoaround% %actor% |%actor% ironwood totem splinters and breaks!
         %purge% %self%
       end
       halt
@@ -831,7 +831,7 @@ done
 Saguaro treant must-fight~
 0 s 100
 ~
-%send% %actor% You cannot flee from %self.name%!
+%send% %actor% You cannot flee from ~%self%!
 return 0
 ~
 #10150
@@ -843,13 +843,13 @@ if (%self.disabled% || %self.fighting%)
 end
 switch %random.3%
   case 1
-    %echo% %self.name% flits about overhead.
+    %echo% ~%self% flits about overhead.
   break
   case 2
-    %echo% %self.name% snatches a moth out of the air.
+    %echo% ~%self% snatches a moth out of the air.
   break
   case 3
-    %echo% %self.name% joins a swarm of bats overhead.
+    %echo% ~%self% joins a swarm of bats overhead.
     %purge% %self%
   break
 done
@@ -863,13 +863,13 @@ if (%self.disabled% || %self.fighting%)
 end
 switch %random.3%
   case 1
-    %echo% %self.name% suns itself on the rocks.
+    %echo% ~%self% suns itself on the rocks.
   break
   case 2
-    %echo% %self.name% flicks its tongue in search of a scent.
+    %echo% ~%self% flicks its tongue in search of a scent.
   break
   case 3
-    %echo% %self.name% crawls into a burrow in the ground.
+    %echo% ~%self% crawls into a burrow in the ground.
     %purge% %self%
   break
 done
@@ -883,14 +883,14 @@ if (%self.disabled% || %self.fighting%)
 end
 switch %random.3%
   case 1
-    %echo% %self.name% rolls up into a ball and rolls away from you.
+    %echo% ~%self% rolls up into a ball and rolls away from you.
     %purge% %self%
   break
   case 2
-    %echo% %self.name% digs at the ground until it finds a tasty grub.
+    %echo% ~%self% digs at the ground until it finds a tasty grub.
   break
   case 3
-    %echo% %self.name% scampers around in the dirt.
+    %echo% ~%self% scampers around in the dirt.
   break
 done
 ~
@@ -903,13 +903,13 @@ if (%self.disabled% || %self.fighting%)
 end
 switch %random.3%
   case 1
-    %echo% %self.name% pecks at loose seeds on the ground.
+    %echo% ~%self% pecks at loose seeds on the ground.
   break
   case 2
-    %echo% %self.name% picks through leaves and sticks, looking for insects.
+    %echo% ~%self% picks through leaves and sticks, looking for insects.
   break
   case 3
-    %echo% %self.name% pokes its head out from its home in a cactus.
+    %echo% ~%self% pokes its head out from its home in a cactus.
   break
 done
 ~
@@ -922,13 +922,13 @@ if (%self.disabled% || %self.fighting%)
 end
 switch %random.3%
   case 1
-    %echo% %self.name% stashes a seed in its cheek.
+    %echo% ~%self% stashes a seed in its cheek.
   break
   case 2
-    %echo% %self.name% grooms its long, thin tail.
+    %echo% ~%self% grooms its long, thin tail.
   break
   case 3
-    %echo% %self.name% scurries into the shade and hugs the cool ground.
+    %echo% ~%self% scurries into the shade and hugs the cool ground.
   break
 done
 ~
@@ -941,14 +941,14 @@ if (%self.disabled% || %self.fighting%)
 end
 switch %random.3%
   case 1
-    %echo% %self.name% rubs its horns against a shrub.
+    %echo% ~%self% rubs its horns against a shrub.
   break
   case 2
-    %echo% %self.name% runs off after an interloping ram.
+    %echo% ~%self% runs off after an interloping ram.
     %purge% %self%
   break
   case 3
-    %echo% %self.name% chews thoughtfully on a stray branch from a shrub.
+    %echo% ~%self% chews thoughtfully on a stray branch from a shrub.
   break
 done
 ~
@@ -961,13 +961,13 @@ if (%self.disabled% || %self.fighting%)
 end
 switch %random.3%
   case 1
-    %echo% %self.name% rustles through the ground litter, looking for bugs.
+    %echo% ~%self% rustles through the ground litter, looking for bugs.
   break
   case 2
-    %echo% %self.name% chirps and snorts at you.
+    %echo% ~%self% chirps and snorts at you.
   break
   case 3
-    %echo% %self.name% struts around with its long tail held straight up.
+    %echo% ~%self% struts around with its long tail held straight up.
   break
 done
 ~
@@ -999,8 +999,8 @@ if (%actor.char_target(%arg%)% != %self% || %actor.nohassle%)
   return 0
   halt
 end
-%send% %actor% You hug %self.name% and immediately realize your mistake as dozens of barbed spines stick into your skin!
-%echoaround% %actor% %actor.name% hugs %self.name% but immediately lets out a yelp of pain as dozens of barbed spines stick into %actor.hisher% skin!
+%send% %actor% You hug ~%self% and immediately realize your mistake as dozens of barbed spines stick into your skin!
+%echoaround% %actor% ~%actor% hugs ~%self% but immediately lets out a yelp of pain as dozens of barbed spines stick into ^%actor% skin!
 %dot% %actor% 100 10 physical 1
 return 1
 ~
@@ -1016,10 +1016,10 @@ switch %random.3%
     say Why won't anyone huuuug me?
   break
   case 2
-    %echo% %self.name% brushes its spines.
+    %echo% ~%self% brushes its spines.
   break
   case 3
-    %echo% You find %self.name% sitting dangerously close to your leg.
+    %echo% You find ~%self% sitting dangerously close to your leg.
   break
 done
 ~
@@ -1039,7 +1039,7 @@ while %cycles_left% >= 0
   if (%actor.room% != %room%) || !%actor.canuseroom_guest(%room%)% || !%location_valid% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < %start_cycles%
-      %echoaround% %actor% %actor.name%'s studying is interrupted.
+      %echoaround% %actor% |%actor% studying is interrupted.
       %send% %actor% Your studying is interrupted.
     elseif !%actor.canuseroom_guest(%room%)%
       %send% %actor% You don't have permission to study here.
@@ -1054,7 +1054,7 @@ while %cycles_left% >= 0
   * Fake ritual messages
   switch %cycles_left%
     case 5
-      %echoaround% %actor% %actor.name% grabs several books and starts studying the monsoon...
+      %echoaround% %actor% ~%actor% grabs several books and starts studying the monsoon...
       %send% %actor% You pull several books from their shelves and start studying the monsoon...
     break
     case 4
@@ -1070,7 +1070,7 @@ while %cycles_left% >= 0
       %send% %actor% It seems as if you should be able to close the rift using Sorcery, if you can find a good spell in one of these books...
     break
     case 0
-      %echoaround% %actor% %actor.name% closes %actor.hisher% books and puts them away.
+      %echoaround% %actor% ~%actor% closes ^%actor% books and puts them away.
       %send% %actor% You close your books and put them away...
       * Load the scroll for the next quest
       %load% obj 10175 %actor% inv
@@ -1152,7 +1152,7 @@ if (!%instance.location% || %self.room.template% != 10146)
   halt
 end
 mgoto %instance.location%
-%echo% A stream of mana flows from the rift, animating %self.name%!
+%echo% A stream of mana flows from the rift, animating ~%self%!
 detach 10166 %self.id%
 ~
 #10167
@@ -1177,7 +1177,7 @@ while %person%
   if %person% != %self% && %person.vnum% == %self.vnum%
     if !%person.aff_flagged(HIDE)%
       if %hide_again%
-        %echoaround% %person% %person.name% steps into the shadows and disappears.
+        %echoaround% %person% ~%person% steps into the shadows and disappears.
       end
     end
     %purge% %person%
@@ -1277,8 +1277,8 @@ if (%self.vampire% && %actor.skill(Vampire)% < 51) || (!%self.vampire% && %actor
 end
 visible
 wait 1
-%send% %actor% %self.name% steps out of the shadows to greet you.
-%echoaround% %actor% %self.name% steps out of the shadows to greet %actor.name%.
+%send% %actor% ~%self% steps out of the shadows to greet you.
+%echoaround% %actor% ~%self% steps out of the shadows to greet ~%actor%.
 * Reveal hide affect from self
 detach 10171 %self.id%
 ~
@@ -1319,9 +1319,9 @@ if %self.room.template% == 10146
   mmove
 elseif %self.room.distance(%start_room%)% > 20
   wait 1
-  %echo% %self.name% heads back to the portal.
+  %echo% ~%self% heads back to the portal.
   mgoto %start_room%
-  %echo% %self.name% arrives.
+  %echo% ~%self% arrives.
 end
 ~
 #10176
@@ -1378,7 +1378,7 @@ while %cycles_left% >= 0
   if (%actor.room% != %room%) || !%sector_valid% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the ritual
     if %cycles_left% < 5
-      %echoaround% %actor% %actor.name%'s ritual is interrupted.
+      %echoaround% %actor% |%actor% ritual is interrupted.
       %send% %actor% Your ritual is interrupted.
       * Refund blood here if we want to
     elseif !%sector_valid%
@@ -1399,23 +1399,23 @@ while %cycles_left% >= 0
         halt
       end
       nop %actor.blood(-%cost%)%
-      %echoaround% %actor% %actor.name% begins the eclipse ritual...
+      %echoaround% %actor% ~%actor% begins the eclipse ritual...
       %send% %actor% You begin the eclipse ritual...
     break
     case 4
-      %echoaround% %actor% %actor.name% holds a glowing bat totem up toward the sun...
+      %echoaround% %actor% ~%actor% holds a glowing bat totem up toward the sun...
       %send% %actor% You hold the glowing bat totem up toward the sun...
     break
     case 2
-      %echoaround% %actor% Tendrils of blood-red shadow stretch upward from %actor.name%'s bat totem...
+      %echoaround% %actor% Tendrils of blood-red shadow stretch upward from |%actor% bat totem...
       %send% %actor% Tendrils of blood-red shadow stretch upward from your bat totem...
     break
     case 1
-      %echoaround% %actor% As %actor.name% performs the eclipse ritual, the sun takes on a deep red color...
+      %echoaround% %actor% As ~%actor% performs the eclipse ritual, the sun takes on a deep red color...
       %send% %actor% As you perform the eclipse ritual, the sun takes on a deep red color....
     break
     case 0
-      %echoaround% %actor% %actor.name% completes %actor.hisher% ritual!
+      %echoaround% %actor% ~%actor% completes ^%actor% ritual!
       %send% %actor% You complete your ritual!
       * Echo the eclipse globally
       %regionecho% %actor.room% -9999 A dark shadow covers the land as the sun is momentarily eclipsed.
@@ -1516,7 +1516,7 @@ while %cycles_left% >= 0
   if (%actor.room% != %room%) || !%sector_valid% || !%rift_present% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < 5
-      %echoaround% %actor% %actor.name%'s ritual is interrupted.
+      %echoaround% %actor% |%actor% ritual is interrupted.
       %send% %actor% Your ritual is interrupted.
     elseif !%sector_valid%
       %send% %actor% You must perform the ritual at the monsoon rift.
@@ -1531,23 +1531,23 @@ while %cycles_left% >= 0
   * Fake ritual messages
   switch %cycles_left%
     case 5
-      %echoaround% %actor% %actor.name% pulls out some chalk and begins the rift ritual...
+      %echoaround% %actor% ~%actor% pulls out some chalk and begins the rift ritual...
       %send% %actor% You pull out some chalk and begin the rift ritual...
     break
     case 4
-      %echoaround% %actor% %actor.name% draws a square frame in the air around the rift...
+      %echoaround% %actor% ~%actor% draws a square frame in the air around the rift...
       %send% %actor% You draw a square frame in the air around the rift...
     break
     case 2
-      %echoaround% %actor% %actor.name% pulls and reshapes the chaotic rift until it looks more stable, like a portal...
+      %echoaround% %actor% ~%actor% pulls and reshapes the chaotic rift until it looks more stable, like a portal...
       %send% %actor% You pull and reshape the chaotic rift until it looks more stable, like a portal...
     break
     case 1
-      %echoaround% %actor% %actor.name% whispers into the rift...
+      %echoaround% %actor% ~%actor% whispers into the rift...
       %send% %actor% You whisper powerful words into the rift, weakening its ties to the Magiterranean...
     break
     case 0
-      %echoaround% %actor% %actor.name% completes %actor.hisher% ritual by grabbing the monsoon rift with %actor.hisher% hands and pulling it shut!
+      %echoaround% %actor% ~%actor% completes ^%actor% ritual by grabbing the monsoon rift with ^%actor% hands and pulling it shut!
       %send% %actor% You grab the monsoon rift with your hands and pull it shut!
       %quest% %actor% trigger 10145
       %send% %actor% %self.shortdesc% bursts into flames!
@@ -1626,7 +1626,7 @@ while %cycles_left% >= 0
   if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the action
     if %cycles_left% < 5
-      %echoaround% %actor% %actor.name%'s search is interrupted.
+      %echoaround% %actor% |%actor% search is interrupted.
       %send% %actor% Your search is interrupted.
     else
       * combat, stun, sitting down, etc
@@ -1637,27 +1637,27 @@ while %cycles_left% >= 0
   * Fake ritual messages
   switch %cycles_left%
     case 5
-      %echoaround% %actor% %actor.name% starts searching the druid's tent...
+      %echoaround% %actor% ~%actor% starts searching the druid's tent...
       %send% %actor% You start searching the druid's tent...
     break
     case 4
-      %echoaround% %actor% %actor.name% rummages through the druid's belongings...
+      %echoaround% %actor% ~%actor% rummages through the druid's belongings...
       %send% %actor% You rummage through the druid's belongings...
     break
     case 3
-      %echoaround% %actor% %actor.name% searches through the scrolls on the druid's shelves...
+      %echoaround% %actor% ~%actor% searches through the scrolls on the druid's shelves...
       %send% %actor% You search through the scrolls on the druid's shelves...
     break
     case 2
-      %echoaround% %actor% %actor.name% opens the druid's ironwood trunk and peers inside...
+      %echoaround% %actor% ~%actor% opens the druid's ironwood trunk and peers inside...
       %send% %actor% You open the druid's ironwood trunk and peer inside...
     break
     case 1
-      %echoaround% %actor% %actor.name% searches the druid's writing desk...
+      %echoaround% %actor% ~%actor% searches the druid's writing desk...
       %send% %actor% You search the druid's writing desk...
     break
     case 0
-      %echoaround% %actor% %actor.name% completes %actor.hisher% search!
+      %echoaround% %actor% ~%actor% completes ^%actor% search!
       %send% %actor% You complete your search!
       * Quest complete
       %load% obj 10178 %actor% inv

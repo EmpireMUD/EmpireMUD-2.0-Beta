@@ -132,7 +132,7 @@ eval to_room %%room_var.%direction%(room)%%
 if (%actor.nohassle% || !%to_room% || %to_room.template% < %room_var.template%)
   halt
 end
-%send% %actor% You can't seem to get past %self.name%!
+%send% %actor% You can't seem to get past ~%self%!
 return 0
 ~
 #10406
@@ -177,22 +177,22 @@ else
   switch %random.4%
     case 1
       if %actor.trigger_counterspell%
-        %send% %actor% %self.name% shoots a bolt of violet energy at you, but it breaks on your counterspell!
-        %echoaround% %actor% %self.name% shoots a bolt of violet energy at %actor.name%, but it breaks on %actor.hisher% counterspell!
+        %send% %actor% ~%self% shoots a bolt of violet energy at you, but it breaks on your counterspell!
+        %echoaround% %actor% ~%self% shoots a bolt of violet energy at ~%actor%, but it breaks on ^%actor% counterspell!
       else
-        %send% %actor% %self.name% shoots a bolt of violet energy at you!
-        %echoaround% %actor% %self.name% shoots a bolt of violet energy at %actor.name%!
+        %send% %actor% ~%self% shoots a bolt of violet energy at you!
+        %echoaround% %actor% ~%self% shoots a bolt of violet energy at ~%actor%!
         %damage% %actor% 100 magical
         %dot% %actor% 100 15 magical
       end
     break
     case 2
-      %send% %actor% %self.name% stares into your eyes. You can't move!
-      %echoaround% %actor% %self.name% stares into %actor.name%'s eyes. %actor.name% seems unable to move!
+      %send% %actor% ~%self% stares into your eyes. You can't move!
+      %echoaround% %actor% ~%self% stares into |%actor% eyes. ~%actor% seems unable to move!
       dg_affect %actor% HARD-STUNNED on 10
     break
     case 3
-      %echo% %self.name% raises %self.hisher% arms and the floor begins to rumble...
+      %echo% ~%self% raises ^%self% arms and the floor begins to rumble...
       wait 2 sec
       %echo% Bone hands rise from the floor and claw at you!
       %aoe% 100 physical
@@ -201,11 +201,11 @@ else
       set target %random.enemy%
       if (%target%)
         if %target.trigger_counterspell%
-          %send% %target% %self.name% shoots a bolt of violet energy at you, but it breaks on your counterspell!
-          %echoaround% %target% %self.name% shoots a bolt of violet energy at %target.name%, but it breaks on %target.hisher% counterspell!
+          %send% %target% ~%self% shoots a bolt of violet energy at you, but it breaks on your counterspell!
+          %echoaround% %target% ~%self% shoots a bolt of violet energy at ~%target%, but it breaks on ^%target% counterspell!
         else
-          %send% %target% %self.name% shoots a bolt of violet energy at you!
-          %echoaround% %target% %self.name% shoots a bolt of violet energy at %target.name%!
+          %send% %target% ~%self% shoots a bolt of violet energy at you!
+          %echoaround% %target% ~%self% shoots a bolt of violet energy at ~%target%!
           %damage% %target% 100 magical
           %dot% %target% 100 15 magical
         end
@@ -226,8 +226,8 @@ Necrofiend Combat~
 ~
 switch %random.2%
   case 1
-    %send% %actor% %self.name% shoots a poisoned spine at you!
-    %echoaround% %actor% %self.name% shoots a poisoned spine at %actor.name%!
+    %send% %actor% ~%self% shoots a poisoned spine at you!
+    %echoaround% %actor% ~%self% shoots a poisoned spine at ~%actor%!
     %damage% %actor% 50 physical
     if (%actor.poison_immunity% || (%actor.resist_poison% && %random.100% < 50))
       %dot% %actor% 100 15 poison
@@ -236,8 +236,8 @@ switch %random.2%
   case 2
     set target %random.enemy%
     if (%target%)
-      %send% %target% %self.name% shoots a poisoned spine at you!
-      %echoaround% %target% %self.name% shoots a poisoned spine at %target.name%!
+      %send% %target% ~%self% shoots a poisoned spine at you!
+      %echoaround% %target% ~%self% shoots a poisoned spine at ~%target%!
       %damage% %target% 50 physical
       if (%target.poison_immunity% || (%target.resist_poison% && %random.100% < 50))
         %dot% %target% 100 15 poison
@@ -256,17 +256,17 @@ else
   switch %random.3%
     case 1
       if %actor.trigger_counterspell%
-        %send% %actor% %self.name% hurls a flaming meteor at you, but it fizzles on your counterspell!
-        %echoaround% %actor% %self.name% hurls a flaming meteor at %actor.name%, but it fizzles on %actor.hisher% counterspell!
+        %send% %actor% ~%self% hurls a flaming meteor at you, but it fizzles on your counterspell!
+        %echoaround% %actor% ~%self% hurls a flaming meteor at ~%actor%, but it fizzles on ^%actor% counterspell!
       else
-        %send% %actor% %self.name% hurls a flaming meteor at you!
-        %echoaround% %actor% %self.name% hurls a flaming meteor at %actor.name%!
+        %send% %actor% ~%self% hurls a flaming meteor at you!
+        %echoaround% %actor% ~%self% hurls a flaming meteor at ~%actor%!
         %damage% %actor% 100 fire
         %dot% %actor% 100 15 fire
       end
     break
     case 2
-      %echo% %self.name% raises %self.hisher% arms and flames swirl around %self.himher%!
+      %echo% ~%self% raises ^%self% arms and flames swirl around *%self%!
       wait 2 sec
       %echo% Waves of flame wash over you, and smoke chokes your lungs!
       %aoe% 100 fire
@@ -275,11 +275,11 @@ else
       set target %random.enemy%
       if (%target%)
         if %target.trigger_counterspell%
-          %send% %target% %self.name% hurls a flaming meteor at you, but it fizzles on your counterspell!
-          %echoaround% %target% %self.name% hurls a flaming meteor at %target.name%, but it fizzles on %target.hisher% counterspell!
+          %send% %target% ~%self% hurls a flaming meteor at you, but it fizzles on your counterspell!
+          %echoaround% %target% ~%self% hurls a flaming meteor at ~%target%, but it fizzles on ^%target% counterspell!
         else
-          %send% %target% %self.name% hurls a flaming meteor at you!
-          %echoaround% %target% %self.name% hurls a flaming meteor at %target.name%!
+          %send% %target% ~%self% hurls a flaming meteor at you!
+          %echoaround% %target% ~%self% hurls a flaming meteor at ~%target%!
           %damage% %target% 100 fire
           %dot% %target% 100 15 fire
         end
@@ -324,10 +324,10 @@ switch %random.4%
     say Urrrrgggghh...
   break
   case 2
-    %echo% %self.name% looks hungry.
+    %echo% ~%self% looks hungry.
   break
   case 3
-    %echo% %self.name% picks its jaw up off the ground.
+    %echo% ~%self% picks its jaw up off the ground.
   break
   case 4
     say Brrrnnnn...
@@ -348,7 +348,7 @@ if (%actor.position% != Standing)
 end
 %load% m %self.val0%
 %send% %actor% You use %self.shortdesc% and a new mount appears!
-%echoaround% %actor% %actor.name% uses %self.shortdesc% and a new mount appears!
+%echoaround% %actor% ~%actor% uses %self.shortdesc% and a new mount appears!
 set mob %self.room.people%
 if (%mob% && %mob.vnum% == %self.val0%)
   nop %mob.unlink_instance%
@@ -450,13 +450,13 @@ else
   halt
 end
 if !%actor.can_afford(500)%
-  %send% %actor% %self.name% tells you, 'Human needs 500 coin to buy that.'
+  %send% %actor% ~%self% tells you, 'Human needs 500 coin to buy that.'
   halt
 end
 nop %actor.charge_coins(500)%
 %load% obj %vnum% %actor% inv
 %send% %actor% You buy %named% for 500 coins.
-%echoaround% %actor% %actor.name% buys %named%.
+%echoaround% %actor% ~%actor% buys %named%.
 ~
 #10458
 Pimmin purchase~
@@ -478,13 +478,13 @@ else
   halt
 end
 if !%actor.can_afford(500)%
-  %send% %actor% %self.name% tells you, 'Human needs 500 coin to buy that.'
+  %send% %actor% ~%self% tells you, 'Human needs 500 coin to buy that.'
   halt
 end
 nop %actor.charge_coins(500)%
 %load% obj %vnum% %actor% inv
 %send% %actor% You buy %named% for 500 coins.
-%echoaround% %actor% %actor.name% buys %named%.
+%echoaround% %actor% ~%actor% buys %named%.
 ~
 #10459
 Shivsper Purchase~
@@ -507,13 +507,13 @@ else
   halt
 end
 if !%actor.can_afford(500)%
-  %send% %actor% %self.name% tells you, 'Human needs 500 coin to buy that.'
+  %send% %actor% ~%self% tells you, 'Human needs 500 coin to buy that.'
   halt
 end
 nop %actor.charge_coins(500)%
 %load% obj %vnum% %actor% inv
 %send% %actor% You buy %named% for 500 coins.
-%echoaround% %actor% %actor.name% buys %named%.
+%echoaround% %actor% ~%actor% buys %named%.
 ~
 #10460
 Wargreyn buy~
@@ -535,12 +535,12 @@ else
   halt
 end
 if !%actor.can_afford(500)%
-  %send% %actor% %self.name% tells you, 'Human needs 500 coin to buy that.'
+  %send% %actor% ~%self% tells you, 'Human needs 500 coin to buy that.'
   halt
 end
 nop %actor.charge_coins(500)%
 %load% obj %vnum% %actor% inv
 %send% %actor% You buy %named% for 500 coins.
-%echoaround% %actor% %actor.name% buys %named%.
+%echoaround% %actor% ~%actor% buys %named%.
 ~
 $

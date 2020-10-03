@@ -85,7 +85,7 @@ set BuildRoom %self.room%
 wait 5 s
 if !%actor.fighting% && %BuildRoom% == %self.room%
   %send% %actor% You shape the newly made snow into a perfect snowball for your snowman.
-  %echoaround% %actor% %player_name% shapes the newly made snow into a perfect snowball for %actor.hisher% snowman.
+  %echoaround% %actor% %player_name% shapes the newly made snow into a perfect snowball for ^%actor% snowman.
   %load% obj 16605 %actor% inv
   nop %actor.set_cooldown(16600, 30)%
 else
@@ -117,13 +117,13 @@ else
       halt
     end
   end
-  %send% %actor% You use all of your vampire know-how to prick %target.name%'s neck and hide the vial of blood before anyone notices.
-  %echoaround% %actor% %actor.name% does something near %target.name%, but it happens so fast you can't tell what.
+  %send% %actor% You use all of your vampire know-how to prick |%target% neck and hide the vial of blood before anyone notices.
+  %echoaround% %actor% ~%actor% does something near ~%target%, but it happens so fast you can't tell what.
   %load% obj 16603 %actor% inv
   set vial %self.carried_by.obj_target_inv(vial)%
   %mod% %vial% keywords vial blood %target.name%
-  %mod% %vial% shortdesc a vial of %target.name%'s blood
-  %mod% %vial% longdesc A vial of %target.name%'s blood is here for the taking.
+  %mod% %vial% shortdesc a vial of |%target% blood
+  %mod% %vial% longdesc A vial of |%target% blood is here for the taking.
 end
 %purge% %self%
 ~
@@ -181,7 +181,7 @@ grinchy death~
 0 f 100
 ~
 return 0
-%echo% %self.name% throws ornaments everywhere and vanishes in the chaos!
+%echo% ~%self% throws ornaments everywhere and vanishes in the chaos!
 set person %self.room.people%
 while %person%
   %quest% %person% trigger 16613
@@ -244,7 +244,7 @@ if %grinch_level% == 0
 end
 set SelfLevel %self.level%
 eval grinch_dam %SelfLevel% / 15 * ( %grinch_level% + 1 )
-%echo% %self.name% shoves christmas fudge in %self.hisher% face.
+%echo% ~%self% shoves christmas fudge in ^%self% face.
 wait 3 s
 say Is that all you got!
 dg_affect #16606 %self% BONUS-PHYSICAL %grinch_dam% -1
@@ -286,7 +286,7 @@ if %old_xmas_tree%
     nop %use_a_lighter.used_lighter(%actor%)%
   end
   %send% %actor% You light %old_xmas_tree.shortdesc% on fire!
-  %echoaround% %actor% %actor.name% lights %old_xmas_tree.shortdesc% on fire!
+  %echoaround% %actor% ~%actor% lights %old_xmas_tree.shortdesc% on fire!
   %load% obj 1002 room
   %purge% %old_xmas_tree%
 end
@@ -465,7 +465,7 @@ if !%room.is_outdoors%
   halt
 end
 %send% %actor% You spread %self.shortdesc%, lay down, and swiftly make a snow angel on the ground.
-%echoaround% %actor% %actor.name% spreads %self.shortdesc%, lays down, and swiftly makes a snow angel on the ground.
+%echoaround% %actor% ~%actor% spreads %self.shortdesc%, lays down, and swiftly makes a snow angel on the ground.
 %load% obj 16609 room
 nop %actor.set_cooldown(16610, 30)%
 if !%self.varexists(angel_count)%
@@ -607,13 +607,13 @@ if %actor.inventory(16612)%
   halt
 end
 if %actor.cooldown(16601)% > 5
-  %send% %actor% %self.name% is highly upset with you and tosses you out!
-  %echoaround% %actor% %self.name% grabs %actor.name% and throws %actor.himher% out!
+  %send% %actor% ~%self% is highly upset with you and tosses you out!
+  %echoaround% %actor% ~%self% grabs ~%actor% and throws *%actor% out!
   %teleport% %actor% %instance.location%
   %force% %actor% look
   halt
 elseif %actor.cooldown(16601)%
-  %send% %actor% You probably shouldn't do that, %self.name% almost caught you once already.
+  %send% %actor% You probably shouldn't do that, ~%self% almost caught you once already.
   nop %actor.set_cooldown(16601, 30)%
   halt
 end
@@ -624,7 +624,7 @@ if %actor.skill(stealth)% >= %theft_roll%
   %send% %actor% You find %item.shortdesc%!
 else
   nop %actor.set_cooldown(16601, 5)%
-  %send% %actor% %self.name% turns in your direction and you have to abort your theft.
+  %send% %actor% ~%self% turns in your direction and you have to abort your theft.
 end
 ~
 #16613
@@ -684,7 +684,7 @@ while %cycles_left% >= 0
   if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < 3
-      %echoaround% %actor% %actor.name%'s summoning is interrupted.
+      %echoaround% %actor% |%actor% summoning is interrupted.
       %send% %actor% Your summoning is interrupted.
     else
       %send% %actor% You can't do that now.
@@ -717,7 +717,7 @@ if %mob.vnum% != 16613
   %echo% Something went wrong...
   halt
 end
-%echo% %mob.name% sidles into view and you rush forward with %self.shortdesc%!
+%echo% ~%mob% sidles into view and you rush forward with %self.shortdesc%!
 if %difficulty% == 1
   * Then we don't need to do anything
 elseif %difficulty% == 2
@@ -764,7 +764,7 @@ if %grinch_level% == 1 && %grinch_roll% > 30
 elseif %grinch_level% == 2 && %grinch_roll% > 60
   halt
 end
-%echo% %self.name% shouts, "get 'hem Max!"
+%echo% ~%self% shouts, "get 'hem Max!"
 %load% mob 16614 ally
 nop %self.set_cooldown(16617, 90)%
 ~
@@ -804,16 +804,16 @@ switch %random.3%
     if !%self.cooldown(16615)%
       say %grinch_gift_is%
       if %grinch_level% == 1
-        %send% %actor% %self.name% pulls out a gift and throws it at you!
-        %echoaround% %actor% %self.name% pulls out a gift and throws it at %actor.name%!
+        %send% %actor% ~%self% pulls out a gift and throws it at you!
+        %echoaround% %actor% ~%self% pulls out a gift and throws it at ~%actor%!
         %damage% %actor% 100
       elseif %grinch_level% == 2
         set grinch_target %random.enemy%
-        %send% %grinch_target% %self.name% pulls out a gift and throws it at you!
-        %echoaround% %grinch_target% %self.name% pulls out a gift and throws it at %grinch_target.name%!
+        %send% %grinch_target% ~%self% pulls out a gift and throws it at you!
+        %echoaround% %grinch_target% ~%self% pulls out a gift and throws it at ~%grinch_target%!
         %damage% %grinch_target% 100
       elseif %grinch_level% == 3
-        %echo% %self.name% pulls out a gift and throws it on the ground, causing everyone to go flying!
+        %echo% ~%self% pulls out a gift and throws it on the ground, causing everyone to go flying!
         %aoe% 100
       end
       nop %self.set_cooldown(16615, 30)%
@@ -828,8 +828,8 @@ switch %random.3%
       end
       nop %self.set_cooldown(16613, 30)%
       if %grinch_level% != 0
-        %send% %actor% %self.name% glares at you and you shiver in fear.
-        %echoaround% %actor% %self.name% glares at %actor.name% and %actor.heshe% shudders in fear.
+        %send% %actor% ~%self% glares at you and you shiver in fear.
+        %echoaround% %actor% ~%self% glares at ~%actor% and &%actor% shudders in fear.
         dg_affect #16612 %actor% dodge -%actor.level% %grinch_timer%
       end
     end
@@ -839,10 +839,10 @@ switch %random.3%
       nop %self.set_cooldown(16614, 45)%
       set running 1
       remote running %self.id%
-      %echo% %self.name% starts to swing a thirty-nine-and-a-half foot pole.
+      %echo% ~%self% starts to swing a thirty-nine-and-a-half foot pole.
       %echo% &&YYou'd better duck!&&0
       wait 10 sec
-      %echo% %self.name% swings the pole like a bat!
+      %echo% ~%self% swings the pole like a bat!
       set running 0
       remote running %self.id%
       set room %self.room%
@@ -861,13 +861,13 @@ switch %random.3%
           end
           if %command% != duck
             %send% %person% &&rYou are knocked senseless by the thirty-nine-and-a-half foot pole!
-            %echoaround% %person% %person.name% is knocked senseless by the thirty-nine-and-a-half foot pole!
+            %echoaround% %person% ~%person% is knocked senseless by the thirty-nine-and-a-half foot pole!
             eval grinch_damage %grinch_level% * 50 + 20
             %damage% %person% %grinch_damage% physical
             dg_affect #16616 %person% STUNNED on 5
           else
             %send% %person% You limbo under the pole and safely straighten back up.
-            %echoaround% %person% %person.name% safely limbos under the pole.
+            %echoaround% %person% ~%person% safely limbos under the pole.
           end
         end
         set person %person.next_in_room%
@@ -898,7 +898,7 @@ if %self.varexists(command_%actor.id%)%
 end
 set command_%actor.id% duck
 %send% %actor% You stand your ground and prepare to duck...
-%echoaround% %actor% %actor.name% stands %actor.hisher% ground and prepares to duck...
+%echoaround% %actor% ~%actor% stands ^%actor% ground and prepares to duck...
 remote command_%actor.id% %self.id%
 ~
 #16617
@@ -907,7 +907,7 @@ melting snowman~
 ~
 wait 1 s
 if !%self.room.in_city%
-  %echo% %self.name% melts into a puddle from the heat.
+  %echo% ~%self% melts into a puddle from the heat.
   %purge% %self%
 end
 if !%self.varexists(melt_counter)%
@@ -922,7 +922,7 @@ else
 end
 eval melt_counter %melt_counter% + %AddMelt%
 if %melt_counter% >= 20
-  %echo% %self.name% melts into a puddle from the heat.
+  %echo% ~%self% melts into a puddle from the heat.
   %purge% %self%
 else
   remote melt_counter %self.id%
@@ -978,8 +978,8 @@ if %actor.on_quest(16618)%
     end
   end
 end
-%send% %actor% You dress %target.name% with %self.shortdesc%.
-%echoaround% %actor% %actor.name% dresses %target.name% with %self.shortdesc%.
+%send% %actor% You dress ~%target% with %self.shortdesc%.
+%echoaround% %actor% ~%actor% dresses ~%target% with %self.shortdesc%.
 %morph% %target% %morphnum%
 eval dress_up_counter %dress_up_counter% - 1
 if %dress_up_counter% > 0
@@ -997,7 +997,7 @@ Max the reindeer dog no-death~
 0 f 100
 ~
 return 0
-%echo% %self.name% yelps and runs off before you can stop him!
+%echo% ~%self% yelps and runs off before you can stop him!
 ~
 #16620
 hanging winter holiday ornaments~
@@ -1024,22 +1024,22 @@ end
 switch %ornament_counter%
   case 1
     %send% %actor% You begin your decorating by stringing strands of garland all about the area.
-    %echoaround% %actor% %actor.name% begins %actor.hisher% decorating by stringing strands of garland all about the area.
+    %echoaround% %actor% ~%actor% begins ^%actor% decorating by stringing strands of garland all about the area.
     %load% obj 16621 room
   break
   case 2
     %send% %actor% You decide it's time to place the candy cane hanging somewhere, and here looks like the perfect spot.
-    %echoaround% %actor% As you watch, %actor.name% strings up a candy cane hanging as part of %actor.hisher% efforts to prepare for the winter holiday.
+    %echoaround% %actor% As you watch, ~%actor% strings up a candy cane hanging as part of ^%actor% efforts to prepare for the winter holiday.
     %load% obj 16622 room
   break
   case 3
     %send% %actor% You carefully carry the faerie lantern to the center of the area and place it on the ground, then back away and admire the bright illumination it gives off.
-    %echoaround% %actor% %actor.name% slowly walks to the center of the area with a faerie lantern in %actor.hisher% hands. As %actor.heshe% backs away, you can't help but admire the illumination it gives off.
+    %echoaround% %actor% ~%actor% slowly walks to the center of the area with a faerie lantern in ^%actor% hands. As &%actor% backs away, you can't help but admire the illumination it gives off.
     %load% obj 16623 room
   break
   case 4
     %send% %actor% You lift the reindeer hoofprint stamp and begin to deliver hammerblows to the ground, leaving behind realistic tracks, giving the impression there was a live reindeer here.
-    %echoaround% %actor% %actor.name% takes out a reindeer hoofprint stamp and begins delivering hammerblows to the ground. The end result is some realistic tracks, giving the impression there was a live reindeer here.
+    %echoaround% %actor% ~%actor% takes out a reindeer hoofprint stamp and begins delivering hammerblows to the ground. The end result is some realistic tracks, giving the impression there was a live reindeer here.
     %load% obj 16624 room
     %quest% %actor% trigger 16620
   break
@@ -1065,16 +1065,16 @@ winter pixy spawn~
 ~
 switch %random.4%
   case 1
-    %echo% You see %self.name% out of the corner of your eye.
+    %echo% You see ~%self% out of the corner of your eye.
   break
   case 2
     %echo% What looks like a flying snowball wizzes by.
   break
   case 3
-    %echo% %self.name% dances in midair.
+    %echo% ~%self% dances in midair.
   break
   case 4
-    %echo% Snow flies everywhere as %self.name% spins in circles.
+    %echo% Snow flies everywhere as ~%self% spins in circles.
   break
 done
 eval movement %random.11% - 1
@@ -1123,9 +1123,9 @@ if !%target%
   halt
 end
 if %target.is_npc% && %target.vnum% == 16624
-  %send% %actor% You point %self.shortdesc% at %target.name% and unleash a blast of icy magic!
-  %echoaround% %actor% %actor.name% points %self.shortdesc% at %target.name% and unleashes a blast of icy magic!
-  %echo% %target.name% is covered in a layer of ice and becomes motionless.
+  %send% %actor% You point %self.shortdesc% at ~%target% and unleash a blast of icy magic!
+  %echoaround% %actor% ~%actor% points %self.shortdesc% at ~%target% and unleashes a blast of icy magic!
+  %echo% ~%target% is covered in a layer of ice and becomes motionless.
   return 1
 else
   %send% %actor% You can only use %self.shortdesc% on the winter pixies.
@@ -1147,18 +1147,18 @@ set carried_by %self.carried_by%
 set pixy_rng %random.100%
 if %pixy_rng% <= 60
   %send% %carried_by% %self.shortdesc% thaws out and suddenly vanishes in a poof of dust!
-  %echoaround% %carried_by% %carried_by.name% is mysteriously engulfed in a cloud of dust!
+  %echoaround% %carried_by% ~%carried_by% is mysteriously engulfed in a cloud of dust!
 elseif %pixy_rng% <= 80
   %send% %carried_by% %self.shortdesc% melts in your hands, but the cold seems to intensify until you're frozen yourself!
-  %echoaround% %carried_by% %carried_by.name% starts turning blue, and eventually comes to a halt as though frozen in place!
+  %echoaround% %carried_by% ~%carried_by% starts turning blue, and eventually comes to a halt as though frozen in place!
   dg_affect #16625 %carried_by% HARD-STUNNED on 60
 elseif %pixy_rng% <= 95
   %send% %carried_by% %self.shortdesc% warms and angrily covers you in dust, you feel drunk all of a sudden!
-  %echoaround% %carried_by% %carried_by.name% sparkles for a moment and begins to stagger.
+  %echoaround% %carried_by% ~%carried_by% sparkles for a moment and begins to stagger.
   nop %carried_by.drunk(30)%
 else
   %send% %carried_by% %self.shortdesc% has apparently thawed out and is quite furious with you!
-  %echoaround% %carried_by% A furious pixy begins to attack %carried_by.name% out of no where!
+  %echoaround% %carried_by% A furious pixy begins to attack ~%carried_by% out of no where!
   %load% mob 16625 room
   %force% %self.room.people% kill %carried_by.name%
 end
@@ -1184,12 +1184,12 @@ end
 if !%christmas_tree.varexists(pixy_topped_off)%
   %mod% %christmas_tree% append-lookdesc-noformat On top %self.shortdesc% sits, frozen in place.
   %send% %actor% You place %self.shortdesc% on top of %christmas_tree.shortdesc%.
-  %echoaround% %actor% %actor.name% places %self.shortdesc% on top of %christmas_tree.shortdesc%.
+  %echoaround% %actor% ~%actor% places %self.shortdesc% on top of %christmas_tree.shortdesc%.
   set pixy_topped_off 1
   remote pixy_topped_off %christmas_tree.id%
 else
   %send% %actor% You remove %christmas_tree.player_topped_tree%'s pixy from %christmas_tree.shortdesc% and throw it away, before placing your own.
-  %echoaround% %actor% %actor.name% removes %christmas_tree.player_topped_tree%'s pixy from %christmas_tree.shortdesc% and throws it away, before placing %actor.hisher% own on top.
+  %echoaround% %actor% ~%actor% removes %christmas_tree.player_topped_tree%'s pixy from %christmas_tree.shortdesc% and throws it away, before placing ^%actor% own on top.
 end
 set player_topped_tree %actor.name%
 remote player_topped_tree %christmas_tree.id%
@@ -1218,7 +1218,7 @@ if %buffnum% != 16621 && %buffnum% != 16622 && %buffnum% != 16623 && %buffnum% !
 end
 otimer 1152
 %send% %actor% You buff %buffing.shortdesc% with a cloth, extending the beauty.
-%echoaround% %actor% %actor.name% buffs %buffing.shortdesc% with a cloth, extending the beauty.
+%echoaround% %actor% ~%actor% buffs %buffing.shortdesc% with a cloth, extending the beauty.
 ~
 #16628
 throw the enchanted snowball~
@@ -1251,11 +1251,11 @@ else
   %send% %actor% You can only freeze the abominable snowman with %self.shortdesc%.
   halt
 end
-%send% %actor% You throw %self.shortdesc% at %AbominableSnowmanHere.name% with all your might...
-%echoaround% %actor% %actor.name% throws %self.shortdesc% at %AbominableSnowmanHere.name% with all %actor.hisher% might...
+%send% %actor% You throw %self.shortdesc% at ~%AbominableSnowmanHere% with all your might...
+%echoaround% %actor% ~%actor% throws %self.shortdesc% at ~%AbominableSnowmanHere% with all ^%actor% might...
 %load% obj 16630 room
 wait 1
-%echo% Instantly %AbominableSnowmanHere.name% freezes solid!
+%echo% Instantly ~%AbominableSnowmanHere% freezes solid!
 %purge% %AbominableSnowmanHere%
 %quest% %actor% trigger 16628
 if %actor.quest_finished(16628)%
@@ -1285,7 +1285,7 @@ end
 nop %actor.add_resources(1300, -6)%
 %load% obj 16628 %actor% inv
 %send% %actor% You enchant %self.shortdesc% with freezing.
-%echoaround% %actor% %actor.name% enchants %self.shortdesc% with freezing.
+%echoaround% %actor% ~%actor% enchants %self.shortdesc% with freezing.
 %purge% %self%
 ~
 #16630
@@ -1299,22 +1299,22 @@ remote SnowmanUnderAttack %self.room.people.id%
 set AbominableSnowman %self.room.people%
 switch %random.4%
   case 1
-    %echo% %AbominableSnowman.name% roars and begins to swing at %self.name%!
+    %echo% ~%AbominableSnowman% roars and begins to swing at ~%self%!
   break
   case 2
-    %echo% Suddenly, a white blur lunges at %self.name% and you see %AbominableSnowman.name% hit it!
+    %echo% Suddenly, a white blur lunges at ~%self% and you see ~%AbominableSnowman% hit it!
   break
   case 3
-    %echo% %AbominableSnowman.name% comes out of nowhere and begins to deal blows to %self.name%!
+    %echo% ~%AbominableSnowman% comes out of nowhere and begins to deal blows to ~%self%!
   break
   case 4
-    %echo% Snow flies everywhere as %AbominableSnowman.name% pops up and violently strikes %self.name%!
+    %echo% Snow flies everywhere as ~%AbominableSnowman% pops up and violently strikes ~%self%!
   break
 done
 %teleport% %self% %self.room%
 %force% %AbominableSnowman% kill %self.pc_name%
 wait 1
-%send% %self.PlayerOnAbominableQuest% %self.name% tells you, 'The abominable snowman is here at %self.room.name%!'
+%send% %self.PlayerOnAbominableQuest% ~%self% tells you, 'The abominable snowman is here at %self.room.name%!'
 ~
 #16631
 snowman target will not escape~
@@ -1322,7 +1322,7 @@ snowman target will not escape~
 ~
 if %actor.id% == %self.SnowmanUnderAttack%
   return 0
-  %echo% %self.name% growls and drags %actor.name% back.
+  %echo% ~%self% growls and drags ~%actor% back.
   mkill %actor%
 end
 ~
@@ -1331,9 +1331,9 @@ abominable kills regular snowman~
 0 z 100
 ~
 if %actor.vnum% == 16600
-  %send% %actor.PlayerOnAbominableQuest% %self.name% tells you, 'You obviously aren't a very good protector, %actor.name% is mush.'
+  %send% %actor.PlayerOnAbominableQuest% ~%self% tells you, 'You obviously aren't a very good protector, ~%actor% is mush.'
   wait 1
-  %echo% %self.name% runs off!
+  %echo% ~%self% runs off!
   %purge% %self%
 else
   set person %self.room.people%
@@ -1367,11 +1367,11 @@ snowman has lived too long~
 if %self.varexists(IWasBornOn)%
   eval SinceLoaded %dailycycle% - %self.IWasBornOn%
 else
-  %echo% %self.name% melts after such a long time of standing around.
+  %echo% ~%self% melts after such a long time of standing around.
   %purge% %self%
 end
 if %SinceLoaded% >= 3 || !%event.running(10700)%
-  %echo% %self.name% melts after such a long time of standing around.
+  %echo% ~%self% melts after such a long time of standing around.
   %purge% %self%
 end
 ~
@@ -1431,16 +1431,16 @@ end
 * READY:
 if %sleigh.contents%
   %send% %actor% You empty out %sleigh.shortdesc%...
-  %echoaround% %actor% %actor.name% empties out %sleigh.shortdesc%...
+  %echoaround% %actor% ~%actor% empties out %sleigh.shortdesc%...
   nop %sleigh.dump%
 end
 if %sleigh.animals_harnessed% > 1
   %send% %actor% You unharness the animals from %sleigh.shortdesc%...
-  %echoaround% %actor% %actor.name% unharnesses the animals from %sleigh.shortdesc%...
+  %echoaround% %actor% ~%actor% unharnesses the animals from %sleigh.shortdesc%...
   nop %sleigh.unharness%
 elseif %sleigh.animals_harnessed% > 0
   %send% %actor% You unharness the animal from %sleigh.shortdesc%...
-  %echoaround% %actor% %actor.name% unharnesses the animal from %sleigh.shortdesc%...
+  %echoaround% %actor% ~%actor% unharnesses the animal from %sleigh.shortdesc%...
   nop %sleigh.unharness%
 end
 %load% veh 16650
@@ -1448,7 +1448,7 @@ set upgr %self.room.vehicles%
 if %upgr.vnum% == 16650
   %own% %upgr% %sleigh.empire%
   %send% %actor% You polish %sleigh.shortdesc% with %self.shortdesc%...
-  %echoaround% %actor% %actor.name% polishes %sleigh.shortdesc% with %self.shortdesc%...
+  %echoaround% %actor% ~%actor% polishes %sleigh.shortdesc% with %self.shortdesc%...
   %echo% It begins to fly!
   %purge% %sleigh%
   %purge% %self%
@@ -1502,7 +1502,7 @@ else
   halt
 end
 * if we get here, we used it successfully
-%echoaround% %actor% %actor.name% uses %self.shortdesc%!
+%echoaround% %actor% ~%actor% uses %self.shortdesc%!
 %purge% %self%
 ~
 #16655
@@ -1532,7 +1532,7 @@ if %target.is_flagged(SUPERIOR)% || %target.vnum% == 16654
   halt
 end
 %send% %actor% You sprinkle %self.shortdesc% onto %target.shortdesc%...
-%echoaround% %actor% %actor.name% sprinkles %self.shortdesc% onto %target.shortdesc%...
+%echoaround% %actor% ~%actor% sprinkles %self.shortdesc% onto %target.shortdesc%...
 %echo% %target.shortdesc% begins to shimmer and glow!
 if %target.vnum% == 16653
   * sweater version: replace item
@@ -1591,11 +1591,11 @@ if %random.2% == 2
   set pers2 %temp%
 end
 * found 2 people!
-%send% %pers1% You notice you're under the mistletoe with %pers2.name%...
-%send% %pers2% You notice you're under the mistletoe with %pers1.name%...
-%send% %pers1% You lean over and kiss %pers2.name% on the cheek!
-%send% %pers2% %pers1.name% leans over and kisses you on the cheek!
-%echoneither% %pers1% %pers2% %pers1.name% leans over and kisses %pers2.name% on the cheek!
+%send% %pers1% You notice you're under the mistletoe with ~%pers2%...
+%send% %pers2% You notice you're under the mistletoe with ~%pers1%...
+%send% %pers1% You lean over and kiss ~%pers2% on the cheek!
+%send% %pers2% ~%pers1% leans over and kisses you on the cheek!
+%echoneither% %pers1% %pers2% ~%pers1% leans over and kisses ~%pers2% on the cheek!
 ~
 #16657
 Spin Dreidel~
@@ -1629,7 +1629,7 @@ done
 * Main work
 nop %actor.set_cooldown(16657, 3)%
 %send% %actor% You spin %self.shortdesc%...
-%echoaround% %actor% %actor.name% spins %self.shortdesc%...
+%echoaround% %actor% ~%actor% spins %self.shortdesc%...
 %echo% It falls down showing '%sign%'.
 remote sign %self.id%
 * Strings
@@ -1725,7 +1725,7 @@ else
   set vnum 11513
 end
 %send% %actor% You open %self.shortdesc%...
-%echoaround% %actor% %actor.name% opens %self.shortdesc%...
+%echoaround% %actor% ~%actor% opens %self.shortdesc%...
 %load% obj %vnum% %actor%
 set gift %actor.inventory%
 if %gift.vnum% == %vnum%
@@ -1760,7 +1760,7 @@ if !%target%
   halt
 end
 set val %target.gain_event_points(10700,%arg.cdr%)%
-%send% %actor% You have modified %target.name%'s event points by %arg.cdr%.
-%send% %actor% %target.heshe% now has %val% points.
+%send% %actor% You have modified |%target% event points by %arg.cdr%.
+%send% %actor% &%target% now has %val% points.
 ~
 $

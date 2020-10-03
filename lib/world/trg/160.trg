@@ -20,7 +20,7 @@ if %self.cooldown(16001)%
   halt
 end
 if %self.affect(BLIND)%
-  %echo% %self.name%'s eyes shine extra bright, and %self.hisher% vision returns!
+  %echo% |%self% eyes shine extra bright, and ^%self% vision returns!
   dg_affect %self% BLIND off 1
 end
 say If you insist on this course of action... Then try this on for size!
@@ -41,7 +41,7 @@ if %self.cooldown(16002)%
   halt
 end
 if %self.affect(BLIND)%
-  %echo% %self.name%'s eyes shine extra bright, and %self.hisher% vision returns!
+  %echo% |%self% eyes shine extra bright, and ^%self% vision returns!
   dg_affect %self% BLIND off 1
 end
 say You handled the last round easy enough, but how about this experiment?
@@ -63,7 +63,7 @@ if %self.cooldown(16003)%
   halt
 end
 if %self.affect(BLIND)%
-  %echo% %self.name%'s eyes shine extra bright, and %self.hisher% vision returns!
+  %echo% |%self% eyes shine extra bright, and ^%self% vision returns!
   dg_affect %self% BLIND off 1
 end
 say Fine then! Now you can meet, my rawhead!
@@ -91,7 +91,7 @@ if %actor.obj_target(%arg%)% != %self%
   halt
 end
 if !%actor.aff_flagged(blind)%
-  %echoaround% %actor% %actor.name% upends an entire bag of bone dust over %actor.hisher% head.
+  %echoaround% %actor% ~%actor% upends an entire bag of bone dust over ^%actor% head.
   %send% %actor% You dump a full bag of bone dust over your head and even as you lose your sight, you feel the protective spell take hold.
   dg_affect %actor% blind on 10
   dg_affect %actor% resist-magical 32 10
@@ -108,7 +108,7 @@ undead blocking~
 ~
 if %actor.is_pc%
   if %actor.can_see(%self%)%
-    %send% %actor% %self.name% won't let you pass!
+    %send% %actor% ~%self% won't let you pass!
   else
     mkill %actor%
   end
@@ -153,12 +153,12 @@ if !%target%
   halt
 end
 if !%target.mob_flagged(mountable)%
-  %send% %actor% You are unable to implant %self.shortdesc% into %target.name%.
+  %send% %actor% You are unable to implant %self.shortdesc% into ~%target%.
   unset target
   halt
 else
-  %send% %actor% You stab %self.shortdesc% into %target.name%'s neck and watch the mutation begin.
-  %echoaround% %actor% As %actor.name% stabs %self.shortdesc% into %target.name%'s neck, a horrific transformation takes place.
+  %send% %actor% You stab %self.shortdesc% into |%target% neck and watch the mutation begin.
+  %echoaround% %actor% As ~%actor% stabs %self.shortdesc% into |%target% neck, a horrific transformation takes place.
   set beast_chance %random.100%
   if %beast_chance% == (6)
     eval monster_level %actor.level% + 13
@@ -225,7 +225,7 @@ end
 mutant mounts die~
 0 f 100
 ~
-%echo% As %self.name% dies, it crumbles and returned to the earth.
+%echo% As ~%self% dies, it crumbles and returned to the earth.
 ~
 #16011
 necrogoblin trigger reattach~
@@ -272,7 +272,7 @@ if %actor.obj_target(%arg%)% == %self%
     %send% %actor% The disc of solidified blood melts as it touches the barier and allows you to pass.
   else
     %send% %actor% You bounce off of a magical barier. Seems there's a key of some sort needed to get through.
-    %echoaround% %actor% You watch %actor.name% flatten %actor.hisher% nose against a magical barier.
+    %echoaround% %actor% You watch ~%actor% flatten ^%actor% nose against a magical barier.
     return 1
   end
 else
@@ -325,7 +325,7 @@ end
 wandering vamps~
 0 n 100
 ~
-%echo% %self.name% appears from the shadows and flashes out through the arch.
+%echo% ~%self% appears from the shadows and flashes out through the arch.
 mgoto %instance.location%
 mmove
 mmove
@@ -356,7 +356,7 @@ tripping in the cave~
 2 g 70
 ~
 if !%actor.is_flying% && %actor.is_pc%
-  %echoaround% %actor% %actor.name% trips on the uneven ground and hits the dirt.
+  %echoaround% %actor% ~%actor% trips on the uneven ground and hits the dirt.
   %send% %actor% Your foot catches on something and you drop to the ground.
   dg_affect %actor% stunned on 6
 end
@@ -369,7 +369,7 @@ switch %random.5%
   case 1
     set dead_char %random.enemy%
     %send% %dead_char% A lightning bolt comes down from the roof and sends your rings flying.
-    %echoaround% %dead_char% A lightningbolt strikes %dead_char.name% and blows %dead_char.hisher% rings off %dead_char.hisher% hands!
+    %echoaround% %dead_char% A lightningbolt strikes ~%dead_char% and blows ^%dead_char% rings off ^%dead_char% hands!
   break
   case 2
     %echo% All of the exits brick over as the vampire smirks.
@@ -379,23 +379,23 @@ switch %random.5%
     set dead_char %random.enemy%
     dg_affect %dead_char% stoned on 180
     %send% %dead_char% A flash from the illusionist's hand forces you to shut your eyes and when you open them again, the world doesn't quite look the same.
-    %echoaround% %dead_char% A flash of light strikes %dead_char.name% with no visible affect.
+    %echoaround% %dead_char% A flash of light strikes ~%dead_char% with no visible affect.
   break
   case 4
     set dead_char %random.enemy%
     %send% %dead_char% A blade spins out of no where and carves a line across your throat.
-    %echoaround% %dead_char% A blade comes flying through the air and opens %dead_char.name%'s throat.
+    %echoaround% %dead_char% A blade comes flying through the air and opens |%dead_char% throat.
     wait 3 sec
     %send% %dead_char% Blood sprays all down your front.
-    %echoaround% %dead_char% Blood sprays all down %dead_char.hisher% front.
+    %echoaround% %dead_char% Blood sprays all down ^%dead_char% front.
     wait 2 sec
     %echo% The mess vanishes, wound and all.
   break
   case 5
-    %echo% Blood begins to fill the room as %self.name% floats up to the ceiling.
+    %echo% Blood begins to fill the room as ~%self% floats up to the ceiling.
     say Drown! drown, in blood!
     wait 5 sec
-    %echo% All of the blood vanishes and %self.name% is back in front of you, grinning.
+    %echo% All of the blood vanishes and ~%self% is back in front of you, grinning.
   break
 done
 ~
@@ -404,7 +404,7 @@ illusionist's death~
 0 f 100
 ~
 attach 16031 %self.room.id%
-%echo% As %self.name% dies all of %self.hisher% illusions fade away.
+%echo% As ~%self% dies all of ^%self% illusions fade away.
 %echo% A hole in the ground opens to the level below.
 eval newroom %self.room.template% + 8
 %door% %self.room% down room i%newroom%
@@ -444,13 +444,13 @@ set room_var %self.room%
 eval move_dir %%room_var.%direction%(room)%%
 if %actor.vampire%
   if !%move_dir% || %move_dir.template% < %room_var.template%
-    %echo% %self.name% says, "By all means %actor.name%, go with my blessing."
+    %echo% ~%self% says, "By all means ~%actor%, go with my blessing."
   else
-    %echo% %self.name% says, "I'm sorry %actor.name%, but even being a fellow vampire, I may not let you pass."
+    %echo% ~%self% says, "I'm sorry ~%actor%, but even being a fellow vampire, I may not let you pass."
     return 0
   end
 else
-  %echo% %self.name% says, "Good try %actor.name%, but you won't be making it out of this chamber alive."
+  %echo% ~%self% says, "Good try ~%actor%, but you won't be making it out of this chamber alive."
   return 0
 end
 ~

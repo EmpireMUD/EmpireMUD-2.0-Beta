@@ -29,7 +29,7 @@ if !%actor.has_resources(%cost_item_vnum%, %cost_item_count%)%
 end
 nop %actor.add_resources(%cost_item_vnum%,-%cost_item_count%)%
 %send% %actor% You enchant %self.shortdesc%!
-%echoaround% %actor% %actor.name% enchants %self.shortdesc%!
+%echoaround% %actor% ~%actor% enchants %self.shortdesc%!
 nop %actor.mana(-%mana_cost%)%
 %load% obj %result_vnum% %actor% inv
 set obj %actor.inventory()%
@@ -58,7 +58,7 @@ if %room.sector_vnum% != 26
   halt
 end
 %send% %actor% You dig a hole and plant %self.shortdesc% in it.
-%echoaround% %actor% %actor.name% digs a hole and plant %self.shortdesc% in it.
+%echoaround% %actor% ~%actor% digs a hole and plant %self.shortdesc% in it.
 %echo% The trees around you twist and turn and take on a strange violet hue.
 %terraform% %room% 610
 %purge% %self%
@@ -72,7 +72,7 @@ set cycles_left 5
 while %cycles_left% >= 0
   if (%self.room% != %room%) || %room.empire% || !(%room.sector% ~= Enchanted || %room.sector% ~= Weirdwood)
     * We've either moved or the room's no longer suitable for deforesting - despawn the mob
-    %echo% %self.name%, seeing no opportunity for destruction here, starts wandering away.
+    %echo% ~%self%, seeing no opportunity for destruction here, starts wandering away.
     nop %self.add_mob_flag(SPAWNED)%
     nop %self.remove_mob_flag(SENTINEL)%
     detach 602 %self.id%
@@ -80,28 +80,28 @@ while %cycles_left% >= 0
   end
   if %self.fighting% || %self.disabled%
     * Combat interrupts the ritual
-    %echo% %self.name%'s ritual is interrupted.
+    %echo% |%self% ritual is interrupted.
     halt
   end
   * Fake ritual messages
   switch %cycles_left%
     case 5
-      %echo% %self.name% plants %self.hisher% skull staff into the ground...
+      %echo% ~%self% plants ^%self% skull staff into the ground...
     break
     case 4
-      %echo% %self.name% mutters an unspeakable word, killing the undergrowth...
+      %echo% ~%self% mutters an unspeakable word, killing the undergrowth...
     break
     case 3
-      %echo% %self.name% sends out a shockwave of death magic, withering the leaves on the trees...
+      %echo% ~%self% sends out a shockwave of death magic, withering the leaves on the trees...
     break
     case 2
-      %echo% %self.name% draws a death sigil on the ground, driving away the animals...
+      %echo% ~%self% draws a death sigil on the ground, driving away the animals...
     break
     case 1
-      %echo% %self.name% chants a dark incantation, rotting the bark of the trees...
+      %echo% ~%self% chants a dark incantation, rotting the bark of the trees...
     break
     case 0
-      %echo% %self.name% completes %self.hisher% ritual, killing the forest!
+      %echo% ~%self% completes ^%self% ritual, killing the forest!
       * terraform based on sector
       if %room.sector_vnum% >= 600 && %room.sector_vnum% <= 604
         %terraform% %room% 605
@@ -117,7 +117,7 @@ while %cycles_left% >= 0
   wait 5 sec
   eval cycles_left %cycles_left% - 1
 done
-%echo% %self.name% looks confused...
+%echo% ~%self% looks confused...
 ~
 #603
 Enchanted seed plant - desert AND plains~
@@ -140,7 +140,7 @@ if (%room.sector_vnum% != 0 && %room.sector_vnum% != 26)
   halt
 end
 %send% %actor% You dig a hole and plant %self.shortdesc% in it.
-%echoaround% %actor% %actor.name% digs a hole and plant %self.shortdesc% in it.
+%echoaround% %actor% ~%actor% digs a hole and plant %self.shortdesc% in it.
 %echo% Dozens of strange saplings spring up!
 if %room.sector_vnum% == 26
   %terraform% %room% 610
@@ -170,7 +170,7 @@ if %room.sector_vnum% != 0
   halt
 end
 %send% %actor% You dig a hole and plant %self.shortdesc% in it.
-%echoaround% %actor% %actor.name% digs a hole and plant %self.shortdesc% in it.
+%echoaround% %actor% ~%actor% digs a hole and plant %self.shortdesc% in it.
 %echo% Dozens of strange saplings spring up!
 %terraform% %room% 600
 %purge% %self%
@@ -207,7 +207,7 @@ if %self.disabled%
 end
 switch %random.4%
   case 1
-    %echo% %self.name% coughs loudly.
+    %echo% ~%self% coughs loudly.
     wait 5
     say It's okay, I'm just a little hoarse.
   break
@@ -234,7 +234,7 @@ switch %random.4%
     say What's up, doc?
   break
   case 2
-    %echo% %self.name% thumps %self.hisher% foot on the ground.
+    %echo% ~%self% thumps ^%self% foot on the ground.
   break
   case 3
     if %self.varexists(has_duped)%
@@ -244,14 +244,14 @@ switch %random.4%
     end
     if %has_duped% > 0
       * has already duplicated
-      %echo% %self.name% curls up, becomes a ball of dust, and blows away in the wind.
+      %echo% ~%self% curls up, becomes a ball of dust, and blows away in the wind.
       %purge% %self%
       halt
     else
       set room %self.room%
       * only duplicate if not in a building
       if (!%room.building%)
-        %echo% %self.name% does a little backflip and splits into two bunnies!
+        %echo% ~%self% does a little backflip and splits into two bunnies!
         %load% mob 612
         set has_duped 1
         remote has_duped %self.id%
@@ -275,13 +275,13 @@ if %self.disabled%
 end
 switch %random.4%
   case 1
-    %echo% %self.name% sings, 'Look for the bear necessities, the simple bear necessities. Forget about your worries and your strife...'
+    %echo% ~%self% sings, 'Look for the bear necessities, the simple bear necessities. Forget about your worries and your strife...'
   break
   case 2
-    %echo% %self.name% dances around, humming to %self.himher%self.
+    %echo% ~%self% dances around, humming to *%self%self.
   break
   case 3
-    %echo% %self.name% sings, 'Now when you pick a pawpaw, or a prickly pear, and you prick a raw paw, well, next time beware!'
+    %echo% ~%self% sings, 'Now when you pick a pawpaw, or a prickly pear, and you prick a raw paw, well, next time beware!'
   break
   case 4
     say I don't know what all the hullabaloo is about a singing bear.
@@ -329,13 +329,13 @@ if %self.disabled%
 end
 switch %random.4%
   case 1
-    %echo% %self.name% whittles away at a toothpick.
+    %echo% ~%self% whittles away at a toothpick.
   break
   case 2
-    %echo% %self.name% hurls acorns at you!
+    %echo% ~%self% hurls acorns at you!
   break
   case 3
-    %echo% %self.name% sneezes pixy dust all over you!
+    %echo% ~%self% sneezes pixy dust all over you!
     set ch %self.room.people%
     while %ch%
       dg_affect %ch% FLY on 60
@@ -345,7 +345,7 @@ switch %random.4%
   case 4
     say They used to make us race for food.
     wait 1
-    %echo% %self.name% shivers uncomfortably.
+    %echo% ~%self% shivers uncomfortably.
   break
 done
 ~
@@ -364,7 +364,7 @@ switch %random.4%
     say I'm the queen bee around here.
   break
   case 3
-    %echo% %self.name% sprinkles pixy dust all over you!
+    %echo% ~%self% sprinkles pixy dust all over you!
     set ch %self.room.people%
     while %ch%
       dg_affect %ch% FLY on 60
@@ -386,7 +386,7 @@ set ch %self.next_in_room%
 while %ch%
   if %ch.vnum% == %self.vnum%
     say I shall go enjoy my freedom.
-    %echo% %self.name% vanishes in a puff of smoke!
+    %echo% ~%self% vanishes in a puff of smoke!
     %purge% %self%
     halt
   end
@@ -417,7 +417,7 @@ Genie death~
 0 f 100
 ~
 say No! Noooo! I won't go back in the bottle!
-%echo% %self.name% screams as he's sucked into a brass bottle, expelling all his power trying in vain to get free.
+%echo% ~%self% screams as he's sucked into a brass bottle, expelling all his power trying in vain to get free.
 return 0
 ~
 $

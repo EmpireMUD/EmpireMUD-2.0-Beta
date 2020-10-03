@@ -54,10 +54,10 @@ remote stored %self.id%
 * messaging
 if %got% > 1
   %send% %actor% You harvest some honeycomb (x%got%) from %self.shortdesc%.
-  %echoaround% %actor% %actor.name% harvests some honeycomb from %self.shortdesc%.
+  %echoaround% %actor% ~%actor% harvests some honeycomb from %self.shortdesc%.
 elseif %got% == 1
   %send% %actor% You harvest some honeycomb from %self.shortdesc%.
-  %echoaround% %actor% %actor.name% harvests some honeycomb from %self.shortdesc%.
+  %echoaround% %actor% ~%actor% harvests some honeycomb from %self.shortdesc%.
 end
 if %full%
   %send% %actor% You can't carry any more.
@@ -131,9 +131,9 @@ bloodletter arrows~
 1 s 25
 ~
 set scale 100
-%send% %actor% %target.name% begins to bleed from the wound left by your bloodletter arrow!
-%send% %target% You begin to bleed from the wound left by %actor.name%'s bloodletter arrow!
-%echoneither% %target% %actor% %target.name% begins to bleed from the wound left by %actor.name%'s bloodletter arrow!
+%send% %actor% ~%target% begins to bleed from the wound left by your bloodletter arrow!
+%send% %target% You begin to bleed from the wound left by |%actor% bloodletter arrow!
+%echoneither% %target% %actor% ~%target% begins to bleed from the wound left by |%actor% bloodletter arrow!
 %dot% %target% %scale% 15 physical
 ~
 #952

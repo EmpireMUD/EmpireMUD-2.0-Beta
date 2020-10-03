@@ -23,12 +23,12 @@ if !%arg%
   halt
 end
 if %self.fighting%
-  %send% %actor% You can't change %self.name%'s difficulty while %self.heshe% is in combat!
+  %send% %actor% You can't change |%self% difficulty while &%self% is in combat!
   return 1
   halt
 end
 %send% %actor% You set the difficulty...
-%echoaround% %actor% %actor.name% sets the difficulty...
+%echoaround% %actor% ~%actor% sets the difficulty...
 if hard /= %arg%
   set difficulty 2
 elseif group /= %arg%
@@ -47,13 +47,13 @@ nop %mob.remove_mob_flag(GROUP)%
 if %difficulty% == 1
   * Then we don't need to do anything
 elseif %difficulty% == 2
-  %echo% %self.name% has been set to Hard.
+  %echo% ~%self% has been set to Hard.
   nop %mob.add_mob_flag(HARD)%
 elseif %difficulty% == 3
-  %echo% %self.name% has been set to Group.
+  %echo% ~%self% has been set to Group.
   nop %mob.add_mob_flag(GROUP)%
 elseif %difficulty% == 4
-  %echo% %self.name% has been set to Boss.
+  %echo% ~%self% has been set to Boss.
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
@@ -76,7 +76,7 @@ end
 set person %self.room.people%
 while %person%
   if %person.is_pc%
-    %send% %person% As %self.name% is defeated, %self.hisher% essence spills forth, bestowing upon you %tokens% %currency.12000(%tokens%)%!
+    %send% %person% As ~%self% is defeated, ^%self% essence spills forth, bestowing upon you %tokens% %currency.12000(%tokens%)%!
     if %person.level% >= (%self.level% - 75)
       nop %person.give_currency(12000, %tokens%)%
       if %tokens% == 1
@@ -180,7 +180,7 @@ end
 set person %self.room.people%
 while %person%
   if %person.is_pc%
-    %send% %person% As %self.name% is defeated, %self.hisher% essence spills forth, bestowing upon you %tokens% %currency.12000(%tokens%)%!
+    %send% %person% As ~%self% is defeated, ^%self% essence spills forth, bestowing upon you %tokens% %currency.12000(%tokens%)%!
     if %person.level% >= (%self.level% - 75)
       nop %person.give_currency(12000, %tokens%)%
       if %tokens% == 1
@@ -208,7 +208,7 @@ if %self.cooldown(12002)%
 end
 nop %self.set_cooldown(12002, 30)%
 if %self.affect(BLIND)%
-  %echo% %self.name%'s eyes flash red, and %self.hisher% vision clears!
+  %echo% |%self% eyes flash red, and ^%self% vision clears!
   dg_affect %self% BLIND off 1
 end
 set person %self.room.people%
@@ -226,19 +226,19 @@ if !%self.cooldown(12005)% && !%yatpan%
   %load% mob 12001 ally
   set summon %self.room.people%
   if %summon.vnum% == 12001
-    %echo% %summon.name% drops from the sky, holding a bow, which %self.name% takes.
+    %echo% ~%summon% drops from the sky, holding a bow, which ~%self% takes.
     %force% %summon% %aggro% %actor%
   end
 else
   * Rain of Arrows
-  %echo% %self.name% draws %self.hisher% bow.
+  %echo% ~%self% draws ^%self% bow.
   dg_affect %self% STUNNED on 5
   wait 2 sec
-  %echo% %self.name% nocks hundreds of arrows and fires them into the air with blinding speed!
+  %echo% ~%self% nocks hundreds of arrows and fires them into the air with blinding speed!
   set cycle 1
   while %cycle% <= 3
     wait 5 sec
-    %echo% &&r%self.name%'s arrows rain down upon you!
+    %echo% &&r|%self% arrows rain down upon you!
     %aoe% 85 physical
     eval cycle %cycle% + 1
   done
@@ -253,21 +253,21 @@ if %self.cooldown(12002)%
 end
 nop %self.set_cooldown(12002, 30)%
 * Might need to clear blind?
-%echo% %self.name% draws %self.hisher% axe.
+%echo% ~%self% draws ^%self% axe.
 dg_affect %self% STUNNED on 5
 wait 2 sec
-%echo% %self.name% raises her axe over one shoulder in a two-handed grip...
+%echo% ~%self% raises her axe over one shoulder in a two-handed grip...
 wait 3 sec
 if %self.aff_flagged(ENTANGLE)%
-  %send% %actor% &&r%self.name% hacks at you between attempts to free %self.himher%self from the entanglement!
-  %echoaround% %actor% %self.name% hacks at %actor.name% between attempts to free %self.himher%self from the entanglement.
+  %send% %actor% &&r~%self% hacks at you between attempts to free *%self%self from the entanglement!
+  %echoaround% %actor% ~%self% hacks at ~%actor% between attempts to free *%self%self from the entanglement.
   %damage% %actor% 250 physical
   %dot% #12008 %actor% 150 30 physical
   halt
 end
-%echo% &&r%self.name% charges forward, hacking and slicing at everyone!
-%send% %actor% &&rYou take the brunt of %self.name%'s assault!
-%echoaround% %actor% %actor.name% takes the brunt of %self.name%'s assault!
+%echo% &&r~%self% charges forward, hacking and slicing at everyone!
+%send% %actor% &&rYou take the brunt of |%self% assault!
+%echoaround% %actor% ~%actor% takes the brunt of |%self% assault!
 %aoe% 25 physical
 %damage% %actor% 200 physical
 %dot% #12008 %actor% 150 30 physical
@@ -282,7 +282,7 @@ end
 set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
-    %send% %person% &&rA fountain of blood suddenly bursts from the wounds left by %self.name%'s assault!
+    %send% %person% &&rA fountain of blood suddenly bursts from the wounds left by |%self% assault!
     %damage% %person% 100
     if %self.mob_flagged(GROUP)%
       eval amount %amount% + 75
@@ -290,7 +290,7 @@ while %person%
   end
   set person %person.next_in_room%
 done
-%echo% %self.name% bathes in the blood of %self.hisher% enemies, and %self.hisher% wounds close!
+%echo% ~%self% bathes in the blood of ^%self% enemies, and ^%self% wounds close!
 %heal% %self% health %amount%
 ~
 #12009
@@ -301,11 +301,11 @@ if %self.cooldown(12002)%
   halt
 end
 nop %self.set_cooldown(12002, 30)%
-%echo% %self.name% draws %self.hisher% spear.
+%echo% ~%self% draws ^%self% spear.
 dg_affect %self% HARD-STUNNED on 5
 wait 2 sec
-%send% %actor% &&r%self.name% drives %self.hisher% spear through your chest, impaling you upon it!
-%echoaround% %actor% %self.name% drives %self.hisher% spear through %actor.name%'s chest, impaling %actor.himher% upon it!
+%send% %actor% &&r~%self% drives ^%self% spear through your chest, impaling you upon it!
+%echoaround% %actor% ~%self% drives ^%self% spear through |%actor% chest, impaling *%actor% upon it!
 if %self.mob_flagged(GROUP)%
   %damage% %actor% 500 physical
   dg_affect #12009 %actor% HARD-STUNNED on 15
@@ -316,8 +316,8 @@ else
   %dot% #12009 %actor% 200 10 physical
 end
 wait 3 sec
-%send% %actor% %self.name% releases %self.hisher% spear, allowing you to slump to the ground.
-%echoaround% %actor% %self.name% releases %self.hisher% spear, allowing %actor.name% to slump to the ground.
+%send% %actor% ~%self% releases ^%self% spear, allowing you to slump to the ground.
+%echoaround% %actor% ~%self% releases ^%self% spear, allowing ~%actor% to slump to the ground.
 ~
 #12010
 Anat: Earthshatter~
@@ -327,17 +327,17 @@ if %self.cooldown(12002)%
   halt
 end
 nop %self.set_cooldown(12002, 30)%
-%echo% %self.name% draws %self.hisher% hammer.
+%echo% ~%self% draws ^%self% hammer.
 dg_affect %self% HARD-STUNNED on 10
 wait 1 sec
-%echo% &&Y%self.name% raises her hammer overhead... (Jump now!)
+%echo% &&Y~%self% raises her hammer overhead... (Jump now!)
 set running 1
 remote running %self.id%
 wait 10 sec
 set running 0
 remote running %self.id%
 shout Hammer down!
-%echo% &&Y%self.name% slams %self.hisher% hammer into the earth with a deafening bang, shattering the ground underfoot!
+%echo% &&Y~%self% slams ^%self% hammer into the earth with a deafening bang, shattering the ground underfoot!
 set person %self.room.people%
 while %person%
   if %person.is_pc%
@@ -347,12 +347,12 @@ while %person%
     end
     if !%test%
       %send% %person% &&rThe force of the blow, traveling through the ground, leaves you stunned!
-      %echoaround% %person% %person.name% is stunned!
+      %echoaround% %person% ~%person% is stunned!
       %damage% %person% 100 physical
       dg_affect #12010 %person% HARD-STUNNED on 20
     else
       %send% %person% You leap into the air, barely avoiding the shockwave.
-      %echoaround% %person% %person.name% dodges the shockwave.
+      %echoaround% %person% ~%person% dodges the shockwave.
       unset jumped_%person.id%
     end
   end
@@ -368,7 +368,7 @@ if %self.cooldown(12003)%
 end
 nop %self.set_cooldown(12003, 30)%
 if %self.affect(BLIND)%
-  %echo% %self.name%'s eyes flash red, and %self.hisher% vision clears!
+  %echo% |%self% eyes flash red, and ^%self% vision clears!
   dg_affect %self% BLIND off 1
 end
 set person %self.room.people%
@@ -379,13 +379,13 @@ while %person%
   set person %person.next_in_room%
 done
 if !%anat%
-  %echo% %self.name% gives a mournful screech, and vanishes in a flash of light!
+  %echo% ~%self% gives a mournful screech, and vanishes in a flash of light!
   %purge% %self%
   halt
 end
 set target %random.enemy%
 if !%target%
-  %echo% %self.name% looks very confused.
+  %echo% ~%self% looks very confused.
   halt
 end
 if %target.is_pc%
@@ -395,17 +395,17 @@ else
   set target_string the %name.cdr%
 end
 %force% %anat% say Yatpan! Strike %target_string% down!
-%send% %target% %self.name% screeches and dives at you!
-%echoaround% %target% %self.name% screeches and dives at %target.name%!
+%send% %target% ~%self% screeches and dives at you!
+%echoaround% %target% ~%self% screeches and dives at ~%target%!
 * Give the tank time to prepare
 wait 5 sec
 if !%anat%
-  %echo% %self.name% gives a mournful cry, and vanishes in a flash of light!
+  %echo% ~%self% gives a mournful cry, and vanishes in a flash of light!
   %purge% %self%
   halt
 end
-%send% %target% &&r%self.name% crashes into you, talons tearing, and seizes your weapon!
-%echoaround% %target% %self.name% crashes into %target.name%, talons tearing, and seizes %target.hisher% weapon!
+%send% %target% &&r~%self% crashes into you, talons tearing, and seizes your weapon!
+%echoaround% %target% ~%self% crashes into ~%target%, talons tearing, and seizes ^%target% weapon!
 if %anat.mob_flagged(GROUP)%
   %damage% %target% 200 physical
   dg_affect #12013 %target% HARD-STUNNED on 10
@@ -430,7 +430,7 @@ if !%self.running%
   halt
 end
 %send% %actor% You crouch down and prepare to jump...
-%echoaround% %actor% %actor.name% crouches down and prepares to jump...
+%echoaround% %actor% ~%actor% crouches down and prepares to jump...
 set jumped_%actor.id% 1
 remote jumped_%actor.id% %self.id%
 ~
@@ -449,12 +449,12 @@ while %person%
   set person %person.next_in_room%
 done
 if !%anat%
-  %echo% %self.name% gives a mournful screech, and vanishes in a flash of light!
+  %echo% ~%self% gives a mournful screech, and vanishes in a flash of light!
   %purge% %self%
   halt
 end
 %force% %anat% say Begone, Yatpan!
-%echo% %self.name% flies away.
+%echo% ~%self% flies away.
 nop %anat.set_cooldown(12005, 0)%
 %purge% %self%
 ~
@@ -483,11 +483,11 @@ if %self.varexists(phase)%
     * Never mind
     halt
   elseif %self.phase% == 2
-    %echo% %self.name% is suddenly rejuvenated by the power of the storm within!
+    %echo% ~%self% is suddenly rejuvenated by the power of the storm within!
     halt
   end
 end
-%echo% %self.name% is surrounded by a swirling mass of storm clouds, protecting %self.himher% from your attacks!
+%echo% ~%self% is surrounded by a swirling mass of storm clouds, protecting *%self% from your attacks!
 %echo% (Type 'enter storm')
 set phase 2
 remote phase %self.id%
@@ -516,8 +516,8 @@ Hadad phase reset~
 ~
 if !%self.fighting% && %self.varexists(phase)%
   if %self.phase% == 2
-    %echo% %self.name%, no longer distracted by combat, turns his full attention inward!
-    %echo% %self.name% is restored!
+    %echo% ~%self%, no longer distracted by combat, turns his full attention inward!
+    %echo% ~%self% is restored!
     * Uh oh
     makeuid loc room i12031
     if %loc%
@@ -530,7 +530,7 @@ if !%self.fighting% && %self.varexists(phase)%
     while %person%
       set next_person %person.next_in_room%
       if %person.is_pc%
-        %send% %person% %self.name% turns his gaze inward upon you!
+        %send% %person% ~%self% turns his gaze inward upon you!
         %send% %person% &&rA torrent of lightning flows through you, blasting you out of the eye of the storm!
         %damage% %person% 99999 direct
         %teleport% %person% %self%
@@ -539,7 +539,7 @@ if !%self.fighting% && %self.varexists(phase)%
       else
         * What are you doing in here?
         * Maybe a familiar?
-        %echo% %person.name% is expelled from the storm chamber.
+        %echo% ~%person% is expelled from the storm chamber.
         %teleport% %person% %self%
       end
       set person %next_person%
@@ -554,7 +554,7 @@ if !%self.fighting% && %self.varexists(phase)%
     attach 12038 %self.id%
     nop %self.remove_mob_flag(NO-ATTACK)%
   elseif %self.phase% > 2
-    %echo% %self.name% is restored!
+    %echo% ~%self% is restored!
     %restore% %self%
     nop %self.remove_mob_flag(NO-ATTACK)%
     unset phase
@@ -575,9 +575,9 @@ if storm /= %arg%
   if %actor.position% == Standing || %actor.position% == Fighting
     if %correct_phase%
       %send% %actor% You step into the swirling storm clouds and find yourself elsewhere!
-      %echoaround% %actor% %actor.name% steps into the swirling storm clouds and vanishes!
+      %echoaround% %actor% ~%actor% steps into the swirling storm clouds and vanishes!
       %teleport% %actor% i12031
-      %echoaround% %actor% %actor.name% emerges from the swirling storm clouds!
+      %echoaround% %actor% ~%actor% emerges from the swirling storm clouds!
       %force% %actor% look
       %force% %actor% kill baalhadadstormcloud
     else
@@ -620,14 +620,14 @@ attach 12035 %hadad.id%
 set destination %hadad.room%
 set person %self.room.people%
 %at% %destination% %echo% The eye of the storm suddenly collapses, as if destroyed from within!
-%echo% As %self.name% is destroyed, the eye of the storm collapses!
+%echo% As ~%self% is destroyed, the eye of the storm collapses!
 while %person%
   set next_person %person.next_in_room%
   if %person.is_pc% || (%person.is_npc% && %person.master%)
     %send% %person% You are expelled from the eye of the storm!
-    %echoaround% %person% %person.name% is expelled from the eye of the storm!
+    %echoaround% %person% ~%person% is expelled from the eye of the storm!
     %teleport% %person% %destination%
-    %echoaround% %person% %person.name% is expelled from the eye of the storm!
+    %echoaround% %person% ~%person% is expelled from the eye of the storm!
   end
   set person %next_person%
 done
@@ -653,9 +653,9 @@ else
   set destination %instance.location%
 end
 %send% %actor% You flee from the heart of the storm.
-%echoaround% %actor% %actor.name% flees from the heart of the storm.
+%echoaround% %actor% ~%actor% flees from the heart of the storm.
 %teleport% %actor% %destination%
-%echoaround% %actor% %actor.name% appears seemingly from nowhere.
+%echoaround% %actor% ~%actor% appears seemingly from nowhere.
 %force% %actor% %look%
 ~
 #12035
@@ -667,10 +667,10 @@ if %self.cooldown(12030)%
 end
 nop %self.set_cooldown(12030, 30)%
 * Might need to clear blind?
-%echo% %self.name% takes a deep breath...
+%echo% ~%self% takes a deep breath...
 wait 2 sec
-%echo% %self.name% lets out a mighty leonine roar!
-%echo% &&rYou are stunned by the loudness of %self.name%'s roar!
+%echo% ~%self% lets out a mighty leonine roar!
+%echo% &&rYou are stunned by the loudness of |%self% roar!
 set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
@@ -686,7 +686,7 @@ done
 if %self.varexists(phase)%
   if %self.phase% == 3
     dg_affect #12040 %self% off
-    %echo% %self.name% charges forward, foaming at the mouth with rage!
+    %echo% ~%self% charges forward, foaming at the mouth with rage!
     dg_affect #12040 %self% HASTE on 30
     dg_affect #12040 %self% BONUS-PHYSICAL 50 30
     dg_affect #12040 %self% BONUS-MAGICAL 50 30
@@ -709,20 +709,20 @@ end
 if !%target%
   set target %actor%
 end
-%send% %target% %self.name% lowers %self.hisher% head and charges you!
-%echoaround% %target% %self.name% lowers %self.hisher% head and charges %target.name%!
+%send% %target% ~%self% lowers ^%self% head and charges you!
+%echoaround% %target% ~%self% lowers ^%self% head and charges ~%target%!
 wait 2 sec
 if !%self.fighting%
   halt
 end
 if (%self.aff_flagged(ENTANGLED)% || %target.room% != %self.room%) && (%target% != %self.fighting%)
-  %send% %target% Unable to reach you, %self.name% turns %self.hisher% attention to %self.fighting.name%!
-  %send% %self.fighting% Unable to reach %target.name%, %self.name% turns %self.hisher% attention to you!
-  %echoneither% %self.fighting% %target% Unable to reach %target.name%, %self.name% turns %self.hisher% attention to %self.fighting.name%!
+  %send% %target% Unable to reach you, ~%self% turns ^%self% attention to %self.fighting.name%!
+  %send% %self.fighting% Unable to reach ~%target%, ~%self% turns ^%self% attention to you!
+  %echoneither% %self.fighting% %target% Unable to reach ~%target%, ~%self% turns ^%self% attention to %self.fighting.name%!
   set target %self.fighting%
 end
-%send% %target% &&r%self.name% crashes into you, sending you flying!
-%echoaround% %target% %self.name% crashes into %target.name%, sending %target.himher% flying!
+%send% %target% &&r~%self% crashes into you, sending you flying!
+%echoaround% %target% ~%self% crashes into ~%target%, sending *%target% flying!
 if %self.mob_flagged(GROUP)%
   %damage% %target% 400 physical
   dg_affect #12036 %target% HARD-STUNNED on 15
@@ -752,13 +752,13 @@ while %time% <= %times%
   if !%target%
     set target %actor%
   end
-  %send% %target% %self.name% draws back an arm and takes aim at you...
-  %echoaround% %target% %self.name% draws back an arm and takes aim at %target.name%...
+  %send% %target% ~%self% draws back an arm and takes aim at you...
+  %echoaround% %target% ~%self% draws back an arm and takes aim at ~%target%...
   wait 2 sec
-  %send% %target% %self.name% hurls a thunderbolt at you!
-  %echoaround% %target% %self.name% hurls a thunderbolt at %target.name%!
+  %send% %target% ~%self% hurls a thunderbolt at you!
+  %echoaround% %target% ~%self% hurls a thunderbolt at ~%target%!
   %send% %target% &&rThe thunderbolt explodes in your face!
-  %echoaround% %target% The thunderbolt explodes in front of %target.name%'s face!
+  %echoaround% %target% The thunderbolt explodes in front of |%target% face!
   %damage% %target% 100 magical
   %dot% #12037 %target% 200 30 magical
   if %self.mob_flagged(GROUP)%
@@ -777,7 +777,7 @@ if %self.cooldown(12030)%
   halt
 end
 nop %self.set_cooldown(12030, 30)%
-%echo% %self.name% raises %self.hisher% arms to the sky and lets out a mighty bellow!
+%echo% ~%self% raises ^%self% arms to the sky and lets out a mighty bellow!
 %echo% A great storm forms overhead!
 set cycle 1
 set cycles 3
@@ -805,10 +805,10 @@ if %self.cooldown(12030)%
 end
 nop %self.set_cooldown(12030, 20)%
 if %self.affect(BLIND)%
-  %echo% %self.name%'s vision clears!
+  %echo% |%self% vision clears!
   dg_affect %self% BLIND off 1
 end
-%echo% %self.name% starts casting a spell!
+%echo% ~%self% starts casting a spell!
 %echo% (Type 'interrupt'.)
 set running 1
 set interrupted 0
@@ -816,14 +816,14 @@ remote running %self.id%
 remote interrupted %self.id%
 wait 5 sec
 if %self.interrupted%
-  %echo% %self.name%'s spell is interrupted.
+  %echo% |%self% spell is interrupted.
   unset running
   unset interrupted
   halt
 end
 unset running
 unset interrupted
-%echo% %self.name%'s spell goes off... but nothing seems to happen.
+%echo% |%self% spell goes off... but nothing seems to happen.
 if %self.vnum% == 12030
   set ally %instance.mob(12031)%
 else
@@ -835,12 +835,12 @@ if %ally%
     if %target.trigger_counterspell%
       %send% %target% A bolt of lightning flies out of nowhere and explodes against your counterspell!
       %send% %target% &&rThe bolt's explosion burns you!
-      %echoaround% %target% A bolt of lightning flies out of nowhere and explodes in front of %target.name%!
+      %echoaround% %target% A bolt of lightning flies out of nowhere and explodes in front of ~%target%!
       %damage% %target% 75 magical
       halt
     else
       %send% %target% &&rA bolt of lightning flies out of nowhere and strikes you!
-      %echoaround% %target% A bolt of lightning flies out of nowhere and strikes %target.name%!
+      %echoaround% %target% A bolt of lightning flies out of nowhere and strikes ~%target%!
       if %self.vnum% == 12030
         %damage% %target% 200 magical
       else
@@ -885,8 +885,8 @@ if !%self.running%
   return 1
   halt
 end
-%send% %actor% You trip %self.name%.
-%echoaround% %actor% %actor.name% trips %self.name%.
+%send% %actor% You trip ~%self%.
+%echoaround% %actor% ~%actor% trips ~%self%.
 set interrupted 1
 remote interrupted %self.id%
 ~
@@ -916,7 +916,7 @@ while %cycles_left% >= 0
   eval sector_valid (!%room.building% && !%room.template%) || (%room.building% && %room.bld_flagged(OPEN)%)
   if !%sector_valid% || %actor.room% != %room% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing) || %actor.aff_flagged(DISTRACTED)%
     if %cycles_left% < 3
-      %echoaround% %actor% %actor.name%'s stormcall is interrupted.
+      %echoaround% %actor% |%actor% stormcall is interrupted.
       %send% %actor% Your stormcall is interrupted.
     elseif !%sector_valid%
       %send% %actor% You can only use %self.shortdesc% outdoors.
@@ -927,20 +927,20 @@ while %cycles_left% >= 0
   end
   switch %cycles_left%
     case 3
-      %echoaround% %actor% %actor.name% raises the stormcaller wand high into the air...
+      %echoaround% %actor% ~%actor% raises the stormcaller wand high into the air...
       %send% %actor% You raise your stormcaller wand high into the air...
     break
     case 2
-      %echoaround% %actor% A swirl of rain and wind shoots up from %actor.name%'s stormcaller wand...
+      %echoaround% %actor% A swirl of rain and wind shoots up from |%actor% stormcaller wand...
       %send% %actor% A swirl of rain and wind shoots up from your stormcaller wand...
     break
     case 1
-      %echoaround% %actor% %actor.name% shouts out the name of Ba'al Hadad, God of Storms!
+      %echoaround% %actor% ~%actor% shouts out the name of Ba'al Hadad, God of Storms!
       %send% %actor% You shout out the name of Ba'al Hadad, God of Storms!
     break
     case 0
       %echo% Lightning cascades across the darkening sky...
-      %echoaround% %actor% %actor.name% falls to the ground as the stormcloud fills the sky and rain begins to fall!
+      %echoaround% %actor% ~%actor% falls to the ground as the stormcloud fills the sky and rain begins to fall!
       %send% %actor% You struggle to catch your breath as the stormcloud fills the sky and rain begins to fall!
       nop %actor.set_cooldown(12049, 300)%
       %load% obj 12050 %room%

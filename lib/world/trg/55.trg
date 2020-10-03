@@ -28,7 +28,7 @@ end
 %load% obj 5511 %actor% inv
 set item %actor.inventory(5511)%
 %send% %actor% You pick up %item.shortdesc%. Reading this would surely start you on the path of High Sorcery.
-%echoaround% %actor% %actor.name% takes %item.shortdesc%.
+%echoaround% %actor% ~%actor% takes %item.shortdesc%.
 ~
 #5512
 High Sorcery skillbook~

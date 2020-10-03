@@ -8,16 +8,16 @@ if %helper% != %self%
   halt
 end
 if !%instance.start%
-  %echo% %self.name% disappears! Or... was it ever there in the first place?
+  %echo% ~%self% disappears! Or... was it ever there in the first place?
   %purge% %self%
   halt
 end
 eval room i12501
 set start_room %actor.room%
-%echoaround% %actor% %actor.name% starts climbing up %self.name%'s leg...
+%echoaround% %actor% ~%actor% starts climbing up |%self% leg...
 %teleport% %actor% %room%
-%echoaround% %actor% %actor.name% climbs up from the ground below.
-%send% %actor% You start climbing up %self.name%'s leg...
+%echoaround% %actor% ~%actor% climbs up from the ground below.
+%send% %actor% You start climbing up |%self% leg...
 %force% %actor% look
 eval room2 i12500
 %at% %room2% %load% obj 12504
@@ -25,11 +25,11 @@ set person %start_room.people%
 while %person%
   set next_person %person.next_in_room%
   if %person.is_npc% && %person.master% == %actor%
-    %echoaround% %person% %person.name% follows %actor.name%.
+    %echoaround% %person% ~%person% follows ~%actor%.
     %teleport% %person% %actor.room%
-    %echoneither% %person% %actor% %person.name% follows %actor.name%.
-    %send% %actor% %person.name% follows you.
-    %send% %person% You follow %actor.name%.
+    %echoneither% %person% %actor% ~%person% follows ~%actor%.
+    %send% %actor% ~%person% follows you.
+    %send% %person% You follow ~%actor%.
   end
   set person %next_person%
 done
@@ -44,14 +44,14 @@ if !%colossus%
 end
 set room %actor.room%
 if %colossus%
-  %send% %actor% You drop down from your perch on %colossus.name% to the ground below.
-  %echoaround% %actor% %actor.name% drops down from %actor.hisher% perch on %colossus.name% to the ground below.
+  %send% %actor% You drop down from your perch on ~%colossus% to the ground below.
+  %echoaround% %actor% ~%actor% drops down from ^%actor% perch on ~%colossus% to the ground below.
   %teleport% %actor% %colossus.room%
-  %echoaround% %actor% %actor.name% drops down from a perch high up on %colossus.name%.
+  %echoaround% %actor% ~%actor% drops down from a perch high up on ~%colossus%.
   %force% %actor% look
 else
   %send% %actor% You drop down.
-  %echoaround% %actor% %actor.name% drops down.
+  %echoaround% %actor% ~%actor% drops down.
   %teleport% %actor% %instance.location%
   %echoaround% %actor% %actor% drops down out of nowhere.
   %force% %actor% look
@@ -60,11 +60,11 @@ set person %room.people%
 while %person%
   set next_person %person.next_in_room%
   if %person.is_npc% && %person.master% == %actor%
-    %echoaround% %person% %person.name% follows %actor.name%.
+    %echoaround% %person% ~%person% follows ~%actor%.
     %teleport% %person% %actor.room%
-    %echoneither% %person% %actor% %person.name% follows %actor.name%.
-    %send% %actor% %person.name% follows you.
-    %send% %person% You follow %actor.name%.
+    %echoneither% %person% %actor% ~%person% follows ~%actor%.
+    %send% %actor% ~%person% follows you.
+    %send% %person% You follow ~%actor%.
   end
   set person %next_person%
 done
@@ -94,10 +94,10 @@ while %person%
     if !%person.aff_flagged(HIDE)%
       if %dodged%
         %send% %person% You scramble out of the way as the colossus fires its eye lasers!
-        %echoaround% %person% %person.name% scrambles out of the way of the colossus's eye lasers!
+        %echoaround% %person% ~%person% scrambles out of the way of the colossus's eye lasers!
       else
         %send% %person% &&rThe colossus blasts you with its eye lasers!
-        %echoaround% %person% &&r%person.name% is blasted!
+        %echoaround% %person% &&r~%person% is blasted!
         %damage% %person% 200 magical
       end
     end
@@ -119,7 +119,7 @@ if !%self.running%
   halt
 end
 %send% %actor% You prepare to dodge the eye lasers.
-%echoaround% %actor% %actor.name% prepares to dodge the eye lasers.
+%echoaround% %actor% ~%actor% prepares to dodge the eye lasers.
 set dodged_%actor.id% 1
 remote dodged_%actor.id% %self.id%
 ~
@@ -140,8 +140,8 @@ if %self.cooldown(12502)%
 end
 nop %self.set_cooldown(12502, 30)%
 if !%instance.mob(12509)%
-  %send% %actor% %self.name% flails at you with %self.hisher% damaged right arm!
-  %echoaround% %actor% %self.name% flails at %actor.name% with %self.hisher% damaged right arm!
+  %send% %actor% ~%self% flails at you with ^%self% damaged right arm!
+  %echoaround% %actor% ~%self% flails at ~%actor% with ^%self% damaged right arm!
   %damage% %actor% 150 physical
 else
   if %self.varexists(parts_destroyed)%
@@ -152,24 +152,24 @@ else
       * Tee hee
       nop %self.set_cooldown(12502, 15)%
     end
-    %echo% %self.name% draws back %self.hisher% right arm, lightning flickering around %self.hisher% clenched fist!
+    %echo% ~%self% draws back ^%self% right arm, lightning flickering around ^%self% clenched fist!
     wait 3 sec
     set actor %self.fighting%
-    %send% %actor% &&r%self.name%'s lightning-charged punch smashes into you with a thunderous boom, sending you flying!
-    %echoaround% %actor% %self.name%'s lightning-charged punch smashes into %actor.name% with a thunderous boom, sending %actor.himher% flying!
+    %send% %actor% &&r|%self% lightning-charged punch smashes into you with a thunderous boom, sending you flying!
+    %echoaround% %actor% |%self% lightning-charged punch smashes into ~%actor% with a thunderous boom, sending *%actor% flying!
     %damage% %actor% 500 physical
     %damage% %actor% 350 magical
     dg_affect #12505 %actor% HARD-STUNNED on 15
     dg_affect #12505 %actor% DODGE -100 15
     dg_affect #12505 %actor% RESIST-PHYSICAL -50 15
-    %echo% &&rBlasts of lightning fly from the impact of %self.name%'s fist against the ground!
+    %echo% &&rBlasts of lightning fly from the impact of |%self% fist against the ground!
     %aoe% 150 magical
   else
-    %echo% %self.name% draws back %self.hisher% right arm, lightning flickering around %self.hisher% clenched fist!
+    %echo% ~%self% draws back ^%self% right arm, lightning flickering around ^%self% clenched fist!
     wait 3 sec
     set actor %self.fighting%
-    %send% %actor% &&r%self.name%'s lightning-charged punch crashes into you, stunning you!
-    %echoaround% %actor% %self.name%'s lightning-charged punch crashes into %actor.name%, stunning %actor.himher%!
+    %send% %actor% &&r|%self% lightning-charged punch crashes into you, stunning you!
+    %echoaround% %actor% |%self% lightning-charged punch crashes into ~%actor%, stunning *%actor%!
     %damage% %actor% 150 physical
     %damage% %actor% 75 magical
     dg_affect #12505 %actor% STUNNED on 10
@@ -186,8 +186,8 @@ if %self.cooldown(12502)%
 end
 nop %self.set_cooldown(12502, 30)%
 if !%instance.mob(12508)%
-  %send% %actor% %self.name% flails at you with %self.hisher% damaged right arm!
-  %echoaround% %actor% %self.name% flails at %actor.name% with %self.hisher% damaged left arm!
+  %send% %actor% ~%self% flails at you with ^%self% damaged right arm!
+  %echoaround% %actor% ~%self% flails at ~%actor% with ^%self% damaged left arm!
   %damage% %actor% 150 physical
 else
   if %self.varexists(parts_destroyed)%
@@ -198,32 +198,32 @@ else
       * Tee hee
       nop %self.set_cooldown(12502, 15)%
     end
-    %echo% %self.name% raises %self.hisher% left arm, and a massive blade extends from %self.hisher% clenched fist.
+    %echo% ~%self% raises ^%self% left arm, and a massive blade extends from ^%self% clenched fist.
     wait 3 sec
     if %actor.is_pc%
       * PC
-      %send% %actor% &&r%self.name%'s slashes at you with %self.hisher% retractable blade, rending your armor and causing mortal injury!
-      %echoaround% %actor% %self.name%'s slashes at %actor.name% with %self.hisher% retractable blade, rending %actor.hisher% armor and causing mortal injury!
+      %send% %actor% &&r|%self% slashes at you with ^%self% retractable blade, rending your armor and causing mortal injury!
+      %echoaround% %actor% |%self% slashes at ~%actor% with ^%self% retractable blade, rending ^%actor% armor and causing mortal injury!
       %damage% %actor% 900 physical
       %dot% #12506 %actor% 1000 15 physical 1
       dg_affect #12506 %actor% RESIST-PHYSICAL -50 15
     else
       * Tank familiar
-      %send% %actor% &&r%self.name% slashes at you with %self.hisher% retractable blade, decapitating you with a single strike!
-      %send% %actor% %self.name% slashes at %actor.name% with %self.hisher% retractable blade, decapitating %actor.himher% with a single strike!
+      %send% %actor% &&r~%self% slashes at you with ^%self% retractable blade, decapitating you with a single strike!
+      %send% %actor% ~%self% slashes at ~%actor% with ^%self% retractable blade, decapitating *%actor% with a single strike!
       %damage% %actor% 99999 physical
     end
     wait 1 sec
-    %echo% %self.name%'s retractable blade slides back into its fist.
+    %echo% |%self% retractable blade slides back into its fist.
   else
-    %echo% %self.name% raises %self.hisher% left arm, and a massive blade extends from %self.hisher% clenched fist.
+    %echo% ~%self% raises ^%self% left arm, and a massive blade extends from ^%self% clenched fist.
     wait 3 sec
-    %send% %actor% &&r%self.name%'s slashes at you with %self.hisher% retractable blade, opening bleeding wounds!
-    %echoaround% %actor% %self.name%'s slashes at %actor.name% with %self.hisher% retractable blade, opening bleeding wounds!
+    %send% %actor% &&r|%self% slashes at you with ^%self% retractable blade, opening bleeding wounds!
+    %echoaround% %actor% |%self% slashes at ~%actor% with ^%self% retractable blade, opening bleeding wounds!
     %damage% %actor% 300 physical
     %dot% #12506 %actor% 200 15 physical 1
     wait 1 sec
-    %echo% %self.name%'s retractable blade slides back into its fist.
+    %echo% |%self% retractable blade slides back into its fist.
   end
 end
 ~
@@ -243,19 +243,19 @@ if %parts_destroyed% < 2
     * Tee hee
     nop %self.set_cooldown(12502, 15)%
   end
-  %echo% %self.name%'s shoulder-mounted cannons fill the sky with dozens of fiery projectiles!
+  %echo% |%self% shoulder-mounted cannons fill the sky with dozens of fiery projectiles!
   set cycle 1
   while %cycle% <= 3
     wait 3 sec
-    %echo% &&r%self.name%'s missile barrage rains from the sky, exploding all around you!
+    %echo% &&r|%self% missile barrage rains from the sky, exploding all around you!
     %aoe% 125 physical
     %aoe% 125 fire
     eval cycle %cycle% + 1
   done
 else
-  %echo% %self.name%'s shoulder-mounted cannons fire a barrage of fiery projectiles into the sky!
+  %echo% |%self% shoulder-mounted cannons fire a barrage of fiery projectiles into the sky!
   wait 3 sec
-  %echo% &&r%self.name%'s missile barrage rains from the sky, exploding all around you!
+  %echo% &&r|%self% missile barrage rains from the sky, exploding all around you!
   %aoe% 50 physical
   %aoe% 50 fire
 end
@@ -279,12 +279,12 @@ if %parts_destroyed% < 2
     * Tee hee
     nop %self.set_cooldown(12502, 15)%
   end
-  %echo% A small army of clockwork spiders swarms over %self.name%'s body, repairing it!
+  %echo% A small army of clockwork spiders swarms over |%self% body, repairing it!
   %heal% %self% health 400
   eval magnitude (%self.level% - 50) * 5
   dg_affect #12508 %self% HEAL-OVER-TIME %magnitude% 30
 else
-  %echo% A handful of clockwork spiders scuttle out of %self.name%'s body and begin to repair it!
+  %echo% A handful of clockwork spiders scuttle out of |%self% body and begin to repair it!
   eval magnitude (%self.level% - 50)
   if %self.vnum% == 12500
     eval magnitude %magnitude% * 2
@@ -304,10 +304,10 @@ if %self.varexists(parts_destroyed)%
   set parts_destroyed %self.parts_destroyed%
 end
 if %self.vnum% == 12501
-  %echo% %self.name% draws back %self.hisher% leg for a kick!
+  %echo% ~%self% draws back ^%self% leg for a kick!
   wait 3 sec
-  %send% %actor% %self.name% kicks you hard, briefly stunning you!
-  %echoaround% %actor% %self.name% kicks %actor.name%, who looks dazed.
+  %send% %actor% ~%self% kicks you hard, briefly stunning you!
+  %echoaround% %actor% ~%self% kicks ~%actor%, who looks dazed.
   %damage% %actor% 200 physical
   dg_affect #12509 %actor% STUNNED on 5
 else
@@ -316,11 +316,11 @@ else
       * Tee hee
       nop %self.set_cooldown(12502, 20)%
     end
-    %echo% %self.name% raises one leg high in the air, pistons shifting as %self.heshe% gathers power...
+    %echo% ~%self% raises one leg high in the air, pistons shifting as &%self% gathers power...
     wait 3 sec
     set actor %self.fighting%
-    %send% %actor% &&r%self.name% brings %self.hisher% foot down on top of you with an earth-shaking crash!
-    %echoaround% %actor% %self.name% brings %self.hisher% foot down on top of %actor.name% with an earth-shaking crash!
+    %send% %actor% &&r~%self% brings ^%self% foot down on top of you with an earth-shaking crash!
+    %echoaround% %actor% ~%self% brings ^%self% foot down on top of ~%actor% with an earth-shaking crash!
     %damage% %actor% 300 physical
     dg_affect #12509 %actor% HARD-STUNNED on 15
     dg_affect #12509 %actor% DODGE -100 15
@@ -330,24 +330,24 @@ else
     if %actor% != %self.fighting%
       halt
     end
-    %echo% There is a mighty boom as %self.name% releases %self.hisher% gathered power into the ground beneath %self.hisher% foot!
-    %send% %actor% &&rThe force of %self.name%'s foot pressing down on you explosively redoubles, hammering you deeper into the ground!
+    %echo% There is a mighty boom as ~%self% releases ^%self% gathered power into the ground beneath ^%self% foot!
+    %send% %actor% &&rThe force of |%self% foot pressing down on you explosively redoubles, hammering you deeper into the ground!
     %damage% %actor% 600 physical
     set person %room.people%
     while %person%
       if (%person.is_enemy(%self%)% || %self.is_enemy(%person%)%) && %person% != %actor%
-        %send% %person% &&rThe force of %self.name%'s stomp knocks you off your feet!
+        %send% %person% &&rThe force of |%self% stomp knocks you off your feet!
         dg_affect #12509 %person% HARD-STUNNED on 5
         %damage% %person% 100 physical
       end
       set person %person.next_in_room%
     done
   else
-    %echo% %self.name% raises one leg high in the air...
+    %echo% ~%self% raises one leg high in the air...
     wait 3 sec
     set actor %self.fighting%
-    %send% %actor% &&r%self.name% brings %self.hisher% foot down on top of you, pinning you to the ground!
-    %echoaround% %actor% %self.name% brings %self.hisher% foot down on top of %actor.name%, pinning %actor.himher% to the ground!
+    %send% %actor% &&r~%self% brings ^%self% foot down on top of you, pinning you to the ground!
+    %echoaround% %actor% ~%self% brings ^%self% foot down on top of ~%actor%, pinning *%actor% to the ground!
     %damage% %actor% 300 physical
     dg_affect #12509 %actor% HARD-STUNNED on 10
     dg_affect #12509 %actor% DODGE -50 10
@@ -376,27 +376,27 @@ if %parts_destroyed% < 2
     * Tee hee
     nop %self.set_cooldown(12502, 15)%
   end
-  %send% %target% %self.name% glowers at you, and %self.hisher% eyes begin to glow red!
-  %echoaround% %target% %self.name% glowers at %target.name%, and %self.hisher% eyes begin to glow red!
+  %send% %target% ~%self% glowers at you, and ^%self% eyes begin to glow red!
+  %echoaround% %target% ~%self% glowers at ~%target%, and ^%self% eyes begin to glow red!
   wait 3 sec
   if !%target% || %target.room% != %self.room%
     set target %self.fighting%
   end
   %send% %target% &&rThere is a blinding flash of light, and you feel unbearable heat and pain!
-  %echoaround% %target% Beams of crimson energy fly from %self.name%'s eyes, engulfing %target.name% and setting %target.himher% ablaze!
+  %echoaround% %target% Beams of crimson energy fly from |%self% eyes, engulfing ~%target% and setting *%target% ablaze!
   %damage% %target% 200 magical
   %damage% %target% 200 fire
   dg_affect #12511 %target% BLIND on 15
   %dot% #12511 %target% 600 15 fire
 else
-  %send% %target% %self.name% glowers at you, and %self.hisher% eyes begin to glow red!
-  %echoaround% %target% %self.name% glowers at %target.name%, and %self.hisher% eyes begin to glow red!
+  %send% %target% ~%self% glowers at you, and ^%self% eyes begin to glow red!
+  %echoaround% %target% ~%self% glowers at ~%target%, and ^%self% eyes begin to glow red!
   wait 3 sec
   if !%target% || %target.room% != %self.room%
     set target %self.fighting%
   end
-  %send% %target% &&rBeams of crimson energy fly from %self.name%'s eyes, cutting into you!
-  %echoaround% %target% Beams of crimson energy fly from %self.name%'s eyes, cutting into %target.name%!
+  %send% %target% &&rBeams of crimson energy fly from |%self% eyes, cutting into you!
+  %echoaround% %target% Beams of crimson energy fly from |%self% eyes, cutting into ~%target%!
   %damage% %target% 75 magical
   %damage% %target% 75 fire
 end
@@ -444,7 +444,7 @@ eval to_room %tricky%
 if %actor.nohassle% || !%tricky% || %direction% == down || %actor.aff_flagged(SNEAK)%
   halt
 end
-%send% %actor% You can't climb anywhere while %self.name% is here!
+%send% %actor% You can't climb anywhere while ~%self% is here!
 return 0
 ~
 #12514
@@ -455,7 +455,7 @@ eval vnum 12501+%random.2%
 %load% mob %vnum%
 eval room %self.room%
 eval mob %room.people%
-%echo% %mob.name% arrives.
+%echo% ~%mob% arrives.
 %purge% %self%
 ~
 #12515
@@ -481,7 +481,7 @@ Colossus load~
 ~
 if %self.room.template% == 12500
   mgoto %instance.real_location%
-  %echo% %self.name% appears.
+  %echo% ~%self% appears.
   set first_chant %random.4%
   set second_chant %random.3%
   if %second_chant% == %first_chant%
@@ -506,7 +506,7 @@ if %room.distance(%instance.real_location%)% > 20
 end
 nop %instance.set_location(%room%)%
 if %self.vnum% == 12500
-  %regionecho% %room% -7 The footfalls of %self.name% shake the earth as %self.heshe% moves to %room.coords%.
+  %regionecho% %room% -7 The footfalls of ~%self% shake the earth as &%self% moves to %room.coords%.
 end
 ~
 #12518
@@ -557,18 +557,18 @@ if %helper% != %self%
 end
 if %self.varexists(parts_destroyed)%
   if %parts_destroyed% == 1
-    %send% %actor% 1 of %self.name%'s major components has been destroyed.
+    %send% %actor% 1 of |%self% major components has been destroyed.
   else
-    %send% %actor% %self.parts_destroyed% of %self.name%'s major components have been destroyed.
+    %send% %actor% %self.parts_destroyed% of |%self% major components have been destroyed.
   end
   if !%instance.mob(12508)%
-    %send% %actor% %self.name%'s left arm has been badly damaged.
+    %send% %actor% |%self% left arm has been badly damaged.
   end
   if !%instance.mob(12509)%
-    %send% %actor% %self.name%'s right arm has been badly damaged.
+    %send% %actor% |%self% right arm has been badly damaged.
   end
 else
-  %send% %actor% All of %self.name%'s major components are intact.
+  %send% %actor% All of |%self% major components are intact.
 end
 ~
 #12521
@@ -591,7 +591,7 @@ if %tokens% > 0
   while %person%
     if %person.is_pc%
       eval name %%currency.12500(%tokens%)%%
-      %send% %person% You loot %tokens% %name% from %self.name%.
+      %send% %person% You loot %tokens% %name% from ~%self%.
       eval op %%person.give_currency(12500, %tokens%)%%
       nop %op%
     end
@@ -600,7 +600,7 @@ if %tokens% > 0
 end
 %load% mob 12505
 set dealer %self.room.people%
-%echo% %dealer.name% arrives!
+%echo% ~%dealer% arrives!
 * Set adventure location back to scaffold
 nop %instance.set_location(%instance.real_location%)%
 * Load despawn timer
@@ -644,17 +644,17 @@ ankle brace completion~
 ~
 nop %self.link_instance%
 if !%instance.real_location%
-  %echo% %self.name% vanishes uselessly.
+  %echo% ~%self% vanishes uselessly.
   %purge% %self%
 end
 eval colossus %instance.mob(12500)%
-%echo% %colossus.name% slowly staggers back to its scaffold.
+%echo% ~%colossus% slowly staggers back to its scaffold.
 if %colossus%
-  %echoaround% %colossus% %colossus.name% staggers slowly back to its scaffold.
+  %echoaround% %colossus% ~%colossus% staggers slowly back to its scaffold.
   %teleport% %colossus% %instance.real_location%
   nop %colossus.add_mob_flag(SENTINEL)%
   nop %instance.set_location(%instance.real_location%)%
-  %echoaround% %colossus% %colossus.name% staggers slowly up.
+  %echoaround% %colossus% ~%colossus% staggers slowly up.
 end
 %purge% %self%
 ~
@@ -688,7 +688,7 @@ Adventurer bribe~
 0 tv 0
 ~
 if %self.aff_flagged(*CHARM)%
-  %send% %actor% Someone else has already bribed %self.name%.
+  %send% %actor% Someone else has already bribed ~%self%.
   return 0
   halt
 end
@@ -725,22 +725,22 @@ while %person%
     end
     if %success%
       %send% %person% You manage to stay on the colossus's wildly flailing arm!
-      %echoaround% %person% %person.name% manages to cling on.
+      %echoaround% %person% ~%person% manages to cling on.
     else
       %send% %person% The colossus's wildly flailing arm sends you flying!
-      %echoaround% %person% %person.name% goes flying!
+      %echoaround% %person% ~%person% goes flying!
       eval colossus %instance.mob(12500)%
       if %colossus%
         rdelete cling_%person.id% %self.id%
         %teleport% %person% %colossus.room%
         %force% %person% look
-        %echoaround% %person% %person.name% falls off %colossus.name%'s arm and comes crashing down!
+        %echoaround% %person% ~%person% falls off |%colossus% arm and comes crashing down!
         %send% %person% &&rYou crash into the ground!
         %damage% %person% 100 physical
       else
         %teleport% %person% %instance.location%
         %force% %person% look
-        %echoaround% %person% %person.name% falls off %colossus.name%'s arm and comes crashing down!
+        %echoaround% %person% ~%person% falls off |%colossus% arm and comes crashing down!
         %send% %person% &&rYou crash into the ground!
         %damage% %person% 100 physical
       end
@@ -762,7 +762,7 @@ if !%self.running%
   halt
 end
 %send% %actor% You cling on for dear life!
-%echoaround% %actor% %actor.name% desperately clings on!
+%echoaround% %actor% ~%actor% desperately clings on!
 set cling_%actor.id% 1
 remote cling_%actor.id% %self.id%
 dg_affect %actor% HARD-STUNNED on 5
@@ -814,7 +814,7 @@ end
 Colossus arm death~
 0 f 100
 ~
-%echo% The destruction of %self.name% weakens the colossus!
+%echo% The destruction of ~%self% weakens the colossus!
 * Start of script fragment: colossus damage updater
 eval colossus %instance.mob(12500)%
 if %colossus%
@@ -853,7 +853,7 @@ else
   set cycle 1
 end
 if %cycle% >= 10
-  %echo% An explosion rocks %self.name%!
+  %echo% An explosion rocks ~%self%!
   %damage% %self% 99999 direct
   halt
 end
@@ -921,7 +921,7 @@ else
     eval cycle %cycle% - 1
     remote cycle %self.id%
   end
-  %echo% &&r%self.name% releases a blast of lightning!
+  %echo% &&r~%self% releases a blast of lightning!
   set person %room.people%
   while %person%
     if %person.is_pc%
@@ -989,7 +989,7 @@ if %command%
     halt
   end
   %send% %actor% You pull the %command% lever.
-  %echoaround% %actor% %actor.name% pulls the %command% lever.
+  %echoaround% %actor% ~%actor% pulls the %command% lever.
   set action_%actor.id% %command%
   remote action_%actor.id% %self.id%
 end
@@ -1296,7 +1296,7 @@ if %target% != %self%
   halt
 end
 %send% %actor% You pry %self.shortdesc% open, revealing a compartment filled with wires...
-%echoaround% %actor% %actor.name% pries %self.shortdesc% open, revealing a compartment filled with wires...
+%echoaround% %actor% ~%actor% pries %self.shortdesc% open, revealing a compartment filled with wires...
 eval first_panel 12552 + %random.6%
 %load% obj %first_panel%
 %force% %actor% look panel
@@ -1342,7 +1342,7 @@ switch %self.vnum%
 done
 if %color% and %correct_color%
   %send% %actor% You cut the %color% wire...
-  %echoaround% %actor% %actor.name% cuts the %color% wire...
+  %echoaround% %actor% ~%actor% cuts the %color% wire...
   if %color% == %correct_color%
     if %self.val0% >= 3
       %echo% The final panel slides closed, and the colossus is rocked by an internal explosion!
@@ -1392,20 +1392,20 @@ if %color% and %correct_color%
     end
   else
     %send% %actor% &&rThe open panel blasts you with lightning!
-    %echoaround% %actor% The open panel blasts %actor.name% with lightning!
+    %echoaround% %actor% The open panel blasts ~%actor% with lightning!
     %damage% %actor% 300 magical
     %send% %actor% Your spasming hands lose purchase on the colossus!
-    %echoaround% %actor% %actor.name% falls off the colossus, twitching and spasming!
+    %echoaround% %actor% ~%actor% falls off the colossus, twitching and spasming!
     eval colossus %instance.mob(12500)%
     if %colossus%
       eval room %colossus.room%
       %teleport% %actor% %room%
-      %echoaround% %actor% %actor.name% falls off the colossus!
+      %echoaround% %actor% ~%actor% falls off the colossus!
       %force% %actor% look
     else
       %teleport% %actor% %instance.location%
       %force% %actor% look
-      %echoaround% %actor% %actor.name% falls out of nowhere.
+      %echoaround% %actor% ~%actor% falls out of nowhere.
     end
   end
 end
@@ -1484,7 +1484,7 @@ while %cycles_left% >= 0
   if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < 4
-      %echoaround% %actor% %actor.name%'s chant is interrupted.
+      %echoaround% %actor% |%actor% chant is interrupted.
       %send% %actor% Your chant is interrupted.
     else
       * combat, stun, sitting down, etc
@@ -1530,8 +1530,8 @@ if %first_chant% == %last_chant% && %second_chant% == %chant_num%
   rdelete first_chant %colossus.id%
   rdelete second_chant %colossus.id%
   rdelete last_chant %colossus.id%
-  %buildingecho% %instance.start% An explosion rocks %colossus.name%!
-  %at% %colossus.room% %echo% An explosion rocks %colossus.name%!
+  %buildingecho% %instance.start% An explosion rocks ~%colossus%!
+  %at% %colossus.room% %echo% An explosion rocks ~%colossus%!
   * Start of script fragment: colossus damage updater
   eval colossus %instance.mob(12500)%
   if %colossus%
@@ -1601,7 +1601,7 @@ search~
 %load% obj 12560 %actor% inv
 set obj %actor.inventory(12560)%
 %send% %actor% Searching the room, you find %obj.shortdesc% stuffed behind a broken gear.
-%echoaround% %actor% %actor.name% searches the room and finds %obj.shortdesc%.
+%echoaround% %actor% ~%actor% searches the room and finds %obj.shortdesc%.
 detach 12557 %self.id%
 ~
 #12558
@@ -1629,7 +1629,7 @@ end
 eval colossus %instance.mob(12500)%
 if %colossus%
   %send% %actor% You turn %self.shortdesc%...
-  %echoaround% %actor% %actor.name% turns %self.shortdesc%...
+  %echoaround% %actor% ~%actor% turns %self.shortdesc%...
   %buildingecho% %instance.start% A shudder runs through the colossus!
   %at% %colossus.room% %echo% A shudder runs through the colossus!
   dg_affect #12501 %colossus% off

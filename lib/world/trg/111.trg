@@ -13,7 +13,7 @@ Hermit Food Exchange~
 0 j 100
 ~
 if %object.type% != FOOD || %self.varexists(gave%actor.id%)%
-  %send% %actor% %self.name% doesn't want %object.shortdesc%!
+  %send% %actor% ~%self% doesn't want %object.shortdesc%!
   %send% %actor% (You have already completed this quest in this instance.)
   return 0
   halt
@@ -22,10 +22,10 @@ wait 1 sec
 if %object.type% == FOOD
   say My thanks to you, %actor.name%!
   * We used to actually load it and then give it but it was not being given to players with full inventories
-  %send% %actor% %self.name% gives you a snakeskin bag.
-  %echoaround% %actor% %self.name% gives %actor.name% a snakeskin bag.
+  %send% %actor% ~%self% gives you a snakeskin bag.
+  %echoaround% %actor% ~%self% gives ~%actor% a snakeskin bag.
   %load% o 11100 %actor% inventory
-  %echo% %self.name% gleefully eats %object.shortdesc%!
+  %echo% ~%self% gleefully eats %object.shortdesc%!
   mjunk %object.name%
   set gave%actor.id% 1
   remote gave%actor.id% %self.id%
@@ -38,7 +38,7 @@ Befriend Pegasus~
 * Reject items other than the 6 crop items from this adventure
 if (%object.vnum% < 11102 || %object.vnum% > 11107)
   wait 1 sec
-  %echo% %self.name% does not seem interested.
+  %echo% ~%self% does not seem interested.
   mjunk all
   halt
 end
@@ -59,12 +59,12 @@ remote befriend_pegasus %actor.id%
 * Behavior
 wait 1 sec
 if (%befriend_pegasus% < 3)
-  %send% %actor% %self.name% eats %object.shortdesc% and nuzzles you.
-  %echoaround% %actor% %self.name% eats %object.shortdesc% and nuzzles %actor.name%.
+  %send% %actor% ~%self% eats %object.shortdesc% and nuzzles you.
+  %echoaround% %actor% ~%self% eats %object.shortdesc% and nuzzles ~%actor%.
   mjunk all
 else
-  %echo% %self.name% eats %object.shortdesc% and nickers.
-  %send% %actor% It looks like you could ride %self.himher%!
+  %echo% ~%self% eats %object.shortdesc% and nickers.
+  %send% %actor% It looks like you could ride *%self%!
   mjunk all
   * reset to 0
   set befriend_pegasus 0
@@ -97,18 +97,18 @@ end
 Cave Viper Combat~
 0 k 10
 ~
-%send% %actor% %self.name% strikes out and bites your leg!
-%echoaround% %actor% %self.name% strikes out and bites %actor.name%'s leg!
+%send% %actor% ~%self% strikes out and bites your leg!
+%echoaround% %actor% ~%self% strikes out and bites |%actor% leg!
 %dot% %actor% 100 30 poison
 ~
 #11105
 Venomous Skink Combat~
 0 k 10
 ~
-%send% %actor% %self.name% bites down and latches onto your arm!
+%send% %actor% ~%self% bites down and latches onto your arm!
 %send% %actor% You don't feel so good...
-%echoaround% %actor% %self.name% bites down and latches onto %actor.name%'s arm!
-%echoaround% %actor% %actor.name% doesn't look so good...
+%echoaround% %actor% ~%self% bites down and latches onto |%actor% arm!
+%echoaround% %actor% ~%actor% doesn't look so good...
 dg_affect %actor% slow on 30
 %damage% %actor% 50
 ~
@@ -118,7 +118,7 @@ Lean Left~
 left~
 context %actor.room.vnum%
 %send% %actor% You lean hard to the left!
-%echoaround% %actor% %actor.name% leans hard to the left!
+%echoaround% %actor% ~%actor% leans hard to the left!
 set lean_left 1
 remote lean_left %actor.id%
 set lean_right 0
@@ -130,7 +130,7 @@ Lean Right~
 right~
 context %actor.room.vnum%
 %send% %actor% You lean hard to the right!
-%echoaround% %actor% %actor.name% leans hard to the right!
+%echoaround% %actor% ~%actor% leans hard to the right!
 set lean_left 0
 remote lean_left %actor.id%
 set lean_right 1
@@ -142,7 +142,7 @@ Duck!~
 duck~
 context %actor.room.vnum%
 %send% %actor% You duck in the boat!
-%echoaround% %actor% %actor.name% ducks!
+%echoaround% %actor% ~%actor% ducks!
 set has_ducked 1
 remote has_ducked %actor.id%
 ~
@@ -244,7 +244,7 @@ while %ch%
     end
     if !%ducked%
       %send% %actor% You smack into the tree branch and are knocked from the boat!
-      %echoaround% %actor% %actor.name% smacks into the tree branch and is knocked from the boat!
+      %echoaround% %actor% ~%actor% smacks into the tree branch and is knocked from the boat!
       %teleport% %ch% i11123
       %force% %ch% look
       %damage% %ch% 25
@@ -341,13 +341,13 @@ wait 3 sec
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
   halt
 end
-%echo% You spot %self.name% in the air above!
+%echo% You spot ~%self% in the air above!
 wait 3 sec
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
   halt
 end
-%send% %actor% %self.name% goes into a dive, heading straight for you!
-%echoaround% %actor% %self.name% goes into a dive, heading straight for %actor.name%!
+%send% %actor% ~%self% goes into a dive, heading straight for you!
+%echoaround% %actor% ~%self% goes into a dive, heading straight for ~%actor%!
 wait 3 sec
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
   halt
@@ -372,13 +372,13 @@ wait 3 sec
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
   halt
 end
-%echo% %self.name% emerges from the water!
+%echo% ~%self% emerges from the water!
 wait 3 sec
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
   halt
 end
-%echoaround% %actor% %self.name% charges toward %actor.name%!
-%send% %actor% %self.name% charges toward you!
+%echoaround% %actor% ~%self% charges toward ~%actor%!
+%send% %actor% ~%self% charges toward you!
 wait 3 sec
 if (%self.fighting% || %self.disabled% || %actor.nohassle% || !(%actor.room%==%self.room%))
   halt
@@ -403,14 +403,14 @@ set target %self.val0%
 * and use %vehicle.name% instead of "a rib-bone boat"
 * (see mini-pet use for an example)
 %send% %actor% You use %self.shortdesc% and a rib-bone boat appears!
-%echoaround% %actor% %actor.name% uses %self.shortdesc% and a rib-bone boat appears!
+%echoaround% %actor% ~%actor% uses %self.shortdesc% and a rib-bone boat appears!
 %purge% %self%
 ~
 #11116
 Loch Colossus block door~
 0 r 100
 ~
-%send% %actor% You cannot reach that while %self.name% is in the way.
+%send% %actor% You cannot reach that while ~%self% is in the way.
 return 0
 ~
 #11123
@@ -470,12 +470,12 @@ if !%hex_box_open%
 end
 * Message
 %send% %actor% You push the image of the garden on the side of %self.shortdesc%.
-%echoaround% %actor% %actor.name% pushes the image of the garden on the side of %self.shortdesc%.
+%echoaround% %actor% ~%actor% pushes the image of the garden on the side of %self.shortdesc%.
 * Fail: wrong order
 if %hex_box_open% != 0
   if %hex_box_open% > 0
     %send% %actor% To your dismay, the sigils fade on the sides of %self.shortdesc%.
-    %echoaround% %actor% To %actor.name%'s dismay, the sigils fade on the sides of %self.shortdesc%.
+    %echoaround% %actor% To |%actor% dismay, the sigils fade on the sides of %self.shortdesc%.
   else
     %send% %actor% ... nothing seems to happen.
   end
@@ -484,7 +484,7 @@ if %hex_box_open% != 0
   halt
 end
 %send% %actor% To your surprise, the image of the garden begins to glow!
-%echoaround% %actor% To %actor.name%'s surprise, the image of the garden begins to glow!
+%echoaround% %actor% To |%actor% surprise, the image of the garden begins to glow!
 set hex_box_open 1
 global hex_box_open
 ~
@@ -503,12 +503,12 @@ if !%hex_box_open%
 end
 * Message
 %send% %actor% You push the image of the mill on the side of %self.shortdesc%.
-%echoaround% %actor% %actor.name% pushes the image of the mill on the side of %self.shortdesc%.
+%echoaround% %actor% ~%actor% pushes the image of the mill on the side of %self.shortdesc%.
 * Fail: wrong order
 if %hex_box_open% != 1
   if %hex_box_open% > 0
     %send% %actor% To your dismay, the sigils fade on the sides of %self.shortdesc%.
-    %echoaround% %actor% To %actor.name%'s dismay, the sigils fade on the sides of %self.shortdesc%.
+    %echoaround% %actor% To |%actor% dismay, the sigils fade on the sides of %self.shortdesc%.
   else
     %send% %actor% ... nothing seems to happen.
   end
@@ -536,12 +536,12 @@ if !%hex_box_open%
 end
 * Message
 %send% %actor% You push the image of the stable on the side of %self.shortdesc%.
-%echoaround% %actor% %actor.name% pushes the image of the stable on the side of %self.shortdesc%.
+%echoaround% %actor% ~%actor% pushes the image of the stable on the side of %self.shortdesc%.
 * Fail: wrong order
 if %hex_box_open% != 2
   if %hex_box_open% > 0
     %send% %actor% To your dismay, the sigils fade on the sides of %self.shortdesc%.
-    %echoaround% %actor% To %actor.name%'s dismay, the sigils fade on the sides of %self.shortdesc%.
+    %echoaround% %actor% To |%actor% dismay, the sigils fade on the sides of %self.shortdesc%.
   else
     %send% %actor% ... nothing seems to happen.
   end
@@ -569,12 +569,12 @@ if !%hex_box_open%
 end
 * Message
 %send% %actor% You push the image of the estate on the side of %self.shortdesc%.
-%echoaround% %actor% %actor.name% pushes the image of the estate on the side of %self.shortdesc%.
+%echoaround% %actor% ~%actor% pushes the image of the estate on the side of %self.shortdesc%.
 * Fail: wrong order
 if %hex_box_open% != 3
   if %hex_box_open% > 0
     %send% %actor% To your dismay, the sigils fade on the sides of %self.shortdesc%.
-    %echoaround% %actor% To %actor.name%'s dismay, the sigils fade on the sides of %self.shortdesc%.
+    %echoaround% %actor% To |%actor% dismay, the sigils fade on the sides of %self.shortdesc%.
   else
     %send% %actor% ... nothing seems to happen.
   end
@@ -605,7 +605,7 @@ end
 set sarcophagus_running 1
 global sarcophagus_running
 %send% %actor% You cautiously open %self.shortdesc%...
-%echoaround% %actor% %actor.name% cautiously opens %self.shortdesc%...
+%echoaround% %actor% ~%actor% cautiously opens %self.shortdesc%...
 %echo% A giant shape lurches at you from the darkness inside!
 %load% mob 11138
 %load% obj 11140
@@ -706,8 +706,8 @@ if !%target%
   * In case of blindness
   set target %actor%
 end
-%send% %target% %self.name% encircles you and constricts!
-%echoaround% %target% %self.name% encircles %target.name% and constricts %target.himher%!
+%send% %target% ~%self% encircles you and constricts!
+%echoaround% %target% ~%self% encircles ~%target% and constricts *%target%!
 dg_affect %target% HARD-STUNNED on 15
 dg_affect %self% HARD-STUNNED on 15
 %damage% %target% 50
@@ -715,22 +715,22 @@ wait 5 sec
 if !%target% || !%self% || !%self.fighting%
   halt
 end
-%send% %target% %self.name% constricts and crushes you!
-%echoaround% %target% %self.name% constricts and crushes %target.name%!
+%send% %target% ~%self% constricts and crushes you!
+%echoaround% %target% ~%self% constricts and crushes ~%target%!
 %damage% %target% 50
 wait 5 sec
 if !%target% || !%self% || !%self.fighting%
   halt
 end
-%send% %target% %self.name% constricts and crushes you!
-%echoaround% %target% %self.name% constricts and crushes %target.name%!
+%send% %target% ~%self% constricts and crushes you!
+%echoaround% %target% ~%self% constricts and crushes ~%target%!
 %damage% %target% 50
 wait 5 sec
 if !%target% || !%self% || !%self.fighting%
   halt
 end
-%send% %target% %self.name% releases you!
-%echoaround% %target% %self.name% releases %target.name%!
+%send% %target% ~%self% releases you!
+%echoaround% %target% ~%self% releases ~%target%!
 ~
 #11139
 Sleeping Ivy combat~
@@ -746,8 +746,8 @@ set target %random.enemy%
 if !%target%
   halt
 end
-%send% %target% %self.name% wraps %self.himher%self around you, mummifying you and dragging you off to blissful slumber...
-%echoaround% %target% %self.name% wraps %self.himher%self around %target.name%, mummifying %target.himher% and dragging %target.himher% off to blissful slumber...
+%send% %target% ~%self% wraps *%self%self around you, mummifying you and dragging you off to blissful slumber...
+%echoaround% %target% ~%self% wraps *%self%self around ~%target%, mummifying *%target% and dragging *%target% off to blissful slumber...
 dg_affect %target% HARD-STUNNED on 15
 dg_affect %self% HARD-STUNNED on 15
 * prevents re-running of this script until affect ends
@@ -759,8 +759,8 @@ Lulling songbird combat~
 ~
 set target %random.enemy%
 if %target%
-  %send% %target% %self.name% sings a sweet tune, lulling you and making you sluggish!
-  %echoaround% %target% %self.name% sings a sweet tune, lulling %target.name% and making %target.himher% sluggish!
+  %send% %target% ~%self% sings a sweet tune, lulling you and making you sluggish!
+  %echoaround% %target% ~%self% sings a sweet tune, lulling ~%target% and making *%target% sluggish!
   dg_affect %target% SLOW on 15
   dg_affect %target% WITS -1 15
 end

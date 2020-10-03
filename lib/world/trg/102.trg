@@ -2,7 +2,7 @@
 Goblin Challenge Must Fight~
 0 s 100
 ~
-%send% %actor% You have begun the Goblin Challenge and cannot leave without fighting %self.name%.
+%send% %actor% You have begun the Goblin Challenge and cannot leave without fighting ~%self%.
 return 0
 ~
 #10201
@@ -30,7 +30,7 @@ switch %random.2%
   case 2
     * Stun
     %send% %actor% Zelkab bashes you in the head with his club!
-    %echoaround% %actor% Zelkab bashes %actor.name% in the head with his club!
+    %echoaround% %actor% Zelkab bashes ~%actor% in the head with his club!
     dg_affect %actor% STUNNED on 10
     %damage% %actor% 50 physical
   break
@@ -89,7 +89,7 @@ switch %random.4%
   default
     * Goblinfire
     %send% %actor% Garlgarl splashes goblinfire at you, causing serious burns!
-    %echoaround% %actor% Garlgarl splashes goblinfire at %actor.name%, causing serious burns!
+    %echoaround% %actor% Garlgarl splashes goblinfire at ~%actor%, causing serious burns!
     %dot% %actor% 33 15 fire
     %damage% %actor% 50 fire
   break
@@ -139,7 +139,7 @@ Filks Archer Combat~
 0 k 10
 ~
 %send% %actor% Filks dashes backwards, draws her bow, and shoots you with a poison arrow!
-%echoaround% %actor% Filks dashes backwards, draws her bow, and shoots %actor.name% with a poison arrow!
+%echoaround% %actor% Filks dashes backwards, draws her bow, and shoots ~%actor% with a poison arrow!
 %dot% %actor% 75 15 poison
 %damage% %actor% 50 physical
 ~
@@ -340,7 +340,7 @@ if (!%found%)
   %load% mob 10203
   makeuid walts mob walts
   if %walts%
-    %echo% %walts.name% respawns.
+    %echo% ~%walts% respawns.
     nop %walts.add_mob_flag(!LOOT)%
   end
 end
@@ -365,7 +365,7 @@ if (!%found%)
   %load% mob 10202
   makeuid filks mob filks
   if %filks%
-    %echo% %filks.name% respawns.
+    %echo% ~%filks% respawns.
     nop %filks.add_mob_flag(!LOOT)%
   end
 end
@@ -399,7 +399,7 @@ if %filks_present% && !%walts_present% && !%fighting%
   %load% mob 10203
   set new_mob %room.people%
   if %new_mob.vnum% == 10203
-    %echo% %new_mob.name% respawns.
+    %echo% ~%new_mob% respawns.
     nop %new_mob.add_mob_flag(!LOOT)%
   end
 elseif %walts_present% && !%filks_present% && !%fighting%
@@ -407,7 +407,7 @@ elseif %walts_present% && !%filks_present% && !%fighting%
   %load% mob 10202
   set new_mob %room.people%
   if %new_mob.vnum% == 10202
-    %echo% %new_mob.name% respawns.
+    %echo% ~%new_mob% respawns.
     nop %new_mob.add_mob_flag(!LOOT)%
   end
 end
@@ -437,14 +437,14 @@ Druid greeting~
 0 g 100
 ~
 wait 5
-%send% %actor% %self.name% greets you warmly.
+%send% %actor% ~%self% greets you warmly.
 * only if they don't have one
 if (%actor.has_item(10233)% || %actor.has_item(10234)% || %actor.has_item(10235)% || %actor.has_item(10236)% || %actor.has_item(10237)%)
   halt
 end
 wait 5
-%send% %actor% %self.name% tells you, 'Here, take this. I could use a hand here.'
-%send% %actor% %self.name% hands you a list.
+%send% %actor% ~%self% tells you, 'Here, take this. I could use a hand here.'
+%send% %actor% ~%self% hands you a list.
 %load% obj 10237 %actor% inv
 ~
 #10226
@@ -458,11 +458,11 @@ if (%actor.has_resources(3002,4)% && %actor.has_resources(3004,4)% && %actor.has
   nop %actor.add_resources(3008,-4)%
   nop %actor.add_resources(3010,-4)%
   %load% obj 10233 %actor% inv
-  %send% %actor% You give %self.name% the fruits you have collected, and %self.heshe% gives you a wooden fruit token!
-  %echoaround% %actor% %actor.name% gives %self.name% several baskets of fruits, and receives a wooden fruit token.
+  %send% %actor% You give ~%self% the fruits you have collected, and &%self% gives you a wooden fruit token!
+  %echoaround% %actor% ~%actor% gives ~%self% several baskets of fruits, and receives a wooden fruit token.
   if !%actor.has_item(10238)%
     %load% obj 10238 %actor% inv
-    %send% %actor% %self.heshe% also gives you another list.
+    %send% %actor% &%self% also gives you another list.
   end
 elseif (%actor.has_resources(141,4)% && %actor.has_resources(3005,4)% && %actor.has_resources(3011,4)% && %actor.has_resources(145,4)%)
   * grains
@@ -471,11 +471,11 @@ elseif (%actor.has_resources(141,4)% && %actor.has_resources(3005,4)% && %actor.
   nop %actor.add_resources(3011,-4)%
   nop %actor.add_resources(145,-4)%
   %load% obj 10234 %actor% inv
-  %send% %actor% You give %self.name% the grains you have collected, and %self.heshe% gives you a copper grain token!
-  %echoaround% %actor% %actor.name% gives %self.name% several baskets of grains, and receives a copper grain token.
+  %send% %actor% You give ~%self% the grains you have collected, and &%self% gives you a copper grain token!
+  %echoaround% %actor% ~%actor% gives ~%self% several baskets of grains, and receives a copper grain token.
   if !%actor.has_item(10239)%
     %load% obj 10239 %actor% inv
-    %send% %actor% %self.heshe% also gives you another list.
+    %send% %actor% &%self% also gives you another list.
   end
 elseif (%actor.has_resources(143,4)% && %actor.has_resources(144,4)% && %actor.has_resources(3023,4)% && %actor.has_resources(3019,4)%)
   * tradegoods
@@ -484,14 +484,14 @@ elseif (%actor.has_resources(143,4)% && %actor.has_resources(144,4)% && %actor.h
   nop %actor.add_resources(3023,-4)%
   nop %actor.add_resources(3019,-4)%
   %load% obj 10235 %actor% inv
-  %send% %actor% You give %self.name% the goods you have collected, and %self.heshe% gives you a silver tradegoods token!
-  %echoaround% %actor% %actor.name% gives %self.name% several baskets of goods, and receives a silver tradegoods token.
+  %send% %actor% You give ~%self% the goods you have collected, and &%self% gives you a silver tradegoods token!
+  %echoaround% %actor% ~%actor% gives ~%self% several baskets of goods, and receives a silver tradegoods token.
 else
   %send% %actor% You have nothing to offer.
   wait 5
   if !%actor.has_item(10237)%
     %load% obj 10237 %actor% inv
-    %send% %actor% %self.name% hands you a list.
+    %send% %actor% ~%self% hands you a list.
   end
 end
 ~
@@ -534,16 +534,16 @@ else
 end
 switch %msg_pos%
   case 1
-    %echo% %self.name% carefully waters the plants.
+    %echo% ~%self% carefully waters the plants.
   break
   case 2
-    %echo% %self.name% trims unwanted growth from the plants.
+    %echo% ~%self% trims unwanted growth from the plants.
   break
   case 3
-    %echo% %self.name% trims unwanted growth from the plants.
+    %echo% ~%self% trims unwanted growth from the plants.
   break
   case 4
-    %echo% %self.name% whistles a strange tune.
+    %echo% ~%self% whistles a strange tune.
   break
 done
 if %msg_pos% >= 4
@@ -576,7 +576,7 @@ end
 %purge% %wooden_token%
 %purge% %copper_token%
 %send% %actor% You magically combine all three tokens into a gnarled wooden token!
-%echoaround% %actor% %actor.name% magically combines three strange tokens into a gnarled wooden token!
+%echoaround% %actor% ~%actor% magically combines three strange tokens into a gnarled wooden token!
 %load% obj 10236 %actor% inv
 %purge% %self%
 ~
@@ -599,20 +599,20 @@ if (%room.template% != 10225)
   halt
 end
 %send% %actor% You begin the chant of gardens...
-%echoaround% %actor% %actor.name% begins the chant of gardens...
+%echoaround% %actor% ~%actor% begins the chant of gardens...
 wait 4 sec
 if !(%self.carried_by% == %actor%) || %room% != %self.room%
   halt
 end
 %send% %actor% You rhythmically speak the words to the chant of gardens...
-%echoaround% %actor% %actor.name% rhythmically speaks the words to the chant of gardens...
+%echoaround% %actor% ~%actor% rhythmically speaks the words to the chant of gardens...
 wait 4 sec
 if !(%self.carried_by% == %actor%) || %room% != %self.room%
   halt
 end
-%echoaround% %actor% %actor.name% vanishes in a swirl of dust!
+%echoaround% %actor% ~%actor% vanishes in a swirl of dust!
 %teleport% %actor% i10226
-%echoaround% %actor% %actor.name% appears in a swirl of dust!
+%echoaround% %actor% ~%actor% appears in a swirl of dust!
 %force% %actor% look
 ~
 #10250
@@ -645,8 +645,8 @@ return 1
 King of the Dracosaurs grievous bite~
 0 k 7
 ~
-%send% %actor% %self.name% takes a grievous bite out of you!
-%echoaround% %actor% %self.name% takes a grievous bite out of %actor.name%!
+%send% %actor% ~%self% takes a grievous bite out of you!
+%echoaround% %actor% ~%self% takes a grievous bite out of ~%actor%!
 %dot% %actor% 100 30 physical
 %damage% %actor% 60 physical
 ~
@@ -655,7 +655,7 @@ Terrosaur combat~
 0 k 5
 ~
 dg_affect %self% BONUS-PHYSICAL 5 120
-%echo% %self.name% seems to get angrier!
+%echo% ~%self% seems to get angrier!
 ~
 #10254
 Malfernes combat~
@@ -733,12 +733,12 @@ if (%self.fighting% || %self.disabled% || %actor.nohassle%)
   halt
 end
 wait 5
-%echo% %self.name% cackles insanely!
+%echo% ~%self% cackles insanely!
 wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-%echo% A strange violet glow encircles %self.name%, as if some arcane magic is controlling him.
+%echo% A strange violet glow encircles ~%self%, as if some arcane magic is controlling him.
 wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
@@ -762,7 +762,7 @@ Primeval must-fight~
 if (%actor.nohassle% || %direction% == south)
   halt
 end
-%send% %actor% You can't seem to get away from %self.name%!
+%send% %actor% You can't seem to get away from ~%self%!
 return 0
 ~
 #10263
@@ -780,8 +780,8 @@ if (%actor.position% != Standing)
 end
 %load% m %self.val0%
 set mob %self.room.people%
-%send% %actor% You use %self.shortdesc% and %mob.name% appears!
-%echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
+%send% %actor% You use %self.shortdesc% and ~%mob% appears!
+%echoaround% %actor% ~%actor% uses %self.shortdesc% and ~%mob% appears!
 if (%mob% && %mob.vnum% == %self.val0%)
   nop %mob.unlink_instance%
 end
@@ -984,23 +984,23 @@ if (%self.fighting% || %self.disabled% || %actor.nohassle%)
   halt
 end
 wait 5
-%echo% The earth itself tremors in fear as %self.name% stomps toward you.
+%echo% The earth itself tremors in fear as ~%self% stomps toward you.
 wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-%echo% %self.name% stops and lets out a terrifying roar!
+%echo% ~%self% stops and lets out a terrifying roar!
 wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-%echo% %self.name% swipes %self.hisher% massive tail, and a tree goes flying!
+%echo% ~%self% swipes ^%self% massive tail, and a tree goes flying!
 %load% obj 120 room
 wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-%echo% %self.name% looms close, and it's only as %self.heshe% bends down to bite you that you realize how big %self.heshe% is!
+%echo% ~%self% looms close, and it's only as &%self% bends down to bite you that you realize how big &%self% is!
 wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
@@ -1020,18 +1020,18 @@ wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-%echo% %self.name% drops the crocodile %self.heshe% was carrying in its talons, and swoops toward you!
+%echo% ~%self% drops the crocodile &%self% was carrying in its talons, and swoops toward you!
 wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-%echo% %self.name% vanishes as %self.heshe% swoops too close to the trees for you to see exactly which way %self.heshe%'s coming from.
+%echo% ~%self% vanishes as &%self% swoops too close to the trees for you to see exactly which way &%self%'s coming from.
 %load% obj 120
 wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt
 end
-%echo% %self.name% reappears over the clearing, suddenly so close %self.heshe% blots out the sun!
+%echo% ~%self% reappears over the clearing, suddenly so close &%self% blots out the sun!
 wait 3 sec
 if (%self.fighting% || %self.disabled%)
   halt

@@ -30,8 +30,8 @@ if %actor.has_reputation(12401,Liked)%
   %send% %actor% You'd rather not upset the goblins by doing that.
   halt
 end
-%send% %actor% You untie %self.name%.
-%echoaround% %actor% %actor.name% unties %self.name%.
+%send% %actor% You untie ~%self%.
+%echoaround% %actor% ~%actor% unties ~%self%.
 nop %actor.set_reputation(12401, Despised)%
 %load% mob 12407
 %purge% %self%
@@ -62,7 +62,7 @@ if %vnum%
     else
       nop %summon.remove_mob_flag(HARD)%
     end
-    %echo% %summon.name% arrives!
+    %echo% ~%summon% arrives!
   end
 end
 * lose rep
@@ -74,7 +74,7 @@ while %person%
       if %self.mob_flagged(HARD)%
         set amount 2
       end
-      %send% %person% You loot %amount% %currency.12403(%amount%)% from %self.name%.
+      %send% %person% You loot %amount% %currency.12403(%amount%)% from ~%self%.
       nop %person.give_currency(12403, %amount%)%
     end
     nop %person.set_reputation(12401, Despised)%
@@ -146,7 +146,7 @@ while %vnum% <= 12420
   eval vnum %vnum% + 1
 done
 %send% %actor% You set the difficulty...
-%echoaround% %actor% %actor.name% sets the difficulty...
+%echoaround% %actor% ~%actor% sets the difficulty...
 %echo% You discover a passage hidden behind %self.shortdesc%.
 set newroom i12401
 %door% %self.room% north room %newroom%
@@ -189,7 +189,7 @@ global depleted
 %load% obj 12407 %actor% inv
 set item %actor.inventory(12407)%
 %send% %actor% Searching the cavern, you find %item.shortdesc%.
-%echoaround% %actor% %actor.name% searches the cavern and finds %item.shortdesc%.
+%echoaround% %actor% ~%actor% searches the cavern and finds %item.shortdesc%.
 ~
 #12408
 Goblin Cove trash spawner~
@@ -230,7 +230,7 @@ Underwater cave mob block~
 if (%actor.nohassle% || %direction% == south || %actor.on_quest(12406)% || %actor.on_quest(12407)% || %actor.on_quest(12408)% || %actor.on_quest(12409)%)
   halt
 end
-%send% %actor% %self.name% won't let you pass!
+%send% %actor% ~%self% won't let you pass!
 return 0
 ~
 #12410
@@ -401,10 +401,10 @@ wait 5 sec
 set person %room.people%
 while %person%
   set next_person %person.next_in_room%
-  %echoaround% %person% %person.name% washes up nearby.
+  %echoaround% %person% ~%person% washes up nearby.
   %teleport% %person% i12406
   %force% %person% look
-  %echoaround% %person% %person.name% washes up nearby.
+  %echoaround% %person% ~%person% washes up nearby.
   set person %next_person%
 done
 ~
@@ -429,8 +429,8 @@ set target %random.enemy%
 if !%target%
   set target %actor%
 end
-%send% %target% %self.name% draws a flintlock pistol and takes aim at you!
-%echoaround% %target% %self.name% draws a flintlock pistol and takes aim at %target.name%!
+%send% %target% ~%self% draws a flintlock pistol and takes aim at you!
+%echoaround% %target% ~%self% draws a flintlock pistol and takes aim at ~%target%!
 wait 3 sec
 if !%target%
   halt
@@ -438,11 +438,11 @@ end
 if !%self.is_enemy(%target%)%
   halt
 end
-%send% %target% &&r%self.name% shoots you with %self.hisher% pistol!
-%echoaround% %target% %self.name% shoots %target.name% with %self.hisher% pistol!
+%send% %target% &&r~%self% shoots you with ^%self% pistol!
+%echoaround% %target% ~%self% shoots ~%target% with ^%self% pistol!
 %damage% %target% 200 physical
 wait 5
-%echo% %self.name% blows on the barrel of %self.hisher% pistol and tosses it carelessly aside.
+%echo% ~%self% blows on the barrel of ^%self% pistol and tosses it carelessly aside.
 ~
 #12419
 Goblin Pirate: Ankle Stab~
@@ -452,8 +452,8 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-%send% %actor% &&r%self.name% stabs you in the ankle with %self.hisher% cutlass!
-%echoaround% %actor% %self.name% stabs %actor.name% in the ankle with %self.hisher% cutlass!
+%send% %actor% &&r~%self% stabs you in the ankle with ^%self% cutlass!
+%echoaround% %actor% ~%self% stabs ~%actor% in the ankle with ^%self% cutlass!
 %damage% %actor% 50 physical
 dg_affect #12419 %actor% SLOW on 5
 dg_affect #12419 %actor% DODGE -10 5
@@ -466,8 +466,8 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-%echo% %self.name% pulls a canteen of goblin grog from somewhere and tips %self.hisher% head back, drinking deeply.
-%echo% %self.name% fights with renewed strength!
+%echo% ~%self% pulls a canteen of goblin grog from somewhere and tips ^%self% head back, drinking deeply.
+%echo% ~%self% fights with renewed strength!
 %heal% %self% health 75
 dg_affect #12420 %self% HASTE on 10
 ~
@@ -483,8 +483,8 @@ set target %random.enemy%
 if !%target%
   set target %actor%
 end
-%send% %target% %self.name% grabs a handful of sand from one of %self.hisher% pockets and tosses it in your eyes!
-%echoaround% %target% %self.name% grabs a handful of sand from one of %self.hisher% pockets and tosses it in %target.name%'s eyes!
+%send% %target% ~%self% grabs a handful of sand from one of ^%self% pockets and tosses it in your eyes!
+%echoaround% %target% ~%self% grabs a handful of sand from one of ^%self% pockets and tosses it in |%target% eyes!
 dg_affect #12421 %target% BLIND on 5
 ~
 #12422
@@ -498,12 +498,12 @@ nop %self.set_cooldown(12400, 30)%
 say Get 'em, Polly!
 wait 2 sec
 if %random.20% == 20
-  %echo% %self.name%'s parrot says, 'Awk! Polly want a cracker!'
+  %echo% |%self% parrot says, 'Awk! Polly want a cracker!'
   wait 5 sec
   say Arr! Curse ye, mutinous fowl!
 else
-  %send% %actor% &&r%self.name%'s parrot dive-bombs you, forcing you to cover your eyes!
-  %echoaround% %actor% %self.name%'s parrot dive-bombs %actor.name%, forcing %actor.himher% to cover %actor.hisher% eyes!
+  %send% %actor% &&r|%self% parrot dive-bombs you, forcing you to cover your eyes!
+  %echoaround% %actor% |%self% parrot dive-bombs ~%actor%, forcing *%actor% to cover ^%actor% eyes!
   %damage% %actor% 25 physical
   dg_affect #12422 %actor% BLIND on 5
   %dot% #12423 %actor% 50 10 physical
@@ -521,20 +521,20 @@ eval health_percent (100 * %self.health%) / %self.maxhealth%
 eval extra_heads %health_percent% / 10
 eval heads 15 - %extra_heads%
 if %heads% == 1
-  %send% %actor% &&rOne of %self.name%'s serpentine heads snaps at you!
-  %echoaround% %actor% One of %self.name%'s serpentine heads snaps at %actor.name%!
+  %send% %actor% &&rOne of |%self% serpentine heads snaps at you!
+  %echoaround% %actor% One of |%self% serpentine heads snaps at ~%actor%!
   %damage% %actor% 100 physical
 elseif %heads% == 2
-  %send% %actor% &&rA pair of %self.name%'s snake heads snap at you!
-  %echoaround% %actor% A pair of %self.name%'s snake heads snap at %actor.name%!
+  %send% %actor% &&rA pair of |%self% snake heads snap at you!
+  %echoaround% %actor% A pair of |%self% snake heads snap at ~%actor%!
   %damage% %actor% 150 physical
 elseif %heads% < 9
-  %send% %actor% &&r%heads% of %self.name%'s heads batter you from all sides!
-  %echoaround% %actor% %actor.name% is attacked from all sides by %heads% of %self.name%'s heads!
+  %send% %actor% &&r%heads% of |%self% heads batter you from all sides!
+  %echoaround% %actor% ~%actor% is attacked from all sides by %heads% of |%self% heads!
   eval amount 50+%heads%*25
   %damage% %actor% %amount% physical
 elseif %heads% >= 9
-  %echo% &&r%self.name%'s %heads% heads lash out in all directions!
+  %echo% &&r|%self% %heads% heads lash out in all directions!
   eval amount 10+%heads%*10
   %aoe% %amount% physical
 end
@@ -547,8 +547,8 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-%send% %actor% One of &&r%self.name%'s serpentine heads snaps out and sinks its venomous fangs into your side!
-%echoaround% %actor% One of %self.name%'s serpentine heads snaps out and sinks its venomous fangs into %actor.name%'s side!
+%send% %actor% One of &&r|%self% serpentine heads snaps out and sinks its venomous fangs into your side!
+%echoaround% %actor% One of |%self% serpentine heads snaps out and sinks its venomous fangs into |%actor% side!
 %damage% %actor% 100 physical
 %dot% #12424 %actor% 100 15 poison
 ~
@@ -563,7 +563,7 @@ if %self.health% == %self.maxhealth%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-%echo% %self.name%'s wounds suddenly begin to close!
+%echo% |%self% wounds suddenly begin to close!
 %damage% %self% -250
 dg_affect #12425 %self% HEAL-OVER-TIME %self.level% 15
 ~
@@ -579,9 +579,9 @@ eval hitpercent %self.health% * 100 / %self.maxhealth%
 if %self.mob_flagged(HARD)% && %hitpercent% < 80
   set keep_attacking 1
 end
-%send% %actor% %self.name%'s head moves suddenly, and its snake-like neck wraps around you!
+%send% %actor% |%self% head moves suddenly, and its snake-like neck wraps around you!
 %send% %actor% (Type 'struggle' to break free.)
-%echoaround% %actor% %self.name%'s head moves suddenly, and its snake-like neck wraps around %actor.name%!
+%echoaround% %actor% |%self% head moves suddenly, and its snake-like neck wraps around ~%actor%!
 set struggle_counter 0
 remote struggle_counter %actor.id%
 dg_affect #12430 %actor% HARD-STUNNED on 20
@@ -589,7 +589,7 @@ if !%keep_attacking%
   dg_affect #12428 %self% HARD-STUNNED on 20
 end
 while %actor.affect(12430)%
-  %send% %actor% &&r%self.name% constricts and crushes you!
+  %send% %actor% &&r~%self% constricts and crushes you!
   %damage% %actor% 50 physical
   wait 5 sec
 done
@@ -602,8 +602,8 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-%echo% %self.name% is surrounded by a shimmering blue light!
-%echo% %self.name% is healed and strengthened!
+%echo% ~%self% is surrounded by a shimmering blue light!
+%echo% ~%self% is healed and strengthened!
 %heal% %self% health 75
 eval amount %self.level%/10
 dg_affect #12427 %self% BONUS-PHYSICAL %amount% 30
@@ -618,11 +618,11 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-%echo% &&r%self.name%'s canine heads lash out, snarling and gnashing.
+%echo% &&r|%self% canine heads lash out, snarling and gnashing.
 set person %self.room.people%
 while %person%
   if %person.is_npc% && %person.mob_flagged(FAMILIAR)%
-    %echo% %self.name%'s heads tear a chunk out of %person.name%!
+    %echo% |%self% heads tear a chunk out of ~%person%!
     %damage% %person% 350
   elseif %person% != %self%
     %damage% %person% 100
@@ -638,9 +638,9 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-%echo% %self.name% starts swimming rapidly in a tight circle...
+%echo% ~%self% starts swimming rapidly in a tight circle...
 wait 3 sec
-%echo% &&r%self.name%'s tentacle-tails lash out at you, blasting you with a wave of high-pressure water!
+%echo% &&r|%self% tentacle-tails lash out at you, blasting you with a wave of high-pressure water!
 %aoe% 50 physical
 set person %self.room.people%
 while %person%
@@ -661,15 +661,15 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-%send% %actor% %self.name%'s tentacles lash out and wrap themselves around you in a crushing embrace!
+%send% %actor% |%self% tentacles lash out and wrap themselves around you in a crushing embrace!
 %send% %actor% (Type 'struggle' to break free.)
-%echoaround% %actor% %self.name%'s tentacles lash out and wrap themselves around %actor.name%.
+%echoaround% %actor% |%self% tentacles lash out and wrap themselves around ~%actor%.
 set struggle_counter 0
 remote struggle_counter %actor.id%
 dg_affect #12430 %actor% HARD-STUNNED on 20
 dg_affect #12428 %self% HARD-STUNNED on 20
 while %actor.affect(12430)%
-  %send% %actor% &&r%self.name% crushes you in %self.hisher% grip!
+  %send% %actor% &&r~%self% crushes you in ^%self% grip!
   %damage% %actor% 150 physical
   wait 4 sec
 done
@@ -696,15 +696,15 @@ else
 end
 eval struggle_counter %struggle_counter% + 1
 if %struggle_counter% >= %break_free_at%
-  %send% %actor% You break free of %self.name%'s grip!
-  %echoaround% %actor% %actor.name% breaks free of %self.name%'s grip!
+  %send% %actor% You break free of |%self% grip!
+  %echoaround% %actor% ~%actor% breaks free of |%self% grip!
   dg_affect #12430 %actor% off
   dg_affect #12428 %self% off
   rdelete struggle_counter %actor.id%
   halt
 else
-  %send% %actor% You struggle in %self.name%'s grip, but fail to break free.
-  %echoaround% %actor% %actor.name% struggles in %self.name%'s grip!
+  %send% %actor% You struggle in |%self% grip, but fail to break free.
+  %echoaround% %actor% ~%actor% struggles in |%self% grip!
   remote struggle_counter %actor.id%
   halt
 end
@@ -720,20 +720,20 @@ dg_affect #12432 %self% IMMUNE-DAMAGE on -1
 dg_affect #12432 %self% HARD-STUNNED on -1
 set phase 2
 remote phase %self.id%
-%echo% %self.name% holds out %self.hisher% arm, and a sword made of ice appears in %self.hisher% outstretched hand!
-%echo% Get ready to dodge! Type 'up', 'down', 'left' and 'right' to evade %self.name%'s attacks.
+%echo% ~%self% holds out ^%self% arm, and a sword made of ice appears in ^%self% outstretched hand!
+%echo% Get ready to dodge! Type 'up', 'down', 'left' and 'right' to evade |%self% attacks.
 wait 2 sec
 set cycle 1
 while %cycle% <= 4
   wait 3 sec
   if %cycle% == 1
-    %echo% &&Y%self.name% charges at you, aiming a wide slash at your head!
+    %echo% &&Y~%self% charges at you, aiming a wide slash at your head!
   elseif %cycle% == 2
-    %echo% &&Y%self.name% draws back %self.hisher% sword for a thrust!
+    %echo% &&Y~%self% draws back ^%self% sword for a thrust!
   elseif %cycle% == 3
-    %echo% &&Y%self.name% raises %self.hisher% sword overhead for a vertical slash!
+    %echo% &&Y~%self% raises ^%self% sword overhead for a vertical slash!
   elseif %cycle% == 4
-    %echo% &&Y%self.name% hurls %self.hisher% sword at the stone floor of the cave!
+    %echo% &&Y~%self% hurls ^%self% sword at the stone floor of the cave!
   end
   set running 1
   remote running %self.id%
@@ -742,13 +742,13 @@ while %cycle% <= 4
   remote running %self.id%
   set person %self.room.people%
   if %cycle% == 1
-    %echo% %self.name%'s sword launches a barrage of ice spikes as %self.heshe% slashes!
+    %echo% |%self% sword launches a barrage of ice spikes as &%self% slashes!
   elseif %cycle% == 2
-    %echo% %self.name% unleashes a blindingly fast flurry of stabs!
+    %echo% ~%self% unleashes a blindingly fast flurry of stabs!
   elseif %cycle% == 3
-    %echo% %self.name%'s sword launches a barrage of ice spikes as %self.heshe% slashes!
+    %echo% |%self% sword launches a barrage of ice spikes as &%self% slashes!
   elseif %cycle% == 4
-    %echo% %self.name%'s sword detonates in a blast of freezing cold!
+    %echo% |%self% sword detonates in a blast of freezing cold!
   end
   while %person%
     if %person.is_pc%
@@ -757,22 +757,22 @@ while %cycle% <= 4
         eval act %%self.last_action_%person.id%%%
       end
       if (%cycle% == 1 && %act% == down) || ((%cycle% == 2 || %cycle% == 3) && (%act% == left || %act% == right)) || (%cycle% == 4 && %act% == up)
-        %send% %person% You barely avoid %self.name%'s attack.
-        %echoaround% %person% %person.name% barely avoids %self.name%'s attack.
+        %send% %person% You barely avoid |%self% attack.
+        %echoaround% %person% ~%person% barely avoids |%self% attack.
       else
-        %send% %person% &&rYou are struck by %self.name%'s attack!
-        %echoaround% %person% %person.name% is struck by %self.name%'s attack!
+        %send% %person% &&rYou are struck by |%self% attack!
+        %echoaround% %person% ~%person% is struck by |%self% attack!
         set test %person.affect(12433)%
         if %test%
           %send% %person% &&rYou are encased in a block of ice!
-          %echoaround% %person% %person.name% is encased in a block of ice!
+          %echoaround% %person% ~%person% is encased in a block of ice!
           %damage% %person% 9999 magical
         else
           dg_affect #12433 %person% DODGE -25 30
           dg_affect #12433 %person% TO-HIT -25 30
           dg_affect #12433 %person% SLOW on 30
           %send% %person% &&rYou feel deathly cold...
-          %echoaround% %person% %person.name% starts shivering violently.
+          %echoaround% %person% ~%person% starts shivering violently.
           %damage% %person% 250 magical
         end
       end
@@ -800,19 +800,19 @@ if %self.varexists(running)%
     if up /= %cmd%
       set last_action_%actor.id% up
       %send% %actor% You quickly swim up.
-      %echoaround% %actor% %actor.name% quickly swims up.
+      %echoaround% %actor% ~%actor% quickly swims up.
     elseif down /= %cmd%
       set last_action_%actor.id% down
       %send% %actor% You quickly dive down.
-      %echoaround% %actor% %actor.name% quickly dives down.
+      %echoaround% %actor% ~%actor% quickly dives down.
     elseif left /= %cmd%
       set last_action_%actor.id% left
       %send% %actor% You lean to the left.
-      %echoaround% %actor% %actor.name% leans to the left.
+      %echoaround% %actor% ~%actor% leans to the left.
     elseif right /= %cmd%
       set last_action_%actor.id% right
       %send% %actor% You lean to the right.
-      %echoaround% %actor% %actor.name% leans to the right.
+      %echoaround% %actor% ~%actor% leans to the right.
     end
     eval test %%last_action_%actor.id%%%
     if %test%
@@ -841,17 +841,17 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-%echo% %self.name% chants and waves %self.hisher% arms!
+%echo% ~%self% chants and waves ^%self% arms!
 wait 5 sec
 if %actor.trigger_counterspell%
-  %send% %actor% %self.name% points at you, but nothing seems to happen.
+  %send% %actor% ~%self% points at you, but nothing seems to happen.
   %echaround% %actor% %self.name% points at %actor.name%, but nothing seems to happen.
 else
-  %send% %actor% %self.name% points at you, and you feel your lungs begin to fill with water!
+  %send% %actor% ~%self% points at you, and you feel your lungs begin to fill with water!
   %dot% #12435 %actor% 50 30 magical 5
   wait 5 sec
   while %actor.affect(12435)%
-    %send% %actor% %self.name%'s curse strengthens!
+    %send% %actor% |%self% curse strengthens!
     %dot% #12435 %actor% 50 30 magical 5
     wait 5 sec
   done
@@ -865,9 +865,9 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-%echo% %self.name% chants and waves %self.hisher% arms!
+%echo% ~%self% chants and waves ^%self% arms!
 wait 5 sec
-%echo% %self.name% is restored!
+%echo% ~%self% is restored!
 %heal% %self% health 100
 %heal% %self% debuffs
 ~
@@ -883,7 +883,7 @@ eval vnum 12407 + %random.4%
 %load% mob %vnum% ally
 set summon %self.room.people%
 if %summon.vnum% == %vnum%
-  %echo% %self.name% sends up a jet of sparkling blue mana and %summon.name% appears!
+  %echo% ~%self% sends up a jet of sparkling blue mana and ~%summon% appears!
   nop %summon.add_mob_flag(NO-CORPSE)%
   nop %summon.add_mob_flag(!LOOT)%
   nop %summon.add_mob_flag(SPAWNED)%
@@ -904,8 +904,8 @@ set target %random.enemy%
 if !%target%
   set target %actor%
 end
-%send% %target% &&r%self.name% blasts you with a ball of icy energy.
-%echoaround% %target% %self.name% blasts %target.name% with a ball of icy energy.
+%send% %target% &&r~%self% blasts you with a ball of icy energy.
+%echoaround% %target% ~%self% blasts ~%target% with a ball of icy energy.
 %damage% %target% 100 magical
 dg_affect #12438 %target% SLOW on 10
 %dot% #12438 %target% 100 10 magical
@@ -914,7 +914,7 @@ dg_affect #12438 %target% SLOW on 10
 Underwater boss death: portal to exit~
 0 f 100
 ~
-%echo% As you slay %self.name%, a portal opens nearby.
+%echo% As you slay ~%self%, a portal opens nearby.
 set loc %instance.location%
 set vnum %loc.vnum%
 %load% obj 12402 room
@@ -939,8 +939,8 @@ if %direction% == portal || %direction% == none
 end
 if %self.vnum% == 12406
   if %actor.has_reputation(12401, Liked)%
-    %send% %actor% As you leave, %self.name% mutters some magic words.
-    %echoaround% %actor% As %actor.name% leaves, %self.name% mutters some magic words.
+    %send% %actor% As you leave, ~%self% mutters some magic words.
+    %echoaround% %actor% As ~%actor% leaves, ~%self% mutters some magic words.
     * In case they just finished the quest, reset their breath now
     set breath 45
     remote breath %actor.id%
@@ -952,7 +952,7 @@ end
 if (%actor.is_npc% || %actor.nohassle% || %actor.has_reputation(12401, Liked)% || (%direction% == fore && %actor.has_reputation(12401, Neutral)%))
   halt
 end
-%send% %actor% %self.name% won't let you pass!
+%send% %actor% ~%self% won't let you pass!
 return 0
 ~
 #12442
@@ -978,7 +978,7 @@ while %person%
     if %self.mob_flagged(HARD)%
       set amount 2
     end
-    %send% %person% You loot %amount% %currency.12403(%amount%)% from %self.name%.
+    %send% %person% You loot %amount% %currency.12403(%amount%)% from ~%self%.
     nop %person.give_currency(12403, %amount%)%
     nop %person.set_reputation(12401, Despised)%
   end
@@ -1048,7 +1048,7 @@ if %done_1% && %done_2% && %done_3% && %done_4%
     set obj %obj.next_in_list%
   done
   wait 1
-  %echo% %self.name% waves %self.hisher% hand and creates a portal!
+  %echo% ~%self% waves ^%self% hand and creates a portal!
   set loc %instance.location%
   set vnum %loc.vnum%
   %load% obj 12402 room

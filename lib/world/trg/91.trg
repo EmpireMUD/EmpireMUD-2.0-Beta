@@ -16,13 +16,13 @@ end
 eval struggle_counter %struggle_counter% + 1
 if %struggle_counter% >= %break_free_at%
   %send% %actor% You break free!
-  %echoaround% %actor% %actor.name% breaks free!
+  %echoaround% %actor% ~%actor% breaks free!
   dg_affect #9104 %actor% off
   rdelete struggle_counter %actor.id%
   halt
 else
   %send% %actor% You struggle, but fail to break free.
-  %echoaround% %actor% %actor.name% struggles to break free!
+  %echoaround% %actor% ~%actor% struggles to break free!
   remote struggle_counter %actor.id%
   halt
 end
@@ -55,14 +55,14 @@ if %target.affect(9104)%
 end
 nop %self.cooldown(9103, 20)%
 * Valid target found, start attack
-%send% %target% %self.name% starts to wrap around you...
-%echoaround% %target% %self.name% starts to wrap around %target.name%...
+%send% %target% ~%self% starts to wrap around you...
+%echoaround% %target% ~%self% starts to wrap around ~%target%...
 wait 3 sec
 if (!%target% || %target.room% != %self.room%)
   halt
 end
-%send% %target% %self.name% squeezes around you, constricting until you cannot move!
-%echoaround% %target% %self.name% constricts around %target.name%!
+%send% %target% ~%self% squeezes around you, constricting until you cannot move!
+%echoaround% %target% ~%self% constricts around ~%target%!
 %send% %target% Type 'struggle' to break free!
 dg_affect #9104 %actor% STUNNED on 20
 ~
@@ -82,19 +82,19 @@ Jungle Bird Animation~
 * Jungle Bird Animation (9106)
 switch (%random.8%)
   case 1
-    %echo% %self.name% flies up and away, disappearing into the distance.
+    %echo% ~%self% flies up and away, disappearing into the distance.
     %purge% %self%
   break
   case 2
-    %echo% %self.name% squawks loudly.
+    %echo% ~%self% squawks loudly.
   break
   case 3
     if (%self.varexists(last_phrase)%)
-      %echo% %self.name% says, Squawk! '%self.last_phrase%' Squawk!
+      %echo% ~%self% says, Squawk! '%self.last_phrase%' Squawk!
     end
   break
   default
-    %echo% %self.name% ruffles %self.hisher% feathers.
+    %echo% ~%self% ruffles ^%self% feathers.
   break
 done
 ~
@@ -153,9 +153,9 @@ Great Horned Owl Animation~
 * This script is no longer used. It was replaced by custom strings.
 * Great Horned Owl Animation (9133)
 if (%random.2% == 1)
-  %echo% %self.name% hoots loudly.
+  %echo% ~%self% hoots loudly.
 else
-  %echo% %self.name% dives, then takes to the air again with a mouse held in %self.hisher% talons.
+  %echo% ~%self% dives, then takes to the air again with a mouse held in ^%self% talons.
 end
 ~
 #9148
@@ -166,7 +166,7 @@ Songbird Animation~
 * songbird Animation (9148)
 * Works for 148 and 149
 if ((%self.room.sector% /= Forest) || (%self.room.sector% /= Orchard))
-  %echo% %self.name% Sings sweetly from a near by tree.
+  %echo% ~%self% Sings sweetly from a near by tree.
 end
 ~
 #9150
@@ -176,7 +176,7 @@ woodpecker animation~
 * This script is no longer used. It was replaced by custom strings.
 * Woodpecker Animation (9150)
 if ((%self.room.sector% /= Forest) || (%self.room.sector% /= Orchard))
-  %echo% %self.name% hammers into a tree with its beak, looking for food.
+  %echo% ~%self% hammers into a tree with its beak, looking for food.
 end
 ~
 #9183
@@ -203,14 +203,14 @@ remote penguins_killed %actor.id%
 Tiny Critter Despawn~
 0 bw 10
 ~
-%echo% %self.name% vanishes down a hole.
+%echo% ~%self% vanishes down a hole.
 %purge% %self%
 ~
 #9198
 Critter Flutters Off~
 0 bw 10
 ~
-%echo% %self.name% flutters off.
+%echo% ~%self% flutters off.
 %purge% %self%
 ~
 $

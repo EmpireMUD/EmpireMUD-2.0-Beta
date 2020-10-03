@@ -7,26 +7,26 @@ if (%self.fighting% || %self.disabled%)
 end
 set room %self.room%
 if (%instance.location% && (%room.template% == 10300 || (%room% != %instance.location% && %random.10% == 10)))
-  %echo% %self.name% flies away!
+  %echo% ~%self% flies away!
   mgoto %instance.location%
-  %echo% %self.name% flies into the cave!
+  %echo% ~%self% flies into the cave!
 elseif %room.sector_vnum% == 7 || %room.sector_vnum% == 13 || %room.sector_vnum% == 15 || %room.sector_vnum% == 16
-  %echo% %self.name% scorches the crops!
+  %echo% ~%self% scorches the crops!
   %terraform% %room% 10303
 elseif %room.sector_vnum% == 12 || %room.sector_vnum% == 14
-  %echo% %self.name% scorches the crops!
+  %echo% ~%self% scorches the crops!
   %terraform% %room% 10304
 elseif %room.sector_vnum% == 20
-  %echo% %self.name% scorches the desert!
+  %echo% ~%self% scorches the desert!
   %terraform% %room% 10305
 elseif (%room.sector_vnum% >= 1 && %room.sector_vnum% <= 4) || %room.sector_vnum% == 27 || %room.sector_vnum% == 28 || %room.sector_vnum% == 44 || %room.sector_vnum% == 45
-  %echo% %self.name% scorches the trees!
+  %echo% ~%self% scorches the trees!
   %terraform% %room% 10300
 elseif %room.sector_vnum% == 26
-  %echo% %self.name% scorches the grove!
+  %echo% ~%self% scorches the grove!
   %terraform% %room% 10301
 elseif %room.sector_vnum% == 0 || %room.sector_vnum% == 40
-  %echo% %self.name% scorches the plains!
+  %echo% ~%self% scorches the plains!
   %terraform% %room% 10302
 end
 ~
@@ -45,16 +45,16 @@ Flame Dragon combat~
 set chance %random.3%
 if (chance < 3)
   * Searing burns on tank
-  %send% %actor% %self.name% spits fire at you, causing searing burns!
-  %echoaround% %actor% %self.name% spits fire at %actor.name%, causing searing burns!
+  %send% %actor% ~%self% spits fire at you, causing searing burns!
+  %echoaround% %actor% ~%self% spits fire at ~%actor%, causing searing burns!
   %dot% %actor% 100 60 fire
   %damage% %actor% 75 fire
 else
   * Flame wave AoE
-  %echo% %self.name% begins puffing smoke and spinning in circles!
+  %echo% ~%self% begins puffing smoke and spinning in circles!
   * Give the healer (if any) time to prepare for group heals
   wait 3 sec
-  %echo% %self.name% unleashes a flame wave!
+  %echo% ~%self% unleashes a flame wave!
   %aoe% 100 fire
 end
 ~
@@ -79,16 +79,16 @@ if (%self.fighting% || %self.disabled%)
 end
 switch %random.4%
   case 1
-    %echo% %self.name% spurts fire into the air.
+    %echo% ~%self% spurts fire into the air.
   break
   case 2
-    %echo% %self.name% curls up and begins puffing clouds of smoke.
+    %echo% ~%self% curls up and begins puffing clouds of smoke.
   break
   case 3
-    %echo% %self.name% hunkers down and starts coughing out bits of ash.
+    %echo% ~%self% hunkers down and starts coughing out bits of ash.
   break
   case 4
-    %echo% %self.name% coughs up some charred bone fragments.
+    %echo% ~%self% coughs up some charred bone fragments.
   break
 done
 ~
@@ -115,10 +115,10 @@ if (%self.fighting% || %self.disabled%)
 end
 set room %self.room%
 if (%instance.real_location% && %room% != %instance.real_location% && (%room.template% == 10330 || %room.sector% == Ocean))
-  %echo% %self.name% flies away!
+  %echo% ~%self% flies away!
   mgoto %instance.real_location%
   nop %instance.set_location(%instance.real_location%)%
-  %echo% %self.name% flies into the nest!
+  %echo% ~%self% flies into the nest!
 else
   nop %instance.set_location(%room%)%
 end
@@ -156,16 +156,16 @@ if (%self.fighting% || %self.disabled%)
 end
 switch %random.4%
   case 1
-    %echo% %self.name% flies in circles overhead.
+    %echo% ~%self% flies in circles overhead.
   break
   case 2
-    %echo% %self.name% spurts fire into the air.
+    %echo% ~%self% spurts fire into the air.
   break
   case 3
-    %echo% %self.name% eyes you warily.
+    %echo% ~%self% eyes you warily.
   break
   case 4
-    %echo% %self.name% swoops low, then soars back into the air.
+    %echo% ~%self% swoops low, then soars back into the air.
   break
 done
 ~
@@ -183,7 +183,7 @@ if (%actor.position% != Standing)
 end
 %load% m %self.val0%
 %send% %actor% You use %self.shortdesc% and a dragon mount appears!
-%echoaround% %actor% %actor.name% uses %self.shortdesc% and a dragon mount appears!
+%echoaround% %actor% ~%actor% uses %self.shortdesc% and a dragon mount appears!
 %purge% %self%
 ~
 #10336
@@ -201,8 +201,8 @@ end
 %load% m %self.val0%
 set mob %self.room.people%
 if (%mob% && %mob.vnum% == %self.val0%)
-  %send% %actor% You use %self.shortdesc% and %mob.name% appears!
-  %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
+  %send% %actor% You use %self.shortdesc% and ~%mob% appears!
+  %echoaround% %actor% ~%actor% uses %self.shortdesc% and ~%mob% appears!
   nop %mob.unlink_instance%
 end
 %purge% %self%
@@ -215,14 +215,14 @@ if (%self.fighting% || %self.disabled%)
   halt
 end
 if (%random.2% == 2)
-  %echo% %self.name% releases a demonic moo, and fire spurts from %self.hisher% nostrils.
+  %echo% ~%self% releases a demonic moo, and fire spurts from ^%self% nostrils.
 else
   * We need the current terrain.
   set room %self.room%
   if (%room.sector% == Plains || %room.sector% ~= Forest)
-    %echo% %self.name% scorches some grass, and eats it.
+    %echo% ~%self% scorches some grass, and eats it.
   else
-    %echo% %self.name% spurts fire from %self.hisher% nostrils.
+    %echo% ~%self% spurts fire from ^%self% nostrils.
   end
 end
 ~
@@ -267,8 +267,8 @@ end
 set mob %self.room.people%
 if (%mob% && %mob.vnum% == %self.val0%)
   %own% %mob% %actor.empire%
-  %send% %actor% You use %self.shortdesc% and %mob.name% appears!
-  %echoaround% %actor% %actor.name% uses %self.shortdesc% and %mob.name% appears!
+  %send% %actor% You use %self.shortdesc% and ~%mob% appears!
+  %echoaround% %actor% ~%actor% uses %self.shortdesc% and ~%mob% appears!
 end
 %purge% %self%
 ~

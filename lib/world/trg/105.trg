@@ -71,7 +71,7 @@ else
 end
 set room %self.room%
 if !%instance.location%
-  %echo% %self.name% vanishes in a swirl of leaf-green mana!
+  %echo% ~%self% vanishes in a swirl of leaf-green mana!
   %purge% %self%
   halt
 end
@@ -83,9 +83,9 @@ elseif %room.sector_vnum% == 7 || %room.sector_vnum% == 13 || %room.sector_vnum%
   set sector_valid 1
 end
 if (%room.template% == 10500 || %room.distance(%instance.location%)% > 3 || %room.building% == Fence || %room.building% == Wall)
-  %echo% %self.name% vanishes in a swirl of leaf-green mana!
+  %echo% ~%self% vanishes in a swirl of leaf-green mana!
   mgoto %instance.location%
-  %echo% %self.name% appears in a swirl of leaf-green mana!
+  %echo% ~%self% appears in a swirl of leaf-green mana!
   halt
 elseif %room.empire_id% || (%room.crop_vnum% >= 10500 && %room.crop_vnum% <= 10549)
   * Claimed or already a whirlwind crop
@@ -98,7 +98,7 @@ if !%no_work%
   * do!
   if !%month_change%
     %terracrop% %room% %vnum%
-    %echo% %self.name% spreads mana over the land and crops begin to grow!
+    %echo% ~%self% spreads mana over the land and crops begin to grow!
   end
 end
 if %month_change%
@@ -124,7 +124,7 @@ Puppy receive treat~
 ~
 set treat 10528
 if %object.vnum% == %treat%
-  %echo% %self.name% chomps down happily on %object.shortdesc%!
+  %echo% ~%self% chomps down happily on %object.shortdesc%!
   %purge% %object%
   wait 1 sec
   switch %random.3%
@@ -135,8 +135,8 @@ if %object.vnum% == %treat%
       emote wags its tail happily!
     break
     case 3
-      %send% %actor% %self.name% runs circles around your legs!
-      %echoaround% %actor% %self.name% runs circles around %actor.name%'s legs!
+      %send% %actor% ~%self% runs circles around your legs!
+      %echoaround% %actor% ~%self% runs circles around |%actor% legs!
     break
   done
 end
@@ -187,8 +187,8 @@ set mob %room_var.people%
 if (%mob% && %mob.vnum% == %target%)
   %own% %mob% %actor.empire%
   %send% %actor% You raise %self.shortdesc% high in the air, then drive it into the ground!
-  %echoaround% %actor% %actor.name% raises %self.shortdesc% high in the air, then drives it into the ground!
-  %echo% %mob.name% bursts from the ground!
+  %echoaround% %actor% ~%actor% raises %self.shortdesc% high in the air, then drives it into the ground!
+  %echo% ~%mob% bursts from the ground!
   set %varname% %timestamp%
   remote %varname% %actor.id%
 end
@@ -223,13 +223,13 @@ elseif %mobs% > 4
   %send% %actor% There are too many mobs here already.
 else
   %send% %actor% You use %self.shortdesc%...
-  %echoaround% %actor% %actor.name% uses %self.shortdesc%...
+  %echoaround% %actor% ~%actor% uses %self.shortdesc%...
   eval vnum 10501 + %random.4% - 1
   %load% m %vnum%
   set pet %self.room.people%
   if (%pet% && %pet.vnum% == %vnum%)
     %force% %pet% mfollow %actor%
-    %echo% %pet.name% appears!
+    %echo% ~%pet% appears!
   end
   %purge% %self%
 end
@@ -343,7 +343,7 @@ if %self.cooldown(10560)%
   halt
 end
 if %self.affect(BLIND)%
-  %echo% %self.name%'s eyes flash blue, and %self.hisher% vision clears!
+  %echo% |%self% eyes flash blue, and ^%self% vision clears!
   dg_affect %self% BLIND off 1
 end
 set heroic_mode %self.mob_flagged(GROUP)%
@@ -353,8 +353,8 @@ set heroic_mode %self.mob_flagged(GROUP)%
 * Lasts 75 seconds, should be refreshed every 45-55
 * Normal/Hard: 25%, stacks up to 5
 * Group/Boss: 75%, stacks up to 10
-%send% %actor% &&r%self.name%'s icy blasts leave a lingering cold which chills you to the bone...
-%echoaround% %actor% %actor.name% shivers under %self.name%'s icy onslaught.
+%send% %actor% &&r|%self% icy blasts leave a lingering cold which chills you to the bone...
+%echoaround% %actor% ~%actor% shivers under |%self% icy onslaught.
 if %heroic_mode%
   %dot% #10551 %actor% 75 75 magical 10
 else
@@ -374,7 +374,7 @@ switch %random.3%
     * Slow entire party for 20 seconds
     * Minor AoE damage (25%)
     * Group/Boss: Also stun entire party for 5 seconds
-    %echo% %self.name% begins gathering magical energy...
+    %echo% ~%self% begins gathering magical energy...
     wait 3 sec
     %echo% &&rThere is a blinding flash of light, and everything is encased in ice!
     %aoe% 25 magical
@@ -396,9 +396,9 @@ switch %random.3%
     * Normal/Hard: 50% AoE damage, 200% extra to tank
     * Group/Boss: 100% AoE damage, 400% extra to tank, tank is stunned for 10 seconds
     say Behold the might of the Polar Baron!
-    %echo% %self.name% gestures dramatically to the sky, where a huge portal opens!
+    %echo% ~%self% gestures dramatically to the sky, where a huge portal opens!
     wait 3 sec
-    %echo% A torrent of water pours through %self.name%'s portal, flash-freezing into a huge icy comet!
+    %echo% A torrent of water pours through |%self% portal, flash-freezing into a huge icy comet!
     wait 2 sec
     set actor %self.fighting%
     if !%self.fighting%
@@ -411,13 +411,13 @@ switch %random.3%
     if %heroic_mode%
       if %counterspell%
         %send% %actor% &&rThe comet triggers your counterspell and briefly slows, before crashing into you and exploding!
-        %echoaround% %actor% The comet briefly slows before crashing into %actor.name% and exploding!
+        %echoaround% %actor% The comet briefly slows before crashing into ~%actor% and exploding!
         %damage% %actor% 200 physical
         %echo% &&rFragments fly in all directions!
         %aoe% 100 physical
       else
         %send% %actor% &&rThe comet crashes into you, smashing you to the ground, and explodes!
-        %echoaround% %actor% The comet crashes into %actor.name%, smashing %actor.himher% to the ground, and explodes!
+        %echoaround% %actor% The comet crashes into ~%actor%, smashing *%actor% to the ground, and explodes!
         %damage% %actor% 400 physical
         dg_affect #10553 %actor% HARD-STUNNED on 10
         %echo% &&rFragments fly in all directions!
@@ -426,12 +426,12 @@ switch %random.3%
     else
       if %counterspell%
         %send% %actor% The comet crashes into your counterspell and explodes!
-        %echoaround% %actor% The comet explodes against an invisible shield in front of %actor.name%!
+        %echoaround% %actor% The comet explodes against an invisible shield in front of ~%actor%!
         %echo% &&rFragments fly in all directions!
         %aoe% 50 physical
       else
         %send% %actor% &&rThe comet crashes into you, knocking you back, and explodes!
-        %echoaround% %actor% The comet crashes into %actor.name%, knocking %actor.himher% back, and explodes!
+        %echoaround% %actor% The comet crashes into ~%actor%, knocking *%actor% back, and explodes!
         %damage% %actor% 200 physical
         %echo% &&rFragments fly in all directions!
         %aoe% 50 physical
@@ -443,17 +443,17 @@ switch %random.3%
     * Summon attacks tank for 30 seconds
     * Normal/Hard: Aquilo is stunned for 15 seconds
     * Group/Boss: Aquilo keeps attacking
-    %send% %actor% %self.name% forms a sword out of ice and hurls it at you!
-    %echoaround% %actor% %self.name% forms a sword out of ice and hurls it at %actor.name%!
+    %send% %actor% ~%self% forms a sword out of ice and hurls it at you!
+    %echoaround% %actor% ~%self% forms a sword out of ice and hurls it at ~%actor%!
     %load% mob 10560 ally %self.level%
     set summon %self.room.people%
     if %summon.vnum% == 10560
-      %send% %actor% %summon.name% begins attacking you with a malevolent will of %summon.hisher% own!
-      %echoaround% %actor% %summon.name% begins attacking %actor.name% with a malevolent will of %summon.hisher% own!
+      %send% %actor% ~%summon% begins attacking you with a malevolent will of ^%summon% own!
+      %echoaround% %actor% ~%summon% begins attacking ~%actor% with a malevolent will of ^%summon% own!
       %force% %summon% %aggro% %actor%
     end
     if !%heroic_mode%
-      %echo% %self.name% steps back and folds %self.hisher% arms.
+      %echo% ~%self% steps back and folds ^%self% arms.
       dg_affect %self% HARD-STUNNED on 15
     end
   break
@@ -474,7 +474,7 @@ switch %random.3%
     * Duration: 20 seconds
     * Normal/Hard: AoE to-hit penalty [level/10]
     * Hard/Group: AoE to-hit penalty [level/5] and DoT [50%]
-    %echo% %self.name% raises %self.hisher% arms to the sky and starts chanting.
+    %echo% ~%self% raises ^%self% arms to the sky and starts chanting.
     wait 3 sec
     %echo% An intense blizzard suddenly forms in the violet sky above the glacier!
     set person %self.room.people%
@@ -502,8 +502,8 @@ switch %random.3%
     * Normal/Hard: 5 seconds
     * Group/Boss: 20 seconds, and adds 50% DoT
     * If too easy, consider adding HIDE and looking for a new target...
-    %send% %actor% &&r%self.name% makes an arcane gesture at you, and the snow beneath your feet swallows you!
-    %echoaround% %actor% %self.name% makes an arcane gesture at %actor.name%, and the snow beneath %actor.hisher% feet swallows %actor.himher%!
+    %send% %actor% &&r~%self% makes an arcane gesture at you, and the snow beneath your feet swallows you!
+    %echoaround% %actor% ~%self% makes an arcane gesture at ~%actor%, and the snow beneath ^%actor% feet swallows *%actor%!
     if %heroic_mode%
       %send% %actor% You attempt to dig yourself out of the deep, painfully cold snowdrift!
       %dot% %actor% 50 20 magical
@@ -519,7 +519,7 @@ switch %random.3%
     * Summon Ice Elemental
     * Normal/Hard: Summon a temporary ice sprite
     * Summon a permanent ice elemental (DPS flag)
-    %echo% %self.name% puts %self.hisher% fingers to %self.hisher% mouth and releases a piercing whistle!
+    %echo% ~%self% puts ^%self% fingers to ^%self% mouth and releases a piercing whistle!
     if !%heroic_mode%
       set summon_vnum 10561
     else
@@ -528,7 +528,7 @@ switch %random.3%
     %load% mob %summon_vnum% ally %self.level%
     set summon %self.room.people%
     if %summon.vnum% == %summon_vnum%
-      %echo% %summon.name% soars down from the clear violet sky!
+      %echo% ~%summon% soars down from the clear violet sky!
       %force% %summon% %aggro% %actor%
     end
   break
@@ -548,8 +548,8 @@ switch %random.3%
     * Freezing Touch (targets tank)
     * Normal/Hard: Slow[20]+dot[75%]
     * Group/Boss: Stun[5]+slow[20]+dot[100%]
-    %send% %actor% %self.name% makes an arcane gesture at you, and hoar frost suddenly encases you!
-    %echoaround% %actor% %self.name% makes an arcane gesture at %actor.name%, and hoar frost suddenly encases %actor.himher%!
+    %send% %actor% ~%self% makes an arcane gesture at you, and hoar frost suddenly encases you!
+    %echoaround% %actor% ~%self% makes an arcane gesture at ~%actor%, and hoar frost suddenly encases *%actor%!
     dg_affect #10557 %actor% SLOW on 20
     if %heroic_mode%
       dg_affect #10556 %actor% HARD-STUNNED on 5
@@ -564,11 +564,11 @@ switch %random.3%
     * DoT duration: 20 seconds
     * Normal/Hard: Tank only
     * Group/Boss: Entire party
-    %echo% %self.name% makes a sweeping arcane gesture, and hoar frost spreads over the cavern walls!
+    %echo% ~%self% makes a sweeping arcane gesture, and hoar frost spreads over the cavern walls!
     wait 3 sec
-    %echo% %self.name% releases a pulse of icy magic, and the hoar frost explodes off the walls!
+    %echo% ~%self% releases a pulse of icy magic, and the hoar frost explodes off the walls!
     if %heroic_mode%
-      %echo% &&rEveryone is slashed by %self.name%'s rime blades!
+      %echo% &&rEveryone is slashed by |%self% rime blades!
       %aoe% 150 physical
       set person %self.room.people%
       while %person%
@@ -580,7 +580,7 @@ switch %random.3%
       done
     else
       %send% %actor% &&rThe rime blades slash you, opening dozens of painful, bleeding wounds!
-      %echoaround% %actor% The rime blades slash %actor.name%, opening dozens of bleeding wounds!
+      %echoaround% %actor% The rime blades slash ~%actor%, opening dozens of bleeding wounds!
       %damage% %actor% 150 physical
       %dot% #10558 %actor% 100 20 physical
     end
@@ -591,9 +591,9 @@ switch %random.3%
     * Applies heal-over-time to self, damage-over-time to tank
     * Normal/Hard: 50% DoT, level/20 HoT
     * Group/Boss: 100% DoT, level/10 HoT
-    %send% %actor% &&r%self.name% lashes out at you with a whip of violet fire, which clings to you and draws your heat away!
-    %echoaround% %actor% %self.name% lashes out at %actor.name% with a whip of violet fire! %actor.name% bursts into cold violet flames!
-    %echo% %self.name% reaches into the cold, violet flames, and %self.hisher% wounds start to close...
+    %send% %actor% &&r~%self% lashes out at you with a whip of violet fire, which clings to you and draws your heat away!
+    %echoaround% %actor% ~%self% lashes out at ~%actor% with a whip of violet fire! ~%actor% bursts into cold violet flames!
+    %echo% ~%self% reaches into the cold, violet flames, and ^%self% wounds start to close...
     if %heroic_mode%
       %dot% #10559 %actor% 100 20 magical
       eval magnitude %actor.level%/10
@@ -615,8 +615,8 @@ Permafrost trash combat~
 switch %random.3%
   case 1
     * Ice shard
-    %send% %actor% %self.name% spits a bolt of icy magic at you, chilling you to the bone!
-    %echoaround% %actor% %self.name% spits a bolt of icy magic at %actor.name%, who starts shivering violently.
+    %send% %actor% ~%self% spits a bolt of icy magic at you, chilling you to the bone!
+    %echoaround% %actor% ~%self% spits a bolt of icy magic at ~%actor%, who starts shivering violently.
     %damage% %actor% 25 magical
     %dot% %actor% 50 30 magical 1
     * 7 ~ 13
@@ -627,7 +627,7 @@ switch %random.3%
   break
   case 2
     * Snow flurry
-    %echo% %self.name% kicks up a flurry of snow!
+    %echo% ~%self% kicks up a flurry of snow!
     set person %self.room.people%
     while %person%
       if %self.is_enemy(%person%)%
@@ -644,25 +644,25 @@ switch %random.3%
   case 3
     * Mob-specific
     if %self.vnum% == 10553
-      %send% %actor% %self.name% puts its head down and charges you!
-      %echoaround% %actor% %self.name% puts its head down and charges %actor.name%!
+      %send% %actor% ~%self% puts its head down and charges you!
+      %echoaround% %actor% ~%self% puts its head down and charges ~%actor%!
       wait 2 sec
       if %self.aff_flagged(ENTANGLED)% || %self.aff_flagged(STUNNED)%
-        %echo% %self.name%'s attack is interrupted.
+        %echo% |%self% attack is interrupted.
         halt
       end
-      %send% %actor% %self.name% crashes into you, leaving you briefly stunned!
-      %echoaround% %actor% %self.name% crashes into %actor.name%, stunning %actor.himher%!
+      %send% %actor% ~%self% crashes into you, leaving you briefly stunned!
+      %echoaround% %actor% ~%self% crashes into ~%actor%, stunning *%actor%!
       if !%actor.aff_flagged(!STUN)%
         dg_affect %actor% STUNNED on 5
       end
       %damage% %actor% 50
     elseif %self.vnum% == 10554
-      %echo% %self.name% glows gently, and fights with renewed vitality!
+      %echo% ~%self% glows gently, and fights with renewed vitality!
       %damage% %self% -150
     elseif %self.vnum% == 10555
-      %send% %actor% %self.name% nips viciously at your ankles, drawing blood and slowing you down!
-      %echoaround% %actor% %self.name% nips viciously at %actor.name%'s ankles, drawing blood and slowing %actor.himher% down!
+      %send% %actor% ~%self% nips viciously at your ankles, drawing blood and slowing you down!
+      %echoaround% %actor% ~%self% nips viciously at |%actor% ankles, drawing blood and slowing *%actor% down!
       %dot% %actor% 50 15 physical
       dg_affect %actor% DEXTERITY -1 15
     end
@@ -826,7 +826,7 @@ if !%actor.canuseroom_member(%room%)%
   halt
 end
 %send% %actor% You plant %self.shortdesc%...
-%echoaround% %actor% %actor.name% plants %self.shortdesc%...
+%echoaround% %actor% ~%actor% plants %self.shortdesc%...
 %echo% The forest around you shifts slowly into an evergreen forest!
 %terraform% %room% 10565
 return 1
@@ -841,7 +841,7 @@ set person %self.room.people%
 while %person%
   if %person.is_pc%
     * You get a token, and you get a token, and YOU get a token!
-    %send% %person% As %self.name% dies, %self.hisher% power crystallizes, creating a permafrost token!
+    %send% %person% As ~%self% dies, ^%self% power crystallizes, creating a permafrost token!
     %send% %person% You take the newly created token.
     nop %person.give_currency(10550, 1)%
   end
@@ -884,19 +884,19 @@ Permafrost boss minion timer~
 if %self.vnum% == 10560
   * attached mob is Aquilo's summon (30 seconds)
   wait 30 s
-  %echo% %self.name% falls to the ground and shatters.
+  %echo% ~%self% falls to the ground and shatters.
   %purge% %self%
 elseif %self.vnum% == 10561
   * Attached mob is Cryomancer's summon on normal/hard (15 seconds)
   wait 15 s
-  %echo% %self.name% flies away, bored.
+  %echo% ~%self% flies away, bored.
   %purge% %self%
 elseif %self.vnum% == 10562
   * Attached mob is Cryomancer's summon on group/boss (permanent until end of combat)
   * make sure we're not despawning right away
   wait 5 sec
   if !%self.fighting%
-    %echo% %self.name% flies away.
+    %echo% ~%self% flies away.
     %purge% %self%
   end
 end
@@ -932,7 +932,7 @@ nop %self.remove_mob_flag(SILENT)%
 if %self.aff_flagged(HIDE)%
   visible
   wait 1
-  %echo% %self.name% shuffles out of the portal and sets up a shop on the ice.
+  %echo% ~%self% shuffles out of the portal and sets up a shop on the ice.
 end
 ~
 #10570
@@ -1017,15 +1017,15 @@ if !%target%
   halt
 end
 if %target.is_npc% && %target.vnum% >= 10553 && %target.vnum% <= 10555
-  %send% %actor% You point %self.shortdesc% at %target.name% and unleash a blast of icy magic!
-  %echoaround% %actor% %actor.name% points %self.shortdesc% at %target.name% and unleashes a blast of icy magic!
-  %echo% %target.name% is encased in a huge block of ice!
+  %send% %actor% You point %self.shortdesc% at ~%target% and unleash a blast of icy magic!
+  %echoaround% %actor% ~%actor% points %self.shortdesc% at ~%target% and unleashes a blast of icy magic!
+  %echo% ~%target% is encased in a huge block of ice!
   %purge% %target%
   %load% obj 10595 %actor.room%
 elseif %target.is_npc% && %target.vnum% >= 10550 && %target.vnum% <= 10552
-  %send% %actor% You point %self.shortdesc% at %target.name% and unleash a blast of icy magic!
-  %echoaround% %actor% %actor.name% points %self.shortdesc% at %target.name% and unleashes a blast of icy magic!
-  %echo% %target.name% absorbs the icy blast harmlessly.
+  %send% %actor% You point %self.shortdesc% at ~%target% and unleash a blast of icy magic!
+  %echoaround% %actor% ~%actor% points %self.shortdesc% at ~%target% and unleashes a blast of icy magic!
+  %echo% ~%target% absorbs the icy blast harmlessly.
   return 1
   halt
 else
@@ -1149,7 +1149,7 @@ while %cycles_left% >= 0
   if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
     * We've either moved or the room's no longer suitable for the action
     if %cycles_left% < 5
-      %echoaround% %actor% %actor.name%'s ritual is interrupted.
+      %echoaround% %actor% |%actor% ritual is interrupted.
       %send% %actor% Your ritual is interrupted.
     else
       * combat, stun, sitting down, etc
@@ -1160,28 +1160,28 @@ while %cycles_left% >= 0
   * Fake ritual messages
   switch %cycles_left%
     case 5
-      %echoaround% %actor% %actor.name% draws blood from %actor.hisher% wrist...
+      %echoaround% %actor% ~%actor% draws blood from ^%actor% wrist...
       %send% %actor% You begin the consecration by drawing blood from your wrist...
       nop %actor.blood(-50)%
     break
     case 4
-      %echoaround% %actor% %actor.name% collects Aquilo's blood from the ground...
+      %echoaround% %actor% ~%actor% collects Aquilo's blood from the ground...
       %send% %actor% You collect Aquilo's blood from the ground...
     break
     case 3
-      %echoaround% %actor% %actor.name% pours %actor.hisher% blood and Aquilo's blood onto the altar...
+      %echoaround% %actor% ~%actor% pours ^%actor% blood and Aquilo's blood onto the altar...
       %send% %actor% You pour your blood and Aquilo's blood onto the altar...
     break
     case 2
-      %echoaround% %actor% %actor.name% watches as the blood slowly mixes, and starts to freeze...
+      %echoaround% %actor% ~%actor% watches as the blood slowly mixes, and starts to freeze...
       %send% %actor% You watch as the blood slowly mixes, and starts to freeze...
     break
     case 1
-      %echoaround% %actor% %actor.name% starts to collect the consecrated frostblood...
+      %echoaround% %actor% ~%actor% starts to collect the consecrated frostblood...
       %send% %actor% You start to collect the consecrated frostblood...
     break
     case 0
-      %echoaround% %actor% %actor.name% completes %actor.hisher% ritual!
+      %echoaround% %actor% ~%actor% completes ^%actor% ritual!
       %send% %actor% You complete your consecration ritual!
       * Quest complete
       %load% obj 10599 %actor% inv

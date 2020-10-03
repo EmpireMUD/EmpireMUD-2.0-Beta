@@ -10,8 +10,8 @@ if %self.cooldown(9501)%
   halt
 end
 nop %self.set_cooldown(9501, 15)%
-%send% %actor% %self.name% spits a bolt of icy magic at you, chilling you to the bone!
-%echoaround% %actor% %self.name% spits a bolt of icy magic at %actor.name%, who starts shivering violently.
+%send% %actor% ~%self% spits a bolt of icy magic at you, chilling you to the bone!
+%echoaround% %actor% ~%self% spits a bolt of icy magic at ~%actor%, who starts shivering violently.
 %damage% %actor% 25 magical
 %dot% %actor% 50 30 magical 1
 eval amnt (%self.level%/10)
@@ -30,7 +30,7 @@ if %self.cooldown(9502)%
   halt
 end
 nop %self.set_cooldown(9502, 15)%
-%echo% %self.name% kicks up a flurry of snow!
+%echo% ~%self% kicks up a flurry of snow!
 eval room %self.room%
 eval person %room.people%
 while %person%
@@ -58,15 +58,15 @@ if %self.cooldown(9503)%
   halt
 end
 nop %self.set_cooldown(9503, 15)%
-%send% %actor% %self.name% puts %self.hisher% head down and charges you!
-%echoaround% %actor% %self.name% puts %self.hisher% head down and charges %actor.name%!
+%send% %actor% ~%self% puts ^%self% head down and charges you!
+%echoaround% %actor% ~%self% puts ^%self% head down and charges ~%actor%!
 wait 2 sec
 if !%actor% || %actor.room% != %self.room% || %self.aff_flagged(ENTANGLED)% || %self.aff_flagged(STUNNED)%
-  %echo% %self.name%'s attack is interrupted.
+  %echo% |%self% attack is interrupted.
   halt
 end
-%send% %actor% %self.name% crashes into you, leaving you briefly stunned!
-%echoaround% %actor% %self.name% crashes into %actor.name%, stunning %actor.himher%!
+%send% %actor% ~%self% crashes into you, leaving you briefly stunned!
+%echoaround% %actor% ~%self% crashes into ~%actor%, stunning *%actor%!
 if !%actor.aff_flagged(!STUN)%
   dg_affect %actor% STUNNED on 5
 end
@@ -83,7 +83,7 @@ if %self.cooldown(9504)%
   halt
 end
 nop %self.set_cooldown(9504, 15)%
-%echo% %self.name% glows gently, and fights with renewed vitality!
+%echo% ~%self% glows gently, and fights with renewed vitality!
 %damage% %self% -150
 ~
 #9505
@@ -98,8 +98,8 @@ if %self.cooldown(9505)%
   halt
 end
 nop %self.set_cooldown(9505, 15)%
-%send% %actor% %self.name% nips viciously at your ankles, drawing blood and slowing you down!
-%echoaround% %actor% %self.name% nips viciously at %actor.name%'s ankles, drawing blood and slowing %actor.himher% down!
+%send% %actor% ~%self% nips viciously at your ankles, drawing blood and slowing you down!
+%echoaround% %actor% ~%self% nips viciously at |%actor% ankles, drawing blood and slowing *%actor% down!
 %dot% %actor% 50 15 physical
 dg_affect %actor% DEXTERITY -1 15
 ~

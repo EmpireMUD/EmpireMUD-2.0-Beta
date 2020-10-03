@@ -8,7 +8,7 @@ Mob Kill Adventure Completion~
 Mob Must Fight~
 0 s 100
 ~
-%send% %actor% You can't leave because of %self.name%.
+%send% %actor% You can't leave because of ~%self%.
 return 0
 ~
 #10002
@@ -16,8 +16,8 @@ Wildling combat: Nasty Bite~
 0 k 10
 ~
 * Nasty bite: low damage over time
-%send% %actor% %self.name% snaps %self.hisher% teeth and takes off a piece of your skin!
-%echoaround% %actor% %self.name% snaps %self.hisher% teeth at %actor.name% and takes off a piece of %actor.hisher% skin!
+%send% %actor% ~%self% snaps ^%self% teeth and takes off a piece of your skin!
+%echoaround% %actor% ~%self% snaps ^%self% teeth at ~%actor% and takes off a piece of ^%actor% skin!
 %dot% %actor% %random.100% 60 physical
 ~
 #10003
@@ -29,8 +29,8 @@ if (%chance% < 3)
   lightningbolt
 else
   * buuurn!
-  %send% %actor% %self.name% reaches out and touches you, leaving a terrible burn!
-  %echoaround% %actor% %self.name% reaches out and touches %actor.name%, leaving a terrible burn!
+  %send% %actor% ~%self% reaches out and touches you, leaving a terrible burn!
+  %echoaround% %actor% ~%self% reaches out and touches ~%actor%, leaving a terrible burn!
   %dot% %actor% 100 60 fire
 end
 ~
@@ -41,16 +41,16 @@ Archdruid combat: frost~
 set chance %random.3%
 if (chance < 3)
   * Arctic chill on tank
-  %send% %actor% &&r%self.name% draws moisture from the air and hits you with an arctic chill!&&0
-  %echoaround% %actor% %self.name% draws moisture from the air and hits %actor.name% with an arctic chill!
+  %send% %actor% &&r~%self% draws moisture from the air and hits you with an arctic chill!&&0
+  %echoaround% %actor% ~%self% draws moisture from the air and hits ~%actor% with an arctic chill!
   %dot% %actor% 100 60 magical
   %damage% %actor% 90 magical
 else
   * Frost storm AoE
-  %echo% %self.name% summons a frost storm...
+  %echo% ~%self% summons a frost storm...
   * Give the healer (if any) time to prepare for group heals
   wait 3 sec
-  %echo% &&r%self.name% unleashes a frost storm!&&0
+  %echo% &&r~%self% unleashes a frost storm!&&0
   %aoe% 50 magical
 end
 ~
@@ -88,23 +88,23 @@ Red Dragon combat~
 switch %random.4%
   * Searing burns on tank
   case 1
-    %send% %actor% &&r%self.name% spits fire at you, causing searing burns!&&0
-    %echoaround% %actor% %self.name% spits fire at %actor.name%, causing searing burns!
+    %send% %actor% &&r~%self% spits fire at you, causing searing burns!&&0
+    %echoaround% %actor% ~%self% spits fire at ~%actor%, causing searing burns!
     %dot% %actor% 100 60 fire
     %damage% %actor% 20 fire
   break
   * Flame wave AoE
   case 2
-    %echo% %self.name% begins puffing smoke and spinning in circles!
+    %echo% ~%self% begins puffing smoke and spinning in circles!
     * Give the healer (if any) time to prepare for group heals
     wait 3 sec
-    %echo% &&r%self.name% unleashes a flame wave!&&0
+    %echo% &&r~%self% unleashes a flame wave!&&0
     %aoe% 25 fire
   break
   * Traumatic burns on tank
   case 3
-    %send% %actor% &&r%self.name% spits fire at you, causing traumatic burns!&&0
-    %echoaround% %actor% %self.name% spits fire at %actor.name%, causing traumatic burns!
+    %send% %actor% &&r~%self% spits fire at you, causing traumatic burns!&&0
+    %echoaround% %actor% ~%self% spits fire at ~%actor%, causing traumatic burns!
     %dot% %actor% 300 10 fire
     %damage% %actor% 20 fire
   break
@@ -112,8 +112,8 @@ switch %random.4%
   case 4
     set target %random.enemy%
     if (%target%)
-      %send% %target% &&r%self.name% uses %self.hisher% tail to hurl a rock at you, stunning you momentarily!&&0
-      %echoaround% %target% %self.name% hurls a rock at %target.name% with %self.hisher% tail, stunning %target.himher% momentarily!
+      %send% %target% &&r~%self% uses ^%self% tail to hurl a rock at you, stunning you momentarily!&&0
+      %echoaround% %target% ~%self% hurls a rock at ~%target% with ^%self% tail, stunning *%target% momentarily!
       dg_affect %target% STUNNED on 10
       %damage% %target% 50 physical
     end
@@ -158,8 +158,8 @@ if (%actor.has_resources(10013,15)%)
   nop %actor.add_resources(10013,-15)%
   say Excellent, %actor.name%, this is exactly what I was looking for!
   %load% o 10015 %actor% inv
-  %send% %actor% %self.name% gives you the ratskin totem.
-  %echoaround% %actor% %self.name% gives %actor.name% the ratskin totem.
+  %send% %actor% ~%self% gives you the ratskin totem.
+  %echoaround% %actor% ~%self% gives ~%actor% the ratskin totem.
   set gave%actor.id% 1
   remote gave%actor.id% %self.id%
 else
@@ -171,8 +171,8 @@ Rat combat~
 0 k 10
 ~
 * Slow bite
-%send% %actor% %self.name% bites into your flesh, and you don't feel so good.
-%echoaround% %actor% %self.name% bites into %actor.name%'s flesh, and %actor.heshe% doesn't look so good.
+%send% %actor% ~%self% bites into your flesh, and you don't feel so good.
+%echoaround% %actor% ~%self% bites into |%actor% flesh, and &%actor% doesn't look so good.
 dg_affect %actor% SLOW on 60
 ~
 #10015
@@ -182,19 +182,19 @@ Dire rat combat~
 switch %random.3%
   * Slow bite
   case 1
-    %send% %actor% %self.name% bites into your flesh, and you don't feel so good.
-    %echoaround% %actor% %self.name% bites into %actor.name%'s flesh, and %actor.heshe% doesn't look so good.
+    %send% %actor% ~%self% bites into your flesh, and you don't feel so good.
+    %echoaround% %actor% ~%self% bites into |%actor% flesh, and &%actor% doesn't look so good.
     dg_affect %actor% SLOW on 120
   break
   * Dash scratch AOE
   case 2
-    %echo% &&r%self.name% dashes around the room, striking everyone!&&0
+    %echo% &&r~%self% dashes around the room, striking everyone!&&0
     %aoe% 50 physical
   break
   * Pain bite
   case 3
-    %send% %actor% %self.name% takes a huge bite out of your arm!
-    %echoaround% %actor% %self.name% takes a huge bite out of %actor.name%'s arm!
+    %send% %actor% ~%self% takes a huge bite out of your arm!
+    %echoaround% %actor% ~%self% takes a huge bite out of |%actor% arm!
     %dot% %actor% 100 60 physical
     %damage% %actor% 20 physical
   break
@@ -236,7 +236,7 @@ while %ch%
   set ch_stealth %ch.skill(Stealth)%
   eval can_gain (%ch_stealth% != 0) && (%ch_stealth% != 50) && (%ch_stealth% != 75) && (%ch_stealth% != 100)
   if (%ch.is_pc% && %ch.is_ally(%actor%)% && %can_gain% && !%ch.noskill(Stealth)%)
-    %send% %actor% You learn a bit about Stealth from watching %self.name% fight.
+    %send% %actor% You learn a bit about Stealth from watching ~%self% fight.
     nop %ch.gain_skill(Stealth, 1)%
   end
   set ch %ch.next_in_room%
@@ -255,8 +255,8 @@ Thief recruiter passive~
 set target_char %self.room.people%
 while %target_char%
   if (%target_char.is_pc% && %target_char.skill(Stealth)% == 0)
-    %echoaround% %target_char% %self.name% whispers something to %target_char.name%.
-    %send% %target_char% %self.name% whispers, 'I could let you into the Guild for 100 coins.'
+    %echoaround% %target_char% ~%self% whispers something to ~%target_char%.
+    %send% %target_char% ~%self% whispers, 'I could let you into the Guild for 100 coins.'
   end
   set target_char %target_char.next_in_room%
 done
@@ -289,7 +289,7 @@ set target %random.char%
 if (%target.is_pc% && %target.has_resources(10013,10)%)
   say Ah, %target.name%, you've done my job for me. Here, have some money.
   nop %target.give_coins(100)%
-  %send% %target% %actor.name% gives you 100 coins.
+  %send% %target% ~%actor% gives you 100 coins.
   detach 10022 %self.id%
 end
 ~
@@ -302,16 +302,16 @@ switch %random.2%
   case 1
     set target %random.enemy%
     if (%target%)
-      %send% %target% %self.name% shoots a web at you, anchoring you to the ground!
-      %echoaround% %target% %self.name% shoots a web at %target.name%, anchoring %target.himher% to the ground!
+      %send% %target% ~%self% shoots a web at you, anchoring you to the ground!
+      %echoaround% %target% ~%self% shoots a web at ~%target%, anchoring *%target% to the ground!
       dg_affect %actor% SLOW on 120
       dg_affect %actor% ENTANGLED on 120
     end
   break
   * Searing Pain poison (DoT) on tank
   case 2
-    %send% %actor% %self.name% sinks %self.hisher% fangs into your flesh, causing searing pain!
-    %echoaround% %actor% %self.name% sinks %self.hisher% fangs into %actor.name%'s flesh, causing searing pain!
+    %send% %actor% ~%self% sinks ^%self% fangs into your flesh, causing searing pain!
+    %echoaround% %actor% ~%self% sinks ^%self% fangs into |%actor% flesh, causing searing pain!
     %dot% %actor% 100 60 poison
     %damage% %actor% 20 poison
   break
@@ -324,16 +324,16 @@ Baby dragon combat~
 set chance %random.3%
 if (chance < 3)
   * Fire spurt on tank
-  %send% %actor% %self.name% spurts fire at you, causing searing burns!
-  %echoaround% %actor% %self.name% spurts fire at %actor.name%, causing searing burns!
+  %send% %actor% ~%self% spurts fire at you, causing searing burns!
+  %echoaround% %actor% ~%self% spurts fire at ~%actor%, causing searing burns!
   %dot% %actor% 100 60 fire
   %damage% %actor% 20 fire
 else
   * Flame wave AoE
-  %echo% %self.name% begins puffing smoke and spinning in circles!
+  %echo% ~%self% begins puffing smoke and spinning in circles!
   * Give the healer (if any) time to prepare for group heals
   wait 3 sec
-  %echo% &&r%self.name% unleashes a flame wave!&&0
+  %echo% &&r~%self% unleashes a flame wave!&&0
   %aoe% 50 fire
 end
 ~
@@ -356,12 +356,12 @@ switch %random.5%
   break
   * Healing Potion
   case 4
-    %echo% %self.name% quaffs a potion!
+    %echo% ~%self% quaffs a potion!
     %damage% %self% -100
   break
   * Buff Potion
   case 5
-    %echo% %self.name% quaffs a vial of sewer water!
+    %echo% ~%self% quaffs a vial of sewer water!
     dg_affect %self% DEXTERITY 1 60
   break
 done
@@ -385,7 +385,7 @@ while %ch%
   set next_ch %ch.next_in_room%
   if (%ch.vnum% == 10018 || %ch.vnum% == 10019 || %ch.vnum% == 10020)
     if !(%ch.fighting%)
-      %echo% %ch.name% leaves to hunt somewhere else.
+      %echo% ~%ch% leaves to hunt somewhere else.
       %purge% %ch%
     end
   end
@@ -395,7 +395,7 @@ done
 eval vnum 10017+%random.3%
 %load% mob %vnum%
 set person %self.people%
-%echo% %person.name% arrives.
+%echo% ~%person% arrives.
 ~
 #10030
 Gossipers~
@@ -427,14 +427,14 @@ switch %random.4%
     say Gosh, let's see, I found the skystones for Celiya and that old book for Barrosh. Now where did I put the breakers for the Grand High Sorcerer?
   break
   case 2
-    %echo% %self.name% looks like %self.heshe%'s in a hurry.
+    %echo% ~%self% looks like &%self%'s in a hurry.
   break
   case 3
     say Oh, muggle forks! I've ripped another shoe. Oh, well. Cobbellus!
-    %echo% %self.name%'s shoe stitches itself back together.
+    %echo% |%self% shoe stitches itself back together.
   break
   case 4
-    %echo% %self.name% vanishes briefly and then reappears with an armful of scrolls.
+    %echo% ~%self% vanishes briefly and then reappears with an armful of scrolls.
   break
 done
 ~
@@ -451,12 +451,12 @@ switch %random.4%
     say We import only the finest coffee!
     %echo% (type 'buy coffee')
     wait 1 sec
-    %echo% %self.name% opens a tiny portal to summon materials...
-    %echo% %self.name% retrieves a sack of coffee beans.
+    %echo% ~%self% opens a tiny portal to summon materials...
+    %echo% ~%self% retrieves a sack of coffee beans.
   break
   case 3
     say Is that getting cold, hon?
-    %echo% %self.name% waves a gnarled wand and the coffee cups start steaming.
+    %echo% ~%self% waves a gnarled wand and the coffee cups start steaming.
   break
   case 4
     say One cream and two pixy dust?
@@ -486,13 +486,13 @@ else
   halt
 end
 if !%actor.can_afford(%cost%)%
-  %send% %actor% %self.name% tells you, 'You'll need %cost% coins to buy that.'
+  %send% %actor% ~%self% tells you, 'You'll need %cost% coins to buy that.'
   halt
 end
 nop %actor.charge_coins(%cost%)%
 %load% obj %vnum% %actor% inv
 %send% %actor% You buy a %named% for %cost% coins.
-%echoaround% %actor% %actor.name% buys a %named%.
+%echoaround% %actor% ~%actor% buys a %named%.
 ~
 #10034
 Teacher passive~
@@ -504,14 +504,14 @@ if (%lesson_running%)
 end
 switch %random.4%
   case 1
-    %echo% %self.name% draws diagrams of wand motions on the board.
+    %echo% ~%self% draws diagrams of wand motions on the board.
   break
   case 2
-    %echo% %self.name% splits into two people!
+    %echo% ~%self% splits into two people!
     wait 1 sec
-    %echo% %self.name% vanishes in a puff of smoke!
+    %echo% ~%self% vanishes in a puff of smoke!
     wait 1 sec
-    %echo% The other %self.name% looks baffled.
+    %echo% The other ~%self% looks baffled.
   break
   case 3
     %echo% Type 'study' to purchase a lesson.
@@ -526,7 +526,7 @@ Teacher study~
 0 c 0
 study~
 if (%actor.skill(High Sorcery)% >= 50)
-  %send% %actor% %self.name% tells you, 'There's nothing more I can teach you.'
+  %send% %actor% ~%self% tells you, 'There's nothing more I can teach you.'
   halt
 end
 if !(%actor.has_resources(10037,1)%)
@@ -539,33 +539,33 @@ set lesson_running 1
 global lesson_running
 nop %actor.add_resources(10037,-1)%
 %send% %actor% You trade a greater skystone for a lesson.
-%echoaround% %actor% %actor.name% begins to study.
+%echoaround% %actor% ~%actor% begins to study.
 wait 1 sec
 if (%actor.room% != %room_var%)
   halt
 end
-%send% %actor% %self.name% begins to teach you a lesson.
+%send% %actor% ~%self% begins to teach you a lesson.
 wait 3 sec
 if (%actor.room% != %room_var%)
   halt
 end
-%send% %actor% %self.name% shows you some simple magical movements.
+%send% %actor% ~%self% shows you some simple magical movements.
 wait 3 sec
 if (%actor.room% != %room_var%)
   halt
 end
-%send% %actor% %self.name% gives you a lesson on magical lore.
+%send% %actor% ~%self% gives you a lesson on magical lore.
 wait 3 sec
 if (%actor.room% != %room_var%)
   halt
 end
-%send% %actor% %self.name% grab you by the head and streams magical thoughts into your mind!
+%send% %actor% ~%self% grab you by the head and streams magical thoughts into your mind!
 wait 3 sec
 if (%actor.room% != %room_var%)
   halt
 end
 %send% %actor% The lesson ends.
-%echoaround% %actor% %actor.name%'s lesson ends.
+%echoaround% %actor% |%actor% lesson ends.
 if (%actor.skill(High Sorcery)% < 50)
   nop %actor.gain_skill(High Sorcery,1)%
 end
@@ -576,7 +576,7 @@ global lesson_running
 Skycleave Cashier list~
 0 c 0
 list~
-%send% %actor% %self.name% sells:
+%send% %actor% ~%self% sells:
 %send% %actor%  - a skycleaver trinket ('buy trinket', 10 greater skystones)
 %send% %actor%  - a skycleaver belt ('buy belt', 8 skystones)
 %send% %actor%  - skycleaver gloves ('buy gloves', 5 skystones)
@@ -647,13 +647,13 @@ else
   halt
 end
 if !%actor.has_resources(%currency_vnum%,%cost%)%
-  %send% %actor% %self.name% tells you, 'You'll need %cost% %currency% to buy that.'
+  %send% %actor% ~%self% tells you, 'You'll need %cost% %currency% to buy that.'
   halt
 end
 nop %actor.add_resources(%currency_vnum%,-%cost%)%
 %load% obj %vnum% %actor% inv %actor.level%
 %send% %actor% You buy %named% for %cost% %currency%.
-%echoaround% %actor% %actor.name% buys %named%.
+%echoaround% %actor% ~%actor% buys %named%.
 ~
 #10038
 Goblin Wrangler passive~
@@ -662,13 +662,13 @@ Goblin Wrangler passive~
 * This script is no longer used. It was replaced by custom strings.
 switch %random.4%
   case 1
-    %echo% %self.name% adjusts %self.hisher% wrangler pants.
+    %echo% ~%self% adjusts ^%self% wrangler pants.
   break
   case 2
     say We've got a real wild crop of goblins this time.
   break
   case 3
-    %echo% %self.name% wraps %self.hisher% whip around the light fixture and swings back and forth across the room.
+    %echo% ~%self% wraps ^%self% whip around the light fixture and swings back and forth across the room.
   break
   case 4
     say Sometimes I worry we'll have too many goblins to control.
@@ -687,15 +687,15 @@ switch %random.4%
     sunshock %actor.name%
   break
   case 3
-    %send% %actor% %self.name% shoots a bolt of lightning from the end of %self.hisher% whip!
-    %echoaround% %actor% %self.name% shoots a bolt of lightning at %actor.name% from the end of %self.hisher% whip!
+    %send% %actor% ~%self% shoots a bolt of lightning from the end of ^%self% whip!
+    %echoaround% %actor% ~%self% shoots a bolt of lightning at ~%actor% from the end of ^%self% whip!
     %damage% %actor% 120 magical
   break
   case 4
     %load% mob 10039 ally
     makeuid goblin mob goblin
     if %goblin%
-      %echo% %self.name% opens a cage and lets %goblin.name% out!
+      %echo% ~%self% opens a cage and lets ~%goblin% out!
       %force% %goblin% %aggro% %actor%
     end
   break
@@ -706,8 +706,8 @@ Goblin combat~
 0 k 10
 ~
 if %random.3% < 3
-  %send% %actor% %self.name% stabs you in the leg with a goblin shortsword!
-  %echoaround% %actor% %self.name% stabs %actor.name% in the leg with a goblin shortsword!
+  %send% %actor% ~%self% stabs you in the leg with a goblin shortsword!
+  %echoaround% %actor% ~%self% stabs ~%actor% in the leg with a goblin shortsword!
   %damage% %actor% 20 physical
   %dot% %actor% 100 10 physical
 else
@@ -783,7 +783,7 @@ remote pixy_wager %actor.id%
 remote pixy_choice %actor.id%
 nop %actor.charge_coins(%pixy_wager%)%
 %send% %actor% You place a wager on #%pixy_choice%, for %pixy_wager% coins.
-%echoaround% %actor% %actor.name% places a wager.
+%echoaround% %actor% ~%actor% places a wager.
 ~
 #10043
 Pixy race~
@@ -868,7 +868,7 @@ while %ch%
     if %ch.pixy_choice% == %winner%
       eval amt %ch.pixy_wager% * 3
       %send% %ch% Your pixy won! You earn %amt% coins!
-      %echoaround% %ch% %ch.name% has won %ch.hisher% bet!
+      %echoaround% %ch% ~%ch% has won ^%ch% bet!
       nop %ch.give_coins(%amt%)%
     elseif %ch.varexists(pixy_choice)%
       %send% %ch% Your pixy lost the race.
@@ -885,7 +885,7 @@ unset pixy_race_running
 2F Watcher combat~
 0 k 5
 ~
-%echo% %self.name% draws the Eye Sigil in the air!
+%echo% ~%self% draws the Eye Sigil in the air!
 %aoe% 75 magical
 ~
 #10045
@@ -894,25 +894,25 @@ Apprentice passive~
 ~
 switch %random.4%
   case 1
-    %echo% %self.name% casts a spell at a broomstick, which promptly splits into two broomsticks!
+    %echo% ~%self% casts a spell at a broomstick, which promptly splits into two broomsticks!
   break
   case 2
-    %echo% %self.name% opens a tiny portal to summon materials...
-    %echo% %self.name% retrieves a venomous skink.
+    %echo% ~%self% opens a tiny portal to summon materials...
+    %echo% ~%self% retrieves a venomous skink.
     wait 1 sec
     %echo% The venomous skink scampers away.
   break
   case 3
-    %echo% %self.name% casts a spell at an escaped pixy, which promptly splits into two pixies!
+    %echo% ~%self% casts a spell at an escaped pixy, which promptly splits into two pixies!
   break
   case 4
-    %echo% %self.name% vanishes briefly and then reappears with an armful of venomous skinks.
+    %echo% ~%self% vanishes briefly and then reappears with an armful of venomous skinks.
     wait 1 sec
     %echo% The venomous skinks scamper away.
   break
 done
 wait 1 sec
-%echo% %self.name% looks quite embarrassed.
+%echo% ~%self% looks quite embarrassed.
 ~
 #10046
 Sorcerer combat~
@@ -935,8 +935,8 @@ end
 if !%actor.affect(enervate)%
   enervate
 else
-  %send% %actor% %self.name% marks you with a piece of chalk. It burns!
-  %echoaround% %actor% %self.name% marks %actor.name% with a piece of chalk. It looks like it burns!
+  %send% %actor% ~%self% marks you with a piece of chalk. It burns!
+  %echoaround% %actor% ~%self% marks ~%actor% with a piece of chalk. It looks like it burns!
   %dot% %actor% 50 20 magical
   %damage% %actor% 50 magical
 end
@@ -974,7 +974,7 @@ Otherworlder prisoner passive~
 0 bw 5
 ~
 * This script is no longer used. It was replaced by custom strings.
-%echo% %self.name% pulls at its chains and lets out a shout.
+%echo% ~%self% pulls at its chains and lets out a shout.
 ~
 #10050
 Otherworlder prisoner combat~
@@ -997,16 +997,16 @@ else
 end
 switch %msg_pos%
   case 1
-    %echo% %self.name% makes a skeleton dance like a puppet.
+    %echo% ~%self% makes a skeleton dance like a puppet.
   break
   case 2
-    %echo% %self.name% pours a jar of ash into a bone-shaped mold.
+    %echo% ~%self% pours a jar of ash into a bone-shaped mold.
   break
   case 3
-    %echo% %self.name% spews flies from %self.hisher% mouth. Luckily, they escape out the window.
+    %echo% ~%self% spews flies from ^%self% mouth. Luckily, they escape out the window.
   break
   case 4
-    %echo% %self.name% lets out an unearthly groan.
+    %echo% ~%self% lets out an unearthly groan.
   break
 done
 if %msg_pos% >= 4
@@ -1025,29 +1025,29 @@ elseif !%actor.affect(slow)%
 else
   switch %random.4%
     case 1
-      %send% %actor% %self.name% grabs you by the neck and you're both enveloped in a bright purple glow!
-      %echoaround% %actor% %self.name% grabs %actor.name% by the neck and they're both enveloped in a bright purple glow!
+      %send% %actor% ~%self% grabs you by the neck and you're both enveloped in a bright purple glow!
+      %echoaround% %actor% ~%self% grabs ~%actor% by the neck and they're both enveloped in a bright purple glow!
       %damage% %self% -50
       %damage% %actor% 75 magical
     break
     case 2
-      %send% %actor% %self.name% stares into your eyes. You can't move!
-      %echoaround% %actor% %self.name% stares into %actor.name%'s eyes. %actor.name% seems unable to move!
+      %send% %actor% ~%self% stares into your eyes. You can't move!
+      %echoaround% %actor% ~%self% stares into |%actor% eyes. ~%actor% seems unable to move!
       dg_affect %actor% STUNNED on 10
     break
     case 3
-      %echo% %self.name% raises %self.hisher% arms and the floor begins to rumble...
+      %echo% ~%self% raises ^%self% arms and the floor begins to rumble...
       wait 2 sec
       %echo% Bone hands rise from the floor and claw at you!
       %aoe% 50 physical
     break
     case 4
-      %echo% %self.name% raises %self.hisher% arms and the floor begins to rumble...
+      %echo% ~%self% raises ^%self% arms and the floor begins to rumble...
       wait 2 sec
       %load% mob 10049 ally
       makeuid skelly mob skeleton
       if %skelly%
-        %echo% %skelly.name% rises from the floor!
+        %echo% ~%skelly% rises from the floor!
         %force% %skelly% %aggro% %actor%
       end
     break
@@ -1064,8 +1064,8 @@ bash
 Shackled Ghost combat~
 0 k 10
 ~
-%send% %actor% %self.name% envelops you. You hear a terrible, soul-piercing scream!
-%echoaround% %actor% %self.name% envelops %actor.name%, who lets out a terrible, soul-piercing scream!
+%send% %actor% ~%self% envelops you. You hear a terrible, soul-piercing scream!
+%echoaround% %actor% ~%self% envelops ~%actor%, who lets out a terrible, soul-piercing scream!
 dg_affect %actor% SLOW on 20
 dg_affect %actor% ENTANGLED on 20
 ~
@@ -1080,16 +1080,16 @@ else
 end
 switch %msg_pos%
   case 1
-    %echo% %self.name% sits in her chair.
+    %echo% ~%self% sits in her chair.
   break
   case 2
-    %echo% %self.name% stands up, puts a book in a glass case, and locks it.
+    %echo% ~%self% stands up, puts a book in a glass case, and locks it.
   break
   case 3
     say I have a lithe, form-fitting backpack for sale -- just 5 greater skystones (type 'buy').
   break
   case 4
-    %echo% %self.name% whistles a catchy tune.
+    %echo% ~%self% whistles a catchy tune.
   break
 done
 if %msg_pos% >= 4
@@ -1103,19 +1103,19 @@ Celiya combat~
 ~
 switch %random.3%
   case 1
-    %echo% %self.name% begins to channel a spell. The silk of %self.hisher% robe begins to grow and stretch out toward you!
+    %echo% ~%self% begins to channel a spell. The silk of ^%self% robe begins to grow and stretch out toward you!
     wait 1 sec
     %echo% Pieces of silk fly at you, slicing at your skin, leaving you in intense pain!
     %aoe% 75 magical
   break
   case 2
-    %echo% %self.name% begins to glow white...
+    %echo% ~%self% begins to glow white...
     wait 2 sec
     heal self
   break
   case 3
-    %send% %actor% %self.name% grabs you by the wrist, and you feel a deep pain in your bones!
-    %echoaround% %actor% %self.name% grabs %actor.name% by the wrist, and %actor.name% writhes in pain!
+    %send% %actor% ~%self% grabs you by the wrist, and you feel a deep pain in your bones!
+    %echoaround% %actor% ~%self% grabs ~%actor% by the wrist, and ~%actor% writhes in pain!
     %damage% %actor% 20 magical
     %dot% %actor% 100 20 magical
   break
@@ -1131,7 +1131,7 @@ set cost 5
 set named a form-fitting backpack
 set keyw backpack
 if (!%arg%)
-  %send% %actor% %self.name% sells %named% for %cost% greater skystones.
+  %send% %actor% ~%self% sells %named% for %cost% greater skystones.
   %send% %actor% Type 'buy backpack' to purchase one.
   halt
 elseif !(backpack /= %arg% || formfitting /= %arg%)
@@ -1139,13 +1139,13 @@ elseif !(backpack /= %arg% || formfitting /= %arg%)
   halt
 end
 if !%actor.has_resources(10037,%cost%)%
-  %send% %actor% %self.name% tells you, 'You'll need %cost% greater skystones to buy that.'
+  %send% %actor% ~%self% tells you, 'You'll need %cost% greater skystones to buy that.'
   halt
 end
 nop %actor.add_resources(10037,-%cost%)%
 %load% obj %vnum% %actor% inv %actor.level%
 %send% %actor% You buy %named% for %cost% greater skystones.
-%echoaround% %actor% %actor.name% buys %named%.
+%echoaround% %actor% ~%actor% buys %named%.
 ~
 #10058
 Barrosh passive~
@@ -1158,16 +1158,16 @@ else
 end
 switch %msg_pos%
   case 1
-    %echo% %self.name% stops concentrating for a moment, and several hovering objects fall.
+    %echo% ~%self% stops concentrating for a moment, and several hovering objects fall.
   break
   case 2
-    %echo% %self.name% stares out the window at the surrounding countryside.
+    %echo% ~%self% stares out the window at the surrounding countryside.
   break
   case 3
     say I have an armored backpack for sale -- just 5 greater skystones (type 'buy').
   break
   case 4
-    %echo% %self.name% shouts, 'Whoever keeps whistling, cut it out.'
+    %echo% ~%self% shouts, 'Whoever keeps whistling, cut it out.'
   break
 done
 if %msg_pos% >= 4
@@ -1181,24 +1181,24 @@ Barrosh combat~
 ~
 switch %random.4%
   case 1
-    %echo% %self.name% speaks an arcane phrase...
+    %echo% ~%self% speaks an arcane phrase...
     wait 1 sec
     dg_affect %actor% STRENGTH -1 20
     %send% %actor% You feel weaker.
   break
   case 2
-    %echo% %self.name% speaks an arcane phrase...
+    %echo% ~%self% speaks an arcane phrase...
     wait 1 sec
     dg_affect %actor% INTELLIGENCE -1 20
     %send% %actor% You feel dumber.
   break
   case 3
-    %echo% %self.name% begins to glow white...
+    %echo% ~%self% begins to glow white...
     wait 2 sec
     heal self
   break
   case 4
-    %echo% %self.name% mutters some arcane words...
+    %echo% ~%self% mutters some arcane words...
     wait 1 sec
     %echo% There is a flash of intense light!
     set ch %self.room.people%
@@ -1221,7 +1221,7 @@ set cost 5
 set named an armored backpack
 set keyw backpack
 if (!%arg%)
-  %send% %actor% %self.name% sells %named% for %cost% greater skystones.
+  %send% %actor% ~%self% sells %named% for %cost% greater skystones.
   %send% %actor% Type 'buy backpack' to purchase one.
   halt
 elseif !(backpack /= %arg% || armored /= %arg%)
@@ -1229,13 +1229,13 @@ elseif !(backpack /= %arg% || armored /= %arg%)
   halt
 end
 if !%actor.has_resources(10037,%cost%)%
-  %send% %actor% %self.name% tells you, 'You'll need %cost% greater skystones to buy that.'
+  %send% %actor% ~%self% tells you, 'You'll need %cost% greater skystones to buy that.'
   halt
 end
 nop %actor.add_resources(10037,-%cost%)%
 %load% obj %vnum% %actor% inv %actor.level%
 %send% %actor% You buy %named% for %cost% greater skystones.
-%echoaround% %actor% %actor.name% buys %named%.
+%echoaround% %actor% ~%actor% buys %named%.
 ~
 #10061
 Knezz passive~
@@ -1248,16 +1248,16 @@ else
 end
 switch %msg_pos%
   case 1
-    %echo% %self.name% reads some correspondence at %self.hisher% desk.
+    %echo% ~%self% reads some correspondence at ^%self% desk.
   break
   case 2
-    %echo% %self.name% vanishes momentarily, and then reappears in new clothes.
+    %echo% ~%self% vanishes momentarily, and then reappears in new clothes.
   break
   case 3
     say I have a gigantic little bag for sale -- just 5 greater skystones (type 'buy').
   break
   case 4
-    %echo% %self.name% pulls some bones out of a pile of ashes and begins tinkering with them.
+    %echo% ~%self% pulls some bones out of a pile of ashes and begins tinkering with them.
   break
 done
 if %msg_pos% >= 4
@@ -1271,18 +1271,18 @@ Knezz combat~
 ~
 switch %random.4%
   case 1
-    %echo% %self.name% seems to spark with electricity...
+    %echo% ~%self% seems to spark with electricity...
     wait 1 sec
     set actor %self.fighting%
     if !%actor%
       halt
     end
-    %send% %actor% %self.name% unleashes a powerful torrent of lightning bolts at you!
-    %echoaround% %actor% %self.name% unleashes a torrent of lightning bolts at %actor.name%!
+    %send% %actor% ~%self% unleashes a powerful torrent of lightning bolts at you!
+    %echoaround% %actor% ~%self% unleashes a torrent of lightning bolts at ~%actor%!
     %damage% %actor% 150 magical
   break
   case 2
-    %echo% %self.name% chants a poem you don't understand...
+    %echo% ~%self% chants a poem you don't understand...
     set ch %self.room.people%
     while %ch%
       set next_ch %ch.next_in_room%
@@ -1294,12 +1294,12 @@ switch %random.4%
     done
   break
   case 3
-    %echo% %self.name% begins to glow white...
+    %echo% ~%self% begins to glow white...
     wait 2 sec
     heal self
   break
   case 4
-    %echo% %self.name% chants a poem you don't understand...
+    %echo% ~%self% chants a poem you don't understand...
     set ch %self.room.people%
     while %ch%
       if %self.is_enemy(%ch%)%
@@ -1320,7 +1320,7 @@ set cost 5
 set named a portable hole
 set keyw portable
 if (!%arg%)
-  %send% %actor% %self.name% sells %named% for %cost% greater skystones.
+  %send% %actor% ~%self% sells %named% for %cost% greater skystones.
   %send% %actor% Type 'buy hole' to purchase one.
   halt
 elseif !(hole /= %arg% || portable /= %arg%)
@@ -1328,13 +1328,13 @@ elseif !(hole /= %arg% || portable /= %arg%)
   halt
 end
 if !%actor.has_resources(10037,%cost%)%
-  %send% %actor% %self.name% tells you, 'You'll need %cost% greater skystones to buy that.'
+  %send% %actor% ~%self% tells you, 'You'll need %cost% greater skystones to buy that.'
   halt
 end
 nop %actor.add_resources(10037,-%cost%)%
 %load% obj %vnum% %actor% inv %actor.level%
 %send% %actor% You buy %named% for %cost% greater skystones.
-%echoaround% %actor% %actor.name% buys %named%.
+%echoaround% %actor% ~%actor% buys %named%.
 ~
 #10064
 Escaped experiment passive~
@@ -1343,13 +1343,13 @@ Escaped experiment passive~
 * This script is no longer used. It was replaced by custom strings.
 switch %random.3%
   case 1
-    %echo% %self.name% flickers, as if %self.heshe% isn't real!
+    %echo% ~%self% flickers, as if &%self% isn't real!
   break
   case 2
-    %echo% %self.name% seems to be growing...
+    %echo% ~%self% seems to be growing...
   break
   case 3
-    %echo% %self.name% seems to be growing spikes.
+    %echo% ~%self% seems to be growing spikes.
   break
 done
 ~
@@ -1383,7 +1383,7 @@ if !(%actor.has_resources(10036,5)%)
   halt
 end
 %send% %actor% You combine 5 skystones into a greater skystone!
-%echoaround% %actor% %actor.name% combines 5 skystones into a greater skystone!
+%echoaround% %actor% ~%actor% combines 5 skystones into a greater skystone!
 %load% obj 10037 %actor% inv
 nop %actor.add_resources(10036,-5)%
 ~
@@ -1396,7 +1396,7 @@ if !%self.is_name(%arg%)%
   halt
 end
 %send% %actor% You split a greater skystone into 5 small skystones!
-%echoaround% %actor% %actor.name% splits a greater skystone into 5 smaller skystones!
+%echoaround% %actor% ~%actor% splits a greater skystone into 5 smaller skystones!
 %load% obj 10036 %actor% inv
 %load% obj 10036 %actor% inv
 %load% obj 10036 %actor% inv
@@ -1453,24 +1453,24 @@ while %cycle% >= 0
   if %actor.room% != %room_var% || %self.carried_by% != %actor% || %error%
     if %cycle% > 0
       %send% %actor% %self.shortdesc% sparks and fizzles.
-      %echoaround% %actor% %actor.name%'s trinket sparks and fizzles.
+      %echoaround% %actor% |%actor% trinket sparks and fizzles.
     end
     halt
   end
   switch %cycle%
     case 0
       %send% %actor% You touch %self.shortdesc% and the glyphs carved into it light up...
-      %echoaround% %actor% %actor.name% touches %self.shortdesc% and the glyphs carved into it light up...
+      %echoaround% %actor% ~%actor% touches %self.shortdesc% and the glyphs carved into it light up...
     break
     case 1
       %send% %actor% The glyphs on %self.shortdesc% glow a deep blue and the light begins to envelop you!
-      %echoaround% %actor% The glyphs on %self.shortdesc% glow a deep blue and the light begins to envelop %actor.name%!
+      %echoaround% %actor% The glyphs on %self.shortdesc% glow a deep blue and the light begins to envelop ~%actor%!
     break
     case 2
-      %echoaround% %actor% %actor.name% vanishes in a flash of blue light!
+      %echoaround% %actor% ~%actor% vanishes in a flash of blue light!
       %teleport% %actor% %loc%
       %force% %actor% look
-      %echoaround% %actor% %actor.name% appears in a flash of blue light!
+      %echoaround% %actor% ~%actor% appears in a flash of blue light!
       nop %actor.set_cooldown(10079, 3600)%
       nop %actor.cancel_adventure_summon%
       nop %self.bind(%actor%)%
