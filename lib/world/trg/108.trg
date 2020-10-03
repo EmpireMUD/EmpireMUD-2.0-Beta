@@ -93,7 +93,7 @@ Crier Shout~
 0 ab 1
 ~
 if %random.3% == 3
-  %regionecho% %self.room% 20 %self.name% shouts, 'Learn the Trade skill at the &y/()\&0 Museum of Early Man!'
+  %regionecho% %self.room% 20 %self.name% shouts, 'Learn the Trade skill at the &&y/()\&&0 Museum of Early Man!'
 end
 ~
 #10828

@@ -29,7 +29,7 @@ set any 0
 while %ch%
   if (%ch% != %actor% && (%ch.plr_flagged(VAMPIRE)% || %ch.mob_flagged(VAMPIRE)%))
     if !%any%
-      %send% %actor% &0
+      %send% %actor% &&0
       set any 1
     end
     %send% %actor% Over your shoulder, you notice that %ch.name% has no reflection.

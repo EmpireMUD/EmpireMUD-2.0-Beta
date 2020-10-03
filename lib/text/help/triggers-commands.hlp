@@ -116,6 +116,10 @@ See also: %TERRAFORM%, %TERRACROP%
 &c%vehicleecho% <vehicle> <message>&0
    Sends a message to everyone on/in the target vehicle.
 
+To use color codes (starting with &&) in any send/echo, you must double the
+&&, e.g. &&&&r is red. See HELP SPEC-VAR for information on using names and
+pronouns safely.
+
 Using a # (hash sign) at the start of the message will queue the message, which
 causes it to be sent on a very short delay (after any non-queued messages) and
 any duplicate queued messages are stacked.

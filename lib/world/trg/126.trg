@@ -647,7 +647,7 @@ if %actor.trigger_counterspell%
   %echoaround% %actor% %self.name% launches a bolt of fire at %actor.name%, but it fizzles out in the air in front of %actor.himher%.
   halt
 else
-  %send% %actor% &r%self.name% thrusts out %self.hisher% hand at you, and blasts you with a bolt of searing flames!
+  %send% %actor% &&r%self.name% thrusts out %self.hisher% hand at you, and blasts you with a bolt of searing flames!
   %echoaround% %actor% %self.name% thrusts out %self.hisher% hand at %actor.name%, and blasts %actor.himher% with a bolt of searing flames!
   %damage% %actor% 100 fire
   %dot% #12660 %actor% 150 15 fire
@@ -697,7 +697,7 @@ if !%self.morph%
   %echo% %current% rapidly morphs into %self.name%!
 end
 wait 1 sec
-%send% %actor% &r%self.name% sinks %self.hisher% teeth into your leg!
+%send% %actor% &&r%self.name% sinks %self.hisher% teeth into your leg!
 %echoaround% %actor% %self.name% sinks %self.hisher% teeth into %actor.name%'s leg!
 %damage% %actor% 100 physical
 ~
@@ -721,8 +721,8 @@ if %actor.trigger_counterspell%
   %echoaround% %actor% %self.name% gestures, and earthen claws burst from the soil, dissolving as they near %actor.name%!
   halt
 else
-  %send% %actor% &r%self.name% gestures, and earthen claws burst from the soil, tearing into you!
-  %echoaround% %actor% &r%self.name% gestures, and earthen claws burst from the soil, tearing into %actor.name%!
+  %send% %actor% &&r%self.name% gestures, and earthen claws burst from the soil, tearing into you!
+  %echoaround% %actor% &&r%self.name% gestures, and earthen claws burst from the soil, tearing into %actor.name%!
   %damage% %actor% 50 physical
   eval scale %self.level%/15 + 1
   dg_affect #12664 %actor% RESIST-PHYSICAL -%scale% 15
@@ -733,7 +733,7 @@ Archdruid: Grand Fireball~
 0 k 50
 ~
 if %self.affect(12666)%
-  %send% %actor% &rThe flames wreathing %self.name%'s staff burn you as %self.heshe% swings at you!
+  %send% %actor% &&rThe flames wreathing %self.name%'s staff burn you as %self.heshe% swings at you!
   %echoaround% %actor% The flames wreathing %self.name%'s staff burn %actor.name% as %self.name% swings at %actor.himher%!
   %damage% %actor% 50 fire
 end
@@ -760,12 +760,12 @@ if %actor.trigger_counterspell%
   %send% %actor% The fireball strikes your counterspell and explodes with a fiery roar!
   %echoaround% %actor% The fireball explodes in front of %actor.name% with a fiery roar!
 else
-  %send% %actor% &rThe fireball crashes into you and explodes, bowling you over!
+  %send% %actor% &&rThe fireball crashes into you and explodes, bowling you over!
   %echoaround% %actor% The fireball crashes into %actor.name% and explodes, bowling %actor.himher% over!
   dg_affect #12665 %actor% STUNNED on 5
   %damage% %actor% 300 fire
 end
-%echo% &rA wave of scorching heat from the explosion washes over you!
+%echo% &&rA wave of scorching heat from the explosion washes over you!
 %aoe% 75 fire
 ~
 #12666
@@ -773,7 +773,7 @@ Archdruid: Ignite Weapon~
 0 k 100
 ~
 if %self.affect(12666)%
-  %send% %actor% &rThe flames wreathing %self.name%'s staff burn you as %self.heshe% swings at you!
+  %send% %actor% &&rThe flames wreathing %self.name%'s staff burn you as %self.heshe% swings at you!
   %echoaround% %actor% The flames wreathing %self.name%'s staff burn %actor.name% as %self.name% swings at %actor.himher%!
   %damage% %actor% 50 fire
 end
@@ -799,7 +799,7 @@ if !%self.morph%
   %echo% %current% rapidly morphs into %self.name% and takes flight!
   wait 1 sec
 end
-%send% %actor% &r%self.name% swoops down and knocks your weapon from your hand!
+%send% %actor% &&r%self.name% swoops down and knocks your weapon from your hand!
 %echoaround% %actor% %self.name% swoops down and knocks %actor.name%'s weapon from %actor.hisher% hand!
 %damage% %actor% 5 physical
 dg_affect #12667 %actor% DISARM on 5
@@ -834,7 +834,7 @@ Turtle Druid: Morph~
 ~
 if %self.aff_flagged(IMMUNE-DAMAGE)% && %random.4% == 4
   %echo% %self.name% has retreated into %self.hisher% shell.
-  %echo% &YYou could 'stomp' on %self.hisher% shell to draw %self.himher% out.
+  %echo% &&YYou could 'stomp' on %self.hisher% shell to draw %self.himher% out.
   halt
 end
 if %self.cooldown(12657)%
@@ -848,7 +848,7 @@ if !%self.morph%
   wait 1 sec
 end
 %echo% %self.name% retreats into the safety of %self.hisher% hard shell.
-%echo% &YYou could 'stomp' on %self.hisher% shell to draw %self.himher% out.
+%echo% &&YYou could 'stomp' on %self.hisher% shell to draw %self.himher% out.
 dg_affect #12669 %self% IMMUNE-DAMAGE on -1
 nop %self.add_mob_flag(NO-ATTACK)%
 ~
@@ -859,7 +859,7 @@ Turtle Druid: Riptide~
 if %self.cooldown(12657)%
   if %self.affect(12669) && %random.4% == 4
     %echo% %self.name% has retreated into %self.hisher% shell.
-    %echo% &YYou could 'stomp' on %self.hisher% shell to draw %self.himher% out.
+    %echo% &&YYou could 'stomp' on %self.hisher% shell to draw %self.himher% out.
     halt
   end
   halt
@@ -881,7 +881,7 @@ end
 set cycle 1
 while %cycle% <= 3
   wait 5 sec
-  %echo% &r%self.name%'s riptide pummels you violently!
+  %echo% &&r%self.name%'s riptide pummels you violently!
   %aoe% 40 physical
   eval cycle %cycle% + 1
 done
@@ -1077,7 +1077,7 @@ if !%actor%
           if %person.is_god% || %person.is_immortal% || %person.health% < 0
             halt
           end
-          %send% %person% # &rYou are drowning!&0
+          %send% %person% # &&rYou are drowning!&&0
           eval amount (%person.breath%) * (-250)
           %damage% %person% %amount%
         end
@@ -1116,7 +1116,7 @@ if %actor.varexists(breath)%
   elseif %breath% == 1
     %send% %actor% You cannot hold your breath much longer! You should find air, and soon!
   elseif %breath% < 0
-    %send% %actor% &rYou are drowning!
+    %send% %actor% &&rYou are drowning!
   elseif %breath% <= 5
     %send% %actor% You can't hold your breath much longer... You think you could swim for another %breath% rooms.
   end
@@ -1298,7 +1298,7 @@ if %actor.trigger_counterspell%
   %echoaround% %actor% The water blast dissipates in front of %actor.name%.
   halt
 else
-  %send% %actor% &rThe water blast crashes into you, sending you spinning!
+  %send% %actor% &&rThe water blast crashes into you, sending you spinning!
   %echoaround% %actor% The water blast crashes into %actor.name%, sending %actor.himher% spinning!
   %damage% %actor% 150 physical
 end
@@ -1377,7 +1377,7 @@ if %success% && !%failure%
   done
   %purge% %self%
 else
-  %send% %actor% &r%self.name% attacks you with a painful bolt of crimson light, and flies off into the trees!
+  %send% %actor% &&r%self.name% attacks you with a painful bolt of crimson light, and flies off into the trees!
   %echoaround% %actor% %self.name% attacks %actor.name% with a bolt of crimson light, and flies off into the trees!
   %damage% %actor% 200 magical
   %purge% %self%
@@ -1390,7 +1390,7 @@ Grove rage spirit time limit~
 wait 6 sec
 %echo% A voice in your head urges, 'Say it out loud!'
 wait 8 sec
-%echo% &r%self.name% releases a painful surge of crimson energy and flies off into the trees, looking furious!
+%echo% &&r%self.name% releases a painful surge of crimson energy and flies off into the trees, looking furious!
 %aoe% 150 magical
 %purge% %self%
 ~

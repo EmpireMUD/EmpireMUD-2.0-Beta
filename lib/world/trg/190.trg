@@ -678,10 +678,10 @@ if %self.mob_flagged(GROUP)%
 end
 %echo% %self.name% starts spinning in circles!
 wait 3 sec
-%echo% &r%self.name% swings %self.hisher% weapon wildly, hitting everything in sight!
+%echo% &&r%self.name% swings %self.hisher% weapon wildly, hitting everything in sight!
 if %heroic_mode%
   %aoe% 125 physical
-  %echo% &r%self.name%'s wild swings leave bleeding wounds!
+  %echo% &&r%self.name%'s wild swings leave bleeding wounds!
   set person %self.room.people%
   while %person%
     if %person.is_enemy(%self%)%
@@ -795,7 +795,7 @@ end
 set cycle 1
 while %cycle% <= %cycles%
   wait 3 sec
-  %echo% &r%self.name% unleashes a flame spiral!
+  %echo% &&r%self.name% unleashes a flame spiral!
   %aoe% 50 fire
   eval cycle %cycle% + 1
 done
@@ -814,7 +814,7 @@ set heroic_mode %self.mob_flagged(GROUP)%
 %echo% %self.name% draws back %self.hisher% fist for a mighty blow...
 wait 3 sec
 if %heroic_mode%
-  %send% %actor% &r%self.name%'s fist flies right at your face!
+  %send% %actor% &&r%self.name%'s fist flies right at your face!
   %damage% %actor% 150 physical
   %send% %actor% Everything turns dark and confusing...
   %echoaround% %actor% %self.name% decks %actor.name% with one powerful punch!
@@ -894,7 +894,7 @@ set heroic_mode %self.mob_flagged(GROUP)%
 wait 5 sec
 %echo% %self.name% hurls the bomb at you!
 if %heroic_mode%
-  %echo% &rThe bomb explodes, stunning you!
+  %echo% &&rThe bomb explodes, stunning you!
   %aoe% 100 physical
   set person %self.room.people%
   while %person%
@@ -904,7 +904,7 @@ if %heroic_mode%
     set person %person.next_in_room%
   done
 else
-  %echo% &rThe bomb explodes!
+  %echo% &&rThe bomb explodes!
   %aoe% 75 physical
 end
 ~
@@ -955,7 +955,7 @@ set heroic_mode %self.mob_flagged(GROUP)%
 set hard %self.mob_flagged(HARD)%
 if %goblin% || !%heroic_mode% || !%hard%
   if %heroic_mode%
-    %echo% &r%self.name% unleashes a storm of uncontrolled magical energy!
+    %echo% &&r%self.name% unleashes a storm of uncontrolled magical energy!
     %aoe% 100 magical
     set person %room.people%
     while %person%
@@ -966,7 +966,7 @@ if %goblin% || !%heroic_mode% || !%hard%
       set person %person.next_in_room%
     done
   else
-    %send% %actor% &r%self.name% unleashes a bolt of uncontrolled magical energy, which strikes you!
+    %send% %actor% &&r%self.name% unleashes a bolt of uncontrolled magical energy, which strikes you!
     %echoaround% %actor% %self.name% unleashes a bolt of uncontrolled magical energy, which strikes %actor.name%!
     %damage% %actor% 100 magical
     %dot% #10211 %actor% 75 30 magical

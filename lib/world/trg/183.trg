@@ -79,14 +79,14 @@ switch %random.4%
   * Rising Waters
   case 2
     %echo% %self.name% raises %self.hisher% hands!
-    %echo% &AWater starts to flood the chamber! Swim for your life!&0
+    %echo% &&AWater starts to flood the chamber! Swim for your life!&&0
     * Give the group time to type 'swim' (if they're going to)
     set running 1
     remote running %self.id%
     wait 10 sec
     set running 0
     remote running %self.id%
-    %echo% &AWater floods the chamber!
+    %echo% &&AWater floods the chamber!
     set room %self.room%
     set person %room.people%
     while %person%
@@ -101,7 +101,7 @@ switch %random.4%
           eval test %%self.swimming_%person.id%%%
         end
         if !%test%
-          %send% %person% &rYou are drowned by the rising waters!
+          %send% %person% &&rYou are drowned by the rising waters!
           %echoaround% %person% %person.name% sinks beneath the rising waters!
           if %heroic_mode%
             %damage% %person% 500 direct
@@ -130,7 +130,7 @@ switch %random.4%
   case 3
     %echo% %self.name% makes a sweeping gesture, and the wind picks up!
     wait 5 sec
-    %echo% &rA howling tornado of sand fills the chamber, blinding and slashing at everyone!
+    %echo% &&rA howling tornado of sand fills the chamber, blinding and slashing at everyone!
     set cycle 1
     while %cycle% <= 4
       set room %self.room%
@@ -147,7 +147,7 @@ switch %random.4%
       wait 5 sec
       eval cycle %cycle% + 1
       if %cycle% <= 4
-        %echo% &rThe sandstorm rages on!
+        %echo% &&rThe sandstorm rages on!
       end
     done
     wait 5 sec
@@ -168,7 +168,7 @@ switch %random.4%
     while %cycle% <= %max_cycles%
       if %actor%
         if %actor.health% > -10
-          %send% %actor% &r%self.name%'s bandages tighten around you, trying to squeeze the life out of you!
+          %send% %actor% &&r%self.name%'s bandages tighten around you, trying to squeeze the life out of you!
           %echoaround% %actor% %self.name%'s bandages tighten around %actor.name%!
           %damage% %actor% 150 physical
           wait 5 sec
@@ -399,7 +399,7 @@ end
 Scarab special attack~
 0 k 100
 ~
-%echo% &rEveryone is bitten and stung by %self.name%!
+%echo% &&rEveryone is bitten and stung by %self.name%!
 %aoe% 75 physical
 ~
 #18309

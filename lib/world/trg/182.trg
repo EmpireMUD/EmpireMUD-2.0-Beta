@@ -28,7 +28,7 @@ if %actor.room% != %self.room%
   halt
 end
 %send% %actor% %self.name% looms large over the scenery. It's so large that it carries
-%send% %actor% &0an inn on its back. (Type 'board tortoise' to climb onto the tortoise.)
+%send% %actor% &&0an inn on its back. (Type 'board tortoise' to climb onto the tortoise.)
 ~
 #18202
 Atlasian Tortoise location updater~
@@ -40,7 +40,7 @@ nop %instance.set_location(%room%)%
 %regionecho% %room% -7 The footfalls of %self.name% shake the earth as %self.heshe% moves to %room.coords%.
 wait 5
 %echo% %self.name% looms large over the scenery. It's so large that it carries
-%echo% &0an inn on its back. (Type 'board tortoise' to climb onto the tortoise.)
+%echo% &&0an inn on its back. (Type 'board tortoise' to climb onto the tortoise.)
 ~
 #18203
 City turtle load~

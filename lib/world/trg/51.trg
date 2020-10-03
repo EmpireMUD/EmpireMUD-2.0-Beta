@@ -113,7 +113,7 @@ while %cycles_left% >= 0
     case 0
       * chant complete
       if %actor.skill(Natural Magic)% < 1
-        %send% %actor% &gAs you finish the chant, you begin to see the weave of mana through nature...&0
+        %send% %actor% &&gAs you finish the chant, you begin to see the weave of mana through nature...&&0
         nop %actor.gain_skill(Natural Magic,1)%
         if %actor.skill(Natural Magic)% < 1
           %send% %actor% But you fail to grasp the concepts of the chant of druids (you cannot gain Natural Magic skill).

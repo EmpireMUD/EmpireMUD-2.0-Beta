@@ -108,9 +108,9 @@ if %phase%==2
         %echo% %self.name%'s attack is interrupted!
         halt
       end
-      %echo% &rA wave of magma rolls over the platform!&0
+      %echo% &&rA wave of magma rolls over the platform!&&0
       %aoe% 50 fire
-      %send% %actor% &rYou take the full force of the wave, and are badly burned!&0
+      %send% %actor% &&rYou take the full force of the wave, and are badly burned!&&0
       %echoaround% %actor% %actor.name% takes the full force of the wave!
       %damage% %actor% 100 fire
       %dot% %actor% 100 20 fire
@@ -126,7 +126,7 @@ if %phase%==3
       wait 5 sec
       *(dex*5)% chance to not get hit
       if %actor.dex%<%random.20%
-        %send% %actor% &rThe earth shakes as %self.name% punches you, stunning you!&0
+        %send% %actor% &&rThe earth shakes as %self.name% punches you, stunning you!&&0
         %echoaround% %actor% The earth shakes as %self.name% punches %actor.name%, stunning %actor.himher%!
         %damage% %actor% 100 physical
         %damage% %actor% 50 fire
@@ -134,7 +134,7 @@ if %phase%==3
       else
         %send% %actor% You leap out of the way of %self.name%'s fist at the last second!
         %echoaround% %actor% %actor.name% leaps out of the way of %self.name%'s fist at the last second!
-        %send% %actor% &rThe wave of heat from %self.name%'s fist burns you!&0
+        %send% %actor% &&rThe wave of heat from %self.name%'s fist burns you!&&0
         %damage% %actor% 50 fire
       end
     break
@@ -152,7 +152,7 @@ if %phase%==3
           %send% %target% A tornado of harmless smoke briefly surrounds you!
           %echoaround %target% A tornado of harmless smoke briefly surrounds %target%!
         else
-          %send% %target% &rYour body bursts into infernal flames!&0
+          %send% %target% &&rYour body bursts into infernal flames!&&0
           %echoaround% %target% %target.name%'s body bursts into infernal flames!
           %damage% %target% 25 fire
           %dot% %target% 300 30 fire
@@ -164,17 +164,17 @@ if %phase%==3
       wait 5 sec
       *Should not be hitting much during this attack
       dg_affect %self% TO-HIT -100 25
-      %echo% &RMana begins condensing around %self.name%!&0
+      %echo% &&RMana begins condensing around %self.name%!&&0
       wait 5 sec
-      %echo% &RThe platform starts shaking beneath your feet!&0
+      %echo% &&RThe platform starts shaking beneath your feet!&&0
       wait 5 sec
-      %echo% &rWaves of fire flood the room!&0
+      %echo% &&rWaves of fire flood the room!&&0
       %aoe% 100 fire
       wait 5 sec
-      %echo% &rA barrage of sharp rocks falls from the ceiling!&0
+      %echo% &&rA barrage of sharp rocks falls from the ceiling!&&0
       %aoe% 100 physical
       wait 5 sec
-      %echo% &rThe floating motes of mana in the air transform into ethereal blades!&0
+      %echo% &&rThe floating motes of mana in the air transform into ethereal blades!&&0
       %aoe% 50 magical
       %aoe% 50 physical
       wait 5 sec
@@ -203,8 +203,8 @@ if %random.3%<3
   %damage% %fiend% -100
   %damage% %self% 100
 else
-  %send% %actor% &rThere is a destructive explosion as %self.name% hurls itself suicidally at you!&0
-  %echoaround% %actor% &rThere is a destructive explosion as %self.name% hurls itself suicidally at %actor.name%!&0
+  %send% %actor% &&rThere is a destructive explosion as %self.name% hurls itself suicidally at you!&&0
+  %echoaround% %actor% &&rThere is a destructive explosion as %self.name% hurls itself suicidally at %actor.name%!&&0
   %damage% %actor% 200 fire
   %aoe% 50 fire
   %damage% %self% 1000
@@ -281,11 +281,11 @@ if !%actor.has_resources(18097,1)%
   return 0
   halt
 end
-%send% %actor% &0All items cost 10 essence each and will be the average level of the
-%send% %actor% &0essence spent to make them. All items are created exactly the same as if the
-%send% %actor% &0fiend dropped that item, but bound to you alone.
+%send% %actor% &&0All items cost 10 essence each and will be the average level of the
+%send% %actor% &&0essence spent to make them. All items are created exactly the same as if the
+%send% %actor% &&0fiend dropped that item, but bound to you alone.
 %send% %actor% You can create (with 'buy <item>') any of the following items:
-%send% %actor% &0
+%send% %actor% &&0
 %send% %actor% firecloth skirt             (caster legs)
 %send% %actor% firecloth pauldrons         (caster arms)
 %send% %actor% hearthflame skirt           (healer legs)

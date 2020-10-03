@@ -64,7 +64,7 @@ switch %random.4%
     if %heroic_mode%
       set adj traumatic
     end
-    %send% %actor% &r%self.name% unleashes a blast of green fire at you, causing %adj% burns!&0
+    %send% %actor% &&r%self.name% unleashes a blast of green fire at you, causing %adj% burns!&&0
     %echoaround% %actor% %self.name% unleashes a blast of green fire at %actor.name%, causing %adj% burns!
     if %heroic_mode%
       %dot% #18503 %actor% 500 15 fire
@@ -79,7 +79,7 @@ switch %random.4%
     %echo% %self.name% raises %self.hisher% hands to the sky, and the green sun flares!
     * Give the healer (if any) time to prepare for group heals
     wait 3 sec
-    %echo% &r%self.name% unleashes a wave of emerald fire from above!&0
+    %echo% &&r%self.name% unleashes a wave of emerald fire from above!&&0
     %echo% %self.name%'s wounds close!
     if %heroic_mode%
       %aoe% 75 fire
@@ -125,17 +125,17 @@ switch %random.4%
         set damage_scale 100
       end
       eval damage_scale %total_drained% / 2
-      %send% %actor% &r%self.name% hurls the stolen mana at you as a huge energy blast, which sends you flying!
+      %send% %actor% &&r%self.name% hurls the stolen mana at you as a huge energy blast, which sends you flying!
       %echoaround% %actor% %self.name% hurls the stolen mana at %actor.name% in the form of a huge energy blast, sending %actor.himher% flying!
       dg_affect #18504 %actor% HARD-STUNNED on 10
       %damage% %actor% %damage_scale% magical
       if %damage_scale% >= 600
-        %echo% &rThe energy blast explodes!
+        %echo% &&rThe energy blast explodes!
         eval aoe_scale %damage_scale%/10
         %aoe% %aoe_scale% magical
       end
     else
-      %send% %actor% &r%self.name% hurls the stolen mana at you in the form of an energy blast!
+      %send% %actor% &&r%self.name% hurls the stolen mana at you in the form of an energy blast!
       %echoaround% %actor% %self.name% hurls the stolen mana at %actor.name% in the form of an energy blast!
       %damage% %actor% 100
     end
@@ -205,7 +205,7 @@ switch %random.4%
     end
     while %cycles_left% >= 1
       wait 3 sec
-      %echo% &rInvisible blades slash at you from every direction!
+      %echo% &&rInvisible blades slash at you from every direction!
       if %heroic_mode%
         %aoe% 75 physical
       else
@@ -245,7 +245,7 @@ switch %random.4%
     say I'll sssmash you to dussst!
     %echo% %self.name% raises all four of %self.hisher% blades overhead!
     wait 3 sec
-    %send% %actor% &rAll four of %self.name%'s blades strike you with deadly force!
+    %send% %actor% &&rAll four of %self.name%'s blades strike you with deadly force!
     %echoaround% %actor% All four of %self.name%'s blades strike %actor.name% with deadly force!
     %send% %actor% You are stunned by %self.name%'s powerful blow!
     if %heroic_mode%
@@ -304,7 +304,7 @@ switch %random.4%
     %echo% %self.name% spreads %self.hisher% prismatic wings wide!
     wait 2 sec
     if %heroic_mode%
-      %echo% &r%self.name%'s jeweled feathers flash brightly, blinding everyone!
+      %echo% &&r%self.name%'s jeweled feathers flash brightly, blinding everyone!
       %aoe% 25 magical
       set person %self.room.people%
       while %person%
@@ -314,7 +314,7 @@ switch %random.4%
         set person %person.next_in_room%
       done
     else
-      %send% %actor% &r%self.name%'s jeweled feathers flash brightly, blinding you!
+      %send% %actor% &&r%self.name%'s jeweled feathers flash brightly, blinding you!
       %echoaround% %actor% %self.name%'s jeweled feathers flash brightly, blinding %actor.name%!
       %damage% %actor% 25 magical
       dg_affect #18511 %actor% BLIND on 10
@@ -407,10 +407,10 @@ switch %random.3%
       end
     end
     if %target.trigger_counterspell%
-      %send% %target% &r%self.name% shoots a bolt of crackling emerald light at you, but it hits your counterspell and explodes!
+      %send% %target% &&r%self.name% shoots a bolt of crackling emerald light at you, but it hits your counterspell and explodes!
       %echoaround% %target% %self.name% shoots a bolt of crackling emerald light at %target.name%, but it explodes in mid flight!
     else
-      %send% %target% &r%self.name% shoots a bolt of crackling emerald light at you!
+      %send% %target% &&r%self.name% shoots a bolt of crackling emerald light at you!
       %echoaround% %target% %self.name% shoots a bolt of crackling emerald light at %target.name%!
       %damage% %target% 100 magical
     end
@@ -422,7 +422,7 @@ switch %random.3%
     if %self.vnum% == 18503
       %echo% %self.name% draws back %self.hisher% mighty fist...
       wait 5
-      %send% %actor% &r%self.name% delivers a devastating punch, sending you flying!
+      %send% %actor% &&r%self.name% delivers a devastating punch, sending you flying!
       %echoaround% %actor% %self.name% delivers a devastating punch, sending %actor.name% flying!
       %damage% %actor% 150 physical
       if %actor.aff_flagged(!STUN)%
@@ -436,12 +436,12 @@ switch %random.3%
     elseif %self.vnum% == 18504
       %echo% %self.name% crouches, gathering energy to pounce...
       wait 5
-      %send% %actor% &r%self.name% pounces on you, raking you with %self.hisher% claws!
+      %send% %actor% &&r%self.name% pounces on you, raking you with %self.hisher% claws!
       %echoaround% %actor% %self.name% pounces on %actor.name%, raking %actor.himher% with %self.hisher% claws!
       %damage% %actor% 150 physical
       %dot% %actor% 150 15 physical
     elseif %self.vnum% == 18505
-      %send% %actor% &r%self.name% whips forward and sinks its fangs into you before you can react!
+      %send% %actor% &&r%self.name% whips forward and sinks its fangs into you before you can react!
       %echoaround% %actor% %self.name% whips forward and sinks its fangs into %actor.name%!
       %damage% %actor% 50 physical
       %dot% %actor% 300 60 poison
@@ -550,7 +550,7 @@ if %actor.last_trap_command% == duck && %actor.position% == Standing
   %echoaround% %actor% %actor.name% scrambles through the doorway from the previous room.
   %force% %actor% look
 else
-  %send% %actor% &rA blade slashes out of the ceiling, dealing you a deadly blow!
+  %send% %actor% &&rA blade slashes out of the ceiling, dealing you a deadly blow!
   %echoaround% %actor% %actor.name% is suddenly slashed by a blade swinging from the ceiling!
   %damage% %actor% 1000 physical
   %dot% %actor% 100 10 physical
@@ -616,7 +616,7 @@ if %actor.last_trap_command% == run && %actor.position% == Standing
   %echoaround% %actor% %actor.name% dives through the doorway from the previous room.
   %force% %actor% look
 else
-  %send% %actor% &rA dart flies out from a hole in the wall, piercing your side!
+  %send% %actor% &&rA dart flies out from a hole in the wall, piercing your side!
   %echoaround% %actor% A dart flies out from a hole in the wall, striking %actor.name%!
   %damage% %actor% 100 physical
   %dot% %actor% 1000 60 poison

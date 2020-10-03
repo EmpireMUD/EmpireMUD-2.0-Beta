@@ -173,9 +173,9 @@ wait 1 sec
 eval rock_left (%random.2% == 2)
 global rock_left
 if (%rock_left%)
-  %echo% &RA huge rock is coming up on the left! Which way should you lean?&0
+  %echo% &&RA huge rock is coming up on the left! Which way should you lean?&&0
 else
-  %echo% &RA huge rock is coming up on the right! Which way should you lean?&0
+  %echo% &&RA huge rock is coming up on the right! Which way should you lean?&&0
 end
 wait 8 sec
 set correct 0
@@ -229,7 +229,7 @@ if %actor.is_pc%
   remote has_ducked %actor.id%
 end
 wait 1 sec
-%echo% &RThe boat is coming up on a low-hanging tree branch!&0
+%echo% &&RThe boat is coming up on a low-hanging tree branch!&&0
 wait 8 sec
 set ch %room.people%
 set wins 0
@@ -275,9 +275,9 @@ wait 1 sec
 eval opening_left (%random.2% == 2)
 global opening_left
 if (%opening_left%)
-  %echo% &RThere is a narrow opening on the left! Which way should you lean?&0
+  %echo% &&RThere is a narrow opening on the left! Which way should you lean?&&0
 else
-  %echo% &RThere is a narrow opening on the right! Which way should you lean?&0
+  %echo% &&RThere is a narrow opening on the right! Which way should you lean?&&0
 end
 wait 8 sec
 set correct 0

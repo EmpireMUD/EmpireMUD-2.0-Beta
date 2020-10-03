@@ -96,8 +96,8 @@ while %person%
         %send% %person% You scramble out of the way as the colossus fires its eye lasers!
         %echoaround% %person% %person.name% scrambles out of the way of the colossus's eye lasers!
       else
-        %send% %person% &rThe colossus blasts you with its eye lasers!
-        %echoaround% %person% &r%person.name% is blasted!
+        %send% %person% &&rThe colossus blasts you with its eye lasers!
+        %echoaround% %person% &&r%person.name% is blasted!
         %damage% %person% 200 magical
       end
     end
@@ -155,20 +155,20 @@ else
     %echo% %self.name% draws back %self.hisher% right arm, lightning flickering around %self.hisher% clenched fist!
     wait 3 sec
     set actor %self.fighting%
-    %send% %actor% &r%self.name%'s lightning-charged punch smashes into you with a thunderous boom, sending you flying!
+    %send% %actor% &&r%self.name%'s lightning-charged punch smashes into you with a thunderous boom, sending you flying!
     %echoaround% %actor% %self.name%'s lightning-charged punch smashes into %actor.name% with a thunderous boom, sending %actor.himher% flying!
     %damage% %actor% 500 physical
     %damage% %actor% 350 magical
     dg_affect #12505 %actor% HARD-STUNNED on 15
     dg_affect #12505 %actor% DODGE -100 15
     dg_affect #12505 %actor% RESIST-PHYSICAL -50 15
-    %echo% &rBlasts of lightning fly from the impact of %self.name%'s fist against the ground!
+    %echo% &&rBlasts of lightning fly from the impact of %self.name%'s fist against the ground!
     %aoe% 150 magical
   else
     %echo% %self.name% draws back %self.hisher% right arm, lightning flickering around %self.hisher% clenched fist!
     wait 3 sec
     set actor %self.fighting%
-    %send% %actor% &r%self.name%'s lightning-charged punch crashes into you, stunning you!
+    %send% %actor% &&r%self.name%'s lightning-charged punch crashes into you, stunning you!
     %echoaround% %actor% %self.name%'s lightning-charged punch crashes into %actor.name%, stunning %actor.himher%!
     %damage% %actor% 150 physical
     %damage% %actor% 75 magical
@@ -202,14 +202,14 @@ else
     wait 3 sec
     if %actor.is_pc%
       * PC
-      %send% %actor% &r%self.name%'s slashes at you with %self.hisher% retractable blade, rending your armor and causing mortal injury!
+      %send% %actor% &&r%self.name%'s slashes at you with %self.hisher% retractable blade, rending your armor and causing mortal injury!
       %echoaround% %actor% %self.name%'s slashes at %actor.name% with %self.hisher% retractable blade, rending %actor.hisher% armor and causing mortal injury!
       %damage% %actor% 900 physical
       %dot% #12506 %actor% 1000 15 physical 1
       dg_affect #12506 %actor% RESIST-PHYSICAL -50 15
     else
       * Tank familiar
-      %send% %actor% &r%self.name% slashes at you with %self.hisher% retractable blade, decapitating you with a single strike!
+      %send% %actor% &&r%self.name% slashes at you with %self.hisher% retractable blade, decapitating you with a single strike!
       %send% %actor% %self.name% slashes at %actor.name% with %self.hisher% retractable blade, decapitating %actor.himher% with a single strike!
       %damage% %actor% 99999 physical
     end
@@ -218,7 +218,7 @@ else
   else
     %echo% %self.name% raises %self.hisher% left arm, and a massive blade extends from %self.hisher% clenched fist.
     wait 3 sec
-    %send% %actor% &r%self.name%'s slashes at you with %self.hisher% retractable blade, opening bleeding wounds!
+    %send% %actor% &&r%self.name%'s slashes at you with %self.hisher% retractable blade, opening bleeding wounds!
     %echoaround% %actor% %self.name%'s slashes at %actor.name% with %self.hisher% retractable blade, opening bleeding wounds!
     %damage% %actor% 300 physical
     %dot% #12506 %actor% 200 15 physical 1
@@ -247,7 +247,7 @@ if %parts_destroyed% < 2
   set cycle 1
   while %cycle% <= 3
     wait 3 sec
-    %echo% &r%self.name%'s missile barrage rains from the sky, exploding all around you!
+    %echo% &&r%self.name%'s missile barrage rains from the sky, exploding all around you!
     %aoe% 125 physical
     %aoe% 125 fire
     eval cycle %cycle% + 1
@@ -255,7 +255,7 @@ if %parts_destroyed% < 2
 else
   %echo% %self.name%'s shoulder-mounted cannons fire a barrage of fiery projectiles into the sky!
   wait 3 sec
-  %echo% &r%self.name%'s missile barrage rains from the sky, exploding all around you!
+  %echo% &&r%self.name%'s missile barrage rains from the sky, exploding all around you!
   %aoe% 50 physical
   %aoe% 50 fire
 end
@@ -319,7 +319,7 @@ else
     %echo% %self.name% raises one leg high in the air, pistons shifting as %self.heshe% gathers power...
     wait 3 sec
     set actor %self.fighting%
-    %send% %actor% &r%self.name% brings %self.hisher% foot down on top of you with an earth-shaking crash!
+    %send% %actor% &&r%self.name% brings %self.hisher% foot down on top of you with an earth-shaking crash!
     %echoaround% %actor% %self.name% brings %self.hisher% foot down on top of %actor.name% with an earth-shaking crash!
     %damage% %actor% 300 physical
     dg_affect #12509 %actor% HARD-STUNNED on 15
@@ -331,12 +331,12 @@ else
       halt
     end
     %echo% There is a mighty boom as %self.name% releases %self.hisher% gathered power into the ground beneath %self.hisher% foot!
-    %send% %actor% &rThe force of %self.name%'s foot pressing down on you explosively redoubles, hammering you deeper into the ground!
+    %send% %actor% &&rThe force of %self.name%'s foot pressing down on you explosively redoubles, hammering you deeper into the ground!
     %damage% %actor% 600 physical
     set person %room.people%
     while %person%
       if (%person.is_enemy(%self%)% || %self.is_enemy(%person%)%) && %person% != %actor%
-        %send% %person% &rThe force of %self.name%'s stomp knocks you off your feet!
+        %send% %person% &&rThe force of %self.name%'s stomp knocks you off your feet!
         dg_affect #12509 %person% HARD-STUNNED on 5
         %damage% %person% 100 physical
       end
@@ -346,7 +346,7 @@ else
     %echo% %self.name% raises one leg high in the air...
     wait 3 sec
     set actor %self.fighting%
-    %send% %actor% &r%self.name% brings %self.hisher% foot down on top of you, pinning you to the ground!
+    %send% %actor% &&r%self.name% brings %self.hisher% foot down on top of you, pinning you to the ground!
     %echoaround% %actor% %self.name% brings %self.hisher% foot down on top of %actor.name%, pinning %actor.himher% to the ground!
     %damage% %actor% 300 physical
     dg_affect #12509 %actor% HARD-STUNNED on 10
@@ -382,7 +382,7 @@ if %parts_destroyed% < 2
   if !%target% || %target.room% != %self.room%
     set target %self.fighting%
   end
-  %send% %target% &rThere is a blinding flash of light, and you feel unbearable heat and pain!
+  %send% %target% &&rThere is a blinding flash of light, and you feel unbearable heat and pain!
   %echoaround% %target% Beams of crimson energy fly from %self.name%'s eyes, engulfing %target.name% and setting %target.himher% ablaze!
   %damage% %target% 200 magical
   %damage% %target% 200 fire
@@ -395,7 +395,7 @@ else
   if !%target% || %target.room% != %self.room%
     set target %self.fighting%
   end
-  %send% %target% &rBeams of crimson energy fly from %self.name%'s eyes, cutting into you!
+  %send% %target% &&rBeams of crimson energy fly from %self.name%'s eyes, cutting into you!
   %echoaround% %target% Beams of crimson energy fly from %self.name%'s eyes, cutting into %target.name%!
   %damage% %target% 75 magical
   %damage% %target% 75 fire
@@ -735,13 +735,13 @@ while %person%
         %teleport% %person% %colossus.room%
         %force% %person% look
         %echoaround% %person% %person.name% falls off %colossus.name%'s arm and comes crashing down!
-        %send% %person% &rYou crash into the ground!
+        %send% %person% &&rYou crash into the ground!
         %damage% %person% 100 physical
       else
         %teleport% %person% %instance.location%
         %force% %person% look
         %echoaround% %person% %person.name% falls off %colossus.name%'s arm and comes crashing down!
-        %send% %person% &rYou crash into the ground!
+        %send% %person% &&rYou crash into the ground!
         %damage% %person% 100 physical
       end
     end
@@ -921,7 +921,7 @@ else
     eval cycle %cycle% - 1
     remote cycle %self.id%
   end
-  %echo% &r%self.name% releases a blast of lightning!
+  %echo% &&r%self.name% releases a blast of lightning!
   set person %room.people%
   while %person%
     if %person.is_pc%
@@ -1391,7 +1391,7 @@ if %color% and %correct_color%
       end
     end
   else
-    %send% %actor% &rThe open panel blasts you with lightning!
+    %send% %actor% &&rThe open panel blasts you with lightning!
     %echoaround% %actor% The open panel blasts %actor.name% with lightning!
     %damage% %actor% 300 magical
     %send% %actor% Your spasming hands lose purchase on the colossus!

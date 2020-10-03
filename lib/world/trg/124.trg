@@ -169,7 +169,7 @@ if %actor.varexists(breath)%
   elseif %breath% == 1
     %send% %actor% You cannot hold your breath much longer! You should find air, and soon!
   elseif %breath% < 0
-    %send% %actor% &rYou are drowning!
+    %send% %actor% &&rYou are drowning!
   elseif %breath% <= 5
     %send% %actor% You can't hold your breath much longer... You think you could swim for another %breath% rooms.
   end
@@ -332,7 +332,7 @@ if !%actor%
           if %person.is_god% || %person.is_immortal% || %person.health% < 0
             halt
           end
-          %send% %person% # &rYou are drowning!&0
+          %send% %person% # &&rYou are drowning!&&0
           eval amount (%person.breath%) * (-250)
           %damage% %person% %amount%
         end
@@ -438,7 +438,7 @@ end
 if !%self.is_enemy(%target%)%
   halt
 end
-%send% %target% &r%self.name% shoots you with %self.hisher% pistol!
+%send% %target% &&r%self.name% shoots you with %self.hisher% pistol!
 %echoaround% %target% %self.name% shoots %target.name% with %self.hisher% pistol!
 %damage% %target% 200 physical
 wait 5
@@ -452,7 +452,7 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-%send% %actor% &r%self.name% stabs you in the ankle with %self.hisher% cutlass!
+%send% %actor% &&r%self.name% stabs you in the ankle with %self.hisher% cutlass!
 %echoaround% %actor% %self.name% stabs %actor.name% in the ankle with %self.hisher% cutlass!
 %damage% %actor% 50 physical
 dg_affect #12419 %actor% SLOW on 5
@@ -502,7 +502,7 @@ if %random.20% == 20
   wait 5 sec
   say Arr! Curse ye, mutinous fowl!
 else
-  %send% %actor% &r%self.name%'s parrot dive-bombs you, forcing you to cover your eyes!
+  %send% %actor% &&r%self.name%'s parrot dive-bombs you, forcing you to cover your eyes!
   %echoaround% %actor% %self.name%'s parrot dive-bombs %actor.name%, forcing %actor.himher% to cover %actor.hisher% eyes!
   %damage% %actor% 25 physical
   dg_affect #12422 %actor% BLIND on 5
@@ -521,20 +521,20 @@ eval health_percent (100 * %self.health%) / %self.maxhealth%
 eval extra_heads %health_percent% / 10
 eval heads 15 - %extra_heads%
 if %heads% == 1
-  %send% %actor% &rOne of %self.name%'s serpentine heads snaps at you!
+  %send% %actor% &&rOne of %self.name%'s serpentine heads snaps at you!
   %echoaround% %actor% One of %self.name%'s serpentine heads snaps at %actor.name%!
   %damage% %actor% 100 physical
 elseif %heads% == 2
-  %send% %actor% &rA pair of %self.name%'s snake heads snap at you!
+  %send% %actor% &&rA pair of %self.name%'s snake heads snap at you!
   %echoaround% %actor% A pair of %self.name%'s snake heads snap at %actor.name%!
   %damage% %actor% 150 physical
 elseif %heads% < 9
-  %send% %actor% &r%heads% of %self.name%'s heads batter you from all sides!
+  %send% %actor% &&r%heads% of %self.name%'s heads batter you from all sides!
   %echoaround% %actor% %actor.name% is attacked from all sides by %heads% of %self.name%'s heads!
   eval amount 50+%heads%*25
   %damage% %actor% %amount% physical
 elseif %heads% >= 9
-  %echo% &r%self.name%'s %heads% heads lash out in all directions!
+  %echo% &&r%self.name%'s %heads% heads lash out in all directions!
   eval amount 10+%heads%*10
   %aoe% %amount% physical
 end
@@ -547,7 +547,7 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-%send% %actor% One of &r%self.name%'s serpentine heads snaps out and sinks its venomous fangs into your side!
+%send% %actor% One of &&r%self.name%'s serpentine heads snaps out and sinks its venomous fangs into your side!
 %echoaround% %actor% One of %self.name%'s serpentine heads snaps out and sinks its venomous fangs into %actor.name%'s side!
 %damage% %actor% 100 physical
 %dot% #12424 %actor% 100 15 poison
@@ -589,7 +589,7 @@ if !%keep_attacking%
   dg_affect #12428 %self% HARD-STUNNED on 20
 end
 while %actor.affect(12430)%
-  %send% %actor% &r%self.name% constricts and crushes you!
+  %send% %actor% &&r%self.name% constricts and crushes you!
   %damage% %actor% 50 physical
   wait 5 sec
 done
@@ -618,7 +618,7 @@ if %self.cooldown(12400)%
   halt
 end
 nop %self.set_cooldown(12400, 30)%
-%echo% &r%self.name%'s canine heads lash out, snarling and gnashing.
+%echo% &&r%self.name%'s canine heads lash out, snarling and gnashing.
 set person %self.room.people%
 while %person%
   if %person.is_npc% && %person.mob_flagged(FAMILIAR)%
@@ -640,7 +640,7 @@ end
 nop %self.set_cooldown(12400, 30)%
 %echo% %self.name% starts swimming rapidly in a tight circle...
 wait 3 sec
-%echo% &r%self.name%'s tentacle-tails lash out at you, blasting you with a wave of high-pressure water!
+%echo% &&r%self.name%'s tentacle-tails lash out at you, blasting you with a wave of high-pressure water!
 %aoe% 50 physical
 set person %self.room.people%
 while %person%
@@ -669,7 +669,7 @@ remote struggle_counter %actor.id%
 dg_affect #12430 %actor% HARD-STUNNED on 20
 dg_affect #12428 %self% HARD-STUNNED on 20
 while %actor.affect(12430)%
-  %send% %actor% &r%self.name% crushes you in %self.hisher% grip!
+  %send% %actor% &&r%self.name% crushes you in %self.hisher% grip!
   %damage% %actor% 150 physical
   wait 4 sec
 done
@@ -727,13 +727,13 @@ set cycle 1
 while %cycle% <= 4
   wait 3 sec
   if %cycle% == 1
-    %echo% &Y%self.name% charges at you, aiming a wide slash at your head!
+    %echo% &&Y%self.name% charges at you, aiming a wide slash at your head!
   elseif %cycle% == 2
-    %echo% &Y%self.name% draws back %self.hisher% sword for a thrust!
+    %echo% &&Y%self.name% draws back %self.hisher% sword for a thrust!
   elseif %cycle% == 3
-    %echo% &Y%self.name% raises %self.hisher% sword overhead for a vertical slash!
+    %echo% &&Y%self.name% raises %self.hisher% sword overhead for a vertical slash!
   elseif %cycle% == 4
-    %echo% &Y%self.name% hurls %self.hisher% sword at the stone floor of the cave!
+    %echo% &&Y%self.name% hurls %self.hisher% sword at the stone floor of the cave!
   end
   set running 1
   remote running %self.id%
@@ -760,18 +760,18 @@ while %cycle% <= 4
         %send% %person% You barely avoid %self.name%'s attack.
         %echoaround% %person% %person.name% barely avoids %self.name%'s attack.
       else
-        %send% %person% &rYou are struck by %self.name%'s attack!
+        %send% %person% &&rYou are struck by %self.name%'s attack!
         %echoaround% %person% %person.name% is struck by %self.name%'s attack!
         set test %person.affect(12433)%
         if %test%
-          %send% %person% &rYou are encased in a block of ice!
+          %send% %person% &&rYou are encased in a block of ice!
           %echoaround% %person% %person.name% is encased in a block of ice!
           %damage% %person% 9999 magical
         else
           dg_affect #12433 %person% DODGE -25 30
           dg_affect #12433 %person% TO-HIT -25 30
           dg_affect #12433 %person% SLOW on 30
-          %send% %person% &rYou feel deathly cold...
+          %send% %person% &&rYou feel deathly cold...
           %echoaround% %person% %person.name% starts shivering violently.
           %damage% %person% 250 magical
         end
@@ -904,7 +904,7 @@ set target %random.enemy%
 if !%target%
   set target %actor%
 end
-%send% %target% &r%self.name% blasts you with a ball of icy energy.
+%send% %target% &&r%self.name% blasts you with a ball of icy energy.
 %echoaround% %target% %self.name% blasts %target.name% with a ball of icy energy.
 %damage% %target% 100 magical
 dg_affect #12438 %target% SLOW on 10

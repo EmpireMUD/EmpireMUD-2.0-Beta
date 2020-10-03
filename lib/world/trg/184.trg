@@ -494,7 +494,7 @@ elseif buy /= %cmd%
       %send% %actor% The shopkeeper says, 'Sorry, pally, all we take here is cold, hard cash.'
     break
     case 4
-      %send% %actor% The shopkeeper says, 'We don't take D&D money here, buddy.'
+      %send% %actor% The shopkeeper says, 'We don't take D&&D money here, buddy.'
     break
   done
 else

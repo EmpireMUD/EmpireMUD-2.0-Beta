@@ -179,7 +179,7 @@ set heroic_mode %self.mob_flagged(GROUP)%
 %echo% %self.name% rears up and prances!
 wait 2 sec
 if %heroic_mode%
-  %echo% &r%self.name% slams %self.hisher% hooves down on the ground, creating a shockwave!
+  %echo% &&r%self.name% slams %self.hisher% hooves down on the ground, creating a shockwave!
   set person %self.room.people%
   while %person%
     if %person.is_enemy(%self%)%
@@ -189,7 +189,7 @@ if %heroic_mode%
     set person %person.next_in_room%
   done
 else
-  %send% %actor% &r%self.name%'s hooves crash down on you!
+  %send% %actor% &&r%self.name%'s hooves crash down on you!
   %echoaround% %actor% %self.name%'s hooves crash down on %actor.name%!
   %damage% %actor% 100
 end
@@ -204,7 +204,7 @@ end
 nop %self.set_cooldown(18801, 30)%
 set heroic_mode %self.mob_flagged(GROUP)%
 if %heroic_mode%
-  %echo% &r%self.name% swings %self.hisher% sword in a wide arc at neck level, causing bleeding wounds!
+  %echo% &&r%self.name% swings %self.hisher% sword in a wide arc at neck level, causing bleeding wounds!
   %aoe% 100 physical
   set person %self.room.people%
   while %person%
@@ -215,7 +215,7 @@ if %heroic_mode%
     set person %person.next_in_room%
   done
 else
-  %send% %actor% &r%self.name% swings %self.hisher% sword, slashing at your neck and opening a bleeding wound!
+  %send% %actor% &&r%self.name% swings %self.hisher% sword, slashing at your neck and opening a bleeding wound!
   %echoaround% %actor% %self.name% swings %self.hisher% sword, slashing at %actor.name%'s neck and opening a bleeding wound!
   %damage% %actor% 150 physical
   %dot% #18804 %actor% 75 30 physical
@@ -289,7 +289,7 @@ while %person%
   end
   set person %person.next_in_room%
 done
-%echo% &rBeams of magical energy fly from %self.name%'s eyes!
+%echo% &&rBeams of magical energy fly from %self.name%'s eyes!
 if !%heroic_mode%
   %aoe% 25 magical
 else

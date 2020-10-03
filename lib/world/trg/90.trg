@@ -685,8 +685,8 @@ if %can_turn%
   %send% %actor% You fall limply to the ground. In the distance, you think you see a light...
   %echoaround% %actor% %actor.name% drops limply from %self.name%'s fangs...
   %echoaround% %actor% %self.name% tears open %self.hisher% wrist with %self.hisher% teeth and drips blood into %actor.name%'s mouth!
-  %send% %actor% &rSuddenly, a warm sensation touches your lips and a stream of blood flows down your throat...&0
-  %send% %actor% &rAs the blood fills you, a strange sensation covers your body... The light in the distance turns blood-red and a hunger builds within you!&0
+  %send% %actor% &&rSuddenly, a warm sensation touches your lips and a stream of blood flows down your throat...&&0
+  %send% %actor% &&rAs the blood fills you, a strange sensation covers your body... The light in the distance turns blood-red and a hunger builds within you!&&0
   nop %actor.vampire(on)%
   if %actor.is_npc%
     attach 9064 %actor.id%

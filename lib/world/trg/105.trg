@@ -353,7 +353,7 @@ set heroic_mode %self.mob_flagged(GROUP)%
 * Lasts 75 seconds, should be refreshed every 45-55
 * Normal/Hard: 25%, stacks up to 5
 * Group/Boss: 75%, stacks up to 10
-%send% %actor% &r%self.name%'s icy blasts leave a lingering cold which chills you to the bone...
+%send% %actor% &&r%self.name%'s icy blasts leave a lingering cold which chills you to the bone...
 %echoaround% %actor% %actor.name% shivers under %self.name%'s icy onslaught.
 if %heroic_mode%
   %dot% #10551 %actor% 75 75 magical 10
@@ -376,7 +376,7 @@ switch %random.3%
     * Group/Boss: Also stun entire party for 5 seconds
     %echo% %self.name% begins gathering magical energy...
     wait 3 sec
-    %echo% &rThere is a blinding flash of light, and everything is encased in ice!
+    %echo% &&rThere is a blinding flash of light, and everything is encased in ice!
     %aoe% 25 magical
     set person %self.room.people%
     while %person%
@@ -410,30 +410,30 @@ switch %random.3%
     end
     if %heroic_mode%
       if %counterspell%
-        %send% %actor% &rThe comet triggers your counterspell and briefly slows, before crashing into you and exploding!
+        %send% %actor% &&rThe comet triggers your counterspell and briefly slows, before crashing into you and exploding!
         %echoaround% %actor% The comet briefly slows before crashing into %actor.name% and exploding!
         %damage% %actor% 200 physical
-        %echo% &rFragments fly in all directions!
+        %echo% &&rFragments fly in all directions!
         %aoe% 100 physical
       else
-        %send% %actor% &rThe comet crashes into you, smashing you to the ground, and explodes!
+        %send% %actor% &&rThe comet crashes into you, smashing you to the ground, and explodes!
         %echoaround% %actor% The comet crashes into %actor.name%, smashing %actor.himher% to the ground, and explodes!
         %damage% %actor% 400 physical
         dg_affect #10553 %actor% HARD-STUNNED on 10
-        %echo% &rFragments fly in all directions!
+        %echo% &&rFragments fly in all directions!
         %aoe% 100 physical
       end
     else
       if %counterspell%
         %send% %actor% The comet crashes into your counterspell and explodes!
         %echoaround% %actor% The comet explodes against an invisible shield in front of %actor.name%!
-        %echo% &rFragments fly in all directions!
+        %echo% &&rFragments fly in all directions!
         %aoe% 50 physical
       else
-        %send% %actor% &rThe comet crashes into you, knocking you back, and explodes!
+        %send% %actor% &&rThe comet crashes into you, knocking you back, and explodes!
         %echoaround% %actor% The comet crashes into %actor.name%, knocking %actor.himher% back, and explodes!
         %damage% %actor% 200 physical
-        %echo% &rFragments fly in all directions!
+        %echo% &&rFragments fly in all directions!
         %aoe% 50 physical
       end
     end
@@ -485,7 +485,7 @@ switch %random.3%
     while %person%
       if %person.is_enemy(%self%)%
         if %heroic_mode%
-          %send% %person% &rYou are chilled to the bone, and can barely see!
+          %send% %person% &&rYou are chilled to the bone, and can barely see!
           %dot% %person% 50 20 magical
           dg_affect #10554 %person% TO-HIT -%magnitude% 20
         else
@@ -502,7 +502,7 @@ switch %random.3%
     * Normal/Hard: 5 seconds
     * Group/Boss: 20 seconds, and adds 50% DoT
     * If too easy, consider adding HIDE and looking for a new target...
-    %send% %actor% &r%self.name% makes an arcane gesture at you, and the snow beneath your feet swallows you!
+    %send% %actor% &&r%self.name% makes an arcane gesture at you, and the snow beneath your feet swallows you!
     %echoaround% %actor% %self.name% makes an arcane gesture at %actor.name%, and the snow beneath %actor.hisher% feet swallows %actor.himher%!
     if %heroic_mode%
       %send% %actor% You attempt to dig yourself out of the deep, painfully cold snowdrift!
@@ -568,7 +568,7 @@ switch %random.3%
     wait 3 sec
     %echo% %self.name% releases a pulse of icy magic, and the hoar frost explodes off the walls!
     if %heroic_mode%
-      %echo% &rEveryone is slashed by %self.name%'s rime blades!
+      %echo% &&rEveryone is slashed by %self.name%'s rime blades!
       %aoe% 150 physical
       set person %self.room.people%
       while %person%
@@ -579,7 +579,7 @@ switch %random.3%
         set person %person.next_in_room%
       done
     else
-      %send% %actor% &rThe rime blades slash you, opening dozens of painful, bleeding wounds!
+      %send% %actor% &&rThe rime blades slash you, opening dozens of painful, bleeding wounds!
       %echoaround% %actor% The rime blades slash %actor.name%, opening dozens of bleeding wounds!
       %damage% %actor% 150 physical
       %dot% #10558 %actor% 100 20 physical
@@ -591,7 +591,7 @@ switch %random.3%
     * Applies heal-over-time to self, damage-over-time to tank
     * Normal/Hard: 50% DoT, level/20 HoT
     * Group/Boss: 100% DoT, level/10 HoT
-    %send% %actor% &r%self.name% lashes out at you with a whip of violet fire, which clings to you and draws your heat away!
+    %send% %actor% &&r%self.name% lashes out at you with a whip of violet fire, which clings to you and draws your heat away!
     %echoaround% %actor% %self.name% lashes out at %actor.name% with a whip of violet fire! %actor.name% bursts into cold violet flames!
     %echo% %self.name% reaches into the cold, violet flames, and %self.hisher% wounds start to close...
     if %heroic_mode%

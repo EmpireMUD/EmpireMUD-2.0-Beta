@@ -135,7 +135,7 @@ end
 switch %random.4%
   * Searing burns on tank
   case 1
-    %send% %actor% &r%self.name% spits fire at you, causing searing burns!&0
+    %send% %actor% &&r%self.name% spits fire at you, causing searing burns!&&0
     %echoaround% %actor% %self.name% spits fire at %actor.name%, causing searing burns!
     %dot% %actor% 200 60 fire
     %damage% %actor% 150 fire
@@ -145,12 +145,12 @@ switch %random.4%
     %echo% %self.name% begins puffing smoke and spinning in circles!
     * Give the healer (if any) time to prepare for group heals
     wait 3 sec
-    %echo% &r%self.name% unleashes a flame wave!&0
+    %echo% &&r%self.name% unleashes a flame wave!&&0
     %aoe% 75 fire
   break
   * Traumatic burns on tank
   case 3
-    %send% %actor% &r%self.name% spits fire at you, causing traumatic burns!&0
+    %send% %actor% &&r%self.name% spits fire at you, causing traumatic burns!&&0
     %echoaround% %actor% %self.name% spits fire at %actor.name%, causing traumatic burns!
     %dot% %actor% 500 15 fire
     %damage% %actor% 50 fire
@@ -159,7 +159,7 @@ switch %random.4%
   case 4
     set target %random.enemy%
     if (%target%)
-      %send% %target% &r%self.name% uses %self.hisher% tail to hurl a rock at you, stunning you momentarily!&0
+      %send% %target% &&r%self.name% uses %self.hisher% tail to hurl a rock at you, stunning you momentarily!&&0
       %echoaround% %target% %self.name% hurls a rock at %target.name% with %self.hisher% tail, stunning %target.himher% momentarily!
       dg_affect %target% HARD-STUNNED on 10
       %damage% %target% 150 physical
@@ -607,7 +607,7 @@ if %success%
   %send% %actor% %self.name% bursts from the swampy ground, narrowly missing you!
   %echoaround% %actor% %self.name% bursts from the swampy ground, narrowly missing %actor.name%!
 else
-  %send% %actor% &r%self.name% bursts from the swampy ground beneath your feet, sending you flying!
+  %send% %actor% &&r%self.name% bursts from the swampy ground beneath your feet, sending you flying!
   %send% %actor% %self.name% bursts from the swampy ground beneath %actor.name%'s feet, sending %actor.himher% flying!
   %damage% %actor% 200 physical
   dg_affect #10957 %actor% HARD-STUNNED on 10
@@ -622,7 +622,7 @@ if %self.cooldown(10950)%
   halt
 end
 nop %self.set_cooldown(10950, 30)%
-%echo% &r%self.name% opens %self.hisher% mouth wide and exhales a cloud of noxious vapor!
+%echo% &&r%self.name% opens %self.hisher% mouth wide and exhales a cloud of noxious vapor!
 set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
@@ -727,7 +727,7 @@ if %self.cooldown(10966)%
 end
 nop %self.set_cooldown(10966, 30)%
 %echo% %self.name% grabs a small boulder from the ground nearby and hefts it!
-%echo% &YYou'd better duck!&0
+%echo% &&YYou'd better duck!&&0
 set running 1
 remote running %self.id%
 wait 10 sec
@@ -749,7 +749,7 @@ while %person%
       end
     end
     if %command% != duck
-      %send% %person% &rYou are knocked to the ground by the flying boulder!
+      %send% %person% &&rYou are knocked to the ground by the flying boulder!
       %echoaround% %person% %person.name% is knocked to the ground by the flying boulder!
       %damage% %person% 150 physical
       dg_affect #10967 %person% STUNNED on 5
@@ -770,7 +770,7 @@ if %self.cooldown(10966)%
 end
 nop %self.set_cooldown(10966, 30)%
 %echo% %self.name% raises %self.hisher% club for an overhead smash!
-%echo% &YYou'd better dive out of the way!&0
+%echo% &&YYou'd better dive out of the way!&&0
 set running 1
 remote running %self.id%
 wait 10 sec
@@ -791,7 +791,7 @@ while %person%
       end
     end
     if %command% != dive
-      %send% %person% &rYou are smashed to the ground by the force of the blow!
+      %send% %person% &&rYou are smashed to the ground by the force of the blow!
       %echoaround% %person% %person.name% is smashed to the ground by the force of the blow!
       %damage% %person% 150 physical
       dg_affect #10967 %person% STUNNED on 5
@@ -812,7 +812,7 @@ if %self.cooldown(10966)%
 end
 nop %self.set_cooldown(10966, 30)%
 %echo% %self.name% lifts %self.hisher% foot high, preparing for a powerful stomp...
-%echo% &YYou'd better jump!&0
+%echo% &&YYou'd better jump!&&0
 set running 1
 remote running %self.id%
 wait 10 sec
@@ -833,7 +833,7 @@ while %person%
       end
     end
     if %command% != jump
-      %send% %person% &rYou are knocked off your feet by the ground tremor!&0
+      %send% %person% &&rYou are knocked off your feet by the ground tremor!&&0
       %echoaround% %person% %person.name% is knocked to the ground!
       dg_affect #10967 %person% HARD-STUNNED on 5
       dg_affect #10968 %person% DODGE -20 15
@@ -1007,7 +1007,7 @@ end
 switch %random.2%
   case 1
     %send% %actor% %self.name% withdraws a rock and hurls it at you!
-    %send% %actor% &rThe rock bounces off your head, stunning you!
+    %send% %actor% &&rThe rock bounces off your head, stunning you!
     %echoaround% %actor% %self.name% withdraws a rock and hurls it at %actor.name%!
     %echoaround% %actor% The rock bounces off %actor.hisher% head, and %actor.heshe% staggers!
     %damage% %actor% 50 physical
@@ -1015,7 +1015,7 @@ switch %random.2%
   break
   case 2
     %send% %actor% %self.name% withdraws a throwing dagger and hurls it at you!
-    %send% %actor% &rThe dagger hits you in the shoulder, opening a bleeding wound!
+    %send% %actor% &&rThe dagger hits you in the shoulder, opening a bleeding wound!
     %echoaround% %actor% %self.name% withdraws a small dagger and hurls it at %actor.name%!
     %echoaround% %actor% The dagger hits %actor.himher% in the shoulder, drawing blood!
     %damage% %actor% 50 physical
@@ -1078,7 +1078,7 @@ wait 5 sec
 if !%self.ritual_active%
   halt
 end
-%send% %actor% &r%self.name% cracks the blazing whip at you, blowing you off your feet!
+%send% %actor% &&r%self.name% cracks the blazing whip at you, blowing you off your feet!
 %echoaround% %actor% %self.name% cracks the blazing whip at %actor.name%, blowing %actor.himher% off %actor.hisher% feet!
 if %actor.trigger_counterspell%
   %send% %actor% The fiery whip crashes through your counterspell unimpeded, breaking it!
@@ -1122,7 +1122,7 @@ if !%self.morph%
   %echo% %current% rapidly morphs into %self.name%!
   wait 1 sec
 end
-%echo% &r%self.name% goes berserk, claws flailing in all directions!
+%echo% &&r%self.name% goes berserk, claws flailing in all directions!
 %damage% %actor% 75 physical
 %aoe% 25 physical
 ~
@@ -1153,14 +1153,14 @@ if %actor.trigger_counterspell%
   %echoaround% %actor% The dust around %actor.name%'s feet swirls gently in a circle, then stops.
 else
   dg_affect #10982 %self% HARD-STUNNED on 10
-  %send% %actor% &rA swirling dust devil abruptly envelops you and hurls you into the air!
+  %send% %actor% &&rA swirling dust devil abruptly envelops you and hurls you into the air!
   %echoaround% %actor% A swirling dust devil abruptly envelops %actor.name% and hurls %actor.himher% into the air!
   %damage% %actor% 50 magical
   dg_affect #10990 %actor% HARD-STUNNED on 10
   wait 5 sec
   if %actor.affect(10990)%
     %echo% %self.name% slams %self.hisher% fist into the earth!
-    %send% %actor% &rA gust of wind suddenly hurls you downward!
+    %send% %actor% &&rA gust of wind suddenly hurls you downward!
     %echoaround% %actor% %actor.name% is abruptly hurled downward!
     dg_affect #10990 %actor% off
     %damage% %actor% 100 physical
@@ -1267,7 +1267,7 @@ wait 1 sec
 if !%actor% || !%self.fighting%
   halt
 end
-%send% %actor% &r%self.name% pulls out a gnarled wooden staff and smacks you over the head with it!
+%send% %actor% &&r%self.name% pulls out a gnarled wooden staff and smacks you over the head with it!
 %echoaround% %actor% %self.name% pulls out a gnarled wooden staff and smacks %actor.name% over the head with it!
 %damage% %actor% 25 physical
 if %actor.trigger_counterspell%

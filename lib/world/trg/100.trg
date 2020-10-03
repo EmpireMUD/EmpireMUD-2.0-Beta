@@ -41,7 +41,7 @@ Archdruid combat: frost~
 set chance %random.3%
 if (chance < 3)
   * Arctic chill on tank
-  %send% %actor% &r%self.name% draws moisture from the air and hits you with an arctic chill!&0
+  %send% %actor% &&r%self.name% draws moisture from the air and hits you with an arctic chill!&&0
   %echoaround% %actor% %self.name% draws moisture from the air and hits %actor.name% with an arctic chill!
   %dot% %actor% 100 60 magical
   %damage% %actor% 90 magical
@@ -50,7 +50,7 @@ else
   %echo% %self.name% summons a frost storm...
   * Give the healer (if any) time to prepare for group heals
   wait 3 sec
-  %echo% &r%self.name% unleashes a frost storm!&0
+  %echo% &&r%self.name% unleashes a frost storm!&&0
   %aoe% 50 magical
 end
 ~
@@ -88,7 +88,7 @@ Red Dragon combat~
 switch %random.4%
   * Searing burns on tank
   case 1
-    %send% %actor% &r%self.name% spits fire at you, causing searing burns!&0
+    %send% %actor% &&r%self.name% spits fire at you, causing searing burns!&&0
     %echoaround% %actor% %self.name% spits fire at %actor.name%, causing searing burns!
     %dot% %actor% 100 60 fire
     %damage% %actor% 20 fire
@@ -98,12 +98,12 @@ switch %random.4%
     %echo% %self.name% begins puffing smoke and spinning in circles!
     * Give the healer (if any) time to prepare for group heals
     wait 3 sec
-    %echo% &r%self.name% unleashes a flame wave!&0
+    %echo% &&r%self.name% unleashes a flame wave!&&0
     %aoe% 25 fire
   break
   * Traumatic burns on tank
   case 3
-    %send% %actor% &r%self.name% spits fire at you, causing traumatic burns!&0
+    %send% %actor% &&r%self.name% spits fire at you, causing traumatic burns!&&0
     %echoaround% %actor% %self.name% spits fire at %actor.name%, causing traumatic burns!
     %dot% %actor% 300 10 fire
     %damage% %actor% 20 fire
@@ -112,7 +112,7 @@ switch %random.4%
   case 4
     set target %random.enemy%
     if (%target%)
-      %send% %target% &r%self.name% uses %self.hisher% tail to hurl a rock at you, stunning you momentarily!&0
+      %send% %target% &&r%self.name% uses %self.hisher% tail to hurl a rock at you, stunning you momentarily!&&0
       %echoaround% %target% %self.name% hurls a rock at %target.name% with %self.hisher% tail, stunning %target.himher% momentarily!
       dg_affect %target% STUNNED on 10
       %damage% %target% 50 physical
@@ -188,7 +188,7 @@ switch %random.3%
   break
   * Dash scratch AOE
   case 2
-    %echo% &r%self.name% dashes around the room, striking everyone!&0
+    %echo% &&r%self.name% dashes around the room, striking everyone!&&0
     %aoe% 50 physical
   break
   * Pain bite
@@ -333,7 +333,7 @@ else
   %echo% %self.name% begins puffing smoke and spinning in circles!
   * Give the healer (if any) time to prepare for group heals
   wait 3 sec
-  %echo% &r%self.name% unleashes a flame wave!&0
+  %echo% &&r%self.name% unleashes a flame wave!&&0
   %aoe% 50 fire
 end
 ~

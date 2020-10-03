@@ -238,7 +238,7 @@ else
   set cycle 1
   while %cycle% <= 3
     wait 5 sec
-    %echo% &r%self.name%'s arrows rain down upon you!
+    %echo% &&r%self.name%'s arrows rain down upon you!
     %aoe% 85 physical
     eval cycle %cycle% + 1
   done
@@ -259,14 +259,14 @@ wait 2 sec
 %echo% %self.name% raises her axe over one shoulder in a two-handed grip...
 wait 3 sec
 if %self.aff_flagged(ENTANGLE)%
-  %send% %actor% &r%self.name% hacks at you between attempts to free %self.himher%self from the entanglement!
+  %send% %actor% &&r%self.name% hacks at you between attempts to free %self.himher%self from the entanglement!
   %echoaround% %actor% %self.name% hacks at %actor.name% between attempts to free %self.himher%self from the entanglement.
   %damage% %actor% 250 physical
   %dot% #12008 %actor% 150 30 physical
   halt
 end
-%echo% &r%self.name% charges forward, hacking and slicing at everyone!
-%send% %actor% &rYou take the brunt of %self.name%'s assault!
+%echo% &&r%self.name% charges forward, hacking and slicing at everyone!
+%send% %actor% &&rYou take the brunt of %self.name%'s assault!
 %echoaround% %actor% %actor.name% takes the brunt of %self.name%'s assault!
 %aoe% 25 physical
 %damage% %actor% 200 physical
@@ -282,7 +282,7 @@ end
 set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
-    %send% %person% &rA fountain of blood suddenly bursts from the wounds left by %self.name%'s assault!
+    %send% %person% &&rA fountain of blood suddenly bursts from the wounds left by %self.name%'s assault!
     %damage% %person% 100
     if %self.mob_flagged(GROUP)%
       eval amount %amount% + 75
@@ -304,7 +304,7 @@ nop %self.set_cooldown(12002, 30)%
 %echo% %self.name% draws %self.hisher% spear.
 dg_affect %self% HARD-STUNNED on 5
 wait 2 sec
-%send% %actor% &r%self.name% drives %self.hisher% spear through your chest, impaling you upon it!
+%send% %actor% &&r%self.name% drives %self.hisher% spear through your chest, impaling you upon it!
 %echoaround% %actor% %self.name% drives %self.hisher% spear through %actor.name%'s chest, impaling %actor.himher% upon it!
 if %self.mob_flagged(GROUP)%
   %damage% %actor% 500 physical
@@ -330,14 +330,14 @@ nop %self.set_cooldown(12002, 30)%
 %echo% %self.name% draws %self.hisher% hammer.
 dg_affect %self% HARD-STUNNED on 10
 wait 1 sec
-%echo% &Y%self.name% raises her hammer overhead... (Jump now!)
+%echo% &&Y%self.name% raises her hammer overhead... (Jump now!)
 set running 1
 remote running %self.id%
 wait 10 sec
 set running 0
 remote running %self.id%
 shout Hammer down!
-%echo% &Y%self.name% slams %self.hisher% hammer into the earth with a deafening bang, shattering the ground underfoot!
+%echo% &&Y%self.name% slams %self.hisher% hammer into the earth with a deafening bang, shattering the ground underfoot!
 set person %self.room.people%
 while %person%
   if %person.is_pc%
@@ -346,7 +346,7 @@ while %person%
       eval test %%self.jumped_%person.id%%%
     end
     if !%test%
-      %send% %person% &rThe force of the blow, traveling through the ground, leaves you stunned!
+      %send% %person% &&rThe force of the blow, traveling through the ground, leaves you stunned!
       %echoaround% %person% %person.name% is stunned!
       %damage% %person% 100 physical
       dg_affect #12010 %person% HARD-STUNNED on 20
@@ -404,7 +404,7 @@ if !%anat%
   %purge% %self%
   halt
 end
-%send% %target% &r%self.name% crashes into you, talons tearing, and seizes your weapon!
+%send% %target% &&r%self.name% crashes into you, talons tearing, and seizes your weapon!
 %echoaround% %target% %self.name% crashes into %target.name%, talons tearing, and seizes %target.hisher% weapon!
 if %anat.mob_flagged(GROUP)%
   %damage% %target% 200 physical
@@ -531,7 +531,7 @@ if !%self.fighting% && %self.varexists(phase)%
       set next_person %person.next_in_room%
       if %person.is_pc%
         %send% %person% %self.name% turns his gaze inward upon you!
-        %send% %person% &rA torrent of lightning flows through you, blasting you out of the eye of the storm!
+        %send% %person% &&rA torrent of lightning flows through you, blasting you out of the eye of the storm!
         %damage% %person% 99999 direct
         %teleport% %person% %self%
       elseif %person.vnum% == 12031
@@ -670,7 +670,7 @@ nop %self.set_cooldown(12030, 30)%
 %echo% %self.name% takes a deep breath...
 wait 2 sec
 %echo% %self.name% lets out a mighty leonine roar!
-%echo% &rYou are stunned by the loudness of %self.name%'s roar!
+%echo% &&rYou are stunned by the loudness of %self.name%'s roar!
 set person %self.room.people%
 while %person%
   if %person.is_enemy(%self%)%
@@ -721,7 +721,7 @@ if (%self.aff_flagged(ENTANGLED)% || %target.room% != %self.room%) && (%target% 
   %echoneither% %self.fighting% %target% Unable to reach %target.name%, %self.name% turns %self.hisher% attention to %self.fighting.name%!
   set target %self.fighting%
 end
-%send% %target% &r%self.name% crashes into you, sending you flying!
+%send% %target% &&r%self.name% crashes into you, sending you flying!
 %echoaround% %target% %self.name% crashes into %target.name%, sending %target.himher% flying!
 if %self.mob_flagged(GROUP)%
   %damage% %target% 400 physical
@@ -757,7 +757,7 @@ while %time% <= %times%
   wait 2 sec
   %send% %target% %self.name% hurls a thunderbolt at you!
   %echoaround% %target% %self.name% hurls a thunderbolt at %target.name%!
-  %send% %target% &rThe thunderbolt explodes in your face!
+  %send% %target% &&rThe thunderbolt explodes in your face!
   %echoaround% %target% The thunderbolt explodes in front of %target.name%'s face!
   %damage% %target% 100 magical
   %dot% #12037 %target% 200 30 magical
@@ -790,7 +790,7 @@ if %self.varexists(phase)%
 end
 while %cycle% <= %cycles%
   wait 5 sec
-  %echo% &rLightning and hail rain down upon you!
+  %echo% &&rLightning and hail rain down upon you!
   %aoe% 25 physical
   %aoe% %scale% magical
   eval cycle %cycle% + 1
@@ -834,12 +834,12 @@ if %ally%
   if %target%
     if %target.trigger_counterspell%
       %send% %target% A bolt of lightning flies out of nowhere and explodes against your counterspell!
-      %send% %target% &rThe bolt's explosion burns you!
+      %send% %target% &&rThe bolt's explosion burns you!
       %echoaround% %target% A bolt of lightning flies out of nowhere and explodes in front of %target.name%!
       %damage% %target% 75 magical
       halt
     else
-      %send% %target% &rA bolt of lightning flies out of nowhere and strikes you!
+      %send% %target% &&rA bolt of lightning flies out of nowhere and strikes you!
       %echoaround% %target% A bolt of lightning flies out of nowhere and strikes %target.name%!
       if %self.vnum% == 12030
         %damage% %target% 200 magical

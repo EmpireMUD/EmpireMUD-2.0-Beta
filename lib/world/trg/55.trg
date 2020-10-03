@@ -49,7 +49,7 @@ if %room.bld_flagged(IN-CITY-ONLY)% && !%room.in_city(true)%
   halt
 end
 if %actor.can_gain_new_skills% && %actor.skill(High Sorcery)% == 0 && !%actor.noskill(High Sorcery)%
-  %send% %actor% &mYour mind begins to open to the ways of High Sorcery, and you are now an apprentice to this school.&0
+  %send% %actor% &&mYour mind begins to open to the ways of High Sorcery, and you are now an apprentice to this school.&&0
   nop %actor.gain_skill(High Sorcery,1)%
 end
 ~

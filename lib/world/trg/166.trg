@@ -840,7 +840,7 @@ switch %random.3%
       set running 1
       remote running %self.id%
       %echo% %self.name% starts to swing a thirty-nine-and-a-half foot pole.
-      %echo% &YYou'd better duck!&0
+      %echo% &&YYou'd better duck!&&0
       wait 10 sec
       %echo% %self.name% swings the pole like a bat!
       set running 0
@@ -860,7 +860,7 @@ switch %random.3%
             end
           end
           if %command% != duck
-            %send% %person% &rYou are knocked senseless by the thirty-nine-and-a-half foot pole!
+            %send% %person% &&rYou are knocked senseless by the thirty-nine-and-a-half foot pole!
             %echoaround% %person% %person.name% is knocked senseless by the thirty-nine-and-a-half foot pole!
             eval grinch_damage %grinch_level% * 50 + 20
             %damage% %person% %grinch_damage% physical
