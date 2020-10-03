@@ -2767,6 +2767,10 @@ ACMD(do_lastname) {
 		else {
 			// ok!
 			change_personal_lastname(ch, new_name);
+			if (GET_CURRENT_LASTNAME(ch)) {
+				free(GET_CURRENT_LASTNAME(ch));
+			}
+			GET_CURRENT_LASTNAME(ch) = str_dup(GET_PERSONAL_LASTNAME(ch));
 			msg_to_char(ch, "Your personal lastname is now: %s\r\n", GET_PERSONAL_LASTNAME(ch));
 			syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "%s has changed personal lastname to: %s", GET_NAME(ch), GET_PERSONAL_LASTNAME(ch));
 		}
