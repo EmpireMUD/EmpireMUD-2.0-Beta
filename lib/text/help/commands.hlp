@@ -1223,6 +1223,24 @@ This allows you to cancel your flight effect and land on the ground.
 
 See also: FLY
 #
+LASTNAME "LAST NAME"
+
+Usage:  lastname [list | change] [name]
+
+&clastname&0  (by itself)
+   Shows your current lastname.
+
+&clastname list [keywords]&0
+   List the lastnames you have available. You can filter by keywords.
+
+&clastname <name>&0
+   Change your name to one in your list of lastnames (if this feature is
+   enabled).
+
+&clastname change <name>&0
+   Change your personal lastname -- the one you usually pick during character
+   creation. (If this feature is enabled.)
+#
 LAY ROAD ROADS
 
 Roads: ----  ..|.  ..+-  --+.  .--.

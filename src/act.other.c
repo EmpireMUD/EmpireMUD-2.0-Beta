@@ -2734,10 +2734,10 @@ ACMD(do_lastname) {
 	else if (!*argument) {	// no arg
 		// usage?
 		if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_SET_ANY_TIME)) {
-			msg_to_char(ch, "Usage: lastname [change] [name]\r\n");
+			msg_to_char(ch, "Usage: lastname [change | list] [name]\r\n");
 		}
 		else if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
-			msg_to_char(ch, "Usage: lastname [name]\r\n");
+			msg_to_char(ch, "Usage: lastname [list] [name]\r\n");
 		}
 		
 		// and show current
@@ -2751,7 +2751,7 @@ ACMD(do_lastname) {
 	else if (is_abbrev(arg1, "change")) {
 		// player wants to change their self-chosen lastname
 		if (!IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_SET_ANY_TIME)) {
-			msg_to_char(ch, "You cannot %s your lastname.\r\n", GET_PERSONAL_LASTNAME(ch) ? "change" : "choose");
+			msg_to_char(ch, "You cannot %s your own lastname.\r\n", GET_PERSONAL_LASTNAME(ch) ? "change" : "choose");
 		}
 		else if (!*arg2) {
 			msg_to_char(ch, "Change your lastname to what?\r\n");
@@ -2785,7 +2785,8 @@ ACMD(do_lastname) {
 			}
 		
 			if (GET_PERSONAL_LASTNAME(ch)) {
-				size += snprintf(output, sizeof(output), "%2d. %s (personal)\r\n", ++count, GET_PERSONAL_LASTNAME(ch));
+				++count;
+				size += snprintf(output, sizeof(output), " %s (personal)\r\n", GET_PERSONAL_LASTNAME(ch));
 			}
 		
 			LL_FOREACH(GET_LASTNAME_LIST(ch), lastn) {
@@ -2794,7 +2795,8 @@ ACMD(do_lastname) {
 				}
 		
 				// show it
-				snprintf(line, sizeof(line), "%2d. %s\r\n", ++count, NULLSAFE(lastn->name));
+				++count;
+				snprintf(line, sizeof(line), " %s\r\n", NULLSAFE(lastn->name));
 				if (size + strlen(line) < sizeof(output)) {
 					strcat(output, line);
 					size += strlen(line);
