@@ -1876,12 +1876,34 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		vict->player.time.birth = time(0) - ((value - 17) * SECS_PER_MUD_YEAR);
 	}
 	else if SET_CASE("lastname") {
+		void add_lastname(char_data *ch, char *name);
 		void change_personal_lastname(char_data *ch, char *name);
+		extern bool has_lastname(char_data *ch, char *name);
+		void remove_lastname(char_data *ch, char *name);
+		char va_1[MAX_INPUT_LENGTH], va_2[MAX_INPUT_LENGTH];
+		
+		half_chop(val_arg, va_1, va_2);
+		
 		if (!*val_arg) {
-			msg_to_char(ch, "Set the last name to what (or \"off\")?\r\n");
+			msg_to_char(ch, "Usage: set <name> lastname <new personal lastname | none>\r\n");
+			msg_to_char(ch, "Usage: set <name> lastname <add | remove> <name>\r\n");
 			return 0;
 		}
-		else if (!strcmp(val_arg, "off") || !strcmp(val_arg, "none")) {
+		else if (!str_cmp(va_1, "add")) {
+			add_lastname(vict, va_2);
+			sprintf(output, "Added lastname for %s: %s.", GET_NAME(vict), va_2);
+		}
+		else if (!str_cmp(va_1, "remove")) {
+			if (has_lastname(vict, va_2)) {
+				remove_lastname(vict, va_2);
+				sprintf(output, "Removed lastname for %s: %s.", GET_NAME(vict), va_2);
+			}
+			else {
+				msg_to_char(ch, "%s doesn't have that lastname.\r\n", GET_NAME(vict));
+				return 0;
+			}
+		}
+		else if (!str_cmp(val_arg, "off") || !str_cmp(val_arg, "none")) {
 			change_personal_lastname(vict, NULL);
     		sprintf(output, "%s no longer has a last name.", GET_NAME(vict));
 		}
