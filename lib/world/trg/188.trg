@@ -179,7 +179,7 @@ set heroic_mode %self.mob_flagged(GROUP)%
 %echo% %self.name% rears up and prances!
 wait 2 sec
 if %heroic_mode%
-  %echo% &&r%self.name% slams %self.hisher% hooves down on the ground, creating a shockwave!
+  %echo% &r%self.name% slams %self.hisher% hooves down on the ground, creating a shockwave!
   set person %self.room.people%
   while %person%
     if %person.is_enemy(%self%)%
@@ -189,7 +189,7 @@ if %heroic_mode%
     set person %person.next_in_room%
   done
 else
-  %send% %actor% &&r%self.name%'s hooves crash down on you!
+  %send% %actor% &r%self.name%'s hooves crash down on you!
   %echoaround% %actor% %self.name%'s hooves crash down on %actor.name%!
   %damage% %actor% 100
 end
@@ -204,7 +204,7 @@ end
 nop %self.set_cooldown(18801, 30)%
 set heroic_mode %self.mob_flagged(GROUP)%
 if %heroic_mode%
-  %echo% &&r%self.name% swings %self.hisher% sword in a wide arc at neck level, causing bleeding wounds!
+  %echo% &r%self.name% swings %self.hisher% sword in a wide arc at neck level, causing bleeding wounds!
   %aoe% 100 physical
   set person %self.room.people%
   while %person%
@@ -215,7 +215,7 @@ if %heroic_mode%
     set person %person.next_in_room%
   done
 else
-  %send% %actor% &&r%self.name% swings %self.hisher% sword, slashing at your neck and opening a bleeding wound!
+  %send% %actor% &r%self.name% swings %self.hisher% sword, slashing at your neck and opening a bleeding wound!
   %echoaround% %actor% %self.name% swings %self.hisher% sword, slashing at %actor.name%'s neck and opening a bleeding wound!
   %damage% %actor% 150 physical
   %dot% #18804 %actor% 75 30 physical
@@ -289,7 +289,7 @@ while %person%
   end
   set person %person.next_in_room%
 done
-%echo% &&rBeams of magical energy fly from %self.name%'s eyes!
+%echo% &rBeams of magical energy fly from %self.name%'s eyes!
 if !%heroic_mode%
   %aoe% 25 magical
 else
@@ -1512,7 +1512,6 @@ else
   %mod% %self% keywords ghostly
   %mod% %self% lookdesc this ghostly version of %target.pc_name% is a citizen of %self.room.empire_name% the same as the living one.
 end
-wait 1
 %echo% A chill comes over you as %self.name% fades into view.
 set day_count %dailycycle%
 remote day_count %self.id%
@@ -1530,30 +1529,101 @@ end
 if %self.vnum% == 18881
   %echo% %self.name% returns to the realm of the dead.
 else
-  %echo% %self.name% whipsers, 'Thank you for this time to make peace,' and then fades away.
+  %echo% %self.name% whispers, 'Thank you for this time to make peace,' and then fades away.
 end
 %purge% %self%
 ~
 #18873
 play the victim to death~
-0 b 50
+0 bw 100
 ~
-%echo% the actor var is %actor%.
 set person %self.room.people%
 while %person%
-  if %person.action% == playing
-    if %person.on_quest(18873)%
-      %quest% %person% finish 18873
-      set actor %person%
-    end
+  if %person.is_pc%
+    set actor %person%
   end
+  set person %person.next_in_room%
 done
 if !%actor%
+  halt
+end
+if %actor.action% != playing
+  halt
+end
+if !%self.varexists(count_up)%
+  set count_up 0
+else
+  set count_up %self.count_up%
+end
+eval count_up %count_up% + 1
+switch %count_up%
+  case 1
+    %send% %actor% %self.name% locks %self.hisher% eyes on you as you play.
+    remote count_up %self.id%
+    halt
+  break
+  case 2
+    %send% %actor% You watch as %self.name%'s eyes closely droop and %self.hisher% body begins to relax.
+    remote count_up %self.id%
+    halt
+  break
+  case 3
+    %send% %actor% %self.name% finally gives up the ghost and healers usher you from the tent!
+    %force% %actor% exit
+    %quest% %actor% finish 18873
+  break
+done
+if !%self.varexists(tent)%
+  set tent %self.room.in_vehicle%
+  remote tent %self.id%
+end
+%regionecho% %tent% 0 Healers sadly dismantle %tent.shortdesc%.
+%purge% %tent%
+~
+#18874
+reject those not on quest~
+5 c 0
+enter~
+if !%actor.veh_target(%arg%)%
+  return 0
+  halt
+end
+if %actor.is_npc%
   return 1
   halt
 end
-%echo% %self.shortdesc% loses all tension in %self.hisher% body and you feel its time to leave.
-%purge% %self%
+set person %self.interior.people%
+while %person%
+  if %person.is_pc%
+    %send% %actor% there's already someone in there playing music!
+    return 1
+    halt
+  end
+  set person %person.next_in_room%
+done
+if %actor.on_quest(18873)%
+  return 0
+  halt
+end
+%send% %actor% You have no business entering %self.shortdesc% at this time!
+return 1
+~
+#18875
+load the victim~
+5 n 100
+~
+%at% %self.interior% %load% mob 18873
+set victim %self.interior.people.id%
+set spawn_time %timestamp%
+set tent %self%
+remote tent %victim%
+remote spawn_time %victim%
+~
+#18876
+tent should not persist~
+5 ab 10
+~
+* No script
 ~
 #18878
 Halloween: Magi-genic Ooze mount upgrader~
