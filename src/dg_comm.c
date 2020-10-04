@@ -105,7 +105,7 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 			}
 			case '@': {
 				if (!otokens[i])
-					strcat(sb,"something");
+					strcat(sb,"somethang");
 				else
 					strcat(sb,OBJS(((obj_data*) otokens[i]), ch));
 				break;
@@ -177,29 +177,36 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 			}
 
 			case '@': {
-				/* get obj_data, move to next token */
-				type[i] = *p;
-				*s = '\0';
-				p = any_one_name(++p, name);
+				if (*(p+1) != *p) {
+					/* get obj_data, move to next token */
+					type[i] = *p;
+					*s = '\0';
+					p = any_one_name(++p, name);
 
-				if (*name == UID_CHAR) {
-					obj = get_obj(name);
-				}
-				else if (find_invis) {
-					obj = get_obj_in_room(IN_ROOM(ch), name);
-				}
-				else if (!(obj = get_obj_in_list_vis(ch, name, ROOM_CONTENTS(IN_ROOM(ch))))) {
-					// nothing
-				}
-				else if (!(obj = get_obj_in_equip_vis(ch, name, ch->equipment))) {
-					// nothing
+					if (*name == UID_CHAR) {
+						obj = get_obj(name);
+					}
+					else if (find_invis) {
+						obj = get_obj_in_room(IN_ROOM(ch), name);
+					}
+					else if (!(obj = get_obj_in_list_vis(ch, name, ROOM_CONTENTS(IN_ROOM(ch))))) {
+						// nothing
+					}
+					else if (!(obj = get_obj_in_equip_vis(ch, name, ch->equipment))) {
+						// nothing
+					}
+					else {
+						obj = get_obj_in_list_vis(ch, name, ch->carrying);
+					}
+
+					otokens[i] = obj;
+					tokens[++i] = ++s;
 				}
 				else {
-					obj = get_obj_in_list_vis(ch, name, ch->carrying);
+					// double symbols are ignored
+					++p;
+					*s++ = *p++;
 				}
-
-				otokens[i] = obj;
-				tokens[++i] = ++s;
 				break;
 			}
 
