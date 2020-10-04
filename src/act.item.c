@@ -456,7 +456,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	extern const char *tool_flags[];
 	extern const char *wear_bits[];
 
-	struct vnum_hash *bld_vhash = NULL, *veh_vhash = NULL, *vhash_iter, *vhash_next;
+	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	vehicle_data *veh, *veh_iter, *next_veh;
 	bld_data *bld, *bld_iter, *next_bld;
 	struct obj_storage_type *store;
@@ -523,39 +523,39 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	if (GET_OBJ_STORAGE(obj) && !OBJ_FLAGGED(obj, OBJ_NO_STORE)) {
 		LL_FOREACH(GET_OBJ_STORAGE(obj), store) {
 			if (store->type == TYPE_BLD && (bld = building_proto(store->vnum))) {
-				add_vnum_hash(&bld_vhash, GET_BLD_VNUM(bld), 1);
+				add_string_hash(&str_hash, GET_BLD_NAME(bld), 1);
 				
 				// check stores-like relations
 				HASH_ITER(hh, building_table, bld_iter, next_bld) {
 					LL_FOREACH(GET_BLD_RELATIONS(bld_iter), relat) {
 						if (relat->type == BLD_REL_STORES_LIKE_BLD && relat->vnum == GET_BLD_VNUM(bld)) {
-							add_vnum_hash(&bld_vhash, GET_BLD_VNUM(bld_iter), 1);
+							add_string_hash(&str_hash, GET_BLD_NAME(bld_iter), 1);
 						}
 					}
 				}
 				HASH_ITER(hh, vehicle_table, veh_iter, next_veh) {
 					LL_FOREACH(VEH_RELATIONS(veh_iter), relat) {
 						if (relat->type == BLD_REL_STORES_LIKE_BLD && relat->vnum == GET_BLD_VNUM(bld)) {
-							add_vnum_hash(&veh_vhash, VEH_VNUM(veh_iter), 1);
+							add_string_hash(&str_hash, skip_filler(VEH_SHORT_DESC(veh_iter)), 1);
 						}
 					}
 				}
 			}
 			else if (store->type == TYPE_VEH && (veh = vehicle_proto(store->vnum))) {
-				add_vnum_hash(&veh_vhash, VEH_VNUM(veh), 1);
+				add_string_hash(&str_hash, skip_filler(VEH_SHORT_DESC(veh)), 1);
 				
 				// check stores-like relations
 				HASH_ITER(hh, building_table, bld_iter, next_bld) {
 					LL_FOREACH(GET_BLD_RELATIONS(bld_iter), relat) {
 						if (relat->type == BLD_REL_STORES_LIKE_VEH && relat->vnum == VEH_VNUM(veh)) {
-							add_vnum_hash(&bld_vhash, GET_BLD_VNUM(bld_iter), 1);
+							add_string_hash(&str_hash, GET_BLD_NAME(bld_iter), 1);
 						}
 					}
 				}
 				HASH_ITER(hh, vehicle_table, veh_iter, next_veh) {
 					LL_FOREACH(VEH_RELATIONS(veh_iter), relat) {
 						if (relat->type == BLD_REL_STORES_LIKE_VEH && relat->vnum == VEH_VNUM(veh)) {
-							add_vnum_hash(&veh_vhash, VEH_VNUM(veh_iter), 1);
+							add_string_hash(&str_hash, skip_filler(VEH_SHORT_DESC(veh_iter)), 1);
 						}
 					}
 				}
@@ -564,14 +564,14 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		
 		snprintf(lbuf, sizeof(lbuf), "Storage locations:");
 		found = 0;
-		HASH_ITER(hh, bld_vhash, vhash_iter, vhash_next) {
-			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s", (found++ > 0 ? ", " : " "), get_bld_name_by_proto(vhash_iter->vnum));
+		HASH_SORT(str_hash, sort_string_hash);
+		HASH_ITER(hh, str_hash, str_iter, next_str) {
+			if (next_str && !str_cmp(str_iter->str, next_str->str)) {
+				continue;	// avoid case-sensitive dupes
+			}
+			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s", (found++ > 0 ? ", " : " "), str_iter->str);
 		}
-		HASH_ITER(hh, veh_vhash, vhash_iter, vhash_next) {
-			snprintf(lbuf + strlen(lbuf), sizeof(lbuf) - strlen(lbuf), "%s%s", (found++ > 0 ? ", " : " "), skip_filler(get_vehicle_name_by_proto(vhash_iter->vnum)));
-		}
-		free_vnum_hash(&bld_vhash);
-		free_vnum_hash(&veh_vhash);
+		free_string_hash(&str_hash);
 		if (strlen(lbuf) < sizeof(lbuf) + 2) {
 			strcat(lbuf, "\r\n");
 		}

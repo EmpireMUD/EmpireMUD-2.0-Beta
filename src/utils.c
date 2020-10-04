@@ -6134,16 +6134,16 @@ int Y_COORD(room_data *room) {
 *   free_string_hash(&my_hash);	// free when done
 *
 * @param struct string_hash **hash A pointer to the hash we're adding to.
-* @param char *string The string to add, if unique (will be copied for this).
+* @param const char *string The string to add, if unique (will be copied for this).
 * @param int count How many to add (usually 1, but you can add any amount including a negative).
 */
-void add_string_hash(struct string_hash **hash, char *string, int count) {
-	struct vnum_hash *item = NULL;
+void add_string_hash(struct string_hash **hash, const char *string, int count) {
+	struct string_hash *item = NULL;
 	
 	if (hash && string) {
 		HASH_FIND_STR(*hash, string, item);
 		if (!item) {
-			CREATE(item, struct vnum_hash, 1);
+			CREATE(item, struct string_hash, 1);
 			item->str = str_dup(string);
 			HASH_ADD_STR(*hash, str, item);
 		}
@@ -6216,6 +6216,12 @@ void free_vnum_hash(struct vnum_hash **hash) {
 			free(iter);
 		}
 	}
+}
+
+
+// easy alpha sorter
+int sort_string_hash(struct string_hash *a, struct string_hash *b) {
+	return strcmp(a->str, b->str);
 }
 
 

@@ -1635,10 +1635,11 @@ extern struct weather_data weather_info;	// db.c
 #define log  basic_mud_log
 
 // vnum hash tools from utils.c
-void add_string_hash(struct string_hash **hash, char *string, int count);
+void add_string_hash(struct string_hash **hash, const char *string, int count);
 void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count);
 void free_string_hash(struct string_hash **hash);
 void free_vnum_hash(struct vnum_hash **hash);
+extern int sort_string_hash(struct string_hash *a, struct string_hash *b);
 
 // basic functions from utils.c
 extern bool any_players_in_room(room_data *room);
