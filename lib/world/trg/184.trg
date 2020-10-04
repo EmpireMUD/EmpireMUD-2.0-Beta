@@ -921,8 +921,8 @@ while %item%
   end
   set item %item.next_in_list%
 done
-%send% %actor% You link the unstable portal to ~%new_room%.
-%echoaround% %actor% ~%actor% links the unstable portal to ~%new_room%.
+%send% %actor% You link the unstable portal to %new_room.name%.
+%echoaround% %actor% ~%actor% links the unstable portal to ~%new_room.name%.
 ~
 #18496
 Unstable portal block where~
