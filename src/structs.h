@@ -3233,6 +3233,14 @@ struct spawn_info {
 };
 
 
+// simple structure for passing around a hash of unique strings
+struct string_hash {
+	char *str;
+	int count;
+	UT_hash_handle hh;
+};
+
+
 // for do_tedit in act.immortal.c
 struct tedit_struct {
 	char *cmd;

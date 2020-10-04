@@ -6126,6 +6126,34 @@ int Y_COORD(room_data *room) {
 //// MISC UTILS //////////////////////////////////////////////////////////////
 
 /**
+* Adds an entry to a string hash. This is a general tool for listing/counting
+* unique names/things. Example:
+*   struct string_hash *my_hash = NULL;	// initialize to null
+*	add_string_hash(&my_hash, string, 1);	// add items
+*   HASH_ITER(hh, my_hash, iter, next) { ... }	// use hash
+*   free_string_hash(&my_hash);	// free when done
+*
+* @param struct string_hash **hash A pointer to the hash we're adding to.
+* @param char *string The string to add, if unique (will be copied for this).
+* @param int count How many to add (usually 1, but you can add any amount including a negative).
+*/
+void add_string_hash(struct string_hash **hash, char *string, int count) {
+	struct vnum_hash *item = NULL;
+	
+	if (hash && string) {
+		HASH_FIND_STR(*hash, string, item);
+		if (!item) {
+			CREATE(item, struct vnum_hash, 1);
+			item->str = str_dup(string);
+			HASH_ADD_STR(*hash, str, item);
+		}
+		
+		SAFE_ADD(item->count, count, INT_MIN, INT_MAX, FALSE);
+	}
+}
+
+
+/**
 * Adds an entry to a vnum hash. This is a general tool for listing/counting
 * unique vnums. Example:
 *   struct vnum_hash *my_hash = NULL;	// initialize to null
@@ -6147,9 +6175,30 @@ void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count) {
 			item->vnum = vnum;
 			HASH_ADD_INT(*hash, vnum, item);
 		}
+		
+		SAFE_ADD(item->count, count, INT_MIN, INT_MAX, FALSE);
 	}
+}
+
+
+/**
+* Frees a string_hash when you're done with it.
+*
+* @param struct string_hash **hash The string hash to free.
+*/
+void free_string_hash(struct string_hash **hash) {
+	struct string_hash *iter, *next;
 	
-	SAFE_ADD(item->count, count, INT_MIN, INT_MAX, FALSE);
+	if (hash) {
+		HASH_ITER(hh, *hash, iter, next) {
+			HASH_DEL(*hash, iter);
+			
+			if (iter->str) {
+				free(iter->str);
+			}
+			free(iter);
+		}
+	}
 }
 
 
