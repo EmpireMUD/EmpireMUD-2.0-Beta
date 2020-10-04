@@ -86,6 +86,7 @@ See also: PROMPT, TOGGLE
 ALIAS ALIASES
 
 Usage:  alias [alias name] [command]
+        unalias [alias name]
 
 An alias is a single command used to represent one or more other commands.
 The ALIAS command can be used to manipulate your character's aliases. Type
@@ -93,22 +94,25 @@ ALIAS alone to see a list of your currently defined aliases.
 
   > alias
 
+Type ALIAS <alias-name> to view a single alias.
+
+  > alias gac
+
 Type ALIAS <alias name> <command> to create a new alias. The alias name must
 be one word. The command can be any string. Aliases may not be nested or
 used recursively. Any command may be overridden by an alias (other than the
 ALIAS command itself, of course).
 
-  > alias gbb get bread bag
-  > alias gac get all corpse
+  > alias gac get all all.corpse
 
-Type ALIAS <alias-name> to delete an alias that has already been defined.
+Type UNALIAS <alias-name> to delete an alias that has already been defined.
 
-  > alias gbb
+  > unalias gac
 
 A semicolon (";") can be used to define multiple actions to be taken with
 a single alias.
 
-  > alias eat get bread bag; eat bread
+  > alias eat summon materials bread; eat bread
 
 Note that the 'eat' contained within the eat alias is interpreted as the MUD's
 internal eat command; aliases may not be nested or used recursively. The
