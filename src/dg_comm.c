@@ -105,7 +105,7 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 			}
 			case '@': {
 				if (!otokens[i])
-					strcat(sb,"somethang");
+					strcat(sb,"something");
 				else
 					strcat(sb,OBJS(((obj_data*) otokens[i]), ch));
 				break;
