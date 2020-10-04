@@ -136,7 +136,7 @@ Give seeds if no seeds or cattails~
 if !%actor.inventory(11008)% && !%actor.inventory(11009)%
   nop %actor.add_resources(11008, 1)%
   set item %actor.inventory()%
-  %send% %actor% You find %item.shortdesc%.
+  %send% %actor% You find @%item%.
 end
 ~
 #11009
@@ -167,7 +167,7 @@ done
 eval vnum (11022-1) + %random.2%
 %load% obj %vnum% %self.room%
 set item %self.room.contents%
-%echo% You find %item.shortdesc% nearby!
+%echo% You find @%item% nearby!
 * Look for the corpses made variable
 if %self.varexists(corpses_made)%
   eval corpses_made %self.corpses_made% + 1
@@ -327,7 +327,7 @@ Wings of Daedalus decay~
 if %self.timer% > 0
   halt
 end
-%send% %actor% The wax holding %self.shortdesc% together begins to slowly melt...
+%send% %actor% The wax holding @%self% together begins to slowly melt...
 otimer 24
 ~
 #11034
@@ -390,7 +390,7 @@ if %actor%
   end
   %load% obj %vnum% %actor% inv %level%
   set item %actor.inventory(%vnum%)%
-  %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
+  %send% %actor% @%self% turns out to be @%item%!
   if %item.is_flagged(BOE)%
     nop %item.flag(BOE)%
   end

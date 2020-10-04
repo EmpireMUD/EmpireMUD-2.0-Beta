@@ -347,8 +347,8 @@ if (%actor.position% != Standing)
   halt
 end
 %load% m %self.val0%
-%send% %actor% You use %self.shortdesc% and a new mount appears!
-%echoaround% %actor% ~%actor% uses %self.shortdesc% and a new mount appears!
+%send% %actor% You use @%self% and a new mount appears!
+%echoaround% %actor% ~%actor% uses @%self% and a new mount appears!
 set mob %self.room.people%
 if (%mob% && %mob.vnum% == %self.val0%)
   nop %mob.unlink_instance%

@@ -780,8 +780,8 @@ if (%actor.position% != Standing)
 end
 %load% m %self.val0%
 set mob %self.room.people%
-%send% %actor% You use %self.shortdesc% and ~%mob% appears!
-%echoaround% %actor% ~%actor% uses %self.shortdesc% and ~%mob% appears!
+%send% %actor% You use @%self% and ~%mob% appears!
+%echoaround% %actor% ~%actor% uses @%self% and ~%mob% appears!
 if (%mob% && %mob.vnum% == %self.val0%)
   nop %mob.unlink_instance%
 end

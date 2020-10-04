@@ -146,7 +146,7 @@ if !%arg%
 end
 set room %self.room%
 if %room.rmt_flagged(!LOCATION)%
-  %send% %actor% %self.shortdesc% spins gently in a circle.
+  %send% %actor% @%self% spins gently in a circle.
   halt
 end
 if (guild /= %arg% || tortoise /= %arg%)
@@ -164,7 +164,7 @@ if (guild /= %arg% || tortoise /= %arg%)
     %send% %actor% Something went wrong (turtle not found).
     halt
   end
-  %send% %actor% You hold %self.shortdesc% aloft...
+  %send% %actor% You hold @%self% aloft...
   set real_dir %room.direction(%turtle.room%)%
   set distance %room.distance(%turtle.room%)%
   if %distance% == 0
@@ -174,7 +174,7 @@ if (guild /= %arg% || tortoise /= %arg%)
   else
     %send% %actor% There is an atlasian tortoise %distance% tiles to the %actor.dir(%real_dir%)%.
   end
-  %echoaround% %actor% ~%actor% holds %self.shortdesc% aloft...
+  %echoaround% %actor% ~%actor% holds @%self% aloft...
 else
   return 0
   halt
@@ -276,7 +276,7 @@ while %object%
 done
 %load% obj 18204
 set object %room.contents%
-%echo% %object.shortdesc% is refreshed!
+%echo% @%object% is refreshed!
 ~
 #18214
 Tortoise Trinket teleporter~
@@ -307,7 +307,7 @@ while %cycle% >= 0
   elseif !%loc%
     %send% %actor% There is no valid location to teleport to.
   elseif %actor.aff_flagged(DISTRACTED)%
-    %send% %actor% You are too distracted to use %self.shortdesc%!
+    %send% %actor% You are too distracted to use @%self%!
   else
     set error 0
   end
@@ -318,19 +318,19 @@ while %cycle% >= 0
   end
   if %actor.room% != %room_var% || %self.carried_by% != %actor% || %error%
     if %cycle% > 0
-      %send% %actor% %self.shortdesc% sparks and fizzles.
+      %send% %actor% @%self% sparks and fizzles.
       %echoaround% %actor% |%actor% trinket sparks and fizzles.
     end
     halt
   end
   switch %cycle%
     case 0
-      %send% %actor% You touch %self.shortdesc% and it begins to rumble...
-      %echoaround% %actor% ~%actor% touches %self.shortdesc% and it begins to rumble...
+      %send% %actor% You touch @%self% and it begins to rumble...
+      %echoaround% %actor% ~%actor% touches @%self% and it begins to rumble...
     break
     case 1
-      %send% %actor% %self.shortdesc% glows a deep green and the light surrounds you like a shell!
-      %echoaround% %actor% %self.shortdesc% glows a deep green and the light surrounds ~%actor% like a shell!
+      %send% %actor% @%self% glows a deep green and the light surrounds you like a shell!
+      %echoaround% %actor% @%self% glows a deep green and the light surrounds ~%actor% like a shell!
     break
     case 2
       %echoaround% %actor% ~%actor% vanishes in a flash of green light!
@@ -453,7 +453,7 @@ if %actor.obj_target(%arg%)% != %self%
 end
 set room %actor.room%
 if (%room.sector% != Plains && %room.sector% != Desert) || %room.building%
-  %send% %actor% You can't plant %self.shortdesc% here.
+  %send% %actor% You can't plant @%self% here.
   return 1
   halt
 end
@@ -463,13 +463,13 @@ if !%actor.on_quest(18221)%
   halt
 end
 if !%actor.canuseroom_member(%room%)%
-  %send% %actor% You don't have permission to use %self.shortdesc% here.
+  %send% %actor% You don't have permission to use @%self% here.
   return 1
   halt
 end
-%send% %actor% You dig a hole in the ground large enough to fit %self.shortdesc%...
+%send% %actor% You dig a hole in the ground large enough to fit @%self%...
 %send% %actor% You carefully nestle the egg into the hole, and brush the dirt off of it.
-%echoaround% %actor% ~%actor% digs a hole in the ground and places %self.shortdesc% in it.
+%echoaround% %actor% ~%actor% digs a hole in the ground and places @%self% in it.
 %load% obj 18222 room
 %build% %room% 18221
 %quest% %actor% finish 18221
@@ -541,7 +541,7 @@ Atlasian Turtle Egg: Hatch~
 set room %self.room%
 %load% veh 18224
 set tortoise %room.vehicles%
-%echo% The huge atlasian egg cracks open, and %tortoise.shortdesc% pokes its head out!
+%echo% The huge atlasian egg cracks open, and @%tortoise% pokes its head out!
 %own% %tortoise% %room.empire%
 %build% %room% demolish
 return 0
@@ -619,13 +619,13 @@ Catch wildling with a huge net~
 1 c 3
 net~
 if !%arg%
-  %send% %actor% What do you want to catch with %self.shortdesc%?
+  %send% %actor% What do you want to catch with @%self%?
   return 1
   halt
 end
 set target %actor.char_target(%arg%)%
 if !%target%
-  %send% %actor% They must have ran away when you started waving %self.shortdesc% around, because they're not here.
+  %send% %actor% They must have ran away when you started waving @%self% around, because they're not here.
   return 1
   halt
 end
@@ -635,8 +635,8 @@ if %target.is_npc% && (%target.vnum% >= 12658 && %target.vnum% <= 12661)
     return 1
     halt
   end
-  %send% %actor% You throw %self.shortdesc% over ~%target% and capture *%target%!
-  %echoaround% %actor% ~%actor% throws %self.shortdesc% over ~%target% and captures *%target%!
+  %send% %actor% You throw @%self% over ~%target% and capture *%target%!
+  %echoaround% %actor% ~%actor% throws @%self% over ~%target% and captures *%target%!
   %purge% %target%
   %load% obj 18257 %actor% inv
   return 1
@@ -648,11 +648,11 @@ elseif %target.is_npc% && ((%target.vnum% >= 12668 && %target.vnum% <= 12670) ||
   halt
 elseif %target.is_pc%
   if %target% == %actor%
-    %send% %actor% You briefly ponder catching yourself with %self.shortdesc%, then think better of it.
+    %send% %actor% You briefly ponder catching yourself with @%self%, then think better of it.
     return 1
     halt
   end
-  %send% %actor% You advance menacingly on ~%target% with %self.shortdesc%...
+  %send% %actor% You advance menacingly on ~%target% with @%self%...
   %send% %target% ~%actor% advances menacingly on you with a huge net...
   %echoneither% %actor% %target% ~%actor% advances menacingly on ~%target% with a huge net...
   return 1
@@ -811,7 +811,7 @@ if !%target%
   halt
 end
 if %target.vnum% != 10551 && %target.vnum% != 10552
-  %send% %actor% That's not a valid target for %self.shortdesc%.
+  %send% %actor% That's not a valid target for @%self%.
   return 1
   halt
 end
@@ -863,7 +863,7 @@ else
   %send% %actor% You pick |%target% pocket...
   %load% obj 18210 %actor% inv
   set item %actor.inventory()%
-  %send% %actor% You find %item.shortdesc%!
+  %send% %actor% You find @%item%!
   %actor.add_resources(18272, -1)%
   return 1
   halt
@@ -906,12 +906,12 @@ done
 if %questvnum% >= 18280 && %questvnum% <= 18283 && !%actor.inventory(18280)%
   %load% obj 18280 %actor% inv
   set item %actor.inventory(18280)%
-  * %send% %actor% You receive %item.shortdesc%.
+  * %send% %actor% You receive @%item%.
 end
 if %questvnum% >= 18288 && %questvnum% <= 18291 && !%actor.inventory(18288)%
   %load% obj 18288 %actor% inv
   set item %actor.inventory(18288)%
-  * %send% %actor% You receive %item.shortdesc%.
+  * %send% %actor% You receive @%item%.
 end
 ~
 #18278
@@ -932,7 +932,7 @@ if %actor.obj_target(%arg%)% != %self%
 end
 if !(%actor.on_quest(18280)% || %actor.on_quest(18281)% || %actor.on_quest(18282)% || %actor.on_quest(18283)%)
   %send% %actor% You have no need to contact Malfernes right now.
-  %send% %actor% %self.shortdesc% crumbles to dust.
+  %send% %actor% @%self% crumbles to dust.
   %purge% %self%
   halt
 end
@@ -963,7 +963,7 @@ if %boss.fighting%
 end
 * Success
 %send% %actor% You signal Archsorcerer Malfernes, letting him know you're coming.
-%echoaround% %actor% ~%actor% waves %self.shortdesc% in the air.
+%echoaround% %actor% ~%actor% waves @%self% in the air.
 %at% %target_room% %echo% ~%boss% suddenly vanishes with a mighty bang, and is replaced by a relaxed-looking Archsorcerer Malfernes!
 %purge% %boss%
 %at% %target_room% %load% mob 18280
@@ -987,8 +987,8 @@ if %room.template% < 11130 || %room.template% > 11159
   %send% %actor% You need to do that inside Mill Manor.
   halt
 end
-%send% %actor% You quickly slap %self.shortdesc% on %chalice.shortdesc%, which sparks and crackles violently before settling down.
-%echoaround% %actor% ~%actor% slaps %self.shortdesc% on %chalice.shortdesc%, which sparks and crackles violently!
+%send% %actor% You quickly slap @%self% on @%chalice%, which sparks and crackles violently before settling down.
+%echoaround% %actor% ~%actor% slaps @%self% on @%chalice%, which sparks and crackles violently!
 %purge% %chalice%
 %load% obj 18283 %actor% inv
 if %instance.id%
@@ -1020,7 +1020,7 @@ set room %self.room%
 if %self.val0%
   * Captured a dragon
   if %room.template% < 10031 || %room.template% > 10099
-    %send% %actor% You have already captured a dragon. Now go to Skycleave and use %self.shortdesc% to imagine a copy of it.
+    %send% %actor% You have already captured a dragon. Now go to Skycleave and use @%self% to imagine a copy of it.
     halt
   elseif %room.template% == 10030
     %send% %actor% Move further in past the entrance first.
@@ -1063,13 +1063,13 @@ Net Rats for Germione~
 1 c 2
 net~
 if !%arg%
-  %send% %actor% What do you want to catch with %self.shortdesc%?
+  %send% %actor% What do you want to catch with @%self%?
   return 1
   halt
 end
 set target %actor.char_target(%arg%)%
 if !%target%
-  %send% %actor% They must have run away when you started waving %self.shortdesc% around, because they're not here.
+  %send% %actor% They must have run away when you started waving @%self% around, because they're not here.
   return 1
   halt
 end
@@ -1109,19 +1109,19 @@ if %target.is_npc%
     %send% %actor% You have enough rats.
     halt
   end
-  %send% %actor% You throw %self.shortdesc% over ~%target% and haul *%target% in...
-  %echoaround% %actor% ~%actor% throws %self.shortdesc% over ~%target% and hauls *%target% in.
+  %send% %actor% You throw @%self% over ~%target% and haul *%target% in...
+  %echoaround% %actor% ~%actor% throws @%self% over ~%target% and hauls *%target% in.
   %purge% %target%
   %load% obj 18287 %actor% inv
   set item %actor.inventory(18287)%
-  %send% %actor% You get %item.shortdesc%.
+  %send% %actor% You get @%item%.
 else
   if %target% == %actor%
-    %send% %actor% You briefly ponder catching yourself with %self.shortdesc%, then think better of it.
+    %send% %actor% You briefly ponder catching yourself with @%self%, then think better of it.
     return 1
     halt
   end
-  %send% %actor% You advance menacingly on ~%target% with %self.shortdesc%...
+  %send% %actor% You advance menacingly on ~%target% with @%self%...
   %send% %target% ~%actor% advances menacingly on you with a huge net...
   %echoneither% %actor% %target% ~%actor% advances menacingly on ~%target% with a huge net...
   return 1
@@ -1168,17 +1168,17 @@ if %actor.obj_target(%arg%)% != %self%
 end
 if !(%actor.on_quest(18288) || %actor.on_quest(18289) || %actor.on_quest(18290) || %actor.on_quest(18391)%)
   %send% %actor% You don't have anything to talk to Scaldorran about right now.
-  %send% %actor% %self.shortdesc% vanishes in a puff of smoke.
+  %send% %actor% @%self% vanishes in a puff of smoke.
   %purge% %self%
   halt
 end
 set room %self.room%
 if %room.template% != 10055
-  %send% %actor% %self.shortdesc% can only be used in Skycleave's Lich Labs.
+  %send% %actor% @%self% can only be used in Skycleave's Lich Labs.
   halt
 end
 if %instance.mob(10048)%
-  %send% %actor% You can't use %self.shortdesc% when Scaldorran is already here.
+  %send% %actor% You can't use @%self% when Scaldorran is already here.
   halt
 end
 %load% mob 10048
@@ -1186,8 +1186,8 @@ set scaldorran %room.people%
 if %scaldorran.vnum% != 10048
   %send% %actor% Failed to load Scaldorran. Please submit a bug report containing this message.
 end
-%send% %actor% You use %self.shortdesc% and the remains of ~%scaldorran% reform and reanimate!
-%echoaround% %actor% ~%actor% uses %self.shortdesc% and the remains of ~%scaldorran% reform and reanimate!
+%send% %actor% You use @%self% and the remains of ~%scaldorran% reform and reanimate!
+%echoaround% %actor% ~%actor% uses @%self% and the remains of ~%scaldorran% reform and reanimate!
 dg_affect %scaldorran% !ATTACK on -1
 ~
 #18289
@@ -1216,7 +1216,7 @@ if !%check%
   %send% %actor% There's no egg here to steal!
   halt
 end
-%send% %actor% You grab %egg.shortdesc% and quickly slide it into %self.shortdesc%.
+%send% %actor% You grab @%egg% and quickly slide it into @%self%.
 %load% obj 18291 %actor% inv
 %load% obj 11021 room
 %load% mob 11002
@@ -1246,9 +1246,9 @@ set knezz %instance.mob(10054)%
 if %knezz%
   * Knezz is still here...
   if %actor.skill(Stealth)% > 50
-    %send% %actor% You use your Stealth skill to plant %self.shortdesc% while ~%knezz% isn't watching.
+    %send% %actor% You use your Stealth skill to plant @%self% while ~%knezz% isn't watching.
   elseif %knezz.aff_flagged(BLIND)%
-    %send% %actor% You quickly plant %self.shortdesc%, taking advantage of |%knezz% temporary blindness.
+    %send% %actor% You quickly plant @%self%, taking advantage of |%knezz% temporary blindness.
     dg_affect %actor% HARD-STUNNED on 10
   elseif %knezz.aff_flagged(STUNNED)% && !%knezz.fighting%
     * Sap (presumably from an ally)
@@ -1258,7 +1258,7 @@ if %knezz%
     halt
   end
 else
-  %send% %actor% You plant %self.shortdesc% in Knezz's office.
+  %send% %actor% You plant @%self% in Knezz's office.
 end
 %quest% %actor% trigger 18290
 %purge% %self%
@@ -1299,12 +1299,12 @@ if %room.sector_vnum% != 0
   halt
 end
 if !%actor.canuseroom_member(%room%)%
-  %send% %actor% You don't have permission to use %self.shortdesc% here.
+  %send% %actor% You don't have permission to use @%self% here.
   return 1
   halt
 end
-%send% %actor% You plant %self.shortdesc%...
-%echoaround% %actor% ~%actor% plants %self.shortdesc%...
+%send% %actor% You plant @%self%...
+%echoaround% %actor% ~%actor% plants @%self%...
 %terraform% %room% 18293
 %echo% The plains around you shift slowly into a %room.sector%!
 %purge% %self%
@@ -1349,7 +1349,7 @@ else
 end
 * limited charges
 if (%terra% && !%self.val0%) || (!%terra% && !%self.val1%)
-  %send% %actor% %self.shortdesc% is out of charges for that ability.
+  %send% %actor% @%self% is out of charges for that ability.
   halt
 end
 set cycle 0
@@ -1359,15 +1359,15 @@ while %cycle% >= 0
   * Rather than setting error in 10 places, just assume there's an error and clear it if there isn't
   set error 1
   if %actor.fighting%
-    %send% %actor% You can't use %self.shortdesc% during combat.
+    %send% %actor% You can't use @%self% during combat.
   elseif %actor.position% != Standing
-    %send% %actor% You need to be standing up to use %self.shortdesc%.
+    %send% %actor% You need to be standing up to use @%self%.
   elseif !%actor.can_teleport_room% && !%terra%
     %send% %actor% You can't teleport out of here.
   elseif !%loc% && !%terra%
     %send% %actor% There is no valid location to teleport to.
   elseif %actor.aff_flagged(DISTRACTED)%
-    %send% %actor% You are too distracted to use %self.shortdesc%!
+    %send% %actor% You are too distracted to use @%self%!
   else
     set error 0
   end
@@ -1378,24 +1378,24 @@ while %cycle% >= 0
   end
   if %actor.room% != %room_var% || %self.carried_by% != %actor% || %error%
     if %cycle% > 0
-      %send% %actor% %self.shortdesc% sparks and fizzles.
+      %send% %actor% @%self% sparks and fizzles.
       %echoaround% %actor% |%actor% trinket sparks and fizzles.
     end
     halt
   end
   switch %cycle%
     case 0
-      %send% %actor% You touch %self.shortdesc% and the glyphs carved into it light up...
-      %echoaround% %actor% ~%actor% touches %self.shortdesc% and the glyphs carved into it light up...
+      %send% %actor% You touch @%self% and the glyphs carved into it light up...
+      %echoaround% %actor% ~%actor% touches @%self% and the glyphs carved into it light up...
     break
     case 1
-      %send% %actor% The glyphs on %self.shortdesc% glow a deep green and the light begins to envelop you!
-      %echoaround% %actor% The glyphs on %self.shortdesc% glow a deep green and the light begins to envelop ~%actor%!
+      %send% %actor% The glyphs on @%self% glow a deep green and the light begins to envelop you!
+      %echoaround% %actor% The glyphs on @%self% glow a deep green and the light begins to envelop ~%actor%!
     break
     case 2
       if %terra%
-        %send% %actor% You raise %self.shortdesc% high and the scorched landscape is restored!
-        %echoaround% %actor% ~%actor% raises %self.shortdesc% high and the scorched landscape is restored!
+        %send% %actor% You raise @%self% high and the scorched landscape is restored!
+        %echoaround% %actor% ~%actor% raises @%self% high and the scorched landscape is restored!
         %terraform% %room_var% %vnum%
         eval charges_left %self.val0%-1
         nop %self.val0(%charges_left%)%

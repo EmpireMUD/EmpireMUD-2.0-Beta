@@ -151,7 +151,7 @@ while %person%
         * Message
         set item %person.inventory(%vnum%)%
         if %item%
-          %send% %person% # You discover %item.shortdesc%!
+          %send% %person% # You discover @%item%!
         end
       end
       * Chance of a rare mount
@@ -177,7 +177,7 @@ while %person%
       if %vnum% != 0
         %load% obj %vnum% %person% inv
         set item %person.inventory()%
-        %send% %person% # You are lucky! You have discovered a rare item: %item.shortdesc%!
+        %send% %person% # You are lucky! You have discovered a rare item: @%item%!
       end
     end
     if %person.is_immortal%
@@ -189,7 +189,7 @@ while %person%
         * Message
         set item %person.inventory(%vnum%)%
         if %item%
-          %send% %person% # You create %item.shortdesc% for yourself.
+          %send% %person% # You create @%item% for yourself.
         end
       end
     end
@@ -759,7 +759,7 @@ while %person%
     set item %person.inventory(18490)%
     if %item%
       %send% %person% ~%mob% says, 'Oh! These are yours.'
-      %send% %person% ~%mob% gives you %item.shortdesc%.
+      %send% %person% ~%mob% gives you @%item%.
     end
   elseif %person.vnum% == 18492
     set doctor %person%
@@ -825,7 +825,7 @@ while %person%
     %load% obj 18493 %person% inv
     set item %person.inventory(18493)%
     if %item%
-      %send% %person% ~%mob% gives you %item.shortdesc%.
+      %send% %person% ~%mob% gives you @%item%.
     end
   elseif %person.vnum% == 18491
     set doc_brown %person%
@@ -870,17 +870,17 @@ if %test%
   eval arg %test%
 end
 if !%actor.is_immortal%
-  %send% %actor% You can't use %self.shortdesc%. You need to be an immortal.
+  %send% %actor% You can't use @%self%. You need to be an immortal.
   halt
 end
 if !%instance%
-  %send% %actor% You need to be in an Unstable Portal instance to use %self.shortdesc%.
+  %send% %actor% You need to be in an Unstable Portal instance to use @%self%.
   return 1
   halt
 end
 set start_room %instance.start%
 if %start_room.template% != 18460
-  %send% %actor% You need to be in an Unstable Portal instance to use %self.shortdesc%.
+  %send% %actor% You need to be in an Unstable Portal instance to use @%self%.
   return 1
   halt
 end

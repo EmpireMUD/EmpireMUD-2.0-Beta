@@ -1122,7 +1122,7 @@ if %item.is_flagged(BOP)%
   eval bind %%item.bind(%self%)%%
   nop %bind%
 end
-* %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
+* %send% %actor% @%self% turns out to be @%item%!
 wait 1
 %purge% %self%
 ~
@@ -1165,7 +1165,7 @@ if %item.is_flagged(BOP)%
   eval bind %%item.bind(%self%)%%
   nop %bind%
 end
-* %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
+* %send% %actor% @%self% turns out to be @%item%!
 wait 1
 %purge% %self%
 ~
@@ -1186,7 +1186,7 @@ if %item.is_flagged(BOP)%
   eval bind %%item.bind(%self%)%%
   nop %bind%
 end
-* %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
+* %send% %actor% @%self% turns out to be @%item%!
 wait 1
 %purge% %self%
 ~
@@ -1211,7 +1211,7 @@ if %item.is_flagged(BOP)%
   eval bind %%item.bind(%self%)%%
   nop %bind%
 end
-* %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
+* %send% %actor% @%self% turns out to be @%item%!
 wait 1
 %purge% %self%
 ~
@@ -1295,8 +1295,8 @@ if %target% != %self%
   return 0
   halt
 end
-%send% %actor% You pry %self.shortdesc% open, revealing a compartment filled with wires...
-%echoaround% %actor% ~%actor% pries %self.shortdesc% open, revealing a compartment filled with wires...
+%send% %actor% You pry @%self% open, revealing a compartment filled with wires...
+%echoaround% %actor% ~%actor% pries @%self% open, revealing a compartment filled with wires...
 eval first_panel 12552 + %random.6%
 %load% obj %first_panel%
 %force% %actor% look panel
@@ -1600,8 +1600,8 @@ Colossus: Search leg alcove for book~
 search~
 %load% obj 12560 %actor% inv
 set obj %actor.inventory(12560)%
-%send% %actor% Searching the room, you find %obj.shortdesc% stuffed behind a broken gear.
-%echoaround% %actor% ~%actor% searches the room and finds %obj.shortdesc%.
+%send% %actor% Searching the room, you find @%obj% stuffed behind a broken gear.
+%echoaround% %actor% ~%actor% searches the room and finds @%obj%.
 detach 12557 %self.id%
 ~
 #12558
@@ -1628,8 +1628,8 @@ end
 * Start of script fragment: colossus damage updater
 eval colossus %instance.mob(12500)%
 if %colossus%
-  %send% %actor% You turn %self.shortdesc%...
-  %echoaround% %actor% ~%actor% turns %self.shortdesc%...
+  %send% %actor% You turn @%self%...
+  %echoaround% %actor% ~%actor% turns @%self%...
   %buildingecho% %instance.start% A shudder runs through the colossus!
   %at% %colossus.room% %echo% A shudder runs through the colossus!
   dg_affect #12501 %colossus% off

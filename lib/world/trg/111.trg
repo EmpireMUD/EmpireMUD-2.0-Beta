@@ -13,7 +13,7 @@ Hermit Food Exchange~
 0 j 100
 ~
 if %object.type% != FOOD || %self.varexists(gave%actor.id%)%
-  %send% %actor% ~%self% doesn't want %object.shortdesc%!
+  %send% %actor% ~%self% doesn't want @%object%!
   %send% %actor% (You have already completed this quest in this instance.)
   return 0
   halt
@@ -25,7 +25,7 @@ if %object.type% == FOOD
   %send% %actor% ~%self% gives you a snakeskin bag.
   %echoaround% %actor% ~%self% gives ~%actor% a snakeskin bag.
   %load% o 11100 %actor% inventory
-  %echo% ~%self% gleefully eats %object.shortdesc%!
+  %echo% ~%self% gleefully eats @%object%!
   mjunk %object.name%
   set gave%actor.id% 1
   remote gave%actor.id% %self.id%
@@ -59,11 +59,11 @@ remote befriend_pegasus %actor.id%
 * Behavior
 wait 1 sec
 if (%befriend_pegasus% < 3)
-  %send% %actor% ~%self% eats %object.shortdesc% and nuzzles you.
-  %echoaround% %actor% ~%self% eats %object.shortdesc% and nuzzles ~%actor%.
+  %send% %actor% ~%self% eats @%object% and nuzzles you.
+  %echoaround% %actor% ~%self% eats @%object% and nuzzles ~%actor%.
   mjunk all
 else
-  %echo% ~%self% eats %object.shortdesc% and nickers.
+  %echo% ~%self% eats @%object% and nickers.
   %send% %actor% It looks like you could ride *%self%!
   mjunk all
   * reset to 0
@@ -402,8 +402,8 @@ set target %self.val0%
 * Todo: eval vehicle %self.room.first_vehicle_in_room% / etc
 * and use %vehicle.name% instead of "a rib-bone boat"
 * (see mini-pet use for an example)
-%send% %actor% You use %self.shortdesc% and a rib-bone boat appears!
-%echoaround% %actor% ~%actor% uses %self.shortdesc% and a rib-bone boat appears!
+%send% %actor% You use @%self% and a rib-bone boat appears!
+%echoaround% %actor% ~%actor% uses @%self% and a rib-bone boat appears!
 %purge% %self%
 ~
 #11116
@@ -469,13 +469,13 @@ if !%hex_box_open%
   set hex_box_open 0
 end
 * Message
-%send% %actor% You push the image of the garden on the side of %self.shortdesc%.
-%echoaround% %actor% ~%actor% pushes the image of the garden on the side of %self.shortdesc%.
+%send% %actor% You push the image of the garden on the side of @%self%.
+%echoaround% %actor% ~%actor% pushes the image of the garden on the side of @%self%.
 * Fail: wrong order
 if %hex_box_open% != 0
   if %hex_box_open% > 0
-    %send% %actor% To your dismay, the sigils fade on the sides of %self.shortdesc%.
-    %echoaround% %actor% To |%actor% dismay, the sigils fade on the sides of %self.shortdesc%.
+    %send% %actor% To your dismay, the sigils fade on the sides of @%self%.
+    %echoaround% %actor% To |%actor% dismay, the sigils fade on the sides of @%self%.
   else
     %send% %actor% ... nothing seems to happen.
   end
@@ -502,13 +502,13 @@ if !%hex_box_open%
   set hex_box_open 0
 end
 * Message
-%send% %actor% You push the image of the mill on the side of %self.shortdesc%.
-%echoaround% %actor% ~%actor% pushes the image of the mill on the side of %self.shortdesc%.
+%send% %actor% You push the image of the mill on the side of @%self%.
+%echoaround% %actor% ~%actor% pushes the image of the mill on the side of @%self%.
 * Fail: wrong order
 if %hex_box_open% != 1
   if %hex_box_open% > 0
-    %send% %actor% To your dismay, the sigils fade on the sides of %self.shortdesc%.
-    %echoaround% %actor% To |%actor% dismay, the sigils fade on the sides of %self.shortdesc%.
+    %send% %actor% To your dismay, the sigils fade on the sides of @%self%.
+    %echoaround% %actor% To |%actor% dismay, the sigils fade on the sides of @%self%.
   else
     %send% %actor% ... nothing seems to happen.
   end
@@ -535,13 +535,13 @@ if !%hex_box_open%
   set hex_box_open 0
 end
 * Message
-%send% %actor% You push the image of the stable on the side of %self.shortdesc%.
-%echoaround% %actor% ~%actor% pushes the image of the stable on the side of %self.shortdesc%.
+%send% %actor% You push the image of the stable on the side of @%self%.
+%echoaround% %actor% ~%actor% pushes the image of the stable on the side of @%self%.
 * Fail: wrong order
 if %hex_box_open% != 2
   if %hex_box_open% > 0
-    %send% %actor% To your dismay, the sigils fade on the sides of %self.shortdesc%.
-    %echoaround% %actor% To |%actor% dismay, the sigils fade on the sides of %self.shortdesc%.
+    %send% %actor% To your dismay, the sigils fade on the sides of @%self%.
+    %echoaround% %actor% To |%actor% dismay, the sigils fade on the sides of @%self%.
   else
     %send% %actor% ... nothing seems to happen.
   end
@@ -568,13 +568,13 @@ if !%hex_box_open%
   set hex_box_open 0
 end
 * Message
-%send% %actor% You push the image of the estate on the side of %self.shortdesc%.
-%echoaround% %actor% ~%actor% pushes the image of the estate on the side of %self.shortdesc%.
+%send% %actor% You push the image of the estate on the side of @%self%.
+%echoaround% %actor% ~%actor% pushes the image of the estate on the side of @%self%.
 * Fail: wrong order
 if %hex_box_open% != 3
   if %hex_box_open% > 0
-    %send% %actor% To your dismay, the sigils fade on the sides of %self.shortdesc%.
-    %echoaround% %actor% To |%actor% dismay, the sigils fade on the sides of %self.shortdesc%.
+    %send% %actor% To your dismay, the sigils fade on the sides of @%self%.
+    %echoaround% %actor% To |%actor% dismay, the sigils fade on the sides of @%self%.
   else
     %send% %actor% ... nothing seems to happen.
   end
@@ -585,7 +585,7 @@ end
 %send% %actor% The image of the estate begins to glow!
 %echoaround% %actor% The image of the estate begins to glow!
 wait 1 sec
-%echo% The lid of %self.shortdesc% dissolves and the box opens!
+%echo% The lid of @%self% dissolves and the box opens!
 * replace with new item
 %load% obj 11141
 makeuid box obj openhexbox
@@ -604,8 +604,8 @@ if %sarcophagus_running% || !%self.is_name(%arg%)%
 end
 set sarcophagus_running 1
 global sarcophagus_running
-%send% %actor% You cautiously open %self.shortdesc%...
-%echoaround% %actor% ~%actor% cautiously opens %self.shortdesc%...
+%send% %actor% You cautiously open @%self%...
+%echoaround% %actor% ~%actor% cautiously opens @%self%...
 %echo% A giant shape lurches at you from the darkness inside!
 %load% mob 11138
 %load% obj 11140
@@ -637,9 +637,9 @@ while %iter%
   else
     * not one of our ingredients -- destroy it
     if %self.carried_by%
-      %send% %self.carried_by% %iter.shortdesc% dissolves in %self.shortdesc%.
+      %send% %self.carried_by% @%iter% dissolves in @%self%.
     else
-      %echo% %iter.shortdesc% dissolves in %self.shortdesc%.
+      %echo% @%iter% dissolves in @%self%.
     end
     %purge% %iter%
   end
@@ -647,7 +647,7 @@ while %iter%
 done
 * Victory against chalice!
 if (%found_cutting% == 1 && %found_pod% == 1 && %found_berries% == 1 && %found_redthorn% == 1)
-  %echo% %self.shortdesc% bursts into flames and melts into a slag of jewels and gold!
+  %echo% @%self% bursts into flames and melts into a slag of jewels and gold!
   * move players if still in instance
   if %instance.id%
     %adventurecomplete%
@@ -687,7 +687,7 @@ if %instance.id%
   * swap in i11150 for the old stone marker
   %door% i11130 east room i11150
   %echo% You find yourself back at the stone marker, where the adventure began!
-  %echo% %self.shortdesc% has vanished.
+  %echo% @%self% has vanished.
   %teleport% adventure i11150
   return 0
   %purge% %self%

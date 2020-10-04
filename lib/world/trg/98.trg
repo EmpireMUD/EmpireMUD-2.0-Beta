@@ -3,7 +3,7 @@ Generic No Sacrifice~
 1 h 100
 ~
 if %command% == sacrifice
-  %send% %actor% %self.shortdesc% cannot be sacrificed.
+  %send% %actor% @%self% cannot be sacrificed.
   return 0
   halt
 end

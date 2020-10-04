@@ -50,18 +50,18 @@ imperial ring: bind-to-empire~
 1 j 0
 ~
 if !%empire%
-  %send% %actor% %self.shortdesc% can't be used anymore.
+  %send% %actor% @%self% can't be used anymore.
   return 0
   halt
 end
 makeuid emp %empire%
 if !%emp%
-  %send% %actor% %self.shortdesc% is from a long-lost empire and can no longer be used.
+  %send% %actor% @%self% is from a long-lost empire and can no longer be used.
   return 0
   halt
 end
 if %actor.empire% != %emp%
-  %send% %actor% Only members of %emp.name% can use %self.shortdesc%.
+  %send% %actor% Only members of %emp.name% can use @%self%.
   return 0
   halt
 end

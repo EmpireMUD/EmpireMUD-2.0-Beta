@@ -13,28 +13,28 @@ set ability_required Enchant Tools
 set mana_cost 100
 set result_vnum 601
 if !%actor.ability(%ability_required%)%
-  %send% %actor% You need %ability_required% to enchant %self.shortdesc%.
+  %send% %actor% You need %ability_required% to enchant @%self%.
   return 1
   halt
 end
 if %actor.mana% < %mana_cost%
-  %send% %actor% You need %mana_cost% mana to enchant %self.shortdesc%.
+  %send% %actor% You need %mana_cost% mana to enchant @%self%.
   return 1
   halt
 end
 if !%actor.has_resources(%cost_item_vnum%, %cost_item_count%)%
-  %send% %actor% You need %cost_item_name% (x%cost_item_count%) to enchant %self.shortdesc%.
+  %send% %actor% You need %cost_item_name% (x%cost_item_count%) to enchant @%self%.
   return 1
   halt
 end
 nop %actor.add_resources(%cost_item_vnum%,-%cost_item_count%)%
-%send% %actor% You enchant %self.shortdesc%!
-%echoaround% %actor% ~%actor% enchants %self.shortdesc%!
+%send% %actor% You enchant @%self%!
+%echoaround% %actor% ~%actor% enchants @%self%!
 nop %actor.mana(-%mana_cost%)%
 %load% obj %result_vnum% %actor% inv
 set obj %actor.inventory()%
-%send% %actor% It becomes %obj.shortdesc%!
-%echoaround% %actor% It becomes %obj.shortdesc%!
+%send% %actor% It becomes @%obj%!
+%echoaround% %actor% It becomes @%obj%!
 %purge% %self%
 ~
 #601
@@ -53,12 +53,12 @@ if !%actor.canuseroom_member()%
   halt
 end
 if %room.sector_vnum% != 26
-  %send% %actor% You can only plant %self.shortdesc% in a desert grove.
+  %send% %actor% You can only plant @%self% in a desert grove.
   return 1
   halt
 end
-%send% %actor% You dig a hole and plant %self.shortdesc% in it.
-%echoaround% %actor% ~%actor% digs a hole and plant %self.shortdesc% in it.
+%send% %actor% You dig a hole and plant @%self% in it.
+%echoaround% %actor% ~%actor% digs a hole and plant @%self% in it.
 %echo% The trees around you twist and turn and take on a strange violet hue.
 %terraform% %room% 610
 %purge% %self%
@@ -135,12 +135,12 @@ if !%actor.canuseroom_member()%
   halt
 end
 if (%room.sector_vnum% != 0 && %room.sector_vnum% != 26)
-  %send% %actor% You can only plant %self.shortdesc% on open plains or in a desert grove.
+  %send% %actor% You can only plant @%self% on open plains or in a desert grove.
   return 1
   halt
 end
-%send% %actor% You dig a hole and plant %self.shortdesc% in it.
-%echoaround% %actor% ~%actor% digs a hole and plant %self.shortdesc% in it.
+%send% %actor% You dig a hole and plant @%self% in it.
+%echoaround% %actor% ~%actor% digs a hole and plant @%self% in it.
 %echo% Dozens of strange saplings spring up!
 if %room.sector_vnum% == 26
   %terraform% %room% 610
@@ -165,12 +165,12 @@ if !%actor.canuseroom_member()%
   halt
 end
 if %room.sector_vnum% != 0
-  %send% %actor% You can only plant %self.shortdesc% on open plains.
+  %send% %actor% You can only plant @%self% on open plains.
   return 1
   halt
 end
-%send% %actor% You dig a hole and plant %self.shortdesc% in it.
-%echoaround% %actor% ~%actor% digs a hole and plant %self.shortdesc% in it.
+%send% %actor% You dig a hole and plant @%self% in it.
+%echoaround% %actor% ~%actor% digs a hole and plant @%self% in it.
 %echo% Dozens of strange saplings spring up!
 %terraform% %room% 600
 %purge% %self%

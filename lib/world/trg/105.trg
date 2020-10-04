@@ -6,7 +6,7 @@ Glowkra consume~
 if !(eat /= %command%)
   halt
 end
-%send% %actor% As you consume %self.shortdesc%, your skin starts to glow slightly.
+%send% %actor% As you consume @%self%, your skin starts to glow slightly.
 dg_affect %actor% INFRA on 300
 ~
 #10501
@@ -124,7 +124,7 @@ Puppy receive treat~
 ~
 set treat 10528
 if %object.vnum% == %treat%
-  %echo% ~%self% chomps down happily on %object.shortdesc%!
+  %echo% ~%self% chomps down happily on @%object%!
   %purge% %object%
   wait 1 sec
   switch %random.3%
@@ -164,7 +164,7 @@ if %actor.varexists(%varname%)%
     if %diff%<10
       set diff 0%diff%
     end
-    %send% %actor% You must wait %diff2%:%diff% to use %self.shortdesc% again.
+    %send% %actor% You must wait %diff2%:%diff% to use @%self% again.
     halt
   end
 end
@@ -186,8 +186,8 @@ end
 set mob %room_var.people%
 if (%mob% && %mob.vnum% == %target%)
   %own% %mob% %actor.empire%
-  %send% %actor% You raise %self.shortdesc% high in the air, then drive it into the ground!
-  %echoaround% %actor% ~%actor% raises %self.shortdesc% high in the air, then drives it into the ground!
+  %send% %actor% You raise @%self% high in the air, then drive it into the ground!
+  %echoaround% %actor% ~%actor% raises @%self% high in the air, then drives it into the ground!
   %echo% ~%mob% bursts from the ground!
   set %varname% %timestamp%
   remote %varname% %actor.id%
@@ -222,8 +222,8 @@ if %found%
 elseif %mobs% > 4
   %send% %actor% There are too many mobs here already.
 else
-  %send% %actor% You use %self.shortdesc%...
-  %echoaround% %actor% ~%actor% uses %self.shortdesc%...
+  %send% %actor% You use @%self%...
+  %echoaround% %actor% ~%actor% uses @%self%...
   eval vnum 10501 + %random.4% - 1
   %load% m %vnum%
   set pet %self.room.people%
@@ -286,7 +286,7 @@ if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-%send% %actor% You must wield %self.shortdesc% to use it.
+%send% %actor% You must wield @%self% to use it.
 return 1
 ~
 #10514
@@ -329,9 +329,9 @@ switch %gem%
   break
 done
 if %self.carried_by%
-  %send% %self.carried_by% %self.shortdesc% in your inventory disintegrates, leaving behind %object%!
+  %send% %self.carried_by% @%self% in your inventory disintegrates, leaving behind %object%!
 else
-  %echo% %self.shortdesc% in the room disintegrates, leaving behind %object%!
+  %echo% @%self% in the room disintegrates, leaving behind %object%!
 end
 %purge% %self%
 ~
@@ -821,12 +821,12 @@ if %room.sector% != Overgrown Forest
   halt
 end
 if !%actor.canuseroom_member(%room%)%
-  %send% %actor% You don't have permission to use %self.shortdesc% here.
+  %send% %actor% You don't have permission to use @%self% here.
   return 1
   halt
 end
-%send% %actor% You plant %self.shortdesc%...
-%echoaround% %actor% ~%actor% plants %self.shortdesc%...
+%send% %actor% You plant @%self%...
+%echoaround% %actor% ~%actor% plants @%self%...
 %echo% The forest around you shifts slowly into an evergreen forest!
 %terraform% %room% 10565
 return 1
@@ -991,7 +991,7 @@ if %actor%
     if %item.is_flagged(BOP)%
       nop %item.bind(%self%)%
     end
-    * %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
+    * %send% %actor% @%self% turns out to be @%item%!
   end
 end
 %purge% %self%
@@ -1006,7 +1006,7 @@ if %actor.varexists(permafrost_mobs_iced)%
   end
 end
 if !%arg%
-  %send% %actor% What do you want to blast with %self.shortdesc%?
+  %send% %actor% What do you want to blast with @%self%?
   return 1
   halt
 end
@@ -1017,19 +1017,19 @@ if !%target%
   halt
 end
 if %target.is_npc% && %target.vnum% >= 10553 && %target.vnum% <= 10555
-  %send% %actor% You point %self.shortdesc% at ~%target% and unleash a blast of icy magic!
-  %echoaround% %actor% ~%actor% points %self.shortdesc% at ~%target% and unleashes a blast of icy magic!
+  %send% %actor% You point @%self% at ~%target% and unleash a blast of icy magic!
+  %echoaround% %actor% ~%actor% points @%self% at ~%target% and unleashes a blast of icy magic!
   %echo% ~%target% is encased in a huge block of ice!
   %purge% %target%
   %load% obj 10595 %actor.room%
 elseif %target.is_npc% && %target.vnum% >= 10550 && %target.vnum% <= 10552
-  %send% %actor% You point %self.shortdesc% at ~%target% and unleash a blast of icy magic!
-  %echoaround% %actor% ~%actor% points %self.shortdesc% at ~%target% and unleashes a blast of icy magic!
+  %send% %actor% You point @%self% at ~%target% and unleash a blast of icy magic!
+  %echoaround% %actor% ~%actor% points @%self% at ~%target% and unleashes a blast of icy magic!
   %echo% ~%target% absorbs the icy blast harmlessly.
   return 1
   halt
 else
-  %send% %actor% %self.shortdesc% only works on enemies from the Permafrost area of the Magiterranean.
+  %send% %actor% @%self% only works on enemies from the Permafrost area of the Magiterranean.
   return 1
   halt
 end
@@ -1109,9 +1109,9 @@ switch %random.4%
   break
 done
 if %actor%
-  %send% %actor% %self.shortdesc% in your inventory melts, turning into %object%!
+  %send% %actor% @%self% in your inventory melts, turning into %object%!
 else
-  %echo% %self.shortdesc% in the room melts, turning into %object%!
+  %echo% @%self% in the room melts, turning into %object%!
 end
 %purge% %self%
 ~

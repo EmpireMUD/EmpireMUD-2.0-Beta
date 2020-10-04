@@ -10,7 +10,7 @@ if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-%send% %actor% You click %self.shortdesc%... ah, that feels good.
+%send% %actor% You click @%self%... ah, that feels good.
 %echoaround% %actor% ~%actor% makes an annoying clicky sound with ^%actor% pen.
 nop %actor.gain_event_points(11500,1)%
 ~
@@ -90,7 +90,7 @@ end
 nop %pers.add_resources(%vnum%,%amt%)%
 set obj %pers.inventory(%vnum%)%
 if %obj%
-  %send% %pers% You find %amt%x %obj.shortdesc% in %self.shortdesc%!
+  %send% %pers% You find %amt%x @%obj% in @%self%!
 end
 %purge% %self%
 ~
@@ -166,7 +166,7 @@ end
 nop %pers.add_resources(%vnum%,%amt%)%
 set obj %pers.inventory(%vnum%)%
 if %obj%
-  %send% %pers% You find %amt%x %obj.shortdesc% in %self.shortdesc%!
+  %send% %pers% You find %amt%x @%obj% in @%self%!
 end
 %purge% %self%
 ~
@@ -193,7 +193,7 @@ if %actor.carrying% >= %actor.maxcarrying%
   halt
 end
 if !%arg%
-  %send% %actor% What do you want to catch with %self.shortdesc%?
+  %send% %actor% What do you want to catch with @%self%?
   return 1
   halt
 end
@@ -560,25 +560,25 @@ Upgrade pixy hunt gear~
 1 c 2
 upgrade~
 if !%arg%
-  %send% %actor% Use %self.shortdesc% on what? (only works on elf-made leather shoes and wishing bags)
+  %send% %actor% Use @%self% on what? (only works on elf-made leather shoes and wishing bags)
   halt
 end
 set target %actor.obj_target_inv(%arg%)%
 if !%target%
-  %send% %actor% You don't seem to have a '%arg%'. (You can only use %self.shortdesc% on items in your inventory.)
+  %send% %actor% You don't seem to have a '%arg%'. (You can only use @%self% on items in your inventory.)
   halt
 end
 if %target.vnum% != 11531 && %target.vnum% != 11533
-  %send% %actor% You can only use %self.shortdesc% on elf-made leather shoes and wishing bags.
+  %send% %actor% You can only use @%self% on elf-made leather shoes and wishing bags.
   halt
 end
 if %target.is_flagged(SUPERIOR)%
-  %send% %actor% %target.shortdesc% is already upgraded; using %self.shortdesc% would have no benefit.
+  %send% %actor% @%target% is already upgraded; using @%self% would have no benefit.
   halt
 end
-%send% %actor% You use %self.shortdesc% on %target.shortdesc%...
-%echoaround% %actor% ~%actor% uses %self.shortdesc% on %target.shortdesc%...
-%echo% %target.shortdesc% takes on a faint glow and floral smell... and looks a LOT better.
+%send% %actor% You use @%self% on @%target%...
+%echoaround% %actor% ~%actor% uses @%self% on @%target%...
+%echo% @%target% takes on a faint glow and floral smell... and looks a LOT better.
 nop %target.flag(SUPERIOR)%
 %scale% %target% %target.level%
 %purge% %self%

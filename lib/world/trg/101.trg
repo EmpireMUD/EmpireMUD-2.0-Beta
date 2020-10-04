@@ -242,16 +242,16 @@ Egg hatch~
 1 ab 1
 ~
 * Random trigger to hatch the egg.
-%echo% %self.shortdesc% begins to twitch.
+%echo% @%self% begins to twitch.
 wait 60 sec
-%echo% %self.shortdesc% twitches.
+%echo% @%self% twitches.
 wait 60 sec
-%echo% %self.shortdesc% begins to crack...
+%echo% @%self% begins to crack...
 wait 10 sec
-%echo% %self.shortdesc% splits open!
+%echo% @%self% splits open!
 wait 1 sec
 %load% mob 10113
-%echo% A baby dragon emerges from %self.shortdesc% and stretches its wings!
+%echo% A baby dragon emerges from @%self% and stretches its wings!
 %purge% %self%
 ~
 #10111
@@ -557,7 +557,7 @@ if %loc%
   while %obj%
     set next_obj %obj.next_in_list%
     if %obj.vnum% == 10171
-      %at% %loc% %echo% You lose track of %obj.shortdesc%.
+      %at% %loc% %echo% You lose track of @%obj%.
       %purge% %obj%
     end
     set obj %next_obj%
@@ -743,7 +743,7 @@ if %loc%
   while %obj%
     set next_obj %obj.next_in_list%
     if %obj.vnum% == 10171
-      %at% %loc% %echo% You lose track of %obj.shortdesc%.
+      %at% %loc% %echo% You lose track of @%obj%.
       %purge% %obj%
     end
     set obj %next_obj%
@@ -775,7 +775,7 @@ remote monsoon_chant_counter %actor.id%
 if !%actor.inventory(10143)%
   %load% obj 10143 %actor% inv
   set item %actor.inventory(10143)%
-  %send% %actor% You receive %item.shortdesc%.
+  %send% %actor% You receive @%item%.
 end
 ~
 #10148
@@ -1263,7 +1263,7 @@ if !%level%
 end
 %load% obj %next_item% %actor% inv %level%
 set item %actor.inventory()%
-%send% %actor% %self.shortdesc% opens, revealing %item.shortdesc%!
+%send% %actor% @%self% opens, revealing @%item%!
 set last_monsoon_loot_item %next_item%
 remote last_monsoon_loot_item %actor.id%
 %purge% %self%
@@ -1337,15 +1337,15 @@ set blood %actor.blood()%
 set cost 50
 * Condition checking
 if %blood% < %cost%
-  %send% %actor% You don't have enough blood to infuse %self.shortdesc% - it costs %cost%.
+  %send% %actor% You don't have enough blood to infuse @%self% - it costs %cost%.
   halt
 end
 if %actor.room.sector% != Oasis
-  %send% %actor% You can only infuse %self.shortdesc% at an oasis.
+  %send% %actor% You can only infuse @%self% at an oasis.
   halt
 end
 if %time.hour% > 7 && %time.hour% < 19
-  %send% %actor% You can only infuse %self.shortdesc% at night.
+  %send% %actor% You can only infuse @%self% at night.
   if !%actor.is_immortal%
     halt
   else
@@ -1420,8 +1420,8 @@ while %cycles_left% >= 0
       * Echo the eclipse globally
       %regionecho% %actor.room% -9999 A dark shadow covers the land as the sun is momentarily eclipsed.
       %quest% %actor% trigger 10157
-      %send% %actor% %self.shortdesc% splinters and breaks!
-      %echoaround% %actor% %self.shortdesc% splinters and breaks!
+      %send% %actor% @%self% splinters and breaks!
+      %echoaround% %actor% @%self% splinters and breaks!
       * Leave the loop
     break
   done
@@ -1451,7 +1451,7 @@ if %loc%
   while %obj%
     set next_obj %obj.next_in_list%
     if %obj.vnum% == 10171
-      %at% %loc% %echo% You lose track of %obj.shortdesc%.
+      %at% %loc% %echo% You lose track of @%obj%.
       %purge% %obj%
     end
     set obj %next_obj%
@@ -1550,8 +1550,8 @@ while %cycles_left% >= 0
       %echoaround% %actor% ~%actor% completes ^%actor% ritual by grabbing the monsoon rift with ^%actor% hands and pulling it shut!
       %send% %actor% You grab the monsoon rift with your hands and pull it shut!
       %quest% %actor% trigger 10145
-      %send% %actor% %self.shortdesc% bursts into flames!
-      %echoaround% %actor% %self.shortdesc% bursts into flames!
+      %send% %actor% @%self% bursts into flames!
+      %echoaround% %actor% @%self% bursts into flames!
       * Leave the loop
     break
   done
@@ -1581,7 +1581,7 @@ if %loc%
   while %obj%
     set next_obj %obj.next_in_list%
     if %obj.vnum% == 10171
-      %at% %loc% %echo% You lose track of %obj.shortdesc%.
+      %at% %loc% %echo% You lose track of @%obj%.
       %purge% %obj%
     end
     set obj %next_obj%

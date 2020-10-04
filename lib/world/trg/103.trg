@@ -182,8 +182,8 @@ if (%actor.position% != Standing)
   halt
 end
 %load% m %self.val0%
-%send% %actor% You use %self.shortdesc% and a dragon mount appears!
-%echoaround% %actor% ~%actor% uses %self.shortdesc% and a dragon mount appears!
+%send% %actor% You use @%self% and a dragon mount appears!
+%echoaround% %actor% ~%actor% uses @%self% and a dragon mount appears!
 %purge% %self%
 ~
 #10336
@@ -201,8 +201,8 @@ end
 %load% m %self.val0%
 set mob %self.room.people%
 if (%mob% && %mob.vnum% == %self.val0%)
-  %send% %actor% You use %self.shortdesc% and ~%mob% appears!
-  %echoaround% %actor% ~%actor% uses %self.shortdesc% and ~%mob% appears!
+  %send% %actor% You use @%self% and ~%mob% appears!
+  %echoaround% %actor% ~%actor% uses @%self% and ~%mob% appears!
   nop %mob.unlink_instance%
 end
 %purge% %self%
@@ -267,8 +267,8 @@ end
 set mob %self.room.people%
 if (%mob% && %mob.vnum% == %self.val0%)
   %own% %mob% %actor.empire%
-  %send% %actor% You use %self.shortdesc% and ~%mob% appears!
-  %echoaround% %actor% ~%actor% uses %self.shortdesc% and ~%mob% appears!
+  %send% %actor% You use @%self% and ~%mob% appears!
+  %echoaround% %actor% ~%actor% uses @%self% and ~%mob% appears!
 end
 %purge% %self%
 ~

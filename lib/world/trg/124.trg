@@ -88,7 +88,7 @@ Cove: Delayed Despawn~
 ~
 %adventurecomplete%
 return 0
-%echo% %self.shortdesc% stands up on small green legs and sidles away.
+%echo% @%self% stands up on small green legs and sidles away.
 %purge% %self%
 ~
 #12405
@@ -147,7 +147,7 @@ while %vnum% <= 12420
 done
 %send% %actor% You set the difficulty...
 %echoaround% %actor% ~%actor% sets the difficulty...
-%echo% You discover a passage hidden behind %self.shortdesc%.
+%echo% You discover a passage hidden behind @%self%.
 set newroom i12401
 %door% %self.room% north room %newroom%
 %load% obj 12461 room
@@ -188,8 +188,8 @@ set depleted 1
 global depleted
 %load% obj 12407 %actor% inv
 set item %actor.inventory(12407)%
-%send% %actor% Searching the cavern, you find %item.shortdesc%.
-%echoaround% %actor% ~%actor% searches the cavern and finds %item.shortdesc%.
+%send% %actor% Searching the cavern, you find @%item%.
+%echoaround% %actor% ~%actor% searches the cavern and finds @%item%.
 ~
 #12408
 Goblin Cove trash spawner~

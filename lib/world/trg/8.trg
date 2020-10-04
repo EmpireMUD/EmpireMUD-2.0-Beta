@@ -6,8 +6,8 @@ if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-%send% %actor% You look into %self.shortdesc%, but it's too tarnished to see a good reflection.
-%echoaround% %actor% ~%actor% looks into %self.shortdesc%.
+%send% %actor% You look into @%self%, but it's too tarnished to see a good reflection.
+%echoaround% %actor% ~%actor% looks into @%self%.
 ~
 #806
 Looking Glass reflection~
@@ -17,8 +17,8 @@ if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-%send% %actor% You look into %self.shortdesc%...
-%echoaround% %actor% ~%actor% looks into %self.shortdesc%.
+%send% %actor% You look into @%self%...
+%echoaround% %actor% ~%actor% looks into @%self%.
 if %actor.plr_flagged(VAMPIRE)%
   %send% %actor% You don't seem to have a reflection.
 else

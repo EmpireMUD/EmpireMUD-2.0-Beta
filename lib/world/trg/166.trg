@@ -42,8 +42,8 @@ if %cmd% == make
     end
     wait 5 s
     if !%actor.fighting% && %BuildRoom% == %self.room%
-      %send% %actor% As you place %self.shortdesc% on top, the snowman wiggles as though it is going to fall over, but then begins to dance around!
-      %echoaround% %actor% As %player_name% places %self.shortdesc% on top, the snowman wiggles as though it is going to fall over, but then begins to dance around!
+      %send% %actor% As you place @%self% on top, the snowman wiggles as though it is going to fall over, but then begins to dance around!
+      %echoaround% %actor% As %player_name% places @%self% on top, the snowman wiggles as though it is going to fall over, but then begins to dance around!
       %load% mob 16600 %actor.level%
       %quest% %actor% trigger 16606
       set snowman %self.room.people%
@@ -75,8 +75,8 @@ if %actor.has_resources(16605,3)%
 end
 set room %self.room%
 if %room.function(DRINK-WATER)% || %room.sector_flagged(DRINK)%
-  %send% %actor% You dip %self.shortdesc% into the water and it freezes the liquid into snow.
-  %echoaround% %actor% %player_name% dips %self.shortdesc% into the water and it freezes the liquid into snow.
+  %send% %actor% You dip @%self% into the water and it freezes the liquid into snow.
+  %echoaround% %actor% %player_name% dips @%self% into the water and it freezes the liquid into snow.
 else
   %send% %actor% You can't find snow worthy water here. Try somewhere you can drink fresh water.
   halt
@@ -105,7 +105,7 @@ if !(%actor.obj_target(%arg.car%)% == %self%)
   halt
 end
 if !%actor.on_quest(16602)% && !%actor.on_quest(16603)%
-  %send% %actor% You don't need %self.shortdesc%, might as well just toss it.
+  %send% %actor% You don't need @%self%, might as well just toss it.
 else
   set target %actor.char_target(%arg.cdr%)%
   if %actor.on_quest(16602)% && !(%target.vnum% == 10703)
@@ -285,8 +285,8 @@ if %old_xmas_tree%
   elseif %use_a_lighter% && !%light_with_mind%
     nop %use_a_lighter.used_lighter(%actor%)%
   end
-  %send% %actor% You light %old_xmas_tree.shortdesc% on fire!
-  %echoaround% %actor% ~%actor% lights %old_xmas_tree.shortdesc% on fire!
+  %send% %actor% You light @%old_xmas_tree% on fire!
+  %echoaround% %actor% ~%actor% lights @%old_xmas_tree% on fire!
   %load% obj 1002 room
   %purge% %old_xmas_tree%
 end
@@ -464,8 +464,8 @@ if !%room.is_outdoors%
   %send% %actor% You can only make a snow angel outside.
   halt
 end
-%send% %actor% You spread %self.shortdesc%, lay down, and swiftly make a snow angel on the ground.
-%echoaround% %actor% ~%actor% spreads %self.shortdesc%, lays down, and swiftly makes a snow angel on the ground.
+%send% %actor% You spread @%self%, lay down, and swiftly make a snow angel on the ground.
+%echoaround% %actor% ~%actor% spreads @%self%, lays down, and swiftly makes a snow angel on the ground.
 %load% obj 16609 room
 nop %actor.set_cooldown(16610, 30)%
 if !%self.varexists(angel_count)%
@@ -621,7 +621,7 @@ set theft_roll %random.100%
 if %actor.skill(stealth)% >= %theft_roll%
   %load% obj 16612 %actor% inv
   set item %actor.inventory()%
-  %send% %actor% You find %item.shortdesc%!
+  %send% %actor% You find @%item%!
 else
   nop %actor.set_cooldown(16601, 5)%
   %send% %actor% ~%self% turns in your direction and you have to abort your theft.
@@ -717,7 +717,7 @@ if %mob.vnum% != 16613
   %echo% Something went wrong...
   halt
 end
-%echo% ~%mob% sidles into view and you rush forward with %self.shortdesc%!
+%echo% ~%mob% sidles into view and you rush forward with @%self%!
 if %difficulty% == 1
   * Then we don't need to do anything
 elseif %difficulty% == 2
@@ -728,7 +728,7 @@ elseif %difficulty% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
-%echo% %self.shortdesc% bursts into blue flames and rapidly crumbles to ash.
+%echo% @%self% bursts into blue flames and rapidly crumbles to ash.
 %purge% %self%
 ~
 #16614
@@ -978,8 +978,8 @@ if %actor.on_quest(16618)%
     end
   end
 end
-%send% %actor% You dress ~%target% with %self.shortdesc%.
-%echoaround% %actor% ~%actor% dresses ~%target% with %self.shortdesc%.
+%send% %actor% You dress ~%target% with @%self%.
+%echoaround% %actor% ~%actor% dresses ~%target% with @%self%.
 %morph% %target% %morphnum%
 eval dress_up_counter %dress_up_counter% - 1
 if %dress_up_counter% > 0
@@ -1108,7 +1108,7 @@ freeze the pixy~
 1 c 2
 freeze~
 if !%arg%
-  %send% %actor% What do you want to blast with %self.shortdesc%?
+  %send% %actor% What do you want to blast with @%self%?
   return 1
   halt
 end
@@ -1123,12 +1123,12 @@ if !%target%
   halt
 end
 if %target.is_npc% && %target.vnum% == 16624
-  %send% %actor% You point %self.shortdesc% at ~%target% and unleash a blast of icy magic!
-  %echoaround% %actor% ~%actor% points %self.shortdesc% at ~%target% and unleashes a blast of icy magic!
+  %send% %actor% You point @%self% at ~%target% and unleash a blast of icy magic!
+  %echoaround% %actor% ~%actor% points @%self% at ~%target% and unleashes a blast of icy magic!
   %echo% ~%target% is covered in a layer of ice and becomes motionless.
   return 1
 else
-  %send% %actor% You can only use %self.shortdesc% on the winter pixies.
+  %send% %actor% You can only use @%self% on the winter pixies.
   return 1
   halt
 end
@@ -1146,18 +1146,18 @@ return 0
 set carried_by %self.carried_by%
 set pixy_rng %random.100%
 if %pixy_rng% <= 60
-  %send% %carried_by% %self.shortdesc% thaws out and suddenly vanishes in a poof of dust!
+  %send% %carried_by% @%self% thaws out and suddenly vanishes in a poof of dust!
   %echoaround% %carried_by% ~%carried_by% is mysteriously engulfed in a cloud of dust!
 elseif %pixy_rng% <= 80
-  %send% %carried_by% %self.shortdesc% melts in your hands, but the cold seems to intensify until you're frozen yourself!
+  %send% %carried_by% @%self% melts in your hands, but the cold seems to intensify until you're frozen yourself!
   %echoaround% %carried_by% ~%carried_by% starts turning blue, and eventually comes to a halt as though frozen in place!
   dg_affect #16625 %carried_by% HARD-STUNNED on 60
 elseif %pixy_rng% <= 95
-  %send% %carried_by% %self.shortdesc% warms and angrily covers you in dust, you feel drunk all of a sudden!
+  %send% %carried_by% @%self% warms and angrily covers you in dust, you feel drunk all of a sudden!
   %echoaround% %carried_by% ~%carried_by% sparkles for a moment and begins to stagger.
   nop %carried_by.drunk(30)%
 else
-  %send% %carried_by% %self.shortdesc% has apparently thawed out and is quite furious with you!
+  %send% %carried_by% @%self% has apparently thawed out and is quite furious with you!
   %echoaround% %carried_by% A furious pixy begins to attack ~%carried_by% out of no where!
   %load% mob 16625 room
   %force% %self.room.people% kill %carried_by.name%
@@ -1174,22 +1174,22 @@ if !%arg%
 end
 set christmas_tree %self.room.contents(16607)%
 if !%christmas_tree%
-  %send% %actor% There's no Christmas tree here for you to place %self.shortdesc% on top of.
+  %send% %actor% There's no Christmas tree here for you to place @%self% on top of.
   halt
 end
 if %actor.obj_target(%arg%)% != %self%
-  %send% %actor% Only %self.shortdesc% can be used to top a Christmas tree.
+  %send% %actor% Only @%self% can be used to top a Christmas tree.
   halt
 end
 if !%christmas_tree.varexists(pixy_topped_off)%
   %mod% %christmas_tree% append-lookdesc-noformat On top %self.shortdesc% sits, frozen in place.
-  %send% %actor% You place %self.shortdesc% on top of %christmas_tree.shortdesc%.
-  %echoaround% %actor% ~%actor% places %self.shortdesc% on top of %christmas_tree.shortdesc%.
+  %send% %actor% You place @%self% on top of @%christmas_tree%.
+  %echoaround% %actor% ~%actor% places @%self% on top of @%christmas_tree%.
   set pixy_topped_off 1
   remote pixy_topped_off %christmas_tree.id%
 else
-  %send% %actor% You remove %christmas_tree.player_topped_tree%'s pixy from %christmas_tree.shortdesc% and throw it away, before placing your own.
-  %echoaround% %actor% ~%actor% removes %christmas_tree.player_topped_tree%'s pixy from %christmas_tree.shortdesc% and throws it away, before placing ^%actor% own on top.
+  %send% %actor% You remove %christmas_tree.player_topped_tree%'s pixy from @%christmas_tree% and throw it away, before placing your own.
+  %echoaround% %actor% ~%actor% removes %christmas_tree.player_topped_tree%'s pixy from @%christmas_tree% and throws it away, before placing ^%actor% own on top.
 end
 set player_topped_tree %actor.name%
 remote player_topped_tree %christmas_tree.id%
@@ -1217,8 +1217,8 @@ if %buffnum% != 16621 && %buffnum% != 16622 && %buffnum% != 16623 && %buffnum% !
   halt
 end
 otimer 1152
-%send% %actor% You buff %buffing.shortdesc% with a cloth, extending the beauty.
-%echoaround% %actor% ~%actor% buffs %buffing.shortdesc% with a cloth, extending the beauty.
+%send% %actor% You buff @%buffing% with a cloth, extending the beauty.
+%echoaround% %actor% ~%actor% buffs @%buffing% with a cloth, extending the beauty.
 ~
 #16628
 throw the enchanted snowball~
@@ -1232,7 +1232,7 @@ elseif !(%actor.obj_target(%arg.car%)% == %self%)
   halt
 end
 if !%arg.cdr%
-  %send% %actor% Fine, but who or what did you want to throw %self.shortdesc% at?
+  %send% %actor% Fine, but who or what did you want to throw @%self% at?
   halt
 end
 if (abominable /= %arg.cdr%) || (snowman /= %arg.cdr%)
@@ -1248,11 +1248,11 @@ if (abominable /= %arg.cdr%) || (snowman /= %arg.cdr%)
     halt
   end
 else
-  %send% %actor% You can only freeze the abominable snowman with %self.shortdesc%.
+  %send% %actor% You can only freeze the abominable snowman with @%self%.
   halt
 end
-%send% %actor% You throw %self.shortdesc% at ~%AbominableSnowmanHere% with all your might...
-%echoaround% %actor% ~%actor% throws %self.shortdesc% at ~%AbominableSnowmanHere% with all ^%actor% might...
+%send% %actor% You throw @%self% at ~%AbominableSnowmanHere% with all your might...
+%echoaround% %actor% ~%actor% throws @%self% at ~%AbominableSnowmanHere% with all ^%actor% might...
 %load% obj 16630 room
 wait 1
 %echo% Instantly ~%AbominableSnowmanHere% freezes solid!
@@ -1275,17 +1275,17 @@ if !(%actor.obj_target(%arg.car%)% == %self%)
   halt
 end
 if %arg.cdr% != freezing
-  %send% %actor% You must enchant %self.shortdesc% with freezing to subdue the abominable snowman.
+  %send% %actor% You must enchant @%self% with freezing to subdue the abominable snowman.
   halt
 end
 if !%actor.has_resources(1300,6)%
-  %send% %actor% It will take six seashells to enchant %self.shortdesc% with freezing.
+  %send% %actor% It will take six seashells to enchant @%self% with freezing.
   halt
 end
 nop %actor.add_resources(1300, -6)%
 %load% obj 16628 %actor% inv
-%send% %actor% You enchant %self.shortdesc% with freezing.
-%echoaround% %actor% ~%actor% enchants %self.shortdesc% with freezing.
+%send% %actor% You enchant @%self% with freezing.
+%echoaround% %actor% ~%actor% enchants @%self% with freezing.
 %purge% %self%
 ~
 #16630
@@ -1413,7 +1413,7 @@ end
 * everything else will return 1
 return 1
 if %sleigh.vnum% != 10715
-  %send% %actor% You can only use %self.shortdesc% to enchant an ordinary red sleigh from the Winter Wonderland adventure.
+  %send% %actor% You can only use @%self% to enchant an ordinary red sleigh from the Winter Wonderland adventure.
   halt
 end
 if (!%actor.empire% || %actor.empire% != %sleigh.empire%)
@@ -1447,8 +1447,8 @@ end
 set upgr %self.room.vehicles%
 if %upgr.vnum% == 16650
   %own% %upgr% %sleigh.empire%
-  %send% %actor% You polish %sleigh.shortdesc% with %self.shortdesc%...
-  %echoaround% %actor% ~%actor% polishes %sleigh.shortdesc% with %self.shortdesc%...
+  %send% %actor% You polish %sleigh.shortdesc% with @%self%...
+  %echoaround% %actor% ~%actor% polishes %sleigh.shortdesc% with @%self%...
   %echo% It begins to fly!
   %purge% %sleigh%
   %purge% %self%
@@ -1476,33 +1476,33 @@ end
 * All other results return 1
 return 1
 if !%self.room.function(STABLE)%
-  %send% %actor% You can only use %self.shortdesc% at a stable.
+  %send% %actor% You can only use @%self% at a stable.
   halt
 elseif (%actor.has_mount(10700)% && !%actor.has_mount(16652)%)
-  %send% %actor% You use %self.shortdesc% and upgrade your flying reindeer mount to a red-nosed reindeer!
+  %send% %actor% You use @%self% and upgrade your flying reindeer mount to a red-nosed reindeer!
   nop %actor.remove_mount(10700)%
   nop %actor.add_mount(16652)%
 elseif (%actor.has_mount(10705)% && !%actor.has_mount(10700)%)
-  %send% %actor% You use %self.shortdesc% and upgrade your reindeer mount to a flying reindeer!
+  %send% %actor% You use @%self% and upgrade your reindeer mount to a flying reindeer!
   nop %actor.remove_mount(10705)%
   nop %actor.add_mount(10700)%
 elseif (%actor.has_mount(9175)% && !%actor.has_mount(10700)%)
-  %send% %actor% You use %self.shortdesc% and upgrade your reindeer mount to a flying reindeer!
+  %send% %actor% You use @%self% and upgrade your reindeer mount to a flying reindeer!
   nop %actor.remove_mount(9175)%
   nop %actor.add_mount(10700)%
 elseif (%actor.has_mount(9176)% && !%actor.has_mount(10700)%)
-  %send% %actor% You use %self.shortdesc% and upgrade your barded reindeer mount to a flying reindeer!
+  %send% %actor% You use @%self% and upgrade your barded reindeer mount to a flying reindeer!
   nop %actor.remove_mount(9176)%
   nop %actor.add_mount(10700)%
 elseif %actor.has_mount(16652)%
-  %send% %actor% You already have a red-nosed reindeer mount. You can't do anything with %self.shortdesc%.
+  %send% %actor% You already have a red-nosed reindeer mount. You can't do anything with @%self%.
   halt
 else
   %send% %actor% You don't have a reindeer mount you can use the polish on. Try looking around the tundra.
   halt
 end
 * if we get here, we used it successfully
-%echoaround% %actor% ~%actor% uses %self.shortdesc%!
+%echoaround% %actor% ~%actor% uses @%self%!
 %purge% %self%
 ~
 #16655
@@ -1517,23 +1517,23 @@ end
 set target %actor.obj_target_inv(%arg%)%
 if !%target%
   * Pass through to upgrade command (upgrading building)
-  * %send% %actor% You don't seem to have a '%arg%'. (You can only use %self.shortdesc% on items in your inventory.)
+  * %send% %actor% You don't seem to have a '%arg%'. (You can only use @%self% on items in your inventory.)
   return 0
   halt
 end
 * All other cases return 1
 return 1
 if %target.vnum% != 16653 && %target.vnum% != 16654 && %target.vnum% != 10711 && %target.vnum% != 10712
-  %send% %actor% You can only use %self.shortdesc% on the gift sack, sweater, and hat from Winter Wonderland.
+  %send% %actor% You can only use @%self% on the gift sack, sweater, and hat from Winter Wonderland.
   halt
 end
 if %target.is_flagged(SUPERIOR)% || %target.vnum% == 16654
-  %send% %actor% %target.shortdesc% is already upgraded; using %self.shortdesc% would have no benefit.
+  %send% %actor% @%target% is already upgraded; using @%self% would have no benefit.
   halt
 end
-%send% %actor% You sprinkle %self.shortdesc% onto %target.shortdesc%...
-%echoaround% %actor% ~%actor% sprinkles %self.shortdesc% onto %target.shortdesc%...
-%echo% %target.shortdesc% begins to shimmer and glow!
+%send% %actor% You sprinkle @%self% onto @%target%...
+%echoaround% %actor% ~%actor% sprinkles @%self% onto @%target%...
+%echo% @%target% begins to shimmer and glow!
 if %target.vnum% == 16653
   * sweater version: replace item
   %load% obj 16654 %actor% inv
@@ -1628,8 +1628,8 @@ switch %random.4%
 done
 * Main work
 nop %actor.set_cooldown(16657, 3)%
-%send% %actor% You spin %self.shortdesc%...
-%echoaround% %actor% ~%actor% spins %self.shortdesc%...
+%send% %actor% You spin @%self%...
+%echoaround% %actor% ~%actor% spins @%self%...
 %echo% It falls down showing '%sign%'.
 remote sign %self.id%
 * Strings
@@ -1724,12 +1724,12 @@ else
   * Remaining %: small resource shipment
   set vnum 11513
 end
-%send% %actor% You open %self.shortdesc%...
-%echoaround% %actor% ~%actor% opens %self.shortdesc%...
+%send% %actor% You open @%self%...
+%echoaround% %actor% ~%actor% opens @%self%...
 %load% obj %vnum% %actor%
 set gift %actor.inventory%
 if %gift.vnum% == %vnum%
-  %echo% It contained %gift.shortdesc%!
+  %echo% It contained @%gift%!
 else
   %echo% It's empty!
 end

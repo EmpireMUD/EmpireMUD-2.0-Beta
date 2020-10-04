@@ -1433,15 +1433,15 @@ while %cycle% >= 0
   * Rather than setting error in 10 places, just assume there's an error and clear it if there isn't
   set error 1
   if %actor.fighting%
-    %send% %actor% You can't use %self.shortdesc% during combat.
+    %send% %actor% You can't use @%self% during combat.
   elseif %actor.position% != Standing
-    %send% %actor% You need to be standing up to use %self.shortdesc%.
+    %send% %actor% You need to be standing up to use @%self%.
   elseif !%actor.can_teleport_room%
     %send% %actor% You can't teleport out of here.
   elseif !%loc%
     %send% %actor% There is no valid location to teleport to.
   elseif %actor.aff_flagged(DISTRACTED)%
-    %send% %actor% You are too distracted to use %self.shortdesc%!
+    %send% %actor% You are too distracted to use @%self%!
   else
     set error 0
   end
@@ -1452,19 +1452,19 @@ while %cycle% >= 0
   end
   if %actor.room% != %room_var% || %self.carried_by% != %actor% || %error%
     if %cycle% > 0
-      %send% %actor% %self.shortdesc% sparks and fizzles.
+      %send% %actor% @%self% sparks and fizzles.
       %echoaround% %actor% |%actor% trinket sparks and fizzles.
     end
     halt
   end
   switch %cycle%
     case 0
-      %send% %actor% You touch %self.shortdesc% and the glyphs carved into it light up...
-      %echoaround% %actor% ~%actor% touches %self.shortdesc% and the glyphs carved into it light up...
+      %send% %actor% You touch @%self% and the glyphs carved into it light up...
+      %echoaround% %actor% ~%actor% touches @%self% and the glyphs carved into it light up...
     break
     case 1
-      %send% %actor% The glyphs on %self.shortdesc% glow a deep blue and the light begins to envelop you!
-      %echoaround% %actor% The glyphs on %self.shortdesc% glow a deep blue and the light begins to envelop ~%actor%!
+      %send% %actor% The glyphs on @%self% glow a deep blue and the light begins to envelop you!
+      %echoaround% %actor% The glyphs on @%self% glow a deep blue and the light begins to envelop ~%actor%!
     break
     case 2
       %echoaround% %actor% ~%actor% vanishes in a flash of blue light!

@@ -26,15 +26,15 @@ else
   return 0
   halt
 end
-%send% %actor% You toss %self.shortdesc% into an open grave...
-%echoaround% %actor% ~%actor% tosses %self.shortdesc% into an open grave...
+%send% %actor% You toss @%self% into an open grave...
+%echoaround% %actor% ~%actor% tosses @%self% into an open grave...
 %load% mob 18800
 set mob %room.people%
 if %mob.vnum% != 18800
   %echo% Something went wrong.
   halt
 end
-%echo% ~%mob% rises from the grave and devours %self.shortdesc%!
+%echo% ~%mob% rises from the grave and devours @%self%!
 %purge% %self%
 ~
 #18801
@@ -104,8 +104,8 @@ while %cycles_left% >= 0
   end
   switch %cycles_left%
     case 3
-      %send% %actor% You light %self.shortdesc% and hold it aloft!
-      %echoaround% %actor% ~%actor% lights %self.shortdesc% and holds it aloft!
+      %send% %actor% You light @%self% and hold it aloft!
+      %echoaround% %actor% ~%actor% lights @%self% and holds it aloft!
     break
     case 2
       %echo% A thick, clammy fog begins to blow in from all directions...
@@ -142,7 +142,7 @@ elseif %difficulty% == 4
   nop %mob.add_mob_flag(HARD)%
   nop %mob.add_mob_flag(GROUP)%
 end
-%echo% %self.shortdesc% bursts into blue flames and rapidly crumbles to ash.
+%echo% @%self% bursts into blue flames and rapidly crumbles to ash.
 %purge% %self%
 ~
 #18802
@@ -160,8 +160,8 @@ if %object.vnum% == 18802
   wait 5
   %load% obj 18826 %actor% inventory
   set item %actor.inventory(18826)%
-  %send% %actor% ~%self% gives you %item.shortdesc%!
-  %echoaround% %actor% ~%self% gives ~%actor% %item.shortdesc%!
+  %send% %actor% ~%self% gives you @%item%!
+  %echoaround% %actor% ~%self% gives ~%actor% @%item%!
 else
   %send% %actor% ~%self% politely declines your gift.
   return 0
@@ -344,7 +344,7 @@ if !%target%
   halt
 end
 if %target.is_pc%
-  %send% %actor% You can't costume players with %self.shortdesc%.
+  %send% %actor% You can't costume players with @%self%.
   halt
 elseif !%target.mob_flagged(HUMAN)%
   %send% %actor% You can't put a costume on ~%target%.
@@ -453,7 +453,7 @@ toad citizen~
 1 c 2
 polymorph~
 if %self.val0% == 0
-  %send% %actor% %self.shortdesc% is out of charges.
+  %send% %actor% @%self% is out of charges.
   halt
 end
 if %actor.cooldown(18821)% > 0
@@ -477,17 +477,17 @@ if %target.is_pc%
   %send% %actor% That seems kind of mean, don't you think?
   halt
 elseif %target.vnum% != 202 && %target.vnum% != 203
-  %send% %actor% You can only use %self.shortdesc% on generic empire citizens.
+  %send% %actor% You can only use @%self% on generic empire citizens.
   halt
 elseif %target.morph%
-  %send% %actor% You can't use %self.shortdesc% on people who are already disguised or transformed.
+  %send% %actor% You can't use @%self% on people who are already disguised or transformed.
   halt
 else
   set prev_name %target.name%
   set costume_vnum 18821
   %morph% %target% %costume_vnum%
-  %send% %actor% You wave %self.shortdesc% at %prev_name%, who turns into ~%target%!
-  %echoaround% %actor% ~%actor% waves %self.shortdesc% at %prev_name%, who turns into ~%target%!
+  %send% %actor% You wave @%self% at %prev_name%, who turns into ~%target%!
+  %echoaround% %actor% ~%actor% waves @%self% at %prev_name%, who turns into ~%target%!
   set charges %self.val0%
   eval charges %charges% - 1
   if %charges% == 0
@@ -521,7 +521,7 @@ end
 %load% mob 18822
 set mob %room.people%
 if %mob.vnum% == 18822
-  %echo% ~%mob% emerges from %self.shortdesc%!
+  %echo% ~%mob% emerges from @%self%!
 end
 ~
 #18823
@@ -572,8 +572,8 @@ while %cycles_left% >= 0
       %send% %actor% You finish your ritual as spirits begin to fill the air!
       %load% obj 18822 room
       %quest% %actor% trigger 18823
-      %send% %actor% %self.shortdesc% bursts into flames!
-      %echoaround% %actor% %self.shortdesc% bursts into flames!
+      %send% %actor% @%self% bursts into flames!
+      %echoaround% %actor% @%self% bursts into flames!
       %quest% %actor% finish 18823
       * Leave the loop
     break
@@ -594,7 +594,7 @@ if %actor.obj_target(%arg%)% != %self%
   halt
 end
 if %self.val0% < 1
-  %send% %actor% %self.shortdesc% has run out.
+  %send% %actor% @%self% has run out.
   halt
 end
 if %actor.cooldown(18824)% > 0
@@ -612,15 +612,15 @@ while %item%
 done
 set vnum %room.building_vnum%
 if !%vnum%
-  %send% %actor% You can only use %self.shortdesc% inside a house.
+  %send% %actor% You can only use @%self% inside a house.
   halt
 end
 if %room.max_citizens% < 1
-  %send% %actor% You can only use %self.shortdesc% inside a house.
+  %send% %actor% You can only use @%self% inside a house.
   halt
 end
-%send% %actor% You start applying %self.shortdesc% to the walls of the building...
-%echoaround% %actor% ~%actor% starts applying %self.shortdesc% to the walls of the building...
+%send% %actor% You start applying @%self% to the walls of the building...
+%echoaround% %actor% ~%actor% starts applying @%self% to the walls of the building...
 wait 1 sec
 * Skill check
 set chance %random.100%
@@ -641,7 +641,7 @@ else
   %load% obj 18825 room
   set charges %self.val0%
   if %charges% == 1
-    %send% %actor% %self.shortdesc% runs out!
+    %send% %actor% @%self% runs out!
     %quest% %actor% trigger 18824
     %quest% %actor% finish 18824
   else
@@ -783,12 +783,12 @@ else
   * Remaining 11%: black rose
   set vnum 18889
 end
-%send% %actor% You open %self.shortdesc%...
-%echoaround% %actor% ~%actor% opens %self.shortdesc%...
+%send% %actor% You open @%self%...
+%echoaround% %actor% ~%actor% opens @%self%...
 %load% obj %vnum% %actor%
 set gift %actor.inventory%
 if %gift.vnum% == %vnum%
-  %echo% It contained %gift.shortdesc%!
+  %echo% It contained @%gift%!
 else
   %echo% It's empty!
 end
@@ -807,23 +807,23 @@ end
 set target %actor.obj_target_inv(%arg%)%
 if !%target%
   * Pass through to upgrade command (upgrading building)
-  * %send% %actor% You don't seem to have a '%arg%'. (You can only use %self.shortdesc% on items in your inventory.)
+  * %send% %actor% You don't seem to have a '%arg%'. (You can only use @%self% on items in your inventory.)
   return 0
   halt
 end
 * All other cases return 1
 return 1
 if %target.vnum% != 18836 && %target.vnum% != 18883 && %target.vnum% != 18884 && %target.vnum% != 18847
-  %send% %actor% You can only use %self.shortdesc% on the plague doctor mask, oversized candy bag, ghastly shackles, or haunted mask.
+  %send% %actor% You can only use @%self% on the plague doctor mask, oversized candy bag, ghastly shackles, or haunted mask.
   halt
 end
 if %target.is_flagged(SUPERIOR)%
-  %send% %actor% %target.shortdesc% is already upgraded; using %self.shortdesc% would have no benefit.
+  %send% %actor% @%target% is already upgraded; using @%self% would have no benefit.
   halt
 end
-%send% %actor% You carefully pour %self.shortdesc% onto %target.shortdesc%...
-%echoaround% %actor% ~%actor% pours %self.shortdesc% onto %target.shortdesc%...
-%echo% %target.shortdesc% takes on a spooky glow!
+%send% %actor% You carefully pour @%self% onto @%target%...
+%echoaround% %actor% ~%actor% pours @%self% onto @%target%...
+%echo% @%target% takes on a spooky glow!
 nop %target.flag(SUPERIOR)%
 if %target.level% > 0
   %scale% %target% %target.level%
@@ -954,7 +954,7 @@ if %stealth_roll% > 10
   nop %target.add_mob_flag(*PICKPOCKETED)%
   %load% obj 18855 %actor% inv
   set item %actor.inventory()%
-  %send% %actor% You find %item.shortdesc%!
+  %send% %actor% You find @%item%!
   return 1
 else
   return 0
@@ -968,7 +968,7 @@ look in magic mirror~
 1 c 2
 look examine~
 if !%actor.on_quest(18856)%
-  %send% %actor% %self.shortdesc%? What about %self.shortdesc%?
+  %send% %actor% @%self%? What about @%self%?
   %purge% %self%
   halt
 end
@@ -986,8 +986,8 @@ if !%actor.eq(clothes)%
   halt
 end
 set clothing %actor.eq(clothes)%
-%send% %actor% You see yourself, ~%actor%, wearing %clothing.shortdesc%.
-%echoaround% %actor% You see ~%actor% look into %self.shortdesc%.
+%send% %actor% You see yourself, ~%actor%, wearing @%clothing%.
+%echoaround% %actor% You see ~%actor% look into @%self%.
 set vnum %clothing.vnum%
 set clothing_count 1
 if !%self.varexists(list_clothing)%
@@ -1060,7 +1060,7 @@ switch %clothing_count%
     set build_up %self.clothing1%, the second %self.clothing2%, the third %self.clothing3%, the fourth %self.clothing4%, and the latest %self.clothing5%.
   break
 done
-%send% %actor% In the background of %self.shortdesc% you see %clothing_count% shadowy %shadows% %build_up%
+%send% %actor% In the background of @%self% you see %clothing_count% shadowy %shadows% %build_up%
 if !%actor.quest_finished(18856)%
   %send% %actor% %left%
 else
@@ -1074,14 +1074,14 @@ challenge accept~
 if %cmd% == challenge
   set owner %self.owner%
   if %actor% != %owner%
-    %send% %actor% If you wanted to challenge someone, perhaps you should get your own %self.shortdesc%?
+    %send% %actor% If you wanted to challenge someone, perhaps you should get your own @%self%?
     return 1
     halt
   end
   if !%actor.on_quest(18857)%
     %send% %actor% You hear a ghostly voice whisper, 'You should not have this any longer.'
     %echoaround% %actor% You hear a ghostly voice whispering, but can't make out the words.
-    %echo% The %self.shortdesc% vanishes into a puff of smoke!
+    %echo% The @%self% vanishes into a puff of smoke!
     return 1
     %purge% %self%
     halt
@@ -1134,7 +1134,7 @@ if %cmd% == accept
   end
   if !%owner.on_quest(18857)%
     %send% %actor% You here spirits whisper, '%owner.pc_name% should no longer have this.'
-    %echo% The %self.shortdesc% vanishes in a puff of smoke!
+    %echo% The @%self% vanishes in a puff of smoke!
     return 1
     halt
   end
@@ -1156,12 +1156,12 @@ apple bobbing bob~
 1 c 4
 bob~
 if !(%actor.obj_target(%arg%)% == %self%)
-  %send% %actor% You can only bob in the %self.shortdesc%.
+  %send% %actor% You can only bob in the @%self%.
   return 1
   halt
 end
 if !%self.varexists(turn)%
-  %send% %actor% A challenge must be offered and accepted before anyone can bob for apples from this %self.shortdesc%.
+  %send% %actor% A challenge must be offered and accepted before anyone can bob for apples from this @%self%.
   return 1
   halt
 end
@@ -1204,7 +1204,7 @@ apple bobbing bucket was left behind~
 if %self.carried_by%
   set actor %self.carried_by%
   if !%actor.on_quest(18857)%
-    %send% %actor% The %self.shortdesc% vanishes from your arms in a poof of smoke!
+    %send% %actor% The @%self% vanishes from your arms in a poof of smoke!
     %purge% %self%
     halt
   end
@@ -1217,7 +1217,7 @@ while %person%
   end
   set person %person.next_in_room%
 done
-%echo% The %self.shortdesc% vanishes in a poof of smoke!
+%echo% The @%self% vanishes in a poof of smoke!
 %purge% %self%
 ~
 #18860
@@ -1226,7 +1226,7 @@ bobbing please stand up~
 bob stand~
 if %cmd% == bob
   if !(%actor.obj_target(%arg%)% == %self%)
-    %send% %actor% You can only bob for apples in the %self.shortdesc%.
+    %send% %actor% You can only bob for apples in the @%self%.
     return 1
     halt
   end
@@ -1653,7 +1653,7 @@ if !%vnum% || !%actor.has_mount(%vnum%)%
   halt
 end
 if !%self.room.function(STABLE)%
-  %send% %actor% You can only use %self.shortdesc% at a stable.
+  %send% %actor% You can only use @%self% at a stable.
   halt
 end
 * validate upgrade
@@ -1667,14 +1667,14 @@ end
 * ok do it
 if %vnum% == 18879
   nop %actor.remove_mount(18879)%
-  %send% %actor% You pour %self.shortdesc% onto your giant tarantula... It curls into a little ball...
+  %send% %actor% You pour @%self% onto your giant tarantula... It curls into a little ball...
   %send% %actor% Your giant tarantula splits open and a giant tarantula hawk flies out! You gain a new mount.
-  %echoaround% %actor% ~%actor% pours %self.shortdesc% onto a giant tarantula... It splits open and a giant tarantula hawk flies out!
+  %echoaround% %actor% ~%actor% pours @%self% onto a giant tarantula... It splits open and a giant tarantula hawk flies out!
   nop %actor.add_mount(18878)%
 elseif %vnum% == 18839
   nop %actor.remove_mount(18839)%
-  %send% %actor% You pour %self.shortdesc% onto your headless horse... It sprouts bat wings and begins to fly!
-  %echoaround% %actor% ~%actor% pours %self.shortdesc% onto a headless horse... It sprouts bat wings and begins to fly!
+  %send% %actor% You pour @%self% onto your headless horse... It sprouts bat wings and begins to fly!
+  %echoaround% %actor% ~%actor% pours @%self% onto a headless horse... It sprouts bat wings and begins to fly!
   nop %actor.add_mount(18838)%
 else
   %send% %actor% It didn't seem to work.
@@ -1788,7 +1788,7 @@ else
 end
 * check room
 if !%room.function(TOMB)%
-  %send% %actor% You need to place %self.shortdesc% at Grandmother %halloween_grandma%'s tomb.
+  %send% %actor% You need to place @%self% at Grandmother %halloween_grandma%'s tomb.
   halt
 end
 * load room obj
@@ -1819,8 +1819,8 @@ if %new.vnum% == 18881%
   set day_count %dailycycle%
   remote day_count %new.id%
   * messaging
-  %send% %actor% You place %self.shortdesc% on the tomb with care...
-  %echoaround% %actor% ~%actor% carefully places %self.shortdesc% on a tomb...
+  %send% %actor% You place @%self% on the tomb with care...
+  %echoaround% %actor% ~%actor% carefully places @%self% on a tomb...
   if %old%
     %echo% ~%old% snaps suddenly into the world of the living, still semi-transparent but very clearly Grandmother %halloween_grandma%!
   else
@@ -1885,8 +1885,8 @@ Halloween: Dropped flower buff~
 ~
 set room %actor.room%
 dg_affect #18887 %actor% off
-%send% %actor% You drop %self.shortdesc%, which crumbles to dust as it falls.
-%echoaround% %actor% ~%actor% drops %self.shortdesc%, which crumbles to dust as it falls.
+%send% %actor% You drop @%self%, which crumbles to dust as it falls.
+%echoaround% %actor% ~%actor% drops @%self%, which crumbles to dust as it falls.
 if %room.function(TOMB)%
   switch %self.vnum%
     case 18887
@@ -1926,7 +1926,7 @@ end
 * everything else will return 1
 return 1
 if %coach.vnum% != 18897
-  %send% %actor% You can only use %self.shortdesc% to enchant an ordinary pumpkin coach from the Halloween event.
+  %send% %actor% You can only use @%self% to enchant an ordinary pumpkin coach from the Halloween event.
   halt
 end
 if (!%actor.empire% || %actor.empire% != %coach.empire%)
@@ -1962,8 +1962,8 @@ if %upgr.vnum% == 18898
   %own% %upgr% %coach.empire%
   %send% %actor% You say, 'Salagadoola... mechicka... boola!'
   %echoaround% %actor% ~%actor% says, 'Salagadoola... mechicka... boola!'
-  %send% %actor% You enchant %coach.shortdesc% with %self.shortdesc%...
-  %echoaround% %actor% ~%actor% enchants %coach.shortdesc% with %self.shortdesc%...
+  %send% %actor% You enchant %coach.shortdesc% with @%self%...
+  %echoaround% %actor% ~%actor% enchants %coach.shortdesc% with @%self%...
   %echo% It begins to fly!
   %purge% %coach%
   %purge% %self%

@@ -21,12 +21,12 @@ elseif %target.fighting%
   %send% %actor% You can't trap someone who is fighting.
   halt
 else
-  %send% %actor% You capture ~%target% with %self.shortdesc%!
-  %echoneither% %actor% %target% ~%actor% captures ~%target% with %self.shortdesc%!
+  %send% %actor% You capture ~%target% with @%self%!
+  %echoneither% %actor% %target% ~%actor% captures ~%target% with @%self%!
   * Essences have the same vnum as the mob
   %load% obj %target.vnum% %actor% inv
   set obj %actor.inventory%
-  %send% %actor% You receive %obj.shortdesc%!
+  %send% %actor% You receive @%obj%!
   %purge% %target%
   %purge% %self%
 end
@@ -324,7 +324,7 @@ mgoto i12651
 set selector %self.room.contents(12652)%
 set result %selector.result%
 if %selector%
-  %echo% %selector.shortdesc% parts before you.
+  %echo% @%selector% parts before you.
   set newroom i12652
   if !%result%
     * global var not found
@@ -394,8 +394,8 @@ while %person%
   set person %person.next_in_room%
 done
 %scale% instance %level%
-%send% %actor% %self.shortdesc% parts before you.
-%echoaround% %actor% %self.shortdesc% parts before ~%actor%.
+%send% %actor% @%self% parts before you.
+%echoaround% %actor% @%self% parts before ~%actor%.
 set newroom i12652
 if !%result%
   * global var not found
@@ -1141,29 +1141,29 @@ Apply snake oil to grove gear~
 1 c 2
 oil~
 if !%arg%
-  %send% %actor% Apply %self.shortdesc% to what?
+  %send% %actor% Apply @%self% to what?
   halt
 end
 set target %actor.obj_target_inv(%arg%)%
 if !%target%
-  %send% %actor% You don't seem to have a '%arg%'. (You can only apply %self.shortdesc% to items in your inventory.)
+  %send% %actor% You don't seem to have a '%arg%'. (You can only apply @%self% to items in your inventory.)
   halt
 end
 if %target.vnum% < 12657 || %target.vnum% > 12665
-  %send% %actor% You can only apply %self.shortdesc% to equipment from the Magiterranean: The Grove shop.
+  %send% %actor% You can only apply @%self% to equipment from the Magiterranean: The Grove shop.
   halt
 end
 if %target.is_flagged(SUPERIOR)%
-  %send% %actor% %target.shortdesc% is already superior; applying %self.shortdesc% would have no benefit.
+  %send% %actor% @%target% is already superior; applying @%self% would have no benefit.
   halt
 end
 if %actor.level% < 50
-  %send% %actor% You must be at least level 50 to use %self.shortdesc%.
+  %send% %actor% You must be at least level 50 to use @%self%.
   halt
 end
-%send% %actor% You apply %self.shortdesc% to %target.shortdesc%...
-%echoaround% %actor% ~%actor% applies %self.shortdesc% to %target.shortdesc%...
-%echo% As the oil soaks in, %target.shortdesc% takes on a faint glow and earthy smell... and looks a LOT more powerful.
+%send% %actor% You apply @%self% to @%target%...
+%echoaround% %actor% ~%actor% applies @%self% to @%target%...
+%echo% As the oil soaks in, @%target% takes on a faint glow and earthy smell... and looks a LOT more powerful.
 nop %target.flag(SUPERIOR)%
 %scale% %target% 75
 %purge% %self%
@@ -1178,7 +1178,7 @@ if !%arg%
 end
 set room %self.room%
 if %room.rmt_flagged(!LOCATION)%
-  %send% %actor% %self.shortdesc% spins gently in a circle.
+  %send% %actor% @%self% spins gently in a circle.
   halt
 end
 if !(grove /= %arg%)
@@ -1186,7 +1186,7 @@ if !(grove /= %arg%)
   halt
 else
   if %actor.cooldown(12678)%
-    %send% %actor% %self.shortdesc% is on cooldown.
+    %send% %actor% @%self% is on cooldown.
     halt
   end
   eval adv %instance.nearest_adventure(12650)%
@@ -1195,7 +1195,7 @@ else
     halt
   end
   nop %actor.set_cooldown(12678, 1800)%
-  %send% %actor% You hold %self.shortdesc% aloft...
+  %send% %actor% You hold @%self% aloft...
   eval real_dir %%room.direction(%adv%)%%
   eval direction %%actor.dir(%real_dir%)%%
   eval distance %%room.distance(%adv%)%%
@@ -1212,7 +1212,7 @@ else
   else
     %send% %actor% There is a Magiterranean Grove %distance% %plural% to the %direction%.
   end
-  %echoaround% %actor% ~%actor% holds %self.shortdesc% aloft...
+  %echoaround% %actor% ~%actor% holds @%self% aloft...
 end
 ~
 #12679

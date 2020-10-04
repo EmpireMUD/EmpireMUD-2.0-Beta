@@ -27,8 +27,8 @@ if %room.bld_flagged(IN-CITY-ONLY)% && !%room.in_city(true)%
 end
 %load% obj 5511 %actor% inv
 set item %actor.inventory(5511)%
-%send% %actor% You pick up %item.shortdesc%. Reading this would surely start you on the path of High Sorcery.
-%echoaround% %actor% ~%actor% takes %item.shortdesc%.
+%send% %actor% You pick up @%item%. Reading this would surely start you on the path of High Sorcery.
+%echoaround% %actor% ~%actor% takes @%item%.
 ~
 #5512
 High Sorcery skillbook~
@@ -39,12 +39,12 @@ if !%self.is_flagged(ENCHANTED)%
   halt
 end
 if %self.room.building_vnum% != 5511
-  %send% %actor% %self.shortdesc% suddenly snaps shut before you can finish reading!
+  %send% %actor% @%self% suddenly snaps shut before you can finish reading!
   %send% %actor% (You must be at the top of a Tower of Sorcery to gain High Sorcery from it.)
   halt
 end
 if %room.bld_flagged(IN-CITY-ONLY)% && !%room.in_city(true)%
-  %send% %actor% %self.shortdesc% suddenly snaps shut before you can finish reading!
+  %send% %actor% @%self% suddenly snaps shut before you can finish reading!
   %send% %actor% (This Tower of Sorcery doesn't work correctly when it's not in a city.)
   halt
 end

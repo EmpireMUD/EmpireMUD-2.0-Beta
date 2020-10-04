@@ -143,14 +143,14 @@ if %actor.cooldown(256)%
   halt
 end
 set room_var %actor.room%
-%send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
-%echoaround% %actor% ~%actor% touches %self.shortdesc% and it begins to swirl with light...
+%send% %actor% You touch @%self% and it begins to swirl with light...
+%echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
-%send% %actor% %self.shortdesc% glows a bright blue and the light begins to envelop you!
-%echoaround% %actor% %self.shortdesc% glows a bright blue and the light begins to envelop ~%actor%!
+%send% %actor% @%self% glows a bright blue and the light begins to envelop you!
+%echoaround% %actor% @%self% glows a bright blue and the light begins to envelop ~%actor%!
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
@@ -183,8 +183,8 @@ else
   halt
 end
 * Smokables drop through to here
-%send% %actor% You smoke %found.shortdesc% in %self.shortdesc%.
-%echoaround% %actor% ~%actor% smokes %found.shortdesc% in %self.shortdesc%.
+%send% %actor% You smoke @%found% in @%self%.
+%echoaround% %actor% ~%actor% smokes @%found% in @%self%.
 %purge% %found%
 ~
 #262
@@ -209,8 +209,8 @@ if %actor.cooldown(262)%
   halt
 end
 set room_var %actor.room%
-%send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
-%echoaround% %actor% ~%actor% touches %self.shortdesc% and it begins to swirl with light...
+%send% %actor% You touch @%self% and it begins to swirl with light...
+%echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
@@ -251,8 +251,8 @@ if !%skill.validate(%sk%)%
   %send% %actor% No such skill '%sk%'.
   halt
 end
-%send% %actor% You use %self.shortdesc% and gain a skill reset in %skill.name(%sk%)%!
-%echoaround% %actor% ~%actor% uses %self.shortdesc%.
+%send% %actor% You use @%self% and gain a skill reset in %skill.name(%sk%)%!
+%echoaround% %actor% ~%actor% uses @%self%.
 nop %actor.give_skill_reset(%sk%)%
 %purge% %self%
 ~

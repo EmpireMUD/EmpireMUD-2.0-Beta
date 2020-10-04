@@ -453,7 +453,7 @@ if !%arg%
 end
 set room %self.room%
 if %room.rmt_flagged(!LOCATION)%
-  %send% %actor% %self.shortdesc% spins gently in a circle.
+  %send% %actor% @%self% spins gently in a circle.
   halt
 end
 if !(hydra /= %arg%)
@@ -461,7 +461,7 @@ if !(hydra /= %arg%)
   halt
 else
   if %actor.cooldown(16115)%
-    %send% %actor% %self.shortdesc% is on cooldown.
+    %send% %actor% @%self% is on cooldown.
     halt
   end
   eval adv %instance.nearest_adventure(16100)%
@@ -470,7 +470,7 @@ else
     %send% %actor% Could not find a single oceanic hydra.
     halt
   end
-  %send% %actor% You hold %self.shortdesc% aloft...
+  %send% %actor% You hold @%self% aloft...
   eval real_dir %%room.direction(%adv%)%%
   eval direction %%actor.dir(%real_dir%)%%
   eval distance %%room.distance(%adv%)%%
@@ -483,7 +483,7 @@ else
     set plural tiles
   end
   %send% %actor% The oceanic hydra was last seen %distance% %plural% to the %direction%.
-  %echoaround% %actor% ~%actor% holds %self.shortdesc% aloft...
+  %echoaround% %actor% ~%actor% holds @%self% aloft...
 end
 ~
 #16116

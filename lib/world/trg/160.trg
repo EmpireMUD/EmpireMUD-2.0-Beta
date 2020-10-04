@@ -153,12 +153,12 @@ if !%target%
   halt
 end
 if !%target.mob_flagged(mountable)%
-  %send% %actor% You are unable to implant %self.shortdesc% into ~%target%.
+  %send% %actor% You are unable to implant @%self% into ~%target%.
   unset target
   halt
 else
-  %send% %actor% You stab %self.shortdesc% into |%target% neck and watch the mutation begin.
-  %echoaround% %actor% As ~%actor% stabs %self.shortdesc% into |%target% neck, a horrific transformation takes place.
+  %send% %actor% You stab @%self% into |%target% neck and watch the mutation begin.
+  %echoaround% %actor% As ~%actor% stabs @%self% into |%target% neck, a horrific transformation takes place.
   set beast_chance %random.100%
   if %beast_chance% == (6)
     eval monster_level %actor.level% + 13

@@ -66,8 +66,8 @@ if %actor.obj_target(%arg%)% != %self%
   halt
 end
 set room_var %actor.room%
-%send% %actor% You start unwrapping %self.shortdesc%...
-%echoaround% %actor% ~%actor% starts unwrapping %self.shortdesc%...
+%send% %actor% You start unwrapping @%self%...
+%echoaround% %actor% ~%actor% starts unwrapping @%self%...
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.disabled%
   halt
@@ -115,8 +115,8 @@ switch %last_christmas_gift_item%
 done
 %load% obj %next_gift% %actor% inv
 set item %actor.inventory()%
-%send% %actor% You finish unwrapping the gift and find %item.shortdesc% inside!
-%echoaround% %actor% ~%actor% finishes unwrapping the gift and finds %item.shortdesc%!
+%send% %actor% You finish unwrapping the gift and find @%item% inside!
+%echoaround% %actor% ~%actor% finishes unwrapping the gift and finds @%item%!
 set last_christmas_gift_item %next_gift%
 remote last_christmas_gift_item %actor.id%
 %quest% %actor% trigger 16600
@@ -205,18 +205,18 @@ if %veh%
 end
 * once per 30 minutes
 if %actor.cooldown(256)%
-  %send% %actor% %self.shortdesc% is on cooldown.
+  %send% %actor% @%self% is on cooldown.
   halt
 end
 set room_var %actor.room%
-%send% %actor% You shake %self.shortdesc% and it begins to swirl with light...
-%echoaround% %actor% ~%actor% shakes %self.shortdesc% and it begins to swirl with light...
+%send% %actor% You shake @%self% and it begins to swirl with light...
+%echoaround% %actor% ~%actor% shakes @%self% and it begins to swirl with light...
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
-%send% %actor% %self.shortdesc% glows a wintry white and the light begins to envelop you!
-%echoaround% %actor% %self.shortdesc% glows a wintry white and the light begins to envelop ~%actor%!
+%send% %actor% @%self% glows a wintry white and the light begins to envelop you!
+%echoaround% %actor% @%self% glows a wintry white and the light begins to envelop ~%actor%!
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
@@ -245,7 +245,7 @@ end
 %load% mob 10712
 set mob %room.people%
 if %mob.vnum% == 10712
-  %echo% ~%mob% comes tumbling out of %self.shortdesc%!
+  %echo% ~%mob% comes tumbling out of @%self%!
 end
 ~
 #10713
@@ -367,7 +367,7 @@ end
 set varname summon_%self.vnum%
 * Cooldown
 if %actor.cooldown(10728)%
-  %send% %actor% %self.shortdesc% is on cooldown.
+  %send% %actor% @%self% is on cooldown.
   halt
 end
 set ch %room.people%
@@ -553,8 +553,8 @@ if %actor.cooldown(10738)%
   halt
 end
 set room_var %actor.room%
-%send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
-%echoaround% %actor% ~%actor% touches %self.shortdesc% and it begins to swirl with light...
+%send% %actor% You touch @%self% and it begins to swirl with light...
+%echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
@@ -659,8 +659,8 @@ if %actor.has_minipet(%self.val0%)%
   %send% %actor% You already have the lamb mini-pet.
 else
   nop %actor.add_minipet(%self.val0%)%
-  %send% %actor% You ring %self.shortdesc% and gain a little lamb mini-pet! (see HELP MINIPET)
-  %echoaround% %actor% ~%actor% rings %self.shortdesc%.
+  %send% %actor% You ring @%self% and gain a little lamb mini-pet! (see HELP MINIPET)
+  %echoaround% %actor% ~%actor% rings @%self%.
 end
 ~
 #10746
@@ -723,8 +723,8 @@ if !%found%
   return 0
   halt
 end
-%send% %actor% You sell %self.shortdesc% to Miner Nynar for 5 goblin coins.
-%echoaround% %actor% ~%actor% sells %self.shortdesc% to Miner Nynar.
+%send% %actor% You sell @%self% to Miner Nynar for 5 goblin coins.
+%echoaround% %actor% ~%actor% sells @%self% to Miner Nynar.
 nop %actor.give_coins(5)%
 %purge% %self%
 ~
@@ -750,8 +750,8 @@ if !%found%
   return 0
   halt
 end
-%send% %actor% You sell %self.shortdesc% to Miner Meena for 5 goblin coins.
-%echoaround% %actor% ~%actor% sells %self.shortdesc% to Miner Meena.
+%send% %actor% You sell @%self% to Miner Meena for 5 goblin coins.
+%echoaround% %actor% ~%actor% sells @%self% to Miner Meena.
 nop %actor.give_coins(5)%
 %purge% %self%
 ~
@@ -1094,7 +1094,7 @@ end
 set varname tomb%self.vnum%
 * once per 6 hours
 if %actor.cooldown(%self.vnum%)%
-  %send% %actor% You must wait before using %self.shortdesc% again.
+  %send% %actor% You must wait before using @%self% again.
   return 1
   halt
 end

@@ -560,8 +560,8 @@ if %target.val1% > 0 && %target.val2% != %liquid_num%
   %send% %actor% There is already another liquid in it. Pour it out first.
   halt
 end
-%send% %actor% You fill %target.shortdesc% with %name%.
-%echoaround% %actor% ~%actor% fills %target.shortdesc% with %name%.
+%send% %actor% You fill @%target% with %name%.
+%echoaround% %actor% ~%actor% fills @%target% with %name%.
 nop %target.val2(%liquid_num%)%
 nop %target.val1(%target.val0%)%
 ~
@@ -629,8 +629,8 @@ elseif %mob_diff% == 4
 end
 %scale% %mob% %mob.level%
 * Done applying difficulty setting
-%send% %actor% You ring %self.shortdesc%, and ~%mob% charges out to meet you.
-%echoaround% %actor% ~%actor% rings %self.shortdesc%, and ~%mob% charges out to meet you.
+%send% %actor% You ring @%self%, and ~%mob% charges out to meet you.
+%echoaround% %actor% ~%actor% rings @%self%, and ~%mob% charges out to meet you.
 %adventurecomplete%
 %purge% %self%
 ~

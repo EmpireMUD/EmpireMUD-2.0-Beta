@@ -249,13 +249,13 @@ if %object.vnum% == 18097
   return 0
   halt
 end
-%send% %actor% You drop %object.shortdesc% into the fissure!
-%echoaround% %actor% ~%actor% drops %object.shortdesc% into the fissure!
-%echo% The fire and darkness below your feet swallow %object.shortdesc%...
+%send% %actor% You drop @%object% into the fissure!
+%echoaround% %actor% ~%actor% drops @%object% into the fissure!
+%echo% The fire and darkness below your feet swallow @%object%...
 if (%object.vnum% >= 18075) && (%object.vnum% <= 18094)
   %load% obj 18097 %actor% inv %object.level%
-  %send% %actor% The molten essence released by the destruction of %object.shortdesc% gathers around you.
-  %echoaround% %actor% The molten essence released by the destruction of %object.shortdesc% gathers around ~%actor%.
+  %send% %actor% The molten essence released by the destruction of @%object% gathers around you.
+  %echoaround% %actor% The molten essence released by the destruction of @%object% gathers around ~%actor%.
 end
 %purge% %object%
 return 0

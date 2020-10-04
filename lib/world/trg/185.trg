@@ -692,7 +692,7 @@ return 0
 set person %room.people%
 while %person%
   if %person.is_npc% && %person.vnum% >= 18500 && %person.vnum% <= 18502
-    %send% %actor% ~%person% won't let you near %self.shortdesc%!
+    %send% %actor% ~%person% won't let you near @%self%!
     return 0
     halt
   end
@@ -864,11 +864,11 @@ while %vnum% <= 18502
   eval vnum %vnum% + 1
 done
 if %difficulty% >= 3
-  %send% %actor% You strike %self.shortdesc% hard, and it shatters!
-  %echoaround% %actor% ~%actor% strikes %self.shortdesc% hard, and it shatters!
+  %send% %actor% You strike @%self% hard, and it shatters!
+  %echoaround% %actor% ~%actor% strikes @%self% hard, and it shatters!
 else
-  %send% %actor% You cautiously strike %self.shortdesc%, and it shatters!
-  %echoaround% %actor% ~%actor% strikes %self.shortdesc%, and it shatters!
+  %send% %actor% You cautiously strike @%self%, and it shatters!
+  %echoaround% %actor% ~%actor% strikes @%self%, and it shatters!
 end
 %echo% There is a brilliant burst of emerald-green light, which fades to an omnipresent eerie glow...
 %echo% The door slowly grinds open, revealing a dimly lit gallery beyond.
@@ -1065,7 +1065,7 @@ if %actor%
     if %item.is_flagged(BOP)%
       nop %item.bind(%self%)%
     end
-    * %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
+    * %send% %actor% @%self% turns out to be %item.shortdesc%!
   end
 end
 %purge% %self%

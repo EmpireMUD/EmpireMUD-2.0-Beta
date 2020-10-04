@@ -46,19 +46,19 @@ if %questvnum% == 9009
   %load% obj 9010 %actor% inv
   set item %actor.inventory(9010)%
   if %item%
-    %send% %actor% The stablemaster gives you %item.shortdesc%.
+    %send% %actor% The stablemaster gives you @%item%.
   end
 elseif %questvnum% == 9033
   %load% obj 9034 %actor% inv
   set item %actor.inventory(9034)%
   if %item%
-    %send% %actor% The guildmaster gives you %item.shortdesc%.
+    %send% %actor% The guildmaster gives you @%item%.
   end
 elseif %questvnum% == 9030
   %load% obj 9031 %actor% inv
   set item %actor.inventory(9031)%
   if %item%
-    %send% %actor% The barkeep gives you %item.shortdesc%.
+    %send% %actor% The barkeep gives you @%item%.
   end
 elseif %questvnum% == 9036
   if %actor.varexists(last_quest_9036_time)%
@@ -220,8 +220,8 @@ switch (%random.8%)
       set obj %target.inventory()%
       while (%obj%)
         if (%obj.type% == FOOD)
-          %send% %target% ~%self% looks at you with pleading in ^%self% eyes as though saying, "please, just one bite of %obj.shortdesc%, I haven't eaten in months."
-          %echoaround% %target% ~%self% stares at ~%target%, ^%self% eyes tracking every move of %obj.shortdesc% as though &%self% were hypnotized.
+          %send% %target% ~%self% looks at you with pleading in ^%self% eyes as though saying, "please, just one bite of @%obj%, I haven't eaten in months."
+          %echoaround% %target% ~%self% stares at ~%target%, ^%self% eyes tracking every move of @%obj% as though &%self% were hypnotized.
           halt
         end
         set obj %obj.next_in_list%
@@ -386,7 +386,7 @@ elseif %self.name% ~= elephant
 else
   set emotion and chews contentedly
 end
-%echo% ~%self% eats %object.shortdesc% %emotion%.
+%echo% ~%self% eats @%object% %emotion%.
 if %tameness% >= %target%
   %send% %actor% &%self% really seems to like you.
   %echoaround% %actor% &%self% really seems to like ~%actor%.
@@ -474,11 +474,11 @@ if %actor.inventory(9030)% || !%actor.on_quest(9030)%
   return 0
   halt
 end
-%send% %actor% You cut the head off %target.shortdesc%...
+%send% %actor% You cut the head off @%target%...
 %load% obj 9030 %actor% inv
 set item %actor.inventory()%
 if %item%
-  %send% %actor% You get %item.shortdesc%!
+  %send% %actor% You get @%item%!
 end
 * Don't butcher normally this time. Less buggy this way.
 return 1
@@ -527,7 +527,7 @@ else
   nop %target.add_mob_flag(*PICKPOCKETED)%
   %load% obj 9033 %actor% inv
   set item %actor.inventory()%
-  %send% %actor% You find %item.shortdesc%!
+  %send% %actor% You find @%item%!
   return 1
   halt
 end
@@ -580,7 +580,7 @@ Postmaster quest start~
 eval vnum 9041+%random.3%
 %load% obj %vnum% %actor% inv
 set item %actor.inventory(%vnum%)%
-%send% %actor% You receive %item.shortdesc%.
+%send% %actor% You receive @%item%.
 ~
 #9043
 Postmaster daily letter delivery~

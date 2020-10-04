@@ -919,7 +919,7 @@ while %cycles_left% >= 0
       %echoaround% %actor% |%actor% stormcall is interrupted.
       %send% %actor% Your stormcall is interrupted.
     elseif !%sector_valid%
-      %send% %actor% You can only use %self.shortdesc% outdoors.
+      %send% %actor% You can only use @%self% outdoors.
     else
       %send% %actor% You can't do that now.
     end

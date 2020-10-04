@@ -431,7 +431,7 @@ if %actor.on_quest(10902)%
   %send% %actor% You pick |%self% pocket...
   %load% obj 10945 %actor% inv
   set item %actor.inventory()%
-  %send% %actor% You find %item.shortdesc%!
+  %send% %actor% You find @%item%!
   return 0
   halt
 end
@@ -708,13 +708,13 @@ if %self.carried_by%
 end
 switch %random.3%
   case 1
-    %echo% Sweet music floats off of %self.shortdesc% as it seemingly plays itself!
+    %echo% Sweet music floats off of @%self% as it seemingly plays itself!
   break
   case 2
-    %echo% The strings of %self.shortdesc% vibrate almost imperceptibly as soft music fills the air!
+    %echo% The strings of @%self% vibrate almost imperceptibly as soft music fills the air!
   break
   case 3
-    %echo% A disembodied voice sings softly behind the ethereal music of %self.shortdesc%.
+    %echo% A disembodied voice sings softly behind the ethereal music of @%self%.
   break
 done
 ~
