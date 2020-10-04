@@ -83,7 +83,7 @@ can also see it in your prompt with %c or %C (conditions).
 
 See also: PROMPT, TOGGLE
 #
-ALIAS ALIASES
+ALIAS ALIASES UNALIAS
 
 Usage:  alias [alias name] [command]
         unalias [alias name]
