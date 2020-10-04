@@ -182,8 +182,12 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 				*s = '\0';
 				p = any_one_name(++p, name);
 
-				if (find_invis)
+				if (*name == UID_CHAR) {
+					obj = get_obj(name);
+				}
+				else if (find_invis) {
 					obj = get_obj_in_room(IN_ROOM(ch), name);
+				}
 				else if (!(obj = get_obj_in_list_vis(ch, name, ROOM_CONTENTS(IN_ROOM(ch))))) {
 					// nothing
 				}
