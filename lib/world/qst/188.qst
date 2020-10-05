@@ -374,12 +374,12 @@ W
 11 0 0 1
 S
 #18861
-Halloween: Delegation of demons~
+Halloween: Delegation of Demons~
 This quest has no description.
 ~
 You have completed the quest.
 ~
-2 ae 0 0 -1
+5 ae 0 0 -1
 D 18823
 P
 36 18800 0 1 a
@@ -456,14 +456,15 @@ put them into this condition, adventurers are demoralized. You might not be
 able to help with them surviving the battle, but you can at least shield this
 latest victim from view and ease the fallen adventurer into the afterlife by
 playing some music.
-   Build the 'medical tent', enter it, and then play some music for the
-poor soul within.
+   Build the 'medical tent' at a tomb or cemetery where some poor soul has
+tried to fight the headless horse man (any tomb should do), enter the tent, and
+then play some music for the poor soul within.
 ~
    Your music soothes the headless horse man's latest victim as they give up
 the ghost. The healers usher you from the medical tent so they can prepare the
 body for burial.
 ~
-19 e 0 0 -1
+20 e 0 0 -1
 A
 2 18809
 A

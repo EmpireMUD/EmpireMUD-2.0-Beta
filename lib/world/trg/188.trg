@@ -1677,7 +1677,7 @@ switch %count_up%
     halt
   break
   case 3
-    %send% %actor% ~%self% finally gives up the ghost and healers usher you from the tent!
+    * %send% %actor% ~%self% finally gives up the ghost and healers usher you from the tent!
     %force% %actor% exit
     %quest% %actor% finish 18873
   break
