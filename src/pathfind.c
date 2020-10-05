@@ -127,7 +127,7 @@ PATHFIND_VALIDATOR(pathfind_road) {
 		if (IS_ROAD(room)) {
 			return TRUE;	// real road
 		}
-		else if (!ROOM_BLD_FLAGGED(room, BLD_ATTACH_ROAD)) {
+		else if (IS_INSIDE(room) && !ROOM_BLD_FLAGGED(room, BLD_ATTACH_ROAD)) {
 			return FALSE;	// not a road-building
 		}
 		else if (!ROOM_IS_CLOSED(room) || CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, room, GUESTS_ALLOWED)) {
@@ -138,7 +138,7 @@ PATHFIND_VALIDATOR(pathfind_road) {
 		if (SECT_FLAGGED(map->sector_type, SECTF_IS_ROAD)) {
 			return TRUE;	// true road
 		}
-		else if (!(find = real_real_room(map->vnum)) || !ROOM_BLD_FLAGGED(find, BLD_ATTACH_ROAD)) {
+		else if (!(find = real_real_room(map->vnum)) || (IS_INSIDE(find) && !ROOM_BLD_FLAGGED(find, BLD_ATTACH_ROAD))) {
 			return FALSE;	// not a building that we can use
 		}
 		else if (!ROOM_IS_CLOSED(find) || CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, find, GUESTS_ALLOWED)) {
