@@ -62,7 +62,7 @@ bool pathfind_get_dir(room_data *from_room, struct map_data *from_map, int dir, 
 // example: validator for ships
 PATHFIND_VALIDATOR(pathfind_ocean) {
 	room_data *find;
-	
+	/*
 	if (room) {
 		if (ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED(room, BLD_SAIL)) {
 			if (!ROOM_IS_CLOSED(room) || CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, room, GUESTS_ALLOWED)) {
@@ -79,6 +79,13 @@ PATHFIND_VALIDATOR(pathfind_ocean) {
 				return TRUE;	// free to pass through
 			}
 		}
+	}
+	*/
+	if (room && (ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED(room, BLD_SAIL))) {
+		return TRUE;
+	}
+	else if (map && SECT_FLAGGED(map->sector_type, SECTF_FRESH_WATER | SECTF_OCEAN)) {
+		return TRUE;	// true ocean
 	}
 	
 	return FALSE;	// all other cases
@@ -489,9 +496,9 @@ char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehic
 			add_pathfind_node(controller, to_room, to_map, node, dir);
 		}
 		
-		// check time limit every 100 nodes: stop after 0.25 seconds
+		// check time limit every 500 nodes: stop after 0.33 seconds
 		if ((++count % 500) == 0) {
-			if (microtime() - start_time > 250000) {
+			if (microtime() - start_time > 330000) {
 				break;
 			}
 		}
