@@ -434,6 +434,9 @@ switch %questvnum%
     set owner %actor%
     remote owner %actor.inventory().id%
   break
+  case 18861
+    %load% obj 18861 %actor% inv
+  break
   case 18869
     %load% obj 18869 %actor% inv
   break
@@ -963,6 +966,19 @@ if %actor.quest_finished(18854)%
   %quest% %actor% finish 18854
 end
 ~
+#18855
+nether portal closes~
+5 ab 30
+~
+if %self.varexists(spawn_time)%
+  eval check_time %timestamp% - %self.spawn_time%
+  if %check_time% < 420
+    halt
+  end
+end
+%echo% %self.shortdesc% implodes with an other-worldly hiss!
+%purge% %self%
+~
 #18856
 look in magic mirror~
 1 c 2
@@ -1339,6 +1355,99 @@ if %cmd% == stand
   end
 end
 ~
+#18861
+Set up Nether Portal~
+2 g 100
+~
+set rn %room.north(room)%
+* Add north first
+if !%rn%
+  %door% %room% north add 18862
+  set rn %room.north(room)%
+end
+* If north worked:
+if %rn% && !%room.east(room)%
+  %door% %room% east room %rn%
+end
+if %rn% && !%room.west(room)%
+  %door% %room% west room %rn%
+end
+if %rn% && !%room.south(room)%
+  %door% %room% south room %rn%
+end
+* reset timer if possible
+if %room.in_vehicle%
+  set spawn_time %timestamp%
+  remote spawn_time %room.in_vehicle.id%
+end
+* load the demon
+%load% mob 18862
+set mob %room.people%
+if %mob.vnum% == 18862
+  wait 1 sec
+  %force% %mob% maggro
+end
+detach 18861 %room.id%
+~
+#18862
+ritual of demon summoning~
+1 c 2
+ritual~
+if !%arg%
+  return 0
+  halt
+end
+if %arg% != demon
+  return 0
+  halt
+end
+if %actor.cooldown(18862)%
+  %send% %actor% You haven't recovered from the strain of the last portal yet.
+  return 1
+  halt
+end
+set veh %self.room.vehicles%
+while %veh%
+  if %veh.vnum(18861)%
+    %send% %actor% someone has already attempted to summon a demon here.
+    halt
+  end
+  set veh %veh.next_in_room%
+done
+nop %actor.set_cooldown(18862, 20)%
+%send% %actor% Your mind feels like it might break under the strain, and suddenly there's a thundering snap!
+%echoaround% %actor% You watch as ~%actor% begins to shake with the strain of opening a portal.
+%echo% A portal pops into existance before you!
+%load% veh 18861
+set veh %self.room.vehicles%
+set spawn_time %timestamp%
+remote spawn_time %veh.id%
+~
+#18863
+nether damage inside portal~
+2 bw 100
+~
+set person %self.people%
+while %person%
+  if %person.is_pc%
+    eval dam_val 99 + %random.200%
+    %send% %person% You feel an emptiness engulf your body!
+    %damage% %person% %dam_val%
+  end
+  set person %person.next_in_room%
+done
+~
+#18864
+Nether portal - Block further entry~
+2 q 100
+~
+if %actor.nohassle% || %direction% == none || %direction% == portal
+  return 1
+  halt
+end
+%send% %actor% Each time you try to walk away from the portal, you end up right back next to it.
+return 0
+~
 #18869
 play them off johny~
 1 c 2
@@ -1512,7 +1621,6 @@ else
   %mod% %self% keywords ghostly
   %mod% %self% lookdesc this ghostly version of %target.pc_name% is a citizen of %self.room.empire_name% the same as the living one.
 end
-wait 1
 %echo% A chill comes over you as ~%self% fades into view.
 set day_count %dailycycle%
 remote day_count %self.id%
@@ -1622,9 +1730,21 @@ remote spawn_time %victim%
 ~
 #18876
 tent should not persist~
-5 ab 10
+0 ab 10
 ~
-* No script
+if %self.varexists(spawn_time)%
+  set spawn_time %self.spawn_time%
+  eval delay %timestamp% - %spawn_time%
+  if %delay% <= 600
+    halt
+  end
+end
+if !%self.varexists(tent)%
+  set tent %self.room.in_vehicle%
+  remote tent %self.id%
+end
+%regionecho% %tent% 0 Healers sadly dismantle %tent.shortdesc%.
+%purge% %tent%
 ~
 #18878
 Halloween: Magi-genic Ooze mount upgrader~

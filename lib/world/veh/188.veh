@@ -1,3 +1,23 @@
+#18861
+portal demonic nether realm~
+a demonic portal~
+A demonic portal to the nether realm is spinning in the air!~
+   At a first glance, the portal is a glowing black color. However, if one took
+a closer look, the portal is made up of two spirals each twisting the opposite
+directions. One spiral black, the other crimson.
+~
+~
+gquvwx 19 1 0 0 0 0 0 0 q
+C
+400 400
+D
+18861 0 0
+P
+2
+R
+18862 1 0 0
+T 18855
+S
 #18873
 tent medical~
 a medical tent~
@@ -6,13 +26,15 @@ A simple and hastely thrown together medical tent has been erected.~
 hide the latest victim of the headless centaur from sight.
 ~
 ~
-gmuw 19 2 0 0 0 0 0 1 0
+gmuwx 19 2 0 0 0 0 0 4 0
 C
 1 1
 D
 18873 0 0
 P
 2
+T 18874
+T 18875
 S
 #18876
 slaughterhouse house~

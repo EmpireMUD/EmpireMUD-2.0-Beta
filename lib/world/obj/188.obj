@@ -873,6 +873,31 @@ T 18858
 T 18859
 T 18860
 S
+#18861
+tome notes demon summoning~
+demon summoning notes~
+A black tome of notes labeled Demon Summoning hovers above the ground.~
+   This black tome constantly hovers above the surface it's placed on. Vibrant
+scarlet letters cover nearly every page in a spidery scrall, detailing how to
+summon various demons into the physical world.
+Perform: 'ritual demon'
+~
+3 0 a 0 4
+0 0 0
+10 0
+Q 18861
+T 18862
+S
+#18862
+words nether~
+Nether words~
+Nether words are here.~
+This just makes it impossible to maintain the nether portal.
+~
+3 0 a 0 1
+0 0 0
+0 0
+S
 #18869
 sheet music~
 some sheet music~
@@ -929,12 +954,12 @@ for the dying adventurer, build a 'medical tent' at the tomb he chose to summon
 the centaur and failed to defeat it. Then soothe the fallen adventurer into his
 final rest by playing some music.
 ~
-3 0 a 0 9
+3 0 a 0 10
 0 0 0
 7 0
 C
 1 1
-Q 18872
+Q 18873
 S
 #18876
 block butcher's butchers reddened~
