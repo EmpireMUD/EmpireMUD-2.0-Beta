@@ -62,11 +62,14 @@ bool pathfind_get_dir(room_data *from_room, struct map_data *from_map, int dir, 
 // example: validator for ships
 PATHFIND_VALIDATOR(pathfind_ocean) {
 	room_data *find;
-	/*
+	
 	if (room) {
 		if (ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED(room, BLD_SAIL)) {
-			if (!ROOM_IS_CLOSED(room) || CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, room, GUESTS_ALLOWED)) {
-				return TRUE;	// free to pass through
+			if (!ROOM_IS_CLOSED(room)) {
+				return TRUE;	// open
+			}
+			else if (CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, room, GUESTS_ALLOWED)) {
+				return TRUE;	// allowed in
 			}
 		}
 	}
@@ -75,17 +78,13 @@ PATHFIND_VALIDATOR(pathfind_ocean) {
 			return TRUE;	// true ocean
 		}
 		else if ((find = real_real_room(map->vnum)) && ROOM_BLD_FLAGGED(find, BLD_SAIL)) {
-			if (!ROOM_IS_CLOSED(find) || !CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, find, GUESTS_ALLOWED)) {
-				return TRUE;	// free to pass through
+			if (!ROOM_IS_CLOSED(find)) {
+				return TRUE;	// open
+			}
+			else if (!CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, find, GUESTS_ALLOWED)) {
+				return TRUE;	// allowed in
 			}
 		}
-	}
-	*/
-	if (room && (ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED(room, BLD_SAIL))) {
-		return TRUE;
-	}
-	else if (map && SECT_FLAGGED(map->sector_type, SECTF_FRESH_WATER | SECTF_OCEAN)) {
-		return TRUE;	// true ocean
 	}
 	
 	return FALSE;	// all other cases
