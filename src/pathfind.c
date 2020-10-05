@@ -490,7 +490,7 @@ char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehic
 		}
 		
 		// check time limit every 100 nodes: stop after 0.25 seconds
-		if ((++count % 100) == 0) {
+		if ((++count % 500) == 0) {
 			if (microtime() - start_time > 250000) {
 				break;
 			}
