@@ -1791,12 +1791,13 @@ ACMD(do_drive) {
 		msg_to_char(ch, "You can't %s by coordinates.\r\n", drive_data[subcmd].command);
 	}
 	else if (path_to_room && get_cooldown_time(ch, COOLDOWN_PATHFINDING) > 0) {
-		msg_to_char(ch, "You must wait another %d second%s before you can run-to-coordinates again.\r\n", get_cooldown_time(ch, COOLDOWN_PATHFINDING), PLURAL(get_cooldown_time(ch, COOLDOWN_PATHFINDING)));
+		msg_to_char(ch, "You must wait another %d second%s before you can %s-to-coordinates again.\r\n", get_cooldown_time(ch, COOLDOWN_PATHFINDING), PLURAL(get_cooldown_time(ch, COOLDOWN_PATHFINDING)), drive_data[subcmd].command);
 	}
 	else if (path_to_room && (time_check = microtime()) && !(found_path = get_pathfind_string(IN_ROOM(veh), path_to_room, ch, veh, drive_data[subcmd].pathfinder))) {
 		msg_to_char(ch, "Unable to find a valid route to that location (or it took longer than the allowed amount of time).\r\n");
 		// if pathfinding took longer than 0.1 seconds, set a cooldown
 		if (time_check > 0 && microtime() - time_check > 100000) {
+			log("Pathfinding: %s failed to find %s path in time: %s to %s", GET_NAME(ch), drive_data[subcmd].command, coord_display(NULL, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), FALSE), coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
 			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
 		}
 	}
@@ -1814,6 +1815,7 @@ ACMD(do_drive) {
 		
 		// if pathfinding took longer than 0.1 seconds, set a cooldown
 		if (time_check > 0 && microtime() - time_check > 100000) {
+			log("Pathfinding: %s got slow %s path (%d microseconds): %s to %s", GET_NAME(ch), drive_data[subcmd].command, (int)(microtime() - time_check), coord_display(NULL, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), FALSE), coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
 			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
 		}
 		

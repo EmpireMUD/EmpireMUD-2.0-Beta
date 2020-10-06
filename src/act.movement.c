@@ -2669,6 +2669,7 @@ ACMD(do_run) {
 		// if pathfinding took longer than 0.1 seconds, set a cooldown
 		if (time_check > 0 && microtime() - time_check > 100000) {
 			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
+			log("Pathfinding: %s failed to find run path in time: %s to %s", GET_NAME(ch), coord_display(NULL, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), FALSE), coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
 		}
 	}
 	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {
@@ -2680,6 +2681,7 @@ ACMD(do_run) {
 		
 		// if pathfinding took longer than 0.1 seconds, set a cooldown
 		if (time_check > 0 && microtime() - time_check > 100000) {
+			log("Pathfinding: %s got slow run path (%d microseconds): %s to %s", GET_NAME(ch), (int)(microtime() - time_check), coord_display(NULL, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), FALSE), coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
 			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
 		}
 		
