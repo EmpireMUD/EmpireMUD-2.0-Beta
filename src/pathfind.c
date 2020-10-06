@@ -58,6 +58,7 @@ bool pathfind_get_dir(room_data *from_room, struct map_data *from_map, int dir, 
 */
 
 #define CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, room, mode)  (!ROOM_OWNER(room) || ((ch) && can_use_room((ch), (room), (mode))) || ((veh) && VEH_OWNER(veh) && emp_can_use_room(VEH_OWNER(veh), (room), (mode))))
+#define CHAR_OR_VEH_ROOM_PERMISSION_SIMPLE(ch, veh, room, junk)  (!ROOM_OWNER(room) || ((ch) && GET_LOYALTY(ch) == ROOM_OWNER(room)) || ((veh) && VEH_OWNER(veh) == ROOM_OWNER(room)))
 
 // example: validator for ships
 PATHFIND_VALIDATOR(pathfind_ocean) {
@@ -68,7 +69,7 @@ PATHFIND_VALIDATOR(pathfind_ocean) {
 			if (!ROOM_IS_CLOSED(room)) {
 				return TRUE;	// open
 			}
-			else if (CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, room, GUESTS_ALLOWED)) {
+			else if (CHAR_OR_VEH_ROOM_PERMISSION_SIMPLE(ch, veh, room, GUESTS_ALLOWED)) {
 				return TRUE;	// allowed in
 			}
 		}
@@ -81,7 +82,7 @@ PATHFIND_VALIDATOR(pathfind_ocean) {
 			if (!ROOM_IS_CLOSED(find)) {
 				return TRUE;	// open
 			}
-			else if (!CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, find, GUESTS_ALLOWED)) {
+			else if (!CHAR_OR_VEH_ROOM_PERMISSION_SIMPLE(ch, veh, find, GUESTS_ALLOWED)) {
 				return TRUE;	// allowed in
 			}
 		}
