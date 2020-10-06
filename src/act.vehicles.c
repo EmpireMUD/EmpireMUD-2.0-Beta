@@ -1794,7 +1794,11 @@ ACMD(do_drive) {
 		msg_to_char(ch, "You must wait another %d second%s before you can run-to-coordinates again.\r\n", get_cooldown_time(ch, COOLDOWN_PATHFINDING), PLURAL(get_cooldown_time(ch, COOLDOWN_PATHFINDING)));
 	}
 	else if (path_to_room && (time_check = microtime()) && !(found_path = get_pathfind_string(IN_ROOM(veh), path_to_room, ch, veh, drive_data[subcmd].pathfinder))) {
-		msg_to_char(ch, "Unable to find a valid route to that location.\r\n");
+		msg_to_char(ch, "Unable to find a valid route to that location (or it took longer than the allowed amount of time).\r\n");
+		// if pathfinding took longer than 0.1 seconds, set a cooldown
+		if (time_check > 0 && microtime() - time_check > 100000) {
+			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
+		}
 	}
 	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {
 		msg_to_char(ch, "Unable to find a valid route to that location.\r\n");

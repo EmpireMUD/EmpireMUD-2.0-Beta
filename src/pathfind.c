@@ -496,10 +496,10 @@ char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehic
 			add_pathfind_node(controller, to_room, to_map, node, dir);
 		}
 		
-		// check time limit every 500 nodes: stop after 0.33 seconds
+		// check time limit every 500 nodes: stop after 0.5 seconds
 		if ((++count % 500) == 0) {
-			if (microtime() - start_time > 330000) {
-				//break;
+			if (microtime() - start_time > 500000) {
+				break;
 			}
 		}
 	}

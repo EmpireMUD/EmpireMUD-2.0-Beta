@@ -2666,6 +2666,10 @@ ACMD(do_run) {
 	}
 	else if (path_to_room && (time_check = microtime()) && !(found_path = get_pathfind_string(IN_ROOM(ch), path_to_room, ch, NULL, pathfind_road))) {
 		msg_to_char(ch, "Unable to find a route to that location (it may be too far or there may not be a road to it).\r\n");
+		// if pathfinding took longer than 0.1 seconds, set a cooldown
+		if (time_check > 0 && microtime() - time_check > 100000) {
+			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
+		}
 	}
 	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {
 		msg_to_char(ch, "Unable to find a route to that location (it may be too far or there may not be a road to it).\r\n");
