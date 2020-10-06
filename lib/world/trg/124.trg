@@ -621,7 +621,7 @@ nop %self.set_cooldown(12400, 30)%
 %echo% &&r|%self% canine heads lash out, snarling and gnashing.
 set person %self.room.people%
 while %person%
-  if %person.is_npc% && %person.mob_flagged(FAMILIAR)%
+  if %person.is_npc% && %person.companion%
     %echo% |%self% heads tear a chunk out of ~%person%!
     %damage% %person% 350
   elseif %person% != %self%

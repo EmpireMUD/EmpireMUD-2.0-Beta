@@ -27,7 +27,7 @@ set ch %self.room.people%
 while %ch% && !%found%
   if (%ch.is_npc% && %ch.vnum% == %self.val0% && %ch.master% && %ch.master% == %actor%)
     set found 1
-  elseif (%ch.is_npc% && %ch.master% && %ch.master% == %actor% && !%ch.mob_flagged(FAMILIAR)%)
+  elseif (%ch.is_npc% && %ch.master% && %ch.master% == %actor% && !%ch.companion%)
     set found_pet 1
   elseif %ch.is_npc%
     eval mobs %mobs% + 1
