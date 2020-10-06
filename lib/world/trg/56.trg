@@ -4,7 +4,7 @@ Study: create board~
 ~
 %load% obj 1
 set board %room.contents%
-%echo% %board.shortdesc% appears.
+%echo% @%board% appears.
 detach 5608 %self.id%
 ~
 #5609

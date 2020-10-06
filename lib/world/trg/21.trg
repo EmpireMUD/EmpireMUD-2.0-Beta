@@ -30,8 +30,8 @@ if !%room.in_city(true)%
   halt
 end
 * ok... messaging
-%send% %actor% You blow %self.shortdesc%...
-%echoaround% %actor% %actor.name% blows %self.shortdesc%...
+%send% %actor% You blow @%self%...
+%echoaround% %actor% ~%actor% blows @%self%...
 * and summon
 eval to_summon %actor.charisma% / 3
 if %to_summon% < 1
@@ -42,7 +42,7 @@ while %count% < %to_summon%
   %load% mob %self.val0%
   set mob %room.people%
   %own% %mob% %actor.empire%
-  %echo% %mob.name% comes running!
+  %echo% ~%mob% comes running!
   eval count %count% + 1
 done
 nop %actor.set_cooldown(2029, 180)%

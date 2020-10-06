@@ -57,14 +57,14 @@ end
 set dist %room.distance(%instance.location%)%
 if (%dist% > 2)
   wait 1
-  %echo% %self.name% scrambles into a hole in the dam and returns to %self.hisher% lodge.
+  %echo% ~%self% scrambles into a hole in the dam and returns to ^%self% lodge.
   mgoto %instance.location%
-  %echo% %self.name% appears from %self.hisher% lodge.
+  %echo% ~%self% appears from ^%self% lodge.
 elseif %room.aff_flagged(*HAS-INSTANCE)%
   halt
 elseif (%room.sector% == River && %dist% <= 2)
   %build% %room% 18451
-  %echo% %self.name% expands %self.hisher% dam here.
+  %echo% ~%self% expands ^%self% dam here.
 end
 ~
 #18454
@@ -151,7 +151,7 @@ while %person%
         * Message
         set item %person.inventory(%vnum%)%
         if %item%
-          %send% %person% # You discover %item.shortdesc%!
+          %send% %person% # You discover @%item%!
         end
       end
       * Chance of a rare mount
@@ -177,7 +177,7 @@ while %person%
       if %vnum% != 0
         %load% obj %vnum% %person% inv
         set item %person.inventory()%
-        %send% %person% # You are lucky! You have discovered a rare item: %item.shortdesc%!
+        %send% %person% # You are lucky! You have discovered a rare item: @%item%!
       end
     end
     if %person.is_immortal%
@@ -189,7 +189,7 @@ while %person%
         * Message
         set item %person.inventory(%vnum%)%
         if %item%
-          %send% %person% # You create %item.shortdesc% for yourself.
+          %send% %person% # You create @%item% for yourself.
         end
       end
     end
@@ -379,7 +379,7 @@ else
   eval person_num %%random.%num_people%%%
   eval person %%person_%person_num%%%
   %send% %person% Your skin sparkles slightly in the sunlight.
-  %echoaround% %person% %person.name% sparkles slightly in the sunlight.
+  %echoaround% %person% ~%person% sparkles slightly in the sunlight.
 done
 ~
 #18472
@@ -403,7 +403,7 @@ else
   eval person_num %%random.%num_people%%%
   eval person %%person_%person_num%%%
   %send% %person% [ You have dysentery. ]
-  %echoaround% %person% [ %person.name% has dysentery. ]
+  %echoaround% %person% [ ~%person% has dysentery. ]
   set level %person.level%
   if %level% < 10
     set level 10
@@ -431,7 +431,7 @@ switch %direction_num%
     set direction west
   break
 done
-%echo% %self.name% %self.movetype% %direction%.
+%echo% ~%self% %self.movetype% %direction%.
 %purge% %self%
 ~
 #18483
@@ -463,7 +463,7 @@ while %person%
 done
 %load% mob %vnum%
 set mob %room.people%
-%echo% %mob.name% %mob.movetype% up from the %direction%.
+%echo% ~%mob% %mob.movetype% up from the %direction%.
 ~
 #18487
 Modern portal fake list/buy~
@@ -494,7 +494,7 @@ elseif buy /= %cmd%
       %send% %actor% The shopkeeper says, 'Sorry, pally, all we take here is cold, hard cash.'
     break
     case 4
-      %send% %actor% The shopkeeper says, 'We don't take D&D money here, buddy.'
+      %send% %actor% The shopkeeper says, 'We don't take D&&D money here, buddy.'
     break
   done
 else
@@ -534,15 +534,15 @@ set room %self.room%
 set dawn 7
 set dusk 19
 visible
-%echo% %self.name% rises from the earth!
+%echo% ~%self% rises from the earth!
 wait 2 sec
 if %time.hour% >= %dawn% && %time.hour% <= %dusk%
   * Sun's out
-  %echo% %self.name% lunges toward you, just as the sun comes out from behind the clouds!
+  %echo% ~%self% lunges toward you, just as the sun comes out from behind the clouds!
   wait 3 sec
-  %echo% A ray of sunlight strikes %self.name%, lighting %self.himher% aflame!
+  %echo% A ray of sunlight strikes ~%self%, lighting *%self% aflame!
   wait 3 sec
-  %echo% %self.name% crumbles to ash!
+  %echo% ~%self% crumbles to ash!
   %load% obj 18489
   %purge% %self%
   halt
@@ -559,42 +559,42 @@ else
   done
   if %num_people% == 0
     * Oops. There aren't any.
-    %echo% %self.name% seems surprised to see you here!
+    %echo% ~%self% seems surprised to see you here!
     wait 3 sec
-    %echo% %self.name% transforms into a bat and flies away!
+    %echo% ~%self% transforms into a bat and flies away!
     %purge% %self%
     halt
   else
     eval person_num %%random.%num_people%%%
     eval person %%person_%person_num%%%
-    %send% %person% %self.name% lunges toward you, sinking %self.hisher% teeth into your neck!
-    %echoaround% %person% %self.name% lunges toward %person.name%, sinking %self.hisher% teeth into %person.hisher% neck!
+    %send% %person% ~%self% lunges toward you, sinking ^%self% teeth into your neck!
+    %echoaround% %person% ~%self% lunges toward ~%person%, sinking ^%self% teeth into ^%person% neck!
     dg_affect %person% HARD-STUNNED on 10
     wait 5 sec
     if %person.room% != %self.room%
-      %echo% %self.name% transforms into a bat and flies away, looking confused.
+      %echo% ~%self% transforms into a bat and flies away, looking confused.
       %purge% %self%
       halt
     end
     %send% %person% You shudder with ecstasy at the feeling of your precious blood leaving your body...
-    %echoaround% %person% %person.name% shudders with ecstasy as %self.name% feeds from %person.himher%!
+    %echoaround% %person% ~%person% shudders with ecstasy as ~%self% feeds from *%person%!
     wait 5 sec
     if %person.room% != %self.room%
-      %echo% %self.name% transforms into a bat and flies away, looking confused.
+      %echo% ~%self% transforms into a bat and flies away, looking confused.
       %purge% %self%
       halt
     end
-    %echoaround% %person% %self.name% tears open %self.hisher% wrist with %self.hisher% teeth and drips blood into %person.name%'s mouth!
+    %echoaround% %person% ~%self% tears open ^%self% wrist with ^%self% teeth and drips blood into |%person% mouth!
     %send% %person% As the world turns black, you feel the taste of warm blood in your mouth...
     wait 1 sec
-    %echoaround% %person% %person.name% sits up suddenly.
+    %echoaround% %person% ~%person% sits up suddenly.
     * Attempt to sire.
     nop %person.vampire(1)%
     if !%person.vampire()%
       * Sire failed...
       %send% %person% You sit up suddenly, wondering why you're still alive.
       wait 1 sec
-      %echo% %self.name% transforms into a bat and flies away, looking annoyed.
+      %echo% ~%self% transforms into a bat and flies away, looking annoyed.
       %purge% %self%
       halt
     end
@@ -758,8 +758,8 @@ while %person%
     %load% obj 18490 %person% inv
     set item %person.inventory(18490)%
     if %item%
-      %send% %person% %mob.name% says, 'Oh! These are yours.'
-      %send% %person% %mob.name% gives you %item.shortdesc%.
+      %send% %person% ~%mob% says, 'Oh! These are yours.'
+      %send% %person% ~%mob% gives you @%item%.
     end
   elseif %person.vnum% == 18492
     set doctor %person%
@@ -825,7 +825,7 @@ while %person%
     %load% obj 18493 %person% inv
     set item %person.inventory(18493)%
     if %item%
-      %send% %person% %mob.name% gives you %item.shortdesc%.
+      %send% %person% ~%mob% gives you @%item%.
     end
   elseif %person.vnum% == 18491
     set doc_brown %person%
@@ -870,17 +870,17 @@ if %test%
   eval arg %test%
 end
 if !%actor.is_immortal%
-  %send% %actor% You can't use %self.shortdesc%. You need to be an immortal.
+  %send% %actor% You can't use @%self%. You need to be an immortal.
   halt
 end
 if !%instance%
-  %send% %actor% You need to be in an Unstable Portal instance to use %self.shortdesc%.
+  %send% %actor% You need to be in an Unstable Portal instance to use @%self%.
   return 1
   halt
 end
 set start_room %instance.start%
 if %start_room.template% != 18460
-  %send% %actor% You need to be in an Unstable Portal instance to use %self.shortdesc%.
+  %send% %actor% You need to be in an Unstable Portal instance to use @%self%.
   return 1
   halt
 end
@@ -922,7 +922,7 @@ while %item%
   set item %item.next_in_list%
 done
 %send% %actor% You link the unstable portal to %new_room.name%.
-%echoaround% %actor% %actor.name% links the unstable portal to %new_room.name%.
+%echoaround% %actor% ~%actor% links the unstable portal to ~%new_room.name%.
 ~
 #18496
 Unstable portal block where~

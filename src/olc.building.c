@@ -101,7 +101,7 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Has extra rooms but no designate flags");
 		problem = TRUE;
 	}
-	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN | BLD_CLOSED | BLD_TWO_ENTRANCES | BLD_ATTACH_ROAD | BLD_INTERLINK)) {
+	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && IS_SET(GET_BLD_FLAGS(bld), BLD_OPEN | BLD_CLOSED | BLD_TWO_ENTRANCES | BLD_INTERLINK)) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Designated room has incompatible flag(s)");
 		problem = TRUE;
 	}

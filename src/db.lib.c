@@ -3479,7 +3479,7 @@ struct empire_homeless_citizen *find_homeless_citizen(empire_data *emp, struct m
 			continue;	// doesn't match required vnum
 		}
 		if (ehc->loc) {
-			dist = compute_map_distance(MAP_X_COORD(ehc->loc->vnum), MAP_Y_COORD(ehc->loc->vnum), MAP_X_COORD(loc->vnum), MAP_Y_COORD(loc->vnum));
+			dist = (int)compute_map_distance(MAP_X_COORD(ehc->loc->vnum), MAP_Y_COORD(ehc->loc->vnum), MAP_X_COORD(loc->vnum), MAP_Y_COORD(loc->vnum));
 			if ((((time(0) - ehc->when) / SECS_PER_REAL_MIN) + 1) < dist / homeless_citizen_speed) {
 				continue;	// too soon for this distance
 			}

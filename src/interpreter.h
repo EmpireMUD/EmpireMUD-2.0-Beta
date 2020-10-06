@@ -90,6 +90,10 @@ struct alias_data {
 #define SCMD_ACCEPT  0
 #define SCMD_REJECT  1
 
+// do_alias
+#define SCMD_ALIAS  0
+#define SCMD_UNALIAS  1
+
 // for do_approve
 #define SCMD_APPROVE  0
 #define SCMD_UNAPPROVE  1

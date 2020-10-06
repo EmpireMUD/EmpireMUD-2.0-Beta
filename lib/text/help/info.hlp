@@ -1092,6 +1092,16 @@ cooked on an ordinary cooking fire.
 
 See also: BAKE
 #
+PATHFINDING "PATHFINDING COOLDOWN" "PATH FINDING COOLDOWN"
+
+The game uses a pathfinding algorithm when you run/drive/sail/pilot using a
+set of coordinates as your destination. Because this process can take a long
+time over long distances, it's limited to 1/2 of a second of processing time.
+However if it passes 1/10th of a second, you will also incur a pathfinding
+cooldown. You can't use pathfinding again until it expires.
+
+See also: RUN, SAIL
+#
 PLAYERKILLING "PLAYER KILLING" PK PVP "TOGGLE PVP"
 
 EmpireMUD player-killing rules

@@ -37,7 +37,7 @@ char *any_one_name(char *argument, char *first_arg) {
 	}
 
 	/* Find length of first word */
-	for (arg = first_arg; *argument && !isspace(*argument) && (!ispunct(*argument) || *argument == '#' || *argument == '-'); arg++, argument++) {
+	for (arg = first_arg; *argument && !isspace(*argument) && (!ispunct(*argument) || *argument == UID_CHAR || *argument == '#' || *argument == '-'); arg++, argument++) {
 		*arg = LOWER(*argument);
 	}
 	*arg = '\0';
@@ -85,7 +85,6 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 					strcat(sb,HSHR((char_data*) otokens[i]));
 				break;
 			}
-			/*
 			case '&': {
 				if (!otokens[i] || !CAN_SEE(ch, (char_data*) otokens[i]))
 					strcat(sb,"it");
@@ -95,7 +94,6 @@ void sub_write_to_char(char_data *ch, char *tokens[], void *otokens[], char type
 					strcat(sb,HSSH((char_data*) otokens[i]));
 				break;
 			}
-			*/
 			case '*': {
 				if (!otokens[i] || !CAN_SEE(ch, (char_data*) otokens[i]))
 					strcat(sb,"it");
@@ -160,37 +158,55 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 			case '~':
 			case '|':
 			case '^':
-			// case '&':	// removed this because it conflicts with color codes
+			case '&':
 			case '*': {
-				/* get char_data, move to next token */
-				type[i] = *p;
-				*s = '\0';
-				p = any_one_name(++p, name);
-				otokens[i] = find_invis ? get_char_in_room(IN_ROOM(ch), name) : get_char_room_vis(ch, name);
-				tokens[++i] = ++s;
+				if (*(p+1) != *p) {
+					/* get char_data, move to next token */
+					type[i] = *p;
+					*s = '\0';
+					p = any_one_name(++p, name);
+					otokens[i] = find_invis ? get_char_in_room(IN_ROOM(ch), name) : get_char_room_vis(ch, name);
+					tokens[++i] = ++s;
+				}
+				else {
+					// double symbols are ignored
+					++p;
+					*s++ = *p++;
+				}
 				break;
 			}
 
 			case '@': {
-				/* get obj_data, move to next token */
-				type[i] = *p;
-				*s = '\0';
-				p = any_one_name(++p, name);
+				if (*(p+1) != *p) {
+					/* get obj_data, move to next token */
+					type[i] = *p;
+					*s = '\0';
+					p = any_one_name(++p, name);
 
-				if (find_invis)
-					obj = get_obj_in_room(IN_ROOM(ch), name);
-				else if (!(obj = get_obj_in_list_vis(ch, name, ROOM_CONTENTS(IN_ROOM(ch))))) {
-					// nothing
-				}
-				else if (!(obj = get_obj_in_equip_vis(ch, name, ch->equipment))) {
-					// nothing
+					if (*name == UID_CHAR) {
+						obj = get_obj(name);
+					}
+					else if (find_invis) {
+						obj = get_obj_in_room(IN_ROOM(ch), name);
+					}
+					else if (!(obj = get_obj_in_list_vis(ch, name, ROOM_CONTENTS(IN_ROOM(ch))))) {
+						// nothing
+					}
+					else if (!(obj = get_obj_in_equip_vis(ch, name, ch->equipment))) {
+						// nothing
+					}
+					else {
+						obj = get_obj_in_list_vis(ch, name, ch->carrying);
+					}
+
+					otokens[i] = obj;
+					tokens[++i] = ++s;
 				}
 				else {
-					obj = get_obj_in_list_vis(ch, name, ch->carrying);
+					// double symbols are ignored
+					++p;
+					*s++ = *p++;
 				}
-
-				otokens[i] = obj;
-				tokens[++i] = ++s;
 				break;
 			}
 

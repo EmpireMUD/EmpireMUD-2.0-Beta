@@ -2617,11 +2617,19 @@ ACMD(do_rest) {
 
 
 ACMD(do_run) {
+	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
+	PATHFIND_VALIDATOR(pathfind_road);
+	
+	char buf[MAX_STRING_LENGTH];
+	long long time_check = -1;
+	room_data *path_to_room;
+	char *found_path = NULL;
 	int dir, dist = -1;
 	bool dir_only;
 
 	skip_run_filler(&argument);
 	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word
+	path_to_room = (*argument && HAS_NAVIGATION(ch)) ? parse_room_from_coords(argument) : NULL;	// maybe
 	
 	// basics
 	if (IS_NPC(ch)) {
@@ -2641,20 +2649,44 @@ ACMD(do_run) {
 	else if (!*argument) {
 		msg_to_char(ch, "You must specify the path to run using directions and distances.\r\n");
 	}
-	else if (!dir_only && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
+	else if (!dir_only && !path_to_room && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
 		// sent its own error message
 	}
-	else if (!dir_only && (dir == -1 || dir == DIR_RANDOM)) {
+	else if (!dir_only && !path_to_room && (dir == -1 || dir == DIR_RANDOM)) {
 		msg_to_char(ch, "Invalid path string.\r\n");
 	}
 	
 	// optional direction-only parsing
-	else if (dir_only && ((dir = parse_direction(ch, argument)) == NO_DIR || dir == DIR_RANDOM)) {
+	else if (dir_only && !path_to_room && ((dir = parse_direction(ch, argument)) == NO_DIR || dir == DIR_RANDOM)) {
 		msg_to_char(ch, "Invalid direction '%s'.\r\n", argument);
+	}
+	
+	// did they request a path?
+	else if (path_to_room && get_cooldown_time(ch, COOLDOWN_PATHFINDING) > 0) {
+		msg_to_char(ch, "You must wait another %d second%s before you can run-to-coordinates again.\r\n", get_cooldown_time(ch, COOLDOWN_PATHFINDING), PLURAL(get_cooldown_time(ch, COOLDOWN_PATHFINDING)));
+	}
+	else if (path_to_room && (time_check = microtime()) && !(found_path = get_pathfind_string(IN_ROOM(ch), path_to_room, ch, NULL, pathfind_road))) {
+		msg_to_char(ch, "Unable to find a route to that location (it may be too far or there may not be a road to it).\r\n");
+		// if pathfinding took longer than 0.1 seconds, set a cooldown
+		if (time_check > 0 && microtime() - time_check > 100000) {
+			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
+			strcpy(buf, coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
+			log("Pathfinding: %s failed to find run path in time:%s to%s", GET_NAME(ch), coord_display(NULL, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), FALSE), buf);
+		}
+	}
+	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {
+		msg_to_char(ch, "Unable to find a route to that location (it may be too far or there may not be a road to it).\r\n");
 	}
 	
 	else {
 		// 'dir' is the way we are ACTUALLY going, but we store the direction the character thinks it is
+		
+		// if pathfinding took longer than 0.1 seconds, set a cooldown
+		if (time_check > 0 && microtime() - time_check > 100000) {
+			strcpy(buf, coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
+			log("Pathfinding: %s got slow run path (%d microseconds):%s to%s", GET_NAME(ch), (int)(microtime() - time_check), coord_display(NULL, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), FALSE), buf);
+			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
+		}
 		
 		GET_ACTION(ch) = ACT_NONE;	// prevents a stops-moving message
 		start_action(ch, ACT_RUNNING, 0);
@@ -2664,7 +2696,7 @@ ACMD(do_run) {
 		if (GET_MOVEMENT_STRING(ch)) {
 			free(GET_MOVEMENT_STRING(ch));
 		}
-		GET_MOVEMENT_STRING(ch) = dir_only ? NULL : str_dup(argument);
+		GET_MOVEMENT_STRING(ch) = found_path ? str_dup(found_path) : (dir_only ? NULL : str_dup(argument));
 		
 		msg_to_char(ch, "You start running %s...\r\n", dirs[get_direction_for_char(ch, dir)]);
 	}

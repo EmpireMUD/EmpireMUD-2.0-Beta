@@ -66,8 +66,8 @@ if %actor.obj_target(%arg%)% != %self%
   halt
 end
 set room_var %actor.room%
-%send% %actor% You start unwrapping %self.shortdesc%...
-%echoaround% %actor% %actor.name% starts unwrapping %self.shortdesc%...
+%send% %actor% You start unwrapping @%self%...
+%echoaround% %actor% ~%actor% starts unwrapping @%self%...
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.disabled%
   halt
@@ -115,8 +115,8 @@ switch %last_christmas_gift_item%
 done
 %load% obj %next_gift% %actor% inv
 set item %actor.inventory()%
-%send% %actor% You finish unwrapping the gift and find %item.shortdesc% inside!
-%echoaround% %actor% %actor.name% finishes unwrapping the gift and finds %item.shortdesc%!
+%send% %actor% You finish unwrapping the gift and find @%item% inside!
+%echoaround% %actor% ~%actor% finishes unwrapping the gift and finds @%item%!
 set last_christmas_gift_item %next_gift%
 remote last_christmas_gift_item %actor.id%
 %quest% %actor% trigger 16600
@@ -133,7 +133,7 @@ if !%actor.is_pc%
   halt
 end
 wait 1 sec
-%echo% %self.name% stands up to greet you.
+%echo% ~%self% stands up to greet you.
 wait 3 sec
 say Ho ho ho! Merry Christmas!
 wait 1 sec
@@ -150,8 +150,8 @@ while %person%
       set last_christmas_day %person.last_christmas_day%
     end
     if %last_christmas_day% < %dailycycle%
-      %send% %person% %self.name% gives you a gift!
-      %echoaround% %person% %self.name% gives %person.name% a gift!
+      %send% %person% ~%self% gives you a gift!
+      %echoaround% %person% ~%self% gives ~%person% a gift!
       %load% obj 10702 %person%
       set last_christmas_day %dailycycle%
       remote last_christmas_day %person.id%
@@ -205,26 +205,26 @@ if %veh%
 end
 * once per 30 minutes
 if %actor.cooldown(256)%
-  %send% %actor% %self.shortdesc% is on cooldown.
+  %send% %actor% @%self% is on cooldown.
   halt
 end
 set room_var %actor.room%
-%send% %actor% You shake %self.shortdesc% and it begins to swirl with light...
-%echoaround% %actor% %actor.name% shakes %self.shortdesc% and it begins to swirl with light...
+%send% %actor% You shake @%self% and it begins to swirl with light...
+%echoaround% %actor% ~%actor% shakes @%self% and it begins to swirl with light...
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
-%send% %actor% %self.shortdesc% glows a wintry white and the light begins to envelop you!
-%echoaround% %actor% %self.shortdesc% glows a wintry white and the light begins to envelop %actor.name%!
+%send% %actor% @%self% glows a wintry white and the light begins to envelop you!
+%echoaround% %actor% @%self% glows a wintry white and the light begins to envelop ~%actor%!
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || !%actor.home% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
-%echoaround% %actor% %actor.name% vanishes in a flurry of snow!
+%echoaround% %actor% ~%actor% vanishes in a flurry of snow!
 %teleport% %actor% %actor.home%
 %force% %actor% look
-%echoaround% %actor% %actor.name% appears in a flurry of snow!
+%echoaround% %actor% ~%actor% appears in a flurry of snow!
 nop %actor.set_cooldown(256, 1800)%
 nop %actor.cancel_adventure_summon%
 ~
@@ -245,7 +245,7 @@ end
 %load% mob 10712
 set mob %room.people%
 if %mob.vnum% == 10712
-  %echo% %mob.name% comes tumbling out of %self.shortdesc%!
+  %echo% ~%mob% comes tumbling out of @%self%!
 end
 ~
 #10713
@@ -274,10 +274,10 @@ wait 1
 set mob %self.room.people%
 if %mob.vnum% == 10705
   * success: send a message
-  %echo% %mob.name% walks up from lower on the mountain.
+  %echo% ~%mob% walks up from lower on the mountain.
 elseif %mob.vnum% == 10700
   * success: send a message
-  %echo% %mob.name% flies up from lower on the mountain.
+  %echo% ~%mob% flies up from lower on the mountain.
 end
 %purge% %self%
 ~
@@ -288,7 +288,7 @@ Elf despawner~
 if %self.fighting% || %self.disabled%
   halt
 end
-%echo% %self.name% runs off!
+%echo% ~%self% runs off!
 %purge% %self%
 ~
 #10715
@@ -344,7 +344,7 @@ end
 set pet %actor.room.people%
 if %pet.vnum% == %vnum%
   nop %actor.add_minipet(%vnum%)%
-  %send% %actor% You gain '%pet.name%' as a mini-pet. Use the minipets command to summon it.
+  %send% %actor% You gain '~%pet%' as a mini-pet. Use the minipets command to summon it.
   %purge% %pet%
 else
   %send% %actor% There seems to be a problem giving you minipet #%vnum%. Please report this.
@@ -367,7 +367,7 @@ end
 set varname summon_%self.vnum%
 * Cooldown
 if %actor.cooldown(10728)%
-  %send% %actor% %self.shortdesc% is on cooldown.
+  %send% %actor% @%self% is on cooldown.
   halt
 end
 set ch %room.people%
@@ -383,7 +383,7 @@ if %mobs% > 4
   halt
 end
 %send% %actor% You throw a handful of the magical coal lumps into the sky...
-%echoaround% %actor% %actor.name% throws a handful of sparkling coal lumps into the sky...
+%echoaround% %actor% ~%actor% throws a handful of sparkling coal lumps into the sky...
 wait 1 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
@@ -396,28 +396,28 @@ if (%actor.room% != %room% || %actor.position% != Standing)
   halt
 end
 %send% %actor% You start rolling the snow into a large ball...
-%echoaround% %actor% %actor.name% starts rolling the snow into a large ball...
+%echoaround% %actor% ~%actor% starts rolling the snow into a large ball...
 wait 3 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
   halt
 end
 %send% %actor% You finish the snowman's body and start rummaging through your belongings...
-%echoaround% %actor% %actor.name% finishes the snowman's body and starts rummaging through %actor.hisher% belongings...
+%echoaround% %actor% ~%actor% finishes the snowman's body and starts rummaging through ^%actor% belongings...
 wait 1 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
   halt
 end
 %send% %actor% You find a carrot and some sticks, and add them to your snowman...
-%echoaround% %actor% %actor.name% finds a carrot and some sticks, and adds them to %actor.hisher% snowman...
+%echoaround% %actor% ~%actor% finds a carrot and some sticks, and adds them to ^%actor% snowman...
 wait 1 sec
 if (%actor.room% != %room% || %actor.position% != Standing)
   %send% %actor% You stop building the snowman.
   halt
 end
 %send% %actor% You finish your snowman and step back to admire your work.
-%echoaround% %actor% %actor.name% finishes %actor.hisher% snowman and steps back with a satisfied nod.
+%echoaround% %actor% ~%actor% finishes ^%actor% snowman and steps back with a satisfied nod.
 nop %actor.set_cooldown(10728, 180)%
 %load% m 10728
 set mob %self.room.people%
@@ -445,7 +445,7 @@ done
 Give rejection~
 0 j 100
 ~
-%send% %actor% %self.name% does not want that.
+%send% %actor% ~%self% does not want that.
 return 0
 ~
 #10732
@@ -460,7 +460,7 @@ switch %random.3%
     say I don't like hills.
   break
   case 3
-    %echo% %self.name% wears some sticks like a crown.
+    %echo% ~%self% wears some sticks like a crown.
   break
 done
 ~
@@ -511,7 +511,7 @@ switch %random.3%
     say Jack, that hill doesn't look safe.
   break
   case 3
-    %echo% %self.name% tumbles around on the ground.
+    %echo% ~%self% tumbles around on the ground.
   break
 done
 ~
@@ -527,7 +527,7 @@ switch %random.3%
     say I think we overfeed the pigs.
   break
   case 3
-    %echo% %self.name% could eat no fat. His wife could eat no lean.
+    %echo% ~%self% could eat no fat. His wife could eat no lean.
   break
 done
 ~
@@ -553,14 +553,14 @@ if %actor.cooldown(10738)%
   halt
 end
 set room_var %actor.room%
-%send% %actor% You touch %self.shortdesc% and it begins to swirl with light...
-%echoaround% %actor% %actor.name% touches %self.shortdesc% and it begins to swirl with light...
+%send% %actor% You touch @%self% and it begins to swirl with light...
+%echoaround% %actor% ~%actor% touches @%self% and it begins to swirl with light...
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
 end
 %send% %actor% Yellow light begins to whirl around you...
-%echoaround% %actor% Yellow light begins to whirl around %actor.name%...
+%echoaround% %actor% Yellow light begins to whirl around ~%actor%...
 wait 5 sec
 if %actor.room% != %room_var% || %actor.fighting% || %self.carried_by% != %actor% || %actor.aff_flagged(DISTRACTED)%
   halt
@@ -568,15 +568,15 @@ end
 set destination %instance.nearest_rmt(10730)%
 if !%destination%
   %send% %actor% Your teleport fails!
-  %echoaround% %actor% %actor.name%'s teleport fails!
+  %echoaround% %actor% |%actor% teleport fails!
   halt
 end
-%echoaround% %actor% %actor.name% vanishes in a flourish of yellow light!
+%echoaround% %actor% ~%actor% vanishes in a flourish of yellow light!
 %teleport% %actor% %destination%
 set destination %instance.location%
 %teleport% %actor% %destination%
 %force% %actor% look
-%echoaround% %actor% %actor.name% appears in a flourish of yellow light!
+%echoaround% %actor% ~%actor% appears in a flourish of yellow light!
 nop %actor.set_cooldown(10738, 43200)%
 nop %actor.cancel_adventure_summon%
 ~
@@ -592,7 +592,7 @@ switch %random.3%
     say I can't believe we're out of pie.
   break
   case 3
-    %echo% %self.name% licks his lips and looks around for his pie.
+    %echo% ~%self% licks his lips and looks around for his pie.
   break
 done
 ~
@@ -627,7 +627,7 @@ switch %random.3%
     say Has anyone seen my curds and whey?
   break
   case 3
-    %echo% %self.name% dusts off her tuffet.
+    %echo% ~%self% dusts off her tuffet.
   break
 done
 ~
@@ -643,7 +643,7 @@ switch %random.3%
     say Oh where, oh where has my little lamb gone?
   break
   case 3
-    %echo% %self.name% seems to have lost her bell.
+    %echo% ~%self% seems to have lost her bell.
   break
 done
 ~
@@ -659,8 +659,8 @@ if %actor.has_minipet(%self.val0%)%
   %send% %actor% You already have the lamb mini-pet.
 else
   nop %actor.add_minipet(%self.val0%)%
-  %send% %actor% You ring %self.shortdesc% and gain a little lamb mini-pet! (see HELP MINIPET)
-  %echoaround% %actor% %actor.name% rings %self.shortdesc%.
+  %send% %actor% You ring @%self% and gain a little lamb mini-pet! (see HELP MINIPET)
+  %echoaround% %actor% ~%actor% rings @%self%.
 end
 ~
 #10746
@@ -675,7 +675,7 @@ switch %random.3%
     say I have so many children, I don't know what to do.
   break
   case 3
-    %echo% %self.name% seems to have lost her broth.
+    %echo% ~%self% seems to have lost her broth.
   break
 done
 ~
@@ -686,9 +686,9 @@ Mother Goose spawn~
 if (!%instance.location% || %self.room.template% != 10730)
   halt
 end
-%echo% %self.name% vanishes!
+%echo% ~%self% vanishes!
 mgoto %instance.location%
-%echo% %self.name% exits from the giant shoe.
+%echo% ~%self% exits from the giant shoe.
 if (%self.vnum% == 10732)
   * Jack: load Jill
   %load% mob 10733 ally
@@ -723,8 +723,8 @@ if !%found%
   return 0
   halt
 end
-%send% %actor% You sell %self.shortdesc% to Miner Nynar for 5 goblin coins.
-%echoaround% %actor% %actor.name% sells %self.shortdesc% to Miner Nynar.
+%send% %actor% You sell @%self% to Miner Nynar for 5 goblin coins.
+%echoaround% %actor% ~%actor% sells @%self% to Miner Nynar.
 nop %actor.give_coins(5)%
 %purge% %self%
 ~
@@ -750,8 +750,8 @@ if !%found%
   return 0
   halt
 end
-%send% %actor% You sell %self.shortdesc% to Miner Meena for 5 goblin coins.
-%echoaround% %actor% %actor.name% sells %self.shortdesc% to Miner Meena.
+%send% %actor% You sell @%self% to Miner Meena for 5 goblin coins.
+%echoaround% %actor% ~%actor% sells @%self% to Miner Meena.
 nop %actor.give_coins(5)%
 %purge% %self%
 ~
@@ -779,7 +779,7 @@ while %person%
   set person %person.next_in_room%
 done
 if (!%arg%)
-  %send% %actor% %self.name% tells you, 'What you want?'
+  %send% %actor% ~%self% tells you, 'What you want?'
   %send% %actor% (Type 'buy <item>' to spend 50 coins and buy something.)
   if %meena_is_here%
     %send% %actor% Meena sells: a goblin pick ('buy pick')
@@ -796,7 +796,7 @@ if (!%arg%)
   halt
 elseif pick ~= %arg%
   if !%meena_is_here%
-    %send% %actor% %self.name% tells you, 'Meena sell that. She not here.'
+    %send% %actor% ~%self% tells you, 'Meena sell that. She not here.'
     return 1
     halt
   else
@@ -805,7 +805,7 @@ elseif pick ~= %arg%
   end
 elseif bug potion ~= %arg%
   if !%nynar_is_here%
-    %send% %actor% %self.name% tells you, 'Nynar sell that. He not here.'
+    %send% %actor% ~%self% tells you, 'Nynar sell that. He not here.'
     return 1
     halt
   else
@@ -814,7 +814,7 @@ elseif bug potion ~= %arg%
   end
 elseif coffin ~= %arg%
   if !%blacklung_is_here%
-    %send% %actor% %self.name% tells you, 'Blacklung sell that. He not here.'
+    %send% %actor% ~%self% tells you, 'Blacklung sell that. He not here.'
     return 1
     halt
   else
@@ -823,7 +823,7 @@ elseif coffin ~= %arg%
   end
 elseif raft ~= %arg%
   if !%hanx_is_here%
-    %send% %actor% %self.name% tells you, 'Hanx sell that. He not here.'
+    %send% %actor% ~%self% tells you, 'Hanx sell that. He not here.'
     return 1
     halt
   else
@@ -832,11 +832,11 @@ elseif raft ~= %arg%
     set is_veh 1
   end
 else
-  %send% %actor% %self.name% tells you, 'Goblin don't sell %arg%.'
+  %send% %actor% ~%self% tells you, 'Goblin don't sell %arg%.'
   halt
 end
 if !%actor.can_afford(50)%
-  %send% %actor% %self.name% tells you, 'Big human needs 50 coin to buy that.'
+  %send% %actor% ~%self% tells you, 'Big human needs 50 coin to buy that.'
   halt
 end
 nop %actor.charge_coins(50)%
@@ -851,7 +851,7 @@ else
   end
 end
 %send% %actor% You buy %named% for 50 coins.
-%echoaround% %actor% %actor.name% buys %named%.
+%echoaround% %actor% ~%actor% buys %named%.
 ~
 #10753
 Buy Potion/Nynar~
@@ -860,24 +860,24 @@ buy~
 set vnum -1
 set named a thing
 if (!%arg%)
-  %send% %actor% %self.name% tells you, 'Nynar only sell bug potion.'
+  %send% %actor% ~%self% tells you, 'Nynar only sell bug potion.'
   %send% %actor% (Type 'buy potion' to spend 30 coins and buy a bug potion.)
   halt
 elseif bug potion ~= %arg%
   set vnum 10754
   set named a bug potion
 else
-  %send% %actor% %self.name% tells you, 'Nynar don't sell %arg%.'
+  %send% %actor% ~%self% tells you, 'Nynar don't sell %arg%.'
   halt
 end
 if !%actor.can_afford(30)%
-  %send% %actor% %self.name% tells you, 'Big human needs 30 coin to buy that.'
+  %send% %actor% ~%self% tells you, 'Big human needs 30 coin to buy that.'
   halt
 end
 nop %actor.charge_coins(30)%
 %load% obj %vnum% %actor% inv 25
 %send% %actor% You buy %named% for 30 coins.
-%echoaround% %actor% %actor.name% buys %named%.
+%echoaround% %actor% ~%actor% buys %named%.
 ~
 #10754
 Nynar env~
@@ -887,14 +887,14 @@ Nynar env~
 switch %random.4%
   case 1
     say So much webs... So much webs...
-    %echo% %self.name% shivers uncomfortably.
+    %echo% ~%self% shivers uncomfortably.
   break
   case 2
     say Nynar sell bug potion for 30 coin!
     %echo% (Type 'buy potion' to buy one.)
   break
   case 3
-    %echo% %self.name% scratches %self.himher%self all over.
+    %echo% ~%self% scratches *%self%self all over.
   break
   case 4
     say Never going back there.
@@ -909,14 +909,14 @@ Meena env~
 switch %random.4%
   case 1
     say All of the screaming!
-    %echo% %self.name% shivers uncomfortably.
+    %echo% ~%self% shivers uncomfortably.
   break
   case 2
     say Meena sell goblin pick for 50 coin!
     %echo% (Type 'buy pick' to buy one.)
   break
   case 3
-    %echo% %self.name% leaps up suddenly, as if something crawled up her leg.
+    %echo% ~%self% leaps up suddenly, as if something crawled up her leg.
   break
   case 4
     say Meena should have been a major.
@@ -930,9 +930,9 @@ Goblin Miner Spawn~
 if (!%instance.location% || %self.room.template% != 10750)
   halt
 end
-%echo% %self.name% flees the mine!
+%echo% ~%self% flees the mine!
 mgoto %instance.location%
-%echo% %self.name% comes screaming out of the mine!
+%echo% ~%self% comes screaming out of the mine!
 mmove
 mmove
 mmove
@@ -959,24 +959,24 @@ buy~
 set vnum -1
 set named a thing
 if (!%arg%)
-  %send% %actor% %self.name% tells you, 'Blacklung only sell coffin.'
+  %send% %actor% ~%self% tells you, 'Blacklung only sell coffin.'
   %send% %actor% (Type 'buy coffin' to spend 50 coins and buy a goblin coffin.)
   halt
 elseif coffin ~= %arg%
   set vnum 10770
   set named a goblin coffin
 else
-  %send% %actor% %self.name% tells you, 'Blacklung don't sell %arg%.'
+  %send% %actor% ~%self% tells you, 'Blacklung don't sell %arg%.'
   halt
 end
 if !%actor.can_afford(50)%
-  %send% %actor% %self.name% tells you, 'Big human needs 50 coin to buy that.'
+  %send% %actor% ~%self% tells you, 'Big human needs 50 coin to buy that.'
   halt
 end
 nop %actor.charge_coins(50)%
 %load% obj %vnum% %actor% inv 25
 %send% %actor% You buy %named% for 50 coins.
-%echoaround% %actor% %actor.name% buys %named%.
+%echoaround% %actor% ~%actor% buys %named%.
 ~
 #10759
 Buy Raft/Hanx~
@@ -985,18 +985,18 @@ buy~
 set vnum -1
 set named a thing
 if (!%arg%)
-  %send% %actor% %self.name% tells you, 'Hanx only sell raft.'
+  %send% %actor% ~%self% tells you, 'Hanx only sell raft.'
   %send% %actor% (Type 'buy raft' to spend 50 coins and buy a goblin raft.)
   halt
 elseif raft ~= %arg%
   set vnum 10771
   set named a goblin raft
 else
-  %send% %actor% %self.name% tells you, 'Hanx don't sell %arg%.'
+  %send% %actor% ~%self% tells you, 'Hanx don't sell %arg%.'
   halt
 end
 if !%actor.can_afford(50)%
-  %send% %actor% %self.name% tells you, 'Big human needs 50 coin to buy that.'
+  %send% %actor% ~%self% tells you, 'Big human needs 50 coin to buy that.'
   halt
 end
 nop %actor.charge_coins(50)%
@@ -1007,7 +1007,7 @@ if %emp%
   %own% %veh% %emp%
 end
 %send% %actor% You buy %named% for 50 coins.
-%echoaround% %actor% %actor.name% buys %named%.
+%echoaround% %actor% ~%actor% buys %named%.
 ~
 #10760
 Widow Spider: Bind~
@@ -1041,11 +1041,11 @@ if %target.affect(10760)%
 end
 nop %self.cooldown(10761, 15)%
 * Valid target found, start attack
-%send% %target% %self.name% twists around, pointing %self.hisher% spinneret at you...
-%echoaround% %target% %self.name% twists around, pointing %self.hisher% spinneret at %target.name%...
+%send% %target% ~%self% twists around, pointing ^%self% spinneret at you...
+%echoaround% %target% ~%self% twists around, pointing ^%self% spinneret at ~%target%...
 wait 3 sec
 %send% %target% A stream of sticky webs flies out, binding your limbs!
-%echoaround% %target% A stream of sticky webs flies out, binding %target.name%'s limbs!
+%echoaround% %target% A stream of sticky webs flies out, binding |%target% limbs!
 %send% %target% Type 'struggle' to break free!
 dg_affect #10760 %actor% STUNNED on 15
 ~
@@ -1067,13 +1067,13 @@ end
 eval struggle_counter %struggle_counter% + 1
 if %struggle_counter% >= %break_free_at%
   %send% %actor% You break free of your bindings!
-  %echoaround% %actor% %actor.name% breaks free of %actor.hisher% bindings!
+  %echoaround% %actor% ~%actor% breaks free of ^%actor% bindings!
   dg_affect #10760 %actor% off
   rdelete struggle_counter %actor.id%
   halt
 else
   %send% %actor% You struggle against your bindings, but fail to break free.
-  %echoaround% %actor% %actor.name% struggles against %actor.hisher% bindings!
+  %echoaround% %actor% ~%actor% struggles against ^%actor% bindings!
   remote struggle_counter %actor.id%
   halt
 end
@@ -1094,7 +1094,7 @@ end
 set varname tomb%self.vnum%
 * once per 6 hours
 if %actor.cooldown(%self.vnum%)%
-  %send% %actor% You must wait before using %self.shortdesc% again.
+  %send% %actor% You must wait before using @%self% again.
   return 1
   halt
 end
@@ -1195,7 +1195,7 @@ if !%actor.canuseroom_member()%
 end
 %load% obj 10777 %actor% inv
 %send% %actor% You pick the fruit of knowledge from the tree, which withers and dies!
-%echoaround% %actor% %actor.name% picks the fruit of knowledge from the tree, which withers and dies!
+%echoaround% %actor% ~%actor% picks the fruit of knowledge from the tree, which withers and dies!
 if %room.building_vnum% == 10779
   %terraform% %room% 10776
 else

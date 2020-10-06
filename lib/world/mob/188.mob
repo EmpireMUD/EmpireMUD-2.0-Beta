@@ -31,7 +31,7 @@ centaur headless horseman man~
 the headless centaur~
 A headless horse man rears back and brandishes his sword!
 ~
-25 400 bdoy c 4
+25 400 bdo c 4
 1 0 12 1
 D
    This mighty centaur stands head and shoulders above you. Well, shoulders,
@@ -313,12 +313,61 @@ D
 half of it into a human!
 ~
 S
+#18861
+demon small basic~
+a small demon~
+A basic small demon growls here.
+~
+1 1 do n 2
+0 0 0 15
+D
+   A basic demon, small enough to fit through the portal, nothing too
+noticeable about it.
+~
+M
+0
+A low growl comes from the shadows.~
+M
+4
+$n hisses as $e looks for shadows to hide in.~
+M
+5
+A patch of shadow resolves itself into $n.~
+M
+5
+The smell of fetted breath preceeds the glow of $n's eyes.~
+M
+0
+A snorting snuffling sound clearly indicates $n is looking for something, or someone.~
+T 18853
+T 18852
+S
+#18862
+demon nether massive~
+a nether demon~
+A massive demon of nether origin roars at you!
+~
+400 400 bdgyzABDF choqABCDEK 5
+0 0 0 15
+M
+1
+You never should have come here. Now you will never leave here.~
+M
+0
+Pure blackness emits from $n like heat off desert sand.~
+M
+4
+Sunlight shines down, but fails to reach the ground anywhere near $n.~
+M
+1
+Suffer.~
+S
 #18871
 ghost friendly~
 a friendly ghost~
 A ghost with a friendly looking smile hovers above the ground.
 ~
-1 1 bdh cmn 3
+1 1 dh cmn 3
 0 0 0 15
 D
 Other than a friendly smile, there isn't much to see about this spirit.
@@ -362,6 +411,8 @@ $n hisses in pain through $s teeth.~
 M
 0
 $n shudders as $s muscles lock up.~
+T 18873
+T 18876
 S
 #18876
 pig~

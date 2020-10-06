@@ -528,11 +528,15 @@ Special Variables When using field - The variable returns:
    (1-35), month (1-12), year, or day_of_year (1-360).
 &ctimestamp&0 - Current unix timestamp.
 &cweather&0 - One of: sunny, cloudy, raining, lightning
+
+Names and pronouns:
+&c~%var%&0 - name, someone, your
 &c|%var%&0 - name's, someone's, your
-&c&&%var%&0 - it, you, he/she -- DOES NOT WORK
-&c*%var%&0 - it, you, him/her
-* object only
-&c'%obj%&0 - something, name
+&c&&%var%&0 - he/she/it, you
+&c*%var%&0 - him/her/it, you
+&c^%var%&0 - his/her/its, your
+* object only:
+&c@%obj%&0 - short desc, something
 #d
 "SPEECH TRIGGER" "MTRIG SPEECH" "RTRIG SPEECH" "VTRIG SPEECH" TRIGEDIT-MOB-SPEECH TRIGEDIT-ROOM-SPEECH TRIGEDIT-VEH-SPEECH
 

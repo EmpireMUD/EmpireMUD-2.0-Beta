@@ -2703,6 +2703,185 @@ ACMD(do_herd) {
 }
 
 
+ACMD(do_lastname) {
+	void change_personal_lastname(char_data *ch, char *name);
+	extern int _parse_name(char *arg, char *name);
+	extern int Valid_Name(char *newname);
+	
+	char arg1[MAX_INPUT_LENGTH], new_name[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	char *arg2, *best, *exact;
+	struct player_lastname *lastn;
+	size_t size;
+	int count;
+	
+	// we assume 'lastname <change | set | list> <name>' but also keep 'argument' whole too
+	arg2 = any_one_arg(argument, arg1);
+	skip_spaces(&argument);
+	skip_spaces(&arg2);
+	
+	if (IS_NPC(ch)) {
+		msg_to_char(ch, "NPCs cannot do this.\r\n");
+	}
+	else if (!IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHANGE_ANY_TIME | LASTNAME_CHOOSE_FROM_LIST)) {
+		// not allowed to pick
+		if (GET_CURRENT_LASTNAME(ch)) {
+			msg_to_char(ch, "Your lastname is: %s\r\n", GET_CURRENT_LASTNAME(ch));
+		}
+		else {
+			msg_to_char(ch, "You cannot set your own lastname.\r\n");
+		}
+	}
+	else if (!*argument) {	// no arg
+		// usage?
+		if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHANGE_ANY_TIME) && IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
+			msg_to_char(ch, "Usage: lastname [change | list] [name | none]\r\n");
+		}
+		else if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHANGE_ANY_TIME)) {
+			msg_to_char(ch, "Usage: lastname [change] [name | none]\r\n");
+		}
+		else if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
+			msg_to_char(ch, "Usage: lastname [list] [name | none]\r\n");
+		}
+		
+		// and show current
+		if (GET_CURRENT_LASTNAME(ch)) {
+			msg_to_char(ch, "Your lastname is: %s\r\n", GET_CURRENT_LASTNAME(ch));
+		}
+		else {
+			msg_to_char(ch, "You don't have a lastname.\r\n");
+		}
+	}
+	else if (is_abbrev(arg1, "change")) {
+		// player wants to change their self-chosen lastname
+		if (!IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHANGE_ANY_TIME)) {
+			msg_to_char(ch, "You cannot %s your own lastname.\r\n", GET_PERSONAL_LASTNAME(ch) ? "change" : "choose");
+		}
+		else if (!*arg2) {
+			msg_to_char(ch, "Change your lastname to what?\r\n");
+		}
+		else if (!str_cmp(arg2, "none")) {
+			change_personal_lastname(ch, NULL);
+			msg_to_char(ch, "You no longer have a personal lastname.\r\n");
+			syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "%s has changed personal lastname to: none", GET_NAME(ch));
+		}
+		else if ((_parse_name(arg2, new_name)) || !Valid_Name(new_name) || strlen(new_name) < 2 || strlen(new_name) > MAX_NAME_LENGTH || fill_word(strcpy(buf, new_name)) || reserved_word(buf)) {
+			msg_to_char(ch, "Invalid lastname.\r\n");
+		}
+		else {
+			// ok!
+			change_personal_lastname(ch, new_name);
+			if (GET_CURRENT_LASTNAME(ch)) {
+				free(GET_CURRENT_LASTNAME(ch));
+			}
+			GET_CURRENT_LASTNAME(ch) = str_dup(GET_PERSONAL_LASTNAME(ch));
+			msg_to_char(ch, "Your personal lastname is now: %s\r\n", GET_PERSONAL_LASTNAME(ch));
+			syslog(SYS_INFO, GET_INVIS_LEV(ch), TRUE, "%s has changed personal lastname to: %s", GET_NAME(ch), GET_PERSONAL_LASTNAME(ch));
+		}
+	}
+	else if (is_abbrev(arg1, "list") && IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
+		if (!GET_PERSONAL_LASTNAME(ch) && !GET_LASTNAME_LIST(ch)) {
+			msg_to_char(ch, "You don't have any lastnames to list.\r\n");
+		}
+		else {	// list them all
+			count = 0;
+			if (*arg2) {
+				size = snprintf(output, sizeof(output), "Lastnames matching '%s':\r\n", arg2);
+			}
+			else {
+				size = snprintf(output, sizeof(output), "Your lastnames:\r\n");
+			}
+		
+			if (GET_PERSONAL_LASTNAME(ch)) {
+				++count;
+				size += snprintf(output + size, sizeof(output) - size, " %s (personal)\r\n", GET_PERSONAL_LASTNAME(ch));
+			}
+		
+			LL_FOREACH(GET_LASTNAME_LIST(ch), lastn) {
+				if (*arg2 && !multi_isname(arg2, lastn->name)) {
+					continue;	// searched
+				}
+		
+				// show it
+				++count;
+				snprintf(line, sizeof(line), " %s\r\n", NULLSAFE(lastn->name));
+				if (size + strlen(line) < sizeof(output)) {
+					strcat(output, line);
+					size += strlen(line);
+				}
+				else {
+					if (size + 10 < sizeof(output)) {
+						strcat(output, "OVERFLOW\r\n");
+					}
+					break;
+				}
+			}
+	
+			if (!count) {
+				strcat(output, " none\r\n");	// space reserved for this for sure
+			}
+	
+			if (ch->desc) {
+				page_string(ch->desc, output, TRUE);
+			}
+		}
+	}
+	else if (IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_CHOOSE_FROM_LIST)) {
+		if (!str_cmp(argument, "none")) {
+			// just shutting it off?
+			if (GET_CURRENT_LASTNAME(ch)) {
+				free(GET_CURRENT_LASTNAME(ch));
+			}
+			GET_CURRENT_LASTNAME(ch) = NULL;
+			queue_delayed_update(ch, CDU_SAVE);
+			msg_to_char(ch, "You stop using a lastname.\r\n");
+			return;
+		}
+		
+		// set current lastname (using whole arg)
+		best = exact = NULL;
+		
+		// check personal first
+		if (GET_PERSONAL_LASTNAME(ch)) {
+			if (!str_cmp(argument, GET_PERSONAL_LASTNAME(ch))) {
+				exact = GET_PERSONAL_LASTNAME(ch);
+			}
+			else if (multi_isname(argument, GET_PERSONAL_LASTNAME(ch))) {
+				best = GET_PERSONAL_LASTNAME(ch);
+			}
+		}
+		
+		// no exact? check the list
+		if (!exact) {
+			LL_FOREACH(GET_LASTNAME_LIST(ch), lastn) {
+				if (lastn->name && !str_cmp(argument, lastn->name)) {
+					exact = lastn->name;
+					break;
+				}
+				else if (lastn->name && !best && multi_isname(argument, lastn->name)) {
+					best = lastn->name;
+				}
+			}
+		}
+		
+		// found any?
+		if (!exact && !best) {
+			msg_to_char(ch, "You don't have a lastname called '%s'.\r\n", argument);
+		}
+		else {	// change it
+			if (GET_CURRENT_LASTNAME(ch)) {
+				free(GET_CURRENT_LASTNAME(ch));
+			}
+			GET_CURRENT_LASTNAME(ch) = str_dup(exact ? exact : best);
+			queue_delayed_update(ch, CDU_SAVE);
+			msg_to_char(ch, "Your lastname is now: %s\r\n", GET_CURRENT_LASTNAME(ch));
+		}
+	}
+	else {
+		msg_to_char(ch, "Invalid lastname command.\r\n");
+	}
+}
+
+
 ACMD(do_milk) {
 	char_data *mob;
 	obj_data *cont;

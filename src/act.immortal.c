@@ -371,6 +371,7 @@ ADMIN_UTIL(util_diminish);
 ADMIN_UTIL(util_evolve);
 ADMIN_UTIL(util_exportcsv);
 ADMIN_UTIL(util_islandsize);
+ADMIN_UTIL(util_pathtest);
 ADMIN_UTIL(util_playerdump);
 ADMIN_UTIL(util_randtest);
 ADMIN_UTIL(util_redo_islands);
@@ -394,6 +395,7 @@ struct {
 	{ "evolve", LVL_CIMPL, util_evolve },
 	{ "exportcsv", LVL_CIMPL, util_exportcsv },
 	{ "islandsize", LVL_START_IMM, util_islandsize },
+	{ "pathtest", LVL_START_IMM, util_pathtest },
 	{ "playerdump", LVL_IMPL, util_playerdump },
 	{ "randtest", LVL_CIMPL, util_randtest },
 	{ "redoislands", LVL_CIMPL, util_redo_islands },
@@ -702,6 +704,53 @@ ADMIN_UTIL(util_islandsize) {
 	
 	if (ch->desc) {
 		page_string(ch->desc, buf, TRUE);
+	}
+}
+
+
+ADMIN_UTIL(util_pathtest) {
+	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
+	PATHFIND_VALIDATOR(pathfind_ocean);
+	PATHFIND_VALIDATOR(pathfind_pilot);
+	PATHFIND_VALIDATOR(pathfind_road);
+	
+	unsigned long long timer;
+	PATHFIND_VALIDATOR(*vdr);
+	room_data *to_room;
+	char *path;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	// find validator
+	if (*argument && is_abbrev(argument, "roads")) {
+		vdr = pathfind_road;
+	}
+	else if (*argument && is_abbrev(argument, "ocean")) {
+		vdr = pathfind_ocean;
+	}
+	else if (*argument && is_abbrev(argument, "pilot")) {
+		vdr = pathfind_pilot;
+	}
+	else {
+		msg_to_char(ch, "Usage: util pathtest <room> <ocean | road | pilot>\r\n");
+		return;
+	}
+	
+	timer = microtime();
+	
+	if (!*arg || !*argument) {
+		msg_to_char(ch, "Usage: util pathtest <room> <ocean | road | pilot>\r\n");
+	}
+	else if (!(to_room = find_target_room(ch, arg))) {
+		msg_to_char(ch, "Unknown target: %s\r\n", arg);
+	}
+	else if (!(path = get_pathfind_string(IN_ROOM(ch), to_room, ch, NULL, vdr))) {
+		msg_to_char(ch, "Unable to find a valid path there.\r\n");
+	}
+	else {
+		msg_to_char(ch, "Path found: %s\r\n", path);
+		msg_to_char(ch, "Time: %f seconds\r\n", (microtime()-timer) / 1000000.0);
 	}
 }
 
@@ -1827,21 +1876,43 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		vict->player.time.birth = time(0) - ((value - 17) * SECS_PER_MUD_YEAR);
 	}
 	else if SET_CASE("lastname") {
+		void add_lastname(char_data *ch, char *name);
+		void change_personal_lastname(char_data *ch, char *name);
+		extern bool has_lastname(char_data *ch, char *name);
+		void remove_lastname(char_data *ch, char *name);
+		char va_1[MAX_INPUT_LENGTH], va_2[MAX_INPUT_LENGTH];
+		
+		half_chop(val_arg, va_1, va_2);
+		
 		if (!*val_arg) {
-			msg_to_char(ch, "Set the last name to what (or \"off\")?\r\n");
+			msg_to_char(ch, "Usage: set <name> lastname <new personal lastname | none>\r\n");
+			msg_to_char(ch, "Usage: set <name> lastname <add | remove> <name>\r\n");
 			return 0;
 		}
-		else if (!strcmp(val_arg, "off") || !strcmp(val_arg, "none")) {
-			if (GET_LASTNAME(vict) != NULL)
-				free(GET_LASTNAME(vict));
-			GET_LASTNAME(vict) = NULL;
+		else if (!str_cmp(va_1, "add")) {
+			add_lastname(vict, va_2);
+			sprintf(output, "Added lastname for %s: %s.", GET_NAME(vict), va_2);
+		}
+		else if (!str_cmp(va_1, "remove")) {
+			if (has_lastname(vict, va_2)) {
+				remove_lastname(vict, va_2);
+				sprintf(output, "Removed lastname for %s: %s.", GET_NAME(vict), va_2);
+			}
+			else {
+				msg_to_char(ch, "%s doesn't have that lastname.\r\n", GET_NAME(vict));
+				return 0;
+			}
+		}
+		else if (!str_cmp(val_arg, "off") || !str_cmp(val_arg, "none")) {
+			change_personal_lastname(vict, NULL);
     		sprintf(output, "%s no longer has a last name.", GET_NAME(vict));
 		}
     	else {
-			if (GET_LASTNAME(vict) != NULL)
-				free(GET_LASTNAME(vict));
-			GET_LASTNAME(vict) = str_dup(val_arg);
-    		sprintf(output, "%s's last name is now: %s", GET_NAME(vict), GET_LASTNAME(vict));
+			change_personal_lastname(vict, val_arg);
+			if (!GET_CURRENT_LASTNAME(vict) && GET_PERSONAL_LASTNAME(vict)) {
+				GET_CURRENT_LASTNAME(vict) = str_dup(GET_PERSONAL_LASTNAME(vict));
+			}
+    		sprintf(output, "%s's last name is now: %s", GET_NAME(vict), GET_PERSONAL_LASTNAME(vict));
 		}
 	}
 	else if SET_CASE("bonustrait") {
@@ -4519,6 +4590,74 @@ SHOW(show_produced) {
 }
 
 
+SHOW(show_lastnames) {
+	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
+	struct player_lastname *lastn;
+	bool file = FALSE, cur;
+	char_data *plr = NULL;
+	size_t size;
+	int count;
+	
+	argument = one_word(argument, arg);
+	skip_spaces(&argument);
+	
+	if (!*arg) {
+		msg_to_char(ch, "Usage: show lastnames <player> [keywords]\r\n");
+	}
+	else if (!(plr = find_or_load_player(arg, &file))) {
+		send_to_char("There is no such player.\r\n", ch);
+	}
+	else {
+		check_delayed_load(plr);
+		
+		count = 0;
+		if (*argument) {
+			size = snprintf(output, sizeof(output), "Lastnames matching '%s' for %s:\r\n", argument, GET_NAME(plr));
+		}
+		else {
+			size = snprintf(output, sizeof(output), "Lastnames for %s:\r\n", GET_NAME(plr));
+		}
+		
+		if (GET_PERSONAL_LASTNAME(plr)) {
+			cur = GET_CURRENT_LASTNAME(plr) && !str_cmp(GET_PERSONAL_LASTNAME(plr), GET_CURRENT_LASTNAME(plr));
+			size += snprintf(output + size, sizeof(output) - size, "%s%2d. %s (personal)%s\r\n", (cur ? "\tg" : ""), ++count, GET_PERSONAL_LASTNAME(plr), (cur ? " (current)\t0" : ""));
+		}
+		
+		LL_FOREACH(GET_LASTNAME_LIST(plr), lastn) {
+			if (*argument && !multi_isname(argument, lastn->name)) {
+				continue;	// searched
+			}
+		
+			// show it
+			cur = GET_CURRENT_LASTNAME(plr) && !str_cmp(NULLSAFE(lastn->name), GET_CURRENT_LASTNAME(plr));
+			snprintf(line, sizeof(line), "%s%2d. %s%s\r\n", (cur ? "\tg" : ""), ++count, NULLSAFE(lastn->name), (cur ? " (current)\t0" : ""));
+			if (size + strlen(line) < sizeof(output)) {
+				strcat(output, line);
+				size += strlen(line);
+			}
+			else {
+				if (size + 10 < sizeof(output)) {
+					strcat(output, "OVERFLOW\r\n");
+				}
+				break;
+			}
+		}
+	
+		if (!count) {
+			strcat(output, " none\r\n");	// space reserved for this for sure
+		}
+	
+		if (ch->desc) {
+			page_string(ch->desc, output, TRUE);
+		}
+	}
+	
+	if (plr && file) {
+		free_char(plr);
+	}
+}
+
+
 SHOW(show_learned) {
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct player_craft_data *pcd, *next_pcd;
@@ -5213,8 +5352,12 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 	sprinttype(GET_REAL_SEX(k), genders, buf);
 	CAP(buf);
-	sprintf(buf2, " %s '&y%s&0'  IDNum: [%5d], In room [%5d]\r\n", (!IS_NPC(k) ? "PC" : (!IS_MOB(k) ? "NPC" : "MOB")), GET_NAME(k), IS_NPC(k) ? k->script_id : GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
-	send_to_char(strcat(buf, buf2), ch);
+	if (!IS_NPC(k)) {
+		msg_to_char(ch, "%s PC '\ty%s\t0', Lastname '\ty%s\t0', IDNum: [%5d], In room [%5d]\r\n", buf, GET_NAME(k), GET_CURRENT_LASTNAME(k) ? GET_CURRENT_LASTNAME(k) : "none", GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
+	}
+	else {	// mob
+		msg_to_char(ch, "%s %s '\ty%s\t0', ID: [%5d], In room [%5d]\r\n", buf, (!IS_MOB(k) ? "NPC" : "MOB"), GET_NAME(k), k->script_id, IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
+	}
 	
 	if (!IS_NPC(k) && GET_ACCOUNT(k)) {
 		if (GET_ACCESS_LEVEL(ch) >= LVL_TO_SEE_ACCOUNTS) {
@@ -9492,6 +9635,7 @@ ACMD(do_show) {
 		{ "olc", LVL_START_IMM, show_olc },
 		{ "homeless", LVL_START_IMM, show_homeless },
 		{ "companions", LVL_START_IMM, show_companions },
+		{ "lastnames", LVL_START_IMM, show_lastnames },
 
 		// last
 		{ "\n", 0, NULL }

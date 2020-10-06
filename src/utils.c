@@ -365,8 +365,8 @@ const char *PERS(char_data *ch, char_data *vict, bool real) {
 	}
 
 	strcpy(output, GET_NAME(ch));
-	if (!IS_NPC(ch) && GET_LASTNAME(ch)) {
-		sprintf(output + strlen(output), " %s", GET_LASTNAME(ch));
+	if (!IS_NPC(ch) && GET_CURRENT_LASTNAME(ch)) {
+		sprintf(output + strlen(output), " %s", GET_CURRENT_LASTNAME(ch));
 	}
 
 	return output;
@@ -5367,9 +5367,9 @@ bool check_sunny(room_data *room) {
 * @param int y1  coordinate
 * @param int x2 second
 * @param int y2  coordinate
-* @return int distance
+* @return double distance
 */
-int compute_map_distance(int x1, int y1, int x2, int y2) {
+double compute_map_distance(int x1, int y1, int x2, int y2) {
 	int dx = x1 - x2;
 	int dy = y1 - y2;
 	int dist;
@@ -5403,9 +5403,7 @@ int compute_map_distance(int x1, int y1, int x2, int y2) {
 	}
 	
 	dist = (dx * dx + dy * dy);
-	dist = (int) sqrt(dist);
-	
-	return dist;
+	return sqrt(dist);
 }
 
 
@@ -5414,7 +5412,7 @@ int compute_map_distance(int x1, int y1, int x2, int y2) {
 * The coordinates will include a leading space, like " (x, y)" if present. It
 * may also return " (unknown)" if (x,y) are not on the map.
 *
-* @param char_data *ch The person to check for Navigation.
+* @param char_data *ch Optional: The person to check for Navigation.
 * @param int x The X-coordinate to show.
 * @param int y The Y-coordinate to show.
 * @param bool fixed_width If TRUE, spaces the coordinates for display in a vertical column.
@@ -5423,7 +5421,7 @@ int compute_map_distance(int x1, int y1, int x2, int y2) {
 char *coord_display(char_data *ch, int x, int y, bool fixed_width) {
 	static char output[80];
 	
-	if (!ch || IS_NPC(ch) || !HAS_NAVIGATION(ch)) {
+	if (ch && (IS_NPC(ch) || !HAS_NAVIGATION(ch))) {
 		*output = '\0';
 	}
 	else if (fixed_width) {
@@ -6128,6 +6126,34 @@ int Y_COORD(room_data *room) {
 //// MISC UTILS //////////////////////////////////////////////////////////////
 
 /**
+* Adds an entry to a string hash. This is a general tool for listing/counting
+* unique names/things. Example:
+*   struct string_hash *my_hash = NULL;	// initialize to null
+*	add_string_hash(&my_hash, string, 1);	// add items
+*   HASH_ITER(hh, my_hash, iter, next) { ... }	// use hash
+*   free_string_hash(&my_hash);	// free when done
+*
+* @param struct string_hash **hash A pointer to the hash we're adding to.
+* @param const char *string The string to add, if unique (will be copied for this).
+* @param int count How many to add (usually 1, but you can add any amount including a negative).
+*/
+void add_string_hash(struct string_hash **hash, const char *string, int count) {
+	struct string_hash *item = NULL;
+	
+	if (hash && string) {
+		HASH_FIND_STR(*hash, string, item);
+		if (!item) {
+			CREATE(item, struct string_hash, 1);
+			item->str = str_dup(string);
+			HASH_ADD_STR(*hash, str, item);
+		}
+		
+		SAFE_ADD(item->count, count, INT_MIN, INT_MAX, FALSE);
+	}
+}
+
+
+/**
 * Adds an entry to a vnum hash. This is a general tool for listing/counting
 * unique vnums. Example:
 *   struct vnum_hash *my_hash = NULL;	// initialize to null
@@ -6149,9 +6175,30 @@ void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count) {
 			item->vnum = vnum;
 			HASH_ADD_INT(*hash, vnum, item);
 		}
+		
+		SAFE_ADD(item->count, count, INT_MIN, INT_MAX, FALSE);
 	}
+}
+
+
+/**
+* Frees a string_hash when you're done with it.
+*
+* @param struct string_hash **hash The string hash to free.
+*/
+void free_string_hash(struct string_hash **hash) {
+	struct string_hash *iter, *next;
 	
-	SAFE_ADD(item->count, count, INT_MIN, INT_MAX, FALSE);
+	if (hash) {
+		HASH_ITER(hh, *hash, iter, next) {
+			HASH_DEL(*hash, iter);
+			
+			if (iter->str) {
+				free(iter->str);
+			}
+			free(iter);
+		}
+	}
 }
 
 
@@ -6169,6 +6216,12 @@ void free_vnum_hash(struct vnum_hash **hash) {
 			free(iter);
 		}
 	}
+}
+
+
+// easy alpha sorter
+int sort_string_hash(struct string_hash *a, struct string_hash *b) {
+	return strcmp(a->str, b->str);
 }
 
 

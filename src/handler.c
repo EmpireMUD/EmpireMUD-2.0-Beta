@@ -1446,7 +1446,7 @@ bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t f
 	if (recognize && isname(name, GET_PC_NAME(target))) {
 		return TRUE;	// name/kw match
 	}
-	else if (recognize && !IS_NPC(target) && GET_LASTNAME(target) && isname(name, GET_LASTNAME(target))) {
+	else if (recognize && !IS_NPC(target) && GET_CURRENT_LASTNAME(target) && isname(name, GET_CURRENT_LASTNAME(target))) {
 		return TRUE;	// lastname match
 	}
 	else if (IS_MORPHED(target) && isname(name, MORPH_KEYWORDS(GET_MORPH(target)))) {
@@ -8849,6 +8849,69 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	}
 
 	return location;
+}
+
+
+/**
+* This function finds a target room from coordinates, if the string contains
+* ONLY those coordinates. It will accept a variety of coordinate formats but
+* will fail if ANYTHING other than the coordinates (and possible parentheses/
+* quotes) is in the string.
+*
+* @param char *string The input string.
+* @return room_data* The target room if the string contained only coordinates.
+*/
+room_data *parse_room_from_coords(char *string) {
+	char copy[MAX_INPUT_LENGTH], word[MAX_INPUT_LENGTH];
+	room_data *room = NULL;
+	char *ptr, *srch;
+	int x, y;
+	
+	strcpy(copy, string);
+	ptr = copy;
+	
+	skip_spaces(&ptr);
+	if (*ptr == '(' || *ptr == '"') {
+		ptr = any_one_word(ptr, word);
+		skip_spaces(&ptr);
+		if (*ptr) {
+			// invalid: there was something (other than spaces) AFTER the coords
+			return NULL;
+		}
+		
+		// if we got this far it's possibly coords; point ptr at it
+		ptr = word;
+	}
+	else {
+		// no parens: point to whole string
+		ptr = copy;
+	}
+	
+	// ptr is the start of possible coords
+	if (isdigit(*ptr) && (srch = strchr(ptr, ','))) {
+		// coords
+		*(srch++) = '\0';
+		skip_spaces(&srch);
+		x = atoi(ptr);
+		y = atoi(srch);
+		if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
+			// success
+			room = real_room((y * MAP_WIDTH) + x);
+		}
+		
+		// ensure nothing was AFTER srch
+		while (isdigit(*srch)) {
+			++srch;
+		}
+		skip_spaces(&srch);
+		
+		if (*srch) {
+			// found a non-space character after the coords
+			room = NULL;
+		}
+	}
+	
+	return room;	// if any
 }
 
 

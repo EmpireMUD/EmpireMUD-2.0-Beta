@@ -247,6 +247,7 @@ ACMD(do_kite);
 
 ACMD(do_land);
 ACMD(do_last);
+ACMD(do_lastname);
 ACMD(do_lay);
 ACMD(do_lead);
 ACMD(do_learn);
@@ -576,7 +577,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "adventure", POS_RESTING, do_adventure, NO_MIN, CTYPE_UTIL ),
 	GRANT_CMD( "addnotes", POS_STANDING, do_addnotes, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EDITNOTES ),
 	GRANT_CMD( "advance", POS_DEAD, do_advance, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_ADVANCE ),
-	SIMPLE_CMD( "alias", POS_DEAD, do_alias, NO_MIN, CTYPE_UTIL ),
+	SCMD_CMD( "alias", POS_DEAD, do_alias, NO_MIN, CTYPE_UTIL, SCMD_ALIAS ),
 	SIMPLE_CMD( "alternate", POS_DEAD, do_alternate, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "affects", POS_DEAD, do_affects, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "approach", POS_FIGHTING, do_approach, NO_MIN, CTYPE_COMBAT ),
@@ -815,6 +816,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "lay", POS_STANDING, do_lay, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "land", POS_FIGHTING, do_land, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "last", POS_DEAD, do_last, LVL_START_IMM, CTYPE_IMMORTAL ),
+	SIMPLE_CMD( "lastname", POS_DEAD, do_lastname, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "lead", POS_STANDING, do_lead, NO_MIN, CTYPE_MOVE ),
 	SIMPLE_CMD( "learn", POS_STANDING, do_learn, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "learned", POS_DEAD, do_learned, NO_MIN, CTYPE_UTIL ),
@@ -1046,6 +1048,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "tunnel", POS_STANDING, do_tunnel, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SCMD_CMD( "typo", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_TYPO ),
 
+	SCMD_CMD( "unalias", POS_DEAD, do_alias, NO_MIN, CTYPE_UTIL, SCMD_UNALIAS ),
 	STANDARD_CMD( "unapprove", POS_DEAD, do_approve, LVL_CIMPL, GRANT_APPROVE, SCMD_UNAPPROVE, CTYPE_IMMORTAL, NOBITS, NO_ABIL ),
 	GRANT_CMD( "unbind", POS_SLEEPING, do_unbind, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_UNBIND ),
 	STANDARD_CMD( "unharness", POS_STANDING, do_unharness, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
@@ -1426,7 +1429,7 @@ int perform_alias(descriptor_data *d, char *orig) {
 }
 
 
-/* The interface to the outside world: do_alias */
+/* The interface to the outside world: do_alias / do_unalias */
 ACMD(do_alias) {
 	extern char *show_color_codes(char *string);
 	
@@ -1452,17 +1455,23 @@ ACMD(do_alias) {
 	}
 	else {			/* otherwise, add or remove aliases */
 		/* is this an alias we've already defined? */
-		if ((a = find_alias(GET_ALIASES(ch), arg)) != NULL) {
+		a = find_alias(GET_ALIASES(ch), arg);
+		
+		// only delete if it's being replaced or they used unalias
+		if (a != NULL && (*repl || subcmd == SCMD_UNALIAS)) {
 			REMOVE_FROM_LIST(a, GET_ALIASES(ch), next);
 			free_alias(a);
 		}
-		/* if no replacement string is specified, assume we want to delete */
-		if (!*repl) {
+		/* if no replacement string is specified (or they used unalias): */
+		if (!*repl || subcmd == SCMD_UNALIAS) {
 			if (a == NULL) {
 				send_to_char("No such alias.\r\n", ch);
 			}
-			else {
+			else if (subcmd == SCMD_UNALIAS) {
 				send_to_char("Alias deleted.\r\n", ch);
+			}
+			else {	// just viewing the alias
+				msg_to_char(ch, "%s: %s\r\n", a->alias, a->replacement);
 			}
 		}
 		else {			/* otherwise, either add or redefine an alias */
@@ -1804,6 +1813,12 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_QLAST_NAME: {
+			if (!IS_SET(config_get_bitvector("lastname_mode"), LASTNAME_SET_AT_CREATION)) {
+				// not allowed to set a lastname at creation
+				set_creation_state(d, CON_QSEX);
+				break;
+			}
+			
 			SEND_TO_Q("\r\n\r\nWould you like a last name (y/n)? ", d);
 			break;
 		}
@@ -1816,7 +1831,7 @@ void prompt_creation(descriptor_data *d) {
 			break;
 		}
 		case CON_CLAST_NAME: {
-			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? ", GET_PC_NAME(d->character), GET_LASTNAME(d->character), (UPPER(*GET_LASTNAME(d->character)) != *GET_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "");
+			msg_to_desc(d, "\r\nDid I get that name right, %s %s%s (y/n)? ", GET_PC_NAME(d->character), GET_PERSONAL_LASTNAME(d->character), (UPPER(*GET_PERSONAL_LASTNAME(d->character)) != *GET_PERSONAL_LASTNAME(d->character)) ? " (first letter is not capitalized)" : "");
 			break;
 		}
 		case CON_QSEX: {
@@ -2308,6 +2323,7 @@ int _parse_name(char *arg, char *name) {
 * Master "socket nanny" for processing menu input.
 */
 void nanny(descriptor_data *d, char *arg) {
+	void change_personal_lastname(char_data *ch, char *name);
 	void check_delayed_load(char_data *ch);
 	void display_automessages_on_login(char_data *ch);
 	void display_tip_to_char(char_data *ch);
@@ -2563,7 +2579,7 @@ void nanny(descriptor_data *d, char *arg) {
 				set_creation_state(d, CON_SLAST_NAME);
 			}
 			else if (UPPER(*arg) == 'N') {
-				GET_LASTNAME(d->character) = NULL;
+				change_personal_lastname(d->character, NULL);
 				set_creation_state(d, CON_QSEX);
 				break;
 			}
@@ -2623,11 +2639,10 @@ void nanny(descriptor_data *d, char *arg) {
 				return;
 			}
 			else {
-				if (GET_LASTNAME(d->character)) {
-					free(GET_LASTNAME(d->character));
+				change_personal_lastname(d->character, tmp_name);
+				if (GET_PERSONAL_LASTNAME(d->character) && !GET_CURRENT_LASTNAME(d->character)) {
+					GET_CURRENT_LASTNAME(d->character) = str_dup(GET_PERSONAL_LASTNAME(d->character));
 				}
-
-				GET_LASTNAME(d->character) = str_dup(tmp_name);
 				next_creation_step(d);
 			}
 			break;
@@ -2639,8 +2654,7 @@ void nanny(descriptor_data *d, char *arg) {
 			}
 			else if (UPPER(*arg) == 'N') {
 				SEND_TO_Q("Okay, what IS it, then? ", d);
-				free(GET_LASTNAME(d->character));
-				GET_LASTNAME(d->character) = NULL;
+				change_personal_lastname(d->character, NULL);
 				STATE(d) = CON_SLAST_NAME;
 			}
 			else {

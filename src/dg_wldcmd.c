@@ -76,7 +76,8 @@ struct wld_command_info {
 */
 int get_room_scale_level(room_data *room, char_data *targ) {
 	struct instance_data *inst;
-	int level = 1;
+	vehicle_data *veh;
+	int level = 0;
 	
 	if ((inst = find_instance_by_room(room, FALSE, TRUE))) {
 		if (INST_LEVEL(inst)) {
@@ -89,12 +90,24 @@ int get_room_scale_level(room_data *room, char_data *targ) {
 			level = GET_ADV_MAX_LEVEL(INST_ADVENTURE(inst)) / 2; // average?
 		}
 	}
-	// backup
+	else if ((veh = GET_ROOM_VEHICLE(room))) {
+		if (VEH_SCALE_LEVEL(veh) > 0) {
+			level = VEH_SCALE_LEVEL(veh);
+		}
+		else if (VEH_MIN_SCALE_LEVEL(veh) > 0) {
+			level = VEH_MIN_SCALE_LEVEL(veh);
+		}
+		else if (VEH_MAX_SCALE_LEVEL(veh) > 0) {
+			level = VEH_MAX_SCALE_LEVEL(veh) / 2;	// average
+		}
+	}
+	
+	// backup (if something above got a 0)
 	if (!level && targ) {
 		level = get_approximate_level(targ);
 	}
 	
-	return level;
+	return MAX(1, level);
 }
 
 

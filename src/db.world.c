@@ -4012,6 +4012,7 @@ void load_world_map_from_file(void) {
 			world_map[x][y].base_sector = NULL;
 			world_map[x][y].natural_sector = NULL;
 			world_map[x][y].crop_type = NULL;
+			world_map[x][y].pathfind_key = 0;
 			world_map[x][y].next = NULL;
 		}
 	}

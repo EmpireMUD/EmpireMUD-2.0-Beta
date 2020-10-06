@@ -2086,6 +2086,12 @@ typedef struct vehicle_data vehicle_data;
 #define GRANT_TRIGGERS  BIT(43)
 
 
+// LASTNAME_x: config players lastname_mode: determines how players get last names
+#define LASTNAME_SET_AT_CREATION  BIT(0)	// a. player chooses during creation menus
+#define LASTNAME_CHANGE_ANY_TIME  BIT(1)	// b. player can change with 'lastname change'
+#define LASTNAME_CHOOSE_FROM_LIST  BIT(2)	// c. player can choose from the namelist
+
+
 // Lore types
 #define LORE_JOIN_EMPIRE		0
 #define LORE_DEFECT_EMPIRE		1
@@ -3091,6 +3097,35 @@ struct offer_data {
 };
 
 
+// pathfind.c: one step in the path
+struct pathfind_node {
+	room_data *inside_room;	// if it's an interior, this is the current room
+	struct map_data *map_loc;	// if it's on the map, this is the current loc
+	struct pathfind_node *parent;	// last node in the path
+	
+	double steps;	// total steps taken (diagonals count more)
+	int cur_dir;	// last direction moved
+	int cur_dist;	// number of times it was moved
+	
+	double estimate;	// estimated distance, for prioritizing
+	
+	struct pathfind_node *prev, *next;	// doubly-linked list
+};
+
+
+// pathfind.c: handles the data for pathfinding
+struct pathfind_controller {
+	room_data *start;	// start pos
+	room_data *end;	// destination
+	int end_x, end_y;	// target coordinates (prevent repeat lookups)
+	
+	int key;	// initialized with get_pathfind_key()
+	
+	struct pathfind_node *nodes;	// doubly-linked list of nodes to check
+	struct pathfind_node *free_nodes;	// doubly-linked list of nodes that have been checked
+};
+
+
 // for ad tracking and special promotions
 struct promo_code_list {
 	char *code;
@@ -3195,6 +3230,14 @@ struct spawn_info {
 	bitvector_t flags;	// SPAWN_
 	
 	struct spawn_info *next;
+};
+
+
+// simple structure for passing around a hash of unique strings
+struct string_hash {
+	char *str;
+	int count;
+	UT_hash_handle hh;
 };
 
 
@@ -3793,6 +3836,13 @@ struct companion_mod {
 };
 
 
+// players have a collection of lastnames
+struct player_lastname {
+	char *name;
+	struct player_lastname *next;	// linked list: GET_LASTNAME_LIST(ch)
+};
+
+
 // track who/when a player has been killed by another player
 struct pk_data {
 	int killed_alt;	// id of which alt died
@@ -4100,7 +4150,8 @@ struct player_special_data {
 	any_vnum last_companion;	// if the player has a companion out, this triggers a re-summon
 	
 	// character strings
-	char *lastname;	// Last name
+	char *personal_lastname;	// Lastname written by the player themselves
+	char *current_lastname;		// Lastname the player is currently using
 	char *title;	// shown on 'who'/'whois'
 	char *prompt;	// custom prompt
 	char *fight_prompt;	// fight prompt
@@ -4133,6 +4184,7 @@ struct player_special_data {
 	struct player_currency *currencies;	// hash table of adventure currencies
 	struct alias_data *aliases;	// Character's aliases
 	struct player_eq_set *eq_sets;	// player's saved equipment sets
+	struct player_lastname *lastname_list;	// linked list of lastnames
 	struct offer_data *offers;	// various offers for do_accept/reject
 	struct player_slash_channel *slash_channels;	// channels the player is on
 	struct slash_channel *load_slash_channels;	// temporary storage between load and join
@@ -5712,6 +5764,7 @@ struct room_data {
 	struct affected_type *af;  // room affects
 	
 	time_t last_spawn_time;  // used to spawn npcs
+	ubyte pathfind_key;	// for the pathfidning system
 	
 	struct trig_proto_list *proto_script;	/* list of default triggers  */
 	struct script_data *script;	/* script info for the room           */
@@ -5872,6 +5925,8 @@ struct map_data {
 	
 	struct shared_room_data *shared;	// for map tiles' room_data*, they point to this
 	crop_data *crop_type;	// possible crop type
+	
+	ubyte pathfind_key;	// for the pathfinding system
 	
 	// lists
 	struct map_data *next_in_sect;	// LL of all map locations of a given sect

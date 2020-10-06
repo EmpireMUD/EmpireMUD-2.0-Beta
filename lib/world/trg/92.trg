@@ -30,8 +30,8 @@ switch %random.3%
     set part neck
   break
 done
-%send% %actor% %self.name%'s tentacles wrap around your %part%... that stings!
-%echoaround% %actor% %self.name%'s tentacles wrap around %actor.name%'s %part%!
+%send% %actor% |%self% tentacles wrap around your %part%... that stings!
+%echoaround% %actor% |%self% tentacles wrap around |%actor% %part%!
 %dot% #9232 %actor% 200 20 poison 100
 ~
 $

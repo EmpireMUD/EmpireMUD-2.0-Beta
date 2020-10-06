@@ -83,6 +83,38 @@ I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1002 1 5 0
 S
+#18861
+Deep Nether~
+The Deep Nether~
+&0[  ]~
+1 0 aj 0
+0 0 0 -1
+A
+bqu
+D
+   The sky twists away from you with dark, violet clouds rising into an
+infinite darkness. The stench of bone ash fills your nostrils as swirls of gray
+dust whip past you. The only landscape in this unnatural place is made from
+gobbets of flesh and crusted blood, and you soon find your own flesh fleeing to
+join it.
+~
+T 18863
+T 18861
+T 18864
+S
+#18862
+Deep Nether~
+The Deep Nether~
+&0[  ]~
+1 0 aj 0
+0 0 0 -1
+A
+bqu
+D
+You have ventured further into the Deep Nether than any mortal ever has.
+~
+T 18863
+S
 #18873
 Medical Tent~
 Inside the Medical Tent~
@@ -94,8 +126,6 @@ D
 the headless centaur from being able to watch a victim finish shuffling off the
 mortal coil.
 ~
-M
-18873 100.00 0
 S
 #18876
 Slaughterhouse~

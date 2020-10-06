@@ -2534,6 +2534,10 @@ void free_vehicle(vehicle_data *veh) {
 		free(veh->attributes);
 	}
 	
+	if (veh->script_id > 0) {
+		remove_from_lookup_table(veh->script_id);
+	}
+	
 	free(veh);
 }
 

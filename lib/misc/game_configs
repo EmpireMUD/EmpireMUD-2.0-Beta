@@ -145,6 +145,7 @@ hours_to_first_bonus_trait 4
 hours_to_second_bonus_trait 48
 idle_linkdead_rent_time 5
 idle_rent_time 20
+lastname_mode ac
 max_capitals_in_name 2
 max_home_store_uniques 300
 max_map_size 12

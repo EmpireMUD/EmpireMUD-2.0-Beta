@@ -27,7 +27,7 @@ if %healthprct% < 90
   * Destroy the egg
   set egg %actor.inventory(11053)%
   if %egg%
-    %send% %actor% The fight with %self.name% destroys the stolen egg!
+    %send% %actor% The fight with ~%self% destroys the stolen egg!
     %purge% %egg%
   end
 end
@@ -40,24 +40,24 @@ if %random.5% != 1
 end
 switch %random.4%
   case 1
-    %echo% %self.name% flaps %self.hisher% wings violently...
+    %echo% ~%self% flaps ^%self% wings violently...
     %echo% You are battered by strong winds!
     %aoe% 50 physical
   break
   case 2
-    %send% %actor% %self.name% buffets you with %self.hisher% wing, knocking your weapon away!
-    %echoaround% %actor% %self.name% buffets %actor.name% with %self.hisher% wing, knocking %actor.hisher% weapon away!
+    %send% %actor% ~%self% buffets you with ^%self% wing, knocking your weapon away!
+    %echoaround% %actor% ~%self% buffets ~%actor% with ^%self% wing, knocking ^%actor% weapon away!
     dg_affect %actor% DISARM on 5
   break
   case 3
-    %send% %actor% %self.name% stabs at you with a series of powerful pecks!
-    %echoaround% %actor% %self.name% stabs at %actor.name% with a series of powerful pecks!
+    %send% %actor% ~%self% stabs at you with a series of powerful pecks!
+    %echoaround% %actor% ~%self% stabs at ~%actor% with a series of powerful pecks!
     %damage% %actor% 50 physical
     %send% %actor% You are bleeding!
     %dot% %actor% 50 15 physical 1
   break
   case 4
-    %echo% %self.name% lets out a piercing screech!
+    %echo% ~%self% lets out a piercing screech!
     set ch %room.people%
     while %ch%
       if %self.is_enemy(%ch%)%
@@ -96,7 +96,7 @@ set cycles_left 3
 while %cycles_left% >= 0
   if (%self.room% != %room%) || %room.empire% || %room.crop% != zephyr cattails
     * We've moved or someone else harvested
-    %echo% %self.name% looks around for more cattails to steal.
+    %echo% ~%self% looks around for more cattails to steal.
     nop %self.add_mob_flag(SPAWNED)%
     nop %self.remove_mob_flag(SENTINEL)%
     detach 11007 %self.id%
@@ -104,22 +104,22 @@ while %cycles_left% >= 0
   end
   if %self.fighting% || %self.disabled%
     * Combat interrupts the ritual
-    %echo% %self.name%'s harvesting is interrupted.
+    %echo% |%self% harvesting is interrupted.
     halt
   end
   * Fake ritual messages
   switch %cycles_left%
     case 3
-      %echo% %self.name% begins to harvest the zephyr cattails.
+      %echo% ~%self% begins to harvest the zephyr cattails.
     break
     case 2
-      %echo% %self.name% carefully harvests the zephyr cattails.
+      %echo% ~%self% carefully harvests the zephyr cattails.
     break
     case 1
-      %echo% %self.name% walks through the field, harvesting the zephyr cattails.
+      %echo% ~%self% walks through the field, harvesting the zephyr cattails.
     break
     case 0
-      %echo% %self.name% finishes harvesting the zephyr cattails!
+      %echo% ~%self% finishes harvesting the zephyr cattails!
       %terraform% %room% 0
       halt
     break
@@ -127,7 +127,7 @@ while %cycles_left% >= 0
   wait 5 sec
   eval cycles_left %cycles_left% - 1
 done
-%echo% %self.name% looks confused...
+%echo% ~%self% looks confused...
 ~
 #11008
 Give seeds if no seeds or cattails~
@@ -136,7 +136,7 @@ Give seeds if no seeds or cattails~
 if !%actor.inventory(11008)% && !%actor.inventory(11009)%
   nop %actor.add_resources(11008, 1)%
   set item %actor.inventory()%
-  %send% %actor% You find %item.shortdesc%.
+  %send% %actor% You find @%item%.
 end
 ~
 #11009
@@ -145,7 +145,7 @@ Roc nest forage for trees~
 forage~
 set num 4
 %send% %actor% You forage around and find a large tree (x%num%)!
-%echoaround% %actor% %actor.name% forages around and finds a large tree (x%num%)
+%echoaround% %actor% ~%actor% forages around and finds a large tree (x%num%)
 nop %actor.add_resources(120, %num%)%
 detach 11009 %self.id%
 ~
@@ -167,7 +167,7 @@ done
 eval vnum (11022-1) + %random.2%
 %load% obj %vnum% %self.room%
 set item %self.room.contents%
-%echo% You find %item.shortdesc% nearby!
+%echo% You find @%item% nearby!
 * Look for the corpses made variable
 if %self.varexists(corpses_made)%
   eval corpses_made %self.corpses_made% + 1
@@ -200,7 +200,7 @@ Roc Hatchling break egg on hatch~
 ~
 %echo% The egg begins to vibrate and crack...
 wait 1
-%echo% %self.name% hatches from the egg!
+%echo% ~%self% hatches from the egg!
 set obj %self.room.contents%
 while %obj%
   set next_obj %obj.next_in_list%
@@ -220,16 +220,16 @@ if %self.disabled%
 end
 switch %random.4%
   case 1
-    %echo% %self.name% runs circles around you.
+    %echo% ~%self% runs circles around you.
   break
   case 2
-    %echo% %self.name% hops up and down, flapping its fluffy wings.
+    %echo% ~%self% hops up and down, flapping its fluffy wings.
   break
   case 3
-    %echo% %self.name% scratches at the ground with its oversized feet.
+    %echo% ~%self% scratches at the ground with its oversized feet.
   break
   case 4
-    %echo% %self.name% sticks its head in a little hole in the ground, perhaps looking for food.
+    %echo% ~%self% sticks its head in a little hole in the ground, perhaps looking for food.
   break
 done
 ~
@@ -292,7 +292,7 @@ Combat Roc Death~
 ~
 %load% mob 11001
 set mob %self.room.people%
-%echo% %mob.name% shows up just at the last second!
+%echo% ~%mob% shows up just at the last second!
 ~
 #11025
 Late adventurer announce~
@@ -327,7 +327,7 @@ Wings of Daedalus decay~
 if %self.timer% > 0
   halt
 end
-%send% %actor% The wax holding %self.shortdesc% together begins to slowly melt...
+%send% %actor% The wax holding @%self% together begins to slowly melt...
 otimer 24
 ~
 #11034
@@ -390,7 +390,7 @@ if %actor%
   end
   %load% obj %vnum% %actor% inv %level%
   set item %actor.inventory(%vnum%)%
-  %send% %actor% %self.shortdesc% turns out to be %item.shortdesc%!
+  %send% %actor% @%self% turns out to be @%item%!
   if %item.is_flagged(BOE)%
     nop %item.flag(BOE)%
   end
@@ -413,7 +413,7 @@ end
 if %actor.fighting%
   * If the egg timer expires: if the player is fighting, they lose the egg.
   set enemy %actor.fighting%
-  %send% %actor% The fight with %enemy.name% destroys the stolen egg!
+  %send% %actor% The fight with ~%enemy% destroys the stolen egg!
   %purge% %self%
   halt
 else
@@ -423,12 +423,12 @@ else
   * Despawn the pursuing roc...
   set pursuer %instance.mob(11002)%
   if %pursuer%
-    %at% %pursuer.room% %echo% %self.name% flies away.
+    %at% %pursuer.room% %echo% ~%self% flies away.
     %purge% %pursuer%
   end
   * Take the egg and set the steal quest complete.
   %quest% %actor% trigger 11002
-  %send% %actor% %mob.name% takes the egg from you.
+  %send% %actor% ~%mob% takes the egg from you.
   %send% %actor% Type 'quest finish Steal the Egg' to complete the quest.
   %purge% %self%
   halt

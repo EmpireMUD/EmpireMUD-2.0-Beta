@@ -1142,6 +1142,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_CREATION_ALT_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->create_alt_id))
 #define GET_CREATION_HOST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->creation_host))
 #define GET_CURRENCIES(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->currencies))
+#define GET_CURRENT_LASTNAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->current_lastname))
 #define GET_CURRENT_SKILL_SET(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->current_skill_set))
 #define GET_CUSTOM_COLOR(ch, pos)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->custom_colors[(pos)]))
 #define GET_DAILY_BONUS_EXPERIENCE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->daily_bonus_experience))
@@ -1165,7 +1166,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_IMMORTAL_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->immortal_level))
 #define GET_INVIS_LEV(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->invis_level))
 #define GET_LARGEST_INVENTORY(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->largest_inventory))
-#define GET_LASTNAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->lastname))
 #define GET_LAST_COMPANION(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_companion))
 #define GET_LAST_CORPSE_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_corpse_id))
 #define GET_LAST_DEATH_TIME(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_death_time))
@@ -1176,6 +1176,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_LAST_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_room))
 #define GET_LAST_TELL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tell))
 #define GET_LAST_TIP(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tip))
+#define GET_LASTNAME_LIST(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->lastname_list))
 #define GET_LAST_VEHICLE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_vehicle))
 #define GET_LEARNED_CRAFTS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->learned_crafts))
 #define GET_LOADROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->load_room))
@@ -1194,6 +1195,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define GET_OLC_MAX_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_max_vnum))
 #define GET_OLC_MIN_VNUM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->olc_min_vnum))
 #define GET_PASSIVE_BUFFS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->passive_buffs))
+#define GET_PERSONAL_LASTNAME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->personal_lastname))
 #define GET_PLAYER_COINS(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->coins))
 #define GET_PLEDGE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->pledge))
 #define GET_PROMO_ID(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->promo_id))
@@ -1310,6 +1312,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_LIGHTS(room)  ((room)->light)
 #define BASE_SECT(room)  ((room)->base_sector)
 #define ROOM_OWNER(room)  ((room)->owner)
+#define ROOM_PATHFIND_KEY(room)  ((room)->pathfind_key)
 #define ROOM_PEOPLE(room)  ((room)->people)
 #define ROOM_UNLOAD_EVENT(room)  ((room)->unload_event)
 #define ROOM_VEHICLES(room)  ((room)->vehicles)
@@ -1632,8 +1635,11 @@ extern struct weather_data weather_info;	// db.c
 #define log  basic_mud_log
 
 // vnum hash tools from utils.c
+void add_string_hash(struct string_hash **hash, const char *string, int count);
 void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count);
+void free_string_hash(struct string_hash **hash);
 void free_vnum_hash(struct vnum_hash **hash);
+extern int sort_string_hash(struct string_hash *a, struct string_hash *b);
 
 // basic functions from utils.c
 extern bool any_players_in_room(room_data *room);
@@ -1774,8 +1780,8 @@ extern bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector
 extern bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance);
 extern bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int distance);
 extern bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance);
-extern int compute_map_distance(int x1, int y1, int x2, int y2);
-#define compute_distance(from, to)  compute_map_distance(X_COORD(from), Y_COORD(from), X_COORD(to), Y_COORD(to))
+extern double compute_map_distance(int x1, int y1, int x2, int y2);
+#define compute_distance(from, to)  ((int)compute_map_distance(X_COORD(from), Y_COORD(from), X_COORD(to), Y_COORD(to)))
 extern int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_original_sect);
 extern int distance_to_nearest_player(room_data *room);
 extern bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);

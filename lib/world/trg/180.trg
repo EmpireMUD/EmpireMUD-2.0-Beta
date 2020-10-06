@@ -27,12 +27,12 @@ end
 if %lastphase%!=%phase%
   if %lastphase% < %phase%
     *we've advanced a phase
-    %echo% %self.name% roars with fury!
+    %echo% ~%self% roars with fury!
     if %phase% == 2
-      %echo% One of %self.name%'s chains shatters!
+      %echo% One of |%self% chains shatters!
     end
     if %phase% == 3
-      %echo% %self.name%'s second chain shatters, freeing it!
+      %echo% |%self% second chain shatters, freeing it!
     end
   end
   set lastphase %phase%
@@ -68,22 +68,22 @@ if %phase%==2
   switch %random.3%
     case 1
       set room %self.room%
-      %echo% %self.name% whistles with a sound like escaping steam...
+      %echo% ~%self% whistles with a sound like escaping steam...
       %echo% A pair of fire elementals appear!
       %load% mob 18077 ally %self.level%
       %force% %room.people% %aggro% %actor%
       %load% mob 18077 ally %self.level%
       %force% %room.people% %aggro% %actor%
-      %echo% %self.name% looks exhausted!
+      %echo% ~%self% looks exhausted!
       *Ensure that no other abilities are used while the elementals are up:
       dg_affect %self% STUNNED on 30
       wait 25 sec
     break
     case 2
-      %echo% %self.name% raises a hand, leaning back from the platform...
+      %echo% ~%self% raises a hand, leaning back from the platform...
       wait 5 sec
       if %self.disabled%
-        %echo% %self.name%'s attack is interrupted!
+        %echo% |%self% attack is interrupted!
         halt
       end
       *Buff dodge massively but debuff own tohit massively...
@@ -91,27 +91,27 @@ if %phase%==2
       dg_affect %self% TO-HIT -100 30
       dg_affect %self% SLOW on 30
       dg_affect %self% DODGE 100 30
-      %echo% A flickering barrier of force surrounds %self.name%!
+      %echo% A flickering barrier of force surrounds ~%self%!
       wait 30 sec *Make sure he doesn't do anything else while the shield is up.
-      %echo% The magical shield around %self.name% fades!
+      %echo% The magical shield around ~%self% fades!
     break
     case 3
-      %echo% %self.name% draws back a hand, curling it into a fist...
+      %echo% ~%self% draws back a hand, curling it into a fist...
       wait 2 sec
       if %self.disabled%
-        %echo% %self.name%'s attack is interrupted!
+        %echo% |%self% attack is interrupted!
         halt
       end
       %echo% The lava below begins to rise!
       wait 3 sec
       if %self.disabled%
-        %echo% %self.name%'s attack is interrupted!
+        %echo% |%self% attack is interrupted!
         halt
       end
-      %echo% &rA wave of magma rolls over the platform!&0
+      %echo% &&rA wave of magma rolls over the platform!&&0
       %aoe% 50 fire
-      %send% %actor% &rYou take the full force of the wave, and are badly burned!&0
-      %echoaround% %actor% %actor.name% takes the full force of the wave!
+      %send% %actor% &&rYou take the full force of the wave, and are badly burned!&&0
+      %echoaround% %actor% ~%actor% takes the full force of the wave!
       %damage% %actor% 100 fire
       %dot% %actor% 100 20 fire
       wait 1 sec
@@ -122,19 +122,19 @@ end
 if %phase%==3
   switch %random.3%
     case 1
-      %echo% %self.name% raises a huge, molten fist!
+      %echo% ~%self% raises a huge, molten fist!
       wait 5 sec
       *(dex*5)% chance to not get hit
       if %actor.dex%<%random.20%
-        %send% %actor% &rThe earth shakes as %self.name% punches you, stunning you!&0
-        %echoaround% %actor% The earth shakes as %self.name% punches %actor.name%, stunning %actor.himher%!
+        %send% %actor% &&rThe earth shakes as ~%self% punches you, stunning you!&&0
+        %echoaround% %actor% The earth shakes as ~%self% punches ~%actor%, stunning *%actor%!
         %damage% %actor% 100 physical
         %damage% %actor% 50 fire
         dg_affect %actor% HARD-STUNNED on 10
       else
-        %send% %actor% You leap out of the way of %self.name%'s fist at the last second!
-        %echoaround% %actor% %actor.name% leaps out of the way of %self.name%'s fist at the last second!
-        %send% %actor% &rThe wave of heat from %self.name%'s fist burns you!&0
+        %send% %actor% You leap out of the way of |%self% fist at the last second!
+        %echoaround% %actor% ~%actor% leaps out of the way of |%self% fist at the last second!
+        %send% %actor% &&rThe wave of heat from |%self% fist burns you!&&0
         %damage% %actor% 50 fire
       end
     break
@@ -144,41 +144,41 @@ if %phase%==3
       if !%target% || target == %self%
         halt
       end
-      %send% %target% %self.name% makes a heretical gesture at you!
-      %echoaround% %target% %self.name% makes a heretical gesture at %target.name%!
+      %send% %target% ~%self% makes a heretical gesture at you!
+      %echoaround% %target% ~%self% makes a heretical gesture at ~%target%!
       wait 5 sec
       if %target%&&(%target.room%==%self.room%)
         if %target.trigger_counterspell%
           %send% %target% A tornado of harmless smoke briefly surrounds you!
           %echoaround %target% A tornado of harmless smoke briefly surrounds %target%!
         else
-          %send% %target% &rYour body bursts into infernal flames!&0
-          %echoaround% %target% %target.name%'s body bursts into infernal flames!
+          %send% %target% &&rYour body bursts into infernal flames!&&0
+          %echoaround% %target% |%target% body bursts into infernal flames!
           %damage% %target% 25 fire
           %dot% %target% 300 30 fire
         end
       end
     break
     case 3
-      %echo% %self.name% rises up out of the lava entirely!
+      %echo% ~%self% rises up out of the lava entirely!
       wait 5 sec
       *Should not be hitting much during this attack
       dg_affect %self% TO-HIT -100 25
-      %echo% &RMana begins condensing around %self.name%!&0
+      %echo% &&RMana begins condensing around ~%self%!&&0
       wait 5 sec
-      %echo% &RThe platform starts shaking beneath your feet!&0
+      %echo% &&RThe platform starts shaking beneath your feet!&&0
       wait 5 sec
-      %echo% &rWaves of fire flood the room!&0
+      %echo% &&rWaves of fire flood the room!&&0
       %aoe% 100 fire
       wait 5 sec
-      %echo% &rA barrage of sharp rocks falls from the ceiling!&0
+      %echo% &&rA barrage of sharp rocks falls from the ceiling!&&0
       %aoe% 100 physical
       wait 5 sec
-      %echo% &rThe floating motes of mana in the air transform into ethereal blades!&0
+      %echo% &&rThe floating motes of mana in the air transform into ethereal blades!&&0
       %aoe% 50 magical
       %aoe% 50 physical
       wait 5 sec
-      %echo% %self.name% sinks back into the lava...
+      %echo% ~%self% sinks back into the lava...
     break
   done
 end
@@ -190,7 +190,7 @@ Fiend adds timer~
 0 n 100
 ~
 wait 30 sec
-%echo% %self.name% burns out, disappearing with a puff of smoke!
+%echo% ~%self% burns out, disappearing with a puff of smoke!
 %purge% %self%
 ~
 #18078
@@ -199,12 +199,12 @@ Fiend adds battle~
 ~
 makeuid fiend mob chained
 if %random.3%<3
-  %echo% %self.name% transfers some of its heat to %fiend.name%!
+  %echo% ~%self% transfers some of its heat to ~%fiend%!
   %damage% %fiend% -100
   %damage% %self% 100
 else
-  %send% %actor% &rThere is a destructive explosion as %self.name% hurls itself suicidally at you!&0
-  %echoaround% %actor% &rThere is a destructive explosion as %self.name% hurls itself suicidally at %actor.name%!&0
+  %send% %actor% &&rThere is a destructive explosion as ~%self% hurls itself suicidally at you!&&0
+  %echoaround% %actor% &&rThere is a destructive explosion as ~%self% hurls itself suicidally at ~%actor%!&&0
   %damage% %actor% 200 fire
   %aoe% 50 fire
   %damage% %self% 1000
@@ -219,7 +219,7 @@ if %actor.nohassle%
   halt
 end
 %send% %actor% You try to leave, but a wall of fire blocks your escape!
-%echoaround% %actor% %actor.name% tries to leave, but a wall of fire blocks %actor.hisher% escape!
+%echoaround% %actor% ~%actor% tries to leave, but a wall of fire blocks ^%actor% escape!
 return 0
 ~
 #18080
@@ -229,7 +229,7 @@ Fiend Immunities~
 if !(%abilityname%==disarm)
   halt
 end
-%send% %actor% You cannot disarm %self.name% - %self.hisher% magic is innate!
+%send% %actor% You cannot disarm ~%self% - ^%self% magic is innate!
 return 0
 ~
 #18081
@@ -237,7 +237,7 @@ Fiend No Flee~
 0 c 0
 flee~
 %send% %actor% You turn to flee, but a wall of fire blocks your escape!
-%echoaround% %actor% %actor.name% turns to flee, but a wall of fire blocks %actor.hisher% escape!
+%echoaround% %actor% ~%actor% turns to flee, but a wall of fire blocks ^%actor% escape!
 ~
 #18082
 Fissure drop destruction~
@@ -249,13 +249,13 @@ if %object.vnum% == 18097
   return 0
   halt
 end
-%send% %actor% You drop %object.shortdesc% into the fissure!
-%echoaround% %actor% %actor.name% drops %object.shortdesc% into the fissure!
-%echo% The fire and darkness below your feet swallow %object.shortdesc%...
+%send% %actor% You drop @%object% into the fissure!
+%echoaround% %actor% ~%actor% drops @%object% into the fissure!
+%echo% The fire and darkness below your feet swallow @%object%...
 if (%object.vnum% >= 18075) && (%object.vnum% <= 18094)
   %load% obj 18097 %actor% inv %object.level%
-  %send% %actor% The molten essence released by the destruction of %object.shortdesc% gathers around you.
-  %echoaround% %actor% The molten essence released by the destruction of %object.shortdesc% gathers around %actor.name%.
+  %send% %actor% The molten essence released by the destruction of @%object% gathers around you.
+  %echoaround% %actor% The molten essence released by the destruction of @%object% gathers around ~%actor%.
 end
 %purge% %object%
 return 0
@@ -281,11 +281,11 @@ if !%actor.has_resources(18097,1)%
   return 0
   halt
 end
-%send% %actor% &0All items cost 10 essence each and will be the average level of the
-%send% %actor% &0essence spent to make them. All items are created exactly the same as if the
-%send% %actor% &0fiend dropped that item, but bound to you alone.
+%send% %actor% &&0All items cost 10 essence each and will be the average level of the
+%send% %actor% &&0essence spent to make them. All items are created exactly the same as if the
+%send% %actor% &&0fiend dropped that item, but bound to you alone.
 %send% %actor% You can create (with 'buy <item>') any of the following items:
-%send% %actor% &0
+%send% %actor% &&0
 %send% %actor% firecloth skirt             (caster legs)
 %send% %actor% firecloth pauldrons         (caster arms)
 %send% %actor% hearthflame skirt           (healer legs)
@@ -410,7 +410,7 @@ if !%vnum%
 end
 * We have a valid item
 %send% %actor% You bring the ten motes of demonic essence together with a fiery explosion!
-%echoaround% %actor% %actor.name% brings ten motes of fiery light together, causing an explosion!
+%echoaround% %actor% ~%actor% brings ten motes of fiery light together, causing an explosion!
 * Charge essence cost and check level to scale to
 set total_level 0
 set essence_count 0
@@ -433,7 +433,7 @@ if %avg_level% < 1
 end
 * Create the item
 %send% %actor% You create %name%!
-%echoaround% %actor% %actor.name% creates %name%!
+%echoaround% %actor% ~%actor% creates %name%!
 %load% obj %vnum% %actor% inv
 set made %actor.inventory(%vnum%)%
 if %made%

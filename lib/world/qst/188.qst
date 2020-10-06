@@ -97,11 +97,12 @@ world of the living.
    Now everyone seems to be getting into the 'spirit' of the holiday! You have
 earned a goody bag!
 ~
-14 e 0 0 -1
+15 e 0 0 -1
 A
 2 18804
 A
 2 18809
+D 18823
 P
 36 18800 0 1 a
 P
@@ -178,9 +179,10 @@ family land. Take the deed and build the 'unearthly manor', for the sake of
 your family. But Grandmother refuses to say if the manor will keep the spirits
 out, or if it's the thing that will release them.
 ~
-Hopefully building that unearthly manor will appease the spirits of the dead.
+   You have built an unearthly manor for the spirits of your ancestors to
+inhabit. Your grandmother must be proud.
 ~
-8 0 0 0 -1
+9 0 0 0 -1
 A
 1 18881
 R
@@ -372,6 +374,36 @@ T 18820
 W
 11 0 0 1
 S
+#18861
+Halloween: Delegation of Demons~
+   A spirit whispers to you: The fabric between your world and the Nether is at
+its thinnest during this time of year. You could have an army of demons some
+day, and the first step is to get more demons into this world. Suddenly you
+notice a note in your pocket with the words to the ritual of demons. You don't
+have the power to bind them, but if you had some raw meat, you could use the
+ritual of demons to lure some through. Find some, and use 'ritual demons' in
+your city to open three portals to the Nether and lure some demons through.
+~
+Congratulations! You've brought new demons into this world.
+~
+8 e 0 0 -1
+A
+2 18804
+A
+2 18809
+D 18823
+P
+36 18800 0 1 a
+P
+9 2 0 1 a
+R
+2 18829 1
+R
+9 18800 10
+T 18820
+W
+11 0 0 1
+S
 #18869
 Halloween: Songs for the Deaths Yet to Come~
    It's been said that music soothes the soul. Now you can prove it. Take this
@@ -435,16 +467,20 @@ put them into this condition, adventurers are demoralized. You might not be
 able to help with them surviving the battle, but you can at least shield this
 latest victim from view and ease the fallen adventurer into the afterlife by
 playing some music.
-   Build the 'medical tent' and then play some music for the poor soul within.
+   Build the 'medical tent' at a tomb or cemetery where some poor soul has
+tried to fight the headless horse man (any tomb should do), enter the tent, and
+then play some music for the poor soul within.
 ~
-   The latest victim has passed peacefully. Now, you should probably go take
-care of that headless centaur!
+   Your music soothes the headless horse man's latest victim as they give up
+the ghost. The healers usher you from the medical tent so they can prepare the
+body for burial.
 ~
-16 ae 0 0 -1
+20 e 0 0 -1
 A
 2 18809
 A
 2 18808
+D 18870
 P
 36 18800 0 1
 R

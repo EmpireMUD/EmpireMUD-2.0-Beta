@@ -10,8 +10,8 @@ if %actor.obj_target(%arg%)% != %self%
   return 0
   halt
 end
-%send% %actor% You click %self.shortdesc%... ah, that feels good.
-%echoaround% %actor% %actor.name% makes an annoying clicky sound with %actor.hisher% pen.
+%send% %actor% You click @%self%... ah, that feels good.
+%echoaround% %actor% ~%actor% makes an annoying clicky sound with ^%actor% pen.
 nop %actor.gain_event_points(11500,1)%
 ~
 #11505
@@ -90,7 +90,7 @@ end
 nop %pers.add_resources(%vnum%,%amt%)%
 set obj %pers.inventory(%vnum%)%
 if %obj%
-  %send% %pers% You find %amt%x %obj.shortdesc% in %self.shortdesc%!
+  %send% %pers% You find %amt%x @%obj% in @%self%!
 end
 %purge% %self%
 ~
@@ -166,7 +166,7 @@ end
 nop %pers.add_resources(%vnum%,%amt%)%
 set obj %pers.inventory(%vnum%)%
 if %obj%
-  %send% %pers% You find %amt%x %obj.shortdesc% in %self.shortdesc%!
+  %send% %pers% You find %amt%x @%obj% in @%self%!
 end
 %purge% %self%
 ~
@@ -193,7 +193,7 @@ if %actor.carrying% >= %actor.maxcarrying%
   halt
 end
 if !%arg%
-  %send% %actor% What do you want to catch with %self.shortdesc%?
+  %send% %actor% What do you want to catch with @%self%?
   return 1
   halt
 end
@@ -269,8 +269,8 @@ switch %target.vnum%
     halt
   break
 done
-%send% %actor% You swoop toward %target.name% with an enchanted jar...
-%echoaround% %actor% %actor.name% swoops toward %target.name% with an enchanted jar...
+%send% %actor% You swoop toward ~%target% with an enchanted jar...
+%echoaround% %actor% ~%actor% swoops toward ~%target% with an enchanted jar...
 * short wait, then re-validate
 wait 2 sec
 if !%target%
@@ -286,13 +286,13 @@ end
 if %has% >= %needs%
   * Success!
   %load% obj %jar_vnum% %actor% inv
-  %send% %actor% You catch %target.name% in a jar!
-  %echoaround% %actor% %actor.name% catches %target.name% in a jar!
+  %send% %actor% You catch ~%target% in a jar!
+  %echoaround% %actor% ~%actor% catches ~%target% in a jar!
 else
   * Fail
   %load% obj 11521 %actor% inv
-  %send% %actor% You miss and %target.name% gets away, leaving behind a little pixy dust.
-  %echoaround% %actor% %actor.name% misses %target.name%, who gets away!
+  %send% %actor% You miss and ~%target% gets away, leaving behind a little pixy dust.
+  %echoaround% %actor% ~%actor% misses ~%target%, who gets away!
 end
 * Purge the target either way
 %purge% %target%
@@ -336,8 +336,8 @@ done
 if %value% == 0
   %send% %actor% You don't have any jarred pixies or dust to exchange.
 else
-  %send% %actor% %alch.name% gives you %value% points for all your jarred pixies and pixy dust.
-  %echoaround% %actor% %actor.name% exchanges jarred pixies and pixy dust with %alch.name%.
+  %send% %actor% ~%alch% gives you %value% points for all your jarred pixies and pixy dust.
+  %echoaround% %actor% ~%actor% exchanges jarred pixies and pixy dust with ~%alch%.
   nop %actor.gain_event_points(11520,%value%)%
 end
 ~
@@ -382,16 +382,16 @@ set pix %master.room.people%
 if %pix.vnum% == %vnum%
   switch %random.4%
     case 1
-      %echo% You've found %pix.name%!
+      %echo% You've found ~%pix%!
     break
     case 2
-      %echo% %pix.name% appears out of nowhere!
+      %echo% ~%pix% appears out of nowhere!
     break
     case 3
-      %echo% You spot %pix.name%, who immediately tries to fly away!
+      %echo% You spot ~%pix%, who immediately tries to fly away!
     break
     case 4
-      %echo% %pix.name% flies down from above!
+      %echo% ~%pix% flies down from above!
     break
   done
 end
@@ -413,14 +413,14 @@ if %self.disabled%
 end
 * Randomly morph the actor
 if %actor.is_pc% && %random.5% == 5 && %actor.morph% != 11528
-  %send% %actor% %self.name% casts a spell and shrinks you to the size of a mouse! (type 'morph normal' to return to full size)
-  %echoaround% %actor% %self.name% casts a spell at %actor.name% and shrinks %actor.himher% to the size of a mouse!
+  %send% %actor% ~%self% casts a spell and shrinks you to the size of a mouse! (type 'morph normal' to return to full size)
+  %echoaround% %actor% ~%self% casts a spell at ~%actor% and shrinks *%actor% to the size of a mouse!
   %morph% %actor% 11528
   halt
 end
 * otherwise 80% chance of vanishing
 if %random.5% != 5
-  %echo% %self.name% vanishes into thin air!
+  %echo% ~%self% vanishes into thin air!
   %purge% %self%
   halt
 end
@@ -492,7 +492,7 @@ set ch %room.people%
 while %ch%
   if (%ch.is_pc% && !%ch.nohassle% && %ch.morph% != 11528)
     %send% %ch% You shrink to tiny size! (type 'morph normal' to return to full size)
-    %echoaround% %ch% %ch.name% shrinks to tiny size!
+    %echoaround% %ch% ~%ch% shrinks to tiny size!
     %morph% %ch% 11528
   end
   set ch %ch.next_in_room%
@@ -511,7 +511,7 @@ if %actor.morph% == 11528
   halt
 end
 %send% %actor% # You shrink to tiny size! (type 'morph normal' to return to full size)
-%echoaround% %actor% # %actor.name% shrinks to tiny size!
+%echoaround% %actor% # ~%actor% shrinks to tiny size!
 %morph% %actor% 11528
 ~
 #11529
@@ -550,7 +550,7 @@ end
 set hog %actor.room.people%
 if %hog% && %hog.vnum% == 11527 && !%hog.master%
   %force% %hog% mfollow %actor%
-  %echo% %hog.name% comes trotting up with its belly flapping side to side!
+  %echo% ~%hog% comes trotting up with its belly flapping side to side!
   nop %hog.unlink_instance%
 end
 return 1
@@ -560,25 +560,25 @@ Upgrade pixy hunt gear~
 1 c 2
 upgrade~
 if !%arg%
-  %send% %actor% Use %self.shortdesc% on what? (only works on elf-made leather shoes and wishing bags)
+  %send% %actor% Use @%self% on what? (only works on elf-made leather shoes and wishing bags)
   halt
 end
 set target %actor.obj_target_inv(%arg%)%
 if !%target%
-  %send% %actor% You don't seem to have a '%arg%'. (You can only use %self.shortdesc% on items in your inventory.)
+  %send% %actor% You don't seem to have a '%arg%'. (You can only use @%self% on items in your inventory.)
   halt
 end
 if %target.vnum% != 11531 && %target.vnum% != 11533
-  %send% %actor% You can only use %self.shortdesc% on elf-made leather shoes and wishing bags.
+  %send% %actor% You can only use @%self% on elf-made leather shoes and wishing bags.
   halt
 end
 if %target.is_flagged(SUPERIOR)%
-  %send% %actor% %target.shortdesc% is already upgraded; using %self.shortdesc% would have no benefit.
+  %send% %actor% @%target% is already upgraded; using @%self% would have no benefit.
   halt
 end
-%send% %actor% You use %self.shortdesc% on %target.shortdesc%...
-%echoaround% %actor% %actor.name% uses %self.shortdesc% on %target.shortdesc%...
-%echo% %target.shortdesc% takes on a faint glow and floral smell... and looks a LOT better.
+%send% %actor% You use @%self% on @%target%...
+%echoaround% %actor% ~%actor% uses @%self% on @%target%...
+%echo% @%target% takes on a faint glow and floral smell... and looks a LOT better.
 nop %target.flag(SUPERIOR)%
 %scale% %target% %target.level%
 %purge% %self%

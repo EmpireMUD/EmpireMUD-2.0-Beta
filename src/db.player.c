@@ -29,6 +29,7 @@
 *   Account DB
 *   Core Player DB
 *   Delayed Update System
+*   Lastname Handlers
 *   loaded_player_hash For Offline Players
 *   Autowiz Wizlist Generator
 *   Helpers
@@ -69,6 +70,7 @@ void free_player_eq_set(struct player_eq_set *eq_set);
 struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
 time_t get_member_timeout_ch(char_data *ch);
 time_t get_member_timeout_time(time_t created, time_t last_login, double played_hours);
+bool has_lastname(char_data *ch, char *name);
 void purge_bound_items(int idnum);
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch);
 void remove_loaded_player(char_data *ch);
@@ -777,6 +779,7 @@ void free_char(char_data *ch) {
 	struct player_craft_data *pcd, *next_pcd;
 	struct player_currency *cur, *next_cur;
 	struct minipet_data *mini, *next_mini;
+	struct player_lastname *lastn;
 	struct player_eq_set *eq_set;
 	struct pursuit_data *purs;
 	struct player_tech *ptech;
@@ -861,8 +864,11 @@ void free_char(char_data *ch) {
 
 	// This is really just players, but I suppose a mob COULD have it ...
 	if (ch->player_specials != NULL && ch->player_specials != &dummy_mob) {		
-		if (GET_LASTNAME(ch)) {
-			free(GET_LASTNAME(ch));
+		if (GET_CURRENT_LASTNAME(ch)) {
+			free(GET_CURRENT_LASTNAME(ch));
+		}
+		if (GET_PERSONAL_LASTNAME(ch)) {
+			free(GET_PERSONAL_LASTNAME(ch));
 		}
 		if (GET_TITLE(ch)) {
 			free(GET_TITLE(ch));
@@ -920,6 +926,14 @@ void free_char(char_data *ch) {
 		while ((a = GET_ALIASES(ch)) != NULL) {
 			GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
 			free_alias(a);
+		}
+		
+		while ((lastn = GET_LASTNAME_LIST(ch))) {
+			GET_LASTNAME_LIST(ch) = lastn->next;
+			if (lastn->name) {
+				free(lastn->name);
+			}
+			free(lastn);
 		}
 		
 		while ((offer = GET_OFFERS(ch))) {
@@ -1153,6 +1167,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct player_skill_data *skdata;
 	int length, i_in[7], iter, num, val;
 	struct player_event_data *ped;
+	struct player_lastname *lastn;
 	struct slash_channel *slash;
 	struct cooldown_data *cool;
 	obj_data *obj, *o, *next_o;
@@ -1490,6 +1505,12 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					}
 					GET_CREATION_HOST(ch) = str_dup(trim(line + length + 1));
 				}
+				else if (PFILE_TAG(line, "Current Lastname:", length)) {
+					if (GET_CURRENT_LASTNAME(ch)) {
+						free(GET_CURRENT_LASTNAME(ch));
+					}
+					GET_CURRENT_LASTNAME(ch) = str_dup(trim(line + length + 1));
+				}
 				else if (PFILE_TAG(line, "Current Pool:", length)) {
 					sscanf(line + length + 1, "%s %d", str_in, &i_in[0]);
 					if ((num = search_block(str_in, pool_types, TRUE)) != NOTHING) {
@@ -1705,10 +1726,10 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					GET_LARGEST_INVENTORY(ch) = atoi(line + length + 1);
 				}
 				else if (PFILE_TAG(line, "Lastname:", length)) {
-					if (GET_LASTNAME(ch)) {
-						free(GET_LASTNAME(ch));
+					if (GET_PERSONAL_LASTNAME(ch)) {
+						free(GET_PERSONAL_LASTNAME(ch));
 					}
-					GET_LASTNAME(ch) = str_dup(trim(line + length + 1));
+					GET_PERSONAL_LASTNAME(ch) = str_dup(trim(line + length + 1));
 				}
 				else if (PFILE_TAG(line, "Last Host:", length)) {
 					if (ch->prev_host) {
@@ -1754,6 +1775,13 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "Last Offense:", length)) {
 					GET_LAST_OFFENSE_SEEN(ch) = atol(line + length + 1);
+				}
+				else if (PFILE_TAG(line, "Lastname List:", length)) {
+					if (*(line + length + 1)) {
+						CREATE(lastn, struct player_lastname, 1);
+						lastn->name = str_dup(line + length + 1);
+						LL_APPEND(GET_LASTNAME_LIST(ch), lastn);
+					}
 				}
 				else if (PFILE_TAG(line, "Learned Craft:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0]) == 1) {
@@ -2547,6 +2575,9 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_CREATION_HOST(ch)) {
 		fprintf(fl, "Creation Host: %s\n", GET_CREATION_HOST(ch));
 	}
+	if (GET_CURRENT_LASTNAME(ch)) {
+		fprintf(fl, "Current Lastname: %s\n", GET_CURRENT_LASTNAME(ch));
+	}
 	HASH_ITER(hh, GET_CURRENCIES(ch), cur, next_cur) {
 		fprintf(fl, "Currency: %d %d\n", cur->vnum, cur->amount);
 	}
@@ -2624,8 +2655,8 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 		fprintf(fl, "Last Vehicle: %d\n", IN_ROOM(ch) ? VEH_VNUM(GET_SITTING_ON(ch)) : GET_LAST_VEHICLE(ch));
 	}
 	fprintf(fl, "Last Offense: %ld\n", GET_LAST_OFFENSE_SEEN(ch));
-	if (GET_LASTNAME(ch)) {
-		fprintf(fl, "Lastname: %s\n", GET_LASTNAME(ch));
+	if (GET_PERSONAL_LASTNAME(ch)) {
+		fprintf(fl, "Lastname: %s\n", GET_PERSONAL_LASTNAME(ch));
 	}
 	HASH_ITER(hh, GET_LEARNED_CRAFTS(ch), pcd, next_pcd) {
 		fprintf(fl, "Learned Craft: %d\n", pcd->vnum);
@@ -2814,6 +2845,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	struct player_event_data *ped, *next_ped;
 	struct empire_unique_storage *eus;
 	struct channel_history_data *hist;
+	struct player_lastname *lastn;
 	struct trig_proto_list *tpro;
 	struct player_eq_set *eq_set;
 	struct companion_mod *cmod;
@@ -2909,6 +2941,11 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	if (GET_LAST_HOME_SET_TIME(ch)) {
 		fprintf(fl, "Last Home Set: %ld\n", GET_LAST_HOME_SET_TIME(ch));
 	}
+	LL_FOREACH(GET_LASTNAME_LIST(ch), lastn) {
+		if (lastn->name) {
+			fprintf(fl, "Lastname List: %s\n", lastn->name);
+		}
+	}
 	for (lore = GET_LORE(ch); lore; lore = lore->next) {
 		if (lore->text && *lore->text) {
 			fprintf(fl, "Lore: %d %ld\n%s\n", lore->type, lore->date, lore->text);
@@ -3002,6 +3039,121 @@ void queue_delayed_update(char_data *ch, bitvector_t type) {
 		}
 		cdu->type |= type;
 	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// LASTNAME HANDLERS ///////////////////////////////////////////////////////
+
+/**
+* Grants a lastname to a player's list.
+*
+* @param char_data *ch The player.
+* @param char *name The lastname to add to the list.
+*/
+void add_lastname(char_data *ch, char *name) {
+	struct player_lastname *lastn;
+	
+	if (!ch || IS_NPC(ch) || !name || !*name) {
+		return;	// no work
+	}
+	if (has_lastname(ch, name)) {
+		return;	// already has it
+	}
+	
+	CREATE(lastn, struct player_lastname, 1);
+	lastn->name = str_dup(name);
+	LL_PREPEND(GET_LASTNAME_LIST(ch), lastn);
+	queue_delayed_update(ch, CDU_SAVE);
+}
+
+
+/**
+* Changes a player's personal lastname. If it's also their current lastname,
+* that is updated as well.
+*
+* @param char_data *ch The player.
+* @param char *name The name to set it to (may be NULL).
+*/
+void change_personal_lastname(char_data *ch, char *name) {
+	bool also_current = FALSE;
+	
+	if (!ch || IS_NPC(ch)) {
+		return;	// no player no work
+	}
+	
+	// free old name
+	if (GET_PERSONAL_LASTNAME(ch)) {
+		if (GET_CURRENT_LASTNAME(ch) && !str_cmp(GET_PERSONAL_LASTNAME(ch), GET_CURRENT_LASTNAME(ch))) {
+			free(GET_CURRENT_LASTNAME(ch));
+			also_current = TRUE;
+		}
+		free(GET_PERSONAL_LASTNAME(ch));
+	}
+	
+	GET_PERSONAL_LASTNAME(ch) = name ? str_dup(name) : NULL;
+	if (also_current) {
+		GET_CURRENT_LASTNAME(ch) = name ? str_dup(name) : NULL;
+	}
+	
+	queue_delayed_update(ch, CDU_SAVE);
+}
+
+
+/**
+* Check the player's lastname list for a name.
+*
+* @param char_data *ch A player.
+* @param char *name The name to look for (not case sensitive).
+* @return bool TRUE if the player has the name, FALSE if not.
+*/
+bool has_lastname(char_data *ch, char *name) {
+	struct player_lastname *lastn;
+	
+	if (!ch || IS_NPC(ch) || !name) {
+		return FALSE;	// safety first
+	}
+	
+	LL_FOREACH(GET_LASTNAME_LIST(ch), lastn) {
+		if (lastn->name && !str_cmp(lastn->name, name)) {
+			return TRUE;
+		}
+	}
+	
+	return FALSE;	// if not
+}
+
+
+/**
+* Removes a name from a player's lastname list, if present.
+*
+* @param char_data *ch A player.
+* @param char *name The name to remove (not case sensitive).
+*/
+void remove_lastname(char_data *ch, char *name) {
+	struct player_lastname *lastn, *next;
+	
+	if (!ch || IS_NPC(ch) || !name) {
+		return;	// safety first
+	}
+	
+	// shut off current lastname if it matches
+	if (GET_CURRENT_LASTNAME(ch) && !str_cmp(GET_CURRENT_LASTNAME(ch), name)) {
+		free(GET_CURRENT_LASTNAME(ch));
+		GET_CURRENT_LASTNAME(ch) = NULL;
+	}
+	
+	LL_FOREACH_SAFE(GET_LASTNAME_LIST(ch), lastn, next) {
+		if (!lastn->name || !str_cmp(lastn->name, name)) {
+			if (lastn->name) {
+				free(lastn->name);
+			}
+			LL_DELETE(GET_LASTNAME_LIST(ch), lastn);
+			free(lastn);
+		}
+	}
+	
+	queue_delayed_update(ch, CDU_SAVE);
 }
 
 

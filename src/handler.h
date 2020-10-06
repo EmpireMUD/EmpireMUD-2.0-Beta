@@ -54,6 +54,22 @@
 #define GLB_FUNCTION(name)		void (name)(struct global_data *glb, char_data *ch, void *other_data)
 
 
+/**
+* Validates a location for the pathfinding system.
+*
+* This must be implemented for both 'room' and 'map', as only 1 of those is set
+* each time it's called.
+*
+* @param room_data *room Optional: An interior room (if this is NULL, map will be set instead).
+* @param struct map_data *map Optional: A map room if outdoors (if this is NULL, room will be set instead).
+* @param char_data *ch Optional: Player trying to find the path (may be NULL).
+* @param vehicle_data *veh Optional: Vehicle trying to find the paath (may be NULL).
+* @param struct pathfind_controller *controller The pathfinding controller and all its data.
+* @return bool TRUE if the room/map is ok, FALSE if not.
+*/
+#define PATHFIND_VALIDATOR(name)  bool (name)(room_data *room, struct map_data *map, char_data *ch, vehicle_data *veh, struct pathfind_controller *controller)
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// HANDLER MACROS //////////////////////////////////////////////////////////
 
@@ -342,6 +358,7 @@ void set_extra_data(struct room_extra_data **list, int type, int value);
 
 // room targeting handlers
 extern room_data *find_target_room(char_data *ch, char *rawroomstr);
+extern room_data *parse_room_from_coords(char *string);
 
 // sector handlers
 extern bool check_evolution_percent(struct evolution_data *evo);

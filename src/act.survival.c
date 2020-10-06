@@ -913,7 +913,7 @@ ACMD(do_track) {
 		
 		if (track->player_id != NOTHING && (vict = is_playing(track->player_id))) {
 			// TODO: this is pretty similar to the MATCH macro in handler.c and could be converted to use it
-			if (isname(arg, GET_PC_NAME(vict)) || isname(arg, PERS(vict, vict, 0)) || isname(arg, PERS(vict, vict, 1)) || (!IS_NPC(vict) && GET_LASTNAME(vict) && isname(arg, GET_LASTNAME(vict)))) {
+			if (isname(arg, GET_PC_NAME(vict)) || isname(arg, PERS(vict, vict, 0)) || isname(arg, PERS(vict, vict, 1)) || (!IS_NPC(vict) && GET_CURRENT_LASTNAME(vict) && isname(arg, GET_CURRENT_LASTNAME(vict)))) {
 				found = TRUE;
 				dir = track->dir;
 				track_to_room = track->to_room;

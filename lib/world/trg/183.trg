@@ -28,11 +28,11 @@ if %enrage_counter% >= %soft_enrage_cycles%
   end
   * Enrage messages
   if %enrage_counter% == %soft_enrage_cycles%
-    %echo% %self.name%'s eyes start glowing brighter!
-    %echo% You'd better return %self.himher% to the grave, quickly!
+    %echo% |%self% eyes start glowing brighter!
+    %echo% You'd better return *%self% to the grave, quickly!
   end
   if %enrage_counter% == %hard_enrage_cycles%
-    %echo% %self.name% floats into the air!
+    %echo% ~%self% floats into the air!
     shout I alone should rule these lands, as a living god!
   end
 end
@@ -41,13 +41,13 @@ remote enrage_counter %self.id%
 if %enraged%
   if %enraged% == 2
     * Stops using normal script attacks, just spams this every hit
-    %echo% %self.name% unleashes an unstoppable blast of energy, bringing stone blocks crashing down from the ceiling!
+    %echo% ~%self% unleashes an unstoppable blast of energy, bringing stone blocks crashing down from the ceiling!
     %aoe% 1000 direct
     halt
   end
   * Don't always show the message or it would be kinda spammy
   if %random.4% == 4
-    %echo% %self.name%'s power grows!
+    %echo% |%self% power grows!
   end
   dg_affect %self% BONUS-PHYSICAL 50 3600
 end
@@ -55,14 +55,14 @@ end
 switch %random.4%
   * Summon
   case 1
-    %echo% %self.name% makes a mystical gesture!
+    %echo% ~%self% makes a mystical gesture!
     set room %self.room%
     if %heroic_mode%
       * Scarab swarm
       %load% mob 18302 ally
       set summon %room.people%
       if %summon.vnum% == 18302
-        %echo% %self.name% summons %summon.name%, and directs them to attack %actor.name%!
+        %echo% ~%self% summons ~%summon%, and directs them to attack ~%actor%!
         %force% %summon% %aggro% %actor%
       end
     else
@@ -70,7 +70,7 @@ switch %random.4%
       %load% mob 18301 ally
       set summon %room.people%
       if %summon.vnum% == 18301
-        %echo% %self.name% summons %summon.name%, and directs it to attack %actor.name%!
+        %echo% ~%self% summons ~%summon%, and directs it to attack ~%actor%!
         %force% %summon% %aggro% %actor%
       end
     end
@@ -78,15 +78,15 @@ switch %random.4%
   break
   * Rising Waters
   case 2
-    %echo% %self.name% raises %self.hisher% hands!
-    %echo% &AWater starts to flood the chamber! Swim for your life!&0
+    %echo% ~%self% raises ^%self% hands!
+    %echo% &&AWater starts to flood the chamber! Swim for your life!&&0
     * Give the group time to type 'swim' (if they're going to)
     set running 1
     remote running %self.id%
     wait 10 sec
     set running 0
     remote running %self.id%
-    %echo% &AWater floods the chamber!
+    %echo% &&AWater floods the chamber!
     set room %self.room%
     set person %room.people%
     while %person%
@@ -101,8 +101,8 @@ switch %random.4%
           eval test %%self.swimming_%person.id%%%
         end
         if !%test%
-          %send% %person% &rYou are drowned by the rising waters!
-          %echoaround% %person% %person.name% sinks beneath the rising waters!
+          %send% %person% &&rYou are drowned by the rising waters!
+          %echoaround% %person% ~%person% sinks beneath the rising waters!
           if %heroic_mode%
             %damage% %person% 500 direct
           else
@@ -110,13 +110,13 @@ switch %random.4%
           end
         else
           %send% %person% You barely keep your head above the water!
-          %echoaround% %person% %person.name% barely keeps %person.hisher% head above the water!
+          %echoaround% %person% ~%person% barely keeps ^%person% head above the water!
           unset swimming_%person.id%
         end
       end
       set person %person.next_in_room%
     done
-    %echo% %self.name% looks rejuvenated by the water!
+    %echo% ~%self% looks rejuvenated by the water!
     if %heroic_mode%
       %damage% %self% -300
     else
@@ -128,9 +128,9 @@ switch %random.4%
   break
   * Sandstorm
   case 3
-    %echo% %self.name% makes a sweeping gesture, and the wind picks up!
+    %echo% ~%self% makes a sweeping gesture, and the wind picks up!
     wait 5 sec
-    %echo% &rA howling tornado of sand fills the chamber, blinding and slashing at everyone!
+    %echo% &&rA howling tornado of sand fills the chamber, blinding and slashing at everyone!
     set cycle 1
     while %cycle% <= 4
       set room %self.room%
@@ -147,7 +147,7 @@ switch %random.4%
       wait 5 sec
       eval cycle %cycle% + 1
       if %cycle% <= 4
-        %echo% &rThe sandstorm rages on!
+        %echo% &&rThe sandstorm rages on!
       end
     done
     wait 5 sec
@@ -155,8 +155,8 @@ switch %random.4%
   break
   * Bandage bondage
   case 4
-    %send% %actor% %self.name%'s bandages unfurl and lash out like tentacles, wrapping around you!
-    %echoaround% %actor% %self.name%'s bandages unfurl and lash out like tentacles, wrapping around %actor.name%!
+    %send% %actor% |%self% bandages unfurl and lash out like tentacles, wrapping around you!
+    %echoaround% %actor% |%self% bandages unfurl and lash out like tentacles, wrapping around ~%actor%!
     if %heroic_mode%
       set max_cycles 5
     else
@@ -168,16 +168,16 @@ switch %random.4%
     while %cycle% <= %max_cycles%
       if %actor%
         if %actor.health% > -10
-          %send% %actor% &r%self.name%'s bandages tighten around you, trying to squeeze the life out of you!
-          %echoaround% %actor% %self.name%'s bandages tighten around %actor.name%!
+          %send% %actor% &&r|%self% bandages tighten around you, trying to squeeze the life out of you!
+          %echoaround% %actor% |%self% bandages tighten around ~%actor%!
           %damage% %actor% 150 physical
           wait 5 sec
         end
       end
       eval cycle %cycle% + 1
     done
-    %send% %actor% %self.name%'s bandages release you.
-    %echoaround% %actor% %self.name%'s bandages release %actor.name%.
+    %send% %actor% |%self% bandages release you.
+    %echoaround% %actor% |%self% bandages release ~%actor%.
     eval time_left 30 - %duration%
     wait %time_left% sec
   break
@@ -190,7 +190,7 @@ Pyramid boss summon timer~
 wait 30 sec
 switch %self.vnum%
   default
-    %echo% %self.name% vanishes.
+    %echo% ~%self% vanishes.
   break
 done
 %purge% %self%
@@ -208,7 +208,7 @@ if !%self.fighting% && %self.varexists(enrage_counter)%
   set enrage_counter 0
   remote enrage_counter %self.id%
   %restore% %self%
-  %echo% %self.name% settles down to rest.
+  %echo% ~%self% settles down to rest.
 end
 ~
 #18303
@@ -225,7 +225,7 @@ if !%self.running%
   halt
 end
 %send% %actor% You start swimming.
-%echoaround% %actor% %actor.name% starts swimming.
+%echoaround% %actor% ~%actor% starts swimming.
 dg_affect %actor% HARD-STUNNED on 10
 set swimming_%actor.id% 1
 remote swimming_%actor.id% %self.id%
@@ -278,7 +278,7 @@ while %vnum% <= 18300
   eval vnum %vnum% + 1
 done
 %send% %actor% You touch one of the symbols on the wall, and a section of the wall slowly slides into the floor...
-%echoaround% %actor% %actor.name% touches one of the symbols on the wall, and a section of the wall slowly slides into the floor...
+%echoaround% %actor% ~%actor% touches one of the symbols on the wall, and a section of the wall slowly slides into the floor...
 set newroom i18302
 set exitroom i18300
 if %exitroom%
@@ -303,7 +303,7 @@ Pyramid delayed despawn~
 Pharaoh: Block flee~
 0 c 0
 flee~
-%send% %actor% You can't flee from %self.name%!
+%send% %actor% You can't flee from ~%self%!
 return 1
 ~
 #18307
@@ -399,7 +399,7 @@ end
 Scarab special attack~
 0 k 100
 ~
-%echo% &rEveryone is bitten and stung by %self.name%!
+%echo% &&rEveryone is bitten and stung by ~%self%!
 %aoe% 75 physical
 ~
 #18309

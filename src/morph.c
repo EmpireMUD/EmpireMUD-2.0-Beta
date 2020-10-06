@@ -277,7 +277,7 @@ const char *get_morph_desc(char_data *ch, bool long_desc_if_true) {
 		strcpy(realname, GET_SHORT_DESC(ch));
 	}
 	else {
-		snprintf(realname, sizeof(realname), "%s%s%s", GET_PC_NAME(ch), GET_LASTNAME(ch) ? " " : "", NULLSAFE(GET_LASTNAME(ch)));
+		snprintf(realname, sizeof(realname), "%s%s%s", GET_PC_NAME(ch), GET_CURRENT_LASTNAME(ch) ? " " : "", NULLSAFE(GET_CURRENT_LASTNAME(ch)));
 	}
 	
 	if (GET_MORPH(ch)) {

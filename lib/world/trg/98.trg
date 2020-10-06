@@ -3,7 +3,7 @@ Generic No Sacrifice~
 1 h 100
 ~
 if %command% == sacrifice
-  %send% %actor% %self.shortdesc% cannot be sacrificed.
+  %send% %actor% @%self% cannot be sacrificed.
   return 0
   halt
 end
@@ -24,7 +24,7 @@ end
 Give rejection~
 0 j 100
 ~
-%send% %actor% You can't give items to %self.name%.
+%send% %actor% You can't give items to ~%self%.
 return 0
 ~
 #9803
@@ -64,7 +64,7 @@ Equip imm-only~
 1 j 0
 ~
 if !%actor.is_immortal%
-  %send% %actor% You can't wear %self.name%.
+  %send% %actor% You can't wear ~%self%.
   return 0
 else
   return 1

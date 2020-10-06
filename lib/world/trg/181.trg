@@ -27,19 +27,19 @@ if %room.sector_vnum% >= 1 && %room.sector_vnum% <= 4
   %terraform% %room% %new_sector%
   eval logs %logs% + 1
   if %room.sector_vnum% == 1
-    %echo% %self.name% fells the last tree with a mighty crash!
+    %echo% ~%self% fells the last tree with a mighty crash!
   else
-    %echo% %self.name% fells a tree with a mighty crash!
+    %echo% ~%self% fells a tree with a mighty crash!
   end
 elseif %room.sector_vnum% == 90
   * old-growth -> overgrown
   nop %self.add_mob_flag(SENTINEL)%
   %terraform% %room% 4
   eval logs %logs% + 1
-  %echo% %self.name% fells a tree with a mighty crash!
+  %echo% ~%self% fells a tree with a mighty crash!
 elseif %room.sector_vnum% == 26
   nop %self.add_mob_flag(SENTINEL)%
-  %echo% %self.name% fells two trees!
+  %echo% ~%self% fells two trees!
   %terraform% %room% 23
   eval logs %logs% + 2
   wait 1 sec
@@ -54,9 +54,9 @@ elseif %room.sector_vnum% >= 42 && %room.sector_vnum% <= 45
   %terraform% %room% %new_sector%
   eval logs %logs% + 1
   if %room.sector_vnum% == 42 || %room.sector_vnum% == 44
-    %echo% %self.name% fells the last tree with a mighty crash!
+    %echo% ~%self% fells the last tree with a mighty crash!
   else
-    %echo% %self.name% fells a tree with a mighty crash!
+    %echo% ~%self% fells a tree with a mighty crash!
   end
 else
   * Tile is clear, can wander now
@@ -64,9 +64,9 @@ else
 end
 wait 1 sec
 if (%gohome% && %instance.location%)
-  %echo% %self.name% heads back to %self.hisher% camp!
+  %echo% ~%self% heads back to ^%self% camp!
   %teleport% %self% %instance.location%
-  %echo% %self.name% returns to the camp!
+  %echo% ~%self% returns to the camp!
 end
 remote logs %self.id%
 ~
@@ -125,13 +125,13 @@ Goblin lumberjack environmental~
 if (%self.mob_flagged(SENTINEL)% && !%self.fighting%)
   switch %random.3%
     case 1
-      %echo% %self.name% swings %self.hisher% axe hard into a tree!
+      %echo% ~%self% swings ^%self% axe hard into a tree!
     break
     case 2
-      %echo% %self.name% hacks wildly at a tree with %self.hisher% axe!
+      %echo% ~%self% hacks wildly at a tree with ^%self% axe!
     break
     case 3
-      %echo% %self.name% flails furiously at a tree, screaming loudly!
+      %echo% ~%self% flails furiously at a tree, screaming loudly!
     break
   done
 end

@@ -310,6 +310,7 @@
 #define COOLDOWN_KITE  2068
 #define COOLDOWN_CHARGE  2069
 #define COOLDOWN_PLEDGE  2087
+#define COOLDOWN_PATHFINDING  2088
 
 
 // LIQ_x: Some different kind of liquids (vnums of GENERIC_LIQUID)

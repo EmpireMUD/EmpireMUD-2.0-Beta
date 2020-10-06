@@ -42,6 +42,9 @@ extern const int rev_dir[];
 
 // external funcs
 ACMD(do_dismount);
+PATHFIND_VALIDATOR(pathfind_ocean);
+PATHFIND_VALIDATOR(pathfind_pilot);
+PATHFIND_VALIDATOR(pathfind_road);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern int count_harnessed_animals(vehicle_data *veh);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
@@ -65,10 +68,11 @@ struct {
 	char *verb;	// "driving"
 	int action;	// ACT_
 	bitvector_t flag;	// required VEH_ flag
+	PATHFIND_VALIDATOR(*pathfinder);	// if it can target coords
 } drive_data[] = {
-	{ "drive", "driving", ACT_DRIVING, VEH_DRIVING },	// SCMD_DRIVE
-	{ "sail", "sailing", ACT_SAILING, VEH_SAILING },	// SCMD_SAIL
-	{ "pilot", "piloting", ACT_PILOTING, VEH_FLYING },	// SCMD_PILOT
+	{ "drive", "driving", ACT_DRIVING, VEH_DRIVING, pathfind_road },	// SCMD_DRIVE
+	{ "sail", "sailing", ACT_SAILING, VEH_SAILING, pathfind_ocean },	// SCMD_SAIL
+	{ "pilot", "piloting", ACT_PILOTING, VEH_FLYING, pathfind_pilot },	// SCMD_PILOT
 };
 
 
@@ -1693,9 +1697,13 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 
 // do_sail, do_pilot (search hints)
 ACMD(do_drive) {
-	char buf[MAX_STRING_LENGTH];
+	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
+	
+	char buf[MAX_STRING_LENGTH], *found_path = NULL;
 	struct vehicle_room_list *vrl;
 	bool was_driving, same_dir, dir_only;
+	long long time_check = -1;
+	room_data *path_to_room;
 	vehicle_data *veh;
 	char_data *ch_iter;
 	obj_data *portal;
@@ -1703,6 +1711,7 @@ ACMD(do_drive) {
 	
 	skip_run_filler(&argument);
 	dir_only = !strchr(argument, ' ') && (parse_direction(ch, argument) != NO_DIR);	// only 1 word, and is a direction
+	path_to_room = (*argument && HAS_NAVIGATION(ch)) ? parse_room_from_coords(argument) : NULL;	// maybe
 	
 	// basics
 	if (IS_NPC(ch)) {
@@ -1767,21 +1776,50 @@ ACMD(do_drive) {
 	else if (strlen(argument) > 2 && (portal = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
 		do_drive_through_portal(ch, veh, portal, subcmd);
 	}
-	else if (!dir_only && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
+	else if (!dir_only && !path_to_room && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
 		// sends own error
 	}
-	else if (dir == NO_DIR && (dir = parse_direction(ch, argument)) == NO_DIR) {
+	else if (dir == NO_DIR && !path_to_room && (dir = parse_direction(ch, argument)) == NO_DIR) {
 		msg_to_char(ch, "'%s' isn't a direction you can %s.\r\n", argument, drive_data[subcmd].command);
 	}
-	else if (!dir_only && (dir == NO_DIR || dir == DIR_RANDOM)) {
+	else if (!dir_only && !path_to_room && (dir == NO_DIR || dir == DIR_RANDOM)) {
 		msg_to_char(ch, "Invalid path string.\r\n");
 	}
+	
+	// did they request a path?
+	else if (path_to_room && !drive_data[subcmd].pathfinder) {
+		msg_to_char(ch, "You can't %s by coordinates.\r\n", drive_data[subcmd].command);
+	}
+	else if (path_to_room && get_cooldown_time(ch, COOLDOWN_PATHFINDING) > 0) {
+		msg_to_char(ch, "You must wait another %d second%s before you can %s-to-coordinates again.\r\n", get_cooldown_time(ch, COOLDOWN_PATHFINDING), PLURAL(get_cooldown_time(ch, COOLDOWN_PATHFINDING)), drive_data[subcmd].command);
+	}
+	else if (path_to_room && (time_check = microtime()) && !(found_path = get_pathfind_string(IN_ROOM(veh), path_to_room, ch, veh, drive_data[subcmd].pathfinder))) {
+		msg_to_char(ch, "Unable to find a valid route to that location (or it took longer than the allowed amount of time).\r\n");
+		// if pathfinding took longer than 0.1 seconds, set a cooldown
+		if (time_check > 0 && microtime() - time_check > 100000) {
+			strcpy(buf, coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
+			log("Pathfinding: %s failed to find %s path in time:%s to%s", GET_NAME(ch), drive_data[subcmd].command, coord_display(NULL, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), FALSE), buf);
+			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
+		}
+	}
+	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {
+		msg_to_char(ch, "Unable to find a valid route to that location.\r\n");
+	}
+	
+	// double-check directions
 	else if (dir == DIR_RANDOM || !dir_to_room(IN_ROOM(veh), dir, FALSE) || (subcmd != SCMD_PILOT && !is_flat_dir[dir])) {
 		msg_to_char(ch, "You can't %s that direction.\r\n", drive_data[subcmd].command);
 	}
 	
 	else {
 		// 'dir' is the way we are ACTUALLY going, but we store the direction the character thinks it is
+		
+		// if pathfinding took longer than 0.1 seconds, set a cooldown
+		if (time_check > 0 && microtime() - time_check > 100000) {
+			strcpy(buf, coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
+			log("Pathfinding: %s got slow %s path (%d microseconds):%s to%s", GET_NAME(ch), drive_data[subcmd].command, (int)(microtime() - time_check), coord_display(NULL, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), FALSE), buf);
+			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
+		}
 		
 		was_driving = (GET_ACTION(ch) == drive_data[subcmd].action);
 		same_dir = (was_driving && (get_direction_for_char(ch, dir) == GET_ACTION_VNUM(ch, 0)));
@@ -1794,7 +1832,7 @@ ACMD(do_drive) {
 		if (GET_MOVEMENT_STRING(ch)) {
 			free(GET_MOVEMENT_STRING(ch));
 		}
-		GET_MOVEMENT_STRING(ch) = dir_only ? NULL : str_dup(argument);
+		GET_MOVEMENT_STRING(ch) = found_path ? str_dup(found_path) : (dir_only ? NULL : str_dup(argument));
 		
 		GET_DRIVING(ch) = veh;
 		VEH_DRIVER(veh) = ch;

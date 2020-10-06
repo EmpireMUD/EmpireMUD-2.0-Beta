@@ -15,7 +15,7 @@ end
 Give rejection~
 0 j 100
 ~
-%send% %actor% You can't give items to %self.name%. Try "quest finish <name>" instead.
+%send% %actor% You can't give items to ~%self%. Try "quest finish <name>" instead.
 return 0
 ~
 #10802
@@ -23,7 +23,7 @@ Pageboy shout~
 0 ab 1
 ~
 if %random.3% == 3
-  %regionecho% %self.room% 20 %self.name% shouts, 'Learn the Empire skill at the (^^) Royal Planning Office!'
+  %regionecho% %self.room% 20 ~%self% shouts, 'Learn the Empire skill at the (^^) Royal Planning Office!'
 end
 ~
 #10803
@@ -50,18 +50,18 @@ imperial ring: bind-to-empire~
 1 j 0
 ~
 if !%empire%
-  %send% %actor% %self.shortdesc% can't be used anymore.
+  %send% %actor% @%self% can't be used anymore.
   return 0
   halt
 end
 makeuid emp %empire%
 if !%emp%
-  %send% %actor% %self.shortdesc% is from a long-lost empire and can no longer be used.
+  %send% %actor% @%self% is from a long-lost empire and can no longer be used.
   return 0
   halt
 end
 if %actor.empire% != %emp%
-  %send% %actor% Only members of %emp.name% can use %self.shortdesc%.
+  %send% %actor% Only members of %emp.name% can use @%self%.
   return 0
   halt
 end
@@ -85,7 +85,7 @@ end
 Give rejection~
 0 j 100
 ~
-%send% %actor% You can't give items to %self.name%. Try "quest finish <name>" instead.
+%send% %actor% You can't give items to ~%self%. Try "quest finish <name>" instead.
 return 0
 ~
 #10827
@@ -93,7 +93,7 @@ Crier Shout~
 0 ab 1
 ~
 if %random.3% == 3
-  %regionecho% %self.room% 20 %self.name% shouts, 'Learn the Trade skill at the &y/()\&0 Museum of Early Man!'
+  %regionecho% %self.room% 20 ~%self% shouts, 'Learn the Trade skill at the &&y/()\&&0 Museum of Early Man!'
 end
 ~
 #10828
@@ -105,13 +105,13 @@ switch %random.4%
     say Maybe I should hire some skeletons to stand around and chat with visitors.
   break
   case 2
-    %echo% %self.name% sprinkles some authentic-looking dust on the shelves.
+    %echo% ~%self% sprinkles some authentic-looking dust on the shelves.
   break
   case 3
-    %echo% %self.name% rubs a piece of leather in the dirt, then heaps it on a shelf.
+    %echo% ~%self% rubs a piece of leather in the dirt, then heaps it on a shelf.
   break
   case 4
-    %echo% %self.name% jingles a jar labeled 'Admissions', but it sounds empty.
+    %echo% ~%self% jingles a jar labeled 'Admissions', but it sounds empty.
   break
 done
 ~
@@ -191,8 +191,8 @@ if ((!%self.is_name(%arg%)% && %actor.char_target(%arg%)% != %self%) || !%actor.
   return 0
   halt
 end
-%send% %actor% Your mana pulses and waves over %self.name%, healing %self.hisher% spirit.
-%echoaround% %actor% %actor.name%'s mana pulses and waves over %self.name%, healing %self.hisher% spirit.
+%send% %actor% Your mana pulses and waves over ~%self%, healing ^%self% spirit.
+%echoaround% %actor% |%actor% mana pulses and waves over ~%self%, healing ^%self% spirit.
 %quest% %actor% trigger 10854
 return 1
 ~
@@ -247,7 +247,7 @@ if %room.template% == 10850
     %send% %actor% You must start the quest 'Enter the Soulstream' before entering.
     %send% %actor% Use 'quest start Enter' to begin the quest.
     %send% %actor% (If you can't see the quest, try 'toggle tutorials'.)
-    %echoaround% %actor% %actor.name% is pushed back through the portal.
+    %echoaround% %actor% ~%actor% is pushed back through the portal.
     return 0
   end
 end
@@ -310,9 +310,9 @@ done
 if %count% > 0 && %self.aff_flagged(!SEE)%
   nop %self.remove_mob_flag(SILENT)%
   dg_affect %self% !SEE off
-  %echo% %self.name% appears from deep in the soulstream!
+  %echo% ~%self% appears from deep in the soulstream!
 elseif %count% == 0 && !%self.aff_flagged(!SEE)%
-  %echo% %self.name% vanishes into the soulstream.
+  %echo% ~%self% vanishes into the soulstream.
   nop %self.add_mob_flag(SILENT)%
   dg_affect %self% !SEE on -1
 end

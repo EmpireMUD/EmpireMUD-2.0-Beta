@@ -83,9 +83,10 @@ can also see it in your prompt with %c or %C (conditions).
 
 See also: PROMPT, TOGGLE
 #
-ALIAS ALIASES
+ALIAS ALIASES UNALIAS
 
 Usage:  alias [alias name] [command]
+        unalias [alias name]
 
 An alias is a single command used to represent one or more other commands.
 The ALIAS command can be used to manipulate your character's aliases. Type
@@ -93,22 +94,25 @@ ALIAS alone to see a list of your currently defined aliases.
 
   > alias
 
+Type ALIAS <alias-name> to view a single alias.
+
+  > alias gac
+
 Type ALIAS <alias name> <command> to create a new alias. The alias name must
 be one word. The command can be any string. Aliases may not be nested or
 used recursively. Any command may be overridden by an alias (other than the
 ALIAS command itself, of course).
 
-  > alias gbb get bread bag
-  > alias gac get all corpse
+  > alias gac get all all.corpse
 
-Type ALIAS <alias-name> to delete an alias that has already been defined.
+Type UNALIAS <alias-name> to delete an alias that has already been defined.
 
-  > alias gbb
+  > unalias gac
 
 A semicolon (";") can be used to define multiple actions to be taken with
 a single alias.
 
-  > alias eat get bread bag; eat bread
+  > alias eat summon materials bread; eat bread
 
 Note that the 'eat' contained within the eat alias is interpreted as the MUD's
 internal eat command; aliases may not be nested or used recursively. The
@@ -1223,6 +1227,24 @@ This allows you to cancel your flight effect and land on the ground.
 
 See also: FLY
 #
+LASTNAME "LAST NAME"
+
+Usage:  lastname [list | change] [name | none]
+
+&clastname&0  (by itself)
+   Shows your current lastname.
+
+&clastname list [keywords]&0
+   List the lastnames you have available. You can filter by keywords.
+
+&clastname <name | none>&0
+   Change your name to one in your list of lastnames (if this feature is
+   enabled).
+
+&clastname change <name | none>&0
+   Change your personal lastname -- the one you usually pick during character
+   creation. (If this feature is enabled.)
+#
 LAY ROAD ROADS
 
 Roads: ----  ..|.  ..+-  --+.  .--.
@@ -1917,10 +1939,14 @@ RUN RUNNING SPEEDWALK SPEED-WALK "SPEED WALK"
 
 Usage:  run <direction>
         run <path>
+        run (x, y)
 
 This command allows you to set your character moving in a given direction, or
 along a path you specify. Paths must be pairs of directions and distances which
 your character will move in order.
+
+If you specify coordinates to run to, there must be continous roads all the way
+there (tunnels, gatehouses, and similar buildings are okay as well).
 
 You will run faster if you have the 'faster walking' bonus trait.
 
@@ -1933,9 +1959,9 @@ See also: BONUS TRAITS
 #
 SAIL DRIVE PILOT SAILING DRIVING PILOTING
 
-Usage:  sail <direction | path | portal>
-        drive <direction | path | portal>
-        pilot <direction | path | portal>
+Usage:  sail <direction | path | coordinates | portal>
+        drive <direction | path | coordinates | portal>
+        pilot <direction | path | coordinates | portal>
 
 These three commands are used to control ships, carriages, and other vehicles.
 Which command you use depends upon the type of vehicle. Travel in this manner
@@ -1946,13 +1972,18 @@ You can use 'stop' to cancel travel at any time. If you don't like seeing the
 messages each time the ship moves, you can 'toggle action-spam' (unless you
 are the pilot).
 
-You can either specify a direction by itself, or a path. Paths must be pairs of
-directions and distances which your character will move in order.
+You can either specify a direction by itself, coordinates, or a path. Paths
+must be pairs of directions and distances which your character will move in
+order. If you specify coordinates, drive requires continuous roads (including
+gatehouses and tunnels) and sail requires continuous water (including buildings
+you can sail through, like bridges). If automatic pathfinding takes too long or
+creates too complex a path, it will fail.
 
 Examples:
  > drive east
  > sail 3e 4n 7nw
  > pilot east 3, north 4, northwest 7
+ > drive (415,780)
 
 Many vehicles cannot move through portals.
 

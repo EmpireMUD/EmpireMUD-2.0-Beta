@@ -168,6 +168,9 @@ For each type, there is a help file named &yOTRIG <type>&0.
 
 All object scripts provide the &c%self%&0 variable.
 
+The correct way to get an object's short description in a send/echo is:
+&c@%obj%&0 - short desc, something
+
 When using field  - The variable returns:
 &cattack(field)&0 - Gets info on a weapon's attack type. Valid fields are:
   &yname&0 - attack name             &yfirst-person or 1&0 - 1st person attack message
@@ -202,7 +205,8 @@ When using field  - The variable returns:
    empty return
 &cquest&0 - If it's a quest obj, this gives the quest vnum (0 if not).
 &croom&0 - Returns the room id the object is in.
-&cshortdesc&0 - The name of the object that players see.
+&cshortdesc&0 - The name of the object that players see. In sends/echos, use
+   @%obj% instead (it checks visibility).
 &csize&0 - Inventory size of the object.
 &ctimer&0 - The timer of the object.
 &ctool&0 - The object's tool types (separated by spaces), if any.

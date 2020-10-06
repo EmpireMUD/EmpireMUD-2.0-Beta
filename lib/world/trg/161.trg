@@ -34,8 +34,8 @@ if %counter% == 1
 else
   set ViciousDamage 110
 end
-%send% %actor% %self.name% suddenly strikes with the speed of a cobra!
-%echoaround% %actor% %self.name% suddenly strikes %actor.name% with the speed of a cobra!
+%send% %actor% ~%self% suddenly strikes with the speed of a cobra!
+%echoaround% %actor% ~%self% suddenly strikes ~%actor% with the speed of a cobra!
 %damage% %actor% %ViciousDamage%
 ~
 #16102
@@ -179,15 +179,15 @@ while %person%
   set person %person.next_in_room%
 done
 if %counter% == 1 && !%ptarget.disabled%
-  %send% %ptarget% You're frozen with fear as %self.name% gazes directly at you!
+  %send% %ptarget% You're frozen with fear as ~%self% gazes directly at you!
   dg_affect #16106 %ptarget% HARD-STUNNED on 10
 elseif %counter% == 1
-  %send% %ptarget% %self.name% opens wide and spits a bolt of mana at you!
+  %send% %ptarget% ~%self% opens wide and spits a bolt of mana at you!
   %dot% #16105 %ptarget% 120 15 magical 3
 else
-  %send% %actor% %self.name% opens wide and spits a bolt of mana at you!
+  %send% %actor% ~%self% opens wide and spits a bolt of mana at you!
   %dot% #16105 %actor% 75 15 magical 3
-  %echoaround% %actor% %self.name% opens wide and spits a bolt of mana at %actor.name%!
+  %echoaround% %actor% ~%self% opens wide and spits a bolt of mana at ~%actor%!
 end
 ~
 #16107
@@ -197,7 +197,7 @@ hydra vicious head buff~
 if %self.cooldown(16107)%
   halt
 end
-%echo% %self.name%'s eyes glow bright red and a fury overtakes it.
+%echo% |%self% eyes glow bright red and a fury overtakes it.
 dg_affect %self% bonus-physical 50 90
 nop %self.set_cooldown(16107, 60)%
 ~
@@ -372,7 +372,7 @@ switch %random.4%
       end
       set person %person.next_in_room%
     done
-    %echo% %self.name% heals all visible heads.
+    %echo% ~%self% heals all visible heads.
   break
   case 2
     while %person%
@@ -453,7 +453,7 @@ if !%arg%
 end
 set room %self.room%
 if %room.rmt_flagged(!LOCATION)%
-  %send% %actor% %self.shortdesc% spins gently in a circle.
+  %send% %actor% @%self% spins gently in a circle.
   halt
 end
 if !(hydra /= %arg%)
@@ -461,7 +461,7 @@ if !(hydra /= %arg%)
   halt
 else
   if %actor.cooldown(16115)%
-    %send% %actor% %self.shortdesc% is on cooldown.
+    %send% %actor% @%self% is on cooldown.
     halt
   end
   eval adv %instance.nearest_adventure(16100)%
@@ -470,7 +470,7 @@ else
     %send% %actor% Could not find a single oceanic hydra.
     halt
   end
-  %send% %actor% You hold %self.shortdesc% aloft...
+  %send% %actor% You hold @%self% aloft...
   eval real_dir %%room.direction(%adv%)%%
   eval direction %%actor.dir(%real_dir%)%%
   eval distance %%room.distance(%adv%)%%
@@ -483,7 +483,7 @@ else
     set plural tiles
   end
   %send% %actor% The oceanic hydra was last seen %distance% %plural% to the %direction%.
-  %echoaround% %actor% %actor.name% holds %self.shortdesc% aloft...
+  %echoaround% %actor% ~%actor% holds @%self% aloft...
 end
 ~
 #16116
@@ -521,38 +521,38 @@ switch %random_roll%
     else
       set eyes pairs
     end
-    %echo% %self.name% blinks its %headcount% %eyes% of eyes as it looks around.
+    %echo% ~%self% blinks its %headcount% %eyes% of eyes as it looks around.
   break
   case 2
     if %headcount% == 1
-      %echo% %self.name% starts shuttering like somethings wrong, then gives up on sprouting a new head.
+      %echo% ~%self% starts shuttering like somethings wrong, then gives up on sprouting a new head.
     elseif %headcount% == 2
       set which_char %random.char%
-      %send% %which_char% %self.name%'s heads each pick an ankle of yours and begin biting them.
-      %echoaround% %which_char% %self.name%'s heads each begin biting an ankle of %which_char.name%.
+      %send% %which_char% |%self% heads each pick an ankle of yours and begin biting them.
+      %echoaround% %which_char% |%self% heads each begin biting an ankle of ~%which_char%.
     elseif %headcount% == 3
-      %echo% %self.name%'s left and center heads begin to fight over something, while its right head simply stares off dreamily.
+      %echo% |%self% left and center heads begin to fight over something, while its right head simply stares off dreamily.
     else
-      %echo% %self.name%'s vicious head begins snapping at you!
+      %echo% |%self% vicious head begins snapping at you!
     end
   break
   case 3
     if %headcount% == 1
-      %echo% %self.name% slithers in a circle, faster and faster, as it chases its own tail.
+      %echo% ~%self% slithers in a circle, faster and faster, as it chases its own tail.
     elseif %headcount% == 2
-      %echo% %self.name% left head goes left, while its right head goes right. The end result? %self.name% doesn't go anywhere.
+      %echo% ~%self% left head goes left, while its right head goes right. The end result? ~%self% doesn't go anywhere.
     elseif %headcount% == 3
       set person %self.room.people%
       set echo_count 1
       while %person%
         if %person.vnum% != 16109 && %echo_count% == 1
-          %send% %person% %self.name%'s left head snaps at your hands.
+          %send% %person% |%self% left head snaps at your hands.
           eval echo_count %echo_count% + 1
         elseif %person.vnum% != 16109 && %echo_count% == 2
-          %send% %person% %self.name%'s right head begins to flutter its tongue around you. Perhaps you'd make a tasty snack?
+          %send% %person% |%self% right head begins to flutter its tongue around you. Perhaps you'd make a tasty snack?
           eval echo_count %echo_count% + 1
         elseif %person.vnum% != 16109 && %echo_count% == 3
-          %send% %person% %self.name%'s center head stares challengingly at you.
+          %send% %person% |%self% center head stares challengingly at you.
           eval echo_count %echo_count% + 1
         end
         set person %person.next_in_room%
@@ -562,16 +562,16 @@ switch %random_roll%
       set echo_count 1
       while %person%
         if %person.vnum% != 16109 && %echo_count% == 1
-          %send% %person% %self.name%'s vicious head snaps at you!
+          %send% %person% |%self% vicious head snaps at you!
           eval echo_count %echo_count% + 1
         elseif %person.vnum% != 16109 && %echo_count% == 2
-          %send% %person% %self.name%'s withering head begins to flutter its tongue around you. Watch out, it might give an infection!
+          %send% %person% |%self% withering head begins to flutter its tongue around you. Watch out, it might give an infection!
           eval echo_count %echo_count% + 1
         elseif %person.vnum% != 16109 && %echo_count% == 3
-          %send% %person% %self.name%'s majestic head stares challengingly at you from behind the other three heads!
+          %send% %person% |%self% majestic head stares challengingly at you from behind the other three heads!
           eval echo_count %echo_count% + 1
         elseif %person.vnum% != 16109 && %echo_count% == 4
-          %send% %person% %self.name%'s ethereal head tries to lunge at you... but passes right through.
+          %send% %person% |%self% ethereal head tries to lunge at you... but passes right through.
           eval echo_count %echo_count% + 1
         end
         set person %person.next_in_room%
@@ -581,7 +581,7 @@ switch %random_roll%
   case 4
     eval new_headcount %random.4%
     if %headcount% == %new_headcount%
-      %echo% %self.name% does its best to roll into a ball.
+      %echo% ~%self% does its best to roll into a ball.
     else
       if %new_headcount% == 1
         set morphnum normal
@@ -603,7 +603,7 @@ switch %random_roll%
           set head_ing heads fall off of
         end
       end
-      %echo% Suddenly %new_headcount% %head_ing% %self.name%'s body.
+      %echo% Suddenly %new_headcount% %head_ing% |%self% body.
       %morph% %self% %morphnum%
     end
   break
