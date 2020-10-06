@@ -450,14 +450,10 @@ char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehic
 	count = 0;
 	
 	// do the thing
-	while ((node = controller->nodes)) {
+	while ((node = controller->nodes) && !end_node) {
 		// pop node off and move it to the free_nodes list now
 		DL_DELETE(controller->nodes, node);
 		DL_PREPEND(controller->free_nodes, node);
-		
-		if (end_node) {
-			break;	// exit early if we found the end
-		}
 		
 		for (dir = 0; dir < (node->inside_room ? NUM_NATURAL_DIRS : NUM_2D_DIRS) && !end_node; ++dir) {
 			// preliminary checks
