@@ -904,6 +904,118 @@ if %sacrifices_left% == 0
   %quest% %actor% finish %qvnum%
 end
 ~
+#18853
+dress up the small demon~
+0 n 100
+~
+set on_head %random.6%
+if %on_head% == 1
+  set lead leads
+else
+  set lead lead
+end
+switch %on_head%
+  case 1
+    set on_head singular black horn
+  break
+  case 2
+    set on_head two curving ram's horns
+  break
+  case 3
+    set on_head blood coated spikes
+  break
+  case 4
+    set on_head rusty iron horns
+  break
+  case 5
+    set on_head patch of writhing tentacles
+  break
+  case 6
+    set on_head hair made of flames
+  break
+done
+set skin_color %random.6%
+switch %skin_color%
+  case 1
+    set skin_color red
+  break
+  case 2
+    set skin_color black
+  break
+  case 3
+    set skin_color gray
+  break
+  case 4
+    set skin_color blue
+  break
+  case 5
+    set skin_color green
+  break
+  case 6
+    set skin_color orange
+  break
+done
+set eye_color %random.3%
+switch %eye_color%
+  case 1
+    set eye_color red
+  break
+  case 2
+    set eye_color black
+  break
+  case 3
+    set eye_color yellow
+  break
+done
+set skin_type %random.3%
+switch %skin_type%
+  case 1
+    set skin_type1 furred
+    set skin_type2 fur
+  break
+  case 2
+    set skin_type1 scaled
+    set skin_type2 scales
+  break
+  case 3
+    set skin_type1 skinned
+    set skin_type2 skin
+  break
+done
+set sex %random.2%
+switch %sex%
+  case 1
+    set sex male
+  break
+  case 2
+    set sex female
+  break
+done
+set body_type %random.5%
+switch %body_type%
+  case 1
+    set body_type bulky
+  break
+  case 2
+    set body_type scrawny
+  break
+  case 3
+    set body_type lean
+  break
+  case 4
+    set body_type lithe
+  break
+  case 5
+    set body_type muscular
+  break
+done
+%mod% %self% shortdesc a %eye_color%-eyed demon
+%mod% %self% longdesc A small %skin_color%-%skin_type1% demon with %eye_color% eyes crouches to spring!
+%mod% %self% keyword demon small %skin_color%
+%mod% %self% sex %sex%
+%mod% %self% lookdesc This small demon sports %skin_color% %skin_type2% covering a %body_type% build.
+%mod% %self% append-lookdesc As you watch, %self.hisher% %eye_color% eyes find you and the %on_head% on %self.hisher% head %lead% the way toward you!
+~
 #18854
 pick or treat action~
 1 c 2
@@ -1392,13 +1504,19 @@ detach 18861 %room.id%
 #18862
 ritual of demon summoning~
 1 c 2
-ritual~
+ritual rite~
+set room %actor.room%
 if !%arg%
   return 0
   halt
 end
-if %arg% != demon
+if !(demons /= %arg%)
   return 0
+  halt
+end
+if %room.empire% != %actor.empire% || !%room.in_city%
+  %send% %actor% You can really only perform the demon ritual in one of your empire's cities.
+  return 1
   halt
 end
 if %actor.cooldown(18862)%
@@ -1406,22 +1524,86 @@ if %actor.cooldown(18862)%
   return 1
   halt
 end
-set veh %self.room.vehicles%
+set veh %room.vehicles%
 while %veh%
-  if %veh.vnum(18861)%
-    %send% %actor% someone has already attempted to summon a demon here.
+  if %veh.vnum% == 18861
+    %send% %actor% Someone has already attempted to summon a demon here.
     halt
   end
   set veh %veh.next_in_room%
 done
-nop %actor.set_cooldown(18862, 20)%
-%send% %actor% Your mind feels like it might break under the strain, and suddenly there's a thundering snap!
-%echoaround% %actor% You watch as ~%actor% begins to shake with the strain of opening a portal.
-%echo% A portal pops into existance before you!
+* Ritual portion
+set cycles_left 5
+while %cycles_left% >= 0
+  if %actor.room% != %room% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+    * We've either moved or the room's no longer suitable for the ritual
+    if %cycles_left% < 5
+      %echo% |%actor% ritual is interrupted.
+    else
+      * combat, stun, sitting down, etc
+      %send% %actor% You can't do that right now.
+    end
+    halt
+  end
+  * Fake ritual messages
+  switch %cycles_left%
+    case 5
+      %echoaround% %actor% ~%actor% lowers ^%actor% head and ^%actor% eyes roll back in ^%actor% head.
+      %send% %actor% You lower your head reverently...
+    break
+    case 4
+      %echoaround% %actor% ~%actor% speaks in a low, droning tone with words you cannot comprehend...
+      %send% %actor% You recite the names of the guardians of the Nether in your throatiest voice...
+    break
+    case 3
+      %echoaround% %actor% ~%actor% seems to float a few inches above the ground as &%actor% speaks the words of the ritual...
+      %send% %actor% You feel the Nether tugging at your soul as you speak into the void...
+    break
+    case 2
+      %echo% A violet spark flickers to life in the air...
+    break
+    case 1
+      %echo% The violet spark scrapes a 31-pointed star out of the air with the piercing sound of fingernails on slate...
+    break
+    case 0
+      %echoaround% %actor% |%actor% eyes snap back as the star becomes a twisting portal!
+      %send% %actor% You black out for a moment, and when your vision returns, you see the star has become a twisting portal!
+      * Leave the loop
+    break
+  done
+  if %cycles_left% > 0
+    wait 5 sec
+  end
+  eval cycles_left %cycles_left% - 1
+done
+* After the ritual finishes:
+nop %actor.set_cooldown(18862, 30)%
 %load% veh 18861
 set veh %self.room.vehicles%
 set spawn_time %timestamp%
 remote spawn_time %veh.id%
+if !%actor.has_component(6200, 1)%
+  %send% %actor% A clawed hand reaches out and yanks you off your feet and pulls you into the newly opened portal!
+  %echoaround% %actor% You watch as a clawed hand reaches out and yanks ~%actor% off ^%actor% feet and into the newly opened portal!
+  %teleport% %actor% %veh.interior%
+  %force% %actor% look
+else
+  %load% mob 18861
+  set demon %self.room.people%
+  %echo% ~%demon% squeezes out of the portal and snatches the meat from |%actor% hands!
+  nop %actor.charge_component(6200, 1)%
+end
+if !%self.varexists(portals)%
+  set portals 0
+else
+  set portals %self.portals%
+end
+eval portals %portals% + 1
+if %portals% < 3
+  remote portals %self.id%
+  halt
+end
+%quest% %actor% finish 18861
 ~
 #18863
 nether damage inside portal~
@@ -1441,12 +1623,56 @@ done
 Nether portal - Block further entry~
 2 q 100
 ~
-if %actor.nohassle% || %direction% == none || %direction% == portal
+if %actor.nohassle% || %direction% == none
   return 1
   halt
 end
 %send% %actor% Each time you try to walk away from the portal, you end up right back next to it.
 return 0
+~
+#18865
+small demons come from the nether~
+5 b 30
+~
+set how_many %random.3%
+switch %how_many%
+  case 1
+    %load% mob 18861
+    set demon %self.room.people%
+    %echo% ~%demon% squeezes out of %self.shortdesc%!
+    %force% %demon% mmove
+    %force% %demon% mmove
+    %force% %demon% mmove
+  break
+  case 2
+    %echo% A pare of demons burst their way out of %self.shortdesc%!
+    switch %how_many%
+      %load% mob 18861
+      set demon %self.room.people%
+      %force% %demon% mmove
+      %force% %demon% mmove
+      %force% %demon% mmove
+      set how_many %how_many% - 1
+    done
+  break
+  case 3
+    set hell %random.10%
+    if %hell% == 6
+      set how_many 6
+      %echo% A hoard of demons rip their way out of %self.shortdesc%!
+    else
+      %echo% A trio of demons muscle their way out of %self.shortdesc%!
+    end
+    switch %how_many%
+      %load% mob 18861
+      set demon %self.room.people%
+      %force% %demon% mmove
+      %force% %demon% mmove
+      %force% %demon% mmove
+      set how_many %how_many% - 1
+    done
+  break
+done
 ~
 #18869
 play them off johny~
@@ -1672,22 +1898,22 @@ switch %count_up%
     halt
   break
   case 2
-    %send% %actor% You watch as |%self% eyes closely droop and ^%self% body begins to relax.
+    %send% %actor% You watch as |%self% eyes droop closed and ^%self% body begins to relax.
     remote count_up %self.id%
     halt
   break
   case 3
     * %send% %actor% ~%self% finally gives up the ghost and healers usher you from the tent!
-    %force% %actor% exit
     %quest% %actor% finish 18873
   break
 done
-if !%self.varexists(tent)%
-  set tent %self.room.in_vehicle%
-  remote tent %self.id%
-end
-%regionecho% %tent% 0 Healers sadly dismantle %tent.shortdesc%.
+set tent %self.room.in_vehicle%
+dg_affect %self% !see on -1
+mgoto %tent.room%
+nop %tent.dump%
+%echo% Healers sadly dismantle %tent.shortdesc%.
 %purge% %tent%
+%purge% %self%
 ~
 #18874
 reject those not on quest~
@@ -1735,16 +1961,17 @@ tent should not persist~
 if %self.varexists(spawn_time)%
   set spawn_time %self.spawn_time%
   eval delay %timestamp% - %spawn_time%
-  if %delay% <= 600
+  if %delay% <= 3600
     halt
   end
 end
-if !%self.varexists(tent)%
-  set tent %self.room.in_vehicle%
-  remote tent %self.id%
-end
-%regionecho% %tent% 0 Healers sadly dismantle %tent.shortdesc%.
+set tent %self.room.in_vehicle%
+dg_affect %self% !see on -1
+mgoto %tent.room%
+nop %tent.dump%
+%echo% %self% Healers sadly dismantle %tent.shortdesc%.
 %purge% %tent%
+%purge% %self%
 ~
 #18878
 Halloween: Magi-genic Ooze mount upgrader~

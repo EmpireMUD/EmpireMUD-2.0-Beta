@@ -313,6 +313,34 @@ D
 half of it into a human!
 ~
 S
+#18861
+demon small basic~
+a small demon~
+A basic small demon growls here.
+~
+1 1 do n 2
+0 0 0 15
+D
+   A basic demon, small enough to fit through the portal, nothing too
+noticeable about it.
+~
+M
+0
+A low growl comes from the shadows.~
+M
+4
+$n hisses as $e looks for shadows to hide in.~
+M
+5
+A patch of shadow resolves itself into $n.~
+M
+5
+The smell of fetted breath preceeds the glow of $n's eyes.~
+M
+0
+A snorting snuffling sound clearly indicates $n is looking for something, or someone.~
+T 18853
+S
 #18862
 demon nether massive~
 a nether demon~
