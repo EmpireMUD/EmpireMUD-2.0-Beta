@@ -69,7 +69,7 @@ PATHFIND_VALIDATOR(pathfind_ocean) {
 			if (!ROOM_IS_CLOSED(room)) {
 				return TRUE;	// open
 			}
-			else if (CHAR_OR_VEH_ROOM_PERMISSION_SIMPLE(ch, veh, room, GUESTS_ALLOWED)) {
+			else if (CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, room, GUESTS_ALLOWED)) {
 				return TRUE;	// allowed in
 			}
 		}
@@ -82,7 +82,7 @@ PATHFIND_VALIDATOR(pathfind_ocean) {
 			if (!ROOM_IS_CLOSED(find)) {
 				return TRUE;	// open
 			}
-			else if (!CHAR_OR_VEH_ROOM_PERMISSION_SIMPLE(ch, veh, find, GUESTS_ALLOWED)) {
+			else if (CHAR_OR_VEH_ROOM_PERMISSION(ch, veh, find, GUESTS_ALLOWED)) {
 				return TRUE;	// allowed in
 			}
 		}
