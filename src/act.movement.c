@@ -2620,6 +2620,7 @@ ACMD(do_run) {
 	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
 	PATHFIND_VALIDATOR(pathfind_road);
 	
+	long long time_check = -1;
 	room_data *path_to_room;
 	char *found_path = NULL;
 	int dir, dist = -1;
@@ -2660,7 +2661,10 @@ ACMD(do_run) {
 	}
 	
 	// did they request a path?
-	else if (path_to_room && !(found_path = get_pathfind_string(IN_ROOM(ch), path_to_room, ch, NULL, pathfind_road))) {
+	else if (path_to_room && get_cooldown_time(ch, COOLDOWN_PATHFINDING) > 0) {
+		msg_to_char(ch, "You must wait another %d second%s before you can run-to-coordinates again.\r\n", get_cooldown_time(ch, COOLDOWN_PATHFINDING), PLURAL(get_cooldown_time(ch, COOLDOWN_PATHFINDING)));
+	}
+	else if (path_to_room && (time_check = microtime()) && !(found_path = get_pathfind_string(IN_ROOM(ch), path_to_room, ch, NULL, pathfind_road))) {
 		msg_to_char(ch, "Unable to find a route to that location (it may be too far or there may not be a road to it).\r\n");
 	}
 	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {
@@ -2669,6 +2673,11 @@ ACMD(do_run) {
 	
 	else {
 		// 'dir' is the way we are ACTUALLY going, but we store the direction the character thinks it is
+		
+		// if pathfinding took longer than 0.1 seconds, set a cooldown
+		if (time_check > 0 && microtime() - time_check > 100000) {
+			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
+		}
 		
 		GET_ACTION(ch) = ACT_NONE;	// prevents a stops-moving message
 		start_action(ch, ACT_RUNNING, 0);

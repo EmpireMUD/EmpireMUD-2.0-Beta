@@ -1702,6 +1702,7 @@ ACMD(do_drive) {
 	char buf[MAX_STRING_LENGTH], *found_path = NULL;
 	struct vehicle_room_list *vrl;
 	bool was_driving, same_dir, dir_only;
+	long long time_check = -1;
 	room_data *path_to_room;
 	vehicle_data *veh;
 	char_data *ch_iter;
@@ -1789,7 +1790,10 @@ ACMD(do_drive) {
 	else if (path_to_room && !drive_data[subcmd].pathfinder) {
 		msg_to_char(ch, "You can't %s by coordinates.\r\n", drive_data[subcmd].command);
 	}
-	else if (path_to_room && !(found_path = get_pathfind_string(IN_ROOM(veh), path_to_room, ch, veh, drive_data[subcmd].pathfinder))) {
+	else if (path_to_room && get_cooldown_time(ch, COOLDOWN_PATHFINDING) > 0) {
+		msg_to_char(ch, "You must wait another %d second%s before you can run-to-coordinates again.\r\n", get_cooldown_time(ch, COOLDOWN_PATHFINDING), PLURAL(get_cooldown_time(ch, COOLDOWN_PATHFINDING)));
+	}
+	else if (path_to_room && (time_check = microtime()) && !(found_path = get_pathfind_string(IN_ROOM(veh), path_to_room, ch, veh, drive_data[subcmd].pathfinder))) {
 		msg_to_char(ch, "Unable to find a valid route to that location.\r\n");
 	}
 	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {
@@ -1803,6 +1807,11 @@ ACMD(do_drive) {
 	
 	else {
 		// 'dir' is the way we are ACTUALLY going, but we store the direction the character thinks it is
+		
+		// if pathfinding took longer than 0.1 seconds, set a cooldown
+		if (time_check > 0 && microtime() - time_check > 100000) {
+			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
+		}
 		
 		was_driving = (GET_ACTION(ch) == drive_data[subcmd].action);
 		same_dir = (was_driving && (get_direction_for_char(ch, dir) == GET_ACTION_VNUM(ch, 0)));
