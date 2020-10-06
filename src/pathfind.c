@@ -62,7 +62,7 @@ bool pathfind_get_dir(room_data *from_room, struct map_data *from_map, int dir, 
 
 // example: validator for ships
 PATHFIND_VALIDATOR(pathfind_ocean) {
-	register room_data *find;
+	room_data *find;
 	
 	if (room) {
 		if (ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_OCEAN) || ROOM_BLD_FLAGGED(room, BLD_SAIL)) {
@@ -78,10 +78,7 @@ PATHFIND_VALIDATOR(pathfind_ocean) {
 		if (SECT_FLAGGED(map->sector_type, SECTF_FRESH_WATER | SECTF_OCEAN)) {
 			return TRUE;	// true ocean
 		}
-		
-		// cheaper than real_real_room, maybe
-		HASH_FIND_INT(world_table, &(map->vnum), find);
-		if (find && ROOM_BLD_FLAGGED(find, BLD_SAIL)) {
+		else if ((find = real_real_room(map->vnum)) && ROOM_BLD_FLAGGED(find, BLD_SAIL)) {
 			if (!ROOM_IS_CLOSED(find)) {
 				return TRUE;	// open
 			}
@@ -416,7 +413,7 @@ char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehic
 	unsigned long long start_time;
 	struct map_data *to_map;
 	room_data *to_room;
-	register int dir, count;
+	int dir, count;
 	
 	// shortcut for safety
 	if (!start || !end || start == end || !validator) {
