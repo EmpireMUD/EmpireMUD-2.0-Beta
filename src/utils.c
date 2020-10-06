@@ -5412,7 +5412,7 @@ double compute_map_distance(int x1, int y1, int x2, int y2) {
 * The coordinates will include a leading space, like " (x, y)" if present. It
 * may also return " (unknown)" if (x,y) are not on the map.
 *
-* @param char_data *ch The person to check for Navigation.
+* @param char_data *ch Optional: The person to check for Navigation.
 * @param int x The X-coordinate to show.
 * @param int y The Y-coordinate to show.
 * @param bool fixed_width If TRUE, spaces the coordinates for display in a vertical column.
@@ -5421,7 +5421,7 @@ double compute_map_distance(int x1, int y1, int x2, int y2) {
 char *coord_display(char_data *ch, int x, int y, bool fixed_width) {
 	static char output[80];
 	
-	if (!ch || IS_NPC(ch) || !HAS_NAVIGATION(ch)) {
+	if (ch && (IS_NPC(ch) || !HAS_NAVIGATION(ch))) {
 		*output = '\0';
 	}
 	else if (fixed_width) {
