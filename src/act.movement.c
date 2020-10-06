@@ -2620,6 +2620,7 @@ ACMD(do_run) {
 	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
 	PATHFIND_VALIDATOR(pathfind_road);
 	
+	char buf[MAX_STRING_LENGTH];
 	long long time_check = -1;
 	room_data *path_to_room;
 	char *found_path = NULL;
@@ -2669,7 +2670,8 @@ ACMD(do_run) {
 		// if pathfinding took longer than 0.1 seconds, set a cooldown
 		if (time_check > 0 && microtime() - time_check > 100000) {
 			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
-			log("Pathfinding: %s failed to find run path in time: %s to %s", GET_NAME(ch), coord_display(NULL, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), FALSE), coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
+			strcpy(buf, coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
+			log("Pathfinding: %s failed to find run path in time:%s to%s", GET_NAME(ch), coord_display(NULL, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), FALSE), buf);
 		}
 	}
 	else if (found_path && !parse_next_dir_from_string(ch, found_path, &dir, &dist, FALSE)) {
@@ -2681,7 +2683,8 @@ ACMD(do_run) {
 		
 		// if pathfinding took longer than 0.1 seconds, set a cooldown
 		if (time_check > 0 && microtime() - time_check > 100000) {
-			log("Pathfinding: %s got slow run path (%d microseconds): %s to %s", GET_NAME(ch), (int)(microtime() - time_check), coord_display(NULL, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), FALSE), coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
+			strcpy(buf, coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
+			log("Pathfinding: %s got slow run path (%d microseconds):%s to%s", GET_NAME(ch), (int)(microtime() - time_check), coord_display(NULL, X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), FALSE), buf);
 			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
 		}
 		

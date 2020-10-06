@@ -1797,7 +1797,8 @@ ACMD(do_drive) {
 		msg_to_char(ch, "Unable to find a valid route to that location (or it took longer than the allowed amount of time).\r\n");
 		// if pathfinding took longer than 0.1 seconds, set a cooldown
 		if (time_check > 0 && microtime() - time_check > 100000) {
-			log("Pathfinding: %s failed to find %s path in time: %s to %s", GET_NAME(ch), drive_data[subcmd].command, coord_display(NULL, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), FALSE), coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
+			strcpy(buf, coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
+			log("Pathfinding: %s failed to find %s path in time:%s to%s", GET_NAME(ch), drive_data[subcmd].command, coord_display(NULL, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), FALSE), buf);
 			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
 		}
 	}
@@ -1815,7 +1816,8 @@ ACMD(do_drive) {
 		
 		// if pathfinding took longer than 0.1 seconds, set a cooldown
 		if (time_check > 0 && microtime() - time_check > 100000) {
-			log("Pathfinding: %s got slow %s path (%d microseconds): %s to %s", GET_NAME(ch), drive_data[subcmd].command, (int)(microtime() - time_check), coord_display(NULL, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), FALSE), coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
+			strcpy(buf, coord_display(NULL, X_COORD(path_to_room), Y_COORD(path_to_room), FALSE));
+			log("Pathfinding: %s got slow %s path (%d microseconds):%s to%s", GET_NAME(ch), drive_data[subcmd].command, (int)(microtime() - time_check), coord_display(NULL, X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)), FALSE), buf);
 			add_cooldown(ch, COOLDOWN_PATHFINDING, 30);
 		}
 		
