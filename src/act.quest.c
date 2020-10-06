@@ -191,7 +191,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	free_player_quests(pq);
 	
 	// determine scale level
-	level = get_approximate_level(ch);
+	level = GET_HIGHEST_KNOWN_LEVEL(ch);
 	if (QUEST_MIN_LEVEL(quest) > 0) {
 		level = MAX(level, QUEST_MIN_LEVEL(quest));
 	}
