@@ -904,6 +904,26 @@ if %sacrifices_left% == 0
   %quest% %actor% finish %qvnum%
 end
 ~
+#18852
+demons are scared off~
+0 g 33
+~
+set banish 0
+if %actor.morph% == 18827
+  set banish 1
+elseif %actor.morph% >= 18812 && %actor.morph% <= 18817
+  set banish 1
+elseif %actor.eq(clothes)%
+  set clothing %actor.eq(clothes)%
+  if %clothing.vnum% >= 18812 && %clothing.vnum% <= 18817
+    set banish 1
+  end
+end
+if %banish% == 1
+  %echo% ~%self% shreaks in terror and vanishes back to where &%self% came from!
+  %purge% %self%
+end
+~
 #18853
 dress up the small demon~
 0 n 100
@@ -1611,7 +1631,7 @@ nether damage inside portal~
 ~
 set person %self.people%
 while %person%
-  if %person.is_pc%
+  if %person.is_pc% && %person.health% > 0
     eval dam_val 99 + %random.200%
     %send% %person% You feel an emptiness engulf your body!
     %damage% %person% %dam_val%

@@ -179,9 +179,10 @@ family land. Take the deed and build the 'unearthly manor', for the sake of
 your family. But Grandmother refuses to say if the manor will keep the spirits
 out, or if it's the thing that will release them.
 ~
-Hopefully building that unearthly manor will appease the spirits of the dead.
+   You have built an unearthly manor for the spirits of your ancestors to
+inhabit. Your grandmother must be proud.
 ~
-8 0 0 0 -1
+9 0 0 0 -1
 A
 1 18881
 R
@@ -385,7 +386,11 @@ your city to open three portals to the Nether and lure some demons through.
 ~
 Congratulations! You've brought new demons into this world.
 ~
-7 e 0 0 -1
+8 e 0 0 -1
+A
+2 18804
+A
+2 18809
 D 18823
 P
 36 18800 0 1 a

@@ -38,4 +38,15 @@ W
 W
 34 18829 0 100 a
 S
+#18862
+The Unbelieveable Demon Tale~
+   You've done it! You have killed the unkillable demon of the nether. That
+destroyer of champions and heros alike is finally dead. Or, at least one of
+them is. Your empire is certainly a force to be reckoned with.
+~
+1 4 0 5 d
+K 7 5
+W
+3 18862 0 1
+S
 $
