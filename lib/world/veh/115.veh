@@ -8,7 +8,7 @@ it moves, shimmering up into the sky and back down again. You can sit on the
 rainbow and pilot it around.
 ~
 &w<**>~
-defnux 32 96 0 0 0 0 0
+defnuxE 32 96 0 0 0 0 0 0 0
 C
 100 100
 P
