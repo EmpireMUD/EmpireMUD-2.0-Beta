@@ -2755,16 +2755,17 @@ int process_input(descriptor_data *t) {
 				t->last_input[sizeof(t->last_input)-1] = '\0';
 			}
 		}
-		else if (*input == '+') {	// add to head of queue
-			add_to_head = TRUE;
-			++input;
-		}
 		else if (*input == '-' && (!t->str || !t->straight_to_editor)) { // manipulate input queue
 			// ^ this doesn't execute if the person is sending text to a text editor
 			manipulate_input_queue(t, input+1);
 			do_not_add = 1;
 		}
-		else {
+		else {	// all other strings
+			if (*input == '+') {	// add to head of queue
+				add_to_head = TRUE;
+				++input;
+			}
+			
 			strncpy(t->last_input, input, sizeof(t->last_input)-1);
 			t->last_input[sizeof(t->last_input)-1] = '\0';
 			
