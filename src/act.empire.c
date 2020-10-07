@@ -121,7 +121,7 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 		old_id = VEH_SHIPPING_ID(veh);
 		new_id = find_free_shipping_id(new_emp);
 		
-		LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(old_emp), sd, next_sd) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(old_emp), sd) {
 			if (sd->shipping_id == old_id) {
 				sd->shipping_id = new_id;
 			}
@@ -131,18 +131,10 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 	}
 	
 	// move all shipping entries over
-	if ((sd = EMPIRE_SHIPPING_LIST(new_emp))) {
-		// append to end
-		while (sd->next) {
-			sd = sd->next;
-		}
-		sd->next = EMPIRE_SHIPPING_LIST(old_emp);
+	DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(old_emp), sd , next_sd) {
+		DL_DELETE(EMPIRE_SHIPPING_LIST(old_emp), sd);
+		DL_APPEND(EMPIRE_SHIPPING_LIST(new_emp), sd);
 	}
-	else {
-		EMPIRE_SHIPPING_LIST(new_emp) = EMPIRE_SHIPPING_LIST(old_emp);
-	}
-	
-	EMPIRE_SHIPPING_LIST(old_emp) = NULL;
 }
 
 
@@ -964,7 +956,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	}
 	
 	// add shipping amounts to totals
-	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
+	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
 		vnum = shipd->vnum;
 		
 		HASH_FIND_INT(list, &vnum, einv);

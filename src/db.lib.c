@@ -1485,11 +1485,11 @@ void check_for_new_map(void) {
 		}
 		
 		// free shipping (and put the items back)
-		LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
+		DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
 			add_to_empire_storage(emp, NO_ISLAND, shipd->vnum, shipd->amount);
+			DL_DELETE(EMPIRE_SHIPPING_LIST(emp), shipd);
 			free(shipd);	// no need to remove from list
 		}
-		EMPIRE_SHIPPING_LIST(emp) = NULL;	// all entries freed
 		
 		// free trade (no longer relevant)
 		LL_FOREACH_SAFE(EMPIRE_TRADE(emp), trade, next_trade) {
@@ -1963,7 +1963,7 @@ void free_empire(empire_data *emp) {
 	struct empire_trade_data *trade;
 	struct empire_log_data *elog;
 	struct workforce_log *wf_log;
-	struct shipping_data *shipd;
+	struct shipping_data *shipd, *next_shipd;
 	room_data *room;
 	int iter;
 	
@@ -1993,11 +1993,10 @@ void free_empire(empire_data *emp) {
 	EMPIRE_UNIQUE_STORAGE(emp) = NULL;
 	
 	// free shipping data
-	while ((shipd = EMPIRE_SHIPPING_LIST(emp))) {
-		EMPIRE_SHIPPING_LIST(emp) = shipd->next;
+	DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
+		DL_DELETE(EMPIRE_SHIPPING_LIST(emp), shipd);
 		free(shipd);
 	}
-	EMPIRE_SHIPPING_LIST(emp) = NULL;
 	
 	// free cities (while they last)
 	while ((city = emp->city_list)) {
@@ -2234,7 +2233,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	long l_in;
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
 	struct empire_unique_storage *eus, *last_eus = NULL;
-	struct shipping_data *shipd, *last_shipd = NULL;
+	struct shipping_data *shipd;
 	struct empire_production_total *egt;
 	struct empire_storage_data *store;
 	struct theft_log *tft;
@@ -2356,9 +2355,13 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				break;
 			}
 			case 'V': {	// shipments
-				if (sscanf(line, "V %d %d %d %d %d %ld %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &l_in, &t[5], &t[6]) != 8) {
-					log("SYSERR: Invalid V line of empire %d: %s", EMPIRE_VNUM(emp), line);
-					exit(0);
+				if (sscanf(line, "V %d %d %d %d %d %ld %d %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &l_in, &t[5], &t[6], &t[7]) != 9) {
+					t[7] = NOWHERE;	// backwards-compatible: to_room
+					
+					if (sscanf(line, "V %d %d %d %d %d %ld %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &l_in, &t[5], &t[6]) != 8) {
+						log("SYSERR: Invalid V line of empire %d: %s", EMPIRE_VNUM(emp), line);
+						exit(0);
+					}
 				}
 				
 				if (obj_proto(t[0]) || t[0] == NOTHING) {
@@ -2372,18 +2375,10 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					shipd->status_time = l_in;
 					shipd->shipping_id = t[5];
 					shipd->ship_origin = t[6];
-					shipd->next = NULL;
+					shipd->to_room = t[7];
 				
 					EMPIRE_TOP_SHIPPING_ID(emp) = MAX(shipd->shipping_id, EMPIRE_TOP_SHIPPING_ID(emp));
-
-					// append to end
-					if (last_shipd) {
-						last_shipd->next = shipd;
-					}
-					else {
-						EMPIRE_SHIPPING_LIST(emp) = shipd;
-					}
-					last_shipd = shipd;
+					DL_APPEND(EMPIRE_SHIPPING_LIST(emp), shipd);
 				}
 				// else: don't bother warning, just drop it if the obj doesn't exist
 				break;
@@ -3236,8 +3231,8 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	}
 	
 	// V: shipments
-	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
-		fprintf(fl, "V %d %d %d %d %d %ld %d %d\n", shipd->vnum, shipd->amount, shipd->from_island, shipd->to_island, shipd->status, shipd->status_time, shipd->shipping_id, shipd->ship_origin);
+	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
+		fprintf(fl, "V %d %d %d %d %d %ld %d %d %d\n", shipd->vnum, shipd->amount, shipd->from_island, shipd->to_island, shipd->status, shipd->status_time, shipd->shipping_id, shipd->ship_origin, shipd->to_room);
 	}
 
 	fprintf(fl, "S\n");

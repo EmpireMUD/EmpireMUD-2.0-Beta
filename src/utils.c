@@ -6325,6 +6325,9 @@ bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvec
 	
 	// check vehicles first
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (!IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
+			continue;	// no function
+		}
 		if (for_emp && VEH_OWNER(veh) && VEH_OWNER(veh) != for_emp && !emp_can_use_vehicle(for_emp, veh, GUESTS_ALLOWED)) {
 			continue;
 		}
@@ -6334,20 +6337,19 @@ bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvec
 		if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS) && IS_SET(fnc_flag, IMMOBILE_FNCS)) {
 			continue;	// exclude certain functions on movable vehicles (functions that require room data)
 		}
-		
-		if (IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
-			if (!IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY) || (ROOM_OWNER(room) && get_territory_type_for_empire(room, ROOM_OWNER(room), TRUE, &junk) == TER_CITY)) {
-				return TRUE;	// vehicle allows it
-			}
+		if (IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY) && (!ROOM_OWNER(room) || get_territory_type_for_empire(room, ROOM_OWNER(room), TRUE, &junk) != TER_CITY)) {
+			continue;	// not in-city but needs it
 		}
+		
+		return TRUE;	// vehicle allows it
 	}
 	
 	// otherwise check the room itself
-	if (for_emp && ROOM_OWNER(room) && ROOM_OWNER(room) != for_emp && !emp_can_use_room(for_emp, room, GUESTS_ALLOWED)) {
-		return FALSE;	// ownership failed
-	}
 	if (!HAS_FUNCTION(room, fnc_flag) || !IS_COMPLETE(room)) {
 		return FALSE;
+	}
+	if (for_emp && ROOM_OWNER(room) && ROOM_OWNER(room) != for_emp && !emp_can_use_room(for_emp, room, GUESTS_ALLOWED)) {
+		return FALSE;	// ownership failed
 	}
 	if (!check_in_city_requirement(room, TRUE)) {
 		return FALSE;

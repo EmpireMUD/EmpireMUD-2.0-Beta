@@ -237,6 +237,51 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 
 
 /**
+* For ship/dispatch, processes the target arg, which may be an island or
+* coords. The coordinates must be a dock, or the island must have a dock. 
+*
+* @param char_data *ch The player targeting an island or docks.
+* @param char *argument The argument as-typed.
+* @param bool *targeted_island A var to bind this data. Will be TRUE if the player targeted by island rather than coords.
+* @return room_data* The valid target, if any. Otherwise, will be NULL and the player received an error message.
+*/
+room_data *get_shipping_target(char_data *ch, char *argument, bool *targeted_island) {
+	extern room_data *find_docks(empire_data *emp, int island_id);
+	
+	struct island_info *to_isle;
+	room_data *room;
+	
+	*targeted_island = FALSE;
+	
+	if (!*argument) {
+		msg_to_char(ch, "You must specify an island name or the coordinates of a dock.\r\n");
+	}
+	else if ((room = parse_room_from_coords(argument))) {
+		// found a room
+		if (!room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_DOCKS)) {
+			msg_to_char(ch, "There are no docks at that location.\r\n");
+		}
+		else {
+			// success!
+			return room;
+		}
+	}
+	else if (!(to_isle = get_island_by_name(ch, argument))) {
+		msg_to_char(ch, "Unknown target island \"%s\".\r\n", argument);
+	}
+	else if (!(room = find_docks(GET_LOYALTY(ch), to_isle->id))) {
+		msg_to_char(ch, "%s has no docks (docks must not be set no-work).\r\n", to_isle->name);
+	}
+	else {
+		*targeted_island = TRUE;
+		return room;
+	}
+	
+	return NULL;	// not found
+}
+
+
+/**
 * Attempt to move a vehicle. This may send an error message if it fails.
 *
 * @param char_data *ch The person trying to move the vehicle (optional: may be NULL).
@@ -1332,17 +1377,17 @@ ACMD(do_disembark) {
 
 ACMD(do_dispatch) {
 	extern char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_data *veh, mob_vnum vnum);
-	extern room_data *find_docks(empire_data *emp, int island_id);
 	extern struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc);
 	extern int find_free_shipping_id(empire_data *emp);
 	void sail_shipment(empire_data *emp, vehicle_data *boat);
 	extern bool ship_is_empty(vehicle_data *ship);
 	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 
-	struct island_info *to_isle;
 	char targ[MAX_INPUT_LENGTH], isle_arg[MAX_INPUT_LENGTH];
+	bool targeted_island = FALSE;
 	struct empire_npc_data *npc;
 	struct shipping_data *shipd;
+	room_data *to_room;
 	char_data *worker;
 	vehicle_data *veh;
 	
@@ -1350,7 +1395,7 @@ ACMD(do_dispatch) {
 	skip_spaces(&argument);
 	
 	// since 'ship' requires quotes around the island name, we are optionally taking them here
-	if (*argument == '"') {
+	if (*argument == '"' || *argument == '(') {
 		any_one_word(argument, isle_arg);
 	}
 	else {
@@ -1392,22 +1437,22 @@ ACMD(do_dispatch) {
 	else if (!ship_is_empty(veh)) {
 		msg_to_char(ch, "You can't dispatch a ship that has people inside it.\r\n");
 	}
+	else if (!GET_ISLAND(IN_ROOM(veh))) {
+		msg_to_char(ch, "You can't automatically dispatch ships that are out at sea.\r\n");
+	}
 	else if (!WATER_SECT(IN_ROOM(veh)) && !IS_WATER_BUILDING(IN_ROOM(veh))) {
 		msg_to_char(ch, "You can only dispatch ships that are on the water or in docks.\r\n");
 	}
 	
 	// destination validation
-	else if (!GET_ISLAND(IN_ROOM(veh))) {
-		msg_to_char(ch, "You can't automatically dispatch ships that are out at sea.\r\n");
+	else if (!(to_room = get_shipping_target(ch, isle_arg, &targeted_island))) {
+		// sent own message
 	}
-	else if (!(to_isle = get_island_by_name(ch, isle_arg)) && !(to_isle = get_island_by_coords(isle_arg))) {
-		msg_to_char(ch, "Unknown target island \"%s\".\r\n", isle_arg);
+	else if (to_room == IN_ROOM(veh)) {
+		msg_to_char(ch, "It's already there!\r\n");
 	}
-	else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(veh)) && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(veh), FNC_DOCKS)) {
+	else if (targeted_island && GET_ISLAND_ID(to_room) == GET_ISLAND_ID(IN_ROOM(veh)) && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(veh), FNC_DOCKS)) {
 		msg_to_char(ch, "It is already docked on that island.\r\n");
-	}
-	else if (!find_docks(GET_LOYALTY(ch), to_isle->id)) {
-		msg_to_char(ch, "%s has no docks (docks must not be set no-work).\r\n", to_isle->name);
 	}
 	
 	// ready ready go
@@ -1431,7 +1476,8 @@ ACMD(do_dispatch) {
 		CREATE(shipd, struct shipping_data, 1);
 		shipd->vnum = NOTHING;
 		shipd->from_island = GET_ISLAND_ID(IN_ROOM(veh));
-		shipd->to_island = to_isle->id;
+		shipd->to_island = GET_ISLAND_ID(to_room);
+		shipd->to_room = GET_ROOM_VNUM(to_room);
 		shipd->status = SHIPPING_QUEUED;
 		shipd->status_time = time(0);
 		shipd->ship_origin = GET_ROOM_VNUM(IN_ROOM(veh));
@@ -1439,7 +1485,7 @@ ACMD(do_dispatch) {
 		VEH_SHIPPING_ID(veh) = find_free_shipping_id(GET_LOYALTY(ch));
 		shipd->shipping_id = VEH_SHIPPING_ID(veh);
 		
-		LL_APPEND(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), shipd);
+		DL_APPEND(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), shipd);
 		sail_shipment(GET_LOYALTY(ch), veh);
 		EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
 		

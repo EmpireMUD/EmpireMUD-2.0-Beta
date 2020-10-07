@@ -2785,9 +2785,10 @@ void scale_item_to_level(obj_data *obj, int level) {
 * @param int to_island The destination island id.
 * @param int number The quantity to ship.
 * @param obj_vnum vnum What item to ship.
+* @param room_data *to_room Optional: Exact destination room (not just island). May be NULL.
 */
-void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to_island, int number, obj_vnum vnum) {
-	struct shipping_data *sd, *temp;
+void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to_island, int number, obj_vnum vnum, room_data *to_room) {
+	struct shipping_data *sd;
 	struct island_info *isle;
 	bool done;
 	
@@ -2798,12 +2799,15 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 	
 	// try to add to existing order
 	done = FALSE;
-	for (sd = EMPIRE_SHIPPING_LIST(emp); sd && !done; sd = sd->next) {
+	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), sd) {
 		if (sd->vnum != vnum) {
 			continue;
 		}
 		if (sd->from_island != from_island || sd->to_island != to_island) {
 			continue;
+		}
+		if ((to_room && sd->to_room != GET_ROOM_VNUM(to_room)) || (!to_room && sd->to_room != NOWHERE)) {
+			continue;	// non-matching to-room
 		}
 		if (sd->status != SHIPPING_QUEUED && sd->status != SHIPPING_WAITING_FOR_SHIP) {
 			continue;	// can combine only with those 2
@@ -2822,22 +2826,14 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 		sd->amount = number;
 		sd->from_island = from_island;
 		sd->to_island = to_island;
+		sd->to_room = to_room ? GET_ROOM_VNUM(to_room) : NOWHERE;
 		sd->status = SHIPPING_QUEUED;
 		sd->status_time = time(0);
 		sd->ship_origin = NOWHERE;
 		sd->shipping_id = -1;
-		sd->next = NULL;
 		
 		// add to end
-		if ((temp = EMPIRE_SHIPPING_LIST(emp))) {
-			while (temp->next) {
-				temp = temp->next;
-			}
-			temp->next = sd;
-		}
-		else {
-			EMPIRE_SHIPPING_LIST(emp) = sd;
-		}
+		DL_APPEND(EMPIRE_SHIPPING_LIST(emp), sd);
 	}
 	
 	// charge resources
@@ -2846,7 +2842,12 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 	
 	// messaging
 	isle = get_island(to_island, TRUE);
-	msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(get_obj_name_by_proto(vnum)), isle ? get_island_name_for(isle->id, ch) : "an unknown island");
+	if (to_room) {
+		msg_to_char(ch, "You set %d '%s' to ship to %s%s.\r\n", number, skip_filler(get_obj_name_by_proto(vnum)), get_room_name(to_room, FALSE), coord_display(ch, X_COORD(to_room), Y_COORD(to_room), FALSE));
+	}
+	else {
+		msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(get_obj_name_by_proto(vnum)), isle ? get_island_name_for(isle->id, ch) : "an unknown island");
+	}
 }
 
 
@@ -2859,23 +2860,28 @@ int calculate_shipping_time(struct shipping_data *shipd) {
 	room_data *from_center, *to_center;
 	int dist, max, cost;
 	
-	from = get_island(shipd->from_island, FALSE);
-	to = get_island(shipd->to_island, FALSE);
-	
-	// unable to find islands?
-	if (!from || !to) {
-		return 0;
+	if (shipd->ship_origin != NOWHERE && shipd->to_room != NOWHERE) {
+		dist = compute_distance(real_room(shipd->ship_origin), real_room(shipd->to_room));
 	}
+	else {
+		from = get_island(shipd->from_island, FALSE);
+		to = get_island(shipd->to_island, FALSE);
+		
+		// unable to find islands?
+		if (!from || !to) {
+			return 0;
+		}
+		
+		from_center = real_room(from->center);
+		to_center = shipd->to_room ? real_room(shipd->to_room) : real_room(to->center);
 	
-	from_center = real_room(from->center);
-	to_center = real_room(to->center);
-	
-	// unable to find locations?
-	if (!from_center || !to_center) {
-		return 0;
+		// unable to find locations?
+		if (!from_center || !to_center) {
+			return 0;
+		}
+		
+		dist = compute_distance(from_center, to_center);
 	}
-	
-	dist = compute_distance(from_center, to_center);
 	
 	// maximum distance (further distances cost nothing): lesser of height/width
 	max = MIN(MAP_WIDTH, MAP_HEIGHT);
@@ -2897,8 +2903,8 @@ int calculate_shipping_time(struct shipping_data *shipd) {
 */
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 	bool have_ship = (shipd->shipping_id != -1);
-	struct shipping_data *iter, *temp;
-	room_data *dock;
+	struct shipping_data *iter;
+	room_data *dock = NULL;
 	
 	// mark all shipments on this ship "delivered" (if we still have a ship)
 	if (have_ship) {
@@ -2909,10 +2915,26 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 		}
 	}
 	
-	if ((dock = find_docks(emp, shipd->to_island))) {
+	// find target location: exact first
+	if (shipd->to_room != NOWHERE && (dock = real_room(shipd->to_room))) {
+		if (room_has_function_and_city_ok(emp, dock, FNC_DOCKS)) {
+			// seems valid
+		}
+		else {
+			// not a valid dock target
+			dock = NULL;
+		}
+	}
+	// backup target location: island
+	if (!dock) {
+		dock = find_docks(emp, shipd->to_island);
+	}
+	
+	// did we find a dock?
+	if (dock) {
 		// unload the shipment at the destination
 		if (shipd->vnum != NOTHING && shipd->amount > 0 && obj_proto(shipd->vnum)) {
-			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: shipped to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->to_island, TRUE)->name);
+			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: shipped to %s%s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->to_island, TRUE)->name, coord_display(NULL, X_COORD(dock), Y_COORD(dock), FALSE));
 			add_to_empire_storage(emp, shipd->to_island, shipd->vnum, shipd->amount);
 		}
 		if (have_ship) {
@@ -2920,18 +2942,21 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 		}
 	}
 	else {
+		// return dock (or point of origin)
+		dock = real_room(shipd->ship_origin);
+		
 		// no docks -- unload the shipment at home
 		if (shipd->vnum != NOTHING && shipd->amount > 0 && obj_proto(shipd->vnum)) {
-			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: returned to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->from_island, TRUE)->name);
+			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: returned to %s%s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->from_island, TRUE)->name, coord_display(NULL, dock ? X_COORD(dock) : -1, dock ? Y_COORD(dock) : -1, FALSE));
 			add_to_empire_storage(emp, shipd->from_island, shipd->vnum, shipd->amount);
 		}
 		if (have_ship) {
-			move_ship_to_destination(emp, shipd, real_room(shipd->ship_origin));
+			move_ship_to_destination(emp, shipd, dock);
 		}
 	}
 	
 	// and delete this entry from the list
-	REMOVE_FROM_LIST(shipd, EMPIRE_SHIPPING_LIST(emp), next);
+	DL_DELETE(EMPIRE_SHIPPING_LIST(emp), shipd);
 	free(shipd);
 }
 
@@ -2946,11 +2971,13 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 */
 room_data *find_docks(empire_data *emp, int island_id) {
 	struct empire_territory_data *ter, *next_ter;
+	vehicle_data *veh;
 	
 	if (!emp || island_id == NO_ISLAND) {
 		return NULL;
 	}
 	
+	// try territory first
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (GET_ISLAND_ID(ter->room) != island_id) {
 			continue;
@@ -2965,6 +2992,24 @@ room_data *find_docks(empire_data *emp, int island_id) {
 		return ter->room;
 	}
 	
+	// if not, try vehicles
+	DL_FOREACH(vehicle_list, veh) {
+		if (!IN_ROOM(veh) || GET_ISLAND_ID(IN_ROOM(veh)) != island_id) {
+			continue;	// wrong island
+		}
+		if (VEH_OWNER(veh) != emp || !IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS) || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+			continue;	// basic ship checks
+		}
+		if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK) || (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
+			continue;	// no-work
+		}
+		if (!room_has_function_and_city_ok(emp, IN_ROOM(veh), FNC_DOCKS)) {
+			continue;	// definitely not a docks
+		}
+		
+		return IN_ROOM(veh);
+	}
+	
 	return NULL;
 }
 
@@ -2972,12 +3017,14 @@ room_data *find_docks(empire_data *emp, int island_id) {
 /**
 * Finds a ship to use for a given cargo. Any ship on this island is good.
 *
+* Note: This cannot specify a single dock to check; it looks for any ship on
+* the island.
+*
 * @param empire_data *emp The empire that is shipping.
 * @param struct shipping_data *shipd The shipment.
 * @return vehicle_data* A ship, or NULL if none.
 */
 vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
-	struct empire_territory_data *ter, *next_ter;
 	struct shipping_data *iter;
 	bool already_used;
 	vehicle_data *veh;
@@ -2987,58 +3034,48 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		return NULL;
 	}
 	
-	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
-		if (GET_ISLAND_ID(ter->room) != shipd->from_island) {
-			continue;
+	DL_FOREACH(vehicle_list, veh) {
+		if (!IN_ROOM(veh) || GET_ISLAND_ID(IN_ROOM(veh)) != shipd->from_island) {
+			continue;	// wrong island
 		}
-		if (!room_has_function_and_city_ok(emp, ter->room, FNC_DOCKS)) {
-			continue;
+		if (VEH_OWNER(veh) != emp || !VEH_FLAGGED(veh, VEH_SHIPPING) || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE) || VEH_CARRYING_N(veh) >= VEH_CAPACITY(veh)) {
+			continue;	// basic ship checks
 		}
-		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
+		if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK) || (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
+			continue;	// no-work
+		}
+		if (!room_has_function_and_city_ok(emp, IN_ROOM(veh), FNC_DOCKS)) {
+			continue;	// not at docks
+		}
+		
+		// viable vehicle:
+	
+		// calculate capacity to see if it's full, and check if it's already used for a different island
+		if (VEH_SHIPPING_ID(veh) != -1) {
+			capacity = VEH_CARRYING_N(veh);
+			already_used = FALSE;
+			DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), iter) {
+				if (iter->shipping_id == VEH_SHIPPING_ID(veh)) {
+					capacity += iter->amount;
+					if (iter->from_island != shipd->from_island || iter->to_island != shipd->to_island || iter->to_room != shipd->to_room) {
+						already_used = TRUE;
+						break;
+					}
+				}
+			}
+			if (already_used || capacity >= VEH_CAPACITY(veh)) {
+				// ship full or in use
+				continue;
+			}
+		}
+		
+		// ensure no players on board
+		if (!ship_is_empty(veh)) {
 			continue;
 		}
 		
-		// found docks...
-		DL_FOREACH2(ROOM_VEHICLES(ter->room), veh, next_in_room) {
-			if (VEH_OWNER(veh) != emp) {
-				continue;
-			}
-			if (!VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
-				continue;
-			}
-			if (!VEH_FLAGGED(veh, VEH_SHIPPING) || VEH_CARRYING_N(veh) >= VEH_CAPACITY(veh)) {
-				continue;
-			}
-			if (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK)) {
-				continue;
-			}
-			
-			// calculate capacity to see if it's full, and check if it's already used for a different island
-			if (VEH_SHIPPING_ID(veh) != -1) {
-				capacity = VEH_CARRYING_N(veh);
-				already_used = FALSE;
-				for (iter = EMPIRE_SHIPPING_LIST(emp); iter && !already_used; iter = iter->next) {
-					if (iter->shipping_id == VEH_SHIPPING_ID(veh)) {
-						capacity += iter->amount;
-						if (iter->from_island != shipd->from_island || iter->to_island != shipd->to_island) {
-							already_used = TRUE;
-						}
-					}
-				}
-				if (already_used || capacity >= VEH_CAPACITY(veh)) {
-					// ship full or in use
-					continue;
-				}
-			}
-			
-			// ensure no players on board
-			if (!ship_is_empty(veh)) {
-				continue;
-			}
-			
-			// looks like we actually found one!
-			return veh;
-		}
+		// looks like we actually found one!
+		return veh;
 	}
 	
 	return NULL;
@@ -3060,7 +3097,7 @@ int find_free_shipping_id(empire_data *emp) {
 	
 	// better look it up
 	for (id = 0; id < INT_MAX; ++id) {
-		LL_SEARCH_SCALAR(EMPIRE_SHIPPING_LIST(emp), find, shipping_id, id);
+		DL_SEARCH_SCALAR(EMPIRE_SHIPPING_LIST(emp), find, shipping_id, id);
 		if (!find) {
 			return id;
 		}
@@ -3149,7 +3186,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 	// calculate capacity
 	capacity = 0;
 	if (VEH_SHIPPING_ID(boat) != -1) {
-		for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), iter) {
 			if (iter->shipping_id == VEH_SHIPPING_ID(boat)) {
 				capacity += iter->amount;
 			}
@@ -3169,6 +3206,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 		newd->amount = shipd->amount - (size_avail - capacity);	// only what's left
 		newd->from_island = shipd->from_island;
 		newd->to_island = shipd->to_island;
+		newd->to_room = shipd->to_room;
 		newd->status = SHIPPING_WAITING_FOR_SHIP;	// at this point, definitely waiting
 		newd->status_time = shipd->status_time;
 		newd->ship_origin = NOWHERE;
@@ -3238,7 +3276,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 	
 	// remove the shipping id from all shipments that were on this ship (including this one)
 	old = shipd->shipping_id;
-	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
+	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), iter) {
 		if (iter->shipping_id == old) {
 			iter->shipping_id = -1;
 		}
@@ -3257,18 +3295,18 @@ void process_shipping_one(empire_data *emp) {
 	vehicle_data *last_ship = NULL;
 	bool full, changed = FALSE;
 	int last_from = NO_ISLAND, last_to = NO_ISLAND;
+	room_vnum last_to_vnum = NOWHERE;
 	
-	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = next_shipd) {
-		next_shipd = shipd->next;
-		
+	DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
 		switch (shipd->status) {
 			case SHIPPING_QUEUED:	// both these are 'waiting' states
 			case SHIPPING_WAITING_FOR_SHIP: {
-				if (!last_ship || last_from != shipd->from_island || last_to != shipd->to_island) {
+				if (!last_ship || last_from != shipd->from_island || last_to != shipd->to_island || last_to_vnum != shipd->to_room) {
 					// attempt to find a(nother) ship
 					last_ship = find_free_ship(emp, shipd);
 					last_from = shipd->from_island;
 					last_to = shipd->to_island;
+					last_to_vnum = shipd->to_room;
 				}
 				
 				// this only works if we found a ship to use (or had a free one)
@@ -3305,9 +3343,7 @@ void process_shipping_one(empire_data *emp) {
 	}
 	
 	// check for unsailed ships
-	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = next_shipd) {
-		next_shipd = shipd->next;
-		
+	DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
 		if ((shipd->status == SHIPPING_QUEUED || shipd->status == SHIPPING_WAITING_FOR_SHIP) && shipd->shipping_id != -1) {
 			vehicle_data *boat = find_ship_by_shipping_id(emp, shipd->shipping_id);
 			if (boat) {
@@ -3330,7 +3366,7 @@ void process_shipping(void) {
 	empire_data *emp, *next_emp;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_SHIPPING_LIST(emp)) {
+		if (EMPIRE_SHIPPING_LIST(emp) && !EMPIRE_IS_TIMED_OUT(emp)) {
 			process_shipping_one(emp);
 		}
 	}
@@ -3354,7 +3390,7 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 	}
 	
 	// verify contents
-	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
+	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), iter) {
 		if (iter->shipping_id == VEH_SHIPPING_ID(boat)) {
 			iter->status = SHIPPING_EN_ROUTE;
 			iter->status_time = time(0);
@@ -6841,11 +6877,14 @@ ACMD(do_sheathe) {
 
 
 ACMD(do_ship) {
+	extern room_data *get_shipping_target(char_data *ch, char *argument, bool *targeted_island);
+	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 3], line[1000], keywords[MAX_INPUT_LENGTH];
 	struct island_info *from_isle, *to_isle;
 	struct empire_storage_data *store;
-	struct shipping_data *sd, *temp;
-	bool done, wrong_isle, gave_number = FALSE, all = FALSE;
+	struct shipping_data *sd;
+	bool done, wrong_isle, gave_number = FALSE, all = FALSE, targeted_island = FALSE;
+	room_data *to_room, *docks;
 	vehicle_data *veh;
 	obj_data *proto;
 	int number = 1;
@@ -6890,7 +6929,7 @@ ACMD(do_ship) {
 		size = snprintf(buf, sizeof(buf), "Shipping queue for %s:\r\n", EMPIRE_NAME(GET_LOYALTY(ch)));
 		
 		done = FALSE;
-		for (sd = EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)); sd; sd = sd->next) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), sd) {
 			if (sd->vnum == NOTHING) {
 				// just a ship, not a shipment
 				if (sd->shipping_id == -1 || !(veh = find_ship_by_shipping_id(GET_LOYALTY(ch), sd->shipping_id))) {
@@ -6947,7 +6986,7 @@ ACMD(do_ship) {
 		
 		// find a matching entry
 		done = wrong_isle = FALSE;
-		for (sd = EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)); sd; sd = sd->next) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), sd) {
 			if ((sd->status != SHIPPING_QUEUED && sd->status != SHIPPING_WAITING_FOR_SHIP) || sd->shipping_id != -1) {
 				continue;	// never cancel one in progress
 			}
@@ -6969,7 +7008,7 @@ ACMD(do_ship) {
 			msg_to_char(ch, "You cancel the shipment for %d '%s'.\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)));
 			add_to_empire_storage(GET_LOYALTY(ch), sd->from_island, sd->vnum, sd->amount);
 			
-			REMOVE_FROM_LIST(sd, EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), next);
+			DL_DELETE(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), sd);
 			free(sd);
 			EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
 			
@@ -6985,13 +7024,16 @@ ACMD(do_ship) {
 		if (number < 1 || !*keywords) {
 			msg_to_char(ch, "Usage: ship <island> [number] <item>\r\n");
 		}
-		else if (!find_docks(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)))) {
+		else if (!(docks = find_docks(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch))))) {
 			msg_to_char(ch, "This island has no docks (docks must not be set no-work).\r\n");
 		}
-		else if (!(to_isle = get_island_by_name(ch, arg1)) && !(to_isle = get_island_by_coords(arg1))) {
-			msg_to_char(ch, "Unknown target island \"%s\".\r\n", arg1);
+		else if (!(to_room = get_shipping_target(ch, arg1, &targeted_island))) {
+			// sent own message
 		}
-		else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(ch))) {
+		else if (to_room == docks) {
+			msg_to_char(ch, "You can't ship to the same docks the ships are dispatched from.\r\n");
+		}
+		else if (targeted_island && GET_ISLAND_ID(to_room) == GET_ISLAND_ID(IN_ROOM(ch))) {
 			msg_to_char(ch, "You are already on that island.\r\n");
 		}
 		else if (!(store = find_island_storage_by_keywords(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), keywords))) {
@@ -7000,11 +7042,8 @@ ACMD(do_ship) {
 		else if (!all && store->amount < number) {
 			msg_to_char(ch, "You only have %d '%s' stored on this island.\r\n", store->amount, skip_filler(get_obj_name_by_proto(store->vnum)));
 		}
-		else if (!find_docks(GET_LOYALTY(ch), to_isle->id)) {
-			msg_to_char(ch, "%s has no docks (docks must not be set no-work).\r\n", to_isle->name);
-		}
 		else {
-			add_shipping_queue(ch, GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), to_isle->id, all ? store->amount : number, store->vnum);
+			add_shipping_queue(ch, GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND_ID(to_room), all ? store->amount : number, store->vnum, to_room);
 		}
 	}
 }

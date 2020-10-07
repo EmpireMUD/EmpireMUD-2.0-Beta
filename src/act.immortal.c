@@ -3085,7 +3085,7 @@ SHOW(show_resource) {
 			}
 		}
 		// scan shipping
-		LL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
 			if (shipd->vnum == vnum) {
 				SAFE_ADD(amt, shipd->amount, 0, LLONG_MAX, FALSE);
 			}
@@ -8903,7 +8903,7 @@ ACMD(do_purge) {
 		else if ((veh = get_vehicle_in_room_vis(ch, buf))) {
 			// finish the shipment before transferring or purging a vehicle
 			if (VEH_OWNER(veh) && VEH_SHIPPING_ID(veh) != -1) {
-				LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
+				DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
 					if (shipd->shipping_id == VEH_SHIPPING_ID(veh)) {
 						deliver_shipment(VEH_OWNER(veh), shipd);
 					}
@@ -10111,7 +10111,7 @@ ACMD(do_trans) {
 	
 		// finish the shipment before transferring
 		if (VEH_OWNER(veh) && VEH_SHIPPING_ID(veh) != -1) {
-			LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
+			DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
 				if (shipd->shipping_id == VEH_SHIPPING_ID(veh)) {
 					deliver_shipment(VEH_OWNER(veh), shipd);
 				}

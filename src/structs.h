@@ -3159,14 +3159,15 @@ struct ritual_strings {
 struct shipping_data {
 	obj_vnum vnum;
 	int amount;
-	int from_island;
-	int to_island;
+	int from_island;	// island of origin
+	int to_island;	// destination island
+	room_vnum to_room;	// optional: exact destination
 	int status;	// SHIPPING_
 	long status_time;	// when it gained that status
 	room_vnum ship_origin;	// where the ship is coming from (in case we have to send it back)
 	int shipping_id;	// VEH_SHIPPING_ID() of ship
 	
-	struct shipping_data *next;
+	struct shipping_data *prev, *next;	// DL: EMPIRE_SHIPPING_LIST()
 };
 
 
@@ -4936,7 +4937,7 @@ struct empire_data {
 
 	// linked lists, hashes, etc
 	struct empire_political_data *diplomacy;
-	struct shipping_data *shipping_list;
+	struct shipping_data *shipping_list;	// DL of shipping orders
 	struct empire_unique_storage *unique_store;	// LL: eus->next
 	struct empire_trade_data *trade;
 	struct empire_log_data *logs;

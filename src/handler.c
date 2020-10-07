@@ -8886,6 +8886,7 @@ room_data *parse_room_from_coords(char *string) {
 		// no parens: point to whole string
 		ptr = copy;
 	}
+	skip_spaces(&ptr);
 	
 	// ptr is the start of possible coords
 	if (isdigit(*ptr) && (srch = strchr(ptr, ','))) {
@@ -9379,7 +9380,7 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_secondary
 	}
 	
 	if (count_secondary) {
-		for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
 			if (shipd->vnum == vnum) {
 				SAFE_ADD(count, shipd->amount, 0, INT_MAX, FALSE);
 			}
