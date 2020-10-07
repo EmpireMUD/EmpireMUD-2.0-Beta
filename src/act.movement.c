@@ -2662,6 +2662,9 @@ ACMD(do_run) {
 	}
 	
 	// did they request a path?
+	else if (path_to_room && path_to_room == IN_ROOM(ch)) {
+		msg_to_char(ch, "You're already there!\r\n");
+	}
 	else if (path_to_room && get_cooldown_time(ch, COOLDOWN_PATHFINDING) > 0) {
 		msg_to_char(ch, "You must wait another %d second%s before you can run-to-coordinates again.\r\n", get_cooldown_time(ch, COOLDOWN_PATHFINDING), PLURAL(get_cooldown_time(ch, COOLDOWN_PATHFINDING)));
 	}

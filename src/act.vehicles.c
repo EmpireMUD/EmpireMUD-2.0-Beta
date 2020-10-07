@@ -1833,6 +1833,9 @@ ACMD(do_drive) {
 	}
 	
 	// did they request a path?
+	else if (path_to_room && path_to_room == IN_ROOM(ch)) {
+		msg_to_char(ch, "You're already there!\r\n");
+	}
 	else if (path_to_room && !drive_data[subcmd].pathfinder) {
 		msg_to_char(ch, "You can't %s by coordinates.\r\n", drive_data[subcmd].command);
 	}
