@@ -50,6 +50,7 @@ extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_ro
 extern char *get_room_name(room_data *room, bool color);
 extern int total_small_vehicles_in_room(room_data *room);
 extern int total_vehicle_size_in_room(room_data *room);
+extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
 
 // local protos
 bool can_enter_room(char_data *ch, room_data *room);
@@ -2605,6 +2606,11 @@ ACMD(do_rest) {
 			if (*arg) {
 				do_sit_on_vehicle(ch, arg, POS_RESTING);
 			}
+			else if (GET_SITTING_ON(ch) && validate_sit_on_vehicle(ch, GET_SITTING_ON(ch), POS_RESTING, FALSE)) {
+				send_to_char("You rest your tired bones.\r\n", ch);
+				act("$n leans back and rests.", TRUE, ch, NULL, NULL, TO_ROOM);
+				GET_POS(ch) = POS_RESTING;
+			}
 			else {
 				do_unseat_from_vehicle(ch);
 				send_to_char("You rest your tired bones on the ground.\r\n", ch);
@@ -2751,6 +2757,10 @@ ACMD(do_sit) {
 				do_sit_on_vehicle(ch, arg, POS_SITTING);
 			}
 			else {
+				if (GET_SITTING_ON(ch) && !validate_sit_on_vehicle(ch, GET_SITTING_ON(ch), POS_SITTING, FALSE)) {
+					do_unseat_from_vehicle(ch);
+				}
+				
 				send_to_char("You stop resting, and sit up.\r\n", ch);
 				act("$n stops resting.", TRUE, ch, 0, 0, TO_ROOM);
 				GET_POS(ch) = POS_SITTING;
@@ -2783,7 +2793,9 @@ ACMD(do_sleep) {
 				do_sit_on_vehicle(ch, arg, POS_SLEEPING);
 			}
 			else {
-				do_unseat_from_vehicle(ch);
+				if (GET_SITTING_ON(ch) && !validate_sit_on_vehicle(ch, GET_SITTING_ON(ch), POS_SLEEPING, FALSE)) {
+					do_unseat_from_vehicle(ch);
+				}
 				if (IS_RIDING(ch)) {
 					msg_to_char(ch, "You climb down from your mount.\r\n");
 					perform_dismount(ch);

@@ -1441,7 +1441,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 		msg_to_char(ch, "You can't dismantle that while animals are harnessed to it.\r\n");
 	}
 	else if (VEH_SITTING_ON(veh)) {
-		msg_to_char(ch, "You can't dismantle it while someone is sitting on it.\r\n");
+		msg_to_char(ch, "You can't dismantle it while someone is %s it.\r\n", IN_OR_ON(veh));
 	}
 	else if (VEH_LED_BY(veh)) {
 		msg_to_char(ch, "You can't dismantle it while someone is leading it.\r\n");

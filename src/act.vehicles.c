@@ -2111,6 +2111,7 @@ ACMD(do_harness) {
 
 
 ACMD(do_lead) {
+	char part[256];
 	vehicle_data *veh;
 	char_data *mob;
 	
@@ -2191,7 +2192,9 @@ ACMD(do_lead) {
 			msg_to_char(ch, "You can't lead it while it's on fire!\r\n");
 		}
 		else if (VEH_SITTING_ON(veh)) {
-			msg_to_char(ch, "You can't lead it while %s sitting on it.\r\n", (VEH_SITTING_ON(veh) == ch) ? "you are" : "someone else is");
+			snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+			*part = LOWER(*part);
+			msg_to_char(ch, "You can't lead it while %s %s on it.\r\n", (VEH_SITTING_ON(veh) == ch) ? "you are" : "someone else is", part);
 		}
 		else if (VEH_DRIVER(veh)) {
 			msg_to_char(ch, "You can't lead it while someone else is controlling it.\r\n");
@@ -2340,7 +2343,9 @@ ACMD(do_load_vehicle) {
 			msg_to_char(ch, "You can't load %s while %s leading it.\r\n", VEH_SHORT_DESC(veh), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_SITTING_ON(veh)) {
-			msg_to_char(ch, "You can't load %s while %s sitting %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", IN_OR_ON(veh));
+			snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+			*buf = LOWER(*buf);
+			msg_to_char(ch, "You can't load %s while %s %s %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
 		}
 		else {
 			perform_load_vehicle(ch, veh, cont, to_room);
@@ -2567,7 +2572,9 @@ ACMD(do_unload_vehicle) {
 			msg_to_char(ch, "You can't unload %s while %s leading it.\r\n", VEH_SHORT_DESC(veh), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_SITTING_ON(veh)) {
-			msg_to_char(ch, "You can't unload %s while %s sitting %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", IN_OR_ON(veh));
+			snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+			*buf = LOWER(*buf);
+			msg_to_char(ch, "You can't unload %s while %s %s %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
 		}
 		else {
 			perform_unload_vehicle(ch, veh, cont);

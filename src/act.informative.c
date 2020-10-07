@@ -47,6 +47,7 @@ extern struct help_index_element *help_table;
 extern const char *item_types[];
 extern int top_of_helpt;
 extern const char *month_name[];
+extern const char *position_types[];
 extern struct faction_reputation_type reputation_levels[];
 extern const char *wear_bits[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
@@ -1088,7 +1089,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	extern bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
 	extern bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
 	
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[256];
 	size_t size = 0, pos;
 	
 	// pre-description
@@ -1123,11 +1124,15 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	}
 	
 	if (VEH_SITTING_ON(veh) == ch) {
-		size += snprintf(buf + size, sizeof(buf) - size, "...you are sitting %s it.\r\n", IN_OR_ON(veh));
+		snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+		*part = LOWER(*part);
+		size += snprintf(buf + size, sizeof(buf) - size, "...you are %s %s it.\r\n", part, IN_OR_ON(veh));
 	}
 	else if (VEH_SITTING_ON(veh)) {
 		// this is PROBABLY not shown to players
-		size += snprintf(buf + size, sizeof(buf) - size, "...%s is sitting %s it.\r\n", PERS(VEH_SITTING_ON(veh), ch, FALSE), IN_OR_ON(veh));
+		snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+		*part = LOWER(*part);
+		size += snprintf(buf + size, sizeof(buf) - size, "...%s is %s %s it.\r\n", PERS(VEH_SITTING_ON(veh), ch, FALSE), part, IN_OR_ON(veh));
 	}
 	
 	if (VEH_LED_BY(veh) == ch) {
