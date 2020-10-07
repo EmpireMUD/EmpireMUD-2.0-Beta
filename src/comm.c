@@ -3881,6 +3881,7 @@ void game_loop(socket_t mother_desc) {
 				if (process_output(d) < 0) {
 					// process_output actually kills it itself
 					// close_socket(d);
+					d->has_prompt = 1;
 					continue;
 				}
 				else
