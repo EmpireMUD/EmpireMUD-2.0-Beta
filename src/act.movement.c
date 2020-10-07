@@ -2592,7 +2592,7 @@ ACMD(do_rest) {
 				do_sit_on_vehicle(ch, arg, POS_RESTING);
 			}
 			else if (WATER_SECT(IN_ROOM(ch))) {
-				msg_to_char(ch, "You can't sleep in the water.\r\n");
+				msg_to_char(ch, "You can't rest in the water.\r\n");
 			}
 			else {
 				if (IS_RIDING(ch)) {
@@ -2801,12 +2801,13 @@ ACMD(do_sleep) {
 			if (*arg) {
 				do_sit_on_vehicle(ch, arg, POS_SLEEPING);
 			}
-			else if (WATER_SECT(IN_ROOM(ch))) {
-				msg_to_char(ch, "You can't sleep in the water.\r\n");
-			}
 			else {
 				if (GET_SITTING_ON(ch) && !validate_sit_on_vehicle(ch, GET_SITTING_ON(ch), POS_SLEEPING, FALSE)) {
 					do_unseat_from_vehicle(ch);
+				}
+				if (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch)) {
+					// only if they were unseated
+					msg_to_char(ch, "You can't sleep in the water.\r\n");
 				}
 				if (IS_RIDING(ch)) {
 					msg_to_char(ch, "You climb down from your mount.\r\n");
