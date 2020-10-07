@@ -506,7 +506,16 @@ void point_update_char(char_data *ch) {
 			GET_BLOOD(ch) = MIN(GET_BLOOD(ch) + 1, GET_MAX_BLOOD(ch));
 		}
 	}
-
+	
+	// drowning
+	if (GET_MOVE(ch) <= 0 && !IS_NPC(ch) && WATER_SECT(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch)) {
+		msg_to_char(ch, "You sink beneath the water and die!\r\n");
+		act("$n sinks beneath the water and dies!", FALSE, ch, NULL, NULL, TO_ROOM);
+		death_log(ch, ch, TYPE_SUFFERING);
+		die(ch, ch);
+		return;
+	}
+	
 	// healing for NPCs -- pcs are in real_update
 	if (IS_NPC(ch)) {
 		if (GET_POS(ch) >= POS_STUNNED && !FIGHTING(ch) && !GET_FED_ON_BY(ch)) {
@@ -866,11 +875,21 @@ void real_update_char(char_data *ch) {
 		GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - gain);
 	}
 	
-	gain = move_gain(ch, FALSE);
-	GET_MOVE(ch) += gain;
-	GET_MOVE(ch) = MIN(GET_MOVE(ch), GET_MAX_MOVE(ch));
-	GET_MOVE_DEFICIT(ch) = MAX(0, GET_MOVE_DEFICIT(ch) - gain);
+	// check move gain
+	if (!IS_NPC(ch) && WATER_SECT(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch)) {
+		// swimming: costs moves
+		if (GET_MOVE(ch) > 0) {
+			GET_MOVE(ch) -= 1;
+		}
+	}
+	else {	// normal move gain
+		gain = move_gain(ch, FALSE);
+		GET_MOVE(ch) += gain;
+		GET_MOVE(ch) = MIN(GET_MOVE(ch), GET_MAX_MOVE(ch));
+		GET_MOVE_DEFICIT(ch) = MAX(0, GET_MOVE_DEFICIT(ch) - gain);
+	}
 	
+	// mana gain
 	gain = mana_gain(ch, FALSE);
 	GET_MANA(ch) += gain;
 	GET_MANA(ch) = MIN(GET_MANA(ch), GET_MAX_MANA(ch));
