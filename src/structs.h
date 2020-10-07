@@ -2485,6 +2485,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_CHAMELEON  BIT(27)	// B. vehicle's icon isn't visible at a distance
 #define VEH_INTERLINK  BIT(28)	// C. rooms can be interlinked with nearby interlink-flagged vehicles or rooms
 #define VEH_IS_RUINS  BIT(29)	// D. counts as ruins for cities/decay
+#define VEH_SLEEP  BIT(30)	// E. player can sleep/rest in/on it (like sit)
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin

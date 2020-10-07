@@ -330,8 +330,8 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (!(mob = get_char_vis(ch, argument, FIND_CHAR_ROOM))) {
 		// special case: mount/ride a vehicle
 		if (get_vehicle_in_room_vis(ch, arg)) {
-			void do_sit_on_vehicle(char_data *ch, char *argument);
-			do_sit_on_vehicle(ch, arg);
+			void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
+			do_sit_on_vehicle(ch, arg, POS_SITTING);
 		}
 		else {
 			send_config_msg(ch, "no_person");

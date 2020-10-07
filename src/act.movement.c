@@ -44,6 +44,7 @@ extern const char *mob_move_types[];
 // external funcs
 ACMD(do_dismount);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
+void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
 void do_unseat_from_vehicle(char_data *ch);
 extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
 extern char *get_room_name(room_data *room, bool color);
@@ -2582,22 +2583,36 @@ ACMD(do_portal) {
 
 
 ACMD(do_rest) {
+	one_argument(argument, arg);
+	
 	switch (GET_POS(ch)) {
-		case POS_STANDING:
-			if (IS_RIDING(ch)) {
-				msg_to_char(ch, "You climb down from your mount.\r\n");
-				perform_dismount(ch);
+		case POS_STANDING: {
+			if (*arg) {
+				do_sit_on_vehicle(ch, arg, POS_RESTING);
 			}
-			send_to_char("You sit down and rest your tired bones.\r\n", ch);
-			act("$n sits down and rests.", TRUE, ch, 0, 0, TO_ROOM);
-			GET_POS(ch) = POS_RESTING;
+			else {
+				if (IS_RIDING(ch)) {
+					msg_to_char(ch, "You climb down from your mount.\r\n");
+					perform_dismount(ch);
+				}
+				send_to_char("You sit down and rest your tired bones.\r\n", ch);
+				act("$n sits down and rests.", TRUE, ch, 0, 0, TO_ROOM);
+				GET_POS(ch) = POS_RESTING;
+			}
 			break;
-		case POS_SITTING:
-			do_unseat_from_vehicle(ch);
-			send_to_char("You rest your tired bones on the ground.\r\n", ch);
-			act("$n rests on the ground.", TRUE, ch, 0, 0, TO_ROOM);
-			GET_POS(ch) = POS_RESTING;
+		}
+		case POS_SITTING: {
+			if (*arg) {
+				do_sit_on_vehicle(ch, arg, POS_RESTING);
+			}
+			else {
+				do_unseat_from_vehicle(ch);
+				send_to_char("You rest your tired bones on the ground.\r\n", ch);
+				act("$n rests on the ground.", TRUE, ch, 0, 0, TO_ROOM);
+				GET_POS(ch) = POS_RESTING;
+			}
 			break;
+		}
 		case POS_RESTING:
 			send_to_char("You are already resting.\r\n", ch);
 			break;
@@ -2714,7 +2729,10 @@ ACMD(do_sit) {
 			if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 				msg_to_char(ch, "You can't do any more sitting while mounted.\r\n");
 			}
-			else if (!*arg) {
+			else if (*arg) {
+				do_sit_on_vehicle(ch, arg, POS_SITTING);
+			}
+			else {
 				if (IS_RIDING(ch)) {
 					do_dismount(ch, "", 0, 0);
 				}
@@ -2723,24 +2741,22 @@ ACMD(do_sit) {
 				GET_POS(ch) = POS_SITTING;
 				break;
 			}
-			else {
-				void do_sit_on_vehicle(char_data *ch, char *argument);
-				do_sit_on_vehicle(ch, arg);
-			}
 			break;
 		}
 		case POS_SITTING:
 			send_to_char("You're sitting already.\r\n", ch);
 			break;
-		case POS_RESTING:
+		case POS_RESTING: {
 			if (*arg) {
-				send_to_char("You need to stand up before you can sit on something.\r\n", ch);
-				return;
+				do_sit_on_vehicle(ch, arg, POS_SITTING);
 			}
-			send_to_char("You stop resting, and sit up.\r\n", ch);
-			act("$n stops resting.", TRUE, ch, 0, 0, TO_ROOM);
-			GET_POS(ch) = POS_SITTING;
+			else {
+				send_to_char("You stop resting, and sit up.\r\n", ch);
+				act("$n stops resting.", TRUE, ch, 0, 0, TO_ROOM);
+				GET_POS(ch) = POS_SITTING;
+			}
 			break;
+		}
 		case POS_SLEEPING:
 			send_to_char("You have to wake up first.\r\n", ch);
 			break;
@@ -2757,19 +2773,27 @@ ACMD(do_sit) {
 
 
 ACMD(do_sleep) {
+	one_argument(argument, arg);
+	
 	switch (GET_POS(ch)) {
 		case POS_SITTING:
-			do_unseat_from_vehicle(ch);
 		case POS_STANDING:
-		case POS_RESTING:
-			if (IS_RIDING(ch)) {
-				msg_to_char(ch, "You climb down from your mount.\r\n");
-				perform_dismount(ch);
+		case POS_RESTING: {
+			if (*arg) {
+				do_sit_on_vehicle(ch, arg, POS_SLEEPING);
 			}
-			send_to_char("You lie down and go to sleep.\r\n", ch);
-			act("$n lies down and falls asleep.", TRUE, ch, 0, 0, TO_ROOM);
-			GET_POS(ch) = POS_SLEEPING;
+			else {
+				do_unseat_from_vehicle(ch);
+				if (IS_RIDING(ch)) {
+					msg_to_char(ch, "You climb down from your mount.\r\n");
+					perform_dismount(ch);
+				}
+				send_to_char("You lie down and go to sleep.\r\n", ch);
+				act("$n lies down and falls asleep.", TRUE, ch, 0, 0, TO_ROOM);
+				GET_POS(ch) = POS_SLEEPING;
+			}
 			break;
+		}
 		case POS_SLEEPING:
 			send_to_char("You are already sound asleep.\r\n", ch);
 			break;
@@ -2790,18 +2814,21 @@ ACMD(do_stand) {
 		case POS_STANDING:
 			send_to_char("You are already standing.\r\n", ch);
 			break;
-		case POS_SITTING:
+		case POS_SITTING: {
 			do_unseat_from_vehicle(ch);
 			send_to_char("You stand up.\r\n", ch);
 			act("$n clambers to $s feet.", TRUE, ch, 0, 0, TO_ROOM);
 			/* Will be sitting after a successful bash and may still be fighting. */
 			GET_POS(ch) = FIGHTING(ch) ? POS_FIGHTING : POS_STANDING;
 			break;
-		case POS_RESTING:
+		}
+		case POS_RESTING: {
+			do_unseat_from_vehicle(ch);
 			send_to_char("You stop resting, and stand up.\r\n", ch);
 			act("$n stops resting, and clambers on $s feet.", TRUE, ch, 0, 0, TO_ROOM);
 			GET_POS(ch) = POS_STANDING;
 			break;
+		}
 		case POS_SLEEPING:
 			send_to_char("You have to wake up first!\r\n", ch);
 			break;

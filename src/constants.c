@@ -1357,7 +1357,7 @@ const char *genders[] = {
 };
 
 
-/* POS_x */
+/* POS_x (1/2) */
 const char *position_types[] = {
 	"Dead",
 	"Mortally wounded",
@@ -1368,6 +1368,21 @@ const char *position_types[] = {
 	"Sitting",
 	"Fighting",
 	"Standing",
+	"\n"
+};
+
+
+// POS_x (2/2): command to reach that state
+const char *position_commands[] = {
+	"",	// "Dead",
+	"",	// "Mortally wounded",
+	"",	// "Incapacitated",
+	"",	// "Stunned",
+	"sleep",
+	"rest",
+	"sit",
+	"",	// "Fighting",
+	"stand",
 	"\n"
 };
 
@@ -4378,6 +4393,7 @@ const char *vehicle_flags[] = {
 	"CHAMELEON",
 	"INTERLINK",
 	"IS-RUINS",
+	"SLEEP",	// 30
 	"\n"
 };
 
@@ -4414,6 +4430,7 @@ const char *identify_vehicle_flags[] = {
 	"chameleon",
 	"can interlink",
 	"is ruined",
+	"",	// "SLEEP", (special handling)	// 30
 	"\n"
 };
 

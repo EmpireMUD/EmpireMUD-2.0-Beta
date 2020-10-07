@@ -902,6 +902,9 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	if (VEH_FLAGGED(veh, VEH_SIT)) {
 		sprintf(buf + strlen(buf), "%scan sit %s", *buf ? ", " : "", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
 	}
+	if (VEH_FLAGGED(veh, VEH_SLEEP)) {
+		sprintf(buf + strlen(buf), "%scan sleep %s", *buf ? ", " : "", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+	}
 	if (*buf) {
 		msg_to_char(ch, "Notes: %s\r\n", buf);
 	}

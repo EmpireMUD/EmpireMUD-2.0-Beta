@@ -3932,7 +3932,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void refresh_all_quests(char_data *ch);
 	void refresh_passive_buffs(char_data *ch);
 	void reset_combat_meters(char_data *ch);
-	extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message);
+	extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
 	
 	extern bool global_mute_slash_channel_joins;
 
@@ -4224,7 +4224,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// attempt to put them back in a vehicle
 	if (GET_LAST_VEHICLE(ch) != NOTHING) {
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (VEH_VNUM(veh) == GET_LAST_VEHICLE(ch) && !VEH_SITTING_ON(veh) && validate_sit_on_vehicle(ch, veh, FALSE)) {
+			if (VEH_VNUM(veh) == GET_LAST_VEHICLE(ch) && !VEH_SITTING_ON(veh) && validate_sit_on_vehicle(ch, veh, POS_SITTING, FALSE)) {
 				sit_on_vehicle(ch, veh);
 				GET_POS(ch) = POS_SITTING;
 				break;	// only need 1

@@ -1296,8 +1296,8 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "ALLOW-ROUGH set without driving/draggable");
 		problem = TRUE;
 	}
-	if (VEH_FLAGGED(veh, VEH_IN) && !VEH_FLAGGED(veh, VEH_SIT) && VEH_INTERIOR_ROOM_VNUM(veh) == NOTHING) {
-		olc_audit_msg(ch, VEH_VNUM(veh), "IN flag set without SIT or interior room");
+	if (VEH_FLAGGED(veh, VEH_IN) && !VEH_FLAGGED(veh, VEH_SIT | VEH_SLEEP) && VEH_INTERIOR_ROOM_VNUM(veh) == NOTHING) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "IN flag set without SIT/SLEEP or interior room");
 		problem = TRUE;
 	}
 	if (VEH_FLAGGED(veh, VEH_CARRY_VEHICLES | VEH_CARRY_MOBS) && VEH_INTERIOR_ROOM_VNUM(veh) == NOTHING) {

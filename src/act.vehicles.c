@@ -31,6 +31,7 @@
 */
 
 // local protos
+void do_unseat_from_vehicle(char_data *ch);
 
 // external consts
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
@@ -38,6 +39,8 @@ extern const char *dirs[];
 extern const char *from_dir[];
 extern const bool is_flat_dir[NUM_OF_DIRS];
 extern const char *mob_move_types[];
+extern const char *position_commands[];
+extern const char *position_types[];
 extern const int rev_dir[];
 
 // external funcs
@@ -768,19 +771,35 @@ void process_driving(char_data *ch) {
 
 
 /**
-* Determines if a person can sit in/on a vehicle.
+* Determines if a person can sit/rest/sleep in/on a vehicle.
 *
 * @param char_data *ch The player.
 * @param vehicle_data *veh The vehicle to sit in/on.
+* @param int pos Whether we're trying to reach POS_SITTING / POS_RESTING / POS_SLEEPING.
 * @param bool message if TRUE, sends its own error message; FALSE is silent.
 * @return bool TRUE if ok to sit, FALSE if not.
 */
-bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message) {
-	if (!VEH_FLAGGED(veh, VEH_SIT)) {
+bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message) {
+	char buf[256];
+	
+	// flag checks
+	if (pos == POS_SITTING && !VEH_FLAGGED(veh, VEH_SIT)) {
 		if (message) {
-			msg_to_char(ch, "You can't sit on that!\r\n");
+			msg_to_char(ch, "You can't %s on that!\r\n", position_commands[pos]);
 		}
 	}
+	else if (pos == POS_SLEEPING && !VEH_FLAGGED(veh, VEH_SLEEP)) {
+		if (message) {
+			msg_to_char(ch, "You can't %s on that!\r\n", position_commands[pos]);
+		}
+	}
+	else if (pos == POS_RESTING && !VEH_FLAGGED(veh, VEH_SIT | VEH_SLEEP)) {
+		if (message) {
+			msg_to_char(ch, "You can't %s on that!\r\n", position_commands[pos]);
+		}
+	}
+	
+	// completeness checks
 	else if (VEH_IS_DISMANTLING(veh)) {
 		if (message) {
 			msg_to_char(ch, "You can't sit %s because it's being dismantled.\r\n", IN_OR_ON(veh));
@@ -796,14 +815,18 @@ bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message) {
 			msg_to_char(ch, "You can't sit on it while it's on fire!\r\n");
 		}
 	}
-	else if (VEH_SITTING_ON(veh)) {
+	
+	// person checks
+	else if (VEH_SITTING_ON(veh) && (VEH_SITTING_ON(veh) != ch || pos == GET_POS(ch))) {
 		if (message) {
-			msg_to_char(ch, "%s already sitting %s it.\r\n", (VEH_SITTING_ON(veh) != ch ? "Someone else is" : "You are"), IN_OR_ON(veh));
+			snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+			*buf = LOWER(*buf);
+			msg_to_char(ch, "%s already %s %s it.\r\n", (VEH_SITTING_ON(veh) != ch ? "Someone else is" : "You are"), buf, IN_OR_ON(veh));
 		}
 	}
 	else if (VEH_LED_BY(veh)) {
 		if (message) {
-			msg_to_char(ch, "You can't sit %s it while %s leading it around.\r\n", IN_OR_ON(veh), (VEH_LED_BY(veh) == ch) ? "you are" : "someone else is");
+			msg_to_char(ch, "You can't %s %s it while %s leading it around.\r\n", position_commands[pos], IN_OR_ON(veh), (VEH_LED_BY(veh) == ch) ? "you are" : "someone else is");
 		}
 	}
 	else if (VEH_DRIVER(veh)) {
@@ -811,6 +834,8 @@ bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message) {
 			msg_to_char(ch, "You can't lead it while someone else is controlling it.\r\n");
 		}
 	}
+	
+	// other checks
 	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
 		if (message) {
 			msg_to_char(ch, "You don't have permission to sit %s that.\r\n", IN_OR_ON(veh));
@@ -818,7 +843,7 @@ bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message) {
 	}
 	else if (GET_LEADING_VEHICLE(ch) || GET_LEADING_MOB(ch)) {
 		if (message) {
-			msg_to_char(ch, "You can't sit %s it while you're leading something.\r\n", IN_OR_ON(veh));
+			msg_to_char(ch, "You can't %s %s it while you're leading something.\r\n", position_commands[pos], IN_OR_ON(veh));
 		}
 	}
 	else {
@@ -1143,12 +1168,14 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 
 
 /**
-* Command processing for a character who is trying to sit in/on a vehicle.
+* Command processing for a character who is trying to sit/rest/sleep in/on
+* a vehicle.
 *
 * @param char_data *ch The person trying to sit.
 * @param char *argument The targeting arg.
+* @param int pos Either POS_SITTING, POS_RESTING, or POS_SLEEPING.
 */
-void do_sit_on_vehicle(char_data *ch, char *argument) {
+void do_sit_on_vehicle(char_data *ch, char *argument, int pos) {
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh;
 	
@@ -1160,17 +1187,17 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 	else if (GET_POS(ch) == POS_FIGHTING) {
 		msg_to_char(ch, "You can't really do that right now!\r\n");
 	}
-	else if (GET_POS(ch) < POS_STANDING || GET_SITTING_ON(ch)) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, argument))) {
+		msg_to_char(ch, "You don't see anything like that here.\r\n");
+	}
+	else if (!validate_sit_on_vehicle(ch, veh, pos, TRUE)) {
+		// sends own message
+	}
+	else if (GET_POS(ch) < POS_STANDING && GET_SITTING_ON(ch) != veh) {
 		msg_to_char(ch, "You need to stand up before you can do that.\r\n");
 	}
 	else if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 		msg_to_char(ch, "You can't do that while mounted.\r\n");
-	}
-	else if (!(veh = get_vehicle_in_room_vis(ch, argument))) {
-		msg_to_char(ch, "You don't see anything like that here.\r\n");
-	}
-	else if (!validate_sit_on_vehicle(ch, veh, TRUE)) {
-		// sends own message
 	}
 	else {
 		// auto-dismount
@@ -1178,14 +1205,18 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 			do_dismount(ch, "", 0, 0);
 		}
 		
-		snprintf(buf, sizeof(buf), "You sit %s $V.", IN_OR_ON(veh));
+		if (GET_SITTING_ON(ch) && GET_SITTING_ON(ch) != veh) {
+			do_unseat_from_vehicle(ch);
+		}
+		
+		snprintf(buf, sizeof(buf), "You %s %s $V.", position_commands[pos], IN_OR_ON(veh));
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 		
-		snprintf(buf, sizeof(buf), "$n sits %s $V.", IN_OR_ON(veh));
+		snprintf(buf, sizeof(buf), "$n %ss %s $V.", position_commands[pos], IN_OR_ON(veh));
 		act(buf, FALSE, ch, NULL, veh, TO_ROOM);
 		
 		sit_on_vehicle(ch, veh);
-		GET_POS(ch) = POS_SITTING;
+		GET_POS(ch) = pos;
 	}
 }
 
@@ -1284,7 +1315,7 @@ void do_unseat_from_vehicle(char_data *ch) {
 	act(buf, TRUE, ch, NULL, GET_SITTING_ON(ch), TO_ROOM);
 
 	unseat_char_from_vehicle(ch);
-	if (GET_POS(ch) == POS_SITTING) {
+	if (GET_POS(ch) == POS_SITTING || GET_POS(ch) == POS_RESTING || GET_POS(ch) == POS_SLEEPING) {
 		GET_POS(ch) = FIGHTING(ch) ? POS_FIGHTING : POS_STANDING;
 	}
 }
