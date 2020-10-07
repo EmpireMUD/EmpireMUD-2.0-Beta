@@ -6956,6 +6956,7 @@ ACMD(do_ship) {
 				
 				from_isle = get_island(sd->from_island, TRUE);
 				to_isle = get_island(sd->to_island, TRUE);
+				to_room = sd->to_room == NOWHERE ? NULL : real_room(sd->to_room);
 				snprintf(line, sizeof(line), " %dx %s (%s to %s%s, %s)\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
 			}
 			
