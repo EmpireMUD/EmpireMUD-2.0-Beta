@@ -3934,6 +3934,7 @@ struct descriptor_data {
 	protocol_t *pProtocol; // see protocol.c
 	struct color_reducer color;
 	bool no_nanny;	// skips interpreting player input if only a telnet negotiation sequence was sent
+	int wait;	// triggers a short wait at some menus to prevent out-of-order interactions
 	
 	char **str;	// for the modify-str system
 	char *backstr;	// for the modify-str aborts

@@ -1197,6 +1197,8 @@ void ProtocolNegotiate(descriptor_t *apDescriptor) {
 /* Tells the client to switch echo on or off. */
 void ProtocolNoEcho(descriptor_t *apDescriptor, bool_t abOn) {
 	ConfirmNegotiation(apDescriptor, eNEGOTIATED_ECHO, abOn, true);
+	// induce wait to prevent out-of-order echo messages
+	apDescriptor->wait = 0.1 RL_SEC;
 }
 
 

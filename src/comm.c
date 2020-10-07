@@ -3833,11 +3833,12 @@ void game_loop(socket_t mother_desc) {
 			 * state then 1 is subtracted. Therefore we don't go less
 			 * than 0 ever and don't require an 'if' bracket. -gg 2/27/99
 			 */
+			d->wait -= (d->wait > 0);
 			if (d->character) {
 				GET_WAIT_STATE(d->character) -= (GET_WAIT_STATE(d->character) > 0);
-
-				if (GET_WAIT_STATE(d->character))
-					continue;
+			}
+			if (d->wait || (d->character && GET_WAIT_STATE(d->character))) {
+				continue;
 			}
 
 			if (!get_from_q(&d->input, comm, &aliased))
