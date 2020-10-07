@@ -2591,6 +2591,9 @@ ACMD(do_rest) {
 			if (*arg) {
 				do_sit_on_vehicle(ch, arg, POS_RESTING);
 			}
+			else if (WATER_SECT(IN_ROOM(ch))) {
+				msg_to_char(ch, "You can't sleep in the water.\r\n");
+			}
 			else {
 				if (IS_RIDING(ch)) {
 					msg_to_char(ch, "You climb down from your mount.\r\n");
@@ -2610,6 +2613,9 @@ ACMD(do_rest) {
 				send_to_char("You rest your tired bones.\r\n", ch);
 				act("$n leans back and rests.", TRUE, ch, NULL, NULL, TO_ROOM);
 				GET_POS(ch) = POS_RESTING;
+			}
+			else if (WATER_SECT(IN_ROOM(ch))) {
+				msg_to_char(ch, "You can't rest in the water.\r\n");
 			}
 			else {
 				do_unseat_from_vehicle(ch);
@@ -2738,6 +2744,9 @@ ACMD(do_sit) {
 			else if (*arg) {
 				do_sit_on_vehicle(ch, arg, POS_SITTING);
 			}
+			else if (WATER_SECT(IN_ROOM(ch))) {
+				msg_to_char(ch, "You can't sit in the water.\r\n");
+			}
 			else {
 				if (IS_RIDING(ch)) {
 					do_dismount(ch, "", 0, 0);
@@ -2791,6 +2800,9 @@ ACMD(do_sleep) {
 		case POS_RESTING: {
 			if (*arg) {
 				do_sit_on_vehicle(ch, arg, POS_SLEEPING);
+			}
+			else if (WATER_SECT(IN_ROOM(ch))) {
+				msg_to_char(ch, "You can't sleep in the water.\r\n");
 			}
 			else {
 				if (GET_SITTING_ON(ch) && !validate_sit_on_vehicle(ch, GET_SITTING_ON(ch), POS_SLEEPING, FALSE)) {
