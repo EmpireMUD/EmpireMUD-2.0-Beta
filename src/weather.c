@@ -46,6 +46,11 @@ void another_hour(int mode) {
 
 	if (mode) {
 		switch (time_info.hours) {
+			case 1: {
+				// 1am shipment
+				process_shipping();
+				break;
+			}
 			case 7:
 				weather_info.sunlight = SUN_RISE;
 				for (d = descriptor_list; d; d = d->next) {
@@ -66,6 +71,11 @@ void another_hour(int mode) {
 			case 12:
 				// noon
 				break;
+			case 13: {
+				// 1pm shipment
+				process_shipping();
+				break;
+			}
 			case 19:
 				weather_info.sunlight = SUN_SET;
 				send_to_outdoor(FALSE, "The sun slowly disappears beneath the horizon.\r\n");

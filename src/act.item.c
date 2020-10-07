@@ -3285,8 +3285,8 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 
 
 /**
-* Run one shipping cycle for an empire. This runs every 12 game hours -- at
-* 7am and 7pm.
+* Run one shipping cycle for an empire. This runs every 6 game hours -- at
+* 1am, 7am, 1pm, and 7pm.
 *
 * @param empire_data *emp The empire to run.
 */
@@ -3359,8 +3359,8 @@ void process_shipping_one(empire_data *emp) {
 
 
 /**
-* Runs a shipping cycle for all empires. This runs every 12 game hours -- at
-* 7am and 7pm.
+* Runs a shipping cycle for all empires. This runs every 6 game hours -- at
+* 1am, 7am, 1pm, and 7pm.
 */
 void process_shipping(void) {
 	empire_data *emp, *next_emp;
