@@ -2146,6 +2146,7 @@ void init_descriptor(descriptor_data *newd, int desc) {
 
 	CREATE(newd->history, char *, HISTORY_SIZE);
 	newd->pProtocol = ProtocolCreate();
+	newd->echo_on = TRUE;
 	
 	newd->olc_type = 0;
 	newd->olc_vnum = NOTHING;

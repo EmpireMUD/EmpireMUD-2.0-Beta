@@ -3933,6 +3933,7 @@ struct descriptor_data {
 	
 	protocol_t *pProtocol; // see protocol.c
 	struct color_reducer color;
+	bool echo_on;	// tracks echo requests
 	bool no_nanny;	// skips interpreting player input if only a telnet negotiation sequence was sent
 	
 	char **str;	// for the modify-str system

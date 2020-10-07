@@ -1196,8 +1196,9 @@ void ProtocolNegotiate(descriptor_t *apDescriptor) {
 
 /* Tells the client to switch echo on or off. */
 void ProtocolNoEcho(descriptor_t *apDescriptor, bool_t abOn) {
-	if ((abOn && apDescriptor->pProtocol->bECHO) || (!abOn && !apDescriptor->pProtocol->bECHO)) {
+	if (apDescriptor->echo_on == abOn) {
 		ConfirmNegotiation(apDescriptor, eNEGOTIATED_ECHO, abOn, true);
+		apDescriptor->echo_on = !abOn;
 	}
 }
 
