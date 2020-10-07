@@ -2808,6 +2808,7 @@ ACMD(do_sleep) {
 				if (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch)) {
 					// only if they were unseated
 					msg_to_char(ch, "You can't sleep in the water.\r\n");
+					return;
 				}
 				if (IS_RIDING(ch)) {
 					msg_to_char(ch, "You climb down from your mount.\r\n");
