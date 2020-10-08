@@ -507,15 +507,6 @@ void point_update_char(char_data *ch) {
 		}
 	}
 	
-	// drowning
-	if (GET_MOVE(ch) <= 0 && !IS_NPC(ch) && WATER_SECT(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch)) {
-		msg_to_char(ch, "You sink beneath the water and die!\r\n");
-		act("$n sinks beneath the water and dies!", FALSE, ch, NULL, NULL, TO_ROOM);
-		death_log(ch, ch, TYPE_SUFFERING);
-		die(ch, ch);
-		return;
-	}
-	
 	// healing for NPCs -- pcs are in real_update
 	if (IS_NPC(ch)) {
 		if (GET_POS(ch) >= POS_STUNNED && !FIGHTING(ch) && !GET_FED_ON_BY(ch)) {
@@ -876,10 +867,17 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// check move gain
-	if (!IS_NPC(ch) && WATER_SECT(IN_ROOM(ch)) && !IS_IMMORTAL(ch) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch)) {
+	if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && IS_SWIMMING(ch)) {
 		// swimming: costs moves
 		if (GET_MOVE(ch) > 0) {
 			GET_MOVE(ch) -= 1;
+		}
+		if (GET_MOVE(ch) <= 0) {
+			msg_to_char(ch, "You sink beneath the water and die!\r\n");
+			act("$n sinks beneath the water and dies!", FALSE, ch, NULL, NULL, TO_ROOM);
+			death_log(ch, ch, TYPE_SUFFERING);
+			die(ch, ch);
+			return;
 		}
 	}
 	else {	// normal move gain
@@ -2228,6 +2226,11 @@ int move_gain(char_data *ch, bool info_only) {
 		gain += GET_MOVE_REGEN(ch);
 	}
 	else {
+		// swimming shows as -1 on info
+		if (info_only && !IS_IMMORTAL(ch) && IS_SWIMMING(ch)) {
+			return -1;
+		}
+	
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_MOVE_REGEN(ch);
 		

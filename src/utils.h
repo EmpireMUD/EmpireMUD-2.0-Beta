@@ -412,6 +412,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_CASTER) : (has_skill_flagged((ch), SKILLF_CASTER) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
+#define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (has_skill_flagged((ch), SKILLF_VAMPIRE) > 0))
 #define NOT_MELEE_RANGE(ch, vict)  ((FIGHTING(ch) && FIGHT_MODE(ch) != FMODE_MELEE) || (FIGHTING(vict) && FIGHT_MODE(vict) != FMODE_MELEE))
 #define WOULD_EXECUTE(ch, vict)  (MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP) || (IS_NPC(ch) ? (((ch)->master && !IS_NPC((ch)->master)) ? PRF_FLAGGED((ch)->master, PRF_AUTOKILL) : (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP))) : PRF_FLAGGED((ch), PRF_AUTOKILL)))
