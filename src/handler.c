@@ -945,21 +945,35 @@ bool affected_by_spell(char_data *ch, any_vnum type) {
 
 
 /**
-* Matches both an ATYPE_ and an APPLY_ on an effect.
+* Matches both an ATYPE_ and an APPLY_ and/or AFF_ on an effect.
 *
 * @param char_data *ch The character to check
 * @param any_vnum type the ATYPE_ const/vnum
-* @param int apply the APPLY_ flag
+* @param int apply the APPLY_ flag, if any (NOTHING to check only aff_flag instead)
+* @param bitvector_t aff_flag the AFF_ flag, if any (NOBITS to check only apply instead)
 * @return bool TRUE if an effect matches both conditions
 */
-bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply) {
+bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply, bitvector_t aff_flag) {
 	struct affected_type *hjp;
 	bool found = FALSE;
+	
+	if (apply == NOTHING && aff_flag == NOBITS) {
+		return FALSE;	// nothing to look for
+	}
 
 	for (hjp = ch->affected; hjp && !found; hjp = hjp->next) {
-		if (hjp->type == type && hjp->location == apply) {
-			found = TRUE;
+		if (hjp->type != type) {
+			continue;
 		}
+		if (apply != NOTHING && hjp->location != apply) {
+			continue;
+		}
+		if (aff_flag && !IS_SET(hjp->bitvector, aff_flag)) {
+			continue;
+		}
+		
+		found = TRUE;
+		break;
 	}
 
 	return found;

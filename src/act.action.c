@@ -37,6 +37,7 @@
 */
 
 // external vars
+extern struct gen_craft_data_t gen_craft_data[];
 extern const bool interact_one_at_a_time[NUM_INTERACTS];
 extern const char *tool_flags[];
 
@@ -274,7 +275,6 @@ void update_actions(void) {
 	extern vehicle_data *get_current_piloted_vehicle(char_data *ch);
 	
 	// Extern vars.
-	extern struct gen_craft_data_t gen_craft_data[];
 	extern bool catch_up_actions;
 	
 	// prevent running multiple action rounds during a catch-up cycle
@@ -420,6 +420,31 @@ void update_actions(void) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Determines if the character is performing an action with a particular flag.
+*
+* @param char_data *ch The person.
+* @param bitvector_t actf Any ACTF_ flag, like ACTF_SITTING.
+* @return bool TRUE if the player's action has the flag, FALSE if not.
+*/
+bool action_flagged(char_data *ch, bitvector_t actf) {
+	craft_data *craft;
+	
+	if (IS_NPC(ch) || GET_ACTION(ch) == ACT_NONE || !actf) {
+		return FALSE;	// no work
+	}
+	
+	if (IS_SET(action_data[GET_ACTION(ch)].flags, actf)) {
+		return TRUE;
+	}
+	if (GET_ACTION(ch) == ACT_GEN_CRAFT && (craft = craft_proto(GET_ACTION_VNUM(ch, 0))) && IS_SET(gen_craft_data[GET_CRAFT_TYPE(craft)].actf_flags, actf)) {
+		return TRUE;
+	}
+	
+	return FALSE;	// otherwise
+}
+
 
 /**
 * When a player forages in the wild and gets nothing, they get a chance at a

@@ -43,6 +43,7 @@ extern const char *mob_move_types[];
 
 // external funcs
 ACMD(do_dismount);
+extern bool action_flagged(char_data *ch, bitvector_t actf);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
 void do_unseat_from_vehicle(char_data *ch);
@@ -327,6 +328,10 @@ bool can_enter_room(char_data *ch, room_data *room) {
 * @return bool TRUE if successful, FALSE if the character is still flying.
 */
 bool check_stop_flying(char_data *ch) {
+	if (affected_by_spell_and_apply(ch, ATYPE_MORPH, NOTHING, AFF_FLY)) {
+		// cannot override a morph
+		return FALSE;
+	}
 	if (!IS_NPC(ch) && IS_RIDING(ch) && MOUNT_FLAGGED(ch, MOUNT_FLYING)) {
 		do_dismount(ch, "", 0, 0);
 	}
@@ -2669,6 +2674,10 @@ ACMD(do_rest) {
 			GET_POS(ch) = POS_RESTING;
 			break;
 	}
+	
+	if (GET_POS(ch) == POS_RESTING && !IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
+		cancel_action(ch);
+	}
 }
 
 
@@ -2820,6 +2829,10 @@ ACMD(do_sit) {
 			GET_POS(ch) = POS_SITTING;
 			break;
 	}
+	
+	if (GET_POS(ch) == POS_SITTING && !IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && !action_flagged(ch, ACTF_SITTING)) {
+		cancel_action(ch);
+	}
 }
 
 
@@ -2867,6 +2880,10 @@ ACMD(do_sleep) {
 			act("$n stops floating around, and lie down to sleep.", TRUE, ch, 0, 0, TO_ROOM);
 			GET_POS(ch) = POS_SLEEPING;
 			break;
+	}
+	
+	if (GET_POS(ch) == POS_SLEEPING && !IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
+		cancel_action(ch);
 	}
 }
 

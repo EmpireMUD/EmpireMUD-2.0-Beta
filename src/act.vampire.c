@@ -1103,7 +1103,7 @@ ACMD(do_boost) {
 		msg_to_char(ch, "Your %s is already at maximum!\r\n", boost_data[pos].name);
 		return;
 	}
-	if (affected_by_spell_and_apply(ch, ATYPE_BOOST, boost_data[pos].apply)) {
+	if (affected_by_spell_and_apply(ch, ATYPE_BOOST, boost_data[pos].apply, NOBITS)) {
 		msg_to_char(ch, "Your %s is already boosted!\r\n", boost_data[pos].name);
 		return;
 	}
