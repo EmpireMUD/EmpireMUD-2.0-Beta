@@ -320,6 +320,29 @@ bool can_enter_room(char_data *ch, room_data *room) {
 
 
 /**
+* Tries to stop the character from flying. Only sends messages if it did stop
+* flying (or at least stopped 1 type of flying).
+*
+* @param char_data *ch The person.
+* @return bool TRUE if successful, FALSE if the character is still flying.
+*/
+bool check_stop_flying(char_data *ch) {
+	if (!IS_NPC(ch) && IS_RIDING(ch) && MOUNT_FLAGGED(ch, MOUNT_FLYING)) {
+		do_dismount(ch, "", 0, 0);
+	}
+	if (AFF_FLAGGED(ch, AFF_FLY)) {
+		affects_from_char_by_aff_flag(ch, AFF_FLY, FALSE);
+		if (!AFF_FLAGGED(ch, AFF_FLY)) {
+			msg_to_char(ch, "You land.\r\n");
+			act("$n lands.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+	}
+	
+	return EFFECTIVELY_FLYING(ch) ? FALSE : TRUE;
+}
+
+
+/**
 * Clears a player's recent move times, which resets their shrinking map.
 *
 * @param char_data *ch The player.
@@ -2594,6 +2617,9 @@ ACMD(do_rest) {
 			else if (WATER_SECT(IN_ROOM(ch))) {
 				msg_to_char(ch, "You can't rest in the water.\r\n");
 			}
+			else if (!check_stop_flying(ch)) {
+				msg_to_char(ch, "You can't do that because you're flying.\r\n");
+			}
 			else {
 				if (IS_RIDING(ch)) {
 					msg_to_char(ch, "You climb down from your mount.\r\n");
@@ -2616,6 +2642,9 @@ ACMD(do_rest) {
 			}
 			else if (WATER_SECT(IN_ROOM(ch))) {
 				msg_to_char(ch, "You can't rest in the water.\r\n");
+			}
+			else if (!check_stop_flying(ch)) {
+				msg_to_char(ch, "You can't do that because you're flying.\r\n");
 			}
 			else {
 				do_unseat_from_vehicle(ch);
@@ -2747,6 +2776,9 @@ ACMD(do_sit) {
 			else if (WATER_SECT(IN_ROOM(ch))) {
 				msg_to_char(ch, "You can't sit in the water.\r\n");
 			}
+			else if (!check_stop_flying(ch)) {
+				msg_to_char(ch, "You can't do that because you're flying.\r\n");
+			}
 			else {
 				if (IS_RIDING(ch)) {
 					do_dismount(ch, "", 0, 0);
@@ -2800,6 +2832,9 @@ ACMD(do_sleep) {
 		case POS_RESTING: {
 			if (*arg) {
 				do_sit_on_vehicle(ch, arg, POS_SLEEPING);
+			}
+			else if (!check_stop_flying(ch)) {
+				msg_to_char(ch, "You can't do that because you're flying.\r\n");
 			}
 			else {
 				if (GET_SITTING_ON(ch) && !validate_sit_on_vehicle(ch, GET_SITTING_ON(ch), POS_SLEEPING, FALSE)) {

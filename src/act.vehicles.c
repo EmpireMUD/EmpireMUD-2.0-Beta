@@ -1176,6 +1176,8 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 * @param int pos Either POS_SITTING, POS_RESTING, or POS_SLEEPING.
 */
 void do_sit_on_vehicle(char_data *ch, char *argument, int pos) {
+	extern bool check_stop_flying(char_data *ch);
+	
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh;
 	
@@ -1198,6 +1200,9 @@ void do_sit_on_vehicle(char_data *ch, char *argument, int pos) {
 	}
 	else if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 		msg_to_char(ch, "You can't do that while mounted.\r\n");
+	}
+	else if (!check_stop_flying(ch)) {
+		msg_to_char(ch, "You can't do that because you're flying.\r\n");
 	}
 	else {
 		// auto-dismount
