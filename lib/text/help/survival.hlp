@@ -275,16 +275,15 @@ Gain skill by walking around in the wilderness without leaving tracks.
 
 See also: TRACK, WHERE, UNSEEN PASSING
 #
-PATHFINDING
+"LAY PATHS" "MOUNTAIN PATHS"
 
-Pathfinding (Survival ability)
+Lay Paths (Survival ability)
 
 Usage:  lay
 Cost:  20x (rock)
 
-With the Pathfinding ability, you can lay roads on mountains. This ability
-also lets you remove them with the same command. You do not need the Roads
-ability to use it.
+With the Lay Paths ability, you can lay roads on mountains. This ability
+also lets you remove them with the same command.
 
 Gains experience when you lay mountain roads.
 
