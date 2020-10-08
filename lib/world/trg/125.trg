@@ -2,8 +2,7 @@
 Board / climb colossus~
 0 c 0
 climb board enter up~
-eval helper %%actor.char_target(%arg%)%%
-if %helper% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -12,14 +11,14 @@ if !%instance.start%
   %purge% %self%
   halt
 end
-eval room i12501
+set room i12501
 set start_room %actor.room%
 %echoaround% %actor% ~%actor% starts climbing up |%self% leg...
 %teleport% %actor% %room%
 %echoaround% %actor% ~%actor% climbs up from the ground below.
 %send% %actor% You start climbing up |%self% leg...
 %force% %actor% look
-eval room2 i12500
+set room2 i12500
 %at% %room2% %load% obj 12504
 set person %start_room.people%
 while %person%
@@ -38,9 +37,9 @@ done
 Disembark colossus~
 2 c 0
 leave exit disembark~
-eval colossus %instance.mob(12500)%
+set colossus %instance.mob(12500)%
 if !%colossus%
-  eval colossus %instance.mob(12501)%
+  set colossus %instance.mob(12501)%
 end
 set room %actor.room%
 if %colossus%
@@ -73,7 +72,7 @@ done
 Colossus eye lasers~
 0 bw 15
 ~
-eval mob %instance.mob(12500)%
+set mob %instance.mob(12500)%
 if !%mob%
   halt
 end
@@ -83,8 +82,8 @@ remote running %self.id%
 wait 5 sec
 set running 0
 remote running %self.id%
-eval room %self.room%
-eval person %room.people%
+set room %self.room%
+set person %room.people%
 while %person%
   if %person.is_pc% && !%person.is_immortal%
     eval dodged %%self.varexists(dodged_%person.id%)%%
@@ -103,7 +102,7 @@ while %person%
     end
     rdelete dodged_%person.id% %self.id%
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 ~
 #12503
@@ -438,9 +437,9 @@ return 1
 Colossus mob block higher room~
 0 s 100
 ~
-eval room_var %self.room%
+set room_var %self.room%
 eval tricky %%room_var.%direction%(room)%%
-eval to_room %tricky%
+set to_room %tricky%
 if %actor.nohassle% || !%tricky% || %direction% == down || %actor.aff_flagged(SNEAK)%
   halt
 end
@@ -453,8 +452,8 @@ Colossus trash spawner~
 ~
 eval vnum 12501+%random.2%
 %load% mob %vnum%
-eval room %self.room%
-eval mob %room.people%
+set room %self.room%
+set mob %room.people%
 %echo% ~%mob% arrives.
 %purge% %self%
 ~
@@ -466,13 +465,13 @@ if %self.fighting%
   halt
 end
 say You know, I could help you out here... for a price.
-eval room %self.room%
-eval person %room.people%
+set room %self.room%
+set person %room.people%
 while %person%
   if %person.is_pc%
     %quest% %person% start 12504
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 ~
 #12516
@@ -499,7 +498,7 @@ end
 Colossus location updater + leash~
 0 i 100
 ~
-eval room %self.room%
+set room %self.room%
 if %room.distance(%instance.real_location%)% > 20
   return 0
   halt
@@ -528,14 +527,14 @@ Colossus look out~
 look~
 if %cmd.mudcommand% == look && out == %arg%
   %send% %actor% Looking down from your perch on the colossus, you see...
-  eval colossus %instance.mob(12500)%
+  set colossus %instance.mob(12500)%
   if !%colossus%
-    eval colossus %instance.mob(12501)%
+    set colossus %instance.mob(12501)%
   end
   if %colossus%
-    eval target %colossus.room%
+    set target %colossus.room%
   else
-    eval target %startloc%
+    set target %startloc%
     %adventurecomplete%
   end
   %teleport% %actor% %target%
@@ -550,8 +549,7 @@ return 0
 Diagnose colossus~
 0 c 0
 diagnose~
-eval helper %%actor.char_target(%arg%)%%
-if %helper% != %self%
+if %actor.char_target(%arg%)% != %self%
   return 0
   halt
 end
@@ -586,8 +584,8 @@ else
   set tokens 2
 end
 if %tokens% > 0
-  eval room %self.room%
-  eval person %room.people%
+  set room %self.room%
+  set person %room.people%
   while %person%
     if %person.is_pc%
       eval name %%currency.12500(%tokens%)%%
@@ -595,7 +593,7 @@ if %tokens% > 0
       eval op %%person.give_currency(12500, %tokens%)%%
       nop %op%
     end
-    eval person %person.next_in_room%
+    set person %person.next_in_room%
   done
 end
 %load% mob 12505
@@ -604,14 +602,13 @@ set dealer %self.room.people%
 * Set adventure location back to scaffold
 nop %instance.set_location(%instance.real_location%)%
 * Load despawn timer
-eval room2 i12500
-%at% %room2% %load% obj 12504
+%at% i12500 %load% obj 12504
 ~
 #12522
 free cannonballs~
 1 n 100
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if %actor%
   %load% obj 12508 %actor% inv
   %load% obj 12508 %actor% inv
@@ -647,7 +644,7 @@ if !%instance.real_location%
   %echo% ~%self% vanishes uselessly.
   %purge% %self%
 end
-eval colossus %instance.mob(12500)%
+set colossus %instance.mob(12500)%
 %echo% ~%colossus% slowly staggers back to its scaffold.
 if %colossus%
   %echoaround% %colossus% ~%colossus% staggers slowly back to its scaffold.
@@ -714,10 +711,10 @@ remote running %self.id%
 wait 5 sec
 set running 0
 remote running %self.id%
-eval room %self.room%
-eval person %room.people%
+set room %self.room%
+set person %room.people%
 while %person%
-  eval next_person %person.next_in_room%
+  set next_person %person.next_in_room%
   if %person.is_pc%
     eval success %%self.varexists(cling_%person.id%)%%
     if %success%
@@ -729,7 +726,7 @@ while %person%
     else
       %send% %person% The colossus's wildly flailing arm sends you flying!
       %echoaround% %person% ~%person% goes flying!
-      eval colossus %instance.mob(12500)%
+      set colossus %instance.mob(12500)%
       if %colossus%
         rdelete cling_%person.id% %self.id%
         %teleport% %person% %colossus.room%
@@ -746,7 +743,7 @@ while %person%
       end
     end
   end
-  eval person %next_person%
+  set person %next_person%
 done
 ~
 #12529
@@ -771,9 +768,9 @@ dg_affect %actor% HARD-STUNNED on 5
 Clockwork Colossus loot bop/boe~
 1 n 100
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if !%actor%
-  eval actor %self.worn_by%
+  set actor %self.worn_by%
 end
 if !%actor%
   halt
@@ -816,7 +813,7 @@ Colossus arm death~
 ~
 %echo% The destruction of ~%self% weakens the colossus!
 * Start of script fragment: colossus damage updater
-eval colossus %instance.mob(12500)%
+set colossus %instance.mob(12500)%
 if %colossus%
   dg_affect #12501 %colossus% off
   if !%colossus.varexists(parts_destroyed)%
@@ -1027,13 +1024,13 @@ if %self.fighting%
 end
 wait 5
 say You know, I could help you out here... for a price.
-eval room %self.room%
-eval person %room.people%
+set room %self.room%
+set person %room.people%
 while %person%
   if %person.is_pc%
     %quest% %person% start 12504
   end
-  eval person %person.next_in_room%
+  set person %person.next_in_room%
 done
 ~
 #12537
@@ -1099,28 +1096,27 @@ end
 Clockwork Colossus super-loot~
 1 n 100
 ~
-eval clothes 12519
-eval vehicle 12513
-eval air_mount 12512
-eval actor %self.carried_by%
-eval percent_roll %random.100%
+set clothes 12519
+set vehicle 12513
+set air_mount 12512
+set actor %self.carried_by%
+set percent_roll %random.100%
 if %percent_roll% <= 10
-  eval vnum %vehicle%
+  set vnum %vehicle%
 elseif %percent_roll% <= 40
-  eval vnum %air_mount%
+  set vnum %air_mount%
 else
-  eval vnum %clothes%
+  set vnum %clothes%
 end
 if %self.level%
-  eval level %self.level%
+  set level %self.level%
 else
-  eval level 100
+  set level 100
 end
 %load% obj %vnum% %actor% inv %level%
-eval item %%actor.inventory(%vnum%)%%
+set item %actor.inventory(%vnum%)%
 if %item.is_flagged(BOP)%
-  eval bind %%item.bind(%self%)%%
-  nop %bind%
+  nop %item.bind(%self%)%
 end
 * %send% %actor% @%self% turns out to be @%item%!
 wait 1
@@ -1130,40 +1126,39 @@ wait 1
 Clockwork Colossus premium loot~
 1 n 100
 ~
-eval actor %self.carried_by%
-eval percent_roll %random.10000%
+set actor %self.carried_by%
+set percent_roll %random.10000%
 if %percent_roll% <= 666
   * bag
-  eval vnum 12515
+  set vnum 12515
 elseif %percent_roll% <= 1332
   * saddle
-  eval vnum 12516
+  set vnum 12516
 elseif %percent_roll% <= 1998
   * shoes
-  eval vnum 12517
+  set vnum 12517
 elseif %percent_roll% <= 2664
   * gun
-  eval vnum 12518
+  set vnum 12518
 elseif %percent_roll% <= 3330
   * pet
-  eval vnum 12510
+  set vnum 12510
 elseif %percent_roll% <= 3996
   * land mount
-  eval vnum 12511
+  set vnum 12511
 else
   * all other vnum: BoEs
   eval vnum 12519 + %random.9%
 end
 if %self.level%
-  eval level %self.level%
+  set level %self.level%
 else
-  eval level 100
+  set level 100
 end
 %load% obj %vnum% %actor% inv %level%
-eval item %%actor.inventory(%vnum%)%%
+set item %actor.inventory(%vnum%)%
 if %item.is_flagged(BOP)%
-  eval bind %%item.bind(%self%)%%
-  nop %bind%
+  nop %item.bind(%self%)%
 end
 * %send% %actor% @%self% turns out to be @%item%!
 wait 1
@@ -1173,18 +1168,17 @@ wait 1
 Clockwork Colossus BoP loot~
 1 n 100
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if %self.level%
-  eval level %self.level%
+  set level %self.level%
 else
-  eval level 100
+  set level 100
 end
 eval vnum 12527 + (%random.9% * 2)
 %load% obj %vnum% %actor% inv %level%
-eval item %%actor.inventory(%vnum%)%%
+set item %actor.inventory(%vnum%)%
 if %item.is_flagged(BOP)%
-  eval bind %%item.bind(%self%)%%
-  nop %bind%
+  nop %item.bind(%self%)%
 end
 * %send% %actor% @%self% turns out to be @%item%!
 wait 1
@@ -1194,11 +1188,11 @@ wait 1
 Clockwork Colossus Normal Difficulty Loot~
 1 n 100
 ~
-eval actor %self.carried_by%
+set actor %self.carried_by%
 if %self.level%
-  eval level %self.level%
+  set level %self.level%
 else
-  eval level 100
+  set level 100
 end
 if %random.2% == 2
   eval vnum 12519 + %random.9%
@@ -1206,10 +1200,9 @@ else
   eval vnum 12527 + (%random.9% * 2)
 end
 %load% obj %vnum% %actor% inv %level%
-eval item %%actor.inventory(%vnum%)%%
+set item %actor.inventory(%vnum%)%
 if %item.is_flagged(BOP)%
-  eval bind %%item.bind(%self%)%%
-  nop %bind%
+  nop %item.bind(%self%)%
 end
 * %send% %actor% @%self% turns out to be @%item%!
 wait 1
@@ -1220,62 +1213,62 @@ Clockwork Colossus Master Loot Controller~
 1 n 100
 ~
 * loot vars to be 0/1
-eval normal 0
-eval basic 0
-eval premium 0
-eval super 0
+set normal 0
+set basic 0
+set premium 0
+set super 0
 * scraps var is number to load
-eval scraps 0
-eval actor %self.carried_by%
+set scraps 0
+set actor %self.carried_by%
 if %self.level%
-  eval level %self.level%
+  set level %self.level%
 else
-  eval level 100
+  set level 100
 end
 if %actor%
   if 0
     * TODO superboss?
   elseif %actor.mob_flagged(GROUP)% && %actor.mob_flagged(HARD)%
-    eval scraps 4
-    eval basic 1
-    eval premium 1
+    set scraps 4
+    set basic 1
+    set premium 1
     if %random.100% <= 25
-      eval super 1
+      set super 1
     end
   elseif %actor.mob_flagged(GROUP)%
-    eval scraps 3
-    eval basic 1
+    set scraps 3
+    set basic 1
     if %random.100% <= 67
-      eval premium 1
+      set premium 1
     end
   elseif %actor.mob_flagged(HARD)%
-    eval scraps 2
-    eval basic 1
+    set scraps 2
+    set basic 1
     if %random.100% <= 33
-      eval premium 1
+      set premium 1
     end
   else
     * Normal
-    eval scraps 1
-    eval normal 1
+    set scraps 1
+    set normal 1
   end
 end
 * load items
 if %normal%
   %load% obj 12550 %actor% inv %level%
-  eval item %%actor.inventory(12550)%%
+  set item %actor.inventory(12550)%
 end
 if %basic%
   %load% obj 12549 %actor% inv %level%
-  eval item %%actor.inventory(12549)%%
+  set item %actor.inventory(12549)%
 end
 if %premium%
   %load% obj 12548 %actor% inv %level%
-  eval item %%actor.inventory(12548)%%
+  set item %actor.inventory(12548)%
 end
 if %super%
   %load% obj 12547 %actor% inv %level%
-  eval item %%actor.inventory(12547)%%
+  set item %actor.inventory(12547)%
 end
 * give scraps
 while %scraps% > 0
@@ -1290,7 +1283,7 @@ wait 1
 Open belt panel~
 1 c 4
 open pry~
-eval target %%actor.obj_target(%arg%)%%
+set target %actor.obj_target(%arg%)%
 if %target% != %self%
   return 0
   halt
@@ -1348,7 +1341,7 @@ if %color% and %correct_color%
       %echo% The final panel slides closed, and the colossus is rocked by an internal explosion!
       %load% obj 12559
       * Start of script fragment: colossus damage updater
-      eval colossus %instance.mob(12500)%
+      set colossus %instance.mob(12500)%
       if %colossus%
         dg_affect #12501 %colossus% off
         if !%colossus.varexists(parts_destroyed)%
@@ -1379,12 +1372,11 @@ if %color% and %correct_color%
         set next_panel_vnum 12558
       end
       %load% obj %next_panel_vnum%
-      eval room %self.room%
-      eval panel %room.contents%
+      set room %self.room%
+      set panel %room.contents%
       if %panel.vnum% == %next_panel_vnum%
         eval next_val %self.val0% + 1
-        eval op %%panel.val0(%next_val%)%%
-        nop %op%
+        nop %panel.val0(%next_val%)%
         %echo% The open panel slides closed, and another panel opens nearby!
         %force% %actor% look panel
         %purge% %self%
@@ -1396,9 +1388,9 @@ if %color% and %correct_color%
     %damage% %actor% 300 magical
     %send% %actor% Your spasming hands lose purchase on the colossus!
     %echoaround% %actor% ~%actor% falls off the colossus, twitching and spasming!
-    eval colossus %instance.mob(12500)%
+    set colossus %instance.mob(12500)%
     if %colossus%
-      eval room %colossus.room%
+      set room %colossus.room%
       %teleport% %actor% %room%
       %echoaround% %actor% ~%actor% falls off the colossus!
       %force% %actor% look
@@ -1533,7 +1525,7 @@ if %first_chant% == %last_chant% && %second_chant% == %chant_num%
   %buildingecho% %instance.start% An explosion rocks ~%colossus%!
   %at% %colossus.room% %echo% An explosion rocks ~%colossus%!
   * Start of script fragment: colossus damage updater
-  eval colossus %instance.mob(12500)%
+  set colossus %instance.mob(12500)%
   if %colossus%
     dg_affect #12501 %colossus% off
     if !%colossus.varexists(parts_destroyed)%
@@ -1626,7 +1618,7 @@ if !%actor.is_immortal%
   halt
 end
 * Start of script fragment: colossus damage updater
-eval colossus %instance.mob(12500)%
+set colossus %instance.mob(12500)%
 if %colossus%
   %send% %actor% You turn @%self%...
   %echoaround% %actor% ~%actor% turns @%self%...
