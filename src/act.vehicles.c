@@ -829,7 +829,7 @@ bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool mes
 			msg_to_char(ch, "You can't %s %s it while %s leading it around.\r\n", position_commands[pos], IN_OR_ON(veh), (VEH_LED_BY(veh) == ch) ? "you are" : "someone else is");
 		}
 	}
-	else if (VEH_DRIVER(veh)) {
+	else if (VEH_DRIVER(veh) && VEH_DRIVER(veh) != ch) {
 		if (message) {
 			msg_to_char(ch, "You can't lead it while someone else is controlling it.\r\n");
 		}
