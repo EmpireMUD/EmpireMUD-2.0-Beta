@@ -585,6 +585,10 @@ ADMIN_UTIL(util_bldconvert) {
 		msg_to_char(ch, "Unable to convert: craft %d is for something other than that building.\r\n", from_vnum);
 		return;
 	}
+	if (from_craft && CRAFT_FLAGGED(from_craft, CRAFT_DISMANTLE_ONLY)) {
+		msg_to_char(ch, "Unable to convert: craft %d is already dismantle-only so this building has probably already been converted (remove dismantle-only to force this conversion).\r\n", from_vnum);
+		return;
+	}
 	
 	// find free vnum -- check the 100-vnum block starting with start_to_vnum
 	for (iter = start_to_vnum; iter < 100 * (int)(start_to_vnum / 100 + 1) && to_vnum == NOTHING; ++iter) {
