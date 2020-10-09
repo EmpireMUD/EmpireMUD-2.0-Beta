@@ -1691,9 +1691,11 @@ What you need to do after:
 - update the vehicle's strings (short desc, keywords, long desc, look desc)
 - split the new craft name if necessary (lumberyard -> lumber yard)
 - change the size (it's set to 1 by default)
+- add "road" to the build-on flags if appropriate
 - check any quests, progress goals, etc that were mentioned by this command and
   update them to use the vehicle version if appropriate
 - remove the build-facing from the new craft if possible
+- any scripts on an open building need to be re-written for vehicles
 - review any other notes given by this command and address them if needed
 
 See also: BUILDING-VEHICLES
