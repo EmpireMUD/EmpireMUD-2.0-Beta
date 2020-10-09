@@ -528,12 +528,12 @@ ADMIN_UTIL(util_bldconvert) {
 	int iter;
 	
 	// for searching
+	vehicle_data *veh_iter, *next_veh;
 	struct adventure_link_rule *link;
 	struct interaction_item *inter;
 	quest_data *quest, *next_quest;
 	bld_data *bld_iter, *next_bld;
 	progress_data *prg, *next_prg;
-	vehicle_data *veh, *next_veh;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
 	struct bld_relation *relat;
@@ -888,24 +888,27 @@ ADMIN_UTIL(util_bldconvert) {
 			msg_to_char(ch, "- Building %d %s in requirements for social %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), SOC_VNUM(soc), SOC_NAME(soc));
 		}
 	}
-	HASH_ITER(hh, vehicle_table, veh, next_veh) {
-		if (VEH_INTERIOR_ROOM_VNUM(veh) == from_vnum) {
-			msg_to_char(ch, "- Building %d %s in interior room for vehicle %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+	HASH_ITER(hh, vehicle_table, veh_iter, next_veh) {
+		if (VEH_VNUM(veh_iter) == to_vnum) {
+			continue;	// skip new one
 		}
-		LL_FOREACH(VEH_INTERACTIONS(veh), inter) {
+		if (VEH_INTERIOR_ROOM_VNUM(veh_iter) == from_vnum) {
+			msg_to_char(ch, "- Building %d %s in interior room for vehicle %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
+		}
+		LL_FOREACH(VEH_INTERACTIONS(veh_iter), inter) {
 			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == from_vnum) {
-				msg_to_char(ch, "- Building %d %s in interaction for vehicle %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				msg_to_char(ch, "- Building %d %s in interaction for vehicle %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 				break;
 			}
 		}
-		LL_FOREACH(VEH_RELATIONS(veh), relat) {
+		LL_FOREACH(VEH_RELATIONS(veh_iter), relat) {
 			if (relat->type != BLD_REL_UPGRADES_TO && relat->type != BLD_REL_STORES_LIKE_BLD) {
 				continue;
 			}
 			if (relat->vnum != from_vnum) {
 				continue;
 			}
-			msg_to_char(ch, "- Building %d %s in relations vehicle %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			msg_to_char(ch, "- Building %d %s in relations vehicle %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 			break;
 		}
 	}
