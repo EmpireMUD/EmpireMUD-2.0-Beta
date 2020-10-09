@@ -1684,7 +1684,7 @@ What this tool does:
   (unless it was an OPEN building)
 - copies the craft to create the vehicle version
   - in some cases, it removes the build-facing flag, but keeps them if certain
-    flags, like mountain or water, were set -- you must review these yourself
+    flags were set -- you must review these yourself
 - updates the old craft with a DISMANTLE-ONLY flag
 
 What you need to do after:

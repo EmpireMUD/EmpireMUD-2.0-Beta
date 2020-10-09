@@ -815,6 +815,14 @@ ADMIN_UTIL(util_bldconvert) {
 		if (!IS_SET(GET_CRAFT_BUILD_FACING(to_craft), BLD_ON_MOUNTAIN | BLD_ON_RIVER | BLD_ON_NOT_PLAYER_MADE | BLD_ON_OCEAN | BLD_ON_OASIS | BLD_ON_SWAMP | BLD_ON_SHALLOW_SEA | BLD_ON_COAST | BLD_ON_RIVERBANK | BLD_ON_ESTUARY | BLD_ON_LAKE)) {
 			GET_CRAFT_BUILD_FACING(to_craft) = NOBITS;
 		}
+		else if (GET_CRAFT_BUILD_FACING(to_craft) == (BLD_ON_MOUNTAIN | BLD_ON_FLAT_TERRAIN | BLD_FACING_OPEN_BUILDING)) {
+			// special case for common mountain-facing-mountain buildings
+			GET_CRAFT_BUILD_FACING(to_craft) = NOBITS;
+		}
+		else if (GET_CRAFT_BUILD_FACING(to_craft) == (BLD_ON_SWAMP | BLD_ON_FLAT_TERRAIN | BLD_FACING_OPEN_BUILDING)) {
+			// special case for common swamp-facing-swamp buildings
+			GET_CRAFT_BUILD_FACING(to_craft) = NOBITS;
+		}
 		else {
 			msg_to_char(ch, "- Craft for building %d %s needs build-facing review.\r\n", to_vnum, GET_BLD_NAME(from_bld));
 		}
