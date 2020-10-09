@@ -8105,6 +8105,8 @@ Available flags:
  INTERLINK - rooms can be interlinked with other interlink-flagged places
  IS-RUINS - counts as ruins for city status and building decay
  SLEEP - can sleep and rest in/on it
+ !PAINT - cannot be painted
+ DEDICATE - can be dedicated
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually

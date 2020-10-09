@@ -4394,6 +4394,8 @@ const char *vehicle_flags[] = {
 	"INTERLINK",
 	"IS-RUINS",
 	"SLEEP",	// 30
+	"!PAINT",
+	"DEDICATE",
 	"\n"
 };
 
@@ -4431,6 +4433,8 @@ const char *identify_vehicle_flags[] = {
 	"can interlink",
 	"is ruined",
 	"",	// "SLEEP", (special handling)	// 30
+	"",	// no-paint
+	"can dedicate",
 	"\n"
 };
 

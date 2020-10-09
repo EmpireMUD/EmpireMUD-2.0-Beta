@@ -365,6 +365,7 @@ bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_
 #define ADMIN_UTIL(name)  void name(char_data *ch, char *argument)
 
 ADMIN_UTIL(util_approval);
+ADMIN_UTIL(util_bldconvert);
 ADMIN_UTIL(util_b318_buildings);
 ADMIN_UTIL(util_clear_roles);
 ADMIN_UTIL(util_diminish);
@@ -389,6 +390,7 @@ struct {
 	void (*func)(char_data *ch, char *argument);
 } admin_utils[] = {
 	{ "approval", LVL_CIMPL, util_approval },
+	{ "bldconvert", LVL_CIMPL, util_bldconvert },
 	{ "b318buildings", LVL_CIMPL, util_b318_buildings },
 	{ "clearroles", LVL_CIMPL, util_clear_roles },
 	{ "diminish", LVL_START_IMM, util_diminish },
@@ -497,6 +499,425 @@ ADMIN_UTIL(util_approval) {
 	
 	syslog(SYS_VALID, GET_INVIS_LEV(ch), TRUE, "VALID: %s changed existing approvals to be %s", GET_NAME(ch), to_acc ? "account-wide" : "by character, not account");
 	msg_to_char(ch, "All approvals are now %s.\r\n", to_acc ? "account-wide" : "by character, not account");
+}
+
+
+// util bldconvert <building vnum> <start of new vnums>
+ADMIN_UTIL(util_bldconvert) {
+	extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
+	extern struct bld_relation *copy_bld_relations(struct bld_relation *input_list);
+	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
+	extern struct resource_data *copy_resource_list(struct resource_data *input);
+	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
+	void save_olc_building(descriptor_data *desc);
+	void save_olc_craft(descriptor_data *desc);
+	void save_olc_vehicle(descriptor_data *desc);
+	extern bld_data *setup_olc_building(bld_data *input);
+	extern craft_data *setup_olc_craft(craft_data *input);
+	extern vehicle_data *setup_olc_vehicle(vehicle_data *input);
+	extern const byte interact_vnum_types[NUM_INTERACTS];
+	
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	any_vnum from_vnum, start_to_vnum, to_vnum = NOTHING;
+	craft_data *from_craft = NULL, *to_craft = NULL;
+	bld_data *from_bld = NULL, *to_bld = NULL;
+	struct trig_proto_list *proto_script;
+	struct bld_relation *new_rel;
+	vehicle_data *to_veh = NULL;
+	int iter;
+	
+	// for searching
+	struct adventure_link_rule *link;
+	struct interaction_item *inter;
+	quest_data *quest, *next_quest;
+	bld_data *bld_iter, *next_bld;
+	progress_data *prg, *next_prg;
+	vehicle_data *veh, *next_veh;
+	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
+	struct bld_relation *relat;
+	adv_data *adv, *next_adv;
+	bool any;
+	
+	// stuff to copy
+	bitvector_t functions = NOBITS, designate = NOBITS, room_affs = NOBITS;
+	int fame = 0, military = 0, max_dam = 0, extra_rooms = 0;
+	struct resource_data *yearly_maintenance = NULL;
+	struct interaction_item *interactions = NULL;
+	struct extra_descr_data *ex_descs = NULL;
+	struct bld_relation *relations = NULL;
+	struct spawn_info *spawns = NULL;
+	char *icon = NULL;
+	
+	// basic safety
+	if (!ch->desc) {
+		return;
+	}
+	
+	two_arguments(argument, arg1, arg2);
+	
+	// basic args
+	if (!*arg1 || !*arg2 || !isdigit(*arg1) || !isdigit(*arg2)) {
+		msg_to_char(ch, "Usage: util bldconvert <building vnum> <start of new vnums>\r\n");
+		msg_to_char(ch, "This will find the first free vnum after the <start>, without going over the current 100-vnum block.\r\n");
+		return;
+	}
+	if ((from_vnum = atoi(arg1)) < 0 || !(from_bld = building_proto(from_vnum)) || BLD_FLAGGED(from_bld, BLD_ROOM)) {
+		msg_to_char(ch, "Invalid building vnum '%s'.\r\n", arg1);
+		return;
+	}
+	if (BLD_FLAGGED(from_bld, BLD_BARRIER | BLD_TWO_ENTRANCES)) {
+		msg_to_char(ch, "Building %d %s cannot be converted because it has BARRIER or TWO-ENTRANCES.\r\n", from_vnum, GET_BLD_NAME(from_bld));
+		return;
+	}
+	if ((start_to_vnum = atoi(arg2)) < 0) {
+		msg_to_char(ch, "Invalid start-of-new-vnums number '%s'.\r\n", arg2);
+		return;
+	}
+	
+	// ensure there's a basic craft
+	if ((from_craft = craft_proto(from_vnum)) && (!CRAFT_IS_BUILDING(from_craft) || GET_CRAFT_BUILD_TYPE(from_craft) != from_vnum)) {
+		msg_to_char(ch, "Unable to convert: craft %d is for something other than that building.\r\n", from_vnum);
+		return;
+	}
+	
+	// find free vnum -- check the 100-vnum block starting with start_to_vnum
+	for (iter = start_to_vnum; iter < 100 * (int)(start_to_vnum / 100) && to_vnum == NOTHING; ++iter) {
+		if (vehicle_proto(iter)) {
+			continue;	// vehicle vnum in use
+		}
+		if (from_craft && craft_proto(iter)) {
+			continue;	// need a craft but this one is in-use
+		}
+		if (!BLD_FLAGGED(from_bld, BLD_OPEN) && building_proto(iter)) {
+			continue;	// need a building but this one is in-use
+		}
+		
+		// found!
+		to_vnum = iter;
+		break;
+	}
+	
+	// did we find one?
+	if (to_vnum == NOTHING) {
+		msg_to_char(ch, "Unable to find a free vnum in the %d block after vnum %d.\r\n", 100 * (int)(start_to_vnum / 100), start_to_vnum);
+		return;
+	}
+	
+	// check olc access
+	if (!can_start_olc_edit(ch, OLC_VEHICLE, to_vnum) || (from_craft && !can_start_olc_edit(ch, OLC_CRAFT, to_vnum)) || (!BLD_FLAGGED(from_bld, BLD_OPEN) && !can_start_olc_edit(ch, OLC_BUILDING, to_vnum))) {
+		return;	// sends own message
+	}
+	
+	msg_to_char(ch, "Creating new building-vehicle %d from building %d %s%s%s:\r\n", to_vnum, from_vnum, GET_BLD_NAME(from_bld), from_craft ? ", with craft" : "", !BLD_FLAGGED(from_bld, BLD_OPEN) ? ", with interior" : "");
+	
+	// this will use the character's olc access because it make saving much easier
+	GET_OLC_VNUM(ch->desc) = to_vnum;
+	
+	// ok start with interior (non-open buildings only):
+	if (!BLD_FLAGGED(from_bld, BLD_OPEN)) {
+		// create the interior
+		GET_OLC_TYPE(ch->desc) = OLC_BUILDING;
+		GET_OLC_BUILDING(ch->desc) = to_bld = setup_olc_building(from_bld);
+		GET_BLD_VNUM(to_bld) = to_vnum;
+		
+		// will move these to the vehicle
+		icon = GET_BLD_ICON(to_bld);
+		GET_BLD_ICON(to_bld) = NULL;
+		fame = GET_BLD_FAME(to_bld);
+		GET_BLD_FAME(to_bld) = 0;
+		military = GET_BLD_MILITARY(to_bld);
+		GET_BLD_MILITARY(to_bld) = 0;
+		max_dam = GET_BLD_MAX_DAMAGE(to_bld);
+		GET_BLD_MAX_DAMAGE(to_bld) = 1;
+		extra_rooms = GET_BLD_EXTRA_ROOMS(to_bld);
+		GET_BLD_EXTRA_ROOMS(to_bld) = 0;
+		designate = GET_BLD_DESIGNATE_FLAGS(to_bld);
+		GET_BLD_DESIGNATE_FLAGS(to_bld) = NOBITS;
+		room_affs = GET_BLD_BASE_AFFECTS(to_bld);
+		GET_BLD_BASE_AFFECTS(to_bld) = NOBITS;
+		yearly_maintenance = GET_BLD_YEARLY_MAINTENANCE(to_bld);
+		GET_BLD_YEARLY_MAINTENANCE(to_bld) = NULL;
+		
+		// flags that change
+		REMOVE_BIT(GET_BLD_FLAGS(to_bld), BLD_OPEN | BLD_CLOSED | BLD_TWO_ENTRANCES);
+		SET_BIT(GET_BLD_FLAGS(to_bld), BLD_ROOM);
+		
+		// add a stores-like for the original bld
+		CREATE(new_rel, struct bld_relation, 1);
+		new_rel->type = BLD_REL_STORES_LIKE_BLD;
+		new_rel->vnum = GET_BLD_VNUM(from_bld);
+		LL_APPEND(GET_BLD_RELATIONS(to_bld), new_rel);
+		
+		// and save it
+		save_olc_building(ch->desc);
+		free_building(GET_OLC_BUILDING(ch->desc));
+		GET_OLC_BUILDING(ch->desc) = NULL;
+	}
+	else {
+		// open building: copy portions of it for the vehicle but don't create a new bld
+		icon = GET_BLD_ICON(from_bld) ? str_dup(GET_BLD_ICON(from_bld)) : NULL;
+		fame = GET_BLD_FAME(from_bld);
+		military = GET_BLD_MILITARY(from_bld);
+		functions = GET_BLD_FUNCTIONS(from_bld);
+		max_dam = GET_BLD_MAX_DAMAGE(from_bld);
+		ex_descs = copy_extra_descs(GET_BLD_EX_DESCS(from_bld));
+		room_affs = GET_BLD_BASE_AFFECTS(from_bld);
+		spawns = copy_spawn_list(GET_BLD_SPAWNS(from_bld));
+		relations = copy_bld_relations(GET_BLD_RELATIONS(from_bld));
+		interactions = copy_interaction_list(GET_BLD_INTERACTIONS(from_bld));
+		yearly_maintenance = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(from_bld));
+		
+		// add a stores-like for the original building
+		CREATE(new_rel, struct bld_relation, 1);
+		new_rel->type = BLD_REL_STORES_LIKE_BLD;
+		new_rel->vnum = GET_BLD_VNUM(from_bld);
+		LL_APPEND(relations, new_rel);
+		
+		if (GET_BLD_ARTISAN(from_bld) > 0) {
+			msg_to_char(ch, "- Open building %d %s has an artisan that cannot be copied (to %d).\r\n", from_vnum, GET_BLD_NAME(from_bld), to_vnum);
+		}
+		LL_FOREACH(GET_BLD_SCRIPTS(from_bld), proto_script) {
+			msg_to_char(ch, "- Open building %d %s has trigger %d which cannot be copied (to %d).\r\n", from_vnum, GET_BLD_NAME(from_bld), proto_script->vnum, to_vnum);
+		}
+	}
+	
+	// set up the vehicle
+	{
+		GET_OLC_TYPE(ch->desc) = OLC_VEHICLE;
+		GET_OLC_VEHICLE(ch->desc) = to_veh = setup_olc_vehicle(NULL);
+		VEH_VNUM(to_veh) = to_vnum;
+		
+		// copy kws
+		if (VEH_KEYWORDS(to_veh)) {
+			free(VEH_KEYWORDS(to_veh));
+		}
+		VEH_KEYWORDS(to_veh) = str_dup(GET_BLD_NAME(from_bld));
+		
+		// build short desc
+		if (VEH_SHORT_DESC(to_veh)) {
+			free(VEH_SHORT_DESC(to_veh));
+		}
+		snprintf(buf, sizeof(buf), "%s %s", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
+		strtolower(buf);
+		VEH_SHORT_DESC(to_veh) = str_dup(buf);
+		
+		// build long desc
+		if (VEH_LONG_DESC(to_veh)) {
+			free(VEH_LONG_DESC(to_veh));
+		}
+		snprintf(buf, sizeof(buf), "%s %s is here.", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
+		strtolower(buf);
+		VEH_LONG_DESC(to_veh) = str_dup(CAP(buf));
+		
+		// look desc?
+		if (VEH_LOOK_DESC(to_veh)) {
+			free(VEH_LOOK_DESC(to_veh));
+		}
+		VEH_LOOK_DESC(to_veh) = GET_BLD_DESC(from_bld) ? str_dup(GET_BLD_DESC(from_bld)) : NULL;
+		
+		// icon?
+		if (VEH_ICON(to_veh)) {
+			free(VEH_ICON(to_veh));
+		}
+		VEH_ICON(to_veh) = icon;
+		
+		// basic traits
+		VEH_SIZE(to_veh) = 1;
+		VEH_INTERIOR_ROOM_VNUM(to_veh) = to_bld ? to_vnum : NOWHERE;
+		
+		// flags
+		SET_BIT(VEH_FLAGS(to_veh), VEH_CUSTOMIZABLE | VEH_NO_BUILDING | VEH_NO_LOAD_ONTO_VEHICLE | VEH_VISIBLE_IN_DARK | VEH_BUILDING | VEH_IN);
+		if (BLD_FLAGGED(from_bld, BLD_BURNABLE)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_BURNABLE);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_INTERLINK)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_INTERLINK);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_ALLOW_MOUNTS | BLD_HERD)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_CARRY_MOBS);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_ALLOW_MOUNTS)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_CARRY_VEHICLES);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_IS_RUINS)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_IS_RUINS);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_NO_PAINT)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_NO_PAINT);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_DEDICATE)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_DEDICATE);
+		}
+		if (IS_SET(room_affs, ROOM_AFF_CHAMELEON)) {
+			REMOVE_BIT(room_affs, ROOM_AFF_CHAMELEON);
+			SET_BIT(VEH_FLAGS(to_veh), VEH_CHAMELEON);
+		}
+		
+		// copy traits over
+		VEH_DESIGNATE_FLAGS(to_veh) = designate;
+		VEH_EX_DESCS(to_veh) = ex_descs;
+		VEH_FAME(to_veh) = fame;
+		VEH_FUNCTIONS(to_veh) = functions;
+		VEH_INTERACTIONS(to_veh) = interactions;
+		VEH_MAX_HEALTH(to_veh) = max_dam;
+		VEH_MILITARY(to_veh) = military;
+		VEH_RELATIONS(to_veh) = relations;
+		VEH_ROOM_AFFECTS(to_veh) = room_affs | ROOM_AFF_NO_WORKFORCE_EVOS;
+		VEH_SPAWNS(to_veh) = spawns;
+		VEH_YEARLY_MAINTENANCE(to_veh) = yearly_maintenance;
+		
+		// add 1 if extra rooms is set: it's in addition to the first/main room
+		VEH_MAX_ROOMS(to_veh) = extra_rooms ? (extra_rooms + 1) : 0;
+		
+		if (room_affs) {
+			sprintbit(room_affs, room_aff_bits, buf, TRUE);
+			msg_to_char(ch, "- Vehicle %d %s has affect flags: %s\r\n", to_vnum, GET_BLD_NAME(from_bld), buf);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_LARGE_CITY_RADIUS)) {
+			msg_to_char(ch, "- Building %d %s has LARGE-CITY-RADIUS flag that cannot be copied.\r\n", to_vnum, GET_BLD_NAME(from_bld));
+		}
+		
+		// and save it
+		save_olc_vehicle(ch->desc);
+		free_vehicle(GET_OLC_VEHICLE(ch->desc));
+		GET_OLC_VEHICLE(ch->desc) = NULL;
+	}
+	
+	// add new craft
+	if (from_craft) {
+		GET_OLC_TYPE(ch->desc) = OLC_CRAFT;
+		GET_OLC_CRAFT(ch->desc) = to_craft = setup_olc_craft(from_craft);
+		GET_CRAFT_VNUM(to_craft) = to_vnum;
+		
+		SET_BIT(GET_CRAFT_FLAGS(to_craft), CRAFT_VEHICLE);
+		GET_CRAFT_QUANTITY(to_craft) = 1;
+		GET_CRAFT_OBJECT(to_craft) = to_vnum;
+		GET_CRAFT_BUILD_TYPE(to_craft) = NOTHING;
+		GET_CRAFT_TIME(to_craft) = 1;
+		
+		// only keep facing flags if certain ones are set
+		if (!IS_SET(GET_CRAFT_BUILD_FACING(to_craft), BLD_ON_MOUNTAIN | BLD_ON_RIVER | BLD_ON_NOT_PLAYER_MADE | BLD_ON_OCEAN | BLD_ON_OASIS | BLD_ON_SWAMP | BLD_ON_SHALLOW_SEA | BLD_ON_COAST | BLD_ON_RIVERBANK | BLD_ON_ESTUARY | BLD_ON_LAKE)) {
+			GET_CRAFT_BUILD_FACING(to_craft) = NOBITS;
+		}
+		else {
+			msg_to_char(ch, "- Craft for building %d %s needs build-facing review.\r\n", to_vnum, GET_BLD_NAME(from_bld));
+		}
+		
+		// and save it
+		save_olc_craft(ch->desc);
+		free_craft(GET_OLC_CRAFT(ch->desc));
+		GET_OLC_CRAFT(ch->desc) = NULL;
+	}
+	else {
+		msg_to_char(ch, "- Building %d %s has no craft.\r\n", to_vnum, GET_BLD_NAME(from_bld));
+	}
+	
+	// convert old craft
+	if (from_craft) {
+		GET_OLC_TYPE(ch->desc) = OLC_CRAFT;
+		GET_OLC_CRAFT(ch->desc) = setup_olc_craft(from_craft);
+		GET_OLC_VNUM(ch->desc) = from_vnum;
+		
+		snprintf(buf, sizeof(buf), "dismantle %s", GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)));
+		free(GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)));
+		GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)) = str_dup(buf);
+		
+		SET_BIT(GET_CRAFT_FLAGS(GET_OLC_CRAFT(ch->desc)), CRAFT_DISMANTLE_ONLY);
+		
+		// and save it
+		save_olc_craft(ch->desc);
+		free_craft(GET_OLC_CRAFT(ch->desc));
+		GET_OLC_CRAFT(ch->desc) = NULL;
+	}
+	
+	// and clean up
+	GET_OLC_TYPE(ch->desc) = 0;
+	GET_OLC_VNUM(ch->desc) = NOTHING;
+	
+	// now warn about things linked to it (similar to .b search
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
+			if (link->type == ADV_LINK_BUILDING_EXISTING || link->type == ADV_LINK_BUILDING_NEW || link->type == ADV_LINK_PORTAL_BUILDING_EXISTING || link->type == ADV_LINK_PORTAL_BUILDING_NEW) {
+				if (link->value == from_vnum) {
+					msg_to_char(ch, "- Building %d %s is linked by adventure %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+					break;
+				}
+			}
+		}
+	}
+	HASH_ITER(hh, building_table, bld_iter, next_bld) {
+		LL_FOREACH(GET_BLD_INTERACTIONS(bld_iter), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == from_vnum) {
+				msg_to_char(ch, "- Building %d %s in interactions for building %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_BLD_VNUM(bld_iter), GET_BLD_NAME(bld_iter));
+				break;
+			}
+		}
+		LL_FOREACH(GET_BLD_RELATIONS(bld_iter), relat) {
+			if (relat->type != BLD_REL_UPGRADES_TO && relat->type != BLD_REL_STORES_LIKE_BLD) {
+				continue;
+			}
+			if (relat->vnum != from_vnum) {
+				continue;
+			}
+			msg_to_char(ch, "- Building %d %s in relations for building %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_BLD_VNUM(bld_iter), GET_BLD_NAME(bld_iter));
+			break;
+		}
+	}
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		any = find_requirement_in_list(PRG_TASKS(prg), REQ_OWN_BUILDING, from_vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_VISIT_BUILDING, from_vnum);
+		
+		if (any) {
+			msg_to_char(ch, "- Building %d %s in tasks for progress %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), PRG_VNUM(prg), PRG_NAME(prg));
+		}
+	}
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, from_vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, from_vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_BUILDING, from_vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_BUILDING, from_vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_BUILDING, from_vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_BUILDING, from_vnum)) {
+			msg_to_char(ch, "- Building %d %s in data for quest %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), QUEST_VNUM(quest), QUEST_NAME(quest));
+		}
+	}
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_BUILDING, from_vnum)) {
+			msg_to_char(ch, "- Building %d %s is location for shop %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), SHOP_VNUM(shop), SHOP_NAME(shop));
+		}
+	}
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_OWN_BUILDING, from_vnum) || find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_BUILDING, from_vnum)) {
+			msg_to_char(ch, "- Building %d %s in requirements for social %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), SOC_VNUM(soc), SOC_NAME(soc));
+		}
+	}
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		if (VEH_INTERIOR_ROOM_VNUM(veh) == from_vnum) {
+			msg_to_char(ch, "- Building %d %s in interior room for vehicle %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+		}
+		LL_FOREACH(VEH_INTERACTIONS(veh), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == from_vnum) {
+				msg_to_char(ch, "- Building %d %s in interaction for vehicle %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+				break;
+			}
+		}
+		LL_FOREACH(VEH_RELATIONS(veh), relat) {
+			if (relat->type != BLD_REL_UPGRADES_TO && relat->type != BLD_REL_STORES_LIKE_BLD) {
+				continue;
+			}
+			if (relat->vnum != from_vnum) {
+				continue;
+			}
+			msg_to_char(ch, "- Building %d %s in relations vehicle %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh), VEH_SHORT_DESC(veh));
+			break;
+		}
+	}
+	
+	snprintf(buf, sizeof(buf), "OLC: %s has cloned building %d %s to vehicle %d", GET_NAME(ch), from_vnum, GET_BLD_NAME(from_bld), to_vnum);
+	if (!BLD_FLAGGED(from_bld, BLD_OPEN)) {
+		snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ", interior room bld %d", to_vnum);
+	}
+	if (from_craft) {
+		snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ", and craft %d (with updates to craft %d)", to_vnum, from_vnum);
+	}
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "%s", buf);
 }
 
 
