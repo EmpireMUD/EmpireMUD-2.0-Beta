@@ -1161,6 +1161,11 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 	vrl->room = room;
 	LL_APPEND(VEH_ROOM_LIST(veh), vrl);
 	
+	// count all rooms after the first
+	if (room != VEH_INTERIOR_HOME_ROOM(veh)) {
+		++VEH_INSIDE_ROOMS(veh);
+	}
+	
 	// initial island data
 	if (IN_ROOM(veh)) {
 		update_vehicle_island_and_loc(veh, IN_ROOM(veh));

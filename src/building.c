@@ -1860,7 +1860,6 @@ ACMD(do_designate) {
 			COMPLEX_DATA(home)->inside_rooms++;
 			
 			if (veh) {
-				++VEH_INSIDE_ROOMS(veh);
 				COMPLEX_DATA(new)->vehicle = veh;
 				add_room_to_vehicle(new, veh);
 			}
