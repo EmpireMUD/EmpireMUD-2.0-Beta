@@ -894,6 +894,10 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	if (VEH_OWNER(veh)) {
 		msg_to_char(ch, "Owner: %s%s\t0\r\n", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
 	}
+	if (VEH_MAX_ROOMS(veh) > 0 && (!VEH_OWNER(veh) || VEH_OWNER(veh) == GET_LOYALTY(ch) || IS_IMMORTAL(ch))) {
+		// add +1 for the base room
+		msg_to_char(ch, "Rooms: %d/%d\r\n", VEH_INSIDE_ROOMS(veh) + 1, VEH_MAX_ROOMS(veh) + 1);
+	}
 	
 	msg_to_char(ch, "Type: %s\r\n", skip_filler((proto && !strchr(VEH_SHORT_DESC(proto), '#')) ? VEH_SHORT_DESC(proto) : VEH_SHORT_DESC(veh)));
 	msg_to_char(ch, "Level: %d\r\n", VEH_SCALE_LEVEL(veh));
