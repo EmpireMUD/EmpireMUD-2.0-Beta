@@ -583,7 +583,7 @@ ADMIN_UTIL(util_bldconvert) {
 	}
 	
 	// find free vnum -- check the 100-vnum block starting with start_to_vnum
-	for (iter = start_to_vnum; iter < 100 * (int)(start_to_vnum / 100) && to_vnum == NOTHING; ++iter) {
+	for (iter = start_to_vnum; iter < 100 * (int)(start_to_vnum / 100 + 1) && to_vnum == NOTHING; ++iter) {
 		if (vehicle_proto(iter)) {
 			continue;	// vehicle vnum in use
 		}
