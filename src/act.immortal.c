@@ -776,14 +776,12 @@ ADMIN_UTIL(util_bldconvert) {
 		VEH_FUNCTIONS(to_veh) = functions;
 		VEH_INTERACTIONS(to_veh) = interactions;
 		VEH_MAX_HEALTH(to_veh) = max_dam;
+		VEH_MAX_ROOMS(to_veh) = extra_rooms;
 		VEH_MILITARY(to_veh) = military;
 		VEH_RELATIONS(to_veh) = relations;
 		VEH_ROOM_AFFECTS(to_veh) = room_affs | ROOM_AFF_NO_WORKFORCE_EVOS;
 		VEH_SPAWNS(to_veh) = spawns;
 		VEH_YEARLY_MAINTENANCE(to_veh) = yearly_maintenance;
-		
-		// add 1 if extra rooms is set: it's in addition to the first/main room
-		VEH_MAX_ROOMS(to_veh) = extra_rooms ? (extra_rooms + 1) : 0;
 		
 		if (room_affs) {
 			sprintbit(room_affs, room_aff_bits, buf, TRUE);
