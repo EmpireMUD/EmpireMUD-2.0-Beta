@@ -1694,7 +1694,7 @@ What you need to do after:
 - add "road" to the build-on flags if appropriate
 - check any quests, progress goals, etc that were mentioned by this command and
   update them to use the vehicle version if appropriate
-- remove the build-facing from the new craft if possible
+- remove the build-facing flags from the new craft if possible
 - any scripts on an open building need to be re-written for vehicles
 - review any other notes given by this command and address them if needed
 

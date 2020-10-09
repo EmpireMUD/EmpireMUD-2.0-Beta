@@ -528,16 +528,20 @@ ADMIN_UTIL(util_bldconvert) {
 	int iter;
 	
 	// for searching
+	struct progress_perk *perk, *next_perk;
 	vehicle_data *veh_iter, *next_veh;
 	struct adventure_link_rule *link;
 	struct interaction_item *inter;
 	quest_data *quest, *next_quest;
 	bld_data *bld_iter, *next_bld;
 	progress_data *prg, *next_prg;
+	struct cmdlist_element *cmd;
 	social_data *soc, *next_soc;
 	shop_data *shop, *next_shop;
+	trig_data *trig, *next_trig;
 	struct bld_relation *relat;
 	adv_data *adv, *next_adv;
+	obj_data *obj, *next_obj;
 	bool any;
 	
 	// stuff to copy
@@ -675,6 +679,9 @@ ADMIN_UTIL(util_bldconvert) {
 		new_rel->vnum = GET_BLD_VNUM(from_bld);
 		LL_APPEND(relations, new_rel);
 		
+		if (!GET_BLD_DESC(from_bld)) {
+			msg_to_char(ch, "- Open building %d %s has no description to copy.\r\n", from_vnum, GET_BLD_NAME(from_bld));
+		}
 		if (GET_BLD_ARTISAN(from_bld) > 0) {
 			msg_to_char(ch, "- Open building %d %s has an artisan that cannot be copied (to %d).\r\n", from_vnum, GET_BLD_NAME(from_bld), to_vnum);
 		}
@@ -812,6 +819,10 @@ ADMIN_UTIL(util_bldconvert) {
 		save_olc_craft(ch->desc);
 		free_craft(GET_OLC_CRAFT(ch->desc));
 		GET_OLC_CRAFT(ch->desc) = NULL;
+		
+		if (CRAFT_FLAGGED(from_craft, CRAFT_LEARNED)) {
+			msg_to_char(ch, "- Craft for building %d %s is LEARNED - you must update whatever taught craft %d.\r\n", to_vnum, GET_BLD_NAME(from_bld), from_vnum);
+		}
 	}
 	else {
 		msg_to_char(ch, "- Building %d %s has no craft.\r\n", to_vnum, GET_BLD_NAME(from_bld));
@@ -844,16 +855,19 @@ ADMIN_UTIL(util_bldconvert) {
 		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
 			if (link->type == ADV_LINK_BUILDING_EXISTING || link->type == ADV_LINK_BUILDING_NEW || link->type == ADV_LINK_PORTAL_BUILDING_EXISTING || link->type == ADV_LINK_PORTAL_BUILDING_NEW) {
 				if (link->value == from_vnum) {
-					msg_to_char(ch, "- Building %d %s is linked by adventure %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+					msg_to_char(ch, "- Building %d %s is linked by ADV [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
 					break;
 				}
 			}
 		}
 	}
 	HASH_ITER(hh, building_table, bld_iter, next_bld) {
+		if (GET_BLD_VNUM(bld_iter) == to_vnum) {
+			continue;	// skip self
+		}
 		LL_FOREACH(GET_BLD_INTERACTIONS(bld_iter), inter) {
 			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == from_vnum) {
-				msg_to_char(ch, "- Building %d %s in interactions for building %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_BLD_VNUM(bld_iter), GET_BLD_NAME(bld_iter));
+				msg_to_char(ch, "- Building %d %s in interactions for BLD [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_BLD_VNUM(bld_iter), GET_BLD_NAME(bld_iter));
 				break;
 			}
 		}
@@ -864,8 +878,13 @@ ADMIN_UTIL(util_bldconvert) {
 			if (relat->vnum != from_vnum) {
 				continue;
 			}
-			msg_to_char(ch, "- Building %d %s in relations for building %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_BLD_VNUM(bld_iter), GET_BLD_NAME(bld_iter));
+			msg_to_char(ch, "- Building %d %s in relations for BLD [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_BLD_VNUM(bld_iter), GET_BLD_NAME(bld_iter));
 			break;
+		}
+	}
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == from_vnum) {
+			msg_to_char(ch, "- Craft %d %s in taught by recipe OBJ [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
 		}
 	}
 	HASH_ITER(hh, progress_table, prg, next_prg) {
@@ -873,22 +892,38 @@ ADMIN_UTIL(util_bldconvert) {
 		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_VISIT_BUILDING, from_vnum);
 		
 		if (any) {
-			msg_to_char(ch, "- Building %d %s in tasks for progress %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), PRG_VNUM(prg), PRG_NAME(prg));
+			msg_to_char(ch, "- Building %d %s in tasks for PRG [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), PRG_VNUM(prg), PRG_NAME(prg));
+		}
+		
+		LL_FOREACH_SAFE(PRG_PERKS(prg), perk, next_perk) {
+			if (perk->type == PRG_PERK_CRAFT && perk->value == from_vnum) {
+				msg_to_char(ch, "- Craft %d %s in taught by PRG [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), PRG_VNUM(prg), PRG_NAME(prg));
+				break;
+			}
 		}
 	}
 	HASH_ITER(hh, quest_table, quest, next_quest) {
 		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, from_vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, from_vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_BUILDING, from_vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_BUILDING, from_vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_BUILDING, from_vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_BUILDING, from_vnum)) {
-			msg_to_char(ch, "- Building %d %s in data for quest %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), QUEST_VNUM(quest), QUEST_NAME(quest));
+			msg_to_char(ch, "- Building %d %s in data for QST [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), QUEST_VNUM(quest), QUEST_NAME(quest));
 		}
 	}
 	HASH_ITER(hh, shop_table, shop, next_shop) {
 		if (find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_BUILDING, from_vnum)) {
-			msg_to_char(ch, "- Building %d %s is location for shop %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), SHOP_VNUM(shop), SHOP_NAME(shop));
+			msg_to_char(ch, "- Building %d %s is location for SHOP [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), SHOP_VNUM(shop), SHOP_NAME(shop));
 		}
 	}
 	HASH_ITER(hh, social_table, soc, next_soc) {
 		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_OWN_BUILDING, from_vnum) || find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_BUILDING, from_vnum)) {
-			msg_to_char(ch, "- Building %d %s in requirements for social %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), SOC_VNUM(soc), SOC_NAME(soc));
+			msg_to_char(ch, "- Building %d %s in requirements for SOC [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), SOC_VNUM(soc), SOC_NAME(soc));
+		}
+	}
+	snprintf(buf, sizeof(buf), "%d", from_vnum);
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		LL_FOREACH(trig->cmdlist, cmd) {
+			if (strstr(cmd->cmd, buf)) {
+				msg_to_char(ch, "- Possible mention of building or craft %d %s in TRG [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+				break;
+			}
 		}
 	}
 	HASH_ITER(hh, vehicle_table, veh_iter, next_veh) {
@@ -896,11 +931,11 @@ ADMIN_UTIL(util_bldconvert) {
 			continue;	// skip new one
 		}
 		if (VEH_INTERIOR_ROOM_VNUM(veh_iter) == from_vnum) {
-			msg_to_char(ch, "- Building %d %s in interior room for vehicle %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
+			msg_to_char(ch, "- Building %d %s in interior room for VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 		}
 		LL_FOREACH(VEH_INTERACTIONS(veh_iter), inter) {
 			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == from_vnum) {
-				msg_to_char(ch, "- Building %d %s in interaction for vehicle %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
+				msg_to_char(ch, "- Building %d %s in interaction for VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 				break;
 			}
 		}
@@ -911,7 +946,7 @@ ADMIN_UTIL(util_bldconvert) {
 			if (relat->vnum != from_vnum) {
 				continue;
 			}
-			msg_to_char(ch, "- Building %d %s in relations vehicle %d %s.\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
+			msg_to_char(ch, "- Building %d %s in relations VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
 			break;
 		}
 	}
