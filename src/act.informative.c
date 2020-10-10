@@ -316,33 +316,43 @@ int sort_chart_hash(struct chart_territory *a, struct chart_territory *b) {
  //////////////////////////////////////////////////////////////////////////////
 //// LOOK ASSIST FUNCTIONS ///////////////////////////////////////////////////
 
-/*
- * Given the argument "look at <target>", figure out what object or char
- * matches the target.  First, see if there is another char in the room
- * with the name.  Then check local objs for exdescs.
- *
- * Thanks to Angus Mezick <angus@EDGIL.CCMAIL.COMPUSERVE.COM> for the
- * suggested fix to this problem.
- *
- * @param char_data *ch The looker.
- * @param char *arg What the person typed to look at.
- */
-void look_at_target(char_data *ch, char *arg) {
+/**
+* Given the argument "look at <target>", figure out what object or char
+* matches the target.  First, see if there is another char in the room
+* with the name.  Then check local objs for exdescs.
+*
+* Thanks to Angus Mezick <angus@EDGIL.CCMAIL.COMPUSERVE.COM> for the
+* suggested fix to this problem.
+*
+* @param char_data *ch The looker.
+* @param char *arg What the person typed to look at.
+* @param char *more_args Additional args they passed.
+*/
+void look_at_target(char_data *ch, char *arg, char *more_args) {
+	char targ_arg[MAX_INPUT_LENGTH];
 	int bits, found = FALSE, j, fnum, i = 0;
 	char_data *found_char = NULL;
 	obj_data *obj, *found_obj = NULL;
 	vehicle_data *veh, *found_veh = NULL;
+	bool inv_only = FALSE;
 	char *desc;
 
 	if (!ch->desc)
 		return;
-
+	
+	// if first arg is 'inv', restrict to inventory
+	if (!str_cmp(arg, "i") || !str_cmp(arg, "inv") || !str_cmp(arg, "inventory")) {
+		inv_only = TRUE;
+		one_argument(more_args, targ_arg);
+		arg = targ_arg;
+	}
+	
 	if (!*arg) {
 		send_to_char("Look at what?\r\n", ch);
 		return;
-		}
+	}
 
-	bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &found_char, &found_obj, &found_veh);
+	bits = generic_find(arg, inv_only ? FIND_OBJ_INV : (FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE), ch, &found_char, &found_obj, &found_veh);
 
 	/* Is the target a character? */
 	if (found_char != NULL) {
@@ -2500,13 +2510,13 @@ ACMD(do_examine) {
 	char_data *tmp_char;
 	obj_data *tmp_object;
 
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
 
 	if (!*arg) {
 		send_to_char("Examine what?\r\n", ch);
 		return;
 	}
-	look_at_target(ch, arg);
+	look_at_target(ch, arg, argument);
 
 	generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &tmp_object, &tmp_veh);
 
@@ -2948,7 +2958,7 @@ ACMD(do_inventory) {
 ACMD(do_look) {
 	void look_in_direction(char_data *ch, int dir);
 	
-	char arg2[MAX_INPUT_LENGTH];
+	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	room_data *map;
 	int look_type;
 
@@ -2995,10 +3005,12 @@ ACMD(do_look) {
 		/* did the char type 'look <direction>?' */
 		else if ((look_type = parse_direction(ch, arg)) != NO_DIR)
 			look_in_direction(ch, look_type);
-		else if (is_abbrev(arg, "at"))
-			look_at_target(ch, arg2);
+		else if (is_abbrev(arg, "at")) {
+			half_chop(arg2, arg, arg3);
+			look_at_target(ch, arg, arg3);
+		}
 		else
-			look_at_target(ch, arg);
+			look_at_target(ch, arg, arg2);
 	}
 }
 
