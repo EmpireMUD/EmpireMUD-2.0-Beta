@@ -9492,6 +9492,9 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool 
 		
 		// vehicles in room
 		DL_FOREACH2(ROOM_VEHICLES(loc), veh, next_in_room) {
+			if (!VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+				continue;	// incomplete or on fire
+			}
 			if (by_emp && VEH_OWNER(veh) && by_emp != VEH_OWNER(veh) && (!emp_can_use_vehicle(by_emp, veh, GUESTS_ALLOWED) || !has_relationship(by_emp, VEH_OWNER(veh), DIPL_TRADE))) {
 				continue;	// no permission for veh
 			}
