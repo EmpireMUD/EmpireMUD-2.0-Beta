@@ -1350,6 +1350,8 @@ void process_build_action(char_data *ch) {
 		else {
 			msg_to_char(ch, "You need %s %s to work on this building.\r\n", AN(buf1), buf1);
 		}
+		cancel_action(ch);
+		return;
 	}
 
 	process_build(ch, IN_ROOM(ch), ACT_BUILDING);
