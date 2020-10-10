@@ -528,10 +528,10 @@ ADMIN_UTIL(util_bldconvert) {
 	int iter;
 	
 	// for searching
+	struct interaction_item *inter, *next_inter;
 	struct progress_perk *perk, *next_perk;
 	vehicle_data *veh_iter, *next_veh;
 	struct adventure_link_rule *link;
-	struct interaction_item *inter;
 	quest_data *quest, *next_quest;
 	bld_data *bld_iter, *next_bld;
 	progress_data *prg, *next_prg;
@@ -658,6 +658,32 @@ ADMIN_UTIL(util_bldconvert) {
 		new_rel->vnum = GET_BLD_VNUM(from_bld);
 		LL_APPEND(GET_BLD_RELATIONS(to_bld), new_rel);
 		
+		// check for a ruins-to interaction to take
+		LL_FOREACH_SAFE(GET_BLD_INTERACTIONS(to_bld), inter, next_inter) {
+			if (inter->type == INTERACT_RUINS_TO_VEH) {
+				// move veh ruins straight across
+				LL_DELETE(GET_BLD_INTERACTIONS(to_bld), inter);
+				LL_APPEND(interactions, inter);
+			}
+			else if (inter->type == INTERACT_RUINS_TO_BLD) {
+				if (inter->vnum == 5006 || inter->vnum == 5007 || inter->vnum == 5010) {
+					// safe to move (keep vnum, change to vehicle)
+					inter->type = INTERACT_RUINS_TO_VEH;
+					LL_DELETE(GET_BLD_INTERACTIONS(to_bld), inter);
+					LL_APPEND(interactions, inter);
+				}
+				else {
+					msg_to_char(ch, "- Building %d %s has RUINS-TO-BLD interactions that cannot be converted (removing instead).\r\n", from_vnum, GET_BLD_NAME(from_bld));
+					LL_DELETE(GET_BLD_INTERACTIONS(to_bld), inter);
+					free(inter);
+				}
+			}
+		}
+		
+		LL_FOREACH(GET_BLD_SCRIPTS(from_bld), proto_script) {
+			msg_to_char(ch, "- Building %d %s has trigger %d %s which was copied (to %d) but should be reviewed.\r\n", from_vnum, GET_BLD_NAME(from_bld), proto_script->vnum, (real_trigger(proto_script->vnum) ? GET_TRIG_NAME(real_trigger(proto_script->vnum)) : "UNKNOWN"), to_vnum);
+		}
+		
 		// and save it
 		save_olc_building(ch->desc);
 		free_building(GET_OLC_BUILDING(ch->desc));
@@ -677,6 +703,21 @@ ADMIN_UTIL(util_bldconvert) {
 		interactions = copy_interaction_list(GET_BLD_INTERACTIONS(from_bld));
 		yearly_maintenance = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(from_bld));
 		
+		// validate ruins
+		LL_FOREACH_SAFE(interactions, inter, next_inter) {
+			if (inter->type == INTERACT_RUINS_TO_BLD) {
+				if (inter->vnum == 5006 || inter->vnum == 5007 || inter->vnum == 5010) {
+					// just change type (keep vnum)
+					inter->type = INTERACT_RUINS_TO_VEH;
+				}
+				else {
+					msg_to_char(ch, "- Building %d %s has RUINS-TO-BLD interactions that cannot be converted (removing instead).\r\n", from_vnum, GET_BLD_NAME(from_bld));
+					LL_DELETE(interactions, inter);
+					free(inter);
+				}
+			}
+		}
+		
 		// add a stores-like for the original building
 		CREATE(new_rel, struct bld_relation, 1);
 		new_rel->type = BLD_REL_STORES_LIKE_BLD;
@@ -690,7 +731,7 @@ ADMIN_UTIL(util_bldconvert) {
 			msg_to_char(ch, "- Open building %d %s has an artisan that cannot be copied (to %d).\r\n", from_vnum, GET_BLD_NAME(from_bld), to_vnum);
 		}
 		LL_FOREACH(GET_BLD_SCRIPTS(from_bld), proto_script) {
-			msg_to_char(ch, "- Open building %d %s has trigger %d which cannot be copied (to %d).\r\n", from_vnum, GET_BLD_NAME(from_bld), proto_script->vnum, to_vnum);
+			msg_to_char(ch, "- Open building %d %s has trigger %d %s which cannot be copied (to %d).\r\n", from_vnum, GET_BLD_NAME(from_bld), proto_script->vnum, (real_trigger(proto_script->vnum) ? GET_TRIG_NAME(real_trigger(proto_script->vnum)) : "UNKNOWN"), to_vnum);
 		}
 	}
 	
