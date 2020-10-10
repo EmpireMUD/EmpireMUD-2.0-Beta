@@ -1476,7 +1476,7 @@ ACMD(do_dismantle) {
 	
 	// fall through to dismantle-vehicle?
 	one_argument(argument, arg);
-	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		do_dismantle_vehicle(ch, veh);
 		return;
 	}
@@ -1610,7 +1610,7 @@ void do_customize_room(char_data *ch, char *argument) {
 	if (!ch->desc) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
-	else if (((veh = get_vehicle_in_room_vis(ch, arg)) || ((veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && isname(arg, VEH_KEYWORDS(veh)))) && VEH_FLAGGED(veh, VEH_BUILDING)) {
+	else if (((veh = get_vehicle_in_room_vis(ch, arg, NULL)) || ((veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && isname(arg, VEH_KEYWORDS(veh)))) && VEH_FLAGGED(veh, VEH_BUILDING)) {
 		// pass through to customize-vehicle (probably a building vehicle)
 		do_customize_vehicle(ch, arg2);
 	}
@@ -2083,7 +2083,7 @@ ACMD(do_maintain) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy right now.\r\n");
 	}
-	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		// MAINTAIN VEHICLE
 		if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
 			msg_to_char(ch, "You can't repair something that belongs to someone else.\r\n");
@@ -2203,7 +2203,7 @@ ACMD(do_paint) {
 	else if (!*arg) {
 		msg_to_char(ch, "Paint the building with what?\r\n");
 	}
-	else if (!(paint = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(paint = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have that paint with.\r\n");
 	}
 	else if (!IS_PAINT(paint)) {

@@ -1885,7 +1885,7 @@ ACMD(do_avoid) {
 	if (!*arg) {
 		msg_to_char(ch, "Who would you like to avoid?\r\n");
 	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (vict == ch) {
@@ -2237,7 +2237,7 @@ ACMD(do_follow) {
 	one_argument(argument, buf);
 
 	if (*buf) {
-		if (!(leader = get_char_vis(ch, buf, FIND_CHAR_ROOM))) {
+		if (!(leader = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM))) {
 			send_config_msg(ch, "no_person");
 			return;
 		}
@@ -2994,7 +2994,7 @@ ACMD(do_wake) {
 	if (*arg) {
 		if (GET_POS(ch) == POS_SLEEPING)
 			send_to_char("Maybe you should wake yourself up first.\r\n", ch);
-		else if ((vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)) == NULL)
+		else if ((vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)) == NULL)
 			send_config_msg(ch, "no_person");
 		else if (vict == ch)
 			self = 1;

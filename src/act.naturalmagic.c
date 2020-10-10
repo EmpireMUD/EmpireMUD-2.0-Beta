@@ -220,7 +220,7 @@ ACMD(do_cleanse) {
 	if (!can_use_ability(ch, ABIL_CLEANSE, MANA, cost, COOLDOWN_CLEANSE)) {
 		return;
 	}
-	else if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_CLEANSE)) {
@@ -351,7 +351,7 @@ ACMD(do_confer) {
 	}
 
 	// optional 2nd arg
-	if (*arg2 && !(vict = get_char_vis(ch, arg2, FIND_CHAR_ROOM))) {
+	if (*arg2 && !(vict = get_char_vis(ch, arg2, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -588,7 +588,7 @@ ACMD(do_entangle) {
 
 	// find target
 	one_argument(argument, arg);
-	if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -679,7 +679,7 @@ ACMD(do_heal) {
 	else if (!str_cmp(arg, "party") || !str_cmp(arg, "group")) {
 		party = TRUE;
 	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -837,7 +837,7 @@ ACMD(do_moonrise) {
 	else if (!*arg) {
 		msg_to_char(ch, "Use Moonrise to resurrect whom?\r\n");
 	}
-	else if ((vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if ((vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		if (!IS_DEAD(vict)) {
 			msg_to_char(ch, "You can only resurrect a dead person.\r\n");
 		}
@@ -859,7 +859,7 @@ ACMD(do_moonrise) {
 			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_MOONRISE);
 		}
 	}
-	else if ((corpse = get_obj_in_list_vis(ch, arg, ch->carrying)) || (corpse = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	else if (generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &corpse, NULL)) {
 		// obj target
 		if (!IS_CORPSE(corpse)) {
 			msg_to_char(ch, "You can't resurrect that.\r\n");
@@ -910,7 +910,7 @@ ACMD(do_purify) {
 	else if (!*arg) {
 		msg_to_char(ch, "Purify whom?\r\n");
 	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!IS_NPC(vict) && has_player_tech(vict, PTECH_NO_PURIFY)) {
@@ -979,7 +979,7 @@ ACMD(do_quaff) {
 	if (!*arg) {
 		msg_to_char(ch, "Which potion would you like to quaff?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
 	}
 	else if (!IS_POTION(obj)) {
@@ -1027,7 +1027,7 @@ ACMD(do_rejuvenate) {
 	if (!can_use_ability(ch, ABIL_REJUVENATE, MANA, 0, COOLDOWN_REJUVENATE)) {
 		return;
 	}
-	if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -1100,7 +1100,7 @@ ACMD(do_resurrect) {
 	else if (!*arg) {
 		msg_to_char(ch, "Resurrect whom?\r\n");
 	}
-	else if ((vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if ((vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		// person target
 		if (!IS_DEAD(vict)) {
 			msg_to_char(ch, "You can only resurrect a dead person.\r\n");
@@ -1123,7 +1123,7 @@ ACMD(do_resurrect) {
 			add_offer(vict, ch, OFFER_RESURRECTION, ABIL_RESURRECT);
 		}
 	}
-	else if ((corpse = get_obj_in_list_vis(ch, arg, ch->carrying)) || (corpse = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	else if (generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &corpse, NULL)) {
 		// obj target
 		if (!IS_CORPSE(corpse)) {
 			msg_to_char(ch, "You can't resurrect that.\r\n");
@@ -1185,7 +1185,7 @@ ACMD(do_skybrand) {
 	
 	// find target
 	one_argument(argument, arg);
-	if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -1253,7 +1253,7 @@ ACMD(do_soulsight) {
 	}
 	else if (!*arg)
 		msg_to_char(ch, "Use soulsight upon whom?\r\n");
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (vict == ch)
 		msg_to_char(ch, "You can't use this upon yourself!\r\n");

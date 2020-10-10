@@ -205,7 +205,7 @@ ACMD(do_create) {
 ACMD(do_sacrifice) {
 	obj_data *obj, *next_obj;
 	char_data *god = NULL;
-	int amount = 0, dotmode;
+	int amount = 0, dotmode, number;
 	bool file = FALSE, any = FALSE;
 
 	two_arguments(argument, arg, buf);
@@ -267,8 +267,8 @@ ACMD(do_sacrifice) {
 			}
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-			if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
+			if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
 				msg_to_char(ch, "You don't seem to have any %ss to sacrifice.\r\n", arg);
 				if (god && file) {
 					free_char(god);
@@ -278,9 +278,9 @@ ACMD(do_sacrifice) {
 		}
 
 		while (obj) {
-			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+			next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 			if (!next_obj && can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) && !IN_ROOM(obj))
-				next_obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)));
+				next_obj = get_obj_in_list_vis(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch)));
 			
 			if (CAN_WEAR(obj, ITEM_WEAR_TAKE) && !OBJ_FLAGGED(obj, OBJ_KEEP) && bind_ok(obj, ch)) {
 				amount += perform_sacrifice(ch, god, obj, TRUE);
@@ -295,7 +295,10 @@ ACMD(do_sacrifice) {
 		}
 	}
 	else {
-		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))))
+		char *argptr = arg;
+		number = get_number(&argptr);
+		
+		if (!(obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))))
 			msg_to_char(ch, "You don't seem to have any %ss to sacrifice.\r\n", arg);
 		else if (!CAN_WEAR(obj, ITEM_WEAR_TAKE)) {
 			msg_to_char(ch, "You can't sacrifice an item that you can't pick up!\r\n");

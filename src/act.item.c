@@ -2044,7 +2044,7 @@ static void get_from_container(char_data *ch, obj_data *cont, char *arg, int mod
 	if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER && OBJVAL_FLAGGED(cont, CONT_CLOSED))
 		act("$p is closed.", FALSE, ch, cont, 0, TO_CHAR);
 	else if (obj_dotmode == FIND_INDIV) {
-		if (!(obj = get_obj_in_list_vis(ch, arg, cont->contains))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, cont->contains))) {
 			sprintf(buf, "There doesn't seem to be %s %s in $p.", AN(arg), arg);
 			act(buf, FALSE, ch, cont, 0, TO_CHAR);
 		}
@@ -2054,7 +2054,7 @@ static void get_from_container(char_data *ch, obj_data *cont, char *arg, int mod
 				obj_next = obj->next_content;
 				if (!perform_get_from_container(ch, obj, cont, mode))
 					break;
-				obj = get_obj_in_list_vis(ch, arg, obj_next);
+				obj = get_obj_in_list_vis(ch, arg, NULL, obj_next);
 			}
 		}
 	}
@@ -2175,7 +2175,7 @@ static void get_from_room(char_data *ch, char *arg, int howmany) {
 	dotmode = find_all_dots(arg);
 
 	if (dotmode == FIND_INDIV) {
-		if (!(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			sprintf(buf, "You don't see %s %s here.\r\n", AN(arg), arg);
 			send_to_char(buf, ch);
 		}
@@ -2185,7 +2185,7 @@ static void get_from_room(char_data *ch, char *arg, int howmany) {
 				obj_next = obj->next_content;
 				if (!perform_get_from_room(ch, obj))
 					break;
-				obj = get_obj_in_list_vis(ch, arg, obj_next);
+				obj = get_obj_in_list_vis(ch, arg, NULL, obj_next);
 			}
 		}
 	}
@@ -2222,7 +2222,7 @@ static char_data *give_find_vict(char_data *ch, char *arg) {
 
 	if (!*arg)
 		send_to_char("To whom?\r\n", ch);
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (vict == ch)
 		send_to_char("What's the point of that?\r\n", ch);
@@ -3938,7 +3938,7 @@ void trade_post(char_data *ch, char *argument) {
 		msg_to_char(ch, "The item must be in your inventory. Cost is number of your empire's coins.\r\n");
 		msg_to_char(ch, "Time is in real hours (default: %d).\r\n", config_get_int("trading_post_max_hours"));
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, itemarg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, itemarg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have a %s to trade.", itemarg);
 	}
 	else if (OBJ_BOUND_TO(obj)) {
@@ -4521,13 +4521,13 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 			msg_to_char(ch, "What do you want to store?\r\n");
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, argument, ch->carrying))) {
+		if (!(obj = get_obj_in_list_vis(ch, argument, NULL, ch->carrying))) {
 			msg_to_char(ch, "You don't seem to have any %ss.\r\n", argument);
 			return;
 		}
 
 		while (obj && (dotmode == FIND_ALLDOT || done < total)) {
-			next_obj = get_obj_in_list_vis(ch, argument, obj->next_content);
+			next_obj = get_obj_in_list_vis(ch, argument, NULL, obj->next_content);
 			
 			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 				kept = TRUE;	// mark for later
@@ -4692,7 +4692,7 @@ ACMD(do_combine) {
 	if (!*arg) {
 		msg_to_char(ch, "Combine what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_COMBINE))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, NULL, ch->carrying, INTERACT_COMBINE))) {
 		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE)) {
@@ -4777,15 +4777,17 @@ ACMD(do_drink) {
 	obj_data *obj = NULL;
 	int amount, i, liquid;
 	double thirst_amt, hunger_amt;
-	int type = drink_OBJ;
+	int type = drink_OBJ, number;
 	room_data *to_room;
+	char *argptr = arg;
 
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 
 	if (REAL_NPC(ch))		/* Cannot use GET_COND() on mobs. */
 		return;
 
-	if (!*arg) {
+	if (!*argptr) {
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK))
 			type = drink_ROOM;
 		else if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER)) {
@@ -4802,13 +4804,13 @@ ACMD(do_drink) {
 		}
 	}
 
-	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))) {
-		if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(arg, "water") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)))) {
+	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)))))) {
+		if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(argptr, "water") || isname(argptr, get_room_name(IN_ROOM(ch), FALSE)))) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;
 			}
 		}
-		if (is_abbrev(arg, "river") || is_abbrev(arg, "water")) {
+		if (is_abbrev(argptr, "river") || is_abbrev(argptr, "water")) {
 			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK))
 				type = drink_ROOM;
 			else if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_OUTDOORS(ch)) {
@@ -4995,7 +4997,7 @@ ACMD(do_drop) {
 			sprintf(buf, "What do you want to %s %d of?\r\n", sname, multi);
 			send_to_char(buf, ch);
 			}
-		else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
 				msg_to_char(ch, "What kind of coins do you want to %s?\r\n", sname);
 			}
@@ -5005,7 +5007,7 @@ ACMD(do_drop) {
 		}
 		else {
 			do {
-				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 				this = perform_drop(ch, obj, mode, sname);
 				obj = next_obj;
 				if (this == -1) {
@@ -5055,7 +5057,7 @@ ACMD(do_drop) {
 				send_to_char(buf, ch);
 				return;
 			}
-			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 				if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
 					msg_to_char(ch, "What kind of coins do you want to %s?\r\n", sname);
 				}
@@ -5065,7 +5067,7 @@ ACMD(do_drop) {
 				return;
 			}
 			while (obj) {
-				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 					obj = next_obj;
 					continue;
@@ -5087,7 +5089,7 @@ ACMD(do_drop) {
 			}
 		}
 		else {
-			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 				if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
 					msg_to_char(ch, "What kind of coins do you want to %s?\r\n", sname);
 				}
@@ -5108,26 +5110,27 @@ ACMD(do_eat) {
 	void taste_blood(char_data *ch, char_data *vict);
 	
 	bool extract = FALSE, will_buff = FALSE;
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], *argptr = arg;
 	struct affected_type *af;
 	struct obj_apply *apply;
 	obj_data *food;
-	int eat_hours;
+	int eat_hours, number;
 
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 	
 	// 1. basic validation
 	if (REAL_NPC(ch))		/* Cannot use GET_COND() on mobs. */
 		return;
-	if (!*arg) {
+	if (!*argptr) {
 		send_to_char("Eat what?\r\n", ch);
 		return;
 	}
-	if (!(food = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		if (!(food = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	if (!(food = get_obj_in_list_vis(ch, argptr, &number, ch->carrying))) {
+		if (!(food = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			// special case: Taste Blood
 			char_data *vict;
-			if (subcmd == SCMD_TASTE && IS_VAMPIRE(ch) && has_ability(ch, ABIL_TASTE_BLOOD) && (vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+			if (subcmd == SCMD_TASTE && IS_VAMPIRE(ch) && has_ability(ch, ABIL_TASTE_BLOOD) && (vict = get_char_vis(ch, argptr, &number, FIND_CHAR_ROOM))) {
 				if (check_vampire_sun(ch, TRUE) && !ABILITY_TRIGGERS(ch, vict, NULL, ABIL_TASTE_BLOOD)) {
 					taste_blood(ch, vict);
 				}
@@ -5382,14 +5385,14 @@ ACMD(do_exchange) {
 			if (!*arg) {
 				msg_to_char(ch, "Exchange all of what?\r\n");
 			}
-			else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 				msg_to_char(ch, "You don't seem to have any %ss to exchange.\r\n", arg);
 			}
 			else {
 				carrying = IS_CARRYING_N(ch);
 			
 				while (obj) {
-					next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+					next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 					if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
 						if (!perform_exchange(ch, obj, emp)) {
 							break;
@@ -5404,7 +5407,7 @@ ACMD(do_exchange) {
 			}
 		}
 		else {
-			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 				msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 			}
 			else if (!IS_WEALTH_ITEM(obj) || GET_WEALTH_VALUE(obj) <= 0 || GET_OBJ_VNUM(obj) == NOTHING) {
@@ -5544,13 +5547,13 @@ ACMD(do_give) {
 		else if (!(vict = give_find_vict(ch, argument))) {
 			return;
 		}
-		else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			sprintf(buf, "You don't seem to have any %ss.\r\n", arg);
 			send_to_char(buf, ch);
 		}
 		else {
 			while (obj && amount > 0) {
-				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 				
 				if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
 					perform_give(ch, vict, obj);
@@ -5573,7 +5576,7 @@ ACMD(do_give) {
 		
 		dotmode = find_all_dots(arg);
 		if (dotmode == FIND_INDIV) {
-			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 				sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 				send_to_char(buf, ch);
 			}
@@ -5615,7 +5618,7 @@ ACMD(do_grab) {
 	}
 	else if (!*arg)
 		send_to_char("Hold what?\r\n", ch);
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		if (GET_EQ(ch, WEAR_HOLD) && MATCH_ITEM_NAME(arg, GET_EQ(ch, WEAR_HOLD))) {
 			msg_to_char(ch, "It looks like you're already holding it!\r\n");
 		}
@@ -5721,9 +5724,9 @@ ACMD(do_identify) {
 		list[1] = can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
 		
 		for (iter = 0; iter < 2; ++iter) {
-			obj = get_obj_in_list_vis(ch, arg, list[iter]);
+			obj = get_obj_in_list_vis(ch, arg, NULL, list[iter]);
 			while (obj) {
-				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 				
 				if (run_identifies_to(ch, &obj, &extract)) {
 					any = TRUE;
@@ -5838,11 +5841,11 @@ ACMD(do_keep) {
 			msg_to_char(ch, "What do you want to %s all of?\r\n", sname);
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
 		}
 		while (obj) {
-			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+			next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 			if (mode == SCMD_KEEP) {
 				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 				qt_keep_obj(ch, obj, TRUE);
@@ -5857,7 +5860,7 @@ ACMD(do_keep) {
 		}
 	}
 	else {
-		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 		}
 		else {
@@ -5884,18 +5887,20 @@ ACMD(do_light) {
 	const char *cmdname[] = { "light", "burn" };	// also in do_burn_area
 	
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], *argptr = arg;
 	obj_data *obj, *lighter = NULL;
 	vehicle_data *veh;
 	bool kept = FALSE;
+	int number;
 
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 
 	if (!objless) {
 		lighter = find_lighter_in_list(ch->carrying, &kept);
 	}
 
-	if (!*arg) {
+	if (!*argptr) {
 		sprintf(buf, "%s what?\r\n", cmdname[subcmd]);
 		send_to_char(CAP(buf), ch);
 	}
@@ -5908,9 +5913,9 @@ ACMD(do_light) {
 			msg_to_char(ch, "You don't have anything to %s that with.\r\n", cmdname[subcmd]);
 		}
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_LIGHT)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_LIGHT))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_LIGHT)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_LIGHT))) {
 		// try burning a vehicle
-		if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+		if ((veh = get_vehicle_in_room_vis(ch, argptr, &number))) {
 			do_light_vehicle(ch, veh, lighter);
 		}
 		else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || !str_cmp(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
@@ -6173,7 +6178,7 @@ ACMD(do_pour) {
 			send_to_char("From what do you want to pour?\r\n", ch);
 			return;
 		}
-		if (!(from_obj = get_obj_in_list_vis(ch, arg1, ch->carrying))) {
+		if (!(from_obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying))) {
 			send_to_char("You can't find it!\r\n", ch);
 			return;
 		}
@@ -6187,7 +6192,7 @@ ACMD(do_pour) {
 			send_to_char("What do you want to fill?  And from what are you filling it?\r\n", ch);
 			return;
 		}
-		if (!(to_obj = get_obj_in_list_vis(ch, arg1, ch->carrying))) {
+		if (!(to_obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying))) {
 			send_to_char("You can't find it!\r\n", ch);
 			return;
 		}
@@ -6268,7 +6273,7 @@ ACMD(do_pour) {
 
 			return;
 		}
-		if (!(to_obj = get_obj_in_list_vis(ch, arg2, ch->carrying))) {
+		if (!(to_obj = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying))) {
 			send_to_char("You can't find it!\r\n", ch);
 			return;
 		}
@@ -6389,7 +6394,7 @@ ACMD(do_put) {
 			send_to_char("You'd better open it first!\r\n", ch);
 		else {
 			if (obj_dotmode == FIND_INDIV) {	/* put <obj> <container> */
-				if (!(obj = get_obj_in_list_vis(ch, theobj, ch->carrying))) {
+				if (!(obj = get_obj_in_list_vis(ch, theobj, NULL, ch->carrying))) {
 					sprintf(buf, "You aren't carrying %s %s.\r\n", AN(theobj), theobj);
 					send_to_char(buf, ch);
 				}
@@ -6409,7 +6414,7 @@ ACMD(do_put) {
 						
 						if (!perform_put(ch, obj, cont))
 							break;
-						obj = get_obj_in_list_vis(ch, theobj, next_obj);
+						obj = get_obj_in_list_vis(ch, theobj, NULL, next_obj);
 						found = 1;
 					}
 					
@@ -6505,7 +6510,7 @@ ACMD(do_remove) {
 	}
 	else {
 		/* Returns object pointer but we don't need it, just true/false. */
-		if (!get_object_in_equip_vis(ch, arg, ch->equipment, &i)) {
+		if (!get_obj_in_equip_vis(ch, arg, NULL, ch->equipment, &i)) {
 			sprintf(buf, "You don't seem to be using %s %s.\r\n", AN(arg), arg);
 			send_to_char(buf, ch);
 		}
@@ -6736,7 +6741,7 @@ ACMD(do_seed) {
 	if (!*arg) {
 		msg_to_char(ch, "Remove the seeds from what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SEED))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, NULL, ch->carrying, INTERACT_SEED))) {
 		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEED)) {
@@ -6771,7 +6776,7 @@ ACMD(do_separate) {
 	if (!*arg) {
 		msg_to_char(ch, "Separate what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SEPARATE))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, NULL, ch->carrying, INTERACT_SEPARATE))) {
 		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE)) {
@@ -6807,7 +6812,7 @@ ACMD(do_share) {
 	else if (!*arg) {
 		msg_to_char(ch, "Share what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else {
@@ -6846,7 +6851,7 @@ ACMD(do_sheathe) {
 		from_loc = WEAR_HOLD;
 	}
 	else if (*arg) {
-		if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		if ((obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			// found obj
 			from_loc = NOWHERE;
 		}
@@ -7221,18 +7226,21 @@ ACMD(do_store) {
 		}
 	}
 	else {
+		char *argptr = arg1;
+		int number = get_number(&argptr);
+		
 		if (!*arg1) {
-			msg_to_char(ch, "What do you want to store all of?\r\n");
+			msg_to_char(ch, "What would you like to store all of?\r\n");
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, arg1, ch->carrying)) && (!use_room || !(obj = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch)))))) {
+		if (!(obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) && (!use_room || !(obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)))))) {
 			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg1);
 			return;
 		}
 		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
 			// try to set up next-obj
-			if (!(next_obj = get_obj_in_list_vis(ch, arg1, obj->next_content)) && obj->carried_by && use_room) {
-				next_obj = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch)));
+			if (!(next_obj = get_obj_in_list_vis(ch, argptr, NULL, obj->next_content)) && obj->carried_by && use_room) {
+				next_obj = get_obj_in_list_vis(ch, argptr, NULL, ROOM_CONTENTS(IN_ROOM(ch)));
 			}
 			
 			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), GET_LOYALTY(ch), FALSE)) {
@@ -7384,7 +7392,7 @@ ACMD(do_use) {
 	if (!*arg) {
 		msg_to_char(ch, "Use what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
 	}
 	else {
@@ -7517,13 +7525,13 @@ ACMD(do_wear) {
 			send_to_char("Wear all of what?\r\n", ch);
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, arg1, ch->carrying))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying))) {
 			sprintf(buf, "You don't seem to have any %ss you can wear.\r\n", arg1);
 			send_to_char(buf, ch);
 		}
 		else {
 			while (obj) {
-				next_obj = get_obj_in_list_vis(ch, arg1, obj->next_content);
+				next_obj = get_obj_in_list_vis(ch, arg1, NULL, obj->next_content);
 				if ((where = find_eq_pos(ch, obj, 0)) != NO_WEAR && where < NUM_WEARS && !GET_EQ(ch, where) && can_wear_item(ch, obj, FALSE)) {
 					perform_wear(ch, obj, where);
 					++items_worn;
@@ -7540,7 +7548,7 @@ ACMD(do_wear) {
 		}
 	}
 	else {
-		if (!(obj = get_obj_in_list_vis(ch, arg1, ch->carrying))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying))) {
 			sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg1), arg1);
 			send_to_char(buf, ch);
 		}
@@ -7574,7 +7582,7 @@ ACMD(do_wield) {
 	else if (!*arg) {
 		send_to_char("Wield what?\r\n", ch);
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		if (GET_EQ(ch, WEAR_WIELD) && MATCH_ITEM_NAME(arg, GET_EQ(ch, WEAR_WIELD))) {
 			msg_to_char(ch, "It looks like you're already wielding it!\r\n");
 		}

@@ -472,7 +472,7 @@ OLC_MODULE(mapedit_ruin) {
 	
 	one_argument(argument, arg);
 	
-	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		ruin_vehicle(veh, "$V is ruined.");
 	}
 	else if (*arg) {

@@ -861,7 +861,7 @@ ACMD(do_bite) {
 	else if (!*arg && !(victim = FIGHTING(ch))) {
 		msg_to_char(ch, "Bite whom?\r\n");
 	}
-	else if (!victim && (*arg == UID_CHAR ? !(victim = get_char(arg)) : (subcmd ? (!(victim = get_player_vis(ch, arg, FIND_CHAR_ROOM))) : (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))))) {
+	else if (!victim && (*arg == UID_CHAR ? !(victim = get_char(arg)) : (subcmd ? (!(victim = get_player_vis(ch, arg, FIND_CHAR_ROOM))) : (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))))) {
 		// targeting can be by UID for script/aggro use
 		send_config_msg(ch, "no_person");
 	}
@@ -1199,7 +1199,7 @@ ACMD(do_command) {
 	}
 	else if (!*arg || !*buf)
 		msg_to_char(ch, "Force whom to do what command?\r\n");
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (ch == victim)
 		msg_to_char(ch, "That seems rather pointless, doesn't it?\r\n");
@@ -1319,7 +1319,7 @@ ACMD(do_feed) {
 		msg_to_char(ch, "Feed how much blood?\r\n");
 	else if (amt > GET_BLOOD(ch) - 1)
 		msg_to_char(ch, "You can't give THAT much blood.\r\n");
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if ( ch == victim )
 		msg_to_char(ch, "What would be the point in that?\r\n");
@@ -1552,7 +1552,7 @@ ACMD(do_sire) {
 		msg_to_char(ch, "Sire whom?\r\n");
 	else if (GET_ACTION(ch) != ACT_NONE)
 		msg_to_char(ch, "You're too busy to do that.\r\n");
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (IS_NPC(victim))
 		msg_to_char(ch, "You can't sire an NPC.\r\n");
@@ -1596,7 +1596,7 @@ ACMD(do_veintap) {
 		msg_to_char(ch, "Drain how much blood?\r\n");
 	else if (GET_BLOOD(ch) < amt + 1)
 		msg_to_char(ch, "You can't drain THAT much!\r\n");
-	else if (!(container = get_obj_in_list_vis(ch, buf1, ch->carrying)))
+	else if (!(container = get_obj_in_list_vis(ch, buf1, NULL, ch->carrying)))
 		msg_to_char(ch, "You don't seem to have a %s.\r\n", buf1);
 	else if (GET_OBJ_TYPE(container) != ITEM_DRINKCON)
 		msg_to_char(ch, "You can't drain blood into that!\r\n");

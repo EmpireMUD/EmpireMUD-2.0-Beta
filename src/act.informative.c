@@ -2466,7 +2466,7 @@ ACMD(do_diagnose) {
 	one_argument(argument, buf);
 
 	if (*buf) {
-		if (!(vict = get_char_vis(ch, buf, FIND_CHAR_ROOM)))
+		if (!(vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
 			send_config_msg(ch, "no_person");
 		else
 			diag_char_to_char(vict, ch);

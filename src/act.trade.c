@@ -1453,7 +1453,7 @@ ACMD(do_gen_augment) {
 		msg_to_char(ch, "Usage: %s <item> <type>\r\nYou know how to %s:\r\n", augment_info[subcmd].verb, augment_info[subcmd].verb);
 		list_available_augments(ch, subcmd, NULL);
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, target_arg, ch->carrying)) && !(obj = get_obj_by_char_share(ch, target_arg))) {
+	else if (!(obj = get_obj_in_list_vis(ch, target_arg, NULL, ch->carrying)) && !(obj = get_obj_by_char_share(ch, target_arg))) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", target_arg);
 	}
 	else if (!*augment_arg) {
@@ -2148,7 +2148,7 @@ ACMD(do_learn) {
 			msg_to_char(ch, "You have learned [%d] %s (%s).\r\n", GET_CRAFT_VNUM(recipe), GET_CRAFT_NAME(recipe), craft_types[GET_CRAFT_TYPE(recipe)]);
 		}
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!bind_ok(obj, ch)) {
@@ -2320,7 +2320,7 @@ ACMD(do_recipes) {
 	if (!*arg) {
 		msg_to_char(ch, "Show recipes for which item?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have a %s in your inventory.\r\n", arg);
 	}
 	else {
@@ -2468,7 +2468,7 @@ ACMD(do_reforge) {
 	else if (reforge_data[subcmd].validate_func && !(reforge_data[subcmd].validate_func)(ch)) {
 		// failed validate func -- sends own messages
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_by_char_share(ch, arg))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)) && !(obj = get_obj_by_char_share(ch, arg))) {
 		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
 	}
 	else if (!match_reforge_type(obj, subcmd)) {
@@ -2701,7 +2701,7 @@ ACMD(do_tame) {
 	else if (!*arg) {
 		msg_to_char(ch, "Which animal would you like to tame?\r\n");
 	}
-	else if (!(mob = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!(mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!IS_NPC(mob) || !has_interaction(mob->interactions, INTERACT_TAME)) {

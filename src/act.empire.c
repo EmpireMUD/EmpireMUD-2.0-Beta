@@ -2344,7 +2344,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 	char cost_arg[MAX_INPUT_LENGTH], limit_arg[MAX_INPUT_LENGTH];
 	struct empire_trade_data *trade;
 	double cost;
-	int limit;
+	int limit, number;
 	obj_vnum vnum = NOTHING;
 	obj_data *obj;
 	
@@ -2352,6 +2352,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 	argument = one_argument(argument, cost_arg);
 	argument = one_argument(argument, limit_arg);
 	skip_spaces(&argument);	// remaining arg is item name
+	number = get_number(&argument);
 	
 	// for later
 	cost = floor(atof(cost_arg) * 10.0) / 10.0;	// round to 0.1f
@@ -2373,7 +2374,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 		// max coin is a safe limit here
 		msg_to_char(ch, "That limit is out of bounds.\r\n");
 	}
-	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !GET_OBJ_STORAGE(obj))) {
+	else if (((obj = get_obj_in_list_vis(ch, argument, &number, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, &number, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !GET_OBJ_STORAGE(obj))) {
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
@@ -2409,11 +2410,14 @@ void do_import_remove(char_data *ch, empire_data *emp, char *argument, int subcm
 	struct empire_trade_data *trade, *temp;
 	obj_vnum vnum = NOTHING;
 	obj_data *obj;
+	int number;
+	
+	number = get_number(&argument);
 	
 	if (!*argument) {
 		msg_to_char(ch, "Usage: %s remove <name>\r\n", trade_type[subcmd]);
 	}
-	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && (vnum = GET_OBJ_VNUM(obj)) == NOTHING) {
+	else if (((obj = get_obj_in_list_vis(ch, argument, &number, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, &number, ROOM_CONTENTS(IN_ROOM(ch))))) && (vnum = GET_OBJ_VNUM(obj)) == NOTHING) {
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
@@ -2525,16 +2529,18 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], coin_conv[256];
 	struct empire_trade_data *trade;
 	empire_data *iter, *next_iter;
-	int haveamt, find_type = (subcmd == TRADE_IMPORT ? TRADE_EXPORT : TRADE_IMPORT);
+	int haveamt, number, find_type = (subcmd == TRADE_IMPORT ? TRADE_EXPORT : TRADE_IMPORT);
 	bool has_avail, is_buying, found = FALSE;
 	double rate;
 	obj_vnum vnum = NOTHING;
 	obj_data *obj;
 	
+	number = get_number(&argument);
+	
 	if (!*argument) {
 		msg_to_char(ch, "Usage: %s analyze <item name>\r\n", trade_type[subcmd]);
 	}
-	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !GET_OBJ_STORAGE(obj))) {
+	else if (((obj = get_obj_in_list_vis(ch, argument, &number, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, &number, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !GET_OBJ_STORAGE(obj))) {
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
@@ -3375,7 +3381,7 @@ ACMD(do_abandon) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}
-	else if (*arg && !confirm_arg_1 && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (*arg && !confirm_arg_1 && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		do_abandon_vehicle(ch, veh, confirm);
 	}
 	else if (*arg && !confirm_arg_1 && !(room = find_target_room(ch, arg))) {
@@ -3426,7 +3432,7 @@ ACMD(do_barde) {
 		msg_to_char(ch, "You don't have permission to barde animals here.\r\n");
 	else if (!*arg)
 		msg_to_char(ch, "Which animal would you like to barde?\r\n");
-	else if (!(mob = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (!IS_NPC(mob)) {
 		act("You can't barde $N!", FALSE, ch, 0, mob, TO_CHAR);
@@ -3773,7 +3779,7 @@ ACMD(do_claim) {
 	
 	// look for optional empire
 	if (imm_access && *argument) {
-		if (!get_vehicle_in_room_vis(ch, arg) && (emp = get_empire_by_name(argument))) {
+		if (!get_vehicle_in_room_vis(ch, arg, NULL) && (emp = get_empire_by_name(argument))) {
 			// found empire; used full arg; clear out args
 			*arg = '\0';
 		}
@@ -3802,7 +3808,7 @@ ACMD(do_claim) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to claim for the empire.\r\n");
 	}
-	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		do_claim_vehicle(ch, veh, emp);
 	}
 	else if (*arg) {
@@ -5851,7 +5857,7 @@ ACMD(do_inspire) {
 		}
 		msg_to_char(ch, "\r\n");
 	}
-	else if (!all && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!all && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!emp) {
@@ -5999,7 +6005,7 @@ ACMD(do_manage) {
 	skip_spaces(&argument);
 	
 	// shortcut: manage <vehicle> ...
-	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		do_manage_vehicle(ch, veh, argument);
 		return;
 	}

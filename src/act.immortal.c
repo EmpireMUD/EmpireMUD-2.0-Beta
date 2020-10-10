@@ -7458,7 +7458,7 @@ ACMD(do_advance) {
 	two_arguments(argument, name, level);
 
 	if (*name) {
-   		if (!(victim = get_char_vis(ch, name, FIND_CHAR_WORLD))) {
+   		if (!(victim = get_char_vis(ch, name, NULL, FIND_CHAR_WORLD))) {
 			send_to_char("That player is not here.\r\n", ch);
 			return;
 		}
@@ -7850,11 +7850,13 @@ ACMD(do_autostore) {
 		msg_to_char(ch, "Nobody owns this spot. Use purge instead.\r\n");
 	}
 	else if (*arg) {
-		if ((obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
+		generic_find(arg, FIND_OBJ_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, &obj, &veh);
+		
+		if (obj) {
 			act("$n auto-stores $p.", FALSE, ch, obj, NULL, TO_ROOM);
 			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
 		}
-		else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+		else if (veh) {
 			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM);
 			
 			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
@@ -8110,7 +8112,7 @@ ACMD(do_echo) {
 			*end = '\0';
 		}
 		len = strlen(lbuf);
-		vict = get_char_vis(ch, lbuf, FIND_CHAR_ROOM);
+		vict = get_char_vis(ch, lbuf, NULL, FIND_CHAR_ROOM);
 
 		if (vict) {		
 			// replace with $N
@@ -8546,7 +8548,7 @@ ACMD(do_force) {
 	if (!*arg || !*to_force)
 		send_to_char("Whom do you wish to force do what?\r\n", ch);
 	else if ((GET_ACCESS_LEVEL(ch) < LVL_IMPL) || (str_cmp("all", arg) && str_cmp("room", arg))) {
-		if (!(vict = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
+		if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
 			send_config_msg(ch, "no_person");
 		else if (!REAL_NPC(vict) && GET_REAL_LEVEL(ch) <= GET_REAL_LEVEL(vict))
 			send_to_char("No, no, no!\r\n", ch);
@@ -9141,17 +9143,19 @@ ACMD(do_moveeinv) {
 
 
 ACMD(do_oset) {
-	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
+	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], *obj_arg_ptr = obj_arg;
 	obj_data *obj, *proto;
+	int number;
 	
 	argument = one_argument(argument, obj_arg);
 	argument = any_one_arg(argument, field_arg);
 	skip_spaces(&argument);	// remainder
+	number = get_number(&obj_arg_ptr);
 	
-	if (!*obj_arg || !*field_arg) {
+	if (!*obj_arg_ptr || !*field_arg) {
 		msg_to_char(ch, "Usage: oset <object> <field> <value>\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, obj_arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, obj_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	else if (!(obj = get_obj_in_list_vis(ch, obj_arg_ptr, &number, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, obj_arg_ptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(obj_arg), obj_arg);
 	}
 	else if (is_abbrev(field_arg, "flags")) {
@@ -9385,11 +9389,15 @@ ACMD(do_purge) {
 	char_data *vict, *next_v;
 	vehicle_data *veh;
 	obj_data *obj;
+	int number;
+	char *arg;
 
 	one_argument(argument, buf);
+	arg = buf;
+	number = get_number(&arg);
 
-	if (*buf) {			/* argument supplied. destroy single object or char */
-		if ((vict = get_char_vis(ch, buf, FIND_CHAR_ROOM)) != NULL) {
+	if (*arg) {			/* argument supplied. destroy single object or char */
+		if ((vict = get_char_vis(ch, arg, &number, FIND_CHAR_ROOM)) != NULL) {
 			if (!REAL_NPC(vict) && (GET_REAL_LEVEL(ch) <= GET_REAL_LEVEL(vict))) {
 				send_to_char("Fuuuuuuuuu!\r\n", ch);
 				return;
@@ -9409,11 +9417,11 @@ ACMD(do_purge) {
 			}
 			extract_char(vict);
 		}
-		else if ((obj = get_obj_in_list_vis(ch, buf, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
+		else if ((obj = get_obj_in_list_vis(ch, arg, &number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
 			act("$n destroys $p.", FALSE, ch, obj, 0, TO_ROOM);
 			extract_obj(obj);
 		}
-		else if ((veh = get_vehicle_in_room_vis(ch, buf))) {
+		else if ((veh = get_vehicle_in_room_vis(ch, arg, &number))) {
 			// finish the shipment before transferring or purging a vehicle
 			if (VEH_OWNER(veh) && VEH_SHIPPING_ID(veh) != -1) {
 				DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
@@ -9665,7 +9673,10 @@ ACMD(do_rescale) {
 	else if (level < 0) {
 		msg_to_char(ch, "Invalid level.\r\n");
 	}
-	else if ((vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!generic_find(arg, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_VEHICLE_ROOM, ch, &vict, &obj, &veh)) {
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
+	}
+	else if (vict) {
 		// victim mode
 		if (!IS_NPC(vict)) {
 			msg_to_char(ch, "You can only rescale NPCs.\r\n");
@@ -9685,14 +9696,14 @@ ACMD(do_rescale) {
 			}
 		}
 	}
-	else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (veh) {
 		scale_vehicle_to_level(veh, level);
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled vehicle %s to level %d at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), VEH_SCALE_LEVEL(veh), room_log_identifier(IN_ROOM(ch)));
 		sprintf(buf, "You rescale $V to level %d.", VEH_SCALE_LEVEL(veh));
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 		act("$n rescales $V.", FALSE, ch, NULL, veh, TO_ROOM);
 	}
-	else if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying)) || (obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	else if (obj) {
 		// item mode
 		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
 			scale_item_to_level(obj, level);
@@ -9738,29 +9749,29 @@ ACMD(do_restore) {
 		send_to_char("Whom do you wish to restore?\r\n", ch);
 		return;
 	}
-	else if (!(vict = get_char_vis(ch, name_arg, FIND_CHAR_WORLD))) {
-		if ((veh = get_vehicle_vis(ch, name_arg))) {
-			// found vehicle target here
-			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s at %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(IN_ROOM(ch)));
-			act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR);
+	if (!generic_find(name_arg, FIND_CHAR_ROOM | FIND_CHAR_WORLD | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE | FIND_VEHICLE_WORLD, ch, &vict, NULL, &veh)) {
+		send_config_msg(ch, "no_person");
+		return;
+	}
 	
-			if (GET_INVIS_LEV(ch) > 1 || PRF_FLAGGED(ch, PRF_WIZHIDE)) {
-				act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM);
-			}
-			else {
-				act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM);
-			}
-			
-			REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
-			if (!VEH_IS_DISMANTLING(veh)) {
-				complete_vehicle(veh);
-			}
-			return;
+	// vehicle mode
+	if (veh) {
+		// found vehicle target here
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s at %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(IN_ROOM(ch)));
+		act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR);
+
+		if (GET_INVIS_LEV(ch) > 1 || PRF_FLAGGED(ch, PRF_WIZHIDE)) {
+			act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM);
 		}
-		else {	// no target at all
-			send_config_msg(ch, "no_person");
-			return;
+		else {
+			act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM);
 		}
+		
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		if (!VEH_IS_DISMANTLING(veh)) {
+			complete_vehicle(veh);
+		}
+		return;
 	}
 	
 	// parse type args
@@ -9986,7 +9997,7 @@ ACMD(do_send) {
 		send_to_char("Send what to whom?\r\n", ch);
 		return;
 	}
-	if (!(vict = get_char_vis(ch, arg, FIND_CHAR_WORLD))) {
+	if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD))) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -10042,7 +10053,7 @@ ACMD(do_set) {
 			}
 		}
 		else { /* is_mob */
-			if (!(vict = get_char_vis(ch, name, FIND_CHAR_WORLD))) {
+			if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_WORLD))) {
 				send_to_char("There is no such creature.\r\n", ch);
 				return;
 			}
@@ -10210,7 +10221,7 @@ ACMD(do_slay) {
 	if (!*arg)
 		send_to_char("Slay whom?\r\n", ch);
 	else {
-		if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+		if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 			send_to_char("They aren't here.\r\n", ch);
 		else if (ch == vict)
 			send_to_char("Your mother would be so sad... :(\r\n", ch);
@@ -10251,7 +10262,7 @@ ACMD(do_snoop) {
 
 	if (!*arg)
 		stop_snooping(ch);
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
 		send_to_char("No such person around.\r\n", ch);
 	else if (!victim->desc)
 		send_to_char("There's no link... nothing to snoop.\r\n", ch);
@@ -10353,7 +10364,7 @@ ACMD(do_stat) {
 		if (!*buf2)
 			send_to_char("Stats on which mobile?\r\n", ch);
 		else {
-			if ((victim = get_char_vis(ch, buf2, FIND_CHAR_WORLD | FIND_NPC_ONLY)) != NULL)
+			if ((victim = get_char_vis(ch, buf2, NULL, FIND_CHAR_WORLD | FIND_NPC_ONLY)) != NULL)
 				do_stat_character(ch, victim);
 			else
 				send_to_char("No such mobile around.\r\n", ch);
@@ -10363,7 +10374,7 @@ ACMD(do_stat) {
 		if (!*buf2)
 			send_to_char("Stats on which vehicle?\r\n", ch);
 		else {
-			if ((veh = get_vehicle_vis(ch, buf2)) != NULL) {
+			if ((veh = get_vehicle_vis(ch, buf2, NULL)) != NULL) {
 				do_stat_vehicle(ch, veh);
 			}
 			else {
@@ -10405,27 +10416,33 @@ ACMD(do_stat) {
 		if (!*buf2)
 			send_to_char("Stats on which object?\r\n", ch);
 		else {
-			if ((obj = get_obj_vis(ch, buf2)) != NULL)
+			if ((obj = get_obj_vis(ch, buf2, NULL)) != NULL)
 				do_stat_object(ch, obj);
 			else
 				send_to_char("No such object around.\r\n", ch);
 		}
 	}
 	else {
-		if ((obj = get_object_in_equip_vis(ch, buf1, ch->equipment, &tmp)) != NULL)
+		int number;
+		char *arg;
+		
+		arg = buf1;
+		number = get_number(&arg);
+		
+		if ((obj = get_obj_in_equip_vis(ch, arg, &number, ch->equipment, &tmp)) != NULL)
 			do_stat_object(ch, obj);
-		else if ((obj = get_obj_in_list_vis(ch, buf1, ch->carrying)) != NULL)
+		else if ((obj = get_obj_in_list_vis(ch, arg, &number, ch->carrying)) != NULL)
 			do_stat_object(ch, obj);
-		else if ((victim = get_char_vis(ch, buf1, FIND_CHAR_ROOM)) != NULL)
+		else if ((victim = get_char_vis(ch, arg, &number, FIND_CHAR_ROOM)) != NULL)
 			do_stat_character(ch, victim);
-		else if ((obj = get_obj_in_list_vis(ch, buf1, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL)
+		else if ((obj = get_obj_in_list_vis(ch, arg, &number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL)
 			do_stat_object(ch, obj);
-		else if ((victim = get_char_vis(ch, buf1, FIND_CHAR_WORLD)) != NULL)
+		else if ((victim = get_char_vis(ch, arg, &number, FIND_CHAR_WORLD)) != NULL)
 			do_stat_character(ch, victim);
-		else if ((veh = get_vehicle_in_room_vis(ch, buf1)) || (veh = get_vehicle_vis(ch, buf1))) {
+		else if ((veh = get_vehicle_in_room_vis(ch, arg, &number)) || (veh = get_vehicle_vis(ch, arg, &number))) {
 			do_stat_vehicle(ch, veh);
 		}
-		else if ((obj = get_obj_vis(ch, buf1)) != NULL)
+		else if ((obj = get_obj_vis(ch, arg, &number)) != NULL)
 			do_stat_object(ch, obj);
 		else
 			send_to_char("Nothing around by that name.\r\n", ch);
@@ -10442,7 +10459,7 @@ ACMD(do_switch) {
 		send_to_char("You're already switched.\r\n", ch);
 	else if (!*arg)
 		send_to_char("Switch with whom?\r\n", ch);
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
 		send_to_char("No such character.\r\n", ch);
 	else if (ch == victim)
 		send_to_char("Hee hee... we are jolly funny today, eh?\r\n", ch);
@@ -10593,7 +10610,7 @@ ACMD(do_trans) {
 		
 		send_config_msg(ch, "ok_string");
 	}
-	else if ((victim = get_char_vis(ch, buf, FIND_CHAR_WORLD))) {
+	else if ((victim = get_char_vis(ch, buf, NULL, FIND_CHAR_WORLD))) {
 		if (victim == ch)
 			send_to_char("That doesn't make much sense, does it?\r\n", ch);
 		else {
@@ -10619,7 +10636,7 @@ ACMD(do_trans) {
 			send_config_msg(ch, "ok_string");
 		}
 	}
-	else if ((veh = get_vehicle_vis(ch, buf))) {
+	else if ((veh = get_vehicle_vis(ch, buf, NULL))) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has transferred %s to %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(to_room));
 	
 		// finish the shipment before transferring
@@ -10662,7 +10679,7 @@ ACMD(do_unbind) {
 	if (!*arg) {
 		msg_to_char(ch, "Unbind which object?\r\n");
 	}
-	else if (!(obj = get_obj_vis(ch, arg))) {
+	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &obj, NULL)) {
 		msg_to_char(ch, "Unable to find '%s'.\r\n", argument);
 	}
 	else if (!OBJ_BOUND_TO(obj)) {
@@ -11367,7 +11384,7 @@ ACMD(do_wizutil) {
 
 	if (!*arg)
 		send_to_char("Yes, but for whom?!?\r\n", ch);
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
 		send_to_char("There is no such player.\r\n", ch);
 	else if (IS_NPC(vict))
 		send_to_char("You can't do that to a mob!\r\n", ch);

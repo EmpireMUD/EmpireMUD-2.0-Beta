@@ -2774,9 +2774,12 @@ ACMD(do_bathe) {
 
 ACMD(do_chip) {
 	obj_data *target;
+	int number;
 	int chip_timer = config_get_int("chip_timer");
-
+	char *argptr = arg;
+	
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot chip.\r\n");
@@ -2798,10 +2801,10 @@ ACMD(do_chip) {
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to chip anything here.\r\n");
 	}
-	else if (!*arg) {
+	else if (!*argptr) {
 		msg_to_char(ch, "Chip what?\r\n");
 	}
-	else if (!(target = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_CHIP)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !(target = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_CHIP)))) {
+	else if (!(target = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_CHIP)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !(target = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_CHIP)))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(target), INTERACT_CHIP)) {
@@ -3251,8 +3254,11 @@ ACMD(do_mine) {
 ACMD(do_mint) {
 	empire_data *emp;
 	obj_data *obj;
+	char *argptr = arg;
+	int number;
 	
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't do that.\r\n");
@@ -3283,10 +3289,10 @@ ACMD(do_mint) {
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
 		msg_to_char(ch, "You don't have permission to mint here.\r\n");
 	}
-	else if (!*arg) {
+	else if (!*argptr) {
 		msg_to_char(ch, "Mint which item into coins?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	else if (!(obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!IS_WEALTH_ITEM(obj) || GET_WEALTH_VALUE(obj) <= 0) {
@@ -3388,7 +3394,7 @@ ACMD(do_plant) {
 	else if (!*arg) {
 		msg_to_char(ch, "What do you want to plant?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
 	}
 	else if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
@@ -3507,8 +3513,11 @@ ACMD(do_prospect) {
 
 ACMD(do_saw) {
 	obj_data *obj, *saw;
+	char *argptr = arg;
+	int number;
 
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot saw.\r\n");
@@ -3532,10 +3541,10 @@ ACMD(do_saw) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy doing something else.\r\n");
 	}
-	else if (!*arg) {
+	else if (!*argptr) {
 		msg_to_char(ch, "Saw what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SAW)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_SAW))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_SAW)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_SAW))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SAW)) {
@@ -3562,9 +3571,12 @@ ACMD(do_saw) {
 
 
 ACMD(do_scrape) {
+	char *argptr = arg;
 	obj_data *obj;
+	int number;
 	
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot scrape.\r\n");
@@ -3582,10 +3594,10 @@ ACMD(do_scrape) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy doing something else.\r\n");
 	}
-	else if (!*arg) {
+	else if (!*argptr) {
 		msg_to_char(ch, "Scrape what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SCRAPE)) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_SCRAPE)))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_SCRAPE)) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_SCRAPE)))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SCRAPE)) {
@@ -3634,11 +3646,14 @@ ACMD(do_stop) {
 
 
 ACMD(do_tan) {
+	char *argptr = arg;
 	obj_data *obj;
+	int number;
 	
 	int tan_timer = config_get_int("tan_timer");
 
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't tan.\r\n");
@@ -3649,13 +3664,13 @@ ACMD(do_tan) {
 	else if (!has_player_tech(ch, PTECH_TAN)) {
 		msg_to_char(ch, "You don't have the correct ability to tan anything.\r\n");
 	}
-	else if (!*arg) {
+	else if (!*argptr) {
 		msg_to_char(ch, "What would you like to tan?\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy right now.\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_TAN)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_TAN))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_TAN)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_TAN))) {
 		msg_to_char(ch, "You don't seem to have more to tan.\r\n");
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_TAN)) {

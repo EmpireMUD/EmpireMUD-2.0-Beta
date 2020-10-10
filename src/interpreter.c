@@ -1653,7 +1653,7 @@ ACMD(do_commands) {
 	one_argument(argument, arg);
 
 	if (*arg) {
-		if (!(vict = get_char_vis(ch, arg, FIND_CHAR_WORLD))) {
+		if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD))) {
 			send_to_char("Who is that?\r\n", ch);
 			return;
 		}

@@ -531,12 +531,12 @@ LIBRARY_SCMD(library_shelve) {
 		else if (!*arg) {
 			msg_to_char(ch, "What do you want to shelve %d of?\r\n", multi);
 		}
-		else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
 		}
 		else {
 			do {
-				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 				amount += perform_shelve(ch, obj);
 				obj = next_obj;
 			} while (obj && --multi);
@@ -567,11 +567,11 @@ LIBRARY_SCMD(library_shelve) {
 				msg_to_char(ch, "What do you want to shelve all of?\r\n");
 				return;
 			}
-			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 				msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
 			}
 			while (obj) {
-				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 				if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
 					amount += perform_shelve(ch, obj);
 				}
@@ -579,7 +579,7 @@ LIBRARY_SCMD(library_shelve) {
 			}
 		}
 		else {
-			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 				msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 			}
 			else {

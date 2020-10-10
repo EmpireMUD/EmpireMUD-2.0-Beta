@@ -118,7 +118,7 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 	vehicle_data *veh;
 	
 	// prefer ones here
-	if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+	if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		return veh;
 	}
 	
@@ -221,7 +221,7 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 	}
 
 	// vehicle targeting
-	else if ((tar = get_vehicle_in_target_room_vis(ch, from_room, arg))) {
+	else if ((tar = get_vehicle_in_target_room_vis(ch, from_room, arg, NULL))) {
 		// validation
 		if (!validate_siege_target_vehicle(ch, veh, tar)) {
 			// sends own message
@@ -877,7 +877,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 		msg_to_char(ch, "Usage: customize vehicle <target> <name | longdesc | description> <value | set | none>\r\n");
 	}
 	// vehicle validation
-	else if (!(veh = get_vehicle_in_room_vis(ch, tar_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(tar_arg, VEH_KEYWORDS(veh)))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, tar_arg, NULL)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(tar_arg, VEH_KEYWORDS(veh)))) {
 		msg_to_char(ch, "You don't see that vehicle here.\r\n");
 	}
 	else if (!VEH_FLAGGED(veh, VEH_BUILDING) && !has_player_tech(ch, PTECH_CUSTOMIZE_VEHICLE)) {
@@ -1084,7 +1084,7 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 	obj_dotmode = find_all_dots(arg);
 	
 	if (obj_dotmode == FIND_INDIV) {
-		if (!(obj = get_obj_in_list_vis(ch, arg, VEH_CONTAINS(veh)))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, VEH_CONTAINS(veh)))) {
 			sprintf(buf, "There doesn't seem to be %s %s in $V.", AN(arg), arg);
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 		}
@@ -1094,7 +1094,7 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 				if (!perform_get_from_vehicle(ch, obj, veh, mode)) {
 					break;
 				}
-				obj = get_obj_in_list_vis(ch, arg, next_obj);
+				obj = get_obj_in_list_vis(ch, arg, NULL, next_obj);
 			}
 		}
 	}
@@ -1189,7 +1189,7 @@ void do_sit_on_vehicle(char_data *ch, char *argument, int pos) {
 	else if (GET_POS(ch) == POS_FIGHTING) {
 		msg_to_char(ch, "You can't really do that right now!\r\n");
 	}
-	else if (!(veh = get_vehicle_in_room_vis(ch, argument))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, argument, NULL))) {
 		msg_to_char(ch, "You don't see anything like that here.\r\n");
 	}
 	else if (!validate_sit_on_vehicle(ch, veh, pos, TRUE)) {
@@ -1250,7 +1250,7 @@ void do_put_obj_in_vehicle(char_data *ch, vehicle_data *veh, int dotmode, char *
 	}
 	
 	if (dotmode == FIND_INDIV) {	// put <obj> <vehicle>
-		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			msg_to_char(ch, "You aren't carrying %s %s.\r\n", AN(arg), arg);
 		}
 		else if (multi && OBJ_FLAGGED(obj, OBJ_KEEP)) {
@@ -1268,7 +1268,7 @@ void do_put_obj_in_vehicle(char_data *ch, vehicle_data *veh, int dotmode, char *
 					break;
 				}
 				
-				obj = get_obj_in_list_vis(ch, arg, next_obj);
+				obj = get_obj_in_list_vis(ch, arg, NULL, next_obj);
 				found = TRUE;
 			}
 			
@@ -1350,7 +1350,7 @@ ACMD(do_board) {
 		snprintf(buf, sizeof(buf), "%s what?\r\n", command);
 		send_to_char(CAP(buf), ch);
 	}
-	else if (!(veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
 	}
 	else if (!VEH_INTERIOR_HOME_ROOM(veh) && VEH_INTERIOR_ROOM_VNUM(veh) == NOTHING) {
@@ -1545,7 +1545,7 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 	room_data *was_in, *to_room;
 	obj_data *portal;
 	
-	if (!*arg || !(portal = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	if (!*arg || !(portal = get_obj_in_list_vis(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		msg_to_char(ch, "Which direction is that?\r\n");
 	}
 	else if (!IS_PORTAL(portal) || !(to_room = real_room(GET_PORTAL_TARGET_VNUM(portal)))) {
@@ -1626,7 +1626,7 @@ ACMD(do_drag) {
 		msg_to_char(ch, "Drag what, in which direction?\r\n");
 	}
 	// vehicle validation
-	else if (!(veh = get_vehicle_in_room_vis(ch, what))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, what, NULL))) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(what), what);
 	}
 	else if (!VEH_FLAGGED(veh, VEH_DRAGGABLE)) {
@@ -1855,7 +1855,7 @@ ACMD(do_drive) {
 	else if (!*argument) {
 		msg_to_char(ch, "You must specify a path to %s using a combination of directions and distances.\r\n", drive_data[subcmd].command);
 	}
-	else if (strlen(argument) > 2 && (portal = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
+	else if (strlen(argument) > 2 && (portal = get_obj_in_list_vis(ch, argument, NULL, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
 		do_drive_through_portal(ch, veh, portal, subcmd);
 	}
 	else if (!dir_only && !path_to_room && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
@@ -1976,7 +1976,7 @@ ACMD(do_fire) {
 	}
 	
 	// find what to fire with
-	else if (!(veh = get_vehicle_in_room_vis(ch, veh_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(veh_arg, VEH_KEYWORDS(veh)))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, veh_arg, NULL)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(veh_arg, VEH_KEYWORDS(veh)))) {
 		msg_to_char(ch, "You don't see %s %s here to fire.\r\n", AN(veh_arg), veh_arg);
 	}
 	else if (!VEH_FLAGGED(veh, VEH_SIEGE_WEAPONS)) {
@@ -2072,10 +2072,10 @@ ACMD(do_harness) {
 	if (!*arg1 || !*arg2) {
 		msg_to_char(ch, "Harness whom to what?\r\n");
 	}
-	else if (!(animal = get_char_vis(ch, arg1, FIND_CHAR_ROOM))) {
+	else if (!(animal = get_char_vis(ch, arg1, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!(veh = get_vehicle_in_room_vis(ch, arg2))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, arg2, NULL))) {
 		msg_to_char(ch, "You don't see a %s here.\r\n", arg2);
 	}
 	else if (count_harnessed_animals(veh) >= VEH_ANIMALS_REQUIRED(veh)) {
@@ -2143,7 +2143,7 @@ ACMD(do_lead) {
 	else if (!*arg) {
 		msg_to_char(ch, "Lead whom (or what)?\r\n");
 	}
-	else if ((mob = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if ((mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		// lead mob (we already made sure they aren't leading anything)
 		if (ch == mob) {
 			msg_to_char(ch, "You can't lead yourself.\r\n");
@@ -2173,7 +2173,7 @@ ACMD(do_lead) {
 			GET_LED_BY(mob) = ch;
 		}
 	}
-	else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		// lead vehicle (we already made sure they aren't leading anything)
 		if (!VEH_FLAGGED(veh, VEH_LEADABLE)) {
 			act("You can't lead $V!", FALSE, ch, NULL, veh, TO_CHAR);
@@ -2229,7 +2229,7 @@ ACMD(do_load_vehicle) {
 	if (!*arg1 || !*arg2) {
 		msg_to_char(ch, "Usage: load <mob | vehicle | all> <onto vehicle>\r\n");
 	}
-	else if (!(cont = get_vehicle_in_room_vis(ch, arg2))) {
+	else if (!(cont = get_vehicle_in_room_vis(ch, arg2, NULL))) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg2), arg2);
 	}
 	else if (VEH_IS_DISMANTLING(cont)) {
@@ -2289,7 +2289,7 @@ ACMD(do_load_vehicle) {
 			msg_to_char(ch, "There was nothing you could load here.\r\n");
 		}
 	}
-	else if ((mob = get_char_room_vis(ch, arg1))) {
+	else if ((mob = get_char_room_vis(ch, arg1, NULL))) {
 		// LOAD MOB
 		if (ch == mob) {
 			msg_to_char(ch, "Just board it.\r\n");
@@ -2314,7 +2314,7 @@ ACMD(do_load_vehicle) {
 			perform_load_mob(ch, mob, cont, to_room);
 		}
 	}
-	else if ((veh = get_vehicle_in_room_vis(ch, arg1))) {
+	else if ((veh = get_vehicle_in_room_vis(ch, arg1, NULL))) {
 		// LOAD VEHICLE
 		if (veh == cont) {
 			msg_to_char(ch, "You can't load it into itself.\r\n");
@@ -2372,7 +2372,7 @@ ACMD(do_scrap) {
 	if (!*arg) {
 		msg_to_char(ch, "Scrap what?\r\n");
 	}
-	else if (!(veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		msg_to_char(ch, "You don't see anything like that here.\r\n");
 	}
 	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
@@ -2421,7 +2421,7 @@ ACMD(do_unharness) {
 	if (!*arg2) {
 		msg_to_char(ch, "Unharness which animal from which vehicle?\r\n");
 	}
-	else if (!(veh = get_vehicle_in_room_vis(ch, arg2))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, arg2, NULL))) {
 		msg_to_char(ch, "You don't see a %s here.\r\n", arg2);
 	}
 	else if (*arg1 && !(animal = find_harnessed_mob_by_name(veh, arg1))) {
@@ -2522,7 +2522,7 @@ ACMD(do_unload_vehicle) {
 			msg_to_char(ch, "There was nothing you could unload here.\r\n");
 		}
 	}
-	else if ((mob = get_char_room_vis(ch, arg))) {
+	else if ((mob = get_char_room_vis(ch, arg, NULL))) {
 		// UNLOAD MOB
 		if (ch == mob) {
 			msg_to_char(ch, "You can't unload yourself.\r\n");
@@ -2547,7 +2547,7 @@ ACMD(do_unload_vehicle) {
 			perform_unload_mob(ch, mob, cont);
 		}
 	}
-	else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		// UNLOAD VEHICLE
 		if (veh == cont) {
 			msg_to_char(ch, "You can't unload it from itself.\r\n");

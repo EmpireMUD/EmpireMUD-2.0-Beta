@@ -635,7 +635,7 @@ ACMD(do_collapse) {
 		return;
 	}
 	
-	if (!(portal = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	if (!(portal = get_obj_in_list_vis(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You don't see a %s here.\r\n", arg);
 		return;
 	}
@@ -691,7 +691,7 @@ ACMD(do_colorburst) {
 	
 	// find target
 	one_argument(argument, arg);
-	if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -762,7 +762,7 @@ ACMD(do_disenchant) {
 	else if (!*arg) {
 		msg_to_char(ch, "Disenchant what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
 	}
 	else if (ABILITY_TRIGGERS(ch, NULL, obj, ABIL_DISENCHANT)) {
@@ -825,7 +825,7 @@ ACMD(do_dispel) {
 	if (!can_use_ability(ch, ABIL_DISPEL, MANA, cost, COOLDOWN_DISPEL)) {
 		return;
 	}
-	else if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_DISPEL)) {
@@ -894,7 +894,7 @@ ACMD(do_enervate) {
 	
 	// find target
 	one_argument(argument, arg);
-	if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -1244,7 +1244,7 @@ ACMD(do_siphon) {
 	
 	// find target
 	one_argument(argument, arg);
-	if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -1319,7 +1319,7 @@ ACMD(do_slow) {
 	
 	// find target
 	one_argument(argument, arg);
-	if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -1389,7 +1389,7 @@ ACMD(do_vigor) {
 	if (!can_use_ability(ch, ABIL_VIGOR, MANA, CHOOSE_BY_ABILITY_LEVEL(costs, ch, ABIL_VIGOR), NOTHING)) {
 		return;
 	}
-	else if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (ABILITY_TRIGGERS(ch, vict, NULL, ABIL_VIGOR)) {

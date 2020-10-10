@@ -602,7 +602,7 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 			emp = GET_LOYALTY(mob);
 			inst = get_instance_by_id(MOB_INSTANCE_ID(mob));
 			if (!vict) {
-				vict = get_char_room_vis(mob, vict_arg);
+				vict = get_char_room_vis(mob, vict_arg, NULL);
 			}
 			break;
 		}
@@ -1076,7 +1076,7 @@ void script_heal(void *thing, int type, char *argument) {
 		case MOB_TRIGGER: {
 			level = get_approximate_level((char_data*)thing);
 			if (!victim) {
-				victim = get_char_room_vis((char_data*)thing, targ_arg);
+				victim = get_char_room_vis((char_data*)thing, targ_arg, NULL);
 			}
 			
 			snprintf(log_root, sizeof(log_root), "Mob (%s, VNum %d)::", GET_SHORT((char_data*)thing), GET_MOB_VNUM((char_data*)thing));

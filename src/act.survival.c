@@ -327,9 +327,9 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (!*argument) {
 		msg_to_char(ch, "What did you want to mount?\r\n");
 	}
-	else if (!(mob = get_char_vis(ch, argument, FIND_CHAR_ROOM))) {
+	else if (!(mob = get_char_vis(ch, argument, NULL, FIND_CHAR_ROOM))) {
 		// special case: mount/ride a vehicle
-		if (get_vehicle_in_room_vis(ch, arg)) {
+		if (get_vehicle_in_room_vis(ch, arg, NULL)) {
 			void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
 			do_sit_on_vehicle(ch, arg, POS_SITTING);
 		}
@@ -528,8 +528,12 @@ void do_mount_swap(char_data *ch, char *argument) {
 ACMD(do_butcher) {
 	char_data *proto, *vict;
 	obj_data *corpse;
+	char *argptr;
+	int number;
 	
 	one_argument(argument, arg);
+	argptr = arg;
+	number = get_number(&argptr);
 	
 	if (!*arg) {
 		msg_to_char(ch, "What would you like to butcher?\r\n");
@@ -537,14 +541,14 @@ ACMD(do_butcher) {
 	}
 	
 	// find in inventory
-	corpse = get_obj_in_list_vis(ch, arg, ch->carrying);
+	corpse = get_obj_in_list_vis(ch, argptr, &number, ch->carrying);
 	
 	// find in room
 	if (!corpse) {
-		corpse = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)));
+		corpse = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)));
 	}
 	
-	if (!corpse && (vict = get_char_room_vis(ch, arg))) {
+	if (!corpse && (vict = get_char_room_vis(ch, argptr, &number))) {
 		// no object found but matched a mob in the room
 		act("You need to kill $M first.", FALSE, ch, NULL, vict, TO_CHAR);
 	}
