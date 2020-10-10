@@ -5662,19 +5662,25 @@ ACMD(do_grab) {
 
 ACMD(do_identify) {
 	obj_data *obj, *next_obj, *list[2];
-	bool any, extract = FALSE;
+	bool any, extract = FALSE, inv_only = FALSE;
 	char_data *tmp_char;
 	vehicle_data *veh;
 	int dotmode, iter;
 	
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
+	
+	// if first arg is 'inv', restrict to inventory
+	if (!str_cmp(arg, "i") || !str_cmp(arg, "inv") || !str_cmp(arg, "inventory")) {
+		inv_only = TRUE;
+		one_argument(argument, arg);
+	}
 	
 	if (GET_POS(ch) == POS_FIGHTING) {
 		msg_to_char(ch, "You're too busy to do that now!\r\n");
 		return;
 	}
 	if (!*arg) {
-		msg_to_char(ch, "Identify what object?\r\n");
+		msg_to_char(ch, "Identify what object%s?\r\n", inv_only ? " in your inventory" : "");
 		return;
 	}
 	
@@ -5694,7 +5700,7 @@ ACMD(do_identify) {
 		}
 		
 		// room
-		if (can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		if (!inv_only && can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 			DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
 				if (run_identifies_to(ch, &obj, &extract)) {
 					any = TRUE;
@@ -5710,18 +5716,18 @@ ACMD(do_identify) {
 			command_lag(ch, WAIT_OTHER);
 		}
 		else {
-			msg_to_char(ch, "You don't have anything special to identify.\r\n");
+			msg_to_char(ch, "You don't have anything special to identify%s.\r\n", inv_only ? " in your inventory" : "");
 		}
 	}	// /all
 	else if (dotmode == FIND_ALLDOT) {
 		if (!*arg) {
-			msg_to_char(ch, "Identify all of what?\r\n");
+			msg_to_char(ch, "Identify all of what%s?\r\n", inv_only ? " in your inventory" : "");
 			return;
 		}
 		
 		any = FALSE;
 		list[0] = ch->carrying;
-		list[1] = can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+		list[1] = (!inv_only && can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
 		
 		for (iter = 0; iter < 2; ++iter) {
 			obj = get_obj_in_list_vis(ch, arg, NULL, list[iter]);
@@ -5744,12 +5750,12 @@ ACMD(do_identify) {
 			command_lag(ch, WAIT_OTHER);
 		}
 		else {
-			msg_to_char(ch, "You don't seem to have any %ss to identify.\r\n", arg);
+			msg_to_char(ch, "You don't seem to have any %ss to identify%s.\r\n", arg, inv_only ? " in your inventory" : "");
 		}
 	}	// /all.
 	else {	// specific obj/vehicle
-		if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &obj, &veh)) {
-			msg_to_char(ch, "You see nothing like that here.\r\n");
+		if (!generic_find(arg, inv_only ? FIND_OBJ_INV : (FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE), ch, &tmp_char, &obj, &veh)) {
+			msg_to_char(ch, "You see nothing like that %s.\r\n", inv_only ? "in your inventory" : "here");
 		}
 		else if (obj) {
 			// message first in case the item changes
