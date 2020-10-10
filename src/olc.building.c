@@ -992,6 +992,8 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 	
 	// vehicles
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		any = FALSE;
+		
 		if (VEH_INTERIOR_ROOM_VNUM(veh) == vnum) {
 			any = TRUE;
 		}
