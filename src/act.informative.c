@@ -341,7 +341,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 		return;
 	
 	// if first arg is 'inv', restrict to inventory
-	if (!str_cmp(arg, "i") || !str_cmp(arg, "inv") || !str_cmp(arg, "inventory")) {
+	if (strlen(arg) >= 2 && is_abbrev(arg, "inventory")) {
 		inv_only = TRUE;
 		one_argument(more_args, targ_arg);
 		arg = targ_arg;
