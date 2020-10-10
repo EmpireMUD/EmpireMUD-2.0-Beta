@@ -183,6 +183,10 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 	needs_reverse = needs_facing && to_build && IS_SET(GET_BLD_FLAGS(to_build), BLD_TWO_ENTRANCES);
 	
 	// checks
+	if (to_build && GET_BUILDING(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't %s that here.\r\n", command);
+		return FALSE;
+	}
 	if ((is_closed || needs_facing) && (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE || !IS_OUTDOORS(ch))) {
 		msg_to_char(ch, "You can only %s that out on the map.\r\n", command);
 		return FALSE;
