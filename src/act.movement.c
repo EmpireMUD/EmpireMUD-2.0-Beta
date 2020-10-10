@@ -1213,7 +1213,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_
 		need_movement /= 2.0;
 	}
 	
-	if (IS_RIDING(ch) || EFFECTIVELY_FLYING(ch) || IS_SET(flags, MOVE_EARTHMELD)) {
+	if (IS_RIDING(ch) || EFFECTIVELY_FLYING(ch) || IS_SET(flags, MOVE_EARTHMELD) || IS_INSIDE(from) != IS_INSIDE(to)) {
 		need_movement /= 4.0;
 	}
 	
