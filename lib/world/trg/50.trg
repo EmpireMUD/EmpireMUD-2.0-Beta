@@ -139,4 +139,19 @@ if %room.title% ~= #n
 end
 detach 5010 %room.id%
 ~
+#5011
+Ruins name verifier for flooded ruins~
+5 n 100
+~
+if %self.shortdesc% ~= #n
+  %mod% %self% shortdesc some flooded ruins
+end
+if %self.longdesc% ~= #n
+  %mod% %self% longdesc Some flooded ruins are crumbling here.
+end
+if %self.keywords% ~= #n
+  %mod% %self% keywords ruins flooded
+end
+detach 5011 %self.id%
+~
 $

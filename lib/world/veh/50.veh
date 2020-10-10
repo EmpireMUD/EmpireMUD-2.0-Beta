@@ -5,7 +5,7 @@ The ruins of #n are crumbling here.~
 It seems to have fallen into disrepair.
 ~
 @.&0(\&?@.~
-muwD 19 3 0 0 0 -1 0 1 0
+muwD 19 3 0 0 0 -1 0 4 0
 P
 2
 T 5009
@@ -19,12 +19,24 @@ offer any real protection from the elements, and the piles of debris are
 infested with rats. This is the sort of place that attracts trouble.
 ~
 @.@.&0/]~
-muwD 19 3 0 0 0 -1 0 2 0
+muwD 19 3 0 0 0 -1 0 4 0
 D
 5016 0 0
 P
 2
 T 5009
+S
+#5010
+ruins flooded #n~
+the flooded ruins of #n~
+The flooded ruins of #n are slowly crumbling.~
+It seems to have fallen into disrepair.
+~
+&?~&0|\&?~~
+muwD 19 3 0 0 0 -1 0 4 0
+P
+2
+T 5011
 S
 #5011
 tent small~
