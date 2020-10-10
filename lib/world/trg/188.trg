@@ -1134,7 +1134,7 @@ if !%actor.eq(clothes)%
   halt
 end
 set clothing %actor.eq(clothes)%
-%send% %actor% You see yourself, ~%actor%, wearing @%clothing%.
+%send% %actor% You see yourself, %actor.name%, wearing @%clothing%.
 %echoaround% %actor% You see ~%actor% look into @%self%.
 set vnum %clothing.vnum%
 set clothing_count 1
@@ -1732,6 +1732,9 @@ if %actor.action% == playing
         if !%target%
           %send% %actor% You don't notice anyone here dangerous enough to soothe.
           halt
+        elseif %target.vnum% == 18801
+          %send% %actor% The spirits whisper in the air, 'did you really think it would be that simple to get rid of the horseman?'
+          halt
         else
           %force% %target% madventurecomplete
           wait 1
@@ -1924,7 +1927,7 @@ switch %count_up%
   break
   case 3
     * %send% %actor% ~%self% finally gives up the ghost and healers usher you from the tent!
-    %quest% %actor% finish 18873
+    %quest% %actor% trigger 18873
   break
 done
 set tent %self.room.in_vehicle%
@@ -1933,6 +1936,9 @@ mgoto %tent.room%
 nop %tent.dump%
 %echo% Healers sadly dismantle %tent.shortdesc%.
 %purge% %tent%
+if %actor.quest_finished(18873)%
+  %quest% %actor% finish 18873
+end
 %purge% %self%
 ~
 #18874
