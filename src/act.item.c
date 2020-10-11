@@ -891,6 +891,7 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
 	char buf[MAX_STRING_LENGTH], buf1[256];
+	player_index_data *index;
 	
 	// basic info
 	act("Your analysis of $V reveals:", FALSE, ch, NULL, veh, TO_CHAR);
@@ -905,6 +906,10 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	
 	msg_to_char(ch, "Type: %s\r\n", skip_filler((proto && !strchr(VEH_SHORT_DESC(proto), '#')) ? VEH_SHORT_DESC(proto) : VEH_SHORT_DESC(veh)));
 	msg_to_char(ch, "Level: %d\r\n", VEH_SCALE_LEVEL(veh));
+	
+	if (VEH_PATRON(veh) && (index = find_player_index_by_idnum(VEH_PATRON(veh)))) {
+		msg_to_char(ch, "Dedicated to: %s\r\n", index->fullname);
+	}
 	
 	if (VEH_PAINT_COLOR(veh)) {
 		sprinttype(VEH_PAINT_COLOR(veh), paint_names, buf, sizeof(buf), "UNDEFINED");

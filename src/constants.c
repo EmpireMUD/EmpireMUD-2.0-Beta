@@ -3419,6 +3419,7 @@ const char *room_aff_bits[] = {
 	"REPEL-NPCS",	// 20
 	"REPEL-ANIMALS",
 	"NO-WORKFORCE-EVOS",
+	"*HIDE-REAL-NAME",
 	"\n"
 };
 
@@ -3437,7 +3438,7 @@ const char *room_extra_types[] = {
 	"trench progress",
 	"harvest progress",	// 10
 	"paint color",
-	"quarry workforce progress",
+	"dedicate id",
 	"build recipe",
 	"found time",
 	"redesignate time",	// 15

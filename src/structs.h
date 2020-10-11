@@ -2680,6 +2680,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_REPEL_NPCS  BIT(20)	// u. all npcs are prevented from wandering in
 #define ROOM_AFF_REPEL_ANIMALS  BIT(21)	// v. animals are prevented from wandering in
 #define ROOM_AFF_NO_WORKFORCE_EVOS  BIT(22)	// w. workforce chores that would evolve the tile don't run
+#define ROOM_AFF_HIDE_REAL_NAME  BIT(23)	// x. won't show the real name after a custom name, like Ruins of a House (Ruins)
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
@@ -2698,7 +2699,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_TRENCH_PROGRESS  9
 #define ROOM_EXTRA_HARVEST_PROGRESS  10
 #define ROOM_EXTRA_PAINT_COLOR  11
-	#define ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS  12	// deprecated
+#define ROOM_EXTRA_DEDICATE_ID  12
 #define ROOM_EXTRA_BUILD_RECIPE  13
 #define ROOM_EXTRA_FOUND_TIME  14
 #define ROOM_EXTRA_REDESIGNATE_TIME  15
@@ -5799,7 +5800,7 @@ struct complex_room_data {
 	room_template *rmt_ptr;	// points to room_template_table proto
 	
 	byte entrance;  // direction of entrance
-	int patron;  // for shrine gods
+	// int patron;  // for shrine gods -- removed in b5.108, stored as extra data
 	byte inside_rooms;  // count of designated rooms inside
 	room_data *home_room;  // for interior rooms (and boats and instances), means this is actually part of another room; is saved as vnum to file but is room_data* in real life
 	

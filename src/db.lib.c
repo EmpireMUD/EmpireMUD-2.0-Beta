@@ -6001,12 +6001,15 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				}
 				
 				COMPLEX_DATA(room)->entrance = t[2];
-				COMPLEX_DATA(room)->patron = t[3];
+				// see below for t[3]
 				COMPLEX_DATA(room)->burn_down_time = l_in;
 				COMPLEX_DATA(room)->damage = dbl_in;	// formerly t[5], which is now unused
 				COMPLEX_DATA(room)->private_owner = t[6];
 				
-				// b5.108: now converts the paint color if it sees it here; it's now saved as extra data
+				// b5.108: now converts the dedicate id / paint color if it sees it here; it's now saved as extra data
+				if (t[3] != 0) {
+					set_room_extra_data(room, ROOM_EXTRA_DEDICATE_ID, t[3]);
+				}
 				if (t[7] != 0) {
 					set_room_extra_data(room, ROOM_EXTRA_PAINT_COLOR, t[7]);
 				}
@@ -6274,8 +6277,9 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	
 	// B building data
 	if (COMPLEX_DATA(room)) {
-		// b5.108 note: the last int here was formerly paint color, which is now stored as room extra data
-		fprintf(fl, "B\n%d %d %d %d %ld %.2f %d %d\n", BUILDING_VNUM(room), ROOM_TEMPLATE_VNUM(room), COMPLEX_DATA(room)->entrance, COMPLEX_DATA(room)->patron, COMPLEX_DATA(room)->burn_down_time, COMPLEX_DATA(room)->damage, COMPLEX_DATA(room)->private_owner, 0);
+		// b5.108 note: the 4th int and last int here were formerly dedicate id and paint color, which are now stored as room extra data
+		// it should be safe to re-use these 0 slots after b6 starts
+		fprintf(fl, "B\n%d %d %d %d %ld %.2f %d %d\n", BUILDING_VNUM(room), ROOM_TEMPLATE_VNUM(room), COMPLEX_DATA(room)->entrance, 0, COMPLEX_DATA(room)->burn_down_time, COMPLEX_DATA(room)->damage, COMPLEX_DATA(room)->private_owner, 0);
 	}
 	
 	// C: load commands
@@ -9387,7 +9391,6 @@ struct complex_room_data *init_complex_data() {
 	data->to_build = NULL;
 	
 	data->entrance = NO_DIR;
-	data->patron = 0;
 	data->inside_rooms = 0;
 	data->home_room = NULL;
 	data->private_owner = NOBODY;

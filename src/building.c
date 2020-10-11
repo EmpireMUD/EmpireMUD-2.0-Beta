@@ -527,7 +527,7 @@ void disassociate_building(room_data *room) {
 	delete_room_npcs(room, NULL, TRUE);
 	
 	// remove bits including dismantle
-	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT);
+	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT | ROOM_AFF_HIDE_REAL_NAME);
 	affect_total_room(room);
 
 	// free up the customs
@@ -569,7 +569,6 @@ void disassociate_building(room_data *room) {
 	
 	// some extra data safely clears now
 	remove_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING);
-	remove_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS);
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
@@ -578,6 +577,7 @@ void disassociate_building(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_REDESIGNATE_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_ORIGINAL_BUILDER);
 	remove_room_extra_data(room, ROOM_EXTRA_PAINT_COLOR);
+	remove_room_extra_data(room, ROOM_EXTRA_DEDICATE_ID);
 	
 	// some event types must be canceled
 	cancel_stored_event_room(room, SEV_BURN_DOWN);
@@ -1654,6 +1654,10 @@ void do_customize_room(char_data *ch, char *argument) {
 				ROOM_CUSTOM_NAME(IN_ROOM(ch)) = NULL;
 			}
 			
+			// they lose hide-real-name if they rename it themselves
+			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
+			affect_total_room(IN_ROOM(ch));
+			
 			msg_to_char(ch, "This room no longer has a custom name.\r\n");
 			command_lag(ch, WAIT_ABILITY);
 		}
@@ -1671,6 +1675,10 @@ void do_customize_room(char_data *ch, char *argument) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 			}
 			ROOM_CUSTOM_NAME(IN_ROOM(ch)) = str_dup(arg2);
+			
+			// they lose hide-real-name if they rename it themselves
+			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
+			affect_total_room(IN_ROOM(ch));
 			
 			msg_to_char(ch, "This room is now called \"%s\".\r\n", arg2);
 			command_lag(ch, WAIT_ABILITY);
@@ -1709,36 +1717,125 @@ void do_customize_room(char_data *ch, char *argument) {
 
 
 ACMD(do_dedicate) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	vehicle_data *ded_veh = NULL, *proto;
+	room_data *ded_room = NULL;
 	player_index_data *index;
 	
-	one_argument(argument, arg);
+	two_arguments(argument, arg1, arg2);
 	
-	if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DEDICATE) || !COMPLEX_DATA(IN_ROOM(ch))) {
-		msg_to_char(ch, "You cannot dedicate anything here.\r\n");
+	if (IS_NPC(ch) || !has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
+		msg_to_char(ch, "You don't have permission to dedicate anything (customize).\r\n");
+		return;
 	}
-	else if (ROOM_PATRON(IN_ROOM(ch)) > 0) {
+	if (!*arg1) {
+		msg_to_char(ch, "Usage: dedicate <building | vehicle> <person>\r\n");
+		return;
+	}
+	
+	// determine what they're trying to dedicate
+	if (is_abbrev(arg1, "building") || is_abbrev(arg1, "room") || isname(arg1, skip_filler(get_room_name(HOME_ROOM(IN_ROOM(ch)), FALSE)))) {
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+			// actually dedicate the vehicle we're in
+			ded_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
+		}
+		else {
+			ded_room = IN_ROOM(ch);
+		}
+	}
+	else if (!generic_find(arg1, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &ded_veh)) {
+		msg_to_char(ch, "You don't see %s %s here to dedicate.\r\n", AN(arg1), arg1);
+		return;
+	}
+	
+	// validate dedicate: room
+	if (ded_room && ROOM_PATRON(ded_room) > 0) {
 		msg_to_char(ch, "It is already dedicated.\r\n");
+		return;
 	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You must finish construction before dedicating it.\r\n");
-	}
-	else if (GET_LOYALTY(ch) != ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)))) {
+	if (ded_room && GET_LOYALTY(ch) != ROOM_OWNER(HOME_ROOM(ded_room))) {
 		msg_to_char(ch, "You can only dedicate it if you own it.\r\n");
+		return;
 	}
-	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-		msg_to_char(ch, "You don't have permission to dedicate buildings.\r\n");
+	if (ded_room && !ROOM_BLD_FLAGGED(ded_room, BLD_DEDICATE)) {
+		msg_to_char(ch, "You cannot dedicate anything here.\r\n");
+		return;
 	}
-	else if (!*arg) {
+	
+	// validate dedicate: vehicle
+	if (ded_veh && VEH_PATRON(ded_veh) > 0) {
+		msg_to_char(ch, "It is already dedicated.\r\n");
+		return;
+	}
+	if (ded_veh && !can_use_vehicle(ch, ded_veh, MEMBERS_ONLY)) {
+		act("You need to own $V to dedicate it.", FALSE, ch, NULL, ded_veh, TO_CHAR);
+		return;
+	}
+	if (ded_veh && !VEH_FLAGGED(ded_veh, VEH_DEDICATE)) {
+		act("You cannot dedicate $V.", FALSE, ch, NULL, ded_veh, TO_CHAR);
+		return;
+	}
+	
+	// validate dedicate: general
+	if ((ded_room && !IS_COMPLETE(ded_room)) || (ded_veh && !VEH_IS_COMPLETE(ded_veh))) {
+		msg_to_char(ch, "Finish building it before you dedicate it.\r\n");
+		return;
+	}
+	if ((ded_room && IS_DISMANTLING(ded_room)) || (ded_veh && VEH_IS_DISMANTLING(ded_veh))) {
+		msg_to_char(ch, "You can't dedicate that while it is being dismantled.\r\n");
+		return;
+	}
+	
+	// ok find/validate the player target
+	if (!*arg2) {
 		msg_to_char(ch, "Dedicate this building to whom?\r\n");
+		return;
 	}
-	else if (!(index = find_player_index_by_name(arg))) {
-		msg_to_char(ch, "You must specify a valid player to dedicate the building to.\r\n");
+	if (!(index = find_player_index_by_name(arg))) {
+		msg_to_char(ch, "You must specify a valid player to dedicate it to.\r\n");
+		return;
 	}
-	else {
-		COMPLEX_DATA(IN_ROOM(ch))->patron = index->idnum;
+	
+	// success:
+	if (ded_room) {
 		msg_to_char(ch, "You dedicate the building to %s!\r\n", index->fullname);
 		sprintf(buf, "$n dedicates the building to %s!", index->fullname);
-		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+		set_room_extra_data(ded_room, ROOM_EXTRA_DEDICATE_ID, index->idnum);
+		
+		snprintf(buf, sizeof(buf), "%s of %s", get_room_name(ded_room, FALSE), index->fullname);
+		if (ROOM_CUSTOM_NAME(ded_room)) {
+			free(ROOM_CUSTOM_NAME(ded_room));
+		}
+		else {
+			// if the name wasn't already custom, grant them hide-real-name
+			SET_BIT(ROOM_BASE_FLAGS(ded_room), ROOM_AFF_HIDE_REAL_NAME);
+		}
+		ROOM_CUSTOM_NAME(ded_room) = str_dup(buf);
+		affect_total_room(ded_room);
+	}
+	if (ded_veh) {
+		snprintf(buf, sizeof(buf), "You dedicate $V to %s!\r\n", index->fullname);
+		act(buf, FALSE, ch, NULL, ded_veh, TO_CHAR);
+		snprintf(buf, sizeof(buf), "$n dedicates $V to %s!", index->fullname);
+		act(buf, FALSE, ch, NULL, ded_veh, TO_ROOM);
+		set_vehicle_extra_data(ded_veh, ROOM_EXTRA_DEDICATE_ID, index->idnum);
+		
+		// update strs
+		proto = vehicle_proto(VEH_VNUM(ded_veh));
+		
+		// keywords
+		snprintf(buf, sizeof(buf), "%s %s", VEH_KEYWORDS(ded_veh), index->fullname);
+		if (!proto || VEH_KEYWORDS(ded_veh) != VEH_KEYWORDS(proto)) {
+			free(VEH_KEYWORDS(ded_veh));
+		}
+		VEH_KEYWORDS(ded_veh) = str_dup(buf);
+		
+		// short desc
+		snprintf(buf, sizeof(buf), "%s of %s", VEH_SHORT_DESC(ded_veh), index->fullname);
+		if (!proto || VEH_SHORT_DESC(ded_veh) != VEH_SHORT_DESC(proto)) {
+			free(VEH_SHORT_DESC(ded_veh));
+		}
+		VEH_SHORT_DESC(ded_veh) = str_dup(buf);
 	}
 }
 
@@ -2220,10 +2317,10 @@ ACMD(do_paint) {
 	
 	// validate painting: room
 	if (paint_room && (!can_use_room(ch, paint_room, MEMBERS_ONLY) || ROOM_AFF_FLAGGED(paint_room, ROOM_AFF_UNCLAIMABLE))) {
-		msg_to_char(ch, "You don't have permission to paint here.\r\n");
+		msg_to_char(ch, "You don't have permission to paint it.\r\n");
 		return;
 	}
-	if (paint_room && (!ROOM_IS_CLOSED(paint_room) || !COMPLEX_DATA(paint_room) || !IS_ANY_BUILDING(paint_room) || ROOM_BLD_FLAGGED(paint_room, BLD_NO_PAINT))) {
+	if (paint_room && (!ROOM_IS_CLOSED(paint_room) || !IS_ANY_BUILDING(paint_room) || ROOM_BLD_FLAGGED(paint_room, BLD_NO_PAINT))) {
 		msg_to_char(ch, "You can't paint that.\r\n");
 		return;
 	}
@@ -2240,7 +2337,7 @@ ACMD(do_paint) {
 	
 	// validate painting: general
 	if ((paint_room && !IS_COMPLETE(paint_room)) || (paint_veh && !VEH_IS_COMPLETE(paint_veh))) {
-		msg_to_char(ch, "Finish the building it painting it.\r\n");
+		msg_to_char(ch, "Finish building it before painting it.\r\n");
 		return;
 	}
 	if ((paint_room && IS_DISMANTLING(paint_room)) || (paint_veh && VEH_IS_DISMANTLING(paint_veh))) {

@@ -3983,6 +3983,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 */
 void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 	char lbuf[MAX_STRING_LENGTH], colbuf[256];
+	player_index_data *index;
 	vehicle_data *proto;
 	
 	if (!veh || !ch || !ch->desc) {
@@ -4016,6 +4017,10 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 			}
 		}
 		send_to_char(".\r\n", ch);
+	}
+	
+	if (VEH_PATRON(veh) && (index = find_player_index_by_idnum(VEH_PATRON(veh)))) {
+		msg_to_char(ch, "It is dedicated to %s.\r\n", index->fullname);
 	}
 	
 	if (VEH_PAINT_COLOR(veh)) {

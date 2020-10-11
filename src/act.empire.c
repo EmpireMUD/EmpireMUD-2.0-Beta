@@ -2777,6 +2777,7 @@ const struct manage_data_type manage_data[] = {
 	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, FALSE, 0, NOBITS, mng_nowork },
 	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS, NULL },
 	
+	{ "hide-real-name", NULL, NOTHING, FALSE, ROOM_AFF_HIDE_REAL_NAME, FALSE, LVL_CIMPL, NOBITS, NULL },
 	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS, NULL },
 	
 	{ "\n", NULL, NOTHING, TRUE, NOBITS, FALSE, 0, NOBITS, NULL }	// last

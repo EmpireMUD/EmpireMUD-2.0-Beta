@@ -408,7 +408,6 @@ char *get_room_description(room_data *room) {
 char *get_room_name(room_data *room, bool color) {
 	static char name[MAX_STRING_LENGTH];
 	empire_data *emp = ROOM_OWNER(room);
-	player_index_data *index;
 	crop_data *cp;
 
 	if (color && emp)
@@ -427,12 +426,6 @@ char *get_room_name(room_data *room, bool color) {
 	/* Custom names by type */
 	else if (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_ROUGH)) {
 		strcat(name, "A Winding Path");
-	}
-
-	// patron monuments
-	else if (GET_BUILDING(room) && ROOM_PATRON(room) > 0) {
-		strcat(name, GET_BLD_TITLE(GET_BUILDING(room)));
-		sprintf(name + strlen(name), " of %s", (index = find_player_index_by_idnum(ROOM_PATRON(room))) ? index->fullname : "a Former God");
 	}
 
 	/* Building */
@@ -718,7 +711,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	
 	// append (Real Name) of a room if the name has been customized and DOESN'T appear in the custom name
 	*rlbuf = '\0';
-	if (ROOM_CUSTOM_NAME(room) && !str_str(room_name_color, GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)))) {
+	if (ROOM_CUSTOM_NAME(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_HIDE_REAL_NAME) && !str_str(room_name_color, GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)))) {
 		sprintf(rlbuf, " (%s)", GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)));
 	}
 	
@@ -1060,6 +1053,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	
 	if (IS_ROAD(room) && ROOM_CUSTOM_DESCRIPTION(room)) {
 		msg_to_char(ch, "Sign: %s\r\n", ROOM_CUSTOM_DESCRIPTION(room));
+	}
+	
+	if (ROOM_PATRON(room) && (index = find_player_index_by_idnum(ROOM_PATRON(room)))) {
+		msg_to_char(ch, "It is dedicated to %s.\r\n", index->fullname);
 	}
 	
 	// custom descs on OPEN buildings show here
