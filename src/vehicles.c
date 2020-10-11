@@ -790,6 +790,10 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 		}
 	}
 	
+	if (VEH_PAINT_COLOR(inter_veh)) {
+		set_vehicle_extra_data(ruin, ROOM_EXTRA_PAINT_COLOR, VEH_PAINT_COLOR(inter_veh));
+	}
+	
 	load_vtrigger(ruin);
 	return TRUE;
 }

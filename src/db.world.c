@@ -3419,13 +3419,14 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	room_data *to_room = NULL;
 	bld_data *old_bld, *proto;
 	double save_resources;
-	int dir;
+	int dir, paint;
 	
 	if (!inter_room || !(proto = building_proto(interaction->vnum)) || GET_ROOM_VNUM(inter_room) >= MAP_SIZE) {
 		return FALSE;	// safety: only works on the map
 	}
 	
 	// save data
+	paint = ROOM_PAINT_COLOR(inter_room);
 	old_bld = GET_BUILDING(inter_room);
 	dir = BUILDING_ENTRANCE(inter_room);
 	
@@ -3471,6 +3472,10 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 	
 	complete_building(inter_room);
 	
+	if (paint) {
+		set_room_extra_data(inter_room, ROOM_EXTRA_PAINT_COLOR, paint);
+	}
+	
 	if (ROOM_IS_CLOSED(inter_room)) {
 		create_exit(inter_room, to_room, rev_dir[dir], FALSE);
 	}
@@ -3510,11 +3515,13 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 	bld_data *old_bld;
 	room_data *inside;
 	char *to_free;
+	int paint;
 	
 	if (!inter_room || !(proto = vehicle_proto(interaction->vnum)) || GET_ROOM_VNUM(inter_room) >= MAP_SIZE) {
 		return FALSE;	// safety: only works on the map
 	}
 	
+	paint = ROOM_PAINT_COLOR(inter_room);
 	old_bld = GET_BUILDING(inter_room);
 	ruin = read_vehicle(interaction->vnum, TRUE);
 	vehicle_to_room(ruin, inter_room);
@@ -3609,6 +3616,10 @@ INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
 		if (to_free) {
 			free(to_free);
 		}
+	}
+	
+	if (paint) {
+		set_vehicle_extra_data(ruin, ROOM_EXTRA_PAINT_COLOR, paint);
 	}
 	
 	load_vtrigger(ruin);
