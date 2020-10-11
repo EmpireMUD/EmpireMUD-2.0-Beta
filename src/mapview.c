@@ -1390,8 +1390,8 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	show_veh = find_vehicle_to_show(ch, to_room);
 	painted = (!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_NO_PAINT)) ? (show_veh ? VEH_PAINT_COLOR(show_veh) : ROOM_PAINT_COLOR(to_room)) : FALSE;
 
-	// start with the sector color
-	strcpy(buf, base_color);
+	// start with an empty buf for the icon
+	*buf = '\0';
 
 	if (to_room == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		sprintf(buf, "&0<%soo&0>", chemp ? EMPIRE_BANNER(chemp) : "");
@@ -1682,6 +1682,12 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		}
 	}
 	else {
+		// need a leading color base color?
+		if (*buf != '&') {
+			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, buf);
+			strcpy(buf, lbuf);
+		}
+		
 		// normal color
 		if (strstr(buf, "&?")) {
 			replace_question_color(buf, base_color, lbuf);
