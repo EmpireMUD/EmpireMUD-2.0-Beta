@@ -1795,7 +1795,8 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	extern byte distance_can_see(char_data *ch);
 	
-	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH], dirbuf[MAX_STRING_LENGTH], plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH];
+	char dirbuf[MAX_STRING_LENGTH], plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH], paint_str[256];
 	char_data *vict;
 	int mapsize, dist_iter;
 	vehicle_data *show_veh;
@@ -1858,15 +1859,24 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			
 			// show ships
 			if ((show_veh = find_vehicle_to_show(ch, to_room))) {
-				if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
-					get_informative_vehicle_string(ch, show_veh, infobuf);
-					sprintf(roombuf + strlen(roombuf), " <%s%s%s>", skip_filler(get_vehicle_short_desc(show_veh, ch)), *infobuf ? ": " :"", infobuf);
-				}
-				else if (VEH_OWNER(show_veh) && !VEH_CLAIMS_WITH_ROOM(show_veh) && PRF_FLAGGED(ch, PRF_POLITICAL)) {
-					sprintf(roombuf + strlen(roombuf), " <%s %s>", EMPIRE_ADJECTIVE(VEH_OWNER(show_veh)), skip_filler(get_vehicle_short_desc(show_veh, ch)));
+				if (VEH_PAINT_COLOR(show_veh)) {
+					sprinttype(VEH_PAINT_COLOR(show_veh), paint_names, paint_str, sizeof(paint_str), "painted");
+					*paint_str = LOWER(*paint_str);
+					strcat(paint_str, " ");
 				}
 				else {
-					sprintf(roombuf + strlen(roombuf), " <%s>", skip_filler(get_vehicle_short_desc(show_veh, ch)));
+					*paint_str = '\0';
+				}
+				
+				if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+					get_informative_vehicle_string(ch, show_veh, infobuf);
+					sprintf(roombuf + strlen(roombuf), " <%s%s%s%s>", paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)), *infobuf ? ": " :"", infobuf);
+				}
+				else if (VEH_OWNER(show_veh) && !VEH_CLAIMS_WITH_ROOM(show_veh) && PRF_FLAGGED(ch, PRF_POLITICAL)) {
+					sprintf(roombuf + strlen(roombuf), " <%s %s%s>", EMPIRE_ADJECTIVE(VEH_OWNER(show_veh)), paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)));
+				}
+				else {
+					sprintf(roombuf + strlen(roombuf), " <%s%s>", paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)));
 				}
 			}
 			

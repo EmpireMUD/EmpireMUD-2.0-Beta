@@ -2975,10 +2975,11 @@ void scan_for_tile(char_data *ch, char *argument) {
 	extern int get_map_radius(char_data *ch);
 	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
 	extern bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
+	extern const char *paint_names[];
 
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
-	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
+	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
 	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
 	room_data *map, *room;
@@ -3080,12 +3081,21 @@ void scan_for_tile(char_data *ch, char *argument) {
 						// found a vehicle match but limit what we show
 						if (VEH_FLAGGED(veh, VEH_BUILDING)) {
 							if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
-								get_informative_vehicle_string(ch, veh, temp);
-								if (*temp) {
-									vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s [%s]", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)), temp);
+								if (VEH_PAINT_COLOR(veh)) {
+									sprinttype(VEH_PAINT_COLOR(veh), paint_names, paint_str, sizeof(paint_str), "painted");
+									*paint_str = LOWER(*paint_str);
+									strcat(paint_str, " ");
 								}
 								else {
-									vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)));
+									*paint_str = '\0';
+								}
+								
+								get_informative_vehicle_string(ch, veh, temp);
+								if (*temp) {
+									vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s [%s]", *veh_string ? ", " : "", paint_str, skip_filler(VEH_SHORT_DESC(veh)), temp);
+								}
+								else {
+									vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s", *veh_string ? ", " : "", paint_str, skip_filler(VEH_SHORT_DESC(veh)));
 								}
 							}
 							else if (!VEH_OWNER(veh) || VEH_CLAIMS_WITH_ROOM(veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
