@@ -1670,8 +1670,14 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		// buf is the icon
 		replace_color_codes(buf, col_buf);
 		
+		// check for ? colors
 		if (strstr(buf, "&?")) {
 			replace_question_color(buf, base_color, lbuf);
+			strcpy(buf, lbuf);
+		}
+		// need a leading color base color?
+		if (*buf != '&') {
+			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, buf);
 			strcpy(buf, lbuf);
 		}
 	}
