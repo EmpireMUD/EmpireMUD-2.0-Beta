@@ -43,7 +43,9 @@
 * @return int The number of items sacrificed.
 */
 static int perform_sacrifice(char_data *ch, char_data *god, obj_data *obj, bool message) {
+	bool any_patron = FALSE;
 	double bonus = 1.0;
+	vehicle_data *veh;
 	int num = 1;
 	
 	if (IS_STOLEN(obj)) {
@@ -60,6 +62,18 @@ static int perform_sacrifice(char_data *ch, char_data *god, obj_data *obj, bool 
 	
 	/* Determine monument bonus */
 	if (ROOM_PATRON(IN_ROOM(ch)) == GET_IDNUM(god)) {
+		any_patron = TRUE;
+	}
+	else {	// look for a vehicle
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
+			if (VEH_PATRON(veh) == GET_IDNUM(god)) {
+				any_patron = TRUE;
+				break;
+			}
+		}
+	}
+	
+	if (any_patron) {
 		bonus = 1.50;
 	}
 
