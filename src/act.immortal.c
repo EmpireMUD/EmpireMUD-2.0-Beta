@@ -187,7 +187,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 			continue;
 		}
 
-		act(buf, TRUE, ch, 0, t, TO_VICT);
+		act(buf, TRUE, ch, 0, t, TO_VICT | DG_NO_TRIG);
 	}
 
 	char_from_room(ch);
@@ -212,7 +212,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 			continue;
 		}
 		
-		act(buf, TRUE, ch, 0, t, TO_VICT);
+		act(buf, TRUE, ch, 0, t, TO_VICT | DG_NO_TRIG);
 	}
 	
 	qt_visit_room(ch, IN_ROOM(ch));
@@ -233,9 +233,9 @@ void perform_immort_invis(char_data *ch, int level) {
 		if (tch == ch)
 			continue;
 		if (GET_ACCESS_LEVEL(tch) >= GET_INVIS_LEV(ch) && GET_ACCESS_LEVEL(tch) < level)
-			act("You blink and suddenly realize that $n is gone.", FALSE, ch, 0, tch, TO_VICT);
+			act("You blink and suddenly realize that $n is gone.", FALSE, ch, 0, tch, TO_VICT | DG_NO_TRIG);
 		if (GET_ACCESS_LEVEL(tch) < GET_INVIS_LEV(ch) && GET_ACCESS_LEVEL(tch) >= level)
-			act("You suddenly realize that $n is standing beside you.", FALSE, ch, 0, tch, TO_VICT);
+			act("You suddenly realize that $n is standing beside you.", FALSE, ch, 0, tch, TO_VICT | DG_NO_TRIG);
 	}
 
 	GET_INVIS_LEV(ch) = level;
@@ -7515,7 +7515,7 @@ ACMD(do_advance) {
 			"to the elements of time and space itself.\r\n"
 			"Suddenly a silent explosion of light\r\n"
 			"snaps you back to reality.\r\n\r\n"
-			"You feel slightly different.", FALSE, ch, 0, victim, TO_VICT);
+			"You feel slightly different.", FALSE, ch, 0, victim, TO_VICT | DG_NO_TRIG);
 	}
 
 	send_config_msg(ch, "ok_string");
@@ -7856,11 +7856,11 @@ ACMD(do_autostore) {
 		generic_find(arg, FIND_OBJ_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, &obj, &veh);
 		
 		if (obj) {
-			act("$n auto-stores $p.", FALSE, ch, obj, NULL, TO_ROOM);
+			act("$n auto-stores $p.", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
 			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
 		}
 		else if (veh) {
-			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
 			
 			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
@@ -7874,7 +7874,7 @@ ACMD(do_autostore) {
 		send_config_msg(ch, "ok_string");
 	}
 	else {			// no argument. clean out the room
-		act("$n gestures...", FALSE, ch, 0, 0, TO_ROOM);
+		act("$n gestures...", FALSE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
 		send_to_room("The world seems a little cleaner.\r\n", IN_ROOM(ch));
 		
 		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
@@ -8166,7 +8166,7 @@ ACMD(do_echo) {
 		}
 		
 		// send message
-		act(lbuf, FALSE, ch, obj, vict, TO_CHAR | TO_IGNORE_BAD_CODE);
+		act(lbuf, FALSE, ch, obj, vict, TO_CHAR | TO_IGNORE_BAD_CODE | DG_NO_TRIG);
 		
 		// channel history
 		if (ch->desc && ch->desc->last_act_message) {
@@ -8373,7 +8373,7 @@ ACMD(do_editnotes) {
 	start_string_editor(ch->desc, buf, &(acct->notes), MAX_ADMIN_NOTES_LENGTH-1, TRUE);
 	ch->desc->notes_id = acct->id;
 
-	act("$n begins editing some notes.", TRUE, ch, FALSE, FALSE, TO_ROOM);
+	act("$n begins editing some notes.", TRUE, ch, FALSE, FALSE, TO_ROOM | DG_NO_TRIG);
 }
 
 
@@ -8558,7 +8558,7 @@ ACMD(do_force) {
 		else {
 			send_config_msg(ch, "ok_string");
 			sprintf(buf1, "$n has forced you to '%s'.", to_force);
-			act(buf1, TRUE, ch, NULL, vict, TO_VICT);
+			act(buf1, TRUE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s forced %s to %s", GET_NAME(ch), GET_NAME(vict), to_force);
 			command_interpreter(vict, to_force);
 		}
@@ -8571,7 +8571,7 @@ ACMD(do_force) {
 			if (!REAL_NPC(vict) && GET_REAL_LEVEL(vict) >= GET_REAL_LEVEL(ch))
 				continue;
 			sprintf(buf1, "$n has forced you to '%s'.", to_force);
-			act(buf1, TRUE, ch, NULL, vict, TO_VICT);
+			act(buf1, TRUE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			command_interpreter(vict, to_force);
 		}
 	}
@@ -8585,7 +8585,7 @@ ACMD(do_force) {
 			if (STATE(i) != CON_PLAYING || !(vict = i->character) || (!REAL_NPC(vict) && GET_REAL_LEVEL(vict) >= GET_REAL_LEVEL(ch)))
 				continue;
 			sprintf(buf1, "$n has forced you to '%s'.", to_force);
-			act(buf1, TRUE, ch, NULL, vict, TO_VICT);
+			act(buf1, TRUE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			command_interpreter(vict, to_force);
 		}
 	}
@@ -8614,7 +8614,7 @@ ACMD(do_forgive) {
 			remove_cooldown_by_type(vict, COOLDOWN_HOSTILE_FLAG);
 			msg_to_char(ch, "Hostile flag forgiven.\r\n");
 			if (ch != vict) {
-				act("$n has forgiven your hostile flag.", FALSE, ch, NULL, vict, TO_VICT);
+				act("$n has forgiven your hostile flag.", FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			}
 			any = TRUE;
 		}
@@ -8623,7 +8623,7 @@ ACMD(do_forgive) {
 			remove_cooldown_by_type(vict, COOLDOWN_ROGUE_FLAG);
 			msg_to_char(ch, "Rogue flag forgiven.\r\n");
 			if (ch != vict) {
-				act("$n has forgiven your rogue flag.", FALSE, ch, NULL, vict, TO_VICT);
+				act("$n has forgiven your rogue flag.", FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			}
 			any = TRUE;
 		}
@@ -8632,7 +8632,7 @@ ACMD(do_forgive) {
 			remove_cooldown_by_type(vict, COOLDOWN_LEFT_EMPIRE);
 			msg_to_char(ch, "Defect timer forgiven.\r\n");
 			if (ch != vict) {
-				act("$n has forgiven your empire defect timer.", FALSE, ch, NULL, vict, TO_VICT);
+				act("$n has forgiven your empire defect timer.", FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			}
 			any = TRUE;
 		}
@@ -8641,7 +8641,7 @@ ACMD(do_forgive) {
 			remove_cooldown_by_type(vict, COOLDOWN_PVP_FLAG);
 			msg_to_char(ch, "PVP cooldown forgiven.\r\n");
 			if (ch != vict) {
-				act("$n has forgiven your PVP cooldown.", FALSE, ch, NULL, vict, TO_VICT);
+				act("$n has forgiven your PVP cooldown.", FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			}
 			any = TRUE;
 		}
@@ -8650,7 +8650,7 @@ ACMD(do_forgive) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has forgiven %s", GET_NAME(ch), GET_NAME(vict));
 		}
 		else {
-			act("There's nothing you can forgive $N for.", FALSE, ch, NULL, vict, TO_CHAR);
+			act("There's nothing you can forgive $N for.", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
 		}
 	}
 }
@@ -8754,7 +8754,7 @@ ACMD(do_hostile) {
 		msg_to_char(vict, "You are now hostile!\r\n");
 		if (ch != vict) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has marked %s as hostile", GET_NAME(ch), GET_NAME(vict));
-			act("$N is now hostile.", FALSE, ch, NULL, vict, TO_CHAR);
+			act("$N is now hostile.", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
 		}
 	}
 }
@@ -9021,9 +9021,9 @@ ACMD(do_load) {
 		setup_generic_npc(mob, NULL, NOTHING, NOTHING);
 		char_to_room(mob, IN_ROOM(ch));
 
-		act("$n makes a quaint, magical gesture with one hand.", TRUE, ch, 0, 0, TO_ROOM);
-		act("$n has created $N!", FALSE, ch, 0, mob, TO_ROOM);
-		act("You create $N.", FALSE, ch, 0, mob, TO_CHAR);
+		act("$n makes a quaint, magical gesture with one hand.", TRUE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
+		act("$n has created $N!", FALSE, ch, 0, mob, TO_ROOM | DG_NO_TRIG);
+		act("You create $N.", FALSE, ch, 0, mob, TO_CHAR | DG_NO_TRIG);
 		load_mtrigger(mob);
 		
 		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
@@ -9043,9 +9043,9 @@ ACMD(do_load) {
 			obj_to_char(obj, ch);
 		else
 			obj_to_room(obj, IN_ROOM(ch));
-		act("$n makes a strange magical gesture.", TRUE, ch, 0, 0, TO_ROOM);
-		act("$n has created $p!", FALSE, ch, obj, 0, TO_ROOM);
-		act("You create $p.", FALSE, ch, obj, 0, TO_CHAR);
+		act("$n makes a strange magical gesture.", TRUE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
+		act("$n has created $p!", FALSE, ch, obj, 0, TO_ROOM | DG_NO_TRIG);
+		act("You create $p.", FALSE, ch, obj, 0, TO_CHAR | DG_NO_TRIG);
 		load_otrigger(obj);
 	}
 	else if (is_abbrev(buf, "vehicle")) {
@@ -9057,9 +9057,9 @@ ACMD(do_load) {
 		vehicle_to_room(veh, IN_ROOM(ch));
 		scale_vehicle_to_level(veh, 0);	// attempt auto-detect of level
 		get_vehicle_interior(veh);	// ensure inside is loaded
-		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM);
-		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
-		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
+		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
 		
 		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(IN_ROOM(veh)))) {
 			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(veh))));
@@ -9261,8 +9261,8 @@ ACMD(do_peace) {
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s used peace with mortal present at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 	}
 	
-	act("You raise your hands and a feeling of peace sweeps over the room.", FALSE, ch, NULL, NULL, TO_CHAR);
-	act("$n raises $s hands and a feeling of peace enters your heart.", FALSE, ch, NULL, NULL, TO_ROOM);
+	act("You raise your hands and a feeling of peace sweeps over the room.", FALSE, ch, NULL, NULL, TO_CHAR | DG_NO_TRIG);
+	act("$n raises $s hands and a feeling of peace enters your heart.", FALSE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
 }
 
 
@@ -9405,7 +9405,7 @@ ACMD(do_purge) {
 				send_to_char("Fuuuuuuuuu!\r\n", ch);
 				return;
 			}
-			act("$n disintegrates $N.", FALSE, ch, 0, vict, TO_NOTVICT);
+			act("$n disintegrates $N.", FALSE, ch, 0, vict, TO_NOTVICT | DG_NO_TRIG);
 
 			if (!REAL_NPC(vict)) {
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has purged %s", GET_NAME(ch), GET_NAME(vict));
@@ -9421,7 +9421,7 @@ ACMD(do_purge) {
 			extract_char(vict);
 		}
 		else if ((obj = get_obj_in_list_vis(ch, arg, &number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
-			act("$n destroys $p.", FALSE, ch, obj, 0, TO_ROOM);
+			act("$n destroys $p.", FALSE, ch, obj, 0, TO_ROOM | DG_NO_TRIG);
 			extract_obj(obj);
 		}
 		else if ((veh = get_vehicle_in_room_vis(ch, arg, &number))) {
@@ -9435,9 +9435,9 @@ ACMD(do_purge) {
 				VEH_SHIPPING_ID(veh) = -1;
 			}
 			
-			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
 			if (IN_ROOM(veh) != IN_ROOM(ch) && ROOM_PEOPLE(IN_ROOM(veh))) {
-				act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+				act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
 			}
 			extract_vehicle(veh);
 		}
@@ -9450,7 +9450,7 @@ ACMD(do_purge) {
 	}
 	else {			/* no argument. clean out the room */
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has purged room %s", GET_REAL_NAME(ch), room_log_identifier(IN_ROOM(ch)));
-		act("$n gestures... You are surrounded by scorching flames!", FALSE, ch, 0, 0, TO_ROOM);
+		act("$n gestures... You are surrounded by scorching flames!", FALSE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
 		send_to_room("The world seems a little cleaner.\r\n", IN_ROOM(ch));
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_v, next_in_room) {
@@ -9691,11 +9691,11 @@ ACMD(do_rescale) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled mob %s to level %d at %s", GET_NAME(ch), PERS(vict, vict, FALSE), GET_CURRENT_SCALE_LEVEL(vict), room_log_identifier(IN_ROOM(vict)));
 			
 			sprintf(buf, "You rescale $N to level %d.", GET_CURRENT_SCALE_LEVEL(vict));
-			act("$n rescales $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+			act("$n rescales $N.", FALSE, ch, NULL, vict, TO_NOTVICT | DG_NO_TRIG);
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
 			if (vict->desc) {
 				sprintf(buf, "$n rescales you to level %d.", GET_CURRENT_SCALE_LEVEL(vict));
-				act(buf, FALSE, ch, NULL, vict, TO_VICT);
+				act(buf, FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			}
 		}
 	}
@@ -9703,8 +9703,8 @@ ACMD(do_rescale) {
 		scale_vehicle_to_level(veh, level);
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled vehicle %s to level %d at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), VEH_SCALE_LEVEL(veh), room_log_identifier(IN_ROOM(ch)));
 		sprintf(buf, "You rescale $V to level %d.", VEH_SCALE_LEVEL(veh));
-		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n rescales $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		act(buf, FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
+		act("$n rescales $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
 	}
 	else if (obj) {
 		// item mode
@@ -9720,8 +9720,8 @@ ACMD(do_rescale) {
 		
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled obj %s to level %d at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_OBJ_CURRENT_SCALE_LEVEL(obj), room_log_identifier(IN_ROOM(ch)));
 		sprintf(buf, "You rescale $p to level %d.", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-		act("$n rescales $p.", FALSE, ch, obj, NULL, TO_ROOM);
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR | DG_NO_TRIG);
+		act("$n rescales $p.", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
 	}
 	else {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
@@ -9761,13 +9761,13 @@ ACMD(do_restore) {
 	if (veh) {
 		// found vehicle target here
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s at %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(IN_ROOM(ch)));
-		act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR);
+		act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
 
 		if (GET_INVIS_LEV(ch) > 1 || PRF_FLAGGED(ch, PRF_WIZHIDE)) {
-			act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM);
+			act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
 		}
 		else {
-			act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM);
+			act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
 		}
 		
 		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
@@ -9951,11 +9951,11 @@ ACMD(do_restore) {
 	if (!all) {
 		sprintf(msg + strlen(msg), "%s!", types);
 	}
-	act(msg, FALSE, vict, NULL, ch, TO_CHAR);
+	act(msg, FALSE, vict, NULL, ch, TO_CHAR | DG_NO_TRIG);
 	
 	// show 3rd-party message in some cases
 	if (all || health || moves || mana || blood || dots) {
-		act("$n is restored!", TRUE, vict, NULL, NULL, TO_CHAR);
+		act("$n is restored!", TRUE, vict, NULL, NULL, TO_CHAR | DG_NO_TRIG);
 	}
 }
 
@@ -10229,7 +10229,7 @@ ACMD(do_slay) {
 		else if (ch == vict)
 			send_to_char("Your mother would be so sad... :(\r\n", ch);
 		else if (!IS_NPC(vict) && GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
-			act("Surely you don't expect $N to let you slay $M, do you?", FALSE, ch, NULL, vict, TO_CHAR);
+			act("Surely you don't expect $N to let you slay $M, do you?", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
 		}
 		else {
 			if (!IS_NPC(vict) && !affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
@@ -10570,7 +10570,7 @@ ACMD(do_tedit) {
 	/* set up editor stats */
 	start_string_editor(ch->desc, "file", tedit_option[l].buffer, tedit_option[l].size, FALSE);
 	ch->desc->file_storage = str_dup(tedit_option[l].filename);
-	act("$n begins editing a file.", TRUE, ch, 0, 0, TO_ROOM);
+	act("$n begins editing a file.", TRUE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
 }
 
 
@@ -10608,12 +10608,12 @@ ACMD(do_trans) {
 				victim = i->character;
 				if (GET_ACCESS_LEVEL(victim) >= GET_ACCESS_LEVEL(ch))
 					continue;
-				act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM);
+				act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM | DG_NO_TRIG);
 				char_from_room(victim);
 				char_to_room(victim, to_room);
 				GET_LAST_DIR(victim) = NO_DIR;
-				act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
-				act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
+				act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM | DG_NO_TRIG);
+				act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT | DG_NO_TRIG);
 				qt_visit_room(victim, IN_ROOM(victim));
 				look_at_room(victim);
 				enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
@@ -10636,12 +10636,12 @@ ACMD(do_trans) {
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has transferred %s to %s", GET_REAL_NAME(ch), GET_REAL_NAME(victim), room_log_identifier(to_room));
 			}
 
-			act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM);
+			act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM | DG_NO_TRIG);
 			char_from_room(victim);
 			char_to_room(victim, to_room);
 			GET_LAST_DIR(victim) = NO_DIR;
-			act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
-			act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
+			act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM | DG_NO_TRIG);
+			act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT | DG_NO_TRIG);
 			qt_visit_room(victim, IN_ROOM(victim));
 			look_at_room(victim);
 			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
@@ -10663,7 +10663,7 @@ ACMD(do_trans) {
 		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
 		}
 		
 		adjust_vehicle_tech(veh, FALSE);
@@ -10672,7 +10672,7 @@ ACMD(do_trans) {
 		adjust_vehicle_tech(veh, TRUE);
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
 		}
 		send_config_msg(ch, "ok_string");
 	}
@@ -10696,12 +10696,12 @@ ACMD(do_unbind) {
 		msg_to_char(ch, "Unable to find '%s'.\r\n", argument);
 	}
 	else if (!OBJ_BOUND_TO(obj)) {
-		act("$p isn't bound to anybody.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p isn't bound to anybody.", FALSE, ch, obj, NULL, TO_CHAR | DG_NO_TRIG);
 	}
 	else {
 		free_obj_binding(&OBJ_BOUND_TO(obj));
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s used unbind on %s", GET_REAL_NAME(ch), GET_OBJ_SHORT_DESC(obj));
-		act("You unbind $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("You unbind $p.", FALSE, ch, obj, NULL, TO_CHAR | DG_NO_TRIG);
 	}
 }
 
@@ -11427,7 +11427,7 @@ ACMD(do_wizutil) {
 				SET_BIT(GET_ACCOUNT(vict)->flags, ACCT_FROZEN);
 				send_to_char("A bitter wind suddenly rises and drains every erg of heat from your body!\r\nYou feel frozen!\r\n", vict);
 				send_to_char("Frozen.\r\n", ch);
-				act("A sudden cold wind conjured from nowhere freezes $n!", FALSE, vict, 0, 0, TO_ROOM);
+				act("A sudden cold wind conjured from nowhere freezes $n!", FALSE, vict, 0, 0, TO_ROOM | DG_NO_TRIG);
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s frozen by %s", GET_NAME(vict), GET_NAME(ch));
 				break;
 			case SCMD_THAW:
@@ -11439,7 +11439,7 @@ ACMD(do_wizutil) {
 				REMOVE_BIT(GET_ACCOUNT(vict)->flags, ACCT_FROZEN);
 				send_to_char("A fireball suddenly explodes in front of you, melting the ice!\r\nYou feel thawed.\r\n", vict);
 				send_to_char("Thawed.\r\n", ch);
-				act("A sudden fireball conjured from nowhere thaws $n!", FALSE, vict, 0, 0, TO_ROOM);
+				act("A sudden fireball conjured from nowhere thaws $n!", FALSE, vict, 0, 0, TO_ROOM | DG_NO_TRIG);
 				break;
 			default:
 				log("SYSERR: Unknown subcmd %d passed to do_wizutil (%s)", subcmd, __FILE__);

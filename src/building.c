@@ -1791,7 +1791,7 @@ ACMD(do_dedicate) {
 		msg_to_char(ch, "Dedicate this building to whom?\r\n");
 		return;
 	}
-	if (!(index = find_player_index_by_name(arg))) {
+	if (!(index = find_player_index_by_name(arg2))) {
 		msg_to_char(ch, "You must specify a valid player to dedicate it to.\r\n");
 		return;
 	}

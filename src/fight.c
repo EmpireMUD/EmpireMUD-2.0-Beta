@@ -2616,7 +2616,7 @@ void appear(char_data *ch) {
 		msg_to_char(ch, "You fade back into view.\r\n");
 	}
 	else {
-		act("You feel a strange presence as $n appears, seemingly from nowhere.", FALSE, ch, 0, 0, TO_ROOM);
+		act("You feel a strange presence as $n appears, seemingly from nowhere.", FALSE, ch, NULL, NULL, TO_ROOM | (IS_IMMORTAL(ch) ? DG_NO_TRIG : NOBITS));
 	}
 }
 
