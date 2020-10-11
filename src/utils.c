@@ -4897,19 +4897,29 @@ void sprintbit(bitvector_t bitvector, const char *names[], char *result, bool sp
 }
 
 
-void sprinttype(int type, const char *names[], char *result) {
+/**
+* Safely gets a value "\n"-terminated array of names. This prevents out-of-
+* bounds issues on the namelist.
+*
+* @param int type The position in the name list.
+* @param const char *names[] The name list to use (must have "\n" as its last entry).
+* @param char *result A string variable to save the result to.
+* @param size_t max_result_size The size of the result buffer (prevents overflows).
+* @param char *error_value If 'type' is out of bounds, uses this string.
+*/
+void sprinttype(int type, const char *names[], char *result, size_t max_result_size, char *error_value) {
 	int nr = 0;
-
+	
 	while (type && *names[nr] != '\n') {
-		type--;
-		nr++;
+		--type;
+		++nr;
 	}
-
+	
 	if (*names[nr] != '\n') {
-		strcpy(result, names[nr]);
+		snprintf(result, max_result_size, "%s", names[nr]);
 	}
 	else {
-		strcpy(result, "UNDEFINED");
+		snprintf(result, max_result_size, "%s", error_value);
 	}
 }
 

@@ -1771,7 +1771,7 @@ void prettier_sprintbit(bitvector_t bitvector, const char *names[], char *result
 void prune_crlf(char *txt);
 extern const char *skip_filler(const char *string);
 void sprintbit(bitvector_t vektor, const char *names[], char *result, bool space);
-void sprinttype(int type, const char *names[], char *result);
+void sprinttype(int type, const char *names[], char *result, size_t max_result_size, char *error_value);
 extern char *time_length_string(int seconds);
 extern char *trim(char *string);
 

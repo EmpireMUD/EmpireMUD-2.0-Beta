@@ -3957,7 +3957,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	if (VEH_EXTRA_DATA(veh)) {
 		msg_to_char(ch, "Extra data:\r\n");
 		HASH_ITER(hh, VEH_EXTRA_DATA(veh), red, next_red) {
-			sprinttype(red->type, room_extra_types, buf);
+			sprinttype(red->type, room_extra_types, buf, sizeof(buf), "UNDEFINED");
 			msg_to_char(ch, " %s: %d\r\n", buf, red->value);
 		}
 	}

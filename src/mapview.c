@@ -1004,7 +1004,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	
 	if (ROOM_PAINT_COLOR(room)) {
-		sprinttype(ROOM_PAINT_COLOR(room), paint_names, col_buf);
+		sprinttype(ROOM_PAINT_COLOR(room), paint_names, col_buf, sizeof(col_buf), "UNDEFINED");
 		*col_buf = LOWER(*col_buf);
 		msg_to_char(ch, "The building has been painted %s%s.\r\n", (ROOM_AFF_FLAGGED(room, ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), col_buf);
 	}
@@ -1622,7 +1622,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			}
 		}
 		else if (painted && !show_dark) {
-			sprinttype(ROOM_PAINT_COLOR(to_room), paint_colors, col_buf);
+			sprinttype(ROOM_PAINT_COLOR(to_room), paint_colors, col_buf, sizeof(col_buf), "&0");
 			if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_BRIGHT_PAINT)) {
 				strtoupper(col_buf);
 			}
@@ -1738,7 +1738,7 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 	
 	// start lbuf: color
 	if (ROOM_PAINT_COLOR(to_room) && !PRF_FLAGGED(ch, PRF_NO_PAINT)) {
-		sprinttype(ROOM_PAINT_COLOR(to_room), paint_names, lbuf);
+		sprinttype(ROOM_PAINT_COLOR(to_room), paint_names, lbuf, sizeof(lbuf), "Painted");
 		strcat(lbuf, " ");
 	}
 	else {

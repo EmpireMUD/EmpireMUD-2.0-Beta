@@ -4830,9 +4830,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 't': {	// obj.t*
-					if (!str_cmp(field, "type"))
-						sprinttype(GET_OBJ_TYPE(o), item_types, str);
-
+					if (!str_cmp(field, "type")) {
+						sprinttype(GET_OBJ_TYPE(o), item_types, str, sizeof(str), "OTHER");
+					}
 					else if (!str_cmp(field, "timer"))
 						snprintf(str, slen, "%d", GET_OBJ_TIMER(o));
 					else if (!str_cmp(field, "tool")) {
@@ -5160,7 +5160,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "enter_dir")) {
 						if (BUILDING_ENTRANCE(r) != NO_DIR) {
-							sprinttype(BUILDING_ENTRANCE(r), dirs, str);
+							sprinttype(BUILDING_ENTRANCE(r), dirs, str, sizeof(str), "north");
 						}
 						else {
 							*str = '\0';
@@ -5168,7 +5168,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "exit_dir")) {
 						if (BUILDING_ENTRANCE(r) != NO_DIR && rev_dir[BUILDING_ENTRANCE(r)] != NO_DIR) {
-							sprinttype(rev_dir[BUILDING_ENTRANCE(r)], dirs, str);
+							sprinttype(rev_dir[BUILDING_ENTRANCE(r)], dirs, str, sizeof(str), "south");
 						}
 						else {
 							*str = '\0';

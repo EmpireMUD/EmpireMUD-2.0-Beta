@@ -5864,7 +5864,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	// ensure fully loaded
 	check_delayed_load(k);
 
-	sprinttype(GET_REAL_SEX(k), genders, buf);
+	sprinttype(GET_REAL_SEX(k), genders, buf, sizeof(buf), "???");
 	CAP(buf);
 	if (!IS_NPC(k)) {
 		msg_to_char(ch, "%s PC '\ty%s\t0', Lastname '\ty%s\t0', IDNum: [%5d], In room [%5d]\r\n", buf, GET_NAME(k), GET_CURRENT_LASTNAME(k) ? GET_CURRENT_LASTNAME(k) : "none", GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
@@ -5969,14 +5969,14 @@ void do_stat_character(char_data *ch, char_data *k) {
 		}
 	}
 
-	sprinttype(GET_POS(k), position_types, buf2);
+	sprinttype(GET_POS(k), position_types, buf2, sizeof(buf2), "UNDEFINED");
 	sprintf(buf, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
 		sprintf(buf + strlen(buf), ", Attack: %s, Move: %s, Size: %s", attack_hit_info[MOB_ATTACK_TYPE(k)].name, mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
 	}
 	if (k->desc) {
-		sprinttype(STATE(k->desc), connected_types, buf2);
+		sprinttype(STATE(k->desc), connected_types, buf2, sizeof(buf2), "UNDEFINED");
 		strcat(buf, ", Connected: ");
 		strcat(buf, buf2);
 	}
@@ -7017,7 +7017,7 @@ void do_stat_room(char_data *ch) {
 		msg_to_char(ch, "Extra data:\r\n");
 		
 		HASH_ITER(hh, ROOM_EXTRA_DATA(IN_ROOM(ch)), red, next_red) {
-			sprinttype(red->type, room_extra_types, buf);
+			sprinttype(red->type, room_extra_types, buf, sizeof(buf), "UNDEFINED");
 			msg_to_char(ch, " %s: %d\r\n", buf, red->value);
 		}
 	}

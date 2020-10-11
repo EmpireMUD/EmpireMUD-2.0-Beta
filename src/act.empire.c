@@ -622,7 +622,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	// Score
 	msg_to_char(ch, "Score: %d, ranked #%d (", get_total_score(e), found_rank);
 	for (iter = 0, comma = FALSE; iter < NUM_SCORES; ++iter) {
-		sprinttype(iter, score_type, buf);
+		sprinttype(iter, score_type, buf, sizeof(buf), "UNDEFINED");
 		msg_to_char(ch, "%s%s %d", (comma ? ", " : ""), buf, EMPIRE_SCORE(e, iter));
 		comma = TRUE;
 	}

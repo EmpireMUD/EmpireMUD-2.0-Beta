@@ -3944,7 +3944,7 @@ ACMD(do_whois) {
 	
 	// basic info
 	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), NULLSAFE(GET_TITLE(victim)));
-	sprinttype(GET_REAL_SEX(victim), genders, part);
+	sprinttype(GET_REAL_SEX(victim), genders, part, sizeof(part), "UNDEFINED");
 	msg_to_char(ch, "Status: %s %s\r\n", CAP(part), level_names[(int) GET_ACCESS_LEVEL(victim)][1]);
 
 	// show class (but don't bother for immortals, as they generally have all skills

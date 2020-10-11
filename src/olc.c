@@ -6061,7 +6061,7 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 		send_config_msg(ch, "ok_string");
 	}
 	else {
-		sprinttype(type, type_names, buf);
+		sprinttype(type, type_names, buf, sizeof(buf), "UNDEFINED");
 		msg_to_char(ch, "You set the %s to %s.\r\n", name, buf);
 	}
 	return type;
