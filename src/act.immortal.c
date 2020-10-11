@@ -746,6 +746,7 @@ ADMIN_UTIL(util_bldconvert) {
 			free(VEH_KEYWORDS(to_veh));
 		}
 		VEH_KEYWORDS(to_veh) = str_dup(GET_BLD_NAME(from_bld));
+		strtolower(VEH_KEYWORDS(to_veh));
 		
 		// build short desc
 		if (VEH_SHORT_DESC(to_veh)) {
