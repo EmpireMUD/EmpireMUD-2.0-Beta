@@ -2506,7 +2506,7 @@ void process_repairing(char_data *ch) {
 		// missing next resource
 		if (VEH_NEEDS_RESOURCES(veh)) {
 			// copy this to display the next 1
-			memcpy(&temp_res, VEH_NEEDS_RESOURCES(veh), sizeof(struct resource_data));
+			memcpy(&temp_res, VEH_NEEDS_RESOURCES(veh), sizeof(temp_res));
 			if (temp_res.type == RES_OBJECT || temp_res.type == RES_COMPONENT) {
 				temp_res.amount = 1;	// just show next 1
 			}
