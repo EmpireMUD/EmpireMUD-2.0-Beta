@@ -1799,9 +1799,9 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 		}
 	}
 	
-	snprintf(buf, sizeof(buf), "You lay the framework and begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+	snprintf(buf, sizeof(buf), "You begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
-	snprintf(buf, sizeof(buf), "$n lays the framework and begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+	snprintf(buf, sizeof(buf), "$n begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_ROOM);
 	
 	process_gen_craft_vehicle(ch, type);
