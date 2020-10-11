@@ -965,8 +965,9 @@ bool is_entrance(room_data *room) {
 */
 void process_build(char_data *ch, room_data *room, int act_type) {
 	craft_data *type = find_building_list_entry(room, FIND_BUILD_NORMAL);
+	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
-	struct resource_data *res;
+	struct resource_data *res, temp_res;
 	
 	// Check if there's no longer a building in that place. 
 	if (!GET_BUILDING(room)) {
@@ -993,7 +994,19 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 		}
 		else {
 			// missing next resource
-			msg_to_char(ch, "You run out of resources and stop working.\r\n");
+			if (BUILDING_RESOURCES(room)) {
+				// copy this to display the next 1
+				memcpy(&temp_res, BUILDING_RESOURCES(room), sizeof(struct resource_data));
+				if (temp_res.type == RES_OBJECT || temp_res.type == RES_COMPONENT) {
+					temp_res.amount = 1;	// just show next 1
+				}
+				temp_res.next = NULL;
+				show_resource_list(&temp_res, buf);
+				msg_to_char(ch, "You don't have %s and stop working.\r\n", buf);
+			}
+			else {
+				msg_to_char(ch, "You run out of resources and stop working.\r\n");
+			}
 			act("$n runs out of resources and stops working.", FALSE, ch, 0, 0, TO_ROOM);
 			GET_ACTION(ch) = ACT_NONE;
 			return;

@@ -1155,7 +1155,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	bool found = FALSE;
 	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
-	struct resource_data *res;
+	struct resource_data *res, temp_res;
 	vehicle_data *veh, *junk;
 	char_data *vict;
 	
@@ -1171,7 +1171,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	}
 	
 	// find and apply something
-	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
+	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, &found_obj))) {
 		// take the item; possibly free the res
 		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_CRAFT, veh, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
 		
@@ -1198,7 +1198,20 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		}
 	}
 	else if (!found) {
-		msg_to_char(ch, "You run out of resources and stop %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		// missing next resource
+		if (VEH_NEEDS_RESOURCES(veh)) {
+			// copy this to display the next 1
+			memcpy(&temp_res, VEH_NEEDS_RESOURCES(veh), sizeof(struct resource_data));
+			if (temp_res.type == RES_OBJECT || temp_res.type == RES_COMPONENT) {
+				temp_res.amount = 1;	// just show next 1
+			}
+			temp_res.next = NULL;
+			show_resource_list(&temp_res, buf);
+			msg_to_char(ch, "You don't have %s and stop %s.\r\n", buf, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		}
+		else {
+			msg_to_char(ch, "You run out of resources and stop %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		}
 		snprintf(buf, sizeof(buf), "$n runs out of resources and stops %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		GET_ACTION(ch) = ACT_NONE;

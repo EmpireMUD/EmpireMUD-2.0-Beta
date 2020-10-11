@@ -2466,8 +2466,9 @@ void process_prospecting(char_data *ch) {
 void process_repairing(char_data *ch) {
 	extern vehicle_data *find_vehicle(int n);
 
+	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
-	struct resource_data *res;
+	struct resource_data *res, temp_res;
 	bool found = FALSE;
 	vehicle_data *veh;
 	
@@ -2487,7 +2488,7 @@ void process_repairing(char_data *ch) {
 	}
 	
 	// good to repair:
-	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
+	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, &found_obj))) {
 		// take the item; possibly free the res
 		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_REPAIR, veh, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
 		found = TRUE;
@@ -2501,7 +2502,21 @@ void process_repairing(char_data *ch) {
 	}
 	else if (!found) {
 		GET_ACTION(ch) = ACT_NONE;
-		msg_to_char(ch, "You run out of resources and stop repairing.\r\n");
+		
+		// missing next resource
+		if (VEH_NEEDS_RESOURCES(veh)) {
+			// copy this to display the next 1
+			memcpy(&temp_res, VEH_NEEDS_RESOURCES(veh), sizeof(struct resource_data));
+			if (temp_res.type == RES_OBJECT || temp_res.type == RES_COMPONENT) {
+				temp_res.amount = 1;	// just show next 1
+			}
+			temp_res.next = NULL;
+			show_resource_list(&temp_res, buf);
+			msg_to_char(ch, "You don't have %s and stop repairing.\r\n", buf);
+		}
+		else {
+			msg_to_char(ch, "You run out of resources and stop repairing.\r\n");
+		}
 		act("$n runs out of resources and stops.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
