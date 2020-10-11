@@ -9932,6 +9932,11 @@ bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_d
 			return (FIND_CHAR_ROOM);
 		}
 	}
+	if (IS_SET(bitvector, FIND_VEHICLE_ROOM) && tar_veh) {
+		if ((*tar_veh = get_vehicle_in_room_vis(ch, name_ptr, &number)) != NULL) {
+			return (FIND_VEHICLE_ROOM);
+		}
+	}
 	if (IS_SET(bitvector, FIND_CHAR_WORLD) && tar_ch) {
 		if ((*tar_ch = get_char_vis(ch, name_ptr, &number, FIND_CHAR_WORLD | npc_only)) != NULL) {
 			return (FIND_CHAR_WORLD);
@@ -9951,11 +9956,6 @@ bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_d
 	if (IS_SET(bitvector, FIND_OBJ_INV) && tar_obj) {
 		if ((*tar_obj = get_obj_in_list_vis(ch, name_ptr, &number, ch->carrying)) != NULL) {
 			return (FIND_OBJ_INV);
-		}
-	}
-	if (IS_SET(bitvector, FIND_VEHICLE_ROOM) && tar_veh) {
-		if ((*tar_veh = get_vehicle_in_room_vis(ch, name_ptr, &number)) != NULL) {
-			return (FIND_VEHICLE_ROOM);
 		}
 	}
 	if (IS_SET(bitvector, FIND_VEHICLE_INSIDE) && tar_veh) {
