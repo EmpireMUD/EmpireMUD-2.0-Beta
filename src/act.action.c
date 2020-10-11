@@ -3873,6 +3873,12 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 	if (!data) {
 		return FALSE;
 	}
+	if (data->depletion != NOTHING && inter_veh && get_vehicle_depletion(inter_veh, data->depletion, FALSE) >= interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion")) {
+		return FALSE;	// depleted vehicle
+	}
+	else if (data->depletion != NOTHING && !inter_veh && get_depletion(inter_room, data->depletion, FALSE) >= interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion")) {
+		return FALSE;	// depleted room
+	}
 	
 	amount = interact_one_at_a_time[interaction->type] ? 1 : interaction->quantity;
 	
