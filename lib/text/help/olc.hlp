@@ -8106,6 +8106,7 @@ Available flags:
  IS-RUINS - counts as ruins for city status and building decay
  SLEEP - can sleep and rest in/on it
  !PAINT - cannot be painted
+ *BRIGHT-PAINT - is brightly painted (set by the paint command)
  DEDICATE - can be dedicated
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving

@@ -4395,6 +4395,7 @@ const char *vehicle_flags[] = {
 	"IS-RUINS",
 	"SLEEP",	// 30
 	"!PAINT",
+	"*BRIGHT-PAINT",
 	"DEDICATE",
 	"\n"
 };
@@ -4434,6 +4435,7 @@ const char *identify_vehicle_flags[] = {
 	"is ruined",
 	"",	// "SLEEP", (special handling)	// 30
 	"",	// no-paint
+	"",	// bright-paint
 	"can dedicate",
 	"\n"
 };

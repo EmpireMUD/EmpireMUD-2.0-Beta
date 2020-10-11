@@ -2286,10 +2286,10 @@ ACMD(do_paint) {
 		
 		// brighten if same color or remove bright if not
 		if (VEH_PAINT_COLOR(paint_veh) == GET_PAINT_COLOR(paint)) {
-			SET_BIT(VEH_ROOM_AFFECTS(paint_veh), ROOM_AFF_BRIGHT_PAINT);
+			SET_BIT(VEH_FLAGS(paint_veh), VEH_BRIGHT_PAINT);
 		}
 		else {
-			REMOVE_BIT(VEH_ROOM_AFFECTS(paint_veh), ROOM_AFF_BRIGHT_PAINT);
+			REMOVE_BIT(VEH_FLAGS(paint_veh), VEH_BRIGHT_PAINT);
 		}
 		
 		set_vehicle_extra_data(paint_veh, ROOM_EXTRA_PAINT_COLOR, GET_PAINT_COLOR(paint));
@@ -2465,7 +2465,7 @@ ACMD(do_unpaint) {
 		act("You strip the paint from $V!", FALSE, ch, NULL, paint_veh, TO_CHAR);
 		act("$n strips the paint from $V!", FALSE, ch, NULL, paint_veh, TO_ROOM);
 		remove_vehicle_extra_data(paint_veh, ROOM_EXTRA_PAINT_COLOR);
-		REMOVE_BIT(VEH_ROOM_AFFECTS(paint_veh), ROOM_AFF_BRIGHT_PAINT);
+		REMOVE_BIT(VEH_FLAGS(paint_veh), VEH_BRIGHT_PAINT);
 	}
 	
 	command_lag(ch, WAIT_ABILITY);

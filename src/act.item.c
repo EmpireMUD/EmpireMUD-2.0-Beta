@@ -645,7 +645,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		case ITEM_PAINT: {
 			extern const char *paint_colors[];
 			extern const char *paint_names[];
-			msg_to_char(ch, "Paint color: %s%s\t0\r\n", paint_colors[GET_PAINT_COLOR(obj)], paint_names[GET_PAINT_COLOR(obj)]);
+			sprinttype(GET_PAINT_COLOR(obj), paint_names, lbuf, sizeof(lbuf), "UNDEFINED");
+			sprinttype(GET_PAINT_COLOR(obj), paint_colors, part, sizeof(part), "&0");
+			msg_to_char(ch, "Paint color: %s%s\t0\r\n", part, lbuf);
 			break;
 		}
 		case ITEM_POISON: {
@@ -884,9 +886,11 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 */
 void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	extern const char *identify_vehicle_flags[];
+	extern const char *paint_colors[];
+	extern const char *paint_names[];
 	
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], buf1[256];
 	
 	// basic info
 	act("Your analysis of $V reveals:", FALSE, ch, NULL, veh, TO_CHAR);
@@ -901,6 +905,16 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	
 	msg_to_char(ch, "Type: %s\r\n", skip_filler((proto && !strchr(VEH_SHORT_DESC(proto), '#')) ? VEH_SHORT_DESC(proto) : VEH_SHORT_DESC(veh)));
 	msg_to_char(ch, "Level: %d\r\n", VEH_SCALE_LEVEL(veh));
+	
+	if (VEH_PAINT_COLOR(veh)) {
+		sprinttype(VEH_PAINT_COLOR(veh), paint_names, buf, sizeof(buf), "UNDEFINED");
+		sprinttype(VEH_PAINT_COLOR(veh), paint_colors, buf1, sizeof(buf1), "&0");
+		*buf = LOWER(*buf);
+		if (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT)) {
+			strtoupper(buf1);
+		}
+		msg_to_char(ch, "Paint color: %s%s%s&0\r\n", buf1, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), buf);
+	}
 	
 	prettier_sprintbit(VEH_FLAGS(veh), identify_vehicle_flags, buf);
 	if (VEH_FLAGGED(veh, VEH_SIT)) {

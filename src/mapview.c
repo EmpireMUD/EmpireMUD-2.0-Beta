@@ -453,6 +453,39 @@ char *get_room_name(room_data *room, bool color) {
 }
 
 
+/**
+* Replaces all color codes in 'string' (except &?) with 'new_color'. The new
+* string should be the same length so long as new_color is a valid single
+* color code.
+*
+* @param char *string The initial string (will have its colors replaced)/
+* @param char *new_color A single color code, like "&b".
+*/
+void replace_color_codes(char *string, char *new_color) {
+	char temp[MAX_STRING_LENGTH];
+	int iter = 0;
+	
+	*temp = '\0';
+	
+	while (string[iter]) {
+		if (string[iter] == '&' && string[iter+1] != '?') {
+			// copy over new color and skip this part of string
+			strcpy(temp + iter, new_color);
+			++iter;
+		}
+		else {
+			// direct copy
+			temp[iter] = string[iter];
+		}
+		
+		// advance it
+		++iter;
+	}
+	temp[iter] = '\0';	// terminate
+	strcpy(string, temp);	// copy back over
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// MAPPC FUNCTIONS /////////////////////////////////////////////////////////
 
@@ -1357,7 +1390,8 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		base_color = crop_icon->color;
 	}
 	
-	painted = (!IS_NPC(ch) && ROOM_PAINT_COLOR(to_room) && !PRF_FLAGGED(ch, PRF_NO_PAINT));
+	show_veh = find_vehicle_to_show(ch, to_room);
+	painted = (!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_NO_PAINT)) ? (show_veh ? VEH_PAINT_COLOR(show_veh) : ROOM_PAINT_COLOR(to_room)) : FALSE;
 
 	// start with the sector color
 	strcpy(buf, base_color);
@@ -1370,7 +1404,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	}
 	
 	// check for a vehicle with an icon
-	else if ((show_veh = find_vehicle_to_show(ch, to_room))) {
+	else if (show_veh) {
 		strcat(buf, NULLSAFE(VEH_ICON(show_veh)));
 	}
 
@@ -1589,7 +1623,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		sprintf(buf, "\t0\t[B300]%s", buf1);
 		need_color_terminator = TRUE;
 	}
-	else if (PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) || painted || show_dark) {
+	else if (PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) || show_dark) {
 		strcpy(buf1, strip_color(buf));
 
 		if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
@@ -1621,21 +1655,22 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 				sprintf(buf, "%s%s", get_informative_color_room(ch, to_room), buf1);
 			}
 		}
-		else if (painted && !show_dark) {
-			sprinttype(ROOM_PAINT_COLOR(to_room), paint_colors, col_buf, sizeof(col_buf), "&0");
-			if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_BRIGHT_PAINT)) {
-				strtoupper(col_buf);
-			}
-			
-			sprintf(buf, "%s%s", col_buf, buf1);
-		}
-		else if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_INFORMATIVE | PRF_POLITICAL) && !painted && show_dark) {
+		else if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_INFORMATIVE | PRF_POLITICAL) && show_dark) {
 			sprintf(buf, "&b%s", buf1);
 		}
 		else {
 			// color was stripped but no color added, so add a "normal" color to prevent color bleed
 			sprintf(buf, "&0%s", buf1);
 		}
+	}
+	else if (painted) {
+		sprinttype(show_veh ? VEH_PAINT_COLOR(show_veh) : ROOM_PAINT_COLOR(to_room), paint_colors, col_buf, sizeof(col_buf), "&0");
+		if (show_veh ? VEH_FLAGGED(show_veh, VEH_BRIGHT_PAINT) : ROOM_AFF_FLAGGED(to_room, ROOM_AFF_BRIGHT_PAINT)) {
+			strtoupper(col_buf);
+		}
+		
+		// buf is the icon
+		replace_color_codes(buf, col_buf);
 	}
 	else {
 		// normal color
