@@ -10430,23 +10430,33 @@ ACMD(do_stat) {
 		arg = buf1;
 		number = get_number(&arg);
 		
-		if ((obj = get_obj_in_equip_vis(ch, arg, &number, ch->equipment, &tmp)) != NULL)
+		if ((obj = get_obj_in_equip_vis(ch, arg, &number, ch->equipment, &tmp)) != NULL) {
 			do_stat_object(ch, obj);
-		else if ((obj = get_obj_in_list_vis(ch, arg, &number, ch->carrying)) != NULL)
+		}
+		else if ((obj = get_obj_in_list_vis(ch, arg, &number, ch->carrying)) != NULL) {
 			do_stat_object(ch, obj);
-		else if ((victim = get_char_vis(ch, arg, &number, FIND_CHAR_ROOM)) != NULL)
+		}
+		else if ((victim = get_char_vis(ch, arg, &number, FIND_CHAR_ROOM)) != NULL) {
 			do_stat_character(ch, victim);
-		else if ((obj = get_obj_in_list_vis(ch, arg, &number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL)
-			do_stat_object(ch, obj);
-		else if ((victim = get_char_vis(ch, arg, &number, FIND_CHAR_WORLD)) != NULL)
-			do_stat_character(ch, victim);
-		else if ((veh = get_vehicle_in_room_vis(ch, arg, &number)) || (veh = get_vehicle_vis(ch, arg, &number))) {
+		}
+		else if ((veh = get_vehicle_in_room_vis(ch, arg, &number))) {
 			do_stat_vehicle(ch, veh);
 		}
-		else if ((obj = get_obj_vis(ch, arg, &number)) != NULL)
+		else if ((obj = get_obj_in_list_vis(ch, arg, &number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
 			do_stat_object(ch, obj);
-		else
+		}
+		else if ((victim = get_char_vis(ch, arg, &number, FIND_CHAR_WORLD)) != NULL) {
+			do_stat_character(ch, victim);
+		}
+		else if ((veh = get_vehicle_vis(ch, arg, &number))) {
+			do_stat_vehicle(ch, veh);
+		}
+		else if ((obj = get_obj_vis(ch, arg, &number)) != NULL) {
+			do_stat_object(ch, obj);
+		}
+		else {
 			send_to_char("Nothing around by that name.\r\n", ch);
+		}
 	}
 }
 

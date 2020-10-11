@@ -3489,7 +3489,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		if (*only_icon && !VEH_ICON(veh)) {
 			continue;
 		}
-		if (*only_icon && !strstr(only_icon, VEH_ICON(veh)) && !strstr(only_icon, strip_color(VEH_ICON(veh)))) {
+		if (*only_icon && str_cmp(only_icon, "any") && !strstr(only_icon, VEH_ICON(veh)) && !strstr(only_icon, strip_color(VEH_ICON(veh)))) {
 			continue;
 		}
 		if (find_interacts) {	// look up its interactions

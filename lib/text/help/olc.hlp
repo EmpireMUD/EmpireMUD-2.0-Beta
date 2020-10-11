@@ -8151,7 +8151,7 @@ Fields:
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP VEDIT FLAGS
   &c-functions&0 - see HELP VEDIT FUNCTIONS
-  &c-icon&0 - match the text of the icon, if any
+  &c-icon [any]&0 - match the text of the icon (or "any" to just require an icon)
   &c-interactions&0 - has a specific type, see HELP VEDIT INTERACTION
   &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
   &c-level&0 - matches anything where this level is within the range
