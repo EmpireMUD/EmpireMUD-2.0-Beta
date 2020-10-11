@@ -3890,7 +3890,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Depletion: ");
 		
 		comma = FALSE;
-		for (dep = ROOM_DEPLETION(IN_ROOM(ch)); dep; dep = dep->next) {
+		for (dep = VEH_DEPLETION(veh); dep; dep = dep->next) {
 			if (dep->type < NUM_DEPLETION_TYPES) {
 				size += snprintf(buf + size, sizeof(buf) - size, "%s%s (%d)", comma ? ", " : "", depletion_type[dep->type], dep->count);
 				comma = TRUE;
