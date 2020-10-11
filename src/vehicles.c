@@ -3999,16 +3999,6 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	
-	if (VEH_PAINT_COLOR(veh)) {
-		sprinttype(VEH_PAINT_COLOR(veh), paint_names, lbuf, sizeof(lbuf), "UNDEFINED");
-		sprinttype(VEH_PAINT_COLOR(veh), paint_colors, colbuf, sizeof(colbuf), "&0");
-		*buf = LOWER(*buf);
-		if (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT)) {
-			strtoupper(buf1);
-		}
-		msg_to_char(ch, "It has been painted %s%s%s&0.\r\n", colbuf, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), lbuf);
-	}
-	
 	if (proto && VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto) && !strchr(VEH_SHORT_DESC(proto), '#')) {
 		strcpy(lbuf, skip_filler(VEH_SHORT_DESC(proto)));
 		msg_to_char(ch, "It appears to be %s %s.\r\n", AN(lbuf), lbuf);
@@ -4026,6 +4016,16 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 			}
 		}
 		send_to_char(".\r\n", ch);
+	}
+	
+	if (VEH_PAINT_COLOR(veh)) {
+		sprinttype(VEH_PAINT_COLOR(veh), paint_names, lbuf, sizeof(lbuf), "UNDEFINED");
+		sprinttype(VEH_PAINT_COLOR(veh), paint_colors, colbuf, sizeof(colbuf), "&0");
+		*lbuf = LOWER(*lbuf);
+		if (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT)) {
+			strtoupper(buf1);
+		}
+		msg_to_char(ch, "It has been painted %s%s%s&0.\r\n", colbuf, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), lbuf);
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
