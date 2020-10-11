@@ -2320,7 +2320,7 @@ ACMD(do_paint) {
 		msg_to_char(ch, "You don't have permission to paint it.\r\n");
 		return;
 	}
-	if (paint_room && (!IS_ANY_BUILDING(paint_room) || ROOM_BLD_FLAGGED(paint_room, BLD_NO_PAINT))) {
+	if (paint_room && (!IS_ANY_BUILDING(paint_room) || ROOM_BLD_FLAGGED(paint_room, BLD_NO_PAINT) || ROOM_AFF_FLAGGED(paint_room, ROOM_AFF_TEMPORARY))) {
 		msg_to_char(ch, "You can't paint that.\r\n");
 		return;
 	}
