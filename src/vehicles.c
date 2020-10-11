@@ -59,6 +59,8 @@ extern const char *function_flags[];
 extern const char *interact_types[];
 extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *mob_move_types[];
+extern const char *paint_colors[];
+extern const char *paint_names[];
 extern const char *room_aff_bits[];
 extern const char *veh_custom_types[];
 extern const char *vehicle_flags[];
@@ -3980,7 +3982,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 * @param char_data *ch The person to show the output to.
 */
 void look_at_vehicle(vehicle_data *veh, char_data *ch) {
-	char lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH], colbuf[256];
 	vehicle_data *proto;
 	
 	if (!veh || !ch || !ch->desc) {
@@ -3997,12 +3999,23 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 		act("You look at $V but see nothing special.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	
+	if (VEH_PAINT_COLOR(veh)) {
+		sprinttype(VEH_PAINT_COLOR(veh), paint_names, lbuf, sizeof(lbuf), "UNDEFINED");
+		sprinttype(VEH_PAINT_COLOR(veh), paint_colors, colbuf, sizeof(colbuf), "&0");
+		*buf = LOWER(*buf);
+		if (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT)) {
+			strtoupper(buf1);
+		}
+		msg_to_char(ch, "It has been painted %s%s%s&0.\r\n", colbuf, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), lbuf);
+	}
+	
 	if (proto && VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto) && !strchr(VEH_SHORT_DESC(proto), '#')) {
-		msg_to_char(ch, "Type: %s\r\n", skip_filler(VEH_SHORT_DESC(proto)));
+		strcpy(lbuf, skip_filler(VEH_SHORT_DESC(proto)));
+		msg_to_char(ch, "It appears to be %s %s.\r\n", AN(lbuf), lbuf);
 	}
 	
 	if (VEH_OWNER(veh)) {
-		msg_to_char(ch, "Owner: %s%s\t0", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+		msg_to_char(ch, "It is flying the flag of %s%s\t0", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
 		
 		if (VEH_OWNER(veh) == GET_LOYALTY(ch)) {
 			if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK)) {
@@ -4012,7 +4025,7 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 				send_to_char(" (no-dismantle)", ch);
 			}
 		}
-		send_to_char("\r\n", ch);
+		send_to_char(".\r\n", ch);
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {
