@@ -9903,7 +9903,7 @@ int find_all_dots(char *arg) {
  * like the one_argument routine), but now it returns an integer that
  * describes what it filled in.
  */
-int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh) {
+bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh) {
 	char name[MAX_INPUT_LENGTH], *name_ptr = name;
 	int i, found, number;
 	bitvector_t npc_only = (bitvector & FIND_NPC_ONLY);
@@ -10191,7 +10191,7 @@ vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, cha
 		}
 		
 		// found: check number
-		if (*(--number) == 0) {
+		if (--(*number) == 0) {
 			return iter;
 		}
 	}
