@@ -5,25 +5,25 @@ Open Ruins: Random Icon~
 * pick random icons for ruins
 switch %random.7%
   case 1
-    %mod% %room% icon .&&0_i&?.
+    %mod% %room% icon .&0_i&?.
   break
   case 2
-    %mod% %room% icon .&&0[.&?.
+    %mod% %room% icon .&0[.&?.
   break
   case 3
-    %mod% %room% icon .&&0.v&?.
+    %mod% %room% icon .&0.v&?.
   break
   case 4
-    %mod% %room% icon .&&0/]&?.
+    %mod% %room% icon .&0/]&?.
   break
   case 5
-    %mod% %room% icon .&&0(\&?.
+    %mod% %room% icon .&0(\&?.
   break
   case 6
-    %mod% %room% icon .&&0}\.
+    %mod% %room% icon .&0}\.
   break
   case 7
-    %mod% %room% icon &&0..}&?.
+    %mod% %room% icon &0..}&?.
   break
 done
 if %room.title% ~= #n
@@ -38,25 +38,25 @@ Closed Ruins: Random Icon~
 * pick random icons for ruins
 switch %random.7%
   case 1
-    %mod% %room% icon ..&&0/]
+    %mod% %room% icon ..&0/]
   break
   case 2
-    %mod% %room% icon &&0[\&?..
+    %mod% %room% icon &0[\&?..
   break
   case 3
-    %mod% %room% icon &&0|\&?..
+    %mod% %room% icon &0|\&?..
   break
   case 4
-    %mod% %room% icon &&0[&?__&&0]
+    %mod% %room% icon &0[&?__&0]
   break
   case 5
-    %mod% %room% icon ..&&0/]
+    %mod% %room% icon ..&0/]
   break
   case 6
-    %mod% %room% icon .&&0-&?.&&0]
+    %mod% %room% icon .&0-&?.&0]
   break
   case 7
-    %mod% %room% icon &&0[&?.&&0-&?.
+    %mod% %room% icon &0[&?.&0-&?.
   break
 done
 if %room.title% ~= #n
@@ -73,49 +73,49 @@ if %self.vnum% == 5006
   * open-style ruins
   switch %random.7%
     case 1
-      %mod% %self% icon .&&0_i&?.
+      %mod% %self% icon .&0_i&?.
     break
     case 2
-      %mod% %self% icon .&&0[.&?.
+      %mod% %self% icon .&0[.&?.
     break
     case 3
-      %mod% %self% icon .&&0.v&?.
+      %mod% %self% icon .&0.v&?.
     break
     case 4
-      %mod% %self% icon .&&0/]&?.
+      %mod% %self% icon .&0/]&?.
     break
     case 5
-      %mod% %self% icon .&&0(\&?.
+      %mod% %self% icon .&0(\&?.
     break
     case 6
-      %mod% %self% icon .&&0}\.
+      %mod% %self% icon .&0}\.
     break
     case 7
-      %mod% %self% icon &&0..}&?.
+      %mod% %self% icon &0..}&?.
     break
   done
 else
   switch %random.7%
     case 1
-      %mod% %self% icon ..&&0/]
+      %mod% %self% icon ..&0/]
     break
     case 2
-      %mod% %self% icon &&0[\&?..
+      %mod% %self% icon &0[\&?..
     break
     case 3
-      %mod% %self% icon &&0|\&?..
+      %mod% %self% icon &0|\&?..
     break
     case 4
-      %mod% %room% icon &&0[&?__&&0]
+      %mod% %room% icon &0[&?__&0]
     break
     case 5
-      %mod% %self% icon ..&&0/]
+      %mod% %self% icon ..&0/]
     break
     case 6
-      %mod% %self% icon .&&0-&?.&&0]
+      %mod% %self% icon .&0-&?.&0]
     break
     case 7
-      %mod% %self% icon &&0[&?.&&0-&?.
+      %mod% %self% icon &0[&?.&0-&?.
     break
   done
 end
