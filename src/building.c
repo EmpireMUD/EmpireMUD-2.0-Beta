@@ -1814,7 +1814,7 @@ ACMD(do_dedicate) {
 		affect_total_room(ded_room);
 	}
 	if (ded_veh) {
-		snprintf(buf, sizeof(buf), "You dedicate $V to %s!\r\n", index->fullname);
+		snprintf(buf, sizeof(buf), "You dedicate $V to %s!", index->fullname);
 		act(buf, FALSE, ch, NULL, ded_veh, TO_CHAR);
 		snprintf(buf, sizeof(buf), "$n dedicates $V to %s!", index->fullname);
 		act(buf, FALSE, ch, NULL, ded_veh, TO_ROOM);
