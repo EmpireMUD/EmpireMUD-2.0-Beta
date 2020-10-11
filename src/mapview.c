@@ -1355,7 +1355,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	empire_data *emp, *chemp = GET_LOYALTY(ch);
 	int tileset = GET_SEASON(to_room);
 	struct icon_data *base_icon, *icon, *crop_icon = NULL;
-	bool junk, enchanted, hidden = FALSE, painted;
+	bool junk, enchanted, hidden = FALSE, painted, veh_is_shown = FALSE;
 	crop_data *cp = ROOM_CROP(to_room);
 	sector_data *st, *base_sect = BASE_SECT(to_room);
 	char *base_color, *str;
@@ -1406,6 +1406,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	// check for a vehicle with an icon
 	else if (show_veh) {
 		strcat(buf, NULLSAFE(VEH_ICON(show_veh)));
+		veh_is_shown = TRUE;
 	}
 
 	/* Hidden buildings */
@@ -1663,7 +1664,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			sprintf(buf, "&0%s", buf1);
 		}
 	}
-	else if (painted) {
+	else if (painted && (!show_veh || veh_is_shown)) {
 		sprinttype(show_veh ? VEH_PAINT_COLOR(show_veh) : ROOM_PAINT_COLOR(to_room), paint_colors, col_buf, sizeof(col_buf), "&0");
 		if (show_veh ? VEH_FLAGGED(show_veh, VEH_BRIGHT_PAINT) : ROOM_AFF_FLAGGED(to_room, ROOM_AFF_BRIGHT_PAINT)) {
 			strtoupper(col_buf);
