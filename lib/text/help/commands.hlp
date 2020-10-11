@@ -1539,15 +1539,18 @@ Examples:
 #
 PAINT PAINTING UNPAINT "PAINT COMPONENT"
 
-Usage:  paint <using paint item>
-        unpaint
+Usage:  paint <building | vehicle> <using paint item>
+        unpaint <building | vehicle>
 
 You can use the 'paint' command to color your buildings. This requires one
-paint item per building. You can learn painting recipes at the Painter's
-Workshop building, and from world drop recipes.
+paint item per building/vehicle. You can learn painting recipes at the
+Painter's Workshop building, and from world drop recipes.
 
-Painting a building the same color twice will result in a brighter color. The
+Painting something the same color twice will result in a brighter color. The
 'unpaint' command removes the paint.
+
+For traditional buildings, you must paint from inside. For vehicles or newer
+buildings, you can also paint them from the outside.
 
 You need the 'customize' privilege in your empire to paint or unpaint.
 

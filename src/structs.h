@@ -2696,7 +2696,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_CHOP_PROGRESS  8
 #define ROOM_EXTRA_TRENCH_PROGRESS  9
 #define ROOM_EXTRA_HARVEST_PROGRESS  10
-	#define ROOM_EXTRA_GARDEN_WORKFORCE_PROGRESS  11	// deprecated
+#define ROOM_EXTRA_PAINT_COLOR  11
 	#define ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS  12	// deprecated
 #define ROOM_EXTRA_BUILD_RECIPE  13
 #define ROOM_EXTRA_FOUND_TIME  14
@@ -5668,6 +5668,7 @@ struct vehicle_data {
 	int construction_id;	// temporary id used to resume construction/dismantle
 	struct room_extra_data *extra_data;	// hash of misc storage
 	any_vnum instance_id;	// adventure instance the vehicle belongs to, or NOTHING if none
+	bitvector_t room_affects;	// ROOM_AFF_ flags applied to the room while veh is here
 	
 	// scripting
 	int script_id;	// used by DG triggers - unique id
@@ -5700,7 +5701,6 @@ struct vehicle_attribute_data {
 	struct extra_descr_data *ex_description;	// extra descriptions
 	struct interaction_item *interactions;	// interaction items
 	struct spawn_info *spawns;	// linked list of spawn data
-	bitvector_t room_affects;	// ROOM_AFF_ flags applied to the room while veh is here
 	bitvector_t functions;	// FNC_ flags offered to the room the vehicle is in
 	bitvector_t requires_climate;	// CLIM_ flags required for this vehicle to enter a room
 	bitvector_t forbid_climate;	// CLIM_ flags that block this vehicle from entering
@@ -5807,7 +5807,7 @@ struct complex_room_data {
 	vehicle_data *vehicle;  // the associated vehicle (usually only on the home room)
 	struct instance_data *instance;	// if part of an instantiated adventure
 	
-	int paint_color;	// for the 'paint' command
+	// int paint_color;	// for the 'paint' command -- as of b5.108 this is stored as extra data
 	int private_owner;	// for privately-owned houses
 	
 	time_t burn_down_time;	// if >0, the timestamp when this building will burn down

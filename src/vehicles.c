@@ -1991,6 +1991,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	HASH_ITER(hh, VEH_EXTRA_DATA(veh), red, next_red) {
 		fprintf(fl, "Extra-data: %d %d\n", red->type, red->value);
 	}
+	if (VEH_ROOM_AFFECTS(veh) && (!proto || VEH_ROOM_AFFECTS(veh) != VEH_ROOM_AFFECTS(proto))) {
+		fprintf(fl, "Room-affects: %lld\r\n", VEH_ROOM_AFFECTS(veh));
+	}
 	
 	// scripts
 	if (SCRIPT(veh)) {
@@ -2326,6 +2329,12 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
 						VEH_OWNER(veh) = real_empire(i_in[0]);
 					}
+				}
+				break;
+			}
+			case 'R': {
+				if (OBJ_FILE_TAG(line, "Room-affects:", length)) {
+					VEH_ROOM_AFFECTS(veh) = strtoull(line + length + 1, NULL, 10);
 				}
 				break;
 			}
@@ -3591,7 +3600,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 	struct spawn_info *spawn;
 	struct quest_lookup *ql;
 	struct shop_lookup *sl;
-	bitvector_t old_flags;
+	bitvector_t old_flags, add_affs, rem_affs;
 	UT_hash_handle hh;
 
 	// have a place to save it?
@@ -3625,6 +3634,10 @@ void save_olc_vehicle(descriptor_data *desc) {
 	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 	prune_extra_descs(&VEH_EX_DESCS(veh));
 	
+	// determine if affs were added or removed, for updating live vehs
+	add_affs = VEH_ROOM_AFFECTS(veh) & ~VEH_ROOM_AFFECTS(proto);
+	rem_affs = VEH_ROOM_AFFECTS(proto) & ~VEH_ROOM_AFFECTS(veh);
+	
 	// update live vehicles
 	DL_FOREACH(vehicle_list, iter) {
 		if (VEH_VNUM(iter) != vnum) {
@@ -3634,6 +3647,10 @@ void save_olc_vehicle(descriptor_data *desc) {
 		// flags (preserve the state of the savable flags only)
 		old_flags = VEH_FLAGS(iter) & SAVABLE_VEH_FLAGS;
 		VEH_FLAGS(iter) = (VEH_FLAGS(veh) & ~SAVABLE_VEH_FLAGS) | old_flags;
+		
+		// apply any changed affs, but leave the rest alone
+		SET_BIT(VEH_ROOM_AFFECTS(iter), add_affs);
+		REMOVE_BIT(VEH_ROOM_AFFECTS(iter), rem_affs);
 		
 		// update pointers
 		if (VEH_KEYWORDS(iter) == VEH_KEYWORDS(proto)) {

@@ -577,6 +577,7 @@ void disassociate_building(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_FOUND_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_REDESIGNATE_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_ORIGINAL_BUILDER);
+	remove_room_extra_data(room, ROOM_EXTRA_PAINT_COLOR);
 	
 	// some event types must be canceled
 	cancel_stored_event_room(room, SEV_BURN_DOWN);
@@ -2186,76 +2187,122 @@ ACMD(do_nodismantle) {
 
 
 ACMD(do_paint) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	vehicle_data *paint_veh = NULL;
+	room_data *paint_room = NULL;
 	obj_data *paint;
 	
-	one_argument(argument, arg);
+	two_arguments(argument, arg1, arg2);
 	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "Mobs can't paint.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
-		msg_to_char(ch, "You don't have permission to paint here.\r\n");
-	}
-	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
+	if (IS_NPC(ch) || !has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to paint anything (customize).\r\n");
+		return;
 	}
-	else if (!COMPLEX_DATA(IN_ROOM(ch)) || !IS_ANY_BUILDING(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can only paint buildings.\r\n");
+	if (!*arg1) {
+		msg_to_char(ch, "Usage: paint <building | vehicle> <paint item>\r\n");
+		return;
 	}
-	else if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
-		msg_to_char(ch, "You need to be in the main entry room to paint the building.\r\n");
+	
+	// determine what they're trying to paint
+	if (is_abbrev(arg1, "building") || is_abbrev(arg1, "room") || isname(arg1, skip_filler(get_room_name(HOME_ROOM(IN_ROOM(ch)), FALSE)))) {
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+			// actually paint the vehicle we're in
+			paint_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
+		}
+		else {
+			paint_room = HOME_ROOM(IN_ROOM(ch));
+		}
 	}
-	else if (!ROOM_IS_CLOSED(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can only paint an enclosed building.\r\n");
+	else if (!generic_find(arg1, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &paint_veh)) {
+		msg_to_char(ch, "You don't see %s %s here to paint.\r\n", AN(arg1), arg1);
+		return;
 	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "Finish the building before painting it.\r\n");
+	
+	// validate painting: room
+	if (paint_room && (!can_use_room(ch, paint_room, MEMBERS_ONLY) || ROOM_AFF_FLAGGED(paint_room, ROOM_AFF_UNCLAIMABLE))) {
+		msg_to_char(ch, "You don't have permission to paint here.\r\n");
+		return;
 	}
-	else if (IS_DISMANTLING(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't paint a building that is being dismantled.\r\n");
+	if (paint_room && (!ROOM_IS_CLOSED(paint_room) || !COMPLEX_DATA(paint_room) || !IS_ANY_BUILDING(paint_room) || ROOM_BLD_FLAGGED(paint_room, BLD_NO_PAINT))) {
+		msg_to_char(ch, "You can't paint that.\r\n");
+		return;
 	}
-	else if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NO_PAINT)) {
-		msg_to_char(ch, "This building cannot be painted.\r\n");
+	
+	// validate painting: vehicle
+	if (paint_veh && !can_use_vehicle(ch, paint_veh, MEMBERS_ONLY)) {
+		act("You don't have permission to paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		return;
 	}
-	else if (!*arg) {
-		msg_to_char(ch, "Paint the building with what?\r\n");
+	if (paint_veh && (!VEH_ICON(paint_veh) || VEH_FLAGGED(paint_veh, VEH_NO_PAINT))) {
+		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		return;
 	}
-	else if (!(paint = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
+	
+	// validate painting: general
+	if ((paint_room && !IS_COMPLETE(paint_room)) || (paint_veh && !VEH_IS_COMPLETE(paint_veh))) {
+		msg_to_char(ch, "Finish the building it painting it.\r\n");
+		return;
+	}
+	if ((paint_room && IS_DISMANTLING(paint_room)) || (paint_veh && VEH_IS_DISMANTLING(paint_veh))) {
+		msg_to_char(ch, "You can't paint that while it is being dismantled.\r\n");
+		return;
+	}
+	
+	// ok find/validate the paint object
+	if (!*arg2) {
+		msg_to_char(ch, "Paint with what color?\r\n");
+		return;
+	}
+	if (!(paint = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have that paint with.\r\n");
+		return;
 	}
-	else if (!IS_PAINT(paint)) {
+	if (!IS_PAINT(paint)) {
 		act("$p isn't paint!", FALSE, ch, paint, NULL, TO_CHAR);
+		return;
 	}
-	else if (!consume_otrigger(paint, ch, OCMD_PAINT, NULL)) {
+	if (!consume_otrigger(paint, ch, OCMD_PAINT, NULL)) {
 		return;	// check trigger
 	}
-	else {
+	
+	// SUCCESS
+	if (paint_room) {
 		act("You use $p to paint the building!", FALSE, ch, paint, NULL, TO_CHAR);
 		act("$n uses $p to paint the building!", FALSE, ch, paint, NULL, TO_ROOM);
 		
-		if (PRF_FLAGGED(ch, PRF_NO_PAINT)) {
-			msg_to_char(ch, "Notice: You have no-paint toggled on, and won't be able to see the color.\r\n");
-		}
-		
-		if (ROOM_PAINT_COLOR(IN_ROOM(ch)) == GET_PAINT_COLOR(paint)) {
-			// same color -- brighten it
-			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
-			affect_total_room(IN_ROOM(ch));
+		// brighten if same color or remove bright if not
+		if (ROOM_PAINT_COLOR(paint_room) == GET_PAINT_COLOR(paint)) {
+			SET_BIT(ROOM_BASE_FLAGS(paint_room), ROOM_AFF_BRIGHT_PAINT);
 		}
 		else {
-			// different color -- remove bright
-			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
-			affect_total_room(IN_ROOM(ch));
+			REMOVE_BIT(ROOM_BASE_FLAGS(paint_room), ROOM_AFF_BRIGHT_PAINT);
 		}
 		
-		// update color
-		COMPLEX_DATA(IN_ROOM(ch))->paint_color = GET_PAINT_COLOR(paint);
-		
-		command_lag(ch, WAIT_ABILITY);
-		
-		run_interactions(ch, GET_OBJ_INTERACTIONS(paint), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, paint, NULL, consumes_or_decays_interact);
-		extract_obj(paint);
+		set_room_extra_data(paint_room, ROOM_EXTRA_PAINT_COLOR, GET_PAINT_COLOR(paint));
 	}
+	if (paint_veh) {
+		act("You use $p to paint $V!", FALSE, ch, paint, paint_veh, TO_CHAR);
+		act("$n uses $p to paint $V!", FALSE, ch, paint, paint_veh, TO_ROOM);
+		
+		// brighten if same color or remove bright if not
+		if (VEH_PAINT_COLOR(paint_veh) == GET_PAINT_COLOR(paint)) {
+			SET_BIT(VEH_ROOM_AFFECTS(paint_veh), ROOM_AFF_BRIGHT_PAINT);
+		}
+		else {
+			REMOVE_BIT(VEH_ROOM_AFFECTS(paint_veh), ROOM_AFF_BRIGHT_PAINT);
+		}
+		
+		set_vehicle_extra_data(paint_veh, ROOM_EXTRA_PAINT_COLOR, GET_PAINT_COLOR(paint));
+	}
+	
+	if (PRF_FLAGGED(ch, PRF_NO_PAINT)) {
+		msg_to_char(ch, "Notice: You have no-paint toggled on, and won't be able to see the color.\r\n");
+	}
+	
+	command_lag(ch, WAIT_ABILITY);
+	affect_total_room(IN_ROOM(ch));
+	run_interactions(ch, GET_OBJ_INTERACTIONS(paint), INTERACT_CONSUMES_TO, paint_room, NULL, paint, paint_veh, consumes_or_decays_interact);
+	extract_obj(paint);
 }
 
 
@@ -2358,29 +2405,71 @@ ACMD(do_tunnel) {
 
 
 ACMD(do_unpaint) {
-	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-		msg_to_char(ch, "You don't have permission to remove the paint here.\r\n");
-	}
-	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
+	vehicle_data *paint_veh = NULL;
+	room_data *paint_room = NULL;
+	
+	one_argument(argument, arg);
+	
+	if (IS_NPC(ch) || !has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to unpaint anything (customize).\r\n");
+		return;
 	}
-	else if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
-		msg_to_char(ch, "You need to be in the main entry room to unpaint the building.\r\n");
-	}
-	else if (!ROOM_PAINT_COLOR(IN_ROOM(ch))) {
-		msg_to_char(ch, "Nothing here is painted.\r\n");
+	if (!*arg) {
+		msg_to_char(ch, "Usage: unpaint <building | vehicle>\r\n");
+		return;
 	}
 	
-	else {
+	// determine what they're trying to unpaint
+	if (is_abbrev(arg, "building") || is_abbrev(arg, "room") || isname(arg, skip_filler(get_room_name(HOME_ROOM(IN_ROOM(ch)), FALSE)))) {
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+			// actually unpaint the vehicle we're in
+			paint_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
+		}
+		else {
+			paint_room = HOME_ROOM(IN_ROOM(ch));
+		}
+	}
+	else if (!generic_find(arg, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &paint_veh)) {
+		msg_to_char(ch, "You don't see %s %s here to unpaint.\r\n", AN(arg), arg);
+		return;
+	}
+	
+	// validate unpainting: room
+	if (paint_room && (!can_use_room(ch, paint_room, MEMBERS_ONLY) || ROOM_AFF_FLAGGED(paint_room, ROOM_AFF_UNCLAIMABLE))) {
+		msg_to_char(ch, "You don't have permission to unpaint here.\r\n");
+		return;
+	}
+	if (paint_room && !ROOM_PAINT_COLOR(paint_room)) {
+		msg_to_char(ch, "It's not even painted.\r\n");
+		return;
+	}
+	
+	// validate unpainting: vehicle
+	if (paint_veh && !can_use_vehicle(ch, paint_veh, MEMBERS_ONLY)) {
+		act("You don't have permission to unpaint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		return;
+	}
+	if (paint_veh && !VEH_PAINT_COLOR(paint_veh)) {
+		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		return;
+	}
+	
+	// SUCCESS:
+	if (paint_room) {
 		act("You strip the paint from the building!", FALSE, ch, NULL, NULL, TO_CHAR);
 		act("$n strips the paint from the building!", FALSE, ch, NULL, NULL, TO_ROOM);
-		
-		COMPLEX_DATA(IN_ROOM(ch))->paint_color = 0;
-		REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
-		affect_total_room(IN_ROOM(ch));
-		
-		command_lag(ch, WAIT_ABILITY);
+		remove_room_extra_data(paint_room, ROOM_EXTRA_PAINT_COLOR);
+		REMOVE_BIT(ROOM_BASE_FLAGS(paint_room), ROOM_AFF_BRIGHT_PAINT);
 	}
+	if (paint_veh) {
+		act("You strip the paint from $V!", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		act("$n strips the paint from $V!", FALSE, ch, NULL, paint_veh, TO_ROOM);
+		remove_vehicle_extra_data(paint_veh, ROOM_EXTRA_PAINT_COLOR);
+		REMOVE_BIT(VEH_ROOM_AFFECTS(paint_veh), ROOM_AFF_BRIGHT_PAINT);
+	}
+	
+	command_lag(ch, WAIT_ABILITY);
+	affect_total_room(IN_ROOM(ch));
 }
 
 

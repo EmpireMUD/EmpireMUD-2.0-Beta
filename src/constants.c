@@ -3436,7 +3436,7 @@ const char *room_extra_types[] = {
 	"chop progress",
 	"trench progress",
 	"harvest progress",	// 10
-	"garden workforce progress",
+	"paint color",
 	"quarry workforce progress",
 	"build recipe",
 	"found time",
