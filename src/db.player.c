@@ -4022,6 +4022,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		try_home = TRUE;
 	}
 	
+	// load room is in a vehicle that's no longer complete?
+	if (load_room && GET_ROOM_VEHICLE(load_room) && (!VEH_IS_COMPLETE(GET_ROOM_VEHICLE(load_room)) || VEH_IS_DISMANTLING(GET_ROOM_VEHICLE(load_room)))) {
+		load_room = NULL;	// re-detect
+		try_home = TRUE;
+	}
+	
 	// on request, try to send them home
 	if (try_home) {
 		load_room = find_home(ch);
