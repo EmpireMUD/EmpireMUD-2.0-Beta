@@ -6326,15 +6326,22 @@ unsigned long long microtime(void) {
 *
 * @param empire_data *for_emp Optional: Which empire wants to use the functions. If NULL, no empire/owner check is made.
 * @param room_data *room The room to check.
-* @param bitvector_t fnc_flag Any FNC_ flag.
+* @param bitvector_t fnc_flag Any FNC_ flag -- only requires 1 of these (except UPGRADED, which is always required in addition to one of the other flags, if present).
 * @return bool TRUE if the room has the function and passed the city check, FALSE if not.
 */
 bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvector_t fnc_flag) {
 	vehicle_data *veh;
-	bool junk;
+	bool junk, upgraded;
+	
+	// are we checking for upgraded?
+	upgraded = IS_SET(fnc_flag, FNC_UPGRADED);
+	fnc_flag &= ~FNC_UPGRADED;
 	
 	// check vehicles first
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (upgraded && !IS_SET(VEH_FUNCTIONS(veh), FNC_UPGRADED)) {
+			continue;
+		}
 		if (!IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
 			continue;	// no function
 		}
@@ -6355,6 +6362,9 @@ bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvec
 	}
 	
 	// otherwise check the room itself
+	if (upgraded && (!HAS_FUNCTION(room, FNC_UPGRADED) || !IS_COMPLETE(room))) {
+		return FALSE;
+	}
 	if (!HAS_FUNCTION(room, fnc_flag) || !IS_COMPLETE(room)) {
 		return FALSE;
 	}

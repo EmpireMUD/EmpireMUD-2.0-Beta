@@ -1846,7 +1846,7 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 
 	/* Now we're sure we can hit this person: gets worse with dex */
 	if (!AWAKE(ch) || !number(0, MAX(0, (GET_DEXTERITY(ch)/2) - 1))) {
-		dam = 25 + (ROOM_BLD_FLAGGED(from_room, BLD_UPGRADED) ? 50 : 0);
+		dam = 25 + (HAS_FUNCTION(from_room, FNC_UPGRADED) ? 50 : 0);
 	}
 	else {
 		dam = 0;
@@ -1908,7 +1908,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// basic guard tower only shoots 2
-	if (distance > 2 && !ROOM_BLD_FLAGGED(from_room, BLD_UPGRADED)) {
+	if (distance > 2 && !HAS_FUNCTION(from_room, FNC_UPGRADED)) {
 		return FALSE;
 	}
 	

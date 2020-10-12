@@ -81,6 +81,7 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	char buf1[MAX_STRING_LENGTH], *str, *ptr;
 	vehicle_data *craft_veh;
 	bool wait, room_wait, makes_building;
+	bitvector_t fncs_minus_upgraded = (GET_CRAFT_REQUIRES_FUNCTION(type) & ~FNC_UPGRADED);
 	
 	char *command = gen_craft_data[GET_CRAFT_TYPE(type)].command;
 	
@@ -149,14 +150,12 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FIRE) && !has_cooking_fire(ch)) {
 		msg_to_char(ch, "You need a good fire to do that.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_BLD_UPGRADED) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_UPGRADED) || !IS_COMPLETE(IN_ROOM(ch)))) {
-		msg_to_char(ch, "The building needs to be upgraded to %s that!\r\n", command);
-	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP) && !find_water_container(ch, ch->carrying) && !find_water_container(ch, ROOM_CONTENTS(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need a container of water to %s that.\r\n", command);
 	}
-	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
-		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags_long, buf1);
+	else if (fncs_minus_upgraded && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), fncs_minus_upgraded)) {
+		// this checks/shows without FNC_UPGRADED, which is handled separately after.
+		prettier_sprintbit(fncs_minus_upgraded, function_flags_long, buf1);
 		str = buf1;
 		if ((ptr = strrchr(str, ','))) {
 			msg_to_char(ch, "You must be %-*.*s or%s to %s that.\r\n", (int)(ptr-str), (int)(ptr-str), str, ptr+1, command);
@@ -164,7 +163,9 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 		else {	// no comma
 			msg_to_char(ch, "You must be %s to %s that.\r\n", buf1, command);
 		}
-	
+	}
+	else if (IS_SET(GET_CRAFT_REQUIRES_FUNCTION(type), FNC_UPGRADED) && !ROOM_IS_UPGRADED(IN_ROOM(ch))) {
+		msg_to_char(ch, "You need to be in an upgraded building to %s that!\r\n", command);
 	}
 	// end flag checks
 	

@@ -117,7 +117,7 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Interior room has yearly maintenance (will have no effect)");
 		problem = TRUE;
 	}
-	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && count_bld_relations(bld, BLD_REL_UPGRADES_TO_BLD) > 0 || count_bld_relations(bld, BLD_REL_UPGRADES_TO_VEH) > 0) {
+	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && (count_bld_relations(bld, BLD_REL_UPGRADES_TO_BLD) > 0 || count_bld_relations(bld, BLD_REL_UPGRADES_TO_VEH) > 0)) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Interior room has upgrades-to- relation(s)");
 		problem = TRUE;
 	}

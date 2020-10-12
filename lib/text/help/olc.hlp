@@ -2153,6 +2153,7 @@ room as the vehicle. For crafts, the 'requiresfunction' field requires that
 the craft be made at a location with that function.
 
 Available functions:
+ UPGRADED - building/vehicle is an upgraded version (modifies other functions)
  ALCHEMIST - can brew and mix here
  APIARY - no current use
  BATHS - can use the bathe command here
@@ -2524,7 +2525,6 @@ Available flags:
  IN-CITY-ONLY - a craft or building can only be made in a city radius
  VEHICLE - creates a vehicle instead of an item, see CRAFT VEHICLES
  SHIPYARD - requires being at a shipyard
- BLD-UPGRADED - requires being at a building with the UPGRADED flag
  LEARNED - requires the player/empire 'learn' a recipe to use it
  BY-RIVER - must be adjacent to a river
  REMOVE-PRODUCTION - removes this craft's resources from empire production

@@ -1384,6 +1384,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_CAN_EXIT(room)  (ROOM_BLD_FLAGGED((room), BLD_EXIT) || (GET_ROOM_VEHICLE(room) && room == HOME_ROOM(room)))
 #define ROOM_CAN_MINE(room)  (ROOM_SECT_FLAGGED((room), SECTF_CAN_MINE) || room_has_function_and_city_ok(ROOM_OWNER(room), (room), FNC_MINE) || (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_CAN_MINE)))
 #define ROOM_IS_CLOSED(room)  (IS_INSIDE(room) || IS_ADVENTURE_ROOM(room) || (IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN) && (IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED))))
+#define ROOM_IS_UPGRADED(room)  ((IS_COMPLETE(room) && HAS_FUNCTION((room), FNC_UPGRADED)) || (IS_COMPLETE(HOME_ROOM(room)) && HAS_FUNCTION(HOME_ROOM(room), FNC_UPGRADED)) || (GET_ROOM_VEHICLE(room) && IS_SET(VEH_FUNCTIONS(GET_ROOM_VEHICLE(room)), FNC_UPGRADED)))
 #define SHOW_PEOPLE_IN_ROOM(room)  (!ROOM_IS_CLOSED(room) && !ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION))
 #define WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room)  (RMT_FLAGGED((room), RMT_LIGHT) || IS_ANY_BUILDING(room) || !IS_DARK(room) || adjacent_room_is_light(room))
 

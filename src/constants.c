@@ -1635,7 +1635,7 @@ const char *craft_flags[] = {
 	"IN-CITY-ONLY",
 	"VEHICLE",
 	"*",	// formerly shipyard (now uses a function)
-	"BLD-UPGRADED",
+	"*",	// formerly bld-upgraded (now uses a function)
 	"LEARNED",
 	"BY-RIVER",
 	"REMOVE-PRODUCTION",
@@ -2887,7 +2887,7 @@ const bitvector_t bld_on_flags_order[] = {
 };
 
 
-// BLD_x -- feel free to re-use the * flags, as they should no longer appear on anything
+// BLD_x: building flags -- * flags are removed flags
 const char *bld_flags[] = {
 	"ROOM",	// 0
 	"ALLOW-MOUNTS",
@@ -2935,7 +2935,7 @@ const char *bld_flags[] = {
 	"LOOK-OUT",
 	"2ND-TERRITORY",
 	"*",	// 45
-	"UPGRADED",
+	"*",
 	"*",
 	"\n"
 };

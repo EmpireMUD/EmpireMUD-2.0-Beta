@@ -781,8 +781,8 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_LOOK_OUT  BIT(43)	// can see the map using "look out"
 #define BLD_SECONDARY_TERRITORY  BIT(44)	// similar to a ship -- counts as territory off the map
 // #define BLD_UNUSED25  BIT(45)
-#define BLD_UPGRADED  BIT(46)	// combines with SHIPYARD, etc. to create upgraded versions of buildings
-// #define BLD_UNUSED26  BIT(47)
+// #define BLD_UNUSED26  BIT(46)	// formerly UPGRADED (use a function flag now)
+// #define BLD_UNUSED27  BIT(47)
 
 
 // BLD_ON_x: Terrain flags for building crafts -- these match up with build_on flags for building crafts
@@ -1073,7 +1073,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_IN_CITY_ONLY  BIT(12)	// craft/building must be inside a city
 #define CRAFT_VEHICLE  BIT(13)	// creates a vehicle instead of an object
 	#define CRAFT_UNUSED5  BIT(14)	// formerly shipyard (now uses a function)
-#define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
+	#define CRAFT_UNUSED6  BIT(15)	// formerly bld-upgraded (now uses a function flag)
 #define CRAFT_LEARNED  BIT(16)	// cannot use unless learned
 #define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
 #define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
