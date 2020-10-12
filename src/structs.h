@@ -851,7 +851,7 @@ typedef struct vehicle_data vehicle_data;
 
 // FNC_x: function flags (for buildings)
 #define FNC_ALCHEMIST  BIT(0)	// can brew and mix here
-	#define FNC_UNUSED  BIT(1)	// formerly 'apiary'
+#define FNC_UPGRADED  BIT(1)	// used on upgraded buildings / advanced crafts
 #define FNC_BATHS  BIT(2)	// can use the bathe command here
 #define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
 #define FNC_CARPENTER  BIT(4)	// required by some crafts

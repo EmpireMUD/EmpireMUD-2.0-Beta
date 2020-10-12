@@ -3150,7 +3150,7 @@ bool evo_is_over_time[] = {
 // FNC_x (1/2): function flags (for buildings)
 const char *function_flags[] = {
 	"ALCHEMIST",	// 0
-	"*",
+	"UPGRADED",
 	"BATHS",
 	"BEDROOM",
 	"CARPENTER",
@@ -3195,7 +3195,7 @@ const char *function_flags[] = {
 // FNC_x (2/2): explainers, usually shown as "You must be %s to craft that."
 const char *function_flags_long[] = {
 	"at an alchemist",	// 0
-	"",
+	"an upgraded building",
 	"at the baths",
 	"in a bedroom",
 	"at a carpenter",
