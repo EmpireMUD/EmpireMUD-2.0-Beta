@@ -117,8 +117,8 @@ bool audit_building(bld_data *bld, char_data *ch) {
 		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Interior room has yearly maintenance (will have no effect)");
 		problem = TRUE;
 	}
-	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && count_bld_relations(bld, BLD_REL_UPGRADES_TO) > 0) {
-		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Interior room has upgrades-to");
+	if (IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM) && count_bld_relations(bld, BLD_REL_UPGRADES_TO_BLD) > 0 || count_bld_relations(bld, BLD_REL_UPGRADES_TO_VEH) > 0) {
+		olc_audit_msg(ch, GET_BLD_VNUM(bld), "Interior room has upgrades-to- relation(s)");
 		problem = TRUE;
 	}
 	if (IS_SET(GET_BLD_FLAGS(bld), BLD_EXIT) && !IS_SET(GET_BLD_FLAGS(bld), BLD_ROOM)) {
@@ -444,7 +444,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	
 	// buildings
 	HASH_ITER(hh, building_table, biter, next_biter) {
-		found = delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(biter), BLD_REL_UPGRADES_TO, vnum);
+		found = delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(biter), BLD_REL_UPGRADES_TO_BLD, vnum);
 		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(biter), BLD_REL_STORES_LIKE_BLD, vnum);
 		found |= delete_from_interaction_list(&GET_BLD_INTERACTIONS(biter), TYPE_BLD, vnum);
 		
@@ -529,7 +529,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 			found |= TRUE;
 		}
 		found |= delete_from_interaction_list(&VEH_INTERACTIONS(veh), TYPE_BLD, vnum);
-		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(veh), BLD_REL_UPGRADES_TO, vnum);
+		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(veh), BLD_REL_UPGRADES_TO_BLD, vnum);
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(veh), BLD_REL_STORES_LIKE_BLD, vnum);
 		
 		if (found) {
@@ -550,7 +550,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 			}
 		}
 		if (GET_OLC_BUILDING(desc)) {
-			found = delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_UPGRADES_TO, vnum);
+			found = delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_UPGRADES_TO_BLD, vnum);
 			found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_STORES_LIKE_BLD, vnum);
 			found |= delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_BLD, vnum);
 			if (found) {
@@ -618,7 +618,7 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 		}
 		if (GET_OLC_VEHICLE(desc)) {
 			found = delete_from_interaction_list(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), TYPE_BLD, vnum);
-			found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(GET_OLC_VEHICLE(desc)), BLD_REL_UPGRADES_TO, vnum);
+			found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(GET_OLC_VEHICLE(desc)), BLD_REL_UPGRADES_TO_BLD, vnum);
 			found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(GET_OLC_VEHICLE(desc)), BLD_REL_STORES_LIKE_BLD, vnum);
 			if (VEH_INTERIOR_ROOM_VNUM(GET_OLC_VEHICLE(desc)) == vnum) {
 				VEH_INTERIOR_ROOM_VNUM(GET_OLC_VEHICLE(desc)) = NOTHING;
@@ -901,7 +901,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 			}
 		}
 		LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
-			if (relat->type != BLD_REL_UPGRADES_TO && relat->type != BLD_REL_STORES_LIKE_BLD) {
+			if (relat->type != BLD_REL_UPGRADES_TO_BLD && relat->type != BLD_REL_STORES_LIKE_BLD) {
 				continue;
 			}
 			if (relat->vnum != vnum) {
@@ -1004,7 +1004,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 			}
 		}
 		LL_FOREACH(VEH_RELATIONS(veh), relat) {
-			if (relat->type != BLD_REL_UPGRADES_TO && relat->type != BLD_REL_STORES_LIKE_BLD) {
+			if (relat->type != BLD_REL_UPGRADES_TO_BLD && relat->type != BLD_REL_STORES_LIKE_BLD) {
 				continue;
 			}
 			if (relat->vnum != vnum) {
@@ -1336,11 +1336,12 @@ void get_bld_relations_display(struct bld_relation *list, char *save_buffer) {
 	LL_FOREACH(list, relat) {
 		// BLD_REL_x
 		switch (relat->type) {
+			case BLD_REL_UPGRADES_TO_VEH:
 			case BLD_REL_STORES_LIKE_VEH: {
 				sprintf(save_buffer + strlen(save_buffer), "%2d. %s: [%5d] %s\r\n", ++count, bld_relationship_types[relat->type], relat->vnum, get_vehicle_name_by_proto(relat->vnum));
 				break;
 			}
-			case BLD_REL_UPGRADES_TO:
+			case BLD_REL_UPGRADES_TO_BLD:
 			case BLD_REL_STORES_LIKE_BLD:
 			default: {
 				sprintf(save_buffer + strlen(save_buffer), "%2d. %s: [%5d] %s\r\n", ++count, bld_relationship_types[relat->type], relat->vnum, get_bld_name_by_proto(relat->vnum));

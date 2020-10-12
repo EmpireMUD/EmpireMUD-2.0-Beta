@@ -924,7 +924,7 @@ ADMIN_UTIL(util_bldconvert) {
 			}
 		}
 		LL_FOREACH(GET_BLD_RELATIONS(bld_iter), relat) {
-			if (relat->type != BLD_REL_UPGRADES_TO && relat->type != BLD_REL_STORES_LIKE_BLD) {
+			if (relat->type != BLD_REL_UPGRADES_TO_BLD && relat->type != BLD_REL_STORES_LIKE_BLD) {
 				continue;
 			}
 			if (relat->vnum != from_vnum) {
@@ -992,7 +992,7 @@ ADMIN_UTIL(util_bldconvert) {
 			}
 		}
 		LL_FOREACH(VEH_RELATIONS(veh_iter), relat) {
-			if (relat->type != BLD_REL_UPGRADES_TO && relat->type != BLD_REL_STORES_LIKE_BLD) {
+			if (relat->type != BLD_REL_UPGRADES_TO_BLD && relat->type != BLD_REL_STORES_LIKE_BLD) {
 				continue;
 			}
 			if (relat->vnum != from_vnum) {

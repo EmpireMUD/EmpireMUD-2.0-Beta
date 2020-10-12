@@ -2943,18 +2943,20 @@ const char *bld_flags[] = {
 
 // BLD_REL_x (1/2): relationships with other buildings
 const char *bld_relationship_types[] = {
-	"UPGRADES-TO",
+	"UPGRADES-TO-BLD",
 	"STORES-LIKE-BLD",
 	"STORES-LIKE-VEH",
+	"UPGRADES-TO-VEH",
 	"\n"
 };
 
 
 // BLD_REL_x (2/2): vnum types
 const int bld_relationship_vnum_types[] = {
-	TYPE_BLD,	// "UPGRADES-TO",
+	TYPE_BLD,	// "UPGRADES-TO-BLD",
 	TYPE_BLD,	// "STORES-LIKE-BLD",
 	TYPE_VEH,	// "STORES-LIKE-VEH",
+	TYPE_VEH,	// "UPGRADES-TO-VEH",
 };
 
 

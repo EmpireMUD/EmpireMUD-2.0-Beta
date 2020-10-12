@@ -733,7 +733,7 @@ bld_data *find_upgraded_from(bld_data *bb) {
 	}
 	
 	HASH_ITER(hh, building_table, iter, next_iter) {
-		if (bld_has_relation(iter, BLD_REL_UPGRADES_TO, GET_BLD_VNUM(bb))) {
+		if (bld_has_relation(iter, BLD_REL_UPGRADES_TO_BLD, GET_BLD_VNUM(bb))) {
 			return iter;
 		}
 	}
@@ -2580,7 +2580,7 @@ ACMD(do_upgrade) {
 	
 	// determine what kind of upgrades are available here
 	if (GET_BUILDING(IN_ROOM(ch))) {
-		upgrade_count = count_bld_relations(GET_BUILDING(IN_ROOM(ch)), BLD_REL_UPGRADES_TO);
+		upgrade_count = count_bld_relations(GET_BUILDING(IN_ROOM(ch)), BLD_REL_UPGRADES_TO_BLD);
 	}
 	
 	skip_spaces(&argument);
@@ -2615,7 +2615,7 @@ ACMD(do_upgrade) {
 		
 		// attempt to figure out what we're upgrading to
 		LL_FOREACH(GET_BLD_RELATIONS(GET_BUILDING(IN_ROOM(ch))), relat) {
-			if (relat->type != BLD_REL_UPGRADES_TO || !(proto = building_proto(relat->vnum))) {
+			if (relat->type != BLD_REL_UPGRADES_TO_BLD || !(proto = building_proto(relat->vnum))) {
 				continue;
 			}
 			

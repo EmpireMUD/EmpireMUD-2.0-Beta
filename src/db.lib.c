@@ -807,8 +807,8 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				}
 				if (sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
 					if (sscanf(line, "%d", &int_in[1]) == 1) {
-						// backwards-compatible to when U was only upgrades-to
-						int_in[0] = BLD_REL_UPGRADES_TO;
+						// backwards-compatible to when U was only upgrades-to-bld
+						int_in[0] = BLD_REL_UPGRADES_TO_BLD;
 					}
 					else {	// error
 						log("SYSERR: Format error in U line of %s", buf2);

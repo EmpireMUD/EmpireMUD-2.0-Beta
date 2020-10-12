@@ -2285,9 +2285,10 @@ Relations link this building/vehicle to other buildings/vehicles in various
 ways:
 
 Available relationship types:
- &cUPGRADES-TO&0 - This building can be upgraded to that type.
- &cSTORES-LIKE-BLD&0 - Anything that can be stored there can be stored here.
- &cSTORES-LIKE-VEH&0 - Anything that can be stored there can be stored here.
+ &cUPGRADES-TO-BLD&0 - Becomes a building, see UPGRADE CRAFTS
+ &cUPGRADES-TO-VEH&0 - Becomes a vehicle, see UPGRADE CRAFTS
+ &cSTORES-LIKE-BLD&0 - Inherits the storage as target building
+ &cSTORES-LIKE-VEH&0 - Inherits the storage as target vehicle
                   (stores-like does not include warehouses; use function flags)
 
 See also: OLC BUILDINGS
@@ -7993,6 +7994,24 @@ currently an option.
 
 The UNDEFINED item type should not be used for live items. If you need a
 generic item, use type OTHER.
+#d
+"UPGRADE CRAFTS" "UPGRADES TO" UPGRADES-TO
+
+Vehicles and buildings can be upgraded into other vehicles and buildings.
+
+Step 1: Add an UPGRADES-TO-BLD or UPGRADES-TO-VEH relationship to a building or
+vehicle, indicating which other building/vehicle it upgrades to.
+
+Step 2: Make a craft for the upgrade:
+- Name it something like "upgrade shipyard" that's easy to search for. It isn't
+  displayed to players.
+- Set the type to whatever seems appropriate. If it's a vehicle, be sure to
+  also set the VEHICLE flag.
+- Set the UPGRADE flag (this also hides it from normal build/craft commands).
+- Set buildon flags, ability, requires-object, and/or level if appropriate
+- Set any tools or resources you need.
+
+See also: BEDIT RELATIONS, BUILDING-VEHICLES, OLC CRAFTS
 #d
 "VEDIT ANIMALSREQUIRED" "VEDIT ANIMALS REQUIRED"
 

@@ -1567,7 +1567,10 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 			}
 		}
 		LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
-			if (relat->type != BLD_REL_STORES_LIKE_VEH || relat->vnum != vnum) {
+			if (relat->vnum != vnum) {
+				continue;
+			}
+			if (relat->type != BLD_REL_STORES_LIKE_VEH && relat->type != BLD_REL_UPGRADES_TO_VEH) {
 				continue;
 			}
 			any = TRUE;
@@ -1683,7 +1686,10 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 			}
 		}
 		LL_FOREACH(VEH_RELATIONS(veh_iter), relat) {
-			if (relat->type != BLD_REL_STORES_LIKE_VEH || relat->vnum != vnum) {
+			if (relat->vnum != vnum) {
+				continue;
+			}
+			if (relat->type != BLD_REL_STORES_LIKE_VEH && relat->type != BLD_REL_UPGRADES_TO_VEH) {
 				continue;
 			}
 			any = TRUE;
@@ -3183,6 +3189,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_STORES_LIKE_VEH, vnum);
+		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_UPGRADES_TO_VEH, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
@@ -3270,6 +3277,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, vehicle_table, iter, next_iter) {
 		found = delete_from_interaction_list(&VEH_INTERACTIONS(iter), TYPE_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_STORES_LIKE_VEH, vnum);
+		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_UPGRADES_TO_VEH, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(iter));
 		}
@@ -3280,6 +3288,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_BUILDING(desc)) {
 			found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_VEH, vnum);
 			found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_STORES_LIKE_VEH, vnum);
+			found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_UPGRADES_TO_VEH, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the vehicles used in the building you're editing was deleted.\r\n");
 			}
@@ -3351,6 +3360,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_VEHICLE(desc)) {
 			found = delete_from_interaction_list(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), TYPE_VEH, vnum);
 			found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(GET_OLC_VEHICLE(desc)), BLD_REL_STORES_LIKE_VEH, vnum);
+			found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(GET_OLC_VEHICLE(desc)), BLD_REL_UPGRADES_TO_VEH, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the vehicles used on the vehicle you're editing was deleted.\r\n");
 			}

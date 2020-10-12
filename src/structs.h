@@ -812,10 +812,11 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_ROAD  BIT(23)	// use on vehicles but not buildings
 
 
-// BLD_REL_x: relationships with other buildings
-#define BLD_REL_UPGRADES_TO  0	// upgrades to another building type
+// BLD_REL_x: relationships with other buildings/vehicles
+#define BLD_REL_UPGRADES_TO_BLD  0	// upgrades to a building type
 #define BLD_REL_STORES_LIKE_BLD  1	// acts like another building for storage locations
-#define BLD_REL_STORES_LIKE_VEH  2	// acts like another building for storage locations
+#define BLD_REL_STORES_LIKE_VEH  2	// acts like another vehicle for storage locations
+#define BLD_REL_UPGRADES_TO_VEH  3	// upgrades to another vehicle type
 
 
 // tavern types
