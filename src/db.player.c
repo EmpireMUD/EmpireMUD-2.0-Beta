@@ -4022,10 +4022,9 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		try_home = TRUE;
 	}
 	
-	// load room is in a vehicle that's no longer complete?
+	// load room is in a vehicle that's no longer complete? dump outside the vehicle
 	if (load_room && GET_ROOM_VEHICLE(load_room) && (!VEH_IS_COMPLETE(GET_ROOM_VEHICLE(load_room)) || VEH_IS_DISMANTLING(GET_ROOM_VEHICLE(load_room)))) {
-		load_room = NULL;	// re-detect
-		try_home = TRUE;
+		load_room = IN_ROOM(GET_ROOM_VEHICLE(load_room));
 	}
 	
 	// on request, try to send them home
