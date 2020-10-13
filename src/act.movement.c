@@ -973,6 +973,14 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 		msg_to_char(ch, "There is a barrier in your way.\r\n");
 		return FALSE;
 	}
+	if (HOME_ROOM(to_room) != HOME_ROOM(was_in) && !IS_COMPLETE(HOME_ROOM(to_room))) {
+		msg_to_char(ch, "You can't go there because the building is incomplete.\r\n");
+		return FALSE;
+	}
+	if (HOME_ROOM(to_room) != HOME_ROOM(was_in) && GET_ROOM_VEHICLE(HOME_ROOM(to_room)) && !VEH_IS_COMPLETE(GET_ROOM_VEHICLE(HOME_ROOM(to_room)))) {
+		msg_to_char(ch, "You can't go there because the %s is incomplete.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(HOME_ROOM(to_room))));
+		return FALSE;
+	}
 	
 	// things that require a direction (i.e. player is not portaling)
 	if (dir != NO_DIR) {
