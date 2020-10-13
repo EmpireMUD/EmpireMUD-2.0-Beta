@@ -3006,6 +3006,7 @@ ACMD(do_upgrade) {
 			// transfer room list
 			VEH_ROOM_LIST(new_veh) = VEH_ROOM_LIST(up_veh);
 			VEH_ROOM_LIST(up_veh) = NULL;
+			VEH_INTERIOR_HOME_ROOM(up_veh) = NULL;
 			
 			// change room
 			if (VEH_INTERIOR_ROOM_VNUM(new_veh) != VEH_INTERIOR_ROOM_VNUM(up_veh) && building_proto(VEH_INTERIOR_ROOM_VNUM(new_veh))) {
