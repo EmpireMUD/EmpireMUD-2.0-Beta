@@ -59,6 +59,7 @@ extern const char *item_types[];
 extern const char *mapout_color_names[];
 extern const char *olc_flag_bits[];
 extern const char *progress_types[];
+extern const int bld_relationship_vnum_types[];
 extern struct faction_reputation_type reputation_levels[];
 extern const char *room_aff_bits[];
 extern const char *sector_flags[];
@@ -924,7 +925,7 @@ ADMIN_UTIL(util_bldconvert) {
 			}
 		}
 		LL_FOREACH(GET_BLD_RELATIONS(bld_iter), relat) {
-			if (relat->type != BLD_REL_UPGRADES_TO_BLD && relat->type != BLD_REL_STORES_LIKE_BLD) {
+			if (bld_relationship_vnum_types[relat->type] != TYPE_BLD) {
 				continue;
 			}
 			if (relat->vnum != from_vnum) {
@@ -992,7 +993,7 @@ ADMIN_UTIL(util_bldconvert) {
 			}
 		}
 		LL_FOREACH(VEH_RELATIONS(veh_iter), relat) {
-			if (relat->type != BLD_REL_UPGRADES_TO_BLD && relat->type != BLD_REL_STORES_LIKE_BLD) {
+			if (bld_relationship_vnum_types[relat->type] != TYPE_BLD) {
 				continue;
 			}
 			if (relat->vnum != from_vnum) {

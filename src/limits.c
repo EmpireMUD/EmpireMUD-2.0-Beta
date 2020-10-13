@@ -1891,7 +1891,7 @@ void point_update_vehicle(vehicle_data *veh) {
 		autostore_vehicle_contents(veh);
 	}
 
-	if (!vehicle_allows_climate(veh, IN_ROOM(veh))) {
+	if (!ROOM_IS_CLOSED(IN_ROOM(veh)) && !vehicle_allows_climate(veh, IN_ROOM(veh))) {
 		// this will extract it (usually)
 		msg = veh_get_custom_message(veh, VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM);
 		ruin_vehicle(veh, msg ? msg : "$V falls into ruin!");

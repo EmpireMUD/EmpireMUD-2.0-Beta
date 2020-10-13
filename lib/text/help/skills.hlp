@@ -749,11 +749,9 @@ See also: BUILD, DISMANTLE, SEW, CLAIM, ABANDON
 #
 UPGRADE
 
-Usage:  upgrade [type]
+Usage:  upgrade <building | vehicle> [type]
 
-This is used to upgrade your guard towers into more powerful towers. They can
-still shoot while you upgrade them, but people will also be able to walk
-inside and sabotage them. You can also upgrade shipyards to make bigger ships.
+Some buildings and vehicles can be upgraded (e.g. guard towers and shipyards).
 
 Some buildings can upgrade into more than one different building. In this case,
 you must type the name of the building you want to upgrade to (or part of it).

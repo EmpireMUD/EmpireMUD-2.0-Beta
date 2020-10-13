@@ -239,6 +239,7 @@ typedef any_vnum rmt_vnum;	// room_template
 typedef any_vnum room_vnum;	/* A room's vnum type */
 typedef any_vnum sector_vnum;	// sector's vnum
 typedef any_vnum trig_vnum;	// for dg scripts
+typedef any_vnum veh_vnum;	// for vehicles
 
 
 // For simplicity...

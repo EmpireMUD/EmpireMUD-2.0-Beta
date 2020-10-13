@@ -1569,7 +1569,7 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 	else if (GET_ROOM_VEHICLE(to_room) && (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES))) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
-	else if (!vehicle_allows_climate(veh, to_room)) {
+	else if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room)) {
 		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
@@ -1666,7 +1666,7 @@ ACMD(do_drag) {
 	else if (ROOM_IS_CLOSED(to_room) && VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
-	else if (!vehicle_allows_climate(veh, to_room)) {
+	else if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room)) {
 		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {

@@ -1299,7 +1299,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	}
 	
 	// climate checks
-	if (!vehicle_allows_climate(veh, to_room)) {
+	if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room)) {
 		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
 		return FALSE;
 	}

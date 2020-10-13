@@ -8003,8 +8003,8 @@ Step 1: Add an UPGRADES-TO-BLD or UPGRADES-TO-VEH relationship to a building or
 vehicle, indicating which other building/vehicle it upgrades to.
 
 Step 2: Make a craft for the upgrade:
-- Name it something like "upgrade shipyard" that's easy to search for. It isn't
-  displayed to players.
+- Players will see the name of the craft if a building/vehicle can be upgraded
+  to more than one thing.
 - Set the type to whatever seems appropriate. If it's a vehicle, be sure to
   also set the VEHICLE flag.
 - Set the UPGRADE flag (this also hides it from normal build/craft commands).

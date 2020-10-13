@@ -44,7 +44,7 @@ extern const char *tool_flags[];
 
 // external functions
 extern bool can_claim(char_data *ch);
-extern bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool *bld_is_closed, bool *bld_needs_reverse);
+extern bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
 void complete_vehicle(vehicle_data *veh);
 INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
@@ -1646,7 +1646,7 @@ void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
 	found_obj = (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING ? has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(type)) : NULL);
 	
 	// validate
-	if (!check_build_location_and_dir(ch, type, dir, &is_closed, &needs_reverse)) {
+	if (!check_build_location_and_dir(ch, type, dir, FALSE, &is_closed, &needs_reverse)) {
 		return;	// sends own messages
 	}
 	else if (found_obj && !consume_otrigger(found_obj, ch, OCMD_BUILD, NULL)) {
@@ -1750,7 +1750,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 		msg_to_char(ch, "You can't %s that while %s is unfinished here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command, VEH_SHORT_DESC(found_other));
 		return;
 	}
-	if (!check_build_location_and_dir(ch, type, dir, NULL, NULL)) {
+	if (!check_build_location_and_dir(ch, type, dir, FALSE, NULL, NULL)) {
 		return;	// sends own messages
 	}
 	

@@ -37,6 +37,7 @@ extern const char *function_flags[];
 extern const char *interact_types[];
 extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *olc_type_bits[NUM_OLC_TYPES+1];
+extern const int bld_relationship_vnum_types[];
 extern const char *room_aff_bits[];
 extern const char *spawn_flags[];
 
@@ -901,7 +902,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 			}
 		}
 		LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
-			if (relat->type != BLD_REL_UPGRADES_TO_BLD && relat->type != BLD_REL_STORES_LIKE_BLD) {
+			if (bld_relationship_vnum_types[relat->type] != TYPE_BLD) {
 				continue;
 			}
 			if (relat->vnum != vnum) {
@@ -1004,7 +1005,7 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 			}
 		}
 		LL_FOREACH(VEH_RELATIONS(veh), relat) {
-			if (relat->type != BLD_REL_UPGRADES_TO_BLD && relat->type != BLD_REL_STORES_LIKE_BLD) {
+			if (bld_relationship_vnum_types[relat->type] != TYPE_BLD) {
 				continue;
 			}
 			if (relat->vnum != vnum) {

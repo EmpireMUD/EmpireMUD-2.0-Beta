@@ -6319,7 +6319,9 @@ unsigned long long microtime(void) {
 /**
 * Determines if a room both has a function flag, and passes any necessary
 * in-city requirements. (If the room does not have FNC_IN_CITY_ONLY, this only
-* checks the function.)
+* checks the function.) Note that the UPGRADED flag is checked on its own
+* inside this function, and having that flag on the home-room of a building
+* will apply it to everything inside.
 *
 * Note: If a player has no empire, they generally pass the for_emp part of this
 * test and you should still check use-permission separately, too.
@@ -6362,7 +6364,7 @@ bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvec
 	}
 	
 	// otherwise check the room itself
-	if (upgraded && (!HAS_FUNCTION(room, FNC_UPGRADED) || !IS_COMPLETE(room))) {
+	if (upgraded && (!HAS_FUNCTION(room, FNC_UPGRADED) || !IS_COMPLETE(room)) && (!HAS_FUNCTION(HOME_ROOM(room), FNC_UPGRADED) || !IS_COMPLETE(HOME_ROOM(room)))) {
 		return FALSE;
 	}
 	if (!HAS_FUNCTION(room, fnc_flag) || !IS_COMPLETE(room)) {

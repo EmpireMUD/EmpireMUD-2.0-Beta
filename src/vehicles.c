@@ -61,6 +61,7 @@ extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *mob_move_types[];
 extern const char *paint_colors[];
 extern const char *paint_names[];
+extern const int bld_relationship_vnum_types[];
 extern const char *room_aff_bits[];
 extern const char *veh_custom_types[];
 extern const char *vehicle_flags[];
@@ -129,7 +130,7 @@ void check_vehicle_climate_change(room_data *room) {
 	char *msg;
 	
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-		if (!vehicle_allows_climate(veh, IN_ROOM(veh))) {
+		if (!ROOM_IS_CLOSED(IN_ROOM(veh)) && !vehicle_allows_climate(veh, IN_ROOM(veh))) {
 			// this will extract it (usually)
 			msg = veh_get_custom_message(veh, VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM);
 			ruin_vehicle(veh, msg ? msg : "$V falls into ruin!");
@@ -1101,9 +1102,6 @@ bool vehicle_allows_climate(vehicle_data *veh, room_data *room) {
 	if (!veh || !room) {
 		return TRUE;	// junk in, junk out
 	}
-	if (ROOM_IS_CLOSED(room)) {
-		return TRUE;	// closed rooms always allowed
-	}
 	
 	// determine which climate to use
 	if (IS_MAP_BUILDING(room) || IS_ROAD(room)) {
@@ -1570,7 +1568,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 			if (relat->vnum != vnum) {
 				continue;
 			}
-			if (relat->type != BLD_REL_STORES_LIKE_VEH && relat->type != BLD_REL_UPGRADES_TO_VEH) {
+			if (bld_relationship_vnum_types[relat->type] != TYPE_VEH) {
 				continue;
 			}
 			any = TRUE;
@@ -1689,7 +1687,7 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 			if (relat->vnum != vnum) {
 				continue;
 			}
-			if (relat->type != BLD_REL_STORES_LIKE_VEH && relat->type != BLD_REL_UPGRADES_TO_VEH) {
+			if (bld_relationship_vnum_types[relat->type] != TYPE_VEH) {
 				continue;
 			}
 			any = TRUE;
