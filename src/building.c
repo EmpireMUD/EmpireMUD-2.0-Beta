@@ -2932,6 +2932,10 @@ ACMD(do_upgrade) {
 		
 		new_veh = read_vehicle(GET_CRAFT_OBJECT(to_craft), TRUE);
 		
+		// set incomplete before putting in the room
+		SET_BIT(VEH_FLAGS(new_veh), VEH_INCOMPLETE);
+		vehicle_to_room(new_veh, IN_ROOM(up_veh));
+		
 		// see if we need to abandon the old one
 		if (VEH_OWNER(up_veh) && VEH_FLAGGED(new_veh, VEH_NO_CLAIM)) {
 			perform_abandon_vehicle(up_veh);
@@ -2939,10 +2943,6 @@ ACMD(do_upgrade) {
 		else if (VEH_OWNER(up_veh)) {
 			perform_claim_vehicle(new_veh, VEH_OWNER(up_veh));
 		}
-		
-		// set incomplete before putting in the room
-		SET_BIT(VEH_FLAGS(new_veh), VEH_INCOMPLETE);
-		vehicle_to_room(new_veh, IN_ROOM(up_veh));
 	
 		// additional setup
 		special_vehicle_setup(ch, new_veh);
