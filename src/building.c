@@ -2766,6 +2766,9 @@ ACMD(do_upgrade) {
 			else if (relat->type == BLD_REL_UPGRADES_TO_VEH) {
 				find_craft = find_upgrade_craft_for_veh(ch, relat->vnum, missing_abil ? NULL : &missing_abil);
 			}
+			else {
+				continue;	// unsupported type
+			}
 			
 			if (!find_craft) {
 				continue;	// no craft available
