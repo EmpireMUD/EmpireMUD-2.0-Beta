@@ -3011,6 +3011,12 @@ ACMD(do_upgrade) {
 			VEH_ROOM_LIST(new_veh) = VEH_ROOM_LIST(up_veh);
 			VEH_ROOM_LIST(up_veh) = NULL;
 			
+			// change room
+			if (VEH_INTERIOR_ROOM_VNUM(new_veh) != VEH_INTERIOR_ROOM_VNUM(up_veh) && building_proto(VEH_INTERIOR_ROOM_VNUM(new_veh))) {
+				detach_building_from_room(interior);
+				attach_building_to_room(building_proto(VEH_INTERIOR_ROOM_VNUM(new_veh)), interior, TRUE);
+			}
+			
 			// need to run this early because it won't run on completion
 			complete_wtrigger(interior);
 		}
