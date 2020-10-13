@@ -502,17 +502,19 @@ int count_players_in_building(room_data *room, bool ignore_home_room, bool ignor
 	room = HOME_ROOM(room);
 	
 	// home room
-	DL_FOREACH2(ROOM_PEOPLE(room), iter, next_in_room) {
-		if (IS_NPC(iter)) {
-			continue;
+	if (!ignore_home_room) {
+		DL_FOREACH2(ROOM_PEOPLE(room), iter, next_in_room) {
+			if (IS_NPC(iter)) {
+				continue;
+			}
+			if (ignore_invis_imms && IS_IMMORTAL(iter) && (GET_INVIS_LEV(iter) > 1 || PRF_FLAGGED(iter, PRF_WIZHIDE))) {
+				continue;
+			}
+			++count;
 		}
-		if (ignore_invis_imms && IS_IMMORTAL(iter) && (GET_INVIS_LEV(iter) > 1 || PRF_FLAGGED(iter, PRF_WIZHIDE))) {
-			continue;
+		DL_FOREACH2(ROOM_VEHICLES(room), viter, next_in_room) {
+			count += count_players_in_vehicle(viter, ignore_invis_imms);
 		}
-		++count;
-	}
-	DL_FOREACH2(ROOM_VEHICLES(room), viter, next_in_room) {
-		count += count_players_in_vehicle(viter, ignore_invis_imms);
 	}
 	
 	// interior rooms
