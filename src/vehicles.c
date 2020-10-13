@@ -1190,8 +1190,9 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
 	
 	char temp[MAX_STRING_LENGTH], *ptr;
-	bld_data *interior = building_proto(VEH_INTERIOR_ROOM_VNUM(veh));
+	bld_data *interior = building_proto(VEH_INTERIOR_ROOM_VNUM(veh)), *proto;
 	struct obj_storage_type *store;
+	struct bld_relation *relat;
 	obj_data *obj, *next_obj;
 	bool any, problem = FALSE;
 	
@@ -1362,6 +1363,13 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 					problem = any = TRUE;
 				}
 			}
+		}
+	}
+	
+	LL_FOREACH(VEH_RELATIONS(veh), relat) {
+		if (relat->type == BLD_REL_UPGRADES_TO_BLD && (proto = building_proto(relat->vnum)) && !BLD_FLAGGED(proto, BLD_OPEN)) {
+			olc_audit_msg(ch, VEH_VNUM(veh), "UPGRADES-TO a non-open building (cannot do this because there's no 'facing' information for the upgrade)");
+			problem = TRUE;
 		}
 	}
 	
