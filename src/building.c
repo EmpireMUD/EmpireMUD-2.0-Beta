@@ -190,7 +190,7 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 		msg_to_char(ch, "You can't %s that here.\r\n", command);
 		return FALSE;
 	}
-	if ((is_closed || needs_facing) && (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE || !IS_OUTDOORS(ch))) {
+	if (!is_upgrade && (is_closed || needs_facing) && (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE || !IS_OUTDOORS(ch))) {
 		msg_to_char(ch, "You can only %s that out on the map.\r\n", command);
 		return FALSE;
 	}
