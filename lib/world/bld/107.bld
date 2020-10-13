@@ -52,7 +52,7 @@ S
 Goblin Gravesite~
 A Shoddy Goblin Gravesite~
 ..&yx&?.~
-2 -1 dp 0
+2 -1 dnp 0
 0 0 0 -1
 F
 B
@@ -84,7 +84,7 @@ S
 Tree of Knowledge~
 The Tree of Knowledge~
 &g^&t||&g^~
-4 0 d 0
+4 0 dn 0
 0 0 0 -1
 C
 pick~
@@ -98,7 +98,7 @@ S
 Tree of Knowledge~
 The Tree of Knowledge~
 &l^||^~
-4 0 d 0
+4 0 dn 0
 0 0 0 -1
 C
 pick~

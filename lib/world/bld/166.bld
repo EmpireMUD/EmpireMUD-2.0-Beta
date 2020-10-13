@@ -2,9 +2,9 @@
 Goose Farm~
 A Goose Farm~
 &0|GG|~
-20 1 d 0
+20 1 dn 0
 0 0 0 -1
-I 29 5006 100.00 1 r  # RUINS-TO-BLD: Small Ruins
+I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 16651 100.00 0
 M
@@ -108,7 +108,7 @@ dagger-like icicle parapets and jagged, frozen stones to make climbing the
 walls impossible. Steam rolls off the frozen blocks, but they never thaw. The
 magic that holds this palace together must be powerful indeed.
 ~
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 6000 2 1 0
 R

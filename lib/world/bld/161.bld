@@ -55,7 +55,7 @@ S
 Advanced Oceanic Tower~
 An Advanced Oceanic Tower~
 &T"TT"~
-64 5 blRU 0
+64 5 blR 0
 0 0 0 -1
 D
    This is a well-constructed guard tower, anchored by long hydra bones. It is
@@ -64,7 +64,7 @@ at any unescorted trespassers it sees. The tower is made from bone, so it is
 not well protected against invasion. Hopefully, it will be enough defense.
 ~
 F
-j
+bj
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 M
 251 5.00 ce
