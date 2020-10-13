@@ -4027,6 +4027,12 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 		load_room = IN_ROOM(GET_ROOM_VEHICLE(load_room));
 	}
 	
+	// load room in a building that's no longer complete? send home
+	if (load_room && HOME_ROOM(load_room) != load_room && !IS_COMPLETE(HOME_ROOM(load_room))) {
+		load_room = NULL;
+		try_home = TRUE;
+	}
+	
 	// on request, try to send them home
 	if (try_home) {
 		load_room = find_home(ch);
