@@ -694,25 +694,6 @@ void disassociate_building(room_data *room) {
 
 
 /**
-* Finds a craft_table entry matching building type.
-*
-* @param bld_vnum build_type e.g. a building vnum
-* @return craft_data* The matching building recipe, or NULL.
-*/
-craft_data *find_build_craft(bld_vnum build_type) {
-	craft_data *iter, *next_iter;
-	
-	HASH_ITER(hh, craft_table, iter, next_iter) {
-		if (CRAFT_IS_BUILDING(iter) && GET_CRAFT_BUILD_TYPE(iter) == build_type) {
-			return iter;
-		}
-	}
-	
-	return NULL;
-}
-
-
-/**
 * Finds the build recipe entry for a given building room.
 *
 * @param room_data *room The building location to find.
@@ -1349,13 +1330,12 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 void start_dismantle_building(room_data *loc) {
 	void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
 	
-	struct resource_data *composite_resources = NULL, *crcp, *res, *next_res;
+	struct resource_data *res, *next_res;
 	room_data *room, *next_room;
 	char_data *targ, *next_targ;
-	craft_data *type, *up_type;
+	craft_data *type;
 	obj_data *obj, *next_obj, *proto;
 	bool deleted = FALSE;
-	bld_data *up_bldg;
 	bool complete = !IS_INCOMPLETE(loc);	// store now -- this gets changed part way through
 	
 	if (!IS_MAP_BUILDING(loc)) {
@@ -1415,27 +1395,6 @@ void start_dismantle_building(room_data *loc) {
 		// normal setup: use the actual materials that built this building
 		GET_BUILDING_RESOURCES(loc) = GET_BUILT_WITH(loc);
 		GET_BUILT_WITH(loc) = NULL;
-	}
-	else if (complete) {
-		// backwards-compatible: attempt to detect resources
-		composite_resources = copy_resource_list(GET_CRAFT_RESOURCES(type));
-		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_UPGRADE)) {
-			// for upgraded buildings, must work up the chain
-			up_bldg = find_upgraded_from(building_proto(GET_CRAFT_BUILD_TYPE(type)));
-			up_type = up_bldg ? find_build_craft(GET_BLD_VNUM(up_bldg)) : NULL;
-		
-			while (up_bldg && up_type) {
-				crcp = composite_resources;
-				composite_resources = combine_resources(crcp, GET_CRAFT_RESOURCES(up_type));
-				free_resource_list(crcp);
-			
-				up_bldg = find_upgraded_from(up_bldg);
-				up_type = up_bldg ? find_build_craft(GET_BLD_VNUM(up_bldg)) : NULL;
-			}
-		}
-		
-		// apply
-		GET_BUILDING_RESOURCES(loc) = composite_resources;
 	}
 	
 	// remove liquids, etc
