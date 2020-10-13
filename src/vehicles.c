@@ -1475,7 +1475,7 @@ void link_and_check_vehicles(void) {
 		}
 	}
 	
-	LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
 		// check for orphaned ship rooms
 		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_IN_VEHICLE) && HOME_ROOM(room) == room && !GET_ROOM_VEHICLE(room)) {
 			delete_room(room, FALSE);	// must check_all_exits later
@@ -3012,7 +3012,7 @@ void convert_one_obj_to_vehicle(obj_data *obj) {
 				}
 				
 				// apply vehicle aff
-				LL_FOREACH2(interior_room_list, room_iter, next_interior) {
+				DL_FOREACH2(interior_room_list, room_iter, next_interior) {
 					if (room_iter == main_room || HOME_ROOM(room_iter) == main_room) {
 						SET_BIT(ROOM_BASE_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
 						affect_total_room(room_iter);

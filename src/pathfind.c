@@ -321,7 +321,7 @@ ubyte get_pathfind_key(void) {
 		log("Resetting pathfinding key (get_pathfind_key)...");
 		
 		// reset all rooms
-		LL_FOREACH2(interior_room_list, room, next_interior) {
+		DL_FOREACH2(interior_room_list, room, next_interior) {
 			ROOM_PATHFIND_KEY(room) = 0;
 		}
 		// reset map

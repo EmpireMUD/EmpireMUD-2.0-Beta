@@ -1253,9 +1253,7 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 	
 	// spawn interior rooms: recursively
 	if (GET_INSIDE_ROOMS(room) > 0) {
-		for (iter = interior_room_list; iter; iter = next_iter) {
-			next_iter = iter->next_interior;
-			
+		DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 			if (HOME_ROOM(iter) == room && iter != room) {
 				spawn_one_room(iter, only_artisans);
 			}

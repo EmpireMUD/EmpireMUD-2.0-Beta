@@ -5847,8 +5847,7 @@ void add_room_to_world_tables(room_data *room) {
 	
 	// interior linked list
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-		room->next_interior = interior_room_list;
-		interior_room_list = room;
+		DL_PREPEND2(interior_room_list, room, prev_interior, next_interior);
 	}
 	
 	world_is_sorted = FALSE;
@@ -5861,12 +5860,10 @@ void add_room_to_world_tables(room_data *room) {
 * @param room_data *room The room to remove.
 */
 void remove_room_from_world_tables(room_data *room) {
-	room_data *temp;
-	
 	HASH_DEL(world_table, room);
 	
 	if (room->vnum >= MAP_SIZE) {
-		REMOVE_FROM_LIST(room, interior_room_list, next_interior);
+		DL_DELETE2(interior_room_list, room, prev_interior, next_interior);
 	}
 }
 

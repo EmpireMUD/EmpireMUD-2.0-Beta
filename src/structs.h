@@ -5786,7 +5786,7 @@ struct room_data {
 	struct dg_event *unload_event;	// used for un-loading of live rooms
 	
 	UT_hash_handle hh;	// hash handle for world_table
-	room_data *next_interior;	// linked list: interior_room_list
+	room_data *prev_interior, *next_interior;	// doubly linked list: interior_room_list
 };
 
 

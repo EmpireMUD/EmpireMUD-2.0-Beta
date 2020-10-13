@@ -680,9 +680,7 @@ void delete_room(room_data *room, bool check_exits) {
 	}
 	else if (GET_INSIDE_ROOMS(room)) {
 		// just check home rooms of interiors
-		for (rm_iter = interior_room_list; rm_iter; rm_iter = next_rm) {
-			next_rm = rm_iter->next_interior;
-			
+		DL_FOREACH_SAFE2(interior_room_list, rm_iter, next_rm, next_interior) {
 			if (rm_iter != room && COMPLEX_DATA(rm_iter)) {
 				// unset homeroom -> this is just interior table
 				if (COMPLEX_DATA(rm_iter)->home_room == room) {
@@ -1374,7 +1372,7 @@ void annual_world_update(void) {
 	}
 	
 	// interiors (not map tiles)
-	LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
 		annual_update_depletions(&ROOM_DEPLETION(room));
 	}
 	
@@ -2996,7 +2994,7 @@ void clear_private_owner(int id) {
 	obj_data *obj;
 	
 	// check interior rooms first
-	LL_FOREACH2(interior_room_list, iter, next_interior) {
+	DL_FOREACH2(interior_room_list, iter, next_interior) {
 		if (ROOM_PRIVATE_OWNER(HOME_ROOM(iter)) == id) {
 			// reset autostore timer
 			DL_FOREACH2(ROOM_CONTENTS(iter), obj, next_content) {
@@ -3071,7 +3069,7 @@ room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance) {
 room_data *get_extraction_room(void) {
 	room_data *room, *iter;
 	
-	LL_FOREACH2(interior_room_list, iter, next_interior) {
+	DL_FOREACH2(interior_room_list, iter, next_interior) {
 		if (GET_BUILDING(iter) && GET_BLD_VNUM(GET_BUILDING(iter)) == RTYPE_EXTRACTION_PIT) {
 			return iter;
 		}
@@ -3939,7 +3937,7 @@ void build_land_map(void) {
 	}
 	
 	// also index the interior while we're here, so it's completely done
-	LL_FOREACH2(interior_room_list, room, next_interior) {
+	DL_FOREACH2(interior_room_list, room, next_interior) {
 		idx = find_sector_index(GET_SECT_VNUM(SECT(room)));
 		++idx->sect_count;
 		

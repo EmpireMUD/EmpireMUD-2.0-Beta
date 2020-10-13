@@ -3170,7 +3170,7 @@ room_data *get_ship_pen(void) {
 
 	room_data *room, *iter;
 	
-	for (iter = interior_room_list; iter; iter = iter->next_interior) {
+	DL_FOREACH2(interior_room_list, iter, next_interior) {
 		if (GET_BUILDING(iter) && GET_BLD_VNUM(GET_BUILDING(iter)) == RTYPE_SHIP_HOLDING_PEN) {
 			return iter;
 		}

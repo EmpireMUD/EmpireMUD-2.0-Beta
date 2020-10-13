@@ -518,7 +518,7 @@ int count_players_in_building(room_data *room, bool ignore_home_room, bool ignor
 	}
 	
 	// interior rooms
-	LL_FOREACH2(interior_room_list, interior, next_interior) {
+	DL_FOREACH2(interior_room_list, interior, next_interior) {
 		if (HOME_ROOM(interior) == room) {
 			DL_FOREACH2(ROOM_PEOPLE(interior), iter, next_in_room) {
 				if (IS_NPC(iter)) {
@@ -645,9 +645,7 @@ void disassociate_building(room_data *room) {
 	cancel_stored_event_room(room, SEV_RESET_TRIGGER);
 	
 	// disassociate inside rooms
-	for (iter = interior_room_list; iter; iter = next_iter) {
-		next_iter = iter->next_interior;
-		
+	DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 		if (HOME_ROOM(iter) == room && iter != room) {
 			dismantle_wtrigger(iter, NULL, FALSE);
 			
@@ -1377,9 +1375,7 @@ void start_dismantle_building(room_data *loc) {
 	}
 	
 	// interior only
-	for (room = interior_room_list; room; room = next_room) {
-		next_room = room->next_interior;
-		
+	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
 		if (HOME_ROOM(room) == loc) {
 			dismantle_wtrigger(room, NULL, FALSE);
 			delete_room_npcs(room, NULL, TRUE);

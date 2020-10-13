@@ -2694,7 +2694,7 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 			if (ROOM_PEOPLE(to_room)) {
 				act("The building is hit by something and shakes violently!", FALSE, ROOM_PEOPLE(to_room), 0, 0, TO_CHAR | TO_ROOM);
 			}
-			for (rm = interior_room_list; rm; rm = rm->next_interior) {
+			DL_FOREACH2(interior_room_list, rm, next_interior) {
 				if (HOME_ROOM(rm) == to_room && ROOM_PEOPLE(rm)) {
 					act("The building is hit by something and shakes violently!", FALSE, ROOM_PEOPLE(rm), 0, 0, TO_CHAR | TO_ROOM);
 				}

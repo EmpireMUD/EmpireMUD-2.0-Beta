@@ -1698,9 +1698,7 @@ void claim_city(char_data *ch, empire_data *emp, char *argument) {
 	
 	if (found) {
 		// update the inside (interior rooms only)
-		for (iter = interior_room_list; iter; iter = next_iter) {
-			next_iter = iter->next_interior;
-			
+		DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 			home = HOME_ROOM(iter);
 			if (home != iter && ROOM_OWNER(home) == emp) {
 				claim_room(iter, emp);
@@ -3593,9 +3591,7 @@ ACMD(do_cede) {
 		
 		// mark as ceded
 		set_room_extra_data(room, ROOM_EXTRA_CEDED, 1);
-		for (iter = interior_room_list; iter; iter = next_iter) {
-			next_iter = iter->next_interior;
-			
+		DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 			if (HOME_ROOM(iter) == room) {
 				set_room_extra_data(iter, ROOM_EXTRA_CEDED, 1);
 			}
@@ -5489,8 +5485,7 @@ ACMD(do_home) {
 			COMPLEX_DATA(real)->private_owner = GET_IDNUM(ch);
 
 			// interior only
-			for (iter = interior_room_list; iter; iter = next_iter) {
-				next_iter = iter->next_interior;
+			DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 				if (HOME_ROOM(iter) != real) {
 					continue;	// this is not the room you're looking for
 				}
