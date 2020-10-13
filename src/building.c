@@ -182,7 +182,7 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 	
 	// setup
 	is_closed = to_build && !IS_SET(GET_BLD_FLAGS(to_build), BLD_OPEN);
-	needs_facing = (GET_CRAFT_BUILD_FACING(type) != NOBITS) || is_closed;
+	needs_facing = (GET_CRAFT_BUILD_FACING(type) != NOBITS);
 	needs_reverse = needs_facing && to_build && IS_SET(GET_BLD_FLAGS(to_build), BLD_TWO_ENTRANCES);
 	
 	// checks
