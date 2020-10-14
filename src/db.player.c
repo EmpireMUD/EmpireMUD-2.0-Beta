@@ -3971,6 +3971,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// ensure the player has an idnum and is in the index
 	if (GET_IDNUM(ch) <= 0) {
 		GET_IDNUM(ch) = ++top_idnum;
+		ch->script_id = GET_IDNUM(ch);
 	}
 	if (!(index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
 		CREATE(index, player_index_data, 1);
@@ -4405,6 +4406,7 @@ void init_player(char_data *ch) {
 	// assign idnum
 	if (GET_IDNUM(ch) <= 0) {
 		GET_IDNUM(ch) = ++top_idnum;
+		ch->script_id = GET_IDNUM(ch);
 	}
 	// ensure in index
 	if (!(index = find_player_index_by_idnum(GET_IDNUM(ch)))) {
