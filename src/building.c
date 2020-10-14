@@ -816,27 +816,6 @@ craft_data *find_upgrade_craft_for(char_data *ch, bld_vnum for_bld, veh_vnum for
 
 
 /**
-* @param bld_data *bb The building to search for.
-* @return bld_data* The building that upgrades to it, or NULL if there isn't one.
-*/
-bld_data *find_upgraded_from(bld_data *bb) {
-	bld_data *iter, *next_iter;
-	
-	if (!bb) {	// occasionally
-		return NULL;
-	}
-	
-	HASH_ITER(hh, building_table, iter, next_iter) {
-		if (bld_has_relation(iter, BLD_REL_UPGRADES_TO_BLD, GET_BLD_VNUM(bb))) {
-			return iter;
-		}
-	}
-	
-	return NULL;
-}
-
-
-/**
 * Process the actual completion for a room.
 *
 * @param char_data *ch the builder (pc or npc)
