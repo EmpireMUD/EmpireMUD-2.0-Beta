@@ -94,6 +94,7 @@ When using field  - The variable returns:
 &ccomplete&0 - True if the vehicle is complete.
 &ccontents&0 - The first item inside the vehicle (if a container).
 &ccount(str)&0 - Number of matching items inside (name/vnum).
+&cdedicated_to&0 - If the vehicle is dedicated to someone, gets the name.
 &cdriver&0 - The person driving/sailing the vehicle, if any.
 &cdump&0 - Empties everything out of the vehicle, including people.
 &cdump_objects&0 - Empties just the contents, if the vehicle is a container.

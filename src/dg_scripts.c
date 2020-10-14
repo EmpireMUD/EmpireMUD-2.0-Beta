@@ -5097,7 +5097,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'd': {	// room.d*
-					if (!str_cmp(field, "direction")) {
+					if (!str_cmp(field, "dedicated_to")) {
+						player_index_data *index;
+						if (GET_ROOM_PATRON(r) && (index = find_player_index_by_idnum(GET_ROOM_PATRON(r)))) {
+							snprintf(str, slen, "%s", index->fullname);
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "direction")) {
 						room_data *targ;
 						int dir;
 				
@@ -5506,7 +5515,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'd': {	// veh.d*
-					if (!str_cmp(field, "driver")) {
+					if (!str_cmp(field, "dedicated_to")) {
+						player_index_data *index;
+						if (VEH_PATRON(v) && (index = find_player_index_by_idnum(VEH_PATRON(v)))) {
+							snprintf(str, slen, "%s", index->fullname);
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "driver")) {
 						if (VEH_DRIVER(v)) {
 							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(VEH_DRIVER(v)));
 						}

@@ -164,6 +164,7 @@ When using field - The variable returns:
 &ccrop&0 - The name of the crop on the map room, if any.
 &ccrop_flagged(FLG)&0 - True if it's a crop and a given crop flag is present.
 &ccrop_vnum&0 - The vnum of the crop on the map room, if any.
+&cdedicated_to&0 - If the room/building is dedicated to someone, gets the name.
 &cdirection(target)&0 - The approximate direction to the target.
 &cdistance(target)&0 - The distance between this room and the target.
 &cempire&0 - The empire that owns the room, if any.
