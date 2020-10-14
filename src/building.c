@@ -2694,16 +2694,6 @@ ACMD(do_upgrade) {
 		return;
 	}
 	
-	// ensure they're not IN the vehicle or an interior room
-	if (up_veh && IN_ROOM(up_veh) != IN_ROOM(ch)) {
-		act("You need to upgrade $V from outside of it.", FALSE, ch, NULL, up_veh, TO_CHAR);
-		return;
-	}
-	if (up_room && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch))) {
-		msg_to_char(ch, "You need to upgrade the building from its main/entry room.\r\n");
-		return;
-	}
-	
 	// process the list of upgrades -- this will build the 'upgrade to what'
 	// output if there's no arg2, will find the craft if there is, and can also
 	// find the craft if there's no arg2 but there's also only 1 option
@@ -2805,6 +2795,14 @@ ACMD(do_upgrade) {
 	}
 	
 	// validate upgrade: general
+	if (up_veh && IN_ROOM(up_veh) != IN_ROOM(ch)) {
+		act("You need to upgrade $V from outside of it.", FALSE, ch, NULL, up_veh, TO_CHAR);
+		return;
+	}
+	if (up_room && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "You need to upgrade the building from its main/entry room.\r\n");
+		return;
+	}
 	if ((up_room && !IS_COMPLETE(up_room)) || (up_veh && !VEH_IS_COMPLETE(up_veh))) {
 		msg_to_char(ch, "Finish building it before you upgrade it.\r\n");
 		return;
