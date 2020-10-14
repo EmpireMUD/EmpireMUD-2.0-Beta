@@ -2848,7 +2848,7 @@ ACMD(do_upgrade) {
 	}
 	
 	// upgrade room version
-	if (up_room) {
+	if (up_room && CRAFT_IS_BUILDING(to_craft)) {
 		dismantle_wtrigger(up_room, NULL, FALSE);
 		detach_building_from_room(up_room);
 		attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(to_craft)), up_room, TRUE);
@@ -2862,7 +2862,7 @@ ACMD(do_upgrade) {
 	}
 	
 	// upgrade vehicle version
-	if (up_veh) {
+	if (up_veh && CRAFT_IS_VEHICLE(to_craft)) {
 		act("You start upgrading $V.", FALSE, ch, NULL, up_veh, TO_CHAR);
 		act("$n starts upgrading $V.", FALSE, ch, NULL, up_veh, TO_ROOM);
 		
