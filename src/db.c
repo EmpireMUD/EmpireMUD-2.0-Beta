@@ -240,7 +240,7 @@ vehicle_data *vehicle_list = NULL;	// global doubly-linked list of vehicles (veh
 
 // world / rooms
 room_data *world_table = NULL;	// hash table of the whole world
-room_data *interior_room_list = NULL;	// linked list of interior rooms: room->next_interior
+room_data *interior_room_list = NULL;	// doubly-linked list of interior rooms: room->prev_interior, room->next_interior
 bool world_is_sorted = FALSE;	// to prevent unnecessary re-sorts
 bool need_world_index = TRUE;	// used to trigger world index saving (always save at least once)
 struct island_info *island_table = NULL; // hash table for all the islands
@@ -872,9 +872,7 @@ void delete_orphaned_rooms(void) {
 	bool deleted = FALSE;
 	
 	// start at the end of the map!
-	for (room = interior_room_list; room; room = next_room) {
-		next_room = room->next_interior;
-		
+	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
 		// vehicles are checked separately
 		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_IN_VEHICLE) && HOME_ROOM(room) == room) {
 			continue;
@@ -2496,7 +2494,7 @@ void b4_36_study_triggers(void) {
 	struct trig_proto_list *tpl;
 	room_data *room;
 	
-	LL_FOREACH2(interior_room_list, room, next_interior) {
+	DL_FOREACH2(interior_room_list, room, next_interior) {
 		if (!GET_BUILDING(room) || GET_BLD_VNUM(GET_BUILDING(room)) != bld_study) {
 			continue;
 		}
@@ -2516,7 +2514,7 @@ void b4_38_tower_triggers(void) {
 	struct trig_proto_list *tpl;
 	room_data *room;
 	
-	LL_FOREACH2(interior_room_list, room, next_interior) {
+	DL_FOREACH2(interior_room_list, room, next_interior) {
 		if (!GET_BUILDING(room) || GET_BLD_VNUM(GET_BUILDING(room)) != bld_tower) {
 			continue;
 		}

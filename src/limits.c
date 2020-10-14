@@ -506,7 +506,7 @@ void point_update_char(char_data *ch) {
 			GET_BLOOD(ch) = MIN(GET_BLOOD(ch) + 1, GET_MAX_BLOOD(ch));
 		}
 	}
-
+	
 	// healing for NPCs -- pcs are in real_update
 	if (IS_NPC(ch)) {
 		if (GET_POS(ch) >= POS_STUNNED && !FIGHTING(ch) && !GET_FED_ON_BY(ch)) {
@@ -652,7 +652,7 @@ void real_update_char(char_data *ch) {
 	}
 	if (GET_SITTING_ON(ch)) {
 		// things that cancel sitting-on:
-		if (IN_ROOM(ch) != IN_ROOM(GET_SITTING_ON(ch)) || GET_POS(ch) != POS_SITTING || IS_RIDING(ch) || GET_LEADING_MOB(ch) || GET_LEADING_VEHICLE(ch)) {
+		if (IN_ROOM(ch) != IN_ROOM(GET_SITTING_ON(ch)) || (GET_POS(ch) != POS_SITTING && GET_POS(ch) != POS_RESTING && GET_POS(ch) != POS_SLEEPING) || IS_RIDING(ch) || GET_LEADING_MOB(ch) || GET_LEADING_VEHICLE(ch)) {
 			do_unseat_from_vehicle(ch);
 		}
 	}
@@ -866,11 +866,28 @@ void real_update_char(char_data *ch) {
 		GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - gain);
 	}
 	
-	gain = move_gain(ch, FALSE);
-	GET_MOVE(ch) += gain;
-	GET_MOVE(ch) = MIN(GET_MOVE(ch), GET_MAX_MOVE(ch));
-	GET_MOVE_DEFICIT(ch) = MAX(0, GET_MOVE_DEFICIT(ch) - gain);
+	// check move gain
+	if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && IS_SWIMMING(ch)) {
+		// swimming: costs moves
+		if (GET_MOVE(ch) > 0) {
+			GET_MOVE(ch) -= 1;
+		}
+		if (GET_MOVE(ch) <= 0) {
+			msg_to_char(ch, "You sink beneath the water and die!\r\n");
+			act("$n sinks beneath the water and dies!", FALSE, ch, NULL, NULL, TO_ROOM);
+			death_log(ch, ch, TYPE_SUFFERING);
+			die(ch, ch);
+			return;
+		}
+	}
+	else {	// normal move gain
+		gain = move_gain(ch, FALSE);
+		GET_MOVE(ch) += gain;
+		GET_MOVE(ch) = MIN(GET_MOVE(ch), GET_MAX_MOVE(ch));
+		GET_MOVE_DEFICIT(ch) = MAX(0, GET_MOVE_DEFICIT(ch) - gain);
+	}
 	
+	// mana gain
 	gain = mana_gain(ch, FALSE);
 	GET_MANA(ch) += gain;
 	GET_MANA(ch) = MIN(GET_MANA(ch), GET_MAX_MANA(ch));
@@ -1259,9 +1276,7 @@ static void reduce_stale_empires_one(empire_data *emp) {
 	
 	// try interior first -- we'll take the first secondary room we find
 	if (!outside_only) {
-		for (iter = interior_room_list; iter; iter = next_iter) {
-			next_iter = iter->next_interior;
-			
+		DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 			// only want rooms owned by this empire and only if they are their own home room (like a ship)
 			if (ROOM_OWNER(iter) != emp || HOME_ROOM(iter) != iter) {
 				continue;
@@ -1874,7 +1889,7 @@ void point_update_vehicle(vehicle_data *veh) {
 		autostore_vehicle_contents(veh);
 	}
 
-	if (!vehicle_allows_climate(veh, IN_ROOM(veh))) {
+	if (!ROOM_IS_CLOSED(IN_ROOM(veh)) && !vehicle_allows_climate(veh, IN_ROOM(veh))) {
 		// this will extract it (usually)
 		msg = veh_get_custom_message(veh, VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM);
 		ruin_vehicle(veh, msg ? msg : "$V falls into ruin!");
@@ -2209,6 +2224,11 @@ int move_gain(char_data *ch, bool info_only) {
 		gain += GET_MOVE_REGEN(ch);
 	}
 	else {
+		// swimming shows as -1 on info
+		if (info_only && !IS_IMMORTAL(ch) && IS_SWIMMING(ch)) {
+			return -1;
+		}
+	
 		gain = regen_by_pos[(int) GET_POS(ch)];
 		gain += GET_MOVE_REGEN(ch);
 		

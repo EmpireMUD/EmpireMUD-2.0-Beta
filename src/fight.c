@@ -1846,7 +1846,7 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 
 	/* Now we're sure we can hit this person: gets worse with dex */
 	if (!AWAKE(ch) || !number(0, MAX(0, (GET_DEXTERITY(ch)/2) - 1))) {
-		dam = 25 + (ROOM_BLD_FLAGGED(from_room, BLD_UPGRADED) ? 50 : 0);
+		dam = 25 + (HAS_FUNCTION(from_room, FNC_UPGRADED) ? 50 : 0);
 	}
 	else {
 		dam = 0;
@@ -1908,7 +1908,7 @@ static bool tower_would_shoot(room_data *from_room, char_data *vict) {
 	}
 	
 	// basic guard tower only shoots 2
-	if (distance > 2 && !ROOM_BLD_FLAGGED(from_room, BLD_UPGRADED)) {
+	if (distance > 2 && !HAS_FUNCTION(from_room, FNC_UPGRADED)) {
 		return FALSE;
 	}
 	
@@ -2616,7 +2616,7 @@ void appear(char_data *ch) {
 		msg_to_char(ch, "You fade back into view.\r\n");
 	}
 	else {
-		act("You feel a strange presence as $n appears, seemingly from nowhere.", FALSE, ch, 0, 0, TO_ROOM);
+		act("You feel a strange presence as $n appears, seemingly from nowhere.", FALSE, ch, NULL, NULL, TO_ROOM | (IS_IMMORTAL(ch) ? DG_NO_TRIG : NOBITS));
 	}
 }
 
@@ -2694,7 +2694,7 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 			if (ROOM_PEOPLE(to_room)) {
 				act("The building is hit by something and shakes violently!", FALSE, ROOM_PEOPLE(to_room), 0, 0, TO_CHAR | TO_ROOM);
 			}
-			for (rm = interior_room_list; rm; rm = rm->next_interior) {
+			DL_FOREACH2(interior_room_list, rm, next_interior) {
 				if (HOME_ROOM(rm) == to_room && ROOM_PEOPLE(rm)) {
 					act("The building is hit by something and shakes violently!", FALSE, ROOM_PEOPLE(rm), 0, 0, TO_CHAR | TO_ROOM);
 				}

@@ -807,8 +807,8 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				}
 				if (sscanf(line, "%d %d", &int_in[0], &int_in[1]) != 2) {
 					if (sscanf(line, "%d", &int_in[1]) == 1) {
-						// backwards-compatible to when U was only upgrades-to
-						int_in[0] = BLD_REL_UPGRADES_TO;
+						// backwards-compatible to when U was only upgrades-to-bld
+						int_in[0] = BLD_REL_UPGRADES_TO_BLD;
 					}
 					else {	// error
 						log("SYSERR: Format error in U line of %s", buf2);
@@ -1485,11 +1485,11 @@ void check_for_new_map(void) {
 		}
 		
 		// free shipping (and put the items back)
-		LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
+		DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
 			add_to_empire_storage(emp, NO_ISLAND, shipd->vnum, shipd->amount);
+			DL_DELETE(EMPIRE_SHIPPING_LIST(emp), shipd);
 			free(shipd);	// no need to remove from list
 		}
-		EMPIRE_SHIPPING_LIST(emp) = NULL;	// all entries freed
 		
 		// free trade (no longer relevant)
 		LL_FOREACH_SAFE(EMPIRE_TRADE(emp), trade, next_trade) {
@@ -1963,7 +1963,7 @@ void free_empire(empire_data *emp) {
 	struct empire_trade_data *trade;
 	struct empire_log_data *elog;
 	struct workforce_log *wf_log;
-	struct shipping_data *shipd;
+	struct shipping_data *shipd, *next_shipd;
 	room_data *room;
 	int iter;
 	
@@ -1993,11 +1993,10 @@ void free_empire(empire_data *emp) {
 	EMPIRE_UNIQUE_STORAGE(emp) = NULL;
 	
 	// free shipping data
-	while ((shipd = EMPIRE_SHIPPING_LIST(emp))) {
-		EMPIRE_SHIPPING_LIST(emp) = shipd->next;
+	DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
+		DL_DELETE(EMPIRE_SHIPPING_LIST(emp), shipd);
 		free(shipd);
 	}
-	EMPIRE_SHIPPING_LIST(emp) = NULL;
 	
 	// free cities (while they last)
 	while ((city = emp->city_list)) {
@@ -2234,7 +2233,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	long l_in;
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
 	struct empire_unique_storage *eus, *last_eus = NULL;
-	struct shipping_data *shipd, *last_shipd = NULL;
+	struct shipping_data *shipd;
 	struct empire_production_total *egt;
 	struct empire_storage_data *store;
 	struct theft_log *tft;
@@ -2356,9 +2355,13 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 				break;
 			}
 			case 'V': {	// shipments
-				if (sscanf(line, "V %d %d %d %d %d %ld %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &l_in, &t[5], &t[6]) != 8) {
-					log("SYSERR: Invalid V line of empire %d: %s", EMPIRE_VNUM(emp), line);
-					exit(0);
+				if (sscanf(line, "V %d %d %d %d %d %ld %d %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &l_in, &t[5], &t[6], &t[7]) != 9) {
+					t[7] = NOWHERE;	// backwards-compatible: to_room
+					
+					if (sscanf(line, "V %d %d %d %d %d %ld %d %d", &t[0], &t[1], &t[2], &t[3], &t[4], &l_in, &t[5], &t[6]) != 8) {
+						log("SYSERR: Invalid V line of empire %d: %s", EMPIRE_VNUM(emp), line);
+						exit(0);
+					}
 				}
 				
 				if (obj_proto(t[0]) || t[0] == NOTHING) {
@@ -2372,18 +2375,10 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					shipd->status_time = l_in;
 					shipd->shipping_id = t[5];
 					shipd->ship_origin = t[6];
-					shipd->next = NULL;
+					shipd->to_room = t[7];
 				
 					EMPIRE_TOP_SHIPPING_ID(emp) = MAX(shipd->shipping_id, EMPIRE_TOP_SHIPPING_ID(emp));
-
-					// append to end
-					if (last_shipd) {
-						last_shipd->next = shipd;
-					}
-					else {
-						EMPIRE_SHIPPING_LIST(emp) = shipd;
-					}
-					last_shipd = shipd;
+					DL_APPEND(EMPIRE_SHIPPING_LIST(emp), shipd);
 				}
 				// else: don't bother warning, just drop it if the obj doesn't exist
 				break;
@@ -3236,8 +3231,8 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	}
 	
 	// V: shipments
-	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
-		fprintf(fl, "V %d %d %d %d %d %ld %d %d\n", shipd->vnum, shipd->amount, shipd->from_island, shipd->to_island, shipd->status, shipd->status_time, shipd->shipping_id, shipd->ship_origin);
+	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
+		fprintf(fl, "V %d %d %d %d %d %ld %d %d %d\n", shipd->vnum, shipd->amount, shipd->from_island, shipd->to_island, shipd->status, shipd->status_time, shipd->shipping_id, shipd->ship_origin, shipd->to_room);
 	}
 
 	fprintf(fl, "S\n");
@@ -5852,8 +5847,7 @@ void add_room_to_world_tables(room_data *room) {
 	
 	// interior linked list
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-		room->next_interior = interior_room_list;
-		interior_room_list = room;
+		DL_PREPEND2(interior_room_list, room, prev_interior, next_interior);
 	}
 	
 	world_is_sorted = FALSE;
@@ -5866,12 +5860,10 @@ void add_room_to_world_tables(room_data *room) {
 * @param room_data *room The room to remove.
 */
 void remove_room_from_world_tables(room_data *room) {
-	room_data *temp;
-	
 	HASH_DEL(world_table, room);
 	
 	if (room->vnum >= MAP_SIZE) {
-		REMOVE_FROM_LIST(room, interior_room_list, next_interior);
+		DL_DELETE2(interior_room_list, room, prev_interior, next_interior);
 	}
 }
 
@@ -6006,12 +5998,18 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				}
 				
 				COMPLEX_DATA(room)->entrance = t[2];
-				COMPLEX_DATA(room)->patron = t[3];
+				// see below for t[3]
 				COMPLEX_DATA(room)->burn_down_time = l_in;
 				COMPLEX_DATA(room)->damage = dbl_in;	// formerly t[5], which is now unused
 				COMPLEX_DATA(room)->private_owner = t[6];
-				COMPLEX_DATA(room)->paint_color = t[7];
 				
+				// b5.108: now converts the dedicate id / paint color if it sees it here; it's now saved as extra data
+				if (t[3] != 0) {
+					set_room_extra_data(room, ROOM_EXTRA_DEDICATE_ID, t[3]);
+				}
+				if (t[7] != 0) {
+					set_room_extra_data(room, ROOM_EXTRA_PAINT_COLOR, t[7]);
+				}
 				break;
 			}
 			case 'C': { // reset command
@@ -6276,7 +6274,9 @@ void write_room_to_file(FILE *fl, room_data *room) {
 	
 	// B building data
 	if (COMPLEX_DATA(room)) {
-		fprintf(fl, "B\n%d %d %d %d %ld %.2f %d %d\n", BUILDING_VNUM(room), ROOM_TEMPLATE_VNUM(room), COMPLEX_DATA(room)->entrance, COMPLEX_DATA(room)->patron, COMPLEX_DATA(room)->burn_down_time, COMPLEX_DATA(room)->damage, COMPLEX_DATA(room)->private_owner, COMPLEX_DATA(room)->paint_color);
+		// b5.108 note: the 4th int and last int here were formerly dedicate id and paint color, which are now stored as room extra data
+		// it should be safe to re-use these 0 slots after b6 starts
+		fprintf(fl, "B\n%d %d %d %d %ld %.2f %d %d\n", BUILDING_VNUM(room), ROOM_TEMPLATE_VNUM(room), COMPLEX_DATA(room)->entrance, 0, COMPLEX_DATA(room)->burn_down_time, COMPLEX_DATA(room)->damage, COMPLEX_DATA(room)->private_owner, 0);
 	}
 	
 	// C: load commands
@@ -9388,7 +9388,6 @@ struct complex_room_data *init_complex_data() {
 	data->to_build = NULL;
 	
 	data->entrance = NO_DIR;
-	data->patron = 0;
 	data->inside_rooms = 0;
 	data->home_room = NULL;
 	data->private_owner = NOBODY;

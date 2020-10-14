@@ -164,7 +164,7 @@ ACMD(do_maggro) {
 				return;
 			}
 		}
-		else if (!(victim = get_char_room_vis(ch, arg))) {
+		else if (!(victim = get_char_room_vis(ch, arg, NULL))) {
 			mob_log(ch, "maggro: victim (%s) not found",arg);
 			return;
 		}
@@ -305,7 +305,7 @@ ACMD(do_mkill) {
 			return;
 		}
 	}
-	else if (!(victim = get_char_room_vis(ch, arg))) {
+	else if (!(victim = get_char_room_vis(ch, arg, NULL))) {
 		mob_log(ch, "mkill: victim (%s) not found",arg);
 		return;
 	}
@@ -367,11 +367,11 @@ ACMD(do_mjunk) {
 
 	if ((find_all_dots(arg) == FIND_INDIV) && !junk_all) { 
 		/* Thanks to Carlos Myers for fixing the line below */
-		if ((pos = get_obj_pos_in_equip_vis(ch, arg, ch->equipment)) >= 0) {
+		if ((pos = get_obj_pos_in_equip_vis(ch, arg, NULL, ch->equipment)) >= 0) {
 			extract_obj(unequip_char(ch, pos));
 			return;
 		}
-		if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying)) != NULL)
+		if ((obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)) != NULL)
 			extract_obj(obj);
 		return;
 	}
@@ -383,7 +383,7 @@ ACMD(do_mjunk) {
 			}
 		}
 		/* Thanks to Carlos Myers for fixing the line below */
-		while ((pos = get_obj_pos_in_equip_vis(ch, arg, ch->equipment)) >= 0)
+		while ((pos = get_obj_pos_in_equip_vis(ch, arg, NULL, ch->equipment)) >= 0)
 			extract_obj(unequip_char(ch, pos));
 	}
 	return;
@@ -420,7 +420,7 @@ ACMD(do_mechoaround) {
 			return;
 		}
 	}
-	else if (!(victim = get_char_room_vis(ch, arg))) {
+	else if (!(victim = get_char_room_vis(ch, arg, NULL))) {
 		mob_log(ch, "mechoaround: victim (%s) does not exist",arg);
 		return;
 	}
@@ -458,7 +458,7 @@ ACMD(do_mechoneither) {
 			return;
 		}
 	}
-	else if (!(vict1 = get_char_room_vis(ch, arg1))) {
+	else if (!(vict1 = get_char_room_vis(ch, arg1, NULL))) {
 		mob_log(ch, "mechoneither: vict 1 (%s) does not exist", arg1);
 		return;
 	}
@@ -469,7 +469,7 @@ ACMD(do_mechoneither) {
 			return;
 		}
 	}
-	else if (!(vict2 = get_char_room_vis(ch, arg2))) {
+	else if (!(vict2 = get_char_room_vis(ch, arg2, NULL))) {
 		mob_log(ch, "mechoneither: vict 2 (%s) does not exist", arg2);
 		return;
 	}
@@ -512,7 +512,7 @@ ACMD(do_msend) {
 			return;
 		}
 	}
-	else if (!(victim = get_char_room_vis(ch, arg))) {
+	else if (!(victim = get_char_room_vis(ch, arg, NULL))) {
 		mob_log(ch, "msend: victim (%s) does not exist",arg);
 		return;
 	}
@@ -650,7 +650,7 @@ ACMD(do_mvehicleecho) {
 	if (!*targ || !*msg) {
 		mob_log(ch, "mvehicleecho called with too few args");
 	}
-	else if ((*targ == UID_CHAR && (veh = get_vehicle(targ))) || (veh = get_vehicle_in_room_vis(ch, targ))) {
+	else if ((*targ == UID_CHAR && (veh = get_vehicle(targ))) || (veh = get_vehicle_in_room_vis(ch, targ, NULL))) {
 		mob_log(ch, "mvehicleecho called with invalid target");
 	}
 	else {
@@ -799,7 +799,7 @@ ACMD(do_mload) {
 			return;
 		}
 		
-		tch = (*arg1 == UID_CHAR) ? get_char(arg1) : get_char_room_vis(ch, arg1);
+		tch = (*arg1 == UID_CHAR) ? get_char(arg1) : get_char_room_vis(ch, arg1, NULL);
 		if (tch) {	// load on char
 			// mark as "gathered" like a resource
 			if (!IS_NPC(tch) && GET_LOYALTY(tch)) {
@@ -816,7 +816,7 @@ ACMD(do_mload) {
 			return;
 		}
 		
-		cnt = (*arg1 == UID_CHAR) ? get_obj(arg1) : get_obj_vis(ch, arg1);
+		cnt = (*arg1 == UID_CHAR) ? get_obj(arg1) : get_obj_vis(ch, arg1, NULL);
 		if (cnt && GET_OBJ_TYPE(cnt) == ITEM_CONTAINER) {	// load in container
 			obj_to_obj(object, cnt);
 			load_otrigger(object);
@@ -887,7 +887,7 @@ ACMD(do_mmorph) {
 	if (!*tar_arg || !*num_arg) {
 		mob_log(ch, "mmorph: missing argument(s)");
 	}
-	else if (*tar_arg == UID_CHAR ? !(vict = get_char(tar_arg)) : !(vict = get_char_room_vis(ch, tar_arg))) {
+	else if (*tar_arg == UID_CHAR ? !(vict = get_char(tar_arg)) : !(vict = get_char_room_vis(ch, tar_arg, NULL))) {
 		mob_log(ch, "mmorph: invalid target '%s'", tar_arg);
 	}
 	else if (!normal && (!isdigit(*num_arg) || !(morph = morph_proto(atoi(num_arg))))) {
@@ -971,7 +971,7 @@ ACMD(do_mpurge) {
 		dg_purge_instance(ch, inst, argument);
 	}
 	// purge mob
-	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg, NULL))) {
 		if (!IS_NPC(victim)) {
 			mob_log(ch, "mpurge: purging a PC");
 			return;
@@ -987,14 +987,14 @@ ACMD(do_mpurge) {
 		extract_char(victim);
 	}
 	// purge vehicle
-	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		if (*argument) {
 			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
 		extract_vehicle(veh);
 	}
 	// purge obj
-	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg, NULL))) {
 		if (*argument) {
 			room_data *room = obj_room(obj);
 			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, obj, NULL, TO_CHAR | TO_ROOM);
@@ -1190,17 +1190,17 @@ ACMD(do_mrestore) {
 	else if (!str_cmp(arg, "room") || !str_cmp(arg, "building")) {
 		room = IN_ROOM(ch);
 	}
-	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg, NULL))) {
 		// found victim
 	}
-	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		// found vehicle
 		if (!VEH_IS_COMPLETE(veh)) {
 			mob_log(ch, "mrestore: used on unfinished vehicle");
 			return;
 		}
 	}
-	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg, NULL))) {
 		// found obj
 	}
 	else if ((room = find_target_room(ch, arg))) {
@@ -1357,7 +1357,7 @@ ACMD(do_mteleport) {
 		}
 	}
 	else {
-		if ((*arg1 == UID_CHAR && (vict = get_char(arg1))) || (vict = get_char_vis(ch, arg1, FIND_CHAR_WORLD))) {
+		if ((*arg1 == UID_CHAR && (vict = get_char(arg1))) || (vict = get_char_vis(ch, arg1, NULL, FIND_CHAR_WORLD))) {
 			if (valid_dg_target(vict, DG_ALLOW_GODS)) {
 				GET_LAST_DIR(vict) = NO_DIR;
 				char_from_room(vict);
@@ -1367,14 +1367,14 @@ ACMD(do_mteleport) {
 				msdp_update_room(vict);
 			}
 		}
-		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_in_room_vis(ch, arg1))) {
+		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_in_room_vis(ch, arg1, NULL))) {
 			adjust_vehicle_tech(veh, FALSE);
 			vehicle_from_room(veh);
 			vehicle_to_room(veh, target);
 			adjust_vehicle_tech(veh, TRUE);
 			entry_vtrigger(veh);
 		}
-		else if ((*arg1 == UID_CHAR && (obj = get_obj(arg1))) || (obj = get_obj_vis(ch, arg1))) {
+		else if ((*arg1 == UID_CHAR && (obj = get_obj(arg1))) || (obj = get_obj_vis(ch, arg1, NULL))) {
 			obj_to_room(obj, target);
 		}
 		else {
@@ -1538,7 +1538,7 @@ ACMD(do_mdamage) {
 			return;
 		}
 	}
-	else if (!(vict = get_char_room_vis(ch, name))) {
+	else if (!(vict = get_char_room_vis(ch, name, NULL))) {
 		mob_log(ch, "mdamage: victim (%s) does not exist", name);
 		return;
 	}
@@ -1655,7 +1655,7 @@ ACMD(do_mdot) {
 			return;
 		}
 	}
-	else if (!(vict = get_char_room_vis(ch, name))) {
+	else if (!(vict = get_char_room_vis(ch, name, NULL))) {
 		mob_log(ch, "mdot: victim (%s) does not exist", name);
 		return;
 	}
@@ -1723,7 +1723,7 @@ ACMD(do_mforce) {
 				return;
 			}
 		}
-		else if ((victim = get_char_room_vis(ch, arg)) == NULL) {
+		else if ((victim = get_char_room_vis(ch, arg, NULL)) == NULL) {
 			mob_log(ch, "mforce: no such victim");
 			return;
 		}
@@ -1787,7 +1787,7 @@ ACMD(do_mhunt) {
 			return;
 		}
 	}
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD))) {
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD))) {
 		mob_log(ch, "mhunt: victim (%s) does not exist", arg);
 		return;
 	}
@@ -1827,7 +1827,7 @@ ACMD(do_mremember) {
 			return;
 		}
 	}
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD))) {
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD))) {
 		mob_log(ch,"mremember: victim (%s) does not exist", arg);
 		return;
 	}
@@ -1881,7 +1881,7 @@ ACMD(do_mforget) {
 			return;
 		}
 	}
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD))) {
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD))) {
 		mob_log(ch, "mforget: victim (%s) does not exist", arg);
 		return;
 	}
@@ -1999,7 +1999,7 @@ ACMD(do_mslay) {
 			return;
 		}
 	}
-	else if (!(vict = get_char_room_vis(ch, name))) {
+	else if (!(vict = get_char_room_vis(ch, name, NULL))) {
 		mob_log(ch, "mslay: victim (%s) does not exist", name);
 		return;
 	}
@@ -2263,7 +2263,7 @@ ACMD(do_mfollow) {
 			return;
 		}
 	}
-	else if (!(leader = get_char_vis(ch, buf, FIND_CHAR_ROOM))) {
+	else if (!(leader = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM))) {
 		mob_log(ch,"mfollow: victim (%s) not found", buf);
 		return;
 	}
@@ -2358,7 +2358,7 @@ ACMD(do_mown) {
 			mob_log(ch, "mown: Too few arguments (mown mob)");
 			return;
 		}
-		else if (!(vict = ((*targ_arg == UID_CHAR) ? get_char(targ_arg) : get_char_room_vis(ch, targ_arg)))) {
+		else if (!(vict = ((*targ_arg == UID_CHAR) ? get_char(targ_arg) : get_char_room_vis(ch, targ_arg, NULL)))) {
 			mob_log(ch, "mown: Invalid mob target");
 			return;
 		}
@@ -2372,7 +2372,7 @@ ACMD(do_mown) {
 			mob_log(ch, "mown: Too few arguments (mown vehicle)");
 			return;
 		}
-		else if (!(vtarg = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_in_room_vis(ch, targ_arg)))) {
+		else if (!(vtarg = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_in_room_vis(ch, targ_arg, NULL)))) {
 			mob_log(ch, "mown: Invalid vehicle target");
 			return;
 		}
@@ -2386,7 +2386,7 @@ ACMD(do_mown) {
 			mob_log(ch, "mown: Too few arguments (mown obj)");
 			return;
 		}
-		else if (!(otarg = ((*targ_arg == UID_CHAR) ? get_obj(targ_arg) : get_obj_vis(ch, targ_arg)))) {
+		else if (!(otarg = ((*targ_arg == UID_CHAR) ? get_obj(targ_arg) : get_obj_vis(ch, targ_arg, NULL)))) {
 			mob_log(ch, "mown: Invalid obj target");
 			return;
 		}
@@ -2403,7 +2403,7 @@ ACMD(do_mown) {
 		else if (*targ_arg == UID_CHAR && ((vict = get_char(targ_arg)) || (vtarg = get_vehicle(targ_arg)) || (otarg = get_obj(targ_arg)) || (rtarg = get_room(IN_ROOM(ch), targ_arg)))) {
 			// found by uid
 		}
-		else if ((vict = get_char_room_vis(ch, targ_arg)) || (vtarg = get_vehicle_in_room_vis(ch, targ_arg)) || (otarg = get_obj_in_list_vis(ch, targ_arg, ch->carrying)) || (otarg = get_obj_in_list_vis(ch, targ_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		else if ((vict = get_char_room_vis(ch, targ_arg, NULL)) || (vtarg = get_vehicle_in_room_vis(ch, targ_arg, NULL)) || (otarg = get_obj_in_list_vis(ch, targ_arg, NULL, ch->carrying)) || (otarg = get_obj_in_list_vis(ch, targ_arg, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			// found by name
 		}
 		else {
@@ -2501,7 +2501,7 @@ ACMD(do_mscale) {
 		}
 	}
 	// scale char
-	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_room_vis(ch, arg, NULL))) {
 		if (!IS_NPC(victim)) {
 			mob_log(ch, "mscale: unable to scale a PC");
 			return;
@@ -2511,11 +2511,11 @@ ACMD(do_mscale) {
 		SET_BIT(MOB_FLAGS(victim), MOB_NO_RESCALE);
 	}
 	// scale evhicle
-	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		scale_vehicle_to_level(veh, level);
 	}
 	// scale obj
-	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg))) {
+	else if ((*arg == UID_CHAR && (obj = get_obj(arg))) || (obj = get_obj_vis(ch, arg, NULL))) {
 		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
 			scale_item_to_level(obj, level);
 		}

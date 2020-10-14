@@ -133,7 +133,7 @@ S
 Boardwalk~
 A Boardwalk Over the Shallows~
 &a~&0--&a~~
-16 0 dm 0
+16 0 dmno 0
 0 0 0 -1
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
@@ -147,7 +147,7 @@ S
 River Fishery~
 A Fishery on the River~
 &0(&c~~&0)~
-8 0 dpDL 0
+8 0 dnpDL 0
 0 0 0 -1
 C
 fish~
@@ -166,7 +166,7 @@ S
 Lake Fishery~
 A Fishery on the Lake~
 &0(&c~~&0)~
-8 0 dpDL 0
+8 0 dnpDL 0
 0 0 0 -1
 C
 fish~
@@ -215,7 +215,7 @@ S
 Sand Pit~
 A Sand Pit~
 &Y|__|~
-4 0 dmL 0
+4 0 dmnL 0
 0 0 0 -1
 C
 dig~

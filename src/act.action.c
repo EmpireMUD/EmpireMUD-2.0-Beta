@@ -37,6 +37,7 @@
 */
 
 // external vars
+extern struct gen_craft_data_t gen_craft_data[];
 extern const bool interact_one_at_a_time[NUM_INTERACTS];
 extern const char *tool_flags[];
 
@@ -274,7 +275,6 @@ void update_actions(void) {
 	extern vehicle_data *get_current_piloted_vehicle(char_data *ch);
 	
 	// Extern vars.
-	extern struct gen_craft_data_t gen_craft_data[];
 	extern bool catch_up_actions;
 	
 	// prevent running multiple action rounds during a catch-up cycle
@@ -420,6 +420,31 @@ void update_actions(void) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
+
+/**
+* Determines if the character is performing an action with a particular flag.
+*
+* @param char_data *ch The person.
+* @param bitvector_t actf Any ACTF_ flag, like ACTF_SITTING.
+* @return bool TRUE if the player's action has the flag, FALSE if not.
+*/
+bool action_flagged(char_data *ch, bitvector_t actf) {
+	craft_data *craft;
+	
+	if (IS_NPC(ch) || GET_ACTION(ch) == ACT_NONE || !actf) {
+		return FALSE;	// no work
+	}
+	
+	if (IS_SET(action_data[GET_ACTION(ch)].flags, actf)) {
+		return TRUE;
+	}
+	if (GET_ACTION(ch) == ACT_GEN_CRAFT && (craft = craft_proto(GET_ACTION_VNUM(ch, 0))) && IS_SET(gen_craft_data[GET_CRAFT_TYPE(craft)].actf_flags, actf)) {
+		return TRUE;
+	}
+	
+	return FALSE;	// otherwise
+}
+
 
 /**
 * When a player forages in the wild and gets nothing, they get a chance at a
@@ -1325,6 +1350,8 @@ void process_build_action(char_data *ch) {
 		else {
 			msg_to_char(ch, "You need %s %s to work on this building.\r\n", AN(buf1), buf1);
 		}
+		cancel_action(ch);
+		return;
 	}
 
 	process_build(ch, IN_ROOM(ch), ACT_BUILDING);
@@ -2439,8 +2466,9 @@ void process_prospecting(char_data *ch) {
 void process_repairing(char_data *ch) {
 	extern vehicle_data *find_vehicle(int n);
 
+	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
-	struct resource_data *res;
+	struct resource_data *res, temp_res;
 	bool found = FALSE;
 	vehicle_data *veh;
 	
@@ -2460,7 +2488,7 @@ void process_repairing(char_data *ch) {
 	}
 	
 	// good to repair:
-	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
+	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, &found_obj))) {
 		// take the item; possibly free the res
 		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_REPAIR, veh, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
 		found = TRUE;
@@ -2474,7 +2502,21 @@ void process_repairing(char_data *ch) {
 	}
 	else if (!found) {
 		GET_ACTION(ch) = ACT_NONE;
-		msg_to_char(ch, "You run out of resources and stop repairing.\r\n");
+		
+		// missing next resource
+		if (VEH_NEEDS_RESOURCES(veh)) {
+			// copy this to display the next 1
+			temp_res = *VEH_NEEDS_RESOURCES(veh);
+			if (temp_res.type == RES_OBJECT || temp_res.type == RES_COMPONENT) {
+				temp_res.amount = 1;	// just show next 1
+			}
+			temp_res.next = NULL;
+			show_resource_list(&temp_res, buf);
+			msg_to_char(ch, "You don't have %s and stop repairing.\r\n", buf);
+		}
+		else {
+			msg_to_char(ch, "You run out of resources and stop repairing.\r\n");
+		}
 		act("$n runs out of resources and stops.", FALSE, ch, NULL, NULL, TO_ROOM);
 	}
 }
@@ -2749,9 +2791,12 @@ ACMD(do_bathe) {
 
 ACMD(do_chip) {
 	obj_data *target;
+	int number;
 	int chip_timer = config_get_int("chip_timer");
-
+	char *argptr = arg;
+	
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot chip.\r\n");
@@ -2773,10 +2818,10 @@ ACMD(do_chip) {
 	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to chip anything here.\r\n");
 	}
-	else if (!*arg) {
+	else if (!*argptr) {
 		msg_to_char(ch, "Chip what?\r\n");
 	}
-	else if (!(target = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_CHIP)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !(target = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_CHIP)))) {
+	else if (!(target = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_CHIP)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || !(target = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_CHIP)))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(target), INTERACT_CHIP)) {
@@ -3226,8 +3271,11 @@ ACMD(do_mine) {
 ACMD(do_mint) {
 	empire_data *emp;
 	obj_data *obj;
+	char *argptr = arg;
+	int number;
 	
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't do that.\r\n");
@@ -3258,10 +3306,10 @@ ACMD(do_mint) {
 	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES)) {
 		msg_to_char(ch, "You don't have permission to mint here.\r\n");
 	}
-	else if (!*arg) {
+	else if (!*argptr) {
 		msg_to_char(ch, "Mint which item into coins?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	else if (!(obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!IS_WEALTH_ITEM(obj) || GET_WEALTH_VALUE(obj) <= 0) {
@@ -3363,7 +3411,7 @@ ACMD(do_plant) {
 	else if (!*arg) {
 		msg_to_char(ch, "What do you want to plant?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", arg);
 	}
 	else if (!OBJ_FLAGGED(obj, OBJ_PLANTABLE)) {
@@ -3482,8 +3530,11 @@ ACMD(do_prospect) {
 
 ACMD(do_saw) {
 	obj_data *obj, *saw;
+	char *argptr = arg;
+	int number;
 
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot saw.\r\n");
@@ -3507,10 +3558,10 @@ ACMD(do_saw) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy doing something else.\r\n");
 	}
-	else if (!*arg) {
+	else if (!*argptr) {
 		msg_to_char(ch, "Saw what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SAW)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_SAW))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_SAW)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_SAW))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SAW)) {
@@ -3537,9 +3588,12 @@ ACMD(do_saw) {
 
 
 ACMD(do_scrape) {
+	char *argptr = arg;
 	obj_data *obj;
+	int number;
 	
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "NPCs cannot scrape.\r\n");
@@ -3557,10 +3611,10 @@ ACMD(do_scrape) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy doing something else.\r\n");
 	}
-	else if (!*arg) {
+	else if (!*argptr) {
 		msg_to_char(ch, "Scrape what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SCRAPE)) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_SCRAPE)))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_SCRAPE)) && (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED) || !(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_SCRAPE)))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SCRAPE)) {
@@ -3609,11 +3663,14 @@ ACMD(do_stop) {
 
 
 ACMD(do_tan) {
+	char *argptr = arg;
 	obj_data *obj;
+	int number;
 	
 	int tan_timer = config_get_int("tan_timer");
 
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "You can't tan.\r\n");
@@ -3624,13 +3681,13 @@ ACMD(do_tan) {
 	else if (!has_player_tech(ch, PTECH_TAN)) {
 		msg_to_char(ch, "You don't have the correct ability to tan anything.\r\n");
 	}
-	else if (!*arg) {
+	else if (!*argptr) {
 		msg_to_char(ch, "What would you like to tan?\r\n");
 	}
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy right now.\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_TAN)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_TAN))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_TAN)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_TAN))) {
 		msg_to_char(ch, "You don't seem to have more to tan.\r\n");
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_TAN)) {
@@ -3815,6 +3872,12 @@ INTERACTION_FUNC(finish_gen_interact_room) {
 	// safety check
 	if (!data) {
 		return FALSE;
+	}
+	if (data->depletion != NOTHING && inter_veh && get_vehicle_depletion(inter_veh, data->depletion, FALSE) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
+		return FALSE;	// depleted vehicle
+	}
+	else if (data->depletion != NOTHING && !inter_veh && get_depletion(inter_room, data->depletion, FALSE) >= (interact_one_at_a_time[interaction->type] ? interaction->quantity : config_get_int("common_depletion"))) {
+		return FALSE;	// depleted room
 	}
 	
 	amount = interact_one_at_a_time[interaction->type] ? 1 : interaction->quantity;

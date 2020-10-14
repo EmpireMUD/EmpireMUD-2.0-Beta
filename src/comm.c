@@ -2755,16 +2755,17 @@ int process_input(descriptor_data *t) {
 				t->last_input[sizeof(t->last_input)-1] = '\0';
 			}
 		}
-		else if (*input == '+') {	// add to head of queue
-			add_to_head = TRUE;
-			++input;
-		}
 		else if (*input == '-' && (!t->str || !t->straight_to_editor)) { // manipulate input queue
 			// ^ this doesn't execute if the person is sending text to a text editor
 			manipulate_input_queue(t, input+1);
 			do_not_add = 1;
 		}
-		else {
+		else {	// all other strings
+			if (*input == '+') {	// add to head of queue
+				add_to_head = TRUE;
+				++input;
+			}
+			
 			strncpy(t->last_input, input, sizeof(t->last_input)-1);
 			t->last_input[sizeof(t->last_input)-1] = '\0';
 			
@@ -3832,11 +3833,12 @@ void game_loop(socket_t mother_desc) {
 			 * state then 1 is subtracted. Therefore we don't go less
 			 * than 0 ever and don't require an 'if' bracket. -gg 2/27/99
 			 */
+			d->wait -= (d->wait > 0);
 			if (d->character) {
 				GET_WAIT_STATE(d->character) -= (GET_WAIT_STATE(d->character) > 0);
-
-				if (GET_WAIT_STATE(d->character))
-					continue;
+			}
+			if (d->wait || (d->character && GET_WAIT_STATE(d->character))) {
+				continue;
 			}
 
 			if (!get_from_q(&d->input, comm, &aliased))
@@ -3880,6 +3882,7 @@ void game_loop(socket_t mother_desc) {
 				if (process_output(d) < 0) {
 					// process_output actually kills it itself
 					// close_socket(d);
+					d->has_prompt = 1;
 					continue;
 				}
 				else

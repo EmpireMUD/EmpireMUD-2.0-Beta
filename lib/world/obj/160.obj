@@ -85,9 +85,9 @@ it looks like you can use the various tools in a lumber yard to render it down
 into useable pieces. Perhaps you should try to scrape or saw it and see what
 happens? And of course, you could always light it on fire.
 ~
-3 0 a 0 3
+3 0 a 0 4
 0 0 0
-0 0
+14 0
 C
 1 1
 I 11 1002 100.00 1  # LIGHT: roaring fire
@@ -109,9 +109,9 @@ A single long bone rests here.~
 from the crushed skeleton someone left in the lumberyard. Seems it could make a
 reasonable replacement for a stick, if just a bit creepy.
 ~
-1 0 ano 0 5
+1 0 ano 0 6
 0 2 5
-0 0
+14 0
 C
 1 1
 I 11 184 100.00 1  # LIGHT: torch

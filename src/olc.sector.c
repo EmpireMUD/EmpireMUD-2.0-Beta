@@ -316,7 +316,7 @@ void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	}
 	
 	// update world: interior
-	LL_FOREACH2(interior_room_list, room, next_interior) {
+	DL_FOREACH2(interior_room_list, room, next_interior) {
 		if (SECT(room) == sect) {
 			// can't use change_terrain() here
 			perform_change_sect(room, NULL, replace_sect);

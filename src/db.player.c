@@ -3242,7 +3242,7 @@ char_data *find_or_load_player(char *name, bool *is_file) {
 	// not able to find -- look for a player partial match?
 	if (!ch) {
 		sprintf(buf, "0.%s", name);	// add 0. to force player match
-		ch = get_char_world(buf);
+		ch = get_char_world(buf, NULL);
 		*is_file = FALSE;
 		if (ch && IS_NPC(ch)) {
 			ch = NULL;	// verify player only
@@ -3932,7 +3932,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void refresh_all_quests(char_data *ch);
 	void refresh_passive_buffs(char_data *ch);
 	void reset_combat_meters(char_data *ch);
-	extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message);
+	extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
 	
 	extern bool global_mute_slash_channel_joins;
 
@@ -4019,6 +4019,17 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// long logout and in somewhere hostile
 	if (load_room && RESTORE_ON_LOGIN(ch) && ROOM_OWNER(load_room) && ROOM_OWNER(load_room) != GET_LOYALTY(ch) && (IS_HOSTILE(ch) || empire_is_hostile(ROOM_OWNER(load_room), GET_LOYALTY(ch), load_room))) {
 		load_room = NULL;	// re-detect
+		try_home = TRUE;
+	}
+	
+	// load room is in a vehicle that's no longer complete? dump outside the vehicle
+	if (load_room && GET_ROOM_VEHICLE(load_room) && (!VEH_IS_COMPLETE(GET_ROOM_VEHICLE(load_room)) || VEH_IS_DISMANTLING(GET_ROOM_VEHICLE(load_room)))) {
+		load_room = IN_ROOM(GET_ROOM_VEHICLE(load_room));
+	}
+	
+	// load room in a building that's no longer complete? send home
+	if (load_room && HOME_ROOM(load_room) != load_room && !IS_COMPLETE(HOME_ROOM(load_room))) {
+		load_room = NULL;
 		try_home = TRUE;
 	}
 	
@@ -4224,7 +4235,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	// attempt to put them back in a vehicle
 	if (GET_LAST_VEHICLE(ch) != NOTHING) {
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (VEH_VNUM(veh) == GET_LAST_VEHICLE(ch) && !VEH_SITTING_ON(veh) && validate_sit_on_vehicle(ch, veh, FALSE)) {
+			if (VEH_VNUM(veh) == GET_LAST_VEHICLE(ch) && !VEH_SITTING_ON(veh) && validate_sit_on_vehicle(ch, veh, POS_SITTING, FALSE)) {
 				sit_on_vehicle(ch, veh);
 				GET_POS(ch) = POS_SITTING;
 				break;	// only need 1

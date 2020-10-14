@@ -259,7 +259,7 @@ ACMD(do_damage_spell) {
 	
 	// find target
 	one_argument(argument, arg);
-	if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 		return;
 	}

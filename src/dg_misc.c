@@ -70,7 +70,6 @@ room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 	COMPLEX_DATA(home)->inside_rooms++;
 	
 	if (GET_ROOM_VEHICLE(from)) {
-		++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(from));
 		COMPLEX_DATA(new)->vehicle = GET_ROOM_VEHICLE(from);
 		add_room_to_vehicle(new, GET_ROOM_VEHICLE(from));
 		SET_BIT(ROOM_BASE_FLAGS(new), ROOM_AFF_IN_VEHICLE);
@@ -603,7 +602,7 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 			emp = GET_LOYALTY(mob);
 			inst = get_instance_by_id(MOB_INSTANCE_ID(mob));
 			if (!vict) {
-				vict = get_char_room_vis(mob, vict_arg);
+				vict = get_char_room_vis(mob, vict_arg, NULL);
 			}
 			break;
 		}
@@ -1077,7 +1076,7 @@ void script_heal(void *thing, int type, char *argument) {
 		case MOB_TRIGGER: {
 			level = get_approximate_level((char_data*)thing);
 			if (!victim) {
-				victim = get_char_room_vis((char_data*)thing, targ_arg);
+				victim = get_char_room_vis((char_data*)thing, targ_arg, NULL);
 			}
 			
 			snprintf(log_root, sizeof(log_root), "Mob (%s, VNum %d)::", GET_SHORT((char_data*)thing), GET_MOB_VNUM((char_data*)thing));

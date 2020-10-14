@@ -1691,7 +1691,7 @@ ACMD(do_page) {
 			}
 			return;
 		}
-		if ((vict = get_char_vis(ch, arg, FIND_CHAR_WORLD)) != NULL) {
+		if ((vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)) != NULL) {
 			if (is_ignoring(vict, ch)) {
 				act("$E is ignoring you.", FALSE, ch, NULL, vict, TO_CHAR | TO_SLEEP);
 			}
@@ -1917,7 +1917,7 @@ ACMD(do_spec_comm) {
 	}
 	else if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_SILENT))
 		msg_to_char(ch, "You speak, but no words come out!\r\n");
-	else if (!(vict = get_char_vis(ch, buf, FIND_CHAR_ROOM)))
+	else if (!(vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (vict == ch)
 		msg_to_char(ch, "You can't get your mouth close enough to your ear...\r\n");

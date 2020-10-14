@@ -953,7 +953,7 @@ vehicle_data *get_vehicle_near_obj(obj_data *obj, char *name) {
 		if (GET_ROOM_VEHICLE(orm) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(orm)))) {
 			return GET_ROOM_VEHICLE(orm);
 		}
-		return get_vehicle_room(orm, name);
+		return get_vehicle_room(orm, name, NULL);
 	}
 	else {
 		return NULL;
@@ -974,7 +974,7 @@ vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name) {
 	if (*name == UID_CHAR) {
 		return find_vehicle(atoi(name + 1));
 	}
-	if ((find = get_vehicle_room(IN_ROOM(veh), name))) {
+	if ((find = get_vehicle_room(IN_ROOM(veh), name, NULL))) {
 		return find;
 	}
 	if (GET_ROOM_VEHICLE(IN_ROOM(veh)) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(veh))))) {
@@ -1498,7 +1498,7 @@ ACMD(do_tattach) {
 	loc = (*loc_name) ? atoi(loc_name) : -1;
 
 	if (is_abbrev(arg, "mobile") || is_abbrev(arg, "mtr")) {
-		victim = (*targ_name == UID_CHAR) ? get_char(targ_name) : get_char_vis(ch, targ_name, FIND_CHAR_WORLD);
+		victim = (*targ_name == UID_CHAR) ? get_char(targ_name) : get_char_vis(ch, targ_name, NULL, FIND_CHAR_WORLD);
 		if (!victim) { /* search room for one with this vnum */
 			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_in_room) {
 				if (GET_MOB_VNUM(victim) == num_arg) {
@@ -1537,7 +1537,7 @@ ACMD(do_tattach) {
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), GET_SHORT(victim), GET_MOB_VNUM(victim));
 	}
 	else if (is_abbrev(arg, "object") || is_abbrev(arg, "otr")) {
-		object = (*targ_name == UID_CHAR) ? get_obj(targ_name) : get_obj_vis(ch, targ_name);
+		object = (*targ_name == UID_CHAR) ? get_obj(targ_name) : get_obj_vis(ch, targ_name, NULL);
 		if (!object) { /* search room for one with this vnum */
 			DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), object, next_content) {
 				if (GET_OBJ_VNUM(object) == num_arg) {
@@ -1580,7 +1580,7 @@ ACMD(do_tattach) {
 		msg_to_char(ch, "Trigger %d (%s) attached to %s [%d].\r\n", tn, GET_TRIG_NAME(trig), (GET_OBJ_SHORT_DESC(object) ? GET_OBJ_SHORT_DESC(object) : object->name), GET_OBJ_VNUM(object));
 	}
 	else if (is_abbrev(arg, "vehicle") || is_abbrev(arg, "vtr")) {
-		veh = (*targ_name == UID_CHAR) ? get_vehicle(targ_name) : get_vehicle_vis(ch, targ_name);
+		veh = (*targ_name == UID_CHAR) ? get_vehicle(targ_name) : get_vehicle_vis(ch, targ_name, NULL);
 		if (!veh) {
 			// search room for vehicle with matching vnum
 			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
@@ -1806,7 +1806,7 @@ ACMD(do_tdetach) {
 		return;
 	}
 	else if (is_abbrev(arg1, "mobile") || !str_cmp(arg1, "mtr")) {
-		victim = (*arg2 == UID_CHAR) ? get_char(arg2) : get_char_vis(ch, arg2, FIND_CHAR_WORLD);
+		victim = (*arg2 == UID_CHAR) ? get_char(arg2) : get_char_vis(ch, arg2, NULL, FIND_CHAR_WORLD);
 		if (!victim) { /* search room for one with this vnum */
 			DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), victim, next_in_room) {
 				if (GET_MOB_VNUM(victim) == num_arg) {
@@ -1831,7 +1831,7 @@ ACMD(do_tdetach) {
 			trigger = arg3;
 	}
 	else if (is_abbrev(arg1, "object") || !str_cmp(arg1, "otr")) {
-		object = (*arg2 == UID_CHAR) ? get_obj(arg2) : get_obj_vis(ch, arg2);
+		object = (*arg2 == UID_CHAR) ? get_obj(arg2) : get_obj_vis(ch, arg2, NULL);
 		if (!object) { /* search room for one with this vnum */
 			DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), object, next_content) {
 				if (GET_OBJ_VNUM(object) == num_arg) {
@@ -1864,7 +1864,7 @@ ACMD(do_tdetach) {
 			trigger = arg3;
 	}
 	else if (is_abbrev(arg1, "vehicle") || !str_cmp(arg1, "vtr")) {
-		veh = (*arg2 == UID_CHAR) ? get_vehicle(arg2) : get_vehicle_vis(ch, arg2);
+		veh = (*arg2 == UID_CHAR) ? get_vehicle(arg2) : get_vehicle_vis(ch, arg2, NULL);
 		if (!veh) {
 			// search room for vehicle with matching vnum
 			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
@@ -1895,22 +1895,22 @@ ACMD(do_tdetach) {
 	else {
 		if (*arg1 == UID_CHAR && ((victim = get_char(arg1)) || (object = get_obj(arg1)))) {
 		}
-		else if ((veh = get_vehicle_in_room_vis(ch, arg1))) {
+		else if ((veh = get_vehicle_in_room_vis(ch, arg1, NULL))) {
 		}
-		else if ((object = get_obj_in_equip_vis(ch, arg1, ch->equipment))) {
+		else if ((object = get_obj_in_equip_vis(ch, arg1, NULL, ch->equipment, NULL))) {
 			/* Thanks to Carlos Myers for fixing the line above */
 		}
-		else if ((object = get_obj_in_list_vis(ch, arg1, ch->carrying))) {
+		else if ((object = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying))) {
 		}
-		else if ((victim = get_char_room_vis(ch, arg1))) {
+		else if ((victim = get_char_room_vis(ch, arg1, NULL))) {
 		}
-		else if ((object = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		else if ((object = get_obj_in_list_vis(ch, arg1, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		}
-		else if ((victim = get_char_vis(ch, arg1, FIND_CHAR_WORLD))) {
+		else if ((victim = get_char_vis(ch, arg1, NULL, FIND_CHAR_WORLD))) {
 		}
-		else if ((veh = get_vehicle_vis(ch, arg1))) {
+		else if ((veh = get_vehicle_vis(ch, arg1, NULL))) {
 		}
-		else if ((object = get_obj_vis(ch, arg1))) {
+		else if ((object = get_obj_vis(ch, arg1, NULL))) {
 		}
 		else {
 			msg_to_char(ch, "Nothing around by that name.\r\n");
@@ -2422,7 +2422,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if ((c = get_char_room(name, IN_ROOM(ch)))) {
 						// just setting
 					}
-					else if ((v = get_vehicle_room(IN_ROOM(ch), name))) {
+					else if ((v = get_vehicle_room(IN_ROOM(ch), name, NULL))) {
 						// just setting
 					}
 					else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
@@ -3210,7 +3210,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						char_data *targ;
 						*str = '\0';	// default to no-target
 						if (subfield && *subfield) {
-							if ((targ = get_char_room_vis(c, subfield))) {
+							if ((targ = get_char_room_vis(c, subfield, NULL))) {
 								snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(targ));
 							}
 						}
@@ -3838,7 +3838,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					
 					else if (!str_cmp(field, "is_ally")) {
 						if (subfield && *subfield) {
-							char_data *targ = (*subfield == UID_CHAR) ? get_char(subfield) : get_char_vis(c, subfield, FIND_CHAR_WORLD);
+							char_data *targ = (*subfield == UID_CHAR) ? get_char(subfield) : get_char_vis(c, subfield, NULL, FIND_CHAR_WORLD);
 							snprintf(str, slen, "%d", (targ && is_fight_ally(c, targ)) ? 1 : 0);
 						}
 						else {
@@ -3847,7 +3847,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "is_enemy")) {
 						if (subfield && *subfield) {
-							char_data *targ = (*subfield == UID_CHAR) ? get_char(subfield) : get_char_vis(c, subfield, FIND_CHAR_WORLD);
+							char_data *targ = (*subfield == UID_CHAR) ? get_char(subfield) : get_char_vis(c, subfield, NULL, FIND_CHAR_WORLD);
 							snprintf(str, slen, "%d", (targ && is_fight_enemy(c, targ)) ? 1 : 0);
 						}
 						else {
@@ -4083,9 +4083,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'o': {	// char.o*
 					if (!str_cmp(field, "obj_target")) {
 						obj_data *targ;
+						int number = subfield ? get_number(&subfield) : 0;
 						*str = '\0';	// default to no-target
 						if (subfield && *subfield) {
-							if ((targ = get_obj_in_list_vis(c, subfield, c->carrying)) || (targ = get_obj_in_list_vis(c, subfield, ROOM_CONTENTS(IN_ROOM(c))))) {
+							if ((targ = get_obj_in_list_vis(c, subfield, &number, c->carrying)) || (targ = get_obj_in_list_vis(c, subfield, &number, ROOM_CONTENTS(IN_ROOM(c))))) {
 								snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(targ));
 							}
 						}
@@ -4094,7 +4095,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						obj_data *targ;
 						*str = '\0';	// default to no-target
 						if (subfield && *subfield) {
-							if ((targ = get_obj_in_list_vis(c, subfield, c->carrying))) {
+							if ((targ = get_obj_in_list_vis(c, subfield, NULL, c->carrying))) {
 								snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(targ));
 							}
 						}
@@ -4452,7 +4453,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						vehicle_data *targ;
 						*str = '\0';	// default to no-target
 						if (subfield && *subfield) {
-							if ((targ = get_vehicle_in_room_vis(c, subfield))) {
+							if ((targ = get_vehicle_in_room_vis(c, subfield, NULL))) {
 								snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(targ));
 							}
 						}
@@ -4829,9 +4830,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 't': {	// obj.t*
-					if (!str_cmp(field, "type"))
-						sprinttype(GET_OBJ_TYPE(o), item_types, str);
-
+					if (!str_cmp(field, "type")) {
+						sprinttype(GET_OBJ_TYPE(o), item_types, str, sizeof(str), "OTHER");
+					}
 					else if (!str_cmp(field, "timer"))
 						snprintf(str, slen, "%d", GET_OBJ_TIMER(o));
 					else if (!str_cmp(field, "tool")) {
@@ -5159,7 +5160,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "enter_dir")) {
 						if (BUILDING_ENTRANCE(r) != NO_DIR) {
-							sprinttype(BUILDING_ENTRANCE(r), dirs, str);
+							sprinttype(BUILDING_ENTRANCE(r), dirs, str, sizeof(str), "north");
 						}
 						else {
 							*str = '\0';
@@ -5167,7 +5168,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "exit_dir")) {
 						if (BUILDING_ENTRANCE(r) != NO_DIR && rev_dir[BUILDING_ENTRANCE(r)] != NO_DIR) {
-							sprinttype(rev_dir[BUILDING_ENTRANCE(r)], dirs, str);
+							sprinttype(rev_dir[BUILDING_ENTRANCE(r)], dirs, str, sizeof(str), "south");
 						}
 						else {
 							*str = '\0';
@@ -6921,7 +6922,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 					c = get_char_near_obj((obj_data*)go, name);
 					break;
 				case MOB_TRIGGER:
-					c = get_char_room_vis((char_data*)go, name);
+					c = get_char_room_vis((char_data*)go, name, NULL);
 					break;
 				case VEH_TRIGGER: {
 					c = get_char_near_vehicle((vehicle_data*)go, name);
@@ -6948,8 +6949,8 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 					o = get_obj_near_obj((obj_data*)go, name);
 					break;
 				case MOB_TRIGGER:
-					if ((o = get_obj_in_list_vis((char_data*)go, name, ((char_data*)go)->carrying)) == NULL)
-						o = get_obj_in_list_vis((char_data*)go, name, ROOM_CONTENTS(IN_ROOM((char_data*)go)));
+					if ((o = get_obj_in_list_vis((char_data*)go, name, NULL, ((char_data*)go)->carrying)) == NULL)
+						o = get_obj_in_list_vis((char_data*)go, name, NULL, ROOM_CONTENTS(IN_ROOM((char_data*)go)));
 					break;
 				case VEH_TRIGGER: {
 					o = get_obj_near_vehicle((vehicle_data*)go, name);
@@ -7027,7 +7028,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 				case RMT_TRIGGER:
 				case BLD_TRIGGER:
 				case ADV_TRIGGER: {
-					v = get_vehicle_room((room_data*)go, name);
+					v = get_vehicle_room((room_data*)go, name, NULL);
 					break;
 				}
 				case OBJ_TRIGGER: {
@@ -7035,7 +7036,7 @@ void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, ch
 					break;
 				}
 				case MOB_TRIGGER: {
-					v = get_vehicle_in_room_vis((char_data*)go, name);
+					v = get_vehicle_in_room_vis((char_data*)go, name, NULL);
 					break;
 				}
 				case VEH_TRIGGER: {

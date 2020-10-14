@@ -116,7 +116,7 @@ S
 Well~
 A Well~
 &t(&c~~&t)~
-4 0 d 0
+4 0 dn 0
 0 0 0 -1
 C
 drink, fill~
@@ -446,7 +446,7 @@ S
 Quarry~
 A Quarry~
 &0|__|~
-4 0 dmL 0
+4 0 dmnL 0
 0 0 0 -1
 C
 dig, quarry~
@@ -464,7 +464,7 @@ S
 Clay Pit~
 A Clay Pit~
 &y|__|~
-4 0 dmL 0
+4 0 dmnL 0
 0 0 0 -1
 C
 dig~
@@ -843,7 +843,7 @@ S
 Steps~
 On The Steps~
 .&0==&?.~
-4 0 do 0
+4 0 dno 0
 0 0 0 -1
 R
 1002 1 5 0
@@ -896,7 +896,7 @@ S
 Cemetery~
 A Gloomy Cemetery~
 .&0i&?.&0i~
-16 0 d 0
+16 0 dn 0
 0 0 0 -1
 C
 tomb~
@@ -920,7 +920,7 @@ S
 Park~
 A Park~
 .&g^&?.&co~
-10 0 d 0
+10 0 dn 0
 0 0 0 -1
 R
 1002 1 5 0
@@ -1083,7 +1083,7 @@ S
 Docks~
 The Docks~
 @w&0==@e~
-10 0 bdpD 0
+10 0 bdnpD 0
 0 0 0 -1
 C
 board, load, unload~
@@ -1104,7 +1104,7 @@ S
 Shipyard~
 The Shipyard~
 @w&0()@e~
-16 0 bdp 0
+16 0 bdnp 0
 0 0 0 216
 C
 board, manufacture, upgrade~
@@ -1128,7 +1128,7 @@ S
 Great Shipyard~
 A Great Shipyard~
 @w&0[]@e~
-48 4 bdU 0
+48 4 bdn 0
 0 0 0 216
 C
 board, manufacture~
@@ -1139,7 +1139,7 @@ passengers, but the shipyard lacks the facilities to load heavy equipment or
 animals. Ships may also not be brought back in once they leave.
 ~
 F
-u
+bu
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
 6000 1 1 0
@@ -1154,7 +1154,7 @@ S
 Swamp Walk~
 A Rickety Swamp Walk~
 &c~&0--&c~~
-10 0 dmp 0
+10 0 dmnp 0
 0 0 0 -1
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
@@ -1164,7 +1164,7 @@ S
 Platform~
 A Platform in the Swamp~
 ~&0__&?~~
-4 0 dp 0
+4 0 dnp 0
 0 0 0 -1
 I 29 5010 100.00 1 r  # RUINS-TO-BLD: Flooded Ruins
 R
@@ -1233,7 +1233,7 @@ S
 Courtyard~
 The Courtyard~
 ....~
-10 0 dl 0
+10 0 dln 0
 0 0 0 -1
 R
 1002 1 5 0
@@ -1293,7 +1293,7 @@ S
 Fountain~
 A Flowing Fountain~
 &0{&c~~&0}~
-10 0 dlo 0
+10 0 dlno 0
 0 0 0 -1
 C
 drink, fill~
@@ -1401,7 +1401,7 @@ S
 Advanced Guard Tower~
 An Advanced Guard Tower~
 &0'TT'~
-24 0 blpRU 0
+24 0 blpR 0
 0 0 0 -1
 C
 upgrade~
@@ -1413,7 +1413,7 @@ against invasion. Hopefully, it will be enough defense. The tower may be
 upgraded by typing upgrade here again.
 ~
 F
-j
+bj
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 251 5.00 ce
@@ -1428,7 +1428,7 @@ S
 Superior Guard Tower~
 A Superior Guard Tower~
 &0"TT"~
-64 0 blRU 0
+64 0 blR 0
 0 0 0 -1
 D
    This is a well-constructed guard tower. It is tall, allowing it to see
@@ -1437,7 +1437,7 @@ trespassers it sees. The tower is made from wood, so it is not well protected
 against invasion. Hopefully, it will be enough defense.
 ~
 F
-j
+bj
 I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 M
 251 5.00 ce
@@ -1562,7 +1562,7 @@ S
 Terraced Garden~
 A Terraced Garden~
 /&r##&?\~
-32 0 d 0
+32 0 dn 0
 0 0 0 -1
 C
 pick~
@@ -1577,7 +1577,7 @@ S
 Raft Garden~
 A Garden Made of Rafts~
 ~&b##&?~~
-10 0 dD 0
+10 0 dnD 0
 0 0 0 -1
 C
 pick~
@@ -1592,7 +1592,7 @@ S
 Oasis Garden~
 An Oasis Garden~
 &g^&C##&g^~
-10 0 d 0
+10 0 dn 0
 0 0 0 -1
 C
 pick~
@@ -1609,7 +1609,7 @@ S
 Estuary Garden~
 An Estuary Garden~
 ~&0##&?~~
-10 0 dD 0
+10 0 dnD 0
 0 0 0 -1
 C
 pick~
@@ -1624,7 +1624,7 @@ S
 Shady Garden~
 A Shady Garden~
 &g|&y##&g|~
-10 0 d 0
+10 0 dn 0
 0 0 0 -1
 C
 pick~
@@ -1720,7 +1720,7 @@ S
 Portal~
 A Mystical Portal~
 ~&b][&?~~
-24 1 bdp 0
+24 1 bdnp 0
 0 0 0 -1
 C
 collapse, enter, portal~
@@ -1839,7 +1839,7 @@ S
 Astral Nexus~
 An Astral Nexus~
 ..&C*&?.~
-24 0 bdp 0
+24 0 bdnp 0
 0 0 0 -1
 C
 summon player <name>~
@@ -1855,7 +1855,7 @@ S
 Draining Oasis~
 A Draining Oasis~
 .&c__&?.~
-4 0 dp 0
+4 0 dnp 0
 0 0 0 -1
 I 29 5006 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
@@ -1912,7 +1912,7 @@ S
 Family Gravesite~
 A Family Gravesite~
 ..&0x&?.~
-10 0 dlp 0
+10 0 dlnp 0
 0 0 0 -1
 C
 tomb~
@@ -1958,7 +1958,7 @@ S
 Ocean Fishery~
 A Fishery on the Coast~
 &0(&a~~&0)~
-8 0 dpDL 0
+8 0 dnpDL 0
 0 0 0 -1
 C
 fish~
@@ -2008,7 +2008,7 @@ S
 Mountain Well~
 A Deep Well on the Mountain~
 &y{&c~~&y}~
-4 0 d 0
+4 0 dn 0
 0 0 0 -1
 C
 drink, fill~

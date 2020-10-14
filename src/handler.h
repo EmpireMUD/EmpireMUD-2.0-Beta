@@ -37,7 +37,8 @@
 #define FIND_NO_DARK		BIT(6)	// ignores light
 #define FIND_VEHICLE_ROOM	BIT(7)
 #define FIND_VEHICLE_INSIDE	BIT(8)
-#define FIND_NPC_ONLY		BIT(9)	// ignores players
+#define FIND_VEHICLE_WORLD	BIT(9)
+#define FIND_NPC_ONLY		BIT(10)	// ignores players
 
 
 // for match_char_name()
@@ -97,7 +98,7 @@ void affect_to_room(room_data *room, struct affected_type *af);
 void affect_total(char_data *ch);
 void affect_total_room(room_data *room);
 extern bool affected_by_spell(char_data *ch, any_vnum type);
-extern bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply);
+extern bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply, bitvector_t aff_flag);
 bool affected_by_spell_from_caster(char_data *ch, any_vnum type, char_data *caster);
 extern struct affected_type *create_aff(any_vnum type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
 void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
@@ -124,10 +125,10 @@ extern char_data *find_closest_char(char_data *ch, char *arg, bool pc);
 extern char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum);
 extern char_data *find_mortal_in_room(room_data *room);
 extern char_data *get_char_room(char *name, room_data *room);
-extern char_data *get_char_room_vis(char_data *ch, char *name);
-extern char_data *get_char_vis(char_data *ch, char *name, bitvector_t where);
+extern char_data *get_char_room_vis(char_data *ch, char *name, int *number);
+extern char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t where);
 extern char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags);
-extern char_data *get_char_world(char *name);
+extern char_data *get_char_world(char *name, int *number);
 
 // coin handlers
 extern bool can_afford_coins(char_data *ch, empire_data *type, int amount);
@@ -291,17 +292,16 @@ extern bool has_custom_message(struct custom_message *list, int type);
 // object targeting handlers
 extern obj_data *get_component_in_list(any_vnum cmp_vnum, obj_data *list, bool *kept);
 extern obj_data *get_obj_by_char_share(char_data *ch, char *arg);
-extern obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]);
 extern obj_data *get_obj_in_list_num(int num, obj_data *list);
 extern obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list);
-extern obj_data *get_obj_in_list_vis(char_data *ch, char *name, obj_data *list);
-extern obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, obj_data *list, int interact_type);
-extern obj_data *get_obj_in_list_vis_prefer_type(char_data *ch, char *name, obj_data *list, int obj_type);
-extern int get_obj_pos_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]);
+extern obj_data *get_obj_in_list_vis(char_data *ch, char *name, int *number, obj_data *list);
+extern obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, int *number, obj_data *list, int interact_type);
+extern obj_data *get_obj_in_list_vis_prefer_type(char_data *ch, char *name, int *number, obj_data *list, int obj_type);
+extern int get_obj_pos_in_equip_vis(char_data *ch, char *arg, int *number, obj_data *equipment[]);
 extern obj_vnum get_obj_vnum_by_name(char *name, bool storable_only);
-extern obj_data *get_obj_vis(char_data *ch, char *name);
-extern obj_data *get_object_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[], int *pos);
-extern obj_data *get_obj_world(char *name);
+extern obj_data *get_obj_vis(char_data *ch, char *name, int *number);
+extern obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, int *number, obj_data *equipment[], int *pos);
+extern obj_data *get_obj_world(char *name, int *number);
 
 // offer handlers
 extern struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data);
@@ -383,7 +383,7 @@ extern bool stored_item_requires_withdraw(obj_data *obj);
 
 // targeting handlers
 extern int find_all_dots(char *arg);
-extern int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh);
+extern bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh);
 extern int get_number(char **name);
 
 // unique storage handlers
@@ -399,11 +399,12 @@ void vehicle_from_room(vehicle_data *veh);
 void vehicle_to_room(vehicle_data *veh, room_data *room);
 
 // vehicle targeting handlers
-vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, char *name);
-#define get_vehicle_in_room_vis(ch, name)  get_vehicle_in_target_room_vis((ch), IN_ROOM(ch), (name))
-extern vehicle_data *get_vehicle_vis(char_data *ch, char *name);
-extern vehicle_data *get_vehicle_room(room_data *room, char *name);
-extern vehicle_data *get_vehicle_world(char *name);
+vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, char *name, int *number);
+#define get_vehicle_in_room_vis(ch, name, number)  get_vehicle_in_target_room_vis((ch), IN_ROOM(ch), (name), (number))
+extern vehicle_data *get_vehicle_vis(char_data *ch, char *name, int *number);
+extern vehicle_data *get_vehicle_room(room_data *room, char *name, int *number);
+extern vehicle_data *get_vehicle_world(char *name, int *number);
+extern vehicle_data *get_vehicle_world_vis(char_data *ch, char *name, int *number);
 
 // world handlers
 extern struct room_direction_data *find_exit(room_data *room, int dir);

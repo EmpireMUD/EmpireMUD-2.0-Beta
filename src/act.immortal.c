@@ -59,6 +59,7 @@ extern const char *item_types[];
 extern const char *mapout_color_names[];
 extern const char *olc_flag_bits[];
 extern const char *progress_types[];
+extern const int bld_relationship_vnum_types[];
 extern struct faction_reputation_type reputation_levels[];
 extern const char *room_aff_bits[];
 extern const char *sector_flags[];
@@ -187,7 +188,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 			continue;
 		}
 
-		act(buf, TRUE, ch, 0, t, TO_VICT);
+		act(buf, TRUE, ch, 0, t, TO_VICT | DG_NO_TRIG);
 	}
 
 	char_from_room(ch);
@@ -212,7 +213,7 @@ static void perform_goto(char_data *ch, room_data *to_room) {
 			continue;
 		}
 		
-		act(buf, TRUE, ch, 0, t, TO_VICT);
+		act(buf, TRUE, ch, 0, t, TO_VICT | DG_NO_TRIG);
 	}
 	
 	qt_visit_room(ch, IN_ROOM(ch));
@@ -233,9 +234,9 @@ void perform_immort_invis(char_data *ch, int level) {
 		if (tch == ch)
 			continue;
 		if (GET_ACCESS_LEVEL(tch) >= GET_INVIS_LEV(ch) && GET_ACCESS_LEVEL(tch) < level)
-			act("You blink and suddenly realize that $n is gone.", FALSE, ch, 0, tch, TO_VICT);
+			act("You blink and suddenly realize that $n is gone.", FALSE, ch, 0, tch, TO_VICT | DG_NO_TRIG);
 		if (GET_ACCESS_LEVEL(tch) < GET_INVIS_LEV(ch) && GET_ACCESS_LEVEL(tch) >= level)
-			act("You suddenly realize that $n is standing beside you.", FALSE, ch, 0, tch, TO_VICT);
+			act("You suddenly realize that $n is standing beside you.", FALSE, ch, 0, tch, TO_VICT | DG_NO_TRIG);
 	}
 
 	GET_INVIS_LEV(ch) = level;
@@ -365,6 +366,7 @@ bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_
 #define ADMIN_UTIL(name)  void name(char_data *ch, char *argument)
 
 ADMIN_UTIL(util_approval);
+ADMIN_UTIL(util_bldconvert);
 ADMIN_UTIL(util_b318_buildings);
 ADMIN_UTIL(util_clear_roles);
 ADMIN_UTIL(util_diminish);
@@ -389,6 +391,7 @@ struct {
 	void (*func)(char_data *ch, char *argument);
 } admin_utils[] = {
 	{ "approval", LVL_CIMPL, util_approval },
+	{ "bldconvert", LVL_CIMPL, util_bldconvert },
 	{ "b318buildings", LVL_CIMPL, util_b318_buildings },
 	{ "clearroles", LVL_CIMPL, util_clear_roles },
 	{ "diminish", LVL_START_IMM, util_diminish },
@@ -497,6 +500,518 @@ ADMIN_UTIL(util_approval) {
 	
 	syslog(SYS_VALID, GET_INVIS_LEV(ch), TRUE, "VALID: %s changed existing approvals to be %s", GET_NAME(ch), to_acc ? "account-wide" : "by character, not account");
 	msg_to_char(ch, "All approvals are now %s.\r\n", to_acc ? "account-wide" : "by character, not account");
+}
+
+
+// util bldconvert <building vnum> <start of new vnums>
+ADMIN_UTIL(util_bldconvert) {
+	extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
+	extern struct bld_relation *copy_bld_relations(struct bld_relation *input_list);
+	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
+	extern struct resource_data *copy_resource_list(struct resource_data *input);
+	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
+	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
+	void save_olc_building(descriptor_data *desc);
+	void save_olc_craft(descriptor_data *desc);
+	void save_olc_vehicle(descriptor_data *desc);
+	extern bld_data *setup_olc_building(bld_data *input);
+	extern craft_data *setup_olc_craft(craft_data *input);
+	extern vehicle_data *setup_olc_vehicle(vehicle_data *input);
+	extern const byte interact_vnum_types[NUM_INTERACTS];
+	
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	any_vnum from_vnum, start_to_vnum, to_vnum = NOTHING;
+	craft_data *from_craft = NULL, *to_craft = NULL;
+	bld_data *from_bld = NULL, *to_bld = NULL;
+	struct trig_proto_list *proto_script;
+	struct bld_relation *new_rel;
+	vehicle_data *to_veh = NULL;
+	int iter;
+	
+	// for searching
+	struct interaction_item *inter, *next_inter;
+	struct progress_perk *perk, *next_perk;
+	vehicle_data *veh_iter, *next_veh;
+	struct adventure_link_rule *link;
+	quest_data *quest, *next_quest;
+	bld_data *bld_iter, *next_bld;
+	progress_data *prg, *next_prg;
+	struct cmdlist_element *cmd;
+	social_data *soc, *next_soc;
+	shop_data *shop, *next_shop;
+	trig_data *trig, *next_trig;
+	struct bld_relation *relat;
+	adv_data *adv, *next_adv;
+	obj_data *obj, *next_obj;
+	bool any;
+	
+	// stuff to copy
+	bitvector_t functions = NOBITS, designate = NOBITS, room_affs = NOBITS;
+	int fame = 0, military = 0, max_dam = 0, extra_rooms = 0;
+	struct resource_data *yearly_maintenance = NULL;
+	struct interaction_item *interactions = NULL;
+	struct extra_descr_data *ex_descs = NULL;
+	struct bld_relation *relations = NULL;
+	struct spawn_info *spawns = NULL;
+	char *icon = NULL;
+	
+	// basic safety
+	if (!ch->desc) {
+		return;
+	}
+	
+	two_arguments(argument, arg1, arg2);
+	
+	// basic args
+	if (!*arg1 || !*arg2 || !isdigit(*arg1) || !isdigit(*arg2)) {
+		msg_to_char(ch, "Usage: util bldconvert <building vnum> <start of new vnums>\r\n");
+		msg_to_char(ch, "This will find the first free vnum after the <start>, without going over the current 100-vnum block.\r\n");
+		return;
+	}
+	if ((from_vnum = atoi(arg1)) < 0 || !(from_bld = building_proto(from_vnum)) || BLD_FLAGGED(from_bld, BLD_ROOM)) {
+		msg_to_char(ch, "Invalid building vnum '%s'.\r\n", arg1);
+		return;
+	}
+	if (BLD_FLAGGED(from_bld, BLD_BARRIER | BLD_TWO_ENTRANCES)) {
+		msg_to_char(ch, "Building %d %s cannot be converted because it has BARRIER or TWO-ENTRANCES.\r\n", from_vnum, GET_BLD_NAME(from_bld));
+		return;
+	}
+	if ((start_to_vnum = atoi(arg2)) < 0) {
+		msg_to_char(ch, "Invalid start-of-new-vnums number '%s'.\r\n", arg2);
+		return;
+	}
+	
+	// ensure there's a basic craft
+	if ((from_craft = craft_proto(from_vnum)) && (!CRAFT_IS_BUILDING(from_craft) || GET_CRAFT_BUILD_TYPE(from_craft) != from_vnum)) {
+		msg_to_char(ch, "Unable to convert: craft %d is for something other than that building.\r\n", from_vnum);
+		return;
+	}
+	if (from_craft && CRAFT_FLAGGED(from_craft, CRAFT_DISMANTLE_ONLY)) {
+		msg_to_char(ch, "Unable to convert: craft %d is already dismantle-only so this building has probably already been converted (remove dismantle-only to force this conversion).\r\n", from_vnum);
+		return;
+	}
+	
+	// find free vnum -- check the 100-vnum block starting with start_to_vnum
+	for (iter = start_to_vnum; iter < 100 * (int)(start_to_vnum / 100 + 1) && to_vnum == NOTHING; ++iter) {
+		if (vehicle_proto(iter)) {
+			continue;	// vehicle vnum in use
+		}
+		if (from_craft && craft_proto(iter)) {
+			continue;	// need a craft but this one is in-use
+		}
+		if (!BLD_FLAGGED(from_bld, BLD_OPEN) && building_proto(iter)) {
+			continue;	// need a building but this one is in-use
+		}
+		
+		// found!
+		to_vnum = iter;
+		break;
+	}
+	
+	// did we find one?
+	if (to_vnum == NOTHING) {
+		msg_to_char(ch, "Unable to find a free vnum in the %d block after vnum %d.\r\n", 100 * (int)(start_to_vnum / 100), start_to_vnum);
+		return;
+	}
+	
+	// check olc access
+	if (!can_start_olc_edit(ch, OLC_VEHICLE, to_vnum) || (from_craft && !can_start_olc_edit(ch, OLC_CRAFT, to_vnum)) || (!BLD_FLAGGED(from_bld, BLD_OPEN) && !can_start_olc_edit(ch, OLC_BUILDING, to_vnum))) {
+		return;	// sends own message
+	}
+	
+	msg_to_char(ch, "Creating new building-vehicle %d from building %d %s%s%s:\r\n", to_vnum, from_vnum, GET_BLD_NAME(from_bld), from_craft ? ", with craft" : "", !BLD_FLAGGED(from_bld, BLD_OPEN) ? ", with interior" : "");
+	
+	// this will use the character's olc access because it make saving much easier
+	GET_OLC_VNUM(ch->desc) = to_vnum;
+	
+	// ok start with interior (non-open buildings only):
+	if (!BLD_FLAGGED(from_bld, BLD_OPEN)) {
+		// create the interior
+		GET_OLC_TYPE(ch->desc) = OLC_BUILDING;
+		GET_OLC_BUILDING(ch->desc) = to_bld = setup_olc_building(from_bld);
+		GET_BLD_VNUM(to_bld) = to_vnum;
+		
+		// will move these to the vehicle
+		icon = GET_BLD_ICON(to_bld);
+		GET_BLD_ICON(to_bld) = NULL;
+		fame = GET_BLD_FAME(to_bld);
+		GET_BLD_FAME(to_bld) = 0;
+		military = GET_BLD_MILITARY(to_bld);
+		GET_BLD_MILITARY(to_bld) = 0;
+		max_dam = GET_BLD_MAX_DAMAGE(to_bld);
+		GET_BLD_MAX_DAMAGE(to_bld) = 1;
+		extra_rooms = GET_BLD_EXTRA_ROOMS(to_bld);
+		GET_BLD_EXTRA_ROOMS(to_bld) = 0;
+		designate = GET_BLD_DESIGNATE_FLAGS(to_bld);
+		GET_BLD_DESIGNATE_FLAGS(to_bld) = NOBITS;
+		room_affs = GET_BLD_BASE_AFFECTS(to_bld);
+		GET_BLD_BASE_AFFECTS(to_bld) = NOBITS;
+		yearly_maintenance = GET_BLD_YEARLY_MAINTENANCE(to_bld);
+		GET_BLD_YEARLY_MAINTENANCE(to_bld) = NULL;
+		
+		// flags that change
+		REMOVE_BIT(GET_BLD_FLAGS(to_bld), BLD_OPEN | BLD_CLOSED | BLD_TWO_ENTRANCES);
+		SET_BIT(GET_BLD_FLAGS(to_bld), BLD_ROOM);
+		
+		// add a stores-like for the original bld
+		CREATE(new_rel, struct bld_relation, 1);
+		new_rel->type = BLD_REL_STORES_LIKE_BLD;
+		new_rel->vnum = GET_BLD_VNUM(from_bld);
+		LL_APPEND(GET_BLD_RELATIONS(to_bld), new_rel);
+		
+		// check for a ruins-to interaction to take
+		LL_FOREACH_SAFE(GET_BLD_INTERACTIONS(to_bld), inter, next_inter) {
+			if (inter->type == INTERACT_RUINS_TO_VEH) {
+				// move veh ruins straight across
+				LL_DELETE(GET_BLD_INTERACTIONS(to_bld), inter);
+				LL_APPEND(interactions, inter);
+			}
+			else if (inter->type == INTERACT_RUINS_TO_BLD) {
+				if (inter->vnum == 5006 || inter->vnum == 5007 || inter->vnum == 5010) {
+					// safe to move (keep vnum, change to vehicle)
+					inter->type = INTERACT_RUINS_TO_VEH;
+					LL_DELETE(GET_BLD_INTERACTIONS(to_bld), inter);
+					LL_APPEND(interactions, inter);
+				}
+				else {
+					msg_to_char(ch, "- Building %d %s has RUINS-TO-BLD interactions that cannot be converted (removing instead).\r\n", from_vnum, GET_BLD_NAME(from_bld));
+					LL_DELETE(GET_BLD_INTERACTIONS(to_bld), inter);
+					free(inter);
+				}
+			}
+		}
+		
+		LL_FOREACH(GET_BLD_SCRIPTS(from_bld), proto_script) {
+			msg_to_char(ch, "- Building %d %s has trigger %d %s which was copied (to %d) but should be reviewed.\r\n", from_vnum, GET_BLD_NAME(from_bld), proto_script->vnum, (real_trigger(proto_script->vnum) ? GET_TRIG_NAME(real_trigger(proto_script->vnum)) : "UNKNOWN"), to_vnum);
+		}
+		
+		// and save it
+		save_olc_building(ch->desc);
+		free_building(GET_OLC_BUILDING(ch->desc));
+		GET_OLC_BUILDING(ch->desc) = NULL;
+	}
+	else {
+		// open building: copy portions of it for the vehicle but don't create a new bld
+		icon = GET_BLD_ICON(from_bld) ? str_dup(GET_BLD_ICON(from_bld)) : NULL;
+		fame = GET_BLD_FAME(from_bld);
+		military = GET_BLD_MILITARY(from_bld);
+		functions = GET_BLD_FUNCTIONS(from_bld);
+		max_dam = GET_BLD_MAX_DAMAGE(from_bld);
+		ex_descs = copy_extra_descs(GET_BLD_EX_DESCS(from_bld));
+		room_affs = GET_BLD_BASE_AFFECTS(from_bld);
+		spawns = copy_spawn_list(GET_BLD_SPAWNS(from_bld));
+		relations = copy_bld_relations(GET_BLD_RELATIONS(from_bld));
+		interactions = copy_interaction_list(GET_BLD_INTERACTIONS(from_bld));
+		yearly_maintenance = copy_resource_list(GET_BLD_YEARLY_MAINTENANCE(from_bld));
+		
+		// validate ruins
+		LL_FOREACH_SAFE(interactions, inter, next_inter) {
+			if (inter->type == INTERACT_RUINS_TO_BLD) {
+				if (inter->vnum == 5006 || inter->vnum == 5007 || inter->vnum == 5010) {
+					// just change type (keep vnum)
+					inter->type = INTERACT_RUINS_TO_VEH;
+				}
+				else {
+					msg_to_char(ch, "- Building %d %s has RUINS-TO-BLD interactions that cannot be converted (removing instead).\r\n", from_vnum, GET_BLD_NAME(from_bld));
+					LL_DELETE(interactions, inter);
+					free(inter);
+				}
+			}
+		}
+		
+		// add a stores-like for the original building
+		CREATE(new_rel, struct bld_relation, 1);
+		new_rel->type = BLD_REL_STORES_LIKE_BLD;
+		new_rel->vnum = GET_BLD_VNUM(from_bld);
+		LL_APPEND(relations, new_rel);
+		
+		if (!GET_BLD_DESC(from_bld)) {
+			msg_to_char(ch, "- Open building %d %s has no description to copy.\r\n", from_vnum, GET_BLD_NAME(from_bld));
+		}
+		if (GET_BLD_ARTISAN(from_bld) > 0) {
+			msg_to_char(ch, "- Open building %d %s has an artisan that cannot be copied (to %d).\r\n", from_vnum, GET_BLD_NAME(from_bld), to_vnum);
+		}
+		LL_FOREACH(GET_BLD_SCRIPTS(from_bld), proto_script) {
+			msg_to_char(ch, "- Open building %d %s has trigger %d %s which cannot be copied (to %d).\r\n", from_vnum, GET_BLD_NAME(from_bld), proto_script->vnum, (real_trigger(proto_script->vnum) ? GET_TRIG_NAME(real_trigger(proto_script->vnum)) : "UNKNOWN"), to_vnum);
+		}
+	}
+	
+	// set up the vehicle
+	{
+		GET_OLC_TYPE(ch->desc) = OLC_VEHICLE;
+		GET_OLC_VEHICLE(ch->desc) = to_veh = setup_olc_vehicle(NULL);
+		VEH_VNUM(to_veh) = to_vnum;
+		
+		// copy kws
+		if (VEH_KEYWORDS(to_veh)) {
+			free(VEH_KEYWORDS(to_veh));
+		}
+		VEH_KEYWORDS(to_veh) = str_dup(GET_BLD_NAME(from_bld));
+		strtolower(VEH_KEYWORDS(to_veh));
+		
+		// build short desc
+		if (VEH_SHORT_DESC(to_veh)) {
+			free(VEH_SHORT_DESC(to_veh));
+		}
+		snprintf(buf, sizeof(buf), "%s %s", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
+		strtolower(buf);
+		VEH_SHORT_DESC(to_veh) = str_dup(buf);
+		
+		// build long desc
+		if (VEH_LONG_DESC(to_veh)) {
+			free(VEH_LONG_DESC(to_veh));
+		}
+		snprintf(buf, sizeof(buf), "%s %s is here.", AN(GET_BLD_NAME(from_bld)), GET_BLD_NAME(from_bld));
+		strtolower(buf);
+		VEH_LONG_DESC(to_veh) = str_dup(CAP(buf));
+		
+		// look desc?
+		if (VEH_LOOK_DESC(to_veh)) {
+			free(VEH_LOOK_DESC(to_veh));
+		}
+		VEH_LOOK_DESC(to_veh) = GET_BLD_DESC(from_bld) ? str_dup(GET_BLD_DESC(from_bld)) : NULL;
+		
+		// icon?
+		if (VEH_ICON(to_veh)) {
+			free(VEH_ICON(to_veh));
+		}
+		VEH_ICON(to_veh) = icon;
+		
+		// basic traits
+		VEH_SIZE(to_veh) = 1;
+		VEH_INTERIOR_ROOM_VNUM(to_veh) = to_bld ? to_vnum : NOWHERE;
+		
+		// flags
+		SET_BIT(VEH_FLAGS(to_veh), VEH_CUSTOMIZABLE | VEH_NO_BUILDING | VEH_NO_LOAD_ONTO_VEHICLE | VEH_VISIBLE_IN_DARK | VEH_BUILDING);
+		if (!BLD_FLAGGED(from_bld, BLD_OPEN)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_IN);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_BURNABLE)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_BURNABLE);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_INTERLINK)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_INTERLINK);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_ALLOW_MOUNTS | BLD_HERD)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_CARRY_MOBS);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_ALLOW_MOUNTS)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_CARRY_VEHICLES);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_IS_RUINS)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_IS_RUINS);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_NO_PAINT)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_NO_PAINT);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_DEDICATE)) {
+			SET_BIT(VEH_FLAGS(to_veh), VEH_DEDICATE);
+		}
+		if (IS_SET(room_affs, ROOM_AFF_CHAMELEON)) {
+			REMOVE_BIT(room_affs, ROOM_AFF_CHAMELEON);
+			SET_BIT(VEH_FLAGS(to_veh), VEH_CHAMELEON);
+		}
+		
+		// copy traits over
+		VEH_DESIGNATE_FLAGS(to_veh) = designate;
+		VEH_EX_DESCS(to_veh) = ex_descs;
+		VEH_FAME(to_veh) = fame;
+		VEH_FUNCTIONS(to_veh) = functions;
+		VEH_INTERACTIONS(to_veh) = interactions;
+		VEH_MAX_HEALTH(to_veh) = max_dam;
+		VEH_MAX_ROOMS(to_veh) = extra_rooms;
+		VEH_MILITARY(to_veh) = military;
+		VEH_RELATIONS(to_veh) = relations;
+		VEH_ROOM_AFFECTS(to_veh) = room_affs | ROOM_AFF_NO_WORKFORCE_EVOS;
+		VEH_SPAWNS(to_veh) = spawns;
+		VEH_YEARLY_MAINTENANCE(to_veh) = yearly_maintenance;
+		
+		if (room_affs) {
+			sprintbit(room_affs, room_aff_bits, buf, TRUE);
+			msg_to_char(ch, "- Vehicle %d %s has affect flags: %s\r\n", to_vnum, GET_BLD_NAME(from_bld), buf);
+		}
+		if (BLD_FLAGGED(from_bld, BLD_LARGE_CITY_RADIUS)) {
+			msg_to_char(ch, "- Building %d %s has LARGE-CITY-RADIUS flag that cannot be copied.\r\n", to_vnum, GET_BLD_NAME(from_bld));
+		}
+		
+		// and save it
+		save_olc_vehicle(ch->desc);
+		free_vehicle(GET_OLC_VEHICLE(ch->desc));
+		GET_OLC_VEHICLE(ch->desc) = NULL;
+	}
+	
+	// add new craft
+	if (from_craft) {
+		GET_OLC_TYPE(ch->desc) = OLC_CRAFT;
+		GET_OLC_CRAFT(ch->desc) = to_craft = setup_olc_craft(from_craft);
+		GET_CRAFT_VNUM(to_craft) = to_vnum;
+		
+		SET_BIT(GET_CRAFT_FLAGS(to_craft), CRAFT_VEHICLE);
+		GET_CRAFT_QUANTITY(to_craft) = 1;
+		GET_CRAFT_OBJECT(to_craft) = to_vnum;
+		GET_CRAFT_BUILD_TYPE(to_craft) = NOTHING;
+		GET_CRAFT_TIME(to_craft) = 1;
+		
+		// only keep facing flags if certain ones are set
+		if (!IS_SET(GET_CRAFT_BUILD_FACING(to_craft), BLD_ON_MOUNTAIN | BLD_ON_RIVER | BLD_ON_NOT_PLAYER_MADE | BLD_ON_OCEAN | BLD_ON_OASIS | BLD_ON_SWAMP | BLD_ON_SHALLOW_SEA | BLD_ON_COAST | BLD_ON_RIVERBANK | BLD_ON_ESTUARY | BLD_ON_LAKE)) {
+			GET_CRAFT_BUILD_FACING(to_craft) = NOBITS;
+		}
+		else if (GET_CRAFT_BUILD_FACING(to_craft) == (BLD_ON_MOUNTAIN | BLD_ON_FLAT_TERRAIN | BLD_FACING_OPEN_BUILDING)) {
+			// special case for common mountain-facing-mountain buildings
+			GET_CRAFT_BUILD_FACING(to_craft) = NOBITS;
+		}
+		else if (GET_CRAFT_BUILD_FACING(to_craft) == (BLD_ON_SWAMP | BLD_ON_FLAT_TERRAIN | BLD_FACING_OPEN_BUILDING)) {
+			// special case for common swamp-facing-swamp buildings
+			GET_CRAFT_BUILD_FACING(to_craft) = NOBITS;
+		}
+		else {
+			msg_to_char(ch, "- Craft for building %d %s needs build-facing review.\r\n", to_vnum, GET_BLD_NAME(from_bld));
+		}
+		
+		// and save it
+		save_olc_craft(ch->desc);
+		free_craft(GET_OLC_CRAFT(ch->desc));
+		GET_OLC_CRAFT(ch->desc) = NULL;
+		
+		if (CRAFT_FLAGGED(from_craft, CRAFT_LEARNED)) {
+			msg_to_char(ch, "- Craft for building %d %s is LEARNED - you must update whatever taught craft %d.\r\n", to_vnum, GET_BLD_NAME(from_bld), from_vnum);
+		}
+	}
+	else {
+		msg_to_char(ch, "- Building %d %s has no craft.\r\n", to_vnum, GET_BLD_NAME(from_bld));
+	}
+	
+	// convert old craft
+	if (from_craft) {
+		GET_OLC_TYPE(ch->desc) = OLC_CRAFT;
+		GET_OLC_CRAFT(ch->desc) = setup_olc_craft(from_craft);
+		GET_OLC_VNUM(ch->desc) = from_vnum;
+		
+		snprintf(buf, sizeof(buf), "dismantle %s", GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)));
+		free(GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)));
+		GET_CRAFT_NAME(GET_OLC_CRAFT(ch->desc)) = str_dup(buf);
+		
+		SET_BIT(GET_CRAFT_FLAGS(GET_OLC_CRAFT(ch->desc)), CRAFT_DISMANTLE_ONLY);
+		
+		// and save it
+		save_olc_craft(ch->desc);
+		free_craft(GET_OLC_CRAFT(ch->desc));
+		GET_OLC_CRAFT(ch->desc) = NULL;
+	}
+	
+	// and clean up
+	GET_OLC_TYPE(ch->desc) = 0;
+	GET_OLC_VNUM(ch->desc) = NOTHING;
+	
+	// now warn about things linked to it (similar to .b search
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		for (link = GET_ADV_LINKING(adv); link; link = link->next) {
+			if (link->type == ADV_LINK_BUILDING_EXISTING || link->type == ADV_LINK_BUILDING_NEW || link->type == ADV_LINK_PORTAL_BUILDING_EXISTING || link->type == ADV_LINK_PORTAL_BUILDING_NEW) {
+				if (link->value == from_vnum) {
+					msg_to_char(ch, "- Building %d %s is linked by ADV [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_ADV_VNUM(adv), GET_ADV_NAME(adv));
+					break;
+				}
+			}
+		}
+	}
+	HASH_ITER(hh, building_table, bld_iter, next_bld) {
+		if (GET_BLD_VNUM(bld_iter) == to_vnum) {
+			continue;	// skip self
+		}
+		LL_FOREACH(GET_BLD_INTERACTIONS(bld_iter), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == from_vnum) {
+				msg_to_char(ch, "- Building %d %s in interactions for BLD [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_BLD_VNUM(bld_iter), GET_BLD_NAME(bld_iter));
+				break;
+			}
+		}
+		LL_FOREACH(GET_BLD_RELATIONS(bld_iter), relat) {
+			if (bld_relationship_vnum_types[relat->type] != TYPE_BLD) {
+				continue;
+			}
+			if (relat->vnum != from_vnum) {
+				continue;
+			}
+			msg_to_char(ch, "- Building %d %s in relations for BLD [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_BLD_VNUM(bld_iter), GET_BLD_NAME(bld_iter));
+			break;
+		}
+	}
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		if (IS_RECIPE(obj) && GET_RECIPE_VNUM(obj) == from_vnum) {
+			msg_to_char(ch, "- Craft %d %s in taught by recipe OBJ [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_OBJ_VNUM(obj), GET_OBJ_SHORT_DESC(obj));
+		}
+	}
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		any = find_requirement_in_list(PRG_TASKS(prg), REQ_OWN_BUILDING, from_vnum);
+		any |= find_requirement_in_list(PRG_TASKS(prg), REQ_VISIT_BUILDING, from_vnum);
+		
+		if (any) {
+			msg_to_char(ch, "- Building %d %s in tasks for PRG [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), PRG_VNUM(prg), PRG_NAME(prg));
+		}
+		
+		LL_FOREACH_SAFE(PRG_PERKS(prg), perk, next_perk) {
+			if (perk->type == PRG_PERK_CRAFT && perk->value == from_vnum) {
+				msg_to_char(ch, "- Craft %d %s in taught by PRG [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), PRG_VNUM(prg), PRG_NAME(prg));
+				break;
+			}
+		}
+	}
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		if (find_quest_giver_in_list(QUEST_STARTS_AT(quest), QG_BUILDING, from_vnum) || find_quest_giver_in_list(QUEST_ENDS_AT(quest), QG_BUILDING, from_vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_OWN_BUILDING, from_vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_OWN_BUILDING, from_vnum) || find_requirement_in_list(QUEST_TASKS(quest), REQ_VISIT_BUILDING, from_vnum) || find_requirement_in_list(QUEST_PREREQS(quest), REQ_VISIT_BUILDING, from_vnum)) {
+			msg_to_char(ch, "- Building %d %s in data for QST [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), QUEST_VNUM(quest), QUEST_NAME(quest));
+		}
+	}
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		if (find_quest_giver_in_list(SHOP_LOCATIONS(shop), QG_BUILDING, from_vnum)) {
+			msg_to_char(ch, "- Building %d %s is location for SHOP [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), SHOP_VNUM(shop), SHOP_NAME(shop));
+		}
+	}
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		if (find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_OWN_BUILDING, from_vnum) || find_requirement_in_list(SOC_REQUIREMENTS(soc), REQ_VISIT_BUILDING, from_vnum)) {
+			msg_to_char(ch, "- Building %d %s in requirements for SOC [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), SOC_VNUM(soc), SOC_NAME(soc));
+		}
+	}
+	snprintf(buf, sizeof(buf), "%d", from_vnum);
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		LL_FOREACH(trig->cmdlist, cmd) {
+			if (strstr(cmd->cmd, buf)) {
+				msg_to_char(ch, "- Possible mention of building or craft %d %s in TRG [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), GET_TRIG_VNUM(trig), GET_TRIG_NAME(trig));
+				break;
+			}
+		}
+	}
+	HASH_ITER(hh, vehicle_table, veh_iter, next_veh) {
+		if (VEH_VNUM(veh_iter) == to_vnum) {
+			continue;	// skip new one
+		}
+		if (VEH_INTERIOR_ROOM_VNUM(veh_iter) == from_vnum) {
+			msg_to_char(ch, "- Building %d %s in interior room for VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
+		}
+		LL_FOREACH(VEH_INTERACTIONS(veh_iter), inter) {
+			if (interact_vnum_types[inter->type] == TYPE_BLD && inter->vnum == from_vnum) {
+				msg_to_char(ch, "- Building %d %s in interaction for VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
+				break;
+			}
+		}
+		LL_FOREACH(VEH_RELATIONS(veh_iter), relat) {
+			if (bld_relationship_vnum_types[relat->type] != TYPE_BLD) {
+				continue;
+			}
+			if (relat->vnum != from_vnum) {
+				continue;
+			}
+			msg_to_char(ch, "- Building %d %s in relations VEH [%d %s].\r\n", to_vnum, GET_BLD_NAME(from_bld), VEH_VNUM(veh_iter), VEH_SHORT_DESC(veh_iter));
+			break;
+		}
+	}
+	
+	snprintf(buf, sizeof(buf), "OLC: %s has cloned building %d %s to vehicle %d", GET_NAME(ch), from_vnum, GET_BLD_NAME(from_bld), to_vnum);
+	if (!BLD_FLAGGED(from_bld, BLD_OPEN)) {
+		snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ", interior room bld %d", to_vnum);
+	}
+	if (from_craft) {
+		snprintf(buf + strlen(buf), sizeof(buf) - strlen(buf), ", and craft %d (with updates to craft %d)", to_vnum, from_vnum);
+	}
+	syslog(SYS_OLC, GET_INVIS_LEV(ch), TRUE, "%s", buf);
 }
 
 
@@ -3085,7 +3600,7 @@ SHOW(show_resource) {
 			}
 		}
 		// scan shipping
-		LL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
 			if (shipd->vnum == vnum) {
 				SAFE_ADD(amt, shipd->amount, 0, LLONG_MAX, FALSE);
 			}
@@ -5350,7 +5865,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	// ensure fully loaded
 	check_delayed_load(k);
 
-	sprinttype(GET_REAL_SEX(k), genders, buf);
+	sprinttype(GET_REAL_SEX(k), genders, buf, sizeof(buf), "???");
 	CAP(buf);
 	if (!IS_NPC(k)) {
 		msg_to_char(ch, "%s PC '\ty%s\t0', Lastname '\ty%s\t0', IDNum: [%5d], In room [%5d]\r\n", buf, GET_NAME(k), GET_CURRENT_LASTNAME(k) ? GET_CURRENT_LASTNAME(k) : "none", GET_IDNUM(k), IN_ROOM(k) ? GET_ROOM_VNUM(IN_ROOM(k)) : NOWHERE);
@@ -5455,14 +5970,14 @@ void do_stat_character(char_data *ch, char_data *k) {
 		}
 	}
 
-	sprinttype(GET_POS(k), position_types, buf2);
+	sprinttype(GET_POS(k), position_types, buf2, sizeof(buf2), "UNDEFINED");
 	sprintf(buf, "Pos: %s, Fighting: %s", buf2, (FIGHTING(k) ? GET_NAME(FIGHTING(k)) : "Nobody"));
 
 	if (IS_NPC(k)) {
 		sprintf(buf + strlen(buf), ", Attack: %s, Move: %s, Size: %s", attack_hit_info[MOB_ATTACK_TYPE(k)].name, mob_move_types[(int)MOB_MOVE_TYPE(k)], size_types[GET_SIZE(k)]);
 	}
 	if (k->desc) {
-		sprinttype(STATE(k->desc), connected_types, buf2);
+		sprinttype(STATE(k->desc), connected_types, buf2, sizeof(buf2), "UNDEFINED");
 		strcat(buf, ", Connected: ");
 		strcat(buf, buf2);
 	}
@@ -6116,7 +6631,9 @@ void do_stat_object(char_data *ch, obj_data *j) {
 		case ITEM_PAINT: {
 			extern const char *paint_colors[];
 			extern const char *paint_names[];
-			msg_to_char(ch, "Paint color: %s%s\t0\r\n", paint_colors[GET_PAINT_COLOR(j)], paint_names[GET_PAINT_COLOR(j)]);
+			sprinttype(GET_PAINT_COLOR(j), paint_names, buf, sizeof(buf), "UNDEFINED");
+			sprinttype(GET_PAINT_COLOR(j), paint_colors, part, sizeof(part), "&0");
+			msg_to_char(ch, "Paint color: %s%s\t0\r\n", part, buf);
 			break;
 		}
 		case ITEM_POTION: {
@@ -6503,7 +7020,7 @@ void do_stat_room(char_data *ch) {
 		msg_to_char(ch, "Extra data:\r\n");
 		
 		HASH_ITER(hh, ROOM_EXTRA_DATA(IN_ROOM(ch)), red, next_red) {
-			sprinttype(red->type, room_extra_types, buf);
+			sprinttype(red->type, room_extra_types, buf, sizeof(buf), "UNDEFINED");
 			msg_to_char(ch, " %s: %d\r\n", buf, red->value);
 		}
 	}
@@ -6945,7 +7462,7 @@ ACMD(do_advance) {
 	two_arguments(argument, name, level);
 
 	if (*name) {
-   		if (!(victim = get_char_vis(ch, name, FIND_CHAR_WORLD))) {
+   		if (!(victim = get_char_vis(ch, name, NULL, FIND_CHAR_WORLD))) {
 			send_to_char("That player is not here.\r\n", ch);
 			return;
 		}
@@ -6999,7 +7516,7 @@ ACMD(do_advance) {
 			"to the elements of time and space itself.\r\n"
 			"Suddenly a silent explosion of light\r\n"
 			"snaps you back to reality.\r\n\r\n"
-			"You feel slightly different.", FALSE, ch, 0, victim, TO_VICT);
+			"You feel slightly different.", FALSE, ch, 0, victim, TO_VICT | DG_NO_TRIG);
 	}
 
 	send_config_msg(ch, "ok_string");
@@ -7337,12 +7854,14 @@ ACMD(do_autostore) {
 		msg_to_char(ch, "Nobody owns this spot. Use purge instead.\r\n");
 	}
 	else if (*arg) {
-		if ((obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
-			act("$n auto-stores $p.", FALSE, ch, obj, NULL, TO_ROOM);
+		generic_find(arg, FIND_OBJ_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, &obj, &veh);
+		
+		if (obj) {
+			act("$n auto-stores $p.", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
 			perform_autostore(obj, emp, GET_ISLAND_ID(IN_ROOM(ch)));
 		}
-		else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
-			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		else if (veh) {
+			act("$n auto-stores items in $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
 			
 			DL_FOREACH_SAFE2(VEH_CONTAINS(veh), obj, next_obj, next_content) {
 				perform_autostore(obj, VEH_OWNER(veh), GET_ISLAND_ID(IN_ROOM(ch)));
@@ -7356,7 +7875,7 @@ ACMD(do_autostore) {
 		send_config_msg(ch, "ok_string");
 	}
 	else {			// no argument. clean out the room
-		act("$n gestures...", FALSE, ch, 0, 0, TO_ROOM);
+		act("$n gestures...", FALSE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
 		send_to_room("The world seems a little cleaner.\r\n", IN_ROOM(ch));
 		
 		DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
@@ -7597,7 +8116,7 @@ ACMD(do_echo) {
 			*end = '\0';
 		}
 		len = strlen(lbuf);
-		vict = get_char_vis(ch, lbuf, FIND_CHAR_ROOM);
+		vict = get_char_vis(ch, lbuf, NULL, FIND_CHAR_ROOM);
 
 		if (vict) {		
 			// replace with $N
@@ -7648,7 +8167,7 @@ ACMD(do_echo) {
 		}
 		
 		// send message
-		act(lbuf, FALSE, ch, obj, vict, TO_CHAR | TO_IGNORE_BAD_CODE);
+		act(lbuf, FALSE, ch, obj, vict, TO_CHAR | TO_IGNORE_BAD_CODE | DG_NO_TRIG);
 		
 		// channel history
 		if (ch->desc && ch->desc->last_act_message) {
@@ -7855,7 +8374,7 @@ ACMD(do_editnotes) {
 	start_string_editor(ch->desc, buf, &(acct->notes), MAX_ADMIN_NOTES_LENGTH-1, TRUE);
 	ch->desc->notes_id = acct->id;
 
-	act("$n begins editing some notes.", TRUE, ch, FALSE, FALSE, TO_ROOM);
+	act("$n begins editing some notes.", TRUE, ch, FALSE, FALSE, TO_ROOM | DG_NO_TRIG);
 }
 
 
@@ -8033,14 +8552,14 @@ ACMD(do_force) {
 	if (!*arg || !*to_force)
 		send_to_char("Whom do you wish to force do what?\r\n", ch);
 	else if ((GET_ACCESS_LEVEL(ch) < LVL_IMPL) || (str_cmp("all", arg) && str_cmp("room", arg))) {
-		if (!(vict = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
+		if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
 			send_config_msg(ch, "no_person");
 		else if (!REAL_NPC(vict) && GET_REAL_LEVEL(ch) <= GET_REAL_LEVEL(vict))
 			send_to_char("No, no, no!\r\n", ch);
 		else {
 			send_config_msg(ch, "ok_string");
 			sprintf(buf1, "$n has forced you to '%s'.", to_force);
-			act(buf1, TRUE, ch, NULL, vict, TO_VICT);
+			act(buf1, TRUE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s forced %s to %s", GET_NAME(ch), GET_NAME(vict), to_force);
 			command_interpreter(vict, to_force);
 		}
@@ -8053,7 +8572,7 @@ ACMD(do_force) {
 			if (!REAL_NPC(vict) && GET_REAL_LEVEL(vict) >= GET_REAL_LEVEL(ch))
 				continue;
 			sprintf(buf1, "$n has forced you to '%s'.", to_force);
-			act(buf1, TRUE, ch, NULL, vict, TO_VICT);
+			act(buf1, TRUE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			command_interpreter(vict, to_force);
 		}
 	}
@@ -8067,7 +8586,7 @@ ACMD(do_force) {
 			if (STATE(i) != CON_PLAYING || !(vict = i->character) || (!REAL_NPC(vict) && GET_REAL_LEVEL(vict) >= GET_REAL_LEVEL(ch)))
 				continue;
 			sprintf(buf1, "$n has forced you to '%s'.", to_force);
-			act(buf1, TRUE, ch, NULL, vict, TO_VICT);
+			act(buf1, TRUE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			command_interpreter(vict, to_force);
 		}
 	}
@@ -8096,7 +8615,7 @@ ACMD(do_forgive) {
 			remove_cooldown_by_type(vict, COOLDOWN_HOSTILE_FLAG);
 			msg_to_char(ch, "Hostile flag forgiven.\r\n");
 			if (ch != vict) {
-				act("$n has forgiven your hostile flag.", FALSE, ch, NULL, vict, TO_VICT);
+				act("$n has forgiven your hostile flag.", FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			}
 			any = TRUE;
 		}
@@ -8105,7 +8624,7 @@ ACMD(do_forgive) {
 			remove_cooldown_by_type(vict, COOLDOWN_ROGUE_FLAG);
 			msg_to_char(ch, "Rogue flag forgiven.\r\n");
 			if (ch != vict) {
-				act("$n has forgiven your rogue flag.", FALSE, ch, NULL, vict, TO_VICT);
+				act("$n has forgiven your rogue flag.", FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			}
 			any = TRUE;
 		}
@@ -8114,7 +8633,7 @@ ACMD(do_forgive) {
 			remove_cooldown_by_type(vict, COOLDOWN_LEFT_EMPIRE);
 			msg_to_char(ch, "Defect timer forgiven.\r\n");
 			if (ch != vict) {
-				act("$n has forgiven your empire defect timer.", FALSE, ch, NULL, vict, TO_VICT);
+				act("$n has forgiven your empire defect timer.", FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			}
 			any = TRUE;
 		}
@@ -8123,7 +8642,7 @@ ACMD(do_forgive) {
 			remove_cooldown_by_type(vict, COOLDOWN_PVP_FLAG);
 			msg_to_char(ch, "PVP cooldown forgiven.\r\n");
 			if (ch != vict) {
-				act("$n has forgiven your PVP cooldown.", FALSE, ch, NULL, vict, TO_VICT);
+				act("$n has forgiven your PVP cooldown.", FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			}
 			any = TRUE;
 		}
@@ -8132,7 +8651,7 @@ ACMD(do_forgive) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has forgiven %s", GET_NAME(ch), GET_NAME(vict));
 		}
 		else {
-			act("There's nothing you can forgive $N for.", FALSE, ch, NULL, vict, TO_CHAR);
+			act("There's nothing you can forgive $N for.", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
 		}
 	}
 }
@@ -8236,7 +8755,7 @@ ACMD(do_hostile) {
 		msg_to_char(vict, "You are now hostile!\r\n");
 		if (ch != vict) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has marked %s as hostile", GET_NAME(ch), GET_NAME(vict));
-			act("$N is now hostile.", FALSE, ch, NULL, vict, TO_CHAR);
+			act("$N is now hostile.", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
 		}
 	}
 }
@@ -8503,9 +9022,9 @@ ACMD(do_load) {
 		setup_generic_npc(mob, NULL, NOTHING, NOTHING);
 		char_to_room(mob, IN_ROOM(ch));
 
-		act("$n makes a quaint, magical gesture with one hand.", TRUE, ch, 0, 0, TO_ROOM);
-		act("$n has created $N!", FALSE, ch, 0, mob, TO_ROOM);
-		act("You create $N.", FALSE, ch, 0, mob, TO_CHAR);
+		act("$n makes a quaint, magical gesture with one hand.", TRUE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
+		act("$n has created $N!", FALSE, ch, 0, mob, TO_ROOM | DG_NO_TRIG);
+		act("You create $N.", FALSE, ch, 0, mob, TO_CHAR | DG_NO_TRIG);
 		load_mtrigger(mob);
 		
 		if ((mort = find_mortal_in_room(IN_ROOM(ch)))) {
@@ -8525,9 +9044,9 @@ ACMD(do_load) {
 			obj_to_char(obj, ch);
 		else
 			obj_to_room(obj, IN_ROOM(ch));
-		act("$n makes a strange magical gesture.", TRUE, ch, 0, 0, TO_ROOM);
-		act("$n has created $p!", FALSE, ch, obj, 0, TO_ROOM);
-		act("You create $p.", FALSE, ch, obj, 0, TO_CHAR);
+		act("$n makes a strange magical gesture.", TRUE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
+		act("$n has created $p!", FALSE, ch, obj, 0, TO_ROOM | DG_NO_TRIG);
+		act("You create $p.", FALSE, ch, obj, 0, TO_CHAR | DG_NO_TRIG);
 		load_otrigger(obj);
 	}
 	else if (is_abbrev(buf, "vehicle")) {
@@ -8539,9 +9058,9 @@ ACMD(do_load) {
 		vehicle_to_room(veh, IN_ROOM(ch));
 		scale_vehicle_to_level(veh, 0);	// attempt auto-detect of level
 		get_vehicle_interior(veh);	// ensure inside is loaded
-		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM);
-		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM);
-		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR);
+		act("$n makes an odd magical gesture.", TRUE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
+		act("$n has created $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
+		act("You create $V.", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
 		
 		if (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_OWNER(HOME_ROOM(IN_ROOM(veh)))) {
 			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(veh))));
@@ -8628,17 +9147,19 @@ ACMD(do_moveeinv) {
 
 
 ACMD(do_oset) {
-	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
+	char obj_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], *obj_arg_ptr = obj_arg;
 	obj_data *obj, *proto;
+	int number;
 	
 	argument = one_argument(argument, obj_arg);
 	argument = any_one_arg(argument, field_arg);
 	skip_spaces(&argument);	// remainder
+	number = get_number(&obj_arg_ptr);
 	
-	if (!*obj_arg || !*field_arg) {
+	if (!*obj_arg_ptr || !*field_arg) {
 		msg_to_char(ch, "Usage: oset <object> <field> <value>\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, obj_arg, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, obj_arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	else if (!(obj = get_obj_in_list_vis(ch, obj_arg_ptr, &number, ch->carrying)) && !(obj = get_obj_in_list_vis(ch, obj_arg_ptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(obj_arg), obj_arg);
 	}
 	else if (is_abbrev(field_arg, "flags")) {
@@ -8741,8 +9262,8 @@ ACMD(do_peace) {
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s used peace with mortal present at %s", GET_NAME(ch), room_log_identifier(IN_ROOM(ch)));
 	}
 	
-	act("You raise your hands and a feeling of peace sweeps over the room.", FALSE, ch, NULL, NULL, TO_CHAR);
-	act("$n raises $s hands and a feeling of peace enters your heart.", FALSE, ch, NULL, NULL, TO_ROOM);
+	act("You raise your hands and a feeling of peace sweeps over the room.", FALSE, ch, NULL, NULL, TO_CHAR | DG_NO_TRIG);
+	act("$n raises $s hands and a feeling of peace enters your heart.", FALSE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
 }
 
 
@@ -8872,16 +9393,20 @@ ACMD(do_purge) {
 	char_data *vict, *next_v;
 	vehicle_data *veh;
 	obj_data *obj;
+	int number;
+	char *arg;
 
 	one_argument(argument, buf);
+	arg = buf;
+	number = get_number(&arg);
 
-	if (*buf) {			/* argument supplied. destroy single object or char */
-		if ((vict = get_char_vis(ch, buf, FIND_CHAR_ROOM)) != NULL) {
+	if (*arg) {			/* argument supplied. destroy single object or char */
+		if ((vict = get_char_vis(ch, arg, &number, FIND_CHAR_ROOM)) != NULL) {
 			if (!REAL_NPC(vict) && (GET_REAL_LEVEL(ch) <= GET_REAL_LEVEL(vict))) {
 				send_to_char("Fuuuuuuuuu!\r\n", ch);
 				return;
 			}
-			act("$n disintegrates $N.", FALSE, ch, 0, vict, TO_NOTVICT);
+			act("$n disintegrates $N.", FALSE, ch, 0, vict, TO_NOTVICT | DG_NO_TRIG);
 
 			if (!REAL_NPC(vict)) {
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has purged %s", GET_NAME(ch), GET_NAME(vict));
@@ -8896,14 +9421,14 @@ ACMD(do_purge) {
 			}
 			extract_char(vict);
 		}
-		else if ((obj = get_obj_in_list_vis(ch, buf, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
-			act("$n destroys $p.", FALSE, ch, obj, 0, TO_ROOM);
+		else if ((obj = get_obj_in_list_vis(ch, arg, &number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
+			act("$n destroys $p.", FALSE, ch, obj, 0, TO_ROOM | DG_NO_TRIG);
 			extract_obj(obj);
 		}
-		else if ((veh = get_vehicle_in_room_vis(ch, buf))) {
+		else if ((veh = get_vehicle_in_room_vis(ch, arg, &number))) {
 			// finish the shipment before transferring or purging a vehicle
 			if (VEH_OWNER(veh) && VEH_SHIPPING_ID(veh) != -1) {
-				LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
+				DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
 					if (shipd->shipping_id == VEH_SHIPPING_ID(veh)) {
 						deliver_shipment(VEH_OWNER(veh), shipd);
 					}
@@ -8911,9 +9436,9 @@ ACMD(do_purge) {
 				VEH_SHIPPING_ID(veh) = -1;
 			}
 			
-			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM);
+			act("$n destroys $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
 			if (IN_ROOM(veh) != IN_ROOM(ch) && ROOM_PEOPLE(IN_ROOM(veh))) {
-				act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+				act("$V is destroyed!", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
 			}
 			extract_vehicle(veh);
 		}
@@ -8926,7 +9451,7 @@ ACMD(do_purge) {
 	}
 	else {			/* no argument. clean out the room */
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has purged room %s", GET_REAL_NAME(ch), room_log_identifier(IN_ROOM(ch)));
-		act("$n gestures... You are surrounded by scorching flames!", FALSE, ch, 0, 0, TO_ROOM);
+		act("$n gestures... You are surrounded by scorching flames!", FALSE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
 		send_to_room("The world seems a little cleaner.\r\n", IN_ROOM(ch));
 		
 		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), vict, next_v, next_in_room) {
@@ -9152,7 +9677,10 @@ ACMD(do_rescale) {
 	else if (level < 0) {
 		msg_to_char(ch, "Invalid level.\r\n");
 	}
-	else if ((vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!generic_find(arg, FIND_CHAR_ROOM | FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_VEHICLE_ROOM, ch, &vict, &obj, &veh)) {
+		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
+	}
+	else if (vict) {
 		// victim mode
 		if (!IS_NPC(vict)) {
 			msg_to_char(ch, "You can only rescale NPCs.\r\n");
@@ -9164,22 +9692,22 @@ ACMD(do_rescale) {
 			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled mob %s to level %d at %s", GET_NAME(ch), PERS(vict, vict, FALSE), GET_CURRENT_SCALE_LEVEL(vict), room_log_identifier(IN_ROOM(vict)));
 			
 			sprintf(buf, "You rescale $N to level %d.", GET_CURRENT_SCALE_LEVEL(vict));
-			act("$n rescales $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
-			act(buf, FALSE, ch, NULL, vict, TO_CHAR);
+			act("$n rescales $N.", FALSE, ch, NULL, vict, TO_NOTVICT | DG_NO_TRIG);
+			act(buf, FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
 			if (vict->desc) {
 				sprintf(buf, "$n rescales you to level %d.", GET_CURRENT_SCALE_LEVEL(vict));
-				act(buf, FALSE, ch, NULL, vict, TO_VICT);
+				act(buf, FALSE, ch, NULL, vict, TO_VICT | DG_NO_TRIG);
 			}
 		}
 	}
-	else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (veh) {
 		scale_vehicle_to_level(veh, level);
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled vehicle %s to level %d at %s", GET_NAME(ch), VEH_SHORT_DESC(veh), VEH_SCALE_LEVEL(veh), room_log_identifier(IN_ROOM(ch)));
 		sprintf(buf, "You rescale $V to level %d.", VEH_SCALE_LEVEL(veh));
-		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
-		act("$n rescales $V.", FALSE, ch, NULL, veh, TO_ROOM);
+		act(buf, FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
+		act("$n rescales $V.", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
 	}
-	else if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying)) || (obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	else if (obj) {
 		// item mode
 		if (OBJ_FLAGGED(obj, OBJ_SCALABLE)) {
 			scale_item_to_level(obj, level);
@@ -9193,8 +9721,8 @@ ACMD(do_rescale) {
 		
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has rescaled obj %s to level %d at %s", GET_NAME(ch), GET_OBJ_SHORT_DESC(obj), GET_OBJ_CURRENT_SCALE_LEVEL(obj), room_log_identifier(IN_ROOM(ch)));
 		sprintf(buf, "You rescale $p to level %d.", GET_OBJ_CURRENT_SCALE_LEVEL(obj));
-		act(buf, FALSE, ch, obj, NULL, TO_CHAR);
-		act("$n rescales $p.", FALSE, ch, obj, NULL, TO_ROOM);
+		act(buf, FALSE, ch, obj, NULL, TO_CHAR | DG_NO_TRIG);
+		act("$n rescales $p.", FALSE, ch, obj, NULL, TO_ROOM | DG_NO_TRIG);
 	}
 	else {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
@@ -9225,29 +9753,29 @@ ACMD(do_restore) {
 		send_to_char("Whom do you wish to restore?\r\n", ch);
 		return;
 	}
-	else if (!(vict = get_char_vis(ch, name_arg, FIND_CHAR_WORLD))) {
-		if ((veh = get_vehicle_vis(ch, name_arg))) {
-			// found vehicle target here
-			syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s at %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(IN_ROOM(ch)));
-			act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR);
+	if (!generic_find(name_arg, FIND_CHAR_ROOM | FIND_CHAR_WORLD | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE | FIND_VEHICLE_WORLD, ch, &vict, NULL, &veh)) {
+		send_config_msg(ch, "no_person");
+		return;
+	}
 	
-			if (GET_INVIS_LEV(ch) > 1 || PRF_FLAGGED(ch, PRF_WIZHIDE)) {
-				act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM);
-			}
-			else {
-				act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM);
-			}
-			
-			REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
-			if (!VEH_IS_DISMANTLING(veh)) {
-				complete_vehicle(veh);
-			}
-			return;
+	// vehicle mode
+	if (veh) {
+		// found vehicle target here
+		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s has restored %s at %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(IN_ROOM(ch)));
+		act("You restore $V!", FALSE, ch, NULL, veh, TO_CHAR | DG_NO_TRIG);
+
+		if (GET_INVIS_LEV(ch) > 1 || PRF_FLAGGED(ch, PRF_WIZHIDE)) {
+			act("$V is restored!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
 		}
-		else {	// no target at all
-			send_config_msg(ch, "no_person");
-			return;
+		else {
+			act("$n waves $s hand and restores $V!", FALSE, ch, NULL, veh, TO_ROOM | DG_NO_TRIG);
 		}
+		
+		REMOVE_BIT(VEH_FLAGS(veh), VEH_ON_FIRE);
+		if (!VEH_IS_DISMANTLING(veh)) {
+			complete_vehicle(veh);
+		}
+		return;
 	}
 	
 	// parse type args
@@ -9424,11 +9952,11 @@ ACMD(do_restore) {
 	if (!all) {
 		sprintf(msg + strlen(msg), "%s!", types);
 	}
-	act(msg, FALSE, vict, NULL, ch, TO_CHAR);
+	act(msg, FALSE, vict, NULL, ch, TO_CHAR | DG_NO_TRIG);
 	
 	// show 3rd-party message in some cases
 	if (all || health || moves || mana || blood || dots) {
-		act("$n is restored!", TRUE, vict, NULL, NULL, TO_CHAR);
+		act("$n is restored!", TRUE, vict, NULL, NULL, TO_CHAR | DG_NO_TRIG);
 	}
 }
 
@@ -9473,7 +10001,7 @@ ACMD(do_send) {
 		send_to_char("Send what to whom?\r\n", ch);
 		return;
 	}
-	if (!(vict = get_char_vis(ch, arg, FIND_CHAR_WORLD))) {
+	if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD))) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -9529,7 +10057,7 @@ ACMD(do_set) {
 			}
 		}
 		else { /* is_mob */
-			if (!(vict = get_char_vis(ch, name, FIND_CHAR_WORLD))) {
+			if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_WORLD))) {
 				send_to_char("There is no such creature.\r\n", ch);
 				return;
 			}
@@ -9697,12 +10225,12 @@ ACMD(do_slay) {
 	if (!*arg)
 		send_to_char("Slay whom?\r\n", ch);
 	else {
-		if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+		if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 			send_to_char("They aren't here.\r\n", ch);
 		else if (ch == vict)
 			send_to_char("Your mother would be so sad... :(\r\n", ch);
 		else if (!IS_NPC(vict) && GET_ACCESS_LEVEL(vict) >= GET_ACCESS_LEVEL(ch)) {
-			act("Surely you don't expect $N to let you slay $M, do you?", FALSE, ch, NULL, vict, TO_CHAR);
+			act("Surely you don't expect $N to let you slay $M, do you?", FALSE, ch, NULL, vict, TO_CHAR | DG_NO_TRIG);
 		}
 		else {
 			if (!IS_NPC(vict) && !affected_by_spell(ch, ATYPE_PHOENIX_RITE)) {
@@ -9738,7 +10266,7 @@ ACMD(do_snoop) {
 
 	if (!*arg)
 		stop_snooping(ch);
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
 		send_to_char("No such person around.\r\n", ch);
 	else if (!victim->desc)
 		send_to_char("There's no link... nothing to snoop.\r\n", ch);
@@ -9840,7 +10368,7 @@ ACMD(do_stat) {
 		if (!*buf2)
 			send_to_char("Stats on which mobile?\r\n", ch);
 		else {
-			if ((victim = get_char_vis(ch, buf2, FIND_CHAR_WORLD | FIND_NPC_ONLY)) != NULL)
+			if ((victim = get_char_vis(ch, buf2, NULL, FIND_CHAR_WORLD | FIND_NPC_ONLY)) != NULL)
 				do_stat_character(ch, victim);
 			else
 				send_to_char("No such mobile around.\r\n", ch);
@@ -9850,7 +10378,7 @@ ACMD(do_stat) {
 		if (!*buf2)
 			send_to_char("Stats on which vehicle?\r\n", ch);
 		else {
-			if ((veh = get_vehicle_vis(ch, buf2)) != NULL) {
+			if ((veh = get_vehicle_vis(ch, buf2, NULL)) != NULL) {
 				do_stat_vehicle(ch, veh);
 			}
 			else {
@@ -9892,30 +10420,46 @@ ACMD(do_stat) {
 		if (!*buf2)
 			send_to_char("Stats on which object?\r\n", ch);
 		else {
-			if ((obj = get_obj_vis(ch, buf2)) != NULL)
+			if ((obj = get_obj_vis(ch, buf2, NULL)) != NULL)
 				do_stat_object(ch, obj);
 			else
 				send_to_char("No such object around.\r\n", ch);
 		}
 	}
 	else {
-		if ((obj = get_object_in_equip_vis(ch, buf1, ch->equipment, &tmp)) != NULL)
+		int number;
+		char *arg;
+		
+		arg = buf1;
+		number = get_number(&arg);
+		
+		if ((obj = get_obj_in_equip_vis(ch, arg, &number, ch->equipment, &tmp)) != NULL) {
 			do_stat_object(ch, obj);
-		else if ((obj = get_obj_in_list_vis(ch, buf1, ch->carrying)) != NULL)
+		}
+		else if ((obj = get_obj_in_list_vis(ch, arg, &number, ch->carrying)) != NULL) {
 			do_stat_object(ch, obj);
-		else if ((victim = get_char_vis(ch, buf1, FIND_CHAR_ROOM)) != NULL)
+		}
+		else if ((victim = get_char_vis(ch, arg, &number, FIND_CHAR_ROOM)) != NULL) {
 			do_stat_character(ch, victim);
-		else if ((obj = get_obj_in_list_vis(ch, buf1, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL)
-			do_stat_object(ch, obj);
-		else if ((victim = get_char_vis(ch, buf1, FIND_CHAR_WORLD)) != NULL)
-			do_stat_character(ch, victim);
-		else if ((veh = get_vehicle_in_room_vis(ch, buf1)) || (veh = get_vehicle_vis(ch, buf1))) {
+		}
+		else if ((veh = get_vehicle_in_room_vis(ch, arg, &number))) {
 			do_stat_vehicle(ch, veh);
 		}
-		else if ((obj = get_obj_vis(ch, buf1)) != NULL)
+		else if ((obj = get_obj_in_list_vis(ch, arg, &number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
 			do_stat_object(ch, obj);
-		else
+		}
+		else if ((victim = get_char_vis(ch, arg, &number, FIND_CHAR_WORLD)) != NULL) {
+			do_stat_character(ch, victim);
+		}
+		else if ((veh = get_vehicle_vis(ch, arg, &number))) {
+			do_stat_vehicle(ch, veh);
+		}
+		else if ((obj = get_obj_vis(ch, arg, &number)) != NULL) {
+			do_stat_object(ch, obj);
+		}
+		else {
 			send_to_char("Nothing around by that name.\r\n", ch);
+		}
 	}
 }
 
@@ -9929,7 +10473,7 @@ ACMD(do_switch) {
 		send_to_char("You're already switched.\r\n", ch);
 	else if (!*arg)
 		send_to_char("Switch with whom?\r\n", ch);
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
 		send_to_char("No such character.\r\n", ch);
 	else if (ch == victim)
 		send_to_char("Hee hee... we are jolly funny today, eh?\r\n", ch);
@@ -10027,7 +10571,7 @@ ACMD(do_tedit) {
 	/* set up editor stats */
 	start_string_editor(ch->desc, "file", tedit_option[l].buffer, tedit_option[l].size, FALSE);
 	ch->desc->file_storage = str_dup(tedit_option[l].filename);
-	act("$n begins editing a file.", TRUE, ch, 0, 0, TO_ROOM);
+	act("$n begins editing a file.", TRUE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
 }
 
 
@@ -10065,12 +10609,12 @@ ACMD(do_trans) {
 				victim = i->character;
 				if (GET_ACCESS_LEVEL(victim) >= GET_ACCESS_LEVEL(ch))
 					continue;
-				act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM);
+				act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM | DG_NO_TRIG);
 				char_from_room(victim);
 				char_to_room(victim, to_room);
 				GET_LAST_DIR(victim) = NO_DIR;
-				act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
-				act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
+				act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM | DG_NO_TRIG);
+				act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT | DG_NO_TRIG);
 				qt_visit_room(victim, IN_ROOM(victim));
 				look_at_room(victim);
 				enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
@@ -10080,7 +10624,7 @@ ACMD(do_trans) {
 		
 		send_config_msg(ch, "ok_string");
 	}
-	else if ((victim = get_char_vis(ch, buf, FIND_CHAR_WORLD))) {
+	else if ((victim = get_char_vis(ch, buf, NULL, FIND_CHAR_WORLD))) {
 		if (victim == ch)
 			send_to_char("That doesn't make much sense, does it?\r\n", ch);
 		else {
@@ -10093,12 +10637,12 @@ ACMD(do_trans) {
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has transferred %s to %s", GET_REAL_NAME(ch), GET_REAL_NAME(victim), room_log_identifier(to_room));
 			}
 
-			act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM);
+			act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM | DG_NO_TRIG);
 			char_from_room(victim);
 			char_to_room(victim, to_room);
 			GET_LAST_DIR(victim) = NO_DIR;
-			act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
-			act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT);
+			act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM | DG_NO_TRIG);
+			act("$n has transferred you!", FALSE, ch, 0, victim, TO_VICT | DG_NO_TRIG);
 			qt_visit_room(victim, IN_ROOM(victim));
 			look_at_room(victim);
 			enter_wtrigger(IN_ROOM(victim), victim, NO_DIR);
@@ -10106,12 +10650,12 @@ ACMD(do_trans) {
 			send_config_msg(ch, "ok_string");
 		}
 	}
-	else if ((veh = get_vehicle_vis(ch, buf))) {
+	else if ((veh = get_vehicle_vis(ch, buf, NULL))) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has transferred %s to %s", GET_REAL_NAME(ch), VEH_SHORT_DESC(veh), room_log_identifier(to_room));
 	
 		// finish the shipment before transferring
 		if (VEH_OWNER(veh) && VEH_SHIPPING_ID(veh) != -1) {
-			LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
+			DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(VEH_OWNER(veh)), shipd, next_shipd) {
 				if (shipd->shipping_id == VEH_SHIPPING_ID(veh)) {
 					deliver_shipment(VEH_OWNER(veh), shipd);
 				}
@@ -10120,7 +10664,7 @@ ACMD(do_trans) {
 		}
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
 		}
 		
 		adjust_vehicle_tech(veh, FALSE);
@@ -10129,7 +10673,7 @@ ACMD(do_trans) {
 		adjust_vehicle_tech(veh, TRUE);
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
-			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
+			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
 		}
 		send_config_msg(ch, "ok_string");
 	}
@@ -10149,16 +10693,16 @@ ACMD(do_unbind) {
 	if (!*arg) {
 		msg_to_char(ch, "Unbind which object?\r\n");
 	}
-	else if (!(obj = get_obj_vis(ch, arg))) {
+	else if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &obj, NULL)) {
 		msg_to_char(ch, "Unable to find '%s'.\r\n", argument);
 	}
 	else if (!OBJ_BOUND_TO(obj)) {
-		act("$p isn't bound to anybody.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p isn't bound to anybody.", FALSE, ch, obj, NULL, TO_CHAR | DG_NO_TRIG);
 	}
 	else {
 		free_obj_binding(&OBJ_BOUND_TO(obj));
 		syslog(SYS_GC, GET_ACCESS_LEVEL(ch), TRUE, "ABUSE: %s used unbind on %s", GET_REAL_NAME(ch), GET_OBJ_SHORT_DESC(obj));
-		act("You unbind $p.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("You unbind $p.", FALSE, ch, obj, NULL, TO_CHAR | DG_NO_TRIG);
 	}
 }
 
@@ -10854,7 +11398,7 @@ ACMD(do_wizutil) {
 
 	if (!*arg)
 		send_to_char("Yes, but for whom?!?\r\n", ch);
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_WORLD)))
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
 		send_to_char("There is no such player.\r\n", ch);
 	else if (IS_NPC(vict))
 		send_to_char("You can't do that to a mob!\r\n", ch);
@@ -10884,7 +11428,7 @@ ACMD(do_wizutil) {
 				SET_BIT(GET_ACCOUNT(vict)->flags, ACCT_FROZEN);
 				send_to_char("A bitter wind suddenly rises and drains every erg of heat from your body!\r\nYou feel frozen!\r\n", vict);
 				send_to_char("Frozen.\r\n", ch);
-				act("A sudden cold wind conjured from nowhere freezes $n!", FALSE, vict, 0, 0, TO_ROOM);
+				act("A sudden cold wind conjured from nowhere freezes $n!", FALSE, vict, 0, 0, TO_ROOM | DG_NO_TRIG);
 				syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s frozen by %s", GET_NAME(vict), GET_NAME(ch));
 				break;
 			case SCMD_THAW:
@@ -10896,7 +11440,7 @@ ACMD(do_wizutil) {
 				REMOVE_BIT(GET_ACCOUNT(vict)->flags, ACCT_FROZEN);
 				send_to_char("A fireball suddenly explodes in front of you, melting the ice!\r\nYou feel thawed.\r\n", vict);
 				send_to_char("Thawed.\r\n", ch);
-				act("A sudden fireball conjured from nowhere thaws $n!", FALSE, vict, 0, 0, TO_ROOM);
+				act("A sudden fireball conjured from nowhere thaws $n!", FALSE, vict, 0, 0, TO_ROOM | DG_NO_TRIG);
 				break;
 			default:
 				log("SYSERR: Unknown subcmd %d passed to do_wizutil (%s)", subcmd, __FILE__);

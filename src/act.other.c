@@ -1868,7 +1868,7 @@ ACMD(do_beckon) {
 			msg_to_char(ch, "There is nobody here to beckon.\r\n");
 		}
 	}
-	else if (!(vict = get_char_room_vis(ch, arg))) {
+	else if (!(vict = get_char_room_vis(ch, arg, NULL))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!IS_NPC(vict) && GET_BECKONED_BY(vict) == GET_IDNUM(REAL_CHAR(ch))) {
@@ -2191,7 +2191,7 @@ ACMD(do_dismiss) {
 			send_config_msg(ch, "ok_string");
 		}
 	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!IS_NPC(vict) || vict->master != ch || (!GET_COMPANION(vict) && !IS_MINIPET_OF(vict, ch))) {
@@ -2232,13 +2232,13 @@ ACMD(do_douse) {
 	else if (!obj)
 		msg_to_char(ch, "You have nothing to douse the fire with!\r\n");
 	else if (*arg) {
-		if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+		if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 			do_douse_vehicle(ch, veh, obj);
 		}
 		else if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(arg, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
 			do_douse_vehicle(ch, GET_ROOM_VEHICLE(IN_ROOM(ch)), obj);
 		}
-		else if ((found_obj = get_obj_in_list_vis(ch, arg, ch->carrying)) || (found_obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		else if (generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, NULL, &found_obj, NULL)) {
 			do_douse_obj(ch, found_obj, obj);
 		}
 		else {
@@ -2644,7 +2644,7 @@ ACMD(do_herd) {
 	}
 	
 	// determine/validate target
-	else if (!(victim = get_char_vis(ch, mob_arg, FIND_CHAR_ROOM)))
+	else if (!(victim = get_char_vis(ch, mob_arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (victim == ch)
 		msg_to_char(ch, "You can't herd yourself.\r\n");
@@ -2684,7 +2684,7 @@ ACMD(do_herd) {
 	}
 	
 	// herd into vehicle
-	else if ((into_veh = get_vehicle_in_room_vis(ch, dir_arg))) {
+	else if ((into_veh = get_vehicle_in_room_vis(ch, dir_arg, NULL))) {
 		if (!VEH_FLAGGED(into_veh, VEH_CARRY_MOBS) || !(to_room = get_vehicle_interior(into_veh))) {
 			msg_to_char(ch, "You can't herd anything into that.\r\n");
 		}
@@ -2901,13 +2901,13 @@ ACMD(do_milk) {
 		msg_to_char(ch, "You don't have permission to milk these animals.\r\n");
 	else if (!*arg || !*buf)
 		msg_to_char(ch, "What would you like to milk, and into what?\r\n");
-	else if (!(mob = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (!IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_MILKABLE))
 		act("You can't milk $N!", FALSE, ch, 0, mob, TO_CHAR);
 	else if (get_cooldown_time(mob, COOLDOWN_MILK) > 0)
 		act("$E can't be milked again for a while.", FALSE, ch, 0, mob, TO_CHAR);
-	else if (!(cont = get_obj_in_list_vis(ch, buf, ch->carrying)))
+	else if (!(cont = get_obj_in_list_vis(ch, buf, NULL, ch->carrying)))
 		msg_to_char(ch, "You don't seem to have a %s.\r\n", buf);
 	else if (GET_OBJ_TYPE(cont) != ITEM_DRINKCON)
 		act("You can't milk $N into $p!", FALSE, ch, cont, mob, TO_CHAR);
@@ -3238,7 +3238,7 @@ ACMD(do_order) {
 
 	if (!*name || !*message)
 		send_to_char("Order who to do what?\r\n", ch);
-	else if (!(vict = get_char_vis(ch, name, FIND_CHAR_ROOM)) && !is_abbrev(name, "followers"))
+	else if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM)) && !is_abbrev(name, "followers"))
 		send_to_char("That person isn't here.\r\n", ch);
 	else if (ch == vict)
 		send_to_char("You obviously suffer from schizophrenia.\r\n", ch);
@@ -3535,7 +3535,7 @@ ACMD(do_shear) {
 	else if (!*arg) {
 		msg_to_char(ch, "Which animal would you like to shear?\r\n");
 	}
-	else if (!(mob = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!(mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!IS_NPC(mob)) {
@@ -3564,17 +3564,21 @@ ACMD(do_shear) {
 ACMD(do_skin) {
 	obj_data *obj;
 	char_data *proto, *vict;
+	char *argptr;
+	int number;
 
 	one_argument(argument, arg);
+	argptr = arg;
+	number = get_number(&argptr);
 
 	if (!IS_APPROVED(ch) && config_get_bool("gather_approval")) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!*arg)
+	else if (!*argptr)
 		msg_to_char(ch, "What would you like to skin?\r\n");
-	else if (!(obj = get_obj_in_list_vis_prefer_type(ch, arg, ch->carrying, ITEM_CORPSE)) && !(obj = get_obj_in_list_vis_prefer_type(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), ITEM_CORPSE))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_type(ch, argptr, &number, ch->carrying, ITEM_CORPSE)) && !(obj = get_obj_in_list_vis_prefer_type(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), ITEM_CORPSE))) {
 		// no object found: try mobs in the room
-		if ((vict = get_char_room_vis(ch, arg))) {
+		if ((vict = get_char_room_vis(ch, arg, &number))) {
 			act("You need to kill $M first.", FALSE, ch, NULL, vict, TO_CHAR);
 		}
 		else {

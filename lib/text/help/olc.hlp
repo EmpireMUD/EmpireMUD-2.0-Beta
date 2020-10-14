@@ -1941,6 +1941,7 @@ Some affects are managed by live data and commands (do not set affects with *):
  *!DISMANTLE - cannot be dismantled until nodismantle is toggled
  *INCOMPLETE - building is unfinished
  *FAKE-INSTANCE - roaming adventure is using this tile
+ *HIDE-REAL-NAME - won't show real name after custom room name (see MANAGE)
 
 See also: OLC BUILDINGS, OLC ROOM TEMPLATES
 #d
@@ -2152,6 +2153,7 @@ room as the vehicle. For crafts, the 'requiresfunction' field requires that
 the craft be made at a location with that function.
 
 Available functions:
+ UPGRADED - building/vehicle is an upgraded version (modifies other functions)
  ALCHEMIST - can brew and mix here
  APIARY - no current use
  BATHS - can use the bathe command here
@@ -2284,9 +2286,10 @@ Relations link this building/vehicle to other buildings/vehicles in various
 ways:
 
 Available relationship types:
- &cUPGRADES-TO&0 - This building can be upgraded to that type.
- &cSTORES-LIKE-BLD&0 - Anything that can be stored there can be stored here.
- &cSTORES-LIKE-VEH&0 - Anything that can be stored there can be stored here.
+ &cUPGRADES-TO-BLD&0 - Becomes a building, see UPGRADE CRAFTS
+ &cUPGRADES-TO-VEH&0 - Becomes a vehicle, see UPGRADE CRAFTS
+ &cSTORES-LIKE-BLD&0 - Inherits the storage as target building
+ &cSTORES-LIKE-VEH&0 - Inherits the storage as target vehicle
                   (stores-like does not include warehouses; use function flags)
 
 See also: OLC BUILDINGS
@@ -2522,7 +2525,6 @@ Available flags:
  IN-CITY-ONLY - a craft or building can only be made in a city radius
  VEHICLE - creates a vehicle instead of an item, see CRAFT VEHICLES
  SHIPYARD - requires being at a shipyard
- BLD-UPGRADED - requires being at a building with the UPGRADED flag
  LEARNED - requires the player/empire 'learn' a recipe to use it
  BY-RIVER - must be adjacent to a river
  REMOVE-PRODUCTION - removes this craft's resources from empire production
@@ -7993,6 +7995,24 @@ currently an option.
 The UNDEFINED item type should not be used for live items. If you need a
 generic item, use type OTHER.
 #d
+"UPGRADE CRAFTS" "UPGRADES TO" UPGRADES-TO
+
+Vehicles and buildings can be upgraded into other vehicles and buildings.
+
+Step 1: Add an UPGRADES-TO-BLD or UPGRADES-TO-VEH relationship to a building or
+vehicle, indicating which other building/vehicle it upgrades to.
+
+Step 2: Make a craft for the upgrade:
+- Players will see the name of the craft if a building/vehicle can be upgraded
+  to more than one thing.
+- Set the type to whatever seems appropriate. If it's a vehicle, be sure to
+  also set the VEHICLE flag.
+- Set the UPGRADE flag (this also hides it from normal build/craft commands).
+- Set buildon flags, ability, requires-object, and/or level if appropriate
+- Set any tools or resources you need.
+
+See also: BEDIT RELATIONS, BUILDING-VEHICLES, OLC CRAFTS
+#d
 "VEDIT ANIMALSREQUIRED" "VEDIT ANIMALS REQUIRED"
 
 Usage:  .animalsrequired <number>
@@ -8104,6 +8124,10 @@ Available flags:
  CHAMELEON - vehicle cannot be seen at a distance (when in good repair)
  INTERLINK - rooms can be interlinked with other interlink-flagged places
  IS-RUINS - counts as ruins for city status and building decay
+ SLEEP - can sleep and rest in/on it
+ !PAINT - cannot be painted
+ *BRIGHT-PAINT - is brightly painted (set by the paint command)
+ DEDICATE - can be dedicated
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually
@@ -8148,7 +8172,7 @@ Fields:
   &c-fame -fameover -fameunder&0 - specific fame amount
   &c-flagged -unflagged&0 - see HELP VEDIT FLAGS
   &c-functions&0 - see HELP VEDIT FUNCTIONS
-  &c-icon&0 - match the text of the icon, if any
+  &c-icon [any]&0 - match the text of the icon (or "any" to just require an icon)
   &c-interactions&0 - has a specific type, see HELP VEDIT INTERACTION
   &c-hitpoints -hitpointsover -hitpointsunder&0 - specific hitpoint amount
   &c-level&0 - matches anything where this level is within the range

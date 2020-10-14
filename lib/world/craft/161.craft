@@ -1,7 +1,7 @@
 #16100
 hydra slayer~
 16100 1
-11 61 npq 1 -1 c u
+11 61 nq 1 -1 c bu
 L
 100
 R
@@ -147,7 +147,7 @@ advanced oceanic tower~
 -1 1
 8 300 kmq 1 -1 0 0
 B
-16109 q op
+16109 0 0
 R
 1306 6 0 0
 R

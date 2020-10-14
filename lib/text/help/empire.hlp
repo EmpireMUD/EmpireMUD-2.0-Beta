@@ -184,7 +184,7 @@ See also: PRIVILEGE, ABANDON, CEDE, PUBLICIZE, TERRITORY
 #
 DEDICATE
 
-Usage:  dedicate <person>
+Usage:  dedicate <building | vehicle> <person>
 
 Some monuments can be dedicated to a particularly powerful person or god. Once
 dedicated, they can never be re-dedicated, so choose carefully.
@@ -782,12 +782,13 @@ options:
  &cno-dismantle&0 - The building cannot be dismantled.
  &cno-work&0 - Workforce will not work the tile (also applies to vehicles here).
 
-Immortals can also configure additional options:
- &cunclaimable&0 - Players cannot claim the tile.
-
 You can also manage vehicles (as well as buildings that appear like vehicles):
  &cno-dismantle&0 - The vehicle/building cannot be dismantled.
  &cno-work&0 - Workforce will not work the vehicle/building.
+
+Immortals can also configure additional room options:
+ &yhide-real-name&0 - Prevents the real name from being shown after a custom name.
+ &yunclaimable&0 - Players cannot claim the tile.
 #
 MEMBERS MEMBERSHIP "EMPIRE MEMBERS" "EMPIRE MEMBERSHIP" "EMPIRE GREATNESS" "TIMED-OUT" "TIMED OUT" TIMEOUTS "EMPIRE TIMEOUT"
 

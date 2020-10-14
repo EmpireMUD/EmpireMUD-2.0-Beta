@@ -99,7 +99,7 @@ ACMD(do_assist) {
 
 	if (!*arg)
 		send_to_char("Whom do you wish to assist?\r\n", ch);
-	else if (!(helpee = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(helpee = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (helpee == ch)
 		send_to_char("You can't help yourself any more than this!\r\n", ch);
@@ -166,7 +166,7 @@ ACMD(do_consider) {
 	if (!*arg) {
 		msg_to_char(ch, "Consider whom?\r\n");
 	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (vict == ch) {
@@ -240,7 +240,7 @@ ACMD(do_execute) {
 
 	if (!*arg)
 		msg_to_char(ch, "Execute whom?\r\n");
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (victim == ch)
 		msg_to_char(ch, "Seek professional help.\r\n");
@@ -335,7 +335,7 @@ ACMD(do_hit) {
 
 	if (!*arg)
 		send_to_char("Hit whom?\r\n", ch);
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_to_char("They don't seem to be here.\r\n", ch);
 	else if (vict == ch) {
 		send_to_char("You hit yourself...OUCH!.\r\n", ch);
@@ -501,7 +501,7 @@ ACMD(do_shoot) {
 	}
 	else if (!*arg)
 		msg_to_char(ch, "Shoot whom?\r\n");
-	else if (!(vict= get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(vict= get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (vict == ch)
 		msg_to_char(ch, "Shooting yourself in the foot will do you no good now.\r\n");
@@ -561,7 +561,7 @@ ACMD(do_stake) {
 
 	if (!*arg)
 		msg_to_char(ch, "%stake whom?\r\n", subcmd ? "Uns" : "S");
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (IS_GOD(victim) || IS_IMMORTAL(victim))
 		msg_to_char(ch, "You can't stake up a god!\r\n");
@@ -716,7 +716,7 @@ ACMD(do_tie) {
 
 	if (!*arg)
 		msg_to_char(ch, "%sie whom?\r\n", subcmd ? "Unt" : "T");
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (IS_DEAD(victim)) {
 		msg_to_char(ch, "You can't do that to someone who is already dead.\r\n");
@@ -780,7 +780,7 @@ ACMD(do_throw) {
 
 	if (!*arg || !*buf)
 		msg_to_char(ch, "What would you like to throw, and which direction?\r\n");
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)))
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
 		msg_to_char(ch, "You don't have anything like that.\r\n");
 	else if ((dir = parse_direction(ch, buf)) == NO_DIR)
 		msg_to_char(ch, "Which way did you want to throw it?\r\n");

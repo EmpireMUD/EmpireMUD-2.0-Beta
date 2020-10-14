@@ -43,12 +43,15 @@ extern const char *mob_move_types[];
 
 // external funcs
 ACMD(do_dismount);
+extern bool action_flagged(char_data *ch, bitvector_t actf);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
+void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
 void do_unseat_from_vehicle(char_data *ch);
 extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
 extern char *get_room_name(room_data *room, bool color);
 extern int total_small_vehicles_in_room(room_data *room);
 extern int total_vehicle_size_in_room(room_data *room);
+extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
 
 // local protos
 bool can_enter_room(char_data *ch, room_data *room);
@@ -314,6 +317,33 @@ bool can_enter_room(char_data *ch, room_data *room) {
 	}
 	
 	return TRUE;
+}
+
+
+/**
+* Tries to stop the character from flying. Only sends messages if it did stop
+* flying (or at least stopped 1 type of flying).
+*
+* @param char_data *ch The person.
+* @return bool TRUE if successful, FALSE if the character is still flying.
+*/
+bool check_stop_flying(char_data *ch) {
+	if (affected_by_spell_and_apply(ch, ATYPE_MORPH, NOTHING, AFF_FLY)) {
+		// cannot override a morph
+		return FALSE;
+	}
+	if (!IS_NPC(ch) && IS_RIDING(ch) && MOUNT_FLAGGED(ch, MOUNT_FLYING)) {
+		do_dismount(ch, "", 0, 0);
+	}
+	if (AFF_FLAGGED(ch, AFF_FLY)) {
+		affects_from_char_by_aff_flag(ch, AFF_FLY, FALSE);
+		if (!AFF_FLAGGED(ch, AFF_FLY)) {
+			msg_to_char(ch, "You land.\r\n");
+			act("$n lands.", TRUE, ch, NULL, NULL, TO_ROOM);
+		}
+	}
+	
+	return EFFECTIVELY_FLYING(ch) ? FALSE : TRUE;
 }
 
 
@@ -943,6 +973,14 @@ bool char_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags
 		msg_to_char(ch, "There is a barrier in your way.\r\n");
 		return FALSE;
 	}
+	if (HOME_ROOM(to_room) != HOME_ROOM(was_in) && !IS_COMPLETE(HOME_ROOM(to_room))) {
+		msg_to_char(ch, "You can't go there because the building is incomplete.\r\n");
+		return FALSE;
+	}
+	if (HOME_ROOM(to_room) != HOME_ROOM(was_in) && GET_ROOM_VEHICLE(HOME_ROOM(to_room)) && !VEH_IS_COMPLETE(GET_ROOM_VEHICLE(HOME_ROOM(to_room)))) {
+		msg_to_char(ch, "You can't go there because the %s is incomplete.\r\n", VEH_OR_BLD(GET_ROOM_VEHICLE(HOME_ROOM(to_room))));
+		return FALSE;
+	}
 	
 	// things that require a direction (i.e. player is not portaling)
 	if (dir != NO_DIR) {
@@ -1183,7 +1221,7 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_
 		need_movement /= 2.0;
 	}
 	
-	if (IS_RIDING(ch) || EFFECTIVELY_FLYING(ch) || IS_SET(flags, MOVE_EARTHMELD)) {
+	if (IS_RIDING(ch) || EFFECTIVELY_FLYING(ch) || IS_SET(flags, MOVE_EARTHMELD) || IS_INSIDE(from) != IS_INSIDE(to)) {
 		need_movement /= 4.0;
 	}
 	
@@ -1269,7 +1307,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	}
 	
 	// climate checks
-	if (!vehicle_allows_climate(veh, to_room)) {
+	if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room)) {
 		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
 		return FALSE;
 	}
@@ -1855,7 +1893,7 @@ ACMD(do_avoid) {
 	if (!*arg) {
 		msg_to_char(ch, "Who would you like to avoid?\r\n");
 	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (vict == ch) {
@@ -2207,7 +2245,7 @@ ACMD(do_follow) {
 	one_argument(argument, buf);
 
 	if (*buf) {
-		if (!(leader = get_char_vis(ch, buf, FIND_CHAR_ROOM))) {
+		if (!(leader = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM))) {
 			send_config_msg(ch, "no_person");
 			return;
 		}
@@ -2582,22 +2620,53 @@ ACMD(do_portal) {
 
 
 ACMD(do_rest) {
+	one_argument(argument, arg);
+	
 	switch (GET_POS(ch)) {
-		case POS_STANDING:
-			if (IS_RIDING(ch)) {
-				msg_to_char(ch, "You climb down from your mount.\r\n");
-				perform_dismount(ch);
+		case POS_STANDING: {
+			if (*arg) {
+				do_sit_on_vehicle(ch, arg, POS_RESTING);
 			}
-			send_to_char("You sit down and rest your tired bones.\r\n", ch);
-			act("$n sits down and rests.", TRUE, ch, 0, 0, TO_ROOM);
-			GET_POS(ch) = POS_RESTING;
+			else if (WATER_SECT(IN_ROOM(ch))) {
+				msg_to_char(ch, "You can't rest in the water.\r\n");
+			}
+			else if (!check_stop_flying(ch)) {
+				msg_to_char(ch, "You can't do that because you're flying.\r\n");
+			}
+			else {
+				if (IS_RIDING(ch)) {
+					msg_to_char(ch, "You climb down from your mount.\r\n");
+					perform_dismount(ch);
+				}
+				send_to_char("You sit down and rest your tired bones.\r\n", ch);
+				act("$n sits down and rests.", TRUE, ch, 0, 0, TO_ROOM);
+				GET_POS(ch) = POS_RESTING;
+			}
 			break;
-		case POS_SITTING:
-			do_unseat_from_vehicle(ch);
-			send_to_char("You rest your tired bones on the ground.\r\n", ch);
-			act("$n rests on the ground.", TRUE, ch, 0, 0, TO_ROOM);
-			GET_POS(ch) = POS_RESTING;
+		}
+		case POS_SITTING: {
+			if (*arg) {
+				do_sit_on_vehicle(ch, arg, POS_RESTING);
+			}
+			else if (GET_SITTING_ON(ch) && validate_sit_on_vehicle(ch, GET_SITTING_ON(ch), POS_RESTING, FALSE)) {
+				send_to_char("You rest your tired bones.\r\n", ch);
+				act("$n leans back and rests.", TRUE, ch, NULL, NULL, TO_ROOM);
+				GET_POS(ch) = POS_RESTING;
+			}
+			else if (WATER_SECT(IN_ROOM(ch))) {
+				msg_to_char(ch, "You can't rest in the water.\r\n");
+			}
+			else if (!check_stop_flying(ch)) {
+				msg_to_char(ch, "You can't do that because you're flying.\r\n");
+			}
+			else {
+				do_unseat_from_vehicle(ch);
+				send_to_char("You rest your tired bones on the ground.\r\n", ch);
+				act("$n rests on the ground.", TRUE, ch, 0, 0, TO_ROOM);
+				GET_POS(ch) = POS_RESTING;
+			}
 			break;
+		}
 		case POS_RESTING:
 			send_to_char("You are already resting.\r\n", ch);
 			break;
@@ -2612,6 +2681,10 @@ ACMD(do_rest) {
 			act("$n stops floating around, and rests.", FALSE, ch, 0, 0, TO_ROOM);
 			GET_POS(ch) = POS_RESTING;
 			break;
+	}
+	
+	if (GET_POS(ch) == POS_RESTING && !IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
+		cancel_action(ch);
 	}
 }
 
@@ -2662,6 +2735,9 @@ ACMD(do_run) {
 	}
 	
 	// did they request a path?
+	else if (path_to_room && path_to_room == IN_ROOM(ch)) {
+		msg_to_char(ch, "You're already there!\r\n");
+	}
 	else if (path_to_room && get_cooldown_time(ch, COOLDOWN_PATHFINDING) > 0) {
 		msg_to_char(ch, "You must wait another %d second%s before you can run-to-coordinates again.\r\n", get_cooldown_time(ch, COOLDOWN_PATHFINDING), PLURAL(get_cooldown_time(ch, COOLDOWN_PATHFINDING)));
 	}
@@ -2711,7 +2787,16 @@ ACMD(do_sit) {
 			if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 				msg_to_char(ch, "You can't do any more sitting while mounted.\r\n");
 			}
-			else if (!*arg) {
+			else if (*arg) {
+				do_sit_on_vehicle(ch, arg, POS_SITTING);
+			}
+			else if (WATER_SECT(IN_ROOM(ch))) {
+				msg_to_char(ch, "You can't sit in the water.\r\n");
+			}
+			else if (!check_stop_flying(ch)) {
+				msg_to_char(ch, "You can't do that because you're flying.\r\n");
+			}
+			else {
 				if (IS_RIDING(ch)) {
 					do_dismount(ch, "", 0, 0);
 				}
@@ -2720,24 +2805,26 @@ ACMD(do_sit) {
 				GET_POS(ch) = POS_SITTING;
 				break;
 			}
-			else {
-				void do_sit_on_vehicle(char_data *ch, char *argument);
-				do_sit_on_vehicle(ch, arg);
-			}
 			break;
 		}
 		case POS_SITTING:
 			send_to_char("You're sitting already.\r\n", ch);
 			break;
-		case POS_RESTING:
+		case POS_RESTING: {
 			if (*arg) {
-				send_to_char("You need to stand up before you can sit on something.\r\n", ch);
-				return;
+				do_sit_on_vehicle(ch, arg, POS_SITTING);
 			}
-			send_to_char("You stop resting, and sit up.\r\n", ch);
-			act("$n stops resting.", TRUE, ch, 0, 0, TO_ROOM);
-			GET_POS(ch) = POS_SITTING;
+			else {
+				if (GET_SITTING_ON(ch) && !validate_sit_on_vehicle(ch, GET_SITTING_ON(ch), POS_SITTING, FALSE)) {
+					do_unseat_from_vehicle(ch);
+				}
+				
+				send_to_char("You stop resting, and sit up.\r\n", ch);
+				act("$n stops resting.", TRUE, ch, 0, 0, TO_ROOM);
+				GET_POS(ch) = POS_SITTING;
+			}
 			break;
+		}
 		case POS_SLEEPING:
 			send_to_char("You have to wake up first.\r\n", ch);
 			break;
@@ -2750,23 +2837,46 @@ ACMD(do_sit) {
 			GET_POS(ch) = POS_SITTING;
 			break;
 	}
+	
+	if (GET_POS(ch) == POS_SITTING && !IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE && !action_flagged(ch, ACTF_SITTING)) {
+		cancel_action(ch);
+	}
 }
 
 
 ACMD(do_sleep) {
+	one_argument(argument, arg);
+	
 	switch (GET_POS(ch)) {
 		case POS_SITTING:
-			do_unseat_from_vehicle(ch);
 		case POS_STANDING:
-		case POS_RESTING:
-			if (IS_RIDING(ch)) {
-				msg_to_char(ch, "You climb down from your mount.\r\n");
-				perform_dismount(ch);
+		case POS_RESTING: {
+			if (*arg) {
+				do_sit_on_vehicle(ch, arg, POS_SLEEPING);
 			}
-			send_to_char("You lie down and go to sleep.\r\n", ch);
-			act("$n lies down and falls asleep.", TRUE, ch, 0, 0, TO_ROOM);
-			GET_POS(ch) = POS_SLEEPING;
+			else {
+				if (GET_SITTING_ON(ch) && !validate_sit_on_vehicle(ch, GET_SITTING_ON(ch), POS_SLEEPING, FALSE)) {
+					do_unseat_from_vehicle(ch);
+				}
+				if (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch)) {
+					// only if they were unseated
+					msg_to_char(ch, "You can't sleep in the water.\r\n");
+					return;
+				}
+				if (!check_stop_flying(ch)) {
+					msg_to_char(ch, "You can't do that because you're flying.\r\n");
+					return;
+				}
+				if (IS_RIDING(ch)) {
+					msg_to_char(ch, "You climb down from your mount.\r\n");
+					perform_dismount(ch);
+				}
+				send_to_char("You lie down and go to sleep.\r\n", ch);
+				act("$n lies down and falls asleep.", TRUE, ch, 0, 0, TO_ROOM);
+				GET_POS(ch) = POS_SLEEPING;
+			}
 			break;
+		}
 		case POS_SLEEPING:
 			send_to_char("You are already sound asleep.\r\n", ch);
 			break;
@@ -2779,6 +2889,10 @@ ACMD(do_sleep) {
 			GET_POS(ch) = POS_SLEEPING;
 			break;
 	}
+	
+	if (GET_POS(ch) == POS_SLEEPING && !IS_NPC(ch) && GET_ACTION(ch) != ACT_NONE) {
+		cancel_action(ch);
+	}
 }
 
 
@@ -2787,18 +2901,21 @@ ACMD(do_stand) {
 		case POS_STANDING:
 			send_to_char("You are already standing.\r\n", ch);
 			break;
-		case POS_SITTING:
+		case POS_SITTING: {
 			do_unseat_from_vehicle(ch);
 			send_to_char("You stand up.\r\n", ch);
 			act("$n clambers to $s feet.", TRUE, ch, 0, 0, TO_ROOM);
 			/* Will be sitting after a successful bash and may still be fighting. */
 			GET_POS(ch) = FIGHTING(ch) ? POS_FIGHTING : POS_STANDING;
 			break;
-		case POS_RESTING:
+		}
+		case POS_RESTING: {
+			do_unseat_from_vehicle(ch);
 			send_to_char("You stop resting, and stand up.\r\n", ch);
 			act("$n stops resting, and clambers on $s feet.", TRUE, ch, 0, 0, TO_ROOM);
 			GET_POS(ch) = POS_STANDING;
 			break;
+		}
 		case POS_SLEEPING:
 			send_to_char("You have to wake up first!\r\n", ch);
 			break;
@@ -2885,7 +3002,7 @@ ACMD(do_wake) {
 	if (*arg) {
 		if (GET_POS(ch) == POS_SLEEPING)
 			send_to_char("Maybe you should wake yourself up first.\r\n", ch);
-		else if ((vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)) == NULL)
+		else if ((vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)) == NULL)
 			send_config_msg(ch, "no_person");
 		else if (vict == ch)
 			self = 1;

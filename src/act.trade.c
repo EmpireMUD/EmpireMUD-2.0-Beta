@@ -44,7 +44,7 @@ extern const char *tool_flags[];
 
 // external functions
 extern bool can_claim(char_data *ch);
-extern bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool *bld_is_closed, bool *bld_needs_reverse);
+extern bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
 void complete_vehicle(vehicle_data *veh);
 INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
@@ -81,6 +81,7 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	char buf1[MAX_STRING_LENGTH], *str, *ptr;
 	vehicle_data *craft_veh;
 	bool wait, room_wait, makes_building;
+	bitvector_t fncs_minus_upgraded = (GET_CRAFT_REQUIRES_FUNCTION(type) & ~FNC_UPGRADED);
 	
 	char *command = gen_craft_data[GET_CRAFT_TYPE(type)].command;
 	
@@ -149,14 +150,12 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_FIRE) && !has_cooking_fire(ch)) {
 		msg_to_char(ch, "You need a good fire to do that.\r\n");
 	}
-	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_BLD_UPGRADED) && (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_UPGRADED) || !IS_COMPLETE(IN_ROOM(ch)))) {
-		msg_to_char(ch, "The building needs to be upgraded to %s that!\r\n", command);
-	}
 	else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_SOUP) && !find_water_container(ch, ch->carrying) && !find_water_container(ch, ROOM_CONTENTS(IN_ROOM(ch)))) {
 		msg_to_char(ch, "You need a container of water to %s that.\r\n", command);
 	}
-	else if (GET_CRAFT_REQUIRES_FUNCTION(type) && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), GET_CRAFT_REQUIRES_FUNCTION(type))) {
-		prettier_sprintbit(GET_CRAFT_REQUIRES_FUNCTION(type), function_flags_long, buf1);
+	else if (fncs_minus_upgraded && !room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), fncs_minus_upgraded)) {
+		// this checks/shows without FNC_UPGRADED, which is handled separately after.
+		prettier_sprintbit(fncs_minus_upgraded, function_flags_long, buf1);
 		str = buf1;
 		if ((ptr = strrchr(str, ','))) {
 			msg_to_char(ch, "You must be %-*.*s or%s to %s that.\r\n", (int)(ptr-str), (int)(ptr-str), str, ptr+1, command);
@@ -164,7 +163,9 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 		else {	// no comma
 			msg_to_char(ch, "You must be %s to %s that.\r\n", buf1, command);
 		}
-	
+	}
+	else if (IS_SET(GET_CRAFT_REQUIRES_FUNCTION(type), FNC_UPGRADED) && !ROOM_IS_UPGRADED(IN_ROOM(ch))) {
+		msg_to_char(ch, "You need to be in an upgraded building to %s that!\r\n", command);
 	}
 	// end flag checks
 	
@@ -1155,7 +1156,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	bool found = FALSE;
 	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
-	struct resource_data *res;
+	struct resource_data *res, temp_res;
 	vehicle_data *veh, *junk;
 	char_data *vict;
 	
@@ -1171,7 +1172,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 	}
 	
 	// find and apply something
-	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), FALSE, &found_obj))) {
+	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, &found_obj))) {
 		// take the item; possibly free the res
 		apply_resource(ch, res, &VEH_NEEDS_RESOURCES(veh), found_obj, APPLY_RES_CRAFT, veh, VEH_FLAGGED(veh, VEH_NEVER_DISMANTLE) ? NULL : &VEH_BUILT_WITH(veh));
 		
@@ -1198,7 +1199,20 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		}
 	}
 	else if (!found) {
-		msg_to_char(ch, "You run out of resources and stop %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		// missing next resource
+		if (VEH_NEEDS_RESOURCES(veh)) {
+			// copy this to display the next 1
+			temp_res = *VEH_NEEDS_RESOURCES(veh);
+			if (temp_res.type == RES_OBJECT || temp_res.type == RES_COMPONENT) {
+				temp_res.amount = 1;	// just show next 1
+			}
+			temp_res.next = NULL;
+			show_resource_list(&temp_res, buf);
+			msg_to_char(ch, "You don't have %s and stop %s.\r\n", buf, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		}
+		else {
+			msg_to_char(ch, "You run out of resources and stop %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+		}
 		snprintf(buf, sizeof(buf), "$n runs out of resources and stops %s.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
 		GET_ACTION(ch) = ACT_NONE;
@@ -1453,7 +1467,7 @@ ACMD(do_gen_augment) {
 		msg_to_char(ch, "Usage: %s <item> <type>\r\nYou know how to %s:\r\n", augment_info[subcmd].verb, augment_info[subcmd].verb);
 		list_available_augments(ch, subcmd, NULL);
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, target_arg, ch->carrying)) && !(obj = get_obj_by_char_share(ch, target_arg))) {
+	else if (!(obj = get_obj_in_list_vis(ch, target_arg, NULL, ch->carrying)) && !(obj = get_obj_by_char_share(ch, target_arg))) {
 		msg_to_char(ch, "You don't seem to have any %s.\r\n", target_arg);
 	}
 	else if (!*augment_arg) {
@@ -1632,7 +1646,7 @@ void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
 	found_obj = (GET_CRAFT_REQUIRES_OBJ(type) != NOTHING ? has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(type)) : NULL);
 	
 	// validate
-	if (!check_build_location_and_dir(ch, type, dir, &is_closed, &needs_reverse)) {
+	if (!check_build_location_and_dir(ch, type, dir, FALSE, &is_closed, &needs_reverse)) {
 		return;	// sends own messages
 	}
 	else if (found_obj && !consume_otrigger(found_obj, ch, OCMD_BUILD, NULL)) {
@@ -1736,7 +1750,7 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 		msg_to_char(ch, "You can't %s that while %s is unfinished here.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].command, VEH_SHORT_DESC(found_other));
 		return;
 	}
-	if (!check_build_location_and_dir(ch, type, dir, NULL, NULL)) {
+	if (!check_build_location_and_dir(ch, type, dir, FALSE, NULL, NULL)) {
 		return;	// sends own messages
 	}
 	
@@ -1786,9 +1800,9 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 		}
 	}
 	
-	snprintf(buf, sizeof(buf), "You lay the framework and begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+	snprintf(buf, sizeof(buf), "You begin %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_CHAR);
-	snprintf(buf, sizeof(buf), "$n lays the framework and begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
+	snprintf(buf, sizeof(buf), "$n begins %s $V.", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 	act(buf, FALSE, ch, NULL, veh, TO_ROOM);
 	
 	process_gen_craft_vehicle(ch, type);
@@ -2148,7 +2162,7 @@ ACMD(do_learn) {
 			msg_to_char(ch, "You have learned [%d] %s (%s).\r\n", GET_CRAFT_VNUM(recipe), GET_CRAFT_NAME(recipe), craft_types[GET_CRAFT_TYPE(recipe)]);
 		}
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!bind_ok(obj, ch)) {
@@ -2320,7 +2334,7 @@ ACMD(do_recipes) {
 	if (!*arg) {
 		msg_to_char(ch, "Show recipes for which item?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have a %s in your inventory.\r\n", arg);
 	}
 	else {
@@ -2468,7 +2482,7 @@ ACMD(do_reforge) {
 	else if (reforge_data[subcmd].validate_func && !(reforge_data[subcmd].validate_func)(ch)) {
 		// failed validate func -- sends own messages
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && !(obj = get_obj_by_char_share(ch, arg))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)) && !(obj = get_obj_by_char_share(ch, arg))) {
 		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
 	}
 	else if (!match_reforge_type(obj, subcmd)) {
@@ -2701,7 +2715,7 @@ ACMD(do_tame) {
 	else if (!*arg) {
 		msg_to_char(ch, "Which animal would you like to tame?\r\n");
 	}
-	else if (!(mob = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!(mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!IS_NPC(mob) || !has_interaction(mob->interactions, INTERACT_TAME)) {

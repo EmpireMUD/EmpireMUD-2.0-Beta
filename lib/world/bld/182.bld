@@ -25,7 +25,7 @@ chandeliers. For so much clutter, the guildhall is surprisingly well-kept.
 ~
 F
 H
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1008 1 5 0
 R
@@ -95,7 +95,7 @@ S
 Strange Egg~
 A Strange Egg~
 .&yO&?..~
-10 0 bd 0
+10 0 bdn 0
 0 0 0 -1
 E
 egg strange~
@@ -109,7 +109,7 @@ S
 Gigantic Egg~
 A Gigantic Egg~
 .&y()&?.~
-10 0 bd 0
+10 0 bdn 0
 0 0 0 -1
 E
 egg gigantic~
@@ -124,7 +124,7 @@ S
 Hatching Egg~
 A Gigantic, Hatching Egg~
 .&y(`)~
-10 0 bd 0
+10 0 bdn 0
 0 0 0 -1
 E
 egg hatching gigantic~

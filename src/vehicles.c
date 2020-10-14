@@ -59,6 +59,9 @@ extern const char *function_flags[];
 extern const char *interact_types[];
 extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const char *mob_move_types[];
+extern const char *paint_colors[];
+extern const char *paint_names[];
+extern const int bld_relationship_vnum_types[];
 extern const char *room_aff_bits[];
 extern const char *veh_custom_types[];
 extern const char *vehicle_flags[];
@@ -127,7 +130,7 @@ void check_vehicle_climate_change(room_data *room) {
 	char *msg;
 	
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-		if (!vehicle_allows_climate(veh, IN_ROOM(veh))) {
+		if (!ROOM_IS_CLOSED(IN_ROOM(veh)) && !vehicle_allows_climate(veh, IN_ROOM(veh))) {
 			// this will extract it (usually)
 			msg = veh_get_custom_message(veh, VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM);
 			ruin_vehicle(veh, msg ? msg : "$V falls into ruin!");
@@ -788,6 +791,10 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 		}
 	}
 	
+	if (VEH_PAINT_COLOR(inter_veh)) {
+		set_vehicle_extra_data(ruin, ROOM_EXTRA_PAINT_COLOR, VEH_PAINT_COLOR(inter_veh));
+	}
+	
 	load_vtrigger(ruin);
 	return TRUE;
 }
@@ -1095,9 +1102,6 @@ bool vehicle_allows_climate(vehicle_data *veh, room_data *room) {
 	if (!veh || !room) {
 		return TRUE;	// junk in, junk out
 	}
-	if (ROOM_IS_CLOSED(room)) {
-		return TRUE;	// closed rooms always allowed
-	}
 	
 	// determine which climate to use
 	if (IS_MAP_BUILDING(room) || IS_ROAD(room)) {
@@ -1161,6 +1165,11 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 	vrl->room = room;
 	LL_APPEND(VEH_ROOM_LIST(veh), vrl);
 	
+	// count all rooms after the first
+	if (room != VEH_INTERIOR_HOME_ROOM(veh)) {
+		++VEH_INSIDE_ROOMS(veh);
+	}
+	
 	// initial island data
 	if (IN_ROOM(veh)) {
 		update_vehicle_island_and_loc(veh, IN_ROOM(veh));
@@ -1181,8 +1190,9 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
 	
 	char temp[MAX_STRING_LENGTH], *ptr;
-	bld_data *interior = building_proto(VEH_INTERIOR_ROOM_VNUM(veh));
+	bld_data *interior = building_proto(VEH_INTERIOR_ROOM_VNUM(veh)), *proto;
 	struct obj_storage_type *store;
+	struct bld_relation *relat;
 	obj_data *obj, *next_obj;
 	bool any, problem = FALSE;
 	
@@ -1296,8 +1306,8 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 		olc_audit_msg(ch, VEH_VNUM(veh), "ALLOW-ROUGH set without driving/draggable");
 		problem = TRUE;
 	}
-	if (VEH_FLAGGED(veh, VEH_IN) && !VEH_FLAGGED(veh, VEH_SIT) && VEH_INTERIOR_ROOM_VNUM(veh) == NOTHING) {
-		olc_audit_msg(ch, VEH_VNUM(veh), "IN flag set without SIT or interior room");
+	if (VEH_FLAGGED(veh, VEH_IN) && !VEH_FLAGGED(veh, VEH_SIT | VEH_SLEEP) && VEH_INTERIOR_ROOM_VNUM(veh) == NOTHING) {
+		olc_audit_msg(ch, VEH_VNUM(veh), "IN flag set without SIT/SLEEP or interior room");
 		problem = TRUE;
 	}
 	if (VEH_FLAGGED(veh, VEH_CARRY_VEHICLES | VEH_CARRY_MOBS) && VEH_INTERIOR_ROOM_VNUM(veh) == NOTHING) {
@@ -1353,6 +1363,13 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 					problem = any = TRUE;
 				}
 			}
+		}
+	}
+	
+	LL_FOREACH(VEH_RELATIONS(veh), relat) {
+		if (relat->type == BLD_REL_UPGRADES_TO_BLD && (proto = building_proto(relat->vnum)) && !BLD_FLAGGED(proto, BLD_OPEN)) {
+			olc_audit_msg(ch, VEH_VNUM(veh), "UPGRADES-TO a non-open building (cannot do this because there's no 'facing' information for the upgrade)");
+			problem = TRUE;
 		}
 	}
 	
@@ -1466,7 +1483,7 @@ void link_and_check_vehicles(void) {
 		}
 	}
 	
-	LL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
 		// check for orphaned ship rooms
 		if (ROOM_AFF_FLAGGED(room, ROOM_AFF_IN_VEHICLE) && HOME_ROOM(room) == room && !GET_ROOM_VEHICLE(room)) {
 			delete_room(room, FALSE);	// must check_all_exits later
@@ -1556,7 +1573,10 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 			}
 		}
 		LL_FOREACH(GET_BLD_RELATIONS(bld), relat) {
-			if (relat->type != BLD_REL_STORES_LIKE_VEH || relat->vnum != vnum) {
+			if (relat->vnum != vnum) {
+				continue;
+			}
+			if (bld_relationship_vnum_types[relat->type] != TYPE_VEH) {
 				continue;
 			}
 			any = TRUE;
@@ -1672,7 +1692,10 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 			}
 		}
 		LL_FOREACH(VEH_RELATIONS(veh_iter), relat) {
-			if (relat->type != BLD_REL_STORES_LIKE_VEH || relat->vnum != vnum) {
+			if (relat->vnum != vnum) {
+				continue;
+			}
+			if (bld_relationship_vnum_types[relat->type] != TYPE_VEH) {
 				continue;
 			}
 			any = TRUE;
@@ -1985,6 +2008,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 	}
 	HASH_ITER(hh, VEH_EXTRA_DATA(veh), red, next_red) {
 		fprintf(fl, "Extra-data: %d %d\n", red->type, red->value);
+	}
+	if (VEH_ROOM_AFFECTS(veh) && (!proto || VEH_ROOM_AFFECTS(veh) != VEH_ROOM_AFFECTS(proto))) {
+		fprintf(fl, "Room-affects: %lld\r\n", VEH_ROOM_AFFECTS(veh));
 	}
 	
 	// scripts
@@ -2321,6 +2347,12 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
 						VEH_OWNER(veh) = real_empire(i_in[0]);
 					}
+				}
+				break;
+			}
+			case 'R': {
+				if (OBJ_FILE_TAG(line, "Room-affects:", length)) {
+					VEH_ROOM_AFFECTS(veh) = strtoull(line + length + 1, NULL, 10);
 				}
 				break;
 			}
@@ -2988,7 +3020,7 @@ void convert_one_obj_to_vehicle(obj_data *obj) {
 				}
 				
 				// apply vehicle aff
-				LL_FOREACH2(interior_room_list, room_iter, next_interior) {
+				DL_FOREACH2(interior_room_list, room_iter, next_interior) {
 					if (room_iter == main_room || HOME_ROOM(room_iter) == main_room) {
 						SET_BIT(ROOM_BASE_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
 						affect_total_room(room_iter);
@@ -3163,6 +3195,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(bld), TYPE_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_STORES_LIKE_VEH, vnum);
+		found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(bld), BLD_REL_UPGRADES_TO_VEH, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_BLD, GET_BLD_VNUM(bld));
 		}
@@ -3250,6 +3283,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	HASH_ITER(hh, vehicle_table, iter, next_iter) {
 		found = delete_from_interaction_list(&VEH_INTERACTIONS(iter), TYPE_VEH, vnum);
 		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_STORES_LIKE_VEH, vnum);
+		found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(iter), BLD_REL_UPGRADES_TO_VEH, vnum);
 		if (found) {
 			save_library_file_for_vnum(DB_BOOT_VEH, VEH_VNUM(iter));
 		}
@@ -3260,6 +3294,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_BUILDING(desc)) {
 			found = delete_from_interaction_list(&GET_BLD_INTERACTIONS(GET_OLC_BUILDING(desc)), TYPE_VEH, vnum);
 			found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_STORES_LIKE_VEH, vnum);
+			found |= delete_bld_relation_by_vnum(&GET_BLD_RELATIONS(GET_OLC_BUILDING(desc)), BLD_REL_UPGRADES_TO_VEH, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the vehicles used in the building you're editing was deleted.\r\n");
 			}
@@ -3331,6 +3366,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		if (GET_OLC_VEHICLE(desc)) {
 			found = delete_from_interaction_list(&VEH_INTERACTIONS(GET_OLC_VEHICLE(desc)), TYPE_VEH, vnum);
 			found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(GET_OLC_VEHICLE(desc)), BLD_REL_STORES_LIKE_VEH, vnum);
+			found |= delete_bld_relation_by_vnum(&VEH_RELATIONS(GET_OLC_VEHICLE(desc)), BLD_REL_UPGRADES_TO_VEH, vnum);
 			if (found) {
 				msg_to_char(desc->character, "One of the vehicles used on the vehicle you're editing was deleted.\r\n");
 			}
@@ -3484,7 +3520,7 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 		if (*only_icon && !VEH_ICON(veh)) {
 			continue;
 		}
-		if (*only_icon && !strstr(only_icon, VEH_ICON(veh)) && !strstr(only_icon, strip_color(VEH_ICON(veh)))) {
+		if (*only_icon && str_cmp(only_icon, "any") && !strstr(only_icon, VEH_ICON(veh)) && !strstr(only_icon, strip_color(VEH_ICON(veh)))) {
 			continue;
 		}
 		if (find_interacts) {	// look up its interactions
@@ -3586,7 +3622,7 @@ void save_olc_vehicle(descriptor_data *desc) {
 	struct spawn_info *spawn;
 	struct quest_lookup *ql;
 	struct shop_lookup *sl;
-	bitvector_t old_flags;
+	bitvector_t old_flags, add_affs, rem_affs;
 	UT_hash_handle hh;
 
 	// have a place to save it?
@@ -3620,6 +3656,10 @@ void save_olc_vehicle(descriptor_data *desc) {
 	VEH_HEALTH(veh) = VEH_MAX_HEALTH(veh);
 	prune_extra_descs(&VEH_EX_DESCS(veh));
 	
+	// determine if affs were added or removed, for updating live vehs
+	add_affs = VEH_ROOM_AFFECTS(veh) & ~VEH_ROOM_AFFECTS(proto);
+	rem_affs = VEH_ROOM_AFFECTS(proto) & ~VEH_ROOM_AFFECTS(veh);
+	
 	// update live vehicles
 	DL_FOREACH(vehicle_list, iter) {
 		if (VEH_VNUM(iter) != vnum) {
@@ -3629,6 +3669,10 @@ void save_olc_vehicle(descriptor_data *desc) {
 		// flags (preserve the state of the savable flags only)
 		old_flags = VEH_FLAGS(iter) & SAVABLE_VEH_FLAGS;
 		VEH_FLAGS(iter) = (VEH_FLAGS(veh) & ~SAVABLE_VEH_FLAGS) | old_flags;
+		
+		// apply any changed affs, but leave the rest alone
+		SET_BIT(VEH_ROOM_AFFECTS(iter), add_affs);
+		REMOVE_BIT(VEH_ROOM_AFFECTS(iter), rem_affs);
 		
 		// update pointers
 		if (VEH_KEYWORDS(iter) == VEH_KEYWORDS(proto)) {
@@ -3885,7 +3929,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 		size += snprintf(buf + size, sizeof(buf) - size, "Depletion: ");
 		
 		comma = FALSE;
-		for (dep = ROOM_DEPLETION(IN_ROOM(ch)); dep; dep = dep->next) {
+		for (dep = VEH_DEPLETION(veh); dep; dep = dep->next) {
 			if (dep->type < NUM_DEPLETION_TYPES) {
 				size += snprintf(buf + size, sizeof(buf) - size, "%s%s (%d)", comma ? ", " : "", depletion_type[dep->type], dep->count);
 				comma = TRUE;
@@ -3935,7 +3979,7 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	if (VEH_EXTRA_DATA(veh)) {
 		msg_to_char(ch, "Extra data:\r\n");
 		HASH_ITER(hh, VEH_EXTRA_DATA(veh), red, next_red) {
-			sprinttype(red->type, room_extra_types, buf);
+			sprinttype(red->type, room_extra_types, buf, sizeof(buf), "UNDEFINED");
 			msg_to_char(ch, " %s: %d\r\n", buf, red->value);
 		}
 	}
@@ -3958,7 +4002,8 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 * @param char_data *ch The person to show the output to.
 */
 void look_at_vehicle(vehicle_data *veh, char_data *ch) {
-	char lbuf[MAX_STRING_LENGTH];
+	char lbuf[MAX_STRING_LENGTH], colbuf[256];
+	player_index_data *index;
 	vehicle_data *proto;
 	
 	if (!veh || !ch || !ch->desc) {
@@ -3976,11 +4021,12 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 	}
 	
 	if (proto && VEH_SHORT_DESC(veh) != VEH_SHORT_DESC(proto) && !strchr(VEH_SHORT_DESC(proto), '#')) {
-		msg_to_char(ch, "Type: %s\r\n", skip_filler(VEH_SHORT_DESC(proto)));
+		strcpy(lbuf, skip_filler(VEH_SHORT_DESC(proto)));
+		msg_to_char(ch, "It appears to be %s %s.\r\n", AN(lbuf), lbuf);
 	}
 	
 	if (VEH_OWNER(veh)) {
-		msg_to_char(ch, "Owner: %s%s\t0", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
+		msg_to_char(ch, "It is flying the flag of %s%s\t0", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
 		
 		if (VEH_OWNER(veh) == GET_LOYALTY(ch)) {
 			if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK)) {
@@ -3990,7 +4036,21 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 				send_to_char(" (no-dismantle)", ch);
 			}
 		}
-		send_to_char("\r\n", ch);
+		send_to_char(".\r\n", ch);
+	}
+	
+	if (VEH_PATRON(veh) && (index = find_player_index_by_idnum(VEH_PATRON(veh)))) {
+		msg_to_char(ch, "It is dedicated to %s.\r\n", index->fullname);
+	}
+	
+	if (VEH_PAINT_COLOR(veh)) {
+		sprinttype(VEH_PAINT_COLOR(veh), paint_names, lbuf, sizeof(lbuf), "UNDEFINED");
+		sprinttype(VEH_PAINT_COLOR(veh), paint_colors, colbuf, sizeof(colbuf), "&0");
+		*lbuf = LOWER(*lbuf);
+		if (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT)) {
+			strtoupper(buf1);
+		}
+		msg_to_char(ch, "It has been painted %s%s%s&0.\r\n", colbuf, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), lbuf);
 	}
 	
 	if (VEH_NEEDS_RESOURCES(veh)) {

@@ -35,7 +35,7 @@ S
 Goblin Message Post~
 A Goblin Message Post~
 @.&0P&?@.@.~
-24 0 dpR 0
+24 0 dnpR 0
 0 0 0 -1
 C
 mail check, mail receive, mail send~
@@ -85,7 +85,7 @@ weeds and rubble cover the surface.
 ~
 F
 B
-I 29 5007 100.00 1 r  # RUINS-TO-BLD: Large Ruins
+I 29 5007 100.00 1 r  # RUINS-TO-BLD: Ruins
 R
 1001 1 5 0
 S

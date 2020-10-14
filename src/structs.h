@@ -239,6 +239,7 @@ typedef any_vnum rmt_vnum;	// room_template
 typedef any_vnum room_vnum;	/* A room's vnum type */
 typedef any_vnum sector_vnum;	// sector's vnum
 typedef any_vnum trig_vnum;	// for dg scripts
+typedef any_vnum veh_vnum;	// for vehicles
 
 
 // For simplicity...
@@ -781,8 +782,8 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_LOOK_OUT  BIT(43)	// can see the map using "look out"
 #define BLD_SECONDARY_TERRITORY  BIT(44)	// similar to a ship -- counts as territory off the map
 // #define BLD_UNUSED25  BIT(45)
-#define BLD_UPGRADED  BIT(46)	// combines with SHIPYARD, etc. to create upgraded versions of buildings
-// #define BLD_UNUSED26  BIT(47)
+// #define BLD_UNUSED26  BIT(46)	// formerly UPGRADED (use a function flag now)
+// #define BLD_UNUSED27  BIT(47)
 
 
 // BLD_ON_x: Terrain flags for building crafts -- these match up with build_on flags for building crafts
@@ -812,10 +813,11 @@ typedef struct vehicle_data vehicle_data;
 #define BLD_ON_ROAD  BIT(23)	// use on vehicles but not buildings
 
 
-// BLD_REL_x: relationships with other buildings
-#define BLD_REL_UPGRADES_TO  0	// upgrades to another building type
+// BLD_REL_x: relationships with other buildings/vehicles
+#define BLD_REL_UPGRADES_TO_BLD  0	// upgrades to a building type
 #define BLD_REL_STORES_LIKE_BLD  1	// acts like another building for storage locations
-#define BLD_REL_STORES_LIKE_VEH  2	// acts like another building for storage locations
+#define BLD_REL_STORES_LIKE_VEH  2	// acts like another vehicle for storage locations
+#define BLD_REL_UPGRADES_TO_VEH  3	// upgrades to another vehicle type
 
 
 // tavern types
@@ -850,7 +852,7 @@ typedef struct vehicle_data vehicle_data;
 
 // FNC_x: function flags (for buildings)
 #define FNC_ALCHEMIST  BIT(0)	// can brew and mix here
-	#define FNC_UNUSED  BIT(1)	// formerly 'apiary'
+#define FNC_UPGRADED  BIT(1)	// used on upgraded buildings / advanced crafts
 #define FNC_BATHS  BIT(2)	// can use the bathe command here
 #define FNC_BEDROOM  BIT(3)	// boosts regen while sleeping
 #define FNC_CARPENTER  BIT(4)	// required by some crafts
@@ -1072,7 +1074,7 @@ typedef struct vehicle_data vehicle_data;
 #define CRAFT_IN_CITY_ONLY  BIT(12)	// craft/building must be inside a city
 #define CRAFT_VEHICLE  BIT(13)	// creates a vehicle instead of an object
 	#define CRAFT_UNUSED5  BIT(14)	// formerly shipyard (now uses a function)
-#define CRAFT_BLD_UPGRADED  BIT(15)	// requires a building with the upgraded flag
+	#define CRAFT_UNUSED6  BIT(15)	// formerly bld-upgraded (now uses a function flag)
 #define CRAFT_LEARNED  BIT(16)	// cannot use unless learned
 #define CRAFT_BY_RIVER  BIT(17)	// must be within 1 tile of river
 #define CRAFT_REMOVE_PRODUCTION  BIT(18)	// empire will un-produce the resources; used for things like 'smelt' where nothing new is really made
@@ -2485,6 +2487,10 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_CHAMELEON  BIT(27)	// B. vehicle's icon isn't visible at a distance
 #define VEH_INTERLINK  BIT(28)	// C. rooms can be interlinked with nearby interlink-flagged vehicles or rooms
 #define VEH_IS_RUINS  BIT(29)	// D. counts as ruins for cities/decay
+#define VEH_SLEEP  BIT(30)	// E. player can sleep/rest in/on it (like sit)
+#define VEH_NO_PAINT  BIT(31)	// F. cannot be painted
+#define VEH_BRIGHT_PAINT  BIT(32)	// G. brightly painted
+#define VEH_DEDICATE  BIT(33)	// H. can be dedicated
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin
@@ -2501,7 +2507,7 @@ typedef struct vehicle_data vehicle_data;
 // The following vehicle flags are saved to file rather than read from the
 // prototype. Flags which are NOT included in this list can be altered with
 // OLC and affect live copies.
-#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE | VEH_PLAYER_NO_DISMANTLE | VEH_DISMANTLING | VEH_CHAMELEON)
+#define SAVABLE_VEH_FLAGS  (VEH_INCOMPLETE | VEH_ON_FIRE | VEH_PLAYER_NO_DISMANTLE | VEH_PLAYER_NO_WORK | VEH_DISMANTLING | VEH_CHAMELEON | VEH_BRIGHT_PAINT)
 
 // The following vehicle flags indicate a vehicle can move
 #define MOVABLE_VEH_FLAGS  (VEH_DRIVING | VEH_SAILING | VEH_FLYING | VEH_DRAGGABLE | VEH_CAN_PORTAL | VEH_LEADABLE)
@@ -2676,6 +2682,7 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_AFF_REPEL_NPCS  BIT(20)	// u. all npcs are prevented from wandering in
 #define ROOM_AFF_REPEL_ANIMALS  BIT(21)	// v. animals are prevented from wandering in
 #define ROOM_AFF_NO_WORKFORCE_EVOS  BIT(22)	// w. workforce chores that would evolve the tile don't run
+#define ROOM_AFF_HIDE_REAL_NAME  BIT(23)	// x. won't show the real name after a custom name, like Ruins of a House (Ruins)
 // NOTE: limit BIT(31) -- This is currently an unsigned int, to save space since there are a lot of rooms in the world
 
 
@@ -2693,8 +2700,8 @@ typedef struct vehicle_data vehicle_data;
 #define ROOM_EXTRA_CHOP_PROGRESS  8
 #define ROOM_EXTRA_TRENCH_PROGRESS  9
 #define ROOM_EXTRA_HARVEST_PROGRESS  10
-	#define ROOM_EXTRA_GARDEN_WORKFORCE_PROGRESS  11	// deprecated
-	#define ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS  12	// deprecated
+#define ROOM_EXTRA_PAINT_COLOR  11
+#define ROOM_EXTRA_DEDICATE_ID  12
 #define ROOM_EXTRA_BUILD_RECIPE  13
 #define ROOM_EXTRA_FOUND_TIME  14
 #define ROOM_EXTRA_REDESIGNATE_TIME  15
@@ -3159,14 +3166,15 @@ struct ritual_strings {
 struct shipping_data {
 	obj_vnum vnum;
 	int amount;
-	int from_island;
-	int to_island;
+	int from_island;	// island of origin
+	int to_island;	// destination island
+	room_vnum to_room;	// optional: exact destination
 	int status;	// SHIPPING_
 	long status_time;	// when it gained that status
 	room_vnum ship_origin;	// where the ship is coming from (in case we have to send it back)
 	int shipping_id;	// VEH_SHIPPING_ID() of ship
 	
-	struct shipping_data *next;
+	struct shipping_data *prev, *next;	// DL: EMPIRE_SHIPPING_LIST()
 };
 
 
@@ -3933,6 +3941,7 @@ struct descriptor_data {
 	protocol_t *pProtocol; // see protocol.c
 	struct color_reducer color;
 	bool no_nanny;	// skips interpreting player input if only a telnet negotiation sequence was sent
+	int wait;	// triggers a short wait at some menus to prevent out-of-order interactions
 	
 	char **str;	// for the modify-str system
 	char *backstr;	// for the modify-str aborts
@@ -4936,7 +4945,7 @@ struct empire_data {
 
 	// linked lists, hashes, etc
 	struct empire_political_data *diplomacy;
-	struct shipping_data *shipping_list;
+	struct shipping_data *shipping_list;	// DL of shipping orders
 	struct empire_unique_storage *unique_store;	// LL: eus->next
 	struct empire_trade_data *trade;
 	struct empire_log_data *logs;
@@ -5663,6 +5672,7 @@ struct vehicle_data {
 	int construction_id;	// temporary id used to resume construction/dismantle
 	struct room_extra_data *extra_data;	// hash of misc storage
 	any_vnum instance_id;	// adventure instance the vehicle belongs to, or NOTHING if none
+	bitvector_t room_affects;	// ROOM_AFF_ flags applied to the room while veh is here
 	
 	// scripting
 	int script_id;	// used by DG triggers - unique id
@@ -5695,7 +5705,6 @@ struct vehicle_attribute_data {
 	struct extra_descr_data *ex_description;	// extra descriptions
 	struct interaction_item *interactions;	// interaction items
 	struct spawn_info *spawns;	// linked list of spawn data
-	bitvector_t room_affects;	// ROOM_AFF_ flags applied to the room while veh is here
 	bitvector_t functions;	// FNC_ flags offered to the room the vehicle is in
 	bitvector_t requires_climate;	// CLIM_ flags required for this vehicle to enter a room
 	bitvector_t forbid_climate;	// CLIM_ flags that block this vehicle from entering
@@ -5777,7 +5786,7 @@ struct room_data {
 	struct dg_event *unload_event;	// used for un-loading of live rooms
 	
 	UT_hash_handle hh;	// hash handle for world_table
-	room_data *next_interior;	// linked list: interior_room_list
+	room_data *prev_interior, *next_interior;	// doubly linked list: interior_room_list
 };
 
 
@@ -5793,7 +5802,7 @@ struct complex_room_data {
 	room_template *rmt_ptr;	// points to room_template_table proto
 	
 	byte entrance;  // direction of entrance
-	int patron;  // for shrine gods
+	// int patron;  // for shrine gods -- removed in b5.108, stored as extra data
 	byte inside_rooms;  // count of designated rooms inside
 	room_data *home_room;  // for interior rooms (and boats and instances), means this is actually part of another room; is saved as vnum to file but is room_data* in real life
 	
@@ -5802,7 +5811,7 @@ struct complex_room_data {
 	vehicle_data *vehicle;  // the associated vehicle (usually only on the home room)
 	struct instance_data *instance;	// if part of an instantiated adventure
 	
-	int paint_color;	// for the 'paint' command
+	// int paint_color;	// for the 'paint' command -- as of b5.108 this is stored as extra data
 	int private_owner;	// for privately-owned houses
 	
 	time_t burn_down_time;	// if >0, the timestamp when this building will burn down

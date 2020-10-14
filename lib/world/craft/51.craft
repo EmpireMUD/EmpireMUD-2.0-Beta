@@ -681,11 +681,11 @@ R
 6790 24 1 0
 S
 #5154
-upgraded shipyard~
+great shipyard~
 -1 1
 8 300 kq 1 -1 0 0
 B
-5154 be a
+5154 0 0
 R
 6075 30 1 0
 R
@@ -857,22 +857,22 @@ R
 6790 3 1 0
 S
 #5168
-advanced guard tower upgrade~
+advanced guard tower~
 -1 1
 8 300 kmq 1 -1 c 0
 B
-5168 be op
+5168 0 0
 R
 6000 12 1 0
 R
 6790 3 1 0
 S
 #5169
-superior guard tower upgrade~
+superior guard tower~
 -1 1
 8 300 kmq 1 -1 c 0
 B
-5169 be op
+5169 0 0
 R
 6000 24 1 0
 R

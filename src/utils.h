@@ -412,6 +412,7 @@ extern int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other
 #define IS_HUMAN(ch)  (!IS_VAMPIRE(ch))
 #define IS_MAGE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_CASTER) : (has_skill_flagged((ch), SKILLF_CASTER) > 0))
 #define IS_OUTDOORS(ch)  IS_OUTDOOR_TILE(IN_ROOM(ch))
+#define IS_SWIMMING(ch)  (WATER_SECT(IN_ROOM(ch)) && !GET_SITTING_ON(ch) && !IS_RIDING(ch) && !EFFECTIVELY_FLYING(ch))
 #define IS_VAMPIRE(ch)  (IS_NPC(ch) ? MOB_FLAGGED((ch), MOB_VAMPIRE) : (has_skill_flagged((ch), SKILLF_VAMPIRE) > 0))
 #define NOT_MELEE_RANGE(ch, vict)  ((FIGHTING(ch) && FIGHT_MODE(ch) != FMODE_MELEE) || (FIGHTING(vict) && FIGHT_MODE(vict) != FMODE_MELEE))
 #define WOULD_EXECUTE(ch, vict)  (MOB_FLAGGED((vict), MOB_HARD | MOB_GROUP) || (IS_NPC(ch) ? (((ch)->master && !IS_NPC((ch)->master)) ? PRF_FLAGGED((ch)->master, PRF_AUTOKILL) : (!MOB_FLAGGED((ch), MOB_ANIMAL) || MOB_FLAGGED((ch), MOB_AGGRESSIVE | MOB_HARD | MOB_GROUP))) : PRF_FLAGGED((ch), PRF_AUTOKILL)))
@@ -1337,8 +1338,8 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define HOME_ROOM(room)  ((COMPLEX_DATA(room) && COMPLEX_DATA(room)->home_room) ? COMPLEX_DATA(room)->home_room : (room))
 #define IS_BURNING(room)  (BUILDING_BURN_DOWN_TIME(room) > 0)
 #define IS_COMPLETE(room)  (!IS_INCOMPLETE(room) && !IS_DISMANTLING(room))
-#define ROOM_PAINT_COLOR(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->paint_color : 0)
-#define ROOM_PATRON(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->patron : NOBODY)
+#define ROOM_PAINT_COLOR(room)  get_room_extra_data((room), ROOM_EXTRA_PAINT_COLOR)
+#define ROOM_PATRON(room)  get_room_extra_data((room), ROOM_EXTRA_DEDICATE_ID)
 #define ROOM_PRIVATE_OWNER(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->private_owner : NOBODY)
 #define ROOM_INSTANCE(room)  (COMPLEX_DATA(room) ? COMPLEX_DATA(room)->instance : NULL)
 
@@ -1383,6 +1384,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_CAN_EXIT(room)  (ROOM_BLD_FLAGGED((room), BLD_EXIT) || (GET_ROOM_VEHICLE(room) && room == HOME_ROOM(room)))
 #define ROOM_CAN_MINE(room)  (ROOM_SECT_FLAGGED((room), SECTF_CAN_MINE) || room_has_function_and_city_ok(ROOM_OWNER(room), (room), FNC_MINE) || (IS_ROAD(room) && SECT_FLAGGED(BASE_SECT(room), SECTF_CAN_MINE)))
 #define ROOM_IS_CLOSED(room)  (IS_INSIDE(room) || IS_ADVENTURE_ROOM(room) || (IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN) && (IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED))))
+#define ROOM_IS_UPGRADED(room)  ((IS_COMPLETE(room) && HAS_FUNCTION((room), FNC_UPGRADED)) || (IS_COMPLETE(HOME_ROOM(room)) && HAS_FUNCTION(HOME_ROOM(room), FNC_UPGRADED)) || (GET_ROOM_VEHICLE(room) && IS_SET(VEH_FUNCTIONS(GET_ROOM_VEHICLE(room)), FNC_UPGRADED)))
 #define SHOW_PEOPLE_IN_ROOM(room)  (!ROOM_IS_CLOSED(room) && !ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION))
 #define WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room)  (RMT_FLAGGED((room), RMT_LIGHT) || IS_ANY_BUILDING(room) || !IS_DARK(room) || adjacent_room_is_light(room))
 
@@ -1400,6 +1402,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define ROOM_TEMPLATE_VNUM(room)  (GET_ROOM_TEMPLATE(room) ? GET_RMT_VNUM(GET_ROOM_TEMPLATE(room)) : NOTHING)
 
 // helpers
+#define BLD_FLAGGED(bld, flag)  IS_SET(GET_BLD_FLAGS(bld), (flag))
 #define BLD_DESIGNATE_FLAGGED(room, flag)  (GET_BUILDING(HOME_ROOM(room)) && IS_SET(GET_BLD_DESIGNATE_FLAGS(GET_BUILDING(HOME_ROOM(room))), (flag)))
 #define CHECK_CHAMELEON(from_room, to_room)  (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(to_room) && compute_distance(from_room, to_room) >= 2)
 #define RMT_FLAGGED(room, flag)  (GET_ROOM_TEMPLATE(room) && IS_SET(GET_RMT_FLAGS(GET_ROOM_TEMPLATE(room)), (flag)))
@@ -1553,7 +1556,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // basic data
 #define VEH_ANIMALS(veh)  ((veh)->animals)
-#define VEH_ARTISAN(veh)  NOTHING	// for future use
 #define VEH_BUILT_WITH(veh)  ((veh)->built_with)
 #define VEH_CARRYING_N(veh)  ((veh)->carrying_n)
 #define VEH_CONSTRUCTION_ID(veh)  ((veh)->construction_id)
@@ -1576,6 +1578,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VEH_NEEDS_RESOURCES(veh)  ((veh)->needs_resources)
 #define VEH_OWNER(veh)  ((veh)->owner)
 #define VEH_QUEST_LOOKUPS(veh)  ((veh)->quest_lookups)
+#define VEH_ROOM_AFFECTS(veh)  ((veh)->room_affects)
 #define VEH_ROOM_LIST(veh)  ((veh)->room_list)
 #define VEH_SCALE_LEVEL(veh)  ((veh)->scale_level)
 #define VEH_SHIPPING_ID(veh)  ((veh)->shipping_id)
@@ -1586,6 +1589,7 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 
 // attribute (non-instanced) data
 #define VEH_ANIMALS_REQUIRED(veh)  ((veh)->attributes->animals_required)
+#define VEH_ARTISAN(veh)  NOTHING	// for future use
 #define VEH_CAPACITY(veh)  ((veh)->attributes->capacity)
 #define VEH_CUSTOM_MSGS(veh)  ((veh)->attributes->custom_msgs)
 #define VEH_DESIGNATE_FLAGS(veh)  ((veh)->attributes->designate_flags)
@@ -1603,7 +1607,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VEH_MOVE_TYPE(veh)  ((veh)->attributes->move_type)
 #define VEH_RELATIONS(veh)  ((veh)->attributes->relations)
 #define VEH_REQUIRES_CLIMATE(veh)  ((veh)->attributes->requires_climate)
-#define VEH_ROOM_AFFECTS(veh)  ((veh)->attributes->room_affects)
 #define VEH_YEARLY_MAINTENANCE(veh)  ((veh)->attributes->yearly_maintenance)
 #define VEH_SIZE(veh)  ((veh)->attributes->size)
 #define VEH_SPAWNS(veh)  ((veh)->attributes->spawns)
@@ -1618,6 +1621,8 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 #define VEH_IS_COMPLETE(veh)  (!VEH_NEEDS_RESOURCES(veh) || !VEH_FLAGGED((veh), VEH_INCOMPLETE | VEH_DISMANTLING))
 #define VEH_IS_DISMANTLING(veh)  (VEH_FLAGGED((veh), VEH_DISMANTLING) ? TRUE : FALSE)
 #define VEH_OR_BLD(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) ? "building" : "vehicle")
+#define VEH_PAINT_COLOR(veh)  get_vehicle_extra_data((veh), ROOM_EXTRA_PAINT_COLOR)
+#define VEH_PATRON(veh)  get_vehicle_extra_data((veh), ROOM_EXTRA_DEDICATE_ID)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1768,7 +1773,7 @@ void prettier_sprintbit(bitvector_t bitvector, const char *names[], char *result
 void prune_crlf(char *txt);
 extern const char *skip_filler(const char *string);
 void sprintbit(bitvector_t vektor, const char *names[], char *result, bool space);
-void sprinttype(int type, const char *names[], char *result);
+void sprinttype(int type, const char *names[], char *result, size_t max_result_size, char *error_value);
 extern char *time_length_string(int seconds);
 extern char *trim(char *string);
 

@@ -121,7 +121,7 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 		old_id = VEH_SHIPPING_ID(veh);
 		new_id = find_free_shipping_id(new_emp);
 		
-		LL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(old_emp), sd, next_sd) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(old_emp), sd) {
 			if (sd->shipping_id == old_id) {
 				sd->shipping_id = new_id;
 			}
@@ -131,18 +131,10 @@ void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
 	}
 	
 	// move all shipping entries over
-	if ((sd = EMPIRE_SHIPPING_LIST(new_emp))) {
-		// append to end
-		while (sd->next) {
-			sd = sd->next;
-		}
-		sd->next = EMPIRE_SHIPPING_LIST(old_emp);
+	DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(old_emp), sd , next_sd) {
+		DL_DELETE(EMPIRE_SHIPPING_LIST(old_emp), sd);
+		DL_APPEND(EMPIRE_SHIPPING_LIST(new_emp), sd);
 	}
-	else {
-		EMPIRE_SHIPPING_LIST(new_emp) = EMPIRE_SHIPPING_LIST(old_emp);
-	}
-	
-	EMPIRE_SHIPPING_LIST(old_emp) = NULL;
 }
 
 
@@ -630,7 +622,7 @@ static void show_detailed_empire(char_data *ch, empire_data *e) {
 	// Score
 	msg_to_char(ch, "Score: %d, ranked #%d (", get_total_score(e), found_rank);
 	for (iter = 0, comma = FALSE; iter < NUM_SCORES; ++iter) {
-		sprinttype(iter, score_type, buf);
+		sprinttype(iter, score_type, buf, sizeof(buf), "UNDEFINED");
 		msg_to_char(ch, "%s%s %d", (comma ? ", " : ""), buf, EMPIRE_SCORE(e, iter));
 		comma = TRUE;
 	}
@@ -964,7 +956,7 @@ static void show_empire_inventory_to_char(char_data *ch, empire_data *emp, char 
 	}
 	
 	// add shipping amounts to totals
-	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
+	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
 		vnum = shipd->vnum;
 		
 		HASH_FIND_INT(list, &vnum, einv);
@@ -1706,9 +1698,7 @@ void claim_city(char_data *ch, empire_data *emp, char *argument) {
 	
 	if (found) {
 		// update the inside (interior rooms only)
-		for (iter = interior_room_list; iter; iter = next_iter) {
-			next_iter = iter->next_interior;
-			
+		DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 			home = HOME_ROOM(iter);
 			if (home != iter && ROOM_OWNER(home) == emp) {
 				claim_room(iter, emp);
@@ -2352,7 +2342,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 	char cost_arg[MAX_INPUT_LENGTH], limit_arg[MAX_INPUT_LENGTH];
 	struct empire_trade_data *trade;
 	double cost;
-	int limit;
+	int limit, number;
 	obj_vnum vnum = NOTHING;
 	obj_data *obj;
 	
@@ -2360,6 +2350,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 	argument = one_argument(argument, cost_arg);
 	argument = one_argument(argument, limit_arg);
 	skip_spaces(&argument);	// remaining arg is item name
+	number = get_number(&argument);
 	
 	// for later
 	cost = floor(atof(cost_arg) * 10.0) / 10.0;	// round to 0.1f
@@ -2381,7 +2372,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 		// max coin is a safe limit here
 		msg_to_char(ch, "That limit is out of bounds.\r\n");
 	}
-	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !GET_OBJ_STORAGE(obj))) {
+	else if (((obj = get_obj_in_list_vis(ch, argument, &number, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, &number, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !GET_OBJ_STORAGE(obj))) {
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
@@ -2417,11 +2408,14 @@ void do_import_remove(char_data *ch, empire_data *emp, char *argument, int subcm
 	struct empire_trade_data *trade, *temp;
 	obj_vnum vnum = NOTHING;
 	obj_data *obj;
+	int number;
+	
+	number = get_number(&argument);
 	
 	if (!*argument) {
 		msg_to_char(ch, "Usage: %s remove <name>\r\n", trade_type[subcmd]);
 	}
-	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && (vnum = GET_OBJ_VNUM(obj)) == NOTHING) {
+	else if (((obj = get_obj_in_list_vis(ch, argument, &number, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, &number, ROOM_CONTENTS(IN_ROOM(ch))))) && (vnum = GET_OBJ_VNUM(obj)) == NOTHING) {
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
@@ -2533,16 +2527,18 @@ void do_import_analysis(char_data *ch, empire_data *emp, char *argument, int sub
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], coin_conv[256];
 	struct empire_trade_data *trade;
 	empire_data *iter, *next_iter;
-	int haveamt, find_type = (subcmd == TRADE_IMPORT ? TRADE_EXPORT : TRADE_IMPORT);
+	int haveamt, number, find_type = (subcmd == TRADE_IMPORT ? TRADE_EXPORT : TRADE_IMPORT);
 	bool has_avail, is_buying, found = FALSE;
 	double rate;
 	obj_vnum vnum = NOTHING;
 	obj_data *obj;
 	
+	number = get_number(&argument);
+	
 	if (!*argument) {
 		msg_to_char(ch, "Usage: %s analyze <item name>\r\n", trade_type[subcmd]);
 	}
-	else if (((obj = get_obj_in_list_vis(ch, argument, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !GET_OBJ_STORAGE(obj))) {
+	else if (((obj = get_obj_in_list_vis(ch, argument, &number, ch->carrying)) || (obj = get_obj_in_list_vis(ch, argument, &number, ROOM_CONTENTS(IN_ROOM(ch))))) && ((vnum = GET_OBJ_VNUM(obj)) == NOTHING || !GET_OBJ_STORAGE(obj))) {
 		// targeting an item in room/inventory
 		act("$p can't be traded.", FALSE, ch, obj, NULL, TO_CHAR);
 	}
@@ -2779,6 +2775,7 @@ const struct manage_data_type manage_data[] = {
 	{ "no-work", "nowork", PRIV_WORKFORCE, TRUE, ROOM_AFF_NO_WORK, FALSE, 0, NOBITS, mng_nowork },
 	{ "public", "publicize", PRIV_CLAIM, TRUE, ROOM_AFF_PUBLIC, TRUE, 0, NOBITS, NULL },
 	
+	{ "hide-real-name", NULL, NOTHING, FALSE, ROOM_AFF_HIDE_REAL_NAME, FALSE, LVL_CIMPL, NOBITS, NULL },
 	{ "unclaimable", NULL, NOTHING, FALSE, ROOM_AFF_UNCLAIMABLE, TRUE, LVL_CIMPL, NOBITS, NULL },
 	
 	{ "\n", NULL, NOTHING, TRUE, NOBITS, FALSE, 0, NOBITS, NULL }	// last
@@ -2977,10 +2974,11 @@ void scan_for_tile(char_data *ch, char *argument) {
 	extern int get_map_radius(char_data *ch);
 	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
 	extern bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
+	extern const char *paint_names[];
 
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
-	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
+	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
 	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
 	room_data *map, *room;
@@ -3082,12 +3080,21 @@ void scan_for_tile(char_data *ch, char *argument) {
 						// found a vehicle match but limit what we show
 						if (VEH_FLAGGED(veh, VEH_BUILDING)) {
 							if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
-								get_informative_vehicle_string(ch, veh, temp);
-								if (*temp) {
-									vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s [%s]", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)), temp);
+								if (VEH_PAINT_COLOR(veh)) {
+									sprinttype(VEH_PAINT_COLOR(veh), paint_names, paint_str, sizeof(paint_str), "painted");
+									*paint_str = LOWER(*paint_str);
+									strcat(paint_str, " ");
 								}
 								else {
-									vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s", *veh_string ? ", " : "", skip_filler(VEH_SHORT_DESC(veh)));
+									*paint_str = '\0';
+								}
+								
+								get_informative_vehicle_string(ch, veh, temp);
+								if (*temp) {
+									vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s [%s]", *veh_string ? ", " : "", paint_str, skip_filler(VEH_SHORT_DESC(veh)), temp);
+								}
+								else {
+									vsize += snprintf(veh_string + vsize, sizeof(veh_string) - vsize, "%s%s%s", *veh_string ? ", " : "", paint_str, skip_filler(VEH_SHORT_DESC(veh)));
 								}
 							}
 							else if (!VEH_OWNER(veh) || VEH_CLAIMS_WITH_ROOM(veh) || !PRF_FLAGGED(ch, PRF_POLITICAL)) {
@@ -3383,7 +3390,7 @@ ACMD(do_abandon) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to abandon.\r\n");
 	}
-	else if (*arg && !confirm_arg_1 && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (*arg && !confirm_arg_1 && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		do_abandon_vehicle(ch, veh, confirm);
 	}
 	else if (*arg && !confirm_arg_1 && !(room = find_target_room(ch, arg))) {
@@ -3434,7 +3441,7 @@ ACMD(do_barde) {
 		msg_to_char(ch, "You don't have permission to barde animals here.\r\n");
 	else if (!*arg)
 		msg_to_char(ch, "Which animal would you like to barde?\r\n");
-	else if (!(mob = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (!IS_NPC(mob)) {
 		act("You can't barde $N!", FALSE, ch, 0, mob, TO_CHAR);
@@ -3584,9 +3591,7 @@ ACMD(do_cede) {
 		
 		// mark as ceded
 		set_room_extra_data(room, ROOM_EXTRA_CEDED, 1);
-		for (iter = interior_room_list; iter; iter = next_iter) {
-			next_iter = iter->next_interior;
-			
+		DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 			if (HOME_ROOM(iter) == room) {
 				set_room_extra_data(iter, ROOM_EXTRA_CEDED, 1);
 			}
@@ -3781,7 +3786,7 @@ ACMD(do_claim) {
 	
 	// look for optional empire
 	if (imm_access && *argument) {
-		if (!get_vehicle_in_room_vis(ch, arg) && (emp = get_empire_by_name(argument))) {
+		if (!get_vehicle_in_room_vis(ch, arg, NULL) && (emp = get_empire_by_name(argument))) {
 			// found empire; used full arg; clear out args
 			*arg = '\0';
 		}
@@ -3810,7 +3815,7 @@ ACMD(do_claim) {
 		// could probably now use has_permission
 		msg_to_char(ch, "You don't have permission to claim for the empire.\r\n");
 	}
-	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		do_claim_vehicle(ch, veh, emp);
 	}
 	else if (*arg) {
@@ -5480,8 +5485,7 @@ ACMD(do_home) {
 			COMPLEX_DATA(real)->private_owner = GET_IDNUM(ch);
 
 			// interior only
-			for (iter = interior_room_list; iter; iter = next_iter) {
-				next_iter = iter->next_interior;
+			DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 				if (HOME_ROOM(iter) != real) {
 					continue;	// this is not the room you're looking for
 				}
@@ -5859,7 +5863,7 @@ ACMD(do_inspire) {
 		}
 		msg_to_char(ch, "\r\n");
 	}
-	else if (!all && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!all && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!emp) {
@@ -6007,7 +6011,7 @@ ACMD(do_manage) {
 	skip_spaces(&argument);
 	
 	// shortcut: manage <vehicle> ...
-	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		do_manage_vehicle(ch, veh, argument);
 		return;
 	}

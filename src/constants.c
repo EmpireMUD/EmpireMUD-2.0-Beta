@@ -1357,7 +1357,7 @@ const char *genders[] = {
 };
 
 
-/* POS_x */
+/* POS_x (1/2) */
 const char *position_types[] = {
 	"Dead",
 	"Mortally wounded",
@@ -1368,6 +1368,21 @@ const char *position_types[] = {
 	"Sitting",
 	"Fighting",
 	"Standing",
+	"\n"
+};
+
+
+// POS_x (2/2): command to reach that state
+const char *position_commands[] = {
+	"",	// "Dead",
+	"",	// "Mortally wounded",
+	"",	// "Incapacitated",
+	"",	// "Stunned",
+	"sleep",
+	"rest",
+	"sit",
+	"",	// "Fighting",
+	"stand",
 	"\n"
 };
 
@@ -1620,7 +1635,7 @@ const char *craft_flags[] = {
 	"IN-CITY-ONLY",
 	"VEHICLE",
 	"*",	// formerly shipyard (now uses a function)
-	"BLD-UPGRADED",
+	"*",	// formerly bld-upgraded (now uses a function)
 	"LEARNED",
 	"BY-RIVER",
 	"REMOVE-PRODUCTION",
@@ -2872,7 +2887,7 @@ const bitvector_t bld_on_flags_order[] = {
 };
 
 
-// BLD_x -- feel free to re-use the * flags, as they should no longer appear on anything
+// BLD_x: building flags -- * flags are removed flags
 const char *bld_flags[] = {
 	"ROOM",	// 0
 	"ALLOW-MOUNTS",
@@ -2920,7 +2935,7 @@ const char *bld_flags[] = {
 	"LOOK-OUT",
 	"2ND-TERRITORY",
 	"*",	// 45
-	"UPGRADED",
+	"*",
 	"*",
 	"\n"
 };
@@ -2928,18 +2943,20 @@ const char *bld_flags[] = {
 
 // BLD_REL_x (1/2): relationships with other buildings
 const char *bld_relationship_types[] = {
-	"UPGRADES-TO",
+	"UPGRADES-TO-BLD",
 	"STORES-LIKE-BLD",
 	"STORES-LIKE-VEH",
+	"UPGRADES-TO-VEH",
 	"\n"
 };
 
 
 // BLD_REL_x (2/2): vnum types
 const int bld_relationship_vnum_types[] = {
-	TYPE_BLD,	// "UPGRADES-TO",
+	TYPE_BLD,	// "UPGRADES-TO-BLD",
 	TYPE_BLD,	// "STORES-LIKE-BLD",
 	TYPE_VEH,	// "STORES-LIKE-VEH",
+	TYPE_VEH,	// "UPGRADES-TO-VEH",
 };
 
 
@@ -3133,7 +3150,7 @@ bool evo_is_over_time[] = {
 // FNC_x (1/2): function flags (for buildings)
 const char *function_flags[] = {
 	"ALCHEMIST",	// 0
-	"*",
+	"UPGRADED",
 	"BATHS",
 	"BEDROOM",
 	"CARPENTER",
@@ -3178,7 +3195,7 @@ const char *function_flags[] = {
 // FNC_x (2/2): explainers, usually shown as "You must be %s to craft that."
 const char *function_flags_long[] = {
 	"at an alchemist",	// 0
-	"",
+	"an upgraded building",
 	"at the baths",
 	"in a bedroom",
 	"at a carpenter",
@@ -3404,6 +3421,7 @@ const char *room_aff_bits[] = {
 	"REPEL-NPCS",	// 20
 	"REPEL-ANIMALS",
 	"NO-WORKFORCE-EVOS",
+	"*HIDE-REAL-NAME",
 	"\n"
 };
 
@@ -3421,8 +3439,8 @@ const char *room_extra_types[] = {
 	"chop progress",
 	"trench progress",
 	"harvest progress",	// 10
-	"garden workforce progress",
-	"quarry workforce progress",
+	"paint color",
+	"dedicate id",
 	"build recipe",
 	"found time",
 	"redesignate time",	// 15
@@ -4378,6 +4396,10 @@ const char *vehicle_flags[] = {
 	"CHAMELEON",
 	"INTERLINK",
 	"IS-RUINS",
+	"SLEEP",	// 30
+	"!PAINT",
+	"*BRIGHT-PAINT",
+	"DEDICATE",
 	"\n"
 };
 
@@ -4414,6 +4436,10 @@ const char *identify_vehicle_flags[] = {
 	"chameleon",
 	"can interlink",
 	"is ruined",
+	"",	// "SLEEP", (special handling)	// 30
+	"",	// no-paint
+	"",	// bright-paint
+	"can dedicate",
 	"\n"
 };
 

@@ -945,21 +945,35 @@ bool affected_by_spell(char_data *ch, any_vnum type) {
 
 
 /**
-* Matches both an ATYPE_ and an APPLY_ on an effect.
+* Matches both an ATYPE_ and an APPLY_ and/or AFF_ on an effect.
 *
 * @param char_data *ch The character to check
 * @param any_vnum type the ATYPE_ const/vnum
-* @param int apply the APPLY_ flag
+* @param int apply the APPLY_ flag, if any (NOTHING to check only aff_flag instead)
+* @param bitvector_t aff_flag the AFF_ flag, if any (NOBITS to check only apply instead)
 * @return bool TRUE if an effect matches both conditions
 */
-bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply) {
+bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply, bitvector_t aff_flag) {
 	struct affected_type *hjp;
 	bool found = FALSE;
+	
+	if (apply == NOTHING && aff_flag == NOBITS) {
+		return FALSE;	// nothing to look for
+	}
 
 	for (hjp = ch->affected; hjp && !found; hjp = hjp->next) {
-		if (hjp->type == type && hjp->location == apply) {
-			found = TRUE;
+		if (hjp->type != type) {
+			continue;
 		}
+		if (apply != NOTHING && hjp->location != apply) {
+			continue;
+		}
+		if (aff_flag && !IS_SET(hjp->bitvector, aff_flag)) {
+			continue;
+		}
+		
+		found = TRUE;
+		break;
 	}
 
 	return found;
@@ -1645,7 +1659,7 @@ char_data *find_closest_char(char_data *ch, char *arg, bool pc_only) {
 	char_data *vict, *best = NULL;
 	int dist, best_dist = MAP_SIZE;
 	
-	if ((vict = get_char_room_vis(ch, arg)) && (!pc_only || !IS_NPC(vict))) {
+	if ((vict = get_char_room_vis(ch, arg, NULL)) && (!pc_only || !IS_NPC(vict))) {
 		return vict;
 	}
 	
@@ -1750,37 +1764,39 @@ char_data *get_char_room(char *name, room_data *room) {
 *
 * @param char_data *ch The person who's looking.
 * @param char *name The target argument.
+* @param int *number Optional: For multi-list number targeting (look 4.bob; may be NULL)
 * @return char_data *A matching character in the room, or NULL.
 */
-char_data *get_char_room_vis(char_data *ch, char *name) {
-	char_data *i, *found = NULL;
-	int j = 0, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
-
+char_data *get_char_room_vis(char_data *ch, char *name, int *number) {
+	char copy[MAX_INPUT_LENGTH], *tmp = copy;
+	char_data *i;
+	int num;
+	
 	/* JE 7/18/94 :-) :-) */
 	if (!str_cmp(name, "self") || !str_cmp(name, "me"))
 		return (ch);
-
-	/* 0.<name> means PC with name */
-	strcpy(tmp, name);
-	if ((number = get_number(&tmp)) == 0) {
+	
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {	// 0.name means PC
 		return get_player_vis(ch, tmp, FIND_CHAR_ROOM);
 	}
 	
 	DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(ch)), i, next_in_room) {
-		if (j > number) {
-			break;
-		}
-		else if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && match_char_name(ch, i, tmp, MATCH_IN_ROOM)) {
-			if (++j == number) {
-				found = i;
-				break;
+		if (CAN_SEE(ch, i) && WIZHIDE_OK(ch, i) && !AFF_FLAGGED(i, AFF_NO_TARGET_IN_ROOM) && match_char_name(ch, i, tmp, MATCH_IN_ROOM)) {
+			if (--(*number) == 0) {
+				return i;
 			}
 		}
 	}
 
-	return found;
+	return NULL;
 }
 
 
@@ -1789,26 +1805,33 @@ char_data *get_char_room_vis(char_data *ch, char *name) {
 *
 * @param char_data *ch The person who's looking.
 * @param char *name The target argument.
+* @param int *number Optional: For multi-list number targeting (look 4.bob; may be NULL)
 * @param bitvector_t where Any FIND_x flags.
 * @return char_data *The found character, or NULL.
 */
-char_data *get_char_vis(char_data *ch, char *name, bitvector_t where) {
-	char_data *i, *found = NULL;
-	int j = 0, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
-
+char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t where) {
+	char copy[MAX_INPUT_LENGTH], *tmp = copy;
+	char_data *i;
+	int num;
+	
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return get_player_vis(ch, tmp, where);
+	}
+	
 	/* check the room first */
 	if (IS_SET(where, FIND_CHAR_ROOM))
-		return get_char_room_vis(ch, name);
+		return get_char_room_vis(ch, tmp, number);
 	else if (IS_SET(where, FIND_CHAR_WORLD)) {
-		if ((i = get_char_room_vis(ch, name)) != NULL) {
+		if ((i = get_char_room_vis(ch, tmp, number)) != NULL) {
 			return (i);
-		}
-
-		strcpy(tmp, name);
-		if ((number = get_number(&tmp)) == 0) {
-			return get_player_vis(ch, tmp, where);
 		}
 		
 		DL_FOREACH(character_list, i) {
@@ -1820,17 +1843,13 @@ char_data *get_char_vis(char_data *ch, char *name, bitvector_t where) {
 			}
 			
 			// found
-			if (++j == number) {
-				found = i;
-				break;	// done
-			}
-			else if (j > number) {
-				break;	// somehow
+			if (--(*number) == 0) {
+				return i;
 			}
 		}
 	}
 
-	return found;
+	return NULL;
 }
 
 
@@ -1875,32 +1894,36 @@ char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags) {
 * requiring visibility.
 *
 * @param char *name The name of the target.
+* @param int *number Optional: For multi-list number targeting (look 4.bob; may be NULL)
 * @return char_data *the found character, or NULL
 */
-char_data *get_char_world(char *name) {
+char_data *get_char_world(char *name, int *number) {
 	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
-	int number, pos = 0;
 	bool pc_only = FALSE;
-	char_data *ch, *found = NULL;
+	char_data *ch;
+	int num;
 	
-	strcpy(tmp, name);
-	if ((number = get_number(&tmp)) == 0) {
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
 		pc_only = TRUE;
 	}
 	
 	DL_FOREACH(character_list, ch) {
 		if ((!IS_NPC(ch) || !pc_only) && match_char_name(NULL, ch, tmp, MATCH_GLOBAL)) {
-			if (++pos == number || pc_only) {	// pc_only messes up pos
-				found = ch;
-				break;	// done
-			}
-			else if (pos > number) {
-				break;	// somehow
+			if (--(*number) == 0 || pc_only) {	// pc_only messes up pos
+				return ch;	// done
 			}
 		}
 	}
 
-	return found;
+	return NULL;
 }
 
 
@@ -2739,7 +2762,7 @@ void abandon_room(room_data *room) {
 	}
 	
 	// inside
-	LL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
+	DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 		if (iter != home && HOME_ROOM(iter) == home) {
 			perform_abandon_room(iter);
 		}
@@ -2766,7 +2789,7 @@ void claim_room(room_data *room, empire_data *emp) {
 	
 	perform_claim_room(home, emp);
 	
-	LL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
+	DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 		if (iter != home && HOME_ROOM(iter) == home) {
 			perform_claim_room(iter, emp);
 		}
@@ -7003,36 +7026,11 @@ obj_data *get_obj_by_char_share(char_data *ch, char *arg) {
 	char_data *targ;
 	
 	// find person by name
-	if (!(targ = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	if (!(targ = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		return NULL;
 	}
 	
 	return GET_EQ(targ, WEAR_SHARE);
-}
-
-
-/**
-* Finds a matching object in a character's equipment.
-*
-* @param char_data *ch The person who is looking...
-* @param char *arg The typed-in arg.
-* @param obj_data *equipment[] The character's EQ array.
-* @return obj_data *The found object if any match, or NULL.
-*/
-obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]) {
-	int j, num;
-
-	num = get_number(&arg);
-
-	if (num == 0)
-		return (NULL);
-
-	for (j = 0; j < NUM_WEARS; j++)
-		if (equipment[j] && CAN_SEE_OBJ(ch, equipment[j]) && isname(arg, equipment[j]->name))
-			if (--num == 0)
-				return (equipment[j]);
-
-	return (NULL);
 }
 
 
@@ -7081,35 +7079,36 @@ obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list) {
 *
 * @param char_data *ch The person who's looking.
 * @param char *name The target argument.
+* @param int *number Optional: For multi-list number targeting (look 4.hat; may be NULL)
 * @param obj_data *list The list to search.
 * @return obj_data *The item found, or NULL.
 */
-obj_data *get_obj_in_list_vis(char_data *ch, char *name, obj_data *list) {	
-	obj_data *i, *found = NULL;
-	int j = 0, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
-
-	strcpy(tmp, name);
+obj_data *get_obj_in_list_vis(char_data *ch, char *name, int *number, obj_data *list) {
+	char copy[MAX_INPUT_LENGTH], *tmp = copy;
+	obj_data *i;
+	int num;
 	
-	// 0.x does not target items
-	if ((number = get_number(&tmp)) == 0) {
-		return (NULL);
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
 	}
 	
 	DL_FOREACH2(list, i, next_content) {
-		if (j > number) {
-			break;	// done
-		}
-		else if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
-			if (++j == number) {
-				found = i;
-				break;
+		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
+			if (--(*number) == 0) {
+				return i;
 			}
 		}
 	}
 
-	return found;
+	return NULL;
 }
 
 
@@ -7121,29 +7120,37 @@ obj_data *get_obj_in_list_vis(char_data *ch, char *name, obj_data *list) {
 *
 * @param char_data *ch The person who's looking.
 * @param char *name The target argument.
+* @param int *number Optional: For multi-list number targeting (look 4.hat; may be NULL)
 * @param obj_data *list The list to search.
 * @return int interact_type Any INTERACT_ to prefer on a matching object.
 * @return obj_data *The item found, or NULL. May or may not have the interaction.
 */
-obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, obj_data *list, int interact_type) {
+obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, int *number, obj_data *list, int interact_type) {
+	char copy[MAX_INPUT_LENGTH], *tmp = copy;
 	obj_data *i, *backup = NULL;
-	int j = 0, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
+	int num;
 	bool gave_num;
-
-	strcpy(tmp, name);
-	gave_num = isdigit(*name) ? TRUE : FALSE;
 	
-	// 0.x does not target items
-	if ((number = get_number(&tmp)) == 0) {
-		return (NULL);
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
 	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
+	}
+	
+	// if the number is > 1 (PROBABLY requested #.name) take any item that matches
+	// note: this changed in b5.108; previously it could detect this more accurately
+	gave_num = (*number > 1);
 	
 	DL_FOREACH2(list, i, next_content) {
 		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
 			if (gave_num) {
-				if (++j == number) {
+				if (--(*number) == 0) {
 					return i;
 				}
 			}
@@ -7170,29 +7177,37 @@ obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, obj_
 *
 * @param char_data *ch The person who's looking.
 * @param char *name The target argument.
+* @param int *number Optional: For multi-list number targeting (look 4.hat; may be NULL)
 * @param obj_data *list The list to search.
 * @return int obj_type Any ITEM_ to prefer on a matching object.
 * @return obj_data *The item found, or NULL. May or may not have the type.
 */
-obj_data *get_obj_in_list_vis_prefer_type(char_data *ch, char *name, obj_data *list, int obj_type) {
+obj_data *get_obj_in_list_vis_prefer_type(char_data *ch, char *name, int *number, obj_data *list, int obj_type) {
+	char copy[MAX_INPUT_LENGTH], *tmp = copy;
 	obj_data *i, *backup = NULL;
-	int j = 0, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
+	int num;
 	bool gave_num;
-
-	strcpy(tmp, name);
-	gave_num = isdigit(*name) ? TRUE : FALSE;
 	
-	// 0.x does not target items
-	if ((number = get_number(&tmp)) == 0) {
-		return (NULL);
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
 	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
+	}
+	
+	// if the number is > 1 (PROBABLY requested #.name) take any item that matches
+	// note: this changed in b5.108; previously it could detect this more accurately
+	gave_num = (*number > 1);
 	
 	DL_FOREACH2(list, i, next_content) {
 		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
 			if (gave_num) {
-				if (++j == number) {
+				if (--(*number) == 0) {
 					return i;
 				}
 			}
@@ -7216,20 +7231,29 @@ obj_data *get_obj_in_list_vis_prefer_type(char_data *ch, char *name, obj_data *l
 *
 * @param char_data *ch The person who's looking.
 * @param char *arg The typed argument (item name).
+* @param int *number Optional: For multi-list number targeting (look 4.cart; may be NULL)
 * @param obj_data *equipment[] The character's gear array.
 * @return int The WEAR_ position, or NO_WEAR if no match was found.
 */
-int get_obj_pos_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[]) {
+int get_obj_pos_in_equip_vis(char_data *ch, char *arg, int *number, obj_data *equipment[]) {
+	char copy[MAX_INPUT_LENGTH], *tmp = copy;
 	int j, num;
 
-	num = get_number(&arg);
-
-	if (num == 0)
+	if (!number) {
+		strcpy(tmp, arg);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = arg;
+	}
+	if (*number == 0) {
 		return NO_WEAR;
+	}
 
 	for (j = 0; j < NUM_WEARS; j++)
 		if (equipment[j] && CAN_SEE_OBJ(ch, equipment[j]) && isname(arg, equipment[j]->name))
-			if (--(num) == 0)
+			if (--(*number) == 0)
 				return (j);
 
 	return NO_WEAR;
@@ -7267,40 +7291,44 @@ obj_vnum get_obj_vnum_by_name(char *name, bool storable_only) {
 *
 * @param char_data *ch The person who is looking for an item.
 * @param char *name The target argument.
+* @param int *number Optional: For multi-list number targeting (look 4.hat; may be NULL)
 * @return obj_data *The found item, or NULL.
 */
-obj_data *get_obj_vis(char_data *ch, char *name) {
-	obj_data *i, *found = NULL;
-	int j = 0, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
-
+obj_data *get_obj_vis(char_data *ch, char *name, int *number) {
+	char copy[MAX_INPUT_LENGTH], *tmp = copy;
+	obj_data *i;
+	int num;
+	
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
+	}
+	
 	/* scan items carried */
-	if ((i = get_obj_in_list_vis(ch, name, ch->carrying)) != NULL)
+	if ((i = get_obj_in_list_vis(ch, tmp, number, ch->carrying)) != NULL)
 		return (i);
-
+	
 	/* scan room */
-	if ((i = get_obj_in_list_vis(ch, name, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL)
+	if ((i = get_obj_in_list_vis(ch, tmp, number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL)
 		return (i);
-
-	strcpy(tmp, name);
-	if ((number = get_number(&tmp)) == 0)
-		return (NULL);
-
+	
 	/* ok.. no luck yet. scan the entire obj list   */
 	DL_FOREACH(object_list, i) {
 		if (CAN_SEE_OBJ(ch, i) && MATCH_ITEM_NAME(tmp, i)) {
-			if (++j == number) {
-				found = i;
-				break;
-			}
-			else if (j > number) {
-				break;	// somehow
+			if (--(*number) == 0) {
+				return i;
 			}
 		}
 	}
 
-	return found;
+	return NULL;
 }
 
 
@@ -7310,20 +7338,40 @@ obj_data *get_obj_vis(char_data *ch, char *name) {
 *
 * @param char_data *ch The person who's looking for an item.
 * @param char *arg The target argument.
+* @param int *number Optional: For multi-list number targeting (look 4.hat; may be NULL)
 * @param obj_data *equipment[] A pointer to an equipment array.
 * @param int *pos A variable to store the WEAR_ const if an item is found.
 * @return obj_data *The found object, or NULL.
 */
-obj_data *get_object_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[], int *pos) {
+obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, int *number, obj_data *equipment[], int *pos) {
+	char copy[MAX_INPUT_LENGTH], *tmp = copy;
 	obj_data *found = NULL;
-	int iter;
+	int iter, num;
 	
-	*pos = NOTHING;
+	if (pos) {
+		*pos = NOTHING;
+	}
+	
+	if (!number) {
+		strcpy(tmp, arg);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = arg;
+	}
+	if (*number == 0) {
+		return NULL;
+	}
 	
 	for (iter = 0; iter < NUM_WEARS && !found; ++iter) {
-		if (equipment[iter] && CAN_SEE_OBJ(ch, equipment[iter]) && MATCH_ITEM_NAME(arg, equipment[iter])) {
-			found = equipment[iter];
-			*pos = iter;
+		if (equipment[iter] && CAN_SEE_OBJ(ch, equipment[iter]) && MATCH_ITEM_NAME(tmp, equipment[iter])) {
+			if (--(*number) == 0) {
+				found = equipment[iter];
+				if (pos) {
+					*pos = iter;
+				}
+			}
 		}
 	}
 
@@ -7336,31 +7384,35 @@ obj_data *get_object_in_equip_vis(char_data *ch, char *arg, obj_data *equipment[
 * regard to visibility.
 *
 * @param char *name The target argument.
+* @param int *number Optional: For multi-list number targeting (look 4.cart; may be NULL)
 * @return obj_data *The found item, or NULL.
 */
-obj_data *get_obj_world(char *name) {
-	obj_data *i, *found = NULL;
-	int j = 0, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
-
-	strcpy(tmp, name);
-	if ((number = get_number(&tmp)) == 0)
-		return (NULL);
+obj_data *get_obj_world(char *name, int *number) {
+	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
+	obj_data *i;
+	int num;
+	
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
+	}
 	
 	DL_FOREACH(object_list, i) {
 		if (MATCH_ITEM_NAME(tmp, i)) {
-			if (++j == number) {
-				found = i;
-				break;
-			}
-			else if (j > number) {
-				break;	// somehow
+			if (--(*number) == 0) {
+				return i;
 			}
 		}
 	}
 
-	return found;
+	return NULL;
 }
 
 
@@ -8755,13 +8807,15 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 	vehicle_data *target_veh;
 	char_data *target_mob;
 	obj_data *target_obj;
-	char roomstr[MAX_INPUT_LENGTH];
-	int x, y;
+	char roomstr[MAX_INPUT_LENGTH], *tmpstr;
+	int x, y, number;
 	char *srch;
 
 	// we may modify it as we go
 	skip_spaces(&rawroomstr);
 	strcpy(roomstr, rawroomstr);
+	tmpstr = roomstr;
+	number = get_number(&tmpstr);
 
 	if (!*roomstr) {
 		if (ch) {
@@ -8769,29 +8823,29 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 		}
    		location = NULL;
 	}
-	else if (*roomstr == UID_CHAR) {
+	else if (*tmpstr == UID_CHAR) {
 		// maybe
-		location = find_room(atoi(roomstr + 1));
+		location = find_room(atoi(tmpstr + 1));
 		
-		if (!location && (target_mob = get_char(roomstr))) {
+		if (!location && (target_mob = get_char(tmpstr))) {
 			location = IN_ROOM(target_mob);
 		}
-		if (!location && (target_veh = get_vehicle(roomstr))) {
+		if (!location && (target_veh = get_vehicle(tmpstr))) {
 			location = IN_ROOM(target_veh);
 		}
-		if (!location && (target_obj = get_obj(roomstr))) {
+		if (!location && (target_obj = get_obj(tmpstr))) {
 			location = obj_room(target_obj);
 		}
 	}
-	else if (*roomstr == 'i' && isdigit(*(roomstr+1)) && ch && IS_NPC(ch) && (inst = real_instance(MOB_INSTANCE_ID(ch))) != NULL) {
+	else if (*tmpstr == 'i' && isdigit(*(tmpstr+1)) && ch && IS_NPC(ch) && (inst = real_instance(MOB_INSTANCE_ID(ch))) != NULL) {
 		// find room in instance by template vnum
-		location = find_room_template_in_instance(inst, atoi(roomstr+1));
+		location = find_room_template_in_instance(inst, atoi(tmpstr+1));
 	}
-	else if (isdigit(*roomstr) && (srch = strchr(roomstr, ','))) {
+	else if (isdigit(*tmpstr) && (srch = strchr(tmpstr, ','))) {
 		// coords
 		*(srch++) = '\0';
 		skip_spaces(&srch);
-		x = atoi(roomstr);
+		x = atoi(tmpstr);
 		y = atoi(srch);
 		if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
 			location = real_room((y * MAP_WIDTH) + x);
@@ -8803,13 +8857,13 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 			location = NULL;
 		}
 	}
-	else if (isdigit(*roomstr) && !strchr(roomstr, '.')) {
-		tmp = atoi(roomstr);
+	else if (isdigit(*tmpstr) && !strchr(tmpstr, '.')) {
+		tmp = atoi(tmpstr);
 		if (!(location = real_room(tmp)) && ch) {
 			send_to_char("No room exists with that number.\r\n", ch);
 		}
 	}
-	else if (ch && (target_mob = get_char_vis(ch, roomstr, FIND_CHAR_WORLD)) != NULL) {
+	else if (ch && (target_mob = get_char_vis(ch, tmpstr, &number, FIND_CHAR_WORLD)) != NULL) {
 		if (WIZHIDE_OK(ch, target_mob)) {
 			location = IN_ROOM(target_mob);
 		}
@@ -8817,10 +8871,10 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 			msg_to_char(ch, "That person is not available.\r\n");
 		}
 	}
-	else if (!ch && (target_mob = get_char_world(roomstr)) != NULL) {
+	else if (!ch && (target_mob = get_char_world(tmpstr, &number)) != NULL) {
 		location = IN_ROOM(target_mob);
 	}
-	else if ((ch && (target_veh = get_vehicle_vis(ch, roomstr))) || (!ch && (target_veh = get_vehicle_world(roomstr)))) {
+	else if ((ch && (target_veh = get_vehicle_vis(ch, tmpstr, &number))) || (!ch && (target_veh = get_vehicle_world(tmpstr, &number)))) {
 		if (IN_ROOM(target_veh)) {
 			location = IN_ROOM(target_veh);
 		}
@@ -8831,7 +8885,7 @@ room_data *find_target_room(char_data *ch, char *rawroomstr) {
 			location = NULL;
 		}
 	}
-	else if ((ch && (target_obj = get_obj_vis(ch, roomstr)) != NULL) || (!ch && (target_obj = get_obj_world(roomstr)) != NULL)) {
+	else if ((ch && (target_obj = get_obj_vis(ch, tmpstr, &number)) != NULL) || (!ch && (target_obj = get_obj_world(tmpstr, &number)) != NULL)) {
 		if (IN_ROOM(target_obj))
 			location = IN_ROOM(target_obj);
 		else {
@@ -8886,6 +8940,7 @@ room_data *parse_room_from_coords(char *string) {
 		// no parens: point to whole string
 		ptr = copy;
 	}
+	skip_spaces(&ptr);
 	
 	// ptr is the start of possible coords
 	if (isdigit(*ptr) && (srch = strchr(ptr, ','))) {
@@ -9379,7 +9434,7 @@ int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_secondary
 	}
 	
 	if (count_secondary) {
-		for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
 			if (shipd->vnum == vnum) {
 				SAFE_ADD(count, shipd->amount, 0, INT_MAX, FALSE);
 			}
@@ -9437,6 +9492,9 @@ bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool 
 		
 		// vehicles in room
 		DL_FOREACH2(ROOM_VEHICLES(loc), veh, next_in_room) {
+			if (!VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+				continue;	// incomplete or on fire
+			}
 			if (by_emp && VEH_OWNER(veh) && by_emp != VEH_OWNER(veh) && (!emp_can_use_vehicle(by_emp, veh, GUESTS_ALLOWED) || !has_relationship(by_emp, VEH_OWNER(veh), DIPL_TRADE))) {
 				continue;	// no permission for veh
 			}
@@ -9845,33 +9903,48 @@ int find_all_dots(char *arg) {
  * like the one_argument routine), but now it returns an integer that
  * describes what it filled in.
  */
-int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh) {
-	int i, found;
-	char name[256];
-
-	*tar_ch = NULL;
-	*tar_obj = NULL;
-	*tar_veh = NULL;
+bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh) {
+	char name[MAX_INPUT_LENGTH], *name_ptr = name;
+	int i, found, number;
+	bitvector_t npc_only = (bitvector & FIND_NPC_ONLY);
+	
+	if (tar_ch) {
+		*tar_ch = NULL;
+	}
+	if (tar_obj) {
+		*tar_obj = NULL;
+	}
+	if (tar_veh) {
+		*tar_veh = NULL;
+	}
 
 	one_argument(arg, name);
 
-	if (!*name) {
+	if (!*name_ptr) {
+		return (0);
+	}
+	if (!(number = get_number(&name_ptr))) {
 		return (0);
 	}
 
-	if (IS_SET(bitvector, FIND_CHAR_ROOM)) {	/* Find person in room */
-		if ((*tar_ch = get_char_vis(ch, name, FIND_CHAR_ROOM)) != NULL) {
+	if (IS_SET(bitvector, FIND_CHAR_ROOM) && tar_ch) {	/* Find person in room */
+		if ((*tar_ch = get_char_vis(ch, name_ptr, &number, FIND_CHAR_ROOM | npc_only)) != NULL) {
 			return (FIND_CHAR_ROOM);
 		}
 	}
-	if (IS_SET(bitvector, FIND_CHAR_WORLD)) {
-		if ((*tar_ch = get_char_vis(ch, name, FIND_CHAR_WORLD)) != NULL) {
+	if (IS_SET(bitvector, FIND_VEHICLE_ROOM) && tar_veh) {
+		if ((*tar_veh = get_vehicle_in_room_vis(ch, name_ptr, &number)) != NULL) {
+			return (FIND_VEHICLE_ROOM);
+		}
+	}
+	if (IS_SET(bitvector, FIND_CHAR_WORLD) && tar_ch) {
+		if ((*tar_ch = get_char_vis(ch, name_ptr, &number, FIND_CHAR_WORLD | npc_only)) != NULL) {
 			return (FIND_CHAR_WORLD);
 		}
 	}
-	if (IS_SET(bitvector, FIND_OBJ_EQUIP)) {
+	if (IS_SET(bitvector, FIND_OBJ_EQUIP) && tar_obj) {
 		for (found = FALSE, i = 0; i < NUM_WEARS && !found; i++) {
-			if (GET_EQ(ch, i) && isname(name, GET_OBJ_KEYWORDS(GET_EQ(ch, i)))) {
+			if (GET_EQ(ch, i) && isname(name_ptr, GET_OBJ_KEYWORDS(GET_EQ(ch, i))) && --number == 0) {
 				*tar_obj = GET_EQ(ch, i);
 				found = TRUE;
 			}
@@ -9880,29 +9953,29 @@ int generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **ta
 			return (FIND_OBJ_EQUIP);
 		}
 	}
-	if (IS_SET(bitvector, FIND_OBJ_INV)) {
-		if ((*tar_obj = get_obj_in_list_vis(ch, name, ch->carrying)) != NULL) {
+	if (IS_SET(bitvector, FIND_OBJ_INV) && tar_obj) {
+		if ((*tar_obj = get_obj_in_list_vis(ch, name_ptr, &number, ch->carrying)) != NULL) {
 			return (FIND_OBJ_INV);
 		}
 	}
-	if (IS_SET(bitvector, FIND_VEHICLE_ROOM)) {
-		if ((*tar_veh = get_vehicle_in_room_vis(ch, name)) != NULL) {
-			return (FIND_VEHICLE_ROOM);
-		}
-	}
-	if (IS_SET(bitvector, FIND_VEHICLE_INSIDE)) {
-		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(name, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch))))) {
+	if (IS_SET(bitvector, FIND_VEHICLE_INSIDE) && tar_veh) {
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch)) && isname(name_ptr, VEH_KEYWORDS(GET_ROOM_VEHICLE(IN_ROOM(ch)))) && --number == 0) {
 			*tar_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
 			return (FIND_VEHICLE_INSIDE);
 		}
 	}
-	if (IS_SET(bitvector, FIND_OBJ_ROOM)) {
-		if ((*tar_obj = get_obj_in_list_vis(ch, name, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
+	if (IS_SET(bitvector, FIND_VEHICLE_WORLD) && tar_veh) {
+		if ((*tar_veh = get_vehicle_world_vis(ch, name_ptr, &number)) != NULL) {
+			return (FIND_VEHICLE_WORLD);
+		}
+	}
+	if (IS_SET(bitvector, FIND_OBJ_ROOM) && tar_obj) {
+		if ((*tar_obj = get_obj_in_list_vis(ch, name_ptr, &number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
 			return (FIND_OBJ_ROOM);
 		}
 	}
-	if (IS_SET(bitvector, FIND_OBJ_WORLD)) {
-		if ((*tar_obj = get_obj_vis(ch, name))) {
+	if (IS_SET(bitvector, FIND_OBJ_WORLD) && tar_obj) {
+		if ((*tar_obj = get_obj_vis(ch, name_ptr, &number))) {
 			return (FIND_OBJ_WORLD);
 		}
 	}
@@ -10087,21 +10160,26 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 * Finds a vehicle the char can see in the room.
 *
 * @param char_data *ch The person who's looking.
+* @pararm room_data *room Which room to look for a vehicle in.
 * @param char *name The target argument.
-* @parma room_data *room Which room to look for a vehicle in.
+* @param int *number Optional: For multi-list number targeting (look 4.cart; may be NULL)
 * @return vehicle_data* The vehicle found, or NULL.
 */
-vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, char *name) {
-	int found = 0, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
+vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, char *name, int *number) {
+	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
 	vehicle_data *iter;
-
-	strcpy(tmp, name);
+	int num;
 	
-	// 0.x does not target vehicles
-	if ((number = get_number(&tmp)) == 0) {
-		return (NULL);
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
 	}
 	
 	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
@@ -10113,7 +10191,7 @@ vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, cha
 		}
 		
 		// found: check number
-		if (++found == number) {
+		if (--(*number) == 0) {
 			return iter;
 		}
 	}
@@ -10127,24 +10205,29 @@ vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, cha
 *
 * @param char_data *ch The person looking.
 * @param char *name The string they typed.
+* @param int *number Optional: For multi-list number targeting (look 4.cart; may be NULL)
 * @return vehicle_data* The vehicle found, or NULL.
 */
-vehicle_data *get_vehicle_vis(char_data *ch, char *name) {
-	int found = 0, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
+vehicle_data *get_vehicle_vis(char_data *ch, char *name, int *number) {
+	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
 	vehicle_data *iter;
+	int num;
 	
 	// prefer match in same room
-	if ((iter = get_vehicle_in_room_vis(ch, name))) {
+	if ((iter = get_vehicle_in_room_vis(ch, name, number))) {
 		return iter;
 	}
-
-	strcpy(tmp, name);
 	
-	// 0.x does not target vehicles
-	if ((number = get_number(&tmp)) == 0) {
-		return (NULL);
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
 	}
 	
 	DL_FOREACH(vehicle_list, iter) {
@@ -10156,7 +10239,7 @@ vehicle_data *get_vehicle_vis(char_data *ch, char *name) {
 		}
 		
 		// found: check number
-		if (++found == number) {
+		if (--(*number) == 0) {
 			return iter;
 		}
 	}
@@ -10170,19 +10253,24 @@ vehicle_data *get_vehicle_vis(char_data *ch, char *name) {
 *
 * @param room_data *room The room to look in.
 * @param char *name The string to search for.
+* @param int *number Optional: For multi-list number targeting (look 4.cart; may be NULL)
 * @return vehicle_data* The found vehicle, or NULL.
 */
-vehicle_data *get_vehicle_room(room_data *room, char *name) {
-	int found = 0, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
+vehicle_data *get_vehicle_room(room_data *room, char *name, int *number) {
+	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
 	vehicle_data *iter;
-
-	strcpy(tmp, name);
+	int num;
 	
-	// 0.x does not target vehicles
-	if ((number = get_number(&tmp)) == 0) {
-		return (NULL);
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
 	}
 	
 	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
@@ -10191,7 +10279,7 @@ vehicle_data *get_vehicle_room(room_data *room, char *name) {
 		}
 		
 		// found: check number
-		if (++found == number) {
+		if (--(*number) == 0) {
 			return iter;
 		}
 	}
@@ -10204,19 +10292,24 @@ vehicle_data *get_vehicle_room(room_data *room, char *name) {
 * Find a vehicle in the world, without regard to visibility.
 *
 * @param char *name The string to search for.
+* @param int *number Optional: For multi-list number targeting (look 4.cart; may be NULL)
 * @return vehicle_data* The vehicle found, or NULL.
 */
-vehicle_data *get_vehicle_world(char *name) {
-	int found = 0, number;
-	char tmpname[MAX_INPUT_LENGTH];
-	char *tmp = tmpname;
+vehicle_data *get_vehicle_world(char *name, int *number) {
+	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
 	vehicle_data *iter;
-
-	strcpy(tmp, name);
+	int num;
 	
-	// 0.x does not target vehicles
-	if ((number = get_number(&tmp)) == 0) {
-		return (NULL);
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
 	}
 	
 	DL_FOREACH(vehicle_list, iter) {
@@ -10225,7 +10318,47 @@ vehicle_data *get_vehicle_world(char *name) {
 		}
 		
 		// found: check number
-		if (++found == number) {
+		if (--(*number)) {
+			return iter;
+		}
+	}
+
+	return NULL;
+}
+
+
+/**
+* Find a vehicle in the world that ch can see.
+*
+* @param char_data *ch The person looking for a vehicle.
+* @param char *name The string to search for.
+* @param int *number Optional: For multi-list number targeting (look 4.cart; may be NULL)
+* @return vehicle_data* The vehicle found, or NULL.
+*/
+vehicle_data *get_vehicle_world_vis(char_data *ch, char *name, int *number) {
+	char tmpname[MAX_INPUT_LENGTH], *tmp = tmpname;
+	vehicle_data *iter;
+	int num;
+	
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {
+		return NULL;
+	}
+	
+	DL_FOREACH(vehicle_list, iter) {
+		if (!CAN_SEE_VEHICLE(ch, iter) || !isname(tmp, VEH_KEYWORDS(iter))) {
+			continue;
+		}
+		
+		// found: check number
+		if (--(*number)) {
 			return iter;
 		}
 	}

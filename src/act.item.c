@@ -645,7 +645,9 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 		case ITEM_PAINT: {
 			extern const char *paint_colors[];
 			extern const char *paint_names[];
-			msg_to_char(ch, "Paint color: %s%s\t0\r\n", paint_colors[GET_PAINT_COLOR(obj)], paint_names[GET_PAINT_COLOR(obj)]);
+			sprinttype(GET_PAINT_COLOR(obj), paint_names, lbuf, sizeof(lbuf), "UNDEFINED");
+			sprinttype(GET_PAINT_COLOR(obj), paint_colors, part, sizeof(part), "&0");
+			msg_to_char(ch, "Paint color: %s%s\t0\r\n", part, lbuf);
 			break;
 		}
 		case ITEM_POISON: {
@@ -884,9 +886,12 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 */
 void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	extern const char *identify_vehicle_flags[];
+	extern const char *paint_colors[];
+	extern const char *paint_names[];
 	
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], buf1[256];
+	player_index_data *index;
 	
 	// basic info
 	act("Your analysis of $V reveals:", FALSE, ch, NULL, veh, TO_CHAR);
@@ -894,13 +899,34 @@ void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	if (VEH_OWNER(veh)) {
 		msg_to_char(ch, "Owner: %s%s\t0\r\n", EMPIRE_BANNER(VEH_OWNER(veh)), EMPIRE_NAME(VEH_OWNER(veh)));
 	}
+	if (VEH_MAX_ROOMS(veh) > 0 && (!VEH_OWNER(veh) || VEH_OWNER(veh) == GET_LOYALTY(ch) || IS_IMMORTAL(ch))) {
+		// add +1 for the base room
+		msg_to_char(ch, "Rooms: %d/%d\r\n", VEH_INSIDE_ROOMS(veh) + 1, VEH_MAX_ROOMS(veh) + 1);
+	}
 	
 	msg_to_char(ch, "Type: %s\r\n", skip_filler((proto && !strchr(VEH_SHORT_DESC(proto), '#')) ? VEH_SHORT_DESC(proto) : VEH_SHORT_DESC(veh)));
 	msg_to_char(ch, "Level: %d\r\n", VEH_SCALE_LEVEL(veh));
 	
+	if (VEH_PATRON(veh) && (index = find_player_index_by_idnum(VEH_PATRON(veh)))) {
+		msg_to_char(ch, "Dedicated to: %s\r\n", index->fullname);
+	}
+	
+	if (VEH_PAINT_COLOR(veh)) {
+		sprinttype(VEH_PAINT_COLOR(veh), paint_names, buf, sizeof(buf), "UNDEFINED");
+		sprinttype(VEH_PAINT_COLOR(veh), paint_colors, buf1, sizeof(buf1), "&0");
+		*buf = LOWER(*buf);
+		if (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT)) {
+			strtoupper(buf1);
+		}
+		msg_to_char(ch, "Paint color: %s%s%s&0\r\n", buf1, (VEH_FLAGGED(veh, VEH_BRIGHT_PAINT) ? "bright " : ""), buf);
+	}
+	
 	prettier_sprintbit(VEH_FLAGS(veh), identify_vehicle_flags, buf);
 	if (VEH_FLAGGED(veh, VEH_SIT)) {
 		sprintf(buf + strlen(buf), "%scan sit %s", *buf ? ", " : "", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
+	}
+	if (VEH_FLAGGED(veh, VEH_SLEEP)) {
+		sprintf(buf + strlen(buf), "%scan sleep %s", *buf ? ", " : "", VEH_FLAGGED(veh, VEH_IN) ? "in" : "on");
 	}
 	if (*buf) {
 		msg_to_char(ch, "Notes: %s\r\n", buf);
@@ -2037,7 +2063,7 @@ static void get_from_container(char_data *ch, obj_data *cont, char *arg, int mod
 	if (GET_OBJ_TYPE(cont) == ITEM_CONTAINER && OBJVAL_FLAGGED(cont, CONT_CLOSED))
 		act("$p is closed.", FALSE, ch, cont, 0, TO_CHAR);
 	else if (obj_dotmode == FIND_INDIV) {
-		if (!(obj = get_obj_in_list_vis(ch, arg, cont->contains))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, cont->contains))) {
 			sprintf(buf, "There doesn't seem to be %s %s in $p.", AN(arg), arg);
 			act(buf, FALSE, ch, cont, 0, TO_CHAR);
 		}
@@ -2047,7 +2073,7 @@ static void get_from_container(char_data *ch, obj_data *cont, char *arg, int mod
 				obj_next = obj->next_content;
 				if (!perform_get_from_container(ch, obj, cont, mode))
 					break;
-				obj = get_obj_in_list_vis(ch, arg, obj_next);
+				obj = get_obj_in_list_vis(ch, arg, NULL, obj_next);
 			}
 		}
 	}
@@ -2168,7 +2194,7 @@ static void get_from_room(char_data *ch, char *arg, int howmany) {
 	dotmode = find_all_dots(arg);
 
 	if (dotmode == FIND_INDIV) {
-		if (!(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			sprintf(buf, "You don't see %s %s here.\r\n", AN(arg), arg);
 			send_to_char(buf, ch);
 		}
@@ -2178,7 +2204,7 @@ static void get_from_room(char_data *ch, char *arg, int howmany) {
 				obj_next = obj->next_content;
 				if (!perform_get_from_room(ch, obj))
 					break;
-				obj = get_obj_in_list_vis(ch, arg, obj_next);
+				obj = get_obj_in_list_vis(ch, arg, NULL, obj_next);
 			}
 		}
 	}
@@ -2215,7 +2241,7 @@ static char_data *give_find_vict(char_data *ch, char *arg) {
 
 	if (!*arg)
 		send_to_char("To whom?\r\n", ch);
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (vict == ch)
 		send_to_char("What's the point of that?\r\n", ch);
@@ -2785,9 +2811,10 @@ void scale_item_to_level(obj_data *obj, int level) {
 * @param int to_island The destination island id.
 * @param int number The quantity to ship.
 * @param obj_vnum vnum What item to ship.
+* @param room_data *to_room Optional: Exact destination room (not just island). May be NULL.
 */
-void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to_island, int number, obj_vnum vnum) {
-	struct shipping_data *sd, *temp;
+void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to_island, int number, obj_vnum vnum, room_data *to_room) {
+	struct shipping_data *sd;
 	struct island_info *isle;
 	bool done;
 	
@@ -2798,12 +2825,15 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 	
 	// try to add to existing order
 	done = FALSE;
-	for (sd = EMPIRE_SHIPPING_LIST(emp); sd && !done; sd = sd->next) {
+	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), sd) {
 		if (sd->vnum != vnum) {
 			continue;
 		}
 		if (sd->from_island != from_island || sd->to_island != to_island) {
 			continue;
+		}
+		if ((to_room && sd->to_room != GET_ROOM_VNUM(to_room)) || (!to_room && sd->to_room != NOWHERE)) {
+			continue;	// non-matching to-room
 		}
 		if (sd->status != SHIPPING_QUEUED && sd->status != SHIPPING_WAITING_FOR_SHIP) {
 			continue;	// can combine only with those 2
@@ -2822,22 +2852,14 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 		sd->amount = number;
 		sd->from_island = from_island;
 		sd->to_island = to_island;
+		sd->to_room = to_room ? GET_ROOM_VNUM(to_room) : NOWHERE;
 		sd->status = SHIPPING_QUEUED;
 		sd->status_time = time(0);
 		sd->ship_origin = NOWHERE;
 		sd->shipping_id = -1;
-		sd->next = NULL;
 		
 		// add to end
-		if ((temp = EMPIRE_SHIPPING_LIST(emp))) {
-			while (temp->next) {
-				temp = temp->next;
-			}
-			temp->next = sd;
-		}
-		else {
-			EMPIRE_SHIPPING_LIST(emp) = sd;
-		}
+		DL_APPEND(EMPIRE_SHIPPING_LIST(emp), sd);
 	}
 	
 	// charge resources
@@ -2846,7 +2868,12 @@ void add_shipping_queue(char_data *ch, empire_data *emp, int from_island, int to
 	
 	// messaging
 	isle = get_island(to_island, TRUE);
-	msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(get_obj_name_by_proto(vnum)), isle ? get_island_name_for(isle->id, ch) : "an unknown island");
+	if (to_room) {
+		msg_to_char(ch, "You set %d '%s' to ship to %s%s.\r\n", number, skip_filler(get_obj_name_by_proto(vnum)), get_room_name(to_room, FALSE), coord_display(ch, X_COORD(to_room), Y_COORD(to_room), FALSE));
+	}
+	else {
+		msg_to_char(ch, "You set %d '%s' to ship to %s.\r\n", number, skip_filler(get_obj_name_by_proto(vnum)), isle ? get_island_name_for(isle->id, ch) : "an unknown island");
+	}
 }
 
 
@@ -2859,23 +2886,28 @@ int calculate_shipping_time(struct shipping_data *shipd) {
 	room_data *from_center, *to_center;
 	int dist, max, cost;
 	
-	from = get_island(shipd->from_island, FALSE);
-	to = get_island(shipd->to_island, FALSE);
-	
-	// unable to find islands?
-	if (!from || !to) {
-		return 0;
+	if (shipd->ship_origin != NOWHERE && shipd->to_room != NOWHERE) {
+		dist = compute_distance(real_room(shipd->ship_origin), real_room(shipd->to_room));
 	}
+	else {
+		from = get_island(shipd->from_island, FALSE);
+		to = get_island(shipd->to_island, FALSE);
+		
+		// unable to find islands?
+		if (!from || !to) {
+			return 0;
+		}
+		
+		from_center = real_room(from->center);
+		to_center = shipd->to_room ? real_room(shipd->to_room) : real_room(to->center);
 	
-	from_center = real_room(from->center);
-	to_center = real_room(to->center);
-	
-	// unable to find locations?
-	if (!from_center || !to_center) {
-		return 0;
+		// unable to find locations?
+		if (!from_center || !to_center) {
+			return 0;
+		}
+		
+		dist = compute_distance(from_center, to_center);
 	}
-	
-	dist = compute_distance(from_center, to_center);
 	
 	// maximum distance (further distances cost nothing): lesser of height/width
 	max = MIN(MAP_WIDTH, MAP_HEIGHT);
@@ -2897,8 +2929,8 @@ int calculate_shipping_time(struct shipping_data *shipd) {
 */
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 	bool have_ship = (shipd->shipping_id != -1);
-	struct shipping_data *iter, *temp;
-	room_data *dock;
+	struct shipping_data *iter;
+	room_data *dock = NULL;
 	
 	// mark all shipments on this ship "delivered" (if we still have a ship)
 	if (have_ship) {
@@ -2909,10 +2941,26 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 		}
 	}
 	
-	if ((dock = find_docks(emp, shipd->to_island))) {
+	// find target location: exact first
+	if (shipd->to_room != NOWHERE && (dock = real_room(shipd->to_room))) {
+		if (room_has_function_and_city_ok(emp, dock, FNC_DOCKS)) {
+			// seems valid
+		}
+		else {
+			// not a valid dock target
+			dock = NULL;
+		}
+	}
+	// backup target location: island
+	if (!dock) {
+		dock = find_docks(emp, shipd->to_island);
+	}
+	
+	// did we find a dock?
+	if (dock) {
 		// unload the shipment at the destination
 		if (shipd->vnum != NOTHING && shipd->amount > 0 && obj_proto(shipd->vnum)) {
-			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: shipped to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->to_island, TRUE)->name);
+			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: shipped to %s%s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->to_island, TRUE)->name, coord_display(NULL, X_COORD(dock), Y_COORD(dock), FALSE));
 			add_to_empire_storage(emp, shipd->to_island, shipd->vnum, shipd->amount);
 		}
 		if (have_ship) {
@@ -2920,18 +2968,21 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 		}
 	}
 	else {
+		// return dock (or point of origin)
+		dock = real_room(shipd->ship_origin);
+		
 		// no docks -- unload the shipment at home
 		if (shipd->vnum != NOTHING && shipd->amount > 0 && obj_proto(shipd->vnum)) {
-			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: returned to %s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->from_island, TRUE)->name);
+			log_to_empire(emp, ELOG_SHIPPING, "%dx %s: returned to %s%s", shipd->amount, get_obj_name_by_proto(shipd->vnum), get_island(shipd->from_island, TRUE)->name, coord_display(NULL, dock ? X_COORD(dock) : -1, dock ? Y_COORD(dock) : -1, FALSE));
 			add_to_empire_storage(emp, shipd->from_island, shipd->vnum, shipd->amount);
 		}
 		if (have_ship) {
-			move_ship_to_destination(emp, shipd, real_room(shipd->ship_origin));
+			move_ship_to_destination(emp, shipd, dock);
 		}
 	}
 	
 	// and delete this entry from the list
-	REMOVE_FROM_LIST(shipd, EMPIRE_SHIPPING_LIST(emp), next);
+	DL_DELETE(EMPIRE_SHIPPING_LIST(emp), shipd);
 	free(shipd);
 }
 
@@ -2946,11 +2997,13 @@ void deliver_shipment(empire_data *emp, struct shipping_data *shipd) {
 */
 room_data *find_docks(empire_data *emp, int island_id) {
 	struct empire_territory_data *ter, *next_ter;
+	vehicle_data *veh;
 	
 	if (!emp || island_id == NO_ISLAND) {
 		return NULL;
 	}
 	
+	// try territory first
 	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
 		if (GET_ISLAND_ID(ter->room) != island_id) {
 			continue;
@@ -2965,6 +3018,24 @@ room_data *find_docks(empire_data *emp, int island_id) {
 		return ter->room;
 	}
 	
+	// if not, try vehicles
+	DL_FOREACH(vehicle_list, veh) {
+		if (!IN_ROOM(veh) || GET_ISLAND_ID(IN_ROOM(veh)) != island_id) {
+			continue;	// wrong island
+		}
+		if (VEH_OWNER(veh) != emp || !IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS) || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+			continue;	// basic ship checks
+		}
+		if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK) || (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
+			continue;	// no-work
+		}
+		if (!room_has_function_and_city_ok(emp, IN_ROOM(veh), FNC_DOCKS)) {
+			continue;	// definitely not a docks
+		}
+		
+		return IN_ROOM(veh);
+	}
+	
 	return NULL;
 }
 
@@ -2972,12 +3043,14 @@ room_data *find_docks(empire_data *emp, int island_id) {
 /**
 * Finds a ship to use for a given cargo. Any ship on this island is good.
 *
+* Note: This cannot specify a single dock to check; it looks for any ship on
+* the island.
+*
 * @param empire_data *emp The empire that is shipping.
 * @param struct shipping_data *shipd The shipment.
 * @return vehicle_data* A ship, or NULL if none.
 */
 vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
-	struct empire_territory_data *ter, *next_ter;
 	struct shipping_data *iter;
 	bool already_used;
 	vehicle_data *veh;
@@ -2987,58 +3060,48 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		return NULL;
 	}
 	
-	HASH_ITER(hh, EMPIRE_TERRITORY_LIST(emp), ter, next_ter) {
-		if (GET_ISLAND_ID(ter->room) != shipd->from_island) {
-			continue;
+	DL_FOREACH(vehicle_list, veh) {
+		if (!IN_ROOM(veh) || GET_ISLAND_ID(IN_ROOM(veh)) != shipd->from_island) {
+			continue;	// wrong island
 		}
-		if (!room_has_function_and_city_ok(emp, ter->room, FNC_DOCKS)) {
-			continue;
+		if (VEH_OWNER(veh) != emp || !VEH_FLAGGED(veh, VEH_SHIPPING) || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE) || VEH_CARRYING_N(veh) >= VEH_CAPACITY(veh)) {
+			continue;	// basic ship checks
 		}
-		if (ROOM_AFF_FLAGGED(ter->room, ROOM_AFF_NO_WORK)) {
+		if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK) || (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
+			continue;	// no-work
+		}
+		if (!room_has_function_and_city_ok(emp, IN_ROOM(veh), FNC_DOCKS)) {
+			continue;	// not at docks
+		}
+		
+		// viable vehicle:
+	
+		// calculate capacity to see if it's full, and check if it's already used for a different island
+		if (VEH_SHIPPING_ID(veh) != -1) {
+			capacity = VEH_CARRYING_N(veh);
+			already_used = FALSE;
+			DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), iter) {
+				if (iter->shipping_id == VEH_SHIPPING_ID(veh)) {
+					capacity += iter->amount;
+					if (iter->from_island != shipd->from_island || iter->to_island != shipd->to_island || iter->to_room != shipd->to_room) {
+						already_used = TRUE;
+						break;
+					}
+				}
+			}
+			if (already_used || capacity >= VEH_CAPACITY(veh)) {
+				// ship full or in use
+				continue;
+			}
+		}
+		
+		// ensure no players on board
+		if (!ship_is_empty(veh)) {
 			continue;
 		}
 		
-		// found docks...
-		DL_FOREACH2(ROOM_VEHICLES(ter->room), veh, next_in_room) {
-			if (VEH_OWNER(veh) != emp) {
-				continue;
-			}
-			if (!VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
-				continue;
-			}
-			if (!VEH_FLAGGED(veh, VEH_SHIPPING) || VEH_CARRYING_N(veh) >= VEH_CAPACITY(veh)) {
-				continue;
-			}
-			if (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK)) {
-				continue;
-			}
-			
-			// calculate capacity to see if it's full, and check if it's already used for a different island
-			if (VEH_SHIPPING_ID(veh) != -1) {
-				capacity = VEH_CARRYING_N(veh);
-				already_used = FALSE;
-				for (iter = EMPIRE_SHIPPING_LIST(emp); iter && !already_used; iter = iter->next) {
-					if (iter->shipping_id == VEH_SHIPPING_ID(veh)) {
-						capacity += iter->amount;
-						if (iter->from_island != shipd->from_island || iter->to_island != shipd->to_island) {
-							already_used = TRUE;
-						}
-					}
-				}
-				if (already_used || capacity >= VEH_CAPACITY(veh)) {
-					// ship full or in use
-					continue;
-				}
-			}
-			
-			// ensure no players on board
-			if (!ship_is_empty(veh)) {
-				continue;
-			}
-			
-			// looks like we actually found one!
-			return veh;
-		}
+		// looks like we actually found one!
+		return veh;
 	}
 	
 	return NULL;
@@ -3060,7 +3123,7 @@ int find_free_shipping_id(empire_data *emp) {
 	
 	// better look it up
 	for (id = 0; id < INT_MAX; ++id) {
-		LL_SEARCH_SCALAR(EMPIRE_SHIPPING_LIST(emp), find, shipping_id, id);
+		DL_SEARCH_SCALAR(EMPIRE_SHIPPING_LIST(emp), find, shipping_id, id);
 		if (!find) {
 			return id;
 		}
@@ -3107,7 +3170,7 @@ room_data *get_ship_pen(void) {
 
 	room_data *room, *iter;
 	
-	for (iter = interior_room_list; iter; iter = iter->next_interior) {
+	DL_FOREACH2(interior_room_list, iter, next_interior) {
 		if (GET_BUILDING(iter) && GET_BLD_VNUM(GET_BUILDING(iter)) == RTYPE_SHIP_HOLDING_PEN) {
 			return iter;
 		}
@@ -3149,7 +3212,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 	// calculate capacity
 	capacity = 0;
 	if (VEH_SHIPPING_ID(boat) != -1) {
-		for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), iter) {
 			if (iter->shipping_id == VEH_SHIPPING_ID(boat)) {
 				capacity += iter->amount;
 			}
@@ -3169,6 +3232,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 		newd->amount = shipd->amount - (size_avail - capacity);	// only what's left
 		newd->from_island = shipd->from_island;
 		newd->to_island = shipd->to_island;
+		newd->to_room = shipd->to_room;
 		newd->status = SHIPPING_WAITING_FOR_SHIP;	// at this point, definitely waiting
 		newd->status_time = shipd->status_time;
 		newd->ship_origin = NOWHERE;
@@ -3238,7 +3302,7 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 	
 	// remove the shipping id from all shipments that were on this ship (including this one)
 	old = shipd->shipping_id;
-	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
+	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), iter) {
 		if (iter->shipping_id == old) {
 			iter->shipping_id = -1;
 		}
@@ -3247,8 +3311,8 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 
 
 /**
-* Run one shipping cycle for an empire. This runs every 12 game hours -- at
-* 7am and 7pm.
+* Run one shipping cycle for an empire. This runs every 6 game hours -- at
+* 1am, 7am, 1pm, and 7pm.
 *
 * @param empire_data *emp The empire to run.
 */
@@ -3257,18 +3321,18 @@ void process_shipping_one(empire_data *emp) {
 	vehicle_data *last_ship = NULL;
 	bool full, changed = FALSE;
 	int last_from = NO_ISLAND, last_to = NO_ISLAND;
+	room_vnum last_to_vnum = NOWHERE;
 	
-	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = next_shipd) {
-		next_shipd = shipd->next;
-		
+	DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
 		switch (shipd->status) {
 			case SHIPPING_QUEUED:	// both these are 'waiting' states
 			case SHIPPING_WAITING_FOR_SHIP: {
-				if (!last_ship || last_from != shipd->from_island || last_to != shipd->to_island) {
+				if (!last_ship || last_from != shipd->from_island || last_to != shipd->to_island || last_to_vnum != shipd->to_room) {
 					// attempt to find a(nother) ship
 					last_ship = find_free_ship(emp, shipd);
 					last_from = shipd->from_island;
 					last_to = shipd->to_island;
+					last_to_vnum = shipd->to_room;
 				}
 				
 				// this only works if we found a ship to use (or had a free one)
@@ -3305,9 +3369,7 @@ void process_shipping_one(empire_data *emp) {
 	}
 	
 	// check for unsailed ships
-	for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = next_shipd) {
-		next_shipd = shipd->next;
-		
+	DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
 		if ((shipd->status == SHIPPING_QUEUED || shipd->status == SHIPPING_WAITING_FOR_SHIP) && shipd->shipping_id != -1) {
 			vehicle_data *boat = find_ship_by_shipping_id(emp, shipd->shipping_id);
 			if (boat) {
@@ -3323,14 +3385,14 @@ void process_shipping_one(empire_data *emp) {
 
 
 /**
-* Runs a shipping cycle for all empires. This runs every 12 game hours -- at
-* 7am and 7pm.
+* Runs a shipping cycle for all empires. This runs every 6 game hours -- at
+* 1am, 7am, 1pm, and 7pm.
 */
 void process_shipping(void) {
 	empire_data *emp, *next_emp;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		if (EMPIRE_SHIPPING_LIST(emp)) {
+		if (EMPIRE_SHIPPING_LIST(emp) && !EMPIRE_IS_TIMED_OUT(emp)) {
 			process_shipping_one(emp);
 		}
 	}
@@ -3354,7 +3416,7 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 	}
 	
 	// verify contents
-	for (iter = EMPIRE_SHIPPING_LIST(emp); iter; iter = iter->next) {
+	DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), iter) {
 		if (iter->shipping_id == VEH_SHIPPING_ID(boat)) {
 			iter->status = SHIPPING_EN_ROUTE;
 			iter->status_time = time(0);
@@ -3895,7 +3957,7 @@ void trade_post(char_data *ch, char *argument) {
 		msg_to_char(ch, "The item must be in your inventory. Cost is number of your empire's coins.\r\n");
 		msg_to_char(ch, "Time is in real hours (default: %d).\r\n", config_get_int("trading_post_max_hours"));
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, itemarg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, itemarg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have a %s to trade.", itemarg);
 	}
 	else if (OBJ_BOUND_TO(obj)) {
@@ -4478,13 +4540,13 @@ void warehouse_store(char_data *ch, char *argument, int mode) {
 			msg_to_char(ch, "What do you want to store?\r\n");
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, argument, ch->carrying))) {
+		if (!(obj = get_obj_in_list_vis(ch, argument, NULL, ch->carrying))) {
 			msg_to_char(ch, "You don't seem to have any %ss.\r\n", argument);
 			return;
 		}
 
 		while (obj && (dotmode == FIND_ALLDOT || done < total)) {
-			next_obj = get_obj_in_list_vis(ch, argument, obj->next_content);
+			next_obj = get_obj_in_list_vis(ch, argument, NULL, obj->next_content);
 			
 			if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 				kept = TRUE;	// mark for later
@@ -4649,7 +4711,7 @@ ACMD(do_combine) {
 	if (!*arg) {
 		msg_to_char(ch, "Combine what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_COMBINE))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, NULL, ch->carrying, INTERACT_COMBINE))) {
 		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_COMBINE)) {
@@ -4734,15 +4796,17 @@ ACMD(do_drink) {
 	obj_data *obj = NULL;
 	int amount, i, liquid;
 	double thirst_amt, hunger_amt;
-	int type = drink_OBJ;
+	int type = drink_OBJ, number;
 	room_data *to_room;
+	char *argptr = arg;
 
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 
 	if (REAL_NPC(ch))		/* Cannot use GET_COND() on mobs. */
 		return;
 
-	if (!*arg) {
+	if (!*argptr) {
 		if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK))
 			type = drink_ROOM;
 		else if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER)) {
@@ -4759,13 +4823,13 @@ ACMD(do_drink) {
 		}
 	}
 
-	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, arg, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))))) {
-		if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(arg, "water") || isname(arg, get_room_name(IN_ROOM(ch), FALSE)))) {
+	if (type == NOTHING && !(obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) && (!can_use_room(ch, IN_ROOM(ch), MEMBERS_AND_ALLIES) || !(obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)))))) {
+		if (room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_DRINK_WATER) && (is_abbrev(argptr, "water") || isname(argptr, get_room_name(IN_ROOM(ch), FALSE)))) {
 			if (!can_drink_from_room(ch, (type = drink_ROOM))) {
 				return;
 			}
 		}
-		if (is_abbrev(arg, "river") || is_abbrev(arg, "water")) {
+		if (is_abbrev(argptr, "river") || is_abbrev(argptr, "water")) {
 			if (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_DRINK))
 				type = drink_ROOM;
 			else if (!IS_ADVENTURE_ROOM(IN_ROOM(ch)) && IS_OUTDOORS(ch)) {
@@ -4952,7 +5016,7 @@ ACMD(do_drop) {
 			sprintf(buf, "What do you want to %s %d of?\r\n", sname, multi);
 			send_to_char(buf, ch);
 			}
-		else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
 				msg_to_char(ch, "What kind of coins do you want to %s?\r\n", sname);
 			}
@@ -4962,7 +5026,7 @@ ACMD(do_drop) {
 		}
 		else {
 			do {
-				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 				this = perform_drop(ch, obj, mode, sname);
 				obj = next_obj;
 				if (this == -1) {
@@ -5012,7 +5076,7 @@ ACMD(do_drop) {
 				send_to_char(buf, ch);
 				return;
 			}
-			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 				if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
 					msg_to_char(ch, "What kind of coins do you want to %s?\r\n", sname);
 				}
@@ -5022,7 +5086,7 @@ ACMD(do_drop) {
 				return;
 			}
 			while (obj) {
-				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 				if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
 					obj = next_obj;
 					continue;
@@ -5044,7 +5108,7 @@ ACMD(do_drop) {
 			}
 		}
 		else {
-			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 				if (!str_cmp(arg, "coin") || !str_cmp(arg, "coins")) {
 					msg_to_char(ch, "What kind of coins do you want to %s?\r\n", sname);
 				}
@@ -5065,26 +5129,27 @@ ACMD(do_eat) {
 	void taste_blood(char_data *ch, char_data *vict);
 	
 	bool extract = FALSE, will_buff = FALSE;
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], *argptr = arg;
 	struct affected_type *af;
 	struct obj_apply *apply;
 	obj_data *food;
-	int eat_hours;
+	int eat_hours, number;
 
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 	
 	// 1. basic validation
 	if (REAL_NPC(ch))		/* Cannot use GET_COND() on mobs. */
 		return;
-	if (!*arg) {
+	if (!*argptr) {
 		send_to_char("Eat what?\r\n", ch);
 		return;
 	}
-	if (!(food = get_obj_in_list_vis(ch, arg, ch->carrying))) {
-		if (!(food = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	if (!(food = get_obj_in_list_vis(ch, argptr, &number, ch->carrying))) {
+		if (!(food = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch))))) {
 			// special case: Taste Blood
 			char_data *vict;
-			if (subcmd == SCMD_TASTE && IS_VAMPIRE(ch) && has_ability(ch, ABIL_TASTE_BLOOD) && (vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+			if (subcmd == SCMD_TASTE && IS_VAMPIRE(ch) && has_ability(ch, ABIL_TASTE_BLOOD) && (vict = get_char_vis(ch, argptr, &number, FIND_CHAR_ROOM))) {
 				if (check_vampire_sun(ch, TRUE) && !ABILITY_TRIGGERS(ch, vict, NULL, ABIL_TASTE_BLOOD)) {
 					taste_blood(ch, vict);
 				}
@@ -5339,14 +5404,14 @@ ACMD(do_exchange) {
 			if (!*arg) {
 				msg_to_char(ch, "Exchange all of what?\r\n");
 			}
-			else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 				msg_to_char(ch, "You don't seem to have any %ss to exchange.\r\n", arg);
 			}
 			else {
 				carrying = IS_CARRYING_N(ch);
 			
 				while (obj) {
-					next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+					next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 					if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
 						if (!perform_exchange(ch, obj, emp)) {
 							break;
@@ -5361,7 +5426,7 @@ ACMD(do_exchange) {
 			}
 		}
 		else {
-			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 				msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 			}
 			else if (!IS_WEALTH_ITEM(obj) || GET_WEALTH_VALUE(obj) <= 0 || GET_OBJ_VNUM(obj) == NOTHING) {
@@ -5501,13 +5566,13 @@ ACMD(do_give) {
 		else if (!(vict = give_find_vict(ch, argument))) {
 			return;
 		}
-		else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			sprintf(buf, "You don't seem to have any %ss.\r\n", arg);
 			send_to_char(buf, ch);
 		}
 		else {
 			while (obj && amount > 0) {
-				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 				
 				if (!OBJ_FLAGGED(obj, OBJ_KEEP)) {
 					perform_give(ch, vict, obj);
@@ -5530,7 +5595,7 @@ ACMD(do_give) {
 		
 		dotmode = find_all_dots(arg);
 		if (dotmode == FIND_INDIV) {
-			if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+			if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 				sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 				send_to_char(buf, ch);
 			}
@@ -5572,7 +5637,7 @@ ACMD(do_grab) {
 	}
 	else if (!*arg)
 		send_to_char("Hold what?\r\n", ch);
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		if (GET_EQ(ch, WEAR_HOLD) && MATCH_ITEM_NAME(arg, GET_EQ(ch, WEAR_HOLD))) {
 			msg_to_char(ch, "It looks like you're already holding it!\r\n");
 		}
@@ -5616,19 +5681,25 @@ ACMD(do_grab) {
 
 ACMD(do_identify) {
 	obj_data *obj, *next_obj, *list[2];
-	bool any, extract = FALSE;
+	bool any, extract = FALSE, inv_only = FALSE;
 	char_data *tmp_char;
 	vehicle_data *veh;
 	int dotmode, iter;
 	
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
+	
+	// if first arg is 'inv', restrict to inventory
+	if (strlen(arg) >= 3 && is_abbrev(arg, "inventory")) {
+		inv_only = TRUE;
+		one_argument(argument, arg);
+	}
 	
 	if (GET_POS(ch) == POS_FIGHTING) {
 		msg_to_char(ch, "You're too busy to do that now!\r\n");
 		return;
 	}
 	if (!*arg) {
-		msg_to_char(ch, "Identify what object?\r\n");
+		msg_to_char(ch, "Identify what object%s?\r\n", inv_only ? " in your inventory" : "");
 		return;
 	}
 	
@@ -5648,7 +5719,7 @@ ACMD(do_identify) {
 		}
 		
 		// room
-		if (can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
+		if (!inv_only && can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
 			DL_FOREACH_SAFE2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_obj, next_content) {
 				if (run_identifies_to(ch, &obj, &extract)) {
 					any = TRUE;
@@ -5664,23 +5735,23 @@ ACMD(do_identify) {
 			command_lag(ch, WAIT_OTHER);
 		}
 		else {
-			msg_to_char(ch, "You don't have anything special to identify.\r\n");
+			msg_to_char(ch, "You don't have anything special to identify%s.\r\n", inv_only ? " in your inventory" : "");
 		}
 	}	// /all
 	else if (dotmode == FIND_ALLDOT) {
 		if (!*arg) {
-			msg_to_char(ch, "Identify all of what?\r\n");
+			msg_to_char(ch, "Identify all of what%s?\r\n", inv_only ? " in your inventory" : "");
 			return;
 		}
 		
 		any = FALSE;
 		list[0] = ch->carrying;
-		list[1] = can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
+		list[1] = (!inv_only && can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) ? ROOM_CONTENTS(IN_ROOM(ch)) : NULL;
 		
 		for (iter = 0; iter < 2; ++iter) {
-			obj = get_obj_in_list_vis(ch, arg, list[iter]);
+			obj = get_obj_in_list_vis(ch, arg, NULL, list[iter]);
 			while (obj) {
-				next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+				next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 				
 				if (run_identifies_to(ch, &obj, &extract)) {
 					any = TRUE;
@@ -5698,12 +5769,12 @@ ACMD(do_identify) {
 			command_lag(ch, WAIT_OTHER);
 		}
 		else {
-			msg_to_char(ch, "You don't seem to have any %ss to identify.\r\n", arg);
+			msg_to_char(ch, "You don't seem to have any %ss to identify%s.\r\n", arg, inv_only ? " in your inventory" : "");
 		}
 	}	// /all.
 	else {	// specific obj/vehicle
-		if (!generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &obj, &veh)) {
-			msg_to_char(ch, "You see nothing like that here.\r\n");
+		if (!generic_find(arg, inv_only ? FIND_OBJ_INV : (FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE), ch, &tmp_char, &obj, &veh)) {
+			msg_to_char(ch, "You see nothing like that %s.\r\n", inv_only ? "in your inventory" : "here");
 		}
 		else if (obj) {
 			// message first in case the item changes
@@ -5795,11 +5866,11 @@ ACMD(do_keep) {
 			msg_to_char(ch, "What do you want to %s all of?\r\n", sname);
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
 		}
 		while (obj) {
-			next_obj = get_obj_in_list_vis(ch, arg, obj->next_content);
+			next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
 			if (mode == SCMD_KEEP) {
 				SET_BIT(GET_OBJ_EXTRA(obj), OBJ_KEEP);
 				qt_keep_obj(ch, obj, TRUE);
@@ -5814,7 +5885,7 @@ ACMD(do_keep) {
 		}
 	}
 	else {
-		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 		}
 		else {
@@ -5841,18 +5912,20 @@ ACMD(do_light) {
 	const char *cmdname[] = { "light", "burn" };	// also in do_burn_area
 	
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], *argptr = arg;
 	obj_data *obj, *lighter = NULL;
 	vehicle_data *veh;
 	bool kept = FALSE;
+	int number;
 
 	one_argument(argument, arg);
+	number = get_number(&argptr);
 
 	if (!objless) {
 		lighter = find_lighter_in_list(ch->carrying, &kept);
 	}
 
-	if (!*arg) {
+	if (!*argptr) {
 		sprintf(buf, "%s what?\r\n", cmdname[subcmd]);
 		send_to_char(CAP(buf), ch);
 	}
@@ -5865,9 +5938,9 @@ ACMD(do_light) {
 			msg_to_char(ch, "You don't have anything to %s that with.\r\n", cmdname[subcmd]);
 		}
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_LIGHT)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_LIGHT))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ch->carrying, INTERACT_LIGHT)) && !(obj = get_obj_in_list_vis_prefer_interaction(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)), INTERACT_LIGHT))) {
 		// try burning a vehicle
-		if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+		if ((veh = get_vehicle_in_room_vis(ch, argptr, &number))) {
 			do_light_vehicle(ch, veh, lighter);
 		}
 		else if (!str_cmp(arg, "area") || !str_cmp(arg, "room") || !str_cmp(arg, "here") || isname(arg, get_room_name(IN_ROOM(ch), FALSE))) {
@@ -6130,7 +6203,7 @@ ACMD(do_pour) {
 			send_to_char("From what do you want to pour?\r\n", ch);
 			return;
 		}
-		if (!(from_obj = get_obj_in_list_vis(ch, arg1, ch->carrying))) {
+		if (!(from_obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying))) {
 			send_to_char("You can't find it!\r\n", ch);
 			return;
 		}
@@ -6144,7 +6217,7 @@ ACMD(do_pour) {
 			send_to_char("What do you want to fill?  And from what are you filling it?\r\n", ch);
 			return;
 		}
-		if (!(to_obj = get_obj_in_list_vis(ch, arg1, ch->carrying))) {
+		if (!(to_obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying))) {
 			send_to_char("You can't find it!\r\n", ch);
 			return;
 		}
@@ -6225,7 +6298,7 @@ ACMD(do_pour) {
 
 			return;
 		}
-		if (!(to_obj = get_obj_in_list_vis(ch, arg2, ch->carrying))) {
+		if (!(to_obj = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying))) {
 			send_to_char("You can't find it!\r\n", ch);
 			return;
 		}
@@ -6346,7 +6419,7 @@ ACMD(do_put) {
 			send_to_char("You'd better open it first!\r\n", ch);
 		else {
 			if (obj_dotmode == FIND_INDIV) {	/* put <obj> <container> */
-				if (!(obj = get_obj_in_list_vis(ch, theobj, ch->carrying))) {
+				if (!(obj = get_obj_in_list_vis(ch, theobj, NULL, ch->carrying))) {
 					sprintf(buf, "You aren't carrying %s %s.\r\n", AN(theobj), theobj);
 					send_to_char(buf, ch);
 				}
@@ -6366,7 +6439,7 @@ ACMD(do_put) {
 						
 						if (!perform_put(ch, obj, cont))
 							break;
-						obj = get_obj_in_list_vis(ch, theobj, next_obj);
+						obj = get_obj_in_list_vis(ch, theobj, NULL, next_obj);
 						found = 1;
 					}
 					
@@ -6462,7 +6535,7 @@ ACMD(do_remove) {
 	}
 	else {
 		/* Returns object pointer but we don't need it, just true/false. */
-		if (!get_object_in_equip_vis(ch, arg, ch->equipment, &i)) {
+		if (!get_obj_in_equip_vis(ch, arg, NULL, ch->equipment, &i)) {
 			sprintf(buf, "You don't seem to be using %s %s.\r\n", AN(arg), arg);
 			send_to_char(buf, ch);
 		}
@@ -6693,7 +6766,7 @@ ACMD(do_seed) {
 	if (!*arg) {
 		msg_to_char(ch, "Remove the seeds from what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SEED))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, NULL, ch->carrying, INTERACT_SEED))) {
 		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEED)) {
@@ -6728,7 +6801,7 @@ ACMD(do_separate) {
 	if (!*arg) {
 		msg_to_char(ch, "Separate what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, ch->carrying, INTERACT_SEPARATE))) {
+	else if (!(obj = get_obj_in_list_vis_prefer_interaction(ch, arg, NULL, ch->carrying, INTERACT_SEPARATE))) {
 		msg_to_char(ch, "You don't have %s %s.\r\n", AN(arg), arg);
 	}
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SEPARATE)) {
@@ -6764,7 +6837,7 @@ ACMD(do_share) {
 	else if (!*arg) {
 		msg_to_char(ch, "Share what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
 	}
 	else {
@@ -6803,7 +6876,7 @@ ACMD(do_sheathe) {
 		from_loc = WEAR_HOLD;
 	}
 	else if (*arg) {
-		if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		if ((obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			// found obj
 			from_loc = NOWHERE;
 		}
@@ -6841,11 +6914,14 @@ ACMD(do_sheathe) {
 
 
 ACMD(do_ship) {
+	extern room_data *get_shipping_target(char_data *ch, char *argument, bool *targeted_island);
+	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 3], line[1000], keywords[MAX_INPUT_LENGTH];
 	struct island_info *from_isle, *to_isle;
 	struct empire_storage_data *store;
-	struct shipping_data *sd, *temp;
-	bool done, wrong_isle, gave_number = FALSE, all = FALSE;
+	struct shipping_data *sd;
+	bool done, wrong_isle, gave_number = FALSE, all = FALSE, targeted_island = FALSE;
+	room_data *to_room, *docks;
 	vehicle_data *veh;
 	obj_data *proto;
 	int number = 1;
@@ -6890,7 +6966,7 @@ ACMD(do_ship) {
 		size = snprintf(buf, sizeof(buf), "Shipping queue for %s:\r\n", EMPIRE_NAME(GET_LOYALTY(ch)));
 		
 		done = FALSE;
-		for (sd = EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)); sd; sd = sd->next) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), sd) {
 			if (sd->vnum == NOTHING) {
 				// just a ship, not a shipment
 				if (sd->shipping_id == -1 || !(veh = find_ship_by_shipping_id(GET_LOYALTY(ch), sd->shipping_id))) {
@@ -6902,7 +6978,8 @@ ACMD(do_ship) {
 				
 				from_isle = get_island(sd->from_island, TRUE);
 				to_isle = get_island(sd->to_island, TRUE);
-				snprintf(line, sizeof(line), "    %s (%s to %s, %s)\r\n", skip_filler(VEH_SHORT_DESC(veh)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", status_type[sd->status]);
+				to_room = sd->to_room == NOWHERE ? NULL : real_room(sd->to_room);
+				snprintf(line, sizeof(line), "    %s (%s to %s%s, %s)\r\n", skip_filler(VEH_SHORT_DESC(veh)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
 			}
 			else {
 				// normal object shipment
@@ -6916,7 +6993,8 @@ ACMD(do_ship) {
 				
 				from_isle = get_island(sd->from_island, TRUE);
 				to_isle = get_island(sd->to_island, TRUE);
-				snprintf(line, sizeof(line), " %dx %s (%s to %s, %s)\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", status_type[sd->status]);
+				to_room = sd->to_room == NOWHERE ? NULL : real_room(sd->to_room);
+				snprintf(line, sizeof(line), " %dx %s (%s to %s%s, %s)\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)), from_isle ? from_isle->name : "unknown", to_isle ? to_isle->name : "unknown", coord_display(ch, to_room ? X_COORD(to_room) : -1, to_room ? Y_COORD(to_room) : -1, FALSE), status_type[sd->status]);
 			}
 			
 			done = TRUE;
@@ -6947,7 +7025,7 @@ ACMD(do_ship) {
 		
 		// find a matching entry
 		done = wrong_isle = FALSE;
-		for (sd = EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)); sd; sd = sd->next) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), sd) {
 			if ((sd->status != SHIPPING_QUEUED && sd->status != SHIPPING_WAITING_FOR_SHIP) || sd->shipping_id != -1) {
 				continue;	// never cancel one in progress
 			}
@@ -6969,7 +7047,7 @@ ACMD(do_ship) {
 			msg_to_char(ch, "You cancel the shipment for %d '%s'.\r\n", sd->amount, skip_filler(GET_OBJ_SHORT_DESC(proto)));
 			add_to_empire_storage(GET_LOYALTY(ch), sd->from_island, sd->vnum, sd->amount);
 			
-			REMOVE_FROM_LIST(sd, EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), next);
+			DL_DELETE(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), sd);
 			free(sd);
 			EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
 			
@@ -6985,13 +7063,16 @@ ACMD(do_ship) {
 		if (number < 1 || !*keywords) {
 			msg_to_char(ch, "Usage: ship <island> [number] <item>\r\n");
 		}
-		else if (!find_docks(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)))) {
+		else if (!(docks = find_docks(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch))))) {
 			msg_to_char(ch, "This island has no docks (docks must not be set no-work).\r\n");
 		}
-		else if (!(to_isle = get_island_by_name(ch, arg1)) && !(to_isle = get_island_by_coords(arg1))) {
-			msg_to_char(ch, "Unknown target island \"%s\".\r\n", arg1);
+		else if (!(to_room = get_shipping_target(ch, arg1, &targeted_island))) {
+			// sent own message
 		}
-		else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(ch))) {
+		else if (to_room == docks) {
+			msg_to_char(ch, "You can't ship to the same docks the ships are dispatched from.\r\n");
+		}
+		else if (targeted_island && GET_ISLAND_ID(to_room) == GET_ISLAND_ID(IN_ROOM(ch))) {
 			msg_to_char(ch, "You are already on that island.\r\n");
 		}
 		else if (!(store = find_island_storage_by_keywords(GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), keywords))) {
@@ -7000,11 +7081,8 @@ ACMD(do_ship) {
 		else if (!all && store->amount < number) {
 			msg_to_char(ch, "You only have %d '%s' stored on this island.\r\n", store->amount, skip_filler(get_obj_name_by_proto(store->vnum)));
 		}
-		else if (!find_docks(GET_LOYALTY(ch), to_isle->id)) {
-			msg_to_char(ch, "%s has no docks (docks must not be set no-work).\r\n", to_isle->name);
-		}
 		else {
-			add_shipping_queue(ch, GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), to_isle->id, all ? store->amount : number, store->vnum);
+			add_shipping_queue(ch, GET_LOYALTY(ch), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND_ID(to_room), all ? store->amount : number, store->vnum, to_room);
 		}
 	}
 }
@@ -7173,18 +7251,21 @@ ACMD(do_store) {
 		}
 	}
 	else {
+		char *argptr = arg1;
+		int number = get_number(&argptr);
+		
 		if (!*arg1) {
-			msg_to_char(ch, "What do you want to store all of?\r\n");
+			msg_to_char(ch, "What would you like to store all of?\r\n");
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, arg1, ch->carrying)) && (!use_room || !(obj = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch)))))) {
+		if (!(obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) && (!use_room || !(obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)))))) {
 			msg_to_char(ch, "You don't seem to have any %ss.\r\n", arg1);
 			return;
 		}
 		while (obj && (dotmode == FIND_ALLDOT || count < total)) {
 			// try to set up next-obj
-			if (!(next_obj = get_obj_in_list_vis(ch, arg1, obj->next_content)) && obj->carried_by && use_room) {
-				next_obj = get_obj_in_list_vis(ch, arg1, ROOM_CONTENTS(IN_ROOM(ch)));
+			if (!(next_obj = get_obj_in_list_vis(ch, argptr, NULL, obj->next_content)) && obj->carried_by && use_room) {
+				next_obj = get_obj_in_list_vis(ch, argptr, NULL, ROOM_CONTENTS(IN_ROOM(ch)));
 			}
 			
 			if ((!OBJ_FLAGGED(obj, OBJ_KEEP) || (total == 1 && dotmode != FIND_ALLDOT)) && OBJ_CAN_STORE(obj) && obj_can_be_stored(obj, IN_ROOM(ch), GET_LOYALTY(ch), FALSE)) {
@@ -7336,7 +7417,7 @@ ACMD(do_use) {
 	if (!*arg) {
 		msg_to_char(ch, "Use what?\r\n");
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have a %s.\r\n", arg);
 	}
 	else {
@@ -7469,13 +7550,13 @@ ACMD(do_wear) {
 			send_to_char("Wear all of what?\r\n", ch);
 			return;
 		}
-		if (!(obj = get_obj_in_list_vis(ch, arg1, ch->carrying))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying))) {
 			sprintf(buf, "You don't seem to have any %ss you can wear.\r\n", arg1);
 			send_to_char(buf, ch);
 		}
 		else {
 			while (obj) {
-				next_obj = get_obj_in_list_vis(ch, arg1, obj->next_content);
+				next_obj = get_obj_in_list_vis(ch, arg1, NULL, obj->next_content);
 				if ((where = find_eq_pos(ch, obj, 0)) != NO_WEAR && where < NUM_WEARS && !GET_EQ(ch, where) && can_wear_item(ch, obj, FALSE)) {
 					perform_wear(ch, obj, where);
 					++items_worn;
@@ -7492,7 +7573,7 @@ ACMD(do_wear) {
 		}
 	}
 	else {
-		if (!(obj = get_obj_in_list_vis(ch, arg1, ch->carrying))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying))) {
 			sprintf(buf, "You don't seem to have %s %s.\r\n", AN(arg1), arg1);
 			send_to_char(buf, ch);
 		}
@@ -7526,7 +7607,7 @@ ACMD(do_wield) {
 	else if (!*arg) {
 		send_to_char("Wield what?\r\n", ch);
 	}
-	else if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 		if (GET_EQ(ch, WEAR_WIELD) && MATCH_ITEM_NAME(arg, GET_EQ(ch, WEAR_WIELD))) {
 			msg_to_char(ch, "It looks like you're already wielding it!\r\n");
 		}

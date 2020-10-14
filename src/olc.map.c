@@ -472,7 +472,7 @@ OLC_MODULE(mapedit_ruin) {
 	
 	one_argument(argument, arg);
 	
-	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		ruin_vehicle(veh, "$V is ruined.");
 	}
 	else if (*arg) {
@@ -532,7 +532,6 @@ OLC_MODULE(mapedit_exits) {
 			
 			// TODO this is done in several different things that add rooms, and could be moved to a function -paul 7/14/2016
 			if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
-				++VEH_INSIDE_ROOMS(GET_ROOM_VEHICLE(IN_ROOM(ch)));
 				COMPLEX_DATA(to_room)->vehicle = GET_ROOM_VEHICLE(IN_ROOM(ch));
 				add_room_to_vehicle(to_room, GET_ROOM_VEHICLE(IN_ROOM(ch)));
 			}

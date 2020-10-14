@@ -122,7 +122,7 @@ ACMD(do_bash) {
 		msg_to_char(ch, "You can't bash -- your weapon has been disarmed!\r\n");
 		return;
 	}
-	if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		if (FIGHTING(ch) && IN_ROOM(ch) == IN_ROOM(FIGHTING(ch)))
 			vict = FIGHTING(ch);
 		else {
@@ -203,7 +203,7 @@ ACMD(do_charge) {
 	if (!can_use_ability(ch, ABIL_CHARGE, MOVE, cost, COOLDOWN_CHARGE)) {
 		// nope
 	}
-	else if (*arg && !(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!*arg && !(vict = FIGHTING(ch))) {
@@ -273,7 +273,7 @@ ACMD(do_disarm) {
 	if (!can_use_ability(ch, ABIL_DISARM, MOVE, cost, COOLDOWN_DISARM)) {
 		// nope
 	}
-	else if (!(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)) && !(victim = FIGHTING(ch)))
+	else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)) && !(victim = FIGHTING(ch)))
 		msg_to_char(ch, "Disarm whom?\r\n");
 	else if (ch == victim)
 		msg_to_char(ch, "You wouldn't want to do that to yourself...\r\n");
@@ -342,7 +342,7 @@ ACMD(do_firstaid) {
 	if (!*arg) {
 		vict = ch;
 	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 		return;
 	}
@@ -418,7 +418,7 @@ ACMD(do_heartstop) {
 	}
 	else if (!*arg && !FIGHTING(ch))
 		msg_to_char(ch, "Stop whose heart?\r\n");
-	else if (*arg && !(victim = get_char_vis(ch, arg, FIND_CHAR_ROOM)))
+	else if (*arg && !(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
 		send_config_msg(ch, "no_person");
 	else if (ch == victim)
 		msg_to_char(ch, "You wouldn't want to do that to yourself...\r\n");
@@ -481,7 +481,7 @@ ACMD(do_kick) {
 		return;
 	}
 	
-	if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		if (FIGHTING(ch) && IN_ROOM(ch) == IN_ROOM(FIGHTING(ch)))
 			vict = FIGHTING(ch);
 		else {
@@ -723,7 +723,7 @@ ACMD(do_rescue) {
 		return;
 	}
 	
-	if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_to_char("Whom do you wish to rescue?\r\n", ch);
 		return;
 	}

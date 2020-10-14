@@ -44,12 +44,14 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add);
 extern bool can_claim(char_data *ch);
 INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
+extern int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
+extern room_data *create_room(room_data *home);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
 void free_complex_data(struct complex_room_data *data);
 extern craft_data *find_craft_for_vehicle(vehicle_data *veh);
 extern char *get_room_name(room_data *room, bool color);
-extern room_data *create_room(room_data *home);
 extern bool has_learned_craft(char_data *ch, any_vnum vnum);
+extern obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 void init_mine(room_data *room, char_data *ch, empire_data *emp);
 struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 void scale_item_to_level(obj_data *obj, int level);
@@ -140,11 +142,12 @@ bool can_build_on(room_data *room, bitvector_t flags) {
 * @param char_data *ch The person trying to build/craft.
 * @param craft_data *type A craft that makes a building or vehicle-building.
 * @param int dir The direction that the character provided (may be NO_DIR or an invalid dir).
+* @param bool is_upgrade If TRUE, skips/modifies some of the checks.
 * @param bool *bld_is_closed A variable to bind whether or not the building is a 'closed' one (may be NULL).
 * @param bool *bld_needs_reverse A variable to bind whether or not there needs to be a reverse exit (may be NULL).
 * @return bool TRUE if it's ok to proceed; FALSE it if sent an error message and failed.
 */
-bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool *bld_is_closed, bool *bld_needs_reverse) {
+bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse) {
 	extern bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 	
 	bool is_closed, needs_facing, needs_reverse;
@@ -179,20 +182,24 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 	
 	// setup
 	is_closed = to_build && !IS_SET(GET_BLD_FLAGS(to_build), BLD_OPEN);
-	needs_facing = (GET_CRAFT_BUILD_FACING(type) != NOBITS) || is_closed;
+	needs_facing = (GET_CRAFT_BUILD_FACING(type) != NOBITS);
 	needs_reverse = needs_facing && to_build && IS_SET(GET_BLD_FLAGS(to_build), BLD_TWO_ENTRANCES);
 	
 	// checks
-	if ((is_closed || needs_facing) && (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE || !IS_OUTDOORS(ch))) {
+	if (!is_upgrade && to_build && GET_BUILDING(IN_ROOM(ch))) {
+		msg_to_char(ch, "You can't %s that here.\r\n", command);
+		return FALSE;
+	}
+	if (!is_upgrade && (is_closed || needs_facing) && (GET_ROOM_VNUM(IN_ROOM(ch)) >= MAP_SIZE || !IS_OUTDOORS(ch))) {
 		msg_to_char(ch, "You can only %s that out on the map.\r\n", command);
 		return FALSE;
 	}
-	if (GET_CRAFT_BUILD_ON(type) && !can_build_on(IN_ROOM(ch), GET_CRAFT_BUILD_ON(type))) {
+	if (GET_CRAFT_BUILD_ON(type) && !can_build_on(IN_ROOM(ch), GET_CRAFT_BUILD_ON(type) | (is_upgrade ? BLD_ON_BASE_TERRAIN_ALLOWED : NOBITS))) {
 		ordered_sprintbit(GET_CRAFT_BUILD_ON(type), bld_on_flags, bld_on_flags_order, TRUE, buf);
 		msg_to_char(ch, "You need to %s %s on: %s\r\n", command, GET_CRAFT_NAME(type), buf);
 		return FALSE;
 	}
-	if (to_build && !GET_CRAFT_BUILD_ON(type)) {
+	if (!is_upgrade && to_build && !GET_CRAFT_BUILD_ON(type)) {
 		msg_to_char(ch, "You can't %s that anywhere.\r\n", command);
 		return FALSE;
 	}
@@ -202,11 +209,11 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 	}
 	
 	// vehicle size/location checks
-	if (make_veh && GET_BUILDING(IN_ROOM(ch)) && VEH_FLAGGED(make_veh, VEH_NO_BUILDING)) {
+	if (!is_upgrade && make_veh && GET_BUILDING(IN_ROOM(ch)) && VEH_FLAGGED(make_veh, VEH_NO_BUILDING)) {
 		msg_to_char(ch, "You can't %s that in a building.\r\n", command);
 		return FALSE;
 	}
-	if (make_veh && GET_ROOM_VEHICLE(IN_ROOM(ch)) && (VEH_FLAGGED(make_veh, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_CARRY_VEHICLES))) {
+	if (!is_upgrade && make_veh && GET_ROOM_VEHICLE(IN_ROOM(ch)) && (VEH_FLAGGED(make_veh, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(IN_ROOM(ch)), VEH_CARRY_VEHICLES))) {
 		msg_to_char(ch, "You can't %s that in here.\r\n", command);
 		return FALSE;
 	}
@@ -218,7 +225,7 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 		msg_to_char(ch, "This area is already too full to %s that.\r\n", command);
 		return FALSE;
 	}
-	if (make_veh && !vehicle_allows_climate(make_veh, IN_ROOM(ch))) {
+	if (make_veh && (is_upgrade || !ROOM_IS_CLOSED(IN_ROOM(ch))) && !vehicle_allows_climate(make_veh, IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't %s %s here.\r\n", command, VEH_SHORT_DESC(make_veh));
 		return FALSE;
 	}
@@ -479,6 +486,63 @@ void construct_tunnel(char_data *ch, int dir, room_data *entrance, room_data *ex
 
 
 /**
+* Determines how many players are inside a building.
+*
+* @param room_data *loc The location of the building to check.
+* @param bool ignore_home_room If TRUE, doesn't count players in the home-room, only ones deeper inside.
+* @param bool ignore_invis_imms If TRUE, does not count immortals who can't be seen by players.
+* @return int How many players were inside.
+*/
+int count_players_in_building(room_data *room, bool ignore_home_room, bool ignore_invis_imms) {
+	room_data *interior;
+	vehicle_data *viter;
+	char_data *iter;
+	int count = 0;
+	
+	room = HOME_ROOM(room);
+	
+	// home room
+	if (!ignore_home_room) {
+		DL_FOREACH2(ROOM_PEOPLE(room), iter, next_in_room) {
+			if (IS_NPC(iter)) {
+				continue;
+			}
+			if (ignore_invis_imms && IS_IMMORTAL(iter) && (GET_INVIS_LEV(iter) > 1 || PRF_FLAGGED(iter, PRF_WIZHIDE))) {
+				continue;
+			}
+			++count;
+		}
+		DL_FOREACH2(ROOM_VEHICLES(room), viter, next_in_room) {
+			count += count_players_in_vehicle(viter, ignore_invis_imms);
+		}
+	}
+	
+	// interior rooms
+	DL_FOREACH2(interior_room_list, interior, next_interior) {
+		if (HOME_ROOM(interior) == room) {
+			DL_FOREACH2(ROOM_PEOPLE(interior), iter, next_in_room) {
+				if (IS_NPC(iter)) {
+					continue;
+				}
+				if (ignore_invis_imms && IS_IMMORTAL(iter) && (GET_INVIS_LEV(iter) > 1 || PRF_FLAGGED(iter, PRF_WIZHIDE))) {
+					continue;
+				}
+		
+				++count;
+			}
+	
+			// check nested vehicles
+			DL_FOREACH2(ROOM_VEHICLES(interior), viter, next_in_room) {
+				count += count_players_in_vehicle(viter, ignore_invis_imms);
+			}
+		}
+	}
+	
+	return count;
+}
+
+
+/**
 * Function to tear down a map tile. This restores it to nature in every
 * regard EXCEPT owner. Mines are also not reset this way.
 *
@@ -523,7 +587,7 @@ void disassociate_building(room_data *room) {
 	delete_room_npcs(room, NULL, TRUE);
 	
 	// remove bits including dismantle
-	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT);
+	REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_DISMANTLING | ROOM_AFF_TEMPORARY | ROOM_AFF_HAS_INSTANCE | ROOM_AFF_CHAMELEON | ROOM_AFF_NO_FLY | ROOM_AFF_NO_DISMANTLE | ROOM_AFF_NO_DISREPAIR | ROOM_AFF_INCOMPLETE | ROOM_AFF_BRIGHT_PAINT | ROOM_AFF_HIDE_REAL_NAME);
 	affect_total_room(room);
 
 	// free up the customs
@@ -565,7 +629,6 @@ void disassociate_building(room_data *room) {
 	
 	// some extra data safely clears now
 	remove_room_extra_data(room, ROOM_EXTRA_FIRE_REMAINING);
-	remove_room_extra_data(room, ROOM_EXTRA_QUARRY_WORKFORCE_PROGRESS);
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_TYPE);
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_BREWING_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_TAVERN_AVAILABLE_TIME);
@@ -573,6 +636,8 @@ void disassociate_building(room_data *room) {
 	remove_room_extra_data(room, ROOM_EXTRA_FOUND_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_REDESIGNATE_TIME);
 	remove_room_extra_data(room, ROOM_EXTRA_ORIGINAL_BUILDER);
+	remove_room_extra_data(room, ROOM_EXTRA_PAINT_COLOR);
+	remove_room_extra_data(room, ROOM_EXTRA_DEDICATE_ID);
 	
 	// some event types must be canceled
 	cancel_stored_event_room(room, SEV_BURN_DOWN);
@@ -580,9 +645,7 @@ void disassociate_building(room_data *room) {
 	cancel_stored_event_room(room, SEV_RESET_TRIGGER);
 	
 	// disassociate inside rooms
-	for (iter = interior_room_list; iter; iter = next_iter) {
-		next_iter = iter->next_interior;
-		
+	DL_FOREACH_SAFE2(interior_room_list, iter, next_iter, next_interior) {
 		if (HOME_ROOM(iter) == room && iter != room) {
 			dismantle_wtrigger(iter, NULL, FALSE);
 			
@@ -627,25 +690,6 @@ void disassociate_building(room_data *room) {
 			// (totals do not change)
 		}
 	}
-}
-
-
-/**
-* Finds a craft_table entry matching building type.
-*
-* @param bld_vnum build_type e.g. a building vnum
-* @return craft_data* The matching building recipe, or NULL.
-*/
-craft_data *find_build_craft(bld_vnum build_type) {
-	craft_data *iter, *next_iter;
-	
-	HASH_ITER(hh, craft_table, iter, next_iter) {
-		if (CRAFT_IS_BUILDING(iter) && GET_CRAFT_BUILD_TYPE(iter) == build_type) {
-			return iter;
-		}
-	}
-	
-	return NULL;
 }
 
 
@@ -717,24 +761,58 @@ bld_data *find_designate_room_by_name(char *name, bitvector_t flags) {
 
 
 /**
-* @param bld_data *bb The building to search for.
-* @return bld_data* The building that upgrades to it, or NULL if there isn't one.
+* Finds an upgrade craft for either a building or vehicle, for the 'upgrade'
+* command. Pass either for_bld or for_veh, and pass NOTHING for the other.
+*
+* This is meant to be called by do_upgrade to find the craft for an upgraded
+* building.
+*
+* @param char_data *ch Optional: the player, for checking skills and can-craft.
+* @param bld_vnum for_bld Optional: The upgraded building to find the craft for (or NOTHING if checking for a vehicle).
+* @param veh_vnum for_veh Optional: The upgraded vehicle to find the craft for (or NOTHING if checking for a building).
+* @param craft_data **missing_abil Optional: A variable to bind a craft that would match except the ability is missing, to help give a better error message. (NULL to skip this)
+* @return craft_data* The upgrade craft, if available. NULL otherwise.
 */
-bld_data *find_upgraded_from(bld_data *bb) {
-	bld_data *iter, *next_iter;
+craft_data *find_upgrade_craft_for(char_data *ch, bld_vnum for_bld, veh_vnum for_veh, craft_data **missing_abil) {
+	craft_data *iter, *next_iter;
 	
-	if (!bb) {	// occasionally
-		return NULL;
+	if (missing_abil) {
+		// initialize
+		*missing_abil = NULL;
 	}
 	
-	HASH_ITER(hh, building_table, iter, next_iter) {
-		if (bld_has_relation(iter, BLD_REL_UPGRADES_TO, GET_BLD_VNUM(bb))) {
-			return iter;
+	HASH_ITER(hh, craft_table, iter, next_iter) {
+		if (!CRAFT_FLAGGED(iter, CRAFT_UPGRADE)) {
+			continue;	// not an upgrade
 		}
+		if (CRAFT_FLAGGED(iter, CRAFT_IN_DEVELOPMENT) && (!ch || !IS_IMMORTAL(ch))) {
+			continue;	// not live
+		}
+		if (!(for_bld != NOTHING && CRAFT_IS_BUILDING(iter) && GET_CRAFT_BUILD_TYPE(iter) == for_bld) && !(for_veh != NOTHING && CRAFT_IS_VEHICLE(iter) && GET_CRAFT_OBJECT(iter) == for_veh)) {
+			continue;	// did not match either for_bld or for_veh
+		}
+		if (ch && IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(iter))) {
+			continue;	// not learned
+		}
+		if (ch && GET_CRAFT_REQUIRES_OBJ(iter) != NOTHING && !has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(iter))) {
+			continue;
+		}
+		if (ch && GET_CRAFT_ABILITY(iter) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(iter))) {
+			if (!*missing_abil) {
+				*missing_abil = iter;
+			}
+			continue;	// missing ability
+		}
+		
+		// it passes muster
+		return iter;
 	}
 	
-	return NULL;
+	return NULL;	// otherwise
 }
+
+#define find_upgrade_craft_for_bld(ch, bld, missing_abil)  find_upgrade_craft_for((ch), (bld), NOTHING, (missing_abil))
+#define find_upgrade_craft_for_veh(ch, veh, missing_abil)  find_upgrade_craft_for((ch), NOTHING, (veh), (missing_abil))
 
 
 /**
@@ -961,8 +1039,9 @@ bool is_entrance(room_data *room) {
 */
 void process_build(char_data *ch, room_data *room, int act_type) {
 	craft_data *type = find_building_list_entry(room, FIND_BUILD_NORMAL);
+	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
-	struct resource_data *res;
+	struct resource_data *res, temp_res;
 	
 	// Check if there's no longer a building in that place. 
 	if (!GET_BUILDING(room)) {
@@ -989,7 +1068,19 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 		}
 		else {
 			// missing next resource
-			msg_to_char(ch, "You run out of resources and stop working.\r\n");
+			if (BUILDING_RESOURCES(room)) {
+				// copy this to display the next 1
+				temp_res = *BUILDING_RESOURCES(room);
+				if (temp_res.type == RES_OBJECT || temp_res.type == RES_COMPONENT) {
+					temp_res.amount = 1;	// just show next 1
+				}
+				temp_res.next = NULL;
+				show_resource_list(&temp_res, buf);
+				msg_to_char(ch, "You don't have %s and stop working.\r\n", buf);
+			}
+			else {
+				msg_to_char(ch, "You run out of resources and stop working.\r\n");
+			}
 			act("$n runs out of resources and stops working.", FALSE, ch, 0, 0, TO_ROOM);
 			GET_ACTION(ch) = ACT_NONE;
 			return;
@@ -1218,13 +1309,12 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 void start_dismantle_building(room_data *loc) {
 	void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
 	
-	struct resource_data *composite_resources = NULL, *crcp, *res, *next_res;
+	struct resource_data *res, *next_res;
 	room_data *room, *next_room;
 	char_data *targ, *next_targ;
-	craft_data *type, *up_type;
+	craft_data *type;
 	obj_data *obj, *next_obj, *proto;
 	bool deleted = FALSE;
-	bld_data *up_bldg;
 	bool complete = !IS_INCOMPLETE(loc);	// store now -- this gets changed part way through
 	
 	if (!IS_MAP_BUILDING(loc)) {
@@ -1244,9 +1334,7 @@ void start_dismantle_building(room_data *loc) {
 	}
 	
 	// interior only
-	for (room = interior_room_list; room; room = next_room) {
-		next_room = room->next_interior;
-		
+	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
 		if (HOME_ROOM(room) == loc) {
 			dismantle_wtrigger(room, NULL, FALSE);
 			delete_room_npcs(room, NULL, TRUE);
@@ -1286,27 +1374,6 @@ void start_dismantle_building(room_data *loc) {
 		// normal setup: use the actual materials that built this building
 		GET_BUILDING_RESOURCES(loc) = GET_BUILT_WITH(loc);
 		GET_BUILT_WITH(loc) = NULL;
-	}
-	else if (complete) {
-		// backwards-compatible: attempt to detect resources
-		composite_resources = copy_resource_list(GET_CRAFT_RESOURCES(type));
-		if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_UPGRADE)) {
-			// for upgraded buildings, must work up the chain
-			up_bldg = find_upgraded_from(building_proto(GET_CRAFT_BUILD_TYPE(type)));
-			up_type = up_bldg ? find_build_craft(GET_BLD_VNUM(up_bldg)) : NULL;
-		
-			while (up_bldg && up_type) {
-				crcp = composite_resources;
-				composite_resources = combine_resources(crcp, GET_CRAFT_RESOURCES(up_type));
-				free_resource_list(crcp);
-			
-				up_bldg = find_upgraded_from(up_bldg);
-				up_type = up_bldg ? find_build_craft(GET_BLD_VNUM(up_bldg)) : NULL;
-			}
-		}
-		
-		// apply
-		GET_BUILDING_RESOURCES(loc) = composite_resources;
 	}
 	
 	// remove liquids, etc
@@ -1387,7 +1454,6 @@ char *vnum_to_interlink(room_vnum vnum) {
 */
 void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	extern int count_harnessed_animals(vehicle_data *veh);
-	extern int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
 	void process_dismantle_vehicle(char_data *ch);
 	void start_dismantle_vehicle(vehicle_data *veh);
 	
@@ -1441,7 +1507,7 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 		msg_to_char(ch, "You can't dismantle that while animals are harnessed to it.\r\n");
 	}
 	else if (VEH_SITTING_ON(veh)) {
-		msg_to_char(ch, "You can't dismantle it while someone is sitting on it.\r\n");
+		msg_to_char(ch, "You can't dismantle it while someone is %s it.\r\n", IN_OR_ON(veh));
 	}
 	else if (VEH_LED_BY(veh)) {
 		msg_to_char(ch, "You can't dismantle it while someone is leading it.\r\n");
@@ -1476,7 +1542,7 @@ ACMD(do_dismantle) {
 	
 	// fall through to dismantle-vehicle?
 	one_argument(argument, arg);
-	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		do_dismantle_vehicle(ch, veh);
 		return;
 	}
@@ -1610,7 +1676,7 @@ void do_customize_room(char_data *ch, char *argument) {
 	if (!ch->desc) {
 		msg_to_char(ch, "You can't do that.\r\n");
 	}
-	else if (((veh = get_vehicle_in_room_vis(ch, arg)) || ((veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && isname(arg, VEH_KEYWORDS(veh)))) && VEH_FLAGGED(veh, VEH_BUILDING)) {
+	else if (((veh = get_vehicle_in_room_vis(ch, arg, NULL)) || ((veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && isname(arg, VEH_KEYWORDS(veh)))) && VEH_FLAGGED(veh, VEH_BUILDING)) {
 		// pass through to customize-vehicle (probably a building vehicle)
 		do_customize_vehicle(ch, arg2);
 	}
@@ -1636,6 +1702,10 @@ void do_customize_room(char_data *ch, char *argument) {
 				ROOM_CUSTOM_NAME(IN_ROOM(ch)) = NULL;
 			}
 			
+			// they lose hide-real-name if they rename it themselves
+			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
+			affect_total_room(IN_ROOM(ch));
+			
 			msg_to_char(ch, "This room no longer has a custom name.\r\n");
 			command_lag(ch, WAIT_ABILITY);
 		}
@@ -1653,6 +1723,10 @@ void do_customize_room(char_data *ch, char *argument) {
 				gain_player_tech_exp(ch, PTECH_CUSTOMIZE_BUILDING, 33.4);
 			}
 			ROOM_CUSTOM_NAME(IN_ROOM(ch)) = str_dup(arg2);
+			
+			// they lose hide-real-name if they rename it themselves
+			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_HIDE_REAL_NAME);
+			affect_total_room(IN_ROOM(ch));
 			
 			msg_to_char(ch, "This room is now called \"%s\".\r\n", arg2);
 			command_lag(ch, WAIT_ABILITY);
@@ -1691,36 +1765,125 @@ void do_customize_room(char_data *ch, char *argument) {
 
 
 ACMD(do_dedicate) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	vehicle_data *ded_veh = NULL, *proto;
+	room_data *ded_room = NULL;
 	player_index_data *index;
 	
-	one_argument(argument, arg);
+	two_arguments(argument, arg1, arg2);
 	
-	if (!ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_DEDICATE) || !COMPLEX_DATA(IN_ROOM(ch))) {
-		msg_to_char(ch, "You cannot dedicate anything here.\r\n");
+	if (IS_NPC(ch) || !has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
+		msg_to_char(ch, "You don't have permission to dedicate anything (customize).\r\n");
+		return;
 	}
-	else if (ROOM_PATRON(IN_ROOM(ch)) > 0) {
+	if (!*arg1) {
+		msg_to_char(ch, "Usage: dedicate <building | vehicle> <person>\r\n");
+		return;
+	}
+	
+	// determine what they're trying to dedicate
+	if (is_abbrev(arg1, "building") || is_abbrev(arg1, "room") || isname(arg1, skip_filler(get_room_name(HOME_ROOM(IN_ROOM(ch)), FALSE)))) {
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+			// actually dedicate the vehicle we're in
+			ded_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
+		}
+		else {
+			ded_room = IN_ROOM(ch);
+		}
+	}
+	else if (!generic_find(arg1, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &ded_veh)) {
+		msg_to_char(ch, "You don't see %s %s here to dedicate.\r\n", AN(arg1), arg1);
+		return;
+	}
+	
+	// validate dedicate: room
+	if (ded_room && ROOM_PATRON(ded_room) > 0) {
 		msg_to_char(ch, "It is already dedicated.\r\n");
+		return;
 	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You must finish construction before dedicating it.\r\n");
-	}
-	else if (GET_LOYALTY(ch) != ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)))) {
+	if (ded_room && GET_LOYALTY(ch) != ROOM_OWNER(HOME_ROOM(ded_room))) {
 		msg_to_char(ch, "You can only dedicate it if you own it.\r\n");
+		return;
 	}
-	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch)) || !can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-		msg_to_char(ch, "You don't have permission to dedicate buildings.\r\n");
+	if (ded_room && !ROOM_BLD_FLAGGED(ded_room, BLD_DEDICATE)) {
+		msg_to_char(ch, "You cannot dedicate anything here.\r\n");
+		return;
 	}
-	else if (!*arg) {
+	
+	// validate dedicate: vehicle
+	if (ded_veh && VEH_PATRON(ded_veh) > 0) {
+		msg_to_char(ch, "It is already dedicated.\r\n");
+		return;
+	}
+	if (ded_veh && !can_use_vehicle(ch, ded_veh, MEMBERS_ONLY)) {
+		act("You need to own $V to dedicate it.", FALSE, ch, NULL, ded_veh, TO_CHAR);
+		return;
+	}
+	if (ded_veh && !VEH_FLAGGED(ded_veh, VEH_DEDICATE)) {
+		act("You cannot dedicate $V.", FALSE, ch, NULL, ded_veh, TO_CHAR);
+		return;
+	}
+	
+	// validate dedicate: general
+	if ((ded_room && !IS_COMPLETE(ded_room)) || (ded_veh && !VEH_IS_COMPLETE(ded_veh))) {
+		msg_to_char(ch, "Finish building it before you dedicate it.\r\n");
+		return;
+	}
+	if ((ded_room && IS_DISMANTLING(ded_room)) || (ded_veh && VEH_IS_DISMANTLING(ded_veh))) {
+		msg_to_char(ch, "You can't dedicate that while it is being dismantled.\r\n");
+		return;
+	}
+	
+	// ok find/validate the player target
+	if (!*arg2) {
 		msg_to_char(ch, "Dedicate this building to whom?\r\n");
+		return;
 	}
-	else if (!(index = find_player_index_by_name(arg))) {
-		msg_to_char(ch, "You must specify a valid player to dedicate the building to.\r\n");
+	if (!(index = find_player_index_by_name(arg2))) {
+		msg_to_char(ch, "You must specify a valid player to dedicate it to.\r\n");
+		return;
 	}
-	else {
-		COMPLEX_DATA(IN_ROOM(ch))->patron = index->idnum;
+	
+	// success:
+	if (ded_room) {
 		msg_to_char(ch, "You dedicate the building to %s!\r\n", index->fullname);
 		sprintf(buf, "$n dedicates the building to %s!", index->fullname);
-		act(buf, FALSE, ch, NULL, NULL, TO_ROOM);
+		set_room_extra_data(ded_room, ROOM_EXTRA_DEDICATE_ID, index->idnum);
+		
+		snprintf(buf, sizeof(buf), "%s of %s", get_room_name(ded_room, FALSE), index->fullname);
+		if (ROOM_CUSTOM_NAME(ded_room)) {
+			free(ROOM_CUSTOM_NAME(ded_room));
+		}
+		else {
+			// if the name wasn't already custom, grant them hide-real-name
+			SET_BIT(ROOM_BASE_FLAGS(ded_room), ROOM_AFF_HIDE_REAL_NAME);
+		}
+		ROOM_CUSTOM_NAME(ded_room) = str_dup(buf);
+		affect_total_room(ded_room);
+	}
+	if (ded_veh) {
+		snprintf(buf, sizeof(buf), "You dedicate $V to %s!", index->fullname);
+		act(buf, FALSE, ch, NULL, ded_veh, TO_CHAR);
+		snprintf(buf, sizeof(buf), "$n dedicates $V to %s!", index->fullname);
+		act(buf, FALSE, ch, NULL, ded_veh, TO_ROOM);
+		set_vehicle_extra_data(ded_veh, ROOM_EXTRA_DEDICATE_ID, index->idnum);
+		
+		// update strs
+		proto = vehicle_proto(VEH_VNUM(ded_veh));
+		
+		// keywords
+		snprintf(buf, sizeof(buf), "%s %s", VEH_KEYWORDS(ded_veh), index->fullname);
+		if (!proto || VEH_KEYWORDS(ded_veh) != VEH_KEYWORDS(proto)) {
+			free(VEH_KEYWORDS(ded_veh));
+		}
+		VEH_KEYWORDS(ded_veh) = str_dup(buf);
+		
+		// short desc
+		snprintf(buf, sizeof(buf), "%s of %s", VEH_SHORT_DESC(ded_veh), index->fullname);
+		if (!proto || VEH_SHORT_DESC(ded_veh) != VEH_SHORT_DESC(proto)) {
+			free(VEH_SHORT_DESC(ded_veh));
+		}
+		VEH_SHORT_DESC(ded_veh) = str_dup(buf);
 	}
 }
 
@@ -1860,7 +2023,6 @@ ACMD(do_designate) {
 			COMPLEX_DATA(home)->inside_rooms++;
 			
 			if (veh) {
-				++VEH_INSIDE_ROOMS(veh);
 				COMPLEX_DATA(new)->vehicle = veh;
 				add_room_to_vehicle(new, veh);
 			}
@@ -2084,7 +2246,7 @@ ACMD(do_maintain) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're busy right now.\r\n");
 	}
-	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (*arg && (veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		// MAINTAIN VEHICLE
 		if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
 			msg_to_char(ch, "You can't repair something that belongs to someone else.\r\n");
@@ -2170,76 +2332,122 @@ ACMD(do_nodismantle) {
 
 
 ACMD(do_paint) {
+	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+	vehicle_data *paint_veh = NULL;
+	room_data *paint_room = NULL;
 	obj_data *paint;
 	
-	one_argument(argument, arg);
+	two_arguments(argument, arg1, arg2);
 	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "Mobs can't paint.\r\n");
-	}
-	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY) || ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_UNCLAIMABLE)) {
-		msg_to_char(ch, "You don't have permission to paint here.\r\n");
-	}
-	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
+	if (IS_NPC(ch) || !has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to paint anything (customize).\r\n");
+		return;
 	}
-	else if (!COMPLEX_DATA(IN_ROOM(ch)) || !IS_ANY_BUILDING(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can only paint buildings.\r\n");
+	if (!*arg1) {
+		msg_to_char(ch, "Usage: paint <building | vehicle> <paint item>\r\n");
+		return;
 	}
-	else if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
-		msg_to_char(ch, "You need to be in the main entry room to paint the building.\r\n");
+	
+	// determine what they're trying to paint
+	if (is_abbrev(arg1, "building") || is_abbrev(arg1, "room") || isname(arg1, skip_filler(get_room_name(HOME_ROOM(IN_ROOM(ch)), FALSE)))) {
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+			// actually paint the vehicle we're in
+			paint_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
+		}
+		else {
+			paint_room = HOME_ROOM(IN_ROOM(ch));
+		}
 	}
-	else if (!ROOM_IS_CLOSED(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can only paint an enclosed building.\r\n");
+	else if (!generic_find(arg1, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &paint_veh)) {
+		msg_to_char(ch, "You don't see %s %s here to paint.\r\n", AN(arg1), arg1);
+		return;
 	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "Finish the building before painting it.\r\n");
+	
+	// validate painting: room
+	if (paint_room && (!can_use_room(ch, paint_room, MEMBERS_ONLY) || ROOM_AFF_FLAGGED(paint_room, ROOM_AFF_UNCLAIMABLE))) {
+		msg_to_char(ch, "You don't have permission to paint it.\r\n");
+		return;
 	}
-	else if (IS_DISMANTLING(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't paint a building that is being dismantled.\r\n");
+	if (paint_room && (!IS_ANY_BUILDING(paint_room) || ROOM_BLD_FLAGGED(paint_room, BLD_NO_PAINT) || ROOM_AFF_FLAGGED(paint_room, ROOM_AFF_TEMPORARY))) {
+		msg_to_char(ch, "You can't paint that.\r\n");
+		return;
 	}
-	else if (ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_NO_PAINT)) {
-		msg_to_char(ch, "This building cannot be painted.\r\n");
+	
+	// validate painting: vehicle
+	if (paint_veh && !can_use_vehicle(ch, paint_veh, MEMBERS_ONLY)) {
+		act("You don't have permission to paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		return;
 	}
-	else if (!*arg) {
-		msg_to_char(ch, "Paint the building with what?\r\n");
+	if (paint_veh && (!VEH_ICON(paint_veh) || VEH_FLAGGED(paint_veh, VEH_NO_PAINT))) {
+		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		return;
 	}
-	else if (!(paint = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+	
+	// validate painting: general
+	if ((paint_room && !IS_COMPLETE(paint_room)) || (paint_veh && !VEH_IS_COMPLETE(paint_veh))) {
+		msg_to_char(ch, "Finish building it before painting it.\r\n");
+		return;
+	}
+	if ((paint_room && IS_DISMANTLING(paint_room)) || (paint_veh && VEH_IS_DISMANTLING(paint_veh))) {
+		msg_to_char(ch, "You can't paint that while it is being dismantled.\r\n");
+		return;
+	}
+	
+	// ok find/validate the paint object
+	if (!*arg2) {
+		msg_to_char(ch, "Paint with what color?\r\n");
+		return;
+	}
+	if (!(paint = get_obj_in_list_vis(ch, arg2, NULL, ch->carrying))) {
 		msg_to_char(ch, "You don't seem to have that paint with.\r\n");
+		return;
 	}
-	else if (!IS_PAINT(paint)) {
+	if (!IS_PAINT(paint)) {
 		act("$p isn't paint!", FALSE, ch, paint, NULL, TO_CHAR);
+		return;
 	}
-	else if (!consume_otrigger(paint, ch, OCMD_PAINT, NULL)) {
+	if (!consume_otrigger(paint, ch, OCMD_PAINT, NULL)) {
 		return;	// check trigger
 	}
-	else {
+	
+	// SUCCESS
+	if (paint_room) {
 		act("You use $p to paint the building!", FALSE, ch, paint, NULL, TO_CHAR);
 		act("$n uses $p to paint the building!", FALSE, ch, paint, NULL, TO_ROOM);
 		
-		if (PRF_FLAGGED(ch, PRF_NO_PAINT)) {
-			msg_to_char(ch, "Notice: You have no-paint toggled on, and won't be able to see the color.\r\n");
-		}
-		
-		if (ROOM_PAINT_COLOR(IN_ROOM(ch)) == GET_PAINT_COLOR(paint)) {
-			// same color -- brighten it
-			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
-			affect_total_room(IN_ROOM(ch));
+		// brighten if same color or remove bright if not
+		if (ROOM_PAINT_COLOR(paint_room) == GET_PAINT_COLOR(paint)) {
+			SET_BIT(ROOM_BASE_FLAGS(paint_room), ROOM_AFF_BRIGHT_PAINT);
 		}
 		else {
-			// different color -- remove bright
-			REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
-			affect_total_room(IN_ROOM(ch));
+			REMOVE_BIT(ROOM_BASE_FLAGS(paint_room), ROOM_AFF_BRIGHT_PAINT);
 		}
 		
-		// update color
-		COMPLEX_DATA(IN_ROOM(ch))->paint_color = GET_PAINT_COLOR(paint);
-		
-		command_lag(ch, WAIT_ABILITY);
-		
-		run_interactions(ch, GET_OBJ_INTERACTIONS(paint), INTERACT_CONSUMES_TO, IN_ROOM(ch), NULL, paint, NULL, consumes_or_decays_interact);
-		extract_obj(paint);
+		set_room_extra_data(paint_room, ROOM_EXTRA_PAINT_COLOR, GET_PAINT_COLOR(paint));
 	}
+	if (paint_veh) {
+		act("You use $p to paint $V!", FALSE, ch, paint, paint_veh, TO_CHAR);
+		act("$n uses $p to paint $V!", FALSE, ch, paint, paint_veh, TO_ROOM);
+		
+		// brighten if same color or remove bright if not
+		if (VEH_PAINT_COLOR(paint_veh) == GET_PAINT_COLOR(paint)) {
+			SET_BIT(VEH_FLAGS(paint_veh), VEH_BRIGHT_PAINT);
+		}
+		else {
+			REMOVE_BIT(VEH_FLAGS(paint_veh), VEH_BRIGHT_PAINT);
+		}
+		
+		set_vehicle_extra_data(paint_veh, ROOM_EXTRA_PAINT_COLOR, GET_PAINT_COLOR(paint));
+	}
+	
+	if (PRF_FLAGGED(ch, PRF_NO_PAINT)) {
+		msg_to_char(ch, "Notice: You have no-paint toggled on, and won't be able to see the color.\r\n");
+	}
+	
+	command_lag(ch, WAIT_ABILITY);
+	affect_total_room(IN_ROOM(ch));
+	run_interactions(ch, GET_OBJ_INTERACTIONS(paint), INTERACT_CONSUMES_TO, paint_room, NULL, paint, paint_veh, consumes_or_decays_interact);
+	extract_obj(paint);
 }
 
 
@@ -2342,146 +2550,415 @@ ACMD(do_tunnel) {
 
 
 ACMD(do_unpaint) {
-	if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-		msg_to_char(ch, "You don't have permission to remove the paint here.\r\n");
-	}
-	else if (!has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
+	vehicle_data *paint_veh = NULL;
+	room_data *paint_room = NULL;
+	
+	one_argument(argument, arg);
+	
+	if (IS_NPC(ch) || !has_permission(ch, PRIV_CUSTOMIZE, IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't have permission to unpaint anything (customize).\r\n");
+		return;
 	}
-	else if (HOME_ROOM(IN_ROOM(ch)) != IN_ROOM(ch)) {
-		msg_to_char(ch, "You need to be in the main entry room to unpaint the building.\r\n");
-	}
-	else if (!ROOM_PAINT_COLOR(IN_ROOM(ch))) {
-		msg_to_char(ch, "Nothing here is painted.\r\n");
+	if (!*arg) {
+		msg_to_char(ch, "Usage: unpaint <building | vehicle>\r\n");
+		return;
 	}
 	
-	else {
+	// determine what they're trying to unpaint
+	if (is_abbrev(arg, "building") || is_abbrev(arg, "room") || isname(arg, skip_filler(get_room_name(HOME_ROOM(IN_ROOM(ch)), FALSE)))) {
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+			// actually unpaint the vehicle we're in
+			paint_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
+		}
+		else {
+			paint_room = HOME_ROOM(IN_ROOM(ch));
+		}
+	}
+	else if (!generic_find(arg, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &paint_veh)) {
+		msg_to_char(ch, "You don't see %s %s here to unpaint.\r\n", AN(arg), arg);
+		return;
+	}
+	
+	// validate unpainting: room
+	if (paint_room && (!can_use_room(ch, paint_room, MEMBERS_ONLY) || ROOM_AFF_FLAGGED(paint_room, ROOM_AFF_UNCLAIMABLE))) {
+		msg_to_char(ch, "You don't have permission to unpaint here.\r\n");
+		return;
+	}
+	if (paint_room && !ROOM_PAINT_COLOR(paint_room)) {
+		msg_to_char(ch, "It's not even painted.\r\n");
+		return;
+	}
+	
+	// validate unpainting: vehicle
+	if (paint_veh && !can_use_vehicle(ch, paint_veh, MEMBERS_ONLY)) {
+		act("You don't have permission to unpaint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		return;
+	}
+	if (paint_veh && !VEH_PAINT_COLOR(paint_veh)) {
+		act("You cannot paint $V.", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		return;
+	}
+	
+	// SUCCESS:
+	if (paint_room) {
 		act("You strip the paint from the building!", FALSE, ch, NULL, NULL, TO_CHAR);
 		act("$n strips the paint from the building!", FALSE, ch, NULL, NULL, TO_ROOM);
-		
-		COMPLEX_DATA(IN_ROOM(ch))->paint_color = 0;
-		REMOVE_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_BRIGHT_PAINT);
-		affect_total_room(IN_ROOM(ch));
-		
-		command_lag(ch, WAIT_ABILITY);
+		remove_room_extra_data(paint_room, ROOM_EXTRA_PAINT_COLOR);
+		REMOVE_BIT(ROOM_BASE_FLAGS(paint_room), ROOM_AFF_BRIGHT_PAINT);
 	}
+	if (paint_veh) {
+		act("You strip the paint from $V!", FALSE, ch, NULL, paint_veh, TO_CHAR);
+		act("$n strips the paint from $V!", FALSE, ch, NULL, paint_veh, TO_ROOM);
+		remove_vehicle_extra_data(paint_veh, ROOM_EXTRA_PAINT_COLOR);
+		REMOVE_BIT(VEH_FLAGS(paint_veh), VEH_BRIGHT_PAINT);
+	}
+	
+	command_lag(ch, WAIT_ABILITY);
+	affect_total_room(IN_ROOM(ch));
 }
 
 
 ACMD(do_upgrade) {
-	craft_data *iter, *next_iter, *type;
-	char valid_list[MAX_STRING_LENGTH];
-	struct bld_relation *relat;
-	bld_data *proto, *found_bld;
-	int upgrade_count = 0;
-	bool wait, room_wait;
+	extern bool check_can_craft(char_data *ch, craft_data *type);
+	void empty_vehicle(vehicle_data *veh, room_data *to_room);
+	extern bool find_and_bind(char_data *ch, obj_vnum vnum);
+	void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
+	extern int get_craft_scale_level(char_data *ch, craft_data *craft);
+	extern int get_new_vehicle_construction_id();
+	extern room_data *get_vehicle_interior(vehicle_data *veh);
+	void perform_abandon_vehicle(vehicle_data *veh);
+	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
+	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	
-	// determine what kind of upgrades are available here
-	if (GET_BUILDING(IN_ROOM(ch))) {
-		upgrade_count = count_bld_relations(GET_BUILDING(IN_ROOM(ch)), BLD_REL_UPGRADES_TO);
+	char arg1[MAX_INPUT_LENGTH], *arg2, output[MAX_STRING_LENGTH];
+	vehicle_data *up_veh = NULL, *prev_veh, *new_veh, *veh_proto;
+	craft_data *find_craft, *to_craft, *missing_abil = NULL;
+	struct bld_relation *relat, *lists[2];
+	obj_data *obj, *next_obj, *found_obj;
+	room_data *up_room = NULL, *interior;
+	struct vehicle_room_list *vrl;
+	bitvector_t set_bits;
+	bool done, fail;
+	int iter, found;
+	size_t size;
+	
+	arg2 = one_argument(argument, arg1);	// what to upgrade
+	skip_spaces(&arg2);	// optional: what to upgrade it to
+	
+	if (IS_NPC(ch) || !has_permission(ch, PRIV_BUILD, IN_ROOM(ch))) {
+		msg_to_char(ch, "You don't have permission to upgrade anything (build).\r\n");
+		return;
 	}
-	
-	skip_spaces(&argument);
-	
-	if (IS_NPC(ch)) {
-		msg_to_char(ch, "NPCs cannot use the upgrade command.\r\n");
-	}
-	else if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
+	if (!IS_APPROVED(ch) && config_get_bool("build_approval")) {
 		send_config_msg(ch, "need_approval_string");
+		return;
 	}
-	else if (!GET_BUILDING(IN_ROOM(ch)) || upgrade_count == 0) {
-		msg_to_char(ch, "You can't upgrade this.\r\n");
+	if (!*arg1) {
+		msg_to_char(ch, "Usage: upgrade <building | vehicle> [upgrade name]\r\n");
+		return;
 	}
-	else if (!can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY)) {
-		msg_to_char(ch, "You don't have permission to upgrade this building.\r\n");
+	
+	// arg1: determine what they're trying to upgrade
+	if (is_abbrev(arg1, "building") || is_abbrev(arg1, "room") || isname(arg1, skip_filler(get_room_name(HOME_ROOM(IN_ROOM(ch)), FALSE)))) {
+		if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
+			// actually upgrade the vehicle we're in
+			up_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
+		}
+		else {
+			up_room = HOME_ROOM(IN_ROOM(ch));
+		}
 	}
-	else if (!has_permission(ch, PRIV_BUILD, IN_ROOM(ch))) {
-		msg_to_char(ch, "You do not have permission to upgrade buildings.\r\n");
+	else if (!generic_find(arg1, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &up_veh)) {
+		msg_to_char(ch, "You don't see %s %s here to upgrade.\r\n", AN(arg1), arg1);
+		return;
 	}
-	else if (GET_ACTION(ch) != ACT_NONE) {
-		msg_to_char(ch, "You're already busy.\r\n");
-	}
-	else if (!IS_COMPLETE(IN_ROOM(ch))) {
-		msg_to_char(ch, "You can't start to upgrade it until you finish the construction.\r\n");
-	}
-	else if (BUILDING_RESOURCES(IN_ROOM(ch))) {
-		msg_to_char(ch, "The building needs some work before it can be upgraded.\r\n");
-	}
-	else {	// tentative success
-		*valid_list = '\0';	// initialize
-		found_bld = NULL;
-		
-		// attempt to figure out what we're upgrading to
-		LL_FOREACH(GET_BLD_RELATIONS(GET_BUILDING(IN_ROOM(ch))), relat) {
-			if (relat->type != BLD_REL_UPGRADES_TO || !(proto = building_proto(relat->vnum))) {
-				continue;
+	
+	// process the list of upgrades -- this will build the 'upgrade to what'
+	// output if there's no arg2, will find the craft if there is, and can also
+	// find the craft if there's no arg2 but there's also only 1 option
+	size = snprintf(output, sizeof(output), "Upgrade %s to what:", (up_veh ? VEH_SHORT_DESC(up_veh) : "it"));
+	to_craft = NULL;	// possibly the one the player requested
+	found = 0;
+	
+	// put relations into an array to do this in 1 loop
+	lists[0] = up_veh ? VEH_RELATIONS(up_veh) : NULL;
+	lists[1] = (up_room && GET_BUILDING(up_room)) ? GET_BLD_RELATIONS(GET_BUILDING(up_room)) : NULL;
+	for (iter = 0, done = FALSE; iter < 2 && !done; ++iter) {
+		LL_FOREACH(lists[iter], relat) {
+			// look up craft: this checks if the player can do it, too
+			if (relat->type == BLD_REL_UPGRADES_TO_BLD) {
+				find_craft = find_upgrade_craft_for_bld(ch, relat->vnum, missing_abil ? NULL : &missing_abil);
+			}
+			else if (relat->type == BLD_REL_UPGRADES_TO_VEH) {
+				find_craft = find_upgrade_craft_for_veh(ch, relat->vnum, missing_abil ? NULL : &missing_abil);
+			}
+			else {
+				continue;	// unsupported type
 			}
 			
-			// did we find a match?
-			if (*argument && multi_isname(argument, GET_BLD_NAME(proto))) {
-				found_bld = proto;
-				break;
+			if (!find_craft) {
+				continue;	// no craft available
 			}
-			else if (upgrade_count == 1) {
-				found_bld = proto;
-				break;
+			if (*arg2 && !multi_isname(arg2, GET_CRAFT_NAME(find_craft))) {
+				continue;	// not the requested craft
 			}
 			
-			// append to the valid list
-			sprintf(valid_list + strlen(valid_list), "%s%s", (*valid_list ? ", " : ""), GET_BLD_NAME(proto));
-		}
-		
-		if (!*argument && upgrade_count > 1) {
-			msg_to_char(ch, "Upgrade it to what: %s\r\n", valid_list);
-			return;
-		}
-		else if (!found_bld && !*valid_list) {
-			msg_to_char(ch, "You can't seem to upgrade anything there.\r\n");
-			return;
-		}
-		else if (!found_bld) {
-			msg_to_char(ch, "You can't upgrade it to that. Valid options are: %s\r\n", valid_list);
-			return;
-		}
-		
-		// ok, we know it's upgradeable and they have permission... now locate the upgrade craft...
-		type = NULL;
-		HASH_ITER(hh, craft_table, iter, next_iter) {
-			if (CRAFT_IS_BUILDING(iter) && IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_UPGRADE) && GET_CRAFT_BUILD_TYPE(iter) == GET_BLD_VNUM(found_bld)) {
-				if (IS_IMMORTAL(ch) || !IS_SET(GET_CRAFT_FLAGS(iter), CRAFT_IN_DEVELOPMENT)) {
-					type = iter;
-					break;
+			// SUCCESS: definitely an available craft
+			if (size < sizeof(output)) {
+				size += snprintf(output + size, sizeof(output) - size, "%s%s", (found ? ", " : " "), GET_CRAFT_NAME(find_craft));
+			}
+			++found;
+			
+			// save it for later if applicable (saves the first match)
+			if (!to_craft) {
+				to_craft = find_craft;
+				
+				if (*arg2) {
+					// only looking for 1
+					done = TRUE;
 				}
 			}
 		}
+	}
+	
+	// see what we've got from arg2
+	if (!*arg2 && found > 1) {
+		// too many choices
+		msg_to_char(ch, "%s\r\n", output);
+		return;
+	}
+	if (missing_abil && !to_craft && GET_CRAFT_ABILITY(missing_abil) != NOTHING) {
+		// didn't find something but did find a missing ability
+		msg_to_char(ch, "You need the %s ability to upgrade that.\r\n", get_ability_name_by_vnum(GET_CRAFT_ABILITY(missing_abil)));
+		return;
+	}
+	if (found == 0 || !to_craft) {
+		msg_to_char(ch, "You can't upgrade %s.\r\n", up_veh ? "that" : "anything here");
+		return;
+	}
+	
+	// validate upgrade: room
+	if (up_room && (!can_use_room(ch, up_room, MEMBERS_ONLY) || ROOM_AFF_FLAGGED(up_room, ROOM_AFF_UNCLAIMABLE))) {
+		msg_to_char(ch, "You don't have permission to upgrade it.\r\n");
+		return;
+	}
+	if (up_room && count_players_in_building(up_room, TRUE, TRUE)) {
+		msg_to_char(ch, "You can't upgrade it while players are inside.\r\n");
+		return;
+	}
+	
+	// validate upgrade: vehicle
+	if (up_veh && !can_use_vehicle(ch, up_veh, MEMBERS_ONLY)) {
+		act("You don't have permission to upgrade $V.", FALSE, ch, NULL, up_veh, TO_CHAR);
+		return;
+	}
+	if (up_veh && VEH_FLAGGED(up_veh, VEH_ON_FIRE)) {
+		msg_to_char(ch, "You can't upgrade that... it's on fire!\r\n");
+		return;
+	}
+	if (up_veh && VEH_DRIVER(up_veh)) {
+		msg_to_char(ch, "You can't upgrade it while %s driving it.\r\n", (VEH_DRIVER(up_veh) == ch) ? "you're" : "someone is");
+		return;
+	}
+	if (up_veh && VEH_LED_BY(up_veh)) {
+		msg_to_char(ch, "You can't upgrade it while %s leading it.\r\n", (VEH_LED_BY(up_veh) == ch) ? "you're" : "someone is");
+		return;
+	}
+	if (up_veh && VEH_SITTING_ON(up_veh)) {
+		msg_to_char(ch, "You can't upgrade it while %s sitting %s it.\r\n", (VEH_SITTING_ON(up_veh) == ch) ? "you're" : "someone is", IN_OR_ON(up_veh));
+		return;
+	}
+	if (up_veh && count_players_in_vehicle(up_veh, TRUE)) {
+		msg_to_char(ch, "You can't upgrade it while players are inside.\r\n");
+		return;
+	}
+	
+	// validate upgrade: general
+	if (up_veh && IN_ROOM(up_veh) != IN_ROOM(ch)) {
+		act("You need to upgrade $V from outside of it.", FALSE, ch, NULL, up_veh, TO_CHAR);
+		return;
+	}
+	if (up_room && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch))) {
+		msg_to_char(ch, "You need to upgrade the building from its main/entry room.\r\n");
+		return;
+	}
+	if ((up_room && !IS_COMPLETE(up_room)) || (up_veh && !VEH_IS_COMPLETE(up_veh))) {
+		msg_to_char(ch, "Finish building it before you upgrade it.\r\n");
+		return;
+	}
+	if ((up_room && IS_DISMANTLING(up_room)) || (up_veh && VEH_IS_DISMANTLING(up_veh))) {
+		msg_to_char(ch, "You can't upgrade that while it is being dismantled.\r\n");
+		return;
+	}
+	if ((up_room && BUILDING_RESOURCES(up_room)) || (up_veh && VEH_NEEDS_RESOURCES(up_veh))) {
+		msg_to_char(ch, "You need to do some repairs before you can upgrade it.\r\n");
+		return;
+	}
+	if (GET_ACTION(ch) != ACT_NONE) {
+		msg_to_char(ch, "You're already busy doing something else.\r\n");
+		return;
+	}
+	if (!check_can_craft(ch, to_craft)) {
+		// sends own messages
+		return;
+	}
+	if (up_room && !check_build_location_and_dir(ch, to_craft, BUILDING_ENTRANCE(up_room) != NO_DIR ? rev_dir[BUILDING_ENTRANCE(up_room)] : NO_DIR, TRUE, NULL, NULL)) {
+		// sends own messages
+		return;
+	}
+	if (up_veh) {	// check building location
+		// temporarily remove from the room for validation
+		prev_veh = (up_veh == ROOM_VEHICLES(IN_ROOM(up_veh))) ? NULL : up_veh->prev_in_room;
+		DL_DELETE2(ROOM_VEHICLES(IN_ROOM(up_veh)), up_veh, prev_in_room, next_in_room);
 		
-		if (!type) {
-			msg_to_char(ch, "You don't know how to upgrade this building.\r\n");
-		}
-		else if (GET_CRAFT_ABILITY(type) != NO_ABIL && !has_ability(ch, GET_CRAFT_ABILITY(type))) {
-			msg_to_char(ch, "You don't have the required ability to upgrade this building.\r\n");
-		}
-		else if (CRAFT_FLAGGED(type, CRAFT_LEARNED) && !has_learned_craft(ch, GET_CRAFT_VNUM(type))) {
-			msg_to_char(ch, "You have not learned the correct recipe to upgrade this building.\r\n");
-		}
-		else if (IS_SET(GET_CRAFT_FLAGS(type), CRAFT_IN_CITY_ONLY) && !is_in_city_for_empire(IN_ROOM(ch), GET_LOYALTY(ch), TRUE, &wait) && !is_in_city_for_empire(IN_ROOM(ch), ROOM_OWNER(IN_ROOM(ch)), TRUE, &room_wait)) {
-			msg_to_char(ch, "You can only upgrade this building in a city%s.\r\n", (wait || room_wait) ? " (this city was founded too recently)" : "");
+		fail = !check_build_location_and_dir(ch, to_craft, NO_DIR, TRUE, NULL, NULL);
+		
+		// re-add vehicle
+		if (prev_veh) {
+			DL_APPEND_ELEM2(ROOM_VEHICLES(IN_ROOM(up_veh)), prev_veh, up_veh, prev_in_room, next_in_room);
 		}
 		else {
-			// it's good!
-			start_action(ch, ACT_BUILDING, 0);
-			
-			dismantle_wtrigger(IN_ROOM(ch), NULL, FALSE);
-			detach_building_from_room(IN_ROOM(ch));
-			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(type)), IN_ROOM(ch), TRUE);
-			set_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(type));
-			SET_BIT(ROOM_BASE_FLAGS(IN_ROOM(ch)), ROOM_AFF_INCOMPLETE);
-			affect_total_room(IN_ROOM(ch));
-			GET_BUILDING_RESOURCES(IN_ROOM(ch)) = copy_resource_list(GET_CRAFT_RESOURCES(type));
-
-			msg_to_char(ch, "You begin to upgrade the building.\r\n");
-			act("$n starts upgrading the building.", FALSE, ch, 0, 0, TO_ROOM);
+			DL_PREPEND2(ROOM_VEHICLES(IN_ROOM(up_veh)), up_veh, prev_in_room, next_in_room);
 		}
+		
+		if (fail) {
+			// sends own messages
+			return;
+		}
+	}		
+	
+	// SUCCESS:
+	if (CRAFT_IS_BUILDING(to_craft)) {
+		start_action(ch, ACT_BUILDING, 0);
+	}
+	else {
+		start_action(ch, ACT_GEN_CRAFT, -1);
+	}
+	
+	GET_ACTION_VNUM(ch, 0) = GET_CRAFT_VNUM(to_craft);
+	
+	// check required obj
+	if (GET_CRAFT_REQUIRES_OBJ(to_craft) != NOTHING) {
+		find_and_bind(ch, GET_CRAFT_REQUIRES_OBJ(to_craft));
+		
+		if ((found_obj = has_required_obj_for_craft(ch, GET_CRAFT_REQUIRES_OBJ(to_craft))) && CRAFT_FLAGGED(to_craft, CRAFT_TAKE_REQUIRED_OBJ)) {
+			act("You use $p.", FALSE, ch, found_obj, NULL, TO_CHAR);
+			extract_obj(found_obj);
+		}
+	}
+	
+	// upgrade room version
+	if (up_room) {
+		dismantle_wtrigger(up_room, NULL, FALSE);
+		detach_building_from_room(up_room);
+		attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(to_craft)), up_room, TRUE);
+		set_room_extra_data(up_room, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(to_craft));
+		SET_BIT(ROOM_BASE_FLAGS(up_room), ROOM_AFF_INCOMPLETE);
+		affect_total_room(up_room);
+		GET_BUILDING_RESOURCES(up_room) = copy_resource_list(GET_CRAFT_RESOURCES(to_craft));
+
+		msg_to_char(ch, "You begin to upgrade the building.\r\n");
+		act("$n starts upgrading the building.", FALSE, ch, NULL, NULL, TO_ROOM);
+	}
+	
+	// upgrade vehicle version
+	if (up_veh) {
+		act("You start upgrading $V.", FALSE, ch, NULL, up_veh, TO_CHAR);
+		act("$n starts upgrading $V.", FALSE, ch, NULL, up_veh, TO_ROOM);
+		
+		new_veh = read_vehicle(GET_CRAFT_OBJECT(to_craft), TRUE);
+		
+		// set incomplete before putting in the room
+		SET_BIT(VEH_FLAGS(new_veh), VEH_INCOMPLETE);
+		vehicle_to_room(new_veh, IN_ROOM(up_veh));
+		
+		// see if we need to abandon the old one
+		if (VEH_OWNER(up_veh) && VEH_FLAGGED(new_veh, VEH_NO_CLAIM)) {
+			perform_abandon_vehicle(up_veh);
+		}
+		else if (VEH_OWNER(up_veh)) {
+			perform_claim_vehicle(new_veh, VEH_OWNER(up_veh));
+		}
+	
+		// additional setup
+		special_vehicle_setup(ch, new_veh);
+		VEH_NEEDS_RESOURCES(new_veh) = copy_resource_list(GET_CRAFT_RESOURCES(to_craft));
+		VEH_HEALTH(new_veh) = MAX(1, VEH_MAX_HEALTH(new_veh) * 0.2);	// start at 20% health, will heal on completion
+		scale_vehicle_to_level(new_veh, get_craft_scale_level(ch, to_craft));
+		VEH_CONSTRUCTION_ID(new_veh) = get_new_vehicle_construction_id();
+		GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(new_veh);
+		
+		// transfer stuff from old veh
+		VEH_ANIMALS(new_veh) = VEH_ANIMALS(up_veh);
+		VEH_ANIMALS(up_veh) = NULL;
+		
+		VEH_BUILT_WITH(new_veh) = VEH_BUILT_WITH(up_veh);
+		VEH_BUILT_WITH(up_veh) = NULL;
+		
+		VEH_DEPLETION(new_veh) = VEH_DEPLETION(up_veh);
+		VEH_DEPLETION(up_veh) = NULL;
+		
+		VEH_EXTRA_DATA(new_veh) = VEH_EXTRA_DATA(up_veh);
+		VEH_EXTRA_DATA(up_veh) = NULL;
+		set_vehicle_extra_data(new_veh, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(to_craft));
+		
+		VEH_INSTANCE_ID(new_veh) = VEH_INSTANCE_ID(up_veh);
+		
+		// adapt flags: find flags added to up_veh
+		if ((veh_proto = vehicle_proto(VEH_VNUM(up_veh)))) {
+			set_bits = VEH_FLAGS(up_veh) & SAVABLE_VEH_FLAGS & ~VEH_FLAGS(veh_proto);
+			SET_BIT(VEH_FLAGS(new_veh), set_bits);
+		}
+		
+		// ensure paintability if paint was copied
+		if (VEH_FLAGGED(new_veh, VEH_NO_PAINT)) {
+			REMOVE_BIT(VEH_FLAGS(new_veh), VEH_BRIGHT_PAINT);
+			remove_vehicle_extra_data(new_veh, ROOM_EXTRA_PAINT_COLOR);
+		}
+		
+		// transfer/dump contents
+		if (VEH_CAPACITY(new_veh) > 0) {
+			DL_FOREACH_SAFE2(VEH_CONTAINS(up_veh), obj, next_obj, next_content) {
+				obj_to_vehicle(obj, new_veh);
+			}
+		}
+		else {
+			empty_vehicle(up_veh, IN_ROOM(up_veh));
+		}
+		
+		// transfer/dump inventory
+		if (VEH_INTERIOR_ROOM_VNUM(new_veh) != NOTHING && (interior = get_vehicle_interior(up_veh))) {
+			VEH_INSIDE_ROOMS(new_veh) = VEH_INSIDE_ROOMS(up_veh);
+			
+			// move home room
+			VEH_INTERIOR_HOME_ROOM(new_veh) = interior;
+			COMPLEX_DATA(interior)->vehicle = new_veh;
+			
+			// move whole interior
+			LL_FOREACH(VEH_ROOM_LIST(up_veh), vrl) {
+				COMPLEX_DATA(vrl->room)->vehicle = new_veh;
+			}
+			
+			// transfer room list
+			VEH_ROOM_LIST(new_veh) = VEH_ROOM_LIST(up_veh);
+			VEH_ROOM_LIST(up_veh) = NULL;
+			VEH_INTERIOR_HOME_ROOM(up_veh) = NULL;
+			
+			// change room
+			if (VEH_INTERIOR_ROOM_VNUM(new_veh) != VEH_INTERIOR_ROOM_VNUM(up_veh) && building_proto(VEH_INTERIOR_ROOM_VNUM(new_veh))) {
+				detach_building_from_room(interior);
+				attach_building_to_room(building_proto(VEH_INTERIOR_ROOM_VNUM(new_veh)), interior, TRUE);
+			}
+			
+			// need to run this early because it won't run on completion
+			complete_wtrigger(interior);
+		}
+		else {
+			fully_empty_vehicle(up_veh, IN_ROOM(up_veh));
+		}
+		
+		// and remove the old one
+		extract_vehicle(up_veh);
 	}
 }
 

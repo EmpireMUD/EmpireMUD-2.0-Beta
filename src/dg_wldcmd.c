@@ -392,7 +392,7 @@ WCMD(do_wvehicleecho) {
 
 	if (!*targ || !*msg)
 		wld_log(room, "wvehicleecho called with too few args");
-	else if (!(*targ == UID_CHAR && (veh = get_vehicle(targ))) && !(veh = get_vehicle_room(room, targ))) {
+	else if (!(*targ == UID_CHAR && (veh = get_vehicle(targ))) && !(veh = get_vehicle_room(room, targ, NULL))) {
 		wld_log(room, "wvehicleecho called with bad target");
 	}
 	else {
@@ -558,7 +558,7 @@ WCMD(do_wsiege) {
 		}
 	}
 	if (!veh_targ && !room_targ) {
-		veh_targ = get_vehicle_room(room, tar_arg);
+		veh_targ = get_vehicle_room(room, tar_arg, NULL);
 	}
 	
 	// seems ok
@@ -695,7 +695,7 @@ WCMD(do_wteleport) {
 				msdp_update_room(ch);	// once we're sure we're staying
 			}
 		}
-		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_room(room, arg1))) {
+		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_room(room, arg1, NULL))) {
 			adjust_vehicle_tech(veh, FALSE);
 			vehicle_from_room(veh);
 			vehicle_to_room(veh, target);
@@ -908,7 +908,7 @@ WCMD(do_wown) {
 			wld_log(room, "wown: Too few arguments (wown vehicle)");
 			return;
 		}
-		else if (!(vtarg = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_room(room, targ_arg)))) {
+		else if (!(vtarg = ((*targ_arg == UID_CHAR) ? get_vehicle(targ_arg) : get_vehicle_room(room, targ_arg, NULL)))) {
 			wld_log(room, "wown: Invalid vehicle target");
 			return;
 		}
@@ -939,7 +939,7 @@ WCMD(do_wown) {
 		else if (*targ_arg == UID_CHAR && ((vict = get_char(targ_arg)) || (vtarg = get_vehicle(targ_arg)) || (otarg = get_obj(targ_arg)) || (rtarg = get_room(room, targ_arg)))) {
 			// found by uid
 		}
-		else if ((vict = get_char_by_room(room, targ_arg)) || (vtarg = get_vehicle_room(room, targ_arg)) || (otarg = get_obj_by_room(room, targ_arg))) {
+		else if ((vict = get_char_by_room(room, targ_arg)) || (vtarg = get_vehicle_room(room, targ_arg, NULL)) || (otarg = get_obj_by_room(room, targ_arg))) {
 			// found by name
 		}
 		else {
@@ -1033,7 +1033,7 @@ WCMD(do_wpurge) {
 		extract_char(ch);
 	}
 	// purge vehicle
-	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg))) {
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg, NULL))) {
 		if (*argument) {
 			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
@@ -1439,7 +1439,7 @@ WCMD(do_wrestore) {
 	else if ((*arg == UID_CHAR && (victim = get_char(arg))) || (victim = get_char_in_room(room, arg))) {
 		// found victim
 	}
-	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg))) {
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg, NULL))) {
 		// found vehicle
 		if (!VEH_IS_COMPLETE(veh)) {
 			wld_log(room, "wrestore: used on unfinished vehicle");
@@ -1573,7 +1573,7 @@ WCMD(do_wscale) {
 		SET_BIT(MOB_FLAGS(victim), MOB_NO_RESCALE);
 	}
 	// scale vehicle
-	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg))) {
+	else if ((*arg == UID_CHAR && (veh = get_vehicle(arg))) || (veh = get_vehicle_room(room, arg, NULL))) {
 		scale_vehicle_to_level(veh, level);
 	}
 	// scale obj

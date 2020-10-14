@@ -1642,6 +1642,7 @@ They generally have no game effect, but can help with testing.
 
 Available utilities:
  &capproval&0 - Change all player approvals to be "by account" or "by character".
+ &cbldconvert&0 - See UTIL BLDCONVERT
  &cb318buildings&0 - Finds buildings using flags that were deprecated in 2.0b3.18.
  &cclearroles&0 - Clears the group roles and abilities of all players.
  &cdiminish <number> <scale>&0 - Applies the game's diminishing returns formula,
@@ -1663,6 +1664,41 @@ Available utilities:
  &cstrlen&0 - Give various measures of string length.
  &cwipeprogress&0 - Clears and fully resets empire progress for 1 or all empires.
  &cyearly&0 - Runs a full annual update on the world.
+#d
+"UTILITY BLDCONVERT" "UTIL BLDCONVERT" "UTILITY BLD CONVERT" "UTIL BLD CONVERT" "UTILITY BUILD CONVERT" "UTIL BUILD CONVERT" BLDCONVERT
+
+Usage:  util bldconvert <old building vnum> <start of new vnum range>
+
+This tool will clone a traditional building as a building-vehicle, a new style
+of building that sits in a map room. The <start of new vnum range> argument
+will search for the first free vnum in that range -- it usually needs to be
+free for a vehicle, an interior (ROOM building), and craft.
+
+What this tool does:
+- sets the old craft dismantle-only
+- copies some of the building's data to a new vehicle
+  - sets flags: BUILDING, IN, CUSTOMIZABLE, !BUILDING, !LOAD-ONTO-VEHICLE,
+                VISIBLE-IN-DARK, and the NO-WORKFORCE-EVOS affect
+  - it will also set certain other flags for HERD or ALLOW-MOUNTS buildings
+- copies some of the data to a new ROOM-flagged building for the interior
+  (unless it was an OPEN building)
+- copies the craft to create the vehicle version
+  - in some cases, it removes the build-facing flag, but keeps them if certain
+    flags were set -- you must review these yourself
+- updates the old craft with a DISMANTLE-ONLY flag
+
+What you need to do after:
+- update the vehicle's strings (short desc, keywords, long desc, look desc)
+- split the new craft name if necessary (lumberyard -> lumber yard)
+- change the size (it's set to 1 by default)
+- add "road" to the build-on flags if appropriate
+- check any quests, progress goals, etc that were mentioned by this command and
+  update them to use the vehicle version if appropriate
+- remove the build-facing flags from the new craft if possible
+- any scripts on an open building need to be re-written for vehicles
+- review any other notes given by this command and address them if needed
+
+See also: BUILDING-VEHICLES
 #d
 VNUM
 

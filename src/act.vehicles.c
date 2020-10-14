@@ -31,6 +31,7 @@
 */
 
 // local protos
+void do_unseat_from_vehicle(char_data *ch);
 
 // external consts
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
@@ -38,6 +39,8 @@ extern const char *dirs[];
 extern const char *from_dir[];
 extern const bool is_flat_dir[NUM_OF_DIRS];
 extern const char *mob_move_types[];
+extern const char *position_commands[];
+extern const char *position_types[];
 extern const int rev_dir[];
 
 // external funcs
@@ -115,7 +118,7 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 	vehicle_data *veh;
 	
 	// prefer ones here
-	if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+	if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		return veh;
 	}
 	
@@ -218,7 +221,7 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 	}
 
 	// vehicle targeting
-	else if ((tar = get_vehicle_in_target_room_vis(ch, from_room, arg))) {
+	else if ((tar = get_vehicle_in_target_room_vis(ch, from_room, arg, NULL))) {
 		// validation
 		if (!validate_siege_target_vehicle(ch, veh, tar)) {
 			// sends own message
@@ -233,6 +236,51 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 	}
 	
 	return (*room_targ || *veh_targ);
+}
+
+
+/**
+* For ship/dispatch, processes the target arg, which may be an island or
+* coords. The coordinates must be a dock, or the island must have a dock. 
+*
+* @param char_data *ch The player targeting an island or docks.
+* @param char *argument The argument as-typed.
+* @param bool *targeted_island A var to bind this data. Will be TRUE if the player targeted by island rather than coords.
+* @return room_data* The valid target, if any. Otherwise, will be NULL and the player received an error message.
+*/
+room_data *get_shipping_target(char_data *ch, char *argument, bool *targeted_island) {
+	extern room_data *find_docks(empire_data *emp, int island_id);
+	
+	struct island_info *to_isle;
+	room_data *room;
+	
+	*targeted_island = FALSE;
+	
+	if (!*argument) {
+		msg_to_char(ch, "You must specify an island name or the coordinates of a dock.\r\n");
+	}
+	else if ((room = parse_room_from_coords(argument))) {
+		// found a room
+		if (!room_has_function_and_city_ok(GET_LOYALTY(ch), room, FNC_DOCKS)) {
+			msg_to_char(ch, "There are no docks at that location.\r\n");
+		}
+		else {
+			// success!
+			return room;
+		}
+	}
+	else if (!(to_isle = get_island_by_name(ch, argument))) {
+		msg_to_char(ch, "Unknown target island \"%s\".\r\n", argument);
+	}
+	else if (!(room = find_docks(GET_LOYALTY(ch), to_isle->id))) {
+		msg_to_char(ch, "%s has no docks (docks must not be set no-work).\r\n", to_isle->name);
+	}
+	else {
+		*targeted_island = TRUE;
+		return room;
+	}
+	
+	return NULL;	// not found
 }
 
 
@@ -723,19 +771,35 @@ void process_driving(char_data *ch) {
 
 
 /**
-* Determines if a person can sit in/on a vehicle.
+* Determines if a person can sit/rest/sleep in/on a vehicle.
 *
 * @param char_data *ch The player.
 * @param vehicle_data *veh The vehicle to sit in/on.
+* @param int pos Whether we're trying to reach POS_SITTING / POS_RESTING / POS_SLEEPING.
 * @param bool message if TRUE, sends its own error message; FALSE is silent.
 * @return bool TRUE if ok to sit, FALSE if not.
 */
-bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message) {
-	if (!VEH_FLAGGED(veh, VEH_SIT)) {
+bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message) {
+	char buf[256];
+	
+	// flag checks
+	if (pos == POS_SITTING && !VEH_FLAGGED(veh, VEH_SIT)) {
 		if (message) {
-			msg_to_char(ch, "You can't sit on that!\r\n");
+			msg_to_char(ch, "You can't %s on that!\r\n", position_commands[pos]);
 		}
 	}
+	else if (pos == POS_SLEEPING && !VEH_FLAGGED(veh, VEH_SLEEP)) {
+		if (message) {
+			msg_to_char(ch, "You can't %s on that!\r\n", position_commands[pos]);
+		}
+	}
+	else if (pos == POS_RESTING && !VEH_FLAGGED(veh, VEH_SIT | VEH_SLEEP)) {
+		if (message) {
+			msg_to_char(ch, "You can't %s on that!\r\n", position_commands[pos]);
+		}
+	}
+	
+	// completeness checks
 	else if (VEH_IS_DISMANTLING(veh)) {
 		if (message) {
 			msg_to_char(ch, "You can't sit %s because it's being dismantled.\r\n", IN_OR_ON(veh));
@@ -751,21 +815,27 @@ bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message) {
 			msg_to_char(ch, "You can't sit on it while it's on fire!\r\n");
 		}
 	}
-	else if (VEH_SITTING_ON(veh)) {
+	
+	// person checks
+	else if (VEH_SITTING_ON(veh) && (VEH_SITTING_ON(veh) != ch || pos == GET_POS(ch))) {
 		if (message) {
-			msg_to_char(ch, "%s already sitting %s it.\r\n", (VEH_SITTING_ON(veh) != ch ? "Someone else is" : "You are"), IN_OR_ON(veh));
+			snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+			*buf = LOWER(*buf);
+			msg_to_char(ch, "%s already %s %s it.\r\n", (VEH_SITTING_ON(veh) != ch ? "Someone else is" : "You are"), buf, IN_OR_ON(veh));
 		}
 	}
 	else if (VEH_LED_BY(veh)) {
 		if (message) {
-			msg_to_char(ch, "You can't sit %s it while %s leading it around.\r\n", IN_OR_ON(veh), (VEH_LED_BY(veh) == ch) ? "you are" : "someone else is");
+			msg_to_char(ch, "You can't %s %s it while %s leading it around.\r\n", position_commands[pos], IN_OR_ON(veh), (VEH_LED_BY(veh) == ch) ? "you are" : "someone else is");
 		}
 	}
-	else if (VEH_DRIVER(veh)) {
+	else if (VEH_DRIVER(veh) && VEH_DRIVER(veh) != ch) {
 		if (message) {
 			msg_to_char(ch, "You can't lead it while someone else is controlling it.\r\n");
 		}
 	}
+	
+	// other checks
 	else if (!can_use_vehicle(ch, veh, MEMBERS_AND_ALLIES)) {
 		if (message) {
 			msg_to_char(ch, "You don't have permission to sit %s that.\r\n", IN_OR_ON(veh));
@@ -773,7 +843,7 @@ bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, bool message) {
 	}
 	else if (GET_LEADING_VEHICLE(ch) || GET_LEADING_MOB(ch)) {
 		if (message) {
-			msg_to_char(ch, "You can't sit %s it while you're leading something.\r\n", IN_OR_ON(veh));
+			msg_to_char(ch, "You can't %s %s it while you're leading something.\r\n", position_commands[pos], IN_OR_ON(veh));
 		}
 	}
 	else {
@@ -807,7 +877,7 @@ void do_customize_vehicle(char_data *ch, char *argument) {
 		msg_to_char(ch, "Usage: customize vehicle <target> <name | longdesc | description> <value | set | none>\r\n");
 	}
 	// vehicle validation
-	else if (!(veh = get_vehicle_in_room_vis(ch, tar_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(tar_arg, VEH_KEYWORDS(veh)))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, tar_arg, NULL)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(tar_arg, VEH_KEYWORDS(veh)))) {
 		msg_to_char(ch, "You don't see that vehicle here.\r\n");
 	}
 	else if (!VEH_FLAGGED(veh, VEH_BUILDING) && !has_player_tech(ch, PTECH_CUSTOMIZE_VEHICLE)) {
@@ -1014,7 +1084,7 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 	obj_dotmode = find_all_dots(arg);
 	
 	if (obj_dotmode == FIND_INDIV) {
-		if (!(obj = get_obj_in_list_vis(ch, arg, VEH_CONTAINS(veh)))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, VEH_CONTAINS(veh)))) {
 			sprintf(buf, "There doesn't seem to be %s %s in $V.", AN(arg), arg);
 			act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 		}
@@ -1024,7 +1094,7 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 				if (!perform_get_from_vehicle(ch, obj, veh, mode)) {
 					break;
 				}
-				obj = get_obj_in_list_vis(ch, arg, next_obj);
+				obj = get_obj_in_list_vis(ch, arg, NULL, next_obj);
 			}
 		}
 	}
@@ -1098,12 +1168,16 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 
 
 /**
-* Command processing for a character who is trying to sit in/on a vehicle.
+* Command processing for a character who is trying to sit/rest/sleep in/on
+* a vehicle.
 *
 * @param char_data *ch The person trying to sit.
 * @param char *argument The targeting arg.
+* @param int pos Either POS_SITTING, POS_RESTING, or POS_SLEEPING.
 */
-void do_sit_on_vehicle(char_data *ch, char *argument) {
+void do_sit_on_vehicle(char_data *ch, char *argument, int pos) {
+	extern bool check_stop_flying(char_data *ch);
+	
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh;
 	
@@ -1115,17 +1189,20 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 	else if (GET_POS(ch) == POS_FIGHTING) {
 		msg_to_char(ch, "You can't really do that right now!\r\n");
 	}
-	else if (GET_POS(ch) < POS_STANDING || GET_SITTING_ON(ch)) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, argument, NULL))) {
+		msg_to_char(ch, "You don't see anything like that here.\r\n");
+	}
+	else if (!validate_sit_on_vehicle(ch, veh, pos, TRUE)) {
+		// sends own message
+	}
+	else if (GET_POS(ch) < POS_STANDING && GET_SITTING_ON(ch) != veh) {
 		msg_to_char(ch, "You need to stand up before you can do that.\r\n");
 	}
 	else if (IS_RIDING(ch) && !PRF_FLAGGED(ch, PRF_AUTODISMOUNT)) {
 		msg_to_char(ch, "You can't do that while mounted.\r\n");
 	}
-	else if (!(veh = get_vehicle_in_room_vis(ch, argument))) {
-		msg_to_char(ch, "You don't see anything like that here.\r\n");
-	}
-	else if (!validate_sit_on_vehicle(ch, veh, TRUE)) {
-		// sends own message
+	else if (!check_stop_flying(ch)) {
+		msg_to_char(ch, "You can't do that because you're flying.\r\n");
 	}
 	else {
 		// auto-dismount
@@ -1133,14 +1210,18 @@ void do_sit_on_vehicle(char_data *ch, char *argument) {
 			do_dismount(ch, "", 0, 0);
 		}
 		
-		snprintf(buf, sizeof(buf), "You sit %s $V.", IN_OR_ON(veh));
+		if (GET_SITTING_ON(ch) && GET_SITTING_ON(ch) != veh) {
+			do_unseat_from_vehicle(ch);
+		}
+		
+		snprintf(buf, sizeof(buf), "You %s %s $V.", position_commands[pos], IN_OR_ON(veh));
 		act(buf, FALSE, ch, NULL, veh, TO_CHAR);
 		
-		snprintf(buf, sizeof(buf), "$n sits %s $V.", IN_OR_ON(veh));
+		snprintf(buf, sizeof(buf), "$n %ss %s $V.", position_commands[pos], IN_OR_ON(veh));
 		act(buf, FALSE, ch, NULL, veh, TO_ROOM);
 		
 		sit_on_vehicle(ch, veh);
-		GET_POS(ch) = POS_SITTING;
+		GET_POS(ch) = pos;
 	}
 }
 
@@ -1169,7 +1250,7 @@ void do_put_obj_in_vehicle(char_data *ch, vehicle_data *veh, int dotmode, char *
 	}
 	
 	if (dotmode == FIND_INDIV) {	// put <obj> <vehicle>
-		if (!(obj = get_obj_in_list_vis(ch, arg, ch->carrying))) {
+		if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
 			msg_to_char(ch, "You aren't carrying %s %s.\r\n", AN(arg), arg);
 		}
 		else if (multi && OBJ_FLAGGED(obj, OBJ_KEEP)) {
@@ -1187,7 +1268,7 @@ void do_put_obj_in_vehicle(char_data *ch, vehicle_data *veh, int dotmode, char *
 					break;
 				}
 				
-				obj = get_obj_in_list_vis(ch, arg, next_obj);
+				obj = get_obj_in_list_vis(ch, arg, NULL, next_obj);
 				found = TRUE;
 			}
 			
@@ -1239,7 +1320,7 @@ void do_unseat_from_vehicle(char_data *ch) {
 	act(buf, TRUE, ch, NULL, GET_SITTING_ON(ch), TO_ROOM);
 
 	unseat_char_from_vehicle(ch);
-	if (GET_POS(ch) == POS_SITTING) {
+	if (GET_POS(ch) == POS_SITTING || GET_POS(ch) == POS_RESTING || GET_POS(ch) == POS_SLEEPING) {
 		GET_POS(ch) = FIGHTING(ch) ? POS_FIGHTING : POS_STANDING;
 	}
 }
@@ -1269,7 +1350,7 @@ ACMD(do_board) {
 		snprintf(buf, sizeof(buf), "%s what?\r\n", command);
 		send_to_char(CAP(buf), ch);
 	}
-	else if (!(veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg), arg);
 	}
 	else if (!VEH_INTERIOR_HOME_ROOM(veh) && VEH_INTERIOR_ROOM_VNUM(veh) == NOTHING) {
@@ -1332,17 +1413,17 @@ ACMD(do_disembark) {
 
 ACMD(do_dispatch) {
 	extern char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_data *veh, mob_vnum vnum);
-	extern room_data *find_docks(empire_data *emp, int island_id);
 	extern struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc);
 	extern int find_free_shipping_id(empire_data *emp);
 	void sail_shipment(empire_data *emp, vehicle_data *boat);
 	extern bool ship_is_empty(vehicle_data *ship);
 	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 
-	struct island_info *to_isle;
 	char targ[MAX_INPUT_LENGTH], isle_arg[MAX_INPUT_LENGTH];
+	bool targeted_island = FALSE;
 	struct empire_npc_data *npc;
 	struct shipping_data *shipd;
+	room_data *to_room;
 	char_data *worker;
 	vehicle_data *veh;
 	
@@ -1350,7 +1431,7 @@ ACMD(do_dispatch) {
 	skip_spaces(&argument);
 	
 	// since 'ship' requires quotes around the island name, we are optionally taking them here
-	if (*argument == '"') {
+	if (*argument == '"' || *argument == '(') {
 		any_one_word(argument, isle_arg);
 	}
 	else {
@@ -1392,22 +1473,22 @@ ACMD(do_dispatch) {
 	else if (!ship_is_empty(veh)) {
 		msg_to_char(ch, "You can't dispatch a ship that has people inside it.\r\n");
 	}
+	else if (!GET_ISLAND(IN_ROOM(veh))) {
+		msg_to_char(ch, "You can't automatically dispatch ships that are out at sea.\r\n");
+	}
 	else if (!WATER_SECT(IN_ROOM(veh)) && !IS_WATER_BUILDING(IN_ROOM(veh))) {
 		msg_to_char(ch, "You can only dispatch ships that are on the water or in docks.\r\n");
 	}
 	
 	// destination validation
-	else if (!GET_ISLAND(IN_ROOM(veh))) {
-		msg_to_char(ch, "You can't automatically dispatch ships that are out at sea.\r\n");
+	else if (!(to_room = get_shipping_target(ch, isle_arg, &targeted_island))) {
+		// sent own message
 	}
-	else if (!(to_isle = get_island_by_name(ch, isle_arg)) && !(to_isle = get_island_by_coords(isle_arg))) {
-		msg_to_char(ch, "Unknown target island \"%s\".\r\n", isle_arg);
+	else if (to_room == IN_ROOM(veh)) {
+		msg_to_char(ch, "It's already there!\r\n");
 	}
-	else if (to_isle->id == GET_ISLAND_ID(IN_ROOM(veh)) && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(veh), FNC_DOCKS)) {
+	else if (targeted_island && GET_ISLAND_ID(to_room) == GET_ISLAND_ID(IN_ROOM(veh)) && room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(veh), FNC_DOCKS)) {
 		msg_to_char(ch, "It is already docked on that island.\r\n");
-	}
-	else if (!find_docks(GET_LOYALTY(ch), to_isle->id)) {
-		msg_to_char(ch, "%s has no docks (docks must not be set no-work).\r\n", to_isle->name);
 	}
 	
 	// ready ready go
@@ -1431,7 +1512,8 @@ ACMD(do_dispatch) {
 		CREATE(shipd, struct shipping_data, 1);
 		shipd->vnum = NOTHING;
 		shipd->from_island = GET_ISLAND_ID(IN_ROOM(veh));
-		shipd->to_island = to_isle->id;
+		shipd->to_island = GET_ISLAND_ID(to_room);
+		shipd->to_room = GET_ROOM_VNUM(to_room);
 		shipd->status = SHIPPING_QUEUED;
 		shipd->status_time = time(0);
 		shipd->ship_origin = GET_ROOM_VNUM(IN_ROOM(veh));
@@ -1439,7 +1521,7 @@ ACMD(do_dispatch) {
 		VEH_SHIPPING_ID(veh) = find_free_shipping_id(GET_LOYALTY(ch));
 		shipd->shipping_id = VEH_SHIPPING_ID(veh);
 		
-		LL_APPEND(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), shipd);
+		DL_APPEND(EMPIRE_SHIPPING_LIST(GET_LOYALTY(ch)), shipd);
 		sail_shipment(GET_LOYALTY(ch), veh);
 		EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
 		
@@ -1463,7 +1545,7 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 	room_data *was_in, *to_room;
 	obj_data *portal;
 	
-	if (!*arg || !(portal = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch))))) {
+	if (!*arg || !(portal = get_obj_in_list_vis(ch, arg, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
 		msg_to_char(ch, "Which direction is that?\r\n");
 	}
 	else if (!IS_PORTAL(portal) || !(to_room = real_room(GET_PORTAL_TARGET_VNUM(portal)))) {
@@ -1487,7 +1569,7 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 	else if (GET_ROOM_VEHICLE(to_room) && (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES))) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
-	else if (!vehicle_allows_climate(veh, to_room)) {
+	else if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room)) {
 		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
@@ -1544,7 +1626,7 @@ ACMD(do_drag) {
 		msg_to_char(ch, "Drag what, in which direction?\r\n");
 	}
 	// vehicle validation
-	else if (!(veh = get_vehicle_in_room_vis(ch, what))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, what, NULL))) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(what), what);
 	}
 	else if (!VEH_FLAGGED(veh, VEH_DRAGGABLE)) {
@@ -1584,7 +1666,7 @@ ACMD(do_drag) {
 	else if (ROOM_IS_CLOSED(to_room) && VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
-	else if (!vehicle_allows_climate(veh, to_room)) {
+	else if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room)) {
 		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
@@ -1773,7 +1855,7 @@ ACMD(do_drive) {
 	else if (!*argument) {
 		msg_to_char(ch, "You must specify a path to %s using a combination of directions and distances.\r\n", drive_data[subcmd].command);
 	}
-	else if (strlen(argument) > 2 && (portal = get_obj_in_list_vis(ch, argument, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
+	else if (strlen(argument) > 2 && (portal = get_obj_in_list_vis(ch, argument, NULL, ROOM_CONTENTS(IN_ROOM(veh)))) && IS_PORTAL(portal)) {
 		do_drive_through_portal(ch, veh, portal, subcmd);
 	}
 	else if (!dir_only && !path_to_room && !parse_next_dir_from_string(ch, argument, &dir, &dist, TRUE)) {
@@ -1787,6 +1869,9 @@ ACMD(do_drive) {
 	}
 	
 	// did they request a path?
+	else if (path_to_room && path_to_room == IN_ROOM(ch)) {
+		msg_to_char(ch, "You're already there!\r\n");
+	}
 	else if (path_to_room && !drive_data[subcmd].pathfinder) {
 		msg_to_char(ch, "You can't %s by coordinates.\r\n", drive_data[subcmd].command);
 	}
@@ -1891,7 +1976,7 @@ ACMD(do_fire) {
 	}
 	
 	// find what to fire with
-	else if (!(veh = get_vehicle_in_room_vis(ch, veh_arg)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(veh_arg, VEH_KEYWORDS(veh)))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, veh_arg, NULL)) && (!(veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) || !isname(veh_arg, VEH_KEYWORDS(veh)))) {
 		msg_to_char(ch, "You don't see %s %s here to fire.\r\n", AN(veh_arg), veh_arg);
 	}
 	else if (!VEH_FLAGGED(veh, VEH_SIEGE_WEAPONS)) {
@@ -1987,10 +2072,10 @@ ACMD(do_harness) {
 	if (!*arg1 || !*arg2) {
 		msg_to_char(ch, "Harness whom to what?\r\n");
 	}
-	else if (!(animal = get_char_vis(ch, arg1, FIND_CHAR_ROOM))) {
+	else if (!(animal = get_char_vis(ch, arg1, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
-	else if (!(veh = get_vehicle_in_room_vis(ch, arg2))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, arg2, NULL))) {
 		msg_to_char(ch, "You don't see a %s here.\r\n", arg2);
 	}
 	else if (count_harnessed_animals(veh) >= VEH_ANIMALS_REQUIRED(veh)) {
@@ -2031,6 +2116,7 @@ ACMD(do_harness) {
 
 
 ACMD(do_lead) {
+	char part[256];
 	vehicle_data *veh;
 	char_data *mob;
 	
@@ -2057,7 +2143,7 @@ ACMD(do_lead) {
 	else if (!*arg) {
 		msg_to_char(ch, "Lead whom (or what)?\r\n");
 	}
-	else if ((mob = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if ((mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		// lead mob (we already made sure they aren't leading anything)
 		if (ch == mob) {
 			msg_to_char(ch, "You can't lead yourself.\r\n");
@@ -2087,7 +2173,7 @@ ACMD(do_lead) {
 			GET_LED_BY(mob) = ch;
 		}
 	}
-	else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		// lead vehicle (we already made sure they aren't leading anything)
 		if (!VEH_FLAGGED(veh, VEH_LEADABLE)) {
 			act("You can't lead $V!", FALSE, ch, NULL, veh, TO_CHAR);
@@ -2111,7 +2197,9 @@ ACMD(do_lead) {
 			msg_to_char(ch, "You can't lead it while it's on fire!\r\n");
 		}
 		else if (VEH_SITTING_ON(veh)) {
-			msg_to_char(ch, "You can't lead it while %s sitting on it.\r\n", (VEH_SITTING_ON(veh) == ch) ? "you are" : "someone else is");
+			snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+			*part = LOWER(*part);
+			msg_to_char(ch, "You can't lead it while %s %s on it.\r\n", (VEH_SITTING_ON(veh) == ch) ? "you are" : "someone else is", part);
 		}
 		else if (VEH_DRIVER(veh)) {
 			msg_to_char(ch, "You can't lead it while someone else is controlling it.\r\n");
@@ -2141,7 +2229,7 @@ ACMD(do_load_vehicle) {
 	if (!*arg1 || !*arg2) {
 		msg_to_char(ch, "Usage: load <mob | vehicle | all> <onto vehicle>\r\n");
 	}
-	else if (!(cont = get_vehicle_in_room_vis(ch, arg2))) {
+	else if (!(cont = get_vehicle_in_room_vis(ch, arg2, NULL))) {
 		msg_to_char(ch, "You don't see %s %s here.\r\n", AN(arg2), arg2);
 	}
 	else if (VEH_IS_DISMANTLING(cont)) {
@@ -2201,7 +2289,7 @@ ACMD(do_load_vehicle) {
 			msg_to_char(ch, "There was nothing you could load here.\r\n");
 		}
 	}
-	else if ((mob = get_char_room_vis(ch, arg1))) {
+	else if ((mob = get_char_room_vis(ch, arg1, NULL))) {
 		// LOAD MOB
 		if (ch == mob) {
 			msg_to_char(ch, "Just board it.\r\n");
@@ -2226,7 +2314,7 @@ ACMD(do_load_vehicle) {
 			perform_load_mob(ch, mob, cont, to_room);
 		}
 	}
-	else if ((veh = get_vehicle_in_room_vis(ch, arg1))) {
+	else if ((veh = get_vehicle_in_room_vis(ch, arg1, NULL))) {
 		// LOAD VEHICLE
 		if (veh == cont) {
 			msg_to_char(ch, "You can't load it into itself.\r\n");
@@ -2260,7 +2348,9 @@ ACMD(do_load_vehicle) {
 			msg_to_char(ch, "You can't load %s while %s leading it.\r\n", VEH_SHORT_DESC(veh), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_SITTING_ON(veh)) {
-			msg_to_char(ch, "You can't load %s while %s sitting %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", IN_OR_ON(veh));
+			snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+			*buf = LOWER(*buf);
+			msg_to_char(ch, "You can't load %s while %s %s %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
 		}
 		else {
 			perform_load_vehicle(ch, veh, cont, to_room);
@@ -2282,7 +2372,7 @@ ACMD(do_scrap) {
 	if (!*arg) {
 		msg_to_char(ch, "Scrap what?\r\n");
 	}
-	else if (!(veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		msg_to_char(ch, "You don't see anything like that here.\r\n");
 	}
 	else if (!can_use_vehicle(ch, veh, MEMBERS_ONLY)) {
@@ -2331,7 +2421,7 @@ ACMD(do_unharness) {
 	if (!*arg2) {
 		msg_to_char(ch, "Unharness which animal from which vehicle?\r\n");
 	}
-	else if (!(veh = get_vehicle_in_room_vis(ch, arg2))) {
+	else if (!(veh = get_vehicle_in_room_vis(ch, arg2, NULL))) {
 		msg_to_char(ch, "You don't see a %s here.\r\n", arg2);
 	}
 	else if (*arg1 && !(animal = find_harnessed_mob_by_name(veh, arg1))) {
@@ -2432,7 +2522,7 @@ ACMD(do_unload_vehicle) {
 			msg_to_char(ch, "There was nothing you could unload here.\r\n");
 		}
 	}
-	else if ((mob = get_char_room_vis(ch, arg))) {
+	else if ((mob = get_char_room_vis(ch, arg, NULL))) {
 		// UNLOAD MOB
 		if (ch == mob) {
 			msg_to_char(ch, "You can't unload yourself.\r\n");
@@ -2457,7 +2547,7 @@ ACMD(do_unload_vehicle) {
 			perform_unload_mob(ch, mob, cont);
 		}
 	}
-	else if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+	else if ((veh = get_vehicle_in_room_vis(ch, arg, NULL))) {
 		// UNLOAD VEHICLE
 		if (veh == cont) {
 			msg_to_char(ch, "You can't unload it from itself.\r\n");
@@ -2487,7 +2577,9 @@ ACMD(do_unload_vehicle) {
 			msg_to_char(ch, "You can't unload %s while %s leading it.\r\n", VEH_SHORT_DESC(veh), VEH_LED_BY(veh) == ch ? "you're" : "someone else is");
 		}
 		else if (VEH_SITTING_ON(veh)) {
-			msg_to_char(ch, "You can't unload %s while %s sitting %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", IN_OR_ON(veh));
+			snprintf(buf, sizeof(buf), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+			*buf = LOWER(*buf);
+			msg_to_char(ch, "You can't unload %s while %s %s %s it.\r\n", VEH_SHORT_DESC(veh), VEH_SITTING_ON(veh) == ch ? "you're" : "someone else is", buf, IN_OR_ON(veh));
 		}
 		else {
 			perform_unload_vehicle(ch, veh, cont);

@@ -457,7 +457,7 @@ static struct empire_workforce_tracker *ewt_find_tracker(empire_data *emp, obj_v
 		}
 	
 		// count shipping, too
-		for (shipd = EMPIRE_SHIPPING_LIST(emp); shipd; shipd = shipd->next) {
+		DL_FOREACH(EMPIRE_SHIPPING_LIST(emp), shipd) {
 			if (shipd->vnum == vnum) {
 				SAFE_ADD(tt->total_amount, shipd->amount, 0, INT_MAX, FALSE);
 				

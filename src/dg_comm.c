@@ -165,7 +165,7 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 					type[i] = *p;
 					*s = '\0';
 					p = any_one_name(++p, name);
-					otokens[i] = find_invis ? get_char_in_room(IN_ROOM(ch), name) : get_char_room_vis(ch, name);
+					otokens[i] = find_invis ? get_char_in_room(IN_ROOM(ch), name) : get_char_room_vis(ch, name, NULL);
 					tokens[++i] = ++s;
 				}
 				else {
@@ -189,14 +189,14 @@ void sub_write(char *arg, char_data *ch, byte find_invis, int targets) {
 					else if (find_invis) {
 						obj = get_obj_in_room(IN_ROOM(ch), name);
 					}
-					else if (!(obj = get_obj_in_list_vis(ch, name, ROOM_CONTENTS(IN_ROOM(ch))))) {
+					else if (!(obj = get_obj_in_list_vis(ch, name, NULL, ROOM_CONTENTS(IN_ROOM(ch))))) {
 						// nothing
 					}
-					else if (!(obj = get_obj_in_equip_vis(ch, name, ch->equipment))) {
+					else if (!(obj = get_obj_in_equip_vis(ch, name, NULL, ch->equipment, NULL))) {
 						// nothing
 					}
 					else {
-						obj = get_obj_in_list_vis(ch, name, ch->carrying);
+						obj = get_obj_in_list_vis(ch, name, NULL, ch->carrying);
 					}
 
 					otokens[i] = obj;

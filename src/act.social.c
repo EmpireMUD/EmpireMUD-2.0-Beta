@@ -198,7 +198,7 @@ void perform_social(char_data *ch, social_data *soc, char *argument) {
 		
 		return;
 	}
-	if (!(vict = get_char_room_vis(ch, buf))) {
+	if (!(vict = get_char_room_vis(ch, buf, NULL))) {
 		sprintf(hbuf, "&%c%s&0\r\n", (!IS_NPC(ch) && GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE)) ? GET_CUSTOM_COLOR(ch, CUSTOM_COLOR_EMOTE) : '0', NULLSAFE(SOC_MESSAGE(soc, SOCM_TARGETED_NOT_FOUND)));
 		send_to_char(hbuf, ch);
 		if (ch->desc) {
@@ -307,7 +307,7 @@ ACMD(do_insult) {
 	one_argument(argument, arg);
 
 	if (*arg) {
-		if (!(victim = get_char_room_vis(ch, arg))) {
+		if (!(victim = get_char_room_vis(ch, arg, NULL))) {
 			send_config_msg(ch, "no_person");
 		}
 		else {

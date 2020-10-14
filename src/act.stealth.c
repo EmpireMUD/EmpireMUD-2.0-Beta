@@ -562,7 +562,7 @@ ACMD(do_backstab) {
 	else if (!IS_NPC(ch) && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_STAB) {
 		send_to_char("You must use a stabbing weapon to backstab.\r\n", ch);
 	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)) && !(vict = FIGHTING(ch))) {
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)) && !(vict = FIGHTING(ch))) {
 		send_to_char("Backstab whom?\r\n", ch);
 	}
 	else if (FIGHTING(vict) == ch) {
@@ -688,7 +688,7 @@ ACMD(do_disguise) {
 	else if (!*arg) {
 		msg_to_char(ch, "Disguise yourself as whom?\r\n");
 	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (!IS_NPC(vict) && !IS_DISGUISED(vict)) {
@@ -1031,7 +1031,7 @@ ACMD(do_jab) {
 	else if (!IS_NPC(ch) && GET_WEAPON_TYPE(GET_EQ(ch, WEAR_WIELD)) != TYPE_STAB) {
 		send_to_char("You must use a stabbing weapon to jab.\r\n", ch);
 	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)) && !(vict = FIGHTING(ch))) {
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)) && !(vict = FIGHTING(ch))) {
 		send_to_char("Jab whom?\r\n", ch);
 	}
 	else if (vict == ch) {
@@ -1112,7 +1112,7 @@ ACMD(do_pickpocket) {
 	else if (!can_use_ability(ch, NOTHING, NOTHING, 0, NOTHING)) {
 		// sends own messages
 	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_to_char("Pickpocket whom?\r\n", ch);
 	}
 	else if (vict == ch) {
@@ -1222,7 +1222,7 @@ ACMD(do_prick) {
 	else if (!can_use_ability(ch, ABIL_PRICK, MOVE, cost, COOLDOWN_PRICK)) {
 		// sends own messages
 	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM)) && !(vict = FIGHTING(ch))) {
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)) && !(vict = FIGHTING(ch))) {
 		send_to_char("Prick whom?\r\n", ch);
 	}
 	else if (vict == ch) {
@@ -1285,7 +1285,7 @@ ACMD(do_sap) {
 	else if (!*arg) {
 		msg_to_char(ch, "Sap whom?\r\n");
 	}
-	else if (!(vict = get_char_vis(ch, arg, FIND_CHAR_ROOM))) {
+	else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
 		send_config_msg(ch, "no_person");
 	}
 	else if (ch == vict) {
@@ -1472,7 +1472,7 @@ ACMD(do_shadowstep) {
 		// simple targeting: find closest
 		msg_to_char(ch, "Nobody by that name within range.\r\n");
 	}
-	else if (!vict && isdigit(*argument) && (!(vict = get_char_vis(ch, arg, FIND_CHAR_WORLD)) || compute_distance(IN_ROOM(ch), IN_ROOM(vict)) > 7)) {
+	else if (!vict && isdigit(*argument) && (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)) || compute_distance(IN_ROOM(ch), IN_ROOM(vict)) > 7)) {
 		// number targeting: find by name
 		msg_to_char(ch, "Nobody by that name within range.\r\n");
 	}

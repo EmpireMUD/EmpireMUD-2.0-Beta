@@ -408,7 +408,6 @@ char *get_room_description(room_data *room) {
 char *get_room_name(room_data *room, bool color) {
 	static char name[MAX_STRING_LENGTH];
 	empire_data *emp = ROOM_OWNER(room);
-	player_index_data *index;
 	crop_data *cp;
 
 	if (color && emp)
@@ -429,12 +428,6 @@ char *get_room_name(room_data *room, bool color) {
 		strcat(name, "A Winding Path");
 	}
 
-	// patron monuments
-	else if (GET_BUILDING(room) && ROOM_PATRON(room) > 0) {
-		strcat(name, GET_BLD_TITLE(GET_BUILDING(room)));
-		sprintf(name + strlen(name), " of %s", (index = find_player_index_by_idnum(ROOM_PATRON(room))) ? index->fullname : "a Former God");
-	}
-
 	/* Building */
 	else if (GET_BUILDING(room)) {
 		strcat(name, GET_BLD_TITLE(GET_BUILDING(room)));
@@ -450,6 +443,39 @@ char *get_room_name(room_data *room, bool color) {
 		strcat(name, GET_SECT_TITLE(SECT(room)));
 
 	return (name);
+}
+
+
+/**
+* Replaces all color codes in 'string' (except &?) with 'new_color'. The new
+* string should be the same length so long as new_color is a valid single
+* color code.
+*
+* @param char *string The initial string (will have its colors replaced)/
+* @param char *new_color A single color code, like "&b".
+*/
+void replace_color_codes(char *string, char *new_color) {
+	char temp[MAX_STRING_LENGTH];
+	int iter = 0;
+	
+	*temp = '\0';
+	
+	while (string[iter]) {
+		if (string[iter] == '&' && string[iter+1] != '?') {
+			// copy over new color and skip this part of string
+			strcpy(temp + iter, new_color);
+			++iter;
+		}
+		else {
+			// direct copy
+			temp[iter] = string[iter];
+		}
+		
+		// advance it
+		++iter;
+	}
+	temp[iter] = '\0';	// terminate
+	strcpy(string, temp);	// copy back over
 }
 
 
@@ -685,7 +711,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	
 	// append (Real Name) of a room if the name has been customized and DOESN'T appear in the custom name
 	*rlbuf = '\0';
-	if (ROOM_CUSTOM_NAME(room) && !str_str(room_name_color, GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)))) {
+	if (ROOM_CUSTOM_NAME(room) && !ROOM_AFF_FLAGGED(room, ROOM_AFF_HIDE_REAL_NAME) && !str_str(room_name_color, GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)))) {
 		sprintf(rlbuf, " (%s)", GET_BUILDING(room) ? GET_BLD_NAME(GET_BUILDING(room)) : GET_SECT_NAME(SECT(room)));
 	}
 	
@@ -1004,7 +1030,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	}
 	
 	if (ROOM_PAINT_COLOR(room)) {
-		strcpy(col_buf, paint_names[ROOM_PAINT_COLOR(room)]);
+		sprinttype(ROOM_PAINT_COLOR(room), paint_names, col_buf, sizeof(col_buf), "UNDEFINED");
 		*col_buf = LOWER(*col_buf);
 		msg_to_char(ch, "The building has been painted %s%s.\r\n", (ROOM_AFF_FLAGGED(room, ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), col_buf);
 	}
@@ -1027,6 +1053,10 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	
 	if (IS_ROAD(room) && ROOM_CUSTOM_DESCRIPTION(room)) {
 		msg_to_char(ch, "Sign: %s\r\n", ROOM_CUSTOM_DESCRIPTION(room));
+	}
+	
+	if (ROOM_PATRON(room) && (index = find_player_index_by_idnum(ROOM_PATRON(room)))) {
+		msg_to_char(ch, "It is dedicated to %s.\r\n", index->fullname);
 	}
 	
 	// custom descs on OPEN buildings show here
@@ -1322,7 +1352,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	empire_data *emp, *chemp = GET_LOYALTY(ch);
 	int tileset = GET_SEASON(to_room);
 	struct icon_data *base_icon, *icon, *crop_icon = NULL;
-	bool junk, enchanted, hidden = FALSE, painted;
+	bool junk, enchanted, hidden = FALSE, painted, veh_is_shown = FALSE;
 	crop_data *cp = ROOM_CROP(to_room);
 	sector_data *st, *base_sect = BASE_SECT(to_room);
 	char *base_color, *str;
@@ -1357,10 +1387,11 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		base_color = crop_icon->color;
 	}
 	
-	painted = (!IS_NPC(ch) && ROOM_PAINT_COLOR(to_room) && !PRF_FLAGGED(ch, PRF_NO_PAINT));
+	show_veh = find_vehicle_to_show(ch, to_room);
+	painted = (!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_NO_PAINT)) ? (show_veh ? VEH_PAINT_COLOR(show_veh) : ROOM_PAINT_COLOR(to_room)) : FALSE;
 
-	// start with the sector color
-	strcpy(buf, base_color);
+	// start with an empty buf for the icon
+	*buf = '\0';
 
 	if (to_room == IN_ROOM(ch) && !ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		sprintf(buf, "&0<%soo&0>", chemp ? EMPIRE_BANNER(chemp) : "");
@@ -1370,8 +1401,9 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 	}
 	
 	// check for a vehicle with an icon
-	else if ((show_veh = find_vehicle_to_show(ch, to_room))) {
+	else if (show_veh) {
 		strcat(buf, NULLSAFE(VEH_ICON(show_veh)));
+		veh_is_shown = TRUE;
 	}
 
 	/* Hidden buildings */
@@ -1589,7 +1621,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 		sprintf(buf, "\t0\t[B300]%s", buf1);
 		need_color_terminator = TRUE;
 	}
-	else if (PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) || painted || show_dark) {
+	else if (PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE) || show_dark) {
 		strcpy(buf1, strip_color(buf));
 
 		if (PRF_FLAGGED(ch, PRF_POLITICAL) && !show_dark) {
@@ -1621,15 +1653,7 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 				sprintf(buf, "%s%s", get_informative_color_room(ch, to_room), buf1);
 			}
 		}
-		else if (painted && !show_dark) {
-			strcpy(col_buf, paint_colors[ROOM_PAINT_COLOR(to_room)]);
-			if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_BRIGHT_PAINT)) {
-				strtoupper(col_buf);
-			}
-			
-			sprintf(buf, "%s%s", col_buf, buf1);
-		}
-		else if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_INFORMATIVE | PRF_POLITICAL) && !painted && show_dark) {
+		else if (!PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_INFORMATIVE | PRF_POLITICAL) && show_dark) {
 			sprintf(buf, "&b%s", buf1);
 		}
 		else {
@@ -1637,7 +1661,33 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 			sprintf(buf, "&0%s", buf1);
 		}
 	}
+	else if (painted && (!show_veh || veh_is_shown)) {
+		sprinttype(show_veh ? VEH_PAINT_COLOR(show_veh) : ROOM_PAINT_COLOR(to_room), paint_colors, col_buf, sizeof(col_buf), "&0");
+		if (show_veh ? VEH_FLAGGED(show_veh, VEH_BRIGHT_PAINT) : ROOM_AFF_FLAGGED(to_room, ROOM_AFF_BRIGHT_PAINT)) {
+			strtoupper(col_buf);
+		}
+		
+		// buf is the icon
+		replace_color_codes(buf, col_buf);
+		
+		// check for ? colors
+		if (strstr(buf, "&?")) {
+			replace_question_color(buf, base_color, lbuf);
+			strcpy(buf, lbuf);
+		}
+		// need a leading color base color?
+		if (*buf != '&') {
+			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, buf);
+			strcpy(buf, lbuf);
+		}
+	}
 	else {
+		// need a leading color base color?
+		if (*buf != '&') {
+			snprintf(lbuf, sizeof(lbuf), "%s%s", base_color, buf);
+			strcpy(buf, lbuf);
+		}
+		
 		// normal color
 		if (strstr(buf, "&?")) {
 			replace_question_color(buf, base_color, lbuf);
@@ -1738,7 +1788,8 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 	
 	// start lbuf: color
 	if (ROOM_PAINT_COLOR(to_room) && !PRF_FLAGGED(ch, PRF_NO_PAINT)) {
-		sprintf(lbuf, "%s ", paint_names[ROOM_PAINT_COLOR(to_room)]);
+		sprinttype(ROOM_PAINT_COLOR(to_room), paint_names, lbuf, sizeof(lbuf), "Painted");
+		strcat(lbuf, " ");
 	}
 	else {
 		*lbuf = '\0';
@@ -1759,7 +1810,8 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	extern byte distance_can_see(char_data *ch);
 	
-	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH], dirbuf[MAX_STRING_LENGTH], plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH];
+	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH];
+	char dirbuf[MAX_STRING_LENGTH], plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH], paint_str[256];
 	char_data *vict;
 	int mapsize, dist_iter;
 	vehicle_data *show_veh;
@@ -1822,15 +1874,24 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			
 			// show ships
 			if ((show_veh = find_vehicle_to_show(ch, to_room))) {
-				if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
-					get_informative_vehicle_string(ch, show_veh, infobuf);
-					sprintf(roombuf + strlen(roombuf), " <%s%s%s>", skip_filler(get_vehicle_short_desc(show_veh, ch)), *infobuf ? ": " :"", infobuf);
-				}
-				else if (VEH_OWNER(show_veh) && !VEH_CLAIMS_WITH_ROOM(show_veh) && PRF_FLAGGED(ch, PRF_POLITICAL)) {
-					sprintf(roombuf + strlen(roombuf), " <%s %s>", EMPIRE_ADJECTIVE(VEH_OWNER(show_veh)), skip_filler(get_vehicle_short_desc(show_veh, ch)));
+				if (VEH_PAINT_COLOR(show_veh)) {
+					sprinttype(VEH_PAINT_COLOR(show_veh), paint_names, paint_str, sizeof(paint_str), "painted");
+					*paint_str = LOWER(*paint_str);
+					strcat(paint_str, " ");
 				}
 				else {
-					sprintf(roombuf + strlen(roombuf), " <%s>", skip_filler(get_vehicle_short_desc(show_veh, ch)));
+					*paint_str = '\0';
+				}
+				
+				if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+					get_informative_vehicle_string(ch, show_veh, infobuf);
+					sprintf(roombuf + strlen(roombuf), " <%s%s%s%s>", paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)), *infobuf ? ": " :"", infobuf);
+				}
+				else if (VEH_OWNER(show_veh) && !VEH_CLAIMS_WITH_ROOM(show_veh) && PRF_FLAGGED(ch, PRF_POLITICAL)) {
+					sprintf(roombuf + strlen(roombuf), " <%s %s%s>", EMPIRE_ADJECTIVE(VEH_OWNER(show_veh)), paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)));
+				}
+				else {
+					sprintf(roombuf + strlen(roombuf), " <%s%s>", paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)));
 				}
 			}
 			

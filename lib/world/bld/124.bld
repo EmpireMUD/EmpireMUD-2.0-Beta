@@ -30,7 +30,7 @@ S
 Cliffside Docks~
 Some Cliffside Docks~
 @w&0==@e~
-24 0 bdD 0
+24 0 bdnD 0
 0 0 0 -1
 C
 board, load, unload~
@@ -48,7 +48,7 @@ S
 Smuggler's Wharf~
 A Smuggler's Wharf~
 @w&0==@e~
-24 0 bdpD 0
+24 0 bdnpD 0
 0 0 0 -1
 A
 d

@@ -47,6 +47,7 @@ extern struct help_index_element *help_table;
 extern const char *item_types[];
 extern int top_of_helpt;
 extern const char *month_name[];
+extern const char *position_types[];
 extern struct faction_reputation_type reputation_levels[];
 extern const char *wear_bits[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
@@ -315,33 +316,43 @@ int sort_chart_hash(struct chart_territory *a, struct chart_territory *b) {
  //////////////////////////////////////////////////////////////////////////////
 //// LOOK ASSIST FUNCTIONS ///////////////////////////////////////////////////
 
-/*
- * Given the argument "look at <target>", figure out what object or char
- * matches the target.  First, see if there is another char in the room
- * with the name.  Then check local objs for exdescs.
- *
- * Thanks to Angus Mezick <angus@EDGIL.CCMAIL.COMPUSERVE.COM> for the
- * suggested fix to this problem.
- *
- * @param char_data *ch The looker.
- * @param char *arg What the person typed to look at.
- */
-void look_at_target(char_data *ch, char *arg) {
+/**
+* Given the argument "look at <target>", figure out what object or char
+* matches the target.  First, see if there is another char in the room
+* with the name.  Then check local objs for exdescs.
+*
+* Thanks to Angus Mezick <angus@EDGIL.CCMAIL.COMPUSERVE.COM> for the
+* suggested fix to this problem.
+*
+* @param char_data *ch The looker.
+* @param char *arg What the person typed to look at.
+* @param char *more_args Additional args they passed.
+*/
+void look_at_target(char_data *ch, char *arg, char *more_args) {
+	char targ_arg[MAX_INPUT_LENGTH];
 	int bits, found = FALSE, j, fnum, i = 0;
 	char_data *found_char = NULL;
 	obj_data *obj, *found_obj = NULL;
 	vehicle_data *veh, *found_veh = NULL;
+	bool inv_only = FALSE;
 	char *desc;
 
 	if (!ch->desc)
 		return;
-
+	
+	// if first arg is 'inv', restrict to inventory
+	if (strlen(arg) >= 3 && is_abbrev(arg, "inventory")) {
+		inv_only = TRUE;
+		one_argument(more_args, targ_arg);
+		arg = targ_arg;
+	}
+	
 	if (!*arg) {
 		send_to_char("Look at what?\r\n", ch);
 		return;
-		}
+	}
 
-	bits = generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &found_char, &found_obj, &found_veh);
+	bits = generic_find(arg, inv_only ? FIND_OBJ_INV : (FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_OBJ_EQUIP | FIND_CHAR_ROOM | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE), ch, &found_char, &found_obj, &found_veh);
 
 	/* Is the target a character? */
 	if (found_char != NULL) {
@@ -645,15 +656,15 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	msg_to_char(to, " +-------------------------------- Condition --------------------------------+\r\n");
 	
 	// row 1 col 1: health, 6 color codes = 12 invisible characters
-	sprintf(lbuf, "&g%d&0/&g%d&0 +&g%d&0/5s", GET_HEALTH(ch), GET_MAX_HEALTH(ch), health_gain(ch, TRUE));
+	sprintf(lbuf, "&g%d&0/&g%d&0 &g%+d&0/5s", GET_HEALTH(ch), GET_MAX_HEALTH(ch), health_gain(ch, TRUE));
 	msg_to_char(to, "  Health: %-28.28s", lbuf);
 
 	// row 1 col 2: move, 6 color codes = 12 invisible characters
-	sprintf(lbuf, "&y%d&0/&y%d&0 +&y%d&0/5s", GET_MOVE(ch), GET_MAX_MOVE(ch), move_gain(ch, TRUE));
+	sprintf(lbuf, "&y%d&0/&y%d&0 &y%+d&0/5s", GET_MOVE(ch), GET_MAX_MOVE(ch), move_gain(ch, TRUE));
 	msg_to_char(to, " Move: %-30.30s", lbuf);
 	
 	// row 1 col 3: mana, 6 color codes = 12 invisible characters
-	sprintf(lbuf, "&c%d&0/&c%d&0 +&c%d&0/5s", GET_MANA(ch), GET_MAX_MANA(ch), mana_gain(ch, TRUE));
+	sprintf(lbuf, "&c%d&0/&c%d&0 &c%+d&0/5s", GET_MANA(ch), GET_MAX_MANA(ch), mana_gain(ch, TRUE));
 	msg_to_char(to, " Mana: %-30.30s\r\n", lbuf);
 	
 	// row 2 col 1: conditions
@@ -869,7 +880,7 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern struct action_data_struct action_data[];
 	
-	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], part[256];
 	struct custom_message *ocm;
 	
 	// POS_x
@@ -953,7 +964,9 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 		
 		if (GET_POS(i) != POS_FIGHTING) {
 			if (GET_SITTING_ON(i)) {
-				sprintf(buf, "$n is sitting %s %s%s%s.", IN_OR_ON(GET_SITTING_ON(i)), get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
+				snprintf(part, sizeof(part), "%s", position_types[GET_POS(i)]);
+				*part = LOWER(*part);
+				sprintf(buf, "$n is %s %s %s%s%s.", part, IN_OR_ON(GET_SITTING_ON(i)), get_vehicle_short_desc(GET_SITTING_ON(i), ch), (VEH_ANIMALS(GET_SITTING_ON(i)) ? ", being pulled by " : ""), (VEH_ANIMALS(GET_SITTING_ON(i)) ? list_harnessed_mobs(GET_SITTING_ON(i)) : ""));
 			}
 			else if (!IS_NPC(i) && GET_ACTION(i) == ACT_GEN_CRAFT) {
 				// show crafting
@@ -1088,7 +1101,7 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	extern bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
 	extern bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
 	
-	char buf[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH], part[256];
 	size_t size = 0, pos;
 	
 	// pre-description
@@ -1123,11 +1136,15 @@ void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
 	}
 	
 	if (VEH_SITTING_ON(veh) == ch) {
-		size += snprintf(buf + size, sizeof(buf) - size, "...you are sitting %s it.\r\n", IN_OR_ON(veh));
+		snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+		*part = LOWER(*part);
+		size += snprintf(buf + size, sizeof(buf) - size, "...you are %s %s it.\r\n", part, IN_OR_ON(veh));
 	}
 	else if (VEH_SITTING_ON(veh)) {
 		// this is PROBABLY not shown to players
-		size += snprintf(buf + size, sizeof(buf) - size, "...%s is sitting %s it.\r\n", PERS(VEH_SITTING_ON(veh), ch, FALSE), IN_OR_ON(veh));
+		snprintf(part, sizeof(part), "%s", position_types[GET_POS(VEH_SITTING_ON(veh))]);
+		*part = LOWER(*part);
+		size += snprintf(buf + size, sizeof(buf) - size, "...%s is %s %s it.\r\n", PERS(VEH_SITTING_ON(veh), ch, FALSE), part, IN_OR_ON(veh));
 	}
 	
 	if (VEH_LED_BY(veh) == ch) {
@@ -2459,7 +2476,7 @@ ACMD(do_diagnose) {
 	one_argument(argument, buf);
 
 	if (*buf) {
-		if (!(vict = get_char_vis(ch, buf, FIND_CHAR_ROOM)))
+		if (!(vict = get_char_vis(ch, buf, NULL, FIND_CHAR_ROOM)))
 			send_config_msg(ch, "no_person");
 		else
 			diag_char_to_char(vict, ch);
@@ -2493,13 +2510,13 @@ ACMD(do_examine) {
 	char_data *tmp_char;
 	obj_data *tmp_object;
 
-	one_argument(argument, arg);
+	argument = one_argument(argument, arg);
 
 	if (!*arg) {
 		send_to_char("Examine what?\r\n", ch);
 		return;
 	}
-	look_at_target(ch, arg);
+	look_at_target(ch, arg, argument);
 
 	generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM | FIND_OBJ_EQUIP | FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, &tmp_char, &tmp_object, &tmp_veh);
 
@@ -2941,7 +2958,7 @@ ACMD(do_inventory) {
 ACMD(do_look) {
 	void look_in_direction(char_data *ch, int dir);
 	
-	char arg2[MAX_INPUT_LENGTH];
+	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	room_data *map;
 	int look_type;
 
@@ -2988,10 +3005,12 @@ ACMD(do_look) {
 		/* did the char type 'look <direction>?' */
 		else if ((look_type = parse_direction(ch, arg)) != NO_DIR)
 			look_in_direction(ch, look_type);
-		else if (is_abbrev(arg, "at"))
-			look_at_target(ch, arg2);
+		else if (is_abbrev(arg, "at")) {
+			half_chop(arg2, arg, arg3);
+			look_at_target(ch, arg, arg3);
+		}
 		else
-			look_at_target(ch, arg);
+			look_at_target(ch, arg, arg2);
 	}
 }
 
@@ -3925,7 +3944,7 @@ ACMD(do_whois) {
 	
 	// basic info
 	msg_to_char(ch, "%s%s&0\r\n", PERS(victim, victim, TRUE), NULLSAFE(GET_TITLE(victim)));
-	sprinttype(GET_REAL_SEX(victim), genders, part);
+	sprinttype(GET_REAL_SEX(victim), genders, part, sizeof(part), "UNDEFINED");
 	msg_to_char(ch, "Status: %s %s\r\n", CAP(part), level_names[(int) GET_ACCESS_LEVEL(victim)][1]);
 
 	// show class (but don't bother for immortals, as they generally have all skills

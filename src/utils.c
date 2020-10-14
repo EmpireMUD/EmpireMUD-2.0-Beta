@@ -4897,19 +4897,29 @@ void sprintbit(bitvector_t bitvector, const char *names[], char *result, bool sp
 }
 
 
-void sprinttype(int type, const char *names[], char *result) {
+/**
+* Safely gets a value "\n"-terminated array of names. This prevents out-of-
+* bounds issues on the namelist.
+*
+* @param int type The position in the name list.
+* @param const char *names[] The name list to use (must have "\n" as its last entry).
+* @param char *result A string variable to save the result to.
+* @param size_t max_result_size The size of the result buffer (prevents overflows).
+* @param char *error_value If 'type' is out of bounds, uses this string.
+*/
+void sprinttype(int type, const char *names[], char *result, size_t max_result_size, char *error_value) {
 	int nr = 0;
-
+	
 	while (type && *names[nr] != '\n') {
-		type--;
-		nr++;
+		--type;
+		++nr;
 	}
-
+	
 	if (*names[nr] != '\n') {
-		strcpy(result, names[nr]);
+		snprintf(result, max_result_size, "%s", names[nr]);
 	}
 	else {
-		strcpy(result, "UNDEFINED");
+		snprintf(result, max_result_size, "%s", error_value);
 	}
 }
 
@@ -6309,22 +6319,34 @@ unsigned long long microtime(void) {
 /**
 * Determines if a room both has a function flag, and passes any necessary
 * in-city requirements. (If the room does not have FNC_IN_CITY_ONLY, this only
-* checks the function.)
+* checks the function.) Note that the UPGRADED flag is checked on its own
+* inside this function, and having that flag on the home-room of a building
+* will apply it to everything inside.
 *
 * Note: If a player has no empire, they generally pass the for_emp part of this
 * test and you should still check use-permission separately, too.
 *
 * @param empire_data *for_emp Optional: Which empire wants to use the functions. If NULL, no empire/owner check is made.
 * @param room_data *room The room to check.
-* @param bitvector_t fnc_flag Any FNC_ flag.
+* @param bitvector_t fnc_flag Any FNC_ flag -- only requires 1 of these (except UPGRADED, which is always required in addition to one of the other flags, if present).
 * @return bool TRUE if the room has the function and passed the city check, FALSE if not.
 */
 bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvector_t fnc_flag) {
 	vehicle_data *veh;
-	bool junk;
+	bool junk, upgraded;
+	
+	// are we checking for upgraded?
+	upgraded = IS_SET(fnc_flag, FNC_UPGRADED);
+	fnc_flag &= ~FNC_UPGRADED;
 	
 	// check vehicles first
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (upgraded && !IS_SET(VEH_FUNCTIONS(veh), FNC_UPGRADED)) {
+			continue;
+		}
+		if (!IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
+			continue;	// no function
+		}
 		if (for_emp && VEH_OWNER(veh) && VEH_OWNER(veh) != for_emp && !emp_can_use_vehicle(for_emp, veh, GUESTS_ALLOWED)) {
 			continue;
 		}
@@ -6334,20 +6356,22 @@ bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvec
 		if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS) && IS_SET(fnc_flag, IMMOBILE_FNCS)) {
 			continue;	// exclude certain functions on movable vehicles (functions that require room data)
 		}
-		
-		if (IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
-			if (!IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY) || (ROOM_OWNER(room) && get_territory_type_for_empire(room, ROOM_OWNER(room), TRUE, &junk) == TER_CITY)) {
-				return TRUE;	// vehicle allows it
-			}
+		if (IS_SET(VEH_FUNCTIONS(veh), FNC_IN_CITY_ONLY) && (!ROOM_OWNER(room) || get_territory_type_for_empire(room, ROOM_OWNER(room), TRUE, &junk) != TER_CITY)) {
+			continue;	// not in-city but needs it
 		}
+		
+		return TRUE;	// vehicle allows it
 	}
 	
 	// otherwise check the room itself
-	if (for_emp && ROOM_OWNER(room) && ROOM_OWNER(room) != for_emp && !emp_can_use_room(for_emp, room, GUESTS_ALLOWED)) {
-		return FALSE;	// ownership failed
+	if (upgraded && (!HAS_FUNCTION(room, FNC_UPGRADED) || !IS_COMPLETE(room)) && (!HAS_FUNCTION(HOME_ROOM(room), FNC_UPGRADED) || !IS_COMPLETE(HOME_ROOM(room)))) {
+		return FALSE;
 	}
 	if (!HAS_FUNCTION(room, fnc_flag) || !IS_COMPLETE(room)) {
 		return FALSE;
+	}
+	if (for_emp && ROOM_OWNER(room) && ROOM_OWNER(room) != for_emp && !emp_can_use_room(for_emp, room, GUESTS_ALLOWED)) {
+		return FALSE;	// ownership failed
 	}
 	if (!check_in_city_requirement(room, TRUE)) {
 		return FALSE;

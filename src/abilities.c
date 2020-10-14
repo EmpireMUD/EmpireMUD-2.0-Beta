@@ -1911,14 +1911,14 @@ DO_ABIL(do_dot_ability) {
 * @param char *argument The typed-in args.
 */
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument) {
-	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
+	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], *argptr = arg;
 	struct ability_exec_type *aet, *next_aet;
 	struct ability_exec *data;
 	vehicle_data *veh = NULL;
 	char_data *targ = NULL;
 	obj_data *obj = NULL;
 	bool has = FALSE;
-	int iter;
+	int iter, number;
 	
 	skip_spaces(&argument);
 	
@@ -1935,56 +1935,59 @@ void perform_ability_command(char_data *ch, ability_data *abil, char *argument) 
 		argument = one_argument(argument, arg);
 		skip_spaces(&argument);	// anything left
 		
+		// extract numbering
+		number = get_number(&argptr);
+		
 		// char targets
 		if (!has && (IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_ROOM | ATAR_SELF_ONLY))) {
-			if ((targ = get_char_vis(ch, arg, FIND_CHAR_ROOM)) != NULL) {
+			if ((targ = get_char_vis(ch, argptr, &number, FIND_CHAR_ROOM)) != NULL) {
 				has = TRUE;
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_CLOSEST)) {
-			if ((targ = find_closest_char(ch, arg, FALSE)) != NULL) {
+			if ((targ = find_closest_char(ch, argptr, FALSE)) != NULL) {
 				has = TRUE;
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_CHAR_WORLD)) {
-			if ((targ = get_char_vis(ch, arg, FIND_CHAR_WORLD)) != NULL) {
+			if ((targ = get_char_vis(ch, argptr, &number, FIND_CHAR_WORLD)) != NULL) {
 				has = TRUE;
 			}
 		}
 		
 		// obj targets
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_INV)) {
-			if ((obj = get_obj_in_list_vis(ch, arg, ch->carrying)) != NULL) {
+			if ((obj = get_obj_in_list_vis(ch, argptr, &number, ch->carrying)) != NULL) {
 				has = TRUE;
 			}
 		}
-		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_EQUIP)) {
+		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_EQUIP) && number > 0) {
 			for (iter = 0; !has && iter < NUM_WEARS; ++iter) {
-				if (GET_EQ(ch, iter) && isname(arg, GET_EQ(ch, iter)->name)) {
+				if (GET_EQ(ch, iter) && isname(argptr, GET_EQ(ch, iter)->name) && --number == 0) {
 					obj = GET_EQ(ch, iter);
 					has = TRUE;
 				}
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_ROOM)) {
-			if ((obj = get_obj_in_list_vis(ch, arg, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
+			if ((obj = get_obj_in_list_vis(ch, argptr, &number, ROOM_CONTENTS(IN_ROOM(ch)))) != NULL) {
 				has = TRUE;
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_OBJ_WORLD)) {
-			if ((obj = get_obj_vis(ch, arg)) != NULL) {
+			if ((obj = get_obj_vis(ch, argptr, &number)) != NULL) {
 				has = TRUE;
 			}
 		}
 		
 		// vehicle targets
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_VEH_ROOM)) {
-			if ((veh = get_vehicle_in_room_vis(ch, arg))) {
+			if ((veh = get_vehicle_in_room_vis(ch, argptr, &number))) {
 				has = TRUE;
 			}
 		}
 		if (!has && IS_SET(ABIL_TARGETS(abil), ATAR_VEH_WORLD)) {
-			if ((veh = get_vehicle_vis(ch, arg))) {
+			if ((veh = get_vehicle_vis(ch, argptr, &number))) {
 				has = TRUE;
 			}
 		}
