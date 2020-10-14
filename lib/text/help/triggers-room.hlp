@@ -190,6 +190,7 @@ When using field - The variable returns:
 &cis_outdoors&0 - True if it's on the map, in an outdoor adventure, etc.
 &cmax_citizens&0 - If a building, the max number of citizens who can live here.
 &cname&0 - The name of the room.
+&cpainted&0 - The color the building is painted, if any.
 &cpeople&0 - The id of the first character in the room, or an empty return.
 &cplayers_present&0 - True if there's at least 1 player in the room.
 &crmt_flagged(AFF)&0 - True if the room has a room template flag on it.

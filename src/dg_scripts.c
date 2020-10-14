@@ -43,6 +43,7 @@ extern const char *dirs[];
 extern const char *extra_bits[];
 extern const char *item_types[];
 extern const char *genders[];
+extern const char *paint_names[];
 extern const char *player_bits[];
 extern const int rev_dir[];
 extern const char *exit_bits[];
@@ -5099,7 +5100,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'd': {	// room.d*
 					if (!str_cmp(field, "dedicated_to")) {
 						player_index_data *index;
-						if (GET_ROOM_PATRON(r) && (index = find_player_index_by_idnum(GET_ROOM_PATRON(r)))) {
+						if (ROOM_PATRON(r) && (index = find_player_index_by_idnum(ROOM_PATRON(r)))) {
 							snprintf(str, slen, "%s", index->fullname);
 						}
 						else {
@@ -5275,7 +5276,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'p': {	// room.p*
-					if (!str_cmp(field, "players_present")) {
+					if (!str_cmp(field, "painted")) {
+						if (ROOM_PAINT_COLOR(r)) {
+							char color_name[80];
+							sprinttype(ROOM_PAINT_COLOR(r), paint_names, color_name, sizeof(color_name), "");
+							*color_name = LOWER(*color_name);
+							snprintf(str, slen, "%s%s", (ROOM_AFF_FLAGGED(r, ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), color_name);
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "players_present")) {
 						snprintf(str, slen, "%d", any_players_in_room(r) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "people")) {
@@ -5731,6 +5743,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							strcpy(str, "");
+						}
+					}
+					break;
+				}
+				case 'p': {	// veh.p*
+					if (!str_cmp(field, "painted")) {
+						if (VEH_PAINT_COLOR(v)) {
+							char color_name[80];
+							sprinttype(VEH_PAINT_COLOR(v), paint_names, color_name, sizeof(color_name), "");
+							*color_name = LOWER(*color_name);
+							snprintf(str, slen, "%s%s", (VEH_FLAGGED(v, VEH_BRIGHT_PAINT) ? "bright " : ""), color_name);
+						}
+						else {
+							*str = '\0';
 						}
 					}
 					break;
