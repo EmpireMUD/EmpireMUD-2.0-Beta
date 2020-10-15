@@ -2978,7 +2978,10 @@ ACMD(do_upgrade) {
 		
 		// DONE: auto-complete it now if no resources
 		if (!GET_BUILDING_RESOURCES(in_room)) {
+			msg_to_char(ch, "You finish the upgrade!\r\n");
+			act("$n finished the upgrade!", FALSE, ch, NULL, NULL, TO_ROOM);
 			complete_building(in_room);
+			cancel_action(ch);
 		}
 	} // end upgrade-to-building
 	
@@ -3143,6 +3146,8 @@ ACMD(do_upgrade) {
 		
 		// DONE: autocomplete if no resources on the upgrade
 		if (!VEH_NEEDS_RESOURCES(to_veh)) {
+			msg_to_char(ch, "You finish the upgrade!\r\n");
+			act("$n finished the upgrade!", FALSE, ch, NULL, NULL, TO_ROOM);
 			complete_vehicle(to_veh);
 			cancel_action(ch);
 		}
