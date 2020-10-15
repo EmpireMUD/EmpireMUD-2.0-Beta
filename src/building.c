@@ -2915,6 +2915,10 @@ ACMD(do_upgrade) {
 		bright_paint = VEH_FLAGGED(from_veh, VEH_BRIGHT_PAINT);
 		REMOVE_BIT(VEH_FLAGS(from_veh), VEH_BRIGHT_PAINT);
 	}
+	else {
+		msg_to_char(ch, "There was an unexpected error in the upgrade process.\r\n");
+		return;
+	}
 	
 	// ---- upgrade-from above; upgrade-to below -----
 	
