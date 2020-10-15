@@ -3009,6 +3009,7 @@ ACMD(do_upgrade) {
 						continue;	// these are not the rooms you're looking for
 					}
 					
+					COMPLEX_DATA(room_iter)->home_room = interior;
 					COMPLEX_DATA(room_iter)->vehicle = to_veh;
 					SET_BIT(ROOM_BASE_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
 					add_room_to_vehicle(room_iter, to_veh);
