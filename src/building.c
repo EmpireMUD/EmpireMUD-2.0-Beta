@@ -40,6 +40,7 @@ void remove_like_item_from_built_with(struct resource_data **built_with, obj_dat
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
 
 // externs
+void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 void adjust_building_tech(empire_data *emp, room_data *room, bool add);
 extern bool can_claim(char_data *ch);
 INTERACTION_FUNC(consumes_or_decays_interact);
@@ -1890,7 +1891,6 @@ ACMD(do_dedicate) {
 
 // Takes subcmd SCMD_DESIGNATE, SCMD_REDESIGNATE
 ACMD(do_designate) {
-	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 	void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 	extern bld_data *get_building_by_name(char *name, bool room_only);
@@ -2620,6 +2620,7 @@ ACMD(do_unpaint) {
 
 ACMD(do_upgrade) {
 	extern bool check_can_craft(char_data *ch, craft_data *type);
+	void complete_vehicle(vehicle_data *veh);
 	void empty_vehicle(vehicle_data *veh, room_data *to_room);
 	extern bool find_and_bind(char_data *ch, obj_vnum vnum);
 	void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
@@ -2629,18 +2630,27 @@ ACMD(do_upgrade) {
 	void perform_abandon_vehicle(vehicle_data *veh);
 	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 	void scale_vehicle_to_level(vehicle_data *veh, int level);
+	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 	
 	char arg1[MAX_INPUT_LENGTH], *arg2, output[MAX_STRING_LENGTH];
-	vehicle_data *up_veh = NULL, *prev_veh, *new_veh, *veh_proto;
+	vehicle_data *from_veh = NULL, *prev_veh, *to_veh, *veh_proto;
+	room_data *from_room = NULL, *interior, *in_room, *room_iter;
 	craft_data *find_craft, *to_craft, *missing_abil = NULL;
 	struct bld_relation *relat, *lists[2];
 	obj_data *obj, *next_obj, *found_obj;
-	room_data *up_room = NULL, *interior;
+	struct room_direction_data *exits;
 	struct vehicle_room_list *vrl;
 	bitvector_t set_bits;
 	bool done, fail;
 	int iter, found;
 	size_t size;
+	
+	// for moving data
+	struct depletion_data *depletion = NULL;
+	struct resource_data *built_with = NULL;
+	int private_owner = NOBODY;
+	bool bright_paint = FALSE;
+	int paint_color = 0;
 	
 	arg2 = one_argument(argument, arg1);	// what to upgrade
 	skip_spaces(&arg2);	// optional: what to upgrade it to
@@ -2662,13 +2672,13 @@ ACMD(do_upgrade) {
 	if (is_abbrev(arg1, "building") || is_abbrev(arg1, "room") || isname(arg1, skip_filler(get_room_name(HOME_ROOM(IN_ROOM(ch)), FALSE)))) {
 		if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
 			// actually upgrade the vehicle we're in
-			up_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
+			from_veh = GET_ROOM_VEHICLE(IN_ROOM(ch));
 		}
 		else {
-			up_room = HOME_ROOM(IN_ROOM(ch));
+			from_room = HOME_ROOM(IN_ROOM(ch));
 		}
 	}
-	else if (!generic_find(arg1, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &up_veh)) {
+	else if (!generic_find(arg1, FIND_VEHICLE_ROOM | FIND_VEHICLE_INSIDE, ch, NULL, NULL, &from_veh)) {
 		msg_to_char(ch, "You don't see %s %s here to upgrade.\r\n", AN(arg1), arg1);
 		return;
 	}
@@ -2676,13 +2686,13 @@ ACMD(do_upgrade) {
 	// process the list of upgrades -- this will build the 'upgrade to what'
 	// output if there's no arg2, will find the craft if there is, and can also
 	// find the craft if there's no arg2 but there's also only 1 option
-	size = snprintf(output, sizeof(output), "Upgrade %s to what:", (up_veh ? VEH_SHORT_DESC(up_veh) : "it"));
+	size = snprintf(output, sizeof(output), "Upgrade %s to what:", (from_veh ? VEH_SHORT_DESC(from_veh) : "it"));
 	to_craft = NULL;	// possibly the one the player requested
 	found = 0;
 	
 	// put relations into an array to do this in 1 loop
-	lists[0] = up_veh ? VEH_RELATIONS(up_veh) : NULL;
-	lists[1] = (up_room && GET_BUILDING(up_room)) ? GET_BLD_RELATIONS(GET_BUILDING(up_room)) : NULL;
+	lists[0] = from_veh ? VEH_RELATIONS(from_veh) : NULL;
+	lists[1] = (from_room && GET_BUILDING(from_room)) ? GET_BLD_RELATIONS(GET_BUILDING(from_room)) : NULL;
 	for (iter = 0, done = FALSE; iter < 2 && !done; ++iter) {
 		LL_FOREACH(lists[iter], relat) {
 			// look up craft: this checks if the player can do it, too
@@ -2733,64 +2743,68 @@ ACMD(do_upgrade) {
 		return;
 	}
 	if (found == 0 || !to_craft) {
-		msg_to_char(ch, "You can't upgrade %s.\r\n", up_veh ? "that" : "anything here");
+		msg_to_char(ch, "You can't upgrade %s.\r\n", from_veh ? "that" : "anything here");
 		return;
 	}
 	
 	// validate upgrade: room
-	if (up_room && (!can_use_room(ch, up_room, MEMBERS_ONLY) || ROOM_AFF_FLAGGED(up_room, ROOM_AFF_UNCLAIMABLE))) {
+	if (from_room && (!can_use_room(ch, from_room, MEMBERS_ONLY) || ROOM_AFF_FLAGGED(from_room, ROOM_AFF_UNCLAIMABLE))) {
 		msg_to_char(ch, "You don't have permission to upgrade it.\r\n");
 		return;
 	}
-	if (up_room && count_players_in_building(up_room, TRUE, TRUE)) {
+	if (from_room && count_players_in_building(from_room, TRUE, TRUE)) {
 		msg_to_char(ch, "You can't upgrade it while players are inside.\r\n");
 		return;
 	}
 	
 	// validate upgrade: vehicle
-	if (up_veh && !can_use_vehicle(ch, up_veh, MEMBERS_ONLY)) {
-		act("You don't have permission to upgrade $V.", FALSE, ch, NULL, up_veh, TO_CHAR);
+	if (from_veh && !can_use_vehicle(ch, from_veh, MEMBERS_ONLY)) {
+		act("You don't have permission to upgrade $V.", FALSE, ch, NULL, from_veh, TO_CHAR);
 		return;
 	}
-	if (up_veh && VEH_FLAGGED(up_veh, VEH_ON_FIRE)) {
+	if (from_veh && VEH_FLAGGED(from_veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "You can't upgrade that... it's on fire!\r\n");
 		return;
 	}
-	if (up_veh && VEH_DRIVER(up_veh)) {
-		msg_to_char(ch, "You can't upgrade it while %s driving it.\r\n", (VEH_DRIVER(up_veh) == ch) ? "you're" : "someone is");
+	if (from_veh && VEH_DRIVER(from_veh)) {
+		msg_to_char(ch, "You can't upgrade it while %s driving it.\r\n", (VEH_DRIVER(from_veh) == ch) ? "you're" : "someone is");
 		return;
 	}
-	if (up_veh && VEH_LED_BY(up_veh)) {
-		msg_to_char(ch, "You can't upgrade it while %s leading it.\r\n", (VEH_LED_BY(up_veh) == ch) ? "you're" : "someone is");
+	if (from_veh && VEH_LED_BY(from_veh)) {
+		msg_to_char(ch, "You can't upgrade it while %s leading it.\r\n", (VEH_LED_BY(from_veh) == ch) ? "you're" : "someone is");
 		return;
 	}
-	if (up_veh && VEH_SITTING_ON(up_veh)) {
-		msg_to_char(ch, "You can't upgrade it while %s sitting %s it.\r\n", (VEH_SITTING_ON(up_veh) == ch) ? "you're" : "someone is", IN_OR_ON(up_veh));
+	if (from_veh && VEH_SITTING_ON(from_veh)) {
+		msg_to_char(ch, "You can't upgrade it while %s sitting %s it.\r\n", (VEH_SITTING_ON(from_veh) == ch) ? "you're" : "someone is", IN_OR_ON(from_veh));
 		return;
 	}
-	if (up_veh && count_players_in_vehicle(up_veh, TRUE)) {
+	if (from_veh && count_players_in_vehicle(from_veh, TRUE)) {
 		msg_to_char(ch, "You can't upgrade it while players are inside.\r\n");
+		return;
+	}
+	if (from_veh && CRAFT_IS_BUILDING(to_craft) && (IS_INSIDE(IN_ROOM(from_veh)) || IS_ANY_BUILDING(IN_ROOM(from_veh)))) {
+		msg_to_char(ch, "You can't upgrade it %s a building.\r\n", ROOM_BLD_FLAGGED(IN_ROOM(from_veh), BLD_OPEN) ? "at" : "in");
 		return;
 	}
 	
 	// validate upgrade: general
-	if (up_veh && IN_ROOM(up_veh) != IN_ROOM(ch)) {
-		act("You need to upgrade $V from outside of it.", FALSE, ch, NULL, up_veh, TO_CHAR);
+	if (from_veh && IN_ROOM(from_veh) != IN_ROOM(ch)) {
+		act("You need to upgrade $V from outside of it.", FALSE, ch, NULL, from_veh, TO_CHAR);
 		return;
 	}
-	if (up_room && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch))) {
+	if (from_room && IN_ROOM(ch) != HOME_ROOM(IN_ROOM(ch))) {
 		msg_to_char(ch, "You need to upgrade the building from its main/entry room.\r\n");
 		return;
 	}
-	if ((up_room && !IS_COMPLETE(up_room)) || (up_veh && !VEH_IS_COMPLETE(up_veh))) {
+	if ((from_room && !IS_COMPLETE(from_room)) || (from_veh && !VEH_IS_COMPLETE(from_veh))) {
 		msg_to_char(ch, "Finish building it before you upgrade it.\r\n");
 		return;
 	}
-	if ((up_room && IS_DISMANTLING(up_room)) || (up_veh && VEH_IS_DISMANTLING(up_veh))) {
+	if ((from_room && IS_DISMANTLING(from_room)) || (from_veh && VEH_IS_DISMANTLING(from_veh))) {
 		msg_to_char(ch, "You can't upgrade that while it is being dismantled.\r\n");
 		return;
 	}
-	if ((up_room && BUILDING_RESOURCES(up_room)) || (up_veh && VEH_NEEDS_RESOURCES(up_veh))) {
+	if ((from_room && BUILDING_RESOURCES(from_room)) || (from_veh && VEH_NEEDS_RESOURCES(from_veh))) {
 		msg_to_char(ch, "You need to do some repairs before you can upgrade it.\r\n");
 		return;
 	}
@@ -2802,23 +2816,23 @@ ACMD(do_upgrade) {
 		// sends own messages
 		return;
 	}
-	if (up_room && !check_build_location_and_dir(ch, to_craft, BUILDING_ENTRANCE(up_room) != NO_DIR ? rev_dir[BUILDING_ENTRANCE(up_room)] : NO_DIR, TRUE, NULL, NULL)) {
+	if (from_room && !check_build_location_and_dir(ch, to_craft, BUILDING_ENTRANCE(from_room) != NO_DIR ? rev_dir[BUILDING_ENTRANCE(from_room)] : NO_DIR, TRUE, NULL, NULL)) {
 		// sends own messages
 		return;
 	}
-	if (up_veh) {	// check building location
+	if (from_veh) {	// check building location
 		// temporarily remove from the room for validation
-		prev_veh = (up_veh == ROOM_VEHICLES(IN_ROOM(up_veh))) ? NULL : up_veh->prev_in_room;
-		DL_DELETE2(ROOM_VEHICLES(IN_ROOM(up_veh)), up_veh, prev_in_room, next_in_room);
+		prev_veh = (from_veh == ROOM_VEHICLES(IN_ROOM(from_veh))) ? NULL : from_veh->prev_in_room;
+		DL_DELETE2(ROOM_VEHICLES(IN_ROOM(from_veh)), from_veh, prev_in_room, next_in_room);
 		
 		fail = !check_build_location_and_dir(ch, to_craft, NO_DIR, TRUE, NULL, NULL);
 		
 		// re-add vehicle
 		if (prev_veh) {
-			DL_APPEND_ELEM2(ROOM_VEHICLES(IN_ROOM(up_veh)), prev_veh, up_veh, prev_in_room, next_in_room);
+			DL_APPEND_ELEM2(ROOM_VEHICLES(IN_ROOM(from_veh)), prev_veh, from_veh, prev_in_room, next_in_room);
 		}
 		else {
-			DL_PREPEND2(ROOM_VEHICLES(IN_ROOM(up_veh)), up_veh, prev_in_room, next_in_room);
+			DL_PREPEND2(ROOM_VEHICLES(IN_ROOM(from_veh)), from_veh, prev_in_room, next_in_room);
 		}
 		
 		if (fail) {
@@ -2827,7 +2841,8 @@ ACMD(do_upgrade) {
 		}
 	}		
 	
-	// SUCCESS:
+	// ---- SUCCESS ----
+	
 	if (CRAFT_IS_BUILDING(to_craft)) {
 		start_action(ch, ACT_BUILDING, 0);
 	}
@@ -2847,118 +2862,284 @@ ACMD(do_upgrade) {
 		}
 	}
 	
-	// upgrade room version
-	if (up_room && CRAFT_IS_BUILDING(to_craft)) {
-		dismantle_wtrigger(up_room, NULL, FALSE);
-		detach_building_from_room(up_room);
-		attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(to_craft)), up_room, TRUE);
-		set_room_extra_data(up_room, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(to_craft));
-		SET_BIT(ROOM_BASE_FLAGS(up_room), ROOM_AFF_INCOMPLETE);
-		affect_total_room(up_room);
-		GET_BUILDING_RESOURCES(up_room) = copy_resource_list(GET_CRAFT_RESOURCES(to_craft));
-
+	// ---- start messages and pull some data for later ----
+	
+	if (from_room) {
+		// upgrade FROM building
+		in_room = from_room;
+		
 		msg_to_char(ch, "You begin to upgrade the building.\r\n");
 		act("$n starts upgrading the building.", FALSE, ch, NULL, NULL, TO_ROOM);
+		
+		// store some data
+		built_with = GET_BUILT_WITH(from_room);
+		GET_BUILT_WITH(from_room) = NULL;
+		
+		depletion = ROOM_DEPLETION(from_room);
+		ROOM_DEPLETION(from_room) = NULL;
+		
+		private_owner = ROOM_PRIVATE_OWNER(from_room);
+		if (COMPLEX_DATA(from_room)) {
+			COMPLEX_DATA(from_room)->private_owner = NOBODY;
+		}
+		
+		// store paint color and remove it
+		paint_color = get_room_extra_data(from_room, ROOM_EXTRA_PAINT_COLOR);
+		remove_room_extra_data(from_room, ROOM_EXTRA_PAINT_COLOR);
+		bright_paint = ROOM_AFF_FLAGGED(from_room, ROOM_AFF_BRIGHT_PAINT);
+		REMOVE_BIT(ROOM_BASE_FLAGS(from_room), ROOM_AFF_BRIGHT_PAINT);
+		// affect_total_room(from_room);	// probably don't need to do this here because it's done later
+	}
+	else if (from_veh) {
+		// upgrade FROM vehicle
+		in_room = IN_ROOM(from_veh);
+		
+		act("You start upgrading $V.", FALSE, ch, NULL, from_veh, TO_CHAR);
+		act("$n starts upgrading $V.", FALSE, ch, NULL, from_veh, TO_ROOM);
+		
+		// store some data
+		built_with = VEH_BUILT_WITH(from_veh);
+		VEH_BUILT_WITH(from_veh) = NULL;
+		
+		depletion = VEH_DEPLETION(from_veh);
+		VEH_DEPLETION(from_veh) = NULL;
+		
+		if (VEH_INTERIOR_HOME_ROOM(from_veh) && COMPLEX_DATA(VEH_INTERIOR_HOME_ROOM(from_veh))) {
+			private_owner = ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(from_veh));
+			COMPLEX_DATA(VEH_INTERIOR_HOME_ROOM(from_veh))->private_owner = NOBODY;
+		}
+		
+		// record and remove paint color
+		paint_color = get_vehicle_extra_data(from_veh, ROOM_EXTRA_PAINT_COLOR);
+		remove_vehicle_extra_data(from_veh, ROOM_EXTRA_PAINT_COLOR);
+		bright_paint = VEH_FLAGGED(from_veh, VEH_BRIGHT_PAINT);
+		REMOVE_BIT(VEH_FLAGS(from_veh), VEH_BRIGHT_PAINT);
 	}
 	
-	// upgrade vehicle version
-	if (up_veh && CRAFT_IS_VEHICLE(to_craft)) {
-		act("You start upgrading $V.", FALSE, ch, NULL, up_veh, TO_CHAR);
-		act("$n starts upgrading $V.", FALSE, ch, NULL, up_veh, TO_ROOM);
+	// ---- upgrade-from above; upgrade-to below -----
+	
+	// upgrade TO building
+	if (CRAFT_IS_BUILDING(to_craft)) {
+		if (from_room) {
+			// upgraded from building: just attach new building type
+			dismantle_wtrigger(from_room, NULL, FALSE);
+			detach_building_from_room(from_room);
+			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(to_craft)), from_room, TRUE);
+		}
+		else if (from_veh) {
+			// upgraded from vehicle
+			construct_building(in_room, GET_CRAFT_BUILD_TYPE(to_craft));
+			
+			// dump the vehicle -- no way to move the interior since the new building needs to be open
+			fully_empty_vehicle(from_veh, in_room);
+			while (VEH_ANIMALS(from_veh)) {
+				unharness_mob_from_vehicle(VEH_ANIMALS(from_veh), from_veh);
+			}
+			
+			// no need to herd animals out: it's got to be an open building
+			
+			// and remove it
+			extract_vehicle(from_veh);
+		}
 		
-		new_veh = read_vehicle(GET_CRAFT_OBJECT(to_craft), TRUE);
+		// main setup
+		special_building_setup(ch, in_room);
+		set_room_extra_data(from_room, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(to_craft));
+		set_room_extra_data(in_room, ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
+		GET_BUILDING_RESOURCES(from_room) = copy_resource_list(GET_CRAFT_RESOURCES(to_craft));
+		SET_BIT(ROOM_BASE_FLAGS(from_room), ROOM_AFF_INCOMPLETE);
+		affect_total_room(from_room);	// do this right away to ensure incomplete flag
+		
+		// claim now if from-vehicle
+		if (from_veh && VEH_OWNER(from_veh) && !ROOM_OWNER(in_room) && !ROOM_AFF_FLAGGED(in_room, ROOM_AFF_UNCLAIMABLE) && can_claim(ch)) {
+			perform_claim_room(in_room, VEH_OWNER(from_veh));
+		}
+		
+		// transfer old data
+		COMPLEX_DATA(from_room)->private_owner = private_owner;
+		GET_BUILT_WITH(from_room) = built_with;
+		ROOM_DEPLETION(from_room) = depletion;
+		
+		if (paint_color > 0) {
+			set_room_extra_data(from_room, ROOM_EXTRA_PAINT_COLOR, paint_color);
+			if (bright_paint) {
+				SET_BIT(ROOM_BASE_FLAGS(from_room), ROOM_AFF_BRIGHT_PAINT);
+				// affect_total_room(from_room);	// probably don't need to do this here because it's done later
+			}
+		}
+		
+		// DONE: auto-complete it now if no resources
+		if (!GET_BUILDING_RESOURCES(in_room)) {
+			complete_building(in_room);
+		}
+	} // end upgrade-to-building
+	
+	// upgrade TO vehicle
+	else if (CRAFT_IS_VEHICLE(to_craft)) {
+		to_veh = read_vehicle(GET_CRAFT_OBJECT(to_craft), TRUE);
 		
 		// set incomplete before putting in the room
-		SET_BIT(VEH_FLAGS(new_veh), VEH_INCOMPLETE);
-		vehicle_to_room(new_veh, IN_ROOM(up_veh));
+		SET_BIT(VEH_FLAGS(to_veh), VEH_INCOMPLETE);
+		vehicle_to_room(to_veh, in_room);
 		
-		// see if we need to abandon the old one
-		if (VEH_OWNER(up_veh) && VEH_FLAGGED(new_veh, VEH_NO_CLAIM)) {
-			perform_abandon_vehicle(up_veh);
-		}
-		else if (VEH_OWNER(up_veh)) {
-			perform_claim_vehicle(new_veh, VEH_OWNER(up_veh));
-		}
-	
-		// additional setup
-		special_vehicle_setup(ch, new_veh);
-		VEH_NEEDS_RESOURCES(new_veh) = copy_resource_list(GET_CRAFT_RESOURCES(to_craft));
-		VEH_HEALTH(new_veh) = MAX(1, VEH_MAX_HEALTH(new_veh) * 0.2);	// start at 20% health, will heal on completion
-		scale_vehicle_to_level(new_veh, get_craft_scale_level(ch, to_craft));
-		VEH_CONSTRUCTION_ID(new_veh) = get_new_vehicle_construction_id();
-		GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(new_veh);
-		
-		// transfer stuff from old veh
-		VEH_ANIMALS(new_veh) = VEH_ANIMALS(up_veh);
-		VEH_ANIMALS(up_veh) = NULL;
-		
-		VEH_BUILT_WITH(new_veh) = VEH_BUILT_WITH(up_veh);
-		VEH_BUILT_WITH(up_veh) = NULL;
-		
-		VEH_DEPLETION(new_veh) = VEH_DEPLETION(up_veh);
-		VEH_DEPLETION(up_veh) = NULL;
-		
-		VEH_EXTRA_DATA(new_veh) = VEH_EXTRA_DATA(up_veh);
-		VEH_EXTRA_DATA(up_veh) = NULL;
-		set_vehicle_extra_data(new_veh, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(to_craft));
-		
-		VEH_INSTANCE_ID(new_veh) = VEH_INSTANCE_ID(up_veh);
-		
-		// adapt flags: find flags added to up_veh
-		if ((veh_proto = vehicle_proto(VEH_VNUM(up_veh)))) {
-			set_bits = VEH_FLAGS(up_veh) & SAVABLE_VEH_FLAGS & ~VEH_FLAGS(veh_proto);
-			SET_BIT(VEH_FLAGS(new_veh), set_bits);
-		}
-		
-		// ensure paintability if paint was copied
-		if (VEH_FLAGGED(new_veh, VEH_NO_PAINT)) {
-			REMOVE_BIT(VEH_FLAGS(new_veh), VEH_BRIGHT_PAINT);
-			remove_vehicle_extra_data(new_veh, ROOM_EXTRA_PAINT_COLOR);
-		}
-		
-		// transfer/dump contents
-		if (VEH_CAPACITY(new_veh) > 0) {
-			DL_FOREACH_SAFE2(VEH_CONTAINS(up_veh), obj, next_obj, next_content) {
-				obj_to_vehicle(obj, new_veh);
-			}
-		}
-		else {
-			empty_vehicle(up_veh, IN_ROOM(up_veh));
-		}
-		
-		// transfer/dump inventory
-		if (VEH_INTERIOR_ROOM_VNUM(new_veh) != NOTHING && (interior = get_vehicle_interior(up_veh))) {
-			VEH_INSIDE_ROOMS(new_veh) = VEH_INSIDE_ROOMS(up_veh);
+		if (from_room) {
+			// upgraded from building
 			
-			// move home room
-			VEH_INTERIOR_HOME_ROOM(new_veh) = interior;
-			COMPLEX_DATA(interior)->vehicle = new_veh;
-			
-			// move whole interior
-			LL_FOREACH(VEH_ROOM_LIST(up_veh), vrl) {
-				COMPLEX_DATA(vrl->room)->vehicle = new_veh;
+			// claim check
+			if (ROOM_OWNER(from_room) && !VEH_FLAGGED(to_veh, VEH_NO_CLAIM)) {
+				perform_claim_vehicle(to_veh, ROOM_OWNER(from_room));
 			}
 			
-			// transfer room list
-			VEH_ROOM_LIST(new_veh) = VEH_ROOM_LIST(up_veh);
-			VEH_ROOM_LIST(up_veh) = NULL;
-			VEH_INTERIOR_HOME_ROOM(up_veh) = NULL;
-			
-			// change room
-			if (VEH_INTERIOR_ROOM_VNUM(new_veh) != VEH_INTERIOR_ROOM_VNUM(up_veh) && building_proto(VEH_INTERIOR_ROOM_VNUM(new_veh))) {
-				detach_building_from_room(interior);
-				attach_building_to_room(building_proto(VEH_INTERIOR_ROOM_VNUM(new_veh)), interior, TRUE);
+			if ((interior = get_vehicle_interior(to_veh))) {
+				// move objs/vehs inside the incomplete vehicle's main room?
+				
+				DL_FOREACH2(interior_room_list, room_iter, next_interior) {
+					if (room_iter == from_room || HOME_ROOM(room_iter) != from_room) {
+						continue;	// these are not the rooms you're looking for
+					}
+					
+					COMPLEX_DATA(room_iter)->vehicle = to_veh;
+					SET_BIT(ROOM_BASE_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
+					add_room_to_vehicle(room_iter, to_veh);
+					affect_total_room(room_iter);
+					
+					// check exits to the old home room and move them
+					LL_FOREACH(COMPLEX_DATA(room_iter)->exits, exits) {
+						if (exits->to_room == GET_ROOM_VNUM(from_room)) {
+							exits->to_room = GET_ROOM_VNUM(interior);
+							exits->room_ptr = interior;
+							++GET_EXITS_HERE(interior);
+							--GET_EXITS_HERE(from_room);
+						}
+					}
+				}
+				
+				// apply exits from the old home-room to the interior
+				if (COMPLEX_DATA(from_room)) {
+					LL_FOREACH(COMPLEX_DATA(from_room)->exits, exits) {
+						if (exits->to_room >= MAP_SIZE) {
+							// copy any exit that's off the map
+							create_exit(interior, exits->room_ptr, exits->dir, FALSE);
+						}
+					}
+				}
+				
+				// apply data inside
+				COMPLEX_DATA(interior)->private_owner = private_owner;
 			}
 			
 			// need to run this early because it won't run on completion
 			complete_wtrigger(interior);
+			
+			// and remove old building
+			disassociate_building(from_room);
 		}
-		else {
-			fully_empty_vehicle(up_veh, IN_ROOM(up_veh));
+		else if (from_veh) {
+			// upgraded from vehicle
+			
+			// see if we need to abandon the old one
+			if (VEH_OWNER(from_veh) && VEH_FLAGGED(to_veh, VEH_NO_CLAIM)) {
+				perform_abandon_vehicle(from_veh);
+			}
+			else if (VEH_OWNER(from_veh)) {
+				perform_claim_vehicle(to_veh, VEH_OWNER(from_veh));
+			}
+			
+			// veh-to-veh data
+			VEH_INSTANCE_ID(to_veh) = VEH_INSTANCE_ID(from_veh);
+			
+			VEH_ANIMALS(to_veh) = VEH_ANIMALS(from_veh);
+			VEH_ANIMALS(from_veh) = NULL;
+			
+			VEH_EXTRA_DATA(to_veh) = VEH_EXTRA_DATA(from_veh);
+			VEH_EXTRA_DATA(from_veh) = NULL;
+			
+			// adapt flags: find flags added to from_veh
+			if ((veh_proto = vehicle_proto(VEH_VNUM(from_veh)))) {
+				set_bits = VEH_FLAGS(from_veh) & SAVABLE_VEH_FLAGS & ~VEH_FLAGS(veh_proto);
+				SET_BIT(VEH_FLAGS(to_veh), set_bits);
+			}
+		
+			// transfer/dump contents
+			if (VEH_CAPACITY(to_veh) > 0) {
+				DL_FOREACH_SAFE2(VEH_CONTAINS(from_veh), obj, next_obj, next_content) {
+					obj_to_vehicle(obj, to_veh);
+				}
+			}
+			else {
+				empty_vehicle(from_veh, in_room);
+			}
+			
+			// transfer rooms
+			if (VEH_INTERIOR_ROOM_VNUM(to_veh) != NOTHING && (interior = get_vehicle_interior(from_veh))) {
+				VEH_INSIDE_ROOMS(to_veh) = VEH_INSIDE_ROOMS(from_veh);
+				
+				// move home room
+				VEH_INTERIOR_HOME_ROOM(to_veh) = interior;
+				COMPLEX_DATA(interior)->vehicle = to_veh;
+				
+				// move whole interior
+				LL_FOREACH(VEH_ROOM_LIST(from_veh), vrl) {
+					COMPLEX_DATA(vrl->room)->vehicle = to_veh;
+				}
+				
+				// transfer room list
+				VEH_ROOM_LIST(to_veh) = VEH_ROOM_LIST(from_veh);
+				VEH_ROOM_LIST(from_veh) = NULL;
+				VEH_INTERIOR_HOME_ROOM(from_veh) = NULL;
+				
+				// change room
+				if (VEH_INTERIOR_ROOM_VNUM(to_veh) != VEH_INTERIOR_ROOM_VNUM(from_veh) && building_proto(VEH_INTERIOR_ROOM_VNUM(to_veh))) {
+					detach_building_from_room(interior);
+					attach_building_to_room(building_proto(VEH_INTERIOR_ROOM_VNUM(to_veh)), interior, TRUE);
+				}
+				
+				// apply data
+				COMPLEX_DATA(interior)->private_owner = private_owner;
+				
+				// need to run this early because it won't run on completion
+				complete_wtrigger(interior);
+			}
+			else {
+				fully_empty_vehicle(from_veh, in_room);
+			}
+			
+			// remove old vehicle
+			extract_vehicle(from_veh);
+		}
+	
+		// additional setup
+		special_vehicle_setup(ch, to_veh);
+		VEH_NEEDS_RESOURCES(to_veh) = copy_resource_list(GET_CRAFT_RESOURCES(to_craft));
+		VEH_HEALTH(to_veh) = MAX(1, VEH_MAX_HEALTH(to_veh) * 0.2);	// start at 20% health, will heal on completion
+		scale_vehicle_to_level(to_veh, get_craft_scale_level(ch, to_craft));
+		VEH_CONSTRUCTION_ID(to_veh) = get_new_vehicle_construction_id();
+		GET_ACTION_VNUM(ch, 1) = VEH_CONSTRUCTION_ID(to_veh);
+		set_vehicle_extra_data(to_veh, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(to_craft));
+		
+		// transfer stuff from old data
+		VEH_BUILT_WITH(to_veh) = built_with;
+		VEH_DEPLETION(to_veh) = depletion;
+		
+		// check the paint
+		if (paint_color > 0 && !VEH_FLAGGED(to_veh, VEH_NO_PAINT)) {
+			set_vehicle_extra_data(to_veh, ROOM_EXTRA_PAINT_COLOR, paint_color);
+			if (bright_paint) {
+				SET_BIT(VEH_FLAGS(to_veh), VEH_BRIGHT_PAINT);
+			}
+		}
+		else {	// ensure not painted
+			REMOVE_BIT(VEH_FLAGS(to_veh), VEH_BRIGHT_PAINT);
+			remove_vehicle_extra_data(to_veh, ROOM_EXTRA_PAINT_COLOR);
 		}
 		
-		// and remove the old one
-		extract_vehicle(up_veh);
-	}
+		// DONE: autocomplete if no resources on the upgrade
+		if (!VEH_NEEDS_RESOURCES(to_veh)) {
+			complete_vehicle(to_veh);
+			cancel_action(ch);
+		}
+	} // end upgrade-to-vehicle
+	
+	affect_total_room(in_room);
 }
 
