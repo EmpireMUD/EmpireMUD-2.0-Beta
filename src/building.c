@@ -2766,7 +2766,7 @@ ACMD(do_upgrade) {
 		return;
 	}
 	if (from_room && ROOM_AFF_FLAGGED(from_room, ROOM_AFF_HAS_INSTANCE)) {
-		msg_to_char(ch, "You can't upgrade it while there's an adventure instance here.s\r\n");
+		msg_to_char(ch, "You can't upgrade it while there's an adventure instance here.\r\n");
 		return;
 	}
 	if (from_room && count_players_in_building(from_room, TRUE, TRUE)) {
