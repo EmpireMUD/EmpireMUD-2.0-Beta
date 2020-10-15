@@ -2952,11 +2952,11 @@ ACMD(do_upgrade) {
 		
 		// main setup
 		special_building_setup(ch, in_room);
-		set_room_extra_data(from_room, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(to_craft));
+		set_room_extra_data(in_room, ROOM_EXTRA_BUILD_RECIPE, GET_CRAFT_VNUM(to_craft));
 		set_room_extra_data(in_room, ROOM_EXTRA_ORIGINAL_BUILDER, GET_ACCOUNT(ch)->id);
-		GET_BUILDING_RESOURCES(from_room) = copy_resource_list(GET_CRAFT_RESOURCES(to_craft));
-		SET_BIT(ROOM_BASE_FLAGS(from_room), ROOM_AFF_INCOMPLETE);
-		affect_total_room(from_room);	// do this right away to ensure incomplete flag
+		GET_BUILDING_RESOURCES(in_room) = copy_resource_list(GET_CRAFT_RESOURCES(to_craft));
+		SET_BIT(ROOM_BASE_FLAGS(in_room), ROOM_AFF_INCOMPLETE);
+		affect_total_room(in_room);	// do this right away to ensure incomplete flag
 		
 		// claim now if from-vehicle
 		if (from_veh && VEH_OWNER(from_veh) && !ROOM_OWNER(in_room) && !ROOM_AFF_FLAGGED(in_room, ROOM_AFF_UNCLAIMABLE) && can_claim(ch)) {
@@ -2964,15 +2964,15 @@ ACMD(do_upgrade) {
 		}
 		
 		// transfer old data
-		COMPLEX_DATA(from_room)->private_owner = private_owner;
-		GET_BUILT_WITH(from_room) = built_with;
-		ROOM_DEPLETION(from_room) = depletion;
+		COMPLEX_DATA(in_room)->private_owner = private_owner;
+		GET_BUILT_WITH(in_room) = built_with;
+		ROOM_DEPLETION(in_room) = depletion;
 		
 		if (paint_color > 0) {
-			set_room_extra_data(from_room, ROOM_EXTRA_PAINT_COLOR, paint_color);
+			set_room_extra_data(in_room, ROOM_EXTRA_PAINT_COLOR, paint_color);
 			if (bright_paint) {
-				SET_BIT(ROOM_BASE_FLAGS(from_room), ROOM_AFF_BRIGHT_PAINT);
-				// affect_total_room(from_room);	// probably don't need to do this here because it's done later
+				SET_BIT(ROOM_BASE_FLAGS(in_room), ROOM_AFF_BRIGHT_PAINT);
+				// affect_total_room(in_room);	// probably don't need to do this here because it's done later
 			}
 		}
 		
