@@ -1346,7 +1346,7 @@ void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data 
 	temp_queue.head = temp_queue.tail = NULL;
 
 	/* now parse the alias */
-	for (temp = a->replacement; *temp; temp++) {
+	for (temp = a->replacement; *temp; ++temp) {
 		if (*temp == ALIAS_SEP_CHAR) {
 			*write_point = '\0';
 			buf[MAX_INPUT_LENGTH - 1] = '\0';
@@ -1354,8 +1354,12 @@ void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data 
 			write_point = buf;
 		}
 		else if (*temp == ALIAS_VAR_CHAR) {
-			temp++;
-			if ((num = *temp - '1') < num_of_tokens && num >= 0) {
+			// advance it by 1
+			if (!*(++temp)) {
+				// hit the end
+				break;
+			}
+			else if ((num = *temp - '1') < num_of_tokens && num >= 0) {
 				strcpy(write_point, tokens[num]);
 				write_point += strlen(tokens[num]);
 			}
@@ -1366,11 +1370,13 @@ void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data 
 				strcpy(write_point, orig);
 				write_point += strlen(orig);
 			}
-			else if ((*(write_point++) = *temp) == '$')	/* redouble $ for act safety */
+			else if ((*(write_point++) = *temp) == '$') {	/* redouble $ for act safety */
 				*(write_point++) = '$';
+			}
 		}
-		else
+		else {
 			*(write_point++) = *temp;
+		}
 	}
 
 	*write_point = '\0';
