@@ -2633,13 +2633,14 @@ ACMD(do_upgrade) {
 	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 	
 	char arg1[MAX_INPUT_LENGTH], *arg2, output[MAX_STRING_LENGTH];
-	vehicle_data *from_veh = NULL, *prev_veh, *to_veh, *veh_proto;
+	vehicle_data *from_veh = NULL, *prev_veh, *to_veh, *old_proto, *veh_proto = NULL;
 	room_data *from_room = NULL, *interior, *in_room, *room_iter;
 	craft_data *find_craft, *to_craft, *missing_abil = NULL;
 	struct bld_relation *relat, *lists[2];
 	obj_data *obj, *next_obj, *found_obj;
 	struct room_direction_data *exits;
 	struct vehicle_room_list *vrl;
+	bld_data *bld_proto = NULL;
 	bitvector_t set_bits;
 	bool done, fail;
 	int iter, found;
@@ -2746,6 +2747,18 @@ ACMD(do_upgrade) {
 		msg_to_char(ch, "You can't upgrade %s.\r\n", from_veh ? "that" : "anything here");
 		return;
 	}
+	if (!CRAFT_IS_BUILDING(to_craft) && !CRAFT_IS_VEHICLE(to_craft)) {
+		msg_to_char(ch, "That upgrade doesn't appear to be implemented correctly.\r\n");
+		return;
+	}
+	if (CRAFT_IS_BUILDING(to_craft) && !(bld_proto = building_proto(GET_CRAFT_BUILD_TYPE(to_craft)))) {
+		msg_to_char(ch, "That upgrade is unimplemented.\r\n");
+		return;
+	}
+	if (CRAFT_IS_VEHICLE(to_craft) && !(veh_proto = vehicle_proto(GET_CRAFT_OBJECT(to_craft)))) {
+		msg_to_char(ch, "That upgrade is unimplemented.\r\n");
+		return;
+	}
 	
 	// validate upgrade: room
 	if (from_room && (!can_use_room(ch, from_room, MEMBERS_ONLY) || ROOM_AFF_FLAGGED(from_room, ROOM_AFF_UNCLAIMABLE))) {
@@ -2788,8 +2801,8 @@ ACMD(do_upgrade) {
 	}
 	
 	// validate upgrade: general
-	if (!CRAFT_IS_BUILDING(to_craft) && !CRAFT_IS_VEHICLE(to_craft)) {
-		msg_to_char(ch, "That upgrade doesn't appear to be implemented correctly.\r\n");
+	if (from_veh && bld_proto && !BLD_FLAGGED(bld_proto, BLD_OPEN)) {
+		msg_to_char(ch, "You can't do that upgrade because it's incorrectly configured with a non-open building.\r\n");
 		return;
 	}
 	if (from_veh && IN_ROOM(from_veh) != IN_ROOM(ch)) {
@@ -3067,8 +3080,8 @@ ACMD(do_upgrade) {
 			VEH_EXTRA_DATA(from_veh) = NULL;
 			
 			// adapt flags: find flags added to from_veh
-			if ((veh_proto = vehicle_proto(VEH_VNUM(from_veh)))) {
-				set_bits = VEH_FLAGS(from_veh) & SAVABLE_VEH_FLAGS & ~VEH_FLAGS(veh_proto);
+			if ((old_proto = vehicle_proto(VEH_VNUM(from_veh)))) {
+				set_bits = VEH_FLAGS(from_veh) & SAVABLE_VEH_FLAGS & ~VEH_FLAGS(old_proto);
 				SET_BIT(VEH_FLAGS(to_veh), set_bits);
 			}
 		
