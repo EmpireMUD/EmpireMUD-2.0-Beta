@@ -3051,10 +3051,10 @@ ACMD(do_upgrade) {
 				
 				// apply data inside
 				COMPLEX_DATA(interior)->private_owner = private_owner;
+				
+				// need to run this early because it won't run on completion
+				complete_wtrigger(interior);
 			}
-			
-			// need to run this early because it won't run on completion
-			complete_wtrigger(interior);
 			
 			// and remove old building
 			disassociate_building(from_room);
