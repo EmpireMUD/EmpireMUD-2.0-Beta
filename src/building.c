@@ -2788,6 +2788,10 @@ ACMD(do_upgrade) {
 	}
 	
 	// validate upgrade: general
+	if (!CRAFT_IS_BUILDING(to_craft) && !CRAFT_IS_VEHICLE(to_craft)) {
+		msg_to_char(ch, "That upgrade doesn't appear to be implemented correctly.\r\n");
+		return;
+	}
 	if (from_veh && IN_ROOM(from_veh) != IN_ROOM(ch)) {
 		act("You need to upgrade $V from outside of it.", FALSE, ch, NULL, from_veh, TO_CHAR);
 		return;
