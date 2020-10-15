@@ -2765,6 +2765,10 @@ ACMD(do_upgrade) {
 		msg_to_char(ch, "You don't have permission to upgrade it.\r\n");
 		return;
 	}
+	if (from_room && ROOM_AFF_FLAGGED(from_room, ROOM_AFF_HAS_INSTANCE)) {
+		msg_to_char(ch, "You can't upgrade it while there's an adventure instance here.s\r\n");
+		return;
+	}
 	if (from_room && count_players_in_building(from_room, TRUE, TRUE)) {
 		msg_to_char(ch, "You can't upgrade it while players are inside.\r\n");
 		return;
