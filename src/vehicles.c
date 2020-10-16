@@ -488,7 +488,7 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 		return VEH_INTERIOR_HOME_ROOM(veh);
 	}
 	// this vehicle has no interior available
-	if (!VEH_IS_COMPLETE(veh) || !(bld = building_proto(VEH_INTERIOR_ROOM_VNUM(veh)))) {
+	if (!(bld = building_proto(VEH_INTERIOR_ROOM_VNUM(veh)))) {
 		return NULL;
 	}
 	

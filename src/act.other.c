@@ -2685,10 +2685,14 @@ ACMD(do_herd) {
 	
 	// herd into vehicle
 	else if ((into_veh = get_vehicle_in_room_vis(ch, dir_arg, NULL))) {
-		if (!VEH_FLAGGED(into_veh, VEH_CARRY_MOBS) || !(to_room = get_vehicle_interior(into_veh))) {
+		if (VEH_INTERIOR_ROOM_VNUM(into_veh) != NOTHING && !VEH_IS_COMPLETE(into_veh)) {
+		    msg_to_char(ch, "You can't herd anything into a %s that isn't complete.\r\n", VEH_OR_BLD(into_veh));
+		}
+		else if (!VEH_FLAGGED(into_veh, VEH_CARRY_MOBS) || !(to_room = get_vehicle_interior(into_veh))) {
 			msg_to_char(ch, "You can't herd anything into that.\r\n");
 		}
 		else if (!VEH_IS_COMPLETE(into_veh)) {
+			// this is almost certainly already checked, but it doesn't hurt to check
 		    msg_to_char(ch, "You can't herd anything into a %s that isn't complete.\r\n", VEH_OR_BLD(into_veh));
 		}
 		else {

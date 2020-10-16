@@ -43,6 +43,7 @@ extern const char *dirs[];
 extern const char *extra_bits[];
 extern const char *item_types[];
 extern const char *genders[];
+extern const char *paint_names[];
 extern const char *player_bits[];
 extern const int rev_dir[];
 extern const char *exit_bits[];
@@ -1062,8 +1063,10 @@ int char_has_item(char *item, char_data *ch) {
 
 /* checks every PULSE_SCRIPT for random triggers */
 void script_trigger_check(void) {
+	extern trig_data *stc_next_random_trig;
+	
 	room_data *room, *in_room = NULL;
-	trig_data *trig, *next_trig;
+	trig_data *trig;
 	char buf[MAX_STRING_LENGTH];
 	struct script_data *sc;
 	vehicle_data *veh;
@@ -1073,7 +1076,7 @@ void script_trigger_check(void) {
 	bool fail;
 	
 	// iterate over global list of random triggers
-	DL_FOREACH_SAFE2(random_triggers, trig, next_trig, next_in_random_triggers) {
+	DL_FOREACH_SAFE2(random_triggers, trig, stc_next_random_trig, next_in_random_triggers) {
 		if (GET_TRIG_DEPTH(trig)) {
 			continue;	// trigger already running
 		}
@@ -4831,7 +4834,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 't': {	// obj.t*
 					if (!str_cmp(field, "type")) {
-						sprinttype(GET_OBJ_TYPE(o), item_types, str, sizeof(str), "OTHER");
+						sprinttype(GET_OBJ_TYPE(o), item_types, str, slen, "OTHER");
 					}
 					else if (!str_cmp(field, "timer"))
 						snprintf(str, slen, "%d", GET_OBJ_TIMER(o));
@@ -5097,7 +5100,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'd': {	// room.d*
-					if (!str_cmp(field, "direction")) {
+					if (!str_cmp(field, "dedicated_to")) {
+						player_index_data *index;
+						if (ROOM_PATRON(r) && (index = find_player_index_by_idnum(ROOM_PATRON(r)))) {
+							snprintf(str, slen, "%s", index->fullname);
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "direction")) {
 						room_data *targ;
 						int dir;
 				
@@ -5160,7 +5172,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "enter_dir")) {
 						if (BUILDING_ENTRANCE(r) != NO_DIR) {
-							sprinttype(BUILDING_ENTRANCE(r), dirs, str, sizeof(str), "north");
+							sprinttype(BUILDING_ENTRANCE(r), dirs, str, slen, "north");
 						}
 						else {
 							*str = '\0';
@@ -5168,7 +5180,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "exit_dir")) {
 						if (BUILDING_ENTRANCE(r) != NO_DIR && rev_dir[BUILDING_ENTRANCE(r)] != NO_DIR) {
-							sprinttype(rev_dir[BUILDING_ENTRANCE(r)], dirs, str, sizeof(str), "south");
+							sprinttype(rev_dir[BUILDING_ENTRANCE(r)], dirs, str, slen, "south");
 						}
 						else {
 							*str = '\0';
@@ -5266,7 +5278,18 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'p': {	// room.p*
-					if (!str_cmp(field, "players_present")) {
+					if (!str_cmp(field, "painted")) {
+						if (ROOM_PAINT_COLOR(r)) {
+							char color_name[80];
+							sprinttype(ROOM_PAINT_COLOR(r), paint_names, color_name, sizeof(color_name), "");
+							*color_name = LOWER(*color_name);
+							snprintf(str, slen, "%s%s", (ROOM_AFF_FLAGGED(r, ROOM_AFF_BRIGHT_PAINT) ? "bright " : ""), color_name);
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "players_present")) {
 						snprintf(str, slen, "%d", any_players_in_room(r) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "people")) {
@@ -5506,7 +5529,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					break;
 				}
 				case 'd': {	// veh.d*
-					if (!str_cmp(field, "driver")) {
+					if (!str_cmp(field, "dedicated_to")) {
+						player_index_data *index;
+						if (VEH_PATRON(v) && (index = find_player_index_by_idnum(VEH_PATRON(v)))) {
+							snprintf(str, slen, "%s", index->fullname);
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "driver")) {
 						if (VEH_DRIVER(v)) {
 							snprintf(str, slen, "%c%d", UID_CHAR, char_script_id(VEH_DRIVER(v)));
 						}
@@ -5713,6 +5745,20 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 						else {
 							strcpy(str, "");
+						}
+					}
+					break;
+				}
+				case 'p': {	// veh.p*
+					if (!str_cmp(field, "painted")) {
+						if (VEH_PAINT_COLOR(v)) {
+							char color_name[80];
+							sprinttype(VEH_PAINT_COLOR(v), paint_names, color_name, sizeof(color_name), "");
+							*color_name = LOWER(*color_name);
+							snprintf(str, slen, "%s%s", (VEH_FLAGGED(v, VEH_BRIGHT_PAINT) ? "bright " : ""), color_name);
+						}
+						else {
+							*str = '\0';
 						}
 					}
 					break;

@@ -1665,7 +1665,7 @@ switch %how_many%
     %force% %demon% mmove
   break
   case 2
-    %echo% A pare of demons burst their way out of %self.shortdesc%!
+    %echo% A pair of demons burst their way out of %self.shortdesc%!
     switch %how_many%
       %load% mob 18861
       set demon %self.room.people%

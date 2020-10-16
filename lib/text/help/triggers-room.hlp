@@ -164,6 +164,7 @@ When using field - The variable returns:
 &ccrop&0 - The name of the crop on the map room, if any.
 &ccrop_flagged(FLG)&0 - True if it's a crop and a given crop flag is present.
 &ccrop_vnum&0 - The vnum of the crop on the map room, if any.
+&cdedicated_to&0 - If the room/building is dedicated to someone, gets the name.
 &cdirection(target)&0 - The approximate direction to the target.
 &cdistance(target)&0 - The distance between this room and the target.
 &cempire&0 - The empire that owns the room, if any.
@@ -189,6 +190,7 @@ When using field - The variable returns:
 &cis_outdoors&0 - True if it's on the map, in an outdoor adventure, etc.
 &cmax_citizens&0 - If a building, the max number of citizens who can live here.
 &cname&0 - The name of the room.
+&cpainted&0 - The color the building is painted, if any.
 &cpeople&0 - The id of the first character in the room, or an empty return.
 &cplayers_present&0 - True if there's at least 1 player in the room.
 &crmt_flagged(AFF)&0 - True if the room has a room template flag on it.

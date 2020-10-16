@@ -2971,9 +2971,10 @@ EVENT_CMD(evcmd_collect) {
 	
 	int level;
 	struct player_event_data *ped, *next_ped;
+	struct event_running_data *run_dat;
 	struct event_reward *reward;
 	struct quest_reward qr;
-	bool any, header;
+	bool any, header, running;
 	
 	// qr is used for sharing reward handling with quests
 	qr.next = NULL;
@@ -2994,6 +2995,12 @@ EVENT_CMD(evcmd_collect) {
 	}
 	
 	any = FALSE;
+	/*
+	
+	if (GET_HIGHEST_KNOWN_LEVEL(ch) > ped->level) {
+		ped->level = GET_HIGHEST_KNOWN_LEVEL(ch);
+	}
+	*/
 	
 	// check player's event data
 	HASH_ITER(hh, GET_EVENT_DATA(ch), ped, next_ped) {
@@ -3004,8 +3011,12 @@ EVENT_CMD(evcmd_collect) {
 			continue;	// no work for fully-collected events
 		}
 		
-		// determine reward level (if no level was recorded, use their current one
-		level = ped->level ? ped->level : GET_HIGHEST_KNOWN_LEVEL(ch);
+		run_dat = find_running_event_by_id(ped->id);
+		running = (run_dat && run_dat->status == EVTS_RUNNING);
+		
+		// determine reward level (if no level was recorded, use their current one)
+		// as of b5.109 this also uses the current level if the event is still running
+		level = (running || !ped->level) ? GET_HIGHEST_KNOWN_LEVEL(ch) : ped->level;
 		if (EVT_MIN_LEVEL(ped->event) > 0) {
 			level = MAX(level, EVT_MIN_LEVEL(ped->event));
 		}
