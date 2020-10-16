@@ -1224,7 +1224,7 @@ char *fread_string(FILE * fl, char *error) {
 			done = 1;
 		}
 		else {
-			strcat(tmp, "\r\n");
+			strcpy(tmp + pos + (pos > 0 ? 1 : 0), "\r\n");
 		}
 
 		templength = strlen(tmp);
