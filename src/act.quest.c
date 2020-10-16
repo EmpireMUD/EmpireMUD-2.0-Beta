@@ -197,6 +197,11 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	// give rewards
 	give_quest_rewards(ch, QUEST_REWARDS(quest), level, giver_emp, pq->instance_id);
 	
+	// remove from player's tracker
+	LL_DELETE(GET_QUESTS(ch), pq);
+	pq->next = NULL;
+	free_player_quests(pq);
+	
 	// dailies:
 	if (QUEST_FLAGGED(quest, QST_DAILY)) {
 		GET_DAILY_QUESTS(ch) += 1;
@@ -206,11 +211,6 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 			msg_to_char(ch, "You have hit the daily quest limit and your remaining daily quests expire.\r\n");
 		}
 	}
-	
-	// remove from player's tracker
-	LL_DELETE(GET_QUESTS(ch), pq);
-	pq->next = NULL;
-	free_player_quests(pq);
 }
 
 
