@@ -1063,8 +1063,10 @@ int char_has_item(char *item, char_data *ch) {
 
 /* checks every PULSE_SCRIPT for random triggers */
 void script_trigger_check(void) {
+	extern trig_data *stc_next_random_trig;
+	
 	room_data *room, *in_room = NULL;
-	trig_data *trig, *next_trig;
+	trig_data *trig;
 	char buf[MAX_STRING_LENGTH];
 	struct script_data *sc;
 	vehicle_data *veh;
@@ -1074,7 +1076,7 @@ void script_trigger_check(void) {
 	bool fail;
 	
 	// iterate over global list of random triggers
-	DL_FOREACH_SAFE2(random_triggers, trig, next_trig, next_in_random_triggers) {
+	DL_FOREACH_SAFE2(random_triggers, trig, stc_next_random_trig, next_in_random_triggers) {
 		if (GET_TRIG_DEPTH(trig)) {
 			continue;	// trigger already running
 		}

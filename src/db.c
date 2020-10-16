@@ -224,6 +224,7 @@ int tips_of_the_day_size = 0;	// size of tip array
 trig_data *trigger_table = NULL;	// trigger prototype hash
 trig_data *trigger_list = NULL;	// DLL of all attached triggers
 trig_data *random_triggers = NULL;	// DLL of live random triggers (next_in_random_triggers, prev_in_random_triggers)
+trig_data *stc_next_random_trig = NULL;	// helps with trigger iteration when multiple random triggers are deleted at once
 trig_data *free_trigger_list = NULL;	// LL of triggers to free (next_to_free)
 int max_mob_id = MOB_ID_BASE;	// for unique mob ids
 int max_obj_id = OBJ_ID_BASE;	// for unique obj ids
