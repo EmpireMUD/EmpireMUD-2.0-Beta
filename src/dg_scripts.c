@@ -7576,14 +7576,6 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 	}
 
 	for (cl = (mode == TRIG_NEW) ? trig->cmdlist : trig->curr_state; cl && GET_TRIG_DEPTH(trig); cl = cl ? cl->next : NULL) {
-		if (dg_owner_purged) {
-			--depth;
-			if (type == OBJ_TRIGGER)  {
-				sdd->o = NULL;
-			}
-			return ret_val;
-		}
-		
 		for (p = cl->cmd; *p && isspace(*p); p++);
 
 		if (*p == '*') /* comment */
@@ -7749,6 +7741,12 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 						// unsupported type
 						break;
 					}
+				}
+				if (dg_owner_purged) {
+						depth--;
+					if (type == OBJ_TRIGGER) 
+						sdd->o = NULL;
+					return ret_val;
 				}
 			}
 
