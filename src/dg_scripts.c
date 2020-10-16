@@ -6190,7 +6190,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 /* substitutes any variables into line and returns it as buf */
 void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char *line, char *buf) {
 	char tmp[MAX_INPUT_LENGTH], repl_str[MAX_INPUT_LENGTH];
-	char *var = NULL, *field = NULL, *p = NULL;
+	char *var = NULL, *field = NULL, *p = NULL, *p_end = NULL;;
 	char tmp2[MAX_INPUT_LENGTH];
 	char *subfield_p, subfield[MAX_INPUT_LENGTH];
 	int left, len;
@@ -6206,15 +6206,16 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 	*repl_str = *tmp = *tmp2 = '\0';
 
 	p = strcpy(tmp, line);
+	p_end = strchr(p, '\0');
 	subfield_p = subfield;
 
 	left = MAX_INPUT_LENGTH - 1;
 
-	while (*p && (left > 0)) {
+	while (p < p_end && *p && (left > 0)) {
 
 
 		/* copy until we find the first % */
-		while (*p && (*p != '%') && (left > 0)) {
+		while (p < p_end && *p && (*p != '%') && (left > 0)) {
 			*(buf++) = *(p++);
 			left--;
 		}
@@ -6222,7 +6223,7 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 		*buf = '\0';
 
 		/* double % */
-		if (*p && (*(++p) == '%') && (left > 0)) {
+		if (p < p_end && *p && (*(++p) == '%') && (left > 0)) {
 			*(buf++) = *(p++);
 			*buf = '\0';
 			left--;
@@ -6230,16 +6231,16 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 		}
 
 		/* so it wasn't double %'s */
-		else if (*p && (left > 0)) {
+		else if (p < p_end && *p && (left > 0)) {
 
 			/* search until end of var or beginning of field */      
-			for (var = p; *p && (*p != '%') && (*p != '.'); p++);
+			for (var = p; p < p_end && *p && (*p != '%') && (*p != '.'); p++);
 
 			field = p;
-			if (*p == '.') {
+			if (p < p_end && *p == '.') {
 				*(p++) = '\0';
 				dots = 0;
-				for (field = p; *p && ((*p != '%')||(paren_count > 0) || (dots)); p++) {
+				for (field = p; p < p_end && *p && ((*p != '%')||(paren_count > 0) || (dots)); ++p) {
 					if (dots > 0) {
 						*subfield_p = '\0';
 						find_replacement(go, sc, trig, type, var, field, subfield, repl_str, sizeof(repl_str));
@@ -6275,7 +6276,9 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 				} /* for (field.. */
 			} /* if *p == '.' */
 
-			*(p++) = '\0';
+			if (p < p_end) {
+				*(p++) = '\0';
+			}
 			*subfield_p = '\0';
 
 			if (*subfield) {
