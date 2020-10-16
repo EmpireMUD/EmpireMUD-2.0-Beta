@@ -7745,14 +7745,15 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 						break;
 					}
 				}
-				if (dg_owner_purged) {
-						depth--;
-					if (type == OBJ_TRIGGER) 
-						sdd->o = NULL;
-					return ret_val;
-				}
 			}
-
+		}
+		
+		// escape when owner purged
+		if (dg_owner_purged) {
+				depth--;
+			if (type == OBJ_TRIGGER) 
+				sdd->o = NULL;
+			return ret_val;
 		}
 	}
 
