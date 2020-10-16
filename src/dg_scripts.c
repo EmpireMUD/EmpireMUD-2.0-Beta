@@ -6315,14 +6315,6 @@ int is_num(char *num) {
 void eval_op(char *op, char *lhs, char *rhs, char *result, void *go, struct script_data *sc, trig_data *trig) {
 	char *p;
 	int n;
-	
-	if (!op || !lhs || !rhs || !result || !go || !sc || !trig) {
-		log("SCRIPT ERR: eval_op %s called with null variable %s: %s", NULLSAFE(op), (!op ? "op" : (!lhs ? "lhs" : (!rhs ? "rhs" : (!result ? "result" : (!go ? "go" : (!sc ? "sc" : (!trig ? "trig" : "?"))))))), (trig && trig->curr_state) ? trig->curr_state->cmd : "unknown line");
-		if (result) {
-			strcpy(result, "0");
-		}
-		return;
-	}
 
 	/* strip off extra spaces at begin and end */
 	while (*lhs && isspace(*lhs)) 
