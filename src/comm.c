@@ -924,6 +924,7 @@ void heartbeat(int heart_pulse) {
 	void chore_update();
 	void display_automessages();
 	void extract_pending_chars();
+	void extract_pending_vehicles();
 	void free_freeable_triggers();
 	void free_loaded_players();
 	void frequent_combat(int pulse);
@@ -1155,6 +1156,7 @@ void heartbeat(int heart_pulse) {
 
 	/* Every pulse! Don't want them to stink the place up... */
 	extract_pending_chars();
+	extract_pending_vehicles();
 	free_freeable_triggers();
 
 	/* Turn this off */

@@ -868,7 +868,7 @@ int timer_otrigger(obj_data *obj) {
 			/* don't allow a wear to take place, if
 			* the object is purged.
 			*/
-			if (!obj || !return_val) {
+			if (!obj || !return_val || (t->purge_tracker && t->purge_tracker->purged)) {
 				return 0;
 			}
 		}
@@ -2042,7 +2042,7 @@ int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int 
 	}
 	
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
-		if (!SCRIPT_CHECK(veh, VTRIG_BUY)) {
+		if (VEH_IS_EXTRACTED(veh) || !SCRIPT_CHECK(veh, VTRIG_BUY)) {
 			continue;
 		}
 		
@@ -2104,7 +2104,7 @@ int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode) {
 	}
 	
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
-		if (SCRIPT_CHECK(veh, VTRIG_COMMAND)) {
+		if (!VEH_IS_EXTRACTED(veh) && SCRIPT_CHECK(veh, VTRIG_COMMAND)) {
 			for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
 				if (!TRIGGER_CHECK(t, VTRIG_COMMAND)) {
 					continue;
@@ -2151,7 +2151,7 @@ int destroy_vtrigger(vehicle_data *veh) {
 		}
 	}
 
-	return dg_owner_purged ? 0 : 1;
+	return 1;
 }
 
 
@@ -2189,7 +2189,7 @@ int greet_vtrigger(char_data *actor, int dir) {
 	}
 	
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
-		if (!SCRIPT_CHECK(veh, VTRIG_GREET)) {
+		if (VEH_IS_EXTRACTED(veh) || !SCRIPT_CHECK(veh, VTRIG_GREET)) {
 			continue;
 		}
 
@@ -2232,7 +2232,7 @@ int leave_vtrigger(char_data *actor, int dir, char *custom_dir) {
 	}
 	
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
-		if (!SCRIPT_CHECK(veh, VTRIG_LEAVE)) {
+		if (VEH_IS_EXTRACTED(veh) || !SCRIPT_CHECK(veh, VTRIG_LEAVE)) {
 			continue;
 		}
 
@@ -2307,7 +2307,7 @@ void speech_vtrigger(char_data *actor, char *str) {
 	trig_data *t;
 	
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
-		if (SCRIPT_CHECK(veh, VTRIG_SPEECH)) {
+		if (!VEH_IS_EXTRACTED(veh) && SCRIPT_CHECK(veh, VTRIG_SPEECH)) {
 			for (t = TRIGGERS(SCRIPT(veh)); t; t = t->next) {
 				if (!TRIGGER_CHECK(t, VTRIG_SPEECH)) {
 					continue;
@@ -2436,7 +2436,7 @@ int start_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_da
 	quest_instance_global = inst;
 	
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
-		if (!SCRIPT_CHECK(veh, VTRIG_START_QUEST)) {
+		if (VEH_IS_EXTRACTED(veh) || !SCRIPT_CHECK(veh, VTRIG_START_QUEST)) {
 			continue;
 		}
 
@@ -2711,7 +2711,7 @@ int finish_quest_vtrigger(char_data *actor, quest_data *quest, struct instance_d
 	quest_instance_global = inst;
 	
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(actor)), veh, next_veh, next_in_room) {
-		if (!SCRIPT_CHECK(veh, VTRIG_FINISH_QUEST)) {
+		if (VEH_IS_EXTRACTED(veh) || !SCRIPT_CHECK(veh, VTRIG_FINISH_QUEST)) {
 			continue;
 		}
 

@@ -1165,8 +1165,10 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 	
 	// start recursively inside vehicles
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-		LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
-			spawn_one_room(vrl->room, only_artisans);
+		if (!VEH_IS_EXTRACTED(veh)) {
+			LL_FOREACH(VEH_ROOM_LIST(veh), vrl) {
+				spawn_one_room(vrl->room, only_artisans);
+			}
 		}
 	}
 	
@@ -1214,7 +1216,7 @@ static void spawn_one_room(room_data *room, bool only_artisans) {
 		if (!only_artisans && count < config_get_int("spawn_limit_per_room")) {
 			// spawn based on vehicles?
 			DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-				if (VEH_SPAWNS(veh)) {
+				if (!VEH_IS_EXTRACTED(veh) && VEH_SPAWNS(veh)) {
 					count += spawn_one_list(room, VEH_SPAWNS(veh));
 				}
 			}

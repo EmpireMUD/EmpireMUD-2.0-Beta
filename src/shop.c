@@ -382,7 +382,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 	
 	// vehicles
 	DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-		if (!CAN_SEE_VEHICLE(ch, veh)) {
+		if (VEH_IS_EXTRACTED(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
 			continue;
 		}
 		LL_FOREACH(VEH_SHOP_LOOKUPS(veh), sl) {

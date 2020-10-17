@@ -419,7 +419,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	// does it match an extra desc of a vehicle here?
 	if (!found && ROOM_VEHICLES(IN_ROOM(ch))) {
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (CAN_SEE_VEHICLE(ch, veh) && (desc = find_exdesc(arg, VEH_EX_DESCS(veh))) != NULL && ++i == fnum) {
+			if (!VEH_IS_EXTRACTED(veh) && CAN_SEE_VEHICLE(ch, veh) && (desc = find_exdesc(arg, VEH_EX_DESCS(veh))) != NULL && ++i == fnum) {
 				send_to_char(desc, ch);
 				act("$n looks at $V.", TRUE, ch, NULL, veh, TO_ROOM);
 				found = TRUE;
@@ -1185,7 +1185,7 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
 	
 	DL_FOREACH2(list, veh, next_in_room) {
 		// conditions to show
-		if (!CAN_SEE_VEHICLE(ch, veh)) {
+		if (VEH_IS_EXTRACTED(veh) || !CAN_SEE_VEHICLE(ch, veh)) {
 			continue;	// should we show a "something" ?
 		}
 		if (VEH_SITTING_ON(veh) && VEH_SITTING_ON(veh) != ch) {
@@ -1736,7 +1736,7 @@ bool show_local_einv(char_data *ch, room_data *room, bool thief_mode) {
 			add_vnum_hash(&vhash, EMPIRE_VNUM(ROOM_OWNER(room)), 1);
 		}
 		DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-			if (VEH_OWNER(veh)) {
+			if (!VEH_IS_EXTRACTED(veh) && VEH_OWNER(veh)) {
 				add_vnum_hash(&vhash, EMPIRE_VNUM(VEH_OWNER(veh)), 1);
 			}
 		}
@@ -2426,7 +2426,7 @@ ACMD(do_contents) {
 	// verify we can see even 1 vehicle
 	if (!can_see_anything) {
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (CAN_SEE_VEHICLE(ch, veh)) {
+			if (!VEH_IS_EXTRACTED(veh) && CAN_SEE_VEHICLE(ch, veh)) {
 				can_see_anything = TRUE;
 				break;	// only need 1
 			}

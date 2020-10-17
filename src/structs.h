@@ -2491,6 +2491,7 @@ typedef struct vehicle_data vehicle_data;
 #define VEH_NO_PAINT  BIT(31)	// F. cannot be painted
 #define VEH_BRIGHT_PAINT  BIT(32)	// G. brightly painted
 #define VEH_DEDICATE  BIT(33)	// H. can be dedicated
+#define VEH_EXTRACTED  BIT(34)	// I. vehicle is mid-extraction
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin

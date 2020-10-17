@@ -1213,10 +1213,7 @@ void despawn_instance_vehicles(struct instance_data *inst) {
 			}
 		}
 		
-		// ensure the trigger didn't purge it
-		if (!dg_owner_purged) {
-			extract_vehicle(veh);
-		}
+		extract_vehicle(veh);
 	}
 }
 

@@ -695,9 +695,6 @@ VCMD(do_vpurge) {
 		extract_obj(o);
 	}
 	else if ((v = get_vehicle_by_vehicle(veh, arg))) {
-		if (v == veh) {
-			dg_owner_purged = 1;
-		}
 		if (*argument) {
 			act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(v)), NULL, v, TO_CHAR | TO_ROOM);
 		}
@@ -726,7 +723,6 @@ VCMD(do_vsiege) {
 	vehicle_data *veh_targ = NULL;
 	room_data *room_targ = NULL;
 	int dam, dir, scale = -1;
-	bool self, res;
 	
 	two_arguments(argument, tar_arg, scale_arg);
 	
@@ -770,11 +766,7 @@ VCMD(do_vsiege) {
 		}
 	}
 	else if (veh_targ) {
-		self = (veh_targ == veh);
-		res = besiege_vehicle(NULL, veh_targ, dam, SIEGE_PHYSICAL, veh);
-		if (self && !res) {
-			dg_owner_purged = TRUE;
-		}
+		besiege_vehicle(NULL, veh_targ, dam, SIEGE_PHYSICAL, veh);
 	}
 	else {
 		veh_log(veh, "vsiege: invalid target");

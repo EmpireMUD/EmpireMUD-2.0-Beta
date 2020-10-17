@@ -216,6 +216,7 @@ struct trig_data {
 	struct trig_var_data *var_list;	/* list of local vars for trigger  */
 	
 	struct script_data *attached_to;	// reference to what I'm on
+	struct dg_owner_purged_tracker_type *purge_tracker;	// detects if the attached thing is purged
 	
 	struct trig_data *next;	// next on assigned SCRIPT()
 	struct trig_data *next_in_world;    /* next in the global trigger list */
@@ -258,6 +259,23 @@ struct script_memory {
 	int id;				/* id of who to remember */
 	char *cmd;				/* command, or NULL for generic */
 	struct script_memory *next;
+};
+
+
+// for tracking owner-purged with multiple scripts running at once
+struct dg_owner_purged_tracker_type {
+	trig_data *parent;	// reference back to the running trigger
+	
+	// what it's attached to (any of):
+	char_data *ch;
+	obj_data *obj;
+	room_data *room;
+	vehicle_data *veh;
+	
+	// whether or not it's purged
+	bool purged;
+	
+	struct dg_owner_purged_tracker_type *prev, *next;	// doubly-linked global list: dg_owner_purged_tracker
 };
 
 
@@ -464,11 +482,12 @@ extern empire_data *find_empire_by_uid(int n);
 extern room_data *find_room(int n);
 
 // purge helpers
-extern int dg_owner_purged;
-extern char_data *dg_owner_mob;
-extern obj_data *dg_owner_obj;
-extern vehicle_data *dg_owner_veh;
-extern room_data *dg_owner_room;
+void create_dg_owner_purged_tracker(trig_data *trig, char_data *ch, obj_data *obj, room_data *room, vehicle_data *veh);
+void cancel_dg_owner_purged_tracker(trig_data *trig);
+void check_dg_owner_purged_char(char_data *ch);
+void check_dg_owner_purged_obj(obj_data *obj);
+void check_dg_owner_purged_room(room_data *room);
+void check_dg_owner_purged_vehicle(vehicle_data *veh);
 
 // id helpers
 extern int char_script_id(char_data *ch);

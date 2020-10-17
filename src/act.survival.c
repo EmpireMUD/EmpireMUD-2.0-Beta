@@ -748,7 +748,7 @@ ACMD(do_hunt) {
 	
 	// build lists: vehicles
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_veh, next_in_room) {
-		if (VEH_SPAWNS(veh)) {
+		if (VEH_IS_COMPLETE(veh) && VEH_SPAWNS(veh)) {
 			CREATE(item, struct hunt_helper, 1);
 			item->list = VEH_SPAWNS(veh);
 			DL_PREPEND(helpers, item);

@@ -130,7 +130,7 @@ void check_vehicle_climate_change(room_data *room) {
 	char *msg;
 	
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-		if (!ROOM_IS_CLOSED(IN_ROOM(veh)) && !vehicle_allows_climate(veh, IN_ROOM(veh))) {
+		if (!VEH_IS_EXTRACTED(veh) && !ROOM_IS_CLOSED(IN_ROOM(veh)) && !vehicle_allows_climate(veh, IN_ROOM(veh))) {
 			// this will extract it (usually)
 			msg = veh_get_custom_message(veh, VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM);
 			ruin_vehicle(veh, msg ? msg : "$V falls into ruin!");
@@ -303,7 +303,7 @@ vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id) {
 	vehicle_data *veh;
 	
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (!VEH_IS_DISMANTLING(veh)) {
+		if (VEH_IS_EXTRACTED(veh) || !VEH_IS_DISMANTLING(veh)) {
 			continue;	// not being dismantled
 		}
 		if (with_id != NOTHING && VEH_CONSTRUCTION_ID(veh) != with_id) {
@@ -329,7 +329,7 @@ vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum inte
 	vehicle_data *veh;
 	
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (VEH_INTERIOR_HOME_ROOM(veh) && GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)) == interior_room) {
+		if (!VEH_IS_EXTRACTED(veh) && VEH_INTERIOR_HOME_ROOM(veh) && GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)) == interior_room) {
 			return veh;
 		}
 	}
@@ -735,7 +735,7 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 		LL_FOREACH(VEH_ROOM_LIST(inter_veh), vrl) {
 			// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
 			DL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), veh_iter, next_veh, next_in_room) {
-				if (!VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
+				if (!VEH_IS_EXTRACTED(veh_iter) && !VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
 					ruin_vehicle(veh_iter, "$V falls into ruin.");
 				}
 			}
@@ -1393,6 +1393,8 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 * @param vehicle_data *veh The vehicle.
 */
 void complete_vehicle(vehicle_data *veh) {
+	room_data *room = IN_ROOM(veh);	// store room in case veh is purged during a trigger
+	
 	if (VEH_IS_DISMANTLING(veh)) {
 		// short-circuit out to dismantling
 		finish_dismantle_vehicle(NULL, veh);
@@ -1426,13 +1428,11 @@ void complete_vehicle(vehicle_data *veh) {
 		
 		// run triggers
 		load_vtrigger(veh);
-		if (dg_owner_purged) {
-			// prevent crashes here
-			return;
-		}
 	}
 	
-	affect_total_room(IN_ROOM(veh));
+	if (room) {
+		affect_total_room(room);
+	}
 }
 
 
@@ -3153,6 +3153,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
+	void extract_pending_vehicles();
 	
 	struct obj_storage_type *store, *next_store;
 	vehicle_data *veh, *iter, *next_iter;
@@ -3183,6 +3184,9 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 		extract_vehicle(iter);
 	}
+	
+	// ensure vehicles are gone
+	extract_pending_vehicles();
 	
 	// remove it from the hash table first
 	remove_vehicle_from_table(veh);

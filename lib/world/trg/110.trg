@@ -414,6 +414,7 @@ if %actor.fighting%
   * If the egg timer expires: if the player is fighting, they lose the egg.
   set enemy %actor.fighting%
   %send% %actor% The fight with ~%enemy% destroys the stolen egg!
+  return 0
   %purge% %self%
   halt
 else
@@ -430,6 +431,7 @@ else
   %quest% %actor% trigger 11002
   %send% %actor% ~%mob% takes the egg from you.
   %send% %actor% Type 'quest finish Steal the Egg' to complete the quest.
+  return 0
   %purge% %self%
   halt
 end

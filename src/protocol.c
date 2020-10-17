@@ -1198,7 +1198,7 @@ void ProtocolNegotiate(descriptor_t *apDescriptor) {
 void ProtocolNoEcho(descriptor_t *apDescriptor, bool_t abOn) {
 	ConfirmNegotiation(apDescriptor, eNEGOTIATED_ECHO, abOn, true);
 	// induce wait to prevent out-of-order echo messages
-	apDescriptor->wait = 0.3 RL_SEC;
+	apDescriptor->wait = 0.4 RL_SEC;
 }
 
 

@@ -151,6 +151,8 @@ void actually_free_trigger(trig_data *trig) {
 	trig_data *proto = real_trigger(GET_TRIG_VNUM(trig));
 	struct cmdlist_element *cmd, *next_cmd;
 	
+	cancel_dg_owner_purged_tracker(trig);
+	
 	if (GET_TRIG_WAIT(trig)) {
 		dg_event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
 	}

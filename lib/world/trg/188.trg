@@ -92,7 +92,7 @@ else
 end
 set cycles_left 3
 while %cycles_left% >= 0
-  if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+  if (%actor.room% != %room%) || !%actor.can_act%
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < 3
       %echoaround% %actor% |%actor% summoning is interrupted.
@@ -274,8 +274,8 @@ while %person%
   end
   set person %person.next_in_room%
 done
-if !%loot%
-  nop %self.add_mob_flag(!LOOT)%
+if %loot% == 1
+  nop %self.remove_mob_flag(!LOOT)%
 end
 ~
 #18807
@@ -539,7 +539,7 @@ set room %actor.room%
 set cycles_left 5
 while %cycles_left% >= 0
   eval sector_valid (%room.building_vnum% == 5009)
-  if (%actor.room% != %room%) || !%sector_valid% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+  if (%actor.room% != %room%) || !%sector_valid% || !%actor.can_act%
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < 5
       %echoaround% %actor% |%actor% ritual is interrupted.
@@ -1303,7 +1303,7 @@ end
 apple bobbing bob~
 1 c 4
 bob~
-if !(%actor.obj_target(%arg%)% == %self%)
+if %actor.obj_target(%arg%).vnum% != 18857
   %send% %actor% You can only bob in the @%self%.
   return 1
   halt
@@ -1555,7 +1555,7 @@ done
 * Ritual portion
 set cycles_left 5
 while %cycles_left% >= 0
-  if %actor.room% != %room% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+  if %actor.room% != %room% || !%actor.can_act%
     * We've either moved or the room's no longer suitable for the ritual
     if %cycles_left% < 5
       %echo% |%actor% ritual is interrupted.

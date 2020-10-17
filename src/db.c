@@ -229,11 +229,6 @@ trig_data *free_trigger_list = NULL;	// LL of triggers to free (next_to_free)
 int max_mob_id = MOB_ID_BASE;	// for unique mob ids
 int max_obj_id = OBJ_ID_BASE;	// for unique obj ids
 int max_vehicle_id = VEHICLE_ID_BASE;	// for unique vehicle ids
-int dg_owner_purged = 0;	// For control of scripts
-char_data *dg_owner_mob = NULL;	// for detecting self-purge
-obj_data *dg_owner_obj = NULL;
-vehicle_data *dg_owner_veh = NULL;
-room_data *dg_owner_room = NULL;
 
 // vehicles
 vehicle_data *vehicle_table = NULL;	// master vehicle hash table
@@ -1201,8 +1196,8 @@ char *fread_action(FILE * fl, int nr) {
 /* read and allocate space for a '~'-terminated string from a given file */
 char *fread_string(FILE * fl, char *error) {
 	char buf[MAX_STRING_LENGTH], tmp[MAX_INPUT_LENGTH], *rslt;
-	register char *point;
 	int done = 0, length = 0, templength;
+	register int pos;
 
 	*buf = '\0';
 
@@ -1213,18 +1208,18 @@ char *fread_string(FILE * fl, char *error) {
 		}
 				
 		// upgrade to allow ~ when not at the end
-		point = strchr(tmp, '\0');
+		pos = strlen(tmp);
 		
 		// backtrack past any \r\n or trailing space or tab
-		for (--point; *point == '\r' || *point == '\n' || *point == ' ' || *point == '\t'; --point);
+		for (--pos; pos > 0 && (tmp[pos] == '\r' || tmp[pos] == '\n' || tmp[pos] == ' ' || tmp[pos] == '\t'); --pos);
 		
 		// look for a trailing ~
-		if (*point == '~') {
-			*point = '\0';
+		if (tmp[pos] == '~') {
+			tmp[pos] = '\0';
 			done = 1;
 		}
 		else {
-			strcpy(point+1, "\r\n");
+			strcpy(tmp + pos + (pos > 0 ? 1 : 0), "\r\n");
 		}
 
 		templength = strlen(tmp);

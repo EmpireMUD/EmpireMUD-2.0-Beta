@@ -169,6 +169,8 @@ void trig_data_copy(trig_data *this_data, const trig_data *trg) {
 	this_data->narg = trg->narg;
 	if (trg->arglist)
 		this_data->arglist = strdup(trg->arglist);
+	
+	this_data->purge_tracker = NULL;
 }
 
 
@@ -340,7 +342,7 @@ void assign_triggers(void *i, int type) {
 * @return int The unique ID.
 */
 int char_script_id(char_data *ch) {
-	if (ch->script_id == 0) {
+	if (ch->script_id == 0 && IS_NPC(ch)) {
 		ch->script_id = max_mob_id++;
 		add_to_lookup_table(ch->script_id, (void *)ch);
 		ch->in_lookup_table = TRUE;
@@ -350,6 +352,11 @@ int char_script_id(char_data *ch) {
 			reboot_control.type = SCMD_REBOOT;
 			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for mobiles has exceeded the limit, scheduling an auto-reboot");
 		}
+	}
+	else if (ch->script_id == 0 && !IS_NPC(ch) && GET_IDNUM(ch) > 0) {
+		ch->script_id = GET_IDNUM(ch);
+		add_to_lookup_table(ch->script_id, (void *)ch);
+		ch->in_lookup_table = TRUE;
 	}
 	return ch->script_id;
 }

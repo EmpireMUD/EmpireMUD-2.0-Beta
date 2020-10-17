@@ -985,7 +985,7 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 					}
 					else {	// check for building-vehicles
 						DL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
-							if (VEH_OWNER(veh) == emp && VEH_FLAGGED(veh, VEH_BUILDING) && !VEH_FLAGGED(veh, VEH_IS_RUINS)) {
+							if (VEH_OWNER(veh) == emp && VEH_FLAGGED(veh, VEH_BUILDING) && !VEH_FLAGGED(veh, VEH_IS_RUINS | VEH_EXTRACTED)) {
 								found_building = TRUE;
 								break;
 							}
@@ -1883,6 +1883,10 @@ void point_update_vehicle(vehicle_data *veh) {
 	bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 	
 	char *msg;
+	
+	if (VEH_IS_EXTRACTED(veh)) {
+		return;
+	}
 	
 	// autostore
 	if ((time(0) - VEH_LAST_MOVE_TIME(veh)) > (config_get_int("autostore_time") * SECS_PER_REAL_MIN)) {

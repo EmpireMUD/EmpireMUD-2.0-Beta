@@ -111,7 +111,8 @@ void remove_lore_record(char_data *ch, struct lore_data *lore);
 void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 
 // local file scope variables
-static int extractions_pending = 0;
+static int char_extractions_pending = 0;
+static int veh_extractions_pending = 0;
 
 
 // for run_global_mob_interactions_func
@@ -902,7 +903,9 @@ void affect_total_room(room_data *room) {
 	
 	// flags from vehicles: do this even if incomplete
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		SET_BIT(ROOM_AFF_FLAGS(room), VEH_ROOM_AFFECTS(veh));
+		if (!VEH_IS_EXTRACTED(veh)) {
+			SET_BIT(ROOM_AFF_FLAGS(room), VEH_ROOM_AFFECTS(veh));
+		}
 	}
 	
 	// flags from building: don't use IS_COMPLETE because this function may be called before resources are added
@@ -1172,6 +1175,8 @@ void extract_char_final(char_data *ch) {
 	
 	// shut this off -- no need to total during an extract
 	pause_affect_total = TRUE;
+	
+	check_dg_owner_purged_char(ch);
 
 	/* Check to see if we are grouped! */
 	if (GROUP(ch)) {
@@ -1323,12 +1328,9 @@ void extract_char_final(char_data *ch) {
 void extract_char(char_data *ch) {
 	void despawn_charmies(char_data *ch, any_vnum only_vnum);
 	
-	if (ch == dg_owner_mob) {
-		dg_owner_purged = 1;
-		dg_owner_mob = NULL;
-	}
-	
 	if (!EXTRACTED(ch)) {
+		check_dg_owner_purged_char(ch);
+		
 		if (IS_NPC(ch)) {
 			SET_BIT(MOB_FLAGS(ch), MOB_EXTRACTED);
 			
@@ -1339,7 +1341,7 @@ void extract_char(char_data *ch) {
 		else {
 			SET_BIT(PLR_FLAGS(ch), PLR_EXTRACTED);
 		}
-		++extractions_pending;
+		++char_extractions_pending;
 	}
 	
 	// get rid of friends now (extracts them as well)
@@ -1376,13 +1378,13 @@ void extract_char(char_data *ch) {
 void extract_pending_chars(void) {
 	char_data *vict, *next_vict;
 
-	if (extractions_pending < 0) {
-		log("SYSERR: Negative (%d) extractions pending.", extractions_pending);
+	if (char_extractions_pending < 0) {
+		log("SYSERR: Negative (%d) character extractions pending.", char_extractions_pending);
 	}
 	
 	DL_FOREACH_SAFE(character_list, vict, next_vict) {
 		// check if done?
-		if (extractions_pending <= 0) {
+		if (char_extractions_pending <= 0) {
 			break;
 		}
 		
@@ -1405,24 +1407,24 @@ void extract_pending_chars(void) {
 		// the character list late in the process, causing a crash in some rare
 		// cases -pc 1/14/2015
 		extract_char_final(vict);
-		--extractions_pending;
+		--char_extractions_pending;
 	}
 
-	if (extractions_pending != 0) {
-		if (extractions_pending > 0) {
-			log("SYSERR: Couldn't find %d extractions as counted.", extractions_pending);
+	if (char_extractions_pending != 0) {
+		if (char_extractions_pending > 0) {
+			log("SYSERR: Couldn't find %d character extractions as counted.", char_extractions_pending);
 		}
 		
 		// likely an error -- search for people who need extracting (for next time)
-		extractions_pending = 0;
+		char_extractions_pending = 0;
 		DL_FOREACH(character_list, vict) {
 			if (EXTRACTED(vict)) {
-				++extractions_pending;
+				++char_extractions_pending;
 			}
 		}
 	}
 	else {
-		extractions_pending = 0;
+		char_extractions_pending = 0;
 	}
 }
 
@@ -4629,10 +4631,13 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, vehicle_dat
 		if (inter_veh && veh != inter_veh) {
 			continue;	// if they provided an inter_veh, skip other vehicles
 		}
+		if (!VEH_IS_COMPLETE(veh)) {
+			continue;	// not complete anyway
+		}
 		if (access_type != NOTHING && ch && !can_use_vehicle(ch, veh, access_type)) {
 			continue;	// no permission
 		}
-		if (VEH_IS_COMPLETE(veh) && has_interaction(VEH_INTERACTIONS(veh), type)) {
+		if (has_interaction(VEH_INTERACTIONS(veh), type)) {
 			CREATE(tvh, struct temp_veh_helper, 1);
 			tvh->veh = veh;
 			
@@ -5766,10 +5771,7 @@ void empty_obj_before_extract(obj_data *obj) {
 void extract_obj(obj_data *obj) {
 	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
 	
-	if (obj == dg_owner_obj) {
-		dg_owner_purged = 1;
-		dg_owner_obj = NULL;
-	}
+	check_dg_owner_purged_obj(obj);
 
 	// remove from anywhere
 	check_obj_in_void(obj);
@@ -9923,7 +9925,16 @@ bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_d
 	if (!*name_ptr) {
 		return (0);
 	}
-	if (!(number = get_number(&name_ptr))) {
+	if ((number = get_number(&name_ptr)) == 0) {
+		// only looking for players
+		if (!npc_only && IS_SET(bitvector, FIND_CHAR_ROOM) && tar_ch && (*tar_ch = get_player_vis(ch, name_ptr, FIND_CHAR_ROOM))) {
+			return FIND_CHAR_ROOM;
+		}
+		else if (!npc_only && IS_SET(bitvector, FIND_CHAR_WORLD) && tar_ch && (*tar_ch = get_player_vis(ch, name_ptr, FIND_CHAR_WORLD))) {
+			return FIND_CHAR_WORLD;
+		}
+		
+		// otherwise can't handle 0.name
 		return (0);
 	}
 
@@ -10024,23 +10035,35 @@ int get_number(char **name) {
 //// VEHICLE HANDLERS ////////////////////////////////////////////////////////
 
 /**
-* Extracts a vehicle from the game.
+* Pre-extracts a vehicle from the game. The actual extraction will happen
+* slightly later in extract_pending_vehicles().
+*
+* @param vehicle_data *veh The vehicle to extract.
+*/
+void extract_vehicle(vehicle_data *veh) {
+	if (!VEH_IS_EXTRACTED(veh)) {
+		check_dg_owner_purged_vehicle(veh);
+		SET_BIT(VEH_FLAGS(veh), VEH_EXTRACTED);
+		++veh_extractions_pending;
+		
+		if (VEH_OWNER(veh) && IN_ROOM(veh)) {
+			adjust_vehicle_tech(veh, FALSE);
+		}
+	}
+}
+
+
+/**
+* Finishes extracting a vehicle from the game.
 *
 * @param vehicle_data *veh The vehicle to extract and free.
 */
-void extract_vehicle(vehicle_data *veh) {
+void extract_vehicle_final(vehicle_data *veh) {
 	void delete_vehicle_interior(vehicle_data *veh);
 	void empty_vehicle(vehicle_data *veh, room_data *to_room);
 	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 	
-	if (veh == dg_owner_veh) {
-		dg_owner_purged = 1;
-		dg_owner_veh = NULL;
-	}
-	
-	if (VEH_OWNER(veh) && IN_ROOM(veh)) {
-		adjust_vehicle_tech(veh, FALSE);
-	}
+	check_dg_owner_purged_vehicle(veh);
 	
 	// delete interior
 	delete_vehicle_interior(veh);
@@ -10074,6 +10097,53 @@ void extract_vehicle(vehicle_data *veh) {
 		DL_DELETE(vehicle_list, veh);
 	}
 	free_vehicle(veh);
+}
+
+
+/**
+* Looks for vehicles in the EXTRACTED state and finishes extracting them.
+* Doing this late prevents issues with vehicles being extracted multiple times.
+*/
+void extract_pending_vehicles(void) {
+	vehicle_data *veh, *next_veh;
+
+	if (veh_extractions_pending < 0) {
+		log("SYSERR: Negative (%d) vehicle extractions pending.", veh_extractions_pending);
+	}
+	
+	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		// check if done?
+		if (veh_extractions_pending <= 0) {
+			break;
+		}
+		
+		if (VEH_IS_EXTRACTED(veh)) {
+			REMOVE_BIT(VEH_FLAGS(veh), VEH_EXTRACTED);
+		}
+		else {	// not extracting
+			continue;
+		}
+		
+		extract_vehicle_final(veh);
+		--veh_extractions_pending;
+	}
+
+	if (veh_extractions_pending != 0) {
+		if (veh_extractions_pending > 0) {
+			log("SYSERR: Couldn't find %d vehicle extractions as counted.", veh_extractions_pending);
+		}
+		
+		// likely an error -- search for vehicles who need extracting (for next time)
+		veh_extractions_pending = 0;
+		DL_FOREACH(vehicle_list, veh) {
+			if (VEH_IS_EXTRACTED(veh)) {
+				++veh_extractions_pending;
+			}
+		}
+	}
+	else {
+		veh_extractions_pending = 0;
+	}
 }
 
 

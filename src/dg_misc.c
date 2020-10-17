@@ -500,9 +500,6 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 				act(argument, TRUE, mob, NULL, NULL, TO_ROOM);
 			}
 			
-			if (mob == owner) {
-				dg_owner_purged = 1;
-			}
 			extract_char(mob);
 		}
 	}
@@ -521,10 +518,7 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 				if (*argument && ROOM_PEOPLE(INST_ROOM(inst, iter))) {
 					act(argument, FALSE, ROOM_PEOPLE(INST_ROOM(inst, iter)), NULL, NULL, TO_CHAR | TO_ROOM);
 				}
-			
-				if (obj == owner) {
-					dg_owner_purged = 1;
-				}
+				
 				extract_obj(obj);
 			}
 		}
@@ -539,9 +533,7 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 			if (*argument && ROOM_PEOPLE(IN_ROOM(veh))) {
 				act(argument, TRUE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 			}
-			if (veh == owner) {
-				dg_owner_purged = 1;
-			}
+			
 			empty_instance_vehicle(inst, veh, IN_ROOM(veh));
 			extract_vehicle(veh);
 		}
@@ -1520,5 +1512,131 @@ void script_modify(char *argument) {
 	else {	// no target?
 		script_log("%%mod%% called with invalid target");
 		return;
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// OWNER-PURGED TRACKING ///////////////////////////////////////////////////
+
+// doubly-linked global list for tracking purged script owners
+struct dg_owner_purged_tracker_type *dg_owner_purged_tracker = NULL;
+
+
+/**
+* Creates (or reuses) trig's purge tracker. This lets it tell if the thing it's
+* attached to has been purged at any point.
+*
+* @param trig_data *trig The trigger that needs purge tracking.
+* @param char_data *ch  Pass any of ch, obj, room, or veh to track that thing.
+* @param obj_data *obj
+* @param room_data *room
+* @param vehicle_data *veh
+*/
+void create_dg_owner_purged_tracker(trig_data *trig, char_data *ch, obj_data *obj, room_data *room, vehicle_data *veh) {
+	struct dg_owner_purged_tracker_type *tracker;
+	
+	if (!(tracker = trig->purge_tracker)) {
+		CREATE(tracker, struct dg_owner_purged_tracker_type, 1);
+		DL_PREPEND(dg_owner_purged_tracker, tracker);
+		trig->purge_tracker = tracker;
+	}
+	
+	tracker->parent = trig;
+	
+	if (ch && ch != tracker->ch) {
+		tracker->ch = ch;
+		tracker->purged = FALSE;
+	}
+	if (obj && obj != tracker->obj) {
+		tracker->obj = obj;
+		tracker->purged = FALSE;
+	}
+	if (room && room != tracker->room) {
+		tracker->room = room;
+		tracker->purged = FALSE;
+	}
+	if (veh && veh != tracker->veh) {
+		tracker->veh = veh;
+		tracker->purged = FALSE;
+	}
+}
+
+
+/**
+* Cancels the owner-purged tracker for a trigger (when trigger is done
+* running).
+*
+* @param trig_data *trig The trigger with owner-purge-checking.
+*/
+void cancel_dg_owner_purged_tracker(trig_data *trig) {
+	if (trig->purge_tracker) {
+		DL_DELETE(dg_owner_purged_tracker, trig->purge_tracker);
+		free(trig->purge_tracker);
+		trig->purge_tracker = NULL;
+	}
+}
+
+
+/**
+* Indicates a character has been purged, to help cancel scripts running on that
+* character.
+*
+* @param char_data *ch The character.
+*/
+void check_dg_owner_purged_char(char_data *ch) {
+	struct dg_owner_purged_tracker_type *iter;
+	DL_FOREACH(dg_owner_purged_tracker, iter) {
+		if (iter->ch == ch) {
+			iter->purged = TRUE;
+		}
+	}
+}
+
+
+/**
+* Indicates an object has been purged, to help cancel scripts running on that
+* object.
+*
+* @param obj_data *obj The object.
+*/
+void check_dg_owner_purged_obj(obj_data *obj) {
+	struct dg_owner_purged_tracker_type *iter;
+	DL_FOREACH(dg_owner_purged_tracker, iter) {
+		if (iter->obj == obj) {
+			iter->purged = TRUE;
+		}
+	}
+}
+
+
+/**
+* Indicates a room has been purged, to help cancel scripts running on that
+* room.
+*
+* @param room_data *room The room.
+*/
+void check_dg_owner_purged_room(room_data *room) {
+	struct dg_owner_purged_tracker_type *iter;
+	DL_FOREACH(dg_owner_purged_tracker, iter) {
+		if (iter->room == room) {
+			iter->purged = TRUE;
+		}
+	}
+}
+
+
+/**
+* Indicates a vehicle has been purged, to help cancel scripts running on that
+* vehicle.
+*
+* @param vehicle_data *veh The vehicle.
+*/
+void check_dg_owner_purged_vehicle(vehicle_data *veh) {
+	struct dg_owner_purged_tracker_type *iter;
+	DL_FOREACH(dg_owner_purged_tracker, iter) {
+		if (iter->veh == veh) {
+			iter->purged = TRUE;
+		}
 	}
 }

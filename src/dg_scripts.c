@@ -3111,11 +3111,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									void out_of_blood(char_data *ch);
 									
 									out_of_blood(c);
-									
-									if (ch && c == ch && EXTRACTED(c)) {
-										// in case
-										dg_owner_purged = 1;
-									}
 								}
 							}
 							
@@ -3164,7 +3159,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					*/
 					
-					if (!str_cmp(field, "can_afford")) {
+					if (!str_cmp(field, "can_act")) {
+						if (!AFF_FLAGGED(c, AFF_DISTRACTED) && GET_POS(c) == POS_STANDING && !FIGHTING(c) && (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) && !EXTRACTED(c) && !GET_FEEDING_FROM(c) && !GET_FED_ON_BY(c) && !IS_DEAD(c) && !AFF_FLAGGED(c, AFF_STUNNED | AFF_HARD_STUNNED)) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
+					else if (!str_cmp(field, "can_afford")) {
 						if (subfield && isdigit(*subfield)) {
 							if (can_afford_coins(c, (type == MOB_TRIGGER) ? GET_LOYALTY((char_data*)go) : REAL_OTHER_COIN, atoi(subfield))) {
 								snprintf(str, slen, "1");
@@ -5413,8 +5416,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "vehicles")) {
-						if (ROOM_VEHICLES(r)) {
-							snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(ROOM_VEHICLES(r)));
+						vehicle_data *temp_veh = NULL;
+						
+						// find first non-extracted vehicle
+						DL_FOREACH2(ROOM_VEHICLES(r), temp_veh, next_in_room) {
+							if (!VEH_IS_EXTRACTED(temp_veh)) {
+								break;
+							}
+						}
+						
+						if (temp_veh) {
+							snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(temp_veh));
 						}
 						else {
 							*str = '\0';
@@ -5740,8 +5752,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "next_in_room")) {
-						if (v->next_in_room) {
-							snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(v->next_in_room));
+						vehicle_data *temp_veh = NULL;
+						
+						DL_FOREACH2(v->next_in_room, temp_veh, next_in_room) {
+							if (!VEH_IS_EXTRACTED(temp_veh)) {
+								break;
+							}
+						}
+						
+						if (temp_veh) {
+							snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(temp_veh));
 						}
 						else {
 							strcpy(str, "");
@@ -6190,7 +6210,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 /* substitutes any variables into line and returns it as buf */
 void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char *line, char *buf) {
 	char tmp[MAX_INPUT_LENGTH], repl_str[MAX_INPUT_LENGTH];
-	char *var = NULL, *field = NULL, *p = NULL;
+	char *var = NULL, *field = NULL, *p = NULL, *p_end = NULL;;
 	char tmp2[MAX_INPUT_LENGTH];
 	char *subfield_p, subfield[MAX_INPUT_LENGTH];
 	int left, len;
@@ -6206,15 +6226,16 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 	*repl_str = *tmp = *tmp2 = '\0';
 
 	p = strcpy(tmp, line);
+	p_end = strchr(p, '\0');
 	subfield_p = subfield;
 
 	left = MAX_INPUT_LENGTH - 1;
 
-	while (*p && (left > 0)) {
+	while (p < p_end && *p && (left > 0)) {
 
 
 		/* copy until we find the first % */
-		while (*p && (*p != '%') && (left > 0)) {
+		while (p < p_end && *p && (*p != '%') && (left > 0)) {
 			*(buf++) = *(p++);
 			left--;
 		}
@@ -6222,7 +6243,7 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 		*buf = '\0';
 
 		/* double % */
-		if (*p && (*(++p) == '%') && (left > 0)) {
+		if (p < p_end && *p && (*(++p) == '%') && (left > 0)) {
 			*(buf++) = *(p++);
 			*buf = '\0';
 			left--;
@@ -6230,16 +6251,16 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 		}
 
 		/* so it wasn't double %'s */
-		else if (*p && (left > 0)) {
+		else if (p < p_end && *p && (left > 0)) {
 
 			/* search until end of var or beginning of field */      
-			for (var = p; *p && (*p != '%') && (*p != '.'); p++);
+			for (var = p; p < p_end && *p && (*p != '%') && (*p != '.'); p++);
 
 			field = p;
-			if (*p == '.') {
+			if (p < p_end && *p == '.') {
 				*(p++) = '\0';
 				dots = 0;
-				for (field = p; *p && ((*p != '%')||(paren_count > 0) || (dots)); p++) {
+				for (field = p; p < p_end && *p && ((*p != '%')||(paren_count > 0) || (dots)); ++p) {
 					if (dots > 0) {
 						*subfield_p = '\0';
 						find_replacement(go, sc, trig, type, var, field, subfield, repl_str, sizeof(repl_str));
@@ -6275,7 +6296,9 @@ void var_subst(void *go, struct script_data *sc, trig_data *trig, int type, char
 				} /* for (field.. */
 			} /* if *p == '.' */
 
-			*(p++) = '\0';
+			if (p < p_end) {
+				*(p++) = '\0';
+			}
 			*subfield_p = '\0';
 
 			if (*subfield) {
@@ -7525,24 +7548,17 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 	}
 
 	depth++;
-	
-	// update dg owners
-	dg_owner_purged = 0;
-	dg_owner_mob = NULL;
-	dg_owner_obj = NULL;
-	dg_owner_veh = NULL;
-	dg_owner_room = NULL;
 
 	switch (type) {
 		case MOB_TRIGGER:
 			go = sdd->c;
 			sc = SCRIPT((char_data*) go);
-			dg_owner_mob = (char_data*)go;
+			create_dg_owner_purged_tracker(trig, (char_data*) go, NULL, NULL, NULL);
 			break;
 		case OBJ_TRIGGER:
 			go = sdd->o;
 			sc = SCRIPT((obj_data*) go);
-			dg_owner_obj = (obj_data*)go;
+			create_dg_owner_purged_tracker(trig, NULL, (obj_data*) go, NULL, NULL);
 			break;
 		case WLD_TRIGGER:
 		case RMT_TRIGGER:
@@ -7550,12 +7566,12 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 		case ADV_TRIGGER:
 			go = sdd->r;
 			sc = SCRIPT((room_data*) go);
-			dg_owner_room = (room_data*)go;
+			create_dg_owner_purged_tracker(trig, NULL, NULL, (room_data*) go, NULL);
 			break;
 		case VEH_TRIGGER: {
 			go = sdd->v;
 			sc = SCRIPT((vehicle_data*) go);
-			dg_owner_veh = (vehicle_data*)go;
+			create_dg_owner_purged_tracker(trig, NULL, NULL, NULL, (vehicle_data*) go);
 			break;
 		}
 		case EMP_TRIGGER: {
@@ -7742,14 +7758,16 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 						break;
 					}
 				}
-				if (dg_owner_purged) {
-						depth--;
-					if (type == OBJ_TRIGGER) 
-						sdd->o = NULL;
-					return ret_val;
-				}
 			}
-
+		}
+		
+		// escape when owner purged
+		if (trig->purge_tracker && trig->purge_tracker->purged) {
+			--depth;
+			if (type == OBJ_TRIGGER) {
+				sdd->o = NULL;
+			}
+			return ret_val;
 		}
 	}
 
@@ -7781,6 +7799,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 		free_varlist(GET_TRIG_VARS(trig));
 	GET_TRIG_VARS(trig) = NULL;
 	GET_TRIG_DEPTH(trig) = 0;
+	cancel_dg_owner_purged_tracker(trig);
 
 	depth--;
 	return ret_val;
