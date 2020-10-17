@@ -496,11 +496,9 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	room = create_room(NULL);
 	attach_building_to_room(bld, room, TRUE);
 	COMPLEX_DATA(room)->home_room = NULL;
-	SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_IN_VEHICLE);
 	affect_total_room(room);
 	
 	// attach
-	COMPLEX_DATA(room)->vehicle = veh;
 	VEH_INTERIOR_HOME_ROOM(veh) = room;
 	add_room_to_vehicle(room, veh);
 	
@@ -1165,10 +1163,17 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 	vrl->room = room;
 	LL_APPEND(VEH_ROOM_LIST(veh), vrl);
 	
+	SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_IN_VEHICLE);
+	if (COMPLEX_DATA(room)) {
+		COMPLEX_DATA(room)->vehicle = veh;
+	}
+	
 	// count all rooms after the first
 	if (room != VEH_INTERIOR_HOME_ROOM(veh)) {
 		++VEH_INSIDE_ROOMS(veh);
 	}
+	
+	affect_total_room(room);
 	
 	// initial island data
 	if (IN_ROOM(veh)) {
@@ -2892,217 +2897,6 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	
 	// end
 	fprintf(fl, "S\n");
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
-//// 2.0b3.8 CONVERTER ///////////////////////////////////////////////////////
-
-// this system converts a set of objects to vehicles, including all the boats,
-// catapults, carts, and ships.
-	
-// list of vnums to convert directly from obj to vehicle
-any_vnum convert_list[] = {
-	900,	// a rickety cart
-	901,	// a carriage
-	902,	// a covered wagon
-	903,	// the catapult
-	904,	// a chair
-	905,	// a wooden bench
-	906,	// a long table
-	907,	// a stool
-	917,	// the throne
-	920,	// a wooden canoe
-	952,	// the pinnace
-	953,	// the brigantine
-	954,	// the galley
-	955,	// the argosy
-	956,	// the galleon
-	10715,	// the sleigh
-	NOTHING	// end list
-};
-
-struct convert_vehicle_data {
-	char_data *mob;	// mob to attach
-	any_vnum vnum;	// vehicle vnum
-	struct convert_vehicle_data *next;
-};
-
-struct convert_vehicle_data *list_of_vehicles_to_convert = NULL;
-
-/**
-* Stores data for a mob that was supposed to be attached to a vehicle.
-*/
-void add_convert_vehicle_data(char_data *mob, any_vnum vnum) {
-	struct convert_vehicle_data *cvd;
-	
-	CREATE(cvd, struct convert_vehicle_data, 1);
-	cvd->mob = mob;
-	cvd->vnum = vnum;
-	LL_PREPEND(list_of_vehicles_to_convert, cvd);
-}
-
-
-/**
-* Processes any temporary data for mobs that should be attached to a vehicle.
-* This basically assumes you're in the middle of upgrading to 2.0 b3.8 and
-* works on any data it found. Mobs are only removed if they become attached
-* to a vehicle.
-*
-* @return int the number converted
-*/
-int run_convert_vehicle_list(void) {
-	struct convert_vehicle_data *cvd;
-	vehicle_data *veh;
-	int changed = 0;
-	
-	while ((cvd = list_of_vehicles_to_convert)) {
-		list_of_vehicles_to_convert = cvd->next;
-		
-		if (cvd->mob && IN_ROOM(cvd->mob)) {
-			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(cvd->mob)), veh, next_in_room) {
-				if (VEH_VNUM(veh) == cvd->vnum && count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
-					harness_mob_to_vehicle(cvd->mob, veh);
-					++changed;
-					break;
-				}
-			}
-		}
-		
-		free(cvd);
-	}
-	
-	return changed;
-}
-
-/**
-* Replaces an object with a vehicle of the same VNUM, and converts the traits
-* that it can. This will result in partially-completed ships becoming fully-
-* completed.
-* 
-* @param obj_data *obj The object to convert (will be extracted).
-*/
-void convert_one_obj_to_vehicle(obj_data *obj) {
-	extern room_data *obj_room(obj_data *obj);
-	
-	obj_data *obj_iter, *next_obj;
-	room_data *room, *room_iter, *main_room;
-	vehicle_data *veh;
-	
-	// if there isn't a room or vehicle involved, just remove the object
-	if (!(room = obj_room(obj)) || !vehicle_proto(GET_OBJ_VNUM(obj))) {
-		extract_obj(obj);
-		return;
-	}
-	
-	// create the vehicle
-	veh = read_vehicle(GET_OBJ_VNUM(obj), TRUE);
-	vehicle_to_room(veh, room);
-	
-	// move inventory
-	DL_FOREACH_SAFE2(obj->contains, obj_iter, next_obj, next_content) {
-		obj_to_vehicle(obj_iter, veh);
-	}
-	
-	// convert traits
-	VEH_OWNER(veh) = real_empire(obj->last_empire_id);
-	VEH_SCALE_LEVEL(veh) = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
-	
-	// type-based traits
-	switch (GET_OBJ_TYPE(obj)) {
-		case ITEM_SHIP: {
-			if ((main_room = real_room(GET_OBJ_VAL(obj, 2)))) {	// obj val 2: was ship's main-room-vnum
-				VEH_INTERIOR_HOME_ROOM(veh) = main_room;
-				
-				// detect owner from room
-				if (ROOM_OWNER(main_room)) {
-					VEH_OWNER(veh) = ROOM_OWNER(main_room);
-				}
-				
-				// apply vehicle aff
-				DL_FOREACH2(interior_room_list, room_iter, next_interior) {
-					if (room_iter == main_room || HOME_ROOM(room_iter) == main_room) {
-						SET_BIT(ROOM_BASE_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
-						affect_total_room(room_iter);
-					}
-				}
-			}
-			break;
-		}
-		case ITEM_CART: {
-			// nothing to convert?
-			break;
-		}
-	}
-	
-	// did we successfully get an owner? try the room it's in
-	if (!VEH_OWNER(veh)) {
-		VEH_OWNER(veh) = ROOM_OWNER(room);
-	}
-	
-	// remove the object
-	extract_obj(obj);
-}
-
-
-/**
-* Converts a list of objects into vehicles with the same vnum. This converter
-* was used during the initial implementation of vehicles in 2.0 b3.8.
-*
-* @return int the number converted
-*/
-int convert_to_vehicles(void) {
-	obj_data *obj, *next_obj;
-	int iter, changed = 0;
-	bool found;
-	
-	DL_FOREACH_SAFE(object_list, obj, next_obj) {
-		// determine if it's in the list to replace
-		found = FALSE;
-		for (iter = 0; convert_list[iter] != NOTHING && !found; ++iter) {
-			if (convert_list[iter] == GET_OBJ_VNUM(obj)) {
-				found = TRUE;
-			}
-		}
-		if (!found) {
-			continue;
-		}
-		
-		// success
-		convert_one_obj_to_vehicle(obj);
-		++changed;
-	}
-	
-	return changed;
-}
-
-
-/**
-* Removes the old room affect flag that hinted when to show a ship in pre-
-* b3.8.
-*/
-void b3_8_ship_update(void) {
-	void save_whole_world();
-	
-	room_data *room, *next_room;
-	int changed = 0;
-	
-	bitvector_t ROOM_AFF_SHIP_PRESENT = BIT(10);	// old bit to remove
-	
-	HASH_ITER(hh, world_table, room, next_room) {
-		if (IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_SHIP_PRESENT)) {
-			REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_SHIP_PRESENT);
-			affect_total_room(room);
-			++changed;
-		}
-	}
-	
-	changed += convert_to_vehicles();
-	changed += run_convert_vehicle_list();
-	
-	if (changed > 0) {
-		save_whole_world();
-	}
 }
 
 

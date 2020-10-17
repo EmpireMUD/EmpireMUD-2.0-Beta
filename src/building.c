@@ -2019,7 +2019,6 @@ ACMD(do_designate) {
 			COMPLEX_DATA(home)->inside_rooms++;
 			
 			if (veh) {
-				COMPLEX_DATA(new)->vehicle = veh;
 				add_room_to_vehicle(new, veh);
 			}
 			
@@ -3038,10 +3037,7 @@ ACMD(do_upgrade) {
 					}
 					
 					COMPLEX_DATA(room_iter)->home_room = interior;
-					COMPLEX_DATA(room_iter)->vehicle = to_veh;
-					SET_BIT(ROOM_BASE_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
 					add_room_to_vehicle(room_iter, to_veh);
-					affect_total_room(room_iter);
 					
 					// check exits to the old home room and move them
 					LL_FOREACH(COMPLEX_DATA(room_iter)->exits, exits) {

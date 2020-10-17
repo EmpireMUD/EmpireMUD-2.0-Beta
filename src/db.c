@@ -318,7 +318,6 @@ void boot_db(void) {
 	void load_slash_channels();
 	void load_tips_of_the_day();
 	void load_trading_post();
-	int run_convert_vehicle_list();
 	void run_reboot_triggers();
 	void schedule_map_unloads();
 	void setup_island_levels();
@@ -408,9 +407,6 @@ void boot_db(void) {
 	log("Verifying world sectors.");
 	verify_sectors();
 	check_sector_times(NOTHING);
-	
-	// convert vehicles -- this normally does nothing, but it may free a temporary list
-	run_convert_vehicle_list();
 	
 	log("Checking for orphaned rooms...");
 	delete_orphaned_rooms();
@@ -4694,9 +4690,8 @@ void check_version(void) {
 			b3_6_einv_fix();
 		}
 		if (MATCH_VERSION("b3.8")) {
-			void b3_8_ship_update(void);	// vehicles.c
-			log("Applying b3.8 update to vehicles...");
-			b3_8_ship_update();
+			// log("Applying b3.8 update to vehicles...");
+			// code removed in b5.110
 		}
 		if (MATCH_VERSION("b3.11")) {
 			log("Applying b3.11 fix to ships...");
