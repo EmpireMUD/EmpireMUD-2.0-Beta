@@ -868,7 +868,7 @@ int timer_otrigger(obj_data *obj) {
 			/* don't allow a wear to take place, if
 			* the object is purged.
 			*/
-			if (!obj || !return_val) {
+			if (!obj || !return_val || (t->purge_tracker && t->purge_tracker->purged)) {
 				return 0;
 			}
 		}
