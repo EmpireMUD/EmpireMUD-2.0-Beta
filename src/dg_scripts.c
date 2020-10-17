@@ -7800,7 +7800,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 		free_varlist(GET_TRIG_VARS(trig));
 	GET_TRIG_VARS(trig) = NULL;
 	GET_TRIG_DEPTH(trig) = 0;
-	// cancel_dg_owner_purged_tracker(trig);
+	cancel_dg_owner_purged_tracker(trig);
 
 	depth--;
 	return ret_val;

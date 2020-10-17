@@ -169,6 +169,8 @@ void trig_data_copy(trig_data *this_data, const trig_data *trg) {
 	this_data->narg = trg->narg;
 	if (trg->arglist)
 		this_data->arglist = strdup(trg->arglist);
+	
+	this_data->tracker = NULL;
 }
 
 
