@@ -1884,6 +1884,10 @@ void point_update_vehicle(vehicle_data *veh) {
 	
 	char *msg;
 	
+	if (VEH_IS_EXTRACTED(veh)) {
+		return;
+	}
+	
 	// autostore
 	if ((time(0) - VEH_LAST_MOVE_TIME(veh)) > (config_get_int("autostore_time") * SECS_PER_REAL_MIN)) {
 		autostore_vehicle_contents(veh);

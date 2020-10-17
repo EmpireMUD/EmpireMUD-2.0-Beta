@@ -10113,11 +10113,6 @@ void extract_pending_vehicles(void) {
 			continue;
 		}
 		
-		// ensure they're really (probably) in the vehicle list
-		if (vehicle_list && (vehicle_list == veh || veh->prev || veh->next)) {
-			DL_DELETE(vehicle_list, veh);
-		}
-		
 		extract_vehicle_final(veh);
 		--veh_extractions_pending;
 	}
