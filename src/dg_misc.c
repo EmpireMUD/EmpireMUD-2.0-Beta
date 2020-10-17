@@ -1534,18 +1534,32 @@ struct dg_owner_purged_tracker_type *dg_owner_purged_tracker = NULL;
 * @param vehicle_data *veh
 */
 void create_dg_owner_purged_tracker(trig_data *trig, char_data *ch, obj_data *obj, room_data *room, vehicle_data *veh) {
-	if (!trig->purge_tracker) {
-		CREATE(trig->purge_tracker, struct dg_owner_purged_tracker_type, 1);
-		DL_PREPEND(dg_owner_purged_tracker, trig->purge_tracker);
+	struct dg_owner_purged_tracker_type *tracker;
+	
+	if (!(tracker = trig->purge_tracker)) {
+		CREATE(tracker, struct dg_owner_purged_tracker_type, 1);
+		DL_PREPEND(dg_owner_purged_tracker, tracker);
+		trig->purge_tracker = tracker;
 	}
 	
 	trig->purge_tracker->parent = trig;
-	trig->purge_tracker->ch = ch;
-	trig->purge_tracker->obj = obj;
-	trig->purge_tracker->room = room;
-	trig->purge_tracker->veh = veh;
 	
-	trig->purge_tracker->purged = FALSE;
+	if (ch && ch != tracker->ch) {
+		tracker->ch = ch;
+		tracker->purged = FALSE;
+	}
+	if (obj && obj != tracker->obj) {
+		tracker->obj = obj;
+		tracker->purged = FALSE;
+	}
+	if (room && room != tracker->room) {
+		tracker->room = room;
+		tracker->purged = FALSE;
+	}
+	if (veh && veh != tracker->veh) {
+		tracker->veh = veh;
+		tracker->purged = FALSE;
+	}
 }
 
 
