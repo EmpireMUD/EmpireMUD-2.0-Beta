@@ -2629,15 +2629,16 @@ ACMD(do_upgrade) {
 	
 	char arg1[MAX_INPUT_LENGTH], *arg2, output[MAX_STRING_LENGTH];
 	vehicle_data *from_veh = NULL, *prev_veh, *to_veh, *old_proto, *veh_proto = NULL;
-	room_data *from_room = NULL, *interior, *in_room, *room_iter;
+	room_data *from_room = NULL, *interior, *in_room, *room_iter, *next_iter;
 	craft_data *find_craft, *to_craft, *from_craft = NULL, *missing_abil = NULL;
 	struct bld_relation *relat, *lists[2];
 	obj_data *obj, *next_obj, *found_obj;
 	struct room_direction_data *exits;
 	struct vehicle_room_list *vrl;
 	bld_data *bld_proto = NULL;
+	bool done, fail, deleted;
 	bitvector_t set_bits;
-	bool done, fail;
+	char_data *temp_ch;
 	int iter, found;
 	size_t size;
 	
@@ -2963,8 +2964,39 @@ ACMD(do_upgrade) {
 	
 	// upgrade TO building
 	if (CRAFT_IS_BUILDING(to_craft)) {
-		if (from_room) {
-			// upgraded from building: just attach new building type
+		if (from_room) {	// upgrading from a traditional building
+			if (GET_INSIDE_ROOMS(from_room) > 0 && !ROOM_BLD_FLAGGED(from_room, BLD_OPEN) && BLD_FLAGGED(bld_proto, BLD_OPEN)) {
+				// closed building to open building with interior: remove the interior
+				deleted = FALSE;
+				DL_FOREACH_SAFE2(interior_room_list, room_iter, next_iter, next_interior) {
+					if (HOME_ROOM(room_iter) == from_room && room_iter != from_room) {
+						dismantle_wtrigger(room_iter, NULL, FALSE);
+						
+						// move people and contents
+						while ((temp_ch = ROOM_PEOPLE(room_iter))) {
+							GET_LAST_DIR(temp_ch) = NO_DIR;
+							char_to_room(temp_ch, from_room);
+							msdp_update_room(temp_ch);
+						}
+						while (ROOM_CONTENTS(room_iter)) {
+							obj_to_room(ROOM_CONTENTS(room_iter), from_room);
+						}
+						while (ROOM_VEHICLES(room_iter)) {
+							vehicle_to_room(ROOM_VEHICLES(room_iter), from_room);
+						}
+
+						COMPLEX_DATA(room_iter)->home_room = NULL;
+						delete_room(room_iter, FALSE);	// must check_all_exits
+						deleted = TRUE;
+					}
+				}
+				
+				if (deleted) {
+					check_all_exits();
+				}
+			}
+			
+			// don't disassociate; just attach new building type
 			dismantle_wtrigger(from_room, NULL, FALSE);
 			detach_building_from_room(from_room);
 			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(to_craft)), from_room, TRUE);
