@@ -1842,8 +1842,6 @@ void mortlog(const char *str, ...) {
 * @return char* The compiled string.
 */
 char *room_log_identifier(room_data *room) {
-	extern char *get_room_name(room_data *room, bool color);
-	
 	static char val[MAX_STRING_LENGTH];
 	
 	sprintf(val, "[%d] %s (%d, %d)", GET_ROOM_VNUM(room), get_room_name(room, FALSE), X_COORD(room), Y_COORD(room));
@@ -1979,8 +1977,6 @@ bool is_basic_component(obj_data *obj) {
 * @return bool TRUE if obj matches cmp (or one of its related types); FALSE if not
 */
 bool is_component(obj_data *obj, generic_data *cmp) {
-	bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
-	
 	generic_data *my_cmp;
 	
 	if (!obj || !cmp || GEN_TYPE(cmp) != GENERIC_COMPONENT) {

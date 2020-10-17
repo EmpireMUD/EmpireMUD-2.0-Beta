@@ -2746,7 +2746,6 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 */
 bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle) {
 	void adjust_vehicle_tech(vehicle_data *veh, bool add);
-	void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
 
 	static struct resource_data *default_res = NULL;
 	struct resource_data *old_list;

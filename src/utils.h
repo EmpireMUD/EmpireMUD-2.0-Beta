@@ -1659,6 +1659,9 @@ extern struct time_info_data *age(char_data *ch);
 extern struct time_info_data *mud_time_passed(time_t t2, time_t t1);
 extern struct time_info_data *real_time_passed(time_t t2, time_t t1);
 
+// building functions from utils.c
+bld_data *get_building_by_name(char *name, bool room_only);
+
 // component functions from utils.c
 extern generic_data *find_generic_component(char *name);
 extern bool is_basic_component(obj_data *obj);
@@ -1740,6 +1743,7 @@ extern struct resource_data *get_next_resource(char_data *ch, struct resource_da
 extern char *get_resource_name(struct resource_data *res);
 void give_resources(char_data *ch, struct resource_data *list, bool split);
 extern bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs);
+void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
 void show_resource_list(struct resource_data *list, char *save_buffer);
 
 // string functions from utils.c
@@ -1782,6 +1786,7 @@ extern char *trim(char *string);
 extern bool check_sunny(room_data *room);
 extern char *coord_display(char_data *ch, int x, int y, bool fixed_width);
 #define coord_display_room(ch, room, fixed_width)  coord_display((ch), (room && !NO_LOCATION(room)) ? X_COORD(room) : NOWHERE, (room && !NO_LOCATION(room)) ? Y_COORD(room) : NOWHERE, (fixed_width))
+int count_flagged_sect_between(bitvector_t sectf_bits, room_data *start, room_data *end, bool check_base_sect);
 extern bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with_flags, bitvector_t without_flags, int distance);
 extern bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance);
 extern bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int distance);
@@ -1803,40 +1808,59 @@ extern unsigned long long microtime(void);
 extern bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvector_t fnc_flag);
 extern bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 
-// utils from abilities.c
+
+// abilities.c
 void add_ability_gain_hook(char_data *ch, ability_data *abil);
 void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trigger);
 
-// utils from act.action.c
+// act.action.c
 void cancel_action(char_data *ch);
-extern obj_data *has_tool(char_data *ch, bitvector_t flags);
-extern obj_data *has_all_tools(char_data *ch, bitvector_t flags);
+obj_data *has_tool(char_data *ch, bitvector_t flags);
+obj_data *has_all_tools(char_data *ch, bitvector_t flags);
 void start_action(char_data *ch, int type, int timer);
 
-// utils from act.comm.c
+// act.comm.c
 void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, const char *messg, ...);
 
-// utils from act.empire.c
-extern bool check_in_city_requirement(room_data *room, bool check_wait);
-extern int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon);
+// act.empire.c
+bool check_in_city_requirement(room_data *room, bool check_wait);
+int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon);
 #define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon)) == TER_CITY)	// backwards-compatibility
 
-// utils from act.informative.c
-extern char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
+// act.informative.c
+char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
 
-// utils from act.item.c
-extern int obj_carry_size(obj_data *obj);
+// act.item.c
+int obj_carry_size(obj_data *obj);
 
-// utils from faction.c
-extern const char *get_faction_name_by_vnum(any_vnum vnum);
-extern const char *get_reputation_name(int type);
+// act.movement.c
+int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 
-// utils from limits.c
-extern bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
+// act.trade.c
+bool check_can_craft(char_data *ch, craft_data *type);
+int get_craft_scale_level(char_data *ch, craft_data *craft);
+bool find_and_bind(char_data *ch, obj_vnum vnum);
+
+// building.c
+
+// faction.c
+const char *get_faction_name_by_vnum(any_vnum vnum);
+const char *get_reputation_name(int type);
+
+// generic.c
+bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
+
+// instance.c
+void delete_instance(struct instance_data *inst, bool run_cleanup);
+
+// limits.c
+bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
+bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
 void gain_condition(char_data *ch, int condition, int value);
 
-// utils from mapview.c
-extern bool adjacent_room_is_light(room_data *room);
+// mapview.c
+bool adjacent_room_is_light(room_data *room);
+char *get_room_name(room_data *room, bool color);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
 
@@ -1844,22 +1868,21 @@ void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool 
 #define get_informative_tile_string(ch, room, buffer)  get_informative_string((ch), (buffer), IS_DISMANTLING(room) ? TRUE : FALSE, !IS_COMPLETE(room), HAS_MAJOR_DISREPAIR(room), HAS_MINOR_DISREPAIR(room), (IS_COMPLETE(room) && HAS_FUNCTION(room, FNC_MINE)) ? (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0, ROOM_AFF_FLAGGED((room), ROOM_AFF_NO_WORK) ? TRUE : FALSE, ((ch) && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED((room), ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)))
 #define get_informative_vehicle_string(ch, veh, buffer)  get_informative_string((ch), (buffer), VEH_IS_DISMANTLING(veh) ? TRUE : FALSE, !VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh), VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), room_has_function_and_city_ok(VEH_OWNER(veh), IN_ROOM(veh), FNC_MINE) ? (get_room_extra_data(IN_ROOM(veh), ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0, VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK) || (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)))
 
-extern char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool no_work, bool chameleon);
+char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bool major_disrepair, bool minor_disrepair, int mine_view, bool no_work, bool chameleon);
 #define get_informative_color_room(ch, room)  get_informative_color((ch), IS_DISMANTLING(room) ? TRUE : FALSE, !IS_COMPLETE(room), HAS_MAJOR_DISREPAIR(room), HAS_MINOR_DISREPAIR(room), (IS_COMPLETE(room) && HAS_FUNCTION(room, FNC_MINE)) ? (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0, ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK) ? TRUE : FALSE, ch && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room) && distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(room), Y_COORD(room)) > 2)
 #define get_informative_color_veh(ch, veh)  get_informative_color((ch), VEH_IS_DISMANTLING(veh) ? TRUE : FALSE, !VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh), VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), room_has_function_and_city_ok(VEH_OWNER(veh), IN_ROOM(veh), FNC_MINE) ? (get_room_extra_data(IN_ROOM(veh), ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0, VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK) || (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)) && distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh))) > 2)
 
+// morph.c
+const char *get_morph_desc(char_data *ch, bool long_desc_if_true);
 
-// utils from morph.c
-extern const char *get_morph_desc(char_data *ch, bool long_desc_if_true);
+// olc.building.c
+bool bld_has_relation(bld_data *bld, int type, bld_vnum vnum);
+bool veh_has_relation(vehicle_data *veh, int type, any_vnum vnum);
+int count_bld_relations(bld_data *bld, int type);
+char *get_bld_name_by_proto(bld_vnum vnum);
 
-// utils from olc.building.c
-extern bool bld_has_relation(bld_data *bld, int type, bld_vnum vnum);
-extern bool veh_has_relation(vehicle_data *veh, int type, any_vnum vnum);
-extern int count_bld_relations(bld_data *bld, int type);
-extern char *get_bld_name_by_proto(bld_vnum vnum);
-
-// utils from quest.c
-extern char *get_quest_name_by_proto(any_vnum vnum);
+// quest.c
+char *get_quest_name_by_proto(any_vnum vnum);
 void qt_change_ability(char_data *ch, any_vnum abil);
 void qt_change_level(char_data *ch, int level);
 void qt_change_production_total(char_data *ch, any_vnum vnum, int amount);
@@ -1893,7 +1916,7 @@ void qt_untrigger_task(char_data *ch, any_vnum vnum);
 void qt_visit_room(char_data *ch, room_data *room);
 void qt_wear_obj(char_data *ch, obj_data *obj);
 
-// utils from progress.c
+// progress.c
 void et_change_cities(empire_data *emp);
 void et_change_coins(empire_data *emp, int amount);
 void et_change_diplomacy(empire_data *emp);
@@ -1908,8 +1931,20 @@ void et_lose_building(empire_data *emp, any_vnum vnum);
 void et_lose_tile_sector(empire_data *emp, sector_vnum vnum);
 void et_lose_vehicle(empire_data *emp, vehicle_data *veh);
 
-// utils from vehicles.c
-extern char *get_vehicle_name_by_proto(obj_vnum vnum);
+// vehicles.c
+void add_room_to_vehicle(room_data *room, vehicle_data *veh);
+void complete_vehicle(vehicle_data *veh);
+int count_harnessed_animals(vehicle_data *veh);
+void empty_vehicle(vehicle_data *veh, room_data *to_room);
+vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id);
+void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
+int get_new_vehicle_construction_id();
+room_data *get_vehicle_interior(vehicle_data *veh);
+char *get_vehicle_name_by_proto(obj_vnum vnum);
+void scale_vehicle_to_level(vehicle_data *veh, int level);
+void start_dismantle_vehicle(vehicle_data *veh);
+char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
+bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 
 
  //////////////////////////////////////////////////////////////////////////////

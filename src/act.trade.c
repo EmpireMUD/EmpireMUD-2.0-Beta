@@ -45,7 +45,6 @@ extern const char *tool_flags[];
 // external functions
 extern bool can_claim(char_data *ch);
 extern bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
-void complete_vehicle(vehicle_data *veh);
 INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
@@ -1725,8 +1724,6 @@ void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
 * @param int dir Optional: If the player specified a direction (may by NO_DIR or an invalid dir for the craft).
 */
 void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
-	extern int get_new_vehicle_construction_id();
-	void scale_vehicle_to_level(vehicle_data *veh, int level);
 	void special_vehicle_setup(char_data *ch, vehicle_data *veh);
 	
 	vehicle_data *veh, *to_craft = NULL, *found_other = NULL;

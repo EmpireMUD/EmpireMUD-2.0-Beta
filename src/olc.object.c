@@ -453,7 +453,6 @@ char *list_one_object(obj_data *obj, bool detail) {
 */
 void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	void complete_building(room_data *room);
-	void complete_vehicle(vehicle_data *veh);
 	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
@@ -3062,8 +3061,6 @@ OLC_MODULE(oedit_size) {
 
 
 OLC_MODULE(oedit_storage) {
-	extern bld_data *get_building_by_name(char *name, bool room_only);
-	
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *flagarg;
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];

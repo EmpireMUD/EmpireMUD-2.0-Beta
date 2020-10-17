@@ -68,7 +68,6 @@ extern bool empire_can_claim(empire_data *emp);
 extern bool empire_is_ignoring(empire_data *emp, char_data *victim);
 extern int get_main_island(empire_data *emp);
 extern int get_total_score(empire_data *emp);
-extern char *get_room_name(room_data *room, bool color);
 extern bool is_trading_with(empire_data *emp, empire_data *partner);
 struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
@@ -3337,7 +3336,6 @@ void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
 */
 void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
-	void perform_abandon_vehicle(vehicle_data *veh);
 	
 	empire_data *emp = VEH_OWNER(veh);
 	
@@ -3727,8 +3725,6 @@ void do_claim_room(char_data *ch, room_data *room, empire_data *emp) {
 * @param empire_data *emp The empire to claim it for.
 */
 void do_claim_vehicle(char_data *ch, vehicle_data *veh, empire_data *emp) {
-	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
-	
 	if (VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
 		msg_to_char(ch, "That cannot be claimed.\r\n");
 	}
@@ -5402,7 +5398,6 @@ room_data *find_home(char_data *ch) {
 
 
 ACMD(do_home) {
-	void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 	void warehouse_inventory(char_data *ch, char *argument, int mode);
 	void warehouse_identify(char_data *ch, char *argument, int mode);
 	void warehouse_retrieve(char_data *ch, char *argument, int mode);

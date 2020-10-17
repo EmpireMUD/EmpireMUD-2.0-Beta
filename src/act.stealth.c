@@ -1561,8 +1561,6 @@ ACMD(do_shadowstep) {
 
 /* Sneak is now sneak <direction>.  Note that entire parties may not sneak together. */
 ACMD(do_sneak) {
-	extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
-	
 	int dir;
 	bool sneaking = FALSE;
 

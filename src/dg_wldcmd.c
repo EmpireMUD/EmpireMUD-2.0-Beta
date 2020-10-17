@@ -44,10 +44,8 @@ obj_data *get_obj_in_room(room_data *room, char *name);
 extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 extern room_data *obj_room(obj_data *obj);
-void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
-void scale_vehicle_to_level(vehicle_data *veh, int level);
 void wld_command_interpreter(room_data *room, char *argument);
 
 // locals
@@ -1062,7 +1060,6 @@ WCMD(do_wquest) {
 
 /* loads a mobile or object into the room */
 WCMD(do_wload) {
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -1413,7 +1410,6 @@ WCMD(do_wat) {
 
 
 WCMD(do_wrestore) {
-	void complete_vehicle(vehicle_data *veh);
 	extern const bool aff_is_bad[];
 	extern const double apply_values[];
 	

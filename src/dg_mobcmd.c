@@ -68,10 +68,8 @@ extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern room_data *obj_room(obj_data *obj);
-void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
-void scale_vehicle_to_level(vehicle_data *veh, int level);
 void send_char_pos(char_data *ch, int dam);
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
@@ -667,9 +665,7 @@ ACMD(do_mvehicleecho) {
 * lets the mobile load an item or mobile.  All items
 * are loaded into inventory, unless it is NO-TAKE. 
 */
-ACMD(do_mload) {
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
-	
+ACMD(do_mload) {	
 	struct instance_data *inst = get_instance_by_mob(ch);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	int number = 0;
@@ -1158,7 +1154,6 @@ ACMD(do_mbuild) {
 
 
 ACMD(do_mrestore) {
-	void complete_vehicle(vehicle_data *veh);
 	extern const bool aff_is_bad[];
 	extern const double apply_values[];
 	

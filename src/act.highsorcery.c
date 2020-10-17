@@ -1838,8 +1838,6 @@ RITUAL_SETUP_FUNC(start_ritual_of_detection) {
 
 
 RITUAL_FINISH_FUNC(perform_ritual_of_detection) {
-	extern char *get_room_name(room_data *room, bool color);
-	
 	struct empire_city_data *city;
 	descriptor_data *d;
 	char_data *targ;

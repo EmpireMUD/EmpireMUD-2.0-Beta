@@ -336,13 +336,16 @@ extern descriptor_data *descriptor_list;
 extern empire_data *empire_table;
 extern struct trading_post_data *trading_list;
 extern bool check_empire_refresh;
+
+struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 void delete_empire(empire_data *emp);
-extern struct empire_island *get_empire_island(empire_data *emp, int island_id);
-extern empire_data *get_or_create_empire(char_data *ch);
+void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
+struct empire_island *get_empire_island(empire_data *emp, int island_id);
+empire_data *get_or_create_empire(char_data *ch);
 void free_empire(empire_data *emp);
 void read_empire_members(empire_data *only_empire, bool read_techs);
 void read_empire_territory(empire_data *emp, bool check_tech);
-extern empire_data *real_empire(empire_vnum vnum);
+empire_data *real_empire(empire_vnum vnum);
 void reread_empire_tech(empire_data *emp);
 void save_empire(empire_data *e, bool save_all_parts);
 void save_all_empires();
@@ -475,6 +478,7 @@ void free_quest(quest_data *quest);
 // room templates
 extern room_template *room_template_table;
 void free_room_template(room_template *rmt);
+struct complex_room_data *init_complex_data();
 extern room_template *room_template_proto(rmt_vnum vnum);
 
 // sectors
@@ -533,16 +537,21 @@ void free_vehicle(vehicle_data *veh);
 extern vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
 
 // world
-void check_all_exits();
-extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
-extern struct room_direction_data *create_exit(room_data *from, room_data *to, int dir, bool back);
-void delete_room(room_data *room, bool check_exits);
 extern room_data *world_table;
 extern room_data *interior_room_list;
 extern struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];
 extern struct map_data *land_map;
+
+void check_all_exits();
+void check_terrain_height(room_data *room);
+struct room_direction_data *create_exit(room_data *from, room_data *to, int dir, bool back);
+void decustomize_room(room_data *room);
+room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
+void delete_room(room_data *room, bool check_exits);
+crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
+void sort_world_table();
 
 // misc
 extern struct obj_apply *copy_obj_apply_list(struct obj_apply *list);

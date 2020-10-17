@@ -44,7 +44,6 @@ extern const int rev_dir[];
 extern struct character_size_data size_data[];
 
 // external functions
-extern char *get_room_name(room_data *room, bool color);
 extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 extern vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
 

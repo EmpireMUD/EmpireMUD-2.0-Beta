@@ -42,14 +42,9 @@ const char *default_vehicle_short_desc = "an unnamed vehicle";
 const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 
 // local protos
-void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 void clear_vehicle(vehicle_data *veh);
 void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
-int get_new_vehicle_construction_id();
 void ruin_vehicle(vehicle_data *veh, char *message);
-void scale_vehicle_to_level(vehicle_data *veh, int level);
-char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
-bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 
 // external consts
 extern const char *climate_flags[];
@@ -76,7 +71,6 @@ void free_custom_messages(struct custom_message *mes);
 void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_resource_display(struct resource_data *list, char *save_buffer);
-void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void scale_item_to_level(obj_data *obj, int level);
 extern char *show_color_codes(char *string);
 extern bool validate_icon(char *icon);
@@ -345,7 +339,6 @@ vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum inte
 * @param vehicle_data *veh The vehicle being dismantled.
 */
 void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
-	extern bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
 	extern struct empire_chore_type chore_data[NUM_CHORES];
 	
 	obj_data *newobj, *proto;
@@ -885,8 +878,6 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 * @param bool vehicle_data *veh The vehicle to dismantle.
 */
 void start_dismantle_vehicle(vehicle_data *veh) {
-	void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
-	
 	struct resource_data *res, *next_res;
 	obj_data *proto;
 	
@@ -3632,7 +3623,6 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 */
 void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	extern char *get_room_name(room_data *room, bool color);
 	void script_stat (char_data *ch, struct script_data *sc);
 	void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
 	extern const char *depletion_type[NUM_DEPLETION_TYPES];

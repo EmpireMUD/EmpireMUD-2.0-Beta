@@ -76,7 +76,6 @@
 // externs
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern int get_north_for_char(char_data *ch);
-extern struct complex_room_data *init_complex_data();
 extern const bool interact_one_at_a_time[NUM_INTERACTS];
 const struct wear_data_type wear_data[NUM_WEARS];
 
@@ -101,8 +100,6 @@ struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 void die_follower(char_data *ch);
 struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
 struct companion_data *has_companion(char_data *ch, any_vnum vnum);
-void perform_abandon_vehicle(vehicle_data *veh);
-void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void remove_companion(char_data *ch, any_vnum vnum);
 void remove_dropped_item(empire_data *emp, obj_data *obj);
 void remove_dropped_item_anywhere(obj_data *obj);
@@ -3042,8 +3039,6 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 * @param empire_data *emp The empire to claim for.
 */
 void perform_claim_room(room_data *room, empire_data *emp) {
-	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
-	
 	struct empire_territory_data *ter;
 	vehicle_data *veh;
 	int ter_type;
@@ -10060,8 +10055,6 @@ void extract_vehicle(vehicle_data *veh) {
 */
 void extract_vehicle_final(vehicle_data *veh) {
 	void delete_vehicle_interior(vehicle_data *veh);
-	void empty_vehicle(vehicle_data *veh, room_data *to_room);
-	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 	
 	check_dg_owner_purged_vehicle(veh);
 	

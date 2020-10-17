@@ -39,9 +39,6 @@
 extern struct generic_name_data *generic_names;
 extern struct character_size_data size_data[];
 
-// external funcs
-extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
-
 // local protos
 void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
@@ -557,7 +554,6 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
 */
 bool try_mobile_movement(char_data *ch) {
 	ACMD(do_exit);
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	extern const int rev_dir[];
 	
 	int dir, count;

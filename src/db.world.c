@@ -57,7 +57,6 @@ EVENT_CANCEL_FUNC(cancel_room_event);
 extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 void complete_building(room_data *room);
 void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
-extern struct complex_room_data *init_complex_data();
 void free_complex_data(struct complex_room_data *bld);
 void free_shared_room_data(struct shared_room_data *data);
 void grow_crop(struct map_data *map);
@@ -67,19 +66,14 @@ void remove_room_from_world_tables(room_data *room);
 void save_and_close_world_file(FILE *fl, int block);
 void setup_start_locations();
 void sort_exits(struct room_direction_data **list);
-void sort_world_table();
 void stop_room_action(room_data *room, int action);
 void write_room_to_file(FILE *fl, room_data *room);
 
 // locals
-void check_terrain_height(room_data *room);
 int count_city_points_used(empire_data *emp);
-struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
-void decustomize_room(room_data *room);
 void decustomize_shared_data(struct shared_room_data *shared);
 room_vnum find_free_vnum();
 room_data *get_extraction_room();
-crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
 void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
@@ -1148,8 +1142,6 @@ void annual_update_depletions(struct depletion_data **list) {
 * @param struct map_data *tile The map tile to update.
 */
 void annual_update_map_tile(struct map_data *tile) {
-	extern char *get_room_name(room_data *room, bool color);
-	
 	struct resource_data *old_list;
 	sector_data *old_sect;
 	int trenched, amount;
@@ -3406,9 +3398,6 @@ void init_room(room_data *room, room_vnum vnum) {
 * and contents.
 */
 INTERACTION_FUNC(ruin_building_to_building_interaction) {
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
-	void scale_vehicle_to_level(vehicle_data *veh, int level);
-	
 	struct resource_data *res, *next_res, *save = NULL;
 	vehicle_data *veh_iter, *next_veh;
 	room_data *to_room = NULL;
@@ -3499,9 +3488,6 @@ INTERACTION_FUNC(ruin_building_to_building_interaction) {
 * contents.
 */
 INTERACTION_FUNC(ruin_building_to_vehicle_interaction) {
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
-	void scale_vehicle_to_level(vehicle_data *veh, int level);
-	
 	struct resource_data *res, *next_res, *save = NULL;
 	vehicle_data *ruin, *proto, *veh_iter, *next_veh;
 	obj_data *obj_iter, *next_obj;

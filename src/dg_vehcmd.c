@@ -49,10 +49,8 @@ extern vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name);
 extern vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 extern room_data *obj_room(obj_data *obj);
-void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
-void scale_vehicle_to_level(vehicle_data *veh, int level);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
 void sub_write_to_room(char *str, room_data *room, bool use_queue);
 void vehicle_command_interpreter(vehicle_data *veh, char *argument);
@@ -1007,7 +1005,6 @@ VCMD(do_vterraform) {
 
 VCMD(do_vload) {
 	extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
@@ -1476,7 +1473,6 @@ VCMD(do_vat)  {
 
 
 VCMD(do_vrestore) {
-	void complete_vehicle(vehicle_data *veh);
 	extern const bool aff_is_bad[];
 	extern const double apply_values[];
 	

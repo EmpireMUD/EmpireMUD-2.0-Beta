@@ -49,10 +49,8 @@
 // external functions
 void check_delayed_load(char_data *ch);
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
-void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 void discrete_load(FILE *fl, int mode, char *filename);
 void free_complex_data(struct complex_room_data *data);
-extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 void index_boot(int mode);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void save_whole_world();
@@ -2277,8 +2275,6 @@ PLAYER_UPDATE_FUNC(b3_12_update_players) {
 
 // respawns wild crops and converts 5% of jungle to crops
 void b3_15_crop_update(void) {
-	extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
-	
 	struct map_data *map;
 	crop_data *new_crop;
 	room_data *room;
@@ -2317,8 +2313,6 @@ void b3_15_crop_update(void) {
 
 // adds built-with resources to roads
 void b3_17_road_update(void) {
-	extern struct complex_room_data *init_complex_data();
-	
 	struct map_data *map;
 	room_data *room;
 	

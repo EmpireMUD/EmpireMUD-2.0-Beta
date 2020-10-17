@@ -304,7 +304,6 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
-	void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 	void remove_minipet(char_data *ch, any_vnum vnum);
 	void remove_homeless_citizen(empire_data *emp, struct empire_homeless_citizen *ehc);
 	

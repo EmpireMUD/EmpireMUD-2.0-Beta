@@ -49,21 +49,16 @@ PATHFIND_VALIDATOR(pathfind_ocean);
 PATHFIND_VALIDATOR(pathfind_pilot);
 PATHFIND_VALIDATOR(pathfind_road);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
-extern int count_harnessed_animals(vehicle_data *veh);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
 extern int get_north_for_char(char_data *ch);
-extern room_data *get_vehicle_interior(vehicle_data *veh);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 extern bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error);
-extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 void scale_item_to_level(obj_data *obj, int level);
 void skip_run_filler(char **string);
 extern int total_small_vehicles_in_room(room_data *room);
 extern int total_vehicle_size_in_room(room_data *room);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
-extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 extern bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
-bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 
 // local data
 struct {

@@ -62,7 +62,6 @@ void free_shop_temp_list(struct shop_temp_list *list);
 extern struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
 extern struct player_eq_set *get_eq_set_by_name(char_data *ch, char *name);
 extern struct eq_set_obj *get_obj_eq_set_by_id(obj_data *obj, int id);
-extern char *get_room_name(room_data *room, bool color);
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 void read_vault(empire_data *emp);
 void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);

@@ -42,7 +42,6 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
 void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
-void scale_vehicle_to_level(vehicle_data *veh, int level);
 extern int stats_get_building_count(bld_data *bdg);
 extern int stats_get_sector_count(sector_data *sect);
 
@@ -997,8 +996,6 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 * if possible.
 */
 void generate_adventure_instances(void) {
-	void sort_world_table();
-
 	struct adventure_link_rule *rule, *rule_iter;
 	adv_data *iter, *next_iter;
 	room_data *loc;
@@ -2636,8 +2633,6 @@ void save_instances(void) {
 * @param int level A pre-validated level.
 */
 void scale_instance_to_level(struct instance_data *inst, int level) {	
-	void scale_vehicle_to_level(vehicle_data *veh, int level);
-	
 	int iter;
 	vehicle_data *veh;
 	char_data *ch;

@@ -1170,8 +1170,6 @@ void reduce_city_overages(void) {
 * @param empire_data *emp The empire to reduce
 */
 static void reduce_outside_territory_one(empire_data *emp) {
-	extern char *get_room_name(room_data *room, bool color);
-	
 	struct empire_city_data *city;
 	room_data *iter, *next_iter, *loc, *farthest;
 	int dist, this_far, far_dist, far_type, ter_type;
@@ -1880,7 +1878,6 @@ void autostore_vehicle_contents(vehicle_data *veh) {
 void point_update_vehicle(vehicle_data *veh) {
 	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
 	void ruin_vehicle(vehicle_data *veh, char *message);
-	bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 	
 	char *msg;
 	

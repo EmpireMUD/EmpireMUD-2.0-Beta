@@ -2027,7 +2027,6 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 */
 void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *veh) {
 	void start_dismantle_building(room_data *loc);
-	void start_dismantle_vehicle(vehicle_data *veh);
 	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_DISMANTLE_MINES].mob);
 	bool can_do = veh ? VEH_IS_COMPLETE(veh) : IS_COMPLETE(room);
@@ -2192,7 +2191,6 @@ INTERACTION_FUNC(one_farming_chore) {
 
 // handles harvest/pick (preferring harvest)
 void do_chore_farming(empire_data *emp, room_data *room) {
-	void check_terrain_height(room_data *room);
 	void schedule_crop_growth(struct map_data *map);
 	void uncrop_tile(room_data *room);
 	
@@ -2779,8 +2777,6 @@ void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
 
 // handles both build (CHORE_BUILD) and repair (CHORE_MAINTENANCE)
 void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
-	void complete_vehicle(vehicle_data *veh);
-	
 	char_data *worker = find_chore_worker_in_room(emp, IN_ROOM(veh), veh, chore_data[chore].mob);
 	struct empire_storage_data *store = NULL;
 	int islid = GET_ISLAND_ID(IN_ROOM(veh));

@@ -60,12 +60,10 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 
 /* external functions */
 void check_for_eligible_goals(empire_data *emp);	// progress.c
-extern int count_harnessed_animals(vehicle_data *veh);
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
 extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct instance_data *get_instance_for_script(int go_type, void *go);
-extern char *get_room_name(room_data *room, bool color);
 void free_varlist(struct trig_var_data *vd);
 extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
@@ -5559,12 +5557,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "dump")) {
-						void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
 						fully_empty_vehicle(v, IN_ROOM(v));
 						*str = '\0';
 					}
 					else if (!str_cmp(field, "dump_objects")) {
-						void empty_vehicle(vehicle_data *veh, room_data *to_room);
 						empty_vehicle(v, IN_ROOM(v));
 						*str = '\0';
 					}
@@ -5668,7 +5664,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%s", IN_OR_ON(v));
 					}
 					else if (!str_cmp(field, "interior")) {
-						extern room_data *get_vehicle_interior(vehicle_data *veh);
 						room_data *interior = get_vehicle_interior(v);
 						if (interior) {
 							snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(interior) + ROOM_ID_BASE);
@@ -5808,7 +5803,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'u': {	// veh.u*
 					if (!str_cmp(field, "unharness")) {
-						extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 						while (VEH_ANIMALS(v)) {
 							unharness_mob_from_vehicle(VEH_ANIMALS(v), v);
 						}

@@ -68,18 +68,15 @@ extern bool world_is_sorted;
 
 // external funcs
 extern any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
-extern struct complex_room_data *init_complex_data();
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 void free_archetype_gear(struct archetype_gear *list);
 extern room_data *load_map_room(room_vnum vnum);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void sort_exits(struct room_direction_data **list);
-void sort_world_table();
 
 // locals
 int check_object(obj_data *obj);
 int count_hash_records(FILE *fl);
-void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 empire_vnum find_free_empire_vnum(void);
 void free_obj_eq_set(struct eq_set_obj *eq_set);
 void free_theft_logs(struct theft_log *list);
@@ -1441,7 +1438,6 @@ void remove_empire_from_table(empire_data *emp) {
 * icon-locking is done.
 */
 void check_for_new_map(void) {
-	void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 	void lock_icon(room_data *room, struct icon_data *use_icon);	// utils.c
 	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 	
@@ -2449,7 +2445,6 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	void assign_old_workforce_chore(empire_data *emp, int chore);
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 	extern struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mob, int sex, int name, struct empire_territory_data *ter);
-	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 	
 	empire_data *emp, *find;
 	int t[6], j, iter;

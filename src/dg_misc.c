@@ -53,10 +53,7 @@ extern const char *affected_bits[];
 * @return room_data* The created room.
 */
 room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
-	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
-	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 	extern room_data *create_room(room_data *home);
-	void sort_world_table();
 	
 	room_data *home = HOME_ROOM(from), *new;
 	
@@ -413,8 +410,6 @@ void do_dg_build(room_data *target, char *argument) {
 */
 void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh) {
 	void kill_empire_npc(char_data *ch);
-	void perform_abandon_vehicle(vehicle_data *veh);
-	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	empire_data *owner;
@@ -904,7 +899,6 @@ void run_reboot_triggers(void) {
 */
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier) {
 	void death_log(char_data *ch, char_data *killer, int type);
-	extern char *get_room_name(room_data *room, bool color);
 	extern int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype);
 	void scale_mob_for_character(char_data *mob, char_data *ch);
 	void scale_mob_to_level(char_data *mob, int level);

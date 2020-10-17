@@ -259,7 +259,6 @@ ACMD(do_execute) {
 
 
 ACMD(do_flee) {
-	extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 	extern const bool can_flee_dir[NUM_OF_DIRS];
 	
 	int i, attempt, try;

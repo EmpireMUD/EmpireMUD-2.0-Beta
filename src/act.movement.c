@@ -48,14 +48,12 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
 void do_unseat_from_vehicle(char_data *ch);
 extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
-extern char *get_room_name(room_data *room, bool color);
 extern int total_small_vehicles_in_room(room_data *room);
 extern int total_vehicle_size_in_room(room_data *room);
 extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
 
 // local protos
 bool can_enter_room(char_data *ch, room_data *room);
-int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room, int dir, bitvector_t flags);
 void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room, int dir, bitvector_t flags);
@@ -1239,9 +1237,6 @@ int move_cost(char_data *ch, room_data *from, room_data *to, int dir, bitvector_
 * @return bool TRUE if the player's vehicle can move there, FALSE if not.
 */
 bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room) {
-	extern bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
-	extern int count_harnessed_animals(vehicle_data *veh);
-
 	char buf[MAX_STRING_LENGTH];
 	bool veh_allows_veh, veh_allows_veh_home, veh_can_go_in;
 	

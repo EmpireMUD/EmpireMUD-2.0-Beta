@@ -34,9 +34,7 @@ extern bool world_map_needs_save;
 // external funcs
 void complete_building(room_data *room);
 void deactivate_workforce_room(empire_data *emp, room_data *room);
-void decustomize_room(room_data *room);
 void decustomize_shared_data(struct shared_room_data *shared);
-extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -494,7 +492,6 @@ OLC_MODULE(mapedit_ruin) {
 
 
 OLC_MODULE(mapedit_exits) {
-	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 	extern room_data *create_room(room_data *home);
 	extern const char *dirs[];
 	extern room_vnum find_free_vnum();
@@ -793,8 +790,6 @@ OLC_MODULE(mapedit_remember) {
 
 
 OLC_MODULE(mapedit_roomtype) {
-	extern bld_data *get_building_by_name(char *name, bool room_only);
-	
 	bld_data *id = NULL;
 
 	if (!IS_INSIDE(IN_ROOM(ch))) {

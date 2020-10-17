@@ -78,7 +78,6 @@ extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_
 void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
-void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
 void deliver_shipment(empire_data *emp, struct shipping_data *shipd);	// act.item.c
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
 extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
@@ -89,12 +88,10 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
-extern char *get_room_name(room_data *room, bool color);
 void refresh_passive_buffs(char_data *ch);
 void replace_question_color(char *input, char *color, char *output);
 void save_whole_world();
 void scale_mob_to_level(char_data *mob, int level);
-void scale_vehicle_to_level(vehicle_data *veh, int level);
 extern char *show_color_codes(char *string);
 extern int stats_get_crop_count(crop_data *cp);
 extern int stats_get_sector_count(sector_data *sect);
@@ -143,8 +140,6 @@ void decustomize_island(int island_id) {
 * @param int island The islands to store it to -- NOT CURRENTLY USED.
 */
 void perform_autostore(obj_data *obj, empire_data *emp, int island) {
-	extern bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
-	
 	obj_data *temp, *next_temp;
 	
 	// store the inside first
@@ -3892,7 +3887,6 @@ SHOW(show_skills) {
 
 
 SHOW(show_buildings) {
-	extern bld_data *get_building_by_name(char *name, bool room_only);
 	extern int stats_get_building_count(bld_data *bdg);
 	
 	char buf[MAX_STRING_LENGTH * 2], line[256], part[256];
@@ -4532,7 +4526,6 @@ SHOW(show_unlearnable) {
 
 SHOW(show_uses) {
 	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-	extern bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH * 3], part[MAX_STRING_LENGTH];
 	craft_data *craft, *next_craft;
@@ -8994,8 +8987,6 @@ ACMD(do_last) {
 
 
 ACMD(do_load) {
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
-	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	vehicle_data *veh;
@@ -9732,7 +9723,6 @@ ACMD(do_rescale) {
 
 ACMD(do_restore) {
 	void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
-	void complete_vehicle(vehicle_data *veh);
 	
 	char name_arg[MAX_INPUT_LENGTH], *type_args, arg[MAX_INPUT_LENGTH], msg[MAX_STRING_LENGTH], types[MAX_STRING_LENGTH];
 	ability_data *abil, *next_abil;

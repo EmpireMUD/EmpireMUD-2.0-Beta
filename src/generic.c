@@ -52,7 +52,6 @@ extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 // local funcs
 struct generic_relation *copy_generic_relations(struct generic_relation *list);
 void free_generic_relations(struct generic_relation **list);
-bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
 
 // external funcs
 extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
@@ -970,7 +969,6 @@ generic_data *create_generic_table_entry(any_vnum vnum) {
 */
 void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	void complete_building(room_data *room);
-	void complete_vehicle(vehicle_data *veh);
 	void refresh_all_quests(char_data *ch);
 	
 	struct trading_post_data *tpd, *next_tpd;

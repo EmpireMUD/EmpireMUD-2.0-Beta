@@ -169,7 +169,9 @@ struct empire_trade_data *find_trade_entry(empire_data *emp, int type, obj_vnum 
 extern int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, double amount);
 #define decrease_empire_coins(emp_gaining, coin_empire, amount)  increase_empire_coins((emp_gaining), (coin_empire), -1 * (amount))
 void perform_abandon_room(room_data *room);
+void perform_abandon_vehicle(vehicle_data *veh);
 void perform_claim_room(room_data *room, empire_data *emp);
+void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 
 // empire production total handlers
 void add_production_total(empire_data *emp, obj_vnum vnum, int amount);

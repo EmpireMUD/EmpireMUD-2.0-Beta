@@ -57,7 +57,6 @@ extern bool despawn_companion(char_data *ch, mob_vnum vnum);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 extern int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
-extern char *get_room_name(room_data *room, bool color);
 extern bool is_ignoring(char_data *ch, char_data *victim);
 void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
 void scale_item_to_level(obj_data *obj, int level);
@@ -568,8 +567,6 @@ void perform_alternate(char_data *old, char_data *new) {
 * @param vehicle_data *into_veh Optional: The vehicle being herded into (pass NULL if n/a).
 */
 void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, vehicle_data *into_veh) {
-	extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
-	
 	room_data *was_in;
 	bool out;
 	
@@ -2613,7 +2610,6 @@ ACMD(do_group) {
 
 ACMD(do_herd) {
 	extern room_data *get_exit_room(room_data *from_room);
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
 	
 	char mob_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH];
 	vehicle_data *into_veh;

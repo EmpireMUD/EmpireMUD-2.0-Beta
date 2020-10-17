@@ -42,7 +42,6 @@ extern const bool interact_one_at_a_time[NUM_INTERACTS];
 extern const char *tool_flags[];
 
 // external funcs
-void complete_vehicle(vehicle_data *veh);
 extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 extern char *get_mine_type_name(room_data *room);
@@ -454,8 +453,6 @@ bool action_flagged(char_data *ch, bitvector_t actf) {
 * @return bool TRUE if any forage interactions ran successfully, FALSE if not.
 */
 bool do_crop_forage(char_data *ch) {
-	extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
-	
 	crop_data *crop;
 	
 	if (!IS_OUTDOOR_TILE(IN_ROOM(ch)) || IS_MAP_BUILDING(IN_ROOM(ch))) {
