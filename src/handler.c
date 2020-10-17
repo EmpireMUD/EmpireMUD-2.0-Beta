@@ -1175,6 +1175,8 @@ void extract_char_final(char_data *ch) {
 	
 	// shut this off -- no need to total during an extract
 	pause_affect_total = TRUE;
+	
+	check_dg_owner_purged_char(ch);
 
 	/* Check to see if we are grouped! */
 	if (GROUP(ch)) {
