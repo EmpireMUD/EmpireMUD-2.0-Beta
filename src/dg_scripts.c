@@ -7762,15 +7762,6 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 			return ret_val;
 		}
 	}
-	
-	// escape when owner purged
-	if (trig->purge_tracker && trig->purge_tracker->purged) {
-		--depth;
-		if (type == OBJ_TRIGGER) {
-			sdd->o = NULL;
-		}
-		return ret_val;
-	}
 
 	switch (type) { /* the script may have been detached */
 		case MOB_TRIGGER:
