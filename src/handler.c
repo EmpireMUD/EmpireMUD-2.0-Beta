@@ -9925,7 +9925,16 @@ bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_d
 	if (!*name_ptr) {
 		return (0);
 	}
-	if (!(number = get_number(&name_ptr))) {
+	if ((number = get_number(&name_ptr)) == 0) {
+		// only looking for players
+		if (IS_SET(bitvector, FIND_CHAR_ROOM) && tar_ch && (*tar_ch = get_player_vis(ch, name_ptr, FIND_CHAR_ROOM))) {
+			return FIND_CHAR_ROOM;
+		}
+		else if (IS_SET(bitvector, FIND_CHAR_WORLD) && tar_ch && (*tar_ch = get_player_vis(ch, name_ptr, FIND_CHAR_WORLD))) {
+			return FIND_CHAR_WORLD;
+		}
+		
+		// otherwise can't handle 0.name
 		return (0);
 	}
 
