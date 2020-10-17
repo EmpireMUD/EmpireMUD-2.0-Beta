@@ -2631,7 +2631,7 @@ ACMD(do_upgrade) {
 	char arg1[MAX_INPUT_LENGTH], *arg2, output[MAX_STRING_LENGTH];
 	vehicle_data *from_veh = NULL, *prev_veh, *to_veh, *old_proto, *veh_proto = NULL;
 	room_data *from_room = NULL, *interior, *in_room, *room_iter;
-	craft_data *find_craft, *to_craft, *missing_abil = NULL;
+	craft_data *find_craft, *to_craft, *from_craft = NULL, *missing_abil = NULL;
 	struct bld_relation *relat, *lists[2];
 	obj_data *obj, *next_obj, *found_obj;
 	struct room_direction_data *exits;
@@ -2888,6 +2888,11 @@ ACMD(do_upgrade) {
 		msg_to_char(ch, "You begin to upgrade the building.\r\n");
 		act("$n starts upgrading the building.", FALSE, ch, NULL, NULL, TO_ROOM);
 		
+		// look up original recipe
+		if (get_room_extra_data(from_room, ROOM_EXTRA_BUILD_RECIPE) > 0) {
+			from_craft = craft_proto(get_room_extra_data(from_room, ROOM_EXTRA_BUILD_RECIPE));
+		}
+		
 		// store some data
 		built_with = GET_BUILT_WITH(from_room);
 		GET_BUILT_WITH(from_room) = NULL;
@@ -2914,6 +2919,11 @@ ACMD(do_upgrade) {
 		act("You start upgrading $V.", FALSE, ch, NULL, from_veh, TO_CHAR);
 		act("$n starts upgrading $V.", FALSE, ch, NULL, from_veh, TO_ROOM);
 		
+		// look up original recipe
+		if (get_vehicle_extra_data(from_veh, ROOM_EXTRA_BUILD_RECIPE) > 0) {
+			from_craft = craft_proto(get_vehicle_extra_data(from_veh, ROOM_EXTRA_BUILD_RECIPE));
+		}
+		
 		// store some data
 		built_with = VEH_BUILT_WITH(from_veh);
 		VEH_BUILT_WITH(from_veh) = NULL;
@@ -2935,6 +2945,11 @@ ACMD(do_upgrade) {
 	else {
 		msg_to_char(ch, "There was an unexpected error in the upgrade process.\r\n");
 		return;
+	}
+	
+	// crunch some additional data
+	if (from_craft && CRAFT_FLAGGED(from_craft, CRAFT_TAKE_REQUIRED_OBJ) && GET_CRAFT_REQUIRES_OBJ(from_craft) != NOTHING) {
+		add_to_resource_list(&built_with, RES_OBJECT, GET_CRAFT_REQUIRES_OBJ(from_craft), 1, 0);
 	}
 	
 	// ---- upgrade-from above; upgrade-to below -----
