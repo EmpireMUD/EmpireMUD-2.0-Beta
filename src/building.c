@@ -2642,9 +2642,9 @@ ACMD(do_upgrade) {
 	size_t size;
 	
 	// for moving data
+	int private_owner = NOBODY, dedicated_to = 0;
 	struct depletion_data *depletion = NULL;
 	struct resource_data *built_with = NULL;
-	int private_owner = NOBODY;
 	bool bright_paint = FALSE;
 	int paint_color = 0;
 	
@@ -2904,6 +2904,10 @@ ACMD(do_upgrade) {
 			COMPLEX_DATA(from_room)->private_owner = NOBODY;
 		}
 		
+		// store dedication and remove it
+		dedicated_to = get_room_extra_data(from_room, ROOM_EXTRA_DEDICATE_ID);
+		remove_room_extra_data(from_room, ROOM_EXTRA_DEDICATE_ID);
+		
 		// store paint color and remove it
 		paint_color = get_room_extra_data(from_room, ROOM_EXTRA_PAINT_COLOR);
 		remove_room_extra_data(from_room, ROOM_EXTRA_PAINT_COLOR);
@@ -2934,6 +2938,10 @@ ACMD(do_upgrade) {
 			private_owner = ROOM_PRIVATE_OWNER(VEH_INTERIOR_HOME_ROOM(from_veh));
 			COMPLEX_DATA(VEH_INTERIOR_HOME_ROOM(from_veh))->private_owner = NOBODY;
 		}
+		
+		// store dedication and remove it
+		dedicated_to = get_vehicle_extra_data(from_veh, ROOM_EXTRA_DEDICATE_ID);
+		remove_vehicle_extra_data(from_veh, ROOM_EXTRA_DEDICATE_ID);
 		
 		// record and remove paint color
 		paint_color = get_vehicle_extra_data(from_veh, ROOM_EXTRA_PAINT_COLOR);
@@ -2995,7 +3003,11 @@ ACMD(do_upgrade) {
 		GET_BUILT_WITH(in_room) = built_with;
 		ROOM_DEPLETION(in_room) = depletion;
 		
-		if (paint_color > 0) {
+		if (dedicated_to > 0 && ROOM_BLD_FLAGGED(in_room, BLD_DEDICATE)) {
+			set_room_extra_data(in_room, ROOM_EXTRA_DEDICATE_ID, dedicated_to);
+		}
+		
+		if (paint_color > 0 && !ROOM_BLD_FLAGGED(in_room, BLD_NO_PAINT)) {
 			set_room_extra_data(in_room, ROOM_EXTRA_PAINT_COLOR, paint_color);
 			if (bright_paint) {
 				SET_BIT(ROOM_BASE_FLAGS(in_room), ROOM_AFF_BRIGHT_PAINT);
@@ -3156,6 +3168,10 @@ ACMD(do_upgrade) {
 		// transfer stuff from old data
 		VEH_BUILT_WITH(to_veh) = built_with;
 		VEH_DEPLETION(to_veh) = depletion;
+		
+		if (dedicated_to > 0 && VEH_FLAGGED(to_veh, BLD_DEDICATE)) {
+			set_vehicle_extra_data(to_veh, ROOM_EXTRA_DEDICATE_ID, dedicated_to);
+		}
 		
 		// check the paint
 		if (paint_color > 0 && !VEH_FLAGGED(to_veh, VEH_NO_PAINT)) {
