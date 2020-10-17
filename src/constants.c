@@ -659,7 +659,7 @@ const char *preference_bits[] = {
 	"TRAVEL-LOOK",
 	"AUTOCLIMB",
 	"AUTOSWIM",
-	"!ITEM-QUALITY",
+	"ITEM-QUALITY",
 	"ITEM-DETAILS",
 	"!EXITS",
 	"\n"
