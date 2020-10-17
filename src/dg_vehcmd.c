@@ -723,7 +723,6 @@ VCMD(do_vsiege) {
 	vehicle_data *veh_targ = NULL;
 	room_data *room_targ = NULL;
 	int dam, dir, scale = -1;
-	bool self, res;
 	
 	two_arguments(argument, tar_arg, scale_arg);
 	
@@ -767,8 +766,7 @@ VCMD(do_vsiege) {
 		}
 	}
 	else if (veh_targ) {
-		self = (veh_targ == veh);
-		res = besiege_vehicle(NULL, veh_targ, dam, SIEGE_PHYSICAL, veh);
+		besiege_vehicle(NULL, veh_targ, dam, SIEGE_PHYSICAL, veh);
 	}
 	else {
 		veh_log(veh, "vsiege: invalid target");
