@@ -1542,7 +1542,7 @@ void create_dg_owner_purged_tracker(trig_data *trig, char_data *ch, obj_data *ob
 		trig->purge_tracker = tracker;
 	}
 	
-	trig->purge_tracker->parent = trig;
+	tracker->parent = trig;
 	
 	if (ch && ch != tracker->ch) {
 		tracker->ch = ch;
