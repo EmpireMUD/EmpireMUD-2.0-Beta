@@ -353,7 +353,7 @@ int char_script_id(char_data *ch) {
 			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for mobiles has exceeded the limit, scheduling an auto-reboot");
 		}
 	}
-	else if (ch->script_id == 0 && !IS_NPC(ch)) {
+	else if (ch->script_id == 0 && !IS_NPC(ch) && GET_IDNUM(ch) > 0) {
 		ch->script_id = GET_IDNUM(ch);
 		add_to_lookup_table(ch->script_id, (void *)ch);
 		ch->in_lookup_table = TRUE;
