@@ -7545,12 +7545,12 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 		case MOB_TRIGGER:
 			go = sdd->c;
 			sc = SCRIPT((char_data*) go);
-			create_dg_owner_purged_tracker(trig, go, NULL, NULL, NULL);
+			create_dg_owner_purged_tracker(trig, (char_data*) go, NULL, NULL, NULL);
 			break;
 		case OBJ_TRIGGER:
 			go = sdd->o;
 			sc = SCRIPT((obj_data*) go);
-			create_dg_owner_purged_tracker(trig, NULL, go, NULL, NULL);
+			create_dg_owner_purged_tracker(trig, NULL, (obj_data*) go, NULL, NULL);
 			break;
 		case WLD_TRIGGER:
 		case RMT_TRIGGER:
@@ -7558,12 +7558,12 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 		case ADV_TRIGGER:
 			go = sdd->r;
 			sc = SCRIPT((room_data*) go);
-			create_dg_owner_purged_tracker(trig, NULL, NULL, go, NULL);
+			create_dg_owner_purged_tracker(trig, NULL, NULL, (room_data*) go, NULL);
 			break;
 		case VEH_TRIGGER: {
 			go = sdd->v;
 			sc = SCRIPT((vehicle_data*) go);
-			create_dg_owner_purged_tracker(trig, NULL, NULL, NULL, go);
+			create_dg_owner_purged_tracker(trig, NULL, NULL, NULL, (vehicle_data*) go);
 			break;
 		}
 		case EMP_TRIGGER: {

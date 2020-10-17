@@ -139,6 +139,8 @@ void free_trigger(trig_data *trig) {
 		GET_TRIG_WAIT(trig) = NULL;
 	}
 	
+	cancel_dg_owner_purged_tracker(trig);
+	
 	LL_PREPEND2(free_trigger_list, trig, next_to_free);
 }
 
@@ -221,8 +223,6 @@ void extract_trigger(trig_data *trig) {
 	if (trig == stc_next_random_trig) {
 		stc_next_random_trig = trig->next_in_random_triggers;
 	}
-	
-	cancel_dg_owner_purged_tracker(trig);
 	
 	if (GET_TRIG_WAIT(trig)) {
 		dg_event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
