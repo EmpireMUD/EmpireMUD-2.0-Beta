@@ -525,10 +525,7 @@ void delete_room(room_data *room, bool check_exits) {
 		return;
 	}
 	
-	if (room == dg_owner_room) {
-		dg_owner_purged = 1;
-		dg_owner_room = NULL;
-	}
+	check_dg_owner_purged_room(room);
 	
 	// delete this first
 	if (ROOM_UNLOAD_EVENT(room)) {

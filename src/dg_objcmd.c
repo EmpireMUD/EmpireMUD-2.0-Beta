@@ -884,9 +884,6 @@ OCMD(do_opurge) {
 	}
 	// purge obj
 	else if ((o = get_obj_by_obj(obj, arg))) {
-		if (o == obj) {
-			dg_owner_purged = 1;
-		}
 		if (*argument) {
 			room_data *room = obj_room(o);
 			act(argument, TRUE, room ? ROOM_PEOPLE(room) : NULL, o, NULL, TO_CHAR | TO_ROOM);
@@ -1753,9 +1750,6 @@ OCMD(do_oscale) {
 		else if ((proto = obj_proto(GET_OBJ_VNUM(otarg))) && OBJ_FLAGGED(proto, OBJ_SCALABLE)) {
 			fresh = fresh_copy_obj(otarg, level);
 			swap_obj_for_obj(otarg, fresh);
-			if (otarg == obj) {
-				dg_owner_purged = 1;
-			}
 			extract_obj(otarg);
 		}
 		else {

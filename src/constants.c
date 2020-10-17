@@ -4400,6 +4400,7 @@ const char *vehicle_flags[] = {
 	"!PAINT",
 	"*BRIGHT-PAINT",
 	"DEDICATE",
+	"*EXTRACTED",
 	"\n"
 };
 
@@ -4440,6 +4441,7 @@ const char *identify_vehicle_flags[] = {
 	"",	// no-paint
 	"",	// bright-paint
 	"can dedicate",
+	"",	// *EXTRACTED
 	"\n"
 };
 

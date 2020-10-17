@@ -2151,7 +2151,7 @@ int destroy_vtrigger(vehicle_data *veh) {
 		}
 	}
 
-	return dg_owner_purged ? 0 : 1;
+	return 1;
 }
 
 

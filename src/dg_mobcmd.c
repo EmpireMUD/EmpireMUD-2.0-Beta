@@ -977,10 +977,6 @@ ACMD(do_mpurge) {
 			return;
 		}
 
-		if (victim == ch) {
-			dg_owner_purged = 1;
-		}
-
 		if (*argument) {
 			act(argument, TRUE, victim, NULL, NULL, TO_ROOM);
 		}

@@ -3111,11 +3111,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									void out_of_blood(char_data *ch);
 									
 									out_of_blood(c);
-									
-									if (ch && c == ch && EXTRACTED(c)) {
-										// in case
-										dg_owner_purged = 1;
-									}
 								}
 							}
 							
@@ -7528,24 +7523,17 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 	}
 
 	depth++;
-	
-	// update dg owners
-	dg_owner_purged = 0;
-	dg_owner_mob = NULL;
-	dg_owner_obj = NULL;
-	dg_owner_veh = NULL;
-	dg_owner_room = NULL;
 
 	switch (type) {
 		case MOB_TRIGGER:
 			go = sdd->c;
 			sc = SCRIPT((char_data*) go);
-			dg_owner_mob = (char_data*)go;
+			create_dg_owner_purged_tracker(trig, go, NULL, NULL, NULL);
 			break;
 		case OBJ_TRIGGER:
 			go = sdd->o;
 			sc = SCRIPT((obj_data*) go);
-			dg_owner_obj = (obj_data*)go;
+			create_dg_owner_purged_tracker(trig, NULL, go, NULL, NULL);
 			break;
 		case WLD_TRIGGER:
 		case RMT_TRIGGER:
@@ -7553,12 +7541,12 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 		case ADV_TRIGGER:
 			go = sdd->r;
 			sc = SCRIPT((room_data*) go);
-			dg_owner_room = (room_data*)go;
+			create_dg_owner_purged_tracker(trig, NULL, NULL, go, NULL);
 			break;
 		case VEH_TRIGGER: {
 			go = sdd->v;
 			sc = SCRIPT((vehicle_data*) go);
-			dg_owner_veh = (vehicle_data*)go;
+			create_dg_owner_purged_tracker(trig, NULL, NULL, NULL, go);
 			break;
 		}
 		case EMP_TRIGGER: {
@@ -7749,10 +7737,11 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 		}
 		
 		// escape when owner purged
-		if (dg_owner_purged) {
-				depth--;
-			if (type == OBJ_TRIGGER) 
+		if (trig->purge_tracker && trig->purge_tracker->purged) {
+			--depth;
+			if (type == OBJ_TRIGGER) {
 				sdd->o = NULL;
+			}
 			return ret_val;
 		}
 	}
@@ -7785,6 +7774,7 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 		free_varlist(GET_TRIG_VARS(trig));
 	GET_TRIG_VARS(trig) = NULL;
 	GET_TRIG_DEPTH(trig) = 0;
+	cancel_dg_owner_purged_tracker(trig);
 
 	depth--;
 	return ret_val;

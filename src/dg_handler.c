@@ -222,6 +222,8 @@ void extract_trigger(trig_data *trig) {
 		stc_next_random_trig = trig->next_in_random_triggers;
 	}
 	
+	cancel_dg_owner_purged_tracker(trig);
+	
 	if (GET_TRIG_WAIT(trig)) {
 		dg_event_cancel(GET_TRIG_WAIT(trig), cancel_wait_event);
 		GET_TRIG_WAIT(trig) = NULL;

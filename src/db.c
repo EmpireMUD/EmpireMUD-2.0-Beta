@@ -229,11 +229,6 @@ trig_data *free_trigger_list = NULL;	// LL of triggers to free (next_to_free)
 int max_mob_id = MOB_ID_BASE;	// for unique mob ids
 int max_obj_id = OBJ_ID_BASE;	// for unique obj ids
 int max_vehicle_id = VEHICLE_ID_BASE;	// for unique vehicle ids
-int dg_owner_purged = 0;	// For control of scripts
-char_data *dg_owner_mob = NULL;	// for detecting self-purge
-obj_data *dg_owner_obj = NULL;
-vehicle_data *dg_owner_veh = NULL;
-room_data *dg_owner_room = NULL;
 
 // vehicles
 vehicle_data *vehicle_table = NULL;	// master vehicle hash table

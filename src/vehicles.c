@@ -1393,6 +1393,8 @@ bool audit_vehicle(vehicle_data *veh, char_data *ch) {
 * @param vehicle_data *veh The vehicle.
 */
 void complete_vehicle(vehicle_data *veh) {
+	room_data *room = IN_ROOM(veh);	// store room in case veh is purged during a trigger
+	
 	if (VEH_IS_DISMANTLING(veh)) {
 		// short-circuit out to dismantling
 		finish_dismantle_vehicle(NULL, veh);
@@ -1426,13 +1428,11 @@ void complete_vehicle(vehicle_data *veh) {
 		
 		// run triggers
 		load_vtrigger(veh);
-		if (dg_owner_purged) {
-			// prevent crashes here
-			return;
-		}
 	}
 	
-	affect_total_room(IN_ROOM(veh));
+	if (room) {
+		affect_total_room(room);
+	}
 }
 
 
@@ -3153,6 +3153,7 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
+	void extract_pending_vehicles();
 	
 	struct obj_storage_type *store, *next_store;
 	vehicle_data *veh, *iter, *next_iter;
@@ -3183,6 +3184,9 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 		}
 		extract_vehicle(iter);
 	}
+	
+	// ensure vehicles are gone
+	extract_pending_vehicles();
 	
 	// remove it from the hash table first
 	remove_vehicle_from_table(veh);
