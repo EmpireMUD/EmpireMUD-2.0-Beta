@@ -681,7 +681,7 @@ else
 end
 set cycles_left 3
 while %cycles_left% >= 0
-  if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+  if (%actor.room% != %room%) || !%actor.can_act%
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < 3
       %echoaround% %actor% |%actor% summoning is interrupted.

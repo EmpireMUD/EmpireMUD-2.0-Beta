@@ -648,7 +648,7 @@ while %cycles_left% >= 0
     end
     set object %object.next_in_list%
   done
-  if (%actor.room% != %room%) || !%actor.canuseroom_member(%room%)% || !%sector_valid% || %cloud_present% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+  if (%actor.room% != %room%) || !%actor.canuseroom_member(%room%)% || !%sector_valid% || %cloud_present% || !%actor.can_act%
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < 5
       %echoaround% %actor% |%actor% chant is interrupted.
@@ -1036,7 +1036,7 @@ set start_cycles 5
 set cycles_left %start_cycles%
 while %cycles_left% >= 0
   eval location_valid (%room.building% == Tower of Sorcery || %room.building% == Top of the Tower)
-  if (%actor.room% != %room%) || !%actor.canuseroom_guest(%room%)% || !%location_valid% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+  if (%actor.room% != %room%) || !%actor.canuseroom_guest(%room%)% || !%location_valid% || !%actor.can_act%
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < %start_cycles%
       %echoaround% %actor% |%actor% studying is interrupted.
@@ -1375,7 +1375,7 @@ set room %actor.room%
 set cycles_left 5
 while %cycles_left% >= 0
   eval sector_valid (%room.template% == 10145)
-  if (%actor.room% != %room%) || !%sector_valid% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+  if (%actor.room% != %room%) || !%sector_valid% || !%actor.can_act%
     * We've either moved or the room's no longer suitable for the ritual
     if %cycles_left% < 5
       %echoaround% %actor% |%actor% ritual is interrupted.
@@ -1513,7 +1513,7 @@ while %cycles_left% >= 0
     end
     set object %object.next_in_list%
   done
-  if (%actor.room% != %room%) || !%sector_valid% || !%rift_present% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+  if (%actor.room% != %room%) || !%sector_valid% || !%rift_present% || !%actor.can_act%
     * We've either moved or the room's no longer suitable for the chant
     if %cycles_left% < 5
       %echoaround% %actor% |%actor% ritual is interrupted.
@@ -1623,7 +1623,7 @@ end
 set room %actor.room%
 set cycles_left 5
 while %cycles_left% >= 0
-  if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+  if (%actor.room% != %room%) || !%actor.can_act%
     * We've either moved or the room's no longer suitable for the action
     if %cycles_left% < 5
       %echoaround% %actor% |%actor% search is interrupted.

@@ -914,7 +914,7 @@ set room %actor.room%
 set cycles_left 3
 while %cycles_left% >= 0
   eval sector_valid (!%room.building% && !%room.template%) || (%room.building% && %room.bld_flagged(OPEN)%)
-  if !%sector_valid% || %actor.room% != %room% || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing) || %actor.aff_flagged(DISTRACTED)%
+  if !%sector_valid% || %actor.room% != %room% || !%actor.can_act%
     if %cycles_left% < 3
       %echoaround% %actor% |%actor% stormcall is interrupted.
       %send% %actor% Your stormcall is interrupted.

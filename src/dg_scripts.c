@@ -3159,7 +3159,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					*/
 					
-					if (!str_cmp(field, "can_afford")) {
+					if (!str_cmp(field, "can_act")) {
+						if (!AFF_FLAGGED(c, AFF_DISTRACTED) && GET_POS(c) == POS_STANDING && !FIGHTING(c) && (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) && !EXTRACTED(c) && !GET_FEEDING_FROM(c) && !GET_FED_ON_BY(c) && !IS_DEAD(c) && !AFF_FLAGGED(c, AFF_STUNNED | AFF_HARD_STUNNED)) {
+							strcpy(str, "1");
+						}
+						else {
+							strcpy(str, "0");
+						}
+					}
+					else if (!str_cmp(field, "can_afford")) {
 						if (subfield && isdigit(*subfield)) {
 							if (can_afford_coins(c, (type == MOB_TRIGGER) ? GET_LOYALTY((char_data*)go) : REAL_OTHER_COIN, atoi(subfield))) {
 								snprintf(str, slen, "1");

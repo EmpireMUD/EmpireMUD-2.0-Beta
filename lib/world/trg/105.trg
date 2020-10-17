@@ -1148,7 +1148,7 @@ end
 set room %actor.room%
 set cycles_left 5
 while %cycles_left% >= 0
-  if (%actor.room% != %room%) || %actor.fighting% || %actor.disabled% || (%actor.position% != Standing)
+  if (%actor.room% != %room%) || !%actor.can_act%
     * We've either moved or the room's no longer suitable for the action
     if %cycles_left% < 5
       %echoaround% %actor% |%actor% ritual is interrupted.
