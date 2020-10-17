@@ -45,7 +45,6 @@ void decustomize_shared_data(struct shared_room_data *shared);
 //// EDIT MODULES ////////////////////////////////////////////////////////////
 
 OLC_MODULE(mapedit_build) {
-	void herd_animals_out(room_data *location);
 	void special_building_setup(char_data *ch, room_data *room);
 	extern const int rev_dir[];
 	
@@ -492,7 +491,6 @@ OLC_MODULE(mapedit_ruin) {
 
 
 OLC_MODULE(mapedit_exits) {
-	extern room_data *create_room(room_data *home);
 	extern const char *dirs[];
 	extern room_vnum find_free_vnum();
 	extern const int rev_dir[];

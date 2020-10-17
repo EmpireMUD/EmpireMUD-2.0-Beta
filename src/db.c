@@ -50,7 +50,6 @@
 void check_delayed_load(char_data *ch);
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 void discrete_load(FILE *fl, int mode, char *filename);
-void free_complex_data(struct complex_room_data *data);
 void index_boot(int mode);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void save_whole_world();
@@ -3799,7 +3798,6 @@ void b5_86_update(void) {
 // also adds old-growth forests
 void b5_87_crop_and_old_growth(void) {
 	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
-	void stop_room_action(room_data *room, int action);
 	void uncrop_tile(room_data *room);
 	
 	int removed_crop = 0, total_crop = 0, new_og = 0, total_forest = 0;

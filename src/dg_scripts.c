@@ -3909,8 +3909,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%s", GET_LAST_DIR(c) != NO_DIR ? dirs[GET_LAST_DIR(c)] : "");
 					}
 					else if (!str_cmp(field, "learned")) {
-						extern bool has_learned_craft(char_data *ch, any_vnum vnum);
-						
 						if (subfield && *subfield && isdigit(*subfield) && has_learned_craft(c, atoi(subfield))) {
 							strcpy(str, "1");
 						}

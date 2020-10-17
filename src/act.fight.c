@@ -38,7 +38,6 @@ extern obj_data *die(char_data *ch, char_data *killer);
 extern int determine_best_scale_level(char_data *ch, bool check_group);	// mobact.c
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
-void scale_item_to_level(obj_data *obj, int level);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 
 

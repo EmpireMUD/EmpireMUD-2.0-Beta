@@ -44,7 +44,6 @@ obj_data *get_obj_in_room(room_data *room, char *name);
 extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 extern room_data *obj_room(obj_data *obj);
-void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void wld_command_interpreter(room_data *room, char *argument);
 

@@ -46,8 +46,6 @@ extern double get_base_dps(obj_data *weapon);
 extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 extern char *get_mine_type_name(room_data *room);
 extern bool is_deep_mine(room_data *room);
-void process_build(char_data *ch, room_data *room, int act_type);
-void scale_item_to_level(obj_data *obj, int level);
 void schedule_crop_growth(struct map_data *map);
 void uncrop_tile(room_data *room);
 
@@ -2412,8 +2410,6 @@ void process_planting(char_data *ch) {
 * @param char_data *ch The prospector.
 */
 void process_prospecting(char_data *ch) {
-	void init_mine(room_data *room, char_data *ch, empire_data *emp);
-	
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark for you to keep prospecting.\r\n");
 		cancel_action(ch);
@@ -2957,8 +2953,6 @@ void do_burn_area(char_data *ch, int subcmd) {
 
 
 ACMD(do_excavate) {
-	extern bool is_entrance(room_data *room);
-	
 	struct evolution_data *evo;
 	sector_data *orig;
 	

@@ -68,7 +68,6 @@ extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern room_data *obj_room(obj_data *obj);
-void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 void send_char_pos(char_data *ch, int dam);
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);

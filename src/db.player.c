@@ -4297,7 +4297,6 @@ int get_highest_access_level(account_data *acct) {
 * @param int pos Where to equip it, or NO_WEAR for inventory.
 */
 void give_newbie_gear(char_data *ch, obj_vnum vnum, int pos) {
-	void scale_item_to_level(obj_data *obj, int level);
 	extern const struct wear_data_type wear_data[NUM_WEARS];
 	
 	obj_data *obj;

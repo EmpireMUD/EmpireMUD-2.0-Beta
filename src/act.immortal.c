@@ -9651,8 +9651,6 @@ ACMD(do_reload) {
 
 
 ACMD(do_rescale) {
-	void scale_item_to_level(obj_data *obj, int level);
-	
 	vehicle_data *veh;
 	obj_data *obj, *new;
 	char_data *vict;

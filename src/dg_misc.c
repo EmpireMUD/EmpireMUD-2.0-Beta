@@ -53,8 +53,6 @@ extern const char *affected_bits[];
 * @return room_data* The created room.
 */
 room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
-	extern room_data *create_room(room_data *home);
-	
 	room_data *home = HOME_ROOM(from), *new;
 	
 	// create the new room

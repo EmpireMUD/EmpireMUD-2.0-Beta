@@ -56,7 +56,6 @@ extern const char *trade_mostleast[];
 extern const char *trade_overunder[];
 
 // external funcs
-extern bool can_claim(char_data *ch);
 void check_nowhere_einv(empire_data *emp, int new_island);
 extern int city_points_available(empire_data *emp);
 void clear_private_owner(int id);
@@ -69,7 +68,6 @@ extern bool empire_is_ignoring(empire_data *emp, char_data *victim);
 extern int get_main_island(empire_data *emp);
 extern int get_total_score(empire_data *emp);
 extern bool is_trading_with(empire_data *emp, empire_data *partner);
-struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 void identify_obj_to_char(obj_data *obj, char_data *ch);
 void refresh_all_quests(char_data *ch);
@@ -1756,7 +1754,6 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 
 void found_city(char_data *ch, empire_data *emp, char *argument) {
 	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
-	void stop_room_action(room_data *room, int action);
 	extern int highest_start_loc_index;
 	extern int *start_locs;
 	

@@ -335,7 +335,6 @@ ACMD(do_damage_spell) {
 ACMD(do_ready) {
 	extern bool check_vampire_sun(char_data *ch, bool message);
 	void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
-	void scale_item_to_level(obj_data *obj, int level);
 	extern const char *pool_types[];
 	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], *to_char, *to_room;

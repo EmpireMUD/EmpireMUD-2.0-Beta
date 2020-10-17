@@ -37,7 +37,6 @@
 // external vars
 
 // external funcs
-void scale_item_to_level(obj_data *obj, int level);
 extern bool trigger_counterspell(char_data *ch);	// spells.c
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 

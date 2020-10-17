@@ -39,8 +39,6 @@ extern int size_of_world;
 
 // external funcs
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
-extern int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
-void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 extern int stats_get_building_count(bld_data *bdg);
 extern int stats_get_sector_count(sector_data *sect);
@@ -410,8 +408,6 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 * @return room_data* The new room.
 */
 static room_data *instantiate_one_room(struct instance_data *inst, room_template *rmt) {
-	extern room_data *create_room(room_data *home);
-	
 	const bitvector_t default_affs = ROOM_AFF_UNCLAIMABLE;
 	
 	sector_data *sect;
@@ -687,8 +683,6 @@ bool validate_linking_limits(adv_data *adv, room_data *loc, struct map_data *map
 * @return bool TRUE if the location seems ok.
 */
 bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, struct map_data *map) {
-	extern bool is_entrance(room_data *room);
-	
 	room_data *home;
 	struct island_info *isle = NULL;
 	empire_data *emp;

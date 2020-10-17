@@ -54,7 +54,6 @@ void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
 void assign_class_abilities(char_data *ch, class_data *cls, int role);
 void resort_empires(bool force);
 extern bool is_class_ability(ability_data *abil);
-void scale_item_to_level(obj_data *obj, int level);
 void update_class(char_data *ch);
 
 // local protos

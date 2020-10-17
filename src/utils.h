@@ -1645,168 +1645,169 @@ void add_string_hash(struct string_hash **hash, const char *string, int count);
 void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count);
 void free_string_hash(struct string_hash **hash);
 void free_vnum_hash(struct vnum_hash **hash);
-extern int sort_string_hash(struct string_hash *a, struct string_hash *b);
+int sort_string_hash(struct string_hash *a, struct string_hash *b);
 
 // basic functions from utils.c
-extern bool any_players_in_room(room_data *room);
-extern const char *PERS(char_data *ch, char_data *vict, bool real);
-extern double diminishing_returns(double val, double scale);
-extern int att_max(char_data *ch);
-extern int count_bits(bitvector_t bitset);
-extern int dice(int number, int size);
-extern int number(int from, int to);
-extern struct time_info_data *age(char_data *ch);
-extern struct time_info_data *mud_time_passed(time_t t2, time_t t1);
-extern struct time_info_data *real_time_passed(time_t t2, time_t t1);
+bool any_players_in_room(room_data *room);
+const char *PERS(char_data *ch, char_data *vict, bool real);
+double diminishing_returns(double val, double scale);
+int att_max(char_data *ch);
+int count_bits(bitvector_t bitset);
+int dice(int number, int size);
+int number(int from, int to);
+struct time_info_data *age(char_data *ch);
+struct time_info_data *mud_time_passed(time_t t2, time_t t1);
+struct time_info_data *real_time_passed(time_t t2, time_t t1);
 
 // building functions from utils.c
 bld_data *get_building_by_name(char *name, bool room_only);
 
 // component functions from utils.c
-extern generic_data *find_generic_component(char *name);
-extern bool is_basic_component(obj_data *obj);
-extern bool is_component(obj_data *obj, generic_data *cmp);
+generic_data *find_generic_component(char *name);
+bool is_basic_component(obj_data *obj);
+bool is_component(obj_data *obj, generic_data *cmp);
 #define is_component_vnum(obj, vnum)  is_component((obj), real_generic(vnum))
 
 // empire utils from utils.c
-extern int count_members_online(empire_data *emp);
-extern int count_tech(empire_data *emp);
+bool can_claim(char_data *ch);
+int count_members_online(empire_data *emp);
+int count_tech(empire_data *emp);
 
 // empire diplomacy utils from utils.c
-extern bool char_has_relationship(char_data *ch_a, char_data *ch_b, bitvector_t dipl_bits);
-extern bool empire_is_friendly(empire_data *emp, empire_data *enemy);
-extern bool empire_is_hostile(empire_data *emp, empire_data *enemy, room_data *loc);
-extern bool has_empire_trait(empire_data *emp, room_data *loc, bitvector_t trait);
-extern bool has_relationship(empire_data *emp, empire_data *fremp, bitvector_t diplomacy);
+bool char_has_relationship(char_data *ch_a, char_data *ch_b, bitvector_t dipl_bits);
+bool empire_is_friendly(empire_data *emp, empire_data *enemy);
+bool empire_is_hostile(empire_data *emp, empire_data *enemy, room_data *loc);
+bool has_empire_trait(empire_data *emp, room_data *loc, bitvector_t trait);
+bool has_relationship(empire_data *emp, empire_data *fremp, bitvector_t diplomacy);
 
 // interpreter utils from utils.c
-extern char *any_one_arg(char *argument, char *first_arg);
-extern char *any_one_word(char *argument, char *first_arg);
+char *any_one_arg(char *argument, char *first_arg);
+char *any_one_word(char *argument, char *first_arg);
 void chop_last_arg(char *string, char *most_args, char *last_arg);
 void comma_args(char *string, char *arg1, char *arg2);
-extern int fill_word(char *argument);
+int fill_word(char *argument);
 void half_chop(char *string, char *arg1, char *arg2);
-extern int is_abbrev(const char *arg1, const char *arg2);
-extern bool is_multiword_abbrev(const char *arg, const char *phrase);
-extern int is_number(const char *str);
-extern char *one_argument(char *argument, char *first_arg);
-extern char *one_word(char *argument, char *first_arg);
-extern int reserved_word(char *argument);
-extern int search_block(char *arg, const char **list, int exact);
+int is_abbrev(const char *arg1, const char *arg2);
+bool is_multiword_abbrev(const char *arg, const char *phrase);
+int is_number(const char *str);
+char *one_argument(char *argument, char *first_arg);
+char *one_word(char *argument, char *first_arg);
+int reserved_word(char *argument);
+int search_block(char *arg, const char **list, int exact);
 void skip_spaces(char **string);
-extern char *two_arguments(char *argument, char *first_arg, char *second_arg);
+char *two_arguments(char *argument, char *first_arg, char *second_arg);
 void ucwords(char *string);
 
 // permission utils from utils.c
-extern bool can_build_or_claim_at_war(char_data *ch, room_data *loc);
-extern bool can_use_room(char_data *ch, room_data *room, int mode);
-extern bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
-extern bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode);
+bool can_build_or_claim_at_war(char_data *ch, room_data *loc);
+bool can_use_room(char_data *ch, room_data *room, int mode);
+bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
+bool emp_can_use_vehicle(empire_data *emp, vehicle_data *veh, int mode);
 #define can_use_vehicle(ch, veh, mode)  (IS_IMMORTAL(ch) || (emp_can_use_vehicle(GET_LOYALTY(ch), (veh), (mode)) && (!VEH_INTERIOR_HOME_ROOM(veh) || can_use_room((ch), VEH_INTERIOR_HOME_ROOM(veh), (mode)))))
-extern bool has_permission(char_data *ch, int type, room_data *loc);
-extern bool has_tech_available(char_data *ch, int tech);
-extern bool has_tech_available_room(room_data *room, int tech);
-extern bool is_at_war(empire_data *emp);
-extern int land_can_claim(empire_data *emp, int ter_type);
+bool has_permission(char_data *ch, int type, room_data *loc);
+bool has_tech_available(char_data *ch, int tech);
+bool has_tech_available_room(room_data *room, int tech);
+bool is_at_war(empire_data *emp);
+int land_can_claim(empire_data *emp, int ter_type);
 
 // file utilities from utils.c
-extern int get_filename(char *orig_name, char *filename, int mode);
-extern int get_line(FILE *fl, char *buf);
-extern int touch(const char *path);
+int get_filename(char *orig_name, char *filename, int mode);
+int get_line(FILE *fl, char *buf);
+int touch(const char *path);
 
 // logging functions from utils.c
-extern char *room_log_identifier(room_data *room);
+char *room_log_identifier(room_data *room);
 void basic_mud_log(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
 void log_to_empire(empire_data *emp, int type, const char *str, ...) __attribute__((format(printf, 3, 4)));
 void mortlog(const char *str, ...) __attribute__((format(printf, 1, 2)));
 void syslog(bitvector_t type, int level, bool file, const char *str, ...) __attribute__((format(printf, 4, 5)));
 
 // mobile functions from utils.c
-extern char *get_mob_name_by_proto(mob_vnum vnum, bool replace_placeholders);
+char *get_mob_name_by_proto(mob_vnum vnum, bool replace_placeholders);
 
 // object functions from utils.c
-extern char *get_obj_name_by_proto(obj_vnum vnum);
-extern obj_data *get_top_object(obj_data *obj);
-extern double rate_item(obj_data *obj);
+char *get_obj_name_by_proto(obj_vnum vnum);
+obj_data *get_top_object(obj_data *obj);
+double rate_item(obj_data *obj);
 
 // player functions from utils.c
 void command_lag(char_data *ch, int wait_type);
 void determine_gear_level(char_data *ch);
-extern int pick_level_from_range(int level, int min, int max);
-extern bool wake_and_stand(char_data *ch);
+int pick_level_from_range(int level, int min, int max);
+bool wake_and_stand(char_data *ch);
 
 // resource functions from utils.c
 void add_to_resource_list(struct resource_data **list, int type, any_vnum vnum, int amount, int misc);
 void apply_resource(char_data *ch, struct resource_data *res, struct resource_data **list, obj_data *use_obj, int msg_type, vehicle_data *crafting_veh, struct resource_data **build_used_list);
 void extract_resources(char_data *ch, struct resource_data *list, bool ground, struct resource_data **build_used_list);
-extern struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj);
-extern char *get_resource_name(struct resource_data *res);
+struct resource_data *get_next_resource(char_data *ch, struct resource_data *list, bool ground, bool left2right, obj_data **found_obj);
+char *get_resource_name(struct resource_data *res);
 void give_resources(char_data *ch, struct resource_data *list, bool split);
-extern bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs);
+bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool send_msgs);
 void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
 void show_resource_list(struct resource_data *list, char *save_buffer);
 
 // string functions from utils.c
-extern bitvector_t asciiflag_conv(char *flag);
-extern char *bitv_to_alpha(bitvector_t flags);
-extern char *delete_doubledollar(char *string);
-extern const char *double_percents(const char *string);
-extern bool has_keyword(char *string, const char *list[], bool exact);
-extern bool isname(const char *str, const char *namelist);
-extern char *level_range_string(int min, int max, int current);
-extern bool multi_isname(const char *arg, const char *namelist);
-extern char *CAP(char *txt);
-extern char *fname(const char *namelist);
-extern char *reverse_strstr(char *haystack, char *needle);
-extern bool search_custom_messages(char *keywords, struct custom_message *list);
-extern bool search_extra_descs(char *keywords, struct extra_descr_data *list);
-extern char *str_dup(const char *source);
-extern char *str_replace(const char *search, const char *replace, const char *subject);
-extern char *str_str(char *cs, char *ct);
-extern char *strip_color(char *input);
+bitvector_t asciiflag_conv(char *flag);
+char *bitv_to_alpha(bitvector_t flags);
+char *delete_doubledollar(char *string);
+const char *double_percents(const char *string);
+bool has_keyword(char *string, const char *list[], bool exact);
+bool isname(const char *str, const char *namelist);
+char *level_range_string(int min, int max, int current);
+bool multi_isname(const char *arg, const char *namelist);
+char *CAP(char *txt);
+char *fname(const char *namelist);
+char *reverse_strstr(char *haystack, char *needle);
+bool search_custom_messages(char *keywords, struct custom_message *list);
+bool search_extra_descs(char *keywords, struct extra_descr_data *list);
+char *str_dup(const char *source);
+char *str_replace(const char *search, const char *replace, const char *subject);
+char *str_str(char *cs, char *ct);
+char *strip_color(char *input);
 void strip_crlf(char *buffer);
-extern char *strtolower(char *str);
-extern char *strtoupper(char *str);
-extern int color_code_length(const char *str);
+char *strtolower(char *str);
+char *strtoupper(char *str);
+int color_code_length(const char *str);
 #define color_strlen(str)  (strlen(str) - color_code_length(str))
-extern int count_icon_codes(char *string);
-extern bool strchrstr(const char *haystack, const char *needles);
-extern int str_cmp(const char *arg1, const char *arg2);
-extern int strn_cmp(const char *arg1, const char *arg2, int n);
+int count_icon_codes(char *string);
+bool strchrstr(const char *haystack, const char *needles);
+int str_cmp(const char *arg1, const char *arg2);
+int strn_cmp(const char *arg1, const char *arg2, int n);
 void ordered_sprintbit(bitvector_t bitvector, const char *names[], const bitvector_t order[], bool commas, char *result);
 void prettier_sprintbit(bitvector_t bitvector, const char *names[], char *result);
 void prune_crlf(char *txt);
-extern const char *skip_filler(const char *string);
+const char *skip_filler(const char *string);
 void sprintbit(bitvector_t vektor, const char *names[], char *result, bool space);
 void sprinttype(int type, const char *names[], char *result, size_t max_result_size, char *error_value);
-extern char *time_length_string(int seconds);
-extern char *trim(char *string);
+char *time_length_string(int seconds);
+char *trim(char *string);
 
 // world functions in utils.c
-extern bool check_sunny(room_data *room);
-extern char *coord_display(char_data *ch, int x, int y, bool fixed_width);
+bool check_sunny(room_data *room);
+char *coord_display(char_data *ch, int x, int y, bool fixed_width);
 #define coord_display_room(ch, room, fixed_width)  coord_display((ch), (room && !NO_LOCATION(room)) ? X_COORD(room) : NOWHERE, (room && !NO_LOCATION(room)) ? Y_COORD(room) : NOWHERE, (fixed_width))
 int count_flagged_sect_between(bitvector_t sectf_bits, room_data *start, room_data *end, bool check_base_sect);
-extern bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with_flags, bitvector_t without_flags, int distance);
-extern bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance);
-extern bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int distance);
-extern bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance);
-extern double compute_map_distance(int x1, int y1, int x2, int y2);
+bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with_flags, bitvector_t without_flags, int distance);
+bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance);
+bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int distance);
+bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance);
+double compute_map_distance(int x1, int y1, int x2, int y2);
 #define compute_distance(from, to)  ((int)compute_map_distance(X_COORD(from), Y_COORD(from), X_COORD(to), Y_COORD(to)))
-extern int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_original_sect);
-extern int distance_to_nearest_player(room_data *room);
-extern bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
-extern int get_direction_to(room_data *from, room_data *to);
-extern room_data *get_map_location_for(room_data *room);
-extern room_data *real_shift(room_data *origin, int x_shift, int y_shift);
-extern room_data *straight_line(room_data *origin, room_data *destination, int iter);
-extern sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags, bitvector_t prefer_climate);
+int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_original_sect);
+int distance_to_nearest_player(room_data *room);
+bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
+int get_direction_to(room_data *from, room_data *to);
+room_data *get_map_location_for(room_data *room);
+room_data *real_shift(room_data *origin, int x_shift, int y_shift);
+room_data *straight_line(room_data *origin, room_data *destination, int iter);
+sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags, bitvector_t prefer_climate);
 
 // misc functions from utils.c
-extern char *simple_time_since(time_t when);
-extern unsigned long long microtime(void);
-extern bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvector_t fnc_flag);
-extern bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
+char *simple_time_since(time_t when);
+unsigned long long microtime(void);
+bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvector_t fnc_flag);
+bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 
 
 // abilities.c
@@ -1818,6 +1819,7 @@ void cancel_action(char_data *ch);
 obj_data *has_tool(char_data *ch, bitvector_t flags);
 obj_data *has_all_tools(char_data *ch, bitvector_t flags);
 void start_action(char_data *ch, int type, int timer);
+void stop_room_action(room_data *room, int action);
 
 // act.comm.c
 void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, const char *messg, ...);
@@ -1832,16 +1834,22 @@ char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
 
 // act.item.c
 int obj_carry_size(obj_data *obj);
+void scale_item_to_level(obj_data *obj, int level);
 
 // act.movement.c
 int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 
 // act.trade.c
 bool check_can_craft(char_data *ch, craft_data *type);
-int get_craft_scale_level(char_data *ch, craft_data *craft);
 bool find_and_bind(char_data *ch, obj_vnum vnum);
+int get_craft_scale_level(char_data *ch, craft_data *craft);
+obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 
 // building.c
+void herd_animals_out(room_data *location);
+bool is_entrance(room_data *room);
+void process_build(char_data *ch, room_data *room, int act_type);
+void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 
 // faction.c
 const char *get_faction_name_by_vnum(any_vnum vnum);
@@ -1935,7 +1943,9 @@ void et_lose_vehicle(empire_data *emp, vehicle_data *veh);
 void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 void complete_vehicle(vehicle_data *veh);
 int count_harnessed_animals(vehicle_data *veh);
+int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
 void empty_vehicle(vehicle_data *veh, room_data *to_room);
+craft_data *find_craft_for_vehicle(vehicle_data *veh);
 vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id);
 void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
 int get_new_vehicle_construction_id();
@@ -1943,6 +1953,8 @@ room_data *get_vehicle_interior(vehicle_data *veh);
 char *get_vehicle_name_by_proto(obj_vnum vnum);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
 void start_dismantle_vehicle(vehicle_data *veh);
+int total_small_vehicles_in_room(room_data *room);
+int total_vehicle_size_in_room(room_data *room);
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 

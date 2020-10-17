@@ -43,16 +43,12 @@ extern const int rev_dir[];
 extern const char *tool_flags[];
 
 // external functions
-extern bool can_claim(char_data *ch);
 extern bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
 INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
 extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 extern bool has_cooking_fire(char_data *ch);
-extern bool has_learned_craft(char_data *ch, any_vnum vnum);
-void process_build(char_data *ch, room_data *room, int act_type);
 void process_build_action(char_data *ch);
-void scale_item_to_level(obj_data *obj, int level);
 extern bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bool send_messages);
 
 // locals
@@ -62,7 +58,6 @@ ACMD(do_gen_craft);
 craft_data *find_craft_for_obj_vnum(obj_vnum vnum);
 obj_data *find_water_container(char_data *ch, obj_data *list);
 int get_crafting_level(char_data *ch);
-obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -392,7 +387,6 @@ vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, int with_
 * @return vehicle_data* The found vehicle, or NULL if none.
 */
 vehicle_data *find_vehicle_to_resume_by_name(char_data *ch, int craft_type, char *name, craft_data **found_craft) {
-	extern craft_data *find_craft_for_vehicle(vehicle_data *veh);
 	vehicle_data *veh;
 	
 	*found_craft = NULL;
@@ -1622,7 +1616,6 @@ ACMD(do_gen_augment) {
 * @param int dir The direction specified by the player (may be NO_DIR or an invalid dir).
 */
 void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
-	void herd_animals_out(room_data *location);
 	void special_building_setup(char_data *ch, room_data *room);
 	
 	bool junk, is_closed, needs_reverse;
@@ -2132,7 +2125,6 @@ ACMD(do_gen_craft) {
 
 ACMD(do_learn) {
 	void add_learned_craft(char_data *ch, any_vnum vnum);
-	extern bool has_learned_craft(char_data *ch, any_vnum vnum);
 	
 	char arg[MAX_INPUT_LENGTH];
 	craft_data *recipe;

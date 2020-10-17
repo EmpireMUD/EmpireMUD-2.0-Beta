@@ -34,7 +34,6 @@
 // external vars
 
 // external funcs
-void scale_item_to_level(obj_data *obj, int level);
 extern bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
 
 // local protos

@@ -80,7 +80,6 @@ extern const bool interact_one_at_a_time[NUM_INTERACTS];
 const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
-void adjust_building_tech(empire_data *emp, room_data *room, bool add);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 EVENT_CANCEL_FUNC(cancel_room_event);
 void check_delayed_load(char_data *ch);
@@ -88,7 +87,6 @@ void clear_delayed_update(char_data *ch);
 void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
 void free_varlist(struct trig_var_data *vd);
-void scale_item_to_level(obj_data *obj, int level);
 void update_member_data(char_data *ch);
 
 // locals

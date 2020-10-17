@@ -297,8 +297,10 @@ void free_book(book_data *book);
 
 // buildings
 extern bld_data *building_table;
+
+void adjust_building_tech(empire_data *emp, room_data *room, bool add);
+bld_data *building_proto(bld_vnum vnum);
 void free_building(bld_data *building);
-extern bld_data *building_proto(bld_vnum vnum);
 
 // classes
 extern class_data *class_table;
@@ -340,9 +342,11 @@ extern bool check_empire_refresh;
 struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 void delete_empire(empire_data *emp);
 void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
+void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
 struct empire_island *get_empire_island(empire_data *emp, int island_id);
 empire_data *get_or_create_empire(char_data *ch);
 void free_empire(empire_data *emp);
+struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 void read_empire_members(empire_data *only_empire, bool read_techs);
 void read_empire_territory(empire_data *emp, bool check_tech);
 empire_data *real_empire(empire_vnum vnum);
@@ -478,7 +482,6 @@ void free_quest(quest_data *quest);
 // room templates
 extern room_template *room_template_table;
 void free_room_template(room_template *rmt);
-struct complex_room_data *init_complex_data();
 extern room_template *room_template_proto(rmt_vnum vnum);
 
 // sectors
@@ -545,10 +548,14 @@ extern struct map_data *land_map;
 void check_all_exits();
 void check_terrain_height(room_data *room);
 struct room_direction_data *create_exit(room_data *from, room_data *to, int dir, bool back);
+room_data *create_room(room_data *home);
 void decustomize_room(room_data *room);
 room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 void delete_room(room_data *room, bool check_exits);
+void free_complex_data(struct complex_room_data *data);
 crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
+struct complex_room_data *init_complex_data();
+void init_mine(room_data *room, char_data *ch, empire_data *emp);
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
 void sort_world_table();

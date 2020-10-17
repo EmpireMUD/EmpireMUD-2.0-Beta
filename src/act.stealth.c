@@ -40,7 +40,6 @@ INTERACTION_FUNC(consumes_or_decays_interact);
 ACMD(do_dismount);
 void check_combat_start(char_data *ch);
 extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
-void scale_item_to_level(obj_data *obj, int level);
 
 // locals
 int apply_poison(char_data *ch, char_data *vict);

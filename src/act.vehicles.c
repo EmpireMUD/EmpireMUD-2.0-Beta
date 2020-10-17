@@ -53,10 +53,7 @@ extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh
 extern int get_north_for_char(char_data *ch);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 extern bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error);
-void scale_item_to_level(obj_data *obj, int level);
 void skip_run_filler(char **string);
-extern int total_small_vehicles_in_room(room_data *room);
-extern int total_vehicle_size_in_room(room_data *room);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 extern bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
 

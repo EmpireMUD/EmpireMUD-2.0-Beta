@@ -60,7 +60,6 @@ extern struct resource_data *copy_resource_list(struct resource_data *input);
 void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 void remove_companion_mod(struct companion_data **companion, int type);
-void scale_item_to_level(obj_data *obj, int level);
 void send_char_pos(char_data *ch, int dam);
 
 // locals

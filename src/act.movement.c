@@ -48,8 +48,6 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
 void do_unseat_from_vehicle(char_data *ch);
 extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
-extern int total_small_vehicles_in_room(room_data *room);
-extern int total_vehicle_size_in_room(room_data *room);
 extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
 
 // local protos

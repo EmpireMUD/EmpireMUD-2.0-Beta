@@ -717,7 +717,6 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 */
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id) {
 	void clear_char_abilities(char_data *ch, any_vnum skill);
-	void scale_item_to_level(obj_data *obj, int level);
 	void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 	
 	char buf[MAX_STRING_LENGTH];

@@ -71,8 +71,6 @@ extern int count_dropped_items(empire_data *emp, obj_vnum vnum);
 void empire_skillup(empire_data *emp, any_vnum ability, double amount);	// skills.c
 int get_workforce_production_limit(empire_data *emp, obj_vnum vnum);
 void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component);
-void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
-void stop_room_action(room_data *room, int action);	// act.action.c
 
 // external vars
 extern const bool interact_one_at_a_time[NUM_INTERACTS];

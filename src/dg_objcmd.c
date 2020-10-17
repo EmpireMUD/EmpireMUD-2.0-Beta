@@ -45,7 +45,6 @@ void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
 void sub_write_to_room(char *str, room_data *room, bool use_queue);
 void die(char_data *ch, char_data *killer);
-void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_to_level(char_data *mob, int level);
 
 // locals

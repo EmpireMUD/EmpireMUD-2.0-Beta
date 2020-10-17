@@ -77,7 +77,6 @@ int get_wear_by_item_wear(bitvector_t item_wear);
 void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room);
 obj_data *perform_eq_change_unequip(char_data *ch, int pos);
 void sail_shipment(empire_data *emp, vehicle_data *boat);
-void scale_item_to_level(obj_data *obj, int level);
 bool ship_is_empty(vehicle_data *ship);
 static void wear_message(char_data *ch, obj_data *obj, int where);
 
@@ -3165,8 +3164,6 @@ vehicle_data *find_ship_by_shipping_id(empire_data *emp, int shipping_id) {
 * @return room_data* The ship holding pen.
 */
 room_data *get_ship_pen(void) {
-	extern room_data *create_room(room_data *home);
-
 	room_data *room, *iter;
 	
 	DL_FOREACH2(interior_room_list, iter, next_interior) {

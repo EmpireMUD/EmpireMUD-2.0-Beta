@@ -51,7 +51,6 @@ extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
-void scale_item_to_level(obj_data *obj, int level);
 
 // locals
 int health_gain(char_data *ch, bool info_only);

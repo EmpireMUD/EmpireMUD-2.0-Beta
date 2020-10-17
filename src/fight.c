@@ -52,7 +52,6 @@ extern struct resource_data *combine_resources(struct resource_data *combine_a, 
 INTERACTION_FUNC(consumes_or_decays_interact);
 extern int determine_best_scale_level(char_data *ch, bool check_group);
 void end_pursuit(char_data *ch, char_data *target);
-void scale_item_to_level(obj_data *obj, int level);
 
 // locals
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);

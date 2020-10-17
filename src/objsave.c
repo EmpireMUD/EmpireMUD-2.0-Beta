@@ -87,8 +87,6 @@ void ensure_safe_obj(obj_data *obj) {
 * @return obj_data* The loaded item, or NULL if it's not available.
 */
 obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify) {
-	void scale_item_to_level(obj_data *obj, int level);
-
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH], *tmp;
 	obj_data *proto = obj_proto(vnum);
 	struct extra_descr_data *ex;

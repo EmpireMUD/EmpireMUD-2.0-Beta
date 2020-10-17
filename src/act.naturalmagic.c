@@ -164,8 +164,6 @@ void un_earthmeld(char_data *ch) {
 * @param char_data *ch the quaffer
 */
 void apply_potion(obj_data *obj, char_data *ch) {
-	void scale_item_to_level(obj_data *obj, int level);
-	
 	any_vnum aff_type = GET_POTION_AFFECT(obj) != NOTHING ? GET_POTION_AFFECT(obj) : ATYPE_POTION;
 	struct affected_type *af;
 	struct obj_apply *apply;
@@ -970,8 +968,6 @@ ACMD(do_purify) {
 
 
 ACMD(do_quaff) {
-	void scale_item_to_level(obj_data *obj, int level);
-	
 	obj_data *obj;
 	
 	one_argument(argument, arg);

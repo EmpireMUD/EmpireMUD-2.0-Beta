@@ -80,7 +80,6 @@ int count_hash_records(FILE *fl);
 empire_vnum find_free_empire_vnum(void);
 void free_obj_eq_set(struct eq_set_obj *eq_set);
 void free_theft_logs(struct theft_log *list);
-struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 void parse_generic_name_file(FILE *fl, char *err_str);

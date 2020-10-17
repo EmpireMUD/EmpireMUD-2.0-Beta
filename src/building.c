@@ -33,30 +33,11 @@
 */
 
 // locals
-void herd_animals_out(room_data *location);
-bool is_entrance(room_data *room);
-void process_build(char_data *ch, room_data *room, int act_type);
-void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
 
 // externs
-void adjust_building_tech(empire_data *emp, room_data *room, bool add);
-extern bool can_claim(char_data *ch);
 INTERACTION_FUNC(consumes_or_decays_interact);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
-extern int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
-extern room_data *create_room(room_data *home);
-void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
-void free_complex_data(struct complex_room_data *data);
-extern craft_data *find_craft_for_vehicle(vehicle_data *veh);
-extern bool has_learned_craft(char_data *ch, any_vnum vnum);
-extern obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
-void init_mine(room_data *room, char_data *ch, empire_data *emp);
-struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
-void scale_item_to_level(obj_data *obj, int level);
-void stop_room_action(room_data *room, int action);
-extern int total_small_vehicles_in_room(room_data *room);
-extern int total_vehicle_size_in_room(room_data *room);
 
 void process_dismantle_vehicle(char_data *ch);
 

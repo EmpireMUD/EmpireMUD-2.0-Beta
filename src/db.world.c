@@ -57,16 +57,13 @@ EVENT_CANCEL_FUNC(cancel_room_event);
 extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 void complete_building(room_data *room);
 void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
-void free_complex_data(struct complex_room_data *bld);
 void free_shared_room_data(struct shared_room_data *data);
 void grow_crop(struct map_data *map);
-extern bool is_entrance(room_data *room);
 extern FILE *open_world_file(int block);
 void remove_room_from_world_tables(room_data *room);
 void save_and_close_world_file(FILE *fl, int block);
 void setup_start_locations();
 void sort_exits(struct room_direction_data **list);
-void stop_room_action(room_data *room, int action);
 void write_room_to_file(FILE *fl, room_data *room);
 
 // locals
@@ -2404,7 +2401,6 @@ struct empire_territory_data *create_territory_entry(empire_data *emp, room_data
 * @param bool make_npcs_homeless If TRUE, any NPCs in the territory become homeless.
 */
 void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless) {
-	void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
 	extern struct empire_territory_data *global_next_territory_entry;
 	
 	// prevent loss

@@ -65,13 +65,11 @@ extern const char *vehicle_speed_types[];
 // external funcs
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern struct resource_data *copy_resource_list(struct resource_data *input);
-extern room_data *create_room(room_data *home);
 void free_bld_relations(struct bld_relation *list);
 void free_custom_messages(struct custom_message *mes);
 void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_resource_display(struct resource_data *list, char *save_buffer);
-void scale_item_to_level(obj_data *obj, int level);
 extern char *show_color_codes(char *string);
 extern bool validate_icon(char *icon);
 
@@ -394,8 +392,6 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle being finished.
 */
 void finish_vehicle_setup(vehicle_data *veh) {
-	void init_mine(room_data *room, char_data *ch, empire_data *emp);
-	
 	if (!veh || !VEH_IS_COMPLETE(veh)) {
 		return;	// no work
 	}
@@ -800,8 +796,6 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 * @param char *message Optional: An act string (using $V for the vehicle) to send to the room. (NULL for none)
 */
 void ruin_vehicle(vehicle_data *veh, char *message) {
-	void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
-	
 	bool was_bld = VEH_FLAGGED(veh, VEH_BUILDING) ? TRUE : FALSE;
 	empire_data *emp = VEH_OWNER(veh);
 	room_data *room = IN_ROOM(veh);

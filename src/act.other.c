@@ -59,7 +59,6 @@ extern int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 extern bool is_ignoring(char_data *ch, char_data *victim);
 void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
-void scale_item_to_level(obj_data *obj, int level);
 void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
 extern char *show_color_codes(char *string);
 
