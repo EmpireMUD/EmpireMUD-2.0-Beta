@@ -9956,7 +9956,7 @@ ACMD(do_restore) {
 	
 	// show 3rd-party message in some cases
 	if (all || health || moves || mana || blood || dots) {
-		act("$n is restored!", TRUE, vict, NULL, NULL, TO_CHAR | DG_NO_TRIG);
+		act("$n is restored!", TRUE, vict, NULL, NULL, TO_ROOM | DG_NO_TRIG);
 	}
 }
 
