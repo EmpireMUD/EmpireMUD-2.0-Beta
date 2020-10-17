@@ -903,7 +903,9 @@ void affect_total_room(room_data *room) {
 	
 	// flags from vehicles: do this even if incomplete
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		SET_BIT(ROOM_AFF_FLAGS(room), VEH_ROOM_AFFECTS(veh));
+		if (!VEH_IS_EXTRACTED(veh)) {
+			SET_BIT(ROOM_AFF_FLAGS(room), VEH_ROOM_AFFECTS(veh));
+		}
 	}
 	
 	// flags from building: don't use IS_COMPLETE because this function may be called before resources are added
@@ -4627,10 +4629,13 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, vehicle_dat
 		if (inter_veh && veh != inter_veh) {
 			continue;	// if they provided an inter_veh, skip other vehicles
 		}
+		if (!VEH_IS_COMPLETE(veh)) {
+			continue;	// not complete anyway
+		}
 		if (access_type != NOTHING && ch && !can_use_vehicle(ch, veh, access_type)) {
 			continue;	// no permission
 		}
-		if (VEH_IS_COMPLETE(veh) && has_interaction(VEH_INTERACTIONS(veh), type)) {
+		if (has_interaction(VEH_INTERACTIONS(veh), type)) {
 			CREATE(tvh, struct temp_veh_helper, 1);
 			tvh->veh = veh;
 			

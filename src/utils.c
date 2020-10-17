@@ -6347,10 +6347,10 @@ bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvec
 		if (!IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
 			continue;	// no function
 		}
-		if (for_emp && VEH_OWNER(veh) && VEH_OWNER(veh) != for_emp && !emp_can_use_vehicle(for_emp, veh, GUESTS_ALLOWED)) {
+		if (!VEH_IS_COMPLETE(veh)) {
 			continue;
 		}
-		if (!VEH_IS_COMPLETE(veh)) {
+		if (for_emp && VEH_OWNER(veh) && VEH_OWNER(veh) != for_emp && !emp_can_use_vehicle(for_emp, veh, GUESTS_ALLOWED)) {
 			continue;
 		}
 		if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS) && IS_SET(fnc_flag, IMMOBILE_FNCS)) {

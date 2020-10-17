@@ -985,7 +985,7 @@ static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *c
 					}
 					else {	// check for building-vehicles
 						DL_FOREACH2(ROOM_VEHICLES(to_room), veh, next_in_room) {
-							if (VEH_OWNER(veh) == emp && VEH_FLAGGED(veh, VEH_BUILDING) && !VEH_FLAGGED(veh, VEH_IS_RUINS)) {
+							if (VEH_OWNER(veh) == emp && VEH_FLAGGED(veh, VEH_BUILDING) && !VEH_FLAGGED(veh, VEH_IS_RUINS | VEH_EXTRACTED)) {
 								found_building = TRUE;
 								break;
 							}

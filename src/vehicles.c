@@ -130,7 +130,7 @@ void check_vehicle_climate_change(room_data *room) {
 	char *msg;
 	
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-		if (!ROOM_IS_CLOSED(IN_ROOM(veh)) && !vehicle_allows_climate(veh, IN_ROOM(veh))) {
+		if (!VEH_IS_EXTRACTED(veh) && !ROOM_IS_CLOSED(IN_ROOM(veh)) && !vehicle_allows_climate(veh, IN_ROOM(veh))) {
 			// this will extract it (usually)
 			msg = veh_get_custom_message(veh, VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM);
 			ruin_vehicle(veh, msg ? msg : "$V falls into ruin!");
@@ -303,7 +303,7 @@ vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id) {
 	vehicle_data *veh;
 	
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (!VEH_IS_DISMANTLING(veh)) {
+		if (VEH_IS_EXTRACTED(veh) || !VEH_IS_DISMANTLING(veh)) {
 			continue;	// not being dismantled
 		}
 		if (with_id != NOTHING && VEH_CONSTRUCTION_ID(veh) != with_id) {
@@ -329,7 +329,7 @@ vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum inte
 	vehicle_data *veh;
 	
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (VEH_INTERIOR_HOME_ROOM(veh) && GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)) == interior_room) {
+		if (!VEH_IS_EXTRACTED(veh) && VEH_INTERIOR_HOME_ROOM(veh) && GET_ROOM_VNUM(VEH_INTERIOR_HOME_ROOM(veh)) == interior_room) {
 			return veh;
 		}
 	}
@@ -735,7 +735,7 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 		LL_FOREACH(VEH_ROOM_LIST(inter_veh), vrl) {
 			// remove any unclaimed/empty vehicles (like furniture) -- those crumble with the building
 			DL_FOREACH_SAFE2(ROOM_VEHICLES(vrl->room), veh_iter, next_veh, next_in_room) {
-				if (!VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
+				if (!VEH_IS_EXTRACTED(veh_iter) && !VEH_OWNER(veh_iter) && !VEH_CONTAINS(veh_iter)) {
 					ruin_vehicle(veh_iter, "$V falls into ruin.");
 				}
 			}

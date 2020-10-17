@@ -5408,8 +5408,17 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "vehicles")) {
-						if (ROOM_VEHICLES(r)) {
-							snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(ROOM_VEHICLES(r)));
+						vehicle_data *temp_veh = NULL;
+						
+						// find first non-extracted vehicle
+						DL_FOREACH2(ROOM_VEHICLES(r), temp_veh, next_in_room) {
+							if (!VEH_IS_EXTRACTED(temp_veh)) {
+								break;
+							}
+						}
+						
+						if (temp_veh) {
+							snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(temp_veh));
 						}
 						else {
 							*str = '\0';
@@ -5735,8 +5744,16 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "next_in_room")) {
-						if (v->next_in_room) {
-							snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(v->next_in_room));
+						vehicle_data *temp_veh = NULL;
+						
+						DL_FOREACH2(v->next_in_room, temp_veh, next_in_room) {
+							if (!VEH_IS_EXTRACTED(temp_veh)) {
+								break;
+							}
+						}
+						
+						if (temp_veh) {
+							snprintf(str, slen, "%c%d", UID_CHAR, veh_script_id(temp_veh));
 						}
 						else {
 							strcpy(str, "");

@@ -153,7 +153,7 @@ bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empi
 			}
 			case QG_VEHICLE: {
 				DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-					if (VEH_VNUM(veh) == giver->vnum && CAN_SEE_VEHICLE(ch, veh)) {
+					if (VEH_VNUM(veh) == giver->vnum && !VEH_IS_EXTRACTED(veh) && CAN_SEE_VEHICLE(ch, veh)) {
 						*giver_emp = VEH_OWNER(veh);
 						return TRUE;
 					}
