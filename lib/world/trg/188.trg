@@ -274,8 +274,8 @@ while %person%
   end
   set person %person.next_in_room%
 done
-if !%loot%
-  nop %self.add_mob_flag(!LOOT)%
+if %loot% == 1
+  nop %self.remove_mob_flag(!LOOT)%
 end
 ~
 #18807
@@ -1303,7 +1303,7 @@ end
 apple bobbing bob~
 1 c 4
 bob~
-if !(%actor.obj_target(%arg%)% == %self%)
+if %actor.obj_target(%arg%).vnum% != 18857
   %send% %actor% You can only bob in the @%self%.
   return 1
   halt

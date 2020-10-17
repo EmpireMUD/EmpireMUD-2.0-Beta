@@ -1489,8 +1489,8 @@ Age Herbicide~
 if %self.carried_by%
   %load% obj 10177 %self.carried_by% inv
   %send% %self.carried_by% One of the herbicide vials turns a bright red color and is done aging.
-  %purge% %self%
   return 0
+  %purge% %self%
 end
 ~
 #10180
@@ -1719,8 +1719,8 @@ elseif (%self.vnum% == 10193)
   end
   %terraform% %room% 10192
 end
-%purge% %self%
 return 0
+%purge% %self%
 ~
 #10193
 Volcanic Weather~

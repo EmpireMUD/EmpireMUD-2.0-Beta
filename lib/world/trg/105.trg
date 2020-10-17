@@ -333,6 +333,7 @@ if %self.carried_by%
 else
   %echo% @%self% in the room disintegrates, leaving behind %object%!
 end
+return 0
 %purge% %self%
 ~
 #10550
@@ -1113,6 +1114,7 @@ if %actor%
 else
   %echo% @%self% in the room melts, turning into %object%!
 end
+return 0
 %purge% %self%
 ~
 #10599
