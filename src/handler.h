@@ -166,6 +166,7 @@ void perform_claim_room(room_data *room, empire_data *emp);
 void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void read_vault(empire_data *emp);
 void refresh_empire_dropped_items(empire_data *only_emp);
+int sort_empire_production_totals(struct empire_production_total *a, struct empire_production_total *b);
 
 // empire production total handlers
 void add_production_total(empire_data *emp, obj_vnum vnum, int amount);

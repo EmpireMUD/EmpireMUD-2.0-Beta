@@ -57,7 +57,6 @@ void free_obj_eq_set(struct eq_set_obj *eq_set);
 void check_eq_sets(char_data *ch);
 void clear_delayed_update(char_data *ch);
 void clear_player(char_data *ch);
-void delete_player_character(char_data *ch);
 void free_player_eq_set(struct player_eq_set *eq_set);
 struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
 time_t get_member_timeout_ch(char_data *ch);
@@ -3528,7 +3527,6 @@ void autowiz_write_wizlist(FILE *out, int minlev, int maxlev) {
 * Reloads the wizlist and godlist files.
 */
 void reload_wizlists(void) {
-	extern int file_to_string_alloc(const char *name, char **buf);
 	extern char *wizlist, *godlist;	// db.c
 
 	file_to_string_alloc(WIZLIST_FILE, &wizlist);

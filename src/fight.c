@@ -52,8 +52,6 @@ void end_pursuit(char_data *ch, char_data *target);
 // locals
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
 void drop_loot(char_data *mob, char_data *killer);
-int get_block_rating(char_data *ch, bool can_gain_skill);
-double get_weapon_speed(obj_data *weapon);
 void heal(char_data *ch, char_data *vict, int amount);
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round);
 extern int lock_instance_level(room_data *room, int level);

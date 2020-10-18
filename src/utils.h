@@ -1778,6 +1778,9 @@ bool has_resources(char_data *ch, struct resource_data *list, bool ground, bool 
 void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
 void show_resource_list(struct resource_data *list, char *save_buffer);
 
+// sector functions from utils.c
+sector_data *get_sect_by_name(char *name);
+
 // string functions from utils.c
 bitvector_t asciiflag_conv(char *flag);
 char *bitv_to_alpha(bitvector_t flags);
@@ -1873,8 +1876,10 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
 void set_workforce_limit_all(empire_data *emp, int chore, int limit);
+void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
 
 // act.informative.c
+void display_attributes(char_data *ch, char_data *to);
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
 void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 struct custom_message *pick_custom_longdesc(char_data *ch);
@@ -1900,6 +1905,7 @@ void cancel_adventure_summon(char_data *ch);
 
 // act.quest.c
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
+void drop_quest(char_data *ch, struct player_quest *pq);
 void show_quest_tracker(char_data *ch, struct player_quest *pq);
 
 // act.trade.c
@@ -1941,8 +1947,11 @@ bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
 void death_log(char_data *ch, char_data *killer, int type);
 obj_data *die(char_data *ch, char_data *killer);
 double get_base_dps(obj_data *weapon);
+int get_block_rating(char_data *ch, bool can_gain_skill);
+double get_combat_speed(char_data *ch, int pos);
 int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
 int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
+double get_weapon_speed(obj_data *weapon);
 bool is_fight_ally(char_data *ch, char_data *frenemy);
 bool is_fight_enemy(char_data *ch, char_data *frenemy);
 void perform_execute(char_data *ch, char_data *victim, int attacktype, int damtype);
@@ -1967,6 +1976,7 @@ void reset_instance(struct instance_data *inst);
 bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
 void gain_condition(char_data *ch, int condition, int value);
+int move_gain(char_data *ch, bool info_only);
 
 // mapview.c
 bool adjacent_room_is_light(room_data *room);
@@ -2017,6 +2027,7 @@ void full_reset_empire_progress(empire_data *only_emp);
 void get_progress_perks_display(struct progress_perk *list, char *save_buffer, bool show_vnums);
 void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
 void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
+void remove_completed_goal(empire_data *emp, any_vnum vnum);
 
 // quest.c
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
@@ -2071,6 +2082,10 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total);
 void et_lose_building(empire_data *emp, any_vnum vnum);
 void et_lose_tile_sector(empire_data *emp, sector_vnum vnum);
 void et_lose_vehicle(empire_data *emp, vehicle_data *veh);
+
+// shop.c
+struct shop_temp_list *build_available_shop_list(char_data *ch);
+void free_shop_temp_list(struct shop_temp_list *list);
 
 // statistics.c
 int stats_get_building_count(bld_data *bdg);

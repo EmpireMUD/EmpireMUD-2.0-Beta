@@ -286,10 +286,12 @@ extern const struct gen_craft_data_t gen_craft_data[];
 // config.c
 extern const int base_hit_chance;
 extern const int base_player_pools[NUM_POOLS];
+extern struct file_lookup_struct file_lookup[];
 extern const double hit_per_dex;
 extern const int primary_attributes[];
 extern const double score_levels[];
 extern const int techs_requiring_same_island[];
+extern struct tedit_struct tedit_option[];
 extern const int universal_wait;
 
 // instance.c

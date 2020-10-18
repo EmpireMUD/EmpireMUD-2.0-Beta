@@ -36,10 +36,6 @@
 *   Commands
 */
 
-// extern variables
-extern struct help_index_element *help_table;
-extern int top_of_helpt;
-
 // external functions
 void clear_recent_moves(char_data *ch);
 extern char *list_harnessed_mobs(vehicle_data *veh);
@@ -576,10 +572,7 @@ void display_attributes(char_data *ch, char_data *to) {
 */
 void display_score_to_char(char_data *ch, char_data *to) {
 	void show_character_affects(char_data *ch, char_data *to);
-	extern double get_combat_speed(char_data *ch, int pos);
-	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern int health_gain(char_data *ch, bool info_only);
-	extern int move_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];

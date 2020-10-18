@@ -35,6 +35,12 @@ char *prompt_color_by_prc(int cur, int max);
 void close_socket(descriptor_data *d);
 void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, bitvector_t act_flags);
 
+// reboot system
+extern struct reboot_control_data reboot_control;
+
+void perform_reboot();
+void update_reboot();
+
 
 // background color codes - not available to players so you have to sprintf/strcpy them in
 #define BACKGROUND_RED  "\033[41m"

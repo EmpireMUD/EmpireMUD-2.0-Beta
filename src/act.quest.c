@@ -52,7 +52,6 @@ void remove_quest_items_by_quest(char_data *ch, any_vnum vnum);
 extern char *requirement_string(struct req_data *task, bool show_vnums);
 
 // local prototypes
-void drop_quest(char_data *ch, struct player_quest *pq);
 bool fail_daily_quests(char_data *ch);
 void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 

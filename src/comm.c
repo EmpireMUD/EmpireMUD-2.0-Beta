@@ -55,7 +55,6 @@ extern bool data_table_needs_save;
 extern int num_invalid;
 extern char **intros;
 extern int num_intros;
-extern int wizlock_level;
 extern int no_auto_deletes;
 extern ush_int DFLT_PORT;
 extern const char *DFLT_DIR;
@@ -307,11 +306,8 @@ void msdp_update_room(char_data *ch) {
 * From KaVir's protocol snippet (see protocol.c)
 */
 static void msdp_update(void) {
-	extern int get_block_rating(char_data *ch, bool can_gain_skill);
-	extern double get_combat_speed(char_data *ch, int pos);
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
-	extern int move_gain(char_data *ch, bool info_only);
 	
 	struct player_skill_data *skill, *next_skill;
 	struct over_time_effect_type *dot;
@@ -858,9 +854,6 @@ void perform_reboot(void) {
 * should be called every minute.
 */
 void update_reboot(void) {
-	extern int wizlock_level;
-	extern char *wizlock_message;
-	
 	char buf[MAX_STRING_LENGTH];
 	
 	// neverboot
@@ -908,7 +901,6 @@ void heartbeat(int heart_pulse) {
 	void free_freeable_triggers();
 	void free_loaded_players();
 	void frequent_combat(int pulse);
-	void output_map_to_file();
 	void point_update();
 	void process_import_evolutions();
 	void process_imports();

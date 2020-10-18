@@ -54,9 +54,7 @@ void index_boot(int mode);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 
 // local functions
-int file_to_string_alloc(const char *name, char **buf);
 void get_one_line(FILE *fl, char *buf);
-void index_boot_help();
 void reset_time();
 
 
@@ -307,8 +305,6 @@ void boot_db(void) {
 	void link_and_check_vehicles();
 	void load_automessages();
 	void load_banned();
-	void load_data_table();
-	void load_intro_screens();
 	void load_fight_messages();
 	void load_slash_channels();
 	void load_tips_of_the_day();

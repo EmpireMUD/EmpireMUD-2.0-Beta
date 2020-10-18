@@ -34,9 +34,6 @@
 void init_building(bld_data *building);
 void sort_interactions(struct interaction_item **list);
 
-// local funcs
-void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
-
 // locals
 const char *default_building_name = "Unnamed Building";
 const char *default_building_title = "An Unnamed Building";

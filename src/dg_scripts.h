@@ -279,7 +279,7 @@ struct dg_owner_purged_tracker_type {
 };
 
 
-/* function prototypes from triggers.c (and others) */
+/* function prototypes from dg_triggers.c (and others) */
 void adventure_cleanup_wtrigger(room_data *room);
 void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *victim, obj_data *object, obj_data *target, char *arg);  
 void speech_mtrigger(char_data *actor, char *str);
@@ -341,7 +341,7 @@ void load_vtrigger(vehicle_data *veh);
 int greet_vtrigger(char_data *actor, int dir);
 void speech_vtrigger(char_data *actor, char *str);
 
-/* function prototypes from scripts.c */
+/* function prototypes from dg_scripts.c */
 void script_trigger_check(void);
 void add_trigger(struct script_data *sc, trig_data *t, int loc);
 char_data *get_char(char *name);
@@ -353,6 +353,7 @@ void do_stat_trigger(char_data *ch, trig_data *trig);
 void do_sstat_room(char_data *ch);
 void do_sstat_object(char_data *ch, obj_data *j);
 void do_sstat_character(char_data *ch, char_data *k);
+void script_stat(char_data *ch, struct script_data *sc);
 
 extern struct script_data *create_script_data(void *attach_to, int type);
 void script_vlog(const char *format, va_list args);
@@ -480,6 +481,7 @@ void remove_from_lookup_table(int uid);
 char_data *find_char(int n);
 empire_data *find_empire_by_uid(int n);
 room_data *find_room(int n);
+void find_uid_name(char *uid, char *name, size_t nlen);
 vehicle_data *find_vehicle(int n);
 
 // purge helpers

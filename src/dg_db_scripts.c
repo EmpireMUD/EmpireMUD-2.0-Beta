@@ -29,7 +29,6 @@
 extern int max_mob_id;
 extern int max_obj_id;
 extern int max_vehicle_id;
-extern struct reboot_control_data reboot_control;
 
 // external fucs
 void free_trigger(trig_data *trig);

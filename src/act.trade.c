@@ -673,8 +673,6 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 * @param int craft_type Whichever CRAFT_TYPE_ the player is using.
 */
 void show_craft_info(char_data *ch, char *argument, int craft_type) {
-	extern double get_weapon_speed(obj_data *weapon);
-	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], range[MAX_STRING_LENGTH];
 	struct obj_apply *apply;
 	ability_data *abil;

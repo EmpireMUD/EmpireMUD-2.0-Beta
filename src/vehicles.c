@@ -50,7 +50,6 @@ void ruin_vehicle(vehicle_data *veh, char *message);
 // external funcs
 void free_bld_relations(struct bld_relation *list);
 void free_custom_messages(struct custom_message *mes);
-void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern bool validate_icon(char *icon);
 
@@ -3579,7 +3578,6 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 * @param vehicle_data *veh The vehicle to display.
 */
 void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
-	void script_stat (char_data *ch, struct script_data *sc);
 	void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
 	
 	char buf[MAX_STRING_LENGTH * 2], part[MAX_STRING_LENGTH];

@@ -2647,9 +2647,7 @@ void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 * @return int The character's value for that attributes.
 */
 int get_attribute_by_apply(char_data *ch, int apply_type) {
-	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern int health_gain(char_data *ch, bool info_only);
-	extern int move_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
 	
 	if (!ch) {

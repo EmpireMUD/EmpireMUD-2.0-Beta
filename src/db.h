@@ -237,6 +237,7 @@ struct stored_data {
 
 // public procedures in db.c
 char *fread_string(FILE *fl, char *error);
+int file_to_string_alloc(const char *name, char **buf);
 void boot_db(void);
 
 // global saves
@@ -280,6 +281,7 @@ extern adv_data *adventure_proto(adv_vnum vnum);
 
 // applies
 struct apply_data *copy_apply_list(struct apply_data *input);
+struct obj_apply *copy_obj_apply_list(struct obj_apply *list);
 void parse_apply(FILE *fl, struct apply_data **list, char *error_str);
 void write_applies_to_file(FILE *fl, struct apply_data *list);
 
@@ -294,6 +296,14 @@ extern augment_data *augment_table;
 extern augment_data *sorted_augments;
 extern augment_data *augment_proto(any_vnum vnum);
 void free_augment(augment_data *aug);
+
+// automessage
+extern struct automessage *automessages;
+
+void free_automessage(struct automessage *msg);
+int new_automessage_id();
+void save_automessages();
+int sort_automessage_by_data(struct automessage *a, struct automessage *b);
 
 // books
 extern book_data *book_table;
@@ -338,15 +348,14 @@ void uncrop_tile(room_data *room);
 void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 
-// data system getters
-extern double data_get_double(int key);
-extern int data_get_int(int key);
-extern long data_get_long(int key);
-
-// data system setters
-extern double data_set_double(int key, double value);
-extern int data_set_int(int key, int value);
-extern long data_set_long(int key, long value);
+// data system
+double data_get_double(int key);
+int data_get_int(int key);
+long data_get_long(int key);
+void load_data_table();
+double data_set_double(int key, double value);
+int data_set_int(int key, int value);
+long data_set_long(int key, long value);
 
 // descriptors
 extern descriptor_data *descriptor_list;
@@ -430,6 +439,12 @@ extern struct global_data *globals_table;
 void free_global(struct global_data *glb);
 extern struct global_data *global_proto(any_vnum vnum);
 
+// help files
+extern struct help_index_element *help_table;
+extern int top_of_helpt;
+
+void index_boot_help();
+
 // interactions
 void free_interactions(struct interaction_item **list);
 
@@ -481,9 +496,11 @@ void free_morph(morph_data *morph);
 // objects
 extern obj_data *object_list;
 extern obj_data *object_table;
+
 obj_data *create_obj(void);
 void clear_object(obj_data *obj);
 void free_obj(obj_data *obj);
+void free_obj_binding(struct obj_binding **list);
 obj_data *obj_proto(obj_vnum vnum);
 obj_data *read_object(obj_vnum nr, bool with_triggers);
 
@@ -493,10 +510,13 @@ extern bool pause_affect_total;
 
 void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
+void delete_player_character(char_data *ch);
 int get_highest_access_level(account_data *acct);
 char_data *find_player_in_room_by_id(room_data *room, int id);
 char_data *is_at_menu(int id);
 char_data *is_playing(int id);
+void start_new_character(char_data *ch);
+int *summarize_weekly_playtime(empire_data *emp);
 
 // progress
 extern progress_data *progress_table;
@@ -577,6 +597,10 @@ void free_vehicle(vehicle_data *veh);
 extern vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
 extern vehicle_data *vehicle_proto(any_vnum vnum);
 
+// wizlock system
+extern int wizlock_level;
+extern char *wizlock_message;
+
 // world
 extern room_data *world_table;
 extern room_data *interior_room_list;
@@ -598,6 +622,7 @@ void free_complex_data(struct complex_room_data *data);
 crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 struct complex_room_data *init_complex_data();
 void init_mine(room_data *room, char_data *ch, empire_data *emp);
+void output_map_to_file();
 void perform_burn_room(room_data *room);
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
@@ -607,7 +632,7 @@ void sort_world_table();
 void untrench_room(room_data *room);
 
 // misc
-extern struct obj_apply *copy_obj_apply_list(struct obj_apply *list);
+void load_intro_screens();
 
 // more frees
 void free_apply_list(struct apply_data *list);

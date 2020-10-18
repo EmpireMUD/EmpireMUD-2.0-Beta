@@ -56,7 +56,6 @@ void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remo
 void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add);
 void complete_goal(empire_data *emp, struct empire_goal *goal);
 void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
-void remove_completed_goal(empire_data *emp, any_vnum vnum);
 struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg);
 
 

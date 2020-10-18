@@ -404,7 +404,6 @@ char *one_summon_entry(char_data *ch, const char *name, int min_level, ability_d
 void perform_alternate(char_data *old, char_data *new) {
 	void display_tip_to_char(char_data *ch);
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
-	void start_new_character(char_data *ch);
 	extern bool global_mute_slash_channel_joins;
 	
 	char sys[MAX_STRING_LENGTH], mort_in[MAX_STRING_LENGTH], mort_out[MAX_STRING_LENGTH], mort_alt[MAX_STRING_LENGTH], temp[256];
@@ -2071,8 +2070,6 @@ ACMD(do_companions) {
 
 ACMD(do_confirm) {
 	bool check_reboot_confirms();
-	void perform_reboot();
-	extern struct reboot_control_data reboot_control;
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -3419,8 +3416,6 @@ ACMD(do_save) {
 
 
 ACMD(do_selfdelete) {
-	void delete_player_character(char_data *ch);
-
 	char passwd[MAX_INPUT_LENGTH];
 	
 	argument = any_one_arg(argument, passwd);

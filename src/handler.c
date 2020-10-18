@@ -4141,9 +4141,6 @@ void leave_group(char_data *ch) {
 * returns help_index_element* or NULL
 */
 struct help_index_element *find_help_entry(int level, const char *word) {
-	extern struct help_index_element *help_table;
-	extern int top_of_helpt;
-	
 	int chk, bot, top, mid, minlen;
 	
 	if (help_table) {
@@ -5898,8 +5895,6 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 * @return bool TRUE if the bindings are the same; FALSE if not.
 */
 bool identical_bindings(obj_data *obj_a, obj_data *obj_b) {
-	void free_obj_binding(struct obj_binding **list);
-	
 	struct obj_binding *a_bind, *b_bind, *b_bind_list, *b_bind_next;
 	bool found;
 	

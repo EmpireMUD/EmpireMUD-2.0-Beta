@@ -30,9 +30,6 @@
 *   Edit Modules
 */
 
-// external funcs
-extern double get_weapon_speed(obj_data *weapon);
-
 // locals
 const char *default_obj_keywords = "object new";
 const char *default_obj_short = "a new object";

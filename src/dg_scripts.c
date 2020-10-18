@@ -1315,7 +1315,7 @@ void find_uid_name(char *uid, char *name, size_t nlen) {
 
 
 /* general function to display stats on script sc */
-void script_stat (char_data *ch, struct script_data *sc) {
+void script_stat(char_data *ch, struct script_data *sc) {
 	struct trig_var_data *tv;
 	trig_data *t;
 	char name[MAX_INPUT_LENGTH];
@@ -3064,7 +3064,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'b': {	// char.b*
 					if (!str_cmp(field, "block")) {
-						extern int get_block_rating(char_data *ch, bool can_gain_skill);
 						snprintf(str, slen, "%d", get_block_rating(c, FALSE));
 					}
 					else if (!str_cmp(field, "blood")) {
@@ -4515,7 +4514,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'b': {	// obj.b*
 					if (!str_cmp(field, "bind")) {
-						void free_obj_binding(struct obj_binding **list);
 						if (subfield && *subfield) {
 							if (!str_cmp(subfield, "none") || !str_cmp(subfield, "nobody")) {
 								free_obj_binding(&OBJ_BOUND_TO(o));
@@ -5991,7 +5989,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
 								if (empire_has_completed_goal(e, vnum)) {
-									void remove_completed_goal(empire_data *emp, any_vnum vnum);
 									remove_completed_goal(e, vnum);
 								}
 								if ((goal = get_current_goal(e, vnum))) {

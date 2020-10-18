@@ -2328,11 +2328,8 @@ void nanny(descriptor_data *d, char *arg) {
 	extern int isbanned(char *hostname);
 	extern int num_earned_bonus_traits(char_data *ch);
 	void run_delayed_refresh();
-	void start_new_character(char_data *ch);
 	
 	extern struct promo_code_list promo_codes[];
-	extern int wizlock_level;
-	extern char *wizlock_message;
 
 	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
 	int load_result, i, iter;

@@ -633,7 +633,6 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 	// ready for commands
 	if (is_abbrev(cmd_arg, "drop")) {
 		if ((pq = is_on_quest(vict, QUEST_VNUM(quest)))) {
-			void drop_quest(char_data *ch, struct player_quest *pq);
 			drop_quest(vict, pq);
 		}
 	}

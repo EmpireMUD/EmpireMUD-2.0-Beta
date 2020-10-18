@@ -2638,7 +2638,6 @@ static const char *GetMSSP_Extra_Descs() {
 }
 
 static const char *GetMSSP_Helpfiles() {
-	extern int top_of_helpt;	// db.c
 	static char buf[256];	
 	snprintf(buf, sizeof(buf), "%d", top_of_helpt + 1);
 	return buf;

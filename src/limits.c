@@ -46,7 +46,6 @@ void out_of_blood(char_data *ch);
 // locals
 int health_gain(char_data *ch, bool info_only);
 int mana_gain(char_data *ch, bool info_only);
-int move_gain(char_data *ch, bool info_only);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -305,7 +304,6 @@ void check_should_dismount(char_data *ch) {
 */
 INTERACTION_FUNC(consumes_or_decays_interact) {
 	struct obj_binding *copy_obj_bindings(struct obj_binding *from);
-	void free_obj_binding(struct obj_binding **list);
 	
 	obj_data *new_obj;
 	bool fail = FALSE;

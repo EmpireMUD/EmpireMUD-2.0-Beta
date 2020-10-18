@@ -46,13 +46,11 @@
 ACMD(do_home);
 extern int add_eq_set_to_char(char_data *ch, int set_id, char *name);
 void add_obj_to_eq_set(obj_data *obj, int set_id, int pos);
-extern struct shop_temp_list *build_available_shop_list(char_data *ch);
 extern bool can_steal(char_data *ch, empire_data *emp);
 extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 INTERACTION_FUNC(consumes_or_decays_interact);
 void expire_trading_post_item(struct trading_post_data *tpd);
 void free_player_eq_set(struct player_eq_set *eq_set);
-void free_shop_temp_list(struct shop_temp_list *list);
 extern struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
 extern struct player_eq_set *get_eq_set_by_name(char_data *ch, char *name);
 extern struct eq_set_obj *get_obj_eq_set_by_id(obj_data *obj, int id);
@@ -428,8 +426,6 @@ bool run_identifies_to(char_data *ch, obj_data **obj, bool *extract) {
 void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 	void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
-	
-	extern double get_weapon_speed(obj_data *weapon);
 
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	vehicle_data *veh, *veh_iter, *next_veh;
@@ -2463,7 +2459,6 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 */
 void scale_item_to_level(obj_data *obj, int level) {
 	void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
-	extern double get_weapon_speed(obj_data *weapon);
 	
 	int total_share, bonus, iter, amt;
 	int room_lev = 0, room_min = 0, room_max = 0, sig;

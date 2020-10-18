@@ -157,6 +157,13 @@ bld_data *setup_olc_building(bld_data *input);
 craft_data *setup_olc_craft(craft_data *input);
 vehicle_data *setup_olc_vehicle(vehicle_data *input);
 
+// olc display parts
+void get_adventure_linking_display(struct adventure_link_rule *list, char *save_buffer);
+void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
+void get_evolution_display(struct evolution_data *list, char *save_buffer);
+void get_exit_template_display(struct exit_template *list, char *save_buffer);
+void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer);
+
 // helpers from other systems
 bool delete_event_reward_from_list(struct event_reward **list, int type, any_vnum vnum);
 bool find_event_reward_in_list(struct event_reward *list, int type, any_vnum vnum);
