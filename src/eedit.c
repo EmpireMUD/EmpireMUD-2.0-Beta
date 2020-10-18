@@ -368,8 +368,6 @@ EEDIT(eedit_admin_flags) {
 
 
 EEDIT(eedit_banner) {
-	extern char *show_color_codes(char *string);
-	
 	if (!*argument) {
 		msg_to_char(ch, "Set the empire banner to what (HELP COLOR)?\r\n");
 	}

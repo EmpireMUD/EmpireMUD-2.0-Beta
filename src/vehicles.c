@@ -48,13 +48,10 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
 void ruin_vehicle(vehicle_data *veh, char *message);
 
 // external funcs
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void free_bld_relations(struct bld_relation *list);
 void free_custom_messages(struct custom_message *mes);
 void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-void get_resource_display(struct resource_data *list, char *save_buffer);
-extern char *show_color_codes(char *string);
 extern bool validate_icon(char *icon);
 
 
@@ -990,8 +987,6 @@ int total_vehicle_size_in_room(room_data *room) {
 * @return char_data* A pointer to the mob if one was loaded, or NULL if not.
 */
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh) {
-	void scale_mob_to_level(char_data *mob, int level);
-	
 	char_data *mob;
 	
 	// safety first
@@ -1503,8 +1498,6 @@ char *list_one_vehicle(vehicle_data *veh, bool detail) {
 * @param any_vnum vnum The vehicle vnum.
 */
 void olc_search_vehicle(char_data *ch, any_vnum vnum) {
-	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh = vehicle_proto(vnum);
 	vehicle_data *veh_iter, *next_veh_iter;
@@ -3528,9 +3521,6 @@ void save_olc_vehicle(descriptor_data *desc) {
 * @return vehicle_data* The copied vehicle.
 */
 vehicle_data *setup_olc_vehicle(vehicle_data *input) {
-	extern struct bld_relation *copy_bld_relations(struct bld_relation *input_list);
-	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
-	
 	vehicle_data *new;
 	
 	CREATE(new, vehicle_data, 1);
@@ -3589,7 +3579,6 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 * @param vehicle_data *veh The vehicle to display.
 */
 void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
 	void script_stat (char_data *ch, struct script_data *sc);
 	void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
 	
@@ -3830,8 +3819,6 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 */
 void olc_show_vehicle(char_data *ch) {
 	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];

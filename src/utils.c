@@ -414,7 +414,6 @@ void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_fla
 void run_delayed_refresh(void) {
 	void complete_goal(empire_data *emp, struct empire_goal *goal);
 	extern int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island);
-	void refresh_passive_buffs(char_data *ch);
 	extern struct char_delayed_update *char_delayed_update_list;
 	
 	struct char_delayed_update *cdu, *next_cdu;

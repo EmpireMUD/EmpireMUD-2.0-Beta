@@ -885,7 +885,6 @@ void run_reboot_triggers(void) {
 */
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier) {
 	extern int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype);
-	void scale_mob_to_level(char_data *mob, int level);
 	
 	double dam;
 	

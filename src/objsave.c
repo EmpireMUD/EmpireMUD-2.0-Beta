@@ -867,7 +867,6 @@ bool objpack_save_room(room_data *room) {
 * @param room_data *room The room.
 */
 void objpack_load_room(room_data *room) {
-	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	extern vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum);
 
 	obj_data *obj, *o, *next_o, *cont_row[MAX_BAG_ROWS];
@@ -1019,7 +1018,6 @@ void objpack_load_room(room_data *room) {
 * @param char *name The name of the person whose rent file to show.
 */
 void Crash_listrent(char_data *ch, char *name) {
-	void check_delayed_load(char_data *ch);
 	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 	char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 	

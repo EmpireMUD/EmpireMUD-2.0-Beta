@@ -63,9 +63,6 @@ struct mappc_data_container {
 };
 
 
-// external funcs
-void replace_question_color(char *input, char *color, char *output);
-
 // locals
 ACMD(do_exits);
 static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, room_data *to_room, bitvector_t options);

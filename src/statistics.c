@@ -57,16 +57,6 @@ int active_accounts_week = 0;	// just this week (at least 1 char)
 int max_players_this_uptime = 0;
 
 
-// external consts
-
-
-// external funcs
-
-
-// locals
-void update_world_count();
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// STATS DISPLAYS //////////////////////////////////////////////////////////
 

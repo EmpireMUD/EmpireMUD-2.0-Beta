@@ -33,7 +33,6 @@
 
 // external funcs
 extern int delete_all_instances(adv_data *adv);
-extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 void init_adventure(adv_data *adv);
 
 // locals
@@ -688,9 +687,6 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 * @param char_data *ch The person who is editing a adventure and will see its display.
 */
 void olc_show_adventure(char_data *ch) {
-	extern int adjusted_instance_limit(adv_data *adv);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
-
 	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
 	char lbuf[MAX_STRING_LENGTH];
 	int time;

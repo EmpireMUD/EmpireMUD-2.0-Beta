@@ -662,8 +662,6 @@ craft_data *setup_olc_craft(craft_data *input) {
 * @param char_data *ch The person who is editing a craft and will see its display.
 */
 void olc_show_craft(char_data *ch) {
-	void get_resource_display(struct resource_data *list, char *save_buffer);
-
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	char lbuf[MAX_STRING_LENGTH];
 	ability_data *abil;

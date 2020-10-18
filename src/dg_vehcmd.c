@@ -36,7 +36,6 @@
 extern struct instance_data *quest_instance_global;
 
 // external functions
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name);
@@ -46,7 +45,6 @@ extern vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name);
 extern vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 extern room_data *obj_room(obj_data *obj);
-void scale_mob_to_level(char_data *mob, int level);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
 void sub_write_to_room(char *str, room_data *room, bool use_queue);
 void vehicle_command_interpreter(vehicle_data *veh, char *argument);

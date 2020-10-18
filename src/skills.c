@@ -47,14 +47,11 @@ const char *default_skill_desc = "New skill";
 
 // eternal functions
 void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
-void assign_class_abilities(char_data *ch, class_data *cls, int role);
 void resort_empires(bool force);
 extern bool is_class_ability(ability_data *abil);
-void update_class(char_data *ch);
 
 // local protos
 bool can_gain_skill_from(char_data *ch, ability_data *abil);
-void clear_char_abilities(char_data *ch, any_vnum skill);
 struct skill_ability *find_skill_ability(skill_data *skill, ability_data *abil);
 int get_ability_points_available(any_vnum skill, int level);
 int get_ability_points_spent(char_data *ch, any_vnum skill);
@@ -1563,8 +1560,6 @@ void reset_skill_gain_tracker_on_abilities_above_level(char_data *ch, any_vnum s
 
 // set a skill directly to a level
 void set_skill(char_data *ch, any_vnum skill, int level) {
-	void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
-	
 	struct player_skill_data *skdata;
 	bool gain = FALSE;
 	bool was_vampire = IS_VAMPIRE(ch);
@@ -1691,7 +1686,6 @@ ACMD(do_noskill) {
 
 ACMD(do_skills) {
 	void check_un_vampire(char_data *ch, bool remove_vampire_skills);
-	void clear_char_abilities(char_data *ch, any_vnum skill);
 	
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
 	struct synergy_display_type *sdt_list = NULL, *sdt;

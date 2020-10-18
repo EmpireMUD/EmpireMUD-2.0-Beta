@@ -52,7 +52,6 @@ extern int add_eq_set_to_char(char_data *ch, int set_id, char *name);
 void add_learned_craft(char_data *ch, any_vnum vnum);
 ACMD(do_slash_channel);
 void free_obj_eq_set(struct eq_set_obj *eq_set);
-void update_class(char_data *ch);
 
 // local protos
 void check_eq_sets(char_data *ch);
@@ -3905,8 +3904,6 @@ void delete_player_character(char_data *ch) {
 void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void add_all_gain_hooks(char_data *ch);
 	void apply_all_ability_techs(char_data *ch);
-	void assign_class_abilities(char_data *ch, class_data *cls, int role);
-	void check_delayed_load(char_data *ch);
 	void check_minipets_and_companions(char_data *ch);
 	void check_player_events(char_data *ch);
 	void clean_lore(char_data *ch);
@@ -3915,7 +3912,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 	void give_level_zero_abilities(char_data *ch);
 	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
-	void refresh_passive_buffs(char_data *ch);
 	extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
 	
 	extern bool global_mute_slash_channel_joins;
@@ -4544,7 +4540,6 @@ GLB_FUNCTION(run_global_newbie_gear) {
 void start_new_character(char_data *ch) {
 	void add_archetype_lore(char_data *ch);
 	void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
-	void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
 	void set_skill(char_data *ch, any_vnum skill, int level);
 	extern const char *default_channels[];
 	extern bool global_mute_slash_channel_joins;

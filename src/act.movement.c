@@ -37,7 +37,6 @@
 // external funcs
 ACMD(do_dismount);
 extern bool action_flagged(char_data *ch, bitvector_t actf);
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
 extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
 extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
@@ -2674,9 +2673,6 @@ ACMD(do_rest) {
 
 
 ACMD(do_run) {
-	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
-	PATHFIND_VALIDATOR(pathfind_road);
-	
 	char buf[MAX_STRING_LENGTH];
 	long long time_check = -1;
 	room_data *path_to_room;

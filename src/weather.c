@@ -36,7 +36,6 @@ void weather_and_time(int mode) {
 
 
 void another_hour(int mode) {
-	void annual_world_update();
 	void process_shipping();
 
 	descriptor_data *d;

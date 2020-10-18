@@ -21,7 +21,9 @@ void command_interpreter(char_data *ch, char *argument);
 char lower( char c );
 void nanny(descriptor_data *d, char *arg);
 int find_command(const char *command);
+int _parse_name(char *arg, char *name);
 void send_low_pos_msg(char_data *ch);
+int Valid_Name(char *newname);
 
 
 struct command_info {

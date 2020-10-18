@@ -46,7 +46,6 @@
 ACMD(do_home);
 extern int add_eq_set_to_char(char_data *ch, int set_id, char *name);
 void add_obj_to_eq_set(obj_data *obj, int set_id, int pos);
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern struct shop_temp_list *build_available_shop_list(char_data *ch);
 extern bool can_steal(char_data *ch, empire_data *emp);
 extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
@@ -3998,7 +3997,6 @@ void trade_post(char_data *ch, char *argument) {
 * @param int mode SCMD_WAREHOUSE or SCMD_HOME
 */
 void warehouse_inventory(char_data *ch, char *argument, int mode) {
-	void check_delayed_load(char_data *ch);
 	char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*4], line[MAX_STRING_LENGTH], part[256], flags[256], quantity[256], *tmp;

@@ -1043,8 +1043,6 @@ class_data *create_class_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_class(char_data *ch, any_vnum vnum) {
-	void update_class(char_data *ch);
-
 	char_data *chiter;
 	class_data *cls;
 	

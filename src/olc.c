@@ -512,16 +512,13 @@ OLC_MODULE(vedit_speed);
 
 
 // external functions
-void replace_question_color(char *input, char *color, char *output);
 extern char *requirement_string(struct req_data *req, bool show_vnums);
-extern char *show_color_codes(char *string);
 void sort_icon_set(struct icon_data **list);
 void sort_interactions(struct interaction_item **list);
 extern int sort_requirements_by_group(struct req_data *a, struct req_data *b);
 extern bool valid_room_template_vnum(rmt_vnum vnum);
 
 // locals
-bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
 void smart_copy_requirements(struct req_data **to_list, struct req_data *from_list);
 
 // prototypes: auditors
@@ -583,9 +580,7 @@ extern adv_data *setup_olc_adventure(adv_data *input);
 extern archetype_data *setup_olc_archetype(archetype_data *input);
 extern augment_data *setup_olc_augment(augment_data *input);
 extern book_data *setup_olc_book(book_data *input);
-extern bld_data *setup_olc_building(bld_data *input);
 extern class_data *setup_olc_class(class_data *input);
-extern craft_data *setup_olc_craft(craft_data *input);
 extern crop_data *setup_olc_crop(crop_data *input);
 extern event_data *setup_olc_event(event_data *input);
 extern faction_data *setup_olc_faction(faction_data *input);
@@ -602,7 +597,6 @@ extern shop_data *setup_olc_shop(shop_data *input);
 extern skill_data *setup_olc_skill(skill_data *input);
 extern social_data *setup_olc_social(social_data *input);
 extern struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_storage);
-extern vehicle_data *setup_olc_vehicle(vehicle_data *input);
 
 // prototypes: other
 extern bool validate_icon(char *icon);
@@ -3562,7 +3556,6 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_BUILDING: {
-				void save_olc_building(descriptor_data *desc);
 				save_olc_building(ch->desc);
 				audit_building(GET_OLC_BUILDING(ch->desc), ch);
 				free_building(GET_OLC_BUILDING(ch->desc));
@@ -3578,7 +3571,6 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_CRAFT: {
-				void save_olc_craft(descriptor_data *desc);
 				save_olc_craft(ch->desc);
 				audit_craft(GET_OLC_CRAFT(ch->desc), ch);
 				free_craft(GET_OLC_CRAFT(ch->desc));
@@ -3718,7 +3710,6 @@ OLC_MODULE(olc_save) {
 				break;
 			}
 			case OLC_VEHICLE: {
-				void save_olc_vehicle(descriptor_data *desc);
 				save_olc_vehicle(ch->desc);
 				audit_vehicle(GET_OLC_VEHICLE(ch->desc), ch);
 				free_vehicle(GET_OLC_VEHICLE(ch->desc));

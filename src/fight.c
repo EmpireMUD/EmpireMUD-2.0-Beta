@@ -2730,8 +2730,6 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 * @return bool TRUE if the target survives, FALSE if it's extracted
 */
 bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle) {
-	void adjust_vehicle_tech(vehicle_data *veh, bool add);
-
 	static struct resource_data *default_res = NULL;
 	struct resource_data *old_list;
 	

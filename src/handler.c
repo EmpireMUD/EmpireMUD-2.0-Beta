@@ -78,9 +78,7 @@
 extern int get_north_for_char(char_data *ch);
 
 // external funcs
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
 EVENT_CANCEL_FUNC(cancel_room_event);
-void check_delayed_load(char_data *ch);
 void clear_delayed_update(char_data *ch);
 void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
@@ -3867,8 +3865,6 @@ void stop_follower(char_data *ch) {
 * @return bool TRUE if any globals ran; FALSE if not.
 */
 bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t type_flags, char_data *ch, adv_data *adv, int level, GLB_VALIDATOR(*validator), void *other_data) {
-	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
-	
 	struct global_data *glb, *next_glb, *choose_last;
 	bool done_cumulative = FALSE, found = FALSE;
 	int cumulative_prc;
@@ -4506,8 +4502,6 @@ GLB_FUNCTION(run_global_mob_interactions_func) {
 * @param INTERACTION_FUNC(*func) A callback function to run for the interaction.
 */
 bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func)) {
-	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
-	
 	struct glb_mob_interact_bean *data;
 	struct instance_data *inst;
 	bool any = FALSE;
@@ -5628,8 +5622,6 @@ void add_to_object_list(obj_data *obj) {
 * @param obj_data *input The item to copy.
 */
 obj_data *copy_warehouse_obj(obj_data *input) {
-	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
-
 	struct trig_var_data *var, *copy;
 	obj_data *obj, *proto;
 	trig_data *trig;

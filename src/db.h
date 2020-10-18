@@ -441,6 +441,7 @@ struct island_info *get_island_by_coords(char *coords);
 struct island_info *get_island_by_name(char_data *ch, char *name);
 char *get_island_name_for(int island_id, char_data *for_ch);
 bool island_has_default_name(struct island_info *island);
+void number_and_count_islands(bool reset);
 void save_island_table();
 
 // mobiles/chars
@@ -489,9 +490,13 @@ obj_data *read_object(obj_vnum nr, bool with_triggers);
 // players
 extern struct group_data *group_list;
 extern bool pause_affect_total;
-extern char_data *find_player_in_room_by_id(room_data *room, int id);
-extern char_data *is_at_menu(int id);
-extern char_data *is_playing(int id);
+
+void check_autowiz(char_data *ch);
+void check_delayed_load(char_data *ch);
+int get_highest_access_level(account_data *acct);
+char_data *find_player_in_room_by_id(room_data *room, int id);
+char_data *is_at_menu(int id);
+char_data *is_playing(int id);
 
 // progress
 extern progress_data *progress_table;
@@ -566,9 +571,11 @@ extern trig_data *free_trigger_list;
 // vehicles
 extern vehicle_data *vehicle_list;
 extern vehicle_data *vehicle_table;
-extern vehicle_data *vehicle_proto(any_vnum vnum);
+
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void free_vehicle(vehicle_data *veh);
 extern vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
+extern vehicle_data *vehicle_proto(any_vnum vnum);
 
 // world
 extern room_data *world_table;
@@ -576,6 +583,7 @@ extern room_data *interior_room_list;
 extern struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];
 extern struct map_data *land_map;
 
+void annual_world_update();
 void change_chop_territory(room_data *room);
 void check_all_exits();
 void check_terrain_height(room_data *room);
@@ -593,6 +601,8 @@ void init_mine(room_data *room, char_data *ch, empire_data *emp);
 void perform_burn_room(room_data *room);
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
+void run_external_evolutions();
+void save_whole_world();
 void sort_world_table();
 void untrench_room(room_data *room);
 

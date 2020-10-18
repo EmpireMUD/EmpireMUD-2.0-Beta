@@ -48,7 +48,9 @@
 
 
 // class.c prototypes
+void assign_class_abilities(char_data *ch, class_data *cls, int role);
 bool remove_vnum_from_class_abilities(struct class_ability **list, any_vnum vnum);
+void update_class(char_data *ch);
 
 // skills.c prototypes
 // TODO sort this
@@ -59,6 +61,7 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type);
 bool check_can_gain_skill(char_data *ch, any_vnum skill_vnum);
 bool check_solo_role(char_data *ch);
+void clear_char_abilities(char_data *ch, any_vnum skill);
 void gain_ability_exp(char_data *ch, any_vnum ability, double amount);
 void gain_player_tech_exp(char_data *ch, int tech, double amount);
 bool gain_skill(char_data *ch, skill_data *skill, int amount);

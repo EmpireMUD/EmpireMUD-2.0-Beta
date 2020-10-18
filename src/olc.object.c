@@ -56,7 +56,6 @@ char **olc_material_list = NULL;	// used for olc
 */
 bool audit_object(obj_data *obj, char_data *ch) {
 	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
-	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	bool is_adventure = (get_adventure_for_vnum(GET_OBJ_VNUM(obj)) != NULL);
 	char temp[MAX_STRING_LENGTH], unplural[MAX_STRING_LENGTH], *ptr;
@@ -1233,7 +1232,6 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_obj(char_data *ch, obj_vnum vnum) {
-	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
 	extern bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);
 	
@@ -2060,8 +2058,6 @@ void olc_get_values_display(char_data *ch, char *storage) {
 */
 void olc_show_object(char_data *ch) {
 	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	struct obj_storage_type *store;
@@ -2869,8 +2865,6 @@ OLC_MODULE(oedit_quantity) {
 
 
 OLC_MODULE(oedit_quick_recipe) {
-	extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
-	
 	char new_vnum_arg[MAX_INPUT_LENGTH], from_vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], cmd[256];
 	any_vnum new_vnum, from_vnum;
 	craft_data *cft;

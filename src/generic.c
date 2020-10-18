@@ -49,7 +49,6 @@ struct generic_relation *copy_generic_relations(struct generic_relation *list);
 void free_generic_relations(struct generic_relation **list);
 
 // external funcs
-extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
 extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
 extern bool find_currency_in_shop_item_list(struct shop_item *list, any_vnum vnum);
 extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);

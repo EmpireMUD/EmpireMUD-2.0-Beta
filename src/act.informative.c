@@ -581,7 +581,6 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int move_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
-	extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	struct player_skill_data *skdata, *next_skill;
@@ -3495,9 +3494,6 @@ ACMD(do_no_cmd) {
 
 
 ACMD(do_passives) {
-	void check_delayed_load(char_data *ch);
-	void refresh_passive_buffs(char_data *ch);
-	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	bool found = FALSE, is_file = FALSE;
 	struct affected_type *aff;
@@ -3871,8 +3867,6 @@ ACMD(do_whoami) {
 
 
 ACMD(do_whois) {
-	void check_delayed_load(char_data *ch);
-	
 	char part[MAX_STRING_LENGTH];
 	char_data *victim = NULL;
 	bool file = FALSE;

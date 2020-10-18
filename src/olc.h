@@ -118,9 +118,16 @@ struct olc_command_data {
 
 
 // olc.c helpers
+bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
+struct bld_relation *copy_bld_relations(struct bld_relation *input_list);
+struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
 struct icon_data *copy_icon_set(struct icon_data *input_list);
 struct interaction_item *copy_interaction_list(struct interaction_item *input_list);
 struct spawn_info *copy_spawn_list(struct spawn_info *input_list);
+void get_icons_display(struct icon_data *list, char *save_buffer);
+void get_interaction_display(struct interaction_item *list, char *save_buffer);
+void get_resource_display(struct resource_data *list, char *save_buffer);
+void get_script_display(struct trig_proto_list *list, char *save_buffer);
 int find_olc_type(char *name);
 bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
 void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
@@ -139,6 +146,16 @@ void smart_copy_interactions(struct interaction_item **addto, struct interaction
 void smart_copy_scripts(struct trig_proto_list **addto, struct trig_proto_list *input);
 void smart_copy_spawns(struct spawn_info **addto, struct spawn_info *input);
 void smart_copy_template_spawns(struct adventure_spawn **addto, struct adventure_spawn *input);
+
+// olc save functions
+void save_olc_building(descriptor_data *desc);
+void save_olc_craft(descriptor_data *desc);
+void save_olc_vehicle(descriptor_data *desc);
+
+// olc setup functions
+bld_data *setup_olc_building(bld_data *input);
+craft_data *setup_olc_craft(craft_data *input);
+vehicle_data *setup_olc_vehicle(vehicle_data *input);
 
 // helpers from other systems
 bool delete_event_reward_from_list(struct event_reward **list, int type, any_vnum vnum);

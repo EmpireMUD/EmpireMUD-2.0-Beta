@@ -33,10 +33,6 @@
 
 // external funcs
 ACMD(do_dismount);
-PATHFIND_VALIDATOR(pathfind_ocean);
-PATHFIND_VALIDATOR(pathfind_pilot);
-PATHFIND_VALIDATOR(pathfind_road);
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
 extern int get_north_for_char(char_data *ch);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
@@ -1753,8 +1749,6 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 
 // do_sail, do_pilot (search hints)
 ACMD(do_drive) {
-	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
-	
 	char buf[MAX_STRING_LENGTH], *found_path = NULL;
 	struct vehicle_room_list *vrl;
 	bool was_driving, same_dir, dir_only;

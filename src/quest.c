@@ -51,7 +51,6 @@ extern struct req_data *copy_requirements(struct req_data *from);
 void drop_quest(char_data *ch, struct player_quest *pq);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_requirement_display(struct req_data *list, char *save_buffer);
-void get_script_display(struct trig_proto_list *list, char *save_buffer);
 extern room_data *obj_room(obj_data *obj);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
 extern char *requirement_string(struct req_data *req, bool show_vnums);
@@ -66,7 +65,6 @@ int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 int count_owned_homes(empire_data *emp);
 int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
-bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 void free_player_quests(struct player_quest *list);
 void free_quest_givers(struct quest_giver *list);
 void free_quest_temp_list(struct quest_temp_list *list);
@@ -703,7 +701,6 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 * @param int instance_id Optional: If the quest is associated with an instance, pass its id. Otherwise, 0 is fine.
 */
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id) {
-	void clear_char_abilities(char_data *ch, any_vnum skill);
 	void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 	
 	char buf[MAX_STRING_LENGTH];

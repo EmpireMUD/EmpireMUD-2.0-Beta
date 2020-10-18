@@ -1454,8 +1454,6 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 * @return bool TRUE if the item is still in the world, FALSE if it was extracted
 */
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
-	void check_delayed_load(char_data *ch);
-	
 	player_index_data *index;
 	empire_data *emp = override_emp;
 	char_data *loaded_ch;

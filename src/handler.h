@@ -55,22 +55,6 @@
 #define GLB_FUNCTION(name)		void (name)(struct global_data *glb, char_data *ch, void *other_data)
 
 
-/**
-* Validates a location for the pathfinding system.
-*
-* This must be implemented for both 'room' and 'map', as only 1 of those is set
-* each time it's called.
-*
-* @param room_data *room Optional: An interior room (if this is NULL, map will be set instead).
-* @param struct map_data *map Optional: A map room if outdoors (if this is NULL, room will be set instead).
-* @param char_data *ch Optional: Player trying to find the path (may be NULL).
-* @param vehicle_data *veh Optional: Vehicle trying to find the paath (may be NULL).
-* @param struct pathfind_controller *controller The pathfinding controller and all its data.
-* @return bool TRUE if the room/map is ok, FALSE if not.
-*/
-#define PATHFIND_VALIDATOR(name)  bool (name)(room_data *room, struct map_data *map, char_data *ch, vehicle_data *veh, struct pathfind_controller *controller)
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// HANDLER MACROS //////////////////////////////////////////////////////////
 
@@ -152,6 +136,7 @@ extern int total_coins(char_data *ch);
 // companion handlers
 struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
 void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
+struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type);
 void reread_companion_trigs(char_data *mob);
 
 // cooldown handlers
@@ -180,6 +165,7 @@ void perform_abandon_vehicle(vehicle_data *veh);
 void perform_claim_room(room_data *room, empire_data *emp);
 void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void read_vault(empire_data *emp);
+void refresh_empire_dropped_items(empire_data *only_emp);
 
 // empire production total handlers
 void add_production_total(empire_data *emp, obj_vnum vnum, int amount);

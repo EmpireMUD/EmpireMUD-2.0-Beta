@@ -52,7 +52,6 @@ const char *default_mob_long = "A new mobile is standing here.\r\n";
 */
 bool audit_mobile(char_data *mob, char_data *ch) {
 	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
-	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	bool is_adventure = (get_adventure_for_vnum(GET_MOB_VNUM(mob)) != NULL);
 	char temp[MAX_STRING_LENGTH], *ptr;
@@ -778,7 +777,6 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_mob(char_data *ch, mob_vnum vnum) {
-	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
 	
 	char_data *proto, *mob, *next_mob;
@@ -1018,8 +1016,6 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 * @param descriptor_data *desc The descriptor who is saving a mobile.
 */
 void save_olc_mobile(descriptor_data *desc) {
-	void scale_mob_to_level(char_data *mob, int level);
-
 	char_data *mob = GET_OLC_MOBILE(desc), *mob_iter, *proto;
 	mob_vnum vnum = GET_OLC_VNUM(desc);
 	struct quest_lookup *ql;
@@ -1188,9 +1184,6 @@ char_data *setup_olc_mobile(char_data *input) {
 * @param char_data *ch The person who is editing an mobile and will see its display.
 */
 void olc_show_mobile(char_data *ch) {
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
-	
 	char buf[MAX_STRING_LENGTH * 4];	// these get long
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	struct custom_message *mcm;

@@ -620,8 +620,6 @@ void un_deathshroud(char_data *ch) {
 * @param bool remove_vampire_skills If TRUE, will set all VAMPIRE-flagged skills to 0 (forcefully un-vampires the player).
 */
 void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
-	void clear_char_abilities(char_data *ch, any_vnum skill);
-	
 	if (IS_NPC(ch)) {
 		if (remove_vampire_skills) {
 			REMOVE_BIT(MOB_FLAGS(ch), MOB_VAMPIRE);

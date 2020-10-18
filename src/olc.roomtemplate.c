@@ -32,7 +32,6 @@
 */
 
 // external funcs
-extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 void init_room_template(room_template *rmt);
 void sort_interactions(struct interaction_item **list);
 
@@ -531,8 +530,6 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
-	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	room_template *rmt = room_template_proto(vnum), *iter, *next_iter;
 	quest_data *quest, *next_quest;
@@ -740,8 +737,6 @@ void save_olc_room_template(descriptor_data *desc) {
 * @return room_template* The copied room template.
 */
 room_template *setup_olc_room_template(room_template *input) {
-	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
-	
 	room_template *new;
 	struct adventure_spawn *old_spawn, *new_spawn, *last_spawn;
 	struct exit_template *old_ex, *new_ex, *last_ex;
@@ -938,8 +933,6 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 */
 void olc_show_room_template(char_data *ch) {
 	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
 	char lbuf[MAX_STRING_LENGTH];

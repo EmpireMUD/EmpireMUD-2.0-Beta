@@ -42,9 +42,6 @@ const char *default_morph_keywords = "morph unnamed shapeless";
 const char *default_morph_short_desc = "an unnamed morph";
 const char *default_morph_long_desc = "A shapeless morph is standing here.";
 
-// external funcs
-void get_resource_display(struct resource_data *list, char *save_buffer);
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////

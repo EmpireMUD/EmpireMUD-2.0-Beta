@@ -42,7 +42,6 @@ extern struct generic_name_data *generic_names;
 // local protos
 void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
-void scale_mob_to_level(char_data *mob, int level);
 bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
 
 

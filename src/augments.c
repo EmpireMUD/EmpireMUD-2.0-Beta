@@ -33,9 +33,6 @@
 *   Edit Modules
 */
 
-// external funcs
-void get_resource_display(struct resource_data *list, char *save_buffer);
-
 // locals
 const char *default_aug_name = "unnamed augment";
 

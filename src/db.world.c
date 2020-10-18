@@ -259,8 +259,6 @@ void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 * @param struct map_data *map The map tile data. (must provide room OR map)
 */
 void check_island_assignment(room_data *room, struct map_data *map) {
-	void number_and_count_islands(bool reset);
-	
 	struct island_info **island;
 	struct map_data *to_map;
 	int x, y, new_x, new_y;
@@ -811,8 +809,6 @@ GLB_FUNCTION(run_global_mine_data) {
 * @param empire_data *emp Optional: The empire/owner (for techs).
 */
 void init_mine(room_data *room, char_data *ch, empire_data *emp) {
-	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
-	
 	struct glb_room_emp_bean *data;
 	
 	// no work

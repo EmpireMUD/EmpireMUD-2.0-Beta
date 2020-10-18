@@ -1436,7 +1436,6 @@ void remove_empire_from_table(empire_data *emp) {
 */
 void check_for_new_map(void) {
 	void lock_icon(room_data *room, struct icon_data *use_icon);	// utils.c
-	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 	
 	struct empire_storage_data *store, *next_store;
 	struct empire_territory_data *ter, *next_ter;

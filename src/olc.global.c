@@ -371,9 +371,6 @@ struct global_data *setup_olc_global(struct global_data *input) {
 * @param char_data *ch The person who is editing a global and will see its display.
 */
 void olc_show_global(char_data *ch) {
-	void get_icons_display(struct icon_data *list, char *save_buffer);
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH];
 	struct spawn_info *spawn;

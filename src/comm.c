@@ -69,7 +69,6 @@ extern char *flush_reduced_color_codes(descriptor_data *desc);
 void mobile_activity(void);
 void show_string(descriptor_data *d, char *input);
 int isbanned(char *hostname);
-void save_whole_world();
 
 // local functions
 RETSIGTYPE checkpointing(int sig);
@@ -909,7 +908,6 @@ void heartbeat(int heart_pulse) {
 	void free_freeable_triggers();
 	void free_loaded_players();
 	void frequent_combat(int pulse);
-	void generate_adventure_instances();
 	void output_map_to_file();
 	void point_update();
 	void process_import_evolutions();
@@ -922,7 +920,6 @@ void heartbeat(int heart_pulse) {
 	void reduce_stale_empires();
 	void reset_instances();
 	void run_delayed_refresh();
-	void run_external_evolutions();
 	void run_mob_echoes();
 	void sanity_check();
 	void save_data_table(bool force);

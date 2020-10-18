@@ -32,7 +32,6 @@
 
 // external funcs
 void init_building(bld_data *building);
-void replace_question_color(char *input, char *color, char *output);
 void sort_interactions(struct interaction_item **list);
 
 // local funcs
@@ -831,8 +830,6 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 * @param bld_vnum vnum The building vnum.
 */
 void olc_search_building(char_data *ch, bld_vnum vnum) {
-	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	bld_data *proto = building_proto(vnum);
 	struct adventure_link_rule *link;
@@ -1123,8 +1120,6 @@ void save_olc_building(descriptor_data *desc) {
 * @return bld_data* The copied building.
 */
 bld_data *setup_olc_building(bld_data *input) {
-	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
-	
 	bld_data *new;
 	
 	CREATE(new, bld_data, 1);
@@ -1213,10 +1208,6 @@ void smart_copy_bld_relations(struct bld_relation **to_list, struct bld_relation
 */
 void olc_show_building(char_data *ch) {
 	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	void get_resource_display(struct resource_data *list, char *save_buffer);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
-	extern char *show_color_codes(char *string);
 	
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	char lbuf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];

@@ -1232,8 +1232,6 @@ EVENTFUNC(trig_wait_event) {
 
 
 void do_stat_trigger(char_data *ch, trig_data *trig) {
-	extern char *show_color_codes(char *string);
-	
 	struct cmdlist_element *cmd_list;
 	char sb[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	int len = 0;
@@ -4390,7 +4388,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							if ((!str_cmp("on", subfield) || *subfield == '1') && !IS_VAMPIRE(c)) {
 								if (!IS_NPC(c)) {
-									void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
 									make_vampire(c, TRUE, NOTHING);
 								}
 								else {

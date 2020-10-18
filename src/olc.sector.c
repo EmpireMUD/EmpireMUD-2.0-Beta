@@ -818,8 +818,6 @@ sector_data *setup_olc_sector(sector_data *input) {
 */
 void olc_show_sector(char_data *ch) {
 	void get_evolution_display(struct evolution_data *list, char *save_buffer);
-	void get_icons_display(struct icon_data *list, char *save_buffer);
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
 	
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
 	char lbuf[MAX_STRING_LENGTH * 2];

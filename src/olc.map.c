@@ -123,7 +123,6 @@ OLC_MODULE(mapedit_decay) {
 
 
 OLC_MODULE(mapedit_terrain) {
-	extern crop_data *get_crop_by_name(char *name);
 	extern sector_data *get_sect_by_name(char *name);
 	
 	struct empire_city_data *city, *temp;

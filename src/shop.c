@@ -41,7 +41,6 @@ const char *default_shop_name = "Unnamed Shop";
 
 // external funcs
 extern struct quest_giver *copy_quest_givers(struct quest_giver *from);
-extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 void free_quest_givers(struct quest_giver *list);
 void get_quest_giver_display(struct quest_giver *list, char *save_buffer);
 

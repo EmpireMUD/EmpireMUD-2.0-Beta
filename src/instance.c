@@ -35,17 +35,9 @@
 // external consts
 extern int size_of_world;
 
-// external funcs
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
-void scale_mob_to_level(char_data *mob, int level);
-extern int stats_get_building_count(bld_data *bdg);
-extern int stats_get_sector_count(sector_data *sect);
-
 // locals
-bool can_instance(adv_data *adv);
 bool check_outside_fights(struct instance_data *inst);
 bool check_outside_vehicles(struct instance_data *inst);
-int count_instances(adv_data *adv);
 int count_mobs_in_instance(struct instance_data *inst, mob_vnum vnum);
 int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
 int count_players_in_instance(struct instance_data *inst, bool include_imms, char_data *ignore_ch);
@@ -59,7 +51,6 @@ any_vnum get_new_instance_id(void);
 void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
 void link_instance_entrance(struct instance_data *inst);
 void remove_instance_fake_loc(struct instance_data *inst);
-void reset_instance(struct instance_data *inst);
 void scale_instance_to_level(struct instance_data *inst, int level);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
 
@@ -1659,7 +1650,6 @@ bool can_instance(adv_data *adv) {
 */
 void check_instance_is_loaded(struct instance_data *inst) {
 	void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
-	void reset_instance(struct instance_data *inst);
 	
 	if (IS_SET(INST_FLAGS(inst), INST_NEEDS_LOAD) && INST_LOCATION(inst)) {
 		instantiate_rooms(INST_ADVENTURE(inst), inst, INST_RULE(inst), INST_LOCATION(inst), INST_DIR(inst), INST_ROTATION(inst));
@@ -1894,8 +1884,6 @@ room_data *find_nearest_adventure(room_data *from, rmt_vnum vnum) {
 * @param rmt_vnum vnum Which room template vnum to look for.
 */
 room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum) {
-	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
-	
 	adv_data *adv = get_adventure_for_vnum(vnum);
 	struct instance_data *inst, *closest = NULL;
 	int this, dist = 0;
@@ -2233,9 +2221,6 @@ void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum) {
 * instances based on the size of the world (land tiles only).
 */
 void update_instance_world_size(void) {
-	extern int stats_get_sector_count(sector_data *sect);
-	void update_world_count();
-	
 	sector_data *sect, *next_sect;
 	int total;
 	

@@ -46,11 +46,9 @@ bitvector_t default_minipet_affs = AFF_NO_ATTACK | AFF_CHARM;
 // external prototypes
 void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
-void check_delayed_load(char_data *ch);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 extern int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
 void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
-extern char *show_color_codes(char *string);
 
 // locals
 char_data *find_minipet(char_data *ch);
@@ -1906,9 +1904,7 @@ ACMD(do_changepass) {
 
 
 ACMD(do_companions) {
-	extern struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type);
 	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
-	void setup_ability_companions(char_data *ch);
 	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct companion_data *cd, *next_cd, *found_cd;
@@ -2680,8 +2676,6 @@ ACMD(do_herd) {
 
 ACMD(do_lastname) {
 	void change_personal_lastname(char_data *ch, char *name);
-	extern int _parse_name(char *arg, char *name);
-	extern int Valid_Name(char *newname);
 	
 	char arg1[MAX_INPUT_LENGTH], new_name[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	char *arg2, *best, *exact;

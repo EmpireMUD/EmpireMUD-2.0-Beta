@@ -1434,8 +1434,6 @@ int perform_alias(descriptor_data *d, char *orig) {
 
 /* The interface to the outside world: do_alias / do_unalias */
 ACMD(do_alias) {
-	extern char *show_color_codes(char *string);
-	
 	char *repl;
 	struct alias_data *a, *temp;
 
@@ -2323,7 +2321,6 @@ int _parse_name(char *arg, char *name) {
 */
 void nanny(descriptor_data *d, char *arg) {
 	void change_personal_lastname(char_data *ch, char *name);
-	void check_delayed_load(char_data *ch);
 	void display_automessages_on_login(char_data *ch);
 	void display_tip_to_char(char_data *ch);
 	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
@@ -2332,7 +2329,6 @@ void nanny(descriptor_data *d, char *arg) {
 	extern int num_earned_bonus_traits(char_data *ch);
 	void run_delayed_refresh();
 	void start_new_character(char_data *ch);
-	extern int Valid_Name(char *newname);
 	
 	extern struct promo_code_list promo_codes[];
 	extern int wizlock_level;

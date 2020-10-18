@@ -48,13 +48,10 @@
 // external vars
 
 // external functions
-void check_delayed_load(char_data *ch);
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 void discrete_load(FILE *fl, int mode, char *filename);
 void index_boot(int mode);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
-void save_whole_world();
-void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 
 // local functions
 int file_to_string_alloc(const char *name, char **buf);
@@ -481,7 +478,6 @@ void boot_world(void) {
 	void load_islands();
 	void load_running_events_file();
 	void load_world_map_from_file();
-	void number_and_count_islands(bool reset);
 	void read_ability_requirements();
 	void renum_world();
 	void setup_start_locations();

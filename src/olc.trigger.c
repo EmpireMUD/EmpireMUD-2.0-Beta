@@ -630,8 +630,6 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_trigger(char_data *ch, trig_vnum vnum) {
-	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	trig_data *proto = real_trigger(vnum);
 	quest_data *quest, *next_quest;
@@ -937,8 +935,6 @@ struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_stor
 * @param char_data *ch The person who is editing a trigger and will see its display.
 */
 void olc_show_trigger(char_data *ch) {
-	extern char *show_color_codes(char *string);
-	
 	trig_data *trig = GET_OLC_TRIGGER(ch->desc);
 	bitvector_t trig_arg_types = compile_argument_types_for_trigger(trig);
 	char trgtypes[256], buf[MAX_STRING_LENGTH * 4];	// that HAS to be long enough, right?

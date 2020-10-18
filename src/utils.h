@@ -1636,15 +1636,36 @@ extern struct weather_data weather_info;	// db.c
  //////////////////////////////////////////////////////////////////////////////
 //// UTIL FUNCTION PROTOS ////////////////////////////////////////////////////
 
+/**
+* Validates a location for the pathfinding system.
+*
+* This must be implemented for both 'room' and 'map', as only 1 of those is set
+* each time it's called.
+*
+* @param room_data *room Optional: An interior room (if this is NULL, map will be set instead).
+* @param struct map_data *map Optional: A map room if outdoors (if this is NULL, room will be set instead).
+* @param char_data *ch Optional: Player trying to find the path (may be NULL).
+* @param vehicle_data *veh Optional: Vehicle trying to find the paath (may be NULL).
+* @param struct pathfind_controller *controller The pathfinding controller and all its data.
+* @return bool TRUE if the room/map is ok, FALSE if not.
+*/
+#define PATHFIND_VALIDATOR(name)  bool (name)(room_data *room, struct map_data *map, char_data *ch, vehicle_data *veh, struct pathfind_controller *controller)
+
+// for the easy-update system
+#define PLAYER_UPDATE_FUNC(name)  void (name)(char_data *ch, bool is_file)
+
 // log information
 #define log  basic_mud_log
 
-// vnum hash tools from utils.c
+// string/vnum hash tools from utils.c
 void add_string_hash(struct string_hash **hash, const char *string, int count);
 void add_vnum_hash(struct vnum_hash **hash, any_vnum vnum, int count);
 void free_string_hash(struct string_hash **hash);
 void free_vnum_hash(struct vnum_hash **hash);
 int sort_string_hash(struct string_hash *a, struct string_hash *b);
+
+// adventure functions utils.c
+adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 
 // basic functions from utils.c
 bool any_players_in_room(room_data *room);
@@ -1669,6 +1690,9 @@ generic_data *find_generic_component(char *name);
 bool is_basic_component(obj_data *obj);
 bool is_component(obj_data *obj, generic_data *cmp);
 #define is_component_vnum(obj, vnum)  is_component((obj), real_generic(vnum))
+
+// crop functions from utils.c
+crop_data *get_crop_by_name(char *name);
 
 // empire utils from utils.c
 bool can_claim(char_data *ch);
@@ -1740,6 +1764,7 @@ void command_lag(char_data *ch, int wait_type);
 void determine_gear_level(char_data *ch);
 room_data *find_load_room(char_data *ch);
 int pick_level_from_range(int level, int min, int max);
+void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 bool wake_and_stand(char_data *ch);
 
 // resource functions from utils.c
@@ -1764,9 +1789,11 @@ char *level_range_string(int min, int max, int current);
 bool multi_isname(const char *arg, const char *namelist);
 char *CAP(char *txt);
 char *fname(const char *namelist);
+void replace_question_color(char *input, char *color, char *output);
 char *reverse_strstr(char *haystack, char *needle);
 bool search_custom_messages(char *keywords, struct custom_message *list);
 bool search_extra_descs(char *keywords, struct extra_descr_data *list);
+char *show_color_codes(char *string);
 char *str_dup(const char *source);
 char *str_replace(const char *search, const char *replace, const char *subject);
 char *str_str(char *cs, char *ct);
@@ -1820,9 +1847,11 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 // abilities.c
 void add_ability_gain_hook(char_data *ch, ability_data *abil);
 ability_data *find_player_ability_by_tech(char_data *ch, int ptech);
+void refresh_passive_buffs(char_data *ch);
 void remove_passive_buff(char_data *ch, struct affected_type *aff);
 void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
 void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trigger);
+void setup_ability_companions(char_data *ch);
 
 // act.action.c
 void cancel_action(char_data *ch);
@@ -1852,6 +1881,7 @@ struct custom_message *pick_custom_longdesc(char_data *ch);
 
 // act.item.c
 int count_objs_in_room(room_data *room);
+void deliver_shipment(empire_data *emp, struct shipping_data *shipd);
 int find_free_shipping_id(empire_data *emp);
 obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 int obj_carry_size(obj_data *obj);
@@ -1870,6 +1900,7 @@ void cancel_adventure_summon(char_data *ch);
 
 // act.quest.c
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
+void show_quest_tracker(char_data *ch, struct player_quest *pq);
 
 // act.trade.c
 bool check_can_craft(char_data *ch, craft_data *type);
@@ -1881,6 +1912,7 @@ obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 // act.vampire.c
 bool cancel_biting(char_data *ch);
 bool check_vampire_sun(char_data *ch, bool message);
+void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
 
 // act.vehicles.c
 void do_unseat_from_vehicle(char_data *ch);
@@ -1924,7 +1956,12 @@ bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_dat
 bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
 
 // instance.c
+int adjusted_instance_limit(adv_data *adv);
+bool can_instance(adv_data *adv);
+int count_instances(adv_data *adv);
 void delete_instance(struct instance_data *inst, bool run_cleanup);
+void generate_adventure_instances();
+void reset_instance(struct instance_data *inst);
 
 // limits.c
 bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
@@ -1952,6 +1989,7 @@ bool check_scaling(char_data *mob, char_data *attacker);
 int determine_best_scale_level(char_data *ch, bool check_group);
 void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
 void scale_mob_for_character(char_data *mob, char_data *ch);
+void scale_mob_to_level(char_data *mob, int level);
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 
 // morph.c
@@ -1964,16 +2002,24 @@ bool veh_has_relation(vehicle_data *veh, int type, any_vnum vnum);
 int count_bld_relations(bld_data *bld, int type);
 char *get_bld_name_by_proto(bld_vnum vnum);
 
+// pathfind.c
+char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
+PATHFIND_VALIDATOR(pathfind_ocean);
+PATHFIND_VALIDATOR(pathfind_pilot);
+PATHFIND_VALIDATOR(pathfind_road);
+
 // progress.c
 bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
 progress_data *find_progress_goal_by_name(char *name);
 progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name);
+void full_reset_empire_progress(empire_data *only_emp);
 void get_progress_perks_display(struct progress_perk *list, char *save_buffer, bool show_vnums);
 void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
 void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 
 // quest.c
+bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 char *get_quest_name_by_proto(any_vnum vnum);
 void get_tracker_display(struct req_data *tracker, char *save_buffer);
 void refresh_all_quests(char_data *ch);
@@ -2026,6 +2072,12 @@ void et_lose_building(empire_data *emp, any_vnum vnum);
 void et_lose_tile_sector(empire_data *emp, sector_vnum vnum);
 void et_lose_vehicle(empire_data *emp, vehicle_data *veh);
 
+// statistics.c
+int stats_get_building_count(bld_data *bdg);
+int stats_get_crop_count(crop_data *cp);
+int stats_get_sector_count(sector_data *sect);
+void update_world_count();
+
 // vehicles.c
 void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 void complete_vehicle(vehicle_data *veh);
@@ -2062,9 +2114,6 @@ void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount)
 
 // unique int for each 'daily cycle' (used for experience, scripting, etc)
 #define DAILY_CYCLE_DAY  (1 + (long)((data_get_long(DATA_DAILY_CYCLE) - data_get_long(DATA_WORLD_START)) / SECS_PER_REAL_DAY))
-
-// for the easy-update system
-#define PLAYER_UPDATE_FUNC(name)  void (name)(char_data *ch, bool is_file)
 
 // Group related defines
 #define GROUP(ch)  (ch->group)
