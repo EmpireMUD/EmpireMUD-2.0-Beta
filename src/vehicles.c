@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -45,22 +46,6 @@ const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 void clear_vehicle(vehicle_data *veh);
 void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
 void ruin_vehicle(vehicle_data *veh, char *message);
-
-// external consts
-extern const char *climate_flags[];
-extern const bitvector_t climate_flags_order[];
-extern const char *designate_flags[];
-extern const char *function_flags[];
-extern const char *interact_types[];
-extern const byte interact_vnum_types[NUM_INTERACTS];
-extern const char *mob_move_types[];
-extern const char *paint_colors[];
-extern const char *paint_names[];
-extern const int bld_relationship_vnum_types[];
-extern const char *room_aff_bits[];
-extern const char *veh_custom_types[];
-extern const char *vehicle_flags[];
-extern const char *vehicle_speed_types[];
 
 // external funcs
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
@@ -1707,8 +1692,6 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 * @param char_data *ch The person doing the dismantling.
 */
 void process_dismantle_vehicle(char_data *ch) {
-	extern const char *pool_types[];
-	
 	struct resource_data *res, *find_res, *next_res, *copy;
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh;
@@ -3609,8 +3592,6 @@ void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
 	void get_interaction_display(struct interaction_item *list, char *save_buffer);
 	void script_stat (char_data *ch, struct script_data *sc);
 	void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
-	extern const char *depletion_type[NUM_DEPLETION_TYPES];
-	extern const char *room_extra_types[];
 	
 	char buf[MAX_STRING_LENGTH * 2], part[MAX_STRING_LENGTH];
 	struct room_extra_data *red, *next_red;

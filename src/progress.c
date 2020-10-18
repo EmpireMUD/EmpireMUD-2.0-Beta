@@ -21,6 +21,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "constants.h"
 
 
 /**
@@ -38,13 +39,6 @@
 
 // local data
 const char *default_progress_name = "Unnamed Goal";
-
-// external consts
-extern const char *progress_flags[];
-extern const char *progress_perk_types[];
-extern const char *progress_types[];
-extern const char *requirement_types[];
-extern const char *techs[];
 
 // external funcs
 extern struct req_data *copy_requirements(struct req_data *from);
@@ -362,8 +356,6 @@ void get_progress_list_display(struct progress_list *list, char *save_buffer) {
 * @param bool show_vnums If true, adds [ 1234] before the name.
 */
 char *get_one_perk_display(struct progress_perk *perk, bool show_vnums) {
-	extern const char *craft_types[];
-	
 	static char save_buffer[MAX_STRING_LENGTH];
 	craft_data *craft;
 	char numstr[256];

@@ -33,6 +33,7 @@
 #include "db.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 #ifdef HAVE_ARPA_TELNET_H
 #include <arpa/telnet.h>
@@ -2572,7 +2573,6 @@ static const char *GetMSSP_Classes() {
 }
 
 static const char *GetMSSP_Codebase() {
-	extern const char *version;	// constants.c
 	return version;
 }
 

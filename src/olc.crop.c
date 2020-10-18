@@ -20,6 +20,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -27,14 +28,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// external consts
-extern const char *climate_flags[];
-extern const bitvector_t climate_flags_order[];
-extern const char *crop_flags[];
-extern const char *interact_types[];
-extern const char *mapout_color_names[];
-extern const char *spawn_flags[];
 
 // external funcs
 void init_crop(crop_data *cp);
@@ -60,7 +53,6 @@ bool audit_crop(crop_data *cp, char_data *ch) {
 	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
 	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
-	extern const char *icon_types[];
 	
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;

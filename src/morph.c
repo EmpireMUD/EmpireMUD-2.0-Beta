@@ -25,6 +25,7 @@
 #include "handler.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -41,15 +42,6 @@ const char *default_morph_keywords = "morph unnamed shapeless";
 const char *default_morph_short_desc = "an unnamed morph";
 const char *default_morph_long_desc = "A shapeless morph is standing here.";
 
-// external consts
-extern const char *affected_bits[];
-extern const bool apply_never_scales[];
-extern const char *apply_types[];
-extern const char *mob_move_types[];
-extern const char *morph_flags[];
-extern const char *pool_types[];
-extern const char *size_types[];
-
 // external funcs
 void get_resource_display(struct resource_data *list, char *save_buffer);
 
@@ -63,8 +55,6 @@ void get_resource_display(struct resource_data *list, char *save_buffer);
 * @param char_data *ch The character to add morph affects to.
 */
 void add_morph_affects(char_data *ch) {
-	extern const double apply_values[];
-	
 	double points_available, remaining, share;
 	morph_data *morph = GET_MORPH(ch);
 	struct affected_type *af = NULL;

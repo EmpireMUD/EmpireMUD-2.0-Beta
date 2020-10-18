@@ -24,6 +24,7 @@
 #include "dg_scripts.h"
 #include "dg_event.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -45,9 +46,7 @@
 */
 
 // external vars
-extern struct city_metadata_type city_type[];
 extern bool need_world_index;
-extern const int rev_dir[];
 extern bool world_map_needs_save;
 
 
@@ -3731,9 +3730,6 @@ int sort_empire_islands(struct empire_island *a, struct empire_island *b) {
 * Writes the data files used to generate graphical maps.
 */
 void output_map_to_file(void) {
-	extern const char banner_to_mapout_token[][2];
-	extern const char mapout_color_tokens[];
-	
 	FILE *out, *pol, *cit;
 	int num, color = 0, x, y;
 	struct empire_city_data *city;

@@ -23,6 +23,7 @@
 #include "skills.h"
 #include "olc.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -36,39 +37,6 @@
 *   Vnum Searches
 *   Commands
 */
-
-// external vars
-extern const char *action_bits[];
-extern const char *affected_bits[];
-extern const char *apply_types[];
-extern const char *apply_type_names[];
-extern const char *bld_on_flags[];
-extern const bitvector_t bld_on_flags_order[];
-extern const char *bonus_bits[];
-extern const char *climate_flags[];
-extern const bitvector_t climate_flags_order[];
-extern const char *craft_types[];
-extern const char *dirs[];
-extern const char *extra_bits[];
-extern const char *function_flags[];
-extern const char *genders[];
-extern const char *grant_bits[];
-extern const char *instance_flags[];
-extern const char *island_bits[];
-extern const char *item_types[];
-extern const char *mapout_color_names[];
-extern const char *olc_flag_bits[];
-extern const char *progress_types[];
-extern const int bld_relationship_vnum_types[];
-extern struct faction_reputation_type reputation_levels[];
-extern const char *room_aff_bits[];
-extern const char *sector_flags[];
-extern const char *size_types[];
-extern const char *spawn_flags[];
-extern const char *spawn_flags_short[];
-extern const char *syslog_types[];
-extern const char *tool_flags[];
-extern const char *wear_bits[];
 
 // external functions
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
@@ -282,7 +250,6 @@ void stop_snooping(char_data *ch) {
 
 // returns TRUE if the user sees the target, FALSE if not
 bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_search, int low, int high, int rp) {
-	extern const char *connected_types[];
 	char_data *ch = tch;
 	char levelname[20], *timeptr, idletime[10];
 	char line[200], line2[220], state[30];
@@ -507,7 +474,6 @@ ADMIN_UTIL(util_bldconvert) {
 	extern bld_data *setup_olc_building(bld_data *input);
 	extern craft_data *setup_olc_craft(craft_data *input);
 	extern vehicle_data *setup_olc_vehicle(vehicle_data *input);
-	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	any_vnum from_vnum, start_to_vnum, to_vnum = NOTHING;
@@ -1006,9 +972,7 @@ ADMIN_UTIL(util_bldconvert) {
 
 
 // looks up buildings with certain flags
-ADMIN_UTIL(util_b318_buildings) {
-	extern const char *bld_flags[];
-	
+ADMIN_UTIL(util_b318_buildings) {	
 	char buf[MAX_STRING_LENGTH];
 	bld_data *bld, *next_bld;
 	bool any = FALSE;
@@ -3983,7 +3947,6 @@ SHOW(show_commons) {
 SHOW(show_companions) {
 	extern struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type);
 	void setup_ability_companions(char_data *ch);
-	extern const char *pool_types[];
 	
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	char_data *proto = NULL, *plr = NULL;
@@ -4288,8 +4251,6 @@ SHOW(show_shops) {
 
 
 SHOW(show_technology) {
-	extern const char *player_tech_types[];
-	
 	struct player_tech *ptech;
 	int last_tech, count = 0;
 	char one[256], line[256];
@@ -5629,7 +5590,6 @@ void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list) {
 void do_stat_adventure(char_data *ch, adv_data *adv) {
 	extern int count_instances(adv_data *adv);
 	void get_adventure_linking_display(struct adventure_link_rule *list, char *save_buffer);
-	extern const char *adventure_flags[];
 	
 	char lbuf[MAX_STRING_LENGTH];
 	int time;
@@ -5731,8 +5691,6 @@ void do_stat_book(char_data *ch, book_data *book) {
 */
 void do_stat_building(char_data *ch, bld_data *bdg) {
 	void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
-	extern const char *bld_flags[];
-	extern const char *designate_flags[];
 	
 	char lbuf[MAX_STRING_LENGTH];
 	
@@ -5813,16 +5771,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern int move_gain(char_data *ch);
 	void display_attributes(char_data *ch, char_data *to);
 
-	extern const char *account_flags[];
-	extern const char *class_role[];
-	extern const char *damage_types[];
 	extern const double hit_per_dex;
-	extern const char *mob_custom_types[];
-	extern const char *mob_move_types[];
-	extern const char *player_bits[];
-	extern const char *position_types[];
-	extern const char *preference_bits[];
-	extern const char *connected_types[];
 	extern const int base_hit_chance;
 	extern struct promo_code_list promo_codes[];
 
@@ -6129,8 +6078,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 
 void do_stat_craft(char_data *ch, craft_data *craft) {
-	extern const char *craft_flags[];
-	
 	ability_data *abil;
 	bld_data *bld;
 	int seconds;
@@ -6199,8 +6146,6 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 * @param crop_data *cp The crop to stat.
 */
 void do_stat_crop(char_data *ch, crop_data *cp) {
-	extern const char *crop_flags[];
-	
 	msg_to_char(ch, "Crop VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
 	msg_to_char(ch, "Room Title: %s, Mapout Color: %s\r\n", GET_CROP_TITLE(cp), mapout_color_names[GET_CROP_MAPOUT(cp)]);
 	
@@ -6237,12 +6182,6 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 void do_stat_empire(char_data *ch, empire_data *emp) {
 	extern int *summarize_weekly_playtime(empire_data *emp);
 	void script_stat (char_data *ch, struct script_data *sc);
-	
-	extern const char *empire_admin_flags[];
-	extern const char *empire_attributes[];
-	extern const char *empire_trait_types[];
-	extern const char *progress_types[];
-	extern const char *techs[];
 	
 	empire_data *emp_iter, *next_emp;
 	int iter, found_rank, total, len, *ptime;
@@ -6341,9 +6280,6 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 * @param struct global_data *glb The global to stat.
 */
 void do_stat_global(char_data *ch, struct global_data *glb) {
-	extern const char *global_flags[];
-	extern const char *global_types[];
-	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	ability_data *abil;
 	
@@ -6399,13 +6335,7 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 
 /* Gives detailed information on an object (j) to ch */
 void do_stat_object(char_data *ch, obj_data *j) {
-	extern const struct material_data materials[NUM_MATERIALS];
-	extern const char *container_bits[];
-	extern const char *corpse_flags[];
-	extern const char *obj_custom_types[];
-	extern const char *storage_bits[];
 	extern double get_weapon_speed(obj_data *weapon);
-	extern const char *armor_types[NUM_ARMOR_TYPES+1];
 	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	int found;
@@ -6603,8 +6533,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			}
 			break;
 		case ITEM_PAINT: {
-			extern const char *paint_colors[];
-			extern const char *paint_names[];
 			sprinttype(GET_PAINT_COLOR(j), paint_names, buf, sizeof(buf), "UNDEFINED");
 			sprinttype(GET_PAINT_COLOR(j), paint_colors, part, sizeof(part), "&0");
 			msg_to_char(ch, "Paint color: %s%s\t0\r\n", part, buf);
@@ -6731,11 +6659,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 /* Displays the vital statistics of IN_ROOM(ch) to ch */
 void do_stat_room(char_data *ch) {
-	extern const char *exit_bits[];
-	extern const char *depletion_type[NUM_DEPLETION_TYPES];
-	extern const char *instance_flags[];
-	extern const char *room_extra_types[];
-	
 	char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH], *nstr;
 	struct depletion_data *dep;
 	struct empire_city_data *city;
@@ -7011,7 +6934,6 @@ void do_stat_room(char_data *ch) {
 void do_stat_room_template(char_data *ch, room_template *rmt) {
 	void get_exit_template_display(struct exit_template *list, char *save_buffer);
 	void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer);
-	extern const char *room_template_flags[];
 	
 	char lbuf[MAX_STRING_LENGTH];
 	adv_data *adv;
@@ -7234,8 +7156,6 @@ int vnum_crop(char *searchname, char_data *ch) {
 * @return int The number of matches shown.
 */
 int vnum_global(char *searchname, char_data *ch) {
-	extern const char *global_types[];
-	
 	struct global_data *iter, *next_iter;
 	char flags[MAX_STRING_LENGTH], flags2[MAX_STRING_LENGTH];
 	int found = 0;
@@ -7616,7 +7536,6 @@ ACMD(do_automessage) {
 	void free_automessage(struct automessage *msg);
 	void save_automessages(void);
 	extern int sort_automessage_by_data(struct automessage *a, struct automessage *b);
-	extern const char *automessage_types[];
 	extern struct automessage *automessages;
 	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
@@ -8931,8 +8850,6 @@ ACMD(do_island) {
 
 
 ACMD(do_last) {
-	extern const char *level_names[][2];
-	
 	char_data *plr = NULL;
 	bool file = FALSE;
 	char status[10];
@@ -9458,8 +9375,6 @@ ACMD(do_reboot) {
 	void perform_reboot();
 	void update_reboot();
 	extern struct reboot_control_data reboot_control;
-	extern const char *shutdown_types[];
-	extern const char *reboot_type[];
 	
 	char arg[MAX_INPUT_LENGTH];
 	descriptor_data *desc;

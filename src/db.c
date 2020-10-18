@@ -25,6 +25,7 @@
 #include "olc.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -713,7 +714,6 @@ void add_trd_owner(room_vnum vnum, empire_vnum owner) {
 */
 void check_for_bad_buildings(void) {
 	void unlink_instance_entrance(room_data *room, bool run_cleanup);
-	extern const char *bld_relationship_types[];
 
 	struct obj_storage_type *store, *next_store, *temp;
 	struct bld_relation *relat, *next_relat;

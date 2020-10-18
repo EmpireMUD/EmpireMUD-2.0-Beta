@@ -21,6 +21,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -28,17 +29,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// externs
-extern const char *action_bits[];
-extern const char *affected_bits[];
-extern const char *genders[];
-extern const char *interact_types[];
-extern const byte interact_vnum_types[NUM_INTERACTS];
-extern const char *mob_custom_types[];
-extern const char *mob_move_types[];
-extern const char *name_sets[];
-extern const char *size_types[];
 
 // external funcs
 extern char **get_weapon_types_string();

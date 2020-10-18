@@ -367,13 +367,13 @@ bool trigger_counterspell(char_data *ch);
 #define TOTAL_ATTACK_TYPES		(TYPE_SUFFERING + 30)
 
 
-// SIEGE_x types for besiege
+// SIEGE_x: types for besiege
 #define SIEGE_PHYSICAL  0
 #define SIEGE_MAGICAL  1
 #define SIEGE_BURNING  2
 
 
-// armor types
+// ARMOR_x: armor types
 #define ARMOR_MAGE  0
 #define ARMOR_LIGHT  1
 #define ARMOR_MEDIUM  2
@@ -381,7 +381,7 @@ bool trigger_counterspell(char_data *ch);
 #define NUM_ARMOR_TYPES  4
 
 
-/* Damage types */
+/* DAM_x: Damage types */
 #define DAM_PHYSICAL  0
 #define DAM_MAGICAL  1
 #define DAM_FIRE  2
@@ -389,26 +389,26 @@ bool trigger_counterspell(char_data *ch);
 #define DAM_DIRECT  4
 
 
-// Fight modes
+// FMODE_x: Fight modes
 #define FMODE_MELEE  0	// Hand-to-hand combat
 #define FMODE_MISSILE  1	// Ranged combat
 #define FMODE_WAITING  2	// Fighting someone in ranged combat
 
 
-// Rescue message types
+// RESCUE_x: Rescue message types
 #define RESCUE_NO_MSG  0
 #define RESCUE_RESCUE  1	// traditional rescue message
 #define RESCUE_FOCUS  2		// mob changes focus
 
 
-// speeds for attack_hit_info.speed
+// SPD_x: speeds for attack_hit_info.speed
 #define SPD_FAST  0
 #define SPD_NORMAL  1
 #define SPD_SLOW  2
 #define NUM_SPEEDS  3
 
 
-// Weapon types
+// WEAPON_x: Weapon types
 #define WEAPON_BLUNT  0
 #define WEAPON_SHARP  1
 #define WEAPON_MAGIC  2
@@ -447,8 +447,11 @@ struct ability_exec_type {
 };
 
 
-// skill and ability data
+// constants.c externs that need skills.h
+extern const char *armor_types[NUM_ARMOR_TYPES+1];
+extern const double armor_scale_bonus[NUM_ARMOR_TYPES];
 extern struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES];
+extern double skill_check_difficulty_modifier[NUM_DIFF_TYPES];
 
 
  //////////////////////////////////////////////////////////////////////////////

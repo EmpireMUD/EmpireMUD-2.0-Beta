@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -37,7 +38,6 @@
 
 // external vars
 extern struct generic_name_data *generic_names;
-extern struct character_size_data size_data[];
 
 // local protos
 void end_pursuit(char_data *ch, char_data *target);
@@ -552,7 +552,6 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
 */
 bool try_mobile_movement(char_data *ch) {
 	ACMD(do_exit);
-	extern const int rev_dir[];
 	
 	int dir, count;
 	room_data *to_room, *temp_room, *was_in = IN_ROOM(ch);

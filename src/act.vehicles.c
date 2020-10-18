@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -29,16 +30,6 @@
 *   Sub-Commands
 *   Commands
 */
-
-// external consts
-extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
-extern const char *dirs[];
-extern const char *from_dir[];
-extern const bool is_flat_dir[NUM_OF_DIRS];
-extern const char *mob_move_types[];
-extern const char *position_commands[];
-extern const char *position_types[];
-extern const int rev_dir[];
 
 // external funcs
 ACMD(do_dismount);

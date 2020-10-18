@@ -23,6 +23,7 @@
 #include "vnums.h"
 #include "dg_scripts.h"
 #include "olc.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -43,11 +44,6 @@
 const char *default_skill_name = "Unnamed Skill";
 const char *default_skill_abbrev = "???";
 const char *default_skill_desc = "New skill";
-
-// external consts
-extern const char *skill_flags[];
-extern const char *class_role[];
-extern const char *class_role_color[];
 
 // eternal functions
 void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
@@ -577,8 +573,6 @@ bool can_gain_skill_from(char_data *ch, ability_data *abil) {
 * @return bool TRUE if ch can use ability; FALSE if not.
 */
 bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type) {
-	extern const char *pool_types[];
-	
 	char buf[MAX_STRING_LENGTH];
 	int time, needs_cost;
 	
@@ -1602,8 +1596,6 @@ void set_skill(char_data *ch, any_vnum skill, int level) {
 * @return bool TRUE for success, FALSE for fail
 */
 bool skill_check(char_data *ch, any_vnum ability, int difficulty) {
-	extern double skill_check_difficulty_modifier[NUM_DIFF_TYPES];
-
 	int chance = get_ability_level(ch, ability);
 	
 	// always succeeds

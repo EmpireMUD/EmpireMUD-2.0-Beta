@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -332,7 +333,6 @@ ACMD(do_damage_spell) {
 
 ACMD(do_ready) {
 	void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
-	extern const char *pool_types[];
 	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], *to_char, *to_room;
 	struct player_ability_data *plab, *next_plab;

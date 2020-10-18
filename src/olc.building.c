@@ -21,6 +21,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -28,18 +29,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// external consts
-extern const char *bld_flags[];
-extern const char *bld_relationship_types[];
-extern const char *designate_flags[];
-extern const char *function_flags[];
-extern const char *interact_types[];
-extern const byte interact_vnum_types[NUM_INTERACTS];
-extern const char *olc_type_bits[NUM_OLC_TYPES+1];
-extern const int bld_relationship_vnum_types[];
-extern const char *room_aff_bits[];
-extern const char *spawn_flags[];
 
 // external funcs
 void init_building(bld_data *building);

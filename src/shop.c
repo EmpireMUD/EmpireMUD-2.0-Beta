@@ -23,7 +23,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
-
+#include "constants.h"
 
 /**
 * Contents:
@@ -38,11 +38,6 @@
 
 // local data
 const char *default_shop_name = "Unnamed Shop";
-
-// external consts
-extern const char *olc_type_bits[NUM_OLC_TYPES+1];
-extern struct faction_reputation_type reputation_levels[];
-extern const char *shop_flags[];
 
 // external funcs
 extern struct quest_giver *copy_quest_givers(struct quest_giver *from);

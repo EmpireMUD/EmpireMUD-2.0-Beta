@@ -25,6 +25,7 @@
 #include "vnums.h"
 #include "dg_scripts.h"
 #include "olc.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -42,19 +43,7 @@
 */
 
 // external vars
-extern const char *alt_dirs[];
 extern struct empire_chore_type chore_data[NUM_CHORES];
-extern struct city_metadata_type city_type[];
-extern const char *dirs[];
-extern const char *empire_admin_flags[];
-extern const char *empire_trait_types[];
-extern const char *offense_flags[];
-extern struct offense_info_type offense_info[NUM_OFFENSES];
-extern const char *priv[];
-extern const char *progress_types[];
-extern const char *trade_type[];
-extern const char *trade_mostleast[];
-extern const char *trade_overunder[];
 
 // external funcs
 void check_nowhere_einv(empire_data *emp, int new_island);
@@ -498,9 +487,6 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type, bool p
 * @param empire_data *e The empire to show
 */
 static void show_detailed_empire(char_data *ch, empire_data *e) {
-	extern const char *score_type[];
-	extern const char *techs[];
-	
 	int iter, sub, found_rank, total, type;
 	empire_data *emp_iter, *next_emp;
 	bool found, is_own_empire, comma;
@@ -1273,8 +1259,6 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 * @param char *argument Any more args.
 */
 void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
-	extern const char *wf_problem_types[];
-	
 	char buf[MAX_STRING_LENGTH * 2], unsupplied[MAX_STRING_LENGTH], line[256], mult[256], rname[256];
 	int iter, only_chore = NOTHING, last_chore, last_problem, count;
 	struct empire_island *isle, *next_isle;
@@ -2613,8 +2597,6 @@ int find_inspire(char *input) {
 * @param int type The inspire_data index
 */
 void perform_inspire(char_data *ch, char_data *vict, int type) {
-	extern const double apply_values[];
-	
 	double points, any = FALSE;
 	struct affected_type *af;
 	int time, value;
@@ -2939,7 +2921,6 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 */
 void scan_for_tile(char_data *ch, char *argument) {
 	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
-	extern const char *paint_names[];
 
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
@@ -4304,9 +4285,6 @@ ACMD(do_efind) {
 
 // syntax: elog [empire] [type] [lines]
 ACMD(do_elog) {
-	extern const char *empire_log_types[];
-	extern const bool empire_log_request_only[];
-	
 	char *argptr, *tempptr, buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	int iter, count, type = NOTHING, lines = -1;
 	struct empire_log_data *elog;
@@ -6898,9 +6876,6 @@ ACMD(do_reclaim) {
 
 
 ACMD(do_roster) {
-	extern const char *class_role[];
-	extern const char *class_role_color[];
-
 	char buf[MAX_STRING_LENGTH * 2], buf1[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], part[MAX_STRING_LENGTH];
 	player_index_data *index, *next_index;
 	empire_data *e = GET_LOYALTY(ch);

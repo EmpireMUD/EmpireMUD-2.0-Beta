@@ -21,6 +21,7 @@
 #include "db.h"
 #include "skills.h"
 #include "olc.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -45,10 +46,6 @@ int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 
 // external consts
 extern const int base_player_pools[NUM_POOLS];
-extern const char *class_flags[];
-extern const char *class_role[];
-extern const char *class_role_color[];
-extern const char *pool_types[];
 
 // external funcs
 

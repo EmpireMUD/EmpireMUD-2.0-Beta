@@ -20,6 +20,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -27,19 +28,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// external consts
-extern const char *bld_on_flags[];
-extern const bitvector_t bld_on_flags_order[];
-extern const char *climate_flags[];
-extern const bitvector_t climate_flags_order[];
-extern const char *evo_types[];
-extern const int evo_val_types[NUM_EVOS];
-extern const char *interact_types[];
-extern const char *mapout_color_names[];
-extern const char *sector_flags[];
-extern const char *spawn_flags[];
-extern const char *icon_types[];
 
 // external funcs
 void init_sector(sector_data *st);
@@ -65,7 +53,6 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
 	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
 	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
-	extern const char *icon_types[];
 	
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;

@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -38,8 +39,6 @@
 
 // external vars
 extern struct gen_craft_data_t gen_craft_data[];
-extern const bool interact_one_at_a_time[NUM_INTERACTS];
-extern const char *tool_flags[];
 
 // cancel protos
 void cancel_resource_list(char_data *ch);
@@ -3331,9 +3330,6 @@ ACMD(do_pan) {
 
 
 ACMD(do_plant) {
-	extern const char *climate_flags[];
-	extern const bitvector_t climate_flags_order[];
-	
 	struct evolution_data *evo;
 	sector_data *original;
 	obj_data *obj;

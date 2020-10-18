@@ -21,6 +21,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -42,15 +43,6 @@ const char *default_archetype_rank = "Adventurer";
 // local protos
 void free_archetype_gear(struct archetype_gear *list);
 void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
-
-// external consts
-extern const char *archetype_flags[];
-extern struct archetype_menu_type archetype_menu[];
-extern const char *archetype_types[];
-extern int attribute_display_order[NUM_ATTRIBUTES];
-extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
-extern const char *olc_type_bits[NUM_OLC_TYPES+1];
-extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
 

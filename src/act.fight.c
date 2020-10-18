@@ -22,15 +22,13 @@
 #include "skills.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
 *   Helpers
 *   Commands
 */
-
-// external vars
-extern const char *dirs[];
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -138,8 +136,6 @@ ACMD(do_clearmeters) {
 
 
 ACMD(do_consider) {
-	extern const char *affected_bits_consider[];
-	
 	char buf[MAX_STRING_LENGTH];
 	bitvector_t bits;
 	int diff, pos, hitch;
@@ -242,8 +238,6 @@ ACMD(do_execute) {
 
 
 ACMD(do_flee) {
-	extern const bool can_flee_dir[NUM_OF_DIRS];
-	
 	int i, attempt, try;
 	room_data *to_room = NULL;
 	char_data *was_fighting;
@@ -741,8 +735,6 @@ ACMD(do_tie) {
 
 
 ACMD(do_throw) {
-	extern const int rev_dir[];
-	
 	char buf[MAX_STRING_LENGTH];
 	int dir = NO_DIR;
 	char_data *vict;

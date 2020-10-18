@@ -24,6 +24,7 @@
 #include "db.h"
 #include "skills.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -32,9 +33,6 @@
 */
 
 // external vars
-extern const char *damage_types[];
-extern const char *alt_dirs[];
-extern const char *dirs[];
 extern struct instance_data *quest_instance_global;
 
 // external functions
@@ -1465,9 +1463,6 @@ VCMD(do_vat)  {
 
 
 VCMD(do_vrestore) {
-	extern const bool aff_is_bad[];
-	extern const double apply_values[];
-	
 	struct affected_type *aff, *next_aff;
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *vtarg = NULL;

@@ -24,11 +24,9 @@
 #include "db.h"
 #include "skills.h"
 #include "vnums.h"
+#include "constants.h"
 
 // external vars
-extern const char *damage_types[];
-extern const char *dirs[];
-extern const char *alt_dirs[];
 extern struct instance_data *quest_instance_global;
 
 // external functions
@@ -424,9 +422,6 @@ OCMD(do_oechoneither) {
 
 
 OCMD(do_orestore) {
-	extern const bool aff_is_bad[];
-	extern const double apply_values[];
-	
 	struct affected_type *aff, *next_aff;
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh = NULL;

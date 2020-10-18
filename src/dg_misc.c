@@ -27,6 +27,7 @@
 #include "db.h"
 #include "skills.h"
 #include "vnums.h"
+#include "constants.h"
 
 // external funcs
 void combat_meter_damage_dealt(char_data *ch, int amt);
@@ -34,10 +35,6 @@ void combat_meter_damage_taken(char_data *ch, int amt);
 void combat_meter_heal_dealt(char_data *ch, int amt);
 void combat_meter_heal_taken(char_data *ch, int amt);
 extern room_data *get_room(room_data *ref, char *name);
-
-/* external vars */
-extern const char *apply_types[];
-extern const char *affected_bits[];
 
 
 /**
@@ -214,8 +211,6 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 * add/remove an affect on a room
 */
 void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int script_type, char *cmd) {
-	extern const char *room_aff_bits[];
-	
 	char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect_room" */
 	char roomname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
 	char value_p[MAX_INPUT_LENGTH], duration_p[MAX_INPUT_LENGTH];
@@ -323,7 +318,6 @@ void do_dg_build(room_data *target, char *argument) {
 	void complete_building(room_data *room);
 	void ruin_one_building(room_data *room);	// db.world.c
 	void special_building_setup(char_data *ch, room_data *room);
-	extern const int rev_dir[];
 	
 	char vnum_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH];
 	bool ruin = FALSE, demolish = FALSE;
@@ -1025,8 +1019,6 @@ void script_heal(void *thing, int type, char *argument) {
 	extern char_data *get_char_by_room(room_data *room, char *name);
 	extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
 	extern int get_room_scale_level(room_data *room, char_data *targ);
-	extern const double apply_values[];
-	extern const bool aff_is_bad[];
 	
 	char targ_arg[MAX_INPUT_LENGTH], what_arg[MAX_INPUT_LENGTH], *scale_arg, log_root[MAX_STRING_LENGTH];
 	struct affected_type *aff, *next_aff;
@@ -1188,7 +1180,6 @@ void script_modify(char *argument) {
 	extern char *get_room_description(room_data *room);
 	extern vehicle_data *get_vehicle(char *name);
 	extern bool validate_icon(char *icon);
-	extern const char *genders[];
 	extern bool world_map_needs_save;
 	
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];

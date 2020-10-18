@@ -20,6 +20,7 @@
 #include "handler.h"
 #include "db.h"
 #include "olc.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -352,8 +353,6 @@ EEDIT(eedit_adjective) {
 
 
 EEDIT(eedit_admin_flags) {
-	extern const char *empire_admin_flags[];
-	
 	bitvector_t old_flags = EMPIRE_ADMIN_FLAGS(emp);
 	char buf[MAX_STRING_LENGTH];
 	
@@ -501,8 +500,6 @@ EEDIT(eedit_description) {
 
 
 EEDIT(eedit_frontiertraits) {
-	extern const char *empire_trait_types[];
-	
 	bitvector_t old_traits = EMPIRE_FRONTIER_TRAITS(emp);
 	char buf[MAX_STRING_LENGTH];
 	

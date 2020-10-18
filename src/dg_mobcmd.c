@@ -52,11 +52,9 @@
 #include "comm.h"
 #include "skills.h"
 #include "vnums.h"
+#include "constants.h"
 
 // external vars
-extern const char *alt_dirs[];
-extern const char *damage_types[];
-extern const char *dirs[];
 extern struct instance_data *quest_instance_global;
 
 // external funcs
@@ -1150,9 +1148,6 @@ ACMD(do_mbuild) {
 
 
 ACMD(do_mrestore) {
-	extern const bool aff_is_bad[];
-	extern const double apply_values[];
-	
 	struct affected_type *aff, *next_aff;
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh = NULL;

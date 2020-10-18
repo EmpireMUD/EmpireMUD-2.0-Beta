@@ -26,6 +26,7 @@
 #include "dg_scripts.h"
 #include "dg_event.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -74,10 +75,7 @@
 */
 
 // externs
-extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern int get_north_for_char(char_data *ch);
-extern const bool interact_one_at_a_time[NUM_INTERACTS];
-const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
@@ -3601,8 +3599,6 @@ bool empire_has_needs_status(empire_data *emp, int island, int type, bitvector_t
 * @return struct empire_city_data* Returns the closest city that loc is inside, or NULL if none
 */
 struct empire_city_data *find_city(empire_data *emp, room_data *loc) {
-	extern struct city_metadata_type city_type[];
-
 	struct empire_city_data *city, *found = NULL;
 	int dist, min = -1;
 
@@ -8168,11 +8164,6 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 * @return char* The string display.
 */
 char *requirement_string(struct req_data *req, bool show_vnums) {
-	extern const char *action_bits[];
-	extern const char *diplomacy_flags[];
-	extern const char *function_flags[];
-	extern const char *vehicle_flags[];
-	
 	char vnum[256], lbuf[256];
 	static char output[256];
 	vehicle_data *vproto;
@@ -10478,9 +10469,6 @@ int get_direction_for_char(char_data *ch, int dir) {
 * @return int A real direction (EAST), or NO_DIR if none.
 */
 int parse_direction(char_data *ch, char *dir) {
-	extern const char *alt_dirs[];
-	extern const char *dirs[];
-
 	int d;
 
 	// two sets of dirs to check -- alt_dirs contains short names like "ne"

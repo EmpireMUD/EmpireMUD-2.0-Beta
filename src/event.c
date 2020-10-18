@@ -26,6 +26,7 @@
 #include "dg_event.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -45,12 +46,6 @@
 const char *default_event_name = "Unnamed Event";
 const char *default_event_description = "This event has no description.\r\n";
 const char *default_event_complete_msg = "The event has ended.\r\n";
-
-// external consts
-extern const char *event_types[];
-extern const char *event_flags[];
-extern const char *olc_type_bits[NUM_OLC_TYPES+1];
-extern const char *quest_reward_types[];
 
 // external funcs
 extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);

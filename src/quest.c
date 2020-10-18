@@ -25,6 +25,7 @@
 #include "handler.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -42,15 +43,6 @@
 const char *default_quest_name = "Unnamed Quest";
 const char *default_quest_description = "This quest has no description.\r\n";
 const char *default_quest_complete_msg = "You have completed the quest.\r\n";
-
-// external consts
-extern const char *action_bits[];
-extern const char *quest_flags[];
-extern const char *quest_giver_types[];
-extern const char *quest_reward_types[];
-extern const bool requirement_amt_type[];
-extern const char *requirement_types[];
-extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 // external funcs
 extern int count_cities(empire_data *emp);
@@ -652,8 +644,6 @@ char *get_quest_name_by_proto(any_vnum vnum) {
 * @param char *save_buffer The string to save it to.
 */
 void get_tracker_display(struct req_data *tracker, char *save_buffer) {
-	extern const bool requirement_amt_type[];
-	
 	int lefthand, count = 0, sub = 0;
 	char buf[MAX_STRING_LENGTH];
 	struct req_data *task;
@@ -3332,8 +3322,6 @@ void qt_wear_obj(char_data *ch, obj_data *obj) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_quest(quest_data *quest, char_data *ch) {
-	extern const bool requirement_needs_tracker[];
-	
 	struct trig_proto_list *tpl;
 	struct quest_reward *rew;
 	struct req_data *task;

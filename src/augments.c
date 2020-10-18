@@ -21,6 +21,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -31,13 +32,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// external consts
-extern const char *apply_types[];
-extern const char *augment_types[];
-extern const struct augment_type_data augment_info[];
-extern const char *augment_flags[];
-extern const char *wear_bits[];
 
 // external funcs
 void get_resource_display(struct resource_data *list, char *save_buffer);

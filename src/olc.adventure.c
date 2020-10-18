@@ -9,6 +9,7 @@
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -21,6 +22,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -28,14 +30,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// external consts
-extern const char *adventure_flags[];
-extern const char *adventure_link_flags[];
-extern const char *adventure_link_types[];
-extern const char *bld_on_flags[];
-extern const bitvector_t bld_on_flags_order[];
-extern const char *dirs[];
 
 // external funcs
 extern int delete_all_instances(adv_data *adv);

@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -35,11 +36,6 @@
 
 // external vars
 extern const struct action_data_struct action_data[];
-extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
-extern const char *dirs[];
-extern const int rev_dir[];
-extern const char *from_dir[];
-extern const char *mob_move_types[];
 
 // external funcs
 ACMD(do_dismount);
@@ -858,7 +854,6 @@ void perform_transport(char_data *ch, room_data *to_room) {
 */
 void process_running(char_data *ch) {
 	extern int get_north_for_char(char_data *ch);
-	extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 	
 	int dir = GET_ACTION_VNUM(ch, 0), dist;
 	bool done = FALSE;

@@ -21,6 +21,7 @@
 #include "comm.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -32,9 +33,6 @@
 */
 
 // external consts
-extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
-extern const char *dirs[];
-extern const int rev_dir[];
 extern int size_of_world;
 
 // external funcs

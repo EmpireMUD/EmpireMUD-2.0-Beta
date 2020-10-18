@@ -23,7 +23,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
-
+#include "constants.h"
 
 /**
 * Contents:
@@ -39,11 +39,6 @@
 const char *default_social_command = "social";
 const char *default_social_name = "Unnamed Social";
 const int default_social_position = POS_RESTING;
-
-// external consts
-extern const char *position_types[];
-extern const char *social_flags[];
-extern const char *social_message_types[NUM_SOCM_MESSAGES][2];
 
 // external funcs
 void get_requirement_display(struct req_data *list, char *save_buffer);

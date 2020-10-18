@@ -9,6 +9,7 @@
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -21,6 +22,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -28,15 +30,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// external consts
-extern const char *adventure_spawn_types[];
-extern const char *dirs[];
-extern const char *exit_bits[];
-extern const char *function_flags[];
-extern const char *interact_types[];
-extern const char *room_aff_bits[];
-extern const char *room_template_flags[];
 
 // external funcs
 extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
@@ -233,8 +226,6 @@ char *list_one_room_template(room_template *rmt, bool detail) {
 * @return bool TRUE if it adds an exit; FALSE if not (no messages sent on FALSE).
 */
 bool match_one_exit(char_data *ch, room_template *add_exit_to, room_template *origin, struct exit_template *ex) {
-	extern int rev_dir[];
-	
 	struct exit_template *new, *temp;
 	int dir = (ex->dir == DIR_RANDOM ? DIR_RANDOM : rev_dir[ex->dir]);
 	bool found = FALSE;
@@ -1270,8 +1261,6 @@ OLC_MODULE(rmedit_script) {
 
 
 OLC_MODULE(rmedit_spawns) {
-	extern const char *olc_type_bits[NUM_OLC_TYPES+1];
-
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	char type_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];

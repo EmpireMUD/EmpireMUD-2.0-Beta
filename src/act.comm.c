@@ -21,6 +21,7 @@
 #include "db.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -1708,8 +1709,6 @@ ACMD(do_page) {
 
 
 ACMD(do_recolor) {
-	extern const char *custom_color_types[];
-	
 	char *valid_colors = "rgbymcwajloptvnRGBYMCWAJLOPTV0";
 	
 	char arg[MAX_INPUT_LENGTH];

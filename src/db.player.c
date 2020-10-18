@@ -22,6 +22,7 @@
 #include "interpreter.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -43,13 +44,6 @@
 #define LOG_BAD_TAG_WARNINGS  TRUE	// triggers syslogs for invalid pfile tags
 
 // external vars
-extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
-extern const char *condition_types[];
-extern const char *custom_color_types[];
-extern const char *extra_attribute_types[];
-extern const char *genders[];
-extern const struct material_data materials[NUM_MATERIALS];
-extern const char *pool_types[];
 extern int top_account_id;
 extern int top_idnum;
 
@@ -4287,8 +4281,6 @@ int get_highest_access_level(account_data *acct) {
 * @param int pos Where to equip it, or NO_WEAR for inventory.
 */
 void give_newbie_gear(char_data *ch, obj_vnum vnum, int pos) {
-	extern const struct wear_data_type wear_data[NUM_WEARS];
-	
 	obj_data *obj;
 	
 	if (!obj_proto(vnum)) {
@@ -4324,7 +4316,6 @@ void give_newbie_gear(char_data *ch, obj_vnum vnum, int pos) {
 */
 void init_player(char_data *ch) {
 	extern const int base_player_pools[NUM_POOLS];
-	extern const char *syslog_types[];
 	
 	player_index_data *index;
 	int account_id = NOTHING;

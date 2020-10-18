@@ -25,6 +25,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -36,12 +37,6 @@
 *   Where Functions
 *   Commands
 */
-
-// external vars
-extern const char *paint_colors[];
-extern const char *paint_names[];
-extern const int rev_dir[];
-extern struct character_size_data size_data[];
 
 // external functions
 extern vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
@@ -67,10 +62,6 @@ struct mappc_data_container {
 	struct mappc_data *data;
 };
 
-
-// external vars
-extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
-extern const char *dirs[];
 
 // external funcs
 void replace_question_color(char *input, char *color, char *output);
@@ -626,12 +617,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	void list_char_to_char(char_data *list, char_data *ch);
 	void list_vehicles_to_char(vehicle_data *list, char_data *ch);
 	extern const struct tavern_data_type tavern_data[];
-	extern int how_to_show_map[NUM_SIMPLE_DIRS][2];
-	extern int show_map_y_first[NUM_SIMPLE_DIRS];
-	extern struct city_metadata_type city_type[];
-	extern const char *bld_flags[];
-	extern const char *room_aff_bits[];
-	extern const char *room_template_flags[];
 
 	struct mappc_data_container *mappc = NULL;
 	struct mappc_data *pc, *next_pc;
@@ -1128,7 +1113,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 
 void look_in_direction(char_data *ch, int dir) {
 	ACMD(do_weather);
-	extern const char *from_dir[];
 	
 	char buf[MAX_STRING_LENGTH - 9], buf2[MAX_STRING_LENGTH - 9];	// save room for the "You see "
 	vehicle_data *veh;
@@ -1340,7 +1324,6 @@ void look_in_direction(char_data *ch, int dir) {
 static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, room_data *to_room, bitvector_t options) {
 	extern int get_north_for_char(char_data *ch);
 	extern int get_direction_for_char(char_data *ch, int dir);
-	extern struct city_metadata_type city_type[];
 	
 	bool need_color_terminator = FALSE;
 	char buf[30], buf1[30], col_buf[256], lbuf[MAX_STRING_LENGTH];
@@ -2280,8 +2263,6 @@ ACMD(do_exits) {
 
 
 ACMD(do_mapscan) {
-	extern const char *alt_dirs[];
-	
 	room_data *use_room = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL);
 	int dir, dist, last_isle;
 	room_data *to_room;

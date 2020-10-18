@@ -29,6 +29,7 @@
 #include "interpreter.h"
 #include "utils.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -38,9 +39,6 @@
 *   World Object Saving
 *   Object Utils
 */
-
-// external vars
-extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
 void add_obj_to_eq_set(obj_data *obj, int set_id, int pos);

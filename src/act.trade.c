@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -34,13 +35,7 @@
 */
 
 // external vars
-extern const struct augment_type_data augment_info[];
-extern const char *craft_types[];
-extern const char *function_flags[];
-extern const char *function_flags_long[];
 extern struct gen_craft_data_t gen_craft_data[];
-extern const int rev_dir[];
-extern const char *tool_flags[];
 
 // external functions
 extern bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
@@ -682,15 +677,6 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 */
 void show_craft_info(char_data *ch, char *argument, int craft_type) {
 	extern double get_weapon_speed(obj_data *weapon);
-	extern const char *affected_bits[];
-	extern const char *apply_types[];
-	extern const char *armor_types[NUM_ARMOR_TYPES+1];
-	extern const char *bld_on_flags[];
-	extern const bitvector_t bld_on_flags_order[];
-	extern const char *craft_flag_for_info[];
-	extern const char *extra_bits[];
-	extern const char *item_types[];
-	extern const char *wear_bits[];
 	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], range[MAX_STRING_LENGTH];
 	struct obj_apply *apply;
@@ -1432,8 +1418,6 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
 ACMD(do_gen_augment) {
 	extern augment_data *find_augment_by_name(char_data *ch, char *name, int type);
 	extern char *shared_by(obj_data *obj, char_data *ch);
-	extern const bool apply_never_scales[];
-	extern const double apply_values[];
 	
 	char buf[MAX_STRING_LENGTH], target_arg[MAX_INPUT_LENGTH], *augment_arg;
 	double points_available, remaining, share;
@@ -2433,7 +2417,6 @@ ACMD(do_recipes) {
 // do_refashion / this handles both 'reforge' and 'refashion'
 ACMD(do_reforge) {
 	extern char *shared_by(obj_data *obj, char_data *ch);
-	extern const char *item_types[];
 	
 	char arg2[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	struct resource_data *res = NULL;

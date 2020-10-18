@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -200,9 +201,6 @@ void apply_potion(obj_data *obj, char_data *ch) {
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_cleanse) {
-	extern const bool aff_is_bad[];
-	extern const double apply_values[];
-	
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *aff, *next_aff;
 	bitvector_t bitv;
@@ -291,8 +289,6 @@ ACMD(do_cleanse) {
 
 
 ACMD(do_confer) {
-	extern const double apply_values[];
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct affected_type *aff, *aff_iter;
 	bool any, found_existing, found_ch;

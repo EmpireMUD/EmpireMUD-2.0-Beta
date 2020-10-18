@@ -25,6 +25,7 @@
 #include "skills.h"
 #include "olc.h"
 #include "dg_event.h"
+#include "constants.h"
 
 
 extern const char *cmd_door[];
@@ -37,8 +38,6 @@ bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
 char *str_str(char *cs, char *ct);
 
 // external vars
-extern const char *dirs[];
-extern const int rev_dir[];
 extern struct instance_data *quest_instance_global;
 
 // locals

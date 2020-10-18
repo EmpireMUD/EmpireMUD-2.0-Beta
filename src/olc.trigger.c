@@ -21,6 +21,7 @@
 #include "handler.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -28,14 +29,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// external consts
-extern const char **trig_attach_type_list[];
-extern const char *trig_attach_types[];
-extern const char *trig_types[];
-extern const char *otrig_types[];
-extern const char *vtrig_types[];
-extern const char *wtrig_types[];
 
 
 // external funcs

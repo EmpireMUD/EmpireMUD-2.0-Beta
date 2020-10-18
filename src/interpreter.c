@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -36,9 +37,6 @@
 *   Character Creation
 *   Menu Interpreter Functions
 */
-
-// external vars
-extern struct archetype_menu_type archetype_menu[];
 
 // external funcs
 extern bool has_anonymous_host(descriptor_data *desc);
@@ -2034,8 +2032,6 @@ void set_creation_state(descriptor_data *d, int state) {
 * @param char_data *ch The player to show the menu to.
 */
 void show_bonus_trait_menu(char_data *ch) {
-	extern const char *bonus_bit_descriptions[];
-
 	int iter;
 	
 	if (IS_NPC(ch) || !ch->desc) {

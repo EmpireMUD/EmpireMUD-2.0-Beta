@@ -20,6 +20,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -27,16 +28,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// externs
-extern const char *apply_types[];
-extern const char *bld_on_flags[];
-extern const bitvector_t bld_on_flags_order[];
-extern const char *craft_flags[];
-extern const char *craft_types[];
-extern const char *function_flags[];
-extern const char *road_types[];
-extern const char *tool_flags[];
 
 // external funcs
 void init_craft(craft_data *craft);

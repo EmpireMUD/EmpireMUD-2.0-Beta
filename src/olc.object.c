@@ -21,6 +21,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -28,26 +29,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// externs
-extern const char *action_bits[];
-extern const char *affected_bits[];
-extern const char *apply_type_names[];
-extern const char *apply_types[];
-extern const char *armor_types[NUM_ARMOR_TYPES+1];
-extern const char *container_bits[];
-extern const char *extra_bits[];
-extern const char *interact_types[];
-extern const char *item_types[];
-extern const struct material_data materials[NUM_MATERIALS];
-extern const char *obj_custom_types[];
-extern const char *offon_types[];
-extern const char *paint_colors[];
-extern const char *paint_names[];
-extern const char *size_types[];
-extern const char *storage_bits[];
-extern const char *tool_flags[];
-extern const char *wear_bits[];
 
 // external funcs
 extern double get_weapon_speed(obj_data *weapon);
@@ -1255,7 +1236,6 @@ void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
 	extern bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);
-	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
 	char buf[MAX_STRING_LENGTH];
 	struct adventure_spawn *asp;
@@ -2890,7 +2870,6 @@ OLC_MODULE(oedit_quantity) {
 
 OLC_MODULE(oedit_quick_recipe) {
 	extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
-	extern const char *craft_types[];
 	
 	char new_vnum_arg[MAX_INPUT_LENGTH], from_vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], cmd[256];
 	any_vnum new_vnum, from_vnum;

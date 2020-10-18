@@ -22,6 +22,7 @@
 #include "db.h"
 #include "skills.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -70,9 +71,6 @@ int count_building_vehicles_in_room(room_data *room, empire_data *only_owner);	/
 void empire_skillup(empire_data *emp, any_vnum ability, double amount);	// skills.c
 int get_workforce_production_limit(empire_data *emp, obj_vnum vnum);
 void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component);
-
-// external vars
-extern const bool interact_one_at_a_time[NUM_INTERACTS];
 
 // gen_craft protos:
 #define CHORE_GEN_CRAFT_VALIDATOR(name)  bool (name)(empire_data *emp, room_data *room, vehicle_data *veh, int chore, craft_data *craft)

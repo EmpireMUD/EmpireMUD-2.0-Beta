@@ -26,6 +26,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "vnums.h"
+#include "constants.h"
 
 #define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
 #define player_script_radius  25	// map tiles away that players may be for scripts to trigger
@@ -35,28 +36,8 @@
 extern unsigned long pulse;
 
 /* other external vars */
-extern const char *action_bits[];
-extern const char *affected_bits[];
-extern const char *alt_dirs[];
-extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
-extern const char *dirs[];
-extern const char *extra_bits[];
-extern const char *item_types[];
-extern const char *genders[];
-extern const char *paint_names[];
-extern const char *player_bits[];
-extern const int rev_dir[];
-extern const char *exit_bits[];
-extern const char *mob_move_types[];
 extern struct time_info_data time_info;
-extern const char *otrig_types[];
 extern struct instance_data *quest_instance_global;
-extern const char *tool_flags[];
-extern const char *trig_attach_types[];
-extern const char *trig_types[];
-extern const char *vtrig_types[];
-extern const char *wtrig_types[];
-extern const struct wear_data_type wear_data[NUM_WEARS];
 
 /* external functions */
 void check_for_eligible_goals(empire_data *emp);	// progress.c
@@ -2391,7 +2372,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				return;
 			}
 			else if (!str_cmp(var, "weather")) {
-				extern const char *weather_types[];
 				snprintf(str, slen, "%s", weather_types[weather_info.sky]);
 				return;
 			}
@@ -3731,7 +3711,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "has_tech")) {
 						if (subfield && *subfield) {
-							extern const char *player_tech_types[];
 							int pos;
 							
 							if ((pos = search_block(subfield, player_tech_types, FALSE)) != NOTHING) {
@@ -4143,7 +4122,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "position")) {
-						extern const char *position_types[];
 						snprintf(str, slen, "%s", position_types[(int) GET_POS(c)]);
 					}
 					
@@ -4504,8 +4482,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			switch (LOWER(*field)) {
 				case 'a': {
 					if (!str_cmp(field, "attack")) {
-						extern const char *damage_types[];
-						
 						if (IS_WEAPON(o) || IS_MISSILE_WEAPON(o)) {
 							int type = IS_WEAPON(o) ? GET_WEAPON_TYPE(o) : GET_MISSILE_WEAPON_TYPE(o);
 							if (!subfield || !*subfield || !str_cmp(subfield, "0") || is_abbrev(subfield, "name")) {
@@ -4591,7 +4567,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'c': {	// obj.c*
 					if (!str_cmp(field, "can_wear")) {
-						extern const char *wear_bits[];
 						int pos;
 						if (subfield && *subfield && (pos = search_block(subfield, wear_bits, FALSE))) {
 							snprintf(str, slen, "%d", CAN_WEAR(o, BIT(pos)) ? 1 : 0);
@@ -4772,7 +4747,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'm': {	// obj.m*
 					if (!str_cmp(field, "material")) {
-						extern const struct material_data materials[NUM_MATERIALS];
 						snprintf(str, slen, "%s", materials[GET_OBJ_MATERIAL(o)].name);
 					}
 					break;
@@ -4922,8 +4896,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			switch (LOWER(*field)) {
 				case 'a': {	// room.a*
 					if (!str_cmp(field, "aff_flagged")) {
-						extern const char *room_aff_bits[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, room_aff_bits, FALSE);
 							if (pos != NOTHING) {
@@ -4960,8 +4932,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "bld_flagged")) {
-						extern const char *bld_flags[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, bld_flags, FALSE);
 							if (pos != NOTHING) {
@@ -4996,8 +4966,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'c': {	// room.c*
 					if (!str_cmp(field, "can_build")) {
-						extern const char *bld_on_flags[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, bld_on_flags, FALSE);
 							if (pos != NOTHING) {
@@ -5053,8 +5021,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "crop_flagged")) {
-						extern const char *crop_flags[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, crop_flags, FALSE);
 							if (pos != NOTHING) {
@@ -5174,8 +5140,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						direction_vars(r, FORE, subfield, str, slen);
 					}
 					else if (!str_cmp(field, "function")) {
-						extern const char *function_flags[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, function_flags, FALSE);
 							if (pos != NOTHING) {
@@ -5297,8 +5261,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'r': {	// room.r*
 					if (!str_cmp(field, "rmt_flagged")) {
-						extern const char *room_template_flags[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, room_template_flags, FALSE);
 							if (pos != NOTHING) {
@@ -5317,7 +5279,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 's': {	// room.s*
 					if (!str_cmp(field, "season")) {
-						extern const char *icon_types[];
 						snprintf(str, slen, "%s", icon_types[GET_SEASON(r)]);
 						*str = LOWER(*str);
 					}
@@ -5325,8 +5286,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%s", GET_SECT_NAME(SECT(r)));
 					}
 					else if (!str_cmp(field, "sector_flagged")) {
-						extern const char *sector_flags[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, sector_flags, FALSE);
 							if (pos != NOTHING) {
@@ -5417,8 +5376,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'w': {	// room.w*
 					if (!str_cmp(field, "weather")) {
-						extern const char *weather_types[];
-
 						if (!ROOM_IS_CLOSED(r))
 							snprintf(str, slen, "%s", weather_types[weather_info.sky]);
 						else
@@ -5653,8 +5610,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "is_flagged")) {
-						extern const char *vehicle_flags[];
-						
 						if (subfield && *subfield) {
 							int fl = search_block(subfield, vehicle_flags, FALSE);
 							if (fl != NOTHING) {
@@ -5922,7 +5877,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "has_tech")) {
 						if (subfield && *subfield) {
-							extern const char *techs[];
 							int pos;
 							
 							if ((pos = search_block(subfield, techs, FALSE)) != NOTHING) {
@@ -5990,7 +5944,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "priv")) {
 						if (subfield && *subfield) {
-							extern const char *priv[];
 							int pos = search_block(subfield, priv, FALSE);
 							
 							if (pos != NOTHING) {

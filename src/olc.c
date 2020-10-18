@@ -20,6 +20,7 @@
 #include "comm.h"
 #include "olc.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -509,21 +510,6 @@ OLC_MODULE(vedit_shortdescription);
 OLC_MODULE(vedit_spawns);
 OLC_MODULE(vedit_speed);
 
-
-// externs
-extern const bool interact_one_at_a_time[NUM_INTERACTS];
-extern const char *interact_types[];
-extern const int interact_attach_types[NUM_INTERACTS];
-extern const byte interact_vnum_types[NUM_INTERACTS];
-extern const char *olc_flag_bits[];
-extern const char *olc_type_bits[NUM_OLC_TYPES+1];
-extern const char *pool_types[];
-extern const char *player_tech_types[];
-extern const bool requirement_amt_type[];
-extern const char *requirement_types[];
-extern const char *resource_types[];
-extern const char *techs[];
-extern const char *tool_flags[];
 
 // external functions
 void replace_question_color(char *input, char *color, char *output);
@@ -4027,9 +4013,6 @@ OLC_MODULE(olc_set_min_vnum) {
 * @param char *save_buffer A buffer to store the result to.
 */
 void get_evolution_display(struct evolution_data *list, char *save_buffer) {
-	extern const char *evo_types[];
-	extern const int evo_val_types[NUM_EVOS];
-	
 	char lbuf[MAX_STRING_LENGTH];
 	struct evolution_data *evo;
 	int count = 0;
@@ -4086,8 +4069,6 @@ void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer) {
 * @param char *save_buffer A buffer to store the result to.
 */
 void get_icons_display(struct icon_data *list, char *save_buffer) {
-	extern const char *icon_types[];
-	
 	char lbuf[MAX_INPUT_LENGTH], ibuf[MAX_INPUT_LENGTH], line[MAX_INPUT_LENGTH];
 	struct icon_data *icon;
 	int size, count = 0;
@@ -4219,8 +4200,6 @@ const char *get_interaction_target(int type, any_vnum vnum) {
 * @param char *save_buffer A buffer to store the result to.
 */
 void get_interaction_display(struct interaction_item *list, char *save_buffer) {
-	extern const char *interact_types[];
-
 	struct interaction_item *interact;
 	char quant[16];
 	int count = 0;
@@ -5128,11 +5107,6 @@ int olc_process_number(char_data *ch, char *argument, char *name, char *command,
 * @return bool TRUE if the arguments were provided correctly, FALSE if an error was sent.
 */
 bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool find_amount, int *amount, any_vnum *vnum, bitvector_t *misc, char *group) {
-	extern const char *action_bits[];
-	extern const char *diplomacy_flags[];
-	extern const char *function_flags[];
-	extern const char *vehicle_flags[];
-	
 	char arg[MAX_INPUT_LENGTH]; 
 	bool need_abil = FALSE, need_bld = FALSE, need_component = FALSE;
 	bool need_mob = FALSE, need_obj = FALSE, need_quest = FALSE;
@@ -5483,8 +5457,6 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 void olc_process_relations(char_data *ch, char *argument, struct bld_relation **list) {
 	void free_bld_relations(struct bld_relation *list);
 	void smart_copy_bld_relations(struct bld_relation **to_list, struct bld_relation *from_list);
-	extern const char *bld_relationship_types[];
-	extern const int bld_relationship_vnum_types[];
 	
 	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
 	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
@@ -5647,9 +5619,6 @@ void olc_process_relations(char_data *ch, char *argument, struct bld_relation **
 * @param bool allow_tracker_types If TRUE, allows types that will require a quest tracker.
 */
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types) {
-	extern const bool requirement_needs_tracker[];
-	extern const char *requirement_types[];
-	
 	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
 	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
@@ -6069,8 +6038,6 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 
 
 void olc_process_applies(char_data *ch, char *argument, struct apply_data **list) {
-	extern const char *apply_types[];
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	struct apply_data *apply, *next_apply, *change, *temp;
@@ -6460,7 +6427,6 @@ void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_da
 void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 	extern bool check_banner_color_string(char *str);
 	void smart_copy_icons(struct icon_data **addto, struct icon_data *input);
-	extern const char *icon_types[];
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
@@ -7586,8 +7552,6 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 * @param struct spawn_info **list A pointer to a spawn info list to modify.
 */
 void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list) {
-	extern const char *spawn_flags[];
-
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	char *flagarg, *tmp;

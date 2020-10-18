@@ -25,6 +25,7 @@
 #include "vnums.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -40,12 +41,6 @@
 *   Warehouse Command Functions
 *   Commands
 */
-
-// extern variables
-extern const char *extra_bits[];
-extern const char *mob_move_types[];
-extern struct faction_reputation_type reputation_levels[];
-extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // extern functions
 ACMD(do_home);
@@ -195,8 +190,6 @@ int count_objs_in_room(room_data *room) {
 * @return int A WEAR_ pos, or NO_WEAR.
 */
 int find_eq_pos(char_data *ch, obj_data *obj, char *arg) {
-	extern const char *wear_keywords[];
-
 	int where = NO_WEAR;
 
 	if (!arg || !*arg) {
@@ -308,7 +301,6 @@ bool get_check_money(char_data *ch, obj_data *obj) {
 * @return int A WEAR_ position that matches, or NOWEHRE.
 */
 int get_wear_by_item_wear(bitvector_t item_wear) {
-	extern int item_wear_to_wear[];
 	int pos;
 	
 	for (pos = 0; item_wear; ++pos, item_wear >>= 1) {
@@ -439,17 +431,7 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
 	
 	extern double get_weapon_speed(obj_data *weapon);
-	extern const char *apply_type_names[];
-	extern const char *climate_flags[];
-	extern const bitvector_t climate_flags_order[];
-	extern const char *craft_types[];
-	extern const char *affected_bits[];
-	extern const char *apply_types[];
-	extern const char *armor_types[NUM_ARMOR_TYPES+1];
 	extern struct gen_craft_data_t gen_craft_data[];
-	extern const char *size_types[];
-	extern const char *tool_flags[];
-	extern const char *wear_bits[];
 
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	vehicle_data *veh, *veh_iter, *next_veh;
@@ -638,8 +620,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	// ITEM_x: identify obj
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_PAINT: {
-			extern const char *paint_colors[];
-			extern const char *paint_names[];
 			sprinttype(GET_PAINT_COLOR(obj), paint_names, lbuf, sizeof(lbuf), "UNDEFINED");
 			sprinttype(GET_PAINT_COLOR(obj), paint_colors, part, sizeof(part), "&0");
 			msg_to_char(ch, "Paint color: %s%s\t0\r\n", part, lbuf);
@@ -880,10 +860,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 * @param char_data *ch The person to show the data to.
 */
 void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
-	extern const char *identify_vehicle_flags[];
-	extern const char *paint_colors[];
-	extern const char *paint_names[];
-	
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
 	char buf[MAX_STRING_LENGTH], buf1[256];
 	player_index_data *index;
@@ -1139,8 +1115,6 @@ obj_data *perform_remove(char_data *ch, int pos) {
 
 
 static void perform_wear(char_data *ch, obj_data *obj, int where) {
-	extern const int apply_attribute[];
-	extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
 	extern const int primary_attributes[];
 	
 	char buf[MAX_STRING_LENGTH];
@@ -2494,11 +2468,8 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 * @param int level The level to scale it to (may be constrained by the room).
 */
 void scale_item_to_level(obj_data *obj, int level) {
-	extern const double apply_values[];
 	void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
 	extern double get_weapon_speed(obj_data *weapon);
-	extern const bool apply_never_scales[];
-	extern const int wear_significance[];
 	
 	int total_share, bonus, iter, amt;
 	int room_lev = 0, room_min = 0, room_max = 0, sig;
@@ -2511,8 +2482,6 @@ void scale_item_to_level(obj_data *obj, int level) {
 	
 	// configure this here
 	double scale_points_at_100 = config_get_double("scale_points_at_100");
-	extern const double obj_flag_scaling_bonus[];	// see constants.c
-	extern const double armor_scale_bonus[NUM_ARMOR_TYPES];	// see constants.c
 	
 	// WEAR_POS_x: modifier based on best wear type
 	const double wear_pos_modifier[] = { 0.75, 1.0 };
@@ -4036,7 +4005,6 @@ void trade_post(char_data *ch, char *argument) {
 void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	void check_delayed_load(char_data *ch);
 	char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
-	extern const char *unique_storage_flags[];
 
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*4], line[MAX_STRING_LENGTH], part[256], flags[256], quantity[256], *tmp;
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));

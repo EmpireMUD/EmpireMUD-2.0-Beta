@@ -2699,7 +2699,7 @@ const char *olc_flag_bits[] = {
 
 
 // OLC_x types
-const char *olc_type_bits[NUM_OLC_TYPES+1] = {
+const char *olc_type_bits[] = {
 	"craft",
 	"mobile",
 	"object",

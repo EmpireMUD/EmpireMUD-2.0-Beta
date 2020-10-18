@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -43,7 +44,6 @@
 // external vars
 extern struct message_list fight_messages[MAX_MESSAGES];
 extern const double hit_per_dex;
-extern struct character_size_data size_data[];
 
 // external funcs
 ACMD(do_flee);
@@ -2975,7 +2975,6 @@ bool check_combat_position(char_data *ch, double speed) {
  */
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype) {
 	void start_drinking_blood(char_data *ch, char_data *victim);
-	extern const struct wear_data_type wear_data[NUM_WEARS];
 	
 	struct instance_data *inst;
 	int iter;
@@ -3335,7 +3334,6 @@ void heal(char_data *ch, char_data *vict, int amount) {
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	void add_pursuit(char_data *ch, char_data *target);
 	extern int apply_poison(char_data *ch, char_data *vict);
-	extern const double basic_speed;
 	
 	struct instance_data *inst;
 	int w_type, result, bonus, ret_val;

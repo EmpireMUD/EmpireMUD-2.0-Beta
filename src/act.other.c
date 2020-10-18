@@ -26,6 +26,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -41,10 +42,6 @@
 bitvector_t default_minipet_flags = MOB_SENTINEL | MOB_SPAWNED | MOB_NO_LOOT | MOB_NO_EXPERIENCE;
 bitvector_t default_minipet_affs = AFF_NO_ATTACK | AFF_CHARM;
 
-
-// external vars
-extern const char *pool_types[];
-extern const struct toggle_data_type toggle_data[];	// constants.c
 
 // external prototypes
 void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
@@ -704,9 +701,6 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 * @param char_data *ch The person to display to.
 */
 static void print_group(char_data *ch) {
-	extern const char *class_role[];
-	extern const char *pool_abbrevs[];
-
 	char status[256], class[256], loc[256], alerts[256], skills[256];
 	struct group_member_data *mem;
 	int iter, ssize;
@@ -1660,8 +1654,6 @@ ACMD(do_accept) {
 ACMD(do_alternate) {
 	extern int isbanned(char *hostname);
 	extern bool has_anonymous_host(descriptor_data *desc);
-	extern const char *class_role[];
-	extern const char *class_role_color[];
 
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct account_player *plr;
@@ -2085,7 +2077,6 @@ ACMD(do_confirm) {
 	bool check_reboot_confirms();
 	void perform_reboot();
 	extern struct reboot_control_data reboot_control;
-	extern const char *reboot_type[];
 	
 	if (IS_NPC(ch)) {
 		return;
@@ -2250,8 +2241,6 @@ ACMD(do_douse) {
 
 
 ACMD(do_fightmessages) {
-	extern const char *combat_message_types[];
-
 	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	int iter, type = NOTHING, count;
 	bool on;

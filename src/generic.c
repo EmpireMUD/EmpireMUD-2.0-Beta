@@ -25,7 +25,7 @@
 #include "handler.h"
 #include "dg_scripts.h"
 #include "vnums.h"
-
+#include "constants.h"
 
 /**
 * Contents:
@@ -43,11 +43,6 @@
 // local data
 const char *default_generic_name = "Unnamed Generic";
 #define MAX_LIQUID_COND  (MAX_CONDITION / 15)	// approximate game hours of max cond
-
-// external consts
-extern const char *generic_flags[];
-extern const char *generic_types[];
-extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 
 // local funcs
 struct generic_relation *copy_generic_relations(struct generic_relation *list);

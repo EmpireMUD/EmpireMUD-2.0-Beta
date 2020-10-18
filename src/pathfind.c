@@ -22,6 +22,7 @@
 #include "comm.h"
 #include "handler.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -29,10 +30,6 @@
 *   Helpers
 *   Pathfinding Core
 */
-
-// external vars
-extern const char *alt_dirs[];
-extern const int rev_dir[];
 
 // local protos
 bool pathfind_get_dir(room_data *from_room, struct map_data *from_map, int dir, room_data **to_room, struct map_data **to_map);

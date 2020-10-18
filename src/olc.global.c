@@ -20,6 +20,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -27,17 +28,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// external consts
-extern const char *action_bits[];
-extern const char *climate_flags[];
-extern const bitvector_t climate_flags_order[];
-extern const char *global_flags[];
-extern const char *global_types[];
-extern const char *interact_types[];
-extern const char *sector_flags[];
-extern const char *spawn_flags[];
-extern const char *spawn_flags_short[];
 
 // external funcs
 extern struct archetype_gear *copy_archetype_gear(struct archetype_gear *input);
@@ -157,8 +147,6 @@ struct global_data *create_global_table_entry(any_vnum vnum) {
 * @return char* The line to show (without a CRLF).
 */
 char *list_one_global(struct global_data *glb, bool detail) {
-	extern const char *action_bits[];
-	
 	static char output[MAX_STRING_LENGTH];
 	char abil[MAX_STRING_LENGTH], flags[MAX_STRING_LENGTH], flags2[MAX_STRING_LENGTH];
 	ability_data *ab;

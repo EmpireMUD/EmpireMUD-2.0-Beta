@@ -25,6 +25,7 @@
 #include "handler.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -44,26 +45,6 @@ const char *default_ability_name = "Unnamed Ability";
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
-
-// external consts
-extern const char *ability_custom_types[];
-extern const char *ability_data_types[];
-extern const char *ability_effects[];
-extern const char *ability_gain_hooks[];
-extern const char *ability_flags[];
-extern const bool apply_never_scales[];
-extern const char *ability_target_flags[];
-extern const char *ability_type_flags[];
-extern const char *affected_bits[];
-extern const char *apply_types[];
-extern const char *apply_type_names[];
-extern const double apply_values[];
-extern const char *damage_types[];
-extern const char *player_tech_types[];
-extern const char *pool_types[];
-extern const char *position_types[];
-extern const char *skill_check_difficulty[];
-extern const char *wait_types[];
 
 
 // ability function prototypes

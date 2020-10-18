@@ -25,6 +25,7 @@
 #include "dg_scripts.h"
 #include "dg_event.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -54,7 +55,6 @@ extern bool data_table_needs_save;
 extern int num_invalid;
 extern char **intros;
 extern int num_intros;
-extern const char *version;
 extern int wizlock_level;
 extern int no_auto_deletes;
 extern ush_int DFLT_PORT;
@@ -237,8 +237,6 @@ inline void empire_sleep(struct timeval *timeout) {
 * @param char_data *ch The player to update (no effect if no descriptor).
 */
 void msdp_update_room(char_data *ch) {
-	extern const char *alt_dirs[];
-	
 	char buf[MAX_STRING_LENGTH], area_name[128], exits[256];
 	struct empire_city_data *city;
 	struct instance_data *inst;
@@ -315,11 +313,7 @@ static void msdp_update(void) {
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
 	extern int move_gain(char_data *ch, bool info_only);
-	extern const char *damage_types[];
-	extern const char *genders[];
 	extern const double hit_per_dex;
-	extern const char *month_name[];
-	extern const char *seasons[];
 	
 	struct player_skill_data *skill, *next_skill;
 	struct over_time_effect_type *dot;
@@ -733,9 +727,6 @@ bool check_reboot_confirms(void) {
 * Perform a reboot/shutdown.
 */
 void perform_reboot(void) {
-	extern const char *reboot_strings[];
-	extern int num_of_reboot_strings;
-	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], group_data[MAX_STRING_LENGTH];
 	descriptor_data *desc, *next_desc;
 	int gsize = 0;
@@ -869,7 +860,6 @@ void perform_reboot(void) {
 * should be called every minute.
 */
 void update_reboot(void) {
-	extern const char *reboot_type[];
 	extern int wizlock_level;
 	extern char *wizlock_message;
 	
@@ -3181,10 +3171,6 @@ char *prompt_str(char_data *ch) {
 */
 char *replace_prompt_codes(char_data *ch, char *str) {
 	extern struct gen_craft_data_t gen_craft_data[];
-	extern const char *health_levels[];
-	extern const char *move_levels[];
-	extern const char *mana_levels[];
-	extern const char *blood_levels[];
 	extern struct action_data_struct action_data[];
 	
 	static char pbuf[MAX_STRING_LENGTH];

@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -40,14 +41,7 @@ INTERACTION_FUNC(consumes_or_decays_interact);
 void process_dismantle_vehicle(char_data *ch);
 
 // external vars
-extern const char *bld_on_flags[];
-extern const bitvector_t bld_on_flags_order[];
-extern const bool can_designate_dir[NUM_OF_DIRS];
-extern const bool can_designate_dir_vehicle[NUM_OF_DIRS];
-extern const char *dirs[];
 extern struct gen_craft_data_t gen_craft_data[];
-extern int rev_dir[];
-extern const char *tool_flags[];
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1070,8 +1064,6 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 * @param room_data *room The location being dismantled.
 */
 void process_dismantling(char_data *ch, room_data *room) {
-	extern const char *pool_types[];
-	
 	struct resource_data *res, *find_res, *next_res, *copy;
 	char buf[MAX_STRING_LENGTH];
 

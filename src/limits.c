@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -36,13 +37,6 @@
 *   Periodic Gainers
 *   Core Periodicals
 */
-
-// external vars
-extern const char *dirs[];
-extern const char *from_dir[];
-extern const struct material_data materials[NUM_MATERIALS];
-extern const int regen_by_pos[];
-extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
@@ -65,7 +59,6 @@ int move_gain(char_data *ch, bool info_only);
 * @param char_data *ch The player to check for attributes.
 */
 void check_attribute_gear(char_data *ch) {
-	extern const int apply_attribute[];
 	extern const int primary_attributes[];
 	
 	struct obj_apply *apply;
@@ -953,9 +946,7 @@ void real_update_char(char_data *ch) {
 * @param struct empire_city_data *city The city to check.
 * @return TRUE if it destroys the city, FALSE otherwise.
 */
-static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *city) {	
-	extern struct city_metadata_type city_type[];
-
+static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *city) {
 	room_data *to_room, *center = city->location;
 	int radius = city_type[city->type].radius;
 	bool found_building = FALSE;

@@ -20,6 +20,7 @@
 #include "handler.h"
 #include "db.h"
 #include "skills.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -345,8 +346,6 @@ ACMD(do_insult) {
 
 
 ACMD(do_point) {
-	extern const char *dirs[];
-	
 	char buf[MAX_STRING_LENGTH];
 	char_data *vict, *next_vict;
 	char color;

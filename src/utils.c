@@ -25,6 +25,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -49,10 +50,6 @@
 *   Misc Utils
 *   Converter Utils
 */
-
-// external vars
-extern const char *pool_types[];
-extern const char *tool_flags[];
 
 // external funcs
 void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
@@ -1110,8 +1107,6 @@ void expire_old_politics(void) {
 * @return bool TRUE if the empire has that (those) trait(s) at loc.
 */
 bool has_empire_trait(empire_data *emp, room_data *loc, bitvector_t trait) {
-	extern struct city_metadata_type city_type[];
-	
 	struct empire_city_data *city;
 	bitvector_t set = NOBITS;
 	bool near_city = FALSE;
@@ -1445,8 +1440,6 @@ bool has_permission(char_data *ch, int type, room_data *loc) {
 * @return TRUE if successful, FALSE if not (and sends its own error message to ch)
 */
 bool has_tech_available(char_data *ch, int tech) {
-	extern const char *techs[];
-
 	if (!ROOM_OWNER(IN_ROOM(ch))) {
 		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s.\r\n", techs[tech]);
 		return FALSE;
@@ -1751,8 +1744,6 @@ void basic_mud_log(const char *format, ...) {
 * @param const char *str The va-arg format ...
 */
 void log_to_empire(empire_data *emp, int type, const char *str, ...) {
-	extern const bool show_empire_log_type[];
-	
 	struct empire_log_data *elog, *temp;
 	char output[MAX_STRING_LENGTH];
 	descriptor_data *i;
@@ -2131,7 +2122,6 @@ void comma_args(char *string, char *arg1, char *arg2) {
 * @return int TRUE if the argument is in the fill_words[] list.
 */
 int fill_word(char *argument) {
-	extern const char *fill_words[];
 	return (search_block(argument, fill_words, TRUE) != NOTHING);
 }
 
@@ -2306,7 +2296,6 @@ char *one_word(char *argument, char *first_arg) {
 * @return int TRUE if the argument is in the reserved_words[] list.
 */
 int reserved_word(char *argument) {
-	extern const char *reserved_words[];
 	return (search_block(argument, reserved_words, TRUE) != NOTHING);
 }
 
@@ -2859,8 +2848,6 @@ obj_data *get_top_object(obj_data *obj) {
 * @return double a score
 */
 double rate_item(obj_data *obj) {
-	extern const double apply_values[];
-	
 	struct obj_apply *apply;
 	double score = 0;
 	
@@ -2969,8 +2956,6 @@ void command_lag(char_data *ch, int wait_type) {
 * @param char_data *ch The player to set gear level for.
 */
 void determine_gear_level(char_data *ch) {
-	extern const struct wear_data_type wear_data[NUM_WEARS];
-
 	double total, slots;
 	int avg, level, pos, old;
 	
@@ -3026,7 +3011,6 @@ void determine_gear_level(char_data *ch) {
 * @return int An attribute constant (STRENGTH) or -1 for no-match.
 */
 int get_attribute_by_name(char *name) {
-	extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
 	int iter, partial = -1;
 	
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
@@ -3857,8 +3841,6 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 * @param struct resource_data **list The list to halve.
 */
 void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list) {
-	extern const struct material_data materials[NUM_MATERIALS];
-	
 	struct resource_data *res, *next_res;
 	int iter, count, total, remaining;
 	double damage_prc, prc_to_keep;

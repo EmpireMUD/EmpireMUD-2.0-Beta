@@ -21,6 +21,7 @@
 #include "interpreter.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -1075,8 +1076,6 @@ const struct { char *command; QCMD(*func); int min_pos; } quest_cmd[] = {
 
 
 ACMD(do_quest) {
-	extern const char *position_types[];
-	
 	char buf[MAX_STRING_LENGTH], cmd_arg[MAX_INPUT_LENGTH];
 	int iter, type;
 	bool found;

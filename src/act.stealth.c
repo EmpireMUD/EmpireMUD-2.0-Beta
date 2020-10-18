@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -31,9 +32,6 @@
 *   Poisons
 *   Commands
 */
-
-// external vars
-extern const int rev_dir[];
 
 // external funcs
 INTERACTION_FUNC(consumes_or_decays_interact);

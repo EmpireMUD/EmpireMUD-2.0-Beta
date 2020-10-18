@@ -9,6 +9,7 @@
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -21,6 +22,7 @@
 #include "olc.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -45,7 +47,6 @@ void decustomize_shared_data(struct shared_room_data *shared);
 
 OLC_MODULE(mapedit_build) {
 	void special_building_setup(char_data *ch, room_data *room);
-	extern const int rev_dir[];
 	
 	char bld_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	bld_data *bld;
@@ -487,9 +488,7 @@ OLC_MODULE(mapedit_ruin) {
 
 
 OLC_MODULE(mapedit_exits) {
-	extern const char *dirs[];
 	extern room_vnum find_free_vnum();
-	extern const int rev_dir[];
 
 	int dir, rev;
 	room_data *to_room = NULL;

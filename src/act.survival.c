@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -249,8 +250,6 @@ void do_mount_current(char_data *ch) {
 
 // list/search mounts
 void do_mount_list(char_data *ch, char *argument) {
-	extern const char *mount_flags[];
-	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
 	struct mount_data *mount, *next_mount;
 	bool any = FALSE, cur;
@@ -607,8 +606,6 @@ ACMD(do_dismount) {
 
 
 ACMD(do_fish) {
-	extern const char *dirs[];
-	
 	room_data *room = IN_ROOM(ch);
 	char buf[MAX_STRING_LENGTH];
 	int dir = NO_DIR;
@@ -874,7 +871,6 @@ ACMD(do_mount) {
 ACMD(do_track) {
 	extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
 	extern vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum interior_room);
-	extern const char *dirs[];
 	
 	char buf[MAX_STRING_LENGTH];
 	room_vnum track_to_room = NOWHERE;

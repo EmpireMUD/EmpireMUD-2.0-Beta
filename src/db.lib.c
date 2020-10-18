@@ -23,6 +23,7 @@
 #include "dg_scripts.h"
 #include "dg_event.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -63,7 +64,6 @@ extern struct player_special_data dummy_mob;
 extern struct generic_name_data *generic_names;
 extern struct empire_territory_data *global_next_territory_entry;
 extern int max_automessage_id;
-extern struct offense_info_type offense_info[NUM_OFFENSES];
 extern bool world_is_sorted;
 
 // external funcs
@@ -4660,7 +4660,6 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
 	extern char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
 	extern const char *get_interaction_target(int type, any_vnum vnum);
-	extern const char *interact_types[];
 	
 	struct interaction_item *interact;
 	struct interact_restriction *res;
@@ -8673,9 +8672,6 @@ sector_data *sector_proto(sector_vnum vnum) {
 * @return int Returns FALSE if the object is ok, or TRUE if it's bad.
 */
 int check_object(obj_data *obj) {
-	extern const char *affected_bits[];
-	extern const char *wear_bits[];
-	extern const char *extra_bits[];
 	int error = FALSE;
 
 	sprintbit(GET_OBJ_WEAR(obj), wear_bits, buf, TRUE);
@@ -9481,7 +9477,6 @@ void parse_apply(FILE *fl, struct apply_data **list, char *error_str) {
 */
 void parse_generic_name_file(FILE *fl, char *err_str) {
 	extern struct generic_name_data *get_generic_name_list(int name_set, int sex);
-	extern const char *genders[];
 	extern int search_block(char *arg, const char **list, int exact);
 	
 	struct generic_name_data *data;

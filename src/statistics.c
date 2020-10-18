@@ -18,6 +18,7 @@
 #include "db.h"
 #include "comm.h"
 #include "handler.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -222,7 +223,6 @@ void display_statistics_to_char(char_data *ch) {
 */
 void mudstats_empires(char_data *ch, char *argument) {
 	extern double empire_score_average[NUM_SCORES];
-	extern const char *score_type[];
 	
 	int iter;
 	
