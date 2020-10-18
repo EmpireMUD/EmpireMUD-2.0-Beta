@@ -52,7 +52,6 @@
 */
 
 // external funcs
-void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 void remove_companion_mod(struct companion_data **companion, int type);
 void send_char_pos(char_data *ch, int dam);
@@ -1158,10 +1157,7 @@ bool has_relationship(empire_data *emp, empire_data *fremp, bitvector_t diplomac
 * @param room_data *loc The location to test.
 * @return bool TRUE if this location is too close to a starting location; FALSE if not.
 */
-bool ignore_distrustful_due_to_start_loc(room_data *loc) {
-	extern int highest_start_loc_index;
-	extern int *start_locs;
-	
+bool ignore_distrustful_due_to_start_loc(room_data *loc) {;
 	int safe_distance = config_get_int("min_distrustful_distance");
 	int iter;
 	
@@ -2647,9 +2643,6 @@ void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 * @return int The character's value for that attributes.
 */
 int get_attribute_by_apply(char_data *ch, int apply_type) {
-	extern int health_gain(char_data *ch, bool info_only);
-	extern int mana_gain(char_data *ch, bool info_only);
-	
 	if (!ch) {
 		return 0;	// shortcut/safety
 	}
@@ -5718,9 +5711,6 @@ bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int 
 * @return room_data* A random starting location.
 */
 room_data *find_starting_location() {
-	extern int highest_start_loc_index;
-	extern int *start_locs;
-	
 	if (highest_start_loc_index < 0) {
 		return NULL;
 	}
@@ -5735,8 +5725,6 @@ room_data *find_starting_location() {
  * @return room_data* A random starting location that's less likely to be your current one
  */
 room_data *find_other_starting_location(room_data *current_room) {
-	extern int highest_start_loc_index;
-	extern int *start_locs;
 	int start_loc_index;
 	
 	if (highest_start_loc_index < 0) {

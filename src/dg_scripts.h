@@ -355,7 +355,7 @@ void do_sstat_object(char_data *ch, obj_data *j);
 void do_sstat_character(char_data *ch, char_data *k);
 void script_stat(char_data *ch, struct script_data *sc);
 
-extern struct script_data *create_script_data(void *attach_to, int type);
+struct script_data *create_script_data(void *attach_to, int type);
 void script_vlog(const char *format, va_list args);
 void script_log(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
 void script_log_by_type(int go_type, void *go, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
@@ -366,18 +366,19 @@ void dg_obj_trigger(char *line, obj_data *obj);
 void assign_triggers(void *i, int type);
 void parse_trigger(FILE *trig_f, int nr);
 void parse_trig_proto(char *line, struct trig_proto_list **list, char *error_str);
-extern trig_data *real_trigger(trig_vnum vnum);
+trig_data *real_trigger(trig_vnum vnum);
 void extract_script(void *thing, int type);
 void extract_script_mem(struct script_memory *sc);
 void check_extract_script(void *go, int type);
 void remove_all_triggers(void *thing, int type);
 void free_proto_scripts(struct trig_proto_list **list);
 void free_trigger(trig_data *trig);
-extern struct trig_proto_list *copy_trig_protos(struct trig_proto_list *list);
+struct trig_proto_list *copy_trig_protos(struct trig_proto_list *list);
 void copy_script(void *source, void *dest, int type);
 void trig_data_copy(trig_data *this_data, const trig_data *trg);
 
-extern bool has_trigger(struct script_data *sc, any_vnum vnum);
+void add_trigger_to_global_lists(trig_data *trig);
+bool has_trigger(struct script_data *sc, any_vnum vnum);
 trig_data *read_trigger(int nr);
 void add_var(struct trig_var_data **var_list, char *name, char *value, int id);
 room_data *dg_room_of_obj(obj_data *obj);
@@ -388,7 +389,7 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument);
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier);
 void script_damage_over_time(char_data *vict, any_vnum atype, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by);
 void script_heal(void *thing, int type, char *argument);
-extern bool script_message_should_queue(char **string);
+bool script_message_should_queue(char **string);
 
 void extract_value(struct script_data *sc, trig_data *trig, char *cmd);
 
@@ -480,6 +481,7 @@ void remove_from_lookup_table(int uid);
 // find helpers
 char_data *find_char(int n);
 empire_data *find_empire_by_uid(int n);
+obj_data *find_obj(int n, bool error);
 room_data *find_room(int n);
 void find_uid_name(char *uid, char *name, size_t nlen);
 vehicle_data *find_vehicle(int n);

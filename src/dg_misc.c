@@ -535,7 +535,6 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 */
 void do_dg_quest(int go_type, void *go, char *argument) {
 	extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 	
 	char vict_arg[MAX_INPUT_LENGTH], cmd_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst = NULL;
@@ -648,7 +647,6 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 	}
 	else if (is_abbrev(cmd_arg, "start")) {
 		if (!is_on_quest(vict, QUEST_VNUM(quest))) {
-			void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 			if (!inst && room) {
 				inst = find_instance_by_room(room, TRUE, TRUE);
 			}
@@ -1172,9 +1170,7 @@ void script_modify(char *argument) {
 	void change_look_desc(char_data *ch, char *str, bool format);
 	void change_look_desc_append(char_data *ch, char *str, bool format);
 	void change_short_desc(char_data *ch, char *str);
-	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
-	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
 	extern char *get_room_description(room_data *room);
 	extern vehicle_data *get_vehicle(char *name);
 	extern bool validate_icon(char *icon);

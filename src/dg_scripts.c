@@ -45,7 +45,6 @@ extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct instance_data *get_instance_for_script(int go_type, void *go);
 void free_varlist(struct trig_var_data *vd);
 extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
-extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);	// quest.c
 extern int is_substring(char *sub, char *string);
 extern room_data *obj_room(obj_data *obj);
 trig_data *read_trigger(trig_vnum vnum);
@@ -1419,7 +1418,6 @@ void do_sstat_character(char_data *ch, char_data *k) {
 * add to the end, loc = 0 means add before all other triggers.
 */
 void add_trigger(struct script_data *sc, trig_data *t, int loc) {
-	void add_trigger_to_global_lists(trig_data *trig);
 	void check_reset_trigger_event(room_data *room, bool random_offset);
 	
 	trig_data *i;
@@ -2929,7 +2927,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					
 					else if (!str_cmp(field, "add_minipet")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
-							void add_minipet(char_data *ch, any_vnum vnum);
 							char_data *pet = mob_proto(atoi(subfield));
 							if (pet) {
 								add_minipet(c, GET_MOB_VNUM(pet));
@@ -3156,8 +3153,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						*str = '\0';
 					}
 					else if (!str_cmp(field, "can_start_quest")) {
-						extern bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
-						
 						if (subfield && *subfield && isdigit(*subfield)) {
 							any_vnum vnum = atoi(subfield);
 							quest_data *qst = quest_proto(vnum);
@@ -3240,7 +3235,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", (troom && can_use_room(c, troom, MEMBERS_ONLY)) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "can_enter_instance")) {
-						extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						struct instance_data *inst;
 						
@@ -3645,8 +3639,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "has_minipet")) {
-						extern bool has_minipet(char_data *ch, any_vnum vnum);
-						
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield) && has_minipet(c, atoi(subfield))) {
 							strcpy(str, "1");
 						}
@@ -4395,7 +4387,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 							else if ((!str_cmp("off", subfield) || *subfield == '0') && IS_VAMPIRE(c)) {
 								if (!IS_NPC(c)) {
-									void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 									check_un_vampire(c, TRUE);
 								}
 								else {

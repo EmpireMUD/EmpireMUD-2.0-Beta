@@ -91,6 +91,12 @@ void process_tanning(char_data *ch);
 // other local protos
 INTERACTION_FUNC(finish_foraging);
 
+// external functions
+ACMD(do_saw);
+ACMD(do_mint);
+ACMD(do_scrape);
+ACMD(do_tan);
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// CONTROL DATA ////////////////////////////////////////////////////////////
@@ -1179,8 +1185,6 @@ INTERACTION_FUNC(finish_scraping) {
 
 // for do_saw
 void perform_saw(char_data *ch) {
-	ACMD(do_saw);
-	
 	char buf[MAX_STRING_LENGTH];
 	bool success = FALSE, room = FALSE;
 	obj_data *proto, *saw;
@@ -2163,8 +2167,6 @@ void process_mining(char_data *ch) {
 * @param char_data *ch The guy minting.
 */
 void process_minting(char_data *ch) {
-	ACMD(do_mint);
-
 	empire_data *emp = ROOM_OWNER(IN_ROOM(ch));
 	char tmp[MAX_INPUT_LENGTH];
 	obj_data *proto;
@@ -2485,8 +2487,6 @@ void process_repairing(char_data *ch) {
 * @param char_data *ch The scraper.
 */
 void process_scraping(char_data *ch) {
-	ACMD(do_scrape);
-	
 	char buf[MAX_STRING_LENGTH];
 	bool success = FALSE;
 	obj_data *proto;
@@ -2650,8 +2650,6 @@ void process_swap_skill_sets(char_data *ch) {
 * @param char_data *ch The tanner.
 */
 void process_tanning(char_data *ch) {
-	ACMD(do_tan);
-	
 	obj_data *proto;
 	bool success;
 	

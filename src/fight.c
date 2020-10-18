@@ -46,7 +46,6 @@ extern struct message_list fight_messages[MAX_MESSAGES];
 
 // external funcs
 ACMD(do_flee);
-INTERACTION_FUNC(consumes_or_decays_interact);
 void end_pursuit(char_data *ch, char_data *target);
 
 // locals
@@ -1663,8 +1662,6 @@ obj_data *make_corpse(char_data *ch) {
 * @param any_vnum ability Optional (or NO_ABIL): The ability to skillup for rez_by.
 */
 void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability) {
-	extern obj_data *find_obj(int n, bool error);
-
 	obj_data *corpse;
 	int exp = 15;	// overridden by some abilities
 	

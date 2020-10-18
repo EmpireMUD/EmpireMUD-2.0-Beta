@@ -91,8 +91,6 @@ INTERACTION_FUNC(butcher_interact) {
 * @return obj_data *the best saddle in inventory, or NULL if none
 */
 obj_data *find_best_saddle(char_data *ch) {
-	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
-	
 	obj_data *obj, *best = NULL;
 	double best_score = 0, this;
 	
@@ -118,6 +116,8 @@ obj_data *find_best_saddle(char_data *ch) {
 
 /**
 * Determines if a room qualifies for No Trace (outdoors/wilderness).
+*
+* TODO: could rename this something more generic
 *
 * @param room_data *room Where to check.
 * @return bool TRUE if No Trace works here.
@@ -328,7 +328,6 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (!(mob = get_char_vis(ch, argument, NULL, FIND_CHAR_ROOM))) {
 		// special case: mount/ride a vehicle
 		if (get_vehicle_in_room_vis(ch, arg, NULL)) {
-			void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
 			do_sit_on_vehicle(ch, arg, POS_SITTING);
 		}
 		else {
@@ -869,7 +868,6 @@ ACMD(do_mount) {
 
 
 ACMD(do_track) {
-	extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
 	extern vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum interior_room);
 	
 	char buf[MAX_STRING_LENGTH];

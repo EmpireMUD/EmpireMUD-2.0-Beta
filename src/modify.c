@@ -679,7 +679,6 @@ int improved_editor_execute(descriptor_data *d, char *str) {
 
 
 void parse_action(int command, char *string, descriptor_data *d) {
-	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 	extern int format_script(descriptor_data *d);
 	extern int replace_str(char **string, char *pattern, char *replacement, int rep_all, unsigned int max_size);
 	

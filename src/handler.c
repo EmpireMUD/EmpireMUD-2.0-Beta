@@ -74,9 +74,6 @@
 *   Miscellaneous Handlers
 */
 
-// externs
-extern int get_north_for_char(char_data *ch);
-
 // external funcs
 EVENT_CANCEL_FUNC(cancel_room_event);
 void clear_delayed_update(char_data *ch);
@@ -6512,8 +6509,6 @@ void obj_to_char(obj_data *object, char_data *ch) {
 * @param char_data *ch The person you're trying to give it to.
 */
 void obj_to_char_if_okay(obj_data *obj, char_data *ch) {
-	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
-	
 	bool ok = TRUE;
 	
 	if (!bind_ok(obj, ch)) {
@@ -7814,7 +7809,6 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 	extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
 	extern int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs);
 	extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
-	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 	
 	// helper struct
 	struct meets_req_data {
@@ -9520,9 +9514,6 @@ void read_vault(empire_data *emp) {
 * @return bool TRUE if something was retrieved and there are more left, FALSE in any other case
 */
 bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen) {
-	void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
-	void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
-	
 	obj_data *obj, *proto;
 	bool room = FALSE;
 	int available;

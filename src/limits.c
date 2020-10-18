@@ -43,10 +43,6 @@ extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 
-// locals
-int health_gain(char_data *ch, bool info_only);
-int mana_gain(char_data *ch, bool info_only);
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// CHARACTER LIMITS ////////////////////////////////////////////////////////
@@ -577,7 +573,6 @@ void point_update_char(char_data *ch) {
 void real_update_char(char_data *ch) {
 	void adventure_unsummon(char_data *ch);
 	void cancel_blood_upkeeps(char_data *ch);
-	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 	void check_combat_end(char_data *ch);
 	void check_morph_ability(char_data *ch);
 	void combat_meter_damage_dealt(char_data *ch, int amt);
@@ -1896,8 +1891,6 @@ void point_update_vehicle(vehicle_data *veh) {
 * @return bool TRUE if you can legally teleport there, otherwise FALSE.
 */
 bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner) {
-	extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
-	
 	struct instance_data *inst;
 	char_data *mob;
 	
@@ -1940,9 +1933,6 @@ bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner) {
 * Called periodically to time out any expired trades.
 */
 void update_trading_post(void) {
-	void expire_trading_post_item(struct trading_post_data *tpd);
-	void save_trading_post();
-	
 	struct trading_post_data *tpd, *next_tpd, *temp;
 	int *notify_list = NULL, top_notify = -1;
 	bool changed = FALSE;

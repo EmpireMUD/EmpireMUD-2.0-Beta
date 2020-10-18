@@ -34,11 +34,8 @@
 // external funcs
 ACMD(do_dismount);
 extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
-extern int get_north_for_char(char_data *ch);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 extern bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error);
-void skip_run_filler(char **string);
-extern bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
 
 // local data
 struct {
@@ -221,8 +218,6 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 * @return room_data* The valid target, if any. Otherwise, will be NULL and the player received an error message.
 */
 room_data *get_shipping_target(char_data *ch, char *argument, bool *targeted_island) {
-	extern room_data *find_docks(empire_data *emp, int island_id);
-	
 	struct island_info *to_isle;
 	room_data *room;
 	
@@ -406,11 +401,8 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 * @return bool TRUE if successful, FALSE on fail.
 */
 bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, int mode) {
-	extern bool can_steal(char_data *ch, empire_data *emp);
 	extern bool can_take_obj(char_data *ch, obj_data *obj);
 	extern bool get_check_money(char_data *ch, obj_data *obj);
-	void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
-	void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 	
 	bool stealing = FALSE;
 	empire_data *emp;
@@ -1385,8 +1377,6 @@ ACMD(do_disembark) {
 ACMD(do_dispatch) {
 	extern char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_data *veh, mob_vnum vnum);
 	extern struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc);
-	void sail_shipment(empire_data *emp, vehicle_data *boat);
-	extern bool ship_is_empty(vehicle_data *ship);
 	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 
 	char targ[MAX_INPUT_LENGTH], isle_arg[MAX_INPUT_LENGTH];

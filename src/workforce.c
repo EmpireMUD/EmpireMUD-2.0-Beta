@@ -2366,8 +2366,6 @@ void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh) {
 
 // for non-vehicles
 void do_chore_fire_brigade(empire_data *emp, room_data *room) {
-	void stop_burning(room_data *room);
-	
 	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_FIRE_BRIGADE].mob);
 	int total_ticks, per_hour;
 	

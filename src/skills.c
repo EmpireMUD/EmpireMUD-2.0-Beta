@@ -248,7 +248,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_EARTHMELD: {
 			if (affected_by_spell(ch, ATYPE_EARTHMELD)) {
-				void un_earthmeld(char_data *ch);
 				un_earthmeld(ch);
 				need_affect_total = TRUE;
 			}
@@ -1685,8 +1684,6 @@ ACMD(do_noskill) {
 
 
 ACMD(do_skills) {
-	void check_un_vampire(char_data *ch, bool remove_vampire_skills);
-	
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
 	struct synergy_display_type *sdt_list = NULL, *sdt;
 	struct synergy_display_ability *sda;

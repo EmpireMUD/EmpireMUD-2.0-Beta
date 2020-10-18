@@ -298,7 +298,7 @@ extern augment_data *augment_proto(any_vnum vnum);
 void free_augment(augment_data *aug);
 
 // automessage
-extern struct automessage *automessages;
+extern struct automessage *automessages_table;
 
 void free_automessage(struct automessage *msg);
 int new_automessage_id();
@@ -360,6 +360,8 @@ long data_set_long(int key, long value);
 // descriptors
 extern descriptor_data *descriptor_list;
 
+bool has_anonymous_host(descriptor_data *desc);
+
 // empires
 extern empire_data *empire_table;
 extern struct trading_post_data *trading_list;
@@ -397,6 +399,9 @@ extern int get_total_offenses_from_char(empire_data *emp, char_data *ch);
 extern bool offense_was_seen(char_data *ch, empire_data *emp, room_data *from_room);
 void remove_offense(empire_data *emp, struct offense_data *off);
 void remove_recent_offenses(empire_data *emp, int type, char_data *offender);
+
+// empire misc
+void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
 
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
@@ -511,12 +516,26 @@ extern bool pause_affect_total;
 void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
 void delete_player_character(char_data *ch);
+void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 int get_highest_access_level(account_data *acct);
 char_data *find_player_in_room_by_id(room_data *room, int id);
 char_data *is_at_menu(int id);
 char_data *is_playing(int id);
 void start_new_character(char_data *ch);
 int *summarize_weekly_playtime(empire_data *emp);
+
+// player equipment set
+int add_eq_set_to_char(char_data *ch, int set_id, char *name);
+void add_obj_to_eq_set(obj_data *obj, int set_id, int pos);
+int count_eq_sets(char_data *ch);
+void free_player_eq_set(struct player_eq_set *eq_set);
+struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
+struct player_eq_set *get_eq_set_by_name(char_data *ch, char *name);
+struct eq_set_obj *get_obj_eq_set_by_id(obj_data *obj, int id);
+void remove_obj_from_eq_set(obj_data *obj, int set_id);
+
+// player lastnames
+void change_personal_lastname(char_data *ch, char *name);
 
 // progress
 extern progress_data *progress_table;
@@ -570,6 +589,10 @@ extern social_data *sorted_socials;
 extern social_data *social_proto(any_vnum vnum);
 void free_social(social_data *soc);
 
+// starting locations / start locs
+extern int highest_start_loc_index;
+extern room_vnum *start_locs;
+
 // stored event libs
 void add_stored_event(struct stored_event **list, int type, struct dg_event *event);
 void cancel_stored_event(struct stored_event **list, int type);
@@ -581,6 +604,9 @@ extern struct stored_event *find_stored_event(struct stored_event *list, int typ
 #define cancel_stored_event_room(room, type)  cancel_stored_event(&SHARED_DATA(room)->events, type)
 #define delete_stored_event_room(room, type)  delete_stored_event(&SHARED_DATA(room)->events, type)
 #define find_stored_event_room(room, type)  find_stored_event(SHARED_DATA(room)->events, type)
+
+// trading post
+void save_trading_post();
 
 // triggers
 extern trig_data *trigger_table;
@@ -629,9 +655,13 @@ room_data *real_room(room_vnum vnum);
 void run_external_evolutions();
 void save_whole_world();
 void sort_world_table();
+void stop_burning(room_data *room);
 void untrench_room(room_data *room);
 
 // misc
+extern char **tips_of_the_day;
+extern int tips_of_the_day_size;
+
 void load_intro_screens();
 
 // more frees
@@ -639,6 +669,13 @@ void free_apply_list(struct apply_data *list);
 void free_obj_apply_list(struct obj_apply *list);
 void free_icon_set(struct icon_data **set);
 void free_exit_template(struct exit_template *ex);
+
+
+// act.comm.c
+extern bool global_mute_slash_channel_joins;
+
+// statistics.c
+extern int max_players_this_uptime;
 
 
 /* global buffering system */

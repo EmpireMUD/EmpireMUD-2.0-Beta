@@ -1714,9 +1714,6 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 
 
 void found_city(char_data *ch, empire_data *emp, char *argument) {
-	extern int highest_start_loc_index;
-	extern int *start_locs;
-	
 	empire_data *emp_iter, *next_emp;
 	char buf[MAX_STRING_LENGTH];
 	struct island_info *isle;

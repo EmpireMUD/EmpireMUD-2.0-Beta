@@ -35,19 +35,15 @@
 */
 
 // external funcs
+ACMD(do_board);
 ACMD(do_dismount);
-extern bool action_flagged(char_data *ch, bitvector_t actf);
-void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
-extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
-extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
+ACMD(do_exits);
 
 // local protos
 bool can_enter_room(char_data *ch, room_data *room);
 bool player_can_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
 void send_arrive_message(char_data *ch, room_data *from_room, room_data *to_room, int dir, bitvector_t flags);
 void send_leave_message(char_data *ch, room_data *from_room, room_data *to_room, int dir, bitvector_t flags);
-void skip_run_filler(char **string);
-bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
 
 
 // door vars
@@ -96,9 +92,6 @@ int sort_temp_portal_data(struct temp_portal_data *a, struct temp_portal_data *b
 * @param room_data *to_room for non-directional exits, helps the mob pursue
 */
 void add_tracks(char_data *ch, room_data *room, byte dir, room_data *to_room) {
-	extern bool valid_no_trace(room_data *room);
-	extern bool valid_unseen_passing(room_data *room);
-	
 	struct track_data *track;
 	
 	if (!IS_IMMORTAL(ch) && !ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_FRESH_WATER)) {
@@ -192,8 +185,6 @@ struct temp_portal_data *build_portal_list_near(char_data *ch, room_data *origin
 * @return bool TRUE if the character can enter the portal.
 */
 bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bool skip_permissions) {
-	extern bool can_infiltrate(char_data *ch, empire_data *emp);
-	
 	room_data *to_room, *was_in = IN_ROOM(ch);
 	bool ok = FALSE;
 	
@@ -284,8 +275,6 @@ bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bo
 * @parma room_data *room The target location.
 */
 bool can_enter_room(char_data *ch, room_data *room) {
-	extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
-	
 	struct instance_data *inst;
 	
 	// always
@@ -849,8 +838,6 @@ void perform_transport(char_data *ch, room_data *to_room) {
 * @param char_data *ch The character doing the running.
 */
 void process_running(char_data *ch) {
-	extern int get_north_for_char(char_data *ch);
-	
 	int dir = GET_ACTION_VNUM(ch, 0), dist;
 	bool done = FALSE;
 	
@@ -1338,8 +1325,6 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 * @param bool following TRUE only if this person followed someone else through.
 */
 void char_through_portal(char_data *ch, obj_data *portal, bool following) {
-	void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
-	
 	obj_data *use_portal;
 	struct follow_type *fol, *next_fol;
 	room_data *to_room = real_room(GET_PORTAL_TARGET_VNUM(portal));
@@ -2155,9 +2140,6 @@ ACMD(do_climb) {
 
 // enters a portal
 ACMD(do_enter) {
-	ACMD(do_board);
-	extern bool can_infiltrate(char_data *ch, empire_data *emp);
-	
 	vehicle_data *find_veh;
 	char_data *tmp_char;
 	obj_data *portal;
@@ -2200,7 +2182,6 @@ ACMD(do_enter) {
 
 // this command tries to 'exit' the current vehicle/building, or falls through to 'exits'
 ACMD(do_exit) {
-	ACMD(do_exits);
 	room_data *to_room;
 	
 	if (IS_OUTDOORS(ch) || !ROOM_CAN_EXIT(IN_ROOM(ch))) {
@@ -2222,7 +2203,6 @@ ACMD(do_exit) {
 
 
 ACMD(do_follow) {
-	bool circle_follow(char_data *ch, char_data *victim);
 	char_data *leader, *chiter;
 
 	one_argument(argument, buf);
@@ -2354,8 +2334,6 @@ ACMD(do_land) {
 
 
 ACMD(do_move) {
-	extern int get_north_for_char(char_data *ch);
-	
 	// this blocks normal moves but not flee
 	if (is_fighting(ch)) {
 		msg_to_char(ch, "You can't move while fighting!\r\n");
@@ -2368,8 +2346,6 @@ ACMD(do_move) {
 
 // mortals have to portal from a certain building, immortals can do it anywhere
 ACMD(do_portal) {
-	void empire_player_tech_skillup(empire_data *emp, int tech, double amount);
-	
 	bool all_access = ((IS_IMMORTAL(ch) && (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_TRANSFER))) || (IS_NPC(ch) && !AFF_FLAGGED(ch, AFF_CHARM)));
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct temp_portal_data *port, *next_port, *portal_list = NULL;
@@ -2942,8 +2918,6 @@ ACMD(do_swim) {
 
 
 ACMD(do_transport) {
-	extern room_data *find_other_starting_location(room_data *current_room);
-	
 	char arg[MAX_INPUT_LENGTH];
 	room_data *target = NULL;
 	

@@ -2823,7 +2823,7 @@ struct automessage {
 	int timing;	// AUTOMSG_ types
 	int interval;	// minutes, for repeating
 	
-	UT_hash_handle hh;	// hash handle (automessages, by id)
+	UT_hash_handle hh;	// hash handle (automessages_table, by id)
 };
 
 

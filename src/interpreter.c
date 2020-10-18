@@ -39,7 +39,6 @@
 */
 
 // external funcs
-extern bool has_anonymous_host(descriptor_data *desc);
 void parse_archetype_menu(descriptor_data *desc, char *argument);
 
 // locals
@@ -1696,8 +1695,6 @@ ACMD(do_commands) {
 
 
 ACMD(do_missing_help_files) {
-	extern struct help_index_element *find_help_entry(int level, const char *word);
-	
 	struct help_index_element *found;
 	int iter, count;
 	char lbuf[MAX_STRING_LENGTH];
@@ -2320,12 +2317,8 @@ int _parse_name(char *arg, char *name) {
 * Master "socket nanny" for processing menu input.
 */
 void nanny(descriptor_data *d, char *arg) {
-	void change_personal_lastname(char_data *ch, char *name);
 	void display_automessages_on_login(char_data *ch);
-	void display_tip_to_char(char_data *ch);
-	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	void free_loaded_players();
-	extern int isbanned(char *hostname);
 	extern int num_earned_bonus_traits(char_data *ch);
 	void run_delayed_refresh();
 	

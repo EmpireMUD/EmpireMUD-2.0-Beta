@@ -40,10 +40,6 @@
 *   Object Utils
 */
 
-// external funcs
-void add_obj_to_eq_set(obj_data *obj, int set_id, int pos);
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// BASIC OBJECT LOADING ////////////////////////////////////////////////////
 
@@ -1018,9 +1014,6 @@ void objpack_load_room(room_data *room) {
 * @param char *name The name of the person whose rent file to show.
 */
 void Crash_listrent(char_data *ch, char *name) {
-	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
-	char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
-	
 	char_data *victim;
 	bool file = FALSE;
 	int iter;

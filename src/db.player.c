@@ -48,7 +48,6 @@ extern int top_account_id;
 extern int top_idnum;
 
 // external funcs
-extern int add_eq_set_to_char(char_data *ch, int set_id, char *name);
 void add_learned_craft(char_data *ch, any_vnum vnum);
 ACMD(do_slash_channel);
 void free_obj_eq_set(struct eq_set_obj *eq_set);
@@ -57,8 +56,6 @@ void free_obj_eq_set(struct eq_set_obj *eq_set);
 void check_eq_sets(char_data *ch);
 void clear_delayed_update(char_data *ch);
 void clear_player(char_data *ch);
-void free_player_eq_set(struct player_eq_set *eq_set);
-struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
 time_t get_member_timeout_ch(char_data *ch);
 time_t get_member_timeout_time(time_t created, time_t last_login, double played_hours);
 bool has_lastname(char_data *ch, char *name);
@@ -1128,7 +1125,6 @@ char_data *load_player(char *name, bool normal) {
 * @return char_data* The loaded character.
 */
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
-	void add_minipet(char_data *ch, any_vnum vnum);
 	extern struct player_event_data *create_event_data(char_data *ch, int event_id, any_vnum event_vnum);
 	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
 	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
@@ -2371,7 +2367,6 @@ void update_player_index(player_index_data *index, char_data *ch) {
 */
 void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	void Crash_save(obj_data *obj, FILE *fp, int location);
-	extern struct slash_channel *find_slash_channel_by_id(int id);
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
 	struct affected_type *af, *new_af, *next_af, *af_list;
@@ -2821,7 +2816,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	void Crash_save(obj_data *obj, FILE *fp, int location);
 	void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
-	extern struct slash_channel *find_slash_channel_by_id(int id);
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
 	char temp[MAX_STRING_LENGTH];
@@ -3909,10 +3903,6 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	extern room_data *find_home(char_data *ch);
 	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 	void give_level_zero_abilities(char_data *ch);
-	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
-	extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
-	
-	extern bool global_mute_slash_channel_joins;
 
 	struct slash_channel *load_slash, *next_slash, *temp;
 	bool stop_action = FALSE, try_home = FALSE;
@@ -4540,9 +4530,7 @@ void start_new_character(char_data *ch) {
 	void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
 	void set_skill(char_data *ch, any_vnum skill, int level);
 	extern const char *default_channels[];
-	extern bool global_mute_slash_channel_joins;
 	extern struct promo_code_list promo_codes[];
-	extern int tips_of_the_day_size;
 	
 	char lbuf[MAX_INPUT_LENGTH];
 	int arch_iter, iter, level;

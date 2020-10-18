@@ -59,10 +59,12 @@ void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool r
 void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add);
 bool can_gain_exp_from(char_data *ch, char_data *vict);
 bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type);
+bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type);
 bool check_can_gain_skill(char_data *ch, any_vnum skill_vnum);
 bool check_solo_role(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
+void empire_player_tech_skillup(empire_data *emp, int tech, double amount);
 void gain_ability_exp(char_data *ch, any_vnum ability, double amount);
 void gain_player_tech_exp(char_data *ch, int tech, double amount);
 bool gain_skill(char_data *ch, skill_data *skill, int amount);

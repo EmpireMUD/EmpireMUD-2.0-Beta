@@ -34,13 +34,11 @@
 */
 
 // external funcs
-INTERACTION_FUNC(consumes_or_decays_interact);
 ACMD(do_dismount);
 
 // locals
 int apply_poison(char_data *ch, char_data *vict);
 obj_data *find_poison_by_vnum(obj_data *list, any_vnum vnum);
-void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -214,8 +212,6 @@ INTERACTION_FUNC(pickpocket_interact) {
 
 // for do_escape
 void perform_escape(char_data *ch) {
-	extern room_data *get_exit_room(room_data *from_room);
-	
 	room_data *to_room = NULL;
 	
 	// on a boat?
@@ -328,6 +324,8 @@ void undisguise(char_data *ch) {
 
 /**
 * Determines if a room qualifies for Unseen Passing (indoors/in-city).
+*
+* TODO: rename something more generic
 *
 * @param room_data *room Where to check.
 * @return bool TRUE if Unseen Passing works here.
@@ -1438,8 +1436,6 @@ ACMD(do_shadowcage) {
 
 
 ACMD(do_shadowstep) {
-	bool can_infiltrate(char_data *ch, empire_data *emp);
-
 	char_data *vict = NULL;
 	empire_data *emp = NULL;
 	room_data *was_in;

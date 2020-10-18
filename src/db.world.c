@@ -2756,8 +2756,6 @@ int genisdesc_sort(struct genisdesc_terrain *a, struct genisdesc_terrain *b) {
 * and terrain data.
 */
 void generate_island_descriptions(void) {
-	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
-	
 	struct genisdesc_isle *isle, *next_isle, *isle_hash = NULL;
 	struct island_info *isliter, *next_isliter;
 	struct genisdesc_terrain *ter, *next_ter;

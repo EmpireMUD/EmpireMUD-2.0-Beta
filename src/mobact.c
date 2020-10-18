@@ -637,7 +637,6 @@ bool try_mobile_movement(char_data *ch) {
 * Main cycle of mob activity (iterates over character list).
 */
 void mobile_activity(void) {
-	extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
 	extern vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum interior_room);
 	extern bool catch_up_mobs;
 	
@@ -1513,8 +1512,6 @@ void scale_mob_for_character(char_data *mob, char_data *ch) {
 * @param int level The level to scale it to.
 */
 void scale_mob_to_level(char_data *mob, int level) {
-	void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
-	
 	double value, target;
 	int low_level, mid_level, high_level, over_level;
 	int room_lev = 0, room_min = 0, room_max = 0;

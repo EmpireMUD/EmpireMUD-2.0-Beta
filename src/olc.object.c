@@ -435,10 +435,8 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
 	extern bool delete_shop_item_from_list(struct shop_item **list, any_vnum vnum);
-	void expire_trading_post_item(struct trading_post_data *tpd);
 	extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 	void remove_object_from_table(obj_data *obj);
-	void save_trading_post();
 
 	struct empire_trade_data *trade, *next_trade;
 	struct ability_data_list *adl, *next_adl;

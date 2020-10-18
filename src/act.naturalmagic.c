@@ -33,16 +33,8 @@
 *   Commands
 */
 
-// external vars
-
 // external funcs
-INTERACTION_FUNC(consumes_or_decays_interact);
 ACMD(do_dismount);
-extern obj_data *find_obj(int n, bool error);
-void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability);
-
-// locals
-void un_earthmeld(char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -814,8 +806,6 @@ ACMD(do_heal) {
 
 
 ACMD(do_moonrise) {
-	void death_restore(char_data *ch);
-	
 	obj_data *corpse;
 	char_data *vict;
 	int cost = 200;
@@ -887,8 +877,6 @@ ACMD(do_moonrise) {
 
 
 ACMD(do_purify) {
-	void check_un_vampire(char_data *ch, bool remove_vampire_skills);
-	
 	bool any = FALSE, was_vampire;
 	char_data *vict;
 	int cost = 50;
@@ -1074,9 +1062,7 @@ ACMD(do_rejuvenate) {
 }
 
 
-ACMD(do_resurrect) {
-	void death_restore(char_data *ch);
-	
+ACMD(do_resurrect) {	
 	obj_data *corpse;
 	char_data *vict;
 	int cost = 75;
@@ -1230,8 +1216,6 @@ ACMD(do_skybrand) {
 
 
 ACMD(do_soulsight) {
-	void show_character_affects(char_data *ch, char_data *to);
-	
 	char_data *vict;
 	int cost = 5;
 

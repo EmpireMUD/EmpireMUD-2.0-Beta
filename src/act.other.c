@@ -37,21 +37,17 @@
 *   Commands
 */
 
+// external functions
+ACMD(do_slash_channel);
+
+// local prototypes
+char_data *find_minipet(char_data *ch);
+
 // configs for mini-pets
+// TODO this seemsl ike it should move to structs.h / utils.h
 #define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && (mob)->master == (ch) && !GET_COMPANION(mob) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
 bitvector_t default_minipet_flags = MOB_SENTINEL | MOB_SPAWNED | MOB_NO_LOOT | MOB_NO_EXPERIENCE;
 bitvector_t default_minipet_affs = AFF_NO_ATTACK | AFF_CHARM;
-
-
-// external prototypes
-void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
-extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
-extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
-extern int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
-void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
-
-// locals
-char_data *find_minipet(char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -402,10 +398,6 @@ char *one_summon_entry(char_data *ch, const char *name, int min_level, ability_d
 * @param char_data *new The character to switch to (may or may not be playing).
 */
 void perform_alternate(char_data *old, char_data *new) {
-	void display_tip_to_char(char_data *ch);
-	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
-	extern bool global_mute_slash_channel_joins;
-	
 	char sys[MAX_STRING_LENGTH], mort_in[MAX_STRING_LENGTH], mort_out[MAX_STRING_LENGTH], mort_alt[MAX_STRING_LENGTH], temp[256];
 	const char *msg;
 	descriptor_data *desc, *next_d;
@@ -935,9 +927,6 @@ void summon_player(char_data *ch, char *argument) {
 
 
 OFFER_VALIDATE(oval_quest) {
-	extern bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
-	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
-	
 	struct instance_data *inst = find_matching_instance_for_shared_quest(ch, offer->data);
 	quest_data *qst = quest_proto(offer->data);
 	
@@ -959,8 +948,6 @@ OFFER_VALIDATE(oval_quest) {
 
 
 OFFER_FINISH(ofin_quest) {
-	void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
-	
 	struct instance_data *inst = find_matching_instance_for_shared_quest(ch, offer->data);
 	quest_data *qst = quest_proto(offer->data);
 	
@@ -973,7 +960,6 @@ OFFER_FINISH(ofin_quest) {
 
 
 OFFER_VALIDATE(oval_rez) {
-	extern obj_data *find_obj(int n, bool error);
 	extern room_data *obj_room(obj_data *obj);
 	
 	room_data *loc = real_room(offer->location);
@@ -1000,7 +986,6 @@ OFFER_VALIDATE(oval_rez) {
 }
 
 OFFER_FINISH(ofin_rez) {
-	void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
 	room_data *loc = real_room(offer->location);	// pre-validated
 	perform_resurrection(ch, is_playing(offer->from), loc, offer->data);
 	return FALSE;	// prevent deletion because perform_res deletes the offer
@@ -1283,10 +1268,6 @@ void alt_import_recolors(char_data *ch, char_data *alt) {
 * @param char_data *alt Player to import from.
 */
 void alt_import_slash_channels(char_data *ch, char_data *alt) {
-	extern struct slash_channel *find_slash_channel_by_id(int id);
-	extern struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
-	ACMD(do_slash_channel);
-	
 	struct slash_channel *chan, *load_slash;
 	struct player_slash_channel *iter;
 	char buf[MAX_STRING_LENGTH];
@@ -1649,9 +1630,6 @@ ACMD(do_accept) {
 
 
 ACMD(do_alternate) {
-	extern int isbanned(char *hostname);
-	extern bool has_anonymous_host(descriptor_data *desc);
-
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct account_player *plr;
 	player_index_data *index;
@@ -1903,8 +1881,6 @@ ACMD(do_changepass) {
 
 
 ACMD(do_companions) {
-	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
-	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct companion_data *cd, *next_cd, *found_cd;
 	char_data *mob, *proto = NULL;
@@ -2069,8 +2045,6 @@ ACMD(do_companions) {
 
 
 ACMD(do_confirm) {
-	bool check_reboot_confirms();
-	
 	if (IS_NPC(ch)) {
 		return;
 	}
@@ -2100,10 +2074,6 @@ ACMD(do_confirm) {
 
 
 ACMD(do_customize) {
-	void do_customize_room(char_data *ch, char *argument);
-	void do_customize_island(char_data *ch, char *argument);
-	void do_customize_vehicle(char_data *ch, char *argument);
-
 	char arg2[MAX_INPUT_LENGTH];
 	
 	half_chop(argument, arg, arg2);
@@ -2175,9 +2145,6 @@ ACMD(do_dismiss) {
 
 
 ACMD(do_douse) {
-	void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont);
-	void stop_burning(room_data *room);
-	
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
 	obj_data *obj = NULL, *found_obj = NULL, *iter;
 	char arg[MAX_INPUT_LENGTH];
@@ -2577,8 +2544,6 @@ ACMD(do_group) {
 
 
 ACMD(do_herd) {
-	extern room_data *get_exit_room(room_data *from_room);
-	
 	char mob_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH];
 	vehicle_data *into_veh;
 	room_data *to_room;
@@ -2672,8 +2637,6 @@ ACMD(do_herd) {
 
 
 ACMD(do_lastname) {
-	void change_personal_lastname(char_data *ch, char *name);
-	
 	char arg1[MAX_INPUT_LENGTH], new_name[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	char *arg2, *best, *exact;
 	struct player_lastname *lastn;

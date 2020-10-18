@@ -34,12 +34,6 @@
 *   Readies
 */
 
-// external vars
-
-// external funcs
-void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
 
@@ -332,8 +326,6 @@ ACMD(do_damage_spell) {
 //// READIES /////////////////////////////////////////////////////////////////
 
 ACMD(do_ready) {
-	void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
-	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], *to_char, *to_room;
 	struct player_ability_data *plab, *next_plab;
 	int scale_level, ch_level = 0, pos;

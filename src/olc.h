@@ -160,8 +160,10 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input);
 // olc display parts
 void get_adventure_linking_display(struct adventure_link_rule *list, char *save_buffer);
 void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
+void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
 void get_evolution_display(struct evolution_data *list, char *save_buffer);
 void get_exit_template_display(struct exit_template *list, char *save_buffer);
+void get_progress_perks_display(struct progress_perk *list, char *save_buffer, bool show_vnums);
 void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer);
 
 // helpers from other systems

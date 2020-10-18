@@ -37,7 +37,6 @@
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
 
 // externs
-INTERACTION_FUNC(consumes_or_decays_interact);
 void process_dismantle_vehicle(char_data *ch);
 
 
@@ -1608,8 +1607,6 @@ ACMD(do_dismantle) {
 
 // called by do_customize
 void do_customize_room(char_data *ch, char *argument) {
-	void do_customize_vehicle(char_data *ch, char *argument);
-	
 	char arg2[MAX_STRING_LENGTH];
 	empire_data *emp = GET_LOYALTY(ch);
 	vehicle_data *veh;

@@ -36,7 +36,6 @@
 
 // external functions
 extern bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
-INTERACTION_FUNC(consumes_or_decays_interact);
 extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 extern bool has_cooking_fire(char_data *ch);
 void process_build_action(char_data *ch);

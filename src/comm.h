@@ -31,6 +31,7 @@ void send_stacked_msgs(descriptor_data *desc);
 void stack_msg_to_desc(descriptor_data *desc, const char *messg, ...);
 void stack_simple_msg_to_desc(descriptor_data *desc, const char *messg);
 void perform_to_all(const char *messg, char_data *ch);
+char *replace_prompt_codes(char_data *ch, char *str);
 char *prompt_color_by_prc(int cur, int max);
 void close_socket(descriptor_data *d);
 void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, bitvector_t act_flags);
@@ -38,6 +39,7 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 // reboot system
 extern struct reboot_control_data reboot_control;
 
+bool check_reboot_confirms();
 void perform_reboot();
 void update_reboot();
 

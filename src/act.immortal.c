@@ -2144,7 +2144,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("vampire") {
 		if (IS_VAMPIRE(vict) && !str_cmp(val_arg, "off")) {
-			void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 			check_un_vampire(vict, TRUE);
 		}
 		else if (!IS_VAMPIRE(vict) && !str_cmp(val_arg, "on")) {
@@ -2286,7 +2285,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("lastname") {
 		void add_lastname(char_data *ch, char *name);
-		void change_personal_lastname(char_data *ch, char *name);
 		extern bool has_lastname(char_data *ch, char *name);
 		void remove_lastname(char_data *ch, char *name);
 		char va_1[MAX_INPUT_LENGTH], va_2[MAX_INPUT_LENGTH];
@@ -2572,7 +2570,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("minipet") {
-		void add_minipet(char_data *ch, any_vnum vnum);
 		void remove_minipet(char_data *ch, any_vnum vnum);
 		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
 		char_data *pet;
@@ -7436,7 +7433,7 @@ ACMD(do_automessage) {
 	if (is_abbrev(cmd_arg, "list")) {
 		size = snprintf(buf, sizeof(buf), "Automessages:\r\n");
 		
-		HASH_ITER(hh, automessages, msg, next_msg) {
+		HASH_ITER(hh, automessages_table, msg, next_msg) {
 			switch (msg->timing) {
 				case AUTOMSG_REPEATING: {
 					snprintf(part, sizeof(part), "%s (%dm)", automessage_types[msg->timing], msg->interval);
@@ -7461,7 +7458,7 @@ ACMD(do_automessage) {
 			}
 		}
 		
-		if (!automessages) {
+		if (!automessages_table) {
 			size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
 		}
 		if (ch->desc) {
@@ -7508,12 +7505,12 @@ ACMD(do_automessage) {
 		msg->interval = interval;
 		msg->msg = str_dup(argument);
 		
-		HASH_ADD_INT(automessages, id, msg);
+		HASH_ADD_INT(automessages_table, id, msg);
 		
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s added automessage %d: %s", GET_NAME(ch), msg->id, msg->msg);
 		msg_to_char(ch, "You create a new message %d: %s\r\n", msg->id, NULLSAFE(msg->msg));
 		
-		HASH_SORT(automessages, sort_automessage_by_data);
+		HASH_SORT(automessages_table, sort_automessage_by_data);
 		save_automessages();
 	}
 	else if (is_abbrev(cmd_arg, "change")) {
@@ -7524,7 +7521,7 @@ ACMD(do_automessage) {
 			return;
 		}
 		
-		HASH_FIND_INT(automessages, &id, msg);
+		HASH_FIND_INT(automessages_table, &id, msg);
 		if (!msg) {
 			msg_to_char(ch, "Invalid message id %d.\r\n", id);
 			return;
@@ -7549,7 +7546,7 @@ ACMD(do_automessage) {
 				msg->interval = 5;	// safe default
 			}
 			msg->timing = type;
-			HASH_SORT(automessages, sort_automessage_by_data);
+			HASH_SORT(automessages_table, sort_automessage_by_data);
 			save_automessages();
 		}
 		else if (is_abbrev(type_arg, "interval")) {
@@ -7595,7 +7592,7 @@ ACMD(do_automessage) {
 		}
 		
 		id = atoi(argument);
-		HASH_FIND_INT(automessages, &id, msg);
+		HASH_FIND_INT(automessages_table, &id, msg);
 		if (!msg) {
 			msg_to_char(ch, "No such message id to delete.\r\n");
 			return;
@@ -7603,7 +7600,7 @@ ACMD(do_automessage) {
 		
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted automessage %d: %s", GET_NAME(ch), msg->id, msg->msg);
 		msg_to_char(ch, "You delete message %d: %s\r\n", msg->id, NULLSAFE(msg->msg));
-		HASH_DEL(automessages, msg);
+		HASH_DEL(automessages_table, msg);
 		free_automessage(msg);
 		save_automessages();
 	}
@@ -9328,7 +9325,7 @@ ACMD(do_reload) {
 	extern char *news;
 	extern char *imotd;
 	extern char *CREDIT_MESSG;
-	extern char *help;
+	extern char *help_screen;
 	extern char *info;
 	extern char *handbook;
 	extern char *policies;
@@ -9349,7 +9346,7 @@ ACMD(do_reload) {
 		file_to_string_alloc(MOTD_FILE, &motd);
 		file_to_string_alloc(NEWS_FILE, &news);
 		file_to_string_alloc(IMOTD_FILE, &imotd);
-		file_to_string_alloc(HELP_PAGE_FILE, &help);
+		file_to_string_alloc(HELP_PAGE_FILE, &help_screen);
 		file_to_string_alloc(INFO_FILE, &info);
 		file_to_string_alloc(POLICIES_FILE, &policies);
 		file_to_string_alloc(HANDBOOK_FILE, &handbook);
@@ -9367,7 +9364,7 @@ ACMD(do_reload) {
 	else if (!str_cmp(arg, "news"))
 		file_to_string_alloc(NEWS_FILE, &news);
 	else if (!str_cmp(arg, "help"))
-		file_to_string_alloc(HELP_PAGE_FILE, &help);
+		file_to_string_alloc(HELP_PAGE_FILE, &help_screen);
 	else if (!str_cmp(arg, "info"))
 		file_to_string_alloc(INFO_FILE, &info);
 	else if (!str_cmp(arg, "policy"))

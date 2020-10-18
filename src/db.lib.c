@@ -58,7 +58,6 @@
 */
 
 // external variables
-extern struct automessage *automessages;
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
 extern struct player_special_data dummy_mob;
 extern struct generic_name_data *generic_names;
@@ -349,7 +348,7 @@ void display_automessages(void) {
 	char_data *ch;
 	int id;
 	
-	HASH_ITER(hh, automessages, msg, next_msg) {
+	HASH_ITER(hh, automessages_table, msg, next_msg) {
 		id = msg->id;
 		
 		if (msg->timing == AUTOMSG_ON_LOGIN) {
@@ -397,7 +396,7 @@ void display_automessages_on_login(char_data *ch) {
 	struct automessage *msg, *next_msg;
 	bool any = FALSE;
 	
-	HASH_ITER(hh, automessages, msg, next_msg) {
+	HASH_ITER(hh, automessages_table, msg, next_msg) {
 		if (msg->timing != AUTOMSG_ON_LOGIN) {
 			continue;	// only showing 1 type
 		}
@@ -479,14 +478,14 @@ void load_automessages(void) {
 			msg->interval = interval;
 			msg->msg = fread_string(fl, error);
 			
-			HASH_FIND_INT(automessages, &id, find);
+			HASH_FIND_INT(automessages_table, &id, find);
 			if (find) {
 				log("SYSERR: Duplicate automessage id %d found in file", id);
-				HASH_DEL(automessages, find);
+				HASH_DEL(automessages_table, find);
 				free_automessage(find);
 			}
 			
-			HASH_ADD_INT(automessages, id, msg);
+			HASH_ADD_INT(automessages_table, id, msg);
 		}
 	}
 	
@@ -503,8 +502,8 @@ int new_automessage_id(void) {
 	}
 	else {
 		// whaaaa? find the first free id
-		HASH_SORT(automessages, sort_automessage_by_id);
-		HASH_ITER(hh, automessages, msg, next_msg) {
+		HASH_SORT(automessages_table, sort_automessage_by_id);
+		HASH_ITER(hh, automessages_table, msg, next_msg) {
 			if (msg->id > last + 1) {
 				found = last + 1;
 			}
@@ -512,7 +511,7 @@ int new_automessage_id(void) {
 		}
 		
 		// sort back
-		HASH_SORT(automessages, sort_automessage_by_data);
+		HASH_SORT(automessages_table, sort_automessage_by_data);
 		if (found) {
 			return found;
 		}
@@ -537,7 +536,7 @@ void save_automessages(void) {
 	fprintf(fl, "Automessage: 1\n");	// version tag
 	fprintf(fl, "Index: %d\n", max_automessage_id);
 	
-	HASH_ITER(hh, automessages, msg, next_msg) {
+	HASH_ITER(hh, automessages_table, msg, next_msg) {
 		fprintf(fl, "Message: %d %d %ld %d %d\n%s~\n", msg->id, msg->author, msg->timestamp, msg->timing, msg->interval, NULLSAFE(msg->msg));
 	}
 	

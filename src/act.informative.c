@@ -24,6 +24,7 @@
 #include "dg_scripts.h"
 #include "vnums.h"
 #include "constants.h"
+#include "boards.h"
 
 /**
 * Contents:
@@ -36,17 +37,10 @@
 *   Commands
 */
 
-// external functions
-void clear_recent_moves(char_data *ch);
-extern char *list_harnessed_mobs(vehicle_data *veh);
-void look_at_vehicle(vehicle_data *veh, char_data *ch);
-
 // local protos
 ACMD(do_affects);
-void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 void list_one_char(char_data *i, char_data *ch, int num);
 void look_at_char(char_data *i, char_data *ch, bool show_eq);
-char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero);
 
 
@@ -59,9 +53,6 @@ void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire
 * @param char_data *ch The person to show a tip to.
 */
 void display_tip_to_char(char_data *ch) {
-	extern char **tips_of_the_day;
-	extern int tips_of_the_day_size;
-	
 	int pos;
 
 	if (IS_NPC(ch)) {
@@ -571,10 +562,6 @@ void display_attributes(char_data *ch, char_data *to) {
 * @param char_data *to The person to show it to.
 */
 void display_score_to_char(char_data *ch, char_data *to) {
-	void show_character_affects(char_data *ch, char_data *to);
-	extern int health_gain(char_data *ch, bool info_only);
-	extern int mana_gain(char_data *ch, bool info_only);
-
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	struct player_skill_data *skdata, *next_skill;
 	int i, j, count, pts, cols, val;
@@ -840,9 +827,6 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 * @param int num If mob-stacking is on, number of copies of this i to show.
 */
 void list_one_char(char_data *i, char_data *ch, int num) {
-	extern bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
-	extern bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
-	
 	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], part[256];
 	struct custom_message *ocm;
 	
@@ -1061,9 +1045,6 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 * @param char_data *ch The person to send the output to.
 */
 void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
-	extern bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
-	extern bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
-	
 	char buf[MAX_STRING_LENGTH], part[256];
 	size_t size = 0, pos;
 	
@@ -1508,13 +1489,6 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
  * This function screams bitvector... -gg 6/45/98
  */
 char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
-	extern int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board);
-	extern int board_loaded;
-	extern bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
-	extern bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
-	void init_boards(void);
-	extern int find_board(char_data *ch);
-	
 	static char buf[MAX_STRING_LENGTH];
 	char tags[MAX_STRING_LENGTH], flags[256];
 	bitvector_t show_flags;
@@ -1980,8 +1954,6 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 * @return char* The who output for imms.
 */
 char *partial_who(char_data *ch, char *name_search, int low, int high, empire_data *empire_who, bool rp, bool shortlist, int type) {
-	extern int max_players_this_uptime;
-	
 	static char who_output[MAX_STRING_LENGTH];
 	struct who_entry *list = NULL, *entry, *next_entry;
 	char whobuf[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], online[MAX_STRING_LENGTH];
@@ -2115,8 +2087,6 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_adventure) {
-	void adventure_summon(char_data *ch, char *argument);
-
 	char arg[MAX_STRING_LENGTH];
 	struct instance_data *inst;
 	
@@ -2445,8 +2415,6 @@ ACMD(do_diagnose) {
 
 
 ACMD(do_display) {
-	extern char *replace_prompt_codes(char_data *ch, char *str);
-	
 	skip_spaces(&argument);
 	
 	if (!*argument) {
@@ -2627,8 +2595,7 @@ ACMD(do_gen_ps) {
 
 
 ACMD(do_help) {
-	extern struct help_index_element *find_help_entry(int level, const char *word);
-	extern char *help;
+	extern char *help_screen;
 	struct help_index_element *found;
 
 	if (!ch->desc)
@@ -2637,7 +2604,7 @@ ACMD(do_help) {
 	skip_spaces(&argument);
 
 	if (!*argument) {
-		page_string(ch->desc, help, 0);
+		page_string(ch->desc, help_screen, 0);
 		return;
 	}
 	if (help_table) {
@@ -2907,8 +2874,6 @@ ACMD(do_inventory) {
 
 
 ACMD(do_look) {
-	void look_in_direction(char_data *ch, int dir);
-	
 	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	room_data *map;
 	int look_type;
@@ -3141,8 +3106,6 @@ ACMD(do_mark) {
 
 
 ACMD(do_messages) {
-	extern struct automessage *automessages;
-	
 	struct automessage *msg, *next_msg;
 	char buf[MAX_STRING_LENGTH * 2];
 	struct player_automessage *pam;
@@ -3152,7 +3115,7 @@ ACMD(do_messages) {
 	
 	size = snprintf(buf, sizeof(buf), "Recent messages:\r\n");
 	
-	HASH_ITER(hh, automessages, msg, next_msg) {
+	HASH_ITER(hh, automessages_table, msg, next_msg) {
 		if (!msg->msg) {
 			continue;	// somehow
 		}
@@ -3196,7 +3159,6 @@ ACMD(do_messages) {
 
 
 ACMD(do_mudstats) {
-	void mudstats_empires(char_data *ch, char *argument);
 	int iter, pos;
 	
 	const struct {
@@ -3241,11 +3203,7 @@ ACMD(do_mudstats) {
 
 
 ACMD(do_nearby) {
-	extern int highest_start_loc_index;
-	extern int *start_locs;
-	
 	int max_dist = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
-	
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct instance_data *inst;
@@ -3708,13 +3666,11 @@ ACMD(do_time) {
 
 
 ACMD(do_tip) {
-	void display_tip_to_char(char_data *ch);
 	display_tip_to_char(ch);
 }
 
 
 ACMD(do_weather) {
-	void list_moons_to_char(char_data *ch);
 	const char *sky_look[] = {
 		"cloudless",
 		"cloudy",

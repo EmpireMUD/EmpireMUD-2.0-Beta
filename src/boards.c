@@ -158,7 +158,6 @@ ACMD(do_write) {
 
 
 ACMD(do_read) {
-	char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 	void read_book(char_data *ch, obj_data *obj);
 	
 	obj_data *board, *obj;

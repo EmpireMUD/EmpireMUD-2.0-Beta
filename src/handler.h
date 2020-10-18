@@ -202,6 +202,9 @@ extern bool in_same_group(char_data *ch, char_data *vict);
 void join_group(char_data *ch, struct group_data *group);
 void leave_group(char_data *ch);
 
+// help file handlers
+struct help_index_element *find_help_entry(int level, const char *word);
+
 // interaction handlers
 extern bool can_interact_room(room_data *room, int type);
 extern bool check_exclusion_set(struct interact_exclusion_data **set, char code, double percent);
@@ -304,6 +307,10 @@ extern obj_data *get_obj_world(char *name, int *number);
 extern struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data);
 void remove_offers_by_type(char_data *ch, int type);
 
+// player minipet handlers
+void add_minipet(char_data *ch, any_vnum vnum);
+bool has_minipet(char_data *ch, any_vnum vnum);
+
 // player tech handlers
 void add_player_tech(char_data *ch, any_vnum abil, int tech);
 extern bool has_player_tech(char_data *ch, int tech);
@@ -367,23 +374,27 @@ sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_t
 
 // storage handlers
 struct empire_storage_data *add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount);
-extern bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool use_kept, bool basic_only, struct resource_data **build_used_list);
-extern bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount);
-extern bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
-extern bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool include_kept, bool basic_only);
-extern struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
-extern struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
-extern int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_secondary);
-extern bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool retrieval_mode);
+bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool use_kept, bool basic_only, struct resource_data **build_used_list);
+bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount);
+bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capped);
+bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
+bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool include_kept, bool basic_only);
+struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
+struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
+int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_secondary);
+bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool retrieval_mode);
 #define obj_can_be_retrieved(obj, loc, by_emp)  obj_can_be_stored((obj), (loc), (by_emp), TRUE)
-extern bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen);
-extern int store_resource(char_data *ch, empire_data *emp, obj_data *obj);
-extern bool stored_item_requires_withdraw(obj_data *obj);
+bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen);
+int store_resource(char_data *ch, empire_data *emp, obj_data *obj);
+bool stored_item_requires_withdraw(obj_data *obj);
 
 // targeting handlers
 extern int find_all_dots(char *arg);
 extern bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh);
 extern int get_number(char **name);
+
+// trading post handlers
+void expire_trading_post_item(struct trading_post_data *tpd);
 
 // unique storage handlers
 extern bool delete_unique_storage_by_vnum(struct empire_unique_storage **list, obj_vnum vnum);
@@ -459,7 +470,8 @@ extern struct instance_data *real_instance(any_vnum instance_id);
 void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum);
 
 // limits.c
-extern int limit_crowd_control(char_data *victim, int atype);
+INTERACTION_FUNC(consumes_or_decays_interact);
+int limit_crowd_control(char_data *victim, int atype);
 
 // morph.c
 void perform_morph(char_data *ch, morph_data *morph);

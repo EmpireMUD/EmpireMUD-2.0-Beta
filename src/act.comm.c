@@ -31,6 +31,9 @@
 *   Communication Commands
 */
 
+// external functions
+ACMD(do_slash_channel);
+
 // local prototypes
 FILE *open_slash_channel_file(struct slash_channel *chan);
 struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message);
@@ -1539,7 +1542,6 @@ ACMD(do_history) {
 	}
 	else if (subcmd == SCMD_HISTORY && *argument == '/') {
 		// forward to /history
-		ACMD(do_slash_channel);
 		char buf[MAX_INPUT_LENGTH];
 		snprintf(buf, sizeof(buf), "history %s", argument);
 		do_slash_channel(ch, buf, 0, 0);

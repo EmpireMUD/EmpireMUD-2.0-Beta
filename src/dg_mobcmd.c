@@ -2209,8 +2209,6 @@ ACMD(do_mdoor) {
 
 
 ACMD(do_mfollow) {
-	extern bool circle_follow(char_data *ch, char_data *victim);
-	
 	char buf[MAX_INPUT_LENGTH];
 	char_data *leader;
 	struct follow_type *j, *k;

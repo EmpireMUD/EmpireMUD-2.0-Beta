@@ -59,7 +59,6 @@ extern char *requirement_string(struct req_data *req, bool show_vnums);
 // local protos
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
-bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
 int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 int count_owned_homes(empire_data *emp);
 int count_owned_vehicles(empire_data *emp, any_vnum vnum);
@@ -69,7 +68,6 @@ void free_quest_givers(struct quest_giver *list);
 void free_quest_temp_list(struct quest_temp_list *list);
 struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest);
 struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
-struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
 void update_veh_quest_lookups(any_vnum vnum);
@@ -700,8 +698,6 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 * @param int instance_id Optional: If the quest is associated with an instance, pass its id. Otherwise, 0 is fine.
 */
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id) {
-	void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
-	
 	char buf[MAX_STRING_LENGTH];
 	struct quest_reward *reward;
 	

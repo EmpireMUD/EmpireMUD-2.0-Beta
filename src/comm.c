@@ -60,14 +60,13 @@ extern ush_int DFLT_PORT;
 extern const char *DFLT_DIR;
 extern char *LOGNAME;
 extern int max_playing;
-extern char *help;
+extern char *help_screen;
 
 // external functions
 void save_all_players(bool delay);
 extern char *flush_reduced_color_codes(descriptor_data *desc);
 void mobile_activity(void);
 void show_string(descriptor_data *d, char *input);
-int isbanned(char *hostname);
 
 // local functions
 RETSIGTYPE checkpointing(int sig);
@@ -77,7 +76,6 @@ RETSIGTYPE import_evolutions(int sig);
 RETSIGTYPE unrestrict_game(int sig);
 char *make_prompt(descriptor_data *point);
 char *prompt_str(char_data *ch);
-char *replace_prompt_codes(char_data *ch, char *str);
 int get_from_q(struct txt_q *queue, char *dest, int *aliased);
 int get_max_players(void);
 static void msdp_update();
@@ -306,9 +304,6 @@ void msdp_update_room(char_data *ch) {
 * From KaVir's protocol snippet (see protocol.c)
 */
 static void msdp_update(void) {
-	extern int health_gain(char_data *ch, bool info_only);
-	extern int mana_gain(char_data *ch, bool info_only);
-	
 	struct player_skill_data *skill, *next_skill;
 	struct over_time_effect_type *dot;
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
@@ -4130,9 +4125,7 @@ void setup_log(const char *filename, int fd) {
 
 
 void reboot_recover(void) {
-	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
 	void free_loaded_players();
-	extern bool global_mute_slash_channel_joins;
 	void run_delayed_refresh();
 
 	char buf[MAX_STRING_LENGTH];

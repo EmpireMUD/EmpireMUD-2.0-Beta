@@ -77,7 +77,7 @@ augment_data *augment_table = NULL;	// master augment hash table
 augment_data *sorted_augments = NULL;	// alphabetic version // sorted_hh
 
 // automessage system
-struct automessage *automessages = NULL;	// hash table (hh, by id)
+struct automessage *automessages_table = NULL;	// hash table (hh, by id)
 int max_automessage_id = 0;	// read from file, permanent max id
 
 // buildings
@@ -201,7 +201,7 @@ char *imotd = NULL;	// message of the day - immorts
 char **intros = NULL;	// array of intro screens
 int num_intros = 0;	// total number of intro screens
 char *CREDIT_MESSG = NULL;	// short credits
-char *help = NULL;	// help screen
+char *help_screen = NULL;	// help screen
 char *info = NULL;	// info page
 char *wizlist = NULL;	// list of higher gods
 char *godlist = NULL;	// list of peon gods
@@ -334,7 +334,7 @@ void boot_db(void) {
 	file_to_string_alloc(CREDITS_FILE, &credits);
 	file_to_string_alloc(MOTD_FILE, &motd);
 	file_to_string_alloc(IMOTD_FILE, &imotd);
-	file_to_string_alloc(HELP_PAGE_FILE, &help);
+	file_to_string_alloc(HELP_PAGE_FILE, &help_screen);
 	file_to_string_alloc(INFO_FILE, &info);
 	file_to_string_alloc(WIZLIST_FILE, &wizlist);
 	file_to_string_alloc(GODLIST_FILE, &godlist);
@@ -2114,8 +2114,6 @@ PLAYER_UPDATE_FUNC(b3_2_player_gear_disenchant) {
 
 // removes the PLAYER-MADE flag from rooms and sets their "natural sect" instead
 void b3_2_map_and_gear(void) {
-	void save_trading_post();
-
 	obj_data *obj, *next_obj, *new, *proto;
 	struct empire_unique_storage *eus;
 	struct trading_post_data *tpd;
@@ -2752,8 +2750,6 @@ PLAYER_UPDATE_FUNC(b5_14_player_superiors) {
 
 // removes the PLAYER-MADE flag from rooms and sets their "natural sect" instead
 void b5_14_superior_items(void) {
-	void save_trading_post();
-
 	obj_data *obj, *next_obj, *new, *proto;
 	struct empire_unique_storage *eus;
 	struct trading_post_data *tpd;
@@ -2910,8 +2906,6 @@ PLAYER_UPDATE_FUNC(b5_23_player_potion_update) {
 
 // reloads and rescales all potions, and moves them from warehouse to einv if possible
 void b5_23_potion_update(void) {
-	void save_trading_post();
-	
 	struct empire_unique_storage *eus, *next_eus;
 	obj_data *obj, *next_obj, *new, *proto;
 	struct trading_post_data *tpd;
@@ -2994,8 +2988,6 @@ PLAYER_UPDATE_FUNC(b5_24_player_poison_update) {
 
 // reloads and rescales all poisons, and moves them from warehouse to einv if possible
 void b5_24_poison_update(void) {
-	void save_trading_post();
-	
 	struct empire_unique_storage *eus, *next_eus;
 	obj_data *obj, *next_obj, *new, *proto;
 	struct trading_post_data *tpd;
@@ -3681,8 +3673,6 @@ PLAYER_UPDATE_FUNC(b5_86_player_missile_weapons) {
 // removes 'crop' tiles from the 'natural sectors' of all tiles, but does not affect any current sectors
 // also refreshes missile weapons
 void b5_86_update(void) {
-	void save_trading_post();
-	
 	obj_data *obj, *next_obj, *new;
 	struct empire_unique_storage *eus;
 	struct trading_post_data *tpd;
@@ -4571,8 +4561,6 @@ void check_version(void) {
 			}
 		}
 		if (MATCH_VERSION("b2.11")) {
-			void save_trading_post();
-			
 			struct empire_unique_storage *eus;
 			struct trading_post_data *tpd;
 			empire_data *emp, *next_emp;
