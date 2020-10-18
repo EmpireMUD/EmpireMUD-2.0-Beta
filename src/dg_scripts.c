@@ -2882,8 +2882,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "action")) {
-						extern const struct action_data_struct action_data[];
-						extern struct gen_craft_data_t gen_craft_data[];
 						if (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) {
 							strcpy(str, "");	// none
 						}

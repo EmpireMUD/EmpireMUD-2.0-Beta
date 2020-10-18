@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -213,8 +214,6 @@ void end_boost(char_data *ch) {
 
 // max blood is set in mobfile for npc, but computed for player
 int GET_MAX_BLOOD(char_data *ch) {
-	extern const int base_player_pools[NUM_POOLS];
-	
 	int base = base_player_pools[BLOOD];
 	
 	if (IS_NPC(ch)) {

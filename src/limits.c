@@ -59,8 +59,6 @@ int move_gain(char_data *ch, bool info_only);
 * @param char_data *ch The player to check for attributes.
 */
 void check_attribute_gear(char_data *ch) {
-	extern const int primary_attributes[];
-	
 	struct obj_apply *apply;
 	int iter, pos;
 	obj_data *obj;

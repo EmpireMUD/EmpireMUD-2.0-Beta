@@ -251,7 +251,6 @@ extern const char *fill_words[];
 extern const char *global_types[];
 extern const char *global_flags[];
 extern const char *interact_types[];
-
 extern const int interact_attach_types[NUM_INTERACTS];
 extern const byte interact_vnum_types[NUM_INTERACTS];
 extern const bool interact_one_at_a_time[NUM_INTERACTS];
@@ -270,3 +269,28 @@ extern const char *identify_vehicle_flags[];
 extern const char *veh_custom_types[];
 extern const char *vehicle_speed_types[];
 extern const char *wait_types[];
+
+
+// act.action.c
+extern const struct action_data_struct action_data[];
+
+// act.empire.c
+extern const struct tavern_data_type tavern_data[];
+
+// act.movement.c
+extern const char *cmd_door[];
+
+// act.trade.c
+extern struct gen_craft_data_t gen_craft_data[];
+
+// config.c
+extern const int base_hit_chance;
+extern const int base_player_pools[NUM_POOLS];
+extern const double hit_per_dex;
+extern const int primary_attributes[];
+extern const double score_levels[];
+extern const int techs_requiring_same_island[];
+extern const int universal_wait;
+
+// instance.c
+extern const bool is_location_rule[];

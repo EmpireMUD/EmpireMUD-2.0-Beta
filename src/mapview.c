@@ -616,7 +616,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 	void list_char_to_char(char_data *list, char_data *ch);
 	void list_vehicles_to_char(vehicle_data *list, char_data *ch);
-	extern const struct tavern_data_type tavern_data[];
 
 	struct mappc_data_container *mappc = NULL;
 	struct mappc_data *pc, *next_pc;

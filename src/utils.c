@@ -598,7 +598,6 @@ static inline void add_scemp(struct scemp_type **list, int value) {
 */
 void score_empires(void) {
 	extern double empire_score_average[NUM_SCORES];
-	extern const double score_levels[];
 	
 	struct scemp_type *scemp, *next_scemp, *lists[NUM_SCORES];
 	int iter, pos, median, num_emps = 0;
@@ -1463,8 +1462,6 @@ bool has_tech_available(char_data *ch, int tech) {
 * @return TRUE if successful, FALSE if not (and sends its own error message to ch)
 */
 bool has_tech_available_room(room_data *room, int tech) {
-	extern const int techs_requiring_same_island[];
-	
 	empire_data *emp = ROOM_OWNER(room);
 	bool requires_island = FALSE;
 	struct empire_island *isle;
@@ -2898,8 +2895,6 @@ double rate_item(obj_data *obj) {
 * @param int wait_type A WAIT_ const to help determine wait time.
 */
 void command_lag(char_data *ch, int wait_type) {
-	extern const int universal_wait;
-	
 	double val;
 	int wait;
 	

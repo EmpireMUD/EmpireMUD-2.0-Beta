@@ -145,8 +145,8 @@ double exchange_rate(empire_data *from, empire_data *to);
 extern char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, bool require_coin_type, bool assume_coins, bool *gave_coin_type);
 extern struct coin_data *find_coin_entry(struct coin_data *list, empire_data *emp);
 extern int increase_coins(char_data *ch, empire_data *emp, int amount);
-extern const char *money_amount(empire_data *type, int amount);
-extern const char *money_desc(empire_data *type, int amount);
+const char *money_amount(empire_data *type, int amount);
+const char *money_desc(empire_data *type, int amount);
 extern int total_coins(char_data *ch);
 
 // companion handlers
@@ -441,7 +441,7 @@ extern bool config_get_bool(char *key);
 extern double config_get_double(char *key);
 extern int config_get_int(char *key);
 extern int *config_get_int_array(char *key, int *array_size);
-extern const char *config_get_string(char *key);
+const char *config_get_string(char *key);
 
 // faction.c
 extern int compare_reptuation(int rep_a, int rep_b);

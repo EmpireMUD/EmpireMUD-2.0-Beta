@@ -126,7 +126,8 @@ act.god.o: act.god.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
   vnums.h interpreter.h handler.h db.h skills.h dg_scripts.h
 	$(CC) -c $(CFLAGS) act.god.c
 act.highsorcery.o: act.highsorcery.c conf.h sysdep.h structs.h uthash.h \
-  utils.h comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+  utils.h comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h \
+  constants.h
 	$(CC) -c $(CFLAGS) act.highsorcery.c
 act.immortal.o: act.immortal.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h vnums.h interpreter.h handler.h db.h skills.h olc.h dg_scripts.h \
@@ -166,7 +167,7 @@ act.trade.o: act.trade.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) act.trade.c
 act.vampire.o: act.vampire.c conf.h sysdep.h structs.h uthash.h utils.h \
-  comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h
+  comm.h interpreter.h handler.h db.h skills.h vnums.h dg_scripts.h constants.h
 	$(CC) -c $(CFLAGS) act.vampire.c
 act.vehicles.o: act.vehicles.c conf.h sysdep.h structs.h uthash.h utils.h \
   comm.h interpreter.h handler.h db.h skills.h dg_scripts.h vnums.h constants.h

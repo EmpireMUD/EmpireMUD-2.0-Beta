@@ -431,7 +431,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
 	
 	extern double get_weapon_speed(obj_data *weapon);
-	extern struct gen_craft_data_t gen_craft_data[];
 
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	vehicle_data *veh, *veh_iter, *next_veh;
@@ -1115,8 +1114,6 @@ obj_data *perform_remove(char_data *ch, int pos) {
 
 
 static void perform_wear(char_data *ch, obj_data *obj, int where) {
-	extern const int primary_attributes[];
-	
 	char buf[MAX_STRING_LENGTH];
 	struct obj_apply *apply;
 	int iter, type, val;
@@ -2396,8 +2393,6 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 
 
 void fill_from_room(char_data *ch, obj_data *obj) {
-	extern const struct tavern_data_type tavern_data[];
-	
 	int amount = GET_DRINK_CONTAINER_CAPACITY(obj) - GET_DRINK_CONTAINER_CONTENTS(obj);
 	int liquid = LIQ_WATER;
 	int timer = UNLIMITED;

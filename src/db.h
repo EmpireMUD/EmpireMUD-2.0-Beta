@@ -421,8 +421,8 @@ void free_generic(generic_data *gen);
 extern generic_data *find_generic(any_vnum vnum, int type);
 extern generic_data *find_generic_by_name(int type, char *name, bool exact);
 extern generic_data *real_generic(any_vnum vnum);
-extern const char *get_generic_name_by_vnum(any_vnum vnum);
-extern const char *get_generic_string_by_vnum(any_vnum vnum, int type, int pos);
+const char *get_generic_name_by_vnum(any_vnum vnum);
+const char *get_generic_string_by_vnum(any_vnum vnum, int type, int pos);
 extern int get_generic_value_by_vnum(any_vnum vnum, int type, int pos);
 
 // globals

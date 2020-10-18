@@ -37,9 +37,6 @@
 *   Generic Interactions: do_gen_interact_room
 */
 
-// external vars
-extern struct gen_craft_data_t gen_craft_data[];
-
 // cancel protos
 void cancel_resource_list(char_data *ch);
 void cancel_driving(char_data *ch);

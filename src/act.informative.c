@@ -37,7 +37,6 @@
 */
 
 // extern variables
-extern struct gen_craft_data_t gen_craft_data[];
 extern struct help_index_element *help_table;
 extern int top_of_helpt;
 
@@ -583,8 +582,6 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	extern int move_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
 	extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
-	extern const int base_hit_chance;
-	extern const double hit_per_dex;
 
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	struct player_skill_data *skdata, *next_skill;
@@ -853,7 +850,6 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 void list_one_char(char_data *i, char_data *ch, int num) {
 	extern bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
 	extern bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
-	extern struct action_data_struct action_data[];
 	
 	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], part[256];
 	struct custom_message *ocm;

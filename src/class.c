@@ -44,11 +44,6 @@ void get_class_ability_display(struct class_ability *list, char *save_buffer, ch
 void get_class_skill_display(struct class_skill_req *list, char *save_buffer, bool one_line);
 int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 
-// external consts
-extern const int base_player_pools[NUM_POOLS];
-
-// external funcs
-
 
  /////////////////////////////////////////////////////////////////////////////
 //// HELPERS ////////////////////////////////////////////////////////////////

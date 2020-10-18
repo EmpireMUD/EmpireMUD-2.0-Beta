@@ -27,9 +27,6 @@
 #include "dg_event.h"
 #include "constants.h"
 
-
-extern const char *cmd_door[];
-
 /* external functions */
 const char *skill_name(int num);
 void add_var(struct trig_var_data **var_list, char *name, char *value, int id);

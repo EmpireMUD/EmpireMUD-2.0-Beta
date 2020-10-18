@@ -4658,8 +4658,8 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 * @param struct interaction_item *list The interaction list to write.
 */
 void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
-	extern char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
-	extern const char *get_interaction_target(int type, any_vnum vnum);
+	char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
+	const char *get_interaction_target(int type, any_vnum vnum);
 	
 	struct interaction_item *interact;
 	struct interact_restriction *res;

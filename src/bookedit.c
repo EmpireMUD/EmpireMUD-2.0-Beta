@@ -31,6 +31,9 @@
 *   Bookedit Commands
 */
 
+// external vars
+extern const char *book_name_list[];
+
 
 const char *bookedit_license_display =
 "You are using EmpireMUD's book editor under these terms:\r\n"
@@ -49,9 +52,6 @@ const char *default_book_desc = "It appears to be a book.\r\n";
 
 // local protos
 void remove_book_from_table(book_data *book);
-
-// external consts
-extern const char *book_name_list[];
 
 // external funcs
 void add_book_author(int idnum);

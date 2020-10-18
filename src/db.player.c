@@ -4315,8 +4315,6 @@ void give_newbie_gear(char_data *ch, obj_vnum vnum, int pos) {
 * @param char_data *ch The player to initialize.
 */
 void init_player(char_data *ch) {
-	extern const int base_player_pools[NUM_POOLS];
-	
 	player_index_data *index;
 	int account_id = NOTHING;
 	account_data *acct;
@@ -4550,7 +4548,6 @@ void start_new_character(char_data *ch) {
 	void set_skill(char_data *ch, any_vnum skill, int level);
 	extern const char *default_channels[];
 	extern bool global_mute_slash_channel_joins;
-	extern const int primary_attributes[];
 	extern struct promo_code_list promo_codes[];
 	extern int tips_of_the_day_size;
 	

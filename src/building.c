@@ -40,9 +40,6 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
 INTERACTION_FUNC(consumes_or_decays_interact);
 void process_dismantle_vehicle(char_data *ch);
 
-// external vars
-extern struct gen_craft_data_t gen_craft_data[];
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// BUILDING DATA ///////////////////////////////////////////////////////////

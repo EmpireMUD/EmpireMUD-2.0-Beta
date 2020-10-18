@@ -1630,7 +1630,6 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
 //// CONST EXTERNS ///////////////////////////////////////////////////////////
 
 extern FILE *logfile;	// comm.c
-extern const int shift_dir[][2];	// constants.c
 extern struct weather_data weather_info;	// db.c
 
 

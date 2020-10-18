@@ -313,7 +313,6 @@ static void msdp_update(void) {
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
 	extern int move_gain(char_data *ch, bool info_only);
-	extern const double hit_per_dex;
 	
 	struct player_skill_data *skill, *next_skill;
 	struct over_time_effect_type *dot;
@@ -3170,9 +3169,6 @@ char *prompt_str(char_data *ch) {
 * @return char* The processed string
 */
 char *replace_prompt_codes(char_data *ch, char *str) {
-	extern struct gen_craft_data_t gen_craft_data[];
-	extern struct action_data_struct action_data[];
-	
 	static char pbuf[MAX_STRING_LENGTH];
 	char i[MAX_STRING_LENGTH], spare[10];
 	char *cp, *tmp;

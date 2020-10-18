@@ -34,9 +34,6 @@
 *   Commands
 */
 
-// external vars
-extern const struct action_data_struct action_data[];
-
 // external funcs
 ACMD(do_dismount);
 extern bool action_flagged(char_data *ch, bitvector_t actf);

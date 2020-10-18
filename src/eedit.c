@@ -622,8 +622,6 @@ EEDIT(eedit_name) {
 
 
 EEDIT(eedit_privilege) {
-	extern const char *priv[];
-
 	int pr, rnk, iter;
 	
 	argument = any_one_word(argument, arg);

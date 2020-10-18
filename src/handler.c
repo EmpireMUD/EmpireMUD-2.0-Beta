@@ -738,8 +738,6 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 * @param char_data *ch The person whose effects to update
 */
 void affect_total(char_data *ch) {
-	extern const int base_player_pools[NUM_POOLS];
-
 	struct affected_type *af;
 	int i, iter, level;
 	struct obj_apply *apply;

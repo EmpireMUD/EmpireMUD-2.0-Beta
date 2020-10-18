@@ -1493,8 +1493,6 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_workforce_crafting) {
 * @param bool is_skilled If TRUE, gains exp for Skilled Labor.
 */
 void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator), bool is_skilled) {
-	extern struct gen_craft_data_t gen_craft_data[];
-	
 	struct empire_storage_data *store = NULL;
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[chore].mob);
 	bool any_over_limit = FALSE, any_no_res = FALSE, done_any = FALSE;

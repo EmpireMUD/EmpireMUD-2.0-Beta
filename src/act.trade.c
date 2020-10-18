@@ -34,9 +34,6 @@
 *   Commands
 */
 
-// external vars
-extern struct gen_craft_data_t gen_craft_data[];
-
 // external functions
 extern bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
 INTERACTION_FUNC(consumes_or_decays_interact);

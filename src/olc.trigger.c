@@ -92,8 +92,6 @@ bool audit_trigger(trig_data *trig, char_data *ch) {
 * @return bitvector_t A set of TRIG_ARG_x flags.
 */
 bitvector_t compile_argument_types_for_trigger(trig_data *trig) {
-	extern const bitvector_t *trig_argument_type_list[];
-	
 	bitvector_t flags = NOBITS, trigger_types = GET_TRIG_TYPE(trig);
 	int pos;
 	

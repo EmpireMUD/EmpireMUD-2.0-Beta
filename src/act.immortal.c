@@ -1497,7 +1497,6 @@ ACMD(do_admin_util) {
 void do_instance_add(char_data *ch, char *argument) {
 	extern bool can_instance(adv_data *adv);
 	extern room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir);
-	extern const bool is_location_rule[];
 
 	struct adventure_link_rule *rule, *rule_iter;
 	int num_rules, tries, dir = NO_DIR;
@@ -5771,8 +5770,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 	extern int move_gain(char_data *ch);
 	void display_attributes(char_data *ch, char_data *to);
 
-	extern const double hit_per_dex;
-	extern const int base_hit_chance;
 	extern struct promo_code_list promo_codes[];
 
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
