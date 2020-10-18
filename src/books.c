@@ -31,7 +31,6 @@
 *   Reading
 */
 
-
  //////////////////////////////////////////////////////////////////////////////
 //// DATA ////////////////////////////////////////////////////////////////////
 
@@ -93,8 +92,6 @@ book_data *book_proto(book_vnum vnum) {
 
 // parse 1 book file
 void parse_book(FILE *fl, book_vnum vnum) {
-	void add_book_to_table(book_data *book);
-
 	book_data *book;
 	struct library_data *libr, *libr_ctr;
 	struct paragraph_data *para, *para_ctr;
@@ -432,8 +429,6 @@ LIBRARY_SCMD(library_browse) {
 
 
 LIBRARY_SCMD(library_checkout) {
-	extern obj_data *create_book_obj(book_data *book);
-	
 	obj_data *obj;
 	book_data *book;
 	
@@ -663,8 +658,6 @@ struct {
 
 // this is both "library" and "bookedit"
 ACMD(do_library) {
-	void olc_show_book(char_data *ch);
-	
 	char arg2[MAX_INPUT_LENGTH];
 	int iter, pos = NOTHING;
 	bool comma;

@@ -288,8 +288,10 @@ void write_applies_to_file(FILE *fl, struct apply_data *list);
 // archetypes
 extern archetype_data *archetype_table;
 extern archetype_data *sorted_archetypes;
+
 extern archetype_data *archetype_proto(any_vnum vnum);
 void free_archetype(archetype_data *arch);
+void free_archetype_gear(struct archetype_gear *list);
 
 // augments
 extern augment_data *augment_table;
@@ -310,6 +312,10 @@ int sort_automessage_by_data(struct automessage *a, struct automessage *b);
 // books
 extern book_data *book_table;
 extern struct author_data *author_table;
+extern book_vnum top_book_vnum;
+
+void add_book_to_table(book_data *book);
+obj_data *create_book_obj(book_data *book);
 void free_book(book_data *book);
 
 // buildings
@@ -561,6 +567,8 @@ void free_quest_temp_list(struct quest_temp_list *list);
 // resources
 struct resource_data *copy_resource_list(struct resource_data *input);
 void free_resource_list(struct resource_data *list);
+void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
+void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 
 // room templates
 extern room_template *room_template_table;

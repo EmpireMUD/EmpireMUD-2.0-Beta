@@ -5046,7 +5046,6 @@ bool member_is_timed_out_ch(char_data *ch) {
 */
 void read_empire_members(empire_data *only_empire, bool read_techs) {
 	void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_flag);
-	void resort_empires(bool force);
 	bool should_delete_empire(empire_data *emp);
 	
 	player_index_data *index, *next_index;

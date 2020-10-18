@@ -31,7 +31,6 @@
 
 // external funcs
 extern struct archetype_gear *copy_archetype_gear(struct archetype_gear *input);
-void free_archetype_gear(struct archetype_gear *list);
 void sort_interactions(struct interaction_item **list);
 
 // locals
@@ -450,8 +449,7 @@ void olc_show_global(char_data *ch) {
 			}
 			break;
 		}
-		case GLOBAL_NEWBIE_GEAR: {			
-			void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
+		case GLOBAL_NEWBIE_GEAR: {
 			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), lbuf);
 			sprintf(buf + strlen(buf), "Gear: <%sgear\t0>\r\n%s", OLC_LABEL_PTR(GET_GLOBAL_GEAR(glb)), GET_GLOBAL_GEAR(glb) ? lbuf : "");
 			break;

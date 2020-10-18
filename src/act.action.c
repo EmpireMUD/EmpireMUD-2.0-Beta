@@ -58,7 +58,6 @@ void process_chop(char_data *ch);
 void process_copying_book(char_data *ch);
 void process_digging(char_data *ch);
 void process_dismantle_action(char_data *ch);
-void process_dismantle_vehicle(char_data *ch);
 void process_escaping(char_data *ch);
 void process_excavating(char_data *ch);
 void process_fillin(char_data *ch);

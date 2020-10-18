@@ -551,7 +551,6 @@ void olc_show_ability(char_data *ch);
 void olc_show_adventure(char_data *ch);
 void olc_show_archetype(char_data *ch);
 void olc_show_augment(char_data *ch);
-void olc_show_book(char_data *ch);
 void olc_show_building(char_data *ch);
 void olc_show_class(char_data *ch);
 void olc_show_craft(char_data *ch);

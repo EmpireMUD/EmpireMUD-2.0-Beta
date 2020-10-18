@@ -2512,8 +2512,6 @@ void read_empire_territory(empire_data *emp, bool check_tech) {
 * @param empire_data *emp An empire if doing one, or NULL to clear all of them.
 */
 void reread_empire_tech(empire_data *emp) {
-	void resort_empires(bool force);
-	
 	struct empire_island *isle, *next_isle;
 	empire_data *iter, *next_iter;
 	vehicle_data *veh;

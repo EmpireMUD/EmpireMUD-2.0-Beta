@@ -47,7 +47,6 @@ const char *default_skill_desc = "New skill";
 
 // eternal functions
 void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
-void resort_empires(bool force);
 extern bool is_class_ability(ability_data *abil);
 
 // local protos

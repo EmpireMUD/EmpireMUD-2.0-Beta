@@ -68,7 +68,6 @@ extern bool world_is_sorted;
 // external funcs
 extern any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
-void free_archetype_gear(struct archetype_gear *list);
 extern room_data *load_map_room(room_vnum vnum);
 extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 void sort_exits(struct room_direction_data **list);
@@ -84,7 +83,6 @@ void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
 void parse_interaction(char *line, struct interaction_item **list, char *error_part);
 void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part);
-void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 struct theft_log *reduce_theft_logs_and_get_recent(empire_data *emp);
 PLAYER_UPDATE_FUNC(send_all_players_to_nowhere);
 int sort_empires(empire_data *a, empire_data *b);
@@ -93,7 +91,6 @@ void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
 void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list);
-void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 void write_shared_room_data(FILE *fl, struct shared_room_data *dat);
 void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 
@@ -1637,7 +1634,6 @@ void check_nowhere_einv_all(void) {
 empire_data *create_empire(char_data *ch) {
 	void add_empire_to_table(empire_data *emp);
 	extern bool check_unique_empire_name(empire_data *for_emp, char *name);
-	void resort_empires(bool force);
 
 	archetype_data *arch;
 	char colorcode[10], name[MAX_STRING_LENGTH];

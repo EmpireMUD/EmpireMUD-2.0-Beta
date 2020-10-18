@@ -6205,7 +6205,6 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 			break;
 		}
 		case GLOBAL_NEWBIE_GEAR: {
-			void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
 			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), buf2);
 			msg_to_char(ch, "Gear:\r\n%s", buf2);
 			break;

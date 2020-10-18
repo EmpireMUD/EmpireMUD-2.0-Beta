@@ -286,6 +286,7 @@ extern const struct gen_craft_data_t gen_craft_data[];
 // config.c
 extern const int base_hit_chance;
 extern const int base_player_pools[NUM_POOLS];
+extern const char *book_name_list[];
 extern struct file_lookup_struct file_lookup[];
 extern const double hit_per_dex;
 extern const int primary_attributes[];

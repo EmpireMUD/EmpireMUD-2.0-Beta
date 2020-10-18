@@ -62,6 +62,7 @@ bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_am
 bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type);
 bool check_can_gain_skill(char_data *ch, any_vnum skill_vnum);
+void check_skill_sell(char_data *ch, ability_data *abil);
 bool check_solo_role(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
 void empire_player_tech_skillup(empire_data *emp, int tech, double amount);

@@ -2563,7 +2563,6 @@ int get_new_vehicle_construction_id(void) {
 void parse_vehicle(FILE *fl, any_vnum vnum) {
 	void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 	void parse_interaction(char *line, struct interaction_item **list, char *error_part);
-	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
 
 	char line[256], error[256], str_in[256], str_in2[256], str_in3[256];
 	struct bld_relation *relat;
@@ -2769,7 +2768,6 @@ void write_vehicle_index(FILE *fl) {
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 	void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 	void write_interactions_to_file(FILE *fl, struct interaction_item *list);
-	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
@@ -4154,7 +4152,6 @@ OLC_MODULE(vedit_requiresclimate) {
 
 
 OLC_MODULE(vedit_resource) {
-	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	olc_process_resources(ch, argument, &VEH_YEARLY_MAINTENANCE(veh));
 }

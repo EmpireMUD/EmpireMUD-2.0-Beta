@@ -652,8 +652,6 @@ void free_morph(morph_data *morph) {
 * @param any_vnum vnum The morph vnum
 */
 void parse_morph(FILE *fl, any_vnum vnum) {
-	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
-
 	char line[256], error[256], str_in[256], str_in2[256];
 	morph_data *morph, *find;
 	int int_in[4];

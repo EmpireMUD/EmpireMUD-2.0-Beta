@@ -158,8 +158,6 @@ ACMD(do_write) {
 
 
 ACMD(do_read) {
-	void read_book(char_data *ch, obj_data *obj);
-	
 	obj_data *board, *obj;
 	int board_type;
 	

@@ -4500,8 +4500,6 @@ PLAYER_UPDATE_FUNC(b5_107_players) {
 * Performs some auto-updates when the mud detects a new version.
 */
 void check_version(void) {
-	void resort_empires(bool force);
-	
 	int last, iter, current = NOTHING;
 	
 	#define MATCH_VERSION(name)  (!str_cmp(versions_list[iter], name))

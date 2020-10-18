@@ -57,8 +57,6 @@ int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 * @param int role Optional: Any ROLE_ const, or NOTHING to detect from the player.
 */
 void assign_class_abilities(char_data *ch, class_data *cls, int role) {
-	void check_skill_sell(char_data *ch, ability_data *abil);
-	
 	// helper type
 	struct assign_abil_t {
 		any_vnum vnum;	// which abil
@@ -1572,8 +1570,6 @@ OLC_MODULE(classedit_role) {
 //// COMMANDS ///////////////////////////////////////////////////////////////
 
 ACMD(do_class) {
-	void resort_empires(bool force);
-	
 	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	empire_data *emp = GET_LOYALTY(ch);
 	int found;
@@ -1640,8 +1636,6 @@ ACMD(do_class) {
 
 
 ACMD(do_role) {
-	void resort_empires(bool force);
-	
 	char arg[MAX_INPUT_LENGTH], roles[NUM_ROLES+2][MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct player_skill_data *plsk, *next_plsk;
 	empire_data *emp = GET_LOYALTY(ch);

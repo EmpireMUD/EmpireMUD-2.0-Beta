@@ -974,7 +974,6 @@ OLC_MODULE(cedit_requiresobject) {
 
 
 OLC_MODULE(cedit_resource) {
-	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	olc_process_resources(ch, argument, &GET_CRAFT_RESOURCES(craft));
 }

@@ -402,8 +402,6 @@ void free_augment(augment_data *aug) {
 * @param any_vnum vnum The augment vnum
 */
 void parse_augment(FILE *fl, any_vnum vnum) {
-	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
-
 	char line[256], error[256], str_in[256], str_in2[256];
 	augment_data *aug, *find;
 	int int_in[4];
@@ -494,8 +492,6 @@ void write_augments_index(FILE *fl) {
 * @param augment_data *aug The thing to save.
 */
 void write_augment_to_file(FILE *fl, augment_data *aug) {
-	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
-	
 	char temp[256], temp2[256];
 	
 	if (!fl || !aug) {
@@ -893,7 +889,6 @@ OLC_MODULE(augedit_requiresobject) {
 
 
 OLC_MODULE(augedit_resource) {
-	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
 	olc_process_resources(ch, argument, &GET_AUG_RESOURCES(aug));
 }

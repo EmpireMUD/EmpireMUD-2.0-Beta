@@ -31,10 +31,7 @@
 *   Bookedit Commands
 */
 
-// external vars
-extern const char *book_name_list[];
-
-
+// TODO: move this to an in-game config
 const char *bookedit_license_display =
 "You are using EmpireMUD's book editor under these terms:\r\n"
 "- All text you write here must be original and written by you. You may not\r\n"
@@ -52,11 +49,10 @@ const char *default_book_desc = "It appears to be a book.\r\n";
 
 // local protos
 void remove_book_from_table(book_data *book);
+int sort_book_table(book_data *a, book_data *b);
 
-// external funcs
-void add_book_author(int idnum);
-void save_author_books(int idnum);
-void save_author_index();
+// external var
+extern const char *book_name_list[];
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -68,8 +64,6 @@ void save_author_index();
 * @param book_data *book The book to add to the table.
 */
 void add_book_to_table(book_data *book) {
-	extern int sort_book_table(book_data *a, book_data *b);
-	
 	book_data *find;
 	book_vnum vnum;
 	
@@ -919,8 +913,6 @@ LIBRARY_SCMD(bookedit_title) {
 
 
 LIBRARY_SCMD(bookedit_write) {
-	extern book_vnum top_book_vnum;
-
 	book_data *book = NULL;
 	descriptor_data *desc;
 	bool found;

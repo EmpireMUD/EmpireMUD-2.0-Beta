@@ -1669,6 +1669,7 @@ adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 
 // apply/attribute functions from utils.c
 int get_attribute_by_apply(char_data *ch, int apply_type);
+int get_attribute_by_name(char *name);
 
 // basic functions from utils.c
 bool any_players_in_room(room_data *room);
@@ -1705,6 +1706,7 @@ int count_tech(empire_data *emp);
 bool empire_can_claim(empire_data *emp);
 int get_total_score(empire_data *emp);
 bool is_trading_with(empire_data *emp, empire_data *partner);
+void resort_empires(bool force);
 
 // empire diplomacy utils from utils.c
 bool char_has_relationship(char_data *ch_a, char_data *ch_b, bitvector_t dipl_bits);
@@ -2010,6 +2012,15 @@ bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bo
 // ban.c
 int isbanned(char *hostname);
 
+// bookedit.c
+void olc_show_book(char_data *ch);
+
+// books.c
+void add_book_author(int idnum);
+void read_book(char_data *ch, obj_data *obj);
+void save_author_books(int idnum);
+void save_author_index();
+
 // building.c
 bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
 struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
@@ -2022,6 +2033,9 @@ void process_dismantling(char_data *ch, room_data *room);
 void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 void special_building_setup(char_data *ch, room_data *room);
 void special_vehicle_setup(char_data *ch, vehicle_data *veh);
+
+// eedit.c
+bool valid_rank_name(char_data *ch, char *newname);
 
 // faction.c
 const char *get_faction_name_by_vnum(any_vnum vnum);
@@ -2233,6 +2247,7 @@ char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 char *list_harnessed_mobs(vehicle_data *veh);
 void look_at_vehicle(vehicle_data *veh, char_data *ch);
+void process_dismantle_vehicle(char_data *ch);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
 void start_dismantle_vehicle(vehicle_data *veh);
 void start_vehicle_burning(vehicle_data *veh);

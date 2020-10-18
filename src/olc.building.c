@@ -1506,7 +1506,6 @@ OLC_MODULE(bedit_relations) {
 
 
 OLC_MODULE(bedit_resource) {
-	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	olc_process_resources(ch, argument, &GET_BLD_YEARLY_MAINTENANCE(bdg));
 }

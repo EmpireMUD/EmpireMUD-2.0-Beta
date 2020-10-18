@@ -140,6 +140,7 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_data **list);
 void olc_process_icons(char_data *ch, char *argument, struct icon_data **list);
 void olc_process_interactions(char_data *ch, char *argument, struct interaction_item **list, int attach_type);
+void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list);
 void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **list, int trigger_attach);
 void smart_copy_interactions(struct interaction_item **addto, struct interaction_item *input);
@@ -159,6 +160,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input);
 
 // olc display parts
 void get_adventure_linking_display(struct adventure_link_rule *list, char *save_buffer);
+void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
 void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
 void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
 void get_evolution_display(struct evolution_data *list, char *save_buffer);

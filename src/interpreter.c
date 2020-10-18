@@ -42,7 +42,6 @@
 void parse_archetype_menu(descriptor_data *desc, char *argument);
 
 // locals
-void next_creation_step(descriptor_data *d);
 void set_creation_state(descriptor_data *d, int state);
 void show_bonus_trait_menu(char_data *ch);
 

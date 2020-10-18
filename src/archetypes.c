@@ -40,12 +40,6 @@ const char *default_archetype_name = "unnamed archetype";
 const char *default_archetype_desc = "no description";
 const char *default_archetype_rank = "Adventurer";
 
-// local protos
-void free_archetype_gear(struct archetype_gear *list);
-void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
-
-// external funcs
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -275,8 +269,6 @@ void smart_copy_gear(struct archetype_gear **list, struct archetype_gear *from) 
 * @return TRUE if it's ok, or FALSE if not.
 */
 bool valid_default_rank(char_data *ch, char *argument) {
-	extern bool valid_rank_name(char_data *ch, char *newname);
-
 	if (color_code_length(argument) > 0 || strchr(argument, '&') != NULL) {
 		msg_to_char(ch, "Default ranks may not contain color codes.\r\n");
 	}
@@ -1259,8 +1251,6 @@ void display_archetype_menu(descriptor_data *desc, int type_pos) {
 * @param char *argument What they typed.
 */
 void parse_archetype_menu(descriptor_data *desc, char *argument) {
-	void next_creation_step(descriptor_data *d);
-
 	char arg1[MAX_INPUT_LENGTH], *arg2;
 	archetype_data *arch;
 	int pos;	// which submenu
@@ -1682,8 +1672,6 @@ int vnum_archetype(char *searchname, char_data *ch) {
 //// OLC MODULES /////////////////////////////////////////////////////////////
 
 OLC_MODULE(archedit_attribute) {
-	extern int get_attribute_by_name(char *name);
-
 	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc), *copyfrom;
 	char att_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
 	int att, num;
