@@ -1502,8 +1502,6 @@ INTERACTION_FUNC(loot_interact) {
 * @param char_data *killer the person who killed it (optional)
 */
 void drop_loot(char_data *mob, char_data *killer) {
-	extern int mob_coins(char_data *mob);
-
 	obj_data *obj;
 	int coins;
 	empire_data *coin_emp;
@@ -2832,8 +2830,6 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 * @param char_data *ch The person who needs help!
 */
 void check_auto_assist(char_data *ch) {
-	void perform_rescue(char_data *ch, char_data *vict, char_data *from, int msg);
-	
 	char_data *ch_iter, *next_iter, *iter_master, *top_ch, *top_iter;
 	bool assist;
 	
@@ -3323,7 +3319,6 @@ void heal(char_data *ch, char_data *vict, int amount) {
 */
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
 	void add_pursuit(char_data *ch, char_data *target);
-	extern int apply_poison(char_data *ch, char_data *vict);
 	
 	struct instance_data *inst;
 	int w_type, result, bonus, ret_val;

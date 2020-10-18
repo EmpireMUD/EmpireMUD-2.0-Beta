@@ -53,7 +53,6 @@ void perform_ritual(char_data *ch);
 void perform_saw(char_data *ch);
 void perform_study(char_data *ch);
 void process_bathing(char_data *ch);
-void process_build_action(char_data *ch);
 void process_burn_area(char_data *ch);
 void process_chop(char_data *ch);
 void process_copying_book(char_data *ch);

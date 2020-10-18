@@ -39,7 +39,6 @@
 */
 
 // external funcs
-extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 
@@ -577,7 +576,6 @@ void real_update_char(char_data *ch) {
 	void check_morph_ability(char_data *ch);
 	void combat_meter_damage_dealt(char_data *ch, int amt);
 	extern int compute_bonus_exp_per_day(char_data *ch);
-	extern bool fail_daily_quests(char_data *ch);
 	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 	void random_encounter(char_data *ch);
 	extern bool starving_vampire_aggro(char_data *ch);

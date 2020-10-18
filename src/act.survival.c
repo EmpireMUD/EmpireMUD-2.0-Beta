@@ -32,11 +32,6 @@
 *   Commands
 */
 
-// external vars
-
-// external funcs
-extern bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
-
 // local protos
 ACMD(do_dismount);
 
@@ -868,8 +863,6 @@ ACMD(do_mount) {
 
 
 ACMD(do_track) {
-	extern vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum interior_room);
-	
 	char buf[MAX_STRING_LENGTH];
 	room_vnum track_to_room = NOWHERE;
 	char_data *vict, *proto;

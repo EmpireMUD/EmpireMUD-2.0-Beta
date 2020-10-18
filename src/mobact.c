@@ -42,7 +42,6 @@ extern struct generic_name_data *generic_names;
 // local protos
 void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
-bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
 
 
 // for validate_global_map_spawns, run_global_map_spawns
@@ -510,8 +509,6 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 * @return TRUE if the move is valid, FALSE otherwise
 */
 bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
-	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
-	
 	empire_data *ch_emp = GET_LOYALTY(ch);
 	empire_data *room_emp = ROOM_OWNER(to_room);
 	bool valid = TRUE;
@@ -637,7 +634,6 @@ bool try_mobile_movement(char_data *ch) {
 * Main cycle of mob activity (iterates over character list).
 */
 void mobile_activity(void) {
-	extern vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum interior_room);
 	extern bool catch_up_mobs;
 	
 	register char_data *ch, *next_ch, *vict, *targ, *m;
@@ -1041,7 +1037,6 @@ void despawn_mob(char_data *ch) {
 */
 static int spawn_one_list(room_data *room, struct spawn_info *list) {
 	extern char *replace_npc_names(const char *str, const char *name, const char *empire_name, const char *empire_adjective);
-	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 	
 	int count, x_coord, y_coord;
 	struct spawn_info *spawn;
@@ -1134,7 +1129,6 @@ GLB_FUNCTION(run_global_map_spawns) {
 */
 static void spawn_one_room(room_data *room, bool only_artisans) {
 	extern char *replace_npc_names(const char *str, const char *name, const char *empire_name, const char *empire_adjective);
-	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 	
 	room_data *iter, *next_iter, *home;
 	struct empire_territory_data *ter;

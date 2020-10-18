@@ -33,9 +33,6 @@
 
 // external funcs
 ACMD(do_dismount);
-extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
-void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
-extern bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error);
 
 // local data
 struct {
@@ -401,9 +398,6 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 * @return bool TRUE if successful, FALSE on fail.
 */
 bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, int mode) {
-	extern bool can_take_obj(char_data *ch, obj_data *obj);
-	extern bool get_check_money(char_data *ch, obj_data *obj);
-	
 	bool stealing = FALSE;
 	empire_data *emp;
 
@@ -1096,8 +1090,6 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 * @param obj_data *lighter Optional: The lighter item, if any.
 */
 void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
-	void start_vehicle_burning(vehicle_data *veh);
-	
 	char buf[MAX_STRING_LENGTH];
 	
 	if (IS_NPC(ch)) {
@@ -1139,8 +1131,6 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 * @param int pos Either POS_SITTING, POS_RESTING, or POS_SLEEPING.
 */
 void do_sit_on_vehicle(char_data *ch, char *argument, int pos) {
-	extern bool check_stop_flying(char_data *ch);
-	
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh;
 	
@@ -1375,10 +1365,6 @@ ACMD(do_disembark) {
 
 
 ACMD(do_dispatch) {
-	extern char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_data *veh, mob_vnum vnum);
-	extern struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc);
-	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
-
 	char targ[MAX_INPUT_LENGTH], isle_arg[MAX_INPUT_LENGTH];
 	bool targeted_island = FALSE;
 	struct empire_npc_data *npc;
@@ -1499,9 +1485,6 @@ ACMD(do_dispatch) {
 * @param char *arg The typed-in arg.
 */
 void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
-	extern bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bool skip_permissions);
-	void char_through_portal(char_data *ch, obj_data *portal, bool following);
-
 	room_data *was_in, *to_room;
 	obj_data *portal;
 	
@@ -1666,10 +1649,6 @@ ACMD(do_drag) {
 * @param int subcmd The original subcommand passed to do_drive.
 */
 void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal, int subcmd) {
-	extern bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bool skip_permissions);
-	extern obj_data *find_back_portal(room_data *in_room, room_data *from_room, obj_data *fallback);
-	void give_portal_sickness(char_data *ch, obj_data *portal, room_data *from, room_data *to);
-	
 	room_data *to_room, *was_in = IN_ROOM(veh);
 	struct vehicle_room_list *vrl;
 	char_data *ch_iter, *next_ch;

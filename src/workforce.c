@@ -68,7 +68,6 @@ bool workforce_is_delayed(empire_data *emp, room_data *room, int chore);
 
 // external functions
 int count_building_vehicles_in_room(room_data *room, empire_data *only_owner);	// vehicles.c
-void empire_skillup(empire_data *emp, any_vnum ability, double amount);	// skills.c
 int get_workforce_production_limit(empire_data *emp, obj_vnum vnum);
 void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component);
 
@@ -1193,8 +1192,6 @@ void mark_workforce_delay(empire_data *emp, room_data *room, int chore, int prob
 * @return char_data *the mob, or NULL if none to spawn
 */
 char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
-	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
-	
 	struct empire_territory_data *ter;
 	struct empire_npc_data *npc;
 	char_data *mob = NULL;

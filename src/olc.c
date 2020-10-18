@@ -512,7 +512,6 @@ OLC_MODULE(vedit_speed);
 
 
 // external functions
-extern char *requirement_string(struct req_data *req, bool show_vnums);
 void sort_icon_set(struct icon_data **list);
 void sort_interactions(struct interaction_item **list);
 extern int sort_requirements_by_group(struct req_data *a, struct req_data *b);

@@ -1004,8 +1004,6 @@ void save_olc_shop(descriptor_data *desc) {
 * @return shop_data* The copied shop.
 */
 shop_data *setup_olc_shop(shop_data *input) {
-	extern struct req_data *copy_requirements(struct req_data *from);
-	
 	shop_data *new;
 	
 	CREATE(new, shop_data, 1);

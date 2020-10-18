@@ -618,8 +618,6 @@ void save_olc_social(descriptor_data *desc) {
 * @return social_data* The copied social.
 */
 social_data *setup_olc_social(social_data *input) {
-	extern struct req_data *copy_requirements(struct req_data *from);
-	
 	social_data *new;
 	int iter;
 	

@@ -84,7 +84,6 @@ const bool is_location_rule[] = {
 * @param struct instance_data *inst The instance.
 */
 void build_instance_exterior(struct instance_data *inst) {
-	void special_building_setup(char_data *ch, room_data *room);
 	void complete_building(room_data *room);
 	
 	char_data *mob, *next_mob;

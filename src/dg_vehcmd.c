@@ -37,7 +37,6 @@ extern struct instance_data *quest_instance_global;
 
 // external functions
 extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
-extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name);
 extern room_data *get_room(room_data *ref, char *name);
 extern vehicle_data *get_vehicle(char *name);
@@ -993,8 +992,6 @@ VCMD(do_vterraform) {
 
 
 VCMD(do_vload) {
-	extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst = NULL;
 	int number = 0;

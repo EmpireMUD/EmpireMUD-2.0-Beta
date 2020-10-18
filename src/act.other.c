@@ -2979,9 +2979,6 @@ ACMD(do_minipets) {
 
 
 ACMD(do_morph) {
-	extern morph_data *find_morph_by_name(char_data *ch, char *name);
-	extern bool morph_affinity_ok(room_data *location, morph_data *morph);
-	
 	char buf[MAX_STRING_LENGTH], line[256];
 	morph_data *morph, *next_morph;
 	bool full = FALSE;
@@ -3279,8 +3276,6 @@ ACMD(do_prompt) {
 
 
 ACMD(do_quit) {
-	void display_statistics_to_char(char_data *ch);
-	
 	descriptor_data *d, *next_d;
 	bool confirm = FALSE, died = FALSE;
 	any_vnum vnum = NOTHING;
@@ -3540,9 +3535,6 @@ ACMD(do_skin) {
 
 
 ACMD(do_summon) {
-	extern int get_attribute_by_apply(char_data *ch, int apply_type);
-	void summon_materials(char_data *ch, char *argument);
-	
 	char buf[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], *arg2, *line;
 	struct player_ability_data *plab, *next_plab;
 	int count, num, fol_count, to_summon;
@@ -3884,8 +3876,6 @@ ACMD(do_toggle) {
 
 
 ACMD(do_visible) {
-	void perform_immort_vis(char_data *ch);
-
 	if (GET_ACCESS_LEVEL(ch) >= LVL_GOD) {
 		perform_immort_vis(ch);
 		return;

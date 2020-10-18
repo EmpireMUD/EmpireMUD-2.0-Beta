@@ -48,7 +48,6 @@ extern int top_account_id;
 extern int top_idnum;
 
 // external funcs
-void add_learned_craft(char_data *ch, any_vnum vnum);
 ACMD(do_slash_channel);
 void free_obj_eq_set(struct eq_set_obj *eq_set);
 
@@ -750,7 +749,6 @@ void free_char(char_data *ch) {
 	void free_player_event_data(struct player_event_data *hash);
 	void free_mail(struct mail_data *mail);
 	void free_player_completed_quests(struct player_completed_quest **hash);
-	void free_player_quests(struct player_quest *list);
 
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
@@ -4528,7 +4526,6 @@ GLB_FUNCTION(run_global_newbie_gear) {
 void start_new_character(char_data *ch) {
 	void add_archetype_lore(char_data *ch);
 	void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
-	void set_skill(char_data *ch, any_vnum skill, int level);
 	extern const char *default_channels[];
 	extern struct promo_code_list promo_codes[];
 	

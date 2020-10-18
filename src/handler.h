@@ -307,7 +307,8 @@ extern obj_data *get_obj_world(char *name, int *number);
 extern struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data);
 void remove_offers_by_type(char_data *ch, int type);
 
-// player minipet handlers
+// player list handlers
+void add_learned_craft(char_data *ch, any_vnum vnum);
 void add_minipet(char_data *ch, any_vnum vnum);
 bool has_minipet(char_data *ch, any_vnum vnum);
 
@@ -318,9 +319,12 @@ void remove_player_tech(char_data *ch, any_vnum abil);
 extern bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvict, obj_data *ovict);
 
 // requirement handlers
+struct req_data *copy_requirements(struct req_data *from);
 bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
+void extract_required_items(char_data *ch, struct req_data *list);
 bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 void free_requirements(struct req_data *list);
+char *requirement_string(struct req_data *task, bool show_vnums);
 
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);

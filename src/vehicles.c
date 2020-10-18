@@ -50,7 +50,6 @@ void ruin_vehicle(vehicle_data *veh, char *message);
 // external funcs
 void free_bld_relations(struct bld_relation *list);
 void free_custom_messages(struct custom_message *mes);
-extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern bool validate_icon(char *icon);
 
 

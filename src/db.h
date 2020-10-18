@@ -294,7 +294,9 @@ void free_archetype(archetype_data *arch);
 // augments
 extern augment_data *augment_table;
 extern augment_data *sorted_augments;
-extern augment_data *augment_proto(any_vnum vnum);
+
+augment_data *augment_proto(any_vnum vnum);
+augment_data *find_augment_by_name(char_data *ch, char *name, int type);
 void free_augment(augment_data *aug);
 
 // automessage
@@ -402,6 +404,7 @@ void remove_recent_offenses(empire_data *emp, int type, char_data *offender);
 
 // empire misc
 void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
+char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
@@ -449,6 +452,9 @@ extern struct help_index_element *help_table;
 extern int top_of_helpt;
 
 void index_boot_help();
+
+// instances
+struct instance_data *get_instance_by_id(any_vnum instance_id);
 
 // interactions
 void free_interactions(struct interaction_item **list);
@@ -548,7 +554,9 @@ void free_progress(progress_data *prg);
 // quests
 extern struct quest_data *quest_table;
 extern quest_data *quest_proto(any_vnum vnum);
+void free_player_quests(struct player_quest *list);
 void free_quest(quest_data *quest);
+void free_quest_temp_list(struct quest_temp_list *list);
 
 // resources
 struct resource_data *copy_resource_list(struct resource_data *input);

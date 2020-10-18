@@ -606,7 +606,6 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 * @param bitvector_t options LRR_x flags.
 */
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
-	extern bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
 	extern bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
 	extern const char *color_by_difficulty(char_data *ch, int level);
 	void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);

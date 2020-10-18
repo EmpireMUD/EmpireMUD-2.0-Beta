@@ -1478,8 +1478,6 @@ void save_olc_generic(descriptor_data *desc) {
 * @return generic_data* The copied generic.
 */
 generic_data *setup_olc_generic(generic_data *input) {
-	extern struct req_data *copy_requirements(struct req_data *from);
-	
 	generic_data *new;
 	int iter;
 	

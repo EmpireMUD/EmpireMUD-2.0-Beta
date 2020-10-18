@@ -41,7 +41,6 @@ extern struct instance_data *quest_instance_global;
 
 /* external functions */
 void check_for_eligible_goals(empire_data *emp);	// progress.c
-extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct instance_data *get_instance_for_script(int go_type, void *go);
 void free_varlist(struct trig_var_data *vd);
 extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
@@ -2912,7 +2911,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "add_learned")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
-							void add_learned_craft(char_data *ch, any_vnum vnum);
 							craft_data *cft = craft_proto(atoi(subfield));
 							if (cft && CRAFT_FLAGGED(cft, CRAFT_LEARNED) && !CRAFT_FLAGGED(cft, CRAFT_IN_DEVELOPMENT)) {
 								add_learned_craft(c, GET_CRAFT_VNUM(cft));
@@ -3551,7 +3549,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "gain_skill")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.gain_skill(skill, amount)%
-							void set_skill(char_data *ch, any_vnum skill, int level);
 							char arg1[256], arg2[256];
 							skill_data *sk;
 							int amount = 0;
@@ -4313,7 +4310,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "set_skill")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.set_skill(skill, number)%
-							void set_skill(char_data *ch, any_vnum skill, int level);
 							char arg1[256], arg2[256];
 							skill_data *sk;
 							int sk_lev = 0;
@@ -5410,7 +5406,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'b': {	// veh.b*
 					if (!str_cmp(field, "burn")) {
 						if (VEH_FLAGGED(v, VEH_BURNABLE) && !VEH_FLAGGED(v, VEH_ON_FIRE)) {
-							void start_vehicle_burning(vehicle_data *veh);
 							start_vehicle_burning(v);
 						}
 						*str = '\0';
@@ -5523,7 +5518,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'h': {	// veh.h*
 					if (!str_cmp(field, "harness")) {
 						if (subfield && *subfield && VEH_ANIMALS_REQUIRED(v) < count_harnessed_animals(v)) {
-							void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 							char_data *mob = NULL;
 							
 							// find or load mob

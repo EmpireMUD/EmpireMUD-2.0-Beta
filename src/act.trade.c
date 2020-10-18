@@ -34,17 +34,10 @@
 *   Commands
 */
 
-// external functions
-extern bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
-extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
-extern bool has_cooking_fire(char_data *ch);
-void process_build_action(char_data *ch);
-extern bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bool send_messages);
-
 // locals
+ACMD(do_gen_craft);
 bool can_forge(char_data *ch);
 bool can_refashion(char_data *ch);
-ACMD(do_gen_craft);
 craft_data *find_craft_for_obj_vnum(obj_vnum vnum);
 obj_data *find_water_container(char_data *ch, obj_data *list);
 
@@ -1410,9 +1403,6 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
 
 // subcmd is AUGMENT_x
 ACMD(do_gen_augment) {
-	extern augment_data *find_augment_by_name(char_data *ch, char *name, int type);
-	extern char *shared_by(obj_data *obj, char_data *ch);
-	
 	char buf[MAX_STRING_LENGTH], target_arg[MAX_INPUT_LENGTH], *augment_arg;
 	double points_available, remaining, share;
 	struct obj_apply *apply, *last_apply;
@@ -1590,8 +1580,6 @@ ACMD(do_gen_augment) {
 * @param int dir The direction specified by the player (may be NO_DIR or an invalid dir).
 */
 void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
-	void special_building_setup(char_data *ch, room_data *room);
-	
 	bool junk, is_closed, needs_reverse;
 	char buf[MAX_STRING_LENGTH];
 	room_data *to_room, *to_rev;
@@ -1691,8 +1679,6 @@ void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
 * @param int dir Optional: If the player specified a direction (may by NO_DIR or an invalid dir for the craft).
 */
 void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
-	void special_vehicle_setup(char_data *ch, vehicle_data *veh);
-	
 	vehicle_data *veh, *to_craft = NULL, *found_other = NULL;
 	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
@@ -2096,8 +2082,6 @@ ACMD(do_gen_craft) {
 
 
 ACMD(do_learn) {
-	void add_learned_craft(char_data *ch, any_vnum vnum);
-	
 	char arg[MAX_INPUT_LENGTH];
 	craft_data *recipe;
 	obj_data *obj;
@@ -2410,8 +2394,6 @@ ACMD(do_recipes) {
 
 // do_refashion / this handles both 'reforge' and 'refashion'
 ACMD(do_reforge) {
-	extern char *shared_by(obj_data *obj, char_data *ch);
-	
 	char arg2[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	struct resource_data *res = NULL;
 	time_t old_stolen_time;

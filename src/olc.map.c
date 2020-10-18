@@ -46,8 +46,6 @@ void decustomize_shared_data(struct shared_room_data *shared);
 //// EDIT MODULES ////////////////////////////////////////////////////////////
 
 OLC_MODULE(mapedit_build) {
-	void special_building_setup(char_data *ch, room_data *room);
-	
 	char bld_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	bld_data *bld;
 	int dir = NO_DIR;

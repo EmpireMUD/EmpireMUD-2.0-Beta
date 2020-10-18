@@ -47,12 +47,9 @@ const char *default_quest_complete_msg = "You have completed the quest.\r\n";
 // external funcs
 extern int count_cities(empire_data *emp);
 extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
-extern struct req_data *copy_requirements(struct req_data *from);
-extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_requirement_display(struct req_data *list, char *save_buffer);
 extern room_data *obj_room(obj_data *obj);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
-extern char *requirement_string(struct req_data *req, bool show_vnums);
 
 // external vars
 
@@ -63,9 +60,7 @@ int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 int count_owned_homes(empire_data *emp);
 int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
-void free_player_quests(struct player_quest *list);
 void free_quest_givers(struct quest_giver *list);
-void free_quest_temp_list(struct quest_temp_list *list);
 struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest);
 struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);

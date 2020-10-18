@@ -3510,7 +3510,6 @@ struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct e
 */
 void populate_npc(room_data *room, struct empire_territory_data *ter, bool force) {
 	extern int pick_generic_name(int name_set, int sex);
-	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 	
 	struct empire_homeless_citizen *homeless;
 	struct empire_npc_data *npc = NULL;

@@ -317,7 +317,6 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 void do_dg_build(room_data *target, char *argument) {
 	void complete_building(room_data *room);
 	void ruin_one_building(room_data *room);	// db.world.c
-	void special_building_setup(char_data *ch, room_data *room);
 	
 	char vnum_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH];
 	bool ruin = FALSE, demolish = FALSE;
@@ -534,8 +533,6 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 * @param char *argument The typed-in arg.
 */
 void do_dg_quest(int go_type, void *go, char *argument) {
-	extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-	
 	char vict_arg[MAX_INPUT_LENGTH], cmd_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst = NULL;
 	struct player_quest *pq;
@@ -637,7 +634,6 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 	}
 	else if (is_abbrev(cmd_arg, "finish")) {
 		if ((pq = is_on_quest(vict, QUEST_VNUM(quest)))) {
-			extern int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
 			void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_emp);
 			
 			if (check_finish_quest_trigger(vict, quest, get_instance_by_id(pq->instance_id))) {

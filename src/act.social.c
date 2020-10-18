@@ -28,14 +28,6 @@
 *   Commands
 */
 
-// external funcs
-extern bool validate_social_requirements(char_data *ch, social_data *soc);
-
-// locals
-social_data *find_social(char_data *ch, char *name, bool exact);
-void perform_social(char_data *ch, social_data *soc, char *argument);
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// SOCIAL CORE /////////////////////////////////////////////////////////////
 

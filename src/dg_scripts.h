@@ -341,6 +341,9 @@ void load_vtrigger(vehicle_data *veh);
 int greet_vtrigger(char_data *actor, int dir);
 void speech_vtrigger(char_data *actor, char *str);
 
+int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
+int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
+
 /* function prototypes from dg_scripts.c */
 void script_trigger_check(void);
 void add_trigger(struct script_data *sc, trig_data *t, int loc);

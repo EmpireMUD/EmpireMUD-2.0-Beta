@@ -2535,7 +2535,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 	else if SET_CASE("learned") {
-		void add_learned_craft(char_data *ch, any_vnum vnum);
 		void remove_learned_craft(char_data *ch, any_vnum vnum);
 		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
 		craft_data *cft;

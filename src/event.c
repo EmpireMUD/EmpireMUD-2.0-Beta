@@ -2958,8 +2958,6 @@ EVENT_CMD(evcmd_cancel) {
 
 // collects all pending rewards
 EVENT_CMD(evcmd_collect) {
-	void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id);
-	
 	int level;
 	struct player_event_data *ped, *next_ped;
 	struct event_running_data *run_dat;

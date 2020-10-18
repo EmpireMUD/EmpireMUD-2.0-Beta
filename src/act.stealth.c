@@ -36,10 +36,6 @@
 // external funcs
 ACMD(do_dismount);
 
-// locals
-int apply_poison(char_data *ch, char_data *vict);
-obj_data *find_poison_by_vnum(obj_data *list, any_vnum vnum);
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -112,9 +108,7 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 * @param empire_data *emp
 * @return TRUE if ch is capable of stealing from emp
 */
-bool can_steal(char_data *ch, empire_data *emp) {	
-	extern time_t get_last_killed_by_empire(char_data *ch, empire_data *emp);
-	
+bool can_steal(char_data *ch, empire_data *emp) {
 	struct empire_political_data *pol;
 	empire_data *chemp = GET_LOYALTY(ch);
 	time_t timediff;
@@ -917,8 +911,6 @@ ACMD(do_howl) {
 
 
 ACMD(do_infiltrate) {
-	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
-
 	room_data *to_room, *was_in;
 	int dir;
 	empire_data *emp;
@@ -1086,8 +1078,6 @@ ACMD(do_jab) {
 
 
 ACMD(do_pickpocket) {
-	extern int mob_coins(char_data *mob);
-
 	empire_data *ch_emp = NULL, *vict_emp = NULL;
 	bool any, low_level;
 	char_data *vict;
@@ -1613,8 +1603,6 @@ ACMD(do_sneak) {
 
 
 ACMD(do_steal) {
-	bool show_local_einv(char_data *ch, room_data *room, bool thief_mode);
-	
 	struct empire_storage_data *store, *next_store;
 	empire_data *emp = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));
 	struct empire_island *isle;

@@ -30,10 +30,9 @@
 *   Commands
 */
 
-// external vars
-
-// external funcs
-void end_morph(char_data *ch);
+// external functions
+ACMD(do_say);
+ACMD(do_stand);
 
 // locals
 ACMD(do_bite);
@@ -243,7 +242,6 @@ int GET_MAX_BLOOD(char_data *ch) {
 * @param any_vnum skill_vnum If you provide a VAMPIRE skill vnum here, gives the player that skill at level 1 (if they don't already have it). Pass NOTHING here to auto-detect -- or to ignore it if the player already has a vampire skill.
 */
 void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
-	void set_skill(char_data *ch, any_vnum skill, int level);
 	skill_data *skl, *next_skl;
 	bool already_vampire = IS_VAMPIRE(ch);
 	
@@ -440,8 +438,6 @@ void start_drinking_blood(char_data *ch, char_data *victim) {
 * @return bool TRUE if the vampire aggroed something, FALSE if not.
 */
 bool starving_vampire_aggro(char_data *ch) {
-	ACMD(do_stand);
-	
 	char_data *ch_iter, *backup = NULL, *victim = FIGHTING(ch);
 	int backup_found = 0, vict_found = 0;
 	char arg[MAX_INPUT_LENGTH];
@@ -807,13 +803,9 @@ void update_vampire_sun(char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+// this is an attack for vampires, and allows them to feed; mortals pass through to the "bite" social
 // has subcmd==1 when sent from do_sire
 ACMD(do_bite) {
-	// this is an attack for vampires, and allows them to feed; mortals pass through to the "bite" social
-	extern social_data *find_social(char_data *ch, char *name, bool exact);
-	void perform_rescue(char_data *ch, char_data *vict, char_data *from, int msg);
-	void perform_social(char_data *ch, social_data *soc, char *argument);
-	
 	bool attacked = FALSE, free_bite = FALSE, in_combat = FALSE;
 	bool tank, melee;
 	char_data *victim = NULL, *ch_iter;
@@ -1168,7 +1160,6 @@ ACMD(do_claws) {
 
 
 ACMD(do_command) {
-	ACMD(do_say);
 	char_data *victim;
 	char *to_do;
 	bool un_charm;

@@ -41,7 +41,6 @@
 const char *default_progress_name = "Unnamed Goal";
 
 // external funcs
-extern struct req_data *copy_requirements(struct req_data *from);
 extern int count_cities(empire_data *emp);
 extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 extern int count_owned_homes(empire_data *emp);;
