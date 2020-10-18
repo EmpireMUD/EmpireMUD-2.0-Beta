@@ -888,7 +888,7 @@ INTERACTION_FUNC(tame_interact) {
 
 
 // CRAFT_TYPE_x
-struct gen_craft_data_t gen_craft_data[] = {
+const struct gen_craft_data_t gen_craft_data[] = {
 	{ "error", "erroring", NOBITS, { "", "", "" } },	// dummy to require scmd
 	
 	// Note: These correspond to CRAFT_TYPE_x so you cannot change the order.
