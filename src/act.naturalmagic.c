@@ -38,10 +38,7 @@
 INTERACTION_FUNC(consumes_or_decays_interact);
 ACMD(do_dismount);
 extern obj_data *find_obj(int n, bool error);
-extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
-extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
 void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability);
-extern bool trigger_counterspell(char_data *ch);	// spells.c
 
 // locals
 void un_earthmeld(char_data *ch);

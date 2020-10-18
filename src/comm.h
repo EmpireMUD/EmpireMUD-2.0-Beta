@@ -15,6 +15,8 @@
 #define REBOOT_FILE			"reboot.dat"
 
 /* comm.c */
+// TODO: organize these externs and probably move them down
+void clear_last_act_message(descriptor_data *desc);
 void send_to_all(const char *messg, ...) __attribute__((format(printf, 1, 2)));
 void send_to_char(const char *messg, char_data *ch);
 void msdp_update_room(char_data *ch);
@@ -29,6 +31,7 @@ void send_stacked_msgs(descriptor_data *desc);
 void stack_msg_to_desc(descriptor_data *desc, const char *messg, ...);
 void stack_simple_msg_to_desc(descriptor_data *desc, const char *messg);
 void perform_to_all(const char *messg, char_data *ch);
+char *prompt_color_by_prc(int cur, int max);
 void close_socket(descriptor_data *d);
 void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, bitvector_t act_flags);
 

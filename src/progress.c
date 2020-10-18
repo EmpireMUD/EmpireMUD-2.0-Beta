@@ -54,7 +54,6 @@ extern int count_owned_homes(empire_data *emp);;
 extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
 extern int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs);
-void count_quest_tasks(struct req_data *list, int *complete, int *total);
 void get_requirement_display(struct req_data *list, char *save_buffer);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
 void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
@@ -62,9 +61,6 @@ void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remo
 // local funcs
 void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add);
 void complete_goal(empire_data *emp, struct empire_goal *goal);
-bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
-void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
-void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
 void remove_completed_goal(empire_data *emp, any_vnum vnum);
 struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg);

@@ -64,7 +64,6 @@ extern const char *vehicle_speed_types[];
 
 // external funcs
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
-extern struct resource_data *copy_resource_list(struct resource_data *input);
 void free_bld_relations(struct bld_relation *list);
 void free_custom_messages(struct custom_message *mes);
 void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
@@ -553,8 +552,6 @@ struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char 
 * @return vehicle_data* A vehicle to show, if any (NULL if not).
 */
 vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
-	extern bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
-	
 	vehicle_data *iter, *in_veh, *found = NULL;
 	bool is_on_vehicle = ((in_veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && room == IN_ROOM(in_veh));
 	int found_size = -1;
@@ -944,8 +941,6 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle to ignite.
 */
 void start_vehicle_burning(vehicle_data *veh) {
-	void do_unseat_from_vehicle(char_data *ch);
-	
 	if (VEH_OWNER(veh)) {
 		log_to_empire(VEH_OWNER(veh), ELOG_HOSTILITY, "Your %s has caught on fire at (%d, %d)", skip_filler(VEH_SHORT_DESC(veh)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 	}
@@ -1011,7 +1006,6 @@ int total_vehicle_size_in_room(room_data *room) {
 */
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh) {
 	void scale_mob_to_level(char_data *mob, int level);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);	
 	
 	char_data *mob;
 	
@@ -1525,7 +1519,6 @@ char *list_one_vehicle(vehicle_data *veh, bool detail) {
 */
 void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh = vehicle_proto(vnum);
@@ -2594,7 +2587,6 @@ int get_new_vehicle_construction_id(void) {
 * @param any_vnum vnum The vehicle vnum
 */
 void parse_vehicle(FILE *fl, any_vnum vnum) {
-	void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 	void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 	void parse_interaction(char *line, struct interaction_item **list, char *error_part);
 	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
@@ -2801,7 +2793,6 @@ void write_vehicle_index(FILE *fl) {
 * @param vehicle_data *veh The thing to save.
 */
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
-	void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 	void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 	void write_interactions_to_file(FILE *fl, struct interaction_item *list);
 	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
@@ -2931,7 +2922,6 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void extract_pending_vehicles();
 	
 	struct obj_storage_type *store, *next_store;
@@ -4019,7 +4009,6 @@ OLC_MODULE(vedit_capacity) {
 
 
 OLC_MODULE(vedit_custom) {
-	void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	
 	olc_process_custom_messages(ch, argument, &VEH_CUSTOM_MSGS(veh), veh_custom_types);

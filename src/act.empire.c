@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "olc.h"
 
 /**
 * Contents:
@@ -57,29 +58,12 @@ extern const char *trade_overunder[];
 
 // external funcs
 void check_nowhere_einv(empire_data *emp, int new_island);
-extern int city_points_available(empire_data *emp);
-void clear_private_owner(int id);
-extern int count_dropped_items(empire_data *emp, obj_vnum vnum);
-void deactivate_workforce(empire_data *emp, int island_id, int type);
-void deactivate_workforce_room(empire_data *emp, room_data *room);
-void delete_member_data(char_data *ch, empire_data *from_emp);
-extern bool empire_can_claim(empire_data *emp);
 extern bool empire_is_ignoring(empire_data *emp, char_data *victim);
-extern int get_main_island(empire_data *emp);
-extern int get_total_score(empire_data *emp);
-extern bool is_trading_with(empire_data *emp, empire_data *partner);
-extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 void identify_obj_to_char(obj_data *obj, char_data *ch);
-void refresh_all_quests(char_data *ch);
-void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_with);
-void update_empire_members_and_greatness(empire_data *emp);
-void update_member_data(char_data *ch);
 
-// locals
+// local prototypes
 bool is_affiliated_island(empire_data *emp, int island_id);
-void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
-void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
-void set_workforce_limit_all(empire_data *emp, int chore, int limit);
+void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_with);
 int sort_workforce_log(struct workforce_log *a, struct workforce_log *b);
 
 
@@ -104,8 +88,6 @@ struct einv_type {
 * @param empire_data *new_emp
 */
 void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
-	extern int find_free_shipping_id(empire_data *emp);
-	
 	struct shipping_data *sd, *next_sd;
 	vehicle_data *veh;
 	int old_id, new_id;
@@ -186,9 +168,6 @@ void copy_workforce_limits_into_current_island(char_data *ch, struct island_info
 * @param char *argument The arguments.
 */
 void do_customize_island(char_data *ch, char *argument) {
-	extern bool island_has_default_name(struct island_info *island);
-	void save_island_table();
-	
 	char type_arg[MAX_INPUT_LENGTH];
 	struct empire_city_data *city;
 	struct empire_island *eisle;
@@ -1434,8 +1413,6 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 * @param char_data *ch The person to show it to.
 */
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
-	extern int *get_ordered_chores();
-	
 	struct empire_island *isle, *next_isle, *this_isle;
 	char part[MAX_STRING_LENGTH];
 	int iter, on, off, size, *order, chore, count;
@@ -1753,7 +1730,6 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 
 
 void found_city(char_data *ch, empire_data *emp, char *argument) {
-	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 	extern int highest_start_loc_index;
 	extern int *start_locs;
 	
@@ -1965,8 +1941,6 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 
 // for do_city
 void list_cities(char_data *ch, empire_data *emp, char *argument) {
-	extern int count_city_points_used(empire_data *emp);
-	
 	char buf[MAX_STRING_LENGTH], traits[256];
 	struct empire_city_data *city;
 	struct island_info *isle;
@@ -2333,8 +2307,6 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *ve
 
 // adds import/export entry for do_import
 void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) {
-	void sort_trade_data(struct empire_trade_data **list);
-
 	char cost_arg[MAX_INPUT_LENGTH], limit_arg[MAX_INPUT_LENGTH];
 	struct empire_trade_data *trade;
 	double cost;
@@ -2966,10 +2938,7 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 * @param char_data *argument The tile to search for.
 */
 void scan_for_tile(char_data *ch, char *argument) {
-	extern byte distance_can_see(char_data *ch);
-	extern int get_map_radius(char_data *ch);
 	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
-	extern bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
 	extern const char *paint_names[];
 
 	struct find_territory_node *node_list = NULL, *node, *next_node;
@@ -3404,8 +3373,6 @@ ACMD(do_abandon) {
 
 
 ACMD(do_barde) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	static struct resource_data *res = NULL;
 	struct interact_exclusion_data *excl = NULL;
 	struct interaction_item *interact;
@@ -4232,8 +4199,6 @@ ACMD(do_diplomacy) {
 
 
 ACMD(do_efind) {
-	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
-	
 	char buf[MAX_STRING_LENGTH*2];
 	obj_data *obj;
 	empire_data *emp;
@@ -4649,8 +4614,6 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
-	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
-	
 	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
@@ -4942,10 +4905,6 @@ ACMD(do_enroll) {
 
 
 ACMD(do_esay) {
-	void clear_last_act_message(descriptor_data *desc);
-	void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message);
-	extern bool is_ignoring(char_data *ch, char_data *victim);
-	
 	descriptor_data *d;
 	char_data *tch;
 	int level = 0, i;
@@ -5175,8 +5134,6 @@ ACMD(do_expel) {
 
 
 ACMD(do_findmaintenance) {
-	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
-	
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH*4], partial[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH], *ptr;
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	struct resource_data *old_res, *total_list = NULL;
@@ -5639,8 +5596,6 @@ ACMD(do_islands) {
 
 
 ACMD(do_tavern) {
-	void check_tavern_setup(room_data *room);
-	
 	int iter, type = NOTHING, pos, old;
 	
 	one_argument(argument, arg);
@@ -6311,15 +6266,6 @@ ACMD(do_pledge) {
 
 
 ACMD(do_progress) {
-	void count_quest_tasks(struct req_data *list, int *complete, int *total);
-	extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
-	extern progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
-	extern progress_data *find_progress_goal_by_name(char *name);
-	extern progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name);
-	void get_progress_perks_display(struct progress_perk *list, char *save_buffer, bool show_vnums);
-	void get_tracker_display(struct req_data *tracker, char *save_buffer);
-	void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
-	
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], vstr[256], *arg2, *ptr;
 	int counts[NUM_PROGRESS_TYPES], compl[NUM_PROGRESS_TYPES], buy[NUM_PROGRESS_TYPES];
@@ -6952,8 +6898,6 @@ ACMD(do_reclaim) {
 
 
 ACMD(do_roster) {
-	void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
-	extern bool member_is_timed_out_ch(char_data *ch);
 	extern const char *class_role[];
 	extern const char *class_role_color[];
 
@@ -7245,8 +7189,6 @@ ACMD(do_unpublicize) {
 * @param char *argument Remaining args after "limit".
 */
 void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
-	void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
-	
 	char amount_arg[MAX_INPUT_LENGTH], keywords_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], line[256];
 	struct workforce_production_limit *wpl, *next_wpl;
 	int amount, count;
@@ -7353,8 +7295,6 @@ void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
 
 
 ACMD(do_workforce) {
-	extern int *get_ordered_chores();
-	
 	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH], island_arg[MAX_INPUT_LENGTH];
 	char temp[MAX_INPUT_LENGTH];
 	struct empire_storage_data *store, *next_store;

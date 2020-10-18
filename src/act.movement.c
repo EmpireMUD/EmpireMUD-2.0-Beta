@@ -46,7 +46,6 @@ ACMD(do_dismount);
 extern bool action_flagged(char_data *ch, bitvector_t actf);
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
-void do_unseat_from_vehicle(char_data *ch);
 extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
 extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
 

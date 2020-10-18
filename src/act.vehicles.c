@@ -30,9 +30,6 @@
 *   Commands
 */
 
-// local protos
-void do_unseat_from_vehicle(char_data *ch);
-
 // external consts
 extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
 extern const char *dirs[];
@@ -54,7 +51,6 @@ extern int get_north_for_char(char_data *ch);
 void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 extern bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error);
 void skip_run_filler(char **string);
-void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 extern bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
 
 // local data
@@ -184,9 +180,6 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 * @return bool TRUE if any target was found, FALSE if not.
 */
 bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ) {
-	bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
-	bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target);
-	
 	vehicle_data *tar;
 	room_data *from_room = veh ? IN_ROOM(veh) : IN_ROOM(ch);
 	room_data *room;
@@ -1125,7 +1118,6 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 */
 void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 	void start_vehicle_burning(vehicle_data *veh);
-	extern bool used_lighter(char_data *ch, obj_data *obj);
 	
 	char buf[MAX_STRING_LENGTH];
 	
@@ -1406,7 +1398,6 @@ ACMD(do_disembark) {
 ACMD(do_dispatch) {
 	extern char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_data *veh, mob_vnum vnum);
 	extern struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc);
-	extern int find_free_shipping_id(empire_data *emp);
 	void sail_shipment(empire_data *emp, vehicle_data *boat);
 	extern bool ship_is_empty(vehicle_data *ship);
 	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
@@ -1937,9 +1928,6 @@ ACMD(do_drive) {
 
 
 ACMD(do_fire) {
-	void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
-	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
-	
 	char veh_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh, *veh_targ;
 	sector_data *secttype;

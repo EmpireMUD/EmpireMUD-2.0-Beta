@@ -31,14 +31,6 @@
 *   Battle Commands
 */
 
-// external vars
-
-// external functions
-void check_combat_start(char_data *ch);
-extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);	// fight.c
-extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// BATTLE HELPERS //////////////////////////////////////////////////////////
 
@@ -326,8 +318,6 @@ ACMD(do_disarm) {
 
 
 ACMD(do_firstaid) {
-	extern int total_bonus_healing(char_data *ch);
-
 	struct over_time_effect_type *dot, *next_dot;
 	bool has_dot = FALSE;
 	char_data *vict;

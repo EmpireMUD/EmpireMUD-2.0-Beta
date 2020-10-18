@@ -34,13 +34,7 @@
 *   Rituals
 */
 
-// external vars
-
-// external funcs
-extern bool trigger_counterspell(char_data *ch);	// spells.c
-void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
-
-// locals
+// local prototypes
 void send_ritual_messages(char_data *ch, int rit, int pos);
 
 
@@ -377,8 +371,6 @@ INTERACTION_FUNC(devastate_trees) {
 * @return double The number of scale points available for an enchantment at that level.
 */
 double get_enchant_scale_for_char(char_data *ch, int max_scale) {
-	extern int get_crafting_level(char_data *ch);
-	
 	double points_available;
 	int level;
 
@@ -465,9 +457,6 @@ void start_ritual(char_data *ch, int ritual) {
 * @param char *argument The typed arg.
 */
 void summon_materials(char_data *ch, char *argument) {
-	extern ability_data *find_player_ability_by_tech(char_data *ch, int ptech);
-	void read_vault(empire_data *emp);
-
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *objname;
 	struct empire_storage_data *store, *next_store;
 	int count = 0, total = 1, number, pos, carry;
@@ -989,10 +978,6 @@ ACMD(do_manashield) {
 
 
 ACMD(do_mirrorimage) {
-	void change_sex(char_data *ch, int sex);
-	extern struct custom_message *pick_custom_longdesc(char_data *ch);
-	void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
-	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], *tmp;
 	char_data *mob, *other;
 	obj_data *wield;
@@ -1644,8 +1629,6 @@ RITUAL_SETUP_FUNC(start_ritual_of_teleportation) {
 
 
 RITUAL_FINISH_FUNC(perform_ritual_of_teleportation) {
-	void cancel_adventure_summon(char_data *ch);
-	
 	room_data *to_room, *rand_room, *map;
 	int tries, rand_x, rand_y;
 	bool random;
@@ -1870,8 +1853,6 @@ RITUAL_FINISH_FUNC(perform_ritual_of_detection) {
 
 
 RITUAL_SETUP_FUNC(start_siege_ritual) {
-	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
-	
 	vehicle_data *veh_targ;
 	room_data *room_targ;
 	int dir;
@@ -1905,12 +1886,6 @@ RITUAL_SETUP_FUNC(start_siege_ritual) {
 
 
 RITUAL_FINISH_FUNC(perform_siege_ritual) {
-	void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
-	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
-	extern vehicle_data *find_vehicle(int n);
-	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
-	extern bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target);
-	
 	vehicle_data *veh_targ = NULL;
 	room_data *room_targ = NULL;
 	sector_data *secttype;
@@ -1990,9 +1965,6 @@ RITUAL_SETUP_FUNC(start_devastation_ritual) {
 
 
 RITUAL_FINISH_FUNC(perform_devastation_ritual) {
-	extern void change_chop_territory(room_data *room);
-	void uncrop_tile(room_data *room);
-	
 	room_data *rand_room, *to_room = NULL;
 	crop_data *cp;
 	int dist, iter;

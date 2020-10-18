@@ -596,10 +596,6 @@ void display_score_to_char(char_data *ch, char_data *to) {
 	void show_character_affects(char_data *ch, char_data *to);
 	extern double get_combat_speed(char_data *ch, int pos);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
-	extern int get_crafting_level(char_data *ch);
-	extern int total_bonus_healing(char_data *ch);
-	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int move_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
@@ -876,7 +872,6 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 void list_one_char(char_data *i, char_data *ch, int num) {
 	extern bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
 	extern bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
-	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern struct action_data_struct action_data[];
 	
 	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], part[256];

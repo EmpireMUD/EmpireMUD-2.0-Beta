@@ -375,7 +375,6 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void remove_building_from_table(bld_data *bld);
 	
 	struct obj_storage_type *store, *next_store;
@@ -844,7 +843,6 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 */
 void olc_search_building(char_data *ch, bld_vnum vnum) {
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
 	bld_data *proto = building_proto(vnum);
@@ -1137,7 +1135,6 @@ void save_olc_building(descriptor_data *desc) {
 */
 bld_data *setup_olc_building(bld_data *input) {
 	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
-	extern struct resource_data *copy_resource_list(struct resource_data *input);
 	
 	bld_data *new;
 	

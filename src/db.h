@@ -278,6 +278,11 @@ extern struct instance_data *instance_list;
 void free_adventure(adv_data *adv);
 extern adv_data *adventure_proto(adv_vnum vnum);
 
+// applies
+struct apply_data *copy_apply_list(struct apply_data *input);
+void parse_apply(FILE *fl, struct apply_data **list, char *error_str);
+void write_applies_to_file(FILE *fl, struct apply_data *list);
+
 // archetypes
 extern archetype_data *archetype_table;
 extern archetype_data *sorted_archetypes;
@@ -302,6 +307,11 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add);
 bld_data *building_proto(bld_vnum vnum);
 void free_building(bld_data *building);
 
+// cities
+int city_points_available(empire_data *emp);
+int count_city_points_used(empire_data *emp);
+struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
+
 // classes
 extern class_data *class_table;
 extern class_data *sorted_classes;
@@ -318,8 +328,15 @@ extern craft_data *craft_proto(craft_vnum vnum);
 
 // crops
 extern crop_data *crop_table;
+
+crop_data *crop_proto(crop_vnum vnum);
 void free_crop(crop_data *cp);
-extern crop_data *crop_proto(crop_vnum vnum);
+void schedule_crop_growth(struct map_data *map);
+void uncrop_tile(room_data *room);
+
+// custom messages
+void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
+void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 
 // data system getters
 extern double data_get_double(int key);
@@ -339,20 +356,27 @@ extern empire_data *empire_table;
 extern struct trading_post_data *trading_list;
 extern bool check_empire_refresh;
 
+void check_tavern_setup(room_data *room);
 struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 void delete_empire(empire_data *emp);
+void delete_member_data(char_data *ch, empire_data *from_emp);
 void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
 struct empire_island *get_empire_island(empire_data *emp, int island_id);
+int get_main_island(empire_data *emp);
 empire_data *get_or_create_empire(char_data *ch);
 void free_empire(empire_data *emp);
 struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
+bool member_is_timed_out_ch(char_data *ch);
 void read_empire_members(empire_data *only_empire, bool read_techs);
 void read_empire_territory(empire_data *emp, bool check_tech);
 empire_data *real_empire(empire_vnum vnum);
 void reread_empire_tech(empire_data *emp);
 void save_empire(empire_data *e, bool save_all_parts);
 void save_all_empires();
+void sort_trade_data(struct empire_trade_data **list);
+void update_empire_members_and_greatness(empire_data *emp);
+void update_member_data(char_data *ch);
 
 // empire offenses
 void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc, bitvector_t flags);
@@ -411,10 +435,13 @@ void free_interactions(struct interaction_item **list);
 
 // islands
 extern struct island_info *island_table;
-extern struct island_info *get_island(int island_id, bool create_if_missing);
-extern struct island_info *get_island_by_coords(char *coords);
-extern struct island_info *get_island_by_name(char_data *ch, char *name);
-extern char *get_island_name_for(int island_id, char_data *for_ch);
+
+struct island_info *get_island(int island_id, bool create_if_missing);
+struct island_info *get_island_by_coords(char *coords);
+struct island_info *get_island_by_name(char_data *ch, char *name);
+char *get_island_name_for(int island_id, char_data *for_ch);
+bool island_has_default_name(struct island_info *island);
+void save_island_table();
 
 // mobiles/chars
 extern account_data *account_table;
@@ -478,6 +505,10 @@ void free_progress(progress_data *prg);
 extern struct quest_data *quest_table;
 extern quest_data *quest_proto(any_vnum vnum);
 void free_quest(quest_data *quest);
+
+// resources
+struct resource_data *copy_resource_list(struct resource_data *input);
+void free_resource_list(struct resource_data *list);
 
 // room templates
 extern room_template *room_template_table;
@@ -545,24 +576,28 @@ extern room_data *interior_room_list;
 extern struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];
 extern struct map_data *land_map;
 
+void change_chop_territory(room_data *room);
 void check_all_exits();
 void check_terrain_height(room_data *room);
+void clear_private_owner(int id);
 struct room_direction_data *create_exit(room_data *from, room_data *to, int dir, bool back);
 room_data *create_room(room_data *home);
 void decustomize_room(room_data *room);
 room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 void delete_room(room_data *room, bool check_exits);
+void finish_trench(room_data *room);
 void free_complex_data(struct complex_room_data *data);
 crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 struct complex_room_data *init_complex_data();
 void init_mine(room_data *room, char_data *ch, empire_data *emp);
+void perform_burn_room(room_data *room);
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
 void sort_world_table();
+void untrench_room(room_data *room);
 
 // misc
 extern struct obj_apply *copy_obj_apply_list(struct obj_apply *list);
-void free_resource_list(struct resource_data *list);
 
 // more frees
 void free_apply_list(struct apply_data *list);

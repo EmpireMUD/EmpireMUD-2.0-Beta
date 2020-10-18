@@ -16,6 +16,7 @@
 
 
 // prototypes
+bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
 void command_interpreter(char_data *ch, char *argument);
 char lower( char c );
 void nanny(descriptor_data *d, char *arg);

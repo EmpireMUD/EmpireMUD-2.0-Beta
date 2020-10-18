@@ -294,7 +294,6 @@ bool match_one_exit(char_data *ch, room_template *add_exit_to, room_template *or
 */
 void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void remove_room_template_from_table(room_template *rmt);
 	
 	quest_data *quest, *next_quest;
@@ -542,7 +541,6 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 */
 void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];
 	room_template *rmt = room_template_proto(vnum), *iter, *next_iter;

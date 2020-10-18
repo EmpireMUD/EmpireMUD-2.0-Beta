@@ -45,12 +45,9 @@ extern const int regen_by_pos[];
 extern const struct wear_data_type wear_data[NUM_WEARS];
 
 // external funcs
-extern obj_data *die(char_data *ch, char_data *killer);
-void death_log(char_data *ch, char_data *killer, int type);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
-void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 
 // locals
 int health_gain(char_data *ch, bool info_only);
@@ -596,7 +593,6 @@ void real_update_char(char_data *ch) {
 	void check_morph_ability(char_data *ch);
 	void combat_meter_damage_dealt(char_data *ch, int amt);
 	extern int compute_bonus_exp_per_day(char_data *ch);
-	void do_unseat_from_vehicle(char_data *ch);
 	extern bool fail_daily_quests(char_data *ch);
 	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 	void random_encounter(char_data *ch);
@@ -1125,9 +1121,7 @@ static void reduce_city_overage_one(empire_data *emp) {
 * - Are used at least 2x their currently-earned city points.
 */
 void reduce_city_overages(void) {
-	extern int city_points_available(empire_data *emp);
 	extern int count_cities(empire_data *emp);
-	extern int count_city_points_used(empire_data *emp);
 	
 	empire_data *iter, *next_iter;
 	int points;
@@ -1378,7 +1372,6 @@ bool should_delete_empire(empire_data *emp) {
 */
 void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs) {
 	void deactivate_workforce_island(empire_data *emp, int island_id);
-	void read_vault(empire_data *emp);
 	
 	struct empire_storage_data *store, *next_store;
 	struct island_info *island = get_island(eisle->island, TRUE);
@@ -1473,7 +1466,6 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 */
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 	void check_delayed_load(char_data *ch);
-	extern int get_main_island(empire_data *emp);
 	
 	player_index_data *index;
 	empire_data *emp = override_emp;
@@ -1875,7 +1867,6 @@ void autostore_vehicle_contents(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle to update.
 */
 void point_update_vehicle(vehicle_data *veh) {
-	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
 	void ruin_vehicle(vehicle_data *veh, char *message);
 	
 	char *msg;

@@ -37,8 +37,6 @@
 
 // external funcs
 void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
-extern bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
-void check_combat_start(char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -333,7 +331,6 @@ ACMD(do_damage_spell) {
 //// READIES /////////////////////////////////////////////////////////////////
 
 ACMD(do_ready) {
-	extern bool check_vampire_sun(char_data *ch, bool message);
 	void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
 	extern const char *pool_types[];
 	

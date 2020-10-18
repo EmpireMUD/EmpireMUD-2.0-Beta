@@ -486,7 +486,6 @@ char *show_daily_quest_line(char_data *ch) {
 * @param struct player_quest *pq The quest to show the tracker for.
 */
 void show_quest_tracker(char_data *ch, struct player_quest *pq) {
-	void get_tracker_display(struct req_data *tracker, char *save_buffer);
 	char buf[MAX_STRING_LENGTH];
 	
 	get_tracker_display(pq->tracker, buf);

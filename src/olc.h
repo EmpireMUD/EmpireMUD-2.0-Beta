@@ -118,16 +118,18 @@ struct olc_command_data {
 
 
 // olc.c helpers
-extern struct icon_data *copy_icon_set(struct icon_data *input_list);
-extern struct interaction_item *copy_interaction_list(struct interaction_item *input_list);
-extern struct spawn_info *copy_spawn_list(struct spawn_info *input_list);
-extern int find_olc_type(char *name);
-extern bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
-extern double olc_process_double(char_data *ch, char *argument, char *name, char *command, double min, double max, double old_value);
-extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
-extern int olc_process_number(char_data *ch, char *argument, char *name, char *command, int min, int max, int old_value);
+struct icon_data *copy_icon_set(struct icon_data *input_list);
+struct interaction_item *copy_interaction_list(struct interaction_item *input_list);
+struct spawn_info *copy_spawn_list(struct spawn_info *input_list);
+int find_olc_type(char *name);
+bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
+void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
+void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
+double olc_process_double(char_data *ch, char *argument, char *name, char *command, double min, double max, double old_value);
+bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
+int olc_process_number(char_data *ch, char *argument, char *name, char *command, int min, int max, int old_value);
 void olc_process_string(char_data *ch, char *argument, const char *name, char **save_point);
-extern int olc_process_type(char_data *ch, char *argument, char *name, char *command, const char **type_names, int old_value);
+int olc_process_type(char_data *ch, char *argument, char *name, char *command, const char **type_names, int old_value);
 void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_data **list);
 void olc_process_icons(char_data *ch, char *argument, struct icon_data **list);
 void olc_process_interactions(char_data *ch, char *argument, struct interaction_item **list, int attach_type);

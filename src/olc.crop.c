@@ -193,7 +193,6 @@ char *list_one_crop(crop_data *crop, bool detail) {
 void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	void remove_crop_from_table(crop_data *crop);
-	void uncrop_tile(room_data *room);
 	
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;

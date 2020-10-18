@@ -32,13 +32,9 @@
 // external vars
 
 // external funcs
-extern bool check_scaling(char_data *mob, char_data *based_on);
-extern obj_data *die(char_data *ch, char_data *killer);
 void end_morph(char_data *ch);
 
 // locals
-bool cancel_biting(char_data *ch);
-bool check_vampire_sun(char_data *ch, bool message);
 ACMD(do_bite);
 
 
@@ -446,7 +442,6 @@ void start_drinking_blood(char_data *ch, char_data *victim) {
 */
 bool starving_vampire_aggro(char_data *ch) {
 	ACMD(do_stand);
-	extern bool is_fight_ally(char_data *ch, char_data *frenemy);
 	
 	char_data *ch_iter, *backup = NULL, *victim = FIGHTING(ch);
 	int backup_found = 0, vict_found = 0;
@@ -655,8 +650,6 @@ void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 * @param char_data *ch The person who might be biting, to update.
 */
 void update_biting_char(char_data *ch) {
-	void death_log(char_data *ch, char_data *killer, int type);
-	
 	char_data *victim;
 	obj_data *corpse;
 	int amount, hamt;
@@ -820,7 +813,6 @@ void update_vampire_sun(char_data *ch) {
 // has subcmd==1 when sent from do_sire
 ACMD(do_bite) {
 	// this is an attack for vampires, and allows them to feed; mortals pass through to the "bite" social
-	extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
 	extern social_data *find_social(char_data *ch, char *name, bool exact);
 	void perform_rescue(char_data *ch, char_data *vict, char_data *from, int msg);
 	void perform_social(char_data *ch, social_data *soc, char *argument);

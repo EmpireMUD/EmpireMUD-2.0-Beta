@@ -64,7 +64,6 @@ void update_class(char_data *ch);
 void check_eq_sets(char_data *ch);
 void clear_delayed_update(char_data *ch);
 void clear_player(char_data *ch);
-void delete_member_data(char_data *ch, empire_data *from_emp);
 void delete_player_character(char_data *ch);
 void free_player_eq_set(struct player_eq_set *eq_set);
 struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
@@ -77,8 +76,6 @@ void remove_loaded_player(char_data *ch);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
 int sort_players_by_name(player_index_data *a, player_index_data *b);
 void track_empire_playtime(empire_data *emp, int add_seconds);
-void update_empire_members_and_greatness(empire_data *emp);
-void update_member_data(char_data *ch);
 void update_played_time(char_data *ch);
 void write_player_delayed_data_to_file(FILE *fl, char_data *ch);
 void write_player_primary_data_to_file(FILE *fl, char_data *ch);
@@ -765,7 +762,6 @@ void free_char(char_data *ch) {
 	void free_mail(struct mail_data *mail);
 	void free_player_completed_quests(struct player_completed_quest **hash);
 	void free_player_quests(struct player_quest *list);
-	void remove_passive_buff(char_data *ch, struct affected_type *aff);
 
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
@@ -1140,7 +1136,6 @@ char_data *load_player(char *name, bool normal) {
 * @return char_data* The loaded character.
 */
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
-	extern struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
 	void add_minipet(char_data *ch, any_vnum vnum);
 	extern struct player_event_data *create_event_data(char_data *ch, int event_id, any_vnum event_vnum);
 	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
@@ -3862,8 +3857,6 @@ void delete_old_players(void) {
 * @param char_data *ch The player to delete.
 */
 void delete_player_character(char_data *ch) {
-	void clear_private_owner(int id);
-	
 	player_index_data *index;
 	empire_data *emp = NULL;
 	char filename[256];
@@ -3925,13 +3918,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	void clean_lore(char_data *ch);
 	void clean_player_kills(char_data *ch);
 	extern room_data *find_home(char_data *ch);
-	extern room_data *find_load_room(char_data *ch);
 	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 	void give_level_zero_abilities(char_data *ch);
 	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
-	void refresh_all_quests(char_data *ch);
 	void refresh_passive_buffs(char_data *ch);
-	void reset_combat_meters(char_data *ch);
 	extern bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
 	
 	extern bool global_mute_slash_channel_joins;

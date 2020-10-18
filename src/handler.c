@@ -87,7 +87,6 @@ void clear_delayed_update(char_data *ch);
 void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
 void free_varlist(struct trig_var_data *vd);
-void update_member_data(char_data *ch);
 
 // locals
 void add_dropped_item(empire_data *emp, obj_data *obj);
@@ -1480,7 +1479,6 @@ bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t f
 */
 void perform_idle_out(char_data *ch) {
 	extern bool dismiss_any_minipet(char_data *ch);
-	extern obj_data *player_death(char_data *ch);
 	
 	empire_data *emp = NULL;
 	bool died = FALSE;
@@ -1577,7 +1575,6 @@ void char_from_room(char_data *ch) {
 void char_to_room(char_data *ch, room_data *room) {
 	void check_instance_is_loaded(struct instance_data *inst);
 	void check_island_levels(room_data *location, int level);
-	extern int determine_best_scale_level(char_data *ch, bool check_group);
 	extern int lock_instance_level(room_data *room, int level);
 	void spawn_mobs_from_center(room_data *center);
 	
@@ -2750,8 +2747,6 @@ int get_currency(char_data *ch, any_vnum vnum) {
 * @param room_data *room The room to abandon.
 */
 void abandon_room(room_data *room) {
-	void clear_private_owner(int id);
-	
 	room_data *iter, *next_iter, *home = HOME_ROOM(room);
 	
 	if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
@@ -2926,8 +2921,6 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, do
 * @param room_data *room The room to abandon.
 */
 void perform_abandon_room(room_data *room) {
-	void check_tavern_setup(room_data *room);
-	void deactivate_workforce_room(empire_data *emp, room_data *room);
 	void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
 	void schedule_check_unload(room_data *room, bool offset);
 	
@@ -9766,7 +9759,6 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique
 */
 void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, obj_data *obj, empire_data *save_emp, room_data *room, bool *full) {
 	EVENT_CANCEL_FUNC(cancel_wait_event);
-	extern int get_main_island(empire_data *emp);
 	void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
 	
 	struct empire_unique_storage *eus;

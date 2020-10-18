@@ -85,7 +85,6 @@ extern struct generic_name_data *get_best_name_list(int name_set, int sex);
 extern int get_highest_access_level(account_data *acct);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
-void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 void refresh_passive_buffs(char_data *ch);
@@ -96,8 +95,6 @@ extern char *show_color_codes(char *string);
 extern int stats_get_crop_count(crop_data *cp);
 extern int stats_get_sector_count(sector_data *sect);
 void update_class(char_data *ch);
-void update_empire_members_and_greatness(empire_data *emp);
-void update_member_data(char_data *ch);
 void update_world_count();
 
 // locals
@@ -503,9 +500,7 @@ ADMIN_UTIL(util_bldconvert) {
 	extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
 	extern struct bld_relation *copy_bld_relations(struct bld_relation *input_list);
 	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
-	extern struct resource_data *copy_resource_list(struct resource_data *input);
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	void save_olc_building(descriptor_data *desc);
 	void save_olc_craft(descriptor_data *desc);
 	void save_olc_vehicle(descriptor_data *desc);
@@ -1387,7 +1382,6 @@ ADMIN_UTIL(util_redo_islands) {
 
 ADMIN_UTIL(util_rescan) {
 	void refresh_empire_dropped_items(empire_data *only_emp);
-	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	
 	empire_data *emp;
 	
@@ -2082,7 +2076,6 @@ struct set_struct {
 /* All setting is done here, for simplicity */
 int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	/* Externs */
-	void change_sex(char_data *ch, int sex);
 	extern int _parse_name(char *arg, char *name);
 	extern int Valid_Name(char *newname);
 	void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
@@ -2510,7 +2503,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("companion") {
-		extern struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
 		void remove_companion(char_data *ch, any_vnum vnum);
 		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
 		char_data *pet;
@@ -3328,8 +3320,6 @@ SHOW(show_player) {
 
 
 SHOW(show_progress) {
-	extern progress_data *find_progress_goal_by_name(char *name);
-	
 	int total = 0, active = 0, active_completed = 0, total_completed = 0;
 	empire_data *emp, *next_emp;
 	progress_data *prg;
@@ -3415,7 +3405,6 @@ SHOW(show_progression) {
 
 
 SHOW(show_quests) {
-	void count_quest_tasks(struct req_data *list, int *complete, int *total);
 	void show_quest_tracker(char_data *ch, struct player_quest *pq);
 	
 	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH], when[256];
@@ -4525,8 +4514,6 @@ SHOW(show_unlearnable) {
 
 
 SHOW(show_uses) {
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH * 3], part[MAX_STRING_LENGTH];
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
@@ -5822,11 +5809,7 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 /* Sends ch information on the character or animal k */
 void do_stat_character(char_data *ch, char_data *k) {
 	extern double get_combat_speed(char_data *ch, int pos);
-	extern int get_crafting_level(char_data *ch);
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
-	extern int total_bonus_healing(char_data *ch);
-	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern int move_gain(char_data *ch);
 	void display_attributes(char_data *ch, char_data *to);
 
@@ -6253,7 +6236,6 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 */
 void do_stat_empire(char_data *ch, empire_data *emp) {
 	extern int *summarize_weekly_playtime(empire_data *emp);
-	extern int get_total_score(empire_data *emp);
 	void script_stat (char_data *ch, struct script_data *sc);
 	
 	extern const char *empire_admin_flags[];
@@ -6422,7 +6404,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 	extern const char *corpse_flags[];
 	extern const char *obj_custom_types[];
 	extern const char *storage_bits[];
-	extern double get_base_dps(obj_data *weapon);
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *armor_types[NUM_ARMOR_TYPES+1];
 	
@@ -7836,7 +7817,6 @@ ACMD(do_automessage) {
 
 
 ACMD(do_autostore) {
-	void read_vault(empire_data *emp);
 	obj_data *obj, *next_obj;
 	vehicle_data *veh;
 	empire_data *emp = ROOM_OWNER(IN_ROOM(ch));
@@ -8072,10 +8052,6 @@ ACMD(do_distance) {
 
 // this also handles emote
 ACMD(do_echo) {
-	void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message);
-	void clear_last_act_message(descriptor_data *desc);
-	extern bool is_ignoring(char_data *ch, char_data *victim);
-	
 	char string[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	char hbuf[MAX_INPUT_LENGTH];
 	char *ptr, *end;
@@ -8831,8 +8807,6 @@ ACMD(do_invis) {
 
 
 ACMD(do_island) {
-	void save_island_table();
-
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH * 2], line[256], flags[256];
 	struct island_info *isle, *next_isle;
 	room_data *center;
@@ -8987,8 +8961,6 @@ ACMD(do_last) {
 
 
 ACMD(do_load) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	vehicle_data *veh;
 	char_data *mob, *mort;
 	obj_data *obj;
@@ -10203,9 +10175,6 @@ ACMD(do_show) {
 
 
 ACMD(do_slay) {
-	extern bool check_scaling(char_data *mob, char_data *attacker);
-	extern obj_data *die(char_data *ch, char_data *killer);
-	
 	char_data *vict;
 
 	one_argument(argument, arg);
@@ -10696,7 +10665,6 @@ ACMD(do_unbind) {
 
 
 ACMD(do_unprogress) {
-	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	void remove_completed_goal(empire_data *emp, any_vnum vnum);
 	
 	char emp_arg[MAX_INPUT_LENGTH], prg_arg[MAX_INPUT_LENGTH];

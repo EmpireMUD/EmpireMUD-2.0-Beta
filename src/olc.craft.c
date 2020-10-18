@@ -632,8 +632,6 @@ void save_olc_craft(descriptor_data *desc) {
 * @return craft_data * The copied recipe.
 */
 craft_data *setup_olc_craft(craft_data *input) {
-	extern struct resource_data *copy_resource_list(struct resource_data *input);
-
 	craft_data *new;
 	
 	CREATE(new, craft_data, 1);

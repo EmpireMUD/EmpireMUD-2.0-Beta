@@ -54,9 +54,7 @@ extern const char *quest_reward_types[];
 
 // external funcs
 extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 
 // local protos
 EVENT_CANCEL_FUNC(cancel_event_event);
@@ -2247,8 +2245,6 @@ void save_olc_event(descriptor_data *desc) {
 * @return event_data* The copied event.
 */
 event_data *setup_olc_event(event_data *input) {
-	extern struct apply_data *copy_apply_list(struct apply_data *input);
-	
 	event_data *new;
 	
 	CREATE(new, event_data, 1);

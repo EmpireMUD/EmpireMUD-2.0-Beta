@@ -80,7 +80,6 @@ int count_hash_records(FILE *fl);
 empire_vnum find_free_empire_vnum(void);
 void free_obj_eq_set(struct eq_set_obj *eq_set);
 void free_theft_logs(struct theft_log *list);
-void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
 void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
@@ -91,7 +90,6 @@ struct theft_log *reduce_theft_logs_and_get_recent(empire_data *emp);
 PLAYER_UPDATE_FUNC(send_all_players_to_nowhere);
 int sort_empires(empire_data *a, empire_data *b);
 int sort_room_templates(room_template *a, room_template *b);
-void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
@@ -1618,8 +1616,6 @@ void check_nowhere_einv(empire_data *emp, int new_island) {
 * state. This is meant to be run at startup but can be re-run as needed.
 */
 void check_nowhere_einv_all(void) {
-	extern int get_main_island(empire_data *emp);
-	
 	empire_data *emp, *next_emp;
 	int island;
 	
@@ -1643,10 +1639,7 @@ void check_nowhere_einv_all(void) {
 empire_data *create_empire(char_data *ch) {
 	void add_empire_to_table(empire_data *emp);
 	extern bool check_unique_empire_name(empire_data *for_emp, char *name);
-	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 	void resort_empires(bool force);
-	void update_empire_members_and_greatness(empire_data *emp);
-	void update_member_data(char_data *ch);
 
 	archetype_data *arch;
 	char colorcode[10], name[MAX_STRING_LENGTH];
@@ -2222,7 +2215,6 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 void load_empire_storage_one(FILE *fl, empire_data *emp) {	
 	extern struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
 	void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
-	void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
 	
 	int t[10], junk;
 	long l_in;
@@ -2442,7 +2434,6 @@ void load_empire_storage(void) {
 */
 void parse_empire(FILE *fl, empire_vnum vnum) {
 	void assign_old_workforce_chore(empire_data *emp, int chore);
-	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 	extern struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mob, int sex, int name, struct empire_territory_data *ter);
 	
 	empire_data *emp, *find;
@@ -3652,8 +3643,6 @@ void update_empire_npc_data(void) {
 * @return char_data *the mob
 */
 char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	char_data *mob;
 	
 	mob = read_mobile((override_mob == NOTHING) ? npc->vnum : override_mob, TRUE);
@@ -8990,8 +8979,6 @@ int sort_globals(struct global_data *a, struct global_data *b) {
 * @return int <0, 0, or >0, depending on comparison
 */
 int sort_empires(empire_data *a, empire_data *b) {
-	extern int get_total_score(empire_data *emp);
-	
 	bool a_timeout = EMPIRE_IS_TIMED_OUT(a);
 	bool b_timeout = EMPIRE_IS_TIMED_OUT(b);
 

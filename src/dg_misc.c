@@ -33,7 +33,6 @@ void combat_meter_damage_dealt(char_data *ch, int amt);
 void combat_meter_damage_taken(char_data *ch, int amt);
 void combat_meter_heal_dealt(char_data *ch, int amt);
 void combat_meter_heal_taken(char_data *ch, int amt);
-extern obj_data *die(char_data *ch, char_data *killer);
 extern room_data *get_room(room_data *ref, char *name);
 
 /* external vars */
@@ -408,7 +407,6 @@ void do_dg_build(room_data *target, char *argument) {
 */
 void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh) {
 	void kill_empire_npc(char_data *ch);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	
 	empire_data *owner;
 	
@@ -711,7 +709,6 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 		remove_depletion(target, DPLTN_PRODUCTION);
 		
 		if (ROOM_OWNER(target)) {
-			void deactivate_workforce_room(empire_data *emp, room_data *room);
 			deactivate_workforce_room(ROOM_OWNER(target), target);
 		}
 	}
@@ -726,8 +723,6 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 * @param sector_data *sect The sector to change it to.
 */
 void do_dg_terraform(room_data *target, sector_data *sect) {
-	void finish_trench(room_data *room);
-	
 	if (!target || !sect) {
 		return;
 	}
@@ -748,7 +743,6 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 	remove_depletion(target, DPLTN_PRODUCTION);
 	
 	if (ROOM_OWNER(target)) {
-		void deactivate_workforce_room(empire_data *emp, room_data *room);
 		deactivate_workforce_room(ROOM_OWNER(target), target);
 	}
 	
@@ -896,9 +890,7 @@ void run_reboot_triggers(void) {
 * @param double modifier Percent to multiply scaled damage by (to make it lower or higher).
 */
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier) {
-	void death_log(char_data *ch, char_data *killer, int type);
 	extern int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype);
-	void scale_mob_for_character(char_data *mob, char_data *ch);
 	void scale_mob_to_level(char_data *mob, int level);
 	
 	double dam;
@@ -1189,9 +1181,7 @@ void script_modify(char *argument) {
 	void change_long_desc(char_data *ch, char *str);
 	void change_look_desc(char_data *ch, char *str, bool format);
 	void change_look_desc_append(char_data *ch, char *str, bool format);
-	void change_sex(char_data *ch, int sex);
 	void change_short_desc(char_data *ch, char *str);
-	extern bool despawn_companion(char_data *ch, mob_vnum vnum);
 	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);

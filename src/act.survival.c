@@ -392,8 +392,6 @@ void do_mount_new(char_data *ch, char *argument) {
 
 // release your current mount
 void do_mount_release(char_data *ch, char *argument) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	struct mount_data *mount;
 	char_data *mob;
 	
@@ -587,8 +585,6 @@ ACMD(do_butcher) {
 
 
 ACMD(do_dismount) {
-	void do_unseat_from_vehicle(char_data *ch);
-	
 	char_data *mount;
 	
 	if (IS_RIDING(ch)) {

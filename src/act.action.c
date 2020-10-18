@@ -41,14 +41,6 @@ extern struct gen_craft_data_t gen_craft_data[];
 extern const bool interact_one_at_a_time[NUM_INTERACTS];
 extern const char *tool_flags[];
 
-// external funcs
-extern double get_base_dps(obj_data *weapon);
-extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
-extern char *get_mine_type_name(room_data *room);
-extern bool is_deep_mine(room_data *room);
-void schedule_crop_growth(struct map_data *map);
-void uncrop_tile(room_data *room);
-
 // cancel protos
 void cancel_resource_list(char_data *ch);
 void cancel_driving(char_data *ch);
@@ -268,10 +260,6 @@ void stop_room_action(room_data *room, int action) {
 * This is the main processor for periodic actions (ACT_), once per second.
 */
 void update_actions(void) {
-	// Extern functions.
-	extern vehicle_data *get_current_piloted_vehicle(char_data *ch);
-	
-	// Extern vars.
 	extern bool catch_up_actions;
 	
 	// prevent running multiple action rounds during a catch-up cycle
@@ -1322,8 +1310,6 @@ void process_bathing(char_data *ch) {
 * @param char_data *ch The builder.
 */
 void process_build_action(char_data *ch) {
-	extern craft_data *find_building_list_entry(room_data *room, byte type);
-	
 	char buf1[MAX_STRING_LENGTH];
 	craft_data *type = NULL;
 	
@@ -1359,9 +1345,6 @@ void process_build_action(char_data *ch) {
 * @param char_data *ch The person burning the area.
 */
 void process_burn_area(char_data *ch) {
-	void perform_burn_room(room_data *room);
-	extern bool used_lighter(char_data *ch, obj_data *obj);
-	
 	if (!validate_burn_area(ch, GET_ACTION_VNUM(ch, 0))) {
 		// sends own message
 		cancel_action(ch);
@@ -1467,8 +1450,6 @@ void process_chipping(char_data *ch) {
 * @param char_data *ch The chopper.
 */
 void process_chop(char_data *ch) {
-	extern int change_chop_territory(room_data *room);
-	
 	bool got_any = FALSE;
 	char_data *ch_iter;
 	obj_data *axe;
@@ -1587,8 +1568,6 @@ void process_digging(char_data *ch) {
 * @param char_data *ch The dismantler.
 */
 void process_dismantle_action(char_data *ch) {
-	void process_dismantling(char_data *ch, room_data *room);
-	
 	int count, total;
 	
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
@@ -1630,8 +1609,6 @@ void process_escaping(char_data *ch) {
 * @param char_data *ch The excavator.
 */
 void process_excavating(char_data *ch) {
-	void finish_trench(room_data *room);
-	
 	int count, total;
 	char_data *iter;
 
@@ -1709,8 +1686,6 @@ void process_excavating(char_data *ch) {
 * @param char_data *ch The filler-inner.
 */
 void process_fillin(char_data *ch) {
-	void untrench_room(room_data *room);
-
 	int count, total;
 
 	total = 1;	// shovelfuls to fill in at once (add things that speed up fillin)
@@ -2023,9 +1998,6 @@ void process_harvesting(char_data *ch) {
 * @param char_data *ch The hunter.
 */
 void process_hunting(char_data *ch) {
-	void scale_mob_for_character(char_data *mob, char_data *ch);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	struct affected_type *af;
 	char_data *mob;
 	
@@ -2249,8 +2221,6 @@ void process_minting(char_data *ch) {
 * @param char_data *ch The morpher.
 */
 void process_morphing(char_data *ch) {
-	void finish_morphing(char_data *ch, morph_data *morph);
-
 	GET_ACTION_TIMER(ch) -= 1;
 
 	if (GET_ACTION_TIMER(ch) <= 0) {
@@ -2457,8 +2427,6 @@ void process_prospecting(char_data *ch) {
 * @param char_data *ch The character doing the repairing.
 */
 void process_repairing(char_data *ch) {
-	extern vehicle_data *find_vehicle(int n);
-
 	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
 	struct resource_data *res, temp_res;
@@ -2589,8 +2557,6 @@ void process_scraping(char_data *ch) {
 * @param char_data *ch The sirer (?).
 */
 void process_siring(char_data *ch) {
-	void sire_char(char_data *ch, char_data *victim);
-	
 	if (!GET_FEEDING_FROM(ch)) {
 		cancel_action(ch);
 	}
@@ -3634,9 +3600,6 @@ ACMD(do_scrape) {
 
 
 ACMD(do_stop) {
-	void cancel_action(char_data *ch);
-	extern bool cancel_biting(char_data *ch);
-	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "No, you stop.\r\n");
 	}
@@ -3946,11 +3909,11 @@ void start_gen_interact_room(char_data *ch, const struct gen_interact_data_t *da
 * @param char_data *ch The person doing the interaction.
 */
 void process_gen_interact_room(char_data *ch) {
-	const struct gen_interact_data_t *data = get_interact_data_by_action(GET_ACTION(ch));
+	const struct gen_interact_data_t *data;
 	room_data *in_room;
 	int count, pos;
 	
-	if (!data || !validate_gen_interact_room(ch, data)) {
+	if (!(data = get_interact_data_by_action(GET_ACTION(ch))) || !validate_gen_interact_room(ch, data)) {
 		cancel_action(ch);
 		return;
 	}

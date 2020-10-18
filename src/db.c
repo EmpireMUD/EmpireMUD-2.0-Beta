@@ -974,9 +974,7 @@ void process_temporary_room_data(void) {
 * scheduled until this point.
 */
 void renum_world(void) {
-	void check_tavern_setup(room_data *room);
 	void schedule_burn_down(room_data *room);
-	void schedule_crop_growth(struct map_data *map);
 	void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 	void schedule_trench_fill(struct map_data *map);
 	
@@ -2392,9 +2390,6 @@ PLAYER_UPDATE_FUNC(b4_4_fight_messages) {
 
 // convert data on unfinished buildings and disrepair
 void b4_15_building_update(void) {
-	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
-	extern struct resource_data *copy_resource_list(struct resource_data *input);
-	
 	struct resource_data *res, *disrepair_res;
 	room_data *room, *next_room;
 	
@@ -3350,7 +3345,6 @@ void b5_38_grove_update(void) {
 // add new channels
 PLAYER_UPDATE_FUNC(b5_40_update_players) {
 	extern struct slash_channel *create_slash_channel(char *name);
-	extern struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
 	extern struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
 	
 	struct player_slash_channel *slash;
@@ -3419,8 +3413,6 @@ PLAYER_UPDATE_FUNC(b5_47_update_players) {
 
 // resets mountain tiles off-cycle because of the addition of tin
 void b5_47_mine_update(void) {
-	void save_island_table();
-	
 	struct island_info *isle, *next_isle;
 	struct map_data *tile;
 	bool any = FALSE;
@@ -3506,7 +3498,6 @@ void b5_58_gather_totals(void) {
 // add new channel
 PLAYER_UPDATE_FUNC(b5_60_update_players) {
 	extern struct slash_channel *create_slash_channel(char *name);
-	extern struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
 	extern struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
 	
 	struct player_slash_channel *slash;
@@ -3798,7 +3789,6 @@ void b5_86_update(void) {
 // also adds old-growth forests
 void b5_87_crop_and_old_growth(void) {
 	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
-	void uncrop_tile(room_data *room);
 	
 	int removed_crop = 0, total_crop = 0, new_og = 0, total_forest = 0;
 	struct empire_completed_goal *goal, *next_goal;
@@ -4430,7 +4420,6 @@ void b5_102_home_cleanup(void) {
 
 // b5.103 removes the REPAIR-VEHICLES workforce chore
 void b5_103_update(void) {
-	void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 	empire_data *emp, *next_emp;
 	
 	const int CHORE_REPAIR_VEHICLES = 26;
@@ -4461,7 +4450,6 @@ void b5_104_update(void) {
 
 // b5.105 modifies workforce configs due to chore changes
 void b5_105_update(void) {
-	void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 	empire_data *emp, *next_emp;
 	
 	int CHORE_BRICKMAKING = 13;
@@ -4549,8 +4537,6 @@ void check_version(void) {
 		
 		// version-specific updates
 		if (MATCH_VERSION("b2.5")) {
-			void set_workforce_limit_all(empire_data *emp, int chore, int limit);
-			
 			log("Applying b2.5 update to empires...");
 			empire_data *emp, *next_emp;
 			HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -4879,8 +4865,6 @@ void check_version(void) {
 * @param int chore Which CHORE_ to turn on.
 */
 void assign_old_workforce_chore(empire_data *emp, int chore) {
-	void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
-	
 	struct trd_type *trd, *next_trd;
 	struct map_data *map;
 	int last_isle = -1;

@@ -56,9 +56,7 @@ extern const char *olc_type_bits[NUM_OLC_TYPES+1];
 extern int count_cities(empire_data *emp);
 extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 extern struct req_data *copy_requirements(struct req_data *from);
-extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 void drop_quest(char_data *ch, struct player_quest *pq);
-extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_requirement_display(struct req_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
@@ -76,7 +74,6 @@ int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 int count_owned_homes(empire_data *emp);
 int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
-void count_quest_tasks(struct req_data *list, int *complete, int *total);
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 void free_player_quests(struct player_quest *list);
 void free_quest_givers(struct quest_giver *list);
@@ -4986,8 +4983,6 @@ void save_olc_quest(descriptor_data *desc) {
 * @return quest_data* The copied quest.
 */
 quest_data *setup_olc_quest(quest_data *input) {
-	extern struct apply_data *copy_apply_list(struct apply_data *input);
-	
 	quest_data *new;
 	
 	CREATE(new, quest_data, 1);

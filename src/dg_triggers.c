@@ -2950,8 +2950,6 @@ void check_reset_trigger_event(room_data *room, bool random_offset) {
 * @return int The return value of a script (1 is normal, 0 suppresses the death cry).
 */
 int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer) {
-	extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
-	
 	union script_driver_data_u sdd;
 	char_data *ch_iter, *next_ch;
 	trig_data *trig, *next_trig;

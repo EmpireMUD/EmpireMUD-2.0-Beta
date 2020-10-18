@@ -43,8 +43,6 @@ const char *default_ability_name = "Unnamed Ability";
 // local protos
 bool has_matching_role(char_data *ch, ability_data *abil, bool ignore_solo_check);
 void perform_ability_command(char_data *ch, ability_data *abil, char *argument);
-void remove_passive_buff(char_data *ch, struct affected_type *aff);
-void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
 double standard_ability_scale(char_data *ch, ability_data *abil, int level, bitvector_t type, struct ability_exec *data);
 
 // external consts
@@ -67,18 +65,14 @@ extern const char *position_types[];
 extern const char *skill_check_difficulty[];
 extern const char *wait_types[];
 
-// external funcs
-void check_combat_start(char_data *ch);
-extern bool check_vampire_sun(char_data *ch, bool message);
-extern int get_attack_type_by_name(char *name);
-extern bool trigger_counterspell(char_data *ch);	// spells.c
 
-
-// ability funcs
+// ability function prototypes
 DO_ABIL(do_buff_ability);
 PREP_ABIL(prep_buff_ability);
+
 DO_ABIL(do_damage_ability);
 PREP_ABIL(prep_damage_ability);
+
 DO_ABIL(do_dot_ability);
 PREP_ABIL(prep_dot_ability);
 
@@ -877,12 +871,6 @@ bool is_class_ability(ability_data *abil) {
 * @return char_data* The mob that was summoned, if possible (NULL otherwise).
 */
 char_data *load_companion_mob(char_data *master, struct companion_data *cd) {
-	void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
-	extern bool despawn_companion(char_data *ch, mob_vnum vnum);
-	void reread_companion_trigs(char_data *mob);
-	void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	struct trig_proto_list *tp;
 	struct trig_var_data *var;
 	struct companion_mod *cm;
@@ -1271,8 +1259,6 @@ void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trig
 * @param char_data *ch The player.
 */
 void setup_ability_companions(char_data *ch) {
-	extern struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
-	
 	struct player_ability_data *plab, *next_plab;
 	struct ability_data_list *adl;
 	ability_data *abil;
@@ -1372,8 +1358,6 @@ void apply_ability_effects(ability_data *abil, char_data *ch) {
 * @return bool TRUE if it was an ability command and we acted; FALSE if not
 */
 bool check_ability(char_data *ch, char *string, bool exact) {
-	extern bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
-	
 	char cmd[MAX_STRING_LENGTH], arg1[MAX_STRING_LENGTH];
 	ability_data *iter, *next_iter, *abil, *abbrev;
 	
@@ -2169,8 +2153,6 @@ char *list_one_ability(ability_data *abil, bool detail) {
 * @param any_vnum vnum The ability vnum.
 */
 void olc_search_ability(char_data *ch, any_vnum vnum) {
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	ability_data *abil = find_ability_by_vnum(vnum);
 	struct global_data *glb, *next_glb;
@@ -2435,9 +2417,6 @@ void free_ability(ability_data *abil) {
 * @param any_vnum vnum The ability vnum
 */
 void parse_ability(FILE *fl, any_vnum vnum) {
-	void parse_apply(FILE *fl, struct apply_data **list, char *error_str);
-	void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
-	
 	char line[256], error[256], str_in[256], str_in2[256], str_in3[256];
 	struct ability_data_list *adl;
 	ability_data *abil, *find;
@@ -2718,9 +2697,6 @@ void write_ability_index(FILE *fl) {
 * @param ability_data *abil The thing to save.
 */
 void write_ability_to_file(FILE *fl, ability_data *abil) {
-	void write_applies_to_file(FILE *fl, struct apply_data *list);
-	void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
-	
 	char temp[256], temp2[256], temp3[256];
 	struct ability_data_list *adl;
 	struct ability_type *at;
@@ -2788,7 +2764,6 @@ void write_ability_to_file(FILE *fl, ability_data *abil) {
  //////////////////////////////////////////////////////////////////////////////
 //// OLC HANDLERS ////////////////////////////////////////////////////////////
 
-
 /**
 * Creates a new ability entry.
 * 
@@ -2825,11 +2800,6 @@ ability_data *create_ability_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_ability(char_data *ch, any_vnum vnum) {
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
-	extern bool remove_vnum_from_class_abilities(struct class_ability **list, any_vnum vnum);
-	extern bool remove_vnum_from_skill_abilities(struct skill_ability **list, any_vnum vnum);
-	extern bool remove_ability_from_synergy_abilities(struct synergy_ability **list, any_vnum abil_vnum);
-	
 	struct player_ability_data *plab, *next_plab;
 	ability_data *abil, *abiter, *next_abiter;
 	struct global_data *glb, *next_glb;
@@ -3384,8 +3354,6 @@ void save_olc_ability(descriptor_data *desc) {
 * @return ability_data* The copied ability.
 */
 ability_data *setup_olc_ability(ability_data *input) {
-	extern struct apply_data *copy_apply_list(struct apply_data *input);
-	
 	ability_data *new;
 	
 	CREATE(new, ability_data, 1);
@@ -3698,7 +3666,6 @@ OLC_MODULE(abiledit_affectvnum) {
 
 
 OLC_MODULE(abiledit_apply) {
-	void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	olc_process_applies(ch, argument, &ABIL_APPLIES(abil));
 }
@@ -3814,7 +3781,6 @@ OLC_MODULE(abiledit_costtype) {
 
 
 OLC_MODULE(abiledit_custom) {
-	void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
 	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	
 	olc_process_custom_messages(ch, argument, &ABIL_CUSTOM_MSGS(abil), ability_custom_types);
@@ -4088,9 +4054,9 @@ OLC_MODULE(abiledit_name) {
 
 
 OLC_MODULE(abiledit_scale) {
+	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	int scale;
 	
-	ability_data *abil = GET_OLC_ABILITY(ch->desc);
 	scale = olc_process_number(ch, argument, "scale", "scale", 1, 1000, ABIL_SCALE(abil) * 100);
 	ABIL_SCALE(abil) = scale / 100.0;
 }

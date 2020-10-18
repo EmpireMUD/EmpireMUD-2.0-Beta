@@ -1662,6 +1662,9 @@ struct time_info_data *real_time_passed(time_t t2, time_t t1);
 // building functions from utils.c
 bld_data *get_building_by_name(char *name, bool room_only);
 
+// character functions from utils.c
+void change_sex(char_data *ch, int sex);
+
 // component functions from utils.c
 generic_data *find_generic_component(char *name);
 bool is_basic_component(obj_data *obj);
@@ -1672,6 +1675,9 @@ bool is_component(obj_data *obj, generic_data *cmp);
 bool can_claim(char_data *ch);
 int count_members_online(empire_data *emp);
 int count_tech(empire_data *emp);
+bool empire_can_claim(empire_data *emp);
+int get_total_score(empire_data *emp);
+bool is_trading_with(empire_data *emp, empire_data *partner);
 
 // empire diplomacy utils from utils.c
 bool char_has_relationship(char_data *ch_a, char_data *ch_b, bitvector_t dipl_bits);
@@ -1733,6 +1739,7 @@ double rate_item(obj_data *obj);
 // player functions from utils.c
 void command_lag(char_data *ch, int wait_type);
 void determine_gear_level(char_data *ch);
+room_data *find_load_room(char_data *ch);
 int pick_level_from_range(int level, int min, int max);
 bool wake_and_stand(char_data *ch);
 
@@ -1788,17 +1795,18 @@ bool check_sunny(room_data *room);
 char *coord_display(char_data *ch, int x, int y, bool fixed_width);
 #define coord_display_room(ch, room, fixed_width)  coord_display((ch), (room && !NO_LOCATION(room)) ? X_COORD(room) : NOWHERE, (room && !NO_LOCATION(room)) ? Y_COORD(room) : NOWHERE, (fixed_width))
 int count_flagged_sect_between(bitvector_t sectf_bits, room_data *start, room_data *end, bool check_base_sect);
-bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with_flags, bitvector_t without_flags, int distance);
-bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance);
-bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int distance);
-bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance);
 double compute_map_distance(int x1, int y1, int x2, int y2);
 #define compute_distance(from, to)  ((int)compute_map_distance(X_COORD(from), Y_COORD(from), X_COORD(to), Y_COORD(to)))
 int count_adjacent_sectors(room_data *room, sector_vnum sect, bool count_original_sect);
 int distance_to_nearest_player(room_data *room);
+bool find_flagged_sect_within_distance_from_char(char_data *ch, bitvector_t with_flags, bitvector_t without_flags, int distance);
+bool find_flagged_sect_within_distance_from_room(room_data *room, bitvector_t with_flags, bitvector_t without_flags, int distance);
+bool find_sect_within_distance_from_char(char_data *ch, sector_vnum sect, int distance);
+bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int distance);
 bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *new_x, int *new_y);
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);
+bool is_deep_mine(room_data *room);
 room_data *real_shift(room_data *origin, int x_shift, int y_shift);
 room_data *straight_line(room_data *origin, room_data *destination, int iter);
 sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags, bitvector_t prefer_climate);
@@ -1812,6 +1820,9 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 
 // abilities.c
 void add_ability_gain_hook(char_data *ch, ability_data *abil);
+ability_data *find_player_ability_by_tech(char_data *ch, int ptech);
+void remove_passive_buff(char_data *ch, struct affected_type *aff);
+void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
 void run_ability_gain_hooks(char_data *ch, char_data *opponent, bitvector_t trigger);
 
 // act.action.c
@@ -1822,38 +1833,93 @@ void start_action(char_data *ch, int type, int timer);
 void stop_room_action(room_data *room, int action);
 
 // act.comm.c
+void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message);
+struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
+bool is_ignoring(char_data *ch, char_data *victim);
 void log_to_slash_channel_by_name(char *chan_name, char_data *ignorable_person, const char *messg, ...);
 
 // act.empire.c
 bool check_in_city_requirement(room_data *room, bool check_wait);
 int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon);
 #define is_in_city_for_empire(loc, emp, check_wait, city_too_soon)  (get_territory_type_for_empire((loc), (emp), (check_wait), (city_too_soon)) == TER_CITY)	// backwards-compatibility
+void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
+void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
+void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 
 // act.informative.c
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
+void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
+struct custom_message *pick_custom_longdesc(char_data *ch);
 
 // act.item.c
+int count_objs_in_room(room_data *room);
+int find_free_shipping_id(empire_data *emp);
+obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 int obj_carry_size(obj_data *obj);
 void scale_item_to_level(obj_data *obj, int level);
+bool used_lighter(char_data *ch, obj_data *obj);
 
 // act.movement.c
 int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
+
+// act.naturalmagic.c
+bool despawn_companion(char_data *ch, mob_vnum vnum);
+int total_bonus_healing(char_data *ch);
+
+// act.other.c
+void cancel_adventure_summon(char_data *ch);
+
+// act.quest.c
+void count_quest_tasks(struct req_data *list, int *complete, int *total);
 
 // act.trade.c
 bool check_can_craft(char_data *ch, craft_data *type);
 bool find_and_bind(char_data *ch, obj_vnum vnum);
 int get_craft_scale_level(char_data *ch, craft_data *craft);
+int get_crafting_level(char_data *ch);
 obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 
+// act.vampire.c
+bool cancel_biting(char_data *ch);
+bool check_vampire_sun(char_data *ch, bool message);
+
+// act.vehicles.c
+void do_unseat_from_vehicle(char_data *ch);
+bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
+vehicle_data *get_current_piloted_vehicle(char_data *ch);
+void sire_char(char_data *ch, char_data *victim);
+
 // building.c
+struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
+craft_data *find_building_list_entry(room_data *room, byte type);
 void herd_animals_out(room_data *location);
 bool is_entrance(room_data *room);
 void process_build(char_data *ch, room_data *room, int act_type);
+void process_dismantling(char_data *ch, room_data *room);
 void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 
 // faction.c
 const char *get_faction_name_by_vnum(any_vnum vnum);
 const char *get_reputation_name(int type);
+
+// fight.c
+void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
+bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
+void check_combat_start(char_data *ch);
+bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
+void death_log(char_data *ch, char_data *killer, int type);
+obj_data *die(char_data *ch, char_data *killer);
+double get_base_dps(obj_data *weapon);
+int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
+int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
+bool is_fight_ally(char_data *ch, char_data *frenemy);
+bool is_fight_enemy(char_data *ch, char_data *frenemy);
+void perform_execute(char_data *ch, char_data *victim, int attacktype, int damtype);
+obj_data *player_death(char_data *ch);
+void reset_combat_meters(char_data *ch);
+void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
+bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
+bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target);
 
 // generic.c
 bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
@@ -1868,6 +1934,8 @@ void gain_condition(char_data *ch, int condition, int value);
 
 // mapview.c
 bool adjacent_room_is_light(room_data *room);
+int get_map_radius(char_data *ch);
+char *get_mine_type_name(room_data *room);
 char *get_room_name(room_data *room, bool color);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
@@ -1880,8 +1948,16 @@ char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bo
 #define get_informative_color_room(ch, room)  get_informative_color((ch), IS_DISMANTLING(room) ? TRUE : FALSE, !IS_COMPLETE(room), HAS_MAJOR_DISREPAIR(room), HAS_MINOR_DISREPAIR(room), (IS_COMPLETE(room) && HAS_FUNCTION(room, FNC_MINE)) ? (get_room_extra_data(room, ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0, ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK) ? TRUE : FALSE, ch && IS_IMMORTAL(ch) && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room) && distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(room), Y_COORD(room)) > 2)
 #define get_informative_color_veh(ch, veh)  get_informative_color((ch), VEH_IS_DISMANTLING(veh) ? TRUE : FALSE, !VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh), VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), room_has_function_and_city_ok(VEH_OWNER(veh), IN_ROOM(veh), FNC_MINE) ? (get_room_extra_data(IN_ROOM(veh), ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0, VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK) || (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)) && distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh))) > 2)
 
+// mobact.c
+bool check_scaling(char_data *mob, char_data *attacker);
+int determine_best_scale_level(char_data *ch, bool check_group);
+void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
+void scale_mob_for_character(char_data *mob, char_data *ch);
+void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+
 // morph.c
 const char *get_morph_desc(char_data *ch, bool long_desc_if_true);
+void finish_morphing(char_data *ch, morph_data *morph);
 
 // olc.building.c
 bool bld_has_relation(bld_data *bld, int type, bld_vnum vnum);
@@ -1889,8 +1965,20 @@ bool veh_has_relation(vehicle_data *veh, int type, any_vnum vnum);
 int count_bld_relations(bld_data *bld, int type);
 char *get_bld_name_by_proto(bld_vnum vnum);
 
+// progress.c
+bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
+progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
+progress_data *find_progress_goal_by_name(char *name);
+progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name);
+void get_progress_perks_display(struct progress_perk *list, char *save_buffer, bool show_vnums);
+void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
+void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
+
 // quest.c
 char *get_quest_name_by_proto(any_vnum vnum);
+void get_tracker_display(struct req_data *tracker, char *save_buffer);
+void refresh_all_quests(char_data *ch);
+
 void qt_change_ability(char_data *ch, any_vnum abil);
 void qt_change_level(char_data *ch, int level);
 void qt_change_production_total(char_data *ch, any_vnum vnum, int amount);
@@ -1951,12 +2039,23 @@ void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
 int get_new_vehicle_construction_id();
 room_data *get_vehicle_interior(vehicle_data *veh);
 char *get_vehicle_name_by_proto(obj_vnum vnum);
+char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
 void start_dismantle_vehicle(vehicle_data *veh);
 int total_small_vehicles_in_room(room_data *room);
 int total_vehicle_size_in_room(room_data *room);
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
+bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
+
+// weather.c
+byte distance_can_see(char_data *ch);
+
+// workforce.c
+void deactivate_workforce(empire_data *emp, int island_id, int type);
+void deactivate_workforce_room(empire_data *emp, room_data *room);
+int *get_ordered_chores();
+void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
 
 
  //////////////////////////////////////////////////////////////////////////////

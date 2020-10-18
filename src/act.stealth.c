@@ -38,8 +38,6 @@ extern const int rev_dir[];
 // external funcs
 INTERACTION_FUNC(consumes_or_decays_interact);
 ACMD(do_dismount);
-void check_combat_start(char_data *ch);
-extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 
 // locals
 int apply_poison(char_data *ch, char_data *vict);
@@ -1092,7 +1090,6 @@ ACMD(do_jab) {
 
 
 ACMD(do_pickpocket) {
-	extern bool check_scaling(char_data *mob, char_data *attacker);
 	extern int mob_coins(char_data *mob);
 
 	empire_data *ch_emp = NULL, *vict_emp = NULL;
@@ -1623,7 +1620,6 @@ ACMD(do_sneak) {
 
 ACMD(do_steal) {
 	bool show_local_einv(char_data *ch, room_data *room, bool thief_mode);
-	void read_vault(empire_data *emp);
 	
 	struct empire_storage_data *store, *next_store;
 	empire_data *emp = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));

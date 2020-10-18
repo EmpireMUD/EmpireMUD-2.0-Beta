@@ -47,26 +47,18 @@ extern struct character_size_data size_data[];
 
 // external funcs
 ACMD(do_flee);
-bool check_scaling(char_data *mob, char_data *based_on);
-extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 INTERACTION_FUNC(consumes_or_decays_interact);
-extern int determine_best_scale_level(char_data *ch, bool check_group);
 void end_pursuit(char_data *ch, char_data *target);
 
 // locals
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
-obj_data *die(char_data *ch, char_data *killer);
 void drop_loot(char_data *mob, char_data *killer);
 int get_block_rating(char_data *ch, bool can_gain_skill);
-int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 double get_weapon_speed(obj_data *weapon);
 void heal(char_data *ch, char_data *vict, int amount);
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round);
 extern int lock_instance_level(room_data *room, int level);
 obj_data *make_corpse(char_data *ch);
-void perform_execute(char_data *ch, char_data *victim, int attacktype, int damtype);
-void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1795,8 +1787,6 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 * @return obj_data* The player's corpse object, if any.
 */
 obj_data *player_death(char_data *ch) {
-	void cancel_adventure_summon(char_data *ch);
-	
 	obj_data *corpse;
 	perform_dismount(ch);	// just to be sure
 	death_restore(ch);
@@ -1865,7 +1855,6 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 		
 		// cancel any action the character is doing
 		if (GET_ACTION(ch) != ACT_NONE) {
-			void cancel_action(char_data *ch);
 			cancel_action(ch);
 		}
 	}

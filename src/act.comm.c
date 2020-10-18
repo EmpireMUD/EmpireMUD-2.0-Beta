@@ -30,19 +30,14 @@
 *   Communication Commands
 */
 
-// externs
-void clear_last_act_message(descriptor_data *desc);
-
-// locals
-struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
-bool is_ignoring(char_data *ch, char_data *victim);
+// local prototypes
 FILE *open_slash_channel_file(struct slash_channel *chan);
 struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message);
 void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entry);
 void write_slash_channel_configs(struct slash_channel *chan);
 void write_slash_channel_index();
 
-
+// local data
 #define MAX_RECENT_CHANNELS		20		/* Number of pub_comm uses to remember */
 
 #define PUB_COMM_OOC  0

@@ -45,7 +45,6 @@ extern bool has_anonymous_host(descriptor_data *desc);
 void parse_archetype_menu(descriptor_data *desc, char *argument);
 
 // locals
-bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
 void next_creation_step(descriptor_data *d);
 void set_creation_state(descriptor_data *d, int state);
 void show_bonus_trait_menu(char_data *ch);
@@ -2160,8 +2159,6 @@ void send_login_motd(descriptor_data *desc, int bad_pws) {
  *      into person returns.  This function seems a bit over-extended too.
  */
 int perform_dupe_check(descriptor_data *d) {
-	void refresh_all_quests(char_data *ch);
-	
 	descriptor_data *k, *next_k;
 	char_data *target = NULL, *ch, *next_ch;
 	int mode = 0;

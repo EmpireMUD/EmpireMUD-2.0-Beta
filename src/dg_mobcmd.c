@@ -61,16 +61,13 @@ extern struct instance_data *quest_instance_global;
 
 // external funcs
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
-void die(char_data *ch, char_data *killer);
 extern struct instance_data *get_instance_by_mob(char_data *mob);
 extern room_data *get_room(room_data *ref, char *name);
 extern vehicle_data *get_vehicle(char *name);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
-extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
 extern room_data *obj_room(obj_data *obj);
 void scale_mob_to_level(char_data *mob, int level);
 void send_char_pos(char_data *ch, int dam);
-void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
 void sub_write_to_room(char *str, room_data *room, bool use_queue);
 
@@ -1549,8 +1546,6 @@ ACMD(do_mdamage) {
 
 
 ACMD(do_maoe) {
-	extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
-
 	char modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
 	int level, type;
@@ -1902,11 +1897,6 @@ ACMD(do_mforget) {
 
 
 ACMD(do_msiege) {
-	void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
-	extern bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
-	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
-	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
-	
 	char scale_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh_targ = NULL;
 	room_data *room_targ = NULL;

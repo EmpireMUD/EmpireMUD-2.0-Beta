@@ -60,19 +60,14 @@ extern const struct wear_data_type wear_data[NUM_WEARS];
 
 /* external functions */
 void check_for_eligible_goals(empire_data *emp);	// progress.c
-void count_quest_tasks(struct req_data *list, int *complete, int *total);
-extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 extern struct instance_data *get_instance_for_script(int go_type, void *go);
 void free_varlist(struct trig_var_data *vd);
 extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
-extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
-extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);	// quest.c
 extern int is_substring(char *sub, char *string);
 extern room_data *obj_room(obj_data *obj);
 trig_data *read_trigger(trig_vnum vnum);
-void reread_companion_trigs(char_data *mob);
 obj_data *get_object_in_equip(char_data *ch, char *name);
 void extract_trigger(trig_data *trig);
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type);
@@ -2923,7 +2918,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					
 					else if (!str_cmp(field, "add_companion")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
-							struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
 							char_data *pet = mob_proto(atoi(subfield));
 							if (pet) {
 								add_companion(c, GET_MOB_VNUM(pet), NO_ABIL);
@@ -3133,7 +3127,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "bonus_healing")) {
-						extern int total_bonus_healing(char_data *ch);
 						snprintf(str, slen, "%d", total_bonus_healing(c));
 					}
 					else if (!str_cmp(field, "bonus_magical")) {
@@ -3182,7 +3175,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", (!IS_NPC(c) && CAN_GAIN_NEW_SKILLS(c)) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "cancel_adventure_summon")) {
-						void cancel_adventure_summon(char_data *ch);
 						if (!IS_NPC(c)) {
 							cancel_adventure_summon(c);
 						}
@@ -3366,7 +3358,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "crafting_level")) {
-						extern int get_crafting_level(char_data *ch);
 						snprintf(str, slen, "%d", get_crafting_level(c));
 					}
 					else if (!str_cmp(field, "currency")) {
@@ -3414,7 +3405,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "dodge")) {
-						extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
 						snprintf(str, slen, "%d", get_dodge_modifier(c, NULL, FALSE));
 					}
 					else if (!str_cmp(field, "drunk")) {
@@ -3501,8 +3491,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 					}
 					else if (!str_cmp(field, "find_lighter")) {
-						extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
-						
 						bool junk;
 						obj_data *lighter = find_lighter_in_list(c->carrying, &junk);
 						if (lighter) {
@@ -3883,7 +3871,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					
 					else if (!str_cmp(field, "is_ignoring")) {
-						bool is_ignoring(char_data *ch, char_data *victim);
 						char_data *targ;
 						if (subfield && *subfield && ((targ = get_char(subfield))) && is_ignoring(c, targ)) {
 							strcpy(str, "1");
@@ -4012,8 +3999,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%s", PERS(c, c, FALSE));
 					}
 					else if (!str_cmp(field, "namelist")) {
-						void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-						
 						if (!IS_NPC(c)) {
 							snprintf(str, slen, "%d", NOTHING);
 						}
@@ -4391,11 +4376,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_COND(c, THIRST) / REAL_UPDATES_PER_MUD_HOUR);
 					}
 					else if (!str_cmp(field, "tohit")) {
-						extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 						snprintf(str, slen, "%d", get_to_hit(c, NULL, FALSE, FALSE));
 					}
 					else if (!str_cmp(field, "trigger_counterspell")) {
-						extern bool trigger_counterspell(char_data *ch);	// spells.c
 						if (trigger_counterspell(c)) {
 							snprintf(str, slen, "1");
 						}
@@ -4849,7 +4832,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'u': {	// obj.u*
 					if (!str_cmp(field, "used_lighter")) {
-						extern bool used_lighter(char_data *ch, obj_data *obj);
 						char_data *person = NULL;
 						
 						if (subfield && *subfield) {	// optional person

@@ -477,9 +477,10 @@ void add_to_lookup_table(int uid, void *c);
 void remove_from_lookup_table(int uid);
 
 // find helpers
-extern char_data *find_char(int n);
-extern empire_data *find_empire_by_uid(int n);
-extern room_data *find_room(int n);
+char_data *find_char(int n);
+empire_data *find_empire_by_uid(int n);
+room_data *find_room(int n);
+vehicle_data *find_vehicle(int n);
 
 // purge helpers
 void create_dg_owner_purged_tracker(trig_data *trig, char_data *ch, obj_data *obj, room_data *room, vehicle_data *veh);

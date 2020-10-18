@@ -49,17 +49,10 @@ extern const struct toggle_data_type toggle_data[];	// constants.c
 // external prototypes
 void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
 extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
-extern bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
 void check_delayed_load(char_data *ch);
-extern bool check_scaling(char_data *mob, char_data *attacker);
-extern bool check_vampire_sun(char_data *ch, bool message);
-extern bool despawn_companion(char_data *ch, mob_vnum vnum);
 extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
 extern int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
-void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
-extern bool is_ignoring(char_data *ch, char_data *victim);
 void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
-void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
 extern char *show_color_codes(char *string);
 
 // locals
@@ -147,8 +140,6 @@ void adventure_summon(char_data *ch, char *argument) {
 * @param char_data *ch The person to return back where they came from.
 */
 void adventure_unsummon(char_data *ch) {
-	extern room_data *find_load_room(char_data *ch);
-	
 	room_data *room, *map;
 	
 	// safety first
@@ -629,8 +620,6 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 * @return bool TRUE if anything was summoned; FALSE if we sent an error.
 */
 bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool checks) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	int level = get_player_level_for_ability(ch, abil ? ABIL_VNUM(abil) : NO_ABIL);
 	char_data *proto = mob_proto(vnum);
 	char_data *mob;
@@ -1303,7 +1292,6 @@ void alt_import_recolors(char_data *ch, char_data *alt) {
 * @param char_data *alt Player to import from.
 */
 void alt_import_slash_channels(char_data *ch, char_data *alt) {
-	extern struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
 	extern struct slash_channel *find_slash_channel_by_id(int id);
 	extern struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
 	ACMD(do_slash_channel);
@@ -1672,7 +1660,6 @@ ACMD(do_accept) {
 ACMD(do_alternate) {
 	extern int isbanned(char *hostname);
 	extern bool has_anonymous_host(descriptor_data *desc);
-	extern bool member_is_timed_out_ch(char_data *ch);
 	extern const char *class_role[];
 	extern const char *class_role_color[];
 
@@ -3050,7 +3037,6 @@ ACMD(do_minipets) {
 
 ACMD(do_morph) {
 	extern morph_data *find_morph_by_name(char_data *ch, char *name);
-	void finish_morphing(char_data *ch, morph_data *morph);
 	extern bool morph_affinity_ok(room_data *location, morph_data *morph);
 	
 	char buf[MAX_STRING_LENGTH], line[256];
@@ -3351,7 +3337,6 @@ ACMD(do_prompt) {
 
 ACMD(do_quit) {
 	void display_statistics_to_char(char_data *ch);
-	extern obj_data *player_death(char_data *ch);
 	
 	descriptor_data *d, *next_d;
 	bool confirm = FALSE, died = FALSE;

@@ -149,6 +149,11 @@ extern const char *money_amount(empire_data *type, int amount);
 extern const char *money_desc(empire_data *type, int amount);
 extern int total_coins(char_data *ch);
 
+// companion handlers
+struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
+void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
+void reread_companion_trigs(char_data *mob);
+
 // cooldown handlers
 void add_cooldown(char_data *ch, any_vnum type, int seconds_duration);
 extern int get_cooldown_time(char_data *ch, any_vnum type);
@@ -162,6 +167,7 @@ extern int get_currency(char_data *ch, any_vnum vnum);
 // empire handlers
 void abandon_room(room_data *room);
 void claim_room(room_data *room, empire_data *emp);
+int count_dropped_items(empire_data *emp, obj_vnum vnum);
 extern struct empire_political_data *create_relation(empire_data *a, empire_data *b);
 extern int find_rank_by_name(empire_data *emp, char *name);
 extern struct empire_political_data *find_relation(empire_data *from, empire_data *to);
@@ -173,6 +179,7 @@ void perform_abandon_room(room_data *room);
 void perform_abandon_vehicle(vehicle_data *veh);
 void perform_claim_room(room_data *room, empire_data *emp);
 void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
+void read_vault(empire_data *emp);
 
 // empire production total handlers
 void add_production_total(empire_data *emp, obj_vnum vnum, int amount);
@@ -317,6 +324,8 @@ void remove_player_tech(char_data *ch, any_vnum abil);
 extern bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvict, obj_data *ovict);
 
 // requirement handlers
+bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
+bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 void free_requirements(struct req_data *list);
 
 // resource depletion handlers

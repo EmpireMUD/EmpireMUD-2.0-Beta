@@ -28,8 +28,6 @@
 */
 
 // external funcs
-void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message);
-void clear_last_act_message(descriptor_data *desc);
 extern bool validate_social_requirements(char_data *ch, social_data *soc);
 
 // locals
@@ -49,8 +47,6 @@ void perform_social(char_data *ch, social_data *soc, char *argument);
 * @return bool TRUE if it was a social and we acted; FALSE if not
 */
 bool check_social(char_data *ch, char *string, bool exact) {
-	extern bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
-	
 	char str[MAX_INPUT_LENGTH], arg1[MAX_INPUT_LENGTH];
 	social_data *soc;
 	
@@ -142,8 +138,6 @@ social_data *find_social(char_data *ch, char *name, bool exact) {
 * @param char *argument The typed-in args, if any.
 */
 void perform_social(char_data *ch, social_data *soc, char *argument) {
-	void clear_last_act_message(descriptor_data *desc);
-	
 	char buf[MAX_INPUT_LENGTH], hbuf[MAX_INPUT_LENGTH];
 	char_data *vict, *c;
 	

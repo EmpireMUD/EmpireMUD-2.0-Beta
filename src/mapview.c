@@ -44,7 +44,6 @@ extern const int rev_dir[];
 extern struct character_size_data size_data[];
 
 // external functions
-extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 extern vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
 
 
@@ -629,7 +628,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	extern const struct tavern_data_type tavern_data[];
 	extern int how_to_show_map[NUM_SIMPLE_DIRS][2];
 	extern int show_map_y_first[NUM_SIMPLE_DIRS];
-	extern byte distance_can_see(char_data *ch);
 	extern struct city_metadata_type city_type[];
 	extern const char *bld_flags[];
 	extern const char *room_aff_bits[];
@@ -1807,8 +1805,6 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 
 
 void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
-	extern byte distance_can_see(char_data *ch);
-	
 	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH];
 	char dirbuf[MAX_STRING_LENGTH], plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH], paint_str[256];
 	char_data *vict;

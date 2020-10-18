@@ -179,8 +179,6 @@ int mob_coins(char_data *mob) {
 
 
 INTERACTION_FUNC(run_one_encounter) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	char_data *aggr;
 	int iter;
 	bool any = FALSE;
@@ -1400,8 +1398,6 @@ bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coo
 * @return bool TRUE -- always
 */
 bool check_scaling(char_data *mob, char_data *attacker) {
-	void scale_mob_for_character(char_data *mob, char_data *ch);
-
 	// ensure scaling
 	if (attacker != mob && IS_NPC(mob) && GET_CURRENT_SCALE_LEVEL(mob) == 0) {
 		scale_mob_for_character(mob, attacker);

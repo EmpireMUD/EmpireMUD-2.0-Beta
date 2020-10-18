@@ -32,13 +32,11 @@
 *   Additional Commands
 */
 
-// locals
+// local prototypes
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
 
 // externs
 INTERACTION_FUNC(consumes_or_decays_interact);
-extern struct resource_data *copy_resource_list(struct resource_data *input);
-
 void process_dismantle_vehicle(char_data *ch);
 
 // external vars
@@ -393,7 +391,6 @@ void construct_building(room_data *room, bld_vnum type) {
 	}
 	
 	if (ROOM_OWNER(room)) {
-		void deactivate_workforce_room(empire_data *emp, room_data *room);
 		deactivate_workforce_room(ROOM_OWNER(room), room);
 	}
 	
@@ -2170,7 +2167,6 @@ ACMD(do_lay) {
 		}
 		
 		if (ROOM_OWNER(IN_ROOM(ch))) {
-			void deactivate_workforce_room(empire_data *emp, room_data *room);
 			deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 		}
 		

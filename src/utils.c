@@ -55,8 +55,6 @@ extern const char *pool_types[];
 extern const char *tool_flags[];
 
 // external funcs
-void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
-extern struct resource_data *copy_resource_list(struct resource_data *input);
 void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 void remove_companion_mod(struct companion_data **companion, int type);
@@ -65,9 +63,7 @@ void send_char_pos(char_data *ch, int dam);
 // locals
 #define WHITESPACE " \t"	// used by some of the string functions
 bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
-bool empire_can_claim(empire_data *emp);
 bool ignore_distrustful_due_to_start_loc(room_data *loc);
-bool is_trading_with(empire_data *emp, empire_data *partner);
 void score_empires();
 void unmark_items_for_char(char_data *ch, bool ground);
 
@@ -421,9 +417,7 @@ void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_fla
 void run_delayed_refresh(void) {
 	void complete_goal(empire_data *emp, struct empire_goal *goal);
 	extern int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island);
-	void count_quest_tasks(struct req_data *list, int *complete, int *total);
 	void refresh_passive_buffs(char_data *ch);
-	void update_empire_members_and_greatness(empire_data *emp);
 	extern struct char_delayed_update *char_delayed_update_list;
 	
 	struct char_delayed_update *cdu, *next_cdu;
@@ -762,8 +756,6 @@ int sort_import_partners(struct import_pair_type *a, struct import_pair_type *b)
 * @return bool TRUE if any items moved
 */
 bool process_import_one(empire_data *emp) {
-	extern int get_main_island(empire_data *emp);
-	
 	struct partner_list_type *plt, *next_plt, *partner_list = NULL;
 	struct import_pair_type *pair, *next_pair, *pair_list;
 	int my_amt, their_amt, trade_amt, found_island = NO_ISLAND;
@@ -905,8 +897,6 @@ bool process_import_one(empire_data *emp) {
 
 // runs daily imports
 void process_imports(void) {
-	void read_vault(empire_data *emp);
-	
 	empire_data *emp, *next_emp;
 	int amount;
 	
@@ -2673,10 +2663,6 @@ void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 */
 int get_attribute_by_apply(char_data *ch, int apply_type) {
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
-	extern int get_crafting_level(char_data *ch);
-	extern int total_bonus_healing(char_data *ch);
-	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int move_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
@@ -2873,7 +2859,6 @@ obj_data *get_top_object(obj_data *obj) {
 * @return double a score
 */
 double rate_item(obj_data *obj) {
-	extern double get_base_dps(obj_data *weapon);
 	extern const double apply_values[];
 	
 	struct obj_apply *apply;
@@ -3084,7 +3069,6 @@ int pick_level_from_range(int level, int min, int max) {
 * @return bool TRUE if the character ended up standing (>= fighting), FALSE if not.
 */
 bool wake_and_stand(char_data *ch) {
-	void do_unseat_from_vehicle(char_data *ch);
 	char buf[MAX_STRING_LENGTH];
 	bool was_sleeping = FALSE;
 	

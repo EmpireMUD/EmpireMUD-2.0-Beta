@@ -49,9 +49,7 @@ extern struct faction_reputation_type reputation_levels[];
 
 // external funcs
 extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 
 
  /////////////////////////////////////////////////////////////////////////////

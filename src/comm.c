@@ -70,7 +70,6 @@ void mobile_activity(void);
 void show_string(descriptor_data *d, char *input);
 int isbanned(char *hostname);
 void save_whole_world();
-extern bool is_fight_ally(char_data *ch, char_data *frenemy);
 
 // local functions
 RETSIGTYPE checkpointing(int sig);
@@ -313,15 +312,9 @@ void msdp_update_room(char_data *ch) {
 static void msdp_update(void) {
 	extern int get_block_rating(char_data *ch, bool can_gain_skill);
 	extern double get_combat_speed(char_data *ch, int pos);
-	extern int get_crafting_level(char_data *ch);
-	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-	void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
-	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 	extern int health_gain(char_data *ch, bool info_only);
 	extern int mana_gain(char_data *ch, bool info_only);
 	extern int move_gain(char_data *ch, bool info_only);
-	extern int total_bonus_healing(char_data *ch);
-	extern int get_total_score(empire_data *emp);
 	extern const char *damage_types[];
 	extern const char *genders[];
 	extern const double hit_per_dex;
@@ -1175,8 +1168,6 @@ void heartbeat(int heart_pulse) {
 //// MESSAGING ///////////////////////////////////////////////////////////////
 
 void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, bitvector_t act_flags) {
-	extern bool is_ignoring(char_data *ch, char_data *victim);
-
 	char_data *to, *list = NULL;
 	bool to_sleeping = FALSE, no_dark = FALSE, is_spammy = FALSE;
 
@@ -1369,9 +1360,6 @@ void send_to_all(const char *messg, ...) {
 
 /* higher-level communication: the act() function */
 void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bitvector_t act_flags) {
-	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
-	extern bool is_fight_ally(char_data *ch, char_data *frenemy);
-	
 	const char *i = NULL;
 	char *buf, lbuf[MAX_STRING_LENGTH], *dg_arg = NULL, temp[MAX_STRING_LENGTH];
 	bool real_ch = FALSE, real_vict = FALSE;

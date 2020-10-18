@@ -1302,8 +1302,6 @@ void instance_obj_setup(struct instance_data *inst, obj_data *obj) {
 * @param room_data *room The room to reset.
 */
 static void reset_instance_room(struct instance_data *inst, room_data *room) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	room_template *rmt = GET_ROOM_TEMPLATE(room);
 	struct adventure_spawn *spawn;
 	vehicle_data *veh;

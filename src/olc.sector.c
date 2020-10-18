@@ -254,7 +254,6 @@ char *list_one_sector(sector_data *sect, bool detail) {
 */
 void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void remove_sector_from_table(sector_data *sect);
 	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
@@ -580,8 +579,6 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_sector(char_data *ch, sector_vnum vnum) {
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	struct adventure_link_rule *link;
 	struct evolution_data *evo;

@@ -34,7 +34,6 @@ extern struct instance_data *quest_instance_global;
 // external functions
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void send_char_pos(char_data *ch, int dam);
-void die(char_data *ch, char_data *killer);
 void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
 char_data *get_char_by_room(room_data *room, char *name);
 room_data *get_room(room_data *ref, char *name);
@@ -520,11 +519,6 @@ WCMD(do_wdoor) {
 
 
 WCMD(do_wsiege) {
-	void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
-	extern bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
-	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
-	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
-	
 	char scale_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh_targ = NULL;
 	room_data *room_targ = NULL;
@@ -1059,8 +1053,6 @@ WCMD(do_wquest) {
 
 /* loads a mobile or object into the room */
 WCMD(do_wload) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst = find_instance_by_room(room, FALSE, TRUE);
 	int number = 0;

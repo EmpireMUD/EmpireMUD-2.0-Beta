@@ -33,7 +33,6 @@ extern bool world_map_needs_save;
 
 // external funcs
 void complete_building(room_data *room);
-void deactivate_workforce_room(empire_data *emp, room_data *room);
 void decustomize_shared_data(struct shared_room_data *shared);
 
 
@@ -125,7 +124,6 @@ OLC_MODULE(mapedit_decay) {
 OLC_MODULE(mapedit_terrain) {
 	extern crop_data *get_crop_by_name(char *name);
 	extern sector_data *get_sect_by_name(char *name);
-	void finish_trench(room_data *room);
 	
 	struct empire_city_data *city, *temp;
 	empire_data *emp, *rescan_emp = NULL;
@@ -404,8 +402,6 @@ OLC_MODULE(mapedit_icon) {
 
 
 OLC_MODULE(mapedit_delete_room) {
-	extern room_data *find_load_room(char_data *ch);
-
 	char_data *c, *next_c;
 	room_data *in_room, *home;
 

@@ -45,7 +45,6 @@ extern const char *tool_flags[];
 // external functions
 extern bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
 INTERACTION_FUNC(consumes_or_decays_interact);
-extern struct resource_data *copy_resource_list(struct resource_data *input);
 extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
 extern bool has_cooking_fire(char_data *ch);
 void process_build_action(char_data *ch);
@@ -57,7 +56,6 @@ bool can_refashion(char_data *ch);
 ACMD(do_gen_craft);
 craft_data *find_craft_for_obj_vnum(obj_vnum vnum);
 obj_data *find_water_container(char_data *ch, obj_data *list);
-int get_crafting_level(char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -858,8 +856,6 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 
 // for do_tame
 INTERACTION_FUNC(tame_interact) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	char buf[MAX_STRING_LENGTH];
 	char_data *newmob;
 	bool any = FALSE;
@@ -1801,8 +1797,6 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 
 // subcmd must be CRAFT_TYPE_
 ACMD(do_gen_craft) {
-	extern craft_data *find_building_list_entry(room_data *room, byte type);
-	
 	char short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[256];
 	int count, timer, num = 1, dir = NO_DIR;
 	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL;

@@ -63,7 +63,6 @@ extern struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
 extern struct player_eq_set *get_eq_set_by_name(char_data *ch, char *name);
 extern struct eq_set_obj *get_obj_eq_set_by_id(obj_data *obj, int id);
 extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
-void read_vault(empire_data *emp);
 void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
 void remove_obj_from_eq_set(obj_data *obj, int set_id);
 void save_trading_post();
@@ -439,8 +438,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 	void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
 	
-	extern double get_base_dps(obj_data *weapon);
-	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 	extern double get_weapon_speed(obj_data *weapon);
 	extern const char *apply_type_names[];
 	extern const char *climate_flags[];
@@ -5121,7 +5118,6 @@ ACMD(do_drop) {
 
 
 ACMD(do_eat) {
-	extern bool check_vampire_sun(char_data *ch, bool message);
 	void taste_blood(char_data *ch, char_data *vict);
 	
 	bool extract = FALSE, will_buff = FALSE;

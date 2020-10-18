@@ -47,30 +47,41 @@
 #define DO_ABIL(name)  void (name)(char_data *ch, ability_data *abil, int level, char_data *vict, struct ability_exec *data)
 
 
-// protos
+// class.c prototypes
+bool remove_vnum_from_class_abilities(struct class_ability **list, any_vnum vnum);
+
+// skills.c prototypes
+// TODO sort this
 void add_ability(char_data *ch, ability_data *abil, bool reset_levels);
 void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add);
-extern bool can_gain_exp_from(char_data *ch, char_data *vict);
-extern bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type);
+bool can_gain_exp_from(char_data *ch, char_data *vict);
+bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type);
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type);
-extern bool check_can_gain_skill(char_data *ch, any_vnum skill_vnum);
-extern bool check_solo_role(char_data *ch);
+bool check_can_gain_skill(char_data *ch, any_vnum skill_vnum);
+bool check_solo_role(char_data *ch);
 void gain_ability_exp(char_data *ch, any_vnum ability, double amount);
 void gain_player_tech_exp(char_data *ch, int tech, double amount);
-extern bool gain_skill(char_data *ch, skill_data *skill, int amount);
-extern bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount);
-extern struct player_ability_data *get_ability_data(char_data *ch, any_vnum abil_id, bool add_if_missing);
-extern int get_ability_level(char_data *ch, any_vnum ability);
-extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
-extern int get_approximate_level(char_data *ch);
-extern struct player_skill_data *get_skill_data(char_data *ch, any_vnum vnum, bool add_if_missing);
-extern int has_skill_flagged(char_data *ch, bitvector_t skill_flag);
+bool gain_skill(char_data *ch, skill_data *skill, int amount);
+bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount);
+struct player_ability_data *get_ability_data(char_data *ch, any_vnum abil_id, bool add_if_missing);
+int get_ability_level(char_data *ch, any_vnum ability);
+int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
+int get_approximate_level(char_data *ch);
+int get_attack_type_by_name(char *name);
+struct player_skill_data *get_skill_data(char_data *ch, any_vnum vnum, bool add_if_missing);
+int has_skill_flagged(char_data *ch, bitvector_t skill_flag);
 void mark_level_gained_from_ability(char_data *ch, ability_data *abil);
+void perform_npc_tie(char_data *ch, char_data *victim, int subcmd);
 void remove_ability(char_data *ch, ability_data *abil, bool reset_levels);
-extern bool remove_skills_by_flag(char_data *ch, bitvector_t skill_flag);
+bool remove_ability_from_synergy_abilities(struct synergy_ability **list, any_vnum abil_vnum);
+bool remove_skills_by_flag(char_data *ch, bitvector_t skill_flag);
+bool remove_vnum_from_skill_abilities(struct skill_ability **list, any_vnum vnum);
 void set_skill(char_data *ch, any_vnum skill, int level);
-extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
-extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
+bool skill_check(char_data *ch, any_vnum ability, int difficulty);
+bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
+
+// spells.c prototypes
+bool trigger_counterspell(char_data *ch);
 
 
 // DIFF_x: skill_check difficulties

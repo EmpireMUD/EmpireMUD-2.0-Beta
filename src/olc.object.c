@@ -50,7 +50,6 @@ extern const char *tool_flags[];
 extern const char *wear_bits[];
 
 // external funcs
-extern double get_base_dps(obj_data *weapon);
 extern double get_weapon_speed(obj_data *weapon);
 
 // locals
@@ -458,7 +457,6 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	extern bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	extern bool delete_shop_item_from_list(struct shop_item **list, any_vnum vnum);
 	void expire_trading_post_item(struct trading_post_data *tpd);
 	extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
@@ -1091,8 +1089,6 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_obj(char_data *ch, char *argument) {
-	extern int get_attack_type_by_name(char *name);
-	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_worn = NOBITS, only_affs = NOBITS;
@@ -1258,7 +1254,6 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 void olc_search_obj(char_data *ch, obj_vnum vnum) {
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	extern bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);
 	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
@@ -2686,7 +2681,6 @@ OLC_MODULE(oedit_currency) {
 
 
 OLC_MODULE(oedit_custom) {
-	void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	olc_process_custom_messages(ch, argument, &(obj->proto_data->custom_msgs), obj_custom_types);
 }

@@ -303,7 +303,6 @@ char *list_one_mobile(char_data *mob, bool detail) {
 void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void remove_minipet(char_data *ch, any_vnum vnum);
 	void remove_homeless_citizen(empire_data *emp, struct empire_homeless_citizen *ehc);
 	
@@ -645,8 +644,6 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_mob(char_data *ch, char *argument) {
-	extern int get_attack_type_by_name(char *name);
-	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS;
@@ -793,7 +790,6 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 void olc_search_mob(char_data *ch, mob_vnum vnum) {
 	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	
 	char_data *proto, *mob, *next_mob;
 	struct ability_data_list *adl;
@@ -1309,7 +1305,6 @@ OLC_MODULE(medit_attack) {
 
 
 OLC_MODULE(medit_custom) {
-	void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	olc_process_custom_messages(ch, argument, &MOB_CUSTOM_MSGS(mob), mob_custom_types);
 }

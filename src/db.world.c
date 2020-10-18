@@ -54,7 +54,6 @@ extern bool world_map_needs_save;
 // external funcs
 void add_room_to_world_tables(room_data *room);
 EVENT_CANCEL_FUNC(cancel_room_event);
-extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
 void complete_building(room_data *room);
 void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
 void free_shared_room_data(struct shared_room_data *data);
@@ -67,7 +66,6 @@ void sort_exits(struct room_direction_data **list);
 void write_room_to_file(FILE *fl, room_data *room);
 
 // locals
-int count_city_points_used(empire_data *emp);
 void decustomize_shared_data(struct shared_room_data *shared);
 room_vnum find_free_vnum();
 room_data *get_extraction_room();
@@ -79,7 +77,6 @@ void save_world_map_to_file();
 void schedule_check_unload(room_data *room, bool offset);
 void schedule_trench_fill(struct map_data *map);
 extern int sort_empire_islands(struct empire_island *a, struct empire_island *b);
-void uncrop_tile(room_data *room);
 void update_island_names();
 
 
@@ -492,7 +489,6 @@ room_data *create_room(room_data *home) {
 */
 void delete_room(room_data *room, bool check_exits) {
 	EVENT_CANCEL_FUNC(cancel_room_expire_event);
-	void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
 	void relocate_players(room_data *room, room_data *to_room);
 	void remove_instance_fake_loc(struct instance_data *inst);
 	void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
@@ -1457,8 +1453,6 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 * and renames the island if they have a custom name for it.
 */
 void update_island_names(void) {
-	void save_island_table();
-	
 	empire_data *emp, *next_emp, *found_emp;
 	struct island_info *isle, *next_isle;
 	struct empire_city_data *city;
@@ -1529,9 +1523,6 @@ void update_island_names(void) {
 
 // see dg_event.c/h
 EVENTFUNC(burn_down_event) {
-	void death_log(char_data *ch, char_data *killer, int type);
-	extern obj_data *die(char_data *ch, char_data *killer);
-	
 	struct room_event_data *burn_data = (struct room_event_data *)event_obj;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;
@@ -1795,9 +1786,7 @@ void reset_one_room(room_data *room) {
 	void add_convert_vehicle_data(char_data *mob, any_vnum vnum);
 	void change_keywords(char_data *ch, char *str);
 	void change_long_desc(char_data *ch, char *str);
-	void change_sex(char_data *ch, int sex);
 	void change_short_desc(char_data *ch, char *str);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
 	void objpack_load_room(room_data *room);
 	
 	char field[256], str[MAX_INPUT_LENGTH];
@@ -2424,8 +2413,6 @@ void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter,
 * @param bool check_tech If TRUE, also does techs (you should almost never do this)
 */
 void read_empire_territory(empire_data *emp, bool check_tech) {
-	void read_vault(empire_data *emp);
-	
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_island *isle, *next_isle;
 	struct empire_npc_data *npc;
@@ -2680,7 +2667,6 @@ bool import_one_evo(room_vnum loc, sector_vnum old_sect, sector_vnum new_sect) {
 	
 	// deactivate workforce if the room type changed
 	if (ROOM_OWNER(room)) {
-		void deactivate_workforce_room(empire_data *emp, room_data *room);
 		deactivate_workforce_room(ROOM_OWNER(room), room);
 	}
 	
@@ -2776,7 +2762,6 @@ int genisdesc_sort(struct genisdesc_terrain *a, struct genisdesc_terrain *b) {
 */
 void generate_island_descriptions(void) {
 	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
-	void save_island_table();
 	
 	struct genisdesc_isle *isle, *next_isle, *isle_hash = NULL;
 	struct island_info *isliter, *next_isliter;
