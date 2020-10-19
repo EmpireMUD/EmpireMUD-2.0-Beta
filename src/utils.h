@@ -2006,6 +2006,7 @@ obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 
 // act.vampire.c
 bool cancel_biting(char_data *ch);
+void cancel_blood_upkeeps(char_data *ch);
 void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 bool check_vampire_sun(char_data *ch, bool message);
 void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
@@ -2197,6 +2198,7 @@ PATHFIND_VALIDATOR(pathfind_road);
 // progress.c
 void check_for_eligible_goals(empire_data *emp);
 void check_progress_refresh();
+int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
 progress_data *find_progress_goal_by_name(char *name);
@@ -2217,6 +2219,13 @@ bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_li
 bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
 bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
 int count_crop_variety_in_list(obj_data *list);
+int count_owned_buildings(empire_data *emp, bld_vnum vnum);
+int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags);
+int count_owned_homes(empire_data *emp);
+int count_owned_sector(empire_data *emp, sector_vnum vnum);
+int count_owned_vehicles(empire_data *emp, any_vnum vnum);
+int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
+int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs);
 bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
 void extract_crop_variety(char_data *ch, int amount);
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
@@ -2303,6 +2312,7 @@ void check_vehicle_climate_change(room_data *room);
 void complete_vehicle(vehicle_data *veh);
 int count_harnessed_animals(vehicle_data *veh);
 int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
+void delete_vehicle_interior(vehicle_data *veh);
 void empty_vehicle(vehicle_data *veh, room_data *to_room);
 craft_data *find_craft_for_vehicle(vehicle_data *veh);
 vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id);
@@ -2325,6 +2335,7 @@ void start_vehicle_burning(vehicle_data *veh);
 int total_small_vehicles_in_room(room_data *room);
 int total_vehicle_size_in_room(room_data *room);
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
+void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);
 bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
 

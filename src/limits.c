@@ -568,7 +568,6 @@ void point_update_char(char_data *ch) {
 */
 void real_update_char(char_data *ch) {
 	void adventure_unsummon(char_data *ch);
-	void cancel_blood_upkeeps(char_data *ch);
 	void check_combat_end(char_data *ch);
 	void check_morph_ability(char_data *ch);
 	extern int compute_bonus_exp_per_day(char_data *ch);

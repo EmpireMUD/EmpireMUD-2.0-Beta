@@ -75,11 +75,13 @@
 */
 
 // external vars
+extern bool override_home_storage_cap;
 extern const int remove_lore_types[];
 
 // external funcs
 ACMD(do_return);
 EVENT_CANCEL_FUNC(cancel_room_event);
+EVENT_CANCEL_FUNC(cancel_wait_event);
 void clear_obj_eq_sets(obj_data *obj);
 
 // locals
@@ -7769,15 +7771,6 @@ void free_requirements(struct req_data *list) {
 * @return bool TRUE if the character meets those requirements, FALSE if not.
 */
 bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance) {
-	extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
-	extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
-	extern int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags);
-	extern int count_owned_homes(empire_data *emp);
-	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
-	extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
-	extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
-	extern int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs);
-	
 	// helper struct
 	struct meets_req_data {
 		int group;	// actually a char, but cast
@@ -9580,8 +9573,6 @@ bool stored_item_requires_withdraw(obj_data *obj) {
 * @return bool TRUE if the player can store, FALSE if they're over the limit.
 */
 bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capped) {
-	extern bool override_home_storage_cap;
-	
 	struct empire_unique_storage *eus;
 	int count;
 	
@@ -9689,8 +9680,6 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique
 * @param bool *full A variable to set TRUE if the storage is full and the item can't be stored.
 */
 void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, obj_data *obj, empire_data *save_emp, room_data *room, bool *full) {
-	EVENT_CANCEL_FUNC(cancel_wait_event);
-	
 	struct empire_unique_storage *eus;
 	bool extract = FALSE;
 	trig_data *trig;
@@ -9974,8 +9963,6 @@ void extract_vehicle(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle to extract and free.
 */
 void extract_vehicle_final(vehicle_data *veh) {
-	void delete_vehicle_interior(vehicle_data *veh);
-	
 	check_dg_owner_purged_vehicle(veh);
 	
 	// delete interior
@@ -10117,8 +10104,6 @@ void vehicle_from_room(vehicle_data *veh) {
 * @param room_data *room The room to put it in.
 */
 void vehicle_to_room(vehicle_data *veh, room_data *room) {
-	void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);
-	
 	if (!veh || !room) {
 		log("SYSERR: Illegal value(s) passed to vehicle_to_room. (Room %p, vehicle %p)", room, veh);
 		return;
@@ -10445,4 +10430,3 @@ void expire_trading_post_item(struct trading_post_data *tpd) {
 		SET_BIT(tpd->state, TPD_OBJ_PENDING);
 	}
 }
-

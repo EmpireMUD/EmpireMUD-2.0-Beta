@@ -1266,8 +1266,6 @@ void death_restore(char_data *ch) {
 * @return obj_data *The corpse (if any), or NULL
 */
 obj_data *die(char_data *ch, char_data *killer) {
-	void cancel_blood_upkeeps(char_data *ch);
-	
 	char_data *ch_iter, *player, *killmaster;
 	obj_data *corpse = NULL;
 	struct mob_tag *tag;

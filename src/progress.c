@@ -41,11 +41,6 @@
 const char *default_progress_name = "Unnamed Goal";
 
 // external funcs
-extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
-extern int count_owned_homes(empire_data *emp);;
-extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
-extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
-extern int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs);
 void get_requirement_display(struct req_data *list, char *save_buffer);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
 
@@ -888,9 +883,6 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 * @param struct empire_goal *goal The goal to refresh.
 */
 void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
-	extern int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags);
-	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
-	
 	struct req_data *task;
 	
 	if (!emp || !goal) {

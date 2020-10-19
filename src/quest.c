@@ -45,7 +45,6 @@ const char *default_quest_description = "This quest has no description.\r\n";
 const char *default_quest_complete_msg = "You have completed the quest.\r\n";
 
 // external funcs
-extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 void get_requirement_display(struct req_data *list, char *save_buffer);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
 
@@ -54,10 +53,6 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 // local protos
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
-int count_owned_buildings(empire_data *emp, bld_vnum vnum);
-int count_owned_homes(empire_data *emp);
-int count_owned_vehicles(empire_data *emp, any_vnum vnum);
-int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
 void free_quest_givers(struct quest_giver *list);
 struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
