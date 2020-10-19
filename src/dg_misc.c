@@ -1166,7 +1166,6 @@ void script_modify(char *argument) {
 	void change_look_desc(char_data *ch, char *str, bool format);
 	void change_look_desc_append(char_data *ch, char *str, bool format);
 	void change_short_desc(char_data *ch, char *str);
-	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 	extern char *get_room_description(room_data *room);
 	extern vehicle_data *get_vehicle(char *name);
 	extern bool validate_icon(char *icon);

@@ -290,6 +290,7 @@ extern const char *book_name_list[];
 extern struct file_lookup_struct file_lookup[];
 extern const double hit_per_dex;
 extern const int primary_attributes[];
+extern struct promo_code_list promo_codes[];
 extern const double score_levels[];
 extern const int techs_requiring_same_island[];
 extern struct tedit_struct tedit_option[];

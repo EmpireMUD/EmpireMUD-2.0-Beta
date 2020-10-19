@@ -3345,8 +3345,6 @@ void b5_45_keep_update(void) {
 
 // fix reputation
 PLAYER_UPDATE_FUNC(b5_47_update_players) {
-	void update_reputations(char_data *ch);
-	
 	struct player_faction_data *fct, *next;
 	bool any = FALSE;
 	

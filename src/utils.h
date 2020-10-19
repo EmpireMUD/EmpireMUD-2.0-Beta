@@ -1772,6 +1772,7 @@ obj_data *get_top_object(obj_data *obj);
 double rate_item(obj_data *obj);
 
 // player functions from utils.c
+void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
 void command_lag(char_data *ch, int wait_type);
 void determine_gear_level(char_data *ch);
 room_data *find_load_room(char_data *ch);
@@ -2047,6 +2048,7 @@ bool valid_rank_name(char_data *ch, char *newname);
 // faction.c
 const char *get_faction_name_by_vnum(any_vnum vnum);
 const char *get_reputation_name(int type);
+void update_reputations(char_data *ch);
 
 // fight.c
 void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);

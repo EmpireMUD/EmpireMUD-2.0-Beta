@@ -2285,7 +2285,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("lastname") {
 		void add_lastname(char_data *ch, char *name);
-		extern bool has_lastname(char_data *ch, char *name);
 		void remove_lastname(char_data *ch, char *name);
 		char va_1[MAX_INPUT_LENGTH], va_2[MAX_INPUT_LENGTH];
 		
@@ -2323,8 +2322,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("bonustrait") {
-		void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
-
 		bitvector_t diff, new, old = GET_BONUS_TRAITS(vict);
 		new = GET_BONUS_TRAITS(vict) = olc_process_flag(ch, val_arg, "bonus", NULL, bonus_bits, GET_BONUS_TRAITS(vict));
 		
@@ -2436,8 +2433,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("faction") {
-		void update_reputations(char_data *ch);
-		
 		int min_idx, min_rep, max_idx, max_rep, new_rep, new_val = 0;
 		char fct_arg[MAX_INPUT_LENGTH], *fct_val;
 		struct player_faction_data *pfd;
@@ -2505,7 +2500,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("skill") {
-		void check_ability_levels(char_data *ch, any_vnum skill);
 		char skillname[MAX_INPUT_LENGTH], *skillval;
 		int level = -1;
 		skill_data *skill;
@@ -2535,7 +2529,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 	else if SET_CASE("learned") {
-		void remove_learned_craft(char_data *ch, any_vnum vnum);
 		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
 		craft_data *cft;
 		
@@ -5672,8 +5665,6 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 
 /* Sends ch information on the character or animal k */
 void do_stat_character(char_data *ch, char_data *k) {
-	extern struct promo_code_list promo_codes[];
-
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	struct script_memory *mem;
 	struct cooldown_data *cool;

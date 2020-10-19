@@ -3593,8 +3593,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'h': {	// char.h*
 					if (!str_cmp(field, "has_companion")) {
-						struct companion_data *has_companion(char_data *ch, any_vnum vnum);
-						
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield) && has_companion(c, atoi(subfield)) != NULL) {
 							strcpy(str, "1");
 						}
@@ -3627,7 +3625,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "%d", char_has_item(subfield, c));
 					}
 					else if (!str_cmp(field, "has_lastname")) {
-						extern bool has_lastname(char_data *ch, char *name);
 						if (subfield && *subfield && !IS_NPC(c)) {
 							snprintf(str, slen, "%d", has_lastname(c, subfield) ? 1 : 0);
 						}
@@ -3730,7 +3727,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_HEALTH(c));
 						
 					else if (!str_cmp(field, "home")) {
-						extern room_data *find_home(char_data *ch);
 						room_data *home_loc;
 						
 						if ((home_loc = find_home(c))) {
@@ -4176,7 +4172,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "remove_learned")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
-							void remove_learned_craft(char_data *ch, any_vnum vnum);
 							remove_learned_craft(c, atoi(subfield));
 						}
 						

@@ -2319,8 +2319,6 @@ void nanny(descriptor_data *d, char *arg) {
 	void display_automessages_on_login(char_data *ch);
 	extern int num_earned_bonus_traits(char_data *ch);
 	
-	extern struct promo_code_list promo_codes[];
-
 	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
 	int load_result, i, iter;
 	bool show_start = FALSE;
@@ -2892,8 +2890,6 @@ void nanny(descriptor_data *d, char *arg) {
 			
 			// only apply now if they are NOT currently doing creation -- otherwise it will be applied during creation
 			if (GET_ACCESS_LEVEL(d->character) > 0) {
-				void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
-				
 				if (!skip) {
 					apply_bonus_trait(d->character, BIT(i), TRUE);
 				}

@@ -1876,8 +1876,6 @@ int sort_vehicles(vehicle_data *a, vehicle_data *b) {
 * @param FILE *fl The file to save to (open for writing).
 */
 void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
-	void Crash_save(obj_data *obj, FILE *fp, int location);
-	
 	struct room_extra_data *red, *next_red;
 	struct vehicle_attached_mob *vam;
 	char temp[MAX_STRING_LENGTH];

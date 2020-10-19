@@ -76,7 +76,6 @@
 
 // external funcs
 EVENT_CANCEL_FUNC(cancel_room_event);
-void clear_delayed_update(char_data *ch);
 void clear_obj_eq_sets(obj_data *obj);
 void extract_trigger(trig_data *trig);
 void free_varlist(struct trig_var_data *vd);
@@ -87,8 +86,6 @@ void add_dropped_item_anywhere(obj_data *obj, empire_data *only_if_emp);
 void add_dropped_item_list(empire_data *emp, obj_data *list);
 static void add_obj_binding(int idnum, struct obj_binding **list);
 struct obj_binding *copy_obj_bindings(struct obj_binding *from);
-void die_follower(char_data *ch);
-struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 void remove_companion(char_data *ch, any_vnum vnum);
 void remove_dropped_item(empire_data *emp, obj_data *obj);
 void remove_dropped_item_anywhere(obj_data *obj);

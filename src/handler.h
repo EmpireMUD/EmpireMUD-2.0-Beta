@@ -96,6 +96,7 @@ void show_wear_off_msg(char_data *ch, int atype);
 
 // character handlers
 void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
+void die_follower(char_data *ch);
 void extract_char(char_data *ch);
 void extract_char_final(char_data *ch);
 bool has_learned_craft(char_data *ch, any_vnum vnum);
@@ -138,6 +139,7 @@ int total_coins(char_data *ch);
 struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
 void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
 struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type);
+struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 void reread_companion_trigs(char_data *mob);
 
 // cooldown handlers
@@ -314,6 +316,7 @@ void remove_offers_by_type(char_data *ch, int type);
 void add_learned_craft(char_data *ch, any_vnum vnum);
 void add_minipet(char_data *ch, any_vnum vnum);
 bool has_minipet(char_data *ch, any_vnum vnum);
+void remove_learned_craft(char_data *ch, any_vnum vnum);
 
 // player tech handlers
 void add_player_tech(char_data *ch, any_vnum abil, int tech);

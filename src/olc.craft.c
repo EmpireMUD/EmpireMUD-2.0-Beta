@@ -249,7 +249,6 @@ char *list_one_craft(craft_data *craft, bool detail) {
 void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	void cancel_gen_craft(char_data *ch);
 	void remove_craft_from_table(craft_data *craft);
-	void remove_learned_craft(char_data *ch, any_vnum vnum);
 	
 	struct progress_perk *perk, *next_perk;
 	progress_data *prg, *next_prg;

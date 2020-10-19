@@ -52,7 +52,6 @@
 */
 
 // external funcs
-extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 void remove_companion_mod(struct companion_data **companion, int type);
 void send_char_pos(char_data *ch, int dam);
 

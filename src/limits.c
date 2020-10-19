@@ -576,7 +576,6 @@ void real_update_char(char_data *ch) {
 	void check_morph_ability(char_data *ch);
 	void combat_meter_damage_dealt(char_data *ch, int amt);
 	extern int compute_bonus_exp_per_day(char_data *ch);
-	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 	void random_encounter(char_data *ch);
 	extern bool starving_vampire_aggro(char_data *ch);
 	void update_biting_char(char_data *ch);

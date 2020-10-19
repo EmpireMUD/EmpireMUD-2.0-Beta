@@ -94,6 +94,7 @@ ACMD(do_saw);
 ACMD(do_mint);
 ACMD(do_scrape);
 ACMD(do_tan);
+void perform_escape(char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1587,8 +1588,6 @@ void process_dismantle_action(char_data *ch) {
 * @param char_data *ch The escapist.
 */
 void process_escaping(char_data *ch) {
-	void perform_escape(char_data *ch);
-	
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to find your way out!\r\n");
 		cancel_action(ch);
@@ -2625,8 +2624,6 @@ void process_start_fillin(char_data *ch) {
 * @param char_data *ch The person trying to fill in.
 */
 void process_swap_skill_sets(char_data *ch) {
-	void perform_swap_skill_sets(char_data *ch);
-	
 	GET_ACTION_TIMER(ch) -= 1;
 	
 	if (GET_ACTION_TIMER(ch) <= 0) {

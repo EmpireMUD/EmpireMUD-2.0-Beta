@@ -263,11 +263,12 @@ extern byte y_coord_to_season[MAP_HEIGHT];
 // abilities
 extern ability_data *ability_table;
 extern ability_data *sorted_abilities;
-extern ability_data *find_ability(char *argument);
-extern ability_data *find_ability_by_name(char *name);
-extern ability_data *find_ability_by_vnum(any_vnum vnum);
+
+ability_data *find_ability(char *argument);
+ability_data *find_ability_by_name(char *name);
+ability_data *find_ability_by_vnum(any_vnum vnum);
 void free_ability(ability_data *abil);
-extern char *get_ability_name_by_vnum(any_vnum vnum);
+char *get_ability_name_by_vnum(any_vnum vnum);
 
 // accounts
 void add_player_to_account(char_data *ch, account_data *acct);
@@ -440,12 +441,14 @@ extern event_data *event_table;
 extern int top_event_id;
 extern struct event_running_data *running_events;
 extern bool events_need_save;
-extern event_data *find_event_by_vnum(any_vnum vnum);
-extern struct event_running_data *find_last_event_run_by_vnum(any_vnum event_vnum);
-extern struct event_running_data *find_running_event_by_id(int id);
-extern struct event_running_data *find_running_event_by_vnum(any_vnum event_vnum);
+
+struct player_event_data *create_event_data(char_data *ch, int event_id, any_vnum event_vnum);
+event_data *find_event_by_vnum(any_vnum vnum);
+struct event_running_data *find_last_event_run_by_vnum(any_vnum event_vnum);
+struct event_running_data *find_running_event_by_id(int id);
+struct event_running_data *find_running_event_by_vnum(any_vnum event_vnum);
 void free_event(event_data *event);
-extern char *get_event_name_by_proto(any_vnum vnum);
+char *get_event_name_by_proto(any_vnum vnum);
 
 // factions
 extern faction_data *faction_table;
@@ -530,6 +533,7 @@ int sort_mobiles(char_data *a, char_data *b);
 void save_char(char_data *ch, room_data *load_room);
 #define SAVE_CHAR(ch)  save_char((ch), (IN_ROOM(ch) ? IN_ROOM(ch) : (GET_LOADROOM(ch) != NOWHERE ? real_room(GET_LOADROOM(ch)) : NULL)))
 
+void clear_delayed_update(char_data *ch);
 void queue_delayed_update(char_data *ch, bitvector_t type);
 void update_player_index(player_index_data *index, char_data *ch);
 extern char_data *find_or_load_player(char *name, bool *is_file);
@@ -556,7 +560,9 @@ obj_data *read_object(obj_vnum nr, bool with_triggers);
 int sort_objects(obj_data *a, obj_data *b);
 
 // objsave
+void Crash_save(obj_data *obj, FILE *fp, int location);
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
+void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
 obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 
 // players
@@ -568,14 +574,22 @@ void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
 void delete_player_character(char_data *ch);
 void enter_player_game(descriptor_data *d, int dolog, bool fresh);
-void free_loaded_players();
-int get_highest_access_level(account_data *acct);
+room_data *find_home(char_data *ch);
 char_data *find_player_in_room_by_id(room_data *room, int id);
+void free_alias(struct alias_data *a);
+void free_companion(struct companion_data *cd);
+void free_loaded_players();
+void free_mail(struct mail_data *mail);
+void free_player_completed_quests(struct player_completed_quest **hash);
+void free_player_event_data(struct player_event_data *hash);
+int get_highest_access_level(account_data *acct);
 char_data *is_at_menu(int id);
 char_data *is_playing(int id);
+struct mail_data *parse_mail(FILE *fl, char *first_line);
 void save_all_players(bool delay);
 void start_new_character(char_data *ch);
 int *summarize_weekly_playtime(empire_data *emp);
+void write_mail_to_file(FILE *fl, char_data *ch);
 
 // player equipment set
 int add_eq_set_to_char(char_data *ch, int set_id, char *name);
@@ -590,6 +604,7 @@ void remove_obj_from_eq_set(obj_data *obj, int set_id);
 
 // player lastnames
 void change_personal_lastname(char_data *ch, char *name);
+bool has_lastname(char_data *ch, char *name);
 
 // progress
 extern progress_data *progress_table;

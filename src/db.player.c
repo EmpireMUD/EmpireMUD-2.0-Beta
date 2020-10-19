@@ -44,23 +44,32 @@
 #define LOG_BAD_TAG_WARNINGS  TRUE	// triggers syslogs for invalid pfile tags
 
 // external vars
+extern const char *anonymous_public_hosts[];
+extern const char *default_channels[];
 extern int top_account_id;
 extern int top_idnum;
 
 // external funcs
 ACMD(do_slash_channel);
-void free_obj_eq_set(struct eq_set_obj *eq_set);
+void add_all_gain_hooks(char_data *ch);
+void add_archetype_lore(char_data *ch);
+void apply_all_ability_techs(char_data *ch);
+void check_minipets_and_companions(char_data *ch);
+void check_player_events(char_data *ch);
+void clean_lore(char_data *ch);
+void clean_player_kills(char_data *ch);
+void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_flag);
+bool should_delete_empire(empire_data *emp);
 
 // local protos
 void check_eq_sets(char_data *ch);
-void clear_delayed_update(char_data *ch);
 void clear_player(char_data *ch);
 time_t get_member_timeout_ch(char_data *ch);
 time_t get_member_timeout_time(time_t created, time_t last_login, double played_hours);
-bool has_lastname(char_data *ch, char *name);
 void purge_bound_items(int idnum);
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch);
 void remove_loaded_player(char_data *ch);
+int sort_accounts(account_data *a, account_data *b);
 int sort_players_by_idnum(player_index_data *a, player_index_data *b);
 int sort_players_by_name(player_index_data *a, player_index_data *b);
 void track_empire_playtime(empire_data *emp, int add_seconds);
@@ -130,7 +139,6 @@ char_data *find_player_in_room_by_id(room_data *room, int id) {
 * @return bool TRUE if the player is from an anonymous public host, FALSE if not.
 */
 bool has_anonymous_host(descriptor_data *desc) {
-	extern const char *anonymous_public_hosts[];
 	int iter;
 	
 	if (!config_get_bool("restrict_anonymous_hosts")) {
@@ -194,8 +202,6 @@ char_data *is_playing(int id) {
 * @param account_data *acct The account to add.
 */
 void add_account_to_table(account_data *acct) {
-	int sort_accounts(account_data *a, account_data *b);
-	
 	account_data *find;
 	int id;
 	
@@ -709,8 +715,6 @@ void build_player_index(void) {
 * @param char_data *ch The player to finish loading.
 */
 void check_delayed_load(char_data *ch) {
-	void update_reputations(char_data *ch);
-	
 	char filename[256];
 	FILE *fl;
 	
@@ -743,13 +747,6 @@ void check_delayed_load(char_data *ch) {
 
 /* release memory allocated for a char struct */
 void free_char(char_data *ch) {
-	void die_follower(char_data *ch);
-	void free_alias(struct alias_data *a);
-	void free_companion(struct companion_data *cd);
-	void free_player_event_data(struct player_event_data *hash);
-	void free_mail(struct mail_data *mail);
-	void free_player_completed_quests(struct player_completed_quest **hash);
-
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
@@ -1123,10 +1120,6 @@ char_data *load_player(char *name, bool normal) {
 * @return char_data* The loaded character.
 */
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
-	extern struct player_event_data *create_event_data(char_data *ch, int event_id, any_vnum event_vnum);
-	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
-	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
-	
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH], *read;
 	int account_id = NOTHING, ignore_pos = 0, junk;
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
@@ -2362,9 +2355,6 @@ void update_player_index(player_index_data *index, char_data *ch) {
 * @param char_data *ch The player to write.
 */
 void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
-	void Crash_save(obj_data *obj, FILE *fp, int location);
-	void write_mail_to_file(FILE *fl, char_data *ch);
-	
 	struct affected_type *af, *new_af, *next_af, *af_list;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
@@ -2810,9 +2800,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 * @param char_data *ch The player to write.
 */
 void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
-	void Crash_save(obj_data *obj, FILE *fp, int location);
-	void write_mail_to_file(FILE *fl, char_data *ch);
-	
 	char temp[MAX_STRING_LENGTH];
 	struct player_completed_quest *plrcom, *next_plrcom;
 	struct player_automessage *automsg, *next_automsg;
@@ -3627,8 +3614,6 @@ void announce_login(char_data *ch) {
 * @param char_data *ch The player to check.
 */
 void check_learned_crafts(char_data *ch) {
-	void remove_learned_craft(char_data *ch, any_vnum vnum);
-	
 	struct player_craft_data *pcd, *next_pcd;
 	craft_data *craft;
 	
@@ -3688,8 +3673,6 @@ void check_currencies(char_data *ch) {
 * class. This should be called on login.
 */
 void check_skills_and_abilities(char_data *ch) {
-	void check_ability_levels(char_data *ch, any_vnum skill);
-	
 	struct player_ability_data *plab, *next_plab;
 	struct player_skill_data *plsk, *next_plsk;
 	
@@ -3887,16 +3870,6 @@ void delete_player_character(char_data *ch) {
 * @param bool fresh If FALSE, player was already in the game, not logging in fresh.
 */
 void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
-	void add_all_gain_hooks(char_data *ch);
-	void apply_all_ability_techs(char_data *ch);
-	void check_minipets_and_companions(char_data *ch);
-	void check_player_events(char_data *ch);
-	void clean_lore(char_data *ch);
-	void clean_player_kills(char_data *ch);
-	extern room_data *find_home(char_data *ch);
-	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
-	void give_level_zero_abilities(char_data *ch);
-
 	struct slash_channel *load_slash, *next_slash, *temp;
 	bool stop_action = FALSE, try_home = FALSE;
 	room_data *load_room = NULL;
@@ -4519,11 +4492,6 @@ GLB_FUNCTION(run_global_newbie_gear) {
 * @param char_data *ch A new player
 */
 void start_new_character(char_data *ch) {
-	void add_archetype_lore(char_data *ch);
-	void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
-	extern const char *default_channels[];
-	extern struct promo_code_list promo_codes[];
-	
 	char lbuf[MAX_INPUT_LENGTH];
 	int arch_iter, iter, level;
 	struct archetype_gear *gear;
@@ -5040,9 +5008,6 @@ bool member_is_timed_out_ch(char_data *ch) {
 * @param bool read_techs if TRUE, will add techs based on players (usually only during startup)
 */
 void read_empire_members(empire_data *only_empire, bool read_techs) {
-	void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_flag);
-	bool should_delete_empire(empire_data *emp);
-	
 	player_index_data *index, *next_index;
 	empire_data *e, *emp, *next_emp;
 	char_data *ch;
