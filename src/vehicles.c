@@ -45,11 +45,9 @@ const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 // local protos
 void clear_vehicle(vehicle_data *veh);
 void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
-void ruin_vehicle(vehicle_data *veh, char *message);
 
 // external funcs
 void free_custom_messages(struct custom_message *mes);
-extern bool validate_icon(char *icon);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -184,8 +182,6 @@ int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms) {
 * @param vehicle_data *veh The vehicle whose interior must go.
 */
 void delete_vehicle_interior(vehicle_data *veh) {
-	void relocate_players(room_data *room, room_data *to_room);
-	
 	struct vehicle_room_list *vrl, *next_vrl;
 	room_data *main_room;
 	

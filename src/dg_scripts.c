@@ -37,7 +37,6 @@ extern unsigned long pulse;
 
 /* other external vars */
 extern struct time_info_data time_info;
-extern struct instance_data *quest_instance_global;
 
 /* external functions */
 void check_for_eligible_goals(empire_data *emp);	// progress.c
@@ -45,7 +44,6 @@ extern struct instance_data *get_instance_for_script(int go_type, void *go);
 void free_varlist(struct trig_var_data *vd);
 extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 extern int is_substring(char *sub, char *string);
-extern room_data *obj_room(obj_data *obj);
 trig_data *read_trigger(trig_vnum vnum);
 obj_data *get_object_in_equip(char_data *ch, char *name);
 void extract_trigger(trig_data *trig);
@@ -4509,7 +4507,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									reduce_obj_binding(o, targ);
 								}
 								else {	// wasn't targeting a person, try an obj
-									struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 									obj_data *oarg = (*subfield == UID_CHAR) ? get_obj(subfield) : get_obj_by_obj(o, subfield);
 									if (oarg) {
 										free_obj_binding(&OBJ_BOUND_TO(o));	// unbind first
@@ -7436,8 +7433,6 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 	unsigned long loops = 0;
 	void *go = NULL;
 
-	void obj_command_interpreter(obj_data *obj, char *argument);
-	void vehicle_command_interpreter(vehicle_data *veh, char *argument);
 	void wld_command_interpreter(room_data *room, char *argument);
 	extern int max_inventory_size;
 

@@ -85,7 +85,6 @@ void add_dropped_item(empire_data *emp, obj_data *obj);
 void add_dropped_item_anywhere(obj_data *obj, empire_data *only_if_emp);
 void add_dropped_item_list(empire_data *emp, obj_data *list);
 static void add_obj_binding(int idnum, struct obj_binding **list);
-struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 void remove_companion(char_data *ch, any_vnum vnum);
 void remove_dropped_item(empire_data *emp, obj_data *obj);
 void remove_dropped_item_anywhere(obj_data *obj);
@@ -2907,9 +2906,6 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, do
 * @param room_data *room The room to abandon.
 */
 void perform_abandon_room(room_data *room) {
-	void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
-	void schedule_check_unload(room_data *room, bool offset);
-	
 	empire_data *emp = ROOM_OWNER(room);
 	struct empire_territory_data *ter;
 	vehicle_data *veh;
@@ -8746,8 +8742,6 @@ void set_extra_data(struct room_extra_data **list, int type, int value) {
 * @return room_data* The matching room, or NULL if none.
 */
 room_data *find_target_room(char_data *ch, char *rawroomstr) {
-	extern vehicle_data *get_vehicle(char *name);
-	extern room_data *obj_room(obj_data *obj);
 	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 	
 	struct instance_data *inst;

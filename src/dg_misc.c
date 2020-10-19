@@ -29,14 +29,6 @@
 #include "vnums.h"
 #include "constants.h"
 
-// external funcs
-void combat_meter_damage_dealt(char_data *ch, int amt);
-void combat_meter_damage_taken(char_data *ch, int amt);
-void combat_meter_heal_dealt(char_data *ch, int amt);
-void combat_meter_heal_taken(char_data *ch, int amt);
-extern room_data *get_room(room_data *ref, char *name);
-
-
 /**
 * Creates a room and adds it to the current ship/building.
 *
@@ -315,9 +307,6 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 * @param char *argument <vnum [dir] | ruin | demolish>
 */
 void do_dg_build(room_data *target, char *argument) {
-	void complete_building(room_data *room);
-	void ruin_one_building(room_data *room);	// db.world.c
-	
 	char vnum_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH];
 	bool ruin = FALSE, demolish = FALSE;
 	any_vnum vnum = NOTHING;
@@ -399,8 +388,6 @@ void do_dg_build(room_data *target, char *argument) {
 * @param vehicle_data *veh Optional: A vehicle whose ownership to change.
 */
 void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh) {
-	void kill_empire_npc(char_data *ch);
-	
 	empire_data *owner;
 	
 	if (vict && IS_NPC(vict)) {
@@ -449,8 +436,6 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 * @param char *argument The arguments passed to "%purge% instance".
 */
 void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) {
-	void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	vehicle_data *veh, *next_veh;
 	char_data *mob, *next_mob;
@@ -577,8 +562,6 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 			break;
 		}
 		case OBJ_TRIGGER: {
-			extern room_data *obj_room(obj_data *obj);
-			
 			obj_data *obj = (obj_data*)go;
 			room = obj_room(obj);
 			if (!vict) {
@@ -591,8 +574,6 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 		case RMT_TRIGGER:
 		case ADV_TRIGGER:
 		case BLD_TRIGGER: {
-			extern char_data *get_char_in_room(room_data *room, char *name);
-			
 			room = (room_data*)go;
 			emp = ROOM_OWNER(room);
 			if (!vict) {
@@ -842,11 +823,6 @@ int valid_dg_target(char_data *ch, int bitvector) {
 * Runs triggers to update and prepare the mud at startup.
 */
 void run_reboot_triggers(void) {
-	void reboot_mtrigger(char_data *ch);
-	void reboot_otrigger(obj_data *obj);
-	void reboot_vtrigger(vehicle_data *veh);
-	void reboot_wtrigger(room_data *room);
-	
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	char_data *mob, *next_mob;
@@ -877,8 +853,6 @@ void run_reboot_triggers(void) {
 * @param double modifier Percent to multiply scaled damage by (to make it lower or higher).
 */
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier) {
-	extern int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype);
-	
 	double dam;
 	
 	// no point damaging the dead
@@ -1008,10 +982,6 @@ void script_damage_over_time(char_data *vict, any_vnum atype, int level, int dam
 * @param char *argument The text passed to the command.
 */
 void script_heal(void *thing, int type, char *argument) {
-	extern char_data *get_char_by_room(room_data *room, char *name);
-	extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
-	extern int get_room_scale_level(room_data *room, char_data *targ);
-	
 	char targ_arg[MAX_INPUT_LENGTH], what_arg[MAX_INPUT_LENGTH], *scale_arg, log_root[MAX_STRING_LENGTH];
 	struct affected_type *aff, *next_aff;
 	int pos, amount, level = -1;
@@ -1161,16 +1131,6 @@ void script_heal(void *thing, int type, char *argument) {
 * @param char *argument Expected to be: <variable> <field> <value>
 */
 void script_modify(char *argument) {
-	void change_keywords(char_data *ch, char *str);
-	void change_long_desc(char_data *ch, char *str);
-	void change_look_desc(char_data *ch, char *str, bool format);
-	void change_look_desc_append(char_data *ch, char *str, bool format);
-	void change_short_desc(char_data *ch, char *str);
-	extern char *get_room_description(room_data *room);
-	extern vehicle_data *get_vehicle(char *name);
-	extern bool validate_icon(char *icon);
-	extern bool world_map_needs_save;
-	
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
 	vehicle_data *veh = NULL, *v_proto;
 	struct companion_data *cd;

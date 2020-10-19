@@ -30,14 +30,6 @@
 *   Edit Modules
 */
 
-// external vars
-extern bool world_map_needs_save;
-
-// external funcs
-void complete_building(room_data *room);
-void decustomize_shared_data(struct shared_room_data *shared);
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
 
@@ -366,8 +358,6 @@ OLC_MODULE(mapedit_room_name) {
 
 
 OLC_MODULE(mapedit_icon) {
-	extern bool validate_icon(char *icon);
-
 	delete_doubledollar(argument);
 
 	if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)))
@@ -453,9 +443,6 @@ OLC_MODULE(mapedit_room_description) {
 
 
 OLC_MODULE(mapedit_ruin) {
-	void ruin_one_building(room_data *room);	// db.world.c
-	void ruin_vehicle(vehicle_data *veh, char *message);	// vehicles.c
-	
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
 	vehicle_data *veh;
 	
@@ -483,8 +470,6 @@ OLC_MODULE(mapedit_ruin) {
 
 
 OLC_MODULE(mapedit_exits) {
-	extern room_vnum find_free_vnum();
-
 	int dir, rev;
 	room_data *to_room = NULL;
 	bool new = FALSE;

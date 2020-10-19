@@ -1687,7 +1687,12 @@ struct time_info_data *real_time_passed(time_t t2, time_t t1);
 bld_data *get_building_by_name(char *name, bool room_only);
 
 // character functions from utils.c
+void change_keywords(char_data *ch, char *str);
+void change_long_desc(char_data *ch, char *str);
+void change_look_desc(char_data *ch, char *str, bool format);
+void change_look_desc_append(char_data *ch, char *str, bool format);
 void change_sex(char_data *ch, int sex);
+void change_short_desc(char_data *ch, char *str);
 bool circle_follow(char_data *ch, char_data *victim);
 
 // component functions from utils.c
@@ -1777,6 +1782,7 @@ void command_lag(char_data *ch, int wait_type);
 void determine_gear_level(char_data *ch);
 room_data *find_load_room(char_data *ch);
 int pick_level_from_range(int level, int min, int max);
+void relocate_players(room_data *room, room_data *to_room);
 void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 bool wake_and_stand(char_data *ch);
 
@@ -2011,6 +2017,7 @@ void do_unseat_from_vehicle(char_data *ch);
 bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
 vehicle_data *get_current_piloted_vehicle(char_data *ch);
 room_data *get_shipping_target(char_data *ch, char *argument, bool *targeted_island);
+bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd);
 bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool message);
 
 // augments.c
@@ -2031,6 +2038,7 @@ void save_author_index();
 // building.c
 bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
 struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
+void complete_building(room_data *room);
 void do_customize_room(char_data *ch, char *argument);
 craft_data *find_building_list_entry(room_data *room, byte type);
 void herd_animals_out(room_data *location);
@@ -2040,6 +2048,9 @@ void process_dismantling(char_data *ch, room_data *room);
 void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 void special_building_setup(char_data *ch, room_data *room);
 void special_vehicle_setup(char_data *ch, vehicle_data *veh);
+
+// dg_wldcmd.c
+int get_room_scale_level(room_data *room, char_data *targ);
 
 // eedit.c
 bool check_unique_empire_name(empire_data *for_emp, char *name);
@@ -2070,10 +2081,17 @@ bool is_fight_enemy(char_data *ch, char_data *frenemy);
 void perform_execute(char_data *ch, char_data *victim, int attacktype, int damtype);
 void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability);
 obj_data *player_death(char_data *ch);
+int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype);
 void reset_combat_meters(char_data *ch);
 void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
 bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
 bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target);
+
+// fight.c combat meters
+void combat_meter_damage_dealt(char_data *ch, int amt);
+void combat_meter_damage_taken(char_data *ch, int amt);
+void combat_meter_heal_dealt(char_data *ch, int amt);
+void combat_meter_heal_taken(char_data *ch, int amt);
 
 // generic.c
 bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
@@ -2084,14 +2102,21 @@ bool can_enter_instance(char_data *ch, struct instance_data *inst);
 bool can_instance(adv_data *adv);
 int count_instances(adv_data *adv);
 void delete_instance(struct instance_data *inst, bool run_cleanup);
+void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
 void generate_adventure_instances();
+struct instance_data *get_instance_by_mob(char_data *mob);
 void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
+void instance_obj_setup(struct instance_data *inst, obj_data *obj);
+void mark_instance_completed(struct instance_data *inst);
+void remove_instance_fake_loc(struct instance_data *inst);
 void reset_instance(struct instance_data *inst);
+void save_instances();
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
 
 // limits.c
 bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
+void check_ruined_cities();
 void gain_condition(char_data *ch, int condition, int value);
 int health_gain(char_data *ch, bool info_only);
 int mana_gain(char_data *ch, bool info_only);
@@ -2101,6 +2126,7 @@ int move_gain(char_data *ch, bool info_only);
 bool adjacent_room_is_light(room_data *room);
 int get_map_radius(char_data *ch);
 char *get_mine_type_name(room_data *room);
+char *get_room_description(room_data *room);
 char *get_room_name(room_data *room, bool color);
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options);
 #define look_at_room(ch)  look_at_room_by_loc((ch), IN_ROOM(ch), NOBITS)
@@ -2115,6 +2141,7 @@ char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bo
 #define get_informative_color_veh(ch, veh)  get_informative_color((ch), VEH_IS_DISMANTLING(veh) ? TRUE : FALSE, !VEH_IS_COMPLETE(veh) && !VEH_IS_DISMANTLING(veh), VEH_HAS_MAJOR_DISREPAIR(veh), VEH_HAS_MINOR_DISREPAIR(veh), room_has_function_and_city_ok(VEH_OWNER(veh), IN_ROOM(veh), FNC_MINE) ? (get_room_extra_data(IN_ROOM(veh), ROOM_EXTRA_MINE_AMOUNT) > 0 ? 1 : -1) : 0, VEH_FLAGGED((veh), VEH_PLAYER_NO_WORK) || (VEH_CLAIMS_WITH_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK)), (ch) && IS_IMMORTAL(ch) && (ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_CHAMELEON) || VEH_FLAGGED(veh, VEH_CHAMELEON)) && IS_COMPLETE(IN_ROOM(veh)) && distance(X_COORD(IN_ROOM(ch)), Y_COORD(IN_ROOM(ch)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh))) > 2)
 
 // mobact.c
+void add_pursuit(char_data *ch, char_data *target);
 bool check_scaling(char_data *mob, char_data *attacker);
 int determine_best_scale_level(char_data *ch, bool check_group);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
@@ -2123,6 +2150,7 @@ void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
 void scale_mob_for_character(char_data *mob, char_data *ch);
 void scale_mob_to_level(char_data *mob, int level);
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+bool try_mobile_movement(char_data *ch);
 bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
 
 // modify.c
@@ -2135,6 +2163,9 @@ const char *get_morph_desc(char_data *ch, bool long_desc_if_true);
 morph_data *find_morph_by_name(char_data *ch, char *name);
 void finish_morphing(char_data *ch, morph_data *morph);
 bool morph_affinity_ok(room_data *location, morph_data *morph);
+
+// olc.c
+bool validate_icon(char *icon);
 
 // olc.building.c
 bool bld_has_relation(bld_data *bld, int type, bld_vnum vnum);
@@ -2245,6 +2276,7 @@ void update_world_count();
 
 // vehicles.c
 void add_room_to_vehicle(room_data *room, vehicle_data *veh);
+void check_vehicle_climate_change(room_data *room);
 void complete_vehicle(vehicle_data *veh);
 int count_harnessed_animals(vehicle_data *veh);
 int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
@@ -2262,6 +2294,8 @@ void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 char *list_harnessed_mobs(vehicle_data *veh);
 void look_at_vehicle(vehicle_data *veh, char_data *ch);
 void process_dismantle_vehicle(char_data *ch);
+void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
+void ruin_vehicle(vehicle_data *veh, char *message);
 void scale_vehicle_to_level(vehicle_data *veh, int level);
 void start_dismantle_vehicle(vehicle_data *veh);
 void start_vehicle_burning(vehicle_data *veh);

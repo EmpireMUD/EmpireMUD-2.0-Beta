@@ -30,13 +30,6 @@ extern int max_mob_id;
 extern int max_obj_id;
 extern int max_vehicle_id;
 
-// external fucs
-void free_trigger(trig_data *trig);
-extern void half_chop(char *string, char *arg1, char *arg2);
-
-// locals
-void trig_data_copy(trig_data *this_data, const trig_data *trg);
-
 
 /**
 * Uses strtok() to compile a list of trigger commands.
@@ -71,8 +64,6 @@ struct cmdlist_element *compile_command_list(char *input) {
 
 
 void parse_trigger(FILE *trig_f, int nr) {
-	void add_trigger_to_table(trig_data *trig);
-
 	int t[2], k, attach_type;
 	char line[256], *cmds, *s, flags[256], errors[MAX_INPUT_LENGTH];
 	struct cmdlist_element *cle;

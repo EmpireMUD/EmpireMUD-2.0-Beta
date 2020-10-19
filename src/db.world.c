@@ -45,35 +45,15 @@
 *   World Map System
 */
 
-// external vars
-extern bool need_world_index;
-extern bool world_map_needs_save;
-
-
 // external funcs
-void add_room_to_world_tables(room_data *room);
 EVENT_CANCEL_FUNC(cancel_room_event);
-void complete_building(room_data *room);
-void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
-void free_shared_room_data(struct shared_room_data *data);
-void grow_crop(struct map_data *map);
-extern FILE *open_world_file(int block);
-void remove_room_from_world_tables(room_data *room);
-void save_and_close_world_file(FILE *fl, int block);
-void setup_start_locations();
-void write_room_to_file(FILE *fl, room_data *room);
+EVENT_CANCEL_FUNC(cancel_room_expire_event);
 
 // locals
-void decustomize_shared_data(struct shared_room_data *shared);
-room_vnum find_free_vnum();
-room_data *get_extraction_room();
+void grow_crop(struct map_data *map);
 void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
-void ruin_one_building(room_data *room);
-void save_world_map_to_file();
-void schedule_check_unload(room_data *room, bool offset);
-extern int sort_empire_islands(struct empire_island *a, struct empire_island *b);
-void update_island_names();
+int sort_empire_islands(struct empire_island *a, struct empire_island *b);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -131,8 +111,6 @@ void change_chop_territory(room_data *room) {
 * @param sector_vnum base_sect Optional: Sets the base sector, too. (pass NOTHING to set it the same as sect)
 */
 void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
-	void check_vehicle_climate_change(room_data *room);
-	
 	sector_data *old_sect = SECT(room), *st = sector_proto(sect), *base;
 	struct map_data *map, *temp;
 	crop_data *new_crop = NULL;
@@ -481,11 +459,6 @@ room_data *create_room(room_data *home) {
 * @param bool check_exits If TRUE, updates all world exits right away*.
 */
 void delete_room(room_data *room, bool check_exits) {
-	EVENT_CANCEL_FUNC(cancel_room_expire_event);
-	void relocate_players(room_data *room, room_data *to_room);
-	void remove_instance_fake_loc(struct instance_data *inst);
-	void remove_room_from_vehicle(room_data *room, vehicle_data *veh);
-
 	struct room_direction_data *ex, *next_ex, *temp;
 	struct empire_territory_data *ter;
 	struct empire_city_data *city, *next_city;
@@ -1010,8 +983,6 @@ void set_crop_type(room_data *room, crop_data *cp) {
 * Executes a full-world save.
 */
 void save_whole_world(void) {
-	void save_instances();
-	
 	FILE *fl = NULL, *index = NULL;
 	room_data *iter, *next_iter;
 	room_vnum vnum;
@@ -1075,7 +1046,6 @@ void save_whole_world(void) {
 * for delayed un-loads. To be run at the end of startup.
 */
 void schedule_map_unloads(void) {
-	void schedule_check_unload(room_data *room, bool offset);
 	room_data *room, *next_room;
 	
 	HASH_ITER(hh, world_table, room, next_room) {
@@ -1255,8 +1225,6 @@ void annual_update_map_tile(struct map_data *tile) {
 * Runs an annual update (mainly, maintenance) on the vehicle.
 */
 void annual_update_vehicle(vehicle_data *veh) {
-	void ruin_vehicle(vehicle_data *veh, char *message);
-	
 	static struct resource_data *default_res = NULL;
 	struct resource_data *old_list;
 	char *msg;
@@ -1302,8 +1270,6 @@ void annual_update_vehicle(vehicle_data *veh) {
 * This runs once a mud year to update the world.
 */
 void annual_world_update(void) {
-	void check_ruined_cities();
-	
 	char message[MAX_STRING_LENGTH];
 	vehicle_data *veh, *next_veh;
 	descriptor_data *d;
@@ -1774,12 +1740,6 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 * @param room_data *room The room to reset.
 */
 void reset_one_room(room_data *room) {
-	void add_convert_vehicle_data(char_data *mob, any_vnum vnum);
-	void change_keywords(char_data *ch, char *str);
-	void change_long_desc(char_data *ch, char *str);
-	void change_short_desc(char_data *ch, char *str);
-	void objpack_load_room(room_data *room);
-	
 	char field[256], str[MAX_INPUT_LENGTH];
 	struct reset_com *reset;
 	char_data *tmob = NULL; /* for trigger assignment */
@@ -2144,8 +2104,6 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 //// TAVERNS /////////////////////////////////////////////////////////////////
 
 EVENTFUNC(tavern_update) {
-	extern bool extract_tavern_resources(room_data *room);
-	
 	struct room_event_data *data = (struct room_event_data *)event_obj;
 	room_data *room;
 	
@@ -2381,8 +2339,6 @@ struct empire_territory_data *create_territory_entry(empire_data *emp, room_data
 * @param bool make_npcs_homeless If TRUE, any NPCs in the territory become homeless.
 */
 void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless) {
-	extern struct empire_territory_data *global_next_territory_entry;
-	
 	// prevent loss
 	if (ter == global_next_territory_entry) {
 		global_next_territory_entry = ter->hh.next;
@@ -2569,8 +2525,6 @@ void reread_empire_tech(empire_data *emp) {
 
 // fills trench when complete
 EVENTFUNC(trench_fill_event) {
-	void fill_trench(room_data *room);
-	
 	struct map_event_data *trench_data = (struct map_event_data *)event_obj;
 	struct map_data *map;
 	room_data *room;

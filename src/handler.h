@@ -111,6 +111,10 @@ void char_to_room(char_data *ch, room_data *room);
 char_data *find_closest_char(char_data *ch, char *arg, bool pc);
 char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum);
 char_data *find_mortal_in_room(room_data *room);
+char_data *get_char_by_obj(obj_data *obj, char *name);
+char_data *get_char_by_room(room_data *room, char *name);
+char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
+char_data *get_char_in_room(room_data *room, char *name);
 char_data *get_char_room(char *name, room_data *room);
 char_data *get_char_room_vis(char_data *ch, char *name, int *number);
 char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t where);
@@ -185,6 +189,9 @@ void add_empire_needs(empire_data *emp, int island, int type, int amount);
 struct empire_needs *get_empire_needs(empire_data *emp, int island, int type);
 bool empire_has_needs_status(empire_data *emp, int island, int type, bitvector_t status);
 
+// empire npc handlers
+void kill_empire_npc(char_data *ch);
+
 // empire targeting handlers
 struct empire_city_data *find_city(empire_data *emp, room_data *loc);
 struct empire_city_data *find_city_entry(empire_data *emp, room_data *location);
@@ -243,6 +250,7 @@ void perform_mount(char_data *ch, char_data *mount);
 
 // object handlers
 void add_to_object_list(obj_data *obj);
+struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 obj_data *copy_warehouse_obj(obj_data *input);
 void empty_obj_before_extract(obj_data *obj);
 void extract_obj(obj_data *obj);
@@ -297,11 +305,15 @@ bool has_custom_message(struct custom_message *list, int type);
 // object targeting handlers
 obj_data *get_component_in_list(any_vnum cmp_vnum, obj_data *list, bool *kept);
 obj_data *get_obj_by_char_share(char_data *ch, char *arg);
+obj_data *get_obj_by_obj(obj_data *obj, char *name);
+obj_data *get_obj_by_room(room_data *room, char *name);
+obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name);
 obj_data *get_obj_in_list_num(int num, obj_data *list);
 obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list);
 obj_data *get_obj_in_list_vis(char_data *ch, char *name, int *number, obj_data *list);
 obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, int *number, obj_data *list, int interact_type);
 obj_data *get_obj_in_list_vis_prefer_type(char_data *ch, char *name, int *number, obj_data *list, int obj_type);
+obj_data *get_obj_in_room(room_data *room, char *name);
 int get_obj_pos_in_equip_vis(char_data *ch, char *arg, int *number, obj_data *equipment[]);
 obj_vnum get_obj_vnum_by_name(char *name, bool storable_only);
 obj_data *get_obj_vis(char_data *ch, char *name, int *number);
@@ -419,7 +431,12 @@ void vehicle_from_room(vehicle_data *veh);
 void vehicle_to_room(vehicle_data *veh, room_data *room);
 
 // vehicle targeting handlers
+vehicle_data *get_vehicle(char *name);
+vehicle_data *get_vehicle_by_obj(obj_data *obj, char *name);
+vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name);
 vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, char *name, int *number);
+vehicle_data *get_vehicle_near_obj(obj_data *obj, char *name);
+vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name);
 #define get_vehicle_in_room_vis(ch, name, number)  get_vehicle_in_target_room_vis((ch), IN_ROOM(ch), (name), (number))
 vehicle_data *get_vehicle_vis(char_data *ch, char *name, int *number);
 vehicle_data *get_vehicle_room(room_data *room, char *name, int *number);
@@ -429,6 +446,8 @@ vehicle_data *get_vehicle_world_vis(char_data *ch, char *name, int *number);
 // world handlers
 struct room_direction_data *find_exit(room_data *room, int dir);
 int get_direction_for_char(char_data *ch, int dir);
+room_data *get_room(room_data *ref, char *name);
+room_data *obj_room(obj_data *obj);
 int parse_direction(char_data *ch, char *dir);
 void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 

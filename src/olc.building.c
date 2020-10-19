@@ -1461,8 +1461,6 @@ OLC_MODULE(bedit_hitpoints) {
 
 
 OLC_MODULE(bedit_icon) {
-	extern bool validate_icon(char *icon);
-
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	
 	delete_doubledollar(argument);

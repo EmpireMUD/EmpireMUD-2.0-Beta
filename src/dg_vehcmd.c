@@ -29,40 +29,9 @@
 /**
 * Contents:
 *   Helpers
-*   Commands
+*   Vehicle Commands
+*   Vehicle Command Interpreter
 */
-
-// external vars
-extern struct instance_data *quest_instance_global;
-
-// external functions
-extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
-extern obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name);
-extern room_data *get_room(room_data *ref, char *name);
-extern vehicle_data *get_vehicle(char *name);
-extern vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name);
-extern vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name);
-void instance_obj_setup(struct instance_data *inst, obj_data *obj);
-extern room_data *obj_room(obj_data *obj);
-void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
-void sub_write_to_room(char *str, room_data *room, bool use_queue);
-void vehicle_command_interpreter(vehicle_data *veh, char *argument);
-
-
-// local stuff
-#define VCMD(name)  void (name)(vehicle_data *veh, char *argument, int cmd, int subcmd)
-
-struct vehicle_command_info {
-	char *command;
-	void (*command_pointer)(vehicle_data *veh, char *argument, int cmd, int subcmd);
-	int subcmd;
-};
-
-
-// do_vsend
-#define SCMD_VSEND         0
-#define SCMD_VECHOAROUND   1
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -122,11 +91,9 @@ void veh_log(vehicle_data *veh, const char *format, ...) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// COMMANDS ////////////////////////////////////////////////////////////////
+//// VEHICLE COMMANDS ////////////////////////////////////////////////////////
 
 VCMD(do_vadventurecomplete) {
-	void mark_instance_completed(struct instance_data *inst);
-	
 	room_data *room = IN_ROOM(veh);
 	struct instance_data *inst;
 	
@@ -145,8 +112,6 @@ VCMD(do_vadventurecomplete) {
 
 
 VCMD(do_vbuild) {
-	void do_dg_build(room_data *target, char *argument);
-
 	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
 	room_data *orm = IN_ROOM(veh), *target;
 	
@@ -442,7 +407,6 @@ VCMD(do_vsend) {
 
 
 VCMD(do_vmod) {
-	void script_modify(char *argument);
 	script_modify(argument);
 }
 
@@ -476,14 +440,11 @@ VCMD(do_vmorph) {
 
 // incoming subcmd is direction
 VCMD(do_vmove) {
-	extern bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd);
 	move_vehicle(NULL, veh, subcmd, 0);
 }
 
 
 VCMD(do_vown) {
-	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
-	
 	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
 	room_data *orm = IN_ROOM(veh);
 	vehicle_data *vtarg = NULL;
@@ -699,7 +660,6 @@ VCMD(do_vpurge) {
 
 // quest commands
 VCMD(do_vquest) {
-	void do_dg_quest(int go_type, void *go, char *argument);	
 	do_dg_quest(VEH_TRIGGER, veh, argument);
 }
 
@@ -889,8 +849,6 @@ VCMD(do_vteleport) {
 
 
 VCMD(do_vterracrop) {
-	void do_dg_terracrop(room_data *target, crop_data *crop);
-
 	char loc_arg[MAX_INPUT_LENGTH], crop_arg[MAX_INPUT_LENGTH];
 	room_data *orm = IN_ROOM(veh), *target;
 	crop_data *crop;
@@ -938,8 +896,6 @@ VCMD(do_vterracrop) {
 
 
 VCMD(do_vterraform) {
-	void do_dg_terraform(room_data *target, sector_data *sect);
-
 	char loc_arg[MAX_INPUT_LENGTH], sect_arg[MAX_INPUT_LENGTH];
 	room_data *orm = IN_ROOM(veh), *target;
 	sector_data *sect;
@@ -1635,6 +1591,9 @@ VCMD(do_vscale) {
 }
 
 
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE COMMAND INTERPRETER /////////////////////////////////////////////
+
 const struct vehicle_command_info veh_cmd_info[] = {
 	{ "RESERVED", 0, 0 },/* this must be first -- for specprocs */
 	
@@ -1690,7 +1649,6 @@ const struct vehicle_command_info veh_cmd_info[] = {
 
 	{ "\n", 0, 0 }        /* this must be last */
 };
-
 
 
 /**

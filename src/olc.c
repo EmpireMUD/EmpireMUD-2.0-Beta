@@ -596,9 +596,6 @@ extern skill_data *setup_olc_skill(skill_data *input);
 extern social_data *setup_olc_social(social_data *input);
 extern struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_storage);
 
-// prototypes: other
-extern bool validate_icon(char *icon);
-
 
 // master olc command structure
 const struct olc_command_data olc_data[] = {

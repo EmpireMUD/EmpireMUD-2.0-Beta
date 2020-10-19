@@ -960,8 +960,6 @@ generic_data *create_generic_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_generic(char_data *ch, any_vnum vnum) {
-	void complete_building(room_data *room);
-	
 	struct trading_post_data *tpd, *next_tpd;
 	struct player_currency *cur, *next_cur;
 	struct empire_unique_storage *eus;

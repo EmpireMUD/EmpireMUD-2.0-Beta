@@ -960,8 +960,6 @@ OFFER_FINISH(ofin_quest) {
 
 
 OFFER_VALIDATE(oval_rez) {
-	extern room_data *obj_room(obj_data *obj);
-	
 	room_data *loc = real_room(offer->location);
 	obj_data *corpse;
 	

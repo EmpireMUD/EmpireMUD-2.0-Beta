@@ -112,8 +112,6 @@ bitvector_t compile_argument_types_for_trigger(trig_data *trig) {
 * @return trig_data* The new trigger.
 */
 trig_data *create_trigger_table_entry(trig_vnum vnum) {
-	void add_trigger_to_table(trig_data *trig);
-	
 	trig_data *trig;
 	
 	// sanity

@@ -396,12 +396,13 @@ void delete_empire(empire_data *emp);
 void delete_member_data(char_data *ch, empire_data *from_emp);
 void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
-struct empire_island *get_empire_island(empire_data *emp, int island_id);
-int get_main_island(empire_data *emp);
-empire_data *get_or_create_empire(char_data *ch);
+bool extract_tavern_resources(room_data *room);
 void free_dropped_items(struct empire_dropped_item **list);
 void free_empire(empire_data *emp);
 void free_member_data(empire_data *emp);
+struct empire_island *get_empire_island(empire_data *emp, int island_id);
+int get_main_island(empire_data *emp);
+empire_data *get_or_create_empire(char_data *ch);
 struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
 bool member_is_timed_out_ch(char_data *ch);
 void read_empire_members(empire_data *only_empire, bool read_techs);
@@ -430,6 +431,9 @@ void remove_recent_offenses(empire_data *emp, int type, char_data *offender);
 // empire misc
 void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
 char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
+
+// empire territory
+void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
 
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
@@ -490,6 +494,8 @@ void index_boot_help();
 void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
 
 // instances
+extern struct instance_data *quest_instance_global;
+
 struct instance_data *get_instance_by_id(any_vnum instance_id);
 
 // interactions
@@ -507,6 +513,7 @@ char *get_island_name_for(int island_id, char_data *for_ch);
 bool island_has_default_name(struct island_info *island);
 void number_and_count_islands(bool reset);
 void save_island_table();
+void update_island_names();
 
 // mobiles/chars
 extern account_data *account_table;
@@ -564,6 +571,7 @@ void Crash_save(obj_data *obj, FILE *fp, int location);
 void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
 obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
+void objpack_load_room(room_data *room);
 
 // players
 extern struct group_data *group_list;
@@ -698,6 +706,7 @@ extern trig_data *trigger_list;
 extern trig_data *random_triggers;
 extern trig_data *free_trigger_list;
 
+void add_trigger_to_table(trig_data *trig);
 int sort_triggers(trig_data *a, trig_data *b);
 void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 
@@ -719,7 +728,10 @@ extern room_data *world_table;
 extern room_data *interior_room_list;
 extern struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];
 extern struct map_data *land_map;
+extern bool need_world_index;
+extern bool world_map_needs_save;
 
+void add_room_to_world_tables(room_data *room);
 void annual_world_update();
 void change_chop_territory(room_data *room);
 void check_all_exits();
@@ -728,27 +740,39 @@ void clear_private_owner(int id);
 struct room_direction_data *create_exit(room_data *from, room_data *to, int dir, bool back);
 room_data *create_room(room_data *home);
 void decustomize_room(room_data *room);
+void decustomize_shared_data(struct shared_room_data *shared);
 room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
 void delete_room(room_data *room, bool check_exits);
+room_vnum find_free_vnum();
 void finish_trench(room_data *room);
 void free_complex_data(struct complex_room_data *data);
+void free_shared_room_data(struct shared_room_data *data);
+room_data *get_extraction_room();
 crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
 struct complex_room_data *init_complex_data();
 void init_mine(room_data *room, char_data *ch, empire_data *emp);
 room_data *load_map_room(room_vnum vnum);
+FILE *open_world_file(int block);
 void output_map_to_file();
 void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
 void perform_burn_room(room_data *room);
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
+void remove_room_from_world_tables(room_data *room);
+void ruin_one_building(room_data *room);
 void run_external_evolutions();
+void save_and_close_world_file(FILE *fl, int block);
 void save_whole_world();
+void save_world_map_to_file();
 void schedule_burn_down(room_data *room);
+void schedule_check_unload(room_data *room, bool offset);
 void schedule_trench_fill(struct map_data *map);
+void setup_start_locations();
 void sort_exits(struct room_direction_data **list);
 void sort_world_table();
 void stop_burning(room_data *room);
 void untrench_room(room_data *room);
+void write_room_to_file(FILE *fl, room_data *room);
 void write_shared_room_data(FILE *fl, struct shared_room_data *dat);
 
 // misc
@@ -769,6 +793,9 @@ extern bool global_mute_slash_channel_joins;
 
 // statistics.c
 extern int max_players_this_uptime;
+
+// workforce.c
+extern struct empire_territory_data *global_next_territory_entry;
 
 
 /* global buffering system */

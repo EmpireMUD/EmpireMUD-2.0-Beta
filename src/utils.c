@@ -53,7 +53,6 @@
 
 // external funcs
 void remove_companion_mod(struct companion_data **companion, int type);
-void send_char_pos(char_data *ch, int dam);
 
 // locals
 #define WHITESPACE " \t"	// used by some of the string functions

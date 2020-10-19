@@ -34,9 +34,6 @@ char *matching_quote(char *p);
 bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
 char *str_str(char *cs, char *ct);
 
-// external vars
-extern struct instance_data *quest_instance_global;
-
 // locals
 int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
 int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer);

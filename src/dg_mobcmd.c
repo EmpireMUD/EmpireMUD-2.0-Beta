@@ -38,7 +38,6 @@
 *  easiest possible way to install and begin using. Documentation for     *
 *  such installation can be found in INSTALL.  Enjoy........    N'Atas-Ha *
 ***************************************************************************/
-// clean
 
 #include "conf.h"
 #include "sysdep.h"
@@ -54,22 +53,14 @@
 #include "vnums.h"
 #include "constants.h"
 
-// external vars
-extern struct instance_data *quest_instance_global;
-
-// external funcs
-extern struct instance_data *get_instance_by_mob(char_data *mob);
-extern room_data *get_room(room_data *ref, char *name);
-extern vehicle_data *get_vehicle(char *name);
-void instance_obj_setup(struct instance_data *inst, obj_data *obj);
-extern room_data *obj_room(obj_data *obj);
-void send_char_pos(char_data *ch, int dam);
-void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
-void sub_write_to_room(char *str, room_data *room, bool use_queue);
-
-/*
-* Local functions.
+/**
+* Contents:
+*   Helpers
+*   Mobile Commands
 */
+
+ //////////////////////////////////////////////////////////////////////////////
+//// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
 * For scaled damage functions, allows mob flags to contribute.
@@ -109,15 +100,17 @@ void mob_log(char_data *mob, const char *format, ...) {
 	va_end(args);
 }
 
+
 /*
 ** macro to determine if a mob is permitted to use these commands
 */
 #define MOB_OR_IMPL(ch) (IS_NPC(ch) && (!(ch)->desc || GET_ACCESS_LEVEL((ch)->desc->original) >= LVL_CIMPL))
 
-/* mob commands */
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MOBILE COMMANDS /////////////////////////////////////////////////////////
 
 ACMD(do_madventurecomplete) {
-	void mark_instance_completed(struct instance_data *inst);
 	struct instance_data *inst;
 	
 	if (!MOB_OR_IMPL(ch)) {
@@ -853,7 +846,6 @@ ACMD(do_mload) {
 
 
 ACMD(do_mmod) {
-	void script_modify(char *argument);
 	script_modify(argument);
 }
 
@@ -891,8 +883,6 @@ ACMD(do_mmorph) {
 
 
 ACMD(do_mmove) {
-	extern bool try_mobile_movement(char_data *ch);
-
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
 		return;
@@ -994,8 +984,6 @@ ACMD(do_mpurge) {
 
 // quest commands
 ACMD(do_mquest) {
-	void do_dg_quest(int go_type, void *go, char *argument);
-		
 	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
 		send_config_msg(ch, "huh_string");
 		return;
@@ -1100,8 +1088,6 @@ ACMD(do_mat) {
 
 
 ACMD(do_mbuild) {
-	void do_dg_build(room_data *target, char *argument);
-	
 	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
 	room_data *target;
 	
@@ -1365,8 +1351,6 @@ ACMD(do_mteleport) {
 
 
 ACMD(do_mterracrop) {
-	void do_dg_terracrop(room_data *target, crop_data *cp);
-
 	char loc_arg[MAX_INPUT_LENGTH], crop_arg[MAX_INPUT_LENGTH];
 	crop_data *crop;
 	room_data *target;
@@ -1418,8 +1402,6 @@ ACMD(do_mterracrop) {
 
 
 ACMD(do_mterraform) {
-	void do_dg_terraform(room_data *target, sector_data *sect);
-
 	char loc_arg[MAX_INPUT_LENGTH], sect_arg[MAX_INPUT_LENGTH];
 	sector_data *sect;
 	room_data *target;
@@ -1728,8 +1710,6 @@ ACMD(do_mheal) {
 
 /* hunt for someone */
 ACMD(do_mhunt) {
-	void add_pursuit(char_data *ch, char_data *target);
-	
 	char_data *victim;
 	char arg[MAX_INPUT_LENGTH];
 
@@ -2281,8 +2261,6 @@ ACMD(do_mfollow) {
 
 
 ACMD(do_mown) {
-	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
-	
 	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
 	vehicle_data *vtarg = NULL;
 	empire_data *emp = NULL;

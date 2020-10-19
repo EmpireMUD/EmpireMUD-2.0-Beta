@@ -1271,7 +1271,6 @@ void death_restore(char_data *ch) {
 obj_data *die(char_data *ch, char_data *killer) {
 	void cancel_blood_upkeeps(char_data *ch);
 	void despawn_charmies(char_data *ch, any_vnum only_vnum);
-	void kill_empire_npc(char_data *ch);
 	
 	char_data *ch_iter, *player, *killmaster;
 	obj_data *corpse = NULL;
@@ -3318,8 +3317,6 @@ void heal(char_data *ch, char_data *vict, int amount) {
 * @return int the result of damage() or -1
 */
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
-	void add_pursuit(char_data *ch, char_data *target);
-	
 	struct instance_data *inst;
 	int w_type, result, bonus, ret_val;
 	bool success = FALSE, block = FALSE;

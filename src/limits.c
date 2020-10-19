@@ -39,7 +39,6 @@
 */
 
 // external funcs
-extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
 
 
@@ -298,8 +297,6 @@ void check_should_dismount(char_data *ch) {
 * Interaction func for "decays-to" and "consumes-to".
 */
 INTERACTION_FUNC(consumes_or_decays_interact) {
-	struct obj_binding *copy_obj_bindings(struct obj_binding *from);
-	
 	obj_data *new_obj;
 	bool fail = FALSE;
 	int iter;
@@ -574,7 +571,6 @@ void real_update_char(char_data *ch) {
 	void cancel_blood_upkeeps(char_data *ch);
 	void check_combat_end(char_data *ch);
 	void check_morph_ability(char_data *ch);
-	void combat_meter_damage_dealt(char_data *ch, int amt);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	void random_encounter(char_data *ch);
 	extern bool starving_vampire_aggro(char_data *ch);
@@ -1844,8 +1840,6 @@ void autostore_vehicle_contents(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle to update.
 */
 void point_update_vehicle(vehicle_data *veh) {
-	void ruin_vehicle(vehicle_data *veh, char *message);
-	
 	char *msg;
 	
 	if (VEH_IS_EXTRACTED(veh)) {

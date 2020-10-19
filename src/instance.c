@@ -44,13 +44,11 @@ int count_players_in_instance(struct instance_data *inst, bool include_imms, cha
 int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum);
 void despawn_instance_vehicles(struct instance_data *inst);
 static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
-void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
 void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
 void link_instance_entrance(struct instance_data *inst);
-void remove_instance_fake_loc(struct instance_data *inst);
 void scale_instance_to_level(struct instance_data *inst, int level);
 
 
@@ -83,8 +81,6 @@ const bool is_location_rule[] = {
 * @param struct instance_data *inst The instance.
 */
 void build_instance_exterior(struct instance_data *inst) {
-	void complete_building(room_data *room);
-	
 	char_data *mob, *next_mob;
 	bld_data *bdg;
 	
@@ -1041,8 +1037,6 @@ void generate_adventure_instances(void) {
 */
 void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	void expire_instance_quests(struct instance_data *inst);
-	extern room_data *get_extraction_room(void);
-	void relocate_players(room_data *room, room_data *to_room);
 	
 	struct instance_mob *im, *next_im;
 	struct adventure_link_rule *rule;
@@ -1993,8 +1987,6 @@ struct instance_data *get_instance_by_mob(char_data *mob) {
 * @return struct instance_data* The matching instance for where the script is running, or NULL if none.
 */
 struct instance_data *get_instance_for_script(int go_type, void *go) {
-	extern room_data *obj_room(obj_data *obj);
-	
 	struct instance_data *inst = NULL;
 	room_data *orm;
 	

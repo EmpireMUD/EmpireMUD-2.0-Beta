@@ -48,7 +48,6 @@ const char *default_quest_complete_msg = "You have completed the quest.\r\n";
 extern int count_cities(empire_data *emp);
 extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 void get_requirement_display(struct req_data *list, char *save_buffer);
-extern room_data *obj_room(obj_data *obj);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
 
 // external vars
