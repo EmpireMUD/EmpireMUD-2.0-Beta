@@ -3167,8 +3167,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 		newd->shipping_id = -1;
 		
 		// put right after shipd in the list
-		newd->next = shipd->next;
-		shipd->next = newd;
+		DL_APPEND_ELEM(EMPIRE_SHIPPING_LIST(emp), shipd, newd);
 		
 		// remove overage
 		shipd->amount = size_avail - capacity;
