@@ -343,7 +343,6 @@ void check_oedit_material_list(void) {
 * @return obj_data* The new object's prototype.
 */
 obj_data *create_obj_table_entry(obj_vnum vnum) {
-	extern struct obj_proto_data *create_obj_proto_data();
 	void add_object_to_table(obj_data *obj);
 	
 	obj_data *obj;
@@ -1820,8 +1819,6 @@ struct obj_storage_type *copy_storage(struct obj_storage_type *list) {
 * @return obj_data *The copied object.
 */
 obj_data *setup_olc_object(obj_data *input) {
-	extern struct obj_proto_data *create_obj_proto_data();
-	
 	obj_data *new;
 	
 	CREATE(new, obj_data, 1);

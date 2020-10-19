@@ -602,4 +602,13 @@ char *UnicodeGet(int aValue);
  */
 void UnicodeAdd(char **apString, int aValue);
 
+
+/******************************************************************************
+ Additional functions (EmpireMUD)
+ ******************************************************************************/
+
+// helps ensure unnecessary color codes aren't sent
+char *flush_reduced_color_codes(descriptor_t *desc);
+
+
 #endif /* PROTOCOL_H */

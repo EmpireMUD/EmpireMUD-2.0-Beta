@@ -119,7 +119,6 @@ void free_freeable_triggers(void) {
 
 /* release memory allocated for a variable list */
 void free_varlist(struct trig_var_data *vd) {
-	void free_var_el(struct trig_var_data *var);
 	struct trig_var_data *var, *next_var;
 	LL_FOREACH_SAFE(vd, var, next_var) {
 		free_var_el(var);

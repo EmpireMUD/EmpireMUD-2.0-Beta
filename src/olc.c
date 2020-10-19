@@ -5444,7 +5444,6 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 * @param struct bld_relation **list A pointer to the list we're adding/changing.
 */
 void olc_process_relations(char_data *ch, char *argument, struct bld_relation **list) {
-	void free_bld_relations(struct bld_relation *list);
 	void smart_copy_bld_relations(struct bld_relation **to_list, struct bld_relation *from_list);
 	
 	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];

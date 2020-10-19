@@ -56,7 +56,6 @@ int get_ability_points_available(any_vnum skill, int level);
 int get_ability_points_spent(char_data *ch, any_vnum skill);
 void get_skill_synergy_display(struct synergy_ability *list, char *save_buffer, char_data *info_ch);
 bool green_skill_deadend(char_data *ch, any_vnum skill);
-void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
 int sort_skill_abilities(struct skill_ability *a, struct skill_ability *b);
 int sort_synergies(struct synergy_ability *a, struct synergy_ability *b);
 

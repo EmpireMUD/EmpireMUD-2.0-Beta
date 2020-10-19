@@ -45,17 +45,75 @@
 *   Miscellaneous Savers
 */
 
-// external vars
-
-// external functions
-void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
-void discrete_load(FILE *fl, int mode, char *filename);
-void index_boot(int mode);
-extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
+// functions called during startup
+void Read_Invalid_List();
+void abandon_lost_vehicles();
+void boot_world();
+void build_all_quest_lookups();
+void build_all_shop_lookups();
+void build_land_map();
+void build_player_index();
+void build_world_map();
+void check_abilities();
+void check_and_link_faction_relations();
+void check_archetypes();
+void check_classes();
+void check_for_bad_buildings();
+void check_for_bad_sectors();
+void check_for_new_map();
+void check_learned_empire_crafts();
+void check_newbie_islands();
+void check_nowhere_einv_all();
+void check_ruined_cities();
+void check_sector_times(any_vnum only_sect);
+void check_skills();
+void check_triggers();
+void check_version();
+void chore_update();
+void clean_empire_logs();
+void compute_generic_relations();
+void delete_old_players();
+void delete_orphaned_rooms();
+void expire_old_politics();
+void generate_island_descriptions();
+void index_boot_world();
+void init_config_system();
+void init_inherent_player_techs();
+void init_reputation();
+void link_and_check_vehicles();
+void load_automessages();
+void load_banned();
+void load_daily_quest_file();
+void load_empire_storage();
+void load_fight_messages();
+void load_instances();
+void load_islands();
+void load_running_events_file();
+void load_slash_channels();
+void load_tips_of_the_day();
+void load_trading_post();
+void load_world_map_from_file();
+void read_ability_requirements();
+void renum_world();
+void run_reboot_triggers();
+void schedule_map_unloads();
+void setup_island_levels();
+void setup_start_locations();
+void sort_commands();
+void startup_room_reset();
+void update_instance_world_size();
+void verify_empire_goals();
+void verify_running_events();
+void verify_sectors();
+int sort_abilities_by_data(ability_data *a, ability_data *b);
+int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
+int sort_augments_by_data(augment_data *a, augment_data *b);
+int sort_classes_by_data(class_data *a, class_data *b);
+int sort_skills_by_data(skill_data *a, skill_data *b);
+int sort_socials_by_data(social_data *a, social_data *b);
 
 // local functions
 void get_one_line(FILE *fl, char *buf);
-void reset_time();
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -283,41 +341,6 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 * world (objs, mobs, etc) has its own function.
 */
 void boot_db(void) {
-	void Read_Invalid_List();
-	void abandon_lost_vehicles();
-	void boot_world();
-	void build_all_quest_lookups();
-	void build_all_shop_lookups();
-	void build_player_index();
-	void check_for_new_map();
-	void check_learned_empire_crafts();
-	void check_nowhere_einv_all();
-	void check_ruined_cities();
-	void check_version();
-	void check_sector_times(any_vnum only_sect);
-	void chore_update();
-	void delete_old_players();
-	void delete_orphaned_rooms();
-	void expire_old_politics();
-	void generate_island_descriptions();
-	void init_config_system();
-	void init_inherent_player_techs();
-	void link_and_check_vehicles();
-	void load_automessages();
-	void load_banned();
-	void load_fight_messages();
-	void load_slash_channels();
-	void load_tips_of_the_day();
-	void load_trading_post();
-	void run_reboot_triggers();
-	void schedule_map_unloads();
-	void setup_island_levels();
-	void sort_commands();
-	void startup_room_reset();
-	void update_instance_world_size();
-	void verify_empire_goals();
-	void verify_sectors();
-
 	log("Boot db -- BEGIN.");
 	
 	log("Loading game config system.");
@@ -453,40 +476,8 @@ void boot_db(void) {
 * rooms (because rooms have sectors).
 */
 void boot_world(void) {
-	void build_land_map();
-	void build_world_map();
-	void check_abilities();
-	void check_and_link_faction_relations();
-	void check_archetypes();
-	void check_classes();
-	void check_skills();
-	void check_for_bad_buildings();
-	void check_for_bad_sectors();
-	void check_newbie_islands();
-	void check_triggers();
-	void clean_empire_logs();
-	void compute_generic_relations();
-	void index_boot_world();
-	void init_reputation();
-	void load_daily_quest_file();
-	void load_empire_storage();
-	void load_instances();
-	void load_islands();
-	void load_running_events_file();
-	void load_world_map_from_file();
-	void read_ability_requirements();
-	void renum_world();
-	void setup_start_locations();
-	void verify_running_events();
-	extern int sort_abilities_by_data(ability_data *a, ability_data *b);
-	extern int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
-	extern int sort_augments_by_data(augment_data *a, augment_data *b);
-	extern int sort_classes_by_data(class_data *a, class_data *b);
-	extern int sort_crafts_by_data(craft_data *a, craft_data *b);
-	extern int sort_skills_by_data(skill_data *a, skill_data *b);
-	extern int sort_socials_by_data(social_data *a, social_data *b);
-
 	// DB_BOOT_x search: boot new types in this function
+	// TODO: could load them sequentially fromm the array (need to order the array)
 	
 	log("Loading generics.");
 	index_boot(DB_BOOT_GEN);
@@ -705,8 +696,6 @@ void add_trd_owner(room_vnum vnum, empire_vnum owner) {
 * startup and should also be called any time a building is deleted.
 */
 void check_for_bad_buildings(void) {
-	void unlink_instance_entrance(room_data *room, bool run_cleanup);
-
 	struct obj_storage_type *store, *next_store, *temp;
 	struct bld_relation *relat, *next_relat;
 	bld_data *bld, *next_bld;
@@ -743,7 +732,7 @@ void check_for_bad_buildings(void) {
 		else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && !find_instance_by_room(room, TRUE, FALSE)) {
 			// room is marked as an instance entrance, but no instance is associated with it
 			log(" unlinking instance entrance room %d for no association with an instance", GET_ROOM_VNUM(room));
-			unlink_instance_entrance(room, FALSE);
+			unlink_instance_entrance(room, NULL, FALSE);
 		}
 		/* This probably isn't necessary and having it here will cause roads to be pulled up as of b3.17 -paul
 		else if (COMPLEX_DATA(room) && !GET_BUILDING(room) && !GET_ROOM_TEMPLATE(room)) {
@@ -966,10 +955,6 @@ void process_temporary_room_data(void) {
 * scheduled until this point.
 */
 void renum_world(void) {
-	void schedule_burn_down(room_data *room);
-	void schedule_room_affect_expire(room_data *room, struct affected_type *af);
-	void schedule_trench_fill(struct map_data *map);
-	
 	room_data *room, *next_room, *home;
 	struct room_direction_data *ex, *next_ex, *temp;
 	struct affected_type *af;
@@ -1136,7 +1121,6 @@ int file_to_string(const char *name, char *buf) {
  * is to the string we're interested in and not a copy.
  */
 int file_to_string_alloc(const char *name, char **buf) {
-	extern int file_to_string(const char *name, char *buf);
 	char temp[MAX_STRING_LENGTH];
 	descriptor_data *in_use;
 
@@ -1325,8 +1309,6 @@ void load_help(FILE *fl) {
 * Loads the help index and every help file therein.
 */
 void index_boot_help(void) {
-	extern int help_sort(const void *a, const void *b);
-	
 	const char *index_filename, *prefix = NULL;	/* NULL or egcs 1.1 complains */
 	FILE *index, *db_file;
 	int rec_count = 0, size[2];
@@ -2531,8 +2513,6 @@ void b4_39_data_conversion(void) {
 
 // b5.1 changes the values of ATYPE_x consts and this updates existing affects
 PLAYER_UPDATE_FUNC(b5_1_update_players) {
-	void free_var_el(struct trig_var_data *var);
-	
 	struct trig_var_data *var, *next_var;
 	struct over_time_effect_type *dot;
 	struct affected_type *af;
@@ -3096,8 +3076,6 @@ void b5_30_empire_update(void) {
 
 
 PLAYER_UPDATE_FUNC(b5_34_player_update) {
-	void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
-	
 	struct player_skill_data *skill, *next_skill;
 	struct player_ability_data *abil, *next_abil;
 	int iter;
@@ -3142,9 +3120,6 @@ PLAYER_UPDATE_FUNC(b5_34_player_update) {
 
 // part of the HUGE progression update
 void b5_34_mega_update(void) {
-	void free_empire_goals(struct empire_goal *hash);
-	void free_empire_completed_goals(struct empire_completed_goal *hash);
-	
 	struct instance_data *inst, *next_inst;
 	struct empire_political_data *pol;
 	empire_data *emp, *next_emp;
@@ -3210,8 +3185,6 @@ void b5_34_mega_update(void) {
 
 // fixes some progression goals
 void b5_35_progress_update(void) {
-	void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
-	
 	struct empire_completed_goal *goal, *next_goal;
 	empire_data *emp, *next_emp;
 	
@@ -3280,8 +3253,6 @@ void b5_35_progress_update(void) {
 
 // fixes some progression goals
 void b5_37_progress_update(void) {
-	void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
-	
 	struct empire_completed_goal *goal, *next_goal;
 	struct instance_data *inst, *next_inst;
 	empire_data *emp, *next_emp;
@@ -3328,9 +3299,6 @@ void b5_38_grove_update(void) {
 
 // add new channels
 PLAYER_UPDATE_FUNC(b5_40_update_players) {
-	extern struct slash_channel *create_slash_channel(char *name);
-	extern struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
-	
 	struct player_slash_channel *slash;
 	struct slash_channel *chan;
 	int iter;
@@ -3454,8 +3422,6 @@ void b5_48_rope_update(void) {
 
 // tracks current empire einv as "gathered items" to retroactively set gather totals
 void b5_58_gather_totals(void) {
-	void save_marked_empires();
-	
 	struct empire_island *isle, *next_isle;
 	struct empire_storage_data *store, *next_store;
 	empire_data *emp, *next_emp;
@@ -3481,9 +3447,6 @@ void b5_58_gather_totals(void) {
 
 // add new channel
 PLAYER_UPDATE_FUNC(b5_60_update_players) {
-	extern struct slash_channel *create_slash_channel(char *name);
-	extern struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
-	
 	struct player_slash_channel *slash;
 	struct slash_channel *chan;
 	int iter;
@@ -3505,8 +3468,6 @@ PLAYER_UPDATE_FUNC(b5_60_update_players) {
 
 
 void b5_80_dailies_fix(void) {
-	void setup_daily_quest_cycles(int only_cycle);
-	
 	log("Applying b5.80 daily quests...");
 	setup_daily_quest_cycles(10700);
 	setup_daily_quest_cycles(16602);
@@ -3770,8 +3731,6 @@ void b5_86_update(void) {
 // removes 75% of unclaimed crops (previous patch removed wild crops in the map generator)
 // also adds old-growth forests
 void b5_87_crop_and_old_growth(void) {
-	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
-	
 	int removed_crop = 0, total_crop = 0, new_og = 0, total_forest = 0;
 	struct empire_completed_goal *goal, *next_goal;
 	empire_data *emp, *next_emp;
@@ -3907,7 +3866,6 @@ void b5_88_irrigation_repair(void) {
 // updates 
 void b5_88_resource_components_update(void) {
 	extern any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
-	void check_progress_refresh();
 	
 	craft_data *craft, *next_craft;
 	progress_data *prg, *next_prg;
@@ -4363,10 +4321,6 @@ void b5_99_henge_triggers(void) {
 bool override_home_storage_cap = FALSE;	// this ensures nobody loses items during this patch
 
 void b5_102_home_cleanup(void) {
-	void free_loaded_players();
-	void perform_autostore(obj_data *obj, empire_data *emp, int island);
-	void run_delayed_refresh();
-	
 	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
 	
@@ -4871,8 +4825,6 @@ void assign_old_workforce_chore(empire_data *emp, int chore) {
 
 /* reset the time in the game from file */
 void reset_time(void) {
-	void determine_seasons();
-	
 	long beginning_of_time = data_get_long(DATA_WORLD_START);
 	
 	// a whole new world!
@@ -4925,7 +4877,6 @@ void reset_time(void) {
 * @param int ptech The PTECH_ type to set as 'inherent'.
 */
 void set_inherent_ptech(int ptech) {
-	extern struct int_hash *inherent_ptech_hash;
 	struct int_hash *entry;
 	
 	HASH_FIND_INT(inherent_ptech_hash, &ptech, entry);

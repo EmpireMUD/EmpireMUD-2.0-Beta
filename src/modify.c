@@ -45,8 +45,6 @@
 #define STRINGADD_ACTION	4	/* Editor action, don't append \r\n.	*/
 
 
-void show_string(descriptor_data *d, char *input);
-
 /* local functions */
 void smash_tilde(char *str);
 char *next_page(char *str, descriptor_data *desc);

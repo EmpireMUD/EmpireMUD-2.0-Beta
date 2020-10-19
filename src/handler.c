@@ -88,14 +88,12 @@ void add_dropped_item_list(empire_data *emp, obj_data *list);
 static void add_obj_binding(int idnum, struct obj_binding **list);
 struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 void die_follower(char_data *ch);
-struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
 struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 void remove_companion(char_data *ch, any_vnum vnum);
 void remove_dropped_item(empire_data *emp, obj_data *obj);
 void remove_dropped_item_anywhere(obj_data *obj);
 void remove_dropped_item_list(empire_data *emp, obj_data *list);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
-void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 
 // local file scope variables
 static int char_extractions_pending = 0;
@@ -7518,8 +7516,6 @@ void add_player_tech(char_data *ch, any_vnum abil, int tech) {
 * @return bool TRUE if the player has it, FALSE otherwise.
 */
 bool has_player_tech(char_data *ch, int tech) {
-	extern struct int_hash *inherent_ptech_hash;
-	
 	struct player_tech *iter;
 	struct int_hash *find;
 	
@@ -9724,7 +9720,6 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique
 */
 void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, obj_data *obj, empire_data *save_emp, room_data *room, bool *full) {
 	EVENT_CANCEL_FUNC(cancel_wait_event);
-	void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
 	
 	struct empire_unique_storage *eus;
 	bool extract = FALSE;

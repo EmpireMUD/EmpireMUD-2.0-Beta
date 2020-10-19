@@ -1125,9 +1125,7 @@ char_data *load_player(char *name, bool normal) {
 char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *ch) {
 	extern struct player_event_data *create_event_data(char_data *ch, int event_id, any_vnum event_vnum);
 	void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
-	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
 	extern struct mail_data *parse_mail(FILE *fl, char *first_line);
-	void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
 	
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], str_in[MAX_INPUT_LENGTH], *read;
 	int account_id = NOTHING, ignore_pos = 0, junk;
@@ -2813,7 +2811,6 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 */
 void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 	void Crash_save(obj_data *obj, FILE *fp, int location);
-	void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
 	void write_mail_to_file(FILE *fl, char_data *ch);
 	
 	char temp[MAX_STRING_LENGTH];
@@ -3651,8 +3648,6 @@ void check_learned_crafts(char_data *ch) {
 * Checks that all empires' learned crafts are valid, and removes bad entries.
 */
 void check_learned_empire_crafts(void) {
-	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
-	
 	struct player_craft_data *pcd, *next_pcd;
 	empire_data *emp, *next_emp;
 	craft_data *craft;

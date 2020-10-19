@@ -41,7 +41,6 @@ extern struct generic_name_data *generic_names;
 
 // local protos
 void end_pursuit(char_data *ch, char_data *target);
-struct generic_name_data *get_generic_name_list(int name_set, int sex);
 
 
 // for validate_global_map_spawns, run_global_map_spawns

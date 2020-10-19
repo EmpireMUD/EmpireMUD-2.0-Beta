@@ -61,12 +61,47 @@ extern const char *DFLT_DIR;
 extern char *LOGNAME;
 extern int max_playing;
 extern char *help_screen;
+extern const char *slow_nameserver_ips[];
 
 // external functions
-void save_all_players(bool delay);
-extern char *flush_reduced_color_codes(descriptor_data *desc);
+void boot_world();
+void empire_srandom(unsigned long initial_seed);
 void mobile_activity(void);
-void show_string(descriptor_data *d, char *input);
+int perform_alias(descriptor_data *d, char *orig);
+
+// heartbeat functions
+void check_death_respawn();
+void check_expired_cooldowns();
+void check_idle_passwords();
+void check_newbie_islands();
+void check_wars();
+void chore_update();
+void display_automessages();
+void extract_pending_chars();
+void extract_pending_vehicles();
+void free_freeable_triggers();
+void frequent_combat(int pulse);
+void point_update();
+void process_import_evolutions();
+void process_imports();
+void process_theft_logs();
+void prune_instances();
+void real_update();
+void reduce_city_overages();
+void reduce_outside_territory();
+void reduce_stale_empires();
+void reset_instances();
+void run_mob_echoes();
+void sanity_check();
+void save_data_table(bool force);
+void update_actions();
+void update_empire_npc_data();
+void update_guard_towers();
+void update_instance_world_size();
+void update_players_online_stats();
+void update_trading_post();
+void weather_and_time(int mode);
+void write_running_events_file();
 
 // local functions
 RETSIGTYPE checkpointing(int sig);
@@ -77,32 +112,14 @@ RETSIGTYPE unrestrict_game(int sig);
 char *make_prompt(descriptor_data *point);
 char *prompt_str(char_data *ch);
 int get_from_q(struct txt_q *queue, char *dest, int *aliased);
-int get_max_players(void);
-static void msdp_update();
-int new_descriptor(socket_t s);
 int open_logfile(const char *filename, FILE *stderr_fp);
-int perform_alias(descriptor_data *d, char *orig);
-int perform_subst(descriptor_data *t, char *orig, char *subst);
-int process_input(descriptor_data *t);
 int set_sendbuf(socket_t s);
 socket_t init_socket(ush_int port);
-ssize_t perform_socket_read(socket_t desc, char *read_point,size_t space_left);
-ssize_t perform_socket_write(socket_t desc, const char *txt,size_t length);
-static int process_output(descriptor_data *t);
-struct in_addr *get_bind_addr(void);
-void empire_sleep(struct timeval *timeout);
 void flush_queues(descriptor_data *d);
-void game_loop(socket_t mother_desc);
-void heartbeat(int heart_pulse);
-void init_descriptor(descriptor_data *newd, int desc);
-void init_game(ush_int port);
 void nonblock(socket_t s);
 void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bitvector_t act_flags);
 void reboot_recover(void);
 void setup_log(const char *filename, int fd);
-void signal_setup(void);
-void timeadd(struct timeval *sum, struct timeval *a, struct timeval *b);
-void timediff(struct timeval *diff, struct timeval *a, struct timeval *b);
 #if defined(POSIX)
 sigfunc *my_signal(int signo, sigfunc * func);
 #endif
@@ -883,43 +900,6 @@ void update_reboot(void) {
 //// MAIN GAME LOOP //////////////////////////////////////////////////////////
 
 void heartbeat(int heart_pulse) {
-	void check_death_respawn();
-	void check_expired_cooldowns();
-	void check_idle_passwords();
-	void check_newbie_islands();
-	void check_progress_refresh();
-	void check_wars();
-	void chore_update();
-	void display_automessages();
-	void extract_pending_chars();
-	void extract_pending_vehicles();
-	void free_freeable_triggers();
-	void free_loaded_players();
-	void frequent_combat(int pulse);
-	void point_update();
-	void process_import_evolutions();
-	void process_imports();
-	void process_theft_logs();
-	void prune_instances();
-	void real_update();
-	void reduce_city_overages();
-	void reduce_outside_territory();
-	void reduce_stale_empires();
-	void reset_instances();
-	void run_delayed_refresh();
-	void run_mob_echoes();
-	void sanity_check();
-	void save_data_table(bool force);
-	void save_marked_empires();
-	void update_actions();
-	void update_empire_npc_data();
-	void update_guard_towers();
-	void update_instance_world_size();
-	void update_players_online_stats();
-	void update_trading_post();
-	void weather_and_time(int mode);
-	void write_running_events_file();
-
 	static int mins_since_crashsave = 0;
 	bool debug_log = FALSE;
 	
@@ -2208,8 +2188,6 @@ socket_t init_socket(ush_int port) {
 * @return bool TRUE if we should skip nameserver lookup on this IP.
 */
 bool is_slow_ip(char *ip) {
-	extern const char *slow_nameserver_ips[];
-	
 	int iter;
 	
 	for (iter = 0; *slow_nameserver_ips[iter] != '\n'; ++iter) {
@@ -3656,8 +3634,6 @@ void signal_setup(void) {
  * such as mobile_activity().
  */
 void game_loop(socket_t mother_desc) {
-	void reset_time(void);
-
 	fd_set input_set, output_set, exc_set, null_set;
 	struct timeval last_time, opt_time, process_time, temp_time;
 	struct timeval before_sleep, now, timeout;
@@ -3908,8 +3884,6 @@ void game_loop(socket_t mother_desc) {
 
 /* Init sockets, run game, and cleanup sockets */
 void init_game(ush_int port) {
-	void empire_srandom(unsigned long initial_seed);
-
 	empire_srandom(time(0));
 
 	log("Finding player limit.");
@@ -3949,8 +3923,6 @@ void init_game(ush_int port) {
 
 
 int main(int argc, char **argv) {
-	void boot_world();
-
 	int pos = 1;
 	const char *dir;
 
@@ -4125,9 +4097,6 @@ void setup_log(const char *filename, int fd) {
 
 
 void reboot_recover(void) {
-	void free_loaded_players();
-	void run_delayed_refresh();
-
 	char buf[MAX_STRING_LENGTH];
 	descriptor_data *d;
 	char_data *plr, *ldr;

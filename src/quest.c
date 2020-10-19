@@ -4589,7 +4589,6 @@ void write_quest_rewards_to_file(FILE *fl, char letter, struct quest_reward *lis
 */
 void write_quest_to_file(FILE *fl, quest_data *quest) {
 	void write_requirements_to_file(FILE *fl, char letter, struct req_data *list);
-	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
 	char temp[MAX_STRING_LENGTH];
 	

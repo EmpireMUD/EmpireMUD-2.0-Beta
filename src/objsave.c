@@ -484,8 +484,6 @@ void Crash_extract_objs(obj_data *obj) {
 * @param int location The gear or bag position.
 */
 void Crash_save(obj_data *obj, FILE *fp, int location) {
-	void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
-
 	if (obj) {
 		Crash_save(obj->next_content, fp, location);
 		Crash_save(obj->contains, fp, MIN(LOC_INVENTORY, location) - 1);

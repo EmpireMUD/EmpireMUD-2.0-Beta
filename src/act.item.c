@@ -6200,7 +6200,6 @@ ACMD(do_pour) {
 					cancel_stored_event(&SHARED_DATA(IN_ROOM(ch))->events, SEV_TRENCH_FILL);
 				}
 				if (GET_MAP_LOC(IN_ROOM(ch))) {	// can this be null?
-					void schedule_trench_fill(struct map_data *map);
 					schedule_trench_fill(GET_MAP_LOC(IN_ROOM(ch)));
 				}
 			}

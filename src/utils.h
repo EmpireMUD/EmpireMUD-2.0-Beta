@@ -1699,6 +1699,9 @@ bool is_component(obj_data *obj, generic_data *cmp);
 // crop functions from utils.c
 crop_data *get_crop_by_name(char *name);
 
+// delayed refresh functions from utils.c
+void run_delayed_refresh();
+
 // empire utils from utils.c
 bool can_claim(char_data *ch);
 int count_members_online(empire_data *emp);
@@ -1847,6 +1850,7 @@ bool get_coord_shift(int start_x, int start_y, int x_shift, int y_shift, int *ne
 int get_direction_to(room_data *from, room_data *to);
 room_data *get_map_location_for(room_data *room);
 bool is_deep_mine(room_data *room);
+void lock_icon(room_data *room, struct icon_data *use_icon);
 room_data *real_shift(room_data *origin, int x_shift, int y_shift);
 room_data *straight_line(room_data *origin, room_data *destination, int iter);
 sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags, bitvector_t prefer_climate);
@@ -1886,6 +1890,7 @@ void perform_rescue(char_data *ch, char_data *vict, char_data *from, int msg);
 
 // act.comm.c
 void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message);
+struct slash_channel *create_slash_channel(char *name);
 struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
 struct slash_channel *find_slash_channel_by_id(int id);
 struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
@@ -1907,6 +1912,7 @@ double get_enchant_scale_for_char(char_data *ch, int max_scale);
 void summon_materials(char_data *ch, char *argument);
 
 // act.immortal.c
+void perform_autostore(obj_data *obj, empire_data *emp, int island);
 void perform_immort_vis(char_data *ch);
 
 // act.informative.c
@@ -2035,6 +2041,7 @@ void special_building_setup(char_data *ch, room_data *room);
 void special_vehicle_setup(char_data *ch, vehicle_data *veh);
 
 // eedit.c
+bool check_unique_empire_name(empire_data *for_emp, char *name);
 bool valid_rank_name(char_data *ch, char *newname);
 
 // faction.c
@@ -2078,6 +2085,7 @@ void delete_instance(struct instance_data *inst, bool run_cleanup);
 void generate_adventure_instances();
 void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
 void reset_instance(struct instance_data *inst);
+void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
 
 // limits.c
 bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner);
@@ -2107,6 +2115,7 @@ char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bo
 // mobact.c
 bool check_scaling(char_data *mob, char_data *attacker);
 int determine_best_scale_level(char_data *ch, bool check_group);
+struct generic_name_data *get_generic_name_list(int name_set, int sex);
 int mob_coins(char_data *mob);
 void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
 void scale_mob_for_character(char_data *mob, char_data *ch);
@@ -2116,6 +2125,7 @@ bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coo
 
 // modify.c
 void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
+void show_string(descriptor_data *d, char *input);
 
 // morph.c
 void end_morph(char_data *ch);
@@ -2137,6 +2147,7 @@ PATHFIND_VALIDATOR(pathfind_pilot);
 PATHFIND_VALIDATOR(pathfind_road);
 
 // progress.c
+void check_progress_refresh();
 bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
 progress_data *find_progress_goal_by_name(char *name);
@@ -2165,6 +2176,7 @@ struct player_quest *is_on_quest_by_name(char_data *ch, char *argument);
 void refresh_all_quests(char_data *ch);
 void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq);
 void remove_quest_items_by_quest(char_data *ch, any_vnum vnum);
+void setup_daily_quest_cycles(int only_cycle);
 
 void qt_change_ability(char_data *ch, any_vnum abil);
 void qt_change_level(char_data *ch, int level);
@@ -2258,6 +2270,7 @@ bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
 
 // weather.c
+void determine_seasons();
 void list_moons_to_char(char_data *ch);
 byte distance_can_see(char_data *ch);
 

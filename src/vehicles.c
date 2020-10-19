@@ -48,7 +48,6 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
 void ruin_vehicle(vehicle_data *veh, char *message);
 
 // external funcs
-void free_bld_relations(struct bld_relation *list);
 void free_custom_messages(struct custom_message *mes);
 extern bool validate_icon(char *icon);
 
@@ -1999,8 +1998,6 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 * @return vehicle_data* The loaded vehicle, if possible.
 */
 vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
-	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
-
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH];
 	obj_data *load_obj, *obj, *next_obj, *cont_row[MAX_BAG_ROWS];
 	struct vehicle_attached_mob *vam, *last_vam = NULL;
@@ -2561,9 +2558,6 @@ int get_new_vehicle_construction_id(void) {
 * @param any_vnum vnum The vehicle vnum
 */
 void parse_vehicle(FILE *fl, any_vnum vnum) {
-	void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
-	void parse_interaction(char *line, struct interaction_item **list, char *error_part);
-
 	char line[256], error[256], str_in[256], str_in2[256], str_in3[256];
 	struct bld_relation *relat;
 	struct spawn_info *spawn;
@@ -2766,10 +2760,6 @@ void write_vehicle_index(FILE *fl) {
 * @param vehicle_data *veh The thing to save.
 */
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
-	void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
-	void write_interactions_to_file(FILE *fl, struct interaction_item *list);
-	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
-	
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
 	struct bld_relation *relat;
 	struct spawn_info *spawn;

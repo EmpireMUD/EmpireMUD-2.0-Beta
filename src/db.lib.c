@@ -66,33 +66,41 @@ extern int max_automessage_id;
 extern bool world_is_sorted;
 
 // external funcs
-extern any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
-void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
-extern room_data *load_map_room(room_vnum vnum);
-extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
-void sort_exits(struct room_direction_data **list);
+void add_trd_home_room(room_vnum vnum, room_vnum home_room);
+void add_trd_owner(room_vnum vnum, empire_vnum owner);
+any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
+bool objpack_save_room(room_data *room);
+
+// parser functions
+void parse_ability(FILE *fl, any_vnum vnum);
+void parse_account(FILE *fl, int nr);
+void parse_archetype(FILE *fl, any_vnum vnum);
+void parse_augment(FILE *fl, any_vnum vnum);
+void parse_book(FILE *fl, int book_id);
+void parse_class(FILE *fl, any_vnum vnum);
+void parse_event(FILE *fl, int nr);
+void parse_faction(FILE *fl, int nr);
+void parse_generic(FILE *fl, int nr);
+void parse_morph(FILE *fl, any_vnum vnum);
+void parse_progress(FILE *fl, any_vnum vnum);
+void parse_quest(FILE *fl, any_vnum vnum);
+void parse_shop(FILE *fl, int nr);
+void parse_skill(FILE *fl, any_vnum vnum);
+void parse_social(FILE *fl, any_vnum vnum);
+void parse_vehicle(FILE *fl, any_vnum vnum);
 
 // locals
+PLAYER_UPDATE_FUNC(send_all_players_to_nowhere);
 int check_object(obj_data *obj);
 int count_hash_records(FILE *fl);
+struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mob, int sex, int name, struct empire_territory_data *ter);
 empire_vnum find_free_empire_vnum(void);
-void free_obj_eq_set(struct eq_set_obj *eq_set);
 void free_theft_logs(struct theft_log *list);
-void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
+void log_offense_to_empire(empire_data *emp, struct offense_data *off, char_data *offender);
 void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
-void parse_interaction(char *line, struct interaction_item **list, char *error_part);
-void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part);
 struct theft_log *reduce_theft_logs_and_get_recent(empire_data *emp);
-PLAYER_UPDATE_FUNC(send_all_players_to_nowhere);
-int sort_empires(empire_data *a, empire_data *b);
-int sort_room_templates(room_template *a, room_template *b);
-void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
-void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
-void write_interactions_to_file(FILE *fl, struct interaction_item *list);
-void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list);
-void write_shared_room_data(FILE *fl, struct shared_room_data *dat);
-void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
+int sort_island_table(struct island_info *a, struct island_info *b);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -104,8 +112,6 @@ void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *li
 * @param adv_data *adv The adventure to add to the table.
 */
 void add_adventure_to_table(adv_data *adv) {
-	extern int sort_adventures(adv_data *a, adv_data *b);
-	
 	adv_data *find;
 	adv_vnum vnum;
 	
@@ -552,8 +558,6 @@ void save_automessages(void) {
 * @param bld_data *bld The building to add to the table.
 */
 void add_building_to_table(bld_data *bld) {
-	extern int sort_buildings(bld_data *a, bld_data *b);
-	
 	bld_data *find;
 	bld_vnum vnum;
 	
@@ -584,8 +588,6 @@ void remove_building_from_table(bld_data *bld) {
 * @param bld_data *building The building to free.
 */
 void free_building(bld_data *bdg) {
-	void free_bld_relations(struct bld_relation *list);
-	
 	bld_data *proto = building_proto(GET_BLD_VNUM(bdg));
 	struct spawn_info *spawn;
 	
@@ -919,9 +921,6 @@ void write_building_to_file(FILE *fl, bld_data *bld) {
 * @param craft_data *craft The craft to add to the table.
 */
 void add_craft_to_table(craft_data *craft) {
-	extern int sort_crafts_by_data(craft_data *a, craft_data *b);
-	extern int sort_crafts_by_vnum(craft_data *a, craft_data *b);
-	
 	craft_data *find;
 	craft_vnum vnum;
 	
@@ -1164,8 +1163,6 @@ void write_craft_to_file(FILE *fl, craft_data *craft) {
 * @param crop_data *crop The crop to add to the table.
 */
 void add_crop_to_table(crop_data *crop) {
-	extern int sort_crops(crop_data *a, crop_data *b);
-	
 	crop_data *find;
 	crop_vnum vnum;
 	
@@ -1431,8 +1428,6 @@ void remove_empire_from_table(empire_data *emp) {
 * icon-locking is done.
 */
 void check_for_new_map(void) {
-	void lock_icon(room_data *room, struct icon_data *use_icon);	// utils.c
-	
 	struct empire_storage_data *store, *next_store;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_trade_data *trade, *next_trade;
@@ -1632,9 +1627,6 @@ void check_nowhere_einv_all(void) {
 * @return empire_data* A pointer to the new empire (sometimes NULL
 */
 empire_data *create_empire(char_data *ch) {
-	void add_empire_to_table(empire_data *emp);
-	extern bool check_unique_empire_name(empire_data *for_emp, char *name);
-
 	archetype_data *arch;
 	char colorcode[10], name[MAX_STRING_LENGTH];
 	empire_vnum vnum;
@@ -1735,8 +1727,6 @@ empire_data *create_empire(char_data *ch) {
 * @param empire_data *emp The empire to delete.
 */
 void delete_empire(empire_data *emp) {
-	void remove_empire_from_table(empire_data *emp);
-
 	struct empire_political_data *emp_pol, *next_pol, *temp;
 	player_index_data *index, *next_index;
 	struct vehicle_attached_mob *vam;
@@ -1923,11 +1913,6 @@ void ewt_free_tracker(struct empire_workforce_tracker **tracker) {
 * @param empire_data *emp The empire to free
 */
 void free_empire(empire_data *emp) {
-	void free_dropped_items(struct empire_dropped_item **list);
-	void free_empire_goals(struct empire_goal *hash);
-	void free_empire_completed_goals(struct empire_completed_goal *hash);
-	void free_member_data(empire_data *emp);
-	
 	struct workforce_production_limit *wpl, *next_wpl;
 	struct empire_production_total *egt, *next_egt;
 	struct empire_playtime_tracker *ept, *next_ept;
@@ -2207,9 +2192,6 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 * @param empire_data *emp The empire to assign the storage to.
 */
 void load_empire_storage_one(FILE *fl, empire_data *emp) {	
-	extern struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
-	void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
-	
 	int t[10], junk;
 	long l_in;
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
@@ -2428,7 +2410,6 @@ void load_empire_storage(void) {
 */
 void parse_empire(FILE *fl, empire_vnum vnum) {
 	void assign_old_workforce_chore(empire_data *emp, int chore);
-	extern struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mob, int sex, int name, struct empire_territory_data *ter);
 	
 	empire_data *emp, *find;
 	int t[6], j, iter;
@@ -3505,8 +3486,6 @@ struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct e
 * @param bool force If TRUE, will override the population timer.
 */
 void populate_npc(room_data *room, struct empire_territory_data *ter, bool force) {
-	extern int pick_generic_name(int name_set, int sex);
-	
 	struct empire_homeless_citizen *homeless;
 	struct empire_npc_data *npc = NULL;
 	mob_vnum artisan, citizen, backup;
@@ -3718,8 +3697,6 @@ void kill_empire_npc(char_data *ch) {
 * @param bitvector_t flags Any OFF_ flags that apply.
 */
 void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc, bitvector_t flags) {
-	void log_offense_to_empire(empire_data *emp, struct offense_data *off, char_data *offender);
-	
 	struct offense_data *off;
 	
 	// try to find a player
@@ -4202,8 +4179,6 @@ void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list) {
 * @param struct global_data *glb The global data to add to the table.
 */
 void add_global_to_table(struct global_data *glb) {
-	extern int sort_globals(struct global_data *a, struct global_data *b);
-	
 	struct global_data *find;
 	any_vnum vnum;
 	
@@ -4283,8 +4258,6 @@ void free_global(struct global_data *glb) {
 * @param any_vnum vnum The global vnum
 */
 void parse_global(FILE *fl, any_vnum vnum) {
-	void parse_archetype_gear(FILE *fl, struct archetype_gear **list, char *error);
-
 	struct global_data *glb, *find;
 	char line[256], str_in[256], str_in2[256], str_in3[256], str_in4[256];
 	struct spawn_info *spawn;
@@ -4404,8 +4377,6 @@ void parse_global(FILE *fl, any_vnum vnum) {
 * @param struct global_data *glb The thing to save.
 */
 void write_global_to_file(FILE *fl, struct global_data *glb) {
-	void write_archetype_gear_to_file(FILE *fl, struct archetype_gear *list);
-	
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH], temp4[MAX_STRING_LENGTH];
 	struct spawn_info *spawn;
 	
@@ -4651,9 +4622,6 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 * @param struct interaction_item *list The interaction list to write.
 */
 void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
-	char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
-	const char *get_interaction_target(int type, any_vnum vnum);
-	
 	struct interaction_item *interact;
 	struct interact_restriction *res;
 	
@@ -4687,8 +4655,6 @@ void write_interactions_to_file(FILE *fl, struct interaction_item *list) {
 * @return struct island_info* A pointer to the island data, or NULL if there is none (and you didn't specify create).
 */
 struct island_info *get_island(int island_id, bool create_if_missing) {
-	extern int sort_island_table(struct island_info *a, struct island_info *b);
-	
 	struct island_info *isle = NULL;
 	char buf[MAX_STRING_LENGTH];
 	int iter;
@@ -4975,8 +4941,6 @@ int sort_island_table(struct island_info *a, struct island_info *b) {
 * @param char_data *mob The mob to add to the table.
 */
 void add_mobile_to_table(char_data *mob) {
-	extern int sort_mobiles(char_data *a, char_data *b);
-	
 	char_data *find;
 	mob_vnum vnum;
 	
@@ -5199,8 +5163,6 @@ void write_mob_to_file(FILE *fl, char_data *mob) {
 * @param obj_data *obj The object to add to the table.
 */
 void add_object_to_table(obj_data *obj) {
-	extern int sort_objects(obj_data *a, obj_data *b);
-	
 	obj_data *find;
 	obj_vnum vnum;
 	
@@ -5360,8 +5322,6 @@ void free_obj(obj_data *obj) {
 * @param int nr The vnum of the object.
 */
 void parse_object(FILE *obj_f, int nr) {
-	extern struct obj_proto_data *create_obj_proto_data();
-	
 	static char line[256];
 	int t[10], retval;
 	char *tmpptr;
@@ -5850,10 +5810,6 @@ void remove_room_from_world_tables(room_data *room) {
 * @param room_vnum vnum The vnum to read in.
 */
 void parse_room(FILE *fl, room_vnum vnum) {
-	void add_trd_home_room(room_vnum vnum, room_vnum home_room);
-	void add_trd_owner(room_vnum vnum, empire_vnum owner);
-	void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
-
 	char line[256], line2[256], error_buf[256], error_log[MAX_STRING_LENGTH], str1[256], str2[256];
 	double dbl_in;
 	long l_in;
@@ -6222,8 +6178,6 @@ void parse_room(FILE *fl, room_vnum vnum) {
 * @param room_data *room The thing to save.
 */
 void write_room_to_file(FILE *fl, room_data *room) {
-	extern bool objpack_save_room(room_data *room);
-	
 	char temp[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	struct trig_var_data *tvd;
@@ -6726,8 +6680,6 @@ void write_room_template_to_file(FILE *fl, room_template *rmt) {
 * @param sector_data *sect The sect to add to the table.
 */
 void add_sector_to_table(sector_data *sect) {
-	extern int sort_sectors(void *a, void *b);
-	
 	sector_data *find;
 	sector_vnum vnum;
 	
@@ -7120,7 +7072,7 @@ EVENT_CANCEL_FUNC(cancel_map_event) {
 }
 
 
-// generic canceller for room events) {
+// generic canceller for room events
 EVENT_CANCEL_FUNC(cancel_room_event) {
 	struct room_event_data *data = (struct room_event_data *)event_obj;
 	free(data);
@@ -7274,8 +7226,6 @@ struct theft_log *reduce_theft_logs_and_get_recent(empire_data *emp) {
 * @param trig_data *trig The trigger to add to the table.
 */
 void add_trigger_to_table(trig_data *trig) {
-	extern int sort_triggers(trig_data *a, trig_data *b);
-	
 	trig_data *find;
 	trig_vnum vnum;
 	
@@ -7366,23 +7316,11 @@ void write_trigger_to_file(FILE *fl, trig_data *trig) {
 * @param char *filename The name of the file, for error reporting.
 */
 void discrete_load(FILE *fl, int mode, char *filename) {
-	void parse_ability(FILE *fl, any_vnum vnum);
-	void parse_account(FILE *fl, int nr);
-	void parse_archetype(FILE *fl, any_vnum vnum);
-	void parse_augment(FILE *fl, any_vnum vnum);
-	void parse_book(FILE *fl, int book_id);
-	void parse_class(FILE *fl, any_vnum vnum);
-	void parse_morph(FILE *fl, any_vnum vnum);
-	void parse_progress(FILE *fl, any_vnum vnum);
-	void parse_quest(FILE *fl, any_vnum vnum);
-	void parse_skill(FILE *fl, any_vnum vnum);
-	void parse_social(FILE *fl, any_vnum vnum);
-	void parse_vehicle(FILE *fl, any_vnum vnum);
-	
 	any_vnum nr = -1, last;
 	char line[256];
 
 	/* modes positions correspond to DB_BOOT_x in db.h */
+	// TODO move this into the other DB_BOOT_x array
 	const char *modes[] = {"world", "mob", "obj", "zone", "empire", "book", "craft", "trg", "crop", "sector", "adventure", "room template", "global", "account", "augment", "archetype", "ability", "class", "skill", "vehicle", "morph", "quest", "social", "faction", "generic", "shop", "progress", "event" };
 
 	for (;;) {
@@ -7443,17 +7381,14 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					break;
 				}
 				case DB_BOOT_EVT: {
-					void parse_event(FILE *fl, int nr);
 					parse_event(fl, nr);
 					break;
 				}
 				case DB_BOOT_FCT: {
-					void parse_faction(FILE *fl, int nr);
 					parse_faction(fl, nr);
 					break;
 				}
 				case DB_BOOT_GEN: {
-					void parse_generic(FILE *fl, int nr);
 					parse_generic(fl, nr);
 					break;
 				}
@@ -7498,7 +7433,6 @@ void discrete_load(FILE *fl, int mode, char *filename) {
 					break;
 				}
 				case DB_BOOT_SHOP: {
-					void parse_shop(FILE *fl, int nr);
 					parse_shop(fl, nr);
 					break;
 				}
@@ -9469,9 +9403,6 @@ void parse_apply(FILE *fl, struct apply_data **list, char *error_str) {
 * @param char *err_str The name of the file, for error reporting.
 */
 void parse_generic_name_file(FILE *fl, char *err_str) {
-	extern struct generic_name_data *get_generic_name_list(int name_set, int sex);
-	extern int search_block(char *arg, const char **list, int exact);
-	
 	struct generic_name_data *data;
 	char line[256], str_in[256];
 	int count, pos, int_in, sex;

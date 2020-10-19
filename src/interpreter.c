@@ -2317,9 +2317,7 @@ int _parse_name(char *arg, char *name) {
 */
 void nanny(descriptor_data *d, char *arg) {
 	void display_automessages_on_login(char_data *ch);
-	void free_loaded_players();
 	extern int num_earned_bonus_traits(char_data *ch);
-	void run_delayed_refresh();
 	
 	extern struct promo_code_list promo_codes[];
 

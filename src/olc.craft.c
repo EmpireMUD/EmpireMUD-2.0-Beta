@@ -250,7 +250,6 @@ void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	void cancel_gen_craft(char_data *ch);
 	void remove_craft_from_table(craft_data *craft);
 	void remove_learned_craft(char_data *ch, any_vnum vnum);
-	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
 	
 	struct progress_perk *perk, *next_perk;
 	progress_data *prg, *next_prg;
@@ -575,8 +574,6 @@ bool remove_thing_from_resource_list(struct resource_data **list, int type, any_
 * @param descriptor_data *desc The descriptor who is saving.
 */
 void save_olc_craft(descriptor_data *desc) {
-	extern int sort_crafts_by_data(craft_data *a, craft_data *b);
-	
 	craft_data *proto, *craft = GET_OLC_CRAFT(desc);
 	craft_vnum vnum = GET_OLC_VNUM(desc);
 	UT_hash_handle hh, sorted_hh;

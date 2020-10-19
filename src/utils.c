@@ -546,8 +546,6 @@ int get_total_score(empire_data *emp) {
 * @param bool force Overrides the time limit on resorting.
 */
 void resort_empires(bool force) {
-	extern int sort_empires(empire_data *a, empire_data *b);
-	
 	static time_t last_sort_time = 0;
 	static int last_sort_size = 0;
 

@@ -49,7 +49,6 @@ extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
 extern int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs);
 void get_requirement_display(struct req_data *list, char *save_buffer);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
-void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
 
 // local funcs
 void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add);
@@ -542,9 +541,6 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 				break;
 			}
 			case PRG_PERK_CRAFT: {
-				void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
-				void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
-				
 				if (add) {
 					add_learned_craft_empire(emp, perk->value);
 				}
@@ -1571,8 +1567,6 @@ void et_lose_vehicle(empire_data *emp, vehicle_data *veh) {
 * @param empire_data *only_emp Optional: If provided, only does that 1 empire. Otherwise does all of them.
 */
 void full_reset_empire_progress(empire_data *only_emp) {
-	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
-	
 	struct player_craft_data *pcd, *next_pcd;
 	empire_data *emp, *next_emp;
 	int iter;

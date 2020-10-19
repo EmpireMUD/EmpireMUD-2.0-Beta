@@ -52,7 +52,6 @@ void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventu
 void link_instance_entrance(struct instance_data *inst);
 void remove_instance_fake_loc(struct instance_data *inst);
 void scale_instance_to_level(struct instance_data *inst, int level);
-void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
 
 
 // local globals
@@ -437,8 +436,6 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 * @param int rotation The direction the instance "faces", e.g. NORTH.
 */
 void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation) {
-	void sort_exits(struct room_direction_data **list);
-	
 	room_data **room_list = NULL;
 	room_template **template_list = NULL;
 	room_template *rmt, *next_rmt;
@@ -2338,8 +2335,6 @@ void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, in
 * @return struct instance_data* The instance.
 */
 static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
-	void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part);
-	
 	struct instance_data *inst;
 	char line[256], str_in[256];
 	int i_in[4];
@@ -2554,8 +2549,6 @@ void load_instances(void) {
 * Writes all instances to the instance file.
 */
 void save_instances(void) {
-	void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list);
-	
 	struct instance_data *inst;
 	FILE *fl;
 	int iter;

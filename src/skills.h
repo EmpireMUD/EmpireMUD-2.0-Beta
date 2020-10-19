@@ -82,6 +82,7 @@ int has_skill_flagged(char_data *ch, bitvector_t skill_flag);
 void mark_level_gained_from_ability(char_data *ch, ability_data *abil);
 void perform_npc_tie(char_data *ch, char_data *victim, int subcmd);
 void remove_ability(char_data *ch, ability_data *abil, bool reset_levels);
+void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
 bool remove_ability_from_synergy_abilities(struct synergy_ability **list, any_vnum abil_vnum);
 bool remove_skills_by_flag(char_data *ch, bitvector_t skill_flag);
 bool remove_vnum_from_skill_abilities(struct skill_ability **list, any_vnum vnum);

@@ -2223,7 +2223,6 @@ int move_gain(char_data *ch, bool info_only) {
 */
 void point_update(bool run_real) {
 	void clean_offers(char_data *ch);
-	void setup_daily_quest_cycles(int only_cycle);
 	void update_players_online_stats();
 	
 	vehicle_data *veh, *next_veh;

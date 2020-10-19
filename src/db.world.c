@@ -61,7 +61,6 @@ extern FILE *open_world_file(int block);
 void remove_room_from_world_tables(room_data *room);
 void save_and_close_world_file(FILE *fl, int block);
 void setup_start_locations();
-void sort_exits(struct room_direction_data **list);
 void write_room_to_file(FILE *fl, room_data *room);
 
 // locals
@@ -70,11 +69,9 @@ room_vnum find_free_vnum();
 room_data *get_extraction_room();
 void init_room(room_data *room, room_vnum vnum);
 int naturalize_newbie_island(struct map_data *tile, bool do_unclaim);
-void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
 void ruin_one_building(room_data *room);
 void save_world_map_to_file();
 void schedule_check_unload(room_data *room, bool offset);
-void schedule_trench_fill(struct map_data *map);
 extern int sort_empire_islands(struct empire_island *a, struct empire_island *b);
 void update_island_names();
 
@@ -135,7 +132,6 @@ void change_chop_territory(room_data *room) {
 */
 void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 	void check_vehicle_climate_change(room_data *room);
-	void lock_icon(room_data *room, struct icon_data *use_icon);
 	
 	sector_data *old_sect = SECT(room), *st = sector_proto(sect), *base;
 	struct map_data *map, *temp;
@@ -4131,8 +4127,6 @@ void load_world_map_from_file(void) {
 * iterating the whole world anyway.
 */
 void save_world_map_to_file(void) {
-	void write_shared_room_data(FILE *fl, struct shared_room_data *dat);
-	
 	struct track_data *track, *next_track;
 	struct map_data *iter;
 	long now = time(0);
