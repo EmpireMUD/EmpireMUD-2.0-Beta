@@ -1770,7 +1770,12 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 	
 	// now check custom name
 	if (ROOM_CUSTOM_NAME(to_room) && !CHECK_CHAMELEON(from_room, to_room)) {
-		sprintf(lbuf + strlen(lbuf), "%s/%s", ROOM_CUSTOM_NAME(to_room), temp);
+		if (!ROOM_AFF_FLAGGED(to_room, ROOM_AFF_HIDE_REAL_NAME)) {
+			sprintf(lbuf + strlen(lbuf), "%s", ROOM_CUSTOM_NAME(to_room));
+		}
+		else {
+			sprintf(lbuf + strlen(lbuf), "%s/%s", ROOM_CUSTOM_NAME(to_room), temp);
+		}
 	}
 	else {
 		strcat(lbuf, temp);
