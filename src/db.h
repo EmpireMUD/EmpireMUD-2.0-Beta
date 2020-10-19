@@ -705,6 +705,7 @@ extern trig_data *trigger_table;
 extern trig_data *trigger_list;
 extern trig_data *random_triggers;
 extern trig_data *free_trigger_list;
+extern trig_data *stc_next_random_trig;
 
 void add_trigger_to_table(trig_data *trig);
 int sort_triggers(trig_data *a, trig_data *b);

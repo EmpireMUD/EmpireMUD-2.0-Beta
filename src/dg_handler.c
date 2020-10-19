@@ -216,8 +216,6 @@ void remove_trigger_from_global_lists(trig_data *trig, bool random_only) {
 
 /* remove a single trigger from a mob/obj/room */
 void extract_trigger(trig_data *trig) {
-	extern trig_data *stc_next_random_trig;
-	
 	// prevents a bug when something has 2 random triggers and is purged by the first one -kh
 	if (trig == stc_next_random_trig) {
 		stc_next_random_trig = trig->next_in_random_triggers;

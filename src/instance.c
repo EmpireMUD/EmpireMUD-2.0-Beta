@@ -44,7 +44,6 @@ int count_players_in_instance(struct instance_data *inst, bool include_imms, cha
 int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum);
 void despawn_instance_vehicles(struct instance_data *inst);
 static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
-room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
 void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
@@ -1445,8 +1444,6 @@ void prune_instances(void) {
 * @param bool run_cleanup If TRUE, runs cleanup scripts. If FALSE, skips this.
 */
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup) {
-	extern bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
-	
 	adv_data *adv = inst ? INST_ADVENTURE(inst) : NULL;
 	struct trig_proto_list *tpl;
 	trig_data *proto, *trig;

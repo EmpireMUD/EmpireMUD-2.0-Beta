@@ -142,8 +142,10 @@ int total_coins(char_data *ch);
 // companion handlers
 struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
 void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
+void add_companion_var(char_data *mob, char *name, char *value, int id);
 struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type);
 struct companion_data *has_companion(char_data *ch, any_vnum vnum);
+void remove_companion_var(char_data *mob, char *name, int context);
 void reread_companion_trigs(char_data *mob);
 
 // cooldown handlers

@@ -32,7 +32,6 @@
 
 
 // external funcs
-void extract_trigger(trig_data *trig);
 void trig_data_init(trig_data *this_data);
 
 
@@ -776,7 +775,6 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	EVENT_CANCEL_FUNC(cancel_wait_event);
 	extern struct cmdlist_element *compile_command_list(char *input);
-	void free_varlist(struct trig_var_data *vd);
 	
 	trig_data *proto, *live_trig, *next_trig, *trig = GET_OLC_TRIGGER(desc);
 	trig_vnum vnum = GET_OLC_VNUM(desc);

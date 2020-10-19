@@ -2989,7 +2989,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	if (!IS_NPC(victim) && (IS_IMMORTAL(victim) || (IS_GOD(victim) && !IS_GOD(ch))))
 		dam = 0;
 
-	if (GET_MOB_VNUM(ch) != DG_CASTER_PROXY && ch != victim && !can_fight(ch, victim))
+	if (ch != victim && !can_fight(ch, victim))
 		return 0;
 
 	/* Only damage to self (sun) still hurts */

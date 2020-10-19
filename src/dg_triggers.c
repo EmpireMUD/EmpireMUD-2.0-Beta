@@ -27,18 +27,6 @@
 #include "dg_event.h"
 #include "constants.h"
 
-/* external functions */
-const char *skill_name(int num);
-void add_var(struct trig_var_data **var_list, char *name, char *value, int id);
-char *matching_quote(char *p);
-bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
-char *str_str(char *cs, char *ct);
-
-// locals
-int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
-int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer);
-
-
 /*
 *  General functions used by several triggers
 */

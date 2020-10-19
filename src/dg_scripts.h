@@ -13,7 +13,7 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-#define DG_SCRIPT_VERSION "DG Scripts 1.0.12 e2"
+#define DG_SCRIPT_VERSION "DG Scripts 1.0.12 e3"
 
 // look for 'x_TRIGGER' for things related to this (I know that's backwards)
 #define MOB_TRIGGER  0
@@ -25,16 +25,13 @@
 #define BLD_TRIGGER  6	// actually a wld trigger attached to a bld
 #define EMP_TRIGGER  7	// empires only store vars, not triggers
 
-/* unless you change this, Puff casts all your dg spells */
-#define DG_CASTER_PROXY 1
-/* spells cast by objects and rooms use this level */
-#define DG_SPELL_LEVEL  25 
 
-/*
- * define this if you don't want wear/remove triggers to fire when
- * a player is saved.
- */
+// map tiles away that players may be for scripts to trigger
+#define PLAYER_SCRIPT_RADIUS  25	// tiles
+
+// this prevents wear/remove triggers firing when a player is saved
 #define NO_EXTRANEOUS_TRIGGERS
+
 
 // MTRIG_x: mob trigger types
 #define MTRIG_GLOBAL           BIT(0)      // check even if no players nearby
@@ -350,6 +347,8 @@ int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil);
 int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil);
 int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum abil);
 
+int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
+
 int leave_mtrigger(char_data *actor, int dir, char *custom_dir);
 int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir);
 int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir);
@@ -361,7 +360,8 @@ int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target
 
 int finish_otrigger(obj_data *obj, char_data *actor);
 
-extern int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer);
+int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer);
+int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer);
 
 int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
 int destroy_vtrigger(vehicle_data *veh);
@@ -378,6 +378,8 @@ void reboot_wtrigger(room_data *room);
 
 int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
 int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
+
+void check_reset_trigger_event(room_data *room, bool random_offset);
 
 /* function prototypes from dg_scripts.c */
 void script_trigger_check(void);
@@ -401,6 +403,10 @@ void obj_log(obj_data *obj, const char *format, ...) __attribute__ ((format (pri
 void wld_log(room_data *room, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
 void dg_obj_trigger(char *line, obj_data *obj);
 void assign_triggers(void *i, int type);
+void extract_trigger(trig_data *trig);
+void free_varlist(struct trig_var_data *vd);
+int is_substring(char *sub, char *string);
+char *matching_quote(char *p);
 void parse_trigger(FILE *trig_f, int nr);
 void parse_trig_proto(char *line, struct trig_proto_list **list, char *error_str);
 trig_data *real_trigger(trig_vnum vnum);
@@ -408,6 +414,7 @@ void extract_script(void *thing, int type);
 void extract_script_mem(struct script_memory *sc);
 void check_extract_script(void *go, int type);
 void remove_all_triggers(void *thing, int type);
+bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
 void free_proto_scripts(struct trig_proto_list **list);
 void free_trigger(trig_data *trig);
 void free_var_el(struct trig_var_data *var);

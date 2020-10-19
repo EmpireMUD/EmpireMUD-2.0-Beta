@@ -77,8 +77,6 @@
 // external funcs
 EVENT_CANCEL_FUNC(cancel_room_event);
 void clear_obj_eq_sets(obj_data *obj);
-void extract_trigger(trig_data *trig);
-void free_varlist(struct trig_var_data *vd);
 
 // locals
 void add_dropped_item(empire_data *emp, obj_data *obj);
@@ -7795,7 +7793,6 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 	extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 	extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
 	extern int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs);
-	extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 	
 	// helper struct
 	struct meets_req_data {
@@ -8742,8 +8739,6 @@ void set_extra_data(struct room_extra_data **list, int type, int value) {
 * @return room_data* The matching room, or NULL if none.
 */
 room_data *find_target_room(char_data *ch, char *rawroomstr) {
-	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
-	
 	struct instance_data *inst;
 	room_vnum tmp;
 	room_data *location = NULL;

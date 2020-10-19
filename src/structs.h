@@ -1475,6 +1475,7 @@ typedef struct vehicle_data vehicle_data;
 // System timing
 #define OPT_USEC  100000	// 10 passes per second
 #define PASSES_PER_SEC  (1000000 / OPT_USEC)
+#define PASSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
 #define RL_SEC  * PASSES_PER_SEC
 #define SEC_MICRO  *1000000	// convert seconds to microseconds for microtime()
 

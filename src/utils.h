@@ -2103,8 +2103,10 @@ bool can_instance(adv_data *adv);
 int count_instances(adv_data *adv);
 void delete_instance(struct instance_data *inst, bool run_cleanup);
 void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
+room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 void generate_adventure_instances();
 struct instance_data *get_instance_by_mob(char_data *mob);
+struct instance_data *get_instance_for_script(int go_type, void *go);
 void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
 void mark_instance_completed(struct instance_data *inst);
@@ -2180,6 +2182,7 @@ PATHFIND_VALIDATOR(pathfind_pilot);
 PATHFIND_VALIDATOR(pathfind_road);
 
 // progress.c
+void check_for_eligible_goals(empire_data *emp);
 void check_progress_refresh();
 bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
 progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
@@ -2204,6 +2207,7 @@ bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum)
 char *get_quest_name_by_proto(any_vnum vnum);
 void get_tracker_display(struct req_data *tracker, char *save_buffer);
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id);
+struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 struct player_quest *is_on_quest_by_name(char_data *ch, char *argument);
 void refresh_all_quests(char_data *ch);

@@ -28,30 +28,11 @@
 #include "vnums.h"
 #include "constants.h"
 
-#define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
-#define player_script_radius  25	// map tiles away that players may be for scripts to trigger
-
-
-/* external vars from db.c */
+// external vars
 extern unsigned long pulse;
 
-/* other external vars */
-extern struct time_info_data time_info;
-
-/* external functions */
-void check_for_eligible_goals(empire_data *emp);	// progress.c
-extern struct instance_data *get_instance_for_script(int go_type, void *go);
-void free_varlist(struct trig_var_data *vd);
-extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
-extern int is_substring(char *sub, char *string);
-trig_data *read_trigger(trig_vnum vnum);
-obj_data *get_object_in_equip(char_data *ch, char *name);
-void extract_trigger(trig_data *trig);
+// local functions
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type);
-
-/* function protos from this file */
-void extract_value(struct script_data *sc, trig_data *trig, char *cmd);
-struct cmdlist_element *find_done(struct cmdlist_element *cl);
 struct cmdlist_element *find_case(trig_data *trig, struct cmdlist_element *cl, void *go, struct script_data *sc, int type, char *cond);
 void process_eval(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
 
@@ -198,7 +179,7 @@ int can_wear_on_pos(obj_data *obj, int pos) {
 * @return bool TRUE if there are players nearby.
 */
 static bool players_nearby_script(room_data *loc) {
-	return distance_to_nearest_player(loc) <= player_script_radius;
+	return distance_to_nearest_player(loc) <= PLAYER_SCRIPT_RADIUS;
 }
 
 
@@ -520,8 +501,6 @@ obj_data *get_obj(char *name)  {
 * @return room_data* The found room, or NULL if none.
 */
 room_data *get_room(room_data *ref, char *name) {
-	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
-	
 	struct instance_data *inst;
 	room_data *nr;
 
@@ -1033,8 +1012,6 @@ int char_has_item(char *item, char_data *ch) {
 
 /* checks every PULSE_SCRIPT for random triggers */
 void script_trigger_check(void) {
-	extern trig_data *stc_next_random_trig;
-	
 	room_data *room, *in_room = NULL;
 	trig_data *trig;
 	char buf[MAX_STRING_LENGTH];
@@ -1415,8 +1392,6 @@ void do_sstat_character(char_data *ch, char_data *k) {
 * add to the end, loc = 0 means add before all other triggers.
 */
 void add_trigger(struct script_data *sc, trig_data *t, int loc) {
-	void check_reset_trigger_event(room_data *room, bool random_offset);
-	
 	trig_data *i;
 	int n;
 
@@ -6594,7 +6569,7 @@ void process_wait(void *go, trig_data *trig, int type, char *cmd, struct cmdlist
 	else {
 		if (sscanf(arg, "%ld %c", &when, &c) == 2) {
 			if (c == 't')
-				when *= PULSES_PER_MUD_HOUR;
+				when *= PASSES_PER_MUD_HOUR;
 			else if (c == 's')
 				when *= PASSES_PER_SEC;
 		}
@@ -6831,8 +6806,6 @@ room_data *dg_room_of_obj(obj_data *obj) {
 
 /* create a UID variable from the id number */
 void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd) {
-	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
-	
 	char junk[MAX_INPUT_LENGTH], varname[MAX_INPUT_LENGTH];
 	char arg[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH];
 	char uid[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
@@ -7070,8 +7043,6 @@ void process_unset(struct script_data *sc, trig_data *trig, char *cmd) {
 *     'remote <variable_name> <uid>'
 */
 void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
-	void add_companion_var(char_data *mob, char *name, char *value, int id);
-	
 	struct trig_var_data *vd;
 	struct script_data *sc_remote=NULL;
 	char *line, *var, *uid_p;
@@ -7160,8 +7131,6 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 * named vdelete so people didn't think it was to delete rooms
 */
 ACMD(do_vdelete) {
-	void remove_companion_var(char_data *mob, char *name, int context);
-	
 	struct trig_var_data *vd, *vd_prev=NULL;
 	struct script_data *sc_remote=NULL;
 	char *var, *uid_p;
@@ -7260,8 +7229,6 @@ ACMD(do_vdelete) {
 *     'rdelete <variable_name> <uid>'
 */
 void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
-	void remove_companion_var(char_data *mob, char *name, int context);
-	
 	struct trig_var_data *vd, *vd_prev=NULL;
 	struct script_data *sc_remote=NULL;
 	char *line, *var, *uid_p;

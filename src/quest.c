@@ -61,7 +61,6 @@ int count_owned_vehicles(empire_data *emp, any_vnum vnum);
 int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
 void free_quest_givers(struct quest_giver *list);
 struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest);
-struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
 void update_veh_quest_lookups(any_vnum vnum);
