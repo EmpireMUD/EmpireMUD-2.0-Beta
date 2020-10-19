@@ -84,4 +84,3 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 #define USING_LARGE(d)  ((d)->output == (d)->large_outbuf)
 
 typedef RETSIGTYPE sigfunc(int);
-

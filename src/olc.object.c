@@ -431,9 +431,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
 	extern bool delete_shop_item_from_list(struct shop_item **list, any_vnum vnum);
-	extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 	void remove_object_from_table(obj_data *obj);
 
 	struct empire_trade_data *trade, *next_trade;
@@ -1225,7 +1223,6 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_obj(char_data *ch, obj_vnum vnum) {
-	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
 	extern bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);
 	
 	char buf[MAX_STRING_LENGTH];

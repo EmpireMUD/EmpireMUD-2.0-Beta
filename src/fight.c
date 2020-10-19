@@ -40,20 +40,17 @@
 *   Combat Engine: Rounds
 */
 
-
 // external vars
+extern bool catch_up_combat;
 extern struct message_list fight_messages[MAX_MESSAGES];
 
 // external funcs
 ACMD(do_flee);
-void end_pursuit(char_data *ch, char_data *target);
 
 // locals
-int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
 void drop_loot(char_data *mob, char_data *killer);
 void heal(char_data *ch, char_data *vict, int amount);
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round);
-extern int lock_instance_level(room_data *room, int level);
 obj_data *make_corpse(char_data *ch);
 
 
@@ -253,7 +250,7 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 * @return double The base damage per second of the weapon
 */
 double get_base_dps(obj_data *weapon) {
-	int damage;
+	int dmg;
 	double speed;
 	
 	if (!weapon) {
@@ -261,14 +258,14 @@ double get_base_dps(obj_data *weapon) {
 	}
 	
 	if (IS_WEAPON(weapon)) {
-		damage = GET_WEAPON_DAMAGE_BONUS(weapon);
+		dmg = GET_WEAPON_DAMAGE_BONUS(weapon);
 		speed = get_weapon_speed(weapon);
-		return (double)damage / speed;
+		return (double)dmg / speed;
 	}
 	else if (IS_MISSILE_WEAPON(weapon)) {
-		damage = GET_MISSILE_WEAPON_DAMAGE(weapon);
+		dmg = GET_MISSILE_WEAPON_DAMAGE(weapon);
 		speed = get_weapon_speed(weapon);
-		return (double)damage / speed;
+		return (double)dmg / speed;
 	}
 	else {
 		return 0.0;
@@ -1270,7 +1267,6 @@ void death_restore(char_data *ch) {
 */
 obj_data *die(char_data *ch, char_data *killer) {
 	void cancel_blood_upkeeps(char_data *ch);
-	void despawn_charmies(char_data *ch, any_vnum only_vnum);
 	
 	char_data *ch_iter, *player, *killmaster;
 	obj_data *corpse = NULL;
@@ -2959,8 +2955,6 @@ bool check_combat_position(char_data *ch, double speed) {
  *	> 0	How much damage done.
  */
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype) {
-	void start_drinking_blood(char_data *ch, char_data *victim);
-	
 	struct instance_data *inst;
 	int iter;
 	bool full_miss = (dam <= 0);
@@ -3844,8 +3838,6 @@ void update_pos(char_data *victim) {
 * @param obj_data *weapon Optional: Which weapon to attack with (NULL means fists)
 */
 void perform_violence_melee(char_data *ch, obj_data *weapon) {
-	extern bool starving_vampire_aggro(char_data *ch);
-	
 	// sanity
 	if (weapon && !IS_WEAPON(weapon)) {
 		weapon = NULL;
@@ -4092,9 +4084,6 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 * @param obj_data *weapon Optional: Which weapon to attack with
 */
 void one_combat_round(char_data *ch, double speed, obj_data *weapon) {
-	void undisguise(char_data *ch);
-	void diag_char_to_char(char_data *i, char_data *ch);
-	
 	// sanity check again
 	if (!FIGHTING(ch)) {
 		return;
@@ -4215,8 +4204,6 @@ void fight_wait_run(char_data *ch, double speed) {
 * @param int pulse the current game pulse, for determining whose turn it is
 */
 void frequent_combat(int pulse) {
-	extern bool catch_up_combat;
-	
 	char_data *ch, *vict;
 	double speed;
 	

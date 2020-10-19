@@ -291,8 +291,6 @@ char *list_one_mobile(char_data *mob, bool detail) {
 */
 void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-	void remove_minipet(char_data *ch, any_vnum vnum);
 	void remove_homeless_citizen(empire_data *emp, struct empire_homeless_citizen *ehc);
 	
 	void extract_pending_chars();
@@ -777,8 +775,6 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_mob(char_data *ch, mob_vnum vnum) {
-	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-	
 	char_data *proto, *mob, *next_mob;
 	struct ability_data_list *adl;
 	char buf[MAX_STRING_LENGTH];

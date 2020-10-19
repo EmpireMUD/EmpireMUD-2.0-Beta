@@ -2610,7 +2610,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(str, slen, "%d", INST_ID(inst));
 				}
 				else if (!str_cmp(field, "load")) {
-					void check_instance_is_loaded(struct instance_data *inst);
 					check_instance_is_loaded(inst);
 					strcpy(str, "1");
 				}
@@ -2618,8 +2617,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(str, slen, "%d", IS_SET(INST_FLAGS(inst), INST_NEEDS_LOAD) ? 0 : 1);
 				}
 				else if (!str_cmp(field, "level")) {
-					extern int lock_instance_level(room_data *room, int level);
-					
 					if (subfield && *subfield && INST_START(inst) && atoi(subfield) > 0) {
 						lock_instance_level(INST_START(inst), atoi(subfield));
 					}
@@ -3397,8 +3394,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "%c%d",UID_CHAR, obj_script_id(GET_EQ(c, pos)));
 					}
 					else if (!str_cmp(field, "event_points")) {
-						extern struct player_event_data *get_event_data(char_data *ch, int event_id);
-						
 						if (subfield && *subfield && isdigit(*subfield)) {
 							struct event_running_data *running = find_running_event_by_vnum(atoi(subfield));
 							struct player_event_data *ped;
@@ -4130,7 +4125,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'r': {	// char.r*
 					if (!str_cmp(field, "remove_companion")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
-							void remove_companion(char_data *ch, any_vnum vnum);
 							remove_companion(c, atoi(subfield));
 						}
 						
@@ -4152,7 +4146,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "remove_minipet")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
-							void remove_minipet(char_data *ch, any_vnum vnum);
 							remove_minipet(c, atoi(subfield));
 						}
 						

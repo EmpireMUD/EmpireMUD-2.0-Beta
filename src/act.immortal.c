@@ -2404,7 +2404,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("companion") {
-		void remove_companion(char_data *ch, any_vnum vnum);
 		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
 		char_data *pet;
 		
@@ -2562,7 +2561,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("minipet") {
-		void remove_minipet(char_data *ch, any_vnum vnum);
 		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
 		char_data *pet;
 		

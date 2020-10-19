@@ -41,7 +41,6 @@
 const char *default_progress_name = "Unnamed Goal";
 
 // external funcs
-extern int count_cities(empire_data *emp);
 extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 extern int count_owned_homes(empire_data *emp);;
 extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
@@ -2009,8 +2008,6 @@ void free_progress(progress_data *prg) {
 * @param any_vnum vnum The progress vnum
 */
 void parse_progress(FILE *fl, any_vnum vnum) {
-	void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
-	
 	char line[256], error[256], str_in[256];
 	struct progress_perk *perk;
 	progress_data *prg, *find;

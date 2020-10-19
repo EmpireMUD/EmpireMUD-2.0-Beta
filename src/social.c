@@ -339,8 +339,6 @@ void free_social(social_data *soc) {
 * @param any_vnum vnum The social vnum
 */
 void parse_social(FILE *fl, any_vnum vnum) {
-	void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
-	
 	char line[256], error[256], str_in[256], *ptr;
 	social_data *soc, *find;
 	int int_in[4];

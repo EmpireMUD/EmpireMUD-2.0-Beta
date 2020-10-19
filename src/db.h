@@ -338,6 +338,7 @@ int sort_buildings(bld_data *a, bld_data *b);
 
 // cities
 int city_points_available(empire_data *emp);
+int count_cities(empire_data *emp);
 int count_city_points_used(empire_data *emp);
 struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 
@@ -506,6 +507,7 @@ void write_interactions_to_file(FILE *fl, struct interaction_item *list);
 // islands
 extern struct island_info *island_table;
 
+void check_island_levels(room_data *location, int level);
 struct island_info *get_island(int island_id, bool create_if_missing);
 struct island_info *get_island_by_coords(char *coords);
 struct island_info *get_island_by_name(char_data *ch, char *name);
@@ -631,6 +633,9 @@ extern quest_data *quest_proto(any_vnum vnum);
 void free_player_quests(struct player_quest *list);
 void free_quest(quest_data *quest);
 void free_quest_temp_list(struct quest_temp_list *list);
+
+// requirements
+void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
 
 // resources
 struct resource_data *copy_resource_list(struct resource_data *input);

@@ -573,7 +573,6 @@ void real_update_char(char_data *ch) {
 	void check_morph_ability(char_data *ch);
 	extern int compute_bonus_exp_per_day(char_data *ch);
 	void random_encounter(char_data *ch);
-	extern bool starving_vampire_aggro(char_data *ch);
 	void update_biting_char(char_data *ch);
 	void update_vampire_sun(char_data *ch);
 	extern int max_inventory_size;
@@ -1096,8 +1095,6 @@ static void reduce_city_overage_one(empire_data *emp) {
 * - Are used at least 2x their currently-earned city points.
 */
 void reduce_city_overages(void) {
-	extern int count_cities(empire_data *emp);
-	
 	empire_data *iter, *next_iter;
 	int points;
 	

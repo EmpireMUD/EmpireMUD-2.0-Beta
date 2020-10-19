@@ -1779,6 +1779,7 @@ double rate_item(obj_data *obj);
 // player functions from utils.c
 void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
 void command_lag(char_data *ch, int wait_type);
+void despawn_charmies(char_data *ch, any_vnum only_vnum);
 void determine_gear_level(char_data *ch);
 room_data *find_load_room(char_data *ch);
 int pick_level_from_range(int level, int min, int max);
@@ -1923,6 +1924,7 @@ void perform_autostore(obj_data *obj, empire_data *emp, int island);
 void perform_immort_vis(char_data *ch);
 
 // act.informative.c
+void diag_char_to_char(char_data *i, char_data *ch);
 void display_attributes(char_data *ch, char_data *to);
 void display_tip_to_char(char_data *ch);
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode);
@@ -1969,6 +1971,7 @@ void un_earthmeld(char_data *ch);
 // act.other.c
 void adventure_summon(char_data *ch, char *argument);
 void cancel_adventure_summon(char_data *ch);
+bool dismiss_any_minipet(char_data *ch);
 
 // act.quest.c
 void count_quest_tasks(struct req_data *list, int *complete, int *total);
@@ -1978,17 +1981,18 @@ struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any
 void show_quest_tracker(char_data *ch, struct player_quest *pq);
 void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 
+// act.social.c
+social_data *find_social(char_data *ch, char *name, bool exact);
+void perform_social(char_data *ch, social_data *soc, char *argument);
+
 // act.stealth.c
 int apply_poison(char_data *ch, char_data *vict);
 bool can_infiltrate(char_data *ch, empire_data *emp);
 bool can_steal(char_data *ch, empire_data *emp);
 obj_data *find_poison_by_vnum(obj_data *list, any_vnum vnum);
 void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
+void undisguise(char_data *ch);
 bool valid_unseen_passing(room_data *room);
-
-// act.social.c
-social_data *find_social(char_data *ch, char *name, bool exact);
-void perform_social(char_data *ch, social_data *soc, char *argument);
 
 // act.survival.c
 bool valid_no_trace(room_data *room);
@@ -2006,6 +2010,8 @@ void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 bool check_vampire_sun(char_data *ch, bool message);
 void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
 void sire_char(char_data *ch, char_data *victim);
+void start_drinking_blood(char_data *ch, char_data *victim);
+bool starving_vampire_aggro(char_data *ch);
 void taste_blood(char_data *ch, char_data *vict);
 
 // act.vehicles.c
@@ -2056,6 +2062,9 @@ int get_room_scale_level(room_data *room, char_data *targ);
 bool check_unique_empire_name(empire_data *for_emp, char *name);
 bool valid_rank_name(char_data *ch, char *newname);
 
+// event.c
+struct player_event_data *get_event_data(char_data *ch, int event_id);
+
 // faction.c
 const char *get_faction_name_by_vnum(any_vnum vnum);
 const char *get_reputation_name(int type);
@@ -2100,6 +2109,7 @@ bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
 int adjusted_instance_limit(adv_data *adv);
 bool can_enter_instance(char_data *ch, struct instance_data *inst);
 bool can_instance(adv_data *adv);
+void check_instance_is_loaded(struct instance_data *inst);
 int count_instances(adv_data *adv);
 void delete_instance(struct instance_data *inst, bool run_cleanup);
 void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
@@ -2109,6 +2119,7 @@ struct instance_data *get_instance_by_mob(char_data *mob);
 struct instance_data *get_instance_for_script(int go_type, void *go);
 void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
 void instance_obj_setup(struct instance_data *inst, obj_data *obj);
+int lock_instance_level(room_data *room, int level);
 void mark_instance_completed(struct instance_data *inst);
 void remove_instance_fake_loc(struct instance_data *inst);
 void reset_instance(struct instance_data *inst);
@@ -2146,12 +2157,14 @@ char *get_informative_color(char_data *ch, bool dismantling, bool unfinished, bo
 void add_pursuit(char_data *ch, char_data *target);
 bool check_scaling(char_data *mob, char_data *attacker);
 int determine_best_scale_level(char_data *ch, bool check_group);
+void end_pursuit(char_data *ch, char_data *target);
 struct generic_name_data *get_generic_name_list(int name_set, int sex);
 int mob_coins(char_data *mob);
 void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
 void scale_mob_for_character(char_data *mob, char_data *ch);
 void scale_mob_to_level(char_data *mob, int level);
 void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
+void spawn_mobs_from_center(room_data *center);
 bool try_mobile_movement(char_data *ch);
 bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
 
@@ -2203,13 +2216,18 @@ bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_l
 bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
 bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
 bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
+int count_crop_variety_in_list(obj_data *list);
+bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
+void extract_crop_variety(char_data *ch, int amount);
 bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
+bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
 char *get_quest_name_by_proto(any_vnum vnum);
 void get_tracker_display(struct req_data *tracker, char *save_buffer);
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id);
 struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 struct player_quest *is_on_quest_by_name(char_data *ch, char *argument);
+char *quest_reward_string(struct quest_reward *reward, bool show_vnums);
 void refresh_all_quests(char_data *ch);
 void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq);
 void remove_quest_items_by_quest(char_data *ch, any_vnum vnum);
@@ -2265,6 +2283,7 @@ void et_lose_vehicle(empire_data *emp, vehicle_data *veh);
 
 // shop.c
 struct shop_temp_list *build_available_shop_list(char_data *ch);
+bool find_currency_in_shop_item_list(struct shop_item *list, any_vnum vnum);
 void free_shop_temp_list(struct shop_temp_list *list);
 
 // social.c

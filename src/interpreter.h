@@ -12,7 +12,9 @@
 
 // command types
 #define ACMD(name)		void name(char_data *ch, char *argument, int cmd, int subcmd)
-#define LIBRARY_SCMD(name)  void name(char_data *ch, char *argument)
+#define EEDIT(name)		void (name)(char_data *ch, char *argument, empire_data *emp)
+#define EVENT_CMD(name)		void (name)(char_data *ch, char *argument)
+#define LIBRARY_SCMD(name)	void name(char_data *ch, char *argument)
 
 
 // prototypes

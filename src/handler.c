@@ -74,7 +74,11 @@
 *   Miscellaneous Handlers
 */
 
+// external vars
+extern const int remove_lore_types[];
+
 // external funcs
+ACMD(do_return);
 EVENT_CANCEL_FUNC(cancel_room_event);
 void clear_obj_eq_sets(obj_data *obj);
 
@@ -83,7 +87,6 @@ void add_dropped_item(empire_data *emp, obj_data *obj);
 void add_dropped_item_anywhere(obj_data *obj, empire_data *only_if_emp);
 void add_dropped_item_list(empire_data *emp, obj_data *list);
 static void add_obj_binding(int idnum, struct obj_binding **list);
-void remove_companion(char_data *ch, any_vnum vnum);
 void remove_dropped_item(empire_data *emp, obj_data *obj);
 void remove_dropped_item_anywhere(obj_data *obj);
 void remove_dropped_item_list(empire_data *emp, obj_data *list);
@@ -1134,8 +1137,6 @@ void show_wear_off_msg(char_data *ch, any_vnum atype) {
 
 /* Extract a ch completely from the world, and leave his stuff behind */
 void extract_char_final(char_data *ch) {
-	ACMD(do_return);
-
 	empire_data *rescan_emp = IS_NPC(ch) ? NULL : GET_LOYALTY(ch);
 	char_data *k, *temp;
 	descriptor_data *t_desc;
@@ -1303,8 +1304,6 @@ void extract_char_final(char_data *ch) {
 * @param char_data *ch The character to mark for extraction.
 */
 void extract_char(char_data *ch) {
-	void despawn_charmies(char_data *ch, any_vnum only_vnum);
-	
 	if (!EXTRACTED(ch)) {
 		check_dg_owner_purged_char(ch);
 		
@@ -1461,8 +1460,6 @@ bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t f
 * @param char_data *ch The player to idle out.
 */
 void perform_idle_out(char_data *ch) {
-	extern bool dismiss_any_minipet(char_data *ch);
-	
 	empire_data *emp = NULL;
 	bool died = FALSE;
 	
@@ -1556,11 +1553,6 @@ void char_from_room(char_data *ch) {
 * @param room_data *room The place to put 'em
 */
 void char_to_room(char_data *ch, room_data *room) {
-	void check_instance_is_loaded(struct instance_data *inst);
-	void check_island_levels(room_data *location, int level);
-	extern int lock_instance_level(room_data *room, int level);
-	void spawn_mobs_from_center(room_data *center);
-	
 	int pos;
 	obj_data *obj;
 	struct instance_data *inst = NULL;
@@ -4839,8 +4831,6 @@ void add_lore(char_data *ch, int type, const char *str, ...) {
 * @param char_data *ch The person whose lore to clean.
 */
 void clean_lore(char_data *ch) {
-	extern const int remove_lore_types[];
-
 	struct lore_data *lore, *next_lore;
 	struct time_info_data t;
 	int iter;
@@ -5072,8 +5062,6 @@ void add_minipet(char_data *ch, any_vnum vnum) {
 * @param char_data *ch The player to check.
 */
 void check_minipets_and_companions(char_data *ch) {
-	void remove_minipet(char_data *ch, any_vnum vnum);
-	
 	struct minipet_data *mini, *next_mini;
 	struct companion_data *cd, *next_cd;
 	
@@ -7646,8 +7634,6 @@ bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnu
 * @param struct req_data *list The items to lose (other task types are ignored).
 */
 void extract_required_items(char_data *ch, struct req_data *list) {
-	void extract_crop_variety(char_data *ch, int amount);
-	
 	// helper type
 	struct extract_items_data {
 		int group;	// cast from char
@@ -7783,8 +7769,6 @@ void free_requirements(struct req_data *list) {
 * @return bool TRUE if the character meets those requirements, FALSE if not.
 */
 bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance) {
-	extern int count_cities(empire_data *emp);
-	extern int count_crop_variety_in_list(obj_data *list);
 	extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 	extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
 	extern int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags);

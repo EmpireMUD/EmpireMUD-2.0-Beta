@@ -29,10 +29,9 @@
 *   Editor Commands
 */
 
-// helpful
-#define EEDIT(name)		void (name)(char_data *ch, char *argument, empire_data *emp)
-
-// externs
+// external data
+extern char *invalid_list[MAX_INVALID_NAMES];
+extern int num_invalid;
 
 // locals
 EEDIT(eedit_adjective);
@@ -124,9 +123,6 @@ bool check_unique_empire_name(empire_data *for_emp, char *name) {
 * @return bool TRUE if the name is ok.
 */
 bool valid_empire_name(char *newname) {
-	extern char *invalid_list[MAX_INVALID_NAMES];
-	extern int num_invalid;
-
 	char *ptr, tempname[MAX_INPUT_LENGTH];
 	bool ok = TRUE;
 	int iter;

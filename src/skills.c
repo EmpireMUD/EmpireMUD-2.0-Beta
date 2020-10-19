@@ -74,7 +74,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 	void remove_armor_by_type(char_data *ch, int armor_type);
 	void remove_honed_gear(char_data *ch);
 	void retract_claws(char_data *ch);
-	void undisguise(char_data *ch);	
 	
 	struct ability_data_list *adl;
 	char_data *mob, *next_mob;
@@ -2654,8 +2653,6 @@ char *list_one_skill(skill_data *skill, bool detail) {
 * @param any_vnum vnum The skill vnum.
 */
 void olc_search_skill(char_data *ch, any_vnum vnum) {
-	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	skill_data *skill = find_skill_by_vnum(vnum), *sk, *next_sk;
 	archetype_data *arch, *next_arch;
@@ -3260,7 +3257,6 @@ skill_data *create_skill_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_skill(char_data *ch, any_vnum vnum) {
-	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
 	extern bool remove_vnum_from_class_skill_reqs(struct class_skill_req **list, any_vnum vnum);
 	extern bool remove_skill_from_synergy_abilities(struct synergy_ability **list, any_vnum skill_vnum);
 	

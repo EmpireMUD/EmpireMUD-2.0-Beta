@@ -47,19 +47,11 @@ const char *default_event_name = "Unnamed Event";
 const char *default_event_description = "This event has no description.\r\n";
 const char *default_event_complete_msg = "The event has ended.\r\n";
 
-// external funcs
-extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-
 // local protos
 EVENT_CANCEL_FUNC(cancel_event_event);
-struct player_event_data *get_event_data(char_data *ch, int event_id);
 void schedule_event_event(struct event_running_data *erd);
 int sort_event_rewards(struct event_reward *a, struct event_reward *b);
 void update_player_leaderboard(char_data *ch, struct event_running_data *re, struct player_event_data *ped);
-
-
-#define EVENT_CMD(name)		void (name)(char_data *ch, char *argument)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -172,8 +164,6 @@ char *get_event_name_by_proto(any_vnum vnum) {
 * @return char* The string display.
 */
 char *event_reward_string(struct event_reward *reward, bool show_vnums) {
-	extern char *quest_reward_string(struct quest_reward *reward, bool show_vnums);
-
 	struct quest_reward qr;
 
 	// borrow data to use the other reward string func
@@ -1453,8 +1443,6 @@ void parse_event_reward(char *line, struct event_reward **list, char *error_str)
 * @param any_vnum vnum The event vnum
 */
 void parse_event(FILE *fl, any_vnum vnum) {
-	void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
-	
 	char line[256], error[256], str_in[256];
 	event_data *event, *find;
 	int int_in[6];
@@ -1535,8 +1523,6 @@ void parse_event(FILE *fl, any_vnum vnum) {
 * @bool rank If TRUE, requires min-max rank. FALSE is threshold mode and only needs min points.
 */
 void process_evedit_rewards(char_data *ch, char *argument, struct event_reward **list, char *cmd, bool rank) {
-	extern any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *prev_arg);
-	
 	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
 	char min_arg[MAX_INPUT_LENGTH], max_arg[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];

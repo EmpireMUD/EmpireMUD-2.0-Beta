@@ -129,7 +129,6 @@ void get_interaction_display(struct interaction_item *list, char *save_buffer);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 int find_olc_type(char *name);
-bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
 void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
 void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
 double olc_process_double(char_data *ch, char *argument, char *name, char *command, double min, double max, double old_value);
@@ -143,6 +142,8 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list);
 void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **list, int trigger_attach);
+any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *prev_arg);
+bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
 void smart_copy_interactions(struct interaction_item **addto, struct interaction_item *input);
 void smart_copy_scripts(struct trig_proto_list **addto, struct trig_proto_list *input);
 void smart_copy_spawns(struct spawn_info **addto, struct spawn_info *input);

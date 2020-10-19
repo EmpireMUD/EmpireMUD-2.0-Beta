@@ -39,9 +39,6 @@
 // external vars
 extern struct generic_name_data *generic_names;
 
-// local protos
-void end_pursuit(char_data *ch, char_data *target);
-
 
 // for validate_global_map_spawns, run_global_map_spawns
 struct glb_map_spawn_bean {

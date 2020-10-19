@@ -145,6 +145,7 @@ void add_companion_mod(struct companion_data *companion, int type, int num, char
 void add_companion_var(char_data *mob, char *name, char *value, int id);
 struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type);
 struct companion_data *has_companion(char_data *ch, any_vnum vnum);
+void remove_companion(char_data *ch, any_vnum vnum);
 void remove_companion_var(char_data *mob, char *name, int context);
 void reread_companion_trigs(char_data *mob);
 
@@ -331,6 +332,7 @@ void add_learned_craft(char_data *ch, any_vnum vnum);
 void add_minipet(char_data *ch, any_vnum vnum);
 bool has_minipet(char_data *ch, any_vnum vnum);
 void remove_learned_craft(char_data *ch, any_vnum vnum);
+void remove_minipet(char_data *ch, any_vnum vnum);
 
 // player tech handlers
 void add_player_tech(char_data *ch, any_vnum abil, int tech);
@@ -345,6 +347,9 @@ void extract_required_items(char_data *ch, struct req_data *list);
 bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 void free_requirements(struct req_data *list);
 char *requirement_string(struct req_data *task, bool show_vnums);
+
+// resource handlers
+bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);

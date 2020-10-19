@@ -221,8 +221,6 @@ morph_data *find_morph_by_name(char_data *ch, char *name) {
 * @param morph_data *morph Which form to change into (NULL for none).
 */
 void finish_morphing(char_data *ch, morph_data *morph) {
-	void undisguise(char_data *ch);
-
 	char lbuf[MAX_STRING_LENGTH];
 	
 	// can't be disguised while morphed

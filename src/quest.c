@@ -45,7 +45,6 @@ const char *default_quest_description = "This quest has no description.\r\n";
 const char *default_quest_complete_msg = "You have completed the quest.\r\n";
 
 // external funcs
-extern int count_cities(empire_data *emp);
 extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
 void get_requirement_display(struct req_data *list, char *save_buffer);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
@@ -4407,8 +4406,6 @@ void parse_quest_reward(FILE *fl, struct quest_reward **list, char *error_str) {
 * @param any_vnum vnum The quest vnum
 */
 void parse_quest(FILE *fl, any_vnum vnum) {
-	void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
-	
 	char line[256], error[256], str_in[256];
 	quest_data *quest, *find;
 	int int_in[4];

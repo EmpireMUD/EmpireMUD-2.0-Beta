@@ -43,10 +43,6 @@ const int default_starting_rep = REP_NEUTRAL;
 // local protos
 void get_faction_relation_display(struct faction_relation *list, char *save_buffer);
 
-// external funcs
-extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-
 
  /////////////////////////////////////////////////////////////////////////////
 //// HELPERS ////////////////////////////////////////////////////////////////
