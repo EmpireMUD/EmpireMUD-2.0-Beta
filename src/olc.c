@@ -5846,9 +5846,9 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
 			}
 			else {
-				// SUCCESS: "move" them by swapping data
+				// SUCCESS: attempt to move
 				if (up && prev) {
-					// can mo ve up
+					// can move up
 					LL_DELETE(*list, to_move);
 					LL_PREPEND_ELEM(*list, prev, to_move);
 				}
@@ -6696,9 +6696,8 @@ bool parse_interaction_restrictions(char_data *ch, char *argument, struct intera
 */
 void olc_process_interactions(char_data *ch, char *argument, struct interaction_item **list, int attach_type) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH], arg6[MAX_INPUT_LENGTH];
-	struct interaction_item *interact, *prev, *to_move, *temp, *a, *b, *a_next, *b_next, *copyfrom = NULL, *change;
+	struct interaction_item *interact, *prev, *to_move, *temp, *copyfrom = NULL, *change;
 	struct interact_restriction *found_restrictions = NULL;
-	struct interaction_item iitem;
 	int iter, loc, num, count, findtype;
 	any_vnum vnum;
 	double prc;
@@ -6864,9 +6863,10 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		else {
 			// find the one to move
 			to_move = prev = NULL;
-			for (interact = *list; interact && !to_move; interact = interact->next) {
+			LL_FOREACH(*list, interact) {
 				if (--num == 0) {
 					to_move = interact;
+					break;	// found;
 				}
 				else {
 					// store for next iteration
@@ -6881,28 +6881,17 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
 			}
 			else {
-				// SUCCESS: "move" them by swapping data
-				if (up) {
-					a = prev;
-					b = to_move;
+				// SUCCESS: attempt to move
+				if (up && prev) {
+					// can move up
+					LL_DELETE(*list, to_move);
+					LL_PREPEND_ELEM(*list, prev, to_move);
 				}
-				else {
-					a = to_move;
-					b = to_move->next;
+				else if (!up && (prev = to_move->next)) {
+					// can move down
+					LL_DELETE(*list, to_move);
+					LL_APPEND_ELEM(*list, prev, to_move);
 				}
-				
-				// store next pointers
-				a_next = a->next;
-				b_next = b->next;
-				
-				// swap data
-				iitem = *a;
-				*a = *b;
-				*b = iitem;
-				
-				// restore next pointers
-				a->next = a_next;
-				b->next = b_next;
 				
 				// message: re-atoi(arg2) because we destroyed num finding our target
 				msg_to_char(ch, "You move interaction %d %s.\r\n", atoi(arg2), (up ? "up" : "down"));
