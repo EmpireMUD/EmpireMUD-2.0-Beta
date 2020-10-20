@@ -4426,6 +4426,7 @@ struct char_data {
 	char_data *prev_in_room, *next_in_room;	// For room->people - doubly-linked list
 	char_data *prev, *next;	// For character_list (doubly-linked)
 	char_data *next_fighting;	// For fighting list
+	bool in_combat_list;	// helps with removing from combat list
 	
 	struct follow_type *followers;	// List of chars followers
 	char_data *master;	// Who is char following?

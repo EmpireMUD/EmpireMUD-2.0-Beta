@@ -43,14 +43,14 @@
 // external vars
 extern bool catch_up_combat;
 extern struct message_list fight_messages[MAX_MESSAGES];
+extern bitvector_t pk_ok;
 
 // external funcs
 ACMD(do_flee);
+ACMD(do_respawn);
 
 // locals
 void drop_loot(char_data *mob, char_data *killer);
-void heal(char_data *ch, char_data *vict, int amount);
-int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round);
 obj_data *make_corpse(char_data *ch);
 
 
@@ -693,8 +693,6 @@ static void recursive_loot_set(obj_data *obj, int idnum, empire_data *emp) {
 * @param int damtype The DAM_x type of damage.
 */
 int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype) {
-	extern bool check_blood_fortitude(char_data *ch, bool can_gain_skill);
-	
 	bool self = (!attacker || attacker == victim);
 	int max_resist;
 	double resist_prc, use_resist;
@@ -815,8 +813,6 @@ static char *replace_fight_string(const char *str, const char *weapon_first, con
 * @param room_data *bodies_to_room Optional: If not NULL, dead players are relocated here.
 */
 void siege_kill_vehicle_occupants(vehicle_data *veh, char_data *attacker, vehicle_data *by_vehicle, room_data *bodies_to_room) {
-	ACMD(do_respawn);
-
 	struct vehicle_room_list *vrl;
 	vehicle_data *iter;
 	char_data *ch, *next_ch;
@@ -1215,9 +1211,7 @@ void death_restore(char_data *ch) {
 	if (FIGHTING(ch)) {
 		stop_fighting(ch);
 	}
-	for (ch_iter = combat_list; ch_iter; ch_iter = next_combat_list) {
-		next_combat_list = ch_iter->next_fighting;
-		
+	LL_FOREACH_SAFE2(combat_list, ch_iter, next_combat_list, next_fighting) {
 		if (FIGHTING(ch_iter) == ch) {
 			stop_fighting(ch_iter);
 		}
@@ -1324,7 +1318,7 @@ obj_data *die(char_data *ch, char_data *killer) {
 	if (FIGHTING(ch)) {
 		stop_fighting(ch);
 	}
-	for (ch_iter = combat_list; ch_iter; ch_iter = ch_iter->next_fighting) {
+	LL_FOREACH_SAFE2(combat_list, ch_iter, next_combat_list, next_fighting) {
 		if (FIGHTING(ch_iter) == ch) {
 			stop_fighting(ch_iter);
 		}
@@ -1856,8 +1850,6 @@ struct tower_victim_list {
 * @param char_data *vict Potential target
 */
 static bool tower_would_shoot(room_data *from_room, char_data *vict) {
-	extern bool ignore_distrustful_due_to_start_loc(room_data *loc);
-	
 	empire_data *emp = ROOM_OWNER(from_room);
 	empire_data *enemy = IS_NPC(vict) ? NULL : GET_LOYALTY(vict);
 	empire_data *m_empire;
@@ -2363,9 +2355,6 @@ int skill_message(int dam, char_data *ch, char_data *vict, int attacktype) {
  * aren't spammed.
  */
 bool can_fight(char_data *ch, char_data *victim) {
-	extern bool has_one_day_playtime(char_data *ch);
-	extern bitvector_t pk_ok;
-	
 	empire_data *ch_emp, *victim_emp;
 	obj_data *obj;
 
@@ -3701,8 +3690,9 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 	if (ch == vict)
 		return;
 
-	if (FIGHTING(ch))
+	if (FIGHTING(ch) && ch->in_combat_list) {
 		return;
+	}
 	
 	// look for possible offense (if vict is in an empire and is not already fighting ch)
 	if (!IS_NPC(ch) && GET_LOYALTY(vict) && FIGHTING(vict) != ch) {
@@ -3713,8 +3703,11 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 			add_offense(GET_LOYALTY(vict), OFFENSE_ATTACKED_NPC, ch, IN_ROOM(ch), OFF_SEEN);
 		}
 	}
-
-	LL_PREPEND2(combat_list, ch, next_fighting);
+	
+	if (!ch->in_combat_list) {
+		LL_PREPEND2(combat_list, ch, next_fighting);
+		ch->in_combat_list = TRUE;
+	}
 
 	FIGHTING(ch) = vict;
 	FIGHT_MODE(ch) = mode;
@@ -3741,9 +3734,15 @@ void stop_fighting(char_data *ch) {
 	if (ch == next_combat_list) {
 		next_combat_list = ch->next_fighting;
 	}
-
-	LL_DELETE2(combat_list, ch, next_fighting);
-	ch->next_fighting = NULL;
+	if (ch == next_combat_list_main) {
+		next_combat_list_main = ch->next_fighting;
+	}
+	
+	if (ch->in_combat_list) {
+		LL_DELETE2(combat_list, ch, next_fighting);
+		ch->next_fighting = NULL;
+		ch->in_combat_list = FALSE;
+	}
 	FIGHTING(ch) = NULL;
 	GET_POS(ch) = POS_STANDING;
 	update_pos(ch);
@@ -4208,8 +4207,7 @@ void frequent_combat(int pulse) {
 	}
 	catch_up_combat = FALSE;
 	
-	for (ch = combat_list; ch; ch = next_combat_list) {
-		next_combat_list = ch->next_fighting;
+	LL_FOREACH_SAFE2(combat_list, ch, next_combat_list_main, next_fighting) {
 		vict = FIGHTING(ch);
 		
 		// never!
