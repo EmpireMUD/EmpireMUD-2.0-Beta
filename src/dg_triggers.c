@@ -158,7 +158,7 @@ int word_check(char *str, char *wordlist) {
 void greet_memory_mtrigger(char_data *actor) {
 	trig_data *t;
 	char_data *ch;
-	struct script_memory *mem;
+	struct script_memory *mem, *next_mem;
 	char buf[MAX_INPUT_LENGTH];
 	int command_performed = 0;
 
@@ -173,7 +173,7 @@ void greet_memory_mtrigger(char_data *actor) {
 			continue;
 		}
 		/* find memory line with command only */
-		for (mem = SCRIPT_MEM(ch); mem && SCRIPT_MEM(ch); mem=mem->next) {
+		LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
 			if (actor->script_id != mem->id) {
 				continue;
 			}
