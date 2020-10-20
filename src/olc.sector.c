@@ -793,7 +793,16 @@ sector_data *setup_olc_sector(sector_data *input) {
 	}
 	
 	// done
-	return new;	
+	return new;
+}
+
+
+// simple sorter for sector evolutions
+int sort_evolutions(struct evolution_data *a, struct evolution_data *b) {
+	if (a->type != b->type) {
+		return a->type - b->type;
+	}
+	return a->percent - b->percent;
 }
 
 
@@ -904,8 +913,6 @@ OLC_MODULE(sectedit_commands) {
 
 
 OLC_MODULE(sectedit_evolution) {
-	void sort_evolutions(sector_data *sect);
-	
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
 	struct evolution_data *evo, *change;
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], valstr[MAX_INPUT_LENGTH], *sectarg, *tmp;
@@ -1016,8 +1023,8 @@ OLC_MODULE(sectedit_evolution) {
 				evo->percent = prc;
 				evo->becomes = GET_SECT_VNUM(to_sect);
 				
-				LL_PREPEND(st->evolution, evo);
-				sort_evolutions(st);
+				LL_PREPEND(GET_SECT_EVOS(st), evo);
+				LL_SORT(GET_SECT_EVOS(st), sort_evolutions);
 				
 				msg_to_char(ch, "You add %s %s%s evolution at %.2f%%: %d %s\r\n", AN(evo_types[evo_type]), evo_types[evo_type], valstr, prc, GET_SECT_VNUM(to_sect), GET_SECT_NAME(to_sect));
 			}
@@ -1113,7 +1120,7 @@ OLC_MODULE(sectedit_evolution) {
 		
 		// if any of them hit (safe to do this anyway)
 		if (change) {
-			sort_evolutions(st);
+			LL_SORT(GET_SECT_EVOS(st), sort_evolutions);
 		}
 	}
 	else {

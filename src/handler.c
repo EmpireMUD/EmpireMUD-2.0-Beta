@@ -8902,59 +8902,6 @@ sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_t
 }
 
 
-// quick-switch of linked list positions
-struct evolution_data *switch_evolution_pos(struct evolution_data *l1, struct evolution_data *l2) {
-    l1->next = l2->next;
-    l2->next = l1;
-    return l2;
-}
-
-
-/**
-* Sorter for evolutions on a sector.
-*
-* @param sector_data *sect The sector to sort evolutions on.
-*/
-void sort_evolutions(sector_data *sect) {
-	struct evolution_data *start, *p, *q, *top;
-    bool changed = TRUE;
-        
-    // safety first
-    if (!sect) {
-    	return;
-    }
-    
-    start = sect->evolution;
-
-	CREATE(top, struct evolution_data, 1);
-
-    top->next = start;
-    if (start && start->next) {
-    	// q is always one item behind p
-
-        while (changed) {
-            changed = FALSE;
-            q = top;
-            p = top->next;
-            while (p->next != NULL) {
-				if (p->type > p->next->type || (p->type == p->next->type && p->percent > p->next->percent)) {
-					q->next = switch_evolution_pos(p, p->next);
-					changed = TRUE;
-				}
-				
-                q = p;
-                if (p->next) {
-                    p = p->next;
-                }
-            }
-        }
-    }
-    
-    sect->evolution = top->next;
-    free(top);
-}
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// STORAGE HANDLERS ////////////////////////////////////////////////////////
 
