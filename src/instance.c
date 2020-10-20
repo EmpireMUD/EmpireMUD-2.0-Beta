@@ -525,7 +525,7 @@ void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventu
 	// sort exits
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 		if (room_list[iter]) {
-			sort_exits(&COMPLEX_DATA(room_list[iter])->exits);
+			LL_SORT(COMPLEX_DATA(room_list[iter])->exits, sort_exits);
 		}
 	}
 	

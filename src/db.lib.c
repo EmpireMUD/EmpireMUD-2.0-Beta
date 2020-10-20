@@ -3995,7 +3995,7 @@ void setup_dir(FILE *fl, room_data *room, int dir) {
 	ex->exit_info = asciiflag_conv(str_in);
 
 	// sort last
-	sort_exits(&(COMPLEX_DATA(room)->exits));
+	LL_SORT(COMPLEX_DATA(room)->exits, sort_exits);
 }
 
 
@@ -8774,43 +8774,9 @@ int sort_empires(empire_data *a, empire_data *b) {
 }
 
 
-/**
-* Sorts a list of exits by direction.
-*
-* @param struct room_direction_data **list The list of exits to sort.
-*/
-void sort_exits(struct room_direction_data **list) {
-	struct room_direction_data *a, *b, *a_next, *b_next;
-	struct room_direction_data temp;
-	bool changed = TRUE;
-	
-	if (*list && (*list)->next) {
-		while (changed) {
-			changed = FALSE;
-
-			a = *list;
-			while ((b = a->next)) {
-				if (a->dir > b->dir) {
-					// preserve next-pointers
-					a_next = a->next;
-					b_next = b->next;
-					
-					// swap positions by swapping data
-					temp = *a;
-					*a = *b;
-					*b = temp;
-					
-					// restore next pointers
-					a->next = a_next;
-					b->next = b_next;
-					
-					changed = TRUE;
-				}
-				
-				a = a->next;
-			}
-		}
-	}
+// simple sorter for exit directions
+int sort_exits(struct room_direction_data *a, struct room_direction_data *b) {
+	return a->dir - b->dir;
 }
 
 
