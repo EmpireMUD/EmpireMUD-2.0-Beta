@@ -21,6 +21,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "constants.h"
 
 
 /**
@@ -39,34 +40,14 @@
 // local data
 const char *default_progress_name = "Unnamed Goal";
 
-// external consts
-extern const char *progress_flags[];
-extern const char *progress_perk_types[];
-extern const char *progress_types[];
-extern const char *requirement_types[];
-extern const char *techs[];
-
 // external funcs
-extern struct req_data *copy_requirements(struct req_data *from);
-extern int count_cities(empire_data *emp);
-extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
-extern int count_owned_homes(empire_data *emp);;
-extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
-extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
-extern int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs);
-void count_quest_tasks(struct req_data *list, int *complete, int *total);
 void get_requirement_display(struct req_data *list, char *save_buffer);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
-void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
 
 // local funcs
 void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add);
 void complete_goal(empire_data *emp, struct empire_goal *goal);
-bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
-void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
-void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
-void remove_completed_goal(empire_data *emp, any_vnum vnum);
 struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg);
 
 
@@ -366,8 +347,6 @@ void get_progress_list_display(struct progress_list *list, char *save_buffer) {
 * @param bool show_vnums If true, adds [ 1234] before the name.
 */
 char *get_one_perk_display(struct progress_perk *perk, bool show_vnums) {
-	extern const char *craft_types[];
-	
 	static char save_buffer[MAX_STRING_LENGTH];
 	craft_data *craft;
 	char numstr[256];
@@ -556,9 +535,6 @@ void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add) {
 				break;
 			}
 			case PRG_PERK_CRAFT: {
-				void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
-				void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
-				
 				if (add) {
 					add_learned_craft_empire(emp, perk->value);
 				}
@@ -907,9 +883,6 @@ void refresh_empire_goals(empire_data *emp, any_vnum only_vnum) {
 * @param struct empire_goal *goal The goal to refresh.
 */
 void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal) {
-	extern int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags);
-	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
-	
 	struct req_data *task;
 	
 	if (!emp || !goal) {
@@ -1585,8 +1558,6 @@ void et_lose_vehicle(empire_data *emp, vehicle_data *veh) {
 * @param empire_data *only_emp Optional: If provided, only does that 1 empire. Otherwise does all of them.
 */
 void full_reset_empire_progress(empire_data *only_emp) {
-	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
-	
 	struct player_craft_data *pcd, *next_pcd;
 	empire_data *emp, *next_emp;
 	int iter;
@@ -2029,8 +2000,6 @@ void free_progress(progress_data *prg) {
 * @param any_vnum vnum The progress vnum
 */
 void parse_progress(FILE *fl, any_vnum vnum) {
-	void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
-	
 	char line[256], error[256], str_in[256];
 	struct progress_perk *perk;
 	progress_data *prg, *find;

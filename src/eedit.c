@@ -20,6 +20,7 @@
 #include "handler.h"
 #include "db.h"
 #include "olc.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -28,10 +29,9 @@
 *   Editor Commands
 */
 
-// helpful
-#define EEDIT(name)		void (name)(char_data *ch, char *argument, empire_data *emp)
-
-// externs
+// external data
+extern char *invalid_list[MAX_INVALID_NAMES];
+extern int num_invalid;
 
 // locals
 EEDIT(eedit_adjective);
@@ -123,9 +123,6 @@ bool check_unique_empire_name(empire_data *for_emp, char *name) {
 * @return bool TRUE if the name is ok.
 */
 bool valid_empire_name(char *newname) {
-	extern char *invalid_list[MAX_INVALID_NAMES];
-	extern int num_invalid;
-
 	char *ptr, tempname[MAX_INPUT_LENGTH];
 	bool ok = TRUE;
 	int iter;
@@ -352,8 +349,6 @@ EEDIT(eedit_adjective) {
 
 
 EEDIT(eedit_admin_flags) {
-	extern const char *empire_admin_flags[];
-	
 	bitvector_t old_flags = EMPIRE_ADMIN_FLAGS(emp);
 	char buf[MAX_STRING_LENGTH];
 	
@@ -369,8 +364,6 @@ EEDIT(eedit_admin_flags) {
 
 
 EEDIT(eedit_banner) {
-	extern char *show_color_codes(char *string);
-	
 	if (!*argument) {
 		msg_to_char(ch, "Set the empire banner to what (HELP COLOR)?\r\n");
 	}
@@ -501,8 +494,6 @@ EEDIT(eedit_description) {
 
 
 EEDIT(eedit_frontiertraits) {
-	extern const char *empire_trait_types[];
-	
 	bitvector_t old_traits = EMPIRE_FRONTIER_TRAITS(emp);
 	char buf[MAX_STRING_LENGTH];
 	
@@ -625,8 +616,6 @@ EEDIT(eedit_name) {
 
 
 EEDIT(eedit_privilege) {
-	extern const char *priv[];
-
 	int pr, rnk, iter;
 	
 	argument = any_one_word(argument, arg);

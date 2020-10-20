@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -30,12 +31,6 @@
 *   Mount Commands
 *   Commands
 */
-
-// external vars
-
-// external funcs
-void scale_item_to_level(obj_data *obj, int level);
-extern bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
 
 // local protos
 ACMD(do_dismount);
@@ -91,8 +86,6 @@ INTERACTION_FUNC(butcher_interact) {
 * @return obj_data *the best saddle in inventory, or NULL if none
 */
 obj_data *find_best_saddle(char_data *ch) {
-	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
-	
 	obj_data *obj, *best = NULL;
 	double best_score = 0, this;
 	
@@ -118,6 +111,8 @@ obj_data *find_best_saddle(char_data *ch) {
 
 /**
 * Determines if a room qualifies for No Trace (outdoors/wilderness).
+*
+* TODO: could rename this something more generic
 *
 * @param room_data *room Where to check.
 * @return bool TRUE if No Trace works here.
@@ -250,8 +245,6 @@ void do_mount_current(char_data *ch) {
 
 // list/search mounts
 void do_mount_list(char_data *ch, char *argument) {
-	extern const char *mount_flags[];
-	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH];
 	struct mount_data *mount, *next_mount;
 	bool any = FALSE, cur;
@@ -330,7 +323,6 @@ void do_mount_new(char_data *ch, char *argument) {
 	else if (!(mob = get_char_vis(ch, argument, NULL, FIND_CHAR_ROOM))) {
 		// special case: mount/ride a vehicle
 		if (get_vehicle_in_room_vis(ch, arg, NULL)) {
-			void do_sit_on_vehicle(char_data *ch, char *argument, int pos);
 			do_sit_on_vehicle(ch, arg, POS_SITTING);
 		}
 		else {
@@ -393,8 +385,6 @@ void do_mount_new(char_data *ch, char *argument) {
 
 // release your current mount
 void do_mount_release(char_data *ch, char *argument) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	struct mount_data *mount;
 	char_data *mob;
 	
@@ -588,8 +578,6 @@ ACMD(do_butcher) {
 
 
 ACMD(do_dismount) {
-	void do_unseat_from_vehicle(char_data *ch);
-	
 	char_data *mount;
 	
 	if (IS_RIDING(ch)) {
@@ -612,8 +600,6 @@ ACMD(do_dismount) {
 
 
 ACMD(do_fish) {
-	extern const char *dirs[];
-	
 	room_data *room = IN_ROOM(ch);
 	char buf[MAX_STRING_LENGTH];
 	int dir = NO_DIR;
@@ -877,10 +863,6 @@ ACMD(do_mount) {
 
 
 ACMD(do_track) {
-	extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
-	extern vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum interior_room);
-	extern const char *dirs[];
-	
 	char buf[MAX_STRING_LENGTH];
 	room_vnum track_to_room = NOWHERE;
 	char_data *vict, *proto;

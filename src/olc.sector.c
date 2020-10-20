@@ -20,6 +20,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -27,19 +28,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// external consts
-extern const char *bld_on_flags[];
-extern const bitvector_t bld_on_flags_order[];
-extern const char *climate_flags[];
-extern const bitvector_t climate_flags_order[];
-extern const char *evo_types[];
-extern const int evo_val_types[NUM_EVOS];
-extern const char *interact_types[];
-extern const char *mapout_color_names[];
-extern const char *sector_flags[];
-extern const char *spawn_flags[];
-extern const char *icon_types[];
 
 // external funcs
 void init_sector(sector_data *st);
@@ -65,7 +53,6 @@ bool audit_sector(sector_data *sect, char_data *ch) {
 	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
 	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
 	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
-	extern const char *icon_types[];
 	
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
@@ -205,14 +192,14 @@ sector_data *create_sector_table_entry(sector_vnum vnum) {
 * @return bool TRUE if any evolutions were deleted.
 */
 bool delete_sector_from_evolutions(sector_vnum vnum, struct evolution_data **list) {
-	struct evolution_data *evo, *next_evo, *temp;
+	struct evolution_data *evo, *next_evo;
 	bool found = FALSE;
 	
 	for (evo = *list; evo; evo = next_evo) {
 		next_evo = evo->next;
 		
 		if (evo->becomes == vnum || (evo_val_types[evo->type] == EVO_VAL_SECTOR && evo->value == vnum)) {
-			REMOVE_FROM_LIST(evo, *list, next);
+			LL_DELETE(*list, evo);
 			free(evo);
 			found = TRUE;
 		}
@@ -254,7 +241,6 @@ char *list_one_sector(sector_data *sect, bool detail) {
 */
 void olc_delete_sector(char_data *ch, sector_vnum vnum) {
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void remove_sector_from_table(sector_data *sect);
 	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
@@ -580,8 +566,6 @@ void olc_fullsearch_sector(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_sector(char_data *ch, sector_vnum vnum) {
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	struct adventure_link_rule *link;
 	struct evolution_data *evo;
@@ -770,7 +754,7 @@ void save_olc_sector(descriptor_data *desc) {
 */
 sector_data *setup_olc_sector(sector_data *input) {
 	sector_data *new;
-	struct evolution_data *old_evo, *new_evo, *last_evo;
+	struct evolution_data *old_evo, *new_evo;
 	
 	CREATE(new, sector_data, 1);
 	init_sector(new);
@@ -790,19 +774,10 @@ sector_data *setup_olc_sector(sector_data *input) {
 		
 		// copy evolutions
 		new->evolution = NULL;
-		last_evo = NULL;
 		for (old_evo = input->evolution; old_evo; old_evo = old_evo->next) {
 			CREATE(new_evo, struct evolution_data, 1);
 			*new_evo = *old_evo;
-			new_evo->next = NULL;
-			
-			if (last_evo) {
-				last_evo->next = new_evo;
-			}
-			else {
-				new->evolution = new_evo;
-			}
-			last_evo = new_evo;
+			LL_APPEND(new->evolution, new_evo);
 		}
 		
 		// copy icons
@@ -833,10 +808,6 @@ sector_data *setup_olc_sector(sector_data *input) {
 * @param char_data *ch The person who is editing a sector and will see its display.
 */
 void olc_show_sector(char_data *ch) {
-	void get_evolution_display(struct evolution_data *list, char *save_buffer);
-	void get_icons_display(struct icon_data *list, char *save_buffer);
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
 	char lbuf[MAX_STRING_LENGTH * 2];
 	struct spawn_info *spawn;
@@ -937,7 +908,7 @@ OLC_MODULE(sectedit_evolution) {
 	void sort_evolutions(sector_data *sect);
 	
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	struct evolution_data *evo, *change, *temp;
+	struct evolution_data *evo, *change;
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], valstr[MAX_INPUT_LENGTH], *sectarg, *tmp;
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	int num, iter, evo_type, value;
@@ -970,7 +941,7 @@ OLC_MODULE(sectedit_evolution) {
 					
 					msg_to_char(ch, "You remove evolution #%d.\r\n", atoi(arg2));
 					
-					REMOVE_FROM_LIST(evo, st->evolution, next);
+					LL_DELETE(st->evolution, evo);
 					free(evo);
 				}
 			}
@@ -1045,9 +1016,8 @@ OLC_MODULE(sectedit_evolution) {
 				evo->value = value;
 				evo->percent = prc;
 				evo->becomes = GET_SECT_VNUM(to_sect);
-			
-				evo->next = st->evolution;
-				st->evolution = evo;
+				
+				LL_PREPEND(st->evolution, evo);
 				sort_evolutions(st);
 				
 				msg_to_char(ch, "You add %s %s%s evolution at %.2f%%: %d %s\r\n", AN(evo_types[evo_type]), evo_types[evo_type], valstr, prc, GET_SECT_VNUM(to_sect), GET_SECT_NAME(to_sect));

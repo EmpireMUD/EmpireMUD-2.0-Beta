@@ -12,15 +12,21 @@
 
 // command types
 #define ACMD(name)		void name(char_data *ch, char *argument, int cmd, int subcmd)
-#define LIBRARY_SCMD(name)  void name(char_data *ch, char *argument)
+#define EEDIT(name)		void (name)(char_data *ch, char *argument, empire_data *emp)
+#define EVENT_CMD(name)		void (name)(char_data *ch, char *argument)
+#define LIBRARY_SCMD(name)	void name(char_data *ch, char *argument)
 
 
 // prototypes
+bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
 void command_interpreter(char_data *ch, char *argument);
+int find_command(const char *command);
 char lower( char c );
 void nanny(descriptor_data *d, char *arg);
-int find_command(const char *command);
+void next_creation_step(descriptor_data *d);
+int _parse_name(char *arg, char *name);
 void send_low_pos_msg(char_data *ch);
+int Valid_Name(char *newname);
 
 
 struct command_info {
@@ -300,3 +306,19 @@ struct alias_data {
 #define LRR_SHIP_PARTIAL  BIT(0)	// shows only part of the room, for use on ships.
 #define LRR_SHOW_DARK  BIT(1)	// for passing to show_map_to_char
 #define LRR_LOOK_OUT  BIT(2)	// show map even indoors
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// OBJ, ROOM, and VEHICLE SUBCOMMANDS //////////////////////////////////////
+
+// do_osend
+#define SCMD_OSEND  0
+#define SCMD_OECHOAROUND  1
+
+// do_vsend
+#define SCMD_VSEND  0
+#define SCMD_VECHOAROUND  1
+
+// do_wsend
+#define SCMD_WSEND  0
+#define SCMD_WECHOAROUND  1

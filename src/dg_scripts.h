@@ -13,7 +13,7 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
-#define DG_SCRIPT_VERSION "DG Scripts 1.0.12 e2"
+#define DG_SCRIPT_VERSION "DG Scripts 1.0.12 e3"
 
 // look for 'x_TRIGGER' for things related to this (I know that's backwards)
 #define MOB_TRIGGER  0
@@ -25,16 +25,13 @@
 #define BLD_TRIGGER  6	// actually a wld trigger attached to a bld
 #define EMP_TRIGGER  7	// empires only store vars, not triggers
 
-/* unless you change this, Puff casts all your dg spells */
-#define DG_CASTER_PROXY 1
-/* spells cast by objects and rooms use this level */
-#define DG_SPELL_LEVEL  25 
 
-/*
- * define this if you don't want wear/remove triggers to fire when
- * a player is saved.
- */
+// map tiles away that players may be for scripts to trigger
+#define PLAYER_SCRIPT_RADIUS  25	// tiles
+
+// this prevents wear/remove triggers firing when a player is saved
 #define NO_EXTRANEOUS_TRIGGERS
+
 
 // MTRIG_x: mob trigger types
 #define MTRIG_GLOBAL           BIT(0)      // check even if no players nearby
@@ -183,6 +180,12 @@
 #define DROP_TRIG_PUT  3
 
 
+// commmand functions
+#define OCMD(name)  void (name)(obj_data *obj, char *argument, int cmd, int subcmd)
+#define VCMD(name)  void (name)(vehicle_data *veh, char *argument, int cmd, int subcmd)
+#define WCMD(name)  void (name)(room_data *room, char *argument, int cmd, int subcmd)
+
+
 /* one line of the trigger */
 struct cmdlist_element {
 	char *cmd;				/* one line of a trigger */
@@ -279,7 +282,31 @@ struct dg_owner_purged_tracker_type {
 };
 
 
-/* function prototypes from triggers.c (and others) */
+// object command list in dg_objcmd.c
+struct obj_command_info {
+	char *command;
+	OCMD(*command_pointer);
+	int subcmd;
+};
+
+
+// vehicle command list in dg_vehcmd.c
+struct vehicle_command_info {
+	char *command;
+	VCMD(*command_pointer);
+	int subcmd;
+};
+
+
+// room command list in dg_wldcmd.c
+struct wld_command_info {
+	char *command;
+	WCMD(*command_pointer);
+	int subcmd;
+};
+
+
+/* function prototypes from dg_triggers.c (and others) */
 void adventure_cleanup_wtrigger(room_data *room);
 void act_mtrigger(const char_data *ch, char *str, char_data *actor, char_data *victim, obj_data *object, obj_data *target, char *arg);  
 void speech_mtrigger(char_data *actor, char *str);
@@ -320,6 +347,8 @@ int ability_mtrigger(char_data *actor, char_data *ch, any_vnum abil);
 int ability_otrigger(char_data *actor, obj_data *obj, any_vnum abil);
 int ability_wtrigger(char_data *actor, char_data *vict, obj_data *obj, any_vnum abil);
 
+int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
+
 int leave_mtrigger(char_data *actor, int dir, char *custom_dir);
 int leave_wtrigger(room_data *room, char_data *actor, int dir, char *custom_dir);
 int leave_otrigger(room_data *room, char_data *actor, int dir, char *custom_dir);
@@ -331,7 +360,8 @@ int consume_otrigger(obj_data *obj, char_data *actor, int cmd, char_data *target
 
 int finish_otrigger(obj_data *obj, char_data *actor);
 
-extern int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer);
+int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer);
+int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer);
 
 int command_vtrigger(char_data *actor, char *cmd, char *argument, int mode);
 int destroy_vtrigger(vehicle_data *veh);
@@ -341,11 +371,20 @@ void load_vtrigger(vehicle_data *veh);
 int greet_vtrigger(char_data *actor, int dir);
 void speech_vtrigger(char_data *actor, char *str);
 
-/* function prototypes from scripts.c */
+void reboot_mtrigger(char_data *ch);
+void reboot_otrigger(obj_data *obj);
+void reboot_vtrigger(vehicle_data *veh);
+void reboot_wtrigger(room_data *room);
+
+int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
+int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
+
+void check_reset_trigger_event(room_data *room, bool random_offset);
+
+/* function prototypes from dg_scripts.c */
 void script_trigger_check(void);
 void add_trigger(struct script_data *sc, trig_data *t, int loc);
 char_data *get_char(char *name);
-char_data *get_char_by_obj(obj_data *obj, char *name);
 empire_data *get_empire(char *name);
 obj_data *get_obj(char *name);
 
@@ -353,8 +392,9 @@ void do_stat_trigger(char_data *ch, trig_data *trig);
 void do_sstat_room(char_data *ch);
 void do_sstat_object(char_data *ch, obj_data *j);
 void do_sstat_character(char_data *ch, char_data *k);
+void script_stat(char_data *ch, struct script_data *sc);
 
-extern struct script_data *create_script_data(void *attach_to, int type);
+struct script_data *create_script_data(void *attach_to, int type);
 void script_vlog(const char *format, va_list args);
 void script_log(const char *format, ...) __attribute__ ((format (printf, 1, 2)));
 void script_log_by_type(int go_type, void *go, const char *format, ...) __attribute__ ((format (printf, 3, 4)));
@@ -363,33 +403,56 @@ void obj_log(obj_data *obj, const char *format, ...) __attribute__ ((format (pri
 void wld_log(room_data *room, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
 void dg_obj_trigger(char *line, obj_data *obj);
 void assign_triggers(void *i, int type);
+void extract_trigger(trig_data *trig);
+void free_varlist(struct trig_var_data *vd);
+int is_substring(char *sub, char *string);
+char *matching_quote(char *p);
 void parse_trigger(FILE *trig_f, int nr);
 void parse_trig_proto(char *line, struct trig_proto_list **list, char *error_str);
-extern trig_data *real_trigger(trig_vnum vnum);
+trig_data *real_trigger(trig_vnum vnum);
 void extract_script(void *thing, int type);
 void extract_script_mem(struct script_memory *sc);
 void check_extract_script(void *go, int type);
 void remove_all_triggers(void *thing, int type);
+bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
 void free_proto_scripts(struct trig_proto_list **list);
 void free_trigger(trig_data *trig);
-extern struct trig_proto_list *copy_trig_protos(struct trig_proto_list *list);
+void free_var_el(struct trig_var_data *var);
+struct trig_proto_list *copy_trig_protos(struct trig_proto_list *list);
 void copy_script(void *source, void *dest, int type);
 void trig_data_copy(trig_data *this_data, const trig_data *trg);
 
-extern bool has_trigger(struct script_data *sc, any_vnum vnum);
+void send_char_pos(char_data *ch, int dam);
+
+void add_trigger_to_global_lists(trig_data *trig);
+bool has_trigger(struct script_data *sc, any_vnum vnum);
 trig_data *read_trigger(int nr);
 void add_var(struct trig_var_data **var_list, char *name, char *value, int id);
 room_data *dg_room_of_obj(obj_data *obj);
 room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld);
 void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
 void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
+void do_dg_build(room_data *target, char *argument);
+void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
+void do_dg_quest(int go_type, void *go, char *argument);
+void do_dg_terracrop(room_data *target, crop_data *cp);
+void do_dg_terraform(room_data *target, sector_data *sect);
 void dg_purge_instance(void *owner, struct instance_data *inst, char *argument);
+void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier);
 void script_damage_over_time(char_data *vict, any_vnum atype, int level, int dam_type, double modifier, int dur_seconds, int max_stacks, char_data *cast_by);
 void script_heal(void *thing, int type, char *argument);
-extern bool script_message_should_queue(char **string);
+bool script_message_should_queue(char **string);
+void script_modify(char *argument);
+void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
+void sub_write_to_room(char *str, room_data *room, bool use_queue);
 
 void extract_value(struct script_data *sc, trig_data *trig, char *cmd);
+
+void obj_command_interpreter(obj_data *obj, char *argument);
+void vehicle_command_interpreter(vehicle_data *veh, char *argument);
+void wld_command_interpreter(room_data *room, char *argument);
+
 
 /* To maintain strict-aliasing we'll have to do this trick with a union */
 union script_driver_data_u {
@@ -477,9 +540,12 @@ void add_to_lookup_table(int uid, void *c);
 void remove_from_lookup_table(int uid);
 
 // find helpers
-extern char_data *find_char(int n);
-extern empire_data *find_empire_by_uid(int n);
-extern room_data *find_room(int n);
+char_data *find_char(int n);
+empire_data *find_empire_by_uid(int n);
+obj_data *find_obj(int n, bool error);
+room_data *find_room(int n);
+void find_uid_name(char *uid, char *name, size_t nlen);
+vehicle_data *find_vehicle(int n);
 
 // purge helpers
 void create_dg_owner_purged_tracker(trig_data *trig, char_data *ch, obj_data *obj, room_data *room, vehicle_data *veh);

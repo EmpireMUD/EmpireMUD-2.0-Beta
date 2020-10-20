@@ -21,6 +21,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -28,17 +29,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// externs
-extern const char *action_bits[];
-extern const char *affected_bits[];
-extern const char *genders[];
-extern const char *interact_types[];
-extern const byte interact_vnum_types[NUM_INTERACTS];
-extern const char *mob_custom_types[];
-extern const char *mob_move_types[];
-extern const char *name_sets[];
-extern const char *size_types[];
 
 // external funcs
 extern char **get_weapon_types_string();
@@ -62,7 +52,6 @@ const char *default_mob_long = "A new mobile is standing here.\r\n";
 */
 bool audit_mobile(char_data *mob, char_data *ch) {
 	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
-	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	bool is_adventure = (get_adventure_for_vnum(GET_MOB_VNUM(mob)) != NULL);
 	char temp[MAX_STRING_LENGTH], *ptr;
@@ -189,7 +178,7 @@ char_data *create_mob_table_entry(mob_vnum vnum) {
 * @return bool TRUE if at least 1 item was deleted, or FALSE
 */
 bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum) {
-	struct interaction_item *inter, *next_inter, *temp;
+	struct interaction_item *inter, *next_inter;
 	bool found = FALSE;
 	
 	for (inter = *list; inter; inter = next_inter) {
@@ -198,8 +187,8 @@ bool delete_from_interaction_list(struct interaction_item **list, int vnum_type,
 		// deleted!
 		if (interact_vnum_types[inter->type] == vnum_type && inter->vnum == vnum) {
 			found = TRUE;
-			REMOVE_FROM_LIST(inter, *list, next);
-			inter->next = NULL;
+			LL_DELETE(*list, inter);
+			inter->next = NULL;	// freed as a list
 			free_interactions(&inter);
 		}
 	}
@@ -217,7 +206,7 @@ bool delete_from_interaction_list(struct interaction_item **list, int vnum_type,
 * @return bool TRUE if any spawn entries were deleted; FALSE otherwise.
 */
 bool delete_mob_from_spawn_list(struct spawn_info **list, mob_vnum vnum) {
-	struct spawn_info *spawn, *next_spawn, *temp;
+	struct spawn_info *spawn, *next_spawn;
 	bool found = FALSE;
 	
 	for (spawn = *list; spawn; spawn = next_spawn) {
@@ -226,7 +215,7 @@ bool delete_mob_from_spawn_list(struct spawn_info **list, mob_vnum vnum) {
 		// deleted!
 		if (spawn->vnum == vnum) {
 			found = TRUE;
-			REMOVE_FROM_LIST(spawn, *list, next);
+			LL_DELETE(*list, spawn);
 			free(spawn);
 		}
 	}
@@ -245,7 +234,7 @@ bool delete_mob_from_spawn_list(struct spawn_info **list, mob_vnum vnum) {
 * @return bool TRUE if any spawn entries were deleted; FALSE otherwise.
 */
 bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum) {
-	struct adventure_spawn *spawn, *next_spawn, *temp;
+	struct adventure_spawn *spawn, *next_spawn;
 	bool found = FALSE;
 	
 	for (spawn = *list; spawn; spawn = next_spawn) {
@@ -254,7 +243,7 @@ bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_ty
 		// deleted!
 		if (spawn->type == spawn_type && spawn->vnum == vnum) {
 			found = TRUE;
-			REMOVE_FROM_LIST(spawn, *list, next);
+			LL_DELETE(*list, spawn);
 			free(spawn);
 		}
 	}
@@ -302,10 +291,6 @@ char *list_one_mobile(char_data *mob, bool detail) {
 */
 void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
-	void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
-	void remove_minipet(char_data *ch, any_vnum vnum);
 	void remove_homeless_citizen(empire_data *emp, struct empire_homeless_citizen *ehc);
 	
 	void extract_pending_chars();
@@ -646,8 +631,6 @@ void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_mob(char_data *ch, char *argument) {
-	extern int get_attack_type_by_name(char *name);
-	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t  find_interacts = NOBITS, found_interacts, find_custom = NOBITS, found_custom;
 	bitvector_t not_flagged = NOBITS, only_flags = NOBITS, only_affs = NOBITS;
@@ -792,10 +775,6 @@ void olc_fullsearch_mob(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_mob(char_data *ch, mob_vnum vnum) {
-	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-	
 	char_data *proto, *mob, *next_mob;
 	struct ability_data_list *adl;
 	char buf[MAX_STRING_LENGTH];
@@ -1033,8 +1012,6 @@ void olc_search_mob(char_data *ch, mob_vnum vnum) {
 * @param descriptor_data *desc The descriptor who is saving a mobile.
 */
 void save_olc_mobile(descriptor_data *desc) {
-	void scale_mob_to_level(char_data *mob, int level);
-
 	char_data *mob = GET_OLC_MOBILE(desc), *mob_iter, *proto;
 	mob_vnum vnum = GET_OLC_VNUM(desc);
 	struct quest_lookup *ql;
@@ -1203,9 +1180,6 @@ char_data *setup_olc_mobile(char_data *input) {
 * @param char_data *ch The person who is editing an mobile and will see its display.
 */
 void olc_show_mobile(char_data *ch) {
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
-	
 	char buf[MAX_STRING_LENGTH * 4];	// these get long
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	struct custom_message *mcm;
@@ -1310,7 +1284,6 @@ OLC_MODULE(medit_attack) {
 
 
 OLC_MODULE(medit_custom) {
-	void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
 	char_data *mob = GET_OLC_MOBILE(ch->desc);
 	olc_process_custom_messages(ch, argument, &MOB_CUSTOM_MSGS(mob), mob_custom_types);
 }

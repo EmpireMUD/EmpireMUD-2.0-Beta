@@ -26,62 +26,13 @@
 #include "olc.h"
 #include "skills.h"
 #include "vnums.h"
+#include "constants.h"
 
-#define PULSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
-#define player_script_radius  25	// map tiles away that players may be for scripts to trigger
-
-
-/* external vars from db.c */
+// external vars
 extern unsigned long pulse;
 
-/* other external vars */
-extern const char *action_bits[];
-extern const char *affected_bits[];
-extern const char *alt_dirs[];
-extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
-extern const char *dirs[];
-extern const char *extra_bits[];
-extern const char *item_types[];
-extern const char *genders[];
-extern const char *paint_names[];
-extern const char *player_bits[];
-extern const int rev_dir[];
-extern const char *exit_bits[];
-extern const char *mob_move_types[];
-extern struct time_info_data time_info;
-extern const char *otrig_types[];
-extern struct instance_data *quest_instance_global;
-extern const char *tool_flags[];
-extern const char *trig_attach_types[];
-extern const char *trig_types[];
-extern const char *vtrig_types[];
-extern const char *wtrig_types[];
-extern const struct wear_data_type wear_data[NUM_WEARS];
-
-/* external functions */
-void check_for_eligible_goals(empire_data *emp);	// progress.c
-extern int count_harnessed_animals(vehicle_data *veh);
-void count_quest_tasks(struct req_data *list, int *complete, int *total);
-extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
-extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-extern struct instance_data *get_instance_for_script(int go_type, void *go);
-extern char *get_room_name(room_data *room, bool color);
-void free_varlist(struct trig_var_data *vd);
-extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
-extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
-extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
-extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);	// quest.c
-extern int is_substring(char *sub, char *string);
-extern room_data *obj_room(obj_data *obj);
-trig_data *read_trigger(trig_vnum vnum);
-void reread_companion_trigs(char_data *mob);
-obj_data *get_object_in_equip(char_data *ch, char *name);
-void extract_trigger(trig_data *trig);
+// local functions
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type);
-
-/* function protos from this file */
-void extract_value(struct script_data *sc, trig_data *trig, char *cmd);
-struct cmdlist_element *find_done(struct cmdlist_element *cl);
 struct cmdlist_element *find_case(trig_data *trig, struct cmdlist_element *cl, void *go, struct script_data *sc, int type, char *cond);
 void process_eval(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd);
 
@@ -228,7 +179,7 @@ int can_wear_on_pos(obj_data *obj, int pos) {
 * @return bool TRUE if there are players nearby.
 */
 static bool players_nearby_script(room_data *loc) {
-	return distance_to_nearest_player(loc) <= player_script_radius;
+	return distance_to_nearest_player(loc) <= PLAYER_SCRIPT_RADIUS;
 }
 
 
@@ -550,8 +501,6 @@ obj_data *get_obj(char *name)  {
 * @return room_data* The found room, or NULL if none.
 */
 room_data *get_room(room_data *ref, char *name) {
-	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
-	
 	struct instance_data *inst;
 	room_data *nr;
 
@@ -1063,8 +1012,6 @@ int char_has_item(char *item, char_data *ch) {
 
 /* checks every PULSE_SCRIPT for random triggers */
 void script_trigger_check(void) {
-	extern trig_data *stc_next_random_trig;
-	
 	room_data *room, *in_room = NULL;
 	trig_data *trig;
 	char buf[MAX_STRING_LENGTH];
@@ -1258,8 +1205,6 @@ EVENTFUNC(trig_wait_event) {
 
 
 void do_stat_trigger(char_data *ch, trig_data *trig) {
-	extern char *show_color_codes(char *string);
-	
 	struct cmdlist_element *cmd_list;
 	char sb[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	int len = 0;
@@ -1343,7 +1288,7 @@ void find_uid_name(char *uid, char *name, size_t nlen) {
 
 
 /* general function to display stats on script sc */
-void script_stat (char_data *ch, struct script_data *sc) {
+void script_stat(char_data *ch, struct script_data *sc) {
 	struct trig_var_data *tv;
 	trig_data *t;
 	char name[MAX_INPUT_LENGTH];
@@ -1447,23 +1392,16 @@ void do_sstat_character(char_data *ch, char_data *k) {
 * add to the end, loc = 0 means add before all other triggers.
 */
 void add_trigger(struct script_data *sc, trig_data *t, int loc) {
-	void add_trigger_to_global_lists(trig_data *trig);
-	void check_reset_trigger_event(room_data *room, bool random_offset);
-	
 	trig_data *i;
 	int n;
 
 	for (n = loc, i = TRIGGERS(sc); i && i->next && (n != 0); n--, i = i->next);
 
-	if (!loc) {
-		t->next = TRIGGERS(sc);
-		TRIGGERS(sc) = t;
+	if (!loc || !i) {
+		LL_PREPEND(TRIGGERS(sc), t);
 	}
-	else if (!i)
-		TRIGGERS(sc) = t;
 	else {
-		t->next = i->next;
-		i->next = t;
+		LL_APPEND_ELEM(TRIGGERS(sc), i, t);
 	}
 
 	SCRIPT_TYPES(sc) |= GET_TRIG_TYPE(t);
@@ -1685,10 +1623,8 @@ void add_var(struct trig_var_data **var_list, char *name, char *value, int id) {
 		strcpy(vd->name, name);                            /* strcpy: ok*/
 
 		CREATE(vd->value, char, strlen(value) + 1);
-
-		vd->next = *var_list;
+		LL_PREPEND(*var_list, vd);
 		vd->context = id;
-		*var_list = vd;
 	}
 
 	strcpy(vd->value, value);                            /* strcpy: ok*/
@@ -1704,7 +1640,7 @@ void add_var(struct trig_var_data **var_list, char *name, char *value, int id) {
 *  this function returns, in order to remove the script.
 */
 int remove_trigger(struct script_data *sc, char *name) {
-	trig_data *i, *j;
+	trig_data *i;
 	int num = 0, string = FALSE, n;
 	char *cname;
 
@@ -1722,7 +1658,7 @@ int remove_trigger(struct script_data *sc, char *name) {
 	else
 		num = atoi(name);
 
-	for (n = 0, j = NULL, i = TRIGGERS(sc); i; j = i, i = i->next) {
+	for (n = 0, i = TRIGGERS(sc); i; i = i->next) {
 		if (string) {
 			if (isname(name, GET_TRIG_NAME(i)))
 				if (++n >= num)
@@ -1738,15 +1674,8 @@ int remove_trigger(struct script_data *sc, char *name) {
 	}
 
 	if (i) {
-		if (j) {
-			j->next = i->next;
-			extract_trigger(i);
-		}
-		/* this was the first trigger */
-		else {
-			TRIGGERS(sc) = i->next;
-			extract_trigger(i);
-		}
+		LL_DELETE(TRIGGERS(sc), i);
+		extract_trigger(i);
 
 		/* update the script type bitvector */
 		SCRIPT_TYPES(sc) = 0;
@@ -2398,7 +2327,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				return;
 			}
 			else if (!str_cmp(var, "weather")) {
-				extern const char *weather_types[];
 				snprintf(str, slen, "%s", weather_types[weather_info.sky]);
 				return;
 			}
@@ -2669,7 +2597,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(str, slen, "%d", INST_ID(inst));
 				}
 				else if (!str_cmp(field, "load")) {
-					void check_instance_is_loaded(struct instance_data *inst);
 					check_instance_is_loaded(inst);
 					strcpy(str, "1");
 				}
@@ -2677,8 +2604,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					snprintf(str, slen, "%d", IS_SET(INST_FLAGS(inst), INST_NEEDS_LOAD) ? 0 : 1);
 				}
 				else if (!str_cmp(field, "level")) {
-					extern int lock_instance_level(room_data *room, int level);
-					
 					if (subfield && *subfield && INST_START(inst) && atoi(subfield) > 0) {
 						lock_instance_level(INST_START(inst), atoi(subfield));
 					}
@@ -2909,8 +2834,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "action")) {
-						extern const struct action_data_struct action_data[];
-						extern struct gen_craft_data_t gen_craft_data[];
 						if (IS_NPC(c) || GET_ACTION(c) == ACT_NONE) {
 							strcpy(str, "");	// none
 						}
@@ -2925,7 +2848,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					
 					else if (!str_cmp(field, "add_companion")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
-							struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
 							char_data *pet = mob_proto(atoi(subfield));
 							if (pet) {
 								add_companion(c, GET_MOB_VNUM(pet), NO_ABIL);
@@ -2946,7 +2868,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "add_learned")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
-							void add_learned_craft(char_data *ch, any_vnum vnum);
 							craft_data *cft = craft_proto(atoi(subfield));
 							if (cft && CRAFT_FLAGGED(cft, CRAFT_LEARNED) && !CRAFT_FLAGGED(cft, CRAFT_IN_DEVELOPMENT)) {
 								add_learned_craft(c, GET_CRAFT_VNUM(cft));
@@ -2961,7 +2882,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					
 					else if (!str_cmp(field, "add_minipet")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
-							void add_minipet(char_data *ch, any_vnum vnum);
 							char_data *pet = mob_proto(atoi(subfield));
 							if (pet) {
 								add_minipet(c, GET_MOB_VNUM(pet));
@@ -3096,7 +3016,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'b': {	// char.b*
 					if (!str_cmp(field, "block")) {
-						extern int get_block_rating(char_data *ch, bool can_gain_skill);
 						snprintf(str, slen, "%d", get_block_rating(c, FALSE));
 					}
 					else if (!str_cmp(field, "blood")) {
@@ -3135,7 +3054,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "bonus_healing")) {
-						extern int total_bonus_healing(char_data *ch);
 						snprintf(str, slen, "%d", total_bonus_healing(c));
 					}
 					else if (!str_cmp(field, "bonus_magical")) {
@@ -3184,15 +3102,12 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", (!IS_NPC(c) && CAN_GAIN_NEW_SKILLS(c)) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "cancel_adventure_summon")) {
-						void cancel_adventure_summon(char_data *ch);
 						if (!IS_NPC(c)) {
 							cancel_adventure_summon(c);
 						}
 						*str = '\0';
 					}
 					else if (!str_cmp(field, "can_start_quest")) {
-						extern bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
-						
 						if (subfield && *subfield && isdigit(*subfield)) {
 							any_vnum vnum = atoi(subfield);
 							quest_data *qst = quest_proto(vnum);
@@ -3275,7 +3190,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", (troom && can_use_room(c, troom, MEMBERS_ONLY)) ? 1 : 0);
 					}
 					else if (!str_cmp(field, "can_enter_instance")) {
-						extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
 						room_data *troom = (subfield && *subfield) ? get_room(IN_ROOM(c), subfield) : IN_ROOM(c);
 						struct instance_data *inst;
 						
@@ -3368,7 +3282,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "crafting_level")) {
-						extern int get_crafting_level(char_data *ch);
 						snprintf(str, slen, "%d", get_crafting_level(c));
 					}
 					else if (!str_cmp(field, "currency")) {
@@ -3416,7 +3329,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "dodge")) {
-						extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
 						snprintf(str, slen, "%d", get_dodge_modifier(c, NULL, FALSE));
 					}
 					else if (!str_cmp(field, "drunk")) {
@@ -3469,8 +3381,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "%c%d",UID_CHAR, obj_script_id(GET_EQ(c, pos)));
 					}
 					else if (!str_cmp(field, "event_points")) {
-						extern struct player_event_data *get_event_data(char_data *ch, int event_id);
-						
 						if (subfield && *subfield && isdigit(*subfield)) {
 							struct event_running_data *running = find_running_event_by_vnum(atoi(subfield));
 							struct player_event_data *ped;
@@ -3503,8 +3413,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 					}
 					else if (!str_cmp(field, "find_lighter")) {
-						extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
-						
 						bool junk;
 						obj_data *lighter = find_lighter_in_list(c->carrying, &junk);
 						if (lighter) {
@@ -3596,7 +3504,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "gain_skill")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.gain_skill(skill, amount)%
-							void set_skill(char_data *ch, any_vnum skill, int level);
 							char arg1[256], arg2[256];
 							skill_data *sk;
 							int amount = 0;
@@ -3641,8 +3548,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'h': {	// char.h*
 					if (!str_cmp(field, "has_companion")) {
-						struct companion_data *has_companion(char_data *ch, any_vnum vnum);
-						
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield) && has_companion(c, atoi(subfield)) != NULL) {
 							strcpy(str, "1");
 						}
@@ -3675,7 +3580,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "%d", char_has_item(subfield, c));
 					}
 					else if (!str_cmp(field, "has_lastname")) {
-						extern bool has_lastname(char_data *ch, char *name);
 						if (subfield && *subfield && !IS_NPC(c)) {
 							snprintf(str, slen, "%d", has_lastname(c, subfield) ? 1 : 0);
 						}
@@ -3684,8 +3588,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "has_minipet")) {
-						extern bool has_minipet(char_data *ch, any_vnum vnum);
-						
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield) && has_minipet(c, atoi(subfield))) {
 							strcpy(str, "1");
 						}
@@ -3745,7 +3647,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "has_tech")) {
 						if (subfield && *subfield) {
-							extern const char *player_tech_types[];
 							int pos;
 							
 							if ((pos = search_block(subfield, player_tech_types, FALSE)) != NOTHING) {
@@ -3781,7 +3682,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_HEALTH(c));
 						
 					else if (!str_cmp(field, "home")) {
-						extern room_data *find_home(char_data *ch);
 						room_data *home_loc;
 						
 						if ((home_loc = find_home(c))) {
@@ -3885,7 +3785,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					
 					else if (!str_cmp(field, "is_ignoring")) {
-						bool is_ignoring(char_data *ch, char_data *victim);
 						char_data *targ;
 						if (subfield && *subfield && ((targ = get_char(subfield))) && is_ignoring(c, targ)) {
 							strcpy(str, "1");
@@ -3911,8 +3810,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%s", GET_LAST_DIR(c) != NO_DIR ? dirs[GET_LAST_DIR(c)] : "");
 					}
 					else if (!str_cmp(field, "learned")) {
-						extern bool has_learned_craft(char_data *ch, any_vnum vnum);
-						
 						if (subfield && *subfield && isdigit(*subfield) && has_learned_craft(c, atoi(subfield))) {
 							strcpy(str, "1");
 						}
@@ -4016,8 +3913,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%s", PERS(c, c, FALSE));
 					}
 					else if (!str_cmp(field, "namelist")) {
-						void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-						
 						if (!IS_NPC(c)) {
 							snprintf(str, slen, "%d", NOTHING);
 						}
@@ -4162,7 +4057,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "position")) {
-						extern const char *position_types[];
 						snprintf(str, slen, "%s", position_types[(int) GET_POS(c)]);
 					}
 					
@@ -4218,7 +4112,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'r': {	// char.r*
 					if (!str_cmp(field, "remove_companion")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
-							void remove_companion(char_data *ch, any_vnum vnum);
 							remove_companion(c, atoi(subfield));
 						}
 						
@@ -4233,7 +4126,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "remove_learned")) {
 						if (subfield && *subfield && isdigit(*subfield)) {
-							void remove_learned_craft(char_data *ch, any_vnum vnum);
 							remove_learned_craft(c, atoi(subfield));
 						}
 						
@@ -4241,7 +4133,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "remove_minipet")) {
 						if (!IS_NPC(c) && subfield && *subfield && isdigit(*subfield)) {
-							void remove_minipet(char_data *ch, any_vnum vnum);
 							remove_minipet(c, atoi(subfield));
 						}
 						
@@ -4367,7 +4258,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "set_skill")) {
 						if (subfield && *subfield && !IS_NPC(c)) {
 							// %actor.set_skill(skill, number)%
-							void set_skill(char_data *ch, any_vnum skill, int level);
 							char arg1[256], arg2[256];
 							skill_data *sk;
 							int sk_lev = 0;
@@ -4395,11 +4285,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_COND(c, THIRST) / REAL_UPDATES_PER_MUD_HOUR);
 					}
 					else if (!str_cmp(field, "tohit")) {
-						extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
 						snprintf(str, slen, "%d", get_to_hit(c, NULL, FALSE, FALSE));
 					}
 					else if (!str_cmp(field, "trigger_counterspell")) {
-						extern bool trigger_counterspell(char_data *ch);	// spells.c
 						if (trigger_counterspell(c)) {
 							snprintf(str, slen, "1");
 						}
@@ -4435,7 +4323,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						if (subfield && *subfield) {
 							if ((!str_cmp("on", subfield) || *subfield == '1') && !IS_VAMPIRE(c)) {
 								if (!IS_NPC(c)) {
-									void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
 									make_vampire(c, TRUE, NOTHING);
 								}
 								else {
@@ -4444,7 +4331,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							}
 							else if ((!str_cmp("off", subfield) || *subfield == '0') && IS_VAMPIRE(c)) {
 								if (!IS_NPC(c)) {
-									void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 									check_un_vampire(c, TRUE);
 								}
 								else {
@@ -4525,8 +4411,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			switch (LOWER(*field)) {
 				case 'a': {
 					if (!str_cmp(field, "attack")) {
-						extern const char *damage_types[];
-						
 						if (IS_WEAPON(o) || IS_MISSILE_WEAPON(o)) {
 							int type = IS_WEAPON(o) ? GET_WEAPON_TYPE(o) : GET_MISSILE_WEAPON_TYPE(o);
 							if (!subfield || !*subfield || !str_cmp(subfield, "0") || is_abbrev(subfield, "name")) {
@@ -4565,7 +4449,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'b': {	// obj.b*
 					if (!str_cmp(field, "bind")) {
-						void free_obj_binding(struct obj_binding **list);
 						if (subfield && *subfield) {
 							if (!str_cmp(subfield, "none") || !str_cmp(subfield, "nobody")) {
 								free_obj_binding(&OBJ_BOUND_TO(o));
@@ -4579,7 +4462,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 									reduce_obj_binding(o, targ);
 								}
 								else {	// wasn't targeting a person, try an obj
-									struct obj_binding *copy_obj_bindings(struct obj_binding *from);
 									obj_data *oarg = (*subfield == UID_CHAR) ? get_obj(subfield) : get_obj_by_obj(o, subfield);
 									if (oarg) {
 										free_obj_binding(&OBJ_BOUND_TO(o));	// unbind first
@@ -4612,7 +4494,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'c': {	// obj.c*
 					if (!str_cmp(field, "can_wear")) {
-						extern const char *wear_bits[];
 						int pos;
 						if (subfield && *subfield && (pos = search_block(subfield, wear_bits, FALSE))) {
 							snprintf(str, slen, "%d", CAN_WEAR(o, BIT(pos)) ? 1 : 0);
@@ -4793,7 +4674,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'm': {	// obj.m*
 					if (!str_cmp(field, "material")) {
-						extern const struct material_data materials[NUM_MATERIALS];
 						snprintf(str, slen, "%s", materials[GET_OBJ_MATERIAL(o)].name);
 					}
 					break;
@@ -4853,7 +4733,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'u': {	// obj.u*
 					if (!str_cmp(field, "used_lighter")) {
-						extern bool used_lighter(char_data *ch, obj_data *obj);
 						char_data *person = NULL;
 						
 						if (subfield && *subfield) {	// optional person
@@ -4944,8 +4823,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 			switch (LOWER(*field)) {
 				case 'a': {	// room.a*
 					if (!str_cmp(field, "aff_flagged")) {
-						extern const char *room_aff_bits[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, room_aff_bits, FALSE);
 							if (pos != NOTHING) {
@@ -4982,8 +4859,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "bld_flagged")) {
-						extern const char *bld_flags[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, bld_flags, FALSE);
 							if (pos != NOTHING) {
@@ -5018,8 +4893,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'c': {	// room.c*
 					if (!str_cmp(field, "can_build")) {
-						extern const char *bld_on_flags[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, bld_on_flags, FALSE);
 							if (pos != NOTHING) {
@@ -5075,8 +4948,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "crop_flagged")) {
-						extern const char *crop_flags[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, crop_flags, FALSE);
 							if (pos != NOTHING) {
@@ -5196,8 +5067,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						direction_vars(r, FORE, subfield, str, slen);
 					}
 					else if (!str_cmp(field, "function")) {
-						extern const char *function_flags[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, function_flags, FALSE);
 							if (pos != NOTHING) {
@@ -5319,8 +5188,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'r': {	// room.r*
 					if (!str_cmp(field, "rmt_flagged")) {
-						extern const char *room_template_flags[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, room_template_flags, FALSE);
 							if (pos != NOTHING) {
@@ -5339,7 +5206,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 's': {	// room.s*
 					if (!str_cmp(field, "season")) {
-						extern const char *icon_types[];
 						snprintf(str, slen, "%s", icon_types[GET_SEASON(r)]);
 						*str = LOWER(*str);
 					}
@@ -5347,8 +5213,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%s", GET_SECT_NAME(SECT(r)));
 					}
 					else if (!str_cmp(field, "sector_flagged")) {
-						extern const char *sector_flags[];
-						
 						if (subfield && *subfield) {
 							bitvector_t pos = search_block(subfield, sector_flags, FALSE);
 							if (pos != NOTHING) {
@@ -5439,8 +5303,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'w': {	// room.w*
 					if (!str_cmp(field, "weather")) {
-						extern const char *weather_types[];
-
 						if (!ROOM_IS_CLOSED(r))
 							snprintf(str, slen, "%s", weather_types[weather_info.sky]);
 						else
@@ -5491,7 +5353,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'b': {	// veh.b*
 					if (!str_cmp(field, "burn")) {
 						if (VEH_FLAGGED(v, VEH_BURNABLE) && !VEH_FLAGGED(v, VEH_ON_FIRE)) {
-							void start_vehicle_burning(vehicle_data *veh);
 							start_vehicle_burning(v);
 						}
 						*str = '\0';
@@ -5559,12 +5420,10 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "dump")) {
-						void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
 						fully_empty_vehicle(v, IN_ROOM(v));
 						*str = '\0';
 					}
 					else if (!str_cmp(field, "dump_objects")) {
-						void empty_vehicle(vehicle_data *veh, room_data *to_room);
 						empty_vehicle(v, IN_ROOM(v));
 						*str = '\0';
 					}
@@ -5606,7 +5465,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'h': {	// veh.h*
 					if (!str_cmp(field, "harness")) {
 						if (subfield && *subfield && VEH_ANIMALS_REQUIRED(v) < count_harnessed_animals(v)) {
-							void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
 							char_data *mob = NULL;
 							
 							// find or load mob
@@ -5668,7 +5526,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%s", IN_OR_ON(v));
 					}
 					else if (!str_cmp(field, "interior")) {
-						extern room_data *get_vehicle_interior(vehicle_data *veh);
 						room_data *interior = get_vehicle_interior(v);
 						if (interior) {
 							snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(interior) + ROOM_ID_BASE);
@@ -5678,8 +5535,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "is_flagged")) {
-						extern const char *vehicle_flags[];
-						
 						if (subfield && *subfield) {
 							int fl = search_block(subfield, vehicle_flags, FALSE);
 							if (fl != NOTHING) {
@@ -5808,7 +5663,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				}
 				case 'u': {	// veh.u*
 					if (!str_cmp(field, "unharness")) {
-						extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 						while (VEH_ANIMALS(v)) {
 							unharness_mob_from_vehicle(VEH_ANIMALS(v), v);
 						}
@@ -5948,7 +5802,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "has_tech")) {
 						if (subfield && *subfield) {
-							extern const char *techs[];
 							int pos;
 							
 							if ((pos = search_block(subfield, techs, FALSE)) != NOTHING) {
@@ -6016,7 +5869,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 					else if (!str_cmp(field, "priv")) {
 						if (subfield && *subfield) {
-							extern const char *priv[];
 							int pos = search_block(subfield, priv, FALSE);
 							
 							if (pos != NOTHING) {
@@ -6069,7 +5921,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
 								if (empire_has_completed_goal(e, vnum)) {
-									void remove_completed_goal(empire_data *emp, any_vnum vnum);
 									remove_completed_goal(e, vnum);
 								}
 								if ((goal = get_current_goal(e, vnum))) {
@@ -6698,7 +6549,7 @@ void process_wait(void *go, trig_data *trig, int type, char *cmd, struct cmdlist
 	else {
 		if (sscanf(arg, "%ld %c", &when, &c) == 2) {
 			if (c == 't')
-				when *= PULSES_PER_MUD_HOUR;
+				when *= PASSES_PER_MUD_HOUR;
 			else if (c == 's')
 				when *= PASSES_PER_SEC;
 		}
@@ -6935,8 +6786,6 @@ room_data *dg_room_of_obj(obj_data *obj) {
 
 /* create a UID variable from the id number */
 void makeuid_var(void *go, struct script_data *sc, trig_data *trig, int type, char *cmd) {
-	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
-	
 	char junk[MAX_INPUT_LENGTH], varname[MAX_INPUT_LENGTH];
 	char arg[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH];
 	char uid[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
@@ -7174,8 +7023,6 @@ void process_unset(struct script_data *sc, trig_data *trig, char *cmd) {
 *     'remote <variable_name> <uid>'
 */
 void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
-	void add_companion_var(char_data *mob, char *name, char *value, int id);
-	
 	struct trig_var_data *vd;
 	struct script_data *sc_remote=NULL;
 	char *line, *var, *uid_p;
@@ -7264,9 +7111,7 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 * named vdelete so people didn't think it was to delete rooms
 */
 ACMD(do_vdelete) {
-	void remove_companion_var(char_data *mob, char *name, int context);
-	
-	struct trig_var_data *vd, *vd_prev=NULL;
+	struct trig_var_data *vd;
 	struct script_data *sc_remote=NULL;
 	char *var, *uid_p;
 	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
@@ -7336,7 +7181,7 @@ ACMD(do_vdelete) {
 	}
 
 	/* find the global */
-	for (vd = sc_remote->global_vars; vd; vd_prev = vd, vd = vd->next)
+	for (vd = sc_remote->global_vars; vd; vd = vd->next)
 		if (!str_cmp(vd->name, var))
 			break;
 
@@ -7346,10 +7191,7 @@ ACMD(do_vdelete) {
 	}
 
 	/* ok, delete the variable */
-	if (vd_prev)
-		vd_prev->next = vd->next;
-	else
-		sc_remote->global_vars = vd->next;
+	LL_DELETE(sc_remote->global_vars, vd);
 
 	/* and free up the space */
 	free(vd->value);
@@ -7364,9 +7206,7 @@ ACMD(do_vdelete) {
 *     'rdelete <variable_name> <uid>'
 */
 void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
-	void remove_companion_var(char_data *mob, char *name, int context);
-	
-	struct trig_var_data *vd, *vd_prev=NULL;
+	struct trig_var_data *vd;
 	struct script_data *sc_remote=NULL;
 	char *line, *var, *uid_p;
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
@@ -7432,7 +7272,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 		return; /* no script globals */
 
 	/* find the global */
-	for (vd = sc_remote->global_vars; vd; vd_prev = vd, vd = vd->next)
+	for (vd = sc_remote->global_vars; vd; vd = vd->next)
 		if (!str_cmp(vd->name, var) && (vd->context==0 || vd->context==sc->context))
 			break;
 
@@ -7440,10 +7280,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 		return; /* the variable doesn't exist, or is the wrong context */
 
 	/* ok, delete the variable */
-	if (vd_prev)
-		vd_prev->next = vd->next;
-	else
-		sc_remote->global_vars = vd->next;
+	LL_DELETE(sc_remote->global_vars, vd);
 
 	/* and free up the space */
 	free(vd->value);
@@ -7537,8 +7374,6 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 	unsigned long loops = 0;
 	void *go = NULL;
 
-	void obj_command_interpreter(obj_data *obj, char *argument);
-	void vehicle_command_interpreter(vehicle_data *veh, char *argument);
 	void wld_command_interpreter(room_data *room, char *argument);
 	extern int max_inventory_size;
 

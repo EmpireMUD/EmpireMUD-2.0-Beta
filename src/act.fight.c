@@ -22,24 +22,13 @@
 #include "skills.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
 *   Helpers
 *   Commands
 */
-
-// external vars
-extern const char *dirs[];
-
-// external functions
-void death_log(char_data *ch, char_data *killer, int type);
-extern obj_data *die(char_data *ch, char_data *killer);
-extern int determine_best_scale_level(char_data *ch, bool check_group);	// mobact.c
-extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
-extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
-void scale_item_to_level(obj_data *obj, int level);
-void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -138,9 +127,6 @@ ACMD(do_assist) {
 
 
 ACMD(do_clearmeters) {
-	void reset_combat_meters(char_data *ch);
-	void stop_combat_meters(char_data *ch);
-	
 	if (!IS_NPC(ch)) {
 		reset_combat_meters(ch);
 		GET_COMBAT_METERS(ch).over = TRUE;
@@ -150,11 +136,6 @@ ACMD(do_clearmeters) {
 
 
 ACMD(do_consider) {
-	extern bool check_scaling(char_data *mob, char_data *attacker);
-	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
-	extern const char *affected_bits_consider[];
-	
 	char buf[MAX_STRING_LENGTH];
 	bitvector_t bits;
 	int diff, pos, hitch;
@@ -232,8 +213,6 @@ ACMD(do_consider) {
 
 
 ACMD(do_execute) {
-	void perform_execute(char_data *ch, char_data *victim, int attacktype, int damtype);
-
 	char_data *victim;
 
 	one_argument(argument, arg);
@@ -259,9 +238,6 @@ ACMD(do_execute) {
 
 
 ACMD(do_flee) {
-	extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
-	extern const bool can_flee_dir[NUM_OF_DIRS];
-	
 	int i, attempt, try;
 	room_data *to_room = NULL;
 	char_data *was_fighting;
@@ -456,9 +432,6 @@ ACMD(do_meters) {
 
 
 ACMD(do_respawn) {
-	extern room_data *find_load_room(char_data *ch);
-	extern obj_data *player_death(char_data *ch);
-	
 	if (!IS_DEAD(ch) && !IS_INJURED(ch, INJ_STAKED)) {
 		msg_to_char(ch, "You aren't even dead yet!\r\n");
 	}
@@ -633,8 +606,6 @@ ACMD(do_struggle) {
 
 
 ACMD(do_summary) {
-	extern char *prompt_color_by_prc(int cur, int max);
-	
 	char_data *iter;
 	bool is_ally, is_enemy, found;
 	
@@ -704,8 +675,6 @@ ACMD(do_summary) {
 
 // do_untie -- search hint
 ACMD(do_tie) {
-	void perform_npc_tie(char_data *ch, char_data *victim, int subcmd);
-	
 	bool kept = FALSE;
 	char_data *victim;
 	obj_data *rope;
@@ -766,9 +735,6 @@ ACMD(do_tie) {
 
 
 ACMD(do_throw) {
-	extern int count_objs_in_room(room_data *room);
-	extern const int rev_dir[];
-	
 	char buf[MAX_STRING_LENGTH];
 	int dir = NO_DIR;
 	char_data *vict;

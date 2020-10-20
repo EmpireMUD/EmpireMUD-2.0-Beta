@@ -21,6 +21,7 @@
 #include "db.h"
 #include "skills.h"
 #include "olc.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -43,15 +44,6 @@ void get_class_ability_display(struct class_ability *list, char *save_buffer, ch
 void get_class_skill_display(struct class_skill_req *list, char *save_buffer, bool one_line);
 int sort_class_abilities(struct class_ability *a, struct class_ability *b);
 
-// external consts
-extern const int base_player_pools[NUM_POOLS];
-extern const char *class_flags[];
-extern const char *class_role[];
-extern const char *class_role_color[];
-extern const char *pool_types[];
-
-// external funcs
-
 
  /////////////////////////////////////////////////////////////////////////////
 //// HELPERS ////////////////////////////////////////////////////////////////
@@ -65,8 +57,6 @@ extern const char *pool_types[];
 * @param int role Optional: Any ROLE_ const, or NOTHING to detect from the player.
 */
 void assign_class_abilities(char_data *ch, class_data *cls, int role) {
-	void check_skill_sell(char_data *ch, ability_data *abil);
-	
 	// helper type
 	struct assign_abil_t {
 		any_vnum vnum;	// which abil
@@ -228,8 +218,6 @@ void check_classes(void) {
 * @return bool TRUE if the player counts as "solo" (for the soloist role).
 */
 bool check_solo_role(char_data *ch) {
-	extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
-
 	char_data *iter;
 	
 	if (IS_NPC(ch) || GET_CLASS_ROLE(ch) != ROLE_SOLO || !IN_ROOM(ch)) {
@@ -774,7 +762,6 @@ struct class_ability *copy_class_abilities(struct class_ability *input) {
 	LL_FOREACH(input, iter) {
 		CREATE(el, struct class_ability, 1);
 		*el = *iter;
-		el->next = NULL;
 		LL_APPEND(list, el);
 	}
 	
@@ -794,7 +781,6 @@ struct class_skill_req *copy_class_skill_reqs(struct class_skill_req *input) {
 	LL_FOREACH(input, iter) {
 		CREATE(el, struct class_skill_req, 1);
 		*el = *iter;
-		el->next = NULL;
 		LL_APPEND(list, el);
 	}
 	
@@ -1053,8 +1039,6 @@ class_data *create_class_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_class(char_data *ch, any_vnum vnum) {
-	void update_class(char_data *ch);
-
 	char_data *chiter;
 	class_data *cls;
 	
@@ -1584,8 +1568,6 @@ OLC_MODULE(classedit_role) {
 //// COMMANDS ///////////////////////////////////////////////////////////////
 
 ACMD(do_class) {
-	void resort_empires(bool force);
-	
 	char arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	empire_data *emp = GET_LOYALTY(ch);
 	int found;
@@ -1652,8 +1634,6 @@ ACMD(do_class) {
 
 
 ACMD(do_role) {
-	void resort_empires(bool force);
-	
 	char arg[MAX_INPUT_LENGTH], roles[NUM_ROLES+2][MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct player_skill_data *plsk, *next_plsk;
 	empire_data *emp = GET_LOYALTY(ch);

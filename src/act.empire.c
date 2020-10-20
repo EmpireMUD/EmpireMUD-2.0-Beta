@@ -24,6 +24,8 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "olc.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -41,48 +43,16 @@
 */
 
 // external vars
-extern const char *alt_dirs[];
 extern struct empire_chore_type chore_data[NUM_CHORES];
-extern struct city_metadata_type city_type[];
-extern const char *dirs[];
-extern const char *empire_admin_flags[];
-extern const char *empire_trait_types[];
-extern const char *offense_flags[];
-extern struct offense_info_type offense_info[NUM_OFFENSES];
-extern const char *priv[];
-extern const char *progress_types[];
-extern const char *trade_type[];
-extern const char *trade_mostleast[];
-extern const char *trade_overunder[];
 
 // external funcs
-extern bool can_claim(char_data *ch);
 void check_nowhere_einv(empire_data *emp, int new_island);
-extern int city_points_available(empire_data *emp);
-void clear_private_owner(int id);
-extern int count_dropped_items(empire_data *emp, obj_vnum vnum);
-void deactivate_workforce(empire_data *emp, int island_id, int type);
-void deactivate_workforce_room(empire_data *emp, room_data *room);
-void delete_member_data(char_data *ch, empire_data *from_emp);
-extern bool empire_can_claim(empire_data *emp);
 extern bool empire_is_ignoring(empire_data *emp, char_data *victim);
-extern int get_main_island(empire_data *emp);
-extern int get_total_score(empire_data *emp);
-extern char *get_room_name(room_data *room, bool color);
-extern bool is_trading_with(empire_data *emp, empire_data *partner);
-struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
-extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
 void identify_obj_to_char(obj_data *obj, char_data *ch);
-void refresh_all_quests(char_data *ch);
-void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_with);
-void update_empire_members_and_greatness(empire_data *emp);
-void update_member_data(char_data *ch);
 
-// locals
+// local prototypes
 bool is_affiliated_island(empire_data *emp, int island_id);
-void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
-void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
-void set_workforce_limit_all(empire_data *emp, int chore, int limit);
+void show_empire_diplomacy(char_data *ch, empire_data *emp, empire_data *only_with);
 int sort_workforce_log(struct workforce_log *a, struct workforce_log *b);
 
 
@@ -107,8 +77,6 @@ struct einv_type {
 * @param empire_data *new_emp
 */
 void convert_empire_shipping(empire_data *old_emp, empire_data *new_emp) {
-	extern int find_free_shipping_id(empire_data *emp);
-	
 	struct shipping_data *sd, *next_sd;
 	vehicle_data *veh;
 	int old_id, new_id;
@@ -189,9 +157,6 @@ void copy_workforce_limits_into_current_island(char_data *ch, struct island_info
 * @param char *argument The arguments.
 */
 void do_customize_island(char_data *ch, char *argument) {
-	extern bool island_has_default_name(struct island_info *island);
-	void save_island_table();
-	
 	char type_arg[MAX_INPUT_LENGTH];
 	struct empire_city_data *city;
 	struct empire_island *eisle;
@@ -522,9 +487,6 @@ void show_completed_goals(char_data *ch, empire_data *emp, int only_type, bool p
 * @param empire_data *e The empire to show
 */
 static void show_detailed_empire(char_data *ch, empire_data *e) {
-	extern const char *score_type[];
-	extern const char *techs[];
-	
 	int iter, sub, found_rank, total, type;
 	empire_data *emp_iter, *next_emp;
 	bool found, is_own_empire, comma;
@@ -1297,8 +1259,6 @@ void show_workforce_where(empire_data *emp, char_data *to, bool here, char *argu
 * @param char *argument Any more args.
 */
 void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
-	extern const char *wf_problem_types[];
-	
 	char buf[MAX_STRING_LENGTH * 2], unsupplied[MAX_STRING_LENGTH], line[256], mult[256], rname[256];
 	int iter, only_chore = NOTHING, last_chore, last_problem, count;
 	struct empire_island *isle, *next_isle;
@@ -1437,8 +1397,6 @@ void show_workforce_why(empire_data *emp, char_data *ch, char *argument) {
 * @param char_data *ch The person to show it to.
 */
 void show_workforce_setup_to_char(empire_data *emp, char_data *ch) {
-	extern int *get_ordered_chores();
-	
 	struct empire_island *isle, *next_isle, *this_isle;
 	char part[MAX_STRING_LENGTH];
 	int iter, on, off, size, *order, chore, count;
@@ -1756,11 +1714,6 @@ void downgrade_city(char_data *ch, empire_data *emp, char *argument) {
 
 
 void found_city(char_data *ch, empire_data *emp, char *argument) {
-	extern struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
-	void stop_room_action(room_data *room, int action);
-	extern int highest_start_loc_index;
-	extern int *start_locs;
-	
 	empire_data *emp_iter, *next_emp;
 	char buf[MAX_STRING_LENGTH];
 	struct island_info *isle;
@@ -1969,8 +1922,6 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 
 // for do_city
 void list_cities(char_data *ch, empire_data *emp, char *argument) {
-	extern int count_city_points_used(empire_data *emp);
-	
 	char buf[MAX_STRING_LENGTH], traits[256];
 	struct empire_city_data *city;
 	struct island_info *isle;
@@ -2271,7 +2222,7 @@ struct efind_group {
 * @param room_data *location Where it is.
 */
 void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *veh, room_data *location) {
-	struct efind_group *eg, *temp;
+	struct efind_group *eg;
 	bool found = FALSE;
 	
 	// need 1 or the other
@@ -2314,20 +2265,7 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *ve
 		eg->veh = veh;
 		eg->count = 1;
 		eg->stackable = obj ? OBJ_CAN_STACK(obj) : FALSE;	// not used for vehicle
-		eg->next = NULL;
-		
-		if (*list) {
-			// add to end
-			temp = *list;
-			while (temp->next) {
-				temp = temp->next;
-			}
-			temp->next = eg;
-		}
-		else {
-			// empty list
-			*list = eg;
-		}
+		LL_APPEND(*list, eg);
 	}
 }
 
@@ -2337,8 +2275,6 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *ve
 
 // adds import/export entry for do_import
 void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) {
-	void sort_trade_data(struct empire_trade_data **list);
-
 	char cost_arg[MAX_INPUT_LENGTH], limit_arg[MAX_INPUT_LENGTH];
 	struct empire_trade_data *trade;
 	double cost;
@@ -2387,8 +2323,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 			trade->vnum = vnum;
 			
 			// add anywhere; sort later
-			trade->next = EMPIRE_TRADE(emp);
-			EMPIRE_TRADE(emp) = trade;
+			LL_PREPEND(EMPIRE_TRADE(emp), trade);
 		}
 		
 		// update values
@@ -2405,7 +2340,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 
 // removes an import/export entry for do_import
 void do_import_remove(char_data *ch, empire_data *emp, char *argument, int subcmd) {
-	struct empire_trade_data *trade, *temp;
+	struct empire_trade_data *trade;
 	obj_vnum vnum = NOTHING;
 	obj_data *obj;
 	int number;
@@ -2426,7 +2361,7 @@ void do_import_remove(char_data *ch, empire_data *emp, char *argument, int subcm
 		msg_to_char(ch, "The empire doesn't appear to be %sing '%s'.\r\n", trade_type[subcmd], get_obj_name_by_proto(vnum));
 	}
 	else {
-		REMOVE_FROM_LIST(trade, EMPIRE_TRADE(emp), next);
+		LL_DELETE(EMPIRE_TRADE(emp), trade);
 		free(trade);
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		
@@ -2645,8 +2580,6 @@ int find_inspire(char *input) {
 * @param int type The inspire_data index
 */
 void perform_inspire(char_data *ch, char_data *vict, int type) {
-	extern const double apply_values[];
-	
 	double points, any = FALSE;
 	struct affected_type *af;
 	int time, value;
@@ -2932,7 +2865,7 @@ static struct find_territory_node *find_nearby_territory_node(room_data *room, s
 * @return struct find_territory_node* The new, reduced list.
 */
 struct find_territory_node *reduce_territory_node_list(struct find_territory_node *list) {
-	struct find_territory_node *node, *next_node, *find, *temp;
+	struct find_territory_node *node, *next_node, *find;
 	int size = 5;
 	
 	// iterate until there are no more than 350 nodes
@@ -2943,7 +2876,7 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 			// is there a node later in the list that is within range?
 			if ((find = find_nearby_territory_node(node->loc, node->next, size))) {
 				find->count += node->count;
-				REMOVE_FROM_LIST(node, list, next);
+				LL_DELETE(list, node);
 				free(node);
 			}
 		}
@@ -2970,11 +2903,7 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 * @param char_data *argument The tile to search for.
 */
 void scan_for_tile(char_data *ch, char *argument) {
-	extern byte distance_can_see(char_data *ch);
-	extern int get_map_radius(char_data *ch);
 	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
-	extern bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
-	extern const char *paint_names[];
 
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
@@ -3337,7 +3266,6 @@ void do_abandon_room(char_data *ch, room_data *room, bool confirm) {
 */
 void do_abandon_vehicle(char_data *ch, vehicle_data *veh, bool confirm) {
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
-	void perform_abandon_vehicle(vehicle_data *veh);
 	
 	empire_data *emp = VEH_OWNER(veh);
 	
@@ -3409,8 +3337,6 @@ ACMD(do_abandon) {
 
 
 ACMD(do_barde) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	static struct resource_data *res = NULL;
 	struct interact_exclusion_data *excl = NULL;
 	struct interaction_item *interact;
@@ -3727,8 +3653,6 @@ void do_claim_room(char_data *ch, room_data *room, empire_data *emp) {
 * @param empire_data *emp The empire to claim it for.
 */
 void do_claim_vehicle(char_data *ch, vehicle_data *veh, empire_data *emp) {
-	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
-	
 	if (VEH_FLAGGED(veh, VEH_NO_CLAIM)) {
 		msg_to_char(ch, "That cannot be claimed.\r\n");
 	}
@@ -4239,8 +4163,6 @@ ACMD(do_diplomacy) {
 
 
 ACMD(do_efind) {
-	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
-	
 	char buf[MAX_STRING_LENGTH*2];
 	obj_data *obj;
 	empire_data *emp;
@@ -4346,9 +4268,6 @@ ACMD(do_efind) {
 
 // syntax: elog [empire] [type] [lines]
 ACMD(do_elog) {
-	extern const char *empire_log_types[];
-	extern const bool empire_log_request_only[];
-	
 	char *argptr, *tempptr, buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	int iter, count, type = NOTHING, lines = -1;
 	struct empire_log_data *elog;
@@ -4422,7 +4341,7 @@ ACMD(do_elog) {
 	
 	// ok, ready to show logs: count total matching logs
 	count = 0;
-	for (elog = EMPIRE_LOGS(emp); elog; elog = elog->next) {
+	DL_FOREACH(EMPIRE_LOGS(emp), elog) {
 		if (type == NOTHING && empire_log_request_only[elog->type]) {
 			continue;	// this type is request-only
 		}
@@ -4434,7 +4353,7 @@ ACMD(do_elog) {
 	size = snprintf(buf, sizeof(buf), "%s logs for %s:\r\n", (type == NOTHING ? "All" : empire_log_types[type]), EMPIRE_NAME(emp));
 	
 	// now show the LAST [lines] log entries (show if remaining-lines<=0)
-	for (elog = EMPIRE_LOGS(emp); elog; elog = elog->next) {
+	DL_FOREACH(EMPIRE_LOGS(emp), elog) {
 		if (type == NOTHING && empire_log_request_only[elog->type]) {
 			continue;	// this type is request-only
 		}
@@ -4656,8 +4575,6 @@ ACMD(do_empire_inventory) {
 
 
 ACMD(do_enroll) {
-	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
-	
 	struct empire_island *from_isle, *next_isle, *isle;
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_npc_data *npc;
@@ -4665,7 +4582,6 @@ ACMD(do_enroll) {
 	struct empire_city_data *city, *next_city;
 	struct empire_needs *needs, *next_needs;
 	player_index_data *index, *next_index;
-	struct empire_unique_storage *eus;
 	struct vehicle_attached_mob *vam;
 	vehicle_data *veh, *next_veh;
 	empire_data *e, *old;
@@ -4836,16 +4752,7 @@ ACMD(do_enroll) {
 			
 			// unique storage: append to end of current empire's list
 			if (EMPIRE_UNIQUE_STORAGE(old)) {
-				// find end
-				if ((eus = EMPIRE_UNIQUE_STORAGE(e))) {
-					while (eus->next) {
-						eus = eus->next;
-					}
-					eus->next = EMPIRE_UNIQUE_STORAGE(old);
-				}
-				else {
-					EMPIRE_UNIQUE_STORAGE(e) = EMPIRE_UNIQUE_STORAGE(old);
-				}
+				LL_CONCAT(EMPIRE_UNIQUE_STORAGE(e), EMPIRE_UNIQUE_STORAGE(old));
 				EMPIRE_UNIQUE_STORAGE(old) = NULL;
 			}
 			
@@ -4949,10 +4856,6 @@ ACMD(do_enroll) {
 
 
 ACMD(do_esay) {
-	void clear_last_act_message(descriptor_data *desc);
-	void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message);
-	extern bool is_ignoring(char_data *ch, char_data *victim);
-	
 	descriptor_data *d;
 	char_data *tch;
 	int level = 0, i;
@@ -5182,8 +5085,6 @@ ACMD(do_expel) {
 
 
 ACMD(do_findmaintenance) {
-	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
-	
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH*4], partial[MAX_STRING_LENGTH], temp[MAX_INPUT_LENGTH], *ptr;
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	struct resource_data *old_res, *total_list = NULL;
@@ -5402,7 +5303,6 @@ room_data *find_home(char_data *ch) {
 
 
 ACMD(do_home) {
-	void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
 	void warehouse_inventory(char_data *ch, char *argument, int mode);
 	void warehouse_identify(char_data *ch, char *argument, int mode);
 	void warehouse_retrieve(char_data *ch, char *argument, int mode);
@@ -5647,8 +5547,6 @@ ACMD(do_islands) {
 
 
 ACMD(do_tavern) {
-	void check_tavern_setup(room_data *room);
-	
 	int iter, type = NOTHING, pos, old;
 	
 	one_argument(argument, arg);
@@ -6175,7 +6073,7 @@ ACMD(do_offenses) {
 	// start buffer
 	size = snprintf(output, sizeof(output), "Offenses for %s:\r\n", EMPIRE_NAME(emp));
 	
-	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+	DL_FOREACH(EMPIRE_OFFENSES(emp), off) {
 		if (!IS_SET(off->flags, OFF_SEEN) && (search_emp || search_plr != NOTHING)) {
 			continue;	// can't search unseen
 		}
@@ -6319,15 +6217,6 @@ ACMD(do_pledge) {
 
 
 ACMD(do_progress) {
-	void count_quest_tasks(struct req_data *list, int *complete, int *total);
-	extern bool empire_meets_goal_prereqs(empire_data *emp, progress_data *prg);
-	extern progress_data *find_current_progress_goal_by_name(empire_data *emp, char *name);
-	extern progress_data *find_progress_goal_by_name(char *name);
-	extern progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name);
-	void get_progress_perks_display(struct progress_perk *list, char *save_buffer, bool show_vnums);
-	void get_tracker_display(struct req_data *tracker, char *save_buffer);
-	void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
-	
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], arg[MAX_INPUT_LENGTH], vstr[256], *arg2, *ptr;
 	int counts[NUM_PROGRESS_TYPES], compl[NUM_PROGRESS_TYPES], buy[NUM_PROGRESS_TYPES];
@@ -6960,11 +6849,6 @@ ACMD(do_reclaim) {
 
 
 ACMD(do_roster) {
-	void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
-	extern bool member_is_timed_out_ch(char_data *ch);
-	extern const char *class_role[];
-	extern const char *class_role_color[];
-
 	char buf[MAX_STRING_LENGTH * 2], buf1[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], part[MAX_STRING_LENGTH];
 	player_index_data *index, *next_index;
 	empire_data *e = GET_LOYALTY(ch);
@@ -7169,8 +7053,7 @@ ACMD(do_territory) {
 			CREATE(node, struct find_territory_node, 1);
 			node->loc = iter;
 			node->count = 1;
-			node->next = node_list;
-			node_list = node;
+			LL_PREPEND(node_list, node);
 		}
 	}
 	
@@ -7253,8 +7136,6 @@ ACMD(do_unpublicize) {
 * @param char *argument Remaining args after "limit".
 */
 void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
-	void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount);
-	
 	char amount_arg[MAX_INPUT_LENGTH], keywords_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], line[256];
 	struct workforce_production_limit *wpl, *next_wpl;
 	int amount, count;
@@ -7361,8 +7242,6 @@ void do_workforce_limit(char_data *ch, empire_data *emp, char *argument) {
 
 
 ACMD(do_workforce) {
-	extern int *get_ordered_chores();
-	
 	char arg[MAX_INPUT_LENGTH], lim_arg[MAX_INPUT_LENGTH], name[MAX_STRING_LENGTH], local_arg[MAX_INPUT_LENGTH], island_arg[MAX_INPUT_LENGTH];
 	char temp[MAX_INPUT_LENGTH];
 	struct empire_storage_data *store, *next_store;

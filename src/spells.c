@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -32,14 +33,6 @@
 *   Chants
 *   Readies
 */
-
-// external vars
-
-// external funcs
-void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
-extern bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
-void check_combat_start(char_data *ch);
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// UTILITIES ///////////////////////////////////////////////////////////////
@@ -333,11 +326,6 @@ ACMD(do_damage_spell) {
 //// READIES /////////////////////////////////////////////////////////////////
 
 ACMD(do_ready) {
-	extern bool check_vampire_sun(char_data *ch, bool message);
-	void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
-	void scale_item_to_level(obj_data *obj, int level);
-	extern const char *pool_types[];
-	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], *to_char, *to_room;
 	struct player_ability_data *plab, *next_plab;
 	int scale_level, ch_level = 0, pos;

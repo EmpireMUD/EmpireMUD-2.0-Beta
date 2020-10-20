@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -35,22 +36,6 @@
 *   Action Commands
 *   Generic Interactions: do_gen_interact_room
 */
-
-// external vars
-extern struct gen_craft_data_t gen_craft_data[];
-extern const bool interact_one_at_a_time[NUM_INTERACTS];
-extern const char *tool_flags[];
-
-// external funcs
-void complete_vehicle(vehicle_data *veh);
-extern double get_base_dps(obj_data *weapon);
-extern obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
-extern char *get_mine_type_name(room_data *room);
-extern bool is_deep_mine(room_data *room);
-void process_build(char_data *ch, room_data *room, int act_type);
-void scale_item_to_level(obj_data *obj, int level);
-void schedule_crop_growth(struct map_data *map);
-void uncrop_tile(room_data *room);
 
 // cancel protos
 void cancel_resource_list(char_data *ch);
@@ -68,13 +53,11 @@ void perform_ritual(char_data *ch);
 void perform_saw(char_data *ch);
 void perform_study(char_data *ch);
 void process_bathing(char_data *ch);
-void process_build_action(char_data *ch);
 void process_burn_area(char_data *ch);
 void process_chop(char_data *ch);
 void process_copying_book(char_data *ch);
 void process_digging(char_data *ch);
 void process_dismantle_action(char_data *ch);
-void process_dismantle_vehicle(char_data *ch);
 void process_escaping(char_data *ch);
 void process_excavating(char_data *ch);
 void process_fillin(char_data *ch);
@@ -105,6 +88,13 @@ void process_tanning(char_data *ch);
 
 // other local protos
 INTERACTION_FUNC(finish_foraging);
+
+// external functions
+ACMD(do_saw);
+ACMD(do_mint);
+ACMD(do_scrape);
+ACMD(do_tan);
+void perform_escape(char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -271,10 +261,6 @@ void stop_room_action(room_data *room, int action) {
 * This is the main processor for periodic actions (ACT_), once per second.
 */
 void update_actions(void) {
-	// Extern functions.
-	extern vehicle_data *get_current_piloted_vehicle(char_data *ch);
-	
-	// Extern vars.
 	extern bool catch_up_actions;
 	
 	// prevent running multiple action rounds during a catch-up cycle
@@ -454,8 +440,6 @@ bool action_flagged(char_data *ch, bitvector_t actf) {
 * @return bool TRUE if any forage interactions ran successfully, FALSE if not.
 */
 bool do_crop_forage(char_data *ch) {
-	extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
-	
 	crop_data *crop;
 	
 	if (!IS_OUTDOOR_TILE(IN_ROOM(ch)) || IS_MAP_BUILDING(IN_ROOM(ch))) {
@@ -1200,8 +1184,6 @@ INTERACTION_FUNC(finish_scraping) {
 
 // for do_saw
 void perform_saw(char_data *ch) {
-	ACMD(do_saw);
-	
 	char buf[MAX_STRING_LENGTH];
 	bool success = FALSE, room = FALSE;
 	obj_data *proto, *saw;
@@ -1327,8 +1309,6 @@ void process_bathing(char_data *ch) {
 * @param char_data *ch The builder.
 */
 void process_build_action(char_data *ch) {
-	extern craft_data *find_building_list_entry(room_data *room, byte type);
-	
 	char buf1[MAX_STRING_LENGTH];
 	craft_data *type = NULL;
 	
@@ -1364,9 +1344,6 @@ void process_build_action(char_data *ch) {
 * @param char_data *ch The person burning the area.
 */
 void process_burn_area(char_data *ch) {
-	void perform_burn_room(room_data *room);
-	extern bool used_lighter(char_data *ch, obj_data *obj);
-	
 	if (!validate_burn_area(ch, GET_ACTION_VNUM(ch, 0))) {
 		// sends own message
 		cancel_action(ch);
@@ -1472,8 +1449,6 @@ void process_chipping(char_data *ch) {
 * @param char_data *ch The chopper.
 */
 void process_chop(char_data *ch) {
-	extern int change_chop_territory(room_data *room);
-	
 	bool got_any = FALSE;
 	char_data *ch_iter;
 	obj_data *axe;
@@ -1592,8 +1567,6 @@ void process_digging(char_data *ch) {
 * @param char_data *ch The dismantler.
 */
 void process_dismantle_action(char_data *ch) {
-	void process_dismantling(char_data *ch, room_data *room);
-	
 	int count, total;
 	
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
@@ -1615,8 +1588,6 @@ void process_dismantle_action(char_data *ch) {
 * @param char_data *ch The escapist.
 */
 void process_escaping(char_data *ch) {
-	void perform_escape(char_data *ch);
-	
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark to find your way out!\r\n");
 		cancel_action(ch);
@@ -1635,8 +1606,6 @@ void process_escaping(char_data *ch) {
 * @param char_data *ch The excavator.
 */
 void process_excavating(char_data *ch) {
-	void finish_trench(room_data *room);
-	
 	int count, total;
 	char_data *iter;
 
@@ -1714,8 +1683,6 @@ void process_excavating(char_data *ch) {
 * @param char_data *ch The filler-inner.
 */
 void process_fillin(char_data *ch) {
-	void untrench_room(room_data *room);
-
 	int count, total;
 
 	total = 1;	// shovelfuls to fill in at once (add things that speed up fillin)
@@ -2028,9 +1995,6 @@ void process_harvesting(char_data *ch) {
 * @param char_data *ch The hunter.
 */
 void process_hunting(char_data *ch) {
-	void scale_mob_for_character(char_data *mob, char_data *ch);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	struct affected_type *af;
 	char_data *mob;
 	
@@ -2200,8 +2164,6 @@ void process_mining(char_data *ch) {
 * @param char_data *ch The guy minting.
 */
 void process_minting(char_data *ch) {
-	ACMD(do_mint);
-
 	empire_data *emp = ROOM_OWNER(IN_ROOM(ch));
 	char tmp[MAX_INPUT_LENGTH];
 	obj_data *proto;
@@ -2254,8 +2216,6 @@ void process_minting(char_data *ch) {
 * @param char_data *ch The morpher.
 */
 void process_morphing(char_data *ch) {
-	void finish_morphing(char_data *ch, morph_data *morph);
-
 	GET_ACTION_TIMER(ch) -= 1;
 
 	if (GET_ACTION_TIMER(ch) <= 0) {
@@ -2415,8 +2375,6 @@ void process_planting(char_data *ch) {
 * @param char_data *ch The prospector.
 */
 void process_prospecting(char_data *ch) {
-	void init_mine(room_data *room, char_data *ch, empire_data *emp);
-	
 	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
 		msg_to_char(ch, "It's too dark for you to keep prospecting.\r\n");
 		cancel_action(ch);
@@ -2464,8 +2422,6 @@ void process_prospecting(char_data *ch) {
 * @param char_data *ch The character doing the repairing.
 */
 void process_repairing(char_data *ch) {
-	extern vehicle_data *find_vehicle(int n);
-
 	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
 	struct resource_data *res, temp_res;
@@ -2528,8 +2484,6 @@ void process_repairing(char_data *ch) {
 * @param char_data *ch The scraper.
 */
 void process_scraping(char_data *ch) {
-	ACMD(do_scrape);
-	
 	char buf[MAX_STRING_LENGTH];
 	bool success = FALSE;
 	obj_data *proto;
@@ -2596,8 +2550,6 @@ void process_scraping(char_data *ch) {
 * @param char_data *ch The sirer (?).
 */
 void process_siring(char_data *ch) {
-	void sire_char(char_data *ch, char_data *victim);
-	
 	if (!GET_FEEDING_FROM(ch)) {
 		cancel_action(ch);
 	}
@@ -2672,8 +2624,6 @@ void process_start_fillin(char_data *ch) {
 * @param char_data *ch The person trying to fill in.
 */
 void process_swap_skill_sets(char_data *ch) {
-	void perform_swap_skill_sets(char_data *ch);
-	
 	GET_ACTION_TIMER(ch) -= 1;
 	
 	if (GET_ACTION_TIMER(ch) <= 0) {
@@ -2695,8 +2645,6 @@ void process_swap_skill_sets(char_data *ch) {
 * @param char_data *ch The tanner.
 */
 void process_tanning(char_data *ch) {
-	ACMD(do_tan);
-	
 	obj_data *proto;
 	bool success;
 	
@@ -2960,8 +2908,6 @@ void do_burn_area(char_data *ch, int subcmd) {
 
 
 ACMD(do_excavate) {
-	extern bool is_entrance(room_data *room);
-	
 	struct evolution_data *evo;
 	sector_data *orig;
 	
@@ -3374,9 +3320,6 @@ ACMD(do_pan) {
 
 
 ACMD(do_plant) {
-	extern const char *climate_flags[];
-	extern const bitvector_t climate_flags_order[];
-	
 	struct evolution_data *evo;
 	sector_data *original;
 	obj_data *obj;
@@ -3643,9 +3586,6 @@ ACMD(do_scrape) {
 
 
 ACMD(do_stop) {
-	void cancel_action(char_data *ch);
-	extern bool cancel_biting(char_data *ch);
-	
 	if (IS_NPC(ch)) {
 		msg_to_char(ch, "No, you stop.\r\n");
 	}
@@ -3955,11 +3895,11 @@ void start_gen_interact_room(char_data *ch, const struct gen_interact_data_t *da
 * @param char_data *ch The person doing the interaction.
 */
 void process_gen_interact_room(char_data *ch) {
-	const struct gen_interact_data_t *data = get_interact_data_by_action(GET_ACTION(ch));
+	const struct gen_interact_data_t *data;
 	room_data *in_room;
 	int count, pos;
 	
-	if (!data || !validate_gen_interact_room(ch, data)) {
+	if (!(data = get_interact_data_by_action(GET_ACTION(ch))) || !validate_gen_interact_room(ch, data)) {
 		cancel_action(ch);
 		return;
 	}

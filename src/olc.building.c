@@ -21,6 +21,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -29,25 +30,9 @@
 *   Edit Modules
 */
 
-// external consts
-extern const char *bld_flags[];
-extern const char *bld_relationship_types[];
-extern const char *designate_flags[];
-extern const char *function_flags[];
-extern const char *interact_types[];
-extern const byte interact_vnum_types[NUM_INTERACTS];
-extern const char *olc_type_bits[NUM_OLC_TYPES+1];
-extern const int bld_relationship_vnum_types[];
-extern const char *room_aff_bits[];
-extern const char *spawn_flags[];
-
 // external funcs
 void init_building(bld_data *building);
-void replace_question_color(char *input, char *color, char *output);
 void sort_interactions(struct interaction_item **list);
-
-// local funcs
-void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
 
 // locals
 const char *default_building_name = "Unnamed Building";
@@ -210,7 +195,6 @@ struct bld_relation *copy_bld_relations(struct bld_relation *input_list) {
 	LL_FOREACH(input_list, relat) {
 		CREATE(new_relat, struct bld_relation, 1);
 		*new_relat = *relat;
-		new_relat->next = NULL;
 		LL_APPEND(list, new_relat);
 	}
 	
@@ -375,7 +359,6 @@ void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void remove_building_from_table(bld_data *bld);
 	
 	struct obj_storage_type *store, *next_store;
@@ -843,9 +826,6 @@ void olc_fullsearch_building(char_data *ch, char *argument) {
 * @param bld_vnum vnum The building vnum.
 */
 void olc_search_building(char_data *ch, bld_vnum vnum) {
-	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	bld_data *proto = building_proto(vnum);
 	struct adventure_link_rule *link;
@@ -1136,9 +1116,6 @@ void save_olc_building(descriptor_data *desc) {
 * @return bld_data* The copied building.
 */
 bld_data *setup_olc_building(bld_data *input) {
-	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
-	extern struct resource_data *copy_resource_list(struct resource_data *input);
-	
 	bld_data *new;
 	
 	CREATE(new, bld_data, 1);
@@ -1227,10 +1204,6 @@ void smart_copy_bld_relations(struct bld_relation **to_list, struct bld_relation
 */
 void olc_show_building(char_data *ch) {
 	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	void get_resource_display(struct resource_data *list, char *save_buffer);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
-	extern char *show_color_codes(char *string);
 	
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	char lbuf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];
@@ -1487,8 +1460,6 @@ OLC_MODULE(bedit_hitpoints) {
 
 
 OLC_MODULE(bedit_icon) {
-	extern bool validate_icon(char *icon);
-
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	
 	delete_doubledollar(argument);
@@ -1532,7 +1503,6 @@ OLC_MODULE(bedit_relations) {
 
 
 OLC_MODULE(bedit_resource) {
-	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	olc_process_resources(ch, argument, &GET_BLD_YEARLY_MAINTENANCE(bdg));
 }

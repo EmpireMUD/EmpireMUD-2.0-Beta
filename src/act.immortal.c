@@ -23,6 +23,7 @@
 #include "skills.h"
 #include "olc.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -37,71 +38,14 @@
 *   Commands
 */
 
-// external vars
-extern const char *action_bits[];
-extern const char *affected_bits[];
-extern const char *apply_types[];
-extern const char *apply_type_names[];
-extern const char *bld_on_flags[];
-extern const bitvector_t bld_on_flags_order[];
-extern const char *bonus_bits[];
-extern const char *climate_flags[];
-extern const bitvector_t climate_flags_order[];
-extern const char *craft_types[];
-extern const char *dirs[];
-extern const char *extra_bits[];
-extern const char *function_flags[];
-extern const char *genders[];
-extern const char *grant_bits[];
-extern const char *instance_flags[];
-extern const char *island_bits[];
-extern const char *item_types[];
-extern const char *mapout_color_names[];
-extern const char *olc_flag_bits[];
-extern const char *progress_types[];
-extern const int bld_relationship_vnum_types[];
-extern struct faction_reputation_type reputation_levels[];
-extern const char *room_aff_bits[];
-extern const char *sector_flags[];
-extern const char *size_types[];
-extern const char *spawn_flags[];
-extern const char *spawn_flags_short[];
-extern const char *syslog_types[];
-extern const char *tool_flags[];
-extern const char *wear_bits[];
-
 // external functions
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
-extern int adjusted_instance_limit(adv_data *adv);
-void assign_class_abilities(char_data *ch, class_data *cls, int role);
-extern struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);	// instance.c
-void check_autowiz(char_data *ch);
-void check_delayed_load(char_data *ch);
-void clear_char_abilities(char_data *ch, any_vnum skill);
-void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
-void deliver_shipment(empire_data *emp, struct shipping_data *shipd);	// act.item.c
+char *ability_color(char_data *ch, ability_data *abil);
+struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);
+void Crash_listrent(char_data *ch, char *name);
 void do_stat_vehicle(char_data *ch, vehicle_data *veh);
-extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
-extern struct generic_name_data *get_best_name_list(int name_set, int sex);
-extern int get_highest_access_level(account_data *acct);
-void get_icons_display(struct icon_data *list, char *save_buffer);
-void get_interaction_display(struct interaction_item *list, char *save_buffer);
-void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
-void get_resource_display(struct resource_data *list, char *save_buffer);
-void get_script_display(struct trig_proto_list *list, char *save_buffer);
-extern char *get_room_name(room_data *room, bool color);
-void refresh_passive_buffs(char_data *ch);
-void replace_question_color(char *input, char *color, char *output);
-void save_whole_world();
-void scale_mob_to_level(char_data *mob, int level);
-void scale_vehicle_to_level(vehicle_data *veh, int level);
-extern char *show_color_codes(char *string);
-extern int stats_get_crop_count(crop_data *cp);
-extern int stats_get_sector_count(sector_data *sect);
-void update_class(char_data *ch);
-void update_empire_members_and_greatness(empire_data *emp);
-void update_member_data(char_data *ch);
-void update_world_count();
+room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir);
+struct generic_name_data *get_best_name_list(int name_set, int sex);
+void update_account_stats();
 
 // locals
 void instance_list_row(struct instance_data *inst, int number, char *save_buffer, size_t size);
@@ -143,8 +87,6 @@ void decustomize_island(int island_id) {
 * @param int island The islands to store it to -- NOT CURRENTLY USED.
 */
 void perform_autostore(obj_data *obj, empire_data *emp, int island) {
-	extern bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
-	
 	obj_data *temp, *next_temp;
 	
 	// store the inside first
@@ -290,7 +232,6 @@ void stop_snooping(char_data *ch) {
 
 // returns TRUE if the user sees the target, FALSE if not
 bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_search, int low, int high, int rp) {
-	extern const char *connected_types[];
 	char_data *ch = tch;
 	char levelname[20], *timeptr, idletime[10];
 	char line[200], line2[220], state[30];
@@ -505,20 +446,6 @@ ADMIN_UTIL(util_approval) {
 
 // util bldconvert <building vnum> <start of new vnums>
 ADMIN_UTIL(util_bldconvert) {
-	extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
-	extern struct bld_relation *copy_bld_relations(struct bld_relation *input_list);
-	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
-	extern struct resource_data *copy_resource_list(struct resource_data *input);
-	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-	void save_olc_building(descriptor_data *desc);
-	void save_olc_craft(descriptor_data *desc);
-	void save_olc_vehicle(descriptor_data *desc);
-	extern bld_data *setup_olc_building(bld_data *input);
-	extern craft_data *setup_olc_craft(craft_data *input);
-	extern vehicle_data *setup_olc_vehicle(vehicle_data *input);
-	extern const byte interact_vnum_types[NUM_INTERACTS];
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	any_vnum from_vnum, start_to_vnum, to_vnum = NOTHING;
 	craft_data *from_craft = NULL, *to_craft = NULL;
@@ -1016,9 +943,7 @@ ADMIN_UTIL(util_bldconvert) {
 
 
 // looks up buildings with certain flags
-ADMIN_UTIL(util_b318_buildings) {
-	extern const char *bld_flags[];
-	
+ADMIN_UTIL(util_b318_buildings) {	
 	char buf[MAX_STRING_LENGTH];
 	bld_data *bld, *next_bld;
 	bool any = FALSE;
@@ -1059,7 +984,6 @@ PLAYER_UPDATE_FUNC(update_clear_roles) {
 
 
 ADMIN_UTIL(util_clear_roles) {
-	void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
 	update_all_players(ch, update_clear_roles);
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has cleared all player roles", GET_NAME(ch));
 	msg_to_char(ch, "Ok.\r\n");
@@ -1091,7 +1015,6 @@ ADMIN_UTIL(util_diminish) {
 
 
 ADMIN_UTIL(util_evolve) {
-	void run_external_evolutions();
 	extern bool manual_evolutions;
 	
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s used util evolve", GET_NAME(ch));
@@ -1224,11 +1147,6 @@ ADMIN_UTIL(util_islandsize) {
 
 
 ADMIN_UTIL(util_pathtest) {
-	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
-	PATHFIND_VALIDATOR(pathfind_ocean);
-	PATHFIND_VALIDATOR(pathfind_pilot);
-	PATHFIND_VALIDATOR(pathfind_road);
-	
 	unsigned long long timer;
 	PATHFIND_VALIDATOR(*vdr);
 	room_data *to_room;
@@ -1374,8 +1292,6 @@ ADMIN_UTIL(util_randtest) {
 
 
 ADMIN_UTIL(util_redo_islands) {
-	void number_and_count_islands(bool reset);
-	
 	skip_spaces(&argument);
 	
 	if (!*argument || str_cmp(argument, "confirm")) {
@@ -1391,9 +1307,6 @@ ADMIN_UTIL(util_redo_islands) {
 
 
 ADMIN_UTIL(util_rescan) {
-	void refresh_empire_dropped_items(empire_data *only_emp);
-	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
-	
 	empire_data *emp;
 	
 	if (GET_ACCESS_LEVEL(ch) < LVL_CIMPL && !IS_GRANTED(ch, GRANT_EMPIRES)) {
@@ -1470,8 +1383,6 @@ ADMIN_UTIL(util_strlen) {
 
 
 ADMIN_UTIL(util_wipeprogress) {
-	void full_reset_empire_progress(empire_data *only_emp);
-	
 	empire_data *emp = NULL;
 	
 	if (!*argument) {
@@ -1489,8 +1400,6 @@ ADMIN_UTIL(util_wipeprogress) {
 
 
 ADMIN_UTIL(util_yearly) {
-	void annual_world_update();
-	
 	if (!*argument || str_cmp(argument, "confirm")) {
 		msg_to_char(ch, "You must type 'util yearly confirm' to do this. It will cause decay on the entire map.\r\n");
 	}
@@ -1542,10 +1451,6 @@ ACMD(do_admin_util) {
 
 
 void do_instance_add(char_data *ch, char *argument) {
-	extern bool can_instance(adv_data *adv);
-	extern room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir);
-	extern const bool is_location_rule[];
-
 	struct adventure_link_rule *rule, *rule_iter;
 	int num_rules, tries, dir = NO_DIR;
 	bool found = FALSE;
@@ -1749,8 +1654,6 @@ void do_instance_info(char_data *ch, char *argument) {
 
 // shows by adventure
 void do_instance_list_all(char_data *ch) {
-	extern int count_instances(adv_data *adv);
-	
 	char buf[MAX_STRING_LENGTH];
 	adv_data *adv, *next_adv;
 	int count = 0;
@@ -1860,8 +1763,6 @@ void do_instance_nearby(char_data *ch, char *argument) {
 
 
 void do_instance_reset(char_data *ch, char *argument) {
-	void reset_instance(struct instance_data *inst);
-
 	struct instance_data *inst;
 	room_data *loc = NULL;
 	int num;
@@ -1938,7 +1839,6 @@ void instance_list_row(struct instance_data *inst, int number, char *save_buffer
 
 
 void do_instance_spawn(char_data *ch, char *argument) {
-	void generate_adventure_instances();
 	int num = 1;
 	
 	if (*argument && isdigit(*argument)) {
@@ -2086,12 +1986,6 @@ struct set_struct {
 
 /* All setting is done here, for simplicity */
 int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
-	/* Externs */
-	void change_sex(char_data *ch, int sex);
-	extern int _parse_name(char *arg, char *name);
-	extern int Valid_Name(char *newname);
-	void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
-
 	player_index_data *index, *next_index, *found_index;
 	int i, iter, on = 0, off = 0, value = 0;
 	empire_data *emp;
@@ -2250,7 +2144,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("vampire") {
 		if (IS_VAMPIRE(vict) && !str_cmp(val_arg, "off")) {
-			void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 			check_un_vampire(vict, TRUE);
 		}
 		else if (!IS_VAMPIRE(vict) && !str_cmp(val_arg, "on")) {
@@ -2392,8 +2285,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("lastname") {
 		void add_lastname(char_data *ch, char *name);
-		void change_personal_lastname(char_data *ch, char *name);
-		extern bool has_lastname(char_data *ch, char *name);
 		void remove_lastname(char_data *ch, char *name);
 		char va_1[MAX_INPUT_LENGTH], va_2[MAX_INPUT_LENGTH];
 		
@@ -2431,8 +2322,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("bonustrait") {
-		void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
-
 		bitvector_t diff, new, old = GET_BONUS_TRAITS(vict);
 		new = GET_BONUS_TRAITS(vict) = olc_process_flag(ch, val_arg, "bonus", NULL, bonus_bits, GET_BONUS_TRAITS(vict));
 		
@@ -2515,8 +2404,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("companion") {
-		extern struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
-		void remove_companion(char_data *ch, any_vnum vnum);
 		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
 		char_data *pet;
 		
@@ -2545,8 +2432,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("faction") {
-		void update_reputations(char_data *ch);
-		
 		int min_idx, min_rep, max_idx, max_rep, new_rep, new_val = 0;
 		char fct_arg[MAX_INPUT_LENGTH], *fct_val;
 		struct player_faction_data *pfd;
@@ -2614,7 +2499,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("skill") {
-		void check_ability_levels(char_data *ch, any_vnum skill);
 		char skillname[MAX_INPUT_LENGTH], *skillval;
 		int level = -1;
 		skill_data *skill;
@@ -2644,8 +2528,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		sprintf(output, "%s's %s set to %d.", GET_NAME(vict), SKILL_NAME(skill), level);
 	}
 	else if SET_CASE("learned") {
-		void add_learned_craft(char_data *ch, any_vnum vnum);
-		void remove_learned_craft(char_data *ch, any_vnum vnum);
 		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
 		craft_data *cft;
 		
@@ -2679,8 +2561,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		}
 	}
 	else if SET_CASE("minipet") {
-		void add_minipet(char_data *ch, any_vnum vnum);
-		void remove_minipet(char_data *ch, any_vnum vnum);
 		char vnum_arg[MAX_INPUT_LENGTH], onoff_arg[MAX_INPUT_LENGTH];
 		char_data *pet;
 		
@@ -3161,8 +3041,7 @@ struct show_island_data *find_or_make_show_island(int island, struct show_island
 		CREATE(cur, struct show_island_data, 1);
 		cur->island = island;
 		cur->count = 0;
-		cur->next = *list;
-		*list = cur;
+		LL_PREPEND(*list, cur);
 	}
 	
 	return cur;
@@ -3178,7 +3057,7 @@ SHOW(show_islands) {
 	empire_data *emp;
 	int iter;
 	
-	struct show_island_data *list = NULL, *sid, *cur = NULL, *temp;
+	struct show_island_data *list = NULL, *sid, *cur = NULL;
 	
 	one_word(argument, arg);
 	if (!*arg) {
@@ -3227,7 +3106,7 @@ SHOW(show_islands) {
 			isle = get_island(cur->island, TRUE);
 			msg_to_char(ch, "%2d. %s: %d items\r\n", cur->island, get_island_name_for(isle->id, ch), cur->count);
 			// pull it out of the list to prevent unlimited iteration
-			REMOVE_FROM_LIST(cur, list, next);
+			LL_DELETE(list, cur);
 			free(cur);
 		}
 	}
@@ -3333,8 +3212,6 @@ SHOW(show_player) {
 
 
 SHOW(show_progress) {
-	extern progress_data *find_progress_goal_by_name(char *name);
-	
 	int total = 0, active = 0, active_completed = 0, total_completed = 0;
 	empire_data *emp, *next_emp;
 	progress_data *prg;
@@ -3420,9 +3297,6 @@ SHOW(show_progression) {
 
 
 SHOW(show_quests) {
-	void count_quest_tasks(struct req_data *list, int *complete, int *total);
-	void show_quest_tracker(char_data *ch, struct player_quest *pq);
-	
 	char name[MAX_INPUT_LENGTH], *arg2, buf[MAX_STRING_LENGTH], when[256];
 	struct player_completed_quest *pcq, *next_pcq;
 	bool file = FALSE, found = FALSE;
@@ -3525,8 +3399,6 @@ SHOW(show_quests) {
 
 
 SHOW(show_rent) {
-	void Crash_listrent(char_data *ch, char *name);
-	
 	if (!*argument) {
 		send_to_char("A name would help.\r\n", ch);
 		return;
@@ -3656,10 +3528,8 @@ SHOW(show_resource) {
 
 
 SHOW(show_stats) {
-	void update_account_stats();
 	extern int buf_switches, buf_largecount, buf_overflows, top_of_helpt;
 	extern int total_accounts, active_accounts, active_accounts_week;
-	extern struct help_index_element *help_table;
 	
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
 	int num_trigs = 0, num_goals = 0, num_rewards = 0, num_mort_helps = 0, num_imm_helps = 0, num_inst = 0;
@@ -3804,9 +3674,6 @@ SHOW(show_site) {
 
 
 SHOW(show_skills) {
-	extern char *ability_color(char_data *ch, ability_data *abil);
-	extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
-	
 	struct player_ability_data *plab, *next_plab;
 	struct player_skill_data *plsk, *next_plsk;
 	ability_data *abil;
@@ -3892,9 +3759,6 @@ SHOW(show_skills) {
 
 
 SHOW(show_buildings) {
-	extern bld_data *get_building_by_name(char *name, bool room_only);
-	extern int stats_get_building_count(bld_data *bdg);
-	
 	char buf[MAX_STRING_LENGTH * 2], line[256], part[256];
 	struct sector_index_type *idx;
 	bld_data *bld, *next_bld;
@@ -3998,10 +3862,6 @@ SHOW(show_commons) {
 
 
 SHOW(show_companions) {
-	extern struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type);
-	void setup_ability_companions(char_data *ch);
-	extern const char *pool_types[];
-	
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	char_data *proto = NULL, *plr = NULL;
 	struct companion_data *cd, *next_cd;
@@ -4090,8 +3950,6 @@ SHOW(show_companions) {
 
 
 SHOW(show_crops) {
-	extern crop_data *get_crop_by_name(char *name);
-	
 	char buf[MAX_STRING_LENGTH * 2], line[256], part[256];
 	crop_data *crop, *next_crop;
 	int count, total, this;
@@ -4266,9 +4124,6 @@ SHOW(show_players) {
 
 
 SHOW(show_shops) {
-	extern struct shop_temp_list *build_available_shop_list(char_data *ch);
-	void free_shop_temp_list(struct shop_temp_list *list);
-
 	struct shop_temp_list *stl, *shop_list = NULL;
 	char buf[MAX_STRING_LENGTH];
 	
@@ -4305,8 +4160,6 @@ SHOW(show_shops) {
 
 
 SHOW(show_technology) {
-	extern const char *player_tech_types[];
-	
 	struct player_tech *ptech;
 	int last_tech, count = 0;
 	char one[256], line[256];
@@ -4360,8 +4213,6 @@ SHOW(show_technology) {
 
 
 SHOW(show_terrain) {
-	extern sector_data *get_sect_by_name(char *name);
-	
 	char buf[MAX_STRING_LENGTH * 2], line[256], part[256];
 	sector_data *sect, *next_sect;
 	int count, total, this;
@@ -4531,9 +4382,6 @@ SHOW(show_unlearnable) {
 
 
 SHOW(show_uses) {
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-	extern bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH * 3], part[MAX_STRING_LENGTH];
 	craft_data *craft, *next_craft;
 	quest_data *quest, *next_quest;
@@ -5032,8 +4880,6 @@ SHOW(show_currency) {
 
 
 SHOW(show_produced) {
-	extern int sort_empire_production_totals(struct empire_production_total *a, struct empire_production_total *b);
-	
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct empire_production_total *egt, *next_egt;
 	empire_data *emp = NULL;
@@ -5368,8 +5214,6 @@ SHOW(show_mounts) {
 
 
 SHOW(show_workforce) {
-	void show_workforce_setup_to_char(empire_data *emp, char_data *ch);
-	
 	char arg[MAX_INPUT_LENGTH];
 	empire_data *emp;
 	
@@ -5558,8 +5402,6 @@ SHOW(show_spawns) {
 
 
 SHOW(show_variables) {
-	void find_uid_name(char *uid, char *name);
-	
 	char uname[MAX_INPUT_LENGTH];
 	struct trig_var_data *tv;
 	char_data *plr = NULL;
@@ -5580,7 +5422,7 @@ SHOW(show_variables) {
 			/* not displayed here. in the future, this might change */
 			for (tv = plr->script->global_vars; tv; tv = tv->next) {
 				if (*(tv->value) == UID_CHAR) {
-					find_uid_name(tv->value, uname);
+					find_uid_name(tv->value, uname, sizeof(uname));
 					msg_to_char(ch, " %10s:  [UID]: %s\r\n", tv->name, uname);
 				}
 				else {
@@ -5647,10 +5489,6 @@ void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list) {
 * @param adv_data *adv The adventure to display.
 */
 void do_stat_adventure(char_data *ch, adv_data *adv) {
-	extern int count_instances(adv_data *adv);
-	void get_adventure_linking_display(struct adventure_link_rule *list, char *save_buffer);
-	extern const char *adventure_flags[];
-	
 	char lbuf[MAX_STRING_LENGTH];
 	int time;
 	
@@ -5750,10 +5588,6 @@ void do_stat_book(char_data *ch, book_data *book) {
 * @param bld_data *bdg The building to stat.
 */
 void do_stat_building(char_data *ch, bld_data *bdg) {
-	void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
-	extern const char *bld_flags[];
-	extern const char *designate_flags[];
-	
 	char lbuf[MAX_STRING_LENGTH];
 	
 	msg_to_char(ch, "Building VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_BLD_VNUM(bdg), GET_BLD_NAME(bdg));
@@ -5828,28 +5662,6 @@ void do_stat_building(char_data *ch, bld_data *bdg) {
 
 /* Sends ch information on the character or animal k */
 void do_stat_character(char_data *ch, char_data *k) {
-	extern double get_combat_speed(char_data *ch, int pos);
-	extern int get_crafting_level(char_data *ch);
-	extern int get_block_rating(char_data *ch, bool can_gain_skill);
-	extern int total_bonus_healing(char_data *ch);
-	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
-	extern int move_gain(char_data *ch);
-	void display_attributes(char_data *ch, char_data *to);
-
-	extern const char *account_flags[];
-	extern const char *class_role[];
-	extern const char *damage_types[];
-	extern const double hit_per_dex;
-	extern const char *mob_custom_types[];
-	extern const char *mob_move_types[];
-	extern const char *player_bits[];
-	extern const char *position_types[];
-	extern const char *preference_bits[];
-	extern const char *connected_types[];
-	extern const int base_hit_chance;
-	extern struct promo_code_list promo_codes[];
-
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	struct script_memory *mem;
 	struct cooldown_data *cool;
@@ -6153,8 +5965,6 @@ void do_stat_character(char_data *ch, char_data *k) {
 
 
 void do_stat_craft(char_data *ch, craft_data *craft) {
-	extern const char *craft_flags[];
-	
 	ability_data *abil;
 	bld_data *bld;
 	int seconds;
@@ -6223,8 +6033,6 @@ void do_stat_craft(char_data *ch, craft_data *craft) {
 * @param crop_data *cp The crop to stat.
 */
 void do_stat_crop(char_data *ch, crop_data *cp) {
-	extern const char *crop_flags[];
-	
 	msg_to_char(ch, "Crop VNum: [&c%d&0], Name: '&c%s&0'\r\n", GET_CROP_VNUM(cp), GET_CROP_NAME(cp));
 	msg_to_char(ch, "Room Title: %s, Mapout Color: %s\r\n", GET_CROP_TITLE(cp), mapout_color_names[GET_CROP_MAPOUT(cp)]);
 	
@@ -6259,16 +6067,6 @@ void do_stat_crop(char_data *ch, crop_data *cp) {
 * @param empire_data *emp The empire.
 */
 void do_stat_empire(char_data *ch, empire_data *emp) {
-	extern int *summarize_weekly_playtime(empire_data *emp);
-	extern int get_total_score(empire_data *emp);
-	void script_stat (char_data *ch, struct script_data *sc);
-	
-	extern const char *empire_admin_flags[];
-	extern const char *empire_attributes[];
-	extern const char *empire_trait_types[];
-	extern const char *progress_types[];
-	extern const char *techs[];
-	
 	empire_data *emp_iter, *next_emp;
 	int iter, found_rank, total, len, *ptime;
 	player_index_data *index;
@@ -6366,9 +6164,6 @@ void do_stat_empire(char_data *ch, empire_data *emp) {
 * @param struct global_data *glb The global to stat.
 */
 void do_stat_global(char_data *ch, struct global_data *glb) {
-	extern const char *global_flags[];
-	extern const char *global_types[];
-	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	ability_data *abil;
 	
@@ -6398,7 +6193,6 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 			break;
 		}
 		case GLOBAL_NEWBIE_GEAR: {
-			void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
 			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), buf2);
 			msg_to_char(ch, "Gear:\r\n%s", buf2);
 			break;
@@ -6424,15 +6218,6 @@ void do_stat_global(char_data *ch, struct global_data *glb) {
 
 /* Gives detailed information on an object (j) to ch */
 void do_stat_object(char_data *ch, obj_data *j) {
-	extern const struct material_data materials[NUM_MATERIALS];
-	extern const char *container_bits[];
-	extern const char *corpse_flags[];
-	extern const char *obj_custom_types[];
-	extern const char *storage_bits[];
-	extern double get_base_dps(obj_data *weapon);
-	extern double get_weapon_speed(obj_data *weapon);
-	extern const char *armor_types[NUM_ARMOR_TYPES+1];
-	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	int found;
 	struct obj_apply *apply;
@@ -6629,8 +6414,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 			}
 			break;
 		case ITEM_PAINT: {
-			extern const char *paint_colors[];
-			extern const char *paint_names[];
 			sprinttype(GET_PAINT_COLOR(j), paint_names, buf, sizeof(buf), "UNDEFINED");
 			sprinttype(GET_PAINT_COLOR(j), paint_colors, part, sizeof(part), "&0");
 			msg_to_char(ch, "Paint color: %s%s\t0\r\n", part, buf);
@@ -6757,11 +6540,6 @@ void do_stat_object(char_data *ch, obj_data *j) {
 
 /* Displays the vital statistics of IN_ROOM(ch) to ch */
 void do_stat_room(char_data *ch) {
-	extern const char *exit_bits[];
-	extern const char *depletion_type[NUM_DEPLETION_TYPES];
-	extern const char *instance_flags[];
-	extern const char *room_extra_types[];
-	
 	char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH], *nstr;
 	struct depletion_data *dep;
 	struct empire_city_data *city;
@@ -7035,10 +6813,6 @@ void do_stat_room(char_data *ch) {
 * @param room_template *rmt The room template to display.
 */
 void do_stat_room_template(char_data *ch, room_template *rmt) {
-	void get_exit_template_display(struct exit_template *list, char *save_buffer);
-	void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer);
-	extern const char *room_template_flags[];
-	
 	char lbuf[MAX_STRING_LENGTH];
 	adv_data *adv;
 	
@@ -7095,8 +6869,6 @@ void do_stat_room_template(char_data *ch, room_template *rmt) {
 * @param sector_data *st The sector to stat.
 */
 void do_stat_sector(char_data *ch, sector_data *st) {
-	void get_evolution_display(struct evolution_data *list, char *save_buffer);
-	
 	struct sector_index_type *idx = find_sector_index(GET_SECT_VNUM(st));
 	char buf[MAX_STRING_LENGTH];
 	
@@ -7260,8 +7032,6 @@ int vnum_crop(char *searchname, char_data *ch) {
 * @return int The number of matches shown.
 */
 int vnum_global(char *searchname, char_data *ch) {
-	extern const char *global_types[];
-	
 	struct global_data *iter, *next_iter;
 	char flags[MAX_STRING_LENGTH], flags2[MAX_STRING_LENGTH];
 	int found = 0;
@@ -7454,7 +7224,6 @@ ACMD(do_addnotes) {
 
 
 ACMD(do_advance) {
-	void start_new_character(char_data *ch);
 	char_data *victim;
 	char *name = arg, *level = buf2;
 	int newlevel, oldlevel, iter;
@@ -7638,13 +7407,6 @@ ACMD(do_at) {
 
 
 ACMD(do_automessage) {
-	extern int new_automessage_id();
-	void free_automessage(struct automessage *msg);
-	void save_automessages(void);
-	extern int sort_automessage_by_data(struct automessage *a, struct automessage *b);
-	extern const char *automessage_types[];
-	extern struct automessage *automessages;
-	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	char cmd_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], id_arg[MAX_STRING_LENGTH];
 	struct automessage *msg, *next_msg;
@@ -7657,7 +7419,7 @@ ACMD(do_automessage) {
 	if (is_abbrev(cmd_arg, "list")) {
 		size = snprintf(buf, sizeof(buf), "Automessages:\r\n");
 		
-		HASH_ITER(hh, automessages, msg, next_msg) {
+		HASH_ITER(hh, automessages_table, msg, next_msg) {
 			switch (msg->timing) {
 				case AUTOMSG_REPEATING: {
 					snprintf(part, sizeof(part), "%s (%dm)", automessage_types[msg->timing], msg->interval);
@@ -7682,7 +7444,7 @@ ACMD(do_automessage) {
 			}
 		}
 		
-		if (!automessages) {
+		if (!automessages_table) {
 			size += snprintf(buf + size, sizeof(buf) - size, " none\r\n");
 		}
 		if (ch->desc) {
@@ -7729,12 +7491,12 @@ ACMD(do_automessage) {
 		msg->interval = interval;
 		msg->msg = str_dup(argument);
 		
-		HASH_ADD_INT(automessages, id, msg);
+		HASH_ADD_INT(automessages_table, id, msg);
 		
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s added automessage %d: %s", GET_NAME(ch), msg->id, msg->msg);
 		msg_to_char(ch, "You create a new message %d: %s\r\n", msg->id, NULLSAFE(msg->msg));
 		
-		HASH_SORT(automessages, sort_automessage_by_data);
+		HASH_SORT(automessages_table, sort_automessage_by_data);
 		save_automessages();
 	}
 	else if (is_abbrev(cmd_arg, "change")) {
@@ -7745,7 +7507,7 @@ ACMD(do_automessage) {
 			return;
 		}
 		
-		HASH_FIND_INT(automessages, &id, msg);
+		HASH_FIND_INT(automessages_table, &id, msg);
 		if (!msg) {
 			msg_to_char(ch, "Invalid message id %d.\r\n", id);
 			return;
@@ -7770,7 +7532,7 @@ ACMD(do_automessage) {
 				msg->interval = 5;	// safe default
 			}
 			msg->timing = type;
-			HASH_SORT(automessages, sort_automessage_by_data);
+			HASH_SORT(automessages_table, sort_automessage_by_data);
 			save_automessages();
 		}
 		else if (is_abbrev(type_arg, "interval")) {
@@ -7816,7 +7578,7 @@ ACMD(do_automessage) {
 		}
 		
 		id = atoi(argument);
-		HASH_FIND_INT(automessages, &id, msg);
+		HASH_FIND_INT(automessages_table, &id, msg);
 		if (!msg) {
 			msg_to_char(ch, "No such message id to delete.\r\n");
 			return;
@@ -7824,7 +7586,7 @@ ACMD(do_automessage) {
 		
 		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s deleted automessage %d: %s", GET_NAME(ch), msg->id, msg->msg);
 		msg_to_char(ch, "You delete message %d: %s\r\n", msg->id, NULLSAFE(msg->msg));
-		HASH_DEL(automessages, msg);
+		HASH_DEL(automessages_table, msg);
 		free_automessage(msg);
 		save_automessages();
 	}
@@ -7843,7 +7605,6 @@ ACMD(do_automessage) {
 
 
 ACMD(do_autostore) {
-	void read_vault(empire_data *emp);
 	obj_data *obj, *next_obj;
 	vehicle_data *veh;
 	empire_data *emp = ROOM_OWNER(IN_ROOM(ch));
@@ -8079,10 +7840,6 @@ ACMD(do_distance) {
 
 // this also handles emote
 ACMD(do_echo) {
-	void add_to_channel_history(char_data *ch, int type, char_data *speaker, char *message);
-	void clear_last_act_message(descriptor_data *desc);
-	extern bool is_ignoring(char_data *ch, char_data *victim);
-	
 	char string[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	char hbuf[MAX_INPUT_LENGTH];
 	char *ptr, *end;
@@ -8473,8 +8230,6 @@ ACMD(do_endwar) {
  * see config.c for the list of loadable files
  */
 ACMD(do_file) {
-	extern struct file_lookup_struct file_lookup[];
-	
 	FILE *req_file;
  	int cur_line = 0, num_lines = 0, req_lines = 0, i, l;
 	char field[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH];
@@ -8838,8 +8593,6 @@ ACMD(do_invis) {
 
 
 ACMD(do_island) {
-	void save_island_table();
-
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH * 2], line[256], flags[256];
 	struct island_info *isle, *next_isle;
 	room_data *center;
@@ -8964,8 +8717,6 @@ ACMD(do_island) {
 
 
 ACMD(do_last) {
-	extern const char *level_names[][2];
-	
 	char_data *plr = NULL;
 	bool file = FALSE;
 	char status[10];
@@ -8994,10 +8745,6 @@ ACMD(do_last) {
 
 
 ACMD(do_load) {
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
-	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	vehicle_data *veh;
 	char_data *mob, *mort;
 	obj_data *obj;
@@ -9082,8 +8829,6 @@ ACMD(do_load) {
 
 
 ACMD(do_mapout) {
-	void output_map_to_file(void);
-
 	msg_to_char(ch, "Writing map output file...\r\n");
 	output_map_to_file();
 	msg_to_char(ch, "Done.\r\n");
@@ -9268,8 +9013,6 @@ ACMD(do_peace) {
 
 
 ACMD(do_playerdelete) {
-	void delete_player_character(char_data *ch);
-	
 	descriptor_data *desc, *next_desc;
 	char name[MAX_INPUT_LENGTH];
 	char_data *victim = NULL;
@@ -9387,8 +9130,6 @@ ACMD(do_poofset) {
 
 
 ACMD(do_purge) {
-	void deliver_shipment(empire_data *emp, struct shipping_data *shipd);
-	
 	struct shipping_data *shipd, *next_shipd;
 	char_data *vict, *next_v;
 	vehicle_data *veh;
@@ -9492,12 +9233,6 @@ ACMD(do_random) {
 
 
 ACMD(do_reboot) {
-	void perform_reboot();
-	void update_reboot();
-	extern struct reboot_control_data reboot_control;
-	extern const char *shutdown_types[];
-	extern const char *reboot_type[];
-	
 	char arg[MAX_INPUT_LENGTH];
 	descriptor_data *desc;
 	int type, time = 0, var;
@@ -9571,23 +9306,17 @@ ACMD(do_reboot) {
  * would be nice to have a syslog. -paul 12/8/2014
  */
 ACMD(do_reload) {
-	extern int file_to_string_alloc(const char *name, char **buf);
-	void index_boot_help();
-	void load_data_table();
-	void load_intro_screens();
 	extern char *credits;
 	extern char *motd;
 	extern char *news;
 	extern char *imotd;
 	extern char *CREDIT_MESSG;
-	extern char *help;
+	extern char *help_screen;
 	extern char *info;
 	extern char *handbook;
 	extern char *policies;
 	extern char *wizlist;
 	extern char *godlist;
-	extern struct help_index_element *help_table;
-	extern int top_of_helpt;
 	
 	int i;
 
@@ -9603,7 +9332,7 @@ ACMD(do_reload) {
 		file_to_string_alloc(MOTD_FILE, &motd);
 		file_to_string_alloc(NEWS_FILE, &news);
 		file_to_string_alloc(IMOTD_FILE, &imotd);
-		file_to_string_alloc(HELP_PAGE_FILE, &help);
+		file_to_string_alloc(HELP_PAGE_FILE, &help_screen);
 		file_to_string_alloc(INFO_FILE, &info);
 		file_to_string_alloc(POLICIES_FILE, &policies);
 		file_to_string_alloc(HANDBOOK_FILE, &handbook);
@@ -9621,7 +9350,7 @@ ACMD(do_reload) {
 	else if (!str_cmp(arg, "news"))
 		file_to_string_alloc(NEWS_FILE, &news);
 	else if (!str_cmp(arg, "help"))
-		file_to_string_alloc(HELP_PAGE_FILE, &help);
+		file_to_string_alloc(HELP_PAGE_FILE, &help_screen);
 	else if (!str_cmp(arg, "info"))
 		file_to_string_alloc(INFO_FILE, &info);
 	else if (!str_cmp(arg, "policy"))
@@ -9660,8 +9389,6 @@ ACMD(do_reload) {
 
 
 ACMD(do_rescale) {
-	void scale_item_to_level(obj_data *obj, int level);
-	
 	vehicle_data *veh;
 	obj_data *obj, *new;
 	char_data *vict;
@@ -9731,9 +9458,6 @@ ACMD(do_rescale) {
 
 
 ACMD(do_restore) {
-	void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
-	void complete_vehicle(vehicle_data *veh);
-	
 	char name_arg[MAX_INPUT_LENGTH], *type_args, arg[MAX_INPUT_LENGTH], msg[MAX_STRING_LENGTH], types[MAX_STRING_LENGTH];
 	ability_data *abil, *next_abil;
 	skill_data *skill, *next_skill;
@@ -10215,9 +9939,6 @@ ACMD(do_show) {
 
 
 ACMD(do_slay) {
-	extern bool check_scaling(char_data *mob, char_data *attacker);
-	extern obj_data *die(char_data *ch, char_data *killer);
-	
 	char_data *vict;
 
 	one_argument(argument, arg);
@@ -10516,8 +10237,7 @@ ACMD(do_syslog) {
 
 
 ACMD(do_tedit) {
-	extern struct tedit_struct tedit_option[];
-	
+	// see configs.c for tedit_option[]
 	int l, i;
 	char field[MAX_INPUT_LENGTH];
 
@@ -10684,8 +10404,6 @@ ACMD(do_trans) {
 
 
 ACMD(do_unbind) {
-	void free_obj_binding(struct obj_binding **list);
-	
 	obj_data *obj;
 	
 	one_argument(argument, arg);
@@ -10708,9 +10426,6 @@ ACMD(do_unbind) {
 
 
 ACMD(do_unprogress) {
-	void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
-	void remove_completed_goal(empire_data *emp, any_vnum vnum);
-	
 	char emp_arg[MAX_INPUT_LENGTH], prg_arg[MAX_INPUT_LENGTH];
 	empire_data *emp, *next_emp, *only = NULL;
 	struct empire_goal *goal;
@@ -10774,8 +10489,6 @@ ACMD(do_unprogress) {
 
 
 ACMD(do_unquest) {
-	void drop_quest(char_data *ch, struct player_quest *pq);
-	
 	struct player_completed_quest *pcq, *next_pcq;
 	struct player_quest *pq, *next_pq;
 	char arg[MAX_INPUT_LENGTH];
@@ -11338,8 +11051,6 @@ ACMD(do_vstat) {
 
 
 ACMD(do_wizlock) {
-	extern int wizlock_level;
-	extern char *wizlock_message;
 	int value;
 	const char *when;
 

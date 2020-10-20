@@ -47,30 +47,54 @@
 #define DO_ABIL(name)  void (name)(char_data *ch, ability_data *abil, int level, char_data *vict, struct ability_exec *data)
 
 
-// protos
+// class.c prototypes
+void assign_class_abilities(char_data *ch, class_data *cls, int role);
+bool remove_vnum_from_class_abilities(struct class_ability **list, any_vnum vnum);
+void update_class(char_data *ch);
+
+// skills.c prototypes
+// TODO sort this
 void add_ability(char_data *ch, ability_data *abil, bool reset_levels);
+void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
 void adjust_abilities_to_empire(char_data *ch, empire_data *emp, bool add);
-extern bool can_gain_exp_from(char_data *ch, char_data *vict);
-extern bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type);
+bool can_gain_exp_from(char_data *ch, char_data *vict);
+bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type);
+bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 void charge_ability_cost(char_data *ch, int cost_pool, int cost_amount, int cooldown_type, int cooldown_time, int wait_type);
-extern bool check_can_gain_skill(char_data *ch, any_vnum skill_vnum);
-extern bool check_solo_role(char_data *ch);
+void check_ability_levels(char_data *ch, any_vnum skill);
+bool check_can_gain_skill(char_data *ch, any_vnum skill_vnum);
+void check_skill_sell(char_data *ch, ability_data *abil);
+bool check_solo_role(char_data *ch);
+void clear_char_abilities(char_data *ch, any_vnum skill);
+void empire_player_tech_skillup(empire_data *emp, int tech, double amount);
+void empire_skillup(empire_data *emp, any_vnum ability, double amount);
 void gain_ability_exp(char_data *ch, any_vnum ability, double amount);
 void gain_player_tech_exp(char_data *ch, int tech, double amount);
-extern bool gain_skill(char_data *ch, skill_data *skill, int amount);
-extern bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount);
-extern struct player_ability_data *get_ability_data(char_data *ch, any_vnum abil_id, bool add_if_missing);
-extern int get_ability_level(char_data *ch, any_vnum ability);
-extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
-extern int get_approximate_level(char_data *ch);
-extern struct player_skill_data *get_skill_data(char_data *ch, any_vnum vnum, bool add_if_missing);
-extern int has_skill_flagged(char_data *ch, bitvector_t skill_flag);
+bool gain_skill(char_data *ch, skill_data *skill, int amount);
+bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount);
+struct player_ability_data *get_ability_data(char_data *ch, any_vnum abil_id, bool add_if_missing);
+int get_ability_level(char_data *ch, any_vnum ability);
+int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
+int get_approximate_level(char_data *ch);
+int get_attack_type_by_name(char *name);
+struct player_skill_data *get_skill_data(char_data *ch, any_vnum vnum, bool add_if_missing);
+void give_level_zero_abilities(char_data *ch);
+bool has_cooking_fire(char_data *ch);
+int has_skill_flagged(char_data *ch, bitvector_t skill_flag);
 void mark_level_gained_from_ability(char_data *ch, ability_data *abil);
+void perform_npc_tie(char_data *ch, char_data *victim, int subcmd);
+void perform_swap_skill_sets(char_data *ch);
 void remove_ability(char_data *ch, ability_data *abil, bool reset_levels);
-extern bool remove_skills_by_flag(char_data *ch, bitvector_t skill_flag);
+void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
+bool remove_ability_from_synergy_abilities(struct synergy_ability **list, any_vnum abil_vnum);
+bool remove_skills_by_flag(char_data *ch, bitvector_t skill_flag);
+bool remove_vnum_from_skill_abilities(struct skill_ability **list, any_vnum vnum);
 void set_skill(char_data *ch, any_vnum skill, int level);
-extern bool skill_check(char_data *ch, any_vnum ability, int difficulty);
-extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
+bool skill_check(char_data *ch, any_vnum ability, int difficulty);
+bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
+
+// spells.c prototypes
+bool trigger_counterspell(char_data *ch);
 
 
 // DIFF_x: skill_check difficulties
@@ -356,13 +380,13 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define TOTAL_ATTACK_TYPES		(TYPE_SUFFERING + 30)
 
 
-// SIEGE_x types for besiege
+// SIEGE_x: types for besiege
 #define SIEGE_PHYSICAL  0
 #define SIEGE_MAGICAL  1
 #define SIEGE_BURNING  2
 
 
-// armor types
+// ARMOR_x: armor types
 #define ARMOR_MAGE  0
 #define ARMOR_LIGHT  1
 #define ARMOR_MEDIUM  2
@@ -370,7 +394,7 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define NUM_ARMOR_TYPES  4
 
 
-/* Damage types */
+/* DAM_x: Damage types */
 #define DAM_PHYSICAL  0
 #define DAM_MAGICAL  1
 #define DAM_FIRE  2
@@ -378,26 +402,26 @@ extern bool player_tech_skill_check(char_data *ch, int tech, int difficulty);
 #define DAM_DIRECT  4
 
 
-// Fight modes
+// FMODE_x: Fight modes
 #define FMODE_MELEE  0	// Hand-to-hand combat
 #define FMODE_MISSILE  1	// Ranged combat
 #define FMODE_WAITING  2	// Fighting someone in ranged combat
 
 
-// Rescue message types
+// RESCUE_x: Rescue message types
 #define RESCUE_NO_MSG  0
 #define RESCUE_RESCUE  1	// traditional rescue message
 #define RESCUE_FOCUS  2		// mob changes focus
 
 
-// speeds for attack_hit_info.speed
+// SPD_x: speeds for attack_hit_info.speed
 #define SPD_FAST  0
 #define SPD_NORMAL  1
 #define SPD_SLOW  2
 #define NUM_SPEEDS  3
 
 
-// Weapon types
+// WEAPON_x: Weapon types
 #define WEAPON_BLUNT  0
 #define WEAPON_SHARP  1
 #define WEAPON_MAGIC  2
@@ -436,8 +460,11 @@ struct ability_exec_type {
 };
 
 
-// skill and ability data
+// constants.c externs that need skills.h
+extern const char *armor_types[NUM_ARMOR_TYPES+1];
+extern const double armor_scale_bonus[NUM_ARMOR_TYPES];
 extern struct attack_hit_type attack_hit_info[NUM_ATTACK_TYPES];
+extern double skill_check_difficulty_modifier[NUM_DIFF_TYPES];
 
 
  //////////////////////////////////////////////////////////////////////////////

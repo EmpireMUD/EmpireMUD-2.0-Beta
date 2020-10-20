@@ -26,6 +26,7 @@
 #include "dg_event.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -46,27 +47,11 @@ const char *default_event_name = "Unnamed Event";
 const char *default_event_description = "This event has no description.\r\n";
 const char *default_event_complete_msg = "The event has ended.\r\n";
 
-// external consts
-extern const char *event_types[];
-extern const char *event_flags[];
-extern const char *olc_type_bits[NUM_OLC_TYPES+1];
-extern const char *quest_reward_types[];
-
-// external funcs
-extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
-extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-
 // local protos
 EVENT_CANCEL_FUNC(cancel_event_event);
-struct player_event_data *get_event_data(char_data *ch, int event_id);
 void schedule_event_event(struct event_running_data *erd);
 int sort_event_rewards(struct event_reward *a, struct event_reward *b);
 void update_player_leaderboard(char_data *ch, struct event_running_data *re, struct player_event_data *ped);
-
-
-#define EVENT_CMD(name)		void (name)(char_data *ch, char *argument)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -179,8 +164,6 @@ char *get_event_name_by_proto(any_vnum vnum) {
 * @return char* The string display.
 */
 char *event_reward_string(struct event_reward *reward, bool show_vnums) {
-	extern char *quest_reward_string(struct quest_reward *reward, bool show_vnums);
-
 	struct quest_reward qr;
 
 	// borrow data to use the other reward string func
@@ -1350,20 +1333,12 @@ void clear_event(event_data *event) {
 * @return struct event_reward* The copy of the list.
 */
 struct event_reward *copy_event_rewards(struct event_reward *from) {
-	struct event_reward *el, *iter, *list = NULL, *end = NULL;
+	struct event_reward *el, *iter, *list = NULL;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct event_reward, 1);
 		*el = *iter;
-		el->next = NULL;
-		
-		if (end) {
-			end->next = el;
-		}
-		else {
-			list = el;
-		}
-		end = el;
+		LL_APPEND(list, el);
 	}
 	
 	return list;
@@ -1460,8 +1435,6 @@ void parse_event_reward(char *line, struct event_reward **list, char *error_str)
 * @param any_vnum vnum The event vnum
 */
 void parse_event(FILE *fl, any_vnum vnum) {
-	void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
-	
 	char line[256], error[256], str_in[256];
 	event_data *event, *find;
 	int int_in[6];
@@ -1542,8 +1515,6 @@ void parse_event(FILE *fl, any_vnum vnum) {
 * @bool rank If TRUE, requires min-max rank. FALSE is threshold mode and only needs min points.
 */
 void process_evedit_rewards(char_data *ch, char *argument, struct event_reward **list, char *cmd, bool rank) {
-	extern any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *prev_arg);
-	
 	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH];
 	char min_arg[MAX_INPUT_LENGTH], max_arg[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
@@ -2247,8 +2218,6 @@ void save_olc_event(descriptor_data *desc) {
 * @return event_data* The copied event.
 */
 event_data *setup_olc_event(event_data *input) {
-	extern struct apply_data *copy_apply_list(struct apply_data *input);
-	
 	event_data *new;
 	
 	CREATE(new, event_data, 1);
@@ -2967,8 +2936,6 @@ EVENT_CMD(evcmd_cancel) {
 
 // collects all pending rewards
 EVENT_CMD(evcmd_collect) {
-	void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id);
-	
 	int level;
 	struct player_event_data *ped, *next_ped;
 	struct event_running_data *run_dat;

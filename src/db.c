@@ -25,6 +25,7 @@
 #include "olc.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -44,25 +45,73 @@
 *   Miscellaneous Savers
 */
 
-// external vars
-
-// external functions
-void check_delayed_load(char_data *ch);
-void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
-void delete_instance(struct instance_data *inst, bool run_cleanup);	// instance.c
-void discrete_load(FILE *fl, int mode, char *filename);
-void free_complex_data(struct complex_room_data *data);
-extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
-void index_boot(int mode);
-extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
-void save_whole_world();
-void update_all_players(char_data *to_message, PLAYER_UPDATE_FUNC(*func));
+// functions called during startup
+void Read_Invalid_List();
+void abandon_lost_vehicles();
+void boot_world();
+void build_all_quest_lookups();
+void build_all_shop_lookups();
+void build_land_map();
+void build_player_index();
+void build_world_map();
+void check_abilities();
+void check_and_link_faction_relations();
+void check_archetypes();
+void check_classes();
+void check_for_bad_buildings();
+void check_for_bad_sectors();
+void check_for_new_map();
+void check_learned_empire_crafts();
+void check_newbie_islands();
+void check_nowhere_einv_all();
+void check_sector_times(any_vnum only_sect);
+void check_skills();
+void check_triggers();
+void check_version();
+void chore_update();
+void clean_empire_logs();
+void compute_generic_relations();
+void delete_old_players();
+void delete_orphaned_rooms();
+void expire_old_politics();
+void generate_island_descriptions();
+void index_boot_world();
+void init_config_system();
+void init_inherent_player_techs();
+void init_reputation();
+void link_and_check_vehicles();
+void load_automessages();
+void load_banned();
+void load_daily_quest_file();
+void load_empire_storage();
+void load_fight_messages();
+void load_instances();
+void load_islands();
+void load_running_events_file();
+void load_slash_channels();
+void load_tips_of_the_day();
+void load_trading_post();
+void load_world_map_from_file();
+void read_ability_requirements();
+void renum_world();
+void run_reboot_triggers();
+void schedule_map_unloads();
+void setup_island_levels();
+void sort_commands();
+void startup_room_reset();
+void update_instance_world_size();
+void verify_empire_goals();
+void verify_running_events();
+void verify_sectors();
+int sort_abilities_by_data(ability_data *a, ability_data *b);
+int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
+int sort_augments_by_data(augment_data *a, augment_data *b);
+int sort_classes_by_data(class_data *a, class_data *b);
+int sort_skills_by_data(skill_data *a, skill_data *b);
+int sort_socials_by_data(social_data *a, social_data *b);
 
 // local functions
-int file_to_string_alloc(const char *name, char **buf);
 void get_one_line(FILE *fl, char *buf);
-void index_boot_help();
-void reset_time();
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -84,7 +133,7 @@ augment_data *augment_table = NULL;	// master augment hash table
 augment_data *sorted_augments = NULL;	// alphabetic version // sorted_hh
 
 // automessage system
-struct automessage *automessages = NULL;	// hash table (hh, by id)
+struct automessage *automessages_table = NULL;	// hash table (hh, by id)
 int max_automessage_id = 0;	// read from file, permanent max id
 
 // buildings
@@ -104,7 +153,7 @@ crop_data *crop_table = NULL;	// crop hash table
 // empires
 empire_data *empire_table = NULL;	// hash table of empires
 double empire_score_average[NUM_SCORES];
-struct trading_post_data *trading_list = NULL;	// global LL of trading post stuff
+struct trading_post_data *trading_list = NULL;	// global DLL of trading post stuff
 bool check_empire_refresh = FALSE;	// triggers empire refreshes
 
 // events
@@ -208,7 +257,7 @@ char *imotd = NULL;	// message of the day - immorts
 char **intros = NULL;	// array of intro screens
 int num_intros = 0;	// total number of intro screens
 char *CREDIT_MESSG = NULL;	// short credits
-char *help = NULL;	// help screen
+char *help_screen = NULL;	// help screen
 char *info = NULL;	// info page
 char *wizlist = NULL;	// list of higher gods
 char *godlist = NULL;	// list of peon gods
@@ -290,44 +339,6 @@ struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES] = {
 * world (objs, mobs, etc) has its own function.
 */
 void boot_db(void) {
-	void Read_Invalid_List();
-	void abandon_lost_vehicles();
-	void boot_world();
-	void build_all_quest_lookups();
-	void build_all_shop_lookups();
-	void build_player_index();
-	void check_for_new_map();
-	void check_learned_empire_crafts();
-	void check_nowhere_einv_all();
-	void check_ruined_cities();
-	void check_version();
-	void check_sector_times(any_vnum only_sect);
-	void chore_update();
-	void delete_old_players();
-	void delete_orphaned_rooms();
-	void expire_old_politics();
-	void generate_island_descriptions();
-	void init_config_system();
-	void init_inherent_player_techs();
-	void link_and_check_vehicles();
-	void load_automessages();
-	void load_banned();
-	void load_data_table();
-	void load_intro_screens();
-	void load_fight_messages();
-	void load_slash_channels();
-	void load_tips_of_the_day();
-	void load_trading_post();
-	int run_convert_vehicle_list();
-	void run_reboot_triggers();
-	void schedule_map_unloads();
-	void setup_island_levels();
-	void sort_commands();
-	void startup_room_reset();
-	void update_instance_world_size();
-	void verify_empire_goals();
-	void verify_sectors();
-
 	log("Boot db -- BEGIN.");
 	
 	log("Loading game config system.");
@@ -344,7 +355,7 @@ void boot_db(void) {
 	file_to_string_alloc(CREDITS_FILE, &credits);
 	file_to_string_alloc(MOTD_FILE, &motd);
 	file_to_string_alloc(IMOTD_FILE, &imotd);
-	file_to_string_alloc(HELP_PAGE_FILE, &help);
+	file_to_string_alloc(HELP_PAGE_FILE, &help_screen);
 	file_to_string_alloc(INFO_FILE, &info);
 	file_to_string_alloc(WIZLIST_FILE, &wizlist);
 	file_to_string_alloc(GODLIST_FILE, &godlist);
@@ -409,9 +420,6 @@ void boot_db(void) {
 	verify_sectors();
 	check_sector_times(NOTHING);
 	
-	// convert vehicles -- this normally does nothing, but it may free a temporary list
-	run_convert_vehicle_list();
-	
 	log("Checking for orphaned rooms...");
 	delete_orphaned_rooms();
 	
@@ -466,41 +474,8 @@ void boot_db(void) {
 * rooms (because rooms have sectors).
 */
 void boot_world(void) {
-	void build_land_map();
-	void build_world_map();
-	void check_abilities();
-	void check_and_link_faction_relations();
-	void check_archetypes();
-	void check_classes();
-	void check_skills();
-	void check_for_bad_buildings();
-	void check_for_bad_sectors();
-	void check_newbie_islands();
-	void check_triggers();
-	void clean_empire_logs();
-	void compute_generic_relations();
-	void index_boot_world();
-	void init_reputation();
-	void load_daily_quest_file();
-	void load_empire_storage();
-	void load_instances();
-	void load_islands();
-	void load_running_events_file();
-	void load_world_map_from_file();
-	void number_and_count_islands(bool reset);
-	void read_ability_requirements();
-	void renum_world();
-	void setup_start_locations();
-	void verify_running_events();
-	extern int sort_abilities_by_data(ability_data *a, ability_data *b);
-	extern int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
-	extern int sort_augments_by_data(augment_data *a, augment_data *b);
-	extern int sort_classes_by_data(class_data *a, class_data *b);
-	extern int sort_crafts_by_data(craft_data *a, craft_data *b);
-	extern int sort_skills_by_data(skill_data *a, skill_data *b);
-	extern int sort_socials_by_data(social_data *a, social_data *b);
-
 	// DB_BOOT_x search: boot new types in this function
+	// TODO: could load them sequentially fromm the array (need to order the array)
 	
 	log("Loading generics.");
 	index_boot(DB_BOOT_GEN);
@@ -719,10 +694,7 @@ void add_trd_owner(room_vnum vnum, empire_vnum owner) {
 * startup and should also be called any time a building is deleted.
 */
 void check_for_bad_buildings(void) {
-	void unlink_instance_entrance(room_data *room, bool run_cleanup);
-	extern const char *bld_relationship_types[];
-
-	struct obj_storage_type *store, *next_store, *temp;
+	struct obj_storage_type *store, *next_store;
 	struct bld_relation *relat, *next_relat;
 	bld_data *bld, *next_bld;
 	room_data *room, *next_room;
@@ -758,7 +730,7 @@ void check_for_bad_buildings(void) {
 		else if (ROOM_AFF_FLAGGED(room, ROOM_AFF_HAS_INSTANCE) && !find_instance_by_room(room, TRUE, FALSE)) {
 			// room is marked as an instance entrance, but no instance is associated with it
 			log(" unlinking instance entrance room %d for no association with an instance", GET_ROOM_VNUM(room));
-			unlink_instance_entrance(room, FALSE);
+			unlink_instance_entrance(room, NULL, FALSE);
 		}
 		/* This probably isn't necessary and having it here will cause roads to be pulled up as of b3.17 -paul
 		else if (COMPLEX_DATA(room) && !GET_BUILDING(room) && !GET_ROOM_TEMPLATE(room)) {
@@ -798,7 +770,7 @@ void check_for_bad_buildings(void) {
 			next_store = store->next;
 			
 			if (store->type == TYPE_BLD && store->vnum != NOTHING && !building_proto(store->vnum)) {
-				REMOVE_FROM_LIST(store, obj->proto_data->storage, next);
+				LL_DELETE(obj->proto_data->storage, store);
 				free(store);
 				log(" removing storage for obj %d for bad building type", obj->vnum);
 				save_library_file_for_vnum(DB_BOOT_OBJ, obj->vnum);
@@ -813,7 +785,7 @@ void check_for_bad_buildings(void) {
 				next_store = store->next;
 			
 				if (store->type == TYPE_BLD && store->vnum != NOTHING && !building_proto(store->vnum)) {
-					REMOVE_FROM_LIST(store, GET_OLC_OBJECT(dd)->proto_data->storage, next);
+					LL_DELETE(GET_OLC_OBJECT(dd)->proto_data->storage, store);
 					free(store);
 					msg_to_desc(dd, "&RYou are editing an object whose storage building has been deleted. Building type removed.&0\r\n");
 				}
@@ -840,7 +812,7 @@ void check_for_bad_buildings(void) {
 * save the changes to file on its own; it will re-fix them on every boot.
 */
 void check_for_bad_sectors(void) {
-	struct evolution_data *evo, *next_evo, *temp;
+	struct evolution_data *evo, *next_evo;
 	sector_data *sect, *next_sect;
 
 	HASH_ITER(hh, sector_table, sect, next_sect) {
@@ -850,7 +822,7 @@ void check_for_bad_sectors(void) {
 			
 			// oops: remove bad evo
 			if (!sector_proto(evo->becomes)) {
-				REMOVE_FROM_LIST(evo, GET_SECT_EVOS(sect), next);
+				LL_DELETE(GET_SECT_EVOS(sect), evo);
 				free(evo);
 			}
 		}
@@ -981,14 +953,8 @@ void process_temporary_room_data(void) {
 * scheduled until this point.
 */
 void renum_world(void) {
-	void check_tavern_setup(room_data *room);
-	void schedule_burn_down(room_data *room);
-	void schedule_crop_growth(struct map_data *map);
-	void schedule_room_affect_expire(room_data *room, struct affected_type *af);
-	void schedule_trench_fill(struct map_data *map);
-	
 	room_data *room, *next_room, *home;
-	struct room_direction_data *ex, *next_ex, *temp;
+	struct room_direction_data *ex, *next_ex;
 	struct affected_type *af;
 	struct map_data *map;
 	
@@ -1019,7 +985,7 @@ void renum_world(void) {
 					if (ex->keyword) {
 						free(ex->keyword);
 					}
-					REMOVE_FROM_LIST(ex, COMPLEX_DATA(room)->exits, next);
+					LL_DELETE(COMPLEX_DATA(room)->exits, ex);
 					free(ex);
 				}
 			}
@@ -1153,7 +1119,6 @@ int file_to_string(const char *name, char *buf) {
  * is to the string we're interested in and not a copy.
  */
 int file_to_string_alloc(const char *name, char **buf) {
-	extern int file_to_string(const char *name, char *buf);
 	char temp[MAX_STRING_LENGTH];
 	descriptor_data *in_use;
 
@@ -1342,8 +1307,6 @@ void load_help(FILE *fl) {
 * Loads the help index and every help file therein.
 */
 void index_boot_help(void) {
-	extern int help_sort(const void *a, const void *b);
-	
 	const char *index_filename, *prefix = NULL;	/* NULL or egcs 1.1 complains */
 	FILE *index, *db_file;
 	int rec_count = 0, size[2];
@@ -1446,8 +1409,7 @@ void push_island(struct map_data *loc) {
 	struct island_num_data_t *island;
 	CREATE(island, struct island_num_data_t, 1);
 	island->loc = loc;
-	island->next = island_stack;
-	island_stack = island;
+	LL_PREPEND(island_stack, island);
 }
 
 
@@ -2131,8 +2093,6 @@ PLAYER_UPDATE_FUNC(b3_2_player_gear_disenchant) {
 
 // removes the PLAYER-MADE flag from rooms and sets their "natural sect" instead
 void b3_2_map_and_gear(void) {
-	void save_trading_post();
-
 	obj_data *obj, *next_obj, *new, *proto;
 	struct empire_unique_storage *eus;
 	struct trading_post_data *tpd;
@@ -2192,7 +2152,7 @@ void b3_2_map_and_gear(void) {
 	}
 	
 	log(" - disenchanting trading post objects...");
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			tpd->obj = new;
@@ -2281,8 +2241,6 @@ PLAYER_UPDATE_FUNC(b3_12_update_players) {
 
 // respawns wild crops and converts 5% of jungle to crops
 void b3_15_crop_update(void) {
-	extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
-	
 	struct map_data *map;
 	crop_data *new_crop;
 	room_data *room;
@@ -2321,8 +2279,6 @@ void b3_15_crop_update(void) {
 
 // adds built-with resources to roads
 void b3_17_road_update(void) {
-	extern struct complex_room_data *init_complex_data();
-	
 	struct map_data *map;
 	room_data *room;
 	
@@ -2403,9 +2359,6 @@ PLAYER_UPDATE_FUNC(b4_4_fight_messages) {
 
 // convert data on unfinished buildings and disrepair
 void b4_15_building_update(void) {
-	extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
-	extern struct resource_data *copy_resource_list(struct resource_data *input);
-	
 	struct resource_data *res, *disrepair_res;
 	room_data *room, *next_room;
 	
@@ -2557,8 +2510,6 @@ void b4_39_data_conversion(void) {
 
 // b5.1 changes the values of ATYPE_x consts and this updates existing affects
 PLAYER_UPDATE_FUNC(b5_1_update_players) {
-	void free_var_el(struct trig_var_data *var);
-	
 	struct trig_var_data *var, *next_var;
 	struct over_time_effect_type *dot;
 	struct affected_type *af;
@@ -2776,8 +2727,6 @@ PLAYER_UPDATE_FUNC(b5_14_player_superiors) {
 
 // removes the PLAYER-MADE flag from rooms and sets their "natural sect" instead
 void b5_14_superior_items(void) {
-	void save_trading_post();
-
 	obj_data *obj, *next_obj, *new, *proto;
 	struct empire_unique_storage *eus;
 	struct trading_post_data *tpd;
@@ -2806,7 +2755,7 @@ void b5_14_superior_items(void) {
 	}
 	
 	log(" - refreshing superiors in trading post objects...");
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			tpd->obj = new;
@@ -2934,8 +2883,6 @@ PLAYER_UPDATE_FUNC(b5_23_player_potion_update) {
 
 // reloads and rescales all potions, and moves them from warehouse to einv if possible
 void b5_23_potion_update(void) {
-	void save_trading_post();
-	
 	struct empire_unique_storage *eus, *next_eus;
 	obj_data *obj, *next_obj, *new, *proto;
 	struct trading_post_data *tpd;
@@ -2974,7 +2921,7 @@ void b5_23_potion_update(void) {
 	}
 	
 	log(" - updating trading post objects...");
-	LL_FOREACH(trading_list, tpd) {
+	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			tpd->obj = new;
@@ -3018,8 +2965,6 @@ PLAYER_UPDATE_FUNC(b5_24_player_poison_update) {
 
 // reloads and rescales all poisons, and moves them from warehouse to einv if possible
 void b5_24_poison_update(void) {
-	void save_trading_post();
-	
 	struct empire_unique_storage *eus, *next_eus;
 	obj_data *obj, *next_obj, *new, *proto;
 	struct trading_post_data *tpd;
@@ -3058,7 +3003,7 @@ void b5_24_poison_update(void) {
 	}
 	
 	log(" - updating trading post objects...");
-	LL_FOREACH(trading_list, tpd) {
+	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && IS_POISON(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			tpd->obj = new;
@@ -3128,8 +3073,6 @@ void b5_30_empire_update(void) {
 
 
 PLAYER_UPDATE_FUNC(b5_34_player_update) {
-	void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
-	
 	struct player_skill_data *skill, *next_skill;
 	struct player_ability_data *abil, *next_abil;
 	int iter;
@@ -3174,9 +3117,6 @@ PLAYER_UPDATE_FUNC(b5_34_player_update) {
 
 // part of the HUGE progression update
 void b5_34_mega_update(void) {
-	void free_empire_goals(struct empire_goal *hash);
-	void free_empire_completed_goals(struct empire_completed_goal *hash);
-	
 	struct instance_data *inst, *next_inst;
 	struct empire_political_data *pol;
 	empire_data *emp, *next_emp;
@@ -3242,8 +3182,6 @@ void b5_34_mega_update(void) {
 
 // fixes some progression goals
 void b5_35_progress_update(void) {
-	void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
-	
 	struct empire_completed_goal *goal, *next_goal;
 	empire_data *emp, *next_emp;
 	
@@ -3312,8 +3250,6 @@ void b5_35_progress_update(void) {
 
 // fixes some progression goals
 void b5_37_progress_update(void) {
-	void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
-	
 	struct empire_completed_goal *goal, *next_goal;
 	struct instance_data *inst, *next_inst;
 	empire_data *emp, *next_emp;
@@ -3360,10 +3296,6 @@ void b5_38_grove_update(void) {
 
 // add new channels
 PLAYER_UPDATE_FUNC(b5_40_update_players) {
-	extern struct slash_channel *create_slash_channel(char *name);
-	extern struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
-	extern struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
-	
 	struct player_slash_channel *slash;
 	struct slash_channel *chan;
 	int iter;
@@ -3376,8 +3308,7 @@ PLAYER_UPDATE_FUNC(b5_40_update_players) {
 		}
 		if (!find_on_slash_channel(ch, chan->id)) {
 			CREATE(slash, struct player_slash_channel, 1);
-			slash->next = GET_SLASH_CHANNELS(ch);
-			GET_SLASH_CHANNELS(ch) = slash;
+			LL_PREPEND(GET_SLASH_CHANNELS(ch), slash);
 			slash->id = chan->id;
 		}
 	}
@@ -3410,8 +3341,6 @@ void b5_45_keep_update(void) {
 
 // fix reputation
 PLAYER_UPDATE_FUNC(b5_47_update_players) {
-	void update_reputations(char_data *ch);
-	
 	struct player_faction_data *fct, *next;
 	bool any = FALSE;
 	
@@ -3430,8 +3359,6 @@ PLAYER_UPDATE_FUNC(b5_47_update_players) {
 
 // resets mountain tiles off-cycle because of the addition of tin
 void b5_47_mine_update(void) {
-	void save_island_table();
-	
 	struct island_info *isle, *next_isle;
 	struct map_data *tile;
 	bool any = FALSE;
@@ -3489,8 +3416,6 @@ void b5_48_rope_update(void) {
 
 // tracks current empire einv as "gathered items" to retroactively set gather totals
 void b5_58_gather_totals(void) {
-	void save_marked_empires();
-	
 	struct empire_island *isle, *next_isle;
 	struct empire_storage_data *store, *next_store;
 	empire_data *emp, *next_emp;
@@ -3516,10 +3441,6 @@ void b5_58_gather_totals(void) {
 
 // add new channel
 PLAYER_UPDATE_FUNC(b5_60_update_players) {
-	extern struct slash_channel *create_slash_channel(char *name);
-	extern struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
-	extern struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
-	
 	struct player_slash_channel *slash;
 	struct slash_channel *chan;
 	int iter;
@@ -3532,8 +3453,7 @@ PLAYER_UPDATE_FUNC(b5_60_update_players) {
 		}
 		if (!find_on_slash_channel(ch, chan->id)) {
 			CREATE(slash, struct player_slash_channel, 1);
-			slash->next = GET_SLASH_CHANNELS(ch);
-			GET_SLASH_CHANNELS(ch) = slash;
+			LL_PREPEND(GET_SLASH_CHANNELS(ch), slash);
 			slash->id = chan->id;
 		}
 	}
@@ -3541,8 +3461,6 @@ PLAYER_UPDATE_FUNC(b5_60_update_players) {
 
 
 void b5_80_dailies_fix(void) {
-	void setup_daily_quest_cycles(int only_cycle);
-	
 	log("Applying b5.80 daily quests...");
 	setup_daily_quest_cycles(10700);
 	setup_daily_quest_cycles(16602);
@@ -3709,8 +3627,6 @@ PLAYER_UPDATE_FUNC(b5_86_player_missile_weapons) {
 // removes 'crop' tiles from the 'natural sectors' of all tiles, but does not affect any current sectors
 // also refreshes missile weapons
 void b5_86_update(void) {
-	void save_trading_post();
-	
 	obj_data *obj, *next_obj, *new;
 	struct empire_unique_storage *eus;
 	struct trading_post_data *tpd;
@@ -3751,7 +3667,7 @@ void b5_86_update(void) {
 	}
 	
 	log(" - refreshing trading post objects...");
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && IS_MISSILE_WEAPON(obj)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			tpd->obj = new;
@@ -3808,10 +3724,6 @@ void b5_86_update(void) {
 // removes 75% of unclaimed crops (previous patch removed wild crops in the map generator)
 // also adds old-growth forests
 void b5_87_crop_and_old_growth(void) {
-	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
-	void stop_room_action(room_data *room, int action);
-	void uncrop_tile(room_data *room);
-	
 	int removed_crop = 0, total_crop = 0, new_og = 0, total_forest = 0;
 	struct empire_completed_goal *goal, *next_goal;
 	empire_data *emp, *next_emp;
@@ -3947,7 +3859,6 @@ void b5_88_irrigation_repair(void) {
 // updates 
 void b5_88_resource_components_update(void) {
 	extern any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
-	void check_progress_refresh();
 	
 	craft_data *craft, *next_craft;
 	progress_data *prg, *next_prg;
@@ -4403,10 +4314,6 @@ void b5_99_henge_triggers(void) {
 bool override_home_storage_cap = FALSE;	// this ensures nobody loses items during this patch
 
 void b5_102_home_cleanup(void) {
-	void free_loaded_players();
-	void perform_autostore(obj_data *obj, empire_data *emp, int island);
-	void run_delayed_refresh();
-	
 	room_data *room, *next_room;
 	obj_data *obj, *next_obj;
 	
@@ -4442,7 +4349,6 @@ void b5_102_home_cleanup(void) {
 
 // b5.103 removes the REPAIR-VEHICLES workforce chore
 void b5_103_update(void) {
-	void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 	empire_data *emp, *next_emp;
 	
 	const int CHORE_REPAIR_VEHICLES = 26;
@@ -4473,7 +4379,6 @@ void b5_104_update(void) {
 
 // b5.105 modifies workforce configs due to chore changes
 void b5_105_update(void) {
-	void set_workforce_limit_all(empire_data *emp, int chore, int limit);
 	empire_data *emp, *next_emp;
 	
 	int CHORE_BRICKMAKING = 13;
@@ -4542,8 +4447,6 @@ PLAYER_UPDATE_FUNC(b5_107_players) {
 * Performs some auto-updates when the mud detects a new version.
 */
 void check_version(void) {
-	void resort_empires(bool force);
-	
 	int last, iter, current = NOTHING;
 	
 	#define MATCH_VERSION(name)  (!str_cmp(versions_list[iter], name))
@@ -4561,8 +4464,6 @@ void check_version(void) {
 		
 		// version-specific updates
 		if (MATCH_VERSION("b2.5")) {
-			void set_workforce_limit_all(empire_data *emp, int chore, int limit);
-			
 			log("Applying b2.5 update to empires...");
 			empire_data *emp, *next_emp;
 			HASH_ITER(hh, empire_table, emp, next_emp) {
@@ -4605,8 +4506,6 @@ void check_version(void) {
 			}
 		}
 		if (MATCH_VERSION("b2.11")) {
-			void save_trading_post();
-			
 			struct empire_unique_storage *eus;
 			struct trading_post_data *tpd;
 			empire_data *emp, *next_emp;
@@ -4641,7 +4540,7 @@ void check_version(void) {
 			}
 			
 			log(" - assigning triggers to trading post objects...");
-			for (tpd = trading_list; tpd; tpd = tpd->next) {
+			DL_FOREACH(trading_list, tpd) {
 				if (tpd->obj && (objpr = obj_proto(GET_OBJ_VNUM(tpd->obj)))) {
 					tpd->obj->proto_script = copy_trig_protos(objpr->proto_script);
 					assign_triggers(tpd->obj, OBJ_TRIGGER);
@@ -4694,9 +4593,8 @@ void check_version(void) {
 			b3_6_einv_fix();
 		}
 		if (MATCH_VERSION("b3.8")) {
-			void b3_8_ship_update(void);	// vehicles.c
-			log("Applying b3.8 update to vehicles...");
-			b3_8_ship_update();
+			// log("Applying b3.8 update to vehicles...");
+			// code removed in b5.110
 		}
 		if (MATCH_VERSION("b3.11")) {
 			log("Applying b3.11 fix to ships...");
@@ -4892,8 +4790,6 @@ void check_version(void) {
 * @param int chore Which CHORE_ to turn on.
 */
 void assign_old_workforce_chore(empire_data *emp, int chore) {
-	void set_workforce_limit(empire_data *emp, int island_id, int chore, int limit);
-	
 	struct trd_type *trd, *next_trd;
 	struct map_data *map;
 	int last_isle = -1;
@@ -4922,8 +4818,6 @@ void assign_old_workforce_chore(empire_data *emp, int chore) {
 
 /* reset the time in the game from file */
 void reset_time(void) {
-	void determine_seasons();
-	
 	long beginning_of_time = data_get_long(DATA_WORLD_START);
 	
 	// a whole new world!
@@ -4976,7 +4870,6 @@ void reset_time(void) {
 * @param int ptech The PTECH_ type to set as 'inherent'.
 */
 void set_inherent_ptech(int ptech) {
-	extern struct int_hash *inherent_ptech_hash;
 	struct int_hash *entry;
 	
 	HASH_FIND_INT(inherent_ptech_hash, &ptech, entry);
@@ -5060,8 +4953,8 @@ void load_fight_messages(void) {
 		CREATE(messages, struct message_type, 1);
 		fight_messages[i].number_of_attacks++;
 		fight_messages[i].a_type = type;
-		messages->next = fight_messages[i].msg;
-		fight_messages[i].msg = messages;
+		
+		LL_PREPEND(fight_messages[i].msg, messages);
 
 		messages->die_msg.attacker_msg = fread_action(fl, i);
 		messages->die_msg.victim_msg = fread_action(fl, i);
@@ -5204,7 +5097,7 @@ void load_tips_of_the_day(void) {
 * Loads the trading post data from file at startup, into trading_list.
 */
 void load_trading_post(void) {
-	struct trading_post_data *tpd = NULL, *last_tpd = NULL;
+	struct trading_post_data *tpd = NULL;
 	char line[256], str_in[256];
 	obj_data *obj;
 	int int_in[5];
@@ -5216,27 +5109,11 @@ void load_trading_post(void) {
 		return;
 	}
 	
-	// if somehow the trading list already exists
-	if ((last_tpd = trading_list)) {
-		while (last_tpd->next) {
-			last_tpd = last_tpd->next;
-		}
-	}
-	
 	while (get_line(fl, line)) {
 		switch (*line) {
 			case 'T': {	// begin new trade item
 				CREATE(tpd, struct trading_post_data, 1);
-				tpd->next = NULL;
-				
-				// put at end of list
-				if (last_tpd) {
-					last_tpd->next = tpd;
-				}
-				else {
-					trading_list = tpd;
-				}
-				last_tpd = tpd;
+				DL_APPEND(trading_list, tpd);
 				
 				if (sscanf(line, "T %d %s %ld %d %d %d %d", &int_in[0], str_in, &long_in, &int_in[1], &int_in[2], &int_in[3], &int_in[4]) != 7) {
 					log("SYSERR: Invalid T line in trading post file");
@@ -5291,7 +5168,7 @@ void save_trading_post(void) {
 		return;
 	}
 	
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		fprintf(fl, "T %d %s %ld %d %d %d %d\n", tpd->player, bitv_to_alpha(tpd->state), tpd->start, tpd->for_hours, tpd->buy_cost, tpd->post_cost, tpd->coin_type);
 		if (tpd->obj) {
 			Crash_save_one_obj_to_file(fl, tpd->obj, 0);

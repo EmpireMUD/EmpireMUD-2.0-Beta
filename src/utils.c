@@ -25,6 +25,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -50,25 +51,13 @@
 *   Converter Utils
 */
 
-// external vars
-extern const char *pool_types[];
-extern const char *tool_flags[];
-
 // external funcs
-void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
-extern struct resource_data *copy_resource_list(struct resource_data *input);
-void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
-extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 void remove_companion_mod(struct companion_data **companion, int type);
-void scale_item_to_level(obj_data *obj, int level);
-void send_char_pos(char_data *ch, int dam);
 
 // locals
 #define WHITESPACE " \t"	// used by some of the string functions
 bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
-bool empire_can_claim(empire_data *emp);
 bool ignore_distrustful_due_to_start_loc(room_data *loc);
-bool is_trading_with(empire_data *emp, empire_data *partner);
 void score_empires();
 void unmark_items_for_char(char_data *ch, bool ground);
 
@@ -422,9 +411,6 @@ void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_fla
 void run_delayed_refresh(void) {
 	void complete_goal(empire_data *emp, struct empire_goal *goal);
 	extern int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island);
-	void count_quest_tasks(struct req_data *list, int *complete, int *total);
-	void refresh_passive_buffs(char_data *ch);
-	void update_empire_members_and_greatness(empire_data *emp);
 	extern struct char_delayed_update *char_delayed_update_list;
 	
 	struct char_delayed_update *cdu, *next_cdu;
@@ -558,8 +544,6 @@ int get_total_score(empire_data *emp) {
 * @param bool force Overrides the time limit on resorting.
 */
 void resort_empires(bool force) {
-	extern int sort_empires(empire_data *a, empire_data *b);
-	
 	static time_t last_sort_time = 0;
 	static int last_sort_size = 0;
 
@@ -608,7 +592,6 @@ static inline void add_scemp(struct scemp_type **list, int value) {
 */
 void score_empires(void) {
 	extern double empire_score_average[NUM_SCORES];
-	extern const double score_levels[];
 	
 	struct scemp_type *scemp, *next_scemp, *lists[NUM_SCORES];
 	int iter, pos, median, num_emps = 0;
@@ -763,8 +746,6 @@ int sort_import_partners(struct import_pair_type *a, struct import_pair_type *b)
 * @return bool TRUE if any items moved
 */
 bool process_import_one(empire_data *emp) {
-	extern int get_main_island(empire_data *emp);
-	
 	struct partner_list_type *plt, *next_plt, *partner_list = NULL;
 	struct import_pair_type *pair, *next_pair, *pair_list;
 	int my_amt, their_amt, trade_amt, found_island = NO_ISLAND;
@@ -906,8 +887,6 @@ bool process_import_one(empire_data *emp) {
 
 // runs daily imports
 void process_imports(void) {
-	void read_vault(empire_data *emp);
-	
 	empire_data *emp, *next_emp;
 	int amount;
 	
@@ -1121,8 +1100,6 @@ void expire_old_politics(void) {
 * @return bool TRUE if the empire has that (those) trait(s) at loc.
 */
 bool has_empire_trait(empire_data *emp, room_data *loc, bitvector_t trait) {
-	extern struct city_metadata_type city_type[];
-	
 	struct empire_city_data *city;
 	bitvector_t set = NOBITS;
 	bool near_city = FALSE;
@@ -1176,10 +1153,7 @@ bool has_relationship(empire_data *emp, empire_data *fremp, bitvector_t diplomac
 * @param room_data *loc The location to test.
 * @return bool TRUE if this location is too close to a starting location; FALSE if not.
 */
-bool ignore_distrustful_due_to_start_loc(room_data *loc) {
-	extern int highest_start_loc_index;
-	extern int *start_locs;
-	
+bool ignore_distrustful_due_to_start_loc(room_data *loc) {;
 	int safe_distance = config_get_int("min_distrustful_distance");
 	int iter;
 	
@@ -1456,8 +1430,6 @@ bool has_permission(char_data *ch, int type, room_data *loc) {
 * @return TRUE if successful, FALSE if not (and sends its own error message to ch)
 */
 bool has_tech_available(char_data *ch, int tech) {
-	extern const char *techs[];
-
 	if (!ROOM_OWNER(IN_ROOM(ch))) {
 		msg_to_char(ch, "In order to do that you need to be in the territory of an empire with %s.\r\n", techs[tech]);
 		return FALSE;
@@ -1481,8 +1453,6 @@ bool has_tech_available(char_data *ch, int tech) {
 * @return TRUE if successful, FALSE if not (and sends its own error message to ch)
 */
 bool has_tech_available_room(room_data *room, int tech) {
-	extern const int techs_requiring_same_island[];
-	
 	empire_data *emp = ROOM_OWNER(room);
 	bool requires_island = FALSE;
 	struct empire_island *isle;
@@ -1762,9 +1732,7 @@ void basic_mud_log(const char *format, ...) {
 * @param const char *str The va-arg format ...
 */
 void log_to_empire(empire_data *emp, int type, const char *str, ...) {
-	extern const bool show_empire_log_type[];
-	
-	struct empire_log_data *elog, *temp;
+	struct empire_log_data *elog;
 	char output[MAX_STRING_LENGTH];
 	descriptor_data *i;
 	va_list tArgList;
@@ -1782,19 +1750,7 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 		elog->type = type;
 		elog->timestamp = time(0);
 		elog->string = str_dup(output);
-		elog->next = NULL;
-		
-		// append to end
-		if ((temp = EMPIRE_LOGS(emp))) {
-			while (temp->next) {
-				temp = temp->next;
-			}
-			temp->next = elog;
-		}
-		else {
-			EMPIRE_LOGS(emp) = elog;
-		}
-		
+		DL_APPEND(EMPIRE_LOGS(emp), elog);
 		EMPIRE_NEEDS_LOGS_SAVE(emp) = TRUE;
 	}
 	
@@ -1842,8 +1798,6 @@ void mortlog(const char *str, ...) {
 * @return char* The compiled string.
 */
 char *room_log_identifier(room_data *room) {
-	extern char *get_room_name(room_data *room, bool color);
-	
 	static char val[MAX_STRING_LENGTH];
 	
 	sprintf(val, "[%d] %s (%d, %d)", GET_ROOM_VNUM(room), get_room_name(room, FALSE), X_COORD(room), Y_COORD(room));
@@ -1979,8 +1933,6 @@ bool is_basic_component(obj_data *obj) {
 * @return bool TRUE if obj matches cmp (or one of its related types); FALSE if not
 */
 bool is_component(obj_data *obj, generic_data *cmp) {
-	bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
-	
 	generic_data *my_cmp;
 	
 	if (!obj || !cmp || GEN_TYPE(cmp) != GENERIC_COMPONENT) {
@@ -2146,7 +2098,6 @@ void comma_args(char *string, char *arg1, char *arg2) {
 * @return int TRUE if the argument is in the fill_words[] list.
 */
 int fill_word(char *argument) {
-	extern const char *fill_words[];
 	return (search_block(argument, fill_words, TRUE) != NOTHING);
 }
 
@@ -2321,7 +2272,6 @@ char *one_word(char *argument, char *first_arg) {
 * @return int TRUE if the argument is in the reserved_words[] list.
 */
 int reserved_word(char *argument) {
-	extern const char *reserved_words[];
 	return (search_block(argument, reserved_words, TRUE) != NOTHING);
 }
 
@@ -2677,15 +2627,6 @@ void despawn_charmies(char_data *ch, any_vnum only_vnum) {
 * @return int The character's value for that attributes.
 */
 int get_attribute_by_apply(char_data *ch, int apply_type) {
-	extern int get_block_rating(char_data *ch, bool can_gain_skill);
-	extern int get_crafting_level(char_data *ch);
-	extern int total_bonus_healing(char_data *ch);
-	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
-	extern int health_gain(char_data *ch, bool info_only);
-	extern int move_gain(char_data *ch, bool info_only);
-	extern int mana_gain(char_data *ch, bool info_only);
-	
 	if (!ch) {
 		return 0;	// shortcut/safety
 	}
@@ -2878,9 +2819,6 @@ obj_data *get_top_object(obj_data *obj) {
 * @return double a score
 */
 double rate_item(obj_data *obj) {
-	extern double get_base_dps(obj_data *weapon);
-	extern const double apply_values[];
-	
 	struct obj_apply *apply;
 	double score = 0;
 	
@@ -2931,8 +2869,6 @@ double rate_item(obj_data *obj) {
 * @param int wait_type A WAIT_ const to help determine wait time.
 */
 void command_lag(char_data *ch, int wait_type) {
-	extern const int universal_wait;
-	
 	double val;
 	int wait;
 	
@@ -2989,8 +2925,6 @@ void command_lag(char_data *ch, int wait_type) {
 * @param char_data *ch The player to set gear level for.
 */
 void determine_gear_level(char_data *ch) {
-	extern const struct wear_data_type wear_data[NUM_WEARS];
-
 	double total, slots;
 	int avg, level, pos, old;
 	
@@ -3046,7 +2980,6 @@ void determine_gear_level(char_data *ch) {
 * @return int An attribute constant (STRENGTH) or -1 for no-match.
 */
 int get_attribute_by_name(char *name) {
-	extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
 	int iter, partial = -1;
 	
 	for (iter = 0; iter < NUM_ATTRIBUTES; ++iter) {
@@ -3089,7 +3022,6 @@ int pick_level_from_range(int level, int min, int max) {
 * @return bool TRUE if the character ended up standing (>= fighting), FALSE if not.
 */
 bool wake_and_stand(char_data *ch) {
-	void do_unseat_from_vehicle(char_data *ch);
 	char buf[MAX_STRING_LENGTH];
 	bool was_sleeping = FALSE;
 	
@@ -3878,8 +3810,6 @@ void give_resources(char_data *ch, struct resource_data *list, bool split) {
 * @param struct resource_data **list The list to halve.
 */
 void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list) {
-	extern const struct material_data materials[NUM_MATERIALS];
-	
 	struct resource_data *res, *next_res;
 	int iter, count, total, remaining;
 	double damage_prc, prc_to_keep;
@@ -5765,9 +5695,6 @@ bool find_sect_within_distance_from_room(room_data *room, sector_vnum sect, int 
 * @return room_data* A random starting location.
 */
 room_data *find_starting_location() {
-	extern int highest_start_loc_index;
-	extern int *start_locs;
-	
 	if (highest_start_loc_index < 0) {
 		return NULL;
 	}
@@ -5782,8 +5709,6 @@ room_data *find_starting_location() {
  * @return room_data* A random starting location that's less likely to be your current one
  */
 room_data *find_other_starting_location(room_data *current_room) {
-	extern int highest_start_loc_index;
-	extern int *start_locs;
 	int start_loc_index;
 	
 	if (highest_start_loc_index < 0) {

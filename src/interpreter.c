@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -37,16 +38,10 @@
 *   Menu Interpreter Functions
 */
 
-// external vars
-extern struct archetype_menu_type archetype_menu[];
-
 // external funcs
-extern bool has_anonymous_host(descriptor_data *desc);
 void parse_archetype_menu(descriptor_data *desc, char *argument);
 
 // locals
-bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
-void next_creation_step(descriptor_data *d);
 void set_creation_state(descriptor_data *d, int state);
 void show_bonus_trait_menu(char_data *ch);
 
@@ -1437,10 +1432,8 @@ int perform_alias(descriptor_data *d, char *orig) {
 
 /* The interface to the outside world: do_alias / do_unalias */
 ACMD(do_alias) {
-	extern char *show_color_codes(char *string);
-	
 	char *repl;
-	struct alias_data *a, *temp;
+	struct alias_data *a;
 
 	if (IS_NPC(ch))
 		return;
@@ -1465,7 +1458,7 @@ ACMD(do_alias) {
 		
 		// only delete if it's being replaced or they used unalias
 		if (a != NULL && (*repl || subcmd == SCMD_UNALIAS)) {
-			REMOVE_FROM_LIST(a, GET_ALIASES(ch), next);
+			LL_DELETE(GET_ALIASES(ch), a);
 			free_alias(a);
 		}
 		/* if no replacement string is specified (or they used unalias): */
@@ -1489,12 +1482,13 @@ ACMD(do_alias) {
 			a->alias = str_dup(arg);
 			delete_doubledollar(repl);
 			a->replacement = str_dup(repl);
-			if (strchr(repl, ALIAS_SEP_CHAR) || strchr(repl, ALIAS_VAR_CHAR))
+			if (strchr(repl, ALIAS_SEP_CHAR) || strchr(repl, ALIAS_VAR_CHAR)) {
 				a->type = ALIAS_COMPLEX;
-			else
+			}
+			else {
 				a->type = ALIAS_SIMPLE;
-			a->next = GET_ALIASES(ch);
-			GET_ALIASES(ch) = a;
+			}
+			LL_PREPEND(GET_ALIASES(ch), a);
 			send_to_char("Alias added.\r\n", ch);
 		}
 	}
@@ -1701,8 +1695,6 @@ ACMD(do_commands) {
 
 
 ACMD(do_missing_help_files) {
-	extern struct help_index_element *find_help_entry(int level, const char *word);
-	
 	struct help_index_element *found;
 	int iter, count;
 	char lbuf[MAX_STRING_LENGTH];
@@ -2035,8 +2027,6 @@ void set_creation_state(descriptor_data *d, int state) {
 * @param char_data *ch The player to show the menu to.
 */
 void show_bonus_trait_menu(char_data *ch) {
-	extern const char *bonus_bit_descriptions[];
-
 	int iter;
 	
 	if (IS_NPC(ch) || !ch->desc) {
@@ -2160,8 +2150,6 @@ void send_login_motd(descriptor_data *desc, int bad_pws) {
  *      into person returns.  This function seems a bit over-extended too.
  */
 int perform_dupe_check(descriptor_data *d) {
-	void refresh_all_quests(char_data *ch);
-	
 	descriptor_data *k, *next_k;
 	char_data *target = NULL, *ch, *next_ch;
 	int mode = 0;
@@ -2329,22 +2317,9 @@ int _parse_name(char *arg, char *name) {
 * Master "socket nanny" for processing menu input.
 */
 void nanny(descriptor_data *d, char *arg) {
-	void change_personal_lastname(char_data *ch, char *name);
-	void check_delayed_load(char_data *ch);
 	void display_automessages_on_login(char_data *ch);
-	void display_tip_to_char(char_data *ch);
-	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
-	void free_loaded_players();
-	extern int isbanned(char *hostname);
 	extern int num_earned_bonus_traits(char_data *ch);
-	void run_delayed_refresh();
-	void start_new_character(char_data *ch);
-	extern int Valid_Name(char *newname);
 	
-	extern struct promo_code_list promo_codes[];
-	extern int wizlock_level;
-	extern char *wizlock_message;
-
 	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
 	int load_result, i, iter;
 	bool show_start = FALSE;
@@ -2916,8 +2891,6 @@ void nanny(descriptor_data *d, char *arg) {
 			
 			// only apply now if they are NOT currently doing creation -- otherwise it will be applied during creation
 			if (GET_ACCESS_LEVEL(d->character) > 0) {
-				void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
-				
 				if (!skip) {
 					apply_bonus_trait(d->character, BIT(i), TRUE);
 				}

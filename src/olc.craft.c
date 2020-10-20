@@ -20,6 +20,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -27,16 +28,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// externs
-extern const char *apply_types[];
-extern const char *bld_on_flags[];
-extern const bitvector_t bld_on_flags_order[];
-extern const char *craft_flags[];
-extern const char *craft_types[];
-extern const char *function_flags[];
-extern const char *road_types[];
-extern const char *tool_flags[];
 
 // external funcs
 void init_craft(craft_data *craft);
@@ -258,8 +249,6 @@ char *list_one_craft(craft_data *craft, bool detail) {
 void olc_delete_craft(char_data *ch, craft_vnum vnum) {
 	void cancel_gen_craft(char_data *ch);
 	void remove_craft_from_table(craft_data *craft);
-	void remove_learned_craft(char_data *ch, any_vnum vnum);
-	void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
 	
 	struct progress_perk *perk, *next_perk;
 	progress_data *prg, *next_prg;
@@ -561,14 +550,14 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 * @return bool TRUE if any were removed.
 */
 bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum) {
-	struct resource_data *res, *next_res, *temp;
+	struct resource_data *res, *next_res;
 	int removed = 0;
 	
 	for (res = *list; res; res = next_res) {
 		next_res = res->next;
 		
 		if (res->type == type && res->vnum == vnum) {
-			REMOVE_FROM_LIST(res, *list, next);
+			LL_DELETE(*list, res);
 			free(res);
 			++removed;
 		}
@@ -584,8 +573,6 @@ bool remove_thing_from_resource_list(struct resource_data **list, int type, any_
 * @param descriptor_data *desc The descriptor who is saving.
 */
 void save_olc_craft(descriptor_data *desc) {
-	extern int sort_crafts_by_data(craft_data *a, craft_data *b);
-	
 	craft_data *proto, *craft = GET_OLC_CRAFT(desc);
 	craft_vnum vnum = GET_OLC_VNUM(desc);
 	UT_hash_handle hh, sorted_hh;
@@ -632,8 +619,6 @@ void save_olc_craft(descriptor_data *desc) {
 * @return craft_data * The copied recipe.
 */
 craft_data *setup_olc_craft(craft_data *input) {
-	extern struct resource_data *copy_resource_list(struct resource_data *input);
-
 	craft_data *new;
 	
 	CREATE(new, craft_data, 1);
@@ -673,8 +658,6 @@ craft_data *setup_olc_craft(craft_data *input) {
 * @param char_data *ch The person who is editing a craft and will see its display.
 */
 void olc_show_craft(char_data *ch) {
-	void get_resource_display(struct resource_data *list, char *save_buffer);
-
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	char lbuf[MAX_STRING_LENGTH];
 	ability_data *abil;
@@ -987,7 +970,6 @@ OLC_MODULE(cedit_requiresobject) {
 
 
 OLC_MODULE(cedit_resource) {
-	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 	craft_data *craft = GET_OLC_CRAFT(ch->desc);
 	olc_process_resources(ch, argument, &GET_CRAFT_RESOURCES(craft));
 }

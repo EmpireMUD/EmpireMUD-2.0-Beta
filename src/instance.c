@@ -21,6 +21,7 @@
 #include "comm.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -32,41 +33,22 @@
 */
 
 // external consts
-extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
-extern const char *dirs[];
-extern const int rev_dir[];
 extern int size_of_world;
 
-// external funcs
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
-extern int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
-void scale_item_to_level(obj_data *obj, int level);
-void scale_mob_to_level(char_data *mob, int level);
-void scale_vehicle_to_level(vehicle_data *veh, int level);
-extern int stats_get_building_count(bld_data *bdg);
-extern int stats_get_sector_count(sector_data *sect);
-
 // locals
-bool can_instance(adv_data *adv);
 bool check_outside_fights(struct instance_data *inst);
 bool check_outside_vehicles(struct instance_data *inst);
-int count_instances(adv_data *adv);
 int count_mobs_in_instance(struct instance_data *inst, mob_vnum vnum);
 int count_objs_in_instance(struct instance_data *inst, obj_vnum vnum);
 int count_players_in_instance(struct instance_data *inst, bool include_imms, char_data *ignore_ch);
 int count_vehicles_in_instance(struct instance_data *inst, any_vnum vnum);
 void despawn_instance_vehicles(struct instance_data *inst);
 static int determine_random_exit(adv_data *adv, room_data *from, room_data *to);
-void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
-room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type);
 any_vnum get_new_instance_id(void);
 void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
 void link_instance_entrance(struct instance_data *inst);
-void remove_instance_fake_loc(struct instance_data *inst);
-void reset_instance(struct instance_data *inst);
 void scale_instance_to_level(struct instance_data *inst, int level);
-void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
 
 
 // local globals
@@ -98,9 +80,6 @@ const bool is_location_rule[] = {
 * @param struct instance_data *inst The instance.
 */
 void build_instance_exterior(struct instance_data *inst) {
-	void special_building_setup(char_data *ch, room_data *room);
-	void complete_building(room_data *room);
-	
 	char_data *mob, *next_mob;
 	bld_data *bdg;
 	
@@ -376,8 +355,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 	// if we already have an exit, repurpose it; otherwise, make one
 	if (!(new = find_exit(room, dir))) {
 		CREATE(new, struct room_direction_data, 1);
-		new->next = COMPLEX_DATA(room)->exits;
-		COMPLEX_DATA(room)->exits = new;
+		LL_PREPEND(COMPLEX_DATA(room)->exits, new);
 	}
 	
 	// build the exit
@@ -411,8 +389,6 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 * @return room_data* The new room.
 */
 static room_data *instantiate_one_room(struct instance_data *inst, room_template *rmt) {
-	extern room_data *create_room(room_data *home);
-	
 	const bitvector_t default_affs = ROOM_AFF_UNCLAIMABLE;
 	
 	sector_data *sect;
@@ -454,8 +430,6 @@ static room_data *instantiate_one_room(struct instance_data *inst, room_template
 * @param int rotation The direction the instance "faces", e.g. NORTH.
 */
 void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation) {
-	void sort_exits(struct room_direction_data **list);
-	
 	room_data **room_list = NULL;
 	room_template **template_list = NULL;
 	room_template *rmt, *next_rmt;
@@ -688,8 +662,6 @@ bool validate_linking_limits(adv_data *adv, room_data *loc, struct map_data *map
 * @return bool TRUE if the location seems ok.
 */
 bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, struct map_data *map) {
-	extern bool is_entrance(room_data *room);
-	
 	room_data *home;
 	struct island_info *isle = NULL;
 	empire_data *emp;
@@ -997,8 +969,6 @@ room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rul
 * if possible.
 */
 void generate_adventure_instances(void) {
-	void sort_world_table();
-
 	struct adventure_link_rule *rule, *rule_iter;
 	adv_data *iter, *next_iter;
 	room_data *loc;
@@ -1065,8 +1035,6 @@ void generate_adventure_instances(void) {
 */
 void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	void expire_instance_quests(struct instance_data *inst);
-	extern room_data *get_extraction_room(void);
-	void relocate_players(room_data *room, room_data *to_room);
 	
 	struct instance_mob *im, *next_im;
 	struct adventure_link_rule *rule;
@@ -1311,8 +1279,6 @@ void instance_obj_setup(struct instance_data *inst, obj_data *obj) {
 * @param room_data *room The room to reset.
 */
 static void reset_instance_room(struct instance_data *inst, room_data *room) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	room_template *rmt = GET_ROOM_TEMPLATE(room);
 	struct adventure_spawn *spawn;
 	vehicle_data *veh;
@@ -1477,8 +1443,6 @@ void prune_instances(void) {
 * @param bool run_cleanup If TRUE, runs cleanup scripts. If FALSE, skips this.
 */
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup) {
-	extern bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
-	
 	adv_data *adv = inst ? INST_ADVENTURE(inst) : NULL;
 	struct trig_proto_list *tpl;
 	trig_data *proto, *trig;
@@ -1672,7 +1636,6 @@ bool can_instance(adv_data *adv) {
 */
 void check_instance_is_loaded(struct instance_data *inst) {
 	void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
-	void reset_instance(struct instance_data *inst);
 	
 	if (IS_SET(INST_FLAGS(inst), INST_NEEDS_LOAD) && INST_LOCATION(inst)) {
 		instantiate_rooms(INST_ADVENTURE(inst), inst, INST_RULE(inst), INST_LOCATION(inst), INST_DIR(inst), INST_ROTATION(inst));
@@ -1907,8 +1870,6 @@ room_data *find_nearest_adventure(room_data *from, rmt_vnum vnum) {
 * @param rmt_vnum vnum Which room template vnum to look for.
 */
 room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum) {
-	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
-	
 	adv_data *adv = get_adventure_for_vnum(vnum);
 	struct instance_data *inst, *closest = NULL;
 	int this, dist = 0;
@@ -2022,8 +1983,6 @@ struct instance_data *get_instance_by_mob(char_data *mob) {
 * @return struct instance_data* The matching instance for where the script is running, or NULL if none.
 */
 struct instance_data *get_instance_for_script(int go_type, void *go) {
-	extern room_data *obj_room(obj_data *obj);
-	
 	struct instance_data *inst = NULL;
 	room_data *orm;
 	
@@ -2246,9 +2205,6 @@ void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum) {
 * instances based on the size of the world (land tiles only).
 */
 void update_instance_world_size(void) {
-	extern int stats_get_sector_count(sector_data *sect);
-	void update_world_count();
-	
 	sector_data *sect, *next_sect;
 	int total;
 	
@@ -2367,8 +2323,6 @@ void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, in
 * @return struct instance_data* The instance.
 */
 static struct instance_data *load_one_instance(FILE *fl, any_vnum idnum) {
-	void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part);
-	
 	struct instance_data *inst;
 	char line[256], str_in[256];
 	int i_in[4];
@@ -2583,8 +2537,6 @@ void load_instances(void) {
 * Writes all instances to the instance file.
 */
 void save_instances(void) {
-	void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list);
-	
 	struct instance_data *inst;
 	FILE *fl;
 	int iter;
@@ -2636,8 +2588,6 @@ void save_instances(void) {
 * @param int level A pre-validated level.
 */
 void scale_instance_to_level(struct instance_data *inst, int level) {	
-	void scale_vehicle_to_level(vehicle_data *veh, int level);
-	
 	int iter;
 	vehicle_data *veh;
 	char_data *ch;

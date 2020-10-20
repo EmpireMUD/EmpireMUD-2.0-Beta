@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -32,20 +33,8 @@
 *   Commands
 */
 
-// external vars
-extern const int rev_dir[];
-
 // external funcs
-INTERACTION_FUNC(consumes_or_decays_interact);
 ACMD(do_dismount);
-void check_combat_start(char_data *ch);
-extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
-void scale_item_to_level(obj_data *obj, int level);
-
-// locals
-int apply_poison(char_data *ch, char_data *vict);
-obj_data *find_poison_by_vnum(obj_data *list, any_vnum vnum);
-void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -119,9 +108,7 @@ bool can_infiltrate(char_data *ch, empire_data *emp) {
 * @param empire_data *emp
 * @return TRUE if ch is capable of stealing from emp
 */
-bool can_steal(char_data *ch, empire_data *emp) {	
-	extern time_t get_last_killed_by_empire(char_data *ch, empire_data *emp);
-	
+bool can_steal(char_data *ch, empire_data *emp) {
 	struct empire_political_data *pol;
 	empire_data *chemp = GET_LOYALTY(ch);
 	time_t timediff;
@@ -219,8 +206,6 @@ INTERACTION_FUNC(pickpocket_interact) {
 
 // for do_escape
 void perform_escape(char_data *ch) {
-	extern room_data *get_exit_room(room_data *from_room);
-	
 	room_data *to_room = NULL;
 	
 	// on a boat?
@@ -333,6 +318,8 @@ void undisguise(char_data *ch) {
 
 /**
 * Determines if a room qualifies for Unseen Passing (indoors/in-city).
+*
+* TODO: rename something more generic
 *
 * @param room_data *room Where to check.
 * @return bool TRUE if Unseen Passing works here.
@@ -924,8 +911,6 @@ ACMD(do_howl) {
 
 
 ACMD(do_infiltrate) {
-	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
-
 	room_data *to_room, *was_in;
 	int dir;
 	empire_data *emp;
@@ -1093,9 +1078,6 @@ ACMD(do_jab) {
 
 
 ACMD(do_pickpocket) {
-	extern bool check_scaling(char_data *mob, char_data *attacker);
-	extern int mob_coins(char_data *mob);
-
 	empire_data *ch_emp = NULL, *vict_emp = NULL;
 	bool any, low_level;
 	char_data *vict;
@@ -1444,8 +1426,6 @@ ACMD(do_shadowcage) {
 
 
 ACMD(do_shadowstep) {
-	bool can_infiltrate(char_data *ch, empire_data *emp);
-
 	char_data *vict = NULL;
 	empire_data *emp = NULL;
 	room_data *was_in;
@@ -1561,8 +1541,6 @@ ACMD(do_shadowstep) {
 
 /* Sneak is now sneak <direction>.  Note that entire parties may not sneak together. */
 ACMD(do_sneak) {
-	extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
-	
 	int dir;
 	bool sneaking = FALSE;
 
@@ -1625,9 +1603,6 @@ ACMD(do_sneak) {
 
 
 ACMD(do_steal) {
-	bool show_local_einv(char_data *ch, room_data *room, bool thief_mode);
-	void read_vault(empire_data *emp);
-	
 	struct empire_storage_data *store, *next_store;
 	empire_data *emp = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));
 	struct empire_island *isle;

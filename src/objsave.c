@@ -29,6 +29,7 @@
 #include "interpreter.h"
 #include "utils.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -38,13 +39,6 @@
 *   World Object Saving
 *   Object Utils
 */
-
-// external vars
-extern const struct wear_data_type wear_data[NUM_WEARS];
-
-// external funcs
-void add_obj_to_eq_set(obj_data *obj, int set_id, int pos);
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// BASIC OBJECT LOADING ////////////////////////////////////////////////////
@@ -87,8 +81,6 @@ void ensure_safe_obj(obj_data *obj) {
 * @return obj_data* The loaded item, or NULL if it's not available.
 */
 obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify) {
-	void scale_item_to_level(obj_data *obj, int level);
-
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH], *tmp;
 	obj_data *proto = obj_proto(vnum);
 	struct extra_descr_data *ex;
@@ -214,8 +206,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						struct obj_binding *bind;
 						CREATE(bind, struct obj_binding, 1);
 						bind->idnum = i_in[0];
-						bind->next = OBJ_BOUND_TO(obj);
-						OBJ_BOUND_TO(obj) = bind;
+						LL_PREPEND(OBJ_BOUND_TO(obj), bind);
 					}
 				}
 				break;
@@ -247,8 +238,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 					if (GET_OBJ_VNUM(obj) == NOTHING) {
 						// only allowed on 'anonymous' objs
 						CREATE(ex, struct extra_descr_data, 1);
-						ex->next = obj->proto_data->ex_description;
-						obj->proto_data->ex_description = ex;
+						LL_PREPEND(obj->proto_data->ex_description, ex);
 						
 						ex->keyword = fread_string(fl, error);
 						ex->description = fread_string(fl, error);
@@ -492,8 +482,6 @@ void Crash_extract_objs(obj_data *obj) {
 * @param int location The gear or bag position.
 */
 void Crash_save(obj_data *obj, FILE *fp, int location) {
-	void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
-
 	if (obj) {
 		Crash_save(obj->next_content, fp, location);
 		Crash_save(obj->contains, fp, MIN(LOC_INVENTORY, location) - 1);
@@ -871,7 +859,6 @@ bool objpack_save_room(room_data *room) {
 * @param room_data *room The room.
 */
 void objpack_load_room(room_data *room) {
-	void adjust_vehicle_tech(vehicle_data *veh, bool add);
 	extern vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum);
 
 	obj_data *obj, *o, *next_o, *cont_row[MAX_BAG_ROWS];
@@ -1023,10 +1010,6 @@ void objpack_load_room(room_data *room) {
 * @param char *name The name of the person whose rent file to show.
 */
 void Crash_listrent(char_data *ch, char *name) {
-	void check_delayed_load(char_data *ch);
-	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
-	char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
-	
 	char_data *victim;
 	bool file = FALSE;
 	int iter;

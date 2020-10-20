@@ -21,6 +21,7 @@
 #include "db.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -30,19 +31,17 @@
 *   Communication Commands
 */
 
-// externs
-void clear_last_act_message(descriptor_data *desc);
+// external functions
+ACMD(do_slash_channel);
 
-// locals
-struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
-bool is_ignoring(char_data *ch, char_data *victim);
+// local prototypes
 FILE *open_slash_channel_file(struct slash_channel *chan);
 struct channel_history_data *process_add_to_channel_history(struct channel_history_data **history, char_data *ch, char *message);
 void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entry);
 void write_slash_channel_configs(struct slash_channel *chan);
 void write_slash_channel_index();
 
-
+// local data
 #define MAX_RECENT_CHANNELS		20		/* Number of pub_comm uses to remember */
 
 #define PUB_COMM_OOC  0
@@ -1172,7 +1171,7 @@ void write_slash_channel_index(void) {
 ACMD(do_slash_channel) {
 	struct slash_channel *chan;
 	struct channel_history_data *hist;
-	struct player_slash_channel *slash, *temp;
+	struct player_slash_channel *slash;
 	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	player_index_data *index;
 	descriptor_data *desc;
@@ -1289,8 +1288,7 @@ ACMD(do_slash_channel) {
 		}
 		else {
 			CREATE(slash, struct player_slash_channel, 1);
-			slash->next = GET_SLASH_CHANNELS(ch);
-			GET_SLASH_CHANNELS(ch) = slash;
+			LL_PREPEND(GET_SLASH_CHANNELS(ch), slash);
 			slash->id = chan->id;
 			
 			// announce it (this also messages the player)
@@ -1321,7 +1319,7 @@ ACMD(do_slash_channel) {
 			msg_to_char(ch, "You leave \t%c/%s\tn.\r\n", chan->color, chan->name);
 			
 			while ((slash = find_on_slash_channel(ch, chan->id))) {
-				REMOVE_FROM_LIST(slash, GET_SLASH_CHANNELS(ch), next);
+			    LL_DELETE(GET_SLASH_CHANNELS(ch), slash);
 				free(slash);
 			}
 			
@@ -1543,7 +1541,6 @@ ACMD(do_history) {
 	}
 	else if (subcmd == SCMD_HISTORY && *argument == '/') {
 		// forward to /history
-		ACMD(do_slash_channel);
 		char buf[MAX_INPUT_LENGTH];
 		snprintf(buf, sizeof(buf), "history %s", argument);
 		do_slash_channel(ch, buf, 0, 0);
@@ -1713,8 +1710,6 @@ ACMD(do_page) {
 
 
 ACMD(do_recolor) {
-	extern const char *custom_color_types[];
-	
 	char *valid_colors = "rgbymcwajloptvnRGBYMCWAJLOPTV0";
 	
 	char arg[MAX_INPUT_LENGTH];

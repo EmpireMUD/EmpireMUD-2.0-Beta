@@ -21,6 +21,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -28,30 +29,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// externs
-extern const char *action_bits[];
-extern const char *affected_bits[];
-extern const char *apply_type_names[];
-extern const char *apply_types[];
-extern const char *armor_types[NUM_ARMOR_TYPES+1];
-extern const char *container_bits[];
-extern const char *extra_bits[];
-extern const char *interact_types[];
-extern const char *item_types[];
-extern const struct material_data materials[NUM_MATERIALS];
-extern const char *obj_custom_types[];
-extern const char *offon_types[];
-extern const char *paint_colors[];
-extern const char *paint_names[];
-extern const char *size_types[];
-extern const char *storage_bits[];
-extern const char *tool_flags[];
-extern const char *wear_bits[];
-
-// external funcs
-extern double get_base_dps(obj_data *weapon);
-extern double get_weapon_speed(obj_data *weapon);
 
 // locals
 const char *default_obj_keywords = "object new";
@@ -76,7 +53,6 @@ char **olc_material_list = NULL;	// used for olc
 */
 bool audit_object(obj_data *obj, char_data *ch) {
 	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
-	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	
 	bool is_adventure = (get_adventure_for_vnum(GET_OBJ_VNUM(obj)) != NULL);
 	char temp[MAX_STRING_LENGTH], unplural[MAX_STRING_LENGTH], *ptr;
@@ -367,7 +343,6 @@ void check_oedit_material_list(void) {
 * @return obj_data* The new object's prototype.
 */
 obj_data *create_obj_table_entry(obj_vnum vnum) {
-	extern struct obj_proto_data *create_obj_proto_data();
 	void add_object_to_table(obj_data *obj);
 	
 	obj_data *obj;
@@ -452,19 +427,12 @@ char *list_one_object(obj_data *obj, bool detail) {
 * @param obj_vnum vnum The vnum to delete.
 */
 void olc_delete_object(char_data *ch, obj_vnum vnum) {
-	void complete_building(room_data *room);
-	void complete_vehicle(vehicle_data *veh);
 	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	extern bool delete_shop_item_from_list(struct shop_item **list, any_vnum vnum);
-	void expire_trading_post_item(struct trading_post_data *tpd);
-	extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 	void remove_object_from_table(obj_data *obj);
-	void save_trading_post();
 
 	struct empire_trade_data *trade, *next_trade;
 	struct ability_data_list *adl, *next_adl;
@@ -584,8 +552,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		for (trade = EMPIRE_TRADE(emp); trade; trade = next_trade) {
 			next_trade = trade->next;
 			if (trade->vnum == vnum) {
-				struct empire_trade_data *temp;
-				REMOVE_FROM_LIST(trade, EMPIRE_TRADE(emp), next);
+				LL_DELETE(EMPIRE_TRADE(emp), trade);
 				free(trade);	// certified
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			}
@@ -601,9 +568,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	}
 	
 	// remove from trading post -- again, BEFORE removing from obj table
-	for (tpd = trading_list; tpd; tpd = next_tpd) {
-		next_tpd = tpd->next;
-		
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
 		if (tpd->obj && GET_OBJ_VNUM(tpd->obj) == vnum) {
 			expire_trading_post_item(tpd);
 			add_to_object_list(tpd->obj);
@@ -654,8 +619,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		for (gear = GET_ARCH_GEAR(arch); gear; gear = next_gear) {
 			next_gear = gear->next;
 			if (gear->vnum == vnum) {
-				struct archetype_gear *temp;
-				REMOVE_FROM_LIST(gear, GET_ARCH_GEAR(arch), next);
+				LL_DELETE(GET_ARCH_GEAR(arch), gear);
 				free(gear);
 				found = TRUE;
 			}
@@ -900,8 +864,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			for (gear = GET_ARCH_GEAR(GET_OLC_ARCHETYPE(desc)); gear; gear = next_gear) {
 				next_gear = gear->next;
 				if (gear->vnum == vnum) {
-					struct archetype_gear *temp;
-					REMOVE_FROM_LIST(gear, GET_ARCH_GEAR(GET_OLC_ARCHETYPE(desc)), next);
+					LL_DELETE(GET_ARCH_GEAR(GET_OLC_ARCHETYPE(desc)), gear);
 					free(gear);
 					found = TRUE;
 				}
@@ -1092,8 +1055,6 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 * @param char *argument The argument they entered.
 */
 void olc_fullsearch_obj(char_data *ch, char *argument) {
-	extern int get_attack_type_by_name(char *name);
-	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH], find_keywords[MAX_INPUT_LENGTH];
 	bitvector_t find_applies = NOBITS, found_applies, not_flagged = NOBITS, only_flags = NOBITS;
 	bitvector_t only_worn = NOBITS, only_affs = NOBITS;
@@ -1257,11 +1218,7 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_obj(char_data *ch, obj_vnum vnum) {
-	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 	extern bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);
-	extern const byte interact_vnum_types[NUM_INTERACTS];
 	
 	char buf[MAX_STRING_LENGTH];
 	struct adventure_spawn *asp;
@@ -1708,7 +1665,7 @@ void save_olc_object(descriptor_data *desc) {
 	}
 	
 	// update objs in trading post
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		if (tpd->obj && GET_OBJ_VNUM(tpd->obj) == vnum) {
 			update_live_obj_from_olc(tpd->obj, proto, obj);
 		}
@@ -1787,9 +1744,9 @@ void setup_extra_desc_editor(char_data *ch, struct extra_descr_data *ex) {
 * @return struct extra_descr_data* The copied list.
 */
 struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list) {
-	struct extra_descr_data *new, *newlist, *last, *iter;
+	struct extra_descr_data *new, *newlist, *iter;
 	
-	newlist = last = NULL;
+	newlist = NULL;
 	for (iter = list; iter; iter = iter->next) {
 		// skip empty descriptions entirely
 		if (!iter->description || !*iter->description || !iter->keyword || !*iter->keyword) {
@@ -1799,16 +1756,7 @@ struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list) {
 		CREATE(new, struct extra_descr_data, 1);
 		new->keyword = iter->keyword ? str_dup(iter->keyword) : NULL;
 		new->description = iter->description ? str_dup(iter->description) : NULL;
-		new->next = NULL;
-	
-		if (last) {
-			last->next = new;
-		}
-		else {
-			newlist = new;
-		}
-	
-		last = new;
+		LL_APPEND(newlist, new);
 	}
 	
 	return newlist;
@@ -1822,22 +1770,13 @@ struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list) {
 * @return struct obj_storage_type* The copied list.
 */
 struct obj_storage_type *copy_storage(struct obj_storage_type *list) {
-	struct obj_storage_type *store, *new_store, *last_store, *new_list;
+	struct obj_storage_type *store, *new_store, *new_list;
 	
-	new_list = last_store = NULL;
+	new_list = NULL;
 	LL_FOREACH(list, store) {
 		CREATE(new_store, struct obj_storage_type, 1);
-		
 		*new_store = *store;
-		new_store->next = NULL;
-		
-		if (last_store) {
-			last_store->next = new_store;
-		}
-		else {
-			new_list = new_store;
-		}
-		last_store = new_store;
+		LL_APPEND(new_list, new_store);
 	}
 	
 	return new_list;
@@ -1853,8 +1792,6 @@ struct obj_storage_type *copy_storage(struct obj_storage_type *list) {
 * @return obj_data *The copied object.
 */
 obj_data *setup_olc_object(obj_data *input) {
-	extern struct obj_proto_data *create_obj_proto_data();
-	
 	obj_data *new;
 	
 	CREATE(new, obj_data, 1);
@@ -2086,8 +2023,6 @@ void olc_get_values_display(char_data *ch, char *storage) {
 */
 void olc_show_object(char_data *ch) {
 	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	struct obj_storage_type *store;
@@ -2271,7 +2206,7 @@ OLC_MODULE(oedit_apply) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	int loc, num, iter, apply_type;
-	struct obj_apply *apply, *change, *temp;
+	struct obj_apply *apply, *change;
 	bool found;
 	
 	// arg1 arg2 arg3
@@ -2297,7 +2232,7 @@ OLC_MODULE(oedit_apply) {
 					found = TRUE;
 					
 					msg_to_char(ch, "You remove the %+d to %s (%s).\r\n", apply->modifier, apply_types[(int)apply->location], apply_type_names[(int)apply->apply_type]);
-					REMOVE_FROM_LIST(apply, GET_OBJ_APPLIES(obj), next);
+					LL_DELETE(GET_OBJ_APPLIES(obj), apply);
 					free(apply);
 				}
 			}
@@ -2328,17 +2263,7 @@ OLC_MODULE(oedit_apply) {
 			apply->location = loc;
 			apply->modifier = num;
 			apply->apply_type = apply_type;
-			
-			// append to end
-			if ((temp = GET_OBJ_APPLIES(obj))) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = apply;
-			}
-			else {
-				GET_OBJ_APPLIES(obj) = apply;
-			}
+			LL_APPEND(GET_OBJ_APPLIES(obj), apply);
 			
 			msg_to_char(ch, "You add %+d to %s (%s).\r\n", num, apply_types[loc], apply_type_names[apply_type]);
 		}
@@ -2687,7 +2612,6 @@ OLC_MODULE(oedit_currency) {
 
 
 OLC_MODULE(oedit_custom) {
-	void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	olc_process_custom_messages(ch, argument, &(obj->proto_data->custom_msgs), obj_custom_types);
 }
@@ -2896,9 +2820,6 @@ OLC_MODULE(oedit_quantity) {
 
 
 OLC_MODULE(oedit_quick_recipe) {
-	extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
-	extern const char *craft_types[];
-	
 	char new_vnum_arg[MAX_INPUT_LENGTH], from_vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], cmd[256];
 	any_vnum new_vnum, from_vnum;
 	craft_data *cft;
@@ -3062,8 +2983,6 @@ OLC_MODULE(oedit_size) {
 
 
 OLC_MODULE(oedit_storage) {
-	extern bld_data *get_building_by_name(char *name, bool room_only);
-	
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], *flagarg;
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];

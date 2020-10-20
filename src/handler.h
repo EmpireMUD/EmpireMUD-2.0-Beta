@@ -55,22 +55,6 @@
 #define GLB_FUNCTION(name)		void (name)(struct global_data *glb, char_data *ch, void *other_data)
 
 
-/**
-* Validates a location for the pathfinding system.
-*
-* This must be implemented for both 'room' and 'map', as only 1 of those is set
-* each time it's called.
-*
-* @param room_data *room Optional: An interior room (if this is NULL, map will be set instead).
-* @param struct map_data *map Optional: A map room if outdoors (if this is NULL, room will be set instead).
-* @param char_data *ch Optional: Player trying to find the path (may be NULL).
-* @param vehicle_data *veh Optional: Vehicle trying to find the paath (may be NULL).
-* @param struct pathfind_controller *controller The pathfinding controller and all its data.
-* @return bool TRUE if the room/map is ok, FALSE if not.
-*/
-#define PATHFIND_VALIDATOR(name)  bool (name)(room_data *room, struct map_data *map, char_data *ch, vehicle_data *veh, struct pathfind_controller *controller)
-
-
  //////////////////////////////////////////////////////////////////////////////
 //// HANDLER MACROS //////////////////////////////////////////////////////////
 
@@ -97,13 +81,13 @@ void affect_to_char(char_data *ch, struct affected_type *af);
 void affect_to_room(room_data *room, struct affected_type *af);
 void affect_total(char_data *ch);
 void affect_total_room(room_data *room);
-extern bool affected_by_spell(char_data *ch, any_vnum type);
-extern bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply, bitvector_t aff_flag);
+bool affected_by_spell(char_data *ch, any_vnum type);
+bool affected_by_spell_and_apply(char_data *ch, any_vnum type, int apply, bitvector_t aff_flag);
 bool affected_by_spell_from_caster(char_data *ch, any_vnum type, char_data *caster);
-extern struct affected_type *create_aff(any_vnum type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
+struct affected_type *create_aff(any_vnum type, int duration, int location, int modifier, bitvector_t bitvector, char_data *cast_by);
 void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int damage_type, sh_int damage, sh_int max_stack, char_data *cast_by);
 void dot_remove(char_data *ch, struct over_time_effect_type *dot);
-extern bool room_affected_by_spell(room_data *room, any_vnum type);
+bool room_affected_by_spell(room_data *room, any_vnum type);
 void show_wear_off_msg(char_data *ch, int atype);
 
 // affect shortcut macros
@@ -111,9 +95,12 @@ void show_wear_off_msg(char_data *ch, int atype);
 #define create_mod_aff(type, duration, loc, mod, cast_by)  create_aff((type), (duration), (loc), (mod), 0, (cast_by))
 
 // character handlers
+void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
+void die_follower(char_data *ch);
 void extract_char(char_data *ch);
 void extract_char_final(char_data *ch);
-extern bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t flags);
+bool has_learned_craft(char_data *ch, any_vnum vnum);
+bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t flags);
 void perform_idle_out(char_data *ch);
 
 // character location handlers
@@ -121,74 +108,99 @@ void char_from_room(char_data *ch);
 void char_to_room(char_data *ch, room_data *room);
 
 // character targeting handlers
-extern char_data *find_closest_char(char_data *ch, char *arg, bool pc);
-extern char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum);
-extern char_data *find_mortal_in_room(room_data *room);
-extern char_data *get_char_room(char *name, room_data *room);
-extern char_data *get_char_room_vis(char_data *ch, char *name, int *number);
-extern char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t where);
-extern char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags);
-extern char_data *get_char_world(char *name, int *number);
+char_data *find_closest_char(char_data *ch, char *arg, bool pc);
+char_data *find_mob_in_room_by_vnum(room_data *room, mob_vnum vnum);
+char_data *find_mortal_in_room(room_data *room);
+char_data *get_char_by_obj(obj_data *obj, char *name);
+char_data *get_char_by_room(room_data *room, char *name);
+char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
+char_data *get_char_in_room(room_data *room, char *name);
+char_data *get_char_room(char *name, room_data *room);
+char_data *get_char_room_vis(char_data *ch, char *name, int *number);
+char_data *get_char_vis(char_data *ch, char *name, int *number, bitvector_t where);
+char_data *get_player_vis(char_data *ch, char *name, bitvector_t flags);
+char_data *get_char_world(char *name, int *number);
 
 // coin handlers
-extern bool can_afford_coins(char_data *ch, empire_data *type, int amount);
+bool can_afford_coins(char_data *ch, empire_data *type, int amount);
 void charge_coins(char_data *ch, empire_data *type, int amount, struct resource_data **build_used_list);
 void cleanup_all_coins();
 void cleanup_coins(char_data *ch);
 void coin_string(struct coin_data *list, char *storage);
-extern int count_total_coins_as(char_data *ch, empire_data *type);
-extern obj_data *create_money(empire_data *type, int amount);
+int count_total_coins_as(char_data *ch, empire_data *type);
+obj_data *create_money(empire_data *type, int amount);
 #define decrease_coins(ch, emp, amount)  increase_coins(ch, emp, -1 * amount)
-extern double exchange_coin_value(double amount, empire_data *convert_from, empire_data *convert_to);
+double exchange_coin_value(double amount, empire_data *convert_from, empire_data *convert_to);
 double exchange_rate(empire_data *from, empire_data *to);
-extern char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, bool require_coin_type, bool assume_coins, bool *gave_coin_type);
-extern struct coin_data *find_coin_entry(struct coin_data *list, empire_data *emp);
-extern int increase_coins(char_data *ch, empire_data *emp, int amount);
-extern const char *money_amount(empire_data *type, int amount);
-extern const char *money_desc(empire_data *type, int amount);
-extern int total_coins(char_data *ch);
+char *find_coin_arg(char *input, empire_data **emp_found, int *amount_found, bool require_coin_type, bool assume_coins, bool *gave_coin_type);
+struct coin_data *find_coin_entry(struct coin_data *list, empire_data *emp);
+int increase_coins(char_data *ch, empire_data *emp, int amount);
+const char *money_amount(empire_data *type, int amount);
+const char *money_desc(empire_data *type, int amount);
+int total_coins(char_data *ch);
+
+// companion handlers
+struct companion_data *add_companion(char_data *ch, any_vnum vnum, any_vnum from_abil);
+void add_companion_mod(struct companion_data *companion, int type, int num, char *str);
+void add_companion_var(char_data *mob, char *name, char *value, int id);
+struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type);
+struct companion_data *has_companion(char_data *ch, any_vnum vnum);
+void remove_companion(char_data *ch, any_vnum vnum);
+void remove_companion_var(char_data *mob, char *name, int context);
+void reread_companion_trigs(char_data *mob);
 
 // cooldown handlers
 void add_cooldown(char_data *ch, any_vnum type, int seconds_duration);
-extern int get_cooldown_time(char_data *ch, any_vnum type);
+int get_cooldown_time(char_data *ch, any_vnum type);
 void remove_cooldown(char_data *ch, struct cooldown_data *cool);
 void remove_cooldown_by_type(char_data *ch, any_vnum type);
 
 // currency handlers
-extern int add_currency(char_data *ch, any_vnum vnum, int amount);
-extern int get_currency(char_data *ch, any_vnum vnum);
+int add_currency(char_data *ch, any_vnum vnum, int amount);
+int get_currency(char_data *ch, any_vnum vnum);
 
 // empire handlers
 void abandon_room(room_data *room);
 void claim_room(room_data *room, empire_data *emp);
-extern struct empire_political_data *create_relation(empire_data *a, empire_data *b);
-extern int find_rank_by_name(empire_data *emp, char *name);
-extern struct empire_political_data *find_relation(empire_data *from, empire_data *to);
-extern struct empire_territory_data *find_territory_entry(empire_data *emp, room_data *room);
+int count_dropped_items(empire_data *emp, obj_vnum vnum);
+struct empire_political_data *create_relation(empire_data *a, empire_data *b);
+int find_rank_by_name(empire_data *emp, char *name);
+struct empire_political_data *find_relation(empire_data *from, empire_data *to);
+struct empire_territory_data *find_territory_entry(empire_data *emp, room_data *room);
 struct empire_trade_data *find_trade_entry(empire_data *emp, int type, obj_vnum vnum);
-extern int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, double amount);
+struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
+int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, double amount);
 #define decrease_empire_coins(emp_gaining, coin_empire, amount)  increase_empire_coins((emp_gaining), (coin_empire), -1 * (amount))
 void perform_abandon_room(room_data *room);
+void perform_abandon_vehicle(vehicle_data *veh);
 void perform_claim_room(room_data *room, empire_data *emp);
+void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
+void read_vault(empire_data *emp);
+void refresh_empire_dropped_items(empire_data *only_emp);
+void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
+int sort_empire_production_totals(struct empire_production_total *a, struct empire_production_total *b);
 
 // empire production total handlers
 void add_production_total(empire_data *emp, obj_vnum vnum, int amount);
 void add_production_total_for_tag_list(struct mob_tag *list, obj_vnum vnum, int amount);
-extern int get_production_total(empire_data *emp, obj_vnum vnum);
-extern int get_production_total_component(empire_data *emp, any_vnum cmp_vnum);
+int get_production_total(empire_data *emp, obj_vnum vnum);
+int get_production_total_component(empire_data *emp, any_vnum cmp_vnum);
 void mark_production_trade(empire_data *emp, obj_vnum vnum, int imported, int exported);
 
 // empire needs handlers
 void add_empire_needs(empire_data *emp, int island, int type, int amount);
-extern struct empire_needs *get_empire_needs(empire_data *emp, int island, int type);
-extern bool empire_has_needs_status(empire_data *emp, int island, int type, bitvector_t status);
+struct empire_needs *get_empire_needs(empire_data *emp, int island, int type);
+bool empire_has_needs_status(empire_data *emp, int island, int type, bitvector_t status);
+
+// empire npc handlers
+void kill_empire_npc(char_data *ch);
 
 // empire targeting handlers
-extern struct empire_city_data *find_city(empire_data *emp, room_data *loc);
-extern struct empire_city_data *find_city_entry(empire_data *emp, room_data *location);
-extern struct empire_city_data *find_city_by_name(empire_data *emp, char *name);
-extern struct empire_city_data *find_closest_city(empire_data *emp, room_data *loc);
-extern empire_data *get_empire_by_name(char *name);
+struct empire_city_data *find_city(empire_data *emp, room_data *loc);
+struct empire_city_data *find_city_entry(empire_data *emp, room_data *location);
+struct empire_city_data *find_city_by_name(empire_data *emp, char *name);
+struct empire_city_data *find_closest_city(empire_data *emp, room_data *loc);
+empire_data *get_empire_by_name(char *name);
 
 // follow handlers
 void add_follower(char_data *ch, char_data *leader, bool msg);
@@ -198,25 +210,28 @@ void stop_follower(char_data *ch);
 bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t type_flags, char_data *ch, adv_data *adv, int level, GLB_VALIDATOR(*validator), void *other_data);
 
 // group handlers
-extern int count_group_members(struct group_data *group);
-extern struct group_data *create_group(char_data *leader);
+int count_group_members(struct group_data *group);
+struct group_data *create_group(char_data *leader);
 void free_group(struct group_data *group);
-extern bool in_same_group(char_data *ch, char_data *vict);
+bool in_same_group(char_data *ch, char_data *vict);
 void join_group(char_data *ch, struct group_data *group);
 void leave_group(char_data *ch);
 
+// help file handlers
+struct help_index_element *find_help_entry(int level, const char *word);
+
 // interaction handlers
-extern bool can_interact_room(room_data *room, int type);
-extern bool check_exclusion_set(struct interact_exclusion_data **set, char code, double percent);
-extern struct interact_exclusion_data *find_exclusion_data(struct interact_exclusion_data **set, char code);
+bool can_interact_room(room_data *room, int type);
+bool check_exclusion_set(struct interact_exclusion_data **set, char code, double percent);
+struct interact_exclusion_data *find_exclusion_data(struct interact_exclusion_data **set, char code);
 void free_exclusion_data(struct interact_exclusion_data *list);
-extern int get_interaction_depletion(char_data *ch, empire_data *emp, struct interaction_item *list, int interaction_type, bool require_storable);
-extern int get_interaction_depletion_room(char_data *ch, empire_data *emp, room_data *room, int interaction_type, bool require_storable);
-extern bool has_interaction(struct interaction_item *list, int type);
-extern bool meets_interaction_restrictions(struct interact_restriction *list, char_data *ch, empire_data *emp, char_data *inter_mob, obj_data *inter_item);
-extern bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func));
-extern bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, vehicle_data *inter_veh, INTERACTION_FUNC(*func));
-extern bool run_room_interactions(char_data *ch, room_data *room, int type, vehicle_data *inter_veh, int access_type, INTERACTION_FUNC(*func));
+int get_interaction_depletion(char_data *ch, empire_data *emp, struct interaction_item *list, int interaction_type, bool require_storable);
+int get_interaction_depletion_room(char_data *ch, empire_data *emp, room_data *room, int interaction_type, bool require_storable);
+bool has_interaction(struct interaction_item *list, int type);
+bool meets_interaction_restrictions(struct interact_restriction *list, char_data *ch, empire_data *emp, char_data *inter_mob, obj_data *inter_item);
+bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func));
+bool run_interactions(char_data *ch, struct interaction_item *run_list, int type, room_data *inter_room, char_data *inter_mob, obj_data *inter_item, vehicle_data *inter_veh, INTERACTION_FUNC(*func));
+bool run_room_interactions(char_data *ch, room_data *room, int type, vehicle_data *inter_veh, int access_type, INTERACTION_FUNC(*func));
 
 // lore handlers
 void add_lore(char_data *ch, int type, const char *str, ...) __attribute__((format(printf, 3, 4)));
@@ -224,34 +239,35 @@ void remove_lore(char_data *ch, int type);
 void remove_recent_lore(char_data *ch, int type);
 
 // mob tagging handlers
-extern bool find_id_in_tag_list(int id, struct mob_tag *list);
+bool find_id_in_tag_list(int id, struct mob_tag *list);
 void expand_mob_tags(char_data *mob);
 void free_mob_tags(struct mob_tag **list);
 void tag_mob(char_data *mob, char_data *player);
 
 // mount handlers
 void add_mount(char_data *ch, mob_vnum vnum, bitvector_t flags);
-extern bitvector_t get_mount_flags_by_mob(char_data *mob);
-extern struct mount_data *find_mount_data(char_data *ch, mob_vnum vnum);
+bitvector_t get_mount_flags_by_mob(char_data *mob);
+struct mount_data *find_mount_data(char_data *ch, mob_vnum vnum);
 void perform_dismount(char_data *ch);
 void perform_mount(char_data *ch, char_data *mount);
 
 // object handlers
 void add_to_object_list(obj_data *obj);
-extern obj_data *copy_warehouse_obj(obj_data *input);
+struct obj_binding *copy_obj_bindings(struct obj_binding *from);
+obj_data *copy_warehouse_obj(obj_data *input);
 void empty_obj_before_extract(obj_data *obj);
 void extract_obj(obj_data *obj);
-extern obj_data *fresh_copy_obj(obj_data *obj, int scale_level);
-extern bool identical_bindings(obj_data *obj_a, obj_data *obj_b);
-extern bool objs_are_identical(obj_data *obj_a, obj_data *obj_b);
+obj_data *fresh_copy_obj(obj_data *obj, int scale_level);
+bool identical_bindings(obj_data *obj_a, obj_data *obj_b);
+bool objs_are_identical(obj_data *obj_a, obj_data *obj_b);
 void remove_from_object_list(obj_data *obj);
 
 // object binding handlers
 void bind_obj_to_group(obj_data *obj, struct group_data *group);
 void bind_obj_to_player(obj_data *obj, char_data *ch);
 void bind_obj_to_tag_list(obj_data *obj, struct mob_tag *list);
-extern bool bind_ok(obj_data *obj, char_data *ch);
-extern bool bind_ok_idnum(obj_data *obj, int idnum);
+bool bind_ok(obj_data *obj, char_data *ch);
+bool bind_ok_idnum(obj_data *obj, int idnum);
 void reduce_obj_binding(obj_data *obj, char_data *player);
 
 // object location handlers
@@ -269,15 +285,15 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to);
 void obj_to_room(obj_data *object, room_data *room);
 void obj_to_vehicle(obj_data *object, vehicle_data *veh);
 void swap_obj_for_obj(obj_data *old, obj_data *new);
-extern obj_data *unequip_char(char_data *ch, int pos);
-extern obj_data *unequip_char_to_inventory(char_data *ch, int pos);
-extern obj_data *unequip_char_to_room(char_data *ch, int pos);
+obj_data *unequip_char(char_data *ch, int pos);
+obj_data *unequip_char_to_inventory(char_data *ch, int pos);
+obj_data *unequip_char_to_room(char_data *ch, int pos);
 
 // custom message handlers
-extern struct custom_message *copy_custom_messages(struct custom_message *from);
+struct custom_message *copy_custom_messages(struct custom_message *from);
 void free_custom_messages(struct custom_message *mes);
-extern char *get_custom_message(struct custom_message *list, int type);
-extern bool has_custom_message(struct custom_message *list, int type);
+char *get_custom_message(struct custom_message *list, int type);
+bool has_custom_message(struct custom_message *list, int type);
 
 // custom message helpers
 #define mob_get_custom_message(mob, type)  get_custom_message(MOB_CUSTOM_MSGS(mob), type)
@@ -290,36 +306,55 @@ extern bool has_custom_message(struct custom_message *list, int type);
 #define veh_has_custom_message(veh, type)  has_custom_message(VEH_CUSTOM_MSGS(veh), type)
 
 // object targeting handlers
-extern obj_data *get_component_in_list(any_vnum cmp_vnum, obj_data *list, bool *kept);
-extern obj_data *get_obj_by_char_share(char_data *ch, char *arg);
-extern obj_data *get_obj_in_list_num(int num, obj_data *list);
-extern obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list);
-extern obj_data *get_obj_in_list_vis(char_data *ch, char *name, int *number, obj_data *list);
-extern obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, int *number, obj_data *list, int interact_type);
-extern obj_data *get_obj_in_list_vis_prefer_type(char_data *ch, char *name, int *number, obj_data *list, int obj_type);
-extern int get_obj_pos_in_equip_vis(char_data *ch, char *arg, int *number, obj_data *equipment[]);
-extern obj_vnum get_obj_vnum_by_name(char *name, bool storable_only);
-extern obj_data *get_obj_vis(char_data *ch, char *name, int *number);
-extern obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, int *number, obj_data *equipment[], int *pos);
-extern obj_data *get_obj_world(char *name, int *number);
+obj_data *get_component_in_list(any_vnum cmp_vnum, obj_data *list, bool *kept);
+obj_data *get_obj_by_char_share(char_data *ch, char *arg);
+obj_data *get_obj_by_obj(obj_data *obj, char *name);
+obj_data *get_obj_by_room(room_data *room, char *name);
+obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name);
+obj_data *get_obj_in_list_num(int num, obj_data *list);
+obj_data *get_obj_in_list_vnum(obj_vnum vnum, obj_data *list);
+obj_data *get_obj_in_list_vis(char_data *ch, char *name, int *number, obj_data *list);
+obj_data *get_obj_in_list_vis_prefer_interaction(char_data *ch, char *name, int *number, obj_data *list, int interact_type);
+obj_data *get_obj_in_list_vis_prefer_type(char_data *ch, char *name, int *number, obj_data *list, int obj_type);
+obj_data *get_obj_in_room(room_data *room, char *name);
+int get_obj_pos_in_equip_vis(char_data *ch, char *arg, int *number, obj_data *equipment[]);
+obj_vnum get_obj_vnum_by_name(char *name, bool storable_only);
+obj_data *get_obj_vis(char_data *ch, char *name, int *number);
+obj_data *get_obj_in_equip_vis(char_data *ch, char *arg, int *number, obj_data *equipment[], int *pos);
+obj_data *get_obj_world(char *name, int *number);
 
 // offer handlers
-extern struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data);
+struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data);
 void remove_offers_by_type(char_data *ch, int type);
+
+// player list handlers
+void add_learned_craft(char_data *ch, any_vnum vnum);
+void add_minipet(char_data *ch, any_vnum vnum);
+bool has_minipet(char_data *ch, any_vnum vnum);
+void remove_learned_craft(char_data *ch, any_vnum vnum);
+void remove_minipet(char_data *ch, any_vnum vnum);
 
 // player tech handlers
 void add_player_tech(char_data *ch, any_vnum abil, int tech);
-extern bool has_player_tech(char_data *ch, int tech);
+bool has_player_tech(char_data *ch, int tech);
 void remove_player_tech(char_data *ch, any_vnum abil);
-extern bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvict, obj_data *ovict);
+bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvict, obj_data *ovict);
 
 // requirement handlers
+struct req_data *copy_requirements(struct req_data *from);
+bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
+void extract_required_items(char_data *ch, struct req_data *list);
+bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 void free_requirements(struct req_data *list);
+char *requirement_string(struct req_data *task, bool show_vnums);
+
+// resource handlers
+bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 
 // resource depletion handlers
 void add_depletion(room_data *room, int type, bool multiple);
 #define add_vehicle_depletion(veh, type, multiple)  perform_add_depletion(&VEH_DEPLETION(veh), (type), (multiple))
-extern int get_depletion_amount(struct depletion_data *list, int type, bool only_type);
+int get_depletion_amount(struct depletion_data *list, int type, bool only_type);
 #define get_depletion(room, type, only_type)  get_depletion_amount(ROOM_DEPLETION(room), (type), (only_type))
 #define get_vehicle_depletion(veh, type, only_type)  get_depletion_amount(VEH_DEPLETION(veh), (type), (only_type))
 void perform_add_depletion(struct depletion_data **list, int type, bool multiple);
@@ -334,8 +369,8 @@ void detach_building_from_room(room_data *room);
 
 // room extra data handlers
 void add_to_extra_data(struct room_extra_data **list, int type, int add_value);
-extern struct room_extra_data *find_extra_data(struct room_extra_data *list, int type);
-extern int get_extra_data(struct room_extra_data *list, int type);
+struct room_extra_data *find_extra_data(struct room_extra_data *list, int type);
+int get_extra_data(struct room_extra_data *list, int type);
 void multiply_extra_data(struct room_extra_data **list, int type, double multiplier);
 void remove_extra_data(struct room_extra_data **list, int type);
 void set_extra_data(struct room_extra_data **list, int type, int value);
@@ -357,38 +392,42 @@ void set_extra_data(struct room_extra_data **list, int type, int value);
 #define set_vehicle_extra_data(veh, type, value)  set_extra_data(&VEH_EXTRA_DATA(veh), type, value)
 
 // room targeting handlers
-extern room_data *find_target_room(char_data *ch, char *rawroomstr);
-extern room_data *parse_room_from_coords(char *string);
+room_data *find_target_room(char_data *ch, char *rawroomstr);
+room_data *parse_room_from_coords(char *string);
 
 // sector handlers
-extern bool check_evolution_percent(struct evolution_data *evo);
-extern struct evolution_data *get_evolution_by_type(sector_data *st, int type);
-extern bool has_evolution_type(sector_data *st, int type);
+bool check_evolution_percent(struct evolution_data *evo);
+struct evolution_data *get_evolution_by_type(sector_data *st, int type);
+bool has_evolution_type(sector_data *st, int type);
 sector_data *reverse_lookup_evolution_for_sector(sector_data *in_sect, int evo_type);
 
 // storage handlers
 struct empire_storage_data *add_to_empire_storage(empire_data *emp, int island, obj_vnum vnum, int amount);
-extern bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool use_kept, bool basic_only, struct resource_data **build_used_list);
-extern bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount);
-extern bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
-extern bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool include_kept, bool basic_only);
-extern struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
-extern struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
-extern int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_secondary);
-extern bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool retrieval_mode);
+bool charge_stored_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool use_kept, bool basic_only, struct resource_data **build_used_list);
+bool charge_stored_resource(empire_data *emp, int island, obj_vnum vnum, int amount);
+bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capped);
+bool delete_stored_resource(empire_data *emp, obj_vnum vnum);
+bool empire_can_afford_component(empire_data *emp, int island, any_vnum cmp_vnum, int amount, bool include_kept, bool basic_only);
+struct empire_storage_data *find_island_storage_by_keywords(empire_data *emp, int island_id, char *keywords);
+struct empire_storage_data *find_stored_resource(empire_data *emp, int island, obj_vnum vnum);
+int get_total_stored_count(empire_data *emp, obj_vnum vnum, bool count_secondary);
+bool obj_can_be_stored(obj_data *obj, room_data *loc, empire_data *by_emp, bool retrieval_mode);
 #define obj_can_be_retrieved(obj, loc, by_emp)  obj_can_be_stored((obj), (loc), (by_emp), TRUE)
-extern bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen);
-extern int store_resource(char_data *ch, empire_data *emp, obj_data *obj);
-extern bool stored_item_requires_withdraw(obj_data *obj);
+bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen);
+int store_resource(char_data *ch, empire_data *emp, obj_data *obj);
+bool stored_item_requires_withdraw(obj_data *obj);
 
 // targeting handlers
-extern int find_all_dots(char *arg);
-extern bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh);
-extern int get_number(char **name);
+int find_all_dots(char *arg);
+bitvector_t generic_find(char *arg, bitvector_t bitvector, char_data *ch, char_data **tar_ch, obj_data **tar_obj, vehicle_data **tar_veh);
+int get_number(char **name);
+
+// trading post handlers
+void expire_trading_post_item(struct trading_post_data *tpd);
 
 // unique storage handlers
-extern bool delete_unique_storage_by_vnum(struct empire_unique_storage **list, obj_vnum vnum);
-extern struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique_storage *list, room_data *location);
+bool delete_unique_storage_by_vnum(struct empire_unique_storage **list, obj_vnum vnum);
+struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique_storage *list, room_data *location);
 void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, obj_data *obj, empire_data *save_emp, room_data *room, bool *full);
 
 // vehicle handlers
@@ -399,17 +438,25 @@ void vehicle_from_room(vehicle_data *veh);
 void vehicle_to_room(vehicle_data *veh, room_data *room);
 
 // vehicle targeting handlers
+vehicle_data *get_vehicle(char *name);
+vehicle_data *get_vehicle_by_obj(obj_data *obj, char *name);
+vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name);
 vehicle_data *get_vehicle_in_target_room_vis(char_data *ch, room_data *room, char *name, int *number);
+vehicle_data *get_vehicle_near_obj(obj_data *obj, char *name);
+vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name);
 #define get_vehicle_in_room_vis(ch, name, number)  get_vehicle_in_target_room_vis((ch), IN_ROOM(ch), (name), (number))
-extern vehicle_data *get_vehicle_vis(char_data *ch, char *name, int *number);
-extern vehicle_data *get_vehicle_room(room_data *room, char *name, int *number);
-extern vehicle_data *get_vehicle_world(char *name, int *number);
-extern vehicle_data *get_vehicle_world_vis(char_data *ch, char *name, int *number);
+vehicle_data *get_vehicle_vis(char_data *ch, char *name, int *number);
+vehicle_data *get_vehicle_room(room_data *room, char *name, int *number);
+vehicle_data *get_vehicle_world(char *name, int *number);
+vehicle_data *get_vehicle_world_vis(char_data *ch, char *name, int *number);
 
 // world handlers
-extern struct room_direction_data *find_exit(room_data *room, int dir);
-extern int get_direction_for_char(char_data *ch, int dir);
-extern int parse_direction(char_data *ch, char *dir);
+struct room_direction_data *find_exit(room_data *room, int dir);
+int get_direction_for_char(char_data *ch, int dir);
+room_data *get_room(room_data *ref, char *name);
+room_data *obj_room(obj_data *obj);
+int parse_direction(char_data *ch, char *dir);
+void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -429,7 +476,7 @@ extern bool config_get_bool(char *key);
 extern double config_get_double(char *key);
 extern int config_get_int(char *key);
 extern int *config_get_int_array(char *key, int *array_size);
-extern const char *config_get_string(char *key);
+const char *config_get_string(char *key);
 
 // faction.c
 extern int compare_reptuation(int rep_a, int rep_b);
@@ -460,7 +507,8 @@ extern struct instance_data *real_instance(any_vnum instance_id);
 void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum);
 
 // limits.c
-extern int limit_crowd_control(char_data *victim, int atype);
+INTERACTION_FUNC(consumes_or_decays_interact);
+int limit_crowd_control(char_data *victim, int atype);
 
 // morph.c
 void perform_morph(char_data *ch, morph_data *morph);

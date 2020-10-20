@@ -29,7 +29,6 @@
 *   Commands
 */
 
-
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
@@ -113,8 +112,6 @@ static int perform_sacrifice(char_data *ch, char_data *god, obj_data *obj, bool 
 
 
 ACMD(do_create) {
-	void scale_item_to_level(obj_data *obj, int level);
-	
 	char *name;
 	obj_data *proto, *obj = NULL;
 	obj_data *obj_iter, *next_obj;

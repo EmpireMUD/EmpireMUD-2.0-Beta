@@ -45,9 +45,6 @@
 #define STRINGADD_ACTION	4	/* Editor action, don't append \r\n.	*/
 
 
-extern char *show_color_codes(char *string);
-void show_string(descriptor_data *d, char *input);
-
 /* local functions */
 void smash_tilde(char *str);
 char *next_page(char *str, descriptor_data *desc);
@@ -155,8 +152,6 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 
 /* Add user input to the 'current' string (as defined by d->str) */
 void string_add(descriptor_data *d, char *str) {
-	void check_delayed_load(char_data *ch);
-	void save_island_table();
 	extern char *stripcr(char *dest, const char *src);
 	extern int improved_editor_execute(descriptor_data *d, char *str);
 	
@@ -255,8 +250,7 @@ void string_add(descriptor_data *d, char *str) {
 					mail->body = str_dup(*d->str);
 					
 					// put it on the pile
-					mail->next = GET_MAIL_PENDING(recip);
-					GET_MAIL_PENDING(recip) = mail;
+					LL_PREPEND(GET_MAIL_PENDING(recip), mail);
 					
 					if (is_file) {
 						store_loaded_char(recip);
@@ -682,7 +676,6 @@ int improved_editor_execute(descriptor_data *d, char *str) {
 
 
 void parse_action(int command, char *string, descriptor_data *d) {
-	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
 	extern int format_script(descriptor_data *d);
 	extern int replace_str(char **string, char *pattern, char *replacement, int rep_all, unsigned int max_size);
 	

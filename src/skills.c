@@ -23,6 +23,7 @@
 #include "vnums.h"
 #include "dg_scripts.h"
 #include "olc.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -44,28 +45,17 @@ const char *default_skill_name = "Unnamed Skill";
 const char *default_skill_abbrev = "???";
 const char *default_skill_desc = "New skill";
 
-// external consts
-extern const char *skill_flags[];
-extern const char *class_role[];
-extern const char *class_role_color[];
-
 // eternal functions
 void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
-void assign_class_abilities(char_data *ch, class_data *cls, int role);
-void resort_empires(bool force);
 extern bool is_class_ability(ability_data *abil);
-void scale_item_to_level(obj_data *obj, int level);
-void update_class(char_data *ch);
 
 // local protos
 bool can_gain_skill_from(char_data *ch, ability_data *abil);
-void clear_char_abilities(char_data *ch, any_vnum skill);
 struct skill_ability *find_skill_ability(skill_data *skill, ability_data *abil);
 int get_ability_points_available(any_vnum skill, int level);
 int get_ability_points_spent(char_data *ch, any_vnum skill);
 void get_skill_synergy_display(struct synergy_ability *list, char *save_buffer, char_data *info_ch);
 bool green_skill_deadend(char_data *ch, any_vnum skill);
-void remove_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels);
 int sort_skill_abilities(struct skill_ability *a, struct skill_ability *b);
 int sort_synergies(struct synergy_ability *a, struct synergy_ability *b);
 
@@ -80,13 +70,9 @@ int sort_synergies(struct synergy_ability *a, struct synergy_ability *b);
 * @param ability_data *abil The ability to sell
 */
 void check_skill_sell(char_data *ch, ability_data *abil) {
-	bool despawn_charmies(char_data *ch, any_vnum only_vnum);
-	void finish_morphing(char_data *ch, morph_data *morph);
 	void remove_armor_by_type(char_data *ch, int armor_type);
 	void remove_honed_gear(char_data *ch);
-	void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
 	void retract_claws(char_data *ch);
-	void undisguise(char_data *ch);	
 	
 	struct ability_data_list *adl;
 	char_data *mob, *next_mob;
@@ -258,7 +244,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_EARTHMELD: {
 			if (affected_by_spell(ch, ATYPE_EARTHMELD)) {
-				void un_earthmeld(char_data *ch);
 				un_earthmeld(ch);
 				need_affect_total = TRUE;
 			}
@@ -580,8 +565,6 @@ bool can_gain_skill_from(char_data *ch, ability_data *abil) {
 * @return bool TRUE if ch can use ability; FALSE if not.
 */
 bool can_use_ability(char_data *ch, any_vnum ability, int cost_pool, int cost_amount, int cooldown_type) {
-	extern const char *pool_types[];
-	
 	char buf[MAX_STRING_LENGTH];
 	int time, needs_cost;
 	
@@ -1572,8 +1555,6 @@ void reset_skill_gain_tracker_on_abilities_above_level(char_data *ch, any_vnum s
 
 // set a skill directly to a level
 void set_skill(char_data *ch, any_vnum skill, int level) {
-	void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
-	
 	struct player_skill_data *skdata;
 	bool gain = FALSE;
 	bool was_vampire = IS_VAMPIRE(ch);
@@ -1605,8 +1586,6 @@ void set_skill(char_data *ch, any_vnum skill, int level) {
 * @return bool TRUE for success, FALSE for fail
 */
 bool skill_check(char_data *ch, any_vnum ability, int difficulty) {
-	extern double skill_check_difficulty_modifier[NUM_DIFF_TYPES];
-
 	int chance = get_ability_level(ch, ability);
 	
 	// always succeeds
@@ -1701,9 +1680,6 @@ ACMD(do_noskill) {
 
 
 ACMD(do_skills) {
-	void check_un_vampire(char_data *ch, bool remove_vampire_skills);
-	void clear_char_abilities(char_data *ch, any_vnum skill);
-	
 	char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], lbuf[MAX_INPUT_LENGTH], outbuf[MAX_STRING_LENGTH], *ptr;
 	struct synergy_display_type *sdt_list = NULL, *sdt;
 	struct synergy_display_ability *sda;
@@ -2676,9 +2652,6 @@ char *list_one_skill(skill_data *skill, bool detail) {
 * @param any_vnum vnum The skill vnum.
 */
 void olc_search_skill(char_data *ch, any_vnum vnum) {
-	extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	skill_data *skill = find_skill_by_vnum(vnum), *sk, *next_sk;
 	archetype_data *arch, *next_arch;
@@ -2993,7 +2966,6 @@ struct skill_ability *copy_skill_abilities(struct skill_ability *input) {
 	LL_FOREACH(input, iter) {
 		CREATE(el, struct skill_ability, 1);
 		*el = *iter;
-		el->next = NULL;
 		LL_APPEND(list, el);
 	}
 	
@@ -3013,7 +2985,6 @@ struct synergy_ability *copy_synergy_abilities(struct synergy_ability *input) {
 	LL_FOREACH(input, iter) {
 		CREATE(el, struct synergy_ability, 1);
 		*el = *iter;
-		el->next = NULL;
 		LL_APPEND(list, el);
 	}
 	
@@ -3283,8 +3254,6 @@ skill_data *create_skill_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_skill(char_data *ch, any_vnum vnum) {
-	extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	extern bool remove_vnum_from_class_skill_reqs(struct class_skill_req **list, any_vnum vnum);
 	extern bool remove_skill_from_synergy_abilities(struct synergy_ability **list, any_vnum skill_vnum);
 	

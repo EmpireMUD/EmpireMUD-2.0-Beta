@@ -24,54 +24,14 @@
 #include "db.h"
 #include "skills.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
 *   Helpers
-*   Commands
+*   Vehicle Commands
+*   Vehicle Command Interpreter
 */
-
-// external vars
-extern const char *damage_types[];
-extern const char *alt_dirs[];
-extern const char *dirs[];
-extern struct instance_data *quest_instance_global;
-
-// external functions
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
-void die(char_data *ch, char_data *killer);
-extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
-extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-extern obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name);
-extern room_data *get_room(room_data *ref, char *name);
-extern vehicle_data *get_vehicle(char *name);
-extern vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name);
-extern vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name);
-void instance_obj_setup(struct instance_data *inst, obj_data *obj);
-extern room_data *obj_room(obj_data *obj);
-void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
-void scale_item_to_level(obj_data *obj, int level);
-void scale_mob_to_level(char_data *mob, int level);
-void scale_vehicle_to_level(vehicle_data *veh, int level);
-void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
-void sub_write_to_room(char *str, room_data *room, bool use_queue);
-void vehicle_command_interpreter(vehicle_data *veh, char *argument);
-
-
-// local stuff
-#define VCMD(name)  void (name)(vehicle_data *veh, char *argument, int cmd, int subcmd)
-
-struct vehicle_command_info {
-	char *command;
-	void (*command_pointer)(vehicle_data *veh, char *argument, int cmd, int subcmd);
-	int subcmd;
-};
-
-
-// do_vsend
-#define SCMD_VSEND         0
-#define SCMD_VECHOAROUND   1
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -131,11 +91,9 @@ void veh_log(vehicle_data *veh, const char *format, ...) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// COMMANDS ////////////////////////////////////////////////////////////////
+//// VEHICLE COMMANDS ////////////////////////////////////////////////////////
 
 VCMD(do_vadventurecomplete) {
-	void mark_instance_completed(struct instance_data *inst);
-	
 	room_data *room = IN_ROOM(veh);
 	struct instance_data *inst;
 	
@@ -154,8 +112,6 @@ VCMD(do_vadventurecomplete) {
 
 
 VCMD(do_vbuild) {
-	void do_dg_build(room_data *target, char *argument);
-
 	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
 	room_data *orm = IN_ROOM(veh), *target;
 	
@@ -451,7 +407,6 @@ VCMD(do_vsend) {
 
 
 VCMD(do_vmod) {
-	void script_modify(char *argument);
 	script_modify(argument);
 }
 
@@ -485,14 +440,11 @@ VCMD(do_vmorph) {
 
 // incoming subcmd is direction
 VCMD(do_vmove) {
-	extern bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd);
 	move_vehicle(NULL, veh, subcmd, 0);
 }
 
 
 VCMD(do_vown) {
-	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
-	
 	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
 	room_data *orm = IN_ROOM(veh);
 	vehicle_data *vtarg = NULL;
@@ -708,17 +660,11 @@ VCMD(do_vpurge) {
 
 // quest commands
 VCMD(do_vquest) {
-	void do_dg_quest(int go_type, void *go, char *argument);	
 	do_dg_quest(VEH_TRIGGER, veh, argument);
 }
 
 
 VCMD(do_vsiege) {
-	void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
-	extern bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
-	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
-	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
-	
 	char scale_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh_targ = NULL;
 	room_data *room_targ = NULL;
@@ -903,8 +849,6 @@ VCMD(do_vteleport) {
 
 
 VCMD(do_vterracrop) {
-	void do_dg_terracrop(room_data *target, crop_data *crop);
-
 	char loc_arg[MAX_INPUT_LENGTH], crop_arg[MAX_INPUT_LENGTH];
 	room_data *orm = IN_ROOM(veh), *target;
 	crop_data *crop;
@@ -952,8 +896,6 @@ VCMD(do_vterracrop) {
 
 
 VCMD(do_vterraform) {
-	void do_dg_terraform(room_data *target, sector_data *sect);
-
 	char loc_arg[MAX_INPUT_LENGTH], sect_arg[MAX_INPUT_LENGTH];
 	room_data *orm = IN_ROOM(veh), *target;
 	sector_data *sect;
@@ -1006,10 +948,6 @@ VCMD(do_vterraform) {
 
 
 VCMD(do_vload) {
-	extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst = NULL;
 	int number = 0;
@@ -1317,7 +1255,7 @@ VCMD(do_vdoor) {
 	char target[MAX_INPUT_LENGTH], direction[MAX_INPUT_LENGTH];
 	char field[MAX_INPUT_LENGTH], *value;
 	room_data *rm, *troom, *orm = IN_ROOM(veh);
-	struct room_direction_data *newexit, *temp;
+	struct room_direction_data *newexit;
 	int dir, fd;
 
 	const char *door_field[] = {
@@ -1365,7 +1303,7 @@ VCMD(do_vdoor) {
 	/* purge exit */
 	if (fd == 0) {
 		if (newexit) {
-			REMOVE_FROM_LIST(newexit, COMPLEX_DATA(rm)->exits, next);
+			LL_DELETE(COMPLEX_DATA(rm)->exits, newexit);
 			if (newexit->room_ptr) {
 				--GET_EXITS_HERE(newexit->room_ptr);
 			}
@@ -1476,10 +1414,6 @@ VCMD(do_vat)  {
 
 
 VCMD(do_vrestore) {
-	void complete_vehicle(vehicle_data *veh);
-	extern const bool aff_is_bad[];
-	extern const double apply_values[];
-	
 	struct affected_type *aff, *next_aff;
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *vtarg = NULL;
@@ -1657,6 +1591,9 @@ VCMD(do_vscale) {
 }
 
 
+ //////////////////////////////////////////////////////////////////////////////
+//// VEHICLE COMMAND INTERPRETER /////////////////////////////////////////////
+
 const struct vehicle_command_info veh_cmd_info[] = {
 	{ "RESERVED", 0, 0 },/* this must be first -- for specprocs */
 	
@@ -1712,7 +1649,6 @@ const struct vehicle_command_info veh_cmd_info[] = {
 
 	{ "\n", 0, 0 }        /* this must be last */
 };
-
 
 
 /**

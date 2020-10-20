@@ -20,6 +20,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -28,20 +29,8 @@
 *   Edit Modules
 */
 
-// external consts
-extern const char *action_bits[];
-extern const char *climate_flags[];
-extern const bitvector_t climate_flags_order[];
-extern const char *global_flags[];
-extern const char *global_types[];
-extern const char *interact_types[];
-extern const char *sector_flags[];
-extern const char *spawn_flags[];
-extern const char *spawn_flags_short[];
-
 // external funcs
 extern struct archetype_gear *copy_archetype_gear(struct archetype_gear *input);
-void free_archetype_gear(struct archetype_gear *list);
 void sort_interactions(struct interaction_item **list);
 
 // locals
@@ -157,8 +146,6 @@ struct global_data *create_global_table_entry(any_vnum vnum) {
 * @return char* The line to show (without a CRLF).
 */
 char *list_one_global(struct global_data *glb, bool detail) {
-	extern const char *action_bits[];
-	
 	static char output[MAX_STRING_LENGTH];
 	char abil[MAX_STRING_LENGTH], flags[MAX_STRING_LENGTH], flags2[MAX_STRING_LENGTH];
 	ability_data *ab;
@@ -383,9 +370,6 @@ struct global_data *setup_olc_global(struct global_data *input) {
 * @param char_data *ch The person who is editing a global and will see its display.
 */
 void olc_show_global(char_data *ch) {
-	void get_icons_display(struct icon_data *list, char *save_buffer);
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	char buf[MAX_STRING_LENGTH * 4], lbuf[MAX_STRING_LENGTH];
 	struct spawn_info *spawn;
@@ -465,8 +449,7 @@ void olc_show_global(char_data *ch) {
 			}
 			break;
 		}
-		case GLOBAL_NEWBIE_GEAR: {			
-			void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
+		case GLOBAL_NEWBIE_GEAR: {
 			get_archetype_gear_display(GET_GLOBAL_GEAR(glb), lbuf);
 			sprintf(buf + strlen(buf), "Gear: <%sgear\t0>\r\n%s", OLC_LABEL_PTR(GET_GLOBAL_GEAR(glb)), GET_GLOBAL_GEAR(glb) ? lbuf : "");
 			break;

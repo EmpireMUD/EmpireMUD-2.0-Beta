@@ -25,7 +25,7 @@
 #include "handler.h"
 #include "dg_scripts.h"
 #include "vnums.h"
-
+#include "constants.h"
 
 /**
 * Contents:
@@ -44,24 +44,9 @@
 const char *default_generic_name = "Unnamed Generic";
 #define MAX_LIQUID_COND  (MAX_CONDITION / 15)	// approximate game hours of max cond
 
-// external consts
-extern const char *generic_flags[];
-extern const char *generic_types[];
-extern const char *olc_type_bits[NUM_OLC_TYPES+1];
-
 // local funcs
 struct generic_relation *copy_generic_relations(struct generic_relation *list);
 void free_generic_relations(struct generic_relation **list);
-bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
-
-// external funcs
-extern bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
-extern bool delete_quest_reward_from_list(struct quest_reward **list, int type, any_vnum vnum);
-extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
-extern bool find_currency_in_shop_item_list(struct shop_item *list, any_vnum vnum);
-extern bool find_quest_reward_in_list(struct quest_reward *list, int type, any_vnum vnum);
-extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-extern bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -969,10 +954,6 @@ generic_data *create_generic_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_generic(char_data *ch, any_vnum vnum) {
-	void complete_building(room_data *room);
-	void complete_vehicle(vehicle_data *veh);
-	void refresh_all_quests(char_data *ch);
-	
 	struct trading_post_data *tpd, *next_tpd;
 	struct player_currency *cur, *next_cur;
 	struct empire_unique_storage *eus;
@@ -1052,8 +1033,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	}
 	
 	// remove from live lists: trading post drink containers
-	for (tpd = trading_list; tpd; tpd = next_tpd) {
-		next_tpd = tpd->next;
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
 		if (!tpd->obj) {
 			continue;
 		}
@@ -1489,8 +1469,6 @@ void save_olc_generic(descriptor_data *desc) {
 * @return generic_data* The copied generic.
 */
 generic_data *setup_olc_generic(generic_data *input) {
-	extern struct req_data *copy_requirements(struct req_data *from);
-	
 	generic_data *new;
 	int iter;
 	

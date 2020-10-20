@@ -21,6 +21,7 @@
 #include "interpreter.h"
 #include "skills.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -29,31 +30,8 @@
 *   Quest Commands
 */
 
-// helpful
+// for quest subcommands
 #define QCMD(name)		void (name)(char_data *ch, char *argument)
-
-// external vars
-
-// external funcs
-extern bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
-extern bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
-extern bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
-extern bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
-extern bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
-extern struct req_data *copy_requirements(struct req_data *from);
-void free_player_quests(struct player_quest *list);
-void free_quest_temp_list(struct quest_temp_list *list);
-extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id);
-extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
-void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq);
-void remove_quest_items_by_quest(char_data *ch, any_vnum vnum);
-extern char *requirement_string(struct req_data *task, bool show_vnums);
-
-// local prototypes
-void drop_quest(char_data *ch, struct player_quest *pq);
-bool fail_daily_quests(char_data *ch);
-void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -145,8 +123,6 @@ const char *color_by_difficulty(char_data *ch, int level) {
 * @param empire_data *giver_emp The empire of the quest-giver, if any.
 */
 void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_emp) {
-	void extract_required_items(char_data *ch, struct req_data *list);
-	
 	quest_data *quest = quest_proto(pq->vnum);
 	struct player_completed_quest *pcq;
 	any_vnum vnum;
@@ -486,7 +462,6 @@ char *show_daily_quest_line(char_data *ch) {
 * @param struct player_quest *pq The quest to show the tracker for.
 */
 void show_quest_tracker(char_data *ch, struct player_quest *pq) {
-	void get_tracker_display(struct req_data *tracker, char *save_buffer);
 	char buf[MAX_STRING_LENGTH];
 	
 	get_tracker_display(pq->tracker, buf);
@@ -502,8 +477,6 @@ void show_quest_tracker(char_data *ch, struct player_quest *pq) {
 * @param struct instance_data *inst The associated instance, if any.
 */
 void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst) {
-	extern int check_start_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
-	
 	char buf[MAX_STRING_LENGTH];
 	struct player_quest *pq;
 	int count, total;
@@ -588,9 +561,6 @@ QCMD(qcmd_drop) {
 * @param bool show_errors If FALSE, runs silently (e.g. trying to turn in all).
 */
 bool qcmd_finish_one(char_data *ch, struct player_quest *pq, bool show_errors) {
-	extern bool can_turn_in_quest_at(char_data *ch, room_data *loc, quest_data *quest, empire_data **giver_emp);
-	extern int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
-	
 	quest_data *quest = quest_proto(pq->vnum);
 	struct group_member_data *mem;
 	empire_data *giver_emp = NULL;
@@ -927,8 +897,6 @@ QCMD(qcmd_share) {
 
 
 QCMD(qcmd_start) {
-	extern struct player_quest *is_on_quest_by_name(char_data *ch, char *argument);
-	
 	struct quest_temp_list *qtl, *quest_list = NULL;
 	struct instance_data *inst = NULL;
 	char buf[MAX_STRING_LENGTH], vstr[128];
@@ -1076,8 +1044,6 @@ const struct { char *command; QCMD(*func); int min_pos; } quest_cmd[] = {
 
 
 ACMD(do_quest) {
-	extern const char *position_types[];
-	
 	char buf[MAX_STRING_LENGTH], cmd_arg[MAX_INPUT_LENGTH];
 	int iter, type;
 	bool found;

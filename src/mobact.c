@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -37,16 +38,6 @@
 
 // external vars
 extern struct generic_name_data *generic_names;
-extern struct character_size_data size_data[];
-
-// external funcs
-extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
-
-// local protos
-void end_pursuit(char_data *ch, char_data *target);
-struct generic_name_data *get_generic_name_list(int name_set, int sex);
-void scale_mob_to_level(char_data *mob, int level);
-bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city);
 
 
 // for validate_global_map_spawns, run_global_map_spawns
@@ -79,8 +70,7 @@ void add_pursuit(char_data *ch, char_data *target) {
 	
 	// add new instance
 	CREATE(purs, struct pursuit_data, 1);
-	purs->next = MOB_PURSUIT(ch);
-	MOB_PURSUIT(ch) = purs;
+	LL_PREPEND(MOB_PURSUIT(ch), purs);
 	
 	purs->idnum = GET_IDNUM(target);
 	purs->last_seen = time(0);
@@ -95,7 +85,7 @@ void add_pursuit(char_data *ch, char_data *target) {
 * @param char_data *target The victim
 */
 void end_pursuit(char_data *ch, char_data *target) {
-	struct pursuit_data *purs, *next_purs, *temp;
+	struct pursuit_data *purs, *next_purs;
 	
 	// only mobs have this
 	if (!IS_NPC(ch)) {
@@ -107,7 +97,7 @@ void end_pursuit(char_data *ch, char_data *target) {
 		next_purs = purs->next;
 		
 		if (purs->idnum == GET_IDNUM(target)) {
-			REMOVE_FROM_LIST(purs, MOB_PURSUIT(ch), next);
+			LL_DELETE(MOB_PURSUIT(ch), purs);
 			free(purs);
 		}
 	}
@@ -182,8 +172,6 @@ int mob_coins(char_data *mob) {
 
 
 INTERACTION_FUNC(run_one_encounter) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	char_data *aggr;
 	int iter;
 	bool any = FALSE;
@@ -516,8 +504,6 @@ bool mob_can_move_to_sect(char_data *mob, room_data *to_room) {
 * @return TRUE if the move is valid, FALSE otherwise
 */
 bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
-	void empire_skillup(empire_data *emp, any_vnum ability, double amount);
-	
 	empire_data *ch_emp = GET_LOYALTY(ch);
 	empire_data *room_emp = ROOM_OWNER(to_room);
 	bool valid = TRUE;
@@ -557,8 +543,6 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
 */
 bool try_mobile_movement(char_data *ch) {
 	ACMD(do_exit);
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
-	extern const int rev_dir[];
 	
 	int dir, count;
 	room_data *to_room, *temp_room, *was_in = IN_ROOM(ch);
@@ -645,13 +629,11 @@ bool try_mobile_movement(char_data *ch) {
 * Main cycle of mob activity (iterates over character list).
 */
 void mobile_activity(void) {
-	extern obj_data *find_portal_in_room_targetting(room_data *room, room_vnum to_room);
-	extern vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum interior_room);
 	extern bool catch_up_mobs;
 	
 	register char_data *ch, *next_ch, *vict, *targ, *m;
 	struct track_data *track;
-	struct pursuit_data *purs, *next_purs, *temp;
+	struct pursuit_data *purs, *next_purs;
 	room_vnum track_to_room = NOWHERE;
 	obj_data *obj;
 	int found, dir = NO_DIR;
@@ -689,7 +671,7 @@ void mobile_activity(void) {
 				
 				// check pursuit timeout and distance
 				if (time(0) - purs->last_seen > config_get_int("mob_pursuit_timeout") * SECS_PER_REAL_MIN || compute_distance(IN_ROOM(ch), real_room(purs->location)) > config_get_int("mob_pursuit_distance")) {
-					REMOVE_FROM_LIST(purs, MOB_PURSUIT(ch), next);
+					LL_DELETE(MOB_PURSUIT(ch), purs);
 					free(purs);
 					continue;
 				}
@@ -1050,7 +1032,6 @@ void despawn_mob(char_data *ch) {
 */
 static int spawn_one_list(room_data *room, struct spawn_info *list) {
 	extern char *replace_npc_names(const char *str, const char *name, const char *empire_name, const char *empire_adjective);
-	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 	
 	int count, x_coord, y_coord;
 	struct spawn_info *spawn;
@@ -1143,7 +1124,6 @@ GLB_FUNCTION(run_global_map_spawns) {
 */
 static void spawn_one_room(room_data *room, bool only_artisans) {
 	extern char *replace_npc_names(const char *str, const char *name, const char *empire_name, const char *empire_adjective);
-	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 	
 	room_data *iter, *next_iter, *home;
 	struct empire_territory_data *ter;
@@ -1404,8 +1384,6 @@ bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coo
 * @return bool TRUE -- always
 */
 bool check_scaling(char_data *mob, char_data *attacker) {
-	void scale_mob_for_character(char_data *mob, char_data *ch);
-
 	// ensure scaling
 	if (attacker != mob && IS_NPC(mob) && GET_CURRENT_SCALE_LEVEL(mob) == 0) {
 		scale_mob_for_character(mob, attacker);
@@ -1523,8 +1501,6 @@ void scale_mob_for_character(char_data *mob, char_data *ch) {
 * @param int level The level to scale it to.
 */
 void scale_mob_to_level(char_data *mob, int level) {
-	void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
-	
 	double value, target;
 	int low_level, mid_level, high_level, over_level;
 	int room_lev = 0, room_min = 0, room_max = 0;

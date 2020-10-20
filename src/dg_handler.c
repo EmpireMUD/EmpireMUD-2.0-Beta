@@ -119,7 +119,6 @@ void free_freeable_triggers(void) {
 
 /* release memory allocated for a variable list */
 void free_varlist(struct trig_var_data *vd) {
-	void free_var_el(struct trig_var_data *var);
 	struct trig_var_data *var, *next_var;
 	LL_FOREACH_SAFE(vd, var, next_var) {
 		free_var_el(var);
@@ -217,8 +216,6 @@ void remove_trigger_from_global_lists(trig_data *trig, bool random_only) {
 
 /* remove a single trigger from a mob/obj/room */
 void extract_trigger(trig_data *trig) {
-	extern trig_data *stc_next_random_trig;
-	
 	// prevents a bug when something has 2 random triggers and is purged by the first one -kh
 	if (trig == stc_next_random_trig) {
 		stc_next_random_trig = trig->next_in_random_triggers;
@@ -458,20 +455,12 @@ void free_proto_scripts(struct trig_proto_list **list) {
 * @return struct trig_proto_list* The copied list.
 */
 struct trig_proto_list *copy_trig_protos(struct trig_proto_list *from) {
-	struct trig_proto_list *el, *iter, *list = NULL, *end = NULL;
+	struct trig_proto_list *el, *iter, *list = NULL;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct trig_proto_list, 1);
 		*el = *iter;
-		el->next = NULL;
-		
-		if (end) {
-			end->next = el;
-		}
-		else {
-			list = el;
-		}
-		end = el;
+		LL_APPEND(list, el);
 	}
 	
 	return list;

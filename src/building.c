@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -32,43 +33,8 @@
 *   Additional Commands
 */
 
-// locals
-void herd_animals_out(room_data *location);
-bool is_entrance(room_data *room);
-void process_build(char_data *ch, room_data *room, int act_type);
-void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
+// local prototypes
 void setup_tunnel_entrance(char_data *ch, room_data *room, int dir);
-
-// externs
-void add_room_to_vehicle(room_data *room, vehicle_data *veh);
-void adjust_building_tech(empire_data *emp, room_data *room, bool add);
-extern bool can_claim(char_data *ch);
-INTERACTION_FUNC(consumes_or_decays_interact);
-extern struct resource_data *copy_resource_list(struct resource_data *input);
-extern int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
-extern room_data *create_room(room_data *home);
-void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
-void free_complex_data(struct complex_room_data *data);
-extern craft_data *find_craft_for_vehicle(vehicle_data *veh);
-extern char *get_room_name(room_data *room, bool color);
-extern bool has_learned_craft(char_data *ch, any_vnum vnum);
-extern obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
-void init_mine(room_data *room, char_data *ch, empire_data *emp);
-struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
-void scale_item_to_level(obj_data *obj, int level);
-void stop_room_action(room_data *room, int action);
-extern int total_small_vehicles_in_room(room_data *room);
-extern int total_vehicle_size_in_room(room_data *room);
-
-// external vars
-extern const char *bld_on_flags[];
-extern const bitvector_t bld_on_flags_order[];
-extern const bool can_designate_dir[NUM_OF_DIRS];
-extern const bool can_designate_dir_vehicle[NUM_OF_DIRS];
-extern const char *dirs[];
-extern struct gen_craft_data_t gen_craft_data[];
-extern int rev_dir[];
-extern const char *tool_flags[];
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -149,8 +115,6 @@ bool can_build_on(room_data *room, bitvector_t flags) {
 * @return bool TRUE if it's ok to proceed; FALSE it if sent an error message and failed.
 */
 bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse) {
-	extern bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
-	
 	bool is_closed, needs_facing, needs_reverse;
 	room_data *to_room = NULL, *to_rev = NULL;
 	vehicle_data *make_veh = NULL, *veh_iter;
@@ -414,7 +378,6 @@ void construct_building(room_data *room, bld_vnum type) {
 	}
 	
 	if (ROOM_OWNER(room)) {
-		void deactivate_workforce_room(empire_data *emp, room_data *room);
 		deactivate_workforce_room(ROOM_OWNER(room), room);
 	}
 	
@@ -550,11 +513,6 @@ int count_players_in_building(room_data *room, bool ignore_home_room, bool ignor
 * @param room_data *room The map room to disassociate.
 */
 void disassociate_building(room_data *room) {
-	void check_terrain_height(room_data *room);
-	void decustomize_room(room_data *room);
-	void delete_instance(struct instance_data *inst, bool run_cleanup);
-	extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
-	
 	sector_data *old_sect = SECT(room);
 	bool was_large, junk;
 	room_data *iter, *next_iter;
@@ -852,8 +810,6 @@ void finish_building(char_data *ch, room_data *room) {
 * @param room_data *room The location that was dismantled.
 */
 void finish_dismantle(char_data *ch, room_data *room) {
-	extern bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
-	
 	obj_data *newobj, *proto;
 	craft_data *type;
 	
@@ -919,8 +875,6 @@ void finish_maintenance(char_data *ch, room_data *room) {
 * @param room_data *location The building's tile.
 */
 void herd_animals_out(room_data *location) {
-	extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
-	
 	char_data *ch_iter, *next_ch;
 	bool found_any, herd_msg = FALSE;
 	room_data *to_room, *to_reverse;
@@ -1103,8 +1057,6 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 * @param room_data *room The location being dismantled.
 */
 void process_dismantling(char_data *ch, room_data *room) {
-	extern const char *pool_types[];
-	
 	struct resource_data *res, *find_res, *next_res, *copy;
 	char buf[MAX_STRING_LENGTH];
 
@@ -1167,7 +1119,7 @@ void process_dismantling(char_data *ch, room_data *room) {
 		// make a copy to pass to give_resources
 		CREATE(copy, struct resource_data, 1);
 		*copy = *res;
-		copy->next = NULL;
+		copy->next = NULL;	// will be freed as a list
 		
 		if (copy->type == RES_OBJECT) {
 			// for items, refund 1 at a time
@@ -1205,8 +1157,6 @@ void process_dismantling(char_data *ch, room_data *room) {
 * @param any_vnum component The component type that was added -- remove something with a matching component type.
 */
 void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component) {
-	extern bool has_generic_relation(struct generic_relation *list, any_vnum vnum);
-	
 	struct resource_data *iter, *next;
 	generic_data *my_cmp;
 	obj_data *proto;
@@ -1304,8 +1254,6 @@ void setup_tunnel_entrance(char_data *ch, room_data *room, int dir) {
 * @param room_data *loc The location to dismantle.
 */
 void start_dismantle_building(room_data *loc) {
-	void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
-	
 	struct resource_data *res, *next_res;
 	room_data *room, *next_room;
 	char_data *targ, *next_targ;
@@ -1450,10 +1398,6 @@ char *vnum_to_interlink(room_vnum vnum) {
 * @param vehicle_data *veh The vehicle they targeted.
 */
 void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
-	extern int count_harnessed_animals(vehicle_data *veh);
-	void process_dismantle_vehicle(char_data *ch);
-	void start_dismantle_vehicle(vehicle_data *veh);
-	
 	craft_data *craft;
 	
 	if (!ch || !veh || IS_NPC(ch)) {
@@ -1527,8 +1471,6 @@ void do_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 
 
 ACMD(do_dismantle) {
-	extern vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id);
-	
 	vehicle_data *veh;
 	craft_data *type;
 
@@ -1662,8 +1604,6 @@ ACMD(do_dismantle) {
 
 // called by do_customize
 void do_customize_room(char_data *ch, char *argument) {
-	void do_customize_vehicle(char_data *ch, char *argument);
-	
 	char arg2[MAX_STRING_LENGTH];
 	empire_data *emp = GET_LOYALTY(ch);
 	vehicle_data *veh;
@@ -1887,11 +1827,6 @@ ACMD(do_dedicate) {
 
 // Takes subcmd SCMD_DESIGNATE, SCMD_REDESIGNATE
 ACMD(do_designate) {
-	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
-	void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
-	extern bld_data *get_building_by_name(char *name, bool room_only);
-	void sort_world_table();
-	
 	struct empire_territory_data *ter;
 	struct room_direction_data *ex;
 	int dir = NO_DIR;
@@ -2019,7 +1954,6 @@ ACMD(do_designate) {
 			COMPLEX_DATA(home)->inside_rooms++;
 			
 			if (veh) {
-				COMPLEX_DATA(new)->vehicle = veh;
 				add_room_to_vehicle(new, veh);
 			}
 			
@@ -2056,8 +1990,6 @@ ACMD(do_designate) {
 
 
 ACMD(do_interlink) {
-	extern int count_flagged_sect_between(bitvector_t sectf_bits, room_data *start, room_data *end, bool check_base_sect);
-	
 	char arg2[MAX_INPUT_LENGTH];
 	room_vnum vnum;
 	room_data *to_room;
@@ -2144,8 +2076,6 @@ ACMD(do_interlink) {
 
 
 ACMD(do_lay) {
-	extern struct complex_room_data *init_complex_data();
-	
 	static struct resource_data *cost = NULL;
 	sector_data *original_sect = SECT(IN_ROOM(ch));
 	sector_data *check_sect = (ROOM_SECT_FLAGGED(IN_ROOM(ch), SECTF_IS_ROAD) ? BASE_SECT(IN_ROOM(ch)) : SECT(IN_ROOM(ch)));
@@ -2220,7 +2150,6 @@ ACMD(do_lay) {
 		}
 		
 		if (ROOM_OWNER(IN_ROOM(ch))) {
-			void deactivate_workforce_room(empire_data *emp, room_data *room);
 			deactivate_workforce_room(ROOM_OWNER(IN_ROOM(ch)), IN_ROOM(ch));
 		}
 		
@@ -2615,37 +2544,25 @@ ACMD(do_unpaint) {
 
 
 ACMD(do_upgrade) {
-	extern bool check_can_craft(char_data *ch, craft_data *type);
-	void complete_vehicle(vehicle_data *veh);
-	void empty_vehicle(vehicle_data *veh, room_data *to_room);
-	extern bool find_and_bind(char_data *ch, obj_vnum vnum);
-	void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
-	extern int get_craft_scale_level(char_data *ch, craft_data *craft);
-	extern int get_new_vehicle_construction_id();
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
-	void perform_abandon_vehicle(vehicle_data *veh);
-	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
-	void scale_vehicle_to_level(vehicle_data *veh, int level);
-	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
-	
 	char arg1[MAX_INPUT_LENGTH], *arg2, output[MAX_STRING_LENGTH];
 	vehicle_data *from_veh = NULL, *prev_veh, *to_veh, *old_proto, *veh_proto = NULL;
-	room_data *from_room = NULL, *interior, *in_room, *room_iter;
-	craft_data *find_craft, *to_craft, *missing_abil = NULL;
+	room_data *from_room = NULL, *interior, *in_room, *room_iter, *next_iter;
+	craft_data *find_craft, *to_craft, *from_craft = NULL, *missing_abil = NULL;
 	struct bld_relation *relat, *lists[2];
 	obj_data *obj, *next_obj, *found_obj;
 	struct room_direction_data *exits;
 	struct vehicle_room_list *vrl;
 	bld_data *bld_proto = NULL;
+	bool done, fail, deleted;
 	bitvector_t set_bits;
-	bool done, fail;
+	char_data *temp_ch;
 	int iter, found;
 	size_t size;
 	
 	// for moving data
+	int private_owner = NOBODY, dedicated_to = 0;
 	struct depletion_data *depletion = NULL;
 	struct resource_data *built_with = NULL;
-	int private_owner = NOBODY;
 	bool bright_paint = FALSE;
 	int paint_color = 0;
 	
@@ -2888,6 +2805,11 @@ ACMD(do_upgrade) {
 		msg_to_char(ch, "You begin to upgrade the building.\r\n");
 		act("$n starts upgrading the building.", FALSE, ch, NULL, NULL, TO_ROOM);
 		
+		// look up original recipe
+		if (get_room_extra_data(from_room, ROOM_EXTRA_BUILD_RECIPE) > 0) {
+			from_craft = craft_proto(get_room_extra_data(from_room, ROOM_EXTRA_BUILD_RECIPE));
+		}
+		
 		// store some data
 		built_with = GET_BUILT_WITH(from_room);
 		GET_BUILT_WITH(from_room) = NULL;
@@ -2899,6 +2821,10 @@ ACMD(do_upgrade) {
 		if (COMPLEX_DATA(from_room)) {
 			COMPLEX_DATA(from_room)->private_owner = NOBODY;
 		}
+		
+		// store dedication and remove it
+		dedicated_to = get_room_extra_data(from_room, ROOM_EXTRA_DEDICATE_ID);
+		remove_room_extra_data(from_room, ROOM_EXTRA_DEDICATE_ID);
 		
 		// store paint color and remove it
 		paint_color = get_room_extra_data(from_room, ROOM_EXTRA_PAINT_COLOR);
@@ -2914,6 +2840,11 @@ ACMD(do_upgrade) {
 		act("You start upgrading $V.", FALSE, ch, NULL, from_veh, TO_CHAR);
 		act("$n starts upgrading $V.", FALSE, ch, NULL, from_veh, TO_ROOM);
 		
+		// look up original recipe
+		if (get_vehicle_extra_data(from_veh, ROOM_EXTRA_BUILD_RECIPE) > 0) {
+			from_craft = craft_proto(get_vehicle_extra_data(from_veh, ROOM_EXTRA_BUILD_RECIPE));
+		}
+		
 		// store some data
 		built_with = VEH_BUILT_WITH(from_veh);
 		VEH_BUILT_WITH(from_veh) = NULL;
@@ -2926,6 +2857,10 @@ ACMD(do_upgrade) {
 			COMPLEX_DATA(VEH_INTERIOR_HOME_ROOM(from_veh))->private_owner = NOBODY;
 		}
 		
+		// store dedication and remove it
+		dedicated_to = get_vehicle_extra_data(from_veh, ROOM_EXTRA_DEDICATE_ID);
+		remove_vehicle_extra_data(from_veh, ROOM_EXTRA_DEDICATE_ID);
+		
 		// record and remove paint color
 		paint_color = get_vehicle_extra_data(from_veh, ROOM_EXTRA_PAINT_COLOR);
 		remove_vehicle_extra_data(from_veh, ROOM_EXTRA_PAINT_COLOR);
@@ -2937,12 +2872,48 @@ ACMD(do_upgrade) {
 		return;
 	}
 	
+	// crunch some additional data
+	if (from_craft && CRAFT_FLAGGED(from_craft, CRAFT_TAKE_REQUIRED_OBJ) && GET_CRAFT_REQUIRES_OBJ(from_craft) != NOTHING) {
+		add_to_resource_list(&built_with, RES_OBJECT, GET_CRAFT_REQUIRES_OBJ(from_craft), 1, 0);
+	}
+	
 	// ---- upgrade-from above; upgrade-to below -----
 	
 	// upgrade TO building
 	if (CRAFT_IS_BUILDING(to_craft)) {
-		if (from_room) {
-			// upgraded from building: just attach new building type
+		if (from_room) {	// upgrading from a traditional building
+			if (GET_INSIDE_ROOMS(from_room) > 0 && !ROOM_BLD_FLAGGED(from_room, BLD_OPEN) && BLD_FLAGGED(bld_proto, BLD_OPEN)) {
+				// closed building to open building with interior: remove the interior
+				deleted = FALSE;
+				DL_FOREACH_SAFE2(interior_room_list, room_iter, next_iter, next_interior) {
+					if (HOME_ROOM(room_iter) == from_room && room_iter != from_room) {
+						dismantle_wtrigger(room_iter, NULL, FALSE);
+						
+						// move people and contents
+						while ((temp_ch = ROOM_PEOPLE(room_iter))) {
+							GET_LAST_DIR(temp_ch) = NO_DIR;
+							char_to_room(temp_ch, from_room);
+							msdp_update_room(temp_ch);
+						}
+						while (ROOM_CONTENTS(room_iter)) {
+							obj_to_room(ROOM_CONTENTS(room_iter), from_room);
+						}
+						while (ROOM_VEHICLES(room_iter)) {
+							vehicle_to_room(ROOM_VEHICLES(room_iter), from_room);
+						}
+
+						COMPLEX_DATA(room_iter)->home_room = NULL;
+						delete_room(room_iter, FALSE);	// must check_all_exits
+						deleted = TRUE;
+					}
+				}
+				
+				if (deleted) {
+					check_all_exits();
+				}
+			}
+			
+			// don't disassociate; just attach new building type
 			dismantle_wtrigger(from_room, NULL, FALSE);
 			detach_building_from_room(from_room);
 			attach_building_to_room(building_proto(GET_CRAFT_BUILD_TYPE(to_craft)), from_room, TRUE);
@@ -2981,7 +2952,11 @@ ACMD(do_upgrade) {
 		GET_BUILT_WITH(in_room) = built_with;
 		ROOM_DEPLETION(in_room) = depletion;
 		
-		if (paint_color > 0) {
+		if (dedicated_to > 0 && ROOM_BLD_FLAGGED(in_room, BLD_DEDICATE)) {
+			set_room_extra_data(in_room, ROOM_EXTRA_DEDICATE_ID, dedicated_to);
+		}
+		
+		if (paint_color > 0 && !ROOM_BLD_FLAGGED(in_room, BLD_NO_PAINT)) {
 			set_room_extra_data(in_room, ROOM_EXTRA_PAINT_COLOR, paint_color);
 			if (bright_paint) {
 				SET_BIT(ROOM_BASE_FLAGS(in_room), ROOM_AFF_BRIGHT_PAINT);
@@ -3023,10 +2998,7 @@ ACMD(do_upgrade) {
 					}
 					
 					COMPLEX_DATA(room_iter)->home_room = interior;
-					COMPLEX_DATA(room_iter)->vehicle = to_veh;
-					SET_BIT(ROOM_BASE_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
 					add_room_to_vehicle(room_iter, to_veh);
-					affect_total_room(room_iter);
 					
 					// check exits to the old home room and move them
 					LL_FOREACH(COMPLEX_DATA(room_iter)->exits, exits) {
@@ -3145,6 +3117,10 @@ ACMD(do_upgrade) {
 		// transfer stuff from old data
 		VEH_BUILT_WITH(to_veh) = built_with;
 		VEH_DEPLETION(to_veh) = depletion;
+		
+		if (dedicated_to > 0 && VEH_FLAGGED(to_veh, BLD_DEDICATE)) {
+			set_vehicle_extra_data(to_veh, ROOM_EXTRA_DEDICATE_ID, dedicated_to);
+		}
 		
 		// check the paint
 		if (paint_color > 0 && !VEH_FLAGGED(to_veh, VEH_NO_PAINT)) {

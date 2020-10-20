@@ -21,9 +21,6 @@
 #include "db.h"
 #include "skills.h"
 
-// local prototypes
-void determine_seasons();
-
 
 void weather_and_time(int mode) {
 	void another_hour(int mode);
@@ -36,7 +33,6 @@ void weather_and_time(int mode) {
 
 
 void another_hour(int mode) {
-	void annual_world_update();
 	void process_shipping();
 
 	descriptor_data *d;

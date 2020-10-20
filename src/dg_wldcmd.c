@@ -24,47 +24,17 @@
 #include "db.h"
 #include "skills.h"
 #include "vnums.h"
+#include "constants.h"
 
-// external vars
-extern const char *damage_types[];
-extern const char *alt_dirs[];
-extern const char *dirs[];
-extern struct instance_data *quest_instance_global;
+/**
+* Contents:
+*   Helpers
+*   World Commands
+*   World Command Interpreter
+*/
 
-// external functions
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
-void send_char_pos(char_data *ch, int dam);
-void die(char_data *ch, char_data *killer);
-void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
-char_data *get_char_by_room(room_data *room, char *name);
-room_data *get_room(room_data *ref, char *name);
-obj_data *get_obj_by_room(room_data *room, char *name);
-char_data *get_char_in_room(room_data *room, char *name);
-obj_data *get_obj_in_room(room_data *room, char *name);
-extern vehicle_data *get_vehicle(char *name);
-void instance_obj_setup(struct instance_data *inst, obj_data *obj);
-extern room_data *obj_room(obj_data *obj);
-void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
-void scale_item_to_level(obj_data *obj, int level);
-void scale_mob_to_level(char_data *mob, int level);
-void scale_vehicle_to_level(vehicle_data *veh, int level);
-void wld_command_interpreter(room_data *room, char *argument);
-
-// locals
-#define WCMD(name)  void (name)(room_data *room, char *argument, int cmd, int subcmd)
-
-
-struct wld_command_info {
-	char *command;
-	void (*command_pointer) (room_data *room, char *argument, int cmd, int subcmd);
-	int subcmd;
-};
-
-
-/* do_wsend */
-#define SCMD_WSEND        0
-#define SCMD_WECHOAROUND  1
-
+ //////////////////////////////////////////////////////////////////////////////
+//// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
 * Determines the scale level for a room, with a character target as a backup
@@ -141,11 +111,10 @@ void sub_write_to_room(char *str, room_data *room, bool use_queue) {
 }
 
 
-/* World commands */
+ //////////////////////////////////////////////////////////////////////////////
+//// WORLD COMMANDS //////////////////////////////////////////////////////////
 
 WCMD(do_wadventurecomplete) {
-	void mark_instance_completed(struct instance_data *inst);
-	
 	struct instance_data *inst;
 	
 	inst = quest_instance_global;
@@ -196,8 +165,6 @@ WCMD(do_wasound) {
 
 
 WCMD(do_wbuild) {
-	void do_dg_build(room_data *target, char *argument);
-
 	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
 	room_data *target;
 	
@@ -409,7 +376,7 @@ WCMD(do_wdoor) {
 	char target[MAX_INPUT_LENGTH], direction[MAX_INPUT_LENGTH];
 	char field[MAX_INPUT_LENGTH], *value;
 	room_data *rm, *to_room;
-	struct room_direction_data *newexit, *temp;
+	struct room_direction_data *newexit;
 	int dir, fd;
 
 	const char *door_field[] = {
@@ -457,7 +424,7 @@ WCMD(do_wdoor) {
 	/* purge exit */
 	if (fd == 0) {
 		if (newexit) {
-			REMOVE_FROM_LIST(newexit, COMPLEX_DATA(rm)->exits, next);
+			LL_DELETE(COMPLEX_DATA(rm)->exits, newexit);
 			if (newexit->room_ptr) {
 				--GET_EXITS_HERE(newexit->room_ptr);
 			}
@@ -523,11 +490,6 @@ WCMD(do_wdoor) {
 
 
 WCMD(do_wsiege) {
-	void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
-	extern bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
-	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
-	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
-	
 	char scale_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh_targ = NULL;
 	room_data *room_targ = NULL;
@@ -712,8 +674,6 @@ WCMD(do_wteleport) {
 
 
 WCMD(do_wterracrop) {
-	void do_dg_terracrop(room_data *target, crop_data *crop);
-
 	char loc_arg[MAX_INPUT_LENGTH], crop_arg[MAX_INPUT_LENGTH];
 	crop_data *crop;
 	room_data *target;
@@ -760,8 +720,6 @@ WCMD(do_wterracrop) {
 
 
 WCMD(do_wterraform) {
-	void do_dg_terraform(room_data *target, sector_data *sect);
-
 	char loc_arg[MAX_INPUT_LENGTH], sect_arg[MAX_INPUT_LENGTH];
 	sector_data *sect;
 	room_data *target;
@@ -851,8 +809,6 @@ WCMD(do_wheal) {
 
 
 WCMD(do_wown) {
-	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
-	
 	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
 	vehicle_data *vtarg = NULL;
 	empire_data *emp = NULL;
@@ -1055,16 +1011,12 @@ WCMD(do_wpurge) {
 
 // quest commands
 WCMD(do_wquest) {
-	void do_dg_quest(int go_type, void *go, char *argument);	
 	do_dg_quest(WLD_TRIGGER, room, argument);
 }
 
 
 /* loads a mobile or object into the room */
 WCMD(do_wload) {
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst = find_instance_by_room(room, FALSE, TRUE);
 	int number = 0;
@@ -1228,7 +1180,6 @@ WCMD(do_wload) {
 
 
 WCMD(do_wmod) {
-	void script_modify(char *argument);
 	script_modify(argument);
 }
 
@@ -1413,10 +1364,6 @@ WCMD(do_wat) {
 
 
 WCMD(do_wrestore) {
-	void complete_vehicle(vehicle_data *veh);
-	extern const bool aff_is_bad[];
-	extern const double apply_values[];
-	
 	struct affected_type *aff, *next_aff;
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh = NULL;
@@ -1597,6 +1544,9 @@ WCMD(do_wscale) {
 }
 
 
+ //////////////////////////////////////////////////////////////////////////////
+//// WORLD COMMAND INTERPRETER ///////////////////////////////////////////////
+
 const struct wld_command_info wld_cmd_info[] = {
 	{ "RESERVED", NULL, NO_SCMD },/* this must be first -- for specprocs */
 
@@ -1634,8 +1584,11 @@ const struct wld_command_info wld_cmd_info[] = {
 };
 
 
-/*
+/**
 *  This is the command interpreter used by rooms, called by script_driver.
+*
+* @param room_data *room The room running the command.
+* @param char *argument The rest of the line from the script.
 */
 void wld_command_interpreter(room_data *room, char *argument) {
 	int cmd, length;
@@ -1644,18 +1597,23 @@ void wld_command_interpreter(room_data *room, char *argument) {
 	skip_spaces(&argument);
 
 	/* just drop to next line for hitting CR */
-	if (!*argument)
+	if (!*argument) {
 		return;
+	}
 
 	half_chop(argument, arg, line);
 
 	/* find the command */
-	for (length = strlen(arg), cmd = 0; *wld_cmd_info[cmd].command != '\n'; cmd++)
-		if (!strn_cmp(wld_cmd_info[cmd].command, arg, length))
+	for (length = strlen(arg), cmd = 0; *wld_cmd_info[cmd].command != '\n'; cmd++) {
+		if (!strn_cmp(wld_cmd_info[cmd].command, arg, length)) {
 			break;
+		}
+	}
 
-	if (*wld_cmd_info[cmd].command == '\n')
+	if (*wld_cmd_info[cmd].command == '\n') {
 		wld_log(room, "Unknown world cmd: '%s'", argument);
-	else
+	}
+	else {
 		((*wld_cmd_info[cmd].command_pointer)(room, line, cmd, wld_cmd_info[cmd].subcmd));
+	}
 }

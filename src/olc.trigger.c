@@ -21,6 +21,7 @@
 #include "handler.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -29,17 +30,8 @@
 *   Edit Modules
 */
 
-// external consts
-extern const char **trig_attach_type_list[];
-extern const char *trig_attach_types[];
-extern const char *trig_types[];
-extern const char *otrig_types[];
-extern const char *vtrig_types[];
-extern const char *wtrig_types[];
-
 
 // external funcs
-void extract_trigger(trig_data *trig);
 void trig_data_init(trig_data *this_data);
 
 
@@ -99,8 +91,6 @@ bool audit_trigger(trig_data *trig, char_data *ch) {
 * @return bitvector_t A set of TRIG_ARG_x flags.
 */
 bitvector_t compile_argument_types_for_trigger(trig_data *trig) {
-	extern const bitvector_t *trig_argument_type_list[];
-	
 	bitvector_t flags = NOBITS, trigger_types = GET_TRIG_TYPE(trig);
 	int pos;
 	
@@ -121,8 +111,6 @@ bitvector_t compile_argument_types_for_trigger(trig_data *trig) {
 * @return trig_data* The new trigger.
 */
 trig_data *create_trigger_table_entry(trig_vnum vnum) {
-	void add_trigger_to_table(trig_data *trig);
-	
 	trig_data *trig;
 	
 	// sanity
@@ -176,7 +164,7 @@ char *list_one_trigger(trig_data *trig, bool detail) {
 * @return bool TRUE if any were removed; FALSE otherwise.
 */
 bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum) {
-	struct trig_data *trig, *next_trig, *temp;
+	struct trig_data *trig, *next_trig;
 	bool found = FALSE;
 	
 	if (!script) {
@@ -188,7 +176,7 @@ bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum) {
 		
 		if (GET_TRIG_VNUM(trig) == vnum) {
 			found = TRUE;
-			REMOVE_FROM_LIST(trig, TRIGGERS(script), next);
+			LL_DELETE(TRIGGERS(script), trig);
 			extract_trigger(trig);
 		}
 	}
@@ -285,14 +273,14 @@ void check_triggers(void) {
 * @return bool TRUE if any triggers were removed, FALSE if not.
 */
 bool delete_from_proto_list_by_vnum(struct trig_proto_list **list, trig_vnum vnum) {
-	struct trig_proto_list *trig, *next_trig, *temp;
+	struct trig_proto_list *trig, *next_trig;
 	bool found = FALSE;
 	
 	for (trig = *list; trig; trig = next_trig) {
 		next_trig = trig->next;
 		if (trig->vnum == vnum) {
 			found = TRUE;
-			REMOVE_FROM_LIST(trig, *list, next);
+			LL_DELETE(*list, trig);
 			free(trig);
 		}
 	}
@@ -639,8 +627,6 @@ void olc_fullsearch_trigger(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_trigger(char_data *ch, trig_vnum vnum) {
-	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	trig_data *proto = real_trigger(vnum);
 	quest_data *quest, *next_quest;
@@ -789,7 +775,6 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 void save_olc_trigger(descriptor_data *desc, char *script_text) {
 	EVENT_CANCEL_FUNC(cancel_wait_event);
 	extern struct cmdlist_element *compile_command_list(char *input);
-	void free_varlist(struct trig_var_data *vd);
 	
 	trig_data *proto, *live_trig, *next_trig, *trig = GET_OLC_TRIGGER(desc);
 	trig_vnum vnum = GET_OLC_VNUM(desc);
@@ -946,8 +931,6 @@ struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_stor
 * @param char_data *ch The person who is editing a trigger and will see its display.
 */
 void olc_show_trigger(char_data *ch) {
-	extern char *show_color_codes(char *string);
-	
 	trig_data *trig = GET_OLC_TRIGGER(ch->desc);
 	bitvector_t trig_arg_types = compile_argument_types_for_trigger(trig);
 	char trgtypes[256], buf[MAX_STRING_LENGTH * 4];	// that HAS to be long enough, right?

@@ -9,6 +9,7 @@
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -21,6 +22,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -29,17 +31,7 @@
 *   Edit Modules
 */
 
-// external consts
-extern const char *adventure_spawn_types[];
-extern const char *dirs[];
-extern const char *exit_bits[];
-extern const char *function_flags[];
-extern const char *interact_types[];
-extern const char *room_aff_bits[];
-extern const char *room_template_flags[];
-
 // external funcs
-extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 void init_room_template(room_template *rmt);
 void sort_interactions(struct interaction_item **list);
 
@@ -233,8 +225,6 @@ char *list_one_room_template(room_template *rmt, bool detail) {
 * @return bool TRUE if it adds an exit; FALSE if not (no messages sent on FALSE).
 */
 bool match_one_exit(char_data *ch, room_template *add_exit_to, room_template *origin, struct exit_template *ex) {
-	extern int rev_dir[];
-	
 	struct exit_template *new, *temp;
 	int dir = (ex->dir == DIR_RANDOM ? DIR_RANDOM : rev_dir[ex->dir]);
 	bool found = FALSE;
@@ -268,18 +258,7 @@ bool match_one_exit(char_data *ch, room_template *add_exit_to, room_template *or
 	new->target_room = origin->vnum;
 	new->exit_info = ex->exit_info;
 	new->keyword = (ex->keyword ? str_dup(ex->keyword) : NULL);
-	new->next = NULL;
-	
-	// add at end
-	if ((temp = add_exit_to->exits) != NULL) {
-		while (temp->next) {
-			temp = temp->next;
-		}
-		temp->next = new;
-	}
-	else {
-		add_exit_to->exits = new;
-	}
+	LL_APPEND(add_exit_to->exits, new);
 	
 	msg_to_char(ch, "Matched exit %s to %d %s.\r\n", dirs[dir], origin->vnum, origin->title);
 	return TRUE;
@@ -294,7 +273,6 @@ bool match_one_exit(char_data *ch, room_template *add_exit_to, room_template *or
 */
 void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void remove_room_template_from_table(room_template *rmt);
 	
 	quest_data *quest, *next_quest;
@@ -541,9 +519,6 @@ void olc_fullsearch_room_template(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_room_template(char_data *ch, rmt_vnum vnum) {
-	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	room_template *rmt = room_template_proto(vnum), *iter, *next_iter;
 	quest_data *quest, *next_quest;
@@ -751,11 +726,9 @@ void save_olc_room_template(descriptor_data *desc) {
 * @return room_template* The copied room template.
 */
 room_template *setup_olc_room_template(room_template *input) {
-	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
-	
 	room_template *new;
-	struct adventure_spawn *old_spawn, *new_spawn, *last_spawn;
-	struct exit_template *old_ex, *new_ex, *last_ex;
+	struct adventure_spawn *old_spawn, *new_spawn;
+	struct exit_template *old_ex, *new_ex;
 	
 	CREATE(new, room_template, 1);
 	init_room_template(new);
@@ -773,39 +746,21 @@ room_template *setup_olc_room_template(room_template *input) {
 		
 		// copy spawns
 		GET_RMT_SPAWNS(new) = NULL;
-		last_spawn = NULL;
 		for (old_spawn = GET_RMT_SPAWNS(input); old_spawn; old_spawn = old_spawn->next) {
 			CREATE(new_spawn, struct adventure_spawn, 1);
 			*new_spawn = *old_spawn;
-			new_spawn->next = NULL;
-			
-			if (last_spawn) {
-				last_spawn->next = new_spawn;
-			}
-			else {
-				GET_RMT_SPAWNS(new) = new_spawn;
-			}
-			last_spawn = new_spawn;
+			LL_APPEND(GET_RMT_SPAWNS(new), new_spawn);
 		}
 		
 		// copy exits
 		GET_RMT_EXITS(new) = NULL;
-		last_ex = NULL;
 		for (old_ex = GET_RMT_EXITS(input); old_ex; old_ex = old_ex->next) {
 			CREATE(new_ex, struct exit_template, 1);
 			*new_ex = *old_ex;
 			if (old_ex->keyword) {
 				new_ex->keyword = str_dup(old_ex->keyword);
 			}
-			new_ex->next = NULL;
-			
-			if (last_ex) {
-				last_ex->next = new_ex;
-			}
-			else {
-				GET_RMT_EXITS(new) = new_ex;
-			}
-			last_ex = new_ex;
+			LL_APPEND(GET_RMT_EXITS(new), new_ex);
 		}
 		
 		// copy interactions
@@ -949,8 +904,6 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 */
 void olc_show_room_template(char_data *ch) {
 	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
 	char lbuf[MAX_STRING_LENGTH];
@@ -1043,7 +996,7 @@ OLC_MODULE(rmedit_exit) {
 	adv_data *adv = get_adventure_for_vnum(GET_OLC_VNUM(ch->desc));
 	int num, vnum, dir;
 	room_template *to_template;
-	struct exit_template *ex, *temp, *change;
+	struct exit_template *ex, *change;
 	bool found;
 	
 	// arg1 argument
@@ -1074,7 +1027,7 @@ OLC_MODULE(rmedit_exit) {
 					found = TRUE;
 					
 					msg_to_char(ch, "You remove the %s exit.\r\n", dirs[ex->dir]);
-					REMOVE_FROM_LIST(ex, GET_RMT_EXITS(rmt), next);
+					LL_DELETE(GET_RMT_EXITS(rmt), ex);
 					if (ex->keyword) {
 						free(ex->keyword);
 					}
@@ -1109,18 +1062,7 @@ OLC_MODULE(rmedit_exit) {
 			ex->target_room = vnum;
 			ex->keyword = *argument ? str_dup(argument) : NULL;
 			ex->exit_info = (*argument ? EX_ISDOOR | EX_CLOSED : NOBITS);
-			ex->next = NULL;
-			
-			// append to end
-			if ((temp = GET_RMT_EXITS(rmt)) != NULL) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = ex;
-			}
-			else {
-				GET_RMT_EXITS(rmt) = ex;
-			}
+			LL_APPEND(GET_RMT_EXITS(rmt), ex);
 			
 			to_template = room_template_proto(vnum);
 			
@@ -1272,14 +1214,12 @@ OLC_MODULE(rmedit_script) {
 
 
 OLC_MODULE(rmedit_spawns) {
-	extern const char *olc_type_bits[NUM_OLC_TYPES+1];
-
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	char type_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];
 	char lbuf[MAX_STRING_LENGTH];
 	int num, stype, limit, findtype;
-	struct adventure_spawn *spawn, *temp, *change, *copyfrom = NULL;
+	struct adventure_spawn *spawn, *change, *copyfrom = NULL;
 	double prc;
 	any_vnum vnum;
 	bool found, none;
@@ -1358,7 +1298,7 @@ OLC_MODULE(rmedit_spawns) {
 					
 					get_spawn_template_name(spawn, lbuf);
 					msg_to_char(ch, "You remove the spawn info for %s.\r\n", lbuf);
-					REMOVE_FROM_LIST(spawn, GET_RMT_SPAWNS(rmt), next);
+					LL_DELETE(GET_RMT_SPAWNS(rmt), spawn);
 					free(spawn);
 				}
 			}
@@ -1405,18 +1345,7 @@ OLC_MODULE(rmedit_spawns) {
 			spawn->vnum = vnum;
 			spawn->percent = prc;
 			spawn->limit = limit;
-			spawn->next = NULL;
-			
-			// append to end
-			if ((temp = GET_RMT_SPAWNS(rmt)) != NULL) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = spawn;
-			}
-			else {
-				GET_RMT_SPAWNS(rmt) = spawn;
-			}
+			LL_APPEND(GET_RMT_SPAWNS(rmt), spawn);
 			
 			get_spawn_template_name(spawn, lbuf);
 			msg_to_char(ch, "You add spawn for %s %s (%d) at %.2f%%, limit %d.\r\n", adventure_spawn_types[stype], lbuf, vnum, prc, limit);

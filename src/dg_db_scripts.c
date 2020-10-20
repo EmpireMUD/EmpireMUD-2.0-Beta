@@ -29,14 +29,6 @@
 extern int max_mob_id;
 extern int max_obj_id;
 extern int max_vehicle_id;
-extern struct reboot_control_data reboot_control;
-
-// external fucs
-void free_trigger(trig_data *trig);
-extern void half_chop(char *string, char *arg1, char *arg2);
-
-// locals
-void trig_data_copy(trig_data *this_data, const trig_data *trg);
 
 
 /**
@@ -72,8 +64,6 @@ struct cmdlist_element *compile_command_list(char *input) {
 
 
 void parse_trigger(FILE *trig_f, int nr) {
-	void add_trigger_to_table(trig_data *trig);
-
 	int t[2], k, attach_type;
 	char line[256], *cmds, *s, flags[256], errors[MAX_INPUT_LENGTH];
 	struct cmdlist_element *cle;
@@ -209,7 +199,7 @@ void dg_obj_trigger(char *line, obj_data *obj) {
 	char junk[8];
 	int vnum, count;
 	trig_data *trproto;
-	struct trig_proto_list *trg_proto, *new_trg;
+	struct trig_proto_list *new_trg;
 
 	count = sscanf(line, "%s %d", junk, &vnum);
 
@@ -226,22 +216,10 @@ void dg_obj_trigger(char *line, obj_data *obj) {
 
 	CREATE(new_trg, struct trig_proto_list, 1);
 	new_trg->vnum = vnum;
-	new_trg->next = NULL;
-
-	trg_proto = obj->proto_script;
-	if (!trg_proto) {
-		obj->proto_script = trg_proto = new_trg;
-	}
-	else {
-		while (trg_proto->next)
-			trg_proto = trg_proto->next;
-		trg_proto->next = new_trg;
-	}
+	LL_APPEND(obj->proto_script, new_trg);
 }
 
 void assign_triggers(void *i, int type) {
-	void reread_companion_trigs(char_data *mob);
-	
 	vehicle_data *veh = NULL;
 	char_data *mob = NULL;
 	obj_data *obj = NULL;

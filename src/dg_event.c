@@ -22,9 +22,11 @@
 #include "utils.h"
 #include "dg_event.h"
 
-struct queue *event_q;          /* the event queue */
+// local data
+struct queue *event_q = NULL;          /* the event queue */
 
-extern long pulse;
+// external data
+extern unsigned long pulse;
 
 
 /* initializes the event queue */

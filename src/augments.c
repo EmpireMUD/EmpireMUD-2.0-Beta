@@ -21,6 +21,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -31,17 +32,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// external consts
-extern const char *apply_types[];
-extern const char *augment_types[];
-extern const struct augment_type_data augment_info[];
-extern const char *augment_flags[];
-extern const char *wear_bits[];
-
-// external funcs
-extern struct resource_data *copy_resource_list(struct resource_data *input);
-void get_resource_display(struct resource_data *list, char *save_buffer);
 
 // locals
 const char *default_aug_name = "unnamed augment";
@@ -412,9 +402,6 @@ void free_augment(augment_data *aug) {
 * @param any_vnum vnum The augment vnum
 */
 void parse_augment(FILE *fl, any_vnum vnum) {
-	void parse_apply(FILE *fl, struct apply_data **list, char *error_str);
-	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
-
 	char line[256], error[256], str_in[256], str_in2[256];
 	augment_data *aug, *find;
 	int int_in[4];
@@ -505,9 +492,6 @@ void write_augments_index(FILE *fl) {
 * @param augment_data *aug The thing to save.
 */
 void write_augment_to_file(FILE *fl, augment_data *aug) {
-	void write_applies_to_file(FILE *fl, struct apply_data *list);
-	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
-	
 	char temp[256], temp2[256];
 	
 	if (!fl || !aug) {
@@ -650,8 +634,6 @@ void save_olc_augment(descriptor_data *desc) {
 * @return augment_data* The copied augment.
 */
 augment_data *setup_olc_augment(augment_data *input) {
-	extern struct apply_data *copy_apply_list(struct apply_data *input);
-	
 	augment_data *new;
 	
 	CREATE(new, augment_data, 1);
@@ -855,7 +837,6 @@ OLC_MODULE(augedit_ability) {
 
 
 OLC_MODULE(augedit_apply) {
-	void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
 	olc_process_applies(ch, argument, &GET_AUG_APPLIES(aug));
 }
@@ -908,7 +889,6 @@ OLC_MODULE(augedit_requiresobject) {
 
 
 OLC_MODULE(augedit_resource) {
-	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 	augment_data *aug = GET_OLC_AUGMENT(ch->desc);
 	olc_process_resources(ch, argument, &GET_AUG_RESOURCES(aug));
 }

@@ -47,9 +47,6 @@
 *   Config System: Command
 */
 
-// external vars
-extern const char *techs[];
-
 // external funcs
 void set_inherent_ptech(int ptech);
 

@@ -235,9 +235,12 @@ struct stored_data {
 };
 
 
-// public procedures in db.c
-char *fread_string(FILE *fl, char *error);
+// public procedures in db.*.c
 void boot_db(void);
+void discrete_load(FILE *fl, int mode, char *filename);
+int file_to_string_alloc(const char *name, char **buf);
+char *fread_string(FILE *fl, char *error);
+void index_boot(int mode);
 
 // global saves
 void save_index(int type);
@@ -260,11 +263,12 @@ extern byte y_coord_to_season[MAP_HEIGHT];
 // abilities
 extern ability_data *ability_table;
 extern ability_data *sorted_abilities;
-extern ability_data *find_ability(char *argument);
-extern ability_data *find_ability_by_name(char *name);
-extern ability_data *find_ability_by_vnum(any_vnum vnum);
+
+ability_data *find_ability(char *argument);
+ability_data *find_ability_by_name(char *name);
+ability_data *find_ability_by_vnum(any_vnum vnum);
 void free_ability(ability_data *abil);
-extern char *get_ability_name_by_vnum(any_vnum vnum);
+char *get_ability_name_by_vnum(any_vnum vnum);
 
 // accounts
 void add_player_to_account(char_data *ch, account_data *acct);
@@ -275,30 +279,68 @@ void remove_player_from_account(char_data *ch);
 // adventures
 extern adv_data *adventure_table;
 extern struct instance_data *instance_list;
-void free_adventure(adv_data *adv);
+
 extern adv_data *adventure_proto(adv_vnum vnum);
+void free_adventure(adv_data *adv);
+void parse_link_rule(FILE *fl, struct adventure_link_rule **list, char *error_part);
+int sort_adventures(adv_data *a, adv_data *b);
+void write_linking_rules_to_file(FILE *fl, char letter, struct adventure_link_rule *list);
+
+// applies
+struct apply_data *copy_apply_list(struct apply_data *input);
+struct obj_apply *copy_obj_apply_list(struct obj_apply *list);
+void parse_apply(FILE *fl, struct apply_data **list, char *error_str);
+void write_applies_to_file(FILE *fl, struct apply_data *list);
 
 // archetypes
 extern archetype_data *archetype_table;
 extern archetype_data *sorted_archetypes;
+
 extern archetype_data *archetype_proto(any_vnum vnum);
 void free_archetype(archetype_data *arch);
+void free_archetype_gear(struct archetype_gear *list);
+void parse_archetype_gear(FILE *fl, struct archetype_gear **list, char *error);
+void write_archetype_gear_to_file(FILE *fl, struct archetype_gear *list);
 
 // augments
 extern augment_data *augment_table;
 extern augment_data *sorted_augments;
-extern augment_data *augment_proto(any_vnum vnum);
+
+augment_data *augment_proto(any_vnum vnum);
+augment_data *find_augment_by_name(char_data *ch, char *name, int type);
 void free_augment(augment_data *aug);
+
+// automessage
+extern struct automessage *automessages_table;
+
+void free_automessage(struct automessage *msg);
+int new_automessage_id();
+void save_automessages();
+int sort_automessage_by_data(struct automessage *a, struct automessage *b);
 
 // books
 extern book_data *book_table;
 extern struct author_data *author_table;
+extern book_vnum top_book_vnum;
+
+void add_book_to_table(book_data *book);
+obj_data *create_book_obj(book_data *book);
 void free_book(book_data *book);
 
 // buildings
 extern bld_data *building_table;
+
+void adjust_building_tech(empire_data *emp, room_data *room, bool add);
+bld_data *building_proto(bld_vnum vnum);
+void free_bld_relations(struct bld_relation *list);
 void free_building(bld_data *building);
-extern bld_data *building_proto(bld_vnum vnum);
+int sort_buildings(bld_data *a, bld_data *b);
+
+// cities
+int city_points_available(empire_data *emp);
+int count_cities(empire_data *emp);
+int count_city_points_used(empire_data *emp);
+struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type);
 
 // classes
 extern class_data *class_table;
@@ -311,41 +353,70 @@ void free_class(class_data *cls);
 // crafts
 extern craft_data *craft_table;
 extern craft_data *sorted_crafts;
-void free_craft(craft_data *craft);
+
 extern craft_data *craft_proto(craft_vnum vnum);
+void free_craft(craft_data *craft);
+int sort_crafts_by_data(craft_data *a, craft_data *b);
+int sort_crafts_by_vnum(craft_data *a, craft_data *b);
 
 // crops
 extern crop_data *crop_table;
+
+crop_data *crop_proto(crop_vnum vnum);
 void free_crop(crop_data *cp);
-extern crop_data *crop_proto(crop_vnum vnum);
+void schedule_crop_growth(struct map_data *map);
+int sort_crops(crop_data *a, crop_data *b);
+void uncrop_tile(room_data *room);
 
-// data system getters
-extern double data_get_double(int key);
-extern int data_get_int(int key);
-extern long data_get_long(int key);
+// custom messages
+void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
+void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 
-// data system setters
-extern double data_set_double(int key, double value);
-extern int data_set_int(int key, int value);
-extern long data_set_long(int key, long value);
+// data system
+double data_get_double(int key);
+int data_get_int(int key);
+long data_get_long(int key);
+void load_data_table();
+double data_set_double(int key, double value);
+int data_set_int(int key, int value);
+long data_set_long(int key, long value);
 
 // descriptors
 extern descriptor_data *descriptor_list;
+
+bool has_anonymous_host(descriptor_data *desc);
 
 // empires
 extern empire_data *empire_table;
 extern struct trading_post_data *trading_list;
 extern bool check_empire_refresh;
+
+void check_tavern_setup(room_data *room);
+struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
 void delete_empire(empire_data *emp);
-extern struct empire_island *get_empire_island(empire_data *emp, int island_id);
-extern empire_data *get_or_create_empire(char_data *ch);
+void delete_member_data(char_data *ch, empire_data *from_emp);
+void delete_territory_npc(struct empire_territory_data *ter, struct empire_npc_data *npc);
+void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
+bool extract_tavern_resources(room_data *room);
+void free_dropped_items(struct empire_dropped_item **list);
 void free_empire(empire_data *emp);
+void free_member_data(empire_data *emp);
+struct empire_island *get_empire_island(empire_data *emp, int island_id);
+int get_main_island(empire_data *emp);
+empire_data *get_or_create_empire(char_data *ch);
+struct empire_homeless_citizen *make_citizen_homeless(empire_data *emp, struct empire_npc_data *npc);
+bool member_is_timed_out_ch(char_data *ch);
 void read_empire_members(empire_data *only_empire, bool read_techs);
 void read_empire_territory(empire_data *emp, bool check_tech);
-extern empire_data *real_empire(empire_vnum vnum);
+empire_data *real_empire(empire_vnum vnum);
 void reread_empire_tech(empire_data *emp);
 void save_empire(empire_data *e, bool save_all_parts);
 void save_all_empires();
+void save_marked_empires();
+int sort_empires(empire_data *a, empire_data *b);
+void sort_trade_data(struct empire_trade_data **list);
+void update_empire_members_and_greatness(empire_data *emp);
+void update_member_data(char_data *ch);
 
 // empire offenses
 void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc, bitvector_t flags);
@@ -358,20 +429,31 @@ extern bool offense_was_seen(char_data *ch, empire_data *emp, room_data *from_ro
 void remove_offense(empire_data *emp, struct offense_data *off);
 void remove_recent_offenses(empire_data *emp, int type, char_data *offender);
 
+// empire misc
+void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
+char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
+
+// empire territory
+void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
+
 // extra descs
 void free_extra_descs(struct extra_descr_data **list);
+void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
+void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
 
 // events
 extern event_data *event_table;
 extern int top_event_id;
 extern struct event_running_data *running_events;
 extern bool events_need_save;
-extern event_data *find_event_by_vnum(any_vnum vnum);
-extern struct event_running_data *find_last_event_run_by_vnum(any_vnum event_vnum);
-extern struct event_running_data *find_running_event_by_id(int id);
-extern struct event_running_data *find_running_event_by_vnum(any_vnum event_vnum);
+
+struct player_event_data *create_event_data(char_data *ch, int event_id, any_vnum event_vnum);
+event_data *find_event_by_vnum(any_vnum vnum);
+struct event_running_data *find_last_event_run_by_vnum(any_vnum event_vnum);
+struct event_running_data *find_running_event_by_id(int id);
+struct event_running_data *find_running_event_by_vnum(any_vnum event_vnum);
 void free_event(event_data *event);
-extern char *get_event_name_by_proto(any_vnum vnum);
+char *get_event_name_by_proto(any_vnum vnum);
 
 // factions
 extern faction_data *faction_table;
@@ -386,28 +468,54 @@ void free_faction(faction_data *fct);
 // generics
 extern generic_data *generic_table;
 extern generic_data *sorted_generics;
+
 void free_generic(generic_data *gen);
-extern generic_data *find_generic(any_vnum vnum, int type);
-extern generic_data *find_generic_by_name(int type, char *name, bool exact);
-extern generic_data *real_generic(any_vnum vnum);
-extern const char *get_generic_name_by_vnum(any_vnum vnum);
-extern const char *get_generic_string_by_vnum(any_vnum vnum, int type, int pos);
-extern int get_generic_value_by_vnum(any_vnum vnum, int type, int pos);
+generic_data *find_generic(any_vnum vnum, int type);
+generic_data *find_generic_by_name(int type, char *name, bool exact);
+generic_data *real_generic(any_vnum vnum);
+const char *get_generic_name_by_vnum(any_vnum vnum);
+const char *get_generic_string_by_vnum(any_vnum vnum, int type, int pos);
+int get_generic_value_by_vnum(any_vnum vnum, int type, int pos);
 
 // globals
 extern struct global_data *globals_table;
+
 void free_global(struct global_data *glb);
-extern struct global_data *global_proto(any_vnum vnum);
+struct global_data *global_proto(any_vnum vnum);
+int sort_globals(struct global_data *a, struct global_data *b);
+
+// help files
+extern struct help_index_element *help_table;
+extern int top_of_helpt;
+
+int help_sort(const void *a, const void *b);
+void index_boot_help();
+
+// icons
+void write_icons_to_file(FILE *fl, char file_tag, struct icon_data *list);
+
+// instances
+extern struct instance_data *quest_instance_global;
+
+struct instance_data *get_instance_by_id(any_vnum instance_id);
 
 // interactions
 void free_interactions(struct interaction_item **list);
+void parse_interaction(char *line, struct interaction_item **list, char *error_part);
+void write_interactions_to_file(FILE *fl, struct interaction_item *list);
 
 // islands
 extern struct island_info *island_table;
-extern struct island_info *get_island(int island_id, bool create_if_missing);
-extern struct island_info *get_island_by_coords(char *coords);
-extern struct island_info *get_island_by_name(char_data *ch, char *name);
-extern char *get_island_name_for(int island_id, char_data *for_ch);
+
+void check_island_levels(room_data *location, int level);
+struct island_info *get_island(int island_id, bool create_if_missing);
+struct island_info *get_island_by_coords(char *coords);
+struct island_info *get_island_by_name(char_data *ch, char *name);
+char *get_island_name_for(int island_id, char_data *for_ch);
+bool island_has_default_name(struct island_info *island);
+void number_and_count_islands(bool reset);
+void save_island_table();
+void update_island_names();
 
 // mobiles/chars
 extern account_data *account_table;
@@ -417,6 +525,7 @@ extern char_data *next_combat_list;
 extern char_data *mobile_table;
 extern player_index_data *player_table_by_idnum;
 extern player_index_data *player_table_by_name;
+
 extern player_index_data *find_player_index_by_idnum(int idnum);
 extern player_index_data *find_player_index_by_name(char *name);
 void init_player(char_data *ch);
@@ -424,13 +533,16 @@ extern char_data *read_mobile(mob_vnum nr, bool with_triggers);
 extern char_data *mob_proto(mob_vnum vnum);
 void clear_char(char_data *ch);
 void init_player_specials(char_data *ch);
+int pick_generic_name(int name_set, int sex);
 void reset_char(char_data *ch);
 void free_char(char_data *ch);
 void set_title(char_data *ch, char *title);
+int sort_mobiles(char_data *a, char_data *b);
 
 void save_char(char_data *ch, room_data *load_room);
 #define SAVE_CHAR(ch)  save_char((ch), (IN_ROOM(ch) ? IN_ROOM(ch) : (GET_LOADROOM(ch) != NOWHERE ? real_room(GET_LOADROOM(ch)) : NULL)))
 
+void clear_delayed_update(char_data *ch);
 void queue_delayed_update(char_data *ch, bitvector_t type);
 void update_player_index(player_index_data *index, char_data *ch);
 extern char_data *find_or_load_player(char *name, bool *is_file);
@@ -446,50 +558,114 @@ void free_morph(morph_data *morph);
 // objects
 extern obj_data *object_list;
 extern obj_data *object_table;
+
 obj_data *create_obj(void);
+struct obj_proto_data *create_obj_proto_data();
 void clear_object(obj_data *obj);
 void free_obj(obj_data *obj);
+void free_obj_binding(struct obj_binding **list);
 obj_data *obj_proto(obj_vnum vnum);
 obj_data *read_object(obj_vnum nr, bool with_triggers);
+int sort_objects(obj_data *a, obj_data *b);
+
+// objsave
+void Crash_save(obj_data *obj, FILE *fp, int location);
+void Crash_save_one_obj_to_file(FILE *fl, obj_data *obj, int location);
+void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***cont_row);
+obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
+void objpack_load_room(room_data *room);
 
 // players
 extern struct group_data *group_list;
+extern struct int_hash *inherent_ptech_hash;
 extern bool pause_affect_total;
-extern char_data *find_player_in_room_by_id(room_data *room, int id);
-extern char_data *is_at_menu(int id);
-extern char_data *is_playing(int id);
+
+void check_autowiz(char_data *ch);
+void check_delayed_load(char_data *ch);
+void delete_player_character(char_data *ch);
+void enter_player_game(descriptor_data *d, int dolog, bool fresh);
+room_data *find_home(char_data *ch);
+char_data *find_player_in_room_by_id(room_data *room, int id);
+void free_alias(struct alias_data *a);
+void free_companion(struct companion_data *cd);
+void free_loaded_players();
+void free_mail(struct mail_data *mail);
+void free_player_completed_quests(struct player_completed_quest **hash);
+void free_player_event_data(struct player_event_data *hash);
+int get_highest_access_level(account_data *acct);
+char_data *is_at_menu(int id);
+char_data *is_playing(int id);
+struct mail_data *parse_mail(FILE *fl, char *first_line);
+void save_all_players(bool delay);
+void start_new_character(char_data *ch);
+int *summarize_weekly_playtime(empire_data *emp);
+void write_mail_to_file(FILE *fl, char_data *ch);
+
+// player equipment set
+int add_eq_set_to_char(char_data *ch, int set_id, char *name);
+void add_obj_to_eq_set(obj_data *obj, int set_id, int pos);
+int count_eq_sets(char_data *ch);
+void free_obj_eq_set(struct eq_set_obj *eq_set);
+void free_player_eq_set(struct player_eq_set *eq_set);
+struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
+struct player_eq_set *get_eq_set_by_name(char_data *ch, char *name);
+struct eq_set_obj *get_obj_eq_set_by_id(obj_data *obj, int id);
+void remove_obj_from_eq_set(obj_data *obj, int set_id);
+
+// player lastnames
+void change_personal_lastname(char_data *ch, char *name);
+bool has_lastname(char_data *ch, char *name);
 
 // progress
 extern progress_data *progress_table;
 extern progress_data *sorted_progress;
 extern bool need_progress_refresh;
-extern char *get_progress_name_by_proto(any_vnum vnum);
-extern progress_data *real_progress(any_vnum vnum);
+
+void free_empire_completed_goals(struct empire_completed_goal *hash);
+void free_empire_goals(struct empire_goal *hash);
 void free_progress(progress_data *prg);
+char *get_progress_name_by_proto(any_vnum vnum);
+progress_data *real_progress(any_vnum vnum);
 
 // quests
 extern struct quest_data *quest_table;
 extern quest_data *quest_proto(any_vnum vnum);
+void free_player_quests(struct player_quest *list);
 void free_quest(quest_data *quest);
+void free_quest_temp_list(struct quest_temp_list *list);
+
+// requirements
+void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
+
+// resources
+struct resource_data *copy_resource_list(struct resource_data *input);
+void free_resource_list(struct resource_data *list);
+void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
+void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
 
 // room templates
 extern room_template *room_template_table;
+
 void free_room_template(room_template *rmt);
-extern room_template *room_template_proto(rmt_vnum vnum);
+room_template *room_template_proto(rmt_vnum vnum);
+int sort_room_templates(room_template *a, room_template *b);
 
 // sectors
 extern sector_data *sector_table;
 extern struct sector_index_type *sector_index;
-extern struct sector_index_type *find_sector_index(sector_vnum vnum);
+
+struct sector_index_type *find_sector_index(sector_vnum vnum);
 void free_sector(struct sector_data *st);
 void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data *sect);
 void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect);
-extern sector_data *sector_proto(sector_vnum vnum);
+sector_data *sector_proto(sector_vnum vnum);
+int sort_sectors(void *a, void *b);
 
 // shops
 extern shop_data *shop_table;
+
 void free_shop(shop_data *shop);
-extern shop_data *real_shop(any_vnum vnum);
+shop_data *real_shop(any_vnum vnum);
 
 // skills
 extern skill_data *skill_table;
@@ -507,6 +683,10 @@ extern social_data *sorted_socials;
 extern social_data *social_proto(any_vnum vnum);
 void free_social(social_data *soc);
 
+// starting locations / start locs
+extern int highest_start_loc_index;
+extern room_vnum *start_locs;
+
 // stored event libs
 void add_stored_event(struct stored_event **list, int type, struct dg_event *event);
 void cancel_stored_event(struct stored_event **list, int type);
@@ -519,40 +699,109 @@ extern struct stored_event *find_stored_event(struct stored_event *list, int typ
 #define delete_stored_event_room(room, type)  delete_stored_event(&SHARED_DATA(room)->events, type)
 #define find_stored_event_room(room, type)  find_stored_event(SHARED_DATA(room)->events, type)
 
+// time
+void reset_time(void);
+
+// trading post
+void save_trading_post();
+
 // triggers
 extern trig_data *trigger_table;
 extern trig_data *trigger_list;
 extern trig_data *random_triggers;
 extern trig_data *free_trigger_list;
+extern trig_data *stc_next_random_trig;
+
+void add_trigger_to_table(trig_data *trig);
+int sort_triggers(trig_data *a, trig_data *b);
+void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 
 // vehicles
 extern vehicle_data *vehicle_list;
 extern vehicle_data *vehicle_table;
-extern vehicle_data *vehicle_proto(any_vnum vnum);
+
+void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void free_vehicle(vehicle_data *veh);
 extern vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
+extern vehicle_data *vehicle_proto(any_vnum vnum);
+
+// wizlock system
+extern int wizlock_level;
+extern char *wizlock_message;
 
 // world
-void check_all_exits();
-extern room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
-extern struct room_direction_data *create_exit(room_data *from, room_data *to, int dir, bool back);
-void delete_room(room_data *room, bool check_exits);
 extern room_data *world_table;
 extern room_data *interior_room_list;
 extern struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];
 extern struct map_data *land_map;
+extern bool need_world_index;
+extern bool world_map_needs_save;
+
+void add_room_to_world_tables(room_data *room);
+void annual_world_update();
+void change_chop_territory(room_data *room);
+void check_all_exits();
+void check_terrain_height(room_data *room);
+void clear_private_owner(int id);
+struct room_direction_data *create_exit(room_data *from, room_data *to, int dir, bool back);
+room_data *create_room(room_data *home);
+void decustomize_room(room_data *room);
+void decustomize_shared_data(struct shared_room_data *shared);
+room_data *dir_to_room(room_data *room, int dir, bool ignore_entrance);
+void delete_room(room_data *room, bool check_exits);
+room_vnum find_free_vnum();
+void finish_trench(room_data *room);
+void free_complex_data(struct complex_room_data *data);
+void free_shared_room_data(struct shared_room_data *data);
+room_data *get_extraction_room();
+crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
+struct complex_room_data *init_complex_data();
+void init_mine(room_data *room, char_data *ch, empire_data *emp);
+room_data *load_map_room(room_vnum vnum);
+FILE *open_world_file(int block);
+void output_map_to_file();
+void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
+void perform_burn_room(room_data *room);
 room_data *real_real_room(room_vnum vnum);
 room_data *real_room(room_vnum vnum);
+void remove_room_from_world_tables(room_data *room);
+void ruin_one_building(room_data *room);
+void run_external_evolutions();
+void save_and_close_world_file(FILE *fl, int block);
+void save_whole_world();
+void save_world_map_to_file();
+void schedule_burn_down(room_data *room);
+void schedule_check_unload(room_data *room, bool offset);
+void schedule_trench_fill(struct map_data *map);
+void setup_start_locations();
+void sort_exits(struct room_direction_data **list);
+void sort_world_table();
+void stop_burning(room_data *room);
+void untrench_room(room_data *room);
+void write_room_to_file(FILE *fl, room_data *room);
+void write_shared_room_data(FILE *fl, struct shared_room_data *dat);
 
 // misc
-extern struct obj_apply *copy_obj_apply_list(struct obj_apply *list);
-void free_resource_list(struct resource_data *list);
+extern char **tips_of_the_day;
+extern int tips_of_the_day_size;
+
+void load_intro_screens();
 
 // more frees
 void free_apply_list(struct apply_data *list);
 void free_obj_apply_list(struct obj_apply *list);
 void free_icon_set(struct icon_data **set);
 void free_exit_template(struct exit_template *ex);
+
+
+// act.comm.c
+extern bool global_mute_slash_channel_joins;
+
+// statistics.c
+extern int max_players_this_uptime;
+
+// workforce.c
+extern struct empire_territory_data *global_next_territory_entry;
 
 
 /* global buffering system */

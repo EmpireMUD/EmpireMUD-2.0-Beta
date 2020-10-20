@@ -25,6 +25,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -37,15 +38,7 @@
 *   Commands
 */
 
-// external vars
-extern const char *paint_colors[];
-extern const char *paint_names[];
-extern const int rev_dir[];
-extern struct character_size_data size_data[];
-
 // external functions
-extern char *get_room_name(room_data *room, bool color);
-extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
 extern vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
 
 
@@ -69,13 +62,6 @@ struct mappc_data_container {
 	struct mappc_data *data;
 };
 
-
-// external vars
-extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
-extern const char *dirs[];
-
-// external funcs
-void replace_question_color(char *input, char *color, char *output);
 
 // locals
 ACMD(do_exits);
@@ -510,7 +496,7 @@ bool can_see_player_in_other_room(char_data *ch, char_data *vict) {
 
 
 bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container *mappc) {
-	struct mappc_data *pc, *pc_iter, *start_this_room = NULL;
+	struct mappc_data *pc, *start_this_room = NULL;
 	bool show_mob = FALSE;
 	char lbuf[60];
 	char_data *c;
@@ -528,19 +514,7 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 			CREATE(pc, struct mappc_data, 1);
 			pc->room = room;
 			pc->character = c;
-			pc->next = NULL;
-	
-			if (mappc->data) {
-				// append to end
-				pc_iter = mappc->data;
-				while (pc_iter->next) {
-					pc_iter = pc_iter->next;
-				}
-				pc_iter->next = pc;
-			}
-			else {
-				mappc->data = pc;
-			}
+			LL_APPEND(mappc->data, pc);
 	
 			if (!start_this_room) {
 				start_this_room = pc;
@@ -620,21 +594,11 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 * @param bitvector_t options LRR_x flags.
 */
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
-	extern bool can_get_quest_from_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
 	extern bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
 	extern const char *color_by_difficulty(char_data *ch, int level);
 	void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
-	void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 	void list_char_to_char(char_data *list, char_data *ch);
 	void list_vehicles_to_char(vehicle_data *list, char_data *ch);
-	extern const struct tavern_data_type tavern_data[];
-	extern int how_to_show_map[NUM_SIMPLE_DIRS][2];
-	extern int show_map_y_first[NUM_SIMPLE_DIRS];
-	extern byte distance_can_see(char_data *ch);
-	extern struct city_metadata_type city_type[];
-	extern const char *bld_flags[];
-	extern const char *room_aff_bits[];
-	extern const char *room_template_flags[];
 
 	struct mappc_data_container *mappc = NULL;
 	struct mappc_data *pc, *next_pc;
@@ -1131,7 +1095,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 
 void look_in_direction(char_data *ch, int dir) {
 	ACMD(do_weather);
-	extern const char *from_dir[];
 	
 	char buf[MAX_STRING_LENGTH - 9], buf2[MAX_STRING_LENGTH - 9];	// save room for the "You see "
 	vehicle_data *veh;
@@ -1341,9 +1304,7 @@ void look_in_direction(char_data *ch, int dir) {
 * @param bitvector_t options Will recolor the tile if TRUE
 */
 static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, room_data *to_room, bitvector_t options) {
-	extern int get_north_for_char(char_data *ch);
 	extern int get_direction_for_char(char_data *ch, int dir);
-	extern struct city_metadata_type city_type[];
 	
 	bool need_color_terminator = FALSE;
 	char buf[30], buf1[30], col_buf[256], lbuf[MAX_STRING_LENGTH];
@@ -1797,7 +1758,12 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 	
 	// now check custom name
 	if (ROOM_CUSTOM_NAME(to_room) && !CHECK_CHAMELEON(from_room, to_room)) {
-		sprintf(lbuf + strlen(lbuf), "%s/%s", ROOM_CUSTOM_NAME(to_room), temp);
+		if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_HIDE_REAL_NAME)) {
+			sprintf(lbuf + strlen(lbuf), "%s", ROOM_CUSTOM_NAME(to_room));
+		}
+		else {
+			sprintf(lbuf + strlen(lbuf), "%s/%s", ROOM_CUSTOM_NAME(to_room), temp);
+		}
 	}
 	else {
 		strcat(lbuf, temp);
@@ -1808,8 +1774,6 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 
 
 void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
-	extern byte distance_can_see(char_data *ch);
-	
 	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH];
 	char dirbuf[MAX_STRING_LENGTH], plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH], paint_str[256];
 	char_data *vict;
@@ -1960,8 +1924,6 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 * @param bitvector_t options Any LLR_x flags that get passed along.
 */
 void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options) {
-	extern int get_north_for_char(char_data *ch);
-	
 	int each_dir, north = get_north_for_char(ch);
 		
 	// each_dir: iterate over directions and show them in order
@@ -1979,9 +1941,6 @@ void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options)
 //// WHERE FUNCTIONS /////////////////////////////////////////////////////////
 
 void perform_mortal_where(char_data *ch, char *arg) {
-	extern bool valid_no_trace(room_data *room);
-	extern bool valid_unseen_passing(room_data *room);
-	
 	int closest, dir, dist, max_distance;
 	struct instance_data *ch_inst, *i_inst;
 	descriptor_data *d;
@@ -2196,8 +2155,6 @@ void perform_immort_where(char_data *ch, char *arg) {
 
 // with cmd == -1, this suppresses extra exits
 ACMD(do_exits) {
-	extern room_data *get_exit_room(room_data *from_room);
-	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	struct room_direction_data *ex;
 	room_data *room, *to_room;
@@ -2285,8 +2242,6 @@ ACMD(do_exits) {
 
 
 ACMD(do_mapscan) {
-	extern const char *alt_dirs[];
-	
 	room_data *use_room = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL);
 	int dir, dist, last_isle;
 	room_data *to_room;
@@ -2354,7 +2309,6 @@ ACMD(do_mapscan) {
 
 
 ACMD(do_scan) {
-	void clear_recent_moves(char_data *ch);
 	void scan_for_tile(char_data *ch, char *argument);
 
 	int dir;

@@ -25,6 +25,7 @@
 #include "dg_scripts.h"
 #include "dg_event.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -54,23 +55,53 @@ extern bool data_table_needs_save;
 extern int num_invalid;
 extern char **intros;
 extern int num_intros;
-extern const char *version;
-extern int wizlock_level;
 extern int no_auto_deletes;
 extern ush_int DFLT_PORT;
 extern const char *DFLT_DIR;
 extern char *LOGNAME;
 extern int max_playing;
-extern char *help;
+extern char *help_screen;
+extern const char *slow_nameserver_ips[];
 
 // external functions
-void save_all_players(bool delay);
-extern char *flush_reduced_color_codes(descriptor_data *desc);
+void boot_world();
+void empire_srandom(unsigned long initial_seed);
 void mobile_activity(void);
-void show_string(descriptor_data *d, char *input);
-int isbanned(char *hostname);
-void save_whole_world();
-extern bool is_fight_ally(char_data *ch, char_data *frenemy);
+int perform_alias(descriptor_data *d, char *orig);
+
+// heartbeat functions
+void check_death_respawn();
+void check_expired_cooldowns();
+void check_idle_passwords();
+void check_newbie_islands();
+void check_wars();
+void chore_update();
+void display_automessages();
+void extract_pending_chars();
+void extract_pending_vehicles();
+void free_freeable_triggers();
+void frequent_combat(int pulse);
+void point_update();
+void process_import_evolutions();
+void process_imports();
+void process_theft_logs();
+void prune_instances();
+void real_update();
+void reduce_city_overages();
+void reduce_outside_territory();
+void reduce_stale_empires();
+void reset_instances();
+void run_mob_echoes();
+void sanity_check();
+void save_data_table(bool force);
+void update_actions();
+void update_empire_npc_data();
+void update_guard_towers();
+void update_instance_world_size();
+void update_players_online_stats();
+void update_trading_post();
+void weather_and_time(int mode);
+void write_running_events_file();
 
 // local functions
 RETSIGTYPE checkpointing(int sig);
@@ -80,34 +111,15 @@ RETSIGTYPE import_evolutions(int sig);
 RETSIGTYPE unrestrict_game(int sig);
 char *make_prompt(descriptor_data *point);
 char *prompt_str(char_data *ch);
-char *replace_prompt_codes(char_data *ch, char *str);
 int get_from_q(struct txt_q *queue, char *dest, int *aliased);
-int get_max_players(void);
-static void msdp_update();
-int new_descriptor(socket_t s);
 int open_logfile(const char *filename, FILE *stderr_fp);
-int perform_alias(descriptor_data *d, char *orig);
-int perform_subst(descriptor_data *t, char *orig, char *subst);
-int process_input(descriptor_data *t);
 int set_sendbuf(socket_t s);
 socket_t init_socket(ush_int port);
-ssize_t perform_socket_read(socket_t desc, char *read_point,size_t space_left);
-ssize_t perform_socket_write(socket_t desc, const char *txt,size_t length);
-static int process_output(descriptor_data *t);
-struct in_addr *get_bind_addr(void);
-void empire_sleep(struct timeval *timeout);
 void flush_queues(descriptor_data *d);
-void game_loop(socket_t mother_desc);
-void heartbeat(int heart_pulse);
-void init_descriptor(descriptor_data *newd, int desc);
-void init_game(ush_int port);
 void nonblock(socket_t s);
 void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bitvector_t act_flags);
 void reboot_recover(void);
 void setup_log(const char *filename, int fd);
-void signal_setup(void);
-void timeadd(struct timeval *sum, struct timeval *a, struct timeval *b);
-void timediff(struct timeval *diff, struct timeval *a, struct timeval *b);
 #if defined(POSIX)
 sigfunc *my_signal(int signo, sigfunc * func);
 #endif
@@ -238,9 +250,6 @@ inline void empire_sleep(struct timeval *timeout) {
 * @param char_data *ch The player to update (no effect if no descriptor).
 */
 void msdp_update_room(char_data *ch) {
-	extern char *get_room_name(room_data *room, bool color);
-	extern const char *alt_dirs[];
-	
 	char buf[MAX_STRING_LENGTH], area_name[128], exits[256];
 	struct empire_city_data *city;
 	struct instance_data *inst;
@@ -312,23 +321,6 @@ void msdp_update_room(char_data *ch) {
 * From KaVir's protocol snippet (see protocol.c)
 */
 static void msdp_update(void) {
-	extern int get_block_rating(char_data *ch, bool can_gain_skill);
-	extern double get_combat_speed(char_data *ch, int pos);
-	extern int get_crafting_level(char_data *ch);
-	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-	void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
-	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
-	extern int health_gain(char_data *ch, bool info_only);
-	extern int mana_gain(char_data *ch, bool info_only);
-	extern int move_gain(char_data *ch, bool info_only);
-	extern int total_bonus_healing(char_data *ch);
-	extern int get_total_score(empire_data *emp);
-	extern const char *damage_types[];
-	extern const char *genders[];
-	extern const double hit_per_dex;
-	extern const char *month_name[];
-	extern const char *seasons[];
-	
 	struct player_skill_data *skill, *next_skill;
 	struct over_time_effect_type *dot;
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
@@ -741,9 +733,6 @@ bool check_reboot_confirms(void) {
 * Perform a reboot/shutdown.
 */
 void perform_reboot(void) {
-	extern const char *reboot_strings[];
-	extern int num_of_reboot_strings;
-	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], group_data[MAX_STRING_LENGTH];
 	descriptor_data *desc, *next_desc;
 	int gsize = 0;
@@ -877,10 +866,6 @@ void perform_reboot(void) {
 * should be called every minute.
 */
 void update_reboot(void) {
-	extern const char *reboot_type[];
-	extern int wizlock_level;
-	extern char *wizlock_message;
-	
 	char buf[MAX_STRING_LENGTH];
 	
 	// neverboot
@@ -915,46 +900,6 @@ void update_reboot(void) {
 //// MAIN GAME LOOP //////////////////////////////////////////////////////////
 
 void heartbeat(int heart_pulse) {
-	void check_death_respawn();
-	void check_expired_cooldowns();
-	void check_idle_passwords();
-	void check_newbie_islands();
-	void check_progress_refresh();
-	void check_wars();
-	void chore_update();
-	void display_automessages();
-	void extract_pending_chars();
-	void extract_pending_vehicles();
-	void free_freeable_triggers();
-	void free_loaded_players();
-	void frequent_combat(int pulse);
-	void generate_adventure_instances();
-	void output_map_to_file();
-	void point_update();
-	void process_import_evolutions();
-	void process_imports();
-	void process_theft_logs();
-	void prune_instances();
-	void real_update();
-	void reduce_city_overages();
-	void reduce_outside_territory();
-	void reduce_stale_empires();
-	void reset_instances();
-	void run_delayed_refresh();
-	void run_external_evolutions();
-	void run_mob_echoes();
-	void sanity_check();
-	void save_data_table(bool force);
-	void save_marked_empires();
-	void update_actions();
-	void update_empire_npc_data();
-	void update_guard_towers();
-	void update_instance_world_size();
-	void update_players_online_stats();
-	void update_trading_post();
-	void weather_and_time(int mode);
-	void write_running_events_file();
-
 	static int mins_since_crashsave = 0;
 	bool debug_log = FALSE;
 	
@@ -1176,8 +1121,6 @@ void heartbeat(int heart_pulse) {
 //// MESSAGING ///////////////////////////////////////////////////////////////
 
 void act(const char *str, int hide_invisible, char_data *ch, const void *obj, const void *vict_obj, bitvector_t act_flags) {
-	extern bool is_ignoring(char_data *ch, char_data *victim);
-
 	char_data *to, *list = NULL;
 	bool to_sleeping = FALSE, no_dark = FALSE, is_spammy = FALSE;
 
@@ -1370,9 +1313,6 @@ void send_to_all(const char *messg, ...) {
 
 /* higher-level communication: the act() function */
 void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bitvector_t act_flags) {
-	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
-	extern bool is_fight_ally(char_data *ch, char_data *frenemy);
-	
 	const char *i = NULL;
 	char *buf, lbuf[MAX_STRING_LENGTH], *dg_arg = NULL, temp[MAX_STRING_LENGTH];
 	bool real_ch = FALSE, real_vict = FALSE;
@@ -1821,9 +1761,8 @@ void stack_simple_msg_to_desc(descriptor_data *desc, const char *messg) {
 
 void close_socket(descriptor_data *d) {
 	struct stack_msg *stacked, *next_stacked;
-	descriptor_data *temp;
 
-	REMOVE_FROM_LIST(d, descriptor_list, next);
+	LL_DELETE(descriptor_list, d);
 	CLOSE_SOCKET(d->descriptor);
 	flush_queues(d);
 
@@ -1996,8 +1935,7 @@ void flush_queues(descriptor_data *d) {
 	int dummy;
 
 	if (d->large_outbuf) {
-		d->large_outbuf->next = bufpool;
-		bufpool = d->large_outbuf;
+		LL_PREPEND(bufpool, d->large_outbuf);
 	}
 	while (get_from_q(&d->input, buf2, &dummy));
 }
@@ -2138,7 +2076,6 @@ void init_descriptor(descriptor_data *newd, int desc) {
 	newd->idle_tics = 0;
 	newd->output = newd->small_outbuf;
 	newd->bufspace = SMALL_BUFSIZE - 1;
-	newd->next = descriptor_list;
 	newd->login_time = time(0);
 	*newd->output = '\0';
 	newd->bufptr = 0;
@@ -2248,8 +2185,6 @@ socket_t init_socket(ush_int port) {
 * @return bool TRUE if we should skip nameserver lookup on this IP.
 */
 bool is_slow_ip(char *ip) {
-	extern const char *slow_nameserver_ips[];
-	
 	int iter;
 	
 	for (iter = 0; *slow_nameserver_ips[iter] != '\n'; ++iter) {
@@ -2280,7 +2215,7 @@ bool is_slow_ip(char *ip) {
 * @param char *input The text typed, after the -.
 */
 void manipulate_input_queue(descriptor_data *desc, char *input) {
-	struct txt_block *iter, *next_iter, *temp;
+	struct txt_block *iter, *next_iter;
 	bool clear_all, found;
 
 	skip_spaces(&input);
@@ -2308,7 +2243,7 @@ void manipulate_input_queue(descriptor_data *desc, char *input) {
 		next_iter = iter->next;
 		
 		if (clear_all || is_abbrev(input, iter->text)) {
-			REMOVE_FROM_LIST(iter, desc->input.head, next);
+			LL_DELETE(desc->input.head, iter);
 			
 			if (!clear_all) {
 				msg_to_desc(desc, "Removed: %s\r\n", iter->text);
@@ -2426,8 +2361,7 @@ int new_descriptor(int s) {
 	newd->has_prompt = 1;
 
 	/* prepend to list */
-	newd->next = descriptor_list;
-	descriptor_list = newd;
+	LL_PREPEND(descriptor_list, newd);
 	
 	ProtocolNegotiate(newd);
 	SEND_TO_Q(intros[number(0, num_intros-1)], newd);
@@ -2883,8 +2817,7 @@ static int process_output(descriptor_data *t) {
 		/* If we were using a large buffer, put the large buffer on the buffer pool
 		* and switch back to the small one. */
 		if (t->large_outbuf) {
-			t->large_outbuf->next = bufpool;
-			bufpool = t->large_outbuf;
+			LL_PREPEND(bufpool, t->large_outbuf);
 			t->large_outbuf = NULL;
 			t->output = t->small_outbuf;
 		}
@@ -3193,13 +3126,6 @@ char *prompt_str(char_data *ch) {
 * @return char* The processed string
 */
 char *replace_prompt_codes(char_data *ch, char *str) {
-	extern struct gen_craft_data_t gen_craft_data[];
-	extern const char *health_levels[];
-	extern const char *move_levels[];
-	extern const char *mana_levels[];
-	extern const char *blood_levels[];
-	extern struct action_data_struct action_data[];
-	
 	static char pbuf[MAX_STRING_LENGTH];
 	char i[MAX_STRING_LENGTH], spare[10];
 	char *cp, *tmp;
@@ -3703,8 +3629,6 @@ void signal_setup(void) {
  * such as mobile_activity().
  */
 void game_loop(socket_t mother_desc) {
-	void reset_time(void);
-
 	fd_set input_set, output_set, exc_set, null_set;
 	struct timeval last_time, opt_time, process_time, temp_time;
 	struct timeval before_sleep, now, timeout;
@@ -3955,8 +3879,6 @@ void game_loop(socket_t mother_desc) {
 
 /* Init sockets, run game, and cleanup sockets */
 void init_game(ush_int port) {
-	void empire_srandom(unsigned long initial_seed);
-
 	empire_srandom(time(0));
 
 	log("Finding player limit.");
@@ -3996,8 +3918,6 @@ void init_game(ush_int port) {
 
 
 int main(int argc, char **argv) {
-	void boot_world();
-
 	int pos = 1;
 	const char *dir;
 
@@ -4172,11 +4092,6 @@ void setup_log(const char *filename, int fd) {
 
 
 void reboot_recover(void) {
-	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
-	void free_loaded_players();
-	extern bool global_mute_slash_channel_joins;
-	void run_delayed_refresh();
-
 	char buf[MAX_STRING_LENGTH];
 	descriptor_data *d;
 	char_data *plr, *ldr;

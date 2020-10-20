@@ -9,6 +9,7 @@
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -21,6 +22,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -29,17 +31,8 @@
 *   Edit Modules
 */
 
-// external consts
-extern const char *adventure_flags[];
-extern const char *adventure_link_flags[];
-extern const char *adventure_link_types[];
-extern const char *bld_on_flags[];
-extern const bitvector_t bld_on_flags_order[];
-extern const char *dirs[];
-
 // external funcs
 extern int delete_all_instances(adv_data *adv);
-extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 void init_adventure(adv_data *adv);
 
 // locals
@@ -235,7 +228,7 @@ adv_data *create_adventure_table_entry(adv_vnum vnum) {
 * @return bool TRUE if any links were deleted, FALSE if not
 */
 bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum) {
-	struct adventure_link_rule *link, *next_link, *temp;
+	struct adventure_link_rule *link, *next_link;
 	bool found = FALSE;
 	
 	// nope
@@ -248,7 +241,7 @@ bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum port
 		if (link->portal_in == portal_vnum || link->portal_out == portal_vnum) {
 			found = TRUE;
 			
-			REMOVE_FROM_LIST(link, *list, next);
+			LL_DELETE(*list, link);
 			free(link);
 		}
 	}
@@ -266,7 +259,7 @@ bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum port
 * @return bool TRUE if any links were deleted, FALSE if not
 */
 bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value) {
-	struct adventure_link_rule *link, *next_link, *temp;
+	struct adventure_link_rule *link, *next_link;
 	bool found = FALSE;
 
 	for (link = *list; link; link = next_link) {
@@ -274,7 +267,7 @@ bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type,
 		if (link->type == type && link->value == value) {
 			found = TRUE;
 			
-			REMOVE_FROM_LIST(link, *list, next);
+			LL_DELETE(*list, link);
 			free(link);
 		}
 	}
@@ -534,7 +527,7 @@ void save_olc_adventure(descriptor_data *desc) {
 */
 adv_data *setup_olc_adventure(adv_data *input) {
 	adv_data *new;
-	struct adventure_link_rule *old_link, *last_link, *new_link;
+	struct adventure_link_rule *old_link, *new_link;
 	
 	CREATE(new, adv_data, 1);
 	init_adventure(new);
@@ -550,19 +543,10 @@ adv_data *setup_olc_adventure(adv_data *input) {
 		
 		// copy linking
 		GET_ADV_LINKING(new) = NULL;
-		last_link = NULL;
 		for (old_link = GET_ADV_LINKING(input); old_link; old_link = old_link->next) {
 			CREATE(new_link, struct adventure_link_rule, 1);
 			*new_link = *old_link;
-			new_link->next = NULL;
-			
-			if (last_link) {
-				last_link->next = new_link;
-			}
-			else {
-				GET_ADV_LINKING(new) = new_link;
-			}
-			last_link = new_link;
+			LL_APPEND(GET_ADV_LINKING(new), new_link);
 		}
 		
 		// scripts
@@ -694,9 +678,6 @@ void get_adventure_linking_display(struct adventure_link_rule *list, char *save_
 * @param char_data *ch The person who is editing a adventure and will see its display.
 */
 void olc_show_adventure(char_data *ch) {
-	extern int adjusted_instance_limit(adv_data *adv);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
-
 	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
 	char lbuf[MAX_STRING_LENGTH];
 	int time;
@@ -924,7 +905,7 @@ OLC_MODULE(advedit_linking) {
 	char type_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], buildon_arg[MAX_INPUT_LENGTH], buildfacing_arg[MAX_INPUT_LENGTH], portalin_arg[MAX_INPUT_LENGTH], portalout_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	bitvector_t buildon = NOBITS, buildfacing = NOBITS;
 	char arg1[MAX_INPUT_LENGTH], lbuf[MAX_STRING_LENGTH];
-	struct adventure_link_rule *link, *change, *temp;
+	struct adventure_link_rule *link, *change;
 	obj_data *portalin = NULL, *portalout = NULL;
 	adv_data *adv = GET_OLC_ADVENTURE(ch->desc);
 	int linktype = 0, dir = NO_DIR, vnum_type;
@@ -957,7 +938,7 @@ OLC_MODULE(advedit_linking) {
 					found = TRUE;
 					
 					msg_to_char(ch, "You remove rule %d (%s)\r\n", atoi(argument), adventure_link_types[link->type]);
-					REMOVE_FROM_LIST(link, GET_ADV_LINKING(adv), next);
+					LL_DELETE(GET_ADV_LINKING(adv), link);
 					free(link);
 				}
 			}
@@ -1116,17 +1097,7 @@ OLC_MODULE(advedit_linking) {
 			link->dir = dir;
 			link->bld_on = buildon;
 			link->bld_facing = buildfacing;
-			link->next = NULL;
-
-			if ((temp = GET_ADV_LINKING(adv)) != NULL) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = link;
-			}
-			else {
-				GET_ADV_LINKING(adv) = link;
-			}
+			LL_APPEND(GET_ADV_LINKING(adv), link);
 
 			msg_to_char(ch, "You add a linking rule of type: %s\r\n", adventure_link_types[linktype]);
 			if (need_vnum) {

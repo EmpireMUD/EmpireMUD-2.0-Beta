@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -30,40 +31,8 @@
 *   Commands
 */
 
-// local protos
-void do_unseat_from_vehicle(char_data *ch);
-
-// external consts
-extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
-extern const char *dirs[];
-extern const char *from_dir[];
-extern const bool is_flat_dir[NUM_OF_DIRS];
-extern const char *mob_move_types[];
-extern const char *position_commands[];
-extern const char *position_types[];
-extern const int rev_dir[];
-
 // external funcs
 ACMD(do_dismount);
-PATHFIND_VALIDATOR(pathfind_ocean);
-PATHFIND_VALIDATOR(pathfind_pilot);
-PATHFIND_VALIDATOR(pathfind_road);
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
-extern int count_harnessed_animals(vehicle_data *veh);
-extern struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
-extern int get_north_for_char(char_data *ch);
-extern room_data *get_vehicle_interior(vehicle_data *veh);
-void harness_mob_to_vehicle(char_data *mob, vehicle_data *veh);
-extern bool parse_next_dir_from_string(char_data *ch, char *string, int *dir, int *dist, bool send_error);
-extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
-void scale_item_to_level(obj_data *obj, int level);
-void skip_run_filler(char **string);
-extern int total_small_vehicles_in_room(room_data *room);
-extern int total_vehicle_size_in_room(room_data *room);
-void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);	// fight.c
-extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
-extern bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room);
-bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 
 // local data
 struct {
@@ -192,9 +161,6 @@ vehicle_data *find_ship_to_dispatch(char_data *ch, char *arg) {
 * @return bool TRUE if any target was found, FALSE if not.
 */
 bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ) {
-	bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
-	bool validate_siege_target_vehicle(char_data *ch, vehicle_data *veh, vehicle_data *target);
-	
 	vehicle_data *tar;
 	room_data *from_room = veh ? IN_ROOM(veh) : IN_ROOM(ch);
 	room_data *room;
@@ -249,8 +215,6 @@ bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, 
 * @return room_data* The valid target, if any. Otherwise, will be NULL and the player received an error message.
 */
 room_data *get_shipping_target(char_data *ch, char *argument, bool *targeted_island) {
-	extern room_data *find_docks(empire_data *emp, int island_id);
-	
 	struct island_info *to_isle;
 	room_data *room;
 	
@@ -434,12 +398,6 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 * @return bool TRUE if successful, FALSE on fail.
 */
 bool perform_get_from_vehicle(char_data *ch, obj_data *obj, vehicle_data *veh, int mode) {
-	extern bool can_steal(char_data *ch, empire_data *emp);
-	extern bool can_take_obj(char_data *ch, obj_data *obj);
-	extern bool get_check_money(char_data *ch, obj_data *obj);
-	void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
-	void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
-	
 	bool stealing = FALSE;
 	empire_data *emp;
 
@@ -1132,9 +1090,6 @@ void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, 
 * @param obj_data *lighter Optional: The lighter item, if any.
 */
 void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
-	void start_vehicle_burning(vehicle_data *veh);
-	extern bool used_lighter(char_data *ch, obj_data *obj);
-	
 	char buf[MAX_STRING_LENGTH];
 	
 	if (IS_NPC(ch)) {
@@ -1176,8 +1131,6 @@ void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *lighter) {
 * @param int pos Either POS_SITTING, POS_RESTING, or POS_SLEEPING.
 */
 void do_sit_on_vehicle(char_data *ch, char *argument, int pos) {
-	extern bool check_stop_flying(char_data *ch);
-	
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh;
 	
@@ -1412,13 +1365,6 @@ ACMD(do_disembark) {
 
 
 ACMD(do_dispatch) {
-	extern char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_data *veh, mob_vnum vnum);
-	extern struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc);
-	extern int find_free_shipping_id(empire_data *emp);
-	void sail_shipment(empire_data *emp, vehicle_data *boat);
-	extern bool ship_is_empty(vehicle_data *ship);
-	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
-
 	char targ[MAX_INPUT_LENGTH], isle_arg[MAX_INPUT_LENGTH];
 	bool targeted_island = FALSE;
 	struct empire_npc_data *npc;
@@ -1539,9 +1485,6 @@ ACMD(do_dispatch) {
 * @param char *arg The typed-in arg.
 */
 void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
-	extern bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bool skip_permissions);
-	void char_through_portal(char_data *ch, obj_data *portal, bool following);
-
 	room_data *was_in, *to_room;
 	obj_data *portal;
 	
@@ -1706,10 +1649,6 @@ ACMD(do_drag) {
 * @param int subcmd The original subcommand passed to do_drive.
 */
 void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal, int subcmd) {
-	extern bool can_enter_portal(char_data *ch, obj_data *portal, bool allow_infiltrate, bool skip_permissions);
-	extern obj_data *find_back_portal(room_data *in_room, room_data *from_room, obj_data *fallback);
-	void give_portal_sickness(char_data *ch, obj_data *portal, room_data *from, room_data *to);
-	
 	room_data *to_room, *was_in = IN_ROOM(veh);
 	struct vehicle_room_list *vrl;
 	char_data *ch_iter, *next_ch;
@@ -1779,8 +1718,6 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 
 // do_sail, do_pilot (search hints)
 ACMD(do_drive) {
-	extern char *get_pathfind_string(room_data *start, room_data *end, char_data *ch, vehicle_data *veh, PATHFIND_VALIDATOR(*validator));
-	
 	char buf[MAX_STRING_LENGTH], *found_path = NULL;
 	struct vehicle_room_list *vrl;
 	bool was_driving, same_dir, dir_only;
@@ -1945,9 +1882,6 @@ ACMD(do_drive) {
 
 
 ACMD(do_fire) {
-	void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
-	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
-	
 	char veh_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh, *veh_targ;
 	sector_data *secttype;

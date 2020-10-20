@@ -22,6 +22,7 @@
 #include "db.h"
 #include "skills.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -67,15 +68,8 @@ bool workforce_is_delayed(empire_data *emp, room_data *room, int chore);
 
 // external functions
 int count_building_vehicles_in_room(room_data *room, empire_data *only_owner);	// vehicles.c
-extern int count_dropped_items(empire_data *emp, obj_vnum vnum);
-void empire_skillup(empire_data *emp, any_vnum ability, double amount);	// skills.c
 int get_workforce_production_limit(empire_data *emp, obj_vnum vnum);
 void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component);
-void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
-void stop_room_action(room_data *room, int action);	// act.action.c
-
-// external vars
-extern const bool interact_one_at_a_time[NUM_INTERACTS];
 
 // gen_craft protos:
 #define CHORE_GEN_CRAFT_VALIDATOR(name)  bool (name)(empire_data *emp, room_data *room, vehicle_data *veh, int chore, craft_data *craft)
@@ -732,7 +726,6 @@ void charge_workforce(empire_data *emp, room_data *room, char_data *worker, int 
 */
 void chore_update(void) {
 	void ewt_free_tracker(struct empire_workforce_tracker **tracker);
-	void read_vault(empire_data *emp);
 	void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs);
 	
 	struct empire_territory_data *ter, *next_ter;
@@ -1199,8 +1192,6 @@ void mark_workforce_delay(empire_data *emp, room_data *room, int chore, int prob
 * @return char_data *the mob, or NULL if none to spawn
 */
 char_data *place_chore_worker(empire_data *emp, int chore, room_data *room) {
-	extern char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
-	
 	struct empire_territory_data *ter;
 	struct empire_npc_data *npc;
 	char_data *mob = NULL;
@@ -1499,8 +1490,6 @@ CHORE_GEN_CRAFT_VALIDATOR(chore_workforce_crafting) {
 * @param bool is_skilled If TRUE, gains exp for Skilled Labor.
 */
 void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator), bool is_skilled) {
-	extern struct gen_craft_data_t gen_craft_data[];
-	
 	struct empire_storage_data *store = NULL;
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[chore].mob);
 	bool any_over_limit = FALSE, any_no_res = FALSE, done_any = FALSE;
@@ -1763,8 +1752,6 @@ void do_chore_building(empire_data *emp, room_data *room, int mode) {
 
 
 void do_chore_burn_stumps(empire_data *emp, room_data *room) {
-	void perform_burn_room(room_data *room);
-	
 	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_BURN_STUMPS].mob);
 	
 	if (!worker) {	// as a backup, use a chopper if present
@@ -1817,8 +1804,6 @@ INTERACTION_FUNC(one_chop_chore) {
 
 
 void do_chore_chopping(empire_data *emp, room_data *room) {
-	extern void change_chop_territory(room_data *room);
-	
 	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_CHOPPING].mob);
 	bool depleted = (get_depletion(room, DPLTN_CHOP, FALSE) >= config_get_int("chop_depletion"));
 	bool can_gain = can_gain_chore_resource_from_interaction_room(emp, room, CHORE_CHOPPING, INTERACT_CHOP);
@@ -2027,7 +2012,6 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 */
 void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *veh) {
 	void start_dismantle_building(room_data *loc);
-	void start_dismantle_vehicle(vehicle_data *veh);
 	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_DISMANTLE_MINES].mob);
 	bool can_do = veh ? VEH_IS_COMPLETE(veh) : IS_COMPLETE(room);
@@ -2192,10 +2176,6 @@ INTERACTION_FUNC(one_farming_chore) {
 
 // handles harvest/pick (preferring harvest)
 void do_chore_farming(empire_data *emp, room_data *room) {
-	void check_terrain_height(room_data *room);
-	void schedule_crop_growth(struct map_data *map);
-	void uncrop_tile(room_data *room);
-	
 	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_FARMING].mob);
 	bool can_gain = FALSE;
 	sector_data *old_sect;
@@ -2383,8 +2363,6 @@ void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh) {
 
 // for non-vehicles
 void do_chore_fire_brigade(empire_data *emp, room_data *room) {
-	void stop_burning(room_data *room);
-	
 	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_FIRE_BRIGADE].mob);
 	int total_ticks, per_hour;
 	
@@ -2779,8 +2757,6 @@ void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh) {
 
 // handles both build (CHORE_BUILD) and repair (CHORE_MAINTENANCE)
 void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
-	void complete_vehicle(vehicle_data *veh);
-	
 	char_data *worker = find_chore_worker_in_room(emp, IN_ROOM(veh), veh, chore_data[chore].mob);
 	struct empire_storage_data *store = NULL;
 	int islid = GET_ISLAND_ID(IN_ROOM(veh));

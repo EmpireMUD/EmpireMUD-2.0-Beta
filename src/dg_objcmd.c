@@ -24,50 +24,17 @@
 #include "db.h"
 #include "skills.h"
 #include "vnums.h"
+#include "constants.h"
 
-// external vars
-extern const char *damage_types[];
-extern const char *dirs[];
-extern const char *alt_dirs[];
-extern struct instance_data *quest_instance_global;
+/**
+* Contents:
+*   Helpers
+*   Object Commands
+*   Object Command Interpreter
+*/
 
-// external functions
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
-void obj_command_interpreter(obj_data *obj, char *argument);
-void send_char_pos(char_data *ch, int dam);
-char_data *get_char_by_obj(obj_data *obj, char *name);
-obj_data *get_obj_by_obj(obj_data *obj, char *name);
-room_data *get_room(room_data *ref, char *name);
-extern vehicle_data *get_vehicle(char *name);
-vehicle_data *get_vehicle_by_obj(obj_data *obj, char *name);
-vehicle_data *get_vehicle_near_obj(obj_data *obj, char *name);
-void instance_obj_setup(struct instance_data *inst, obj_data *obj);
-void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
-void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
-void sub_write_to_room(char *str, room_data *room, bool use_queue);
-void die(char_data *ch, char_data *killer);
-void scale_item_to_level(obj_data *obj, int level);
-void scale_mob_to_level(char_data *mob, int level);
-void scale_vehicle_to_level(vehicle_data *veh, int level);
-
-// locals
-room_data *obj_room(obj_data *obj);
-
-
-#define OCMD(name)  void (name)(obj_data *obj, char *argument, int cmd, int subcmd)
-
-
-struct obj_command_info {
-	char *command;
-	void (*command_pointer)(obj_data *obj, char *argument, int cmd, int subcmd);
-	int subcmd;
-};
-
-
-/* do_osend */
-#define SCMD_OSEND         0
-#define SCMD_OECHOAROUND   1
-
+ //////////////////////////////////////////////////////////////////////////////
+//// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
 * Determines the scale level for a obj, with a character target as a backup
@@ -139,11 +106,10 @@ room_data *obj_room(obj_data *obj) {
 }
 
 
-/* obj_data *commands */
+ //////////////////////////////////////////////////////////////////////////////
+//// OBJECT COMMANDS /////////////////////////////////////////////////////////
 
 OCMD(do_oadventurecomplete) {
-	void mark_instance_completed(struct instance_data *inst);
-	
 	struct instance_data *inst;
 	room_data *room = obj_room(obj);
 	
@@ -159,8 +125,6 @@ OCMD(do_oadventurecomplete) {
 
 
 OCMD(do_obuild) {
-	void do_dg_build(room_data *target, char *argument);
-
 	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
 	room_data *orm = obj_room(obj), *target;
 	
@@ -428,10 +392,6 @@ OCMD(do_oechoneither) {
 
 
 OCMD(do_orestore) {
-	void complete_vehicle(vehicle_data *veh);
-	extern const bool aff_is_bad[];
-	extern const double apply_values[];
-	
 	struct affected_type *aff, *next_aff;
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh = NULL;
@@ -645,7 +605,6 @@ OCMD(do_otransform) {
 
 
 OCMD(do_omod) {
-	void script_modify(char *argument);
 	script_modify(argument);
 }
 
@@ -678,8 +637,6 @@ OCMD(do_omorph) {
 
 
 OCMD(do_oown) {
-	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
-	
 	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
 	room_data *orm = obj_room(obj);
 	vehicle_data *vtarg = NULL;
@@ -898,17 +855,11 @@ OCMD(do_opurge) {
 
 // quest commands
 OCMD(do_oquest) {
-	void do_dg_quest(int go_type, void *go, char *argument);	
 	do_dg_quest(OBJ_TRIGGER, obj, argument);
 }
 
 
 OCMD(do_osiege) {
-	void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
-	extern bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
-	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
-	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
-	
 	char scale_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh_targ = NULL;
 	room_data *orm, *room_targ = NULL;
@@ -1091,8 +1042,6 @@ OCMD(do_oteleport) {
 
 
 OCMD(do_oterracrop) {
-	void do_dg_terracrop(room_data *target, crop_data *crop);
-
 	char loc_arg[MAX_INPUT_LENGTH], crop_arg[MAX_INPUT_LENGTH];
 	crop_data *crop;
 	room_data *orm = obj_room(obj), *target;
@@ -1140,8 +1089,6 @@ OCMD(do_oterracrop) {
 
 
 OCMD(do_oterraform) {
-	void do_dg_terraform(room_data *target, sector_data *sect);
-
 	char loc_arg[MAX_INPUT_LENGTH], sect_arg[MAX_INPUT_LENGTH];
 	sector_data *sect;
 	room_data *orm = obj_room(obj), *target;
@@ -1194,10 +1141,6 @@ OCMD(do_oterraform) {
 
 
 OCMD(do_oload) {
-	struct obj_binding *copy_obj_bindings(struct obj_binding *from);
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	struct instance_data *inst = NULL;
 	int number = 0;
@@ -1521,7 +1464,7 @@ OCMD(do_odoor) {
 	char target[MAX_INPUT_LENGTH], direction[MAX_INPUT_LENGTH];
 	char field[MAX_INPUT_LENGTH], *value;
 	room_data *rm, *troom, *orm = obj_room(obj);
-	struct room_direction_data *newexit, *temp;
+	struct room_direction_data *newexit;
 	int dir, fd;
 
 	const char *door_field[] = {
@@ -1569,7 +1512,7 @@ OCMD(do_odoor) {
 	/* purge exit */
 	if (fd == 0) {
 		if (newexit) {
-			REMOVE_FROM_LIST(newexit, COMPLEX_DATA(rm)->exits, next);
+			LL_DELETE(COMPLEX_DATA(rm)->exits, newexit);
 			if (newexit->room_ptr) {
 				--GET_EXITS_HERE(newexit->room_ptr);
 			}
@@ -1763,6 +1706,9 @@ OCMD(do_oscale) {
 }
 
 
+ //////////////////////////////////////////////////////////////////////////////
+//// OBJECT COMMAND INTERPRETER //////////////////////////////////////////////
+
 const struct obj_command_info obj_cmd_info[] = {
 	{ "RESERVED", 0, 0 },/* this must be first -- for specprocs */
 
@@ -1804,9 +1750,11 @@ const struct obj_command_info obj_cmd_info[] = {
 };
 
 
-
-/*
+/**
 *  This is the command interpreter used by objects, called by script_driver.
+*
+* @param obj_data *obj The object executing the command.
+* @param argument The remaining script line.
 */
 void obj_command_interpreter(obj_data *obj, char *argument) {
 	int cmd, length;
@@ -1815,18 +1763,23 @@ void obj_command_interpreter(obj_data *obj, char *argument) {
 	skip_spaces(&argument);
 
 	/* just drop to next line for hitting CR */
-	if (!*argument)
+	if (!*argument) {
 		return;
+	}
 
 	half_chop(argument, arg, line);
 
 	/* find the command */
-	for (length = strlen(arg), cmd = 0; *obj_cmd_info[cmd].command != '\n'; cmd++)
-		if (!strn_cmp(obj_cmd_info[cmd].command, arg, length))
+	for (length = strlen(arg), cmd = 0; *obj_cmd_info[cmd].command != '\n'; cmd++) {
+		if (!strn_cmp(obj_cmd_info[cmd].command, arg, length)) {
 			break;
+		}
+	}
 
-	if (*obj_cmd_info[cmd].command == '\n')
+	if (*obj_cmd_info[cmd].command == '\n') {
 		obj_log(obj, "Unknown object cmd: '%s'", argument);
-	else
+	}
+	else {
 		((*obj_cmd_info[cmd].command_pointer) (obj, line, cmd, obj_cmd_info[cmd].subcmd));
+	}
 }

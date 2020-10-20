@@ -1475,6 +1475,7 @@ typedef struct vehicle_data vehicle_data;
 // System timing
 #define OPT_USEC  100000	// 10 passes per second
 #define PASSES_PER_SEC  (1000000 / OPT_USEC)
+#define PASSES_PER_MUD_HOUR     (SECS_PER_MUD_HOUR*PASSES_PER_SEC)
 #define RL_SEC  * PASSES_PER_SEC
 #define SEC_MICRO  *1000000	// convert seconds to microseconds for microtime()
 
@@ -2823,7 +2824,7 @@ struct automessage {
 	int timing;	// AUTOMSG_ types
 	int interval;	// minutes, for repeating
 	
-	UT_hash_handle hh;	// hash handle (automessages, by id)
+	UT_hash_handle hh;	// hash handle (automessages_table, by id)
 };
 
 
@@ -3281,7 +3282,7 @@ struct trading_post_data {
 	int post_cost;	// # of coins paid to post it
 	empire_vnum coin_type;	// empire vnum or OTHER_COIN for buy/post coins
 	
-	struct trading_post_data *next;	// LL
+	struct trading_post_data *prev, *next;	// DLL
 };
 
 
@@ -4731,7 +4732,7 @@ struct empire_log_data {
 	time_t timestamp;
 	char *string;
 	
-	struct empire_log_data *next;
+	struct empire_log_data *prev, *next;
 };
 
 
@@ -4885,7 +4886,7 @@ struct offense_data {
 	int x, y;	// approximate location
 	bitvector_t flags;	// OFF_ for anonymous offenses, whether or not there was an observer
 	
-	struct offense_data *next;	// linked list
+	struct offense_data *prev, *next;	// doubly-linked list
 };
 
 
@@ -4950,7 +4951,7 @@ struct empire_data {
 	struct empire_unique_storage *unique_store;	// LL: eus->next
 	struct empire_trade_data *trade;
 	struct empire_log_data *logs;
-	struct offense_data *offenses;
+	struct offense_data *offenses;	// doubly-linked list
 	struct empire_goal *goals;	// current goal trackers (hash by vnum)
 	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
 	struct player_craft_data *learned_crafts;	// crafts available to the whole empire

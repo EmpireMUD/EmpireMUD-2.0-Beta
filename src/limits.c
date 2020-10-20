@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -37,26 +38,8 @@
 *   Core Periodicals
 */
 
-// external vars
-extern const char *dirs[];
-extern const char *from_dir[];
-extern const struct material_data materials[NUM_MATERIALS];
-extern const int regen_by_pos[];
-extern const struct wear_data_type wear_data[NUM_WEARS];
-
 // external funcs
-extern obj_data *die(char_data *ch, char_data *killer);
-void death_log(char_data *ch, char_data *killer, int type);
-extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-extern room_data *obj_room(obj_data *obj);
 void out_of_blood(char_data *ch);
-void perform_abandon_city(empire_data *emp, struct empire_city_data *city, bool full_abandon);
-void scale_item_to_level(obj_data *obj, int level);
-
-// locals
-int health_gain(char_data *ch, bool info_only);
-int mana_gain(char_data *ch, bool info_only);
-int move_gain(char_data *ch, bool info_only);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -69,9 +52,6 @@ int move_gain(char_data *ch, bool info_only);
 * @param char_data *ch The player to check for attributes.
 */
 void check_attribute_gear(char_data *ch) {
-	extern const int apply_attribute[];
-	extern const int primary_attributes[];
-	
 	struct obj_apply *apply;
 	int iter, pos;
 	obj_data *obj;
@@ -317,9 +297,6 @@ void check_should_dismount(char_data *ch) {
 * Interaction func for "decays-to" and "consumes-to".
 */
 INTERACTION_FUNC(consumes_or_decays_interact) {
-	struct obj_binding *copy_obj_bindings(struct obj_binding *from);
-	void free_obj_binding(struct obj_binding **list);
-	
 	obj_data *new_obj;
 	bool fail = FALSE;
 	int iter;
@@ -591,17 +568,10 @@ void point_update_char(char_data *ch) {
 */
 void real_update_char(char_data *ch) {
 	void adventure_unsummon(char_data *ch);
-	void cancel_blood_upkeeps(char_data *ch);
-	extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
 	void check_combat_end(char_data *ch);
 	void check_morph_ability(char_data *ch);
-	void combat_meter_damage_dealt(char_data *ch, int amt);
 	extern int compute_bonus_exp_per_day(char_data *ch);
-	void do_unseat_from_vehicle(char_data *ch);
-	extern bool fail_daily_quests(char_data *ch);
-	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 	void random_encounter(char_data *ch);
-	extern bool starving_vampire_aggro(char_data *ch);
 	void update_biting_char(char_data *ch);
 	void update_vampire_sun(char_data *ch);
 	extern int max_inventory_size;
@@ -958,9 +928,7 @@ void real_update_char(char_data *ch) {
 * @param struct empire_city_data *city The city to check.
 * @return TRUE if it destroys the city, FALSE otherwise.
 */
-static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *city) {	
-	extern struct city_metadata_type city_type[];
-
+static bool check_one_city_for_ruin(empire_data *emp, struct empire_city_data *city) {
 	room_data *to_room, *center = city->location;
 	int radius = city_type[city->type].radius;
 	bool found_building = FALSE;
@@ -1126,10 +1094,6 @@ static void reduce_city_overage_one(empire_data *emp) {
 * - Are used at least 2x their currently-earned city points.
 */
 void reduce_city_overages(void) {
-	extern int city_points_available(empire_data *emp);
-	extern int count_cities(empire_data *emp);
-	extern int count_city_points_used(empire_data *emp);
-	
 	empire_data *iter, *next_iter;
 	int points;
 	
@@ -1170,8 +1134,6 @@ void reduce_city_overages(void) {
 * @param empire_data *emp The empire to reduce
 */
 static void reduce_outside_territory_one(empire_data *emp) {
-	extern char *get_room_name(room_data *room, bool color);
-	
 	struct empire_city_data *city;
 	room_data *iter, *next_iter, *loc, *farthest;
 	int dist, this_far, far_dist, far_type, ter_type;
@@ -1381,7 +1343,6 @@ bool should_delete_empire(empire_data *emp) {
 */
 void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs) {
 	void deactivate_workforce_island(empire_data *emp, int island_id);
-	void read_vault(empire_data *emp);
 	
 	struct empire_storage_data *store, *next_store;
 	struct island_info *island = get_island(eisle->island, TRUE);
@@ -1475,9 +1436,6 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 * @return bool TRUE if the item is still in the world, FALSE if it was extracted
 */
 bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
-	void check_delayed_load(char_data *ch);
-	extern int get_main_island(empire_data *emp);
-	
 	player_index_data *index;
 	empire_data *emp = override_emp;
 	char_data *loaded_ch;
@@ -1878,10 +1836,6 @@ void autostore_vehicle_contents(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle to update.
 */
 void point_update_vehicle(vehicle_data *veh) {
-	bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
-	void ruin_vehicle(vehicle_data *veh, char *message);
-	bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
-	
 	char *msg;
 	
 	if (VEH_IS_EXTRACTED(veh)) {
@@ -1924,8 +1878,6 @@ void point_update_vehicle(vehicle_data *veh) {
 * @return bool TRUE if you can legally teleport there, otherwise FALSE.
 */
 bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner) {
-	extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
-	
 	struct instance_data *inst;
 	char_data *mob;
 	
@@ -1968,10 +1920,7 @@ bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner) {
 * Called periodically to time out any expired trades.
 */
 void update_trading_post(void) {
-	void expire_trading_post_item(struct trading_post_data *tpd);
-	void save_trading_post();
-	
-	struct trading_post_data *tpd, *next_tpd, *temp;
+	struct trading_post_data *tpd, *next_tpd;
 	int *notify_list = NULL, top_notify = -1;
 	bool changed = FALSE;
 	char_data *ch;
@@ -1980,8 +1929,7 @@ void update_trading_post(void) {
 	
 	int trading_post_days_to_timeout = config_get_int("trading_post_days_to_timeout");
 	
-	for (tpd = trading_list; tpd; tpd = next_tpd) {
-		next_tpd = tpd->next;
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
 		diff = time(0) - tpd->start;
 		
 		if ((!IS_SET(tpd->state, TPD_FOR_SALE | TPD_OBJ_PENDING | TPD_COINS_PENDING) || diff >= (trading_post_days_to_timeout * SECS_PER_REAL_DAY)) && !is_playing(tpd->player)) {
@@ -1992,7 +1940,7 @@ void update_trading_post(void) {
 				tpd->obj = NULL;
 			}
 			
-			REMOVE_FROM_LIST(tpd, trading_list, next);
+			DL_DELETE(trading_list, tpd);
 			free(tpd);
 			changed = TRUE;
 		}
@@ -2263,7 +2211,6 @@ int move_gain(char_data *ch, bool info_only) {
 */
 void point_update(bool run_real) {
 	void clean_offers(char_data *ch);
-	void setup_daily_quest_cycles(int only_cycle);
 	void update_players_online_stats();
 	
 	vehicle_data *veh, *next_veh;

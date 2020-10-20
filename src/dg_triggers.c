@@ -25,26 +25,7 @@
 #include "skills.h"
 #include "olc.h"
 #include "dg_event.h"
-
-
-extern const char *cmd_door[];
-
-/* external functions */
-const char *skill_name(int num);
-void add_var(struct trig_var_data **var_list, char *name, char *value, int id);
-char *matching_quote(char *p);
-bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum);
-char *str_str(char *cs, char *ct);
-
-// external vars
-extern const char *dirs[];
-extern const int rev_dir[];
-extern struct instance_data *quest_instance_global;
-
-// locals
-int buy_vtrigger(char_data *actor, char_data *shopkeeper, obj_data *buying, int cost, any_vnum currency);
-int kill_otrigger(obj_data *obj, char_data *dying, char_data *killer);
-
+#include "constants.h"
 
 /*
 *  General functions used by several triggers
@@ -177,7 +158,7 @@ int word_check(char *str, char *wordlist) {
 void greet_memory_mtrigger(char_data *actor) {
 	trig_data *t;
 	char_data *ch;
-	struct script_memory *mem;
+	struct script_memory *mem, *next_mem;
 	char buf[MAX_INPUT_LENGTH];
 	int command_performed = 0;
 
@@ -192,7 +173,7 @@ void greet_memory_mtrigger(char_data *actor) {
 			continue;
 		}
 		/* find memory line with command only */
-		for (mem = SCRIPT_MEM(ch); mem && SCRIPT_MEM(ch); mem=mem->next) {
+		LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
 			if (actor->script_id != mem->id) {
 				continue;
 			}
@@ -218,17 +199,11 @@ void greet_memory_mtrigger(char_data *actor) {
 			}
 			/* delete the memory */
 			if (mem) {
-				if (SCRIPT_MEM(ch)==mem) {
-					SCRIPT_MEM(ch) = mem->next;
+				LL_DELETE(SCRIPT_MEM(ch), mem);
+				if (mem->cmd) {
+					free(mem->cmd);
 				}
-				else {
-					struct script_memory *prev;
-					prev = SCRIPT_MEM(ch);
-					while (prev->next != mem) prev = prev->next;
-						prev->next = mem->next;
-				}
-				if (mem->cmd) free(mem->cmd);
-					free(mem);
+				free(mem);
 			}
 		}
 	}
@@ -281,7 +256,7 @@ int greet_mtrigger(char_data *actor, int dir) {
 void entry_memory_mtrigger(char_data *ch) {
 	trig_data *t;
 	char_data *actor;
-	struct script_memory *mem;
+	struct script_memory *mem, *next_mem;
 	char buf[MAX_INPUT_LENGTH];
 
 	if (!SCRIPT_MEM(ch))
@@ -295,10 +270,11 @@ void entry_memory_mtrigger(char_data *ch) {
 			continue;
 		}
 		if (actor!=ch && SCRIPT_MEM(ch)) {
-			for (mem = SCRIPT_MEM(ch); mem && SCRIPT_MEM(ch); mem = mem->next) {
+			LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
 				if (actor->script_id == mem->id) {
-					struct script_memory *prev;
-					if (mem->cmd) command_interpreter(ch, mem->cmd);
+					if (mem->cmd) {
+						command_interpreter(ch, mem->cmd);
+					}
 					else {
 						for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
 							if (TRIGGER_CHECK(t, MTRIG_MEMORY) && (number(1, 100) <= GET_TRIG_NARG(t))){
@@ -311,18 +287,13 @@ void entry_memory_mtrigger(char_data *ch) {
 						}
 					}
 					/* delete the memory */
-					if (SCRIPT_MEM(ch)==mem) {
-						SCRIPT_MEM(ch) = mem->next;
+					LL_DELETE(SCRIPT_MEM(ch), mem);
+					if (mem->cmd) {
+						free(mem->cmd);
 					}
-					else {
-						prev = SCRIPT_MEM(ch);
-						while (prev->next != mem) prev = prev->next;
-							prev->next = mem->next;
-					}
-					if (mem->cmd) free(mem->cmd);
-						free(mem);
+					free(mem);
 				}
-			} /* for (mem =..... */
+			}
 		}
 	}
 }
@@ -2950,8 +2921,6 @@ void check_reset_trigger_event(room_data *room, bool random_offset) {
 * @return int The return value of a script (1 is normal, 0 suppresses the death cry).
 */
 int run_kill_triggers(char_data *dying, char_data *killer, vehicle_data *veh_killer) {
-	extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
-	
 	union script_driver_data_u sdd;
 	char_data *ch_iter, *next_ch;
 	trig_data *trig, *next_trig;

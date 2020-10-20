@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "handler.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -42,44 +43,11 @@ const char *default_vehicle_short_desc = "an unnamed vehicle";
 const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 
 // local protos
-void add_room_to_vehicle(room_data *room, vehicle_data *veh);
 void clear_vehicle(vehicle_data *veh);
 void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
-int get_new_vehicle_construction_id();
-void ruin_vehicle(vehicle_data *veh, char *message);
-void scale_vehicle_to_level(vehicle_data *veh, int level);
-char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
-bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
-
-// external consts
-extern const char *climate_flags[];
-extern const bitvector_t climate_flags_order[];
-extern const char *designate_flags[];
-extern const char *function_flags[];
-extern const char *interact_types[];
-extern const byte interact_vnum_types[NUM_INTERACTS];
-extern const char *mob_move_types[];
-extern const char *paint_colors[];
-extern const char *paint_names[];
-extern const int bld_relationship_vnum_types[];
-extern const char *room_aff_bits[];
-extern const char *veh_custom_types[];
-extern const char *vehicle_flags[];
-extern const char *vehicle_speed_types[];
 
 // external funcs
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
-extern struct resource_data *copy_resource_list(struct resource_data *input);
-extern room_data *create_room(room_data *home);
-void free_bld_relations(struct bld_relation *list);
 void free_custom_messages(struct custom_message *mes);
-void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
-extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-void get_resource_display(struct resource_data *list, char *save_buffer);
-void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
-void scale_item_to_level(obj_data *obj, int level);
-extern char *show_color_codes(char *string);
-extern bool validate_icon(char *icon);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -214,8 +182,6 @@ int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms) {
 * @param vehicle_data *veh The vehicle whose interior must go.
 */
 void delete_vehicle_interior(vehicle_data *veh) {
-	void relocate_players(room_data *room, room_data *to_room);
-	
 	struct vehicle_room_list *vrl, *next_vrl;
 	room_data *main_room;
 	
@@ -345,7 +311,6 @@ vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum inte
 * @param vehicle_data *veh The vehicle being dismantled.
 */
 void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
-	extern bool check_autostore(obj_data *obj, bool force, empire_data *override_emp);
 	extern struct empire_chore_type chore_data[NUM_CHORES];
 	
 	obj_data *newobj, *proto;
@@ -401,8 +366,6 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle being finished.
 */
 void finish_vehicle_setup(vehicle_data *veh) {
-	void init_mine(room_data *room, char_data *ch, empire_data *emp);
-	
 	if (!veh || !VEH_IS_COMPLETE(veh)) {
 		return;	// no work
 	}
@@ -496,11 +459,9 @@ room_data *get_vehicle_interior(vehicle_data *veh) {
 	room = create_room(NULL);
 	attach_building_to_room(bld, room, TRUE);
 	COMPLEX_DATA(room)->home_room = NULL;
-	SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_IN_VEHICLE);
 	affect_total_room(room);
 	
 	// attach
-	COMPLEX_DATA(room)->vehicle = veh;
 	VEH_INTERIOR_HOME_ROOM(veh) = room;
 	add_room_to_vehicle(room, veh);
 	
@@ -566,8 +527,6 @@ struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char 
 * @return vehicle_data* A vehicle to show, if any (NULL if not).
 */
 vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room) {
-	extern bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
-	
 	vehicle_data *iter, *in_veh, *found = NULL;
 	bool is_on_vehicle = ((in_veh = GET_ROOM_VEHICLE(IN_ROOM(ch))) && room == IN_ROOM(in_veh));
 	int found_size = -1;
@@ -809,8 +768,6 @@ INTERACTION_FUNC(ruin_vehicle_to_vehicle_interaction) {
 * @param char *message Optional: An act string (using $V for the vehicle) to send to the room. (NULL for none)
 */
 void ruin_vehicle(vehicle_data *veh, char *message) {
-	void delete_room_npcs(room_data *room, struct empire_territory_data *ter, bool make_homeless);
-	
 	bool was_bld = VEH_FLAGGED(veh, VEH_BUILDING) ? TRUE : FALSE;
 	empire_data *emp = VEH_OWNER(veh);
 	room_data *room = IN_ROOM(veh);
@@ -887,8 +844,6 @@ void scale_vehicle_to_level(vehicle_data *veh, int level) {
 * @param bool vehicle_data *veh The vehicle to dismantle.
 */
 void start_dismantle_vehicle(vehicle_data *veh) {
-	void reduce_dismantle_resources(int damage, int max_health, struct resource_data **list);
-	
 	struct resource_data *res, *next_res;
 	obj_data *proto;
 	
@@ -961,8 +916,6 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle to ignite.
 */
 void start_vehicle_burning(vehicle_data *veh) {
-	void do_unseat_from_vehicle(char_data *ch);
-	
 	if (VEH_OWNER(veh)) {
 		log_to_empire(VEH_OWNER(veh), ELOG_HOSTILITY, "Your %s has caught on fire at (%d, %d)", skip_filler(VEH_SHORT_DESC(veh)), X_COORD(IN_ROOM(veh)), Y_COORD(IN_ROOM(veh)));
 	}
@@ -1027,9 +980,6 @@ int total_vehicle_size_in_room(room_data *room) {
 * @return char_data* A pointer to the mob if one was loaded, or NULL if not.
 */
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh) {
-	void scale_mob_to_level(char_data *mob, int level);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);	
-	
 	char_data *mob;
 	
 	// safety first
@@ -1165,10 +1115,17 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 	vrl->room = room;
 	LL_APPEND(VEH_ROOM_LIST(veh), vrl);
 	
+	SET_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_IN_VEHICLE);
+	if (COMPLEX_DATA(room)) {
+		COMPLEX_DATA(room)->vehicle = veh;
+	}
+	
 	// count all rooms after the first
 	if (room != VEH_INTERIOR_HOME_ROOM(veh)) {
 		++VEH_INSIDE_ROOMS(veh);
 	}
+	
+	affect_total_room(room);
 	
 	// initial island data
 	if (IN_ROOM(veh)) {
@@ -1534,9 +1491,6 @@ char *list_one_vehicle(vehicle_data *veh, bool detail) {
 * @param any_vnum vnum The vehicle vnum.
 */
 void olc_search_vehicle(char_data *ch, any_vnum vnum) {
-	extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-	extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh = vehicle_proto(vnum);
 	vehicle_data *veh_iter, *next_veh_iter;
@@ -1724,8 +1678,6 @@ void olc_search_vehicle(char_data *ch, any_vnum vnum) {
 * @param char_data *ch The person doing the dismantling.
 */
 void process_dismantle_vehicle(char_data *ch) {
-	extern const char *pool_types[];
-	
 	struct resource_data *res, *find_res, *next_res, *copy;
 	char buf[MAX_STRING_LENGTH];
 	vehicle_data *veh;
@@ -1804,7 +1756,7 @@ void process_dismantle_vehicle(char_data *ch) {
 		// make a copy to pass to give_resources
 		CREATE(copy, struct resource_data, 1);
 		*copy = *res;
-		copy->next = NULL;
+		copy->next = NULL;	// will be freed as a list
 		
 		if (copy->type == RES_OBJECT) {
 			// for items, refund 1 at a time
@@ -1920,8 +1872,6 @@ int sort_vehicles(vehicle_data *a, vehicle_data *b) {
 * @param FILE *fl The file to save to (open for writing).
 */
 void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
-	void Crash_save(obj_data *obj, FILE *fp, int location);
-	
 	struct room_extra_data *red, *next_red;
 	struct vehicle_attached_mob *vam;
 	char temp[MAX_STRING_LENGTH];
@@ -2042,13 +1992,11 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 * @return vehicle_data* The loaded vehicle, if possible.
 */
 vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
-	extern obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *notify);
-
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH];
 	obj_data *load_obj, *obj, *next_obj, *cont_row[MAX_BAG_ROWS];
-	struct vehicle_attached_mob *vam, *last_vam = NULL;
+	struct vehicle_attached_mob *vam;
 	int length, iter, i_in[4], location = 0, timer;
-	struct resource_data *res, *last_res = NULL;
+	struct resource_data *res;
 	vehicle_data *proto = vehicle_proto(vnum);
 	bool end = FALSE, seek_end = FALSE;
 	any_vnum load_vnum;
@@ -2097,15 +2045,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						vam->scale_level = i_in[1];
 						vam->flags = asciiflag_conv(s_in);
 						vam->empire = i_in[2];
-						
-						// append
-						if (last_vam) {
-							last_vam->next = vam;
-						}
-						else {
-							VEH_ANIMALS(veh) = vam;
-						}
-						last_vam = vam;
+						LL_APPEND(VEH_ANIMALS(veh), vam);
 					}
 				}
 				break;
@@ -2330,15 +2270,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					res->amount = i_in[1];
 					res->type = i_in[2];
 					res->misc = i_in[3];
-					
-					// append
-					if (last_res) {
-						last_res->next = res;
-					}
-					else {
-						VEH_NEEDS_RESOURCES(veh) = res;
-					}
-					last_res = res;
+					LL_APPEND(VEH_NEEDS_RESOURCES(veh), res);
 				}
 				break;
 			}
@@ -2604,11 +2536,6 @@ int get_new_vehicle_construction_id(void) {
 * @param any_vnum vnum The vehicle vnum
 */
 void parse_vehicle(FILE *fl, any_vnum vnum) {
-	void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
-	void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part);
-	void parse_interaction(char *line, struct interaction_item **list, char *error_part);
-	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
-
 	char line[256], error[256], str_in[256], str_in2[256], str_in3[256];
 	struct bld_relation *relat;
 	struct spawn_info *spawn;
@@ -2811,12 +2738,6 @@ void write_vehicle_index(FILE *fl) {
 * @param vehicle_data *veh The thing to save.
 */
 void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
-	void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
-	void write_extra_descs_to_file(FILE *fl, struct extra_descr_data *list);
-	void write_interactions_to_file(FILE *fl, struct interaction_item *list);
-	void write_resources_to_file(FILE *fl, char letter, struct resource_data *list);
-	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
-	
 	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], temp3[MAX_STRING_LENGTH];
 	struct bld_relation *relat;
 	struct spawn_info *spawn;
@@ -2896,217 +2817,6 @@ void write_vehicle_to_file(FILE *fl, vehicle_data *veh) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// 2.0b3.8 CONVERTER ///////////////////////////////////////////////////////
-
-// this system converts a set of objects to vehicles, including all the boats,
-// catapults, carts, and ships.
-	
-// list of vnums to convert directly from obj to vehicle
-any_vnum convert_list[] = {
-	900,	// a rickety cart
-	901,	// a carriage
-	902,	// a covered wagon
-	903,	// the catapult
-	904,	// a chair
-	905,	// a wooden bench
-	906,	// a long table
-	907,	// a stool
-	917,	// the throne
-	920,	// a wooden canoe
-	952,	// the pinnace
-	953,	// the brigantine
-	954,	// the galley
-	955,	// the argosy
-	956,	// the galleon
-	10715,	// the sleigh
-	NOTHING	// end list
-};
-
-struct convert_vehicle_data {
-	char_data *mob;	// mob to attach
-	any_vnum vnum;	// vehicle vnum
-	struct convert_vehicle_data *next;
-};
-
-struct convert_vehicle_data *list_of_vehicles_to_convert = NULL;
-
-/**
-* Stores data for a mob that was supposed to be attached to a vehicle.
-*/
-void add_convert_vehicle_data(char_data *mob, any_vnum vnum) {
-	struct convert_vehicle_data *cvd;
-	
-	CREATE(cvd, struct convert_vehicle_data, 1);
-	cvd->mob = mob;
-	cvd->vnum = vnum;
-	LL_PREPEND(list_of_vehicles_to_convert, cvd);
-}
-
-
-/**
-* Processes any temporary data for mobs that should be attached to a vehicle.
-* This basically assumes you're in the middle of upgrading to 2.0 b3.8 and
-* works on any data it found. Mobs are only removed if they become attached
-* to a vehicle.
-*
-* @return int the number converted
-*/
-int run_convert_vehicle_list(void) {
-	struct convert_vehicle_data *cvd;
-	vehicle_data *veh;
-	int changed = 0;
-	
-	while ((cvd = list_of_vehicles_to_convert)) {
-		list_of_vehicles_to_convert = cvd->next;
-		
-		if (cvd->mob && IN_ROOM(cvd->mob)) {
-			DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(cvd->mob)), veh, next_in_room) {
-				if (VEH_VNUM(veh) == cvd->vnum && count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
-					harness_mob_to_vehicle(cvd->mob, veh);
-					++changed;
-					break;
-				}
-			}
-		}
-		
-		free(cvd);
-	}
-	
-	return changed;
-}
-
-/**
-* Replaces an object with a vehicle of the same VNUM, and converts the traits
-* that it can. This will result in partially-completed ships becoming fully-
-* completed.
-* 
-* @param obj_data *obj The object to convert (will be extracted).
-*/
-void convert_one_obj_to_vehicle(obj_data *obj) {
-	extern room_data *obj_room(obj_data *obj);
-	
-	obj_data *obj_iter, *next_obj;
-	room_data *room, *room_iter, *main_room;
-	vehicle_data *veh;
-	
-	// if there isn't a room or vehicle involved, just remove the object
-	if (!(room = obj_room(obj)) || !vehicle_proto(GET_OBJ_VNUM(obj))) {
-		extract_obj(obj);
-		return;
-	}
-	
-	// create the vehicle
-	veh = read_vehicle(GET_OBJ_VNUM(obj), TRUE);
-	vehicle_to_room(veh, room);
-	
-	// move inventory
-	DL_FOREACH_SAFE2(obj->contains, obj_iter, next_obj, next_content) {
-		obj_to_vehicle(obj_iter, veh);
-	}
-	
-	// convert traits
-	VEH_OWNER(veh) = real_empire(obj->last_empire_id);
-	VEH_SCALE_LEVEL(veh) = GET_OBJ_CURRENT_SCALE_LEVEL(obj);
-	
-	// type-based traits
-	switch (GET_OBJ_TYPE(obj)) {
-		case ITEM_SHIP: {
-			if ((main_room = real_room(GET_OBJ_VAL(obj, 2)))) {	// obj val 2: was ship's main-room-vnum
-				VEH_INTERIOR_HOME_ROOM(veh) = main_room;
-				
-				// detect owner from room
-				if (ROOM_OWNER(main_room)) {
-					VEH_OWNER(veh) = ROOM_OWNER(main_room);
-				}
-				
-				// apply vehicle aff
-				DL_FOREACH2(interior_room_list, room_iter, next_interior) {
-					if (room_iter == main_room || HOME_ROOM(room_iter) == main_room) {
-						SET_BIT(ROOM_BASE_FLAGS(room_iter), ROOM_AFF_IN_VEHICLE);
-						affect_total_room(room_iter);
-					}
-				}
-			}
-			break;
-		}
-		case ITEM_CART: {
-			// nothing to convert?
-			break;
-		}
-	}
-	
-	// did we successfully get an owner? try the room it's in
-	if (!VEH_OWNER(veh)) {
-		VEH_OWNER(veh) = ROOM_OWNER(room);
-	}
-	
-	// remove the object
-	extract_obj(obj);
-}
-
-
-/**
-* Converts a list of objects into vehicles with the same vnum. This converter
-* was used during the initial implementation of vehicles in 2.0 b3.8.
-*
-* @return int the number converted
-*/
-int convert_to_vehicles(void) {
-	obj_data *obj, *next_obj;
-	int iter, changed = 0;
-	bool found;
-	
-	DL_FOREACH_SAFE(object_list, obj, next_obj) {
-		// determine if it's in the list to replace
-		found = FALSE;
-		for (iter = 0; convert_list[iter] != NOTHING && !found; ++iter) {
-			if (convert_list[iter] == GET_OBJ_VNUM(obj)) {
-				found = TRUE;
-			}
-		}
-		if (!found) {
-			continue;
-		}
-		
-		// success
-		convert_one_obj_to_vehicle(obj);
-		++changed;
-	}
-	
-	return changed;
-}
-
-
-/**
-* Removes the old room affect flag that hinted when to show a ship in pre-
-* b3.8.
-*/
-void b3_8_ship_update(void) {
-	void save_whole_world();
-	
-	room_data *room, *next_room;
-	int changed = 0;
-	
-	bitvector_t ROOM_AFF_SHIP_PRESENT = BIT(10);	// old bit to remove
-	
-	HASH_ITER(hh, world_table, room, next_room) {
-		if (IS_SET(ROOM_AFF_FLAGS(room) | ROOM_BASE_FLAGS(room), ROOM_AFF_SHIP_PRESENT)) {
-			REMOVE_BIT(ROOM_BASE_FLAGS(room), ROOM_AFF_SHIP_PRESENT);
-			affect_total_room(room);
-			++changed;
-		}
-	}
-	
-	changed += convert_to_vehicles();
-	changed += run_convert_vehicle_list();
-	
-	if (changed > 0) {
-		save_whole_world();
-	}
-}
-
-
- //////////////////////////////////////////////////////////////////////////////
 //// OLC HANDLERS ////////////////////////////////////////////////////////////
 
 /**
@@ -3152,7 +2862,6 @@ void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
 	void extract_pending_vehicles();
 	
 	struct obj_storage_type *store, *next_store;
@@ -3776,9 +3485,6 @@ void save_olc_vehicle(descriptor_data *desc) {
 * @return vehicle_data* The copied vehicle.
 */
 vehicle_data *setup_olc_vehicle(vehicle_data *input) {
-	extern struct bld_relation *copy_bld_relations(struct bld_relation *input_list);
-	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
-	
 	vehicle_data *new;
 	
 	CREATE(new, vehicle_data, 1);
@@ -3837,12 +3543,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 * @param vehicle_data *veh The vehicle to display.
 */
 void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	extern char *get_room_name(room_data *room, bool color);
-	void script_stat (char_data *ch, struct script_data *sc);
 	void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
-	extern const char *depletion_type[NUM_DEPLETION_TYPES];
-	extern const char *room_extra_types[];
 	
 	char buf[MAX_STRING_LENGTH * 2], part[MAX_STRING_LENGTH];
 	struct room_extra_data *red, *next_red;
@@ -4081,8 +3782,6 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 */
 void olc_show_vehicle(char_data *ch) {
 	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	void get_script_display(struct trig_proto_list *list, char *save_buffer);
 	
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
@@ -4241,7 +3940,6 @@ OLC_MODULE(vedit_capacity) {
 
 
 OLC_MODULE(vedit_custom) {
-	void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	
 	olc_process_custom_messages(ch, argument, &VEH_CUSTOM_MSGS(veh), veh_custom_types);
@@ -4422,7 +4120,6 @@ OLC_MODULE(vedit_requiresclimate) {
 
 
 OLC_MODULE(vedit_resource) {
-	void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	olc_process_resources(ch, argument, &VEH_YEARLY_MAINTENANCE(veh));
 }

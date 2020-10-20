@@ -347,7 +347,7 @@ const char *archetype_types[] = {
 
 
 // ARCHT_x (2/2): The order and contents of this array determine what players see during creation.
-struct archetype_menu_type archetype_menu[] = {
+const struct archetype_menu_type archetype_menu[] = {
 	{ ARCHT_ORIGIN,
 		"Origin",
 		"Your character's origins, be they noble or meager, determine your attributes\r\n"
@@ -1133,7 +1133,7 @@ const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS] = {
 
 // for PTECH_NAVIGATION: how_to_show_map[dir which is north for char][x=0,y=1]
 // for each direction, whether the x/y coord goes from positive to negative (1) or negative to positive (-1)
-int how_to_show_map[NUM_SIMPLE_DIRS][2] = {
+const int how_to_show_map[NUM_SIMPLE_DIRS][2] = {
 	{ -1, 1 },	// north
 	{ -1, -1 },	// east
 	{ 1, -1 },	// south
@@ -1143,7 +1143,7 @@ int how_to_show_map[NUM_SIMPLE_DIRS][2] = {
 
 // for PTECH_NAVIGATION: show_map_y_first[dir which is north for char]
 // 1 = show y coordinate vertically, 0 = show x coord vertically
-int show_map_y_first[NUM_SIMPLE_DIRS] = {
+const int show_map_y_first[NUM_SIMPLE_DIRS] = {
 	1,	// N
 	0,	// E
 	1,	// S
@@ -1552,7 +1552,7 @@ const bool apply_never_scales[] = {
 
 
 // STRENGTH, etc (part 1)
-struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
+const struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
 	// Label, Description, low-stat error
 	{ "Strength", "Strength improves your melee damage and lets you chop trees faster", "too weak" },
 	{ "Dexterity", "Dexterity helps you hit opponents and dodge hits", "not agile enough" },
@@ -1563,7 +1563,7 @@ struct attribute_data_type attributes[NUM_ATTRIBUTES] = {
 };
 
 // STRENGTH, etc (part 2)
-int attribute_display_order[NUM_ATTRIBUTES] = {
+const int attribute_display_order[NUM_ATTRIBUTES] = {
 	STRENGTH, CHARISMA, INTELLIGENCE,
 	DEXTERITY, GREATNESS, WITS
 };
@@ -1603,7 +1603,7 @@ const char *size_types[] = {
 
 
 // SIZE_x (1/2): character size, data
-struct character_size_data size_data[] = {
+const struct character_size_data size_data[] = {
 	// max_blood, corpse_flags, can_take_corpse, show_on_map, corpse kws, corpse longdesc, body longdesc, show on look
 	/* negligible */{ 100, NOBITS, TRUE, FALSE, "", "%s's corpse is festering on the ground.", "%s's body is lying here.", NULL },
 	/* tiny */		{ 10, NOBITS, TRUE, FALSE, "tiny", "The tiny corpse of %s is rotting on the ground.", "%s's tiny body is lying here.", "$E is tiny!" },
@@ -1697,7 +1697,7 @@ const char *craft_types[] = {
 //// EMPIRE CONSTANTS ////////////////////////////////////////////////////////
 
 // name, icon, radius, show-to-others, is-capital
-struct city_metadata_type city_type[] = {
+const struct city_metadata_type city_type[] = {
 	{ "outpost", "&0-&?C1&0-", 5, FALSE, FALSE },
 	{ "village", "&0-&?C2&0-", 10, TRUE, FALSE },
 	{ "city", "&0-&?C3&0-", 15, TRUE, FALSE },
@@ -1724,7 +1724,7 @@ const char *diplomacy_flags[] = {
 
 // OFFENSE_x: offense definitions
 // note: weights are in relation to the offense_min_to_war and offenses_for_free_war
-struct offense_info_type offense_info[NUM_OFFENSES] = {
+const struct offense_info_type offense_info[NUM_OFFENSES] = {
 	// name, weight
 	{ "stealing", 15 },	// 0
 	{ "attacked player", 5 },
@@ -2012,7 +2012,7 @@ const char *relationship_descs[] = {
 
 
 // REP_x: faction reputation levels
-struct faction_reputation_type reputation_levels[] = {
+const struct faction_reputation_type reputation_levels[] = {
 	// { type const, name, points to achieve this level } -> ASCENDING ORDER
 	// note: you achieve the level when you reach the absolute value of its
 	// points (-99 < x < 99 is neutral, +/-100 are the cutoffs for the first rank)
@@ -2313,7 +2313,7 @@ const int wear_significance[] = {
 
 
 // ITEM_WEAR_x -- for each wear flag, the first matching eq pos
-int item_wear_to_wear[] = {
+const int item_wear_to_wear[] = {
 	NO_WEAR,	// special
 	WEAR_FINGER_R,
 	WEAR_NECK_1,
@@ -2699,7 +2699,7 @@ const char *olc_flag_bits[] = {
 
 
 // OLC_x types
-const char *olc_type_bits[NUM_OLC_TYPES+1] = {
+const char *olc_type_bits[] = {
 	"craft",
 	"mobile",
 	"object",
@@ -3120,7 +3120,7 @@ const int evo_val_types[NUM_EVOS] = {
 
 
 // EVO_x 3/3: evolution is over time (as opposed to triggered by an action)
-bool evo_is_over_time[] = {
+const bool evo_is_over_time[] = {
 	FALSE,	// chopped
 	FALSE,	// crop grows
 	TRUE,	// adjacent-one

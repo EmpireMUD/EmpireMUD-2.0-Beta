@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -32,19 +33,8 @@
 *   Commands
 */
 
-// external vars
-
 // external funcs
-INTERACTION_FUNC(consumes_or_decays_interact);
 ACMD(do_dismount);
-extern obj_data *find_obj(int n, bool error);
-extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
-extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
-void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability);
-extern bool trigger_counterspell(char_data *ch);	// spells.c
-
-// locals
-void un_earthmeld(char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -164,8 +154,6 @@ void un_earthmeld(char_data *ch) {
 * @param char_data *ch the quaffer
 */
 void apply_potion(obj_data *obj, char_data *ch) {
-	void scale_item_to_level(obj_data *obj, int level);
-	
 	any_vnum aff_type = GET_POTION_AFFECT(obj) != NOTHING ? GET_POTION_AFFECT(obj) : ATYPE_POTION;
 	struct affected_type *af;
 	struct obj_apply *apply;
@@ -205,9 +193,6 @@ void apply_potion(obj_data *obj, char_data *ch) {
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_cleanse) {
-	extern const bool aff_is_bad[];
-	extern const double apply_values[];
-	
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *aff, *next_aff;
 	bitvector_t bitv;
@@ -296,8 +281,6 @@ ACMD(do_cleanse) {
 
 
 ACMD(do_confer) {
-	extern const double apply_values[];
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct affected_type *aff, *aff_iter;
 	bool any, found_existing, found_ch;
@@ -823,8 +806,6 @@ ACMD(do_heal) {
 
 
 ACMD(do_moonrise) {
-	void death_restore(char_data *ch);
-	
 	obj_data *corpse;
 	char_data *vict;
 	int cost = 200;
@@ -896,8 +877,6 @@ ACMD(do_moonrise) {
 
 
 ACMD(do_purify) {
-	void check_un_vampire(char_data *ch, bool remove_vampire_skills);
-	
 	bool any = FALSE, was_vampire;
 	char_data *vict;
 	int cost = 50;
@@ -970,8 +949,6 @@ ACMD(do_purify) {
 
 
 ACMD(do_quaff) {
-	void scale_item_to_level(obj_data *obj, int level);
-	
 	obj_data *obj;
 	
 	one_argument(argument, arg);
@@ -1085,9 +1062,7 @@ ACMD(do_rejuvenate) {
 }
 
 
-ACMD(do_resurrect) {
-	void death_restore(char_data *ch);
-	
+ACMD(do_resurrect) {	
 	obj_data *corpse;
 	char_data *vict;
 	int cost = 75;
@@ -1241,8 +1216,6 @@ ACMD(do_skybrand) {
 
 
 ACMD(do_soulsight) {
-	void show_character_affects(char_data *ch, char_data *to);
-	
 	char_data *vict;
 	int cost = 5;
 

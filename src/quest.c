@@ -25,6 +25,7 @@
 #include "handler.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -43,47 +44,17 @@ const char *default_quest_name = "Unnamed Quest";
 const char *default_quest_description = "This quest has no description.\r\n";
 const char *default_quest_complete_msg = "You have completed the quest.\r\n";
 
-// external consts
-extern const char *action_bits[];
-extern const char *quest_flags[];
-extern const char *quest_giver_types[];
-extern const char *quest_reward_types[];
-extern const bool requirement_amt_type[];
-extern const char *requirement_types[];
-extern const char *olc_type_bits[NUM_OLC_TYPES+1];
-
 // external funcs
-extern int count_cities(empire_data *emp);
-extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
-extern struct req_data *copy_requirements(struct req_data *from);
-extern bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnum);
-void drop_quest(char_data *ch, struct player_quest *pq);
-extern bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
-extern struct instance_data *get_instance_by_id(any_vnum instance_id);
 void get_requirement_display(struct req_data *list, char *save_buffer);
-void get_script_display(struct trig_proto_list *list, char *save_buffer);
-extern room_data *obj_room(obj_data *obj);
 void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
-extern char *requirement_string(struct req_data *req, bool show_vnums);
 
 // external vars
 
 // local protos
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
-bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
-int count_owned_buildings(empire_data *emp, bld_vnum vnum);
-int count_owned_homes(empire_data *emp);
-int count_owned_vehicles(empire_data *emp, any_vnum vnum);
-int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
-void count_quest_tasks(struct req_data *list, int *complete, int *total);
-bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
-void free_player_quests(struct player_quest *list);
 void free_quest_givers(struct quest_giver *list);
-void free_quest_temp_list(struct quest_temp_list *list);
 struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest);
-struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
-struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
 void update_veh_quest_lookups(any_vnum vnum);
@@ -655,8 +626,6 @@ char *get_quest_name_by_proto(any_vnum vnum) {
 * @param char *save_buffer The string to save it to.
 */
 void get_tracker_display(struct req_data *tracker, char *save_buffer) {
-	extern const bool requirement_amt_type[];
-	
 	int lefthand, count = 0, sub = 0;
 	char buf[MAX_STRING_LENGTH];
 	struct req_data *task;
@@ -716,10 +685,6 @@ void get_tracker_display(struct req_data *tracker, char *save_buffer) {
 * @param int instance_id Optional: If the quest is associated with an instance, pass its id. Otherwise, 0 is fine.
 */
 void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_level, empire_data *quest_giver_emp, int instance_id) {
-	void clear_char_abilities(char_data *ch, any_vnum skill);
-	void scale_item_to_level(obj_data *obj, int level);
-	void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
-	
 	char buf[MAX_STRING_LENGTH];
 	struct quest_reward *reward;
 	
@@ -3336,8 +3301,6 @@ void qt_wear_obj(char_data *ch, obj_data *obj) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_quest(quest_data *quest, char_data *ch) {
-	extern const bool requirement_needs_tracker[];
-	
 	struct trig_proto_list *tpl;
 	struct quest_reward *rew;
 	struct req_data *task;
@@ -4168,20 +4131,12 @@ void clear_quest(quest_data *quest) {
 * @return struct quest_giver* The copy of the list.
 */
 struct quest_giver *copy_quest_givers(struct quest_giver *from) {
-	struct quest_giver *el, *iter, *list = NULL, *end = NULL;
+	struct quest_giver *el, *iter, *list = NULL;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct quest_giver, 1);
 		*el = *iter;
-		el->next = NULL;
-		
-		if (end) {
-			end->next = el;
-		}
-		else {
-			list = el;
-		}
-		end = el;
+		LL_APPEND(list, el);
 	}
 	
 	return list;
@@ -4193,20 +4148,12 @@ struct quest_giver *copy_quest_givers(struct quest_giver *from) {
 * @return struct quest_reward* The copy of the list.
 */
 struct quest_reward *copy_quest_rewards(struct quest_reward *from) {
-	struct quest_reward *el, *iter, *list = NULL, *end = NULL;
+	struct quest_reward *el, *iter, *list = NULL;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct quest_reward, 1);
 		*el = *iter;
-		el->next = NULL;
-		
-		if (end) {
-			end->next = el;
-		}
-		else {
-			list = el;
-		}
-		end = el;
+		LL_APPEND(list, el);
 	}
 	
 	return list;
@@ -4438,8 +4385,6 @@ void parse_quest_reward(FILE *fl, struct quest_reward **list, char *error_str) {
 * @param any_vnum vnum The quest vnum
 */
 void parse_quest(FILE *fl, any_vnum vnum) {
-	void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
-	
 	char line[256], error[256], str_in[256];
 	quest_data *quest, *find;
 	int int_in[4];
@@ -4618,7 +4563,6 @@ void write_quest_rewards_to_file(FILE *fl, char letter, struct quest_reward *lis
 */
 void write_quest_to_file(FILE *fl, quest_data *quest) {
 	void write_requirements_to_file(FILE *fl, char letter, struct req_data *list);
-	void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *list);
 	
 	char temp[MAX_STRING_LENGTH];
 	
@@ -4987,8 +4931,6 @@ void save_olc_quest(descriptor_data *desc) {
 * @return quest_data* The copied quest.
 */
 quest_data *setup_olc_quest(quest_data *input) {
-	extern struct apply_data *copy_apply_list(struct apply_data *input);
-	
 	quest_data *new;
 	
 	CREATE(new, quest_data, 1);

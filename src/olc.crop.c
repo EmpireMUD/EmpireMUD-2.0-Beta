@@ -20,6 +20,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -27,14 +28,6 @@
 *   Displays
 *   Edit Modules
 */
-
-// external consts
-extern const char *climate_flags[];
-extern const bitvector_t climate_flags_order[];
-extern const char *crop_flags[];
-extern const char *interact_types[];
-extern const char *mapout_color_names[];
-extern const char *spawn_flags[];
 
 // external funcs
 void init_crop(crop_data *cp);
@@ -58,9 +51,7 @@ const char *default_crop_title = "An Unnamed Crop";
 bool audit_crop(crop_data *cp, char_data *ch) {
 	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
 	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
-	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
 	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
-	extern const char *icon_types[];
 	
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
@@ -193,7 +184,6 @@ char *list_one_crop(crop_data *crop, bool detail) {
 void olc_delete_crop(char_data *ch, crop_vnum vnum) {
 	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	void remove_crop_from_table(crop_data *crop);
-	void uncrop_tile(room_data *room);
 	
 	adv_data *adv, *next_adv;
 	obj_data *obj, *next_obj;
@@ -583,9 +573,6 @@ crop_data *setup_olc_crop(crop_data *input) {
 * @param char_data *ch The person who is editing a crop and will see its display.
 */
 void olc_show_crop(char_data *ch) {
-	void get_icons_display(struct icon_data *list, char *save_buffer);
-	void get_interaction_display(struct interaction_item *list, char *save_buffer);
-	
 	crop_data *cp = GET_OLC_CROP(ch->desc);
 	char lbuf[MAX_STRING_LENGTH];
 	struct spawn_info *spawn;

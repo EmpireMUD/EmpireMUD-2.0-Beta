@@ -18,6 +18,7 @@
 #include "db.h"
 #include "comm.h"
 #include "handler.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -54,16 +55,6 @@ int total_accounts = 0;	// including inactive
 int active_accounts = 0;	// not timed out (at least 1 char)
 int active_accounts_week = 0;	// just this week (at least 1 char)
 int max_players_this_uptime = 0;
-
-
-// external consts
-
-
-// external funcs
-
-
-// locals
-void update_world_count();
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -222,7 +213,6 @@ void display_statistics_to_char(char_data *ch) {
 */
 void mudstats_empires(char_data *ch, char *argument) {
 	extern double empire_score_average[NUM_SCORES];
-	extern const char *score_type[];
 	
 	int iter;
 	

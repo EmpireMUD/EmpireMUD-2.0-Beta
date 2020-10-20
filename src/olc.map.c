@@ -9,6 +9,7 @@
 *  CircleMUD (C) 1993, 94 by the Trustees of the Johns Hopkins University *
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -21,23 +22,13 @@
 #include "olc.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
 *   Displays
 *   Edit Modules
 */
-
-// external vars
-extern bool world_map_needs_save;
-
-// external funcs
-void complete_building(room_data *room);
-void deactivate_workforce_room(empire_data *emp, room_data *room);
-void decustomize_room(room_data *room);
-void decustomize_shared_data(struct shared_room_data *shared);
-extern crop_data *get_potential_crop_for_location(room_data *location, bool must_have_forage);
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// DISPLAYS ////////////////////////////////////////////////////////////////
@@ -47,10 +38,6 @@ extern crop_data *get_potential_crop_for_location(room_data *location, bool must
 //// EDIT MODULES ////////////////////////////////////////////////////////////
 
 OLC_MODULE(mapedit_build) {
-	void herd_animals_out(room_data *location);
-	void special_building_setup(char_data *ch, room_data *room);
-	extern const int rev_dir[];
-	
 	char bld_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	bld_data *bld;
 	int dir = NO_DIR;
@@ -126,11 +113,7 @@ OLC_MODULE(mapedit_decay) {
 
 
 OLC_MODULE(mapedit_terrain) {
-	extern crop_data *get_crop_by_name(char *name);
-	extern sector_data *get_sect_by_name(char *name);
-	void finish_trench(room_data *room);
-	
-	struct empire_city_data *city, *temp;
+	struct empire_city_data *city;
 	empire_data *emp, *rescan_emp = NULL;
 	int count;
 	sector_data *sect = NULL, *next_sect, *old_sect = NULL;
@@ -170,7 +153,7 @@ OLC_MODULE(mapedit_terrain) {
 		// delete city center?
 		if (IS_CITY_CENTER(IN_ROOM(ch)) && emp && (city = find_city_entry(emp, IN_ROOM(ch)))) {
 			log_to_empire(emp, ELOG_TERRITORY, "%s was lost", city->name);
-			REMOVE_FROM_LIST(city, EMPIRE_CITY_LIST(emp), next);
+			LL_DELETE(EMPIRE_CITY_LIST(emp), city);
 			if (city->name) {
 				free(city->name);
 			}
@@ -375,8 +358,6 @@ OLC_MODULE(mapedit_room_name) {
 
 
 OLC_MODULE(mapedit_icon) {
-	extern bool validate_icon(char *icon);
-
 	delete_doubledollar(argument);
 
 	if (IS_INSIDE(IN_ROOM(ch)) || IS_ADVENTURE_ROOM(IN_ROOM(ch)))
@@ -407,8 +388,6 @@ OLC_MODULE(mapedit_icon) {
 
 
 OLC_MODULE(mapedit_delete_room) {
-	extern room_data *find_load_room(char_data *ch);
-
 	char_data *c, *next_c;
 	room_data *in_room, *home;
 
@@ -464,9 +443,6 @@ OLC_MODULE(mapedit_room_description) {
 
 
 OLC_MODULE(mapedit_ruin) {
-	void ruin_one_building(room_data *room);	// db.world.c
-	void ruin_vehicle(vehicle_data *veh, char *message);	// vehicles.c
-	
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
 	vehicle_data *veh;
 	
@@ -494,12 +470,6 @@ OLC_MODULE(mapedit_ruin) {
 
 
 OLC_MODULE(mapedit_exits) {
-	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
-	extern room_data *create_room(room_data *home);
-	extern const char *dirs[];
-	extern room_vnum find_free_vnum();
-	extern const int rev_dir[];
-
 	int dir, rev;
 	room_data *to_room = NULL;
 	bool new = FALSE;
@@ -532,7 +502,6 @@ OLC_MODULE(mapedit_exits) {
 			
 			// TODO this is done in several different things that add rooms, and could be moved to a function -paul 7/14/2016
 			if (GET_ROOM_VEHICLE(IN_ROOM(ch))) {
-				COMPLEX_DATA(to_room)->vehicle = GET_ROOM_VEHICLE(IN_ROOM(ch));
 				add_room_to_vehicle(to_room, GET_ROOM_VEHICLE(IN_ROOM(ch)));
 			}
 			COMPLEX_DATA(HOME_ROOM(IN_ROOM(ch)))->inside_rooms++;
@@ -550,7 +519,7 @@ OLC_MODULE(mapedit_exits) {
 
 
 OLC_MODULE(mapedit_delete_exit) {
-	struct room_direction_data *ex, *temp;
+	struct room_direction_data *ex;
 	int dir;
 
 	one_argument(argument, arg);
@@ -569,7 +538,7 @@ OLC_MODULE(mapedit_delete_exit) {
 			}
 			if (ex->keyword)
 				free(ex->keyword);
-			REMOVE_FROM_LIST(ex, COMPLEX_DATA(IN_ROOM(ch))->exits, next);
+			LL_DELETE(COMPLEX_DATA(IN_ROOM(ch))->exits, ex);
 			free(ex);
 		}
 		msg_to_char(ch, "Exit deleted. Target room not deleted.\r\n");
@@ -794,8 +763,6 @@ OLC_MODULE(mapedit_remember) {
 
 
 OLC_MODULE(mapedit_roomtype) {
-	extern bld_data *get_building_by_name(char *name, bool room_only);
-	
 	bld_data *id = NULL;
 
 	if (!IS_INSIDE(IN_ROOM(ch))) {

@@ -38,7 +38,6 @@
 *  easiest possible way to install and begin using. Documentation for     *
 *  such installation can be found in INSTALL.  Enjoy........    N'Atas-Ha *
 ***************************************************************************/
-// clean
 
 #include "conf.h"
 #include "sysdep.h"
@@ -52,34 +51,16 @@
 #include "comm.h"
 #include "skills.h"
 #include "vnums.h"
+#include "constants.h"
 
-// external vars
-extern const char *alt_dirs[];
-extern const char *damage_types[];
-extern const char *dirs[];
-extern struct instance_data *quest_instance_global;
-
-// external funcs
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
-void die(char_data *ch, char_data *killer);
-extern struct instance_data *get_instance_by_mob(char_data *mob);
-extern room_data *get_room(room_data *ref, char *name);
-extern vehicle_data *get_vehicle(char *name);
-void instance_obj_setup(struct instance_data *inst, obj_data *obj);
-extern bool is_fight_ally(char_data *ch, char_data *frenemy);	// fight.c
-extern room_data *obj_room(obj_data *obj);
-void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
-void scale_item_to_level(obj_data *obj, int level);
-void scale_mob_to_level(char_data *mob, int level);
-void scale_vehicle_to_level(vehicle_data *veh, int level);
-void send_char_pos(char_data *ch, int dam);
-void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-void sub_write(char *arg, char_data *ch, byte find_invis, int targets);
-void sub_write_to_room(char *str, room_data *room, bool use_queue);
-
-/*
-* Local functions.
+/**
+* Contents:
+*   Helpers
+*   Mobile Commands
 */
+
+ //////////////////////////////////////////////////////////////////////////////
+//// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
 * For scaled damage functions, allows mob flags to contribute.
@@ -119,15 +100,17 @@ void mob_log(char_data *mob, const char *format, ...) {
 	va_end(args);
 }
 
+
 /*
 ** macro to determine if a mob is permitted to use these commands
 */
 #define MOB_OR_IMPL(ch) (IS_NPC(ch) && (!(ch)->desc || GET_ACCESS_LEVEL((ch)->desc->original) >= LVL_CIMPL))
 
-/* mob commands */
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MOBILE COMMANDS /////////////////////////////////////////////////////////
 
 ACMD(do_madventurecomplete) {
-	void mark_instance_completed(struct instance_data *inst);
 	struct instance_data *inst;
 	
 	if (!MOB_OR_IMPL(ch)) {
@@ -667,9 +650,7 @@ ACMD(do_mvehicleecho) {
 * lets the mobile load an item or mobile.  All items
 * are loaded into inventory, unless it is NO-TAKE. 
 */
-ACMD(do_mload) {
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
-	
+ACMD(do_mload) {	
 	struct instance_data *inst = get_instance_by_mob(ch);
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	int number = 0;
@@ -865,7 +846,6 @@ ACMD(do_mload) {
 
 
 ACMD(do_mmod) {
-	void script_modify(char *argument);
 	script_modify(argument);
 }
 
@@ -903,8 +883,6 @@ ACMD(do_mmorph) {
 
 
 ACMD(do_mmove) {
-	extern bool try_mobile_movement(char_data *ch);
-
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
 		return;
@@ -1006,8 +984,6 @@ ACMD(do_mpurge) {
 
 // quest commands
 ACMD(do_mquest) {
-	void do_dg_quest(int go_type, void *go, char *argument);
-		
 	if (!MOB_OR_IMPL(ch) || AFF_FLAGGED(ch, AFF_ORDERED)) {
 		send_config_msg(ch, "huh_string");
 		return;
@@ -1112,8 +1088,6 @@ ACMD(do_mat) {
 
 
 ACMD(do_mbuild) {
-	void do_dg_build(room_data *target, char *argument);
-	
 	char loc_arg[MAX_INPUT_LENGTH], bld_arg[MAX_INPUT_LENGTH], *tmp;
 	room_data *target;
 	
@@ -1158,10 +1132,6 @@ ACMD(do_mbuild) {
 
 
 ACMD(do_mrestore) {
-	void complete_vehicle(vehicle_data *veh);
-	extern const bool aff_is_bad[];
-	extern const double apply_values[];
-	
 	struct affected_type *aff, *next_aff;
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh = NULL;
@@ -1381,8 +1351,6 @@ ACMD(do_mteleport) {
 
 
 ACMD(do_mterracrop) {
-	void do_dg_terracrop(room_data *target, crop_data *cp);
-
 	char loc_arg[MAX_INPUT_LENGTH], crop_arg[MAX_INPUT_LENGTH];
 	crop_data *crop;
 	room_data *target;
@@ -1434,8 +1402,6 @@ ACMD(do_mterracrop) {
 
 
 ACMD(do_mterraform) {
-	void do_dg_terraform(room_data *target, sector_data *sect);
-
 	char loc_arg[MAX_INPUT_LENGTH], sect_arg[MAX_INPUT_LENGTH];
 	sector_data *sect;
 	room_data *target;
@@ -1555,8 +1521,6 @@ ACMD(do_mdamage) {
 
 
 ACMD(do_maoe) {
-	extern bool is_fight_enemy(char_data *ch, char_data *frenemy);	// fight.c
-
 	char modarg[MAX_INPUT_LENGTH], typearg[MAX_INPUT_LENGTH];
 	double modifier = 1.0;
 	int level, type;
@@ -1746,8 +1710,6 @@ ACMD(do_mheal) {
 
 /* hunt for someone */
 ACMD(do_mhunt) {
-	void add_pursuit(char_data *ch, char_data *target);
-	
 	char_data *victim;
 	char arg[MAX_INPUT_LENGTH];
 
@@ -1830,14 +1792,7 @@ ACMD(do_mremember) {
 
 	/* create a structure and add it to the list */
 	CREATE(mem, struct script_memory, 1);
-	if (!SCRIPT_MEM(ch))
-		SCRIPT_MEM(ch) = mem;
-	else {
-		struct script_memory *tmpmem = SCRIPT_MEM(ch);
-		while (tmpmem->next)
-			tmpmem = tmpmem->next;
-		tmpmem->next = mem;
-	}
+	LL_APPEND(SCRIPT_MEM(ch), mem);
 
 	/* fill in the structure */
 	mem->id = char_script_id(victim);
@@ -1850,7 +1805,7 @@ ACMD(do_mremember) {
 /* remove someone from the list */
 ACMD(do_mforget) {
 	char_data *victim;
-	struct script_memory *mem, *prev;
+	struct script_memory *mem, *next_mem;
 	char arg[MAX_INPUT_LENGTH];
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -1881,38 +1836,20 @@ ACMD(do_mforget) {
 		mob_log(ch, "mforget: victim (%s) does not exist", arg);
 		return;
 	}
-
-	mem = SCRIPT_MEM(ch);
-	prev = NULL;
-	while (mem) {
+	
+	LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
 		if (mem->id == victim->script_id) {
-			if (mem->cmd)
+			LL_DELETE(SCRIPT_MEM(ch), mem);
+			if (mem->cmd) {
 				free(mem->cmd);
-			if (prev==NULL) {
-				SCRIPT_MEM(ch) = mem->next;
-				free(mem);
-				mem = SCRIPT_MEM(ch);
 			}
-			else {
-				prev->next = mem->next;
-				free(mem);
-				mem = prev->next;
-			}
-		}
-		else {
-			prev = mem;
-			mem = mem->next;
+			free(mem);
 		}
 	}
 }
 
 
 ACMD(do_msiege) {
-	void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_data *by_vehicle);
-	extern bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle);
-	extern bool find_siege_target_for_vehicle(char_data *ch, vehicle_data *veh, char *arg, room_data **room_targ, int *dir, vehicle_data **veh_targ);
-	extern bool validate_siege_target_room(char_data *ch, vehicle_data *veh, room_data *to_room);
-	
 	char scale_arg[MAX_INPUT_LENGTH], tar_arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh_targ = NULL;
 	room_data *room_targ = NULL;
@@ -2111,7 +2048,7 @@ ACMD(do_mdoor) {
 	char target[MAX_INPUT_LENGTH], direction[MAX_INPUT_LENGTH];
 	char field[MAX_INPUT_LENGTH], *value;
 	room_data *rm, *to_room;
-	struct room_direction_data *newexit, *temp;
+	struct room_direction_data *newexit;
 	int dir, fd;
 
 	const char *door_field[] = {
@@ -2167,7 +2104,7 @@ ACMD(do_mdoor) {
 	/* purge exit */
 	if (fd == 0) {
 		if (newexit) {
-			REMOVE_FROM_LIST(newexit, COMPLEX_DATA(rm)->exits, next);
+			LL_DELETE(COMPLEX_DATA(rm)->exits, newexit);
 			if (newexit->room_ptr) {
 				--GET_EXITS_HERE(newexit->room_ptr);
 			}
@@ -2232,11 +2169,9 @@ ACMD(do_mdoor) {
 
 
 ACMD(do_mfollow) {
-	extern bool circle_follow(char_data *ch, char_data *victim);
-	
 	char buf[MAX_INPUT_LENGTH];
 	char_data *leader;
-	struct follow_type *j, *k;
+	struct follow_type *fol, *next_fol;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -2272,18 +2207,13 @@ ACMD(do_mfollow) {
 
 	/* stop following someone else first */
 	if (ch->master) {
-		if (ch->master->followers->follower == ch) {	/* Head of follower-list? */
-			k = ch->master->followers;
-			ch->master->followers = k->next;
-			free(k);
+		LL_FOREACH_SAFE(ch->master->followers, fol, next_fol) {
+			if (fol->follower == ch) {
+				LL_DELETE(ch->master->followers, fol);
+				free(fol);
+			}
 		}
-		else {			/* locate follower who is not head of list */
-			for (k = ch->master->followers; k->next->follower != ch; k = k->next);
-
-			j = k->next;
-			k->next = j->next;
-			free(j);
-		}
+		
 		ch->master = NULL;
 	}
 
@@ -2297,17 +2227,13 @@ ACMD(do_mfollow) {
 
 	ch->master = leader;
 
-	CREATE(k, struct follow_type, 1);
-
-	k->follower = ch;
-	k->next = leader->followers;
-	leader->followers = k;
+	CREATE(fol, struct follow_type, 1);
+	fol->follower = ch;
+	LL_PREPEND(leader->followers, fol);
 }
 
 
 ACMD(do_mown) {
-	void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh);
-	
 	char type_arg[MAX_INPUT_LENGTH], targ_arg[MAX_INPUT_LENGTH], emp_arg[MAX_INPUT_LENGTH];
 	vehicle_data *vtarg = NULL;
 	empire_data *emp = NULL;

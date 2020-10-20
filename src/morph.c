@@ -25,6 +25,7 @@
 #include "handler.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -41,22 +42,6 @@ const char *default_morph_keywords = "morph unnamed shapeless";
 const char *default_morph_short_desc = "an unnamed morph";
 const char *default_morph_long_desc = "A shapeless morph is standing here.";
 
-// external consts
-extern const char *affected_bits[];
-extern const bool apply_never_scales[];
-extern const char *apply_types[];
-extern const char *mob_move_types[];
-extern const char *morph_flags[];
-extern const char *pool_types[];
-extern const char *size_types[];
-
-// external funcs
-extern struct resource_data *copy_resource_list(struct resource_data *input);
-void get_resource_display(struct resource_data *list, char *save_buffer);
-
-// local protos
-void finish_morphing(char_data *ch, morph_data *morph);
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -67,8 +52,6 @@ void finish_morphing(char_data *ch, morph_data *morph);
 * @param char_data *ch The character to add morph affects to.
 */
 void add_morph_affects(char_data *ch) {
-	extern const double apply_values[];
-	
 	double points_available, remaining, share;
 	morph_data *morph = GET_MORPH(ch);
 	struct affected_type *af = NULL;
@@ -238,8 +221,6 @@ morph_data *find_morph_by_name(char_data *ch, char *name) {
 * @param morph_data *morph Which form to change into (NULL for none).
 */
 void finish_morphing(char_data *ch, morph_data *morph) {
-	void undisguise(char_data *ch);
-
 	char lbuf[MAX_STRING_LENGTH];
 	
 	// can't be disguised while morphed
@@ -669,9 +650,6 @@ void free_morph(morph_data *morph) {
 * @param any_vnum vnum The morph vnum
 */
 void parse_morph(FILE *fl, any_vnum vnum) {
-	void parse_apply(FILE *fl, struct apply_data **list, char *error_str);
-	void parse_resource(FILE *fl, struct resource_data **list, char *error_str);
-
 	char line[256], error[256], str_in[256], str_in2[256];
 	morph_data *morph, *find;
 	int int_in[4];
@@ -779,8 +757,6 @@ void write_morphs_index(FILE *fl) {
 * @param morph_data *morph The thing to save.
 */
 void write_morph_to_file(FILE *fl, morph_data *morph) {
-	void write_applies_to_file(FILE *fl, struct apply_data *list);
-	
 	char temp[256], temp2[256];
 	
 	if (!fl || !morph) {
@@ -966,8 +942,6 @@ void save_olc_morph(descriptor_data *desc) {
 * @return morph_data* The copied morph.
 */
 morph_data *setup_olc_morph(morph_data *input) {
-	extern struct apply_data *copy_apply_list(struct apply_data *input);
-	
 	morph_data *new;
 	
 	CREATE(new, morph_data, 1);
@@ -1188,7 +1162,6 @@ OLC_MODULE(morphedit_affects) {
 
 
 OLC_MODULE(morphedit_apply) {
-	void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
 	olc_process_applies(ch, argument, &MORPH_APPLIES(morph));
 }

@@ -23,7 +23,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
-
+#include "constants.h"
 
 /**
 * Contents:
@@ -39,14 +39,8 @@
 // local data
 const char *default_shop_name = "Unnamed Shop";
 
-// external consts
-extern const char *olc_type_bits[NUM_OLC_TYPES+1];
-extern struct faction_reputation_type reputation_levels[];
-extern const char *shop_flags[];
-
 // external funcs
 extern struct quest_giver *copy_quest_givers(struct quest_giver *from);
-extern bool find_quest_giver_in_list(struct quest_giver *list, int type, any_vnum vnum);
 void free_quest_givers(struct quest_giver *list);
 void get_quest_giver_display(struct quest_giver *list, char *save_buffer);
 
@@ -161,7 +155,6 @@ void smart_copy_shop_items(struct shop_item **to_list, struct shop_item *from_li
 		if (!found) {
 			CREATE(item, struct shop_item, 1);
 			*item = *iter;
-			item->next = NULL;
 			LL_APPEND(*to_list, item);
 		}
 	}
@@ -673,20 +666,12 @@ void clear_shop(shop_data *shop) {
 * @return struct shop_item* The copy of the list.
 */
 struct shop_item *copy_shop_item_list(struct shop_item *from) {
-	struct shop_item *el, *iter, *list = NULL, *end = NULL;
+	struct shop_item *el, *iter, *list = NULL;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct shop_item, 1);
 		*el = *iter;
-		el->next = NULL;
-		
-		if (end) {
-			end->next = el;
-		}
-		else {
-			list = el;
-		}
-		end = el;
+		LL_APPEND(list, el);
 	}
 	
 	return list;
@@ -1010,8 +995,6 @@ void save_olc_shop(descriptor_data *desc) {
 * @return shop_data* The copied shop.
 */
 shop_data *setup_olc_shop(shop_data *input) {
-	extern struct req_data *copy_requirements(struct req_data *from);
-	
 	shop_data *new;
 	
 	CREATE(new, shop_data, 1);

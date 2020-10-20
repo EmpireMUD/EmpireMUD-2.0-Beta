@@ -22,6 +22,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -29,16 +30,11 @@
 *   Commands
 */
 
-// external vars
-
-// external funcs
-extern bool check_scaling(char_data *mob, char_data *based_on);
-extern obj_data *die(char_data *ch, char_data *killer);
-void end_morph(char_data *ch);
+// external functions
+ACMD(do_say);
+ACMD(do_stand);
 
 // locals
-bool cancel_biting(char_data *ch);
-bool check_vampire_sun(char_data *ch, bool message);
 ACMD(do_bite);
 
 
@@ -217,8 +213,6 @@ void end_boost(char_data *ch) {
 
 // max blood is set in mobfile for npc, but computed for player
 int GET_MAX_BLOOD(char_data *ch) {
-	extern const int base_player_pools[NUM_POOLS];
-	
 	int base = base_player_pools[BLOOD];
 	
 	if (IS_NPC(ch)) {
@@ -248,7 +242,6 @@ int GET_MAX_BLOOD(char_data *ch) {
 * @param any_vnum skill_vnum If you provide a VAMPIRE skill vnum here, gives the player that skill at level 1 (if they don't already have it). Pass NOTHING here to auto-detect -- or to ignore it if the player already has a vampire skill.
 */
 void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum) {
-	void set_skill(char_data *ch, any_vnum skill, int level);
 	skill_data *skl, *next_skl;
 	bool already_vampire = IS_VAMPIRE(ch);
 	
@@ -445,9 +438,6 @@ void start_drinking_blood(char_data *ch, char_data *victim) {
 * @return bool TRUE if the vampire aggroed something, FALSE if not.
 */
 bool starving_vampire_aggro(char_data *ch) {
-	ACMD(do_stand);
-	extern bool is_fight_ally(char_data *ch, char_data *frenemy);
-	
 	char_data *ch_iter, *backup = NULL, *victim = FIGHTING(ch);
 	int backup_found = 0, vict_found = 0;
 	char arg[MAX_INPUT_LENGTH];
@@ -626,8 +616,6 @@ void un_deathshroud(char_data *ch) {
 * @param bool remove_vampire_skills If TRUE, will set all VAMPIRE-flagged skills to 0 (forcefully un-vampires the player).
 */
 void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
-	void clear_char_abilities(char_data *ch, any_vnum skill);
-	
 	if (IS_NPC(ch)) {
 		if (remove_vampire_skills) {
 			REMOVE_BIT(MOB_FLAGS(ch), MOB_VAMPIRE);
@@ -655,8 +643,6 @@ void check_un_vampire(char_data *ch, bool remove_vampire_skills) {
 * @param char_data *ch The person who might be biting, to update.
 */
 void update_biting_char(char_data *ch) {
-	void death_log(char_data *ch, char_data *killer, int type);
-	
 	char_data *victim;
 	obj_data *corpse;
 	int amount, hamt;
@@ -817,14 +803,9 @@ void update_vampire_sun(char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
+// this is an attack for vampires, and allows them to feed; mortals pass through to the "bite" social
 // has subcmd==1 when sent from do_sire
 ACMD(do_bite) {
-	// this is an attack for vampires, and allows them to feed; mortals pass through to the "bite" social
-	extern bool check_hit_vs_dodge(char_data *attacker, char_data *victim, bool off_hand);
-	extern social_data *find_social(char_data *ch, char *name, bool exact);
-	void perform_rescue(char_data *ch, char_data *vict, char_data *from, int msg);
-	void perform_social(char_data *ch, social_data *soc, char *argument);
-	
 	bool attacked = FALSE, free_bite = FALSE, in_combat = FALSE;
 	bool tank, melee;
 	char_data *victim = NULL, *ch_iter;
@@ -1179,7 +1160,6 @@ ACMD(do_claws) {
 
 
 ACMD(do_command) {
-	ACMD(do_say);
 	char_data *victim;
 	char *to_do;
 	bool un_charm;

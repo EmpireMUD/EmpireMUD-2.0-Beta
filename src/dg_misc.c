@@ -27,19 +27,7 @@
 #include "db.h"
 #include "skills.h"
 #include "vnums.h"
-
-// external funcs
-void combat_meter_damage_dealt(char_data *ch, int amt);
-void combat_meter_damage_taken(char_data *ch, int amt);
-void combat_meter_heal_dealt(char_data *ch, int amt);
-void combat_meter_heal_taken(char_data *ch, int amt);
-extern obj_data *die(char_data *ch, char_data *killer);
-extern room_data *get_room(room_data *ref, char *name);
-
-/* external vars */
-extern const char *apply_types[];
-extern const char *affected_bits[];
-
+#include "constants.h"
 
 /**
 * Creates a room and adds it to the current ship/building.
@@ -53,11 +41,6 @@ extern const char *affected_bits[];
 * @return room_data* The created room.
 */
 room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
-	void add_room_to_vehicle(room_data *room, vehicle_data *veh);
-	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
-	extern room_data *create_room(room_data *home);
-	void sort_world_table();
-	
 	room_data *home = HOME_ROOM(from), *new;
 	
 	// create the new room
@@ -70,10 +53,7 @@ room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 	COMPLEX_DATA(home)->inside_rooms++;
 	
 	if (GET_ROOM_VEHICLE(from)) {
-		COMPLEX_DATA(new)->vehicle = GET_ROOM_VEHICLE(from);
 		add_room_to_vehicle(new, GET_ROOM_VEHICLE(from));
-		SET_BIT(ROOM_BASE_FLAGS(new), ROOM_AFF_IN_VEHICLE);
-		affect_total_room(new);
 	}
 	
 	if (ROOM_OWNER(home)) {
@@ -223,8 +203,6 @@ void do_dg_affect(void *go, struct script_data *sc, trig_data *trig, int script_
 * add/remove an affect on a room
 */
 void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int script_type, char *cmd) {
-	extern const char *room_aff_bits[];
-	
 	char junk[MAX_INPUT_LENGTH]; /* will be set to "dg_affect_room" */
 	char roomname[MAX_INPUT_LENGTH], property[MAX_INPUT_LENGTH];
 	char value_p[MAX_INPUT_LENGTH], duration_p[MAX_INPUT_LENGTH];
@@ -329,11 +307,6 @@ void do_dg_affect_room(void *go, struct script_data *sc, trig_data *trig, int sc
 * @param char *argument <vnum [dir] | ruin | demolish>
 */
 void do_dg_build(room_data *target, char *argument) {
-	void complete_building(room_data *room);
-	void ruin_one_building(room_data *room);	// db.world.c
-	void special_building_setup(char_data *ch, room_data *room);
-	extern const int rev_dir[];
-	
 	char vnum_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH];
 	bool ruin = FALSE, demolish = FALSE;
 	any_vnum vnum = NOTHING;
@@ -415,11 +388,6 @@ void do_dg_build(room_data *target, char *argument) {
 * @param vehicle_data *veh Optional: A vehicle whose ownership to change.
 */
 void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room, vehicle_data *veh) {
-	void kill_empire_npc(char_data *ch);
-	void perform_abandon_vehicle(vehicle_data *veh);
-	void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	empire_data *owner;
 	
 	if (vict && IS_NPC(vict)) {
@@ -468,8 +436,6 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 * @param char *argument The arguments passed to "%purge% instance".
 */
 void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) {
-	void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	vehicle_data *veh, *next_veh;
 	char_data *mob, *next_mob;
@@ -552,9 +518,6 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 * @param char *argument The typed-in arg.
 */
 void do_dg_quest(int go_type, void *go, char *argument) {
-	extern struct instance_data *get_instance_by_id(any_vnum instance_id);
-	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
-	
 	char vict_arg[MAX_INPUT_LENGTH], cmd_arg[MAX_INPUT_LENGTH], vnum_arg[MAX_INPUT_LENGTH];
 	struct instance_data *inst = NULL;
 	struct player_quest *pq;
@@ -599,8 +562,6 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 			break;
 		}
 		case OBJ_TRIGGER: {
-			extern room_data *obj_room(obj_data *obj);
-			
 			obj_data *obj = (obj_data*)go;
 			room = obj_room(obj);
 			if (!vict) {
@@ -613,8 +574,6 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 		case RMT_TRIGGER:
 		case ADV_TRIGGER:
 		case BLD_TRIGGER: {
-			extern char_data *get_char_in_room(room_data *room, char *name);
-			
 			room = (room_data*)go;
 			emp = ROOM_OWNER(room);
 			if (!vict) {
@@ -651,13 +610,11 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 	// ready for commands
 	if (is_abbrev(cmd_arg, "drop")) {
 		if ((pq = is_on_quest(vict, QUEST_VNUM(quest)))) {
-			void drop_quest(char_data *ch, struct player_quest *pq);
 			drop_quest(vict, pq);
 		}
 	}
 	else if (is_abbrev(cmd_arg, "finish")) {
 		if ((pq = is_on_quest(vict, QUEST_VNUM(quest)))) {
-			extern int check_finish_quest_trigger(char_data *actor, quest_data *quest, struct instance_data *inst);
 			void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_emp);
 			
 			if (check_finish_quest_trigger(vict, quest, get_instance_by_id(pq->instance_id))) {
@@ -667,7 +624,6 @@ void do_dg_quest(int go_type, void *go, char *argument) {
 	}
 	else if (is_abbrev(cmd_arg, "start")) {
 		if (!is_on_quest(vict, QUEST_VNUM(quest))) {
-			void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
 			if (!inst && room) {
 				inst = find_instance_by_room(room, TRUE, TRUE);
 			}
@@ -721,7 +677,6 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 		remove_depletion(target, DPLTN_PRODUCTION);
 		
 		if (ROOM_OWNER(target)) {
-			void deactivate_workforce_room(empire_data *emp, room_data *room);
 			deactivate_workforce_room(ROOM_OWNER(target), target);
 		}
 	}
@@ -736,8 +691,6 @@ void do_dg_terracrop(room_data *target, crop_data *cp) {
 * @param sector_data *sect The sector to change it to.
 */
 void do_dg_terraform(room_data *target, sector_data *sect) {
-	void finish_trench(room_data *room);
-	
 	if (!target || !sect) {
 		return;
 	}
@@ -758,7 +711,6 @@ void do_dg_terraform(room_data *target, sector_data *sect) {
 	remove_depletion(target, DPLTN_PRODUCTION);
 	
 	if (ROOM_OWNER(target)) {
-		void deactivate_workforce_room(empire_data *emp, room_data *room);
 		deactivate_workforce_room(ROOM_OWNER(target), target);
 	}
 	
@@ -871,11 +823,6 @@ int valid_dg_target(char_data *ch, int bitvector) {
 * Runs triggers to update and prepare the mud at startup.
 */
 void run_reboot_triggers(void) {
-	void reboot_mtrigger(char_data *ch);
-	void reboot_otrigger(obj_data *obj);
-	void reboot_vtrigger(vehicle_data *veh);
-	void reboot_wtrigger(room_data *room);
-	
 	vehicle_data *veh, *next_veh;
 	room_data *room, *next_room;
 	char_data *mob, *next_mob;
@@ -906,12 +853,6 @@ void run_reboot_triggers(void) {
 * @param double modifier Percent to multiply scaled damage by (to make it lower or higher).
 */
 void script_damage(char_data *vict, char_data *killer, int level, int dam_type, double modifier) {
-	void death_log(char_data *ch, char_data *killer, int type);
-	extern char *get_room_name(room_data *room, bool color);
-	extern int reduce_damage_from_skills(int dam, char_data *victim, char_data *attacker, int damtype);
-	void scale_mob_for_character(char_data *mob, char_data *ch);
-	void scale_mob_to_level(char_data *mob, int level);
-	
 	double dam;
 	
 	// no point damaging the dead
@@ -1041,12 +982,6 @@ void script_damage_over_time(char_data *vict, any_vnum atype, int level, int dam
 * @param char *argument The text passed to the command.
 */
 void script_heal(void *thing, int type, char *argument) {
-	extern char_data *get_char_by_room(room_data *room, char *name);
-	extern char_data *get_char_by_vehicle(vehicle_data *veh, char *name);
-	extern int get_room_scale_level(room_data *room, char_data *targ);
-	extern const double apply_values[];
-	extern const bool aff_is_bad[];
-	
 	char targ_arg[MAX_INPUT_LENGTH], what_arg[MAX_INPUT_LENGTH], *scale_arg, log_root[MAX_STRING_LENGTH];
 	struct affected_type *aff, *next_aff;
 	int pos, amount, level = -1;
@@ -1196,22 +1131,6 @@ void script_heal(void *thing, int type, char *argument) {
 * @param char *argument Expected to be: <variable> <field> <value>
 */
 void script_modify(char *argument) {
-	void change_keywords(char_data *ch, char *str);
-	void change_long_desc(char_data *ch, char *str);
-	void change_look_desc(char_data *ch, char *str, bool format);
-	void change_look_desc_append(char_data *ch, char *str, bool format);
-	void change_sex(char_data *ch, int sex);
-	void change_short_desc(char_data *ch, char *str);
-	extern bool despawn_companion(char_data *ch, mob_vnum vnum);
-	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
-	extern struct companion_data *has_companion(char_data *ch, any_vnum vnum);
-	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
-	extern char *get_room_description(room_data *room);
-	extern vehicle_data *get_vehicle(char *name);
-	extern bool validate_icon(char *icon);
-	extern const char *genders[];
-	extern bool world_map_needs_save;
-	
 	char targ_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], value[MAX_INPUT_LENGTH], temp[MAX_STRING_LENGTH];
 	vehicle_data *veh = NULL, *v_proto;
 	struct companion_data *cd;

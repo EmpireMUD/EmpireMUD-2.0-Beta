@@ -23,7 +23,7 @@
 #include "olc.h"
 #include "skills.h"
 #include "handler.h"
-
+#include "constants.h"
 
 /**
 * Contents:
@@ -39,11 +39,6 @@
 const char *default_social_command = "social";
 const char *default_social_name = "Unnamed Social";
 const int default_social_position = POS_RESTING;
-
-// external consts
-extern const char *position_types[];
-extern const char *social_flags[];
-extern const char *social_message_types[NUM_SOCM_MESSAGES][2];
 
 // external funcs
 void get_requirement_display(struct req_data *list, char *save_buffer);
@@ -344,8 +339,6 @@ void free_social(social_data *soc) {
 * @param any_vnum vnum The social vnum
 */
 void parse_social(FILE *fl, any_vnum vnum) {
-	void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
-	
 	char line[256], error[256], str_in[256], *ptr;
 	social_data *soc, *find;
 	int int_in[4];
@@ -623,8 +616,6 @@ void save_olc_social(descriptor_data *desc) {
 * @return social_data* The copied social.
 */
 social_data *setup_olc_social(social_data *input) {
-	extern struct req_data *copy_requirements(struct req_data *from);
-	
 	social_data *new;
 	int iter;
 	

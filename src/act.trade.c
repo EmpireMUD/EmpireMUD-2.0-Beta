@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -33,37 +34,12 @@
 *   Commands
 */
 
-// external vars
-extern const struct augment_type_data augment_info[];
-extern const char *craft_types[];
-extern const char *function_flags[];
-extern const char *function_flags_long[];
-extern struct gen_craft_data_t gen_craft_data[];
-extern const int rev_dir[];
-extern const char *tool_flags[];
-
-// external functions
-extern bool can_claim(char_data *ch);
-extern bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool is_upgrade, bool *bld_is_closed, bool *bld_needs_reverse);
-void complete_vehicle(vehicle_data *veh);
-INTERACTION_FUNC(consumes_or_decays_interact);
-extern struct resource_data *copy_resource_list(struct resource_data *input);
-extern double get_enchant_scale_for_char(char_data *ch, int max_scale);
-extern bool has_cooking_fire(char_data *ch);
-extern bool has_learned_craft(char_data *ch, any_vnum vnum);
-void process_build(char_data *ch, room_data *room, int act_type);
-void process_build_action(char_data *ch);
-void scale_item_to_level(obj_data *obj, int level);
-extern bool validate_augment_target(char_data *ch, obj_data *obj, augment_data *aug, bool send_messages);
-
 // locals
+ACMD(do_gen_craft);
 bool can_forge(char_data *ch);
 bool can_refashion(char_data *ch);
-ACMD(do_gen_craft);
 craft_data *find_craft_for_obj_vnum(obj_vnum vnum);
 obj_data *find_water_container(char_data *ch, obj_data *list);
-int get_crafting_level(char_data *ch);
-obj_data *has_required_obj_for_craft(char_data *ch, obj_vnum vnum);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -393,7 +369,6 @@ vehicle_data *find_finishable_vehicle(char_data *ch, craft_data *type, int with_
 * @return vehicle_data* The found vehicle, or NULL if none.
 */
 vehicle_data *find_vehicle_to_resume_by_name(char_data *ch, int craft_type, char *name, craft_data **found_craft) {
-	extern craft_data *find_craft_for_vehicle(vehicle_data *veh);
 	vehicle_data *veh;
 	
 	*found_craft = NULL;
@@ -690,17 +665,6 @@ void resume_craft_vehicle(char_data *ch, vehicle_data *veh, craft_data *craft) {
 * @param int craft_type Whichever CRAFT_TYPE_ the player is using.
 */
 void show_craft_info(char_data *ch, char *argument, int craft_type) {
-	extern double get_weapon_speed(obj_data *weapon);
-	extern const char *affected_bits[];
-	extern const char *apply_types[];
-	extern const char *armor_types[NUM_ARMOR_TYPES+1];
-	extern const char *bld_on_flags[];
-	extern const bitvector_t bld_on_flags_order[];
-	extern const char *craft_flag_for_info[];
-	extern const char *extra_bits[];
-	extern const char *item_types[];
-	extern const char *wear_bits[];
-	
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH], range[MAX_STRING_LENGTH];
 	struct obj_apply *apply;
 	ability_data *abil;
@@ -865,8 +829,6 @@ void show_craft_info(char_data *ch, char *argument, int craft_type) {
 
 // for do_tame
 INTERACTION_FUNC(tame_interact) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	char buf[MAX_STRING_LENGTH];
 	char_data *newmob;
 	bool any = FALSE;
@@ -916,7 +878,7 @@ INTERACTION_FUNC(tame_interact) {
 
 
 // CRAFT_TYPE_x
-struct gen_craft_data_t gen_craft_data[] = {
+const struct gen_craft_data_t gen_craft_data[] = {
 	{ "error", "erroring", NOBITS, { "", "", "" } },	// dummy to require scmd
 	
 	// Note: These correspond to CRAFT_TYPE_x so you cannot change the order.
@@ -1441,11 +1403,6 @@ bool validate_item_rename(char_data *ch, obj_data *obj, char *name) {
 
 // subcmd is AUGMENT_x
 ACMD(do_gen_augment) {
-	extern augment_data *find_augment_by_name(char_data *ch, char *name, int type);
-	extern char *shared_by(obj_data *obj, char_data *ch);
-	extern const bool apply_never_scales[];
-	extern const double apply_values[];
-	
 	char buf[MAX_STRING_LENGTH], target_arg[MAX_INPUT_LENGTH], *augment_arg;
 	double points_available, remaining, share;
 	struct obj_apply *apply, *last_apply;
@@ -1572,14 +1529,7 @@ ACMD(do_gen_augment) {
 			if (apply) {
 				apply->apply_type = augment_info[subcmd].apply_type;
 				apply->location = app->location;
-				
-				if (last_apply) {
-					last_apply->next = apply;
-				}
-				else {
-					GET_OBJ_APPLIES(obj) = apply;
-				}
-				last_apply = apply;
+				LL_APPEND(GET_OBJ_APPLIES(obj), apply);
 			}
 		}
 		
@@ -1623,9 +1573,6 @@ ACMD(do_gen_augment) {
 * @param int dir The direction specified by the player (may be NO_DIR or an invalid dir).
 */
 void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
-	void herd_animals_out(room_data *location);
-	void special_building_setup(char_data *ch, room_data *room);
-	
 	bool junk, is_closed, needs_reverse;
 	char buf[MAX_STRING_LENGTH];
 	room_data *to_room, *to_rev;
@@ -1725,10 +1672,6 @@ void do_gen_craft_building(char_data *ch, craft_data *type, int dir) {
 * @param int dir Optional: If the player specified a direction (may by NO_DIR or an invalid dir for the craft).
 */
 void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
-	extern int get_new_vehicle_construction_id();
-	void scale_vehicle_to_level(vehicle_data *veh, int level);
-	void special_vehicle_setup(char_data *ch, vehicle_data *veh);
-	
 	vehicle_data *veh, *to_craft = NULL, *found_other = NULL;
 	char buf[MAX_STRING_LENGTH];
 	obj_data *found_obj = NULL;
@@ -1811,8 +1754,6 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 
 // subcmd must be CRAFT_TYPE_
 ACMD(do_gen_craft) {
-	extern craft_data *find_building_list_entry(room_data *room, byte type);
-	
 	char short_arg[MAX_INPUT_LENGTH], last_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[256];
 	int count, timer, num = 1, dir = NO_DIR;
 	craft_data *craft, *next_craft, *type = NULL, *find_type = NULL, *abbrev_match = NULL;
@@ -2134,9 +2075,6 @@ ACMD(do_gen_craft) {
 
 
 ACMD(do_learn) {
-	void add_learned_craft(char_data *ch, any_vnum vnum);
-	extern bool has_learned_craft(char_data *ch, any_vnum vnum);
-	
 	char arg[MAX_INPUT_LENGTH];
 	craft_data *recipe;
 	obj_data *obj;
@@ -2449,9 +2387,6 @@ ACMD(do_recipes) {
 
 // do_refashion / this handles both 'reforge' and 'refashion'
 ACMD(do_reforge) {
-	extern char *shared_by(obj_data *obj, char_data *ch);
-	extern const char *item_types[];
-	
 	char arg2[MAX_INPUT_LENGTH], temp[MAX_INPUT_LENGTH];
 	struct resource_data *res = NULL;
 	time_t old_stolen_time;

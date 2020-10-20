@@ -26,6 +26,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -36,36 +37,17 @@
 *   Commands
 */
 
+// external functions
+ACMD(do_slash_channel);
+
+// local prototypes
+char_data *find_minipet(char_data *ch);
+
 // configs for mini-pets
+// TODO this seemsl ike it should move to structs.h / utils.h
 #define IS_MINIPET_OF(mob, ch)  (!EXTRACTED(mob) && IS_NPC(mob) && (mob)->master == (ch) && !GET_COMPANION(mob) && (MOB_FLAGS(mob) & default_minipet_flags) == default_minipet_flags && (AFF_FLAGS(mob) & default_minipet_affs) == default_minipet_affs)
 bitvector_t default_minipet_flags = MOB_SENTINEL | MOB_SPAWNED | MOB_NO_LOOT | MOB_NO_EXPERIENCE;
 bitvector_t default_minipet_affs = AFF_NO_ATTACK | AFF_CHARM;
-
-
-// external vars
-extern const char *pool_types[];
-extern const struct toggle_data_type toggle_data[];	// constants.c
-
-// external prototypes
-void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
-extern bool can_enter_instance(char_data *ch, struct instance_data *inst);
-extern bool char_can_act(char_data *ch, int min_pos, bool allow_animal, bool allow_invulnerable);
-void check_delayed_load(char_data *ch);
-extern bool check_scaling(char_data *mob, char_data *attacker);
-extern bool check_vampire_sun(char_data *ch, bool message);
-extern bool despawn_companion(char_data *ch, mob_vnum vnum);
-extern struct instance_data *find_matching_instance_for_shared_quest(char_data *ch, any_vnum quest_vnum);
-extern int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
-void get_player_skill_string(char_data *ch, char *buffer, bool abbrev);
-extern char *get_room_name(room_data *room, bool color);
-extern bool is_ignoring(char_data *ch, char_data *victim);
-void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
-void scale_item_to_level(obj_data *obj, int level);
-void scale_mob_as_companion(char_data *mob, char_data *master, int use_level);
-extern char *show_color_codes(char *string);
-
-// locals
-char_data *find_minipet(char_data *ch);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -149,8 +131,6 @@ void adventure_summon(char_data *ch, char *argument) {
 * @param char_data *ch The person to return back where they came from.
 */
 void adventure_unsummon(char_data *ch) {
-	extern room_data *find_load_room(char_data *ch);
-	
 	room_data *room, *map;
 	
 	// safety first
@@ -418,11 +398,6 @@ char *one_summon_entry(char_data *ch, const char *name, int min_level, ability_d
 * @param char_data *new The character to switch to (may or may not be playing).
 */
 void perform_alternate(char_data *old, char_data *new) {
-	void display_tip_to_char(char_data *ch);
-	extern void enter_player_game(descriptor_data *d, int dolog, bool fresh);
-	void start_new_character(char_data *ch);
-	extern bool global_mute_slash_channel_joins;
-	
 	char sys[MAX_STRING_LENGTH], mort_in[MAX_STRING_LENGTH], mort_out[MAX_STRING_LENGTH], mort_alt[MAX_STRING_LENGTH], temp[256];
 	const char *msg;
 	descriptor_data *desc, *next_d;
@@ -568,8 +543,6 @@ void perform_alternate(char_data *old, char_data *new) {
 * @param vehicle_data *into_veh Optional: The vehicle being herded into (pass NULL if n/a).
 */
 void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, vehicle_data *into_veh) {
-	extern int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags);
-	
 	room_data *was_in;
 	bool out;
 	
@@ -633,8 +606,6 @@ void perform_herd(char_data *ch, char_data *mob, room_data *to_room, int dir, ve
 * @return bool TRUE if anything was summoned; FALSE if we sent an error.
 */
 bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool checks) {
-	void setup_generic_npc(char_data *mob, empire_data *emp, int name, int sex);
-	
 	int level = get_player_level_for_ability(ch, abil ? ABIL_VNUM(abil) : NO_ABIL);
 	char_data *proto = mob_proto(vnum);
 	char_data *mob;
@@ -719,9 +690,6 @@ bool perform_summon(char_data *ch, ability_data *abil, any_vnum vnum, bool check
 * @param char_data *ch The person to display to.
 */
 static void print_group(char_data *ch) {
-	extern const char *class_role[];
-	extern const char *pool_abbrevs[];
-
 	char status[256], class[256], loc[256], alerts[256], skills[256];
 	struct group_member_data *mem;
 	int iter, ssize;
@@ -959,9 +927,6 @@ void summon_player(char_data *ch, char *argument) {
 
 
 OFFER_VALIDATE(oval_quest) {
-	extern bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance);
-	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
-	
 	struct instance_data *inst = find_matching_instance_for_shared_quest(ch, offer->data);
 	quest_data *qst = quest_proto(offer->data);
 	
@@ -983,8 +948,6 @@ OFFER_VALIDATE(oval_quest) {
 
 
 OFFER_FINISH(ofin_quest) {
-	void start_quest(char_data *ch, quest_data *qst, struct instance_data *inst);
-	
 	struct instance_data *inst = find_matching_instance_for_shared_quest(ch, offer->data);
 	quest_data *qst = quest_proto(offer->data);
 	
@@ -997,9 +960,6 @@ OFFER_FINISH(ofin_quest) {
 
 
 OFFER_VALIDATE(oval_rez) {
-	extern obj_data *find_obj(int n, bool error);
-	extern room_data *obj_room(obj_data *obj);
-	
 	room_data *loc = real_room(offer->location);
 	obj_data *corpse;
 	
@@ -1024,7 +984,6 @@ OFFER_VALIDATE(oval_rez) {
 }
 
 OFFER_FINISH(ofin_rez) {
-	void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, int ability);
 	room_data *loc = real_room(offer->location);	// pre-validated
 	perform_resurrection(ch, is_playing(offer->from), loc, offer->data);
 	return FALSE;	// prevent deletion because perform_res deletes the offer
@@ -1137,8 +1096,7 @@ void alt_import_aliases(char_data *ch, char_data *alt) {
 		newl->replacement = str_dup(al->replacement);
 		newl->type = al->type;
 		
-		newl->next = GET_ALIASES(ch);
-		GET_ALIASES(ch) = newl;
+		LL_PREPEND(GET_ALIASES(ch), newl);
 		
 		msg_to_char(ch, "Imported alias '%s'.\r\n", newl->alias);
 		imported = TRUE;
@@ -1307,11 +1265,6 @@ void alt_import_recolors(char_data *ch, char_data *alt) {
 * @param char_data *alt Player to import from.
 */
 void alt_import_slash_channels(char_data *ch, char_data *alt) {
-	extern struct player_slash_channel *find_on_slash_channel(char_data *ch, int id);
-	extern struct slash_channel *find_slash_channel_by_id(int id);
-	extern struct slash_channel *find_slash_channel_by_name(char *name, bool exact);
-	ACMD(do_slash_channel);
-	
 	struct slash_channel *chan, *load_slash;
 	struct player_slash_channel *iter;
 	char buf[MAX_STRING_LENGTH];
@@ -1535,7 +1488,7 @@ void tog_pvp(char_data *ch) {
 ACMD(do_accept) {
 	char type_arg[MAX_INPUT_LENGTH], name_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	int max_duration = config_get_int("offer_time");
-	struct offer_data *ofiter, *offer, *temp;
+	struct offer_data *ofiter, *offer;
 	bool delete = FALSE;
 	int iter, type, ts;
 	bool found, dupe;
@@ -1667,19 +1620,13 @@ ACMD(do_accept) {
 	
 	// in either case
 	if (delete) {
-		REMOVE_FROM_LIST(offer, GET_OFFERS(ch), next);
+		LL_DELETE(GET_OFFERS(ch), offer);
 		free(offer);
 	}
 }
 
 
 ACMD(do_alternate) {
-	extern int isbanned(char *hostname);
-	extern bool has_anonymous_host(descriptor_data *desc);
-	extern bool member_is_timed_out_ch(char_data *ch);
-	extern const char *class_role[];
-	extern const char *class_role_color[];
-
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct account_player *plr;
 	player_index_data *index;
@@ -1931,10 +1878,6 @@ ACMD(do_changepass) {
 
 
 ACMD(do_companions) {
-	extern struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type);
-	extern char_data *load_companion_mob(char_data *master, struct companion_data *cd);
-	void setup_ability_companions(char_data *ch);
-	
 	char buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct companion_data *cd, *next_cd, *found_cd;
 	char_data *mob, *proto = NULL;
@@ -2099,11 +2042,6 @@ ACMD(do_companions) {
 
 
 ACMD(do_confirm) {
-	bool check_reboot_confirms();
-	void perform_reboot();
-	extern struct reboot_control_data reboot_control;
-	extern const char *reboot_type[];
-	
 	if (IS_NPC(ch)) {
 		return;
 	}
@@ -2133,10 +2071,6 @@ ACMD(do_confirm) {
 
 
 ACMD(do_customize) {
-	void do_customize_room(char_data *ch, char *argument);
-	void do_customize_island(char_data *ch, char *argument);
-	void do_customize_vehicle(char_data *ch, char *argument);
-
 	char arg2[MAX_INPUT_LENGTH];
 	
 	half_chop(argument, arg, arg2);
@@ -2208,9 +2142,6 @@ ACMD(do_dismiss) {
 
 
 ACMD(do_douse) {
-	void do_douse_vehicle(char_data *ch, vehicle_data *veh, obj_data *cont);
-	void stop_burning(room_data *room);
-	
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
 	obj_data *obj = NULL, *found_obj = NULL, *iter;
 	char arg[MAX_INPUT_LENGTH];
@@ -2267,8 +2198,6 @@ ACMD(do_douse) {
 
 
 ACMD(do_fightmessages) {
-	extern const char *combat_message_types[];
-
 	bool screenreader = PRF_FLAGGED(ch, PRF_SCREEN_READER);
 	int iter, type = NOTHING, count;
 	bool on;
@@ -2612,9 +2541,6 @@ ACMD(do_group) {
 
 
 ACMD(do_herd) {
-	extern room_data *get_exit_room(room_data *from_room);
-	extern room_data *get_vehicle_interior(vehicle_data *veh);
-	
 	char mob_arg[MAX_INPUT_LENGTH], dir_arg[MAX_INPUT_LENGTH];
 	vehicle_data *into_veh;
 	room_data *to_room;
@@ -2708,10 +2634,6 @@ ACMD(do_herd) {
 
 
 ACMD(do_lastname) {
-	void change_personal_lastname(char_data *ch, char *name);
-	extern int _parse_name(char *arg, char *name);
-	extern int Valid_Name(char *newname);
-	
 	char arg1[MAX_INPUT_LENGTH], new_name[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	char *arg2, *best, *exact;
 	struct player_lastname *lastn;
@@ -3054,10 +2976,6 @@ ACMD(do_minipets) {
 
 
 ACMD(do_morph) {
-	extern morph_data *find_morph_by_name(char_data *ch, char *name);
-	void finish_morphing(char_data *ch, morph_data *morph);
-	extern bool morph_affinity_ok(room_data *location, morph_data *morph);
-	
 	char buf[MAX_STRING_LENGTH], line[256];
 	morph_data *morph, *next_morph;
 	bool full = FALSE;
@@ -3355,9 +3273,6 @@ ACMD(do_prompt) {
 
 
 ACMD(do_quit) {
-	void display_statistics_to_char(char_data *ch);
-	extern obj_data *player_death(char_data *ch);
-	
 	descriptor_data *d, *next_d;
 	bool confirm = FALSE, died = FALSE;
 	any_vnum vnum = NOTHING;
@@ -3456,8 +3371,6 @@ ACMD(do_save) {
 
 
 ACMD(do_selfdelete) {
-	void delete_player_character(char_data *ch);
-
 	char passwd[MAX_INPUT_LENGTH];
 	
 	argument = any_one_arg(argument, passwd);
@@ -3619,9 +3532,6 @@ ACMD(do_skin) {
 
 
 ACMD(do_summon) {
-	extern int get_attribute_by_apply(char_data *ch, int apply_type);
-	void summon_materials(char_data *ch, char *argument);
-	
 	char buf[MAX_STRING_LENGTH * 2], arg[MAX_INPUT_LENGTH], *arg2, *line;
 	struct player_ability_data *plab, *next_plab;
 	int count, num, fol_count, to_summon;
@@ -3963,8 +3873,6 @@ ACMD(do_toggle) {
 
 
 ACMD(do_visible) {
-	void perform_immort_vis(char_data *ch);
-
 	if (GET_ACCESS_LEVEL(ch) >= LVL_GOD) {
 		perform_immort_vis(ch);
 		return;

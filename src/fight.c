@@ -24,6 +24,7 @@
 #include "skills.h"
 #include "vnums.h"
 #include "dg_scripts.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -39,35 +40,18 @@
 *   Combat Engine: Rounds
 */
 
-
 // external vars
+extern bool catch_up_combat;
 extern struct message_list fight_messages[MAX_MESSAGES];
-extern const double hit_per_dex;
-extern struct character_size_data size_data[];
 
 // external funcs
 ACMD(do_flee);
-bool check_scaling(char_data *mob, char_data *based_on);
-extern struct resource_data *combine_resources(struct resource_data *combine_a, struct resource_data *combine_b);
-INTERACTION_FUNC(consumes_or_decays_interact);
-extern int determine_best_scale_level(char_data *ch, bool check_group);
-void end_pursuit(char_data *ch, char_data *target);
-void scale_item_to_level(obj_data *obj, int level);
 
 // locals
-int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
-obj_data *die(char_data *ch, char_data *killer);
 void drop_loot(char_data *mob, char_data *killer);
-int get_block_rating(char_data *ch, bool can_gain_skill);
-int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
-double get_weapon_speed(obj_data *weapon);
 void heal(char_data *ch, char_data *vict, int amount);
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round);
-extern int lock_instance_level(room_data *room, int level);
 obj_data *make_corpse(char_data *ch);
-void perform_execute(char_data *ch, char_data *victim, int attacktype, int damtype);
-void trigger_distrust_from_hostile(char_data *ch, empire_data *emp);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -266,7 +250,7 @@ int get_attack_type(char_data *ch, obj_data *weapon) {
 * @return double The base damage per second of the weapon
 */
 double get_base_dps(obj_data *weapon) {
-	int damage;
+	int dmg;
 	double speed;
 	
 	if (!weapon) {
@@ -274,14 +258,14 @@ double get_base_dps(obj_data *weapon) {
 	}
 	
 	if (IS_WEAPON(weapon)) {
-		damage = GET_WEAPON_DAMAGE_BONUS(weapon);
+		dmg = GET_WEAPON_DAMAGE_BONUS(weapon);
 		speed = get_weapon_speed(weapon);
-		return (double)damage / speed;
+		return (double)dmg / speed;
 	}
 	else if (IS_MISSILE_WEAPON(weapon)) {
-		damage = GET_MISSILE_WEAPON_DAMAGE(weapon);
+		dmg = GET_MISSILE_WEAPON_DAMAGE(weapon);
 		speed = get_weapon_speed(weapon);
-		return (double)damage / speed;
+		return (double)dmg / speed;
 	}
 	else {
 		return 0.0;
@@ -464,8 +448,6 @@ int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill) 
 * @return int The hit %.
 */
 int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill) {
-	extern const int base_hit_chance;
-	
 	double base_chance, spar = 0.0;
 	
 	// starting value
@@ -1284,10 +1266,6 @@ void death_restore(char_data *ch) {
 * @return obj_data *The corpse (if any), or NULL
 */
 obj_data *die(char_data *ch, char_data *killer) {
-	void cancel_blood_upkeeps(char_data *ch);
-	void despawn_charmies(char_data *ch, any_vnum only_vnum);
-	void kill_empire_npc(char_data *ch);
-	
 	char_data *ch_iter, *player, *killmaster;
 	obj_data *corpse = NULL;
 	struct mob_tag *tag;
@@ -1517,8 +1495,6 @@ INTERACTION_FUNC(loot_interact) {
 * @param char_data *killer the person who killed it (optional)
 */
 void drop_loot(char_data *mob, char_data *killer) {
-	extern int mob_coins(char_data *mob);
-
 	obj_data *obj;
 	int coins;
 	empire_data *coin_emp;
@@ -1677,8 +1653,6 @@ obj_data *make_corpse(char_data *ch) {
 * @param any_vnum ability Optional (or NO_ABIL): The ability to skillup for rez_by.
 */
 void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_vnum ability) {
-	extern obj_data *find_obj(int n, bool error);
-
 	obj_data *corpse;
 	int exp = 15;	// overridden by some abilities
 	
@@ -1796,8 +1770,6 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 * @return obj_data* The player's corpse object, if any.
 */
 obj_data *player_death(char_data *ch) {
-	void cancel_adventure_summon(char_data *ch);
-	
 	obj_data *corpse;
 	perform_dismount(ch);	// just to be sure
 	death_restore(ch);
@@ -1866,7 +1838,6 @@ static void shoot_at_char(room_data *from_room, char_data *ch) {
 		
 		// cancel any action the character is doing
 		if (GET_ACTION(ch) != ACT_NONE) {
-			void cancel_action(char_data *ch);
 			cancel_action(ch);
 		}
 	}
@@ -2044,9 +2015,8 @@ void process_tower(room_data *room) {
 					if (tower_would_shoot(room, ch)) {
 						CREATE(tvl, struct tower_victim_list, 1);
 						tvl->ch = ch;
-					
-						tvl->next = victim_list;
-						victim_list = tvl;
+						
+						LL_PREPEND(victim_list, tvl);
 						++num_victs;
 					}
 				}
@@ -2745,9 +2715,6 @@ void besiege_room(char_data *attacker, room_data *to_room, int damage, vehicle_d
 * @return bool TRUE if the target survives, FALSE if it's extracted
 */
 bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int siege_type, vehicle_data *by_vehicle) {
-	void adjust_vehicle_tech(vehicle_data *veh, bool add);
-	void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
-
 	static struct resource_data *default_res = NULL;
 	struct resource_data *old_list;
 	
@@ -2855,8 +2822,6 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 * @param char_data *ch The person who needs help!
 */
 void check_auto_assist(char_data *ch) {
-	void perform_rescue(char_data *ch, char_data *vict, char_data *from, int msg);
-	
 	char_data *ch_iter, *next_iter, *iter_master, *top_ch, *top_iter;
 	bool assist;
 	
@@ -2987,9 +2952,6 @@ bool check_combat_position(char_data *ch, double speed) {
  *	> 0	How much damage done.
  */
 int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype) {
-	void start_drinking_blood(char_data *ch, char_data *victim);
-	extern const struct wear_data_type wear_data[NUM_WEARS];
-	
 	struct instance_data *inst;
 	int iter;
 	bool full_miss = (dam <= 0);
@@ -3018,7 +2980,7 @@ int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damty
 	if (!IS_NPC(victim) && (IS_IMMORTAL(victim) || (IS_GOD(victim) && !IS_GOD(ch))))
 		dam = 0;
 
-	if (GET_MOB_VNUM(ch) != DG_CASTER_PROXY && ch != victim && !can_fight(ch, victim))
+	if (ch != victim && !can_fight(ch, victim))
 		return 0;
 
 	/* Only damage to self (sun) still hurts */
@@ -3346,10 +3308,6 @@ void heal(char_data *ch, char_data *vict, int amount) {
 * @return int the result of damage() or -1
 */
 int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round) {
-	void add_pursuit(char_data *ch, char_data *target);
-	extern int apply_poison(char_data *ch, char_data *vict);
-	extern const double basic_speed;
-	
 	struct instance_data *inst;
 	int w_type, result, bonus, ret_val;
 	bool success = FALSE, block = FALSE;
@@ -3756,8 +3714,7 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 		}
 	}
 
-	ch->next_fighting = combat_list;
-	combat_list = ch;
+	LL_PREPEND2(combat_list, ch, next_fighting);
 
 	FIGHTING(ch) = vict;
 	FIGHT_MODE(ch) = mode;
@@ -3781,12 +3738,11 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 
 /* remove a char from the list of fighting chars */
 void stop_fighting(char_data *ch) {
-	char_data *temp;
-
-	if (ch == next_combat_list)
+	if (ch == next_combat_list) {
 		next_combat_list = ch->next_fighting;
+	}
 
-	REMOVE_FROM_LIST(ch, combat_list, next_fighting);
+	LL_DELETE2(combat_list, ch, next_fighting);
 	ch->next_fighting = NULL;
 	FIGHTING(ch) = NULL;
 	GET_POS(ch) = POS_STANDING;
@@ -3877,8 +3833,6 @@ void update_pos(char_data *victim) {
 * @param obj_data *weapon Optional: Which weapon to attack with (NULL means fists)
 */
 void perform_violence_melee(char_data *ch, obj_data *weapon) {
-	extern bool starving_vampire_aggro(char_data *ch);
-	
 	// sanity
 	if (weapon && !IS_WEAPON(weapon)) {
 		weapon = NULL;
@@ -4125,9 +4079,6 @@ void perform_violence_missile(char_data *ch, obj_data *weapon) {
 * @param obj_data *weapon Optional: Which weapon to attack with
 */
 void one_combat_round(char_data *ch, double speed, obj_data *weapon) {
-	void undisguise(char_data *ch);
-	void diag_char_to_char(char_data *i, char_data *ch);
-	
 	// sanity check again
 	if (!FIGHTING(ch)) {
 		return;
@@ -4248,8 +4199,6 @@ void fight_wait_run(char_data *ch, double speed) {
 * @param int pulse the current game pulse, for determining whose turn it is
 */
 void frequent_combat(int pulse) {
-	extern bool catch_up_combat;
-	
 	char_data *ch, *vict;
 	double speed;
 	

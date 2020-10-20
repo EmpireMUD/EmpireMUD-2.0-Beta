@@ -26,6 +26,7 @@
 #include "dg_scripts.h"
 #include "dg_event.h"
 #include "vnums.h"
+#include "constants.h"
 
 /**
 * Contents:
@@ -73,42 +74,25 @@
 *   Miscellaneous Handlers
 */
 
-// externs
-extern const int confused_dirs[NUM_2D_DIRS][2][NUM_OF_DIRS];
-extern int get_north_for_char(char_data *ch);
-extern struct complex_room_data *init_complex_data();
-extern const bool interact_one_at_a_time[NUM_INTERACTS];
-const struct wear_data_type wear_data[NUM_WEARS];
+// external vars
+extern bool override_home_storage_cap;
+extern const int remove_lore_types[];
 
 // external funcs
-void adjust_building_tech(empire_data *emp, room_data *room, bool add);
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
+ACMD(do_return);
 EVENT_CANCEL_FUNC(cancel_room_event);
-void check_delayed_load(char_data *ch);
-void clear_delayed_update(char_data *ch);
+EVENT_CANCEL_FUNC(cancel_wait_event);
 void clear_obj_eq_sets(obj_data *obj);
-void extract_trigger(trig_data *trig);
-void free_varlist(struct trig_var_data *vd);
-void scale_item_to_level(obj_data *obj, int level);
-void update_member_data(char_data *ch);
 
 // locals
 void add_dropped_item(empire_data *emp, obj_data *obj);
 void add_dropped_item_anywhere(obj_data *obj, empire_data *only_if_emp);
 void add_dropped_item_list(empire_data *emp, obj_data *list);
 static void add_obj_binding(int idnum, struct obj_binding **list);
-struct obj_binding *copy_obj_bindings(struct obj_binding *from);
-void die_follower(char_data *ch);
-struct empire_production_total *get_production_total_entry(empire_data *emp, any_vnum vnum);
-struct companion_data *has_companion(char_data *ch, any_vnum vnum);
-void perform_abandon_vehicle(vehicle_data *veh);
-void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
-void remove_companion(char_data *ch, any_vnum vnum);
 void remove_dropped_item(empire_data *emp, obj_data *obj);
 void remove_dropped_item_anywhere(obj_data *obj);
 void remove_dropped_item_list(empire_data *emp, obj_data *list);
 void remove_lore_record(char_data *ch, struct lore_data *lore);
-void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 
 // local file scope variables
 static int char_extractions_pending = 0;
@@ -621,15 +605,13 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 * @param struct affected_by *af The affect to remove.
 */
 void affect_remove(char_data *ch, struct affected_type *af) {
-	struct affected_type *temp;
-
 	// not affected by it at all somehow?
 	if (ch->affected == NULL) {
 		return;
 	}
 
 	affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
-	REMOVE_FROM_LIST(af, ch->affected, next);
+	LL_DELETE(ch->affected, af);
 	free(af);
 }
 
@@ -643,8 +625,6 @@ void affect_remove(char_data *ch, struct affected_type *af) {
 * @param struct affected_by *af The affect to remove.
 */
 void affect_remove_room(room_data *room, struct affected_type *af) {
-	struct affected_type *temp;
-
 	// only prevent basic errors
 	if (!room || !af) {
 		return;
@@ -657,7 +637,7 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 	
 	REMOVE_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
 	
-	REMOVE_FROM_LIST(af, ROOM_AFFECTS(room), next);
+	LL_DELETE(ROOM_AFFECTS(room), af);
 	free(af);
 	
 	affect_total_room(room);
@@ -681,8 +661,7 @@ void affect_to_char_silent(char_data *ch, struct affected_type *af) {
 	CREATE(affected_alloc, struct affected_type, 1);
 
 	*affected_alloc = *af;
-	affected_alloc->next = ch->affected;
-	ch->affected = affected_alloc;
+	LL_PREPEND(ch->affected, affected_alloc);
 
 	affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	affect_total(ch);
@@ -726,8 +705,7 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 	CREATE(affected_alloc, struct affected_type, 1);
 
 	*affected_alloc = *af;
-	affected_alloc->next = ROOM_AFFECTS(room);
-	ROOM_AFFECTS(room) = affected_alloc;
+	LL_PREPEND(ROOM_AFFECTS(room), affected_alloc);
 	
 	affected_alloc->expire_event = NULL;	// cannot have an event in the copied af at this point
 	
@@ -746,8 +724,6 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 * @param char_data *ch The person whose effects to update
 */
 void affect_total(char_data *ch) {
-	extern const int base_player_pools[NUM_POOLS];
-
 	struct affected_type *af;
 	int i, iter, level;
 	struct obj_apply *apply;
@@ -1059,8 +1035,7 @@ void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int dama
 	
 	if (!found) {
 		CREATE(dot, struct over_time_effect_type, 1);
-		dot->next = ch->over_time_effects;
-		ch->over_time_effects = dot;
+		LL_PREPEND(ch->over_time_effects, dot);
 		
 		dot->type = type;
 		dot->cast_by = id;
@@ -1080,9 +1055,7 @@ void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int dama
 * @param struct over_time_effect_type *dot The DoT to remove.
 */
 void dot_remove(char_data *ch, struct over_time_effect_type *dot) {
-	struct over_time_effect_type *temp;
-
-	REMOVE_FROM_LIST(dot, ch->over_time_effects, next);
+	LL_DELETE(ch->over_time_effects, dot);
 	free(dot);
 }
 
@@ -1157,8 +1130,6 @@ void show_wear_off_msg(char_data *ch, any_vnum atype) {
 
 /* Extract a ch completely from the world, and leave his stuff behind */
 void extract_char_final(char_data *ch) {
-	ACMD(do_return);
-
 	empire_data *rescan_emp = IS_NPC(ch) ? NULL : GET_LOYALTY(ch);
 	char_data *k, *temp;
 	descriptor_data *t_desc;
@@ -1326,8 +1297,6 @@ void extract_char_final(char_data *ch) {
 * @param char_data *ch The character to mark for extraction.
 */
 void extract_char(char_data *ch) {
-	void despawn_charmies(char_data *ch, any_vnum only_vnum);
-	
 	if (!EXTRACTED(ch)) {
 		check_dg_owner_purged_char(ch);
 		
@@ -1484,9 +1453,6 @@ bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t f
 * @param char_data *ch The player to idle out.
 */
 void perform_idle_out(char_data *ch) {
-	extern bool dismiss_any_minipet(char_data *ch);
-	extern obj_data *player_death(char_data *ch);
-	
 	empire_data *emp = NULL;
 	bool died = FALSE;
 	
@@ -1569,6 +1535,7 @@ void char_from_room(char_data *ch) {
     
     DL_DELETE2(ROOM_PEOPLE(IN_ROOM(ch)), ch, prev_in_room, next_in_room);
 	IN_ROOM(ch) = NULL;
+	ch->prev_in_room = NULL;
 	ch->next_in_room = NULL;
 }
 
@@ -1580,12 +1547,6 @@ void char_from_room(char_data *ch) {
 * @param room_data *room The place to put 'em
 */
 void char_to_room(char_data *ch, room_data *room) {
-	void check_instance_is_loaded(struct instance_data *inst);
-	void check_island_levels(room_data *location, int level);
-	extern int determine_best_scale_level(char_data *ch, bool check_group);
-	extern int lock_instance_level(room_data *room, int level);
-	void spawn_mobs_from_center(room_data *center);
-	
 	int pos;
 	obj_data *obj;
 	struct instance_data *inst = NULL;
@@ -2064,7 +2025,7 @@ void cleanup_all_coins(void) {
 * Removes zero-entries and reduces extra coins to the OTHER category.
 */
 void cleanup_coins(char_data *ch) {
-	struct coin_data *iter, *least, *next_iter, *temp;
+	struct coin_data *iter, *least, *next_iter;
 	int count, add_other, least_amount;
 	
 	if (IS_NPC(ch)) {
@@ -2083,13 +2044,13 @@ void cleanup_coins(char_data *ch) {
 		
 			if (iter->amount == 0) {
 				// delete zeroes
-				REMOVE_FROM_LIST(iter, GET_PLAYER_COINS(ch), next);
+				LL_DELETE(GET_PLAYER_COINS(ch), iter);
 				free(iter);
 			}
 			else if (iter->empire_id != OTHER_COIN && real_empire(iter->empire_id) == NULL) {
 				// no more empire
 				add_other += iter->amount;
-				REMOVE_FROM_LIST(iter, GET_PLAYER_COINS(ch), next);
+				LL_DELETE(GET_PLAYER_COINS(ch), iter);
 				free(iter);
 			}
 			else {
@@ -2106,7 +2067,7 @@ void cleanup_coins(char_data *ch) {
 		// remove one -- keep it simple
 		if (count > MAX_COIN_TYPES && least) {
 			add_other += least->amount;
-			REMOVE_FROM_LIST(least, GET_PLAYER_COINS(ch), next);
+			LL_DELETE(GET_PLAYER_COINS(ch), least);
 			free(least);
 		}
 	} while (count > MAX_COIN_TYPES && MAX_COIN_TYPES > 1);
@@ -2448,8 +2409,7 @@ int increase_coins(char_data *ch, empire_data *emp, int amount) {
 		CREATE(coin, struct coin_data, 1);
 		coin->amount = 0;
 		coin->empire_id = !emp ? OTHER_COIN : EMPIRE_VNUM(emp);
-		coin->next = GET_PLAYER_COINS(ch);
-		GET_PLAYER_COINS(ch) = coin;
+		LL_PREPEND(GET_PLAYER_COINS(ch), coin);
 	}
 
 	// now, if we have a coin object, add the money
@@ -2623,8 +2583,7 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 		CREATE(cool, struct cooldown_data, 1);
 		cool->type = type;
 		cool->expire_time = time(0) + seconds_duration;
-		cool->next = ch->cooldowns;
-		ch->cooldowns = cool;
+		LL_PREPEND(ch->cooldowns, cool);
 	}
 }
 
@@ -2658,9 +2617,7 @@ int get_cooldown_time(char_data *ch, any_vnum type) {
 * @param struct cooldown_data *cool The cooldown to remove.
 */
 void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
-	struct cooldown_data *temp;
-	
-	REMOVE_FROM_LIST(cool, ch->cooldowns, next);
+	LL_DELETE(ch->cooldowns, cool);
 	free(cool);
 }
 
@@ -2755,8 +2712,6 @@ int get_currency(char_data *ch, any_vnum vnum) {
 * @param room_data *room The room to abandon.
 */
 void abandon_room(room_data *room) {
-	void clear_private_owner(int id);
-	
 	room_data *iter, *next_iter, *home = HOME_ROOM(room);
 	
 	if (ROOM_PRIVATE_OWNER(room) != NOBODY) {
@@ -2806,8 +2761,7 @@ struct empire_political_data *create_relation(empire_data *a, empire_data *b) {
 	CREATE(pol, struct empire_political_data, 1);
 	pol->id = EMPIRE_VNUM(b);
 	pol->start_time = time(0);
-	pol->next = EMPIRE_DIPLOMACY(a);
-	EMPIRE_DIPLOMACY(a) = pol;
+	LL_PREPEND(EMPIRE_DIPLOMACY(a), pol);
 	
 	EMPIRE_NEEDS_SAVE(a) = TRUE;
 	return pol;
@@ -2931,11 +2885,6 @@ int increase_empire_coins(empire_data *emp_gaining, empire_data *coin_empire, do
 * @param room_data *room The room to abandon.
 */
 void perform_abandon_room(room_data *room) {
-	void check_tavern_setup(room_data *room);
-	void deactivate_workforce_room(empire_data *emp, room_data *room);
-	void delete_territory_entry(empire_data *emp, struct empire_territory_data *ter, bool make_npcs_homeless);
-	void schedule_check_unload(room_data *room, bool offset);
-	
 	empire_data *emp = ROOM_OWNER(room);
 	struct empire_territory_data *ter;
 	vehicle_data *veh;
@@ -3042,8 +2991,6 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 * @param empire_data *emp The empire to claim for.
 */
 void perform_claim_room(room_data *room, empire_data *emp) {
-	extern struct empire_territory_data *create_territory_entry(empire_data *emp, room_data *room);
-	
 	struct empire_territory_data *ter;
 	vehicle_data *veh;
 	int ter_type;
@@ -3615,8 +3562,6 @@ bool empire_has_needs_status(empire_data *emp, int island, int type, bitvector_t
 * @return struct empire_city_data* Returns the closest city that loc is inside, or NULL if none
 */
 struct empire_city_data *find_city(empire_data *emp, room_data *loc) {
-	extern struct city_metadata_type city_type[];
-
 	struct empire_city_data *city, *found = NULL;
 	int dist, min = -1;
 
@@ -3792,8 +3737,7 @@ void add_follower(char_data *ch, char_data *leader, bool msg) {
 	CREATE(k, struct follow_type, 1);
 
 	k->follower = ch;
-	k->next = leader->followers;
-	leader->followers = k;
+	LL_PREPEND(leader->followers, k);
 
 	if (msg) {
 		act("You now follow $N.", FALSE, ch, 0, leader, TO_CHAR);
@@ -3832,7 +3776,7 @@ void die_follower(char_data *ch) {
 * @param char_data *ch The character who will stop following
 */
 void stop_follower(char_data *ch) {
-	struct follow_type *j, *k;
+	struct follow_type *fol, *next_fol;
 
 	if (ch->master == NULL)
 		return;
@@ -3845,18 +3789,13 @@ void stop_follower(char_data *ch) {
 			act("$n stops following you.", TRUE, ch, 0, ch->master, TO_VICT);
 		}
 	}
-
-	if (ch->master->followers->follower == ch) {	/* Head of follower-list? */
-		k = ch->master->followers;
-		ch->master->followers = k->next;
-		free(k);
-	}
-	else {			/* locate follower who is not head of list */
-		for (k = ch->master->followers; k->next->follower != ch; k = k->next);
-
-		j = k->next;
-		k->next = j->next;
-		free(j);
+	
+	// delete from list
+	LL_FOREACH_SAFE(ch->master->followers, fol, next_fol) {
+		if (fol->follower == ch) {
+			LL_DELETE(ch->master->followers, fol);
+			free(fol);
+		}
 	}
 
 	ch->master = NULL;
@@ -3887,8 +3826,6 @@ void stop_follower(char_data *ch) {
 * @return bool TRUE if any globals ran; FALSE if not.
 */
 bool run_globals(int glb_type, GLB_FUNCTION(*func), bool allow_many, bitvector_t type_flags, char_data *ch, adv_data *adv, int level, GLB_VALIDATOR(*validator), void *other_data) {
-	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
-	
 	struct global_data *glb, *next_glb, *choose_last;
 	bool done_cumulative = FALSE, found = FALSE;
 	int cumulative_prc;
@@ -4012,22 +3949,10 @@ int count_group_members(struct group_data *group) {
 * @return struct group_data* The group.
 */
 struct group_data *create_group(char_data *leader) {
-	struct group_data *new_group, *tail;
+	struct group_data *new_group;
 
 	CREATE(new_group, struct group_data, 1);
-	new_group->next = NULL;
-	
-	// add to end
-	if ((tail = group_list)) {
-		while (tail->next) {
-			tail = tail->next;
-		}
-		tail->next = new_group;
-	}
-	else {
-		group_list = new_group;
-	}
-
+	LL_APPEND(group_list, new_group);
 	join_group(leader, new_group);
 	return new_group;
 }
@@ -4040,7 +3965,6 @@ struct group_data *create_group(char_data *leader) {
 */
 void free_group(struct group_data *group) {
 	struct group_member_data *mem;
-	struct group_data *temp;
 	
 	// short remove-from-group
 	while ((mem = group->members)) {
@@ -4049,7 +3973,7 @@ void free_group(struct group_data *group) {
 		free(mem);
 	}
 
-	REMOVE_FROM_LIST(group, group_list, next);
+	LL_DELETE(group_list, group);
 	free(group);
 }
 
@@ -4085,22 +4009,11 @@ bool in_same_group(char_data *ch, char_data *vict) {
 * @param struct group_data *group The group to add to.
 */
 void join_group(char_data *ch, struct group_data *group) {
-	struct group_member_data *mem, *tail;
+	struct group_member_data *mem;
 	
 	CREATE(mem, struct group_member_data, 1);
 	mem->member = ch;
-	mem->next = NULL;
-	
-	// add to tail
-	if ((tail = group->members)) {
-		while (tail->next) {
-			tail = tail->next;
-		}
-		tail->next = mem;
-	}
-	else {
-		group->members = mem;
-	}
+	LL_APPEND(group->members, mem);
 
 	ch->group = group;  
 	if (!group->leader) {
@@ -4122,7 +4035,7 @@ void join_group(char_data *ch, struct group_data *group) {
 * @param char_data *ch The player to remove.
 */
 void leave_group(char_data *ch) {
-	struct group_member_data *mem, *next_mem, *temp;
+	struct group_member_data *mem, *next_mem;
 	char_data *first_pc = NULL;
 	struct group_data *group;
 
@@ -4135,7 +4048,7 @@ void leave_group(char_data *ch) {
 	for (mem = group->members; mem; mem = next_mem) {
 		next_mem = mem->next;
 		if (mem->member == ch) {
-			REMOVE_FROM_LIST(mem, group->members, next);
+			LL_DELETE(group->members, mem);
 			free(mem);
 		}
 		else if (!IS_NPC(mem->member) && !first_pc) {
@@ -4165,9 +4078,6 @@ void leave_group(char_data *ch) {
 * returns help_index_element* or NULL
 */
 struct help_index_element *find_help_entry(int level, const char *word) {
-	extern struct help_index_element *help_table;
-	extern int top_of_helpt;
-	
 	int chk, bot, top, mid, minlen;
 	
 	if (help_table) {
@@ -4526,8 +4436,6 @@ GLB_FUNCTION(run_global_mob_interactions_func) {
 * @param INTERACTION_FUNC(*func) A callback function to run for the interaction.
 */
 bool run_global_mob_interactions(char_data *ch, char_data *mob, int type, INTERACTION_FUNC(*func)) {
-	extern adv_data *get_adventure_for_vnum(rmt_vnum vnum);
-	
 	struct glb_mob_interact_bean *data;
 	struct instance_data *inst;
 	bool any = FALSE;
@@ -4838,7 +4746,7 @@ void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remo
 * @param ... printf-style args for str.
 */
 void add_lore(char_data *ch, int type, const char *str, ...) {
-	struct lore_data *new, *lore;
+	struct lore_data *new;
 	char text[MAX_STRING_LENGTH];
 	va_list tArgList;
 
@@ -4848,13 +4756,6 @@ void add_lore(char_data *ch, int type, const char *str, ...) {
 	// need the old lore, in case the player is offline
 	check_delayed_load(ch);
 	
-	// find end
-	if ((lore = GET_LORE(ch))) {
-		while (lore->next) {
-			lore = lore->next;
-		}
-	}
-	
 	va_start(tArgList, str);
 	vsprintf(text, str, tArgList);
 	
@@ -4862,15 +4763,7 @@ void add_lore(char_data *ch, int type, const char *str, ...) {
 	new->type = type;
 	new->date = (long) time(0);
 	new->text = str_dup(text);
-	new->next = NULL;
-
-	// append to end
-	if (lore) {
-		lore->next = new;
-	}
-	else {
-		GET_LORE(ch) = new;
-	}
+	LL_APPEND(GET_LORE(ch), new);
 	
 	va_end(tArgList);
 }
@@ -4882,8 +4775,6 @@ void add_lore(char_data *ch, int type, const char *str, ...) {
 * @param char_data *ch The person whose lore to clean.
 */
 void clean_lore(char_data *ch) {
-	extern const int remove_lore_types[];
-
 	struct lore_data *lore, *next_lore;
 	struct time_info_data t;
 	int iter;
@@ -4977,12 +4868,10 @@ void remove_recent_lore(char_data *ch, int type) {
 
 /* Remove specific lore */
 void remove_lore_record(char_data *ch, struct lore_data *lore) {
-	struct lore_data *temp;
-
 	if (!ch || IS_NPC(ch) || !lore)
 		return;
 
-	REMOVE_FROM_LIST(lore, GET_LORE(ch), next);
+	LL_DELETE(GET_LORE(ch), lore);
 	if (lore->text) {
 		free(lore->text);
 	}
@@ -5115,8 +5004,6 @@ void add_minipet(char_data *ch, any_vnum vnum) {
 * @param char_data *ch The player to check.
 */
 void check_minipets_and_companions(char_data *ch) {
-	void remove_minipet(char_data *ch, any_vnum vnum);
-	
 	struct minipet_data *mini, *next_mini;
 	struct companion_data *cd, *next_cd;
 	
@@ -5372,8 +5259,7 @@ static void add_mob_tag(int idnum, struct mob_tag **list) {
 	
 	CREATE(tag, struct mob_tag, 1);
 	tag->idnum = idnum;
-	tag->next = *list;
-	*list = tag;
+	LL_PREPEND(*list, tag);
 }
 
 
@@ -5648,8 +5534,6 @@ void add_to_object_list(obj_data *obj) {
 * @param obj_data *input The item to copy.
 */
 obj_data *copy_warehouse_obj(obj_data *input) {
-	extern struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
-
 	struct trig_var_data *var, *copy;
 	obj_data *obj, *proto;
 	trig_data *trig;
@@ -5734,8 +5618,6 @@ obj_data *copy_warehouse_obj(obj_data *input) {
 * @param obj_data *obj The object to empty.
 */
 void empty_obj_before_extract(obj_data *obj) {
-	bool get_check_money(char_data *ch, obj_data *obj);
-	
 	obj_data *jj, *next_thing;
 	
 	DL_FOREACH_SAFE2(obj->contains, jj, next_thing, next_content) {
@@ -5926,8 +5808,6 @@ obj_data *fresh_copy_obj(obj_data *obj, int scale_level) {
 * @return bool TRUE if the bindings are the same; FALSE if not.
 */
 bool identical_bindings(obj_data *obj_a, obj_data *obj_b) {
-	void free_obj_binding(struct obj_binding **list);
-	
 	struct obj_binding *a_bind, *b_bind, *b_bind_list, *b_bind_next;
 	bool found;
 	
@@ -5970,7 +5850,7 @@ bool identical_bindings(obj_data *obj_a, obj_data *obj_b) {
 * @return bool TRUE if the two items are functionally identical.
 */
 bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
-	struct obj_apply *a_apply, *b_list, *b_apply, *b_apply_next, *temp;
+	struct obj_apply *a_apply, *b_list, *b_apply, *b_apply_next;
 	bool found;
 	int iter;
 	
@@ -6030,7 +5910,7 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 			b_apply_next = b_apply->next;
 			if (a_apply->location == b_apply->location && a_apply->modifier == b_apply->modifier && a_apply->apply_type == b_apply->apply_type) {
 				found = TRUE;
-				REMOVE_FROM_LIST(b_apply, b_list, next);
+				LL_DELETE(b_list, b_apply);
 				free(b_apply);
 				break;	// only need one, plus we freed it
 			}
@@ -6079,8 +5959,7 @@ static void add_obj_binding(int idnum, struct obj_binding **list) {
 	
 	CREATE(bind, struct obj_binding, 1);
 	bind->idnum = idnum;
-	bind->next = *list;
-	*list = bind;
+	LL_PREPEND(*list, bind);
 }
 
 
@@ -6253,7 +6132,7 @@ struct obj_binding *copy_obj_bindings(struct obj_binding *from) {
 * @param char_data *player The player to bind to.
 */
 void reduce_obj_binding(obj_data *obj, char_data *player) {
-	struct obj_binding *bind, *next_bind, *temp;
+	struct obj_binding *bind, *next_bind;
 	
 	if (!obj || !player || IS_NPC(player) || IS_IMMORTAL(player)) {
 		return;
@@ -6262,7 +6141,7 @@ void reduce_obj_binding(obj_data *obj, char_data *player) {
 	for (bind = OBJ_BOUND_TO(obj); bind; bind = next_bind) {
 		next_bind = bind->next;
 		if (bind->idnum != GET_IDNUM(player)) {
-			REMOVE_FROM_LIST(bind, OBJ_BOUND_TO(obj), next);
+			LL_DELETE(OBJ_BOUND_TO(obj), bind);
 			free(bind);
 		}
 	}
@@ -6374,7 +6253,7 @@ void obj_from_char(obj_data *object) {
 	}
 	else {
 		DL_DELETE2(object->carried_by->carrying, object, prev_content, next_content);
-		object->next_content = NULL;
+		object->next_content = object->prev_content = NULL;
 
 		IS_CARRYING_N(object->carried_by) -= obj_carry_size(object);
 
@@ -6416,7 +6295,7 @@ void obj_from_obj(obj_data *obj) {
 		}
 
 		obj->in_obj = NULL;
-		obj->next_content = NULL;
+		obj->next_content = obj->prev_content = NULL;
 	}
 }
 
@@ -6441,7 +6320,7 @@ void obj_from_room(obj_data *object) {
 		
 		DL_DELETE2(ROOM_CONTENTS(IN_ROOM(object)), object, prev_content, next_content);
 		IN_ROOM(object) = NULL;
-		object->next_content = NULL;
+		object->next_content = object->prev_content = NULL;
 	}
 }
 
@@ -6461,7 +6340,7 @@ void obj_from_vehicle(obj_data *object) {
 		VEH_CARRYING_N(object->in_vehicle) -= obj_carry_size(object);
 		DL_DELETE2(VEH_CONTAINS(object->in_vehicle), object, prev_content, next_content);
 		object->in_vehicle = NULL;
-		object->next_content = NULL;
+		object->next_content = object->prev_content = NULL;
 	}
 }
 
@@ -6545,8 +6424,6 @@ void obj_to_char(obj_data *object, char_data *ch) {
 * @param char_data *ch The person you're trying to give it to.
 */
 void obj_to_char_if_okay(obj_data *obj, char_data *ch) {
-	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
-	
 	bool ok = TRUE;
 	
 	if (!bind_ok(obj, ch)) {
@@ -6871,7 +6748,7 @@ obj_data *unequip_char_to_room(char_data *ch, int pos) {
 * @return struct custom_message* The copied list.
 */
 struct custom_message *copy_custom_messages(struct custom_message *from) {
-	struct custom_message *list = NULL, *mes, *iter, *last = NULL;
+	struct custom_message *list = NULL, *mes, *iter;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(mes, struct custom_message, 1);
@@ -6879,13 +6756,7 @@ struct custom_message *copy_custom_messages(struct custom_message *from) {
 		mes->type = iter->type;
 		mes->msg = iter->msg ? str_dup(iter->msg) : NULL;
 		
-		if (last) {
-			last->next = mes;
-		}
-		else {
-			list = mes;
-		}
-		last = mes;
+		LL_APPEND(list, mes);
 	}
 	
 	return list;
@@ -7448,8 +7319,7 @@ struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data)
 	
 	if (!offer) {
 		CREATE(offer, struct offer_data, 1);
-		offer->next = GET_OFFERS(ch);
-		GET_OFFERS(ch) = offer;
+		LL_PREPEND(GET_OFFERS(ch), offer);
 	}
 	
 	offer->from = GET_IDNUM(from);
@@ -7468,7 +7338,7 @@ struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data)
 * @param char_data *ch The player to clean up offers for.
 */
 void clean_offers(char_data *ch) {
-	struct offer_data *offer, *next_offer, *temp;
+	struct offer_data *offer, *next_offer;
 	int max_duration = config_get_int("offer_time");
 	
 	if (!ch || IS_NPC(ch)) {
@@ -7479,7 +7349,7 @@ void clean_offers(char_data *ch) {
 		next_offer = offer->next;
 		
 		if (time(0) - offer->time > max_duration) {
-			REMOVE_FROM_LIST(offer, GET_OFFERS(ch), next);
+			LL_DELETE(GET_OFFERS(ch), offer);
 			free(offer);
 		}
 	}
@@ -7493,7 +7363,7 @@ void clean_offers(char_data *ch) {
 * @param int type Any OFFER_ type.
 */
 void remove_offers_by_type(char_data *ch, int type) {
-	struct offer_data *offer, *next_offer, *temp;
+	struct offer_data *offer, *next_offer;
 	
 	if (!ch || IS_NPC(ch)) {
 		return;
@@ -7503,7 +7373,7 @@ void remove_offers_by_type(char_data *ch, int type) {
 		next_offer = offer->next;
 		
 		if (offer->type == type) {
-			REMOVE_FROM_LIST(offer, GET_OFFERS(ch), next);
+			LL_DELETE(GET_OFFERS(ch), offer);
 			free(offer);
 		}
 	}
@@ -7558,8 +7428,6 @@ void add_player_tech(char_data *ch, any_vnum abil, int tech) {
 * @return bool TRUE if the player has it, FALSE otherwise.
 */
 bool has_player_tech(char_data *ch, int tech) {
-	extern struct int_hash *inherent_ptech_hash;
-	
 	struct player_tech *iter;
 	struct int_hash *find;
 	
@@ -7646,20 +7514,12 @@ bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvi
 * @return struct req_data* The copy of the list.
 */
 struct req_data *copy_requirements(struct req_data *from) {
-	struct req_data *el, *iter, *list = NULL, *end = NULL;
+	struct req_data *el, *iter, *list = NULL;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct req_data, 1);
 		*el = *iter;
-		el->next = NULL;
-		
-		if (end) {
-			end->next = el;
-		}
-		else {
-			list = el;
-		}
-		end = el;
+		LL_APPEND(list, el);
 	}
 	
 	return list;
@@ -7699,8 +7559,6 @@ bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnu
 * @param struct req_data *list The items to lose (other task types are ignored).
 */
 void extract_required_items(char_data *ch, struct req_data *list) {
-	void extract_crop_variety(char_data *ch, int amount);
-	
 	// helper type
 	struct extract_items_data {
 		int group;	// cast from char
@@ -7836,19 +7694,6 @@ void free_requirements(struct req_data *list) {
 * @return bool TRUE if the character meets those requirements, FALSE if not.
 */
 bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance) {
-	extern int count_cities(empire_data *emp);
-	extern int count_crop_variety_in_list(obj_data *list);
-	extern int count_diplomacy(empire_data *emp, bitvector_t dip_flags);
-	extern int count_owned_buildings(empire_data *emp, bld_vnum vnum);
-	extern int count_owned_buildings_by_function(empire_data *emp, bitvector_t flags);
-	extern int count_owned_homes(empire_data *emp);
-	extern int count_owned_sector(empire_data *emp, sector_vnum vnum);
-	extern int count_owned_vehicles(empire_data *emp, any_vnum vnum);
-	extern int count_owned_vehicles_by_flags(empire_data *emp, bitvector_t flags);
-	extern int count_owned_vehicles_by_function(empire_data *emp, bitvector_t funcs);
-	extern struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
-	extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
-	
 	// helper struct
 	struct meets_req_data {
 		int group;	// actually a char, but cast
@@ -8182,11 +8027,6 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 * @return char* The string display.
 */
 char *requirement_string(struct req_data *req, bool show_vnums) {
-	extern const char *action_bits[];
-	extern const char *diplomacy_flags[];
-	extern const char *function_flags[];
-	extern const char *vehicle_flags[];
-	
 	char vnum[256], lbuf[256];
 	static char output[256];
 	vehicle_data *vproto;
@@ -8799,10 +8639,6 @@ void set_extra_data(struct room_extra_data **list, int type, int value) {
 * @return room_data* The matching room, or NULL if none.
 */
 room_data *find_target_room(char_data *ch, char *rawroomstr) {
-	extern vehicle_data *get_vehicle(char *name);
-	extern room_data *obj_room(obj_data *obj);
-	extern room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
-	
 	struct instance_data *inst;
 	room_vnum tmp;
 	room_data *location = NULL;
@@ -9558,9 +9394,6 @@ void read_vault(empire_data *emp) {
 * @return bool TRUE if something was retrieved and there are more left, FALSE in any other case
 */
 bool retrieve_resource(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool stolen) {
-	void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
-	void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
-	
 	obj_data *obj, *proto;
 	bool room = FALSE;
 	int available;
@@ -9663,8 +9496,6 @@ bool stored_item_requires_withdraw(obj_data *obj) {
 * @return bool TRUE if the player can store, FALSE if they're over the limit.
 */
 bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capped) {
-	extern bool override_home_storage_cap;
-	
 	struct empire_unique_storage *eus;
 	int count;
 	
@@ -9772,10 +9603,6 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique
 * @param bool *full A variable to set TRUE if the storage is full and the item can't be stored.
 */
 void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, obj_data *obj, empire_data *save_emp, room_data *room, bool *full) {
-	EVENT_CANCEL_FUNC(cancel_wait_event);
-	extern int get_main_island(empire_data *emp);
-	void remove_trigger_from_global_lists(trig_data *trig, bool random_only);
-	
 	struct empire_unique_storage *eus;
 	bool extract = FALSE;
 	trig_data *trig;
@@ -10059,10 +9886,6 @@ void extract_vehicle(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle to extract and free.
 */
 void extract_vehicle_final(vehicle_data *veh) {
-	void delete_vehicle_interior(vehicle_data *veh);
-	void empty_vehicle(vehicle_data *veh, room_data *to_room);
-	extern char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
-	
 	check_dg_owner_purged_vehicle(veh);
 	
 	// delete interior
@@ -10204,8 +10027,6 @@ void vehicle_from_room(vehicle_data *veh) {
 * @param room_data *room The room to put it in.
 */
 void vehicle_to_room(vehicle_data *veh, room_data *room) {
-	void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);
-	
 	if (!veh || !room) {
 		log("SYSERR: Illegal value(s) passed to vehicle_to_room. (Room %p, vehicle %p)", room, veh);
 		return;
@@ -10495,9 +10316,6 @@ int get_direction_for_char(char_data *ch, int dir) {
 * @return int A real direction (EAST), or NO_DIR if none.
 */
 int parse_direction(char_data *ch, char *dir) {
-	extern const char *alt_dirs[];
-	extern const char *dirs[];
-
 	int d;
 
 	// two sets of dirs to check -- alt_dirs contains short names like "ne"
@@ -10535,4 +10353,3 @@ void expire_trading_post_item(struct trading_post_data *tpd) {
 		SET_BIT(tpd->state, TPD_OBJ_PENDING);
 	}
 }
-

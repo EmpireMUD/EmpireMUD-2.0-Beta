@@ -118,25 +118,60 @@ struct olc_command_data {
 
 
 // olc.c helpers
-extern struct icon_data *copy_icon_set(struct icon_data *input_list);
-extern struct interaction_item *copy_interaction_list(struct interaction_item *input_list);
-extern struct spawn_info *copy_spawn_list(struct spawn_info *input_list);
-extern int find_olc_type(char *name);
-extern bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
-extern double olc_process_double(char_data *ch, char *argument, char *name, char *command, double min, double max, double old_value);
-extern bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
-extern int olc_process_number(char_data *ch, char *argument, char *name, char *command, int min, int max, int old_value);
+bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
+struct bld_relation *copy_bld_relations(struct bld_relation *input_list);
+struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
+struct icon_data *copy_icon_set(struct icon_data *input_list);
+struct interaction_item *copy_interaction_list(struct interaction_item *input_list);
+struct spawn_info *copy_spawn_list(struct spawn_info *input_list);
+void get_icons_display(struct icon_data *list, char *save_buffer);
+void get_interaction_display(struct interaction_item *list, char *save_buffer);
+void get_resource_display(struct resource_data *list, char *save_buffer);
+void get_script_display(struct trig_proto_list *list, char *save_buffer);
+int find_olc_type(char *name);
+void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
+void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
+double olc_process_double(char_data *ch, char *argument, char *name, char *command, double min, double max, double old_value);
+bitvector_t olc_process_flag(char_data *ch, char *argument, char *name, char *command, const char **flag_names, bitvector_t existing_bits);
+int olc_process_number(char_data *ch, char *argument, char *name, char *command, int min, int max, int old_value);
 void olc_process_string(char_data *ch, char *argument, const char *name, char **save_point);
-extern int olc_process_type(char_data *ch, char *argument, char *name, char *command, const char **type_names, int old_value);
+int olc_process_type(char_data *ch, char *argument, char *name, char *command, const char **type_names, int old_value);
 void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_data **list);
 void olc_process_icons(char_data *ch, char *argument, struct icon_data **list);
 void olc_process_interactions(char_data *ch, char *argument, struct interaction_item **list, int attach_type);
+void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list);
 void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **list, int trigger_attach);
+any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *prev_arg);
+bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
 void smart_copy_interactions(struct interaction_item **addto, struct interaction_item *input);
 void smart_copy_scripts(struct trig_proto_list **addto, struct trig_proto_list *input);
 void smart_copy_spawns(struct spawn_info **addto, struct spawn_info *input);
 void smart_copy_template_spawns(struct adventure_spawn **addto, struct adventure_spawn *input);
+
+// olc save functions
+void save_olc_building(descriptor_data *desc);
+void save_olc_craft(descriptor_data *desc);
+void save_olc_vehicle(descriptor_data *desc);
+
+// olc setup functions
+bld_data *setup_olc_building(bld_data *input);
+craft_data *setup_olc_craft(craft_data *input);
+vehicle_data *setup_olc_vehicle(vehicle_data *input);
+
+// olc display parts
+void get_adventure_linking_display(struct adventure_link_rule *list, char *save_buffer);
+void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
+void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
+void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
+char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
+void get_evolution_display(struct evolution_data *list, char *save_buffer);
+void get_exit_template_display(struct exit_template *list, char *save_buffer);
+void get_progress_perks_display(struct progress_perk *list, char *save_buffer, bool show_vnums);
+void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer);
+
+// olc helpers
+const char *get_interaction_target(int type, any_vnum vnum);
 
 // helpers from other systems
 bool delete_event_reward_from_list(struct event_reward **list, int type, any_vnum vnum);

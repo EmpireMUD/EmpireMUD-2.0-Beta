@@ -23,6 +23,8 @@
 #include "skills.h"
 #include "dg_scripts.h"
 #include "vnums.h"
+#include "constants.h"
+#include "boards.h"
 
 /**
 * Contents:
@@ -35,35 +37,10 @@
 *   Commands
 */
 
-// extern variables
-extern struct city_metadata_type city_type[];
-extern const char *class_role[];
-extern const char *class_role_color[];
-extern const char *climate_flags[];
-extern const bitvector_t climate_flags_order[];
-extern const char *dirs[];
-extern struct gen_craft_data_t gen_craft_data[];
-extern struct help_index_element *help_table;
-extern const char *item_types[];
-extern int top_of_helpt;
-extern const char *month_name[];
-extern const char *position_types[];
-extern struct faction_reputation_type reputation_levels[];
-extern const char *wear_bits[];
-extern const struct wear_data_type wear_data[NUM_WEARS];
-
-// external functions
-void clear_recent_moves(char_data *ch);
-extern char *get_room_name(room_data *room, bool color);
-extern char *list_harnessed_mobs(vehicle_data *veh);
-void look_at_vehicle(vehicle_data *veh, char_data *ch);
-
 // local protos
 ACMD(do_affects);
-void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show);
 void list_one_char(char_data *i, char_data *ch, int num);
 void look_at_char(char_data *i, char_data *ch, bool show_eq);
-char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
 void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire_storage_data *store, bool show_zero);
 
 
@@ -76,9 +53,6 @@ void show_one_stored_item_to_char(char_data *ch, empire_data *emp, struct empire
 * @param char_data *ch The person to show a tip to.
 */
 void display_tip_to_char(char_data *ch) {
-	extern char **tips_of_the_day;
-	extern int tips_of_the_day_size;
-	
 	int pos;
 
 	if (IS_NPC(ch)) {
@@ -466,7 +440,6 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 * @param char *arg The typed argument (usually obj name).
 */
 void look_in_obj(char_data *ch, char *arg) {
-	extern const char *fullness[];
 	vehicle_data *veh = NULL;
 	obj_data *obj = NULL;
 	char_data *dummy = NULL;
@@ -545,8 +518,6 @@ void look_in_obj(char_data *ch, char *arg) {
 * @param char_data *ch Person to show the output to.
 */
 void diag_char_to_char(char_data *i, char_data *ch) {
-	extern const char *health_levels[];
-	
 	if (!ch || !i || IS_DEAD(i) || EXTRACTED(i) || !ch->desc) {
 		return;
 	}
@@ -563,9 +534,6 @@ void diag_char_to_char(char_data *i, char_data *ch) {
 * @param char_data *to The person to show them to.
 */
 void display_attributes(char_data *ch, char_data *to) {
-	extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
-	extern int attribute_display_order[NUM_ATTRIBUTES];
-	
 	char buf[MAX_STRING_LENGTH];
 	int iter, pos;
 
@@ -594,22 +562,6 @@ void display_attributes(char_data *ch, char_data *to) {
 * @param char_data *to The person to show it to.
 */
 void display_score_to_char(char_data *ch, char_data *to) {
-	void show_character_affects(char_data *ch, char_data *to);
-	extern double get_combat_speed(char_data *ch, int pos);
-	extern int get_block_rating(char_data *ch, bool can_gain_skill);
-	extern int get_crafting_level(char_data *ch);
-	extern int total_bonus_healing(char_data *ch);
-	extern int get_dodge_modifier(char_data *ch, char_data *attacker, bool can_gain_skill);
-	extern int get_to_hit(char_data *ch, char_data *victim, bool off_hand, bool can_gain_skill);
-	extern int health_gain(char_data *ch, bool info_only);
-	extern int move_gain(char_data *ch, bool info_only);
-	extern int mana_gain(char_data *ch, bool info_only);
-	extern int get_ability_points_available_for_char(char_data *ch, any_vnum skill);
-	extern const char *bonus_bit_descriptions[];
-	extern const struct material_data materials[NUM_MATERIALS];
-	extern const int base_hit_chance;
-	extern const double hit_per_dex;
-
 	char lbuf[MAX_STRING_LENGTH], lbuf2[MAX_STRING_LENGTH], lbuf3[MAX_STRING_LENGTH];
 	struct player_skill_data *skdata, *next_skill;
 	int i, j, count, pts, cols, val;
@@ -875,11 +827,6 @@ void list_lore_to_char(char_data *ch, char_data *to) {
 * @param int num If mob-stacking is on, number of copies of this i to show.
 */
 void list_one_char(char_data *i, char_data *ch, int num) {
-	extern bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
-	extern bool can_turn_quest_in_to_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
-	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
-	extern struct action_data_struct action_data[];
-	
 	char buf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH], part[256];
 	struct custom_message *ocm;
 	
@@ -1098,9 +1045,6 @@ void list_one_char(char_data *i, char_data *ch, int num) {
 * @param char_data *ch The person to send the output to.
 */
 void list_one_vehicle_to_char(vehicle_data *veh, char_data *ch) {
-	extern bool can_get_quest_from_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
-	extern bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest_temp_list **build_list);
-	
 	char buf[MAX_STRING_LENGTH], part[256];
 	size_t size = 0, pos;
 	
@@ -1205,8 +1149,6 @@ void list_vehicles_to_char(vehicle_data *list, char_data *ch) {
 * @param bool show_eq If TRUE, can also show inventory (if skilled).
 */
 void look_at_char(char_data *i, char_data *ch, bool show_eq) {
-	extern struct character_size_data size_data[];
-	
 	char buf[MAX_STRING_LENGTH];
 	bool disguise;
 	int j, found;
@@ -1322,10 +1264,6 @@ void look_at_char(char_data *i, char_data *ch, bool show_eq) {
 * @param char_data *to Who to send to
 */
 void show_character_affects(char_data *ch, char_data *to) {
-	extern const char *apply_types[];
-	extern const char *affected_bits[];
-	extern const char *damage_types[];
-
 	struct over_time_effect_type *dot;
 	struct affected_type *aff;
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], lbuf[MAX_INPUT_LENGTH];
@@ -1417,8 +1355,6 @@ char *obj_color_by_quality(obj_data *obj, char_data *ch) {
 * @param int mode OBJ_DESC_SHORT, OBJ_DESC_LONG
 */
 char *get_obj_desc(obj_data *obj, char_data *ch, int mode) {
-	extern const struct material_data materials[NUM_MATERIALS];
-
 	static char output[MAX_STRING_LENGTH];
 	char sdesc[MAX_STRING_LENGTH];
 	bool color = FALSE;
@@ -1553,14 +1489,6 @@ void list_obj_to_char(obj_data *list, char_data *ch, int mode, int show) {
  * This function screams bitvector... -gg 6/45/98
  */
 char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode) {
-	extern int Board_show_board(int board_type, char_data *ch, char *arg, obj_data *board);
-	extern int board_loaded;
-	extern bool can_get_quest_from_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
-	extern bool can_turn_quest_in_to_obj(char_data *ch, obj_data *obj, struct quest_temp_list **build_list);
-	void init_boards(void);
-	extern int find_board(char_data *ch);
-	extern const char *extra_bits_inv_flags[];
-	
 	static char buf[MAX_STRING_LENGTH];
 	char tags[MAX_STRING_LENGTH], flags[256];
 	bitvector_t show_flags;
@@ -2026,8 +1954,6 @@ char *one_who_line(char_data *ch, bool shortlist, bool screenreader) {
 * @return char* The who output for imms.
 */
 char *partial_who(char_data *ch, char *name_search, int low, int high, empire_data *empire_who, bool rp, bool shortlist, int type) {
-	extern int max_players_this_uptime;
-	
 	static char who_output[MAX_STRING_LENGTH];
 	struct who_entry *list = NULL, *entry, *next_entry;
 	char whobuf[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH], online[MAX_STRING_LENGTH];
@@ -2094,8 +2020,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		entry->computed_level = GET_COMPUTED_LEVEL(tch);
 		entry->role = GET_CLASS_ROLE(tch);
 		entry->string = str_dup(one_who_line(tch, shortlist, PRF_FLAGGED(ch, PRF_SCREEN_READER)));
-		entry->next = list;
-		list = entry;
+		LL_PREPEND(list, entry);
 	}
 	
 	sort_who_entries(&list, who_sorters[type]);
@@ -2161,8 +2086,6 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 //// COMMANDS ////////////////////////////////////////////////////////////////
 
 ACMD(do_adventure) {
-	void adventure_summon(char_data *ch, char *argument);
-
 	char arg[MAX_STRING_LENGTH];
 	struct instance_data *inst;
 	
@@ -2491,8 +2414,6 @@ ACMD(do_diagnose) {
 
 
 ACMD(do_display) {
-	extern char *replace_prompt_codes(char_data *ch, char *str);
-	
 	skip_spaces(&argument);
 	
 	if (!*argument) {
@@ -2534,8 +2455,6 @@ ACMD(do_examine) {
 
 
 ACMD(do_factions) {
-	extern const char *relationship_descs[];
-	
 	struct player_faction_data *pfd, *next_pfd;
 	struct faction_relation *rel, *next_rel;
 	char buf[MAX_STRING_LENGTH];
@@ -2662,7 +2581,6 @@ ACMD(do_gen_ps) {
 			break;
 		}
 		case SCMD_VERSION: {
-			extern const char *version;
 			msg_to_char(ch, "%s\r\n", version);
 			msg_to_char(ch, "%s\r\n", DG_SCRIPT_VERSION);
 			break;
@@ -2676,8 +2594,7 @@ ACMD(do_gen_ps) {
 
 
 ACMD(do_help) {
-	extern struct help_index_element *find_help_entry(int level, const char *word);
-	extern char *help;
+	extern char *help_screen;
 	struct help_index_element *found;
 
 	if (!ch->desc)
@@ -2686,7 +2603,7 @@ ACMD(do_help) {
 	skip_spaces(&argument);
 
 	if (!*argument) {
-		page_string(ch->desc, help, 0);
+		page_string(ch->desc, help_screen, 0);
 		return;
 	}
 	if (help_table) {
@@ -2956,8 +2873,6 @@ ACMD(do_inventory) {
 
 
 ACMD(do_look) {
-	void look_in_direction(char_data *ch, int dir);
-	
 	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	room_data *map;
 	int look_type;
@@ -3190,8 +3105,6 @@ ACMD(do_mark) {
 
 
 ACMD(do_messages) {
-	extern struct automessage *automessages;
-	
 	struct automessage *msg, *next_msg;
 	char buf[MAX_STRING_LENGTH * 2];
 	struct player_automessage *pam;
@@ -3201,7 +3114,7 @@ ACMD(do_messages) {
 	
 	size = snprintf(buf, sizeof(buf), "Recent messages:\r\n");
 	
-	HASH_ITER(hh, automessages, msg, next_msg) {
+	HASH_ITER(hh, automessages_table, msg, next_msg) {
 		if (!msg->msg) {
 			continue;	// somehow
 		}
@@ -3245,7 +3158,6 @@ ACMD(do_messages) {
 
 
 ACMD(do_mudstats) {
-	void mudstats_empires(char_data *ch, char *argument);
 	int iter, pos;
 	
 	const struct {
@@ -3290,12 +3202,7 @@ ACMD(do_mudstats) {
 
 
 ACMD(do_nearby) {
-	extern const char *alt_dirs[];
-	extern int highest_start_loc_index;
-	extern int *start_locs;
-	
 	int max_dist = room_has_function_and_city_ok(GET_LOYALTY(ch), IN_ROOM(ch), FNC_LARGER_NEARBY) ? 150 : 50;
-	
 	bool cities = TRUE, adventures = TRUE, starts = TRUE, check_arg = FALSE;
 	char buf[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
 	struct instance_data *inst;
@@ -3537,11 +3444,6 @@ ACMD(do_no_cmd) {
 
 
 ACMD(do_passives) {
-	void check_delayed_load(char_data *ch);
-	void refresh_passive_buffs(char_data *ch);
-	extern const char *affected_bits[];
-	extern const char *apply_types[];
-	
 	char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 	bool found = FALSE, is_file = FALSE;
 	struct affected_type *aff;
@@ -3699,9 +3601,6 @@ ACMD(do_survey) {
 
 
 ACMD(do_time) {
-	extern const char *seasons[];
-	extern const char *weekdays[];
-	
 	const char *suf;
 	int weekday, day;
 	
@@ -3766,14 +3665,11 @@ ACMD(do_time) {
 
 
 ACMD(do_tip) {
-	void display_tip_to_char(char_data *ch);
 	display_tip_to_char(ch);
 }
 
 
 ACMD(do_weather) {
-	extern const char *seasons[];
-	void list_moons_to_char(char_data *ch);
 	const char *sky_look[] = {
 		"cloudless",
 		"cloudy",
@@ -3919,10 +3815,6 @@ ACMD(do_whoami) {
 
 
 ACMD(do_whois) {
-	void check_delayed_load(char_data *ch);
-	extern const char *genders[];
-	extern const char *level_names[][2];
-	
 	char part[MAX_STRING_LENGTH];
 	char_data *victim = NULL;
 	bool file = FALSE;

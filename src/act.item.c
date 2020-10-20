@@ -25,6 +25,9 @@
 #include "vnums.h"
 #include "dg_scripts.h"
 #include "dg_event.h"
+#include "constants.h"
+#include "boards.h"
+#include "olc.h"
 
 /**
 * Contents:
@@ -41,45 +44,19 @@
 *   Commands
 */
 
-// extern variables
-extern const char *extra_bits[];
-extern const char *mob_move_types[];
-extern struct faction_reputation_type reputation_levels[];
-extern const struct wear_data_type wear_data[NUM_WEARS];
-
 // extern functions
 ACMD(do_home);
-extern int add_eq_set_to_char(char_data *ch, int set_id, char *name);
-void add_obj_to_eq_set(obj_data *obj, int set_id, int pos);
-void adjust_vehicle_tech(vehicle_data *veh, bool add);
-extern struct shop_temp_list *build_available_shop_list(char_data *ch);
-extern bool can_steal(char_data *ch, empire_data *emp);
-extern bool can_wear_item(char_data *ch, obj_data *item, bool send_messages);
-INTERACTION_FUNC(consumes_or_decays_interact);
-void expire_trading_post_item(struct trading_post_data *tpd);
-void free_player_eq_set(struct player_eq_set *eq_set);
-void free_shop_temp_list(struct shop_temp_list *list);
-extern struct player_eq_set *get_eq_set_by_id(char_data *ch, int id);
-extern struct player_eq_set *get_eq_set_by_name(char_data *ch, char *name);
-extern struct eq_set_obj *get_obj_eq_set_by_id(obj_data *obj, int id);
-extern char *get_room_name(room_data *room, bool color);
-extern struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
-void read_vault(empire_data *emp);
-void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
-void remove_obj_from_eq_set(obj_data *obj, int set_id);
-void save_trading_post();
-void trigger_distrust_from_stealth(char_data *ch, empire_data *emp);
+void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, int howmany);
+void do_put_obj_in_vehicle(char_data *ch, vehicle_data *veh, int dotmode, char *arg, int howmany);
+void use_ammo(char_data *ch, obj_data *obj);
+void use_poison(char_data *ch, obj_data *obj);
 
 // local protos
 ACMD(do_unshare);
 ACMD(do_warehouse);
-room_data *find_docks(empire_data *emp, int island_id);
 int get_wear_by_item_wear(bitvector_t item_wear);
 void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, room_data *to_room);
 obj_data *perform_eq_change_unequip(char_data *ch, int pos);
-void sail_shipment(empire_data *emp, vehicle_data *boat);
-void scale_item_to_level(obj_data *obj, int level);
-bool ship_is_empty(vehicle_data *ship);
 static void wear_message(char_data *ch, obj_data *obj, int where);
 
 // local stuff
@@ -87,6 +64,7 @@ static void wear_message(char_data *ch, obj_data *obj, int where);
 #define drink_ROOM  1
 
 // ONLY flags to show on identify / warehouse inv
+// TODO consider moving this to structs.h near the flag list
 bitvector_t show_obj_flags = OBJ_LIGHT | OBJ_SUPERIOR | OBJ_ENCHANTED | OBJ_JUNK | OBJ_TWO_HANDED | OBJ_BIND_ON_EQUIP | OBJ_BIND_ON_PICKUP | OBJ_HARD_DROP | OBJ_GROUP_DROP | OBJ_GENERIC_DROP | OBJ_UNIQUE;
 
 
@@ -198,8 +176,6 @@ int count_objs_in_room(room_data *room) {
 * @return int A WEAR_ pos, or NO_WEAR.
 */
 int find_eq_pos(char_data *ch, obj_data *obj, char *arg) {
-	extern const char *wear_keywords[];
-
 	int where = NO_WEAR;
 
 	if (!arg || !*arg) {
@@ -311,7 +287,6 @@ bool get_check_money(char_data *ch, obj_data *obj) {
 * @return int A WEAR_ position that matches, or NOWEHRE.
 */
 int get_wear_by_item_wear(bitvector_t item_wear) {
-	extern int item_wear_to_wear[];
 	int pos;
 	
 	for (pos = 0; item_wear; ++pos, item_wear >>= 1) {
@@ -438,24 +413,6 @@ bool run_identifies_to(char_data *ch, obj_data **obj, bool *extract) {
 * @param char_data *ch The person to show the data to.
 */
 void identify_obj_to_char(obj_data *obj, char_data *ch) {
-	void format_text(char **ptr_string, int mode, descriptor_data *d, unsigned int maxlen);
-	void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
-	
-	extern double get_base_dps(obj_data *weapon);
-	extern char *get_vehicle_short_desc(vehicle_data *veh, char_data *to);
-	extern double get_weapon_speed(obj_data *weapon);
-	extern const char *apply_type_names[];
-	extern const char *climate_flags[];
-	extern const bitvector_t climate_flags_order[];
-	extern const char *craft_types[];
-	extern const char *affected_bits[];
-	extern const char *apply_types[];
-	extern const char *armor_types[NUM_ARMOR_TYPES+1];
-	extern struct gen_craft_data_t gen_craft_data[];
-	extern const char *size_types[];
-	extern const char *tool_flags[];
-	extern const char *wear_bits[];
-
 	struct string_hash *str_iter, *next_str, *str_hash = NULL;
 	vehicle_data *veh, *veh_iter, *next_veh;
 	bld_data *bld, *bld_iter, *next_bld;
@@ -643,8 +600,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 	// ITEM_x: identify obj
 	switch (GET_OBJ_TYPE(obj)) {
 		case ITEM_PAINT: {
-			extern const char *paint_colors[];
-			extern const char *paint_names[];
 			sprinttype(GET_PAINT_COLOR(obj), paint_names, lbuf, sizeof(lbuf), "UNDEFINED");
 			sprinttype(GET_PAINT_COLOR(obj), paint_colors, part, sizeof(part), "&0");
 			msg_to_char(ch, "Paint color: %s%s\t0\r\n", part, lbuf);
@@ -885,10 +840,6 @@ void identify_obj_to_char(obj_data *obj, char_data *ch) {
 * @param char_data *ch The person to show the data to.
 */
 void identify_vehicle_to_char(vehicle_data *veh, char_data *ch) {
-	extern const char *identify_vehicle_flags[];
-	extern const char *paint_colors[];
-	extern const char *paint_names[];
-	
 	vehicle_data *proto = vehicle_proto(VEH_VNUM(veh));
 	char buf[MAX_STRING_LENGTH], buf1[256];
 	player_index_data *index;
@@ -1144,10 +1095,6 @@ obj_data *perform_remove(char_data *ch, int pos) {
 
 
 static void perform_wear(char_data *ch, obj_data *obj, int where) {
-	extern const int apply_attribute[];
-	extern struct attribute_data_type attributes[NUM_ATTRIBUTES];
-	extern const int primary_attributes[];
-	
 	char buf[MAX_STRING_LENGTH];
 	struct obj_apply *apply;
 	int iter, type, val;
@@ -1445,9 +1392,6 @@ static void wear_message(char_data *ch, obj_data *obj, int where) {
 * @param obj_data *obj The MINIPET item.
 */
 void use_minipet_obj(char_data *ch, obj_data *obj) {
-	void add_minipet(char_data *ch, any_vnum vnum);
-	extern bool has_minipet(char_data *ch, any_vnum vnum);
-	
 	char_data *mob;
 	
 	if (!ch || IS_NPC(ch)) {
@@ -1674,8 +1618,6 @@ static void perform_drop_coins(char_data *ch, empire_data *type, int amount, byt
 * @param bool show_all If TRUE, shows empty slots.
 */
 void do_eq_show_current(char_data *ch, bool show_all) {
-	char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
-	
 	bool found = FALSE;
 	int pos;
 	
@@ -1853,8 +1795,6 @@ void do_eq_list(char_data *ch, char *argument) {
 * @param char *argument The name to set.
 */
 void do_eq_set(char_data *ch, char *argument) {
-	extern int count_eq_sets(char_data *ch);
-	
 	const char *invalids[] = { "all", "delete", "list", "save", "set", "\n" };
 	struct player_eq_set *eq_set;
 	int iter, set_id = NOTHING;
@@ -2427,8 +2367,6 @@ static void drink_message(char_data *ch, obj_data *obj, byte type, int subcmd, i
 
 
 void fill_from_room(char_data *ch, obj_data *obj) {
-	extern const struct tavern_data_type tavern_data[];
-	
 	int amount = GET_DRINK_CONTAINER_CAPACITY(obj) - GET_DRINK_CONTAINER_CONTENTS(obj);
 	int liquid = LIQ_WATER;
 	int timer = UNLIMITED;
@@ -2499,25 +2437,17 @@ void fill_from_room(char_data *ch, obj_data *obj) {
 * @param int level The level to scale it to (may be constrained by the room).
 */
 void scale_item_to_level(obj_data *obj, int level) {
-	extern const double apply_values[];
-	void get_scale_constraints(room_data *room, char_data *mob, int *scale_level, int *min, int *max);
-	extern double get_weapon_speed(obj_data *weapon);
-	extern const bool apply_never_scales[];
-	extern const int wear_significance[];
-	
 	int total_share, bonus, iter, amt;
 	int room_lev = 0, room_min = 0, room_max = 0, sig;
 	double share, this_share, points_to_give, per_point, base_mod = 1.0;
 	room_data *room = NULL;
 	obj_data *top_obj, *proto;
-	struct obj_apply *apply, *next_apply, *temp;
+	struct obj_apply *apply, *next_apply;
 	bool scale_negative = FALSE;
 	bitvector_t bits;
 	
 	// configure this here
 	double scale_points_at_100 = config_get_double("scale_points_at_100");
-	extern const double obj_flag_scaling_bonus[];	// see constants.c
-	extern const double armor_scale_bonus[NUM_ARMOR_TYPES];	// see constants.c
 	
 	// WEAR_POS_x: modifier based on best wear type
 	const double wear_pos_modifier[] = { 0.75, 1.0 };
@@ -2789,7 +2719,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 		
 		// remove zero-applies
 		if (apply->modifier == 0) {
-			REMOVE_FROM_LIST(apply, GET_OBJ_APPLIES(obj), next);
+			LL_DELETE(GET_OBJ_APPLIES(obj), apply);
 			free(apply);
 		}
 	}
@@ -3166,8 +3096,6 @@ vehicle_data *find_ship_by_shipping_id(empire_data *emp, int shipping_id) {
 * @return room_data* The ship holding pen.
 */
 room_data *get_ship_pen(void) {
-	extern room_data *create_room(room_data *home);
-
 	room_data *room, *iter;
 	
 	DL_FOREACH2(interior_room_list, iter, next_interior) {
@@ -3239,8 +3167,7 @@ void load_shipment(struct empire_data *emp, struct shipping_data *shipd, vehicle
 		newd->shipping_id = -1;
 		
 		// put right after shipd in the list
-		newd->next = shipd->next;
-		shipd->next = newd;
+		DL_APPEND_ELEM(EMPIRE_SHIPPING_LIST(emp), shipd, newd);
 		
 		// remove overage
 		shipd->amount = size_avail - capacity;
@@ -3515,7 +3442,7 @@ void trade_check(char_data *ch, char *argument) {
 		size = snprintf(output, sizeof(output), "Your items for trade:\r\n");
 	}
 	
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		// disqualifiers -- this should be the same as trade_cancel because players use this function to find numbers for that one
 		if (tpd->player != GET_IDNUM(ch)) {
 			continue;
@@ -3596,7 +3523,7 @@ void trade_list(char_data *ch, char *argument) {
 		size = snprintf(output, sizeof(output), "Items for trade:\r\n");
 	}
 	
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		// disqualifiers -- should match trade_list because players use that to find numbers
 		if (!IS_SET(tpd->state, TPD_FOR_SALE) || !tpd->obj) {
 			continue;
@@ -3657,7 +3584,7 @@ void trade_list(char_data *ch, char *argument) {
 * @param char *argument Any text after the subcommand.
 */
 void trade_buy(char_data *ch, char *argument) {
-	struct trading_post_data *tpd;
+	struct trading_post_data *tpd, *next_tpd;
 	empire_data *coin_emp = NULL;
 	char buf[MAX_STRING_LENGTH], *ptr1, *ptr2;
 	char_data *seller;
@@ -3678,8 +3605,8 @@ void trade_buy(char_data *ch, char *argument) {
 		}
 		skip_spaces(&argument);
 	}
-		
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
 		// disqualifiers -- should match trade_list because players use that to find numbers
 		if (!IS_SET(tpd->state, TPD_FOR_SALE) || !tpd->obj) {
 			continue;
@@ -3745,7 +3672,7 @@ void trade_buy(char_data *ch, char *argument) {
 * @param char *argument Any text after the subcommand.
 */
 void trade_cancel(char_data *ch, char *argument) {
-	struct trading_post_data *tpd;
+	struct trading_post_data *tpd, *next_tpd;
 	char *ptr1, *ptr2;
 	int num = 1;
 	
@@ -3770,7 +3697,7 @@ void trade_cancel(char_data *ch, char *argument) {
 		return;
 	}
 	
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
 		// disqualifiers -- this should be the same as trade_check since the player uses it to find numbers
 		if (tpd->player != GET_IDNUM(ch)) {
 			continue;
@@ -3822,13 +3749,13 @@ void trade_cancel(char_data *ch, char *argument) {
 * @param char *argument Any text after the subcommand.
 */
 void trade_collect(char_data *ch, char *argument) {	
-	struct trading_post_data *tpd;
+	struct trading_post_data *tpd, *next_tpd;
 	int to_collect = 0;
 	bool full = FALSE, any = FALSE;
 	
 	double trading_post_fee = config_get_double("trading_post_fee");
 	
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
 		// disqualifiers
 		if (tpd->player != GET_IDNUM(ch)) {
 			continue;
@@ -3910,8 +3837,8 @@ void trade_identify(char_data *ch, char *argument) {
 		}
 		skip_spaces(&argument);
 	}
-		
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	
+	DL_FOREACH(trading_list, tpd) {
 		// disqualifiers -- should match trade_list because players use that to find numbers
 		if (!IS_SET(tpd->state, TPD_FOR_SALE) || !tpd->obj) {
 			continue;
@@ -3943,7 +3870,7 @@ void trade_identify(char_data *ch, char *argument) {
 */
 void trade_post(char_data *ch, char *argument) {	
 	char buf[MAX_STRING_LENGTH], itemarg[MAX_INPUT_LENGTH], costarg[MAX_INPUT_LENGTH], *timearg;
-	struct trading_post_data *tpd, *end;
+	struct trading_post_data *tpd;
 	obj_data *obj;
 	int cost, length = config_get_int("trading_post_max_hours"), post_cost = 0;
 	
@@ -3994,20 +3921,9 @@ void trade_post(char_data *ch, char *argument) {
 		charge_coins(ch, GET_LOYALTY(ch), post_cost, NULL);
 		
 		CREATE(tpd, struct trading_post_data, 1);
-		tpd->next = NULL;
 		
 		// put at end of list
-		if ((end = trading_list)) {
-			while (end->next) {
-				end = end->next;
-			}
-		}
-		if (end) {
-			end->next = tpd;
-		}
-		else {
-			trading_list = tpd;
-		}
+		DL_APPEND(trading_list, tpd);
 		
 		// data
 		tpd->player = GET_IDNUM(ch);
@@ -4041,10 +3957,6 @@ void trade_post(char_data *ch, char *argument) {
 * @param int mode SCMD_WAREHOUSE or SCMD_HOME
 */
 void warehouse_inventory(char_data *ch, char *argument, int mode) {
-	void check_delayed_load(char_data *ch);
-	char *obj_desc_for_char(obj_data *obj, char_data *ch, int mode);
-	extern const char *unique_storage_flags[];
-
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH*4], line[MAX_STRING_LENGTH], part[256], flags[256], quantity[256], *tmp;
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	bool home_mode = (mode == SCMD_HOME);
@@ -4243,8 +4155,6 @@ void warehouse_identify(char_data *ch, char *argument, int mode) {
 * @param int mode SCMD_WAREHOUSE or SCMD_HOME
 */
 void warehouse_retrieve(char_data *ch, char *argument, int mode) {
-	void add_trigger_to_global_lists(trig_data *trig);
-	
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch));
 	struct empire_unique_storage *iter, *next_iter;
@@ -4428,8 +4338,6 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 * @param int mode SCMD_WAREHOUSE or SCMD_HOME
 */
 void warehouse_store(char_data *ch, char *argument, int mode) {
-	extern bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capped);
-	
 	bool imm_access = (GET_ACCESS_LEVEL(ch) >= LVL_CIMPL || IS_GRANTED(ch, GRANT_EMPIRES));
 	empire_data *room_emp = ROOM_OWNER(IN_ROOM(ch)), *use_emp = NULL;
 	bool home_mode = (mode == SCMD_HOME);
@@ -5125,9 +5033,6 @@ ACMD(do_drop) {
 
 
 ACMD(do_eat) {
-	extern bool check_vampire_sun(char_data *ch, bool message);
-	void taste_blood(char_data *ch, char_data *vict);
-	
 	bool extract = FALSE, will_buff = FALSE;
 	char buf[MAX_STRING_LENGTH], *argptr = arg;
 	struct affected_type *af;
@@ -5441,8 +5346,6 @@ ACMD(do_exchange) {
 
 
 ACMD(do_get) {
-	void do_get_from_vehicle(char_data *ch, vehicle_data *veh, char *arg, int mode, int howmany);
-
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	int cont_dotmode, found = 0, mode;
 	vehicle_data *find_veh, *veh;
@@ -5906,9 +5809,6 @@ ACMD(do_keep) {
 
 // also do_burn
 ACMD(do_light) {
-	void do_burn_area(char_data *ch, int subcmd);
-	void do_light_vehicle(char_data *ch, vehicle_data *veh, obj_data *flint);
-	
 	const char *cmdname[] = { "light", "burn" };	// also in do_burn_area
 	
 	bool objless = has_player_tech(ch, PTECH_LIGHT_FIRE);
@@ -6288,7 +6188,6 @@ ACMD(do_pour) {
 					cancel_stored_event(&SHARED_DATA(IN_ROOM(ch))->events, SEV_TRENCH_FILL);
 				}
 				if (GET_MAP_LOC(IN_ROOM(ch))) {	// can this be null?
-					void schedule_trench_fill(struct map_data *map);
 					schedule_trench_fill(GET_MAP_LOC(IN_ROOM(ch)));
 				}
 			}
@@ -6368,8 +6267,6 @@ ACMD(do_pour) {
 *  all objects to be put into container must be in inventory.
 */
 ACMD(do_put) {
-	void do_put_obj_in_vehicle(char_data *ch, vehicle_data *veh, int dotmode, char *arg, int howmany);
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	obj_data *obj, *next_obj, *cont;
 	vehicle_data *find_veh;
@@ -6474,10 +6371,6 @@ ACMD(do_put) {
 
 
 ACMD(do_remove) {
-	extern int board_loaded;
-	void init_boards(void);
-	extern int find_board(char_data *ch);
-	extern int Board_remove_msg(int board_type, char_data *ch, char *arg, obj_data *board);
 	int i, dotmode, found;
 	int board_type;
 	obj_data *board;
@@ -6914,8 +6807,6 @@ ACMD(do_sheathe) {
 
 
 ACMD(do_ship) {
-	extern room_data *get_shipping_target(char_data *ch, char *argument, bool *targeted_island);
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 3], line[1000], keywords[MAX_INPUT_LENGTH];
 	struct island_info *from_isle, *to_isle;
 	struct empire_storage_data *store;
@@ -7407,9 +7298,6 @@ ACMD(do_unshare) {
 
 
 ACMD(do_use) {
-	void use_ammo(char_data *ch, obj_data *obj);
-	void use_poison(char_data *ch, obj_data *obj);
-
 	obj_data *obj;
 	
 	one_argument(argument, arg);

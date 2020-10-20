@@ -23,10 +23,6 @@
 #include "db.h"
 #include "skills.h"
 
-/* external functions */
-extern char_data *get_char_in_room(room_data *room, char *name);
-extern obj_data *get_obj_in_room(room_data *room, char *name);
-
 /* same as any_one_arg except that it stops at punctuation */
 char *any_one_name(char *argument, char *first_arg) {
 	char *arg;
