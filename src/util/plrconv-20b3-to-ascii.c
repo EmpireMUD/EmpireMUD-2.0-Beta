@@ -749,8 +749,7 @@ void push_free_list(long pos) {
 
 	CREATE(new_pos, b3_position_list_type, 1);
 	new_pos->position = pos;
-	new_pos->next = free_list;
-	free_list = new_pos;
+	LL_PREPEND(free_list, new_pos);
 }
 
 
@@ -881,14 +880,12 @@ void index_mail(long id_to_index, long pos) {
 		new_index->list_start = NULL;
 
 		/* add to front of list */
-		new_index->next = mail_index;
-		mail_index = new_index;
+		LL_PREPEND(mail_index, new_index);
 	}
 	/* now, add this position to front of position list */
 	CREATE(new_position, b3_position_list_type, 1);
 	new_position->position = pos;
-	new_position->next = new_index->list_start;
-	new_index->list_start = new_position;
+	LL_PREPEND(new_index->list_start, new_position);
 }
 
 
@@ -936,7 +933,7 @@ int scan_mail_file(void) {
 char *read_delete(long recipient, int *from, time_t *timestamp) {
 	b3_header_block_type header;
 	b3_data_block_type data;
-	b3_mail_index_type *mail_pointer, *prev_mail;
+	b3_mail_index_type *mail_pointer;
 	b3_position_list_type *position_pointer;
 	long mail_address, following_block;
 	char *message;
@@ -962,16 +959,8 @@ char *read_delete(long recipient, int *from, time_t *timestamp) {
 		free(position_pointer);
 
 		/* now free up the actual name entry */
-		if (mail_index == mail_pointer) {	/* name is 1st in list */
-			mail_index = mail_pointer->next;
-			free(mail_pointer);
-		}
-		else {
-			/* find entry before the one we're going to del */
-			for (prev_mail = mail_index; prev_mail->next != mail_pointer; prev_mail = prev_mail->next);
-			prev_mail->next = mail_pointer->next;
-			free(mail_pointer);
-		}
+		LL_DELETE(mail_index, mail_pointer);
+		free(mail_pointer);
 	}
 	else {
 		/* move to next-to-last record */
@@ -1031,7 +1020,7 @@ char *read_delete(long recipient, int *from, time_t *timestamp) {
 * @return struct mail_data* The linked list of mail, or NULL.
 */
 struct mail_data *get_converted_mail(long recipient) {
-	struct mail_data *mail, *last_mail = NULL, *list = NULL;
+	struct mail_data *mail, *list = NULL;
 	time_t timestamp;
 	int from;
 	
@@ -1040,14 +1029,7 @@ struct mail_data *get_converted_mail(long recipient) {
 		mail->body = read_delete(recipient, &from, &timestamp);
 		mail->from = from;
 		mail->timestamp = timestamp;
-		
-		if (last_mail) {
-			last_mail->next = mail;
-		}
-		else {
-			list = mail;
-		}
-		last_mail = mail;
+		LL_APPEND(list, mail);
 	}
 	
 	return list;
@@ -1069,7 +1051,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 	char charname_lower[MAX_STRING_LENGTH], buf[MAX_STRING_LENGTH];
 	char temp[MAX_STRING_LENGTH], str_in1[MAX_STRING_LENGTH];
 	char str_in2[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
-	struct account_player *acct_player, *last_acct_player;
+	struct account_player *acct_player;
 	struct mail_data *mail, *mail_list;
 	struct b3_lore_data lore;
 	struct b3_alias_data alias;
@@ -1124,15 +1106,7 @@ void convert_char(struct b3_char_file_u *cfu) {
 	}
 	CREATE(acct_player, struct account_player, 1);
 	acct_player->name = strdup(charname_lower);
-	if ((last_acct_player = acct->players)) {
-		while (last_acct_player->next) {
-			last_acct_player = last_acct_player->next;
-		}
-		last_acct_player->next = acct_player;
-	}
-	else {	// no list yet
-		acct->players = acct_player;
-	}
+	LL_APPEND(acct->players, acct_player);
 	// account: import flags and remove them from the character
 	if (IS_SET(cfu->char_specials_saved.act, b3_PLR_FROZEN)) {
 		SET_BIT(acct->flags, ACCT_FROZEN);

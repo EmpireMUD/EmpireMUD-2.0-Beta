@@ -6395,7 +6395,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 					
 					msg_to_char(ch, "You remove icon %d.\r\n", atoi(arg2));
 					LL_DELETE(*list, icon);
-					icon->next = NULL;
+					icon->next = NULL;	// freed as a list
 					free_icon_set(&icon);
 				}
 			}

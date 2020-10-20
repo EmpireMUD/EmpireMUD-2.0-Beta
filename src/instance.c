@@ -194,7 +194,7 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	INST_ROTATION(inst) = rotation;
 	CREATE(INST_RULE(inst), struct adventure_link_rule, 1);
 	*INST_RULE(inst) = *rule;	// COPY the rule
-	INST_RULE(inst)->next = NULL;
+	INST_RULE(inst)->next = NULL;	// because it's a copy
 	
 	// check for players
 	present = FALSE;
