@@ -31,7 +31,6 @@
 
 // external funcs
 void init_sector(sector_data *st);
-void sort_interactions(struct interaction_item **list);
 
 // locals
 const char *default_sect_name = "Unnamed Sector";

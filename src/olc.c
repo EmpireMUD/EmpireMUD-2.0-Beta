@@ -28,6 +28,7 @@
 *   Common Modules
 *   Common Displays
 *   Auditors
+*   Sorters
 *   Helpers
 */
 
@@ -512,7 +513,6 @@ OLC_MODULE(vedit_speed);
 
 
 // external functions
-void sort_interactions(struct interaction_item **list);
 extern int sort_requirements_by_group(struct req_data *a, struct req_data *b);
 extern bool valid_room_template_vnum(rmt_vnum vnum);
 
@@ -4505,13 +4505,27 @@ bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch) {
 
 
  //////////////////////////////////////////////////////////////////////////////
-//// HELPERS /////////////////////////////////////////////////////////////////
+//// SORTERS /////////////////////////////////////////////////////////////////
 
 // simple sorter for icons
 int sort_icon_set(struct icon_data *a, struct icon_data *b) {
 	return a->type - b->type;
 }
 
+
+// simple sorter for interactions
+int sort_interactions(struct interaction_item *a, struct interaction_item *b) {
+	if (a->type != b->type) {
+		return a->type - b->type;
+	}
+	else {
+		return a->exclusion_code - b->exclusion_code;
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
 * Pre-checks several requirements for opening a new OLC editor.
@@ -4628,7 +4642,7 @@ struct interaction_item *copy_interaction_list(struct interaction_item *input_li
 	}
 			
 	// ensure these are sorted
-	sort_interactions(&list);
+	LL_SORT(list, sort_interactions);
 	return list;
 }
 
@@ -6904,7 +6918,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				msg_to_char(ch, "You move interaction %d %s.\r\n", atoi(arg2), (up ? "up" : "down"));
 				
 				// re-sort to keep types together
-				sort_interactions(list);
+				LL_SORT(*list, sort_interactions);
 			}
 		}
 	}
@@ -6958,7 +6972,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			temp->restrictions = found_restrictions;
 			LL_APPEND(*list, temp);
 
-			sort_interactions(list);
+			LL_SORT(*list, sort_interactions);
 			msg_to_char(ch, "You add %s: %dx %s %.2f%%", interact_types[loc], num, get_interaction_target(loc, vnum), prc);
 			if (exc) {
 				msg_to_char(ch, " (%c)", exc);
@@ -7067,7 +7081,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			msg_to_char(ch, "Invalid field. You can change: type, quantity, vnum, percent, exclusion\r\n");
 		}
 		
-		sort_interactions(list);
+		LL_SORT(*list, sort_interactions);
 	}
 	else {
 		msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code | restrictions]\r\n");
@@ -7993,7 +8007,7 @@ void smart_copy_interactions(struct interaction_item **addto, struct interaction
 	}
 			
 	// ensure these are sorted
-	sort_interactions(addto);
+	LL_SORT(*addto, sort_interactions);
 }
 
 

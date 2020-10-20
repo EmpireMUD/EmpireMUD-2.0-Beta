@@ -31,7 +31,6 @@
 
 // external funcs
 void init_crop(crop_data *cp);
-void sort_interactions(struct interaction_item **list);
 
 // locals
 const char *default_crop_name = "Unnamed Crop";

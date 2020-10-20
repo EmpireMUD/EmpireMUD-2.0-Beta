@@ -32,7 +32,6 @@
 
 // external funcs
 void init_building(bld_data *building);
-void sort_interactions(struct interaction_item **list);
 
 // locals
 const char *default_building_name = "Unnamed Building";

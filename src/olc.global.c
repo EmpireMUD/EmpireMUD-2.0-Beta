@@ -31,7 +31,6 @@
 
 // external funcs
 extern struct archetype_gear *copy_archetype_gear(struct archetype_gear *input);
-void sort_interactions(struct interaction_item **list);
 
 // locals
 const char *default_glb_name = "Unnamed Global";

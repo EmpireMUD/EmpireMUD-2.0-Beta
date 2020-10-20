@@ -33,7 +33,6 @@
 
 // external funcs
 void init_room_template(room_template *rmt);
-void sort_interactions(struct interaction_item **list);
 
 // locals
 const char *default_rmt_title = "An Unnamed Room";

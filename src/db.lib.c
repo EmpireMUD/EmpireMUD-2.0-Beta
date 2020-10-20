@@ -8815,48 +8815,6 @@ void sort_exits(struct room_direction_data **list) {
 
 
 /**
-* This sorts interactions by type, for easier visual analysis in both
-* the editor and the db file. It should not change the relative order of any
-* entries within a type.
-*
-* @param struct interaction_item **list The interactions list to sort.
-*/
-void sort_interactions(struct interaction_item **list) {
-	struct interaction_item *a, *b, *a_next, *b_next;
-	struct interaction_item temp;
-	bool changed = TRUE;
-	
-	if (*list && (*list)->next) {
-		while (changed) {
-			changed = FALSE;
-
-			a = *list;
-			while ((b = a->next)) {
-				if (a->type > b->type || (a->type == b->type && a->exclusion_code > b->exclusion_code)) {
-					// preserve next-pointers
-					a_next = a->next;
-					b_next = b->next;
-					
-					// swap positions by swapping data
-					temp = *a;
-					*a = *b;
-					*b = temp;
-					
-					// restore next pointers
-					a->next = a_next;
-					b->next = b_next;
-					
-					changed = TRUE;
-				}
-				
-				a = a->next;
-			}
-		}
-	}
-}
-
-
-/**
 * Simple sorter for the mob hash
 *
 * @param char_data *a One element
