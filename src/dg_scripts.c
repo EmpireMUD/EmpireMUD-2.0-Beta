@@ -184,77 +184,6 @@ static bool players_nearby_script(room_data *loc) {
 
 
 /************************************************************
-* search by number routines
-************************************************************/
-
-/* return char with UID n */
-char_data *find_char(int n) {
-	if (n >= EMPIRE_ID_BASE) /* See note in dg_scripts.h */
-		return NULL;
-
-	return find_char_by_uid_in_lookup_table(n);
-}
-
-
-/**
-* Looks up an empire by a DG Scripts UID.
-*
-* @param int n The UID.
-* @return empire_data* The found empire, or NULL.
-*/
-empire_data *find_empire_by_uid(int n) {
-	if (n < EMPIRE_ID_BASE || n >= ROOM_ID_BASE) {
-		// see note in dg_scripts.h
-		return NULL;
-	}
-	
-	return real_empire(n - EMPIRE_ID_BASE);
-}
-
-
-/**
-* return object with UID n
-*
-* @param int n The UID to look up.
-* @param bool error If TRUE, will log if the ID is an object ID but doesn't exist.
-* @return obj_data* The found object, or NULL if it doesn't exist.
-*/
-obj_data *find_obj(int n, bool error) {
-	if (n < OBJ_ID_BASE) /* see note in dg_scripts.h */
-		return NULL;
-
-	return find_obj_by_uid_in_lookup_table(n, error);
-}
-
-/* return room with UID n */
-room_data *find_room(int n) {
-	room_data *room;
-
-	n -= ROOM_ID_BASE;
-	if (n < 0) 
-		return NULL;
-
-	room = real_room((room_vnum)n); 
-
-	return room;
-}
-
-
-/**
-* Find a vehicle in the lookup table by id.
-*
-* @param int n The scripting id.
-* @return vehicle_data* The vehicle, if any.
-*/
-vehicle_data *find_vehicle(int n) {
-	if (n < VEHICLE_ID_BASE || n >= OBJ_ID_BASE) {
-		return NULL;
-	}
-	return find_vehicle_by_uid_in_lookup_table(n);
-}
-
-
-/************************************************************
 * generic searches based only on name
 ************************************************************/
 
@@ -263,7 +192,7 @@ char_data *get_char(char *name) {
 	char_data *i;
 
 	if (*name == UID_CHAR) {
-		i = find_char(atoi(name + 1));
+		i = find_char(atoi(name + 1), TRUE);
 
 		if (i && valid_dg_target(i, DG_ALLOW_GODS))
 			return i;
@@ -286,7 +215,7 @@ char_data *get_char_near_obj(obj_data *obj, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1));
+		ch = find_char(atoi(name + 1), TRUE);
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS))
 			return ch;
@@ -317,7 +246,7 @@ char_data *get_char_near_vehicle(vehicle_data *veh, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1));
+		ch = find_char(atoi(name + 1), TRUE);
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS)) {
 			return ch;
@@ -356,7 +285,7 @@ char_data *get_char_in_room(room_data *room, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1));
+		ch = find_char(atoi(name + 1), TRUE);
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS))
 			return ch;
@@ -573,7 +502,7 @@ vehicle_data *get_vehicle(char *name) {
 	vehicle_data *veh;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1));
+		return find_vehicle(atoi(name + 1), TRUE);
 	}
 	else {
 		DL_FOREACH(vehicle_list, veh) {
@@ -595,7 +524,7 @@ char_data *get_char_by_obj(obj_data *obj, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1));
+		ch = find_char(atoi(name + 1), TRUE);
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS))
 			return ch;
@@ -629,7 +558,7 @@ char_data *get_char_by_vehicle(vehicle_data *veh, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1));
+		ch = find_char(atoi(name + 1), TRUE);
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS)) {
 			return ch;
@@ -674,7 +603,7 @@ char_data *get_char_by_room(room_data *room, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1));
+		ch = find_char(atoi(name + 1), TRUE);
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS))
 			return ch;
@@ -816,7 +745,7 @@ vehicle_data *get_vehicle_by_obj(obj_data *obj, char *name) {
 	room_data *room;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1));
+		return find_vehicle(atoi(name + 1), TRUE);
 	}
 	
 	if ((room = obj_room(obj))) {
@@ -843,7 +772,7 @@ vehicle_data *get_vehicle_by_room(room_data *room, char *name) {
 	vehicle_data *iter;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1));
+		return find_vehicle(atoi(name + 1), TRUE);
 	}
 
 	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
@@ -867,7 +796,7 @@ vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name) {
 	vehicle_data *iter;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1));
+		return find_vehicle(atoi(name + 1), TRUE);
 	}
 	if (!str_cmp(name, "self") || !str_cmp(name, "me")) {
 		return veh;
@@ -894,7 +823,7 @@ vehicle_data *get_vehicle_near_obj(obj_data *obj, char *name) {
 	room_data *orm;
 
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1));
+		return find_vehicle(atoi(name + 1), TRUE);
 	}
 	else if (obj->in_vehicle && isname(name, VEH_KEYWORDS(obj->in_vehicle))) {
 		return obj->in_vehicle;
@@ -922,7 +851,7 @@ vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name) {
 	vehicle_data *find;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1));
+		return find_vehicle(atoi(name + 1), TRUE);
 	}
 	if ((find = get_vehicle_room(IN_ROOM(veh), name, NULL))) {
 		return find;
@@ -6633,7 +6562,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 		return;
 	}
 	
-	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id, FALSE)) && !(r = find_room(id))) {
+	if (!(c = find_char(id, TRUE)) && !(v = find_vehicle(id, TRUE)) && !(o = find_obj(id, FALSE)) && !(r = find_room(id))) {
 		script_log("Trigger: %s, VNum %d. attach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
@@ -6715,7 +6644,7 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 	}
 	
 	// find first good match
-	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id, FALSE)) && !(r = find_room(id))) {
+	if (!(c = find_char(id, TRUE)) && !(v = find_vehicle(id, TRUE)) && !(o = find_obj(id, FALSE)) && !(r = find_room(id))) {
 		script_log("Trigger: %s, VNum %d. detach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
@@ -7076,7 +7005,7 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 	if ((room = find_room(uid))) {
 		sc_remote = SCRIPT(room) ? SCRIPT(room) : create_script_data(room, WLD_TRIGGER);
 	}
-	else if ((mob = find_char(uid))) {
+	else if ((mob = find_char(uid, TRUE))) {
 		sc_remote = SCRIPT(mob) ? SCRIPT(mob) : create_script_data(mob, MOB_TRIGGER);
 		if (!IS_NPC(mob))
 			context = 0;
@@ -7085,7 +7014,7 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 	else if ((obj = find_obj(uid, FALSE))) {
 		sc_remote = SCRIPT(obj) ? SCRIPT(obj) : create_script_data(obj, OBJ_TRIGGER);
 	}
-	else if ((veh = find_vehicle(uid))) {
+	else if ((veh = find_vehicle(uid, TRUE))) {
 		sc_remote = SCRIPT(veh) ? SCRIPT(veh) : create_script_data(veh, VEH_TRIGGER);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {
@@ -7145,7 +7074,7 @@ ACMD(do_vdelete) {
 	if ((room = find_room(uid))) {
 		sc_remote = SCRIPT(room);
 	}
-	else if ((mob = find_char(uid))) {
+	else if ((mob = find_char(uid, TRUE))) {
 		sc_remote = SCRIPT(mob);
 		remove_companion_var(mob, var, 0);
 		/*
@@ -7157,7 +7086,7 @@ ACMD(do_vdelete) {
 	else if ((obj = find_obj(uid, FALSE))) {
 		sc_remote = SCRIPT(obj);
 	}
-	else if ((veh = find_vehicle(uid))) {
+	else if ((veh = find_vehicle(uid, TRUE))) {
 		sc_remote = SCRIPT(veh);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {
@@ -7241,7 +7170,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	if ((room = find_room(uid))) {
 		sc_remote = SCRIPT(room);
 	}
-	else if ((mob = find_char(uid))) {
+	else if ((mob = find_char(uid, TRUE))) {
 		sc_remote = SCRIPT(mob);
 		remove_companion_var(mob, var, sc->context);
 		/*
@@ -7253,7 +7182,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	else if ((obj = find_obj(uid, FALSE))) {
 		sc_remote = SCRIPT(obj);
 	}
-	else if ((veh = find_vehicle(uid))) {
+	else if ((veh = find_vehicle(uid, TRUE))) {
 		sc_remote = SCRIPT(veh);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {
@@ -7733,116 +7662,3 @@ int fgetline(FILE *file, char *p) {
 	return count;
 }
 
-
-/* find_char() helpers */
-
-// Must be power of 2
-#define BUCKET_COUNT 64
-// to recognize an empty bucket
-#define UID_OUT_OF_RANGE 1000000000
-
-struct lookup_table_t {
-	int uid;
-	void * c; 
-	struct lookup_table_t *next;
-};
-struct lookup_table_t lookup_table[BUCKET_COUNT];
-
-void init_lookup_table(void) {
-	int i;
-	for (i = 0; i < BUCKET_COUNT; i++) {
-		lookup_table[i].uid = UID_OUT_OF_RANGE;
-		lookup_table[i].c = NULL;
-		lookup_table[i].next = NULL;
-	}
-}
-
-char_data *find_char_by_uid_in_lookup_table(int uid) {
-	int bucket = (int) (uid & (BUCKET_COUNT - 1));
-	struct lookup_table_t *lt = &lookup_table[bucket];
-
-	for (;lt && lt->uid != uid ; lt = lt->next) ;
-
-	if (lt)
-		return (char_data*)(lt->c);
-
-	log("find_char_by_uid_in_lookup_table : No entity with number %d in lookup table", uid);
-	return NULL;
-}
-
-/**
-* Determines if an object uid is in the lookup table. This provides its own
-* error suppression because it's not always an error for an object to be
-* missing.
-*
-* @param int uid The object's uid.
-* @param bool error if TRUE, logs an error if it can't find it.
-* @return obj_data* The found object, or NULL if it doesn't exist.
-*/
-obj_data *find_obj_by_uid_in_lookup_table(int uid, bool error) {
-	int bucket = (int) (uid & (BUCKET_COUNT - 1));
-	struct lookup_table_t *lt = &lookup_table[bucket];
-
-	for (;lt && lt->uid != uid ; lt = lt->next) ;
-
-	if (lt)
-		return (obj_data*)(lt->c);
-	
-	if (error) {
-		log("find_obj_by_uid_in_lookup_table : No entity with number %d in lookup table", uid);
-	}
-	
-	return NULL;
-}
-
-vehicle_data *find_vehicle_by_uid_in_lookup_table(int uid) {
-	int bucket = (int) (uid & (BUCKET_COUNT - 1));
-	struct lookup_table_t *lt = &lookup_table[bucket];
-
-	for (;lt && lt->uid != uid ; lt = lt->next) ;
-
-	if (lt)
-		return (vehicle_data*)(lt->c);
-
-	log("find_vehicle_by_uid_in_lookup_table : No entity with number %d in lookup table", uid);
-	return NULL;
-}
-
-void add_to_lookup_table(int uid, void *c) {
-	int bucket = (int) (uid & (BUCKET_COUNT - 1));
-	struct lookup_table_t *lt = &lookup_table[bucket];
-
-	for (;lt->next; lt = lt->next)
-		if (lt->c == c) {
-			log ("Add_to_lookup failed. %d already there.", uid);
-			return;
-		}
-
-	CREATE(lt->next, struct lookup_table_t, 1);
-	lt->next->uid = uid;
-	lt->next->c = c;
-}
-
-void remove_from_lookup_table(int uid) {
-	int bucket = (int) (uid & (BUCKET_COUNT - 1));
-	struct lookup_table_t *lt = &lookup_table[bucket], *flt = NULL;
-	
-	// no work -- no assigned id
-	if (uid == 0) {
-		return;
-	}
-
-	// TODO saw a crash here where lt seemed to have been freed... lt->uid crashed, no clear reason why because lookup_table[bucket] seemed to exist.
-	for (;lt;lt = lt->next)
-		if (lt->uid == uid)
-			flt = lt;
-
-	if (flt) {
-		for (lt = &lookup_table[bucket];lt->next != flt;lt = lt->next);
-		lt->next = flt->next;
-		free(flt);
-		return;
-	}
-
-	log("remove_from_lookup. UID %d not found.", uid);
-}

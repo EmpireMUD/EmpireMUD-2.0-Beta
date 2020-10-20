@@ -3891,9 +3891,6 @@ void init_game(ush_int port) {
 
 	dg_event_init();
 
-	/* set up hash table for find_char() */
-	init_lookup_table();
-
 	boot_db();
 
 	log("Signal trapping.");

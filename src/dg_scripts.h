@@ -493,16 +493,13 @@ int valid_dg_target(char_data *ch, int bitvector);
 #define GET_TRIG_DEPTH(t)         ((t)->depth)
 #define GET_TRIG_LOOPS(t)         ((t)->loops)
 
-/* player id's: 0 to MOB_ID_BASE - 1            */
-/* mob id's: MOB_ID_BASE to EMPIRE_ID_BASE - 1      */
-// empire ids: EMPIRE_ID_BASE to ROOM_ID_BASE - 1
-/* room id's: ROOM_ID_BASE to OBJ_ID_BASE - 1    */
-/* object id's: OBJ_ID_BASE and higher           */
-#define MOB_ID_BASE	  10000000  /* 10000000 player IDNUMS should suffice */
-#define EMPIRE_ID_BASE  (10000000 + MOB_ID_BASE) /* 10000000 Mobs */
-#define ROOM_ID_BASE    (10000000 + EMPIRE_ID_BASE)	// 10000000 empire id limit?
-#define VEHICLE_ID_BASE  ((MAP_SIZE * 5) + ROOM_ID_BASE)	// Lots o' Rooms
-#define OBJ_ID_BASE  (1000000 + VEHICLE_ID_BASE)	// Plenty o' Vehicles
+// SCRIPT IDS:
+// player idnums are used as script ids up to EMPIRE_ID_BASE-1
+#define EMPIRE_ID_BASE  20000000	// reserve this many ids for players; empires use base+vnum
+#define ROOM_ID_BASE  (10000000 + EMPIRE_ID_BASE)	// reserve 10000000 ids for empires
+#define OTHER_ID_BASE  ((MAP_SIZE * 5) + ROOM_ID_BASE)	// reserve 5x mapsize for room ids
+// removed MOB_ID_BASE, OBJ_ID_BASE, VEHICLE_ID_BASE: these ids now share the OTHER_ID_BASE-space
+
 
 #define SCRIPT(o)		  ((o)->script)
 #define SCRIPT_MEM(c)             ((c)->memory)
@@ -531,21 +528,17 @@ int valid_dg_target(char_data *ch, int bitvector);
 /* needed for new %load% handling */
 int can_wear_on_pos(obj_data *obj, int pos);
 
-/* find_char helpers */
-void init_lookup_table(void);
-char_data *find_char_by_uid_in_lookup_table(int uid);
-obj_data *find_obj_by_uid_in_lookup_table(int uid, bool error);
-vehicle_data *find_vehicle_by_uid_in_lookup_table(int uid);
-void add_to_lookup_table(int uid, void *c);
+// script uid lookup table functions
+void add_to_lookup_table(int uid, void *ptr, int type);
 void remove_from_lookup_table(int uid);
 
 // find helpers
-char_data *find_char(int n);
-empire_data *find_empire_by_uid(int n);
-obj_data *find_obj(int n, bool error);
-room_data *find_room(int n);
+char_data *find_char(int uid, bool log_error);
+empire_data *find_empire_by_uid(int uid);
+obj_data *find_obj(int uid, bool log_error);
+room_data *find_room(int uid);
 void find_uid_name(char *uid, char *name, size_t nlen);
-vehicle_data *find_vehicle(int n);
+vehicle_data *find_vehicle(int uid, bool log_error);
 
 // purge helpers
 void create_dg_owner_purged_tracker(trig_data *trig, char_data *ch, obj_data *obj, room_data *room, vehicle_data *veh);

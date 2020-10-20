@@ -3969,7 +3969,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	DL_PREPEND(character_list, ch);
 	ch->script_id = GET_IDNUM(ch);	// if not already set
 	if (!ch->in_lookup_table) {
-		add_to_lookup_table(ch->script_id, (void *)ch);
+		add_to_lookup_table(ch->script_id, (void *)ch, TYPE_MOB);
 		ch->in_lookup_table = TRUE;
 	}
 	
