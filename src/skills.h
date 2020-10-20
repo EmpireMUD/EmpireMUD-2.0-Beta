@@ -66,6 +66,7 @@ bool check_can_gain_skill(char_data *ch, any_vnum skill_vnum);
 void check_skill_sell(char_data *ch, ability_data *abil);
 bool check_solo_role(char_data *ch);
 void clear_char_abilities(char_data *ch, any_vnum skill);
+int compute_bonus_exp_per_day(char_data *ch);
 void empire_player_tech_skillup(empire_data *emp, int tech, double amount);
 void empire_skillup(empire_data *emp, any_vnum ability, double amount);
 void gain_ability_exp(char_data *ch, any_vnum ability, double amount);

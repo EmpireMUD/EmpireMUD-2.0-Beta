@@ -192,6 +192,11 @@ struct global_data *globals_table = NULL;	// hash table of global_data
 struct help_index_element *help_table = 0;	// the help table -- NOT a hash table
 int top_of_helpt = 0;	// top of help index table
 
+// instances
+struct instance_data *instance_list = NULL;	// doubly-linked global instance list
+bool instance_save_wait = FALSE;	// prevents repeated instance saving
+struct instance_data *quest_instance_global = NULL;	// passes instances through to some quest triggers
+
 // map
 room_vnum *start_locs = NULL;	// array of start locations
 int highest_start_loc_index = -1;	// maximum start locations
@@ -203,6 +208,7 @@ struct player_special_data dummy_mob;	// dummy spec area for mobs
 char_data *character_list = NULL;	// global doubly-linked list of chars (including players)
 char_data *combat_list = NULL;	// head of l-list of fighting chars
 char_data *next_combat_list = NULL;	// used for iteration of combat_list when more than 1 person can be removed from combat in 1 loop iteration
+char_data *next_combat_list_main = NULL;	// used for iteration of combat_list in frequent_combat()
 struct generic_name_data *generic_names = NULL;	// LL of generic name sets
 
 // morphs

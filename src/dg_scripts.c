@@ -2956,8 +2956,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 								GET_BLOOD(c) = MIN(GET_BLOOD(c), GET_MAX_BLOOD(c));
 								
 								if (GET_BLOOD(c) == 0) {
-									void out_of_blood(char_data *ch);
-									
 									out_of_blood(c);
 								}
 							}
@@ -7303,7 +7301,6 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 	void *go = NULL;
 
 	void wld_command_interpreter(room_data *room, char *argument);
-	extern int max_inventory_size;
 
 	if (depth > MAX_SCRIPT_DEPTH) {
 		script_log("Triggers recursed beyond maximum allowed depth.");

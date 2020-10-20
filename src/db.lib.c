@@ -60,7 +60,6 @@
 // external variables
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
 extern struct player_special_data dummy_mob;
-extern struct generic_name_data *generic_names;
 extern int max_automessage_id;
 extern bool world_is_sorted;
 

@@ -99,6 +99,7 @@ void add_learned_craft_empire(empire_data *emp, any_vnum vnum);
 void die_follower(char_data *ch);
 void extract_char(char_data *ch);
 void extract_char_final(char_data *ch);
+void extract_pending_chars();
 bool has_learned_craft(char_data *ch, any_vnum vnum);
 bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t flags);
 void perform_idle_out(char_data *ch);
@@ -177,6 +178,7 @@ void perform_claim_room(room_data *room, empire_data *emp);
 void perform_claim_vehicle(vehicle_data *veh, empire_data *emp);
 void read_vault(empire_data *emp);
 void refresh_empire_dropped_items(empire_data *only_emp);
+void remove_homeless_citizen(empire_data *emp, struct empire_homeless_citizen *ehc);
 void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remove);
 int sort_empire_production_totals(struct empire_production_total *a, struct empire_production_total *b);
 
@@ -330,6 +332,7 @@ void remove_offers_by_type(char_data *ch, int type);
 // player list handlers
 void add_learned_craft(char_data *ch, any_vnum vnum);
 void add_minipet(char_data *ch, any_vnum vnum);
+void clean_offers(char_data *ch);
 bool has_minipet(char_data *ch, any_vnum vnum);
 void remove_learned_craft(char_data *ch, any_vnum vnum);
 void remove_minipet(char_data *ch, any_vnum vnum);
@@ -463,47 +466,49 @@ void schedule_room_affect_expire(room_data *room, struct affected_type *af);
 //// handlers from other files ///////////////////////////////////////////////
 
 // act.item.c
-extern obj_data *perform_remove(char_data *ch, int pos);
+int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);
+obj_data *perform_remove(char_data *ch, int pos);
 
 // books.c
-extern book_data *book_proto(book_vnum vnum);
-extern book_data *find_book_by_author(char *argument, int idnum);
-extern book_data *find_book_in_library(char *argument, room_data *room);
+book_data *book_proto(book_vnum vnum);
+book_data *find_book_by_author(char *argument, int idnum);
+book_data *find_book_in_library(char *argument, room_data *room);
 
 // config.c
-extern bitvector_t config_get_bitvector(char *key);
-extern bool config_get_bool(char *key);
-extern double config_get_double(char *key);
-extern int config_get_int(char *key);
-extern int *config_get_int_array(char *key, int *array_size);
+bitvector_t config_get_bitvector(char *key);
+bool config_get_bool(char *key);
+double config_get_double(char *key);
+int config_get_int(char *key);
+int *config_get_int_array(char *key, int *array_size);
 const char *config_get_string(char *key);
 
 // faction.c
-extern int compare_reptuation(int rep_a, int rep_b);
+int compare_reptuation(int rep_a, int rep_b);
 void gain_reputation(char_data *ch, any_vnum vnum, int amount, bool is_kill, bool cascade);
-extern struct player_faction_data *get_reputation(char_data *ch, any_vnum vnum, bool create);
-extern int get_reputation_by_name(char *name);
-extern int get_reputation_value(char_data *ch, any_vnum vnum);
-extern bool has_reputation(char_data *ch, any_vnum faction, int rep);
-extern int rep_const_to_index(int rep_const);
+struct player_faction_data *get_reputation(char_data *ch, any_vnum vnum, bool create);
+int get_reputation_by_name(char *name);
+int get_reputation_value(char_data *ch, any_vnum vnum);
+bool has_reputation(char_data *ch, any_vnum faction, int rep);
+int rep_const_to_index(int rep_const);
 void set_reputation(char_data *ch, any_vnum vnum, int rep);
 
 // fight.c
 void appear(char_data *ch);
-extern bool can_fight(char_data *ch, char_data *victim);
-extern int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
+bool can_fight(char_data *ch, char_data *victim);
+int damage(char_data *ch, char_data *victim, int dam, int attacktype, byte damtype);
+obj_data *die(char_data *ch, char_data *killer);
 void engage_combat(char_data *ch, char_data *vict, bool melee);
 void heal(char_data *ch, char_data *vict, int amount);
-extern int hit(char_data *ch, char_data *victim, obj_data *weapon, bool normal_round);
-extern bool is_fighting(char_data *ch);
+int hit(char_data *ch, char_data *victim, obj_data *weapon, bool combat_round);
+bool is_fighting(char_data *ch);
 void set_fighting(char_data *ch, char_data *victim, byte mode);
 void stop_fighting(char_data *ch);
 void update_pos(char_data *victim);
 
 // instance.c
 void add_instance_mob(struct instance_data *inst, mob_vnum vnum);
-extern struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
-extern struct instance_data *real_instance(any_vnum instance_id);
+struct instance_data *find_instance_by_room(room_data *room, bool check_homeroom, bool allow_fake_loc);
+struct instance_data *real_instance(any_vnum instance_id);
 void subtract_instance_mob(struct instance_data *inst, mob_vnum vnum);
 
 // limits.c
@@ -517,9 +522,9 @@ void perform_morph(char_data *ch, morph_data *morph);
 
 // progress.c
 void cancel_empire_goal(empire_data *emp, struct empire_goal *goal);
-extern struct empire_goal *get_current_goal(empire_data *emp, any_vnum vnum);
-extern bool empire_has_completed_goal(empire_data *emp, any_vnum vnum);
-extern time_t when_empire_completed_goal(empire_data *emp, any_vnum vnum);
+struct empire_goal *get_current_goal(empire_data *emp, any_vnum vnum);
+bool empire_has_completed_goal(empire_data *emp, any_vnum vnum);
+time_t when_empire_completed_goal(empire_data *emp, any_vnum vnum);
 
 
 /**

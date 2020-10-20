@@ -1473,7 +1473,7 @@ void do_instance_add(char_data *ch, char *argument) {
 		num_rules = 0;
 		rule = NULL;
 		for (rule_iter = GET_ADV_LINKING(adv); rule_iter; rule_iter = rule_iter->next) {
-			if (is_location_rule[rule_iter->type]) {
+			if (adventure_link_is_location_rule[rule_iter->type]) {
 				// choose one at random
 				if (!number(0, num_rules++) || !rule) {
 					rule = rule_iter;

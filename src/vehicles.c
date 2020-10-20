@@ -1142,10 +1142,6 @@ void add_room_to_vehicle(room_data *room, vehicle_data *veh) {
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_vehicle(vehicle_data *veh, char_data *ch) {
-	extern bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch);
-	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
-	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
-	
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bld_data *interior = building_proto(VEH_INTERIOR_ROOM_VNUM(veh)), *proto;
 	struct obj_storage_type *store;
@@ -2859,9 +2855,6 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 */
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
 	extern bool delete_bld_relation_by_vnum(struct bld_relation **list, int type, bld_vnum vnum);
-	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
-	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
-	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	void extract_pending_vehicles();
 	
 	struct obj_storage_type *store, *next_store;
@@ -3328,8 +3321,6 @@ void olc_fullsearch_vehicle(char_data *ch, char *argument) {
 * @param descriptor_data *desc The descriptor who is saving.
 */
 void save_olc_vehicle(descriptor_data *desc) {
-	void prune_extra_descs(struct extra_descr_data **list);
-	
 	vehicle_data *proto, *veh = GET_OLC_VEHICLE(desc), *iter;
 	any_vnum vnum = GET_OLC_VNUM(desc);
 	struct spawn_info *spawn;
@@ -3781,8 +3772,6 @@ void look_at_vehicle(vehicle_data *veh, char_data *ch) {
 * @param char_data *ch The person who is editing a vehicle and will see its display.
 */
 void olc_show_vehicle(char_data *ch) {
-	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
-	
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	char buf[MAX_STRING_LENGTH], lbuf[MAX_STRING_LENGTH];
 	struct custom_message *custm;

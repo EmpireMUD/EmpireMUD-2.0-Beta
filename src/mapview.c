@@ -39,7 +39,12 @@
 */
 
 // external functions
+ACMD(do_weather);
 extern vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
+
+// locals
+ACMD(do_exits);
+void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -62,15 +67,12 @@ struct mappc_data_container {
 	struct mappc_data *data;
 };
 
-
-// locals
-ACMD(do_exits);
+// prototype this here
 static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, room_data *to_room, bitvector_t options);
 
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
-
 
 /**
 * @param room_data *room The room to check.
@@ -315,8 +317,6 @@ void get_informative_string(char_data *ch, char *buffer, bool dismantling, bool 
 * @return int The map radius.
 */
 int get_map_radius(char_data *ch) {
-	extern int count_recent_moves(char_data *ch);
-	
 	int mapsize, recent, max, smallmax;
 
 	mapsize = GET_MAPSIZE(REAL_CHAR(ch));
@@ -594,12 +594,6 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 * @param bitvector_t options LRR_x flags.
 */
 void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
-	extern bool can_turn_quest_in_to_room(char_data *ch, room_data *room, struct quest_temp_list **build_list);
-	extern const char *color_by_difficulty(char_data *ch, int level);
-	void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
-	void list_char_to_char(char_data *list, char_data *ch);
-	void list_vehicles_to_char(vehicle_data *list, char_data *ch);
-
 	struct mappc_data_container *mappc = NULL;
 	struct mappc_data *pc, *next_pc;
 	struct empire_city_data *city;
@@ -1094,8 +1088,6 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 
 
 void look_in_direction(char_data *ch, int dir) {
-	ACMD(do_weather);
-	
 	char buf[MAX_STRING_LENGTH - 9], buf2[MAX_STRING_LENGTH - 9];	// save room for the "You see "
 	vehicle_data *veh;
 	char_data *c;
@@ -1304,8 +1296,6 @@ void look_in_direction(char_data *ch, int dir) {
 * @param bitvector_t options Will recolor the tile if TRUE
 */
 static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, room_data *to_room, bitvector_t options) {
-	extern int get_direction_for_char(char_data *ch, int dir);
-	
 	bool need_color_terminator = FALSE;
 	char buf[30], buf1[30], col_buf[256], lbuf[MAX_STRING_LENGTH];
 	struct empire_city_data *city;
@@ -2309,8 +2299,6 @@ ACMD(do_mapscan) {
 
 
 ACMD(do_scan) {
-	void scan_for_tile(char_data *ch, char *argument);
-
 	int dir;
 	
 	room_data *use_room = (GET_MAP_LOC(IN_ROOM(ch)) ? real_room(GET_MAP_LOC(IN_ROOM(ch))->vnum) : NULL);

@@ -278,18 +278,32 @@ const char *adventure_link_flags[] = {
 };
 
 
-// ADV_LINK_x
+// ADV_LINK_x (1/2): link types
 const char *adventure_link_types[] = {
-	"BDG-EXISTING",
+	"BDG-EXISTING",	// 0
 	"BDG-NEW",
 	"PORTAL-WORLD",
 	"PORTAL-BDG-EXISTING",
 	"PORTAL-BDG-NEW",
-	"TIME-LIMIT",
+	"TIME-LIMIT",	// 5
 	"NOT-NEAR-SELF",
 	"PORTAL-CROP",
 	"EVENT-RUNNING",
 	"\n"
+};
+
+
+// ADV_LINK_x (2/2): whether or not a rule specifies a possible location (other types are for limits)
+const bool adventure_link_is_location_rule[] = {
+	TRUE,	// ADV_LINK_BUILDING_EXISTING
+	TRUE,	// ADV_LINK_BUILDING_NEW
+	TRUE,	// ADV_LINK_PORTAL_WORLD
+	TRUE,	// ADV_LINK_PORTAL_BUILDING_EXISTING
+	TRUE,	// ADV_LINK_PORTAL_BUILDING_NEW
+	FALSE,	// ADV_LINK_TIME_LIMIT
+	FALSE,	// ADV_LINK_NOT_NEAR_SELF
+	TRUE,	// ADV_LINK_PORTAL_CROP
+	FALSE,	// ADV_LINK_EVENT_RUNNING
 };
 
 

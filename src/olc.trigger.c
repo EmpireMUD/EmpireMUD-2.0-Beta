@@ -30,9 +30,9 @@
 *   Edit Modules
 */
 
-
-// external funcs
-void trig_data_init(trig_data *this_data);
+// external functions
+EVENT_CANCEL_FUNC(cancel_wait_event);
+struct cmdlist_element *compile_command_list(char *input);
 
 
 // locals
@@ -296,10 +296,6 @@ bool delete_from_proto_list_by_vnum(struct trig_proto_list **list, trig_vnum vnu
 * @param trig_vnum vnum The vnum to delete.
 */
 void olc_delete_trigger(char_data *ch, trig_vnum vnum) {
-	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	void free_freeable_triggers();
-	void remove_trigger_from_table(trig_data *trig);
-	
 	trig_data *trig;
 	quest_data *quest, *next_quest;
 	room_template *rmt, *next_rmt;
@@ -773,9 +769,6 @@ void olc_search_trigger(char_data *ch, trig_vnum vnum) {
 * @param descriptor_data *desc The descriptor who is saving.
 */
 void save_olc_trigger(descriptor_data *desc, char *script_text) {
-	EVENT_CANCEL_FUNC(cancel_wait_event);
-	extern struct cmdlist_element *compile_command_list(char *input);
-	
 	trig_data *proto, *live_trig, *next_trig, *trig = GET_OLC_TRIGGER(desc);
 	trig_vnum vnum = GET_OLC_VNUM(desc);
 	struct cmdlist_element *cmd, *next_cmd, *cmdlist;

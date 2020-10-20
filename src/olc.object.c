@@ -30,12 +30,13 @@
 *   Edit Modules
 */
 
+// external vars
+extern bitvector_t default_minipet_flags, default_minipet_affs;
+
 // locals
 const char *default_obj_keywords = "object new";
 const char *default_obj_short = "a new object";
 const char *default_obj_long = "A new object is sitting here.";
-
-char **get_weapon_types_string();
 
 // data
 char **olc_material_list = NULL;	// used for olc
@@ -52,8 +53,6 @@ char **olc_material_list = NULL;	// used for olc
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_object(obj_data *obj, char_data *ch) {
-	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
-	
 	bool is_adventure = (get_adventure_for_vnum(GET_OBJ_VNUM(obj)) != NULL);
 	char temp[MAX_STRING_LENGTH], unplural[MAX_STRING_LENGTH], *ptr;
 	bool problem = FALSE;
@@ -343,8 +342,6 @@ void check_oedit_material_list(void) {
 * @return obj_data* The new object's prototype.
 */
 obj_data *create_obj_table_entry(obj_vnum vnum) {
-	void add_object_to_table(obj_data *obj);
-	
 	obj_data *obj;
 	
 	// sanity
@@ -427,13 +424,6 @@ char *list_one_object(obj_data *obj, bool detail) {
 * @param obj_vnum vnum The vnum to delete.
 */
 void olc_delete_object(char_data *ch, obj_vnum vnum) {
-	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
-	extern bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
-	extern bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
-	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	extern bool delete_shop_item_from_list(struct shop_item **list, any_vnum vnum);
-	void remove_object_from_table(obj_data *obj);
-
 	struct empire_trade_data *trade, *next_trade;
 	struct ability_data_list *adl, *next_adl;
 	struct trading_post_data *tpd, *next_tpd;
@@ -1218,8 +1208,6 @@ void olc_fullsearch_obj(char_data *ch, char *argument) {
 * @param crop_vnum vnum The crop vnum.
 */
 void olc_search_obj(char_data *ch, obj_vnum vnum) {
-	extern bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);
-	
 	char buf[MAX_STRING_LENGTH];
 	struct adventure_spawn *asp;
 	struct interaction_item *inter;
@@ -1621,9 +1609,6 @@ void update_live_obj_from_olc(obj_data *to_update, obj_data *old_proto, obj_data
 * @param descriptor_data *desc The descriptor who is saving an object.
 */
 void save_olc_object(descriptor_data *desc) {
-	void free_obj_proto_data(struct obj_proto_data *data);
-	void prune_extra_descs(struct extra_descr_data **list);
-	
 	obj_data *obj = GET_OLC_OBJECT(desc), *obj_iter, *proto;
 	obj_vnum vnum = GET_OLC_VNUM(desc);
 	struct empire_unique_storage *eus;
@@ -2022,8 +2007,6 @@ void olc_get_values_display(char_data *ch, char *storage) {
 * @param char_data *ch The person who is editing an object and will see its display.
 */
 void olc_show_object(char_data *ch) {
-	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
-	
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	struct obj_storage_type *store;
 	struct custom_message *ocm;
@@ -2731,8 +2714,6 @@ OLC_MODULE(oedit_maxlevel) {
 
 
 OLC_MODULE(oedit_minipet) {
-	extern bitvector_t default_minipet_flags, default_minipet_affs;
-	
 	obj_data *obj = GET_OLC_OBJECT(ch->desc);
 	mob_vnum old = GET_MINIPET_VNUM(obj);
 	char buf[MAX_STRING_LENGTH];

@@ -29,9 +29,6 @@
 *   Edit Modules
 */
 
-// external funcs
-extern struct archetype_gear *copy_archetype_gear(struct archetype_gear *input);
-
 // locals
 const char *default_glb_name = "Unnamed Global";
 
@@ -115,8 +112,6 @@ bool audit_global(struct global_data *glb, char_data *ch) {
 * @return struct global_data* The new global's prototype.
 */
 struct global_data *create_global_table_entry(any_vnum vnum) {
-	void add_global_to_table(struct global_data *glb);
-	
 	struct global_data *glb;
 	
 	// sanity
@@ -216,8 +211,6 @@ char *list_one_global(struct global_data *glb, bool detail) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_global(char_data *ch, any_vnum vnum) {
-	void remove_global_from_table(struct global_data *glb);
-	
 	struct global_data *glb;
 	
 	if (!(glb = global_proto(vnum))) {
@@ -329,8 +322,6 @@ void save_olc_global(descriptor_data *desc) {
 * @return struct global_data* The copied global.
 */
 struct global_data *setup_olc_global(struct global_data *input) {
-	void clear_global(struct global_data *glb);
-
 	struct global_data *new;
 	
 	CREATE(new, struct global_data, 1);
@@ -569,8 +560,6 @@ OLC_MODULE(gedit_flags) {
 
 
 OLC_MODULE(gedit_gear) {
-	void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear **list);
-	
 	struct global_data *glb = GET_OLC_GLOBAL(ch->desc);
 	
 	if (GET_GLOBAL_TYPE(glb) != GLOBAL_NEWBIE_GEAR) {

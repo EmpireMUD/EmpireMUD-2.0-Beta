@@ -46,10 +46,10 @@
 
 
 /* local functions */
-void smash_tilde(char *str);
-char *next_page(char *str, descriptor_data *desc);
-int count_pages(char *str, descriptor_data *desc);
-void paginate_string(char *str, descriptor_data *d);
+int format_script(descriptor_data *d);
+int improved_editor_execute(descriptor_data *d, char *str);
+void parse_action(int command, char *string, descriptor_data *d);
+int replace_str(char **string, char *pattern, char *replacement, int rep_all, unsigned int max_size);
 
 
 /* ************************************************************************
@@ -152,9 +152,6 @@ void start_string_editor(descriptor_data *d, char *prompt, char **writeto, size_
 
 /* Add user input to the 'current' string (as defined by d->str) */
 void string_add(descriptor_data *d, char *str) {
-	extern char *stripcr(char *dest, const char *src);
-	extern int improved_editor_execute(descriptor_data *d, char *str);
-	
 	char buf1[MAX_STRING_LENGTH];
 	player_index_data *index;
 	struct mail_data *mail;
@@ -589,7 +586,6 @@ void show_string(descriptor_data *d, char *input) {
 
 
 int improved_editor_execute(descriptor_data *d, char *str) {
-	void parse_action(int command, char *string, descriptor_data *d);
 	char actions[MAX_INPUT_LENGTH];
 
 	if (*str != '/')
@@ -676,9 +672,6 @@ int improved_editor_execute(descriptor_data *d, char *str) {
 
 
 void parse_action(int command, char *string, descriptor_data *d) {
-	extern int format_script(descriptor_data *d);
-	extern int replace_str(char **string, char *pattern, char *replacement, int rep_all, unsigned int max_size);
-	
 	char buf[MAX_STRING_LENGTH * 3], buf2[MAX_STRING_LENGTH * 3];	// should be big enough
 	int indent = 0, rep_all = 0, flags = 0, replaced, i, line_low, line_high, j = 0;
 	unsigned int total_len;

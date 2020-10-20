@@ -119,16 +119,40 @@ struct olc_command_data {
 
 // olc.c helpers
 bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum);
-struct bld_relation *copy_bld_relations(struct bld_relation *input_list);
-struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
-struct icon_data *copy_icon_set(struct icon_data *input_list);
-struct interaction_item *copy_interaction_list(struct interaction_item *input_list);
-struct spawn_info *copy_spawn_list(struct spawn_info *input_list);
 void get_icons_display(struct icon_data *list, char *save_buffer);
 void get_interaction_display(struct interaction_item *list, char *save_buffer);
 void get_resource_display(struct resource_data *list, char *save_buffer);
 void get_script_display(struct trig_proto_list *list, char *save_buffer);
 int find_olc_type(char *name);
+bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
+
+// olc auditor functions
+bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch);
+bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
+bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
+
+// olc copiers
+struct archetype_gear *copy_archetype_gear(struct archetype_gear *input);
+struct bld_relation *copy_bld_relations(struct bld_relation *input_list);
+struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
+struct icon_data *copy_icon_set(struct icon_data *input_list);
+struct interaction_item *copy_interaction_list(struct interaction_item *input_list);
+struct spawn_info *copy_spawn_list(struct spawn_info *input_list);
+void smart_copy_interactions(struct interaction_item **addto, struct interaction_item *input);
+void smart_copy_scripts(struct trig_proto_list **addto, struct trig_proto_list *input);
+void smart_copy_spawns(struct spawn_info **addto, struct spawn_info *input);
+void smart_copy_template_spawns(struct adventure_spawn **addto, struct adventure_spawn *input);
+
+// olc list-deleters
+bool delete_event_reward_from_list(struct event_reward **list, int type, any_vnum vnum);
+bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
+bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
+bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
+bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
+bool delete_shop_item_from_list(struct shop_item **list, any_vnum vnum);
+
+// olc processors/parsers
+void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear **list);
 void olc_process_applies(char_data *ch, char *argument, struct apply_data **list);
 void olc_process_custom_messages(char_data *ch, char *argument, struct custom_message **list, const char **type_names);
 double olc_process_double(char_data *ch, char *argument, char *name, char *command, double min, double max, double old_value);
@@ -143,11 +167,6 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list);
 void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **list, int trigger_attach);
 any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *prev_arg);
-bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
-void smart_copy_interactions(struct interaction_item **addto, struct interaction_item *input);
-void smart_copy_scripts(struct trig_proto_list **addto, struct trig_proto_list *input);
-void smart_copy_spawns(struct spawn_info **addto, struct spawn_info *input);
-void smart_copy_template_spawns(struct adventure_spawn **addto, struct adventure_spawn *input);
 
 // olc save functions
 void save_olc_building(descriptor_data *desc);
@@ -163,6 +182,7 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input);
 void get_adventure_linking_display(struct adventure_link_rule *list, char *save_buffer);
 void get_archetype_gear_display(struct archetype_gear *list, char *save_buffer);
 void get_bld_relations_display(struct bld_relation *list, char *save_buffer);
+void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
 void get_generic_relation_display(struct generic_relation *list, bool show_vnums, char *save_buf, char *prefix);
 char *get_interaction_restriction_display(struct interact_restriction *list, bool whole_list);
 void get_evolution_display(struct evolution_data *list, char *save_buffer);
@@ -172,10 +192,11 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 
 // olc helpers
 const char *get_interaction_target(int type, any_vnum vnum);
+char **get_weapon_types_string();
 
 // helpers from other systems
-bool delete_event_reward_from_list(struct event_reward **list, int type, any_vnum vnum);
 bool find_event_reward_in_list(struct event_reward *list, int type, any_vnum vnum);
+bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum);
 
 
 // fullsearch helpers

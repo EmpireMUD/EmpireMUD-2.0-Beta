@@ -82,7 +82,6 @@ extern const int remove_lore_types[];
 ACMD(do_return);
 EVENT_CANCEL_FUNC(cancel_room_event);
 EVENT_CANCEL_FUNC(cancel_wait_event);
-void clear_obj_eq_sets(obj_data *obj);
 
 // locals
 void add_dropped_item(empire_data *emp, obj_data *obj);
@@ -1131,7 +1130,7 @@ void show_wear_off_msg(char_data *ch, any_vnum atype) {
 /* Extract a ch completely from the world, and leave his stuff behind */
 void extract_char_final(char_data *ch) {
 	empire_data *rescan_emp = IS_NPC(ch) ? NULL : GET_LOYALTY(ch);
-	char_data *k, *temp;
+	char_data *k;
 	descriptor_data *t_desc;
 	obj_data *obj;
 	int i;
@@ -1241,8 +1240,7 @@ void extract_char_final(char_data *ch) {
 	if (FIGHTING(ch)) {
 		stop_fighting(ch);
 	}
-	for (k = combat_list; k; k = temp) {
-		temp = k->next_fighting;
+	LL_FOREACH_SAFE2(combat_list, k, next_combat_list, next_fighting) {
 		if (FIGHTING(k) == ch) {
 			stop_fighting(k);
 		}

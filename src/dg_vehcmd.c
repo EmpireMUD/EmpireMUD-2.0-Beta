@@ -1552,7 +1552,6 @@ VCMD(do_vscale) {
 
 	// scale adventure
 	if (!str_cmp(arg, "instance")) {
-		void scale_instance_to_level(struct instance_data *inst, int level);
 		struct instance_data *inst;
 		if ((inst = get_instance_by_id(VEH_INSTANCE_ID(veh))) || (inst = find_instance_by_room(IN_ROOM(veh), FALSE, TRUE))) {
 			scale_instance_to_level(inst, level);

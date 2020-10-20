@@ -30,6 +30,7 @@ extern const char *ability_gain_hooks[];
 extern const char *adventure_flags[];
 extern const char *adventure_link_flags[];
 extern const char *adventure_link_types[];
+extern const bool adventure_link_is_location_rule[];
 extern const char *adventure_spawn_types[];
 extern const char *instance_flags[];
 extern const char *room_template_flags[];
@@ -295,6 +296,3 @@ extern const double score_levels[];
 extern const int techs_requiring_same_island[];
 extern struct tedit_struct tedit_option[];
 extern const int universal_wait;
-
-// instance.c
-extern const bool is_location_rule[];

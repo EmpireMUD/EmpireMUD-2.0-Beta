@@ -57,7 +57,6 @@ void remove_companion_mod(struct companion_data **companion, int type);
 // locals
 #define WHITESPACE " \t"	// used by some of the string functions
 bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
-bool ignore_distrustful_due_to_start_loc(room_data *loc);
 void score_empires();
 void unmark_items_for_char(char_data *ch, bool ground);
 
@@ -5878,8 +5877,6 @@ bool is_deep_mine(room_data *room) {
 * @param struct icon_data *use_icon Optional: Force it to use this icon (may be NULL).
 */
 void lock_icon(room_data *room, struct icon_data *use_icon) {
-	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
-	
 	struct icon_data *icon;
 
 	// don't do it if a custom icon is set (or no room provided)

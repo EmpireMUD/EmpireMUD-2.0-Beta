@@ -404,6 +404,7 @@ void wld_log(room_data *room, const char *format, ...) __attribute__ ((format (p
 void dg_obj_trigger(char *line, obj_data *obj);
 void assign_triggers(void *i, int type);
 void extract_trigger(trig_data *trig);
+void free_freeable_triggers();
 void free_varlist(struct trig_var_data *vd);
 int is_substring(char *sub, char *string);
 char *matching_quote(char *p);
@@ -421,6 +422,7 @@ void free_var_el(struct trig_var_data *var);
 struct trig_proto_list *copy_trig_protos(struct trig_proto_list *list);
 void copy_script(void *source, void *dest, int type);
 void trig_data_copy(trig_data *this_data, const trig_data *trg);
+void trig_data_init(trig_data *this_data);
 
 void send_char_pos(char_data *ch, int dam);
 

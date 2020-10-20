@@ -96,9 +96,6 @@ OLC_MODULE(mapedit_build) {
 
 
 OLC_MODULE(mapedit_decay) {
-	void annual_update_depletions(struct depletion_data **list);	// db.world.c
-	void annual_update_map_tile(struct map_data *tile);	// db.world.c
-	
 	room_data *room = HOME_ROOM(IN_ROOM(ch));
 	
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
@@ -255,8 +252,6 @@ OLC_MODULE(mapedit_height) {
 
 
 OLC_MODULE(mapedit_maintain) {
-	void finish_maintenance(char_data *ch, room_data *room);
-	
 	if (IS_DISMANTLING(IN_ROOM(ch)) || !IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can only maintain completed buildings.\r\n");
 		return;
@@ -679,7 +674,6 @@ OLC_MODULE(mapedit_naturalize) {
 
 
 OLC_MODULE(mapedit_populate) {
-	void populate_npc(room_data *room, struct empire_territory_data *ter, bool force);
 	char_data *current = ROOM_PEOPLE(IN_ROOM(ch));
 	
 	if (!GET_BUILDING(IN_ROOM(ch))) {

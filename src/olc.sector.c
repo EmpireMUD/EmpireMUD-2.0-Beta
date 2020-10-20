@@ -29,9 +29,6 @@
 *   Edit Modules
 */
 
-// external funcs
-void init_sector(sector_data *st);
-
 // locals
 const char *default_sect_name = "Unnamed Sector";
 const char *default_sect_title = "An Unnamed Sector";
@@ -49,10 +46,6 @@ const char default_roadside_icon = '.';
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_sector(sector_data *sect, char_data *ch) {
-	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
-	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
-	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
-	
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
 	int iter;
@@ -159,8 +152,6 @@ void check_sector_times(any_vnum only_sect) {
 * @return sector_data* The new sector.
 */
 sector_data *create_sector_table_entry(sector_vnum vnum) {
-	void add_sector_to_table(sector_data *sect);
-
 	sector_data *sect;
 	
 	// sanity
@@ -239,9 +230,6 @@ char *list_one_sector(sector_data *sect, bool detail) {
 * @param sector_vnum vnum The vnum to delete.
 */
 void olc_delete_sector(char_data *ch, sector_vnum vnum) {
-	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
-	void remove_sector_from_table(sector_data *sect);
-	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;

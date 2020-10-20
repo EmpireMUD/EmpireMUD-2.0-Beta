@@ -31,9 +31,6 @@
 *   Edit Modules
 */
 
-// external funcs
-void init_room_template(room_template *rmt);
-
 // locals
 const char *default_rmt_title = "An Unnamed Room";
 
@@ -49,9 +46,6 @@ const char *default_rmt_title = "An Unnamed Room";
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_room_template(room_template *rmt, char_data *ch) {
-	extern bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch);
-	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
-	
 	adv_data *my_adv = get_adventure_for_vnum(GET_RMT_VNUM(rmt));
 	struct adventure_spawn *spawn;
 	struct trig_proto_list *tpl;
@@ -158,8 +152,6 @@ bool audit_room_template(room_template *rmt, char_data *ch) {
 * @return room_template* The new room template's prototype.
 */
 room_template *create_room_template_table_entry(rmt_vnum vnum) {
-	void add_room_template_to_table(room_template *rmt);
-
 	room_template *rmt;
 	
 	// sanity
@@ -271,9 +263,6 @@ bool match_one_exit(char_data *ch, room_template *add_exit_to, room_template *or
 * @param rmt_vnum vnum The vnum to delete.
 */
 void olc_delete_room_template(char_data *ch, rmt_vnum vnum) {
-	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	void remove_room_template_from_table(room_template *rmt);
-	
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
 	room_data *room, *next_room;
@@ -648,8 +637,6 @@ bool rmt_has_exit(room_template *rmt, int dir) {
 * @param descriptor_data *desc The descriptor who is saving.
 */
 void save_olc_room_template(descriptor_data *desc) {
-	void prune_extra_descs(struct extra_descr_data **list);
-	
 	room_template *proto, *rmt = GET_OLC_ROOM_TEMPLATE(desc);
 	rmt_vnum vnum = GET_OLC_VNUM(desc);
 	struct adventure_spawn *spawn;
@@ -902,8 +889,6 @@ void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer
 * @param char_data *ch The person who is editing a room template and will see its display.
 */
 void olc_show_room_template(char_data *ch) {
-	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
-	
 	room_template *rmt = GET_OLC_ROOM_TEMPLATE(ch->desc);
 	char lbuf[MAX_STRING_LENGTH];
 	

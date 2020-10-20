@@ -37,7 +37,11 @@
 */
 
 // external vars
-extern struct generic_name_data *generic_names;
+extern bool catch_up_mobs;
+
+// external funcs
+ACMD(do_exit);
+ACMD(do_say);
 
 
 // for validate_global_map_spawns, run_global_map_spawns
@@ -542,8 +546,6 @@ bool validate_mobile_move(char_data *ch, int dir, room_data *to_room) {
 * @return bool TRUE if the mobile moved successfully
 */
 bool try_mobile_movement(char_data *ch) {
-	ACMD(do_exit);
-	
 	int dir, count;
 	room_data *to_room, *temp_room, *was_in = IN_ROOM(ch);
 	struct room_direction_data *ex;
@@ -629,8 +631,6 @@ bool try_mobile_movement(char_data *ch) {
 * Main cycle of mob activity (iterates over character list).
 */
 void mobile_activity(void) {
-	extern bool catch_up_mobs;
-	
 	register char_data *ch, *next_ch, *vict, *targ, *m;
 	struct track_data *track;
 	struct pursuit_data *purs, *next_purs;
@@ -899,8 +899,6 @@ void mobile_activity(void) {
 * This is called every few seconds to animate mobs in the room with players.
 */
 void run_mob_echoes(void) {
-	ACMD(do_say);
-	
 	struct custom_message *mcm, *found_mcm;
 	char_data *ch, *mob, *found_mob, *chiter;
 	descriptor_data *desc;
@@ -1031,8 +1029,6 @@ void despawn_mob(char_data *ch) {
 * @return int The number of mobs spawned, if any.
 */
 static int spawn_one_list(room_data *room, struct spawn_info *list) {
-	extern char *replace_npc_names(const char *str, const char *name, const char *empire_name, const char *empire_adjective);
-	
 	int count, x_coord, y_coord;
 	struct spawn_info *spawn;
 	bool in_city, junk;
@@ -1123,8 +1119,6 @@ GLB_FUNCTION(run_global_map_spawns) {
 * @param bool only_artisans If TRUE, the room has respawned too recently and will only spawn artisans
 */
 static void spawn_one_room(room_data *room, bool only_artisans) {
-	extern char *replace_npc_names(const char *str, const char *name, const char *empire_name, const char *empire_adjective);
-	
 	room_data *iter, *next_iter, *home;
 	struct empire_territory_data *ter;
 	struct vehicle_room_list *vrl;
