@@ -4886,7 +4886,7 @@ struct offense_data {
 	int x, y;	// approximate location
 	bitvector_t flags;	// OFF_ for anonymous offenses, whether or not there was an observer
 	
-	struct offense_data *next;	// linked list
+	struct offense_data *prev, *next;	// doubly-linked list
 };
 
 
@@ -4951,7 +4951,7 @@ struct empire_data {
 	struct empire_unique_storage *unique_store;	// LL: eus->next
 	struct empire_trade_data *trade;
 	struct empire_log_data *logs;
-	struct offense_data *offenses;
+	struct offense_data *offenses;	// doubly-linked list
 	struct empire_goal *goals;	// current goal trackers (hash by vnum)
 	struct empire_completed_goal *completed_goals;	// actually a hash (vnum)
 	struct player_craft_data *learned_crafts;	// crafts available to the whole empire

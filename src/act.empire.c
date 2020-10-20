@@ -6073,7 +6073,7 @@ ACMD(do_offenses) {
 	// start buffer
 	size = snprintf(output, sizeof(output), "Offenses for %s:\r\n", EMPIRE_NAME(emp));
 	
-	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+	DL_FOREACH(EMPIRE_OFFENSES(emp), off) {
 		if (!IS_SET(off->flags, OFF_SEEN) && (search_emp || search_plr != NOTHING)) {
 			continue;	// can't search unseen
 		}

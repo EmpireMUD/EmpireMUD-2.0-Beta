@@ -2128,7 +2128,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 				off->x = t[4];
 				off->y = t[5];
 				off->flags = asciiflag_conv(str_in);
-				LL_APPEND(EMPIRE_OFFENSES(emp), off);
+				DL_APPEND(EMPIRE_OFFENSES(emp), off);
 				break;
 			}
 
@@ -2780,7 +2780,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				off->x = t[4];
 				off->y = t[5];
 				off->flags = asciiflag_conv(str_in);
-				LL_APPEND(EMPIRE_OFFENSES(emp), off);
+				DL_APPEND(EMPIRE_OFFENSES(emp), off);
 				break;
 			}
 			case 'X': { // trade
@@ -3071,7 +3071,7 @@ void write_empire_logs_to_file(FILE *fl, empire_data *emp) {
 	}
 	
 	// W: offenses
-	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+	DL_FOREACH(EMPIRE_OFFENSES(emp), off) {
 		fprintf(fl, "W %d %d %d %ld %d %d %s\n", off->type, off->empire, off->player_id, off->timestamp, off->x, off->y, bitv_to_alpha(off->flags));
 	}
 	
@@ -3661,7 +3661,7 @@ void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc
 		off->flags |= OFF_WAR;
 	}
 	
-	LL_PREPEND(EMPIRE_OFFENSES(emp), off);
+	DL_PREPEND(EMPIRE_OFFENSES(emp), off);
 	EMPIRE_NEEDS_LOGS_SAVE(emp) = TRUE;
 	
 	log_offense_to_empire(emp, off, offender);
@@ -3683,7 +3683,7 @@ int avenge_offenses_from_empire(empire_data *emp, empire_data *foe) {
 		return 0;	// no work
 	}
 	
-	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+	DL_FOREACH(EMPIRE_OFFENSES(emp), off) {
 		if (off->empire == EMPIRE_VNUM(foe)) {
 			SET_BIT(off->flags, OFF_AVENGED);
 			++count;
@@ -3714,7 +3714,7 @@ int avenge_solo_offenses_from_player(empire_data *emp, char_data *foe) {
 		return 0;	// no work
 	}
 	
-	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+	DL_FOREACH(EMPIRE_OFFENSES(emp), off) {
 		if (off->empire == NOTHING && off->player_id == GET_IDNUM(foe)) {
 			SET_BIT(off->flags, OFF_AVENGED);
 			++count;
@@ -3738,7 +3738,7 @@ void clean_empire_offenses(void) {
 	empire_data *emp, *next_emp;
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		LL_FOREACH_SAFE(EMPIRE_OFFENSES(emp), off, next_off) {
+		DL_FOREACH_SAFE(EMPIRE_OFFENSES(emp), off, next_off) {
 			if (off->timestamp < clear_older) {
 				remove_offense(emp, off);
 			}
@@ -3768,7 +3768,7 @@ int get_total_offenses_from_empire(empire_data *emp, empire_data *foe) {
 		return 0;	// shortcut
 	}
 	
-	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+	DL_FOREACH(EMPIRE_OFFENSES(emp), off) {
 		if (!OFFENSE_HAS_WEIGHT(off)) {
 			continue;	// some don't count
 		}
@@ -3799,7 +3799,7 @@ int get_total_offenses_from_char(empire_data *emp, char_data *ch) {
 		return 0;	// shortcut
 	}
 	
-	LL_FOREACH(EMPIRE_OFFENSES(emp), off) {
+	DL_FOREACH(EMPIRE_OFFENSES(emp), off) {
 		if (!OFFENSE_HAS_WEIGHT(off)) {
 			continue;	// some don't count
 		}
@@ -3892,7 +3892,7 @@ bool offense_was_seen(char_data *ch, empire_data *emp, room_data *from_room) {
 * @param struct offense_data *off The offense to remove.
 */
 void remove_offense(empire_data *emp, struct offense_data *off) {
-	LL_DELETE(EMPIRE_OFFENSES(emp), off);
+	DL_DELETE(EMPIRE_OFFENSES(emp), off);
 	free(off);
 }
 
@@ -3917,7 +3917,7 @@ void remove_recent_offenses(empire_data *emp, int type, char_data *offender) {
 		return;	// sanitation check
 	}
 	
-	LL_FOREACH_SAFE(EMPIRE_OFFENSES(emp), off, next_off) {
+	DL_FOREACH_SAFE(EMPIRE_OFFENSES(emp), off, next_off) {
 		if (off->timestamp < cutoff) {
 			break;	// offenses are sorted reverse-chronologically and we have gone too far this time
 		}
