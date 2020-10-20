@@ -2085,8 +2085,8 @@ void free_empire(empire_data *emp) {
 */
 void load_empire_logs_one(FILE *fl, empire_data *emp) {	
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
-	struct empire_log_data *elog, *last_log = NULL;
-	struct offense_data *off, *last_off = NULL;
+	struct empire_log_data *elog;
+	struct offense_data *off;
 	long long_in;
 	int t[10];
 	
@@ -2114,7 +2114,6 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 				elog->timestamp = (time_t) t[1];
 				elog->string = fread_string(fl, buf2);
 				LL_APPEND(emp->logs, elog);
-				last_log = elog;
 				break;
 			}
 			case 'W': {	// offenses
@@ -2131,7 +2130,6 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 				off->y = t[5];
 				off->flags = asciiflag_conv(str_in);
 				LL_APPEND(EMPIRE_OFFENSES(emp), off);
-				last_off = off;
 				break;
 			}
 
@@ -2157,7 +2155,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	int t[10], junk;
 	long l_in;
 	char line[1024], str_in[256], buf[MAX_STRING_LENGTH];
-	struct empire_unique_storage *eus, *last_eus = NULL;
+	struct empire_unique_storage *eus;
 	struct shipping_data *shipd;
 	struct empire_production_total *egt;
 	struct empire_storage_data *store;
@@ -2267,7 +2265,6 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					eus->flags = asciiflag_conv(str_in);
 					eus->obj = obj;
 					LL_APPEND(EMPIRE_UNIQUE_STORAGE(emp), eus);
-					last_eus = eus;
 				}
 				
 				break;
@@ -2371,7 +2368,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	char line[1024], str_in[256];
 	struct empire_political_data *emp_pol;
 	struct empire_territory_data *ter;
-	struct empire_trade_data *trade, *last_trade = NULL;
+	struct empire_trade_data *trade;
 	struct empire_goal *egoal, *last_egoal = NULL;
 	struct empire_homeless_citizen *ehc;
 	struct empire_playtime_tracker *ept;
@@ -2795,7 +2792,6 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 					trade->limit = t[2];
 					trade->cost = dbl_in;
 					LL_APPEND(emp->trade, trade);
-					last_trade = trade;
 				}
 				else {
 					log("SYSERR: X line of empire %d does not scan.\r\n", emp->vnum);
@@ -5235,8 +5231,8 @@ void parse_object(FILE *obj_f, int nr) {
 	int t[10], retval;
 	char *tmpptr;
 	char f1[256], f2[256], f3[256];
-	struct obj_storage_type *store, *last_store = NULL;
-	struct obj_apply *apply, *last_apply = NULL;
+	struct obj_storage_type *store;
+	struct obj_apply *apply;
 	obj_data *obj, *find;
 	any_vnum vn;
 	
@@ -5348,7 +5344,6 @@ void parse_object(FILE *obj_f, int nr) {
 				apply->modifier = t[1];
 				apply->apply_type = t[2];
 				LL_APPEND(GET_OBJ_APPLIES(obj), apply);
-				last_apply = apply;
 				break;
 
 			case 'B':
@@ -5443,7 +5438,6 @@ void parse_object(FILE *obj_f, int nr) {
 				store->vnum = t[1];
 				store->flags = asciiflag_conv(f1);
 				LL_APPEND(obj->proto_data->storage, store);
-				last_store = store;
 				break;
 			}
 			
@@ -5702,7 +5696,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	long l_in;
 	int t[10];
 	struct depletion_data *dep;
-	struct reset_com *reset, *last_reset = NULL;
+	struct reset_com *reset;
 	struct affected_type *af;
 	struct track_data *track;
 	room_data *room, *find;
@@ -5838,7 +5832,6 @@ void parse_room(FILE *fl, room_vnum vnum) {
 			
 				CREATE(reset, struct reset_com, 1);
 				LL_APPEND(room->reset_commands, reset);
-				last_reset = reset;
 				
 				// load data
 				reset->command = *(line + 2);
@@ -6369,8 +6362,8 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 	int int_in[4];
 	double dbl_in;
 	char line[256], str_in[256], str_in2[256], str_in3[256];
-	struct adventure_spawn *spawn, *last_spawn = NULL;
-	struct exit_template *ex, *last_ex = NULL;
+	struct adventure_spawn *spawn;
+	struct exit_template *ex;
 	room_template *rmt, *find;
 
 	CREATE(rmt, room_template, 1);
@@ -6420,7 +6413,6 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 			case 'D': {	// exit
 				CREATE(ex, struct exit_template, 1);
 				LL_APPEND(GET_RMT_EXITS(rmt), ex);
-				last_ex = ex;
 				
 				ex->dir = atoi(line + 1);
 				
@@ -6448,7 +6440,6 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 			case 'M': {	// spawn
 				CREATE(spawn, struct adventure_spawn, 1);
 				LL_APPEND(GET_RMT_SPAWNS(rmt), spawn);
-				last_spawn = spawn;
 
 				// same line (don't read another): type vnum percent limit
 				if (sscanf(line, "M %d %d %lf %d", &int_in[0], &int_in[1], &dbl_in, &int_in[2]) != 4) {
@@ -6640,7 +6631,7 @@ void init_sector(sector_data *st) {
 */
 void parse_sector(FILE *fl, sector_vnum vnum) {
 	char line[256], str_in[256], str_in2[256], str_in3[256], char_in[2];
-	struct evolution_data *evo, *last_evo = NULL;
+	struct evolution_data *evo;
 	struct spawn_info *spawn;
 	sector_data *sect, *find;
 	double dbl_in;
@@ -6710,7 +6701,6 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				evo->percent = dbl_in;
 				evo->becomes = int_in[2];
 				LL_APPEND(GET_SECT_EVOS(sect), evo);
-				last_evo = evo;
 				break;
 			}
 	

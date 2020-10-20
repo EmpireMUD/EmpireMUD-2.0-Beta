@@ -362,7 +362,7 @@ void free_account(account_data *acct) {
 */
 void parse_account(FILE *fl, int nr) {
 	char err_buf[MAX_STRING_LENGTH], line[256], str_in[256];
-	struct account_player *plr, *last_plr = NULL;
+	struct account_player *plr;
 	account_data *acct, *find;
 	struct pk_data *pk;
 	int int_in[3];
@@ -426,7 +426,6 @@ void parse_account(FILE *fl, int nr) {
 					
 					// add to end
 					LL_APPEND(acct->players, plr);
-					last_plr = plr;
 				}
 				else {
 					log("SYSERR: Format error in P section of %s", err_buf);

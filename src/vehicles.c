@@ -1994,9 +1994,9 @@ void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl) {
 vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 	char line[MAX_INPUT_LENGTH], error[MAX_STRING_LENGTH], s_in[MAX_INPUT_LENGTH];
 	obj_data *load_obj, *obj, *next_obj, *cont_row[MAX_BAG_ROWS];
-	struct vehicle_attached_mob *vam, *last_vam = NULL;
+	struct vehicle_attached_mob *vam;
 	int length, iter, i_in[4], location = 0, timer;
-	struct resource_data *res, *last_res = NULL;
+	struct resource_data *res;
 	vehicle_data *proto = vehicle_proto(vnum);
 	bool end = FALSE, seek_end = FALSE;
 	any_vnum load_vnum;
@@ -2046,7 +2046,6 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						vam->flags = asciiflag_conv(s_in);
 						vam->empire = i_in[2];
 						LL_APPEND(VEH_ANIMALS(veh), vam);
-						last_vam = vam;
 					}
 				}
 				break;
@@ -2272,7 +2271,6 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					res->type = i_in[2];
 					res->misc = i_in[3];
 					LL_APPEND(VEH_NEEDS_RESOURCES(veh), res);
-					last_res = res;
 				}
 				break;
 			}

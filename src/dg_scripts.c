@@ -1640,7 +1640,7 @@ void add_var(struct trig_var_data **var_list, char *name, char *value, int id) {
 *  this function returns, in order to remove the script.
 */
 int remove_trigger(struct script_data *sc, char *name) {
-	trig_data *i, *j;
+	trig_data *i;
 	int num = 0, string = FALSE, n;
 	char *cname;
 
@@ -1658,7 +1658,7 @@ int remove_trigger(struct script_data *sc, char *name) {
 	else
 		num = atoi(name);
 
-	for (n = 0, j = NULL, i = TRIGGERS(sc); i; j = i, i = i->next) {
+	for (n = 0, i = TRIGGERS(sc); i; i = i->next) {
 		if (string) {
 			if (isname(name, GET_TRIG_NAME(i)))
 				if (++n >= num)
@@ -7111,7 +7111,7 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 * named vdelete so people didn't think it was to delete rooms
 */
 ACMD(do_vdelete) {
-	struct trig_var_data *vd, *vd_prev=NULL;
+	struct trig_var_data *vd;
 	struct script_data *sc_remote=NULL;
 	char *var, *uid_p;
 	char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];
@@ -7181,7 +7181,7 @@ ACMD(do_vdelete) {
 	}
 
 	/* find the global */
-	for (vd = sc_remote->global_vars; vd; vd_prev = vd, vd = vd->next)
+	for (vd = sc_remote->global_vars; vd; vd = vd->next)
 		if (!str_cmp(vd->name, var))
 			break;
 
@@ -7206,7 +7206,7 @@ ACMD(do_vdelete) {
 *     'rdelete <variable_name> <uid>'
 */
 void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
-	struct trig_var_data *vd, *vd_prev=NULL;
+	struct trig_var_data *vd;
 	struct script_data *sc_remote=NULL;
 	char *line, *var, *uid_p;
 	char arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
@@ -7272,7 +7272,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 		return; /* no script globals */
 
 	/* find the global */
-	for (vd = sc_remote->global_vars; vd; vd_prev = vd, vd = vd->next)
+	for (vd = sc_remote->global_vars; vd; vd = vd->next)
 		if (!str_cmp(vd->name, var) && (vd->context==0 || vd->context==sc->context))
 			break;
 
