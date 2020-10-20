@@ -879,8 +879,12 @@ struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_stor
 	if (input) {
 		*new = *input;
 		
+		// don't copy next/list pointers
 		new->next = NULL;
-		new->next_in_world = NULL;
+		new->next_in_world = new->prev_in_world = NULL;
+		new->next_in_random_triggers = new->prev_in_random_triggers = NULL;
+		new->in_world_list = FALSE;
+		new->in_random_list = FALSE;
 		
 		new->name = str_dup(NULLSAFE(input->name));
 		new->arglist = input->arglist ? str_dup(input->arglist) : NULL;
