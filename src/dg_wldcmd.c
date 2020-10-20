@@ -1504,7 +1504,6 @@ WCMD(do_wscale) {
 	
 	// scale adventure
 	if (!str_cmp(arg, "instance")) {
-		void scale_instance_to_level(struct instance_data *inst, int level);
 		if (inst || (inst = find_instance_by_room(room, FALSE, TRUE))) {
 			scale_instance_to_level(inst, level);
 		}

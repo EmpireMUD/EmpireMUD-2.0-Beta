@@ -996,8 +996,6 @@ char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_
 * @return struct empire_npc_data* The npc who will help, or NULL.
 */
 struct empire_npc_data *find_free_npc_for_chore(empire_data *emp, room_data *loc) {
-	void extract_pending_chars();
-	
 	struct empire_territory_data *ter_iter, *next_ter;
 	struct empire_npc_data *backup = NULL, *npc_iter;
 	room_data *rm;
@@ -1661,7 +1659,6 @@ void workforce_crafting_chores(empire_data *emp, room_data *room, vehicle_data *
 */
 void do_chore_building(empire_data *emp, room_data *room, int mode) {
 	void finish_building(char_data *ch, room_data *room);
-	void finish_maintenance(char_data *ch, room_data *room);
 	
 	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[mode].mob);
 	struct empire_storage_data *store = NULL;

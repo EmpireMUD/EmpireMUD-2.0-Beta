@@ -28,6 +28,7 @@
 *   Common Modules
 *   Common Displays
 *   Auditors
+*   Sorters
 *   Helpers
 */
 
@@ -512,8 +513,6 @@ OLC_MODULE(vedit_speed);
 
 
 // external functions
-void sort_icon_set(struct icon_data **list);
-void sort_interactions(struct interaction_item **list);
 extern int sort_requirements_by_group(struct req_data *a, struct req_data *b);
 extern bool valid_room_template_vnum(rmt_vnum vnum);
 
@@ -4506,6 +4505,26 @@ bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// SORTERS /////////////////////////////////////////////////////////////////
+
+// simple sorter for icons
+int sort_icon_set(struct icon_data *a, struct icon_data *b) {
+	return a->type - b->type;
+}
+
+
+// simple sorter for interactions
+int sort_interactions(struct interaction_item *a, struct interaction_item *b) {
+	if (a->type != b->type) {
+		return a->type - b->type;
+	}
+	else {
+		return a->exclusion_code - b->exclusion_code;
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
 /**
@@ -4578,7 +4597,7 @@ struct icon_data *copy_icon_set(struct icon_data *input_list) {
 		LL_APPEND(list, new);
 	}
 	
-	sort_icon_set(&list);
+	LL_SORT(list, sort_icon_set);
 	return list;
 }
 
@@ -4623,7 +4642,7 @@ struct interaction_item *copy_interaction_list(struct interaction_item *input_li
 	}
 			
 	// ensure these are sorted
-	sort_interactions(&list);
+	LL_SORT(list, sort_interactions);
 	return list;
 }
 
@@ -5786,7 +5805,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		}
 	}	// end 'change'
 	else if (is_abbrev(cmd_arg, "move")) {
-		struct req_data *to_move, *prev, *a, *b, *a_next, *b_next, iitem;
+		struct req_data *to_move, *prev;
 		bool up;
 		
 		// usage: <cmd> move <number> <up | down>
@@ -5809,9 +5828,10 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		else {
 			// find the one to move
 			to_move = prev = NULL;
-			for (req = *list; req && !to_move; req = req->next) {
+			LL_FOREACH(*list, req) {
 				if (--num == 0) {
 					to_move = req;
+					break;	// found
 				}
 				else {
 					// store for next iteration
@@ -5826,28 +5846,17 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
 			}
 			else {
-				// SUCCESS: "move" them by swapping data
-				if (up) {
-					a = prev;
-					b = to_move;
+				// SUCCESS: attempt to move
+				if (up && prev) {
+					// can move up
+					LL_DELETE(*list, to_move);
+					LL_PREPEND_ELEM(*list, prev, to_move);
 				}
-				else {
-					a = to_move;
-					b = to_move->next;
+				else if (!up && (prev = to_move->next)) {
+					// can move down
+					LL_DELETE(*list, to_move);
+					LL_APPEND_ELEM(*list, prev, to_move);
 				}
-				
-				// store next pointers
-				a_next = a->next;
-				b_next = b->next;
-				
-				// swap data
-				iitem = *a;
-				*a = *b;
-				*b = iitem;
-				
-				// restore next pointers
-				a->next = a_next;
-				b->next = b_next;
 				
 				// message: re-atoi(num_arg) because we destroyed num finding our target
 				msg_to_char(ch, "You move %s %d %s.\r\n", command, atoi(num_arg), (up ? "up" : "down"));
@@ -6386,7 +6395,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 					
 					msg_to_char(ch, "You remove icon %d.\r\n", atoi(arg2));
 					LL_DELETE(*list, icon);
-					icon->next = NULL;
+					icon->next = NULL;	// freed as a list
 					free_icon_set(&icon);
 				}
 			}
@@ -6422,7 +6431,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 			temp->icon = str_dup(arg4);
 			LL_APPEND(*list, temp);
 
-			sort_icon_set(list);
+			LL_SORT(*list, sort_icon_set);
 			strcpy(lbuf, show_color_codes(arg4));
 			msg_to_char(ch, "You add %s: %s %s%s&0 %s\r\n", icon_types[loc], show_color_codes(arg3), arg3, arg4, lbuf);
 		}
@@ -6687,9 +6696,8 @@ bool parse_interaction_restrictions(char_data *ch, char *argument, struct intera
 */
 void olc_process_interactions(char_data *ch, char *argument, struct interaction_item **list, int attach_type) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH], arg5[MAX_INPUT_LENGTH], arg6[MAX_INPUT_LENGTH];
-	struct interaction_item *interact, *prev, *to_move, *temp, *a, *b, *a_next, *b_next, *copyfrom = NULL, *change;
+	struct interaction_item *interact, *prev, *to_move, *temp, *copyfrom = NULL, *change;
 	struct interact_restriction *found_restrictions = NULL;
-	struct interaction_item iitem;
 	int iter, loc, num, count, findtype;
 	any_vnum vnum;
 	double prc;
@@ -6855,9 +6863,10 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 		else {
 			// find the one to move
 			to_move = prev = NULL;
-			for (interact = *list; interact && !to_move; interact = interact->next) {
+			LL_FOREACH(*list, interact) {
 				if (--num == 0) {
 					to_move = interact;
+					break;	// found;
 				}
 				else {
 					// store for next iteration
@@ -6872,34 +6881,23 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
 			}
 			else {
-				// SUCCESS: "move" them by swapping data
-				if (up) {
-					a = prev;
-					b = to_move;
+				// SUCCESS: attempt to move
+				if (up && prev) {
+					// can move up
+					LL_DELETE(*list, to_move);
+					LL_PREPEND_ELEM(*list, prev, to_move);
 				}
-				else {
-					a = to_move;
-					b = to_move->next;
+				else if (!up && (prev = to_move->next)) {
+					// can move down
+					LL_DELETE(*list, to_move);
+					LL_APPEND_ELEM(*list, prev, to_move);
 				}
-				
-				// store next pointers
-				a_next = a->next;
-				b_next = b->next;
-				
-				// swap data
-				iitem = *a;
-				*a = *b;
-				*b = iitem;
-				
-				// restore next pointers
-				a->next = a_next;
-				b->next = b_next;
 				
 				// message: re-atoi(arg2) because we destroyed num finding our target
 				msg_to_char(ch, "You move interaction %d %s.\r\n", atoi(arg2), (up ? "up" : "down"));
 				
 				// re-sort to keep types together
-				sort_interactions(list);
+				LL_SORT(*list, sort_interactions);
 			}
 		}
 	}
@@ -6953,7 +6951,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			temp->restrictions = found_restrictions;
 			LL_APPEND(*list, temp);
 
-			sort_interactions(list);
+			LL_SORT(*list, sort_interactions);
 			msg_to_char(ch, "You add %s: %dx %s %.2f%%", interact_types[loc], num, get_interaction_target(loc, vnum), prc);
 			if (exc) {
 				msg_to_char(ch, " (%c)", exc);
@@ -7062,7 +7060,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			msg_to_char(ch, "Invalid field. You can change: type, quantity, vnum, percent, exclusion\r\n");
 		}
 		
-		sort_interactions(list);
+		LL_SORT(*list, sort_interactions);
 	}
 	else {
 		msg_to_char(ch, "Usage: interaction add <type> <quantity> <vnum> <percent> [exclusion code | restrictions]\r\n");
@@ -7094,7 +7092,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 void olc_process_resources(char_data *ch, char *argument, struct resource_data **list) {	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	char arg4[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
+	struct resource_data *res, *next_res, *prev, *change, *to_move;
 	int num, type, misc;
 	any_vnum vnum;
 	bool found;
@@ -7273,54 +7271,38 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
 		}
 		else {
-			prev_res = prev_prev = NULL;
-			found = FALSE;
-			for (res = *list; res && !found && num > 0; res = res->next) {
+			to_move = prev = NULL;
+			LL_FOREACH(*list, res) {
 				if (--num == 0) {
-					if (up) {
-						found = TRUE;
-						if (prev_prev) {
-							prev_prev->next = res;
-							prev_res->next = res->next;
-							res->next = prev_res;
-						}
-						else {
-							// must be head of list
-							prev_res->next = res->next;
-							res->next = prev_res;
-							*list = res;
-						}
-					}
-					else {	// down
-						if (res->next) {
-							found = TRUE;
-							temp = res->next;
-							if (prev_res) {
-								prev_res->next = temp;
-								res->next = temp->next;
-								temp->next = res;
-							}
-							else {
-								// was at start
-								res->next = temp->next;
-								temp->next = res;
-								*list = temp;
-							}
-						}
-					}
-					
-					if (found) {
-						msg_to_char(ch, "You move resource %d (%s) %s.\r\n", atoi(arg2), get_resource_name(res), (up ? "up" : "down"));
-					}
+					to_move = res;
+					break;	// found
 				}
-				
-				// rotate back
-				prev_prev = prev_res;
-				prev_res = res;
+				else {
+					// store for later
+					prev = res;
+				}
 			}
 			
-			if (!found) {
-				msg_to_char(ch, "Invalid resource number to move.\r\n");
+			if (!to_move) {
+				msg_to_char(ch, "Invalid resource number.\r\n");
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: attempt to move
+				if (up && prev) {
+					// can move up
+					LL_DELETE(*list, to_move);
+					LL_PREPEND_ELEM(*list, prev, to_move);
+				}
+				else if (!up && (prev = to_move->next)) {
+					// can move down
+					LL_DELETE(*list, to_move);
+					LL_APPEND_ELEM(*list, prev, to_move);
+				}
+				
+				msg_to_char(ch, "You move resource %d (%s) %s.\r\n", atoi(arg2), get_resource_name(res), (up ? "up" : "down"));
 			}
 		}
 	}
@@ -7941,7 +7923,7 @@ void smart_copy_icons(struct icon_data **addto, struct icon_data *input) {
 		LL_APPEND(*addto, new_icon);
 	}
 	
-	sort_icon_set(addto);
+	LL_SORT(*addto, sort_icon_set);
 }
 
 
@@ -7988,7 +7970,7 @@ void smart_copy_interactions(struct interaction_item **addto, struct interaction
 	}
 			
 	// ensure these are sorted
-	sort_interactions(addto);
+	LL_SORT(*addto, sort_interactions);
 }
 
 

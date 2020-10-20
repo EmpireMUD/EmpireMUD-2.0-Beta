@@ -31,9 +31,8 @@
 *   Edit Modules
 */
 
-// external funcs
-extern int delete_all_instances(adv_data *adv);
-void init_adventure(adv_data *adv);
+// external functions
+OLC_MODULE(olc_audit);
 
 // locals
 const char *default_adv_name = "Unnamed Adventure Zone";
@@ -53,8 +52,6 @@ int default_adv_reset = 30;
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
-	OLC_MODULE(olc_audit);
-	
 	struct adventure_link_rule *link;
 	char buf[MAX_STRING_LENGTH];
 	struct trig_proto_list *tpl;
@@ -197,8 +194,6 @@ bool audit_adventure(adv_data *adv, char_data *ch, bool only_one) {
 * @return adv_data* The new adventure.
 */
 adv_data *create_adventure_table_entry(adv_vnum vnum) {
-	void add_adventure_to_table(adv_data *adv);
-	
 	adv_data *adv;
 	
 	// sanity
@@ -411,8 +406,6 @@ char *list_one_adventure(adv_data *adv, bool detail) {
 * @param adv_vnum vnum The vnum to delete.
 */
 void olc_delete_adventure(char_data *ch, adv_vnum vnum) {
-	void remove_adventure_from_table(adv_data *adv);
-	
 	adv_data *adv;
 	int live = 0;
 	

@@ -4007,7 +4007,7 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	}
 	
 	if (home_mode) {
-		LL_COUNT(GET_HOME_STORAGE(targ_player), eus, num);
+		DL_COUNT(GET_HOME_STORAGE(targ_player), eus, num);
 		if (targ_player == ch) {
 			size = snprintf(output, sizeof(output), "%s items stored in your home (%d/%d):\r\n", part, num, config_get_int("max_home_store_uniques"));
 		}
@@ -4020,7 +4020,7 @@ void warehouse_inventory(char_data *ch, char *argument, int mode) {
 	}
 	num = 0;
 	
-	LL_FOREACH((home_mode ? GET_HOME_STORAGE(targ_player) : EMPIRE_UNIQUE_STORAGE(emp)), iter) {
+	DL_FOREACH((home_mode ? GET_HOME_STORAGE(targ_player) : EMPIRE_UNIQUE_STORAGE(emp)), iter) {
 		if (!home_mode && !imm_access && iter->island != island) {
 			continue;
 		}
@@ -4123,7 +4123,7 @@ void warehouse_identify(char_data *ch, char *argument, int mode) {
 	}
 	
 	// ok, find it
-	LL_FOREACH_SAFE((home_mode ? GET_HOME_STORAGE(ch) : EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch))), iter, next_iter) {
+	DL_FOREACH_SAFE((home_mode ? GET_HOME_STORAGE(ch) : EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch))), iter, next_iter) {
 		if (!home_mode && !imm_access && iter->island != island) {
 			continue;
 		}
@@ -4250,8 +4250,10 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 	}
 	
 	// ok, find it
-	for (iter = (home_mode ? GET_HOME_STORAGE(ch) : EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch))); iter && !done && (amt > 0 || all); iter = next_iter) {
-		next_iter = iter->next;
+	DL_FOREACH_SAFE((home_mode ? GET_HOME_STORAGE(ch) : EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch))), iter, next_iter) {
+		if (done || (amt <= 0 && !all)) {
+			break;	// done early
+		}
 		
 		if (!home_mode && !imm_access && iter->island != island) {
 			continue;
@@ -4310,10 +4312,10 @@ void warehouse_retrieve(char_data *ch, char *argument, int mode) {
 		// remove the entry
 		if (iter->amount <= 0 || !iter->obj) {
 			if (home_mode) {
-				LL_DELETE(GET_HOME_STORAGE(ch), iter);
+				DL_DELETE(GET_HOME_STORAGE(ch), iter);
 			}
 			else {
-				LL_DELETE(EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch)), iter);
+				DL_DELETE(EMPIRE_UNIQUE_STORAGE(GET_LOYALTY(ch)), iter);
 				EMPIRE_NEEDS_STORAGE_SAVE(GET_LOYALTY(ch)) = TRUE;
 			}
 		    free(iter);

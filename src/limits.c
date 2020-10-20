@@ -38,8 +38,12 @@
 *   Core Periodicals
 */
 
+// external vars
+extern bool gain_cond_message;
+
 // external funcs
-void out_of_blood(char_data *ch);
+ACMD(do_dismount);
+ACMD(do_respawn);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -120,8 +124,6 @@ void check_attribute_gear(char_data *ch) {
 * Called periodically to force players to respawn from death.
 */
 void check_death_respawn(void) {
-	ACMD(do_respawn);
-	
 	descriptor_data *desc;
 	char_data *ch;
 	
@@ -261,8 +263,6 @@ void check_pointless_fight(char_data *mob) {
 * @param char_data *ch The player to check.
 */
 void check_should_dismount(char_data *ch) {
-	ACMD(do_dismount);
-	
 	bool ok = TRUE;
 	
 	if (!IS_RIDING(ch)) {
@@ -386,10 +386,6 @@ int limit_crowd_control(char_data *victim, int atype) {
 * @param char_data *ch The character to update.
 */
 void point_update_char(char_data *ch) {
-	void despawn_mob(char_data *ch);
-	extern int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname);
-	void remove_quest_items(char_data *ch);
-	
 	struct cooldown_data *cool, *next_cool;
 	struct instance_data *inst;
 	obj_data *obj, *next_obj;
@@ -567,15 +563,6 @@ void point_update_char(char_data *ch) {
 * @param char_data *ch The character to update.
 */
 void real_update_char(char_data *ch) {
-	void adventure_unsummon(char_data *ch);
-	void check_combat_end(char_data *ch);
-	void check_morph_ability(char_data *ch);
-	extern int compute_bonus_exp_per_day(char_data *ch);
-	void random_encounter(char_data *ch);
-	void update_biting_char(char_data *ch);
-	void update_vampire_sun(char_data *ch);
-	extern int max_inventory_size;
-	
 	struct over_time_effect_type *dot, *next_dot;
 	struct affected_type *af, *next_af, *immune;
 	char_data *room_ch, *next_ch, *caster;
@@ -1342,8 +1329,6 @@ bool should_delete_empire(empire_data *emp) {
 * @param struct empire_needs *needs The current 'needs' to process.
 */
 void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs) {
-	void deactivate_workforce_island(empire_data *emp, int island_id);
-	
 	struct empire_storage_data *store, *next_store;
 	struct island_info *island = get_island(eisle->island, TRUE);
 	bool any = TRUE, vault = FALSE;
@@ -1753,8 +1738,6 @@ void point_update_obj(obj_data *obj) {
 * @param obj_data *obj The object to update.
 */
 void real_update_obj(obj_data *obj) {
-	void start_burning(room_data *room);
-	
 	struct empire_political_data *pol;
 	empire_data *emp, *enemy;
 	room_data *home;
@@ -2003,7 +1986,6 @@ void update_trading_post(void) {
 * @param int value The amount to gain or lose
 */
 void gain_condition(char_data *ch, int condition, int value) {
-	extern bool gain_cond_message;
 	bool intoxicated;
 
 	// no change?
@@ -2210,9 +2192,6 @@ int move_gain(char_data *ch, bool info_only) {
 * update for that tick, to avoid iterating a second time over the same data.
 */
 void point_update(bool run_real) {
-	void clean_offers(char_data *ch);
-	void update_players_online_stats();
-	
 	vehicle_data *veh, *next_veh;
 	obj_data *obj, *next_obj;
 	char_data *ch, *next_ch;

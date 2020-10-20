@@ -30,9 +30,6 @@
 *   Edit Modules
 */
 
-// external funcs
-extern char **get_weapon_types_string();
-
 // locals
 const char *default_mob_keywords = "mobile new";
 const char *default_mob_short = "a new mobile";
@@ -51,8 +48,6 @@ const char *default_mob_long = "A new mobile is standing here.\r\n";
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_mobile(char_data *mob, char_data *ch) {
-	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
-	
 	bool is_adventure = (get_adventure_for_vnum(GET_MOB_VNUM(mob)) != NULL);
 	char temp[MAX_STRING_LENGTH], *ptr;
 	bool problem = FALSE;
@@ -145,8 +140,6 @@ bool audit_mobile(char_data *mob, char_data *ch) {
 * @return char_data* The new mob's prototype.
 */
 char_data *create_mob_table_entry(mob_vnum vnum) {
-	void add_mobile_to_table(char_data *mob);
-	
 	char_data *mob;
 	
 	// sanity
@@ -290,12 +283,6 @@ char *list_one_mobile(char_data *mob, bool detail) {
 * @param mob_vnum vnum The vnum to delete.
 */
 void olc_delete_mobile(char_data *ch, mob_vnum vnum) {
-	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
-	void remove_homeless_citizen(empire_data *emp, struct empire_homeless_citizen *ehc);
-	
-	void extract_pending_chars();
-	void remove_mobile_from_table(char_data *mob);
-	
 	struct empire_homeless_citizen *ehc, *next_ehc;
 	struct empire_territory_data *ter, *next_ter;
 	struct ability_data_list *adl, *next_adl;

@@ -338,7 +338,7 @@ bool is_affiliated_island(empire_data *emp, int island_id) {
 	}
 	
 	//Check unique storage too
-	for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 		if (isle->island == eus->island) {
 			return TRUE;
 		}
@@ -845,6 +845,19 @@ static void show_empire_identify_to_char(char_data *ch, empire_data *emp, char *
 // quick sorter for einv
 int sort_einv_list(struct einv_type *a, struct einv_type *b) {
 	return b->total - a->total;
+}
+
+
+// simple sorter for territory nodes
+static room_data *sort_territory_from_loc = NULL;
+int sort_territory_nodes_by_distance(struct find_territory_node *a, struct find_territory_node *b) {
+	if (sort_territory_from_loc) {
+		return compute_distance(sort_territory_from_loc, a->loc) - compute_distance(sort_territory_from_loc, b->loc);
+	}
+	else {
+		// no data?
+		return 0;
+	}
 }
 
 
@@ -2208,7 +2221,7 @@ struct efind_group {
 	int count;	// how many found
 	bool stackable;	// whether or not this can stack
 	
-	struct efind_group *next;
+	struct efind_group *prev, *next;	// DLL
 };
 
 
@@ -2231,7 +2244,7 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *ve
 	}
 	
 	if (obj && OBJ_CAN_STACK(obj)) {
-		LL_FOREACH(*list, eg) {
+		DL_FOREACH(*list, eg) {
 			if (eg->location == location && eg->stackable && GET_OBJ_VNUM(eg->obj) == GET_OBJ_VNUM(obj)) {
 				eg->count += 1;
 				found = TRUE;
@@ -2240,7 +2253,7 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *ve
 		}
 	}
 	if (veh) {
-		LL_FOREACH(*list, eg) {
+		DL_FOREACH(*list, eg) {
 			if (eg->location != location) {
 				continue;
 			}
@@ -2265,7 +2278,7 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *ve
 		eg->veh = veh;
 		eg->count = 1;
 		eg->stackable = obj ? OBJ_CAN_STACK(obj) : FALSE;	// not used for vehicle
-		LL_APPEND(*list, eg);
+		DL_APPEND(*list, eg);
 	}
 }
 
@@ -2330,7 +2343,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 		trade->cost = cost;
 		trade->limit = limit;
 		
-		sort_trade_data(&EMPIRE_TRADE(emp));
+		LL_SORT(EMPIRE_TRADE(emp), sort_trade_data);
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		
 		msg_to_char(ch, "%s now %ss '%s' costing %s%.1f, when %s %d.\r\n", EMPIRE_NAME(emp), trade_type[subcmd], get_obj_name_by_proto(vnum), trade_mostleast[subcmd], cost, trade_overunder[subcmd], limit);
@@ -2817,43 +2830,17 @@ void show_tavern_status(char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// TERRITORY HELPERS ///////////////////////////////////////////////////////
 
-// for do_findmaintenance and do_territory
-struct find_territory_node {
-	room_data *loc;
-	char *details;	// optional string with vehicles, etc
-	int count;
-	
-	struct find_territory_node *next;
-};
-
-
-/**
-* @param struct find_territory_node *list The node list to count.
-* @return int The number of elements in the list.
-*/
-int count_node_list(struct find_territory_node *list) {
-	struct find_territory_node *node;
-	int count = 0;
-	
-	for (node = list; node; node = node->next) {
-		++count;
-	}
-	
-	return count;
-}
-
-
 // sees if the room is within 10 spaces of any existing node
-static struct find_territory_node *find_nearby_territory_node(room_data *room, struct find_territory_node *list, int distance) {
-	struct find_territory_node *node, *found = NULL;
+struct find_territory_node *find_nearby_territory_node(room_data *room, struct find_territory_node *list, int distance) {
+	struct find_territory_node *node;
 	
-	for (node = list; node && !found; node = node->next) {
+	DL_FOREACH(list, node) {
 		if (compute_distance(room, node->loc) <= distance) {
-			found = node;
+			return node;
 		}
 	}
 	
-	return found;
+	return NULL;
 }
 
 
@@ -2866,23 +2853,23 @@ static struct find_territory_node *find_nearby_territory_node(room_data *room, s
 */
 struct find_territory_node *reduce_territory_node_list(struct find_territory_node *list) {
 	struct find_territory_node *node, *next_node, *find;
-	int size = 5;
+	int count, size = 5;
 	
 	// iterate until there are no more than 350 nodes
-	while (count_node_list(list) > 350) {
-		for (node = list; node && node->next; node = next_node) {
-			next_node = node->next;
-			
+	DL_COUNT(list, node, count);
+	while (count > 350) {
+		DL_FOREACH_SAFE(list, node, next_node) {
 			// is there a node later in the list that is within range?
-			if ((find = find_nearby_territory_node(node->loc, node->next, size))) {
+			if ((find = find_nearby_territory_node(node->loc, next_node, size))) {
 				find->count += node->count;
-				LL_DELETE(list, node);
+				DL_DELETE(list, node);
 				free(node);
 			}
 		}
 		
 		// double size on each pass
 		size *= 2;
+		DL_COUNT(list, node, count);
 	}
 	
 	// return the list (head of list may have changed)
@@ -2903,8 +2890,6 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 * @param char_data *argument The tile to search for.
 */
 void scan_for_tile(char_data *ch, char *argument) {
-	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
-
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
 	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
@@ -3056,20 +3041,20 @@ void scan_for_tile(char_data *ch, char *argument) {
 				node->loc = room;
 				node->count = 1;
 				node->details = *veh_string ? str_dup(veh_string) : NULL;	// if any
-				LL_PREPEND(node_list, node);
+				DL_PREPEND(node_list, node);
 			}
 		}
 	}
 
 	if (node_list) {
-		sort_territory_node_list_by_distance(IN_ROOM(ch), &node_list);
+		sort_territory_from_loc = IN_ROOM(ch);
+	    DL_SORT(node_list, sort_territory_nodes_by_distance);
 		
 		size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, mapsize, PLURAL(mapsize));
 		
 		// display and free the nodes
 		total = over_count = 0;
-		for (node = node_list; node; node = next_node) {
-			next_node = node->next;
+		DL_FOREACH_SAFE(node_list, node, next_node) {
 			total += node->count;
 			
 			if (over_count) {
@@ -3119,10 +3104,9 @@ void scan_for_tile(char_data *ch, char *argument) {
 				}
 			}
 			
+			DL_DELETE(node_list, node);
 			free(node);
 		}
-		
-		node_list = NULL;
 		
 		if (over_count) {
 			size += snprintf(output + size, sizeof(output) - size, "... and %d more tile%s\r\n", over_count, PLURAL(over_count));
@@ -3135,60 +3119,6 @@ void scan_for_tile(char_data *ch, char *argument) {
 	}
 	
 	GET_WAIT_STATE(ch) = 1 RL_SEC;	// short lag for scannings
-}
-
-
-// quick-switch of linked list positions
-inline struct find_territory_node *switch_node_pos(struct find_territory_node *l1, struct find_territory_node *l2) {
-    l1->next = l2->next;
-    l2->next = l1;
-    return l2;
-}
-
-
-/**
-* Sort a territory node list, by distance from a room.
-*
-* @param room_data *from The room to measure from.
-* @param struct find_territory_node **node_list A pointer to the node list to sort.
-*/
-void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list) {
-	struct find_territory_node *start, *p, *q, *top;
-    bool changed = TRUE;
-        
-    // safety first
-    if (!from) {
-    	return;
-    }
-    
-    start = *node_list;
-
-	CREATE(top, struct find_territory_node, 1);
-
-    top->next = start;
-    if (start && start->next) {
-    	// q is always one item behind p
-
-        while (changed) {
-            changed = FALSE;
-            q = top;
-            p = top->next;
-            while (p->next != NULL) {
-            	if (compute_distance(from, p->loc) > compute_distance(from, p->next->loc)) {
-					q->next = switch_node_pos(p, p->next);
-					changed = TRUE;
-				}
-				
-                q = p;
-                if (p->next) {
-                    p = p->next;
-                }
-            }
-        }
-    }
-    
-    *node_list = top->next;
-    free(top);
 }
 
 
@@ -4223,9 +4153,7 @@ ACMD(do_efind) {
 			size = snprintf(buf, sizeof(buf), "You discover:");	// leave off \r\n
 			last_rm = NULL;
 			
-			for (eg = list; eg; eg = next_eg) {
-				next_eg = eg->next;
-				
+			DL_FOREACH_SAFE(list, eg, next_eg) {
 				// length limit check
 				if (size + 24 > sizeof(buf)) {
 					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
@@ -4251,10 +4179,10 @@ ACMD(do_efind) {
 				else if (eg->veh) {
 					size += snprintf(buf + size, sizeof(buf) - size, "%s", skip_filler(VEH_SHORT_DESC(eg->veh)));
 				}
+				
+				DL_DELETE(list, eg);
 				free(eg);
 			}
-			// all free! free!
-			list = NULL;
 			
 			size += snprintf(buf + size, sizeof(buf) - size, "\r\n");	// training crlf
 			page_string(ch->desc, buf, TRUE);
@@ -4752,7 +4680,7 @@ ACMD(do_enroll) {
 			
 			// unique storage: append to end of current empire's list
 			if (EMPIRE_UNIQUE_STORAGE(old)) {
-				LL_CONCAT(EMPIRE_UNIQUE_STORAGE(e), EMPIRE_UNIQUE_STORAGE(old));
+				DL_CONCAT(EMPIRE_UNIQUE_STORAGE(e), EMPIRE_UNIQUE_STORAGE(old));
 				EMPIRE_UNIQUE_STORAGE(old) = NULL;
 			}
 			
@@ -5180,7 +5108,7 @@ ACMD(do_findmaintenance) {
 			CREATE(node, struct find_territory_node, 1);
 			node->loc = ter->room;
 			node->count = 1;
-			LL_PREPEND(node_list, node);
+			DL_PREPEND(node_list, node);
 		}
 	}
 	
@@ -5218,7 +5146,7 @@ ACMD(do_findmaintenance) {
 			snprintf(partial, sizeof(partial), "%s", skip_filler(VEH_SHORT_DESC(veh)));
 			node->details = str_dup(partial);
 			node->count = 1;
-			LL_PREPEND(node_list, node);
+			DL_PREPEND(node_list, node);
 		}
 	}
 	
@@ -5245,7 +5173,7 @@ ACMD(do_findmaintenance) {
 		
 		// display and free the nodes
 		full = FALSE;
-		LL_FOREACH_SAFE(node_list, node, next_node) {
+		DL_FOREACH_SAFE(node_list, node, next_node) {
 			if (!full) {
 				lsize = snprintf(partial, sizeof(partial), "%s %s", coord_display_room(ch, node->loc, TRUE), node->details ? node->details : skip_filler(get_room_name(node->loc, FALSE)));
 				if (node->count > 1) {
@@ -5267,10 +5195,11 @@ ACMD(do_findmaintenance) {
 			if (node->details) {
 				free(node->details);
 			}
+			
+			DL_DELETE(node_list, node);
 			free(node);
 		}
 		
-		node_list = NULL;
 		page_string(ch->desc, buf, TRUE);
 	}
 	else {
@@ -5500,7 +5429,7 @@ ACMD(do_islands) {
 	}
 	
 	// add unique storage
-	for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 		do_islands_add_einv(&list, eus->island, eus->amount);
 	}
 	
@@ -7053,7 +6982,7 @@ ACMD(do_territory) {
 			CREATE(node, struct find_territory_node, 1);
 			node->loc = iter;
 			node->count = 1;
-			LL_PREPEND(node_list, node);
+			DL_PREPEND(node_list, node);
 		}
 	}
 	
@@ -7071,7 +7000,7 @@ ACMD(do_territory) {
 		// display and free the nodes
 		total = 0;
 		full = FALSE;
-		LL_FOREACH_SAFE(node_list, node, next_node) {
+		DL_FOREACH_SAFE(node_list, node, next_node) {
 			total += node->count;
 			
 			if (!full) {
@@ -7090,10 +7019,11 @@ ACMD(do_territory) {
 			if (node->details) {
 				free(node->details);
 			}
+			
+			DL_DELETE(node_list, node);
 			free(node);
 		}
 		
-		node_list = NULL;
 		if (!full) {
 			size += snprintf(buf +  size, sizeof(buf) - size, "Total: %d\r\n", total);
 		}

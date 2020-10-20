@@ -24,6 +24,7 @@ int find_command(const char *command);
 char lower( char c );
 void nanny(descriptor_data *d, char *arg);
 void next_creation_step(descriptor_data *d);
+void parse_archetype_menu(descriptor_data *desc, char *argument);
 int _parse_name(char *arg, char *name);
 void send_low_pos_msg(char_data *ch);
 int Valid_Name(char *newname);

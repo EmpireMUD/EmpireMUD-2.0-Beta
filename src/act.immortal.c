@@ -1473,7 +1473,7 @@ void do_instance_add(char_data *ch, char *argument) {
 		num_rules = 0;
 		rule = NULL;
 		for (rule_iter = GET_ADV_LINKING(adv); rule_iter; rule_iter = rule_iter->next) {
-			if (is_location_rule[rule_iter->type]) {
+			if (adventure_link_is_location_rule[rule_iter->type]) {
 				// choose one at random
 				if (!number(0, num_rules++) || !rule) {
 					rule = rule_iter;
@@ -3077,7 +3077,7 @@ SHOW(show_islands) {
 				SAFE_ADD(cur->count, store->amount, 0, INT_MAX, FALSE);
 			}
 		}
-		for (uniq = EMPIRE_UNIQUE_STORAGE(emp); uniq; uniq = uniq->next) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), uniq) {
 			if (!cur || cur->island != uniq->island) {
 				cur = find_or_make_show_island(uniq->island, &list);
 			}
@@ -5944,7 +5944,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			mem = SCRIPT_MEM(k);
 			msg_to_char(ch, "Script memory:\r\n  Remember             Command\r\n");
 			while (mem) {
-				char_data *mc = find_char(mem->id);
+				char_data *mc = find_char(mem->id, FALSE);
 				if (!mc) {
 					msg_to_char(ch, "  ** Corrupted!\r\n");
 				}
@@ -8870,7 +8870,7 @@ ACMD(do_moveeinv) {
 			HASH_DEL(eisle->store, store);
 			free(store);
 		}
-		for (unique = EMPIRE_UNIQUE_STORAGE(emp); unique; unique = unique->next) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), unique) {
 			if (unique->island == island_from) {
 				unique->island = island_to;
 				count += unique->amount;

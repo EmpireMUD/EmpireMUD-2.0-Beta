@@ -77,9 +77,7 @@ void check_newbie_islands();
 void check_wars();
 void chore_update();
 void display_automessages();
-void extract_pending_chars();
 void extract_pending_vehicles();
-void free_freeable_triggers();
 void frequent_combat(int pulse);
 void point_update();
 void process_import_evolutions();
@@ -98,7 +96,6 @@ void update_actions();
 void update_empire_npc_data();
 void update_guard_towers();
 void update_instance_world_size();
-void update_players_online_stats();
 void update_trading_post();
 void weather_and_time(int mode);
 void write_running_events_file();
@@ -3890,9 +3887,6 @@ void init_game(ush_int port) {
 	}
 
 	dg_event_init();
-
-	/* set up hash table for find_char() */
-	init_lookup_table();
 
 	boot_db();
 

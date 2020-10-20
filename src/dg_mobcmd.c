@@ -2416,7 +2416,6 @@ ACMD(do_mscale) {
 	
 	// scale adventure
 	if (!str_cmp(arg, "instance")) {
-		void scale_instance_to_level(struct instance_data *inst, int level);
 		struct instance_data *inst;
 		if (MOB_INSTANCE_ID(ch) != NOTHING && (inst = get_instance_by_mob(ch))) {
 			scale_instance_to_level(inst, level);

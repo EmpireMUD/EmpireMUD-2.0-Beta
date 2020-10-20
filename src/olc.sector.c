@@ -29,10 +29,6 @@
 *   Edit Modules
 */
 
-// external funcs
-void init_sector(sector_data *st);
-void sort_interactions(struct interaction_item **list);
-
 // locals
 const char *default_sect_name = "Unnamed Sector";
 const char *default_sect_title = "An Unnamed Sector";
@@ -50,10 +46,6 @@ const char default_roadside_icon = '.';
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_sector(sector_data *sect, char_data *ch) {
-	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
-	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
-	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
-	
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
 	int iter;
@@ -160,8 +152,6 @@ void check_sector_times(any_vnum only_sect) {
 * @return sector_data* The new sector.
 */
 sector_data *create_sector_table_entry(sector_vnum vnum) {
-	void add_sector_to_table(sector_data *sect);
-
 	sector_data *sect;
 	
 	// sanity
@@ -240,9 +230,6 @@ char *list_one_sector(sector_data *sect, bool detail) {
 * @param sector_vnum vnum The vnum to delete.
 */
 void olc_delete_sector(char_data *ch, sector_vnum vnum) {
-	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
-	void remove_sector_from_table(sector_data *sect);
-	
 	sector_data *sect, *sect_iter, *next_sect, *replace_sect;
 	quest_data *quest, *next_quest;
 	progress_data *prg, *next_prg;
@@ -794,7 +781,16 @@ sector_data *setup_olc_sector(sector_data *input) {
 	}
 	
 	// done
-	return new;	
+	return new;
+}
+
+
+// simple sorter for sector evolutions
+int sort_evolutions(struct evolution_data *a, struct evolution_data *b) {
+	if (a->type != b->type) {
+		return a->type - b->type;
+	}
+	return a->percent - b->percent;
 }
 
 
@@ -905,8 +901,6 @@ OLC_MODULE(sectedit_commands) {
 
 
 OLC_MODULE(sectedit_evolution) {
-	void sort_evolutions(sector_data *sect);
-	
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
 	struct evolution_data *evo, *change;
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], valstr[MAX_INPUT_LENGTH], *sectarg, *tmp;
@@ -1017,8 +1011,8 @@ OLC_MODULE(sectedit_evolution) {
 				evo->percent = prc;
 				evo->becomes = GET_SECT_VNUM(to_sect);
 				
-				LL_PREPEND(st->evolution, evo);
-				sort_evolutions(st);
+				LL_PREPEND(GET_SECT_EVOS(st), evo);
+				LL_SORT(GET_SECT_EVOS(st), sort_evolutions);
 				
 				msg_to_char(ch, "You add %s %s%s evolution at %.2f%%: %d %s\r\n", AN(evo_types[evo_type]), evo_types[evo_type], valstr, prc, GET_SECT_VNUM(to_sect), GET_SECT_NAME(to_sect));
 			}
@@ -1114,7 +1108,7 @@ OLC_MODULE(sectedit_evolution) {
 		
 		// if any of them hit (safe to do this anyway)
 		if (change) {
-			sort_evolutions(st);
+			LL_SORT(GET_SECT_EVOS(st), sort_evolutions);
 		}
 	}
 	else {

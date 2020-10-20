@@ -177,7 +177,7 @@ void complete_quest(char_data *ch, struct player_quest *pq, empire_data *giver_e
 	
 	// remove from player's tracker
 	LL_DELETE(GET_QUESTS(ch), pq);
-	pq->next = NULL;
+	pq->next = NULL;	// freed as list
 	free_player_quests(pq);
 	
 	// dailies:
@@ -430,7 +430,7 @@ void drop_quest(char_data *ch, struct player_quest *pq) {
 	remove_quest_items_by_quest(ch, pq->vnum);
 	
 	LL_DELETE(GET_QUESTS(ch), pq);
-	pq->next = NULL;
+	pq->next = NULL;	// freed as list
 	free_player_quests(pq);
 }
 

@@ -26,9 +26,7 @@
 #include "interpreter.h"
 
 // external vars
-extern int max_mob_id;
-extern int max_obj_id;
-extern int max_vehicle_id;
+extern int top_script_uid;
 
 
 /**
@@ -321,19 +319,20 @@ void assign_triggers(void *i, int type) {
 */
 int char_script_id(char_data *ch) {
 	if (ch->script_id == 0 && IS_NPC(ch)) {
-		ch->script_id = max_mob_id++;
-		add_to_lookup_table(ch->script_id, (void *)ch);
+		ch->script_id = top_script_uid++;
+		add_to_lookup_table(ch->script_id, (void *)ch, TYPE_MOB);
 		ch->in_lookup_table = TRUE;
 		
-		if (max_mob_id >= EMPIRE_ID_BASE && reboot_control.time > 16) {
+		if (top_script_uid == INT_MAX && reboot_control.time > 16) {
 			reboot_control.time = 16;
 			reboot_control.type = SCMD_REBOOT;
 			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for mobiles has exceeded the limit, scheduling an auto-reboot");
+			top_script_uid = OTHER_ID_BASE;
 		}
 	}
 	else if (ch->script_id == 0 && !IS_NPC(ch) && GET_IDNUM(ch) > 0) {
 		ch->script_id = GET_IDNUM(ch);
-		add_to_lookup_table(ch->script_id, (void *)ch);
+		add_to_lookup_table(ch->script_id, (void *)ch, TYPE_MOB);
 		ch->in_lookup_table = TRUE;
 	}
 	return ch->script_id;
@@ -348,16 +347,15 @@ int char_script_id(char_data *ch) {
 */
 int obj_script_id(obj_data *obj) {
 	if (obj->script_id == 0) {
-		obj->script_id = max_obj_id++;
-		add_to_lookup_table(obj->script_id, (void *)obj);
+		obj->script_id = top_script_uid++;
+		add_to_lookup_table(obj->script_id, (void *)obj, TYPE_OBJ);
 		
-		/* objs don't run out of idspace, currently
-		if (max_obj_id > x && reboot_control.time > 16) {
+		if (top_script_uid == INT_MAX && reboot_control.time > 16) {
 			reboot_control.time = 16;
 			reboot_control.type = SCMD_REBOOT;
 			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for objects has exceeded the limit, scheduling an auto-reboot");
+			top_script_uid = OTHER_ID_BASE;
 		}
-		*/
 	}
 	return obj->script_id;
 }
@@ -371,13 +369,14 @@ int obj_script_id(obj_data *obj) {
 */
 int veh_script_id(vehicle_data *veh) {
 	if (veh->script_id == 0) {
-		veh->script_id = max_vehicle_id++;
-		add_to_lookup_table(veh->script_id, (void *)veh);
+		veh->script_id = top_script_uid++;
+		add_to_lookup_table(veh->script_id, (void *)veh, TYPE_VEH);
 		
-		if (max_vehicle_id >= OBJ_ID_BASE && reboot_control.time > 16) {
+		if (top_script_uid == INT_MAX && reboot_control.time > 16) {
 			reboot_control.time = 16;
 			reboot_control.type = SCMD_REBOOT;
 			syslog(SYS_ERROR, 0, TRUE, "SYSERR: Script IDs for vehicles has exceeded the limit, scheduling an auto-reboot");
+			top_script_uid = OTHER_ID_BASE;
 		}
 	}
 	return veh->script_id;

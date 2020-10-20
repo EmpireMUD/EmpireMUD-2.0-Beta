@@ -1664,7 +1664,6 @@ OCMD(do_oscale) {
 
 	// scale adventure
 	if (!str_cmp(arg, "instance")) {
-		void scale_instance_to_level(struct instance_data *inst, int level);
 		room_data *orm = obj_room(obj);
 		struct instance_data *inst;
 		if ((inst = find_instance_by_room(orm, FALSE, TRUE))) {

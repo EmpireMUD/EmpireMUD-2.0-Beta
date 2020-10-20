@@ -31,7 +31,6 @@
 
 // external funcs
 void init_crop(crop_data *cp);
-void sort_interactions(struct interaction_item **list);
 
 // locals
 const char *default_crop_name = "Unnamed Crop";
@@ -49,10 +48,6 @@ const char *default_crop_title = "An Unnamed Crop";
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_crop(crop_data *cp, char_data *ch) {
-	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
-	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
-	extern struct icon_data *get_icon_from_set(struct icon_data *set, int type);
-	
 	char temp[MAX_STRING_LENGTH];
 	bool problem = FALSE;
 	adv_data *adv;
@@ -182,7 +177,6 @@ char *list_one_crop(crop_data *crop, bool detail) {
 * @param crop_vnum vnum The vnum to delete.
 */
 void olc_delete_crop(char_data *ch, crop_vnum vnum) {
-	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 	void remove_crop_from_table(crop_data *crop);
 	
 	adv_data *adv, *next_adv;

@@ -38,8 +38,10 @@
 *   Menu Interpreter Functions
 */
 
-// external funcs
-void parse_archetype_menu(descriptor_data *desc, char *argument);
+// exernal vars
+extern char *motd;
+extern char *imotd;
+extern char *CREDIT_MESSG;
 
 // locals
 void set_creation_state(descriptor_data *d, int state);
@@ -1156,8 +1158,6 @@ cpp_extern const struct command_info cmd_info[] = {
  * then calls the appropriate function.
  */
 void command_interpreter(char_data *ch, char *argument) {
-	extern bool check_ability(char_data *ch, char *string, bool exact);
-	extern bool check_social(char_data *ch, char *string, bool exact);
 	int cmd, length, iter;
 	char arg[MAX_INPUT_LENGTH], *line;
 
@@ -2094,9 +2094,6 @@ bool check_multiplaying(descriptor_data *d) {
 
 // simple motd
 void send_motd(descriptor_data *d) {
-	extern char *motd;
-	extern char *imotd;
-	extern char *CREDIT_MESSG;
 	int i;
 
 	SEND_TO_Q(CREDIT_MESSG, d);
@@ -2317,9 +2314,6 @@ int _parse_name(char *arg, char *name) {
 * Master "socket nanny" for processing menu input.
 */
 void nanny(descriptor_data *d, char *arg) {
-	void display_automessages_on_login(char_data *ch);
-	extern int num_earned_bonus_traits(char_data *ch);
-	
 	char buf[MAX_STRING_LENGTH], tmp_name[MAX_INPUT_LENGTH];
 	int load_result, i, iter;
 	bool show_start = FALSE;

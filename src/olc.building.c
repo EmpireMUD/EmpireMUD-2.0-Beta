@@ -32,7 +32,6 @@
 
 // external funcs
 void init_building(bld_data *building);
-void sort_interactions(struct interaction_item **list);
 
 // locals
 const char *default_building_name = "Unnamed Building";
@@ -51,10 +50,6 @@ const char *default_building_icon = "&0[  ]";
 * @return bool TRUE if any problems were reported; FALSE if all good.
 */
 bool audit_building(bld_data *bld, char_data *ch) {
-	extern bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch);
-	extern bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
-	extern bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
-	
 	struct trig_proto_list *tpl;
 	bool problem = FALSE;
 	trig_data *trig;
@@ -356,9 +351,6 @@ char *list_one_building(bld_data *bld, bool detail) {
 */
 void olc_delete_building(char_data *ch, bld_vnum vnum) {
 	void check_for_bad_buildings();
-	extern bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
-	extern bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
-	extern bool delete_quest_giver_from_list(struct quest_giver **list, int type, any_vnum vnum);
 	void remove_building_from_table(bld_data *bld);
 	
 	struct obj_storage_type *store, *next_store;
@@ -1017,8 +1009,6 @@ void olc_search_building(char_data *ch, bld_vnum vnum) {
 * @param descriptor_data *desc The descriptor who is saving.
 */
 void save_olc_building(descriptor_data *desc) {
-	void prune_extra_descs(struct extra_descr_data **list);
-
 	bld_data *proto, *bdg = GET_OLC_BUILDING(desc);
 	bld_vnum vnum = GET_OLC_VNUM(desc);
 	struct trig_proto_list *trig;
@@ -1203,8 +1193,6 @@ void smart_copy_bld_relations(struct bld_relation **to_list, struct bld_relation
 * @param char_data *ch The person who is editing a building and will see its display.
 */
 void olc_show_building(char_data *ch) {
-	void get_extra_desc_display(struct extra_descr_data *list, char *save_buffer);
-	
 	bld_data *bdg = GET_OLC_BUILDING(ch->desc);
 	char lbuf[MAX_STRING_LENGTH], buf1[MAX_STRING_LENGTH];
 	bool is_room = IS_SET(GET_BLD_FLAGS(bdg), BLD_ROOM) ? TRUE : FALSE;

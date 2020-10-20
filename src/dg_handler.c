@@ -481,3 +481,208 @@ void update_wait_events(room_data *to, room_data *from) {
 		((struct wait_event_data *)GET_TRIG_WAIT(trig)->event_obj)->go = to;
 	}
 }
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// UID LOOKUP TABLE ////////////////////////////////////////////////////////
+
+// this system handles lookups by id for script objects
+struct uid_lookup_table {
+	int uid;
+	int type;	// TYPE_ const for typesafety
+	union {
+		char_data *ch;	// TYPE_MOB (or player)
+		obj_data *obj;	// TYPE_OBJ
+		room_data *room;	// TYPE_ROOM
+		vehicle_data *veh;	// TYPE_VEH
+	} data;
+	
+	UT_hash_handle hh;
+};
+
+// master hash table
+struct uid_lookup_table *master_uid_lookup_table = NULL;
+
+
+/**
+* Adds a person, place, or thing to the script lookup table.
+*
+* @param int uid The thing's id.
+* @param void *ptr A pointer to the thing to add.
+* @param int type TYPE_MOB, TYPE_VEH, etc. (matching ptr)
+*/
+void add_to_lookup_table(int uid, void *ptr, int type) {
+	struct uid_lookup_table *find;
+	
+	HASH_FIND_INT(master_uid_lookup_table, &uid, find);
+	if (find) {
+		log ("Add_to_lookup failed. %d already there.", uid);
+	}
+	else {
+		CREATE(find, struct uid_lookup_table, 1);
+		find->uid = uid;
+		find->type = type;
+		HASH_ADD_INT(master_uid_lookup_table, uid, find);
+		
+		switch (type) {
+			case TYPE_MOB: {
+				find->data.ch = ptr;
+				break;
+			}
+			case TYPE_OBJ: {
+				find->data.obj = ptr;
+				break;
+			}
+			case TYPE_ROOM: {
+				find->data.room = ptr;
+				break;
+			}
+			case TYPE_VEH: {
+				find->data.veh = ptr;
+				break;
+			}
+			default: {
+				log ("Add_to_lookup called with invalid type %d for uid %d", type, uid);
+				break;
+			}
+		}
+	}
+}
+
+
+/**
+* Find a character in the script lookup table.
+*
+* This incorporates former parts of find_char_by_uid_in_lookup_table()
+*
+* @param int uid The script id (or player idnum) to find in the lookup table.
+* @param bool log_error If TRUE, will log if it can't find them.
+* @return char_data* The found character, or NULL if not present.
+*/
+char_data *find_char(int uid, bool log_error) {
+	struct uid_lookup_table *find;
+	
+	if (uid >= EMPIRE_ID_BASE && uid < OTHER_ID_BASE) {
+		return NULL;	// shortcut: see note in dg_scripts.h
+	}
+	
+	HASH_FIND_INT(master_uid_lookup_table, &uid, find);
+	if (find && find->type == TYPE_MOB) {
+		return find->data.ch;
+	}
+	
+	if (log_error) {
+		log("find_char : No character with number %d in lookup table", uid);
+	}
+	return NULL;	// all other cases
+}
+
+
+/**
+* Looks up an empire by a DG Scripts UID. Does not use the lookup table because
+* these can be found mathematically.
+*
+* @param int uid The UID.
+* @return empire_data* The found empire, or NULL.
+*/
+empire_data *find_empire_by_uid(int uid) {
+	if (uid < EMPIRE_ID_BASE || uid >= ROOM_ID_BASE) {
+		// see note in dg_scripts.h
+		return NULL;
+	}
+	
+	return real_empire(uid - EMPIRE_ID_BASE);
+}
+
+
+
+/**
+* Find an object in the script lookup table.
+*
+* This incorporates former parts of find_obj_by_uid_in_lookup_table()
+*
+* @param int uid The script id to find in the lookup table.
+* @param bool log_error If TRUE, will log if it can't find the thing.
+* @return obj_data* The found object, or NULL if not present.
+*/
+obj_data *find_obj(int uid, bool log_error) {
+	struct uid_lookup_table *find;
+	
+	if (uid < OTHER_ID_BASE) {
+		return NULL;	// shortcut: see note in dg_scripts.h
+	}
+	
+	HASH_FIND_INT(master_uid_lookup_table, &uid, find);
+	if (find && find->type == TYPE_OBJ) {
+		return find->data.obj;
+	}
+	
+	if (log_error) {
+		log("find_obj : No object with number %d in lookup table", uid);
+	}
+	return NULL;	// all other cases
+}
+
+
+/**
+* Finds a room from a script uid.
+*
+* @param int uid The script uid.
+* @return room_data* The room, if any, or NULL if not.
+*/
+room_data *find_room(int uid) {
+	uid -= ROOM_ID_BASE;
+	if (uid >= 0)  {
+    	return real_room(uid); 	// if any
+    }
+    
+    return NULL;
+}
+
+
+/**
+* Find a vehicle in the script lookup table.
+*
+* This incorporates former parts of find_vehicle_by_uid_in_lookup_table()
+*
+* @param int uid The script id to find in the lookup table.
+* @param bool log_error If TRUE, will log if it can't find the thing.
+* @return vehicle_data* The found vehicle, or NULL if not present.
+*/
+vehicle_data *find_vehicle(int uid, bool log_error) {
+	struct uid_lookup_table *find;
+	
+	if (uid < OTHER_ID_BASE) {
+		return NULL;	// shortcut: see note in dg_scripts.h
+	}
+	
+	HASH_FIND_INT(master_uid_lookup_table, &uid, find);
+	if (find && find->type == TYPE_VEH) {
+		return find->data.veh;
+	}
+	
+	if (log_error) {
+		log("find_veh : No vehicle with number %d in lookup table", uid);
+	}
+	return NULL;	// all other cases
+}
+
+
+/**
+* Removes a person, place, or thing from the script lookup table. This will
+* log a warning if not found.
+*
+* @param int uid The id to remove.
+*/
+void remove_from_lookup_table(int uid) {
+	struct uid_lookup_table *find;
+	
+	HASH_FIND_INT(master_uid_lookup_table, &uid, find);
+	if (find) {
+		HASH_DEL(master_uid_lookup_table, find);
+		free(find);
+	}
+	else {
+		log("remove_from_lookup. UID %d not found.", uid);
+	}
+}

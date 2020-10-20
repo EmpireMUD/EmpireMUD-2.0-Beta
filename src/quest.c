@@ -5474,7 +5474,7 @@ OLC_MODULE(qedit_rewards) {
 		}
 	}	// end 'change'
 	else if (is_abbrev(cmd_arg, "move")) {
-		struct quest_reward *to_move, *prev, *a, *b, *a_next, *b_next, iitem;
+		struct quest_reward *to_move, *prev;
 		bool up;
 		
 		// usage: rewards move <number> <up | down>
@@ -5497,9 +5497,10 @@ OLC_MODULE(qedit_rewards) {
 		else {
 			// find the one to move
 			to_move = prev = NULL;
-			for (reward = *list; reward && !to_move; reward = reward->next) {
+			LL_FOREACH(*list, reward) {
 				if (--num == 0) {
 					to_move = reward;
+					break;	// found
 				}
 				else {
 					// store for next iteration
@@ -5514,28 +5515,17 @@ OLC_MODULE(qedit_rewards) {
 				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
 			}
 			else {
-				// SUCCESS: "move" them by swapping data
-				if (up) {
-					a = prev;
-					b = to_move;
+				// SUCCESS: attempt to move
+				if (up && prev) {
+					// can move up
+					LL_DELETE(*list, to_move);
+					LL_PREPEND_ELEM(*list, prev, to_move);
 				}
-				else {
-					a = to_move;
-					b = to_move->next;
+				else if (!up && (prev = to_move->next)) {
+					// can move down
+					LL_DELETE(*list, to_move);
+					LL_APPEND_ELEM(*list, prev, to_move);
 				}
-				
-				// store next pointers
-				a_next = a->next;
-				b_next = b->next;
-				
-				// swap data
-				iitem = *a;
-				*a = *b;
-				*b = iitem;
-				
-				// restore next pointers
-				a->next = a_next;
-				b->next = b_next;
 				
 				// message: re-atoi(num_arg) because we destroyed num finding our target
 				msg_to_char(ch, "You move reward %d %s.\r\n", atoi(num_arg), (up ? "up" : "down"));

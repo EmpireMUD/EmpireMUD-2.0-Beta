@@ -823,8 +823,6 @@ void loaded_obj_to_char(obj_data *obj, char_data *ch, int location, obj_data ***
 * @param room_data *room The world location whose objects we are saving.
 */
 bool objpack_save_room(room_data *room) {
-	void Crash_save_vehicles(vehicle_data *veh, FILE *fl);
-	
 	char filename[MAX_INPUT_LENGTH], tempname[MAX_INPUT_LENGTH];
 	FILE *fp;
 
@@ -859,8 +857,6 @@ bool objpack_save_room(room_data *room) {
 * @param room_data *room The room.
 */
 void objpack_load_room(room_data *room) {
-	extern vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum);
-
 	obj_data *obj, *o, *next_o, *cont_row[MAX_BAG_ROWS];
 	char fname[MAX_STRING_LENGTH], line[MAX_INPUT_LENGTH];
 	int iter, location;

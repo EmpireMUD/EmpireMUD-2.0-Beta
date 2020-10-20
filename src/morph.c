@@ -37,6 +37,9 @@
 *   Edit Modules
 */
 
+// external functions
+ACMD(do_dismount);
+
 // local data
 const char *default_morph_keywords = "morph unnamed shapeless";
 const char *default_morph_short_desc = "an unnamed morph";
@@ -319,7 +322,6 @@ bool morph_affinity_ok(room_data *location, morph_data *morph) {
 * @param morph_data *morph Which morph (NULL to revert to normal).
 */
 void perform_morph(char_data *ch, morph_data *morph) {
-	ACMD(do_dismount);
 	double move_mod, health_mod, mana_mod;
 	
 	// read current pools
@@ -1168,7 +1170,6 @@ OLC_MODULE(morphedit_apply) {
 
 
 OLC_MODULE(morphedit_attack) {
-	extern char **get_weapon_types_string();
 	morph_data *morph = GET_OLC_MORPH(ch->desc);
 	MORPH_ATTACK_TYPE(morph) = olc_process_type(ch, argument, "attack type", "attack", (const char**)get_weapon_types_string(), MORPH_ATTACK_TYPE(morph));
 }

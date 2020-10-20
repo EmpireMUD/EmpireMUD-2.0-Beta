@@ -2904,6 +2904,16 @@ struct file_lookup_struct {
 };
 
 
+// for do_findmaintenance and do_territory
+struct find_territory_node {
+	room_data *loc;
+	char *details;	// optional string with vehicles, etc
+	int count;
+	
+	struct find_territory_node *prev, *next;	// doubly-linked list
+};
+
+
 // for do_gen_interact_room, act.actions.c
 struct gen_interact_data_t {
 	int interact;	// INTERACT_ type
@@ -4255,7 +4265,7 @@ struct player_special_data {
 	struct minipet_data *minipets;	// collection of summonable pets
 	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
 	struct player_tech *techs;	// techs from abilities
-	struct empire_unique_storage *home_storage;	// items stored in the home
+	struct empire_unique_storage *home_storage;	// DLL: items stored in the home
 	time_t last_home_set_time;	// how long ago the player used home-set (blocks home retrieve)
 	
 	// tracking for specific skills
@@ -4416,6 +4426,7 @@ struct char_data {
 	char_data *prev_in_room, *next_in_room;	// For room->people - doubly-linked list
 	char_data *prev, *next;	// For character_list (doubly-linked)
 	char_data *next_fighting;	// For fighting list
+	bool in_combat_list;	// helps with removing from combat list
 	
 	struct follow_type *followers;	// List of chars followers
 	char_data *master;	// Who is char following?
@@ -4829,7 +4840,7 @@ struct empire_unique_storage {
 	sh_int flags;	// up to 15 flags, EUS_x
 	int island;	// split by islands
 	
-	struct empire_unique_storage *next;
+	struct empire_unique_storage *prev, *next;
 };
 
 
@@ -4948,7 +4959,7 @@ struct empire_data {
 	// linked lists, hashes, etc
 	struct empire_political_data *diplomacy;
 	struct shipping_data *shipping_list;	// DL of shipping orders
-	struct empire_unique_storage *unique_store;	// LL: eus->next
+	struct empire_unique_storage *unique_store;	// DLL: eus->next
 	struct empire_trade_data *trade;
 	struct empire_log_data *logs;
 	struct offense_data *offenses;	// doubly-linked list

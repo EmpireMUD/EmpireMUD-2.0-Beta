@@ -60,7 +60,6 @@
 // external variables
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
 extern struct player_special_data dummy_mob;
-extern struct generic_name_data *generic_names;
 extern int max_automessage_id;
 extern bool world_is_sorted;
 
@@ -1440,7 +1439,7 @@ void check_for_new_map(void) {
 	// update all empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		// move unique storage
-		LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			eus->island = NO_ISLAND;	// simple move, for now
 		}
 		
@@ -1564,7 +1563,7 @@ void check_nowhere_einv(empire_data *emp, int new_island) {
 	}
 	
 	// move unique storage
-	LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 		if (eus->island == NO_ISLAND) {
 			eus->island = new_island;	// simple move, for now
 			any = TRUE;
@@ -1928,13 +1927,12 @@ void free_empire(empire_data *emp) {
 	
 	// free unique storage
 	while ((eus = EMPIRE_UNIQUE_STORAGE(emp))) {
-		EMPIRE_UNIQUE_STORAGE(emp) = eus->next;
+		DL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
 		if (eus->obj) {
 			extract_obj(eus->obj);
 		}
 		free(eus);
 	}
-	EMPIRE_UNIQUE_STORAGE(emp) = NULL;
 	
 	// free shipping data
 	DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
@@ -2263,7 +2261,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					eus->amount = t[1];
 					eus->flags = asciiflag_conv(str_in);
 					eus->obj = obj;
-					LL_APPEND(EMPIRE_UNIQUE_STORAGE(emp), eus);
+					DL_APPEND(EMPIRE_UNIQUE_STORAGE(emp), eus);
 				}
 				
 				break;
@@ -2310,7 +2308,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	}
 	
 	// ensure random triggers are shut off on unique storage
-	LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 		if (eus->obj && SCRIPT(eus->obj)) {
 			LL_FOREACH(TRIGGERS(SCRIPT(eus->obj)), trig) {
 				remove_trigger_from_global_lists(trig, TRUE);
@@ -3123,7 +3121,7 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	}
 
 	// U: unique storage
-	for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 		// wut?
 		if (eus->amount <= 0 || !eus->obj) {
 			continue;
@@ -3995,7 +3993,7 @@ void setup_dir(FILE *fl, room_data *room, int dir) {
 	ex->exit_info = asciiflag_conv(str_in);
 
 	// sort last
-	sort_exits(&(COMPLEX_DATA(room)->exits));
+	LL_SORT(COMPLEX_DATA(room)->exits, sort_exits);
 }
 
 
@@ -8774,127 +8772,9 @@ int sort_empires(empire_data *a, empire_data *b) {
 }
 
 
-/**
-* Sorts a list of exits by direction.
-*
-* @param struct room_direction_data **list The list of exits to sort.
-*/
-void sort_exits(struct room_direction_data **list) {
-	struct room_direction_data *a, *b, *a_next, *b_next;
-	struct room_direction_data temp;
-	bool changed = TRUE;
-	
-	if (*list && (*list)->next) {
-		while (changed) {
-			changed = FALSE;
-
-			a = *list;
-			while ((b = a->next)) {
-				if (a->dir > b->dir) {
-					// preserve next-pointers
-					a_next = a->next;
-					b_next = b->next;
-					
-					// swap positions by swapping data
-					temp = *a;
-					*a = *b;
-					*b = temp;
-					
-					// restore next pointers
-					a->next = a_next;
-					b->next = b_next;
-					
-					changed = TRUE;
-				}
-				
-				a = a->next;
-			}
-		}
-	}
-}
-
-
-/**
-* This sorts icons by type, for easier visual analysis in both the editor and
-* the db file. It should not change the relative order of any entries within
-* a type.
-*
-* @param struct icon_data **list The icon set to sort.
-*/
-void sort_icon_set(struct icon_data **list) {
-	struct icon_data *a, *b, *a_next, *b_next;
-	struct icon_data temp;
-	bool changed = TRUE;
-	
-	if (*list && (*list)->next) {
-		while (changed) {
-			changed = FALSE;
-
-			a = *list;
-			while ((b = a->next)) {
-				if (a->type > b->type) {
-					// preserve next-pointers
-					a_next = a->next;
-					b_next = b->next;
-					
-					// swap positions by swapping data
-					temp = *a;
-					*a = *b;
-					*b = temp;
-					
-					// restore next pointers
-					a->next = a_next;
-					b->next = b_next;
-					
-					changed = TRUE;
-				}
-				
-				a = a->next;
-			}
-		}
-	}
-}
-
-
-/**
-* This sorts interactions by type, for easier visual analysis in both
-* the editor and the db file. It should not change the relative order of any
-* entries within a type.
-*
-* @param struct interaction_item **list The interactions list to sort.
-*/
-void sort_interactions(struct interaction_item **list) {
-	struct interaction_item *a, *b, *a_next, *b_next;
-	struct interaction_item temp;
-	bool changed = TRUE;
-	
-	if (*list && (*list)->next) {
-		while (changed) {
-			changed = FALSE;
-
-			a = *list;
-			while ((b = a->next)) {
-				if (a->type > b->type || (a->type == b->type && a->exclusion_code > b->exclusion_code)) {
-					// preserve next-pointers
-					a_next = a->next;
-					b_next = b->next;
-					
-					// swap positions by swapping data
-					temp = *a;
-					*a = *b;
-					*b = temp;
-					
-					// restore next pointers
-					a->next = a_next;
-					b->next = b_next;
-					
-					changed = TRUE;
-				}
-				
-				a = a->next;
-			}
-		}
-	}
+// simple sorter for exit directions
+int sort_exits(struct room_direction_data *a, struct room_direction_data *b) {
+	return a->dir - b->dir;
 }
 
 
@@ -8947,45 +8827,12 @@ int sort_sectors(void *a, void *b) {
 }
 
 
-/**
-* This sorts trade data by type and cost, for easier visual analysis in both
-* the editor and the db file. It should not change the relative order of any
-* entries within a type.
-*
-* @param struct empire_trade_data **list The trade list to sort.
-*/
-void sort_trade_data(struct empire_trade_data **list) {
-	struct empire_trade_data *a, *b, *a_next, *b_next;
-	struct empire_trade_data temp;
-	bool changed = TRUE;
-	
-	if (*list && (*list)->next) {
-		while (changed) {
-			changed = FALSE;
-
-			a = *list;
-			while ((b = a->next)) {
-				if (a->type > b->type || (a->type == b->type && a->cost > b->cost)) {
-					// preserve next-pointers
-					a_next = a->next;
-					b_next = b->next;
-					
-					// swap positions by swapping data
-					temp = *a;
-					*a = *b;
-					*b = temp;
-					
-					// restore next pointers
-					a->next = a_next;
-					b->next = b_next;
-					
-					changed = TRUE;
-				}
-				
-				a = a->next;
-			}
-		}
+// simple sorter for empire trade lists
+int sort_trade_data(struct empire_trade_data *a, struct empire_trade_data *b) {
+	if (a->type != b->type) {
+		return a->type - b->type;
 	}
+	return a->cost - b->cost;
 }
 
 

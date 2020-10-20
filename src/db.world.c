@@ -365,7 +365,7 @@ struct room_direction_data *create_exit(room_data *from, room_data *to, int dir,
 		ex->dir = dir;
 		
 		LL_PREPEND(COMPLEX_DATA(from)->exits, ex);
-		sort_exits(&(COMPLEX_DATA(from)->exits));
+		LL_SORT(COMPLEX_DATA(from)->exits, sort_exits);
 
 		// re-find after sort
 		ex = find_exit(from, dir);
@@ -385,7 +385,7 @@ struct room_direction_data *create_exit(room_data *from, room_data *to, int dir,
 		other->dir = rev_dir[dir];
 		
 		LL_PREPEND(COMPLEX_DATA(to)->exits, other);
-		sort_exits(&(COMPLEX_DATA(to)->exits));
+		LL_SORT(COMPLEX_DATA(to)->exits, sort_exits);
 		
 		// re-find after sort
 		other = find_exit(to, rev_dir[dir]);

@@ -972,13 +972,14 @@ void free_char(char_data *ch) {
 		}
 		
 		// free unique storage
-		LL_FOREACH_SAFE(GET_HOME_STORAGE(ch), eus, next_eus) {
+		DL_FOREACH_SAFE(GET_HOME_STORAGE(ch), eus, next_eus) {
+			DL_DELETE(GET_HOME_STORAGE(ch), eus);
+			
 			if (eus->obj) {
 				extract_obj(eus->obj);
 			}
 			free(eus);
 		}
-		GET_HOME_STORAGE(ch) = NULL;
 		
 		free_player_completed_quests(&GET_COMPLETED_QUESTS(ch));
 		free_player_quests(GET_QUESTS(ch));
@@ -1111,7 +1112,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct lore_data *lore, *last_lore = NULL, *new_lore;
 	struct over_time_effect_type *dot, *last_dot = NULL;
 	struct affected_type *af, *next_af, *af_list = NULL;
-	struct empire_unique_storage *eus, *last_eus = NULL;
+	struct empire_unique_storage *eus;
 	struct player_quest *plrq, *last_plrq = NULL;
 	struct offer_data *offer, *last_offer = NULL;
 	struct alias_data *alias, *last_alias = NULL;
@@ -1174,11 +1175,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	if ((last_plrq = GET_QUESTS(ch))) {
 		while (last_plrq->next) {
 			last_plrq = last_plrq->next;
-		}
-	}
-	if ((last_eus = GET_HOME_STORAGE(ch))) {
-		while (last_eus->next) {
-			last_eus = last_eus->next;
 		}
 	}
 	
@@ -1643,13 +1639,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 						eus->flags = i_in[2];
 						eus->obj = obj;
 						
-						if (last_eus) {
-							last_eus->next = eus;
-						}
-						else {
-							GET_HOME_STORAGE(ch) = eus;
-						}
-						last_eus = eus;
+						DL_APPEND(GET_HOME_STORAGE(ch), eus);
 					}
 				}
 				BAD_TAG_WARNING(line);
@@ -2146,7 +2136,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	}
 	
 	// ensure random triggers are shut off on home storage
-	LL_FOREACH(GET_HOME_STORAGE(ch), eus) {
+	DL_FOREACH(GET_HOME_STORAGE(ch), eus) {
 		if (eus->obj && SCRIPT(eus->obj)) {
 			LL_FOREACH(TRIGGERS(SCRIPT(eus->obj)), trig) {
 				remove_trigger_from_global_lists(trig, TRUE);
@@ -2872,7 +2862,7 @@ void write_player_delayed_data_to_file(FILE *fl, char_data *ch) {
 			fprintf(fl, "History: %d %ld\n%s~\n", iter, hist->timestamp, NULLSAFE(hist->message));
 		}
 	}
-	LL_FOREACH(GET_HOME_STORAGE(ch), eus) {
+	DL_FOREACH(GET_HOME_STORAGE(ch), eus) {
 		if (eus->amount <= 0 || !eus->obj) {
 			continue;	// ??
 		}
@@ -3969,7 +3959,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	DL_PREPEND(character_list, ch);
 	ch->script_id = GET_IDNUM(ch);	// if not already set
 	if (!ch->in_lookup_table) {
-		add_to_lookup_table(ch->script_id, (void *)ch);
+		add_to_lookup_table(ch->script_id, (void *)ch, TYPE_MOB);
 		ch->in_lookup_table = TRUE;
 	}
 	

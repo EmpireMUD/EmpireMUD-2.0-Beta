@@ -32,9 +32,6 @@
 *   Instance File Utils
 */
 
-// external consts
-extern int size_of_world;
-
 // locals
 bool check_outside_fights(struct instance_data *inst);
 bool check_outside_vehicles(struct instance_data *inst);
@@ -48,26 +45,6 @@ static struct adventure_link_rule *get_link_rule_by_type(adv_data *adv, int type
 any_vnum get_new_instance_id(void);
 void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
 void link_instance_entrance(struct instance_data *inst);
-void scale_instance_to_level(struct instance_data *inst, int level);
-
-
-// local globals
-struct instance_data *instance_list = NULL;	// doubly-linked global instance list
-bool instance_save_wait = FALSE;	// prevents repeated instance saving
-struct instance_data *quest_instance_global = NULL;	// passes instances through to some quest triggers
-
-// ADV_LINK_x: whether or not a rule specifies a possible location (other types are for limits)
-const bool is_location_rule[] = {
-	TRUE,	// ADV_LINK_BUILDING_EXISTING
-	TRUE,	// ADV_LINK_BUILDING_NEW
-	TRUE,	// ADV_LINK_PORTAL_WORLD
-	TRUE,	// ADV_LINK_PORTAL_BUILDING_EXISTING
-	TRUE,	// ADV_LINK_PORTAL_BUILDING_NEW
-	FALSE,	// ADV_LINK_TIME_LIMIT
-	FALSE,	// ADV_LINK_NOT_NEAR_SELF
-	TRUE,	// ADV_LINK_PORTAL_CROP
-	FALSE,	// ADV_LINK_EVENT_RUNNING
-};
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -194,7 +171,7 @@ struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_ru
 	INST_ROTATION(inst) = rotation;
 	CREATE(INST_RULE(inst), struct adventure_link_rule, 1);
 	*INST_RULE(inst) = *rule;	// COPY the rule
-	INST_RULE(inst)->next = NULL;
+	INST_RULE(inst)->next = NULL;	// because it's a copy
 	
 	// check for players
 	present = FALSE;
@@ -525,7 +502,7 @@ void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventu
 	// sort exits
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
 		if (room_list[iter]) {
-			sort_exits(&COMPLEX_DATA(room_list[iter])->exits);
+			LL_SORT(COMPLEX_DATA(room_list[iter])->exits, sort_exits);
 		}
 	}
 	
@@ -802,9 +779,6 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 * @return room_data* A valid location, or else NULL if we couldn't find one.
 */
 room_data *find_location_for_rule(adv_data *adv, struct adventure_link_rule *rule, int *which_dir) {
-	extern bool can_build_on(room_data *room, bitvector_t flags);
-	extern bool rmt_has_exit(room_template *rmt, int dir);
-	
 	room_template *start_room = room_template_proto(GET_ADV_START_VNUM(adv));
 	room_data *room, *next_room, *loc, *shift, *found = NULL;
 	int dir, iter, sub, num_found, pos;
@@ -997,7 +971,7 @@ void generate_adventure_instances(void) {
 				num_rules = 0;
 				rule = NULL;
 				for (rule_iter = GET_ADV_LINKING(iter); rule_iter; rule_iter = rule_iter->next) {
-					if (is_location_rule[rule_iter->type]) {
+					if (adventure_link_is_location_rule[rule_iter->type]) {
 						// choose one at random
 						if (!number(0, num_rules++) || !rule) {
 							rule = rule_iter;
@@ -1034,8 +1008,6 @@ void generate_adventure_instances(void) {
 * @param bool run_cleanup If TRUE, runs cleanup scripts. If FALSE, skips this.
 */
 void delete_instance(struct instance_data *inst, bool run_cleanup) {
-	void expire_instance_quests(struct instance_data *inst);
-	
 	struct instance_mob *im, *next_im;
 	struct adventure_link_rule *rule;
 	vehicle_data *veh, *next_veh;
@@ -1635,8 +1607,6 @@ bool can_instance(adv_data *adv) {
 * @param struct instance_data *inst The instance to check/load.
 */
 void check_instance_is_loaded(struct instance_data *inst) {
-	void instantiate_rooms(adv_data *adv, struct instance_data *inst, struct adventure_link_rule *rule, room_data *loc, int dir, int rotation);
-	
 	if (IS_SET(INST_FLAGS(inst), INST_NEEDS_LOAD) && INST_LOCATION(inst)) {
 		instantiate_rooms(INST_ADVENTURE(inst), inst, INST_RULE(inst), INST_LOCATION(inst), INST_DIR(inst), INST_ROTATION(inst));
 		reset_instance(inst);
