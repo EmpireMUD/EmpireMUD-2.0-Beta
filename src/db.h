@@ -414,7 +414,7 @@ void save_empire(empire_data *e, bool save_all_parts);
 void save_all_empires();
 void save_marked_empires();
 int sort_empires(empire_data *a, empire_data *b);
-void sort_trade_data(struct empire_trade_data **list);
+int sort_trade_data(struct empire_trade_data *a, struct empire_trade_data *b);
 void update_empire_members_and_greatness(empire_data *emp);
 void update_member_data(char_data *ch);
 

@@ -2343,7 +2343,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 		trade->cost = cost;
 		trade->limit = limit;
 		
-		sort_trade_data(&EMPIRE_TRADE(emp));
+		LL_SORT(EMPIRE_TRADE(emp), sort_trade_data);
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		
 		msg_to_char(ch, "%s now %ss '%s' costing %s%.1f, when %s %d.\r\n", EMPIRE_NAME(emp), trade_type[subcmd], get_obj_name_by_proto(vnum), trade_mostleast[subcmd], cost, trade_overunder[subcmd], limit);

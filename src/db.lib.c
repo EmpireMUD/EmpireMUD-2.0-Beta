@@ -8829,45 +8829,12 @@ int sort_sectors(void *a, void *b) {
 }
 
 
-/**
-* This sorts trade data by type and cost, for easier visual analysis in both
-* the editor and the db file. It should not change the relative order of any
-* entries within a type.
-*
-* @param struct empire_trade_data **list The trade list to sort.
-*/
-void sort_trade_data(struct empire_trade_data **list) {
-	struct empire_trade_data *a, *b, *a_next, *b_next;
-	struct empire_trade_data temp;
-	bool changed = TRUE;
-	
-	if (*list && (*list)->next) {
-		while (changed) {
-			changed = FALSE;
-
-			a = *list;
-			while ((b = a->next)) {
-				if (a->type > b->type || (a->type == b->type && a->cost > b->cost)) {
-					// preserve next-pointers
-					a_next = a->next;
-					b_next = b->next;
-					
-					// swap positions by swapping data
-					temp = *a;
-					*a = *b;
-					*b = temp;
-					
-					// restore next pointers
-					a->next = a_next;
-					b->next = b_next;
-					
-					changed = TRUE;
-				}
-				
-				a = a->next;
-			}
-		}
+// simple sorter for empire trade lists
+int sort_trade_data(struct empire_trade_data *a, struct empire_trade_data *b) {
+	if (a->type != b->type) {
+		return a->type - b->type;
 	}
+	return a->cost - b->cost;
 }
 
 
