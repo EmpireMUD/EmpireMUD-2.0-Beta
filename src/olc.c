@@ -5805,7 +5805,7 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		}
 	}	// end 'change'
 	else if (is_abbrev(cmd_arg, "move")) {
-		struct req_data *to_move, *prev, *a, *b, *a_next, *b_next, iitem;
+		struct req_data *to_move, *prev;
 		bool up;
 		
 		// usage: <cmd> move <number> <up | down>
@@ -5828,9 +5828,10 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 		else {
 			// find the one to move
 			to_move = prev = NULL;
-			for (req = *list; req && !to_move; req = req->next) {
+			LL_FOREACH(*list, req) {
 				if (--num == 0) {
 					to_move = req;
+					break;	// found
 				}
 				else {
 					// store for next iteration
@@ -5846,27 +5847,16 @@ void olc_process_requirements(char_data *ch, char *argument, struct req_data **l
 			}
 			else {
 				// SUCCESS: "move" them by swapping data
-				if (up) {
-					a = prev;
-					b = to_move;
+				if (up && prev) {
+					// can mo ve up
+					LL_DELETE(*list, to_move);
+					LL_PREPEND_ELEM(*list, prev, to_move);
 				}
-				else {
-					a = to_move;
-					b = to_move->next;
+				else if (!up && (prev = to_move->next)) {
+					// can move down
+					LL_DELETE(*list, to_move);
+					LL_APPEND_ELEM(*list, prev, to_move);
 				}
-				
-				// store next pointers
-				a_next = a->next;
-				b_next = b->next;
-				
-				// swap data
-				iitem = *a;
-				*a = *b;
-				*b = iitem;
-				
-				// restore next pointers
-				a->next = a_next;
-				b->next = b_next;
 				
 				// message: re-atoi(num_arg) because we destroyed num finding our target
 				msg_to_char(ch, "You move %s %d %s.\r\n", command, atoi(num_arg), (up ? "up" : "down"));
