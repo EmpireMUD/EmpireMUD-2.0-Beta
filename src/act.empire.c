@@ -2221,7 +2221,7 @@ struct efind_group {
 	int count;	// how many found
 	bool stackable;	// whether or not this can stack
 	
-	struct efind_group *next;
+	struct efind_group *prev, *next;	// DLL
 };
 
 
@@ -2244,7 +2244,7 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *ve
 	}
 	
 	if (obj && OBJ_CAN_STACK(obj)) {
-		LL_FOREACH(*list, eg) {
+		DL_FOREACH(*list, eg) {
 			if (eg->location == location && eg->stackable && GET_OBJ_VNUM(eg->obj) == GET_OBJ_VNUM(obj)) {
 				eg->count += 1;
 				found = TRUE;
@@ -2253,7 +2253,7 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *ve
 		}
 	}
 	if (veh) {
-		LL_FOREACH(*list, eg) {
+		DL_FOREACH(*list, eg) {
 			if (eg->location != location) {
 				continue;
 			}
@@ -2278,7 +2278,7 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *ve
 		eg->veh = veh;
 		eg->count = 1;
 		eg->stackable = obj ? OBJ_CAN_STACK(obj) : FALSE;	// not used for vehicle
-		LL_APPEND(*list, eg);
+		DL_APPEND(*list, eg);
 	}
 }
 
@@ -4153,9 +4153,7 @@ ACMD(do_efind) {
 			size = snprintf(buf, sizeof(buf), "You discover:");	// leave off \r\n
 			last_rm = NULL;
 			
-			for (eg = list; eg; eg = next_eg) {
-				next_eg = eg->next;
-				
+			DL_FOREACH_SAFE(list, eg, next_eg) {
 				// length limit check
 				if (size + 24 > sizeof(buf)) {
 					size += snprintf(buf + size, sizeof(buf) - size, "OVERFLOW\r\n");
@@ -4181,10 +4179,10 @@ ACMD(do_efind) {
 				else if (eg->veh) {
 					size += snprintf(buf + size, sizeof(buf) - size, "%s", skip_filler(VEH_SHORT_DESC(eg->veh)));
 				}
+				
+				DL_DELETE(list, eg);
 				free(eg);
 			}
-			// all free! free!
-			list = NULL;
 			
 			size += snprintf(buf + size, sizeof(buf) - size, "\r\n");	// training crlf
 			page_string(ch->desc, buf, TRUE);
