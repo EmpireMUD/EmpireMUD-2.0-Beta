@@ -338,7 +338,7 @@ bool is_affiliated_island(empire_data *emp, int island_id) {
 	}
 	
 	//Check unique storage too
-	for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 		if (isle->island == eus->island) {
 			return TRUE;
 		}
@@ -4680,7 +4680,7 @@ ACMD(do_enroll) {
 			
 			// unique storage: append to end of current empire's list
 			if (EMPIRE_UNIQUE_STORAGE(old)) {
-				LL_CONCAT(EMPIRE_UNIQUE_STORAGE(e), EMPIRE_UNIQUE_STORAGE(old));
+				DL_CONCAT(EMPIRE_UNIQUE_STORAGE(e), EMPIRE_UNIQUE_STORAGE(old));
 				EMPIRE_UNIQUE_STORAGE(old) = NULL;
 			}
 			
@@ -5429,7 +5429,7 @@ ACMD(do_islands) {
 	}
 	
 	// add unique storage
-	for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 		do_islands_add_einv(&list, eus->island, eus->amount);
 	}
 	

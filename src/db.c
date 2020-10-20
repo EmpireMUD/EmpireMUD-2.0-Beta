@@ -2140,7 +2140,7 @@ void b3_2_map_and_gear(void) {
 	
 	log(" - disenchanting warehouse objects...");
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			if ((obj = eus->obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
 				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 				eus->obj = new;
@@ -2743,7 +2743,7 @@ void b5_14_superior_items(void) {
 	
 	log(" - refreshing superiors in warehouse objects...");
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			if ((obj = eus->obj) && OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
 				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 				eus->obj = new;
@@ -2899,12 +2899,12 @@ void b5_23_potion_update(void) {
 	
 	log(" - updating warehouse objects...");
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		LL_FOREACH_SAFE(EMPIRE_UNIQUE_STORAGE(emp), eus, next_eus) {
+		DL_FOREACH_SAFE(EMPIRE_UNIQUE_STORAGE(emp), eus, next_eus) {
 			if ((obj = eus->obj) && IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 				if (GET_OBJ_STORAGE(proto)) {
 					// move to regular einv if now possible
 					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount);
-					LL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
+					DL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
 					free(eus);
 				}
 				else {	// otherwise replace with a fresh copy
@@ -2981,12 +2981,12 @@ void b5_24_poison_update(void) {
 	
 	log(" - updating warehouse objects...");
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		LL_FOREACH_SAFE(EMPIRE_UNIQUE_STORAGE(emp), eus, next_eus) {
+		DL_FOREACH_SAFE(EMPIRE_UNIQUE_STORAGE(emp), eus, next_eus) {
 			if ((obj = eus->obj) && IS_POISON(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 				if (GET_OBJ_STORAGE(proto)) {
 					// move to regular einv if now possible
 					add_to_empire_storage(emp, eus->island, GET_OBJ_VNUM(proto), eus->amount);
-					LL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
+					DL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
 					free(eus);
 				}
 				else {	// otherwise replace with a fresh copy
@@ -3654,7 +3654,7 @@ void b5_86_update(void) {
 	
 	log(" - refreshing warehouse objects...");
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			if ((obj = eus->obj) && IS_MISSILE_WEAPON(obj)) {
 				new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 				eus->obj = new;
@@ -4529,7 +4529,7 @@ void check_version(void) {
 			
 			log(" - assigning triggers to warehouse objects...");
 			HASH_ITER(hh, empire_table, emp, next_emp) {
-				for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+				DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 					if (eus->obj && (objpr = obj_proto(GET_OBJ_VNUM(eus->obj)))) {
 						eus->obj->proto_script = copy_trig_protos(objpr->proto_script);
 						assign_triggers(eus->obj, OBJ_TRIGGER);

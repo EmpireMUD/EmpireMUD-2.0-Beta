@@ -4265,7 +4265,7 @@ struct player_special_data {
 	struct minipet_data *minipets;	// collection of summonable pets
 	struct ability_gain_hook *gain_hooks;	// hash table of when to gain ability xp
 	struct player_tech *techs;	// techs from abilities
-	struct empire_unique_storage *home_storage;	// items stored in the home
+	struct empire_unique_storage *home_storage;	// DLL: items stored in the home
 	time_t last_home_set_time;	// how long ago the player used home-set (blocks home retrieve)
 	
 	// tracking for specific skills
@@ -4839,7 +4839,7 @@ struct empire_unique_storage {
 	sh_int flags;	// up to 15 flags, EUS_x
 	int island;	// split by islands
 	
-	struct empire_unique_storage *next;
+	struct empire_unique_storage *prev, *next;
 };
 
 
@@ -4958,7 +4958,7 @@ struct empire_data {
 	// linked lists, hashes, etc
 	struct empire_political_data *diplomacy;
 	struct shipping_data *shipping_list;	// DL of shipping orders
-	struct empire_unique_storage *unique_store;	// LL: eus->next
+	struct empire_unique_storage *unique_store;	// DLL: eus->next
 	struct empire_trade_data *trade;
 	struct empire_log_data *logs;
 	struct offense_data *offenses;	// doubly-linked list

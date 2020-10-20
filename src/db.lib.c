@@ -1440,7 +1440,7 @@ void check_for_new_map(void) {
 	// update all empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		// move unique storage
-		LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			eus->island = NO_ISLAND;	// simple move, for now
 		}
 		
@@ -1564,7 +1564,7 @@ void check_nowhere_einv(empire_data *emp, int new_island) {
 	}
 	
 	// move unique storage
-	LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 		if (eus->island == NO_ISLAND) {
 			eus->island = new_island;	// simple move, for now
 			any = TRUE;
@@ -1928,13 +1928,12 @@ void free_empire(empire_data *emp) {
 	
 	// free unique storage
 	while ((eus = EMPIRE_UNIQUE_STORAGE(emp))) {
-		EMPIRE_UNIQUE_STORAGE(emp) = eus->next;
+		DL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
 		if (eus->obj) {
 			extract_obj(eus->obj);
 		}
 		free(eus);
 	}
-	EMPIRE_UNIQUE_STORAGE(emp) = NULL;
 	
 	// free shipping data
 	DL_FOREACH_SAFE(EMPIRE_SHIPPING_LIST(emp), shipd, next_shipd) {
@@ -2263,7 +2262,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					eus->amount = t[1];
 					eus->flags = asciiflag_conv(str_in);
 					eus->obj = obj;
-					LL_APPEND(EMPIRE_UNIQUE_STORAGE(emp), eus);
+					DL_APPEND(EMPIRE_UNIQUE_STORAGE(emp), eus);
 				}
 				
 				break;
@@ -2310,7 +2309,7 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 	}
 	
 	// ensure random triggers are shut off on unique storage
-	LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 		if (eus->obj && SCRIPT(eus->obj)) {
 			LL_FOREACH(TRIGGERS(SCRIPT(eus->obj)), trig) {
 				remove_trigger_from_global_lists(trig, TRUE);
@@ -3123,7 +3122,7 @@ void write_empire_storage_to_file(FILE *fl, empire_data *emp) {
 	}
 
 	// U: unique storage
-	for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+	DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 		// wut?
 		if (eus->amount <= 0 || !eus->obj) {
 			continue;

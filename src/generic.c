@@ -1013,7 +1013,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 				queue_delayed_update(chiter, CDU_SAVE);
 			}
 		}
-		LL_FOREACH(GET_HOME_STORAGE(chiter), eus) {
+		DL_FOREACH(GET_HOME_STORAGE(chiter), eus) {
 			if (!eus->obj) {
 				continue;
 			}
@@ -1045,7 +1045,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	
 	// remove from live lists: unique storage of drink containers
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		LL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			if (!eus->obj) {
 				continue;
 			}

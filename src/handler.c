@@ -9456,7 +9456,7 @@ bool check_home_store_cap(char_data *ch, obj_data *obj, bool message, bool *capp
 	}
 	
 	if (!find_eus_entry(obj, GET_HOME_STORAGE(ch), NULL)) {
-		LL_COUNT(GET_HOME_STORAGE(ch), eus, count);
+		DL_COUNT(GET_HOME_STORAGE(ch), eus, count);
 		if (count >= config_get_int("max_home_store_uniques")) {
 			*capped = TRUE;
 			if (message) {
@@ -9487,12 +9487,12 @@ bool delete_unique_storage_by_vnum(struct empire_unique_storage **list, obj_vnum
 		return FALSE;
 	}
 	
-	LL_FOREACH_SAFE(*list, iter, next_iter) {
+	DL_FOREACH_SAFE(*list, iter, next_iter) {
 		if (iter->obj && GET_OBJ_VNUM(iter->obj) == vnum) {
 			add_to_object_list(iter->obj);
 			extract_obj(iter->obj);
 			iter->obj = NULL;
-			LL_DELETE(*list, iter);
+			DL_DELETE(*list, iter);
 			free(iter);
 			any = TRUE;
 		}
@@ -9517,7 +9517,7 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique
 		return NULL;
 	}
 	
-	LL_FOREACH(list, iter) {
+	DL_FOREACH(list, iter) {
 		if (location && GET_ISLAND_ID(location) != iter->island) {
 			continue;
 		}
@@ -9586,7 +9586,7 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 	else {
 		// new entry
 		CREATE(eus, struct empire_unique_storage, 1);
-		LL_PREPEND(*to_list, eus);
+		DL_PREPEND(*to_list, eus);
 		check_obj_in_void(obj);
 		eus->obj = obj;
 		eus->amount = 1;

@@ -1647,7 +1647,7 @@ void save_olc_object(descriptor_data *desc) {
 	// update objs in home storage
 	DL_FOREACH(character_list, chiter) {
 		if (!IS_NPC(chiter)) {
-			LL_FOREACH(GET_HOME_STORAGE(chiter), eus) {
+			DL_FOREACH(GET_HOME_STORAGE(chiter), eus) {
 				if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
 					update_live_obj_from_olc(eus->obj, proto, obj);
 				}
@@ -1657,7 +1657,7 @@ void save_olc_object(descriptor_data *desc) {
 	
 	// update objects in unique storage
 	HASH_ITER(hh, empire_table, emp, next_emp) {
-		for (eus = EMPIRE_UNIQUE_STORAGE(emp); eus; eus = eus->next) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), eus) {
 			if (eus->obj && GET_OBJ_VNUM(eus->obj) == vnum) {
 				update_live_obj_from_olc(eus->obj, proto, obj);
 			}

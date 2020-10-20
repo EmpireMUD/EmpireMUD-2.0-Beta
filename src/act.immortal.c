@@ -3077,7 +3077,7 @@ SHOW(show_islands) {
 				SAFE_ADD(cur->count, store->amount, 0, INT_MAX, FALSE);
 			}
 		}
-		for (uniq = EMPIRE_UNIQUE_STORAGE(emp); uniq; uniq = uniq->next) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), uniq) {
 			if (!cur || cur->island != uniq->island) {
 				cur = find_or_make_show_island(uniq->island, &list);
 			}
@@ -8870,7 +8870,7 @@ ACMD(do_moveeinv) {
 			HASH_DEL(eisle->store, store);
 			free(store);
 		}
-		for (unique = EMPIRE_UNIQUE_STORAGE(emp); unique; unique = unique->next) {
+		DL_FOREACH(EMPIRE_UNIQUE_STORAGE(emp), unique) {
 			if (unique->island == island_from) {
 				unique->island = island_to;
 				count += unique->amount;
