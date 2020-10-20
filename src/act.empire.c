@@ -2830,33 +2830,17 @@ void show_tavern_status(char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// TERRITORY HELPERS ///////////////////////////////////////////////////////
 
-/**
-* @param struct find_territory_node *list The node list to count.
-* @return int The number of elements in the list.
-*/
-int count_node_list(struct find_territory_node *list) {
-	struct find_territory_node *node;
-	int count = 0;
-	
-	for (node = list; node; node = node->next) {
-		++count;
-	}
-	
-	return count;
-}
-
-
 // sees if the room is within 10 spaces of any existing node
-static struct find_territory_node *find_nearby_territory_node(room_data *room, struct find_territory_node *list, int distance) {
-	struct find_territory_node *node, *found = NULL;
+struct find_territory_node *find_nearby_territory_node(room_data *room, struct find_territory_node *list, int distance) {
+	struct find_territory_node *node;
 	
-	for (node = list; node && !found; node = node->next) {
+	DL_FOREACH(list, node) {
 		if (compute_distance(room, node->loc) <= distance) {
-			found = node;
+			return node;
 		}
 	}
 	
-	return found;
+	return NULL;
 }
 
 
@@ -2869,23 +2853,23 @@ static struct find_territory_node *find_nearby_territory_node(room_data *room, s
 */
 struct find_territory_node *reduce_territory_node_list(struct find_territory_node *list) {
 	struct find_territory_node *node, *next_node, *find;
-	int size = 5;
+	int count, size = 5;
 	
 	// iterate until there are no more than 350 nodes
-	while (count_node_list(list) > 350) {
-		for (node = list; node && node->next; node = next_node) {
-			next_node = node->next;
-			
+	DL_COUNT(list, node, count);
+	while (count > 350) {
+		DL_FOREACH_SAFE(list, node, next_node) {
 			// is there a node later in the list that is within range?
-			if ((find = find_nearby_territory_node(node->loc, node->next, size))) {
+			if ((find = find_nearby_territory_node(node->loc, next_node, size))) {
 				find->count += node->count;
-				LL_DELETE(list, node);
+				DL_DELETE(list, node);
 				free(node);
 			}
 		}
 		
 		// double size on each pass
 		size *= 2;
+		DL_COUNT(list, node, count);
 	}
 	
 	// return the list (head of list may have changed)
@@ -3057,21 +3041,20 @@ void scan_for_tile(char_data *ch, char *argument) {
 				node->loc = room;
 				node->count = 1;
 				node->details = *veh_string ? str_dup(veh_string) : NULL;	// if any
-				LL_PREPEND(node_list, node);
+				DL_PREPEND(node_list, node);
 			}
 		}
 	}
 
 	if (node_list) {
 		sort_territory_from_loc = IN_ROOM(ch);
-	    LL_SORT(node_list, sort_territory_nodes_by_distance);
+	    DL_SORT(node_list, sort_territory_nodes_by_distance);
 		
 		size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, mapsize, PLURAL(mapsize));
 		
 		// display and free the nodes
 		total = over_count = 0;
-		for (node = node_list; node; node = next_node) {
-			next_node = node->next;
+		DL_FOREACH_SAFE(node_list, node, next_node) {
 			total += node->count;
 			
 			if (over_count) {
@@ -3121,10 +3104,9 @@ void scan_for_tile(char_data *ch, char *argument) {
 				}
 			}
 			
+			DL_DELETE(node_list, node);
 			free(node);
 		}
-		
-		node_list = NULL;
 		
 		if (over_count) {
 			size += snprintf(output + size, sizeof(output) - size, "... and %d more tile%s\r\n", over_count, PLURAL(over_count));
@@ -5128,7 +5110,7 @@ ACMD(do_findmaintenance) {
 			CREATE(node, struct find_territory_node, 1);
 			node->loc = ter->room;
 			node->count = 1;
-			LL_PREPEND(node_list, node);
+			DL_PREPEND(node_list, node);
 		}
 	}
 	
@@ -5166,7 +5148,7 @@ ACMD(do_findmaintenance) {
 			snprintf(partial, sizeof(partial), "%s", skip_filler(VEH_SHORT_DESC(veh)));
 			node->details = str_dup(partial);
 			node->count = 1;
-			LL_PREPEND(node_list, node);
+			DL_PREPEND(node_list, node);
 		}
 	}
 	
@@ -5193,7 +5175,7 @@ ACMD(do_findmaintenance) {
 		
 		// display and free the nodes
 		full = FALSE;
-		LL_FOREACH_SAFE(node_list, node, next_node) {
+		DL_FOREACH_SAFE(node_list, node, next_node) {
 			if (!full) {
 				lsize = snprintf(partial, sizeof(partial), "%s %s", coord_display_room(ch, node->loc, TRUE), node->details ? node->details : skip_filler(get_room_name(node->loc, FALSE)));
 				if (node->count > 1) {
@@ -5215,10 +5197,11 @@ ACMD(do_findmaintenance) {
 			if (node->details) {
 				free(node->details);
 			}
+			
+			DL_DELETE(node_list, node);
 			free(node);
 		}
 		
-		node_list = NULL;
 		page_string(ch->desc, buf, TRUE);
 	}
 	else {
@@ -7001,7 +6984,7 @@ ACMD(do_territory) {
 			CREATE(node, struct find_territory_node, 1);
 			node->loc = iter;
 			node->count = 1;
-			LL_PREPEND(node_list, node);
+			DL_PREPEND(node_list, node);
 		}
 	}
 	
@@ -7019,7 +7002,7 @@ ACMD(do_territory) {
 		// display and free the nodes
 		total = 0;
 		full = FALSE;
-		LL_FOREACH_SAFE(node_list, node, next_node) {
+		DL_FOREACH_SAFE(node_list, node, next_node) {
 			total += node->count;
 			
 			if (!full) {
@@ -7038,10 +7021,11 @@ ACMD(do_territory) {
 			if (node->details) {
 				free(node->details);
 			}
+			
+			DL_DELETE(node_list, node);
 			free(node);
 		}
 		
-		node_list = NULL;
 		if (!full) {
 			size += snprintf(buf +  size, sizeof(buf) - size, "Total: %d\r\n", total);
 		}

@@ -2910,7 +2910,7 @@ struct find_territory_node {
 	char *details;	// optional string with vehicles, etc
 	int count;
 	
-	struct find_territory_node *next;
+	struct find_territory_node *prev, *next;	// doubly-linked list
 };
 
 
