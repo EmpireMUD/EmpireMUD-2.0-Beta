@@ -1785,60 +1785,6 @@ WHO_SORTER(sort_who_role_level) {
 }
 
 
-// quick-switch of linked list positions
-inline struct who_entry *switch_who_pos(struct who_entry *l1, struct who_entry *l2) {
-    l1->next = l2->next;
-    l2->next = l1;
-    return l2;
-}
-
-
-/**
-* Sorts a who list using a sort function.
-*
-* @param struct who_entry **node_list A pointer to the linked list to sort.
-* @param WHO_SORTER(*compare_func) A sorter function.
-*/
-void sort_who_entries(struct who_entry **node_list, WHO_SORTER(*compare_func)) {
-	struct who_entry *start, *p, *q, *top;
-    bool changed = TRUE;
-        
-    // safety first
-    if (!node_list || !compare_func) {
-    	return;
-    }
-    
-    start = *node_list;
-
-	CREATE(top, struct who_entry, 1);
-
-    top->next = start;
-    if (start && start->next) {
-    	// q is always one item behind p
-
-        while (changed) {
-            changed = FALSE;
-            q = top;
-            p = top->next;
-            while (p->next != NULL) {
-            	if ((compare_func)(p, p->next) > 0) {
-					q->next = switch_who_pos(p, p->next);
-					changed = TRUE;
-				}
-				
-                q = p;
-                if (p->next) {
-                    p = p->next;
-                }
-            }
-        }
-    }
-    
-    *node_list = top->next;
-    free(top);
-}
-
-
 /**
 * Get the "who" display for one person.
 *
@@ -2023,7 +1969,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		LL_PREPEND(list, entry);
 	}
 	
-	sort_who_entries(&list, who_sorters[type]);
+	LL_SORT(list, who_sorters[type]);
 
 	for (entry = list; entry; entry = next_entry) {
 		next_entry = entry->next;
