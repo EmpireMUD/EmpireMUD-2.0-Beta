@@ -7092,7 +7092,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 void olc_process_resources(char_data *ch, char *argument, struct resource_data **list) {	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	char arg4[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
-	struct resource_data *res, *next_res, *prev_res, *prev_prev, *change, *temp;
+	struct resource_data *res, *next_res, *prev, *change, *to_move;
 	int num, type, misc;
 	any_vnum vnum;
 	bool found;
@@ -7271,54 +7271,38 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 			msg_to_char(ch, "You can't move it up; it's already at the top of the list.\r\n");
 		}
 		else {
-			prev_res = prev_prev = NULL;
-			found = FALSE;
-			for (res = *list; res && !found && num > 0; res = res->next) {
+			to_move = prev = NULL;
+			LL_FOREACH(*list, res) {
 				if (--num == 0) {
-					if (up) {
-						found = TRUE;
-						if (prev_prev) {
-							prev_prev->next = res;
-							prev_res->next = res->next;
-							res->next = prev_res;
-						}
-						else {
-							// must be head of list
-							prev_res->next = res->next;
-							res->next = prev_res;
-							*list = res;
-						}
-					}
-					else {	// down
-						if (res->next) {
-							found = TRUE;
-							temp = res->next;
-							if (prev_res) {
-								prev_res->next = temp;
-								res->next = temp->next;
-								temp->next = res;
-							}
-							else {
-								// was at start
-								res->next = temp->next;
-								temp->next = res;
-								*list = temp;
-							}
-						}
-					}
-					
-					if (found) {
-						msg_to_char(ch, "You move resource %d (%s) %s.\r\n", atoi(arg2), get_resource_name(res), (up ? "up" : "down"));
-					}
+					to_move = res;
+					break;	// found
 				}
-				
-				// rotate back
-				prev_prev = prev_res;
-				prev_res = res;
+				else {
+					// store for later
+					prev = res;
+				}
 			}
 			
-			if (!found) {
-				msg_to_char(ch, "Invalid resource number to move.\r\n");
+			if (!to_move) {
+				msg_to_char(ch, "Invalid resource number.\r\n");
+			}
+			else if (!up && !to_move->next) {
+				msg_to_char(ch, "You can't move it down; it's already at the bottom of the list.\r\n");
+			}
+			else {
+				// SUCCESS: attempt to move
+				if (up && prev) {
+					// can move up
+					LL_DELETE(*list, to_move);
+					LL_PREPEND_ELEM(*list, prev, to_move);
+				}
+				else if (!up && (prev = to_move->next)) {
+					// can move down
+					LL_DELETE(*list, to_move);
+					LL_APPEND_ELEM(*list, prev, to_move);
+				}
+				
+				msg_to_char(ch, "You move resource %d (%s) %s.\r\n", atoi(arg2), get_resource_name(res), (up ? "up" : "down"));
 			}
 		}
 	}
