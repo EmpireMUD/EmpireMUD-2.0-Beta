@@ -1936,8 +1936,7 @@ void flush_queues(descriptor_data *d) {
 	int dummy;
 
 	if (d->large_outbuf) {
-		d->large_outbuf->next = bufpool;
-		bufpool = d->large_outbuf;
+		LL_PREPEND(bufpool, d->large_outbuf);
 	}
 	while (get_from_q(&d->input, buf2, &dummy));
 }
@@ -2078,7 +2077,6 @@ void init_descriptor(descriptor_data *newd, int desc) {
 	newd->idle_tics = 0;
 	newd->output = newd->small_outbuf;
 	newd->bufspace = SMALL_BUFSIZE - 1;
-	newd->next = descriptor_list;
 	newd->login_time = time(0);
 	*newd->output = '\0';
 	newd->bufptr = 0;
@@ -2364,8 +2362,7 @@ int new_descriptor(int s) {
 	newd->has_prompt = 1;
 
 	/* prepend to list */
-	newd->next = descriptor_list;
-	descriptor_list = newd;
+	LL_PREPEND(descriptor_list, newd);
 	
 	ProtocolNegotiate(newd);
 	SEND_TO_Q(intros[number(0, num_intros-1)], newd);
@@ -2821,8 +2818,7 @@ static int process_output(descriptor_data *t) {
 		/* If we were using a large buffer, put the large buffer on the buffer pool
 		* and switch back to the small one. */
 		if (t->large_outbuf) {
-			t->large_outbuf->next = bufpool;
-			bufpool = t->large_outbuf;
+			LL_PREPEND(bufpool, t->large_outbuf);
 			t->large_outbuf = NULL;
 			t->output = t->small_outbuf;
 		}

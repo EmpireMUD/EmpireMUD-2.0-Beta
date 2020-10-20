@@ -2020,8 +2020,7 @@ char *partial_who(char_data *ch, char *name_search, int low, int high, empire_da
 		entry->computed_level = GET_COMPUTED_LEVEL(tch);
 		entry->role = GET_CLASS_ROLE(tch);
 		entry->string = str_dup(one_who_line(tch, shortlist, PRF_FLAGGED(ch, PRF_SCREEN_READER)));
-		entry->next = list;
-		list = entry;
+		LL_PREPEND(list, entry);
 	}
 	
 	sort_who_entries(&list, who_sorters[type]);

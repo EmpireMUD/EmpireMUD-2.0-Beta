@@ -4566,25 +4566,16 @@ bool can_start_olc_edit(char_data *ch, int type, any_vnum vnum) {
 * @return struct icon_data* A pointer to the start of the copied list.
 */
 struct icon_data *copy_icon_set(struct icon_data *input_list) {
-	struct icon_data *icon, *last_icon, *new, *list;
+	struct icon_data *icon, *new, *list;
 	
 	// copy in order
-	list = last_icon = NULL;
+	list = NULL;
 	for (icon = input_list; icon; icon = icon->next) {
 		CREATE(new, struct icon_data, 1);
 		new->type = icon->type;
 		new->icon = str_dup(NULLSAFE(icon->icon));
 		new->color = str_dup(NULLSAFE(icon->color));
-		new->next = NULL;
-		
-		if (last_icon) {
-			last_icon->next = new;
-		}
-		else {
-			list = new;
-		}
-		
-		last_icon = new;
+		LL_APPEND(list, new);
 	}
 	
 	sort_icon_set(&list);
@@ -4599,22 +4590,14 @@ struct icon_data *copy_icon_set(struct icon_data *input_list) {
 * @return struct interact_restriction* The copied list.
 */
 struct interact_restriction *copy_interaction_restrictions(struct interact_restriction *input_list) {
-	struct interact_restriction *iter, *new_res, *list, *last;
+	struct interact_restriction *iter, *new_res, *list;
 	
 	// copy in order
-	list = last = NULL;
+	list = NULL;
 	LL_FOREACH(input_list, iter) {
 		CREATE(new_res, struct interact_restriction, 1);
 		*new_res = *iter;
-		new_res->next = NULL;
-		
-		if (last) {
-			last->next = new_res;
-		}
-		else {
-			list = new_res;
-		}
-		last = new_res;
+		LL_APPEND(list, new_res);
 	}
 	
 	return list;
@@ -4628,25 +4611,15 @@ struct interact_restriction *copy_interaction_restrictions(struct interact_restr
 * @return struct interaction_item* A pointer to the start of the copy list.
 */
 struct interaction_item *copy_interaction_list(struct interaction_item *input_list) {
-	struct interaction_item *interact, *last_interact, *new_interact, *list;
+	struct interaction_item *interact, *new_interact, *list;
 	
 	// copy interactions in order
-	list = last_interact = NULL;
+	list = NULL;
 	for (interact = input_list; interact; interact = interact->next) {
 		CREATE(new_interact, struct interaction_item, 1);
 		*new_interact = *interact;
 		new_interact->restrictions = copy_interaction_restrictions(interact->restrictions);
-		new_interact->next = NULL;
-		
-		// preserve order
-		if (last_interact) {
-			last_interact->next = new_interact;
-		}
-		else {
-			list = new_interact;
-		}
-		
-		last_interact = new_interact;
+		LL_APPEND(list, new_interact);
 	}
 			
 	// ensure these are sorted
@@ -4662,21 +4635,13 @@ struct interaction_item *copy_interaction_list(struct interaction_item *input_li
 * @return struct spawn_info* A pointer to the start of the copy list.
 */
 struct spawn_info *copy_spawn_list(struct spawn_info *input_list) {
-	struct spawn_info *spawn, *new_spawn, *last, *list;
+	struct spawn_info *spawn, *new_spawn, *list;
 	
-	list = last = NULL;
+	list = NULL;
 	for (spawn = input_list; spawn; spawn = spawn->next) {
 		CREATE(new_spawn, struct spawn_info, 1);
 		*new_spawn = *spawn;
-		new_spawn->next = NULL;
-		
-		if (last) {
-			last->next = new_spawn;
-		}
-		else {
-			list = new_spawn;
-		}
-		last = new_spawn;
+		LL_APPEND(list, new_spawn);
 	}
 	
 	return list;
@@ -6076,17 +6041,7 @@ void olc_process_applies(char_data *ch, char *argument, struct apply_data **list
 			CREATE(apply, struct apply_data, 1);
 			apply->location = loc;
 			apply->weight = num;
-			
-			// append to end
-			if ((temp = *list)) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = apply;
-			}
-			else {
-				*list = apply;
-			}
+			LL_APPEND(*list, apply);
 			
 			msg_to_char(ch, "You add %d to %s.\r\n", num, apply_types[loc]);
 		}
@@ -6297,7 +6252,7 @@ void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_da
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	struct extra_descr_data *ex, *change, *find_ex, *temp;
+	struct extra_descr_data *ex, *change, *temp;
 	int num;
 	
 	half_chop(argument, arg1, arg2);
@@ -6315,18 +6270,7 @@ void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_da
 			CREATE(ex, struct extra_descr_data, 1);
 			ex->keyword = str_dup(arg2);
 			ex->description = NULL;
-			ex->next = NULL;
-			
-			// insert
-			if ((find_ex = *list)) {
-				while (find_ex->next) {
-					find_ex = find_ex->next;
-				}
-				find_ex->next = ex;
-			}
-			else {
-				*list = ex;
-			}
+			LL_APPEND(*list, ex);
 			
 			// and edit
 			setup_extra_desc_editor(ch, ex);
@@ -6441,7 +6385,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 					found = TRUE;
 					
 					msg_to_char(ch, "You remove icon %d.\r\n", atoi(arg2));
-					REMOVE_FROM_LIST(icon, *list, next);
+					LL_DELETE(*list, icon);
 					icon->next = NULL;
 					free_icon_set(&icon);
 				}
@@ -6476,17 +6420,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 			temp->type = loc;
 			temp->color = str_dup(arg3);
 			temp->icon = str_dup(arg4);
-			temp->next = NULL;
-			
-			if ((icon = *list) != NULL) {
-				while (icon->next) {
-					icon = icon->next;
-				}
-				icon->next = temp;
-			}
-			else {
-				*list = temp;
-			}
+			LL_APPEND(*list, temp);
 
 			sort_icon_set(list);
 			strcpy(lbuf, show_color_codes(arg4));
@@ -7017,17 +6951,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 			temp->quantity = num;
 			temp->exclusion_code = exc;
 			temp->restrictions = found_restrictions;
-			temp->next = NULL;
-			
-			if ((interact = *list) != NULL) {
-				while (interact->next) {
-					interact = interact->next;
-				}
-				interact->next = temp;
-			}
-			else {
-				*list = temp;
-			}
+			LL_APPEND(*list, temp);
 
 			sort_interactions(list);
 			msg_to_char(ch, "You add %s: %dx %s %.2f%%", interact_types[loc], num, get_interaction_target(loc, vnum), prc);
@@ -7731,23 +7655,10 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 		}
 		else {
 			CREATE(spawn, struct spawn_info, 1);
-			
 			spawn->vnum = vnum;
 			spawn->percent = prc;
 			spawn->flags = 0;
-			
-			spawn->next = NULL;
-			
-			// append to end
-			if ((temp = *list) != NULL) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = spawn;
-			}
-			else {
-				*list = spawn;
-			}
+			LL_APPEND(*list, spawn);
 			
 			// process flags as space-separated string
 			while (*flagarg) {
@@ -7800,7 +7711,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 */
 void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **list, int trigger_attach) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], *tmp;
-	struct trig_proto_list *tpl, *temp, *last, *copyfrom = NULL;
+	struct trig_proto_list *tpl, *temp, *copyfrom = NULL;
 	char lbuf[MAX_STRING_LENGTH];
 	int num, pos, findtype;
 	any_vnum vnum;
@@ -7953,47 +7864,29 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 		else {
 			CREATE(tpl, struct trig_proto_list, 1);
 			tpl->vnum = vnum;
-			tpl->next = NULL;
 			
 			// find where to insert:
 			if (pos == -1) {
 				// end
-				if ((temp = *list)) {
-					while (temp->next) {
-						temp = temp->next;
-					}
-					temp->next = tpl;
-				}
-				else {
-					*list = tpl;
-				}
+				LL_APPEND(*list, tpl);
 			}
 			else if (pos <= 1 || !*list) {
 				// start
-				tpl->next = *list;
-				*list = tpl;
+				LL_PREPEND(*list, tpl);
 			}
 			else {
 				// find pos
 				found = FALSE;
-				last = NULL;
 				for (temp = *list; temp && !found; temp = temp->next) {
 					if (--pos == 1) {
-						tpl->next = temp->next;
-						temp->next = tpl;
+						LL_APPEND_ELEM(*list, temp, tpl);
 						found = TRUE;
 						break;
 					}
-					last = temp;
 				}
 				
 				if (!found) {
-					if (last) {
-						last->next = tpl;
-					}
-					else {
-						*list = tpl;
-					}
+					LL_APPEND(*list, tpl);
 				}
 			}
 			
@@ -8044,8 +7937,7 @@ void smart_copy_icons(struct icon_data **addto, struct icon_data *input) {
 		*new_icon = *icon;
 		new_icon->icon = str_dup(NULLSAFE(icon->icon));
 		new_icon->color = str_dup(NULLSAFE(icon->color));
-		new_icon->next = NULL;
-		
+
 		LL_APPEND(*addto, new_icon);
 	}
 	
@@ -8088,15 +7980,9 @@ void smart_copy_interactions(struct interaction_item **addto, struct interaction
 		CREATE(new_interact, struct interaction_item, 1);
 		*new_interact = *interact;
 		new_interact->restrictions = copy_interaction_restrictions(interact->restrictions);
-		new_interact->next = NULL;
 		
 		// preserve order
-		if (end) {
-			end->next = new_interact;
-		}
-		else {
-			*addto = new_interact;
-		}
+		LL_APPEND(*addto, new_interact);
 		
 		end = new_interact;
 	}
@@ -8131,7 +8017,6 @@ void smart_copy_requirements(struct req_data **to_list, struct req_data *from_li
 		if (!found) {
 			CREATE(req, struct req_data, 1);
 			*req = *iter;
-			req->next = NULL;
 			LL_APPEND(*to_list, req);
 		}
 	}
@@ -8172,15 +8057,9 @@ void smart_copy_scripts(struct trig_proto_list **addto, struct trig_proto_list *
 		
 		CREATE(new_script, struct trig_proto_list, 1);
 		*new_script = *script;
-		new_script->next = NULL;
 		
 		// preserve order
-		if (end) {
-			end->next = new_script;
-		}
-		else {
-			*addto = new_script;
-		}
+		LL_APPEND(*addto, new_script);
 		
 		end = new_script;
 	}
@@ -8221,15 +8100,9 @@ void smart_copy_spawns(struct spawn_info **addto, struct spawn_info *input) {
 		
 		CREATE(new_spawn, struct spawn_info, 1);
 		*new_spawn = *spawn;
-		new_spawn->next = NULL;
 		
 		// preserve order
-		if (end) {
-			end->next = new_spawn;
-		}
-		else {
-			*addto = new_spawn;
-		}
+		LL_APPEND(*addto, new_spawn);
 		
 		end = new_spawn;
 	}
@@ -8270,15 +8143,9 @@ void smart_copy_template_spawns(struct adventure_spawn **addto, struct adventure
 		
 		CREATE(new_spawn, struct adventure_spawn, 1);
 		*new_spawn = *spawn;
-		new_spawn->next = NULL;
 		
 		// preserve order
-		if (end) {
-			end->next = new_spawn;
-		}
-		else {
-			*addto = new_spawn;
-		}
+		LL_APPEND(*addto, new_spawn);
 		
 		end = new_spawn;
 	}

@@ -250,8 +250,7 @@ void string_add(descriptor_data *d, char *str) {
 					mail->body = str_dup(*d->str);
 					
 					// put it on the pile
-					mail->next = GET_MAIL_PENDING(recip);
-					GET_MAIL_PENDING(recip) = mail;
+					LL_PREPEND(GET_MAIL_PENDING(recip), mail);
 					
 					if (is_file) {
 						store_loaded_char(recip);

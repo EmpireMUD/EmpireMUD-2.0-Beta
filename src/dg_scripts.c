@@ -1397,15 +1397,11 @@ void add_trigger(struct script_data *sc, trig_data *t, int loc) {
 
 	for (n = loc, i = TRIGGERS(sc); i && i->next && (n != 0); n--, i = i->next);
 
-	if (!loc) {
-		t->next = TRIGGERS(sc);
-		TRIGGERS(sc) = t;
+	if (!loc || !i) {
+		LL_PREPEND(TRIGGERS(sc), t);
 	}
-	else if (!i)
-		TRIGGERS(sc) = t;
 	else {
-		t->next = i->next;
-		i->next = t;
+		LL_APPEND_ELEM(TRIGGERS(sc), i, t);
 	}
 
 	SCRIPT_TYPES(sc) |= GET_TRIG_TYPE(t);
@@ -1627,10 +1623,8 @@ void add_var(struct trig_var_data **var_list, char *name, char *value, int id) {
 		strcpy(vd->name, name);                            /* strcpy: ok*/
 
 		CREATE(vd->value, char, strlen(value) + 1);
-
-		vd->next = *var_list;
+		LL_PREPEND(*var_list, vd);
 		vd->context = id;
-		*var_list = vd;
 	}
 
 	strcpy(vd->value, value);                            /* strcpy: ok*/
@@ -1680,15 +1674,8 @@ int remove_trigger(struct script_data *sc, char *name) {
 	}
 
 	if (i) {
-		if (j) {
-			j->next = i->next;
-			extract_trigger(i);
-		}
-		/* this was the first trigger */
-		else {
-			TRIGGERS(sc) = i->next;
-			extract_trigger(i);
-		}
+		LL_DELETE(TRIGGERS(sc), i);
+		extract_trigger(i);
 
 		/* update the script type bitvector */
 		SCRIPT_TYPES(sc) = 0;
@@ -7204,10 +7191,7 @@ ACMD(do_vdelete) {
 	}
 
 	/* ok, delete the variable */
-	if (vd_prev)
-		vd_prev->next = vd->next;
-	else
-		sc_remote->global_vars = vd->next;
+	LL_DELETE(sc_remote->global_vars, vd);
 
 	/* and free up the space */
 	free(vd->value);
@@ -7296,10 +7280,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 		return; /* the variable doesn't exist, or is the wrong context */
 
 	/* ok, delete the variable */
-	if (vd_prev)
-		vd_prev->next = vd->next;
-	else
-		sc_remote->global_vars = vd->next;
+	LL_DELETE(sc_remote->global_vars, vd);
 
 	/* and free up the space */
 	free(vd->value);

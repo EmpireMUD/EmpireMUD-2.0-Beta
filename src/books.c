@@ -93,8 +93,8 @@ book_data *book_proto(book_vnum vnum) {
 // parse 1 book file
 void parse_book(FILE *fl, book_vnum vnum) {
 	book_data *book;
-	struct library_data *libr, *libr_ctr;
-	struct paragraph_data *para, *para_ctr;
+	struct library_data *libr;
+	struct paragraph_data *para;
 	
 	room_vnum room;
 	int lvar[2];
@@ -150,22 +150,9 @@ void parse_book(FILE *fl, book_vnum vnum) {
 		switch (*line) {
 			case 'P': {	// paragraph
 				CREATE(para, struct paragraph_data, 1);
-				para->next = NULL;
 				
 				if ((para->text = fread_string(fl, buf2)) != NULL) {
-					if (book->paragraphs) {
-						// append to end
-						para_ctr = book->paragraphs;
-						while (para_ctr->next) {
-							para_ctr = para_ctr->next;
-						}
-						
-						para_ctr->next = para;
-					}
-					else {
-						// empty list
-						book->paragraphs = para;
-					}
+				    LL_APPEND(book->paragraphs, para);
 				}
 				else {
 					// oops
@@ -177,22 +164,9 @@ void parse_book(FILE *fl, book_vnum vnum) {
 				room = atoi(line+2);
 				if (real_room(room)) {
 					CREATE(libr, struct library_data, 1);
-					libr->next = NULL;
 					libr->location = room;
 
-					if (book->in_libraries) {
-						// append to end
-						libr_ctr = book->in_libraries;
-						while (libr_ctr->next) {
-							libr_ctr = libr_ctr->next;
-						}
-					
-						libr_ctr->next = libr;
-					}
-					else {
-						// empty list
-						book->in_libraries = libr;
-					}
+					LL_APPEND(book->in_libraries, libr);
 				}
 				
 				break;
@@ -454,7 +428,7 @@ LIBRARY_SCMD(library_checkout) {
 // actually shelves a book -- 99% of sanity checks done before this
 int perform_shelve(char_data *ch, obj_data *obj) {
 	book_data *book;
-	struct library_data *libr, *libr_ctr;
+	struct library_data *libr;
 	bool found = FALSE;
 	
 	if (!IS_BOOK(obj) || !(book = book_proto(GET_BOOK_ID(obj)))) {
@@ -471,22 +445,8 @@ int perform_shelve(char_data *ch, obj_data *obj) {
 		if (!found) {
 			// not already in the library
 			CREATE(libr, struct library_data, 1);
-			libr->next = NULL;
 			libr->location = GET_ROOM_VNUM(IN_ROOM(ch));
-
-			if (book->in_libraries) {
-				// append to end
-				libr_ctr = book->in_libraries;
-				while (libr_ctr->next) {
-					libr_ctr = libr_ctr->next;
-				}
-			
-				libr_ctr->next = libr;
-			}
-			else {
-				// empty list
-				book->in_libraries = libr;
-			}
+			LL_APPEND(book->in_libraries, libr);
 			
 			// save new locations
 			save_author_books(book->author);

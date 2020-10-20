@@ -2015,9 +2015,8 @@ void process_tower(room_data *room) {
 					if (tower_would_shoot(room, ch)) {
 						CREATE(tvl, struct tower_victim_list, 1);
 						tvl->ch = ch;
-					
-						tvl->next = victim_list;
-						victim_list = tvl;
+						
+						LL_PREPEND(victim_list, tvl);
 						++num_victs;
 					}
 				}
@@ -3715,8 +3714,7 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 		}
 	}
 
-	ch->next_fighting = combat_list;
-	combat_list = ch;
+	LL_PREPEND2(combat_list, ch, next_fighting);
 
 	FIGHTING(ch) = vict;
 	FIGHT_MODE(ch) = mode;
@@ -3740,12 +3738,11 @@ void set_fighting(char_data *ch, char_data *vict, byte mode) {
 
 /* remove a char from the list of fighting chars */
 void stop_fighting(char_data *ch) {
-	char_data *temp;
-
-	if (ch == next_combat_list)
+	if (ch == next_combat_list) {
 		next_combat_list = ch->next_fighting;
+	}
 
-	REMOVE_FROM_LIST(ch, combat_list, next_fighting);
+	LL_DELETE2(combat_list, ch, next_fighting);
 	ch->next_fighting = NULL;
 	FIGHTING(ch) = NULL;
 	GET_POS(ch) = POS_STANDING;

@@ -754,7 +754,7 @@ void save_olc_sector(descriptor_data *desc) {
 */
 sector_data *setup_olc_sector(sector_data *input) {
 	sector_data *new;
-	struct evolution_data *old_evo, *new_evo, *last_evo;
+	struct evolution_data *old_evo, *new_evo;
 	
 	CREATE(new, sector_data, 1);
 	init_sector(new);
@@ -774,19 +774,10 @@ sector_data *setup_olc_sector(sector_data *input) {
 		
 		// copy evolutions
 		new->evolution = NULL;
-		last_evo = NULL;
 		for (old_evo = input->evolution; old_evo; old_evo = old_evo->next) {
 			CREATE(new_evo, struct evolution_data, 1);
 			*new_evo = *old_evo;
-			new_evo->next = NULL;
-			
-			if (last_evo) {
-				last_evo->next = new_evo;
-			}
-			else {
-				new->evolution = new_evo;
-			}
-			last_evo = new_evo;
+			LL_APPEND(new->evolution, new_evo);
 		}
 		
 		// copy icons
@@ -1025,9 +1016,8 @@ OLC_MODULE(sectedit_evolution) {
 				evo->value = value;
 				evo->percent = prc;
 				evo->becomes = GET_SECT_VNUM(to_sect);
-			
-				evo->next = st->evolution;
-				st->evolution = evo;
+				
+				LL_PREPEND(st->evolution, evo);
 				sort_evolutions(st);
 				
 				msg_to_char(ch, "You add %s %s%s evolution at %.2f%%: %d %s\r\n", AN(evo_types[evo_type]), evo_types[evo_type], valstr, prc, GET_SECT_VNUM(to_sect), GET_SECT_NAME(to_sect));

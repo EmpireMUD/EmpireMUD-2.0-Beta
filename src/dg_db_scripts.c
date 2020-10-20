@@ -199,7 +199,7 @@ void dg_obj_trigger(char *line, obj_data *obj) {
 	char junk[8];
 	int vnum, count;
 	trig_data *trproto;
-	struct trig_proto_list *trg_proto, *new_trg;
+	struct trig_proto_list *new_trg;
 
 	count = sscanf(line, "%s %d", junk, &vnum);
 
@@ -216,17 +216,7 @@ void dg_obj_trigger(char *line, obj_data *obj) {
 
 	CREATE(new_trg, struct trig_proto_list, 1);
 	new_trg->vnum = vnum;
-	new_trg->next = NULL;
-
-	trg_proto = obj->proto_script;
-	if (!trg_proto) {
-		obj->proto_script = trg_proto = new_trg;
-	}
-	else {
-		while (trg_proto->next)
-			trg_proto = trg_proto->next;
-		trg_proto->next = new_trg;
-	}
+	LL_APPEND(obj->proto_script, new_trg);
 }
 
 void assign_triggers(void *i, int type) {

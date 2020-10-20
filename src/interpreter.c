@@ -1482,12 +1482,13 @@ ACMD(do_alias) {
 			a->alias = str_dup(arg);
 			delete_doubledollar(repl);
 			a->replacement = str_dup(repl);
-			if (strchr(repl, ALIAS_SEP_CHAR) || strchr(repl, ALIAS_VAR_CHAR))
+			if (strchr(repl, ALIAS_SEP_CHAR) || strchr(repl, ALIAS_VAR_CHAR)) {
 				a->type = ALIAS_COMPLEX;
-			else
+			}
+			else {
 				a->type = ALIAS_SIMPLE;
-			a->next = GET_ALIASES(ch);
-			GET_ALIASES(ch) = a;
+			}
+			LL_PREPEND(GET_ALIASES(ch), a);
 			send_to_char("Alias added.\r\n", ch);
 		}
 	}

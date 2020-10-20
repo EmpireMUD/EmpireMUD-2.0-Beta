@@ -70,8 +70,7 @@ void add_pursuit(char_data *ch, char_data *target) {
 	
 	// add new instance
 	CREATE(purs, struct pursuit_data, 1);
-	purs->next = MOB_PURSUIT(ch);
-	MOB_PURSUIT(ch) = purs;
+	LL_PREPEND(MOB_PURSUIT(ch), purs);
 	
 	purs->idnum = GET_IDNUM(target);
 	purs->last_seen = time(0);

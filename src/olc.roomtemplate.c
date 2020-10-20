@@ -258,18 +258,7 @@ bool match_one_exit(char_data *ch, room_template *add_exit_to, room_template *or
 	new->target_room = origin->vnum;
 	new->exit_info = ex->exit_info;
 	new->keyword = (ex->keyword ? str_dup(ex->keyword) : NULL);
-	new->next = NULL;
-	
-	// add at end
-	if ((temp = add_exit_to->exits) != NULL) {
-		while (temp->next) {
-			temp = temp->next;
-		}
-		temp->next = new;
-	}
-	else {
-		add_exit_to->exits = new;
-	}
+	LL_APPEND(add_exit_to->exits, new);
 	
 	msg_to_char(ch, "Matched exit %s to %d %s.\r\n", dirs[dir], origin->vnum, origin->title);
 	return TRUE;
@@ -738,8 +727,8 @@ void save_olc_room_template(descriptor_data *desc) {
 */
 room_template *setup_olc_room_template(room_template *input) {
 	room_template *new;
-	struct adventure_spawn *old_spawn, *new_spawn, *last_spawn;
-	struct exit_template *old_ex, *new_ex, *last_ex;
+	struct adventure_spawn *old_spawn, *new_spawn;
+	struct exit_template *old_ex, *new_ex;
 	
 	CREATE(new, room_template, 1);
 	init_room_template(new);
@@ -757,39 +746,21 @@ room_template *setup_olc_room_template(room_template *input) {
 		
 		// copy spawns
 		GET_RMT_SPAWNS(new) = NULL;
-		last_spawn = NULL;
 		for (old_spawn = GET_RMT_SPAWNS(input); old_spawn; old_spawn = old_spawn->next) {
 			CREATE(new_spawn, struct adventure_spawn, 1);
 			*new_spawn = *old_spawn;
-			new_spawn->next = NULL;
-			
-			if (last_spawn) {
-				last_spawn->next = new_spawn;
-			}
-			else {
-				GET_RMT_SPAWNS(new) = new_spawn;
-			}
-			last_spawn = new_spawn;
+			LL_APPEND(GET_RMT_SPAWNS(new), new_spawn);
 		}
 		
 		// copy exits
 		GET_RMT_EXITS(new) = NULL;
-		last_ex = NULL;
 		for (old_ex = GET_RMT_EXITS(input); old_ex; old_ex = old_ex->next) {
 			CREATE(new_ex, struct exit_template, 1);
 			*new_ex = *old_ex;
 			if (old_ex->keyword) {
 				new_ex->keyword = str_dup(old_ex->keyword);
 			}
-			new_ex->next = NULL;
-			
-			if (last_ex) {
-				last_ex->next = new_ex;
-			}
-			else {
-				GET_RMT_EXITS(new) = new_ex;
-			}
-			last_ex = new_ex;
+			LL_APPEND(GET_RMT_EXITS(new), new_ex);
 		}
 		
 		// copy interactions
@@ -1091,18 +1062,7 @@ OLC_MODULE(rmedit_exit) {
 			ex->target_room = vnum;
 			ex->keyword = *argument ? str_dup(argument) : NULL;
 			ex->exit_info = (*argument ? EX_ISDOOR | EX_CLOSED : NOBITS);
-			ex->next = NULL;
-			
-			// append to end
-			if ((temp = GET_RMT_EXITS(rmt)) != NULL) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = ex;
-			}
-			else {
-				GET_RMT_EXITS(rmt) = ex;
-			}
+			LL_APPEND(GET_RMT_EXITS(rmt), ex);
 			
 			to_template = room_template_proto(vnum);
 			
@@ -1385,18 +1345,7 @@ OLC_MODULE(rmedit_spawns) {
 			spawn->vnum = vnum;
 			spawn->percent = prc;
 			spawn->limit = limit;
-			spawn->next = NULL;
-			
-			// append to end
-			if ((temp = GET_RMT_SPAWNS(rmt)) != NULL) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = spawn;
-			}
-			else {
-				GET_RMT_SPAWNS(rmt) = spawn;
-			}
+			LL_APPEND(GET_RMT_SPAWNS(rmt), spawn);
 			
 			get_spawn_template_name(spawn, lbuf);
 			msg_to_char(ch, "You add spawn for %s %s (%d) at %.2f%%, limit %d.\r\n", adventure_spawn_types[stype], lbuf, vnum, prc, limit);

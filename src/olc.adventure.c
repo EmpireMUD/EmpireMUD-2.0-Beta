@@ -527,7 +527,7 @@ void save_olc_adventure(descriptor_data *desc) {
 */
 adv_data *setup_olc_adventure(adv_data *input) {
 	adv_data *new;
-	struct adventure_link_rule *old_link, *last_link, *new_link;
+	struct adventure_link_rule *old_link, *new_link;
 	
 	CREATE(new, adv_data, 1);
 	init_adventure(new);
@@ -543,19 +543,10 @@ adv_data *setup_olc_adventure(adv_data *input) {
 		
 		// copy linking
 		GET_ADV_LINKING(new) = NULL;
-		last_link = NULL;
 		for (old_link = GET_ADV_LINKING(input); old_link; old_link = old_link->next) {
 			CREATE(new_link, struct adventure_link_rule, 1);
 			*new_link = *old_link;
-			new_link->next = NULL;
-			
-			if (last_link) {
-				last_link->next = new_link;
-			}
-			else {
-				GET_ADV_LINKING(new) = new_link;
-			}
-			last_link = new_link;
+			LL_APPEND(GET_ADV_LINKING(new), new_link);
 		}
 		
 		// scripts
@@ -1106,17 +1097,7 @@ OLC_MODULE(advedit_linking) {
 			link->dir = dir;
 			link->bld_on = buildon;
 			link->bld_facing = buildfacing;
-			link->next = NULL;
-
-			if ((temp = GET_ADV_LINKING(adv)) != NULL) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = link;
-			}
-			else {
-				GET_ADV_LINKING(adv) = link;
-			}
+			LL_APPEND(GET_ADV_LINKING(adv), link);
 
 			msg_to_char(ch, "You add a linking rule of type: %s\r\n", adventure_link_types[linktype]);
 			if (need_vnum) {

@@ -155,7 +155,6 @@ void smart_copy_shop_items(struct shop_item **to_list, struct shop_item *from_li
 		if (!found) {
 			CREATE(item, struct shop_item, 1);
 			*item = *iter;
-			item->next = NULL;
 			LL_APPEND(*to_list, item);
 		}
 	}
@@ -667,20 +666,12 @@ void clear_shop(shop_data *shop) {
 * @return struct shop_item* The copy of the list.
 */
 struct shop_item *copy_shop_item_list(struct shop_item *from) {
-	struct shop_item *el, *iter, *list = NULL, *end = NULL;
+	struct shop_item *el, *iter, *list = NULL;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct shop_item, 1);
 		*el = *iter;
-		el->next = NULL;
-		
-		if (end) {
-			end->next = el;
-		}
-		else {
-			list = el;
-		}
-		end = el;
+		LL_APPEND(list, el);
 	}
 	
 	return list;

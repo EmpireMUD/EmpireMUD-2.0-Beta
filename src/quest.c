@@ -4131,20 +4131,12 @@ void clear_quest(quest_data *quest) {
 * @return struct quest_giver* The copy of the list.
 */
 struct quest_giver *copy_quest_givers(struct quest_giver *from) {
-	struct quest_giver *el, *iter, *list = NULL, *end = NULL;
+	struct quest_giver *el, *iter, *list = NULL;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct quest_giver, 1);
 		*el = *iter;
-		el->next = NULL;
-		
-		if (end) {
-			end->next = el;
-		}
-		else {
-			list = el;
-		}
-		end = el;
+		LL_APPEND(list, el);
 	}
 	
 	return list;
@@ -4156,20 +4148,12 @@ struct quest_giver *copy_quest_givers(struct quest_giver *from) {
 * @return struct quest_reward* The copy of the list.
 */
 struct quest_reward *copy_quest_rewards(struct quest_reward *from) {
-	struct quest_reward *el, *iter, *list = NULL, *end = NULL;
+	struct quest_reward *el, *iter, *list = NULL;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct quest_reward, 1);
 		*el = *iter;
-		el->next = NULL;
-		
-		if (end) {
-			end->next = el;
-		}
-		else {
-			list = el;
-		}
-		end = el;
+		LL_APPEND(list, el);
 	}
 	
 	return list;

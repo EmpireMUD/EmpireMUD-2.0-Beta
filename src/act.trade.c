@@ -1529,14 +1529,7 @@ ACMD(do_gen_augment) {
 			if (apply) {
 				apply->apply_type = augment_info[subcmd].apply_type;
 				apply->location = app->location;
-				
-				if (last_apply) {
-					last_apply->next = apply;
-				}
-				else {
-					GET_OBJ_APPLIES(obj) = apply;
-				}
-				last_apply = apply;
+				LL_APPEND(GET_OBJ_APPLIES(obj), apply);
 			}
 		}
 		

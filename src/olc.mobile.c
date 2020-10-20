@@ -178,7 +178,7 @@ char_data *create_mob_table_entry(mob_vnum vnum) {
 * @return bool TRUE if at least 1 item was deleted, or FALSE
 */
 bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum) {
-	struct interaction_item *inter, *next_inter, *temp;
+	struct interaction_item *inter, *next_inter;
 	bool found = FALSE;
 	
 	for (inter = *list; inter; inter = next_inter) {
@@ -187,8 +187,8 @@ bool delete_from_interaction_list(struct interaction_item **list, int vnum_type,
 		// deleted!
 		if (interact_vnum_types[inter->type] == vnum_type && inter->vnum == vnum) {
 			found = TRUE;
-			REMOVE_FROM_LIST(inter, *list, next);
-			inter->next = NULL;
+			LL_DELETE(*list, inter);
+			inter->next = NULL;	// freed as a list
 			free_interactions(&inter);
 		}
 	}

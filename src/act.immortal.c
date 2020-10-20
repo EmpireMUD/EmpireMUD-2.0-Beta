@@ -3041,8 +3041,7 @@ struct show_island_data *find_or_make_show_island(int island, struct show_island
 		CREATE(cur, struct show_island_data, 1);
 		cur->island = island;
 		cur->count = 0;
-		cur->next = *list;
-		*list = cur;
+		LL_PREPEND(*list, cur);
 	}
 	
 	return cur;

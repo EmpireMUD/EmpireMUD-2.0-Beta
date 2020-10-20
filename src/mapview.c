@@ -496,7 +496,7 @@ bool can_see_player_in_other_room(char_data *ch, char_data *vict) {
 
 
 bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container *mappc) {
-	struct mappc_data *pc, *pc_iter, *start_this_room = NULL;
+	struct mappc_data *pc, *start_this_room = NULL;
 	bool show_mob = FALSE;
 	char lbuf[60];
 	char_data *c;
@@ -514,19 +514,7 @@ bool show_pc_in_room(char_data *ch, room_data *room, struct mappc_data_container
 			CREATE(pc, struct mappc_data, 1);
 			pc->room = room;
 			pc->character = c;
-			pc->next = NULL;
-	
-			if (mappc->data) {
-				// append to end
-				pc_iter = mappc->data;
-				while (pc_iter->next) {
-					pc_iter = pc_iter->next;
-				}
-				pc_iter->next = pc;
-			}
-			else {
-				mappc->data = pc;
-			}
+			LL_APPEND(mappc->data, pc);
 	
 			if (!start_this_room) {
 				start_this_room = pc;

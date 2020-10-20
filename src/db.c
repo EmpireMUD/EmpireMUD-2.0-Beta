@@ -1409,8 +1409,7 @@ void push_island(struct map_data *loc) {
 	struct island_num_data_t *island;
 	CREATE(island, struct island_num_data_t, 1);
 	island->loc = loc;
-	island->next = island_stack;
-	island_stack = island;
+	LL_PREPEND(island_stack, island);
 }
 
 
@@ -3309,8 +3308,7 @@ PLAYER_UPDATE_FUNC(b5_40_update_players) {
 		}
 		if (!find_on_slash_channel(ch, chan->id)) {
 			CREATE(slash, struct player_slash_channel, 1);
-			slash->next = GET_SLASH_CHANNELS(ch);
-			GET_SLASH_CHANNELS(ch) = slash;
+			LL_PREPEND(GET_SLASH_CHANNELS(ch), slash);
 			slash->id = chan->id;
 		}
 	}
@@ -3455,8 +3453,7 @@ PLAYER_UPDATE_FUNC(b5_60_update_players) {
 		}
 		if (!find_on_slash_channel(ch, chan->id)) {
 			CREATE(slash, struct player_slash_channel, 1);
-			slash->next = GET_SLASH_CHANNELS(ch);
-			GET_SLASH_CHANNELS(ch) = slash;
+			LL_PREPEND(GET_SLASH_CHANNELS(ch), slash);
 			slash->id = chan->id;
 		}
 	}
@@ -4956,8 +4953,8 @@ void load_fight_messages(void) {
 		CREATE(messages, struct message_type, 1);
 		fight_messages[i].number_of_attacks++;
 		fight_messages[i].a_type = type;
-		messages->next = fight_messages[i].msg;
-		fight_messages[i].msg = messages;
+		
+		LL_PREPEND(fight_messages[i].msg, messages);
 
 		messages->die_msg.attacker_msg = fread_action(fl, i);
 		messages->die_msg.victim_msg = fread_action(fl, i);
@@ -5123,15 +5120,7 @@ void load_trading_post(void) {
 		switch (*line) {
 			case 'T': {	// begin new trade item
 				CREATE(tpd, struct trading_post_data, 1);
-				tpd->next = NULL;
-				
-				// put at end of list
-				if (last_tpd) {
-					last_tpd->next = tpd;
-				}
-				else {
-					trading_list = tpd;
-				}
+				LL_APPEND(trading_list, tpd);
 				last_tpd = tpd;
 				
 				if (sscanf(line, "T %d %s %ld %d %d %d %d", &int_in[0], str_in, &long_in, &int_in[1], &int_in[2], &int_in[3], &int_in[4]) != 7) {

@@ -248,15 +248,7 @@ void smart_copy_gear(struct archetype_gear **list, struct archetype_gear *from) 
 		// ok copy it
 		CREATE(gear, struct archetype_gear, 1);
 		*gear = *old;
-		gear->next = NULL;
-		
-		if (last) {
-			last->next = gear;
-		}
-		else {
-			*list = gear;
-		}
-		last = gear;
+		LL_APPEND(*list, gear);
 	}
 }
 
@@ -360,17 +352,7 @@ void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear 
 			CREATE(gear, struct archetype_gear, 1);
 			gear->wear = loc;
 			gear->vnum = num;
-			
-			// append to end
-			if ((temp = *list)) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = gear;
-			}
-			else {
-				*list = gear;
-			}
+			LL_APPEND(*list, gear);
 			
 			msg_to_char(ch, "You add %s (%s).\r\n", get_obj_name_by_proto(num), loc == NO_WEAR ? "inventory" : wear_data[loc].name);
 		}
@@ -761,22 +743,13 @@ void clear_archetype(archetype_data *arch) {
 * @return struct archetype_gear* The copied list.
 */
 struct archetype_gear *copy_archetype_gear(struct archetype_gear *input) {
-	struct archetype_gear *new, *last, *list, *iter;
+	struct archetype_gear *new, *list, *iter;
 	
-	last = NULL;
 	list = NULL;
 	for (iter = input; iter; iter = iter->next) {
 		CREATE(new, struct archetype_gear, 1);
 		*new = *iter;
-		new->next = NULL;
-		
-		if (last) {
-			last->next = new;
-		}
-		else {
-			list = new;
-		}
-		last = new;
+		LL_APPEND(list, new);
 	}
 	
 	return list;
@@ -790,22 +763,13 @@ struct archetype_gear *copy_archetype_gear(struct archetype_gear *input) {
 * @return struct archetype_skill* The copied list.
 */
 struct archetype_skill *copy_archetype_skills(struct archetype_skill *input) {
-	struct archetype_skill *new, *last, *list, *iter;
+	struct archetype_skill *new, *list, *iter;
 	
-	last = NULL;
 	list = NULL;
 	for (iter = input; iter; iter = iter->next) {
 		CREATE(new, struct archetype_skill, 1);
 		*new = *iter;
-		new->next = NULL;
-		
-		if (last) {
-			last->next = new;
-		}
-		else {
-			list = new;
-		}
-		last = new;
+		LL_APPEND(list, new);
 	}
 	
 	return list;
@@ -882,7 +846,7 @@ void free_archetype(archetype_data *arch) {
 * @param char *error The string describing the item being read, in case something goes wrong.
 */
 void parse_archetype_gear(FILE *fl, struct archetype_gear **list, char *error) {
-	struct archetype_gear *gear, *last;
+	struct archetype_gear *gear;
 	char line[256];
 	int int_in[2];
 
@@ -896,17 +860,7 @@ void parse_archetype_gear(FILE *fl, struct archetype_gear **list, char *error) {
 		CREATE(gear, struct archetype_gear, 1);
 		gear->wear = int_in[0];
 		gear->vnum = int_in[1];
-	
-		// append
-		if ((last = *list)) {
-			while (last->next) {
-				last = last->next;
-			}
-			last->next = gear;
-		}
-		else {
-			*list = gear;
-		}
+		LL_APPEND(*list, gear);
 	}
 }
 
@@ -919,7 +873,7 @@ void parse_archetype_gear(FILE *fl, struct archetype_gear **list, char *error) {
 */
 void parse_archetype(FILE *fl, any_vnum vnum) {
 	char line[256], error[256], str_in[256];
-	struct archetype_skill *sk, *last_sk = NULL;
+	struct archetype_skill *sk;
 	archetype_data *arch, *find;
 	int int_in[4];
 	
@@ -995,15 +949,7 @@ void parse_archetype(FILE *fl, any_vnum vnum) {
 				CREATE(sk, struct archetype_skill, 1);
 				sk->skill = int_in[0];
 				sk->level = int_in[1];
-			
-				// append
-				if (last_sk) {
-					last_sk->next = sk;
-				}
-				else {
-					GET_ARCH_SKILLS(arch) = sk;
-				}
-				last_sk = sk;
+				LL_APPEND(GET_ARCH_SKILLS(arch), sk);
 				break;
 			}
 			
@@ -1833,17 +1779,7 @@ OLC_MODULE(archedit_skill) {
 			CREATE(sk, struct archetype_skill, 1);
 			sk->skill = SKILL_VNUM(skill);
 			sk->level = num;
-			
-			// append
-			if ((temp = GET_ARCH_SKILLS(arch))) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = sk;
-			}
-			else {
-				GET_ARCH_SKILLS(arch) = sk;
-			}
+			LL_APPEND(GET_ARCH_SKILLS(arch), sk);
 		}
 		
 		if (PRF_FLAGGED(ch, PRF_NOREPEAT)) {

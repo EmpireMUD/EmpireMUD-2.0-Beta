@@ -3870,7 +3870,7 @@ void trade_identify(char_data *ch, char *argument) {
 */
 void trade_post(char_data *ch, char *argument) {	
 	char buf[MAX_STRING_LENGTH], itemarg[MAX_INPUT_LENGTH], costarg[MAX_INPUT_LENGTH], *timearg;
-	struct trading_post_data *tpd, *end;
+	struct trading_post_data *tpd;
 	obj_data *obj;
 	int cost, length = config_get_int("trading_post_max_hours"), post_cost = 0;
 	
@@ -3921,20 +3921,9 @@ void trade_post(char_data *ch, char *argument) {
 		charge_coins(ch, GET_LOYALTY(ch), post_cost, NULL);
 		
 		CREATE(tpd, struct trading_post_data, 1);
-		tpd->next = NULL;
 		
 		// put at end of list
-		if ((end = trading_list)) {
-			while (end->next) {
-				end = end->next;
-			}
-		}
-		if (end) {
-			end->next = tpd;
-		}
-		else {
-			trading_list = tpd;
-		}
+		LL_APPEND(trading_list, tpd);
 		
 		// data
 		tpd->player = GET_IDNUM(ch);

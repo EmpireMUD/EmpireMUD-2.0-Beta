@@ -1749,9 +1749,9 @@ void setup_extra_desc_editor(char_data *ch, struct extra_descr_data *ex) {
 * @return struct extra_descr_data* The copied list.
 */
 struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list) {
-	struct extra_descr_data *new, *newlist, *last, *iter;
+	struct extra_descr_data *new, *newlist, *iter;
 	
-	newlist = last = NULL;
+	newlist = NULL;
 	for (iter = list; iter; iter = iter->next) {
 		// skip empty descriptions entirely
 		if (!iter->description || !*iter->description || !iter->keyword || !*iter->keyword) {
@@ -1761,16 +1761,7 @@ struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list) {
 		CREATE(new, struct extra_descr_data, 1);
 		new->keyword = iter->keyword ? str_dup(iter->keyword) : NULL;
 		new->description = iter->description ? str_dup(iter->description) : NULL;
-		new->next = NULL;
-	
-		if (last) {
-			last->next = new;
-		}
-		else {
-			newlist = new;
-		}
-	
-		last = new;
+		LL_APPEND(newlist, new);
 	}
 	
 	return newlist;
@@ -1784,22 +1775,13 @@ struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list) {
 * @return struct obj_storage_type* The copied list.
 */
 struct obj_storage_type *copy_storage(struct obj_storage_type *list) {
-	struct obj_storage_type *store, *new_store, *last_store, *new_list;
+	struct obj_storage_type *store, *new_store, *new_list;
 	
-	new_list = last_store = NULL;
+	new_list = NULL;
 	LL_FOREACH(list, store) {
 		CREATE(new_store, struct obj_storage_type, 1);
-		
 		*new_store = *store;
-		new_store->next = NULL;
-		
-		if (last_store) {
-			last_store->next = new_store;
-		}
-		else {
-			new_list = new_store;
-		}
-		last_store = new_store;
+		LL_APPEND(new_list, new_store);
 	}
 	
 	return new_list;
@@ -2286,17 +2268,7 @@ OLC_MODULE(oedit_apply) {
 			apply->location = loc;
 			apply->modifier = num;
 			apply->apply_type = apply_type;
-			
-			// append to end
-			if ((temp = GET_OBJ_APPLIES(obj))) {
-				while (temp->next) {
-					temp = temp->next;
-				}
-				temp->next = apply;
-			}
-			else {
-				GET_OBJ_APPLIES(obj) = apply;
-			}
+			LL_APPEND(GET_OBJ_APPLIES(obj), apply);
 			
 			msg_to_char(ch, "You add %+d to %s (%s).\r\n", num, apply_types[loc], apply_type_names[apply_type]);
 		}

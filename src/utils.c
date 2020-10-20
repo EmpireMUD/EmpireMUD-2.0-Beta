@@ -1732,7 +1732,7 @@ void basic_mud_log(const char *format, ...) {
 * @param const char *str The va-arg format ...
 */
 void log_to_empire(empire_data *emp, int type, const char *str, ...) {
-	struct empire_log_data *elog, *temp;
+	struct empire_log_data *elog;
 	char output[MAX_STRING_LENGTH];
 	descriptor_data *i;
 	va_list tArgList;
@@ -1750,19 +1750,7 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 		elog->type = type;
 		elog->timestamp = time(0);
 		elog->string = str_dup(output);
-		elog->next = NULL;
-		
-		// append to end
-		if ((temp = EMPIRE_LOGS(emp))) {
-			while (temp->next) {
-				temp = temp->next;
-			}
-			temp->next = elog;
-		}
-		else {
-			EMPIRE_LOGS(emp) = elog;
-		}
-		
+		LL_APPEND(EMPIRE_LOGS(emp), elog);
 		EMPIRE_NEEDS_LOGS_SAVE(emp) = TRUE;
 	}
 	

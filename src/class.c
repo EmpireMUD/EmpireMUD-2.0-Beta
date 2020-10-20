@@ -762,7 +762,6 @@ struct class_ability *copy_class_abilities(struct class_ability *input) {
 	LL_FOREACH(input, iter) {
 		CREATE(el, struct class_ability, 1);
 		*el = *iter;
-		el->next = NULL;
 		LL_APPEND(list, el);
 	}
 	
@@ -782,7 +781,6 @@ struct class_skill_req *copy_class_skill_reqs(struct class_skill_req *input) {
 	LL_FOREACH(input, iter) {
 		CREATE(el, struct class_skill_req, 1);
 		*el = *iter;
-		el->next = NULL;
 		LL_APPEND(list, el);
 	}
 	

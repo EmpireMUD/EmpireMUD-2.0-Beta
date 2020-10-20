@@ -2222,7 +2222,7 @@ struct efind_group {
 * @param room_data *location Where it is.
 */
 void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *veh, room_data *location) {
-	struct efind_group *eg, *temp;
+	struct efind_group *eg;
 	bool found = FALSE;
 	
 	// need 1 or the other
@@ -2265,20 +2265,7 @@ void add_obj_to_efind(struct efind_group **list, obj_data *obj, vehicle_data *ve
 		eg->veh = veh;
 		eg->count = 1;
 		eg->stackable = obj ? OBJ_CAN_STACK(obj) : FALSE;	// not used for vehicle
-		eg->next = NULL;
-		
-		if (*list) {
-			// add to end
-			temp = *list;
-			while (temp->next) {
-				temp = temp->next;
-			}
-			temp->next = eg;
-		}
-		else {
-			// empty list
-			*list = eg;
-		}
+		LL_APPEND(*list, eg);
 	}
 }
 
@@ -2336,8 +2323,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 			trade->vnum = vnum;
 			
 			// add anywhere; sort later
-			trade->next = EMPIRE_TRADE(emp);
-			EMPIRE_TRADE(emp) = trade;
+			LL_PREPEND(EMPIRE_TRADE(emp), trade);
 		}
 		
 		// update values
@@ -4596,7 +4582,6 @@ ACMD(do_enroll) {
 	struct empire_city_data *city, *next_city;
 	struct empire_needs *needs, *next_needs;
 	player_index_data *index, *next_index;
-	struct empire_unique_storage *eus;
 	struct vehicle_attached_mob *vam;
 	vehicle_data *veh, *next_veh;
 	empire_data *e, *old;
@@ -4767,16 +4752,7 @@ ACMD(do_enroll) {
 			
 			// unique storage: append to end of current empire's list
 			if (EMPIRE_UNIQUE_STORAGE(old)) {
-				// find end
-				if ((eus = EMPIRE_UNIQUE_STORAGE(e))) {
-					while (eus->next) {
-						eus = eus->next;
-					}
-					eus->next = EMPIRE_UNIQUE_STORAGE(old);
-				}
-				else {
-					EMPIRE_UNIQUE_STORAGE(e) = EMPIRE_UNIQUE_STORAGE(old);
-				}
+				LL_CONCAT(EMPIRE_UNIQUE_STORAGE(e), EMPIRE_UNIQUE_STORAGE(old));
 				EMPIRE_UNIQUE_STORAGE(old) = NULL;
 			}
 			
@@ -7077,8 +7053,7 @@ ACMD(do_territory) {
 			CREATE(node, struct find_territory_node, 1);
 			node->loc = iter;
 			node->count = 1;
-			node->next = node_list;
-			node_list = node;
+			LL_PREPEND(node_list, node);
 		}
 	}
 	

@@ -1119,7 +1119,7 @@ void process_dismantling(char_data *ch, room_data *room) {
 		// make a copy to pass to give_resources
 		CREATE(copy, struct resource_data, 1);
 		*copy = *res;
-		copy->next = NULL;
+		copy->next = NULL;	// will be freed as a list
 		
 		if (copy->type == RES_OBJECT) {
 			// for items, refund 1 at a time

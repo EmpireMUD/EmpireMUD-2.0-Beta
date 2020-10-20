@@ -206,8 +206,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 						struct obj_binding *bind;
 						CREATE(bind, struct obj_binding, 1);
 						bind->idnum = i_in[0];
-						bind->next = OBJ_BOUND_TO(obj);
-						OBJ_BOUND_TO(obj) = bind;
+						LL_PREPEND(OBJ_BOUND_TO(obj), bind);
 					}
 				}
 				break;
@@ -239,8 +238,7 @@ obj_data *Obj_load_from_file(FILE *fl, obj_vnum vnum, int *location, char_data *
 					if (GET_OBJ_VNUM(obj) == NOTHING) {
 						// only allowed on 'anonymous' objs
 						CREATE(ex, struct extra_descr_data, 1);
-						ex->next = obj->proto_data->ex_description;
-						obj->proto_data->ex_description = ex;
+						LL_PREPEND(obj->proto_data->ex_description, ex);
 						
 						ex->keyword = fread_string(fl, error);
 						ex->description = fread_string(fl, error);

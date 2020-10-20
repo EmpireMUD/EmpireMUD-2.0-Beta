@@ -355,8 +355,7 @@ static void instantiate_one_exit(struct instance_data *inst, room_data *room, st
 	// if we already have an exit, repurpose it; otherwise, make one
 	if (!(new = find_exit(room, dir))) {
 		CREATE(new, struct room_direction_data, 1);
-		new->next = COMPLEX_DATA(room)->exits;
-		COMPLEX_DATA(room)->exits = new;
+		LL_PREPEND(COMPLEX_DATA(room)->exits, new);
 	}
 	
 	// build the exit

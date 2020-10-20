@@ -260,15 +260,7 @@ void add_player_to_account(char_data *ch, account_data *acct) {
 	
 	if (!found) {
 		// add to end of account player list
-		if ((pos = acct->players)) {
-			while (pos->next) {
-				pos = pos->next;
-			}
-			pos->next = plr;
-		}
-		else {
-			acct->players = plr;
-		}
+		LL_APPEND(acct->players, plr);
 	}
 	
 	// update this at the end, after we're sure we've found it
@@ -433,12 +425,7 @@ void parse_account(FILE *fl, int nr) {
 					strtolower(plr->name);	// ensure lowercase
 					
 					// add to end
-					if (last_plr) {
-						last_plr->next = plr;
-					}
-					else {
-						acct->players = plr;
-					}
+					LL_APPEND(acct->players, plr);
 					last_plr = plr;
 				}
 				else {
@@ -2049,8 +2036,7 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					slash->name = str_dup(trim(line + length + 1));
 					
 					// append to start (it reverses them on-join anyway)
-					slash->next = LOAD_SLASH_CHANNELS(ch);
-					LOAD_SLASH_CHANNELS(ch) = slash;
+					LL_PREPEND(LOAD_SLASH_CHANNELS(ch), slash);
 				}
 				else if (PFILE_TAG(line, "Slash-History:", length)) {
 					// this line is ignored after b5.88 -- slash histories are now global
@@ -2413,9 +2399,7 @@ void write_player_primary_data_to_file(FILE *fl, char_data *ch) {
 	while ((af = ch->affected)) {
 		CREATE(new_af, struct affected_type, 1);
 		*new_af = *af;
-		new_af->next = af_list;
-		af_list = new_af;
-		
+		LL_PREPEND(af_list, new_af);
 		affect_remove(ch, af);
 	}
 	
@@ -3332,8 +3316,7 @@ void autowiz_initialize(void) {
 	while (level_params[i].level > 0) {
 		CREATE(tmp, struct autowiz_level_rec, 1);
 		tmp->params = &(level_params[i++]);
-		tmp->next = autowiz_data;
-		autowiz_data = tmp;
+		LL_PREPEND(autowiz_data, tmp);
 	}
 }
 
@@ -3345,7 +3328,7 @@ void autowiz_initialize(void) {
 * @param char *name The player's name.
 */
 void autowiz_add_name(int level, char *name) {
-	struct autowiz_name_rec *tmp, *end;
+	struct autowiz_name_rec *tmp;
 	struct autowiz_level_rec *curr_level;
 
 	if (!*name)
@@ -3361,19 +3344,11 @@ void autowiz_add_name(int level, char *name) {
 	tmp->name = str_dup(name);
 	
 	curr_level = autowiz_data;
-	while (curr_level->params->level > level)
+	while (curr_level->params->level > level) {
 		curr_level = curr_level->next;
+	}
 	
-	// attempt to append at end
-	if ((end = curr_level->names)) {
-		while (end->next) {
-			end = end->next;
-		}
-		end->next = tmp;
-	}
-	else {
-		curr_level->names = tmp;
-	}
+	LL_APPEND(curr_level->names, tmp);
 }
 
 

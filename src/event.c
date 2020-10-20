@@ -1333,20 +1333,12 @@ void clear_event(event_data *event) {
 * @return struct event_reward* The copy of the list.
 */
 struct event_reward *copy_event_rewards(struct event_reward *from) {
-	struct event_reward *el, *iter, *list = NULL, *end = NULL;
+	struct event_reward *el, *iter, *list = NULL;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct event_reward, 1);
 		*el = *iter;
-		el->next = NULL;
-		
-		if (end) {
-			end->next = el;
-		}
-		else {
-			list = el;
-		}
-		end = el;
+		LL_APPEND(list, el);
 	}
 	
 	return list;

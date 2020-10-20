@@ -60,8 +60,7 @@ void load_banned(void) {
 			if (!str_cmp(ban_type, ban_types[i]))
 				next_node->type = i;
 
-		next_node->next = ban_list;
-		ban_list = next_node;
+		LL_PREPEND(ban_list, next_node);
 	}
 
 	fclose(fl);
@@ -166,8 +165,7 @@ ACMD(do_ban) {
 		if (!str_cmp(flag, ban_types[i]))
 			ban_node->type = i;
 
-	ban_node->next = ban_list;
-	ban_list = ban_node;
+	LL_PREPEND(ban_list, ban_node);
 
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "BAN: %s has banned %s for %s players", GET_NAME(ch), site, ban_types[ban_node->type]);
 	send_to_char("Site banned.\r\n", ch);

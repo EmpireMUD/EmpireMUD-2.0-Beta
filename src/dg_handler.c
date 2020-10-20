@@ -455,20 +455,12 @@ void free_proto_scripts(struct trig_proto_list **list) {
 * @return struct trig_proto_list* The copied list.
 */
 struct trig_proto_list *copy_trig_protos(struct trig_proto_list *from) {
-	struct trig_proto_list *el, *iter, *list = NULL, *end = NULL;
+	struct trig_proto_list *el, *iter, *list = NULL;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct trig_proto_list, 1);
 		*el = *iter;
-		el->next = NULL;
-		
-		if (end) {
-			end->next = el;
-		}
-		else {
-			list = el;
-		}
-		end = el;
+		LL_APPEND(list, el);
 	}
 	
 	return list;

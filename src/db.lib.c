@@ -657,7 +657,7 @@ void init_building(bld_data *building) {
 */
 void parse_building(FILE *fl, bld_vnum vnum) {
 	char line[256], str_in[256], str_in2[256];
-	struct spawn_info *spawn, *stemp;
+	struct spawn_info *spawn;
 	struct bld_relation *relat;
 	bld_data *bld, *find;
 	int int_in[4];
@@ -766,18 +766,7 @@ void parse_building(FILE *fl, bld_vnum vnum) {
 				spawn->vnum = int_in[0];
 				spawn->percent = dbl_in;
 				spawn->flags = asciiflag_conv(str_in);
-				spawn->next = NULL;
-				
-				// append at end
-				if ((stemp = GET_BLD_SPAWNS(bld))) {
-					while (stemp->next) {
-						stemp = stemp->next;
-					}
-					stemp->next = spawn;
-				}
-				else {
-					GET_BLD_SPAWNS(bld) = spawn;
-				}
+				LL_APPEND(GET_BLD_SPAWNS(bld), spawn);
 				break;
 			}
 			
@@ -1243,7 +1232,7 @@ void parse_crop(FILE *fl, crop_vnum vnum) {
 	int int_in[4];
 	double dbl_in;
 	char line[256], str_in[256], str_in2[256];
-	struct spawn_info *spawn, *stemp;
+	struct spawn_info *spawn;
 	
 	// create
 	CREATE(crop, crop_data, 1);
@@ -1314,18 +1303,7 @@ void parse_crop(FILE *fl, crop_vnum vnum) {
 				spawn->vnum = int_in[0];
 				spawn->percent = dbl_in;
 				spawn->flags = asciiflag_conv(str_in);
-				spawn->next = NULL;
-				
-				// append at end
-				if ((stemp = GET_CROP_SPAWNS(crop))) {
-					while (stemp->next) {
-						stemp = stemp->next;
-					}
-					stemp->next = spawn;
-				}
-				else {
-					GET_CROP_SPAWNS(crop) = spawn;
-				}
+				LL_APPEND(GET_CROP_SPAWNS(crop), spawn);
 				break;
 			}
 
@@ -2135,15 +2113,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 				elog->type = t[0];
 				elog->timestamp = (time_t) t[1];
 				elog->string = fread_string(fl, buf2);
-				elog->next = NULL;
-				
-				// append to end to preserve original order
-				if (last_log) {
-					last_log->next = elog;
-				}
-				else {
-					emp->logs = elog;
-				}
+				LL_APPEND(emp->logs, elog);
 				last_log = elog;
 				break;
 			}
@@ -2160,14 +2130,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 				off->x = t[4];
 				off->y = t[5];
 				off->flags = asciiflag_conv(str_in);
-				
-				if (last_off) {
-					last_off->next = off;
-				}
-				else {
-					EMPIRE_OFFENSES(emp) = off;
-				}
-				
+				LL_APPEND(EMPIRE_OFFENSES(emp), off);
 				last_off = off;
 				break;
 			}
@@ -2299,18 +2262,11 @@ void load_empire_storage_one(FILE *fl, empire_data *emp) {
 					remove_from_object_list(obj);	// doesn't really go here right now
 					
 					CREATE(eus, struct empire_unique_storage, 1);
-					eus->next = NULL;
 					eus->island = t[0];
 					eus->amount = t[1];
 					eus->flags = asciiflag_conv(str_in);
 					eus->obj = obj;
-					
-					if (last_eus) {
-						last_eus->next = eus;
-					}
-					else {
-						EMPIRE_UNIQUE_STORAGE(emp) = eus;
-					}
+					LL_APPEND(EMPIRE_UNIQUE_STORAGE(emp), eus);
 					last_eus = eus;
 				}
 				
@@ -2838,15 +2794,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 					trade->vnum = t[1];
 					trade->limit = t[2];
 					trade->cost = dbl_in;
-					trade->next = NULL;
-					
-					// add to end
-					if (last_trade) {
-						last_trade->next = trade;
-					}
-					else {
-						emp->trade = trade;
-					}
+					LL_APPEND(emp->trade, trade);
 					last_trade = trade;
 				}
 				else {
@@ -3352,9 +3300,7 @@ struct empire_npc_data *create_empire_npc(empire_data *emp, mob_vnum mobv, int s
 	
 	npc->empire_id = EMPIRE_VNUM(emp);
 	
-	npc->next = ter->npcs;
-	ter->npcs = npc;
-	
+	LL_PREPEND(ter->npcs, npc);
 	EMPIRE_NEEDS_SAVE(emp) = TRUE;
 	
 	return npc;
@@ -4044,9 +3990,7 @@ void setup_dir(FILE *fl, room_data *room, int dir) {
 	if (!(ex = find_exit(room, dir))) {
 		CREATE(ex, struct room_direction_data, 1);
 		ex->dir = dir;
-		
-		ex->next = COMPLEX_DATA(room)->exits;
-		COMPLEX_DATA(room)->exits = ex;
+		LL_PREPEND(COMPLEX_DATA(room)->exits, ex);
 	}
 
 	// exit data
@@ -4129,23 +4073,12 @@ void prune_extra_descs(struct extra_descr_data **list) {
 * @param char *error_part A string containing e.g. "mob #1234", describing where the error occurred, if one happens.
 */
 void parse_extra_desc(FILE *fl, struct extra_descr_data **list, char *error_part) {
-	struct extra_descr_data *new_descr, *ex_iter;
+	struct extra_descr_data *new_descr;
 				
 	CREATE(new_descr, struct extra_descr_data, 1);
 	new_descr->keyword = fread_string(fl, buf2);
 	new_descr->description = fread_string(fl, buf2);
-	new_descr->next = NULL;
-		
-	// add to end
-	if ((ex_iter = *list) != NULL) {
-		while (ex_iter->next) {
-			ex_iter = ex_iter->next;
-		}
-		ex_iter->next = new_descr;
-	}
-	else {
-		*list = new_descr;
-	}
+	LL_APPEND(*list, new_descr);
 }
 
 
@@ -4348,7 +4281,6 @@ void parse_global(FILE *fl, any_vnum vnum) {
 				spawn->vnum = int_in[0];
 				spawn->percent = dbl_in;
 				spawn->flags = asciiflag_conv(str_in);
-				spawn->next = NULL;
 				
 				LL_APPEND(GET_GLOBAL_SPAWNS(glb), spawn);
 				break;
@@ -4451,7 +4383,7 @@ void free_icon_set(struct icon_data **set) {
 * @param char *error_part A string containing e.g. "mob #1234", describing where the error occurred, if one happens.
 */
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part) {
-	struct icon_data *icon, *icon_iter;
+	struct icon_data *icon;
 	int type;
 
 	// First line was like D7, where D is the file code and the number is a TILESET_x
@@ -4464,18 +4396,7 @@ void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part)
 	icon->type = type;
 	icon->icon = fread_string(fl, error_part);
 	icon->color = fread_string(fl, error_part);
-	icon->next = NULL;
-	
-	// append to end
-	if ((icon_iter = *list) != NULL) {
-		while (icon_iter->next) {
-			icon_iter = icon_iter->next;
-		}
-		icon_iter->next = icon;
-	}
-	else {
-		*list = icon;
-	}
+	LL_APPEND(*list, icon);
 }
 
 
@@ -4551,7 +4472,7 @@ void free_interactions(struct interaction_item **list) {
 * @param char *error_part A string containing e.g. "mob #1234", describing where the error occurred, if one happens.
 */
 void parse_interaction(char *line, struct interaction_item **list, char *error_part) {
-	struct interaction_item *interact, *inter_iter;
+	struct interaction_item *interact;
 	static struct interaction_item *last_interact = NULL;
 	struct interact_restriction *res;
 	int int_in[3];
@@ -4597,18 +4518,7 @@ void parse_interaction(char *line, struct interaction_item **list, char *error_p
 	interact->percent = dbl_in;
 	interact->quantity = int_in[2];
 	interact->exclusion_code = excl;
-	interact->next = NULL;
-	
-	// gotta add to the end of the list exclusion order is important
-	if ((inter_iter = *list) != NULL) {
-		while (inter_iter->next) {
-			inter_iter = inter_iter->next;
-		}
-		inter_iter->next = interact;
-	}
-	else {
-		*list = interact;
-	}
+	LL_APPEND(*list, interact);
 	
 	last_interact = interact;
 }
@@ -5437,14 +5347,7 @@ void parse_object(FILE *obj_f, int nr) {
 				apply->location = t[0];
 				apply->modifier = t[1];
 				apply->apply_type = t[2];
-				
-				// append to end
-				if (last_apply) {
-					last_apply->next = apply;
-				}
-				else {
-					GET_OBJ_APPLIES(obj) = apply;
-				}
+				LL_APPEND(GET_OBJ_APPLIES(obj), apply);
 				last_apply = apply;
 				break;
 
@@ -5539,14 +5442,7 @@ void parse_object(FILE *obj_f, int nr) {
 				store->type = t[0];
 				store->vnum = t[1];
 				store->flags = asciiflag_conv(f1);
-				store->next = NULL;
-				
-				if (last_store) {
-					last_store->next = store;
-				}
-				else {
-					obj->proto_data->storage = store;
-				}
+				LL_APPEND(obj->proto_data->storage, store);
 				last_store = store;
 				break;
 			}
@@ -5670,21 +5566,13 @@ void write_obj_to_file(FILE *fl, obj_data *obj) {
 * @return struct resource_data* The copied list.
 */
 struct resource_data *copy_resource_list(struct resource_data *input) {
-	struct resource_data *new, *last, *list, *iter;
+	struct resource_data *new, *list, *iter;
 	
-	last = list = NULL;
+	list = NULL;
 	for (iter = input; iter; iter = iter->next) {
 		CREATE(new, struct resource_data, 1);
 		*new = *iter;
-		new->next = NULL;
-		
-		if (last) {
-			last->next = new;
-		}
-		else {
-			list = new;
-		}
-		last = new;
+		LL_APPEND(list, new);
 	}
 	
 	return list;
@@ -5949,15 +5837,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				}
 			
 				CREATE(reset, struct reset_com, 1);
-				reset->next = NULL;
-				
-				// add to end
-				if (last_reset) {
-					last_reset->next = reset;
-				}
-				else {
-					room->reset_commands = reset;
-				}
+				LL_APPEND(room->reset_commands, reset);
 				last_reset = reset;
 				
 				// load data
@@ -6108,8 +5988,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 				CREATE(dep, struct depletion_data, 1);
 				dep->type = t[0];
 				dep->count = t[1];
-				dep->next = ROOM_DEPLETION(room);
-				ROOM_DEPLETION(room) = dep;
+				LL_PREPEND(ROOM_DEPLETION(room), dep);
 				
 				break;
 			}
@@ -6540,13 +6419,7 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 		switch (*line) {
 			case 'D': {	// exit
 				CREATE(ex, struct exit_template, 1);
-				ex->next = NULL;
-				if (last_ex) {
-					last_ex->next = ex;
-				}
-				else {
-					GET_RMT_EXITS(rmt) = ex;
-				}
+				LL_APPEND(GET_RMT_EXITS(rmt), ex);
 				last_ex = ex;
 				
 				ex->dir = atoi(line + 1);
@@ -6574,13 +6447,7 @@ void parse_room_template(FILE *fl, rmt_vnum vnum) {
 			}
 			case 'M': {	// spawn
 				CREATE(spawn, struct adventure_spawn, 1);
-				spawn->next = NULL;
-				if (last_spawn) {
-					last_spawn->next = spawn;
-				}
-				else {
-					GET_RMT_SPAWNS(rmt) = spawn;
-				}
+				LL_APPEND(GET_RMT_SPAWNS(rmt), spawn);
 				last_spawn = spawn;
 
 				// same line (don't read another): type vnum percent limit
@@ -6774,7 +6641,7 @@ void init_sector(sector_data *st) {
 void parse_sector(FILE *fl, sector_vnum vnum) {
 	char line[256], str_in[256], str_in2[256], str_in3[256], char_in[2];
 	struct evolution_data *evo, *last_evo = NULL;
-	struct spawn_info *spawn, *stemp;
+	struct spawn_info *spawn;
 	sector_data *sect, *find;
 	double dbl_in;
 	int int_in[4];
@@ -6842,14 +6709,7 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				evo->value = int_in[1];
 				evo->percent = dbl_in;
 				evo->becomes = int_in[2];
-				evo->next = NULL;
-				
-				if (last_evo) {
-					last_evo->next = evo;
-				}
-				else {
-					GET_SECT_EVOS(sect) = evo;
-				}
+				LL_APPEND(GET_SECT_EVOS(sect), evo);
 				last_evo = evo;
 				break;
 			}
@@ -6870,18 +6730,7 @@ void parse_sector(FILE *fl, sector_vnum vnum) {
 				spawn->vnum = int_in[0];
 				spawn->percent = dbl_in;
 				spawn->flags = asciiflag_conv(str_in);
-				spawn->next = NULL;
-				
-				// append at end
-				if ((stemp = GET_SECT_SPAWNS(sect))) {
-					while (stemp->next) {
-						stemp = stemp->next;
-					}
-					stemp->next = spawn;
-				}
-				else {
-					GET_SECT_SPAWNS(sect) = spawn;
-				}
+				LL_APPEND(GET_SECT_SPAWNS(sect), spawn);
 				break;
 			}
 			
@@ -9198,22 +9047,13 @@ void sort_world_table(void) {
 * @return struct apply_data* The copied list.
 */
 struct apply_data *copy_apply_list(struct apply_data *input) {
-	struct apply_data *new, *last, *list, *iter;
+	struct apply_data *new, *list, *iter;
 	
-	last = NULL;
 	list = NULL;
 	for (iter = input; iter; iter = iter->next) {
 		CREATE(new, struct apply_data, 1);
 		*new = *iter;
-		new->next = NULL;
-		
-		if (last) {
-			last->next = new;
-		}
-		else {
-			list = new;
-		}
-		last = new;
+		LL_APPEND(list, new);
 	}
 	
 	return list;
@@ -9227,21 +9067,13 @@ struct apply_data *copy_apply_list(struct apply_data *input) {
 * @return struct obj_apply* A pointer to the copy list.
 */
 struct obj_apply *copy_obj_apply_list(struct obj_apply *list) {
-	struct obj_apply *new_list, *last, *iter, *new;
+	struct obj_apply *new_list, *iter, *new;
 	
-	new_list = last = NULL;
+	new_list = NULL;
 	for (iter = list; iter; iter = iter->next) {
 		CREATE(new, struct obj_apply, 1);
 		*new = *iter;
-		new->next = NULL;
-		
-		if (last) {
-			last->next = new;
-		}
-		else {
-			new_list = new;
-		}
-		last = new;
+		LL_APPEND(new_list, new);
 	}
 	
 	return new_list;
@@ -9452,8 +9284,7 @@ void parse_generic_name_file(FILE *fl, char *err_str) {
 	data->sex = sex;
 	
 	// add to LL
-	data->next = generic_names;
-	generic_names = data;
+	LL_PREPEND(generic_names, data);
 	
 	// name data
 	CREATE(data->names, char*, count);

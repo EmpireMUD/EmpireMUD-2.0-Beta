@@ -1792,14 +1792,7 @@ ACMD(do_mremember) {
 
 	/* create a structure and add it to the list */
 	CREATE(mem, struct script_memory, 1);
-	if (!SCRIPT_MEM(ch))
-		SCRIPT_MEM(ch) = mem;
-	else {
-		struct script_memory *tmpmem = SCRIPT_MEM(ch);
-		while (tmpmem->next)
-			tmpmem = tmpmem->next;
-		tmpmem->next = mem;
-	}
+	LL_APPEND(SCRIPT_MEM(ch), mem);
 
 	/* fill in the structure */
 	mem->id = char_script_id(victim);
@@ -1812,7 +1805,7 @@ ACMD(do_mremember) {
 /* remove someone from the list */
 ACMD(do_mforget) {
 	char_data *victim;
-	struct script_memory *mem, *prev;
+	struct script_memory *mem, *next_mem;
 	char arg[MAX_INPUT_LENGTH];
 
 	if (!MOB_OR_IMPL(ch)) {
@@ -1843,27 +1836,14 @@ ACMD(do_mforget) {
 		mob_log(ch, "mforget: victim (%s) does not exist", arg);
 		return;
 	}
-
-	mem = SCRIPT_MEM(ch);
-	prev = NULL;
-	while (mem) {
+	
+	LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
 		if (mem->id == victim->script_id) {
-			if (mem->cmd)
+			LL_DELETE(SCRIPT_MEM(ch), mem);
+			if (mem->cmd) {
 				free(mem->cmd);
-			if (prev==NULL) {
-				SCRIPT_MEM(ch) = mem->next;
-				free(mem);
-				mem = SCRIPT_MEM(ch);
 			}
-			else {
-				prev->next = mem->next;
-				free(mem);
-				mem = prev->next;
-			}
-		}
-		else {
-			prev = mem;
-			mem = mem->next;
+			free(mem);
 		}
 	}
 }
@@ -2191,7 +2171,7 @@ ACMD(do_mdoor) {
 ACMD(do_mfollow) {
 	char buf[MAX_INPUT_LENGTH];
 	char_data *leader;
-	struct follow_type *j, *k;
+	struct follow_type *fol, *next_fol;
 
 	if (!MOB_OR_IMPL(ch)) {
 		send_config_msg(ch, "huh_string");
@@ -2227,18 +2207,13 @@ ACMD(do_mfollow) {
 
 	/* stop following someone else first */
 	if (ch->master) {
-		if (ch->master->followers->follower == ch) {	/* Head of follower-list? */
-			k = ch->master->followers;
-			ch->master->followers = k->next;
-			free(k);
+		LL_FOREACH_SAFE(ch->master->followers, fol, next_fol) {
+			if (fol->follower == ch) {
+				LL_DELETE(ch->master->followers, fol);
+				free(fol);
+			}
 		}
-		else {			/* locate follower who is not head of list */
-			for (k = ch->master->followers; k->next->follower != ch; k = k->next);
-
-			j = k->next;
-			k->next = j->next;
-			free(j);
-		}
+		
 		ch->master = NULL;
 	}
 
@@ -2252,11 +2227,9 @@ ACMD(do_mfollow) {
 
 	ch->master = leader;
 
-	CREATE(k, struct follow_type, 1);
-
-	k->follower = ch;
-	k->next = leader->followers;
-	leader->followers = k;
+	CREATE(fol, struct follow_type, 1);
+	fol->follower = ch;
+	LL_PREPEND(leader->followers, fol);
 }
 
 

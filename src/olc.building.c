@@ -195,7 +195,6 @@ struct bld_relation *copy_bld_relations(struct bld_relation *input_list) {
 	LL_FOREACH(input_list, relat) {
 		CREATE(new_relat, struct bld_relation, 1);
 		*new_relat = *relat;
-		new_relat->next = NULL;
 		LL_APPEND(list, new_relat);
 	}
 	

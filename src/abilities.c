@@ -449,7 +449,6 @@ struct ability_data_list *copy_data_list(struct ability_data_list *input) {
 	LL_FOREACH(input, iter) {
 		CREATE(adl, struct ability_data_list, 1);
 		*adl = *iter;
-		adl->next = NULL;
 		LL_APPEND(list, adl);
 	}
 	

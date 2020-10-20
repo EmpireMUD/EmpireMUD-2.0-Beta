@@ -1096,8 +1096,7 @@ void alt_import_aliases(char_data *ch, char_data *alt) {
 		newl->replacement = str_dup(al->replacement);
 		newl->type = al->type;
 		
-		newl->next = GET_ALIASES(ch);
-		GET_ALIASES(ch) = newl;
+		LL_PREPEND(GET_ALIASES(ch), newl);
 		
 		msg_to_char(ch, "Imported alias '%s'.\r\n", newl->alias);
 		imported = TRUE;

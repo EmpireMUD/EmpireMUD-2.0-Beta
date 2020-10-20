@@ -362,7 +362,7 @@ void save_olc_book(descriptor_data *desc) {
 * @return book_data* The copied book.
 */
 book_data *setup_olc_book(book_data *input) {
-	struct paragraph_data *para, *copy, *last;
+	struct paragraph_data *para, *copy;
 	book_data *new;
 	
 	CREATE(new, book_data, 1);
@@ -379,19 +379,11 @@ book_data *setup_olc_book(book_data *input) {
 		// don't need this
 		new->in_libraries = NULL;
 		
-		last = NULL;
 		new->paragraphs = NULL;
 		for (para = input->paragraphs; para; para = para->next) {
 			CREATE(copy, struct paragraph_data, 1);
 			copy->text = str_dup(para->text);
-		
-			if (last) {
-				last->next = copy;
-			}
-			else {
-				new->paragraphs = copy;
-			}
-			last = copy;
+			LL_APPEND(new->paragraphs, copy);
 		}
 	}
 	else {
@@ -562,7 +554,7 @@ OLC_MODULE(booked_license) {
 OLC_MODULE(booked_paragraphs) {
 	char arg1[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	book_data *book = GET_OLC_BOOK(ch->desc);
-	struct paragraph_data *para, *new, *last, *temp;
+	struct paragraph_data *para, *new, *temp;
 	size_t size;
 	
 	argument = any_one_arg(argument, arg1);
@@ -653,29 +645,21 @@ OLC_MODULE(booked_paragraphs) {
 		CREATE(new, struct paragraph_data, 1);
 		
 		if (pos == 1) {
-			new->next = book->paragraphs;
-			book->paragraphs = new;
+			LL_PREPEND(book->paragraphs, new);
 			found = TRUE;
 		}
 		else {
 			// find the correct insert position or possibly the end of the list
-			for (para = book->paragraphs, last = para; !found && para; para = para->next) {
-				if (pos != -1 && --pos == 0) {
-					new->next = last->next;
-					last->next = new;
+			for (para = book->paragraphs; !found && para; para = para->next) {
+				if (pos != -1 && --pos == 1) {
+					LL_APPEND_ELEM(book->paragraphs, para, new);
 					found = TRUE;
+					break;
 				}
-			
-				last = para;
 			}
 		
 			if (!found) {
-				if (last) {
-					last->next = new;
-				}
-				else {
-					book->paragraphs = new;
-				}
+				LL_APPEND(book->paragraphs, new);
 				found = TRUE;
 			}
 		}

@@ -144,8 +144,7 @@ void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 		map = &(world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)]);
 		if (SECT_IS_LAND_MAP(st)) {
 			// add to land_map (at the start is fine)
-			map->next = land_map;
-			land_map = map;
+			LL_PREPEND(land_map, map);
 		}
 		else {
 			// remove from land_map
@@ -365,8 +364,7 @@ struct room_direction_data *create_exit(room_data *from, room_data *to, int dir,
 		CREATE(ex, struct room_direction_data, 1);
 		ex->dir = dir;
 		
-		ex->next = COMPLEX_DATA(from)->exits;
-		COMPLEX_DATA(from)->exits = ex;
+		LL_PREPEND(COMPLEX_DATA(from)->exits, ex);
 		sort_exits(&(COMPLEX_DATA(from)->exits));
 
 		// re-find after sort
@@ -386,8 +384,7 @@ struct room_direction_data *create_exit(room_data *from, room_data *to, int dir,
 		CREATE(other, struct room_direction_data, 1);
 		other->dir = rev_dir[dir];
 		
-		other->next = COMPLEX_DATA(to)->exits;
-		COMPLEX_DATA(to)->exits = other;
+		LL_PREPEND(COMPLEX_DATA(to)->exits, other);
 		sort_exits(&(COMPLEX_DATA(to)->exits));
 		
 		// re-find after sort
@@ -1681,7 +1678,7 @@ int count_city_points_used(empire_data *emp) {
 * @return struct empire_city_data* the city object
 */
 struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_data *location, int type) {
-	struct empire_city_data *city, *cc;
+	struct empire_city_data *city;
 	
 	// sanity first
 	if (!location) {
@@ -1702,19 +1699,8 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 	city->military = 0;
 	
 	city->traits = EMPIRE_FRONTIER_TRAITS(emp);	// defaults
-
-	city->next = NULL;
 	
-	if ((cc = EMPIRE_CITY_LIST(emp))) {
-		// append to end
-		while (cc->next) {
-			cc = cc->next;
-		}
-		cc->next = city;
-	}
-	else {
-		EMPIRE_CITY_LIST(emp) = city;
-	}
+	LL_APPEND(EMPIRE_CITY_LIST(emp), city);
 	
 	// check building exists
 	if (!IS_CITY_CENTER(location)) {

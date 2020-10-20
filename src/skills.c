@@ -2966,7 +2966,6 @@ struct skill_ability *copy_skill_abilities(struct skill_ability *input) {
 	LL_FOREACH(input, iter) {
 		CREATE(el, struct skill_ability, 1);
 		*el = *iter;
-		el->next = NULL;
 		LL_APPEND(list, el);
 	}
 	
@@ -2986,7 +2985,6 @@ struct synergy_ability *copy_synergy_abilities(struct synergy_ability *input) {
 	LL_FOREACH(input, iter) {
 		CREATE(el, struct synergy_ability, 1);
 		*el = *iter;
-		el->next = NULL;
 		LL_APPEND(list, el);
 	}
 	

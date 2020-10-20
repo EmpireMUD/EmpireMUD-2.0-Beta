@@ -665,8 +665,7 @@ void affect_to_char_silent(char_data *ch, struct affected_type *af) {
 	CREATE(affected_alloc, struct affected_type, 1);
 
 	*affected_alloc = *af;
-	affected_alloc->next = ch->affected;
-	ch->affected = affected_alloc;
+	LL_PREPEND(ch->affected, affected_alloc);
 
 	affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	affect_total(ch);
@@ -710,8 +709,7 @@ void affect_to_room(room_data *room, struct affected_type *af) {
 	CREATE(affected_alloc, struct affected_type, 1);
 
 	*affected_alloc = *af;
-	affected_alloc->next = ROOM_AFFECTS(room);
-	ROOM_AFFECTS(room) = affected_alloc;
+	LL_PREPEND(ROOM_AFFECTS(room), affected_alloc);
 	
 	affected_alloc->expire_event = NULL;	// cannot have an event in the copied af at this point
 	
@@ -1041,8 +1039,7 @@ void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int dama
 	
 	if (!found) {
 		CREATE(dot, struct over_time_effect_type, 1);
-		dot->next = ch->over_time_effects;
-		ch->over_time_effects = dot;
+		LL_PREPEND(ch->over_time_effects, dot);
 		
 		dot->type = type;
 		dot->cast_by = id;
@@ -1544,6 +1541,7 @@ void char_from_room(char_data *ch) {
     
     DL_DELETE2(ROOM_PEOPLE(IN_ROOM(ch)), ch, prev_in_room, next_in_room);
 	IN_ROOM(ch) = NULL;
+	ch->prev_in_room = NULL;
 	ch->next_in_room = NULL;
 }
 
@@ -2417,8 +2415,7 @@ int increase_coins(char_data *ch, empire_data *emp, int amount) {
 		CREATE(coin, struct coin_data, 1);
 		coin->amount = 0;
 		coin->empire_id = !emp ? OTHER_COIN : EMPIRE_VNUM(emp);
-		coin->next = GET_PLAYER_COINS(ch);
-		GET_PLAYER_COINS(ch) = coin;
+		LL_PREPEND(GET_PLAYER_COINS(ch), coin);
 	}
 
 	// now, if we have a coin object, add the money
@@ -2592,8 +2589,7 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 		CREATE(cool, struct cooldown_data, 1);
 		cool->type = type;
 		cool->expire_time = time(0) + seconds_duration;
-		cool->next = ch->cooldowns;
-		ch->cooldowns = cool;
+		LL_PREPEND(ch->cooldowns, cool);
 	}
 }
 
@@ -2773,8 +2769,7 @@ struct empire_political_data *create_relation(empire_data *a, empire_data *b) {
 	CREATE(pol, struct empire_political_data, 1);
 	pol->id = EMPIRE_VNUM(b);
 	pol->start_time = time(0);
-	pol->next = EMPIRE_DIPLOMACY(a);
-	EMPIRE_DIPLOMACY(a) = pol;
+	LL_PREPEND(EMPIRE_DIPLOMACY(a), pol);
 	
 	EMPIRE_NEEDS_SAVE(a) = TRUE;
 	return pol;
@@ -3750,8 +3745,7 @@ void add_follower(char_data *ch, char_data *leader, bool msg) {
 	CREATE(k, struct follow_type, 1);
 
 	k->follower = ch;
-	k->next = leader->followers;
-	leader->followers = k;
+	LL_PREPEND(leader->followers, k);
 
 	if (msg) {
 		act("You now follow $N.", FALSE, ch, 0, leader, TO_CHAR);
@@ -3790,7 +3784,7 @@ void die_follower(char_data *ch) {
 * @param char_data *ch The character who will stop following
 */
 void stop_follower(char_data *ch) {
-	struct follow_type *j, *k;
+	struct follow_type *fol, *next_fol;
 
 	if (ch->master == NULL)
 		return;
@@ -3803,18 +3797,13 @@ void stop_follower(char_data *ch) {
 			act("$n stops following you.", TRUE, ch, 0, ch->master, TO_VICT);
 		}
 	}
-
-	if (ch->master->followers->follower == ch) {	/* Head of follower-list? */
-		k = ch->master->followers;
-		ch->master->followers = k->next;
-		free(k);
-	}
-	else {			/* locate follower who is not head of list */
-		for (k = ch->master->followers; k->next->follower != ch; k = k->next);
-
-		j = k->next;
-		k->next = j->next;
-		free(j);
+	
+	// delete from list
+	LL_FOREACH_SAFE(ch->master->followers, fol, next_fol) {
+		if (fol->follower == ch) {
+			LL_DELETE(ch->master->followers, fol);
+			free(fol);
+		}
 	}
 
 	ch->master = NULL;
@@ -3968,22 +3957,10 @@ int count_group_members(struct group_data *group) {
 * @return struct group_data* The group.
 */
 struct group_data *create_group(char_data *leader) {
-	struct group_data *new_group, *tail;
+	struct group_data *new_group;
 
 	CREATE(new_group, struct group_data, 1);
-	new_group->next = NULL;
-	
-	// add to end
-	if ((tail = group_list)) {
-		while (tail->next) {
-			tail = tail->next;
-		}
-		tail->next = new_group;
-	}
-	else {
-		group_list = new_group;
-	}
-
+	LL_APPEND(group_list, new_group);
 	join_group(leader, new_group);
 	return new_group;
 }
@@ -4041,22 +4018,11 @@ bool in_same_group(char_data *ch, char_data *vict) {
 * @param struct group_data *group The group to add to.
 */
 void join_group(char_data *ch, struct group_data *group) {
-	struct group_member_data *mem, *tail;
+	struct group_member_data *mem;
 	
 	CREATE(mem, struct group_member_data, 1);
 	mem->member = ch;
-	mem->next = NULL;
-	
-	// add to tail
-	if ((tail = group->members)) {
-		while (tail->next) {
-			tail = tail->next;
-		}
-		tail->next = mem;
-	}
-	else {
-		group->members = mem;
-	}
+	LL_APPEND(group->members, mem);
 
 	ch->group = group;  
 	if (!group->leader) {
@@ -4789,7 +4755,7 @@ void remove_learned_craft_empire(empire_data *emp, any_vnum vnum, bool full_remo
 * @param ... printf-style args for str.
 */
 void add_lore(char_data *ch, int type, const char *str, ...) {
-	struct lore_data *new, *lore;
+	struct lore_data *new;
 	char text[MAX_STRING_LENGTH];
 	va_list tArgList;
 
@@ -4799,13 +4765,6 @@ void add_lore(char_data *ch, int type, const char *str, ...) {
 	// need the old lore, in case the player is offline
 	check_delayed_load(ch);
 	
-	// find end
-	if ((lore = GET_LORE(ch))) {
-		while (lore->next) {
-			lore = lore->next;
-		}
-	}
-	
 	va_start(tArgList, str);
 	vsprintf(text, str, tArgList);
 	
@@ -4813,15 +4772,7 @@ void add_lore(char_data *ch, int type, const char *str, ...) {
 	new->type = type;
 	new->date = (long) time(0);
 	new->text = str_dup(text);
-	new->next = NULL;
-
-	// append to end
-	if (lore) {
-		lore->next = new;
-	}
-	else {
-		GET_LORE(ch) = new;
-	}
+	LL_APPEND(GET_LORE(ch), new);
 	
 	va_end(tArgList);
 }
@@ -5319,8 +5270,7 @@ static void add_mob_tag(int idnum, struct mob_tag **list) {
 	
 	CREATE(tag, struct mob_tag, 1);
 	tag->idnum = idnum;
-	tag->next = *list;
-	*list = tag;
+	LL_PREPEND(*list, tag);
 }
 
 
@@ -6020,8 +5970,7 @@ static void add_obj_binding(int idnum, struct obj_binding **list) {
 	
 	CREATE(bind, struct obj_binding, 1);
 	bind->idnum = idnum;
-	bind->next = *list;
-	*list = bind;
+	LL_PREPEND(*list, bind);
 }
 
 
@@ -6315,7 +6264,7 @@ void obj_from_char(obj_data *object) {
 	}
 	else {
 		DL_DELETE2(object->carried_by->carrying, object, prev_content, next_content);
-		object->next_content = NULL;
+		object->next_content = object->prev_content = NULL;
 
 		IS_CARRYING_N(object->carried_by) -= obj_carry_size(object);
 
@@ -6357,7 +6306,7 @@ void obj_from_obj(obj_data *obj) {
 		}
 
 		obj->in_obj = NULL;
-		obj->next_content = NULL;
+		obj->next_content = obj->prev_content = NULL;
 	}
 }
 
@@ -6382,7 +6331,7 @@ void obj_from_room(obj_data *object) {
 		
 		DL_DELETE2(ROOM_CONTENTS(IN_ROOM(object)), object, prev_content, next_content);
 		IN_ROOM(object) = NULL;
-		object->next_content = NULL;
+		object->next_content = object->prev_content = NULL;
 	}
 }
 
@@ -6402,7 +6351,7 @@ void obj_from_vehicle(obj_data *object) {
 		VEH_CARRYING_N(object->in_vehicle) -= obj_carry_size(object);
 		DL_DELETE2(VEH_CONTAINS(object->in_vehicle), object, prev_content, next_content);
 		object->in_vehicle = NULL;
-		object->next_content = NULL;
+		object->next_content = object->prev_content = NULL;
 	}
 }
 
@@ -6810,7 +6759,7 @@ obj_data *unequip_char_to_room(char_data *ch, int pos) {
 * @return struct custom_message* The copied list.
 */
 struct custom_message *copy_custom_messages(struct custom_message *from) {
-	struct custom_message *list = NULL, *mes, *iter, *last = NULL;
+	struct custom_message *list = NULL, *mes, *iter;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(mes, struct custom_message, 1);
@@ -6818,13 +6767,7 @@ struct custom_message *copy_custom_messages(struct custom_message *from) {
 		mes->type = iter->type;
 		mes->msg = iter->msg ? str_dup(iter->msg) : NULL;
 		
-		if (last) {
-			last->next = mes;
-		}
-		else {
-			list = mes;
-		}
-		last = mes;
+		LL_APPEND(list, mes);
 	}
 	
 	return list;
@@ -7387,8 +7330,7 @@ struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data)
 	
 	if (!offer) {
 		CREATE(offer, struct offer_data, 1);
-		offer->next = GET_OFFERS(ch);
-		GET_OFFERS(ch) = offer;
+		LL_PREPEND(GET_OFFERS(ch), offer);
 	}
 	
 	offer->from = GET_IDNUM(from);
@@ -7583,20 +7525,12 @@ bool run_ability_triggers_by_player_tech(char_data *ch, int tech, char_data *cvi
 * @return struct req_data* The copy of the list.
 */
 struct req_data *copy_requirements(struct req_data *from) {
-	struct req_data *el, *iter, *list = NULL, *end = NULL;
+	struct req_data *el, *iter, *list = NULL;
 	
 	LL_FOREACH(from, iter) {
 		CREATE(el, struct req_data, 1);
 		*el = *iter;
-		el->next = NULL;
-		
-		if (end) {
-			end->next = el;
-		}
-		else {
-			list = el;
-		}
-		end = el;
+		LL_APPEND(list, el);
 	}
 	
 	return list;

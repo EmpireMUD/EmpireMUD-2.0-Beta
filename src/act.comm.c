@@ -1288,8 +1288,7 @@ ACMD(do_slash_channel) {
 		}
 		else {
 			CREATE(slash, struct player_slash_channel, 1);
-			slash->next = GET_SLASH_CHANNELS(ch);
-			GET_SLASH_CHANNELS(ch) = slash;
+			LL_PREPEND(GET_SLASH_CHANNELS(ch), slash);
 			slash->id = chan->id;
 			
 			// announce it (this also messages the player)

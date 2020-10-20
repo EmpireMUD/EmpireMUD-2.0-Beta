@@ -199,17 +199,11 @@ void greet_memory_mtrigger(char_data *actor) {
 			}
 			/* delete the memory */
 			if (mem) {
-				if (SCRIPT_MEM(ch)==mem) {
-					SCRIPT_MEM(ch) = mem->next;
+				LL_DELETE(SCRIPT_MEM(ch), mem);
+				if (mem->cmd) {
+					free(mem->cmd);
 				}
-				else {
-					struct script_memory *prev;
-					prev = SCRIPT_MEM(ch);
-					while (prev->next != mem) prev = prev->next;
-						prev->next = mem->next;
-				}
-				if (mem->cmd) free(mem->cmd);
-					free(mem);
+				free(mem);
 			}
 		}
 	}
@@ -262,7 +256,7 @@ int greet_mtrigger(char_data *actor, int dir) {
 void entry_memory_mtrigger(char_data *ch) {
 	trig_data *t;
 	char_data *actor;
-	struct script_memory *mem;
+	struct script_memory *mem, *next_mem;
 	char buf[MAX_INPUT_LENGTH];
 
 	if (!SCRIPT_MEM(ch))
@@ -276,10 +270,11 @@ void entry_memory_mtrigger(char_data *ch) {
 			continue;
 		}
 		if (actor!=ch && SCRIPT_MEM(ch)) {
-			for (mem = SCRIPT_MEM(ch); mem && SCRIPT_MEM(ch); mem = mem->next) {
+			LL_FOREACH_SAFE(SCRIPT_MEM(ch), mem, next_mem) {
 				if (actor->script_id == mem->id) {
-					struct script_memory *prev;
-					if (mem->cmd) command_interpreter(ch, mem->cmd);
+					if (mem->cmd) {
+						command_interpreter(ch, mem->cmd);
+					}
 					else {
 						for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next) {
 							if (TRIGGER_CHECK(t, MTRIG_MEMORY) && (number(1, 100) <= GET_TRIG_NARG(t))){
@@ -292,18 +287,13 @@ void entry_memory_mtrigger(char_data *ch) {
 						}
 					}
 					/* delete the memory */
-					if (SCRIPT_MEM(ch)==mem) {
-						SCRIPT_MEM(ch) = mem->next;
+					LL_DELETE(SCRIPT_MEM(ch), mem);
+					if (mem->cmd) {
+						free(mem->cmd);
 					}
-					else {
-						prev = SCRIPT_MEM(ch);
-						while (prev->next != mem) prev = prev->next;
-							prev->next = mem->next;
-					}
-					if (mem->cmd) free(mem->cmd);
-						free(mem);
+					free(mem);
 				}
-			} /* for (mem =..... */
+			}
 		}
 	}
 }

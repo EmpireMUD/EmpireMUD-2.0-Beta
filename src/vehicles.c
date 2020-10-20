@@ -1756,7 +1756,7 @@ void process_dismantle_vehicle(char_data *ch) {
 		// make a copy to pass to give_resources
 		CREATE(copy, struct resource_data, 1);
 		*copy = *res;
-		copy->next = NULL;
+		copy->next = NULL;	// will be freed as a list
 		
 		if (copy->type == RES_OBJECT) {
 			// for items, refund 1 at a time
@@ -2045,14 +2045,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 						vam->scale_level = i_in[1];
 						vam->flags = asciiflag_conv(s_in);
 						vam->empire = i_in[2];
-						
-						// append
-						if (last_vam) {
-							last_vam->next = vam;
-						}
-						else {
-							VEH_ANIMALS(veh) = vam;
-						}
+						LL_APPEND(VEH_ANIMALS(veh), vam);
 						last_vam = vam;
 					}
 				}
@@ -2278,14 +2271,7 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 					res->amount = i_in[1];
 					res->type = i_in[2];
 					res->misc = i_in[3];
-					
-					// append
-					if (last_res) {
-						last_res->next = res;
-					}
-					else {
-						VEH_NEEDS_RESOURCES(veh) = res;
-					}
+					LL_APPEND(VEH_NEEDS_RESOURCES(veh), res);
 					last_res = res;
 				}
 				break;
