@@ -3984,12 +3984,11 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				case 'o': {	// char.o*
 					if (!str_cmp(field, "obj_target")) {
 						obj_data *targ;
-						int number = subfield ? get_number(&subfield) : 0;
-						*str = '\0';	// default to no-target
-						if (subfield && *subfield) {
-							if ((targ = get_obj_in_list_vis(c, subfield, &number, c->carrying)) || (targ = get_obj_in_list_vis(c, subfield, &number, ROOM_CONTENTS(IN_ROOM(c))))) {
-								snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(targ));
-							}
+						if (subfield && generic_find(subfield, FIND_OBJ_INV | FIND_OBJ_ROOM, c, NULL, &targ, NULL)) {
+							snprintf(str, slen, "%c%d", UID_CHAR, obj_script_id(targ));
+						}
+						else {
+							strcpy(str, "");
 						}
 					}
 					else if (!str_cmp(field, "obj_target_inv")) {
