@@ -153,7 +153,7 @@ crop_data *crop_table = NULL;	// crop hash table
 // empires
 empire_data *empire_table = NULL;	// hash table of empires
 double empire_score_average[NUM_SCORES];
-struct trading_post_data *trading_list = NULL;	// global LL of trading post stuff
+struct trading_post_data *trading_list = NULL;	// global DLL of trading post stuff
 bool check_empire_refresh = FALSE;	// triggers empire refreshes
 
 // events
@@ -2152,7 +2152,7 @@ void b3_2_map_and_gear(void) {
 	}
 	
 	log(" - disenchanting trading post objects...");
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && OBJ_FLAGGED(obj, OBJ_ENCHANTED) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_ENCHANTED)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			tpd->obj = new;
@@ -2755,7 +2755,7 @@ void b5_14_superior_items(void) {
 	}
 	
 	log(" - refreshing superiors in trading post objects...");
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && OBJ_FLAGGED(obj, OBJ_SUPERIOR) && (proto = obj_proto(GET_OBJ_VNUM(obj))) && !OBJ_FLAGGED(proto, OBJ_SUPERIOR)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			tpd->obj = new;
@@ -2921,7 +2921,7 @@ void b5_23_potion_update(void) {
 	}
 	
 	log(" - updating trading post objects...");
-	LL_FOREACH(trading_list, tpd) {
+	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && IS_POTION(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			tpd->obj = new;
@@ -3003,7 +3003,7 @@ void b5_24_poison_update(void) {
 	}
 	
 	log(" - updating trading post objects...");
-	LL_FOREACH(trading_list, tpd) {
+	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && IS_POISON(obj) && (proto = obj_proto(GET_OBJ_VNUM(obj)))) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			tpd->obj = new;
@@ -3667,7 +3667,7 @@ void b5_86_update(void) {
 	}
 	
 	log(" - refreshing trading post objects...");
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		if ((obj = tpd->obj) && IS_MISSILE_WEAPON(obj)) {
 			new = fresh_copy_obj(obj, GET_OBJ_CURRENT_SCALE_LEVEL(obj));
 			tpd->obj = new;
@@ -4540,7 +4540,7 @@ void check_version(void) {
 			}
 			
 			log(" - assigning triggers to trading post objects...");
-			for (tpd = trading_list; tpd; tpd = tpd->next) {
+			DL_FOREACH(trading_list, tpd) {
 				if (tpd->obj && (objpr = obj_proto(GET_OBJ_VNUM(tpd->obj)))) {
 					tpd->obj->proto_script = copy_trig_protos(objpr->proto_script);
 					assign_triggers(tpd->obj, OBJ_TRIGGER);
@@ -5097,7 +5097,7 @@ void load_tips_of_the_day(void) {
 * Loads the trading post data from file at startup, into trading_list.
 */
 void load_trading_post(void) {
-	struct trading_post_data *tpd = NULL, *last_tpd = NULL;
+	struct trading_post_data *tpd = NULL;
 	char line[256], str_in[256];
 	obj_data *obj;
 	int int_in[5];
@@ -5109,19 +5109,11 @@ void load_trading_post(void) {
 		return;
 	}
 	
-	// if somehow the trading list already exists
-	if ((last_tpd = trading_list)) {
-		while (last_tpd->next) {
-			last_tpd = last_tpd->next;
-		}
-	}
-	
 	while (get_line(fl, line)) {
 		switch (*line) {
 			case 'T': {	// begin new trade item
 				CREATE(tpd, struct trading_post_data, 1);
-				LL_APPEND(trading_list, tpd);
-				last_tpd = tpd;
+				DL_APPEND(trading_list, tpd);
 				
 				if (sscanf(line, "T %d %s %ld %d %d %d %d", &int_in[0], str_in, &long_in, &int_in[1], &int_in[2], &int_in[3], &int_in[4]) != 7) {
 					log("SYSERR: Invalid T line in trading post file");
@@ -5176,7 +5168,7 @@ void save_trading_post(void) {
 		return;
 	}
 	
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		fprintf(fl, "T %d %s %ld %d %d %d %d\n", tpd->player, bitv_to_alpha(tpd->state), tpd->start, tpd->for_hours, tpd->buy_cost, tpd->post_cost, tpd->coin_type);
 		if (tpd->obj) {
 			Crash_save_one_obj_to_file(fl, tpd->obj, 0);

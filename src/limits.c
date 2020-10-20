@@ -1929,8 +1929,7 @@ void update_trading_post(void) {
 	
 	int trading_post_days_to_timeout = config_get_int("trading_post_days_to_timeout");
 	
-	for (tpd = trading_list; tpd; tpd = next_tpd) {
-		next_tpd = tpd->next;
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
 		diff = time(0) - tpd->start;
 		
 		if ((!IS_SET(tpd->state, TPD_FOR_SALE | TPD_OBJ_PENDING | TPD_COINS_PENDING) || diff >= (trading_post_days_to_timeout * SECS_PER_REAL_DAY)) && !is_playing(tpd->player)) {
@@ -1941,7 +1940,7 @@ void update_trading_post(void) {
 				tpd->obj = NULL;
 			}
 			
-			LL_DELETE(trading_list, tpd);
+			DL_DELETE(trading_list, tpd);
 			free(tpd);
 			changed = TRUE;
 		}

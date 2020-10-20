@@ -1905,7 +1905,7 @@ void free_empire(empire_data *emp) {
 	struct empire_city_data *city;
 	struct empire_political_data *pol;
 	struct empire_trade_data *trade;
-	struct empire_log_data *elog;
+	struct empire_log_data *elog, *next_elog;
 	struct workforce_log *wf_log;
 	struct shipping_data *shipd, *next_shipd;
 	room_data *room;
@@ -1981,8 +1981,7 @@ void free_empire(empire_data *emp) {
 	}
 	
 	// free logs
-	while ((elog = emp->logs)) {
-		emp->logs = elog->next;
+	DL_FOREACH_SAFE(EMPIRE_LOGS(emp), elog, next_elog) {
 		if (elog->string) {
 			free(elog->string);
 		}
@@ -2113,7 +2112,7 @@ void load_empire_logs_one(FILE *fl, empire_data *emp) {
 				elog->type = t[0];
 				elog->timestamp = (time_t) t[1];
 				elog->string = fread_string(fl, buf2);
-				LL_APPEND(emp->logs, elog);
+				DL_APPEND(EMPIRE_LOGS(emp), elog);
 				break;
 			}
 			case 'W': {	// offenses
@@ -2680,7 +2679,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 				elog->type = t[0];
 				elog->timestamp = (time_t) t[1];
 				elog->string = fread_string(fl, buf2);
-				LL_APPEND(emp->logs, elog);
+				DL_APPEND(EMPIRE_LOGS(emp), elog);
 				break;
 			}
 			case 'K': {	// script var
@@ -3065,7 +3064,7 @@ void write_empire_logs_to_file(FILE *fl, empire_data *emp) {
 	}
 	
 	// L: logs
-	for (elog = EMPIRE_LOGS(emp); elog; elog = elog->next) {
+	DL_FOREACH(EMPIRE_LOGS(emp), elog) {
 		fprintf(fl, "L\n");
 		fprintf(fl, "%d %d\n", elog->type, (int) elog->timestamp);
 		fprintf(fl, "%s~\n", elog->string);
@@ -8484,12 +8483,10 @@ void clean_empire_logs(void) {
 	log("Cleaning stale empire logs...");
 
 	HASH_ITER(hh, empire_table, iter, next_iter) {
-		for (elog = EMPIRE_LOGS(iter); elog; elog = next_elog) {
-			next_elog = elog->next;
-			
+		DL_FOREACH_SAFE(EMPIRE_LOGS(iter), elog, next_elog) {
 			// stale?
 			if (elog->timestamp + empire_log_ttl < now) {
-				LL_DELETE(EMPIRE_LOGS(iter), elog);
+				DL_DELETE(EMPIRE_LOGS(iter), elog);
 				if (elog->string) {
 					free(elog->string);
 				}

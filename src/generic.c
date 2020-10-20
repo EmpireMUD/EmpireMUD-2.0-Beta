@@ -1033,8 +1033,7 @@ void olc_delete_generic(char_data *ch, any_vnum vnum) {
 	}
 	
 	// remove from live lists: trading post drink containers
-	for (tpd = trading_list; tpd; tpd = next_tpd) {
-		next_tpd = tpd->next;
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
 		if (!tpd->obj) {
 			continue;
 		}

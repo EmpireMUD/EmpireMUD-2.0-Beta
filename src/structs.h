@@ -3282,7 +3282,7 @@ struct trading_post_data {
 	int post_cost;	// # of coins paid to post it
 	empire_vnum coin_type;	// empire vnum or OTHER_COIN for buy/post coins
 	
-	struct trading_post_data *next;	// LL
+	struct trading_post_data *prev, *next;	// DLL
 };
 
 
@@ -4732,7 +4732,7 @@ struct empire_log_data {
 	time_t timestamp;
 	char *string;
 	
-	struct empire_log_data *next;
+	struct empire_log_data *prev, *next;
 };
 
 

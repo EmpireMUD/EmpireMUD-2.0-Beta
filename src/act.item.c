@@ -3442,7 +3442,7 @@ void trade_check(char_data *ch, char *argument) {
 		size = snprintf(output, sizeof(output), "Your items for trade:\r\n");
 	}
 	
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		// disqualifiers -- this should be the same as trade_cancel because players use this function to find numbers for that one
 		if (tpd->player != GET_IDNUM(ch)) {
 			continue;
@@ -3523,7 +3523,7 @@ void trade_list(char_data *ch, char *argument) {
 		size = snprintf(output, sizeof(output), "Items for trade:\r\n");
 	}
 	
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		// disqualifiers -- should match trade_list because players use that to find numbers
 		if (!IS_SET(tpd->state, TPD_FOR_SALE) || !tpd->obj) {
 			continue;
@@ -3584,7 +3584,7 @@ void trade_list(char_data *ch, char *argument) {
 * @param char *argument Any text after the subcommand.
 */
 void trade_buy(char_data *ch, char *argument) {
-	struct trading_post_data *tpd;
+	struct trading_post_data *tpd, *next_tpd;
 	empire_data *coin_emp = NULL;
 	char buf[MAX_STRING_LENGTH], *ptr1, *ptr2;
 	char_data *seller;
@@ -3605,8 +3605,8 @@ void trade_buy(char_data *ch, char *argument) {
 		}
 		skip_spaces(&argument);
 	}
-		
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
 		// disqualifiers -- should match trade_list because players use that to find numbers
 		if (!IS_SET(tpd->state, TPD_FOR_SALE) || !tpd->obj) {
 			continue;
@@ -3672,7 +3672,7 @@ void trade_buy(char_data *ch, char *argument) {
 * @param char *argument Any text after the subcommand.
 */
 void trade_cancel(char_data *ch, char *argument) {
-	struct trading_post_data *tpd;
+	struct trading_post_data *tpd, *next_tpd;
 	char *ptr1, *ptr2;
 	int num = 1;
 	
@@ -3697,7 +3697,7 @@ void trade_cancel(char_data *ch, char *argument) {
 		return;
 	}
 	
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
 		// disqualifiers -- this should be the same as trade_check since the player uses it to find numbers
 		if (tpd->player != GET_IDNUM(ch)) {
 			continue;
@@ -3749,13 +3749,13 @@ void trade_cancel(char_data *ch, char *argument) {
 * @param char *argument Any text after the subcommand.
 */
 void trade_collect(char_data *ch, char *argument) {	
-	struct trading_post_data *tpd;
+	struct trading_post_data *tpd, *next_tpd;
 	int to_collect = 0;
 	bool full = FALSE, any = FALSE;
 	
 	double trading_post_fee = config_get_double("trading_post_fee");
 	
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
 		// disqualifiers
 		if (tpd->player != GET_IDNUM(ch)) {
 			continue;
@@ -3837,8 +3837,8 @@ void trade_identify(char_data *ch, char *argument) {
 		}
 		skip_spaces(&argument);
 	}
-		
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	
+	DL_FOREACH(trading_list, tpd) {
 		// disqualifiers -- should match trade_list because players use that to find numbers
 		if (!IS_SET(tpd->state, TPD_FOR_SALE) || !tpd->obj) {
 			continue;
@@ -3923,7 +3923,7 @@ void trade_post(char_data *ch, char *argument) {
 		CREATE(tpd, struct trading_post_data, 1);
 		
 		// put at end of list
-		LL_APPEND(trading_list, tpd);
+		DL_APPEND(trading_list, tpd);
 		
 		// data
 		tpd->player = GET_IDNUM(ch);

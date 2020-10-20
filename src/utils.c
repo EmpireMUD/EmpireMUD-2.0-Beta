@@ -1750,7 +1750,7 @@ void log_to_empire(empire_data *emp, int type, const char *str, ...) {
 		elog->type = type;
 		elog->timestamp = time(0);
 		elog->string = str_dup(output);
-		LL_APPEND(EMPIRE_LOGS(emp), elog);
+		DL_APPEND(EMPIRE_LOGS(emp), elog);
 		EMPIRE_NEEDS_LOGS_SAVE(emp) = TRUE;
 	}
 	

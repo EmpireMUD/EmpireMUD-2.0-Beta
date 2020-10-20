@@ -568,9 +568,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 	}
 	
 	// remove from trading post -- again, BEFORE removing from obj table
-	for (tpd = trading_list; tpd; tpd = next_tpd) {
-		next_tpd = tpd->next;
-		
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
 		if (tpd->obj && GET_OBJ_VNUM(tpd->obj) == vnum) {
 			expire_trading_post_item(tpd);
 			add_to_object_list(tpd->obj);
@@ -1667,7 +1665,7 @@ void save_olc_object(descriptor_data *desc) {
 	}
 	
 	// update objs in trading post
-	for (tpd = trading_list; tpd; tpd = tpd->next) {
+	DL_FOREACH(trading_list, tpd) {
 		if (tpd->obj && GET_OBJ_VNUM(tpd->obj) == vnum) {
 			update_live_obj_from_olc(tpd->obj, proto, obj);
 		}

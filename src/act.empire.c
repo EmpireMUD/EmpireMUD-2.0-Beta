@@ -4341,7 +4341,7 @@ ACMD(do_elog) {
 	
 	// ok, ready to show logs: count total matching logs
 	count = 0;
-	for (elog = EMPIRE_LOGS(emp); elog; elog = elog->next) {
+	DL_FOREACH(EMPIRE_LOGS(emp), elog) {
 		if (type == NOTHING && empire_log_request_only[elog->type]) {
 			continue;	// this type is request-only
 		}
@@ -4353,7 +4353,7 @@ ACMD(do_elog) {
 	size = snprintf(buf, sizeof(buf), "%s logs for %s:\r\n", (type == NOTHING ? "All" : empire_log_types[type]), EMPIRE_NAME(emp));
 	
 	// now show the LAST [lines] log entries (show if remaining-lines<=0)
-	for (elog = EMPIRE_LOGS(emp); elog; elog = elog->next) {
+	DL_FOREACH(EMPIRE_LOGS(emp), elog) {
 		if (type == NOTHING && empire_log_request_only[elog->type]) {
 			continue;	// this type is request-only
 		}
