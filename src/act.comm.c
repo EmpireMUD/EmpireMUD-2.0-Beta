@@ -1171,7 +1171,7 @@ void write_slash_channel_index(void) {
 ACMD(do_slash_channel) {
 	struct slash_channel *chan;
 	struct channel_history_data *hist;
-	struct player_slash_channel *slash, *temp;
+	struct player_slash_channel *slash;
 	char arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	player_index_data *index;
 	descriptor_data *desc;
@@ -1319,7 +1319,7 @@ ACMD(do_slash_channel) {
 			msg_to_char(ch, "You leave \t%c/%s\tn.\r\n", chan->color, chan->name);
 			
 			while ((slash = find_on_slash_channel(ch, chan->id))) {
-				REMOVE_FROM_LIST(slash, GET_SLASH_CHANNELS(ch), next);
+			    LL_DELETE(GET_SLASH_CHANNELS(ch), slash);
 				free(slash);
 			}
 			

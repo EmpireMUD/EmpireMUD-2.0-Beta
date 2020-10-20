@@ -1761,9 +1761,8 @@ void stack_simple_msg_to_desc(descriptor_data *desc, const char *messg) {
 
 void close_socket(descriptor_data *d) {
 	struct stack_msg *stacked, *next_stacked;
-	descriptor_data *temp;
 
-	REMOVE_FROM_LIST(d, descriptor_list, next);
+	LL_DELETE(descriptor_list, d);
 	CLOSE_SOCKET(d->descriptor);
 	flush_queues(d);
 
@@ -2216,7 +2215,7 @@ bool is_slow_ip(char *ip) {
 * @param char *input The text typed, after the -.
 */
 void manipulate_input_queue(descriptor_data *desc, char *input) {
-	struct txt_block *iter, *next_iter, *temp;
+	struct txt_block *iter, *next_iter;
 	bool clear_all, found;
 
 	skip_spaces(&input);
@@ -2244,7 +2243,7 @@ void manipulate_input_queue(descriptor_data *desc, char *input) {
 		next_iter = iter->next;
 		
 		if (clear_all || is_abbrev(input, iter->text)) {
-			REMOVE_FROM_LIST(iter, desc->input.head, next);
+			LL_DELETE(desc->input.head, iter);
 			
 			if (!clear_all) {
 				msg_to_desc(desc, "Removed: %s\r\n", iter->text);

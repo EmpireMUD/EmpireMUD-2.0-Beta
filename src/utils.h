@@ -784,34 +784,20 @@ extern int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_C
  //////////////////////////////////////////////////////////////////////////////
 //// MEMORY UTILS ////////////////////////////////////////////////////////////
 
-#define CREATE(result, type, number)  do {\
+#define CREATE(result, type, number)  {\
 	if ((number) * sizeof(type) <= 0)	\
 		log("SYSERR: Zero bytes or less requested at %s:%d.", __FILE__, __LINE__);	\
 	if (!((result) = (type *) calloc ((number), sizeof(type))))	\
-		{ log("SYSERR: malloc failure: %s: %d", __FILE__, __LINE__); abort(); } } while(0)
+		{ log("SYSERR: malloc failure: %s: %d", __FILE__, __LINE__); abort(); } }
 
 
-#define RECREATE(result, type, number) do {\
+#define RECREATE(result, type, number) {\
   if (!((result) = (type *) realloc ((result), sizeof(type) * (number))))\
-		{ log("SYSERR: realloc failure: %s: %d", __FILE__, __LINE__); abort(); } } while(0)
+		{ log("SYSERR: realloc failure: %s: %d", __FILE__, __LINE__); abort(); } }
 
-/*
- * the source previously used the same code in many places to remove an item
- * from a list: if it's the list head, change the head, else traverse the
- * list looking for the item before the one to be removed.  Now, we have a
- * macro to do this.  To use, just make sure that there is a variable 'temp'
- * declared as the same type as the list to be manipulated.
- */
-#define REMOVE_FROM_LIST(item, head, next)	\
-   if ((item) == (head))		\
-      head = (item)->next;		\
-   else {				\
-      temp = head;			\
-      while (temp && (temp->next != (item))) \
-	 temp = temp->next;		\
-      if (temp)				\
-         temp->next = (item)->next;	\
-   }
+
+// b5.110 replaced this with LL_DELETE everywhere in the code, for consistency, but it is provided here for compatibility
+#define REMOVE_FROM_LIST(item, head, next)  LL_DELETE2(head, item, next)
 
 
  //////////////////////////////////////////////////////////////////////////////

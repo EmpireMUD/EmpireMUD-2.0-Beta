@@ -554,7 +554,7 @@ OLC_MODULE(booked_license) {
 OLC_MODULE(booked_paragraphs) {
 	char arg1[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	book_data *book = GET_OLC_BOOK(ch->desc);
-	struct paragraph_data *para, *new, *temp;
+	struct paragraph_data *para, *new;
 	size_t size;
 	
 	argument = any_one_arg(argument, arg1);
@@ -685,7 +685,7 @@ OLC_MODULE(booked_paragraphs) {
 		else {
 			for (para = book->paragraphs; !found && para; para = para->next) {
 				if (--pos == 0) {
-					REMOVE_FROM_LIST(para, book->paragraphs, next);
+					LL_DELETE(book->paragraphs, para);
 					if (para->text) {
 						free(para->text);
 					}

@@ -552,8 +552,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		for (trade = EMPIRE_TRADE(emp); trade; trade = next_trade) {
 			next_trade = trade->next;
 			if (trade->vnum == vnum) {
-				struct empire_trade_data *temp;
-				REMOVE_FROM_LIST(trade, EMPIRE_TRADE(emp), next);
+				LL_DELETE(EMPIRE_TRADE(emp), trade);
 				free(trade);	// certified
 				EMPIRE_NEEDS_SAVE(emp) = TRUE;
 			}
@@ -622,8 +621,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 		for (gear = GET_ARCH_GEAR(arch); gear; gear = next_gear) {
 			next_gear = gear->next;
 			if (gear->vnum == vnum) {
-				struct archetype_gear *temp;
-				REMOVE_FROM_LIST(gear, GET_ARCH_GEAR(arch), next);
+				LL_DELETE(GET_ARCH_GEAR(arch), gear);
 				free(gear);
 				found = TRUE;
 			}
@@ -868,8 +866,7 @@ void olc_delete_object(char_data *ch, obj_vnum vnum) {
 			for (gear = GET_ARCH_GEAR(GET_OLC_ARCHETYPE(desc)); gear; gear = next_gear) {
 				next_gear = gear->next;
 				if (gear->vnum == vnum) {
-					struct archetype_gear *temp;
-					REMOVE_FROM_LIST(gear, GET_ARCH_GEAR(GET_OLC_ARCHETYPE(desc)), next);
+					LL_DELETE(GET_ARCH_GEAR(GET_OLC_ARCHETYPE(desc)), gear);
 					free(gear);
 					found = TRUE;
 				}
@@ -2211,7 +2208,7 @@ OLC_MODULE(oedit_apply) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	int loc, num, iter, apply_type;
-	struct obj_apply *apply, *change, *temp;
+	struct obj_apply *apply, *change;
 	bool found;
 	
 	// arg1 arg2 arg3
@@ -2237,7 +2234,7 @@ OLC_MODULE(oedit_apply) {
 					found = TRUE;
 					
 					msg_to_char(ch, "You remove the %+d to %s (%s).\r\n", apply->modifier, apply_types[(int)apply->location], apply_type_names[(int)apply->apply_type]);
-					REMOVE_FROM_LIST(apply, GET_OBJ_APPLIES(obj), next);
+					LL_DELETE(GET_OBJ_APPLIES(obj), apply);
 					free(apply);
 				}
 			}

@@ -85,7 +85,7 @@ void add_pursuit(char_data *ch, char_data *target) {
 * @param char_data *target The victim
 */
 void end_pursuit(char_data *ch, char_data *target) {
-	struct pursuit_data *purs, *next_purs, *temp;
+	struct pursuit_data *purs, *next_purs;
 	
 	// only mobs have this
 	if (!IS_NPC(ch)) {
@@ -97,7 +97,7 @@ void end_pursuit(char_data *ch, char_data *target) {
 		next_purs = purs->next;
 		
 		if (purs->idnum == GET_IDNUM(target)) {
-			REMOVE_FROM_LIST(purs, MOB_PURSUIT(ch), next);
+			LL_DELETE(MOB_PURSUIT(ch), purs);
 			free(purs);
 		}
 	}
@@ -633,7 +633,7 @@ void mobile_activity(void) {
 	
 	register char_data *ch, *next_ch, *vict, *targ, *m;
 	struct track_data *track;
-	struct pursuit_data *purs, *next_purs, *temp;
+	struct pursuit_data *purs, *next_purs;
 	room_vnum track_to_room = NOWHERE;
 	obj_data *obj;
 	int found, dir = NO_DIR;
@@ -671,7 +671,7 @@ void mobile_activity(void) {
 				
 				// check pursuit timeout and distance
 				if (time(0) - purs->last_seen > config_get_int("mob_pursuit_timeout") * SECS_PER_REAL_MIN || compute_distance(IN_ROOM(ch), real_room(purs->location)) > config_get_int("mob_pursuit_distance")) {
-					REMOVE_FROM_LIST(purs, MOB_PURSUIT(ch), next);
+					LL_DELETE(MOB_PURSUIT(ch), purs);
 					free(purs);
 					continue;
 				}

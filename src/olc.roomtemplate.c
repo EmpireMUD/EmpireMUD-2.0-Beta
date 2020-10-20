@@ -996,7 +996,7 @@ OLC_MODULE(rmedit_exit) {
 	adv_data *adv = get_adventure_for_vnum(GET_OLC_VNUM(ch->desc));
 	int num, vnum, dir;
 	room_template *to_template;
-	struct exit_template *ex, *temp, *change;
+	struct exit_template *ex, *change;
 	bool found;
 	
 	// arg1 argument
@@ -1027,7 +1027,7 @@ OLC_MODULE(rmedit_exit) {
 					found = TRUE;
 					
 					msg_to_char(ch, "You remove the %s exit.\r\n", dirs[ex->dir]);
-					REMOVE_FROM_LIST(ex, GET_RMT_EXITS(rmt), next);
+					LL_DELETE(GET_RMT_EXITS(rmt), ex);
 					if (ex->keyword) {
 						free(ex->keyword);
 					}
@@ -1219,7 +1219,7 @@ OLC_MODULE(rmedit_spawns) {
 	char type_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], prc_arg[MAX_INPUT_LENGTH];
 	char lbuf[MAX_STRING_LENGTH];
 	int num, stype, limit, findtype;
-	struct adventure_spawn *spawn, *temp, *change, *copyfrom = NULL;
+	struct adventure_spawn *spawn, *change, *copyfrom = NULL;
 	double prc;
 	any_vnum vnum;
 	bool found, none;
@@ -1298,7 +1298,7 @@ OLC_MODULE(rmedit_spawns) {
 					
 					get_spawn_template_name(spawn, lbuf);
 					msg_to_char(ch, "You remove the spawn info for %s.\r\n", lbuf);
-					REMOVE_FROM_LIST(spawn, GET_RMT_SPAWNS(rmt), next);
+					LL_DELETE(GET_RMT_SPAWNS(rmt), spawn);
 					free(spawn);
 				}
 			}

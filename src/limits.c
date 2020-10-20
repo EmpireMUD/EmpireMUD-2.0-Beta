@@ -1920,7 +1920,7 @@ bool can_teleport_to(char_data *ch, room_data *loc, bool check_owner) {
 * Called periodically to time out any expired trades.
 */
 void update_trading_post(void) {
-	struct trading_post_data *tpd, *next_tpd, *temp;
+	struct trading_post_data *tpd, *next_tpd;
 	int *notify_list = NULL, top_notify = -1;
 	bool changed = FALSE;
 	char_data *ch;
@@ -1941,7 +1941,7 @@ void update_trading_post(void) {
 				tpd->obj = NULL;
 			}
 			
-			REMOVE_FROM_LIST(tpd, trading_list, next);
+			LL_DELETE(trading_list, tpd);
 			free(tpd);
 			changed = TRUE;
 		}

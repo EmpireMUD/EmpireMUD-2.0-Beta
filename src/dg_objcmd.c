@@ -1464,7 +1464,7 @@ OCMD(do_odoor) {
 	char target[MAX_INPUT_LENGTH], direction[MAX_INPUT_LENGTH];
 	char field[MAX_INPUT_LENGTH], *value;
 	room_data *rm, *troom, *orm = obj_room(obj);
-	struct room_direction_data *newexit, *temp;
+	struct room_direction_data *newexit;
 	int dir, fd;
 
 	const char *door_field[] = {
@@ -1512,7 +1512,7 @@ OCMD(do_odoor) {
 	/* purge exit */
 	if (fd == 0) {
 		if (newexit) {
-			REMOVE_FROM_LIST(newexit, COMPLEX_DATA(rm)->exits, next);
+			LL_DELETE(COMPLEX_DATA(rm)->exits, newexit);
 			if (newexit->room_ptr) {
 				--GET_EXITS_HERE(newexit->room_ptr);
 			}

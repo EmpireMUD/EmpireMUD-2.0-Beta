@@ -192,14 +192,14 @@ sector_data *create_sector_table_entry(sector_vnum vnum) {
 * @return bool TRUE if any evolutions were deleted.
 */
 bool delete_sector_from_evolutions(sector_vnum vnum, struct evolution_data **list) {
-	struct evolution_data *evo, *next_evo, *temp;
+	struct evolution_data *evo, *next_evo;
 	bool found = FALSE;
 	
 	for (evo = *list; evo; evo = next_evo) {
 		next_evo = evo->next;
 		
 		if (evo->becomes == vnum || (evo_val_types[evo->type] == EVO_VAL_SECTOR && evo->value == vnum)) {
-			REMOVE_FROM_LIST(evo, *list, next);
+			LL_DELETE(*list, evo);
 			free(evo);
 			found = TRUE;
 		}
@@ -908,7 +908,7 @@ OLC_MODULE(sectedit_evolution) {
 	void sort_evolutions(sector_data *sect);
 	
 	sector_data *st = GET_OLC_SECTOR(ch->desc);
-	struct evolution_data *evo, *change, *temp;
+	struct evolution_data *evo, *change;
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], valstr[MAX_INPUT_LENGTH], *sectarg, *tmp;
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	int num, iter, evo_type, value;
@@ -941,7 +941,7 @@ OLC_MODULE(sectedit_evolution) {
 					
 					msg_to_char(ch, "You remove evolution #%d.\r\n", atoi(arg2));
 					
-					REMOVE_FROM_LIST(evo, st->evolution, next);
+					LL_DELETE(st->evolution, evo);
 					free(evo);
 				}
 			}

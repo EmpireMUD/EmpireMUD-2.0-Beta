@@ -206,7 +206,7 @@ bool delete_from_interaction_list(struct interaction_item **list, int vnum_type,
 * @return bool TRUE if any spawn entries were deleted; FALSE otherwise.
 */
 bool delete_mob_from_spawn_list(struct spawn_info **list, mob_vnum vnum) {
-	struct spawn_info *spawn, *next_spawn, *temp;
+	struct spawn_info *spawn, *next_spawn;
 	bool found = FALSE;
 	
 	for (spawn = *list; spawn; spawn = next_spawn) {
@@ -215,7 +215,7 @@ bool delete_mob_from_spawn_list(struct spawn_info **list, mob_vnum vnum) {
 		// deleted!
 		if (spawn->vnum == vnum) {
 			found = TRUE;
-			REMOVE_FROM_LIST(spawn, *list, next);
+			LL_DELETE(*list, spawn);
 			free(spawn);
 		}
 	}
@@ -234,7 +234,7 @@ bool delete_mob_from_spawn_list(struct spawn_info **list, mob_vnum vnum) {
 * @return bool TRUE if any spawn entries were deleted; FALSE otherwise.
 */
 bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum) {
-	struct adventure_spawn *spawn, *next_spawn, *temp;
+	struct adventure_spawn *spawn, *next_spawn;
 	bool found = FALSE;
 	
 	for (spawn = *list; spawn; spawn = next_spawn) {
@@ -243,7 +243,7 @@ bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_ty
 		// deleted!
 		if (spawn->type == spawn_type && spawn->vnum == vnum) {
 			found = TRUE;
-			REMOVE_FROM_LIST(spawn, *list, next);
+			LL_DELETE(*list, spawn);
 			free(spawn);
 		}
 	}

@@ -164,7 +164,7 @@ char *list_one_trigger(trig_data *trig, bool detail) {
 * @return bool TRUE if any were removed; FALSE otherwise.
 */
 bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum) {
-	struct trig_data *trig, *next_trig, *temp;
+	struct trig_data *trig, *next_trig;
 	bool found = FALSE;
 	
 	if (!script) {
@@ -176,7 +176,7 @@ bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum) {
 		
 		if (GET_TRIG_VNUM(trig) == vnum) {
 			found = TRUE;
-			REMOVE_FROM_LIST(trig, TRIGGERS(script), next);
+			LL_DELETE(TRIGGERS(script), trig);
 			extract_trigger(trig);
 		}
 	}
@@ -273,14 +273,14 @@ void check_triggers(void) {
 * @return bool TRUE if any triggers were removed, FALSE if not.
 */
 bool delete_from_proto_list_by_vnum(struct trig_proto_list **list, trig_vnum vnum) {
-	struct trig_proto_list *trig, *next_trig, *temp;
+	struct trig_proto_list *trig, *next_trig;
 	bool found = FALSE;
 	
 	for (trig = *list; trig; trig = next_trig) {
 		next_trig = trig->next;
 		if (trig->vnum == vnum) {
 			found = TRUE;
-			REMOVE_FROM_LIST(trig, *list, next);
+			LL_DELETE(*list, trig);
 			free(trig);
 		}
 	}

@@ -2340,7 +2340,7 @@ void do_import_add(char_data *ch, empire_data *emp, char *argument, int subcmd) 
 
 // removes an import/export entry for do_import
 void do_import_remove(char_data *ch, empire_data *emp, char *argument, int subcmd) {
-	struct empire_trade_data *trade, *temp;
+	struct empire_trade_data *trade;
 	obj_vnum vnum = NOTHING;
 	obj_data *obj;
 	int number;
@@ -2361,7 +2361,7 @@ void do_import_remove(char_data *ch, empire_data *emp, char *argument, int subcm
 		msg_to_char(ch, "The empire doesn't appear to be %sing '%s'.\r\n", trade_type[subcmd], get_obj_name_by_proto(vnum));
 	}
 	else {
-		REMOVE_FROM_LIST(trade, EMPIRE_TRADE(emp), next);
+		LL_DELETE(EMPIRE_TRADE(emp), trade);
 		free(trade);
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		
@@ -2865,7 +2865,7 @@ static struct find_territory_node *find_nearby_territory_node(room_data *room, s
 * @return struct find_territory_node* The new, reduced list.
 */
 struct find_territory_node *reduce_territory_node_list(struct find_territory_node *list) {
-	struct find_territory_node *node, *next_node, *find, *temp;
+	struct find_territory_node *node, *next_node, *find;
 	int size = 5;
 	
 	// iterate until there are no more than 350 nodes
@@ -2876,7 +2876,7 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 			// is there a node later in the list that is within range?
 			if ((find = find_nearby_territory_node(node->loc, node->next, size))) {
 				find->count += node->count;
-				REMOVE_FROM_LIST(node, list, next);
+				LL_DELETE(list, node);
 				free(node);
 			}
 		}

@@ -550,14 +550,14 @@ void olc_search_craft(char_data *ch, craft_vnum vnum) {
 * @return bool TRUE if any were removed.
 */
 bool remove_thing_from_resource_list(struct resource_data **list, int type, any_vnum vnum) {
-	struct resource_data *res, *next_res, *temp;
+	struct resource_data *res, *next_res;
 	int removed = 0;
 	
 	for (res = *list; res; res = next_res) {
 		next_res = res->next;
 		
 		if (res->type == type && res->vnum == vnum) {
-			REMOVE_FROM_LIST(res, *list, next);
+			LL_DELETE(*list, res);
 			free(res);
 			++removed;
 		}

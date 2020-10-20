@@ -113,7 +113,7 @@ OLC_MODULE(mapedit_decay) {
 
 
 OLC_MODULE(mapedit_terrain) {
-	struct empire_city_data *city, *temp;
+	struct empire_city_data *city;
 	empire_data *emp, *rescan_emp = NULL;
 	int count;
 	sector_data *sect = NULL, *next_sect, *old_sect = NULL;
@@ -153,7 +153,7 @@ OLC_MODULE(mapedit_terrain) {
 		// delete city center?
 		if (IS_CITY_CENTER(IN_ROOM(ch)) && emp && (city = find_city_entry(emp, IN_ROOM(ch)))) {
 			log_to_empire(emp, ELOG_TERRITORY, "%s was lost", city->name);
-			REMOVE_FROM_LIST(city, EMPIRE_CITY_LIST(emp), next);
+			LL_DELETE(EMPIRE_CITY_LIST(emp), city);
 			if (city->name) {
 				free(city->name);
 			}
@@ -519,7 +519,7 @@ OLC_MODULE(mapedit_exits) {
 
 
 OLC_MODULE(mapedit_delete_exit) {
-	struct room_direction_data *ex, *temp;
+	struct room_direction_data *ex;
 	int dir;
 
 	one_argument(argument, arg);
@@ -538,7 +538,7 @@ OLC_MODULE(mapedit_delete_exit) {
 			}
 			if (ex->keyword)
 				free(ex->keyword);
-			REMOVE_FROM_LIST(ex, COMPLEX_DATA(IN_ROOM(ch))->exits, next);
+			LL_DELETE(COMPLEX_DATA(IN_ROOM(ch))->exits, ex);
 			free(ex);
 		}
 		msg_to_char(ch, "Exit deleted. Target room not deleted.\r\n");

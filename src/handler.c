@@ -605,15 +605,13 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 * @param struct affected_by *af The affect to remove.
 */
 void affect_remove(char_data *ch, struct affected_type *af) {
-	struct affected_type *temp;
-
 	// not affected by it at all somehow?
 	if (ch->affected == NULL) {
 		return;
 	}
 
 	affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
-	REMOVE_FROM_LIST(af, ch->affected, next);
+	LL_DELETE(ch->affected, af);
 	free(af);
 }
 
@@ -627,8 +625,6 @@ void affect_remove(char_data *ch, struct affected_type *af) {
 * @param struct affected_by *af The affect to remove.
 */
 void affect_remove_room(room_data *room, struct affected_type *af) {
-	struct affected_type *temp;
-
 	// only prevent basic errors
 	if (!room || !af) {
 		return;
@@ -641,7 +637,7 @@ void affect_remove_room(room_data *room, struct affected_type *af) {
 	
 	REMOVE_BIT(ROOM_AFF_FLAGS(room), af->bitvector);
 	
-	REMOVE_FROM_LIST(af, ROOM_AFFECTS(room), next);
+	LL_DELETE(ROOM_AFFECTS(room), af);
 	free(af);
 	
 	affect_total_room(room);
@@ -1059,9 +1055,7 @@ void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int dama
 * @param struct over_time_effect_type *dot The DoT to remove.
 */
 void dot_remove(char_data *ch, struct over_time_effect_type *dot) {
-	struct over_time_effect_type *temp;
-
-	REMOVE_FROM_LIST(dot, ch->over_time_effects, next);
+	LL_DELETE(ch->over_time_effects, dot);
 	free(dot);
 }
 
@@ -2031,7 +2025,7 @@ void cleanup_all_coins(void) {
 * Removes zero-entries and reduces extra coins to the OTHER category.
 */
 void cleanup_coins(char_data *ch) {
-	struct coin_data *iter, *least, *next_iter, *temp;
+	struct coin_data *iter, *least, *next_iter;
 	int count, add_other, least_amount;
 	
 	if (IS_NPC(ch)) {
@@ -2050,13 +2044,13 @@ void cleanup_coins(char_data *ch) {
 		
 			if (iter->amount == 0) {
 				// delete zeroes
-				REMOVE_FROM_LIST(iter, GET_PLAYER_COINS(ch), next);
+				LL_DELETE(GET_PLAYER_COINS(ch), iter);
 				free(iter);
 			}
 			else if (iter->empire_id != OTHER_COIN && real_empire(iter->empire_id) == NULL) {
 				// no more empire
 				add_other += iter->amount;
-				REMOVE_FROM_LIST(iter, GET_PLAYER_COINS(ch), next);
+				LL_DELETE(GET_PLAYER_COINS(ch), iter);
 				free(iter);
 			}
 			else {
@@ -2073,7 +2067,7 @@ void cleanup_coins(char_data *ch) {
 		// remove one -- keep it simple
 		if (count > MAX_COIN_TYPES && least) {
 			add_other += least->amount;
-			REMOVE_FROM_LIST(least, GET_PLAYER_COINS(ch), next);
+			LL_DELETE(GET_PLAYER_COINS(ch), least);
 			free(least);
 		}
 	} while (count > MAX_COIN_TYPES && MAX_COIN_TYPES > 1);
@@ -2623,9 +2617,7 @@ int get_cooldown_time(char_data *ch, any_vnum type) {
 * @param struct cooldown_data *cool The cooldown to remove.
 */
 void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
-	struct cooldown_data *temp;
-	
-	REMOVE_FROM_LIST(cool, ch->cooldowns, next);
+	LL_DELETE(ch->cooldowns, cool);
 	free(cool);
 }
 
@@ -3973,7 +3965,6 @@ struct group_data *create_group(char_data *leader) {
 */
 void free_group(struct group_data *group) {
 	struct group_member_data *mem;
-	struct group_data *temp;
 	
 	// short remove-from-group
 	while ((mem = group->members)) {
@@ -3982,7 +3973,7 @@ void free_group(struct group_data *group) {
 		free(mem);
 	}
 
-	REMOVE_FROM_LIST(group, group_list, next);
+	LL_DELETE(group_list, group);
 	free(group);
 }
 
@@ -4044,7 +4035,7 @@ void join_group(char_data *ch, struct group_data *group) {
 * @param char_data *ch The player to remove.
 */
 void leave_group(char_data *ch) {
-	struct group_member_data *mem, *next_mem, *temp;
+	struct group_member_data *mem, *next_mem;
 	char_data *first_pc = NULL;
 	struct group_data *group;
 
@@ -4057,7 +4048,7 @@ void leave_group(char_data *ch) {
 	for (mem = group->members; mem; mem = next_mem) {
 		next_mem = mem->next;
 		if (mem->member == ch) {
-			REMOVE_FROM_LIST(mem, group->members, next);
+			LL_DELETE(group->members, mem);
 			free(mem);
 		}
 		else if (!IS_NPC(mem->member) && !first_pc) {
@@ -4877,12 +4868,10 @@ void remove_recent_lore(char_data *ch, int type) {
 
 /* Remove specific lore */
 void remove_lore_record(char_data *ch, struct lore_data *lore) {
-	struct lore_data *temp;
-
 	if (!ch || IS_NPC(ch) || !lore)
 		return;
 
-	REMOVE_FROM_LIST(lore, GET_LORE(ch), next);
+	LL_DELETE(GET_LORE(ch), lore);
 	if (lore->text) {
 		free(lore->text);
 	}
@@ -5861,7 +5850,7 @@ bool identical_bindings(obj_data *obj_a, obj_data *obj_b) {
 * @return bool TRUE if the two items are functionally identical.
 */
 bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
-	struct obj_apply *a_apply, *b_list, *b_apply, *b_apply_next, *temp;
+	struct obj_apply *a_apply, *b_list, *b_apply, *b_apply_next;
 	bool found;
 	int iter;
 	
@@ -5921,7 +5910,7 @@ bool objs_are_identical(obj_data *obj_a, obj_data *obj_b) {
 			b_apply_next = b_apply->next;
 			if (a_apply->location == b_apply->location && a_apply->modifier == b_apply->modifier && a_apply->apply_type == b_apply->apply_type) {
 				found = TRUE;
-				REMOVE_FROM_LIST(b_apply, b_list, next);
+				LL_DELETE(b_list, b_apply);
 				free(b_apply);
 				break;	// only need one, plus we freed it
 			}
@@ -6143,7 +6132,7 @@ struct obj_binding *copy_obj_bindings(struct obj_binding *from) {
 * @param char_data *player The player to bind to.
 */
 void reduce_obj_binding(obj_data *obj, char_data *player) {
-	struct obj_binding *bind, *next_bind, *temp;
+	struct obj_binding *bind, *next_bind;
 	
 	if (!obj || !player || IS_NPC(player) || IS_IMMORTAL(player)) {
 		return;
@@ -6152,7 +6141,7 @@ void reduce_obj_binding(obj_data *obj, char_data *player) {
 	for (bind = OBJ_BOUND_TO(obj); bind; bind = next_bind) {
 		next_bind = bind->next;
 		if (bind->idnum != GET_IDNUM(player)) {
-			REMOVE_FROM_LIST(bind, OBJ_BOUND_TO(obj), next);
+			LL_DELETE(OBJ_BOUND_TO(obj), bind);
 			free(bind);
 		}
 	}
@@ -7349,7 +7338,7 @@ struct offer_data *add_offer(char_data *ch, char_data *from, int type, int data)
 * @param char_data *ch The player to clean up offers for.
 */
 void clean_offers(char_data *ch) {
-	struct offer_data *offer, *next_offer, *temp;
+	struct offer_data *offer, *next_offer;
 	int max_duration = config_get_int("offer_time");
 	
 	if (!ch || IS_NPC(ch)) {
@@ -7360,7 +7349,7 @@ void clean_offers(char_data *ch) {
 		next_offer = offer->next;
 		
 		if (time(0) - offer->time > max_duration) {
-			REMOVE_FROM_LIST(offer, GET_OFFERS(ch), next);
+			LL_DELETE(GET_OFFERS(ch), offer);
 			free(offer);
 		}
 	}
@@ -7374,7 +7363,7 @@ void clean_offers(char_data *ch) {
 * @param int type Any OFFER_ type.
 */
 void remove_offers_by_type(char_data *ch, int type) {
-	struct offer_data *offer, *next_offer, *temp;
+	struct offer_data *offer, *next_offer;
 	
 	if (!ch || IS_NPC(ch)) {
 		return;
@@ -7384,7 +7373,7 @@ void remove_offers_by_type(char_data *ch, int type) {
 		next_offer = offer->next;
 		
 		if (offer->type == type) {
-			REMOVE_FROM_LIST(offer, GET_OFFERS(ch), next);
+			LL_DELETE(GET_OFFERS(ch), offer);
 			free(offer);
 		}
 	}

@@ -2442,7 +2442,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 	double share, this_share, points_to_give, per_point, base_mod = 1.0;
 	room_data *room = NULL;
 	obj_data *top_obj, *proto;
-	struct obj_apply *apply, *next_apply, *temp;
+	struct obj_apply *apply, *next_apply;
 	bool scale_negative = FALSE;
 	bitvector_t bits;
 	
@@ -2719,7 +2719,7 @@ void scale_item_to_level(obj_data *obj, int level) {
 		
 		// remove zero-applies
 		if (apply->modifier == 0) {
-			REMOVE_FROM_LIST(apply, GET_OBJ_APPLIES(obj), next);
+			LL_DELETE(GET_OBJ_APPLIES(obj), apply);
 			free(apply);
 		}
 	}

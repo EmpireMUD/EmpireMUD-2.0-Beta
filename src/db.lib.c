@@ -1704,7 +1704,7 @@ empire_data *create_empire(char_data *ch) {
 * @param empire_data *emp The empire to delete.
 */
 void delete_empire(empire_data *emp) {
-	struct empire_political_data *emp_pol, *next_pol, *temp;
+	struct empire_political_data *emp_pol, *next_pol;
 	player_index_data *index, *next_index;
 	struct vehicle_attached_mob *vam;
 	empire_data *emp_iter, *next_emp;
@@ -1734,7 +1734,7 @@ void delete_empire(empire_data *emp) {
 		for (emp_pol = EMPIRE_DIPLOMACY(emp_iter); emp_pol; emp_pol = next_pol) {
 			next_pol = emp_pol->next;
 			if (emp_pol->id == vnum) {
-				REMOVE_FROM_LIST(emp_pol, EMPIRE_DIPLOMACY(emp_iter), next);
+				LL_DELETE(EMPIRE_DIPLOMACY(emp_iter), emp_pol);
 				free(emp_pol);
 				
 				et_change_diplomacy(emp_iter);
@@ -4041,7 +4041,7 @@ void free_extra_descs(struct extra_descr_data **list) {
 * @param struct extra_descr_data **list The list to clean up.
 */
 void prune_extra_descs(struct extra_descr_data **list) {
-	struct extra_descr_data *ex, *next_ex, *temp;
+	struct extra_descr_data *ex, *next_ex;
 	
 	if (!list) {
 		return;
@@ -4051,7 +4051,7 @@ void prune_extra_descs(struct extra_descr_data **list) {
 		next_ex = ex->next;
 		
 		if (!ex->description || !*ex->description || !ex->keyword || !*ex->keyword) {
-			REMOVE_FROM_LIST(ex, *list, next);
+			LL_DELETE(*list, ex);
 
 			if (ex->keyword) {
 				free(ex->keyword);
@@ -8487,7 +8487,7 @@ int check_object(obj_data *obj) {
 void clean_empire_logs(void) {
 	int empire_log_ttl = config_get_int("empire_log_ttl") * SECS_PER_REAL_DAY;
 	
-	struct empire_log_data *elog, *next_elog, *temp;
+	struct empire_log_data *elog, *next_elog;
 	empire_data *iter, *next_iter;
 	time_t now = time(0);
 	
@@ -8499,7 +8499,7 @@ void clean_empire_logs(void) {
 			
 			// stale?
 			if (elog->timestamp + empire_log_ttl < now) {
-				REMOVE_FROM_LIST(elog, EMPIRE_LOGS(iter), next);
+				LL_DELETE(EMPIRE_LOGS(iter), elog);
 				if (elog->string) {
 					free(elog->string);
 				}

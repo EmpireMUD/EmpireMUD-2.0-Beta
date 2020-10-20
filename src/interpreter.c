@@ -1433,7 +1433,7 @@ int perform_alias(descriptor_data *d, char *orig) {
 /* The interface to the outside world: do_alias / do_unalias */
 ACMD(do_alias) {
 	char *repl;
-	struct alias_data *a, *temp;
+	struct alias_data *a;
 
 	if (IS_NPC(ch))
 		return;
@@ -1458,7 +1458,7 @@ ACMD(do_alias) {
 		
 		// only delete if it's being replaced or they used unalias
 		if (a != NULL && (*repl || subcmd == SCMD_UNALIAS)) {
-			REMOVE_FROM_LIST(a, GET_ALIASES(ch), next);
+			LL_DELETE(GET_ALIASES(ch), a);
 			free_alias(a);
 		}
 		/* if no replacement string is specified (or they used unalias): */

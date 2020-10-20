@@ -175,7 +175,7 @@ ACMD(do_ban) {
 
 ACMD(do_unban) {
 	char site[MAX_INPUT_LENGTH];
-	struct ban_list_element *ban_node, *temp;
+	struct ban_list_element *ban_node;
 	int found = 0;
 
 	one_argument(argument, site);
@@ -195,7 +195,7 @@ ACMD(do_unban) {
 		send_to_char("That site is not currently banned.\r\n", ch);
 		return;
 	}
-	REMOVE_FROM_LIST(ban_node, ban_list, next);
+	LL_DELETE(ban_list, ban_node);
 	send_to_char("Site unbanned.\r\n", ch);
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "BAN: %s removed the %s-player ban on %s", GET_NAME(ch), ban_types[ban_node->type], ban_node->site);
 

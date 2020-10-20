@@ -737,7 +737,7 @@ ACMD(do_colorburst) {
 
 
 ACMD(do_disenchant) {
-	struct obj_apply *apply, *next_apply, *temp;
+	struct obj_apply *apply, *next_apply;
 	obj_data *obj, *reward;
 	int iter, prc, rnd;
 	obj_vnum vnum = NOTHING;
@@ -770,7 +770,7 @@ ACMD(do_disenchant) {
 		for (apply = GET_OBJ_APPLIES(obj); apply; apply = next_apply) {
 			next_apply = apply->next;
 			if (apply->apply_type == APPLY_TYPE_ENCHANTMENT) {
-				REMOVE_FROM_LIST(apply, GET_OBJ_APPLIES(obj), next);
+				LL_DELETE(GET_OBJ_APPLIES(obj), apply);
 				free(apply);
 			}
 		}

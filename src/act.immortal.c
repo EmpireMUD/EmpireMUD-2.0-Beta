@@ -3057,7 +3057,7 @@ SHOW(show_islands) {
 	empire_data *emp;
 	int iter;
 	
-	struct show_island_data *list = NULL, *sid, *cur = NULL, *temp;
+	struct show_island_data *list = NULL, *sid, *cur = NULL;
 	
 	one_word(argument, arg);
 	if (!*arg) {
@@ -3106,7 +3106,7 @@ SHOW(show_islands) {
 			isle = get_island(cur->island, TRUE);
 			msg_to_char(ch, "%2d. %s: %d items\r\n", cur->island, get_island_name_for(isle->id, ch), cur->count);
 			// pull it out of the list to prevent unlimited iteration
-			REMOVE_FROM_LIST(cur, list, next);
+			LL_DELETE(list, cur);
 			free(cur);
 		}
 	}

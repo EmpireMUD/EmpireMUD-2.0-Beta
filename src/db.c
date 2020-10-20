@@ -694,7 +694,7 @@ void add_trd_owner(room_vnum vnum, empire_vnum owner) {
 * startup and should also be called any time a building is deleted.
 */
 void check_for_bad_buildings(void) {
-	struct obj_storage_type *store, *next_store, *temp;
+	struct obj_storage_type *store, *next_store;
 	struct bld_relation *relat, *next_relat;
 	bld_data *bld, *next_bld;
 	room_data *room, *next_room;
@@ -770,7 +770,7 @@ void check_for_bad_buildings(void) {
 			next_store = store->next;
 			
 			if (store->type == TYPE_BLD && store->vnum != NOTHING && !building_proto(store->vnum)) {
-				REMOVE_FROM_LIST(store, obj->proto_data->storage, next);
+				LL_DELETE(obj->proto_data->storage, store);
 				free(store);
 				log(" removing storage for obj %d for bad building type", obj->vnum);
 				save_library_file_for_vnum(DB_BOOT_OBJ, obj->vnum);
@@ -785,7 +785,7 @@ void check_for_bad_buildings(void) {
 				next_store = store->next;
 			
 				if (store->type == TYPE_BLD && store->vnum != NOTHING && !building_proto(store->vnum)) {
-					REMOVE_FROM_LIST(store, GET_OLC_OBJECT(dd)->proto_data->storage, next);
+					LL_DELETE(GET_OLC_OBJECT(dd)->proto_data->storage, store);
 					free(store);
 					msg_to_desc(dd, "&RYou are editing an object whose storage building has been deleted. Building type removed.&0\r\n");
 				}
@@ -812,7 +812,7 @@ void check_for_bad_buildings(void) {
 * save the changes to file on its own; it will re-fix them on every boot.
 */
 void check_for_bad_sectors(void) {
-	struct evolution_data *evo, *next_evo, *temp;
+	struct evolution_data *evo, *next_evo;
 	sector_data *sect, *next_sect;
 
 	HASH_ITER(hh, sector_table, sect, next_sect) {
@@ -822,7 +822,7 @@ void check_for_bad_sectors(void) {
 			
 			// oops: remove bad evo
 			if (!sector_proto(evo->becomes)) {
-				REMOVE_FROM_LIST(evo, GET_SECT_EVOS(sect), next);
+				LL_DELETE(GET_SECT_EVOS(sect), evo);
 				free(evo);
 			}
 		}
@@ -954,7 +954,7 @@ void process_temporary_room_data(void) {
 */
 void renum_world(void) {
 	room_data *room, *next_room, *home;
-	struct room_direction_data *ex, *next_ex, *temp;
+	struct room_direction_data *ex, *next_ex;
 	struct affected_type *af;
 	struct map_data *map;
 	
@@ -985,7 +985,7 @@ void renum_world(void) {
 					if (ex->keyword) {
 						free(ex->keyword);
 					}
-					REMOVE_FROM_LIST(ex, COMPLEX_DATA(room)->exits, next);
+					LL_DELETE(COMPLEX_DATA(room)->exits, ex);
 					free(ex);
 				}
 			}

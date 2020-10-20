@@ -112,7 +112,7 @@ void change_chop_territory(room_data *room) {
 */
 void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 	sector_data *old_sect = SECT(room), *st = sector_proto(sect), *base;
-	struct map_data *map, *temp;
+	struct map_data *map;
 	crop_data *new_crop = NULL;
 	empire_data *emp;
 	
@@ -148,7 +148,7 @@ void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 		}
 		else {
 			// remove from land_map
-			REMOVE_FROM_LIST(map, land_map, next);
+			LL_DELETE(land_map, map);
 			// do NOT free map -- it's a pointer to something in world_map
 		}
 	}
@@ -456,7 +456,7 @@ room_data *create_room(room_data *home) {
 * @param bool check_exits If TRUE, updates all world exits right away*.
 */
 void delete_room(room_data *room, bool check_exits) {
-	struct room_direction_data *ex, *next_ex, *temp;
+	struct room_direction_data *ex, *next_ex;
 	struct empire_territory_data *ter;
 	struct empire_city_data *city, *next_city;
 	room_data *rm_iter, *next_rm, *home;
@@ -614,7 +614,7 @@ void delete_room(room_data *room, bool check_exits) {
 					next_ex = ex->next;
 				
 					if (ex->to_room == GET_ROOM_VNUM(room) || ex->room_ptr == room) {
-						REMOVE_FROM_LIST(ex, COMPLEX_DATA(rm_iter)->exits, next);
+						LL_DELETE(COMPLEX_DATA(rm_iter)->exits, ex);
 						if (ex->keyword) {
 							free(ex->keyword);
 						}
@@ -2801,7 +2801,7 @@ void generate_island_descriptions(void) {
 * deleted.
 */
 void check_all_exits(void) {
-	struct room_direction_data *ex, *next_ex, *temp;
+	struct room_direction_data *ex, *next_ex;
 	room_data *room, *next_room;
 	obj_data *o, *next_o;
 	
@@ -2826,7 +2826,7 @@ void check_all_exits(void) {
 					if (ex->keyword) {
 						free(ex->keyword);
 					}
-					REMOVE_FROM_LIST(ex, COMPLEX_DATA(room)->exits, next);
+					LL_DELETE(COMPLEX_DATA(room)->exits, ex);
 					free(ex);
 					
 					// no need to update GET_EXITS_HERE() as the target room is gone

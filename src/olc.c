@@ -5990,7 +5990,7 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 void olc_process_applies(char_data *ch, char *argument, struct apply_data **list) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	struct apply_data *apply, *next_apply, *change, *temp;
+	struct apply_data *apply, *next_apply, *change;
 	int loc, num, iter;
 	bool found;
 	
@@ -6018,7 +6018,7 @@ void olc_process_applies(char_data *ch, char *argument, struct apply_data **list
 					found = TRUE;
 					
 					msg_to_char(ch, "You remove the %d to %s.\r\n", apply->weight, apply_types[apply->location]);
-					REMOVE_FROM_LIST(apply, *list, next);
+					LL_DELETE(*list, apply);
 					free(apply);
 				}
 			}
@@ -6252,7 +6252,7 @@ void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_da
 	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	struct extra_descr_data *ex, *change, *temp;
+	struct extra_descr_data *ex, *change;
 	int num;
 	
 	half_chop(argument, arg1, arg2);
@@ -6300,7 +6300,7 @@ void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_da
 			if (ex->description) {
 				free(ex->description);
 			}
-			REMOVE_FROM_LIST(ex, *list, next);
+			LL_DELETE(*list, ex);
 			free(ex);
 			
 			msg_to_char(ch, "You remove extra description %d.\r\n", num);
@@ -6824,7 +6824,7 @@ void olc_process_interactions(char_data *ch, char *argument, struct interaction_
 					found = TRUE;
 					
 					msg_to_char(ch, "You remove %s: %dx %s %.2f%%\r\n", interact_types[interact->type], interact->quantity, get_interaction_target(interact->type, interact->vnum), interact->percent);
-					REMOVE_FROM_LIST(interact, *list, next);
+					LL_DELETE(*list, interact);
 					free(interact);
 				}
 			}
@@ -7124,7 +7124,7 @@ void olc_process_resources(char_data *ch, char *argument, struct resource_data *
 					found = TRUE;
 					
 					msg_to_char(ch, "You remove the %s.\r\n", get_resource_name(res));
-					REMOVE_FROM_LIST(res, *list, next);
+					LL_DELETE(*list, res);
 					free(res);
 				}
 			}
@@ -7465,7 +7465,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	char *flagarg, *tmp;
 	int loc, num, iter, count, findtype;
-	struct spawn_info *spawn, *change, *temp, *copyfrom = NULL;
+	struct spawn_info *spawn, *change, *copyfrom = NULL;
 	vehicle_data *veh;
 	sector_data *sect;
 	any_vnum vnum;
@@ -7628,7 +7628,7 @@ void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list)
 					
 					msg_to_char(ch, "You remove the spawn info for %s.\r\n", get_mob_name_by_proto(spawn->vnum, FALSE));
 					
-					REMOVE_FROM_LIST(spawn, *list, next);
+					LL_DELETE(*list, spawn);
 					free(spawn);
 				}
 			}
@@ -7829,7 +7829,7 @@ void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **
 					}
 					msg_to_char(ch, "You remove script [%d] %s.\r\n", tpl->vnum, lbuf);
 					
-					REMOVE_FROM_LIST(tpl, *list, next);
+					LL_DELETE(*list, tpl);
 					free(tpl);
 				}
 			}

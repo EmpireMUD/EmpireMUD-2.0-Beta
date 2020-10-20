@@ -1488,7 +1488,7 @@ void tog_pvp(char_data *ch) {
 ACMD(do_accept) {
 	char type_arg[MAX_INPUT_LENGTH], name_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	int max_duration = config_get_int("offer_time");
-	struct offer_data *ofiter, *offer, *temp;
+	struct offer_data *ofiter, *offer;
 	bool delete = FALSE;
 	int iter, type, ts;
 	bool found, dupe;
@@ -1620,7 +1620,7 @@ ACMD(do_accept) {
 	
 	// in either case
 	if (delete) {
-		REMOVE_FROM_LIST(offer, GET_OFFERS(ch), next);
+		LL_DELETE(GET_OFFERS(ch), offer);
 		free(offer);
 	}
 }

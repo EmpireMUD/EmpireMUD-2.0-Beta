@@ -293,7 +293,7 @@ bool valid_default_rank(char_data *ch, char *argument) {
 */
 void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear **list) {
 	char cmd_arg[MAX_INPUT_LENGTH], slot_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
-	struct archetype_gear *gear, *next_gear, *change, *temp, *copyfrom;
+	struct archetype_gear *gear, *next_gear, *change, *copyfrom;
 	char buf[MAX_STRING_LENGTH];
 	archetype_data *copyarch;
 	bitvector_t findtype;
@@ -323,7 +323,7 @@ void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear 
 					found = TRUE;
 					
 					msg_to_char(ch, "You remove %s.\r\n", get_obj_name_by_proto(gear->vnum));
-					REMOVE_FROM_LIST(gear, *list, next);
+					LL_DELETE(*list, gear);
 					free(gear);
 				}
 			}
@@ -1733,7 +1733,7 @@ OLC_MODULE(archedit_name) {
 OLC_MODULE(archedit_skill) {	
 	archetype_data *arch = GET_OLC_ARCHETYPE(ch->desc);
 	char cmd_arg[MAX_INPUT_LENGTH], skill_arg[MAX_INPUT_LENGTH], num_arg[MAX_INPUT_LENGTH];
-	struct archetype_skill *sk, *next_sk, *temp;
+	struct archetype_skill *sk, *next_sk;
 	skill_data *skill;
 	bool found;
 	int num;
@@ -1770,7 +1770,7 @@ OLC_MODULE(archedit_skill) {
 			sk->level = num;
 			
 			if (num == 0) {
-				REMOVE_FROM_LIST(sk, GET_ARCH_SKILLS(arch), next);
+				LL_DELETE(GET_ARCH_SKILLS(arch), sk);
 				free(sk);
 			}
 		}
@@ -1799,7 +1799,7 @@ OLC_MODULE(archedit_skill) {
 			}
 			
 			// found it!
-			REMOVE_FROM_LIST(sk, GET_ARCH_SKILLS(arch), next);
+			LL_DELETE(GET_ARCH_SKILLS(arch), sk);
 			free(sk);
 		}
 		

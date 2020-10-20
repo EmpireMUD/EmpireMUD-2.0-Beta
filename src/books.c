@@ -547,7 +547,7 @@ LIBRARY_SCMD(library_shelve) {
 
 LIBRARY_SCMD(library_burn) {
 	book_data *book;
-	struct library_data *libr, *next_libr, *temp;
+	struct library_data *libr, *next_libr;
 	
 	skip_spaces(&argument);
 	
@@ -565,7 +565,7 @@ LIBRARY_SCMD(library_burn) {
 			next_libr = libr->next;
 			
 			if (libr->location == GET_ROOM_VNUM(IN_ROOM(ch))) {
-				REMOVE_FROM_LIST(libr, book->in_libraries, next);
+				LL_DELETE(book->in_libraries, libr);
 				free(libr);
 			}
 		}

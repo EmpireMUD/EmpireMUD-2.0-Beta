@@ -464,7 +464,7 @@ void remove_account_from_table(account_data *acct) {
 * @param char_data *ch The player to remove from its account.
 */
 void remove_player_from_account(char_data *ch) {
-	struct account_player *plr, *next_plr, *temp;
+	struct account_player *plr, *next_plr;
 	player_index_data *index;
 	account_data *acct;
 	bool has_players;
@@ -487,7 +487,7 @@ void remove_player_from_account(char_data *ch) {
 			if (plr->name) {
 				free(plr->name);
 			}
-			REMOVE_FROM_LIST(plr, acct->players, next);
+			LL_DELETE(acct->players, plr);
 			free(plr);
 		}
 		else {
@@ -630,7 +630,7 @@ void add_player_to_table(player_index_data *plr) {
 *   top_account_id
 */
 void build_player_index(void) {
-	struct account_player *plr, *next_plr, *temp;
+	struct account_player *plr, *next_plr;
 	account_data *acct, *next_acct;
 	player_index_data *index;
 	bool has_players;
@@ -656,7 +656,7 @@ void build_player_index(void) {
 				// could not load character for this entry
 				if (!ch) {
 					log("SYSERR: Unable to index account player '%s'", plr->name ? plr->name : "???");
-					REMOVE_FROM_LIST(plr, acct->players, next);
+					LL_DELETE(acct->players, plr);
 					if (plr->name) {
 						free(plr->name);
 					}
@@ -3845,7 +3845,7 @@ void delete_player_character(char_data *ch) {
 * @param bool fresh If FALSE, player was already in the game, not logging in fresh.
 */
 void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
-	struct slash_channel *load_slash, *next_slash, *temp;
+	struct slash_channel *load_slash, *next_slash;
 	bool stop_action = FALSE, try_home = FALSE;
 	room_data *load_room = NULL;
 	char_data *ch = d->character, *repl;
@@ -4011,7 +4011,7 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 			do_slash_channel(ch, lbuf, 0, 0);
 		}
 		
-		REMOVE_FROM_LIST(load_slash, LOAD_SLASH_CHANNELS(ch), next);
+		LL_DELETE(LOAD_SLASH_CHANNELS(ch), load_slash);
 		if (load_slash->name) {
 			free(load_slash->name);
 		}
