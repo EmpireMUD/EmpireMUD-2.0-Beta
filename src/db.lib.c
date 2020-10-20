@@ -8815,48 +8815,6 @@ void sort_exits(struct room_direction_data **list) {
 
 
 /**
-* This sorts icons by type, for easier visual analysis in both the editor and
-* the db file. It should not change the relative order of any entries within
-* a type.
-*
-* @param struct icon_data **list The icon set to sort.
-*/
-void sort_icon_set(struct icon_data **list) {
-	struct icon_data *a, *b, *a_next, *b_next;
-	struct icon_data temp;
-	bool changed = TRUE;
-	
-	if (*list && (*list)->next) {
-		while (changed) {
-			changed = FALSE;
-
-			a = *list;
-			while ((b = a->next)) {
-				if (a->type > b->type) {
-					// preserve next-pointers
-					a_next = a->next;
-					b_next = b->next;
-					
-					// swap positions by swapping data
-					temp = *a;
-					*a = *b;
-					*b = temp;
-					
-					// restore next pointers
-					a->next = a_next;
-					b->next = b_next;
-					
-					changed = TRUE;
-				}
-				
-				a = a->next;
-			}
-		}
-	}
-}
-
-
-/**
 * This sorts interactions by type, for easier visual analysis in both
 * the editor and the db file. It should not change the relative order of any
 * entries within a type.

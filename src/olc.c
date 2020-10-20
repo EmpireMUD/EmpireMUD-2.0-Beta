@@ -512,7 +512,6 @@ OLC_MODULE(vedit_speed);
 
 
 // external functions
-void sort_icon_set(struct icon_data **list);
 void sort_interactions(struct interaction_item **list);
 extern int sort_requirements_by_group(struct req_data *a, struct req_data *b);
 extern bool valid_room_template_vnum(rmt_vnum vnum);
@@ -4508,6 +4507,12 @@ bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
 
+// simple sorter for icons
+int sort_icon_set(struct icon_data *a, struct icon_data *b) {
+	return a->type - b->type;
+}
+
+
 /**
 * Pre-checks several requirements for opening a new OLC editor.
 *
@@ -4578,7 +4583,7 @@ struct icon_data *copy_icon_set(struct icon_data *input_list) {
 		LL_APPEND(list, new);
 	}
 	
-	sort_icon_set(&list);
+	LL_SORT(list, sort_icon_set);
 	return list;
 }
 
@@ -6422,7 +6427,7 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 			temp->icon = str_dup(arg4);
 			LL_APPEND(*list, temp);
 
-			sort_icon_set(list);
+			LL_SORT(*list, sort_icon_set);
 			strcpy(lbuf, show_color_codes(arg4));
 			msg_to_char(ch, "You add %s: %s %s%s&0 %s\r\n", icon_types[loc], show_color_codes(arg3), arg3, arg4, lbuf);
 		}
@@ -7941,7 +7946,7 @@ void smart_copy_icons(struct icon_data **addto, struct icon_data *input) {
 		LL_APPEND(*addto, new_icon);
 	}
 	
-	sort_icon_set(addto);
+	LL_SORT(*addto, sort_icon_set);
 }
 
 
