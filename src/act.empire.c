@@ -848,6 +848,19 @@ int sort_einv_list(struct einv_type *a, struct einv_type *b) {
 }
 
 
+// simple sorter for territory nodes
+static room_data *sort_territory_from_loc = NULL;
+int sort_territory_nodes_by_distance(struct find_territory_node *a, struct find_territory_node *b) {
+	if (sort_territory_from_loc) {
+		return compute_distance(sort_territory_from_loc, a->loc) - compute_distance(sort_territory_from_loc, b->loc);
+	}
+	else {
+		// no data?
+		return 0;
+	}
+}
+
+
 /**
 * called by do_empire_inventory to show einv
 *
@@ -2817,16 +2830,6 @@ void show_tavern_status(char_data *ch) {
  //////////////////////////////////////////////////////////////////////////////
 //// TERRITORY HELPERS ///////////////////////////////////////////////////////
 
-// for do_findmaintenance and do_territory
-struct find_territory_node {
-	room_data *loc;
-	char *details;	// optional string with vehicles, etc
-	int count;
-	
-	struct find_territory_node *next;
-};
-
-
 /**
 * @param struct find_territory_node *list The node list to count.
 * @return int The number of elements in the list.
@@ -2903,8 +2906,6 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 * @param char_data *argument The tile to search for.
 */
 void scan_for_tile(char_data *ch, char *argument) {
-	void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list);
-
 	struct find_territory_node *node_list = NULL, *node, *next_node;
 	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
 	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
@@ -3062,7 +3063,8 @@ void scan_for_tile(char_data *ch, char *argument) {
 	}
 
 	if (node_list) {
-		sort_territory_node_list_by_distance(IN_ROOM(ch), &node_list);
+		sort_territory_from_loc = IN_ROOM(ch);
+	    LL_SORT(node_list, sort_territory_nodes_by_distance);
 		
 		size = snprintf(output, sizeof(output), "Nearby tiles matching '%s' within %d tile%s:\r\n", argument, mapsize, PLURAL(mapsize));
 		
@@ -3135,60 +3137,6 @@ void scan_for_tile(char_data *ch, char *argument) {
 	}
 	
 	GET_WAIT_STATE(ch) = 1 RL_SEC;	// short lag for scannings
-}
-
-
-// quick-switch of linked list positions
-inline struct find_territory_node *switch_node_pos(struct find_territory_node *l1, struct find_territory_node *l2) {
-    l1->next = l2->next;
-    l2->next = l1;
-    return l2;
-}
-
-
-/**
-* Sort a territory node list, by distance from a room.
-*
-* @param room_data *from The room to measure from.
-* @param struct find_territory_node **node_list A pointer to the node list to sort.
-*/
-void sort_territory_node_list_by_distance(room_data *from, struct find_territory_node **node_list) {
-	struct find_territory_node *start, *p, *q, *top;
-    bool changed = TRUE;
-        
-    // safety first
-    if (!from) {
-    	return;
-    }
-    
-    start = *node_list;
-
-	CREATE(top, struct find_territory_node, 1);
-
-    top->next = start;
-    if (start && start->next) {
-    	// q is always one item behind p
-
-        while (changed) {
-            changed = FALSE;
-            q = top;
-            p = top->next;
-            while (p->next != NULL) {
-            	if (compute_distance(from, p->loc) > compute_distance(from, p->next->loc)) {
-					q->next = switch_node_pos(p, p->next);
-					changed = TRUE;
-				}
-				
-                q = p;
-                if (p->next) {
-                    p = p->next;
-                }
-            }
-        }
-    }
-    
-    *node_list = top->next;
-    free(top);
 }
 
 

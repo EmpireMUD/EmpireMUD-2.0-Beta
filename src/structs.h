@@ -2904,6 +2904,16 @@ struct file_lookup_struct {
 };
 
 
+// for do_findmaintenance and do_territory
+struct find_territory_node {
+	room_data *loc;
+	char *details;	// optional string with vehicles, etc
+	int count;
+	
+	struct find_territory_node *next;
+};
+
+
 // for do_gen_interact_room, act.actions.c
 struct gen_interact_data_t {
 	int interact;	// INTERACT_ type
