@@ -5057,6 +5057,38 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "max_citizens")) {
 						snprintf(str, slen, "%d", GET_BUILDING(HOME_ROOM(r)) ? GET_BLD_CITIZENS(GET_BUILDING(HOME_ROOM(r))) : 0);
 					}
+					else if (!str_cmp(field, "moon_phase")) {
+						char arg1[256], arg2[256];
+						generic_data *moon;
+						comma_args(subfield, arg1, arg2);	// optional 2nd arg for long phase names
+						
+						if (!subfield || !*arg1) {
+							strcpy(str, "");
+						}
+						else if ((isdigit(*arg1) && (moon = real_generic(atoi(arg1))) && GEN_TYPE(moon) == GENERIC_MOON) || (moon = find_generic_by_name(GENERIC_MOON, arg1, FALSE))) {
+							if (*arg2 && (!str_cmp(arg2, "l") || !str_cmp(arg2, "long"))) {
+								snprintf(str, slen, "%s", moon_phases_long[get_moon_phase(GET_MOON_CYCLE_DAYS(moon))]);
+							}
+							else {
+								snprintf(str, slen, "%s", moon_phases[get_moon_phase(GET_MOON_CYCLE_DAYS(moon))]);
+							}
+						}
+						else {	// unknown moon
+							strcpy(str, "");
+						}
+					}
+					else if (!str_cmp(field, "moon_pos")) {
+						generic_data *moon;
+						if (!subfield || !*subfield) {
+							strcpy(str, "");
+						}
+						else if ((isdigit(*subfield) && (moon = real_generic(atoi(subfield))) && GEN_TYPE(moon) == GENERIC_MOON) || (moon = find_generic_by_name(GENERIC_MOON, subfield, FALSE))) {
+							snprintf(str, slen, "%s", moon_positions[get_moon_position(get_moon_phase(GET_MOON_CYCLE_DAYS(moon)), time_info.hours)]);
+						}
+						else {	// unknown moon
+							strcpy(str, "");
+						}
+					}
 					break;
 				}
 				case 'n': {	// room.n*
