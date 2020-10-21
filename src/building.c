@@ -776,7 +776,7 @@ craft_data *find_upgrade_craft_for(char_data *ch, bld_vnum for_bld, veh_vnum for
 * @param char_data *ch the builder (pc or npc)
 * @param room_data *room the location
 */
-void finish_building(char_data *ch, room_data *room) {	
+void finish_building(char_data *ch, room_data *room) {
 	craft_data *type = find_building_list_entry(room, FIND_BUILD_NORMAL);
 	char_data *c = NULL;
 	empire_data *emp = ROOM_OWNER(room);

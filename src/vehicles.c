@@ -37,6 +37,9 @@
 *   Edit Modules
 */
 
+// external vars
+extern struct empire_chore_type chore_data[NUM_CHORES];
+
 // local data
 const char *default_vehicle_keywords = "vehicle unnamed";
 const char *default_vehicle_short_desc = "an unnamed vehicle";
@@ -44,10 +47,7 @@ const char *default_vehicle_long_desc = "An unnamed vehicle is parked here.";
 
 // local protos
 void clear_vehicle(vehicle_data *veh);
-void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
-
-// external funcs
-void free_custom_messages(struct custom_message *mes);
+void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -311,8 +311,6 @@ vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum inte
 * @param vehicle_data *veh The vehicle being dismantled.
 */
 void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
-	extern struct empire_chore_type chore_data[NUM_CHORES];
-	
 	obj_data *newobj, *proto;
 	craft_data *type;
 	char_data *iter;
@@ -1397,8 +1395,6 @@ void complete_vehicle(vehicle_data *veh) {
 * @param FILE *fl The file open for writing.
 */
 void Crash_save_vehicles(vehicle_data *veh, FILE *fl) {
-	void store_one_vehicle_to_file(vehicle_data *veh, FILE *fl);
-	
 	// store next first so the order is right on reboot
 	if (veh && veh->next_in_room) {
 		Crash_save_vehicles(veh->next_in_room, fl);
@@ -2854,9 +2850,6 @@ vehicle_data *create_vehicle_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_vehicle(char_data *ch, any_vnum vnum) {
-	extern bool delete_bld_relation_by_vnum(struct bld_relation **list, int type, bld_vnum vnum);
-	void extract_pending_vehicles();
-	
 	struct obj_storage_type *store, *next_store;
 	vehicle_data *veh, *iter, *next_iter;
 	craft_data *craft, *next_craft;
@@ -3534,8 +3527,6 @@ vehicle_data *setup_olc_vehicle(vehicle_data *input) {
 * @param vehicle_data *veh The vehicle to display.
 */
 void do_stat_vehicle(char_data *ch, vehicle_data *veh) {
-	void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
-	
 	char buf[MAX_STRING_LENGTH * 2], part[MAX_STRING_LENGTH];
 	struct room_extra_data *red, *next_red;
 	struct custom_message *custm;
@@ -4096,7 +4087,6 @@ OLC_MODULE(vedit_movetype) {
 
 
 OLC_MODULE(vedit_relations) {
-	void olc_process_relations(char_data *ch, char *argument, struct bld_relation **list);
 	vehicle_data *veh = GET_OLC_VEHICLE(ch->desc);
 	olc_process_relations(ch, argument, &VEH_RELATIONS(veh));
 }

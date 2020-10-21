@@ -40,9 +40,6 @@ const char *default_social_command = "social";
 const char *default_social_name = "Unnamed Social";
 const int default_social_position = POS_RESTING;
 
-// external funcs
-void get_requirement_display(struct req_data *list, char *save_buffer);
-
 
  //////////////////////////////////////////////////////////////////////////////
 //// HELPERS /////////////////////////////////////////////////////////////////
@@ -84,7 +81,6 @@ void process_soc_msg_field(char_data *ch, char *argument, int msg) {
 * @return bool TRUE if the character can do it, FALSE if not.
 */
 bool validate_social_requirements(char_data *ch, social_data *soc) {
-	extern bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance);
 	return meets_requirements(ch, SOC_REQUIREMENTS(soc), NULL);
 }
 
@@ -451,8 +447,6 @@ void write_socials_index(FILE *fl) {
 * @param social_data *soc The thing to save.
 */
 void write_social_to_file(FILE *fl, social_data *soc) {
-	void write_requirements_to_file(FILE *fl, char letter, struct req_data *list);
-	
 	char temp[256];
 	int iter;
 	
@@ -789,8 +783,6 @@ OLC_MODULE(socedit_name) {
 
 
 OLC_MODULE(socedit_requirements) {
-	void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
-	
 	social_data *soc = GET_OLC_SOCIAL(ch->desc);
 	olc_process_requirements(ch, argument, &SOC_REQUIREMENTS(soc), "requirements", FALSE);
 }

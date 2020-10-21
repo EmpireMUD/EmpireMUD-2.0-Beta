@@ -21,20 +21,20 @@
 #include "db.h"
 #include "skills.h"
 
+// local prototypes
+void another_hour(int mode);
+void weather_change();
+
 
 void weather_and_time(int mode) {
-	void another_hour(int mode);
-	void weather_change();
-
 	another_hour(mode);
-	if (mode)
+	if (mode) {
 		weather_change();
+	}
 }
 
 
 void another_hour(int mode) {
-	void process_shipping();
-
 	descriptor_data *d;
 	long lny;
 

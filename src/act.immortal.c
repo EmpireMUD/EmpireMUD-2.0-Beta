@@ -7723,7 +7723,6 @@ ACMD(do_clearabilities) {
 
 
 ACMD(do_date) {
-	extern time_t boot_time;
 	char *tmstr;
 	time_t mytime;
 	int d, h, m;

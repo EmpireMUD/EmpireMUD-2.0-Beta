@@ -51,14 +51,11 @@
 *   Converter Utils
 */
 
-// external funcs
-void remove_companion_mod(struct companion_data **companion, int type);
-
-// locals
-#define WHITESPACE " \t"	// used by some of the string functions
-bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
+// local prototypes
 void score_empires();
 void unmark_items_for_char(char_data *ch, bool ground);
+
+#define WHITESPACE " \t"	// used by some of the string functions
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -195,8 +192,6 @@ int count_bits(bitvector_t bitset) {
 
 /* simulates dice roll */
 int dice(int number, int size) {
-	unsigned long empire_random();
-
 	int sum = 0;
 
 	if (size <= 0 || number <= 0)
@@ -289,8 +284,6 @@ int num_earned_bonus_traits(char_data *ch) {
 
 /* creates a random number in interval [from;to] */
 int number(int from, int to) {
-	unsigned long empire_random();
-
 	// shortcut -paul 12/9/2014
 	if (from == to) {
 		return from;
@@ -408,10 +401,6 @@ void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_fla
 * Checks players and empires for delayed-refresh commands.
 */
 void run_delayed_refresh(void) {
-	void complete_goal(empire_data *emp, struct empire_goal *goal);
-	extern int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island);
-	extern struct char_delayed_update *char_delayed_update_list;
-	
 	struct char_delayed_update *cdu, *next_cdu;
 	
 	// player portion
@@ -590,8 +579,6 @@ static inline void add_scemp(struct scemp_type **list, int value) {
 * empire list.
 */
 void score_empires(void) {
-	extern double empire_score_average[NUM_SCORES];
-	
 	struct scemp_type *scemp, *next_scemp, *lists[NUM_SCORES];
 	int iter, pos, median, num_emps = 0;
 	struct empire_storage_data *store, *next_store;
@@ -5532,8 +5519,6 @@ room_data *get_map_location_for(room_data *room) {
 * @return room_data* The location of a place to start.
 */
 room_data *find_load_room(char_data *ch) {
-	extern room_data *find_starting_location();
-	
 	struct empire_territory_data *ter, *next_ter;
 	room_data *rl, *rl_last_room, *found, *map;
 	int num_found = 0;

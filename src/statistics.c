@@ -29,7 +29,7 @@
 */
 
 // config
-int rescan_world_after = 5 * SECS_PER_REAL_MIN;
+#define RESCAN_WORLD_AFTER  (5 * SECS_PER_REAL_MIN)
 
 
 // stats data
@@ -39,6 +39,7 @@ struct stats_data_struct {
 	
 	UT_hash_handle hh;	// hashable
 };
+
 
 // stats globals
 struct stats_data_struct *global_sector_count = NULL;	// hash table of sector counts
@@ -66,8 +67,6 @@ int max_players_this_uptime = 0;
 * @param char_data *ch The person to show stats to.
 */
 void display_statistics_to_char(char_data *ch) {
-	extern time_t boot_time;
-
 	char populous_str[MAX_STRING_LENGTH], wealthiest_str[MAX_STRING_LENGTH], famous_str[MAX_STRING_LENGTH], greatest_str[MAX_STRING_LENGTH];
 	int populous_empire = NOTHING, wealthiest_empire = NOTHING, famous_empire = NOTHING, greatest_empire = NOTHING;
 	int num_populous = 0, num_wealthy = 0, num_famous = 0, num_great = 0;
@@ -212,8 +211,6 @@ void display_statistics_to_char(char_data *ch) {
 * @param char *argument In case some stats have sub-categories.
 */
 void mudstats_empires(char_data *ch, char *argument) {
-	extern double empire_score_average[NUM_SCORES];
-	
 	int iter;
 	
 	msg_to_char(ch, "Empire score medians:\r\n");
@@ -240,7 +237,7 @@ int stats_get_building_count(bld_data *bdg) {
 		return 0;
 	}
 	
-	if (HASH_COUNT(global_building_count) != global_building_size || last_world_count + rescan_world_after < time(0)) {
+	if (HASH_COUNT(global_building_count) != global_building_size || last_world_count + RESCAN_WORLD_AFTER < time(0)) {
 		update_world_count();
 	}
 	
@@ -262,7 +259,7 @@ int stats_get_crop_count(crop_data *cp) {
 		return 0;
 	}
 	
-	if (HASH_COUNT(global_crop_count) != global_crop_size || last_world_count + rescan_world_after < time(0)) {
+	if (HASH_COUNT(global_crop_count) != global_crop_size || last_world_count + RESCAN_WORLD_AFTER < time(0)) {
 		update_world_count();
 	}
 	
@@ -285,7 +282,7 @@ int stats_get_sector_count(sector_data *sect) {
 		return 0;
 	}
 	
-	if (HASH_COUNT(global_sector_count) != global_sector_size || last_world_count + rescan_world_after < time(0)) {
+	if (HASH_COUNT(global_sector_count) != global_sector_size || last_world_count + RESCAN_WORLD_AFTER < time(0)) {
 		update_world_count();
 	}
 	
@@ -306,8 +303,6 @@ int stats_get_sector_count(sector_data *sect) {
 *  active_accounts_week (at least one character this week)
 */
 void update_account_stats(void) {
-	extern bool member_is_timed_out_index(player_index_data *index);
-
 	// helper type
 	struct uniq_acct_t {
 		int id;	// either account id (positive) or player idnum (negative)
@@ -321,7 +316,7 @@ void update_account_stats(void) {
 	int id;
 	
 	// rate-limit this, as it scans the whole playerfile
-	if (last_account_count + rescan_world_after > time(0)) {
+	if (last_account_count + RESCAN_WORLD_AFTER > time(0)) {
 		return;
 	}
 	

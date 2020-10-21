@@ -2250,7 +2250,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				return;
 			}
 			else if (!str_cmp(var, "startloc")) {
-				extern room_data *find_starting_location();
 				room_data *sloc = find_starting_location();
 				snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(sloc) + ROOM_ID_BASE);
 				return;
@@ -5876,19 +5875,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
 								if (!empire_has_completed_goal(e, vnum) && !get_current_goal(e, vnum) && empire_meets_goal_prereqs(e, prg)) {
-									extern struct empire_goal *start_empire_goal(empire_data *e, progress_data *prg);
-									
 									struct empire_goal *goal = start_empire_goal(e, prg);
 									int complete, total;
 									
 									if (goal) {
-										void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
 										refresh_one_goal_tracker(e, goal);
 									}
 									// check if complete
 									count_quest_tasks(goal->tracker, &complete, &total);
 									if (complete == total) {
-										void complete_goal(empire_data *emp, struct empire_goal *goal);
 										complete_goal(e, goal);
 									}
 								}

@@ -58,7 +58,6 @@ void check_abilities();
 void check_and_link_faction_relations();
 void check_archetypes();
 void check_classes();
-void check_for_bad_buildings();
 void check_for_bad_sectors();
 void check_for_new_map();
 void check_learned_empire_crafts();
@@ -92,7 +91,6 @@ void load_slash_channels();
 void load_tips_of_the_day();
 void load_trading_post();
 void load_world_map_from_file();
-void read_ability_requirements();
 void renum_world();
 void run_reboot_triggers();
 void schedule_map_unloads();
@@ -155,6 +153,7 @@ empire_data *empire_table = NULL;	// hash table of empires
 double empire_score_average[NUM_SCORES];
 struct trading_post_data *trading_list = NULL;	// global DLL of trading post stuff
 bool check_empire_refresh = FALSE;	// triggers empire refreshes
+struct empire_territory_data *global_next_territory_entry = NULL;	// for territory iteration
 
 // events
 event_data *event_table = NULL;	// global hash table (hh)

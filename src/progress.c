@@ -40,15 +40,8 @@
 // local data
 const char *default_progress_name = "Unnamed Goal";
 
-// external funcs
-void get_requirement_display(struct req_data *list, char *save_buffer);
-void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
-
 // local funcs
 void apply_progress_to_empire(empire_data *emp, progress_data *prg, bool add);
-void complete_goal(empire_data *emp, struct empire_goal *goal);
-void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
-struct empire_goal *start_empire_goal(empire_data *emp, progress_data *prg);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2127,8 +2120,6 @@ void write_progress_index(FILE *fl) {
 * @param progress_data *prg The thing to save.
 */
 void write_progress_to_file(FILE *fl, progress_data *prg) {
-	void write_requirements_to_file(FILE *fl, char letter, struct req_data *list);
-	
 	char temp[MAX_STRING_LENGTH];
 	struct progress_perk *perk;
 	struct progress_list *pl;

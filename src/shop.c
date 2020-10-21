@@ -39,11 +39,6 @@
 // local data
 const char *default_shop_name = "Unnamed Shop";
 
-// external funcs
-extern struct quest_giver *copy_quest_givers(struct quest_giver *from);
-void free_quest_givers(struct quest_giver *list);
-void get_quest_giver_display(struct quest_giver *list, char *save_buffer);
-
 // local funcs
 void add_shop_lookup(struct shop_lookup **list, shop_data *shop);
 bool remove_shop_lookup(struct shop_lookup **list, shop_data *shop);
@@ -724,8 +719,6 @@ void free_shop(shop_data *shop) {
 * @param any_vnum vnum The shop vnum
 */
 void parse_shop(FILE *fl, any_vnum vnum) {
-	void parse_quest_giver(FILE *fl, struct quest_giver **list, char *error_str);
-	
 	char line[256], error[256], str_in[256];
 	struct shop_item *item;
 	shop_data *shop, *find;
@@ -842,8 +835,6 @@ void write_shop_index(FILE *fl) {
 * @param shop_data *shop The thing to save.
 */
 void write_shop_to_file(FILE *fl, shop_data *shop) {
-	void write_quest_givers_to_file(FILE *fl, char letter, struct quest_giver *list);
-	
 	struct shop_item *item;
 	char temp[256];
 	
@@ -1489,8 +1480,6 @@ OLC_MODULE(shopedit_items) {
 
 
 OLC_MODULE(shopedit_locations) {
-	void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_giver **list, char *command);
-	
 	shop_data *shop = GET_OLC_SHOP(ch->desc);
 	qedit_process_quest_givers(ch, argument, &SHOP_LOCATIONS(shop), "locations");
 }

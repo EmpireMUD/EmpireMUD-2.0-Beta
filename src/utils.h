@@ -1622,6 +1622,9 @@ extern struct weather_data weather_info;	// db.c
  //////////////////////////////////////////////////////////////////////////////
 //// UTIL FUNCTION PROTOS ////////////////////////////////////////////////////
 
+// used by workforce.c to validate crafts
+#define CHORE_GEN_CRAFT_VALIDATOR(name)  bool (name)(empire_data *emp, room_data *room, vehicle_data *veh, int chore, craft_data *craft)
+
 /**
 * Validates a location for the pathfinding system.
 *
@@ -1769,6 +1772,7 @@ void command_lag(char_data *ch, int wait_type);
 void despawn_charmies(char_data *ch, any_vnum only_vnum);
 void determine_gear_level(char_data *ch);
 room_data *find_load_room(char_data *ch);
+room_data *find_starting_location();
 bool has_one_day_playtime(char_data *ch);
 int num_earned_bonus_traits(char_data *ch);
 int pick_level_from_range(int level, int min, int max);
@@ -1863,11 +1867,16 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 // abilities.c
 void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
 void add_ability_gain_hook(char_data *ch, ability_data *abil);
+void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
+void apply_one_passive_buff(char_data *ch, ability_data *abil);
 bool check_ability(char_data *ch, char *string, bool exact);
+ability_data *find_ability_on_skill(char *name, skill_data *skill);
 ability_data *find_player_ability_by_tech(char_data *ch, int ptech);
 int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
+bool is_class_ability(ability_data *abil);
 char_data *load_companion_mob(char_data *master, struct companion_data *cd);
 void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
+void read_ability_requirements();
 void refresh_passive_buffs(char_data *ch);
 void remove_passive_buff(char_data *ch, struct affected_type *aff);
 void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
@@ -1914,6 +1923,7 @@ void summon_materials(char_data *ch, char *argument);
 // act.immortal.c
 void perform_autostore(obj_data *obj, empire_data *emp, int island);
 void perform_immort_vis(char_data *ch);
+void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
 
 // act.informative.c
 void diag_char_to_char(char_data *i, char_data *ch);
@@ -1938,6 +1948,9 @@ int find_free_shipping_id(empire_data *emp);
 obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 bool get_check_money(char_data *ch, obj_data *obj);
 int obj_carry_size(obj_data *obj);
+void process_shipping();
+void remove_armor_by_type(char_data *ch, int armor_type);
+void remove_honed_gear(char_data *ch);
 void sail_shipment(empire_data *emp, vehicle_data *boat);
 void scale_item_to_level(obj_data *obj, int level);
 bool ship_is_empty(vehicle_data *ship);
@@ -1996,6 +2009,7 @@ bool valid_unseen_passing(room_data *room);
 bool valid_no_trace(room_data *room);
 
 // act.trade.c
+void cancel_gen_craft(char_data *ch);
 bool check_can_craft(char_data *ch, craft_data *type);
 bool find_and_bind(char_data *ch, obj_vnum vnum);
 int get_craft_scale_level(char_data *ch, craft_data *craft);
@@ -2009,6 +2023,7 @@ bool check_blood_fortitude(char_data *ch, bool can_gain_skill);
 void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 bool check_vampire_sun(char_data *ch, bool message);
 void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
+void retract_claws(char_data *ch);
 void sire_char(char_data *ch, char_data *victim);
 void start_drinking_blood(char_data *ch, char_data *victim);
 bool starving_vampire_aggro(char_data *ch);
@@ -2050,19 +2065,24 @@ struct resource_data *combine_resources(struct resource_data *combine_a, struct 
 void complete_building(room_data *room);
 void do_customize_room(char_data *ch, char *argument);
 craft_data *find_building_list_entry(room_data *room, byte type);
+void finish_building(char_data *ch, room_data *room);
+void finish_dismantle(char_data *ch, room_data *room);
 void finish_maintenance(char_data *ch, room_data *room);
 void herd_animals_out(room_data *location);
 bool is_entrance(room_data *room);
 void process_build(char_data *ch, room_data *room, int act_type);
 void process_dismantling(char_data *ch, room_data *room);
+void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component);
 void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 void special_building_setup(char_data *ch, room_data *room);
 void special_vehicle_setup(char_data *ch, vehicle_data *veh);
+void start_dismantle_building(room_data *loc);
 
 // dg_wldcmd.c
 int get_room_scale_level(room_data *room, char_data *targ);
 
 // eedit.c
+bool check_banner_color_string(char *str);
 bool check_unique_empire_name(empire_data *for_emp, char *name);
 bool valid_rank_name(char_data *ch, char *newname);
 
@@ -2141,6 +2161,7 @@ void gain_condition(char_data *ch, int condition, int value);
 int health_gain(char_data *ch, bool info_only);
 int mana_gain(char_data *ch, bool info_only);
 int move_gain(char_data *ch, bool info_only);
+void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs);
 
 // mapview.c
 bool adjacent_room_is_light(room_data *room);
@@ -2219,7 +2240,9 @@ progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name);
 void full_reset_empire_progress(empire_data *only_emp);
 void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
 void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
+void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
 void remove_completed_goal(empire_data *emp, any_vnum vnum);
+struct empire_goal *start_empire_goal(empire_data *e, progress_data *prg);
 
 // quest.c
 bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
@@ -2293,6 +2316,9 @@ void qt_visit_room(char_data *ch, room_data *room);
 void qt_wear_obj(char_data *ch, obj_data *obj);
 
 // progress.c
+void complete_goal(empire_data *emp, struct empire_goal *goal);
+int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island);
+
 void et_change_cities(empire_data *emp);
 void et_change_coins(empire_data *emp, int amount);
 void et_change_diplomacy(empire_data *emp);
@@ -2306,6 +2332,9 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total);
 void et_lose_building(empire_data *emp, any_vnum vnum);
 void et_lose_tile_sector(empire_data *emp, sector_vnum vnum);
 void et_lose_vehicle(empire_data *emp, vehicle_data *veh);
+
+// random.c
+unsigned long empire_random();
 
 // shop.c
 struct shop_temp_list *build_available_shop_list(char_data *ch);
@@ -2330,6 +2359,7 @@ void check_vehicle_climate_change(room_data *room);
 void complete_vehicle(vehicle_data *veh);
 int count_harnessed_animals(vehicle_data *veh);
 int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
+int count_building_vehicles_in_room(room_data *room, empire_data *only_owner);
 void Crash_save_vehicles(vehicle_data *veh, FILE *fl);
 void delete_vehicle_interior(vehicle_data *veh);
 void empty_vehicle(vehicle_data *veh, room_data *to_room);
@@ -2337,6 +2367,7 @@ craft_data *find_craft_for_vehicle(vehicle_data *veh);
 vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id);
 struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
 vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum interior_room);
+void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
 void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
 int get_new_vehicle_construction_id();
 room_data *get_vehicle_interior(vehicle_data *veh);

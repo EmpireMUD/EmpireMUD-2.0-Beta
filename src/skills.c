@@ -40,14 +40,13 @@
 *   Edit Modules
 */
 
+// external variables
+extern int master_ability_levels[];
+
 // local data
 const char *default_skill_name = "Unnamed Skill";
 const char *default_skill_abbrev = "???";
 const char *default_skill_desc = "New skill";
-
-// eternal functions
-void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
-extern bool is_class_ability(ability_data *abil);
 
 // local protos
 bool can_gain_skill_from(char_data *ch, ability_data *abil);
@@ -70,10 +69,6 @@ int sort_synergies(struct synergy_ability *a, struct synergy_ability *b);
 * @param ability_data *abil The ability to sell
 */
 void check_skill_sell(char_data *ch, ability_data *abil) {
-	void remove_armor_by_type(char_data *ch, int armor_type);
-	void remove_honed_gear(char_data *ch);
-	void retract_claws(char_data *ch);
-	
 	struct ability_data_list *adl;
 	char_data *mob, *next_mob;
 	obj_data *obj;
@@ -466,8 +461,6 @@ char *ability_color(char_data *ch, ability_data *abil) {
 * @param bool reset_levels If TRUE, wipes out the number of levels gained from the ability.
 */
 void add_ability_by_set(char_data *ch, ability_data *abil, int skill_set, bool reset_levels) {
-	void apply_one_passive_buff(char_data *ch, ability_data *abil);
-	
 	struct player_ability_data *data = get_ability_data(ch, ABIL_VNUM(abil), TRUE);
 	
 	if (skill_set < 0 || skill_set >= NUM_SKILL_SETS) {
@@ -1100,8 +1093,6 @@ int get_approximate_level(char_data *ch) {
 * @return int how many abilities are available by that level
 */
 int get_ability_points_available(any_vnum skill, int level) {
-	extern int master_ability_levels[];
-	
 	int iter, count;
 	
 	count = 0;
@@ -3254,9 +3245,6 @@ skill_data *create_skill_table_entry(any_vnum vnum) {
 * @param any_vnum vnum The vnum to delete.
 */
 void olc_delete_skill(char_data *ch, any_vnum vnum) {
-	extern bool remove_vnum_from_class_skill_reqs(struct class_skill_req **list, any_vnum vnum);
-	extern bool remove_skill_from_synergy_abilities(struct synergy_ability **list, any_vnum skill_vnum);
-	
 	struct player_skill_data *plsk, *next_plsk;
 	struct archetype_skill *arsk, *next_arsk;
 	archetype_data *arch, *next_arch;
@@ -3463,8 +3451,6 @@ void olc_delete_skill(char_data *ch, any_vnum vnum) {
 * @param descriptor_data *desc The descriptor who is saving.
 */
 void save_olc_skill(descriptor_data *desc) {
-	void read_ability_requirements();
-	
 	skill_data *proto, *skill = GET_OLC_SKILL(desc);
 	any_vnum vnum = GET_OLC_VNUM(desc);
 	UT_hash_handle hh, sorted;
@@ -4183,8 +4169,6 @@ OLC_MODULE(skilledit_synergy) {
 
 
 OLC_MODULE(skilledit_tree) {
-	extern ability_data *find_ability_on_skill(char *name, skill_data *skill);
-
 	skill_data *skill = GET_OLC_SKILL(ch->desc);
 	char cmd_arg[MAX_INPUT_LENGTH], abil_arg[MAX_INPUT_LENGTH], sub_arg[MAX_INPUT_LENGTH], req_arg[MAX_INPUT_LENGTH];
 	struct skill_ability *skab, *next_skab, *change;

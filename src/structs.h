@@ -3026,7 +3026,7 @@ struct index_data {
 	int number;	// number of existing units of this mob/obj
 
 	char *farg;	// string argument for special function
-	struct trig_data *proto;	// for triggers... the trigger
+	trig_data *proto;	// for triggers... the trigger
 };
 
 
@@ -4019,7 +4019,7 @@ struct descriptor_data {
 	shop_data *olc_shop;	// shop being edited
 	social_data *olc_social;	// social being edited
 	skill_data *olc_skill;	// skill being edited
-	struct trig_data *olc_trigger;	// trigger being edited
+	trig_data *olc_trigger;	// trigger being edited
 	vehicle_data *olc_vehicle;	// vehicle being edited
 	
 	// linked list

@@ -40,7 +40,6 @@
 // cancel protos
 void cancel_resource_list(char_data *ch);
 void cancel_driving(char_data *ch);
-void cancel_gen_craft(char_data *ch);
 void cancel_minting(char_data *ch);
 void cancel_morphing(char_data *ch);
 void cancel_movement_string(char_data *ch);

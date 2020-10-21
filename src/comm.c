@@ -77,7 +77,6 @@ void check_newbie_islands();
 void check_wars();
 void chore_update();
 void display_automessages();
-void extract_pending_vehicles();
 void frequent_combat(int pulse);
 void point_update();
 void process_import_evolutions();
