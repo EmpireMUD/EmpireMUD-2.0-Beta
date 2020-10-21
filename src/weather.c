@@ -357,7 +357,7 @@ moon_phase_t get_moon_phase(double cycle_days) {
 		cycle_time = 0.0;
 	}
 	
-	phase = round(NUM_PHASES * cycle_time);
+	phase = round((NUM_PHASES-1.0) * cycle_time);
 	phase = MAX(0, MIN(NUM_PHASES-1, phase));
 	return (moon_phase_t)phase;
 }
