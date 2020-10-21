@@ -5215,6 +5215,29 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							*str = '\0';
 						}
 					}
+					else if (!str_cmp(field, "time")) {
+						struct time_info_data *tinfo = local_time_info(r, NULL);
+						
+						if (!subfield || !str_cmp(subfield, "hour")) {
+							// defaults to hour
+							snprintf(str, slen, "%d", tinfo->hours);
+						}
+						else if (!str_cmp(subfield, "day")) {
+							snprintf(str, slen, "%d", tinfo->day + 1);
+						}
+						else if (!str_cmp(subfield, "month")) {
+							snprintf(str, slen, "%d", tinfo->month + 1);
+						}
+						else if (!str_cmp(subfield, "year")) {
+							snprintf(str, slen, "%d", tinfo->year);
+						}
+						else if (!str_cmp(subfield, "day_of_year")) {
+							snprintf(str, slen, "%d", (tinfo->month * 30) + tinfo->day + 1);
+						}
+						else {
+							*str = '\0';
+						}
+					}
 					else if (!str_cmp(field, "title")) {
 						snprintf(str, slen, "%s", get_room_name(r, FALSE));
 					}

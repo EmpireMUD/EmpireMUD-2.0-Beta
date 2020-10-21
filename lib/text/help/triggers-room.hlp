@@ -204,6 +204,7 @@ When using field - The variable returns:
 &csector_flagged(FLG)&0 - True if a given sector flag is present.
 &csector_vnum&0 - The sector vnum of the room.
 &ctemplate&0 - The room template vnum, if any.
+&ctime(field)&0 - Time at this room. Fields: hour, day, month, year, day_of_year.
 &ctitle&0 - The room's title (shown on 'look').
 &cvehicles&0 - The id of the first vehicle in the room, if any
    (then %veh.next_in_room%).
