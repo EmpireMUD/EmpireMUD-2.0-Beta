@@ -2228,11 +2228,11 @@ const int moon_phase_brightness[NUM_PHASES] = {
 // MOON_POS_x: moon position in the sky	-- shown as "<moon name> is <moon_phases_long> <moon_positions>."
 const char *moon_positions[] = {
 	"down",
-	"rising in the east",
+	"low in the east",
 	"high in the east",
 	"overhead",
 	"high in the west",
-	"setting in the west",
+	"low in the west",
 	"\n"
 };
 
