@@ -5170,7 +5170,7 @@ SHOW(show_moons) {
 		
 		// ok: show it
 		++count;
-		msg_to_char(ch, "[%5d] %s: %s, %s (%.2f day%s)\r\n", GEN_VNUM(moon), GEN_NAME(moon), moon_phases[phase], moon_positions[pos], GET_MOON_CYCLE_DAYS(moon), PLURAL(GET_MOON_CYCLE_DAYS(moon)));
+		msg_to_char(ch, "[%5d] %s: %s, %s (%.2f day%s)%s\r\n", GEN_VNUM(moon), GEN_NAME(moon), moon_phases[phase], moon_positions[pos], GET_MOON_CYCLE_DAYS(moon), PLURAL(GET_MOON_CYCLE_DAYS(moon)), GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT) ? " (in-development)" : "");
 	}
 	
 	if (!count) {

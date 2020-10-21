@@ -3068,6 +3068,7 @@ OLC_MODULE(olc_removeindev) {
 	event_data *event, *next_event;
 	progress_data *prg, *next_prg;
 	faction_data *fct, *next_fct;
+	generic_data *gen, *next_gen;
 	social_data *soc, *next_soc;
 	augment_data *aug, *next_aug;
 	shop_data *shop, *next_shop;
@@ -3190,6 +3191,23 @@ OLC_MODULE(olc_removeindev) {
 			REMOVE_BIT(FCT_FLAGS(fct), FCT_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_FCT, FCT_VNUM(fct));
 			msg_to_char(ch, "Removed IN-DEV flag from faction [%d] %s.\r\n", FCT_VNUM(fct), FCT_NAME(fct));
+			any = TRUE;
+		}
+		
+		HASH_ITER(hh, generic_table, gen, next_gen) {
+			if (GEN_VNUM(gen) < from || GEN_VNUM(gen) > to) {
+				continue;
+			}
+			if (!IS_SET(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_GENERIC, GEN_VNUM(gen))) {
+				continue;
+			}
+			
+			REMOVE_BIT(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_GEN, GEN_VNUM(gen));
+			msg_to_char(ch, "Removed IN-DEV flag from generic [%d] %s.\r\n", GEN_VNUM(gen), GEN_NAME(gen));
 			any = TRUE;
 		}
 		

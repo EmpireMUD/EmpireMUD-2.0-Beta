@@ -237,6 +237,10 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 		olc_audit_msg(ch, GEN_VNUM(gen), "No name set");
 		problem = TRUE;
 	}
+	if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+		olc_audit_msg(ch, GEN_VNUM(gen), "IN-DEVELOPMENT");
+		problem = TRUE;
+	}
 	
 	// GENERIC_x: auditing by type
 	switch (GEN_TYPE(gen)) {
@@ -1729,7 +1733,15 @@ int vnum_generic(char *searchname, char_data *ch) {
 
 OLC_MODULE(genedit_flags) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	bool had_in_dev = GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT) ? TRUE : FALSE;
+	
 	GEN_FLAGS(gen) = olc_process_flag(ch, argument, "generic", "flags", generic_flags, GEN_FLAGS(gen));
+	
+	// validate removal of GEN_IN_DEVELOPMENT
+	if (had_in_dev && !GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT) && GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !OLC_FLAGGED(ch, OLC_FLAG_CLEAR_IN_DEV)) {
+		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
+		SET_BIT(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT);
+	}
 }
 
 
@@ -1777,6 +1789,15 @@ OLC_MODULE(genedit_type) {
 				}
 				break;
 			}
+		}
+		
+		if (generic_types_uses_in_dev[GEN_TYPE(gen)]) {
+			SET_BIT(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT);
+			msg_to_char(ch, "Added IN-DEVELOPMENT flag because you changed it to a %s.\r\n", generic_types[GEN_TYPE(gen)]);
+		}
+		else if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+			REMOVE_BIT(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT);
+			msg_to_char(ch, "Removed IN-DEVELOPMENT flag because you changed it to a %s.\r\n", generic_types[GEN_TYPE(gen)]);
 		}
 	}
 }

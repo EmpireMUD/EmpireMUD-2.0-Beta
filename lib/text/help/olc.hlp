@@ -6140,6 +6140,7 @@ The following types will have IN-DEVELOPMENT flags removed in the vnum range:
 - classes
 - crafts
 - factions
+- generics (moon)
 - globals
 - morphs
 - progress goals

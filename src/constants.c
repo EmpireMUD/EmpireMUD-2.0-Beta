@@ -2049,7 +2049,7 @@ const struct faction_reputation_type reputation_levels[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// GENERIC CONSTANTS ///////////////////////////////////////////////////////
 
-// GENERIC_x: generic types
+// GENERIC_x (1/2): generic types
 const char *generic_types[] = {
 	"UNKNOWN",	// 0
 	"LIQUID",
@@ -2063,9 +2063,23 @@ const char *generic_types[] = {
 };
 
 
+// GENERIC_x (2/2): generic types that are affected by in-development
+const bool generic_types_uses_in_dev[] = {
+	FALSE,	// UNKNOWN	// 0
+	FALSE,	// LIQUID
+	FALSE,	// ACTION
+	FALSE,	// COOLDOWN
+	FALSE,	// AFFECT
+	FALSE,	// CURRENCY	// 5
+	FALSE,	// COMPONENT
+	TRUE,	// MOON
+};
+
+
 // GEN_x: generic flags
 const char *generic_flags[] = {
 	"BASIC",	// 0
+	"IN-DEVELOPMENT",
 	"\n"
 };
 

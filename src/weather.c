@@ -425,7 +425,7 @@ int compute_night_light_radius(void) {
 	int max_light_radius_base = config_get_int("max_light_radius_base");
 	
 	HASH_ITER(hh, generic_table, moon, next_gen) {
-		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1) {
+		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1 || GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT)) {
 			continue;	// not a moon or invalid cycle
 		}
 		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
@@ -467,7 +467,7 @@ void show_visible_moons(char_data *ch) {
 	moon_pos_t pos;
 	
 	HASH_ITER(hh, generic_table, moon, next_gen) {
-		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1) {
+		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1 || GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT)) {
 			continue;	// not a moon or invalid cycle
 		}
 		
