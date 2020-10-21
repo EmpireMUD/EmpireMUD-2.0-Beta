@@ -5282,7 +5282,7 @@ sector_data *get_sect_by_name(char *name) {
 */
 bool check_sunny(room_data *room) {
 	bool sun_sect = !ROOM_IS_CLOSED(room) || (IS_ADVENTURE_ROOM(room) && RMT_FLAGGED(room, RMT_OUTDOOR));
-	return (sun_sect && weather_info.sunlight != SUN_DARK && !ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK));
+	return (sun_sect && get_sun_status(room) != SUN_DARK && !ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK));
 }
 
 

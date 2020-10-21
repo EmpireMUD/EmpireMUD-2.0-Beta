@@ -902,7 +902,7 @@ void run_mob_echoes(void) {
 	struct custom_message *mcm, *found_mcm;
 	char_data *ch, *mob, *found_mob, *chiter;
 	descriptor_data *desc;
-	int count;
+	int count, sun;
 	bool oops;
 	
 	LL_FOREACH(descriptor_list, desc) {
@@ -931,6 +931,7 @@ void run_mob_echoes(void) {
 		}
 		
 		// initialize vars
+		sun = get_sun_status(IN_ROOM(ch));
 		found_mob = NULL;
 		found_mcm = NULL;
 		count = 0;
@@ -948,10 +949,10 @@ void run_mob_echoes(void) {
 				if (mcm->type == MOB_CUSTOM_ECHO || mcm->type == MOB_CUSTOM_SAY) {
 					// ok = true
 				}
-				else if ((mcm->type == MOB_CUSTOM_SAY_DAY || mcm->type == MOB_CUSTOM_ECHO_DAY) && (weather_info.sunlight == SUN_LIGHT || weather_info.sunlight == SUN_RISE)) {
+				else if ((mcm->type == MOB_CUSTOM_SAY_DAY || mcm->type == MOB_CUSTOM_ECHO_DAY) && (sun == SUN_LIGHT || sun == SUN_RISE)) {
 					// day ok
 				}
-				else if ((mcm->type == MOB_CUSTOM_SAY_NIGHT || mcm->type == MOB_CUSTOM_ECHO_NIGHT) && (weather_info.sunlight == SUN_DARK || weather_info.sunlight == SUN_SET)) {
+				else if ((mcm->type == MOB_CUSTOM_SAY_NIGHT || mcm->type == MOB_CUSTOM_ECHO_NIGHT) && (sun == SUN_DARK || sun == SUN_SET)) {
 					// night ok
 				}
 				else {
@@ -1292,7 +1293,7 @@ void spawn_mobs_from_center(room_data *center) {
 */
 bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coord, int y_coord, bool in_city) {
 	room_data *home;
-	int season;
+	int season, sun = SUN_LIGHT;
 	
 	if (!room) {
 		return FALSE;	// shortcut
@@ -1300,11 +1301,16 @@ bool validate_spawn_location(room_data *room, bitvector_t spawn_flags, int x_coo
 	
 	// SPAWN_x: this code validates spawn flags
 	
+	// load sun info if needed
+	if (IS_SET(spawn_flags, SPAWN_NOCTURNAL | SPAWN_DIURNAL)) {
+		sun = get_sun_status(room);
+	}
+	
 	// easy checks
-	if (IS_SET(spawn_flags, SPAWN_NOCTURNAL) && weather_info.sunlight != SUN_DARK && weather_info.sunlight != SUN_SET) {
+	if (IS_SET(spawn_flags, SPAWN_NOCTURNAL) && sun != SUN_DARK && sun != SUN_SET) {
 		return FALSE;
 	}
-	if (IS_SET(spawn_flags, SPAWN_DIURNAL) && weather_info.sunlight != SUN_LIGHT && weather_info.sunlight != SUN_RISE) {
+	if (IS_SET(spawn_flags, SPAWN_DIURNAL) && sun != SUN_LIGHT && sun != SUN_RISE) {
 		return FALSE;
 	}
 	

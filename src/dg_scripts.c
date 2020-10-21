@@ -2433,16 +2433,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				return;
 			}
 			else if (!str_cmp(var, "time")) {
+				room_data *where = get_room_by_script(type, go);
+				struct time_info_data *tinfo = local_time_info(where, NULL);
+				
 				if (!str_cmp(field, "hour"))
-					snprintf(str, slen, "%d", time_info.hours);
+					snprintf(str, slen, "%d", tinfo->hours);
 				else if (!str_cmp(field, "day"))
-					snprintf(str, slen, "%d", time_info.day + 1);
+					snprintf(str, slen, "%d", tinfo->day + 1);
 				else if (!str_cmp(field, "month"))
-					snprintf(str, slen, "%d", time_info.month + 1);
+					snprintf(str, slen, "%d", tinfo->month + 1);
 				else if (!str_cmp(field, "year"))
-					snprintf(str, slen, "%d", time_info.year);
+					snprintf(str, slen, "%d", tinfo->year);
 				else if (!str_cmp(field, "day_of_year")) {
-					snprintf(str, slen, "%d", (time_info.month * 30) + time_info.day + 1);
+					snprintf(str, slen, "%d", (tinfo->month * 30) + tinfo->day + 1);
 				}
 				else
 					*str = '\0';
@@ -5078,12 +5081,14 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						}
 					}
 					else if (!str_cmp(field, "moon_pos")) {
+						struct time_info_data *tinfo;
 						generic_data *moon;
 						if (!subfield || !*subfield) {
 							strcpy(str, "");
 						}
 						else if ((isdigit(*subfield) && (moon = real_generic(atoi(subfield))) && GEN_TYPE(moon) == GENERIC_MOON) || (moon = find_generic_by_name(GENERIC_MOON, subfield, FALSE))) {
-							snprintf(str, slen, "%s", moon_positions[get_moon_position(get_moon_phase(GET_MOON_CYCLE_DAYS(moon)), time_info.hours)]);
+							tinfo = local_time_info(r, NULL);
+							snprintf(str, slen, "%s", moon_positions[get_moon_position(get_moon_phase(GET_MOON_CYCLE_DAYS(moon)), tinfo->hours)]);
 						}
 						else {	// unknown moon
 							strcpy(str, "");
@@ -6480,6 +6485,8 @@ void process_wait(void *go, trig_data *trig, int type, char *cmd, struct cmdlist
 	}
 
 	if (!strn_cmp(arg, "until ", 6)) {
+		room_data *where = get_room_by_script(type, go);
+		struct time_info_data *tinfo = local_time_info(where, NULL);
 
 		/* valid forms of time are 14:30 and 1430 */
 		if (sscanf(arg, "until %ld:%ld", &hr, &min) == 2)
@@ -6491,7 +6498,7 @@ void process_wait(void *go, trig_data *trig, int type, char *cmd, struct cmdlist
 		ntime = (min * SECS_PER_MUD_HOUR * PASSES_PER_SEC) / 60;
 
 		/* calculate pulse of day of current time */
-		when = (pulse % (SECS_PER_MUD_HOUR * PASSES_PER_SEC)) + (time_info.hours * SECS_PER_MUD_HOUR * PASSES_PER_SEC);
+		when = (pulse % (SECS_PER_MUD_HOUR * PASSES_PER_SEC)) + (tinfo->hours * SECS_PER_MUD_HOUR * PASSES_PER_SEC);
 
 		if (when >= ntime) /* adjust for next day */
 			when = (SECS_PER_MUD_DAY * PASSES_PER_SEC) - when + ntime;

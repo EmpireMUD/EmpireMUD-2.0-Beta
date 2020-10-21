@@ -121,9 +121,16 @@
 #define Y_MIN_LATITUDE  -67	// 0 is the equator, -66.56 is the anarctic circle
 #define Y_MAX_LATITUDE  67	// 66.56 is the arctic circle, 90 is the north pole
 
+// -180 to 180 covers a full globe
+#define X_MIN_LONGITUDE  -180	// min must always be the lower number
+#define X_MAX_LONGITUDE  180
+
 // these can safely be floating points
 #define ARCTIC_LATITUDE  66.56	// based on the real world
 #define TROPIC_LATITUDE  23.43	// based on the real world
+
+// converts an X-coordinate to equivalent longitude based on X_MIN_LONGITUDE/X_MAX_LONGITUDE
+#define X_TO_LONGITUDE(x_coord)  ((((double)x_coord) / MAP_WIDTH) * (X_MAX_LONGITUDE - X_MIN_LONGITUDE) + X_MIN_LONGITUDE)
 
 // converts a Y-coordinate to the equivalent latitude, based on Y_MIN_LATITUDE/Y_MAX_LATITUDE
 #define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * ABSOLUTE(Y_MAX_LATITUDE - Y_MIN_LATITUDE)) + Y_MIN_LATITUDE)
@@ -1512,7 +1519,7 @@ typedef struct vehicle_data vehicle_data;
 
 // GEN_x: generic flags
 #define GEN_BASIC  BIT(0)	// a. indicates it's basic (varies by type)
-#define GEN_IN_DEVELOPMENT  BIT(1)	// b. disables SOME types
+#define GEN_IN_DEVELOPMENT  BIT(1)	// b. disables SOME types -- see generic_types_uses_in_dev[]
 
 
 // how many strings a generic stores (can be safely raised with no updates)
@@ -2559,7 +2566,7 @@ typedef enum {
 #define SKY_LIGHTNING  3
 
 
-// Sun state for weather_data
+// Sun state for get_sun_status()
 #define SUN_DARK  0
 #define SUN_RISE  1
 #define SUN_LIGHT  2
@@ -5793,7 +5800,7 @@ struct weather_data {
 	int pressure;	// How is the pressure ( Mb )
 	int change;	// How fast and what way does it change
 	int sky;	// How is the sky
-	int sunlight;	// And how much sun
+	// formerly sunlight -- now use get_sun_status(room)
 };
 
 

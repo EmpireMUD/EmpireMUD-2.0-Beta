@@ -27,112 +27,18 @@
 /**
 * Contents:
 *   Unsorted Code
+*   Time Handling
 *   Moon System
 */
 
 // local prototypes
-void another_hour(int mode);
+void another_hour();
 void weather_change();
 
 
-void weather_and_time(int mode) {
-	another_hour(mode);
-	if (mode) {
-		weather_change();
-	}
-}
-
-
-void another_hour(int mode) {
-	descriptor_data *d;
-	long lny;
-
-	time_info.hours++;
-
-	if (mode) {
-		switch (time_info.hours) {
-			case 1: {
-				// 1am shipment
-				process_shipping();
-				break;
-			}
-			case 7:
-				weather_info.sunlight = SUN_RISE;
-				for (d = descriptor_list; d; d = d->next) {
-					if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) && AWAKE(d->character) && IS_OUTDOORS(d->character)) {
-						look_at_room(d->character);
-						msg_to_char(d->character, "\r\n");
-					}
-				}
-				send_to_outdoor(FALSE, "The sun rises over the horizon.\r\n");
-				
-				// 7am shipment
-				process_shipping();
-				break;
-			case 8:
-				weather_info.sunlight = SUN_LIGHT;
-				send_to_outdoor(FALSE, "The day has begun.\r\n");
-				break;
-			case 12:
-				// noon
-				break;
-			case 13: {
-				// 1pm shipment
-				process_shipping();
-				break;
-			}
-			case 19:
-				weather_info.sunlight = SUN_SET;
-				send_to_outdoor(FALSE, "The sun slowly disappears beneath the horizon.\r\n");
-				
-				// 7pm shipment
-				process_shipping();
-				break;
-			case 20:
-				weather_info.sunlight = SUN_DARK;
-				for (d = descriptor_list; d; d = d->next)
-					if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) &&  AWAKE(d->character) && IS_OUTDOORS(d->character)) {
-						look_at_room(d->character);
-						msg_to_char(d->character, "\r\n");
-					}
-				send_to_outdoor(FALSE, "The night has begun.\r\n");
-				break;
-		}
-	}
-	
-	// day change
-	if (time_info.hours > 23) {	/* Changed by HHS due to bug ??? */
-		time_info.hours -= 24;
-		time_info.day++;
-		
-		determine_seasons();
-		
-		// month change
-		if (time_info.day > 29) {
-			time_info.day = 0;
-			time_info.month++;
-			
-			// year change
-			if (time_info.month > 11) {
-				time_info.month = 0;
-				time_info.year++;
-				
-				annual_world_update();
-			}
-		}
-		else {	// not day 30
-			// check if we've missed a new year
-			lny = data_get_long(DATA_LAST_NEW_YEAR);
-			if (lny && lny + SECS_PER_MUD_YEAR < time(0)) {
-				annual_world_update();
-			}
-		}
-	}
-	
-	// other hourly work
-	if (weather_info.sunlight == SUN_SET || weather_info.sunlight == SUN_DARK) {
-		compute_night_light_radius();
-	}
+void weather_and_time(void) {
+	another_hour();
+	weather_change();
 }
 
 
@@ -172,7 +78,7 @@ void determine_seasons(void) {
 	
 	// Day_of_year is the x-axis of the graph that determines the season at a
 	// given y-coord. Month 0 is january; year is 0-359 days.
-	day_of_year = time_info.month * 30 + time_info.day;
+	day_of_year = main_time_info.month * 30 + main_time_info.day;
 	
 	for (ycoord = 0; ycoord < MAP_HEIGHT; ++ycoord) {
 		latitude = Y_TO_LATITUDE(ycoord);
@@ -180,10 +86,10 @@ void determine_seasons(void) {
 		
 		// tropics? -- take half the tropic value, convert to percent, multiply by map height
 		if (ABSOLUTE(latitude) < TROPIC_LATITUDE) {
-			if (time_info.month < 2) {
+			if (main_time_info.month < 2) {
 				y_coord_to_season[ycoord] = TILESET_SPRING;
 			}
-			else if (time_info.month >= 10) {
+			else if (main_time_info.month >= 10) {
 				y_coord_to_season[ycoord] = TILESET_AUTUMN;
 			}
 			else {
@@ -239,7 +145,7 @@ void determine_seasons(void) {
 
 void weather_change(void) {
 	int diff, change;
-	if ((time_info.month >= 4) && (time_info.month <= 8))
+	if ((main_time_info.month >= 4) && (main_time_info.month <= 8))
 		diff = (weather_info.pressure > 985 ? -2 : 2);
 	else
 		diff = (weather_info.pressure > 1015 ? -2 : 2);
@@ -333,6 +239,204 @@ void weather_change(void) {
 
 
  //////////////////////////////////////////////////////////////////////////////
+//// WEATHER HANDLING ////////////////////////////////////////////////////////
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// TIME HANDLING ///////////////////////////////////////////////////////////
+
+/**
+* Advances time by an hour (and cascades it to other time zones). Also triggers
+* things which happen on specific hours.
+*/
+void another_hour(void) {
+	descriptor_data *d;
+	long lny;
+	
+	// update main time
+	++main_time_info.hours;
+	if (main_time_info.hours > 23) {
+		// day change
+		main_time_info.hours -= 24;
+		++main_time_info.day;
+		
+		// seasons move daily
+		determine_seasons();
+		
+		// month change
+		if (main_time_info.day > 29) {
+			main_time_info.day = 0;
+			++main_time_info.month;
+			
+			// year change
+			if (main_time_info.month > 11) {
+				main_time_info.month = 0;
+				++main_time_info.year;
+				
+				// run annual update
+				annual_world_update();
+			}
+		}
+		else {	// not day 30
+			// check if we've missed a new year recently
+			lny = data_get_long(DATA_LAST_NEW_YEAR);
+			if (lny && lny + SECS_PER_MUD_YEAR < time(0)) {
+				annual_world_update();
+			}
+		}
+	}
+	
+	// cascade to other time zones
+	cascade_time_info();
+	
+	// hour-based updates
+	switch (main_time_info.hours) {
+		case 0: {	// midnight
+			run_external_evolutions();
+			break;
+		}
+		case 1: {
+			// 1am shipment
+			process_shipping();
+			break;
+		}
+		case 7: {
+			for (d = descriptor_list; d; d = d->next) {
+				if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) && AWAKE(d->character) && IS_OUTDOORS(d->character)) {
+					look_at_room(d->character);
+					msg_to_char(d->character, "\r\n");
+				}
+			}
+			send_to_outdoor(FALSE, "The sun rises over the horizon.\r\n");
+			
+			// 7am shipment
+			process_shipping();
+			
+			// world save
+			save_whole_world();
+			break;
+		}
+		case 8: {
+			send_to_outdoor(FALSE, "The day has begun.\r\n");
+			break;
+		}
+		case 12: {	// noon
+			process_imports();
+			break;
+		}
+		case 13: {
+			// 1pm shipment
+			process_shipping();
+			break;
+		}
+		case 19: {
+			send_to_outdoor(FALSE, "The sun slowly disappears beneath the horizon.\r\n");
+			
+			// 7pm shipment
+			process_shipping();
+			break;
+		}
+		case 20: {
+			for (d = descriptor_list; d; d = d->next)
+				if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) &&  AWAKE(d->character) && IS_OUTDOORS(d->character)) {
+					look_at_room(d->character);
+					msg_to_char(d->character, "\r\n");
+				}
+			send_to_outdoor(FALSE, "The night has begun.\r\n");
+			break;
+		}
+	}
+	
+	// other hourly work
+	compute_night_light_radius();
+}
+
+
+/**
+* Cascades the main_time_info to the other time zones.
+*/
+void cascade_time_info(void) {
+	struct time_info_data *ptr;
+	int iter;
+	
+	for (iter = 0; iter < 23; ++iter) {
+		ptr = &regional_time_info[23-iter];
+		
+		// start with same values
+		ptr->year = main_time_info.year;
+		ptr->month = main_time_info.month;
+		ptr->day = main_time_info.day;
+		
+		// adjust hours
+		ptr->hours = main_time_info.hours - iter;
+		
+		// adjust back days/months/years if needed
+		if (ptr->hours < 0) {
+			ptr->hours += 24;
+			ptr->day -= 1;
+			if (ptr->day < 0) {
+				ptr->day += 30;
+				ptr->month -= 1;
+				if (ptr->month < 0) {
+					ptr->month += 12;
+					ptr->year -= 1;
+				}
+			}
+		}
+	}
+}
+
+
+/**
+* @param room_data *room Any location.
+* @return int One of SUN_RISE, SUN_LIGHT, SUN_SET, or SUN_DARK.
+*/
+int get_sun_status(room_data *room) {
+	struct time_info_data *tinfo = local_time_info(room, NULL);
+	if (tinfo->hours == 7) {
+		return SUN_RISE;
+	}
+	else if (tinfo->hours == 19) {
+		return SUN_SET;
+	}
+	else if (tinfo->hours > 7 && tinfo->hours < 19) {
+		return SUN_LIGHT;
+	}
+	else {
+		return SUN_DARK;
+	}
+}
+
+
+/**
+* Determines which of the 24 east-west time zones a location is in.
+*
+* @param room_data *room A room location.
+* @param struct map_data *loc Or: a map location (pass one or the other).
+* @return int One of the map's time zones (0..23).
+*/
+int get_time_zone(room_data *room, struct map_data *loc) {
+	int x_coord, longitude, region;
+	
+	// determine location
+	x_coord = (loc ? MAP_X_COORD(loc->vnum) : (room ? X_COORD(room) : -1));
+	if (x_coord == -1) {
+		return 23;	// 23 is the same as the main region
+	}
+	
+	// determine longitude
+	longitude = X_TO_LONGITUDE(x_coord);
+	
+	// determine grouping based on that
+	longitude += 180;	// move from (-180 to 180) to (0 to 360)
+	region = longitude / 24;	// split into 24
+	region = MAX(0, MIN(23, region));	// safety: ensure it's within bounds}
+	
+	return region;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
 //// MOON SYSTEM /////////////////////////////////////////////////////////////
 
 /**
@@ -417,41 +521,46 @@ moon_pos_t get_moon_position(moon_phase_t phase, int hour) {
 *
 * @return int Number of tiles you can see at night.
 */
-int compute_night_light_radius(void) {
-	int dist, best = 0, second = 0;
+void compute_night_light_radius(void) {
+	int dist, iter, best[24], second[24];
 	generic_data *moon, *next_gen;
 	moon_phase_t phase;
 	
 	int max_light_radius_base = config_get_int("max_light_radius_base");
+	
+	// init
+	for (iter = 0; iter < 24; ++iter) {
+		best[iter] = second[iter] = 0;
+	}
 	
 	HASH_ITER(hh, generic_table, moon, next_gen) {
 		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1 || GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT)) {
 			continue;	// not a moon or invalid cycle
 		}
 		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
-		if (get_moon_position(phase, time_info.hours) == MOON_POS_DOWN) {
-			continue;	// moon isn't up
-		}
 		
-		// ok: record it if better
-		if (moon_phase_brightness[phase] > best) {
-			second = best;
-			best = moon_phase_brightness[phase];
-		}
-		else if (moon_phase_brightness[phase] > second) {
-			second = moon_phase_brightness[phase];
+		for (iter = 0; iter < 24; ++iter) {
+			if (get_moon_position(phase, regional_time_info[iter].hours) != MOON_POS_DOWN) {
+				// moon is up: record it if better
+				if (moon_phase_brightness[phase] > best[iter]) {
+					second[iter] = best[iter];
+					best[iter] = moon_phase_brightness[phase];
+				}
+				else if (moon_phase_brightness[phase] > second[iter]) {
+					second[iter] = moon_phase_brightness[phase];
+				}
+			}
 		}
 	}
 	
 	// compute
-	dist = best + second/2;
-	dist = MAX(1, MIN(dist, max_light_radius_base));
+	for (iter = 0; iter < 24; ++iter) {
+		dist = best[iter] + second[iter]/2;
+		dist = MAX(1, MIN(dist, max_light_radius_base));
 	
-	// save to the global
-	night_light_radius = dist;
-	
-	// and return it
-	return night_light_radius;
+		// save to the global
+		night_light_radius[iter] = dist;
+	}
 }
 
 
@@ -461,10 +570,13 @@ int compute_night_light_radius(void) {
 * @param char_data *ch The person to show the moons to.
 */
 void show_visible_moons(char_data *ch) {
+	struct time_info_data *tinfo;
 	char buf[MAX_STRING_LENGTH];
 	generic_data *moon, *next_gen;
 	moon_phase_t phase;
 	moon_pos_t pos;
+	
+	tinfo = local_time_info(IN_ROOM(ch), NULL);
 	
 	HASH_ITER(hh, generic_table, moon, next_gen) {
 		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1 || GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT)) {
@@ -473,13 +585,13 @@ void show_visible_moons(char_data *ch) {
 		
 		// find moon in the sky
 		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
-		pos = get_moon_position(phase, time_info.hours);
+		pos = get_moon_position(phase, tinfo->hours);
 		
 		// qualify it some more
 		if (pos == MOON_POS_DOWN) {
 			continue;	// moon is down
 		}
-		if (phase == PHASE_NEW && weather_info.sunlight == SUN_LIGHT) {
+		if (phase == PHASE_NEW && get_sun_status(IN_ROOM(ch)) == SUN_LIGHT) {
 			continue;	// new moon not visible in strong sunlight
 		}
 		

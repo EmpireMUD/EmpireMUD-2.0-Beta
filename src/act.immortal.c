@@ -5152,9 +5152,12 @@ SHOW(show_minipets) {
 
 SHOW(show_moons) {
 	generic_data *moon, *next_gen;
+	struct time_info_data *tinfo;
 	moon_phase_t phase;
 	moon_pos_t pos;
 	int count;
+	
+	tinfo = local_time_info(IN_ROOM(ch), NULL);
 	
 	msg_to_char(ch, "Moons:\r\n");
 	
@@ -5166,7 +5169,7 @@ SHOW(show_moons) {
 		
 		// find moon in the sky
 		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
-		pos = get_moon_position(phase, time_info.hours);
+		pos = get_moon_position(phase, tinfo->hours);
 		
 		// ok: show it
 		++count;

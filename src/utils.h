@@ -1366,7 +1366,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define HAS_MINOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_minor") / 100)))
 #define HAS_MAJOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_major") / 100)))
 #define IS_CITY_CENTER(room)  (BUILDING_VNUM(room) == BUILDING_CITY_CENTER)
-#define IS_DARK(room)  (MAGIC_DARKNESS(room) || (!IS_ANY_BUILDING(room) && ROOM_LIGHTS(room) == 0 && (!ROOM_OWNER(room) || !EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS)) && !RMT_FLAGGED((room), RMT_LIGHT) && (weather_info.sunlight == SUN_DARK || RMT_FLAGGED((room), RMT_DARK))))
+#define IS_DARK(room)  (MAGIC_DARKNESS(room) || (!IS_ANY_BUILDING(room) && ROOM_LIGHTS(room) == 0 && (!ROOM_OWNER(room) || !EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS)) && !RMT_FLAGGED((room), RMT_LIGHT) && (RMT_FLAGGED((room), RMT_DARK) || get_sun_status(room) == SUN_DARK)))
 #define IS_LIGHT(room)  (!MAGIC_DARKNESS(room) && WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room))
 #define IS_REAL_LIGHT(room)  (!IS_DARK(room) || RMT_FLAGGED((room), RMT_LIGHT) || IS_INSIDE(room) || (ROOM_OWNER(room) && IS_ANY_BUILDING(room)))
 #define ISLAND_FLAGGED(room, flag)  (GET_ISLAND(room) ? IS_SET(GET_ISLAND(room)->flags, (flag)) : FALSE)
@@ -1709,6 +1709,7 @@ bool empire_can_claim(empire_data *emp);
 int get_total_score(empire_data *emp);
 bool ignore_distrustful_due_to_start_loc(room_data *loc);
 bool is_trading_with(empire_data *emp, empire_data *partner);
+void process_imports();
 void resort_empires(bool force);
 
 // empire diplomacy utils from utils.c
@@ -2396,12 +2397,18 @@ void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);
 bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
 
-// weather.c
-int compute_night_light_radius();
+// weather.c moons
+void compute_night_light_radius();
 void determine_seasons();
 moon_phase_t get_moon_phase(double cycle_days);
 moon_pos_t get_moon_position(moon_phase_t phase, int hour);
 void show_visible_moons(char_data *ch);
+
+// weather.c time
+void cascade_time_info();
+int get_sun_status(room_data *room);
+int get_time_zone(room_data *room, struct map_data *loc);
+#define local_time_info(room, maploc)  &regional_time_info[get_time_zone((room), (maploc))]
 
 // workforce.c
 void deactivate_workforce(empire_data *emp, int island_id, int type);

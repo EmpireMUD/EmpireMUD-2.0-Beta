@@ -739,7 +739,7 @@ void chore_update(void) {
 			}
 			
 			// run needs (8pm only)
-			if (time_info.hours == 20) {
+			if (main_time_info.hours == 20) {
 				// TODO: currently this runs 1 need at a time, but could probably save a lot of processing if it ran all needs at once
 				HASH_ITER(hh, eisle->needs, needs, next_needs) {
 					if (needs->needed > 0 && !EMPIRE_IMM_ONLY(emp)) {

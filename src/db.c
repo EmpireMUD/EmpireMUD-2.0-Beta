@@ -174,9 +174,6 @@ struct message_list fight_messages[MAX_MESSAGES];	// fighting messages
 time_t boot_time = 0;	// time of mud boot
 int Global_ignore_dark = 0;	// For use in public channels
 int no_auto_deletes = 0;	// skip player deletes on boot?
-struct time_info_data time_info;	// the infomation about the time
-struct weather_data weather_info;	// the infomation about the weather
-byte y_coord_to_season[MAP_HEIGHT];	// what season a given y-coord is in, as set by determine_seasons()
 int wizlock_level = 0;	// level of game restriction
 char *wizlock_message = NULL;	// Message sent to people trying to connect
 
@@ -209,9 +206,6 @@ char_data *combat_list = NULL;	// head of l-list of fighting chars
 char_data *next_combat_list = NULL;	// used for iteration of combat_list when more than 1 person can be removed from combat in 1 loop iteration
 char_data *next_combat_list_main = NULL;	// used for iteration of combat_list in frequent_combat()
 struct generic_name_data *generic_names = NULL;	// LL of generic name sets
-
-// moons
-int night_light_radius = 1;	// how many tiles you can see at night (unskilled)
 
 // morphs
 morph_data *morph_table = NULL;	// master morph hash table
@@ -272,6 +266,13 @@ char *godlist = NULL;	// list of peon gods
 char *handbook = NULL;	// handbook for new immortals
 char *policies = NULL;	// policies page
 char *news = NULL;	// news for players
+
+// time, seasons, and weather
+struct time_info_data main_time_info;	// central time (corresponds to the latest time zone)
+struct time_info_data regional_time_info[24];	// subdivisions of 24-hour time
+struct weather_data weather_info;	// the infomation about the weather
+byte y_coord_to_season[MAP_HEIGHT];	// what season a given y-coord is in, as set by determine_seasons()
+int night_light_radius[24];	// how many tiles you can see at night (unskilled) in each time zone
 
 // tips of the day system
 char **tips_of_the_day = NULL;	// array of tips
@@ -4835,23 +4836,14 @@ void reset_time(void) {
 		data_set_long(DATA_WORLD_START, beginning_of_time);
 	}
 
-	time_info = *mud_time_passed(time(0), beginning_of_time);
+	main_time_info = *mud_time_passed(time(0), beginning_of_time);
+	cascade_time_info();
+	compute_night_light_radius();
 
-	if (time_info.hours <= 6)
-		weather_info.sunlight = SUN_DARK;
-	else if (time_info.hours == 7)
-		weather_info.sunlight = SUN_RISE;
-	else if (time_info.hours <= 18)
-		weather_info.sunlight = SUN_LIGHT;
-	else if (time_info.hours == 19)
-		weather_info.sunlight = SUN_SET;
-	else
-		weather_info.sunlight = SUN_DARK;
-
-	log("   Current Gametime: %dH %dD %dM %dY.", time_info.hours, time_info.day, time_info.month, time_info.year);
+	log("   Current Gametime: %dH %dD %dM %dY.", main_time_info.hours, main_time_info.day, main_time_info.month, main_time_info.year);
 
 	weather_info.pressure = 960;
-	if ((time_info.month >= 5) && (time_info.month <= 8))
+	if ((main_time_info.month >= 5) && (main_time_info.month <= 8))
 		weather_info.pressure += number(1, 50);
 	else
 		weather_info.pressure += number(1, 80);

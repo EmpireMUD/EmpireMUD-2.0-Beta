@@ -256,7 +256,8 @@ void set_crop_type(room_data *room, crop_data *cp);
 
 // various externs
 extern int Global_ignore_dark;
-extern struct time_info_data time_info;
+extern struct time_info_data main_time_info;
+extern struct time_info_data regional_time_info[24];
 extern byte y_coord_to_season[MAP_HEIGHT];
 
 
@@ -574,9 +575,6 @@ extern char_data *find_or_load_player(char *name, bool *is_file);
 void store_loaded_char(char_data *ch);
 char_data *load_player(char *name, bool normal);
 
-// moons
-extern int night_light_radius;
-
 // morphs
 extern morph_data *morph_table;
 extern morph_data *sorted_morphs;
@@ -751,6 +749,8 @@ extern struct stored_event *find_stored_event(struct stored_event *list, int typ
 #define find_stored_event_room(room, type)  find_stored_event(SHARED_DATA(room)->events, type)
 
 // time
+extern int night_light_radius[24];
+
 void reset_time(void);
 
 // trading post

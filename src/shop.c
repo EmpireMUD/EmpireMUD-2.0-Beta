@@ -108,17 +108,21 @@ bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum) {
 * Determines if a shop is open right now.
 * 
 * @param shop_data *shop The shop to check.
+* @param room_data *room Location of the shop, to check time zone.
 * @return bool TRUE if the shop is open (based on its hours)
 */
-bool shop_is_open(shop_data *shop) {
+bool shop_is_open(shop_data *shop, room_data *room) {
+	struct time_info_data *tinfo;
+	tinfo = local_time_info(room, NULL);
+	
 	if (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) {
 		return TRUE;	// always
 	}
 	else if (SHOP_OPEN_TIME(shop) < SHOP_CLOSE_TIME(shop)) {
-		return (time_info.hours >= SHOP_OPEN_TIME(shop) && time_info.hours < SHOP_CLOSE_TIME(shop));
+		return (tinfo->hours >= SHOP_OPEN_TIME(shop) && tinfo->hours < SHOP_CLOSE_TIME(shop));
 	}
 	else if (SHOP_OPEN_TIME(shop) > SHOP_CLOSE_TIME(shop)) {
-		return (time_info.hours >= SHOP_OPEN_TIME(shop) || time_info.hours < SHOP_CLOSE_TIME(shop));
+		return (tinfo->hours >= SHOP_OPEN_TIME(shop) || tinfo->hours < SHOP_CLOSE_TIME(shop));
 	}
 	
 	return FALSE;	// unreachable?
@@ -338,7 +342,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 			continue;
 		}
 		LL_FOREACH(MOB_SHOP_LOOKUPS(mob), sl) {
-			if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_MOBILE, GET_MOB_VNUM(mob))) {
+			if (shop_is_open(sl->shop, IN_ROOM(ch)) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_MOBILE, GET_MOB_VNUM(mob))) {
 				add_temp_shop(&shop_list, sl->shop, mob, NULL, NULL, NULL);
 			}
 		}
@@ -350,7 +354,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 			continue;
 		}
 		LL_FOREACH(GET_OBJ_SHOP_LOOKUPS(obj), sl) {
-			if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
+			if (shop_is_open(sl->shop, IN_ROOM(ch)) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
 				add_temp_shop(&shop_list, sl->shop, NULL, obj, NULL, NULL);
 			}
 		}
@@ -362,7 +366,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 			continue;
 		}
 		LL_FOREACH(GET_OBJ_SHOP_LOOKUPS(obj), sl) {
-			if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
+			if (shop_is_open(sl->shop, IN_ROOM(ch)) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
 				add_temp_shop(&shop_list, sl->shop, NULL, obj, NULL, NULL);
 			}
 		}
@@ -374,7 +378,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 			continue;
 		}
 		LL_FOREACH(VEH_SHOP_LOOKUPS(veh), sl) {
-			if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_VEHICLE, VEH_VNUM(veh))) {
+			if (shop_is_open(sl->shop, IN_ROOM(ch)) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_VEHICLE, VEH_VNUM(veh))) {
 				add_temp_shop(&shop_list, sl->shop, NULL, NULL, NULL, veh);
 			}
 		}
@@ -385,7 +389,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 		// search room: building
 		if (GET_BUILDING(IN_ROOM(ch))) {
 			LL_FOREACH(GET_BLD_SHOP_LOOKUPS(GET_BUILDING(IN_ROOM(ch))), sl) {
-				if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_BUILDING, GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))))) {
+				if (shop_is_open(sl->shop, IN_ROOM(ch)) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_BUILDING, GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))))) {
 					add_temp_shop(&shop_list, sl->shop, NULL, NULL, IN_ROOM(ch), NULL);
 				}
 			}
@@ -394,7 +398,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 		// search room: template
 		if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
 			LL_FOREACH(GET_RMT_SHOP_LOOKUPS(GET_ROOM_TEMPLATE(IN_ROOM(ch))), sl) {
-				if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))))) {
+				if (shop_is_open(sl->shop, IN_ROOM(ch)) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))))) {
 					add_temp_shop(&shop_list, sl->shop, NULL, NULL, IN_ROOM(ch), NULL);
 				}
 			}
