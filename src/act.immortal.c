@@ -5150,6 +5150,35 @@ SHOW(show_minipets) {
 }
 
 
+SHOW(show_moons) {
+	generic_data *moon, *next_gen;
+	moon_phase_t phase;
+	moon_pos_t pos;
+	int count;
+	
+	msg_to_char(ch, "Moons:\r\n");
+	
+	count = 0;
+	HASH_ITER(hh, generic_table, moon, next_gen) {
+		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1) {
+			continue;	// not a moon or invalid cycle
+		}
+		
+		// find moon in the sky
+		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
+		pos = get_moon_position(phase, time_info.hours);
+		
+		// ok: show it
+		++count;
+		msg_to_char(ch, "[%5d] %s  %s (%s) %.2f day%s\r\n", GEN_VNUM(moon), GEN_NAME(moon), moon_phases[phase], moon_positions[pos], GET_MOON_CYCLE_DAYS(moon), PLURAL(GET_MOON_CYCLE_DAYS(moon)));
+	}
+	
+	if (!count) {
+		msg_to_char(ch, " none\r\n");
+	}
+}
+
+
 SHOW(show_mounts) {
 	char arg[MAX_INPUT_LENGTH], output[MAX_STRING_LENGTH], line[MAX_STRING_LENGTH];
 	struct mount_data *mount, *next_mount;
@@ -9872,6 +9901,7 @@ ACMD(do_show) {
 		{ "dailycycle", LVL_START_IMM, show_dailycycle },
 		{ "data", LVL_CIMPL, show_data },
 		{ "minipets", LVL_START_IMM, show_minipets },
+		{ "moons", LVL_START_IMM, show_moons },
 		{ "mounts", LVL_START_IMM, show_mounts },
 		{ "learned", LVL_START_IMM, show_learned },
 		{ "currency", LVL_START_IMM, show_currency },

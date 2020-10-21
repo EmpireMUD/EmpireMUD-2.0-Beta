@@ -471,11 +471,20 @@ void show_visible_moons(char_data *ch) {
 			continue;	// not a moon or invalid cycle
 		}
 		
+		// find moon in the sky
 		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
 		pos = get_moon_position(phase, time_info.hours);
-		if (pos != MOON_POS_DOWN) {
-			snprintf(buf, sizeof(buf), "%s is %s %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
-			send_to_char(CAP(buf), ch);
+		
+		// qualify it some more
+		if (pos == MOON_POS_DOWN) {
+			continue;	// moon is down
 		}
+		if (phase == PHASE_NEW && weather_info.sunlight == SUN_LIGHT) {
+			continue;	// new moon not visible in strong sunlight
+		}
+		
+		// ok: show it
+		snprintf(buf, sizeof(buf), "%s is %s %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
+		send_to_char(CAP(buf), ch);
 	}
 }

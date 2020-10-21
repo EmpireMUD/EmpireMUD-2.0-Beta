@@ -1616,7 +1616,7 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			break;
 		}
 		case GENERIC_MOON: {
-			size += snprintf(buf + size, sizeof(buf) - size, "Cycle: \ty%.2f day%s\t0\r\n", GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE(gen)));
+			size += snprintf(buf + size, sizeof(buf) - size, "Cycle: \ty%.2f day%s\t0\r\n", GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE_DAYS(gen)));
 			break;
 		}
 	}
@@ -1694,7 +1694,7 @@ void olc_show_generic(char_data *ch) {
 			break;
 		}
 		case GENERIC_MOON: {
-			sprintf(buf + strlen(buf), "<%scycle\t0> %.2f day%s\r\n", OLC_LABEL_VAL(GET_MOON_CYCLE(gen), 0), GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE(gen)/100));
+			sprintf(buf + strlen(buf), "<%scycle\t0> %.2f day%s\r\n", OLC_LABEL_VAL(GET_MOON_CYCLE(gen), 0), GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE_DAYS(gen)));
 			break;
 		}
 	}
