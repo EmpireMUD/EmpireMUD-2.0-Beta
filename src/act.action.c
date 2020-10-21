@@ -2428,7 +2428,7 @@ void process_repairing(char_data *ch) {
 	vehicle_data *veh;
 	
 	// first attempt to re-find the vehicle
-	if (!(veh = find_vehicle(GET_ACTION_VNUM(ch, 0), FALSE)) || IN_ROOM(veh) != IN_ROOM(ch) || !VEH_IS_COMPLETE(veh)) {
+	if (!(veh = find_vehicle(GET_ACTION_VNUM(ch, 0))) || IN_ROOM(veh) != IN_ROOM(ch) || !VEH_IS_COMPLETE(veh)) {
 		cancel_action(ch);
 		return;
 	}

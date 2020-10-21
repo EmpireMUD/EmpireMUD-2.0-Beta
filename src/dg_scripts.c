@@ -192,7 +192,7 @@ char_data *get_char(char *name) {
 	char_data *i;
 
 	if (*name == UID_CHAR) {
-		i = find_char(atoi(name + 1), TRUE);
+		i = find_char(atoi(name + 1));
 
 		if (i && valid_dg_target(i, DG_ALLOW_GODS))
 			return i;
@@ -215,7 +215,7 @@ char_data *get_char_near_obj(obj_data *obj, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1), TRUE);
+		ch = find_char(atoi(name + 1));
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS))
 			return ch;
@@ -246,7 +246,7 @@ char_data *get_char_near_vehicle(vehicle_data *veh, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1), TRUE);
+		ch = find_char(atoi(name + 1));
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS)) {
 			return ch;
@@ -285,7 +285,7 @@ char_data *get_char_in_room(room_data *room, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1), TRUE);
+		ch = find_char(atoi(name + 1));
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS))
 			return ch;
@@ -382,7 +382,7 @@ obj_data *get_obj_near_vehicle(vehicle_data *veh, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		return find_obj(atoi(name + 1), TRUE);
+		return find_obj(atoi(name + 1));
 	}
 	if (VEH_CONTAINS(veh) && (i = get_obj_in_list(name, VEH_CONTAINS(veh)))) {
 		return i;
@@ -409,7 +409,7 @@ obj_data *get_obj(char *name)  {
 	obj_data *obj;
 
 	if (*name == UID_CHAR)
-		return find_obj(atoi(name + 1), TRUE);
+		return find_obj(atoi(name + 1));
 	else {
 		DL_FOREACH(object_list, obj) {
 			if (isname(name, obj->name)) {
@@ -502,7 +502,7 @@ vehicle_data *get_vehicle(char *name) {
 	vehicle_data *veh;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1), TRUE);
+		return find_vehicle(atoi(name + 1));
 	}
 	else {
 		DL_FOREACH(vehicle_list, veh) {
@@ -524,7 +524,7 @@ char_data *get_char_by_obj(obj_data *obj, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1), TRUE);
+		ch = find_char(atoi(name + 1));
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS))
 			return ch;
@@ -558,7 +558,7 @@ char_data *get_char_by_vehicle(vehicle_data *veh, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1), TRUE);
+		ch = find_char(atoi(name + 1));
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS)) {
 			return ch;
@@ -603,7 +603,7 @@ char_data *get_char_by_room(room_data *room, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1), TRUE);
+		ch = find_char(atoi(name + 1));
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS))
 			return ch;
@@ -635,7 +635,7 @@ obj_data *get_obj_by_obj(obj_data *obj, char *name) {
 	room_data *rm;
 
 	if (*name == UID_CHAR) 
-		return find_obj(atoi(name + 1), TRUE);
+		return find_obj(atoi(name + 1));
 
 	if (!str_cmp(name, "self") || !str_cmp(name, "me"))
 		return obj;
@@ -670,7 +670,7 @@ obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name) {
 	obj_data *i = NULL;
 
 	if (*name == UID_CHAR) {
-		return find_obj(atoi(name + 1), TRUE);
+		return find_obj(atoi(name + 1));
 	}
 	if (VEH_CONTAINS(veh) && (i = get_obj_in_list(name, VEH_CONTAINS(veh)))) {
 		return i;
@@ -714,7 +714,7 @@ obj_data *get_obj_by_room(room_data *room, char *name) {
 	obj_data *obj;
 
 	if (*name == UID_CHAR) {
-		return find_obj(atoi(name+1), TRUE);
+		return find_obj(atoi(name+1));
 	}
 	
 	DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
@@ -745,7 +745,7 @@ vehicle_data *get_vehicle_by_obj(obj_data *obj, char *name) {
 	room_data *room;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1), TRUE);
+		return find_vehicle(atoi(name + 1));
 	}
 	
 	if ((room = obj_room(obj))) {
@@ -772,7 +772,7 @@ vehicle_data *get_vehicle_by_room(room_data *room, char *name) {
 	vehicle_data *iter;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1), TRUE);
+		return find_vehicle(atoi(name + 1));
 	}
 
 	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
@@ -796,7 +796,7 @@ vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name) {
 	vehicle_data *iter;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1), TRUE);
+		return find_vehicle(atoi(name + 1));
 	}
 	if (!str_cmp(name, "self") || !str_cmp(name, "me")) {
 		return veh;
@@ -823,7 +823,7 @@ vehicle_data *get_vehicle_near_obj(obj_data *obj, char *name) {
 	room_data *orm;
 
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1), TRUE);
+		return find_vehicle(atoi(name + 1));
 	}
 	else if (obj->in_vehicle && isname(name, VEH_KEYWORDS(obj->in_vehicle))) {
 		return obj->in_vehicle;
@@ -851,7 +851,7 @@ vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name) {
 	vehicle_data *find;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1), TRUE);
+		return find_vehicle(atoi(name + 1));
 	}
 	if ((find = get_vehicle_room(IN_ROOM(veh), name, NULL))) {
 		return find;
@@ -6555,7 +6555,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 		return;
 	}
 	
-	if (!(c = find_char(id, TRUE)) && !(v = find_vehicle(id, TRUE)) && !(o = find_obj(id, FALSE)) && !(r = find_room(id))) {
+	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id)) && !(r = find_room(id))) {
 		script_log("Trigger: %s, VNum %d. attach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
@@ -6637,7 +6637,7 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 	}
 	
 	// find first good match
-	if (!(c = find_char(id, TRUE)) && !(v = find_vehicle(id, TRUE)) && !(o = find_obj(id, FALSE)) && !(r = find_room(id))) {
+	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id)) && !(r = find_room(id))) {
 		script_log("Trigger: %s, VNum %d. detach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
@@ -6998,16 +6998,16 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 	if ((room = find_room(uid))) {
 		sc_remote = SCRIPT(room) ? SCRIPT(room) : create_script_data(room, WLD_TRIGGER);
 	}
-	else if ((mob = find_char(uid, TRUE))) {
+	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob) ? SCRIPT(mob) : create_script_data(mob, MOB_TRIGGER);
 		if (!IS_NPC(mob))
 			context = 0;
 		add_companion_var(mob, vd->name, vd->value, context);
 	}
-	else if ((obj = find_obj(uid, FALSE))) {
+	else if ((obj = find_obj(uid))) {
 		sc_remote = SCRIPT(obj) ? SCRIPT(obj) : create_script_data(obj, OBJ_TRIGGER);
 	}
-	else if ((veh = find_vehicle(uid, TRUE))) {
+	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh) ? SCRIPT(veh) : create_script_data(veh, VEH_TRIGGER);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {
@@ -7067,7 +7067,7 @@ ACMD(do_vdelete) {
 	if ((room = find_room(uid))) {
 		sc_remote = SCRIPT(room);
 	}
-	else if ((mob = find_char(uid, TRUE))) {
+	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob);
 		remove_companion_var(mob, var, 0);
 		/*
@@ -7076,10 +7076,10 @@ ACMD(do_vdelete) {
 			context = 0;
 		*/
 	}
-	else if ((obj = find_obj(uid, FALSE))) {
+	else if ((obj = find_obj(uid))) {
 		sc_remote = SCRIPT(obj);
 	}
-	else if ((veh = find_vehicle(uid, TRUE))) {
+	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {
@@ -7163,7 +7163,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	if ((room = find_room(uid))) {
 		sc_remote = SCRIPT(room);
 	}
-	else if ((mob = find_char(uid, TRUE))) {
+	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob);
 		remove_companion_var(mob, var, sc->context);
 		/*
@@ -7172,10 +7172,10 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 			context = 0;
 		*/
 	}
-	else if ((obj = find_obj(uid, FALSE))) {
+	else if ((obj = find_obj(uid))) {
 		sc_remote = SCRIPT(obj);
 	}
-	else if ((veh = find_vehicle(uid, TRUE))) {
+	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {

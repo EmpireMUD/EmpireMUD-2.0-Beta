@@ -970,7 +970,7 @@ OFFER_VALIDATE(oval_rez) {
 	
 	// if already respawned, verify corpse location
 	if (!IS_DEAD(ch)) {
-		if (!(corpse = find_obj(GET_LAST_CORPSE_ID(ch), FALSE)) || !IS_CORPSE(corpse)) {
+		if (!(corpse = find_obj(GET_LAST_CORPSE_ID(ch))) || !IS_CORPSE(corpse)) {
 			msg_to_char(ch, "You can't resurrect because your corpse is gone.\r\n");
 			return FALSE;
 		}

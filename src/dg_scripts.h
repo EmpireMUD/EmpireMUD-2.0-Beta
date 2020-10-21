@@ -32,6 +32,9 @@
 // this prevents wear/remove triggers firing when a player is saved
 #define NO_EXTRANEOUS_TRIGGERS
 
+// uncomment this to see errors when uid lookups fail
+//#define DEBUG_UID_LOOKUPS
+
 
 // MTRIG_x: mob trigger types
 #define MTRIG_GLOBAL           BIT(0)      // check even if no players nearby
@@ -535,12 +538,12 @@ void add_to_lookup_table(int uid, void *ptr, int type);
 void remove_from_lookup_table(int uid);
 
 // find helpers
-char_data *find_char(int uid, bool log_error);
+char_data *find_char(int uid);
 empire_data *find_empire_by_uid(int uid);
-obj_data *find_obj(int uid, bool log_error);
+obj_data *find_obj(int uid);
 room_data *find_room(int uid);
 void find_uid_name(char *uid, char *name, size_t nlen);
-vehicle_data *find_vehicle(int uid, bool log_error);
+vehicle_data *find_vehicle(int uid);
 
 // purge helpers
 void create_dg_owner_purged_tracker(trig_data *trig, char_data *ch, obj_data *obj, room_data *room, vehicle_data *veh);

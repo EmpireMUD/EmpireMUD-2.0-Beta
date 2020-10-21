@@ -1897,7 +1897,7 @@ RITUAL_FINISH_FUNC(perform_siege_ritual) {
 		room_targ = real_room(GET_ACTION_VNUM(ch, 1));
 	}
 	else if (GET_ACTION_VNUM(ch, 2) != NOTHING) {
-		veh_targ = find_vehicle(GET_ACTION_VNUM(ch, 2), FALSE);
+		veh_targ = find_vehicle(GET_ACTION_VNUM(ch, 2));
 		if (veh_targ && IN_ROOM(veh_targ) != IN_ROOM(ch)) {
 			// must not really be valid
 			veh_targ = NULL;

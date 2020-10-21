@@ -857,7 +857,7 @@ ACMD(do_moonrise) {
 		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
 			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
 		}
-		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict), FALSE) || !IS_CORPSE(corpse)) {
+		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
 			act("You can only resurrect $N using $S most recent corpse.", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
 		}
@@ -1115,7 +1115,7 @@ ACMD(do_resurrect) {
 		else if (GET_ACCOUNT(ch) == GET_ACCOUNT(vict)) {
 			msg_to_char(ch, "You can't resurrect your own alts.\r\n");
 		}
-		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict), FALSE) || !IS_CORPSE(corpse)) {
+		else if (IS_DEAD(vict) || corpse != find_obj(GET_LAST_CORPSE_ID(vict)) || !IS_CORPSE(corpse)) {
 			// victim has died AGAIN
 			act("You can't resurrect $N with that corpse.", FALSE, ch, NULL, vict, TO_CHAR | TO_NODARK);
 		}

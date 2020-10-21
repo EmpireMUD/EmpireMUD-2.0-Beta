@@ -5944,7 +5944,7 @@ void do_stat_character(char_data *ch, char_data *k) {
 			mem = SCRIPT_MEM(k);
 			msg_to_char(ch, "Script memory:\r\n  Remember             Command\r\n");
 			while (mem) {
-				char_data *mc = find_char(mem->id, FALSE);
+				char_data *mc = find_char(mem->id);
 				if (!mc) {
 					msg_to_char(ch, "  ** Corrupted!\r\n");
 				}
