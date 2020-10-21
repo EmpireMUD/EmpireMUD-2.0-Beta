@@ -339,7 +339,7 @@ void weather_change(void) {
 * Determines the current phase of the moon based on how long its cycle is, and
 * based on how long the mud has been alive.
 *
-* @param double cycle_days Number of days in the moon's cycle (Earth's moon is 29.53 days).
+* @param double cycle_days Number of days in the moon's cycle (Earth's moon is 29.53 days real time or 29.13 days game time).
 * @return moon_phase_t One of the PHASE_ values.
 */
 moon_phase_t get_moon_phase(double cycle_days) {
@@ -351,7 +351,7 @@ moon_phase_t get_moon_phase(double cycle_days) {
 	
 	// determine how far into the current cycle we are
 	if (cycle_days > 0.0) {
-		cycle_time = fmod(long_count_day, cycle_days) / cycle_days;
+		cycle_time = (fmod(long_count_day, cycle_days) + 1.0) / cycle_days;
 	}
 	else {	// div/0 safety
 		cycle_time = 0.0;

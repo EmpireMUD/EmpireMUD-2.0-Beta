@@ -3450,7 +3450,10 @@ The 'moon' generic type controls what moons appear in the sky. These are shown
 to players on 'look up' or 'weather' and to immortals on 'show moons'.
 
 Aside from their name, moons have just one property:
-  <&ycycle&0> the number of days in the moon's full cycle (29.53 for Earth's moon)
+  <&ycycle&0> the number of days in the moon's full cycle
+
+Note: Earth's moon has a natural cycle of 29.53 days but since EmpireMUD uses
+30-day months, this is better approximated as 29.13 days.
 
 See also: OLC GENERICS
 #d
