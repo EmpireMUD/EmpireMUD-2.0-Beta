@@ -484,7 +484,7 @@ void show_visible_moons(char_data *ch) {
 		}
 		
 		// ok: show it
-		snprintf(buf, sizeof(buf), "%s is %s %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
+		snprintf(buf, sizeof(buf), "%s is %s, %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
 		send_to_char(CAP(buf), ch);
 	}
 }
