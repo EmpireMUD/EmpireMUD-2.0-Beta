@@ -3565,7 +3565,7 @@ ACMD(do_time) {
 		}
 		
 		if (IS_IMMORTAL(ch)) {
-			msg_to_char(ch, " (%d%s global time)", ((main_time_info.hours % 12 == 0) ? 12 : ((main_time_info.hours) % 12)), ((main_time_info.hours >= 12) ? "pm" : "am"));
+			sprintf(buf + strlen(buf), " (%d%s global time)", ((main_time_info.hours % 12 == 0) ? 12 : ((main_time_info.hours) % 12)), ((main_time_info.hours >= 12) ? "pm" : "am"));
 		}
 		
 		strcat(buf, ".\r\n");
