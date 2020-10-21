@@ -351,7 +351,7 @@ moon_phase_t get_moon_phase(double cycle_days) {
 	
 	// determine how far into the current cycle we are
 	if (cycle_days > 0.0) {
-		cycle_time = fmod(long_count_day, cycle_days);
+		cycle_time = fmod(long_count_day, cycle_days) / cycle_days;
 	}
 	else {	// div/0 safety
 		cycle_time = 0.0;
