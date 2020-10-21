@@ -333,7 +333,7 @@ void cascade_time_info(void) {
 	struct time_info_data *ptr;
 	int iter;
 	
-	for (iter = 0; iter < 23; ++iter) {
+	for (iter = 0; iter < 24; ++iter) {
 		ptr = &regional_time_info[23-iter];
 		
 		// start with same values

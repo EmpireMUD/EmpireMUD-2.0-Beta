@@ -3563,6 +3563,11 @@ ACMD(do_time) {
 			weekday = ((30 * tinfo->month) + tinfo->day + 1) % 7;
 			strcat(buf, weekdays[weekday]);
 		}
+		
+		if (IS_IMMORTAL(ch)) {
+			msg_to_char(ch, " (%d%s global time)", ((main_time_info.hours % 12 == 0) ? 12 : ((main_time_info.hours) % 12)), ((main_time_info.hours >= 12) ? "pm" : "am"));
+		}
+		
 		strcat(buf, ".\r\n");
 		send_to_char(buf, ch);
 	
