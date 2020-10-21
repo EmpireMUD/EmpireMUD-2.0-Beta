@@ -399,11 +399,11 @@ int get_time_zone(room_data *room, struct map_data *loc) {
 	}
 	
 	// determine longitude
-	longitude = X_TO_LONGITUDE(x_coord);
+	longitude = (int)X_TO_LONGITUDE(x_coord);
 	
 	// determine grouping based on that
 	longitude += 180;	// move from (-180 to 180) to (0 to 360)
-	region = longitude / 24;	// split into 24
+	region = longitude / 15;	// split 360 degrees into 15-degree-wide groups of 24
 	region = MAX(0, MIN(23, region));	// safety: ensure it's within bounds}
 	
 	return region;
