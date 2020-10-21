@@ -422,7 +422,7 @@ int compute_night_light_radius(void) {
 	generic_data *moon, *next_gen;
 	moon_phase_t phase;
 	
-	const int max_light_radius = 5;
+	int max_light_radius_base = config_get_int("max_light_radius_base");
 	
 	HASH_ITER(hh, generic_table, moon, next_gen) {
 		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1) {
@@ -445,7 +445,7 @@ int compute_night_light_radius(void) {
 	
 	// compute
 	dist = best + second/2;
-	dist = MAX(1, MIN(dist, max_light_radius));
+	dist = MAX(1, MIN(dist, max_light_radius_base));
 	
 	// save to the global
 	night_light_radius = dist;

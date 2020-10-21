@@ -148,6 +148,7 @@ idle_rent_time 20
 lastname_mode ac
 max_capitals_in_name 2
 max_home_store_uniques 300
+max_light_radius_base 5
 max_map_size 12
 max_map_while_moving 5
 max_player_attribute 15

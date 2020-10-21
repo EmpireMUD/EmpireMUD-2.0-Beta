@@ -2198,7 +2198,7 @@ const char *moon_phases[] = {
 };
 
 
-// PHASE_x (2/3): moon phases	-- shown as "<moon name> is <moon_phases_long> <moon_positions>."
+// PHASE_x (2/3): moon phases	-- shown as "<moon name> is <moon_phases_long>, <moon_positions>."
 const char *moon_phases_long[] = {
 	"a new moon",
 	"a waxing crescent",
@@ -2225,7 +2225,7 @@ const int moon_phase_brightness[NUM_PHASES] = {
 };
 
 
-// MOON_POS_x: moon position in the sky	-- shown as "<moon name> is <moon_phases_long> <moon_positions>."
+// MOON_POS_x: moon position in the sky	-- shown as "<moon name> is <moon_phases_long>, <moon_positions>."
 const char *moon_positions[] = {
 	"down",
 	"low in the east",
