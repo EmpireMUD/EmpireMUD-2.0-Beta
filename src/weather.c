@@ -33,6 +33,7 @@
 
 // local prototypes
 void another_hour();
+void send_hourly_sun_messages();
 void weather_change();
 
 
@@ -250,7 +251,6 @@ void weather_change(void) {
 * things which happen on specific hours.
 */
 void another_hour(void) {
-	descriptor_data *d;
 	long lny;
 	
 	// update main time
@@ -295,60 +295,34 @@ void another_hour(void) {
 			run_external_evolutions();
 			break;
 		}
-		case 1: {
-			// 1am shipment
+		case 1: {	// 1am shipment
 			process_shipping();
 			break;
 		}
-		case 7: {
-			for (d = descriptor_list; d; d = d->next) {
-				if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) && AWAKE(d->character) && IS_OUTDOORS(d->character)) {
-					look_at_room(d->character);
-					msg_to_char(d->character, "\r\n");
-				}
-			}
-			send_to_outdoor(FALSE, "The sun rises over the horizon.\r\n");
-			
-			// 7am shipment
+		case 7: {	// 7am shipment and world save
 			process_shipping();
-			
-			// world save
 			save_whole_world();
-			break;
-		}
-		case 8: {
-			send_to_outdoor(FALSE, "The day has begun.\r\n");
 			break;
 		}
 		case 12: {	// noon
 			process_imports();
 			break;
 		}
-		case 13: {
-			// 1pm shipment
+		case 13: {	// 1pm shipment
 			process_shipping();
 			break;
 		}
-		case 19: {
-			send_to_outdoor(FALSE, "The sun slowly disappears beneath the horizon.\r\n");
-			
-			// 7pm shipment
+		case 19: {	// 7pm shipment
 			process_shipping();
-			break;
-		}
-		case 20: {
-			for (d = descriptor_list; d; d = d->next)
-				if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) &&  AWAKE(d->character) && IS_OUTDOORS(d->character)) {
-					look_at_room(d->character);
-					msg_to_char(d->character, "\r\n");
-				}
-			send_to_outdoor(FALSE, "The night has begun.\r\n");
 			break;
 		}
 	}
 	
 	// other hourly work
 	compute_night_light_radius();
+	
+	// and announce it to the players
+	send_hourly_sun_messages();
 }
 
 
@@ -433,6 +407,56 @@ int get_time_zone(room_data *room, struct map_data *loc) {
 	region = MAX(0, MIN(23, region));	// safety: ensure it's within bounds}
 	
 	return region;
+}
+
+
+/**
+* To be called at the end of the hourly update to show players sunrise/sunset.
+*/
+void send_hourly_sun_messages(void) {
+	struct time_info_data *tinfo;
+	descriptor_data *desc;
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || desc->character == NULL) {
+			continue;
+		}
+		if (!AWAKE(desc->character) || !IS_OUTDOORS(desc->character)) {
+			continue;
+		}
+		
+		// get local time
+		tinfo = local_time_info(IN_ROOM(desc->character), NULL);
+		
+		switch (tinfo->hours) {
+			case 7: {	// sunrise
+				// show map if needed
+				if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT)) {
+					look_at_room(desc->character);
+					msg_to_char(desc->character, "\r\n");
+				}
+				msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
+				break;
+			}
+			case 8: {	// day start
+				msg_to_char(desc->character, "The day has begun.\r\n");
+				break;
+			}
+			case 19: {	// sunset
+				msg_to_char(desc->character, "The sun slowly disappears beneath the horizon.\r\n");
+				break;
+			}
+			case 20: {	// dark
+				// show map if needed
+				if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT)) {
+					look_at_room(desc->character);
+					msg_to_char(desc->character, "\r\n");
+				}
+				msg_to_char(desc->character, "The night has begun.\r\n");
+				break;
+			}
+		}
+	}
 }
 
 
