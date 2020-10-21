@@ -155,6 +155,12 @@ extern const char *mob_custom_types[];
 extern const char *mob_move_types[];
 extern const char *name_sets[];
 
+// moon constants
+extern const char *moon_phases[];
+extern const char *moon_phases_long[];
+extern const int moon_phase_brightness[NUM_PHASES];
+extern const char *moon_positions[];
+
 // item constants
 extern const char *wear_keywords[];
 extern const struct wear_data_type wear_data[NUM_WEARS];

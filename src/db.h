@@ -574,6 +574,9 @@ extern char_data *find_or_load_player(char *name, bool *is_file);
 void store_loaded_char(char_data *ch);
 char_data *load_player(char *name, bool normal);
 
+// moons
+extern int night_light_radius;
+
 // morphs
 extern morph_data *morph_table;
 extern morph_data *sorted_morphs;

@@ -3444,6 +3444,16 @@ However, this is not required if you have a compelling reason not to.
 
 See also: GENERIC COMPONENTS
 #d
+"GENERIC MOON" "MOON GENERICS" "MOON EDITOR" "GENEDIT CYCLE"
+
+The 'moon' generic type controls what moons appear in the sky. These are shown
+to players on 'look up' or 'weather' and to immortals on 'show moons'.
+
+Aside from their name, moons have just one property:
+  <&ycycle&0> the number of days in the moon's full cycle (29.53 for Earth's moon)
+
+See also: OLC GENERICS
+#d
 "GENEDIT NAME"
 
 Usage:  .name <name>

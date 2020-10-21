@@ -241,6 +241,7 @@ OLC_MODULE(genedit_wearoff);
 OLC_MODULE(genedit_wearoff2room);
 OLC_MODULE(genedit_plural);
 OLC_MODULE(genedit_singular);
+OLC_MODULE(genedit_cycle);
 
 // global modules
 OLC_MODULE(gedit_ability);
@@ -735,6 +736,8 @@ const struct olc_command_data olc_data[] = {
 	// generic: component
 	{ "item", genedit_item, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "relations", genedit_relations, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: moon
+	{ "cycle", genedit_cycle, OLC_GENERIC, OLC_CF_EDITOR },
 	
 	// globals commands
 	{ "capacity", gedit_capacity, OLC_GLOBAL, OLC_CF_EDITOR },

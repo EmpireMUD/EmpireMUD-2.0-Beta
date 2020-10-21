@@ -99,6 +99,27 @@ bool adjacent_room_is_light(room_data *room) {
 
 
 /**
+* How many tiles a player can see at night, depending on moons, tech, and
+* local light.
+*
+* @param char_data *ch The person.
+* @return How many tiles they can see.
+*/
+int distance_can_see_in_dark(char_data *ch) {
+	int dist = night_light_radius;	// from the global
+
+	if (has_player_tech(ch, PTECH_LARGER_LIGHT_RADIUS)) {
+		dist += 2;
+	}
+	if (IS_LIGHT(IN_ROOM(ch))) {
+		++dist;
+	}
+
+	return dist;
+}
+
+
+/**
 * Gets the one-line description for a single exit.
 *
 * @param char_data *ch The person looking at exits (for see-in-dark/roomflags).
@@ -835,7 +856,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						// magic dark
 						send_to_char("    ", ch);
 					}
-					else if (to_room != room && !CAN_SEE_IN_DARK_ROOM(ch, to_room) && compute_distance(room, to_room) > distance_can_see(ch) && !adjacent_room_is_light(to_room)) {
+					else if (to_room != room && !CAN_SEE_IN_DARK_ROOM(ch, to_room) && compute_distance(room, to_room) > distance_can_see_in_dark(ch) && !adjacent_room_is_light(to_room)) {
 						// normal dark
 						if (!PRF_FLAGGED(ch, PRF_NOMAPCOL)) {
 							show_map_to_char(ch, mappc, to_room, options | LRR_SHOW_DARK);
@@ -1799,7 +1820,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 		
 		*roombuf = '\0';
 		
-		if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK) || (!CAN_SEE_IN_DARK_ROOM(ch, to_room) && compute_distance(origin, to_room) > distance_can_see(ch) && !adjacent_room_is_light(to_room))) {
+		if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK) || (!CAN_SEE_IN_DARK_ROOM(ch, to_room) && compute_distance(origin, to_room) > distance_can_see_in_dark(ch) && !adjacent_room_is_light(to_room))) {
 			strcpy(roombuf, "Dark");
 		}
 		else {

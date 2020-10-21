@@ -34,6 +34,7 @@
 *     Game Defines
 *     Generic Defines
 *     Mobile Defines
+*     Moon Defines
 *     Object Defines
 *     Player Defines
 *     Progress Defines
@@ -1506,6 +1507,7 @@ typedef struct vehicle_data vehicle_data;
 #define GENERIC_AFFECT  4	// for affects (ATYPE_*)
 #define GENERIC_CURRENCY  5	// tokens, for shops
 #define GENERIC_COMPONENT  6	// types of generic objects
+#define GENERIC_MOON  7	// moon in the sky
 
 
 // GEN_x: generic flags
@@ -1616,6 +1618,37 @@ typedef struct vehicle_data vehicle_data;
 #define NAMES_NORTHERN  3
 #define NAMES_PRIMITIVE_SHORT  4
 #define NAMES_DESCRIPTIVE  5
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MOON DEFINES ////////////////////////////////////////////////////////////
+
+// PHASE_x: moon phases
+typedef enum {
+	PHASE_NEW,
+	PHASE_WAXING_CRESCENT,
+	PHASE_FIRST_QUARTER,
+	PHASE_WAXING_GIBBOUS,
+	PHASE_FULL,
+	PHASE_WANING_GIBBOUS,
+	PHASE_THIRD_QUARTER,
+	PHASE_WANING_CRESCENT,
+	
+	NUM_PHASES	// this goes last
+} moon_phase_t;
+
+
+// MOON_POS_x: moon position in the sky
+typedef enum {
+	MOON_POS_DOWN,	// not visible
+	MOON_POS_RISING,	// low in the east
+	MOON_POS_EAST,	// high in the east
+	MOON_POS_HIGH,	// overhead
+	MOON_POS_WEST,	// high in the west
+	MOON_POS_SETTING,	// low in the west
+	
+	NUM_MOON_POS	// this goes last
+} moon_pos_t;
 
 
  //////////////////////////////////////////////////////////////////////////////

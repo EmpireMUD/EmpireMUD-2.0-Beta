@@ -210,6 +210,9 @@ char_data *next_combat_list = NULL;	// used for iteration of combat_list when mo
 char_data *next_combat_list_main = NULL;	// used for iteration of combat_list in frequent_combat()
 struct generic_name_data *generic_names = NULL;	// LL of generic name sets
 
+// moons
+int night_light_radius = 1;	// how many tiles you can see at night (unskilled)
+
 // morphs
 morph_data *morph_table = NULL;	// master morph hash table
 morph_data *sorted_morphs = NULL;	// alphabetic version // sorted_hh
@@ -442,7 +445,7 @@ void boot_db(void) {
 	log("Running reboot triggers.");
 	run_reboot_triggers();
 	
-	log(" Calculating empire data.");
+	log("Calculating empire data.");
 	reread_empire_tech(NULL);
 	check_for_new_map();
 	setup_island_levels();
@@ -452,10 +455,10 @@ void boot_db(void) {
 	verify_empire_goals();
 	need_progress_refresh = TRUE;
 	
-	log(" Checking for ruined cities...");
+	log("Checking for ruined cities...");
 	check_ruined_cities();
 	
-	log(" Abandoning lost vehicles...");
+	log("Abandoning lost vehicles...");
 	abandon_lost_vehicles();
 	
 	log("Managing world memory.");
@@ -464,6 +467,9 @@ void boot_db(void) {
 	
 	log("Activating workforce.");
 	chore_update();
+	
+	log("Final startup...");
+	compute_night_light_radius();
 	
 	// END
 	log("Boot db -- DONE.");

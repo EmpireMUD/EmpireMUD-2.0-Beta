@@ -735,6 +735,11 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_COMPONENT_PLURAL(gen)  (GEN_TYPE(gen) == GENERIC_COMPONENT ? GEN_STRING((gen), GSTR_COMPONENT_PLURAL) : NULL)
 #define GET_COMPONENT_SINGULAR(gen)  (GEN_TYPE(gen) == GENERIC_COMPONENT ? GEN_NAME(gen) : NULL)
 
+// GENERIC_MOON
+#define GVAL_MOON_CYCLE  0
+#define GET_MOON_CYCLE(gen)  GEN_VALUE((gen), GVAL_MOON_CYCLE)
+#define GET_MOON_CYCLE_DAYS(gen)  (GET_MOON_CYCLE(gen) / 100.0)
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// GLOBAL UTILS ////////////////////////////////////////////////////////////
@@ -2165,6 +2170,7 @@ void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct e
 
 // mapview.c
 bool adjacent_room_is_light(room_data *room);
+int distance_can_see_in_dark(char_data *ch);
 struct icon_data *get_icon_from_set(struct icon_data *set, int type);
 int get_map_radius(char_data *ch);
 char *get_mine_type_name(room_data *room);
@@ -2391,9 +2397,11 @@ bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
 
 // weather.c
+int compute_night_light_radius();
 void determine_seasons();
-void list_moons_to_char(char_data *ch);
-byte distance_can_see(char_data *ch);
+moon_phase_t get_moon_phase(double cycle_days);
+moon_pos_t get_moon_position(moon_phase_t phase, int hour);
+void show_visible_moons(char_data *ch);
 
 // workforce.c
 void deactivate_workforce(empire_data *emp, int island_id, int type);

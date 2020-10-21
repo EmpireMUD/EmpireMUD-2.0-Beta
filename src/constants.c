@@ -37,6 +37,7 @@
 *   Faction Constants
 *   Generic Constants
 *   Mob Constants
+*   Moon Constants
 *   Item Contants
 *   OLC Constants
 *   Progress Constants
@@ -2057,6 +2058,7 @@ const char *generic_types[] = {
 	"AFFECT",
 	"CURRENCY",	// 5
 	"COMPONENT",
+	"MOON",
 	"\n"
 };
 
@@ -2175,6 +2177,62 @@ const char *name_sets[] = {
 	"Northern",
 	"Primitive-Short",
 	"Descriptive",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MOON CONSTANTS //////////////////////////////////////////////////////////
+
+// PHASE_x (1/3): moon phases (short names)
+const char *moon_phases[] = {
+	"new",
+	"waxing crescent",
+	"first quarter",
+	"waxing gibbous",
+	"full",
+	"waning gibbous",
+	"third quarter",
+	"waning crescent",
+	"\n"
+};
+
+
+// PHASE_x (2/3): moon phases	-- shown as "<moon name> is <moon_phases_long> <moon_positions>."
+const char *moon_phases_long[] = {
+	"a new moon",
+	"a waxing crescent",
+	"in the first quarter",
+	"a waxing gibbous",
+	"full",
+	"a waning gibbous",
+	"in the third quarter",
+	"a waning crescent",
+	"\n"
+};
+
+
+// PHASE_x (2/3): moon phase brightness (base distance you can see in the dark)
+const int moon_phase_brightness[NUM_PHASES] = {
+	1,	// new
+	2,	// crescent
+	3,	// quarter
+	3,	// gibbous
+	4,	// full
+	3,	// gibbous
+	3,	// quarter
+	2	// crescent
+};
+
+
+// MOON_POS_x: moon position in the sky	-- shown as "<moon name> is <moon_phases_long> <moon_positions>."
+const char *moon_positions[] = {
+	"down",
+	"rising in the east",
+	"high in the east",
+	"overhead",
+	"high in the west",
+	"setting in the west",
 	"\n"
 };
 

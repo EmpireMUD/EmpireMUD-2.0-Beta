@@ -323,6 +323,13 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 			// everything here is optional
 			break;
 		}
+		case GENERIC_MOON: {
+			if (GET_MOON_CYCLE(gen) < 1) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Moon cycle not set; moon can't be shown.");
+				problem = TRUE;
+			}
+			break;
+		}
 	}
 	
 	return problem;
@@ -1608,6 +1615,10 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Extended Relations:\r\n%s", GEN_COMPUTED_RELATIONS(gen) ? part : " none\r\n");
 			break;
 		}
+		case GENERIC_MOON: {
+			size += snprintf(buf + size, sizeof(buf) - size, "Cycle: \ty%.2f day%s\t0\r\n", GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE(gen)));
+			break;
+		}
 	}
 
 	page_string(ch->desc, buf, TRUE);
@@ -1680,6 +1691,10 @@ void olc_show_generic(char_data *ch) {
 			
 			get_generic_relation_display(GEN_RELATIONS(gen), TRUE, lbuf, NULL);
 			sprintf(buf + strlen(buf), "<%srelations\t0>\r\n%s", OLC_LABEL_PTR(GEN_RELATIONS(gen)), lbuf);
+			break;
+		}
+		case GENERIC_MOON: {
+			sprintf(buf + strlen(buf), "<%scycle\t0> %.2f day%s\r\n", OLC_LABEL_VAL(GET_MOON_CYCLE(gen), 0), GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE(gen)/100));
 			break;
 		}
 	}
@@ -2406,6 +2421,19 @@ OLC_MODULE(genedit_color) {
 	}
 	else {
 		olc_process_string(ch, argument, "color", &GEN_STRING(gen, GSTR_LIQUID_COLOR));
+	}
+}
+
+
+OLC_MODULE(genedit_cycle) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	double days;
+	
+	if (GEN_TYPE(gen) != GENERIC_MOON) {
+		msg_to_char(ch, "You can only change that on a MOON generic.\r\n");
+	}
+	else if ((days = olc_process_double(ch, argument, "days in the moon's cycle", "cycle", .01, 100000.00, 0.0)) > 0.0) {
+		 GEN_VALUE(gen, GVAL_MOON_CYCLE) = (int)(days * 100.0);
 	}
 }
 

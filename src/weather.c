@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -20,6 +22,13 @@
 #include "interpreter.h"
 #include "db.h"
 #include "skills.h"
+#include "constants.h"
+
+/**
+* Contents:
+*   Unsorted Code
+*   Moon System
+*/
 
 // local prototypes
 void another_hour(int mode);
@@ -90,16 +99,20 @@ void another_hour(int mode) {
 				break;
 		}
 	}
+	
+	// day change
 	if (time_info.hours > 23) {	/* Changed by HHS due to bug ??? */
 		time_info.hours -= 24;
 		time_info.day++;
 		
 		determine_seasons();
 		
+		// month change
 		if (time_info.day > 29) {
 			time_info.day = 0;
 			time_info.month++;
-
+			
+			// year change
 			if (time_info.month > 11) {
 				time_info.month = 0;
 				time_info.year++;
@@ -114,6 +127,11 @@ void another_hour(int mode) {
 				annual_world_update();
 			}
 		}
+	}
+	
+	// other hourly work
+	if (weather_info.sunlight == SUN_SET || weather_info.sunlight == SUN_DARK) {
+		compute_night_light_radius();
 	}
 }
 
@@ -314,126 +332,150 @@ void weather_change(void) {
 }
 
 
-/*
- *  Empire Moons 1.0
- *   by Paul Clarke, 10/19/2k
- *
- *  To add a moon: increase NUM_OF_MOONS by 1 and add a line in moons[]
- *  to correspond with your new moon.  Reboot and it's all done for you.
- */
+ //////////////////////////////////////////////////////////////////////////////
+//// MOON SYSTEM /////////////////////////////////////////////////////////////
 
-#define NUM_OF_MOONS		1
-
-#define PHASE_NEW				0	/*								*/
-#define PHASE_WAXING			1	/*								*/
-#define PHASE_FIRST_QUARTER		2	/*  Phases of the moon			*/
-#define PHASE_FULL				3	/*								*/
-#define PHASE_LAST_QUARTER		4	/*								*/
-#define PHASE_WANING			5	/*								*/
-
-struct moon_data {
-	char *name;
-	byte cycle;			/* Days between full moons */
-} moons[NUM_OF_MOONS] = {
-	{ "The Moon", 28 }
-};
-
-
-/* Retrieve the current phase of a specific moon */
-byte get_phase(int M) {
-	int total_time = time_info.day;
-	int diff;
-
-	total_time += time_info.month * 30;		/* 30 days in a month	*/
-	total_time += time_info.year * 12 * 30;	/* 12 months in a year	*/
-
-	total_time %= moons[M].cycle;
-
-	diff = 100 * total_time / moons[M].cycle;		/* diff is a percentage of the rotation */
-
-	if (diff <= 2 || diff >= 98)
-		return PHASE_NEW;
-	if (diff >= 23 && diff <= 27)
-		return PHASE_FIRST_QUARTER;
-	if (diff >= 73 && diff <= 77)
-		return PHASE_LAST_QUARTER;
-	if (diff >= 48 && diff <= 52)
-		return PHASE_FULL;
-	if (diff < 50)
-		return PHASE_WAXING;
-	else
-		return PHASE_WANING;
+/**
+* Determines the current phase of the moon based on how long its cycle is, and
+* based on how long the mud has been alive.
+*
+* @param double cycle_days Number of days in the moon's cycle (Earth's moon is 29.53 days).
+* @return moon_phase_t One of the PHASE_ values.
+*/
+moon_phase_t get_moon_phase(double cycle_days) {
+	double long_count_day, cycle_time;
+	int phase;
+	
+	// exact number of days the mud has been running (all moons are 'new' at the time of DATA_START_WORLD)
+	long_count_day = (double)(time(0) - data_get_long(DATA_WORLD_START)) / (double)SECS_PER_MUD_DAY;
+	
+	// determine how far into the current cycle we are
+	if (cycle_days > 0.0) {
+		cycle_time = fmod(long_count_day, cycle_days);
+	}
+	else {	// div/0 safety
+		cycle_time = 0.0;
+	}
+	
+	phase = round(NUM_PHASES * cycle_time);
+	phase = MAX(0, MIN(NUM_PHASES-1, phase));
+	return (moon_phase_t)phase;
 }
 
 
-void list_moons_to_char(char_data *ch) {
-	int M, i;
-	char moon_str[112];
-
-	if (NUM_OF_MOONS == 0)
-		return;
-
-	*buf = '\0';
-
-	for (M = 0; M < NUM_OF_MOONS; M++) {
-		*moon_str = '\0';
-		switch(get_phase(M)) {
-			case PHASE_WAXING:			sprintf(moon_str, "waxing");				break;
-			case PHASE_FIRST_QUARTER:	sprintf(moon_str, "in its first quarter");	break;
-			case PHASE_FULL:			sprintf(moon_str, "full");					break;
-			case PHASE_LAST_QUARTER:	sprintf(moon_str, "in its last quarter");	break;
-			case PHASE_WANING:			sprintf(moon_str, "waning");				break;
-		}
-		if (*buf)
-			strcat(buf, ", ");
-		if (*moon_str)
-			sprintf(buf+strlen(buf), "%s is %s", moons[M].name, moon_str);
+/**
+* Determines where the moon is in the sky. Phases rise roughly 3 hours apart.
+*
+* @param moon_phase_t phase Any moon phase.
+* @param int hour Time of day from 0..23 hours.
+*/
+moon_pos_t get_moon_position(moon_phase_t phase, int hour) {
+	int moonrise = (phase * 3) + 7, moonset = (phase * 3) + 19;
+	double percent, pos;
+	
+	// check bounds/wraparound
+	if (moonrise > 23) {
+		moonrise -= 24;
 	}
-
-	if (!*buf)
-		sprintf(buf, "You can't see the moon%s right now", NUM_OF_MOONS > 1 ? "s" : "");
-
-	strcat(buf, ".\r\n");
-
-	/* This will find the last comma and replace it with an "and" */
-	for (i = strlen(buf)-1; i > 0; i--)
-		if (buf[i] == ',') {
-			sprintf(buf1, "%s", buf + i+1);
-			buf[i] = '\0';
-			strcat(buf, " and");
-			strcat(buf, buf1);
-			break;
-		}
-	send_to_char(buf, ch);
+	if (moonset > 23) {
+		moonset -= 24;
+	}
+	
+	// shift moonset forward IF it's lower than moonrise (moon rises late)
+	if (moonset < moonrise) {
+		moonset += 24;	// tomorrow
+	}
+	
+	// shift the incoming hour if it's before moonrise to see if it's in tomorrow's moonrise
+	if (hour < moonrise) {
+		hour += 24;
+	}
+	
+	// now see how far inside or outside of this they are as a percentage
+	percent = (double)(hour - moonrise) / (double)(moonset - moonrise);
+	
+	// outside of that range and the moon is not up
+	if (percent <= 0.0 || percent >= 1.0) {
+		return MOON_POS_DOWN;
+	}
+	
+	pos = NUM_MOON_POS * percent;
+	
+	// determine which way to round to give some last-light
+	if (percent < 0.5) {
+		return (moon_pos_t) ceil(pos);
+	}
+	else {
+		return (moon_pos_t) floor(pos);
+	}
 }
 
 
-byte distance_can_see(char_data *ch) {
-	int M, p, a = 0, b = 0, c = 0;
-
-	for (M = 0; M < NUM_OF_MOONS; M++) {
-		switch (get_phase(M)) {
-			case PHASE_FULL:			c = 4;		break;
-			case PHASE_FIRST_QUARTER:
-			case PHASE_LAST_QUARTER:	c = 3;		break;
-			case PHASE_WAXING:
-			case PHASE_WANING:			c = 2;		break;
-			default:					c = 1;		break;
+/**
+* Computes the light radius at night based on any visible moon(s) in the sky.
+* Fetch this from the night_light_radius global bool.
+*
+* @return int Number of tiles you can see at night.
+*/
+int compute_night_light_radius(void) {
+	int dist, best = 0, second = 0;
+	generic_data *moon, *next_gen;
+	moon_phase_t phase;
+	
+	const int max_light_radius = 5;
+	
+	HASH_ITER(hh, generic_table, moon, next_gen) {
+		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1) {
+			continue;	// not a moon or invalid cycle
 		}
-		if (c > a)
-			a = c;
-		else if (c > b)
-			b = c;
+		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
+		if (get_moon_position(phase, time_info.hours) == MOON_POS_DOWN) {
+			continue;	// moon isn't up
+		}
+		
+		// ok: record it if better
+		if (moon_phase_brightness[phase] > best) {
+			second = best;
+			best = moon_phase_brightness[phase];
+		}
+		else if (moon_phase_brightness[phase] > second) {
+			second = moon_phase_brightness[phase];
+		}
 	}
-	p = a + b;
-	p = MIN(5, p);
+	
+	// compute
+	dist = best + second/2;
+	dist = MAX(1, MIN(dist, max_light_radius));
+	
+	// save to the global
+	night_light_radius = dist;
+	
+	// and return it
+	return night_light_radius;
+}
 
-	if (has_player_tech(ch, PTECH_LARGER_LIGHT_RADIUS)) {
-		p += 2;
+
+/**
+* Displays any visible moons to the player, one per line.
+*
+* @param char_data *ch The person to show the moons to.
+*/
+void show_visible_moons(char_data *ch) {
+	char buf[MAX_STRING_LENGTH];
+	generic_data *moon, *next_gen;
+	moon_phase_t phase;
+	moon_pos_t pos;
+	
+	HASH_ITER(hh, generic_table, moon, next_gen) {
+		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1) {
+			continue;	// not a moon or invalid cycle
+		}
+		
+		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
+		pos = get_moon_position(phase, time_info.hours);
+		if (pos != MOON_POS_DOWN) {
+			snprintf(buf, sizeof(buf), "%s is %s %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
+			send_to_char(CAP(buf), ch);
+		}
 	}
-
-	if (IS_LIGHT(IN_ROOM(ch)))
-		p++;
-
-	return p;
 }
