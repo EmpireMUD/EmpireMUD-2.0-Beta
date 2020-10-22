@@ -40,7 +40,7 @@ The improved version is called Nightsight.
 
 Gains experience passively when you're standing in a dark room.
 
-See also: NIGHTSIGHT
+See also: DARK, NIGHTSIGHT
 #
 "FIND HERBS" WHITEGRASS FIVELEAF REDTHORN MAGEWHISPER DAGGERBITE BILEBERRIES BILEBERRY "WHITE GRASS" "FIVE LEAF" "RED THORN" "MAGE WHISPER" "DAGGER BITE" "BILE BERRIES"
 
@@ -261,7 +261,7 @@ this ability on and off at will.
 Gains experience passively when you're standing in a dark room, as long as it's
 active.
 
-See also: BY MOONLIGHT
+See also: BY MOONLIGHT, NIGHT
 #
 "NO TRACE"
 
