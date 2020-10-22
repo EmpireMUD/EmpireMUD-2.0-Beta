@@ -858,7 +858,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						// magic dark: show blank
 						send_to_char("    ", ch);
 					}
-					else if (to_room != room && !CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
+					else if (to_room != room && !CAN_SEE_IN_DARK_ROOM_NO_ADJACENT(ch, to_room)) {
 						// normal dark
 						dist = compute_distance(room, to_room);
 						
