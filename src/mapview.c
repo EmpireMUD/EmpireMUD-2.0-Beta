@@ -1787,7 +1787,12 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 	}
 	else if (partial_dark) {
 		// on request, some types apply 'Dark' to a shortened name
-		chop_last_arg(temp, junk, temp2);
+		if (strchr(temp, ' ')) {
+			chop_last_arg(temp, junk, temp2);
+		}
+		else {
+			strcpy(temp2, temp);
+		}
 		sprintf(temp, "Dark %s", temp2);
 	}
 	
