@@ -867,7 +867,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 							// close enough to see
 							show_map_to_char(ch, mappc, to_room, options);
 						}
-						else if ((dist <= can_see_in_dark_distance + 2 && !PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE)) || adjacent_room_is_light(to_room)) {
+						else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room)) && !PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE)) {
 							// see-distance to see-distance+2: show as dark tile
 							// note: no-map-color toggle will show these as blank instead
 							show_map_to_char(ch, mappc, to_room, options | LRR_SHOW_DARK);
