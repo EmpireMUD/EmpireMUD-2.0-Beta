@@ -1261,7 +1261,8 @@ on the map.
 
 You can get extra information if you have the 'political' or 'informative'
 toggles turned on. Scanning for 'foreign' tiles will show ones owned by empires
-other than your own.
+other than your own. However, dimly lit tiles won't appear on political or
+informative at night.
 
 Example:
  > scan southwest

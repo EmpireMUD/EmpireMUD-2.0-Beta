@@ -1101,7 +1101,8 @@ INFORMATIVE "TOGGLE INFORMATIVE"
 
 Usage:  toggle informative [on/off]
 
-Informative map mode shows you details about map tiles:
+Informative map mode shows you details about map tiles. Screenreader users see
+this information as text, while people using the visual map see tiles in color:
 
   &C[--]&0  being dismantled
   &c(--)&0  not done building
@@ -1112,6 +1113,8 @@ Informative map mode shows you details about map tiles:
   &B^^^^&0  no-work
   
   &y^()^&0  chameleon building (immortal only)
+
+Dimly lit tiles do not appear in 'informative' mode.
 
 See also: TOGGLES, MAINTAIN, WORKFORCE
 #
@@ -1596,7 +1599,10 @@ POLITICAL "POLITICAL VIEW" "TOGGLE POLITICAL"
 Usage:  toggle political [on/off]
 
 This toggle changes your map colors from environmental to political. You will
-see each acre colored with the banner of the empire who owns it.
+see each acre colored with the banner of the empire who owns it. Screenreader
+users will see empire names next to claimed tiles.
+
+Dimly lit tiles do not appear in 'informative' mode.
 
 See also: BANNER, TOGGLE
 #
@@ -2450,6 +2456,9 @@ Immortal toggles:
   incognito - if on, the immortal does not appear on 'who' to mortals
   wizhide - if on, the immortal can't be seen in rooms but is not invisible
   autonotes - automatically show notes on accounts when players log in
+
+Note: Political and informative views only show fully-lit tiles at night, not
+dim tiles.
 
 See also: FIGHT MESSAGES, TOGGLE <type>
 #
