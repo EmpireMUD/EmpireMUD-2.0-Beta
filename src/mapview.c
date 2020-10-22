@@ -623,6 +623,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	int s, t, mapsize, iter, check_x, check_y, level, ter_type;
 	int first_iter, second_iter, xx, yy, magnitude, north;
 	int first_start, first_end, second_start, second_end, temp;
+	int dist, can_see_in_dark_distance;
 	bool y_first, invert_x, invert_y, comma, junk;
 	struct instance_data *inst;
 	player_index_data *index;
@@ -765,6 +766,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 			invert_y = (how_to_show_map[north][1] == -1);
 			first_start = second_start = magnitude;
 			first_end = second_end = magnitude;
+			can_see_in_dark_distance = distance_can_see_in_dark(ch);
 			
 			// map edges?
 			if (!WRAP_Y) {
@@ -853,19 +855,29 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						send_to_char("    ", ch);
 					}
 					else if (to_room != room && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
-						// magic dark
+						// magic dark: show blank
 						send_to_char("    ", ch);
 					}
-					else if (to_room != room && !CAN_SEE_IN_DARK_ROOM(ch, to_room) && compute_distance(room, to_room) > distance_can_see_in_dark(ch) && !adjacent_room_is_light(to_room)) {
+					else if (to_room != room && !CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
 						// normal dark
-						if (!PRF_FLAGGED(ch, PRF_NOMAPCOL)) {
+						dist = compute_distance(room, to_room);
+						
+						if (dist <= can_see_in_dark_distance) {
+							// close enough to see
+							show_map_to_char(ch, mappc, to_room, options);
+						}
+						else if ((dist <= can_see_in_dark_distance + 2 && !PRF_FLAGGED(ch, PRF_NOMAPCOL)) || adjacent_room_is_light(to_room)) {
+							// see-distance to see-distance+2: show as dark tile
+							// note: no-map-color toggle will show these as blank instead
 							show_map_to_char(ch, mappc, to_room, options | LRR_SHOW_DARK);
 						}
 						else {
+							// too far (or color is off): show blank
 							send_to_char("    ", ch);
 						}
-					}
+					}	// end dark
 					else {
+						// normal view
 						show_map_to_char(ch, mappc, to_room, options);
 					}
 				}

@@ -6013,7 +6013,7 @@ room_data *straight_line(room_data *origin, room_data *destination, int iter) {
 * @return int The x-coordinate, or -1 if none.
 */
 int X_COORD(room_data *room) {
-	if (GET_MAP_LOC(room)) {
+	if (room && GET_MAP_LOC(room)) {
 		return MAP_X_COORD(GET_MAP_LOC(room)->vnum);
 	}
 	else {
@@ -6030,7 +6030,7 @@ int X_COORD(room_data *room) {
 * @return int The y-coordinate, or -1 if none.
 */
 int Y_COORD(room_data *room) {
-	if (GET_MAP_LOC(room)) {
+	if (room && GET_MAP_LOC(room)) {
 		return MAP_Y_COORD(GET_MAP_LOC(room)->vnum);
 	}
 	else {
