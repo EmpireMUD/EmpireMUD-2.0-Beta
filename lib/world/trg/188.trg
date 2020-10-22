@@ -2281,7 +2281,8 @@ Great Pumpkin wrong-month despawn~
 0 n 100
 ~
 * Despawns if it's not October in-game
-if %time.month% != 10
+set room %self.room%
+if %room.time(month)% != 10
   %echo% ~%self% returns to the Pumpkinverse.
   %purge% %self%
 end

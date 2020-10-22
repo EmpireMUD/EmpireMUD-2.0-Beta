@@ -1340,11 +1340,12 @@ if %blood% < %cost%
   %send% %actor% You don't have enough blood to infuse @%self% - it costs %cost%.
   halt
 end
-if %actor.room.sector% != Oasis
+set room %actor.room%
+if %room.sector% != Oasis
   %send% %actor% You can only infuse @%self% at an oasis.
   halt
 end
-if %time.hour% > 7 && %time.hour% < 19
+if %room.time(hour)% > 7 && %room.time(hour)% < 19
   %send% %actor% You can only infuse @%self% at night.
   if !%actor.is_immortal%
     halt
@@ -1366,12 +1367,12 @@ if (!(eclipse /= %arg%) || %actor.position% != Standing)
   return 0
   halt
 end
+set room %actor.room%
 * Check time of day (only at start to avoid sunset annoyances)
-if %time.hour% < 7 || %time.hour% > 19
+if %room.time(hour)% < 7 || %room.time(hour)% > 19
   %send% %actor% You can only perform this ritual during the day.
   halt
 end
-set room %actor.room%
 set cycles_left 5
 while %cycles_left% >= 0
   eval sector_valid (%room.template% == 10145)
