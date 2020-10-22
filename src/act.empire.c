@@ -2891,7 +2891,7 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 */
 void scan_for_tile(char_data *ch, char *argument) {
 	struct find_territory_node *node_list = NULL, *node, *next_node;
-	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count;
+	int dir, dist, mapsize, total, x, y, check_x, check_y, over_count, dark_distance;
 	char output[MAX_STRING_LENGTH], line[128], info[256], veh_string[MAX_STRING_LENGTH], temp[MAX_STRING_LENGTH], paint_str[256];
 	vehicle_data *veh, *scanned_veh;
 	struct map_data *map_loc;
@@ -2920,6 +2920,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 	unclaimed = !str_cmp(argument, "unclaimed") || !str_cmp(argument, "unclaim");
 	foreign = !str_cmp(argument, "foreign");
 	adventures = !str_cmp(argument, "adventures") || !str_cmp(argument, "adventure");
+	dark_distance = distance_can_see_in_dark(ch);
 	
 	for (x = -mapsize; x <= mapsize; ++x) {
 		for (y = -mapsize; y <= mapsize; ++y) {
@@ -2928,12 +2929,13 @@ void scan_for_tile(char_data *ch, char *argument) {
 			}
 			
 			// actual distance check (compute circle)
-			if (compute_distance(room, IN_ROOM(ch)) > mapsize) {
+			dist = compute_distance(room, IN_ROOM(ch));
+			if (dist > mapsize) {
 				continue;
 			}
 			
 			// darkness check
-			if (room != IN_ROOM(ch) && !CAN_SEE_IN_DARK_ROOM_NO_ADJACENT(ch, room) && compute_distance(room, IN_ROOM(ch)) > distance_can_see_in_dark(ch) && !adjacent_room_is_light(room)) {
+			if (room != IN_ROOM(ch) && !CAN_SEE_IN_DARK_ROOM_NO_ADJACENT(ch, room) && dist > dark_distance) {
 				continue;
 			}
 			
