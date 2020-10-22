@@ -44,6 +44,7 @@ extern vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
 
 // locals
 ACMD(do_exits);
+char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, bool show_dark);
 void show_screenreader_room(char_data *ch, room_data *room, bitvector_t options);
 
 
@@ -847,9 +848,9 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 				for (second_iter = second_start; second_iter >= -second_end; --second_iter) {
 					xx = (y_first ? second_iter : first_iter) * (invert_x ? -1 : 1);
 					yy = (y_first ? first_iter : second_iter) * (invert_y ? -1 : 1);
-				
+					
 					to_room = real_shift(room, xx, yy);
-				
+					
 					if (!to_room) {
 						// nothing to show?
 						send_to_char("    ", ch);
@@ -1738,23 +1739,28 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 * @param char_data *ch The person to get the view for.
 * @param room_data *from_room The room being viewed from.
 * @param room_data *to_room The room being shown.
+* @param bool show_dark If TRUE, tries to modify the name for darkened tiles.
 * @return char* The string to show.
 */
-char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data *to_room) {
+char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data *to_room, bool show_dark) {
 	static char lbuf[MAX_STRING_LENGTH];
-	char temp[MAX_STRING_LENGTH];
+	char temp[MAX_STRING_LENGTH], temp2[MAX_STRING_LENGTH], junk[MAX_STRING_LENGTH];
+	bool whole_dark = FALSE, partial_dark = FALSE;
 	crop_data *cp;
 	
 	strcpy(temp, "*");
 	
 	if (CHECK_CHAMELEON(from_room, to_room)) {
 		strcpy(temp, GET_SECT_NAME(BASE_SECT(to_room)));
+		partial_dark = show_dark;
 	}
 	else if (GET_BUILDING(to_room) && ROOM_BLD_FLAGGED(to_room, BLD_BARRIER) && ROOM_AFF_FLAGGED(to_room, ROOM_AFF_NO_FLY)) {
 		sprintf(temp, "Enchanted %s", GET_BLD_NAME(GET_BUILDING(to_room)));
+		whole_dark = show_dark;
 	}
 	else if (GET_BUILDING(to_room)) {
 		strcpy(temp, GET_BLD_NAME(GET_BUILDING(to_room)));
+		whole_dark = show_dark;
 	}
 	else if (GET_ROOM_TEMPLATE(to_room)) {
 		strcpy(temp, GET_RMT_TITLE(GET_ROOM_TEMPLATE(to_room)));
@@ -1762,12 +1768,27 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 	else if (ROOM_SECT_FLAGGED(to_room, SECTF_CROP) && (cp = ROOM_CROP(to_room))) {
 		strcpy(temp, GET_CROP_NAME(cp));
 		CAP(temp);
+		partial_dark = show_dark;
 	}
 	else if (IS_ROAD(to_room) && SECT_FLAGGED(BASE_SECT(to_room), SECTF_ROUGH)) {
 		strcpy(temp, "Winding Path");
+		partial_dark = show_dark;
 	}
 	else {
 		strcpy(temp, GET_SECT_NAME(SECT(to_room)));
+		partial_dark = show_dark;
+	}
+	
+	// dark check
+	if (whole_dark) {
+		// add Dark to whole tile name
+		strcpy(temp2, temp);
+		sprintf(temp, "Dark %s", temp2);
+	}
+	else if (partial_dark) {
+		// on request, some types apply 'Dark' to a shortened name
+		chop_last_arg(temp, junk, temp2);
+		sprintf(temp, "Dark %s", temp2);
 	}
 	
 	// start lbuf: color
@@ -1798,11 +1819,8 @@ char *get_screenreader_room_name(char_data *ch, room_data *from_room, room_data 
 
 void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	char buf[MAX_STRING_LENGTH], roombuf[MAX_INPUT_LENGTH], lastroom[MAX_INPUT_LENGTH];
-	char dirbuf[MAX_STRING_LENGTH], plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH], paint_str[256];
-	char_data *vict;
-	int mapsize, dist_iter;
-	vehicle_data *show_veh;
-	empire_data *emp;
+	char dirbuf[MAX_STRING_LENGTH];
+	int mapsize, dist, dist_iter, can_see_in_dark_distance;
 	room_data *to_room;
 	int repeats;
 	bool allow_stacking = TRUE;	// always
@@ -1818,6 +1836,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	}
 
 	// setup
+	can_see_in_dark_distance = distance_can_see_in_dark(ch);
 	*dirbuf = '\0';
 	*lastroom = '\0';
 	repeats = 0;
@@ -1831,73 +1850,29 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 		}
 		
 		*roombuf = '\0';
-		
-		if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK) || (!CAN_SEE_IN_DARK_ROOM(ch, to_room) && compute_distance(origin, to_room) > distance_can_see_in_dark(ch) && !adjacent_room_is_light(to_room))) {
+		if (ROOM_AFF_FLAGGED(to_room, ROOM_AFF_DARK)) {
+			// magic dark
 			strcpy(roombuf, "Dark");
 		}
-		else {
-			// not dark
-		
-			// show tile type
-			strcat(roombuf, get_screenreader_room_name(ch, origin, to_room));
-		
-			// show mappc
-			if (SHOW_PEOPLE_IN_ROOM(to_room)) {
-				*plrbuf = '\0';
-				
-				DL_FOREACH2(ROOM_PEOPLE(to_room), vict, next_in_room) {
-					if (can_see_player_in_other_room(ch, vict)) {
-						sprintf(plrbuf + strlen(plrbuf), "%s%s", *plrbuf ? ", " : "", PERS(vict, ch, FALSE));
-					}
-					else if (IS_NPC(vict) && size_data[GET_SIZE(vict)].show_on_map) {
-						sprintf(plrbuf + strlen(plrbuf), "%s%s", *plrbuf ? ", " : "", skip_filler(PERS(vict, ch, FALSE)));
-					}
-				}
+		else if (!CAN_SEE_IN_DARK_ROOM_NO_ADJACENT(ch, to_room)) {
+			// normal dark
+			dist = compute_distance(origin, to_room);
 			
-				if (*plrbuf) {
-					sprintf(roombuf + strlen(roombuf), " <%s>", plrbuf);
-				}
+			if (dist <= can_see_in_dark_distance) {
+				// close enough to see
+				strcpy(roombuf, screenread_one_tile(ch, origin, to_room, FALSE));
 			}
-			
-			// show ships
-			if ((show_veh = find_vehicle_to_show(ch, to_room))) {
-				if (VEH_PAINT_COLOR(show_veh)) {
-					sprinttype(VEH_PAINT_COLOR(show_veh), paint_names, paint_str, sizeof(paint_str), "painted");
-					*paint_str = LOWER(*paint_str);
-					strcat(paint_str, " ");
-				}
-				else {
-					*paint_str = '\0';
-				}
-				
-				if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
-					get_informative_vehicle_string(ch, show_veh, infobuf);
-					sprintf(roombuf + strlen(roombuf), " <%s%s%s%s>", paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)), *infobuf ? ": " :"", infobuf);
-				}
-				else if (VEH_OWNER(show_veh) && !VEH_CLAIMS_WITH_ROOM(show_veh) && PRF_FLAGGED(ch, PRF_POLITICAL)) {
-					sprintf(roombuf + strlen(roombuf), " <%s %s%s>", EMPIRE_ADJECTIVE(VEH_OWNER(show_veh)), paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)));
-				}
-				else {
-					sprintf(roombuf + strlen(roombuf), " <%s%s>", paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)));
-				}
+			else if (dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room)) {
+				// see-distance to see-distance+2: show as dark tile
+				strcpy(roombuf, screenread_one_tile(ch, origin, to_room, TRUE));
 			}
-			
-			// show ownership (political)
-			if (PRF_FLAGGED(ch, PRF_POLITICAL) && !CHECK_CHAMELEON(origin, to_room)) {
-				emp = ROOM_OWNER(to_room);
-			
-				if (emp) {
-					sprintf(roombuf + strlen(roombuf), " (%s)", EMPIRE_ADJECTIVE(emp));
-				}
+			else {
+				// too far: show blank
+				strcpy(roombuf, "Dark");
 			}
-		
-			// show status (informative)
-			if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
-				get_informative_tile_string(ch, to_room, infobuf);
-				if (*infobuf) {
-					sprintf(roombuf + strlen(roombuf), " [%s]", infobuf);
-				}
-			}
+		}
+		else {	// not dark
+			strcpy(roombuf, screenread_one_tile(ch, origin, to_room, FALSE));
 		}
 		
 		// check for repeats?
@@ -1935,6 +1910,86 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 	snprintf(buf, sizeof(buf), "%s: %s\r\n", dirs[get_direction_for_char(ch, dir)], dirbuf);
 	CAP(buf);
 	msg_to_char(ch, "%s", buf);
+}
+
+
+/**
+* Gets the full display for a single screenreader tile.
+*
+* @param char_data *ch The observer.
+* @param room_data *origin Where the player is looking from.
+* @param room_data *to_room The room to show.
+* @param bool show_dark If TRUE, prepends 'Dark' to some tile names.
+*/
+char *screenread_one_tile(char_data *ch, room_data *origin, room_data *to_room, bool show_dark) {
+	static char output[1024];
+	char plrbuf[MAX_INPUT_LENGTH], infobuf[MAX_INPUT_LENGTH], paint_str[256];
+	vehicle_data *show_veh;
+	empire_data *emp;
+	char_data *vict;
+	
+	// start with tile type
+	strcpy(output, get_screenreader_room_name(ch, origin, to_room, show_dark));
+
+	// show mappc
+	if (SHOW_PEOPLE_IN_ROOM(to_room)) {
+		*plrbuf = '\0';
+		
+		DL_FOREACH2(ROOM_PEOPLE(to_room), vict, next_in_room) {
+			if (can_see_player_in_other_room(ch, vict)) {
+				sprintf(plrbuf + strlen(plrbuf), "%s%s", *plrbuf ? ", " : "", PERS(vict, ch, FALSE));
+			}
+			else if (IS_NPC(vict) && size_data[GET_SIZE(vict)].show_on_map) {
+				sprintf(plrbuf + strlen(plrbuf), "%s%s", *plrbuf ? ", " : "", skip_filler(PERS(vict, ch, FALSE)));
+			}
+		}
+	
+		if (*plrbuf) {
+			sprintf(output + strlen(output), " <%s>", plrbuf);
+		}
+	}
+	
+	// show ships
+	if ((show_veh = find_vehicle_to_show(ch, to_room))) {
+		if (VEH_PAINT_COLOR(show_veh)) {
+			sprinttype(VEH_PAINT_COLOR(show_veh), paint_names, paint_str, sizeof(paint_str), "painted");
+			*paint_str = LOWER(*paint_str);
+			strcat(paint_str, " ");
+		}
+		else {
+			*paint_str = '\0';
+		}
+		
+		if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+			get_informative_vehicle_string(ch, show_veh, infobuf);
+			sprintf(output + strlen(output), " <%s%s%s%s>", paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)), *infobuf ? ": " :"", infobuf);
+		}
+		else if (VEH_OWNER(show_veh) && !VEH_CLAIMS_WITH_ROOM(show_veh) && PRF_FLAGGED(ch, PRF_POLITICAL)) {
+			sprintf(output + strlen(output), " <%s %s%s>", EMPIRE_ADJECTIVE(VEH_OWNER(show_veh)), paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)));
+		}
+		else {
+			sprintf(output + strlen(output), " <%s%s>", paint_str, skip_filler(get_vehicle_short_desc(show_veh, ch)));
+		}
+	}
+	
+	// show ownership (political)
+	if (PRF_FLAGGED(ch, PRF_POLITICAL) && !CHECK_CHAMELEON(origin, to_room)) {
+		emp = ROOM_OWNER(to_room);
+	
+		if (emp) {
+			sprintf(output + strlen(output), " (%s)", EMPIRE_ADJECTIVE(emp));
+		}
+	}
+
+	// show status (informative)
+	if (PRF_FLAGGED(ch, PRF_INFORMATIVE)) {
+		get_informative_tile_string(ch, to_room, infobuf);
+		if (*infobuf) {
+			sprintf(output + strlen(output), " [%s]", infobuf);
+		}
+	}
+	
+	return output;
 }
 
 
