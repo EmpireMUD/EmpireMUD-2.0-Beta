@@ -867,7 +867,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 							// close enough to see
 							show_map_to_char(ch, mappc, to_room, options);
 						}
-						else if ((dist <= can_see_in_dark_distance + 2 && !PRF_FLAGGED(ch, PRF_NOMAPCOL)) || adjacent_room_is_light(to_room)) {
+						else if ((dist <= can_see_in_dark_distance + 2 && !PRF_FLAGGED(ch, PRF_NOMAPCOL | PRF_POLITICAL | PRF_INFORMATIVE)) || adjacent_room_is_light(to_room)) {
 							// see-distance to see-distance+2: show as dark tile
 							// note: no-map-color toggle will show these as blank instead
 							show_map_to_char(ch, mappc, to_room, options | LRR_SHOW_DARK);
@@ -1866,6 +1866,10 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			if (dist <= can_see_in_dark_distance) {
 				// close enough to see
 				strcpy(roombuf, screenread_one_tile(ch, origin, to_room, FALSE));
+			}
+			else if (PRF_FLAGGED(ch, PRF_POLITICAL | PRF_INFORMATIVE)) {
+				// political and informative don't show the 'dim' section
+				strcpy(roombuf, "Dark");
 			}
 			else if (dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room)) {
 				// see-distance to see-distance+2: show as dark tile
