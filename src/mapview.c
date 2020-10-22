@@ -1871,12 +1871,12 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 				// political and informative don't show the 'dim' section
 				strcpy(roombuf, "Dark");
 			}
-			else if (dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room)) {
-				// see-distance to see-distance+2: show as dark tile
+			else if ((dist <= (can_see_in_dark_distance + 2) || adjacent_room_is_light(to_room)) && !PRF_FLAGGED(ch, PRF_POLITICAL | PRF_INFORMATIVE)) {
+				// see-distance to see-distance+2: show as dim tile (if political/informative are off)
 				strcpy(roombuf, screenread_one_tile(ch, origin, to_room, TRUE));
 			}
 			else {
-				// too far: show blank
+				// too far: show only darkness
 				strcpy(roombuf, "Dark");
 			}
 		}
