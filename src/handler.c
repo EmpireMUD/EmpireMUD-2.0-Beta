@@ -9647,13 +9647,15 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 * @return int FIND_ALL, FIND_ALLDOT, or FIND_INDIV
 */
 int find_all_dots(char *arg) {
+	char temp[MAX_INPUT_LENGTH];
 	int mode;
 	
 	if (!str_cmp(arg, "all")) {
 		mode = FIND_ALL;
 	}
 	else if (!strn_cmp(arg, "all.", 4)) {
-		strcpy(arg, arg + 4);
+		strcpy(temp, arg);
+		strcpy(arg, temp + 4);	// safer to copy twice to prevent memory overlap warning
 		mode = FIND_ALLDOT;
 	}
 	else {
