@@ -269,10 +269,8 @@ char *news = NULL;	// news for players
 
 // time, seasons, and weather
 struct time_info_data main_time_info;	// central time (corresponds to the latest time zone)
-struct time_info_data regional_time_info[24];	// subdivisions of 24-hour time
 struct weather_data weather_info;	// the infomation about the weather
 byte y_coord_to_season[MAP_HEIGHT];	// what season a given y-coord is in, as set by determine_seasons()
-int night_light_radius[24];	// how many tiles you can see at night (unskilled) in each time zone
 
 // tips of the day system
 char **tips_of_the_day = NULL;	// array of tips
@@ -470,7 +468,7 @@ void boot_db(void) {
 	chore_update();
 	
 	log("Final startup...");
-	compute_night_light_radius();
+	// put things here
 	
 	// END
 	log("Boot db -- DONE.");
@@ -4837,8 +4835,6 @@ void reset_time(void) {
 	}
 
 	main_time_info = *mud_time_passed(time(0), beginning_of_time);
-	cascade_time_info();
-	compute_night_light_radius();
 	reset_weather();
 	determine_seasons();
 

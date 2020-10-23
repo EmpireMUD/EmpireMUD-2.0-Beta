@@ -112,17 +112,17 @@ bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum) {
 * @return bool TRUE if the shop is open (based on its hours)
 */
 bool shop_is_open(shop_data *shop, room_data *room) {
-	struct time_info_data *tinfo;
-	tinfo = local_time_info(room, NULL);
+	struct time_info_data tinfo;
+	tinfo = get_local_time(room);
 	
 	if (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) {
 		return TRUE;	// always
 	}
 	else if (SHOP_OPEN_TIME(shop) < SHOP_CLOSE_TIME(shop)) {
-		return (tinfo->hours >= SHOP_OPEN_TIME(shop) && tinfo->hours < SHOP_CLOSE_TIME(shop));
+		return (tinfo.hours >= SHOP_OPEN_TIME(shop) && tinfo.hours < SHOP_CLOSE_TIME(shop));
 	}
 	else if (SHOP_OPEN_TIME(shop) > SHOP_CLOSE_TIME(shop)) {
-		return (tinfo->hours >= SHOP_OPEN_TIME(shop) || tinfo->hours < SHOP_CLOSE_TIME(shop));
+		return (tinfo.hours >= SHOP_OPEN_TIME(shop) || tinfo.hours < SHOP_CLOSE_TIME(shop));
 	}
 	
 	return FALSE;	// unreachable?

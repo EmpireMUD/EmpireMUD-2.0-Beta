@@ -2394,7 +2394,7 @@ bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
 
 // weather.c moons
-void compute_night_light_radius();
+int compute_night_light_radius(room_data *room);
 void determine_seasons();
 moon_phase_t get_moon_phase(double cycle_days);
 moon_pos_t get_moon_position(moon_phase_t phase, int hour);
@@ -2402,10 +2402,9 @@ bool look_at_moon(char_data *ch, char *name, int *number);
 void show_visible_moons(char_data *ch);
 
 // weather.c time
-void cascade_time_info();
+struct time_info_data get_local_time(room_data *room);
 int get_sun_status(room_data *room);
 int get_time_zone(room_data *room, struct map_data *loc);
-#define local_time_info(room, maploc)  &regional_time_info[get_time_zone((room), (maploc))]
 
 // weather.c weather
 void reset_weather();

@@ -319,7 +319,7 @@ static void msdp_update(void) {
 	struct player_skill_data *skill, *next_skill;
 	struct over_time_effect_type *dot;
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
-	struct time_info_data *tinfo;
+	struct time_info_data tinfo;
 	struct cooldown_data *cool;
 	char_data *ch, *pOpponent, *focus;
 	bool is_ally;
@@ -497,12 +497,12 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
 			}
 			
-			tinfo = local_time_info(IN_ROOM(ch), NULL);
+			tinfo = get_local_time(IN_ROOM(ch));
 			
-			MSDPSetNumber(d, eMSDP_WORLD_TIME, tinfo->hours);
-			MSDPSetNumber(d, eMSDP_WORLD_DAY_OF_MONTH, tinfo->day + 1);
-			MSDPSetString(d, eMSDP_WORLD_MONTH, month_name[(int)tinfo->month]);
-			MSDPSetNumber(d, eMSDP_WORLD_YEAR, tinfo->year);
+			MSDPSetNumber(d, eMSDP_WORLD_TIME, tinfo.hours);
+			MSDPSetNumber(d, eMSDP_WORLD_DAY_OF_MONTH, tinfo.day + 1);
+			MSDPSetString(d, eMSDP_WORLD_MONTH, month_name[(int)tinfo.month]);
+			MSDPSetNumber(d, eMSDP_WORLD_YEAR, tinfo.year);
 			MSDPSetString(d, eMSDP_WORLD_SEASON, seasons[GET_SEASON(IN_ROOM(ch))]);
 			
 			// done -- send it
@@ -3109,7 +3109,7 @@ char *prompt_str(char_data *ch) {
 char *replace_prompt_codes(char_data *ch, char *str) {
 	static char pbuf[MAX_STRING_LENGTH];
 	char i[MAX_STRING_LENGTH], spare[10];
-	struct time_info_data *tinfo;
+	struct time_info_data tinfo;
 	char *cp, *tmp;
 	char_data *vict;
 
@@ -3370,36 +3370,36 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				}
 				case 't':	/* Sun timer */
 				case 'T': {
-					tinfo = local_time_info(IN_ROOM(ch), NULL);
+					tinfo = get_local_time(IN_ROOM(ch));
 					
 					if (has_player_tech(ch, PTECH_CLOCK)) {
-						if (tinfo->hours >= 12)
+						if (tinfo.hours >= 12)
 							strcpy(spare, "pm");
 						else
 							strcpy(spare, "am");
 
-						if (tinfo->hours == 6)
-							sprintf(i, "\tC%d%s\t0", tinfo->hours > 12 ? tinfo->hours - 12 : tinfo->hours, spare);
-						else if (tinfo->hours < 19 && tinfo->hours > 6)
-							sprintf(i, "\tY%d%s\t0", tinfo->hours > 12 ? tinfo->hours - 12 : tinfo->hours, spare);
-						else if (tinfo->hours == 19)
-							sprintf(i, "\tR%d%s\t0", tinfo->hours > 12 ? tinfo->hours - 12 : tinfo->hours, spare);
-						else if (tinfo->hours == 0)
+						if (tinfo.hours == 6)
+							sprintf(i, "\tC%d%s\t0", tinfo.hours > 12 ? tinfo.hours - 12 : tinfo.hours, spare);
+						else if (tinfo.hours < 19 && tinfo.hours > 6)
+							sprintf(i, "\tY%d%s\t0", tinfo.hours > 12 ? tinfo.hours - 12 : tinfo.hours, spare);
+						else if (tinfo.hours == 19)
+							sprintf(i, "\tR%d%s\t0", tinfo.hours > 12 ? tinfo.hours - 12 : tinfo.hours, spare);
+						else if (tinfo.hours == 0)
 							sprintf(i, "\tB12am\t0");
 						else
-							sprintf(i, "\tB%d%s\t0", tinfo->hours > 12 ? tinfo->hours - 12 : tinfo->hours, spare);
+							sprintf(i, "\tB%d%s\t0", tinfo.hours > 12 ? tinfo.hours - 12 : tinfo.hours, spare);
 					}
 					else {	// no clock
-						if (tinfo->hours == 6) {
+						if (tinfo.hours == 6) {
 							strcpy(i, "\tCdawn\t0");
 						}
-						else if (tinfo->hours == 12) {
+						else if (tinfo.hours == 12) {
 							strcpy(i, "\tYnoon\t0");
 						}
-						else if (tinfo->hours < 19 && tinfo->hours > 6) {
+						else if (tinfo.hours < 19 && tinfo.hours > 6) {
 							strcpy(i, "\tYday\t0");
 						}
-						else if (tinfo->hours == 19) {
+						else if (tinfo.hours == 19) {
 							strcpy(i, "\tRdusk\t0");
 						}
 						else {

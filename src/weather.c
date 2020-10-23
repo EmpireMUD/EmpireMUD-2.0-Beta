@@ -315,9 +315,6 @@ void another_hour(void) {
 		}
 	}
 	
-	// cascade to other time zones
-	cascade_time_info();
-	
 	// hour-based updates
 	switch (main_time_info.hours) {
 		case 0: {	// midnight
@@ -347,46 +344,50 @@ void another_hour(void) {
 		}
 	}
 	
-	// other hourly work
-	compute_night_light_radius();
-	
 	// and announce it to the players
 	send_hourly_sun_messages();
 }
 
 
 /**
-* Cascades the main_time_info to the other time zones.
+* Determines exact local time based on east/west position.
+*
+* @param room_data *room The location.
+* @return struct time_info_data The local time data.
 */
-void cascade_time_info(void) {
-	struct time_info_data *ptr;
-	int iter;
+struct time_info_data get_local_time(room_data *room) {
+	struct time_info_data tinfo;
+	double longitude, percent;
+	int x_coord;
 	
-	for (iter = 0; iter < 24; ++iter) {
-		ptr = &regional_time_info[23-iter];
-		
-		// start with same values
-		ptr->year = main_time_info.year;
-		ptr->month = main_time_info.month;
-		ptr->day = main_time_info.day;
-		
-		// adjust hours
-		ptr->hours = main_time_info.hours - iter;
-		
-		// adjust back days/months/years if needed
-		if (ptr->hours < 0) {
-			ptr->hours += 24;
-			ptr->day -= 1;
-			if (ptr->day < 0) {
-				ptr->day += 30;
-				ptr->month -= 1;
-				if (ptr->month < 0) {
-					ptr->month += 12;
-					ptr->year -= 1;
-				}
+	// determine location
+	x_coord = (room ? X_COORD(room) : -1);
+	if (x_coord == -1) {
+		return main_time_info;	// shortcut if no region
+	}
+	
+	// determine longitude
+	longitude = X_TO_LONGITUDE(x_coord) + 180.0;	// longitude from 0-360 instead of -/+180
+	percent = 1.0 - (longitude / 360.0);	// percentage of the way west
+	
+	tinfo = main_time_info;	// copy
+	
+	// adjust hours backward for distance from east end
+	tinfo.hours -= round(23 * percent);
+	
+	// adjust back days/months/years if needed
+	if (tinfo.hours < 0) {
+		tinfo.hours += 24;
+		if (--tinfo.day < 0) {
+			tinfo.day += 30;
+			if (--tinfo.month < 0) {
+				tinfo.month += 12;
+				--tinfo.year;
 			}
 		}
 	}
+	
+	return tinfo;
 }
 
 
@@ -395,14 +396,14 @@ void cascade_time_info(void) {
 * @return int One of SUN_RISE, SUN_LIGHT, SUN_SET, or SUN_DARK.
 */
 int get_sun_status(room_data *room) {
-	struct time_info_data *tinfo = local_time_info(room, NULL);
-	if (tinfo->hours == 7) {
+	struct time_info_data tinfo = get_local_time(room);
+	if (tinfo.hours == 7) {
 		return SUN_RISE;
 	}
-	else if (tinfo->hours == 19) {
+	else if (tinfo.hours == 19) {
 		return SUN_SET;
 	}
-	else if (tinfo->hours > 7 && tinfo->hours < 19) {
+	else if (tinfo.hours > 7 && tinfo.hours < 19) {
 		return SUN_LIGHT;
 	}
 	else {
@@ -443,7 +444,7 @@ int get_time_zone(room_data *room, struct map_data *loc) {
 * To be called at the end of the hourly update to show players sunrise/sunset.
 */
 void send_hourly_sun_messages(void) {
-	struct time_info_data *tinfo;
+	struct time_info_data tinfo;
 	descriptor_data *desc;
 	
 	LL_FOREACH(descriptor_list, desc) {
@@ -455,9 +456,9 @@ void send_hourly_sun_messages(void) {
 		}
 		
 		// get local time
-		tinfo = local_time_info(IN_ROOM(desc->character), NULL);
+		tinfo = get_local_time(IN_ROOM(desc->character));
 		
-		switch (tinfo->hours) {
+		switch (tinfo.hours) {
 			case 7: {	// sunrise
 				// show map if needed
 				if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT)) {
@@ -570,50 +571,41 @@ moon_pos_t get_moon_position(moon_phase_t phase, int hour) {
 
 /**
 * Computes the light radius at night based on any visible moon(s) in the sky.
-* Fetch this from the night_light_radius global bool.
 *
-* @return int Number of tiles you can see at night.
+* @param room_data *room A location.
+* @return int Number of tiles you can see at night in that room.
 */
-void compute_night_light_radius(void) {
-	int dist, iter, best[24], second[24];
+int compute_night_light_radius(room_data *room) {
 	generic_data *moon, *next_gen;
+	struct time_info_data tinfo;
+	int dist, best, second;
 	moon_phase_t phase;
 	
 	int max_light_radius_base = config_get_int("max_light_radius_base");
 	
-	// init
-	for (iter = 0; iter < 24; ++iter) {
-		best[iter] = second[iter] = 0;
-	}
+	tinfo = get_local_time(room);
 	
 	HASH_ITER(hh, generic_table, moon, next_gen) {
 		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1 || GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT)) {
 			continue;	// not a moon or invalid cycle
 		}
 		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
-		
-		for (iter = 0; iter < 24; ++iter) {
-			if (get_moon_position(phase, regional_time_info[iter].hours) != MOON_POS_DOWN) {
-				// moon is up: record it if better
-				if (moon_phase_brightness[phase] > best[iter]) {
-					second[iter] = best[iter];
-					best[iter] = moon_phase_brightness[phase];
-				}
-				else if (moon_phase_brightness[phase] > second[iter]) {
-					second[iter] = moon_phase_brightness[phase];
-				}
+		if (get_moon_position(phase, tinfo.hours) != MOON_POS_DOWN) {
+			// moon is up: record it if better
+			if (moon_phase_brightness[phase] > best) {
+				second = best;
+				best = moon_phase_brightness[phase];
+			}
+			else if (moon_phase_brightness[phase] > second) {
+				second = moon_phase_brightness[phase];
 			}
 		}
 	}
 	
 	// compute
-	for (iter = 0; iter < 24; ++iter) {
-		dist = best[iter] + second[iter]/2;
-		dist = MAX(1, MIN(dist, max_light_radius_base));
-	
-		// save to the global
-		night_light_radius[iter] = dist;
-	}
+	dist = best + second/2;
+	dist = MAX(1, MIN(dist, max_light_radius_base));
+	return dist;
 }
 
 
@@ -626,7 +618,7 @@ void compute_night_light_radius(void) {
 */
 bool look_at_moon(char_data *ch, char *name, int *number) {
 	char buf[MAX_STRING_LENGTH], copy[MAX_INPUT_LENGTH], *tmp = copy;
-	struct time_info_data *tinfo;
+	struct time_info_data tinfo;
 	generic_data *moon, *next_gen;
 	moon_phase_t phase;
 	moon_pos_t pos;
@@ -650,7 +642,7 @@ bool look_at_moon(char_data *ch, char *name, int *number) {
 		return FALSE;
 	}
 	
-	tinfo = local_time_info(IN_ROOM(ch), NULL);
+	tinfo = get_local_time(IN_ROOM(ch));
 	
 	HASH_ITER(hh, generic_table, moon, next_gen) {
 		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1 || GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT)) {
@@ -662,7 +654,7 @@ bool look_at_moon(char_data *ch, char *name, int *number) {
 		
 		// find moon in the sky
 		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
-		pos = get_moon_position(phase, tinfo->hours);
+		pos = get_moon_position(phase, tinfo.hours);
 		
 		// qualify it some more -- allow new moon in direct sunlight (unlike show-visible-moons)
 		if (pos == MOON_POS_DOWN) {
@@ -689,13 +681,13 @@ bool look_at_moon(char_data *ch, char *name, int *number) {
 * @param char_data *ch The person to show the moons to.
 */
 void show_visible_moons(char_data *ch) {
-	struct time_info_data *tinfo;
+	struct time_info_data tinfo;
 	char buf[MAX_STRING_LENGTH];
 	generic_data *moon, *next_gen;
 	moon_phase_t phase;
 	moon_pos_t pos;
 	
-	tinfo = local_time_info(IN_ROOM(ch), NULL);
+	tinfo = get_local_time(IN_ROOM(ch));
 	
 	HASH_ITER(hh, generic_table, moon, next_gen) {
 		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1 || GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT)) {
@@ -704,7 +696,7 @@ void show_visible_moons(char_data *ch) {
 		
 		// find moon in the sky
 		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
-		pos = get_moon_position(phase, tinfo->hours);
+		pos = get_moon_position(phase, tinfo.hours);
 		
 		// qualify it some more
 		if (pos == MOON_POS_DOWN) {

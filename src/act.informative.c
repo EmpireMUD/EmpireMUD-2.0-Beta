@@ -3552,20 +3552,20 @@ ACMD(do_survey) {
 
 
 ACMD(do_time) {
-	struct time_info_data *tinfo;
+	struct time_info_data tinfo;
 	const char *suf;
 	int weekday, day;
 	
-	tinfo = local_time_info(IN_ROOM(ch), NULL);
+	tinfo = get_local_time(IN_ROOM(ch));
 	
 	if (has_player_tech(ch, PTECH_CLOCK)) {
-		sprintf(buf, "It is %d o'clock %s", ((tinfo->hours % 12 == 0) ? 12 : ((tinfo->hours) % 12)), ((tinfo->hours >= 12) ? "pm" : "am"));
+		sprintf(buf, "It is %d o'clock %s", ((tinfo.hours % 12 == 0) ? 12 : ((tinfo.hours) % 12)), ((tinfo.hours >= 12) ? "pm" : "am"));
 		
 		if (has_player_tech(ch, PTECH_CALENDAR)) {
 			strcat(buf, ", on ");
 			
 			/* 30 days in a month */
-			weekday = ((30 * tinfo->month) + tinfo->day + 1) % 7;
+			weekday = ((30 * tinfo.month) + tinfo.day + 1) % 7;
 			strcat(buf, weekdays[weekday]);
 		}
 		
@@ -3579,28 +3579,28 @@ ACMD(do_time) {
 		gain_player_tech_exp(ch, PTECH_CLOCK, 1);
 	}
 	else {
-		if (tinfo->hours < 6 || tinfo->hours > 19) {
+		if (tinfo.hours < 6 || tinfo.hours > 19) {
 			msg_to_char(ch, "It is nighttime.\r\n");
 		}
-		else if (tinfo->hours == 6) {
+		else if (tinfo.hours == 6) {
 			msg_to_char(ch, "It is almost dawn.\r\n");
 		}
-		else if (tinfo->hours == 19) {
+		else if (tinfo.hours == 19) {
 			msg_to_char(ch, "It is sunset.\r\n");
 		}
-		else if (tinfo->hours == 12) {
+		else if (tinfo.hours == 12) {
 			msg_to_char(ch, "It is nighttime.\r\n");
 		}
-		else if (tinfo->hours < 12) {
-			msg_to_char(ch, "It is %smorning.\r\n", tinfo->hours <= 8 ? "early " : "");
+		else if (tinfo.hours < 12) {
+			msg_to_char(ch, "It is %smorning.\r\n", tinfo.hours <= 8 ? "early " : "");
 		}
 		else {	// afternoon is all that's left
-			msg_to_char(ch, "It is %safternoon.\r\n", tinfo->hours >= 17 ? "late " : "");
+			msg_to_char(ch, "It is %safternoon.\r\n", tinfo.hours >= 17 ? "late " : "");
 		}
 	}
 
 	if (has_player_tech(ch, PTECH_CALENDAR)) {
-		day = tinfo->day + 1;	/* day in [1..30] */
+		day = tinfo.day + 1;	/* day in [1..30] */
 
 		/* 11, 12, and 13 are the infernal exceptions to the rule */
 		if ((day % 10) == 1 && day != 11)
@@ -3612,7 +3612,7 @@ ACMD(do_time) {
 		else
 			suf = "th";
 
-		msg_to_char(ch, "The %d%s day of the month of %s, year %d.\r\n", day, suf, month_name[(int) tinfo->month], tinfo->year);
+		msg_to_char(ch, "The %d%s day of the month of %s, year %d.\r\n", day, suf, month_name[(int) tinfo.month], tinfo.year);
 		
 		gain_player_tech_exp(ch, PTECH_CALENDAR, 1);
 	}
