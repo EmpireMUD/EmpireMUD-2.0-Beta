@@ -523,6 +523,7 @@ const char *extra_attribute_types[] = {
 	"Crafting-Bonus",
 	"Blood-Upkeep",
 	"Age",
+	"Night-Vision",
 	"\n"
 };
 
@@ -1466,6 +1467,7 @@ const char *apply_types[] = {
 	"RESIST-MAGICAL",
 	"CRAFTING",
 	"BLOOD-UPKEEP",
+	"NIGHT-VISION",
 	"\n"
 };
 
@@ -1499,6 +1501,7 @@ const double apply_values[] = {
 	0.5,	// RESIST-MAGICAL
 	0.01,	// CRAFTING
 	1,	// BLOOD-UPKEEP
+	1,	// NIGTH-VISION
 };
 
 
@@ -1531,6 +1534,7 @@ const int apply_attribute[] = {
 	NOTHING,	// resist-magical
 	NOTHING,	// crafting
 	NOTHING,	// blood-upkeep
+	NOTHING,	// night-vision
 };
 
 
@@ -1563,6 +1567,7 @@ const bool apply_never_scales[] = {
 	FALSE,	// RESIST-MAGICAL
 	TRUE,	// CRAFTING
 	TRUE,	// BLOOD-UPKEEP
+	TRUE,	// NIGHT-VISION
 };
 
 

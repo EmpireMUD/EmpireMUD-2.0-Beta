@@ -108,9 +108,10 @@ bool adjacent_room_is_light(room_data *room) {
 */
 int distance_can_see_in_dark(char_data *ch) {
 	int dist = night_light_radius[get_time_zone(IN_ROOM(ch), NULL)];	// from the global
-
+	
+	dist += GET_EXTRA_ATT(ch, ATT_NIGHT_VISION);
 	if (has_player_tech(ch, PTECH_LARGER_LIGHT_RADIUS)) {
-		dist += 2;
+		dist += 1;
 	}
 	if (IS_LIGHT(IN_ROOM(ch))) {
 		++dist;

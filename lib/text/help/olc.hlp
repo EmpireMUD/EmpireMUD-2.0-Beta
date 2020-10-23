@@ -3859,7 +3859,8 @@ Scaling based on item types:
  ammo - the "damage" value
  pack - the "capacity" value
 
-The following attributes never scale: greatness, age, crafting, blood-upkeep
+The following attributes never scale: greatness, age, crafting, blood-upkeep,
+night-vision
 
 Applies and item values of 0 are ignored and do not get any points assigned.
 
@@ -4959,6 +4960,7 @@ Most applies are self-explanatory:
  RESIST-MAGICAL - magical damage reduction
  CRAFTING - bonus to craft level (unscaled)
  BLOOD-UPKEEP - adds to how much blood vampires must spend per hour (unscaled)
+ NIGHT-VISION - adds to light radius at night (unscaled)
 
 See also: OLC OBJECTS
 #d

@@ -2697,6 +2697,9 @@ int get_attribute_by_apply(char_data *ch, int apply_type) {
 		case APPLY_BLOOD_UPKEEP: {
 			return GET_BLOOD_UPKEEP(ch);
 		}
+		case APPLY_NIGHT_VISION: {
+			return GET_EXTRA_ATT(ch, ATT_NIGHT_VISION);
+		}
 	}
 	return 0;	// if we got this far
 }

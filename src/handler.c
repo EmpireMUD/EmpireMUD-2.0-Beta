@@ -585,6 +585,10 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_BLOOD_UPKEEP), mod, INT_MIN, INT_MAX, TRUE);
 			break;
 		}
+		case APPLY_NIGHT_VISION: {
+			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_NIGHT_VISION), mod, INT_MIN, INT_MAX, TRUE);
+			break;
+		}
 		default:
 			log("SYSERR: Unknown apply adjust %d attempt (%s, affect_modify).", loc, __FILE__);
 			break;

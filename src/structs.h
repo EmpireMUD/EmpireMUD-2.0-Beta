@@ -318,6 +318,7 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_RESIST_MAGICAL  24	// Apply to magic damage resistance
 #define APPLY_CRAFTING  25	// bonus craft levels
 #define APPLY_BLOOD_UPKEEP  26	// vampire blood requirement
+#define APPLY_NIGHT_VISION  27	// bonus to nighttime light radius
 
 
 // AUTOMSG_x: automessage types
@@ -939,7 +940,8 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_CRAFTING_BONUS  11	// levels added to crafting
 #define ATT_BLOOD_UPKEEP  12	// blood cost per hour
 #define ATT_AGE_MODIFIER  13	// +/- age
-#define NUM_EXTRA_ATTRIBUTES  14
+#define ATT_NIGHT_VISION  14	// bonus light radius at night
+#define NUM_EXTRA_ATTRIBUTES  15
 
 
 // AFF_x: Affect bits
