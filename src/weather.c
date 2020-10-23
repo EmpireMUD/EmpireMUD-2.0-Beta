@@ -144,6 +144,35 @@ void determine_seasons(void) {
 }
 
 
+/**
+* Reset weather data on startup (or request).
+*/
+void reset_weather(void) {
+	weather_info.pressure = 960;
+	if ((main_time_info.month >= 5) && (main_time_info.month <= 8)) {
+		weather_info.pressure += number(1, 50);
+	}
+	else {
+		weather_info.pressure += number(1, 80);
+	}
+
+	weather_info.change = 0;
+
+	if (weather_info.pressure <= 980) {
+		weather_info.sky = SKY_LIGHTNING;
+	}
+	else if (weather_info.pressure <= 1000) {
+		weather_info.sky = SKY_RAINING;
+	}
+	else if (weather_info.pressure <= 1020) {
+		weather_info.sky = SKY_CLOUDY;
+	}
+	else {
+		weather_info.sky = SKY_CLOUDLESS;
+	}
+}
+
+
 void weather_change(void) {
 	int diff, change;
 	if ((main_time_info.month >= 4) && (main_time_info.month <= 8))

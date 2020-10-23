@@ -4839,27 +4839,10 @@ void reset_time(void) {
 	main_time_info = *mud_time_passed(time(0), beginning_of_time);
 	cascade_time_info();
 	compute_night_light_radius();
+	reset_weather();
+	determine_seasons();
 
 	log("   Current Gametime: %dH %dD %dM %dY.", main_time_info.hours, main_time_info.day, main_time_info.month, main_time_info.year);
-
-	weather_info.pressure = 960;
-	if ((main_time_info.month >= 5) && (main_time_info.month <= 8))
-		weather_info.pressure += number(1, 50);
-	else
-		weather_info.pressure += number(1, 80);
-
-	weather_info.change = 0;
-
-	if (weather_info.pressure <= 980)
-		weather_info.sky = SKY_LIGHTNING;
-	else if (weather_info.pressure <= 1000)
-		weather_info.sky = SKY_RAINING;
-	else if (weather_info.pressure <= 1020)
-		weather_info.sky = SKY_CLOUDY;
-	else
-		weather_info.sky = SKY_CLOUDLESS;
-	
-	determine_seasons();
 }
 
 

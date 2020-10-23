@@ -2413,6 +2413,9 @@ int get_sun_status(room_data *room);
 int get_time_zone(room_data *room, struct map_data *loc);
 #define local_time_info(room, maploc)  &regional_time_info[get_time_zone((room), (maploc))]
 
+// weather.c weather
+void reset_weather();
+
 // workforce.c
 void deactivate_workforce(empire_data *emp, int island_id, int type);
 void deactivate_workforce_island(empire_data *emp, int island_id);
