@@ -359,9 +359,9 @@ void another_hour(void) {
 * @return struct time_info_data The local time data.
 */
 struct time_info_data get_local_time(room_data *room) {
+	double longitude, percent, minutes_dec;
 	struct time_info_data tinfo;
-	double longitude, percent;
-	int x_coord, part_hour;
+	int x_coord;
 	
 	// determine location
 	x_coord = (room ? X_COORD(room) : -1);
@@ -376,8 +376,8 @@ struct time_info_data get_local_time(room_data *room) {
 	tinfo = main_time_info;	// copy
 	
 	// adjust hours backward for distance from east end
-	part_hour = ((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR);
-	tinfo.hours -= round((23 - (double)part_hour/SECS_PER_MUD_HOUR) * percent);
+	minutes_dec = ((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR;
+	tinfo.hours -= ceil(24.0 * percent - minutes_dec);
 	
 	// adjust back days/months/years if needed
 	if (tinfo.hours < 0) {
@@ -554,7 +554,7 @@ moon_pos_t get_moon_position(moon_phase_t phase, int hour) {
 int compute_night_light_radius(room_data *room) {
 	generic_data *moon, *next_gen;
 	struct time_info_data tinfo;
-	int dist, best, second;
+	int dist, best = 0, second = 0;
 	moon_phase_t phase;
 	
 	int max_light_radius_base = config_get_int("max_light_radius_base");
