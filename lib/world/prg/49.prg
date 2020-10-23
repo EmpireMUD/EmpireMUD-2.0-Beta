@@ -1,9 +1,9 @@
 #4900
 City Lights~
-   Your citizens keep all your claimed territory well-lit at night. Every tile
-you own instantly provides light.
+   Your citizens keep your cities well-lit at night. All your in-city and
+outskirts tiles provide light.
 ~
-2 4 10 0 b
+3 4 10 0 b
 K 0 1
 S
 #4901
