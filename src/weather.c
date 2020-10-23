@@ -31,6 +31,9 @@
 *   Moon System
 */
 
+// external vars
+extern unsigned long pulse;
+
 // local prototypes
 void another_hour();
 void send_hourly_sun_messages();
@@ -358,7 +361,7 @@ void another_hour(void) {
 struct time_info_data get_local_time(room_data *room) {
 	struct time_info_data tinfo;
 	double longitude, percent;
-	int x_coord;
+	int x_coord, part_hour;
 	
 	// determine location
 	x_coord = (room ? X_COORD(room) : -1);
@@ -373,7 +376,8 @@ struct time_info_data get_local_time(room_data *room) {
 	tinfo = main_time_info;	// copy
 	
 	// adjust hours backward for distance from east end
-	tinfo.hours -= round(23 * percent);
+	part_hour = ((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR);
+	tinfo.hours -= round((23 - (double)part_hour/SECS_PER_MUD_HOUR) * percent);
 	
 	// adjust back days/months/years if needed
 	if (tinfo.hours < 0) {
@@ -409,34 +413,6 @@ int get_sun_status(room_data *room) {
 	else {
 		return SUN_DARK;
 	}
-}
-
-
-/**
-* Determines which of the 24 east-west time zones a location is in.
-*
-* @param room_data *room A room location.
-* @param struct map_data *loc Or: a map location (pass one or the other).
-* @return int One of the map's time zones (0..23).
-*/
-int get_time_zone(room_data *room, struct map_data *loc) {
-	int x_coord, longitude, region;
-	
-	// determine location
-	x_coord = (loc ? MAP_X_COORD(loc->vnum) : (room ? X_COORD(room) : -1));
-	if (x_coord == -1) {
-		return 23;	// 23 is the same as the main region
-	}
-	
-	// determine longitude
-	longitude = (int)X_TO_LONGITUDE(x_coord);
-	
-	// determine grouping based on that
-	longitude += 180;	// move from (-180 to 180) to (0 to 360)
-	region = longitude / 15;	// split 360 degrees into 15-degree-wide groups of 24
-	region = MAX(0, MIN(23, region));	// safety: ensure it's within bounds}
-	
-	return region;
 }
 
 

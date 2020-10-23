@@ -2404,7 +2404,6 @@ void show_visible_moons(char_data *ch);
 // weather.c time
 struct time_info_data get_local_time(room_data *room);
 int get_sun_status(room_data *room);
-int get_time_zone(room_data *room, struct map_data *loc);
 
 // weather.c weather
 void reset_weather();
