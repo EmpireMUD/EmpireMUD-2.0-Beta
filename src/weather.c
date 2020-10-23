@@ -437,7 +437,7 @@ void send_hourly_sun_messages(void) {
 		switch (tinfo.hours) {
 			case 7: {	// sunrise
 				// show map if needed
-				if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT)) {
+				if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && get_sun_status(IN_ROOM(desc->character)) != GET_LAST_LOOK_SUN(desc->character)) {
 					look_at_room(desc->character);
 					msg_to_char(desc->character, "\r\n");
 				}
@@ -454,7 +454,7 @@ void send_hourly_sun_messages(void) {
 			}
 			case 20: {	// dark
 				// show map if needed
-				if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT)) {
+				if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && get_sun_status(IN_ROOM(desc->character)) != GET_LAST_LOOK_SUN(desc->character)) {
 					look_at_room(desc->character);
 					msg_to_char(desc->character, "\r\n");
 				}

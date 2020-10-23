@@ -646,6 +646,11 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	// begin with the sanity check
 	if (!ch || !ch->desc)
 		return;
+	
+	if (!IS_NPC(ch)) {
+		// store the sun's status to be able to force a 'look' correctly at sunrise/set
+		GET_LAST_LOOK_SUN(ch) = get_sun_status(IN_ROOM(ch));
+	}
 
 	mapsize = get_map_radius(ch);
 
