@@ -2872,17 +2872,8 @@ bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_li
 	}
 	
 	// check if the room is actually light
-	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS)) {
-		return TRUE;	// not dark: city lights
-	}
-	if (IS_ANY_BUILDING(room) && (ROOM_OWNER(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE))) {
-		return TRUE;	// not dark: claimed (or unclaimable) building
-	}
-	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT) || (count_adjacent_light && adjacent_room_is_light(room))) {
-		return TRUE;	// not dark: has a light source
-	}
-	if (!RMT_FLAGGED(room, RMT_DARK) && get_sun_status(room) != SUN_DARK) {
-		return TRUE;	// not dark: it isn't dark outside
+	if (room_is_light(room, count_adjacent_light)) {
+		return TRUE;
 	}
 	
 	// reasons the character can see
@@ -5994,6 +5985,38 @@ void relocate_players(room_data *room, room_data *to_room) {
 			msdp_update_room(ch);
 		}
 	}
+}
+
+
+/**
+* Determines if any room is light. This replaces the IS_LIGHT/IS_REAL_LIGHT
+* macro family.
+*
+* @param room_data *room The room to check (which may be light).
+* @param bool count_adjacent_light If TRUE, light cascades from adjacent tiles.
+* @return bool TRUE if the room is light, FALSE if not.
+*/
+bool room_is_light(room_data *room, bool count_adjacent_light) {
+	if (MAGIC_DARKNESS(room)) {
+		return FALSE;	// always dark
+	}
+	
+	// things that make the room light
+	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS)) {
+		return TRUE;	// not dark: city lights
+	}
+	if (IS_ANY_BUILDING(room) && (ROOM_OWNER(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE))) {
+		return TRUE;	// not dark: claimed (or unclaimable) building
+	}
+	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT) || (count_adjacent_light && adjacent_room_is_light(room))) {
+		return TRUE;	// not dark: has a light source
+	}
+	if (!RMT_FLAGGED(room, RMT_DARK) && get_sun_status(room) != SUN_DARK) {
+		return TRUE;	// not dark: it isn't dark outside
+	}
+	
+	// otherwise: it's dark
+	return FALSE;
 }
 
 

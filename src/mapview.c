@@ -81,16 +81,15 @@ static void show_map_to_char(char_data *ch, struct mappc_data_container *mappc, 
 */
 bool adjacent_room_is_light(room_data *room) {
 	room_data *to_room;
-	int i;
+	int dir;
 	
 	// adventure rooms don't bother
 	if (IS_ADVENTURE_ROOM(room)) {
 		return FALSE;
 	}
 
-	for (i = 0; i < NUM_SIMPLE_DIRS; i++) {
-		to_room = real_shift(room, shift_dir[i][0], shift_dir[i][1]);
-		if (to_room && IS_REAL_LIGHT(to_room)) {
+	for (dir = 0; dir < NUM_SIMPLE_DIRS; ++dir) {
+		if ((to_room = dir_to_room(room, dir, TRUE)) && room_is_light(to_room, FALSE)) {
 			return TRUE;
 		}
 	}
@@ -113,7 +112,7 @@ int distance_can_see_in_dark(char_data *ch) {
 	if (has_player_tech(ch, PTECH_LARGER_LIGHT_RADIUS)) {
 		dist += 1;
 	}
-	if (IS_LIGHT(IN_ROOM(ch))) {
+	if (room_is_light(IN_ROOM(ch), TRUE)) {
 		++dist;
 	}
 

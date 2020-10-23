@@ -1871,7 +1871,7 @@ void found_city(char_data *ch, empire_data *emp, char *argument) {
 * @param room_data *loc The location to check.
 * @param empire_data *emp The empire to check.
 * @param bool check_wait If TRUE, requires the city wait time to have passed.
-* @param bool *city_too_soon Will be set to TRUE if there was a city but it was founded too recently.
+* @param bool *city_too_soon Optional: Will be set to TRUE if there was a city but it was founded too recently. (Pass NULL to skip.)
 * @return bool TRUE if in-city, FALSE if not.
 */
 int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_wait, bool *city_too_soon) {
@@ -1881,7 +1881,9 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 	double outskirts_multiplier = config_get_double("outskirts_modifier");	// radius multiplier
 	int wait = check_wait ? config_get_int("minutes_to_full_city") * SECS_PER_REAL_MIN : 0;
 	
-	*city_too_soon = FALSE;	// init this
+	if (city_too_soon) {
+		*city_too_soon = FALSE;	// init this
+	}
 	
 	if (!emp) {
 		return TER_FRONTIER;
@@ -1920,7 +1922,9 @@ int get_territory_type_for_empire(room_data *loc, empire_data *emp, bool check_w
 		
 		// verify city is new enough
 		if (type != TER_FRONTIER && check_wait && (get_room_extra_data(city->location, ROOM_EXTRA_FOUND_TIME) + wait) > time(0)) {
-			*city_too_soon = TRUE;
+			if (city_too_soon) {
+				*city_too_soon = TRUE;
+			}
 			type = last_type;	// restore previous type
 		}
 		else {
