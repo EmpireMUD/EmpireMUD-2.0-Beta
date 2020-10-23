@@ -385,7 +385,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 	}
 	
 	// rooms
-	if (CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		// search room: building
 		if (GET_BUILDING(IN_ROOM(ch))) {
 			LL_FOREACH(GET_BLD_SHOP_LOOKUPS(GET_BUILDING(IN_ROOM(ch))), sl) {

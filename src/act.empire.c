@@ -2935,7 +2935,7 @@ void scan_for_tile(char_data *ch, char *argument) {
 			}
 			
 			// darkness check
-			if (room != IN_ROOM(ch) && !CAN_SEE_IN_DARK_ROOM_NO_ADJACENT(ch, room) && dist > dark_distance) {
+			if (room != IN_ROOM(ch) && !can_see_in_dark_room(ch, room, FALSE) && dist > dark_distance) {
 				continue;
 			}
 			

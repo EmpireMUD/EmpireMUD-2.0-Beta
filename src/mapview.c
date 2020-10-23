@@ -137,7 +137,7 @@ char *exit_description(char_data *ch, room_data *room, const char *prefix) {
 	size = snprintf(output, sizeof(output), "%-5s - ", prefix);
 	
 	// done early if they can't see the target room
-	if (!CAN_SEE_IN_DARK_ROOM(ch, room)) {
+	if (!can_see_in_dark_room(ch, room, TRUE)) {
 		size += snprintf(output + size, sizeof(output) - size, "Too dark to tell");
 		return output;
 	}
@@ -729,7 +729,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 	if (!ROOM_IS_CLOSED(room) || look_out) {
 		// map rooms:
 		
-		if (MAGIC_DARKNESS(room) && !CAN_SEE_IN_DARK_ROOM(ch, room)) {
+		if (MAGIC_DARKNESS(room) && !can_see_in_dark_room(ch, room, TRUE)) {
 			// no title
 			send_to_char("It is pitch black...\r\n", ch);
 		}
@@ -860,7 +860,7 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 						// magic dark: show blank
 						send_to_char("    ", ch);
 					}
-					else if (to_room != room && !CAN_SEE_IN_DARK_ROOM_NO_ADJACENT(ch, to_room)) {
+					else if (to_room != room && !can_see_in_dark_room(ch, to_room, FALSE)) {
 						// normal dark
 						dist = compute_distance(room, to_room);
 						
@@ -896,13 +896,13 @@ void look_at_room_by_loc(char_data *ch, room_data *room, bitvector_t options) {
 		}
 
 		// notify character they can't see in the dark
-		if (!CAN_SEE_IN_DARK_ROOM(ch, room)) {
+		if (!can_see_in_dark_room(ch, room, TRUE)) {
 			msg_to_char(ch, "It's dark and you're having trouble seeing items and people.\r\n");
 		}
 	}
 	else {
 		// show room: non-map
-		if (!CAN_SEE_IN_DARK_ROOM(ch, room)) {
+		if (!can_see_in_dark_room(ch, room, TRUE)) {
 			send_to_char("It is pitch black...\r\n", ch);
 		}
 		else {
@@ -1152,7 +1152,7 @@ void look_in_direction(char_data *ch, int dir) {
 				num_commas = 0;
 				
 				to_room = ex->room_ptr;
-				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
+				if (can_see_in_dark_room(ch, to_room, TRUE)) {
 					DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 						if (!AFF_FLAGGED(c, AFF_HIDE | AFF_NO_SEE_IN_ROOM) && CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
@@ -1247,7 +1247,7 @@ void look_in_direction(char_data *ch, int dir) {
 			return;
 		}
 
-		if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
+		if (can_see_in_dark_room(ch, to_room, FALSE)) {
 			DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 				if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 					bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
@@ -1274,7 +1274,7 @@ void look_in_direction(char_data *ch, int dir) {
 		/* Shift, rinse, repeat */
 		to_room = real_shift(to_room, shift_dir[dir][0], shift_dir[dir][1]);
 		if (to_room && !ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) && !ROOM_IS_CLOSED(to_room)) {
-			if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
+			if (can_see_in_dark_room(ch, to_room, FALSE)) {
 				DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 					if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 						bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
@@ -1289,7 +1289,7 @@ void look_in_direction(char_data *ch, int dir) {
 			/* And a third time for good measure */
 			to_room = real_shift(to_room, shift_dir[dir][0], shift_dir[dir][1]);
 			if (to_room && !ROOM_SECT_FLAGGED(to_room, SECTF_OBSCURE_VISION) && !ROOM_IS_CLOSED(to_room)) {
-				if (CAN_SEE_IN_DARK_ROOM(ch, to_room)) {
+				if (can_see_in_dark_room(ch, to_room, FALSE)) {
 					DL_FOREACH2(ROOM_PEOPLE(to_room), c, next_in_room) {
 						if (CAN_SEE(ch, c) && WIZHIDE_OK(ch, c)) {
 							bufsize += snprintf(buf + bufsize, sizeof(buf) - bufsize, "%s, ", PERS(c, ch, FALSE));
@@ -1860,7 +1860,7 @@ void screenread_one_dir(char_data *ch, room_data *origin, int dir) {
 			// magic dark
 			strcpy(roombuf, "Dark");
 		}
-		else if (!CAN_SEE_IN_DARK_ROOM_NO_ADJACENT(ch, to_room)) {
+		else if (!can_see_in_dark_room(ch, to_room, FALSE)) {
 			// normal dark
 			dist = compute_distance(origin, to_room);
 			

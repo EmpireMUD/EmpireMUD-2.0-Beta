@@ -262,7 +262,7 @@
 //// CAN SEE UTILS ///////////////////////////////////////////////////////////
 
 // this all builds up to CAN_SEE
-#define LIGHT_OK(sub)  (!AFF_FLAGGED(sub, AFF_BLIND) && CAN_SEE_IN_DARK_ROOM((sub), (IN_ROOM(sub))))
+#define LIGHT_OK(sub)  (!AFF_FLAGGED(sub, AFF_BLIND) && can_see_in_dark_room((sub), (IN_ROOM(sub)), TRUE))
 #define INVIS_OK(sub, obj)  ((!AFF_FLAGGED(obj, AFF_INVISIBLE)) && (!AFF_FLAGGED((obj), AFF_HIDE) || AFF_FLAGGED((sub), AFF_SENSE_HIDE)))
 
 
@@ -400,10 +400,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define CAN_GET_OBJ(ch, obj)  (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && CAN_SEE_OBJ((ch),(obj)))
 #define CAN_RECOGNIZE(ch, vict)  (PRF_FLAGGED(ch, PRF_HOLYLIGHT) || (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM) && ((GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict)) || (GROUP(ch) && in_same_group(ch, vict)) || (!CHAR_MORPH_FLAGGED((vict), MORPHF_ANIMAL) && !IS_DISGUISED(vict)))))
 #define CAN_RIDE_FLYING_MOUNT(ch)  (has_player_tech((ch), PTECH_RIDING_FLYING))
-#define CAN_SEE_IN_DARK(ch)  (HAS_INFRA(ch) || (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_HOLYLIGHT)))
-#define CAN_SEE_IN_DARK_ROOM(ch, room)  ((WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room) || (room == IN_ROOM(ch) && (has_player_tech((ch), PTECH_SEE_CHARS_IN_DARK) || (IS_OUTDOORS(ch) && has_player_tech((ch), PTECH_SEE_IN_DARK_OUTDOORS)) || has_player_tech((ch), PTECH_SEE_OBJS_IN_DARK))) || CAN_SEE_IN_DARK(ch)) && (!MAGIC_DARKNESS(room) || CAN_SEE_IN_MAGIC_DARKNESS(ch)))
-#define CAN_SEE_IN_DARK_ROOM_NO_ADJACENT(ch, room)  ((WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS_NO_ADJACENT(room) || (room == IN_ROOM(ch) && (has_player_tech((ch), PTECH_SEE_CHARS_IN_DARK) || (IS_OUTDOORS(ch) && has_player_tech((ch), PTECH_SEE_IN_DARK_OUTDOORS)) || has_player_tech((ch), PTECH_SEE_OBJS_IN_DARK))) || CAN_SEE_IN_DARK(ch)) && (!MAGIC_DARKNESS(room) || CAN_SEE_IN_MAGIC_DARKNESS(ch)))
-#define CAN_SEE_IN_MAGIC_DARKNESS(ch)  (IS_NPC(ch) ? (get_approximate_level(ch) > 100) : has_ability((ch), ABIL_DARKNESS))
+#define CAN_SEE_IN_MAGIC_DARKNESS(ch)  (IS_NPC(ch) ? (get_approximate_level(ch) > 100) : (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || has_ability((ch), ABIL_DARKNESS)))
 #define CAN_SPEND_BLOOD(ch)  (!AFF_FLAGGED(ch, AFF_CANT_SPEND_BLOOD))
 #define CAST_BY_ID(ch)  (IS_NPC(ch) ? (-1 * GET_MOB_VNUM(ch)) : GET_IDNUM(ch))
 #define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : AFF_FLAGGED(ch, AFF_FLY))
@@ -1379,7 +1376,6 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define ROOM_IS_UPGRADED(room)  ((IS_COMPLETE(room) && HAS_FUNCTION((room), FNC_UPGRADED)) || (IS_COMPLETE(HOME_ROOM(room)) && HAS_FUNCTION(HOME_ROOM(room), FNC_UPGRADED)) || (GET_ROOM_VEHICLE(room) && IS_SET(VEH_FUNCTIONS(GET_ROOM_VEHICLE(room)), FNC_UPGRADED)))
 #define SHOW_PEOPLE_IN_ROOM(room)  (!ROOM_IS_CLOSED(room) && !ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION))
 #define WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room)  (RMT_FLAGGED((room), RMT_LIGHT) || IS_ANY_BUILDING(room) || !IS_DARK(room) || adjacent_room_is_light(room))
-#define WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS_NO_ADJACENT(room)  (RMT_FLAGGED((room), RMT_LIGHT) || IS_ANY_BUILDING(room) || !IS_DARK(room))
 
 // interaction checks (by type)
 #define BLD_CAN_INTERACT_ROOM(room, type)  (GET_BUILDING(room) && has_interaction(GET_BLD_INTERACTIONS(GET_BUILDING(room)), (type)))
@@ -1776,6 +1772,7 @@ double rate_item(obj_data *obj);
 
 // player functions from utils.c
 void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
+bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_light);
 void command_lag(char_data *ch, int wait_type);
 void despawn_charmies(char_data *ch, any_vnum only_vnum);
 void determine_gear_level(char_data *ch);

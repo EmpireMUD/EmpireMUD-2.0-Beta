@@ -1201,7 +1201,7 @@ void perform_saw(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish sawing.\r\n");
 		cancel_action(ch);
 		return;
@@ -1311,7 +1311,7 @@ void process_build_action(char_data *ch) {
 	char buf1[MAX_STRING_LENGTH];
 	craft_data *type = NULL;
 	
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to keep working here.\r\n");
 		cancel_action(ch);
 		return;
@@ -1406,7 +1406,7 @@ void process_chipping(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish chipping.\r\n");
 		cancel_action(ch);
 		return;
@@ -1457,7 +1457,7 @@ void process_chop(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish chopping.\r\n");
 		cancel_action(ch);
 		return;
@@ -1508,7 +1508,7 @@ void process_digging(char_data *ch) {
 	room_data *in_room;
 	char_data *iter;
 	
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to dig here.\r\n");
 		cancel_action(ch);
 		return;
@@ -1568,7 +1568,7 @@ void process_digging(char_data *ch) {
 void process_dismantle_action(char_data *ch) {
 	int count, total;
 	
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish dismantling.\r\n");
 		cancel_action(ch);
 		return;
@@ -1587,7 +1587,7 @@ void process_dismantle_action(char_data *ch) {
 * @param char_data *ch The escapist.
 */
 void process_escaping(char_data *ch) {
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to find your way out!\r\n");
 		cancel_action(ch);
 		return;
@@ -1759,7 +1759,7 @@ void process_fishing(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to fish here.\r\n");
 		cancel_action(ch);
 		return;
@@ -1831,7 +1831,7 @@ void process_foraging(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to forage for anything.\r\n");
 		cancel_action(ch);
 		return;
@@ -1934,7 +1934,7 @@ void process_harvesting(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish harvesting.\r\n");
 		cancel_action(ch);
 		return;
@@ -2001,7 +2001,7 @@ void process_hunting(char_data *ch) {
 	any_vnum mob_vnum = GET_ACTION_VNUM(ch, 0);
 	int chance_times_100 = GET_ACTION_VNUM(ch, 1);
 	
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to keep hunting now.\r\n");
 		cancel_action(ch);
 		return;
@@ -2063,7 +2063,7 @@ void process_hunting(char_data *ch) {
 * @param char_data *ch The repairman.
 */
 void process_maintenance(char_data *ch) {
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to maintain the building.\r\n");
 		cancel_action(ch);
 		return;
@@ -2090,7 +2090,7 @@ void process_mining(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish mining.\r\n");
 		cancel_action(ch);
 		return;
@@ -2178,7 +2178,7 @@ void process_minting(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish minting.\r\n");
 		cancel_action(ch);
 		return;
@@ -2271,7 +2271,7 @@ void process_panning(char_data *ch) {
 		msg_to_char(ch, "You need to be using a pan to do that.\r\n");
 		cancel_action(ch);
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to pan here.\r\n");
 		cancel_action(ch);
 	}
@@ -2374,7 +2374,7 @@ void process_planting(char_data *ch) {
 * @param char_data *ch The prospector.
 */
 void process_prospecting(char_data *ch) {
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark for you to keep prospecting.\r\n");
 		cancel_action(ch);
 		return;
@@ -2436,7 +2436,7 @@ void process_repairing(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to repair anything.\r\n");
 		cancel_action(ch);
 		return;
@@ -2497,7 +2497,7 @@ void process_scraping(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish scraping.\r\n");
 		cancel_action(ch);
 		return;
@@ -2647,7 +2647,7 @@ void process_tanning(char_data *ch) {
 	obj_data *proto;
 	bool success;
 	
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish tanning.\r\n");
 		cancel_action(ch);
 		return;
@@ -2762,7 +2762,7 @@ ACMD(do_chip) {
 	else if (GET_ACTION(ch) != ACT_NONE) {
 		msg_to_char(ch, "You're already busy doing something else.\r\n");
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to chip anything here.\r\n");
 	}
 	else if (!*argptr) {
@@ -2829,7 +2829,7 @@ ACMD(do_chop) {
 	else if (!has_tool(ch, TOOL_AXE)) {
 		send_to_char("You need to be using some kind of axe to chop.\r\n", ch);
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to chop anything here.\r\n");
 	}
 	else {
@@ -3071,7 +3071,7 @@ ACMD(do_forage) {
 	else if (!IS_COMPLETE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You can't forage for anything in an incomplete building.\r\n");
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to forage for anything here.\r\n");
 	}
 	else {
@@ -3154,7 +3154,7 @@ ACMD(do_harvest) {
 	else if (!has_tool(ch, TOOL_HARVESTING)) {
 		msg_to_char(ch, "You aren't using the proper tool for that.\r\n");
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to harvest anything here.\r\n");
 	}
 	else {
@@ -3204,7 +3204,7 @@ ACMD(do_mine) {
 	else if (!has_tool(ch, TOOL_MINING)) {
 		msg_to_char(ch, "You aren't wielding a tool suitable for mining.\r\n");
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to mine anything here.\r\n");
 	}
 	else {
@@ -3260,7 +3260,7 @@ ACMD(do_mint) {
 	else if (!IS_WEALTH_ITEM(obj) || GET_WEALTH_VALUE(obj) <= 0) {
 		msg_to_char(ch, "You can't mint that into coins.\r\n");
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to mint anything here.\r\n");
 	}
 	else {
@@ -3309,7 +3309,7 @@ ACMD(do_pan) {
 	else if (!has_tool(ch, TOOL_PAN)) {
 		msg_to_char(ch, "You need to be using a pan to do that.\r\n");
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to pan for anything here.\r\n");
 	}
 	else {
@@ -3452,7 +3452,7 @@ ACMD(do_prospect) {
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to prospect here.\r\n");
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark for you to prospect.\r\n");
 	}
 	else if (get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_MINE_GLB_VNUM) > 0 && GET_LOYALTY(ch) && get_room_extra_data(IN_ROOM(ch), ROOM_EXTRA_PROSPECT_EMPIRE) == EMPIRE_VNUM(GET_LOYALTY(ch))) {
@@ -3509,7 +3509,7 @@ ACMD(do_saw) {
 	else if (!has_interaction(GET_OBJ_INTERACTIONS(obj), INTERACT_SAW)) {
 		msg_to_char(ch, "You can't saw that!\r\n");
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to saw anything here.\r\n");
 	}
 	else {
@@ -3565,7 +3565,7 @@ ACMD(do_scrape) {
 	else if (!has_tool(ch, TOOL_AXE | TOOL_KNIFE)) {
 		msg_to_char(ch, "You need to be using a good axe or knife to scrape anything.\r\n");
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to scrape anything here.\r\n");
 	}
 	else {
@@ -3635,7 +3635,7 @@ ACMD(do_tan) {
 	else if (!can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED)) {
 		msg_to_char(ch, "You don't have permission to tan here.\r\n");
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to tan anything here.\r\n");
 	}
 	else {
@@ -3786,7 +3786,7 @@ bool validate_gen_interact_room(char_data *ch, const struct gen_interact_data_t 
 	else if (data->approval_config && *(data->approval_config) && !IS_APPROVED(ch) && config_get_bool(data->approval_config)) {
 		send_config_msg(ch, "need_approval_string");
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to %s anything here.\r\n", data->command);
 	}
 	else if (!can_gen_interact_room(ch, IN_ROOM(ch), data)) {

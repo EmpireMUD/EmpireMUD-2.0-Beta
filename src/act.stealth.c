@@ -792,7 +792,7 @@ ACMD(do_escape) {
 	else if (!IS_INSIDE(IN_ROOM(ch))) {
 		msg_to_char(ch, "You don't need to escape from here.\r\n");
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to try to escape from here.\r\n");
 	}
 	else {
@@ -1327,7 +1327,7 @@ ACMD(do_search) {
 	}
 	else if (AFF_FLAGGED(ch, AFF_BLIND))
 		msg_to_char(ch, "How can you do that, you're blind!\r\n");
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch)))
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE))
 		msg_to_char(ch, "You can't see well enough here to search for anyone!\r\n");
 	else if (AFF_FLAGGED(ch, AFF_SENSE_HIDE))
 		msg_to_char(ch, "You search, but find nobody.\r\n");

@@ -1632,7 +1632,7 @@ char_data *find_closest_char(char_data *ch, char *arg, bool pc_only) {
 		if (pc_only && IS_NPC(vict)) {
 			continue;
 		}
-		if (!CAN_SEE(ch, vict) || !CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(vict))) {
+		if (!CAN_SEE(ch, vict) || !can_see_in_dark_room(ch, IN_ROOM(vict), FALSE)) {
 			continue;
 		}
 		if (!match_char_name(ch, vict, arg, MATCH_IN_ROOM)) {

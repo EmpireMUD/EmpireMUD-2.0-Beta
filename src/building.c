@@ -2188,7 +2188,7 @@ ACMD(do_maintain) {
 		else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 			msg_to_char(ch, "You can't repair it while it's on fire!\r\n");
 		}
-		else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 			msg_to_char(ch, "It's too dark to repair anything here.\r\n");
 		}
 		else {
@@ -2218,7 +2218,7 @@ ACMD(do_maintain) {
 		else if (IS_BURNING(IN_ROOM(ch))) {
 			msg_to_char(ch, "You can't maintain a building that's on fire!\r\n");
 		}
-		else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 			msg_to_char(ch, "It's too dark to maintain anything here.\r\n");
 		}
 		else {

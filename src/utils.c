@@ -2852,6 +2852,53 @@ double rate_item(obj_data *obj) {
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
 
 /**
+* Determines if a character can see in a dark room. This replaces a shirt-load
+* of macros that were increasingly hard to read.
+*
+* @param char_data *ch The character.
+* @param room_data *room The room they're trying to see in (which may be light).
+* @param bool count_adjacent_light If TRUE, light cascades from adjacent tiles.
+* @return bool TRUE if the character can see in dark here (or the room is light); FALSE if the character cannot see due to darkness.
+*/
+bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_light) {
+	// magic darkness overrides everything
+	if (MAGIC_DARKNESS(room) && !CAN_SEE_IN_MAGIC_DARKNESS(ch)) {
+		return FALSE;	// magic dark
+	}
+	
+	// see-in-dark abilities
+	if (HAS_INFRA(ch) || (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_HOLYLIGHT))) {
+		return TRUE;	// can see
+	}
+	
+	// check if the room is actually light
+	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS)) {
+		return TRUE;	// not dark: city lights
+	}
+	if (IS_ANY_BUILDING(room) && (ROOM_OWNER(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE))) {
+		return TRUE;	// not dark: claimed (or unclaimable) building
+	}
+	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT) || (count_adjacent_light && adjacent_room_is_light(room))) {
+		return TRUE;	// not dark: has a light source
+	}
+	if (!RMT_FLAGGED(room, RMT_DARK) && get_sun_status(room) != SUN_DARK) {
+		return TRUE;	// not dark: it isn't dark outside
+	}
+	
+	// reasons the character can see
+	if (room == IN_ROOM(ch) && (has_player_tech((ch), PTECH_SEE_CHARS_IN_DARK) || has_player_tech((ch), PTECH_SEE_OBJS_IN_DARK))) {
+		return TRUE;	// can see in own room due to see-*-in-dark
+	}
+	if (room == IN_ROOM(ch) && IS_OUTDOORS(ch) && has_player_tech((ch), PTECH_SEE_IN_DARK_OUTDOORS)) {
+		return TRUE;	// can see in own room outdoors
+	}
+	
+	// all other cases:
+	return FALSE;
+}
+
+
+/**
 * Gives a character the appropriate amount of command lag (wait time).
 *
 * @param char_data *ch The person to give command lag to.

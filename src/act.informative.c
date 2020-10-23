@@ -779,7 +779,7 @@ void list_char_to_char(char_data *list, char_data *ch) {
 			if (CAN_SEE(ch, i)) {
 				list_one_char(i, ch, c);
 			}
-			else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch)) && HAS_INFRA(i) && !MAGIC_DARKNESS(IN_ROOM(ch))) {
+			else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE) && HAS_INFRA(i) && !MAGIC_DARKNESS(IN_ROOM(ch))) {
 				if (c > 1) {
 					msg_to_char(ch, "(%2d) ", c);
 				}
@@ -2837,7 +2837,7 @@ ACMD(do_look) {
 		send_to_char("You can't see a damned thing, you're blind!\r\n", ch);
 	
 	/* prior to b5.31, this block gave an abbreviated version of look_at_room, which isn't necessary
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch)) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		send_to_char("It is pitch black...\r\n", ch);
 		list_char_to_char(ROOM_PEOPLE(IN_ROOM(ch)), ch);	// glowing red eyes
 	}
