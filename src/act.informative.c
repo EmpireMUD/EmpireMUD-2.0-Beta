@@ -304,7 +304,7 @@ int sort_chart_hash(struct chart_territory *a, struct chart_territory *b) {
 */
 void look_at_target(char_data *ch, char *arg, char *more_args) {
 	char targ_arg[MAX_INPUT_LENGTH];
-	int bits, found = FALSE, j, fnum, i = 0;
+	int bits, found = FALSE, j, fnum;
 	char_data *found_char = NULL;
 	obj_data *obj, *found_obj = NULL;
 	vehicle_data *veh, *found_veh = NULL;
@@ -357,7 +357,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	if (!found) {
 		DL_FOREACH2(ch->carrying, obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj)) {
-				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
+				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && --fnum == 0) {
 					send_to_char(desc, ch);
 					act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
 					found = TRUE;
@@ -370,7 +370,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	/* Does the argument match an extra desc in the char's equipment? */
 	for (j = 0; j < NUM_WEARS && !found; j++)
 		if (GET_EQ(ch, j) && CAN_SEE_OBJ(ch, GET_EQ(ch, j)))
-			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(GET_EQ(ch, j)))) != NULL && ++i == fnum) {
+			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(GET_EQ(ch, j)))) != NULL && --fnum == 0) {
 				send_to_char(desc, ch);
 				act("$n looks at $p.", TRUE, ch, GET_EQ(ch, j), NULL, TO_ROOM);
 				found = TRUE;
@@ -380,7 +380,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	if (!found) {
 		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj)) {
-				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
+				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && --fnum == 0) {
 					send_to_char(desc, ch);
 					act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
 					found = TRUE;
@@ -393,7 +393,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	// does it match an extra desc of a vehicle here?
 	if (!found && ROOM_VEHICLES(IN_ROOM(ch))) {
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (!VEH_IS_EXTRACTED(veh) && CAN_SEE_VEHICLE(ch, veh) && (desc = find_exdesc(arg, VEH_EX_DESCS(veh))) != NULL && ++i == fnum) {
+			if (!VEH_IS_EXTRACTED(veh) && CAN_SEE_VEHICLE(ch, veh) && (desc = find_exdesc(arg, VEH_EX_DESCS(veh))) != NULL && --fnum == 0) {
 				send_to_char(desc, ch);
 				act("$n looks at $V.", TRUE, ch, NULL, veh, TO_ROOM);
 				found = TRUE;
@@ -404,7 +404,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 
 	// does it match an extra desc of the room template?
 	if (!found && GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
-		if ((desc = find_exdesc(arg, GET_RMT_EX_DESCS(GET_ROOM_TEMPLATE(IN_ROOM(ch))))) != NULL && ++i == fnum) {
+		if ((desc = find_exdesc(arg, GET_RMT_EX_DESCS(GET_ROOM_TEMPLATE(IN_ROOM(ch))))) != NULL && --fnum == 0) {
 			send_to_char(desc, ch);
 			found = TRUE;
 		}
@@ -412,10 +412,15 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 
 	// does it match an extra desc of the building?
 	if (!found && GET_BUILDING(IN_ROOM(ch))) {
-		if ((desc = find_exdesc(arg, GET_BLD_EX_DESCS(GET_BUILDING(IN_ROOM(ch))))) != NULL && ++i == fnum) {
+		if ((desc = find_exdesc(arg, GET_BLD_EX_DESCS(GET_BUILDING(IN_ROOM(ch))))) != NULL && --fnum == 0) {
 			send_to_char(desc, ch);
 			found = TRUE;
 		}
+	}
+	
+	// try moons
+	if (!found) {
+		found = look_at_moon(ch, arg, &fnum);
 	}
 	
 	/* If an object was found back in generic_find */

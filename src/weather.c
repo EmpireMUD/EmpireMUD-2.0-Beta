@@ -589,6 +589,71 @@ void compute_night_light_radius(void) {
 
 
 /**
+* Lets a player look at a moon by name.
+*
+* @param char_data *ch The player.
+* @param char *name The argument typed by the player after 'look [at]'.
+* @param int *number Optional: For multi-list number targeting (look 4.moon; may be NULL)
+*/
+bool look_at_moon(char_data *ch, char *name, int *number) {
+	char buf[MAX_STRING_LENGTH], copy[MAX_INPUT_LENGTH], *tmp = copy;
+	struct time_info_data *tinfo;
+	generic_data *moon, *next_gen;
+	moon_phase_t phase;
+	moon_pos_t pos;
+	int num;
+	
+	if (!IS_OUTDOORS(ch)) {
+		return FALSE;
+	}
+	
+	skip_spaces(&name);
+	
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {	// can't target 0.moon
+		return FALSE;
+	}
+	
+	tinfo = local_time_info(IN_ROOM(ch), NULL);
+	
+	HASH_ITER(hh, generic_table, moon, next_gen) {
+		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1 || GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT)) {
+			continue;	// not a moon or invalid cycle
+		}
+		if (!isname(tmp, GEN_NAME(moon))) {
+			continue;	// not a name match
+		}
+		
+		// find moon in the sky
+		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
+		pos = get_moon_position(phase, tinfo->hours);
+		
+		// qualify it some more -- allow new moon in direct sunlight (unlike show-visible-moons)
+		if (pos == MOON_POS_DOWN) {
+			continue;	// moon is down
+		}
+		if (--(*number) > 0) {
+			continue;	// number-dot syntax
+		}
+		
+		// ok: show it
+		snprintf(buf, sizeof(buf), "%s is %s, %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
+		send_to_char(CAP(buf), ch);
+		return TRUE;
+	}
+	
+	return FALSE;	// nope
+}
+
+
+/**
 * Displays any visible moons to the player, one per line.
 *
 * @param char_data *ch The person to show the moons to.

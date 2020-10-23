@@ -2404,6 +2404,7 @@ void compute_night_light_radius();
 void determine_seasons();
 moon_phase_t get_moon_phase(double cycle_days);
 moon_pos_t get_moon_position(moon_phase_t phase, int hour);
+bool look_at_moon(char_data *ch, char *name, int *number);
 void show_visible_moons(char_data *ch);
 
 // weather.c time
