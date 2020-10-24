@@ -6019,7 +6019,7 @@ bool room_is_light(room_data *room, bool count_adjacent_light) {
 	
 	// check for lighted vehicle-type buildings
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (VEH_OWNER(veh) && VEH_FLAGGED(veh, VEH_BUILDING) && VEH_IS_COMPLETE(veh)) {
+		if (VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_OWNER(veh) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) && VEH_IS_COMPLETE(veh)) {
 			return TRUE;
 		}
 	}
