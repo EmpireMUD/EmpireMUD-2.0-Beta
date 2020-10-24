@@ -1939,6 +1939,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "interlink_river_limit", CONFTYPE_INT, "how many intervening tiles may be river");
 	init_config(CONFIG_WORLD, "interlink_mountain_limit", CONFTYPE_INT, "how many intervening tiles may be mountain");
 	init_config(CONFIG_WORLD, "newbie_adventure_cap", CONFTYPE_INT, "highest adventure min-level that can spawn on newbie islands");
+	init_config(CONFIG_WORLD, "use_local_time", CONFTYPE_BOOL, "each part of the world gets its own time zone instead of one global time");
 	init_config(CONFIG_WORLD, "vehicle_max_per_tile", CONFTYPE_INT, "maximum number of zero-size vehicles per tile");
 	init_config(CONFIG_WORLD, "vehicle_size_per_tile", CONFTYPE_INT, "maximum total vehicle size on any map tile");
 	

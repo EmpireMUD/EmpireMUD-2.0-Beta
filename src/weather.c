@@ -279,8 +279,7 @@ void weather_change(void) {
 //// TIME HANDLING ///////////////////////////////////////////////////////////
 
 /**
-* Advances time by an hour (and cascades it to other time zones). Also triggers
-* things which happen on specific hours.
+* Advances time by an hour and triggers things which happen on specific hours.
 */
 void another_hour(void) {
 	long lny;
@@ -363,10 +362,9 @@ struct time_info_data get_local_time(room_data *room) {
 	struct time_info_data tinfo;
 	int x_coord;
 	
-	// determine location
-	x_coord = (room ? X_COORD(room) : -1);
-	if (x_coord == -1) {
-		return main_time_info;	// shortcut if no region
+	// ensure we're using local time & determine location
+	if (!config_get_bool("use_local_time") || (x_coord = (room ? X_COORD(room) : -1)) == -1) {
+		return main_time_info;
 	}
 	
 	// determine longitude

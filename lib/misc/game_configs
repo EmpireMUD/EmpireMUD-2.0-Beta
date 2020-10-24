@@ -228,6 +228,7 @@ nearby_sector_distance 2
 newbie_adventure_cap 25
 ocean_pool_size 1000
 tropics_percent 40.000000
+use_local_time 1
 vehicle_max_per_tile 8
 vehicle_size_per_tile 4
 water_crop_distance 4
