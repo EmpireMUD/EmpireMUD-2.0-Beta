@@ -1303,7 +1303,8 @@ end
 apple bobbing bob~
 1 c 4
 bob~
-if %actor.obj_target(%arg%).vnum% != 18857
+set otarg %actor.obj_target(%arg%)%
+if !%otarg% || %otarg.vnum% != 18857
   %send% %actor% You can only bob in the @%self%.
   return 1
   halt
