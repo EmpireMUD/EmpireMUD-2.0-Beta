@@ -696,7 +696,7 @@ else
   %force% %target% mmove
   eval times %self.val0% + 1
   if %times% == 5
-    %send% %actor% You have scared enough citizens... but you can keep going if you want to.
+    %send% %actor% You have scared enough citizens, but you can keep pretending to be Dracula if you want to.
     %quest% %actor% trigger 18827
     %quest% %actor% finish 18827
   else
