@@ -3467,17 +3467,16 @@ void autowiz_write_wizlist(FILE *out, int minlev, int maxlev) {
 * Reloads the wizlist and godlist files.
 */
 void reload_wizlists(void) {
-	extern char *wizlist, *godlist;	// db.c
-
-	file_to_string_alloc(WIZLIST_FILE, &wizlist);
-	file_to_string_alloc(GODLIST_FILE, &godlist);
+	reload_text_string(TEXT_FILE_WIZLIST);
+	reload_text_string(TEXT_FILE_GODLIST);
 }
 
 
 /**
 * Builds and generates the wizlist and godlist files, and reloads them.
 */
-void run_autowiz(void) {	
+void run_autowiz(void) {
+	char basename[256], tempname[256];
 	FILE *fl;
 	
 	syslog(SYS_INFO, LVL_START_IMM, TRUE, "Rebuilding wizlists");
@@ -3485,21 +3484,31 @@ void run_autowiz(void) {
 	autowiz_initialize();
 	autowiz_read_players();
 	
-	if (!(fl = fopen(WIZLIST_FILE TEMP_SUFFIX, "w"))) {
-		log("SYSERR: run_autowiz: Unable to open file %s for writing\r\n", WIZLIST_FILE TEMP_SUFFIX);
+	// wizlist
+	strcpy(basename, text_file_data[TEXT_FILE_WIZLIST].filename);
+	strcpy(tempname, basename);
+	strcat(tempname, TEMP_SUFFIX);
+	
+	if (!(fl = fopen(tempname, "w"))) {
+		log("SYSERR: run_autowiz: Unable to open file %s for writing\r\n", tempname);
 		return;
 	}
 	autowiz_write_wizlist(fl, LVL_START_IMM, LVL_TOP);
 	fclose(fl);
-	rename(WIZLIST_FILE TEMP_SUFFIX, WIZLIST_FILE);
+	rename(tempname, basename);
 	
-	if (!(fl = fopen(GODLIST_FILE TEMP_SUFFIX, "w"))) {
-		log("SYSERR: run_autowiz: Unable to open file %s for writing\r\n", GODLIST_FILE TEMP_SUFFIX);
+	// godlist
+	strcpy(basename, text_file_data[TEXT_FILE_GODLIST].filename);
+	strcpy(tempname, basename);
+	strcat(tempname, TEMP_SUFFIX);
+	
+	if (!(fl = fopen(tempname, "w"))) {
+		log("SYSERR: run_autowiz: Unable to open file %s for writing\r\n", tempname);
 		return;
 	}
 	autowiz_write_wizlist(fl, LVL_GOD, LVL_START_IMM - 1);
 	fclose(fl);
-	rename(GODLIST_FILE TEMP_SUFFIX, GODLIST_FILE);
+	rename(tempname, basename);
 	
 	autowiz_cleanup();
 	reload_wizlists();

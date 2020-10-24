@@ -2055,7 +2055,6 @@ int text_processed(char *field, char *subfield, struct trig_var_data *vd, char *
 	}
 	else if (!str_cmp(field, "mudcommand")) {
 		/* find the mud command returned from this text */
-		extern const struct command_info cmd_info[];
 		int length, cmd;
 		for (length = strlen(vd->value), cmd = 0; *cmd_info[cmd].command != '\n'; cmd++)
 			if (!strn_cmp(cmd_info[cmd].command, vd->value, length))
@@ -2497,7 +2496,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				
 				// does not require an instance
 				if (!str_cmp(field, "nearest_adventure")) {
-					extern room_data *find_nearest_adventure(room_data *from, rmt_vnum vnum);
 					room_data *find;
 					any_vnum vnum;
 					if (subfield && isdigit(*subfield) && ((vnum = atoi(subfield)) != NOTHING) && (find = find_nearest_adventure(get_room_by_script(type, go), vnum))) {
@@ -2508,7 +2506,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 				}
 				else if (!str_cmp(field, "nearest_rmt")) {
-					extern room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum);
 					room_data *find;
 					any_vnum vnum;
 					if (subfield && isdigit(*subfield) && ((vnum = atoi(subfield)) != NOTHING) && (find = find_nearest_rmt(get_room_by_script(type, go), vnum))) {
@@ -2584,7 +2581,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					}
 				}
 				else if (!str_cmp(field, "set_location")) {
-					void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
 					room_data *targ_room;
 					
 					if (subfield && *subfield && (targ_room = get_room(get_room_by_script(type, go), subfield))) {
@@ -2791,7 +2787,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						strcpy(str, "0");
 					}
 					else if (!str_cmp(field, "add_lastname")) {
-						void add_lastname(char_data *ch, char *name);
 						if (subfield && *subfield && !IS_NPC(c)) {
 							add_lastname(c, subfield);
 						}
@@ -3394,7 +3389,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%d", GET_GREATNESS(c));
 					}
 					else if (!str_cmp(field, "gain_event_points")) {
-						extern int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
 						// %actor.gain_event_points(vnum,amt)%
 						
 						if (subfield && *subfield && !IS_NPC(c)) {
@@ -4046,7 +4040,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						strcpy(str, "0");
 					}
 					else if (!str_cmp(field, "remove_lastname")) {
-						void remove_lastname(char_data *ch, char *name);
 						if (subfield && *subfield && !IS_NPC(c)) {
 							remove_lastname(c, subfield);
 						}
@@ -4638,7 +4631,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						snprintf(str, slen, "%s",  GET_OBJ_SHORT_DESC(o));
 					}
 					else if (!str_cmp(field, "size")) {
-						extern int obj_carry_size(obj_data *obj);
 						snprintf(str, slen, "%d", obj_carry_size(o));
 					}
 					break;
@@ -5719,7 +5711,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
 								if (!empire_has_completed_goal(e, vnum)) {
-									void script_reward_goal(empire_data *emp, progress_data *prg);
 									script_reward_goal(e, prg);
 									check_for_eligible_goals(e);
 								}
@@ -7356,8 +7347,6 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 	struct cmdlist_element *temp;
 	unsigned long loops = 0;
 	void *go = NULL;
-
-	void wld_command_interpreter(room_data *room, char *argument);
 
 	if (depth > MAX_SCRIPT_DEPTH) {
 		script_log("Triggers recursed beyond maximum allowed depth.");

@@ -2482,51 +2482,6 @@ ACMD(do_factions) {
 /* Generic page_string function for displaying text */
 ACMD(do_gen_ps) {
 	switch (subcmd) {
-		case SCMD_CREDITS: {
-			extern char *credits;
-			page_string(ch->desc, credits, 0);
-			break;
-		}
-		case SCMD_INFO: {
-			extern char *info;
-			page_string(ch->desc, info, 0);
-			break;
-		}
-		case SCMD_WIZLIST: {
-			extern char *wizlist;
-			page_string(ch->desc, wizlist, 0);
-			break;
-		}
-		case SCMD_GODLIST: {
-			extern char *godlist;
-			page_string(ch->desc, godlist, 0);
-			break;
-		}
-		case SCMD_HANDBOOK: {
-			extern char *handbook;
-			page_string(ch->desc, handbook, 0);
-			break;
-		}
-		case SCMD_POLICIES: {
-			extern char *policies;
-			page_string(ch->desc, policies, 0);
-			break;
-		}
-		case SCMD_MOTD: {
-			extern char *motd;
-			page_string(ch->desc, motd, 0);
-			break;
-		}
-		case SCMD_IMOTD: {
-			extern char *imotd;
-			page_string(ch->desc, imotd, 0);
-			break;
-		}
-		case SCMD_NEWS: {
-			extern char *news;
-			page_string(ch->desc, news, 0);
-			break;
-		}
 		case SCMD_CLEAR: {
 			send_to_char("\033[H\033[J", ch);
 			break;
@@ -2544,8 +2499,20 @@ ACMD(do_gen_ps) {
 }
 
 
+ACMD(do_gen_text_string) {
+	if (subcmd < 0 || subcmd >= NUM_TEXT_FILE_STRINGS) {
+		send_config_msg(ch, "huh_string");
+	}
+	else if (!text_file_strings[subcmd] || !*text_file_strings[subcmd]) {
+		msg_to_char(ch, "This text is blank.\r\n");
+	}
+	else {
+		page_string(ch->desc, text_file_strings[subcmd], FALSE);
+	}
+}
+
+
 ACMD(do_help) {
-	extern char *help_screen;
 	struct help_index_element *found;
 
 	if (!ch->desc)
@@ -2554,7 +2521,7 @@ ACMD(do_help) {
 	skip_spaces(&argument);
 
 	if (!*argument) {
-		page_string(ch->desc, help_screen, 0);
+		page_string(ch->desc, text_file_strings[TEXT_FILE_HELP_SCREEN], FALSE);
 		return;
 	}
 	if (help_table) {

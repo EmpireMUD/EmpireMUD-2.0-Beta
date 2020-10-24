@@ -38,11 +38,6 @@
 *   Menu Interpreter Functions
 */
 
-// exernal vars
-extern char *motd;
-extern char *imotd;
-extern char *CREDIT_MESSG;
-
 // locals
 void set_creation_state(descriptor_data *d, int state);
 void show_bonus_trait_menu(char_data *ch);
@@ -200,6 +195,7 @@ ACMD(do_gen_craft);
 ACMD(do_gen_door);
 ACMD(do_gen_interact_room);
 ACMD(do_gen_ps);
+ACMD(do_gen_text_string);
 ACMD(do_gen_write);
 ACMD(do_get);
 ACMD(do_give);
@@ -649,7 +645,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "cooldowns", POS_DEAD, do_cooldowns, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "counterspell", POS_FIGHTING, do_counterspell, NO_MIN, CTYPE_SKILL, ABIL_COUNTERSPELL ),
 	STANDARD_CMD( "craft", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_CRAFT, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
-	SCMD_CMD( "credits", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_CREDITS ),
+	SCMD_CMD( "credits", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_CREDITS ),
 	SIMPLE_CMD( "create", POS_STANDING, do_create, LVL_GOD, CTYPE_IMMORTAL ),
 	SIMPLE_CMD( "customize", POS_STANDING, do_customize, NO_MIN, CTYPE_BUILD ),
 	SCMD_CMD( "cast", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_CAST ),
@@ -758,7 +754,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "godnet", POS_DEAD, do_pub_comm, LVL_GOD, CTYPE_IMMORTAL, SCMD_GODNET ),
 	SCMD_CMD( "godhistory", POS_DEAD, do_history, LVL_GOD, CTYPE_COMM, SCMD_GOD_HISTORY ),
 	SCMD_CMD( "ghistory", POS_DEAD, do_history, LVL_GOD, CTYPE_COMM, SCMD_GOD_HISTORY ),
-	SCMD_CMD( "godlist", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_GODLIST ),
+	SCMD_CMD( "godlist", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_GODLIST ),
 	SCMD_CMD( "gold", POS_DEAD, do_coins, NO_MIN, CTYPE_UTIL, TRUE ),
 	SIMPLE_CMD( "grab", POS_RESTING, do_grab, NO_MIN, CTYPE_UTIL ),
 	SIMPLE_CMD( "group", POS_DEAD, do_group, NO_MIN, CTYPE_UTIL ),
@@ -767,7 +763,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "gossip", POS_DEAD, do_no_cmd, NO_MIN, CTYPE_UTIL, NOCMD_GOSSIP ),
 
 	SIMPLE_CMD( "help", POS_DEAD, do_help, NO_MIN, CTYPE_UTIL ),
-	SCMD_CMD( "handbook", POS_DEAD, do_gen_ps, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_HANDBOOK ),
+	SCMD_CMD( "handbook", POS_DEAD, do_gen_text_string, LVL_START_IMM, CTYPE_IMMORTAL, TEXT_FILE_HANDBOOK ),
 	STANDARD_CMD( "harness", POS_STANDING, do_harness, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_MOVE, CMD_NO_ANIMALS, NO_ABIL ),
 	STANDARD_CMD( "harvest", POS_STANDING, do_harvest, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "heal", POS_FIGHTING, do_heal, NO_MIN, CTYPE_SKILL ),
@@ -790,10 +786,10 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( "idea", POS_DEAD, do_gen_write, NO_MIN, CTYPE_COMM, SCMD_IDEA ),
 	SIMPLE_CMD( "ignore", POS_DEAD, do_ignore, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "import", POS_DEAD, do_import, NO_MIN, CTYPE_UTIL, TRADE_IMPORT ),
-	SCMD_CMD( "imotd", POS_DEAD, do_gen_ps, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_IMOTD ),
+	SCMD_CMD( "imotd", POS_DEAD, do_gen_text_string, LVL_START_IMM, CTYPE_IMMORTAL, TEXT_FILE_IMOTD ),
 	SIMPLE_CMD( "infiltrate", POS_STANDING, do_infiltrate, NO_MIN, CTYPE_MOVE ),
 	GRANT_CMD( "instance", POS_DEAD, do_instance, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_INSTANCE ),
-	SCMD_CMD( "info", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_INFO ),
+	SCMD_CMD( "info", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_INFO ),
 	ABILITY_CMD( "inspire", POS_STANDING, do_inspire, NO_MIN, CTYPE_SKILL, ABIL_INSPIRE ),
 	SIMPLE_CMD( "insult", POS_RESTING, do_insult, NO_MIN, CTYPE_COMM ),
 	SIMPLE_CMD( "interlink", POS_STANDING, do_interlink, NO_MIN, CTYPE_BUILD ),
@@ -851,7 +847,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "mix", POS_DEAD, do_gen_craft, NO_MIN, NO_GRANTS, CRAFT_TYPE_MIX, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	ABILITY_CMD( "moonrise", POS_FIGHTING, do_moonrise, NO_MIN, CTYPE_COMBAT, ABIL_MOONRISE ),
 	SCMD_CMD( "morph", POS_FIGHTING, do_morph, NO_MIN, CTYPE_MOVE, SCMD_MORPH ),
-	SCMD_CMD( "motd", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_MOTD ),
+	SCMD_CMD( "motd", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_MOTD ),
 	GRANT_CMD( "moveeinv", POS_DEAD, do_moveeinv, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_EMPIRES ),
 	SIMPLE_CMD( "mudstats", POS_DEAD, do_mudstats, NO_MIN, CTYPE_UTIL ),
 	ABILITY_CMD( "mummify", POS_STUNNED, do_mummify, NO_MIN, CTYPE_MOVE, ABIL_MUMMIFY ),
@@ -861,7 +857,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SIMPLE_CMD( "mydescription", POS_STANDING, do_mydescription, NO_MIN, CTYPE_UTIL ),
 
 	SIMPLE_CMD( "nearby", POS_RESTING, do_nearby, NO_MIN, CTYPE_UTIL ),
-	SCMD_CMD( "news", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_NEWS ),
+	SCMD_CMD( "news", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_NEWS ),
 	SIMPLE_CMD( "nodismantle", POS_SLEEPING, do_nodismantle, NO_MIN, CTYPE_BUILD ),
 	SIMPLE_CMD( "noskill", POS_DEAD, do_noskill, NO_MIN, CTYPE_UTIL ),
 	SCMD_CMD( "notitle", POS_DEAD, do_wizutil, LVL_CIMPL, CTYPE_IMMORTAL, SCMD_NOTITLE ),
@@ -891,7 +887,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	STANDARD_CMD( "plant", POS_STANDING, do_plant, NO_MIN, NO_GRANTS, NO_SCMD, CTYPE_BUILD, CMD_NO_ANIMALS, NO_ABIL ),
 	SIMPLE_CMD( "pledge", POS_SLEEPING, do_pledge, NO_MIN, CTYPE_EMPIRE ),
 	SIMPLE_CMD( "point", POS_RESTING, do_point, NO_MIN, CTYPE_UTIL ),
-	SCMD_CMD( "policy", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_POLICIES ),
+	SCMD_CMD( "policy", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_POLICY ),
 	SCMD_CMD( "poofin", POS_DEAD, do_poofset, LVL_GOD, CTYPE_IMMORTAL, SCMD_POOFIN ),
 	SCMD_CMD( "poofout", POS_DEAD, do_poofset, LVL_GOD, CTYPE_IMMORTAL, SCMD_POOFOUT ),
 	SIMPLE_CMD( "portal", POS_STANDING, do_portal, NO_MIN, CTYPE_MOVE ),
@@ -1093,7 +1089,7 @@ cpp_extern const struct command_info cmd_info[] = {
 	SCMD_CMD( ";", POS_DEAD, do_pub_comm, LVL_START_IMM, CTYPE_IMMORTAL, SCMD_WIZNET ),
 	SCMD_CMD( "wizhelp", POS_DEAD, do_commands, LVL_GOD, CTYPE_IMMORTAL, SCMD_WIZHELP ),
 	SCMD_CMD( "wizhistory", POS_DEAD, do_history, LVL_GOD, CTYPE_COMM, SCMD_GOD_HISTORY ),
-	SCMD_CMD( "wizlist", POS_DEAD, do_gen_ps, NO_MIN, CTYPE_UTIL, SCMD_WIZLIST ),
+	SCMD_CMD( "wizlist", POS_DEAD, do_gen_text_string, NO_MIN, CTYPE_UTIL, TEXT_FILE_WIZLIST ),
 	GRANT_CMD( "wizlock", POS_DEAD, do_wizlock, LVL_CIMPL, CTYPE_IMMORTAL, GRANT_WIZLOCK ),
 	SIMPLE_CMD( "workforce", POS_DEAD, do_workforce, NO_MIN, CTYPE_EMPIRE ),
 	ABILITY_CMD( "worm", POS_STUNNED, do_worm, NO_MIN, CTYPE_MOVE, ABIL_WORM ),
@@ -2108,18 +2104,22 @@ bool check_multiplaying(descriptor_data *d) {
 // simple motd
 void send_motd(descriptor_data *d) {
 	int i;
-
-	SEND_TO_Q(CREDIT_MESSG, d);
+	
+	if (text_file_strings[TEXT_FILE_SHORT_CREDITS]) {
+		SEND_TO_Q(text_file_strings[TEXT_FILE_SHORT_CREDITS], d);
+	}
 
 	SEND_TO_Q(" ", d);
 	for (i = 0; i < 79; i++)
 		SEND_TO_Q("=", d);
 	SEND_TO_Q("\r\n\r\n", d);
 
-	if (IS_IMMORTAL(d->character))
-		SEND_TO_Q(imotd, d);
-	else
-		SEND_TO_Q(motd, d);
+	if (IS_IMMORTAL(d->character) && text_file_strings[TEXT_FILE_IMOTD]) {
+		SEND_TO_Q(text_file_strings[TEXT_FILE_IMOTD], d);
+	}
+	else if (text_file_strings[TEXT_FILE_MOTD]) {
+		SEND_TO_Q(text_file_strings[TEXT_FILE_IMOTD], d);
+	}
 
 	SEND_TO_Q("\r\n ", d);
 	for (i = 0; i < 79; i++)

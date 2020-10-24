@@ -23,7 +23,7 @@
 #define LVL_UNRESTRICTED_BUILDER  LVL_CIMPL	// level at which there are no vnum restrictions on olc
 
 
-#define OLC_MODULE(name)	void name(char_data *ch, int type, char *argument)
+#define OLC_MODULE(name)	void (name)(char_data *ch, int type, char *argument)
 
 
 // OLC_x types -- these are bits because some things operate on more than one type
@@ -111,7 +111,7 @@
 // subcommands for olc
 struct olc_command_data {
 	char *command;
-	void (*func)(char_data *ch, int type, char *argument);
+	OLC_MODULE(*func);
 	int valid_types;	// OLC_ type const
 	int flags;	// OLC_CF_
 };

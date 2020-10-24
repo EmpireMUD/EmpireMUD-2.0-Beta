@@ -2358,8 +2358,6 @@ void load_empire_storage(void) {
 * @param empire_vnum vnum The vnum to process.
 */
 void parse_empire(FILE *fl, empire_vnum vnum) {
-	void assign_old_workforce_chore(empire_data *emp, int chore);
-	
 	empire_data *emp, *find;
 	int t[6], j, iter;
 	char line[1024], str_in[256];
@@ -2476,10 +2474,6 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 					if (t[1] >= 0 && t[1] < NUM_CHORES && (isle = get_empire_island(emp, t[0]))) {
 						isle->workforce_limit[t[1]] = t[2];
 					}
-				}
-				else if (sscanf(line, "C%d", &t[0]) == 1) {
-					// old version
-					assign_old_workforce_chore(emp, t[0]);
 				}
 				else {
 					log("SYSERR: Bad chore data for empire %d", vnum);

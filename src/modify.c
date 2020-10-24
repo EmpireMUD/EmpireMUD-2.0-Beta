@@ -333,8 +333,6 @@ void string_add(descriptor_data *d, char *str) {
 			d->file_storage = NULL;
 		}
 		else if (d->save_config) {
-			void save_config_system();
-			
 			save_config_system();
 			syslog(SYS_CONFIG, GET_INVIS_LEV(d->character), TRUE, "CONFIG: %s edited the text for %s", GET_NAME(d->character), d->save_config->key);
 			msg_to_char(d->character, "Text for %s saved.\r\n", d->save_config->key);

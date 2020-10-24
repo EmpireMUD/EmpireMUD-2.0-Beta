@@ -301,5 +301,5 @@ extern const int primary_attributes[];
 extern struct promo_code_list promo_codes[];
 extern const double score_levels[];
 extern const int techs_requiring_same_island[];
-extern struct tedit_struct tedit_option[];
+extern struct text_file_data_type text_file_data[NUM_TEXT_FILE_STRINGS];
 extern const int universal_wait;

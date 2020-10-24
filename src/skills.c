@@ -224,7 +224,6 @@ void check_skill_sell(char_data *ch, ability_data *abil) {
 		}
 		case ABIL_DEATHSHROUD: {
 			if (affected_by_spell(ch, ATYPE_DEATHSHROUD)) {
-				void un_deathshroud(char_data *ch);
 				un_deathshroud(ch);
 				need_affect_total = TRUE;
 			}

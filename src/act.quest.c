@@ -728,7 +728,6 @@ QCMD(qcmd_group) {
 
 
 QCMD(qcmd_info) {
-	extern char *quest_giver_string(struct quest_giver *giver, bool show_vnums);
 	char buf[MAX_STRING_LENGTH], *buf2, vstr[128];
 	struct instance_data *inst;
 	struct quest_giver *giver;

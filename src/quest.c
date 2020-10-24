@@ -792,7 +792,6 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 				break;
 			}
 			case QR_EVENT_POINTS: {
-				extern int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
 				gain_event_points(ch, reward->vnum, reward->amount);
 				break;
 			}

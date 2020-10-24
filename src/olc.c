@@ -2692,7 +2692,7 @@ OLC_MODULE(olc_list) {
 		// OLC_x:
 		switch (type) {
 			case OLC_ABILITY: {
-				extern char *list_one_ability(ability_data *abil, bool detail);
+				char *list_one_ability(ability_data *abil, bool detail);
 				ability_data *abil, *next_abil;
 				HASH_ITER(hh, ability_table, abil, next_abil) {
 					if (len >= sizeof(buf)) {
@@ -2706,7 +2706,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_ADVENTURE: {
-				extern char *list_one_adventure(adv_data *adv, bool detail);
+				char *list_one_adventure(adv_data *adv, bool detail);
 				adv_data *adv, *next_adv;
 				HASH_ITER(hh, adventure_table, adv, next_adv) {
 					if (len >= sizeof(buf)) {
@@ -2720,7 +2720,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_ARCHETYPE: {
-				extern char *list_one_archetype(archetype_data *arch, bool detail);
+				char *list_one_archetype(archetype_data *arch, bool detail);
 				struct archetype_data *arch, *next_arch;
 				HASH_ITER(hh, archetype_table, arch, next_arch) {
 					if (len >= sizeof(buf)) {
@@ -2734,7 +2734,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_AUGMENT: {
-				extern char *list_one_augment(augment_data *aug, bool detail);
+				char *list_one_augment(augment_data *aug, bool detail);
 				struct augment_data *aug, *next_aug;
 				HASH_ITER(hh, augment_table, aug, next_aug) {
 					if (len >= sizeof(buf)) {
@@ -2748,7 +2748,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_BOOK: {
-				extern char *list_one_book(book_data *book, bool detail);
+				char *list_one_book(book_data *book, bool detail);
 				book_data *book, *next_book;
 				HASH_ITER(hh, book_table, book, next_book) {
 					if (len >= sizeof(buf)) {
@@ -2762,7 +2762,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_BUILDING: {
-				extern char *list_one_building(bld_data *bld, bool detail);
+				char *list_one_building(bld_data *bld, bool detail);
 				bld_data *bld, *next_bld;
 				HASH_ITER(hh, building_table, bld, next_bld) {
 					if (len >= sizeof(buf)) {
@@ -2776,7 +2776,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_CLASS: {
-				extern char *list_one_class(class_data *cls, bool detail);
+				char *list_one_class(class_data *cls, bool detail);
 				class_data *cls, *next_cls;
 				HASH_ITER(hh, class_table, cls, next_cls) {
 					if (len >= sizeof(buf)) {
@@ -2790,7 +2790,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_CRAFT: {
-				extern char *list_one_craft(craft_data *craft, bool detail);
+				char *list_one_craft(craft_data *craft, bool detail);
 				craft_data *craft, *next_craft;
 				HASH_ITER(hh, craft_table, craft, next_craft) {
 					if (len >= sizeof(buf)) {
@@ -2804,7 +2804,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_CROP: {
-				extern char *list_one_crop(crop_data *crop, bool detail);
+				char *list_one_crop(crop_data *crop, bool detail);
 				crop_data *crop, *next_crop;
 				HASH_ITER(hh, crop_table, crop, next_crop) {
 					if (len >= sizeof(buf)) {
@@ -2818,7 +2818,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_EVENT: {
-				extern char *list_one_event(event_data *event, bool detail);
+				char *list_one_event(event_data *event, bool detail);
 				event_data *event, *next_event;
 				HASH_ITER(hh, event_table, event, next_event) {
 					if (len >= sizeof(buf)) {
@@ -2832,7 +2832,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_FACTION: {
-				extern char *list_one_faction(faction_data *fct, bool detail);
+				char *list_one_faction(faction_data *fct, bool detail);
 				faction_data *fct, *next_fct;
 				HASH_ITER(hh, faction_table, fct, next_fct) {
 					if (len >= sizeof(buf)) {
@@ -2846,7 +2846,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_GENERIC: {
-				extern char *list_one_generic(generic_data *gen, bool detail);
+				char *list_one_generic(generic_data *gen, bool detail);
 				generic_data *gen, *next_gen;
 				HASH_ITER(hh, generic_table, gen, next_gen) {
 					if (len >= sizeof(buf)) {
@@ -2860,7 +2860,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_GLOBAL: {
-				extern char *list_one_global(struct global_data *glb, bool detail);
+				char *list_one_global(struct global_data *glb, bool detail);
 				struct global_data *glb, *next_glb;
 				HASH_ITER(hh, globals_table, glb, next_glb) {
 					if (len >= sizeof(buf)) {
@@ -2874,7 +2874,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_MOBILE: {
-				extern char *list_one_mobile(char_data *mob, bool detail);
+				char *list_one_mobile(char_data *mob, bool detail);
 				char_data *mob, *next_mob;
 				HASH_ITER(hh, mobile_table, mob, next_mob) {
 					if (len >= sizeof(buf)) {
@@ -2888,7 +2888,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_MORPH: {
-				extern char *list_one_morph(morph_data *morph, bool detail);
+				char *list_one_morph(morph_data *morph, bool detail);
 				morph_data *morph, *next_morph;
 				HASH_ITER(hh, morph_table, morph, next_morph) {
 					if (len >= sizeof(buf)) {
@@ -2902,7 +2902,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_OBJECT: {
-				extern char *list_one_object(obj_data *obj, bool detail);
+				char *list_one_object(obj_data *obj, bool detail);
 				obj_data *obj, *next_obj;
 				HASH_ITER(hh, object_table, obj, next_obj) {
 					if (len >= sizeof(buf)) {
@@ -2916,7 +2916,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_PROGRESS: {
-				extern char *list_one_progress(progress_data *prg, bool detail);
+				char *list_one_progress(progress_data *prg, bool detail);
 				progress_data *prg, *next_prg;
 				HASH_ITER(hh, progress_table, prg, next_prg) {
 					if (len >= sizeof(buf)) {
@@ -2930,7 +2930,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_QUEST: {
-				extern char *list_one_quest(quest_data *quest, bool detail);
+				char *list_one_quest(quest_data *quest, bool detail);
 				quest_data *quest, *next_quest;
 				HASH_ITER(hh, quest_table, quest, next_quest) {
 					if (len >= sizeof(buf)) {
@@ -2944,7 +2944,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_ROOM_TEMPLATE: {
-				extern char *list_one_room_template(room_template *rmt, bool detail);
+				char *list_one_room_template(room_template *rmt, bool detail);
 				room_template *rmt, *next_rmt;
 				HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 					if (len >= sizeof(buf)) {
@@ -2958,7 +2958,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_SECTOR: {
-				extern char *list_one_sector(sector_data *sect, bool detail);
+				char *list_one_sector(sector_data *sect, bool detail);
 				sector_data *sect, *next_sect;
 				HASH_ITER(hh, sector_table, sect, next_sect) {
 					if (len >= sizeof(buf)) {
@@ -2972,7 +2972,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_SHOP: {
-				extern char *list_one_shop(shop_data *shop, bool detail);
+				char *list_one_shop(shop_data *shop, bool detail);
 				shop_data *shop, *next_shop;
 				HASH_ITER(hh, shop_table, shop, next_shop) {
 					if (len >= sizeof(buf)) {
@@ -2986,7 +2986,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_SKILL: {
-				extern char *list_one_skill(skill_data *skill, bool detail);
+				char *list_one_skill(skill_data *skill, bool detail);
 				skill_data *skill, *next_skill;
 				HASH_ITER(hh, skill_table, skill, next_skill) {
 					if (len >= sizeof(buf)) {
@@ -3000,7 +3000,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_SOCIAL: {
-				extern char *list_one_social(social_data *soc, bool detail);
+				char *list_one_social(social_data *soc, bool detail);
 				social_data *soc, *next_soc;
 				HASH_ITER(hh, social_table, soc, next_soc) {
 					if (len >= sizeof(buf)) {
@@ -3014,7 +3014,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_TRIGGER: {
-				extern char *list_one_trigger(trig_data *trig, bool detail);
+				char *list_one_trigger(trig_data *trig, bool detail);
 				trig_data *trig, *next_trig;
 				HASH_ITER(hh, trigger_table, trig, next_trig) {
 					if (len >= sizeof(buf)) {
@@ -3028,7 +3028,7 @@ OLC_MODULE(olc_list) {
 				break;
 			}
 			case OLC_VEHICLE: {
-				extern char *list_one_vehicle(vehicle_data *veh, bool detail);
+				char *list_one_vehicle(vehicle_data *veh, bool detail);
 				vehicle_data *veh, *next_veh;
 				HASH_ITER(hh, vehicle_table, veh, next_veh) {
 					if (len >= sizeof(buf)) {

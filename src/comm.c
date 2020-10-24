@@ -53,14 +53,13 @@
 extern struct ban_list_element *ban_list;
 extern bool data_table_needs_save;
 extern int num_invalid;
-extern char **intros;
-extern int num_intros;
+extern char **intro_screens;
+extern int num_intro_screens;
 extern int no_auto_deletes;
 extern ush_int DFLT_PORT;
 extern const char *DFLT_DIR;
 extern char *LOGNAME;
 extern int max_playing;
-extern char *help_screen;
 extern const char *slow_nameserver_ips[];
 
 // external functions
@@ -68,6 +67,7 @@ void boot_world();
 void empire_srandom(unsigned long initial_seed);
 void mobile_activity(void);
 int perform_alias(descriptor_data *d, char *orig);
+char *prompt_olc_info(char_data *ch);
 
 // heartbeat functions
 void check_death_respawn();
@@ -2345,7 +2345,7 @@ int new_descriptor(int s) {
 	LL_PREPEND(descriptor_list, newd);
 	
 	ProtocolNegotiate(newd);
-	SEND_TO_Q(intros[number(0, num_intros-1)], newd);
+	SEND_TO_Q(intro_screens[number(0, num_intro_screens-1)], newd);
 
 	return (0);
 }
@@ -3265,7 +3265,6 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 							sprintf(i + strlen(i), "%sinvis-%d", (*i ? " " : ""), GET_INVIS_LEV(ch));
 						}
 						if (ch->desc && GET_OLC_TYPE(ch->desc) != 0) {
-							extern char *prompt_olc_info(char_data *ch);
 							sprintf(i + strlen(i), "%solc-%s", (*i ? " " : ""), prompt_olc_info(ch));
 						}
 					}

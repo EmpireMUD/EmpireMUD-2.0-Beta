@@ -38,6 +38,13 @@
 *   Commands
 */
 
+// external variables
+extern struct stored_data *data_table;
+extern struct stored_data_type stored_data_info[];
+extern bool manual_evolutions;
+extern int buf_switches, buf_largecount, buf_overflows, top_of_helpt;
+extern int total_accounts, active_accounts, active_accounts_week;
+
 // external functions
 char *ability_color(char_data *ch, ability_data *abil);
 struct instance_data *build_instance_loc(adv_data *adv, struct adventure_link_rule *rule, room_data *loc, int dir);
@@ -304,7 +311,7 @@ bool users_output(char_data *to, char_data *tch, descriptor_data *d, char *name_
  //////////////////////////////////////////////////////////////////////////////
 //// ADMIN UTIL SYSTEM ///////////////////////////////////////////////////////
 
-#define ADMIN_UTIL(name)  void name(char_data *ch, char *argument)
+#define ADMIN_UTIL(name)  void (name)(char_data *ch, char *argument)
 
 ADMIN_UTIL(util_approval);
 ADMIN_UTIL(util_bldconvert);
@@ -329,7 +336,7 @@ ADMIN_UTIL(util_yearly);
 struct {
 	char *command;
 	int level;
-	void (*func)(char_data *ch, char *argument);
+	ADMIN_UTIL(*func);
 } admin_utils[] = {
 	{ "approval", LVL_CIMPL, util_approval },
 	{ "bldconvert", LVL_CIMPL, util_bldconvert },
@@ -1015,8 +1022,6 @@ ADMIN_UTIL(util_diminish) {
 
 
 ADMIN_UTIL(util_evolve) {
-	extern bool manual_evolutions;
-	
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s used util evolve", GET_NAME(ch));
 	send_config_msg(ch, "ok_string");
 	manual_evolutions = TRUE;	// triggers a log
@@ -2284,8 +2289,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		vict->player.time.birth = time(0) - ((value - 17) * SECS_PER_MUD_YEAR);
 	}
 	else if SET_CASE("lastname") {
-		void add_lastname(char_data *ch, char *name);
-		void remove_lastname(char_data *ch, char *name);
 		char va_1[MAX_INPUT_LENGTH], va_2[MAX_INPUT_LENGTH];
 		
 		half_chop(val_arg, va_1, va_2);
@@ -2717,9 +2720,6 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 
 	else if SET_CASE("name") {
-		void add_player_to_table(player_index_data *plr);
-		void remove_player_from_table(player_index_data *plr);
-
 		SAVE_CHAR(vict);
 		one_argument(val_arg, buf);
 		if (_parse_name(buf, newname) || fill_word(newname) || strlen(newname) > MAX_NAME_LENGTH || strlen(newname) < 2 || !Valid_Name(newname)) {
@@ -2856,9 +2856,6 @@ SHOW(show_components) {
 
 // show data system
 SHOW(show_data) {
-	extern struct stored_data *data_table;
-	extern struct stored_data_type stored_data_info[];
-	
 	char output[MAX_STRING_LENGTH * 2], line[MAX_STRING_LENGTH];
 	struct stored_data *data, *next_data;
 	size_t size;
@@ -3528,9 +3525,6 @@ SHOW(show_resource) {
 
 
 SHOW(show_stats) {
-	extern int buf_switches, buf_largecount, buf_overflows, top_of_helpt;
-	extern int total_accounts, active_accounts, active_accounts_week;
-	
 	int num_active_empires = 0, num_objs = 0, num_mobs = 0, num_vehs = 0, num_players = 0, num_descs = 0, menu_count = 0;
 	int num_trigs = 0, num_goals = 0, num_rewards = 0, num_mort_helps = 0, num_imm_helps = 0, num_inst = 0;
 	progress_data *prg, *next_prg;
@@ -9337,69 +9331,62 @@ ACMD(do_reboot) {
  * would be nice to have a syslog. -paul 12/8/2014
  */
 ACMD(do_reload) {
-	extern char *credits;
-	extern char *motd;
-	extern char *news;
-	extern char *imotd;
-	extern char *CREDIT_MESSG;
-	extern char *help_screen;
-	extern char *info;
-	extern char *handbook;
-	extern char *policies;
-	extern char *wizlist;
-	extern char *godlist;
-	
-	int i;
+	int iter;
 
 	one_argument(argument, arg);
 
 	if (!str_cmp(arg, "all") || *arg == '*') {
 		load_intro_screens();
 		
-		file_to_string_alloc(SCREDITS_FILE, &CREDIT_MESSG);
-		file_to_string_alloc(WIZLIST_FILE, &wizlist);
-		file_to_string_alloc(GODLIST_FILE, &godlist);
-		file_to_string_alloc(CREDITS_FILE, &credits);
-		file_to_string_alloc(MOTD_FILE, &motd);
-		file_to_string_alloc(NEWS_FILE, &news);
-		file_to_string_alloc(IMOTD_FILE, &imotd);
-		file_to_string_alloc(HELP_PAGE_FILE, &help_screen);
-		file_to_string_alloc(INFO_FILE, &info);
-		file_to_string_alloc(POLICIES_FILE, &policies);
-		file_to_string_alloc(HANDBOOK_FILE, &handbook);
+		for (iter = 0; iter < NUM_TEXT_FILE_STRINGS; ++iter) {
+			reload_text_string(iter);
+		}
 	}
-	else if (!str_cmp(arg, "wizlist"))
-		file_to_string_alloc(WIZLIST_FILE, &wizlist);
-	else if (!str_cmp(arg, "godlist"))
-		file_to_string_alloc(GODLIST_FILE, &godlist);
-	else if (!str_cmp(arg, "credits"))
-		file_to_string_alloc(CREDITS_FILE, &credits);
-	else if (!str_cmp(arg, "motd"))
-		file_to_string_alloc(MOTD_FILE, &motd);
-	else if (!str_cmp(arg, "imotd"))
-		file_to_string_alloc(IMOTD_FILE, &imotd);
-	else if (!str_cmp(arg, "news"))
-		file_to_string_alloc(NEWS_FILE, &news);
-	else if (!str_cmp(arg, "help"))
-		file_to_string_alloc(HELP_PAGE_FILE, &help_screen);
-	else if (!str_cmp(arg, "info"))
-		file_to_string_alloc(INFO_FILE, &info);
-	else if (!str_cmp(arg, "policy"))
-		file_to_string_alloc(POLICIES_FILE, &policies);
-	else if (!str_cmp(arg, "handbook"))
-		file_to_string_alloc(HANDBOOK_FILE, &handbook);
-	else if (!str_cmp(arg, "shortcredits"))
-		file_to_string_alloc(SCREDITS_FILE, &CREDIT_MESSG);
+	else if (!str_cmp(arg, "wizlist")) {
+		reload_text_string(TEXT_FILE_WIZLIST);
+	}
+	else if (!str_cmp(arg, "godlist")) {
+		reload_text_string(TEXT_FILE_GODLIST);
+	}
+	else if (!str_cmp(arg, "credits")) {
+		reload_text_string(TEXT_FILE_CREDITS);
+	}
+	else if (!str_cmp(arg, "motd")) {
+		reload_text_string(TEXT_FILE_MOTD);
+	}
+	else if (!str_cmp(arg, "imotd")) {
+		reload_text_string(TEXT_FILE_IMOTD);
+	}
+	else if (!str_cmp(arg, "news")) {
+		reload_text_string(TEXT_FILE_NEWS);
+	}
+	else if (!str_cmp(arg, "help")) {
+		reload_text_string(TEXT_FILE_HELP_SCREEN);
+	}
+	else if (!str_cmp(arg, "info")) {
+		reload_text_string(TEXT_FILE_INFO);
+	}
+	else if (!str_cmp(arg, "policy")) {
+		reload_text_string(TEXT_FILE_POLICY);
+	}
+	else if (!str_cmp(arg, "handbook")) {
+		reload_text_string(TEXT_FILE_HANDBOOK);
+	}
+	else if (!str_cmp(arg, "shortcredits")) {
+		reload_text_string(TEXT_FILE_SHORT_CREDITS);
+	}
 	else if (!str_cmp(arg, "intros")) {
 		load_intro_screens();
 	}
 	else if (!str_cmp(arg, "xhelp")) {
 		if (help_table) {
-			for (i = 0; i <= top_of_helpt; i++) {
-				if (help_table[i].keyword)
-					free(help_table[i].keyword);
-				if (help_table[i].entry && !help_table[i].duplicate)
-					free(help_table[i].entry);
+			for (iter = 0; iter <= top_of_helpt; ++iter) {
+				if (help_table[iter].keyword) {
+					free(help_table[iter].keyword);
+				}
+				if (help_table[iter].entry && !help_table[iter].duplicate) {
+					free(help_table[iter].entry);
+				}
 			}
 			free(help_table);
 		}
@@ -10269,10 +10256,9 @@ ACMD(do_syslog) {
 
 
 ACMD(do_tedit) {
-	// see configs.c for tedit_option[]
-	int l, i;
+	// see configs.c for text_file_data[]
+	int count, iter, type;
 	char field[MAX_INPUT_LENGTH];
-
 
 	if (ch->desc == NULL) {
 		send_to_char("Get outta here you linkdead head!\r\n", ch);
@@ -10287,43 +10273,46 @@ ACMD(do_tedit) {
 
 	if (!*field) {
 		strcpy(buf, "Files available to be edited:\r\n");
-		i = 1;
-		for (l = 0; *tedit_option[l].cmd != '\n'; l++) {
-			if (GET_ACCESS_LEVEL(ch) >= tedit_option[l].level) {
-				sprintf(buf, "%s%-11.11s", buf, tedit_option[l].cmd);
-				if (!(i % 7))
+		count = 1;
+		for (iter = 0; iter < NUM_TEXT_FILE_STRINGS; ++iter) {
+			if (text_file_data[iter].can_edit && GET_ACCESS_LEVEL(ch) >= text_file_data[iter].level) {
+				sprintf(buf, "%s%-15.15s", buf, text_file_data[iter].name);
+				if (!(count++ % 5)) {
 					strcat(buf, "\r\n");
-				i++;
+				}
 			}
 		}
 
-		if (--i % 7)
+		if (--count % 5) {
 			strcat(buf, "\r\n");
-
-		if (i == 0)
+		}
+		if (count == 0) {
 			strcat(buf, "None.\r\n");
+		}
 
 		send_to_char(buf, ch);
 		return;
 	}
-	for (l = 0; *(tedit_option[l].cmd) != '\n'; l++)
-		if (!strn_cmp(field, tedit_option[l].cmd, strlen(field)))
+	for (type = 0; type < NUM_TEXT_FILE_STRINGS; type++) {
+		if (text_file_data[type].can_edit && !strn_cmp(field, text_file_data[type].name, strlen(field))) {
 			break;
+		}
+	}
 
-	if (*tedit_option[l].cmd == '\n') {
+	if (type >= NUM_TEXT_FILE_STRINGS) {
 		send_to_char("Invalid text editor option.\r\n", ch);
 		return;
 	}
 
-	if (GET_ACCESS_LEVEL(ch) < tedit_option[l].level) {
+	if (GET_ACCESS_LEVEL(ch) < text_file_data[type].level) {
 		send_to_char("You are not godly enough for that!\r\n", ch);
 		return;
 	}
 
 	/* set up editor stats */
-	start_string_editor(ch->desc, "file", tedit_option[l].buffer, tedit_option[l].size, FALSE);
-	ch->desc->file_storage = str_dup(tedit_option[l].filename);
-	act("$n begins editing a file.", TRUE, ch, 0, 0, TO_ROOM | DG_NO_TRIG);
+	start_string_editor(ch->desc, "file", &text_file_strings[type], text_file_data[type].size, FALSE);
+	ch->desc->file_storage = str_dup(text_file_data[type].filename);
+	act("$n begins editing a file.", TRUE, ch, NULL, NULL, TO_ROOM | DG_NO_TRIG);
 }
 
 

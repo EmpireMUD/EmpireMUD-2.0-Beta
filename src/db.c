@@ -78,6 +78,7 @@ void index_boot_world();
 void init_config_system();
 void init_inherent_player_techs();
 void init_reputation();
+void init_text_file_strings();
 void link_and_check_vehicles();
 void load_automessages();
 void load_banned();
@@ -253,19 +254,9 @@ social_data *social_table = NULL;	// master social hash table (hh)
 social_data *sorted_socials = NULL;	// alphabetic version (sorted_hh)
 
 // strings
-char *credits = NULL;	// game credits
-char *motd = NULL;	// message of the day - mortals
-char *imotd = NULL;	// message of the day - immorts
-char **intros = NULL;	// array of intro screens
-int num_intros = 0;	// total number of intro screens
-char *CREDIT_MESSG = NULL;	// short credits
-char *help_screen = NULL;	// help screen
-char *info = NULL;	// info page
-char *wizlist = NULL;	// list of higher gods
-char *godlist = NULL;	// list of peon gods
-char *handbook = NULL;	// handbook for new immortals
-char *policies = NULL;	// policies page
-char *news = NULL;	// news for players
+char *text_file_strings[NUM_TEXT_FILE_STRINGS];	// array of basic text file strings
+char **intro_screens = NULL;	// array of intro screens
+int num_intro_screens = 0;	// total number of intro screens
 
 // time, seasons, and weather
 struct time_info_data main_time_info;	// central time (corresponds to the latest time zone)
@@ -356,18 +347,8 @@ void boot_db(void) {
 	log("Resetting the game time:");
 	reset_time();
 
-	log("Reading credits, help, bground, info & motds.");
-	file_to_string_alloc(CREDITS_FILE, &credits);
-	file_to_string_alloc(MOTD_FILE, &motd);
-	file_to_string_alloc(IMOTD_FILE, &imotd);
-	file_to_string_alloc(HELP_PAGE_FILE, &help_screen);
-	file_to_string_alloc(INFO_FILE, &info);
-	file_to_string_alloc(WIZLIST_FILE, &wizlist);
-	file_to_string_alloc(GODLIST_FILE, &godlist);
-	file_to_string_alloc(POLICIES_FILE, &policies);
-	file_to_string_alloc(HANDBOOK_FILE, &handbook);
-	file_to_string_alloc(SCREDITS_FILE, &CREDIT_MESSG);
-	file_to_string_alloc(NEWS_FILE, &news);
+	log("Reading credits, help, info, motds, etc.");
+	init_text_file_strings();
 	load_intro_screens();
 
 	// Load the world!
@@ -1235,6 +1216,38 @@ void get_one_line(FILE *fl, char *buf) {
 
 	buf[strlen(buf) - 1] = '\0'; /* take off the trailing \n */
 }
+
+
+/**
+* Initializes all the text_file_strings[] and reads them, at startup ONLY.
+*/
+void init_text_file_strings(void) {
+	int iter;
+	
+	for (iter = 0; iter < NUM_TEXT_FILE_STRINGS; ++iter) {
+		text_file_strings[iter] = NULL;
+		if (text_file_data[iter].filename && *text_file_data[iter].filename) {
+			file_to_string_alloc(text_file_data[iter].filename, &text_file_strings[iter]);
+		}
+	}
+}
+
+
+/**
+* Reloads 1 text file, by type.
+*
+* @param int type Any TEXT_FILE_ type.
+*/
+void reload_text_string(int type) {
+	if (type >= 0 && type < NUM_TEXT_FILE_STRINGS && text_file_data[type].filename && *text_file_data[type].filename) {
+		if (text_file_strings[type]) {
+			free(text_file_strings[type]);
+			text_file_strings[type] = NULL;
+		}
+		file_to_string_alloc(text_file_data[type].filename, &text_file_strings[type]);
+	}
+}
+
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2110,7 +2123,7 @@ void b3_2_map_and_gear(void) {
 	
 	/* as of b5.84, this is no longer active because climate_default_sector is gone
 	log(" - updating the map...");
-	extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+	const sector_vnum climate_default_sector[NUM_CLIMATES];
 	room_data *room, *next_room;
 	crop_vnum type;
 	sector_vnum OASIS = 21, SANDY_TRENCH = 22;
@@ -3866,7 +3879,7 @@ void b5_88_irrigation_repair(void) {
 
 // updates 
 void b5_88_resource_components_update(void) {
-	extern any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
+	any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
 	
 	craft_data *craft, *next_craft;
 	progress_data *prg, *next_prg;
@@ -4063,7 +4076,7 @@ void b5_88_resource_components_update(void) {
 
 // addendum to b5_88_resource_components_update to fix maintenance/repair lists
 void b5_88_maintenance_fix(void) {
-	extern any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
+	any_vnum b5_88_old_component_to_new_component(int old_type, bitvector_t old_flags);
 	
 	int fixed_veh = 0, fixed_rm = 0;
 	room_data *room, *next_room;
@@ -4503,7 +4516,7 @@ void check_version(void) {
 				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT(room) == BASE_SECT(room)) {
 					// second error case: a Seeded crop with itself as its
 					// original sect: detect a new original sect
-					extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+					const sector_vnum climate_default_sector[NUM_CLIMATES];
 					sector_data *sect;
 					crop_data *cp;
 					if ((cp = ROOM_CROP(room)) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
@@ -4580,7 +4593,7 @@ void check_version(void) {
 				else if (ROOM_SECT_FLAGGED(room, SECTF_HAS_CROP_DATA) && !ROOM_SECT_FLAGGED(room, SECTF_CROP) && SECT_FLAGGED(BASE_SECT(room), SECTF_HAS_CROP_DATA) && !SECT_FLAGGED(BASE_SECT(room), SECTF_CROP)) {
 					// second error case: a Seeded crop with a Seeded crop as
 					// its original sect: detect a new original sect
-					extern const sector_vnum climate_default_sector[NUM_CLIMATES];
+					const sector_vnum climate_default_sector[NUM_CLIMATES];
 					sector_data *sect;
 					crop_data *cp;
 					if ((cp = ROOM_CROP(room)) && (sect = sector_proto(climate_default_sector[GET_CROP_CLIMATE(cp)]))) {
@@ -4788,42 +4801,6 @@ void check_version(void) {
  //////////////////////////////////////////////////////////////////////////////
 //// MISCELLANEOUS HELPERS ///////////////////////////////////////////////////
 
-/**
-* This adapts a saved empire's chore data from the pre-2.0b3.6 format, to the
-* newer version that is done per-island. It uses the temporary_room_data that
-* exists during startup to find a list of islands the empire controls. No other
-* ownership data is available during startup.
-* 
-* @param empire_data *emp The empire to add chore data for.
-* @param int chore Which CHORE_ to turn on.
-*/
-void assign_old_workforce_chore(empire_data *emp, int chore) {
-	struct trd_type *trd, *next_trd;
-	struct map_data *map;
-	int last_isle = -1;
-	
-	if (chore < 0 || chore >= NUM_CHORES) {
-		return;
-	}
-	
-	HASH_ITER(hh, temporary_room_data, trd, next_trd) {
-		if (trd->owner != EMPIRE_VNUM(emp)) {	// ensure is this empire
-			continue;
-		}
-		if (trd->vnum >= MAP_SIZE) {	// ensure is on map
-			continue;
-		}
-		
-		// only bother if different from the last island found
-		map = &(world_map[MAP_X_COORD(trd->vnum)][MAP_Y_COORD(trd->vnum)]);
-		if (map->shared->island_id != NO_ISLAND && last_isle != map->shared->island_id) {
-			set_workforce_limit(emp, map->shared->island_id, chore, WORKFORCE_UNLIMITED);
-			last_isle = map->shared->island_id;
-		}
-	}
-}
-
-
 /* reset the time in the game from file */
 void reset_time(void) {
 	long beginning_of_time = data_get_long(DATA_WORLD_START);
@@ -4966,15 +4943,15 @@ void load_intro_screens(void) {
 	int iter;
 	
 	// any old intros?
-	if (num_intros > 0 && intros) {
-		for (iter = 0; iter < num_intros; ++iter) {
-			free(intros[iter]);
+	if (num_intro_screens > 0 && intro_screens) {
+		for (iter = 0; iter < num_intro_screens; ++iter) {
+			free(intro_screens[iter]);
 		}
-		free(intros);
-		intros = NULL;
+		free(intro_screens);
+		intro_screens = NULL;
 	}
 	
-	num_intros = 0;
+	num_intro_screens = 0;
 
 	sprintf(lbuf, "%s%s", INTROS_PREFIX, INDEX_FILE);
 	if (!(index = fopen(lbuf, "r"))) {
@@ -4985,31 +4962,31 @@ void load_intro_screens(void) {
 	// count records in the index
 	fscanf(index, "%s\n", lbuf2);
 	while (*lbuf2 != '$') {
-		++num_intros;
+		++num_intro_screens;
 		fscanf(index, "%s\n", lbuf2);
 	}
 
-	if (num_intros <= 0) {
+	if (num_intro_screens <= 0) {
 		log("SYSERR: boot error - 0 intro screens counted in %s.", lbuf);
 		exit(1);
 	}
 
 	rewind(index);
-	CREATE(intros, char*, num_intros);
+	CREATE(intro_screens, char*, num_intro_screens);
 	iter = 0;
 	
 	fscanf(index, "%s\n", lbuf2);
 	while (*lbuf2 != '$') {
 		sprintf(lbuf, "%s%s", INTROS_PREFIX, lbuf2);
-		if (file_to_string_alloc(lbuf, intros + iter) == 0) {
-			prune_crlf(intros[iter]);
+		if (file_to_string_alloc(lbuf, intro_screens + iter) == 0) {
+			prune_crlf(intro_screens[iter]);
 		}
 		++iter;
 		
 		fscanf(index, "%s\n", lbuf2);
 	}
 	
-	log("Loaded %d intro screens.", num_intros);
+	log("Loaded %d intro screens.", num_intro_screens);
 }
 
 

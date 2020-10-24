@@ -589,7 +589,7 @@ struct {
 	char *name;
 	int needs_approval;
 	bitvector_t flags;
-	void (*func)(char_data *ch, char *argument);
+	LIBRARY_SCMD(*func);
 } library_command[] = {
 	{ SCMD_LIBRARY, "browse", FALSE, LIBR_REQ_LIBRARY, library_browse },
 	{ SCMD_LIBRARY, "checkout", FALSE, LIBR_REQ_LIBRARY, library_checkout },

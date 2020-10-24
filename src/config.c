@@ -54,7 +54,6 @@ void set_inherent_ptech(int ptech);
 bool add_int_to_int_array(int to_add, int **array, int *size);
 bool find_int_in_array(int to_find, int *array, int size);
 bool remove_int_from_int_array(int to_remove, int **array, int *size);
-void save_config_system();
 
 
 // these are used in various configs below
@@ -136,21 +135,20 @@ struct file_lookup_struct file_lookup[] = {
 };
 
 
-// externs for tedit_option
-extern char *motd;
-extern char *imotd;
-extern char *info;
-extern char *news;
-
-
-// editable files, for do_tedit in act.immortal.c
-struct tedit_struct tedit_option[] = {
-	{ "motd", LVL_GOD, &motd, MAX_MOTD_LENGTH, MOTD_FILE },
-	{ "imotd", LVL_GOD, &imotd, MAX_MOTD_LENGTH, IMOTD_FILE },
-	{ "info", LVL_GOD, &info, MAX_STRING_LENGTH, INFO_FILE },
-	{ "news", LVL_GOD, &news, MAX_STRING_LENGTH, NEWS_FILE },
-
-	{ "\n", 0, NULL, 0, NULL }
+// TEXT_FILE_x: text file loading (and optional editing via do_tedit in act.immortal.c)
+struct text_file_data_type text_file_data[NUM_TEXT_FILE_STRINGS] = {
+	// name, filename, can-edit, level-to-edit, max-size
+	{ "credits", LIB_TEXT"credits", TRUE, LVL_CIMPL, MAX_STRING_LENGTH },
+	{ "godlist", LIB_TEXT"godlist", FALSE, 0, 0 },
+	{ "handbook", LIB_TEXT"handbook", TRUE, LVL_CIMPL, MAX_STRING_LENGTH },
+	{ "helpscreen", LIB_TEXT_HELP"screen", TRUE, LVL_GOD, MAX_STRING_LENGTH },
+	{ "imotd", LIB_TEXT"imotd", TRUE, LVL_GOD, MAX_MOTD_LENGTH },
+	{ "info", LIB_TEXT"info", TRUE, LVL_GOD, MAX_STRING_LENGTH },
+	{ "motd", LIB_TEXT"motd", TRUE, LVL_GOD, MAX_MOTD_LENGTH },
+	{ "news", LIB_TEXT"news", TRUE, LVL_GOD, MAX_STRING_LENGTH },
+	{ "policy", LIB_TEXT"policies", TRUE, LVL_CIMPL, MAX_STRING_LENGTH },
+	{ "shortcredits", LIB_TEXT"credits.short", TRUE, LVL_GOD, MAX_STRING_LENGTH },
+	{ "wizlist", LIB_TEXT"wizlist", FALSE, 0, 0 },
 };
 
 

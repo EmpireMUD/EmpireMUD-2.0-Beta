@@ -88,6 +88,9 @@ void process_tanning(char_data *ch);
 // other local protos
 INTERACTION_FUNC(finish_foraging);
 
+// external variables
+extern bool catch_up_actions;
+
 // external functions
 ACMD(do_saw);
 ACMD(do_mint);
@@ -260,8 +263,6 @@ void stop_room_action(room_data *room, int action) {
 * This is the main processor for periodic actions (ACT_), once per second.
 */
 void update_actions(void) {
-	extern bool catch_up_actions;
-	
 	// prevent running multiple action rounds during a catch-up cycle
 	if (!catch_up_actions) {
 		return;
