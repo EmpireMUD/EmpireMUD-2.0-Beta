@@ -2219,9 +2219,14 @@ See also: DISPATCH, DOCKS, EINVENTORY, ISLANDS, SHIPBUILDING, SHIPS, WORKFORCE
 #
 SLEEP
 
+Usage:  sleep [furniture/canoe]
+
 The SLEEP command puts you to sleep, allowing you to regain your stamina more
 quickly. You will be largely unaware of your surroundings while asleep. You
 can awaken yourself with the WAKE command.
+
+You also can sleep on some furniture and vehicles. Sleeping in a canoe will
+protect you from sharks in the ocean.
 
 See also: WAKE
 #
