@@ -192,7 +192,7 @@ char_data *get_char(char *name) {
 	char_data *i;
 
 	if (*name == UID_CHAR) {
-		i = find_char(atoi(name + 1), TRUE);
+		i = find_char(atoi(name + 1));
 
 		if (i && valid_dg_target(i, DG_ALLOW_GODS))
 			return i;
@@ -215,7 +215,7 @@ char_data *get_char_near_obj(obj_data *obj, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1), TRUE);
+		ch = find_char(atoi(name + 1));
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS))
 			return ch;
@@ -246,7 +246,7 @@ char_data *get_char_near_vehicle(vehicle_data *veh, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1), TRUE);
+		ch = find_char(atoi(name + 1));
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS)) {
 			return ch;
@@ -285,7 +285,7 @@ char_data *get_char_in_room(room_data *room, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1), TRUE);
+		ch = find_char(atoi(name + 1));
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS))
 			return ch;
@@ -382,7 +382,7 @@ obj_data *get_obj_near_vehicle(vehicle_data *veh, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		return find_obj(atoi(name + 1), TRUE);
+		return find_obj(atoi(name + 1));
 	}
 	if (VEH_CONTAINS(veh) && (i = get_obj_in_list(name, VEH_CONTAINS(veh)))) {
 		return i;
@@ -409,7 +409,7 @@ obj_data *get_obj(char *name)  {
 	obj_data *obj;
 
 	if (*name == UID_CHAR)
-		return find_obj(atoi(name + 1), TRUE);
+		return find_obj(atoi(name + 1));
 	else {
 		DL_FOREACH(object_list, obj) {
 			if (isname(name, obj->name)) {
@@ -502,7 +502,7 @@ vehicle_data *get_vehicle(char *name) {
 	vehicle_data *veh;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1), TRUE);
+		return find_vehicle(atoi(name + 1));
 	}
 	else {
 		DL_FOREACH(vehicle_list, veh) {
@@ -524,7 +524,7 @@ char_data *get_char_by_obj(obj_data *obj, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1), TRUE);
+		ch = find_char(atoi(name + 1));
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS))
 			return ch;
@@ -558,7 +558,7 @@ char_data *get_char_by_vehicle(vehicle_data *veh, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1), TRUE);
+		ch = find_char(atoi(name + 1));
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS)) {
 			return ch;
@@ -603,7 +603,7 @@ char_data *get_char_by_room(room_data *room, char *name) {
 	char_data *ch;
 
 	if (*name == UID_CHAR) {
-		ch = find_char(atoi(name + 1), TRUE);
+		ch = find_char(atoi(name + 1));
 
 		if (ch && valid_dg_target(ch, DG_ALLOW_GODS))
 			return ch;
@@ -635,7 +635,7 @@ obj_data *get_obj_by_obj(obj_data *obj, char *name) {
 	room_data *rm;
 
 	if (*name == UID_CHAR) 
-		return find_obj(atoi(name + 1), TRUE);
+		return find_obj(atoi(name + 1));
 
 	if (!str_cmp(name, "self") || !str_cmp(name, "me"))
 		return obj;
@@ -670,7 +670,7 @@ obj_data *get_obj_by_vehicle(vehicle_data *veh, char *name) {
 	obj_data *i = NULL;
 
 	if (*name == UID_CHAR) {
-		return find_obj(atoi(name + 1), TRUE);
+		return find_obj(atoi(name + 1));
 	}
 	if (VEH_CONTAINS(veh) && (i = get_obj_in_list(name, VEH_CONTAINS(veh)))) {
 		return i;
@@ -714,7 +714,7 @@ obj_data *get_obj_by_room(room_data *room, char *name) {
 	obj_data *obj;
 
 	if (*name == UID_CHAR) {
-		return find_obj(atoi(name+1), TRUE);
+		return find_obj(atoi(name+1));
 	}
 	
 	DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
@@ -745,7 +745,7 @@ vehicle_data *get_vehicle_by_obj(obj_data *obj, char *name) {
 	room_data *room;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1), TRUE);
+		return find_vehicle(atoi(name + 1));
 	}
 	
 	if ((room = obj_room(obj))) {
@@ -772,7 +772,7 @@ vehicle_data *get_vehicle_by_room(room_data *room, char *name) {
 	vehicle_data *iter;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1), TRUE);
+		return find_vehicle(atoi(name + 1));
 	}
 
 	DL_FOREACH2(ROOM_VEHICLES(room), iter, next_in_room) {
@@ -796,7 +796,7 @@ vehicle_data *get_vehicle_by_vehicle(vehicle_data *veh, char *name) {
 	vehicle_data *iter;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1), TRUE);
+		return find_vehicle(atoi(name + 1));
 	}
 	if (!str_cmp(name, "self") || !str_cmp(name, "me")) {
 		return veh;
@@ -823,7 +823,7 @@ vehicle_data *get_vehicle_near_obj(obj_data *obj, char *name) {
 	room_data *orm;
 
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1), TRUE);
+		return find_vehicle(atoi(name + 1));
 	}
 	else if (obj->in_vehicle && isname(name, VEH_KEYWORDS(obj->in_vehicle))) {
 		return obj->in_vehicle;
@@ -851,7 +851,7 @@ vehicle_data *get_vehicle_near_vehicle(vehicle_data *veh, char *name) {
 	vehicle_data *find;
 	
 	if (*name == UID_CHAR) {
-		return find_vehicle(atoi(name + 1), TRUE);
+		return find_vehicle(atoi(name + 1));
 	}
 	if ((find = get_vehicle_room(IN_ROOM(veh), name, NULL))) {
 		return find;
@@ -2250,7 +2250,6 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				return;
 			}
 			else if (!str_cmp(var, "startloc")) {
-				extern room_data *find_starting_location();
 				room_data *sloc = find_starting_location();
 				snprintf(str, slen, "%c%d", UID_CHAR, GET_ROOM_VNUM(sloc) + ROOM_ID_BASE);
 				return;
@@ -2434,16 +2433,19 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				return;
 			}
 			else if (!str_cmp(var, "time")) {
+				room_data *where = get_room_by_script(type, go);
+				struct time_info_data tinfo = get_local_time(where);
+				
 				if (!str_cmp(field, "hour"))
-					snprintf(str, slen, "%d", time_info.hours);
+					snprintf(str, slen, "%d", tinfo.hours);
 				else if (!str_cmp(field, "day"))
-					snprintf(str, slen, "%d", time_info.day + 1);
+					snprintf(str, slen, "%d", tinfo.day + 1);
 				else if (!str_cmp(field, "month"))
-					snprintf(str, slen, "%d", time_info.month + 1);
+					snprintf(str, slen, "%d", tinfo.month + 1);
 				else if (!str_cmp(field, "year"))
-					snprintf(str, slen, "%d", time_info.year);
+					snprintf(str, slen, "%d", tinfo.year);
 				else if (!str_cmp(field, "day_of_year")) {
-					snprintf(str, slen, "%d", (time_info.month * 30) + time_info.day + 1);
+					snprintf(str, slen, "%d", (tinfo.month * 30) + tinfo.day + 1);
 				}
 				else
 					*str = '\0';
@@ -5058,6 +5060,40 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "max_citizens")) {
 						snprintf(str, slen, "%d", GET_BUILDING(HOME_ROOM(r)) ? GET_BLD_CITIZENS(GET_BUILDING(HOME_ROOM(r))) : 0);
 					}
+					else if (!str_cmp(field, "moon_phase")) {
+						char arg1[256], arg2[256];
+						generic_data *moon;
+						comma_args(subfield, arg1, arg2);	// optional 2nd arg for long phase names
+						
+						if (!subfield || !*arg1) {
+							strcpy(str, "");
+						}
+						else if ((isdigit(*arg1) && (moon = real_generic(atoi(arg1))) && GEN_TYPE(moon) == GENERIC_MOON) || (moon = find_generic_by_name(GENERIC_MOON, arg1, FALSE))) {
+							if (*arg2 && (!str_cmp(arg2, "l") || !str_cmp(arg2, "long"))) {
+								snprintf(str, slen, "%s", moon_phases_long[get_moon_phase(GET_MOON_CYCLE_DAYS(moon))]);
+							}
+							else {
+								snprintf(str, slen, "%s", moon_phases[get_moon_phase(GET_MOON_CYCLE_DAYS(moon))]);
+							}
+						}
+						else {	// unknown moon
+							strcpy(str, "");
+						}
+					}
+					else if (!str_cmp(field, "moon_pos")) {
+						struct time_info_data tinfo;
+						generic_data *moon;
+						if (!subfield || !*subfield) {
+							strcpy(str, "");
+						}
+						else if ((isdigit(*subfield) && (moon = real_generic(atoi(subfield))) && GEN_TYPE(moon) == GENERIC_MOON) || (moon = find_generic_by_name(GENERIC_MOON, subfield, FALSE))) {
+							tinfo = get_local_time(r);
+							snprintf(str, slen, "%s", moon_positions[get_moon_position(get_moon_phase(GET_MOON_CYCLE_DAYS(moon)), tinfo.hours)]);
+						}
+						else {	// unknown moon
+							strcpy(str, "");
+						}
+					}
 					break;
 				}
 				case 'n': {	// room.n*
@@ -5174,6 +5210,29 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					if (!str_cmp(field, "template")) {
 						if (r && GET_ROOM_TEMPLATE(r)) {
 							snprintf(str, slen, "%d", GET_RMT_VNUM(GET_ROOM_TEMPLATE(r))); 
+						}
+						else {
+							*str = '\0';
+						}
+					}
+					else if (!str_cmp(field, "time")) {
+						struct time_info_data tinfo = get_local_time(r);
+						
+						if (!subfield || !str_cmp(subfield, "hour")) {
+							// defaults to hour
+							snprintf(str, slen, "%d", tinfo.hours);
+						}
+						else if (!str_cmp(subfield, "day")) {
+							snprintf(str, slen, "%d", tinfo.day + 1);
+						}
+						else if (!str_cmp(subfield, "month")) {
+							snprintf(str, slen, "%d", tinfo.month + 1);
+						}
+						else if (!str_cmp(subfield, "year")) {
+							snprintf(str, slen, "%d", tinfo.year);
+						}
+						else if (!str_cmp(subfield, "day_of_year")) {
+							snprintf(str, slen, "%d", (tinfo.month * 30) + tinfo.day + 1);
 						}
 						else {
 							*str = '\0';
@@ -5876,19 +5935,15 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							
 							if (isdigit(*subfield) && (vnum = atoi(subfield)) != NOTHING && (prg = real_progress(vnum))) {
 								if (!empire_has_completed_goal(e, vnum) && !get_current_goal(e, vnum) && empire_meets_goal_prereqs(e, prg)) {
-									extern struct empire_goal *start_empire_goal(empire_data *e, progress_data *prg);
-									
 									struct empire_goal *goal = start_empire_goal(e, prg);
 									int complete, total;
 									
 									if (goal) {
-										void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
 										refresh_one_goal_tracker(e, goal);
 									}
 									// check if complete
 									count_quest_tasks(goal->tracker, &complete, &total);
 									if (complete == total) {
-										void complete_goal(empire_data *emp, struct empire_goal *goal);
 										complete_goal(e, goal);
 									}
 								}
@@ -6453,6 +6508,8 @@ void process_wait(void *go, trig_data *trig, int type, char *cmd, struct cmdlist
 	}
 
 	if (!strn_cmp(arg, "until ", 6)) {
+		room_data *where = get_room_by_script(type, go);
+		struct time_info_data tinfo = get_local_time(where);
 
 		/* valid forms of time are 14:30 and 1430 */
 		if (sscanf(arg, "until %ld:%ld", &hr, &min) == 2)
@@ -6464,7 +6521,7 @@ void process_wait(void *go, trig_data *trig, int type, char *cmd, struct cmdlist
 		ntime = (min * SECS_PER_MUD_HOUR * PASSES_PER_SEC) / 60;
 
 		/* calculate pulse of day of current time */
-		when = (pulse % (SECS_PER_MUD_HOUR * PASSES_PER_SEC)) + (time_info.hours * SECS_PER_MUD_HOUR * PASSES_PER_SEC);
+		when = (pulse % (SECS_PER_MUD_HOUR * PASSES_PER_SEC)) + (tinfo.hours * SECS_PER_MUD_HOUR * PASSES_PER_SEC);
 
 		if (when >= ntime) /* adjust for next day */
 			when = (SECS_PER_MUD_DAY * PASSES_PER_SEC) - when + ntime;
@@ -6560,7 +6617,7 @@ void process_attach(void *go, struct script_data *sc, trig_data *trig, int type,
 		return;
 	}
 	
-	if (!(c = find_char(id, TRUE)) && !(v = find_vehicle(id, TRUE)) && !(o = find_obj(id, FALSE)) && !(r = find_room(id))) {
+	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id)) && !(r = find_room(id))) {
 		script_log("Trigger: %s, VNum %d. attach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
@@ -6642,7 +6699,7 @@ void process_detach(void *go, struct script_data *sc, trig_data *trig, int type,
 	}
 	
 	// find first good match
-	if (!(c = find_char(id, TRUE)) && !(v = find_vehicle(id, TRUE)) && !(o = find_obj(id, FALSE)) && !(r = find_room(id))) {
+	if (!(c = find_char(id)) && !(v = find_vehicle(id)) && !(o = find_obj(id)) && !(r = find_room(id))) {
 		script_log("Trigger: %s, VNum %d. detach invalid id arg: '%s'", GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), cmd);
 		return;
 	}
@@ -7003,16 +7060,16 @@ void process_remote(struct script_data *sc, trig_data *trig, char *cmd) {
 	if ((room = find_room(uid))) {
 		sc_remote = SCRIPT(room) ? SCRIPT(room) : create_script_data(room, WLD_TRIGGER);
 	}
-	else if ((mob = find_char(uid, TRUE))) {
+	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob) ? SCRIPT(mob) : create_script_data(mob, MOB_TRIGGER);
 		if (!IS_NPC(mob))
 			context = 0;
 		add_companion_var(mob, vd->name, vd->value, context);
 	}
-	else if ((obj = find_obj(uid, FALSE))) {
+	else if ((obj = find_obj(uid))) {
 		sc_remote = SCRIPT(obj) ? SCRIPT(obj) : create_script_data(obj, OBJ_TRIGGER);
 	}
-	else if ((veh = find_vehicle(uid, TRUE))) {
+	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh) ? SCRIPT(veh) : create_script_data(veh, VEH_TRIGGER);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {
@@ -7072,7 +7129,7 @@ ACMD(do_vdelete) {
 	if ((room = find_room(uid))) {
 		sc_remote = SCRIPT(room);
 	}
-	else if ((mob = find_char(uid, TRUE))) {
+	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob);
 		remove_companion_var(mob, var, 0);
 		/*
@@ -7081,10 +7138,10 @@ ACMD(do_vdelete) {
 			context = 0;
 		*/
 	}
-	else if ((obj = find_obj(uid, FALSE))) {
+	else if ((obj = find_obj(uid))) {
 		sc_remote = SCRIPT(obj);
 	}
-	else if ((veh = find_vehicle(uid, TRUE))) {
+	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {
@@ -7168,7 +7225,7 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 	if ((room = find_room(uid))) {
 		sc_remote = SCRIPT(room);
 	}
-	else if ((mob = find_char(uid, TRUE))) {
+	else if ((mob = find_char(uid))) {
 		sc_remote = SCRIPT(mob);
 		remove_companion_var(mob, var, sc->context);
 		/*
@@ -7177,10 +7234,10 @@ void process_rdelete(struct script_data *sc, trig_data *trig, char *cmd) {
 			context = 0;
 		*/
 	}
-	else if ((obj = find_obj(uid, FALSE))) {
+	else if ((obj = find_obj(uid))) {
 		sc_remote = SCRIPT(obj);
 	}
-	else if ((veh = find_vehicle(uid, TRUE))) {
+	else if ((veh = find_vehicle(uid))) {
 		sc_remote = SCRIPT(veh);
 	}
 	else if ((emp = find_empire_by_uid(uid))) {

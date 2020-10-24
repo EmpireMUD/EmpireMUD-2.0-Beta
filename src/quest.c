@@ -44,16 +44,9 @@ const char *default_quest_name = "Unnamed Quest";
 const char *default_quest_description = "This quest has no description.\r\n";
 const char *default_quest_complete_msg = "You have completed the quest.\r\n";
 
-// external funcs
-void get_requirement_display(struct req_data *list, char *save_buffer);
-void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
-
-// external vars
-
 // local protos
 void add_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void add_to_quest_temp_list(struct quest_temp_list **list, quest_data *quest, struct instance_data *instance);
-void free_quest_givers(struct quest_giver *list);
 struct player_completed_quest *has_completed_quest_any(char_data *ch, any_vnum quest);
 bool remove_quest_lookup(struct quest_lookup **list, quest_data *quest);
 void update_mob_quest_lookups(mob_vnum vnum);
@@ -2112,8 +2105,6 @@ bool can_turn_quest_in_to_vehicle(char_data *ch, vehicle_data *veh, struct quest
 * @return bool TRUE if the player can get the quest.
 */
 bool char_meets_prereqs(char_data *ch, quest_data *quest, struct instance_data *instance) {
-	extern bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance);
-	
 	bool daily = QUEST_FLAGGED(quest, QST_DAILY);
 	struct player_completed_quest *completed;
 	bool ok = TRUE;
@@ -4562,8 +4553,6 @@ void write_quest_rewards_to_file(FILE *fl, char letter, struct quest_reward *lis
 * @param quest_data *quest The thing to save.
 */
 void write_quest_to_file(FILE *fl, quest_data *quest) {
-	void write_requirements_to_file(FILE *fl, char letter, struct req_data *list);
-	
 	char temp[MAX_STRING_LENGTH];
 	
 	if (!fl || !quest) {

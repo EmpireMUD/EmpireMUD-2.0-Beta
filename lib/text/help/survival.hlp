@@ -40,7 +40,7 @@ The improved version is called Nightsight.
 
 Gains experience passively when you're standing in a dark room.
 
-See also: NIGHTSIGHT
+See also: DARK, NIGHTSIGHT
 #
 "FIND HERBS" WHITEGRASS FIVELEAF REDTHORN MAGEWHISPER DAGGERBITE BILEBERRIES BILEBERRY "WHITE GRASS" "FIVE LEAF" "RED THORN" "MAGE WHISPER" "DAGGER BITE" "BILE BERRIES"
 
@@ -256,12 +256,13 @@ Usage:  nightsight
 
 This ability lets you see perfectly in almost pitch black, although your
 eyes take on a characteristic glint that is visible to others. You can turn
-this ability on and off at will.
+this ability on and off at will. Even when off, it increases your light radius
+by 1 at night.
 
 Gains experience passively when you're standing in a dark room, as long as it's
 active.
 
-See also: BY MOONLIGHT
+See also: BY MOONLIGHT, NIGHT
 #
 "NO TRACE"
 

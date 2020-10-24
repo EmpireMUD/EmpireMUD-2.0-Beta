@@ -10,6 +10,8 @@
 *  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
 ************************************************************************ */
 
+#include <math.h>
+
 #include "conf.h"
 #include "sysdep.h"
 
@@ -20,101 +22,27 @@
 #include "interpreter.h"
 #include "db.h"
 #include "skills.h"
+#include "constants.h"
+
+/**
+* Contents:
+*   Unsorted Code
+*   Time Handling
+*   Moon System
+*/
+
+// external vars
+extern unsigned long pulse;
+
+// local prototypes
+void another_hour();
+void send_hourly_sun_messages();
+void weather_change();
 
 
-void weather_and_time(int mode) {
-	void another_hour(int mode);
-	void weather_change();
-
-	another_hour(mode);
-	if (mode)
-		weather_change();
-}
-
-
-void another_hour(int mode) {
-	void process_shipping();
-
-	descriptor_data *d;
-	long lny;
-
-	time_info.hours++;
-
-	if (mode) {
-		switch (time_info.hours) {
-			case 1: {
-				// 1am shipment
-				process_shipping();
-				break;
-			}
-			case 7:
-				weather_info.sunlight = SUN_RISE;
-				for (d = descriptor_list; d; d = d->next) {
-					if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) && AWAKE(d->character) && IS_OUTDOORS(d->character)) {
-						look_at_room(d->character);
-						msg_to_char(d->character, "\r\n");
-					}
-				}
-				send_to_outdoor(FALSE, "The sun rises over the horizon.\r\n");
-				
-				// 7am shipment
-				process_shipping();
-				break;
-			case 8:
-				weather_info.sunlight = SUN_LIGHT;
-				send_to_outdoor(FALSE, "The day has begun.\r\n");
-				break;
-			case 12:
-				// noon
-				break;
-			case 13: {
-				// 1pm shipment
-				process_shipping();
-				break;
-			}
-			case 19:
-				weather_info.sunlight = SUN_SET;
-				send_to_outdoor(FALSE, "The sun slowly disappears beneath the horizon.\r\n");
-				
-				// 7pm shipment
-				process_shipping();
-				break;
-			case 20:
-				weather_info.sunlight = SUN_DARK;
-				for (d = descriptor_list; d; d = d->next)
-					if (STATE(d) == CON_PLAYING && !HAS_INFRA(d->character) && !PRF_FLAGGED(d->character, PRF_HOLYLIGHT) &&  AWAKE(d->character) && IS_OUTDOORS(d->character)) {
-						look_at_room(d->character);
-						msg_to_char(d->character, "\r\n");
-					}
-				send_to_outdoor(FALSE, "The night has begun.\r\n");
-				break;
-		}
-	}
-	if (time_info.hours > 23) {	/* Changed by HHS due to bug ??? */
-		time_info.hours -= 24;
-		time_info.day++;
-		
-		determine_seasons();
-		
-		if (time_info.day > 29) {
-			time_info.day = 0;
-			time_info.month++;
-
-			if (time_info.month > 11) {
-				time_info.month = 0;
-				time_info.year++;
-				
-				annual_world_update();
-			}
-		}
-		else {	// not day 30
-			// check if we've missed a new year
-			lny = data_get_long(DATA_LAST_NEW_YEAR);
-			if (lny && lny + SECS_PER_MUD_YEAR < time(0)) {
-				annual_world_update();
-			}
-		}
-	}
+void weather_and_time(void) {
+	another_hour();
+	weather_change();
 }
 
 
@@ -154,7 +82,7 @@ void determine_seasons(void) {
 	
 	// Day_of_year is the x-axis of the graph that determines the season at a
 	// given y-coord. Month 0 is january; year is 0-359 days.
-	day_of_year = time_info.month * 30 + time_info.day;
+	day_of_year = main_time_info.month * 30 + main_time_info.day;
 	
 	for (ycoord = 0; ycoord < MAP_HEIGHT; ++ycoord) {
 		latitude = Y_TO_LATITUDE(ycoord);
@@ -162,10 +90,10 @@ void determine_seasons(void) {
 		
 		// tropics? -- take half the tropic value, convert to percent, multiply by map height
 		if (ABSOLUTE(latitude) < TROPIC_LATITUDE) {
-			if (time_info.month < 2) {
+			if (main_time_info.month < 2) {
 				y_coord_to_season[ycoord] = TILESET_SPRING;
 			}
-			else if (time_info.month >= 10) {
+			else if (main_time_info.month >= 10) {
 				y_coord_to_season[ycoord] = TILESET_AUTUMN;
 			}
 			else {
@@ -219,9 +147,38 @@ void determine_seasons(void) {
 }
 
 
+/**
+* Reset weather data on startup (or request).
+*/
+void reset_weather(void) {
+	weather_info.pressure = 960;
+	if ((main_time_info.month >= 5) && (main_time_info.month <= 8)) {
+		weather_info.pressure += number(1, 50);
+	}
+	else {
+		weather_info.pressure += number(1, 80);
+	}
+
+	weather_info.change = 0;
+
+	if (weather_info.pressure <= 980) {
+		weather_info.sky = SKY_LIGHTNING;
+	}
+	else if (weather_info.pressure <= 1000) {
+		weather_info.sky = SKY_RAINING;
+	}
+	else if (weather_info.pressure <= 1020) {
+		weather_info.sky = SKY_CLOUDY;
+	}
+	else {
+		weather_info.sky = SKY_CLOUDLESS;
+	}
+}
+
+
 void weather_change(void) {
 	int diff, change;
-	if ((time_info.month >= 4) && (time_info.month <= 8))
+	if ((main_time_info.month >= 4) && (main_time_info.month <= 8))
 		diff = (weather_info.pressure > 985 ? -2 : 2);
 	else
 		diff = (weather_info.pressure > 1015 ? -2 : 2);
@@ -314,126 +271,417 @@ void weather_change(void) {
 }
 
 
-/*
- *  Empire Moons 1.0
- *   by Paul Clarke, 10/19/2k
- *
- *  To add a moon: increase NUM_OF_MOONS by 1 and add a line in moons[]
- *  to correspond with your new moon.  Reboot and it's all done for you.
- */
-
-#define NUM_OF_MOONS		1
-
-#define PHASE_NEW				0	/*								*/
-#define PHASE_WAXING			1	/*								*/
-#define PHASE_FIRST_QUARTER		2	/*  Phases of the moon			*/
-#define PHASE_FULL				3	/*								*/
-#define PHASE_LAST_QUARTER		4	/*								*/
-#define PHASE_WANING			5	/*								*/
-
-struct moon_data {
-	char *name;
-	byte cycle;			/* Days between full moons */
-} moons[NUM_OF_MOONS] = {
-	{ "The Moon", 28 }
-};
+ //////////////////////////////////////////////////////////////////////////////
+//// WEATHER HANDLING ////////////////////////////////////////////////////////
 
 
-/* Retrieve the current phase of a specific moon */
-byte get_phase(int M) {
-	int total_time = time_info.day;
-	int diff;
+ //////////////////////////////////////////////////////////////////////////////
+//// TIME HANDLING ///////////////////////////////////////////////////////////
 
-	total_time += time_info.month * 30;		/* 30 days in a month	*/
-	total_time += time_info.year * 12 * 30;	/* 12 months in a year	*/
-
-	total_time %= moons[M].cycle;
-
-	diff = 100 * total_time / moons[M].cycle;		/* diff is a percentage of the rotation */
-
-	if (diff <= 2 || diff >= 98)
-		return PHASE_NEW;
-	if (diff >= 23 && diff <= 27)
-		return PHASE_FIRST_QUARTER;
-	if (diff >= 73 && diff <= 77)
-		return PHASE_LAST_QUARTER;
-	if (diff >= 48 && diff <= 52)
-		return PHASE_FULL;
-	if (diff < 50)
-		return PHASE_WAXING;
-	else
-		return PHASE_WANING;
-}
-
-
-void list_moons_to_char(char_data *ch) {
-	int M, i;
-	char moon_str[112];
-
-	if (NUM_OF_MOONS == 0)
-		return;
-
-	*buf = '\0';
-
-	for (M = 0; M < NUM_OF_MOONS; M++) {
-		*moon_str = '\0';
-		switch(get_phase(M)) {
-			case PHASE_WAXING:			sprintf(moon_str, "waxing");				break;
-			case PHASE_FIRST_QUARTER:	sprintf(moon_str, "in its first quarter");	break;
-			case PHASE_FULL:			sprintf(moon_str, "full");					break;
-			case PHASE_LAST_QUARTER:	sprintf(moon_str, "in its last quarter");	break;
-			case PHASE_WANING:			sprintf(moon_str, "waning");				break;
+/**
+* Advances time by an hour and triggers things which happen on specific hours.
+*/
+void another_hour(void) {
+	long lny;
+	
+	// update main time
+	++main_time_info.hours;
+	if (main_time_info.hours > 23) {
+		// day change
+		main_time_info.hours -= 24;
+		++main_time_info.day;
+		
+		// seasons move daily
+		determine_seasons();
+		
+		// month change
+		if (main_time_info.day > 29) {
+			main_time_info.day = 0;
+			++main_time_info.month;
+			
+			// year change
+			if (main_time_info.month > 11) {
+				main_time_info.month = 0;
+				++main_time_info.year;
+				
+				// run annual update
+				annual_world_update();
+			}
 		}
-		if (*buf)
-			strcat(buf, ", ");
-		if (*moon_str)
-			sprintf(buf+strlen(buf), "%s is %s", moons[M].name, moon_str);
+		else {	// not day 30
+			// check if we've missed a new year recently
+			lny = data_get_long(DATA_LAST_NEW_YEAR);
+			if (lny && lny + SECS_PER_MUD_YEAR < time(0)) {
+				annual_world_update();
+			}
+		}
 	}
-
-	if (!*buf)
-		sprintf(buf, "You can't see the moon%s right now", NUM_OF_MOONS > 1 ? "s" : "");
-
-	strcat(buf, ".\r\n");
-
-	/* This will find the last comma and replace it with an "and" */
-	for (i = strlen(buf)-1; i > 0; i--)
-		if (buf[i] == ',') {
-			sprintf(buf1, "%s", buf + i+1);
-			buf[i] = '\0';
-			strcat(buf, " and");
-			strcat(buf, buf1);
+	
+	// hour-based updates
+	switch (main_time_info.hours) {
+		case 0: {	// midnight
+			run_external_evolutions();
 			break;
 		}
-	send_to_char(buf, ch);
+		case 1: {	// 1am shipment
+			process_shipping();
+			break;
+		}
+		case 7: {	// 7am shipment and world save
+			process_shipping();
+			save_whole_world();
+			break;
+		}
+		case 12: {	// noon
+			process_imports();
+			break;
+		}
+		case 13: {	// 1pm shipment
+			process_shipping();
+			break;
+		}
+		case 19: {	// 7pm shipment
+			process_shipping();
+			break;
+		}
+	}
+	
+	// and announce it to the players
+	send_hourly_sun_messages();
 }
 
 
-byte distance_can_see(char_data *ch) {
-	int M, p, a = 0, b = 0, c = 0;
-
-	for (M = 0; M < NUM_OF_MOONS; M++) {
-		switch (get_phase(M)) {
-			case PHASE_FULL:			c = 4;		break;
-			case PHASE_FIRST_QUARTER:
-			case PHASE_LAST_QUARTER:	c = 3;		break;
-			case PHASE_WAXING:
-			case PHASE_WANING:			c = 2;		break;
-			default:					c = 1;		break;
+/**
+* Determines exact local time based on east/west position.
+*
+* @param room_data *room The location.
+* @return struct time_info_data The local time data.
+*/
+struct time_info_data get_local_time(room_data *room) {
+	double longitude, percent, minutes_dec;
+	struct time_info_data tinfo;
+	int x_coord;
+	
+	// ensure we're using local time & determine location
+	if (!config_get_bool("use_local_time") || (x_coord = (room ? X_COORD(room) : -1)) == -1) {
+		return main_time_info;
+	}
+	
+	// determine longitude
+	longitude = X_TO_LONGITUDE(x_coord) + 180.0;	// longitude from 0-360 instead of -/+180
+	percent = 1.0 - (longitude / 360.0);	// percentage of the way west
+	
+	tinfo = main_time_info;	// copy
+	
+	// adjust hours backward for distance from east end
+	minutes_dec = ((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR;
+	tinfo.hours -= ceil(24.0 * percent - minutes_dec);
+	
+	// adjust back days/months/years if needed
+	if (tinfo.hours < 0) {
+		tinfo.hours += 24;
+		if (--tinfo.day < 0) {
+			tinfo.day += 30;
+			if (--tinfo.month < 0) {
+				tinfo.month += 12;
+				--tinfo.year;
+			}
 		}
-		if (c > a)
-			a = c;
-		else if (c > b)
-			b = c;
 	}
-	p = a + b;
-	p = MIN(5, p);
+	
+	return tinfo;
+}
 
-	if (has_player_tech(ch, PTECH_LARGER_LIGHT_RADIUS)) {
-		p += 2;
+
+/**
+* @param room_data *room Any location.
+* @return int One of SUN_RISE, SUN_LIGHT, SUN_SET, or SUN_DARK.
+*/
+int get_sun_status(room_data *room) {
+	struct time_info_data tinfo = get_local_time(room);
+	if (tinfo.hours == 7) {
+		return SUN_RISE;
 	}
+	else if (tinfo.hours == 19) {
+		return SUN_SET;
+	}
+	else if (tinfo.hours > 7 && tinfo.hours < 19) {
+		return SUN_LIGHT;
+	}
+	else {
+		return SUN_DARK;
+	}
+}
 
-	if (IS_LIGHT(IN_ROOM(ch)))
-		p++;
 
-	return p;
+/**
+* To be called at the end of the hourly update to show players sunrise/sunset.
+*/
+void send_hourly_sun_messages(void) {
+	struct time_info_data tinfo;
+	descriptor_data *desc;
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) != CON_PLAYING || desc->character == NULL) {
+			continue;
+		}
+		if (!AWAKE(desc->character) || !IS_OUTDOORS(desc->character)) {
+			continue;
+		}
+		
+		// get local time
+		tinfo = get_local_time(IN_ROOM(desc->character));
+		
+		switch (tinfo.hours) {
+			case 7: {	// sunrise
+				// show map if needed
+				if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && get_sun_status(IN_ROOM(desc->character)) != GET_LAST_LOOK_SUN(desc->character)) {
+					look_at_room(desc->character);
+					msg_to_char(desc->character, "\r\n");
+				}
+				msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
+				break;
+			}
+			case 8: {	// day start
+				msg_to_char(desc->character, "The day has begun.\r\n");
+				break;
+			}
+			case 19: {	// sunset
+				msg_to_char(desc->character, "The sun slowly disappears beneath the horizon.\r\n");
+				break;
+			}
+			case 20: {	// dark
+				// show map if needed
+				if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && get_sun_status(IN_ROOM(desc->character)) != GET_LAST_LOOK_SUN(desc->character)) {
+					look_at_room(desc->character);
+					msg_to_char(desc->character, "\r\n");
+				}
+				msg_to_char(desc->character, "The night has begun.\r\n");
+				break;
+			}
+		}
+	}
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MOON SYSTEM /////////////////////////////////////////////////////////////
+
+/**
+* Determines the current phase of the moon based on how long its cycle is, and
+* based on how long the mud has been alive.
+*
+* @param double cycle_days Number of days in the moon's cycle (Earth's moon is 29.53 days real time or 29.13 days game time).
+* @return moon_phase_t One of the PHASE_ values.
+*/
+moon_phase_t get_moon_phase(double cycle_days) {
+	double long_count_day, cycle_time;
+	int phase;
+	
+	// exact number of days the mud has been running (all moons are 'new' at the time of DATA_START_WORLD)
+	long_count_day = (double)(time(0) - data_get_long(DATA_WORLD_START)) / (double)SECS_PER_MUD_DAY;
+	
+	// determine how far into the current cycle we are
+	if (cycle_days > 0.0) {
+		cycle_time = fmod(long_count_day, cycle_days) / cycle_days;
+	}
+	else {	// div/0 safety
+		cycle_time = 0.0;
+	}
+	
+	phase = round((NUM_PHASES-1.0) * cycle_time);
+	phase = MAX(0, MIN(NUM_PHASES-1, phase));
+	return (moon_phase_t)phase;
+}
+
+
+/**
+* Determines where the moon is in the sky. Phases rise roughly 3 hours apart.
+*
+* @param moon_phase_t phase Any moon phase.
+* @param int hour Time of day from 0..23 hours.
+*/
+moon_pos_t get_moon_position(moon_phase_t phase, int hour) {
+	int moonrise = (phase * 3) + 7, moonset = (phase * 3) + 19;
+	double percent, pos;
+	
+	// check bounds/wraparound
+	if (moonrise > 23) {
+		moonrise -= 24;
+	}
+	if (moonset > 23) {
+		moonset -= 24;
+	}
+	
+	// shift moonset forward IF it's lower than moonrise (moon rises late)
+	if (moonset < moonrise) {
+		moonset += 24;	// tomorrow
+	}
+	
+	// shift the incoming hour if it's before moonrise to see if it's in tomorrow's moonrise
+	if (hour < moonrise) {
+		hour += 24;
+	}
+	
+	// now see how far inside or outside of this they are as a percentage
+	percent = (double)(hour - moonrise) / (double)(moonset - moonrise);
+	
+	// outside of that range and the moon is not up
+	if (percent <= 0.0 || percent >= 1.0) {
+		return MOON_POS_DOWN;
+	}
+	
+	pos = NUM_MOON_POS * percent;
+	
+	// determine which way to round to give some last-light
+	if (percent < 0.5) {
+		return (moon_pos_t) ceil(pos);
+	}
+	else {
+		return (moon_pos_t) floor(pos);
+	}
+}
+
+
+/**
+* Computes the light radius at night based on any visible moon(s) in the sky.
+*
+* @param room_data *room A location.
+* @return int Number of tiles you can see at night in that room.
+*/
+int compute_night_light_radius(room_data *room) {
+	generic_data *moon, *next_gen;
+	struct time_info_data tinfo;
+	int dist, best = 0, second = 0;
+	moon_phase_t phase;
+	
+	int max_light_radius_base = config_get_int("max_light_radius_base");
+	
+	tinfo = get_local_time(room);
+	
+	HASH_ITER(hh, generic_table, moon, next_gen) {
+		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1 || GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT)) {
+			continue;	// not a moon or invalid cycle
+		}
+		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
+		if (get_moon_position(phase, tinfo.hours) != MOON_POS_DOWN) {
+			// moon is up: record it if better
+			if (moon_phase_brightness[phase] > best) {
+				second = best;
+				best = moon_phase_brightness[phase];
+			}
+			else if (moon_phase_brightness[phase] > second) {
+				second = moon_phase_brightness[phase];
+			}
+		}
+	}
+	
+	// compute
+	dist = best + second/2;
+	dist = MAX(1, MIN(dist, max_light_radius_base));
+	return dist;
+}
+
+
+/**
+* Lets a player look at a moon by name.
+*
+* @param char_data *ch The player.
+* @param char *name The argument typed by the player after 'look [at]'.
+* @param int *number Optional: For multi-list number targeting (look 4.moon; may be NULL)
+*/
+bool look_at_moon(char_data *ch, char *name, int *number) {
+	char buf[MAX_STRING_LENGTH], copy[MAX_INPUT_LENGTH], *tmp = copy;
+	struct time_info_data tinfo;
+	generic_data *moon, *next_gen;
+	moon_phase_t phase;
+	moon_pos_t pos;
+	int num;
+	
+	if (!IS_OUTDOORS(ch)) {
+		return FALSE;
+	}
+	
+	skip_spaces(&name);
+	
+	if (!number) {
+		strcpy(tmp, name);
+		number = &num;
+		num = get_number(&tmp);
+	}
+	else {
+		tmp = name;
+	}
+	if (*number == 0) {	// can't target 0.moon
+		return FALSE;
+	}
+	
+	tinfo = get_local_time(IN_ROOM(ch));
+	
+	HASH_ITER(hh, generic_table, moon, next_gen) {
+		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1 || GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT)) {
+			continue;	// not a moon or invalid cycle
+		}
+		if (!isname(tmp, GEN_NAME(moon))) {
+			continue;	// not a name match
+		}
+		
+		// find moon in the sky
+		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
+		pos = get_moon_position(phase, tinfo.hours);
+		
+		// qualify it some more -- allow new moon in direct sunlight (unlike show-visible-moons)
+		if (pos == MOON_POS_DOWN) {
+			continue;	// moon is down
+		}
+		if (--(*number) > 0) {
+			continue;	// number-dot syntax
+		}
+		
+		// ok: show it
+		snprintf(buf, sizeof(buf), "%s is %s, %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
+		send_to_char(CAP(buf), ch);
+		act("$n looks at $t.", TRUE, ch, GEN_NAME(moon), NULL, TO_ROOM);
+		return TRUE;
+	}
+	
+	return FALSE;	// nope
+}
+
+
+/**
+* Displays any visible moons to the player, one per line.
+*
+* @param char_data *ch The person to show the moons to.
+*/
+void show_visible_moons(char_data *ch) {
+	struct time_info_data tinfo;
+	char buf[MAX_STRING_LENGTH];
+	generic_data *moon, *next_gen;
+	moon_phase_t phase;
+	moon_pos_t pos;
+	
+	tinfo = get_local_time(IN_ROOM(ch));
+	
+	HASH_ITER(hh, generic_table, moon, next_gen) {
+		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1 || GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT)) {
+			continue;	// not a moon or invalid cycle
+		}
+		
+		// find moon in the sky
+		phase = get_moon_phase(GET_MOON_CYCLE_DAYS(moon));
+		pos = get_moon_position(phase, tinfo.hours);
+		
+		// qualify it some more
+		if (pos == MOON_POS_DOWN) {
+			continue;	// moon is down
+		}
+		if (phase == PHASE_NEW && get_sun_status(IN_ROOM(ch)) == SUN_LIGHT) {
+			continue;	// new moon not visible in strong sunlight
+		}
+		
+		// ok: show it
+		snprintf(buf, sizeof(buf), "%s is %s, %s.\r\n", GEN_NAME(moon), moon_phases_long[phase], moon_positions[pos]);
+		send_to_char(CAP(buf), ch);
+	}
 }

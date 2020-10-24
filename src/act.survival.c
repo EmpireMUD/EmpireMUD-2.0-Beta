@@ -626,7 +626,7 @@ ACMD(do_fish) {
 	else if (GET_ACTION(ch) != ACT_NONE && GET_ACTION(ch) != ACT_FISHING) {
 		msg_to_char(ch, "You're really too busy to do that.\r\n");
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to fish for anything here.\r\n");
 	}
 	else if (*arg && (dir = parse_direction(ch, arg)) == NO_DIR) {
@@ -686,7 +686,7 @@ ACMD(do_hunt) {
 		msg_to_char(ch, "You don't have the right ability to hunt anything.\r\n");
 		return;
 	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to hunt anything right now.\r\n");
 		return;
 	}
@@ -879,7 +879,7 @@ ACMD(do_track) {
 	if (!can_use_ability(ch, ABIL_TRACK, NOTHING, 0, NOTHING)) {
 		return;
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to track for anything here.\r\n");
 		return;
 	}

@@ -654,7 +654,8 @@ Wandering Vampire combat~
 if !%self.vampire()%
   halt
 end
-if %time.hour%>=7 && %time.hour%<=19
+set room %self.room%
+if %room.time(hour)% >= 7 && %room.time(hour)% <= 19
   halt
 end
 if %actor.aff_flagged(!DRINK-BLOOD)%

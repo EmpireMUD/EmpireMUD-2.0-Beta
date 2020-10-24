@@ -241,6 +241,7 @@ OLC_MODULE(genedit_wearoff);
 OLC_MODULE(genedit_wearoff2room);
 OLC_MODULE(genedit_plural);
 OLC_MODULE(genedit_singular);
+OLC_MODULE(genedit_cycle);
 
 // global modules
 OLC_MODULE(gedit_ability);
@@ -512,90 +513,6 @@ OLC_MODULE(vedit_spawns);
 OLC_MODULE(vedit_speed);
 
 
-// external functions
-extern int sort_requirements_by_group(struct req_data *a, struct req_data *b);
-extern bool valid_room_template_vnum(rmt_vnum vnum);
-
-// locals
-void smart_copy_requirements(struct req_data **to_list, struct req_data *from_list);
-
-// prototypes: auditors
-extern bool audit_ability(ability_data *abil, char_data *ch);
-extern bool audit_adventure(adv_data *adv, char_data *ch, bool only_one);
-extern bool audit_archetype(archetype_data *arch, char_data *ch);
-extern bool audit_augment(augment_data *aug, char_data *ch);
-extern bool audit_building(bld_data *bld, char_data *ch);
-extern bool audit_class(class_data *cls, char_data *ch);
-extern bool audit_craft(craft_data *craft, char_data *ch);
-extern bool audit_crop(crop_data *cp, char_data *ch);
-extern bool audit_event(event_data *event, char_data *ch);
-extern bool audit_faction(faction_data *fct, char_data *ch);
-extern bool audit_generic(generic_data *gen, char_data *ch);
-extern bool audit_global(struct global_data *global, char_data *ch);
-extern bool audit_mobile(char_data *mob, char_data *ch);
-extern bool audit_morph(morph_data *morph, char_data *ch);
-extern bool audit_object(obj_data *obj, char_data *ch);
-extern bool audit_progress(progress_data *prg, char_data *ch);
-extern bool audit_quest(quest_data *quest, char_data *ch);
-extern bool audit_room_template(room_template *rmt, char_data *ch);
-extern bool audit_sector(sector_data *sect, char_data *ch);
-extern bool audit_shop(shop_data *shop, char_data *ch);
-extern bool audit_skill(skill_data *skill, char_data *ch);
-extern bool audit_social(social_data *soc, char_data *ch);
-extern bool audit_trigger(trig_data *trig, char_data *ch);
-extern bool audit_vehicle(vehicle_data *veh, char_data *ch);
-
-// prototypes: show
-void olc_show_ability(char_data *ch);
-void olc_show_adventure(char_data *ch);
-void olc_show_archetype(char_data *ch);
-void olc_show_augment(char_data *ch);
-void olc_show_building(char_data *ch);
-void olc_show_class(char_data *ch);
-void olc_show_craft(char_data *ch);
-void olc_show_crop(char_data *ch);
-void olc_show_event(char_data *ch);
-void olc_show_faction(char_data *ch);
-void olc_show_generic(char_data *ch);
-void olc_show_global(char_data *ch);
-void olc_show_mobile(char_data *ch);
-void olc_show_morph(char_data *ch);
-void olc_show_object(char_data *ch);
-void olc_show_progress(char_data *ch);
-void olc_show_quest(char_data *ch);
-void olc_show_room_template(char_data *ch);
-void olc_show_sector(char_data *ch);
-void olc_show_shop(char_data *ch);
-void olc_show_skill(char_data *ch);
-void olc_show_social(char_data *ch);
-void olc_show_trigger(char_data *ch);
-void olc_show_vehicle(char_data *ch);
-
-// prototypes: setup
-extern ability_data *setup_olc_ability(ability_data *input);
-extern adv_data *setup_olc_adventure(adv_data *input);
-extern archetype_data *setup_olc_archetype(archetype_data *input);
-extern augment_data *setup_olc_augment(augment_data *input);
-extern book_data *setup_olc_book(book_data *input);
-extern class_data *setup_olc_class(class_data *input);
-extern crop_data *setup_olc_crop(crop_data *input);
-extern event_data *setup_olc_event(event_data *input);
-extern faction_data *setup_olc_faction(faction_data *input);
-extern generic_data *setup_olc_generic(generic_data *input);
-extern struct global_data *setup_olc_global(struct global_data *input);
-extern char_data *setup_olc_mobile(char_data *input);
-extern morph_data *setup_olc_morph(morph_data *input);
-extern obj_data *setup_olc_object(obj_data *input);
-extern progress_data *setup_olc_progress(progress_data *input);
-extern quest_data *setup_olc_quest(quest_data *input);
-extern room_template *setup_olc_room_template(room_template *input);
-extern sector_data *setup_olc_sector(sector_data *input);
-extern shop_data *setup_olc_shop(shop_data *input);
-extern skill_data *setup_olc_skill(skill_data *input);
-extern social_data *setup_olc_social(social_data *input);
-extern struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_storage);
-
-
 // master olc command structure
 const struct olc_command_data olc_data[] = {
 	// OLC_x: main commands
@@ -819,6 +736,8 @@ const struct olc_command_data olc_data[] = {
 	// generic: component
 	{ "item", genedit_item, OLC_GENERIC, OLC_CF_EDITOR },
 	{ "relations", genedit_relations, OLC_GENERIC, OLC_CF_EDITOR },
+	// generic: moon
+	{ "cycle", genedit_cycle, OLC_GENERIC, OLC_CF_EDITOR },
 	
 	// globals commands
 	{ "capacity", gedit_capacity, OLC_GLOBAL, OLC_CF_EDITOR },
@@ -1989,26 +1908,6 @@ OLC_MODULE(olc_copy) {
 
 
 OLC_MODULE(olc_delete) {
-	void olc_delete_ability(char_data *ch, any_vnum vnum);
-	void olc_delete_adventure(char_data *ch, adv_vnum vnum);
-	void olc_delete_archetype(char_data *ch, any_vnum vnum);
-	void olc_delete_augment(char_data *ch, any_vnum vnum);
-	void olc_delete_book(char_data *ch, book_vnum vnum);
-	void olc_delete_building(char_data *ch, bld_vnum vnum);
-	void olc_delete_class(char_data *ch, any_vnum vnum);
-	void olc_delete_craft(char_data *ch, craft_vnum vnum);
-	void olc_delete_crop(char_data *ch, crop_vnum vnum);
-	void olc_delete_global(char_data *ch, any_vnum vnum);
-	void olc_delete_mobile(char_data *ch, mob_vnum vnum);
-	void olc_delete_morph(char_data *ch, any_vnum vnum);
-	void olc_delete_object(char_data *ch, obj_vnum vnum);
-	void olc_delete_room_template(char_data *ch, rmt_vnum vnum);
-	void olc_delete_sector(char_data *ch, sector_vnum vnum);
-	void olc_delete_skill(char_data *ch, any_vnum vnum);
-	void olc_delete_social(char_data *ch, any_vnum vnum);
-	void olc_delete_trigger(char_data *ch, trig_vnum vnum);
-	void olc_delete_vehicle(char_data *ch, any_vnum vnum);
-	
 	descriptor_data *desc;
 	char typename[42];
 	bool found;
@@ -2046,38 +1945,47 @@ OLC_MODULE(olc_delete) {
 	// OLC_x: success by type
 	switch (type) {
 		case OLC_ABILITY: {
+			void olc_delete_ability(char_data *ch, any_vnum vnum);
 			olc_delete_ability(ch, vnum);
 			break;
 		}
 		case OLC_ADVENTURE: {
+			void olc_delete_adventure(char_data *ch, adv_vnum vnum);
 			olc_delete_adventure(ch, vnum);
 			break;
 		}
 		case OLC_ARCHETYPE: {
+			void olc_delete_archetype(char_data *ch, any_vnum vnum);
 			olc_delete_archetype(ch, vnum);
 			break;
 		}
 		case OLC_AUGMENT: {
+			void olc_delete_augment(char_data *ch, any_vnum vnum);
 			olc_delete_augment(ch, vnum);
 			break;
 		}
 		case OLC_BOOK: {
+			void olc_delete_book(char_data *ch, book_vnum vnum);
 			olc_delete_book(ch, vnum);
 			break;
 		}
 		case OLC_BUILDING: {
+			void olc_delete_building(char_data *ch, bld_vnum vnum);
 			olc_delete_building(ch, vnum);
 			break;
 		}
 		case OLC_CLASS: {
+			void olc_delete_class(char_data *ch, any_vnum vnum);
 			olc_delete_class(ch, vnum);
 			break;
 		}
 		case OLC_CRAFT: {
+			void olc_delete_craft(char_data *ch, craft_vnum vnum);
 			olc_delete_craft(ch, vnum);
 			break;
 		}
 		case OLC_CROP: {
+			void olc_delete_crop(char_data *ch, crop_vnum vnum);
 			olc_delete_crop(ch, vnum);
 			break;
 		}
@@ -2097,18 +2005,22 @@ OLC_MODULE(olc_delete) {
 			break;
 		}
 		case OLC_GLOBAL: {
+			void olc_delete_global(char_data *ch, any_vnum vnum);
 			olc_delete_global(ch, vnum);
 			break;
 		}
 		case OLC_MOBILE: {
+			void olc_delete_mobile(char_data *ch, mob_vnum vnum);
 			olc_delete_mobile(ch, vnum);
 			break;
 		}
 		case OLC_MORPH: {
+			void olc_delete_morph(char_data *ch, any_vnum vnum);
 			olc_delete_morph(ch, vnum);
 			break;
 		}
 		case OLC_OBJECT: {
+			void olc_delete_object(char_data *ch, obj_vnum vnum);
 			olc_delete_object(ch, vnum);
 			break;
 		}
@@ -2123,10 +2035,12 @@ OLC_MODULE(olc_delete) {
 			break;
 		}
 		case OLC_ROOM_TEMPLATE: {
+			void olc_delete_room_template(char_data *ch, rmt_vnum vnum);
 			olc_delete_room_template(ch, vnum);
 			break;
 		}
 		case OLC_SECTOR: {
+			void olc_delete_sector(char_data *ch, sector_vnum vnum);
 			olc_delete_sector(ch, vnum);
 			break;
 		}
@@ -2136,18 +2050,22 @@ OLC_MODULE(olc_delete) {
 			break;
 		}
 		case OLC_SKILL: {
+			void olc_delete_skill(char_data *ch, any_vnum vnum);
 			olc_delete_skill(ch, vnum);
 			break;
 		}
 		case OLC_SOCIAL: {
+			void olc_delete_social(char_data *ch, any_vnum vnum);
 			olc_delete_social(ch, vnum);
 			break;
 		}
 		case OLC_TRIGGER: {
+			void olc_delete_trigger(char_data *ch, trig_vnum vnum);
 			olc_delete_trigger(ch, vnum);
 			break;
 		}
 		case OLC_VEHICLE: {
+			void olc_delete_vehicle(char_data *ch, any_vnum vnum);
 			olc_delete_vehicle(ch, vnum);
 			break;
 		}
@@ -3150,6 +3068,7 @@ OLC_MODULE(olc_removeindev) {
 	event_data *event, *next_event;
 	progress_data *prg, *next_prg;
 	faction_data *fct, *next_fct;
+	generic_data *gen, *next_gen;
 	social_data *soc, *next_soc;
 	augment_data *aug, *next_aug;
 	shop_data *shop, *next_shop;
@@ -3272,6 +3191,23 @@ OLC_MODULE(olc_removeindev) {
 			REMOVE_BIT(FCT_FLAGS(fct), FCT_IN_DEVELOPMENT);
 			save_library_file_for_vnum(DB_BOOT_FCT, FCT_VNUM(fct));
 			msg_to_char(ch, "Removed IN-DEV flag from faction [%d] %s.\r\n", FCT_VNUM(fct), FCT_NAME(fct));
+			any = TRUE;
+		}
+		
+		HASH_ITER(hh, generic_table, gen, next_gen) {
+			if (GEN_VNUM(gen) < from || GEN_VNUM(gen) > to) {
+				continue;
+			}
+			if (!IS_SET(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT)) {
+				continue;
+			}
+			if (!player_can_olc_edit(ch, OLC_GENERIC, GEN_VNUM(gen))) {
+				continue;
+			}
+			
+			REMOVE_BIT(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT);
+			save_library_file_for_vnum(DB_BOOT_GEN, GEN_VNUM(gen));
+			msg_to_char(ch, "Removed IN-DEV flag from generic [%d] %s.\r\n", GEN_VNUM(gen), GEN_NAME(gen));
 			any = TRUE;
 		}
 		
@@ -3725,24 +3661,6 @@ OLC_MODULE(olc_save) {
 
 
 OLC_MODULE(olc_search) {
-	void olc_search_ability(char_data *ch, any_vnum vnum);
-	void olc_search_archetype(char_data *ch, any_vnum vnum);
-	void olc_search_augment(char_data *ch, any_vnum vnum);
-	void olc_search_building(char_data *ch, bld_vnum vnum);
-	void olc_search_class(char_data *ch, any_vnum vnum);
-	void olc_search_craft(char_data *ch, craft_vnum vnum);
-	void olc_search_crop(char_data *ch, crop_vnum vnum);
-	void olc_search_global(char_data *ch, any_vnum vnum);
-	void olc_search_mob(char_data *ch, mob_vnum vnum);
-	void olc_search_morph(char_data *ch, any_vnum vnum);
-	void olc_search_obj(char_data *ch, obj_vnum vnum);
-	void olc_search_room_template(char_data *ch, rmt_vnum vnum);
-	void olc_search_sector(char_data *ch, sector_vnum vnum);
-	void olc_search_skill(char_data *ch, any_vnum vnum);
-	void olc_search_social(char_data *ch, any_vnum vnum);
-	void olc_search_trigger(char_data *ch, trig_vnum vnum);
-	void olc_search_vehicle(char_data *ch, any_vnum vnum);
-
 	any_vnum vnum = NOTHING;
 	
 	skip_spaces(&argument);
@@ -3757,30 +3675,37 @@ OLC_MODULE(olc_search) {
 		// OLC_x:
 		switch (type) {
 			case OLC_ABILITY: {
+				void olc_search_ability(char_data *ch, any_vnum vnum);
 				olc_search_ability(ch, vnum);
 				break;
 			}
 			case OLC_ARCHETYPE: {
+				void olc_search_archetype(char_data *ch, any_vnum vnum);
 				olc_search_archetype(ch, vnum);
 				break;
 			}
 			case OLC_AUGMENT: {
+				void olc_search_augment(char_data *ch, any_vnum vnum);
 				olc_search_augment(ch, vnum);
 				break;
 			}
 			case OLC_BUILDING: {
+				void olc_search_building(char_data *ch, bld_vnum vnum);
 				olc_search_building(ch, vnum);
 				break;
 			}
 			case OLC_CLASS: {
+				void olc_search_class(char_data *ch, any_vnum vnum);
 				olc_search_class(ch, vnum);
 				break;
 			}
 			case OLC_CRAFT: {
+				void olc_search_craft(char_data *ch, craft_vnum vnum);
 				olc_search_craft(ch, vnum);
 				break;
 			}
 			case OLC_CROP: {
+				void olc_search_crop(char_data *ch, crop_vnum vnum);
 				olc_search_crop(ch, vnum);
 				break;
 			}
@@ -3800,18 +3725,22 @@ OLC_MODULE(olc_search) {
 				break;
 			}
 			case OLC_GLOBAL: {
+				void olc_search_global(char_data *ch, any_vnum vnum);
 				olc_search_global(ch, vnum);
 				break;
 			}
 			case OLC_MOBILE: {
+				void olc_search_mob(char_data *ch, mob_vnum vnum);
 				olc_search_mob(ch, vnum);
 				break;
 			}
 			case OLC_MORPH: {
+				void olc_search_morph(char_data *ch, any_vnum vnum);
 				olc_search_morph(ch, vnum);
 				break;
 			}
 			case OLC_OBJECT: {
+				void olc_search_obj(char_data *ch, obj_vnum vnum);
 				olc_search_obj(ch, vnum);
 				break;
 			}
@@ -3826,10 +3755,12 @@ OLC_MODULE(olc_search) {
 				break;
 			}
 			case OLC_ROOM_TEMPLATE: {
+				void olc_search_room_template(char_data *ch, rmt_vnum vnum);
 				olc_search_room_template(ch, vnum);
 				break;
 			}
 			case OLC_SECTOR: {
+				void olc_search_sector(char_data *ch, sector_vnum vnum);
 				olc_search_sector(ch, vnum);
 				break;
 			}
@@ -3839,18 +3770,22 @@ OLC_MODULE(olc_search) {
 				break;
 			}
 			case OLC_SKILL: {
+				void olc_search_skill(char_data *ch, any_vnum vnum);
 				olc_search_skill(ch, vnum);
 				break;
 			}
 			case OLC_SOCIAL: {
+				void olc_search_social(char_data *ch, any_vnum vnum);
 				olc_search_social(ch, vnum);
 				break;
 			}
 			case OLC_TRIGGER: {
+				void olc_search_trigger(char_data *ch, trig_vnum vnum);
 				olc_search_trigger(ch, vnum);
 				break;
 			}
 			case OLC_VEHICLE: {
+				void olc_search_vehicle(char_data *ch, any_vnum vnum);
 				olc_search_vehicle(ch, vnum);
 				break;
 			}
@@ -5425,8 +5360,6 @@ bool olc_parse_requirement_args(char_data *ch, int type, char *argument, bool fi
 * @param struct bld_relation **list A pointer to the list we're adding/changing.
 */
 void olc_process_relations(char_data *ch, char *argument, struct bld_relation **list) {
-	void smart_copy_bld_relations(struct bld_relation **to_list, struct bld_relation *from_list);
-	
 	char cmd_arg[MAX_INPUT_LENGTH], field_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH];
 	char vnum_arg[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
 	struct bld_relation *relat, *iter, *copyfrom;
@@ -6257,8 +6190,6 @@ void olc_process_custom_messages(char_data *ch, char *argument, struct custom_me
 * @param struct extra_descr_data **list A pointer to an exdesc list to modify.
 */
 void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_data **list) {
-	void setup_extra_desc_editor(char_data *ch, struct extra_descr_data *ex);
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	struct extra_descr_data *ex, *change;
@@ -6363,9 +6294,6 @@ void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_da
 * @param struct icon_data **list A pointer to an icon list to modify.
 */
 void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
-	extern bool check_banner_color_string(char *str);
-	void smart_copy_icons(struct icon_data **addto, struct icon_data *input);
-	
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
 	char num_arg[MAX_INPUT_LENGTH], type_arg[MAX_INPUT_LENGTH], val_arg[MAX_INPUT_LENGTH];
 	char lbuf[MAX_INPUT_LENGTH];
@@ -6582,8 +6510,6 @@ void olc_process_icons(char_data *ch, char *argument, struct icon_data **list) {
 * @return bool TRUE normally; FALSE if there was an error (message sent to character).
 */
 bool parse_interaction_restrictions(char_data *ch, char *argument, struct interact_restriction **found_restrictions, char *found_exclusion) {
-	void free_interaction_restrictions(struct interact_restriction **list);
-	
 	char arg[MAX_INPUT_LENGTH], *ptr = argument;
 	struct interact_restriction *res;
 	ability_data *abil;

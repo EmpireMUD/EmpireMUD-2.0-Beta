@@ -147,6 +147,7 @@ extern const struct faction_reputation_type reputation_levels[];
 
 // generic constants
 extern const char *generic_types[];
+extern const bool generic_types_uses_in_dev[];
 extern const char *generic_flags[];
 
 // mob constants
@@ -154,6 +155,12 @@ extern const char *action_bits[];
 extern const char *mob_custom_types[];
 extern const char *mob_move_types[];
 extern const char *name_sets[];
+
+// moon constants
+extern const char *moon_phases[];
+extern const char *moon_phases_long[];
+extern const int moon_phase_brightness[NUM_PHASES];
+extern const char *moon_positions[];
 
 // item constants
 extern const char *wear_keywords[];

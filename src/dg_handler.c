@@ -556,10 +556,9 @@ void add_to_lookup_table(int uid, void *ptr, int type) {
 * This incorporates former parts of find_char_by_uid_in_lookup_table()
 *
 * @param int uid The script id (or player idnum) to find in the lookup table.
-* @param bool log_error If TRUE, will log if it can't find them.
 * @return char_data* The found character, or NULL if not present.
 */
-char_data *find_char(int uid, bool log_error) {
+char_data *find_char(int uid) {
 	struct uid_lookup_table *find;
 	
 	if (uid >= EMPIRE_ID_BASE && uid < OTHER_ID_BASE) {
@@ -571,9 +570,10 @@ char_data *find_char(int uid, bool log_error) {
 		return find->data.ch;
 	}
 	
-	if (log_error) {
+	#ifdef DEBUG_UID_LOOKUPS
 		log("find_char : No character with number %d in lookup table", uid);
-	}
+	#endif
+	
 	return NULL;	// all other cases
 }
 
@@ -602,10 +602,9 @@ empire_data *find_empire_by_uid(int uid) {
 * This incorporates former parts of find_obj_by_uid_in_lookup_table()
 *
 * @param int uid The script id to find in the lookup table.
-* @param bool log_error If TRUE, will log if it can't find the thing.
 * @return obj_data* The found object, or NULL if not present.
 */
-obj_data *find_obj(int uid, bool log_error) {
+obj_data *find_obj(int uid) {
 	struct uid_lookup_table *find;
 	
 	if (uid < OTHER_ID_BASE) {
@@ -617,9 +616,10 @@ obj_data *find_obj(int uid, bool log_error) {
 		return find->data.obj;
 	}
 	
-	if (log_error) {
+	#ifdef DEBUG_UID_LOOKUPS
 		log("find_obj : No object with number %d in lookup table", uid);
-	}
+	#endif
+	
 	return NULL;	// all other cases
 }
 
@@ -646,10 +646,9 @@ room_data *find_room(int uid) {
 * This incorporates former parts of find_vehicle_by_uid_in_lookup_table()
 *
 * @param int uid The script id to find in the lookup table.
-* @param bool log_error If TRUE, will log if it can't find the thing.
 * @return vehicle_data* The found vehicle, or NULL if not present.
 */
-vehicle_data *find_vehicle(int uid, bool log_error) {
+vehicle_data *find_vehicle(int uid) {
 	struct uid_lookup_table *find;
 	
 	if (uid < OTHER_ID_BASE) {
@@ -661,9 +660,9 @@ vehicle_data *find_vehicle(int uid, bool log_error) {
 		return find->data.veh;
 	}
 	
-	if (log_error) {
+	#ifdef DEBUG_UID_LOOKUPS
 		log("find_veh : No vehicle with number %d in lookup table", uid);
-	}
+	#endif
 	return NULL;	// all other cases
 }
 

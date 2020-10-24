@@ -69,7 +69,7 @@ bool check_can_craft(char_data *ch, craft_data *type) {
 	if (GET_CRAFT_MIN_LEVEL(type) > get_crafting_level(ch)) {
 		msg_to_char(ch, "You need to have a crafting level of %d to %s that.\r\n", GET_CRAFT_MIN_LEVEL(type), command);
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to %s anything.\r\n", command);
 	}
 	
@@ -1127,7 +1127,7 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		cancel_gen_craft(ch);
 		return;
 	}
-	if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		cancel_gen_craft(ch);
 		return;
@@ -1225,7 +1225,7 @@ void process_gen_craft(char_data *ch) {
 		msg_to_char(ch, "You need to be in a mill or have a grinding stone to do keep milling.\r\n");
 		cancel_gen_craft(ch);
 	}
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		msg_to_char(ch, "It's too dark to finish %s.\r\n", gen_craft_data[GET_CRAFT_TYPE(type)].verb);
 		cancel_gen_craft(ch);
 	}
@@ -1900,7 +1900,7 @@ ACMD(do_gen_craft) {
 		if (IS_BURNING(IN_ROOM(ch))) {
 			msg_to_char(ch, "You can't work on a burning building!\r\n");
 		}
-		else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+		else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 			msg_to_char(ch, "It's too dark to work on the building.\r\n");
 		}
 		else if (!(find_type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_NORMAL)) && !(find_type = find_building_list_entry(IN_ROOM(ch), FIND_BUILD_UPGRADE))) {

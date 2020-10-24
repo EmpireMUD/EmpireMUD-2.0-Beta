@@ -37,6 +37,7 @@
 *   Faction Constants
 *   Generic Constants
 *   Mob Constants
+*   Moon Constants
 *   Item Contants
 *   OLC Constants
 *   Progress Constants
@@ -522,6 +523,7 @@ const char *extra_attribute_types[] = {
 	"Crafting-Bonus",
 	"Blood-Upkeep",
 	"Age",
+	"Night-Vision",
 	"\n"
 };
 
@@ -1465,6 +1467,7 @@ const char *apply_types[] = {
 	"RESIST-MAGICAL",
 	"CRAFTING",
 	"BLOOD-UPKEEP",
+	"NIGHT-VISION",
 	"\n"
 };
 
@@ -1498,6 +1501,7 @@ const double apply_values[] = {
 	0.5,	// RESIST-MAGICAL
 	0.01,	// CRAFTING
 	1,	// BLOOD-UPKEEP
+	1,	// NIGTH-VISION
 };
 
 
@@ -1530,6 +1534,7 @@ const int apply_attribute[] = {
 	NOTHING,	// resist-magical
 	NOTHING,	// crafting
 	NOTHING,	// blood-upkeep
+	NOTHING,	// night-vision
 };
 
 
@@ -1562,6 +1567,7 @@ const bool apply_never_scales[] = {
 	FALSE,	// RESIST-MAGICAL
 	TRUE,	// CRAFTING
 	TRUE,	// BLOOD-UPKEEP
+	TRUE,	// NIGHT-VISION
 };
 
 
@@ -2048,7 +2054,7 @@ const struct faction_reputation_type reputation_levels[] = {
  //////////////////////////////////////////////////////////////////////////////
 //// GENERIC CONSTANTS ///////////////////////////////////////////////////////
 
-// GENERIC_x: generic types
+// GENERIC_x (1/2): generic types
 const char *generic_types[] = {
 	"UNKNOWN",	// 0
 	"LIQUID",
@@ -2057,13 +2063,28 @@ const char *generic_types[] = {
 	"AFFECT",
 	"CURRENCY",	// 5
 	"COMPONENT",
+	"MOON",
 	"\n"
+};
+
+
+// GENERIC_x (2/2): generic types that are affected by in-development
+const bool generic_types_uses_in_dev[] = {
+	FALSE,	// UNKNOWN	// 0
+	FALSE,	// LIQUID
+	FALSE,	// ACTION
+	FALSE,	// COOLDOWN
+	FALSE,	// AFFECT
+	FALSE,	// CURRENCY	// 5
+	FALSE,	// COMPONENT
+	TRUE,	// MOON
 };
 
 
 // GEN_x: generic flags
 const char *generic_flags[] = {
 	"BASIC",	// 0
+	"IN-DEVELOPMENT",
 	"\n"
 };
 
@@ -2175,6 +2196,62 @@ const char *name_sets[] = {
 	"Northern",
 	"Primitive-Short",
 	"Descriptive",
+	"\n"
+};
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MOON CONSTANTS //////////////////////////////////////////////////////////
+
+// PHASE_x (1/3): moon phases (short names)
+const char *moon_phases[] = {
+	"new",
+	"waxing crescent",
+	"first quarter",
+	"waxing gibbous",
+	"full",
+	"waning gibbous",
+	"third quarter",
+	"waning crescent",
+	"\n"
+};
+
+
+// PHASE_x (2/3): moon phases	-- shown as "<moon name> is <moon_phases_long>, <moon_positions>."
+const char *moon_phases_long[] = {
+	"a new moon",
+	"a waxing crescent",
+	"in the first quarter",
+	"a waxing gibbous",
+	"full",
+	"a waning gibbous",
+	"in the third quarter",
+	"a waning crescent",
+	"\n"
+};
+
+
+// PHASE_x (2/3): moon phase brightness (base distance you can see in the dark)
+const int moon_phase_brightness[NUM_PHASES] = {
+	1,	// new
+	2,	// crescent
+	3,	// quarter
+	3,	// gibbous
+	4,	// full
+	3,	// gibbous
+	3,	// quarter
+	2	// crescent
+};
+
+
+// MOON_POS_x: moon position in the sky	-- shown as "<moon name> is <moon_phases_long>, <moon_positions>."
+const char *moon_positions[] = {
+	"down",
+	"low in the east",
+	"high in the east",
+	"overhead",
+	"high in the west",
+	"low in the west",
 	"\n"
 };
 

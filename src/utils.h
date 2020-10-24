@@ -262,7 +262,7 @@
 //// CAN SEE UTILS ///////////////////////////////////////////////////////////
 
 // this all builds up to CAN_SEE
-#define LIGHT_OK(sub)  (!AFF_FLAGGED(sub, AFF_BLIND) && CAN_SEE_IN_DARK_ROOM((sub), (IN_ROOM(sub))))
+#define LIGHT_OK(sub)  (!AFF_FLAGGED(sub, AFF_BLIND) && can_see_in_dark_room((sub), (IN_ROOM(sub)), TRUE))
 #define INVIS_OK(sub, obj)  ((!AFF_FLAGGED(obj, AFF_INVISIBLE)) && (!AFF_FLAGGED((obj), AFF_HIDE) || AFF_FLAGGED((sub), AFF_SENSE_HIDE)))
 
 
@@ -400,9 +400,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define CAN_GET_OBJ(ch, obj)  (CAN_WEAR((obj), ITEM_WEAR_TAKE) && CAN_CARRY_OBJ((ch),(obj)) && CAN_SEE_OBJ((ch),(obj)))
 #define CAN_RECOGNIZE(ch, vict)  (PRF_FLAGGED(ch, PRF_HOLYLIGHT) || (!AFF_FLAGGED(vict, AFF_NO_SEE_IN_ROOM) && ((GET_LOYALTY(ch) && GET_LOYALTY(ch) == GET_LOYALTY(vict)) || (GROUP(ch) && in_same_group(ch, vict)) || (!CHAR_MORPH_FLAGGED((vict), MORPHF_ANIMAL) && !IS_DISGUISED(vict)))))
 #define CAN_RIDE_FLYING_MOUNT(ch)  (has_player_tech((ch), PTECH_RIDING_FLYING))
-#define CAN_SEE_IN_DARK(ch)  (HAS_INFRA(ch) || (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_HOLYLIGHT)))
-#define CAN_SEE_IN_DARK_ROOM(ch, room)  ((WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room) || (room == IN_ROOM(ch) && (has_player_tech((ch), PTECH_SEE_CHARS_IN_DARK) || (IS_OUTDOORS(ch) && has_player_tech((ch), PTECH_SEE_IN_DARK_OUTDOORS)) || has_player_tech((ch), PTECH_SEE_OBJS_IN_DARK))) || CAN_SEE_IN_DARK(ch)) && (!MAGIC_DARKNESS(room) || CAN_SEE_IN_MAGIC_DARKNESS(ch)))
-#define CAN_SEE_IN_MAGIC_DARKNESS(ch)  (IS_NPC(ch) ? (get_approximate_level(ch) > 100) : has_ability((ch), ABIL_DARKNESS))
+#define CAN_SEE_IN_MAGIC_DARKNESS(ch)  (IS_NPC(ch) ? (get_approximate_level(ch) > 100) : (PRF_FLAGGED((ch), PRF_HOLYLIGHT) || has_ability((ch), ABIL_DARKNESS)))
 #define CAN_SPEND_BLOOD(ch)  (!AFF_FLAGGED(ch, AFF_CANT_SPEND_BLOOD))
 #define CAST_BY_ID(ch)  (IS_NPC(ch) ? (-1 * GET_MOB_VNUM(ch)) : GET_IDNUM(ch))
 #define EFFECTIVELY_FLYING(ch)  (IS_RIDING(ch) ? MOUNT_FLAGGED(ch, MOUNT_FLYING) : AFF_FLAGGED(ch, AFF_FLY))
@@ -734,6 +732,11 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_COMPONENT_OBJ_VNUM(gen)  (GEN_TYPE(gen) == GENERIC_COMPONENT ? GEN_VALUE((gen), GVAL_OBJ_VNUM) : NOTHING)
 #define GET_COMPONENT_PLURAL(gen)  (GEN_TYPE(gen) == GENERIC_COMPONENT ? GEN_STRING((gen), GSTR_COMPONENT_PLURAL) : NULL)
 #define GET_COMPONENT_SINGULAR(gen)  (GEN_TYPE(gen) == GENERIC_COMPONENT ? GEN_NAME(gen) : NULL)
+
+// GENERIC_MOON
+#define GVAL_MOON_CYCLE  0
+#define GET_MOON_CYCLE(gen)  GEN_VALUE((gen), GVAL_MOON_CYCLE)
+#define GET_MOON_CYCLE_DAYS(gen)  (GET_MOON_CYCLE(gen) / 100.0)
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -1159,6 +1162,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define GET_LAST_GOAL_CHECK(ch)  CHECK_PLAYER_SPECIAL(REAL_CHAR(ch), (REAL_CHAR(ch)->player_specials->last_goal_check))
 #define GET_LAST_HOME_SET_TIME(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_home_set_time))
 #define GET_LAST_KNOWN_LEVEL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_known_level))
+#define GET_LAST_LOOK_SUN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_look_sun))
 #define GET_LAST_OFFENSE_SEEN(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_offense_seen))
 #define GET_LAST_ROOM(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_room))
 #define GET_LAST_TELL(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->last_tell))
@@ -1361,9 +1365,6 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define HAS_MINOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_minor") / 100)))
 #define HAS_MAJOR_DISREPAIR(room)  (HOME_ROOM(room) == room && GET_BUILDING(room) && BUILDING_DAMAGE(room) > 0 && (BUILDING_DAMAGE(room) >= (GET_BLD_MAX_DAMAGE(GET_BUILDING(room)) * config_get_int("disrepair_major") / 100)))
 #define IS_CITY_CENTER(room)  (BUILDING_VNUM(room) == BUILDING_CITY_CENTER)
-#define IS_DARK(room)  (MAGIC_DARKNESS(room) || (!IS_ANY_BUILDING(room) && ROOM_LIGHTS(room) == 0 && (!ROOM_OWNER(room) || !EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS)) && !RMT_FLAGGED((room), RMT_LIGHT) && (weather_info.sunlight == SUN_DARK || RMT_FLAGGED((room), RMT_DARK))))
-#define IS_LIGHT(room)  (!MAGIC_DARKNESS(room) && WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room))
-#define IS_REAL_LIGHT(room)  (!IS_DARK(room) || RMT_FLAGGED((room), RMT_LIGHT) || IS_INSIDE(room) || (ROOM_OWNER(room) && IS_ANY_BUILDING(room)))
 #define ISLAND_FLAGGED(room, flag)  (GET_ISLAND(room) ? IS_SET(GET_ISLAND(room)->flags, (flag)) : FALSE)
 #define MAGIC_DARKNESS(room)  (ROOM_AFF_FLAGGED((room), ROOM_AFF_DARK))
 #define NO_LOCATION(room)  (RMT_FLAGGED(room, RMT_NO_LOCATION) || RMT_FLAGGED(IN_VEHICLE_IN_ROOM(room), RMT_NO_LOCATION))
@@ -1372,7 +1373,6 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define ROOM_IS_CLOSED(room)  (IS_INSIDE(room) || IS_ADVENTURE_ROOM(room) || (IS_ANY_BUILDING(room) && !ROOM_BLD_FLAGGED(room, BLD_OPEN) && (IS_COMPLETE(room) || ROOM_BLD_FLAGGED(room, BLD_CLOSED))))
 #define ROOM_IS_UPGRADED(room)  ((IS_COMPLETE(room) && HAS_FUNCTION((room), FNC_UPGRADED)) || (IS_COMPLETE(HOME_ROOM(room)) && HAS_FUNCTION(HOME_ROOM(room), FNC_UPGRADED)) || (GET_ROOM_VEHICLE(room) && IS_SET(VEH_FUNCTIONS(GET_ROOM_VEHICLE(room)), FNC_UPGRADED)))
 #define SHOW_PEOPLE_IN_ROOM(room)  (!ROOM_IS_CLOSED(room) && !ROOM_SECT_FLAGGED(room, SECTF_OBSCURE_VISION))
-#define WOULD_BE_LIGHT_WITHOUT_MAGIC_DARKNESS(room)  (RMT_FLAGGED((room), RMT_LIGHT) || IS_ANY_BUILDING(room) || !IS_DARK(room) || adjacent_room_is_light(room))
 
 // interaction checks (by type)
 #define BLD_CAN_INTERACT_ROOM(room, type)  (GET_BUILDING(room) && has_interaction(GET_BLD_INTERACTIONS(GET_BUILDING(room)), (type)))
@@ -1622,6 +1622,9 @@ extern struct weather_data weather_info;	// db.c
  //////////////////////////////////////////////////////////////////////////////
 //// UTIL FUNCTION PROTOS ////////////////////////////////////////////////////
 
+// used by workforce.c to validate crafts
+#define CHORE_GEN_CRAFT_VALIDATOR(name)  bool (name)(empire_data *emp, room_data *room, vehicle_data *veh, int chore, craft_data *craft)
+
 /**
 * Validates a location for the pathfinding system.
 *
@@ -1701,6 +1704,7 @@ bool empire_can_claim(empire_data *emp);
 int get_total_score(empire_data *emp);
 bool ignore_distrustful_due_to_start_loc(room_data *loc);
 bool is_trading_with(empire_data *emp, empire_data *partner);
+void process_imports();
 void resort_empires(bool force);
 
 // empire diplomacy utils from utils.c
@@ -1765,10 +1769,12 @@ double rate_item(obj_data *obj);
 
 // player functions from utils.c
 void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add);
+bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_light);
 void command_lag(char_data *ch, int wait_type);
 void despawn_charmies(char_data *ch, any_vnum only_vnum);
 void determine_gear_level(char_data *ch);
 room_data *find_load_room(char_data *ch);
+room_data *find_starting_location();
 bool has_one_day_playtime(char_data *ch);
 int num_earned_bonus_traits(char_data *ch);
 int pick_level_from_range(int level, int min, int max);
@@ -1850,6 +1856,7 @@ room_data *get_map_location_for(room_data *room);
 bool is_deep_mine(room_data *room);
 void lock_icon(room_data *room, struct icon_data *use_icon);
 room_data *real_shift(room_data *origin, int x_shift, int y_shift);
+bool room_is_light(room_data *room, bool count_adjacent_light);
 room_data *straight_line(room_data *origin, room_data *destination, int iter);
 sector_data *find_first_matching_sector(bitvector_t with_flags, bitvector_t without_flags, bitvector_t prefer_climate);
 
@@ -1863,11 +1870,16 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag);
 // abilities.c
 void ability_fail_message(char_data *ch, char_data *vict, ability_data *abil);
 void add_ability_gain_hook(char_data *ch, ability_data *abil);
+void apply_ability_techs_to_player(char_data *ch, ability_data *abil);
+void apply_one_passive_buff(char_data *ch, ability_data *abil);
 bool check_ability(char_data *ch, char *string, bool exact);
+ability_data *find_ability_on_skill(char *name, skill_data *skill);
 ability_data *find_player_ability_by_tech(char_data *ch, int ptech);
 int get_player_level_for_ability(char_data *ch, any_vnum abil_vnum);
+bool is_class_ability(ability_data *abil);
 char_data *load_companion_mob(char_data *master, struct companion_data *cd);
 void pre_ability_message(char_data *ch, char_data *vict, ability_data *abil);
+void read_ability_requirements();
 void refresh_passive_buffs(char_data *ch);
 void remove_passive_buff(char_data *ch, struct affected_type *aff);
 void remove_passive_buff_by_ability(char_data *ch, any_vnum abil);
@@ -1914,6 +1926,7 @@ void summon_materials(char_data *ch, char *argument);
 // act.immortal.c
 void perform_autostore(obj_data *obj, empire_data *emp, int island);
 void perform_immort_vis(char_data *ch);
+void show_spawn_summary_to_char(char_data *ch, struct spawn_info *list);
 
 // act.informative.c
 void diag_char_to_char(char_data *i, char_data *ch);
@@ -1938,6 +1951,9 @@ int find_free_shipping_id(empire_data *emp);
 obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 bool get_check_money(char_data *ch, obj_data *obj);
 int obj_carry_size(obj_data *obj);
+void process_shipping();
+void remove_armor_by_type(char_data *ch, int armor_type);
+void remove_honed_gear(char_data *ch);
 void sail_shipment(empire_data *emp, vehicle_data *boat);
 void scale_item_to_level(obj_data *obj, int level);
 bool ship_is_empty(vehicle_data *ship);
@@ -1996,6 +2012,7 @@ bool valid_unseen_passing(room_data *room);
 bool valid_no_trace(room_data *room);
 
 // act.trade.c
+void cancel_gen_craft(char_data *ch);
 bool check_can_craft(char_data *ch, craft_data *type);
 bool find_and_bind(char_data *ch, obj_vnum vnum);
 int get_craft_scale_level(char_data *ch, craft_data *craft);
@@ -2009,6 +2026,7 @@ bool check_blood_fortitude(char_data *ch, bool can_gain_skill);
 void check_un_vampire(char_data *ch, bool remove_vampire_skills);
 bool check_vampire_sun(char_data *ch, bool message);
 void make_vampire(char_data *ch, bool lore, any_vnum skill_vnum);
+void retract_claws(char_data *ch);
 void sire_char(char_data *ch, char_data *victim);
 void start_drinking_blood(char_data *ch, char_data *victim);
 bool starving_vampire_aggro(char_data *ch);
@@ -2050,19 +2068,24 @@ struct resource_data *combine_resources(struct resource_data *combine_a, struct 
 void complete_building(room_data *room);
 void do_customize_room(char_data *ch, char *argument);
 craft_data *find_building_list_entry(room_data *room, byte type);
+void finish_building(char_data *ch, room_data *room);
+void finish_dismantle(char_data *ch, room_data *room);
 void finish_maintenance(char_data *ch, room_data *room);
 void herd_animals_out(room_data *location);
 bool is_entrance(room_data *room);
 void process_build(char_data *ch, room_data *room, int act_type);
 void process_dismantling(char_data *ch, room_data *room);
+void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component);
 void remove_like_item_from_built_with(struct resource_data **built_with, obj_data *obj);
 void special_building_setup(char_data *ch, room_data *room);
 void special_vehicle_setup(char_data *ch, vehicle_data *veh);
+void start_dismantle_building(room_data *loc);
 
 // dg_wldcmd.c
 int get_room_scale_level(room_data *room, char_data *targ);
 
 // eedit.c
+bool check_banner_color_string(char *str);
 bool check_unique_empire_name(empire_data *for_emp, char *name);
 bool valid_rank_name(char_data *ch, char *newname);
 
@@ -2141,9 +2164,11 @@ void gain_condition(char_data *ch, int condition, int value);
 int health_gain(char_data *ch, bool info_only);
 int mana_gain(char_data *ch, bool info_only);
 int move_gain(char_data *ch, bool info_only);
+void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs);
 
 // mapview.c
 bool adjacent_room_is_light(room_data *room);
+int distance_can_see_in_dark(char_data *ch);
 struct icon_data *get_icon_from_set(struct icon_data *set, int type);
 int get_map_radius(char_data *ch);
 char *get_mine_type_name(room_data *room);
@@ -2219,7 +2244,9 @@ progress_data *find_purchasable_goal_by_name(empire_data *emp, char *name);
 void full_reset_empire_progress(empire_data *only_emp);
 void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by);
 void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
+void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
 void remove_completed_goal(empire_data *emp, any_vnum vnum);
+struct empire_goal *start_empire_goal(empire_data *e, progress_data *prg);
 
 // quest.c
 bool can_get_quest_from_mob(char_data *ch, char_data *mob, struct quest_temp_list **build_list);
@@ -2293,6 +2320,9 @@ void qt_visit_room(char_data *ch, room_data *room);
 void qt_wear_obj(char_data *ch, obj_data *obj);
 
 // progress.c
+void complete_goal(empire_data *emp, struct empire_goal *goal);
+int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island);
+
 void et_change_cities(empire_data *emp);
 void et_change_coins(empire_data *emp, int amount);
 void et_change_diplomacy(empire_data *emp);
@@ -2306,6 +2336,9 @@ void et_get_obj(empire_data *emp, obj_data *obj, int amount, int new_total);
 void et_lose_building(empire_data *emp, any_vnum vnum);
 void et_lose_tile_sector(empire_data *emp, sector_vnum vnum);
 void et_lose_vehicle(empire_data *emp, vehicle_data *veh);
+
+// random.c
+unsigned long empire_random();
 
 // shop.c
 struct shop_temp_list *build_available_shop_list(char_data *ch);
@@ -2330,6 +2363,7 @@ void check_vehicle_climate_change(room_data *room);
 void complete_vehicle(vehicle_data *veh);
 int count_harnessed_animals(vehicle_data *veh);
 int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
+int count_building_vehicles_in_room(room_data *room, empire_data *only_owner);
 void Crash_save_vehicles(vehicle_data *veh, FILE *fl);
 void delete_vehicle_interior(vehicle_data *veh);
 void empty_vehicle(vehicle_data *veh, room_data *to_room);
@@ -2337,6 +2371,7 @@ craft_data *find_craft_for_vehicle(vehicle_data *veh);
 vehicle_data *find_dismantling_vehicle_in_room(room_data *room, int with_id);
 struct vehicle_attached_mob *find_harnessed_mob_by_name(vehicle_data *veh, char *name);
 vehicle_data *find_vehicle_in_room_with_interior(room_data *room, room_vnum interior_room);
+void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
 void fully_empty_vehicle(vehicle_data *veh, room_data *to_room);
 int get_new_vehicle_construction_id();
 room_data *get_vehicle_interior(vehicle_data *veh);
@@ -2359,10 +2394,20 @@ void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);
 bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
 bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
 
-// weather.c
+// weather.c moons
+int compute_night_light_radius(room_data *room);
 void determine_seasons();
-void list_moons_to_char(char_data *ch);
-byte distance_can_see(char_data *ch);
+moon_phase_t get_moon_phase(double cycle_days);
+moon_pos_t get_moon_position(moon_phase_t phase, int hour);
+bool look_at_moon(char_data *ch, char *name, int *number);
+void show_visible_moons(char_data *ch);
+
+// weather.c time
+struct time_info_data get_local_time(room_data *room);
+int get_sun_status(room_data *room);
+
+// weather.c weather
+void reset_weather();
 
 // workforce.c
 void deactivate_workforce(empire_data *emp, int island_id, int type);

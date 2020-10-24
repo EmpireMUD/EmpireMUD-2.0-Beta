@@ -77,11 +77,9 @@ void check_newbie_islands();
 void check_wars();
 void chore_update();
 void display_automessages();
-void extract_pending_vehicles();
 void frequent_combat(int pulse);
 void point_update();
 void process_import_evolutions();
-void process_imports();
 void process_theft_logs();
 void prune_instances();
 void real_update();
@@ -97,7 +95,7 @@ void update_empire_npc_data();
 void update_guard_towers();
 void update_instance_world_size();
 void update_trading_post();
-void weather_and_time(int mode);
+void weather_and_time();
 void write_running_events_file();
 
 // local functions
@@ -321,6 +319,7 @@ static void msdp_update(void) {
 	struct player_skill_data *skill, *next_skill;
 	struct over_time_effect_type *dot;
 	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	struct time_info_data tinfo;
 	struct cooldown_data *cool;
 	char_data *ch, *pOpponent, *focus;
 	bool is_ally;
@@ -498,10 +497,12 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
 			}
 			
-			MSDPSetNumber(d, eMSDP_WORLD_TIME, time_info.hours);
-			MSDPSetNumber(d, eMSDP_WORLD_DAY_OF_MONTH, time_info.day + 1);
-			MSDPSetString(d, eMSDP_WORLD_MONTH, month_name[(int)time_info.month]);
-			MSDPSetNumber(d, eMSDP_WORLD_YEAR, time_info.year);
+			tinfo = get_local_time(IN_ROOM(ch));
+			
+			MSDPSetNumber(d, eMSDP_WORLD_TIME, tinfo.hours);
+			MSDPSetNumber(d, eMSDP_WORLD_DAY_OF_MONTH, tinfo.day + 1);
+			MSDPSetString(d, eMSDP_WORLD_MONTH, month_name[(int)tinfo.month]);
+			MSDPSetNumber(d, eMSDP_WORLD_YEAR, tinfo.year);
 			MSDPSetString(d, eMSDP_WORLD_SEASON, seasons[GET_SEASON(IN_ROOM(ch))]);
 			
 			// done -- send it
@@ -974,16 +975,10 @@ void heartbeat(int heart_pulse) {
 	}
 
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
-		weather_and_time(1);
+		weather_and_time();
 		if (debug_log && HEARTBEAT(15)) { log("debug 14a:\t%lld", microtime()); }
 		chore_update();
 		if (debug_log && HEARTBEAT(15)) { log("debug 14b:\t%lld", microtime()); }
-		
-		// save the world at dawn
-		if (time_info.hours == 7) {
-			save_whole_world();
-			if (debug_log && HEARTBEAT(15)) { log("debug 14c:\t%lld", microtime()); }
-		}
 	}
 	
 	// slightly off the hour to prevent yet another thing on the tick
@@ -1044,17 +1039,6 @@ void heartbeat(int heart_pulse) {
 		if (debug_log && HEARTBEAT(15)) { log("debug 24:\t%lld", microtime()); }
 		update_trading_post();
 		if (debug_log && HEARTBEAT(15)) { log("debug 24.5:\t%lld", microtime()); }
-	}
-	
-	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
-		if (time_info.hours == 0) {
-			run_external_evolutions();
-			if (debug_log && HEARTBEAT(15)) { log("debug 25:\t%lld", microtime()); }
-		}
-		if (time_info.hours == 12) {
-			process_imports();
-			if (debug_log && HEARTBEAT(15)) { log("debug 25.5:\t%lld", microtime()); }
-		}
 	}
 	
 	if (HEARTBEAT(1)) {
@@ -3125,6 +3109,7 @@ char *prompt_str(char_data *ch) {
 char *replace_prompt_codes(char_data *ch, char *str) {
 	static char pbuf[MAX_STRING_LENGTH];
 	char i[MAX_STRING_LENGTH], spare[10];
+	struct time_info_data tinfo;
 	char *cp, *tmp;
 	char_data *vict;
 
@@ -3384,35 +3369,37 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					break;
 				}
 				case 't':	/* Sun timer */
-				case 'T':
+				case 'T': {
+					tinfo = get_local_time(IN_ROOM(ch));
+					
 					if (has_player_tech(ch, PTECH_CLOCK)) {
-						if (time_info.hours >= 12)
+						if (tinfo.hours >= 12)
 							strcpy(spare, "pm");
 						else
 							strcpy(spare, "am");
 
-						if (time_info.hours == 6)
-							sprintf(i, "\tC%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
-						else if (time_info.hours < 19 && time_info.hours > 6)
-							sprintf(i, "\tY%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
-						else if (time_info.hours == 19)
-							sprintf(i, "\tR%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
-						else if (time_info.hours == 0)
+						if (tinfo.hours == 6)
+							sprintf(i, "\tC%d%s\t0", tinfo.hours > 12 ? tinfo.hours - 12 : tinfo.hours, spare);
+						else if (tinfo.hours < 19 && tinfo.hours > 6)
+							sprintf(i, "\tY%d%s\t0", tinfo.hours > 12 ? tinfo.hours - 12 : tinfo.hours, spare);
+						else if (tinfo.hours == 19)
+							sprintf(i, "\tR%d%s\t0", tinfo.hours > 12 ? tinfo.hours - 12 : tinfo.hours, spare);
+						else if (tinfo.hours == 0)
 							sprintf(i, "\tB12am\t0");
 						else
-							sprintf(i, "\tB%d%s\t0", time_info.hours > 12 ? time_info.hours - 12 : time_info.hours, spare);
+							sprintf(i, "\tB%d%s\t0", tinfo.hours > 12 ? tinfo.hours - 12 : tinfo.hours, spare);
 					}
 					else {	// no clock
-						if (time_info.hours == 6) {
+						if (tinfo.hours == 6) {
 							strcpy(i, "\tCdawn\t0");
 						}
-						else if (time_info.hours == 12) {
+						else if (tinfo.hours == 12) {
 							strcpy(i, "\tYnoon\t0");
 						}
-						else if (time_info.hours < 19 && time_info.hours > 6) {
+						else if (tinfo.hours < 19 && tinfo.hours > 6) {
 							strcpy(i, "\tYday\t0");
 						}
-						else if (time_info.hours == 19) {
+						else if (tinfo.hours == 19) {
 							strcpy(i, "\tRdusk\t0");
 						}
 						else {
@@ -3421,6 +3408,7 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 					}
 					tmp = i;
 					break;
+				}
 				case 'a': {	// action
 					if (!IS_NPC(ch) && GET_ACTION(ch) == ACT_GEN_CRAFT) {
 						craft_data *ctype = craft_proto(GET_ACTION_VNUM(ch, 0));

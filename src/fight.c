@@ -1666,7 +1666,7 @@ void perform_resurrection(char_data *ch, char_data *rez_by, room_data *loc, any_
 	msdp_update_room(ch);
 	
 	// take care of the corpse
-	if ((corpse = find_obj(GET_LAST_CORPSE_ID(ch), FALSE)) && IS_CORPSE(corpse)) {
+	if ((corpse = find_obj(GET_LAST_CORPSE_ID(ch))) && IS_CORPSE(corpse)) {
 		while (corpse->contains) {
 			obj_to_char(corpse->contains, ch);
 		}

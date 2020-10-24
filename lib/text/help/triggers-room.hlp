@@ -189,6 +189,10 @@ When using field - The variable returns:
 &cin_vehicle&0 - The vehicle the room is inside of, if any.
 &cis_outdoors&0 - True if it's on the map, in an outdoor adventure, etc.
 &cmax_citizens&0 - If a building, the max number of citizens who can live here.
+&cmoon_phase(moon,*)&0 - Current phase of the moon (vnum or name). Optional 2nd
+   argument may be 'long' (or L) to give the longer version of the phase text.
+&cmoon_pos(moon)&0 - Current phase of the moon (vnum or name): down, overhead,
+   low in the east/west, high in the east/west
 &cname&0 - The name of the room.
 &cpainted&0 - The color the building is painted, if any.
 &cpeople&0 - The id of the first character in the room, or an empty return.
@@ -200,6 +204,7 @@ When using field - The variable returns:
 &csector_flagged(FLG)&0 - True if a given sector flag is present.
 &csector_vnum&0 - The sector vnum of the room.
 &ctemplate&0 - The room template vnum, if any.
+&ctime(field)&0 - Time at this room. Fields: hour, day, month, year, day_of_year.
 &ctitle&0 - The room's title (shown on 'look').
 &cvehicles&0 - The id of the first vehicle in the room, if any
    (then %veh.next_in_room%).

@@ -29,9 +29,6 @@
 *   Edit Modules
 */
 
-// external funcs
-void init_craft(craft_data *craft);
-
 // locals
 const char *default_craft_name = "unnamed recipe";
 
@@ -196,8 +193,6 @@ bool audit_craft(craft_data *craft, char_data *ch) {
 * @return craft_data* The new recipe's prototypes.
 */
 craft_data *create_craft_table_entry(craft_vnum vnum) {
-	void add_craft_to_table(craft_data *craft);
-	
 	craft_data *craft;
 	
 	// sanity
@@ -247,9 +242,6 @@ char *list_one_craft(craft_data *craft, bool detail) {
 * @param craft_vnum vnum The vnum to delete.
 */
 void olc_delete_craft(char_data *ch, craft_vnum vnum) {
-	void cancel_gen_craft(char_data *ch);
-	void remove_craft_from_table(craft_data *craft);
-	
 	struct progress_perk *perk, *next_perk;
 	progress_data *prg, *next_prg;
 	empire_data *emp, *next_emp;

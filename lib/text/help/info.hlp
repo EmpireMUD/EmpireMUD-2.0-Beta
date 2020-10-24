@@ -544,6 +544,23 @@ Examples:
 
 See also: CASTER DPS, DOT, HIT, MELEE DPS, METERS
 #
+DARK NIGHT DIM "DIMLY-LIT" "DIMLY LIT"
+
+When it gets dark outside, you won't be able to see as far on the map. Light a
+stick to make a torch to be able to see better at night. You'll also be able to
+see better under a full moon.
+
+Map tiles inside your light radius appear normally while the tiles just outside
+that radius are dimly-lit, as are tiles that are adjacent to well-lit tiles.
+
+Players using the ascii map will see fully dark tiles as blank, while dimly-lit
+tiles will be tinted dark blue.
+
+Screenreader users see fully dark tiles as 'Dark' while dimly-lit tiles show
+part of the tile name (e.g. Overgrown Forest becomes 'Dark Forest').
+
+See also: MOON, BY MOONLIGHT, NIGHTSIGHT
+#
 DEATH DYING
 
 When you die in EmpireMUD, you will lie on the ground for a short time, until
@@ -931,6 +948,13 @@ You must have Navigation to do this.
 
 See also: SCAN, LOOK, MAP
 #
+MOON MOONS
+
+You can look for the moon by typing 'look up' or 'weather' while outside. Your
+light radius at night is based on moonlight available.
+
+See also: DARK
+#
 MOVE MOVES "MOVE POINTS" "MOVEMENT POINTS"
 
 Move points are the basic energy pool for physical effort. It takes move points
@@ -1261,7 +1285,8 @@ on the map.
 
 You can get extra information if you have the 'political' or 'informative'
 toggles turned on. Scanning for 'foreign' tiles will show ones owned by empires
-other than your own.
+other than your own. However, dimly lit tiles won't appear on political or
+informative at night.
 
 Example:
  > scan southwest

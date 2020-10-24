@@ -30,9 +30,6 @@
 *   Edit Modules
 */
 
-// external funcs
-void init_building(bld_data *building);
-
 // locals
 const char *default_building_name = "Unnamed Building";
 const char *default_building_title = "An Unnamed Building";
@@ -224,8 +221,6 @@ int count_bld_relations(bld_data *bld, int type) {
 * @return bld_data *The new building's prototype.
 */
 bld_data *create_building_table_entry(bld_vnum vnum) {
-	void add_building_to_table(bld_data *bld);
-	
 	bld_data *bld;
 	
 	// sanity
@@ -350,9 +345,6 @@ char *list_one_building(bld_data *bld, bool detail) {
 * @param bld_vnum vnum The vnum to delete.
 */
 void olc_delete_building(char_data *ch, bld_vnum vnum) {
-	void check_for_bad_buildings();
-	void remove_building_from_table(bld_data *bld);
-	
 	struct obj_storage_type *store, *next_store;
 	bld_data *bld, *biter, *next_biter;
 	craft_data *craft, *next_craft;
@@ -1484,7 +1476,6 @@ OLC_MODULE(bedit_name) {
 
 
 OLC_MODULE(bedit_relations) {
-	void olc_process_relations(char_data *ch, char *argument, struct bld_relation **list);
 	bld_data *bld = GET_OLC_BUILDING(ch->desc);
 	olc_process_relations(ch, argument, &GET_BLD_RELATIONS(bld));
 }

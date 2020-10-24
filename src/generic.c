@@ -237,6 +237,10 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 		olc_audit_msg(ch, GEN_VNUM(gen), "No name set");
 		problem = TRUE;
 	}
+	if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+		olc_audit_msg(ch, GEN_VNUM(gen), "IN-DEVELOPMENT");
+		problem = TRUE;
+	}
 	
 	// GENERIC_x: auditing by type
 	switch (GEN_TYPE(gen)) {
@@ -321,6 +325,13 @@ bool audit_generic(generic_data *gen, char_data *ch) {
 		case GENERIC_AFFECT:
 		case GENERIC_COOLDOWN: {
 			// everything here is optional
+			break;
+		}
+		case GENERIC_MOON: {
+			if (GET_MOON_CYCLE(gen) < 1) {
+				olc_audit_msg(ch, GEN_VNUM(gen), "Moon cycle not set; moon can't be shown.");
+				problem = TRUE;
+			}
 			break;
 		}
 	}
@@ -1608,6 +1619,10 @@ void do_stat_generic(char_data *ch, generic_data *gen) {
 			size += snprintf(buf + size, sizeof(buf) - size, "Extended Relations:\r\n%s", GEN_COMPUTED_RELATIONS(gen) ? part : " none\r\n");
 			break;
 		}
+		case GENERIC_MOON: {
+			size += snprintf(buf + size, sizeof(buf) - size, "Cycle: \ty%.2f day%s\t0\r\n", GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE_DAYS(gen)));
+			break;
+		}
 	}
 
 	page_string(ch->desc, buf, TRUE);
@@ -1682,6 +1697,10 @@ void olc_show_generic(char_data *ch) {
 			sprintf(buf + strlen(buf), "<%srelations\t0>\r\n%s", OLC_LABEL_PTR(GEN_RELATIONS(gen)), lbuf);
 			break;
 		}
+		case GENERIC_MOON: {
+			sprintf(buf + strlen(buf), "<%scycle\t0> %.2f day%s\r\n", OLC_LABEL_VAL(GET_MOON_CYCLE(gen), 0), GET_MOON_CYCLE_DAYS(gen), PLURAL(GET_MOON_CYCLE_DAYS(gen)));
+			break;
+		}
 	}
 		
 	page_string(ch->desc, buf, TRUE);
@@ -1714,7 +1733,15 @@ int vnum_generic(char *searchname, char_data *ch) {
 
 OLC_MODULE(genedit_flags) {
 	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	bool had_in_dev = GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT) ? TRUE : FALSE;
+	
 	GEN_FLAGS(gen) = olc_process_flag(ch, argument, "generic", "flags", generic_flags, GEN_FLAGS(gen));
+	
+	// validate removal of GEN_IN_DEVELOPMENT
+	if (had_in_dev && !GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT) && GET_ACCESS_LEVEL(ch) < LVL_UNRESTRICTED_BUILDER && !OLC_FLAGGED(ch, OLC_FLAG_CLEAR_IN_DEV)) {
+		msg_to_char(ch, "You don't have permission to remove the IN-DEVELOPMENT flag.\r\n");
+		SET_BIT(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT);
+	}
 }
 
 
@@ -1762,6 +1789,15 @@ OLC_MODULE(genedit_type) {
 				}
 				break;
 			}
+		}
+		
+		if (generic_types_uses_in_dev[GEN_TYPE(gen)]) {
+			SET_BIT(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT);
+			msg_to_char(ch, "Added IN-DEVELOPMENT flag because you changed it to a %s.\r\n", generic_types[GEN_TYPE(gen)]);
+		}
+		else if (GEN_FLAGGED(gen, GEN_IN_DEVELOPMENT)) {
+			REMOVE_BIT(GEN_FLAGS(gen), GEN_IN_DEVELOPMENT);
+			msg_to_char(ch, "Removed IN-DEVELOPMENT flag because you changed it to a %s.\r\n", generic_types[GEN_TYPE(gen)]);
 		}
 	}
 }
@@ -2406,6 +2442,19 @@ OLC_MODULE(genedit_color) {
 	}
 	else {
 		olc_process_string(ch, argument, "color", &GEN_STRING(gen, GSTR_LIQUID_COLOR));
+	}
+}
+
+
+OLC_MODULE(genedit_cycle) {
+	generic_data *gen = GET_OLC_GENERIC(ch->desc);
+	double days;
+	
+	if (GEN_TYPE(gen) != GENERIC_MOON) {
+		msg_to_char(ch, "You can only change that on a MOON generic.\r\n");
+	}
+	else if ((days = olc_process_double(ch, argument, "days in the moon's cycle", "cycle", .01, 100000.00, 0.0)) > 0.0) {
+		 GEN_VALUE(gen, GVAL_MOON_CYCLE) = (int)(days * 100.0);
 	}
 }
 

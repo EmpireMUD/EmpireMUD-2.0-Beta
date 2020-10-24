@@ -39,11 +39,6 @@
 // local data
 const char *default_shop_name = "Unnamed Shop";
 
-// external funcs
-extern struct quest_giver *copy_quest_givers(struct quest_giver *from);
-void free_quest_givers(struct quest_giver *list);
-void get_quest_giver_display(struct quest_giver *list, char *save_buffer);
-
 // local funcs
 void add_shop_lookup(struct shop_lookup **list, shop_data *shop);
 bool remove_shop_lookup(struct shop_lookup **list, shop_data *shop);
@@ -113,17 +108,21 @@ bool find_shop_item_in_list(struct shop_item *list, any_vnum vnum) {
 * Determines if a shop is open right now.
 * 
 * @param shop_data *shop The shop to check.
+* @param room_data *room Location of the shop, to check time zone.
 * @return bool TRUE if the shop is open (based on its hours)
 */
-bool shop_is_open(shop_data *shop) {
+bool shop_is_open(shop_data *shop, room_data *room) {
+	struct time_info_data tinfo;
+	tinfo = get_local_time(room);
+	
 	if (SHOP_OPEN_TIME(shop) == SHOP_CLOSE_TIME(shop)) {
 		return TRUE;	// always
 	}
 	else if (SHOP_OPEN_TIME(shop) < SHOP_CLOSE_TIME(shop)) {
-		return (time_info.hours >= SHOP_OPEN_TIME(shop) && time_info.hours < SHOP_CLOSE_TIME(shop));
+		return (tinfo.hours >= SHOP_OPEN_TIME(shop) && tinfo.hours < SHOP_CLOSE_TIME(shop));
 	}
 	else if (SHOP_OPEN_TIME(shop) > SHOP_CLOSE_TIME(shop)) {
-		return (time_info.hours >= SHOP_OPEN_TIME(shop) || time_info.hours < SHOP_CLOSE_TIME(shop));
+		return (tinfo.hours >= SHOP_OPEN_TIME(shop) || tinfo.hours < SHOP_CLOSE_TIME(shop));
 	}
 	
 	return FALSE;	// unreachable?
@@ -343,7 +342,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 			continue;
 		}
 		LL_FOREACH(MOB_SHOP_LOOKUPS(mob), sl) {
-			if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_MOBILE, GET_MOB_VNUM(mob))) {
+			if (shop_is_open(sl->shop, IN_ROOM(ch)) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_MOBILE, GET_MOB_VNUM(mob))) {
 				add_temp_shop(&shop_list, sl->shop, mob, NULL, NULL, NULL);
 			}
 		}
@@ -355,7 +354,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 			continue;
 		}
 		LL_FOREACH(GET_OBJ_SHOP_LOOKUPS(obj), sl) {
-			if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
+			if (shop_is_open(sl->shop, IN_ROOM(ch)) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
 				add_temp_shop(&shop_list, sl->shop, NULL, obj, NULL, NULL);
 			}
 		}
@@ -367,7 +366,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 			continue;
 		}
 		LL_FOREACH(GET_OBJ_SHOP_LOOKUPS(obj), sl) {
-			if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
+			if (shop_is_open(sl->shop, IN_ROOM(ch)) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_OBJECT, GET_OBJ_VNUM(obj))) {
 				add_temp_shop(&shop_list, sl->shop, NULL, obj, NULL, NULL);
 			}
 		}
@@ -379,18 +378,18 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 			continue;
 		}
 		LL_FOREACH(VEH_SHOP_LOOKUPS(veh), sl) {
-			if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_VEHICLE, VEH_VNUM(veh))) {
+			if (shop_is_open(sl->shop, IN_ROOM(ch)) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_VEHICLE, VEH_VNUM(veh))) {
 				add_temp_shop(&shop_list, sl->shop, NULL, NULL, NULL, veh);
 			}
 		}
 	}
 	
 	// rooms
-	if (CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch))) {
+	if (can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 		// search room: building
 		if (GET_BUILDING(IN_ROOM(ch))) {
 			LL_FOREACH(GET_BLD_SHOP_LOOKUPS(GET_BUILDING(IN_ROOM(ch))), sl) {
-				if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_BUILDING, GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))))) {
+				if (shop_is_open(sl->shop, IN_ROOM(ch)) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_BUILDING, GET_BLD_VNUM(GET_BUILDING(IN_ROOM(ch))))) {
 					add_temp_shop(&shop_list, sl->shop, NULL, NULL, IN_ROOM(ch), NULL);
 				}
 			}
@@ -399,7 +398,7 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 		// search room: template
 		if (GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
 			LL_FOREACH(GET_RMT_SHOP_LOOKUPS(GET_ROOM_TEMPLATE(IN_ROOM(ch))), sl) {
-				if (shop_is_open(sl->shop) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))))) {
+				if (shop_is_open(sl->shop, IN_ROOM(ch)) && find_quest_giver_in_list(SHOP_LOCATIONS(sl->shop), QG_ROOM_TEMPLATE, GET_RMT_VNUM(GET_ROOM_TEMPLATE(IN_ROOM(ch))))) {
 					add_temp_shop(&shop_list, sl->shop, NULL, NULL, IN_ROOM(ch), NULL);
 				}
 			}
@@ -724,8 +723,6 @@ void free_shop(shop_data *shop) {
 * @param any_vnum vnum The shop vnum
 */
 void parse_shop(FILE *fl, any_vnum vnum) {
-	void parse_quest_giver(FILE *fl, struct quest_giver **list, char *error_str);
-	
 	char line[256], error[256], str_in[256];
 	struct shop_item *item;
 	shop_data *shop, *find;
@@ -842,8 +839,6 @@ void write_shop_index(FILE *fl) {
 * @param shop_data *shop The thing to save.
 */
 void write_shop_to_file(FILE *fl, shop_data *shop) {
-	void write_quest_givers_to_file(FILE *fl, char letter, struct quest_giver *list);
-	
 	struct shop_item *item;
 	char temp[256];
 	
@@ -1489,8 +1484,6 @@ OLC_MODULE(shopedit_items) {
 
 
 OLC_MODULE(shopedit_locations) {
-	void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_giver **list, char *command);
-	
 	shop_data *shop = GET_OLC_SHOP(ch->desc);
 	qedit_process_quest_givers(ch, argument, &SHOP_LOCATIONS(shop), "locations");
 }

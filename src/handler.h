@@ -147,6 +147,7 @@ void add_companion_var(char_data *mob, char *name, char *value, int id);
 struct companion_mod *get_companion_mod_by_type(struct companion_data *cd, int type);
 struct companion_data *has_companion(char_data *ch, any_vnum vnum);
 void remove_companion(char_data *ch, any_vnum vnum);
+void remove_companion_mod(struct companion_data **companion, int type);
 void remove_companion_var(char_data *mob, char *name, int context);
 void reread_companion_trigs(char_data *mob);
 
@@ -349,6 +350,7 @@ bool delete_requirement_from_list(struct req_data **list, int type, any_vnum vnu
 void extract_required_items(char_data *ch, struct req_data *list);
 bool find_requirement_in_list(struct req_data *list, int type, any_vnum vnum);
 void free_requirements(struct req_data *list);
+bool meets_requirements(char_data *ch, struct req_data *list, struct instance_data *instance);
 char *requirement_string(struct req_data *task, bool show_vnums);
 
 // resource handlers
@@ -434,6 +436,7 @@ struct empire_unique_storage *find_eus_entry(obj_data *obj, struct empire_unique
 void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, obj_data *obj, empire_data *save_emp, room_data *room, bool *full);
 
 // vehicle handlers
+void extract_pending_vehicles();
 void extract_vehicle(vehicle_data *veh);
 void sit_on_vehicle(char_data *ch, vehicle_data *veh);
 void unseat_char_from_vehicle(char_data *ch);

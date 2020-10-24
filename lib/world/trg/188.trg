@@ -696,7 +696,7 @@ else
   %force% %target% mmove
   eval times %self.val0% + 1
   if %times% == 5
-    %send% %actor% You have scared enough citizens... but you can keep going if you want to.
+    %send% %actor% You have scared enough citizens, but you can keep pretending to be Dracula if you want to.
     %quest% %actor% trigger 18827
     %quest% %actor% finish 18827
   else
@@ -1303,7 +1303,8 @@ end
 apple bobbing bob~
 1 c 4
 bob~
-if %actor.obj_target(%arg%).vnum% != 18857
+set otarg %actor.obj_target(%arg%)%
+if !%otarg% || %otarg.vnum% != 18857
   %send% %actor% You can only bob in the @%self%.
   return 1
   halt
@@ -2281,7 +2282,8 @@ Great Pumpkin wrong-month despawn~
 0 n 100
 ~
 * Despawns if it's not October in-game
-if %time.month% != 10
+set room %self.room%
+if %room.time(month)% != 10
   %echo% ~%self% returns to the Pumpkinverse.
   %purge% %self%
 end

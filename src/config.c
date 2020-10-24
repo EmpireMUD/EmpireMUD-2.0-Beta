@@ -1860,6 +1860,7 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "lastname_mode", CONFTYPE_BITVECTOR, "how players choose their lastname, if at all");
 		init_config_custom("lastname_mode", config_show_bitvector, config_edit_bitvector, lastname_modes);
 	init_config(CONFIG_PLAYERS, "pool_bonus_amount", CONFTYPE_INT, "bonus trait amount for health/move/mana, multiplied by (level/25)");
+	init_config(CONFIG_PLAYERS, "max_light_radius_base", CONFTYPE_INT, "maximum tiles away you can see unskilled in the dark based on the moon(s)");
 	init_config(CONFIG_PLAYERS, "num_daily_skill_points", CONFTYPE_INT, "easy skillups per day");
 	init_config(CONFIG_PLAYERS, "num_bonus_trait_daily_skills", CONFTYPE_INT, "bonus trait for skillups");
 	init_config(CONFIG_PLAYERS, "idle_rent_time", CONFTYPE_INT, "how many ticks before a player is idle-rented");
@@ -1938,6 +1939,7 @@ void init_config_system(void) {
 	init_config(CONFIG_WORLD, "interlink_river_limit", CONFTYPE_INT, "how many intervening tiles may be river");
 	init_config(CONFIG_WORLD, "interlink_mountain_limit", CONFTYPE_INT, "how many intervening tiles may be mountain");
 	init_config(CONFIG_WORLD, "newbie_adventure_cap", CONFTYPE_INT, "highest adventure min-level that can spawn on newbie islands");
+	init_config(CONFIG_WORLD, "use_local_time", CONFTYPE_BOOL, "each part of the world gets its own time zone instead of one global time");
 	init_config(CONFIG_WORLD, "vehicle_max_per_tile", CONFTYPE_INT, "maximum number of zero-size vehicles per tile");
 	init_config(CONFIG_WORLD, "vehicle_size_per_tile", CONFTYPE_INT, "maximum total vehicle size on any map tile");
 	

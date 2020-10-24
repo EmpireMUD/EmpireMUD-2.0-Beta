@@ -256,7 +256,7 @@ void set_crop_type(room_data *room, crop_data *cp);
 
 // various externs
 extern int Global_ignore_dark;
-extern struct time_info_data time_info;
+extern struct time_info_data main_time_info;
 extern byte y_coord_to_season[MAP_HEIGHT];
 
 
@@ -333,10 +333,14 @@ void free_book(book_data *book);
 // buildings
 extern bld_data *building_table;
 
+void add_building_to_table(bld_data *bld);
 void adjust_building_tech(empire_data *emp, room_data *room, bool add);
 bld_data *building_proto(bld_vnum vnum);
+void check_for_bad_buildings();
 void free_bld_relations(struct bld_relation *list);
 void free_building(bld_data *building);
+void init_building(bld_data *building);
+void remove_building_from_table(bld_data *bld);
 int sort_buildings(bld_data *a, bld_data *b);
 
 // cities
@@ -357,16 +361,22 @@ void free_class(class_data *cls);
 extern craft_data *craft_table;
 extern craft_data *sorted_crafts;
 
+void add_craft_to_table(craft_data *craft);
 extern craft_data *craft_proto(craft_vnum vnum);
+void init_craft(craft_data *craft);
 void free_craft(craft_data *craft);
+void remove_craft_from_table(craft_data *craft);
 int sort_crafts_by_data(craft_data *a, craft_data *b);
 int sort_crafts_by_vnum(craft_data *a, craft_data *b);
 
 // crops
 extern crop_data *crop_table;
 
+void add_crop_to_table(crop_data *crop);
 crop_data *crop_proto(crop_vnum vnum);
 void free_crop(crop_data *cp);
+void init_crop(crop_data *cp);
+void remove_crop_from_table(crop_data *crop);
 void schedule_crop_growth(struct map_data *map);
 int sort_crops(crop_data *a, crop_data *b);
 void uncrop_tile(room_data *room);
@@ -433,6 +443,7 @@ void remove_offense(empire_data *emp, struct offense_data *off);
 void remove_recent_offenses(empire_data *emp, int type, char_data *offender);
 
 // empire misc
+void ewt_free_tracker(struct empire_workforce_tracker **tracker);
 void record_theft_log(empire_data *emp, obj_vnum vnum, int amount);
 char_data *spawn_empire_npc_to_room(empire_data *emp, struct empire_npc_data *npc, room_data *room, mob_vnum override_mob);
 
@@ -511,6 +522,7 @@ struct instance_data *get_instance_by_id(any_vnum instance_id);
 
 // interactions
 void free_interactions(struct interaction_item **list);
+void free_interaction_restrictions(struct interact_restriction **list);
 void parse_interaction(char *line, struct interaction_item **list, char *error_part);
 void write_interactions_to_file(FILE *fl, struct interaction_item *list);
 
@@ -612,6 +624,7 @@ void free_player_event_data(struct player_event_data *hash);
 int get_highest_access_level(account_data *acct);
 char_data *is_at_menu(int id);
 char_data *is_playing(int id);
+bool member_is_timed_out_index(player_index_data *index);
 struct mail_data *parse_mail(FILE *fl, char *first_line);
 void save_all_players(bool delay);
 void start_new_character(char_data *ch);
@@ -647,13 +660,20 @@ progress_data *real_progress(any_vnum vnum);
 
 // quests
 extern struct quest_data *quest_table;
-extern quest_data *quest_proto(any_vnum vnum);
+
+struct quest_giver *copy_quest_givers(struct quest_giver *from);
 void free_player_quests(struct player_quest *list);
 void free_quest(quest_data *quest);
+void free_quest_givers(struct quest_giver *list);
 void free_quest_temp_list(struct quest_temp_list *list);
+void parse_quest_giver(FILE *fl, struct quest_giver **list, char *error_str);
+quest_data *quest_proto(any_vnum vnum);
+void write_quest_givers_to_file(FILE *fl, char letter, struct quest_giver *list);
 
 // requirements
 void parse_requirement(FILE *fl, struct req_data **list, char *error_str);
+int sort_requirements_by_group(struct req_data *a, struct req_data *b);
+void write_requirements_to_file(FILE *fl, char letter, struct req_data *list);
 
 // resources
 struct resource_data *copy_resource_list(struct resource_data *input);
@@ -670,6 +690,7 @@ void init_room_template(room_template *rmt);
 void remove_room_template_from_table(room_template *rmt);
 room_template *room_template_proto(rmt_vnum vnum);
 int sort_room_templates(room_template *a, room_template *b);
+bool valid_room_template_vnum(rmt_vnum vnum);
 
 // sectors
 extern sector_data *sector_table;
@@ -710,6 +731,9 @@ void free_social(social_data *soc);
 // starting locations / start locs
 extern int highest_start_loc_index;
 extern room_vnum *start_locs;
+
+// statistics
+extern double empire_score_average[NUM_SCORES];
 
 // stored event libs
 void add_stored_event(struct stored_event **list, int type, struct dg_event *event);
@@ -811,6 +835,8 @@ void write_room_to_file(FILE *fl, room_data *room);
 void write_shared_room_data(FILE *fl, struct shared_room_data *dat);
 
 // misc
+extern time_t boot_time;
+extern struct char_delayed_update *char_delayed_update_list;
 extern struct generic_name_data *generic_names;
 extern char **tips_of_the_day;
 extern int tips_of_the_day_size;

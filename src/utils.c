@@ -51,14 +51,11 @@
 *   Converter Utils
 */
 
-// external funcs
-void remove_companion_mod(struct companion_data **companion, int type);
-
-// locals
-#define WHITESPACE " \t"	// used by some of the string functions
-bool emp_can_use_room(empire_data *emp, room_data *room, int mode);
+// local prototypes
 void score_empires();
 void unmark_items_for_char(char_data *ch, bool ground);
+
+#define WHITESPACE " \t"	// used by some of the string functions
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -195,8 +192,6 @@ int count_bits(bitvector_t bitset) {
 
 /* simulates dice roll */
 int dice(int number, int size) {
-	unsigned long empire_random();
-
 	int sum = 0;
 
 	if (size <= 0 || number <= 0)
@@ -289,8 +284,6 @@ int num_earned_bonus_traits(char_data *ch) {
 
 /* creates a random number in interval [from;to] */
 int number(int from, int to) {
-	unsigned long empire_random();
-
 	// shortcut -paul 12/9/2014
 	if (from == to) {
 		return from;
@@ -408,10 +401,6 @@ void clear_delayed_empire_refresh(empire_data *only_emp, bitvector_t refresh_fla
 * Checks players and empires for delayed-refresh commands.
 */
 void run_delayed_refresh(void) {
-	void complete_goal(empire_data *emp, struct empire_goal *goal);
-	extern int count_empire_crop_variety(empire_data *emp, int max_needed, int only_island);
-	extern struct char_delayed_update *char_delayed_update_list;
-	
 	struct char_delayed_update *cdu, *next_cdu;
 	
 	// player portion
@@ -590,8 +579,6 @@ static inline void add_scemp(struct scemp_type **list, int value) {
 * empire list.
 */
 void score_empires(void) {
-	extern double empire_score_average[NUM_SCORES];
-	
 	struct scemp_type *scemp, *next_scemp, *lists[NUM_SCORES];
 	int iter, pos, median, num_emps = 0;
 	struct empire_storage_data *store, *next_store;
@@ -2710,6 +2697,9 @@ int get_attribute_by_apply(char_data *ch, int apply_type) {
 		case APPLY_BLOOD_UPKEEP: {
 			return GET_BLOOD_UPKEEP(ch);
 		}
+		case APPLY_NIGHT_VISION: {
+			return GET_EXTRA_ATT(ch, ATT_NIGHT_VISION);
+		}
 	}
 	return 0;	// if we got this far
 }
@@ -2860,6 +2850,44 @@ double rate_item(obj_data *obj) {
 
  //////////////////////////////////////////////////////////////////////////////
 //// PLAYER UTILS ////////////////////////////////////////////////////////////
+
+/**
+* Determines if a character can see in a dark room. This replaces a shirt-load
+* of macros that were increasingly hard to read.
+*
+* @param char_data *ch The character.
+* @param room_data *room The room they're trying to see in (which may be light).
+* @param bool count_adjacent_light If TRUE, light cascades from adjacent tiles.
+* @return bool TRUE if the character can see in dark here (or the room is light); FALSE if the character cannot see due to darkness.
+*/
+bool can_see_in_dark_room(char_data *ch, room_data *room, bool count_adjacent_light) {
+	// magic darkness overrides everything
+	if (MAGIC_DARKNESS(room) && !CAN_SEE_IN_MAGIC_DARKNESS(ch)) {
+		return FALSE;	// magic dark
+	}
+	
+	// see-in-dark abilities
+	if (HAS_INFRA(ch) || (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_HOLYLIGHT))) {
+		return TRUE;	// can see
+	}
+	
+	// check if the room is actually light
+	if (room_is_light(room, count_adjacent_light)) {
+		return TRUE;
+	}
+	
+	// reasons the character can see
+	if (room == IN_ROOM(ch) && (has_player_tech((ch), PTECH_SEE_CHARS_IN_DARK) || has_player_tech((ch), PTECH_SEE_OBJS_IN_DARK))) {
+		return TRUE;	// can see in own room due to see-*-in-dark
+	}
+	if (room == IN_ROOM(ch) && IS_OUTDOORS(ch) && has_player_tech((ch), PTECH_SEE_IN_DARK_OUTDOORS)) {
+		return TRUE;	// can see in own room outdoors
+	}
+	
+	// all other cases:
+	return FALSE;
+}
+
 
 /**
 * Gives a character the appropriate amount of command lag (wait time).
@@ -5295,7 +5323,7 @@ sector_data *get_sect_by_name(char *name) {
 */
 bool check_sunny(room_data *room) {
 	bool sun_sect = !ROOM_IS_CLOSED(room) || (IS_ADVENTURE_ROOM(room) && RMT_FLAGGED(room, RMT_OUTDOOR));
-	return (sun_sect && weather_info.sunlight != SUN_DARK && !ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK));
+	return (sun_sect && get_sun_status(room) != SUN_DARK && !ROOM_AFF_FLAGGED(room, ROOM_AFF_DARK));
 }
 
 
@@ -5532,8 +5560,6 @@ room_data *get_map_location_for(room_data *room) {
 * @return room_data* The location of a place to start.
 */
 room_data *find_load_room(char_data *ch) {
-	extern room_data *find_starting_location();
-	
 	struct empire_territory_data *ter, *next_ter;
 	room_data *rl, *rl_last_room, *found, *map;
 	int num_found = 0;
@@ -5963,6 +5989,47 @@ void relocate_players(room_data *room, room_data *to_room) {
 
 
 /**
+* Determines if any room is light. This replaces the IS_LIGHT/IS_REAL_LIGHT
+* macro family.
+*
+* @param room_data *room The room to check (which may be light).
+* @param bool count_adjacent_light If TRUE, light cascades from adjacent tiles.
+* @return bool TRUE if the room is light, FALSE if not.
+*/
+bool room_is_light(room_data *room, bool count_adjacent_light) {
+	vehicle_data *veh;
+	
+	if (MAGIC_DARKNESS(room)) {
+		return FALSE;	// always dark
+	}
+	
+	// things that make the room light
+	if (IS_ANY_BUILDING(room) && (ROOM_OWNER(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE))) {
+		return TRUE;	// not dark: claimed (or unclaimable) building
+	}
+	if (!RMT_FLAGGED(room, RMT_DARK) && get_sun_status(room) != SUN_DARK) {
+		return TRUE;	// not dark: it isn't dark outside
+	}
+	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS) && get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, NULL) != TER_FRONTIER) {
+		return TRUE;	// not dark: city lights
+	}
+	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT) || (count_adjacent_light && adjacent_room_is_light(room))) {
+		return TRUE;	// not dark: has a light source
+	}
+	
+	// check for lighted vehicle-type buildings
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_OWNER(veh) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) && VEH_IS_COMPLETE(veh)) {
+			return TRUE;
+		}
+	}
+	
+	// otherwise: it's dark
+	return FALSE;
+}
+
+
+/**
 * This approximates a straight line on the map, where "iter" is how far
 * along the line.
 *
@@ -6028,7 +6095,7 @@ room_data *straight_line(room_data *origin, room_data *destination, int iter) {
 * @return int The x-coordinate, or -1 if none.
 */
 int X_COORD(room_data *room) {
-	if (GET_MAP_LOC(room)) {
+	if (room && GET_MAP_LOC(room)) {
 		return MAP_X_COORD(GET_MAP_LOC(room)->vnum);
 	}
 	else {
@@ -6045,7 +6112,7 @@ int X_COORD(room_data *room) {
 * @return int The y-coordinate, or -1 if none.
 */
 int Y_COORD(room_data *room) {
-	if (GET_MAP_LOC(room)) {
+	if (room && GET_MAP_LOC(room)) {
 		return MAP_Y_COORD(GET_MAP_LOC(room)->vnum);
 	}
 	else {

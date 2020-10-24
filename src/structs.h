@@ -34,6 +34,7 @@
 *     Game Defines
 *     Generic Defines
 *     Mobile Defines
+*     Moon Defines
 *     Object Defines
 *     Player Defines
 *     Progress Defines
@@ -120,9 +121,16 @@
 #define Y_MIN_LATITUDE  -67	// 0 is the equator, -66.56 is the anarctic circle
 #define Y_MAX_LATITUDE  67	// 66.56 is the arctic circle, 90 is the north pole
 
+// -180 to 180 covers a full globe
+#define X_MIN_LONGITUDE  -180	// min must always be the lower number
+#define X_MAX_LONGITUDE  180
+
 // these can safely be floating points
 #define ARCTIC_LATITUDE  66.56	// based on the real world
 #define TROPIC_LATITUDE  23.43	// based on the real world
+
+// converts an X-coordinate to equivalent longitude based on X_MIN_LONGITUDE/X_MAX_LONGITUDE
+#define X_TO_LONGITUDE(x_coord)  ((((double)x_coord) / MAP_WIDTH) * (X_MAX_LONGITUDE - X_MIN_LONGITUDE) + X_MIN_LONGITUDE)
 
 // converts a Y-coordinate to the equivalent latitude, based on Y_MIN_LATITUDE/Y_MAX_LATITUDE
 #define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * ABSOLUTE(Y_MAX_LATITUDE - Y_MIN_LATITUDE)) + Y_MIN_LATITUDE)
@@ -310,6 +318,7 @@ typedef struct vehicle_data vehicle_data;
 #define APPLY_RESIST_MAGICAL  24	// Apply to magic damage resistance
 #define APPLY_CRAFTING  25	// bonus craft levels
 #define APPLY_BLOOD_UPKEEP  26	// vampire blood requirement
+#define APPLY_NIGHT_VISION  27	// bonus to nighttime light radius
 
 
 // AUTOMSG_x: automessage types
@@ -931,7 +940,8 @@ typedef struct vehicle_data vehicle_data;
 #define ATT_CRAFTING_BONUS  11	// levels added to crafting
 #define ATT_BLOOD_UPKEEP  12	// blood cost per hour
 #define ATT_AGE_MODIFIER  13	// +/- age
-#define NUM_EXTRA_ATTRIBUTES  14
+#define ATT_NIGHT_VISION  14	// bonus light radius at night
+#define NUM_EXTRA_ATTRIBUTES  15
 
 
 // AFF_x: Affect bits
@@ -1506,10 +1516,12 @@ typedef struct vehicle_data vehicle_data;
 #define GENERIC_AFFECT  4	// for affects (ATYPE_*)
 #define GENERIC_CURRENCY  5	// tokens, for shops
 #define GENERIC_COMPONENT  6	// types of generic objects
+#define GENERIC_MOON  7	// moon in the sky
 
 
 // GEN_x: generic flags
 #define GEN_BASIC  BIT(0)	// a. indicates it's basic (varies by type)
+#define GEN_IN_DEVELOPMENT  BIT(1)	// b. disables SOME types -- see generic_types_uses_in_dev[]
 
 
 // how many strings a generic stores (can be safely raised with no updates)
@@ -1616,6 +1628,37 @@ typedef struct vehicle_data vehicle_data;
 #define NAMES_NORTHERN  3
 #define NAMES_PRIMITIVE_SHORT  4
 #define NAMES_DESCRIPTIVE  5
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MOON DEFINES ////////////////////////////////////////////////////////////
+
+// PHASE_x: moon phases
+typedef enum {
+	PHASE_NEW,
+	PHASE_WAXING_CRESCENT,
+	PHASE_FIRST_QUARTER,
+	PHASE_WAXING_GIBBOUS,
+	PHASE_FULL,
+	PHASE_WANING_GIBBOUS,
+	PHASE_THIRD_QUARTER,
+	PHASE_WANING_CRESCENT,
+	
+	NUM_PHASES	// this goes last
+} moon_phase_t;
+
+
+// MOON_POS_x: moon position in the sky
+typedef enum {
+	MOON_POS_DOWN,	// not visible
+	MOON_POS_RISING,	// low in the east
+	MOON_POS_EAST,	// high in the east
+	MOON_POS_HIGH,	// overhead
+	MOON_POS_WEST,	// high in the west
+	MOON_POS_SETTING,	// low in the west
+	
+	NUM_MOON_POS	// this goes last
+} moon_pos_t;
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2525,7 +2568,7 @@ typedef struct vehicle_data vehicle_data;
 #define SKY_LIGHTNING  3
 
 
-// Sun state for weather_data
+// Sun state for get_sun_status()
 #define SUN_DARK  0
 #define SUN_RISE  1
 #define SUN_LIGHT  2
@@ -3026,7 +3069,7 @@ struct index_data {
 	int number;	// number of existing units of this mob/obj
 
 	char *farg;	// string argument for special function
-	struct trig_data *proto;	// for triggers... the trigger
+	trig_data *proto;	// for triggers... the trigger
 };
 
 
@@ -4019,7 +4062,7 @@ struct descriptor_data {
 	shop_data *olc_shop;	// shop being edited
 	social_data *olc_social;	// social being edited
 	skill_data *olc_skill;	// skill being edited
-	struct trig_data *olc_trigger;	// trigger being edited
+	trig_data *olc_trigger;	// trigger being edited
 	vehicle_data *olc_vehicle;	// vehicle being edited
 	
 	// linked list
@@ -4291,6 +4334,7 @@ struct player_special_data {
 	int group_invite_by;	// idnum of the last player to invite this one
 	time_t move_time[TRACK_MOVE_TIMES];	// timestamp of last X moves
 	int beckoned_by;	// idnum of player who beckoned (for follow)
+	int last_look_sun;	// used to determine if the player needs to 'look' at sunrise/set
 	
 	struct combat_meters meters;	// combat meter data
 	
@@ -5759,7 +5803,7 @@ struct weather_data {
 	int pressure;	// How is the pressure ( Mb )
 	int change;	// How fast and what way does it change
 	int sky;	// How is the sky
-	int sunlight;	// And how much sun
+	// formerly sunlight -- now use get_sun_status(room)
 };
 
 

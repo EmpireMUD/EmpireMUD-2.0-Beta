@@ -304,7 +304,7 @@ int sort_chart_hash(struct chart_territory *a, struct chart_territory *b) {
 */
 void look_at_target(char_data *ch, char *arg, char *more_args) {
 	char targ_arg[MAX_INPUT_LENGTH];
-	int bits, found = FALSE, j, fnum, i = 0;
+	int bits, found = FALSE, j, fnum;
 	char_data *found_char = NULL;
 	obj_data *obj, *found_obj = NULL;
 	vehicle_data *veh, *found_veh = NULL;
@@ -357,7 +357,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	if (!found) {
 		DL_FOREACH2(ch->carrying, obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj)) {
-				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
+				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && --fnum == 0) {
 					send_to_char(desc, ch);
 					act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
 					found = TRUE;
@@ -370,7 +370,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	/* Does the argument match an extra desc in the char's equipment? */
 	for (j = 0; j < NUM_WEARS && !found; j++)
 		if (GET_EQ(ch, j) && CAN_SEE_OBJ(ch, GET_EQ(ch, j)))
-			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(GET_EQ(ch, j)))) != NULL && ++i == fnum) {
+			if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(GET_EQ(ch, j)))) != NULL && --fnum == 0) {
 				send_to_char(desc, ch);
 				act("$n looks at $p.", TRUE, ch, GET_EQ(ch, j), NULL, TO_ROOM);
 				found = TRUE;
@@ -380,7 +380,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	if (!found) {
 		DL_FOREACH2(ROOM_CONTENTS(IN_ROOM(ch)), obj, next_content) {
 			if (CAN_SEE_OBJ(ch, obj)) {
-				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && ++i == fnum) {
+				if ((desc = find_exdesc(arg, GET_OBJ_EX_DESCS(obj))) != NULL && --fnum == 0) {
 					send_to_char(desc, ch);
 					act("$n looks at $p.", TRUE, ch, obj, NULL, TO_ROOM);
 					found = TRUE;
@@ -393,7 +393,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	// does it match an extra desc of a vehicle here?
 	if (!found && ROOM_VEHICLES(IN_ROOM(ch))) {
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (!VEH_IS_EXTRACTED(veh) && CAN_SEE_VEHICLE(ch, veh) && (desc = find_exdesc(arg, VEH_EX_DESCS(veh))) != NULL && ++i == fnum) {
+			if (!VEH_IS_EXTRACTED(veh) && CAN_SEE_VEHICLE(ch, veh) && (desc = find_exdesc(arg, VEH_EX_DESCS(veh))) != NULL && --fnum == 0) {
 				send_to_char(desc, ch);
 				act("$n looks at $V.", TRUE, ch, NULL, veh, TO_ROOM);
 				found = TRUE;
@@ -404,7 +404,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 
 	// does it match an extra desc of the room template?
 	if (!found && GET_ROOM_TEMPLATE(IN_ROOM(ch))) {
-		if ((desc = find_exdesc(arg, GET_RMT_EX_DESCS(GET_ROOM_TEMPLATE(IN_ROOM(ch))))) != NULL && ++i == fnum) {
+		if ((desc = find_exdesc(arg, GET_RMT_EX_DESCS(GET_ROOM_TEMPLATE(IN_ROOM(ch))))) != NULL && --fnum == 0) {
 			send_to_char(desc, ch);
 			found = TRUE;
 		}
@@ -412,10 +412,15 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 
 	// does it match an extra desc of the building?
 	if (!found && GET_BUILDING(IN_ROOM(ch))) {
-		if ((desc = find_exdesc(arg, GET_BLD_EX_DESCS(GET_BUILDING(IN_ROOM(ch))))) != NULL && ++i == fnum) {
+		if ((desc = find_exdesc(arg, GET_BLD_EX_DESCS(GET_BUILDING(IN_ROOM(ch))))) != NULL && --fnum == 0) {
 			send_to_char(desc, ch);
 			found = TRUE;
 		}
+	}
+	
+	// try moons
+	if (!found) {
+		found = look_at_moon(ch, arg, &fnum);
 	}
 	
 	/* If an object was found back in generic_find */
@@ -774,7 +779,7 @@ void list_char_to_char(char_data *list, char_data *ch) {
 			if (CAN_SEE(ch, i)) {
 				list_one_char(i, ch, c);
 			}
-			else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch)) && HAS_INFRA(i) && !MAGIC_DARKNESS(IN_ROOM(ch))) {
+			else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE) && HAS_INFRA(i) && !MAGIC_DARKNESS(IN_ROOM(ch))) {
 				if (c > 1) {
 					msg_to_char(ch, "(%2d) ", c);
 				}
@@ -2832,7 +2837,7 @@ ACMD(do_look) {
 		send_to_char("You can't see a damned thing, you're blind!\r\n", ch);
 	
 	/* prior to b5.31, this block gave an abbreviated version of look_at_room, which isn't necessary
-	else if (!CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(ch)) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
+	else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE) && ROOM_IS_CLOSED(IN_ROOM(ch))) {
 		send_to_char("It is pitch black...\r\n", ch);
 		list_char_to_char(ROOM_PEOPLE(IN_ROOM(ch)), ch);	// glowing red eyes
 	}
@@ -3547,47 +3552,55 @@ ACMD(do_survey) {
 
 
 ACMD(do_time) {
+	struct time_info_data tinfo;
 	const char *suf;
 	int weekday, day;
 	
+	tinfo = get_local_time(IN_ROOM(ch));
+	
 	if (has_player_tech(ch, PTECH_CLOCK)) {
-		sprintf(buf, "It is %d o'clock %s", ((time_info.hours % 12 == 0) ? 12 : ((time_info.hours) % 12)), ((time_info.hours >= 12) ? "pm" : "am"));
+		sprintf(buf, "It is %d o'clock %s", ((tinfo.hours % 12 == 0) ? 12 : ((tinfo.hours) % 12)), ((tinfo.hours >= 12) ? "pm" : "am"));
 		
 		if (has_player_tech(ch, PTECH_CALENDAR)) {
 			strcat(buf, ", on ");
 			
 			/* 30 days in a month */
-			weekday = ((30 * time_info.month) + time_info.day + 1) % 7;
+			weekday = ((30 * tinfo.month) + tinfo.day + 1) % 7;
 			strcat(buf, weekdays[weekday]);
 		}
+		
+		if (IS_IMMORTAL(ch)) {
+			sprintf(buf + strlen(buf), " (%d%s global time)", ((main_time_info.hours % 12 == 0) ? 12 : ((main_time_info.hours) % 12)), ((main_time_info.hours >= 12) ? "pm" : "am"));
+		}
+		
 		strcat(buf, ".\r\n");
 		send_to_char(buf, ch);
 	
 		gain_player_tech_exp(ch, PTECH_CLOCK, 1);
 	}
 	else {
-		if (time_info.hours < 6 || time_info.hours > 19) {
+		if (tinfo.hours < 6 || tinfo.hours > 19) {
 			msg_to_char(ch, "It is nighttime.\r\n");
 		}
-		else if (time_info.hours == 6) {
+		else if (tinfo.hours == 6) {
 			msg_to_char(ch, "It is almost dawn.\r\n");
 		}
-		else if (time_info.hours == 19) {
+		else if (tinfo.hours == 19) {
 			msg_to_char(ch, "It is sunset.\r\n");
 		}
-		else if (time_info.hours == 12) {
+		else if (tinfo.hours == 12) {
 			msg_to_char(ch, "It is nighttime.\r\n");
 		}
-		else if (time_info.hours < 12) {
-			msg_to_char(ch, "It is %smorning.\r\n", time_info.hours <= 8 ? "early " : "");
+		else if (tinfo.hours < 12) {
+			msg_to_char(ch, "It is %smorning.\r\n", tinfo.hours <= 8 ? "early " : "");
 		}
 		else {	// afternoon is all that's left
-			msg_to_char(ch, "It is %safternoon.\r\n", time_info.hours >= 17 ? "late " : "");
+			msg_to_char(ch, "It is %safternoon.\r\n", tinfo.hours >= 17 ? "late " : "");
 		}
 	}
 
 	if (has_player_tech(ch, PTECH_CALENDAR)) {
-		day = time_info.day + 1;	/* day in [1..30] */
+		day = tinfo.day + 1;	/* day in [1..30] */
 
 		/* 11, 12, and 13 are the infernal exceptions to the rule */
 		if ((day % 10) == 1 && day != 11)
@@ -3599,7 +3612,7 @@ ACMD(do_time) {
 		else
 			suf = "th";
 
-		msg_to_char(ch, "The %d%s day of the month of %s, year %d.\r\n", day, suf, month_name[(int) time_info.month], time_info.year);
+		msg_to_char(ch, "The %d%s day of the month of %s, year %d.\r\n", day, suf, month_name[(int) tinfo.month], tinfo.year);
 		
 		gain_player_tech_exp(ch, PTECH_CALENDAR, 1);
 	}
@@ -3628,9 +3641,7 @@ ACMD(do_weather) {
 	}
 	else if (IS_OUTDOORS(ch)) {
 		msg_to_char(ch, "The sky is %s and %s.\r\n", sky_look[weather_info.sky], (weather_info.change >= 0 ? "you feel a warm wind from the south" : "your foot tells you bad weather is due"));
-		if (weather_info.sunlight == SUN_SET || weather_info.sunlight == SUN_DARK) {
-			list_moons_to_char(ch);
-		}
+		show_visible_moons(ch);
 
 		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
 	}

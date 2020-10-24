@@ -58,7 +58,6 @@ void check_abilities();
 void check_and_link_faction_relations();
 void check_archetypes();
 void check_classes();
-void check_for_bad_buildings();
 void check_for_bad_sectors();
 void check_for_new_map();
 void check_learned_empire_crafts();
@@ -92,7 +91,6 @@ void load_slash_channels();
 void load_tips_of_the_day();
 void load_trading_post();
 void load_world_map_from_file();
-void read_ability_requirements();
 void renum_world();
 void run_reboot_triggers();
 void schedule_map_unloads();
@@ -155,6 +153,7 @@ empire_data *empire_table = NULL;	// hash table of empires
 double empire_score_average[NUM_SCORES];
 struct trading_post_data *trading_list = NULL;	// global DLL of trading post stuff
 bool check_empire_refresh = FALSE;	// triggers empire refreshes
+struct empire_territory_data *global_next_territory_entry = NULL;	// for territory iteration
 
 // events
 event_data *event_table = NULL;	// global hash table (hh)
@@ -175,9 +174,6 @@ struct message_list fight_messages[MAX_MESSAGES];	// fighting messages
 time_t boot_time = 0;	// time of mud boot
 int Global_ignore_dark = 0;	// For use in public channels
 int no_auto_deletes = 0;	// skip player deletes on boot?
-struct time_info_data time_info;	// the infomation about the time
-struct weather_data weather_info;	// the infomation about the weather
-byte y_coord_to_season[MAP_HEIGHT];	// what season a given y-coord is in, as set by determine_seasons()
 int wizlock_level = 0;	// level of game restriction
 char *wizlock_message = NULL;	// Message sent to people trying to connect
 
@@ -270,6 +266,11 @@ char *godlist = NULL;	// list of peon gods
 char *handbook = NULL;	// handbook for new immortals
 char *policies = NULL;	// policies page
 char *news = NULL;	// news for players
+
+// time, seasons, and weather
+struct time_info_data main_time_info;	// central time (corresponds to the latest time zone)
+struct weather_data weather_info;	// the infomation about the weather
+byte y_coord_to_season[MAP_HEIGHT];	// what season a given y-coord is in, as set by determine_seasons()
 
 // tips of the day system
 char **tips_of_the_day = NULL;	// array of tips
@@ -443,7 +444,7 @@ void boot_db(void) {
 	log("Running reboot triggers.");
 	run_reboot_triggers();
 	
-	log(" Calculating empire data.");
+	log("Calculating empire data.");
 	reread_empire_tech(NULL);
 	check_for_new_map();
 	setup_island_levels();
@@ -453,10 +454,10 @@ void boot_db(void) {
 	verify_empire_goals();
 	need_progress_refresh = TRUE;
 	
-	log(" Checking for ruined cities...");
+	log("Checking for ruined cities...");
 	check_ruined_cities();
 	
-	log(" Abandoning lost vehicles...");
+	log("Abandoning lost vehicles...");
 	abandon_lost_vehicles();
 	
 	log("Managing world memory.");
@@ -465,6 +466,9 @@ void boot_db(void) {
 	
 	log("Activating workforce.");
 	chore_update();
+	
+	log("Final startup...");
+	// put things here
 	
 	// END
 	log("Boot db -- DONE.");
@@ -4830,39 +4834,11 @@ void reset_time(void) {
 		data_set_long(DATA_WORLD_START, beginning_of_time);
 	}
 
-	time_info = *mud_time_passed(time(0), beginning_of_time);
-
-	if (time_info.hours <= 6)
-		weather_info.sunlight = SUN_DARK;
-	else if (time_info.hours == 7)
-		weather_info.sunlight = SUN_RISE;
-	else if (time_info.hours <= 18)
-		weather_info.sunlight = SUN_LIGHT;
-	else if (time_info.hours == 19)
-		weather_info.sunlight = SUN_SET;
-	else
-		weather_info.sunlight = SUN_DARK;
-
-	log("   Current Gametime: %dH %dD %dM %dY.", time_info.hours, time_info.day, time_info.month, time_info.year);
-
-	weather_info.pressure = 960;
-	if ((time_info.month >= 5) && (time_info.month <= 8))
-		weather_info.pressure += number(1, 50);
-	else
-		weather_info.pressure += number(1, 80);
-
-	weather_info.change = 0;
-
-	if (weather_info.pressure <= 980)
-		weather_info.sky = SKY_LIGHTNING;
-	else if (weather_info.pressure <= 1000)
-		weather_info.sky = SKY_RAINING;
-	else if (weather_info.pressure <= 1020)
-		weather_info.sky = SKY_CLOUDY;
-	else
-		weather_info.sky = SKY_CLOUDLESS;
-	
+	main_time_info = *mud_time_passed(time(0), beginning_of_time);
+	reset_weather();
 	determine_seasons();
+
+	log("   Current Gametime: %dH %dD %dM %dY.", main_time_info.hours, main_time_info.day, main_time_info.month, main_time_info.year);
 }
 
 

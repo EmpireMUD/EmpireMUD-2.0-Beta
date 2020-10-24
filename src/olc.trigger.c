@@ -164,7 +164,7 @@ char *list_one_trigger(trig_data *trig, bool detail) {
 * @return bool TRUE if any were removed; FALSE otherwise.
 */
 bool remove_live_script_by_vnum(struct script_data *script, trig_vnum vnum) {
-	struct trig_data *trig, *next_trig;
+	trig_data *trig, *next_trig;
 	bool found = FALSE;
 	
 	if (!script) {
@@ -857,16 +857,16 @@ void save_olc_trigger(descriptor_data *desc, char *script_text) {
 /**
 * Creates a copy of a trigger, or clears a new one, for editing.
 * 
-* @param struct trig_data *input The trigger to copy, or NULL to make a new one.
+* @param trig_data *input The trigger to copy, or NULL to make a new one.
 * @param char **cmdlist_storage A place to store the command list e.g. &GET_OLC_STORAGE(ch->desc)
-* @return struct trig_data* The copied trigger.
+* @return trig_data* The copied trigger.
 */
-struct trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_storage) {
+trig_data *setup_olc_trigger(trig_data *input, char **cmdlist_storage) {
 	struct cmdlist_element *c;
-	struct trig_data *new;
+	trig_data *new;
 	
 	CREATE(*cmdlist_storage, char, MAX_CMD_LENGTH);
-	CREATE(new, struct trig_data, 1);
+	CREATE(new, trig_data, 1);
 	trig_data_init(new);
 	
 	if (input) {

@@ -101,9 +101,13 @@ S
 #225
 Predator Vision~
 0 -1 1.00 0 gi
+A
+27 1
 D 1 43 0
-D 1 23 0
-T e 1
+T e 0
+T f 1
+X f
+0
 S
 #226
 Sanguine Restoration~

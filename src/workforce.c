@@ -35,10 +35,8 @@
 *   Vehicle Chore Functions
 */
 
-// for territory iteration
-struct empire_territory_data *global_next_territory_entry = NULL;
 
-// protos
+// local chore prototypes
 void do_chore_building(empire_data *emp, room_data *room, int mode);
 void do_chore_burn_stumps(empire_data *emp, room_data *room);
 void do_chore_chopping(empire_data *emp, room_data *room);
@@ -49,37 +47,29 @@ void do_chore_einv_interaction(empire_data *emp, room_data *room, vehicle_data *
 void do_chore_farming(empire_data *emp, room_data *room);
 void do_chore_fishing(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_fire_brigade(empire_data *emp, room_data *room);
+void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator), bool is_skilled);
 void do_chore_mining(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_minting(empire_data *emp, room_data *room, vehicle_data *veh);
 void do_chore_production(empire_data *emp, room_data *room, vehicle_data *veh, int interact_type);
 void do_chore_shearing(empire_data *emp, room_data *room, vehicle_data *veh);
-
 void vehicle_chore_fire_brigade(empire_data *emp, vehicle_data *veh);
 void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore);
 void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh);
-
-// other locals
-int empire_chore_limit(empire_data *emp, int island_id, int chore);
-int sort_einv(struct empire_storage_data *a, struct empire_storage_data *b);
-void log_workforce_problem(empire_data *emp, room_data *room, int chore, int problem, bool is_delay);
-void mark_workforce_delay(empire_data *emp, room_data *room, int chore, int problem);
 void workforce_crafting_chores(empire_data *emp, room_data *room, vehicle_data *veh);
-bool workforce_is_delayed(empire_data *emp, room_data *room, int chore);
 
-// external functions
-int count_building_vehicles_in_room(room_data *room, empire_data *only_owner);	// vehicles.c
-int get_workforce_production_limit(empire_data *emp, obj_vnum vnum);
-void remove_like_component_from_built_with(struct resource_data **built_with, any_vnum component);
-
-// gen_craft protos:
-#define CHORE_GEN_CRAFT_VALIDATOR(name)  bool (name)(empire_data *emp, room_data *room, vehicle_data *veh, int chore, craft_data *craft)
+// gen_craft prototypes
 CHORE_GEN_CRAFT_VALIDATOR(chore_milling);
 CHORE_GEN_CRAFT_VALIDATOR(chore_pressing);
 CHORE_GEN_CRAFT_VALIDATOR(chore_smelting);
 CHORE_GEN_CRAFT_VALIDATOR(chore_weaving);
 CHORE_GEN_CRAFT_VALIDATOR(chore_workforce_crafting);
 
-void do_chore_gen_craft(empire_data *emp, room_data *room, vehicle_data *veh, int chore, CHORE_GEN_CRAFT_VALIDATOR(*validator), bool is_skilled);
+// other local prototypes
+int get_workforce_production_limit(empire_data *emp, obj_vnum vnum);
+int empire_chore_limit(empire_data *emp, int island_id, int chore);
+int sort_einv(struct empire_storage_data *a, struct empire_storage_data *b);
+void log_workforce_problem(empire_data *emp, room_data *room, int chore, int problem, bool is_delay);
+bool workforce_is_delayed(empire_data *emp, room_data *room, int chore);
 
 
  /////////////////////////////////////////////////////////////////////////////
@@ -725,9 +715,6 @@ void charge_workforce(empire_data *emp, room_data *room, char_data *worker, int 
 * This runs once per mud hour to update all empire chores.
 */
 void chore_update(void) {
-	void ewt_free_tracker(struct empire_workforce_tracker **tracker);
-	void update_empire_needs(empire_data *emp, struct empire_island *eisle, struct empire_needs *needs);
-	
 	struct empire_territory_data *ter, *next_ter;
 	struct empire_island *eisle, *next_eisle;
 	struct empire_needs *needs, *next_needs;
@@ -752,7 +739,7 @@ void chore_update(void) {
 			}
 			
 			// run needs (8pm only)
-			if (time_info.hours == 20) {
+			if (main_time_info.hours == 20) {
 				// TODO: currently this runs 1 need at a time, but could probably save a lot of processing if it ran all needs at once
 				HASH_ITER(hh, eisle->needs, needs, next_needs) {
 					if (needs->needed > 0 && !EMPIRE_IMM_ONLY(emp)) {
@@ -975,7 +962,7 @@ char_data *find_chore_worker_in_room(empire_data *emp, room_data *room, vehicle_
 		if (MOB_SPAWN_TIME(mob) == time(0)) {
 			continue;	// probably just spawned or doing another chore
 		}
-		if (IS_DEAD(mob) || EXTRACTED(mob) || GET_POS(mob) < MIN_WORKER_POS || GET_FED_ON_BY(mob) || GET_FEEDING_FROM(mob)) {
+		if (IS_DEAD(mob) || EXTRACTED(mob) || GET_POS(mob) < MIN_WORKER_POS || FIGHTING(mob) || GET_FED_ON_BY(mob) || GET_FEEDING_FROM(mob)) {
 			continue;	// mob is in some way incapacitated
 		}
 		
@@ -1658,8 +1645,6 @@ void workforce_crafting_chores(empire_data *emp, room_data *room, vehicle_data *
 * @param int mode Which CHORE_ is being performed (build/maintain).
 */
 void do_chore_building(empire_data *emp, room_data *room, int mode) {
-	void finish_building(char_data *ch, room_data *room);
-	
 	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[mode].mob);
 	struct empire_storage_data *store = NULL;
 	bool can_do = FALSE;
@@ -1934,9 +1919,6 @@ void do_chore_digging(empire_data *emp, room_data *room, vehicle_data *veh) {
 
 // for non-vehicles
 void do_chore_dismantle(empire_data *emp, room_data *room) {
-	void finish_dismantle(char_data *ch, room_data *room);
-	void finish_building(char_data *ch, room_data *room);
-	
 	struct resource_data *res, *next_res;
 	bool can_do = FALSE;
 	char_data *worker = find_chore_worker_in_room(emp, room, NULL, chore_data[CHORE_BUILDING].mob);
@@ -2008,8 +1990,6 @@ void do_chore_dismantle(empire_data *emp, room_data *room) {
 * @param vehicle_data *veh Optional: If the chore is peformed by a vehicle, this is set.
 */
 void do_chore_dismantle_mines(empire_data *emp, room_data *room, vehicle_data *veh) {
-	void start_dismantle_building(room_data *loc);
-	
 	char_data *worker = find_chore_worker_in_room(emp, room, veh, chore_data[CHORE_DISMANTLE_MINES].mob);
 	bool can_do = veh ? VEH_IS_COMPLETE(veh) : IS_COMPLETE(room);
 	
@@ -2833,8 +2813,6 @@ void vehicle_chore_build(empire_data *emp, vehicle_data *veh, int chore) {
 
 // handles CHORE_BUILD on vehicles that are mid-dismantle
 void vehicle_chore_dismantle(empire_data *emp, vehicle_data *veh) {
-	void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh);
-	
 	char_data *worker = find_chore_worker_in_room(emp, IN_ROOM(veh), veh, chore_data[CHORE_BUILDING].mob);
 	bool can_do = FALSE, claims_with_room;
 	struct resource_data *res, *found_res = NULL;

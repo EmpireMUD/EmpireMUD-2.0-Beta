@@ -458,15 +458,20 @@ S
 #67
 By Moonlight~
 0 -1 1.00 0 gi
-D 1 23 0
+A
+27 1
 D 1 62 0
-T e 1
+T e 0
+T f 1
+X f
+0
 S
 #68
 Nightsight~
 cd -1 1.00 0 ag
 C
 nightsight 5 bg 0 0 0 -1 0 0 1 0
+D 1 23 0
 M
 0
 You concentrate for a moment...~
@@ -474,6 +479,7 @@ M
 1
 $n concentrates for a moment.~
 T b 1
+T e 0
 X b
 3045 -1 -1 c
 S

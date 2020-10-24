@@ -361,7 +361,7 @@ Sparkle sparkle~
 2 bw 10
 ~
 * I am shuddering internally as I type this
-if %time.hour% < 7 || %time.hour% > 19
+if %room.time(hour)% < 7 || %room.time(hour)% > 19
   halt
 end
 set num_people 0
@@ -536,7 +536,7 @@ set dusk 19
 visible
 %echo% ~%self% rises from the earth!
 wait 2 sec
-if %time.hour% >= %dawn% && %time.hour% <= %dusk%
+if %room.time(hour)% >= %dawn% && %room.time(hour)% <= %dusk%
   * Sun's out
   %echo% ~%self% lunges toward you, just as the sun comes out from behind the clouds!
   wait 3 sec

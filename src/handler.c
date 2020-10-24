@@ -585,6 +585,10 @@ void affect_modify(char_data *ch, byte loc, sh_int mod, bitvector_t bitv, bool a
 			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_BLOOD_UPKEEP), mod, INT_MIN, INT_MAX, TRUE);
 			break;
 		}
+		case APPLY_NIGHT_VISION: {
+			SAFE_ADD(GET_EXTRA_ATT(ch, ATT_NIGHT_VISION), mod, INT_MIN, INT_MAX, TRUE);
+			break;
+		}
 		default:
 			log("SYSERR: Unknown apply adjust %d attempt (%s, affect_modify).", loc, __FILE__);
 			break;
@@ -1628,7 +1632,7 @@ char_data *find_closest_char(char_data *ch, char *arg, bool pc_only) {
 		if (pc_only && IS_NPC(vict)) {
 			continue;
 		}
-		if (!CAN_SEE(ch, vict) || !CAN_SEE_IN_DARK_ROOM(ch, IN_ROOM(vict))) {
+		if (!CAN_SEE(ch, vict) || !can_see_in_dark_room(ch, IN_ROOM(vict), FALSE)) {
 			continue;
 		}
 		if (!match_char_name(ch, vict, arg, MATCH_IN_ROOM)) {
@@ -9643,13 +9647,15 @@ void store_unique_item(char_data *ch, struct empire_unique_storage **to_list, ob
 * @return int FIND_ALL, FIND_ALLDOT, or FIND_INDIV
 */
 int find_all_dots(char *arg) {
+	char temp[MAX_INPUT_LENGTH];
 	int mode;
 	
 	if (!str_cmp(arg, "all")) {
 		mode = FIND_ALL;
 	}
 	else if (!strn_cmp(arg, "all.", 4)) {
-		strcpy(arg, arg + 4);
+		strcpy(temp, arg);
+		strcpy(arg, temp + 4);	// safer to copy twice to prevent memory overlap warning
 		mode = FIND_ALLDOT;
 	}
 	else {

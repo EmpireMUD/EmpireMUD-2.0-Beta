@@ -127,6 +127,32 @@ int find_olc_type(char *name);
 bool player_can_olc_edit(char_data *ch, int type, any_vnum vnum);
 
 // olc auditor functions
+bool audit_ability(ability_data *abil, char_data *ch);
+bool audit_adventure(adv_data *adv, char_data *ch, bool only_one);
+bool audit_archetype(archetype_data *arch, char_data *ch);
+bool audit_augment(augment_data *aug, char_data *ch);
+bool audit_building(bld_data *bld, char_data *ch);
+bool audit_class(class_data *cls, char_data *ch);
+bool audit_craft(craft_data *craft, char_data *ch);
+bool audit_crop(crop_data *cp, char_data *ch);
+bool audit_event(event_data *event, char_data *ch);
+bool audit_faction(faction_data *fct, char_data *ch);
+bool audit_generic(generic_data *gen, char_data *ch);
+bool audit_global(struct global_data *global, char_data *ch);
+bool audit_mobile(char_data *mob, char_data *ch);
+bool audit_morph(morph_data *morph, char_data *ch);
+bool audit_object(obj_data *obj, char_data *ch);
+bool audit_progress(progress_data *prg, char_data *ch);
+bool audit_quest(quest_data *quest, char_data *ch);
+bool audit_room_template(room_template *rmt, char_data *ch);
+bool audit_sector(sector_data *sect, char_data *ch);
+bool audit_shop(shop_data *shop, char_data *ch);
+bool audit_skill(skill_data *skill, char_data *ch);
+bool audit_social(social_data *soc, char_data *ch);
+bool audit_trigger(trig_data *trig, char_data *ch);
+bool audit_vehicle(vehicle_data *veh, char_data *ch);
+
+// supplemental auditors
 bool audit_extra_descs(any_vnum vnum, struct extra_descr_data *list, char_data *ch);
 bool audit_interactions(any_vnum vnum, struct interaction_item *list, int attach_type, char_data *ch);
 bool audit_spawns(any_vnum vnum, struct spawn_info *list, char_data *ch);
@@ -138,18 +164,26 @@ struct extra_descr_data *copy_extra_descs(struct extra_descr_data *list);
 struct icon_data *copy_icon_set(struct icon_data *input_list);
 struct interaction_item *copy_interaction_list(struct interaction_item *input_list);
 struct spawn_info *copy_spawn_list(struct spawn_info *input_list);
+void smart_copy_bld_relations(struct bld_relation **to_list, struct bld_relation *from_list);
+void smart_copy_icons(struct icon_data **addto, struct icon_data *input);
 void smart_copy_interactions(struct interaction_item **addto, struct interaction_item *input);
+void smart_copy_requirements(struct req_data **to_list, struct req_data *from_list);
 void smart_copy_scripts(struct trig_proto_list **addto, struct trig_proto_list *input);
 void smart_copy_spawns(struct spawn_info **addto, struct spawn_info *input);
 void smart_copy_template_spawns(struct adventure_spawn **addto, struct adventure_spawn *input);
 
+// olc editors
+void setup_extra_desc_editor(char_data *ch, struct extra_descr_data *ex);
+
 // olc list-deleters
+bool delete_bld_relation_by_vnum(struct bld_relation **list, int type, bld_vnum vnum);
 bool delete_event_reward_from_list(struct event_reward **list, int type, any_vnum vnum);
 bool delete_from_interaction_list(struct interaction_item **list, int vnum_type, any_vnum vnum);
 bool delete_link_rule_by_portal(struct adventure_link_rule **list, obj_vnum portal_vnum);
 bool delete_link_rule_by_type_value(struct adventure_link_rule **list, int type, any_vnum value);
 bool delete_from_spawn_template_list(struct adventure_spawn **list, int spawn_type, mob_vnum vnum);
 bool delete_shop_item_from_list(struct shop_item **list, any_vnum vnum);
+bool remove_vnum_from_class_skill_reqs(struct class_skill_req **list, any_vnum vnum);
 
 // olc processors/parsers
 void archedit_process_gear(char_data *ch, char *argument, struct archetype_gear **list);
@@ -163,10 +197,13 @@ int olc_process_type(char_data *ch, char *argument, char *name, char *command, c
 void olc_process_extra_desc(char_data *ch, char *argument, struct extra_descr_data **list);
 void olc_process_icons(char_data *ch, char *argument, struct icon_data **list);
 void olc_process_interactions(char_data *ch, char *argument, struct interaction_item **list, int attach_type);
+void olc_process_relations(char_data *ch, char *argument, struct bld_relation **list);
+void olc_process_requirements(char_data *ch, char *argument, struct req_data **list, char *command, bool allow_tracker_types);
 void olc_process_resources(char_data *ch, char *argument, struct resource_data **list);
 void olc_process_spawns(char_data *ch, char *argument, struct spawn_info **list);
 void olc_process_script(char_data *ch, char *argument, struct trig_proto_list **list, int trigger_attach);
 any_vnum parse_quest_reward_vnum(char_data *ch, int type, char *vnum_arg, char *prev_arg);
+void qedit_process_quest_givers(char_data *ch, char *argument, struct quest_giver **list, char *command);
 
 // olc save functions
 void save_olc_building(descriptor_data *desc);
@@ -174,9 +211,57 @@ void save_olc_craft(descriptor_data *desc);
 void save_olc_vehicle(descriptor_data *desc);
 
 // olc setup functions
+ability_data *setup_olc_ability(ability_data *input);
+adv_data *setup_olc_adventure(adv_data *input);
+archetype_data *setup_olc_archetype(archetype_data *input);
+augment_data *setup_olc_augment(augment_data *input);
+book_data *setup_olc_book(book_data *input);
 bld_data *setup_olc_building(bld_data *input);
+class_data *setup_olc_class(class_data *input);
 craft_data *setup_olc_craft(craft_data *input);
+crop_data *setup_olc_crop(crop_data *input);
+event_data *setup_olc_event(event_data *input);
+faction_data *setup_olc_faction(faction_data *input);
+generic_data *setup_olc_generic(generic_data *input);
+struct global_data *setup_olc_global(struct global_data *input);
+char_data *setup_olc_mobile(char_data *input);
+morph_data *setup_olc_morph(morph_data *input);
+obj_data *setup_olc_object(obj_data *input);
+progress_data *setup_olc_progress(progress_data *input);
+quest_data *setup_olc_quest(quest_data *input);
+room_template *setup_olc_room_template(room_template *input);
+sector_data *setup_olc_sector(sector_data *input);
+shop_data *setup_olc_shop(shop_data *input);
+skill_data *setup_olc_skill(skill_data *input);
+social_data *setup_olc_social(social_data *input);
+trig_data *setup_olc_trigger(struct trig_data *input, char **cmdlist_storage);
 vehicle_data *setup_olc_vehicle(vehicle_data *input);
+
+// main olc displays
+void olc_show_ability(char_data *ch);
+void olc_show_adventure(char_data *ch);
+void olc_show_archetype(char_data *ch);
+void olc_show_augment(char_data *ch);
+void olc_show_building(char_data *ch);
+void olc_show_class(char_data *ch);
+void olc_show_craft(char_data *ch);
+void olc_show_crop(char_data *ch);
+void olc_show_event(char_data *ch);
+void olc_show_faction(char_data *ch);
+void olc_show_generic(char_data *ch);
+void olc_show_global(char_data *ch);
+void olc_show_mobile(char_data *ch);
+void olc_show_morph(char_data *ch);
+void olc_show_object(char_data *ch);
+void olc_show_progress(char_data *ch);
+void olc_show_quest(char_data *ch);
+void olc_show_room_template(char_data *ch);
+void olc_show_sector(char_data *ch);
+void olc_show_shop(char_data *ch);
+void olc_show_skill(char_data *ch);
+void olc_show_social(char_data *ch);
+void olc_show_trigger(char_data *ch);
+void olc_show_vehicle(char_data *ch);
 
 // olc display parts
 void get_adventure_linking_display(struct adventure_link_rule *list, char *save_buffer);
@@ -188,6 +273,8 @@ char *get_interaction_restriction_display(struct interact_restriction *list, boo
 void get_evolution_display(struct evolution_data *list, char *save_buffer);
 void get_exit_template_display(struct exit_template *list, char *save_buffer);
 void get_progress_perks_display(struct progress_perk *list, char *save_buffer, bool show_vnums);
+void get_quest_giver_display(struct quest_giver *list, char *save_buffer);
+void get_requirement_display(struct req_data *list, char *save_buffer);
 void get_template_spawns_display(struct adventure_spawn *list, char *save_buffer);
 
 // olc helpers

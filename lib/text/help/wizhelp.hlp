@@ -1103,6 +1103,7 @@ islands    Immort   Shows you which island ids have empire storage (for MOVEEINV
 lastnames  Immort   Shows target player's lastname list.
 learned    Immort   Shows you learned recipes.
 minipets   Immort   Shows you mini-pets collected by a player.
+moons      Immort   Shows any moons and their current phases/positions.
 mounts     Immort   Shows you mounts owned by a player.
 notes      Immort   Show notes on a player.
 olc        Immort   Shows all players with OLC access (vnum optional).
@@ -1252,6 +1253,15 @@ Usage:  show minipets <player> [search phrase]
 Shows you mini-pets collected by a player.
 
 See also: SET MINIPET
+#e
+"SHOW MOONS"
+
+Usage:  show moons
+
+Shows you the current status of any moons. Configure moons in the generics
+editor.
+
+See also: MOON GENERICS
 #e
 "SHOW MOUNTS"
 

@@ -1432,8 +1432,10 @@ int perform_alias(descriptor_data *d, char *orig) {
 
 /* The interface to the outside world: do_alias / do_unalias */
 ACMD(do_alias) {
+	char output[MAX_STRING_LENGTH * 2], line[MAX_INPUT_LENGTH];
 	char *repl;
 	struct alias_data *a;
+	size_t size, lsize;
 
 	if (IS_NPC(ch))
 		return;
@@ -1441,14 +1443,25 @@ ACMD(do_alias) {
 	repl = any_one_arg(argument, arg);
 
 	if (!*arg) {			/* no argument specified -- list currently defined aliases */
-		send_to_char("Currently defined aliases:\r\n", ch);
-		if ((a = GET_ALIASES(ch)) == NULL)
-			send_to_char(" None.\r\n", ch);
+		size = snprintf(output, sizeof(output), "Currently defined aliases:\r\n");
+		if (GET_ALIASES(ch) == NULL) {
+			strcat(output, " None.\r\n");	// strcat: length ok
+		}
 		else {
-			while (a != NULL) {
-				sprintf(buf, "%-15s %s\r\n", a->alias, show_color_codes(a->replacement));
-				send_to_char(buf, ch);
-				a = a->next;
+			LL_FOREACH(GET_ALIASES(ch), a) {
+				lsize = snprintf(line, sizeof(line), "%-15s %s\r\n", a->alias, show_color_codes(a->replacement));
+				if (size + lsize + 10 < sizeof(output)) {
+					strcat(output, line);
+					size += lsize;
+				}
+				else {
+					size += snprintf(output + size, sizeof(output) - size, "OVERFLOW\r\n");
+					break;
+				}
+			}
+			
+			if (ch->desc) {
+				page_string(ch->desc, output, TRUE);
 			}
 		}
 	}

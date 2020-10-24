@@ -438,7 +438,7 @@ void point_update_char(char_data *ch) {
 		}
 		
 		// light-based gains
-		if (weather_info.sunlight == SUN_LIGHT && IS_OUTDOORS(ch)) {
+		if (IS_OUTDOORS(ch) && get_sun_status(IN_ROOM(ch)) == SUN_LIGHT) {
 			gain_player_tech_exp(ch, PTECH_VAMPIRE_SUN_IMMUNITY, 2);
 		}
 		
