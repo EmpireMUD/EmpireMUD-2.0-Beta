@@ -135,6 +135,13 @@
 // converts a Y-coordinate to the equivalent latitude, based on Y_MIN_LATITUDE/Y_MAX_LATITUDE
 #define Y_TO_LATITUDE(y_coord)  ((((double)(y_coord) / MAP_HEIGHT) * ABSOLUTE(Y_MAX_LATITUDE - Y_MIN_LATITUDE)) + Y_MIN_LATITUDE)
 
+// based on EmpireMUD's 360-day year (12 x 30-day months): code expects these 90 days apart
+#define FIRST_EQUINOX_DOY  81	// march 21
+#define NORTHERN_SOLSTICE_DOY  171	// june 21
+#define LAST_EQUINOX_DOY  261	// sept 21
+#define SOUTHERN_SOLSTICE_DOY  351	// dec 21
+
+
 #define COIN_VALUE  0.1	// value of a coin as compared to 1 wealth (0.1 coin value = 10 coins per wealth)
 
 // ***WARNING*** Change this before starting your playerfile

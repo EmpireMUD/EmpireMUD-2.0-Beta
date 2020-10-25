@@ -415,6 +415,64 @@ int get_sun_status(room_data *room) {
 
 
 /**
+* Gets the numbers of days from the solstice a given room will experience
+* zenith passage -- the day(s) of the year where the sun passes directly over-
+* head at noon. This only occurs in the tropics; everywhere else returns -1.
+*
+* @param room_data *room The location.
+* @return int Number of days before/after the solstice that the zenith occurs (or -1 if no zenith).
+*/
+int get_zenith_days_from_solstice(room_data *room) {
+	double latitude, percent_from_solstice;
+	int y_coord;
+	
+	if ((y_coord = Y_COORD(room)) == -1) {
+		return -1;	// exit early if not on the map
+	}
+	
+	latitude = Y_TO_LATITUDE(y_coord);
+	if (latitude > TROPIC_LATITUDE || latitude < -TROPIC_LATITUDE) {
+		return -1;	// not in the tropics
+	}
+	
+	// percent of days from the solstice to equinox that the zenith happens
+	percent_from_solstice = 1.0 - ABSOLUTE(latitude / TROPIC_LATITUDE);
+	return (int)round(percent_from_solstice * 90);	// 90 days in 1/4 year
+}
+
+
+/**
+* Determines whether or not today is the day of zenith passage -- the day(s) of
+* the year where the sun passes directly overhead at noon. This only occurs in
+* the tropics; everywhere else returns FALSE all year.
+*
+* @param room_data *room The location to check.
+* @return bool TRUE if the current day (in that room) is the day of zenith passage, or FALSE if not.
+*/
+bool is_zenith_day(room_data *room) {
+	int zenith_days, y_coord, current_doy;
+	struct time_info_data tinfo;
+	
+	if ((y_coord = Y_COORD(room)) == -1 || (zenith_days = get_zenith_days_from_solstice(room))) {
+		return FALSE;	// exit early if not on the map or no zenith
+	}
+	
+	// get day of year
+	tinfo = get_local_time(room);
+	current_doy = (tinfo.month * 30) + tinfo.day + 1;
+	
+	if (Y_TO_LATITUDE(y_coord) > 0) {
+		// northern hemisphere
+		return (ABSOLUTE(NORTHERN_SOLSTICE_DOY - current_doy) == zenith_days);
+	}
+	else {
+		// southern hemisphere
+		return (ABSOLUTE(NORTHERN_SOLSTICE_DOY - current_doy) == zenith_days);
+	}
+}
+
+
+/**
 * To be called at the end of the hourly update to show players sunrise/sunset.
 */
 void send_hourly_sun_messages(void) {
@@ -444,6 +502,12 @@ void send_hourly_sun_messages(void) {
 			}
 			case 8: {	// day start
 				msg_to_char(desc->character, "The day has begun.\r\n");
+				break;
+			}
+			case 12: {	// noon
+				if (is_zenith_day(IN_ROOM(desc->character))) {
+					msg_to_char(desc->character, "You watch as the sun passes directly overhead -- today is the zenith passage.\r\n");
+				}
 				break;
 			}
 			case 19: {	// sunset

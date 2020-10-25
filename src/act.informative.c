@@ -3584,8 +3584,22 @@ ACMD(do_time) {
 		gain_player_tech_exp(ch, PTECH_CALENDAR, 1);
 	}
 	
+	// check season
 	if (IS_OUTDOORS(ch)) {
 		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
+	}
+	
+	// check zenith
+	if (is_zenith_day(IN_ROOM(ch))) {
+		if (tinfo.hours < 12) {
+			msg_to_char(ch, "Today will be the sun's zenith passage.\r\n");
+		}
+		else if (tinfo.hours > 12) {
+			msg_to_char(ch, "Today was the sun's zenith passage.\r\n");
+		}
+		else {
+			msg_to_char(ch, "Today is the sun's zenith passage.%s\r\n", IS_OUTDOORS(ch) ? " It's directly overhead!" : "");
+		}
 	}
 }
 
@@ -3619,7 +3633,21 @@ ACMD(do_weather) {
 
 
 ACMD(do_whereami) {
+	double latitude, longitude;
+	int zenith;
+	
 	msg_to_char(ch, "You are at: %s%s\r\n", get_room_name(IN_ROOM(ch), FALSE), coord_display_room(ch, IN_ROOM(ch), FALSE));
+	
+	// additional stats for imms if there's coords for this room
+	if (IS_IMMORTAL(ch) && X_COORD(IN_ROOM(ch)) != -1) {
+		latitude = Y_TO_LATITUDE(Y_COORD(IN_ROOM(ch)));
+		longitude = X_TO_LONGITUDE(X_COORD(IN_ROOM(ch)));
+		msg_to_char(ch, "Latitude: %.2f %s, Longitude: %.2f %s\r\n", ABSOLUTE(latitude), latitude >= 0.0 ? "N" : "S", ABSOLUTE(longitude), longitude >= 0.0 ? "E" : "W");
+		
+		if ((zenith = get_zenith_days_from_solstice(IN_ROOM(ch))) != -1) {
+			msg_to_char(ch, "Zenith passage: %d day%s from the solstice\r\n", zenith, PLURAL(zenith));
+		}
+	}
 }
 
 

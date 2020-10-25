@@ -2414,6 +2414,8 @@ void show_visible_moons(char_data *ch);
 // weather.c time
 struct time_info_data get_local_time(room_data *room);
 int get_sun_status(room_data *room);
+int get_zenith_days_from_solstice(room_data *room);
+bool is_zenith_day(room_data *room);
 
 // weather.c weather
 void reset_weather();
