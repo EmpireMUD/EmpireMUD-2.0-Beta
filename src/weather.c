@@ -404,11 +404,6 @@ double get_hours_of_sun(room_data *room) {
 		days_percent = 1.0 - ((doy - SOUTHERN_SOLSTICE_DOY) / 90.0);
 	}
 	
-	// flip the days_percent in the south?
-	if (latitude < 0) {
-		days_percent = 1.0 - days_percent;
-	}
-	
 	if (max_hours > 12.0) {
 		hours = days_percent * (max_hours - 12.0) + 12.0;
 	}
