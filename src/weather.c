@@ -573,6 +573,7 @@ bool is_zenith_day(room_data *room) {
 void send_hourly_sun_messages(void) {
 	struct time_info_data tinfo;
 	descriptor_data *desc;
+	int sun;
 	
 	LL_FOREACH(descriptor_list, desc) {
 		if (STATE(desc) != CON_PLAYING || desc->character == NULL) {
@@ -585,39 +586,41 @@ void send_hourly_sun_messages(void) {
 		// get local time
 		tinfo = get_local_time(IN_ROOM(desc->character));
 		
-		switch (tinfo.hours) {
-			case 7: {	// sunrise
-				// show map if needed
-				if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && get_sun_status(IN_ROOM(desc->character)) != GET_LAST_LOOK_SUN(desc->character)) {
-					look_at_room(desc->character);
-					msg_to_char(desc->character, "\r\n");
+		// check for sun changes
+		sun = get_sun_status(IN_ROOM(desc->character));
+		if (sun != GET_LAST_LOOK_SUN(desc->character)) {
+			switch (sun) {
+				case SUN_RISE: {
+					if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT)) {
+						// show map if needed
+						look_at_room(desc->character);
+						msg_to_char(desc->character, "\r\n");
+					}
+					msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
+					break;
 				}
-				msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
-				break;
-			}
-			case 8: {	// day start
-				msg_to_char(desc->character, "The day has begun.\r\n");
-				break;
-			}
-			case 12: {	// noon
-				if (is_zenith_day(IN_ROOM(desc->character))) {
-					msg_to_char(desc->character, "You watch as the sun passes directly overhead -- today is the zenith passage!\r\n");
+				case SUN_LIGHT: {
+					msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
+					break;
 				}
-				break;
-			}
-			case 19: {	// sunset
-				msg_to_char(desc->character, "The sun slowly disappears beneath the horizon.\r\n");
-				break;
-			}
-			case 20: {	// dark
-				// show map if needed
-				if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && get_sun_status(IN_ROOM(desc->character)) != GET_LAST_LOOK_SUN(desc->character)) {
-					look_at_room(desc->character);
-					msg_to_char(desc->character, "\r\n");
+				case SUN_SET: {
+					msg_to_char(desc->character, "The sun slowly disappears beneath the horizon.\r\n");
+					break;
 				}
-				msg_to_char(desc->character, "The night has begun.\r\n");
-				break;
+				case SUN_DARK: {
+					if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT)) {
+						look_at_room(desc->character);
+						msg_to_char(desc->character, "\r\n");
+					}
+					msg_to_char(desc->character, "The night has begun.\r\n");
+					break;
+				}
 			}
+		}	// end sun-change
+		
+		// check and show zenith
+		if (tinfo.hours == 12 && is_zenith_day(IN_ROOM(desc->character))) {
+			msg_to_char(desc->character, "You watch as the sun passes directly overhead -- today is the zenith passage!\r\n");
 		}
 	}
 }
