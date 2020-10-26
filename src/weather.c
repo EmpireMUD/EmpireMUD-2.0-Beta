@@ -450,7 +450,7 @@ int get_zenith_days_from_solstice(room_data *room) {
 * @return bool TRUE if the current day (in that room) is the day of zenith passage, or FALSE if not.
 */
 bool is_zenith_day(room_data *room) {
-	int zenith_days, y_coord;
+	int zenith_days, y_coord, doy;
 	struct time_info_data tinfo;
 	
 	if ((y_coord = Y_COORD(room)) == -1 || (zenith_days = get_zenith_days_from_solstice(room)) < 0) {
@@ -461,12 +461,17 @@ bool is_zenith_day(room_data *room) {
 	tinfo = get_local_time(room);
 	
 	if (Y_TO_LATITUDE(y_coord) > 0) {
-		// northern hemisphere
+		// northern hemisphere: no need to wrap here (unlike the southern solstice)
 		return (ABSOLUTE(NORTHERN_SOLSTICE_DOY - DAY_OF_YEAR(tinfo)) == zenith_days);
 	}
 	else {
 		// southern hemisphere
-		return (ABSOLUTE(NORTHERN_SOLSTICE_DOY - DAY_OF_YEAR(tinfo)) == zenith_days);
+		doy = DAY_OF_YEAR(tinfo);
+		if (doy < 90) {
+			// wrap it around to put it in range of the december solstice
+			doy += 360;
+		}
+		return (ABSOLUTE(SOUTHERN_SOLSTICE_DOY - doy) == zenith_days);
 	}
 }
 
