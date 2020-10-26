@@ -453,7 +453,7 @@ bool is_zenith_day(room_data *room) {
 	int zenith_days, y_coord;
 	struct time_info_data tinfo;
 	
-	if ((y_coord = Y_COORD(room)) == -1 || (zenith_days = get_zenith_days_from_solstice(room))) {
+	if ((y_coord = Y_COORD(room)) == -1 || (zenith_days = get_zenith_days_from_solstice(room)) < 0) {
 		return FALSE;	// exit early if not on the map or no zenith
 	}
 	
