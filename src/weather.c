@@ -385,17 +385,17 @@ int get_hours_of_sun(room_data *room, bool debug) {
 	if (doy >= FIRST_EQUINOX_DOY && doy < NORTHERN_SOLSTICE_DOY) {
 		// march-june: days before the solstice
 		max_hours = HOURS_SUN_AT_SOLSTICE(latitude, (latitude < 0));
-		days_percent = (doy - FIRST_EQUINOX_DOY) / 90;
+		days_percent = (doy - FIRST_EQUINOX_DOY) / 90.0;
 	}
 	else if (doy >= NORTHERN_SOLSTICE_DOY && doy < LAST_EQUINOX_DOY) {
 		// june-september: days after the solstice
 		max_hours = HOURS_SUN_AT_SOLSTICE(latitude, (latitude < 0));
-		days_percent = 1.0 - ((doy - NORTHERN_SOLSTICE_DOY) / 90);
+		days_percent = 1.0 - ((doy - NORTHERN_SOLSTICE_DOY) / 90.0);
 	}
 	else if (doy >= LAST_EQUINOX_DOY && doy < SOUTHERN_SOLSTICE_DOY) {
 		// september-december: days before the solstice
 		max_hours = HOURS_SUN_AT_SOLSTICE(latitude, (latitude > 0));
-		days_percent = (doy - LAST_EQUINOX_DOY) / 90;
+		days_percent = (doy - LAST_EQUINOX_DOY) / 90.0;
 	}
 	else {
 		// december-march: days after the solstice
@@ -403,7 +403,7 @@ int get_hours_of_sun(room_data *room, bool debug) {
 			doy += 360;	// to make it "days after the solstice"
 		}
 		max_hours = HOURS_SUN_AT_SOLSTICE(latitude, (latitude < 0));
-		days_percent = 1.0 - ((doy - SOUTHERN_SOLSTICE_DOY) / 90);
+		days_percent = 1.0 - ((doy - SOUTHERN_SOLSTICE_DOY) / 90.0);
 	}
 	
 	if (max_hours > 12.0) {
