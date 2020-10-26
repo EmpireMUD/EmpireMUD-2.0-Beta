@@ -378,7 +378,7 @@ int get_hours_of_sun(room_data *room, bool debug) {
 	doy = DAY_OF_YEAR(tinfo);
 	
 	// bound it to -67..67 because anything beyond that is in the arctic circle
-	latitude = MIN(-67.0, MAX(67.0, latitude));
+	latitude = MAX(-67.0, MIN(67.0, latitude));
 	
 	// set max_hours to the number of hours at the solstice
 	// and set days_percent to percent of the way to that solstice from the equinox
