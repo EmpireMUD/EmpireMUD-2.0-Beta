@@ -414,7 +414,7 @@ int get_hours_of_sun(room_data *room, bool debug) {
 	}
 	
 	if (debug) {
-		log("debug: lat=%d doy=%d days_percent=%.2f max_hours=%.2f hours=%d", latitude, doy, days_percent, max_hours, hours);
+		log("debug: lat=%.2f doy=%d days_percent=%.2f max_hours=%.2f hours=%d", latitude, doy, days_percent, max_hours, hours);
 	}
 	
 	// bound it to 0-24 hours of daylight
