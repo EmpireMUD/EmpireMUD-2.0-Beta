@@ -474,13 +474,13 @@ int get_sun_status(room_data *room) {
 	
 	// sun_mod is subtracted in the morning and added in the evening
 	
-	if (tinfo.hours - sun_mod == 7) {
+	if (tinfo.hours == 7 - sun_mod) {
 		return SUN_RISE;
 	}
-	else if (tinfo.hours + sun_mod == 19) {
+	else if (tinfo.hours == 19 + sun_mod) {
 		return SUN_SET;
 	}
-	else if (tinfo.hours - sun_mod > 7 && tinfo.hours + sun_mod < 19) {
+	else if (tinfo.hours > 7 - sun_mod && tinfo.hours < 19 + sun_mod) {
 		return SUN_LIGHT;
 	}
 	else {
