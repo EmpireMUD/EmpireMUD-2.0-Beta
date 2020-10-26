@@ -355,16 +355,14 @@ void another_hour(void) {
 * Determines the number of hours of sunlight in the room today, based on
 * latitude and time of year.
 *
-* NOTE: could be a double to get semi-hours of sun
-*
 * @param room_data *room The location.
-* @return int The number of hours of sunlight today.
+* @return double The number of hours of sunlight today.
 */
-int get_hours_of_sun(room_data *room, bool debug) {
+double get_hours_of_sun(room_data *room, bool debug) {
 	double latitude, days_percent, max_hours;
 	struct time_info_data tinfo;
 	int y_coord, doy;
-	int hours = 12;
+	double hours = 12.0;
 	
 	// this takes latitude in degrees but uses it in radians for the tangent...
 	// it fits the graph we need though
@@ -407,18 +405,18 @@ int get_hours_of_sun(room_data *room, bool debug) {
 	}
 	
 	if (max_hours > 12.0) {
-		hours = round(days_percent * (max_hours - 12.0) + 12.0);
+		hours = days_percent * (max_hours - 12.0) + 12.0;
 	}
 	else if (max_hours < 12.0) {
-		hours = round(12.0 - (days_percent * (12.0 - max_hours)));
+		hours = 12.0 - (days_percent * (12.0 - max_hours));
 	}
 	
 	if (debug) {
-		log("debug: lat=%.2f doy=%d days_percent=%.2f max_hours=%.2f hours=%d", latitude, doy, days_percent, max_hours, hours);
+		log("debug: lat=%.2f doy=%d days_percent=%.2f max_hours=%.2f hours=%.2f", latitude, doy, days_percent, max_hours, hours);
 	}
 	
 	// bound it to 0-24 hours of daylight
-	return MAX(0, MIN(24, hours));
+	return MAX(0.0, MIN(24.0, hours));
 }
 
 
@@ -470,17 +468,19 @@ struct time_info_data get_local_time(room_data *room) {
 */
 int get_sun_status(room_data *room) {
 	struct time_info_data tinfo = get_local_time(room);
-	int sun_mod = round((get_hours_of_sun(room, FALSE) - 12) / 2.0);
+	double hours, sun_mod;
 	
 	// sun_mod is subtracted in the morning and added in the evening
+	sun_mod = (get_hours_of_sun(room, FALSE) - 12.0) / 2.0;
+	hours = tinfo.hours + (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
 	
-	if (tinfo.hours == 7 - sun_mod) {
+	if (round(hours) == round(7.0 - sun_mod)) {
 		return SUN_RISE;
 	}
-	else if (tinfo.hours == 19 + sun_mod) {
+	else if (round(hours) == round(19.0 + sun_mod)) {
 		return SUN_SET;
 	}
-	else if (tinfo.hours > 7 - sun_mod && tinfo.hours < 19 + sun_mod) {
+	else if (hours > 7.0 - sun_mod && hours < 19.0 + sun_mod) {
 		return SUN_LIGHT;
 	}
 	else {
