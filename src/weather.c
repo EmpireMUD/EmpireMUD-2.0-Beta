@@ -358,7 +358,7 @@ void another_hour(void) {
 * @param room_data *room The location.
 * @return double The number of hours of sunlight today.
 */
-double get_hours_of_sun(room_data *room) {
+double get_hours_of_sun(room_data *room, bool debug) {
 	double latitude, days_percent, max_hours;
 	struct time_info_data tinfo;
 	int y_coord, doy;
@@ -409,6 +409,10 @@ double get_hours_of_sun(room_data *room) {
 	}
 	else if (max_hours < 12.0) {
 		hours = 12.0 - (days_percent * (12.0 - max_hours));
+	}
+	
+	if (debug) {
+		log("lat=%.2f, doy=%d, perc=%.2f, max_hours=%.2f, hours=%.2f", latitude, doy, days_percent, max_hours, hours);
 	}
 	
 	// bound it to 0-24 hours of daylight
@@ -483,7 +487,7 @@ int get_sun_status(room_data *room) {
 	
 	
 	// sun_mod is subtracted in the morning and added in the evening
-	sun_mod = (get_hours_of_sun(room) - 12.0) / 2.0;
+	sun_mod = (get_hours_of_sun(room, FALSE) - 12.0) / 2.0;
 	// hours = tinfo.hours + (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
 	
 	if (ABSOLUTE(hours - (7.0 - sun_mod)) < 0.5) {
