@@ -3521,9 +3521,11 @@ ACMD(do_survey) {
 ACMD(do_time) {
 	struct time_info_data tinfo;
 	const char *suf;
-	int weekday, day;
+	int weekday, day, latitude, y_coord;
 	
 	tinfo = get_local_time(IN_ROOM(ch));
+	y_coord = Y_COORD(IN_ROOM(ch));
+	latitude = (y_coord != -1) ? Y_TO_LATITUDE(y_coord) : 0;
 	
 	if (has_player_tech(ch, PTECH_CLOCK)) {
 		sprintf(buf, "It is %d o'clock %s", ((tinfo.hours % 12 == 0) ? 12 : ((tinfo.hours) % 12)), ((tinfo.hours >= 12) ? "pm" : "am"));
@@ -3587,6 +3589,20 @@ ACMD(do_time) {
 	// check season
 	if (IS_OUTDOORS(ch)) {
 		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
+	}
+	
+	// check solstices
+	if (DAY_OF_YEAR(tinfo) == FIRST_EQUINOX_DOY) {
+		msg_to_char(ch, "It is the %s equinox.\r\n", latitude >= 0 ? "vernal" : "autumnal");
+	}
+	else if (DAY_OF_YEAR(tinfo) == NORTHERN_SOLSTICE_DOY) {
+		msg_to_char(ch, "It is the %s solstice.\r\n", latitude >= 0 ? "summer" : "winter");
+	}
+	else if (DAY_OF_YEAR(tinfo) == LAST_EQUINOX_DOY) {
+		msg_to_char(ch, "It is the %s equinox.\r\n", latitude >= 0 ? "autumnal" : "vernal");
+	}
+	else if (DAY_OF_YEAR(tinfo) == SOUTHERN_SOLSTICE_DOY) {
+		msg_to_char(ch, "It is the %s solstice.\r\n", latitude >= 0 ? "winter" : "summer");
 	}
 	
 	// check zenith
