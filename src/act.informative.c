@@ -3659,7 +3659,7 @@ ACMD(do_whereami) {
 		latitude = Y_TO_LATITUDE(Y_COORD(IN_ROOM(ch)));
 		longitude = X_TO_LONGITUDE(X_COORD(IN_ROOM(ch)));
 		msg_to_char(ch, "Latitude: %.2f %s, Longitude: %.2f %s\r\n", ABSOLUTE(latitude), latitude >= 0.0 ? "N" : "S", ABSOLUTE(longitude), longitude >= 0.0 ? "E" : "W");
-		msg_to_char(ch, "Hours of sunlight today: %d\r\n", get_hours_of_sun(IN_ROOM(ch)));
+		msg_to_char(ch, "Hours of sunlight today: %d\r\n", get_hours_of_sun(IN_ROOM(ch), TRUE));
 		
 		if ((zenith = get_zenith_days_from_solstice(IN_ROOM(ch))) != -1) {
 			msg_to_char(ch, "Zenith passage: %d day%s from the solstice\r\n", zenith, PLURAL(zenith));
