@@ -3108,10 +3108,11 @@ char *prompt_str(char_data *ch) {
 */
 char *replace_prompt_codes(char_data *ch, char *str) {
 	static char pbuf[MAX_STRING_LENGTH];
-	char i[MAX_STRING_LENGTH], spare[10];
+	char i[MAX_STRING_LENGTH];
 	struct time_info_data tinfo;
 	char *cp, *tmp;
 	char_data *vict;
+	int sun;
 
 	cp = pbuf;
 
@@ -3370,39 +3371,30 @@ char *replace_prompt_codes(char_data *ch, char *str) {
 				case 't':	/* Sun timer */
 				case 'T': {
 					tinfo = get_local_time(IN_ROOM(ch));
+					sun = get_sun_status(IN_ROOM(ch));
+					
+					// start with basic colors and words based on sun
+					if (sun == SUN_RISE) {
+						strcpy(i, "\tCdawn\t0");
+					}
+					else if (sun == SUN_LIGHT) {
+						strcpy(i, "\tYday\t0");
+					}
+					else if (sun == SUN_SET) {
+						strcpy(i, "\tRdusk\t0");
+					}
+					else {
+						strcpy(i, "\tBnight\t0");
+					}
 					
 					if (has_player_tech(ch, PTECH_CLOCK)) {
-						if (tinfo.hours >= 12)
-							strcpy(spare, "pm");
-						else
-							strcpy(spare, "am");
-
-						if (tinfo.hours == 6)
-							sprintf(i, "\tC%d%s\t0", tinfo.hours > 12 ? tinfo.hours - 12 : tinfo.hours, spare);
-						else if (tinfo.hours < 19 && tinfo.hours > 6)
-							sprintf(i, "\tY%d%s\t0", tinfo.hours > 12 ? tinfo.hours - 12 : tinfo.hours, spare);
-						else if (tinfo.hours == 19)
-							sprintf(i, "\tR%d%s\t0", tinfo.hours > 12 ? tinfo.hours - 12 : tinfo.hours, spare);
-						else if (tinfo.hours == 0)
-							sprintf(i, "\tB12am\t0");
-						else
-							sprintf(i, "\tB%d%s\t0", tinfo.hours > 12 ? tinfo.hours - 12 : tinfo.hours, spare);
+						// has clock: append clock after color code
+						sprintf(i+2, "%d%s\t0", TIME_TO_12H(tinfo.hours), AM_PM(tinfo.hours));
 					}
 					else {	// no clock
-						if (tinfo.hours == 6) {
-							strcpy(i, "\tCdawn\t0");
-						}
-						else if (tinfo.hours == 12) {
-							strcpy(i, "\tYnoon\t0");
-						}
-						else if (tinfo.hours < 19 && tinfo.hours > 6) {
-							strcpy(i, "\tYday\t0");
-						}
-						else if (tinfo.hours == 19) {
-							strcpy(i, "\tRdusk\t0");
-						}
-						else {
-							strcpy(i, "\tBnight\t0");
+						if (tinfo.hours == 12) {
+							// noon override after color code
+							strcpy(i+2, "noon\t0");
 						}
 					}
 					tmp = i;
