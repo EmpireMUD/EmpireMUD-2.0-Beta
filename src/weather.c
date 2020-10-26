@@ -82,7 +82,7 @@ void determine_seasons(void) {
 	
 	// Day_of_year is the x-axis of the graph that determines the season at a
 	// given y-coord. Month 0 is january; year is 0-359 days.
-	day_of_year = main_time_info.month * 30 + main_time_info.day;
+	day_of_year = DAY_OF_YEAR(main_time_info);
 	
 	for (ycoord = 0; ycoord < MAP_HEIGHT; ++ycoord) {
 		latitude = Y_TO_LATITUDE(ycoord);
@@ -450,7 +450,7 @@ int get_zenith_days_from_solstice(room_data *room) {
 * @return bool TRUE if the current day (in that room) is the day of zenith passage, or FALSE if not.
 */
 bool is_zenith_day(room_data *room) {
-	int zenith_days, y_coord, current_doy;
+	int zenith_days, y_coord;
 	struct time_info_data tinfo;
 	
 	if ((y_coord = Y_COORD(room)) == -1 || (zenith_days = get_zenith_days_from_solstice(room))) {
@@ -459,15 +459,14 @@ bool is_zenith_day(room_data *room) {
 	
 	// get day of year
 	tinfo = get_local_time(room);
-	current_doy = (tinfo.month * 30) + tinfo.day + 1;
 	
 	if (Y_TO_LATITUDE(y_coord) > 0) {
 		// northern hemisphere
-		return (ABSOLUTE(NORTHERN_SOLSTICE_DOY - current_doy) == zenith_days);
+		return (ABSOLUTE(NORTHERN_SOLSTICE_DOY - DAY_OF_YEAR(tinfo)) == zenith_days);
 	}
 	else {
 		// southern hemisphere
-		return (ABSOLUTE(NORTHERN_SOLSTICE_DOY - current_doy) == zenith_days);
+		return (ABSOLUTE(NORTHERN_SOLSTICE_DOY - DAY_OF_YEAR(tinfo)) == zenith_days);
 	}
 }
 

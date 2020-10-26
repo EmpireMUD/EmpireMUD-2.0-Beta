@@ -2444,7 +2444,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 				else if (!str_cmp(field, "year"))
 					snprintf(str, slen, "%d", tinfo.year);
 				else if (!str_cmp(field, "day_of_year")) {
-					snprintf(str, slen, "%d", (tinfo.month * 30) + tinfo.day + 1);
+					snprintf(str, slen, "%d", DAY_OF_YEAR(tinfo));
 				}
 				else
 					*str = '\0';
@@ -5224,7 +5224,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							snprintf(str, slen, "%d", tinfo.year);
 						}
 						else if (!str_cmp(subfield, "day_of_year")) {
-							snprintf(str, slen, "%d", (tinfo.month * 30) + tinfo.day + 1);
+							snprintf(str, slen, "%d", DAY_OF_YEAR(tinfo));
 						}
 						else {
 							*str = '\0';
