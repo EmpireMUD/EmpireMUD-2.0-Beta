@@ -468,35 +468,35 @@ struct time_info_data get_local_time(room_data *room) {
 */
 int get_sun_status(room_data *room) {
 	// struct time_info_data tinfo = get_local_time(room);
-	double hours, sun_mod, longitude, percent;
+	double hour, sun_mod, longitude, percent;
 	int x_coord;
 	
 	if ((x_coord = X_COORD(room)) == -1) {
 		// no x-coord (not in a mappable spot)
-		hours = main_time_info.hours + (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
+		hour = main_time_info.hours + (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
 	}
 	else {
 		// determine exact time
 		longitude = X_TO_LONGITUDE(x_coord) + 180.0;	// longitude from 0-360 instead of -/+180
 		percent = 1.0 - (longitude / 360.0);	// percentage of the way west
-		hours = main_time_info.hours - (24.0 * percent - ((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
-		if (hours < 0.0) {
-			hours += 24.0;
+		hour = main_time_info.hours - (24.0 * percent - ((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR + 1);
+		if (hour < 0.0) {
+			hour += 24.0;
 		}
 	}
 	
 	
 	// sun_mod is subtracted in the morning and added in the evening
 	sun_mod = (get_hours_of_sun(room, FALSE) - 12.0) / 2.0;
-	// hours = tinfo.hours + (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
+	// hour = tinfo.hours + (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
 	
-	if (ABSOLUTE(hours - (7.0 - sun_mod)) < 0.5) {
+	if (ABSOLUTE(hour - (7.0 - sun_mod)) < 0.5) {
 		return SUN_RISE;
 	}
-	else if (ABSOLUTE(hours - (19.0 + sun_mod)) < 0.5) {
+	else if (ABSOLUTE(hour - (19.0 + sun_mod)) < 0.5) {
 		return SUN_SET;
 	}
-	else if (hours > 7.0 - sun_mod && hours < 19.0 + sun_mod) {
+	else if (hour > 7.0 - sun_mod && hour < 19.0 + sun_mod) {
 		return SUN_LIGHT;
 	}
 	else {
