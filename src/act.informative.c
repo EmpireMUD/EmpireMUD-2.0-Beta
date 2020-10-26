@@ -3521,7 +3521,7 @@ ACMD(do_survey) {
 ACMD(do_time) {
 	struct time_info_data tinfo;
 	const char *suf;
-	int weekday, day, latitude, y_coord;
+	int weekday, day, latitude, y_coord, sun;
 	
 	tinfo = get_local_time(IN_ROOM(ch));
 	y_coord = Y_COORD(IN_ROOM(ch));
@@ -3548,17 +3548,18 @@ ACMD(do_time) {
 		gain_player_tech_exp(ch, PTECH_CLOCK, 1);
 	}
 	else {
-		if (tinfo.hours < 6 || tinfo.hours > 19) {
+		sun = get_sun_status(IN_ROOM(ch));
+		if (sun == SUN_DARK) {
 			msg_to_char(ch, "It is nighttime.\r\n");
 		}
-		else if (tinfo.hours == 6) {
+		else if (sun == SUN_RISE) {
 			msg_to_char(ch, "It is almost dawn.\r\n");
 		}
-		else if (tinfo.hours == 19) {
+		else if (sun == SUN_SET) {
 			msg_to_char(ch, "It is sunset.\r\n");
 		}
 		else if (tinfo.hours == 12) {
-			msg_to_char(ch, "It is nighttime.\r\n");
+			msg_to_char(ch, "It is noon.\r\n");
 		}
 		else if (tinfo.hours < 12) {
 			msg_to_char(ch, "It is %smorning.\r\n", tinfo.hours <= 8 ? "early " : "");
