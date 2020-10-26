@@ -510,7 +510,7 @@ void send_hourly_sun_messages(void) {
 			}
 			case 12: {	// noon
 				if (is_zenith_day(IN_ROOM(desc->character))) {
-					msg_to_char(desc->character, "You watch as the sun passes directly overhead -- today is the zenith passage.\r\n");
+					msg_to_char(desc->character, "You watch as the sun passes directly overhead -- today is the zenith passage!\r\n");
 				}
 				break;
 			}
