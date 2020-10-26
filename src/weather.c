@@ -404,6 +404,11 @@ double get_hours_of_sun(room_data *room) {
 		days_percent = 1.0 - ((doy - SOUTHERN_SOLSTICE_DOY) / 90.0);
 	}
 	
+	// flip the days_percent in the south?
+	if (latitude < 0) {
+		days_percent = 1.0 - days_percent;
+	}
+	
 	if (max_hours > 12.0) {
 		hours = days_percent * (max_hours - 12.0) + 12.0;
 	}
@@ -486,10 +491,10 @@ int get_sun_status(room_data *room) {
 	sun_mod = (get_hours_of_sun(room) - 12.0) / 2.0;
 	// hours = tinfo.hours + (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
 	
-	if (ABSOLUTE(hours - (7.0 - sun_mod)) < 0.05) {
+	if (ABSOLUTE(hours - (7.0 - sun_mod)) < 0.5) {
 		return SUN_RISE;
 	}
-	else if (ABSOLUTE(hours - (19.0 + sun_mod)) < 0.05) {
+	else if (ABSOLUTE(hours - (19.0 + sun_mod)) < 0.5) {
 		return SUN_SET;
 	}
 	else if (hours > 7.0 - sun_mod && hours < 19.0 + sun_mod) {
