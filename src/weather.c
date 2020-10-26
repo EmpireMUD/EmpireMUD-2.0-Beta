@@ -589,6 +589,8 @@ void send_hourly_sun_messages(void) {
 		// check for sun changes
 		sun = get_sun_status(IN_ROOM(desc->character));
 		if (sun != GET_LAST_LOOK_SUN(desc->character)) {
+			GET_LAST_LOOK_SUN(desc->character) = sun;
+			
 			switch (sun) {
 				case SUN_RISE: {
 					if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT)) {
