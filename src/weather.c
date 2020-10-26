@@ -352,6 +352,73 @@ void another_hour(void) {
 
 
 /**
+* Determines the number of hours of sunlight in the room today, based on
+* latitude and time of year.
+*
+* NOTE: could be a double to get semi-hours of sun
+*
+* @param room_data *room The location.
+* @return int The number of hours of sunlight today.
+*/
+int get_hours_of_sun(room_data *room) {
+	double latitude, days_percent, max_hours;
+	struct time_info_data tinfo;
+	int y_coord, doy;
+	int hours = 12;
+	
+	// this takes latitude in degrees but uses it in radians for the tangent...
+	// it fits the graph we need though
+	#define HOURS_SUN_AT_SOLSTICE(latitude, flip)  (((flip) ? -2.5 : 2.5) * tan((latitude) / 48) + 12)
+	
+	if ((y_coord = Y_COORD(room)) == -1) {
+		return hours;	// no location: default
+	}
+	latitude = Y_TO_LATITUDE(y_coord);
+	tinfo = get_local_time(room);
+	doy = DAY_OF_YEAR(tinfo);
+	
+	// bound it to -67..67 because anything beyond that is in the arctic circle
+	latitude = MIN(-67.0, MAX(67.0, latitude));
+	
+	// set max_hours to the number of hours at the solstice
+	// and set days_percent to percent of the way to that solstice from the equinox
+	if (doy >= FIRST_EQUINOX_DOY && doy < NORTHERN_SOLSTICE_DOY) {
+		// march-june: days before the solstice
+		max_hours = HOURS_SUN_AT_SOLSTICE(latitude, (latitude < 0));
+		days_percent = (doy - FIRST_EQUINOX_DOY) / 90;
+	}
+	else if (doy >= NORTHERN_SOLSTICE_DOY && doy < LAST_EQUINOX_DOY) {
+		// june-september: days after the solstice
+		max_hours = HOURS_SUN_AT_SOLSTICE(latitude, (latitude < 0));
+		days_percent = 1.0 - ((doy - NORTHERN_SOLSTICE_DOY) / 90);
+	}
+	else if (doy >= LAST_EQUINOX_DOY && doy < SOUTHERN_SOLSTICE_DOY) {
+		// september-december: days before the solstice
+		max_hours = HOURS_SUN_AT_SOLSTICE(latitude, (latitude > 0));
+		days_percent = (doy - LAST_EQUINOX_DOY) / 90;
+	}
+	else {
+		// december-march: days after the solstice
+		if (doy < SOUTHERN_SOLSTICE_DOY) {
+			doy += 360;	// to make it "days after the solstice"
+		}
+		max_hours = HOURS_SUN_AT_SOLSTICE(latitude, (latitude < 0));
+		days_percent = 1.0 - ((doy - SOUTHERN_SOLSTICE_DOY) / 90);
+	}
+	
+	if (max_hours > 12.0) {
+		hours = round(days_percent * (max_hours - 12.0) + 12.0);
+	}
+	else if (max_hours < 12.0) {
+		hours = round(12.0 - (days_percent * (12.0 - max_hours)));
+	}
+	
+	// bound it to 0-24 hours of daylight
+	return MAX(0, MIN(24, hours));
+}
+
+
+/**
 * Determines exact local time based on east/west position.
 *
 * @param room_data *room The location.
@@ -399,13 +466,15 @@ struct time_info_data get_local_time(room_data *room) {
 */
 int get_sun_status(room_data *room) {
 	struct time_info_data tinfo = get_local_time(room);
-	if (tinfo.hours == 7) {
+	int sun_mod = round((get_hours_of_sun(room) - 12) / 2.0);
+	
+	if (tinfo.hours - sun_mod == 7) {
 		return SUN_RISE;
 	}
-	else if (tinfo.hours == 19) {
+	else if (tinfo.hours + sun_mod == 19) {
 		return SUN_SET;
 	}
-	else if (tinfo.hours > 7 && tinfo.hours < 19) {
+	else if (tinfo.hours - sun_mod > 7 && tinfo.hours + sun_mod < 19) {
 		return SUN_LIGHT;
 	}
 	else {
