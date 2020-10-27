@@ -2575,7 +2575,7 @@ typedef enum {
 #define SKY_LIGHTNING  3
 
 
-// Sun state for get_sun_status()
+// SUN_x: Sun state for get_sun_status()
 #define SUN_DARK  0
 #define SUN_RISE  1
 #define SUN_LIGHT  2

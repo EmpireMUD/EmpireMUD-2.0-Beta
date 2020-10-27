@@ -1741,8 +1741,6 @@ void stack_simple_msg_to_desc(descriptor_data *desc, const char *messg) {
 
 
 void close_socket(descriptor_data *d) {
-	struct stack_msg *stacked, *next_stacked;
-
 	LL_DELETE(descriptor_list, d);
 	CLOSE_SOCKET(d->descriptor);
 	flush_queues(d);
@@ -1790,123 +1788,8 @@ void close_socket(descriptor_data *d) {
 	/* JE 2/22/95 -- part of my unending quest to make switch stable */
 	if (d->original && d->original->desc)
 		d->original->desc = NULL;
-
-	/* Clear the command history. */
-	if (d->history) {
-		int cnt;
-		for (cnt = 0; cnt < HISTORY_SIZE; cnt++)
-			if (d->history[cnt])
-				free(d->history[cnt]);
-		free(d->history);
-	}
-
-	if (d->showstr_head)
-		free(d->showstr_head);
-	if (d->showstr_count)
-		free(d->showstr_vector);
-	if (d->backstr) {
-		free(d->backstr);
-	}
-	// do NOT free d->str_on_abort (is a pointer to something else)
 	
-	// other strings
-	if (d->host) {
-		free(d->host);
-	}
-	if (d->last_act_message) {
-		free(d->last_act_message);
-	}
-	if (d->file_storage) {
-		free(d->file_storage);
-	}
-	
-	// leftover stacked messages
-	DL_FOREACH_SAFE(d->stack_msg_list, stacked, next_stacked) {
-		DL_DELETE(d->stack_msg_list, stacked);
-		
-		if (stacked->string) {
-			free(stacked->string);
-		}
-		free(stacked);
-	}
-	
-	ProtocolDestroy(d->pProtocol);
-
-	// OLC_x: olc data
-	if (d->olc_storage) {
-		free(d->olc_storage);
-	}
-	if (d->olc_ability) {
-		free_ability(d->olc_ability);
-	}
-	if (d->olc_adventure) {
-		free_adventure(d->olc_adventure);
-	}
-	if (d->olc_archetype) {
-		free_archetype(d->olc_archetype);
-	}
-	if (d->olc_augment) {
-		free_augment(d->olc_augment);
-	}
-	if (d->olc_book) {
-		free_book(d->olc_book);
-	}
-	if (d->olc_craft) {
-		free_craft(d->olc_craft);
-	}
-	if (d->olc_object) {
-		free_obj(d->olc_object);
-	}
-	if (d->olc_mobile) {
-		free_char(d->olc_mobile);
-	}
-	if (d->olc_morph) {
-		free_morph(d->olc_morph);
-	}
-	if (d->olc_progress) {
-		free_progress(d->olc_progress);
-	}
-	if (d->olc_building) {
-		free_building(d->olc_building);
-	}
-	if (d->olc_crop) {
-		free_crop(d->olc_crop);
-	}
-	if (d->olc_event) {
-		free_event(d->olc_event);
-	}
-	if (d->olc_faction) {
-		free_faction(d->olc_faction);
-	}
-	if (d->olc_generic) {
-		free_generic(d->olc_generic);
-	}
-	if (d->olc_global) {
-		free_global(d->olc_global);
-	}
-	if (d->olc_quest) {
-		free_quest(d->olc_quest);
-	}
-	if (d->olc_room_template) {
-		free_room_template(d->olc_room_template);
-	}
-	if (d->olc_sector) {
-		free_sector(d->olc_sector);
-	}
-	if (d->olc_shop) {
-		free_shop(d->olc_shop);
-	}
-	if (d->olc_social) {
-		free_social(d->olc_social);
-	}
-	if (d->olc_trigger) {
-		free_trigger(d->olc_trigger);
-	}
-	if (d->olc_vehicle) {
-		free_vehicle(d->olc_vehicle);
-	}
-	
-	free(d);
+	free_descriptor(d);
 }
 
 
@@ -1919,6 +1802,137 @@ void flush_queues(descriptor_data *d) {
 		LL_PREPEND(bufpool, d->large_outbuf);
 	}
 	while (get_from_q(&d->input, buf2, &dummy));
+}
+
+
+/**
+* Frees a descriptor and all its data. Usually you should be calling
+* close_socket(desc) instead.
+*
+* @param descriptor_data *desc The descriptor.
+*/
+void free_descriptor(descriptor_data *desc) {
+	struct stack_msg *stacked, *next_stacked;
+	int count;
+	
+	if (desc->history) {
+		for (count = 0; count < HISTORY_SIZE; count++) {
+			if (desc->history[count]) {
+				free(desc->history[count]);
+			}
+		}
+		free(desc->history);
+	}
+
+	if (desc->showstr_head) {
+		free(desc->showstr_head);
+	}
+	if (desc->showstr_count) {
+		free(desc->showstr_vector);
+	}
+	if (desc->backstr) {
+		free(desc->backstr);
+	}
+	// do NOT free desc->str_on_abort (is a pointer to something else)
+	
+	// other strings
+	if (desc->host) {
+		free(desc->host);
+	}
+	if (desc->last_act_message) {
+		free(desc->last_act_message);
+	}
+	if (desc->file_storage) {
+		free(desc->file_storage);
+	}
+	
+	// leftover stacked messages
+	DL_FOREACH_SAFE(desc->stack_msg_list, stacked, next_stacked) {
+		DL_DELETE(desc->stack_msg_list, stacked);
+		
+		if (stacked->string) {
+			free(stacked->string);
+		}
+		free(stacked);
+	}
+	
+	ProtocolDestroy(desc->pProtocol);
+
+	// OLC_x: olc data
+	if (desc->olc_storage) {
+		free(desc->olc_storage);
+	}
+	if (desc->olc_ability) {
+		free_ability(desc->olc_ability);
+	}
+	if (desc->olc_adventure) {
+		free_adventure(desc->olc_adventure);
+	}
+	if (desc->olc_archetype) {
+		free_archetype(desc->olc_archetype);
+	}
+	if (desc->olc_augment) {
+		free_augment(desc->olc_augment);
+	}
+	if (desc->olc_book) {
+		free_book(desc->olc_book);
+	}
+	if (desc->olc_craft) {
+		free_craft(desc->olc_craft);
+	}
+	if (desc->olc_object) {
+		free_obj(desc->olc_object);
+	}
+	if (desc->olc_mobile) {
+		free_char(desc->olc_mobile);
+	}
+	if (desc->olc_morph) {
+		free_morph(desc->olc_morph);
+	}
+	if (desc->olc_progress) {
+		free_progress(desc->olc_progress);
+	}
+	if (desc->olc_building) {
+		free_building(desc->olc_building);
+	}
+	if (desc->olc_crop) {
+		free_crop(desc->olc_crop);
+	}
+	if (desc->olc_event) {
+		free_event(desc->olc_event);
+	}
+	if (desc->olc_faction) {
+		free_faction(desc->olc_faction);
+	}
+	if (desc->olc_generic) {
+		free_generic(desc->olc_generic);
+	}
+	if (desc->olc_global) {
+		free_global(desc->olc_global);
+	}
+	if (desc->olc_quest) {
+		free_quest(desc->olc_quest);
+	}
+	if (desc->olc_room_template) {
+		free_room_template(desc->olc_room_template);
+	}
+	if (desc->olc_sector) {
+		free_sector(desc->olc_sector);
+	}
+	if (desc->olc_shop) {
+		free_shop(desc->olc_shop);
+	}
+	if (desc->olc_social) {
+		free_social(desc->olc_social);
+	}
+	if (desc->olc_trigger) {
+		free_trigger(desc->olc_trigger);
+	}
+	if (desc->olc_vehicle) {
+		free_vehicle(desc->olc_vehicle);
+	}
+	
+	free(desc);
 }
 
 

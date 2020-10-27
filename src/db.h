@@ -402,6 +402,7 @@ long data_set_long(int key, long value);
 // descriptors
 extern descriptor_data *descriptor_list;
 
+void free_descriptor(descriptor_data *desc);
 bool has_anonymous_host(descriptor_data *desc);
 
 // empires
