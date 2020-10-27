@@ -525,6 +525,7 @@ extern struct instance_data *instance_list;
 extern bool instance_save_wait;
 extern struct instance_data *quest_instance_global;
 
+void free_instance(struct instance_data *inst);
 struct instance_data *get_instance_by_id(any_vnum instance_id);
 
 // interactions

@@ -1008,8 +1008,6 @@ void generate_adventure_instances(void) {
 * @param bool run_cleanup If TRUE, runs cleanup scripts. If FALSE, skips this.
 */
 void delete_instance(struct instance_data *inst, bool run_cleanup) {
-	struct instance_mob *im, *next_im;
-	struct adventure_link_rule *rule;
 	vehicle_data *veh, *next_veh;
 	char_data *mob, *next_mob;
 	room_data *room, *extraction_room;
@@ -1084,22 +1082,7 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	
 	// remove from list AFTER removing rooms
 	DL_DELETE(instance_list, inst);
-	if (inst->room) {
-		free(inst->room);
-	}
-	
-	// other stuff to free
-	HASH_ITER(hh, INST_MOB_COUNTS(inst), im, next_im) {
-		HASH_DEL(INST_MOB_COUNTS(inst), im);
-		free(im);
-	}
-	
-	while ((rule = INST_RULE(inst))) {
-		INST_RULE(inst) = rule->next;
-		free(rule);
-	}
-	
-	free(inst);
+	free_instance(inst);
 	
 	// re-enable instance saving
 	instance_save_wait = FALSE;
@@ -1217,6 +1200,35 @@ void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_
 		}
 	}
 }
+
+
+/**
+* Free an instance. This is normally called by delete_instance().
+*
+* @param struct instance_data *inst The instance to free.
+*/
+void free_instance(struct instance_data *inst) {
+	struct instance_mob *im, *next_im;
+	struct adventure_link_rule *rule;
+	
+	if (inst->room) {
+		free(inst->room);
+	}
+	
+	// other stuff to free
+	HASH_ITER(hh, INST_MOB_COUNTS(inst), im, next_im) {
+		HASH_DEL(INST_MOB_COUNTS(inst), im);
+		free(im);
+	}
+	
+	while ((rule = INST_RULE(inst))) {
+		INST_RULE(inst) = rule->next;
+		free(rule);
+	}
+	
+	free(inst);
+}
+
 
 
 /**
