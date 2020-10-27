@@ -467,7 +467,6 @@ struct time_info_data get_local_time(room_data *room) {
 * @return int One of SUN_RISE, SUN_LIGHT, SUN_SET, or SUN_DARK.
 */
 int get_sun_status(room_data *room) {
-	// struct time_info_data tinfo = get_local_time(room);
 	double hour, sun_mod, longitude, percent;
 	int x_coord;
 	
@@ -488,8 +487,6 @@ int get_sun_status(room_data *room) {
 	
 	// sun_mod is subtracted in the morning and added in the evening
 	sun_mod = get_hours_of_sun(room, FALSE) / 2.0;
-	// hour = tinfo.hours + (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
-	log("debug: sunrise=%.2f  hour=%.2f  sunset=%.2f (+/- 0.5)", (7.0 - sun_mod), hour, (19.0 + sun_mod));
 	
 	if (sun_mod == 0.0) {
 		return SUN_DARK;	// perpetual night
