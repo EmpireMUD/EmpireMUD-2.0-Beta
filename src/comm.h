@@ -38,6 +38,7 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 
 // reboot system
 extern struct reboot_control_data reboot_control;
+extern bool block_all_saves_due_to_shutdown;
 
 bool check_reboot_confirms();
 void perform_reboot();

@@ -985,6 +985,10 @@ void save_whole_world(void) {
 	room_vnum vnum;
 	int block, last;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	last = -1;
 	
 	// must sort first
@@ -4077,7 +4081,7 @@ void save_world_map_to_file(void) {
 	int tracks_lifespan = config_get_int("tracks_lifespan");
 	
 	// shortcut
-	if (!world_map_needs_save) {
+	if (!world_map_needs_save || block_all_saves_due_to_shutdown) {
 		return;
 	}
 	

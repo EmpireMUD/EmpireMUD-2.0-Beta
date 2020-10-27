@@ -528,6 +528,10 @@ void save_automessages(void) {
 	struct automessage *msg, *next_msg;
 	FILE *fl;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	if (!(fl = fopen(AUTOMESSAGE_FILE TEMP_SUFFIX, "w"))) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write %s", AUTOMESSAGE_FILE TEMP_SUFFIX);
 		return;
@@ -1929,6 +1933,7 @@ void free_empire(empire_data *emp) {
 	while ((eus = EMPIRE_UNIQUE_STORAGE(emp))) {
 		DL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
 		if (eus->obj) {
+			add_to_object_list(eus->obj);
 			extract_obj(eus->obj);
 		}
 		free(eus);
@@ -3202,6 +3207,10 @@ void save_empire_storage(empire_data *emp) {
 void save_empire(empire_data *emp, bool save_all_parts) {
 	FILE *fl;
 	char fname[30], tempname[64];
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 
 	if (!emp) {
 		return;
@@ -3234,6 +3243,10 @@ void save_empire(empire_data *emp, bool save_all_parts) {
 */
 void save_all_empires(void) {
 	empire_data *iter, *next_iter;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 
 	HASH_ITER(hh, empire_table, iter, next_iter) {
 		save_empire(iter, TRUE);
@@ -3246,6 +3259,10 @@ void save_all_empires(void) {
 */
 void save_marked_empires(void) {
 	empire_data *emp, *next_emp;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (EMPIRE_NEEDS_SAVE(emp)) {
@@ -4789,6 +4806,10 @@ void save_island_table(void) {
 	struct island_info *isle, *next_isle;
 	char temp[MAX_STRING_LENGTH];
 	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 	
 	if (!(fl = fopen(ISLAND_FILE TEMP_SUFFIX, "w"))) {
 		log("SYSERR: Unable to write %s", ISLAND_FILE TEMP_SUFFIX);
@@ -7568,6 +7589,10 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 	int zone = vnum / 100;
 	FILE *fl;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	// setup
 	if (type >= 0 && type < NUM_DB_BOOT_TYPES && db_boot_info[type].prefix && db_boot_info[type].suffix) {
 		prefix = db_boot_info[type].prefix;
@@ -8039,6 +8064,10 @@ void write_trigger_index(FILE *fl) {
 void save_index(int type) {
 	char filename[64], tempfile[64], *prefix = NULL, *suffix = NULL;
 	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 	
 	// setup
 	if (type >= 0 && type < NUM_DB_BOOT_TYPES && db_boot_info[type].prefix && db_boot_info[type].suffix) {

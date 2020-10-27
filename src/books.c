@@ -196,6 +196,10 @@ void save_author_books(int idnum) {
 	book_data *book, *next_book;
 	FILE *fl;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	sprintf(filename, "%s%d%s", BOOK_PREFIX, idnum, BOOK_SUFFIX);
 	strcpy(tempfile, filename);
 	strcat(tempfile, TEMP_SUFFIX);
@@ -247,6 +251,10 @@ void save_author_index(void) {
 	char filename[MAX_STRING_LENGTH], tempfile[MAX_STRING_LENGTH];
 	struct author_data *author, *next_author;
 	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 	
 	sprintf(filename, "%s%s", BOOK_PREFIX, INDEX_FILE);
 	strcpy(tempfile, filename);

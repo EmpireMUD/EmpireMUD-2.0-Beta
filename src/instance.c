@@ -2524,7 +2524,7 @@ void save_instances(void) {
 	int iter;
 	
 	// this prevents dozens of saves during an instance delete
-	if (instance_save_wait) {
+	if (instance_save_wait || block_all_saves_due_to_shutdown) {
 		return;
 	}
 	

@@ -1347,6 +1347,10 @@ void save_config_system(void) {
 	int last_set = -1;
 	FILE *fl;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	if (!(fl = fopen(CONFIG_FILE TEMP_SUFFIX, "w"))) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write %s", CONFIG_FILE TEMP_SUFFIX);
 		return;

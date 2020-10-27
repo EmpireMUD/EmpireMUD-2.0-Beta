@@ -1998,6 +1998,10 @@ int get_last_boot_version(void) {
 void write_last_boot_version(int version) {
 	FILE *fl;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	if (version == NOTHING) {
 		return;
 	}
@@ -5144,6 +5148,10 @@ void load_trading_post(void) {
 void save_trading_post(void) {
 	struct trading_post_data *tpd;
 	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 	
 	if (!(fl = fopen(TRADING_POST_FILE, "w"))) {
 		log("SYSERR: Unable to open file %s for writing.", TRADING_POST_FILE);

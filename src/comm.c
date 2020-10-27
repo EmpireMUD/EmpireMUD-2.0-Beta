@@ -142,6 +142,7 @@ static bool reboot_recovery = FALSE;
 int mother_desc;
 ush_int port;
 bool do_evo_import = FALSE;	// triggered by SIGUSR1 to import evolutions
+bool block_all_saves_due_to_shutdown = FALSE;	// if TRUE, nothing can be saved to file
 
 // vars to prevent running multiple cycles during a missed-pulse catch-up cycle
 bool catch_up_combat = FALSE;	// frequent_combat()

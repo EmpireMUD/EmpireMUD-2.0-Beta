@@ -4472,6 +4472,10 @@ void write_daily_quest_file(void) {
 	quest_data *qst, *next_qst;
 	FILE *fl;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	if (!(fl = fopen(DAILY_QUEST_FILE TEMP_SUFFIX, "w"))) {
 		log("SYSERR: Unable to write %s", DAILY_QUEST_FILE TEMP_SUFFIX);
 		return;

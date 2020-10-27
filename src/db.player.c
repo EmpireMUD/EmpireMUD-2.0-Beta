@@ -976,6 +976,7 @@ void free_char(char_data *ch) {
 			DL_DELETE(GET_HOME_STORAGE(ch), eus);
 			
 			if (eus->obj) {
+				add_to_object_list(eus->obj);
 				extract_obj(eus->obj);
 			}
 			free(eus);
@@ -2181,7 +2182,7 @@ void save_char(char_data *ch, room_data *load_room) {
 	struct map_data *map;
 	FILE *fl;
 
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch) || block_all_saves_due_to_shutdown) {
 		return;
 	}
 	
@@ -4400,6 +4401,10 @@ void reset_char(char_data *ch) {
 */
 void save_all_players(bool delay) {
 	descriptor_data *desc;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if ((STATE(desc) == CON_PLAYING) && !IS_NPC(desc->character)) {
