@@ -203,6 +203,8 @@ When using field - The variable returns:
 &csector&0 - The sector type of the room.
 &csector_flagged(FLG)&0 - True if a given sector flag is present.
 &csector_vnum&0 - The sector vnum of the room.
+&csun&0 - Sun status at the room (regardless of indoor/outdoor): dark, rising,
+   light, setting (only 'dark' makes the room dark).
 &ctemplate&0 - The room template vnum, if any.
 &ctime(field)&0 - Time at this room. Fields: hour, day, month, year, day_of_year.
 &ctitle&0 - The room's title (shown on 'look').

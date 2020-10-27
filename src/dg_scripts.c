@@ -5196,6 +5196,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "starboard")) {
 						direction_vars(r, STARBOARD, subfield, str, slen);
 					}
+					else if (!str_cmp(field, "sun")) {
+						snprintf(str, slen, "%s", sun_types[get_sun_status(r)]);
+					}
 					break;
 				}
 				case 't': {	// room.t*
