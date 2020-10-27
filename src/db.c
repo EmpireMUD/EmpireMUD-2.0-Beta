@@ -1949,6 +1949,7 @@ const char *versions_list[] = {
 	"b5.105",
 	"b5.106",
 	"b5.107",
+	"b5.112",
 	"\n"	// be sure the list terminates with \n
 };
 
@@ -4464,6 +4465,27 @@ PLAYER_UPDATE_FUNC(b5_107_players) {
 }
 
 
+// repairs bad dedicate ids on rooms
+void b5_112_update(void) {
+	struct map_data *map;
+	room_data *room;
+	
+	log("Applying b5.112 update to fix bad dedicate data...");
+	
+	LL_FOREACH(land_map, map) {
+		if (!(room = real_real_room(map->vnum)) || !ROOM_BLD_FLAGGED(room, BLD_DEDICATE)) {
+			remove_extra_data(&map->shared->extra_data, ROOM_EXTRA_DEDICATE_ID);
+		}
+	}
+	
+	DL_FOREACH2(interior_room_list, room, next_interior) {
+		if (!ROOM_BLD_FLAGGED(room, BLD_DEDICATE)) {
+			remove_room_extra_data(room, ROOM_EXTRA_DEDICATE_ID);
+		}
+	}
+}
+
+
 /**
 * Performs some auto-updates when the mud detects a new version.
 */
@@ -4791,6 +4813,9 @@ void check_version(void) {
 		if (MATCH_VERSION("b5.107")) {
 			log("Applying b5.107 update to move lastname data...");
 			update_all_players(NULL, b5_107_players);
+		}
+		if (MATCH_VERSION("b5.112")) {
+			b5_112_update();
 		}
 	}
 	
