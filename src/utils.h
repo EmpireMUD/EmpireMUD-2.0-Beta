@@ -2412,7 +2412,7 @@ bool look_at_moon(char_data *ch, char *name, int *number);
 void show_visible_moons(char_data *ch);
 
 // weather.c time
-double get_hours_of_sun(room_data *room, bool debug);
+double get_hours_of_sun(room_data *room);
 struct time_info_data get_local_time(room_data *room);
 int get_sun_status(room_data *room);
 int get_zenith_days_from_solstice(room_data *room);
