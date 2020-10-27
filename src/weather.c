@@ -479,7 +479,7 @@ int get_sun_status(room_data *room) {
 		// determine exact time
 		longitude = X_TO_LONGITUDE(x_coord) + 180.0;	// longitude from 0-360 instead of -/+180
 		percent = 1.0 - (longitude / 360.0);	// percentage of the way west
-		hour = main_time_info.hours - (24.0 * percent - ((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR + 1);
+		hour = main_time_info.hours - (24.0 * percent - ((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
 		if (hour < 0.0) {
 			hour += 24.0;
 		}
@@ -487,16 +487,23 @@ int get_sun_status(room_data *room) {
 	
 	
 	// sun_mod is subtracted in the morning and added in the evening
-	sun_mod = (get_hours_of_sun(room, FALSE) - 12.0) / 2.0;
+	sun_mod = get_hours_of_sun(room, FALSE) / 2.0;
 	// hour = tinfo.hours + (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
+	log("debug: sunrise=%.2f  hour=%.2f  sunset=%.2f (+/- 0.5)", (7.0 - sun_mod), hour, (19.0 + sun_mod));
 	
-	if (ABSOLUTE(hour - (7.0 - sun_mod)) < 0.5) {
+	if (sun_mod == 0.0) {
+		return SUN_DARK;	// perpetual night
+	}
+	else if (sun_mod == 12.0) {
+		return SUN_LIGHT;	// perpetual light;
+	}
+	else if (ABSOLUTE(hour - (12.0 - sun_mod)) < 0.5) {
 		return SUN_RISE;
 	}
-	else if (ABSOLUTE(hour - (19.0 + sun_mod)) < 0.5) {
+	else if (ABSOLUTE(hour - (12.0 + sun_mod)) < 0.5) {
 		return SUN_SET;
 	}
-	else if (hour > 7.0 - sun_mod && hour < 19.0 + sun_mod) {
+	else if (hour > 12.0 - sun_mod && hour < 12.0 + sun_mod) {
 		return SUN_LIGHT;
 	}
 	else {
