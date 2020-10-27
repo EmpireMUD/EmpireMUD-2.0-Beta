@@ -11,10 +11,10 @@
 ************************************************************************ */
 
 // command types
-#define ACMD(name)		void name(char_data *ch, char *argument, int cmd, int subcmd)
+#define ACMD(name)		void (name)(char_data *ch, char *argument, int cmd, int subcmd)
 #define EEDIT(name)		void (name)(char_data *ch, char *argument, empire_data *emp)
 #define EVENT_CMD(name)		void (name)(char_data *ch, char *argument)
-#define LIBRARY_SCMD(name)	void name(char_data *ch, char *argument)
+#define LIBRARY_SCMD(name)	void (name)(char_data *ch, char *argument)
 
 
 // prototypes
@@ -33,7 +33,7 @@ int Valid_Name(char *newname);
 struct command_info {
 	const char *command;
 	byte minimum_position;
-	void (*command_pointer)	(char_data *ch, char * argument, int cmd, int subcmd);
+	ACMD(*command_pointer);
 	sh_int minimum_level;
 	bitvector_t grants;
 	int	subcmd;
@@ -41,6 +41,10 @@ struct command_info {
 	sh_int flags;
 	any_vnum ability;
 };
+
+
+// data
+extern const struct command_info cmd_info[];
 
 
 // for the command_info structure
@@ -115,17 +119,8 @@ struct alias_data {
 #define SCMD_PILOT  2
 
 /* do_gen_ps */
-#define SCMD_INFO		0
-#define SCMD_HANDBOOK	1 
-#define SCMD_CREDITS	2
-#define SCMD_WIZLIST	3
-#define SCMD_POLICIES	4
-#define SCMD_VERSION	5
-#define SCMD_GODLIST	6
-#define SCMD_MOTD		7
-#define SCMD_IMOTD		8
-#define SCMD_CLEAR		9
-#define SCMD_NEWS		10
+#define SCMD_VERSION  0
+#define SCMD_CLEAR  1
 
 /* do_say */
 #define SCMD_SAY			0

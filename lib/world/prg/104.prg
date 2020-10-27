@@ -16,11 +16,11 @@ S
 #10450
 Goblin Architecture~
    Your advisors think we have much to learn from the goblins. Their portable
-buildings will help the empire's adventurers when they travel far from home. 
+buildings will help the empire's adventurers when they travel far from home.
 Build each of the buildings from the Goblin Outpost: the war tent, the message
 post, the lab tent, and the dolmen.
 ~
-1 4 0 5 c
+2 4 0 5 c
 K 7 5
 W
 7 10479 0 1 a
@@ -30,5 +30,13 @@ W
 7 10481 0 1 a
 W
 7 10482 0 1 a
+W
+8 10483 0 1 b
+W
+8 10484 0 1 b
+W
+7 10480 0 1 b
+W
+7 10482 0 1 b
 S
 $

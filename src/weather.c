@@ -82,7 +82,7 @@ void determine_seasons(void) {
 	
 	// Day_of_year is the x-axis of the graph that determines the season at a
 	// given y-coord. Month 0 is january; year is 0-359 days.
-	day_of_year = main_time_info.month * 30 + main_time_info.day;
+	day_of_year = DAY_OF_YEAR(main_time_info);
 	
 	for (ycoord = 0; ycoord < MAP_HEIGHT; ++ycoord) {
 		latitude = Y_TO_LATITUDE(ycoord);
@@ -352,6 +352,75 @@ void another_hour(void) {
 
 
 /**
+* Determines the number of hours of sunlight in the room today, based on
+* latitude and time of year.
+*
+* @param room_data *room The location.
+* @return double The number of hours of sunlight today.
+*/
+double get_hours_of_sun(room_data *room, bool debug) {
+	double latitude, days_percent, max_hours;
+	struct time_info_data tinfo;
+	int y_coord, doy;
+	double hours = 12.0;
+	
+	// this takes latitude in degrees but uses it in radians for the tangent...
+	// it fits the graph we need though
+	#define HOURS_SUN_AT_SOLSTICE(latitude, flip)  (((flip) ? -2.5 : 2.5) * tan((latitude) / 48) + 12)
+	
+	if ((y_coord = Y_COORD(room)) == -1) {
+		return hours;	// no location: default
+	}
+	latitude = Y_TO_LATITUDE(y_coord);
+	tinfo = get_local_time(room);
+	doy = DAY_OF_YEAR(tinfo);
+	
+	// bound it to -67..67 because anything beyond that is in the arctic circle
+	latitude = MAX(-67.0, MIN(67.0, latitude));
+	
+	// set max_hours to the number of hours at the solstice
+	// and set days_percent to percent of the way to that solstice from the equinox
+	if (doy >= FIRST_EQUINOX_DOY && doy < NORTHERN_SOLSTICE_DOY) {
+		// march-june: days before the solstice
+		max_hours = HOURS_SUN_AT_SOLSTICE(latitude, FALSE);
+		days_percent = (doy - FIRST_EQUINOX_DOY) / 90.0;
+	}
+	else if (doy >= NORTHERN_SOLSTICE_DOY && doy < LAST_EQUINOX_DOY) {
+		// june-september: days after the solstice
+		max_hours = HOURS_SUN_AT_SOLSTICE(latitude, FALSE);
+		days_percent = 1.0 - ((doy - NORTHERN_SOLSTICE_DOY) / 90.0);
+	}
+	else if (doy >= LAST_EQUINOX_DOY && doy < SOUTHERN_SOLSTICE_DOY) {
+		// september-december: days before the solstice
+		max_hours = HOURS_SUN_AT_SOLSTICE(latitude, TRUE);
+		days_percent = (doy - LAST_EQUINOX_DOY) / 90.0;
+	}
+	else {
+		// december-march: days after the solstice
+		if (doy < SOUTHERN_SOLSTICE_DOY) {
+			doy += 360;	// to make it "days after the solstice"
+		}
+		max_hours = HOURS_SUN_AT_SOLSTICE(latitude, TRUE);
+		days_percent = 1.0 - ((doy - SOUTHERN_SOLSTICE_DOY) / 90.0);
+	}
+	
+	if (max_hours > 12.0) {
+		hours = days_percent * (max_hours - 12.0) + 12.0;
+	}
+	else if (max_hours < 12.0) {
+		hours = 12.0 - (days_percent * (12.0 - max_hours));
+	}
+	
+	if (debug) {
+		log("lat=%.2f, doy=%d, perc=%.2f, max_hours=%.2f, hours=%.2f", latitude, doy, days_percent, max_hours, hours);
+	}
+	
+	// bound it to 0-24 hours of daylight
+	return MAX(0.0, MIN(24.0, hours));
+}
+
+
+/**
 * Determines exact local time based on east/west position.
 *
 * @param room_data *room The location.
@@ -398,18 +467,109 @@ struct time_info_data get_local_time(room_data *room) {
 * @return int One of SUN_RISE, SUN_LIGHT, SUN_SET, or SUN_DARK.
 */
 int get_sun_status(room_data *room) {
-	struct time_info_data tinfo = get_local_time(room);
-	if (tinfo.hours == 7) {
+	// struct time_info_data tinfo = get_local_time(room);
+	double hour, sun_mod, longitude, percent;
+	int x_coord;
+	
+	if ((x_coord = X_COORD(room)) == -1) {
+		// no x-coord (not in a mappable spot)
+		hour = main_time_info.hours + (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
+	}
+	else {
+		// determine exact time
+		longitude = X_TO_LONGITUDE(x_coord) + 180.0;	// longitude from 0-360 instead of -/+180
+		percent = 1.0 - (longitude / 360.0);	// percentage of the way west
+		hour = main_time_info.hours - (24.0 * percent - ((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
+		if (hour < 0.0) {
+			hour += 24.0;
+		}
+	}
+	
+	
+	// sun_mod is subtracted in the morning and added in the evening
+	sun_mod = get_hours_of_sun(room, FALSE) / 2.0;
+	// hour = tinfo.hours + (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
+	log("debug: sunrise=%.2f  hour=%.2f  sunset=%.2f (+/- 0.5)", (7.0 - sun_mod), hour, (19.0 + sun_mod));
+	
+	if (sun_mod == 0.0) {
+		return SUN_DARK;	// perpetual night
+	}
+	else if (sun_mod == 12.0) {
+		return SUN_LIGHT;	// perpetual light;
+	}
+	else if (ABSOLUTE(hour - (12.0 - sun_mod)) < 0.5) {
 		return SUN_RISE;
 	}
-	else if (tinfo.hours == 19) {
+	else if (ABSOLUTE(hour - (12.0 + sun_mod)) < 0.5) {
 		return SUN_SET;
 	}
-	else if (tinfo.hours > 7 && tinfo.hours < 19) {
+	else if (hour > 12.0 - sun_mod && hour < 12.0 + sun_mod) {
 		return SUN_LIGHT;
 	}
 	else {
 		return SUN_DARK;
+	}
+}
+
+
+/**
+* Gets the numbers of days from the solstice a given room will experience
+* zenith passage -- the day(s) of the year where the sun passes directly over-
+* head at noon. This only occurs in the tropics; everywhere else returns -1.
+*
+* @param room_data *room The location.
+* @return int Number of days before/after the solstice that the zenith occurs (or -1 if no zenith).
+*/
+int get_zenith_days_from_solstice(room_data *room) {
+	double latitude, percent_from_solstice;
+	int y_coord;
+	
+	if ((y_coord = Y_COORD(room)) == -1) {
+		return -1;	// exit early if not on the map
+	}
+	
+	latitude = Y_TO_LATITUDE(y_coord);
+	if (latitude > TROPIC_LATITUDE || latitude < -TROPIC_LATITUDE) {
+		return -1;	// not in the tropics
+	}
+	
+	// percent of days from the solstice to equinox that the zenith happens
+	percent_from_solstice = 1.0 - ABSOLUTE(latitude / TROPIC_LATITUDE);
+	return (int)round(percent_from_solstice * 90);	// 90 days in 1/4 year
+}
+
+
+/**
+* Determines whether or not today is the day of zenith passage -- the day(s) of
+* the year where the sun passes directly overhead at noon. This only occurs in
+* the tropics; everywhere else returns FALSE all year.
+*
+* @param room_data *room The location to check.
+* @return bool TRUE if the current day (in that room) is the day of zenith passage, or FALSE if not.
+*/
+bool is_zenith_day(room_data *room) {
+	int zenith_days, y_coord, doy;
+	struct time_info_data tinfo;
+	
+	if ((y_coord = Y_COORD(room)) == -1 || (zenith_days = get_zenith_days_from_solstice(room)) < 0) {
+		return FALSE;	// exit early if not on the map or no zenith
+	}
+	
+	// get day of year
+	tinfo = get_local_time(room);
+	
+	if (Y_TO_LATITUDE(y_coord) > 0) {
+		// northern hemisphere: no need to wrap here (unlike the southern solstice)
+		return (ABSOLUTE(NORTHERN_SOLSTICE_DOY - DAY_OF_YEAR(tinfo)) == zenith_days);
+	}
+	else {
+		// southern hemisphere
+		doy = DAY_OF_YEAR(tinfo);
+		if (doy < 90) {
+			// wrap it around to put it in range of the december solstice
+			doy += 360;
+		}
+		return (ABSOLUTE(SOUTHERN_SOLSTICE_DOY - doy) == zenith_days);
 	}
 }
 
@@ -420,6 +580,7 @@ int get_sun_status(room_data *room) {
 void send_hourly_sun_messages(void) {
 	struct time_info_data tinfo;
 	descriptor_data *desc;
+	int sun;
 	
 	LL_FOREACH(descriptor_list, desc) {
 		if (STATE(desc) != CON_PLAYING || desc->character == NULL) {
@@ -432,33 +593,43 @@ void send_hourly_sun_messages(void) {
 		// get local time
 		tinfo = get_local_time(IN_ROOM(desc->character));
 		
-		switch (tinfo.hours) {
-			case 7: {	// sunrise
-				// show map if needed
-				if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && get_sun_status(IN_ROOM(desc->character)) != GET_LAST_LOOK_SUN(desc->character)) {
-					look_at_room(desc->character);
-					msg_to_char(desc->character, "\r\n");
+		// check for sun changes
+		sun = get_sun_status(IN_ROOM(desc->character));
+		if (sun != GET_LAST_LOOK_SUN(desc->character)) {
+			GET_LAST_LOOK_SUN(desc->character) = sun;
+			
+			switch (sun) {
+				case SUN_RISE: {
+					if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT)) {
+						// show map if needed
+						look_at_room(desc->character);
+						msg_to_char(desc->character, "\r\n");
+					}
+					msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
+					break;
 				}
-				msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
-				break;
-			}
-			case 8: {	// day start
-				msg_to_char(desc->character, "The day has begun.\r\n");
-				break;
-			}
-			case 19: {	// sunset
-				msg_to_char(desc->character, "The sun slowly disappears beneath the horizon.\r\n");
-				break;
-			}
-			case 20: {	// dark
-				// show map if needed
-				if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && get_sun_status(IN_ROOM(desc->character)) != GET_LAST_LOOK_SUN(desc->character)) {
-					look_at_room(desc->character);
-					msg_to_char(desc->character, "\r\n");
+				case SUN_LIGHT: {
+					msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
+					break;
 				}
-				msg_to_char(desc->character, "The night has begun.\r\n");
-				break;
+				case SUN_SET: {
+					msg_to_char(desc->character, "The sun slowly disappears beneath the horizon.\r\n");
+					break;
+				}
+				case SUN_DARK: {
+					if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT)) {
+						look_at_room(desc->character);
+						msg_to_char(desc->character, "\r\n");
+					}
+					msg_to_char(desc->character, "The night has begun.\r\n");
+					break;
+				}
 			}
+		}	// end sun-change
+		
+		// check and show zenith
+		if (tinfo.hours == 12 && is_zenith_day(IN_ROOM(desc->character))) {
+			msg_to_char(desc->character, "You watch as the sun passes directly overhead -- today is the zenith passage!\r\n");
 		}
 	}
 }

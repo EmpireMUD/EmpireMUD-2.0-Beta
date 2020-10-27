@@ -47,8 +47,11 @@ extern struct empire_chore_type chore_data[NUM_CHORES];
 
 // external funcs
 void check_nowhere_einv(empire_data *emp, int new_island);
-extern bool empire_is_ignoring(empire_data *emp, char_data *victim);
-void identify_obj_to_char(obj_data *obj, char_data *ch);
+bool empire_is_ignoring(empire_data *emp, char_data *victim);
+void warehouse_inventory(char_data *ch, char *argument, int mode);
+void warehouse_identify(char_data *ch, char *argument, int mode);
+void warehouse_retrieve(char_data *ch, char *argument, int mode);
+void warehouse_store(char_data *ch, char *argument, int mode);
 
 // local prototypes
 bool is_affiliated_island(empire_data *emp, int island_id);
@@ -5238,11 +5241,6 @@ room_data *find_home(char_data *ch) {
 
 
 ACMD(do_home) {
-	void warehouse_inventory(char_data *ch, char *argument, int mode);
-	void warehouse_identify(char_data *ch, char *argument, int mode);
-	void warehouse_retrieve(char_data *ch, char *argument, int mode);
-	void warehouse_store(char_data *ch, char *argument, int mode);
-	
 	char command[MAX_INPUT_LENGTH];
 	struct empire_territory_data *ter;
 	room_data *iter, *next_iter, *home = NULL, *real = HOME_ROOM(IN_ROOM(ch));

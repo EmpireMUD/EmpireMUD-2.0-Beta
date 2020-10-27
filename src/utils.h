@@ -1950,6 +1950,7 @@ room_data *find_docks(empire_data *emp, int island_id);
 int find_free_shipping_id(empire_data *emp);
 obj_data *find_lighter_in_list(obj_data *list, bool *had_keep);
 bool get_check_money(char_data *ch, obj_data *obj);
+void identify_obj_to_char(obj_data *obj, char_data *ch);
 int obj_carry_size(obj_data *obj);
 void process_shipping();
 void remove_armor_by_type(char_data *ch, int armor_type);
@@ -2031,6 +2032,8 @@ void sire_char(char_data *ch, char_data *victim);
 void start_drinking_blood(char_data *ch, char_data *victim);
 bool starving_vampire_aggro(char_data *ch);
 void taste_blood(char_data *ch, char_data *vict);
+void un_deathshroud(char_data *ch);
+void un_mummify(char_data *ch);
 void update_biting_char(char_data *ch);
 void update_vampire_sun(char_data *ch);
 
@@ -2090,6 +2093,7 @@ bool check_unique_empire_name(empire_data *for_emp, char *name);
 bool valid_rank_name(char_data *ch, char *newname);
 
 // event.c
+int gain_event_points(char_data *ch, any_vnum event_vnum, int points);
 struct player_event_data *get_event_data(char_data *ch, int event_id);
 
 // faction.c
@@ -2142,6 +2146,8 @@ int count_instances(adv_data *adv);
 int delete_all_instances(adv_data *adv);
 void delete_instance(struct instance_data *inst, bool run_cleanup);
 void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_data *to_room);
+room_data *find_nearest_adventure(room_data *from, rmt_vnum vnum);
+room_data *find_nearest_rmt(room_data *from, rmt_vnum vnum);
 room_data *find_room_template_in_instance(struct instance_data *inst, rmt_vnum vnum);
 void generate_adventure_instances();
 struct instance_data *get_instance_by_mob(char_data *mob);
@@ -2154,6 +2160,7 @@ void remove_instance_fake_loc(struct instance_data *inst);
 void reset_instance(struct instance_data *inst);
 void save_instances();
 void scale_instance_to_level(struct instance_data *inst, int level);
+void set_instance_fake_loc(struct instance_data *inst, room_data *loc);
 void unlink_instance_entrance(room_data *room, struct instance_data *inst, bool run_cleanup);
 
 // limits.c
@@ -2246,6 +2253,7 @@ void purchase_goal(empire_data *emp, progress_data *prg, char_data *purchased_by
 void refresh_empire_goals(empire_data *emp, any_vnum only_vnum);
 void refresh_one_goal_tracker(empire_data *emp, struct empire_goal *goal);
 void remove_completed_goal(empire_data *emp, any_vnum vnum);
+void script_reward_goal(empire_data *emp, progress_data *prg);
 struct empire_goal *start_empire_goal(empire_data *e, progress_data *prg);
 
 // quest.c
@@ -2279,6 +2287,7 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 struct player_completed_quest *has_completed_quest(char_data *ch, any_vnum quest, int instance_id);
 struct player_quest *is_on_quest(char_data *ch, any_vnum quest);
 struct player_quest *is_on_quest_by_name(char_data *ch, char *argument);
+char *quest_giver_string(struct quest_giver *giver, bool show_vnums);
 char *quest_reward_string(struct quest_reward *reward, bool show_vnums);
 void refresh_all_quests(char_data *ch);
 void refresh_one_quest_tracker(char_data *ch, struct player_quest *pq);
@@ -2403,8 +2412,11 @@ bool look_at_moon(char_data *ch, char *name, int *number);
 void show_visible_moons(char_data *ch);
 
 // weather.c time
+double get_hours_of_sun(room_data *room, bool debug);
 struct time_info_data get_local_time(room_data *room);
 int get_sun_status(room_data *room);
+int get_zenith_days_from_solstice(room_data *room);
+bool is_zenith_day(room_data *room);
 
 // weather.c weather
 void reset_weather();
@@ -2444,6 +2456,9 @@ void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount)
 // time: converts 0-23 to 1-12am, 1-12pm
 #define TIME_TO_12H(time)  ((time) > 12 ? (time) - 12 : ((time) == 0 ? 12 : (time)))
 #define AM_PM(time)  (time < 12 ? "am" : "pm")
+
+// time: gets day of year
+#define DAY_OF_YEAR(timeinfo)  ((timeinfo).month * 30 + (timeinfo).day + 1)
 
 
 /* undefine MAX and MIN so that our macros are used instead */

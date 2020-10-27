@@ -338,7 +338,7 @@ void hitprcnt_mtrigger(char_data *ch);
 int bribe_mtrigger(char_data *ch, char_data *actor, int amount);
 
 void complete_wtrigger(room_data *room);
-extern int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable);
+int dismantle_wtrigger(room_data *room, char_data *actor, bool preventable);
 
 void reset_wtrigger(room_data *ch);
 
@@ -554,7 +554,7 @@ void check_dg_owner_purged_room(room_data *room);
 void check_dg_owner_purged_vehicle(vehicle_data *veh);
 
 // id helpers
-extern int char_script_id(char_data *ch);
-extern int obj_script_id(obj_data *obj);
-extern int veh_script_id(vehicle_data *veh);
+int char_script_id(char_data *ch);
+int obj_script_id(obj_data *obj);
+int veh_script_id(vehicle_data *veh);
 #define room_script_id(room)  (GET_ROOM_VNUM(room) + ROOM_ID_BASE)

@@ -137,18 +137,19 @@
 #define VEH_SUFFIX  ".veh"	// vehicle file suffix
 #define WLD_SUFFIX  ".wld"	// suffix for rooms
 
-// various text files
-#define CREDITS_FILE  LIB_TEXT"credits"	// for the 'credits' command
-#define SCREDITS_FILE  LIB_TEXT"credits.short"	// short version of credits
-#define MOTD_FILE  LIB_TEXT"motd"	// messages of the day / mortal
-#define IMOTD_FILE  LIB_TEXT"imotd"	// messages of the day / immort
-#define HELP_PAGE_FILE  LIB_TEXT_HELP"screen"	// for HELP <CR>
-#define INFO_FILE  LIB_TEXT"info"	// for INFO
-#define WIZLIST_FILE  LIB_TEXT"wizlist"	// for WIZLIST
-#define GODLIST_FILE  LIB_TEXT"godlist"	// for GODLIST
-#define POLICIES_FILE  LIB_TEXT"policies"	// player policies/rules
-#define HANDBOOK_FILE  LIB_TEXT"handbook"	// handbook for new immorts
-#define NEWS_FILE  LIB_TEXT"news"	// shown when players type 'news'
+// TEXT_FILE_x: Text loaded from files for display in-game
+#define TEXT_FILE_CREDITS  0
+#define TEXT_FILE_GODLIST  1
+#define TEXT_FILE_HANDBOOK  2
+#define TEXT_FILE_HELP_SCREEN  3
+#define TEXT_FILE_IMOTD  4
+#define TEXT_FILE_INFO  5
+#define TEXT_FILE_MOTD  6
+#define TEXT_FILE_NEWS  7
+#define TEXT_FILE_POLICY  8
+#define TEXT_FILE_SHORT_CREDITS  9
+#define TEXT_FILE_WIZLIST  10
+#define NUM_TEXT_FILE_STRINGS  11	// total
 
 // misc files (user-modifiable libs)
 #define CONFIG_FILE  LIB_MISC"game_configs"  // config.c system
@@ -272,8 +273,8 @@ char *get_ability_name_by_vnum(any_vnum vnum);
 
 // accounts
 void add_player_to_account(char_data *ch, account_data *acct);
-extern account_data *create_account_for_player(char_data *ch);
-extern account_data *find_account(int id);
+account_data *create_account_for_player(char_data *ch);
+account_data *find_account(int id);
 void remove_player_from_account(char_data *ch);
 
 // adventures
@@ -298,7 +299,7 @@ void write_applies_to_file(FILE *fl, struct apply_data *list);
 extern archetype_data *archetype_table;
 extern archetype_data *sorted_archetypes;
 
-extern archetype_data *archetype_proto(any_vnum vnum);
+archetype_data *archetype_proto(any_vnum vnum);
 void free_archetype(archetype_data *arch);
 void free_archetype_gear(struct archetype_gear *list);
 void parse_archetype_gear(FILE *fl, struct archetype_gear **list, char *error);
@@ -352,17 +353,21 @@ struct empire_city_data *create_city_entry(empire_data *emp, char *name, room_da
 // classes
 extern class_data *class_table;
 extern class_data *sorted_classes;
-extern class_data *find_class(char *argument);
-extern class_data *find_class_by_name(char *name);
-extern class_data *find_class_by_vnum(any_vnum vnum);
+
+class_data *find_class(char *argument);
+class_data *find_class_by_name(char *name);
+class_data *find_class_by_vnum(any_vnum vnum);
 void free_class(class_data *cls);
+
+// configs
+void save_config_system();
 
 // crafts
 extern craft_data *craft_table;
 extern craft_data *sorted_crafts;
 
 void add_craft_to_table(craft_data *craft);
-extern craft_data *craft_proto(craft_vnum vnum);
+craft_data *craft_proto(craft_vnum vnum);
 void init_craft(craft_data *craft);
 void free_craft(craft_data *craft);
 void remove_craft_from_table(craft_data *craft);
@@ -433,12 +438,12 @@ void update_member_data(char_data *ch);
 
 // empire offenses
 void add_offense(empire_data *emp, int type, char_data *offender, room_data *loc, bitvector_t flags);
-extern int avenge_offenses_from_empire(empire_data *emp, empire_data *foe);
-extern int avenge_solo_offenses_from_player(empire_data *emp, char_data *foe);
+int avenge_offenses_from_empire(empire_data *emp, empire_data *foe);
+int avenge_solo_offenses_from_player(empire_data *emp, char_data *foe);
 void clean_empire_offenses();
-extern int get_total_offenses_from_empire(empire_data *emp, empire_data *foe);
-extern int get_total_offenses_from_char(empire_data *emp, char_data *ch);
-extern bool offense_was_seen(char_data *ch, empire_data *emp, room_data *from_room);
+int get_total_offenses_from_empire(empire_data *emp, empire_data *foe);
+int get_total_offenses_from_char(empire_data *emp, char_data *ch);
+bool offense_was_seen(char_data *ch, empire_data *emp, room_data *from_room);
 void remove_offense(empire_data *emp, struct offense_data *off);
 void remove_recent_offenses(empire_data *emp, int type, char_data *offender);
 
@@ -476,9 +481,10 @@ extern faction_data *faction_table;
 extern int MAX_REPUTATION;
 extern int MIN_REPUTATION;
 extern faction_data *sorted_factions;
-extern faction_data *find_faction(char *argument);
-extern faction_data *find_faction_by_name(char *name);
-extern faction_data *find_faction_by_vnum(any_vnum vnum);
+
+faction_data *find_faction(char *argument);
+faction_data *find_faction_by_name(char *name);
+faction_data *find_faction_by_vnum(any_vnum vnum);
 void free_faction(faction_data *fct);
 
 // generics
@@ -570,14 +576,15 @@ void save_char(char_data *ch, room_data *load_room);
 void clear_delayed_update(char_data *ch);
 void queue_delayed_update(char_data *ch, bitvector_t type);
 void update_player_index(player_index_data *index, char_data *ch);
-extern char_data *find_or_load_player(char *name, bool *is_file);
+char_data *find_or_load_player(char *name, bool *is_file);
 void store_loaded_char(char_data *ch);
 char_data *load_player(char *name, bool normal);
 
 // morphs
 extern morph_data *morph_table;
 extern morph_data *sorted_morphs;
-extern morph_data *morph_proto(any_vnum vnum);
+
+morph_data *morph_proto(any_vnum vnum);
 void free_morph(morph_data *morph);
 
 // objects
@@ -609,6 +616,8 @@ extern struct int_hash *inherent_ptech_hash;
 extern int max_inventory_size;
 extern bool pause_affect_total;
 
+void add_lastname(char_data *ch, char *name);
+void add_player_to_table(player_index_data *plr);
 void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
 void delete_player_character(char_data *ch);
@@ -626,6 +635,8 @@ char_data *is_at_menu(int id);
 char_data *is_playing(int id);
 bool member_is_timed_out_index(player_index_data *index);
 struct mail_data *parse_mail(FILE *fl, char *first_line);
+void remove_lastname(char_data *ch, char *name);
+void remove_player_from_table(player_index_data *plr);
 void save_all_players(bool delay);
 void start_new_character(char_data *ch);
 int *summarize_weekly_playtime(empire_data *emp);
@@ -715,17 +726,19 @@ shop_data *real_shop(any_vnum vnum);
 // skills
 extern skill_data *skill_table;
 extern skill_data *sorted_skills;
-extern skill_data *find_skill(char *argument);
-extern skill_data *find_skill_by_name(char *name);
-extern skill_data *find_skill_by_vnum(any_vnum vnum);
+
+skill_data *find_skill(char *argument);
+skill_data *find_skill_by_name(char *name);
+skill_data *find_skill_by_vnum(any_vnum vnum);
 void free_skill(skill_data *skill);
-extern char *get_skill_abbrev_by_vnum(any_vnum vnum);
-extern char *get_skill_name_by_vnum(any_vnum vnum);
+char *get_skill_abbrev_by_vnum(any_vnum vnum);
+char *get_skill_name_by_vnum(any_vnum vnum);
 
 // socials
 extern social_data *social_table;
 extern social_data *sorted_socials;
-extern social_data *social_proto(any_vnum vnum);
+
+social_data *social_proto(any_vnum vnum);
 void free_social(social_data *soc);
 
 // starting locations / start locs
@@ -739,7 +752,7 @@ extern double empire_score_average[NUM_SCORES];
 void add_stored_event(struct stored_event **list, int type, struct dg_event *event);
 void cancel_stored_event(struct stored_event **list, int type);
 void delete_stored_event(struct stored_event **list, int type);
-extern struct stored_event *find_stored_event(struct stored_event *list, int type);
+struct stored_event *find_stored_event(struct stored_event *list, int type);
 
 // stored event helpers
 #define add_stored_event_room(room, type, ev)  add_stored_event(&SHARED_DATA(room)->events, type, ev)
@@ -771,8 +784,8 @@ extern vehicle_data *vehicle_table;
 
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void free_vehicle(vehicle_data *veh);
-extern vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
-extern vehicle_data *vehicle_proto(any_vnum vnum);
+vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
+vehicle_data *vehicle_proto(any_vnum vnum);
 
 // wizlock system
 extern int wizlock_level;
@@ -842,6 +855,7 @@ extern char **tips_of_the_day;
 extern int tips_of_the_day_size;
 
 void load_intro_screens();
+void reload_text_string(int type);
 
 // more frees
 void free_apply_list(struct apply_data *list);
@@ -856,6 +870,9 @@ extern bool global_mute_slash_channel_joins;
 // statistics.c
 extern int max_players_this_uptime;
 
+// text file strings
+extern char *text_file_strings[NUM_TEXT_FILE_STRINGS];
+
 // workforce.c
 extern struct empire_territory_data *global_next_territory_entry;
 
@@ -867,7 +884,6 @@ extern struct empire_territory_data *global_next_territory_entry;
 	char buf2[MAX_STRING_LENGTH];
 	char arg[MAX_STRING_LENGTH];
 #else
-	extern struct player_special_data dummy_mob;
 	extern struct shared_room_data ocean_shared_data;
 	extern char buf[MAX_STRING_LENGTH];
 	extern char buf1[MAX_STRING_LENGTH];

@@ -88,6 +88,9 @@ void process_tanning(char_data *ch);
 // other local protos
 INTERACTION_FUNC(finish_foraging);
 
+// external variables
+extern bool catch_up_actions;
+
 // external functions
 ACMD(do_saw);
 ACMD(do_mint);
@@ -134,7 +137,7 @@ const struct action_data_struct action_data[] = {
 	{ "quarrying", "is quarrying stone.", ACTF_HASTE | ACTF_FAST_CHORES, process_gen_interact_room, NULL },	// ACT_QUARRYING
 	{ "driving", "is driving.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_DRIVING
 	{ "tanning", "is tanning leather.", ACTF_FAST_CHORES, process_tanning, cancel_resource_list },	// ACT_TANNING
-	{ "reading", "is reading a book.", ACTF_SITTING, process_reading, NULL },	// ACT_READING
+	{ "reading", "is reading a book.", ACTF_SITTING | ACTF_ALWAYS_FAST, process_reading, NULL },	// ACT_READING
 	{ "copying", "is writing out a copy of a book.", NOBITS, process_copying_book, NULL },	// ACT_COPYING_BOOK
 	{ "crafting", "is working on something.", NOBITS, process_gen_craft, cancel_gen_craft },	// ACT_GEN_CRAFT
 	{ "sailing", "is sailing the ship.", ACTF_VEHICLE_SPEEDS | ACTF_SITTING, process_driving, cancel_driving },	// ACT_SAILING
@@ -260,8 +263,6 @@ void stop_room_action(room_data *room, int action) {
 * This is the main processor for periodic actions (ACT_), once per second.
 */
 void update_actions(void) {
-	extern bool catch_up_actions;
-	
 	// prevent running multiple action rounds during a catch-up cycle
 	if (!catch_up_actions) {
 		return;

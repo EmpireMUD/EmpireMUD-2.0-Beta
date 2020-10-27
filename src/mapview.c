@@ -40,7 +40,7 @@
 
 // external functions
 ACMD(do_weather);
-extern vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
+vehicle_data *find_vehicle_to_show(char_data *ch, room_data *room);
 
 // locals
 ACMD(do_exits);

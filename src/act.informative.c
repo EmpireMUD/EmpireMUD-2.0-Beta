@@ -2482,51 +2482,6 @@ ACMD(do_factions) {
 /* Generic page_string function for displaying text */
 ACMD(do_gen_ps) {
 	switch (subcmd) {
-		case SCMD_CREDITS: {
-			extern char *credits;
-			page_string(ch->desc, credits, 0);
-			break;
-		}
-		case SCMD_INFO: {
-			extern char *info;
-			page_string(ch->desc, info, 0);
-			break;
-		}
-		case SCMD_WIZLIST: {
-			extern char *wizlist;
-			page_string(ch->desc, wizlist, 0);
-			break;
-		}
-		case SCMD_GODLIST: {
-			extern char *godlist;
-			page_string(ch->desc, godlist, 0);
-			break;
-		}
-		case SCMD_HANDBOOK: {
-			extern char *handbook;
-			page_string(ch->desc, handbook, 0);
-			break;
-		}
-		case SCMD_POLICIES: {
-			extern char *policies;
-			page_string(ch->desc, policies, 0);
-			break;
-		}
-		case SCMD_MOTD: {
-			extern char *motd;
-			page_string(ch->desc, motd, 0);
-			break;
-		}
-		case SCMD_IMOTD: {
-			extern char *imotd;
-			page_string(ch->desc, imotd, 0);
-			break;
-		}
-		case SCMD_NEWS: {
-			extern char *news;
-			page_string(ch->desc, news, 0);
-			break;
-		}
 		case SCMD_CLEAR: {
 			send_to_char("\033[H\033[J", ch);
 			break;
@@ -2544,8 +2499,20 @@ ACMD(do_gen_ps) {
 }
 
 
+ACMD(do_gen_text_string) {
+	if (subcmd < 0 || subcmd >= NUM_TEXT_FILE_STRINGS) {
+		send_config_msg(ch, "huh_string");
+	}
+	else if (!text_file_strings[subcmd] || !*text_file_strings[subcmd]) {
+		msg_to_char(ch, "This text is blank.\r\n");
+	}
+	else {
+		page_string(ch->desc, text_file_strings[subcmd], FALSE);
+	}
+}
+
+
 ACMD(do_help) {
-	extern char *help_screen;
 	struct help_index_element *found;
 
 	if (!ch->desc)
@@ -2554,7 +2521,7 @@ ACMD(do_help) {
 	skip_spaces(&argument);
 
 	if (!*argument) {
-		page_string(ch->desc, help_screen, 0);
+		page_string(ch->desc, text_file_strings[TEXT_FILE_HELP_SCREEN], FALSE);
 		return;
 	}
 	if (help_table) {
@@ -3554,9 +3521,11 @@ ACMD(do_survey) {
 ACMD(do_time) {
 	struct time_info_data tinfo;
 	const char *suf;
-	int weekday, day;
+	int weekday, day, latitude, y_coord, sun;
 	
 	tinfo = get_local_time(IN_ROOM(ch));
+	y_coord = Y_COORD(IN_ROOM(ch));
+	latitude = (y_coord != -1) ? Y_TO_LATITUDE(y_coord) : 0;
 	
 	if (has_player_tech(ch, PTECH_CLOCK)) {
 		sprintf(buf, "It is %d o'clock %s", ((tinfo.hours % 12 == 0) ? 12 : ((tinfo.hours) % 12)), ((tinfo.hours >= 12) ? "pm" : "am"));
@@ -3579,17 +3548,18 @@ ACMD(do_time) {
 		gain_player_tech_exp(ch, PTECH_CLOCK, 1);
 	}
 	else {
-		if (tinfo.hours < 6 || tinfo.hours > 19) {
+		sun = get_sun_status(IN_ROOM(ch));
+		if (sun == SUN_DARK) {
 			msg_to_char(ch, "It is nighttime.\r\n");
 		}
-		else if (tinfo.hours == 6) {
+		else if (sun == SUN_RISE) {
 			msg_to_char(ch, "It is almost dawn.\r\n");
 		}
-		else if (tinfo.hours == 19) {
+		else if (sun == SUN_SET) {
 			msg_to_char(ch, "It is sunset.\r\n");
 		}
 		else if (tinfo.hours == 12) {
-			msg_to_char(ch, "It is nighttime.\r\n");
+			msg_to_char(ch, "It is noon.\r\n");
 		}
 		else if (tinfo.hours < 12) {
 			msg_to_char(ch, "It is %smorning.\r\n", tinfo.hours <= 8 ? "early " : "");
@@ -3617,8 +3587,36 @@ ACMD(do_time) {
 		gain_player_tech_exp(ch, PTECH_CALENDAR, 1);
 	}
 	
+	// check season
 	if (IS_OUTDOORS(ch)) {
 		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
+	}
+	
+	// check solstices
+	if (DAY_OF_YEAR(tinfo) == FIRST_EQUINOX_DOY) {
+		msg_to_char(ch, "It is the %s equinox.\r\n", latitude >= 0 ? "vernal" : "autumnal");
+	}
+	else if (DAY_OF_YEAR(tinfo) == NORTHERN_SOLSTICE_DOY) {
+		msg_to_char(ch, "It is the %s solstice.\r\n", latitude >= 0 ? "summer" : "winter");
+	}
+	else if (DAY_OF_YEAR(tinfo) == LAST_EQUINOX_DOY) {
+		msg_to_char(ch, "It is the %s equinox.\r\n", latitude >= 0 ? "autumnal" : "vernal");
+	}
+	else if (DAY_OF_YEAR(tinfo) == SOUTHERN_SOLSTICE_DOY) {
+		msg_to_char(ch, "It is the %s solstice.\r\n", latitude >= 0 ? "winter" : "summer");
+	}
+	
+	// check zenith
+	if (is_zenith_day(IN_ROOM(ch))) {
+		if (tinfo.hours < 12) {
+			msg_to_char(ch, "Today will be the sun's zenith passage.\r\n");
+		}
+		else if (tinfo.hours > 12) {
+			msg_to_char(ch, "Today was the sun's zenith passage.\r\n");
+		}
+		else {
+			msg_to_char(ch, "Today is the sun's zenith passage.%s\r\n", IS_OUTDOORS(ch) ? " It's directly overhead!" : "");
+		}
 	}
 }
 
@@ -3652,7 +3650,22 @@ ACMD(do_weather) {
 
 
 ACMD(do_whereami) {
+	double latitude, longitude;
+	int zenith;
+	
 	msg_to_char(ch, "You are at: %s%s\r\n", get_room_name(IN_ROOM(ch), FALSE), coord_display_room(ch, IN_ROOM(ch), FALSE));
+	
+	// additional stats for imms if there's coords for this room
+	if (IS_IMMORTAL(ch) && X_COORD(IN_ROOM(ch)) != -1) {
+		latitude = Y_TO_LATITUDE(Y_COORD(IN_ROOM(ch)));
+		longitude = X_TO_LONGITUDE(X_COORD(IN_ROOM(ch)));
+		msg_to_char(ch, "Latitude: %.2f %s, Longitude: %.2f %s\r\n", ABSOLUTE(latitude), latitude >= 0.0 ? "N" : "S", ABSOLUTE(longitude), longitude >= 0.0 ? "E" : "W");
+		msg_to_char(ch, "Hours of sunlight today: %.2f\r\n", get_hours_of_sun(IN_ROOM(ch), TRUE));
+		
+		if ((zenith = get_zenith_days_from_solstice(IN_ROOM(ch))) != -1) {
+			msg_to_char(ch, "Zenith passage: %d day%s from the solstice\r\n", zenith, PLURAL(zenith));
+		}
+	}
 }
 
 
