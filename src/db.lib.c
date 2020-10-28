@@ -8509,11 +8509,6 @@ void free_whole_library(void) {
 	
 	// extract everything in the game
 	free_loaded_players();
-	while ((desc = descriptor_list)) {
-		flush_queues(desc);
-		LL_DELETE(descriptor_list, desc);
-		free_descriptor(desc);
-	}
 	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
 		if (tpd->obj) {
 			add_to_object_list(tpd->obj);
@@ -8526,6 +8521,11 @@ void free_whole_library(void) {
 	while (character_list) {
 		extract_char(character_list);
 		extract_pending_chars();
+	}
+	while ((desc = descriptor_list)) {
+		flush_queues(desc);
+		LL_DELETE(descriptor_list, desc);
+		free_descriptor(desc);
 	}
 	while (object_list) {
 		extract_obj(object_list);
