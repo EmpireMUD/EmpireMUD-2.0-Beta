@@ -5162,8 +5162,6 @@ void free_obj_eq_set(struct eq_set_obj *eq_set) {
 */
 void free_obj_proto_data(struct obj_proto_data *data) {
 	struct obj_storage_type *store;
-	struct quest_lookup *ql;
-	struct shop_lookup *sl;
 	
 	if (!data) {
 		return;	// basic safety
@@ -5178,15 +5176,8 @@ void free_obj_proto_data(struct obj_proto_data *data) {
 		free(store);
 	}
 	
-	while ((ql = data->quest_lookups)) {
-		data->quest_lookups = ql->next;
-		free(ql);
-	}
-	
-	while ((sl = data->shop_lookups)) {
-		data->shop_lookups = sl->next;
-		free(sl);
-	}
+	free_quest_lookups(data->quest_lookups);
+	free_shop_lookups(data->shop_lookups);
 	
 	free(data);
 }
@@ -8552,9 +8543,11 @@ void free_whole_library(void) {
 	
 	// free world and map data
 	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+		ROOM_OWNER(room) = NULL;	// skip claim cleanup
 		delete_room(room, FALSE);
 	}
 	HASH_ITER(hh, world_table, room, next_room) {
+		ROOM_OWNER(room) = NULL;	// skip claim cleanup
 		delete_room(room, FALSE);
 	}
 	for (x = 0; x < MAP_WIDTH; ++x) {
@@ -8685,8 +8678,6 @@ void free_whole_library(void) {
 	}
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		remove_object_from_table(obj);
-		free_quest_lookups(GET_OBJ_QUEST_LOOKUPS(obj));
-		free_shop_lookups(GET_OBJ_SHOP_LOOKUPS(obj));
 		free_obj(obj);
 	}
 	HASH_ITER(idnum_hh, player_table_by_idnum, pid, next_pid) {
