@@ -5824,6 +5824,7 @@ bool identical_bindings(obj_data *obj_a, obj_data *obj_b) {
 		LL_FOREACH_SAFE(b_bind_list, b_bind, b_bind_next) {
 			if (a_bind->idnum == b_bind->idnum) {
 				LL_DELETE(b_bind_list, b_bind);
+				free(b_bind);
 				found = TRUE;
 				break;
 			}
