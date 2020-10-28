@@ -8005,16 +8005,15 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 		}
 	}
 	
-	if (!global_ok) {	// did any sub-groups succeed?
-		HASH_ITER(hh, mrd_list, mrd, next_mrd) {
-			if (mrd->ok && mrd->group) {	// only grouped requirements count here
-				global_ok = TRUE;
-			}
-			
-			// free memory
-			HASH_DEL(mrd_list, mrd);
-			free(mrd);
+	// check if any sub-groups succeeded, if necessary (and free the mrd_list even if not)
+	HASH_ITER(hh, mrd_list, mrd, next_mrd) {
+		if (!global_ok && mrd->ok && mrd->group) {	// only grouped requirements count here (if we didn't already find one)
+			global_ok = TRUE;
 		}
+		
+		// free memory
+		HASH_DEL(mrd_list, mrd);
+		free(mrd);
 	}
 	
 	return global_ok;
