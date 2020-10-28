@@ -1070,12 +1070,18 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 	// delete vehicles
 	despawn_instance_vehicles(inst);
 	
-	// remove rooms
+	// remove rooms EXCEPT the starting room
 	for (iter = 0; iter < INST_SIZE(inst); ++iter) {
-		if (INST_ROOM(inst, iter)) {
+		if (INST_ROOM(inst, iter) && INST_ROOM(inst, iter) != INST_START(inst)) {
 			delete_room(INST_ROOM(inst, iter), FALSE);	// must call check_all_exits
 			INST_ROOM(inst, iter) = NULL;
 		}
+	}
+	
+	// delete the starting room last (it's the HOME_ROOM for the others)
+	if (INST_START(inst)) {
+		delete_room(INST_START(inst), FALSE);	// must call check_all_exits
+		INST_START(inst) = NULL;
 	}
 	
 	check_all_exits();
