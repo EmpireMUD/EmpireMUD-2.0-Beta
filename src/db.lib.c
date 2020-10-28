@@ -8538,6 +8538,11 @@ void free_whole_library(void) {
 		free(erd);
 	}
 	
+	// free empires
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		free_empire(emp);
+	}
+	
 	// free world and map data
 	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
 		delete_room(room, FALSE);
@@ -8551,11 +8556,6 @@ void free_whole_library(void) {
 				free_shared_room_data(world_map[x][y].shared);
 			}
 		}
-	}
-	
-	// free empires
-	HASH_ITER(hh, empire_table, emp, next_emp) {
-		free_empire(emp);
 	}
 	
 	// free islands
