@@ -8820,6 +8820,7 @@ void free_whole_library(void) {
 			if (chd->message) {
 				free(chd->message);
 			}
+			free(chd);
 		}
 		free(slash);
 	}
