@@ -5046,6 +5046,9 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 					else if (!str_cmp(field, "is_outdoors")) {
 						snprintf(str, slen, "%d", IS_OUTDOOR_TILE(r) ? 1 : 0);
 					}
+					else if (!str_cmp(field, "is_zenith_day")) {
+						snprintf(str, slen, "%d", is_zenith_day(r) ? 1 : 0);
+					}
 					break;
 				}
 				case 'm': {	// room.m*
