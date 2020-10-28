@@ -1539,6 +1539,20 @@ void build_all_quest_lookups(void) {
 
 
 /**
+* Frees a list of quest lookups. This is normally only called on 'shutdown
+* complete'.
+*
+* @param struct quest_lookup *list The list of lookups to free.
+*/
+void free_quest_lookups(struct quest_lookup *list) {
+	struct quest_lookup *ql, *next_ql;
+	LL_FOREACH_SAFE(list, ql, next_ql) {
+		free(ql);
+	}
+}
+
+
+/**
 * Adds a quest lookup hint to a list (e.g. on a mob).
 *
 * Note: For mob/obj/veh quests, run update_mob_quest_lookups() etc after this.

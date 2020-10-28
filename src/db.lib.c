@@ -1915,21 +1915,6 @@ void free_empire(empire_data *emp) {
 	room_data *room;
 	int iter;
 	
-	// free islands
-	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
-		HASH_ITER(hh, isle->needs, needs, next_needs) {
-			HASH_DEL(isle->needs, needs);
-			free(needs);
-		}
-		HASH_ITER(hh, isle->store, store, next_store) {
-			HASH_DEL(isle->store, store);
-			free(store);
-		}
-		HASH_DEL(EMPIRE_ISLANDS(emp), isle);
-		free(isle);
-	}
-	EMPIRE_ISLANDS(emp) = NULL;
-	
 	// free unique storage
 	while ((eus = EMPIRE_UNIQUE_STORAGE(emp))) {
 		DL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
@@ -2051,9 +2036,30 @@ void free_empire(empire_data *emp) {
 	free_empire_goals(EMPIRE_GOALS(emp));
 	free_empire_completed_goals(EMPIRE_COMPLETED_GOALS(emp));
 	
+	// free islands (late because some stuff above will add islands)
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		if (isle->name) {
+			free(isle->name);
+		}
+		HASH_ITER(hh, isle->needs, needs, next_needs) {
+			HASH_DEL(isle->needs, needs);
+			free(needs);
+		}
+		HASH_ITER(hh, isle->store, store, next_store) {
+			HASH_DEL(isle->store, store);
+			free(store);
+		}
+		HASH_DEL(EMPIRE_ISLANDS(emp), isle);
+		free(isle);
+	}
+	EMPIRE_ISLANDS(emp) = NULL;
+	
 	// free strings
 	if (emp->name) {
 		free(emp->name);
+	}
+	if (emp->adjective) {
+		free(emp->adjective);
 	}
 	if (emp->banner) {
 		free(emp->banner);
@@ -8540,6 +8546,7 @@ void free_whole_library(void) {
 	
 	// free empires
 	HASH_ITER(hh, empire_table, emp, next_emp) {
+		remove_empire_from_table(emp);
 		free_empire(emp);
 	}
 	
@@ -8614,6 +8621,8 @@ void free_whole_library(void) {
 	}
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		remove_building_from_table(bld);
+		free_quest_lookups(GET_BLD_QUEST_LOOKUPS(bld));
+		free_shop_lookups(GET_BLD_SHOP_LOOKUPS(bld));
 		free_building(bld);
 	}
 	HASH_ITER(hh, class_table, class, next_class) {
@@ -8666,6 +8675,8 @@ void free_whole_library(void) {
 	free(help_table);
 	HASH_ITER(hh, mobile_table, mob, next_mob) {
 		remove_mobile_from_table(mob);
+		free_quest_lookups(MOB_QUEST_LOOKUPS(mob));
+		free_shop_lookups(MOB_SHOP_LOOKUPS(mob));
 		free_char(mob);
 	}
 	HASH_ITER(hh, morph_table, morph, next_morph) {
@@ -8674,6 +8685,8 @@ void free_whole_library(void) {
 	}
 	HASH_ITER(hh, object_table, obj, next_obj) {
 		remove_object_from_table(obj);
+		free_quest_lookups(GET_OBJ_QUEST_LOOKUPS(obj));
+		free_shop_lookups(GET_OBJ_SHOP_LOOKUPS(obj));
 		free_obj(obj);
 	}
 	HASH_ITER(idnum_hh, player_table_by_idnum, pid, next_pid) {
@@ -8699,6 +8712,8 @@ void free_whole_library(void) {
 	}
 	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
 		remove_room_template_from_table(rmt);
+		free_quest_lookups(GET_RMT_QUEST_LOOKUPS(rmt));
+		free_shop_lookups(GET_RMT_SHOP_LOOKUPS(rmt));
 		free_room_template(rmt);
 	}
 	HASH_ITER(hh, sector_table, sect, next_sect) {
@@ -8728,6 +8743,8 @@ void free_whole_library(void) {
 	}
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		remove_vehicle_from_table(veh);
+		free_quest_lookups(VEH_QUEST_LOOKUPS(veh));
+		free_shop_lookups(VEH_SHOP_LOOKUPS(veh));
 		free_vehicle(veh);
 	}
 	
@@ -8792,13 +8809,7 @@ void free_whole_library(void) {
 	// free these last
 	HASH_ITER(hh, config_table, cnf, next_cnf) {
 		HASH_DEL(config_table, cnf);
-		if (cnf->description) {
-			free(cnf->description);
-		}
-		if (cnf->key) {
-			free(cnf->key);
-		}
-		free(cnf);
+		free_config_type(cnf);
 	}
 	HASH_ITER(hh, data_table, data, next_data) {
 		HASH_DEL(data_table, data);
@@ -9391,7 +9402,6 @@ void free_complex_data(struct complex_room_data *data) {
 * @param struct shared_room_data *data The data to free.
 */
 void free_shared_room_data(struct shared_room_data *data) {
-	struct room_extra_data *room_ex, *next_room_ex;
 	struct stored_event *ev, *next_ev;
 	struct depletion_data *dep;
 	struct track_data *track, *next_track;
@@ -9410,10 +9420,7 @@ void free_shared_room_data(struct shared_room_data *data) {
 		data->depletion = dep->next;
 		free(dep);
 	}
-	HASH_ITER(hh, data->extra_data, room_ex, next_room_ex) {
-		HASH_DEL(data->extra_data, room_ex);
-		free(room_ex);
-	}
+	free_extra_data(&data->extra_data);
 	DL_FOREACH_SAFE(data->tracks, track, next_track) {
 		free(track);
 	}

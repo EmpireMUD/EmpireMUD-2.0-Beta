@@ -796,7 +796,6 @@ void perform_reboot(void) {
 	// If this is a reboot, restart the mud!
 	if (reboot_control.type == SCMD_REBOOT) {
 		log("Reboot: performing live reboot");
-		free_whole_library();
 		
 		chdir("..");
 				
@@ -837,7 +836,8 @@ void perform_reboot(void) {
 	else {
 		empire_shutdown = 1;
 		switch (reboot_control.level) {
-			case SHUTDOWN_DIE: {
+			case SHUTDOWN_DIE:
+			case SHUTDOWN_COMPLETE: {
 				touch(KILLSCRIPT_FILE);
 				log("Shutdown die: mud will not reboot");
 				break;
@@ -854,7 +854,9 @@ void perform_reboot(void) {
 		}
 		
 		// done!
-		free_whole_library();
+		if (reboot_control.level == SHUTDOWN_COMPLETE) {
+			free_whole_library();
+		}
 		exit(0);
 	}
 }

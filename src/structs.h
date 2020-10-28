@@ -1510,6 +1510,7 @@ typedef struct vehicle_data vehicle_data;
 #define SHUTDOWN_NORMAL  0	// comes up normally
 #define SHUTDOWN_PAUSE  1	// writes a pause file which must be removed
 #define SHUTDOWN_DIE  2	// kills the autorun
+#define SHUTDOWN_COMPLETE  3	// like die but also frees all memory
 
 
  //////////////////////////////////////////////////////////////////////////////

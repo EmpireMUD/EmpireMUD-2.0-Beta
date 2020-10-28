@@ -8559,6 +8559,20 @@ struct room_extra_data *find_extra_data(struct room_extra_data *list, int type) 
 
 
 /**
+* Frees a list of extra data.
+*
+* @param struct room_extra_data **hash Pointer to the hash to free.
+*/
+void free_extra_data(struct room_extra_data **hash) {
+	struct room_extra_data *red, *next;
+	HASH_ITER(hh, *hash, red, next) {
+		HASH_DEL(*hash, red);
+		free(red);
+	}
+}
+
+
+/**
 * Gets the value of an extra data type; defaults to 0 if none is set.
 *
 * @param struct room_extra_data *list The list to get data from.

@@ -469,8 +469,9 @@ void delete_room(room_data *room, bool check_exits) {
 	obj_data *o, *next_o;
 	empire_data *emp;
 	int iter;
-
-	if (!room || (GET_ROOM_VNUM(room) < MAP_SIZE && !CAN_UNLOAD_MAP_ROOM(room))) {
+	
+	// this blocks deleting map rooms unless they can be unloaded (or the mud is being shut down)
+	if (!room || (GET_ROOM_VNUM(room) < MAP_SIZE && !CAN_UNLOAD_MAP_ROOM(room) && !block_all_saves_due_to_shutdown)) {
 		syslog(SYS_ERROR, 0, TRUE, "SYSERR: delete_room() attempting to delete invalid room %d", room ? GET_ROOM_VNUM(room) : NOWHERE);
 		return;
 	}

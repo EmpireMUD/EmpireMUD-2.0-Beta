@@ -2369,6 +2369,8 @@ void clear_ability(ability_data *abil) {
 void free_ability(ability_data *abil) {
 	ability_data *proto = find_ability_by_vnum(ABIL_VNUM(abil));
 	struct ability_data_list *adl;
+	struct ability_type *atl;
+	struct apply_data *app;
 	
 	if (ABIL_NAME(abil) && (!proto || ABIL_NAME(abil) != ABIL_NAME(proto))) {
 		free(ABIL_NAME(abil));
@@ -2379,10 +2381,22 @@ void free_ability(ability_data *abil) {
 	if (ABIL_CUSTOM_MSGS(abil) && (!proto || ABIL_CUSTOM_MSGS(abil) != ABIL_CUSTOM_MSGS(proto))) {
 		free_custom_messages(ABIL_CUSTOM_MSGS(abil));
 	}
+	if (ABIL_APPLIES(abil) && (!proto || ABIL_APPLIES(abil) != ABIL_APPLIES(proto))) {
+		while ((app = ABIL_APPLIES(abil))) {
+			ABIL_APPLIES(abil) = app->next;
+			free(app);
+		}
+	}
 	if (ABIL_DATA(abil) && (!proto || ABIL_DATA(abil) != ABIL_DATA(proto))) {
 		while ((adl = ABIL_DATA(abil))) {
 			ABIL_DATA(abil) = adl->next;
 			free(adl);
+		}
+	}
+	if (ABIL_TYPE_LIST(abil) && (!proto || ABIL_TYPE_LIST(abil) != ABIL_TYPE_LIST(proto))) {
+		while ((atl = ABIL_TYPE_LIST(abil))) {
+			ABIL_TYPE_LIST(abil) = atl->next;
+			free(atl);
 		}
 	}
 	

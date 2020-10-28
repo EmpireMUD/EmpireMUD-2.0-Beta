@@ -820,6 +820,9 @@ void free_archetype(archetype_data *arch) {
 	if (GET_ARCH_DESC(arch) && (!proto || GET_ARCH_DESC(arch) != GET_ARCH_DESC(proto))) {
 		free(GET_ARCH_DESC(arch));
 	}
+	if (GET_ARCH_LORE(arch) && (!proto || GET_ARCH_LORE(arch) != GET_ARCH_LORE(proto))) {
+		free(GET_ARCH_LORE(arch));
+	}
 	if (GET_ARCH_MALE_RANK(arch) && (!proto || GET_ARCH_MALE_RANK(arch) != GET_ARCH_MALE_RANK(proto))) {
 		free(GET_ARCH_MALE_RANK(arch));
 	}

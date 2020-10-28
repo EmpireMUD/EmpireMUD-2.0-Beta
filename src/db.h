@@ -366,6 +366,7 @@ void remove_class_from_table(class_data *cls);
 // configs
 extern struct config_type *config_table;
 
+void free_config_type(struct config_type *cnf);
 void save_config_system();
 
 // crafts
@@ -692,6 +693,7 @@ struct quest_giver *copy_quest_givers(struct quest_giver *from);
 void free_player_quests(struct player_quest *list);
 void free_quest(quest_data *quest);
 void free_quest_givers(struct quest_giver *list);
+void free_quest_lookups(struct quest_lookup *list);
 void free_quest_temp_list(struct quest_temp_list *list);
 void parse_quest_giver(FILE *fl, struct quest_giver **list, char *error_str);
 quest_data *quest_proto(any_vnum vnum);
@@ -738,6 +740,7 @@ int sort_sectors(void *a, void *b);
 extern shop_data *shop_table;
 
 void free_shop(shop_data *shop);
+void free_shop_lookups(struct shop_lookup *list);
 shop_data *real_shop(any_vnum vnum);
 void remove_shop_from_table(shop_data *shop);
 

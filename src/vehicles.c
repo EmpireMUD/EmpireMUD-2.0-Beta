@@ -2453,6 +2453,7 @@ void free_vehicle(vehicle_data *veh) {
 		VEH_DEPLETION(veh) = dep->next;
 		free(dep);
 	}
+	free_extra_data(&VEH_EXTRA_DATA(veh));
 	empty_vehicle(veh, NULL);
 	
 	// free any assigned scripts and vars

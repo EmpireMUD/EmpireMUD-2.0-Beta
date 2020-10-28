@@ -4461,6 +4461,7 @@ const char *shutdown_types[] = {
 	"normal",
 	"pause",
 	"die",
+	"complete",
 	"\n"
 };
 

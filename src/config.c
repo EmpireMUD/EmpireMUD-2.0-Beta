@@ -1170,6 +1170,27 @@ CONFIG_HANDLER(config_show_typelist) {
 //// CONFIG SYSTEM: I/O //////////////////////////////////////////////////////
 
 /**
+* Frees 1 config entry. Usually only called during 'shutdown complete'.
+*
+* @param struct config_type *cnf The config_type entry to free.
+*/
+void free_config_type(struct config_type *cnf) {
+	if (cnf->description) {
+		free(cnf->description);
+	}
+	if (cnf->key) {
+		free(cnf->key);
+	}
+	if (cnf->type == CONFTYPE_SHORT_STRING || cnf->type == CONFTYPE_LONG_STRING) {
+		if (cnf->data.string_val) {
+			free(cnf->data.string_val);
+		}
+	}
+	free(cnf);
+}
+
+
+/**
 * Read one config line that is an int array, starting with the array size.
 *
 * @param struct config_type *cnf The config item to read into.

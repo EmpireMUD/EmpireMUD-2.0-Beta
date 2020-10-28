@@ -733,10 +733,12 @@ void check_delayed_load(char_data *ch) {
 
 /* release memory allocated for a char struct */
 void free_char(char_data *ch) {
+	struct player_automessage *automsg, *next_automsg;
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
 	struct companion_data *compan, *next_compan;
+	struct player_faction_data *pfd, *next_pfd;
 	struct ability_gain_hook *hook, *next_hook;
 	struct mount_data *mount, *next_mount;
 	struct channel_history_data *history, *next_hist;
@@ -866,6 +868,11 @@ void free_char(char_data *ch) {
 		
 		free_resource_list(GET_ACTION_RESOURCES(ch));
 		
+		HASH_ITER(hh, GET_AUTOMESSAGES(ch), automsg, next_automsg) {
+			HASH_DEL(GET_AUTOMESSAGES(ch), automsg);
+			free(automsg);
+		}
+		
 		for (loadslash = LOAD_SLASH_CHANNELS(ch); loadslash; loadslash = next_loadslash) {
 			next_loadslash = loadslash->next;
 			if (loadslash->name) {
@@ -892,6 +899,11 @@ void free_char(char_data *ch) {
 		while ((a = GET_ALIASES(ch)) != NULL) {
 			GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
 			free_alias(a);
+		}
+		
+		HASH_ITER(hh, GET_FACTIONS(ch), pfd, next_pfd) {
+			HASH_DEL(GET_FACTIONS(ch), pfd);
+			free(pfd);
 		}
 		
 		while ((lastn = GET_LASTNAME_LIST(ch))) {
@@ -1129,7 +1141,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct player_event_data *ped;
 	struct player_lastname *lastn;
 	struct slash_channel *slash;
-	struct cooldown_data *cool;
 	obj_data *obj, *o, *next_o;
 	struct req_data *task;
 	obj_data **cont_row;
@@ -1445,7 +1456,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "Cooldown:", length)) {
 					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[0]);
-					CREATE(cool, struct cooldown_data, 1);
 					add_cooldown(ch, i_in[0], l_in[0] - time(0));
 				}
 				else if (PFILE_TAG(line, "Creation Archetype:", length)) {
@@ -5107,6 +5117,9 @@ int add_eq_set_to_char(char_data *ch, int set_id, char *name) {
 	int max_id = 0;
 	
 	if (!ch || IS_NPC(ch) || set_id == 0 || !name || !*name) {
+		if (name) {
+			free(name);
+		}
 		return NOTHING;	// invalid input
 	}
 	
@@ -5120,7 +5133,7 @@ int add_eq_set_to_char(char_data *ch, int set_id, char *name) {
 			if (eq_set->name) {
 				free(eq_set->name);
 			}
-			eq_set->name = str_dup(name);
+			eq_set->name = name;
 			found = TRUE;
 			return eq_set->id;	// done
 		}
@@ -5132,7 +5145,7 @@ int add_eq_set_to_char(char_data *ch, int set_id, char *name) {
 	if (!found) {
 		CREATE(eq_set, struct player_eq_set, 1);
 		eq_set->id = (set_id > 0 ? set_id : ++max_id);
-		eq_set->name = str_dup(name);
+		eq_set->name = name;
 		LL_PREPEND(GET_EQ_SETS(ch), eq_set);
 	}
 	

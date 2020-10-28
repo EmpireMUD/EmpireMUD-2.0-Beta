@@ -410,6 +410,20 @@ struct shop_temp_list *build_available_shop_list(char_data *ch) {
 
 
 /**
+* Frees a list of shop lookups. This is normally called during 'shutdown
+* complete'.
+*
+* @param struct shop_lookup *list The list to free.
+*/
+void free_shop_lookups(struct shop_lookup *list) {
+	struct shop_lookup *lookup, *next_lookup;
+	LL_FOREACH_SAFE(list, lookup, next_lookup) {
+		free(lookup);
+	}
+}
+
+
+/**
 * Frees a temporary shop list.
 *
 * @param struct shop_temp_list *list The list to free.
