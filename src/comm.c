@@ -53,8 +53,6 @@
 extern struct ban_list_element *ban_list;
 extern bool data_table_needs_save;
 extern int num_invalid;
-extern char **intro_screens;
-extern int num_intro_screens;
 extern int no_auto_deletes;
 extern ush_int DFLT_PORT;
 extern const char *DFLT_DIR;
@@ -65,7 +63,8 @@ extern const char *slow_nameserver_ips[];
 // external functions
 void boot_world();
 void empire_srandom(unsigned long initial_seed);
-void mobile_activity(void);
+void free_whole_library();
+void mobile_activity();
 int perform_alias(descriptor_data *d, char *orig);
 char *prompt_olc_info(char_data *ch);
 
@@ -110,7 +109,6 @@ int get_from_q(struct txt_q *queue, char *dest, int *aliased);
 int open_logfile(const char *filename, FILE *stderr_fp);
 int set_sendbuf(socket_t s);
 socket_t init_socket(ush_int port);
-void flush_queues(descriptor_data *d);
 void nonblock(socket_t s);
 void perform_act(const char *orig, char_data *ch, const void *obj, const void *vict_obj, const char_data *to, bitvector_t act_flags);
 void reboot_recover(void);
@@ -798,6 +796,7 @@ void perform_reboot(void) {
 	// If this is a reboot, restart the mud!
 	if (reboot_control.type == SCMD_REBOOT) {
 		log("Reboot: performing live reboot");
+		free_whole_library();
 		
 		chdir("..");
 				
@@ -855,6 +854,7 @@ void perform_reboot(void) {
 		}
 		
 		// done!
+		free_whole_library();
 		exit(0);
 	}
 }

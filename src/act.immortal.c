@@ -39,7 +39,6 @@
 */
 
 // external variables
-extern struct stored_data *data_table;
 extern struct stored_data_type stored_data_info[];
 extern bool manual_evolutions;
 extern int buf_switches, buf_largecount, buf_overflows, top_of_helpt;

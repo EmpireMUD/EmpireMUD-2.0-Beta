@@ -3303,6 +3303,15 @@ struct spawn_info {
 };
 
 
+// stats data
+struct stats_data_struct {
+	any_vnum vnum;
+	int count;
+	
+	UT_hash_handle hh;	// hashable
+};
+
+
 // simple structure for passing around a hash of unique strings
 struct string_hash {
 	char *str;

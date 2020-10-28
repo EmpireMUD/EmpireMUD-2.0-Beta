@@ -31,16 +31,6 @@
 // config
 #define RESCAN_WORLD_AFTER  (5 * SECS_PER_REAL_MIN)
 
-
-// stats data
-struct stats_data_struct {
-	any_vnum vnum;
-	int count;
-	
-	UT_hash_handle hh;	// hashable
-};
-
-
 // stats globals
 struct stats_data_struct *global_sector_count = NULL;	// hash table of sector counts
 int global_sector_size = 0;

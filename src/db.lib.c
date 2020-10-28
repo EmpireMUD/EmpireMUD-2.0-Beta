@@ -52,6 +52,7 @@
 *   Core Lib Functions
 *   Index Saving
 *   The Reals
+*   Free Whole Library
 *   Helpers
 *   Sorters
 *   Miscellaneous Lib
@@ -8443,6 +8444,373 @@ sector_data *sector_proto(sector_vnum vnum) {
 	
 	HASH_FIND_INT(sector_table, &vnum, sect);
 	return sect;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// FREE WHOLE LIBRARY //////////////////////////////////////////////////////
+
+/**
+* Attempts to free all allocated memory. This can help to check for memory
+* leaks.
+*/
+void free_whole_library(void) {
+	ability_data *abil, *next_abil;
+	account_data *acct, *next_acct;
+	struct account_player *acct_player;
+	adv_data *adv, *next_adv;
+	archetype_data *arch, *next_arch;
+	augment_data *aug, *next_aug;
+	struct automessage *automsg, *next_automsg;
+	struct ban_list_element *ban, *next_ban;
+	bld_data *bld, *next_bld;
+	char_data *mob, *next_mob;
+	class_data *class, *next_class;
+	struct config_type *cnf, *next_cnf;
+	craft_data *craft, *next_craft;
+	crop_data *crop, *next_crop;
+	descriptor_data *desc;
+	empire_data *emp, *next_emp;
+	event_data *event, *next_event;
+	struct event_running_data *erd, *next_erd;
+	faction_data *fct, *next_fct;
+	generic_data *gen, *next_gen;
+	struct generic_name_data *gen_name, *next_gen_name;
+	struct global_data *glb, *next_glb;
+	struct int_hash *int_iter, *next_int_iter;
+	struct island_info *island, *next_island;
+	morph_data *morph, *next_morph;
+	obj_data *obj, *next_obj;
+	struct pk_data *pkd;
+	player_index_data *pid, *next_pid;
+	progress_data *prg, *next_prg;
+	struct quest_data *quest, *next_quest;
+	room_data *room, *next_room;
+	room_template *rmt, *next_rmt;
+	sector_data *sect, *next_sect;
+	struct sector_index_type *sect_idx, *next_sect_idx;
+	shop_data *shop, *next_shop;
+	skill_data *skill, *next_skill;
+	social_data *soc, *next_soc;
+	struct stats_data_struct *sds, *next_sds;
+	struct stored_data *data, *next_data;
+	struct trading_post_data *tpd, *next_tpd;
+	trig_data *trig, *next_trig;
+	vehicle_data *veh, *next_veh;
+	int iter, x, y;
+	
+	// set this first: it's critical that nothing is saved after this:
+	log("Freeing whole library...");
+	block_all_saves_due_to_shutdown = TRUE;
+	
+	// extract everything in the game
+	while ((desc = descriptor_list)) {
+		flush_queues(desc);
+		LL_DELETE(descriptor_list, desc);
+		free_descriptor(desc);
+	}
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
+		if (tpd->obj) {
+			add_to_object_list(tpd->obj);
+			extract_obj(tpd->obj);
+			tpd->obj = NULL;
+		}
+		DL_DELETE(trading_list, tpd);
+		free(tpd);
+	}
+	while (character_list) {
+		extract_char(character_list);
+		extract_pending_chars();
+	}
+	while (object_list) {
+		extract_obj(object_list);
+	}
+	while (vehicle_list) {
+		extract_vehicle(vehicle_list);
+		extract_pending_vehicles();
+	}
+	while (instance_list) {
+		delete_instance(instance_list, FALSE);
+	}
+	LL_FOREACH_SAFE(running_events, erd, next_erd) {
+		LL_DELETE(running_events, erd);
+		free_event_leaderboard(erd->player_leaderboard);
+		free(erd);
+	}
+	
+	// free world and map data
+	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+		delete_room(room, FALSE);
+	}
+	HASH_ITER(hh, world_table, room, next_room) {
+		delete_room(room, FALSE);
+	}
+	for (x = 0; x < MAP_WIDTH; ++x) {
+		for (y = 0; y < MAP_HEIGHT; ++y) {
+			if (world_map[x][y].shared != &ocean_shared_data) {
+				free_shared_room_data(world_map[x][y].shared);
+			}
+		}
+	}
+	
+	// free empires
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		free_empire(emp);
+	}
+	
+	// free islands
+	HASH_ITER(hh, island_table, island, next_island) {
+		if (island->name) {
+			free(island->name);
+		}
+		if (island->desc) {
+			free(island->desc);
+		}
+		HASH_DEL(island_table, island);
+		free(island);
+	}
+	
+	// ensure triggers are gone
+	free_freeable_triggers();
+	
+	// most of this part is just done in alphabetical order
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		remove_ability_from_table(abil);
+		free_ability(abil);
+	}
+	HASH_ITER(hh, account_table, acct, next_acct) {
+		if (acct->notes) {
+			free(acct->notes);
+		}
+		while ((acct_player = acct->players)) {
+			if (acct_player->name) {
+				free(acct_player->name);
+			}
+			acct->players = acct_player->next;
+			free(acct_player);
+		}
+		while ((pkd = acct->killed_by)) {
+			acct->killed_by = pkd->next;
+			free(pkd);
+		}
+		HASH_DEL(account_table, acct);
+		free(acct);
+	}
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		remove_adventure_from_table(adv);
+		free_adventure(adv);
+	}
+	HASH_ITER(hh, archetype_table, arch, next_arch) {
+		remove_archetype_from_table(arch);
+		free_archetype(arch);
+	}
+	HASH_ITER(hh, augment_table, aug, next_aug) {
+		remove_augment_from_table(aug);
+		free_augment(aug);
+	}
+	HASH_ITER(hh, automessages_table, automsg, next_automsg) {
+		HASH_DEL(automessages_table, automsg);
+		free_automessage(automsg);
+	}
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		remove_building_from_table(bld);
+		free_building(bld);
+	}
+	HASH_ITER(hh, class_table, class, next_class) {
+		remove_class_from_table(class);
+		free_class(class);
+	}
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		remove_craft_from_table(craft);
+		free_craft(craft);
+	}
+	HASH_ITER(hh, crop_table, crop, next_crop) {
+		remove_crop_from_table(crop);
+		free_crop(crop);
+	}
+	HASH_ITER(hh, event_table, event, next_event) {
+		remove_event_from_table(event);
+		free_event(event);
+	}
+	HASH_ITER(hh, faction_table, fct, next_fct) {
+		remove_faction_from_table(fct);
+		free_faction(fct);
+	}
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		remove_generic_from_table(gen);
+		free_generic(gen);
+	}
+	LL_FOREACH_SAFE(generic_names, gen_name, next_gen_name) {
+		if (gen_name->names) {
+			for (iter = 0; iter < gen_name->size; ++iter) {
+				if (gen_name->names[iter]) {
+					free(gen_name->names[iter]);
+				}
+			}
+			free(gen_name->names);
+		}
+		free(gen_name);
+	}
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		remove_global_from_table(glb);
+		free_global(glb);
+	}
+	for (iter = 0; iter <= top_of_helpt; ++iter) {
+		if (help_table[iter].keyword) {
+			free(help_table[iter].keyword);
+		}
+		if (help_table[iter].entry&& !help_table[iter].duplicate) {
+			free(help_table[iter].entry);
+		}
+	}
+	free(help_table);
+	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		remove_mobile_from_table(mob);
+		free_char(mob);
+	}
+	HASH_ITER(hh, morph_table, morph, next_morph) {
+		remove_morph_from_table(morph);
+		free_morph(morph);
+	}
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		remove_object_from_table(obj);
+		free_obj(obj);
+	}
+	HASH_ITER(idnum_hh, player_table_by_idnum, pid, next_pid) {
+		remove_player_from_table(pid);
+		if (pid->name) {
+			free(pid->name);
+		}
+		if (pid->fullname) {
+			free(pid->fullname);
+		}
+		if (pid->last_host) {
+			free(pid->last_host);
+		}
+		free(pid);
+	}
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		remove_progress_from_table(prg);
+		free_progress(prg);
+	}
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		remove_quest_from_table(quest);
+		free_quest(quest);
+	}
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		remove_room_template_from_table(rmt);
+		free_room_template(rmt);
+	}
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		remove_sector_from_table(sect);
+		free_sector(sect);
+	}
+	HASH_ITER(hh, sector_index, sect_idx, next_sect_idx) {
+		HASH_DEL(sector_index, sect_idx);
+		free(sect_idx);
+	}
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		remove_shop_from_table(shop);
+		free_shop(shop);
+	}
+	HASH_ITER(hh, skill_table, skill, next_skill) {
+		remove_skill_from_table(skill);
+		free_skill(skill);
+	}
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		remove_social_from_table(soc);
+		free_social(soc);
+	}
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		remove_trigger_from_table(trig);
+		free_trigger(trig);
+		free_freeable_triggers();
+	}
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		remove_vehicle_from_table(veh);
+		free_vehicle(veh);
+	}
+	
+	// misc data
+	LL_FOREACH_SAFE(ban_list, ban, next_ban) {
+		free(ban);
+	}
+
+	for (iter = 0; iter < num_slow_ips; ++iter) {
+		if (detected_slow_ips[iter]) {
+			free(detected_slow_ips[iter]);
+		}
+	}
+	free(detected_slow_ips);
+	
+	HASH_ITER(hh, global_sector_count, sds, next_sds) {
+		HASH_DEL(global_sector_count, sds);
+		free(sds);
+	}
+	HASH_ITER(hh, global_crop_count, sds, next_sds) {
+		HASH_DEL(global_crop_count, sds);
+		free(sds);
+	}
+	HASH_ITER(hh, global_building_count, sds, next_sds) {
+		HASH_DEL(global_building_count, sds);
+		free(sds);
+	}
+	
+	HASH_ITER(hh, inherent_ptech_hash, int_iter, next_int_iter) {
+		HASH_DEL(inherent_ptech_hash, int_iter);
+		free(int_iter);
+	}
+	
+	for (iter = 0; iter < num_intro_screens; ++iter) {
+		if (intro_screens[iter]) {
+			free(intro_screens[iter]);
+		}
+	}
+	free(intro_screens);
+	
+	if (start_locs) {
+		free(start_locs);
+	}
+	
+	for (iter = 0; iter < NUM_TEXT_FILE_STRINGS; ++iter) {
+		if (text_file_strings[iter]) {
+			free(text_file_strings[iter]);
+		}
+	}
+	
+	for (iter = 0; iter < tips_of_the_day_size; ++iter) {
+		if (tips_of_the_day[iter]) {
+			free(tips_of_the_day[iter]);
+		}
+	}
+	free(tips_of_the_day);
+	
+	if (wizlock_message) {
+		free(wizlock_message);
+	}
+	
+	// free these last
+	HASH_ITER(hh, config_table, cnf, next_cnf) {
+		HASH_DEL(config_table, cnf);
+		if (cnf->description) {
+			free(cnf->description);
+		}
+		if (cnf->key) {
+			free(cnf->key);
+		}
+		free(cnf);
+	}
+	HASH_ITER(hh, data_table, data, next_data) {
+		HASH_DEL(data_table, data);
+		free(data);
+	}
+		
+	/* additional notes:
+	- probably don't need to close 'logfile'
+	- trigger_list is PROBABLY already free
+	*/
+	
+	log(" done");
 }
 
 

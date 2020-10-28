@@ -270,6 +270,7 @@ ability_data *find_ability_by_name(char *name);
 ability_data *find_ability_by_vnum(any_vnum vnum);
 void free_ability(ability_data *abil);
 char *get_ability_name_by_vnum(any_vnum vnum);
+void remove_ability_from_table(ability_data *abil);
 
 // accounts
 void add_player_to_account(char_data *ch, account_data *acct);
@@ -303,6 +304,7 @@ archetype_data *archetype_proto(any_vnum vnum);
 void free_archetype(archetype_data *arch);
 void free_archetype_gear(struct archetype_gear *list);
 void parse_archetype_gear(FILE *fl, struct archetype_gear **list, char *error);
+void remove_archetype_from_table(archetype_data *arch);
 void write_archetype_gear_to_file(FILE *fl, struct archetype_gear *list);
 
 // augments
@@ -312,6 +314,7 @@ extern augment_data *sorted_augments;
 augment_data *augment_proto(any_vnum vnum);
 augment_data *find_augment_by_name(char_data *ch, char *name, int type);
 void free_augment(augment_data *aug);
+void remove_augment_from_table(augment_data *aug);
 
 // automessage
 extern struct automessage *automessages_table;
@@ -358,8 +361,11 @@ class_data *find_class(char *argument);
 class_data *find_class_by_name(char *name);
 class_data *find_class_by_vnum(any_vnum vnum);
 void free_class(class_data *cls);
+void remove_class_from_table(class_data *cls);
 
 // configs
+extern struct config_type *config_table;
+
 void save_config_system();
 
 // crafts
@@ -391,6 +397,8 @@ void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 
 // data system
+extern struct stored_data *data_table;
+
 double data_get_double(int key);
 int data_get_int(int key);
 long data_get_long(int key);
@@ -475,7 +483,9 @@ struct event_running_data *find_last_event_run_by_vnum(any_vnum event_vnum);
 struct event_running_data *find_running_event_by_id(int id);
 struct event_running_data *find_running_event_by_vnum(any_vnum event_vnum);
 void free_event(event_data *event);
+void free_event_leaderboard(struct event_leaderboard *hash);
 char *get_event_name_by_proto(any_vnum vnum);
+void remove_event_from_table(event_data *event);
 
 // factions
 extern faction_data *faction_table;
@@ -487,6 +497,7 @@ faction_data *find_faction(char *argument);
 faction_data *find_faction_by_name(char *name);
 faction_data *find_faction_by_vnum(any_vnum vnum);
 void free_faction(faction_data *fct);
+void remove_faction_from_table(faction_data *fct);
 
 // generics
 extern generic_data *generic_table;
@@ -499,6 +510,7 @@ generic_data *real_generic(any_vnum vnum);
 const char *get_generic_name_by_vnum(any_vnum vnum);
 const char *get_generic_string_by_vnum(any_vnum vnum, int type, int pos);
 int get_generic_value_by_vnum(any_vnum vnum, int type, int pos);
+void remove_generic_from_table(generic_data *gen);
 
 // globals
 extern struct global_data *globals_table;
@@ -588,6 +600,7 @@ extern morph_data *sorted_morphs;
 
 morph_data *morph_proto(any_vnum vnum);
 void free_morph(morph_data *morph);
+void remove_morph_from_table(morph_data *morph);
 
 // objects
 extern obj_data *object_list;
@@ -670,6 +683,7 @@ void free_empire_goals(struct empire_goal *hash);
 void free_progress(progress_data *prg);
 char *get_progress_name_by_proto(any_vnum vnum);
 progress_data *real_progress(any_vnum vnum);
+void remove_progress_from_table(progress_data *prg);
 
 // quests
 extern struct quest_data *quest_table;
@@ -681,6 +695,7 @@ void free_quest_givers(struct quest_giver *list);
 void free_quest_temp_list(struct quest_temp_list *list);
 void parse_quest_giver(FILE *fl, struct quest_giver **list, char *error_str);
 quest_data *quest_proto(any_vnum vnum);
+void remove_quest_from_table(quest_data *quest);
 void write_quest_givers_to_file(FILE *fl, char letter, struct quest_giver *list);
 
 // requirements
@@ -724,6 +739,7 @@ extern shop_data *shop_table;
 
 void free_shop(shop_data *shop);
 shop_data *real_shop(any_vnum vnum);
+void remove_shop_from_table(shop_data *shop);
 
 // skills
 extern skill_data *skill_table;
@@ -735,6 +751,7 @@ skill_data *find_skill_by_vnum(any_vnum vnum);
 void free_skill(skill_data *skill);
 char *get_skill_abbrev_by_vnum(any_vnum vnum);
 char *get_skill_name_by_vnum(any_vnum vnum);
+void remove_skill_from_table(skill_data *skill);
 
 // socials
 extern social_data *social_table;
@@ -742,6 +759,7 @@ extern social_data *sorted_socials;
 
 social_data *social_proto(any_vnum vnum);
 void free_social(social_data *soc);
+void remove_social_from_table(social_data *soc);
 
 // starting locations / start locs
 extern int highest_start_loc_index;
@@ -787,6 +805,7 @@ extern vehicle_data *vehicle_table;
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void free_vehicle(vehicle_data *veh);
 vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
+void remove_vehicle_from_table(vehicle_data *veh);
 vehicle_data *vehicle_proto(any_vnum vnum);
 
 // wizlock system
@@ -850,9 +869,17 @@ void write_room_to_file(FILE *fl, room_data *room);
 void write_shared_room_data(FILE *fl, struct shared_room_data *dat);
 
 // misc
+extern struct ban_list_element *ban_list;
 extern time_t boot_time;
 extern struct char_delayed_update *char_delayed_update_list;
+extern char **detected_slow_ips;
+extern int num_slow_ips;
 extern struct generic_name_data *generic_names;
+extern struct stats_data_struct *global_sector_count;
+extern struct stats_data_struct *global_crop_count;
+extern struct stats_data_struct *global_building_count;
+extern char **intro_screens;
+extern int num_intro_screens;
 extern char **tips_of_the_day;
 extern int tips_of_the_day_size;
 
