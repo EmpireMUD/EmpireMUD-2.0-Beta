@@ -333,6 +333,7 @@ extern book_vnum top_book_vnum;
 void add_book_to_table(book_data *book);
 obj_data *create_book_obj(book_data *book);
 void free_book(book_data *book);
+void remove_book_from_table(book_data *book);
 
 // buildings
 extern bld_data *building_table;
@@ -362,6 +363,9 @@ class_data *find_class_by_name(char *name);
 class_data *find_class_by_vnum(any_vnum vnum);
 void free_class(class_data *cls);
 void remove_class_from_table(class_data *cls);
+
+// communication
+extern struct slash_channel *slash_channel_list;
 
 // configs
 extern struct config_type *config_table;
@@ -795,6 +799,8 @@ extern trig_data *trigger_list;
 extern trig_data *random_triggers;
 extern trig_data *free_trigger_list;
 extern trig_data *stc_next_random_trig;
+extern struct dg_owner_purged_tracker_type *dg_owner_purged_tracker;
+extern struct uid_lookup_table *master_uid_lookup_table;
 
 void add_trigger_to_table(trig_data *trig);
 void remove_trigger_from_table(trig_data *trig);

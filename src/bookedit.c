@@ -48,7 +48,6 @@ const char *default_book_desc = "It appears to be a book.\r\n";
 
 
 // local protos
-void remove_book_from_table(book_data *book);
 int sort_book_table(book_data *a, book_data *b);
 
 // external var

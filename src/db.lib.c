@@ -8458,15 +8458,20 @@ void free_whole_library(void) {
 	adv_data *adv, *next_adv;
 	archetype_data *arch, *next_arch;
 	augment_data *aug, *next_aug;
+	struct author_data *author, *next_author;
 	struct automessage *automsg, *next_automsg;
 	struct ban_list_element *ban, *next_ban;
 	bld_data *bld, *next_bld;
+	book_data *book, *next_book;
 	char_data *mob, *next_mob;
+	struct channel_history_data *chd, *next_chd;
+	struct char_delayed_update *cdu, *next_cdu;
 	class_data *class, *next_class;
 	struct config_type *cnf, *next_cnf;
 	craft_data *craft, *next_craft;
 	crop_data *crop, *next_crop;
 	descriptor_data *desc;
+	// struct dg_owner_purged_tracker_type *dopt, *next_dopt;
 	empire_data *emp, *next_emp;
 	event_data *event, *next_event;
 	struct event_running_data *erd, *next_erd;
@@ -8491,8 +8496,10 @@ void free_whole_library(void) {
 	social_data *soc, *next_soc;
 	struct stats_data_struct *sds, *next_sds;
 	struct stored_data *data, *next_data;
+	struct slash_channel *slash, *next_slash;
 	struct trading_post_data *tpd, *next_tpd;
 	trig_data *trig, *next_trig;
+	// struct uid_lookup_table *uid, *next_uid;
 	vehicle_data *veh, *next_veh;
 	int iter, x, y;
 	
@@ -8501,6 +8508,7 @@ void free_whole_library(void) {
 	block_all_saves_due_to_shutdown = TRUE;
 	
 	// extract everything in the game
+	free_loaded_players();
 	while ((desc = descriptor_list)) {
 		flush_queues(desc);
 		LL_DELETE(descriptor_list, desc);
@@ -8608,15 +8616,27 @@ void free_whole_library(void) {
 		remove_augment_from_table(aug);
 		free_augment(aug);
 	}
+	HASH_ITER(hh, author_table, author, next_author) {
+		HASH_DEL(author_table, author);
+		free(author);
+	}
 	HASH_ITER(hh, automessages_table, automsg, next_automsg) {
 		HASH_DEL(automessages_table, automsg);
 		free_automessage(automsg);
+	}
+	HASH_ITER(hh, book_table, book, next_book) {
+		remove_book_from_table(book);
+		free_book(book);
 	}
 	HASH_ITER(hh, building_table, bld, next_bld) {
 		remove_building_from_table(bld);
 		free_quest_lookups(GET_BLD_QUEST_LOOKUPS(bld));
 		free_shop_lookups(GET_BLD_SHOP_LOOKUPS(bld));
 		free_building(bld);
+	}
+	HASH_ITER(hh, char_delayed_update_list, cdu, next_cdu) {
+		HASH_DEL(char_delayed_update_list, cdu);
+		free(cdu);
 	}
 	HASH_ITER(hh, class_table, class, next_class) {
 		remove_class_from_table(class);
@@ -8630,6 +8650,12 @@ void free_whole_library(void) {
 		remove_crop_from_table(crop);
 		free_crop(crop);
 	}
+	/* this should be empty so just cut the reference to it and see if the memory profiler shows it:
+	DL_FOREACH_SAFE(dg_owner_purged_tracker, dopt, next_dopt) {
+		free(dopt);
+	}
+	*/
+	dg_owner_purged_tracker = NULL;
 	HASH_ITER(hh, event_table, event, next_event) {
 		remove_event_from_table(event);
 		free_event(event);
@@ -8732,6 +8758,13 @@ void free_whole_library(void) {
 		free_trigger(trig);
 		free_freeable_triggers();
 	}
+	/* this should be empty so just cut the reference to it and see if the memory profiler shows it:
+	HASH_ITER(hh, master_uid_lookup_table, uid, next_uid) {
+		HASH_DEL(master_uid_lookup_table, uid);
+		free(uid);
+	}
+	*/
+	master_uid_lookup_table = NULL;
 	HASH_ITER(hh, vehicle_table, veh, next_veh) {
 		remove_vehicle_from_table(veh);
 		free_quest_lookups(VEH_QUEST_LOOKUPS(veh));
@@ -8775,6 +8808,21 @@ void free_whole_library(void) {
 		}
 	}
 	free(intro_screens);
+	
+	LL_FOREACH_SAFE(slash_channel_list, slash, next_slash) {
+		if (slash->name) {
+			free(slash->name);
+		}
+		if (slash->lc_name) {
+			free(slash->lc_name);
+		}
+		DL_FOREACH_SAFE(slash->history, chd, next_chd) {
+			if (chd->message) {
+				free(chd->message);
+			}
+		}
+		free(slash);
+	}
 	
 	if (start_locs) {
 		free(start_locs);
