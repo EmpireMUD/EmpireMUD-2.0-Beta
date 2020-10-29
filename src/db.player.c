@@ -3867,6 +3867,11 @@ void delete_player_character(char_data *ch) {
 			log("SYSERR: deleting player file %s: %s", filename, strerror(errno));
 		}
 	}
+	if (get_filename(GET_NAME(ch), filename, DELAYED_FILE)) {
+		if (remove(filename) < 0 && errno != ENOENT) {
+			log("SYSERR: deleting player delay file %s: %s", filename, strerror(errno));
+		}
+	}
 	
 	// cleanup
 	if (emp) {
