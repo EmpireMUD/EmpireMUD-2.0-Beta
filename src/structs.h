@@ -3949,6 +3949,7 @@ struct player_index_data {
 	empire_data *loyalty;	// empire, if any
 	int rank;	// empire rank
 	char *last_host;	// last known host
+	sh_int highest_known_level;	// player's highest-ever level
 	
 	UT_hash_handle idnum_hh;	// player_table_by_idnum
 	UT_hash_handle name_hh;	// player_table_by_name

@@ -2354,6 +2354,7 @@ void update_player_index(player_index_data *index, char_data *ch) {
 	index->plr_flags = PLR_FLAGS(ch);
 	index->loyalty = GET_LOYALTY(ch);
 	index->rank = GET_RANK(ch);
+	index->highest_known_level = GET_HIGHEST_KNOWN_LEVEL(ch);
 	
 	if (ch->desc || ch->prev_host) {
 		if (index->last_host) {
