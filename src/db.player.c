@@ -3878,7 +3878,7 @@ void delete_old_players(void) {
 void delete_player_character(char_data *ch) {
 	player_index_data *index;
 	empire_data *emp = NULL;
-	char filename[256];
+	char filename[256], delname[256];
 	
 	if (IS_NPC(ch)) {
 		syslog(SYS_ERROR, 0, TRUE, "SYSERR: delete_player_character called on NPC");
@@ -3906,14 +3906,14 @@ void delete_player_character(char_data *ch) {
 	}
 	
 	// various file deletes
-	if (get_filename(GET_NAME(ch), filename, PLR_FILE)) {
-		if (remove(filename) < 0 && errno != ENOENT) {
-			log("SYSERR: deleting player file %s: %s", filename, strerror(errno));
+	if (get_filename(GET_NAME(ch), filename, PLR_FILE) && get_filename(GET_NAME(ch), delname, DELETED_PLR_FILE)) {
+		if (rename(filename, delname) < 0 && errno != ENOENT) {
+			log("SYSERR: moving deleted player file %s: %s", filename, strerror(errno));
 		}
 	}
-	if (get_filename(GET_NAME(ch), filename, DELAYED_FILE)) {
-		if (remove(filename) < 0 && errno != ENOENT) {
-			log("SYSERR: deleting player delay file %s: %s", filename, strerror(errno));
+	if (get_filename(GET_NAME(ch), filename, DELAYED_FILE) && get_filename(GET_NAME(ch), delname, DELETED_DELAYED_FILE)) {
+		if (rename(filename, delname) < 0 && errno != ENOENT) {
+			log("SYSERR: moving deleted player delay file %s: %s", filename, strerror(errno));
 		}
 	}
 	

@@ -52,6 +52,7 @@
 #define LIB_ETC  "etc/"
 #define LIB_BOARD  "boards/"
 #define LIB_PLAYERS  "players/"
+#define LIB_PLAYERS_DELETED  LIB_PLAYERS"deleted/"
 #define LIB_OBJPACK  "packs/"
 #define LIB_EMPIRE  "empires/"
 #define LIB_CHANNELS  "channels/"

@@ -1584,6 +1584,16 @@ int get_filename(char *orig_name, char *filename, int mode) {
 			suffix = SUF_DELAY;
 			break;
 		}
+		case DELETED_PLR_FILE: {
+			prefix = LIB_PLAYERS_DELETED;
+			suffix = SUF_PLR;
+			break;
+		}
+		case DELETED_DELAYED_FILE: {
+			prefix = LIB_PLAYERS_DELETED;
+			suffix = SUF_DELAY;
+			break;
+		}
 		default: {
 			return (0);
 		}
