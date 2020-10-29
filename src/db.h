@@ -637,7 +637,7 @@ extern int max_inventory_size;
 extern bool pause_affect_total;
 
 void add_lastname(char_data *ch, char *name);
-void add_player_to_table(player_index_data *plr);
+bool add_player_to_table(player_index_data *plr);
 void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
 void delete_player_character(char_data *ch);
@@ -650,6 +650,7 @@ void free_loaded_players();
 void free_mail(struct mail_data *mail);
 void free_player_completed_quests(struct player_completed_quest **hash);
 void free_player_event_data(struct player_event_data *hash);
+void free_player_index_data(player_index_data *index);
 int get_highest_access_level(account_data *acct);
 char_data *is_at_menu(int id);
 char_data *is_playing(int id);

@@ -596,8 +596,9 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 * tables.
 *
 * @param player_index_data *plr The player to add.
+* @return bool TRUE if it succeeded or FALSE if it failed because the name or ID is in-use.
 */
-void add_player_to_table(player_index_data *plr) {
+bool add_player_to_table(player_index_data *plr) {
 	bool bad_id = FALSE, bad_name = FALSE;
 	player_index_data *find;
 	int idnum = plr->idnum;
@@ -628,6 +629,9 @@ void add_player_to_table(player_index_data *plr) {
 	if (bad_id || bad_name) {
 		log("SYSERR: add_player_to_table: '%s' (%d) is already in %s", plr->name, plr->idnum, (bad_id && bad_name) ? "both tables" : (bad_id ? "id table" : "name table"));
 	}
+	
+	// return FALSE only if both id and name failed
+	return !(bad_id && bad_name);
 }
 
 
@@ -674,13 +678,24 @@ void build_player_index(void) {
 					continue;
 				}
 				
-				has_players = TRUE;
-				
 				GET_ACCOUNT(ch) = acct;	// not set by load_player
-				
+
 				CREATE(index, player_index_data, 1);
 				update_player_index(index, ch);
-				add_player_to_table(index);
+				
+				// ensure it can add to the index or else back out
+				if (!add_player_to_table(index)) {
+					free_player_index_data(index);
+					log("SYSERR: Deleting account's player entry for '%s' because it's already on another account", plr->name ? plr->name : "???");
+					LL_DELETE(acct->players, plr);
+					if (plr->name) {
+						free(plr->name);
+					}
+					free(plr);
+					continue;
+				}
+				
+				// otherwise store the index entry
 				plr->player = index;
 				
 				// detect top idnum
@@ -688,6 +703,9 @@ void build_player_index(void) {
 				
 				// unload character
 				free_char(ch);
+				
+				// set this for later
+				has_players = TRUE;
 			}
 			
 			// update last logon
