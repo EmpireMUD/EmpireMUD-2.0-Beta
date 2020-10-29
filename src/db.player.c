@@ -675,6 +675,7 @@ void build_player_index(void) {
 						free(plr->name);
 					}
 					free(plr);
+					save_library_file_for_vnum(DB_BOOT_ACCT, acct->id);
 					continue;
 				}
 				
