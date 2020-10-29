@@ -7295,7 +7295,10 @@ void process_global(struct script_data *sc, trig_data *trig, char *cmd, int id) 
 	}    
 
 	add_var(&(sc->global_vars), vd->name, vd->value, id);
-	remove_var(&GET_TRIG_VARS(trig), vd->name, id);
+	
+	// formerly: remove_var(&GET_TRIG_VARS(trig), vd->name, id);
+	LL_DELETE(GET_TRIG_VARS(trig), vd);
+	free_var_el(vd);
 }
 
 
