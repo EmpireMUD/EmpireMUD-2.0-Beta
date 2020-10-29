@@ -138,6 +138,7 @@ dailies_per_day 5
 default_class_abbrev Advn
 default_class_name Adventurer
 default_map_size 7
+delete_abandoned_players_after 0
 delete_inactive_players_after 0
 delete_invalid_players_after 30
 exp_level_difference 50

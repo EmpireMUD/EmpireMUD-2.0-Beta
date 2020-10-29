@@ -3783,47 +3783,89 @@ void clear_player(char_data *ch) {
 * This runs at startup (if you don't use -q) and deletes players who are
 * timed out according to the delete_invalid_players_after and 
 * delete_inactive_players_after configs. This can be prevented with the
-* NODELETE flag. Immortals are also never deleted this way.
+* NODELETE flag. Immortals are also never deleted this way. Only whole accounts
+* will be deleted, never individual characters on accounts.
 */
 void delete_old_players(void) {
-	player_index_data *index, *next_index;
-	bool file, will_delete;
+	account_data *acct, *next_acct;
+	bool has_imm, has_nodelete, will_delete, file;
+	char reason[256];
 	char_data *ch;
+	int avg_min_per_day, inactive_days;
+	int max_access_level, max_char_level, best_mins_per_day;
+	struct account_player *plr, *next_plr;
 	
-	int delete_inactive = config_get_int("delete_inactive_players_after");
+	int delete_abandoned = config_get_int("delete_abandoned_players_after");
 	int delete_invalid = config_get_int("delete_invalid_players_after");
+	int delete_inactive = config_get_int("delete_inactive_players_after");
 	
-	HASH_ITER(name_hh, player_table_by_name, index, next_index) {
-		// imms immune
-		if (index->access_level >= LVL_START_IMM && index->access_level <= LVL_TOP) {
-			continue;
-		}
-		// never!
-		if (IS_SET(index->plr_flags, PLR_NODELETE)) {
-			continue;
-		}
+	HASH_ITER(hh, account_table, acct, next_acct) {
+		max_char_level = max_access_level = best_mins_per_day = 0;
+		has_imm = has_nodelete = will_delete = FALSE;
+		*reason = '\0';
 		
-		will_delete = FALSE;
-		
-		// delete #1: invalid players
-		if (delete_invalid > 0 && (index->access_level <= 0 || index->access_level > LVL_TOP) && (index->last_logon + (delete_invalid * SECS_PER_REAL_DAY)) < time(0)) {
-			will_delete = TRUE;
-		}
-		// delete #2: inactive players
-		else if (delete_inactive > 0 && (index->last_logon + (delete_inactive * SECS_PER_REAL_DAY)) < time(0)) {
-			will_delete = TRUE;
-		}
-		
-		// attempt the delete
-		if (will_delete && (ch = find_or_load_player(index->name, &file))) {
-			if (!file) {
-				// EXTREMELY unlikely: they may be deletable but are actually in-game, so we skip them
-				continue;
+		// scan players in the account
+		LL_FOREACH(acct->players, plr) {
+			if (plr->player->access_level > LVL_MORTAL) {
+				has_imm = TRUE;
 			}
+			if (IS_SET(plr->player->plr_flags, PLR_NODELETE)) {
+				has_nodelete = TRUE;
+			}
+			max_access_level = MAX(max_access_level, plr->player->access_level);
+			max_char_level = MAX(max_char_level, plr->player->highest_known_level);
 			
-			delete_player_character(ch);
-			free_char(ch);
+			// determine avg playtime
+			avg_min_per_day = (((double) plr->player->played / SECS_PER_REAL_HOUR) / ((double)(time(0) - plr->player->birth) / SECS_PER_REAL_DAY)) * SECS_PER_REAL_MIN;
+			best_mins_per_day = MAX(best_mins_per_day, avg_min_per_day);
 		}
+		
+		// never delete imms or anyone with nodelete on the account
+		if (has_imm || has_nodelete) {
+			continue;
+		}
+		
+		// how long they've been gone
+		inactive_days = (time(0) - acct->last_logon) / SECS_PER_REAL_DAY;
+		
+		// reasons to delete
+		if (delete_invalid > 0 && (max_access_level <= 0 || max_char_level <= 0) && inactive_days >= delete_invalid) {
+			will_delete = TRUE;
+			snprintf(reason, sizeof(reason), "no characters over level 0");
+		}
+		else if (delete_inactive > 0 && inactive_days >= delete_inactive) {
+			will_delete = TRUE;
+			snprintf(reason, sizeof(reason), "inactive too long");
+		}
+		else if (delete_abandoned > 0 && max_char_level < 100 && best_mins_per_day <= 3 && inactive_days >= delete_abandoned) {
+			will_delete = TRUE;	// low-level and long-gone
+			snprintf(reason, sizeof(reason), "abandoned low-level account");
+		}
+		
+		if (will_delete) {
+			log("DELETE: Deleting account %d: %s", acct->id, reason);
+			LL_FOREACH_SAFE(acct->players, plr, next_plr) {
+				log("- deleting [%d] %s", plr->player->idnum, plr->player->name);
+				
+				// ensure not at the menu somehow
+				if ((ch = is_at_menu(plr->player->idnum)) && ch->desc) {
+					close_socket(ch->desc);
+				}
+				
+				// now find/load and delete
+				if ((ch = find_or_load_player(plr->player->name, &file))) {
+					if (file) {
+						delete_player_character(ch);
+						free_char(ch);
+					}
+					else {	// in-game somehow
+						extract_all_items(ch);
+						delete_player_character(ch);
+						extract_char(ch);
+					}
+				}
+			}
+		}	// end will_delete: if last player was deleted, the account is already gone, too
 	}
 }
 
