@@ -266,6 +266,7 @@ void extract_script(void *thing, int type) {
 			empire_data *emp = (empire_data*)thing;
 			sc = SCRIPT(emp);
 			SCRIPT(emp) = NULL;
+			break;
 		}
 		default: {
 			log("SYSERR: Invalid type called for extract_script()");
