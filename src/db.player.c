@@ -598,6 +598,7 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 * @param player_index_data *plr The player to add.
 */
 void add_player_to_table(player_index_data *plr) {
+	bool bad_id = FALSE, bad_name = FALSE;
 	player_index_data *find;
 	int idnum = plr->idnum;
 	
@@ -608,6 +609,9 @@ void add_player_to_table(player_index_data *plr) {
 		HASH_ADD(idnum_hh, player_table_by_idnum, idnum, sizeof(int), plr);
 		HASH_SRT(idnum_hh, player_table_by_idnum, sort_players_by_idnum);
 	}
+	else {
+		bad_id = TRUE;
+	}
 	
 	// by name: ensure name is lowercase
 	find = NULL;
@@ -616,6 +620,13 @@ void add_player_to_table(player_index_data *plr) {
 	if (!find) {
 		HASH_ADD(name_hh, player_table_by_name, name[0], strlen(plr->name), plr);
 		HASH_SRT(name_hh, player_table_by_name, sort_players_by_name);
+	}
+	else {
+		bad_name = TRUE;
+	}
+	
+	if (bad_id || bad_name) {
+		log("SYSERR: add_player_to_table: '%s' (%d) is already in %s", plr->name, plr->idnum, (bad_id && bad_name) ? "both tables" : (bad_id ? "id table" : "name table"));
 	}
 }
 
