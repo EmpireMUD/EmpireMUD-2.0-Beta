@@ -9079,7 +9079,7 @@ ACMD(do_playerdelete) {
 	}
 	else {
 		// logs and messaging
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has deleted player %s", GET_NAME(ch), GET_NAME(victim));
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "DEL: %s has deleted player %s", GET_NAME(ch), GET_NAME(victim));
 		if (!file) {
 			if (!GET_INVIS_LEV(victim)) {
 				act("$n has left the game.", TRUE, victim, FALSE, FALSE, TO_ROOM);

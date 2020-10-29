@@ -3843,9 +3843,9 @@ void delete_old_players(void) {
 		}
 		
 		if (will_delete) {
-			log("DELETE: Deleting account %d: %s", acct->id, reason);
+			log("DEL: Deleting account %d: %s", acct->id, reason);
 			LL_FOREACH_SAFE(acct->players, plr, next_plr) {
-				log("- deleting [%d] %s", plr->player->idnum, plr->player->name);
+				log("DEL: - [%d] %s", plr->player->idnum, plr->player->fullname);
 				
 				// ensure not at the menu somehow
 				if ((ch = is_at_menu(plr->player->idnum)) && ch->desc) {
