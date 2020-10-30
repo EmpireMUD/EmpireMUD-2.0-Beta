@@ -5655,8 +5655,12 @@ void empty_obj_before_extract(obj_data *obj) {
 void extract_obj(obj_data *obj) {
 	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
 	
+	// safety checks
 	check_dg_owner_purged_obj(obj);
-
+	if (obj == purge_bound_items_next) {
+		purge_bound_items_next = purge_bound_items_next->next;
+	}
+	
 	// remove from anywhere
 	check_obj_in_void(obj);
 

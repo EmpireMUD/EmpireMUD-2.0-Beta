@@ -216,6 +216,9 @@ morph_data *sorted_morphs = NULL;	// alphabetic version // sorted_hh
 obj_data *object_list = NULL;	// global doubly-linked list of objs
 obj_data *object_table = NULL;	// hash table of objs
 
+// safe obj iterators
+obj_data *purge_bound_items_next = NULL;	// used in purge_bound_items()
+
 // players
 account_data *account_table = NULL;	// hash table of accounts
 player_index_data *player_table_by_idnum = NULL;	// hash table by idnum

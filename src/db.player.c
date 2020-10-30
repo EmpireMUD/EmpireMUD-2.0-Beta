@@ -4457,9 +4457,10 @@ void init_player(char_data *ch) {
 * @param int idnum The idnum to clear bound objects for.
 */
 void purge_bound_items(int idnum) {
-	obj_data *obj, *next_obj;
+	obj_data *obj;
 	
-	DL_FOREACH_SAFE(object_list, obj, next_obj) {
+	// this uses a global, purge_bound_items_next, to avoid problems where both obj and next-obj are purged from being nested (like a corpse)
+	DL_FOREACH_SAFE(object_list, obj, purge_bound_items_next) {
 		if (obj->bound_to && obj->bound_to->idnum == idnum && !obj->bound_to->next) {
 			// bound to exactly 1 idnum and it's this one
 			if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
