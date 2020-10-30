@@ -8505,10 +8505,7 @@ void detach_building_from_room(room_data *room) {
 		}
 		
 		if (any) {	// update script types
-			SCRIPT_TYPES(SCRIPT(room)) = 0;
-			LL_FOREACH(TRIGGERS(SCRIPT(room)), trig) {
-				SCRIPT_TYPES(SCRIPT(room)) |= GET_TRIG_TYPE(trig);
-			}
+			update_script_types(SCRIPT(room));
 		}
 		check_extract_script(room, WLD_TRIGGER);
 	}

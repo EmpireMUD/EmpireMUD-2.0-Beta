@@ -468,6 +468,23 @@ struct trig_proto_list *copy_trig_protos(struct trig_proto_list *from) {
 }
 
 
+/**
+* Updates SCRIPT_TYPES(sc) for all triggers attached to it.
+*
+* @param struct script_data *sc The script data to update.
+*/
+void update_script_types(struct script_data *sc) {
+	trig_data *trig;
+	
+	if (sc) {
+		SCRIPT_TYPES(sc) = NOBITS;
+		LL_FOREACH(TRIGGERS(sc), trig) {
+			SCRIPT_TYPES(sc) |= GET_TRIG_TYPE(trig);
+		}
+	}
+}
+
+
 // I don't believe this is used any more... it was required before the world was a hash table, when we had to copy the world
 void update_wait_events(room_data *to, room_data *from) {
 	trig_data *trig;

@@ -1560,61 +1560,52 @@ void add_var(struct trig_var_data **var_list, char *name, char *value, int id) {
 }
 
 
-/*
-*  removes the trigger specified by name, and the script of o if
-*  it removes the last trigger.  name can either be a number, or
-*  a 'silly' name for the trigger, including things like 2.beggar-death.
-*  returns 0 if did not find the trigger, otherwise 1.  If it matters,
-*  you might need to check to see if all the triggers were removed after
-*  this function returns, in order to remove the script.
+/**
+* Attempts to remove a trigger from the script. Will likely also free the
+* script data if it removes the last one. It only removes the first matching
+* trigger it finds.
+*
+* @param struct script_data *sc The script data to remove a trigger from.
+* @param char *name The keyword (goblin, 2.goblin) or vnum (12345) of the script to remove.
+* @return bool TRUE if it removed a trigger, FALSE if not.
 */
-int remove_trigger(struct script_data *sc, char *name) {
-	trig_data *i;
-	int num = 0, string = FALSE, n;
-	char *cname;
-
-	if (!sc)
-		return 0;
-
-	if ((cname = strstr(name,".")) || (!isdigit(*name)) ) {
-		string = TRUE;
-		if (cname) {
-			*cname = '\0';
-			num = atoi(name);
-			name = ++cname;
+bool remove_trigger(struct script_data *sc, char *name) {
+	bool vnum_only = FALSE, any = FALSE;
+	trig_data *trig, *next_trig;
+	char copy[256], *str;
+	int num;
+	
+	if (is_number(name)) {
+		// remove by number
+		str = name;
+		num = atoi(str);
+		vnum_only = TRUE;
+	}
+	else {
+		// remove by name
+		strcpy(copy, name);
+		str = copy;
+		num = get_number(&str);
+	}
+	
+	if (sc) {
+		LL_FOREACH_SAFE(TRIGGERS(sc), trig, next_trig) {
+			if (vnum_only && GET_TRIG_VNUM(trig) != num) {
+				continue;
+			}
+			else if (!vnum_only && (!isname(str, GET_TRIG_NAME(trig)) || --num > 0)) {
+				continue;
+			}
+			
+			// this is the one to detach
+			LL_DELETE(TRIGGERS(sc), trig);
+			extract_trigger(trig);			
+			update_script_types(sc);
+			any = TRUE;
 		}
 	}
-	else
-		num = atoi(name);
-
-	for (n = 0, i = TRIGGERS(sc); i; i = i->next) {
-		if (string) {
-			if (isname(name, GET_TRIG_NAME(i)))
-				if (++n >= num)
-					break;
-		}
-		/* this isn't clean... */
-		/* a numeric value will match if it's position OR vnum */
-		/* is found. originally the number was position-only */
-		else if (++n >= num)
-			break;
-		else if (GET_TRIG_VNUM(i) == num)
-			break;
-	}
-
-	if (i) {
-		LL_DELETE(TRIGGERS(sc), i);
-		extract_trigger(i);
-
-		/* update the script type bitvector */
-		SCRIPT_TYPES(sc) = 0;
-		for (i = TRIGGERS(sc); i; i = i->next)
-			SCRIPT_TYPES(sc) |= GET_TRIG_TYPE(i);
-
-		return 1;
-	}
-	else
-		return 0; 
+	
+	return any;
 }
 
 ACMD(do_tdetach) {
