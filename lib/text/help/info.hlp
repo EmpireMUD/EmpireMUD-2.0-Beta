@@ -143,6 +143,19 @@ There is also currently a maximum rating of 15 in these attributes.
 
 See also: DODGE, DPS, EMPIRE GREATNESS, SPEED, TO-HIT
 #
+AUTO-DELETE AUTODELETE "AUTO DELETE"
+
+If enabled, the MUD will delete accounts that are inactive for too long. This
+generally depends on various factors like the level of characters on the
+account, the average playtime, and how long the account has been inactive.
+
+Immortals: Players are only auto-deleted if the MUD boots up without the -q
+option (in the autorun file). You can configure how long accounts can be
+inactive without being deleted using the following configs:
+  delete_abandoned_players_after
+  delete_inactive_players_after
+  delete_invalid_players_after
+#
 AUTORECALL "AUTO-RECALL" "AUTO RECALL" "TOGGLE AUTORECALL"
 
 Usage:  toggle autorecall [on/off]

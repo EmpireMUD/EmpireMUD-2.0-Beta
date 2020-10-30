@@ -214,6 +214,9 @@ Futher steps once you are logged into EmpireMUD:
   the correct paths for the game and backup directories. You should set these
   on a cron, to get hourly backups:
    0 * * * * php /path/to/backups/make-backup.php
+- If you end up with a large number of former players and your MUD's startup
+  time is long, remove the -q flag from your autorun to enable auto-deletes.
+  See HELP AUTO-DELETE in-game for more information on configuring it.
 
 
 Other Documentation
