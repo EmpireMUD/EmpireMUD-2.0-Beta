@@ -7600,9 +7600,8 @@ int script_driver(union script_driver_data_u *sdd, trig_data *trig, int type, in
 		}
 	}
 	
-	// TODO why does this only free vars if there's still a script? Is there a possibility of getting here with vars unfreed? If not, isn't it safe to try to free them again?
-	if (sc)
-		free_varlist(GET_TRIG_VARS(trig));
+	// this formerly only called free_varlist "if (sc)" but that seems like a memory leak
+	free_varlist(GET_TRIG_VARS(trig));
 	GET_TRIG_VARS(trig) = NULL;
 	GET_TRIG_DEPTH(trig) = 0;
 	cancel_dg_owner_purged_tracker(trig);
