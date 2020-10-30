@@ -538,6 +538,11 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	// get rid of vehicles
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+		if (!extraction_room) {
+			extraction_room = get_extraction_room();
+		}
+		vehicle_from_room(veh);
+		vehicle_to_room(veh, extraction_room);
 		extract_vehicle(veh);
 	}
 	
@@ -1273,7 +1278,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 */
 void annual_world_update(void) {
 	char message[MAX_STRING_LENGTH];
-	vehicle_data *veh, *next_veh;
+	vehicle_data *veh;
 	descriptor_data *d;
 	room_data *room, *next_room;
 	struct map_data *tile;
@@ -1317,7 +1322,7 @@ void annual_world_update(void) {
 		annual_update_depletions(&ROOM_DEPLETION(room));
 	}
 	
-	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
 		annual_update_vehicle(veh);
 	}
 	

@@ -218,6 +218,7 @@ obj_data *object_table = NULL;	// hash table of objs
 
 // safe obj iterators
 obj_data *purge_bound_items_next = NULL;	// used in purge_bound_items()
+obj_data *global_next_obj = NULL;	// used in limits.c
 
 // players
 account_data *account_table = NULL;	// hash table of accounts
@@ -281,6 +282,10 @@ int top_script_uid = OTHER_ID_BASE;	// for unique mobs/objs/vehicles in the DG S
 // vehicles
 vehicle_data *vehicle_table = NULL;	// master vehicle hash table
 vehicle_data *vehicle_list = NULL;	// global doubly-linked list of vehicles (veh->next)
+
+// safe vehicle iterators
+vehicle_data *global_next_vehicle = NULL;	// used in limits.c
+vehicle_data *next_pending_vehicle = NULL;	// used in handler.c
 
 // world / rooms
 room_data *world_table = NULL;	// hash table of the whole world

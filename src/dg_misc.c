@@ -437,7 +437,7 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 */
 void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) {
 	char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-	vehicle_data *veh, *next_veh;
+	vehicle_data *veh;
 	char_data *mob, *next_mob;
 	obj_data *obj, *next_obj;
 	any_vnum vnum;
@@ -490,7 +490,7 @@ void dg_purge_instance(void *owner, struct instance_data *inst, char *argument) 
 		}
 	}
 	else if (is_abbrev(arg1, "vehicle")) {
-		DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+		DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
 			if (VEH_VNUM(veh) != vnum || VEH_INSTANCE_ID(veh) != INST_ID(inst)) {
 				continue;
 			}
@@ -823,10 +823,10 @@ int valid_dg_target(char_data *ch, int bitvector) {
 * Runs triggers to update and prepare the mud at startup.
 */
 void run_reboot_triggers(void) {
-	vehicle_data *veh, *next_veh;
+	vehicle_data *veh;
 	room_data *room, *next_room;
 	char_data *mob, *next_mob;
-	obj_data *obj, *next_obj;
+	obj_data *obj;
 	
 	HASH_ITER(hh, world_table, room, next_room) {
 		reboot_wtrigger(room);
@@ -834,10 +834,10 @@ void run_reboot_triggers(void) {
 	DL_FOREACH_SAFE(character_list, mob, next_mob) {
 		reboot_mtrigger(mob);
 	}
-	DL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH_SAFE(object_list, obj, global_next_obj) {
 		reboot_otrigger(obj);
 	}
-	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
 		reboot_vtrigger(veh);
 	}
 }

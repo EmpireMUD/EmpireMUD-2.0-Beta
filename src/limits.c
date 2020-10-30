@@ -2192,8 +2192,8 @@ int move_gain(char_data *ch, bool info_only) {
 * update for that tick, to avoid iterating a second time over the same data.
 */
 void point_update(bool run_real) {
-	vehicle_data *veh, *next_veh;
-	obj_data *obj, *next_obj;
+	vehicle_data *veh;
+	obj_data *obj;
 	char_data *ch, *next_ch;
 	
 	long daily_cycle = data_get_long(DATA_DAILY_CYCLE);
@@ -2234,12 +2234,12 @@ void point_update(bool run_real) {
 	}
 	
 	// vehicles
-	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
 		point_update_vehicle(veh);
 	}
 	
 	// objs
-	DL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH_SAFE(object_list, obj, global_next_obj) {
 		real_update_obj(obj);
 		point_update_obj(obj);
 	}
@@ -2251,7 +2251,7 @@ void point_update(bool run_real) {
 * affects.
 */
 void real_update(void) {
-	obj_data *obj, *next_obj;
+	obj_data *obj;
 	char_data *ch, *next_ch;
 
 	// characters
@@ -2264,7 +2264,7 @@ void real_update(void) {
 	}
 
 	// objs
-	DL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH_SAFE(object_list, obj, global_next_obj) {
 		real_update_obj(obj);
 	}
 }

@@ -1030,6 +1030,8 @@ void delete_instance(struct instance_data *inst, bool run_cleanup) {
 			if (INST_ROOM(inst, iter)) {
 				// get rid of vehicles first (helps relocate players inside)
 				DL_FOREACH_SAFE2(ROOM_VEHICLES(INST_ROOM(inst, iter)), veh, next_veh, next_in_room) {
+					vehicle_from_room(veh);
+					vehicle_to_room(veh, extraction_room);
 					extract_vehicle(veh);
 				}
 	

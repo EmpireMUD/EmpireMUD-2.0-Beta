@@ -5660,6 +5660,9 @@ void extract_obj(obj_data *obj) {
 	if (obj == purge_bound_items_next) {
 		purge_bound_items_next = purge_bound_items_next->next;
 	}
+	if (obj == global_next_obj) {
+		global_next_obj = global_next_obj->next;
+	}
 	
 	// remove from anywhere
 	check_obj_in_void(obj);
@@ -9852,7 +9855,14 @@ void extract_vehicle(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle to extract and free.
 */
 void extract_vehicle_final(vehicle_data *veh) {
+	// safety
 	check_dg_owner_purged_vehicle(veh);
+	if (veh == global_next_vehicle) {
+		global_next_vehicle = global_next_vehicle->next;
+	}
+	if (veh == next_pending_vehicle) {
+		next_pending_vehicle = next_pending_vehicle->next;
+	}
 	
 	// delete interior
 	delete_vehicle_interior(veh);
@@ -9894,13 +9904,13 @@ void extract_vehicle_final(vehicle_data *veh) {
 * Doing this late prevents issues with vehicles being extracted multiple times.
 */
 void extract_pending_vehicles(void) {
-	vehicle_data *veh, *next_veh;
+	vehicle_data *veh;
 
 	if (veh_extractions_pending < 0) {
 		log("SYSERR: Negative (%d) vehicle extractions pending.", veh_extractions_pending);
 	}
 	
-	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, next_pending_vehicle) {
 		// check if done?
 		if (veh_extractions_pending <= 0) {
 			break;

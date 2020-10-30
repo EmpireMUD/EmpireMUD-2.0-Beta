@@ -613,6 +613,7 @@ void remove_morph_from_table(morph_data *morph);
 extern obj_data *object_list;
 extern obj_data *object_table;
 extern obj_data *purge_bound_items_next;
+extern obj_data *global_next_obj;
 
 void add_object_to_table(obj_data *obj);
 obj_data *create_obj(void);
@@ -814,6 +815,8 @@ void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *li
 // vehicles
 extern vehicle_data *vehicle_list;
 extern vehicle_data *vehicle_table;
+extern vehicle_data *global_next_vehicle;
+extern vehicle_data *next_pending_vehicle;
 
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void free_vehicle(vehicle_data *veh);
