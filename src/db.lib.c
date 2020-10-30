@@ -1712,10 +1712,10 @@ void delete_empire(empire_data *emp) {
 	player_index_data *index, *next_index;
 	struct vehicle_attached_mob *vam;
 	empire_data *emp_iter, *next_emp;
-	vehicle_data *veh, *next_veh;
+	vehicle_data *veh;
 	room_data *room, *next_room;
 	char buf[MAX_STRING_LENGTH];
-	obj_data *obj, *next_obj;
+	obj_data *obj;
 	char_data *ch, *next_ch;
 	bool file = FALSE;
 	empire_vnum vnum;
@@ -1783,14 +1783,14 @@ void delete_empire(empire_data *emp) {
 	}
 	
 	// update all objs
-	DL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH(object_list, obj) {
 		if (obj->last_empire_id == vnum) {
 			obj->last_empire_id = NOTHING;
 		}
 	}
 	
 	// update all vehicles
-	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_OWNER(veh) == emp) {
 			VEH_OWNER(veh) = NULL;
 			VEH_SHIPPING_ID(veh) = -1;
