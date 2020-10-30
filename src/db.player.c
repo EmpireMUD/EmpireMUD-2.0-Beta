@@ -323,6 +323,7 @@ account_data *find_account(int id) {
 void free_account(account_data *acct) {
 	struct account_player *plr;
 	descriptor_data *desc;
+	struct pk_data *pkd;
 	
 	if (!acct) {
 		return;
@@ -348,6 +349,12 @@ void free_account(account_data *acct) {
 		}
 		acct->players = plr->next;
 		free(plr);
+	}
+	
+	// free pk data
+	while ((pkd = acct->killed_by)) {
+		acct->killed_by = pkd->next;
+		free(pkd);
 	}
 	
 	free(acct);

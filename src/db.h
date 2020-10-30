@@ -277,6 +277,7 @@ void remove_ability_from_table(ability_data *abil);
 void add_player_to_account(char_data *ch, account_data *acct);
 account_data *create_account_for_player(char_data *ch);
 account_data *find_account(int id);
+void free_account(account_data *acct);
 void remove_player_from_account(char_data *ch);
 
 // adventures

@@ -8454,7 +8454,6 @@ sector_data *sector_proto(sector_vnum vnum) {
 void free_whole_library(void) {
 	ability_data *abil, *next_abil;
 	account_data *acct, *next_acct;
-	struct account_player *acct_player;
 	adv_data *adv, *next_adv;
 	archetype_data *arch, *next_arch;
 	augment_data *aug, *next_aug;
@@ -8483,7 +8482,6 @@ void free_whole_library(void) {
 	struct island_info *island, *next_island;
 	morph_data *morph, *next_morph;
 	obj_data *obj, *next_obj;
-	struct pk_data *pkd;
 	player_index_data *pid, *next_pid;
 	progress_data *prg, *next_prg;
 	struct quest_data *quest, *next_quest;
@@ -8587,22 +8585,8 @@ void free_whole_library(void) {
 		free_ability(abil);
 	}
 	HASH_ITER(hh, account_table, acct, next_acct) {
-		if (acct->notes) {
-			free(acct->notes);
-		}
-		while ((acct_player = acct->players)) {
-			if (acct_player->name) {
-				free(acct_player->name);
-			}
-			acct->players = acct_player->next;
-			free(acct_player);
-		}
-		while ((pkd = acct->killed_by)) {
-			acct->killed_by = pkd->next;
-			free(pkd);
-		}
 		HASH_DEL(account_table, acct);
-		free(acct);
+		free_account(acct);
 	}
 	HASH_ITER(hh, adventure_table, adv, next_adv) {
 		remove_adventure_from_table(adv);
