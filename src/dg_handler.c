@@ -162,9 +162,6 @@ void actually_free_trigger(trig_data *trig) {
 	if (trig->arglist && (!proto || trig->arglist != proto->arglist)) {
 		free(trig->arglist);
 	}
-	if (trig->var_list && (!proto || trig->var_list != proto->var_list)) {
-		free_varlist(trig->var_list);
-	}
 	if (trig->cmdlist && (!proto || trig->cmdlist != proto->cmdlist)) {
 		LL_FOREACH_SAFE(trig->cmdlist, cmd, next_cmd) {
 			if (cmd->cmd) {
@@ -174,6 +171,7 @@ void actually_free_trigger(trig_data *trig) {
 		}
 	}
 	
+	free_varlist(trig->var_list);
 	free(trig);
 }
 
