@@ -1523,10 +1523,14 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					struct player_currency *cur;
 					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
 					
-					CREATE(cur, struct player_currency, 1);
-					cur->vnum = i_in[0];
+					// ensure no duplicates
+					HASH_FIND_INT(GET_CURRENCIES(ch), &i_in[0], cur);
+					if (!cur) {
+						CREATE(cur, struct player_currency, 1);
+						cur->vnum = i_in[0];
+						HASH_ADD_INT(GET_CURRENCIES(ch), vnum, cur);
+					}
 					cur->amount = i_in[1];
-					HASH_ADD_INT(GET_CURRENCIES(ch), vnum, cur);
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -5151,6 +5155,9 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		}
 	}
 	
+	// do this before risking deleting empires
+	clear_delayed_empire_refresh(only_empire, DELAY_REFRESH_MEMBERS);
+	
 	// final updates
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		// refresh first
@@ -5173,8 +5180,6 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	if (!read_techs) {
 		resort_empires(FALSE);
 	}
-	
-	clear_delayed_empire_refresh(only_empire, DELAY_REFRESH_MEMBERS);
 }
 
 
