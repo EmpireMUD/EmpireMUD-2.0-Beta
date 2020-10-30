@@ -1233,6 +1233,7 @@ ACMD(do_command) {
 		}
 		
 		command_lag(ch, WAIT_ABILITY);
+		free(to_do);
 	}
 }
 
