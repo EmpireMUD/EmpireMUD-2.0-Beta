@@ -37,6 +37,9 @@
 *   Commands
 */
 
+// external protos
+ACMD(do_weather);
+
 // local protos
 ACMD(do_affects);
 void list_one_char(char_data *i, char_data *ch, int num);
@@ -421,6 +424,11 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	// try moons
 	if (!found) {
 		found = look_at_moon(ch, arg, &fnum);
+	}
+	
+	// try sky
+	if (!found && !str_cmp(arg, "sky")) {
+		do_weather(ch, "", 0, 0);
 	}
 	
 	/* If an object was found back in generic_find */

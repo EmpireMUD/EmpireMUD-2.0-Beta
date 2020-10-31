@@ -786,8 +786,8 @@ bool look_at_moon(char_data *ch, char *name, int *number) {
 		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1 || GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT)) {
 			continue;	// not a moon or invalid cycle
 		}
-		if (!isname(tmp, GEN_NAME(moon))) {
-			continue;	// not a name match
+		if (str_cmp(tmp, "moon") && !isname(tmp, GEN_NAME(moon))) {
+			continue;	// not a name match (or "look 2.moon")
 		}
 		
 		// find moon in the sky
