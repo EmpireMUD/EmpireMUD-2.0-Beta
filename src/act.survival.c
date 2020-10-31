@@ -866,7 +866,7 @@ ACMD(do_track) {
 	char buf[MAX_STRING_LENGTH];
 	room_vnum track_to_room = NOWHERE;
 	char_data *vict, *proto;
-	struct track_data *track;
+	struct track_data *track, *next_track;
 	bool found = FALSE;
 	vehicle_data *veh;
 	byte dir = NO_DIR;
@@ -891,13 +891,13 @@ ACMD(do_track) {
 		return;
 	}
 	
-	DL_FOREACH(ROOM_TRACKS(IN_ROOM(ch)), track) {
+	HASH_ITER(hh, ROOM_TRACKS(IN_ROOM(ch)), track, next_track) {
 		// skip already-expired tracks
 		if (time(0) - track->timestamp > tracks_lifespan * SECS_PER_REAL_MIN) {
 			continue;
 		}
 		
-		if (track->player_id != NOTHING && (vict = is_playing(track->player_id))) {
+		if (track->id < 0 && (vict = is_playing(-1 * track->id))) {
 			// TODO: this is pretty similar to the MATCH macro in handler.c and could be converted to use it
 			if (isname(arg, GET_PC_NAME(vict)) || isname(arg, PERS(vict, vict, 0)) || isname(arg, PERS(vict, vict, 1)) || (!IS_NPC(vict) && GET_CURRENT_LASTNAME(vict) && isname(arg, GET_CURRENT_LASTNAME(vict)))) {
 				found = TRUE;
@@ -906,7 +906,7 @@ ACMD(do_track) {
 				break;
 			}
 		}
-		else if (track->mob_num != NOTHING && (proto = mob_proto(track->mob_num)) && isname(arg, GET_PC_NAME(proto))) {
+		else if (track->id >= 0 && (proto = mob_proto(track->id)) && isname(arg, GET_PC_NAME(proto))) {
 			found = TRUE;
 			dir = track->dir;
 			track_to_room = track->to_room;

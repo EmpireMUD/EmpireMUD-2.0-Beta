@@ -112,6 +112,10 @@ void add_to_slash_channel_history(struct slash_channel *chan, char_data *speaker
 	struct channel_history_data *entry;
 	FILE *fl;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	entry = process_add_to_channel_history(&(chan->history), speaker, message);
 	if (!(fl = open_slash_channel_file(chan))) {
 		return;	// unable to write
@@ -650,6 +654,10 @@ void clean_slash_channel(struct slash_channel *chan) {
 	int count;
 	FILE *fl;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	clear_before = time(0) - (config_get_int("slash_message_log_days") * SECS_PER_REAL_DAY);
 	
 	// open the file for write (overwrite the old one)
@@ -1137,8 +1145,13 @@ void write_one_slash_channel_message(FILE *fl, struct channel_history_data *entr
 * @param struct slash_channel *chan The channel to write to.
 */
 void write_slash_channel_configs(struct slash_channel *chan) {
-	FILE *fl = open_slash_channel_file(chan);
-	if (!fl) {
+	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
+	if (!(fl = open_slash_channel_file(chan))) {
 		return;	// unable to write
 	}
 	
@@ -1153,6 +1166,10 @@ void write_slash_channel_configs(struct slash_channel *chan) {
 void write_slash_channel_index(void) {
 	struct slash_channel *chan;
 	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 	
 	if (!(fl = fopen(LIB_CHANNELS INDEX_FILE TEMP_SUFFIX, "w"))) {
 		log("SYSERR: Unable to open slash channel index for writing");

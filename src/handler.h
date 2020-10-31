@@ -375,6 +375,7 @@ void detach_building_from_room(room_data *room);
 // room extra data handlers
 void add_to_extra_data(struct room_extra_data **list, int type, int add_value);
 struct room_extra_data *find_extra_data(struct room_extra_data *list, int type);
+void free_extra_data(struct room_extra_data **hash);
 int get_extra_data(struct room_extra_data *list, int type);
 void multiply_extra_data(struct room_extra_data **list, int type, double multiplier);
 void remove_extra_data(struct room_extra_data **list, int type);

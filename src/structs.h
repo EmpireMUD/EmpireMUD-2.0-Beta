@@ -1510,6 +1510,7 @@ typedef struct vehicle_data vehicle_data;
 #define SHUTDOWN_NORMAL  0	// comes up normally
 #define SHUTDOWN_PAUSE  1	// writes a pause file which must be removed
 #define SHUTDOWN_DIE  2	// kills the autorun
+#define SHUTDOWN_COMPLETE  3	// like die but also frees all memory
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2575,7 +2576,7 @@ typedef enum {
 #define SKY_LIGHTNING  3
 
 
-// Sun state for get_sun_status()
+// SUN_x: Sun state for get_sun_status()
 #define SUN_DARK  0
 #define SUN_RISE  1
 #define SUN_LIGHT  2
@@ -3303,6 +3304,15 @@ struct spawn_info {
 };
 
 
+// stats data
+struct stats_data_struct {
+	any_vnum vnum;
+	int count;
+	
+	UT_hash_handle hh;	// hashable
+};
+
+
 // simple structure for passing around a hash of unique strings
 struct string_hash {
 	char *str;
@@ -3939,6 +3949,7 @@ struct player_index_data {
 	empire_data *loyalty;	// empire, if any
 	int rank;	// empire rank
 	char *last_host;	// last known host
+	sh_int highest_known_level;	// player's highest-ever level
 	
 	UT_hash_handle idnum_hh;	// player_table_by_idnum
 	UT_hash_handle name_hh;	// player_table_by_name
@@ -5903,7 +5914,7 @@ struct shared_room_data {
 	// lists
 	struct depletion_data *depletion;	// resource depletion
 	struct room_extra_data *extra_data;	// hash of misc storage
-	struct track_data *tracks;	// for tracking
+	struct track_data *tracks;	// hash: for tracking
 	
 	// events
 	struct stored_event *events;	// hash table (by type) of stored events
@@ -5976,14 +5987,13 @@ struct room_extra_data {
 
 // for tracking
 struct track_data {
-	int player_id;	// player or NOTHING
-	mob_vnum mob_num;	// mob or NOTHING
+	int id;	// positive = mob vnum, negative = player idnum
 	
 	time_t timestamp;	// when
 	byte dir;	// which way (may be NO_DIR)
 	room_vnum to_room;	// for tracks that enter portals/vehicles
 	
-	struct track_data *next, *prev;	// doubly-linked list
+	UT_hash_handle hh;	// tracks are hashed by positive vnum or negative player id
 };
 
 

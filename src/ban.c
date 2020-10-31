@@ -97,6 +97,10 @@ void _write_one_node(FILE * fp, struct ban_list_element * node) {
 
 void write_ban_list(void) {
 	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 
 	if (!(fl = fopen(BAN_FILE, "w"))) {
 		perror("SYSERR: Unable to open '" BAN_FILE "' for writing");

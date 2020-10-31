@@ -37,6 +37,9 @@
 *   Commands
 */
 
+// external protos
+ACMD(do_weather);
+
 // local protos
 ACMD(do_affects);
 void list_one_char(char_data *i, char_data *ch, int num);
@@ -421,6 +424,11 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	// try moons
 	if (!found) {
 		found = look_at_moon(ch, arg, &fnum);
+	}
+	
+	// try sky
+	if (!found && !str_cmp(arg, "sky")) {
+		do_weather(ch, "", 0, 0);
 	}
 	
 	/* If an object was found back in generic_find */
@@ -3547,26 +3555,29 @@ ACMD(do_time) {
 	
 		gain_player_tech_exp(ch, PTECH_CLOCK, 1);
 	}
-	else {
-		sun = get_sun_status(IN_ROOM(ch));
-		if (sun == SUN_DARK) {
-			msg_to_char(ch, "It is nighttime.\r\n");
-		}
-		else if (sun == SUN_RISE) {
-			msg_to_char(ch, "It is almost dawn.\r\n");
-		}
-		else if (sun == SUN_SET) {
-			msg_to_char(ch, "It is sunset.\r\n");
-		}
-		else if (tinfo.hours == 12) {
-			msg_to_char(ch, "It is noon.\r\n");
-		}
-		else if (tinfo.hours < 12) {
-			msg_to_char(ch, "It is %smorning.\r\n", tinfo.hours <= 8 ? "early " : "");
-		}
-		else {	// afternoon is all that's left
-			msg_to_char(ch, "It is %safternoon.\r\n", tinfo.hours >= 17 ? "late " : "");
-		}
+
+	sun = get_sun_status(IN_ROOM(ch));
+	if (sun == SUN_DARK) {
+		msg_to_char(ch, "It is nighttime.\r\n");
+	}
+	else if (sun == SUN_RISE) {
+		msg_to_char(ch, "It is almost dawn.\r\n");
+	}
+	else if (sun == SUN_SET) {
+		msg_to_char(ch, "It is sunset.\r\n");
+	}
+	else if (has_player_tech(ch, PTECH_CLOCK)) {
+		msg_to_char(ch, "It is daytime.\r\n");
+	}
+	// all other time options are only shown without clocks:
+	else if (tinfo.hours == 12) {
+		msg_to_char(ch, "It is noon.\r\n");
+	}
+	else if (tinfo.hours < 12) {
+		msg_to_char(ch, "It is %smorning.\r\n", tinfo.hours <= 8 ? "early " : "");
+	}
+	else {	// afternoon is all that's left
+		msg_to_char(ch, "It is %safternoon.\r\n", tinfo.hours >= 17 ? "late " : "");
 	}
 
 	if (has_player_tech(ch, PTECH_CALENDAR)) {
@@ -3632,40 +3643,63 @@ ACMD(do_weather) {
 		"cloudy",
 		"rainy",
 		"lit by flashes of lightning"
-		};
+	};
 	
+	// weather, if available
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
 		msg_to_char(ch, "There's nothing interesting about the weather.\r\n");
 	}
 	else if (IS_OUTDOORS(ch)) {
 		msg_to_char(ch, "The sky is %s and %s.\r\n", sky_look[weather_info.sky], (weather_info.change >= 0 ? "you feel a warm wind from the south" : "your foot tells you bad weather is due"));
-		show_visible_moons(ch);
-
+	}
+	
+	// show season unless in a no-location room
+	if (!NO_LOCATION(IN_ROOM(ch))) {
 		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
 	}
+	
+	// show sun/daytime
+	if (IS_OUTDOORS(ch) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) || RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
+		switch (get_sun_status(IN_ROOM(ch))) {
+			case SUN_DARK: {
+				msg_to_char(ch, "It is nighttime.\r\n");
+				break;
+			}
+			case SUN_RISE: {
+				msg_to_char(ch, "The sun is rising.\r\n");
+				break;
+			}
+			case SUN_SET: {
+				msg_to_char(ch, "The sun is setting.\r\n");
+				break;
+			}
+			case SUN_LIGHT: {
+				msg_to_char(ch, "The sun is up.\r\n");
+				break;
+			}
+		}
+	}
+	else if (get_sun_status(IN_ROOM(ch)) == SUN_DARK) {
+		msg_to_char(ch, "It is nighttime.\r\n");
+	}
 	else {
+		msg_to_char(ch, "It is daytime.\r\n");
+	}
+	
+	// show moons
+	if (IS_OUTDOORS(ch)) {
+		show_visible_moons(ch);
+	}
+	
+	// final message if not outdoors
+	if (!IS_OUTDOORS(ch)) {
 		msg_to_char(ch, "You can't see the sky from here.\r\n");
 	}
 }
 
 
 ACMD(do_whereami) {
-	double latitude, longitude;
-	int zenith;
-	
 	msg_to_char(ch, "You are at: %s%s\r\n", get_room_name(IN_ROOM(ch), FALSE), coord_display_room(ch, IN_ROOM(ch), FALSE));
-	
-	// additional stats for imms if there's coords for this room
-	if (IS_IMMORTAL(ch) && X_COORD(IN_ROOM(ch)) != -1) {
-		latitude = Y_TO_LATITUDE(Y_COORD(IN_ROOM(ch)));
-		longitude = X_TO_LONGITUDE(X_COORD(IN_ROOM(ch)));
-		msg_to_char(ch, "Latitude: %.2f %s, Longitude: %.2f %s\r\n", ABSOLUTE(latitude), latitude >= 0.0 ? "N" : "S", ABSOLUTE(longitude), longitude >= 0.0 ? "E" : "W");
-		msg_to_char(ch, "Hours of sunlight today: %.2f\r\n", get_hours_of_sun(IN_ROOM(ch), TRUE));
-		
-		if ((zenith = get_zenith_days_from_solstice(IN_ROOM(ch))) != -1) {
-			msg_to_char(ch, "Zenith passage: %d day%s from the solstice\r\n", zenith, PLURAL(zenith));
-		}
-	}
 }
 
 

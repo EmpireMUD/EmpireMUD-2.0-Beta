@@ -3641,6 +3641,16 @@ const char *icon_types[] = {
 };
 
 
+// SUN_x: sun states (anything other than 'dark' is light)
+const char *sun_types[] = {
+	"dark",
+	"rising",
+	"light",
+	"setting",
+	"\n"
+};
+
+
 // SKY_x -- mainly used by scripting
 const char *weather_types[] = {
 	"sunny",
@@ -4451,6 +4461,7 @@ const char *shutdown_types[] = {
 	"normal",
 	"pause",
 	"die",
+	"complete",
 	"\n"
 };
 

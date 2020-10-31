@@ -993,6 +993,10 @@ void write_running_events_file(void) {
 	struct event_running_data *re;
 	FILE *fl;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	if (!(fl = fopen(RUNNING_EVENTS_FILE TEMP_SUFFIX, "w"))) {
 		log("SYSERR: Unable to write %s", RUNNING_EVENTS_FILE TEMP_SUFFIX);
 		return;

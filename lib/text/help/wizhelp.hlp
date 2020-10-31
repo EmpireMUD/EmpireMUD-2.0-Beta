@@ -1473,16 +1473,18 @@ If you don't specify an option, you will see their list of active quests.
 #e
 SHUTDOWN
 
-Usage:  shutdown [now | timer] [die | pause]
+Usage:  shutdown [now | timer] [pause | die | complete]
 
 SHUTDOWN shuts the MUD down. The SHUTDOWN command works in conjunction with
 EmpireMUD's 'autorun' script. If you are not using autorun, the arguments are
 meaningless. If you are using autorun, the following arguments are available:
 
-die - Kill the autorun script; the MUD will not reboot until autorun is
-   explicitly run again.
 pause - Create a file called 'pause' in Empire's root directory; do not
    try to restart the MUD until 'paused' is removed.
+die - Kill the autorun script; the MUD will not reboot until autorun is
+   explicitly run again.
+complete - Like die, but also frees all allocated memory, which helps detect
+   memory leaks. This is slow, and should be done in profiler like valgrind.
 
 You can also set a timer, giving the players some warning before the reboot.
 

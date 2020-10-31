@@ -2393,6 +2393,10 @@ command may be one of surprise, but you'll get used to it. You'll have to, at
 any rate, since certain things in the game depend on this particular notion of
 time.
 
+Just like the real world, time is different in different parts of the game
+world. Eastern parts of the map are later in the day (or even the next morning)
+than western parts of the map.
+
 Handy time-conversion chart:
  - 1 regeneration tick in-game = 5 seconds
  - 1 hour in-game = 75 seconds
@@ -2607,8 +2611,8 @@ WEATHER
 Usage:  weather
 
 If you're uncertain whether the sun is shining or the rain is pouring down. 
-You'll have to be outside in order to tell however. At night, this also
-allows you to look at the phases of the moons.
+You'll have to be outside in order to tell however. It will also tell you if
+the sun or moon are up.
 #
 WHO
 

@@ -632,7 +632,7 @@ bool try_mobile_movement(char_data *ch) {
 */
 void mobile_activity(void) {
 	register char_data *ch, *next_ch, *vict, *targ, *m;
-	struct track_data *track;
+	struct track_data *track, *next_track;
 	struct pursuit_data *purs, *next_purs;
 	room_vnum track_to_room = NOWHERE;
 	obj_data *obj;
@@ -689,9 +689,9 @@ void mobile_activity(void) {
 					}
 
 					// track to next room
-					DL_FOREACH(ROOM_TRACKS(IN_ROOM(ch)), track) {
+					HASH_ITER(hh, ROOM_TRACKS(IN_ROOM(ch)), track, next_track) {
 						// don't bother checking track lifespan here -- just let mobs follow it till it gets removed
-						if (track->player_id == purs->idnum) {
+						if ((-1 * track->id) == purs->idnum) {
 							found = TRUE;
 							dir = track->dir;
 							track_to_room = track->to_room;

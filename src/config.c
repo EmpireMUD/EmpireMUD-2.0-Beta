@@ -1170,6 +1170,27 @@ CONFIG_HANDLER(config_show_typelist) {
 //// CONFIG SYSTEM: I/O //////////////////////////////////////////////////////
 
 /**
+* Frees 1 config entry. Usually only called during 'shutdown complete'.
+*
+* @param struct config_type *cnf The config_type entry to free.
+*/
+void free_config_type(struct config_type *cnf) {
+	if (cnf->description) {
+		free(cnf->description);
+	}
+	if (cnf->key) {
+		free(cnf->key);
+	}
+	if (cnf->type == CONFTYPE_SHORT_STRING || cnf->type == CONFTYPE_LONG_STRING) {
+		if (cnf->data.string_val) {
+			free(cnf->data.string_val);
+		}
+	}
+	free(cnf);
+}
+
+
+/**
 * Read one config line that is an int array, starting with the array size.
 *
 * @param struct config_type *cnf The config item to read into.
@@ -1346,6 +1367,10 @@ void save_config_system(void) {
 	struct config_type *cnf, *next_cnf;
 	int last_set = -1;
 	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 	
 	if (!(fl = fopen(CONFIG_FILE TEMP_SUFFIX, "w"))) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write %s", CONFIG_FILE TEMP_SUFFIX);
@@ -1850,8 +1875,9 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "dailies_per_day", CONFTYPE_INT, "how many daily quests a player can complete each day");
 	init_config(CONFIG_PLAYERS, "default_class_abbrev", CONFTYPE_SHORT_STRING, "abbreviation to show for unclassed players");
 	init_config(CONFIG_PLAYERS, "default_class_name", CONFTYPE_SHORT_STRING, "name to show for unclassed players");
-	init_config(CONFIG_PLAYERS, "delete_inactive_players_after", CONFTYPE_INT, "days to a player can be inactive before auto-delete (0 = never)");
-	init_config(CONFIG_PLAYERS, "delete_invalid_players_after", CONFTYPE_INT, "days to wait before deleting players with bad level data (0 = never)");
+	init_config(CONFIG_PLAYERS, "delete_abandoned_players_after", CONFTYPE_INT, "days until deleting an account with only low-level characters and very low playtime (0 = never)");
+	init_config(CONFIG_PLAYERS, "delete_inactive_players_after", CONFTYPE_INT, "days an account can be inactive before auto-delete (0 = never)");
+	init_config(CONFIG_PLAYERS, "delete_invalid_players_after", CONFTYPE_INT, "days to wait before deleting accounts with no level or who never logged in (0 = never)");
 	init_config(CONFIG_PLAYERS, "exp_level_difference", CONFTYPE_INT, "levels a player can have above a mob and still gain exp from it");
 	init_config(CONFIG_PLAYERS, "hours_to_first_bonus_trait", CONFTYPE_INT, "how much playtime to get the first bonus trait");
 	init_config(CONFIG_PLAYERS, "hours_to_second_bonus_trait", CONFTYPE_INT, "how much playtime to get the second bonus trait");

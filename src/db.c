@@ -216,6 +216,10 @@ morph_data *sorted_morphs = NULL;	// alphabetic version // sorted_hh
 obj_data *object_list = NULL;	// global doubly-linked list of objs
 obj_data *object_table = NULL;	// hash table of objs
 
+// safe obj iterators
+obj_data *purge_bound_items_next = NULL;	// used in purge_bound_items()
+obj_data *global_next_obj = NULL;	// used in limits.c
+
 // players
 account_data *account_table = NULL;	// hash table of accounts
 player_index_data *player_table_by_idnum = NULL;	// hash table by idnum
@@ -278,6 +282,10 @@ int top_script_uid = OTHER_ID_BASE;	// for unique mobs/objs/vehicles in the DG S
 // vehicles
 vehicle_data *vehicle_table = NULL;	// master vehicle hash table
 vehicle_data *vehicle_list = NULL;	// global doubly-linked list of vehicles (veh->next)
+
+// safe vehicle iterators
+vehicle_data *global_next_vehicle = NULL;	// used in limits.c
+vehicle_data *next_pending_vehicle = NULL;	// used in handler.c
 
 // world / rooms
 room_data *world_table = NULL;	// hash table of the whole world
@@ -1997,6 +2005,10 @@ int get_last_boot_version(void) {
 // version is pos in versions_list[]
 void write_last_boot_version(int version) {
 	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 	
 	if (version == NOTHING) {
 		return;
@@ -5144,6 +5156,10 @@ void load_trading_post(void) {
 void save_trading_post(void) {
 	struct trading_post_data *tpd;
 	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 	
 	if (!(fl = fopen(TRADING_POST_FILE, "w"))) {
 		log("SYSERR: Unable to open file %s for writing.", TRADING_POST_FILE);

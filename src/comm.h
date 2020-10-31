@@ -17,6 +17,7 @@
 /* comm.c */
 // TODO: organize these externs and probably move them down
 void clear_last_act_message(descriptor_data *desc);
+void flush_queues(descriptor_data *d);
 void send_to_all(const char *messg, ...) __attribute__((format(printf, 1, 2)));
 void send_to_char(const char *messg, char_data *ch);
 void msdp_update_room(char_data *ch);
@@ -38,6 +39,7 @@ void act(const char *str, int hide_invisible, char_data *ch, const void *obj, co
 
 // reboot system
 extern struct reboot_control_data reboot_control;
+extern bool block_all_saves_due_to_shutdown;
 
 bool check_reboot_confirms();
 void perform_reboot();

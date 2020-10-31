@@ -5655,8 +5655,15 @@ void empty_obj_before_extract(obj_data *obj) {
 void extract_obj(obj_data *obj) {
 	obj_data *proto = obj_proto(GET_OBJ_VNUM(obj));
 	
+	// safety checks
 	check_dg_owner_purged_obj(obj);
-
+	if (obj == purge_bound_items_next) {
+		purge_bound_items_next = purge_bound_items_next->next;
+	}
+	if (obj == global_next_obj) {
+		global_next_obj = global_next_obj->next;
+	}
+	
 	// remove from anywhere
 	check_obj_in_void(obj);
 
@@ -5824,6 +5831,7 @@ bool identical_bindings(obj_data *obj_a, obj_data *obj_b) {
 		LL_FOREACH_SAFE(b_bind_list, b_bind, b_bind_next) {
 			if (a_bind->idnum == b_bind->idnum) {
 				LL_DELETE(b_bind_list, b_bind);
+				free(b_bind);
 				found = TRUE;
 				break;
 			}
@@ -8004,16 +8012,15 @@ bool meets_requirements(char_data *ch, struct req_data *list, struct instance_da
 		}
 	}
 	
-	if (!global_ok) {	// did any sub-groups succeed?
-		HASH_ITER(hh, mrd_list, mrd, next_mrd) {
-			if (mrd->ok && mrd->group) {	// only grouped requirements count here
-				global_ok = TRUE;
-			}
-			
-			// free memory
-			HASH_DEL(mrd_list, mrd);
-			free(mrd);
+	// check if any sub-groups succeeded, if necessary (and free the mrd_list even if not)
+	HASH_ITER(hh, mrd_list, mrd, next_mrd) {
+		if (!global_ok && mrd->ok && mrd->group) {	// only grouped requirements count here (if we didn't already find one)
+			global_ok = TRUE;
 		}
+		
+		// free memory
+		HASH_DEL(mrd_list, mrd);
+		free(mrd);
 	}
 	
 	return global_ok;
@@ -8505,10 +8512,7 @@ void detach_building_from_room(room_data *room) {
 		}
 		
 		if (any) {	// update script types
-			SCRIPT_TYPES(SCRIPT(room)) = 0;
-			LL_FOREACH(TRIGGERS(SCRIPT(room)), trig) {
-				SCRIPT_TYPES(SCRIPT(room)) |= GET_TRIG_TYPE(trig);
-			}
+			update_script_types(SCRIPT(room));
 		}
 		check_extract_script(room, WLD_TRIGGER);
 	}
@@ -8555,6 +8559,20 @@ struct room_extra_data *find_extra_data(struct room_extra_data *list, int type) 
 	struct room_extra_data *red;
 	HASH_FIND_INT(list, &type, red);
 	return red;
+}
+
+
+/**
+* Frees a list of extra data.
+*
+* @param struct room_extra_data **hash Pointer to the hash to free.
+*/
+void free_extra_data(struct room_extra_data **hash) {
+	struct room_extra_data *red, *next;
+	HASH_ITER(hh, *hash, red, next) {
+		HASH_DEL(*hash, red);
+		free(red);
+	}
 }
 
 
@@ -9837,7 +9855,14 @@ void extract_vehicle(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle to extract and free.
 */
 void extract_vehicle_final(vehicle_data *veh) {
+	// safety
 	check_dg_owner_purged_vehicle(veh);
+	if (veh == global_next_vehicle) {
+		global_next_vehicle = global_next_vehicle->next;
+	}
+	if (veh == next_pending_vehicle) {
+		next_pending_vehicle = next_pending_vehicle->next;
+	}
 	
 	// delete interior
 	delete_vehicle_interior(veh);
@@ -9879,13 +9904,13 @@ void extract_vehicle_final(vehicle_data *veh) {
 * Doing this late prevents issues with vehicles being extracted multiple times.
 */
 void extract_pending_vehicles(void) {
-	vehicle_data *veh, *next_veh;
+	vehicle_data *veh;
 
 	if (veh_extractions_pending < 0) {
 		log("SYSERR: Negative (%d) vehicle extractions pending.", veh_extractions_pending);
 	}
 	
-	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, next_pending_vehicle) {
 		// check if done?
 		if (veh_extractions_pending <= 0) {
 			break;

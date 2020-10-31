@@ -39,7 +39,6 @@
 */
 
 // external variables
-extern struct stored_data *data_table;
 extern struct stored_data_type stored_data_info[];
 extern bool manual_evolutions;
 extern int buf_switches, buf_largecount, buf_overflows, top_of_helpt;
@@ -6569,7 +6568,8 @@ void do_stat_room(char_data *ch) {
 	char buf1[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH], buf3[MAX_STRING_LENGTH], *nstr;
 	struct depletion_data *dep;
 	struct empire_city_data *city;
-	int found, num;
+	struct time_info_data tinfo;
+	int found, num, zenith;
 	bool comma;
 	obj_data *j;
 	char_data *k;
@@ -6584,6 +6584,7 @@ void do_stat_room(char_data *ch) {
 	struct global_data *glb;
 	room_data *home = HOME_ROOM(IN_ROOM(ch));
 	struct instance_data *inst, *inst_iter;
+	double latitude, longitude;
 	struct map_data *map;
 	vehicle_data *veh;
 	
@@ -6617,7 +6618,21 @@ void do_stat_room(char_data *ch) {
 	}
 	msg_to_char(ch, "\r\n");
 	
-	msg_to_char(ch, "VNum: [&g%d&0], Island: [\tg%d\t0] %s, Height [\tg%d\t0]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)));
+	msg_to_char(ch, "VNum: [\tg%d\t0], Island: [\tg%d\t0] %s, Height [\tg%d\t0]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)));
+	
+	// location/time data
+	if (X_COORD(IN_ROOM(ch)) != -1) {
+		tinfo = get_local_time(IN_ROOM(ch));
+		latitude = Y_TO_LATITUDE(Y_COORD(IN_ROOM(ch)));
+		longitude = X_TO_LONGITUDE(X_COORD(IN_ROOM(ch)));
+		msg_to_char(ch, "Globe: [%.2f %s, %.2f %s], Time: [\tc%d%s\t0], Sun: [\tc%s\t0], Hours of sun today: [\tc%.2f\t0]\r\n", ABSOLUTE(latitude), (latitude >= 0.0 ? "N" : "S"), ABSOLUTE(longitude), (longitude >= 0.0 ? "E" : "W"), TIME_TO_12H(tinfo.hours), AM_PM(tinfo.hours), sun_types[get_sun_status(IN_ROOM(ch))], get_hours_of_sun(IN_ROOM(ch)));
+		if ((zenith = get_zenith_days_from_solstice(IN_ROOM(ch))) != -1) {
+			msg_to_char(ch, "Zenith passage: [\tg%d day%s from the solstice\t0]\r\n", zenith, PLURAL(zenith));
+		}
+	}
+	else {
+		msg_to_char(ch, "Globe: no data available (location is not on the map)\r\n");
+	}
 	
 	if (home != IN_ROOM(ch)) {
 		msg_to_char(ch, "Home room: &g%d&0 %s\r\n", GET_ROOM_VNUM(home), get_room_name(home, FALSE));
@@ -9064,7 +9079,7 @@ ACMD(do_playerdelete) {
 	}
 	else {
 		// logs and messaging
-		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has deleted player %s", GET_NAME(ch), GET_NAME(victim));
+		syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "DEL: %s has deleted player %s", GET_NAME(ch), GET_NAME(victim));
 		if (!file) {
 			if (!GET_INVIS_LEV(victim)) {
 				act("$n has left the game.", TRUE, victim, FALSE, FALSE, TO_ROOM);

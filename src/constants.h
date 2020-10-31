@@ -226,6 +226,7 @@ extern const char *spawn_flags[];
 extern const char *spawn_flags_short[];
 extern const char *seasons[];
 extern const char *icon_types[];
+extern const char *sun_types[];
 extern const char *weather_types[];
 
 // shop constants

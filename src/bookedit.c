@@ -48,7 +48,6 @@ const char *default_book_desc = "It appears to be a book.\r\n";
 
 
 // local protos
-void remove_book_from_table(book_data *book);
 int sort_book_table(book_data *a, book_data *b);
 
 // external var
@@ -147,6 +146,7 @@ book_data *create_book_table_entry(book_vnum vnum, int author) {
 void free_book(book_data *book) {
 	book_data *proto = book_proto(book->vnum);
 	struct paragraph_data *para;
+	struct library_data *libr;
 	
 	if (book->title && (!proto || book->title != proto->title)) {
 		free(book->title);
@@ -159,6 +159,13 @@ void free_book(book_data *book) {
 	}
 	if (book->item_description && (!proto || book->item_description != proto->item_description)) {
 		free(book->item_description);
+	}
+	
+	if (book->in_libraries && (!proto || book->in_libraries != proto->in_libraries)) {
+		while ((libr = book->in_libraries)) {
+			book->in_libraries = libr->next;
+			free(libr);
+		}
 	}
 	
 	if (book->paragraphs && (!proto || book->paragraphs != proto->paragraphs)) {

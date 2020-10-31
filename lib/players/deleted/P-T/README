@@ -1,0 +1,2 @@
+This directory is for deleted players. When the game deletes someone, it moves
+their player files here. You can safely empty this directory at any time.

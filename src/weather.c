@@ -358,7 +358,7 @@ void another_hour(void) {
 * @param room_data *room The location.
 * @return double The number of hours of sunlight today.
 */
-double get_hours_of_sun(room_data *room, bool debug) {
+double get_hours_of_sun(room_data *room) {
 	double latitude, days_percent, max_hours;
 	struct time_info_data tinfo;
 	int y_coord, doy;
@@ -409,10 +409,6 @@ double get_hours_of_sun(room_data *room, bool debug) {
 	}
 	else if (max_hours < 12.0) {
 		hours = 12.0 - (days_percent * (12.0 - max_hours));
-	}
-	
-	if (debug) {
-		log("lat=%.2f, doy=%d, perc=%.2f, max_hours=%.2f, hours=%.2f", latitude, doy, days_percent, max_hours, hours);
 	}
 	
 	// bound it to 0-24 hours of daylight
@@ -467,7 +463,6 @@ struct time_info_data get_local_time(room_data *room) {
 * @return int One of SUN_RISE, SUN_LIGHT, SUN_SET, or SUN_DARK.
 */
 int get_sun_status(room_data *room) {
-	// struct time_info_data tinfo = get_local_time(room);
 	double hour, sun_mod, longitude, percent;
 	int x_coord;
 	
@@ -487,9 +482,7 @@ int get_sun_status(room_data *room) {
 	
 	
 	// sun_mod is subtracted in the morning and added in the evening
-	sun_mod = get_hours_of_sun(room, FALSE) / 2.0;
-	// hour = tinfo.hours + (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR);
-	log("debug: sunrise=%.2f  hour=%.2f  sunset=%.2f (+/- 0.5)", (7.0 - sun_mod), hour, (19.0 + sun_mod));
+	sun_mod = get_hours_of_sun(room) / 2.0;
 	
 	if (sun_mod == 0.0) {
 		return SUN_DARK;	// perpetual night
@@ -793,8 +786,8 @@ bool look_at_moon(char_data *ch, char *name, int *number) {
 		if (GEN_TYPE(moon) != GENERIC_MOON || GET_MOON_CYCLE(moon) < 1 || GEN_FLAGGED(moon, GEN_IN_DEVELOPMENT)) {
 			continue;	// not a moon or invalid cycle
 		}
-		if (!isname(tmp, GEN_NAME(moon))) {
-			continue;	// not a name match
+		if (str_cmp(tmp, "moon") && !isname(tmp, GEN_NAME(moon))) {
+			continue;	// not a name match (or "look 2.moon")
 		}
 		
 		// find moon in the sky

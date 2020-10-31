@@ -1421,12 +1421,12 @@ char *get_vehicle_name_by_proto(obj_vnum vnum) {
 * Looks for dead vehicle interiors at startup, and deletes them.
 */
 void link_and_check_vehicles(void) {
-	vehicle_data *veh, *next_veh;
+	vehicle_data *veh;
 	room_data *room, *next_room;
 	bool found = FALSE;
 	
 	// reverse-link the home-room of vehicles to this one
-	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
 			COMPLEX_DATA(VEH_INTERIOR_HOME_ROOM(veh))->vehicle = veh;
 		}
@@ -2453,6 +2453,7 @@ void free_vehicle(vehicle_data *veh) {
 		VEH_DEPLETION(veh) = dep->next;
 		free(dep);
 	}
+	free_extra_data(&VEH_EXTRA_DATA(veh));
 	empty_vehicle(veh, NULL);
 	
 	// free any assigned scripts and vars

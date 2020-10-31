@@ -52,6 +52,7 @@
 #define LIB_ETC  "etc/"
 #define LIB_BOARD  "boards/"
 #define LIB_PLAYERS  "players/"
+#define LIB_PLAYERS_DELETED  LIB_PLAYERS"deleted/"
 #define LIB_OBJPACK  "packs/"
 #define LIB_EMPIRE  "empires/"
 #define LIB_CHANNELS  "channels/"
@@ -270,11 +271,13 @@ ability_data *find_ability_by_name(char *name);
 ability_data *find_ability_by_vnum(any_vnum vnum);
 void free_ability(ability_data *abil);
 char *get_ability_name_by_vnum(any_vnum vnum);
+void remove_ability_from_table(ability_data *abil);
 
 // accounts
 void add_player_to_account(char_data *ch, account_data *acct);
 account_data *create_account_for_player(char_data *ch);
 account_data *find_account(int id);
+void free_account(account_data *acct);
 void remove_player_from_account(char_data *ch);
 
 // adventures
@@ -303,6 +306,7 @@ archetype_data *archetype_proto(any_vnum vnum);
 void free_archetype(archetype_data *arch);
 void free_archetype_gear(struct archetype_gear *list);
 void parse_archetype_gear(FILE *fl, struct archetype_gear **list, char *error);
+void remove_archetype_from_table(archetype_data *arch);
 void write_archetype_gear_to_file(FILE *fl, struct archetype_gear *list);
 
 // augments
@@ -312,6 +316,7 @@ extern augment_data *sorted_augments;
 augment_data *augment_proto(any_vnum vnum);
 augment_data *find_augment_by_name(char_data *ch, char *name, int type);
 void free_augment(augment_data *aug);
+void remove_augment_from_table(augment_data *aug);
 
 // automessage
 extern struct automessage *automessages_table;
@@ -330,6 +335,7 @@ extern book_vnum top_book_vnum;
 void add_book_to_table(book_data *book);
 obj_data *create_book_obj(book_data *book);
 void free_book(book_data *book);
+void remove_book_from_table(book_data *book);
 
 // buildings
 extern bld_data *building_table;
@@ -358,8 +364,15 @@ class_data *find_class(char *argument);
 class_data *find_class_by_name(char *name);
 class_data *find_class_by_vnum(any_vnum vnum);
 void free_class(class_data *cls);
+void remove_class_from_table(class_data *cls);
+
+// communication
+extern struct slash_channel *slash_channel_list;
 
 // configs
+extern struct config_type *config_table;
+
+void free_config_type(struct config_type *cnf);
 void save_config_system();
 
 // crafts
@@ -391,6 +404,8 @@ void parse_custom_message(FILE *fl, struct custom_message **list, char *error);
 void write_custom_messages_to_file(FILE *fl, char letter, struct custom_message *list);
 
 // data system
+extern struct stored_data *data_table;
+
 double data_get_double(int key);
 int data_get_int(int key);
 long data_get_long(int key);
@@ -402,6 +417,7 @@ long data_set_long(int key, long value);
 // descriptors
 extern descriptor_data *descriptor_list;
 
+void free_descriptor(descriptor_data *desc);
 bool has_anonymous_host(descriptor_data *desc);
 
 // empires
@@ -474,7 +490,9 @@ struct event_running_data *find_last_event_run_by_vnum(any_vnum event_vnum);
 struct event_running_data *find_running_event_by_id(int id);
 struct event_running_data *find_running_event_by_vnum(any_vnum event_vnum);
 void free_event(event_data *event);
+void free_event_leaderboard(struct event_leaderboard *hash);
 char *get_event_name_by_proto(any_vnum vnum);
+void remove_event_from_table(event_data *event);
 
 // factions
 extern faction_data *faction_table;
@@ -486,6 +504,7 @@ faction_data *find_faction(char *argument);
 faction_data *find_faction_by_name(char *name);
 faction_data *find_faction_by_vnum(any_vnum vnum);
 void free_faction(faction_data *fct);
+void remove_faction_from_table(faction_data *fct);
 
 // generics
 extern generic_data *generic_table;
@@ -498,6 +517,7 @@ generic_data *real_generic(any_vnum vnum);
 const char *get_generic_name_by_vnum(any_vnum vnum);
 const char *get_generic_string_by_vnum(any_vnum vnum, int type, int pos);
 int get_generic_value_by_vnum(any_vnum vnum, int type, int pos);
+void remove_generic_from_table(generic_data *gen);
 
 // globals
 extern struct global_data *globals_table;
@@ -524,6 +544,7 @@ extern struct instance_data *instance_list;
 extern bool instance_save_wait;
 extern struct instance_data *quest_instance_global;
 
+void free_instance(struct instance_data *inst);
 struct instance_data *get_instance_by_id(any_vnum instance_id);
 
 // interactions
@@ -586,10 +607,13 @@ extern morph_data *sorted_morphs;
 
 morph_data *morph_proto(any_vnum vnum);
 void free_morph(morph_data *morph);
+void remove_morph_from_table(morph_data *morph);
 
 // objects
 extern obj_data *object_list;
 extern obj_data *object_table;
+extern obj_data *purge_bound_items_next;
+extern obj_data *global_next_obj;
 
 void add_object_to_table(obj_data *obj);
 obj_data *create_obj(void);
@@ -617,7 +641,7 @@ extern int max_inventory_size;
 extern bool pause_affect_total;
 
 void add_lastname(char_data *ch, char *name);
-void add_player_to_table(player_index_data *plr);
+bool add_player_to_table(player_index_data *plr);
 void check_autowiz(char_data *ch);
 void check_delayed_load(char_data *ch);
 void delete_player_character(char_data *ch);
@@ -630,6 +654,7 @@ void free_loaded_players();
 void free_mail(struct mail_data *mail);
 void free_player_completed_quests(struct player_completed_quest **hash);
 void free_player_event_data(struct player_event_data *hash);
+void free_player_index_data(player_index_data *index);
 int get_highest_access_level(account_data *acct);
 char_data *is_at_menu(int id);
 char_data *is_playing(int id);
@@ -668,6 +693,7 @@ void free_empire_goals(struct empire_goal *hash);
 void free_progress(progress_data *prg);
 char *get_progress_name_by_proto(any_vnum vnum);
 progress_data *real_progress(any_vnum vnum);
+void remove_progress_from_table(progress_data *prg);
 
 // quests
 extern struct quest_data *quest_table;
@@ -676,9 +702,11 @@ struct quest_giver *copy_quest_givers(struct quest_giver *from);
 void free_player_quests(struct player_quest *list);
 void free_quest(quest_data *quest);
 void free_quest_givers(struct quest_giver *list);
+void free_quest_lookups(struct quest_lookup *list);
 void free_quest_temp_list(struct quest_temp_list *list);
 void parse_quest_giver(FILE *fl, struct quest_giver **list, char *error_str);
 quest_data *quest_proto(any_vnum vnum);
+void remove_quest_from_table(quest_data *quest);
 void write_quest_givers_to_file(FILE *fl, char letter, struct quest_giver *list);
 
 // requirements
@@ -721,7 +749,9 @@ int sort_sectors(void *a, void *b);
 extern shop_data *shop_table;
 
 void free_shop(shop_data *shop);
+void free_shop_lookups(struct shop_lookup *list);
 shop_data *real_shop(any_vnum vnum);
+void remove_shop_from_table(shop_data *shop);
 
 // skills
 extern skill_data *skill_table;
@@ -733,6 +763,7 @@ skill_data *find_skill_by_vnum(any_vnum vnum);
 void free_skill(skill_data *skill);
 char *get_skill_abbrev_by_vnum(any_vnum vnum);
 char *get_skill_name_by_vnum(any_vnum vnum);
+void remove_skill_from_table(skill_data *skill);
 
 // socials
 extern social_data *social_table;
@@ -740,6 +771,7 @@ extern social_data *sorted_socials;
 
 social_data *social_proto(any_vnum vnum);
 void free_social(social_data *soc);
+void remove_social_from_table(social_data *soc);
 
 // starting locations / start locs
 extern int highest_start_loc_index;
@@ -772,6 +804,8 @@ extern trig_data *trigger_list;
 extern trig_data *random_triggers;
 extern trig_data *free_trigger_list;
 extern trig_data *stc_next_random_trig;
+extern struct dg_owner_purged_tracker_type *dg_owner_purged_tracker;
+extern struct uid_lookup_table *master_uid_lookup_table;
 
 void add_trigger_to_table(trig_data *trig);
 void remove_trigger_from_table(trig_data *trig);
@@ -781,10 +815,13 @@ void write_trig_protos_to_file(FILE *fl, char letter, struct trig_proto_list *li
 // vehicles
 extern vehicle_data *vehicle_list;
 extern vehicle_data *vehicle_table;
+extern vehicle_data *global_next_vehicle;
+extern vehicle_data *next_pending_vehicle;
 
 void adjust_vehicle_tech(vehicle_data *veh, bool add);
 void free_vehicle(vehicle_data *veh);
 vehicle_data *read_vehicle(any_vnum vnum, bool with_triggers);
+void remove_vehicle_from_table(vehicle_data *veh);
 vehicle_data *vehicle_proto(any_vnum vnum);
 
 // wizlock system
@@ -848,9 +885,17 @@ void write_room_to_file(FILE *fl, room_data *room);
 void write_shared_room_data(FILE *fl, struct shared_room_data *dat);
 
 // misc
+extern struct ban_list_element *ban_list;
 extern time_t boot_time;
 extern struct char_delayed_update *char_delayed_update_list;
+extern char **detected_slow_ips;
+extern int num_slow_ips;
 extern struct generic_name_data *generic_names;
+extern struct stats_data_struct *global_sector_count;
+extern struct stats_data_struct *global_crop_count;
+extern struct stats_data_struct *global_building_count;
+extern char **intro_screens;
+extern int num_intro_screens;
 extern char **tips_of_the_day;
 extern int tips_of_the_day_size;
 

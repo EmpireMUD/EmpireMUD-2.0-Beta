@@ -323,6 +323,7 @@ account_data *find_account(int id) {
 void free_account(account_data *acct) {
 	struct account_player *plr;
 	descriptor_data *desc;
+	struct pk_data *pkd;
 	
 	if (!acct) {
 		return;
@@ -348,6 +349,12 @@ void free_account(account_data *acct) {
 		}
 		acct->players = plr->next;
 		free(plr);
+	}
+	
+	// free pk data
+	while ((pkd = acct->killed_by)) {
+		acct->killed_by = pkd->next;
+		free(pkd);
 	}
 	
 	free(acct);
@@ -596,8 +603,10 @@ void write_account_to_file(FILE *fl, account_data *acct) {
 * tables.
 *
 * @param player_index_data *plr The player to add.
+* @return bool TRUE if it succeeded or FALSE if it failed because the name or ID is in-use.
 */
-void add_player_to_table(player_index_data *plr) {
+bool add_player_to_table(player_index_data *plr) {
+	bool bad_id = FALSE, bad_name = FALSE;
 	player_index_data *find;
 	int idnum = plr->idnum;
 	
@@ -608,6 +617,9 @@ void add_player_to_table(player_index_data *plr) {
 		HASH_ADD(idnum_hh, player_table_by_idnum, idnum, sizeof(int), plr);
 		HASH_SRT(idnum_hh, player_table_by_idnum, sort_players_by_idnum);
 	}
+	else {
+		bad_id = TRUE;
+	}
 	
 	// by name: ensure name is lowercase
 	find = NULL;
@@ -617,6 +629,16 @@ void add_player_to_table(player_index_data *plr) {
 		HASH_ADD(name_hh, player_table_by_name, name[0], strlen(plr->name), plr);
 		HASH_SRT(name_hh, player_table_by_name, sort_players_by_name);
 	}
+	else {
+		bad_name = TRUE;
+	}
+	
+	if (bad_id || bad_name) {
+		log("SYSERR: add_player_to_table: '%s' (%d) is already in %s", plr->name, plr->idnum, (bad_id && bad_name) ? "both tables" : (bad_id ? "id table" : "name table"));
+	}
+	
+	// return FALSE only if both id and name failed
+	return !(bad_id && bad_name);
 }
 
 
@@ -660,16 +682,30 @@ void build_player_index(void) {
 						free(plr->name);
 					}
 					free(plr);
+					save_library_file_for_vnum(DB_BOOT_ACCT, acct->id);
 					continue;
 				}
 				
-				has_players = TRUE;
-				
 				GET_ACCOUNT(ch) = acct;	// not set by load_player
-				
+
 				CREATE(index, player_index_data, 1);
 				update_player_index(index, ch);
-				add_player_to_table(index);
+				
+				// ensure it can add to the index or else back out
+				if (!add_player_to_table(index)) {
+					free_player_index_data(index);
+					log("SYSERR: Deleting account's player entry for '%s' because it's already on another account", plr->name ? plr->name : "???");
+					LL_DELETE(acct->players, plr);
+					if (plr->name) {
+						free(plr->name);
+					}
+					free(plr);
+					save_library_file_for_vnum(DB_BOOT_ACCT, acct->id);
+					free_char(ch);
+					continue;
+				}
+				
+				// otherwise store the index entry
 				plr->player = index;
 				
 				// detect top idnum
@@ -677,6 +713,9 @@ void build_player_index(void) {
 				
 				// unload character
 				free_char(ch);
+				
+				// set this for later
+				has_players = TRUE;
 			}
 			
 			// update last logon
@@ -733,10 +772,12 @@ void check_delayed_load(char_data *ch) {
 
 /* release memory allocated for a char struct */
 void free_char(char_data *ch) {
+	struct player_automessage *automsg, *next_automsg;
 	struct slash_channel *loadslash, *next_loadslash;
 	struct player_ability_data *abil, *next_abil;
 	struct player_skill_data *skill, *next_skill;
 	struct companion_data *compan, *next_compan;
+	struct player_faction_data *pfd, *next_pfd;
 	struct ability_gain_hook *hook, *next_hook;
 	struct mount_data *mount, *next_mount;
 	struct channel_history_data *history, *next_hist;
@@ -866,6 +907,11 @@ void free_char(char_data *ch) {
 		
 		free_resource_list(GET_ACTION_RESOURCES(ch));
 		
+		HASH_ITER(hh, GET_AUTOMESSAGES(ch), automsg, next_automsg) {
+			HASH_DEL(GET_AUTOMESSAGES(ch), automsg);
+			free(automsg);
+		}
+		
 		for (loadslash = LOAD_SLASH_CHANNELS(ch); loadslash; loadslash = next_loadslash) {
 			next_loadslash = loadslash->next;
 			if (loadslash->name) {
@@ -892,6 +938,11 @@ void free_char(char_data *ch) {
 		while ((a = GET_ALIASES(ch)) != NULL) {
 			GET_ALIASES(ch) = (GET_ALIASES(ch))->next;
 			free_alias(a);
+		}
+		
+		HASH_ITER(hh, GET_FACTIONS(ch), pfd, next_pfd) {
+			HASH_DEL(GET_FACTIONS(ch), pfd);
+			free(pfd);
 		}
 		
 		while ((lastn = GET_LASTNAME_LIST(ch))) {
@@ -976,6 +1027,7 @@ void free_char(char_data *ch) {
 			DL_DELETE(GET_HOME_STORAGE(ch), eus);
 			
 			if (eus->obj) {
+				add_to_object_list(eus->obj);
 				extract_obj(eus->obj);
 			}
 			free(eus);
@@ -1128,7 +1180,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 	struct player_event_data *ped;
 	struct player_lastname *lastn;
 	struct slash_channel *slash;
-	struct cooldown_data *cool;
 	obj_data *obj, *o, *next_o;
 	struct req_data *task;
 	obj_data **cont_row;
@@ -1444,7 +1495,6 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 				}
 				else if (PFILE_TAG(line, "Cooldown:", length)) {
 					sscanf(line + length + 1, "%d %ld", &i_in[0], &l_in[0]);
-					CREATE(cool, struct cooldown_data, 1);
 					add_cooldown(ch, i_in[0], l_in[0] - time(0));
 				}
 				else if (PFILE_TAG(line, "Creation Archetype:", length)) {
@@ -1481,10 +1531,14 @@ char_data *read_player_from_file(FILE *fl, char *name, bool normal, char_data *c
 					struct player_currency *cur;
 					sscanf(line + length + 1, "%d %d", &i_in[0], &i_in[1]);
 					
-					CREATE(cur, struct player_currency, 1);
-					cur->vnum = i_in[0];
+					// ensure no duplicates
+					HASH_FIND_INT(GET_CURRENCIES(ch), &i_in[0], cur);
+					if (!cur) {
+						CREATE(cur, struct player_currency, 1);
+						cur->vnum = i_in[0];
+						HASH_ADD_INT(GET_CURRENCIES(ch), vnum, cur);
+					}
 					cur->amount = i_in[1];
-					HASH_ADD_INT(GET_CURRENCIES(ch), vnum, cur);
 				}
 				BAD_TAG_WARNING(line);
 				break;
@@ -2181,7 +2235,7 @@ void save_char(char_data *ch, room_data *load_room) {
 	struct map_data *map;
 	FILE *fl;
 
-	if (IS_NPC(ch)) {
+	if (IS_NPC(ch) || block_all_saves_due_to_shutdown) {
 		return;
 	}
 	
@@ -2312,6 +2366,7 @@ void update_player_index(player_index_data *index, char_data *ch) {
 	index->plr_flags = PLR_FLAGS(ch);
 	index->loyalty = GET_LOYALTY(ch);
 	index->rank = GET_RANK(ch);
+	index->highest_known_level = GET_HIGHEST_KNOWN_LEVEL(ch);
 	
 	if (ch->desc || ch->prev_host) {
 		if (index->last_host) {
@@ -3740,47 +3795,89 @@ void clear_player(char_data *ch) {
 * This runs at startup (if you don't use -q) and deletes players who are
 * timed out according to the delete_invalid_players_after and 
 * delete_inactive_players_after configs. This can be prevented with the
-* NODELETE flag. Immortals are also never deleted this way.
+* NODELETE flag. Immortals are also never deleted this way. Only whole accounts
+* will be deleted, never individual characters on accounts.
 */
 void delete_old_players(void) {
-	player_index_data *index, *next_index;
-	bool file, will_delete;
+	account_data *acct, *next_acct;
+	bool has_imm, has_nodelete, will_delete, file;
+	char reason[256];
 	char_data *ch;
+	int avg_min_per_day, inactive_days;
+	int max_access_level, max_char_level, best_mins_per_day;
+	struct account_player *plr, *next_plr;
 	
-	int delete_inactive = config_get_int("delete_inactive_players_after");
+	int delete_abandoned = config_get_int("delete_abandoned_players_after");
 	int delete_invalid = config_get_int("delete_invalid_players_after");
+	int delete_inactive = config_get_int("delete_inactive_players_after");
 	
-	HASH_ITER(name_hh, player_table_by_name, index, next_index) {
-		// imms immune
-		if (index->access_level >= LVL_START_IMM && index->access_level <= LVL_TOP) {
-			continue;
-		}
-		// never!
-		if (IS_SET(index->plr_flags, PLR_NODELETE)) {
-			continue;
-		}
+	HASH_ITER(hh, account_table, acct, next_acct) {
+		max_char_level = max_access_level = best_mins_per_day = 0;
+		has_imm = has_nodelete = will_delete = FALSE;
+		*reason = '\0';
 		
-		will_delete = FALSE;
-		
-		// delete #1: invalid players
-		if (delete_invalid > 0 && (index->access_level <= 0 || index->access_level > LVL_TOP) && (index->last_logon + (delete_invalid * SECS_PER_REAL_DAY)) < time(0)) {
-			will_delete = TRUE;
-		}
-		// delete #2: inactive players
-		else if (delete_inactive > 0 && (index->last_logon + (delete_inactive * SECS_PER_REAL_DAY)) < time(0)) {
-			will_delete = TRUE;
-		}
-		
-		// attempt the delete
-		if (will_delete && (ch = find_or_load_player(index->name, &file))) {
-			if (!file) {
-				// EXTREMELY unlikely: they may be deletable but are actually in-game, so we skip them
-				continue;
+		// scan players in the account
+		LL_FOREACH(acct->players, plr) {
+			if (plr->player->access_level > LVL_MORTAL) {
+				has_imm = TRUE;
 			}
+			if (IS_SET(plr->player->plr_flags, PLR_NODELETE)) {
+				has_nodelete = TRUE;
+			}
+			max_access_level = MAX(max_access_level, plr->player->access_level);
+			max_char_level = MAX(max_char_level, plr->player->highest_known_level);
 			
-			delete_player_character(ch);
-			free_char(ch);
+			// determine avg playtime
+			avg_min_per_day = (((double) plr->player->played / SECS_PER_REAL_HOUR) / ((double)(time(0) - plr->player->birth) / SECS_PER_REAL_DAY)) * SECS_PER_REAL_MIN;
+			best_mins_per_day = MAX(best_mins_per_day, avg_min_per_day);
 		}
+		
+		// never delete imms or anyone with nodelete on the account
+		if (has_imm || has_nodelete) {
+			continue;
+		}
+		
+		// how long they've been gone
+		inactive_days = (time(0) - acct->last_logon) / SECS_PER_REAL_DAY;
+		
+		// reasons to delete
+		if (delete_invalid > 0 && (max_access_level <= 0 || max_char_level <= 0) && inactive_days >= delete_invalid) {
+			will_delete = TRUE;
+			snprintf(reason, sizeof(reason), "no characters over level 0");
+		}
+		else if (delete_inactive > 0 && inactive_days >= delete_inactive) {
+			will_delete = TRUE;
+			snprintf(reason, sizeof(reason), "inactive too long");
+		}
+		else if (delete_abandoned > 0 && max_char_level < 100 && best_mins_per_day <= 3 && inactive_days >= delete_abandoned) {
+			will_delete = TRUE;	// low-level and long-gone
+			snprintf(reason, sizeof(reason), "abandoned low-level account");
+		}
+		
+		if (will_delete) {
+			log("DEL: Deleting account %d: %s", acct->id, reason);
+			LL_FOREACH_SAFE(acct->players, plr, next_plr) {
+				log("DEL: - [%d] %s", plr->player->idnum, plr->player->fullname);
+				
+				// ensure not at the menu somehow
+				if ((ch = is_at_menu(plr->player->idnum)) && ch->desc) {
+					close_socket(ch->desc);
+				}
+				
+				// now find/load and delete
+				if ((ch = find_or_load_player(plr->player->name, &file))) {
+					if (file) {
+						delete_player_character(ch);
+						free_char(ch);
+					}
+					else {	// in-game somehow
+						extract_all_items(ch);
+						delete_player_character(ch);
+						extract_char(ch);
+					}
+				}
+			}
+		}	// end will_delete: if last player was deleted, the account is already gone, too
 	}
 }
 
@@ -3793,7 +3890,7 @@ void delete_old_players(void) {
 void delete_player_character(char_data *ch) {
 	player_index_data *index;
 	empire_data *emp = NULL;
-	char filename[256];
+	char filename[256], delname[256];
 	
 	if (IS_NPC(ch)) {
 		syslog(SYS_ERROR, 0, TRUE, "SYSERR: delete_player_character called on NPC");
@@ -3821,9 +3918,14 @@ void delete_player_character(char_data *ch) {
 	}
 	
 	// various file deletes
-	if (get_filename(GET_NAME(ch), filename, PLR_FILE)) {
-		if (remove(filename) < 0 && errno != ENOENT) {
-			log("SYSERR: deleting player file %s: %s", filename, strerror(errno));
+	if (get_filename(GET_NAME(ch), filename, PLR_FILE) && get_filename(GET_NAME(ch), delname, DELETED_PLR_FILE)) {
+		if (rename(filename, delname) < 0 && errno != ENOENT) {
+			log("SYSERR: moving deleted player file %s: %s", filename, strerror(errno));
+		}
+	}
+	if (get_filename(GET_NAME(ch), filename, DELAYED_FILE) && get_filename(GET_NAME(ch), delname, DELETED_DELAYED_FILE)) {
+		if (rename(filename, delname) < 0 && errno != ENOENT) {
+			log("SYSERR: moving deleted player delay file %s: %s", filename, strerror(errno));
 		}
 	}
 	
@@ -4355,9 +4457,10 @@ void init_player(char_data *ch) {
 * @param int idnum The idnum to clear bound objects for.
 */
 void purge_bound_items(int idnum) {
-	obj_data *obj, *next_obj;
+	obj_data *obj;
 	
-	DL_FOREACH_SAFE(object_list, obj, next_obj) {
+	// this uses a global, purge_bound_items_next, to avoid problems where both obj and next-obj are purged from being nested (like a corpse)
+	DL_FOREACH_SAFE(object_list, obj, purge_bound_items_next) {
 		if (obj->bound_to && obj->bound_to->idnum == idnum && !obj->bound_to->next) {
 			// bound to exactly 1 idnum and it's this one
 			if (IN_ROOM(obj) && ROOM_PEOPLE(IN_ROOM(obj))) {
@@ -4400,6 +4503,10 @@ void reset_char(char_data *ch) {
 */
 void save_all_players(bool delay) {
 	descriptor_data *desc;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 
 	for (desc = descriptor_list; desc; desc = desc->next) {
 		if ((STATE(desc) == CON_PLAYING) && !IS_NPC(desc->character)) {
@@ -5057,6 +5164,9 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 		}
 	}
 	
+	// do this before risking deleting empires
+	clear_delayed_empire_refresh(only_empire, DELAY_REFRESH_MEMBERS);
+	
 	// final updates
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		// refresh first
@@ -5079,8 +5189,6 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 	if (!read_techs) {
 		resort_empires(FALSE);
 	}
-	
-	clear_delayed_empire_refresh(only_empire, DELAY_REFRESH_MEMBERS);
 }
 
 
@@ -5102,6 +5210,9 @@ int add_eq_set_to_char(char_data *ch, int set_id, char *name) {
 	int max_id = 0;
 	
 	if (!ch || IS_NPC(ch) || set_id == 0 || !name || !*name) {
+		if (name) {
+			free(name);
+		}
 		return NOTHING;	// invalid input
 	}
 	
@@ -5115,7 +5226,7 @@ int add_eq_set_to_char(char_data *ch, int set_id, char *name) {
 			if (eq_set->name) {
 				free(eq_set->name);
 			}
-			eq_set->name = str_dup(name);
+			eq_set->name = name;
 			found = TRUE;
 			return eq_set->id;	// done
 		}
@@ -5127,7 +5238,7 @@ int add_eq_set_to_char(char_data *ch, int set_id, char *name) {
 	if (!found) {
 		CREATE(eq_set, struct player_eq_set, 1);
 		eq_set->id = (set_id > 0 ? set_id : ++max_id);
-		eq_set->name = str_dup(name);
+		eq_set->name = name;
 		LL_PREPEND(GET_EQ_SETS(ch), eq_set);
 	}
 	

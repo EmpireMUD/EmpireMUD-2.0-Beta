@@ -421,6 +421,7 @@ int GET_MAX_BLOOD(char_data *ch);	// this one is different than the other max po
 #define GET_NAME(ch)  (IS_NPC(ch) ? GET_SHORT_DESC(ch) : GET_PC_NAME(ch))
 #define GET_REAL_LEVEL(ch)  (ch->desc && ch->desc->original ? GET_ACCESS_LEVEL(ch->desc->original) : GET_ACCESS_LEVEL(ch))
 #define GET_SEX(ch)  (IS_DISGUISED(ch) ? GET_DISGUISED_SEX(ch) : GET_REAL_SEX(ch))
+#define GET_TRACK_ID(ch)  (!IS_NPC(ch) ? GET_IDNUM(ch) : (GET_MOB_VNUM(ch) >= 0 ? GET_MOB_VNUM(ch) : 0))
 #define IS_DEAD(ch)  (GET_POS(ch) == POS_DEAD)
 #define IS_INJURED(ch, flag)  (IS_SET(INJURY_FLAGS(ch), (flag)))
 #define IS_NPC(ch)  (IS_SET(MOB_FLAGS(ch), MOB_ISNPC))
@@ -2412,7 +2413,7 @@ bool look_at_moon(char_data *ch, char *name, int *number);
 void show_visible_moons(char_data *ch);
 
 // weather.c time
-double get_hours_of_sun(room_data *room, bool debug);
+double get_hours_of_sun(room_data *room);
 struct time_info_data get_local_time(room_data *room);
 int get_sun_status(room_data *room);
 int get_zenith_days_from_solstice(room_data *room);
@@ -2537,6 +2538,8 @@ void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount)
 // get_filename()
 #define PLR_FILE  0
 #define DELAYED_FILE  1
+#define DELETED_PLR_FILE  2
+#define DELETED_DELAYED_FILE  3
 
 
 // APPLY_RES_x: messaging for the apply_resource() function

@@ -1539,6 +1539,20 @@ void build_all_quest_lookups(void) {
 
 
 /**
+* Frees a list of quest lookups. This is normally only called on 'shutdown
+* complete'.
+*
+* @param struct quest_lookup *list The list of lookups to free.
+*/
+void free_quest_lookups(struct quest_lookup *list) {
+	struct quest_lookup *ql, *next_ql;
+	LL_FOREACH_SAFE(list, ql, next_ql) {
+		free(ql);
+	}
+}
+
+
+/**
 * Adds a quest lookup hint to a list (e.g. on a mob).
 *
 * Note: For mob/obj/veh quests, run update_mob_quest_lookups() etc after this.
@@ -4471,6 +4485,10 @@ void parse_quest(FILE *fl, any_vnum vnum) {
 void write_daily_quest_file(void) {
 	quest_data *qst, *next_qst;
 	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 	
 	if (!(fl = fopen(DAILY_QUEST_FILE TEMP_SUFFIX, "w"))) {
 		log("SYSERR: Unable to write %s", DAILY_QUEST_FILE TEMP_SUFFIX);

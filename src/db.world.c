@@ -469,8 +469,9 @@ void delete_room(room_data *room, bool check_exits) {
 	obj_data *o, *next_o;
 	empire_data *emp;
 	int iter;
-
-	if (!room || (GET_ROOM_VNUM(room) < MAP_SIZE && !CAN_UNLOAD_MAP_ROOM(room))) {
+	
+	// this blocks deleting map rooms unless they can be unloaded (or the mud is being shut down)
+	if (!room || (GET_ROOM_VNUM(room) < MAP_SIZE && !CAN_UNLOAD_MAP_ROOM(room) && !block_all_saves_due_to_shutdown)) {
 		syslog(SYS_ERROR, 0, TRUE, "SYSERR: delete_room() attempting to delete invalid room %d", room ? GET_ROOM_VNUM(room) : NOWHERE);
 		return;
 	}
@@ -537,6 +538,11 @@ void delete_room(room_data *room, bool check_exits) {
 	
 	// get rid of vehicles
 	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+		if (!extraction_room) {
+			extraction_room = get_extraction_room();
+		}
+		vehicle_from_room(veh);
+		vehicle_to_room(veh, extraction_room);
 		extract_vehicle(veh);
 	}
 	
@@ -985,6 +991,10 @@ void save_whole_world(void) {
 	room_vnum vnum;
 	int block, last;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	last = -1;
 	
 	// must sort first
@@ -1268,7 +1278,7 @@ void annual_update_vehicle(vehicle_data *veh) {
 */
 void annual_world_update(void) {
 	char message[MAX_STRING_LENGTH];
-	vehicle_data *veh, *next_veh;
+	vehicle_data *veh;
 	descriptor_data *d;
 	room_data *room, *next_room;
 	struct map_data *tile;
@@ -1312,7 +1322,7 @@ void annual_world_update(void) {
 		annual_update_depletions(&ROOM_DEPLETION(room));
 	}
 	
-	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
 		annual_update_vehicle(veh);
 	}
 	
@@ -3877,7 +3887,7 @@ void build_world_map(void) {
 * run after sectors are loaded, and before the .wld files are read in.
 */
 void load_world_map_from_file(void) {
-	char line[256], line2[256], error_buf[MAX_STRING_LENGTH];
+	char line[256], line2[256], str1[256], str2[256], error_buf[MAX_STRING_LENGTH];
 	struct map_data *map, *last = NULL;
 	struct depletion_data *dep;
 	struct track_data *track;
@@ -3971,9 +3981,17 @@ void load_world_map_from_file(void) {
 						log("SYSERR: Unable to get E line for map tile #%d", last->vnum);
 						break;
 					}
+					if (sscanf(line2, "%s %s", str1, str2) != 2) {
+						if (sscanf(line2, "%s", str1) != 1) {
+							log("SYSERR: Invalid E line for map tile #%d", last->vnum);
+							break;
+						}
+						// otherwise backwards-compatible:
+						strcpy(str2, str1);
+					}
 
-					last->shared->base_affects = asciiflag_conv(line2);
-					last->shared->affects = last->shared->base_affects;
+					last->shared->base_affects = asciiflag_conv(str1);
+					last->shared->affects = asciiflag_conv(str2);
 					break;
 				}
 				case 'I': {	// icon
@@ -4030,14 +4048,16 @@ void load_world_map_from_file(void) {
 						}
 					}
 					
-					CREATE(track, struct track_data, 1);
-					track->player_id = var[0];
-					track->mob_num = var[1];
+					// note: var[0] is no longer used (formerly player id)
+					HASH_FIND_INT(last->shared->tracks, &var[1], track);
+					if (!track) {
+						CREATE(track, struct track_data, 1);
+						track->id = var[1];
+						HASH_ADD_INT(last->shared->tracks, id, track);
+					}
 					track->timestamp = l_in;
 					track->dir = var[2];
 					track->to_room = var[3];
-					
-					DL_APPEND(last->shared->tracks, track);
 					break;
 				}
 				case 'Z': {	// extra data
@@ -4077,7 +4097,7 @@ void save_world_map_to_file(void) {
 	int tracks_lifespan = config_get_int("tracks_lifespan");
 	
 	// shortcut
-	if (!world_map_needs_save) {
+	if (!world_map_needs_save || block_all_saves_due_to_shutdown) {
 		return;
 	}
 	
@@ -4089,9 +4109,9 @@ void save_world_map_to_file(void) {
 	// only bother with ones that aren't base ocean
 	for (iter = land_map; iter; iter = iter->next) {
 		// free some junk while we're here anyway
-		DL_FOREACH_SAFE(iter->shared->tracks, track, next_track) {
+		HASH_ITER(hh, iter->shared->tracks, track, next_track) {
 			if (now - track->timestamp > tracks_lifespan * SECS_PER_REAL_MIN) {
-				DL_DELETE(iter->shared->tracks, track);
+				HASH_DEL(iter->shared->tracks, track);
 				free(track);
 			}
 		}

@@ -719,7 +719,7 @@ void chore_update(void) {
 	struct empire_island *eisle, *next_eisle;
 	struct empire_needs *needs, *next_needs;
 	struct workforce_log *wf_log;
-	vehicle_data *veh, *next_veh;
+	vehicle_data *veh;
 	empire_data *emp, *next_emp;
 	
 	int time_to_empire_emptiness = config_get_int("time_to_empire_emptiness") * SECS_PER_REAL_WEEK;
@@ -768,7 +768,7 @@ void chore_update(void) {
 				next_ter = global_next_territory_entry;
 			}
 			
-			DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+			DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
 				if (VEH_OWNER(veh) == emp) {
 					process_one_vehicle_chore(emp, veh);
 				}

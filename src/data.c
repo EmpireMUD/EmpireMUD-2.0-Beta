@@ -243,6 +243,10 @@ void save_data_table(bool force) {
 	struct stored_data *data, *next_data;
 	FILE *fl;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	if (!force && !data_table_needs_save) {
 		return;
 	}

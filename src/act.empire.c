@@ -2870,6 +2870,9 @@ struct find_territory_node *reduce_territory_node_list(struct find_territory_nod
 			if ((find = find_nearby_territory_node(node->loc, next_node, size))) {
 				find->count += node->count;
 				DL_DELETE(list, node);
+				if (node->details) {
+					free(node->details);
+				}
 				free(node);
 			}
 		}
@@ -3114,6 +3117,9 @@ void scan_for_tile(char_data *ch, char *argument) {
 			}
 			
 			DL_DELETE(node_list, node);
+			if (node->details) {
+				free(node->details);
+			}
 			free(node);
 		}
 		

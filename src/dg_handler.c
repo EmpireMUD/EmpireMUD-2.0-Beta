@@ -162,9 +162,6 @@ void actually_free_trigger(trig_data *trig) {
 	if (trig->arglist && (!proto || trig->arglist != proto->arglist)) {
 		free(trig->arglist);
 	}
-	if (trig->var_list && (!proto || trig->var_list != proto->var_list)) {
-		free_varlist(trig->var_list);
-	}
 	if (trig->cmdlist && (!proto || trig->cmdlist != proto->cmdlist)) {
 		LL_FOREACH_SAFE(trig->cmdlist, cmd, next_cmd) {
 			if (cmd->cmd) {
@@ -174,6 +171,7 @@ void actually_free_trigger(trig_data *trig) {
 		}
 	}
 	
+	free_varlist(trig->var_list);
 	free(trig);
 }
 
@@ -266,6 +264,7 @@ void extract_script(void *thing, int type) {
 			empire_data *emp = (empire_data*)thing;
 			sc = SCRIPT(emp);
 			SCRIPT(emp) = NULL;
+			break;
 		}
 		default: {
 			log("SYSERR: Invalid type called for extract_script()");
@@ -464,6 +463,23 @@ struct trig_proto_list *copy_trig_protos(struct trig_proto_list *from) {
 	}
 	
 	return list;
+}
+
+
+/**
+* Updates SCRIPT_TYPES(sc) for all triggers attached to it.
+*
+* @param struct script_data *sc The script data to update.
+*/
+void update_script_types(struct script_data *sc) {
+	trig_data *trig;
+	
+	if (sc) {
+		SCRIPT_TYPES(sc) = NOBITS;
+		LL_FOREACH(TRIGGERS(sc), trig) {
+			SCRIPT_TYPES(sc) |= GET_TRIG_TYPE(trig);
+		}
+	}
 }
 
 

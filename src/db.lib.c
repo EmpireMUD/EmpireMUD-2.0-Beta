@@ -52,6 +52,7 @@
 *   Core Lib Functions
 *   Index Saving
 *   The Reals
+*   Free Whole Library
 *   Helpers
 *   Sorters
 *   Miscellaneous Lib
@@ -527,6 +528,10 @@ int new_automessage_id(void) {
 void save_automessages(void) {
 	struct automessage *msg, *next_msg;
 	FILE *fl;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 	
 	if (!(fl = fopen(AUTOMESSAGE_FILE TEMP_SUFFIX, "w"))) {
 		syslog(SYS_ERROR, LVL_START_IMM, TRUE, "SYSERR: Unable to write %s", AUTOMESSAGE_FILE TEMP_SUFFIX);
@@ -1707,10 +1712,10 @@ void delete_empire(empire_data *emp) {
 	player_index_data *index, *next_index;
 	struct vehicle_attached_mob *vam;
 	empire_data *emp_iter, *next_emp;
-	vehicle_data *veh, *next_veh;
+	vehicle_data *veh;
 	room_data *room, *next_room;
 	char buf[MAX_STRING_LENGTH];
-	obj_data *obj, *next_obj;
+	obj_data *obj;
 	char_data *ch, *next_ch;
 	bool file = FALSE;
 	empire_vnum vnum;
@@ -1778,14 +1783,14 @@ void delete_empire(empire_data *emp) {
 	}
 	
 	// update all objs
-	DL_FOREACH_SAFE(object_list, obj, next_obj) {
+	DL_FOREACH(object_list, obj) {
 		if (obj->last_empire_id == vnum) {
 			obj->last_empire_id = NOTHING;
 		}
 	}
 	
 	// update all vehicles
-	DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
+	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_OWNER(veh) == emp) {
 			VEH_OWNER(veh) = NULL;
 			VEH_SHIPPING_ID(veh) = -1;
@@ -1910,25 +1915,11 @@ void free_empire(empire_data *emp) {
 	room_data *room;
 	int iter;
 	
-	// free islands
-	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
-		HASH_ITER(hh, isle->needs, needs, next_needs) {
-			HASH_DEL(isle->needs, needs);
-			free(needs);
-		}
-		HASH_ITER(hh, isle->store, store, next_store) {
-			HASH_DEL(isle->store, store);
-			free(store);
-		}
-		HASH_DEL(EMPIRE_ISLANDS(emp), isle);
-		free(isle);
-	}
-	EMPIRE_ISLANDS(emp) = NULL;
-	
 	// free unique storage
 	while ((eus = EMPIRE_UNIQUE_STORAGE(emp))) {
 		DL_DELETE(EMPIRE_UNIQUE_STORAGE(emp), eus);
 		if (eus->obj) {
+			add_to_object_list(eus->obj);
 			extract_obj(eus->obj);
 		}
 		free(eus);
@@ -2045,9 +2036,30 @@ void free_empire(empire_data *emp) {
 	free_empire_goals(EMPIRE_GOALS(emp));
 	free_empire_completed_goals(EMPIRE_COMPLETED_GOALS(emp));
 	
+	// free islands (late because some stuff above will add islands)
+	HASH_ITER(hh, EMPIRE_ISLANDS(emp), isle, next_isle) {
+		if (isle->name) {
+			free(isle->name);
+		}
+		HASH_ITER(hh, isle->needs, needs, next_needs) {
+			HASH_DEL(isle->needs, needs);
+			free(needs);
+		}
+		HASH_ITER(hh, isle->store, store, next_store) {
+			HASH_DEL(isle->store, store);
+			free(store);
+		}
+		HASH_DEL(EMPIRE_ISLANDS(emp), isle);
+		free(isle);
+	}
+	EMPIRE_ISLANDS(emp) = NULL;
+	
 	// free strings
 	if (emp->name) {
 		free(emp->name);
+	}
+	if (emp->adjective) {
+		free(emp->adjective);
 	}
 	if (emp->banner) {
 		free(emp->banner);
@@ -3202,6 +3214,10 @@ void save_empire_storage(empire_data *emp) {
 void save_empire(empire_data *emp, bool save_all_parts) {
 	FILE *fl;
 	char fname[30], tempname[64];
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 
 	if (!emp) {
 		return;
@@ -3234,6 +3250,10 @@ void save_empire(empire_data *emp, bool save_all_parts) {
 */
 void save_all_empires(void) {
 	empire_data *iter, *next_iter;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 
 	HASH_ITER(hh, empire_table, iter, next_iter) {
 		save_empire(iter, TRUE);
@@ -3246,6 +3266,10 @@ void save_all_empires(void) {
 */
 void save_marked_empires(void) {
 	empire_data *emp, *next_emp;
+	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
 	
 	HASH_ITER(hh, empire_table, emp, next_emp) {
 		if (EMPIRE_NEEDS_SAVE(emp)) {
@@ -4790,6 +4814,10 @@ void save_island_table(void) {
 	char temp[MAX_STRING_LENGTH];
 	FILE *fl;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	if (!(fl = fopen(ISLAND_FILE TEMP_SUFFIX, "w"))) {
 		log("SYSERR: Unable to write %s", ISLAND_FILE TEMP_SUFFIX);
 		return;
@@ -5134,8 +5162,6 @@ void free_obj_eq_set(struct eq_set_obj *eq_set) {
 */
 void free_obj_proto_data(struct obj_proto_data *data) {
 	struct obj_storage_type *store;
-	struct quest_lookup *ql;
-	struct shop_lookup *sl;
 	
 	if (!data) {
 		return;	// basic safety
@@ -5150,15 +5176,8 @@ void free_obj_proto_data(struct obj_proto_data *data) {
 		free(store);
 	}
 	
-	while ((ql = data->quest_lookups)) {
-		data->quest_lookups = ql->next;
-		free(ql);
-	}
-	
-	while ((sl = data->shop_lookups)) {
-		data->shop_lookups = sl->next;
-		free(sl);
-	}
+	free_quest_lookups(data->quest_lookups);
+	free_shop_lookups(data->shop_lookups);
 	
 	free(data);
 }
@@ -5892,9 +5911,17 @@ void parse_room(FILE *fl, room_vnum vnum) {
 					log("SYSERR: Unable to get E line for room #%d", vnum);
 					break;
 				}
+				if (sscanf(line2, "%s %s", str1, str2) != 2) {
+					if (sscanf(line2, "%s", str1) != 1) {
+						log("SYSERR: Invalid E line for room #%d", vnum);
+						break;
+					}
+					// otherwise backwards-compatible:
+					strcpy(str2, str1);
+				}
 
-				ROOM_BASE_FLAGS(room) = asciiflag_conv(line2);
-				ROOM_AFF_FLAGS(room) = ROOM_BASE_FLAGS(room);
+				ROOM_BASE_FLAGS(room) = asciiflag_conv(str1);
+				ROOM_AFF_FLAGS(room) = asciiflag_conv(str2);
 				break;
 			}
 			case 'H': {	// home_room
@@ -5999,14 +6026,16 @@ void parse_room(FILE *fl, room_vnum vnum) {
 					}
 				}
 				
-				CREATE(track, struct track_data, 1);
-				track->player_id = t[0];
-				track->mob_num = t[1];
+				// t[0] is no longer used at all (formerly player id)
+				HASH_FIND_INT(ROOM_TRACKS(room), &t[1], track);
+				if (!track) {
+					CREATE(track, struct track_data, 1);
+					track->id = t[1];
+					HASH_ADD_INT(ROOM_TRACKS(room), id, track);
+				}
 				track->timestamp = l_in;
 				track->dir = t[2];
 				track->to_room = t[3];
-				
-				DL_APPEND(ROOM_TRACKS(room), track);
 				break;
 			}
 			
@@ -7568,6 +7597,10 @@ void save_library_file_for_vnum(int type, any_vnum vnum) {
 	int zone = vnum / 100;
 	FILE *fl;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	// setup
 	if (type >= 0 && type < NUM_DB_BOOT_TYPES && db_boot_info[type].prefix && db_boot_info[type].suffix) {
 		prefix = db_boot_info[type].prefix;
@@ -8040,6 +8073,10 @@ void save_index(int type) {
 	char filename[64], tempfile[64], *prefix = NULL, *suffix = NULL;
 	FILE *fl;
 	
+	if (block_all_saves_due_to_shutdown) {
+		return;
+	}
+	
 	// setup
 	if (type >= 0 && type < NUM_DB_BOOT_TYPES && db_boot_info[type].prefix && db_boot_info[type].suffix) {
 		prefix = db_boot_info[type].prefix;
@@ -8414,6 +8451,411 @@ sector_data *sector_proto(sector_vnum vnum) {
 	
 	HASH_FIND_INT(sector_table, &vnum, sect);
 	return sect;
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// FREE WHOLE LIBRARY //////////////////////////////////////////////////////
+
+/**
+* Attempts to free all allocated memory. This can help to check for memory
+* leaks.
+*/
+void free_whole_library(void) {
+	ability_data *abil, *next_abil;
+	account_data *acct, *next_acct;
+	adv_data *adv, *next_adv;
+	archetype_data *arch, *next_arch;
+	augment_data *aug, *next_aug;
+	struct author_data *author, *next_author;
+	struct automessage *automsg, *next_automsg;
+	struct ban_list_element *ban, *next_ban;
+	bld_data *bld, *next_bld;
+	book_data *book, *next_book;
+	char_data *mob, *next_mob;
+	struct channel_history_data *chd, *next_chd;
+	struct char_delayed_update *cdu, *next_cdu;
+	class_data *class, *next_class;
+	struct config_type *cnf, *next_cnf;
+	craft_data *craft, *next_craft;
+	crop_data *crop, *next_crop;
+	descriptor_data *desc;
+	// struct dg_owner_purged_tracker_type *dopt, *next_dopt;
+	empire_data *emp, *next_emp;
+	event_data *event, *next_event;
+	struct event_running_data *erd, *next_erd;
+	faction_data *fct, *next_fct;
+	generic_data *gen, *next_gen;
+	struct generic_name_data *gen_name, *next_gen_name;
+	struct global_data *glb, *next_glb;
+	struct int_hash *int_iter, *next_int_iter;
+	struct island_info *island, *next_island;
+	morph_data *morph, *next_morph;
+	obj_data *obj, *next_obj;
+	player_index_data *pid, *next_pid;
+	progress_data *prg, *next_prg;
+	struct quest_data *quest, *next_quest;
+	room_data *room, *next_room;
+	room_template *rmt, *next_rmt;
+	sector_data *sect, *next_sect;
+	struct sector_index_type *sect_idx, *next_sect_idx;
+	shop_data *shop, *next_shop;
+	skill_data *skill, *next_skill;
+	social_data *soc, *next_soc;
+	struct stats_data_struct *sds, *next_sds;
+	struct stored_data *data, *next_data;
+	struct slash_channel *slash, *next_slash;
+	struct trading_post_data *tpd, *next_tpd;
+	trig_data *trig, *next_trig;
+	// struct uid_lookup_table *uid, *next_uid;
+	vehicle_data *veh, *next_veh;
+	int iter, x, y;
+	
+	// set this first: it's critical that nothing is saved after this:
+	log("Freeing whole library...");
+	block_all_saves_due_to_shutdown = TRUE;
+	
+	// extract everything in the game
+	free_loaded_players();
+	DL_FOREACH_SAFE(trading_list, tpd, next_tpd) {
+		if (tpd->obj) {
+			add_to_object_list(tpd->obj);
+			extract_obj(tpd->obj);
+			tpd->obj = NULL;
+		}
+		DL_DELETE(trading_list, tpd);
+		free(tpd);
+	}
+	while (character_list) {
+		extract_char(character_list);
+		extract_pending_chars();
+	}
+	while ((desc = descriptor_list)) {
+		flush_queues(desc);
+		LL_DELETE(descriptor_list, desc);
+		free_descriptor(desc);
+	}
+	while (object_list) {
+		extract_obj(object_list);
+	}
+	while (vehicle_list) {
+		extract_vehicle(vehicle_list);
+		extract_pending_vehicles();
+	}
+	while (instance_list) {
+		delete_instance(instance_list, FALSE);
+	}
+	LL_FOREACH_SAFE(running_events, erd, next_erd) {
+		LL_DELETE(running_events, erd);
+		free_event_leaderboard(erd->player_leaderboard);
+		free(erd);
+	}
+	
+	// free empires
+	HASH_ITER(hh, empire_table, emp, next_emp) {
+		remove_empire_from_table(emp);
+		free_empire(emp);
+	}
+	
+	// free world and map data
+	DL_FOREACH_SAFE2(interior_room_list, room, next_room, next_interior) {
+		ROOM_OWNER(room) = NULL;	// skip claim cleanup
+		delete_room(room, FALSE);
+	}
+	HASH_ITER(hh, world_table, room, next_room) {
+		ROOM_OWNER(room) = NULL;	// skip claim cleanup
+		delete_room(room, FALSE);
+	}
+	for (x = 0; x < MAP_WIDTH; ++x) {
+		for (y = 0; y < MAP_HEIGHT; ++y) {
+			if (world_map[x][y].shared != &ocean_shared_data) {
+				free_shared_room_data(world_map[x][y].shared);
+			}
+		}
+	}
+	
+	// free islands
+	HASH_ITER(hh, island_table, island, next_island) {
+		if (island->name) {
+			free(island->name);
+		}
+		if (island->desc) {
+			free(island->desc);
+		}
+		HASH_DEL(island_table, island);
+		free(island);
+	}
+	
+	// ensure triggers are gone
+	free_freeable_triggers();
+	
+	// most of this part is just done in alphabetical order
+	HASH_ITER(hh, ability_table, abil, next_abil) {
+		remove_ability_from_table(abil);
+		free_ability(abil);
+	}
+	HASH_ITER(hh, account_table, acct, next_acct) {
+		HASH_DEL(account_table, acct);
+		free_account(acct);
+	}
+	HASH_ITER(hh, adventure_table, adv, next_adv) {
+		remove_adventure_from_table(adv);
+		free_adventure(adv);
+	}
+	HASH_ITER(hh, archetype_table, arch, next_arch) {
+		remove_archetype_from_table(arch);
+		free_archetype(arch);
+	}
+	HASH_ITER(hh, augment_table, aug, next_aug) {
+		remove_augment_from_table(aug);
+		free_augment(aug);
+	}
+	HASH_ITER(hh, author_table, author, next_author) {
+		HASH_DEL(author_table, author);
+		free(author);
+	}
+	HASH_ITER(hh, automessages_table, automsg, next_automsg) {
+		HASH_DEL(automessages_table, automsg);
+		free_automessage(automsg);
+	}
+	HASH_ITER(hh, book_table, book, next_book) {
+		remove_book_from_table(book);
+		free_book(book);
+	}
+	HASH_ITER(hh, building_table, bld, next_bld) {
+		remove_building_from_table(bld);
+		free_quest_lookups(GET_BLD_QUEST_LOOKUPS(bld));
+		free_shop_lookups(GET_BLD_SHOP_LOOKUPS(bld));
+		free_building(bld);
+	}
+	HASH_ITER(hh, char_delayed_update_list, cdu, next_cdu) {
+		HASH_DEL(char_delayed_update_list, cdu);
+		free(cdu);
+	}
+	HASH_ITER(hh, class_table, class, next_class) {
+		remove_class_from_table(class);
+		free_class(class);
+	}
+	HASH_ITER(hh, craft_table, craft, next_craft) {
+		remove_craft_from_table(craft);
+		free_craft(craft);
+	}
+	HASH_ITER(hh, crop_table, crop, next_crop) {
+		remove_crop_from_table(crop);
+		free_crop(crop);
+	}
+	/* this should be empty so just cut the reference to it and see if the memory profiler shows it:
+	DL_FOREACH_SAFE(dg_owner_purged_tracker, dopt, next_dopt) {
+		free(dopt);
+	}
+	*/
+	dg_owner_purged_tracker = NULL;
+	HASH_ITER(hh, event_table, event, next_event) {
+		remove_event_from_table(event);
+		free_event(event);
+	}
+	HASH_ITER(hh, faction_table, fct, next_fct) {
+		remove_faction_from_table(fct);
+		free_faction(fct);
+	}
+	HASH_ITER(hh, generic_table, gen, next_gen) {
+		remove_generic_from_table(gen);
+		free_generic(gen);
+	}
+	LL_FOREACH_SAFE(generic_names, gen_name, next_gen_name) {
+		if (gen_name->names) {
+			for (iter = 0; iter < gen_name->size; ++iter) {
+				if (gen_name->names[iter]) {
+					free(gen_name->names[iter]);
+				}
+			}
+			free(gen_name->names);
+		}
+		free(gen_name);
+	}
+	HASH_ITER(hh, globals_table, glb, next_glb) {
+		remove_global_from_table(glb);
+		free_global(glb);
+	}
+	for (iter = 0; iter <= top_of_helpt; ++iter) {
+		if (help_table[iter].keyword) {
+			free(help_table[iter].keyword);
+		}
+		if (help_table[iter].entry&& !help_table[iter].duplicate) {
+			free(help_table[iter].entry);
+		}
+	}
+	free(help_table);
+	HASH_ITER(hh, mobile_table, mob, next_mob) {
+		remove_mobile_from_table(mob);
+		free_quest_lookups(MOB_QUEST_LOOKUPS(mob));
+		free_shop_lookups(MOB_SHOP_LOOKUPS(mob));
+		free_char(mob);
+	}
+	HASH_ITER(hh, morph_table, morph, next_morph) {
+		remove_morph_from_table(morph);
+		free_morph(morph);
+	}
+	HASH_ITER(hh, object_table, obj, next_obj) {
+		remove_object_from_table(obj);
+		free_obj(obj);
+	}
+	HASH_ITER(idnum_hh, player_table_by_idnum, pid, next_pid) {
+		remove_player_from_table(pid);
+		if (pid->name) {
+			free(pid->name);
+		}
+		if (pid->fullname) {
+			free(pid->fullname);
+		}
+		if (pid->last_host) {
+			free(pid->last_host);
+		}
+		free(pid);
+	}
+	HASH_ITER(hh, progress_table, prg, next_prg) {
+		remove_progress_from_table(prg);
+		free_progress(prg);
+	}
+	HASH_ITER(hh, quest_table, quest, next_quest) {
+		remove_quest_from_table(quest);
+		free_quest(quest);
+	}
+	HASH_ITER(hh, room_template_table, rmt, next_rmt) {
+		remove_room_template_from_table(rmt);
+		free_quest_lookups(GET_RMT_QUEST_LOOKUPS(rmt));
+		free_shop_lookups(GET_RMT_SHOP_LOOKUPS(rmt));
+		free_room_template(rmt);
+	}
+	HASH_ITER(hh, sector_table, sect, next_sect) {
+		remove_sector_from_table(sect);
+		free_sector(sect);
+	}
+	HASH_ITER(hh, sector_index, sect_idx, next_sect_idx) {
+		HASH_DEL(sector_index, sect_idx);
+		free(sect_idx);
+	}
+	HASH_ITER(hh, shop_table, shop, next_shop) {
+		remove_shop_from_table(shop);
+		free_shop(shop);
+	}
+	HASH_ITER(hh, skill_table, skill, next_skill) {
+		remove_skill_from_table(skill);
+		free_skill(skill);
+	}
+	HASH_ITER(hh, social_table, soc, next_soc) {
+		remove_social_from_table(soc);
+		free_social(soc);
+	}
+	HASH_ITER(hh, trigger_table, trig, next_trig) {
+		remove_trigger_from_table(trig);
+		free_trigger(trig);
+		free_freeable_triggers();
+	}
+	/* this should be empty so just cut the reference to it and see if the memory profiler shows it:
+	HASH_ITER(hh, master_uid_lookup_table, uid, next_uid) {
+		HASH_DEL(master_uid_lookup_table, uid);
+		free(uid);
+	}
+	*/
+	master_uid_lookup_table = NULL;
+	HASH_ITER(hh, vehicle_table, veh, next_veh) {
+		remove_vehicle_from_table(veh);
+		free_quest_lookups(VEH_QUEST_LOOKUPS(veh));
+		free_shop_lookups(VEH_SHOP_LOOKUPS(veh));
+		free_vehicle(veh);
+	}
+	
+	// misc data
+	LL_FOREACH_SAFE(ban_list, ban, next_ban) {
+		free(ban);
+	}
+
+	for (iter = 0; iter < num_slow_ips; ++iter) {
+		if (detected_slow_ips[iter]) {
+			free(detected_slow_ips[iter]);
+		}
+	}
+	free(detected_slow_ips);
+	
+	HASH_ITER(hh, global_sector_count, sds, next_sds) {
+		HASH_DEL(global_sector_count, sds);
+		free(sds);
+	}
+	HASH_ITER(hh, global_crop_count, sds, next_sds) {
+		HASH_DEL(global_crop_count, sds);
+		free(sds);
+	}
+	HASH_ITER(hh, global_building_count, sds, next_sds) {
+		HASH_DEL(global_building_count, sds);
+		free(sds);
+	}
+	
+	HASH_ITER(hh, inherent_ptech_hash, int_iter, next_int_iter) {
+		HASH_DEL(inherent_ptech_hash, int_iter);
+		free(int_iter);
+	}
+	
+	for (iter = 0; iter < num_intro_screens; ++iter) {
+		if (intro_screens[iter]) {
+			free(intro_screens[iter]);
+		}
+	}
+	free(intro_screens);
+	
+	LL_FOREACH_SAFE(slash_channel_list, slash, next_slash) {
+		if (slash->name) {
+			free(slash->name);
+		}
+		if (slash->lc_name) {
+			free(slash->lc_name);
+		}
+		DL_FOREACH_SAFE(slash->history, chd, next_chd) {
+			if (chd->message) {
+				free(chd->message);
+			}
+			free(chd);
+		}
+		free(slash);
+	}
+	
+	if (start_locs) {
+		free(start_locs);
+	}
+	
+	for (iter = 0; iter < NUM_TEXT_FILE_STRINGS; ++iter) {
+		if (text_file_strings[iter]) {
+			free(text_file_strings[iter]);
+		}
+	}
+	
+	for (iter = 0; iter < tips_of_the_day_size; ++iter) {
+		if (tips_of_the_day[iter]) {
+			free(tips_of_the_day[iter]);
+		}
+	}
+	free(tips_of_the_day);
+	
+	if (wizlock_message) {
+		free(wizlock_message);
+	}
+	
+	// free these last
+	HASH_ITER(hh, config_table, cnf, next_cnf) {
+		HASH_DEL(config_table, cnf);
+		free_config_type(cnf);
+	}
+	HASH_ITER(hh, data_table, data, next_data) {
+		HASH_DEL(data_table, data);
+		free(data);
+	}
+		
+	/* additional notes:
+	- probably don't need to close 'logfile'
+	- trigger_list is PROBABLY already free
+	*/
+	
+	log(" done");
 }
 
 
@@ -8994,7 +9436,6 @@ void free_complex_data(struct complex_room_data *data) {
 * @param struct shared_room_data *data The data to free.
 */
 void free_shared_room_data(struct shared_room_data *data) {
-	struct room_extra_data *room_ex, *next_room_ex;
 	struct stored_event *ev, *next_ev;
 	struct depletion_data *dep;
 	struct track_data *track, *next_track;
@@ -9013,11 +9454,9 @@ void free_shared_room_data(struct shared_room_data *data) {
 		data->depletion = dep->next;
 		free(dep);
 	}
-	HASH_ITER(hh, data->extra_data, room_ex, next_room_ex) {
-		HASH_DEL(data->extra_data, room_ex);
-		free(room_ex);
-	}
-	DL_FOREACH_SAFE(data->tracks, track, next_track) {
+	free_extra_data(&data->extra_data);
+	HASH_ITER(hh, data->tracks, track, next_track) {
+		HASH_DEL(data->tracks, track);
 		free(track);
 	}
 	
@@ -9316,8 +9755,8 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	// 'load_world_map_from_file' -- more letters are used than appear here
 	
 	// E affects
-	if (dat->base_affects) {
-		fprintf(fl, "E\n%llu\n", dat->base_affects);
+	if (dat->affects || dat->base_affects) {
+		fprintf(fl, "E\n%llu %llu\n", dat->base_affects, dat->affects);
 	}
 
 	// I icon
@@ -9348,13 +9787,14 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	}
 	
 	// Y tracks
-	DL_FOREACH_SAFE(dat->tracks, track, next_track) {
+	HASH_ITER(hh, dat->tracks, track, next_track) {
 		if (now - track->timestamp > SECS_PER_REAL_HOUR) {
-			DL_DELETE(dat->tracks, track);
+			HASH_DEL(dat->tracks, track);
 			free(track);
 		}
 		else {
-			fprintf(fl, "Y\n%d %d %ld %d %d\n", track->player_id, track->mob_num, track->timestamp, track->dir, track->to_room);
+			// note: 1st arg is now always 0 (formerly player id)
+			fprintf(fl, "Y\n0 %d %ld %d %d\n", track->id, track->timestamp, track->dir, track->to_room);
 		}
 	}
 
