@@ -1,6 +1,8 @@
 players/*/*.plr
 players/*/*.delay
 players/accounts/*.acct
+players/deleted/*/*.plr
+players/deleted/*/*.delay
 plralias/*/*.alias
 plrlore/*/*.lore
 plrobjs/*/*.objs
