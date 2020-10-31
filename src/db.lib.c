@@ -9752,7 +9752,7 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	// 'load_world_map_from_file' -- more letters are used than appear here
 	
 	// E affects
-	if (dat->base_affects || dat->affects) {
+	if (dat->affects || dat->base_affects) {
 		fprintf(fl, "E\n%llu %llu\n", dat->base_affects, dat->affects);
 	}
 
