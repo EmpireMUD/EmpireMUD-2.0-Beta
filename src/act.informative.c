@@ -3555,26 +3555,29 @@ ACMD(do_time) {
 	
 		gain_player_tech_exp(ch, PTECH_CLOCK, 1);
 	}
-	else {
-		sun = get_sun_status(IN_ROOM(ch));
-		if (sun == SUN_DARK) {
-			msg_to_char(ch, "It is nighttime.\r\n");
-		}
-		else if (sun == SUN_RISE) {
-			msg_to_char(ch, "It is almost dawn.\r\n");
-		}
-		else if (sun == SUN_SET) {
-			msg_to_char(ch, "It is sunset.\r\n");
-		}
-		else if (tinfo.hours == 12) {
-			msg_to_char(ch, "It is noon.\r\n");
-		}
-		else if (tinfo.hours < 12) {
-			msg_to_char(ch, "It is %smorning.\r\n", tinfo.hours <= 8 ? "early " : "");
-		}
-		else {	// afternoon is all that's left
-			msg_to_char(ch, "It is %safternoon.\r\n", tinfo.hours >= 17 ? "late " : "");
-		}
+
+	sun = get_sun_status(IN_ROOM(ch));
+	if (sun == SUN_DARK) {
+		msg_to_char(ch, "It is nighttime.\r\n");
+	}
+	else if (sun == SUN_RISE) {
+		msg_to_char(ch, "It is almost dawn.\r\n");
+	}
+	else if (sun == SUN_SET) {
+		msg_to_char(ch, "It is sunset.\r\n");
+	}
+	else if (has_player_tech(ch, PTECH_CLOCK)) {
+		msg_to_char(ch, "It is daytime.\r\n");
+	}
+	// all other time options are only shown without clocks:
+	else if (tinfo.hours == 12) {
+		msg_to_char(ch, "It is noon.\r\n");
+	}
+	else if (tinfo.hours < 12) {
+		msg_to_char(ch, "It is %smorning.\r\n", tinfo.hours <= 8 ? "early " : "");
+	}
+	else {	// afternoon is all that's left
+		msg_to_char(ch, "It is %safternoon.\r\n", tinfo.hours >= 17 ? "late " : "");
 	}
 
 	if (has_player_tech(ch, PTECH_CALENDAR)) {
