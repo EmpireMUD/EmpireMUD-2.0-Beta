@@ -2607,8 +2607,8 @@ WEATHER
 Usage:  weather
 
 If you're uncertain whether the sun is shining or the rain is pouring down. 
-You'll have to be outside in order to tell however. At night, this also
-allows you to look at the phases of the moons.
+You'll have to be outside in order to tell however. It will also tell you if
+the sun or moon are up.
 #
 WHO
 

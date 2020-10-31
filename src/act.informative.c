@@ -3640,18 +3640,56 @@ ACMD(do_weather) {
 		"cloudy",
 		"rainy",
 		"lit by flashes of lightning"
-		};
+	};
 	
+	// weather, if available
 	if (ROOM_AFF_FLAGGED(IN_ROOM(ch), ROOM_AFF_NO_WEATHER)) {
 		msg_to_char(ch, "There's nothing interesting about the weather.\r\n");
 	}
 	else if (IS_OUTDOORS(ch)) {
 		msg_to_char(ch, "The sky is %s and %s.\r\n", sky_look[weather_info.sky], (weather_info.change >= 0 ? "you feel a warm wind from the south" : "your foot tells you bad weather is due"));
-		show_visible_moons(ch);
-
+	}
+	
+	// show season unless in a no-location room
+	if (!NO_LOCATION(IN_ROOM(ch))) {
 		msg_to_char(ch, "%s\r\n", seasons[GET_SEASON(IN_ROOM(ch))]);
 	}
+	
+	// show sun/daytime
+	if (IS_OUTDOORS(ch) || ROOM_BLD_FLAGGED(IN_ROOM(ch), BLD_LOOK_OUT) || RMT_FLAGGED(IN_ROOM(ch), RMT_LOOK_OUT)) {
+		switch (get_sun_status(IN_ROOM(ch))) {
+			case SUN_DARK: {
+				msg_to_char(ch, "It is nighttime.\r\n");
+				break;
+			}
+			case SUN_RISE: {
+				msg_to_char(ch, "The sun is rising.\r\n");
+				break;
+			}
+			case SUN_SET: {
+				msg_to_char(ch, "The sun is setting.\r\n");
+				break;
+			}
+			case SUN_LIGHT: {
+				msg_to_char(ch, "The sun is up.\r\n");
+				break;
+			}
+		}
+	}
+	else if (get_sun_status(IN_ROOM(ch)) == SUN_DARK) {
+		msg_to_char(ch, "It is nighttime.\r\n");
+	}
 	else {
+		msg_to_char(ch, "It is daytime.\r\n");
+	}
+	
+	// show moons
+	if (IS_OUTDOORS(ch)) {
+		show_visible_moons(ch);
+	}
+	
+	// final message if not outdoors
+	if (!IS_OUTDOORS(ch)) {
 		msg_to_char(ch, "You can't see the sky from here.\r\n");
 	}
 }
