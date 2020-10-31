@@ -1,3 +1,5 @@
+channels/*
+!channels/index
 players/*/*.plr
 players/*/*.delay
 players/accounts/*.acct
