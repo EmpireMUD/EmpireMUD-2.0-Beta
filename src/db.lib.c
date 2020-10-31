@@ -5911,9 +5911,17 @@ void parse_room(FILE *fl, room_vnum vnum) {
 					log("SYSERR: Unable to get E line for room #%d", vnum);
 					break;
 				}
+				if (sscanf(line2, "%s %s", str1, str2) != 2) {
+					if (sscanf(line2, "%s", str1) != 1) {
+						log("SYSERR: Invalid E line for room #%d", vnum);
+						break;
+					}
+					// otherwise backwards-compatible:
+					strcpy(str2, str1);
+				}
 
-				ROOM_BASE_FLAGS(room) = asciiflag_conv(line2);
-				ROOM_AFF_FLAGS(room) = ROOM_BASE_FLAGS(room);
+				ROOM_BASE_FLAGS(room) = asciiflag_conv(str1);
+				ROOM_AFF_FLAGS(room) = asciiflag_conv(str2);
 				break;
 			}
 			case 'H': {	// home_room
@@ -9745,7 +9753,7 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	
 	// E affects
 	if (dat->base_affects) {
-		fprintf(fl, "E\n%llu\n", dat->base_affects);
+		fprintf(fl, "E\n%llu %llu\n", dat->base_affects, dat->affects);
 	}
 
 	// I icon

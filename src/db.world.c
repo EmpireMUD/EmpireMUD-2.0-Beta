@@ -3887,7 +3887,7 @@ void build_world_map(void) {
 * run after sectors are loaded, and before the .wld files are read in.
 */
 void load_world_map_from_file(void) {
-	char line[256], line2[256], error_buf[MAX_STRING_LENGTH];
+	char line[256], line2[256], str1[256], str2[256], error_buf[MAX_STRING_LENGTH];
 	struct map_data *map, *last = NULL;
 	struct depletion_data *dep;
 	struct track_data *track;
@@ -3981,9 +3981,17 @@ void load_world_map_from_file(void) {
 						log("SYSERR: Unable to get E line for map tile #%d", last->vnum);
 						break;
 					}
+					if (sscanf(line2, "%s %s", str1, str2) != 2) {
+						if (sscanf(line2, "%s", str1) != 1) {
+							log("SYSERR: Invalid E line for map tile #%d", last->vnum);
+							break;
+						}
+						// otherwise backwards-compatible:
+						strcpy(str2, str1);
+					}
 
-					last->shared->base_affects = asciiflag_conv(line2);
-					last->shared->affects = last->shared->base_affects;
+					last->shared->base_affects = asciiflag_conv(str1);
+					last->shared->affects = asciiflag_conv(str2);
 					break;
 				}
 				case 'I': {	// icon

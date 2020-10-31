@@ -695,7 +695,7 @@ void index_boot_sectors(void) {
 * This loads the world array from file. This is optional.
 */
 void load_base_map(void) {
-	char line[256], line2[256], error_buf[MAX_STRING_LENGTH], *tmp;
+	char line[256], line2[256], str1[256], str2[256], error_buf[MAX_STRING_LENGTH], *tmp;
 	struct map_t *map, *last = NULL, *last_land = NULL;
 	struct room_extra_data *red;
 	int var[8], x, y, type;
@@ -773,7 +773,16 @@ void load_base_map(void) {
 						printf("ERROR: Unable to get E line for map tile #%d\n", last->vnum);
 						break;
 					}
-					last->affects = asciiflag_conv(line2);
+					if (sscanf(line2, "%s %s", str1, str2) != 2) {
+						if (sscanf(line2, "%s %s", str1, str2) != 1) {
+							printf("ERROR: Invalid E line for map tile #%d\n", last->vnum);
+							break;
+						}
+						// otherwise backwards-compatible:
+						strcpy(str2, str1);
+					}
+					// ignore str1 (base affects)
+					last->affects = asciiflag_conv(str2);
 					break;
 				}
 				
