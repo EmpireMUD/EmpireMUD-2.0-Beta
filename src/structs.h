@@ -5914,7 +5914,7 @@ struct shared_room_data {
 	// lists
 	struct depletion_data *depletion;	// resource depletion
 	struct room_extra_data *extra_data;	// hash of misc storage
-	struct track_data *tracks;	// for tracking
+	struct track_data *tracks;	// hash: for tracking
 	
 	// events
 	struct stored_event *events;	// hash table (by type) of stored events
@@ -5987,14 +5987,13 @@ struct room_extra_data {
 
 // for tracking
 struct track_data {
-	int player_id;	// player or NOTHING
-	mob_vnum mob_num;	// mob or NOTHING
+	int id;	// positive = mob vnum, negative = player idnum
 	
 	time_t timestamp;	// when
 	byte dir;	// which way (may be NO_DIR)
 	room_vnum to_room;	// for tracks that enter portals/vehicles
 	
-	struct track_data *next, *prev;	// doubly-linked list
+	UT_hash_handle hh;	// tracks are hashed by positive vnum or negative player id
 };
 
 

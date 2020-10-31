@@ -93,6 +93,7 @@ int sort_temp_portal_data(struct temp_portal_data *a, struct temp_portal_data *b
 */
 void add_tracks(char_data *ch, room_data *room, byte dir, room_data *to_room) {
 	struct track_data *track;
+	int id;
 	
 	if (!IS_IMMORTAL(ch) && !ROOM_SECT_FLAGGED(room, SECTF_FRESH_WATER | SECTF_FRESH_WATER)) {
 		if (!IS_NPC(ch) && has_player_tech(ch, PTECH_NO_TRACK_WILD) && valid_no_trace(room)) {
@@ -101,23 +102,19 @@ void add_tracks(char_data *ch, room_data *room, byte dir, room_data *to_room) {
 		else if (!IS_NPC(ch) && has_player_tech(ch, PTECH_NO_TRACK_CITY) && valid_unseen_passing(room)) {
 			gain_player_tech_exp(ch, PTECH_NO_TRACK_CITY, 5);
 		}
-		else {
-			CREATE(track, struct track_data, 1);
-		
+		else if ((id = GET_TRACK_ID(ch)) != 0) {
+			// add tracks if they have any positive/negative track id
+			HASH_FIND_INT(ROOM_TRACKS(room), &id, track);
+			if (!track) {
+				CREATE(track, struct track_data, 1);
+				track->id = id;
+				HASH_ADD_INT(ROOM_TRACKS(room), id, track);
+			}
+			
+			// update/add track info
 			track->timestamp = time(0);
 			track->dir = dir;
 			track->to_room = to_room ? GET_ROOM_VNUM(to_room) : NOWHERE;
-		
-			if (IS_NPC(ch)) {
-				track->mob_num = GET_MOB_VNUM(ch);
-				track->player_id = NOTHING;
-			}
-			else {
-				track->mob_num = NOTHING;
-				track->player_id = GET_IDNUM(ch);
-			}
-			
-			DL_PREPEND(ROOM_TRACKS(room), track);
 		}
 	}
 }

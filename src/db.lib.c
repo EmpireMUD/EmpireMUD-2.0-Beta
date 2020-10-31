@@ -6026,14 +6026,16 @@ void parse_room(FILE *fl, room_vnum vnum) {
 					}
 				}
 				
-				CREATE(track, struct track_data, 1);
-				track->player_id = t[0];
-				track->mob_num = t[1];
+				// t[0] is no longer used at all (formerly player id)
+				HASH_FIND_INT(ROOM_TRACKS(room), &t[1], track);
+				if (!track) {
+					CREATE(track, struct track_data, 1);
+					track->id = t[1];
+					HASH_ADD_INT(ROOM_TRACKS(room), id, track);
+				}
 				track->timestamp = l_in;
 				track->dir = t[2];
 				track->to_room = t[3];
-				
-				DL_APPEND(ROOM_TRACKS(room), track);
 				break;
 			}
 			
@@ -9453,7 +9455,8 @@ void free_shared_room_data(struct shared_room_data *data) {
 		free(dep);
 	}
 	free_extra_data(&data->extra_data);
-	DL_FOREACH_SAFE(data->tracks, track, next_track) {
+	HASH_ITER(hh, data->tracks, track, next_track) {
+		HASH_DEL(data->tracks, track);
 		free(track);
 	}
 	
@@ -9784,13 +9787,14 @@ void write_shared_room_data(FILE *fl, struct shared_room_data *dat) {
 	}
 	
 	// Y tracks
-	DL_FOREACH_SAFE(dat->tracks, track, next_track) {
+	HASH_ITER(hh, dat->tracks, track, next_track) {
 		if (now - track->timestamp > SECS_PER_REAL_HOUR) {
-			DL_DELETE(dat->tracks, track);
+			HASH_DEL(dat->tracks, track);
 			free(track);
 		}
 		else {
-			fprintf(fl, "Y\n%d %d %ld %d %d\n", track->player_id, track->mob_num, track->timestamp, track->dir, track->to_room);
+			// note: 1st arg is now always 0 (formerly player id)
+			fprintf(fl, "Y\n0 %d %ld %d %d\n", track->id, track->timestamp, track->dir, track->to_room);
 		}
 	}
 

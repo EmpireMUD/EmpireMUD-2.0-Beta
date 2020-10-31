@@ -4048,14 +4048,16 @@ void load_world_map_from_file(void) {
 						}
 					}
 					
-					CREATE(track, struct track_data, 1);
-					track->player_id = var[0];
-					track->mob_num = var[1];
+					// note: var[0] is no longer used (formerly player id)
+					HASH_FIND_INT(last->shared->tracks, &var[1], track);
+					if (!track) {
+						CREATE(track, struct track_data, 1);
+						track->id = var[1];
+						HASH_ADD_INT(last->shared->tracks, id, track);
+					}
 					track->timestamp = l_in;
 					track->dir = var[2];
 					track->to_room = var[3];
-					
-					DL_APPEND(last->shared->tracks, track);
 					break;
 				}
 				case 'Z': {	// extra data
@@ -4107,9 +4109,9 @@ void save_world_map_to_file(void) {
 	// only bother with ones that aren't base ocean
 	for (iter = land_map; iter; iter = iter->next) {
 		// free some junk while we're here anyway
-		DL_FOREACH_SAFE(iter->shared->tracks, track, next_track) {
+		HASH_ITER(hh, iter->shared->tracks, track, next_track) {
 			if (now - track->timestamp > tracks_lifespan * SECS_PER_REAL_MIN) {
-				DL_DELETE(iter->shared->tracks, track);
+				HASH_DEL(iter->shared->tracks, track);
 				free(track);
 			}
 		}
