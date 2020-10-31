@@ -6625,7 +6625,7 @@ void do_stat_room(char_data *ch) {
 		tinfo = get_local_time(IN_ROOM(ch));
 		latitude = Y_TO_LATITUDE(Y_COORD(IN_ROOM(ch)));
 		longitude = X_TO_LONGITUDE(X_COORD(IN_ROOM(ch)));
-		msg_to_char(ch, "Globe: [%.2f %s, %.2f %s], Time: [\tc%d%s\t0], Sun: [\tc%s\t0], Hours of sun today: [\tc%.2f\t0]\r\n", ABSOLUTE(latitude), (latitude >= 0.0 ? "N" : "S"), ABSOLUTE(longitude), (longitude >= 0.0 ? "E" : "W"), TIME_TO_12H(tinfo.hours), AM_PM(tinfo.hours), sun_types[get_sun_status(IN_ROOM(ch))], get_hours_of_sun(IN_ROOM(ch)));
+		msg_to_char(ch, "Globe: [\tc%.2f %s, %.2f %s\t0], Time: [\tc%d%s\t0], Sun: [\tc%s\t0], Hours of sun today: [\tc%.2f\t0]\r\n", ABSOLUTE(latitude), (latitude >= 0.0 ? "N" : "S"), ABSOLUTE(longitude), (longitude >= 0.0 ? "E" : "W"), TIME_TO_12H(tinfo.hours), AM_PM(tinfo.hours), sun_types[get_sun_status(IN_ROOM(ch))], get_hours_of_sun(IN_ROOM(ch)));
 		if ((zenith = get_zenith_days_from_solstice(IN_ROOM(ch))) != -1) {
 			msg_to_char(ch, "Zenith passage: [\tg%d day%s from the solstice\t0]\r\n", zenith, PLURAL(zenith));
 		}
