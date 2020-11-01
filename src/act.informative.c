@@ -429,6 +429,7 @@ void look_at_target(char_data *ch, char *arg, char *more_args) {
 	// try sky
 	if (!found && !str_cmp(arg, "sky")) {
 		do_weather(ch, "", 0, 0);
+		found = TRUE;
 	}
 	
 	/* If an object was found back in generic_find */
