@@ -1875,7 +1875,7 @@ void init_config_system(void) {
 	init_config(CONFIG_PLAYERS, "dailies_per_day", CONFTYPE_INT, "how many daily quests a player can complete each day");
 	init_config(CONFIG_PLAYERS, "default_class_abbrev", CONFTYPE_SHORT_STRING, "abbreviation to show for unclassed players");
 	init_config(CONFIG_PLAYERS, "default_class_name", CONFTYPE_SHORT_STRING, "name to show for unclassed players");
-	init_config(CONFIG_PLAYERS, "delete_abandoned_players_after", CONFTYPE_INT, "days until deleting an account with only low-level characters and very low playtime (0 = never)");
+	init_config(CONFIG_PLAYERS, "delete_abandoned_players_after", CONFTYPE_INT, "days until deleting an account with only characters below 100 and very low playtime (0 = never)");
 	init_config(CONFIG_PLAYERS, "delete_inactive_players_after", CONFTYPE_INT, "days an account can be inactive before auto-delete (0 = never)");
 	init_config(CONFIG_PLAYERS, "delete_invalid_players_after", CONFTYPE_INT, "days to wait before deleting accounts with no level or who never logged in (0 = never)");
 	init_config(CONFIG_PLAYERS, "exp_level_difference", CONFTYPE_INT, "levels a player can have above a mob and still gain exp from it");
