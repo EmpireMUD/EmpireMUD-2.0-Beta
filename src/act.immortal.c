@@ -9110,11 +9110,17 @@ ACMD(do_playerdelete) {
 			}
 		}
 		
-		// actual delete (remove items first)
-		extract_all_items(victim);
-		delete_player_character(victim);
-		extract_char(victim);
-		victim = NULL;	// prevent cleanup
+		if (file) {
+			// offline delete (will be freed at the end)
+			delete_player_character(victim);
+		}
+		else {
+			// in-game delete (remove items first, and extract)
+			extract_all_items(victim);
+			delete_player_character(victim);
+			extract_char(victim);
+			victim = NULL;	// prevent cleanup
+		}
 	}
 	
 	// cleanup
