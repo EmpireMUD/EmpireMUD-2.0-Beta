@@ -1022,9 +1022,6 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 			if (BUILDING_RESOURCES(room)) {
 				// copy this to display the next 1
 				temp_res = *BUILDING_RESOURCES(room);
-				if (temp_res.type == RES_OBJECT || temp_res.type == RES_COMPONENT) {
-					temp_res.amount = 1;	// just show next 1
-				}
 				temp_res.next = NULL;
 				show_resource_list(&temp_res, buf);
 				msg_to_char(ch, "You don't have %s and stop working.\r\n", buf);
