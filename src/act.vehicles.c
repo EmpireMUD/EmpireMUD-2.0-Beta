@@ -314,14 +314,12 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	}
 	
 	was_in = IN_ROOM(veh);
-	adjust_vehicle_tech(veh, FALSE);
+	vehicle_from_room(veh);
 	vehicle_to_room(veh, to_room);
-	adjust_vehicle_tech(veh, TRUE);
 	
 	if (!entry_vtrigger(veh)) {
-		adjust_vehicle_tech(veh, FALSE);
+		vehicle_from_room(veh);
 		vehicle_to_room(veh, was_in);
-		adjust_vehicle_tech(veh, TRUE);
 		return FALSE;
 	}
 	
@@ -1534,9 +1532,8 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 			act("$V is dragged into $p.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), portal, veh, TO_CHAR | TO_ROOM);
 		}
 		
-		adjust_vehicle_tech(veh, FALSE);
+		vehicle_from_room(veh);
 		vehicle_to_room(veh, IN_ROOM(ch));
-		adjust_vehicle_tech(veh, TRUE);
 		
 		act("$V is dragged in with you.", FALSE, ch, NULL, veh, TO_CHAR);
 		act("$V is dragged in with $m.", FALSE, ch, NULL, veh, TO_ROOM);
@@ -1630,9 +1627,8 @@ ACMD(do_drag) {
 			act("$V is dragged along.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
 		
-		adjust_vehicle_tech(veh, FALSE);
+		vehicle_from_room(veh);
 		vehicle_to_room(veh, IN_ROOM(ch));
-		adjust_vehicle_tech(veh, TRUE);
 		
 		act("$V is dragged along with you.", FALSE, ch, NULL, veh, TO_CHAR);
 		act("$V is dragged along with $m.", FALSE, ch, NULL, veh, TO_ROOM);
@@ -1679,9 +1675,8 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 			act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), portal, veh, TO_CHAR | TO_ROOM);
 		}
 		
-		adjust_vehicle_tech(veh, FALSE);
+		vehicle_from_room(veh);
 		vehicle_to_room(veh, to_room);
-		adjust_vehicle_tech(veh, TRUE);
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			snprintf(buf, sizeof(buf), "$V %s out of $p.", mob_move_types[VEH_MOVE_TYPE(veh)]);

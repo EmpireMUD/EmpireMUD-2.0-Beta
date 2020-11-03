@@ -3216,9 +3216,8 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
 	}
 	
-	adjust_vehicle_tech(boat, FALSE);
+	vehicle_from_room(boat);
 	vehicle_to_room(boat, to_room);
-	adjust_vehicle_tech(boat, TRUE);
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
@@ -3356,9 +3355,8 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
 	}
 	
-	adjust_vehicle_tech(boat, FALSE);
+	vehicle_from_room(boat);
 	vehicle_to_room(boat, get_ship_pen());
-	adjust_vehicle_tech(boat, TRUE);
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);

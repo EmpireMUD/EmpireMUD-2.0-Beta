@@ -2784,11 +2784,6 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 			die(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh));
 		}
 		
-		if (VEH_OWNER(veh)) {
-			// do this before removing it from room
-			adjust_vehicle_tech(veh, FALSE);
-		}
-		
 		vehicle_from_room(veh);	// remove from room first to destroy anything inside
 		fully_empty_vehicle(veh, NULL);
 		

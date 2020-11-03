@@ -832,10 +832,8 @@ VCMD(do_vteleport) {
 			}
 		}
 		else if ((v = get_vehicle_near_vehicle(veh, arg1))) {
-			adjust_vehicle_tech(v, FALSE);
 			vehicle_from_room(v);
 			vehicle_to_room(v, target);
-			adjust_vehicle_tech(v, TRUE);
 			entry_vtrigger(v);
 		}
 		else if ((obj = get_obj_by_vehicle(veh, arg1))) {

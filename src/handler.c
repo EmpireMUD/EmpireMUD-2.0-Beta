@@ -2956,11 +2956,11 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 		if (VEH_INTERIOR_HOME_ROOM(veh)) {
 			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
 		}
-	
+		
+		adjust_vehicle_tech(veh, FALSE);
 		if (VEH_IS_COMPLETE(veh) && emp) {
 			qt_empire_players_vehicle(emp, qt_lose_vehicle, veh);
 			et_lose_vehicle(emp, veh);
-			adjust_vehicle_tech(veh, FALSE);
 		}
 		
 		if (emp) {
@@ -3063,11 +3063,11 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 			}
 			claim_room(VEH_INTERIOR_HOME_ROOM(veh), emp);
 		}
-	
+		
+		adjust_vehicle_tech(veh, TRUE);
 		if (VEH_IS_COMPLETE(veh)) {
 			qt_empire_players_vehicle(emp, qt_gain_vehicle, veh);
 			et_gain_vehicle(emp, veh);
-			adjust_vehicle_tech(veh, TRUE);
 		}
 		
 		add_dropped_item_list(emp, VEH_CONTAINS(veh));
@@ -9912,10 +9912,6 @@ void extract_vehicle(vehicle_data *veh) {
 		check_dg_owner_purged_vehicle(veh);
 		SET_BIT(VEH_FLAGS(veh), VEH_EXTRACTED);
 		++veh_extractions_pending;
-		
-		if (VEH_OWNER(veh) && IN_ROOM(veh)) {
-			adjust_vehicle_tech(veh, FALSE);
-		}
 	}
 }
 
@@ -9937,6 +9933,13 @@ void extract_vehicle_final(vehicle_data *veh) {
 	
 	// delete interior
 	delete_vehicle_interior(veh);
+	
+	// ownership stuff
+	adjust_vehicle_tech(veh, FALSE);
+	if (VEH_IS_COMPLETE(veh) && VEH_OWNER(veh)) {
+		qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
+		et_lose_vehicle(VEH_OWNER(veh), veh);
+	}
 	
 	if (VEH_LED_BY(veh)) {
 		GET_LEADING_VEHICLE(VEH_LED_BY(veh)) = NULL;
@@ -10059,6 +10062,9 @@ void vehicle_from_room(vehicle_data *veh) {
 		return;
 	}
 	
+	// yank empire tech (which may be island-based)
+	adjust_vehicle_tech(veh, FALSE);
+	
 	// check lights
 	if (VEH_PROVIDES_LIGHT(veh)) {
 		--ROOM_LIGHTS(was_in);
@@ -10098,6 +10104,9 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	if (VEH_PROVIDES_LIGHT(veh)) {
 		++ROOM_LIGHTS(room);
 	}
+	
+	// apply empire tech (which may be island-based)
+	adjust_vehicle_tech(veh, TRUE);
 }
 
 

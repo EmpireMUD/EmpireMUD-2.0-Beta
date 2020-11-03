@@ -1171,10 +1171,8 @@ void empty_instance_vehicle(struct instance_data *inst, vehicle_data *veh, room_
 			}
 			else {
 				// not attached -- move it
-				adjust_vehicle_tech(inner, FALSE);
 				vehicle_from_room(inner);
 				vehicle_to_room(inner, to_room);
-				adjust_vehicle_tech(inner, TRUE);
 				
 				// don't announce
 				/*
