@@ -2244,7 +2244,7 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 	if (veh) {
 		emp = VEH_OWNER(veh);
 		room = IN_ROOM(veh);
-		island = GET_ISLAND_ID(room);
+		island = room ? GET_ISLAND_ID(room) : NO_ISLAND;
 	}
 	
 	// only care about
