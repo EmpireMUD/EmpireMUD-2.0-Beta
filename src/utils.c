@@ -6007,13 +6007,14 @@ void relocate_players(room_data *room, room_data *to_room) {
 * @return bool TRUE if the room is light, FALSE if not.
 */
 bool room_is_light(room_data *room, bool count_adjacent_light) {
-	vehicle_data *veh;
-	
 	if (MAGIC_DARKNESS(room)) {
 		return FALSE;	// always dark
 	}
 	
 	// things that make the room light
+	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT)) {
+		return TRUE;	// not dark: has a light source
+	}
 	if (IS_ANY_BUILDING(room) && (ROOM_OWNER(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE))) {
 		return TRUE;	// not dark: claimed (or unclaimable) building
 	}
@@ -6023,15 +6024,8 @@ bool room_is_light(room_data *room, bool count_adjacent_light) {
 	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS) && get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, NULL) != TER_FRONTIER) {
 		return TRUE;	// not dark: city lights
 	}
-	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT) || (count_adjacent_light && adjacent_room_is_light(room))) {
-		return TRUE;	// not dark: has a light source
-	}
-	
-	// check for lighted vehicle-type buildings
-	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_OWNER(veh) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) && VEH_IS_COMPLETE(veh)) {
-			return TRUE;
-		}
+	if (count_adjacent_light && adjacent_room_is_light(room)) {
+		return TRUE;	// not dark: adjacent room is light
 	}
 	
 	// otherwise: it's dark

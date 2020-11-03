@@ -3300,7 +3300,7 @@ void init_room(room_data *room, room_vnum vnum) {
 	perform_change_base_sect(room, NULL, inside);
 	
 	COMPLEX_DATA(room) = init_complex_data();	// no type at this point
-	room->light = 0;
+	ROOM_LIGHTS(room) = 0;
 		
 	room->af = NULL;
 	

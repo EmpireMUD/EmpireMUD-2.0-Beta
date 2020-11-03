@@ -4684,7 +4684,8 @@ ACMD(do_enroll) {
 			// vehicles
 			DL_FOREACH_SAFE(vehicle_list, veh, next_veh) {
 				if (VEH_OWNER(veh) == old) {
-					VEH_OWNER(veh) = e;
+					perform_abandon_vehicle(veh);
+					perform_claim_vehicle(veh, e);
 				}
 				LL_FOREACH(VEH_ANIMALS(veh), vam) {
 					if (vam->empire == EMPIRE_VNUM(old)) {

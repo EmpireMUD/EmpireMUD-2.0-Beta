@@ -371,6 +371,7 @@ void set_depletion(room_data *room, int type, int value);
 void attach_building_to_room(bld_data *bld, room_data *room, bool with_triggers);
 void attach_template_to_room(room_template *rmt, room_data *room);
 void detach_building_from_room(room_data *room);
+void reset_light_count(room_data *room);
 
 // room extra data handlers
 void add_to_extra_data(struct room_extra_data **list, int type, int add_value);

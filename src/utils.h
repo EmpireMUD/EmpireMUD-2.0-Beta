@@ -310,6 +310,7 @@
 #define GET_EQ(ch, i)  ((ch)->equipment[i])
 #define GET_REAL_AGE(ch)  (age(ch)->year)
 #define IN_ROOM(ch)  ((ch)->in_room)
+#define GET_LIGHTS(ch)  ((ch)->lights)
 #define GET_LOYALTY(ch)  ((ch)->loyalty)
 
 // ch->aff_attributes, ch->real_attributes:
@@ -1611,6 +1612,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define VEH_OR_BLD(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) ? "building" : "vehicle")
 #define VEH_PAINT_COLOR(veh)  get_vehicle_extra_data((veh), ROOM_EXTRA_PAINT_COLOR)
 #define VEH_PATRON(veh)  get_vehicle_extra_data((veh), ROOM_EXTRA_DEDICATE_ID)
+#define VEH_PROVIDES_LIGHT(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && (VEH_OWNER(veh) || (IN_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_UNCLAIMABLE))))
 
 
  //////////////////////////////////////////////////////////////////////////////

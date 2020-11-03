@@ -6618,7 +6618,7 @@ void do_stat_room(char_data *ch) {
 	}
 	msg_to_char(ch, "\r\n");
 	
-	msg_to_char(ch, "VNum: [\tg%d\t0], Island: [\tg%d\t0] %s, Height [\tg%d\t0]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)));
+	msg_to_char(ch, "VNum: [\tg%d\t0], Lights: [\tg%d\tg], Island: [\tg%d\t0] %s, Height [\tg%d\t0]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), ROOM_LIGHTS(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)));
 	
 	// location/time data
 	if (X_COORD(IN_ROOM(ch)) != -1) {

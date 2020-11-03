@@ -869,6 +869,7 @@ void affect_total(char_data *ch) {
 * @param room_data *room The room to check.
 */
 void affect_total_room(room_data *room) {
+	bool was_unclaimable = IS_SET(ROOM_AFF_FLAGS(room), ROOM_AFF_UNCLAIMABLE) ? TRUE : FALSE;
 	struct affected_type *af;
 	vehicle_data *veh;
 	
@@ -895,6 +896,11 @@ void affect_total_room(room_data *room) {
 	// flags from template
 	if (GET_ROOM_TEMPLATE(room)) {
 		SET_BIT(ROOM_AFF_FLAGS(room), GET_RMT_BASE_AFFECTS(GET_ROOM_TEMPLATE(room)));
+	}
+	
+	// if unclaimable changed, update room lights
+	if (was_unclaimable != (IS_SET(ROOM_AFF_FLAGS(room), ROOM_AFF_UNCLAIMABLE) ? TRUE : FALSE)) {
+		reset_light_count(room);
 	}
 }
 
@@ -1511,9 +1517,6 @@ void perform_idle_out(char_data *ch) {
 * @param char_data *ch The character to remove
 */
 void char_from_room(char_data *ch) {
-	obj_data *obj;
-	int pos;
-
 	if (ch == NULL || !IN_ROOM(ch)) {
 		log("SYSERR: NULL character or no location in %s, char_from_room", __FILE__);
 		exit(1);
@@ -1524,16 +1527,7 @@ void char_from_room(char_data *ch) {
 	}
 
 	// update lights
-	for (pos = 0; pos < NUM_WEARS; pos++) {
-		if (GET_EQ(ch, pos) && OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_LIGHT)) {
-			ROOM_LIGHTS(IN_ROOM(ch))--;
-		}
-	}
-	DL_FOREACH2(ch->carrying, obj, next_content) {
-		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
-			ROOM_LIGHTS(IN_ROOM(ch))--;
-		}
-	}
+	ROOM_LIGHTS(IN_ROOM(ch)) -= GET_LIGHTS(ch);
     
     DL_DELETE2(ROOM_PEOPLE(IN_ROOM(ch)), ch, prev_in_room, next_in_room);
 	IN_ROOM(ch) = NULL;
@@ -1549,8 +1543,6 @@ void char_from_room(char_data *ch) {
 * @param room_data *room The place to put 'em
 */
 void char_to_room(char_data *ch, room_data *room) {
-	int pos;
-	obj_data *obj;
 	struct instance_data *inst = NULL;
 
 	if (!ch || !room) {
@@ -1571,16 +1563,7 @@ void char_to_room(char_data *ch, room_data *room) {
 		IN_ROOM(ch) = room;
 
 		// update lights
-		for (pos = 0; pos < NUM_WEARS; pos++) {
-			if (GET_EQ(ch, pos) && OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_LIGHT)) {
-				ROOM_LIGHTS(room)++;
-			}
-		}
-		DL_FOREACH2(ch->carrying, obj, next_content) {
-			if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
-				ROOM_LIGHTS(room)++;
-			}
-		}
+		ROOM_LIGHTS(room) += GET_LIGHTS(ch);
 		
 		if (!IS_NPC(ch) && !IS_IMMORTAL(ch)) {
 			check_island_levels(room, (int) GET_COMPUTED_LEVEL(ch));
@@ -2965,6 +2948,7 @@ void perform_abandon_room(room_data *room) {
 void perform_abandon_vehicle(vehicle_data *veh) {
 	if (veh) {
 		empire_data *emp = VEH_OWNER(veh);
+		bool provided_light = VEH_PROVIDES_LIGHT(veh);
 		
 		VEH_OWNER(veh) = NULL;
 		REMOVE_BIT(VEH_FLAGS(veh), VEH_PLAYER_NO_WORK | VEH_PLAYER_NO_DISMANTLE);
@@ -2981,6 +2965,16 @@ void perform_abandon_vehicle(vehicle_data *veh) {
 		
 		if (emp) {
 			remove_dropped_item_list(emp, VEH_CONTAINS(veh));
+		}
+		
+		// check if light changed
+		if (IN_ROOM(veh)) {
+			if (!VEH_PROVIDES_LIGHT(veh) && provided_light) {
+				--ROOM_LIGHTS(IN_ROOM(veh));
+			}
+			else if (VEH_PROVIDES_LIGHT(veh) && !provided_light) {
+				++ROOM_LIGHTS(IN_ROOM(veh));
+			}
 		}
 	}
 }
@@ -3050,9 +3044,14 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 * @param empire_data *emp The empire claiming it.
 */
 void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
+	bool provided_light;
+	
 	if (VEH_OWNER(veh)) {
 		perform_abandon_vehicle(veh);
 	}
+	
+	// check current lights AFTER abandoning
+	provided_light = VEH_PROVIDES_LIGHT(veh);
 	
 	if (emp) {
 		VEH_OWNER(veh) = emp;
@@ -3072,6 +3071,16 @@ void perform_claim_vehicle(vehicle_data *veh, empire_data *emp) {
 		}
 		
 		add_dropped_item_list(emp, VEH_CONTAINS(veh));
+		
+		// check if light changed
+		if (IN_ROOM(veh)) {
+			if (VEH_PROVIDES_LIGHT(veh) && !provided_light) {
+				++ROOM_LIGHTS(IN_ROOM(veh));
+			}
+			else if (!VEH_PROVIDES_LIGHT(veh) && provided_light) {
+				--ROOM_LIGHTS(IN_ROOM(veh));
+			}
+		}
 	}
 }
 
@@ -6226,8 +6235,11 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 		obj->worn_on = pos;
 
 		// lights?
-		if (IN_ROOM(ch) && OBJ_FLAGGED(obj, OBJ_LIGHT)) {
-			ROOM_LIGHTS(IN_ROOM(ch))++;
+		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+			++GET_LIGHTS(ch);
+			if (IN_ROOM(ch)) {
+				++ROOM_LIGHTS(IN_ROOM(ch));
+			}
 		}
 		
 		if (IS_CONTAINER(obj)) {
@@ -6268,8 +6280,11 @@ void obj_from_char(obj_data *object) {
 		IS_CARRYING_N(object->carried_by) -= obj_carry_size(object);
 
 		// check lights
-		if (IN_ROOM(object->carried_by) && OBJ_FLAGGED(object, OBJ_LIGHT)) {
-			ROOM_LIGHTS(IN_ROOM(object->carried_by))--;
+		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
+			--GET_LIGHTS(object->carried_by);
+			if (IN_ROOM(object->carried_by)) {
+				--ROOM_LIGHTS(IN_ROOM(object->carried_by));
+			}
 		}
 		
 		qt_drop_obj(object->carried_by, object);
@@ -6322,7 +6337,7 @@ void obj_from_room(obj_data *object) {
 	else {
 		// update lights
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
-			ROOM_LIGHTS(IN_ROOM(object))--;
+			--ROOM_LIGHTS(IN_ROOM(object));
 		}
 		if (ROOM_OWNER(IN_ROOM(object))) {
 			remove_dropped_item(ROOM_OWNER(IN_ROOM(object)), object);
@@ -6412,10 +6427,15 @@ void obj_to_char(obj_data *object, char_data *ch) {
 				object->last_empire_id = GET_LOYALTY(ch) ? EMPIRE_VNUM(GET_LOYALTY(ch)) : NOTHING;
 			}
 		}
-
-		// check if the room needs to be lit
-		if (IN_ROOM(ch) && OBJ_FLAGGED(object, OBJ_LIGHT)) {
-			ROOM_LIGHTS(IN_ROOM(ch))++;
+		
+		// update lights
+		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
+			++GET_LIGHTS(ch);
+			
+			// check if the room needs to be lit
+			if (IN_ROOM(ch)) {
+				ROOM_LIGHTS(IN_ROOM(ch))++;
+			}
 		}
 		
 		qt_get_obj(ch, object);
@@ -6561,7 +6581,7 @@ void obj_to_room(obj_data *object, room_data *room) {
 		
 		// check light
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
-			ROOM_LIGHTS(IN_ROOM(object))++;
+			++ROOM_LIGHTS(IN_ROOM(object));
 		}
 		
 		// clear these now
@@ -6670,8 +6690,11 @@ obj_data *unequip_char(char_data *ch, int pos) {
 		obj->worn_on = NO_WEAR;
 
 		// adjust lights
-		if (IN_ROOM(ch) && OBJ_FLAGGED(obj, OBJ_LIGHT)) {
-			ROOM_LIGHTS(IN_ROOM(ch))--;
+		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+			--GET_LIGHTS(ch);
+			if (IN_ROOM(ch)) {
+				--ROOM_LIGHTS(IN_ROOM(ch));
+			}
 		}
 		
 		if (IS_CONTAINER(obj)) {
@@ -8521,6 +8544,54 @@ void detach_building_from_room(room_data *room) {
 }
 
 
+/**
+* Recounts and sets the number of lights in a room: ROOM_LIGHTS(room)
+*
+* @param room_data *room The room to check for lights again.
+*/
+void reset_light_count(room_data *room) {
+	vehicle_data *veh;
+	obj_data *obj;
+	char_data *ch;
+	int pos;
+	
+	ROOM_LIGHTS(room) = 0;
+	
+	// building
+	if (IS_ANY_BUILDING(room) && (ROOM_OWNER(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE))) {
+		++ROOM_LIGHTS(room);
+	}
+	
+	// lighted vehicle-type buildings
+	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
+		if (VEH_PROVIDES_LIGHT(veh)) {
+			++ROOM_LIGHTS(room);
+		}
+	}
+	
+	// people
+	DL_FOREACH2(ROOM_PEOPLE(room), ch, next_in_room) {
+		for (pos = 0; pos < NUM_WEARS; ++pos) {
+			if (GET_EQ(ch, pos) && OBJ_FLAGGED(GET_EQ(ch, pos), OBJ_LIGHT)) {
+				++ROOM_LIGHTS(room);
+			}
+		}
+		DL_FOREACH2(ch->carrying, obj, next_content) {
+			if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+				++ROOM_LIGHTS(room);
+			}
+		}
+	}
+	
+	// objects
+	DL_FOREACH2(ROOM_CONTENTS(room), obj, next_content) {
+		if (OBJ_FLAGGED(obj, OBJ_LIGHT)) {
+			++ROOM_LIGHTS(room);
+		}
+	}
+}
+
+
  //////////////////////////////////////////////////////////////////////////////
 //// ROOM EXTRA HANDLERS /////////////////////////////////////////////////////
 
@@ -9988,6 +10059,11 @@ void vehicle_from_room(vehicle_data *veh) {
 		return;
 	}
 	
+	// check lights
+	if (VEH_PROVIDES_LIGHT(veh)) {
+		--ROOM_LIGHTS(was_in);
+	}
+	
 	DL_DELETE2(ROOM_VEHICLES(was_in), veh, prev_in_room, next_in_room);
 	veh->next_in_room = veh->prev_in_room = NULL;
 	IN_ROOM(veh) = NULL;
@@ -10017,6 +10093,11 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	VEH_LAST_MOVE_TIME(veh) = time(0);
 	update_vehicle_island_and_loc(veh, room);
 	affect_total_room(room);
+	
+	// check lights
+	if (VEH_PROVIDES_LIGHT(veh)) {
+		++ROOM_LIGHTS(room);
+	}
 }
 
 

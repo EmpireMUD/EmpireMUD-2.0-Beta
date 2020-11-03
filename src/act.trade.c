@@ -1716,10 +1716,10 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 			}
 			
 			// and set the owner to the room owner
-			VEH_OWNER(veh) = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));
+			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
 		}
 		else {
-			VEH_OWNER(veh) = GET_LOYALTY(ch);
+			perform_claim_vehicle(veh, GET_LOYALTY(ch));
 		}
 	}
 	VEH_HEALTH(veh) = MAX(1, VEH_MAX_HEALTH(veh) * 0.2);	// start at 20% health, will heal on completion

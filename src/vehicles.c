@@ -73,16 +73,7 @@ void abandon_lost_vehicles(void) {
 		}
 		
 		// found!
-		VEH_OWNER(veh) = NULL;
-		
-		if (VEH_INTERIOR_HOME_ROOM(veh)) {
-			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
-		}
-		
-		if (VEH_IS_COMPLETE(veh)) {
-			qt_empire_players_vehicle(emp, qt_lose_vehicle, veh);
-			et_lose_vehicle(emp, veh);
-		}
+		perform_abandon_vehicle(veh);
 	}
 }
 
@@ -2269,7 +2260,8 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 			case 'O': {
 				if (OBJ_FILE_TAG(line, "Owner:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
-						VEH_OWNER(veh) = real_empire(i_in[0]);
+						// VEH_OWNER(veh) = real_empire(i_in[0]);
+						perform_claim_vehicle(veh, real_empire(i_in[0]));
 					}
 				}
 				break;

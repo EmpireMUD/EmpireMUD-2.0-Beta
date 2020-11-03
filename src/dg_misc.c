@@ -405,7 +405,6 @@ void do_dg_own(empire_data *emp, char_data *vict, obj_data *obj, room_data *room
 		if ((owner = VEH_OWNER(veh)) && emp != owner) {
 			perform_abandon_vehicle(veh);
 		}
-		VEH_OWNER(veh) = emp;
 		if (emp) {
 			perform_claim_vehicle(veh, emp);
 		}
