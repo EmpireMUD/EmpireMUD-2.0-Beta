@@ -45,6 +45,9 @@ extern bool gain_cond_message;
 ACMD(do_dismount);
 ACMD(do_respawn);
 
+// local vars
+int point_update_cycle = 0;	// helps spread out point updates
+
 
  //////////////////////////////////////////////////////////////////////////////
 //// CHARACTER LIMITS ////////////////////////////////////////////////////////
@@ -197,17 +200,20 @@ void check_idle_passwords(void) {
 * This checks if a character is too idle and disconnects or times them out.
 *
 * @param char_data *ch The person to check.
+* @return bool TRUE if the player is still in-game, FALSE if they idled out.
 */
-void check_idling(char_data *ch) {
+bool check_idling(char_data *ch) {
 	if (IS_NPC(ch)) {
-		return;
+		return TRUE;
 	}
 
 	ch->char_specials.timer++;
 
 	if ((ch->desc && ch->char_specials.timer > config_get_int("idle_rent_time")) || (!ch->desc && ch->char_specials.timer > config_get_int("idle_linkdead_rent_time"))) {
-		perform_idle_out(ch);
+		return perform_idle_out(ch);
 	}
+	
+	return TRUE;
 }
 
 
@@ -393,6 +399,19 @@ void point_update_char(char_data *ch) {
 	bool found;
 	int count;
 	
+	// remove stale offers -- this needs to happen even if dead (resurrect)
+	if (!IS_NPC(ch)) {
+		clean_offers(ch);
+		if (!check_idling(ch)) {
+			return;
+		}
+	}
+	
+	// everything beyond here only matters if still alive
+	if (IS_DEAD(ch)) {
+		return;
+	}
+	
 	if (IS_NPC(ch) && FIGHTING(ch)) {
 		check_pointless_fight(ch);
 	}
@@ -548,11 +567,6 @@ void point_update_char(char_data *ch) {
 			}
 		}
 	}
-
-	// these must go last
-	if (!IS_NPC(ch)) {
-		check_idling(ch);
-	}
 }
 
 
@@ -574,27 +588,21 @@ void real_update_char(char_data *ch) {
 	ability_data *abil;
 	bool found, took_dot, msg, any;
 	
+	// put stuff that happens when dead here
+	
+	// everything beyond here only matters if still alive
+	if (IS_DEAD(ch)) {
+		return;
+	}
+	
 	// check for end of meters (in case it was missed in the fight code)
 	if (!FIGHTING(ch)) {
 		check_combat_end(ch);
 	}
 	
 	// first check location: this may move the player
-	if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE)) || INST_ID(inst) != GET_ADVENTURE_SUMMON_INSTANCE_ID(ch))) {
+	if (PLR_FLAGGED(ch, PLR_ADVENTURE_SUMMONED) && (!(inst = find_instance_by_room(IN_ROOM(ch), FALSE, FALSE)) || INST_ID(inst) != GET_ADVENTURE_SUMMON_INSTANCE_ID(ch))) {
 		adventure_unsummon(ch);
-	}
-	
-	if (!IS_NPC(ch) && IS_MORPHED(ch)) {
-		check_morph_ability(ch);
-	}
-	
-	if (!IS_NPC(ch) && IS_RIDING(ch)) {
-		check_should_dismount(ch);
-	}
-	
-	// record maximum global inventory size, for script safety
-	if (!IS_NPC(ch) && CAN_CARRY_N(ch) > max_inventory_size) {
-		max_inventory_size = CAN_CARRY_N(ch);
 	}
 	
 	if (GET_LEADING_VEHICLE(ch) && IN_ROOM(ch) != IN_ROOM(GET_LEADING_VEHICLE(ch))) {
@@ -702,205 +710,222 @@ void real_update_char(char_data *ch) {
 			return;
 		}
 	}
-
-	// nothing else pertains to NPCs	
-	if (IS_NPC(ch)) {
-		return;
-	}
 	
-	// update recent level data if level has gone up or it's been too long since we've seen a higher level
-	if (!IS_IMMORTAL(ch) && GET_COMPUTED_LEVEL(ch) > GET_HIGHEST_KNOWN_LEVEL(ch)) {
-		if ((int) (GET_COMPUTED_LEVEL(ch) / 100) > (int) (GET_HIGHEST_KNOWN_LEVEL(ch) / 100)) {
-			// first time over a new 100?
-			log_to_slash_channel_by_name(PLAYER_LOG_CHANNEL, ch, "%s has reached level %d!", PERS(ch, ch, TRUE), (int)(GET_COMPUTED_LEVEL(ch) / 100) * 100);
+	// players only
+	if (!IS_NPC(ch)) {
+		if (IS_MORPHED(ch)) {
+			check_morph_ability(ch);
+		}
+		if (IS_RIDING(ch)) {
+			check_should_dismount(ch);
+		}
+		if (CAN_CARRY_N(ch) > max_inventory_size) {
+			// record maximum global inventory size, for script safety
+			max_inventory_size = CAN_CARRY_N(ch);
 		}
 		
-		GET_HIGHEST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
-	}
-	// update the last-known-level
-	GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
-	
-	// very drunk? more confused!
-	if (GET_COND(ch, DRUNK) > 350) {
-		GET_CONFUSED_DIR(ch) = number(0, NUM_SIMPLE_DIRS-1);
-	}
-	
-	if (GET_EQ(ch, WEAR_SADDLE) && !IS_RIDING(ch)) {
-		perform_remove(ch, WEAR_SADDLE);
-	}
-	
-	if (GET_BLOOD(ch) > GET_MAX_BLOOD(ch)) {
-		GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
-	}
-
-	// periodic exp and skill gain
-	if (GET_DAILY_CYCLE(ch) < data_get_long(DATA_DAILY_CYCLE)) {
-		// other stuff that resets daily
-		gain = compute_bonus_exp_per_day(ch);
-		if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
-			GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
-		}
-		GET_DAILY_QUESTS(ch) = 0;
+		// update recent level data if level has gone up or it's been too long since we've seen a higher level
+		if (!IS_IMMORTAL(ch) && GET_COMPUTED_LEVEL(ch) > GET_HIGHEST_KNOWN_LEVEL(ch)) {
+			if ((int) (GET_COMPUTED_LEVEL(ch) / 100) > (int) (GET_HIGHEST_KNOWN_LEVEL(ch) / 100)) {
+				// first time over a new 100?
+				log_to_slash_channel_by_name(PLAYER_LOG_CHANNEL, ch, "%s has reached level %d!", PERS(ch, ch, TRUE), (int)(GET_COMPUTED_LEVEL(ch) / 100) * 100);
+			}
 		
-		msg_to_char(ch, "&yYour daily quests and bonus experience have reset!&0\r\n");
-		
-		if (fail_daily_quests(ch)) {
-			msg_to_char(ch, "Your daily quests expire.\r\n");
+			GET_HIGHEST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
 		}
-		
-		// update to this cycle so it only happens once a day
-		GET_DAILY_CYCLE(ch) = data_get_long(DATA_DAILY_CYCLE);
-	}
+		// update the last-known-level
+		GET_LAST_KNOWN_LEVEL(ch) = GET_COMPUTED_LEVEL(ch);
+	
+		// very drunk? more confused!
+		if (GET_COND(ch, DRUNK) > 350) {
+			GET_CONFUSED_DIR(ch) = number(0, NUM_SIMPLE_DIRS-1);
+		}
+	
+		if (GET_EQ(ch, WEAR_SADDLE) && !IS_RIDING(ch)) {
+			perform_remove(ch, WEAR_SADDLE);
+		}
+	
+		if (GET_BLOOD(ch) > GET_MAX_BLOOD(ch)) {
+			GET_BLOOD(ch) = GET_MAX_BLOOD(ch);
+		}
 
-	/* Update conditions */
-	if (has_player_tech(ch, PTECH_NO_HUNGER)) {			
-		gain_condition(ch, FULL, -1);
-	}
-	else {
-		if (!number(0, 1)) {
-			gain_condition(ch, FULL, 1);
+		// periodic exp and skill gain
+		if (GET_DAILY_CYCLE(ch) < data_get_long(DATA_DAILY_CYCLE)) {
+			// other stuff that resets daily
+			gain = compute_bonus_exp_per_day(ch);
+			if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
+				GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
+			}
+			GET_DAILY_QUESTS(ch) = 0;
+		
+			msg_to_char(ch, "&yYour daily quests and bonus experience have reset!&0\r\n");
+		
+			if (fail_daily_quests(ch)) {
+				msg_to_char(ch, "Your daily quests expire.\r\n");
+			}
+		
+			// update to this cycle so it only happens once a day
+			GET_DAILY_CYCLE(ch) = data_get_long(DATA_DAILY_CYCLE);
 		}
-	}
-	
-	run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_FREQUENT);
-	
-	// more thirsty?
-	if (has_player_tech(ch, PTECH_NO_THIRST)) {
-		gain_condition(ch, THIRST, -1);
-	}
-	else {
-		if (!number(0, 1)) {
-			gain_condition(ch, THIRST, 1);
-		}
-	}
-	
-	// less drunk
-	gain_condition(ch, DRUNK, AWAKE(ch) ? -1 : -6);
-	
-	// ensure character isn't under on primary attributes
-	check_attribute_gear(ch);
-	
-	// ensure character isn't using any gear they shouldn't be
-	found = FALSE;
-	for (iter = 0; iter < NUM_WEARS; ++iter) {
-		if (wear_data[iter].count_stats && GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
-			// can_wear_item sends own message to ch
-			act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
-			// this may extract it
-			unequip_char_to_inventory(ch, iter);
-			found = TRUE;
-		}
-	}
-	if (found) {
-		determine_gear_level(ch);
-	}
 
-	/* moving on.. */
-	if (GET_POS(ch) < POS_STUNNED || (GET_POS(ch) == POS_STUNNED && health_gain(ch, TRUE) <= 0)) {
-		GET_HEALTH(ch) = MIN(0, GET_HEALTH(ch));	// fixing? a bug where a player whose health is positve but is in a bleeding out position, would not bleed out right away (but couldn't recover)
-		GET_HEALTH(ch) -= 1;
-		update_pos(ch);
-		if (GET_POS(ch) == POS_DEAD) {
-			msg_to_char(ch, "You die from your wounds!\r\n");
-			act("$n falls down, dead.", FALSE, ch, 0, 0, TO_ROOM);
-			death_log(ch, ch, TYPE_SUFFERING);
-			die(ch, ch);
+		/* Update conditions */
+		if (has_player_tech(ch, PTECH_NO_HUNGER)) {			
+			gain_condition(ch, FULL, -1);
+		}
+		else {
+			if (!number(0, 1)) {
+				gain_condition(ch, FULL, 1);
+			}
+		}
+	
+		run_ability_gain_hooks(ch, NULL, AGH_PASSIVE_FREQUENT);
+	
+		// more thirsty?
+		if (has_player_tech(ch, PTECH_NO_THIRST)) {
+			gain_condition(ch, THIRST, -1);
+		}
+		else {
+			if (!number(0, 1)) {
+				gain_condition(ch, THIRST, 1);
+			}
+		}
+	
+		// less drunk
+		gain_condition(ch, DRUNK, AWAKE(ch) ? -1 : -6);
+	
+		// ensure character isn't under on primary attributes
+		check_attribute_gear(ch);
+	
+		// ensure character isn't using any gear they shouldn't be
+		found = FALSE;
+		for (iter = 0; iter < NUM_WEARS; ++iter) {
+			if (wear_data[iter].count_stats && GET_EQ(ch, iter) && !can_wear_item(ch, GET_EQ(ch, iter), TRUE)) {
+				// can_wear_item sends own message to ch
+				act("$n stops using $p.", TRUE, ch, GET_EQ(ch, iter), NULL, TO_ROOM);
+				// this may extract it
+				unequip_char_to_inventory(ch, iter);
+				found = TRUE;
+			}
+		}
+		if (found) {
+			determine_gear_level(ch);
+		}
+
+		/* moving on.. */
+		if (GET_POS(ch) < POS_STUNNED || (GET_POS(ch) == POS_STUNNED && health_gain(ch, TRUE) <= 0)) {
+			GET_HEALTH(ch) = MIN(0, GET_HEALTH(ch));	// fixing? a bug where a player whose health is positve but is in a bleeding out position, would not bleed out right away (but couldn't recover)
+			GET_HEALTH(ch) -= 1;
+			update_pos(ch);
+			if (GET_POS(ch) == POS_DEAD) {
+				msg_to_char(ch, "You die from your wounds!\r\n");
+				act("$n falls down, dead.", FALSE, ch, 0, 0, TO_ROOM);
+				death_log(ch, ch, TYPE_SUFFERING);
+				die(ch, ch);
+				return;
+			}
+			else {
+				msg_to_char(ch, "You are bleeding and will die soon without aid.\r\n");
+			}
 			return;
 		}
 		else {
-			msg_to_char(ch, "You are bleeding and will die soon without aid.\r\n");
+			// position > stunned		
 		}
-		return;
-	}
-	else {
-		// position > stunned		
-	}
 
-	// regenerate: do not put move_gain and mana_gain inside of MIN/MAX macros -- this will call them twice
-	if (!took_dot) {
-		gain = health_gain(ch, FALSE);
-		heal(ch, ch, gain);
-		GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - gain);
-	}
+		// regenerate: do not put move_gain and mana_gain inside of MIN/MAX macros -- this will call them twice
+		if (!took_dot) {
+			gain = health_gain(ch, FALSE);
+			heal(ch, ch, gain);
+			GET_HEALTH_DEFICIT(ch) = MAX(0, GET_HEALTH_DEFICIT(ch) - gain);
+		}
 	
-	// check move gain
-	if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && IS_SWIMMING(ch)) {
-		// swimming: costs moves
-		if (GET_MOVE(ch) > 0) {
-			GET_MOVE(ch) -= 1;
-		}
-		if (GET_MOVE(ch) <= 0) {
-			msg_to_char(ch, "You sink beneath the water and die!\r\n");
-			act("$n sinks beneath the water and dies!", FALSE, ch, NULL, NULL, TO_ROOM);
-			death_log(ch, ch, TYPE_SUFFERING);
-			die(ch, ch);
-			return;
-		}
-	}
-	else {	// normal move gain
-		gain = move_gain(ch, FALSE);
-		GET_MOVE(ch) += gain;
-		GET_MOVE(ch) = MIN(GET_MOVE(ch), GET_MAX_MOVE(ch));
-		GET_MOVE_DEFICIT(ch) = MAX(0, GET_MOVE_DEFICIT(ch) - gain);
-	}
-	
-	// mana gain
-	gain = mana_gain(ch, FALSE);
-	GET_MANA(ch) += gain;
-	GET_MANA(ch) = MIN(GET_MANA(ch), GET_MAX_MANA(ch));
-	GET_MANA_DEFICIT(ch) = MAX(0, GET_MANA_DEFICIT(ch) - gain);
-	
-	if (IS_VAMPIRE(ch)) {
-		update_vampire_sun(ch);
-	}
-
-	if (!AWAKE(ch) && IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_NO_SLEEP)) {
-		sprintf(buf, "%s has become $n!", PERS(ch, ch, 0));
-		msg = !CHAR_MORPH_FLAGGED(ch, MORPHF_NO_MORPH_MESSAGE);
-
-		perform_morph(ch, NULL);
-		
-		if (msg) {
-			act(buf, TRUE, ch, 0, 0, TO_ROOM);
-		}
-		msg_to_char(ch, "You revert to normal!\r\n");
-	}
-
-	/* Blood check */
-	if (GET_BLOOD(ch) <= 0 && !GET_FED_ON_BY(ch) && !GET_FEEDING_FROM(ch)) {
-		out_of_blood(ch);
-		return;
-	}
-	else if (IS_BLOOD_STARVED(ch)) {
-		cancel_blood_upkeeps(ch);
-		starving_vampire_aggro(ch);
-	}
-	
-	// too-many-followers check
-	fol_count = 0;
-	DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), room_ch, next_ch, next_in_room) {
-		// check is npc following ch
-		if (room_ch == ch || room_ch->desc || !IS_NPC(room_ch) || room_ch->master != ch) {
-			continue;
-		}
-		
-		// don't care about companions
-		if (GET_COMPANION(room_ch)) {
-			continue;
-		}
-		
-		if (++fol_count > config_get_int("npc_follower_limit")) {
-			REMOVE_BIT(AFF_FLAGS(room_ch), AFF_CHARM);
-			stop_follower(room_ch);
-			
-			if (can_fight(room_ch, ch)) {
-				act("$n becomes enraged!", FALSE, room_ch, NULL, NULL, TO_ROOM);
-				engage_combat(room_ch, ch, TRUE);
+		// check move gain
+		if (!IS_NPC(ch) && !IS_IMMORTAL(ch) && IS_SWIMMING(ch)) {
+			// swimming: costs moves
+			if (GET_MOVE(ch) > 0) {
+				GET_MOVE(ch) -= 1;
+			}
+			if (GET_MOVE(ch) <= 0) {
+				msg_to_char(ch, "You sink beneath the water and die!\r\n");
+				act("$n sinks beneath the water and dies!", FALSE, ch, NULL, NULL, TO_ROOM);
+				death_log(ch, ch, TYPE_SUFFERING);
+				die(ch, ch);
+				return;
 			}
 		}
-	}
+		else {	// normal move gain
+			gain = move_gain(ch, FALSE);
+			GET_MOVE(ch) += gain;
+			GET_MOVE(ch) = MIN(GET_MOVE(ch), GET_MAX_MOVE(ch));
+			GET_MOVE_DEFICIT(ch) = MAX(0, GET_MOVE_DEFICIT(ch) - gain);
+		}
 	
-	random_encounter(ch);
+		// mana gain
+		gain = mana_gain(ch, FALSE);
+		GET_MANA(ch) += gain;
+		GET_MANA(ch) = MIN(GET_MANA(ch), GET_MAX_MANA(ch));
+		GET_MANA_DEFICIT(ch) = MAX(0, GET_MANA_DEFICIT(ch) - gain);
+	
+		if (IS_VAMPIRE(ch)) {
+			update_vampire_sun(ch);
+		}
+
+		if (!AWAKE(ch) && IS_MORPHED(ch) && CHAR_MORPH_FLAGGED(ch, MORPHF_NO_SLEEP)) {
+			sprintf(buf, "%s has become $n!", PERS(ch, ch, 0));
+			msg = !CHAR_MORPH_FLAGGED(ch, MORPHF_NO_MORPH_MESSAGE);
+
+			perform_morph(ch, NULL);
+		
+			if (msg) {
+				act(buf, TRUE, ch, 0, 0, TO_ROOM);
+			}
+			msg_to_char(ch, "You revert to normal!\r\n");
+		}
+
+		/* Blood check */
+		if (GET_BLOOD(ch) <= 0 && !GET_FED_ON_BY(ch) && !GET_FEEDING_FROM(ch)) {
+			out_of_blood(ch);
+			return;
+		}
+		else if (IS_BLOOD_STARVED(ch)) {
+			cancel_blood_upkeeps(ch);
+			starving_vampire_aggro(ch);
+		}
+	
+		// too-many-followers check
+		fol_count = 0;
+		DL_FOREACH_SAFE2(ROOM_PEOPLE(IN_ROOM(ch)), room_ch, next_ch, next_in_room) {
+			// check is npc following ch
+			if (room_ch == ch || room_ch->desc || !IS_NPC(room_ch) || room_ch->master != ch) {
+				continue;
+			}
+		
+			// don't care about companions
+			if (GET_COMPANION(room_ch)) {
+				continue;
+			}
+		
+			if (++fol_count > config_get_int("npc_follower_limit")) {
+				REMOVE_BIT(AFF_FLAGS(room_ch), AFF_CHARM);
+				stop_follower(room_ch);
+			
+				if (can_fight(room_ch, ch)) {
+					act("$n becomes enraged!", FALSE, room_ch, NULL, NULL, TO_ROOM);
+					engage_combat(room_ch, ch, TRUE);
+				}
+			}
+		}
+	
+		random_encounter(ch);
+	}	// end npc-only
+	
+	// LAST: call point-update if it's our turn
+	if (IS_NPC(ch) && (GET_MOB_VNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
+		point_update_char(ch);
+	}
+	else if (!IS_NPC(ch) && (GET_IDNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
+		point_update_char(ch);
+	}
 }
 
 
@@ -2197,6 +2222,11 @@ void point_update(bool run_real) {
 	
 	long daily_cycle = data_get_long(DATA_DAILY_CYCLE);
 	
+	// advance the cycle
+	if (++point_update_cycle >= REAL_UPDATES_PER_MUD_HOUR) {
+		point_update_cycle = 0;
+	}
+	
 	// check if the skill cycle must reset (daily)
 	if (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
 		// put this in a while so that it doesn't repeatedly update if the mud is down for more than a day
@@ -2214,22 +2244,10 @@ void point_update(bool run_real) {
 	
 	// characters
 	DL_FOREACH_SAFE(character_list, ch, next_ch) {
-		// remove stale offers -- this needs to happen even if dead (resurrect)
-		// TODO shouldn't this logic be inside the point_update_char function?
-		if (!IS_NPC(ch)) {
-			clean_offers(ch);
+		if (!EXTRACTED(ch)) {
+			real_update_char(ch);
+			// NOTE: we don't call point_update_char here; we call it inside real_update_char as of b5.114
 		}
-		
-		if (EXTRACTED(ch)) {
-			continue;
-		}
-		if (IS_DEAD(ch)) {
-			check_idling(ch);
-			continue;
-		}
-		
-		real_update_char(ch);
-		point_update_char(ch);
 	}
 	
 	// vehicles
@@ -2252,14 +2270,17 @@ void point_update(bool run_real) {
 void real_update(void) {
 	obj_data *obj;
 	char_data *ch, *next_ch;
+	
+	// advance the cycle
+	if (++point_update_cycle >= REAL_UPDATES_PER_MUD_HOUR) {
+		point_update_cycle = 0;
+	}
 
 	// characters
 	DL_FOREACH_SAFE(character_list, ch, next_ch) {
-		if (EXTRACTED(ch) || IS_DEAD(ch)) {
-			continue;
+		if (!EXTRACTED(ch)) {
+			real_update_char(ch);
 		}
-
-		real_update_char(ch);
 	}
 
 	// objs

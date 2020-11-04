@@ -1459,18 +1459,19 @@ bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t f
 * Handles the actual extract of an idle character.
 * 
 * @param char_data *ch The player to idle out.
+* @return bool TRUE if the character is still in, FALSE if extracted
 */
-void perform_idle_out(char_data *ch) {
+bool perform_idle_out(char_data *ch) {
 	empire_data *emp = NULL;
 	bool died = FALSE;
 	
 	if (!ch) {
-		return;
+		return FALSE;
 	}
 	
 	// block idle-out entirely with this prf
 	if (ch->desc && PRF_FLAGGED(ch, PRF_NO_IDLE_OUT)) {
-		return;
+		return TRUE;
 	}
 	
 	emp = GET_LOYALTY(ch);
@@ -1504,6 +1505,8 @@ void perform_idle_out(char_data *ch) {
 	if (emp) {
 		extract_pending_chars();	// ensure char is gone
 	}
+	
+	return FALSE;
 }
 
 

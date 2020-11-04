@@ -102,7 +102,7 @@ void extract_char_final(char_data *ch);
 void extract_pending_chars();
 bool has_learned_craft(char_data *ch, any_vnum vnum);
 bool match_char_name(char_data *ch, char_data *target, char *name, bitvector_t flags);
-void perform_idle_out(char_data *ch);
+bool perform_idle_out(char_data *ch);
 
 // character location handlers
 void char_from_room(char_data *ch);
