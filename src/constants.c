@@ -3051,7 +3051,7 @@ const int bld_relationship_vnum_types[] = {
 };
 
 
-// CLIM_x (1/2): climate flags
+// CLIM_x (1/3): climate flags
 const char *climate_flags[] = {
 	"*",	// 0
 	"*",
@@ -3079,7 +3079,7 @@ const char *climate_flags[] = {
 };
 
 
-// CLIM_x (2/2): order to display climate flags
+// CLIM_x (2/3): order to display climate flags
 const bitvector_t climate_flags_order[] = {
 	CLIM_HOT, CLIM_COLD,	// temperatures first
 	CLIM_HIGH, CLIM_LOW,	// relative elevation
@@ -3097,6 +3097,34 @@ const bitvector_t climate_flags_order[] = {
 	
 	CLIM_UNUSED1, CLIM_UNUSED2, CLIM_UNUSED3, CLIM_UNUSED4,	// move these when used
 	NOBITS	// last
+};
+
+
+// CLIM_x (3/3): whether or not vehicles can ruin slowly over time when they have an invalid climate
+const bool climate_ruins_vehicle_slowly[][2] = {
+	// { when gaining climate, when losing climate }
+	{ FALSE, FALSE },	// *
+	{ FALSE, FALSE },	// *
+	{ FALSE, FALSE },	// *
+	{ FALSE, FALSE },	// *
+	{ TRUE, TRUE },	// hot
+	{ TRUE, TRUE },	// cold	// 5
+	{ TRUE, TRUE },	// high
+	{ TRUE, TRUE },	// low
+	{ FALSE, FALSE },	// magical
+	{ TRUE, TRUE },	// temperate
+	{ TRUE, TRUE },	// arid	// 10
+	{ TRUE, TRUE },	// tropical
+	{ FALSE, FALSE },	// mountain
+	{ FALSE, TRUE },	// river
+	{ FALSE, TRUE },	// fresh water
+	{ FALSE, TRUE },	// salt water	// 15
+	{ TRUE, FALSE },	// forest
+	{ TRUE, TRUE },	// grassland
+	{ TRUE, TRUE },	// coastal
+	{ FALSE, TRUE },	// ocean
+	{ FALSE, TRUE },	// lake
+	{ TRUE, TRUE }	// waterside
 };
 
 

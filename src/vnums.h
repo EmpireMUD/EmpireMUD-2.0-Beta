@@ -93,7 +93,6 @@
 
 // misc stuff
 #define o_GLOWING_SEASHELL  1300
-#define o_NAILS  1306
 
 // for catapults/ships
 #define o_HEAVY_SHOT  2135	// TODO: This could be a material or item type
@@ -107,7 +106,7 @@
 #define COMP_ROCK  6050	// for 'lay' (road)
 #define COMP_CLAY  6090	// for workforce bricks
 #define COMP_COMMON_METAL  6720	// for 'barde'
-#define COMP_NAILS  6790	// for 'tunnel'
+#define COMP_NAILS  6790	// for 'tunnel' and default maintenance
 #define COMP_ROPE  6880	// for 'tie'
 
 

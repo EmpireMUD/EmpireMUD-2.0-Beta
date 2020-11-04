@@ -1819,8 +1819,6 @@ void autostore_vehicle_contents(vehicle_data *veh) {
 * @param vehicle_data *veh The vehicle to update.
 */
 void point_update_vehicle(vehicle_data *veh) {
-	char *msg;
-	
 	if (VEH_IS_EXTRACTED(veh)) {
 		return;
 	}
@@ -1829,13 +1827,14 @@ void point_update_vehicle(vehicle_data *veh) {
 	if ((time(0) - VEH_LAST_MOVE_TIME(veh)) > (config_get_int("autostore_time") * SECS_PER_REAL_MIN)) {
 		autostore_vehicle_contents(veh);
 	}
-
-	if (!ROOM_IS_CLOSED(IN_ROOM(veh)) && !vehicle_allows_climate(veh, IN_ROOM(veh))) {
-		// this will extract it (usually)
-		msg = veh_get_custom_message(veh, VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM);
-		ruin_vehicle(veh, msg ? msg : "$V falls into ruin!");
-		return;
+	
+	// climate check: only once per day (based on room vnum)
+	if (main_time_info.hours == (GET_ROOM_VNUM(IN_ROOM(veh)) % 24)) {
+		if (!check_vehicle_climate_change(veh, FALSE)) {
+			return;
+		}
 	}
+	
 	if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		// burny burny burny!
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {

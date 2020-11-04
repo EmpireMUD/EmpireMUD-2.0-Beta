@@ -206,6 +206,7 @@ extern const char *bld_relationship_types[];
 extern const int bld_relationship_vnum_types[];
 extern const char *climate_flags[];
 extern const bitvector_t climate_flags_order[];
+extern const bool climate_ruins_vehicle_slowly[][2];
 extern const char *crop_flags[];
 extern const char *depletion_type[NUM_DEPLETION_TYPES];
 extern const char *designate_flags[];
@@ -228,6 +229,10 @@ extern const char *seasons[];
 extern const char *icon_types[];
 extern const char *sun_types[];
 extern const char *weather_types[];
+
+// for the second dimension of: climate_ruins_vehicle_slowly[climate][when]
+#define CRVS_WHEN_GAINING  0
+#define CRVS_WHEN_LOSING  1
 
 // shop constants
 extern const char *shop_flags[];

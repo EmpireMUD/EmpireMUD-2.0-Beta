@@ -2709,7 +2709,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 	
 	// resources if it doesn't have its own
 	if (!default_res) {
-		add_to_resource_list(&default_res, RES_OBJECT, o_NAILS, 1, 0);
+		add_to_resource_list(&default_res, RES_COMPONENT, COMP_NAILS, 1, 0);
 	}
 	
 	// no effect

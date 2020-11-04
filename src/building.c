@@ -190,7 +190,7 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 		msg_to_char(ch, "This area is already too full to %s that.\r\n", command);
 		return FALSE;
 	}
-	if (make_veh && (is_upgrade || !ROOM_IS_CLOSED(IN_ROOM(ch))) && !vehicle_allows_climate(make_veh, IN_ROOM(ch))) {
+	if (make_veh && (is_upgrade || !ROOM_IS_CLOSED(IN_ROOM(ch))) && !vehicle_allows_climate(make_veh, IN_ROOM(ch), NULL)) {
 		msg_to_char(ch, "You can't %s %s here.\r\n", command, VEH_SHORT_DESC(make_veh));
 		return FALSE;
 	}
