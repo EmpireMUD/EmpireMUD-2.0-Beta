@@ -593,7 +593,7 @@ void send_hourly_sun_messages(void) {
 			
 			switch (sun) {
 				case SUN_RISE: {
-					if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT)) {
+					if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
 						// show map if needed
 						look_at_room(desc->character);
 						msg_to_char(desc->character, "\r\n");
@@ -610,7 +610,7 @@ void send_hourly_sun_messages(void) {
 					break;
 				}
 				case SUN_DARK: {
-					if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT)) {
+					if (!HAS_INFRA(desc->character) && !PRF_FLAGGED(desc->character, PRF_HOLYLIGHT) && !FIGHTING(desc->character)) {
 						look_at_room(desc->character);
 						msg_to_char(desc->character, "\r\n");
 					}
