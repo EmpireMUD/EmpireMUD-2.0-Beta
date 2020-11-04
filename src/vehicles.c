@@ -259,7 +259,7 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 		perform_abandon_vehicle(veh);
 		
 		// 50% of the time we just abandon, the rest we also decay to ruins
-		if (!number(0, 1)) {
+		if (!number(0, 1) || VEH_IS_DISMANTLING(veh)) {
 			if (emp) {
 				log_to_empire(emp, ELOG_TERRITORY, "%s%s has crumbled to ruin", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
 			}

@@ -3853,7 +3853,7 @@ void reduce_dismantle_resources(int damage, int max_health, struct resource_data
 	obj_data *proto;
 	
 	// determine how damaged the building it -- 1.0+ is VERY damaged, 0 is not damaged at all
-	damage_prc = (damage / MAX(1, max_health));
+	damage_prc = ((double)damage / MAX(1.0, (double)max_health));
 	damage_prc = MIN(1.0, damage_prc);	// reduce to 0-1.0 range (1.0 is fully damaged)
 	
 	// we keep a percent of the items based on how damaged it is, in the 20-90% range
