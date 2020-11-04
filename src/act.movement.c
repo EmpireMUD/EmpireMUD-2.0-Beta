@@ -1218,6 +1218,12 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 		}
 		return FALSE;
 	}
+	if (VEH_HEALTH(veh) < 1) {
+		if (ch) {
+			act("$V can't move anywhere until it's repaired!", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		return FALSE;
+	}
 	
 	// required number of mounts
 	if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {

@@ -4531,6 +4531,8 @@ const char *vehicle_flags[] = {
 	"*BRIGHT-PAINT",
 	"DEDICATE",
 	"*EXTRACTED",
+	"RUIN-SLOWLY-FROM-CLIMATE",	// 35
+	"RUIN-QUICKLY-FROM-CLIMATE",
 	"\n"
 };
 
@@ -4572,6 +4574,8 @@ const char *identify_vehicle_flags[] = {
 	"",	// bright-paint
 	"can dedicate",
 	"",	// *EXTRACTED
+	"",	// RUIN-SLOWLY-FROM-CLIMATE	// 35
+	"",	// RUIN-QUICKLY-FROM-CLIMATE
 	"\n"
 };
 

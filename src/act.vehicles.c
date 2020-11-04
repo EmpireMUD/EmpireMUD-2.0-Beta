@@ -766,6 +766,11 @@ bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool mes
 			msg_to_char(ch, "You can't sit %s it until it's finished.\r\n", IN_OR_ON(veh));
 		}
 	}
+	else if (VEH_HEALTH(veh) < 1) {
+		if (message) {
+			msg_to_char(ch, "It needs some repairs before you can sit %s it.\r\n", IN_OR_ON(veh));
+		}
+	}
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		if (message) {
 			msg_to_char(ch, "You can't sit on it while it's on fire!\r\n");
@@ -1408,6 +1413,9 @@ ACMD(do_dispatch) {
 	else if (!VEH_IS_COMPLETE(veh)) {
 		msg_to_char(ch, "It isn't even built yet.\r\n");
 	}
+	else if (VEH_HEALTH(veh) < 1) {
+		msg_to_char(ch, "It needs some repairs before you can dispatch it.\r\n");
+	}
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "You can't dispatch it while it's on fire!\r\n");
 	}
@@ -1761,6 +1769,9 @@ ACMD(do_drive) {
 	else if (!VEH_IS_COMPLETE(veh)) {
 		act("$V isn't going anywhere until it's finished.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
+	else if (VEH_HEALTH(veh) < 1) {
+		act("$V isn't going anywhere until it gets some repairs.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
 	else if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
 		msg_to_char(ch, "You must harness %d more animal%s to it first.\r\n", (VEH_ANIMALS_REQUIRED(veh) - count_harnessed_animals(veh)), PLURAL(VEH_ANIMALS_REQUIRED(veh) - count_harnessed_animals(veh)));
 	}
@@ -2112,6 +2123,9 @@ ACMD(do_lead) {
 		}
 		else if (!VEH_IS_COMPLETE(veh)) {
 			act("You must finish constructing $V before you can lead it.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		else if (VEH_HEALTH(veh) < 1) {
+			act("You must repair $V before you can lead it.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
 		else if (VEH_LED_BY(veh)) {
 			act("$N is already leading it.", FALSE, ch, NULL, VEH_LED_BY(veh), TO_CHAR);

@@ -65,7 +65,7 @@ static int perform_sacrifice(char_data *ch, char_data *god, obj_data *obj, bool 
 	}
 	else {	// look for a vehicle
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (VEH_IS_COMPLETE(veh) && VEH_PATRON(veh) == GET_IDNUM(god)) {
+			if (VEH_IS_COMPLETE(veh) && VEH_HEALTH(veh) > 0 && VEH_PATRON(veh) == GET_IDNUM(god)) {
 				any_patron = TRUE;
 				break;
 			}

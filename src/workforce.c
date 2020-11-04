@@ -294,6 +294,9 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	if (ROOM_OWNER(room) && ROOM_OWNER(room) != emp && !on_fire && !has_relationship(emp, ROOM_OWNER(room), DIPL_ALLIED)) {
 		return;	// cannot work in non-allied empires
 	}
+	if (!vehicle_allows_climate(veh, room, NULL)) {
+		return;	// cannot work when the vehicle is in forbidden climates (it's ruining itself)
+	}
 	
 	// PART 1: burning
 	if (on_fire) {
@@ -304,7 +307,7 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	}
 	
 	// PART 2: chores that happen even if starving (food chores)
-	if (!on_fire && vehicle_has_function_and_city_ok(veh, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
+	if (!on_fire && VEH_HEALTH(veh) >= 1 && vehicle_has_function_and_city_ok(veh, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
 		do_chore_fishing(emp, room, veh);
 	}
 	if (starving) {
@@ -326,6 +329,9 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	}
 	
 	// PART 4: other chores (unlike room chores, you must check city status with vehicle_has_function_and_city_ok)
+	if (VEH_HEALTH(veh) < 1) {
+		return;	// can only fire-brigade/repair if low health
+	}
 	
 	// skilled labor chores:
 	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {

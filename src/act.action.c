@@ -3730,7 +3730,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 	no_guest_room = !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED);
 	
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (!VEH_IS_COMPLETE(veh) || !has_interaction(VEH_INTERACTIONS(veh), data->interact)) {
+		if (!VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || !has_interaction(VEH_INTERACTIONS(veh), data->interact)) {
 			continue;	// can't act on veh at all
 		}
 		else if (no_guest_room || !can_use_vehicle(ch, veh, MEMBERS_ONLY)) {

@@ -2544,6 +2544,8 @@ typedef enum {
 #define VEH_BRIGHT_PAINT  BIT(32)	// G. brightly painted
 #define VEH_DEDICATE  BIT(33)	// H. can be dedicated
 #define VEH_EXTRACTED  BIT(34)	// I. vehicle is mid-extraction
+#define VEH_RUIN_SLOWLY_FROM_CLIMATE  BIT(35)	// J. always ruins slowly no matter what climate
+#define VEH_RUIN_QUICKLY_FROM_CLIMATE  BIT(36)	// K. always ruins quickly no matter what climate
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin

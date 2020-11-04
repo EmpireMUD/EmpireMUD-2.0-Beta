@@ -4153,7 +4153,7 @@ bool can_interact_room(room_data *room, int type) {
 	}
 	
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (VEH_IS_COMPLETE(veh) && has_interaction(VEH_INTERACTIONS(veh), type)) {
+		if (VEH_IS_COMPLETE(veh) && VEH_HEALTH(veh) > 0 && has_interaction(VEH_INTERACTIONS(veh), type)) {
 			return TRUE;
 		}
 	}
@@ -4550,7 +4550,7 @@ bool run_room_interactions(char_data *ch, room_data *room, int type, vehicle_dat
 		if (inter_veh && veh != inter_veh) {
 			continue;	// if they provided an inter_veh, skip other vehicles
 		}
-		if (!VEH_IS_COMPLETE(veh)) {
+		if (!VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1) {
 			continue;	// not complete anyway
 		}
 		if (access_type != NOTHING && ch && !can_use_vehicle(ch, veh, access_type)) {

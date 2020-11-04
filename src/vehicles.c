@@ -124,7 +124,17 @@ bool check_vehicle_climate_change(vehicle_data *veh, bool immediate_only) {
 		return TRUE;	// vehicle is safe
 	}
 	
-	// oh no! the vehicle can't be here
+	// oh no! the vehicle can't be here!
+	
+	// verify ruin speed
+	if (VEH_FLAGGED(veh, VEH_RUIN_SLOWLY_FROM_CLIMATE)) {	
+		slow_ruin = TRUE;
+	}
+	if (VEH_FLAGGED(veh, VEH_RUIN_QUICKLY_FROM_CLIMATE)) {	
+		slow_ruin = FALSE;
+	}
+	
+	// and now do the work...
 	if (slow_ruin && !immediate_only) {
 		// this does its own logging
 		res = decay_one_vehicle(veh, "$V falls into ruin!");

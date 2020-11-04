@@ -6340,7 +6340,7 @@ bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvec
 		if (!IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
 			continue;	// no function
 		}
-		if (!VEH_IS_COMPLETE(veh)) {
+		if (!VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1) {
 			continue;
 		}
 		if (for_emp && VEH_OWNER(veh) && VEH_OWNER(veh) != for_emp && !emp_can_use_vehicle(for_emp, veh, GUESTS_ALLOWED)) {
@@ -6392,7 +6392,7 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag) {
 	room_data *room = IN_ROOM(veh);
 	bool junk;
 	
-	if (!VEH_IS_COMPLETE(veh) || !IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
+	if (!VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || !IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
 		return FALSE;	// no function
 	}
 	if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS) && IS_SET(fnc_flag, IMMOBILE_FNCS)) {

@@ -2953,7 +2953,7 @@ room_data *find_docks(empire_data *emp, int island_id) {
 		if (!IN_ROOM(veh) || GET_ISLAND_ID(IN_ROOM(veh)) != island_id) {
 			continue;	// wrong island
 		}
-		if (VEH_OWNER(veh) != emp || !IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS) || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		if (VEH_OWNER(veh) != emp || !IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS) || !VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 			continue;	// basic ship checks
 		}
 		if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK) || (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
@@ -2994,7 +2994,7 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		if (!IN_ROOM(veh) || GET_ISLAND_ID(IN_ROOM(veh)) != shipd->from_island) {
 			continue;	// wrong island
 		}
-		if (VEH_OWNER(veh) != emp || !VEH_FLAGGED(veh, VEH_SHIPPING) || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE) || VEH_CARRYING_N(veh) >= VEH_CAPACITY(veh)) {
+		if (VEH_OWNER(veh) != emp || !VEH_FLAGGED(veh, VEH_SHIPPING) || !VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || VEH_FLAGGED(veh, VEH_ON_FIRE) || VEH_CARRYING_N(veh) >= VEH_CAPACITY(veh)) {
 			continue;	// basic ship checks
 		}
 		if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK) || (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
