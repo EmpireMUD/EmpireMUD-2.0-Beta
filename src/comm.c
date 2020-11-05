@@ -77,7 +77,6 @@ void check_wars();
 void chore_update();
 void display_automessages();
 void frequent_combat(int pulse);
-void point_update();
 void process_import_evolutions();
 void process_theft_logs();
 void prune_instances();
@@ -966,13 +965,10 @@ void heartbeat(int heart_pulse) {
 	}
 	
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
-		point_update();
-		if (debug_log && HEARTBEAT(15)) { log("debug 12:\t%lld", microtime()); }
 		process_theft_logs();
 		if (debug_log && HEARTBEAT(15)) { log("debug 12.1:\t%lld", microtime()); }
 	}
-	else if (HEARTBEAT(SECS_PER_REAL_UPDATE)) {
-		// only call real_update if we didn't also point_update
+	if (HEARTBEAT(SECS_PER_REAL_UPDATE)) {
 		real_update();
 		if (debug_log && HEARTBEAT(15)) { log("debug 13:\t%lld", microtime()); }
 	}

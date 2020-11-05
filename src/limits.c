@@ -1594,7 +1594,7 @@ bool check_autostore(obj_data *obj, bool force, empire_data *override_emp) {
 
 
 /**
-* This runs a point update (every tick) on an object.
+* This runs a point update (every hour tick) on an object.
 *
 * @param obj_data *obj The object to update.
 */
@@ -1791,6 +1791,11 @@ void real_update_obj(obj_data *obj) {
 				}
 			}
 		}
+	}
+	
+	// point-update if it's my turn
+	if ((GET_OBJ_VNUM(obj) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
+		point_update_obj(obj);
 	}
 }
 
@@ -2212,20 +2217,15 @@ int move_gain(char_data *ch, bool info_only) {
 //// CORE PERIODICALS ////////////////////////////////////////////////////////
 
 /**
-* Point Update: runs once per tick (75 seconds). This also calls the "real"
-* update for that tick, to avoid iterating a second time over the same data.
+* Real Update: runs every 5 seconds, primarily for player characters,
+* affects, and objects. REAL_UPDATES_PER_MUD_HOUR determines actual timing.
 */
-void point_update(bool run_real) {
-	vehicle_data *veh;
+void real_update(void) {
 	obj_data *obj;
 	char_data *ch, *next_ch;
+	vehicle_data *veh;
 	
 	long daily_cycle = data_get_long(DATA_DAILY_CYCLE);
-	
-	// advance the cycle
-	if (++point_update_cycle >= REAL_UPDATES_PER_MUD_HOUR) {
-		point_update_cycle = 0;
-	}
 	
 	// check if the skill cycle must reset (daily)
 	if (time(0) > daily_cycle + SECS_PER_REAL_DAY) {
@@ -2242,35 +2242,6 @@ void point_update(bool run_real) {
 		setup_daily_quest_cycles(NOTHING);
 	}
 	
-	// characters
-	DL_FOREACH_SAFE(character_list, ch, next_ch) {
-		if (!EXTRACTED(ch)) {
-			real_update_char(ch);
-			// NOTE: we don't call point_update_char here; we call it inside real_update_char as of b5.114
-		}
-	}
-	
-	// vehicles
-	DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
-		point_update_vehicle(veh);
-	}
-	
-	// objs
-	DL_FOREACH_SAFE(object_list, obj, global_next_obj) {
-		real_update_obj(obj);
-		point_update_obj(obj);
-	}
-}
-
-
-/**
-* Real Update: runs every 5 seconds, primarily for player characters and
-* affects.
-*/
-void real_update(void) {
-	obj_data *obj;
-	char_data *ch, *next_ch;
-	
 	// advance the cycle
 	if (++point_update_cycle >= REAL_UPDATES_PER_MUD_HOUR) {
 		point_update_cycle = 0;
@@ -2286,5 +2257,13 @@ void real_update(void) {
 	// objs
 	DL_FOREACH_SAFE(object_list, obj, global_next_obj) {
 		real_update_obj(obj);
+	}
+	
+	// vehicles
+	DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
+		// each vehicle runs during part of the hour
+		if (!VEH_IS_EXTRACTED(veh) && (VEH_VNUM(veh) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
+			point_update_vehicle(veh);
+		}
 	}
 }
