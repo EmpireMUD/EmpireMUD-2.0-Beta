@@ -1489,6 +1489,12 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 		return -1;
 	}
 	
+	// can't junk kept items
+	if (mode == SCMD_JUNK && OBJ_FLAGGED(obj, OBJ_KEEP)) {
+		act("$p: You can't junk items with (keep).", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+		return 0;
+	}
+	
 	// don't let people drop bound items in other people's territory
 	if (mode != SCMD_JUNK && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
 		act("$p: You can't drop bound items here.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
@@ -1496,7 +1502,7 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	}
 	
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
-		act("$p: you can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+		act("$p: You can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return 0;
 	}
 	
