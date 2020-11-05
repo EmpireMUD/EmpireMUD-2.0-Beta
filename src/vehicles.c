@@ -274,7 +274,7 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 		}
 		else if (emp) {
 			snprintf(buf, sizeof(buf), "%s%s has been abandoned due to decay", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
-			log_to_empire(emp, ELOG_TERRITORY, "%s", buf);
+			log_to_empire(emp, ELOG_TERRITORY, "%s", CAP(buf));
 		}
 	}
 	
