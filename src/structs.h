@@ -2544,6 +2544,8 @@ typedef enum {
 #define VEH_BRIGHT_PAINT  BIT(32)	// G. brightly painted
 #define VEH_DEDICATE  BIT(33)	// H. can be dedicated
 #define VEH_EXTRACTED  BIT(34)	// I. vehicle is mid-extraction
+#define VEH_RUIN_SLOWLY_FROM_CLIMATE  BIT(35)	// J. always ruins slowly no matter what climate
+#define VEH_RUIN_QUICKLY_FROM_CLIMATE  BIT(36)	// K. always ruins quickly no matter what climate
 
 // VEH_CUSTOM_x: custom message types
 #define VEH_CUSTOM_RUINS_TO_ROOM  0	// sent when the building falls into ruin
@@ -4501,6 +4503,7 @@ struct char_data {
 	struct quest_lookup *quest_lookups;
 	struct shop_lookup *shop_lookups;
 	bool customized;	// mob strings need saving if TRUE
+	sh_int lights;	// number of lights on the character
 	
 	UT_hash_handle hh;	// mobile_table
 };
@@ -5842,7 +5845,7 @@ struct room_data {
 	struct map_data *map_loc;	// map location if any
 	struct complex_room_data *complex; // for rooms that are buildings, inside, adventures, etc
 	struct shared_room_data *shared;	// data that could be local OR from the map tile
-	byte light;  // number of light sources
+	sh_int light;  // number of light sources
 	int exits_here;	// number of rooms that have complex->exits to this one
 	
 	struct affected_type *af;  // room affects

@@ -1489,6 +1489,12 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 		return -1;
 	}
 	
+	// can't junk kept items
+	if (mode == SCMD_JUNK && OBJ_FLAGGED(obj, OBJ_KEEP)) {
+		act("$p: You can't junk items with (keep).", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+		return 0;
+	}
+	
 	// don't let people drop bound items in other people's territory
 	if (mode != SCMD_JUNK && OBJ_BOUND_TO(obj) && ROOM_OWNER(IN_ROOM(ch)) && ROOM_OWNER(IN_ROOM(ch)) != GET_LOYALTY(ch)) {
 		act("$p: You can't drop bound items here.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
@@ -1496,7 +1502,7 @@ int perform_drop(char_data *ch, obj_data *obj, byte mode, const char *sname) {
 	}
 	
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
-		act("$p: you can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
+		act("$p: You can't drop quest items.", FALSE, ch, obj, NULL, TO_CHAR | TO_QUEUE);
 		return 0;
 	}
 	
@@ -1836,7 +1842,7 @@ void do_eq_set(char_data *ch, char *argument) {
 		return;
 	}
 	else {
-		set_id = add_eq_set_to_char(ch, NOTHING, argument);
+		set_id = add_eq_set_to_char(ch, NOTHING, str_dup(argument));
 	}
 	
 	// put all current gear on that set
@@ -2953,7 +2959,7 @@ room_data *find_docks(empire_data *emp, int island_id) {
 		if (!IN_ROOM(veh) || GET_ISLAND_ID(IN_ROOM(veh)) != island_id) {
 			continue;	// wrong island
 		}
-		if (VEH_OWNER(veh) != emp || !IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS) || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
+		if (VEH_OWNER(veh) != emp || !IS_SET(VEH_FUNCTIONS(veh), FNC_DOCKS) || !VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 			continue;	// basic ship checks
 		}
 		if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK) || (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
@@ -2994,7 +3000,7 @@ vehicle_data *find_free_ship(empire_data *emp, struct shipping_data *shipd) {
 		if (!IN_ROOM(veh) || GET_ISLAND_ID(IN_ROOM(veh)) != shipd->from_island) {
 			continue;	// wrong island
 		}
-		if (VEH_OWNER(veh) != emp || !VEH_FLAGGED(veh, VEH_SHIPPING) || !VEH_IS_COMPLETE(veh) || VEH_FLAGGED(veh, VEH_ON_FIRE) || VEH_CARRYING_N(veh) >= VEH_CAPACITY(veh)) {
+		if (VEH_OWNER(veh) != emp || !VEH_FLAGGED(veh, VEH_SHIPPING) || !VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || VEH_FLAGGED(veh, VEH_ON_FIRE) || VEH_CARRYING_N(veh) >= VEH_CAPACITY(veh)) {
 			continue;	// basic ship checks
 		}
 		if (VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_NO_WORK) || (VEH_INTERIOR_HOME_ROOM(veh) && ROOM_AFF_FLAGGED(VEH_INTERIOR_HOME_ROOM(veh), ROOM_AFF_NO_WORK))) {
@@ -3216,9 +3222,8 @@ void move_ship_to_destination(empire_data *emp, struct shipping_data *shipd, roo
 		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
 	}
 	
-	adjust_vehicle_tech(boat, FALSE);
+	vehicle_from_room(boat);
 	vehicle_to_room(boat, to_room);
-	adjust_vehicle_tech(boat, TRUE);
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);
@@ -3356,9 +3361,8 @@ void sail_shipment(empire_data *emp, vehicle_data *boat) {
 		act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(boat)), NULL, boat, TO_CHAR | TO_ROOM | TO_QUEUE);
 	}
 	
-	adjust_vehicle_tech(boat, FALSE);
+	vehicle_from_room(boat);
 	vehicle_to_room(boat, get_ship_pen());
-	adjust_vehicle_tech(boat, TRUE);
 	
 	if (ROOM_PEOPLE(IN_ROOM(boat))) {
 		snprintf(buf, sizeof(buf), "$V %s in.", mob_move_types[VEH_MOVE_TYPE(boat)]);

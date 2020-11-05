@@ -314,14 +314,12 @@ bool move_vehicle(char_data *ch, vehicle_data *veh, int dir, int subcmd) {
 	}
 	
 	was_in = IN_ROOM(veh);
-	adjust_vehicle_tech(veh, FALSE);
+	vehicle_from_room(veh);
 	vehicle_to_room(veh, to_room);
-	adjust_vehicle_tech(veh, TRUE);
 	
 	if (!entry_vtrigger(veh)) {
-		adjust_vehicle_tech(veh, FALSE);
+		vehicle_from_room(veh);
 		vehicle_to_room(veh, was_in);
-		adjust_vehicle_tech(veh, TRUE);
 		return FALSE;
 	}
 	
@@ -766,6 +764,11 @@ bool validate_sit_on_vehicle(char_data *ch, vehicle_data *veh, int pos, bool mes
 	else if (!VEH_IS_COMPLETE(veh)) {
 		if (message) {
 			msg_to_char(ch, "You can't sit %s it until it's finished.\r\n", IN_OR_ON(veh));
+		}
+	}
+	else if (VEH_HEALTH(veh) < 1) {
+		if (message) {
+			msg_to_char(ch, "It needs some repairs before you can sit %s it.\r\n", IN_OR_ON(veh));
 		}
 	}
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
@@ -1410,6 +1413,9 @@ ACMD(do_dispatch) {
 	else if (!VEH_IS_COMPLETE(veh)) {
 		msg_to_char(ch, "It isn't even built yet.\r\n");
 	}
+	else if (VEH_HEALTH(veh) < 1) {
+		msg_to_char(ch, "It needs some repairs before you can dispatch it.\r\n");
+	}
 	else if (VEH_FLAGGED(veh, VEH_ON_FIRE)) {
 		msg_to_char(ch, "You can't dispatch it while it's on fire!\r\n");
 	}
@@ -1512,7 +1518,7 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 	else if (GET_ROOM_VEHICLE(to_room) && (VEH_FLAGGED(veh, VEH_NO_LOAD_ONTO_VEHICLE) || !VEH_FLAGGED(GET_ROOM_VEHICLE(to_room), VEH_CARRY_VEHICLES))) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
-	else if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room)) {
+	else if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room, NULL)) {
 		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
@@ -1534,9 +1540,8 @@ void do_drag_portal(char_data *ch, vehicle_data *veh, char *arg) {
 			act("$V is dragged into $p.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), portal, veh, TO_CHAR | TO_ROOM);
 		}
 		
-		adjust_vehicle_tech(veh, FALSE);
+		vehicle_from_room(veh);
 		vehicle_to_room(veh, IN_ROOM(ch));
-		adjust_vehicle_tech(veh, TRUE);
 		
 		act("$V is dragged in with you.", FALSE, ch, NULL, veh, TO_CHAR);
 		act("$V is dragged in with $m.", FALSE, ch, NULL, veh, TO_ROOM);
@@ -1609,7 +1614,7 @@ ACMD(do_drag) {
 	else if (ROOM_IS_CLOSED(to_room) && VEH_FLAGGED(veh, VEH_NO_BUILDING)) {
 		msg_to_char(ch, "You can't drag it in there.\r\n");
 	}
-	else if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room)) {
+	else if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room, NULL)) {
 		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	else if (VEH_SIZE(veh) > 0 && total_vehicle_size_in_room(to_room) + VEH_SIZE(veh) > config_get_int("vehicle_size_per_tile")) {
@@ -1630,9 +1635,8 @@ ACMD(do_drag) {
 			act("$V is dragged along.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM);
 		}
 		
-		adjust_vehicle_tech(veh, FALSE);
+		vehicle_from_room(veh);
 		vehicle_to_room(veh, IN_ROOM(ch));
-		adjust_vehicle_tech(veh, TRUE);
 		
 		act("$V is dragged along with you.", FALSE, ch, NULL, veh, TO_CHAR);
 		act("$V is dragged along with $m.", FALSE, ch, NULL, veh, TO_ROOM);
@@ -1679,9 +1683,8 @@ void do_drive_through_portal(char_data *ch, vehicle_data *veh, obj_data *portal,
 			act(buf, FALSE, ROOM_PEOPLE(IN_ROOM(veh)), portal, veh, TO_CHAR | TO_ROOM);
 		}
 		
-		adjust_vehicle_tech(veh, FALSE);
+		vehicle_from_room(veh);
 		vehicle_to_room(veh, to_room);
-		adjust_vehicle_tech(veh, TRUE);
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			snprintf(buf, sizeof(buf), "$V %s out of $p.", mob_move_types[VEH_MOVE_TYPE(veh)]);
@@ -1765,6 +1768,9 @@ ACMD(do_drive) {
 	}
 	else if (!VEH_IS_COMPLETE(veh)) {
 		act("$V isn't going anywhere until it's finished.", FALSE, ch, NULL, veh, TO_CHAR);
+	}
+	else if (VEH_HEALTH(veh) < 1) {
+		act("$V isn't going anywhere until it gets some repairs.", FALSE, ch, NULL, veh, TO_CHAR);
 	}
 	else if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
 		msg_to_char(ch, "You must harness %d more animal%s to it first.\r\n", (VEH_ANIMALS_REQUIRED(veh) - count_harnessed_animals(veh)), PLURAL(VEH_ANIMALS_REQUIRED(veh) - count_harnessed_animals(veh)));
@@ -2117,6 +2123,9 @@ ACMD(do_lead) {
 		}
 		else if (!VEH_IS_COMPLETE(veh)) {
 			act("You must finish constructing $V before you can lead it.", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		else if (VEH_HEALTH(veh) < 1) {
+			act("You must repair $V before you can lead it.", FALSE, ch, NULL, veh, TO_CHAR);
 		}
 		else if (VEH_LED_BY(veh)) {
 			act("$N is already leading it.", FALSE, ch, NULL, VEH_LED_BY(veh), TO_CHAR);

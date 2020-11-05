@@ -1218,6 +1218,12 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 		}
 		return FALSE;
 	}
+	if (VEH_HEALTH(veh) < 1) {
+		if (ch) {
+			act("$V can't move anywhere until it's repaired!", FALSE, ch, NULL, veh, TO_CHAR);
+		}
+		return FALSE;
+	}
 	
 	// required number of mounts
 	if (count_harnessed_animals(veh) < VEH_ANIMALS_REQUIRED(veh)) {
@@ -1274,7 +1280,7 @@ bool validate_vehicle_move(char_data *ch, vehicle_data *veh, room_data *to_room)
 	}
 	
 	// climate checks
-	if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room)) {
+	if (!ROOM_IS_CLOSED(to_room) && !vehicle_allows_climate(veh, to_room, NULL)) {
 		act("$V can't go there.", FALSE, ch, NULL, veh, TO_CHAR);
 		return FALSE;
 	}
@@ -1372,9 +1378,8 @@ void char_through_portal(char_data *ch, obj_data *portal, bool following) {
 			act(buf, FALSE, ROOM_PEOPLE(was_in), portal, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM);
 		}
 		
-		adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), FALSE);
+		vehicle_from_room(GET_LEADING_VEHICLE(ch));
 		vehicle_to_room(GET_LEADING_VEHICLE(ch), IN_ROOM(ch));
-		adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), TRUE);
 		
 		snprintf(buf, sizeof(buf), "$V %s in through $p.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
 		act(buf, FALSE, ch, use_portal, GET_LEADING_VEHICLE(ch), TO_CHAR | TO_ROOM);
@@ -1584,9 +1589,8 @@ int perform_move(char_data *ch, int dir, room_data *to_room, bitvector_t flags) 
 			act(buf, FALSE, ROOM_PEOPLE(was_in), GET_LEADING_VEHICLE(ch), ch, TO_CHAR | TO_ROOM | ACT_VEHICLE_OBJ);
 		}
 		
-		adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), FALSE);
+		vehicle_from_room(GET_LEADING_VEHICLE(ch));
 		vehicle_to_room(GET_LEADING_VEHICLE(ch), IN_ROOM(ch));
-		adjust_vehicle_tech(GET_LEADING_VEHICLE(ch), TRUE);
 		
 		snprintf(buf, sizeof(buf), "$V %s in behind you.", mob_move_types[VEH_MOVE_TYPE(GET_LEADING_VEHICLE(ch))]);
 		act(buf, FALSE, ch, NULL, GET_LEADING_VEHICLE(ch), TO_CHAR);

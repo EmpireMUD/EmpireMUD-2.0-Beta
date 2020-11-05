@@ -1334,10 +1334,8 @@ ACMD(do_mteleport) {
 			}
 		}
 		else if ((*arg1 == UID_CHAR && (veh = get_vehicle(arg1))) || (veh = get_vehicle_in_room_vis(ch, arg1, NULL))) {
-			adjust_vehicle_tech(veh, FALSE);
 			vehicle_from_room(veh);
 			vehicle_to_room(veh, target);
-			adjust_vehicle_tech(veh, TRUE);
 			entry_vtrigger(veh);
 		}
 		else if ((*arg1 == UID_CHAR && (obj = get_obj(arg1))) || (obj = get_obj_vis(ch, arg1, NULL))) {

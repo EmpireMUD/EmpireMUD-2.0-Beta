@@ -106,7 +106,7 @@ else
       %mod% %self% icon &0|\&?..
     break
     case 4
-      %mod% %room% icon &0[&?__&0]
+      %mod% %self% icon &0[&?__&0]
     break
     case 5
       %mod% %self% icon ..&0/]

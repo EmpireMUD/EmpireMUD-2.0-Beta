@@ -25,6 +25,7 @@
 #include "handler.h"
 #include "dg_scripts.h"
 #include "constants.h"
+#include "vnums.h"
 
 /**
 * Contents:
@@ -73,37 +74,94 @@ void abandon_lost_vehicles(void) {
 		}
 		
 		// found!
-		VEH_OWNER(veh) = NULL;
-		
-		if (VEH_INTERIOR_HOME_ROOM(veh)) {
-			abandon_room(VEH_INTERIOR_HOME_ROOM(veh));
-		}
-		
-		if (VEH_IS_COMPLETE(veh)) {
-			qt_empire_players_vehicle(emp, qt_lose_vehicle, veh);
-			et_lose_vehicle(emp, veh);
-		}
+		perform_abandon_vehicle(veh);
 	}
 }
 
 
 /**
-* Checks the allowed-climates on every vehicle in the room. This should be
-* called if the terrain changes.
+* Determines if one or more climate flags are allowed to ruin a vehicle slowly
+* (damaging it over time rather than all at once).
 *
-* @param room_data *room The room to check vehicles in.
+* @param bitvector_t climate_flags Any number of CLIM_ to check together.
+* @param int mode CRVS_WHEN_GAINING or CRVS_WHEN_LOSING (whether you gained or lost this climate).
+* @return bool TRUE if the climate(s) allow the vehicle to ruin slowly, or FALSE if any climate does not allow it.
 */
-void check_vehicle_climate_change(room_data *room) {
-	vehicle_data *veh, *next_veh;
-	char *msg;
+bool check_climate_ruins_vehicle_slowly(bitvector_t climate_flags, int mode) {
+	bitvector_t check;
+	int pos;
+	bool ok = TRUE;
 	
-	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
-		if (!VEH_IS_EXTRACTED(veh) && !ROOM_IS_CLOSED(IN_ROOM(veh)) && !vehicle_allows_climate(veh, IN_ROOM(veh))) {
-			// this will extract it (usually)
-			msg = veh_get_custom_message(veh, VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM);
-			ruin_vehicle(veh, msg ? msg : "$V falls into ruin!");
+	for (check = climate_flags, pos = 0; check && ok; check >>= 1, ++pos) {
+		if (IS_SET(check, 1)) {
+			if (!climate_ruins_vehicle_slowly[pos][mode]) {
+				// any FALSE ruins the whole bunch
+				ok = FALSE;
+			}
 		}
 	}
+	
+	return ok;
+}
+
+
+/**
+* Checks the allowed-climates on a vehicle. This should be called if the
+* terrain changes, and can also be called periodically to check for damage.
+*
+* @param vehicle_data *veh The vehicle to check.
+* @param bool immediate_only If TRUE, only ruins a vehicle that must ruin immediately and skips any that ruin slowly. If FALSE, does both.
+* @return bool TRUE if the vehicle survived, FALSE if it was destroyed.
+*/
+bool check_vehicle_climate_change(vehicle_data *veh, bool immediate_only) {
+	char buf[256];
+	bool res, slow_ruin = FALSE;
+	char *msg;
+	
+	if (VEH_IS_EXTRACTED(veh) || ROOM_IS_CLOSED(IN_ROOM(veh))) {
+		return TRUE;	// skip extracted vehicles or inside ones
+	}
+	if (vehicle_allows_climate(veh, IN_ROOM(veh), &slow_ruin)) {
+		return TRUE;	// vehicle is safe
+	}
+	
+	// oh no! the vehicle can't be here!
+	
+	// verify ruin speed
+	if (VEH_FLAGGED(veh, VEH_RUIN_SLOWLY_FROM_CLIMATE)) {	
+		slow_ruin = TRUE;
+	}
+	if (VEH_FLAGGED(veh, VEH_RUIN_QUICKLY_FROM_CLIMATE)) {	
+		slow_ruin = FALSE;
+	}
+	
+	// and now do the work...
+	if (slow_ruin && !immediate_only) {
+		// this does its own logging
+		res = decay_one_vehicle(veh, "$V falls into ruin!");
+		
+		if (res && VEH_OWNER(veh)) {
+			// log AFTER because it probably logged on its own if it auto-abandoned
+			snprintf(buf, sizeof(buf), "%s%s is falling into ruin due to changing terrain", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+			log_to_empire(VEH_OWNER(veh), ELOG_TERRITORY, "%s", CAP(buf));
+		}
+		
+		return res;
+	}
+	else if (!slow_ruin) {
+		if (VEH_OWNER(veh)) {
+			// log before ruining (it'll be gone)
+			snprintf(buf, sizeof(buf), "%s%s has crumbled to ruin", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+			log_to_empire(VEH_OWNER(veh), ELOG_TERRITORY, "%s", CAP(buf));
+		}
+		// this will extract it (usually)
+		msg = veh_get_custom_message(veh, VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM);
+		ruin_vehicle(veh, msg ? msg : "$V falls into ruin!");
+		return FALSE;
+	}
+	
+	// other cases
+	return TRUE;
 }
 
 
@@ -173,6 +231,62 @@ int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms) {
 	}
 	
 	return count;
+}
+
+
+/**
+* Deals 10% damage, adds needed-maintenance if applicable, and may ruin the
+* vehicle when it's very damaged. It will always abandon it if the damage falls
+* too low.
+*
+* @param vehicle_data *veh The vehicle.
+* @param char *message A message to send if it's ruined ("$V crumbles from disrepair!") -- may be NULL and might be overridden by the vehicle's custom messages
+* @return bool TRUE if the vehicle survived, FALSE if it was ruined.
+*/
+bool decay_one_vehicle(vehicle_data *veh, char *message) {
+	static struct resource_data *default_res = NULL;
+	empire_data *emp = VEH_OWNER(veh);
+	struct resource_data *old_list;
+	char buf[256];
+	char *msg;
+	
+	// resources if it doesn't have its own
+	if (!default_res) {
+		add_to_resource_list(&default_res, RES_COMPONENT, COMP_NAILS, 1, 0);
+	}
+	
+	// update health
+	VEH_HEALTH(veh) -= MAX(1.0, ((double) VEH_MAX_HEALTH(veh) / 10.0));
+	
+	// check very low health
+	if (VEH_HEALTH(veh) <= 0) {
+		perform_abandon_vehicle(veh);
+		
+		// 50% of the time we just abandon, the rest we also decay to ruins
+		if (!number(0, 1) || VEH_IS_DISMANTLING(veh)) {
+			if (emp) {
+				snprintf(buf, sizeof(buf), "%s%s has crumbled to ruin", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+				log_to_empire(emp, ELOG_TERRITORY, "%s", CAP(buf));
+			}
+			msg = veh_get_custom_message(veh, VEH_CUSTOM_RUINS_TO_ROOM);
+			ruin_vehicle(veh, msg ? msg : message);
+			return FALSE;	// returns only if ruined
+		}
+		else if (emp) {
+			snprintf(buf, sizeof(buf), "%s%s has been abandoned due to decay", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+			log_to_empire(emp, ELOG_TERRITORY, "%s", CAP(buf));
+		}
+	}
+	
+	// apply maintenance if not dismantling
+	if (!VEH_IS_DISMANTLING(veh)) {
+		// add maintenance (if not dismantling)
+		old_list = VEH_NEEDS_RESOURCES(veh);
+		VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
+		free_resource_list(old_list);
+	}
+	
+	return TRUE;
 }
 
 
@@ -1042,10 +1156,17 @@ void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc) {
 *
 * @param vehicle_data *veh The vehicle to test.
 * @param room_data *room What room to check for climate.
+* @param bool *allow_slow_ruin Optional: A variable to pass back whether or not it can slowly ruin here (rather than all at once). Pass NULL to skip this.
 * @return bool TRUE if the vehicle allows it; FALSE if not.
 */
-bool vehicle_allows_climate(vehicle_data *veh, room_data *room) {
+bool vehicle_allows_climate(vehicle_data *veh, room_data *room, bool *allow_slow_ruin) {
 	bitvector_t climate = NOBITS;
+	bool ok = TRUE;
+	
+	if (allow_slow_ruin) {
+		// default this to true; change if needed
+		*allow_slow_ruin = TRUE;
+	}
 	
 	if (!veh || !room) {
 		return TRUE;	// junk in, junk out
@@ -1063,14 +1184,21 @@ bool vehicle_allows_climate(vehicle_data *veh, room_data *room) {
 	
 	// compare
 	if (VEH_REQUIRES_CLIMATE(veh) && !(VEH_REQUIRES_CLIMATE(veh) & climate)) {
-		return FALSE;	// required climate type is missing
+		// required climate type is missing
+		ok = FALSE;
+		if (allow_slow_ruin) {
+			*allow_slow_ruin &= check_climate_ruins_vehicle_slowly(VEH_REQUIRES_CLIMATE(veh) & ~climate, CRVS_WHEN_LOSING);
+		}
 	}
 	if (VEH_FORBID_CLIMATE(veh) && (VEH_FORBID_CLIMATE(veh) & climate)) {
-		return FALSE;	// has a forbidden climate type
+		// has a forbidden climate type
+		ok = FALSE;
+		if (allow_slow_ruin) {
+			*allow_slow_ruin &= check_climate_ruins_vehicle_slowly(VEH_FORBID_CLIMATE(veh) & climate, CRVS_WHEN_GAINING);
+		}
 	}
 	
-	// otherwise, we made it!
-	return TRUE;
+	return ok;
 }
 
 
@@ -2269,7 +2397,8 @@ vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum) {
 			case 'O': {
 				if (OBJ_FILE_TAG(line, "Owner:", length)) {
 					if (sscanf(line + length + 1, "%d", &i_in[0])) {
-						VEH_OWNER(veh) = real_empire(i_in[0]);
+						// VEH_OWNER(veh) = real_empire(i_in[0]);
+						perform_claim_vehicle(veh, real_empire(i_in[0]));
 					}
 				}
 				break;

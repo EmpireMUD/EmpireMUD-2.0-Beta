@@ -378,7 +378,7 @@ utils.o: utils.c conf.h sysdep.h structs.h uthash.h utils.h db.h comm.h \
 	$(CC) -c $(CFLAGS) utils.c
 vehicles.o: vehicles.c conf.h sysdep.h structs.h protocol.h uthash.h \
   utils.h interpreter.h db.h comm.h olc.h skills.h handler.h dg_scripts.h \
-  constants.h
+  constants.h vnums.h
 	$(CC) -c $(CFLAGS) vehicles.c
 weather.o: weather.c conf.h sysdep.h structs.h uthash.h utils.h comm.h \
   handler.h interpreter.h db.h skills.h constants.h

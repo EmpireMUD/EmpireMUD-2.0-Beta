@@ -6618,14 +6618,14 @@ void do_stat_room(char_data *ch) {
 	}
 	msg_to_char(ch, "\r\n");
 	
-	msg_to_char(ch, "VNum: [\tg%d\t0], Island: [\tg%d\t0] %s, Height [\tg%d\t0]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)));
+	msg_to_char(ch, "VNum: [\tg%d\t0], Lights: [\tg%d\t0], Island: [\tg%d\t0] %s, Height [\tg%d\t0]\r\n", GET_ROOM_VNUM(IN_ROOM(ch)), ROOM_LIGHTS(IN_ROOM(ch)), GET_ISLAND_ID(IN_ROOM(ch)), GET_ISLAND(IN_ROOM(ch)) ? GET_ISLAND(IN_ROOM(ch))->name : "no island", ROOM_HEIGHT(IN_ROOM(ch)));
 	
 	// location/time data
 	if (X_COORD(IN_ROOM(ch)) != -1) {
 		tinfo = get_local_time(IN_ROOM(ch));
 		latitude = Y_TO_LATITUDE(Y_COORD(IN_ROOM(ch)));
 		longitude = X_TO_LONGITUDE(X_COORD(IN_ROOM(ch)));
-		msg_to_char(ch, "Globe: [%.2f %s, %.2f %s], Time: [\tc%d%s\t0], Sun: [\tc%s\t0], Hours of sun today: [\tc%.2f\t0]\r\n", ABSOLUTE(latitude), (latitude >= 0.0 ? "N" : "S"), ABSOLUTE(longitude), (longitude >= 0.0 ? "E" : "W"), TIME_TO_12H(tinfo.hours), AM_PM(tinfo.hours), sun_types[get_sun_status(IN_ROOM(ch))], get_hours_of_sun(IN_ROOM(ch)));
+		msg_to_char(ch, "Globe: [\tc%.2f %s, %.2f %s\t0], Time: [\tc%d%s\t0], Sun: [\tc%s\t0], Hours of sun today: [\tc%.2f\t0]\r\n", ABSOLUTE(latitude), (latitude >= 0.0 ? "N" : "S"), ABSOLUTE(longitude), (longitude >= 0.0 ? "E" : "W"), TIME_TO_12H(tinfo.hours), AM_PM(tinfo.hours), sun_types[get_sun_status(IN_ROOM(ch))], get_hours_of_sun(IN_ROOM(ch)));
 		if ((zenith = get_zenith_days_from_solstice(IN_ROOM(ch))) != -1) {
 			msg_to_char(ch, "Zenith passage: [\tg%d day%s from the solstice\t0]\r\n", zenith, PLURAL(zenith));
 		}
@@ -9110,11 +9110,17 @@ ACMD(do_playerdelete) {
 			}
 		}
 		
-		// actual delete (remove items first)
-		extract_all_items(victim);
-		delete_player_character(victim);
-		extract_char(victim);
-		victim = NULL;	// prevent cleanup
+		if (file) {
+			// offline delete (will be freed at the end)
+			delete_player_character(victim);
+		}
+		else {
+			// in-game delete (remove items first, and extract)
+			extract_all_items(victim);
+			delete_player_character(victim);
+			extract_char(victim);
+			victim = NULL;	// prevent cleanup
+		}
 	}
 	
 	// cleanup
@@ -10423,10 +10429,8 @@ ACMD(do_trans) {
 			act("$V disappears in a mushroom cloud.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);
 		}
 		
-		adjust_vehicle_tech(veh, FALSE);
 		vehicle_from_room(veh);
 		vehicle_to_room(veh, to_room);
-		adjust_vehicle_tech(veh, TRUE);
 		
 		if (ROOM_PEOPLE(IN_ROOM(veh))) {
 			act("$V arrives from a puff of smoke.", FALSE, ROOM_PEOPLE(IN_ROOM(veh)), NULL, veh, TO_CHAR | TO_ROOM | DG_NO_TRIG);

@@ -278,11 +278,16 @@ void process_one_chore(empire_data *emp, room_data *room) {
 */
 void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	room_data *room = IN_ROOM(veh);
+	bool on_fire, starving;
 	int island;
 	
+	if (!room) {
+		return;
+	}
+	
 	// basic vars that determine what we do:
-	bool on_fire = VEH_FLAGGED(veh, VEH_ON_FIRE) ? TRUE : FALSE;
-	bool starving = empire_has_needs_status(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED);
+	on_fire = VEH_FLAGGED(veh, VEH_ON_FIRE) ? TRUE : FALSE;
+	starving = empire_has_needs_status(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED);
 	
 	// basic checks
 	if ((VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || (VEH_FLAGGED(veh, VEH_BUILDING) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK))) && !on_fire) {
@@ -294,6 +299,9 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	if (ROOM_OWNER(room) && ROOM_OWNER(room) != emp && !on_fire && !has_relationship(emp, ROOM_OWNER(room), DIPL_ALLIED)) {
 		return;	// cannot work in non-allied empires
 	}
+	if (!vehicle_allows_climate(veh, room, NULL)) {
+		return;	// cannot work when the vehicle is in forbidden climates (it's ruining itself)
+	}
 	
 	// PART 1: burning
 	if (on_fire) {
@@ -304,7 +312,7 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	}
 	
 	// PART 2: chores that happen even if starving (food chores)
-	if (!on_fire && vehicle_has_function_and_city_ok(veh, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
+	if (!on_fire && VEH_HEALTH(veh) >= 1 && vehicle_has_function_and_city_ok(veh, FNC_FISHING) && CHORE_ACTIVE(CHORE_FISHING)) {
 		do_chore_fishing(emp, room, veh);
 	}
 	if (starving) {
@@ -326,6 +334,9 @@ void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	}
 	
 	// PART 4: other chores (unlike room chores, you must check city status with vehicle_has_function_and_city_ok)
+	if (VEH_HEALTH(veh) < 1) {
+		return;	// can only fire-brigade/repair if low health
+	}
 	
 	// skilled labor chores:
 	if (EMPIRE_HAS_TECH(emp, TECH_SKILLED_LABOR)) {
@@ -769,7 +780,7 @@ void chore_update(void) {
 			}
 			
 			DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
-				if (VEH_OWNER(veh) == emp) {
+				if (VEH_OWNER(veh) == emp && !VEH_IS_EXTRACTED(veh)) {
 					process_one_vehicle_chore(emp, veh);
 				}
 			}

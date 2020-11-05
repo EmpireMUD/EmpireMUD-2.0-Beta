@@ -8144,6 +8144,8 @@ Available flags:
  !PAINT - cannot be painted
  *BRIGHT-PAINT - is brightly painted (set by the paint command)
  DEDICATE - can be dedicated
+ RUIN-SLOWLY-FROM-CLIMATE - always ruins slowly no matter what climate change
+ RUIN-QUICKLY-FROM-CLIMATE - always ruins quickly due to climate change
 
 ** The DRIVING/SAILING/FLYING flags each enable specific commands for moving
 the vehicle. If it has more than one of these, each command will work. Usually

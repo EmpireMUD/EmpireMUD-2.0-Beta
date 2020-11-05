@@ -3853,7 +3853,7 @@ void reduce_dismantle_resources(int damage, int max_health, struct resource_data
 	obj_data *proto;
 	
 	// determine how damaged the building it -- 1.0+ is VERY damaged, 0 is not damaged at all
-	damage_prc = (damage / MAX(1, max_health));
+	damage_prc = ((double)damage / MAX(1.0, (double)max_health));
 	damage_prc = MIN(1.0, damage_prc);	// reduce to 0-1.0 range (1.0 is fully damaged)
 	
 	// we keep a percent of the items based on how damaged it is, in the 20-90% range
@@ -3876,7 +3876,7 @@ void reduce_dismantle_resources(int damage, int max_health, struct resource_data
 			remaining += res->amount;	// how much survived this round
 		}
 		else {	// survives this round
-			++remaining;
+			remaining += res->amount;
 		}
 	}
 	
@@ -3885,7 +3885,7 @@ void reduce_dismantle_resources(int damage, int max_health, struct resource_data
 	
 	// second round (if we didn't reduce enough)
 	count = 0;
-	while (count < 10 && ((double) remaining) / total > prc_to_keep) {
+	while (count < 150 && (((double) remaining) / total) > prc_to_keep) {
 		++count;	// prevents infinite loop
 		
 		LL_FOREACH(*list, res) {
@@ -6007,13 +6007,14 @@ void relocate_players(room_data *room, room_data *to_room) {
 * @return bool TRUE if the room is light, FALSE if not.
 */
 bool room_is_light(room_data *room, bool count_adjacent_light) {
-	vehicle_data *veh;
-	
 	if (MAGIC_DARKNESS(room)) {
 		return FALSE;	// always dark
 	}
 	
 	// things that make the room light
+	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT)) {
+		return TRUE;	// not dark: has a light source
+	}
 	if (IS_ANY_BUILDING(room) && (ROOM_OWNER(room) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE))) {
 		return TRUE;	// not dark: claimed (or unclaimable) building
 	}
@@ -6023,15 +6024,8 @@ bool room_is_light(room_data *room, bool count_adjacent_light) {
 	if (ROOM_OWNER(room) && EMPIRE_HAS_TECH(ROOM_OWNER(room), TECH_CITY_LIGHTS) && get_territory_type_for_empire(room, ROOM_OWNER(room), FALSE, NULL) != TER_FRONTIER) {
 		return TRUE;	// not dark: city lights
 	}
-	if (ROOM_LIGHTS(room) > 0 || RMT_FLAGGED(room, RMT_LIGHT) || (count_adjacent_light && adjacent_room_is_light(room))) {
-		return TRUE;	// not dark: has a light source
-	}
-	
-	// check for lighted vehicle-type buildings
-	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (VEH_FLAGGED(veh, VEH_BUILDING) && (VEH_OWNER(veh) || ROOM_AFF_FLAGGED(room, ROOM_AFF_UNCLAIMABLE)) && VEH_IS_COMPLETE(veh)) {
-			return TRUE;
-		}
+	if (count_adjacent_light && adjacent_room_is_light(room)) {
+		return TRUE;	// not dark: adjacent room is light
 	}
 	
 	// otherwise: it's dark
@@ -6346,7 +6340,7 @@ bool room_has_function_and_city_ok(empire_data *for_emp, room_data *room, bitvec
 		if (!IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
 			continue;	// no function
 		}
-		if (!VEH_IS_COMPLETE(veh)) {
+		if (!VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1) {
 			continue;
 		}
 		if (for_emp && VEH_OWNER(veh) && VEH_OWNER(veh) != for_emp && !emp_can_use_vehicle(for_emp, veh, GUESTS_ALLOWED)) {
@@ -6398,7 +6392,7 @@ bool vehicle_has_function_and_city_ok(vehicle_data *veh, bitvector_t fnc_flag) {
 	room_data *room = IN_ROOM(veh);
 	bool junk;
 	
-	if (!VEH_IS_COMPLETE(veh) || !IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
+	if (!VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || !IS_SET(VEH_FUNCTIONS(veh), fnc_flag)) {
 		return FALSE;	// no function
 	}
 	if (VEH_FLAGGED(veh, MOVABLE_VEH_FLAGS) && IS_SET(fnc_flag, IMMOBILE_FNCS)) {

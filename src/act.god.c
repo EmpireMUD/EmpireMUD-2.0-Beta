@@ -51,8 +51,12 @@ static int perform_sacrifice(char_data *ch, char_data *god, obj_data *obj, bool 
 		act("$p: You can't sacrifice stolen items!", FALSE, ch, obj, NULL, TO_CHAR);
 		return 0;
 	}
+	if (OBJ_FLAGGED(obj, OBJ_KEEP)) {
+		act("$p: You can't sacrifice items with (keep).", FALSE, ch, obj, NULL, TO_CHAR);
+		return 0;
+	}
 	if (GET_OBJ_REQUIRES_QUEST(obj) != NOTHING && !IS_NPC(ch) && !IS_IMMORTAL(ch)) {
-		act("$p: you can't sacrifice quest items.", FALSE, ch, obj, NULL, TO_CHAR);
+		act("$p: You can't sacrifice quest items.", FALSE, ch, obj, NULL, TO_CHAR);
 		return 0;
 	}
 	if (!drop_otrigger(obj, ch, DROP_TRIG_SACRIFICE) || !drop_wtrigger(obj, ch, DROP_TRIG_SACRIFICE)) {
@@ -65,7 +69,7 @@ static int perform_sacrifice(char_data *ch, char_data *god, obj_data *obj, bool 
 	}
 	else {	// look for a vehicle
 		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(ch)), veh, next_in_room) {
-			if (VEH_IS_COMPLETE(veh) && VEH_PATRON(veh) == GET_IDNUM(god)) {
+			if (VEH_IS_COMPLETE(veh) && VEH_HEALTH(veh) > 0 && VEH_PATRON(veh) == GET_IDNUM(god)) {
 				any_patron = TRUE;
 				break;
 			}

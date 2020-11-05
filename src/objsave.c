@@ -975,7 +975,6 @@ void objpack_load_room(room_data *room) {
 			
 			if ((veh = unstore_vehicle_from_file(fl, vnum))) {
 				vehicle_to_room(veh, room);
-				adjust_vehicle_tech(veh, TRUE);
 			}
 		}
 		else if (!strn_cmp(line, "Rent-time:", 10)) {

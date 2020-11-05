@@ -112,6 +112,7 @@ void change_chop_territory(room_data *room) {
 */
 void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 	sector_data *old_sect = SECT(room), *st = sector_proto(sect), *base;
+	vehicle_data *veh, *next_veh;
 	struct map_data *map;
 	crop_data *new_crop = NULL;
 	empire_data *emp;
@@ -219,7 +220,9 @@ void change_terrain(room_data *room, sector_vnum sect, sector_vnum base_sect) {
 	}
 	
 	// lastly, see if any vehicles died from this
-	check_vehicle_climate_change(room);
+	DL_FOREACH_SAFE2(ROOM_VEHICLES(room), veh, next_veh, next_in_room) {
+		check_vehicle_climate_change(veh, TRUE);
+	}
 }
 
 
@@ -1233,12 +1236,11 @@ void annual_update_map_tile(struct map_data *tile) {
 */
 void annual_update_vehicle(vehicle_data *veh) {
 	static struct resource_data *default_res = NULL;
-	struct resource_data *old_list;
 	char *msg;
 	
 	// resources if it doesn't have its own
 	if (!default_res) {
-		add_to_resource_list(&default_res, RES_OBJECT, o_NAILS, 1, 0);
+		add_to_resource_list(&default_res, RES_COMPONENT, COMP_NAILS, 1, 0);
 	}
 	
 	// non-damage stuff:
@@ -1249,26 +1251,16 @@ void annual_update_vehicle(vehicle_data *veh) {
 		return;
 	}
 	
-	VEH_HEALTH(veh) -= MAX(1.0, ((double) VEH_MAX_HEALTH(veh) / 10.0));
-	
-	if (VEH_HEALTH(veh) > 0) {	// still alive
-		if (VEH_FLAGGED(veh, VEH_IS_RUINS)) {
-			// chance of ruining ruins: roughly 2 real years for average chance for ruins to be gone
-			if (!number(0, 89)) {
-				msg = veh_get_custom_message(veh, VEH_CUSTOM_RUINS_TO_ROOM);
-				ruin_vehicle(veh, msg ? msg : "$V finally crumbles to dust!");
-			}
-		}
-		else if (!VEH_IS_DISMANTLING(veh)) {
-			// add maintenance (if not dismantling)
-			old_list = VEH_NEEDS_RESOURCES(veh);
-			VEH_NEEDS_RESOURCES(veh) = combine_resources(old_list, VEH_YEARLY_MAINTENANCE(veh) ? VEH_YEARLY_MAINTENANCE(veh) : default_res);
-			free_resource_list(old_list);
+	// prepare to decay (ruins have special handling here)
+	if (VEH_FLAGGED(veh, VEH_IS_RUINS)) {
+		// chance of ruining ruins: roughly 2 real years for average chance for ruins to be gone
+		if (!number(0, 89)) {
+			msg = veh_get_custom_message(veh, VEH_CUSTOM_RUINS_TO_ROOM);
+			ruin_vehicle(veh, msg ? msg : "$V finally crumbles to dust!");
 		}
 	}
-	else {	// destroyed
-		msg = veh_get_custom_message(veh, VEH_CUSTOM_RUINS_TO_ROOM);
-		ruin_vehicle(veh, msg ? msg : "$V crumbles from disrepair!");
+	else {	// normal decay (not ruins)
+		decay_one_vehicle(veh, "$V crumbles from disrepair!");
 	}
 }
 
@@ -2244,7 +2236,7 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 	if (veh) {
 		emp = VEH_OWNER(veh);
 		room = IN_ROOM(veh);
-		island = GET_ISLAND_ID(room);
+		island = room ? GET_ISLAND_ID(room) : NO_ISLAND;
 	}
 	
 	// only care about
@@ -3300,7 +3292,7 @@ void init_room(room_data *room, room_vnum vnum) {
 	perform_change_base_sect(room, NULL, inside);
 	
 	COMPLEX_DATA(room) = init_complex_data();	// no type at this point
-	room->light = 0;
+	ROOM_LIGHTS(room) = 0;
 		
 	room->af = NULL;
 	

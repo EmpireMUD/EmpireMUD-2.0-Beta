@@ -190,7 +190,7 @@ bool check_build_location_and_dir(char_data *ch, craft_data *type, int dir, bool
 		msg_to_char(ch, "This area is already too full to %s that.\r\n", command);
 		return FALSE;
 	}
-	if (make_veh && (is_upgrade || !ROOM_IS_CLOSED(IN_ROOM(ch))) && !vehicle_allows_climate(make_veh, IN_ROOM(ch))) {
+	if (make_veh && (is_upgrade || !ROOM_IS_CLOSED(IN_ROOM(ch))) && !vehicle_allows_climate(make_veh, IN_ROOM(ch), NULL)) {
 		msg_to_char(ch, "You can't %s %s here.\r\n", command, VEH_SHORT_DESC(make_veh));
 		return FALSE;
 	}
@@ -1022,9 +1022,6 @@ void process_build(char_data *ch, room_data *room, int act_type) {
 			if (BUILDING_RESOURCES(room)) {
 				// copy this to display the next 1
 				temp_res = *BUILDING_RESOURCES(room);
-				if (temp_res.type == RES_OBJECT || temp_res.type == RES_COMPONENT) {
-					temp_res.amount = 1;	// just show next 1
-				}
 				temp_res.next = NULL;
 				show_resource_list(&temp_res, buf);
 				msg_to_char(ch, "You don't have %s and stop working.\r\n", buf);
@@ -2190,6 +2187,9 @@ ACMD(do_maintain) {
 		}
 		else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 			msg_to_char(ch, "It's too dark to repair anything here.\r\n");
+		}
+		else if (!vehicle_allows_climate(veh, IN_ROOM(veh), NULL)) {
+			msg_to_char(ch, "You can't repair it -- it's falling into disrepair because it's in the wrong terrain.\r\n");
 		}
 		else {
 			start_action(ch, ACT_REPAIR_VEHICLE, -1);

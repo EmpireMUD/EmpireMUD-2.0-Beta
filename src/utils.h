@@ -310,6 +310,7 @@
 #define GET_EQ(ch, i)  ((ch)->equipment[i])
 #define GET_REAL_AGE(ch)  (age(ch)->year)
 #define IN_ROOM(ch)  ((ch)->in_room)
+#define GET_LIGHTS(ch)  ((ch)->lights)
 #define GET_LOYALTY(ch)  ((ch)->loyalty)
 
 // ch->aff_attributes, ch->real_attributes:
@@ -1611,6 +1612,7 @@ int Y_COORD(room_data *room);	// formerly #define Y_COORD(room)  FLAT_Y_COORD(ge
 #define VEH_OR_BLD(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) ? "building" : "vehicle")
 #define VEH_PAINT_COLOR(veh)  get_vehicle_extra_data((veh), ROOM_EXTRA_PAINT_COLOR)
 #define VEH_PATRON(veh)  get_vehicle_extra_data((veh), ROOM_EXTRA_DEDICATE_ID)
+#define VEH_PROVIDES_LIGHT(veh)  (VEH_FLAGGED((veh), VEH_BUILDING) && (VEH_OWNER(veh) || (IN_ROOM(veh) && ROOM_AFF_FLAGGED(IN_ROOM(veh), ROOM_AFF_UNCLAIMABLE))))
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -2369,12 +2371,13 @@ void update_world_count();
 
 // vehicles.c
 void add_room_to_vehicle(room_data *room, vehicle_data *veh);
-void check_vehicle_climate_change(room_data *room);
+bool check_vehicle_climate_change(vehicle_data *veh, bool immediate_only);
 void complete_vehicle(vehicle_data *veh);
 int count_harnessed_animals(vehicle_data *veh);
 int count_players_in_vehicle(vehicle_data *veh, bool ignore_invis_imms);
 int count_building_vehicles_in_room(room_data *room, empire_data *only_owner);
 void Crash_save_vehicles(vehicle_data *veh, FILE *fl);
+bool decay_one_vehicle(vehicle_data *veh, char *message);
 void delete_vehicle_interior(vehicle_data *veh);
 void empty_vehicle(vehicle_data *veh, room_data *to_room);
 craft_data *find_craft_for_vehicle(vehicle_data *veh);
@@ -2401,7 +2404,7 @@ int total_vehicle_size_in_room(room_data *room);
 char_data *unharness_mob_from_vehicle(struct vehicle_attached_mob *vam, vehicle_data *veh);
 vehicle_data *unstore_vehicle_from_file(FILE *fl, any_vnum vnum);
 void update_vehicle_island_and_loc(vehicle_data *veh, room_data *loc);
-bool vehicle_allows_climate(vehicle_data *veh, room_data *room);
+bool vehicle_allows_climate(vehicle_data *veh, room_data *room, bool *allow_slow_ruin);
 bool vehicle_is_chameleon(vehicle_data *veh, room_data *from);
 
 // weather.c moons

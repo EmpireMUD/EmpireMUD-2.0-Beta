@@ -1025,10 +1025,8 @@ OCMD(do_oteleport) {
 			}
 		}
 		else if ((veh = get_vehicle_near_obj(obj, arg1))) {
-			adjust_vehicle_tech(veh, FALSE);
 			vehicle_from_room(veh);
 			vehicle_to_room(veh, target);
-			adjust_vehicle_tech(veh, TRUE);
 			entry_vtrigger(veh);
 		}
 		else if ((tobj = get_obj_by_obj(obj, arg1))) {

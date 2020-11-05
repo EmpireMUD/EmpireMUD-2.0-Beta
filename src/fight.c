@@ -2709,7 +2709,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 	
 	// resources if it doesn't have its own
 	if (!default_res) {
-		add_to_resource_list(&default_res, RES_OBJECT, o_NAILS, 1, 0);
+		add_to_resource_list(&default_res, RES_COMPONENT, COMP_NAILS, 1, 0);
 	}
 	
 	// no effect
@@ -2784,13 +2784,9 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 			die(VEH_SITTING_ON(veh), VEH_SITTING_ON(veh));
 		}
 		
-		if (VEH_OWNER(veh)) {
-			// do this before removing it from room
-			adjust_vehicle_tech(veh, FALSE);
-		}
-		
 		vehicle_from_room(veh);	// remove from room first to destroy anything inside
 		fully_empty_vehicle(veh, NULL);
+		vehicle_to_room(veh, get_extraction_room());	// put it here temporarily
 		
 		if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
 			qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);

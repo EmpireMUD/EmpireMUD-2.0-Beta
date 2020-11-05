@@ -2442,6 +2442,11 @@ void process_repairing(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
+	if (!vehicle_allows_climate(veh, IN_ROOM(veh), NULL)) {
+		msg_to_char(ch, "You can't repair it -- it's falling into disrepair because it's in the wrong terrain.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	
 	// good to repair:
 	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, &found_obj))) {
@@ -2463,9 +2468,6 @@ void process_repairing(char_data *ch) {
 		if (VEH_NEEDS_RESOURCES(veh)) {
 			// copy this to display the next 1
 			temp_res = *VEH_NEEDS_RESOURCES(veh);
-			if (temp_res.type == RES_OBJECT || temp_res.type == RES_COMPONENT) {
-				temp_res.amount = 1;	// just show next 1
-			}
 			temp_res.next = NULL;
 			show_resource_list(&temp_res, buf);
 			msg_to_char(ch, "You don't have %s and stop repairing.\r\n", buf);
@@ -3733,7 +3735,7 @@ bool can_gen_interact_room(char_data *ch, room_data *room, const struct gen_inte
 	no_guest_room = !can_use_room(ch, IN_ROOM(ch), GUESTS_ALLOWED);
 	
 	DL_FOREACH2(ROOM_VEHICLES(room), veh, next_in_room) {
-		if (!VEH_IS_COMPLETE(veh) || !has_interaction(VEH_INTERACTIONS(veh), data->interact)) {
+		if (!VEH_IS_COMPLETE(veh) || VEH_HEALTH(veh) < 1 || !has_interaction(VEH_INTERACTIONS(veh), data->interact)) {
 			continue;	// can't act on veh at all
 		}
 		else if (no_guest_room || !can_use_vehicle(ch, veh, MEMBERS_ONLY)) {

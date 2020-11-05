@@ -1792,8 +1792,7 @@ void delete_empire(empire_data *emp) {
 	// update all vehicles
 	DL_FOREACH(vehicle_list, veh) {
 		if (VEH_OWNER(veh) == emp) {
-			VEH_OWNER(veh) = NULL;
-			VEH_SHIPPING_ID(veh) = -1;
+			perform_abandon_vehicle(veh);
 		}
 		LL_FOREACH(VEH_ANIMALS(veh), vam) {
 			if (vam->empire == vnum) {

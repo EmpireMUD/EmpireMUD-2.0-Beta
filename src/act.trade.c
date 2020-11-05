@@ -1165,9 +1165,6 @@ void process_gen_craft_vehicle(char_data *ch, craft_data *type) {
 		if (VEH_NEEDS_RESOURCES(veh)) {
 			// copy this to display the next 1
 			temp_res = *VEH_NEEDS_RESOURCES(veh);
-			if (temp_res.type == RES_OBJECT || temp_res.type == RES_COMPONENT) {
-				temp_res.amount = 1;	// just show next 1
-			}
 			temp_res.next = NULL;
 			show_resource_list(&temp_res, buf);
 			msg_to_char(ch, "You don't have %s and stop %s.\r\n", buf, gen_craft_data[GET_CRAFT_TYPE(type)].verb);
@@ -1719,10 +1716,10 @@ void do_gen_craft_vehicle(char_data *ch, craft_data *type, int dir) {
 			}
 			
 			// and set the owner to the room owner
-			VEH_OWNER(veh) = ROOM_OWNER(HOME_ROOM(IN_ROOM(ch)));
+			perform_claim_vehicle(veh, ROOM_OWNER(HOME_ROOM(IN_ROOM(ch))));
 		}
 		else {
-			VEH_OWNER(veh) = GET_LOYALTY(ch);
+			perform_claim_vehicle(veh, GET_LOYALTY(ch));
 		}
 	}
 	VEH_HEALTH(veh) = MAX(1, VEH_MAX_HEALTH(veh) * 0.2);	// start at 20% health, will heal on completion
