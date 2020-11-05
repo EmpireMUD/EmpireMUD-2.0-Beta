@@ -5201,7 +5201,7 @@ void read_empire_members(empire_data *only_empire, bool read_techs) {
 *
 * @param char_data *ch The player to add the set to.
 * @param int set_id The set's idnum, or NOTHING if you want to auto-detect and create a new one.
-* @param char *name The name of the equipment set (arbitrary but must be pre-validated).
+* @param char *name The name of the equipment set (arbitrary but must be pre-validated). NOTE: This string will be stored as the name, so pass a copy of it.
 * @return int The id of the set (in case you requested a new one), or NOTHING if we failed to create one.
 */
 int add_eq_set_to_char(char_data *ch, int set_id, char *name) {

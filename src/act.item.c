@@ -1836,7 +1836,7 @@ void do_eq_set(char_data *ch, char *argument) {
 		return;
 	}
 	else {
-		set_id = add_eq_set_to_char(ch, NOTHING, argument);
+		set_id = add_eq_set_to_char(ch, NOTHING, str_dup(argument));
 	}
 	
 	// put all current gear on that set
