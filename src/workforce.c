@@ -278,11 +278,16 @@ void process_one_chore(empire_data *emp, room_data *room) {
 */
 void process_one_vehicle_chore(empire_data *emp, vehicle_data *veh) {
 	room_data *room = IN_ROOM(veh);
+	bool on_fire, starving;
 	int island;
 	
+	if (!room) {
+		return;
+	}
+	
 	// basic vars that determine what we do:
-	bool on_fire = VEH_FLAGGED(veh, VEH_ON_FIRE) ? TRUE : FALSE;
-	bool starving = empire_has_needs_status(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED);
+	on_fire = VEH_FLAGGED(veh, VEH_ON_FIRE) ? TRUE : FALSE;
+	starving = empire_has_needs_status(emp, GET_ISLAND_ID(room), ENEED_WORKFORCE, ENEED_STATUS_UNSUPPLIED);
 	
 	// basic checks
 	if ((VEH_FLAGGED(veh, VEH_PLAYER_NO_WORK) || (VEH_FLAGGED(veh, VEH_BUILDING) && ROOM_AFF_FLAGGED(room, ROOM_AFF_NO_WORK))) && !on_fire) {
@@ -775,7 +780,7 @@ void chore_update(void) {
 			}
 			
 			DL_FOREACH_SAFE(vehicle_list, veh, global_next_vehicle) {
-				if (VEH_OWNER(veh) == emp) {
+				if (VEH_OWNER(veh) == emp && !VEH_IS_EXTRACTED(veh)) {
 					process_one_vehicle_chore(emp, veh);
 				}
 			}

@@ -2786,6 +2786,7 @@ bool besiege_vehicle(char_data *attacker, vehicle_data *veh, int damage, int sie
 		
 		vehicle_from_room(veh);	// remove from room first to destroy anything inside
 		fully_empty_vehicle(veh, NULL);
+		vehicle_to_room(veh, get_extraction_room());	// put it here temporarily
 		
 		if (VEH_OWNER(veh) && VEH_IS_COMPLETE(veh)) {
 			qt_empire_players_vehicle(VEH_OWNER(veh), qt_lose_vehicle, veh);
