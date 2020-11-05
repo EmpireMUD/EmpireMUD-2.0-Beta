@@ -247,6 +247,7 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 	static struct resource_data *default_res = NULL;
 	empire_data *emp = VEH_OWNER(veh);
 	struct resource_data *old_list;
+	char buf[256];
 	char *msg;
 	
 	// resources if it doesn't have its own
@@ -264,14 +265,16 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 		// 50% of the time we just abandon, the rest we also decay to ruins
 		if (!number(0, 1) || VEH_IS_DISMANTLING(veh)) {
 			if (emp) {
-				log_to_empire(emp, ELOG_TERRITORY, "%s%s has crumbled to ruin", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+				snprintf(buf, sizeof(buf), "%s%s has crumbled to ruin", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+				log_to_empire(emp, ELOG_TERRITORY, "%s", CAP(buf));
 			}
 			msg = veh_get_custom_message(veh, VEH_CUSTOM_RUINS_TO_ROOM);
 			ruin_vehicle(veh, msg ? msg : message);
 			return FALSE;	// returns only if ruined
 		}
 		else if (emp) {
-			log_to_empire(emp, ELOG_TERRITORY, "%s%s has been abandoned due to decay", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+			snprintf(buf, sizeof(buf), "%s%s has been abandoned due to decay", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+			log_to_empire(emp, ELOG_TERRITORY, "%s", buf);
 		}
 	}
 	
