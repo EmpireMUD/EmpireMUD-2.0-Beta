@@ -114,6 +114,7 @@ bool check_climate_ruins_vehicle_slowly(bitvector_t climate_flags, int mode) {
 * @return bool TRUE if the vehicle survived, FALSE if it was destroyed.
 */
 bool check_vehicle_climate_change(vehicle_data *veh, bool immediate_only) {
+	char buf[256];
 	bool res, slow_ruin = FALSE;
 	char *msg;
 	
@@ -141,7 +142,8 @@ bool check_vehicle_climate_change(vehicle_data *veh, bool immediate_only) {
 		
 		if (res && VEH_OWNER(veh)) {
 			// log AFTER because it probably logged on its own if it auto-abandoned
-			log_to_empire(VEH_OWNER(veh), ELOG_TERRITORY, "%s%s is falling into ruin due to changing terrain", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+			snprintf(buf, sizeof(buf), "%s%s is falling into ruin due to changing terrain", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+			log_to_empire(VEH_OWNER(veh), ELOG_TERRITORY, "%s", CAP(buf));
 		}
 		
 		return res;
@@ -149,7 +151,8 @@ bool check_vehicle_climate_change(vehicle_data *veh, bool immediate_only) {
 	else if (!slow_ruin) {
 		if (VEH_OWNER(veh)) {
 			// log before ruining (it'll be gone)
-			log_to_empire(VEH_OWNER(veh), ELOG_TERRITORY, "%s%s has crumbled to ruin", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+			snprintf(buf, sizeof(buf), "%s%s has crumbled to ruin", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
+			log_to_empire(VEH_OWNER(veh), ELOG_TERRITORY, "%s", CAP(buf));
 		}
 		// this will extract it (usually)
 		msg = veh_get_custom_message(veh, VEH_CUSTOM_CLIMATE_CHANGE_TO_ROOM);
