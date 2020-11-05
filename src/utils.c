@@ -3876,7 +3876,7 @@ void reduce_dismantle_resources(int damage, int max_health, struct resource_data
 			remaining += res->amount;	// how much survived this round
 		}
 		else {	// survives this round
-			++remaining;
+			remaining += res->amount;
 		}
 	}
 	
@@ -3885,7 +3885,7 @@ void reduce_dismantle_resources(int damage, int max_health, struct resource_data
 	
 	// second round (if we didn't reduce enough)
 	count = 0;
-	while (count < 10 && ((double) remaining) / total > prc_to_keep) {
+	while (count < 150 && (((double) remaining) / total) > prc_to_keep) {
 		++count;	// prevents infinite loop
 		
 		LL_FOREACH(*list, res) {
