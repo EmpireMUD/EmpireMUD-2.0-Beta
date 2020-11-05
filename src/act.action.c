@@ -2442,6 +2442,11 @@ void process_repairing(char_data *ch) {
 		cancel_action(ch);
 		return;
 	}
+	if (!vehicle_allows_climate(veh, IN_ROOM(veh), NULL)) {
+		msg_to_char(ch, "You can't repair it -- it's falling into disrepair because it's in the wrong terrain.\r\n");
+		cancel_action(ch);
+		return;
+	}
 	
 	// good to repair:
 	if ((res = get_next_resource(ch, VEH_NEEDS_RESOURCES(veh), can_use_room(ch, IN_ROOM(ch), MEMBERS_ONLY), TRUE, &found_obj))) {

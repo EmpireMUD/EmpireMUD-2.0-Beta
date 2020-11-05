@@ -2188,6 +2188,9 @@ ACMD(do_maintain) {
 		else if (!can_see_in_dark_room(ch, IN_ROOM(ch), TRUE)) {
 			msg_to_char(ch, "It's too dark to repair anything here.\r\n");
 		}
+		else if (!vehicle_allows_climate(veh, IN_ROOM(veh), NULL)) {
+			msg_to_char(ch, "You can't repair it -- it's falling into disrepair because it's in the wrong terrain.\r\n");
+		}
 		else {
 			start_action(ch, ACT_REPAIR_VEHICLE, -1);
 			GET_ACTION_VNUM(ch, 0) = veh_script_id(veh);
