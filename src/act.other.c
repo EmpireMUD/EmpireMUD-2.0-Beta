@@ -2146,7 +2146,7 @@ ACMD(do_douse) {
 	obj_data *obj = NULL, *found_obj = NULL, *iter;
 	char arg[MAX_INPUT_LENGTH];
 	vehicle_data *veh;
-	byte amount;
+	int amount;
 	
 	// this loop finds a water container and sets obj
 	DL_FOREACH2(ch->carrying, iter, next_content) {
