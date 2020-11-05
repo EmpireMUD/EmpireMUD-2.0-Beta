@@ -963,8 +963,7 @@ void heartbeat(int heart_pulse) {
 		HEARTBEAT_LOG("10")
 	}
 
-	// TODO won't the macro work here?
-	if (!(heart_pulse % (int)(0.1 * PASSES_PER_SEC))) {
+	if (HEARTBEAT(0.1)) {
 		frequent_combat(heart_pulse);
 		HEARTBEAT_LOG("11")
 	}
