@@ -415,6 +415,7 @@ int data_set_int(int key, int value);
 long data_set_long(int key, long value);
 
 // descriptors
+extern struct txt_block *bufpool;
 extern descriptor_data *descriptor_list;
 
 void free_descriptor(descriptor_data *desc);

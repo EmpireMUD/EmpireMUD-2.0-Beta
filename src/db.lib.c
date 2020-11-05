@@ -8506,6 +8506,7 @@ void free_whole_library(void) {
 	struct slash_channel *slash, *next_slash;
 	struct trading_post_data *tpd, *next_tpd;
 	trig_data *trig, *next_trig;
+	struct txt_block *txb;
 	// struct uid_lookup_table *uid, *next_uid;
 	vehicle_data *veh, *next_veh;
 	int iter, x, y;
@@ -8768,6 +8769,14 @@ void free_whole_library(void) {
 	// misc data
 	LL_FOREACH_SAFE(ban_list, ban, next_ban) {
 		free(ban);
+	}
+	
+	while ((txb = bufpool)) {
+		bufpool = txb->next;
+		if (txb->text) {
+			free(txb->text);
+		}
+		free(txb);
 	}
 
 	for (iter = 0; iter < num_slow_ips; ++iter) {
