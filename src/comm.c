@@ -2961,7 +2961,7 @@ void write_to_output(const char *txt, descriptor_data *t) {
 		bufpool = bufpool->next;
 	}
 	else {			/* else create a new one */
-   		CREATE(t->large_outbuf, struct txt_block, 1);
+   		CREATE(t->large_outbuf, struct txt_block, 1);	// saw this line memory-leak
 		CREATE(t->large_outbuf->text, char, LARGE_BUFSIZE);
 		buf_largecount++;
 	}
