@@ -901,9 +901,12 @@ void update_reboot(void) {
 
 void heartbeat(int heart_pulse) {
 	static int mins_since_crashsave = 0;
-	bool debug_log = FALSE;
 	
 	#define HEARTBEAT(x)  !(heart_pulse % (int)((x) * PASSES_PER_SEC))
+	
+	// switch which of these is commented if you want timestamp logging:
+	// #define HEARTBEAT_LOG(id_str)  if (HEARTBEAT(15)) { log("debug %s:\t%lld", id_str, microtime()); }
+	#define HEARTBEAT_LOG(id_str)
 	
 	// TODO go through this, arrange it better, combine anything combinable
 
@@ -917,166 +920,177 @@ void heartbeat(int heart_pulse) {
 	// this is meant to be slightly longer than the mobile_activity pulse, and is mentioned in help files
 	if (HEARTBEAT(13)) {
 		script_trigger_check();
-		if (debug_log && HEARTBEAT(15)) { log("debug  2:\t%lld", microtime()); }
+		HEARTBEAT_LOG("1")
 	}
 
 	if (HEARTBEAT(0.2)) {
-		update_actions();		
-		if (debug_log && HEARTBEAT(15)) { log("debug  3:\t%lld", microtime()); }
+		update_actions();
+		HEARTBEAT_LOG("2")
 	}
 	if (HEARTBEAT(1)) {
 		check_expired_cooldowns();	// descriptor list
-		if (debug_log && HEARTBEAT(15)) { log("debug  4:\t%lld", microtime()); }
+		HEARTBEAT_LOG("3")
 	}
 
 	if (HEARTBEAT(3)) {
 		update_guard_towers();
-		if (debug_log && HEARTBEAT(15)) { log("debug  5:\t%lld", microtime()); }
+		HEARTBEAT_LOG("4")
 	}
 	
 	if (HEARTBEAT(30)) {
 		sanity_check();
-		if (debug_log && HEARTBEAT(15)) { log("debug  6:\t%lld", microtime()); }
+		HEARTBEAT_LOG("5")
 	}
 
 	if (HEARTBEAT(15)) {
 		check_idle_passwords();
-		if (debug_log && HEARTBEAT(15)) { log("debug  7:\t%lld", microtime()); }
+		HEARTBEAT_LOG("6")
+		
 		check_death_respawn();
-		if (debug_log && HEARTBEAT(15)) { log("debug  7.5:\t%lld", microtime()); }
+		HEARTBEAT_LOG("7")
+		
 		run_mob_echoes();
-		if (debug_log && HEARTBEAT(15)) { log("debug  7.6:\t%lld", microtime()); }
+		HEARTBEAT_LOG("8")
 	}
 
 	if (HEARTBEAT(30)) {
 		update_players_online_stats();
-		if (debug_log && HEARTBEAT(15)) { log("debug  9:\t%lld", microtime()); }
+		HEARTBEAT_LOG("9")
 	}
 
 	if (HEARTBEAT(10)) {
 		mobile_activity();
-		if (debug_log && HEARTBEAT(15)) { log("debug 10:\t%lld", microtime()); }
+		HEARTBEAT_LOG("10")
 	}
 
 	// TODO won't the macro work here?
 	if (!(heart_pulse % (int)(0.1 * PASSES_PER_SEC))) {
 		frequent_combat(heart_pulse);
-		if (debug_log && HEARTBEAT(15)) { log("debug 11:\t%lld", microtime()); }
+		HEARTBEAT_LOG("11")
 	}
 	
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
 		process_theft_logs();
-		if (debug_log && HEARTBEAT(15)) { log("debug 12.1:\t%lld", microtime()); }
+		HEARTBEAT_LOG("12")
 	}
 	if (HEARTBEAT(SECS_PER_REAL_UPDATE)) {
 		real_update();
-		if (debug_log && HEARTBEAT(15)) { log("debug 13:\t%lld", microtime()); }
+		HEARTBEAT_LOG("13")
 	}
 
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
 		weather_and_time();
-		if (debug_log && HEARTBEAT(15)) { log("debug 14a:\t%lld", microtime()); }
+		HEARTBEAT_LOG("14")
+		
 		chore_update();
-		if (debug_log && HEARTBEAT(15)) { log("debug 14b:\t%lld", microtime()); }
+		HEARTBEAT_LOG("15")
 	}
 	
 	// slightly off the hour to prevent yet another thing on the tick
 	if (HEARTBEAT(SECS_PER_MUD_HOUR+1)) {
 		update_empire_npc_data();
-		if (debug_log && HEARTBEAT(15)) { log("debug 15:\t%lld", microtime()); }
+		HEARTBEAT_LOG("16")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
 		check_wars();
-		if (debug_log && HEARTBEAT(15)) { log("debug 16:\t%lld", microtime()); }
+		HEARTBEAT_LOG("17")
+		
 		reset_instances();
-		if (debug_log && HEARTBEAT(15)) { log("debug 17:\t%lld", microtime()); }
+		HEARTBEAT_LOG("18")
 	}
 	
 	if (HEARTBEAT(15 * SECS_PER_REAL_MIN)) {
 		output_map_to_file();
-		if (debug_log && HEARTBEAT(15)) { log("debug 18:\t%lld", microtime()); }
+		HEARTBEAT_LOG("19")
 	}
 
 	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
 		update_reboot();
-		if (debug_log && HEARTBEAT(15)) { log("debug 19a:\t%lld", microtime()); }
+		HEARTBEAT_LOG("20")
+		
 		if (++mins_since_crashsave >= 5) {
 			mins_since_crashsave = 0;
 			save_all_players(TRUE);
-			if (debug_log && HEARTBEAT(15)) { log("debug 19b:\t%lld", microtime()); }
+			HEARTBEAT_LOG("21")
 		}
 		
 		display_automessages();
-		if (debug_log && HEARTBEAT(15)) { log("debug 19c:\t%lld", microtime()); }
+		HEARTBEAT_LOG("22")
 	}
 	
 	if (HEARTBEAT(12 * SECS_PER_REAL_HOUR)) {
 		reduce_city_overages();
-		if (debug_log && HEARTBEAT(15)) { log("debug 20:\t%lld", microtime()); }
+		HEARTBEAT_LOG("23")
+		
 		check_newbie_islands();
-		if (debug_log && HEARTBEAT(15)) { log("debug 20.5:\t%lld", microtime()); }
+		HEARTBEAT_LOG("24")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
 		reduce_stale_empires();
-		if (debug_log && HEARTBEAT(15)) { log("debug 21:\t%lld", microtime()); }
+		HEARTBEAT_LOG("25")
 	}
 	
 	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
 		reduce_outside_territory();
-		if (debug_log && HEARTBEAT(15)) { log("debug 22:\t%lld", microtime()); }
+		HEARTBEAT_LOG("26")
 	}
 	
 	if (HEARTBEAT(3 * SECS_PER_REAL_MIN)) {
 		generate_adventure_instances();
-		if (debug_log && HEARTBEAT(15)) { log("debug 23:\t%lld", microtime()); }
+		HEARTBEAT_LOG("27")
 	}
 	
 	if (HEARTBEAT(5 * SECS_PER_REAL_MIN)) {
 		prune_instances();
-		if (debug_log && HEARTBEAT(15)) { log("debug 24:\t%lld", microtime()); }
+		HEARTBEAT_LOG("28")
+		
 		update_trading_post();
-		if (debug_log && HEARTBEAT(15)) { log("debug 24.5:\t%lld", microtime()); }
+		HEARTBEAT_LOG("29")
 	}
 	
 	if (HEARTBEAT(1)) {
 		if (data_table_needs_save) {
 			save_data_table(FALSE);
-			if (debug_log && HEARTBEAT(15)) { log("debug 26:\t%lld", microtime()); }
+			HEARTBEAT_LOG("30")
 		}
 		if (events_need_save) {
 			write_running_events_file();
-			if (debug_log && HEARTBEAT(15)) { log("debug 26.5:\t%lld", microtime()); }
+			HEARTBEAT_LOG("31")
 		}
 		save_marked_empires();
-		if (debug_log && HEARTBEAT(15)) { log("debug 27:\t%lld", microtime()); }
+		HEARTBEAT_LOG("32")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_DAY)) {
 		clean_empire_offenses();
-		if (debug_log && HEARTBEAT(15)) { log("debug 28:\t%lld", microtime()); }
+		HEARTBEAT_LOG("33")
+		
 		update_instance_world_size();
-		if (debug_log && HEARTBEAT(15)) { log("debug 28.2:\t%lld", microtime()); }
+		HEARTBEAT_LOG("34")
 	}
 	
 	// check if we've been asked to import new evolutions
 	if (do_evo_import) {
 		do_evo_import = FALSE;
 		process_import_evolutions();
-		if (debug_log && HEARTBEAT(15)) { log("debug 28.5:\t%lld", microtime()); }
+		HEARTBEAT_LOG("35")
 	}
 	
 	// this goes roughly last -- update MSDP users
 	if (HEARTBEAT(1)) {
 		msdp_update();
-		if (debug_log && HEARTBEAT(15)) { log("debug 29:\t%lld", microtime()); }
+		HEARTBEAT_LOG("36")
+		
 		check_progress_refresh();
-		if (debug_log && HEARTBEAT(15)) { log("debug 30:\t%lld", microtime()); }
+		HEARTBEAT_LOG("37")
+		
 		run_delayed_refresh();
-		if (debug_log && HEARTBEAT(15)) { log("debug 31:\t%lld", microtime()); }
+		HEARTBEAT_LOG("38")
+		
 		free_loaded_players();	// ensure this comes AFTER run_delayed_refresh
-		if (debug_log && HEARTBEAT(15)) { log("debug 32:\t%lld", microtime()); }
+		HEARTBEAT_LOG("39")
 	}
 
 	/* Every pulse! Don't want them to stink the place up... */
