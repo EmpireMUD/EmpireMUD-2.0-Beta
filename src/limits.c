@@ -125,25 +125,6 @@ void check_attribute_gear(char_data *ch) {
 
 
 /**
-* Called periodically to force players to respawn from death.
-*/
-void check_death_respawn(void) {
-	descriptor_data *desc;
-	char_data *ch;
-	
-	for (desc = descriptor_list; desc; desc = desc->next) {
-		if (STATE(desc) != CON_PLAYING || !(ch = desc->character)) {
-			continue;
-		}
-		
-		if (IS_DEAD(ch) && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
-			do_respawn(ch, "", 0, 0);
-		}
-	}
-}
-
-
-/**
 * It's not necessary to force-expire cooldowns like this, but players may
 * benefit from an explicit message. As such, to save computational power, this
 * only runs on players who are connected. Nobody else, including mobs, needs
@@ -922,7 +903,9 @@ void real_update_char(char_data *ch) {
 		random_encounter(ch);
 	}	// end npc-only
 	
-	// LAST: call point-update if it's our turn
+	// DO THESE LAST:
+	
+	// call point-update if it's our turn
 	if (IS_NPC(ch) && (GET_MOB_VNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
 		if (!point_update_char(ch)) {
 			return;
@@ -937,6 +920,11 @@ void real_update_char(char_data *ch) {
 	// mob activity: if we're still here, run half the mobs each time
 	if (IS_NPC(ch) && (GET_MOB_VNUM(ch) % 2) == mobile_activity_cycle) {
 		run_mobile_activity(ch);
+	}
+	
+	// players: check for auto-respawn
+	if (ch->desc && IS_DEAD(ch) && get_cooldown_time(ch, COOLDOWN_DEATH_RESPAWN) == 0) {
+		do_respawn(ch, "", 0, 0);
 	}
 }
 

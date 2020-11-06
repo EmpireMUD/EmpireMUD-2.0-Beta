@@ -68,7 +68,6 @@ int perform_alias(descriptor_data *d, char *orig);
 char *prompt_olc_info(char_data *ch);
 
 // heartbeat functions
-void check_death_respawn();
 void check_expired_cooldowns();
 void check_idle_passwords();
 void check_newbie_islands();
@@ -946,145 +945,142 @@ void heartbeat(int heart_pulse) {
 		check_idle_passwords();
 		HEARTBEAT_LOG("6")
 		
-		check_death_respawn();
-		HEARTBEAT_LOG("7")
-		
 		run_mob_echoes();
-		HEARTBEAT_LOG("8")
+		HEARTBEAT_LOG("7")
 	}
 
 	if (HEARTBEAT(30)) {
 		update_players_online_stats();
-		HEARTBEAT_LOG("9")
+		HEARTBEAT_LOG("8")
 	}
 
 	if (HEARTBEAT(0.1)) {
 		frequent_combat(heart_pulse);
-		HEARTBEAT_LOG("11")
+		HEARTBEAT_LOG("9")
 	}
 	
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
 		process_theft_logs();
-		HEARTBEAT_LOG("12")
+		HEARTBEAT_LOG("10")
 	}
 	if (HEARTBEAT(SECS_PER_REAL_UPDATE)) {
 		real_update();
-		HEARTBEAT_LOG("13")
+		HEARTBEAT_LOG("11")
 	}
 
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
 		weather_and_time();
-		HEARTBEAT_LOG("14")
+		HEARTBEAT_LOG("12")
 		
 		chore_update();
-		HEARTBEAT_LOG("15")
+		HEARTBEAT_LOG("13")
 	}
 	
 	// slightly off the hour to prevent yet another thing on the tick
 	if (HEARTBEAT(SECS_PER_MUD_HOUR+1)) {
 		update_empire_npc_data();
-		HEARTBEAT_LOG("16")
+		HEARTBEAT_LOG("14")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
 		check_wars();
-		HEARTBEAT_LOG("17")
+		HEARTBEAT_LOG("15")
 		
 		reset_instances();
-		HEARTBEAT_LOG("18")
+		HEARTBEAT_LOG("16")
 	}
 	
 	if (HEARTBEAT(15 * SECS_PER_REAL_MIN)) {
 		output_map_to_file();
-		HEARTBEAT_LOG("19")
+		HEARTBEAT_LOG("17")
 	}
 
 	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
 		update_reboot();
-		HEARTBEAT_LOG("20")
+		HEARTBEAT_LOG("18")
 		
 		if (++mins_since_crashsave >= 5) {
 			mins_since_crashsave = 0;
 			save_all_players(TRUE);
-			HEARTBEAT_LOG("21")
+			HEARTBEAT_LOG("19")
 		}
 		
 		display_automessages();
-		HEARTBEAT_LOG("22")
+		HEARTBEAT_LOG("20")
 	}
 	
 	if (HEARTBEAT(12 * SECS_PER_REAL_HOUR)) {
 		reduce_city_overages();
-		HEARTBEAT_LOG("23")
+		HEARTBEAT_LOG("21")
 		
 		check_newbie_islands();
-		HEARTBEAT_LOG("24")
+		HEARTBEAT_LOG("22")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
 		reduce_stale_empires();
-		HEARTBEAT_LOG("25")
+		HEARTBEAT_LOG("23")
 	}
 	
 	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
 		reduce_outside_territory();
-		HEARTBEAT_LOG("26")
+		HEARTBEAT_LOG("24")
 	}
 	
 	if (HEARTBEAT(3 * SECS_PER_REAL_MIN)) {
 		generate_adventure_instances();
-		HEARTBEAT_LOG("27")
+		HEARTBEAT_LOG("25")
 	}
 	
 	if (HEARTBEAT(5 * SECS_PER_REAL_MIN)) {
 		prune_instances();
-		HEARTBEAT_LOG("28")
+		HEARTBEAT_LOG("26")
 		
 		update_trading_post();
-		HEARTBEAT_LOG("29")
+		HEARTBEAT_LOG("27")
 	}
 	
 	if (HEARTBEAT(1)) {
 		if (data_table_needs_save) {
 			save_data_table(FALSE);
-			HEARTBEAT_LOG("30")
+			HEARTBEAT_LOG("28")
 		}
 		if (events_need_save) {
 			write_running_events_file();
-			HEARTBEAT_LOG("31")
+			HEARTBEAT_LOG("29")
 		}
 		save_marked_empires();
-		HEARTBEAT_LOG("32")
+		HEARTBEAT_LOG("30")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_DAY)) {
 		clean_empire_offenses();
-		HEARTBEAT_LOG("33")
+		HEARTBEAT_LOG("31")
 		
 		update_instance_world_size();
-		HEARTBEAT_LOG("34")
+		HEARTBEAT_LOG("32")
 	}
 	
 	// check if we've been asked to import new evolutions
 	if (do_evo_import) {
 		do_evo_import = FALSE;
 		process_import_evolutions();
-		HEARTBEAT_LOG("35")
+		HEARTBEAT_LOG("33")
 	}
 	
 	// this goes roughly last -- update MSDP users
 	if (HEARTBEAT(1)) {
 		msdp_update();
-		HEARTBEAT_LOG("36")
+		HEARTBEAT_LOG("34")
 		
 		check_progress_refresh();
-		HEARTBEAT_LOG("37")
+		HEARTBEAT_LOG("35")
 		
 		run_delayed_refresh();
-		HEARTBEAT_LOG("38")
+		HEARTBEAT_LOG("36")
 		
 		free_loaded_players();	// ensure this comes AFTER run_delayed_refresh
-		HEARTBEAT_LOG("39")
+		HEARTBEAT_LOG("37")
 	}
 
 	/* Every pulse! Don't want them to stink the place up... */
