@@ -390,8 +390,9 @@ int limit_crowd_control(char_data *victim, int atype) {
 * tick.
 *
 * @param char_data *ch The character to update.
+* @return bool TRUE if the character survives the update, FALSE if not.
 */
-void point_update_char(char_data *ch) {
+bool point_update_char(char_data *ch) {
 	struct cooldown_data *cool, *next_cool;
 	struct instance_data *inst;
 	obj_data *obj, *next_obj;
@@ -403,13 +404,13 @@ void point_update_char(char_data *ch) {
 	if (!IS_NPC(ch)) {
 		clean_offers(ch);
 		if (!check_idling(ch)) {
-			return;
+			return FALSE;
 		}
 	}
 	
 	// everything beyond here only matters if still alive
 	if (IS_DEAD(ch)) {
-		return;
+		return FALSE;
 	}
 	
 	if (IS_NPC(ch) && FIGHTING(ch)) {
@@ -428,7 +429,7 @@ void point_update_char(char_data *ch) {
 		if (count > config_get_int("num_duplicates_in_stable")) {
 			act("$n is feeling overcrowded, and leaves.", TRUE, ch, NULL, NULL, TO_ROOM);
 			extract_char(ch);
-			return;
+			return FALSE;
 		}
 	}
 	
@@ -478,7 +479,7 @@ void point_update_char(char_data *ch) {
 		if (!GET_LED_BY(ch) && !GET_LEADING_MOB(ch) && !GET_LEADING_VEHICLE(ch) && !MOB_FLAGGED(ch, MOB_TIED)) {
 			if (distance_to_nearest_player(IN_ROOM(ch)) > config_get_int("mob_despawn_radius")) {
 				despawn_mob(ch);
-				return;
+				return FALSE;
 			}
 		}
 	}
@@ -489,7 +490,7 @@ void point_update_char(char_data *ch) {
 		
 		if (GET_BLOOD(ch) < 0) {
 			out_of_blood(ch);
-			return;
+			return FALSE;
 		}
 	}
 	else {	// not a vampire (or is imm/npc)
@@ -539,7 +540,7 @@ void point_update_char(char_data *ch) {
 			update_pos(ch);
 			if (GET_POS(ch) == POS_DEAD) {
 				die(ch, ch);
-				return;
+				return FALSE;
 			}
 		}
 	}
@@ -567,6 +568,8 @@ void point_update_char(char_data *ch) {
 			}
 		}
 	}
+	
+	return TRUE;	// we lived!
 }
 
 
@@ -921,10 +924,19 @@ void real_update_char(char_data *ch) {
 	
 	// LAST: call point-update if it's our turn
 	if (IS_NPC(ch) && (GET_MOB_VNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
-		point_update_char(ch);
+		if (!point_update_char(ch)) {
+			return;
+		}
 	}
 	else if (!IS_NPC(ch) && (GET_IDNUM(ch) % REAL_UPDATES_PER_MUD_HOUR) == point_update_cycle) {
-		point_update_char(ch);
+		if (!point_update_char(ch)) {
+			return;
+		}
+	}
+	
+	// run half the mobs each time
+	if (IS_NPC(ch) && (GET_MOB_VNUM(ch) % 2) == (point_update_cycle % 2)) {
+		run_mobile_activity(ch);
 	}
 }
 

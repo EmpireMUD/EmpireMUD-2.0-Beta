@@ -64,7 +64,6 @@ extern const char *slow_nameserver_ips[];
 void boot_world();
 void empire_srandom(unsigned long initial_seed);
 void free_whole_library();
-void mobile_activity();
 int perform_alias(descriptor_data *d, char *orig);
 char *prompt_olc_info(char_data *ch);
 
@@ -144,7 +143,8 @@ bool block_all_saves_due_to_shutdown = FALSE;	// if TRUE, nothing can be saved t
 // vars to prevent running multiple cycles during a missed-pulse catch-up cycle
 bool catch_up_combat = FALSE;	// frequent_combat()
 bool catch_up_actions = FALSE;	// update_actions()
-bool catch_up_mobs = FALSE;	// mobile_activity()
+bool catch_up_mobs = FALSE;		// prevents mobile activity from running repeatedly
+bool caught_up_mobs = FALSE;	// used to ensure mobile activity ran
 
 // vars for detecting slow IPs and preventing repeat-lag
 char **detected_slow_ips = NULL;
@@ -917,7 +917,7 @@ void heartbeat(int heart_pulse) {
 	
 	dg_event_process();
 
-	// this is meant to be slightly longer than the mobile_activity pulse, and is mentioned in help files
+	// this is meant to be slightly longer than the mobile_activity pulse (10), and is mentioned in help files
 	if (HEARTBEAT(13)) {
 		script_trigger_check();
 		HEARTBEAT_LOG("1")
@@ -956,11 +956,6 @@ void heartbeat(int heart_pulse) {
 	if (HEARTBEAT(30)) {
 		update_players_online_stats();
 		HEARTBEAT_LOG("9")
-	}
-
-	if (HEARTBEAT(10)) {
-		mobile_activity();
-		HEARTBEAT_LOG("10")
 	}
 
 	if (HEARTBEAT(0.1)) {
@@ -3628,7 +3623,7 @@ void signal_setup(void) {
  * cycles once every 0.10 seconds and is responsible for accepting new
  * new connections, polling existing connections for input, dequeueing
  * output and sending it out to players, and calling "heartbeat" functions
- * such as mobile_activity().
+ * such as real_update().
  */
 void game_loop(socket_t mother_desc) {
 	fd_set input_set, output_set, exc_set, null_set;
@@ -3869,8 +3864,15 @@ void game_loop(socket_t mother_desc) {
 		catch_up_combat = TRUE;
 		catch_up_actions = TRUE;
 		catch_up_mobs = TRUE;
+		caught_up_mobs = FALSE;
+		
 		while (missed_pulses--) {
 			heartbeat(++pulse);
+			
+			// check this and mark mobs as caught up now: this prevents too much mobile_activity when the mud is stalled
+			if (caught_up_mobs) {
+				catch_up_mobs = FALSE;
+			}
 		}
 
 		/* Update tics_passed for deadlock protection */
