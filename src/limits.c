@@ -47,6 +47,7 @@ ACMD(do_respawn);
 
 // local vars
 int point_update_cycle = 0;	// helps spread out point updates
+int mobile_activity_cycle = 0;	// alternates groups of mobs
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -935,7 +936,7 @@ void real_update_char(char_data *ch) {
 	}
 	
 	// run half the mobs each time
-	if (IS_NPC(ch) && (GET_MOB_VNUM(ch) % 2) == (point_update_cycle % 2)) {
+	if (IS_NPC(ch) && (GET_MOB_VNUM(ch) % 2) == mobile_activity_cycle) {
 		run_mobile_activity(ch);
 	}
 }
@@ -2254,10 +2255,11 @@ void real_update(void) {
 		setup_daily_quest_cycles(NOTHING);
 	}
 	
-	// advance the cycle
+	// advance the cycles
 	if (++point_update_cycle >= REAL_UPDATES_PER_MUD_HOUR) {
 		point_update_cycle = 0;
 	}
+	mobile_activity_cycle = (mobile_activity_cycle ? 0 : 1);
 
 	// characters
 	DL_FOREACH_SAFE(character_list, ch, next_ch) {
