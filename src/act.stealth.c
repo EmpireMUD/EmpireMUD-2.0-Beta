@@ -251,6 +251,41 @@ void perform_escape(char_data *ch) {
 
 
 /**
+* Sets up a player's disguise.
+*
+* @param char_data *ch The player (not NPC).
+* @param const char *name A name to set (Optional: pass NULL if you're just changing the sex).
+* @param int sex The sex to disguise as (Optional: pass NOTHING if you're just changing the name).
+*/
+void set_disguise(char_data *ch, const char *name, int sex) {
+	if (IS_NPC(ch)) {
+		return;	// no disguises
+	}
+	
+	SET_BIT(PLR_FLAGS(ch), PLR_DISGUISED);
+	
+	// copy name and check limit
+	if (name && *name) {
+		if (GET_DISGUISED_NAME(ch)) {
+			free(GET_DISGUISED_NAME(ch));
+		}
+		GET_DISGUISED_NAME(ch) = str_dup(name);
+	}
+
+	// copy the sex
+	if (sex != NOTHING) {
+		GET_DISGUISED_SEX(ch) = sex;
+	}
+	
+	// msdp updates
+	if (ch->desc) {
+		MSDPSetString(ch->desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
+		MSDPSetString(ch->desc, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
+	}
+}
+
+
+/**
 * This marks the player hostile and may lead to empire distrust.
 *
 * @param char_data *ch The player.
@@ -309,6 +344,12 @@ void undisguise(char_data *ch) {
 		*lbuf = UPPER(*lbuf);
 		
 		REMOVE_BIT(PLR_FLAGS(ch), PLR_DISGUISED);
+	
+		// msdp updates
+		if (ch->desc) {
+			MSDPSetString(ch->desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
+			MSDPSetString(ch->desc, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
+		}
 		
 		msg_to_char(ch, "You take off your disguise.\r\n");
 		act(lbuf, TRUE, ch, NULL, NULL, TO_ROOM);
@@ -698,17 +739,7 @@ ACMD(do_disguise) {
 		act("You skillfully disguise yourself as $N!", FALSE, ch, NULL, vict, TO_CHAR);
 		act("$n disguises $mself as $N!", TRUE, ch, NULL, vict, TO_ROOM);
 		
-		SET_BIT(PLR_FLAGS(ch), PLR_DISGUISED);
-		
-		// copy name and check limit
-		if (GET_DISGUISED_NAME(ch)) {
-			free(GET_DISGUISED_NAME(ch));
-		}
-		GET_DISGUISED_NAME(ch) = str_dup(PERS(vict, vict, FALSE));
-
-		// copy the sex
-		GET_DISGUISED_SEX(ch) = GET_SEX(vict);
-		
+		set_disguise(ch, PERS(vict, vict, FALSE), GET_SEX(vict));
 		gain_ability_exp(ch, ABIL_DISGUISE, 33.4);
 		GET_WAIT_STATE(ch) = 4 RL_SEC;	// long wait
 	}

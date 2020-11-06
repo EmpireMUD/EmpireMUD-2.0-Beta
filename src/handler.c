@@ -2583,6 +2583,10 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 		cool->expire_time = time(0) + seconds_duration;
 		LL_PREPEND(ch->cooldowns, cool);
 	}
+	
+	if (ch->desc) {
+		update_MSDP_cooldowns(ch->desc);
+	}
 }
 
 
@@ -2617,6 +2621,10 @@ int get_cooldown_time(char_data *ch, any_vnum type) {
 void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
 	LL_DELETE(ch->cooldowns, cool);
 	free(cool);
+	
+	if (ch->desc) {
+		update_MSDP_cooldowns(ch->desc);
+	}
 }
 
 

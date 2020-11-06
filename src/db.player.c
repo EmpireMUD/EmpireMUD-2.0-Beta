@@ -3088,6 +3088,11 @@ void change_personal_lastname(char_data *ch, char *name) {
 	}
 	
 	queue_delayed_update(ch, CDU_SAVE);
+	
+	// update msdp
+	if (ch->desc) {
+		MSDPSetString(ch->desc, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
+	}
 }
 
 
@@ -4262,6 +4267,10 @@ void enter_player_game(descriptor_data *d, int dolog, bool fresh) {
 	if (GET_LOYALTY(ch)) {
 		update_member_data(ch);
 		update_empire_members_and_greatness(GET_LOYALTY(ch));
+	}
+	
+	if (ch->desc) {
+		send_initial_MSDP(ch->desc);
 	}
 }
 

@@ -2281,6 +2281,7 @@ int perform_dupe_check(descriptor_data *d) {
 	
 	refresh_all_quests(d->character);
 	MXPSendTag(d, "<VERSION>");
+	send_initial_MSDP(d);
 	
 	return (1);
 }

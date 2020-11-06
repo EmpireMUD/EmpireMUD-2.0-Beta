@@ -2322,6 +2322,11 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 			}
     		sprintf(output, "%s's last name is now: %s", GET_NAME(vict), GET_PERSONAL_LASTNAME(vict));
 		}
+		
+		// update msdp
+		if (vict->desc) {
+			MSDPSetString(vict->desc, eMSDP_CHARACTER_NAME, PERS(vict, vict, FALSE));
+		}
 	}
 	else if SET_CASE("bonustrait") {
 		bitvector_t diff, new, old = GET_BONUS_TRAITS(vict);
@@ -2774,6 +2779,12 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		get_filename(oldname, buf1, DELAYED_FILE);
 		get_filename(GET_NAME(vict), buf2, DELAYED_FILE);
 		rename(buf1, buf2);
+		
+		// update msdp
+		if (vict->desc) {
+			MSDPSetString(vict->desc, eMSDP_ACCOUNT_NAME, GET_REAL_NAME(vict));
+			MSDPSetString(vict->desc, eMSDP_CHARACTER_NAME, PERS(vict, vict, FALSE));
+		}
 		
 		SAVE_CHAR(vict);
 		save_library_file_for_vnum(DB_BOOT_ACCT, GET_ACCOUNT(vict)->id);
@@ -9725,7 +9736,9 @@ ACMD(do_restore) {
 
 
 ACMD(do_return) {
-	if (ch->desc && ch->desc->original) {
+	char_data *orig;
+	
+	if (ch->desc && (orig = ch->desc->original)) {
 		syslog(SYS_GC, GET_INVIS_LEV(ch->desc->original), TRUE, "GC: %s has returned to %s original body", GET_REAL_NAME(ch->desc->original), REAL_HSHR(ch->desc->original));
 		send_to_char("You return to your original body.\r\n", ch);
 
@@ -9739,18 +9752,20 @@ ACMD(do_return) {
 		 * (which is assigned below in this function). 12/17/99
 		 */
 
-		if (ch->desc->original->desc) {
-			ch->desc->original->desc->character = NULL;
-			STATE(ch->desc->original->desc) = CON_DISCONNECT;
+		if (orig->desc) {
+			orig->desc->character = NULL;
+			STATE(orig->desc) = CON_DISCONNECT;
 		}
 
 		/* Now our descriptor points to our original body. */
-		ch->desc->character = ch->desc->original;
+		ch->desc->character = orig;
 		ch->desc->original = NULL;
 
 		/* And our body's pointer to descriptor now points to our descriptor. */
-		ch->desc->character->desc = ch->desc;
+		orig->desc = ch->desc;
 		ch->desc = NULL;
+		
+		send_initial_MSDP(orig->desc);
 	}
 }
 
@@ -10229,8 +10244,11 @@ ACMD(do_switch) {
 	char_data *victim;
 
 	one_argument(argument, arg);
-
-	if (ch->desc->original)
+	
+	if (!ch->desc) {
+		msg_to_char(ch, "You can't do that now.\r\n");
+	}
+	else if (ch->desc->original)
 		send_to_char("You're already switched.\r\n", ch);
 	else if (!*arg)
 		send_to_char("Switch with whom?\r\n", ch);
@@ -10251,6 +10269,8 @@ ACMD(do_switch) {
 
 		victim->desc = ch->desc;
 		ch->desc = NULL;
+		
+		send_initial_MSDP(victim->desc);
 	}
 }
 

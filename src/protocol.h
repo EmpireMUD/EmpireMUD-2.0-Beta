@@ -610,5 +610,8 @@ void UnicodeAdd(char **apString, int aValue);
 // helps ensure unnecessary color codes aren't sent
 char *flush_reduced_color_codes(descriptor_t *desc);
 
+// MSDP updaters
+void send_initial_MSDP(descriptor_t *desc);
+void update_MSDP_cooldowns(descriptor_t *desc);
 
 #endif /* PROTOCOL_H */

@@ -2544,6 +2544,11 @@ void change_sex(char_data *ch, int sex) {
 		add_companion_mod(cd, CMOD_SEX, sex, NULL);
 		queue_delayed_update(GET_COMPANION(ch), CDU_SAVE);
 	}
+	
+	// update msdp
+	if (ch->desc) {
+		MSDPSetString(ch->desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
+	}
 }
 
 

@@ -315,9 +315,8 @@ void msdp_update_room(char_data *ch) {
 static void msdp_update(void) {
 	struct player_skill_data *skill, *next_skill;
 	struct over_time_effect_type *dot;
-	char buf[MAX_STRING_LENGTH], part[MAX_STRING_LENGTH];
+	char buf[MAX_STRING_LENGTH];
 	struct time_info_data tinfo;
-	struct cooldown_data *cool;
 	char_data *ch, *pOpponent, *focus;
 	bool is_ally;
 	struct affected_type *aff;
@@ -330,11 +329,8 @@ static void msdp_update(void) {
 			++PlayerCount;
 			
 			// TODO: Most of this could be moved to set only when it is changed
-
-			MSDPSetString(d, eMSDP_ACCOUNT_NAME, GET_NAME(ch));
-			MSDPSetString(d, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
 			
-			MSDPSetString(d, eMSDP_GENDER, genders[GET_SEX(ch)]);
+			// current h/m/v/b and regens
 			MSDPSetNumber(d, eMSDP_HEALTH, GET_HEALTH(ch));
 			MSDPSetNumber(d, eMSDP_HEALTH_MAX, GET_MAX_HEALTH(ch));
 			MSDPSetNumber(d, eMSDP_HEALTH_REGEN, health_gain(ch, TRUE));
@@ -374,23 +370,12 @@ static void msdp_update(void) {
 			}
 			MSDPSetTable(d, eMSDP_DOTS, buf);
 			
-			// cooldowns
-			*buf = '\0';
-			buf_size = 0;
-			for (cool = ch->cooldowns; cool; cool = cool->next) {
-				if (cool->expire_time > time(0)) {
-					buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(cool->type), (char)MSDP_VAL, cool->expire_time - time(0));
-				}
-			}
-			MSDPSetTable(d, eMSDP_COOLDOWNS, buf);
-			
 			MSDPSetNumber(d, eMSDP_LEVEL, get_approximate_level(ch));
 			MSDPSetNumber(d, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
 			MSDPSetNumber(d, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
 			MSDPSetNumber(d, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
 
-			get_player_skill_string(ch, part, FALSE);
-			snprintf(buf, sizeof(buf), "%s", part);
+			get_player_skill_string(ch, buf, FALSE);
 			MSDPSetString(d, eMSDP_CLASS, buf);
 			
 			// skills
@@ -437,6 +422,8 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_BONUS_PHYSICAL, GET_BONUS_PHYSICAL(ch));
 			MSDPSetNumber(d, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
 			MSDPSetNumber(d, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
+			
+			// TODO: some of these could be set once an hour (point_update_char) rather than every second
 			
 			// empire
 			if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
@@ -497,9 +484,12 @@ static void msdp_update(void) {
 			tinfo = get_local_time(IN_ROOM(ch));
 			
 			MSDPSetNumber(d, eMSDP_WORLD_TIME, tinfo.hours);
+			// TODO: these could be set as they change
 			MSDPSetNumber(d, eMSDP_WORLD_DAY_OF_MONTH, tinfo.day + 1);
 			MSDPSetString(d, eMSDP_WORLD_MONTH, month_name[(int)tinfo.month]);
 			MSDPSetNumber(d, eMSDP_WORLD_YEAR, tinfo.year);
+			
+			// TODO: this one changes when the player moves (should be set in the same code that updates location)
 			MSDPSetString(d, eMSDP_WORLD_SEASON, seasons[GET_SEASON(IN_ROOM(ch))]);
 			
 			// done -- send it
@@ -510,7 +500,7 @@ static void msdp_update(void) {
 		* someone leaves or joins the mud.  But this works, and it keeps the
 		* snippet simple.  Optimise as you see fit.
 		*/
-	MSSPSetPlayers(PlayerCount);
+		MSSPSetPlayers(PlayerCount);
 	}
 }
 

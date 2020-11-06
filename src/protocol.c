@@ -3032,3 +3032,59 @@ static char *AllocString(const char *apString) {
 
 	return pResult;
 }
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MSDP SETTERS ////////////////////////////////////////////////////////////
+
+/**
+* Sends a large update of MSDP information, to be called when a player enters
+* the game, reconnects, or before/after an immortal switches (any time lots
+* of player info changes or is initially set).
+*
+* @param descriptor_data *desc The descriptor of the player.
+*/
+void send_initial_MSDP(descriptor_data *desc) {
+	char_data *ch;
+	
+	if (!desc || !(ch = desc->character)) {
+		return;
+	}
+	
+	// strings
+	MSDPSetString(desc, eMSDP_ACCOUNT_NAME, GET_REAL_NAME(ch));
+	MSDPSetString(desc, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
+	
+	// numeric data
+	MSDPSetString(desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
+	
+	// lists
+	update_MSDP_cooldowns(desc);
+}
+
+
+/**
+* Updates all cooldowns for MSDP.
+*
+* @param descriptor_data *desc The descriptor of an in-game player.
+*/
+void update_MSDP_cooldowns(descriptor_data *desc) {
+	char buf[MAX_STRING_LENGTH];
+	struct cooldown_data *cool;
+	size_t buf_size;
+	char_data *ch;
+	
+	if (!(ch = desc->character)) {
+		return;
+	}
+	
+	// cooldowns
+	*buf = '\0';
+	buf_size = 0;
+	LL_FOREACH(ch->cooldowns, cool) {
+		if (cool->expire_time > time(0)) {
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(cool->type), (char)MSDP_VAL, cool->expire_time - time(0));
+		}
+	}
+	MSDPSetTable(desc, eMSDP_COOLDOWNS, buf);
+}
