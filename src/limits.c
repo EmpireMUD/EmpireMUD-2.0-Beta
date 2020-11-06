@@ -386,9 +386,8 @@ int limit_crowd_control(char_data *victim, int atype) {
 
 
 /**
-* This runs a point update (every tick) on a character. It runs on both players
-* and NPCS, but players have also had their "real update" run already this
-* tick.
+* This runs a point update (every hour tick) on a character. It runs on both
+* players and NPCS, right after their "real update" runs.
 *
 * @param char_data *ch The character to update.
 * @return bool TRUE if the character survives the update, FALSE if not.
