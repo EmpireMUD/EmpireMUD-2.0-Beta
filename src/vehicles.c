@@ -106,6 +106,39 @@ bool check_climate_ruins_vehicle_slowly(bitvector_t climate_flags, int mode) {
 
 
 /**
+* When a vehicle decays, call this to see if it and/or the room should also
+* be abandoned.
+*
+* @param vehicle_data *veh The vehicle that's decayed.
+*/
+void check_decayed_vehicle_abandon(vehicle_data *veh) {
+	vehicle_data *iter;
+	bool any = FALSE;
+	
+	if (!VEH_OWNER(veh)) {
+		return;
+	}
+	else if (!VEH_CLAIMS_WITH_ROOM(veh)) {
+		perform_abandon_vehicle(veh);
+		return;
+	}
+	
+	// otherwise check the room for any non-decayed vehicles that claim with room
+	if (IN_ROOM(veh)) {
+		DL_FOREACH2(ROOM_VEHICLES(IN_ROOM(veh)), iter, next_in_room) {
+			if (VEH_CLAIMS_WITH_ROOM(iter) && VEH_HEALTH(iter) > 0) {
+				any = TRUE;
+			}
+		}
+		
+		if (!any && ROOM_OWNER(IN_ROOM(veh)) && HOME_ROOM(IN_ROOM(veh)) == IN_ROOM(veh)) {
+			abandon_room(IN_ROOM(veh));
+		}
+	}
+}
+
+
+/**
 * Checks the allowed-climates on a vehicle. This should be called if the
 * terrain changes, and can also be called periodically to check for damage.
 *
@@ -260,7 +293,7 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 	
 	// check very low health
 	if (VEH_HEALTH(veh) <= 0) {
-		perform_abandon_vehicle(veh);
+		check_decayed_vehicle_abandon(veh);
 		
 		// 50% of the time we just abandon, the rest we also decay to ruins
 		if (!number(0, 1) || VEH_IS_DISMANTLING(veh)) {
@@ -272,7 +305,7 @@ bool decay_one_vehicle(vehicle_data *veh, char *message) {
 			ruin_vehicle(veh, msg ? msg : message);
 			return FALSE;	// returns only if ruined
 		}
-		else if (emp) {
+		else if (emp && !VEH_OWNER(veh)) {
 			snprintf(buf, sizeof(buf), "%s%s has been abandoned due to decay", get_vehicle_short_desc(veh, NULL), coord_display_room(NULL, IN_ROOM(veh), FALSE));
 			log_to_empire(emp, ELOG_TERRITORY, "%s", CAP(buf));
 		}
