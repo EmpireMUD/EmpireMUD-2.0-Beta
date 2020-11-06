@@ -571,6 +571,7 @@ void update_island_names();
 extern account_data *account_table;
 extern char_data *character_list;
 extern char_data *combat_list;
+extern char_data *global_next_char;
 extern char_data *next_combat_list;
 extern char_data *next_combat_list_main;
 extern char_data *mobile_table;

@@ -207,6 +207,7 @@ char_data *combat_list = NULL;	// head of l-list of fighting chars
 char_data *next_combat_list = NULL;	// used for iteration of combat_list when more than 1 person can be removed from combat in 1 loop iteration
 char_data *next_combat_list_main = NULL;	// used for iteration of combat_list in frequent_combat()
 struct generic_name_data *generic_names = NULL;	// LL of generic name sets
+char_data *global_next_char = NULL;	// used in limits.c for iterating
 
 // morphs
 morph_data *morph_table = NULL;	// master morph hash table

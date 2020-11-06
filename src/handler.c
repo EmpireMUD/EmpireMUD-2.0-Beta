@@ -1156,6 +1156,11 @@ void extract_char_final(char_data *ch) {
 	// shut this off -- no need to total during an extract
 	pause_affect_total = TRUE;
 	
+	// update iterators
+	if (ch == global_next_char) {
+		global_next_char = global_next_char->next;
+	}
+	
 	check_dg_owner_purged_char(ch);
 
 	/* Check to see if we are grouped! */
@@ -1305,6 +1310,11 @@ void extract_char_final(char_data *ch) {
 * @param char_data *ch The character to mark for extraction.
 */
 void extract_char(char_data *ch) {
+	// update iterators
+	if (ch == global_next_char) {
+		global_next_char = global_next_char->next;
+	}
+	
 	if (!EXTRACTED(ch)) {
 		check_dg_owner_purged_char(ch);
 		

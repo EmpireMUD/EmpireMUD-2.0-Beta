@@ -2235,7 +2235,7 @@ int move_gain(char_data *ch, bool info_only) {
 */
 void real_update(void) {
 	obj_data *obj;
-	char_data *ch, *next_ch;
+	char_data *ch;
 	vehicle_data *veh;
 	
 	long daily_cycle = data_get_long(DATA_DAILY_CYCLE);
@@ -2262,7 +2262,7 @@ void real_update(void) {
 	mobile_activity_cycle = (mobile_activity_cycle ? 0 : 1);
 
 	// characters
-	DL_FOREACH_SAFE(character_list, ch, next_ch) {
+	DL_FOREACH_SAFE(character_list, ch, global_next_char) {
 		if (!EXTRACTED(ch)) {
 			real_update_char(ch);
 		}
