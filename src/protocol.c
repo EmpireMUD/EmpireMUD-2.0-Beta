@@ -3059,11 +3059,42 @@ void send_initial_MSDP(descriptor_data *desc) {
 	MSDPSetString(desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
 	
 	// lists
+	update_MSDP_affects(desc, FALSE);
 	update_MSDP_cooldowns(desc, FALSE);
 	update_MSDP_skills(desc, FALSE);
 	
 	// send it
 	MSDPUpdate(desc);
+}
+
+
+/**
+* Updates all cooldowns for MSDP.
+*
+* @param descriptor_data *desc The descriptor of an in-game player.
+* @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
+*/
+void update_MSDP_affects(descriptor_data *desc, int send_update) {
+	char buf[MAX_STRING_LENGTH];
+	struct affected_type *aff;
+	size_t buf_size;
+	char_data *ch;
+	
+	if (!(ch = desc->character)) {
+		return;
+	}
+	
+	// affects
+	*buf = '\0';
+	buf_size = 0;
+	LL_FOREACH(ch->affected, aff) {
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
+	}
+	MSDPSetTable(desc, eMSDP_AFFECTS, buf);
+	
+	if (send_update) {
+		MSDPUpdate(desc);
+	}
 }
 
 

@@ -412,6 +412,13 @@ void run_delayed_refresh(void) {
 		}
 		
 		// MSDP sections
+		if (IS_SET(cdu->type, CDU_MSDP_AFFECTS)) {
+			if (cdu->ch->desc) {
+				update_MSDP_affects(cdu->ch->desc, FALSE);
+			}
+			REMOVE_BIT(cdu->type, CDU_MSDP_AFFECTS);
+			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
+		}
 		if (IS_SET(cdu->type, CDU_MSDP_COOLDOWNS)) {
 			if (cdu->ch->desc) {
 				update_MSDP_cooldowns(cdu->ch->desc, FALSE);

@@ -321,7 +321,6 @@ static void msdp_update(void) {
 	struct time_info_data tinfo;
 	char_data *ch, *pOpponent, *focus;
 	bool is_ally;
-	struct affected_type *aff;
 	descriptor_data *d;
 	int hit_points, PlayerCount = 0;
 	size_t buf_size;
@@ -347,14 +346,6 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_BLOOD, GET_BLOOD(ch));
 			MSDPSetNumber(d, eMSDP_BLOOD_MAX, GET_MAX_BLOOD(ch));
 			MSDPSetNumber(d, eMSDP_BLOOD_UPKEEP, MAX(0, GET_BLOOD_UPKEEP(ch)));
-			
-			// affects
-			*buf = '\0';
-			buf_size = 0;
-			for (aff = ch->affected; aff; aff = aff->next) {
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
-			}
-			MSDPSetTable(d, eMSDP_AFFECTS, buf);
 			
 			// dots
 			*buf = '\0';

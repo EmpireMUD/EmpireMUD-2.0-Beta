@@ -616,6 +616,8 @@ void affect_remove(char_data *ch, struct affected_type *af) {
 	affect_modify(ch, af->location, af->modifier, af->bitvector, FALSE);
 	LL_DELETE(ch->affected, af);
 	free(af);
+	
+	queue_delayed_update(ch, CDU_MSDP_AFFECTS);
 }
 
 
@@ -668,6 +670,8 @@ void affect_to_char_silent(char_data *ch, struct affected_type *af) {
 
 	affect_modify(ch, af->location, af->modifier, af->bitvector, TRUE);
 	affect_total(ch);
+	
+	queue_delayed_update(ch, CDU_MSDP_AFFECTS);
 }
 
 
