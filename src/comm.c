@@ -316,17 +316,16 @@ void msdp_update_room(char_data *ch) {
 * From KaVir's protocol snippet (see protocol.c)
 */
 static void msdp_update(void) {
-	struct over_time_effect_type *dot;
 	char buf[MAX_STRING_LENGTH];
 	struct time_info_data tinfo;
 	char_data *ch, *pOpponent, *focus;
 	bool is_ally;
 	descriptor_data *d;
 	int hit_points, PlayerCount = 0;
-	size_t buf_size;
 
 	for (d = descriptor_list; d; d = d->next) {
 		if ((ch = d->character) && !IS_NPC(ch) && STATE(d) == CON_PLAYING) {
+			// update count for MSSP
 			if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO)) {
 				++PlayerCount;
 			}
@@ -346,24 +345,6 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_BLOOD, GET_BLOOD(ch));
 			MSDPSetNumber(d, eMSDP_BLOOD_MAX, GET_MAX_BLOOD(ch));
 			MSDPSetNumber(d, eMSDP_BLOOD_UPKEEP, MAX(0, GET_BLOOD_UPKEEP(ch)));
-			
-			// dots
-			*buf = '\0';
-			buf_size = 0;
-			for (dot = ch->over_time_effects; dot; dot = dot->next) {
-				// each dot has a sub-table
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, get_generic_name_by_vnum(dot->type), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
-				
-				
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%ld", (char)MSDP_VAR, (char)MSDP_VAL, (dot->duration == UNLIMITED ? -1 : (dot->duration * SECS_PER_REAL_UPDATE)));
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cTYPE%c%s", (char)MSDP_VAR, (char)MSDP_VAL, damage_types[dot->damage_type]);
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDAMAGE%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->damage * dot->stack);
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cSTACKS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->stack);
-				
-				// end table
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
-			}
-			MSDPSetTable(d, eMSDP_DOTS, buf);
 			
 			// TODO this whole section can be moved to the place these numbers are updated/set (and send_initial_MSDP)
 			MSDPSetNumber(d, eMSDP_LEVEL, get_approximate_level(ch));

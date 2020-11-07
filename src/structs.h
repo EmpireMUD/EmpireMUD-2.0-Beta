@@ -1998,9 +1998,10 @@ typedef enum {
 #define CDU_PASSIVE_BUFFS  BIT(0)	// refresh passive buffs
 #define CDU_SAVE  BIT(1)	// saves the character
 #define CDU_MSDP_SEND_UPDATES  BIT(2)	// sends any pending MSDP updates
-#define CDU_MSDP_AFFECTS  BIT(3)	// runs update_MSDP_affects()_
+#define CDU_MSDP_AFFECTS  BIT(3)	// runs update_MSDP_affects()
 #define CDU_MSDP_COOLDOWNS  BIT(4)	// runs update_MSDP_cooldowns()
-#define CDU_MSDP_SKILLS  BIT(5)	// runs update_MSDP_skills()
+#define CDU_MSDP_DOTS  BIT(5)	// runs update_MSDP_dots()
+#define CDU_MSDP_SKILLS  BIT(6)	// runs update_MSDP_skills()
 
 
 // types of channel histories -- act.comm.c

@@ -426,6 +426,13 @@ void run_delayed_refresh(void) {
 			REMOVE_BIT(cdu->type, CDU_MSDP_COOLDOWNS);
 			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
 		}
+		if (IS_SET(cdu->type, CDU_MSDP_DOTS)) {
+			if (cdu->ch->desc) {
+				update_MSDP_dots(cdu->ch->desc, FALSE);
+			}
+			REMOVE_BIT(cdu->type, CDU_MSDP_DOTS);
+			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
+		}
 		if (IS_SET(cdu->type, CDU_MSDP_SKILLS)) {
 			if (cdu->ch->desc) {
 				update_MSDP_skills(cdu->ch->desc, FALSE);
@@ -2584,6 +2591,7 @@ void change_sex(char_data *ch, int sex) {
 	// update msdp
 	if (ch->desc) {
 		MSDPSetString(ch->desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
+		queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
 	}
 }
 

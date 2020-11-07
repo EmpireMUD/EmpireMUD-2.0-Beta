@@ -281,6 +281,7 @@ void set_disguise(char_data *ch, const char *name, int sex) {
 	if (ch->desc) {
 		MSDPSetString(ch->desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
 		MSDPSetString(ch->desc, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
+		queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
 	}
 }
 
@@ -349,6 +350,7 @@ void undisguise(char_data *ch) {
 		if (ch->desc) {
 			MSDPSetString(ch->desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
 			MSDPSetString(ch->desc, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
+			queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
 		}
 		
 		msg_to_char(ch, "You take off your disguise.\r\n");

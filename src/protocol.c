@@ -3061,6 +3061,7 @@ void send_initial_MSDP(descriptor_data *desc) {
 	// lists
 	update_MSDP_affects(desc, FALSE);
 	update_MSDP_cooldowns(desc, FALSE);
+	update_MSDP_dots(desc, FALSE);
 	update_MSDP_skills(desc, FALSE);
 	
 	// send it
@@ -3069,7 +3070,7 @@ void send_initial_MSDP(descriptor_data *desc) {
 
 
 /**
-* Updates all cooldowns for MSDP.
+* Updates all affects for MSDP.
 *
 * @param descriptor_data *desc The descriptor of an in-game player.
 * @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
@@ -3123,6 +3124,45 @@ void update_MSDP_cooldowns(descriptor_data *desc, int send_update) {
 		}
 	}
 	MSDPSetTable(desc, eMSDP_COOLDOWNS, buf);
+	
+	if (send_update) {
+		MSDPUpdate(desc);
+	}
+}
+
+
+/**
+* Updates all DoTs for MSDP.
+*
+* @param descriptor_data *desc The descriptor of an in-game player.
+* @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
+*/
+void update_MSDP_dots(descriptor_data *desc, int send_update) {
+	char buf[MAX_STRING_LENGTH];
+	struct over_time_effect_type *dot;
+	size_t buf_size;
+	char_data *ch;
+	
+	if (!(ch = desc->character)) {
+		return;
+	}
+			
+	// dots
+	*buf = '\0';
+	buf_size = 0;
+	LL_FOREACH(ch->over_time_effects, dot) {
+		// each dot has a sub-table
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, get_generic_name_by_vnum(dot->type), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+		
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%ld", (char)MSDP_VAR, (char)MSDP_VAL, (dot->duration == UNLIMITED ? -1 : (dot->duration * SECS_PER_REAL_UPDATE)));
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cTYPE%c%s", (char)MSDP_VAR, (char)MSDP_VAL, damage_types[dot->damage_type]);
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDAMAGE%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->damage * dot->stack);
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cSTACKS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->stack);
+		
+		// end table
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
+	}
+	MSDPSetTable(desc, eMSDP_DOTS, buf);
 	
 	if (send_update) {
 		MSDPUpdate(desc);

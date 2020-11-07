@@ -2326,6 +2326,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		// update msdp
 		if (vict->desc) {
 			MSDPSetString(vict->desc, eMSDP_CHARACTER_NAME, PERS(vict, vict, FALSE));
+			queue_delayed_update(vict, CDU_MSDP_SEND_UPDATES);
 		}
 	}
 	else if SET_CASE("bonustrait") {
@@ -2784,6 +2785,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		if (vict->desc) {
 			MSDPSetString(vict->desc, eMSDP_ACCOUNT_NAME, GET_REAL_NAME(vict));
 			MSDPSetString(vict->desc, eMSDP_CHARACTER_NAME, PERS(vict, vict, FALSE));
+			queue_delayed_update(vict, CDU_MSDP_SEND_UPDATES);
 		}
 		
 		SAVE_CHAR(vict);

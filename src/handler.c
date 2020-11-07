@@ -1058,6 +1058,8 @@ void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int dama
 		dot->stack = 1;
 		dot->max_stack = max_stack;
 	}
+	
+	queue_delayed_update(ch, CDU_MSDP_DOTS);
 }
 
 
@@ -1070,6 +1072,8 @@ void apply_dot_effect(char_data *ch, any_vnum type, sh_int duration, sh_int dama
 void dot_remove(char_data *ch, struct over_time_effect_type *dot) {
 	LL_DELETE(ch->over_time_effects, dot);
 	free(dot);
+	
+	queue_delayed_update(ch, CDU_MSDP_DOTS);
 }
 
 
