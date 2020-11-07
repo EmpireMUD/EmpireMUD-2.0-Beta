@@ -3057,9 +3057,13 @@ void send_initial_MSDP(descriptor_data *desc) {
 	
 	// numeric data
 	MSDPSetString(desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
+	MSDPSetNumber(desc, eMSDP_LEVEL, get_approximate_level(ch));
+	MSDPSetNumber(desc, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
+	MSDPSetNumber(desc, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
 	
 	// lists
 	update_MSDP_affects(desc, FALSE);
+	update_MSDP_attributes(desc, FALSE);
 	update_MSDP_cooldowns(desc, FALSE);
 	update_MSDP_dots(desc, FALSE);
 	update_MSDP_empire_data(desc, FALSE);
@@ -3093,6 +3097,56 @@ void update_MSDP_affects(descriptor_data *desc, int send_update) {
 		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
 	}
 	MSDPSetTable(desc, eMSDP_AFFECTS, buf);
+	
+	if (send_update) {
+		MSDPUpdate(desc);
+	}
+}
+
+
+/**
+* Updates all attributes for MSDP.
+*
+* @param descriptor_data *desc The descriptor of an in-game player.
+* @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
+*/
+void update_MSDP_attributes(descriptor_data *desc, int send_update) {
+	char buf[MAX_STRING_LENGTH];
+	char_data *ch;
+	
+	if (!(ch = desc->character)) {
+		return;
+	}
+	
+	// base
+	MSDPSetNumber(desc, eMSDP_STR_PERM, GET_REAL_ATT(ch, STRENGTH));
+	MSDPSetNumber(desc, eMSDP_DEX_PERM, GET_REAL_ATT(ch, DEXTERITY));
+	MSDPSetNumber(desc, eMSDP_CHA_PERM, GET_REAL_ATT(ch, CHARISMA));
+	MSDPSetNumber(desc, eMSDP_GRT_PERM, GET_REAL_ATT(ch, GREATNESS));
+	MSDPSetNumber(desc, eMSDP_INT_PERM, GET_REAL_ATT(ch, INTELLIGENCE));
+	MSDPSetNumber(desc, eMSDP_WIT_PERM, GET_REAL_ATT(ch, WITS));
+	
+	// core
+	MSDPSetNumber(desc, eMSDP_STR, GET_STRENGTH(ch));
+	MSDPSetNumber(desc, eMSDP_DEX, GET_DEXTERITY(ch));
+	MSDPSetNumber(desc, eMSDP_CHA, GET_CHARISMA(ch));
+	MSDPSetNumber(desc, eMSDP_GRT, GET_GREATNESS(ch));
+	MSDPSetNumber(desc, eMSDP_INT, GET_INTELLIGENCE(ch));
+	MSDPSetNumber(desc, eMSDP_WIT, GET_WITS(ch));
+	
+	// extra
+	MSDPSetNumber(desc, eMSDP_BLOCK, get_block_rating(ch, FALSE));
+	MSDPSetNumber(desc, eMSDP_DODGE, get_dodge_modifier(ch, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change made to it in score
+	MSDPSetNumber(desc, eMSDP_TO_HIT, get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change as in score
+	snprintf(buf, sizeof(buf), "%.2f", get_combat_speed(ch, WEAR_WIELD));
+	MSDPSetString(desc, eMSDP_SPEED, buf);
+	MSDPSetNumber(desc, eMSDP_RESIST_PHYSICAL, GET_RESIST_PHYSICAL(ch));
+	MSDPSetNumber(desc, eMSDP_RESIST_MAGICAL, GET_RESIST_MAGICAL(ch));
+	MSDPSetNumber(desc, eMSDP_BONUS_PHYSICAL, GET_BONUS_PHYSICAL(ch));
+	MSDPSetNumber(desc, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
+	MSDPSetNumber(desc, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
+	MSDPSetNumber(desc, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
+	MSDPSetNumber(desc, eMSDP_INVENTORY_MAX, CAN_CARRY_N(ch));
 	
 	if (send_update) {
 		MSDPUpdate(desc);

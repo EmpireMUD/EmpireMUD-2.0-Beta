@@ -864,6 +864,11 @@ void affect_total(char_data *ch) {
 		update_member_data(ch);
 		TRIGGER_DELAYED_REFRESH(GET_LOYALTY(ch), DELAY_REFRESH_GREATNESS);
 	}
+	
+	// delayed re-send of msdp affects
+	if (ch->desc) {
+		queue_delayed_update(ch, CDU_MSDP_AFFECTS);
+	}
 }
 
 
@@ -6271,8 +6276,13 @@ void equip_char(char_data *ch, obj_data *obj, int pos) {
 			}
 		}
 		
+		// TODO this seems like a huge error: why is it adding to is-carrying when equipping a container
 		if (IS_CONTAINER(obj)) {
 			IS_CARRYING_N(ch) += obj_carry_size(obj);
+			if (ch->desc) {
+				MSDPSetNumber(ch->desc, eMSDP_INVENTORY, IS_CARRYING_N(ch));
+				queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
+			}
 		}
 
 		if (wear_data[pos].count_stats) {
@@ -6307,6 +6317,10 @@ void obj_from_char(obj_data *object) {
 		object->next_content = object->prev_content = NULL;
 
 		IS_CARRYING_N(object->carried_by) -= obj_carry_size(object);
+		if (object->carried_by->desc) {
+			MSDPSetNumber(object->carried_by->desc, eMSDP_INVENTORY, IS_CARRYING_N(object->carried_by));
+			queue_delayed_update(object->carried_by, CDU_MSDP_SEND_UPDATES);
+		}
 
 		// check lights
 		if (OBJ_FLAGGED(object, OBJ_LIGHT)) {
@@ -6343,9 +6357,17 @@ void obj_from_obj(obj_data *obj) {
 		GET_OBJ_CARRYING_N(obj_from) -= obj_carry_size(obj);
 		if (obj_from->carried_by) {
 			IS_CARRYING_N(obj_from->carried_by) -= obj_carry_size(obj);
+			if (obj_from->carried_by->desc) {
+				MSDPSetNumber(obj_from->carried_by->desc, eMSDP_INVENTORY, IS_CARRYING_N(obj_from->carried_by));
+				queue_delayed_update(obj_from->carried_by, CDU_MSDP_SEND_UPDATES);
+			}
 		}
 		if (obj_from->worn_by && IS_CONTAINER(obj_from)) {
 			IS_CARRYING_N(obj_from->worn_by) -= obj_carry_size(obj);
+			if (obj_from->worn_by->desc) {
+				MSDPSetNumber(obj_from->worn_by->desc, eMSDP_INVENTORY, IS_CARRYING_N(obj_from->worn_by));
+				queue_delayed_update(obj_from->worn_by, CDU_MSDP_SEND_UPDATES);
+			}
 		}
 
 		obj->in_obj = NULL;
@@ -6426,6 +6448,11 @@ void obj_to_char(obj_data *object, char_data *ch) {
 		DL_PREPEND2(ch->carrying, object, prev_content, next_content);
 		object->carried_by = ch;
 		IS_CARRYING_N(ch) += obj_carry_size(object);
+		
+		if (ch->desc) {
+			MSDPSetNumber(ch->desc, eMSDP_INVENTORY, IS_CARRYING_N(ch));
+			queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
+		}
 		
 		// binding
 		if (OBJ_FLAGGED(object, OBJ_BIND_ON_PICKUP)) {
@@ -6573,9 +6600,19 @@ void obj_to_obj(obj_data *obj, obj_data *obj_to) {
 		GET_OBJ_CARRYING_N(obj_to) += obj_carry_size(obj);
 		if (obj_to->carried_by) {
 			IS_CARRYING_N(obj_to->carried_by) += obj_carry_size(obj);
+			
+			if (obj_to->carried_by->desc) {
+				MSDPSetNumber(obj_to->carried_by->desc, eMSDP_INVENTORY, IS_CARRYING_N(obj_to->carried_by));
+				queue_delayed_update(obj_to->carried_by, CDU_MSDP_SEND_UPDATES);
+			}
 		}
 		if (obj_to->worn_by && IS_CONTAINER(obj_to)) {
 			IS_CARRYING_N(obj_to->worn_by) += obj_carry_size(obj);
+			
+			if (obj_to->worn_by->desc) {
+				MSDPSetNumber(obj_to->worn_by->desc, eMSDP_INVENTORY, IS_CARRYING_N(obj_to->worn_by));
+				queue_delayed_update(obj_to->worn_by, CDU_MSDP_SEND_UPDATES);
+			}
 		}
 		
 		// set the timer here; actual rules for it are in limits.c
@@ -6728,6 +6765,11 @@ obj_data *unequip_char(char_data *ch, int pos) {
 		
 		if (IS_CONTAINER(obj)) {
 			IS_CARRYING_N(ch) -= obj_carry_size(obj);
+			
+			if (ch->desc) {
+				MSDPSetNumber(ch->desc, eMSDP_INVENTORY, IS_CARRYING_N(ch));
+				queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
+			}
 		}
 
 		// actual remove

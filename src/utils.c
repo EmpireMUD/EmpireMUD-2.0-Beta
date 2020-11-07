@@ -419,6 +419,13 @@ void run_delayed_refresh(void) {
 			REMOVE_BIT(cdu->type, CDU_MSDP_AFFECTS);
 			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
 		}
+		if (IS_SET(cdu->type, CDU_MSDP_ATTRIBUTES)) {
+			if (cdu->ch->desc) {
+				update_MSDP_attributes(cdu->ch->desc, FALSE);
+			}
+			REMOVE_BIT(cdu->type, CDU_MSDP_ATTRIBUTES);
+			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
+		}
 		if (IS_SET(cdu->type, CDU_MSDP_COOLDOWNS)) {
 			if (cdu->ch->desc) {
 				update_MSDP_cooldowns(cdu->ch->desc, FALSE);
@@ -3054,7 +3061,11 @@ void determine_gear_level(char_data *ch) {
 	GET_GEAR_LEVEL(ch) = MAX(level, 0);
 	
 	if (old != GET_GEAR_LEVEL(ch)) {
-		queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
+		if (ch->desc) {
+			MSDPSetNumber(ch->desc, eMSDP_LEVEL, get_approximate_level(ch));
+			MSDPSetNumber(ch->desc, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
+		}
+		queue_delayed_update(ch, CDU_PASSIVE_BUFFS | CDU_MSDP_SEND_UPDATES);
 	}
 }
 

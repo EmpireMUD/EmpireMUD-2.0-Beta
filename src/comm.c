@@ -316,7 +316,6 @@ void msdp_update_room(char_data *ch) {
 * From KaVir's protocol snippet (see protocol.c)
 */
 static void msdp_update(void) {
-	char buf[MAX_STRING_LENGTH];
 	struct time_info_data tinfo;
 	char_data *ch, *pOpponent, *focus;
 	bool is_ally;
@@ -348,41 +347,9 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_BLOOD_UPKEEP, MAX(0, GET_BLOOD_UPKEEP(ch)));
 			
 			// TODO this whole section can be moved to the place these numbers are updated/set (and send_initial_MSDP)
-			MSDPSetNumber(d, eMSDP_LEVEL, get_approximate_level(ch));
-			MSDPSetNumber(d, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
-			MSDPSetNumber(d, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
-			MSDPSetNumber(d, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
 			
 			MSDPSetNumber(d, eMSDP_MONEY, total_coins(ch));
 			MSDPSetNumber(d, eMSDP_BONUS_EXP, IS_NPC(ch) ? 0 : GET_DAILY_BONUS_EXPERIENCE(ch));
-			MSDPSetNumber(d, eMSDP_INVENTORY, IS_CARRYING_N(ch));
-			MSDPSetNumber(d, eMSDP_INVENTORY_MAX, CAN_CARRY_N(ch));
-			
-			// TODO lots of this can be updated on affect-total (but need to affect-total after buying all abilities, if update-passives doesn't already)
-			
-			MSDPSetNumber(d, eMSDP_STR, GET_STRENGTH(ch));
-			MSDPSetNumber(d, eMSDP_DEX, GET_DEXTERITY(ch));
-			MSDPSetNumber(d, eMSDP_CHA, GET_CHARISMA(ch));
-			MSDPSetNumber(d, eMSDP_GRT, GET_GREATNESS(ch));
-			MSDPSetNumber(d, eMSDP_INT, GET_INTELLIGENCE(ch));
-			MSDPSetNumber(d, eMSDP_WIT, GET_WITS(ch));
-			MSDPSetNumber(d, eMSDP_STR_PERM, GET_REAL_ATT(ch, STRENGTH));
-			MSDPSetNumber(d, eMSDP_DEX_PERM, GET_REAL_ATT(ch, DEXTERITY));
-			MSDPSetNumber(d, eMSDP_CHA_PERM, GET_REAL_ATT(ch, CHARISMA));
-			MSDPSetNumber(d, eMSDP_GRT_PERM, GET_REAL_ATT(ch, GREATNESS));
-			MSDPSetNumber(d, eMSDP_INT_PERM, GET_REAL_ATT(ch, INTELLIGENCE));
-			MSDPSetNumber(d, eMSDP_WIT_PERM, GET_REAL_ATT(ch, WITS));
-			
-			MSDPSetNumber(d, eMSDP_BLOCK, get_block_rating(ch, FALSE));
-			MSDPSetNumber(d, eMSDP_DODGE, get_dodge_modifier(ch, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change made to it in score
-			MSDPSetNumber(d, eMSDP_TO_HIT, get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change as in score
-			snprintf(buf, sizeof(buf), "%.2f", get_combat_speed(ch, WEAR_WIELD));
-			MSDPSetString(d, eMSDP_SPEED, buf);
-			MSDPSetNumber(d, eMSDP_RESIST_PHYSICAL, GET_RESIST_PHYSICAL(ch));
-			MSDPSetNumber(d, eMSDP_RESIST_MAGICAL, GET_RESIST_MAGICAL(ch));
-			MSDPSetNumber(d, eMSDP_BONUS_PHYSICAL, GET_BONUS_PHYSICAL(ch));
-			MSDPSetNumber(d, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
-			MSDPSetNumber(d, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
 			
 			// partial empire data (the rest is updated less often)
 			if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
