@@ -330,7 +330,8 @@ static void msdp_update(void) {
 				++PlayerCount;
 			}
 			
-			// TODO: Most of this could be moved to set only when it is changed
+			// The folllowing items are updated every second for connected players:
+			// (everything else is updated less often or only when it changes)
 			
 			// current h/m/v/b and regens
 			MSDPSetNumber(d, eMSDP_HEALTH, GET_HEALTH(ch));
@@ -357,6 +358,8 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_INVENTORY, IS_CARRYING_N(ch));
 			MSDPSetNumber(d, eMSDP_INVENTORY_MAX, CAN_CARRY_N(ch));
 			
+			// TODO lots of this can be updated on affect-total (but need to affect-total after buying all abilities, if update-passives doesn't already)
+			
 			MSDPSetNumber(d, eMSDP_STR, GET_STRENGTH(ch));
 			MSDPSetNumber(d, eMSDP_DEX, GET_DEXTERITY(ch));
 			MSDPSetNumber(d, eMSDP_CHA, GET_CHARISMA(ch));
@@ -381,37 +384,17 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
 			MSDPSetNumber(d, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
 			
-			// TODO: some of these could be set once an hour (point_update_char) rather than every second
-			
-			// empire
+			// partial empire data (the rest is updated less often)
 			if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
-				MSDPSetString(d, eMSDP_EMPIRE_NAME, EMPIRE_NAME(GET_LOYALTY(ch)));
-				MSDPSetString(d, eMSDP_EMPIRE_ADJECTIVE, EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
-				MSDPSetString(d, eMSDP_EMPIRE_RANK, strip_color(EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1)));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_TOTAL));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_MAX, land_can_claim(GET_LOYALTY(ch), TER_TOTAL));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_OUTSKIRTS));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, land_can_claim(GET_LOYALTY(ch), TER_OUTSKIRTS));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_FRONTIER, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_FRONTIER));
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_FRONTIER_MAX, land_can_claim(GET_LOYALTY(ch), TER_FRONTIER));
 				MSDPSetNumber(d, eMSDP_EMPIRE_WEALTH, GET_TOTAL_WEALTH(GET_LOYALTY(ch)));
 				MSDPSetNumber(d, eMSDP_EMPIRE_SCORE, get_total_score(GET_LOYALTY(ch)));
 			}
 			else {
-				MSDPSetString(d, eMSDP_EMPIRE_NAME, "");
-				MSDPSetString(d, eMSDP_EMPIRE_ADJECTIVE, "");
-				MSDPSetString(d, eMSDP_EMPIRE_RANK, "");
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY, 0);
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_MAX, 0);
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE, 0);
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, 0);
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_FRONTIER, 0);
-				MSDPSetNumber(d, eMSDP_EMPIRE_TERRITORY_FRONTIER_MAX, 0);
 				MSDPSetNumber(d, eMSDP_EMPIRE_WEALTH, 0);
 				MSDPSetNumber(d, eMSDP_EMPIRE_SCORE, 0);
 			}
-
-			/* This would be better moved elsewhere */
+			
+			// combat info if fighting
 			if ((pOpponent = FIGHTING(ch))) {
 				hit_points = (GET_HEALTH(pOpponent) * 100) / GET_MAX_HEALTH(pOpponent);
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, hit_points);
@@ -431,7 +414,7 @@ static void msdp_update(void) {
 					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
 				}
 			}
-			else { // Clear the values
+			else { // Clear the values if not fighting
 				MSDPSetNumber(d, eMSDP_OPPONENT_HEALTH, 0);
 				MSDPSetNumber(d, eMSDP_OPPONENT_LEVEL, 0);
 				MSDPSetString(d, eMSDP_OPPONENT_NAME, "");
@@ -440,7 +423,7 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
 			}
 			
-			// time
+			// time (changes as the player moves)
 			tinfo = get_local_time(IN_ROOM(ch));
 			MSDPSetNumber(d, eMSDP_WORLD_TIME, tinfo.hours);
 			MSDPSetNumber(d, eMSDP_WORLD_DAY_OF_MONTH, tinfo.day + 1);

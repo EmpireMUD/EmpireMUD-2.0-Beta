@@ -23,6 +23,7 @@
 #define PROTOCOL_H
 
 typedef struct descriptor_data descriptor_t;
+typedef struct empire_data empire_t;
 
 
 /******************************************************************************
@@ -615,6 +616,8 @@ void send_initial_MSDP(descriptor_t *desc);
 void update_MSDP_affects(descriptor_t *desc, int send_update);
 void update_MSDP_cooldowns(descriptor_t *desc, int send_update);
 void update_MSDP_dots(descriptor_t *desc, int send_update);
+void update_MSDP_empire_data(descriptor_t *desc, int send_update);
+void update_MSDP_empire_data_all(empire_t *emp);
 void update_MSDP_skills(descriptor_t *desc, int send_update);
 
 #endif /* PROTOCOL_H */

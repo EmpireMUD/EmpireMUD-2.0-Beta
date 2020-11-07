@@ -3062,6 +3062,7 @@ void send_initial_MSDP(descriptor_data *desc) {
 	update_MSDP_affects(desc, FALSE);
 	update_MSDP_cooldowns(desc, FALSE);
 	update_MSDP_dots(desc, FALSE);
+	update_MSDP_empire_data(desc, FALSE);
 	update_MSDP_skills(desc, FALSE);
 	
 	// send it
@@ -3146,7 +3147,7 @@ void update_MSDP_dots(descriptor_data *desc, int send_update) {
 	if (!(ch = desc->character)) {
 		return;
 	}
-			
+	
 	// dots
 	*buf = '\0';
 	buf_size = 0;
@@ -3166,6 +3167,67 @@ void update_MSDP_dots(descriptor_data *desc, int send_update) {
 	
 	if (send_update) {
 		MSDPUpdate(desc);
+	}
+}
+
+
+/**
+* Updates all empire data for MSDP.
+*
+* @param descriptor_data *desc The descriptor of an in-game player.
+* @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
+*/
+void update_MSDP_empire_data(descriptor_data *desc, int send_update) {
+	char_data *ch;
+	
+	if (!(ch = desc->character)) {
+		return;
+	}
+	
+	// empire
+	if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
+		MSDPSetString(desc, eMSDP_EMPIRE_NAME, EMPIRE_NAME(GET_LOYALTY(ch)));
+		MSDPSetString(desc, eMSDP_EMPIRE_ADJECTIVE, EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
+		MSDPSetString(desc, eMSDP_EMPIRE_RANK, strip_color(EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1)));
+		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_TOTAL));
+		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_MAX, land_can_claim(GET_LOYALTY(ch), TER_TOTAL));
+		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_OUTSIDE, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_OUTSKIRTS));
+		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, land_can_claim(GET_LOYALTY(ch), TER_OUTSKIRTS));
+		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_FRONTIER, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_FRONTIER));
+		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_FRONTIER_MAX, land_can_claim(GET_LOYALTY(ch), TER_FRONTIER));
+		// wealth/score are updated every second in msdp_update()
+	}
+	else {
+		MSDPSetString(desc, eMSDP_EMPIRE_NAME, "");
+		MSDPSetString(desc, eMSDP_EMPIRE_ADJECTIVE, "");
+		MSDPSetString(desc, eMSDP_EMPIRE_RANK, "");
+		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY, 0);
+		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_MAX, 0);
+		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_OUTSIDE, 0);
+		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, 0);
+		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_FRONTIER, 0);
+		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_FRONTIER_MAX, 0);
+	}
+	
+	if (send_update) {
+		MSDPUpdate(desc);
+	}
+}
+
+
+/**
+* Runs MSDP empire-data update for all online players for an empire.
+*
+* @param empire_data *emp The empire to update (or NULL for all empires).
+*/
+void update_MSDP_empire_data_all(empire_data *emp) {
+	descriptor_data *desc;
+	
+	LL_FOREACH(descriptor_list, desc) {
+		if (STATE(desc) == CON_PLAYING && desc->character && (!emp || GET_LOYALTY(desc->character) == emp)) {
+			update_MSDP_empire_data(desc, FALSE);
+			queue_delayed_update(desc->character, CDU_MSDP_SEND_UPDATES);
+		}
 	}
 }
 

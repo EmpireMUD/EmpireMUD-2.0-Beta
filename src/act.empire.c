@@ -3730,6 +3730,10 @@ ACMD(do_defect) {
 		// this will adjust the empire's player count
 		reread_empire_tech(e);
 		refresh_all_quests(ch);
+		
+		if (ch->desc) {
+			update_MSDP_empire_data(ch->desc, TRUE);
+		}
 	}
 }
 
@@ -3812,6 +3816,10 @@ ACMD(do_demote) {
 		}
 		else {
 			queue_delayed_update(victim, CDU_SAVE);
+		
+			if (victim->desc) {
+				update_MSDP_empire_data(victim->desc, TRUE);
+			}
 		}
 	}
 
@@ -4790,6 +4798,7 @@ ACMD(do_enroll) {
 		refresh_empire_goals(e, NOTHING);
 		
 		save_empire(e, TRUE);
+		update_MSDP_empire_data_all(e);
 	}
 	
 	// clean up if still necessary
@@ -5015,6 +5024,10 @@ ACMD(do_expel) {
 		else {
 			refresh_all_quests(targ);
 			queue_delayed_update(targ, CDU_SAVE);
+		
+			if (targ->desc) {
+				update_MSDP_empire_data(targ->desc, TRUE);
+			}
 		}
 
 		// do this AFTER the save -- fixes member counts, etc
@@ -6634,6 +6647,10 @@ ACMD(do_promote) {
 		}
 		else {
 			queue_delayed_update(victim, CDU_SAVE);
+		
+			if (victim->desc) {
+				update_MSDP_empire_data(victim->desc, TRUE);
+			}
 		}
 	}
 	
