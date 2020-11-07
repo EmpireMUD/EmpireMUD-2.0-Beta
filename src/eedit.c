@@ -344,6 +344,8 @@ EEDIT(eedit_adjective) {
 		if (emp != GET_LOYALTY(ch)) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's adjective form to %s", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_ADJECTIVE(emp));
 		}
+		
+		update_MSDP_empire_data_all(emp);
 	}
 }
 
@@ -384,6 +386,8 @@ EEDIT(eedit_banner) {
 		if (emp != GET_LOYALTY(ch)) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's banner to %s%s&0", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)));
 		}
+		
+		update_MSDP_empire_data_all(emp);
 	}
 }
 
@@ -457,6 +461,8 @@ EEDIT(eedit_change_leader) {
 				free_char(victim);
 			}
 		}
+		
+		update_MSDP_empire_data_all(emp);
 	}
 	
 	// clean up
@@ -611,6 +617,8 @@ EEDIT(eedit_name) {
 				}
 			}
 		}
+		
+		update_MSDP_empire_data_all(emp);
 	}
 }
 
@@ -702,6 +710,8 @@ EEDIT(eedit_rank) {
 				}
 			}
 		}
+		
+		update_MSDP_empire_data_all(emp);
 	}
 }
 
@@ -787,5 +797,7 @@ EEDIT(eedit_num_ranks) {
 		if (emp != GET_LOYALTY(ch)) {
 			syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "ABUSE: %s has changed %s's number of ranks to %d", GET_NAME(ch), EMPIRE_NAME(emp), EMPIRE_NUM_RANKS(emp));
 		}
+		
+		update_MSDP_empire_data_all(emp);
 	}
 }
