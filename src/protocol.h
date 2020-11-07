@@ -612,6 +612,7 @@ char *flush_reduced_color_codes(descriptor_t *desc);
 
 // MSDP updaters
 void send_initial_MSDP(descriptor_t *desc);
-void update_MSDP_cooldowns(descriptor_t *desc);
+void update_MSDP_cooldowns(descriptor_t *desc, int send_update);
+void update_MSDP_skills(descriptor_t *desc, int send_update);
 
 #endif /* PROTOCOL_H */

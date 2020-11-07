@@ -3455,6 +3455,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 						
 						if (sk && (skdata = get_skill_data(c, SKILL_VNUM(sk), TRUE))) {
 							skdata->resets = MIN(skdata->resets + 1, MAX_SKILL_RESETS);
+							queue_delayed_update(c, CDU_MSDP_SKILLS);
 						}
 						*str = '\0';
 					}

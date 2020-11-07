@@ -2585,7 +2585,7 @@ void add_cooldown(char_data *ch, any_vnum type, int seconds_duration) {
 	}
 	
 	if (ch->desc) {
-		update_MSDP_cooldowns(ch->desc);
+		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
 	}
 }
 
@@ -2623,7 +2623,7 @@ void remove_cooldown(char_data *ch, struct cooldown_data *cool) {
 	free(cool);
 	
 	if (ch->desc) {
-		update_MSDP_cooldowns(ch->desc);
+		queue_delayed_update(ch, CDU_MSDP_COOLDOWNS);
 	}
 }
 

@@ -3059,7 +3059,11 @@ void send_initial_MSDP(descriptor_data *desc) {
 	MSDPSetString(desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
 	
 	// lists
-	update_MSDP_cooldowns(desc);
+	update_MSDP_cooldowns(desc, FALSE);
+	update_MSDP_skills(desc, FALSE);
+	
+	// send it
+	MSDPUpdate(desc);
 }
 
 
@@ -3067,8 +3071,9 @@ void send_initial_MSDP(descriptor_data *desc) {
 * Updates all cooldowns for MSDP.
 *
 * @param descriptor_data *desc The descriptor of an in-game player.
+* @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
 */
-void update_MSDP_cooldowns(descriptor_data *desc) {
+void update_MSDP_cooldowns(descriptor_data *desc, int send_update) {
 	char buf[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	size_t buf_size;
@@ -3087,4 +3092,49 @@ void update_MSDP_cooldowns(descriptor_data *desc) {
 		}
 	}
 	MSDPSetTable(desc, eMSDP_COOLDOWNS, buf);
+	
+	if (send_update) {
+		MSDPUpdate(desc);
+	}
+}
+
+
+/**
+* Updates all skill info for MSDP.
+*
+* @param descriptor_data *desc The descriptor of an in-game player.
+* @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
+*/
+void update_MSDP_skills(descriptor_data *desc, int send_update) {
+	struct player_skill_data *skill, *next_skill;
+	char buf[MAX_STRING_LENGTH];
+	size_t buf_size;
+	char_data *ch;
+	
+	if (!(ch = desc->character)) {
+		return;
+	}
+	
+	get_player_skill_string(ch, buf, FALSE);
+	MSDPSetString(desc, eMSDP_CLASS, buf);
+	
+	// skills
+	*buf = '\0';
+	buf_size = 0;
+	HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, SKILL_NAME(skill->ptr), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+		
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->level);
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, skill->exp);
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cRESETS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->resets);
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNOSKILL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->noskill ? 1 : 0);
+		
+		// end table
+		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
+	}
+	MSDPSetTable(desc, eMSDP_SKILLS, buf);
+	
+	if (send_update) {
+		MSDPUpdate(desc);
+	}
 }

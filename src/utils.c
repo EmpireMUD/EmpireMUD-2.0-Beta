@@ -408,15 +408,44 @@ void run_delayed_refresh(void) {
 		// CDU_x: functionality for delayed update types
 		if (IS_SET(cdu->type, CDU_PASSIVE_BUFFS)) {
 			refresh_passive_buffs(cdu->ch);
+			REMOVE_BIT(cdu->type, CDU_PASSIVE_BUFFS);
+		}
+		
+		// MSDP sections
+		if (IS_SET(cdu->type, CDU_MSDP_COOLDOWNS)) {
+			if (cdu->ch->desc) {
+				update_MSDP_cooldowns(cdu->ch->desc, FALSE);
+			}
+			REMOVE_BIT(cdu->type, CDU_MSDP_COOLDOWNS);
+			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
+		}
+		if (IS_SET(cdu->type, CDU_MSDP_SKILLS)) {
+			if (cdu->ch->desc) {
+				update_MSDP_skills(cdu->ch->desc, FALSE);
+			}
+			REMOVE_BIT(cdu->type, CDU_MSDP_SKILLS);
+			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
+		}
+		
+		// do this after the MSDP section
+		if (IS_SET(cdu->type, CDU_MSDP_SEND_UPDATES)) {
+			if (cdu->ch->desc) {
+				MSDPUpdate(cdu->ch->desc);
+			}
+			REMOVE_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);
 		}
 		
 		// do this one last (anything above may be save-able)
 		if (IS_SET(cdu->type, CDU_SAVE)) {
 			SAVE_CHAR(cdu->ch);
+			REMOVE_BIT(cdu->type, CDU_SAVE);
 		}
 		
-		HASH_DEL(char_delayed_update_list, cdu);
-		free(cdu);
+		// remove only if no bits remain (sometimes more bits get added while running)
+		if (!cdu->type) {
+			HASH_DEL(char_delayed_update_list, cdu);
+			free(cdu);
+		}
 	}
 
 	

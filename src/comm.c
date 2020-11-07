@@ -305,6 +305,9 @@ void msdp_update_room(char_data *ch) {
 	MSDPSetString(desc, eMSDP_ROOM_NAME, get_room_name(IN_ROOM(ch), FALSE));
 	MSDPSetTable(desc, eMSDP_ROOM_EXITS, exits);
 	
+	// other stuff that's room-based
+	MSDPSetString(desc, eMSDP_WORLD_SEASON, seasons[GET_SEASON(IN_ROOM(ch))]);
+	
 	MSDPUpdate(desc);
 }
 
@@ -313,7 +316,6 @@ void msdp_update_room(char_data *ch) {
 * From KaVir's protocol snippet (see protocol.c)
 */
 static void msdp_update(void) {
-	struct player_skill_data *skill, *next_skill;
 	struct over_time_effect_type *dot;
 	char buf[MAX_STRING_LENGTH];
 	struct time_info_data tinfo;
@@ -326,7 +328,9 @@ static void msdp_update(void) {
 
 	for (d = descriptor_list; d; d = d->next) {
 		if ((ch = d->character) && !IS_NPC(ch) && STATE(d) == CON_PLAYING) {
-			++PlayerCount;
+			if (GET_INVIS_LEV(ch) <= LVL_MORTAL && !PRF_FLAGGED(ch, PRF_INCOGNITO)) {
+				++PlayerCount;
+			}
 			
 			// TODO: Most of this could be moved to set only when it is changed
 			
@@ -370,30 +374,12 @@ static void msdp_update(void) {
 			}
 			MSDPSetTable(d, eMSDP_DOTS, buf);
 			
+			// TODO this whole section can be moved to the place these numbers are updated/set (and send_initial_MSDP)
 			MSDPSetNumber(d, eMSDP_LEVEL, get_approximate_level(ch));
 			MSDPSetNumber(d, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
 			MSDPSetNumber(d, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
 			MSDPSetNumber(d, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
-
-			get_player_skill_string(ch, buf, FALSE);
-			MSDPSetString(d, eMSDP_CLASS, buf);
 			
-			// skills
-			*buf = '\0';
-			buf_size = 0;
-			HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, SKILL_NAME(skill->ptr), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
-				
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->level);
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, skill->exp);
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cRESETS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->resets);
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNOSKILL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->noskill ? 1 : 0);
-				
-				// end table
-				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
-			}
-			MSDPSetTable(d, eMSDP_SKILLS, buf);
-
 			MSDPSetNumber(d, eMSDP_MONEY, total_coins(ch));
 			MSDPSetNumber(d, eMSDP_BONUS_EXP, IS_NPC(ch) ? 0 : GET_DAILY_BONUS_EXPERIENCE(ch));
 			MSDPSetNumber(d, eMSDP_INVENTORY, IS_CARRYING_N(ch));
@@ -466,7 +452,8 @@ static void msdp_update(void) {
 					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, hit_points);
 					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, is_ally ? GET_MAX_HEALTH(focus) : 100);
 					MSDPSetString(d, eMSDP_OPPONENT_FOCUS_NAME, PERS(focus, ch, FALSE));
-				} else {
+				}
+				else {
 					MSDPSetString(d, eMSDP_OPPONENT_FOCUS_NAME, "");
 					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH, 0);
 					MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
@@ -481,16 +468,12 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
 			}
 			
+			// time
 			tinfo = get_local_time(IN_ROOM(ch));
-			
 			MSDPSetNumber(d, eMSDP_WORLD_TIME, tinfo.hours);
-			// TODO: these could be set as they change
 			MSDPSetNumber(d, eMSDP_WORLD_DAY_OF_MONTH, tinfo.day + 1);
 			MSDPSetString(d, eMSDP_WORLD_MONTH, month_name[(int)tinfo.month]);
 			MSDPSetNumber(d, eMSDP_WORLD_YEAR, tinfo.year);
-			
-			// TODO: this one changes when the player moves (should be set in the same code that updates location)
-			MSDPSetString(d, eMSDP_WORLD_SEASON, seasons[GET_SEASON(IN_ROOM(ch))]);
 			
 			// done -- send it
 			MSDPUpdate(d);
