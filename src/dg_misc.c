@@ -60,9 +60,6 @@ room_data *do_dg_add_room_dir(room_data *from, int dir, bld_data *bld) {
 		perform_claim_room(new, ROOM_OWNER(home));
 	}
 	
-	// sort now just in case
-	sort_world_table();
-	
 	return new;
 }
 

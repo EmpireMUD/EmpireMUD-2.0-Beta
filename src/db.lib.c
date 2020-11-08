@@ -62,7 +62,6 @@
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
 extern struct player_special_data dummy_mob;
 extern int max_automessage_id;
-extern bool world_is_sorted;
 
 // external funcs
 void add_trd_home_room(room_vnum vnum, room_vnum home_room);
@@ -100,6 +99,7 @@ void parse_generic_name_file(FILE *fl, char *err_str);
 void parse_icon(char *line, FILE *fl, struct icon_data **list, char *error_part);
 struct theft_log *reduce_theft_logs_and_get_recent(empire_data *emp);
 int sort_island_table(struct island_info *a, struct island_info *b);
+int sort_world_table_func(room_data *a, room_data *b);
 
 
  //////////////////////////////////////////////////////////////////////////////
@@ -5667,15 +5667,15 @@ void write_resources_to_file(FILE *fl, char letter, struct resource_data *list) 
 *
 * @param room_data *room The room to add.
 */
-void add_room_to_world_tables(room_data *room) {	
-	HASH_ADD_INT(world_table, vnum, room);
+void add_room_to_world_tables(room_data *room) {
+	HASH_ADD_INORDER(hh, world_table, vnum, sizeof(int), room, sort_world_table_func);
+	// formerly unordered: HASH_ADD_INT(world_table, vnum, room);
 	
 	// interior linked list
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-		DL_PREPEND2(interior_room_list, room, prev_interior, next_interior);
+		DL_INSERT_INORDER2(interior_room_list, room, sort_world_table_func, prev_interior, next_interior);
+		// formerly unordered: DL_PREPEND2(interior_room_list, room, prev_interior, next_interior);
 	}
-	
-	world_is_sorted = FALSE;
 }
 
 
@@ -9295,23 +9295,12 @@ int sort_triggers(trig_data *a, trig_data *b) {
 /**
 * Simple sorter for the world_table hash
 *
-* @param void *a One element
-* @param void *b Another element
+* @param room_data *a One element
+* @param room_data *b Another element
 * @return int Sort instruction of -1, 0, or 1
 */
-int sort_world_table_func(void *a, void *b) {
-	return ((room_data*)a)->vnum - ((room_data*)b)->vnum;
-}
-
-
-/**
-* Sorts the world table -- only necessary for things like saving.
-*/
-void sort_world_table(void) {
-	if (!world_is_sorted) {
-		HASH_SORT(world_table, sort_world_table_func);
-	}
-	world_is_sorted = TRUE;
+int sort_world_table_func(room_data *a, room_data *b) {
+	return a->vnum - b->vnum;
 }
 
 
