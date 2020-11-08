@@ -5672,7 +5672,8 @@ void add_room_to_world_tables(room_data *room) {
 	
 	// interior linked list
 	if (GET_ROOM_VNUM(room) >= MAP_SIZE) {
-		DL_PREPEND2(interior_room_list, room, prev_interior, next_interior);
+		// appends as of b5.115 because it's less likely to need sorting there
+		DL_APPEND2(interior_room_list, room, prev_interior, next_interior);
 	}
 	
 	world_is_sorted = FALSE;
