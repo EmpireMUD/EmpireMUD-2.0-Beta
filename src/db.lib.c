@@ -5723,6 +5723,7 @@ void parse_room(FILE *fl, room_vnum vnum) {
 	if (vnum < MAP_SIZE) {
 		GET_MAP_LOC(room) = &(world_map[MAP_X_COORD(vnum)][MAP_Y_COORD(vnum)]);
 		SHARED_DATA(room) = GET_MAP_LOC(room)->shared;
+		GET_MAP_LOC(room)->room = room;
 	}
 	else {
 		CREATE(SHARED_DATA(room), struct shared_room_data, 1);
