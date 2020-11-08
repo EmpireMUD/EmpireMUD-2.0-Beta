@@ -602,7 +602,7 @@ void send_hourly_sun_messages(void) {
 					break;
 				}
 				case SUN_LIGHT: {
-					msg_to_char(desc->character, "The sun rises over the horizon.\r\n");
+					msg_to_char(desc->character, "The day has begun.\r\n");
 					break;
 				}
 				case SUN_SET: {
