@@ -659,7 +659,7 @@ bool validate_one_loc(adv_data *adv, struct adventure_link_rule *rule, room_data
 	
 	// detect loc (still OPTIONAL at this stage)
 	if (!loc) {
-		loc = real_real_room(map->vnum);
+		loc = map->room;
 	}
 	
 	// detect home room if applicable

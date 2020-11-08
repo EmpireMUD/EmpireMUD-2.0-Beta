@@ -893,7 +893,7 @@ void verify_sectors(void) {
 	
 	// check whole world
 	LL_FOREACH_SAFE(land_map, map, next_map) {
-		room = real_real_room(map->vnum);
+		room = map->room;	// if loaded
 		
 		if (!map->sector_type) {
 			// can't use change_terrain() here -- note check_terrain_height() does not run here either
@@ -2287,7 +2287,7 @@ void b3_15_crop_update(void) {
 	LL_FOREACH(land_map, map) {
 		room = NULL;
 		
-		if ((room = real_real_room(map->vnum))) {
+		if ((room = map->room)) {
 			if (ROOM_OWNER(room)) {
 				continue;	// skip owned tiles
 			}
@@ -2824,7 +2824,7 @@ void b5_19_world_fix(void) {
 		}
 		
 		// used several times below:
-		room = real_real_room(map->vnum);
+		room = map->room;
 		
 		// building affs fix
 		if (!room || !(bld = GET_BUILDING(room))) {
@@ -3406,7 +3406,7 @@ void b5_47_mine_update(void) {
 	
 	// clear mines
 	LL_FOREACH(land_map, tile) {
-		if (!(room = real_real_room(tile->vnum)) || !room_has_function_and_city_ok(ROOM_OWNER(room), room, FNC_MINE)) {
+		if (!(room = tile->room) || !room_has_function_and_city_ok(ROOM_OWNER(room), room, FNC_MINE)) {
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_GLB_VNUM);
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_MINE_AMOUNT);
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
@@ -4486,7 +4486,7 @@ void b5_112_update(void) {
 	log("Applying b5.112 update to fix bad dedicate data...");
 	
 	LL_FOREACH(land_map, map) {
-		if (!(room = real_real_room(map->vnum)) || !ROOM_BLD_FLAGGED(room, BLD_DEDICATE)) {
+		if (!(room = map->room) || !ROOM_BLD_FLAGGED(room, BLD_DEDICATE)) {
 			remove_extra_data(&map->shared->extra_data, ROOM_EXTRA_DEDICATE_ID);
 		}
 	}

@@ -6011,6 +6011,7 @@ struct track_data {
 // data for the world map (world_map, land_map)
 struct map_data {
 	room_vnum vnum;	// corresponding room vnum (coordinates can be derived from here)
+	room_data *room;	// pointer is set IF it exists in the world_table right now (otherwise load with real_room)
 	
 	// three basic sector types
 	sector_data *sector_type;	// current sector

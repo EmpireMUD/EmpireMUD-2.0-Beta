@@ -687,6 +687,11 @@ void delete_room(room_data *room, bool check_exits) {
 		free_shared_room_data(SHARED_DATA(room));
 	}
 	
+	// break the association with the world_map tile
+	if (GET_MAP_LOC(room) && GET_MAP_LOC(room)->room == room) {
+		GET_MAP_LOC(room)->room = NULL;
+	}
+	
 	// free the room
 	free(room);
 	
@@ -1114,7 +1119,7 @@ void annual_update_map_tile(struct map_data *tile) {
 	double dmg;
 	
 	// actual room is optional
-	room = real_real_room(tile->vnum);
+	room = tile->room;
 	
 	// updates that only matter if there's a room:
 	if (room) {
@@ -1359,7 +1364,7 @@ int naturalize_newbie_island(struct map_data *tile, bool do_unclaim) {
 	}
 	
 	// checks needed if the room exists
-	if ((room = real_real_room(tile->vnum))) {
+	if ((room = tile->room)) {
 		if (ROOM_OWNER(room)) {
 			return 0;	// owned rooms don't naturalize
 		}
@@ -1936,7 +1941,7 @@ void perform_change_base_sect(room_data *loc, struct map_data *map, sector_data 
 	old_sect = (loc ? BASE_SECT(loc) : map->base_sector);
 	
 	// update room
-	if (loc || (loc = real_real_room(map->vnum))) {
+	if (loc || (loc = map->room)) {
 		BASE_SECT(loc) = sect;
 	}
 	
@@ -1991,7 +1996,7 @@ void perform_change_sect(room_data *loc, struct map_data *map, sector_data *sect
 	
 	// ensure we have loc if possible
 	if (!loc) {
-		loc = real_real_room(map->vnum);
+		loc = map->room;
 	}
 	
 	// for updating territory counts
@@ -3017,6 +3022,7 @@ room_data *load_map_room(room_vnum vnum) {
 	room->vnum = vnum;
 	SHARED_DATA(room) = map->shared;	// point to map
 	GET_MAP_LOC(room) = map;
+	map->room = room;
 	add_room_to_world_tables(room);
 	
 	// do not use perform_change_sect here because we're only loading from the existing data -- this already has height data
@@ -3702,8 +3708,8 @@ void output_map_to_file(void) {
 	
 	for (y = 0; y < MAP_HEIGHT; ++y) {
 		for (x = 0; x < MAP_WIDTH; ++x) {
-			// load room only if in memory
-			room = real_real_room(world_map[x][y].vnum);
+			// use room only if in memory
+			room = world_map[x][y].room;
 			sect = world_map[x][y].sector_type;
 			if (room && ROOM_AFF_FLAGGED(room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(room)) {
 				sect = world_map[x][y].base_sector;
@@ -3913,6 +3919,7 @@ void load_world_map_from_file(void) {
 	for (x = 0; x < MAP_WIDTH; ++x) {
 		for (y = 0; y < MAP_HEIGHT; ++y) {
 			world_map[x][y].vnum = (y * MAP_WIDTH) + x;
+			world_map[x][y].room = NULL;
 			world_map[x][y].shared = &ocean_shared_data;
 			world_map[x][y].shared->island_id = NO_ISLAND;
 			world_map[x][y].shared->island_ptr = NULL;
@@ -4091,7 +4098,6 @@ void save_world_map_to_file(void) {
 	struct track_data *track, *next_track;
 	struct map_data *iter;
 	long now = time(0);
-	room_data *room;
 	FILE *fl;
 	int misc;
 	
@@ -4119,7 +4125,7 @@ void save_world_map_to_file(void) {
 		
 		// misc is some extra flags we pass to the evolver here, and is not really read back in by the MUD
 		misc = 0;
-		if ((room = real_real_room(iter->vnum)) && ROOM_OWNER(room)) {
+		if (iter->room && ROOM_OWNER(iter->room)) {
 			misc |= EVOLVER_OWNED;
 		}
 		

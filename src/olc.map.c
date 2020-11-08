@@ -575,7 +575,7 @@ OLC_MODULE(mapedit_naturalize) {
 		
 		// check all land tiles
 		LL_FOREACH(land_map, map) {
-			room = real_real_room(map->vnum);	// may or may not exist
+			room = map->room;	// may or may not exist
 			
 			if (island && map->shared->island_id != island_id) {
 				continue;

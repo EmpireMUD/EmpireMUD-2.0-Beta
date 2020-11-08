@@ -3961,7 +3961,6 @@ SHOW(show_crops) {
 	int count, total, this;
 	struct map_data *map;
 	size_t size, l_size;
-	room_data *room;
 	bool any;
 	
 	// fresh numbers
@@ -3997,17 +3996,14 @@ SHOW(show_crops) {
 				continue;
 			}
 			
-			// load room if possible (but not if it's not in RAM)
-			room = real_real_room(map->vnum);
-			
-			// found
-			if (room && ROOM_OWNER(room)) {
-				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+			// room info if possible
+			if (map->room && ROOM_OWNER(map->room)) {
+				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(map->room)), EMPIRE_ADJECTIVE(ROOM_OWNER(map->room)));
 			}
 			else {
 				*part = '\0';
 			}
-			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), room ? get_room_name(room, FALSE) : GET_CROP_TITLE(crop), part);
+			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_CROP_TITLE(crop), part);
 			any = TRUE;
 			
 			if (size + l_size < sizeof(buf) + 40) {	// reserve a little extra space
@@ -4224,7 +4220,6 @@ SHOW(show_terrain) {
 	int count, total, this;
 	struct map_data *map;
 	size_t size, l_size;
-	room_data *room;
 	bool any;
 	
 	// fresh numbers
@@ -4260,17 +4255,14 @@ SHOW(show_terrain) {
 				continue;
 			}
 			
-			// load room if possible (but not if it's not in RAM)
-			room = real_real_room(map->vnum);
-			
 			// found
-			if (room && ROOM_OWNER(room)) {
-				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(room)), EMPIRE_ADJECTIVE(ROOM_OWNER(room)));
+			if (map->room && ROOM_OWNER(map->room)) {
+				snprintf(part, sizeof(part), " - %s%s\t0", EMPIRE_BANNER(ROOM_OWNER(map->room)), EMPIRE_ADJECTIVE(ROOM_OWNER(map->room)));
 			}
 			else {
 				*part = '\0';
 			}
-			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), room ? get_room_name(room, FALSE) : GET_SECT_TITLE(sect), part);
+			l_size = snprintf(line, sizeof(line), "(%*d, %*d) %s%s\r\n", X_PRECISION, MAP_X_COORD(map->vnum), Y_PRECISION, MAP_Y_COORD(map->vnum), map->room ? get_room_name(map->room, FALSE) : GET_SECT_TITLE(sect), part);
 			any = TRUE;
 			
 			if (size + l_size < sizeof(buf) + 40) {	// reserve a little extra space
