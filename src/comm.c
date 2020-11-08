@@ -349,7 +349,6 @@ static void msdp_update(void) {
 			// TODO this whole section can be moved to the place these numbers are updated/set (and send_initial_MSDP)
 			
 			MSDPSetNumber(d, eMSDP_MONEY, total_coins(ch));
-			MSDPSetNumber(d, eMSDP_BONUS_EXP, IS_NPC(ch) ? 0 : GET_DAILY_BONUS_EXPERIENCE(ch));
 			
 			// partial empire data (the rest is updated less often)
 			if (GET_LOYALTY(ch) && !IS_NPC(ch)) {

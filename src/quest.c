@@ -687,6 +687,10 @@ void give_quest_rewards(char_data *ch, struct quest_reward *list, int reward_lev
 			case QR_BONUS_EXP: {
 				msg_to_char(ch, "\tyYou gain %d bonus experience point%s!\t0\r\n", reward->amount, PLURAL(reward->amount));
 				SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(ch), reward->amount, 0, UCHAR_MAX, FALSE);
+				if (ch->desc) {
+					MSDPSetNumber(ch->desc, eMSDP_BONUS_EXP, IS_NPC(ch) ? 0 : GET_DAILY_BONUS_EXPERIENCE(ch));
+					queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
+				}
 				break;
 			}
 			case QR_COINS: {

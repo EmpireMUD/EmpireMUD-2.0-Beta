@@ -739,6 +739,10 @@ void real_update_char(char_data *ch) {
 			gain = compute_bonus_exp_per_day(ch);
 			if (GET_DAILY_BONUS_EXPERIENCE(ch) < gain) {
 				GET_DAILY_BONUS_EXPERIENCE(ch) = gain;
+				if (ch->desc) {
+					MSDPSetNumber(ch->desc, eMSDP_BONUS_EXP, GET_DAILY_BONUS_EXPERIENCE(ch));
+					queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
+				}
 			}
 			GET_DAILY_QUESTS(ch) = 0;
 		

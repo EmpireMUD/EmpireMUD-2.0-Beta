@@ -111,6 +111,10 @@ void apply_bonus_trait(char_data *ch, bitvector_t trait, bool add) {
 	
 	if (IS_SET(trait, BONUS_EXTRA_DAILY_SKILLS)) {
 		GET_DAILY_BONUS_EXPERIENCE(ch) = MAX(0, GET_DAILY_BONUS_EXPERIENCE(ch) + (config_get_int("num_bonus_trait_daily_skills") * amt));
+		if (ch->desc) {
+			MSDPSetNumber(ch->desc, eMSDP_BONUS_EXP, GET_DAILY_BONUS_EXPERIENCE(ch));
+			queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
+		}
 	}
 	if (IS_SET(trait, BONUS_STRENGTH)) {
 		ch->real_attributes[STRENGTH] = MAX(1, MIN(att_max(ch), ch->real_attributes[STRENGTH] + amt));

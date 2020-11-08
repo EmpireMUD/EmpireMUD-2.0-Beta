@@ -2354,6 +2354,10 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 	}
 	else if SET_CASE("bonusexp") {
 		GET_DAILY_BONUS_EXPERIENCE(vict) = RANGE(0, 255);
+		if (vict->desc) {
+			MSDPSetNumber(vict->desc, eMSDP_BONUS_EXP, GET_DAILY_BONUS_EXPERIENCE(vict));
+			queue_delayed_update(vict, CDU_MSDP_SEND_UPDATES);
+		}
 	}
 	else if SET_CASE("dailyquestscompleted") {
 		GET_DAILY_QUESTS(vict) = RANGE(0, config_get_int("dailies_per_day"));
