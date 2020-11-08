@@ -4076,7 +4076,7 @@ void write_world_to_files(void) {
 	// write world_map:
 	for (y = 0; y < MAP_HEIGHT; ++y) {
 		// iterating x inside of y will ensure we're in vnum-order here
-		for (x = 0; x < MAP_HEIGHT; ++x) {
+		for (x = 0; x < MAP_WIDTH; ++x) {
 			map = &world_map[x][y];
 			write_graphical_map_data(map, map_fl, pol_fl);
 			
