@@ -8458,11 +8458,15 @@ ACMD(do_forgive) {
 
 
 ACMD(do_fullsave) {
+	unsigned long long time;
+	
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has triggered a full map save", GET_REAL_NAME(ch));
 	syslog(SYS_INFO, 0, FALSE, "Updating zone files...");
-
+	
+	time = microtime();
 	write_world_to_files();
 	send_config_msg(ch, "ok_string");
+	msg_to_char(ch, "Save time: %.2f seconds\r\n", (microtime() - time) / 1000000.0);
 }
 
 
