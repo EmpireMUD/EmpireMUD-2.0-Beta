@@ -8466,7 +8466,10 @@ ACMD(do_fullsave) {
 	time = microtime();
 	write_world_to_files();
 	send_config_msg(ch, "ok_string");
-	msg_to_char(ch, "Save time: %.2f seconds\r\n", (microtime() - time) / 1000000.0);
+	
+	if (ch->desc) {
+		stack_msg_to_desc(ch->desc, "World save time: %.2f seconds\r\n", (microtime() - time) / 1000000.0);
+	}
 }
 
 
