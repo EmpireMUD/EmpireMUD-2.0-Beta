@@ -691,6 +691,7 @@ void delete_room(room_data *room, bool check_exits) {
 	free(room);
 	
 	// maybe
+	// world_is_sorted = FALSE;
 	need_world_index = TRUE;
 }
 
@@ -998,6 +999,9 @@ void save_whole_world(void) {
 	}
 	
 	last = -1;
+	
+	// must sort first
+	sort_world_table();
 	
 	// open index file
 	if (need_world_index) {
@@ -3678,6 +3682,8 @@ void output_map_to_file(void) {
 		log("SYSERR: Basic ocean sector %d is missing", BASIC_OCEAN);
 		return;
 	}
+	
+	sort_world_table();
 
 	// NORMAL MAP
 	if (!(out = fopen(GEOGRAPHIC_MAP_FILE TEMP_SUFFIX, "w"))) {

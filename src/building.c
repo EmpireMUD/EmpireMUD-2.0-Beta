@@ -1976,6 +1976,9 @@ ACMD(do_designate) {
 					act(buf, FALSE, ch, 0, vict, TO_VICT);
 				}
 			}
+			
+			// sort now just in case
+			sort_world_table();
 		}
 		
 		complete_wtrigger(new);

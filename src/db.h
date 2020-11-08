@@ -879,6 +879,7 @@ void schedule_check_unload(room_data *room, bool offset);
 void schedule_trench_fill(struct map_data *map);
 void setup_start_locations();
 int sort_exits(struct room_direction_data *a, struct room_direction_data *b);
+void sort_world_table();
 void start_burning(room_data *room);
 void stop_burning(room_data *room);
 void untrench_room(room_data *room);
