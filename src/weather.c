@@ -327,9 +327,8 @@ void another_hour(void) {
 			process_shipping();
 			break;
 		}
-		case 7: {	// 7am shipment and world save
+		case 7: {	// 7am shipment
 			process_shipping();
-			save_whole_world();
 			break;
 		}
 		case 12: {	// noon

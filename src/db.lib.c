@@ -62,7 +62,6 @@
 extern struct db_boot_info_type db_boot_info[NUM_DB_BOOT_TYPES];
 extern struct player_special_data dummy_mob;
 extern int max_automessage_id;
-extern bool world_is_sorted;
 
 // external funcs
 void add_trd_home_room(room_vnum vnum, room_vnum home_room);
@@ -1649,6 +1648,7 @@ empire_data *create_empire(char_data *ch) {
 	EMPIRE_ADJECTIVE(emp) = str_dup(name);
 	sprintf(colorcode, "&%c", colorlist[number(0, num_colors-1)]);	// pick random color
 	EMPIRE_BANNER(emp) = str_dup(colorcode);
+	EMPIRE_MAPOUT_TOKEN(emp) = empire_banner_to_mapout_token(EMPIRE_BANNER(emp));
 	
 	EMPIRE_CREATE_TIME(emp) = time(0);
 
@@ -2412,6 +2412,7 @@ void parse_empire(FILE *fl, empire_vnum vnum) {
 	emp->adjective = fread_string(fl, buf2);
 	emp->banner = fread_string(fl, buf2);
 	EMPIRE_BANNER_HAS_UNDERLINE(emp) = (strstr(EMPIRE_BANNER(emp), "&u") ? TRUE : FALSE);
+	EMPIRE_MAPOUT_TOKEN(emp) = empire_banner_to_mapout_token(EMPIRE_BANNER(emp));
 	
 	if (!get_line(fl, line)) {
 		log("SYSERR: Expecting ranks type of empire #%d but file ended!", vnum);
@@ -5675,8 +5676,6 @@ void add_room_to_world_tables(room_data *room) {
 		// appends as of b5.115 because it's less likely to need sorting there
 		DL_APPEND2(interior_room_list, room, prev_interior, next_interior);
 	}
-	
-	world_is_sorted = FALSE;
 }
 
 
@@ -9290,29 +9289,6 @@ int sort_trade_data(struct empire_trade_data *a, struct empire_trade_data *b) {
 */
 int sort_triggers(trig_data *a, trig_data *b) {
 	return GET_TRIG_VNUM(a) - GET_TRIG_VNUM(b);
-}
-
-
-/**
-* Simple sorter for the world_table hash
-*
-* @param void *a One element
-* @param void *b Another element
-* @return int Sort instruction of -1, 0, or 1
-*/
-int sort_world_table_func(void *a, void *b) {
-	return ((room_data*)a)->vnum - ((room_data*)b)->vnum;
-}
-
-
-/**
-* Sorts the world table -- only necessary for things like saving.
-*/
-void sort_world_table(void) {
-	if (!world_is_sorted) {
-		HASH_SORT(world_table, sort_world_table_func);
-	}
-	world_is_sorted = TRUE;
 }
 
 

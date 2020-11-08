@@ -5077,6 +5077,7 @@ struct empire_data {
 	bitvector_t delayed_refresh;	// things that are requesting an update
 	struct empire_member_account *member_accounts;	// tracks greatness/etc
 	struct empire_dropped_item *dropped_items;	// hash (by vnum) of items dropped in the empire
+	char mapout_token;	// displayed for this empire on the graphical political map
 	
 	bool storage_loaded;	// record whether or not storage has been loaded, to prevent saving over it
 	bool logs_loaded;	// record whether or not logs have been loaded, to prevent saving over them

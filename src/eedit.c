@@ -119,6 +119,28 @@ bool check_unique_empire_name(empire_data *for_emp, char *name) {
 
 
 /**
+* Determines how the banner will appear on the graphical version of the
+* political map.
+*
+* @param const char *banner The empire banner.
+* @return char A mapout token character.
+*/
+char empire_banner_to_mapout_token(const char *banner) {
+	int num, color;
+	
+	color = -1;
+	for (num = 0; banner_to_mapout_token[0][0] != '\n'; ++num) {
+		if (banner && strchr(banner, banner_to_mapout_token[num][0])) {
+			color = num;
+			break;
+		}
+	}
+	
+	return (color != -1 ? banner_to_mapout_token[color][1] : '?');
+}
+
+
+/**
 * @param char *newname The proposed empire name.
 * @return bool TRUE if the name is ok.
 */
@@ -379,6 +401,7 @@ EEDIT(eedit_banner) {
 		EMPIRE_BANNER(emp) = str_dup(argument);
 		
 		EMPIRE_BANNER_HAS_UNDERLINE(emp) = (strstr(EMPIRE_BANNER(emp), "&u") ? TRUE : FALSE);
+		EMPIRE_MAPOUT_TOKEN(emp) = empire_banner_to_mapout_token(EMPIRE_BANNER(emp));
 
 		log_to_empire(emp, ELOG_ADMIN, "%s has changed the banner color", PERS(ch, ch, TRUE));
 		msg_to_char(ch, "The empire's banner is now: %s%s&0\r\n", EMPIRE_BANNER(emp), show_color_codes(EMPIRE_BANNER(emp)));

@@ -8461,7 +8461,7 @@ ACMD(do_fullsave) {
 	syslog(SYS_GC, GET_INVIS_LEV(ch), TRUE, "GC: %s has triggered a full map save", GET_REAL_NAME(ch));
 	syslog(SYS_INFO, 0, FALSE, "Updating zone files...");
 
-	save_whole_world();
+	write_world_to_files();
 	send_config_msg(ch, "ok_string");
 }
 
@@ -8870,13 +8870,6 @@ ACMD(do_load) {
 	else {
 		send_to_char("That'll have to be either 'obj', 'mob', or 'vehicle'.\r\n", ch);
 	}
-}
-
-
-ACMD(do_mapout) {
-	msg_to_char(ch, "Writing map output file...\r\n");
-	output_map_to_file();
-	msg_to_char(ch, "Done.\r\n");
 }
 
 

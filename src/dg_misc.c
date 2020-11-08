@@ -1279,10 +1279,6 @@ void script_modify(char *argument) {
 	}
 	// ROOM MODE
 	else if ((room = get_room(NULL, targ_arg))) {
-		if (GET_ROOM_VNUM(room) < MAP_SIZE) {
-			world_map_needs_save = TRUE;
-		}
-		
 		if (SHARED_DATA(room) == &ocean_shared_data) {
 			script_log("%%mod%% cannot be used on Ocean rooms");
 		}

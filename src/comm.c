@@ -638,7 +638,7 @@ void perform_reboot(void) {
 
 	// prepare for the end!
 	save_all_empires();
-	save_whole_world();
+	write_world_to_files();
 
 	if (reboot_control.type == SCMD_REBOOT) {
 		sprintf(buf, "\r\n[0;0;31m *** Rebooting ***[0;0;37m\r\nPlease be patient, this will take a second.\r\n\r\n");
@@ -884,82 +884,82 @@ void heartbeat(int heart_pulse) {
 		reset_instances();
 		HEARTBEAT_LOG("16")
 	}
-	
-	if (HEARTBEAT(15 * SECS_PER_REAL_MIN)) {
-		output_map_to_file();
-		HEARTBEAT_LOG("17")
-	}
 
 	if (HEARTBEAT(SECS_PER_REAL_MIN)) {
 		update_reboot();
-		HEARTBEAT_LOG("18")
+		HEARTBEAT_LOG("17")
 		
 		if (++mins_since_crashsave >= 5) {
 			mins_since_crashsave = 0;
 			save_all_players(TRUE);
-			HEARTBEAT_LOG("19")
+			HEARTBEAT_LOG("17")
 		}
 		
 		display_automessages();
-		HEARTBEAT_LOG("20")
+		HEARTBEAT_LOG("19")
 	}
 	
 	if (HEARTBEAT(12 * SECS_PER_REAL_HOUR)) {
 		reduce_city_overages();
-		HEARTBEAT_LOG("21")
+		HEARTBEAT_LOG("20")
 		
 		check_newbie_islands();
-		HEARTBEAT_LOG("22")
+		HEARTBEAT_LOG("21")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_HOUR)) {
 		reduce_stale_empires();
-		HEARTBEAT_LOG("23")
+		HEARTBEAT_LOG("22")
 	}
 	
 	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
 		reduce_outside_territory();
-		HEARTBEAT_LOG("24")
+		HEARTBEAT_LOG("23")
 	}
 	
 	if (HEARTBEAT(3 * SECS_PER_REAL_MIN)) {
 		generate_adventure_instances();
-		HEARTBEAT_LOG("25")
+		HEARTBEAT_LOG("24")
 	}
 	
 	if (HEARTBEAT(5 * SECS_PER_REAL_MIN)) {
 		prune_instances();
-		HEARTBEAT_LOG("26")
+		HEARTBEAT_LOG("25")
 		
 		update_trading_post();
-		HEARTBEAT_LOG("27")
+		HEARTBEAT_LOG("26")
 	}
 	
 	if (HEARTBEAT(1)) {
 		if (data_table_needs_save) {
 			save_data_table(FALSE);
-			HEARTBEAT_LOG("28")
+			HEARTBEAT_LOG("27")
 		}
 		if (events_need_save) {
 			write_running_events_file();
-			HEARTBEAT_LOG("29")
+			HEARTBEAT_LOG("28")
 		}
 		save_marked_empires();
-		HEARTBEAT_LOG("30")
+		HEARTBEAT_LOG("29")
 	}
 	
 	if (HEARTBEAT(SECS_PER_REAL_DAY)) {
 		clean_empire_offenses();
-		HEARTBEAT_LOG("31")
+		HEARTBEAT_LOG("30")
 		
 		update_instance_world_size();
-		HEARTBEAT_LOG("32")
+		HEARTBEAT_LOG("31")
 	}
 	
 	// check if we've been asked to import new evolutions
 	if (do_evo_import) {
 		do_evo_import = FALSE;
 		process_import_evolutions();
+		HEARTBEAT_LOG("32")
+	}
+	
+	if (HEARTBEAT(30 * SECS_PER_REAL_MIN)) {
+		write_world_to_files();
 		HEARTBEAT_LOG("33")
 	}
 	

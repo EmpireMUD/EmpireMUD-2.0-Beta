@@ -836,7 +836,6 @@ extern room_data *interior_room_list;
 extern struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];
 extern struct map_data *land_map;
 extern bool need_world_index;
-extern bool world_map_needs_save;
 extern int size_of_world;
 
 void add_room_to_world_tables(room_data *room);
@@ -863,7 +862,6 @@ struct complex_room_data *init_complex_data();
 void init_mine(room_data *room, char_data *ch, empire_data *emp);
 room_data *load_map_room(room_vnum vnum);
 FILE *open_world_file(int block);
-void output_map_to_file();
 void parse_other_shared_data(struct shared_room_data *shared, char *line, char *error_part);
 void perform_burn_room(room_data *room);
 room_data *real_real_room(room_vnum vnum);
@@ -872,19 +870,17 @@ void remove_room_from_world_tables(room_data *room);
 void ruin_one_building(room_data *room);
 void run_external_evolutions();
 void save_and_close_world_file(FILE *fl, int block);
-void save_whole_world();
-void save_world_map_to_file();
 void schedule_burn_down(room_data *room);
 void schedule_check_unload(room_data *room, bool offset);
 void schedule_trench_fill(struct map_data *map);
 void setup_start_locations();
 int sort_exits(struct room_direction_data *a, struct room_direction_data *b);
-void sort_world_table();
 void start_burning(room_data *room);
 void stop_burning(room_data *room);
 void untrench_room(room_data *room);
 void write_room_to_file(FILE *fl, room_data *room);
 void write_shared_room_data(FILE *fl, struct shared_room_data *dat);
+void write_world_to_files();
 
 // misc
 extern struct ban_list_element *ban_list;

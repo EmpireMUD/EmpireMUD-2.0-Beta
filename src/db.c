@@ -291,14 +291,12 @@ vehicle_data *next_pending_vehicle = NULL;	// used in handler.c
 // world / rooms
 room_data *world_table = NULL;	// hash table of the whole world
 room_data *interior_room_list = NULL;	// doubly-linked list of interior rooms: room->prev_interior, room->next_interior
-bool world_is_sorted = FALSE;	// to prevent unnecessary re-sorts
 bool need_world_index = TRUE;	// used to trigger world index saving (always save at least once)
 struct island_info *island_table = NULL; // hash table for all the islands
 struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// master world map
 struct map_data *land_map = NULL;	// linked list of non-ocean
 int size_of_world = 1;	// used by the instancer to adjust instance counts
 struct shared_room_data ocean_shared_data;	// for BASIC_OCEAN tiles
-bool world_map_needs_save = TRUE;	// always do at least 1 save
 
 
 // DB_BOOT_x
@@ -2153,7 +2151,6 @@ void b3_2_map_and_gear(void) {
 			// update the natural sector
 			if (GET_ROOM_VNUM(room) < MAP_SIZE) {
 				world_map[FLAT_X_COORD(room)][FLAT_Y_COORD(room)].natural_sector = sector_proto((GET_SECT_VNUM(SECT(room)) == OASIS || GET_SECT_VNUM(SECT(room)) == SANDY_TRENCH) ? climate_default_sector[CLIMATE_ARID] : climate_default_sector[CLIMATE_TEMPERATE]);
-				world_map_needs_save = TRUE;
 			}
 		}
 		
@@ -2201,7 +2198,7 @@ void b3_2_map_and_gear(void) {
 	// ensure everything gets saved this way since we won't do this again
 	save_all_empires();
 	save_trading_post();
-	save_whole_world();
+	write_world_to_files();
 }
 
 
@@ -2308,7 +2305,7 @@ void b3_15_crop_update(void) {
 		}
 	}
 	
-	save_whole_world();
+	write_world_to_files();
 }
 
 
@@ -2338,7 +2335,7 @@ void b3_17_road_update(void) {
 		}
 	}
 	
-	save_whole_world();
+	write_world_to_files();
 }
 
 
@@ -2437,7 +2434,7 @@ void b4_15_building_update(void) {
 		}
 	}
 	
-	save_whole_world();
+	write_world_to_files();
 }
 
 
@@ -2711,7 +2708,7 @@ void b5_1_global_update(void) {
 		}
 	}
 	
-	save_whole_world();
+	write_world_to_files();
 	
 	update_all_players(NULL, b5_1_update_players);
 }
@@ -2804,7 +2801,7 @@ void b5_14_superior_items(void) {
 	// ensure everything gets saved this way since we won't do this again
 	save_all_empires();
 	save_trading_post();
-	save_whole_world();
+	write_world_to_files();
 }
 
 
@@ -2851,7 +2848,7 @@ void b5_19_world_fix(void) {
 		}
 	}
 	
-	save_whole_world();
+	write_world_to_files();
 }
 
 
@@ -2970,7 +2967,7 @@ void b5_23_potion_update(void) {
 	// ensure everything gets saved this way since we won't do this again
 	save_all_empires();
 	save_trading_post();
-	save_whole_world();
+	write_world_to_files();
 }
 
 
@@ -3052,7 +3049,7 @@ void b5_24_poison_update(void) {
 	// ensure everything gets saved this way since we won't do this again
 	save_all_empires();
 	save_trading_post();
-	save_whole_world();
+	write_world_to_files();
 }
 
 
@@ -3412,7 +3409,7 @@ void b5_47_mine_update(void) {
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
 		}
 	}
-	save_whole_world();
+	write_world_to_files();
 	
 	// island desc flags
 	HASH_ITER(hh, island_table, isle, next_isle) {
@@ -3444,7 +3441,7 @@ void b5_48_rope_update(void) {
 	}
 	
 	if (any) {
-		save_whole_world();
+		write_world_to_files();
 	}
 }
 
@@ -3543,7 +3540,7 @@ void b5_82_snowman_fix(void) {
 	}
 	
 	if (any) {
-		save_whole_world();
+		write_world_to_files();
 	}
 }
 
@@ -3716,7 +3713,7 @@ void b5_86_update(void) {
 	// ensure everything gets saved this way since we won't do this again
 	save_all_empires();
 	save_trading_post();
-	save_whole_world();
+	write_world_to_files();
 	
 	// part 2:
 	log("Applying b5.86 update: removing crops from 'natural' sectors (but not current sectors)...");
@@ -3751,8 +3748,7 @@ void b5_86_update(void) {
 	}
 	
 	log("- replaced natural sectors on %d temperate, %d desert, and %d jungle tile%s", temp, des, jung, PLURAL(temp+des+jung));
-	world_map_needs_save = TRUE;
-	save_whole_world();
+	write_world_to_files();
 }
 
 
@@ -3820,8 +3816,7 @@ void b5_87_crop_and_old_growth(void) {
 	}
 	
 	if (removed_crop > 0 || total_forest > 0) {
-		world_map_needs_save = TRUE;
-		save_whole_world();
+		write_world_to_files();
 	}
 }
 
@@ -3885,8 +3880,7 @@ void b5_88_irrigation_repair(void) {
 	log("- repaired %d current and %d base sectors", fixed_current, fixed_base);
 	
 	if (fixed_current > 0 || fixed_base > 0) {
-		world_map_needs_save = TRUE;
-		save_whole_world();
+		write_world_to_files();
 	}
 }
 
@@ -4299,8 +4293,7 @@ void b5_94_terrain_heights(void) {
 		}
 	}
 	
-	world_map_needs_save = TRUE;
-	save_whole_world();
+	write_world_to_files();
 }
 
 
@@ -4376,7 +4369,7 @@ void b5_102_home_cleanup(void) {
 	
 	run_delayed_refresh();
 	free_loaded_players();
-	save_whole_world();
+	write_world_to_files();
 	
 	override_home_storage_cap = FALSE;
 }
@@ -4609,7 +4602,7 @@ void check_version(void) {
 			// ensure everything gets saved this way since we won't do this again
 			save_all_empires();
 			save_trading_post();
-			save_whole_world();
+			write_world_to_files();
 		}
 		if (MATCH_VERSION("b3.0")) {
 			log("Applying b3.0 update to crops...");
