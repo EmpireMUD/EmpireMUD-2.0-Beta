@@ -2452,6 +2452,10 @@ int increase_coins(char_data *ch, empire_data *emp, int amount) {
 	
 	if (amount != 0) {
 		qt_change_coins(ch);
+		if (ch->desc) {
+			MSDPSetNumber(ch->desc, eMSDP_MONEY, total_coins(ch));
+			queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
+		}
 	}
 	
 	return value;

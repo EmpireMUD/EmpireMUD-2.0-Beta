@@ -3057,6 +3057,7 @@ void send_initial_MSDP(descriptor_data *desc) {
 	
 	// numeric data
 	MSDPSetNumber(desc, eMSDP_BONUS_EXP, IS_NPC(ch) ? 0 : GET_DAILY_BONUS_EXPERIENCE(ch));
+	MSDPSetNumber(desc, eMSDP_MONEY, total_coins(ch));
 	MSDPSetString(desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
 	MSDPSetNumber(desc, eMSDP_LEVEL, get_approximate_level(ch));
 	MSDPSetNumber(desc, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));

@@ -346,10 +346,6 @@ static void msdp_update(void) {
 			MSDPSetNumber(d, eMSDP_BLOOD_MAX, GET_MAX_BLOOD(ch));
 			MSDPSetNumber(d, eMSDP_BLOOD_UPKEEP, MAX(0, GET_BLOOD_UPKEEP(ch)));
 			
-			// TODO this whole section can be moved to the place these numbers are updated/set (and send_initial_MSDP)
-			
-			MSDPSetNumber(d, eMSDP_MONEY, total_coins(ch));
-			
 			// partial empire data (the rest is updated less often)
 			if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
 				MSDPSetNumber(d, eMSDP_EMPIRE_WEALTH, GET_TOTAL_WEALTH(GET_LOYALTY(ch)));
