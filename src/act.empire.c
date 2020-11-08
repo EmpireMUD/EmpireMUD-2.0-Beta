@@ -4798,7 +4798,7 @@ ACMD(do_enroll) {
 		refresh_empire_goals(e, NOTHING);
 		
 		save_empire(e, TRUE);
-		update_MSDP_empire_data_all(e);
+		update_MSDP_empire_data_all(e, FALSE, FALSE);
 	}
 	
 	// clean up if still necessary

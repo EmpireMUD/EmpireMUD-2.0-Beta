@@ -4980,6 +4980,7 @@ void update_empire_members_and_greatness(empire_data *emp) {
 	
 	if (greatness != old) {
 		et_change_greatness(emp);
+		update_MSDP_empire_data_all(emp, TRUE, TRUE);
 	}
 }
 

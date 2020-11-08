@@ -618,7 +618,8 @@ void update_MSDP_attributes(descriptor_t *desc, int send_update);
 void update_MSDP_cooldowns(descriptor_t *desc, int send_update);
 void update_MSDP_dots(descriptor_t *desc, int send_update);
 void update_MSDP_empire_data(descriptor_t *desc, int send_update);
-void update_MSDP_empire_data_all(empire_t *emp);
+void update_MSDP_empire_claims(descriptor_t *desc, int send_update);
+void update_MSDP_empire_data_all(empire_t *emp, int claims_only, int delay);
 void update_MSDP_skills(descriptor_t *desc, int send_update);
 
 #endif /* PROTOCOL_H */

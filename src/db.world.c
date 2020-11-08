@@ -2214,6 +2214,9 @@ void adjust_building_tech(empire_data *emp, room_data *room, bool add) {
 	// other traits from buildings?
 	EMPIRE_MILITARY(emp) += GET_BLD_MILITARY(GET_BUILDING(room)) * amt;
 	EMPIRE_FAME(emp) += GET_BLD_FAME(GET_BUILDING(room)) * amt;
+	
+	// re-send claim info in case it changed
+	update_MSDP_empire_data_all(emp, TRUE, TRUE);
 }
 
 
@@ -2257,6 +2260,9 @@ void adjust_vehicle_tech(vehicle_data *veh, bool add) {
 	// other traits from buildings?
 	EMPIRE_MILITARY(emp) += VEH_MILITARY(veh) * amt;
 	EMPIRE_FAME(emp) += VEH_FAME(veh) * amt;
+	
+	// re-send claim info in case it changed
+	update_MSDP_empire_data_all(emp, TRUE, TRUE);
 }
 
 
@@ -2505,6 +2511,9 @@ void reread_empire_tech(empire_data *emp) {
 	
 	// trigger a re-sort now
 	resort_empires(FALSE);
+	
+	// re-send MSDP claim data
+	update_MSDP_empire_data_all(emp, TRUE, TRUE);
 }
 
 

@@ -2002,7 +2002,9 @@ typedef enum {
 #define CDU_MSDP_ATTRIBUTES  BIT(4)	// runs update_MSDP_attributes()
 #define CDU_MSDP_COOLDOWNS  BIT(5)	// runs update_MSDP_cooldowns()
 #define CDU_MSDP_DOTS  BIT(6)	// runs update_MSDP_dots()
-#define CDU_MSDP_SKILLS  BIT(7)	// runs update_MSDP_skills()
+#define CDU_MSDP_EMPIRE_ALL  BIT(7)	// runs update_MSDP_empire_data()
+#define CDU_MSDP_EMPIRE_CLAIMS  BIT(8)	// runs update_MSDP_empire_claims()
+#define CDU_MSDP_SKILLS  BIT(9)	// runs update_MSDP_skills()
 
 
 // types of channel histories -- act.comm.c

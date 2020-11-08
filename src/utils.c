@@ -440,6 +440,20 @@ void run_delayed_refresh(void) {
 			REMOVE_BIT(cdu->type, CDU_MSDP_DOTS);
 			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
 		}
+		if (IS_SET(cdu->type, CDU_MSDP_EMPIRE_ALL)) {
+			if (cdu->ch->desc) {
+				update_MSDP_empire_data(cdu->ch->desc, FALSE);
+			}
+			REMOVE_BIT(cdu->type, CDU_MSDP_EMPIRE_ALL);
+			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
+		}
+		if (IS_SET(cdu->type, CDU_MSDP_EMPIRE_CLAIMS)) {
+			if (cdu->ch->desc) {
+				update_MSDP_empire_claims(cdu->ch->desc, FALSE);
+			}
+			REMOVE_BIT(cdu->type, CDU_MSDP_EMPIRE_CLAIMS);
+			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
+		}
 		if (IS_SET(cdu->type, CDU_MSDP_SKILLS)) {
 			if (cdu->ch->desc) {
 				update_MSDP_skills(cdu->ch->desc, FALSE);
