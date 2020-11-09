@@ -179,7 +179,6 @@ bool trigger_counterspell(char_data *ch);
 #define ABIL_PURIFY  115
 #define ABIL_CLEANSE  116
 // #define ABIL_READY_FIREBALL  117
-#define ABIL_LIGHTNINGBOLT  118
 #define ABIL_COUNTERSPELL  120
 #define ABIL_ENTANGLE  121
 // #define ABIL_FAMILIAR  122
@@ -216,7 +215,6 @@ bool trigger_counterspell(char_data *ch);
 #define ABIL_SLOW  175
 #define ABIL_SIPHON  176
 #define ABIL_MIRRORIMAGE  177
-#define ABIL_SUNSHOCK  178
 #define ABIL_PHOENIX_RITE  179
 #define ABIL_DISENCHANT  180
 #define ABIL_VIGOR  183
@@ -273,19 +271,9 @@ bool trigger_counterspell(char_data *ch);
 #define ABIL_WHISPERSTRIDE 268
 // #define ABIL_WEREWOLF_FORM  269
 #define ABIL_STABLEMASTER  272
-#define ABIL_ABLATE  273
-#define ABIL_ACIDBLAST  274
-#define ABIL_ARCLIGHT  275
-#define ABIL_ASTRALCLAW  276
-#define ABIL_CHRONOBLAST  277
-#define ABIL_DEATHTOUCH  278
-#define ABIL_DISPIRIT  279
 // formerly: #define ABIL_ERODE  280
 // formerly: #define ABIL_SCOUR  281
 #define ABIL_SHADOWLASH  282
-#define ABIL_SOULCHAIN  283
-#define ABIL_STARSTRIKE  284
-#define ABIL_THORNLASH  285
 #define ABIL_EVASION  286
 #define ABIL_WEAPON_PROFICIENCY  287
 #define ABIL_BITE  292
@@ -348,6 +336,7 @@ bool trigger_counterspell(char_data *ch);
 // Non-weapon attacks -- these are defined starting from TYPE_SUFFERING
 // but they actually correspond to numbers in the combat message file, so
 // it's not necessarily quick to convert them.
+// TODO: need to move attack messages into an in-game editor + many of these could be messages on their respective abilities
 #define ATTACK_GUARD_TOWER		(TYPE_SUFFERING + 1)
 #define ATTACK_EXECUTE			(TYPE_SUFFERING + 2)
 #define ATTACK_ARROW			(TYPE_SUFFERING + 3)
