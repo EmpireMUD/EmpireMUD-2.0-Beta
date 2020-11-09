@@ -2593,10 +2593,7 @@ void change_sex(char_data *ch, int sex) {
 	}
 	
 	// update msdp
-	if (ch->desc) {
-		MSDPSetString(ch->desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
-		queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
-	}
+	update_MSDP_gender(ch, UPDATE_SOON);
 }
 
 

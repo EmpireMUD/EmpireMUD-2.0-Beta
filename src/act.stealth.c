@@ -278,11 +278,8 @@ void set_disguise(char_data *ch, const char *name, int sex) {
 	}
 	
 	// msdp updates
-	if (ch->desc) {
-		MSDPSetString(ch->desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
-		update_MSDP_name(ch, UPDATE_SOON);
-		queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
-	}
+	update_MSDP_gender(ch, UPDATE_SOON);
+	update_MSDP_name(ch, UPDATE_SOON);
 }
 
 
@@ -347,10 +344,8 @@ void undisguise(char_data *ch) {
 		REMOVE_BIT(PLR_FLAGS(ch), PLR_DISGUISED);
 	
 		// msdp updates
-		if (ch->desc) {
-			MSDPSetString(ch->desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
-			update_MSDP_name(ch, UPDATE_SOON);
-		}
+		update_MSDP_gender(ch, UPDATE_SOON);
+		update_MSDP_name(ch, UPDATE_SOON);
 		
 		msg_to_char(ch, "You take off your disguise.\r\n");
 		act(lbuf, TRUE, ch, NULL, NULL, TO_ROOM);
