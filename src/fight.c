@@ -1612,10 +1612,7 @@ obj_data *make_corpse(char_data *ch) {
 		IS_CARRYING_N(ch) = 0;
 		ch->carrying = NULL;
 		
-		if (ch->desc) {
-			MSDPSetNumber(ch->desc, eMSDP_INVENTORY, IS_CARRYING_N(ch));
-			queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
-		}
+		update_MSDP_inventory(ch, UPDATE_SOON);
 		
 		if (MOB_TAGGED_BY(ch)) {
 			DL_FOREACH2(corpse->contains, o, next_content) {

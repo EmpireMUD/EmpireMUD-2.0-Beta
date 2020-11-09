@@ -623,7 +623,9 @@ void update_MSDP_empire_data(char_data_t *ch, int send_update);
 void update_MSDP_empire_claims(char_data_t *ch, int send_update);
 void update_MSDP_empire_data_all(empire_t *emp, int claims_only, int delay);
 void update_MSDP_gender(char_data_t *ch, int send_update);
+void update_MSDP_inventory(char_data_t *ch, int send_update);
 void update_MSDP_level(char_data_t *ch, int send_update);
+void update_MSDP_money(char_data_t *ch, int send_update);
 void update_MSDP_name(char_data_t *ch, int send_update);
 void update_MSDP_skills(char_data_t *ch, int send_update);
 
