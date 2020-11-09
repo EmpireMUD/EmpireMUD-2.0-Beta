@@ -435,31 +435,87 @@ Stablemaster~
 S
 #273
 Ablate~
-0 -1 1.00 0 0
+abi -1 1.00 o 0
+A
+12 -1
+C
+ablate 7 0 2 11 4 2055 9 8 3 0
+T c 3
+T b 2
+X b
+3065 10 10 0
+X c
+67 1
 S
 #274
 Acidblast~
-0 -1 1.00 0 0
+abi -1 1.00 B 0
+A
+24 -1
+C
+acidblast 7 bf 2 13 5 2056 9 8 3 0
+T c 6
+T b 4
+X b
+3066 10 10 0
+X c
+68 1
 S
 #275
 Arclight~
-0 -1 1.00 0 0
+abi -1 1.40 B 0
+C
+arclight 7 bf 2 10 3 2057 9 8 3 0
+T c 1
+X c
+69 1
 S
 #276
 Astralclaw~
-0 -1 1.00 0 0
+abi -1 1.00 B 0
+C
+astralclaw 7 bf 2 10 3 2058 9 8 3 0
+T c 4
+T d 6
+X c
+70 0
+X d
+3067 15 15 0 3
 S
 #277
 Chronoblast~
-0 -1 1.00 0 0
+abi -1 1.00 o 0
+C
+chronoblast 7 bf 2 11 4 2059 6 8 3 0
+T b 1
+T c 9
+X b
+3068 5 5 s
+X c
+71 1
 S
 #278
 Deathtouch~
-0 -1 1.00 0 0
+abi -1 1.20 B 0
+C
+deathtouch 7 bf 2 10 3 2060 6 8 3 0
+T c 1
+X c
+72 1
 S
 #279
 Dispirit~
-0 -1 1.00 0 0
+abio -1 1.00 B 0
+A
+9 -4
+C
+dispirit 7 bf 2 11 4 2061 9 8 3 0
+T c 9
+T b 1
+X b
+3069 10 10 0
+X c
+73 4
 S
 #282
 Shadowlash~
@@ -467,15 +523,38 @@ Shadowlash~
 S
 #283
 Soulchain~
-0 -1 1.00 0 0
+abio -1 1.00 o 0
+A
+8 -4
+C
+soulchain 7 bf 2 11 4 2065 9 8 3 0
+T c 8
+T b 2
+X b
+3074 10 10 0
+X c
+77 1
 S
 #284
 Starstrike~
-0 -1 1.00 0 0
+abi -1 1.50 B 0
+C
+starstrike 7 bf 2 10 3 2066 9 8 3 0
+T c 1
+X c
+78 1
 S
 #285
 Thornlash~
-0 -1 1.00 0 0
+abi -1 1.00 o 0
+C
+thornlash 7 0 2 10 3 2067 9 8 3 0
+T c 4
+T d 6
+X c
+79 3
+X d
+3075 15 15 3 3
 S
 #286
 Evasion~
