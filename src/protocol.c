@@ -3053,7 +3053,7 @@ void send_initial_MSDP(descriptor_data *desc) {
 	
 	// strings
 	MSDPSetString(desc, eMSDP_ACCOUNT_NAME, GET_REAL_NAME(ch));
-	MSDPSetString(desc, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
+	update_MSDP_name(ch, NO_UPDATE);
 	
 	// numeric data
 	MSDPSetNumber(desc, eMSDP_BONUS_EXP, IS_NPC(ch) ? 0 : GET_DAILY_BONUS_EXPERIENCE(ch));
@@ -3064,12 +3064,12 @@ void send_initial_MSDP(descriptor_data *desc) {
 	MSDPSetNumber(desc, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
 	
 	// lists
-	update_MSDP_affects(desc, FALSE);
-	update_MSDP_attributes(desc, FALSE);
-	update_MSDP_cooldowns(desc, FALSE);
-	update_MSDP_dots(desc, FALSE);
-	update_MSDP_empire_data(desc, FALSE);
-	update_MSDP_skills(desc, FALSE);
+	update_MSDP_affects(ch, NO_UPDATE);
+	update_MSDP_attributes(ch, NO_UPDATE);
+	update_MSDP_cooldowns(ch, NO_UPDATE);
+	update_MSDP_dots(ch, NO_UPDATE);
+	update_MSDP_empire_data(ch, NO_UPDATE);
+	update_MSDP_skills(ch, NO_UPDATE);
 	
 	// send it
 	MSDPUpdate(desc);
@@ -3077,31 +3077,42 @@ void send_initial_MSDP(descriptor_data *desc) {
 
 
 /**
+* Sends the update based on the update type (or not at all if NO_UPDATE).
+*
+* @param char_data *ch The player.
+* @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
+*/
+inline void check_send_msdp_update(char_data *ch, int send_update) {
+	if (ch->desc && send_update == UPDATE_NOW) {
+		MSDPUpdate(ch->desc);
+	}
+	else if (send_update == UPDATE_SOON) {
+		queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
+	}
+}
+
+
+/**
 * Updates all affects for MSDP.
 *
-* @param descriptor_data *desc The descriptor of an in-game player.
-* @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
+* @param char_data *ch A player.
+* @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
 */
-void update_MSDP_affects(descriptor_data *desc, int send_update) {
+void update_MSDP_affects(char_data *ch, int send_update) {
 	char buf[MAX_STRING_LENGTH];
 	struct affected_type *aff;
 	size_t buf_size;
-	char_data *ch;
 	
-	if (!(ch = desc->character)) {
-		return;
-	}
-	
-	// affects
-	*buf = '\0';
-	buf_size = 0;
-	LL_FOREACH(ch->affected, aff) {
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
-	}
-	MSDPSetTable(desc, eMSDP_AFFECTS, buf);
-	
-	if (send_update) {
-		MSDPUpdate(desc);
+	if (ch->desc) {
+		// affects
+		*buf = '\0';
+		buf_size = 0;
+		LL_FOREACH(ch->affected, aff) {
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(aff->type), (char)MSDP_VAL, (aff->duration == UNLIMITED ? -1 : (aff->duration * SECS_PER_REAL_UPDATE)));
+		}
+		MSDPSetTable(ch->desc, eMSDP_AFFECTS, buf);
+		
+		check_send_msdp_update(ch, send_update);
 	}
 }
 
@@ -3109,49 +3120,44 @@ void update_MSDP_affects(descriptor_data *desc, int send_update) {
 /**
 * Updates all attributes for MSDP.
 *
-* @param descriptor_data *desc The descriptor of an in-game player.
-* @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
+* @param char_data *ch A player.
+* @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
 */
-void update_MSDP_attributes(descriptor_data *desc, int send_update) {
+void update_MSDP_attributes(char_data *ch, int send_update) {
 	char buf[MAX_STRING_LENGTH];
-	char_data *ch;
 	
-	if (!(ch = desc->character)) {
-		return;
-	}
-	
-	// base
-	MSDPSetNumber(desc, eMSDP_STR_PERM, GET_REAL_ATT(ch, STRENGTH));
-	MSDPSetNumber(desc, eMSDP_DEX_PERM, GET_REAL_ATT(ch, DEXTERITY));
-	MSDPSetNumber(desc, eMSDP_CHA_PERM, GET_REAL_ATT(ch, CHARISMA));
-	MSDPSetNumber(desc, eMSDP_GRT_PERM, GET_REAL_ATT(ch, GREATNESS));
-	MSDPSetNumber(desc, eMSDP_INT_PERM, GET_REAL_ATT(ch, INTELLIGENCE));
-	MSDPSetNumber(desc, eMSDP_WIT_PERM, GET_REAL_ATT(ch, WITS));
-	
-	// core
-	MSDPSetNumber(desc, eMSDP_STR, GET_STRENGTH(ch));
-	MSDPSetNumber(desc, eMSDP_DEX, GET_DEXTERITY(ch));
-	MSDPSetNumber(desc, eMSDP_CHA, GET_CHARISMA(ch));
-	MSDPSetNumber(desc, eMSDP_GRT, GET_GREATNESS(ch));
-	MSDPSetNumber(desc, eMSDP_INT, GET_INTELLIGENCE(ch));
-	MSDPSetNumber(desc, eMSDP_WIT, GET_WITS(ch));
-	
-	// extra
-	MSDPSetNumber(desc, eMSDP_BLOCK, get_block_rating(ch, FALSE));
-	MSDPSetNumber(desc, eMSDP_DODGE, get_dodge_modifier(ch, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change made to it in score
-	MSDPSetNumber(desc, eMSDP_TO_HIT, get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change as in score
-	snprintf(buf, sizeof(buf), "%.2f", get_combat_speed(ch, WEAR_WIELD));
-	MSDPSetString(desc, eMSDP_SPEED, buf);
-	MSDPSetNumber(desc, eMSDP_RESIST_PHYSICAL, GET_RESIST_PHYSICAL(ch));
-	MSDPSetNumber(desc, eMSDP_RESIST_MAGICAL, GET_RESIST_MAGICAL(ch));
-	MSDPSetNumber(desc, eMSDP_BONUS_PHYSICAL, GET_BONUS_PHYSICAL(ch));
-	MSDPSetNumber(desc, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
-	MSDPSetNumber(desc, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
-	MSDPSetNumber(desc, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
-	MSDPSetNumber(desc, eMSDP_INVENTORY_MAX, CAN_CARRY_N(ch));
-	
-	if (send_update) {
-		MSDPUpdate(desc);
+	if (ch->desc) {
+		// base
+		MSDPSetNumber(ch->desc, eMSDP_STR_PERM, GET_REAL_ATT(ch, STRENGTH));
+		MSDPSetNumber(ch->desc, eMSDP_DEX_PERM, GET_REAL_ATT(ch, DEXTERITY));
+		MSDPSetNumber(ch->desc, eMSDP_CHA_PERM, GET_REAL_ATT(ch, CHARISMA));
+		MSDPSetNumber(ch->desc, eMSDP_GRT_PERM, GET_REAL_ATT(ch, GREATNESS));
+		MSDPSetNumber(ch->desc, eMSDP_INT_PERM, GET_REAL_ATT(ch, INTELLIGENCE));
+		MSDPSetNumber(ch->desc, eMSDP_WIT_PERM, GET_REAL_ATT(ch, WITS));
+		
+		// core
+		MSDPSetNumber(ch->desc, eMSDP_STR, GET_STRENGTH(ch));
+		MSDPSetNumber(ch->desc, eMSDP_DEX, GET_DEXTERITY(ch));
+		MSDPSetNumber(ch->desc, eMSDP_CHA, GET_CHARISMA(ch));
+		MSDPSetNumber(ch->desc, eMSDP_GRT, GET_GREATNESS(ch));
+		MSDPSetNumber(ch->desc, eMSDP_INT, GET_INTELLIGENCE(ch));
+		MSDPSetNumber(ch->desc, eMSDP_WIT, GET_WITS(ch));
+		
+		// extra
+		MSDPSetNumber(ch->desc, eMSDP_BLOCK, get_block_rating(ch, FALSE));
+		MSDPSetNumber(ch->desc, eMSDP_DODGE, get_dodge_modifier(ch, NULL, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change made to it in score
+		MSDPSetNumber(ch->desc, eMSDP_TO_HIT, get_to_hit(ch, NULL, FALSE, FALSE) - (hit_per_dex * GET_DEXTERITY(ch)));	// same change as in score
+		snprintf(buf, sizeof(buf), "%.2f", get_combat_speed(ch, WEAR_WIELD));
+		MSDPSetString(ch->desc, eMSDP_SPEED, buf);
+		MSDPSetNumber(ch->desc, eMSDP_RESIST_PHYSICAL, GET_RESIST_PHYSICAL(ch));
+		MSDPSetNumber(ch->desc, eMSDP_RESIST_MAGICAL, GET_RESIST_MAGICAL(ch));
+		MSDPSetNumber(ch->desc, eMSDP_BONUS_PHYSICAL, GET_BONUS_PHYSICAL(ch));
+		MSDPSetNumber(ch->desc, eMSDP_BONUS_MAGICAL, GET_BONUS_MAGICAL(ch));
+		MSDPSetNumber(ch->desc, eMSDP_BONUS_HEALING, total_bonus_healing(ch));
+		MSDPSetNumber(ch->desc, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
+		MSDPSetNumber(ch->desc, eMSDP_INVENTORY_MAX, CAN_CARRY_N(ch));
+		
+		check_send_msdp_update(ch, send_update);
 	}
 }
 
@@ -3159,31 +3165,26 @@ void update_MSDP_attributes(descriptor_data *desc, int send_update) {
 /**
 * Updates all cooldowns for MSDP.
 *
-* @param descriptor_data *desc The descriptor of an in-game player.
-* @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
+* @param char_data *ch A player.
+* @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
 */
-void update_MSDP_cooldowns(descriptor_data *desc, int send_update) {
+void update_MSDP_cooldowns(char_data *ch, int send_update) {
 	char buf[MAX_STRING_LENGTH];
 	struct cooldown_data *cool;
 	size_t buf_size;
-	char_data *ch;
 	
-	if (!(ch = desc->character)) {
-		return;
-	}
-	
-	// cooldowns
-	*buf = '\0';
-	buf_size = 0;
-	LL_FOREACH(ch->cooldowns, cool) {
-		if (cool->expire_time > time(0)) {
-			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(cool->type), (char)MSDP_VAL, cool->expire_time - time(0));
+	if (ch->desc) {
+		// cooldowns
+		*buf = '\0';
+		buf_size = 0;
+		LL_FOREACH(ch->cooldowns, cool) {
+			if (cool->expire_time > time(0)) {
+				buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%ld", (char)MSDP_VAR, get_generic_name_by_vnum(cool->type), (char)MSDP_VAL, cool->expire_time - time(0));
+			}
 		}
-	}
-	MSDPSetTable(desc, eMSDP_COOLDOWNS, buf);
-	
-	if (send_update) {
-		MSDPUpdate(desc);
+		MSDPSetTable(ch->desc, eMSDP_COOLDOWNS, buf);
+		
+		check_send_msdp_update(ch, send_update);
 	}
 }
 
@@ -3191,38 +3192,33 @@ void update_MSDP_cooldowns(descriptor_data *desc, int send_update) {
 /**
 * Updates all DoTs for MSDP.
 *
-* @param descriptor_data *desc The descriptor of an in-game player.
-* @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
+* @param char_data *ch A player.
+* @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
 */
-void update_MSDP_dots(descriptor_data *desc, int send_update) {
+void update_MSDP_dots(char_data *ch, int send_update) {
 	char buf[MAX_STRING_LENGTH];
 	struct over_time_effect_type *dot;
 	size_t buf_size;
-	char_data *ch;
 	
-	if (!(ch = desc->character)) {
-		return;
-	}
-	
-	// dots
-	*buf = '\0';
-	buf_size = 0;
-	LL_FOREACH(ch->over_time_effects, dot) {
-		// each dot has a sub-table
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, get_generic_name_by_vnum(dot->type), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+	if (ch->desc) {
+		// dots
+		*buf = '\0';
+		buf_size = 0;
+		LL_FOREACH(ch->over_time_effects, dot) {
+			// each dot has a sub-table
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, get_generic_name_by_vnum(dot->type), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+			
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%ld", (char)MSDP_VAR, (char)MSDP_VAL, (dot->duration == UNLIMITED ? -1 : (dot->duration * SECS_PER_REAL_UPDATE)));
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cTYPE%c%s", (char)MSDP_VAR, (char)MSDP_VAL, damage_types[dot->damage_type]);
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDAMAGE%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->damage * dot->stack);
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cSTACKS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->stack);
+			
+			// end table
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
+		}
+		MSDPSetTable(ch->desc, eMSDP_DOTS, buf);
 		
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDURATION%c%ld", (char)MSDP_VAR, (char)MSDP_VAL, (dot->duration == UNLIMITED ? -1 : (dot->duration * SECS_PER_REAL_UPDATE)));
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cTYPE%c%s", (char)MSDP_VAR, (char)MSDP_VAL, damage_types[dot->damage_type]);
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cDAMAGE%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->damage * dot->stack);
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cSTACKS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, dot->stack);
-		
-		// end table
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
-	}
-	MSDPSetTable(desc, eMSDP_DOTS, buf);
-	
-	if (send_update) {
-		MSDPUpdate(desc);
+		check_send_msdp_update(ch, send_update);
 	}
 }
 
@@ -3230,36 +3226,30 @@ void update_MSDP_dots(descriptor_data *desc, int send_update) {
 /**
 * Updates all empire claim/territory data for MSDP.
 *
-* @param descriptor_data *desc The descriptor of an in-game player.
-* @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
+* @param char_data *ch A player.
+* @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
 */
-void update_MSDP_empire_claims(descriptor_data *desc, int send_update) {
-	char_data *ch;
-	
-	if (!(ch = desc->character)) {
-		return;
-	}
-	
-	// empire
-	if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
-		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_TOTAL));
-		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_MAX, land_can_claim(GET_LOYALTY(ch), TER_TOTAL));
-		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_OUTSIDE, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_OUTSKIRTS));
-		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, land_can_claim(GET_LOYALTY(ch), TER_OUTSKIRTS));
-		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_FRONTIER, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_FRONTIER));
-		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_FRONTIER_MAX, land_can_claim(GET_LOYALTY(ch), TER_FRONTIER));
-	}
-	else {
-		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY, 0);
-		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_MAX, 0);
-		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_OUTSIDE, 0);
-		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, 0);
-		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_FRONTIER, 0);
-		MSDPSetNumber(desc, eMSDP_EMPIRE_TERRITORY_FRONTIER_MAX, 0);
-	}
-	
-	if (send_update) {
-		MSDPUpdate(desc);
+void update_MSDP_empire_claims(char_data *ch, int send_update) {
+	if (ch->desc) {
+		// empire
+		if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
+			MSDPSetNumber(ch->desc, eMSDP_EMPIRE_TERRITORY, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_TOTAL));
+			MSDPSetNumber(ch->desc, eMSDP_EMPIRE_TERRITORY_MAX, land_can_claim(GET_LOYALTY(ch), TER_TOTAL));
+			MSDPSetNumber(ch->desc, eMSDP_EMPIRE_TERRITORY_OUTSIDE, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_OUTSKIRTS));
+			MSDPSetNumber(ch->desc, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, land_can_claim(GET_LOYALTY(ch), TER_OUTSKIRTS));
+			MSDPSetNumber(ch->desc, eMSDP_EMPIRE_TERRITORY_FRONTIER, EMPIRE_TERRITORY(GET_LOYALTY(ch), TER_FRONTIER));
+			MSDPSetNumber(ch->desc, eMSDP_EMPIRE_TERRITORY_FRONTIER_MAX, land_can_claim(GET_LOYALTY(ch), TER_FRONTIER));
+		}
+		else {
+			MSDPSetNumber(ch->desc, eMSDP_EMPIRE_TERRITORY, 0);
+			MSDPSetNumber(ch->desc, eMSDP_EMPIRE_TERRITORY_MAX, 0);
+			MSDPSetNumber(ch->desc, eMSDP_EMPIRE_TERRITORY_OUTSIDE, 0);
+			MSDPSetNumber(ch->desc, eMSDP_EMPIRE_TERRITORY_OUTSIDE_MAX, 0);
+			MSDPSetNumber(ch->desc, eMSDP_EMPIRE_TERRITORY_FRONTIER, 0);
+			MSDPSetNumber(ch->desc, eMSDP_EMPIRE_TERRITORY_FRONTIER_MAX, 0);
+		}
+		
+		check_send_msdp_update(ch, send_update);
 	}
 }
 
@@ -3267,32 +3257,26 @@ void update_MSDP_empire_claims(descriptor_data *desc, int send_update) {
 /**
 * Updates all empire data for MSDP.
 *
-* @param descriptor_data *desc The descriptor of an in-game player.
-* @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
+* @param char_data *ch A player.
+* @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
 */
-void update_MSDP_empire_data(descriptor_data *desc, int send_update) {
-	char_data *ch;
-	
-	if (!(ch = desc->character)) {
-		return;
-	}
-	
-	// empire
-	update_MSDP_empire_claims(desc, FALSE);
-	if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
-		MSDPSetString(desc, eMSDP_EMPIRE_NAME, EMPIRE_NAME(GET_LOYALTY(ch)));
-		MSDPSetString(desc, eMSDP_EMPIRE_ADJECTIVE, EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
-		MSDPSetString(desc, eMSDP_EMPIRE_RANK, strip_color(EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1)));
-		// wealth/score are updated every second in msdp_update()
-	}
-	else {
-		MSDPSetString(desc, eMSDP_EMPIRE_NAME, "");
-		MSDPSetString(desc, eMSDP_EMPIRE_ADJECTIVE, "");
-		MSDPSetString(desc, eMSDP_EMPIRE_RANK, "");
-	}
-	
-	if (send_update) {
-		MSDPUpdate(desc);
+void update_MSDP_empire_data(char_data *ch, int send_update) {
+	if (ch->desc) {
+		// empire
+		update_MSDP_empire_claims(ch, NO_UPDATE);
+		if (GET_LOYALTY(ch) && !IS_NPC(ch)) {
+			MSDPSetString(ch->desc, eMSDP_EMPIRE_NAME, EMPIRE_NAME(GET_LOYALTY(ch)));
+			MSDPSetString(ch->desc, eMSDP_EMPIRE_ADJECTIVE, EMPIRE_ADJECTIVE(GET_LOYALTY(ch)));
+			MSDPSetString(ch->desc, eMSDP_EMPIRE_RANK, strip_color(EMPIRE_RANK(GET_LOYALTY(ch), GET_RANK(ch)-1)));
+			// wealth/score are updated every second in msdp_update()
+		}
+		else {
+			MSDPSetString(ch->desc, eMSDP_EMPIRE_NAME, "");
+			MSDPSetString(ch->desc, eMSDP_EMPIRE_ADJECTIVE, "");
+			MSDPSetString(ch->desc, eMSDP_EMPIRE_RANK, "");
+		}
+		
+		check_send_msdp_update(ch, send_update);
 	}
 }
 
@@ -3314,12 +3298,11 @@ void update_MSDP_empire_data_all(empire_data *emp, int claims_only, int delay) {
 			}
 			else {	// not delay
 				if (claims_only) {
-					update_MSDP_empire_claims(desc, FALSE);
+					update_MSDP_empire_claims(desc->character, UPDATE_SOON);
 				}
 				else {
-					update_MSDP_empire_data(desc, FALSE);
+					update_MSDP_empire_data(desc->character, UPDATE_SOON);
 				}
-				queue_delayed_update(desc->character, CDU_MSDP_SEND_UPDATES);
 			}
 		}
 	}
@@ -3327,41 +3310,50 @@ void update_MSDP_empire_data_all(empire_data *emp, int claims_only, int delay) {
 
 
 /**
+* Updates name info for MSDP.
+*
+* @param char_data *ch A player.
+* @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
+*/
+void update_MSDP_name(char_data *ch, int send_update) {
+	if (ch->desc) {
+		MSDPSetString(ch->desc, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
+		check_send_msdp_update(ch, send_update);
+	}
+}
+
+
+/**
 * Updates all skill info for MSDP.
 *
-* @param descriptor_data *desc The descriptor of an in-game player.
-* @param int send_update If TRUE, will run MSDPUpdate. Pass FALSE instead if you'll be calling it yourself at the end.
+* @param char_data *ch A player.
+* @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
 */
-void update_MSDP_skills(descriptor_data *desc, int send_update) {
+void update_MSDP_skills(char_data *ch, int send_update) {
 	struct player_skill_data *skill, *next_skill;
 	char buf[MAX_STRING_LENGTH];
 	size_t buf_size;
-	char_data *ch;
 	
-	if (!(ch = desc->character)) {
-		return;
-	}
+	if (ch->desc) {
+		get_player_skill_string(ch, buf, FALSE);
+		MSDPSetString(ch->desc, eMSDP_CLASS, buf);
 	
-	get_player_skill_string(ch, buf, FALSE);
-	MSDPSetString(desc, eMSDP_CLASS, buf);
-	
-	// skills
-	*buf = '\0';
-	buf_size = 0;
-	HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, SKILL_NAME(skill->ptr), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
+		// skills
+		*buf = '\0';
+		buf_size = 0;
+		HASH_ITER(hh, GET_SKILL_HASH(ch), skill, next_skill) {
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c%s%c%c", (char)MSDP_VAR, SKILL_NAME(skill->ptr), (char)MSDP_VAL, (char)MSDP_TABLE_OPEN);
 		
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->level);
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, skill->exp);
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cRESETS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->resets);
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNOSKILL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->noskill ? 1 : 0);
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cLEVEL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->level);
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cEXP%c%.2f", (char)MSDP_VAR, (char)MSDP_VAL, skill->exp);
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cRESETS%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->resets);
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%cNOSKILL%c%d", (char)MSDP_VAR, (char)MSDP_VAL, skill->noskill ? 1 : 0);
 		
-		// end table
-		buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
-	}
-	MSDPSetTable(desc, eMSDP_SKILLS, buf);
+			// end table
+			buf_size += snprintf(buf + buf_size, sizeof(buf) - buf_size, "%c", (char)MSDP_TABLE_CLOSE);
+		}
+		MSDPSetTable(ch->desc, eMSDP_SKILLS, buf);
 	
-	if (send_update) {
-		MSDPUpdate(desc);
+		check_send_msdp_update(ch, send_update);
 	}
 }

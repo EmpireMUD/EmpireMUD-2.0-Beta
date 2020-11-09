@@ -385,7 +385,7 @@ static void msdp_update(void) {
 				MSDPSetNumber(d, eMSDP_OPPONENT_FOCUS_HEALTH_MAX, 0);
 			}
 			
-			// time (changes as the player moves)
+			// time (changes as the player moves, in addition to over-time)
 			tinfo = get_local_time(IN_ROOM(ch));
 			MSDPSetNumber(d, eMSDP_WORLD_TIME, tinfo.hours);
 			MSDPSetNumber(d, eMSDP_WORLD_DAY_OF_MONTH, tinfo.day + 1);

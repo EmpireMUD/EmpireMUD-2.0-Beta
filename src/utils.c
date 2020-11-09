@@ -417,53 +417,32 @@ void run_delayed_refresh(void) {
 		
 		// MSDP sections
 		if (IS_SET(cdu->type, CDU_MSDP_AFFECTS)) {
-			if (cdu->ch->desc) {
-				update_MSDP_affects(cdu->ch->desc, FALSE);
-			}
+			update_MSDP_affects(cdu->ch, UPDATE_SOON);
 			REMOVE_BIT(cdu->type, CDU_MSDP_AFFECTS);
-			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
 		}
 		if (IS_SET(cdu->type, CDU_MSDP_ATTRIBUTES)) {
-			if (cdu->ch->desc) {
-				update_MSDP_attributes(cdu->ch->desc, FALSE);
-			}
+			update_MSDP_attributes(cdu->ch, UPDATE_SOON);
 			REMOVE_BIT(cdu->type, CDU_MSDP_ATTRIBUTES);
-			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
 		}
 		if (IS_SET(cdu->type, CDU_MSDP_COOLDOWNS)) {
-			if (cdu->ch->desc) {
-				update_MSDP_cooldowns(cdu->ch->desc, FALSE);
-			}
+			update_MSDP_cooldowns(cdu->ch, UPDATE_SOON);
 			REMOVE_BIT(cdu->type, CDU_MSDP_COOLDOWNS);
-			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
 		}
 		if (IS_SET(cdu->type, CDU_MSDP_DOTS)) {
-			if (cdu->ch->desc) {
-				update_MSDP_dots(cdu->ch->desc, FALSE);
-			}
+			update_MSDP_dots(cdu->ch, UPDATE_SOON);
 			REMOVE_BIT(cdu->type, CDU_MSDP_DOTS);
-			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
 		}
 		if (IS_SET(cdu->type, CDU_MSDP_EMPIRE_ALL)) {
-			if (cdu->ch->desc) {
-				update_MSDP_empire_data(cdu->ch->desc, FALSE);
-			}
+			update_MSDP_empire_data(cdu->ch, UPDATE_SOON);
 			REMOVE_BIT(cdu->type, CDU_MSDP_EMPIRE_ALL);
-			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
 		}
 		if (IS_SET(cdu->type, CDU_MSDP_EMPIRE_CLAIMS)) {
-			if (cdu->ch->desc) {
-				update_MSDP_empire_claims(cdu->ch->desc, FALSE);
-			}
+			update_MSDP_empire_claims(cdu->ch, UPDATE_SOON);
 			REMOVE_BIT(cdu->type, CDU_MSDP_EMPIRE_CLAIMS);
-			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
 		}
 		if (IS_SET(cdu->type, CDU_MSDP_SKILLS)) {
-			if (cdu->ch->desc) {
-				update_MSDP_skills(cdu->ch->desc, FALSE);
-			}
+			update_MSDP_skills(cdu->ch, UPDATE_SOON);
 			REMOVE_BIT(cdu->type, CDU_MSDP_SKILLS);
-			SET_BIT(cdu->type, CDU_MSDP_SEND_UPDATES);	// trigger a refresh later
 		}
 		
 		// do this after the MSDP section

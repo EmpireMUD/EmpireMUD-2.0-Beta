@@ -2323,11 +2323,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
     		sprintf(output, "%s's last name is now: %s", GET_NAME(vict), GET_PERSONAL_LASTNAME(vict));
 		}
 		
-		// update msdp
-		if (vict->desc) {
-			MSDPSetString(vict->desc, eMSDP_CHARACTER_NAME, PERS(vict, vict, FALSE));
-			queue_delayed_update(vict, CDU_MSDP_SEND_UPDATES);
-		}
+		update_MSDP_name(vict, UPDATE_NOW);
 	}
 	else if SET_CASE("bonustrait") {
 		bitvector_t diff, new, old = GET_BONUS_TRAITS(vict);
@@ -2788,8 +2784,7 @@ int perform_set(char_data *ch, char_data *vict, int mode, char *val_arg) {
 		// update msdp
 		if (vict->desc) {
 			MSDPSetString(vict->desc, eMSDP_ACCOUNT_NAME, GET_REAL_NAME(vict));
-			MSDPSetString(vict->desc, eMSDP_CHARACTER_NAME, PERS(vict, vict, FALSE));
-			queue_delayed_update(vict, CDU_MSDP_SEND_UPDATES);
+			update_MSDP_name(vict, UPDATE_SOON);
 		}
 		
 		SAVE_CHAR(vict);
