@@ -203,8 +203,6 @@ void b5_1_global_update(void) {
 			}
 		}
 	}
-	
-	write_world_to_files();
 }
 
 
@@ -286,11 +284,6 @@ void b5_14_superior_items(void) {
 			extract_obj(obj);
 		}
 	}
-	
-	// ensure everything gets saved this way since we won't do this again
-	save_all_empires();
-	save_trading_post();
-	write_world_to_files();
 }
 
 
@@ -336,8 +329,6 @@ void b5_19_world_fix(void) {
 			}
 		}
 	}
-	
-	write_world_to_files();
 }
 
 
@@ -447,11 +438,6 @@ void b5_23_potion_update(void) {
 			extract_obj(obj);
 		}
 	}
-	
-	// ensure everything gets saved this way since we won't do this again
-	save_all_empires();
-	save_trading_post();
-	write_world_to_files();
 }
 
 
@@ -524,11 +510,6 @@ void b5_24_poison_update(void) {
 			extract_obj(obj);
 		}
 	}
-	
-	// ensure everything gets saved this way since we won't do this again
-	save_all_empires();
-	save_trading_post();
-	write_world_to_files();
 }
 
 
@@ -574,8 +555,6 @@ void b5_30_empire_update(void) {
 		EMPIRE_NEEDS_SAVE(emp) = TRUE;
 		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	}
-	
-	save_all_empires();
 }
 
 
@@ -828,8 +807,6 @@ void b5_45_keep_update(void) {
 			}
 		}
 	}
-	
-	save_all_empires();
 }
 
 
@@ -855,7 +832,6 @@ PLAYER_UPDATE_FUNC(b5_47_update_players) {
 void b5_47_mine_update(void) {
 	struct island_info *isle, *next_isle;
 	struct map_data *tile;
-	bool any = FALSE;
 	room_data *room;
 	
 	const char *detect_desc = "   The island has ";
@@ -869,23 +845,17 @@ void b5_47_mine_update(void) {
 			remove_extra_data(&tile->shared->extra_data, ROOM_EXTRA_PROSPECT_EMPIRE);
 		}
 	}
-	write_world_to_files();
 	
 	// island desc flags
 	HASH_ITER(hh, island_table, isle, next_isle) {
 		if (isle->desc && strncmp(isle->desc, detect_desc, len)) {
 			SET_BIT(isle->flags, ISLE_HAS_CUSTOM_DESC);
-			any = TRUE;
 		}
-	}
-	if (any) {
-		save_island_table();
 	}
 }
 
 // adds a rope vnum to mobs that are tied
 void b5_48_rope_update(void) {
-	bool any = FALSE;
 	char_data *mob;
 	
 	obj_vnum OLD_ROPE = 2035;	// leather rope
@@ -893,12 +863,7 @@ void b5_48_rope_update(void) {
 	DL_FOREACH(character_list, mob) {
 		if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_TIED)) {
 			GET_ROPE_VNUM(mob) = OLD_ROPE;
-			any = TRUE;
 		}
-	}
-	
-	if (any) {
-		write_world_to_files();
 	}
 }
 
@@ -921,8 +886,6 @@ void b5_58_gather_totals(void) {
 		
 		EMPIRE_NEEDS_STORAGE_SAVE(emp) = TRUE;
 	}
-	
-	save_marked_empires();
 }
 
 
@@ -961,7 +924,7 @@ void b5_80_dailies_fix(void) {
 void b5_82_snowman_fix(void) {
 	char_data *ch, *next_ch;
 	trig_data *trig;
-	bool has, any = FALSE;
+	bool has;
 	
 	int snowman_vnum = 16600;
 	int new_script = 16634;
@@ -987,12 +950,7 @@ void b5_82_snowman_fix(void) {
 				create_script_data(ch, MOB_TRIGGER);
 			}
 			add_trigger(SCRIPT(ch), trig, -1);
-			any = TRUE;
 		}
-	}
-	
-	if (any) {
-		write_world_to_files();
 	}
 }
 
@@ -1157,11 +1115,6 @@ void b5_86_update(void) {
 	
 	log(" - refreshing player inventories...");
 	
-	// ensure everything gets saved this way since we won't do this again
-	save_all_empires();
-	save_trading_post();
-	write_world_to_files();
-	
 	// part 2:
 	log("Removing crops from 'natural' sectors (but not current sectors)...");
 	
@@ -1195,7 +1148,6 @@ void b5_86_update(void) {
 	}
 	
 	log("- replaced natural sectors on %d temperate, %d desert, and %d jungle tile%s", temp, des, jung, PLURAL(temp+des+jung));
-	write_world_to_files();
 }
 
 
@@ -1254,15 +1206,10 @@ void b5_87_crop_and_old_growth(void) {
 			switch (goal->vnum) {
 				case 2011: {	// Foundations: -craft
 					remove_learned_craft_empire(emp, 5131, FALSE);	// apiary
-					save_empire(emp, TRUE);
 					break;
 				}
 			}
 		}
-	}
-	
-	if (removed_crop > 0 || total_forest > 0) {
-		write_world_to_files();
 	}
 }
 
@@ -1322,10 +1269,6 @@ void b5_88_irrigation_repair(void) {
 	}
 	
 	log("- repaired %d current and %d base sectors", fixed_current, fixed_base);
-	
-	if (fixed_current > 0 || fixed_base > 0) {
-		write_world_to_files();
-	}
 }
 
 
@@ -1730,8 +1673,6 @@ void b5_94_terrain_heights(void) {
 			}
 		}
 	}
-	
-	write_world_to_files();
 }
 
 
@@ -1801,10 +1742,6 @@ void b5_102_home_cleanup(void) {
 			}
 		}
 	}
-	
-	run_delayed_refresh();
-	free_loaded_players();
-	write_world_to_files();
 	
 	override_home_storage_cap = FALSE;
 }
@@ -2049,6 +1986,7 @@ void write_last_boot_version(int version) {
 */
 void check_version(void) {
 	int last, iter, current = NOTHING;
+	bool any = FALSE;
 	
 	last = get_last_boot_version();
 	
@@ -2073,7 +2011,20 @@ void check_version(void) {
 		if (version_update_data[iter].player_update_func) {
 			update_all_players(NULL, version_update_data[iter].player_update_func);
 		}
+		
+		any = TRUE;
 	}
 	
+	// save for next time
 	write_last_boot_version(current);
+	
+	// ensure everything is saved
+	if (any) {
+		save_island_table();
+		save_trading_post();
+		run_delayed_refresh();
+		free_loaded_players();
+		save_all_empires();
+		write_world_to_files();
+	}
 }
