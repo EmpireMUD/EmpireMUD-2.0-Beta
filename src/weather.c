@@ -32,7 +32,7 @@
 */
 
 // external vars
-extern unsigned long pulse;
+extern unsigned long main_game_pulse;
 
 // local prototypes
 void another_hour();

@@ -74,7 +74,7 @@ void check_newbie_islands();
 void check_wars();
 void chore_update();
 void display_automessages();
-void frequent_combat(int pulse);
+void frequent_combat(unsigned long pulse);
 void process_import_evolutions();
 void process_theft_logs();
 void prune_instances();
@@ -132,7 +132,7 @@ struct timeval null_time;				/* zero-valued time structure		*/
 FILE *logfile = NULL;					/* Where to send the log messages	*/
 bool gain_cond_message = FALSE;		/* gain cond send messages			*/
 int dg_act_check;	/* toggle for act_trigger */
-unsigned long pulse = 0;	/* number of pulses since game start */
+unsigned long main_game_pulse = 0;	/* number of pulses since game start */
 static bool reboot_recovery = FALSE;
 int mother_desc;
 ush_int port;
@@ -788,7 +788,7 @@ void update_reboot(void) {
  //////////////////////////////////////////////////////////////////////////////
 //// MAIN GAME LOOP //////////////////////////////////////////////////////////
 
-void heartbeat(int heart_pulse) {
+void heartbeat(unsigned long heart_pulse) {
 	static int mins_since_crashsave = 0;
 	
 	#define HEARTBEAT(x)  !(heart_pulse % (int)((x) * PASSES_PER_SEC))
@@ -797,7 +797,7 @@ void heartbeat(int heart_pulse) {
 	// #define HEARTBEAT_LOG(id_str)  if (HEARTBEAT(15)) { log("debug %s:\t%lld", id_str, microtime()); }
 	#define HEARTBEAT_LOG(id_str)
 	
-	// TODO go through this, arrange it better, combine anything combinable
+	// TODO go through this, arrange it better, --combine-anything-combinable(done)--
 
 	// only get a gain condition message on the hour
 	if (HEARTBEAT(SECS_PER_MUD_HOUR)) {
@@ -3753,7 +3753,7 @@ void game_loop(socket_t mother_desc) {
 		caught_up_mobs = FALSE;
 		
 		while (missed_pulses--) {
-			heartbeat(++pulse);
+			heartbeat(++main_game_pulse);
 			
 			// check this and mark mobs as caught up now: this prevents too much mobile_activity when the mud is stalled
 			if (caught_up_mobs) {

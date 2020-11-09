@@ -26,7 +26,7 @@
 struct queue *event_q = NULL;          /* the event queue */
 
 // external data
-extern unsigned long pulse;
+extern unsigned long main_game_pulse;
 
 
 /* initializes the event queue */
@@ -39,16 +39,19 @@ void dg_event_init(void) {
 ** Add an event to the current list
 */
 /* creates an event and returns it */
-struct dg_event *dg_event_create(EVENTFUNC(*func), void *event_obj, long when) {
+struct dg_event *dg_event_create(EVENTFUNC(*func), void *event_obj, unsigned long when) {
 	struct dg_event *new_event;
 
 	if (when < 1) /* make sure its in the future */
 		when = 1;
+	
+	// add to current pulse time
+	SAFE_ADD(when, main_game_pulse, 0, ULONG_MAX, FALSE);
 
 	CREATE(new_event, struct dg_event, 1);
 	new_event->func = func;
 	new_event->event_obj = event_obj;
-	new_event->q_el = queue_enq(event_q, new_event, when + pulse);
+	new_event->q_el = queue_enq(event_q, new_event, when);
 
 	return new_event;
 }
@@ -84,9 +87,9 @@ void dg_event_cancel(struct dg_event *event, EVENT_CANCEL_FUNC(*func)) {
 /* Process any events whose time has come. */
 void dg_event_process(void) {
 	struct dg_event *the_event;
-	long new_time;
+	unsigned long new_time;
 
-	while ((long) pulse >= queue_key(event_q)) {
+	while (main_game_pulse >= queue_key(event_q)) {
 		if (!(the_event = (struct dg_event *) queue_head(event_q))) {
 			log("SYSERR: Attempt to get a NULL event");
 			return;
@@ -105,8 +108,10 @@ void dg_event_process(void) {
 		}
 
 		/* call event func, reenqueue event if retval > 0 */
-		if ((new_time = (the_event->func)(the_event->event_obj)) > 0)
-			the_event->q_el = queue_enq(event_q, the_event, new_time + pulse);
+		if ((new_time = (the_event->func)(the_event->event_obj)) > 0) {
+			SAFE_ADD(new_time, main_game_pulse, 0, ULONG_MAX, FALSE);
+			the_event->q_el = queue_enq(event_q, the_event, new_time);
+		}
 		else {
 			free(the_event);
 		}
@@ -115,12 +120,13 @@ void dg_event_process(void) {
 
 
 /* returns the time remaining before the event */
-long dg_event_time(struct dg_event *event) {
-	long when;
+unsigned long dg_event_time(struct dg_event *event) {
+	unsigned long when;
 
 	when = queue_elmt_key(event->q_el);
+	SAFE_ADD(when, (-1 * main_game_pulse), 0, ULONG_MAX, FALSE);
 
-	return (when - pulse);
+	return when;
 }
 
 
@@ -162,7 +168,7 @@ struct queue *queue_init(void) {
 
 
 /* add data into the priority queue q with key */
-struct q_element *queue_enq(struct queue *q, void *data, long key) {
+struct q_element *queue_enq(struct queue *q, void *data, unsigned long key) {
 	struct q_element *qe, *i;
 	int bucket;
 
@@ -234,7 +240,7 @@ void *queue_head(struct queue *q) {
 	void *data;
 	int i;
 
-	i = pulse % NUM_EVENT_QUEUES;
+	i = main_game_pulse % NUM_EVENT_QUEUES;
 
 	if (!q->head[i])
 		return NULL;
@@ -249,20 +255,20 @@ void *queue_head(struct queue *q) {
 * returns the key of the head element of the priority queue
 * if q is NULL, then return the largest unsigned number
 */
-long queue_key(struct queue *q) {
+unsigned long queue_key(struct queue *q) {
 	int i;
 
-	i = pulse % NUM_EVENT_QUEUES;
+	i = main_game_pulse % NUM_EVENT_QUEUES;
 
 	if (q->head[i])
 		return q->head[i]->key;
 	else
-		return LONG_MAX;
+		return ULONG_MAX;
 }
 
 
 /* returns the key of queue element qe */
-long queue_elmt_key(struct q_element *qe) {
+unsigned long queue_elmt_key(struct q_element *qe) {
 	return qe->key;
 }
 

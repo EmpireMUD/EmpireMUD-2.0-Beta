@@ -2466,7 +2466,7 @@ void set_workforce_production_limit(empire_data *emp, any_vnum vnum, int amount)
 
 // time helpers
 #define DAY_OF_YEAR(timeinfo)  ((timeinfo).month * 30 + (timeinfo).day + 1)
-#define PERCENT_THROUGH_CURRENT_HOUR  (((pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR)
+#define PERCENT_THROUGH_CURRENT_HOUR  (((main_game_pulse / PASSES_PER_SEC) % SECS_PER_MUD_HOUR) / (double)SECS_PER_MUD_HOUR)
 
 
 /* undefine MAX and MIN so that our macros are used instead */

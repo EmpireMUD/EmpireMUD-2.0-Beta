@@ -29,7 +29,7 @@
 #include "constants.h"
 
 // external vars
-extern unsigned long pulse;
+extern unsigned long main_game_pulse;
 
 // local functions
 int eval_lhs_op_rhs(char *expr, char *result, void *go, struct script_data *sc, trig_data *trig, int type);
@@ -6511,7 +6511,7 @@ void process_wait(void *go, trig_data *trig, int type, char *cmd, struct cmdlist
 		ntime = (min * SECS_PER_MUD_HOUR * PASSES_PER_SEC) / 60;
 
 		/* calculate pulse of day of current time */
-		when = (pulse % (SECS_PER_MUD_HOUR * PASSES_PER_SEC)) + (tinfo.hours * SECS_PER_MUD_HOUR * PASSES_PER_SEC);
+		when = (main_game_pulse % (SECS_PER_MUD_HOUR * PASSES_PER_SEC)) + (tinfo.hours * SECS_PER_MUD_HOUR * PASSES_PER_SEC);
 
 		if (when >= ntime) /* adjust for next day */
 			when = (SECS_PER_MUD_DAY * PASSES_PER_SEC) - when + ntime;

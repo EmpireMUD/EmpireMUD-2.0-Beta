@@ -4193,9 +4193,9 @@ void fight_wait_run(char_data *ch, double speed) {
 * based on their speed. This runs much much more often than actual
 * hits.
 *
-* @param int pulse the current game pulse, for determining whose turn it is
+* @param unsigned long pulse the current game pulse, for determining whose turn it is
 */
-void frequent_combat(int pulse) {
+void frequent_combat(unsigned long pulse) {
 	char_data *ch, *vict;
 	double speed;
 	
