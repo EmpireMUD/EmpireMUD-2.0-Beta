@@ -453,12 +453,7 @@ void update_class(char_data *ch) {
 	if (GET_CLASS(ch) != old_class || GET_SKILL_LEVEL(ch) != old_level) {
 		affect_total(ch);
 		qt_change_level(ch, GET_COMPUTED_LEVEL(ch));
-		
-		if (ch->desc) {
-			MSDPSetNumber(ch->desc, eMSDP_LEVEL, get_approximate_level(ch));
-			MSDPSetNumber(ch->desc, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
-			queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
-		}
+		update_MSDP_level(ch, UPDATE_SOON);
 	}
 }
 

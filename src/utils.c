@@ -3052,11 +3052,8 @@ void determine_gear_level(char_data *ch) {
 	GET_GEAR_LEVEL(ch) = MAX(level, 0);
 	
 	if (old != GET_GEAR_LEVEL(ch)) {
-		if (ch->desc) {
-			MSDPSetNumber(ch->desc, eMSDP_LEVEL, get_approximate_level(ch));
-			MSDPSetNumber(ch->desc, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
-		}
-		queue_delayed_update(ch, CDU_PASSIVE_BUFFS | CDU_MSDP_SEND_UPDATES);
+		update_MSDP_level(ch, UPDATE_SOON);
+		queue_delayed_update(ch, CDU_PASSIVE_BUFFS);
 	}
 }
 

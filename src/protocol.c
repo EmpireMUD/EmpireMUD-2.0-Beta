@@ -3057,10 +3057,8 @@ void send_initial_MSDP(descriptor_data *desc) {
 	
 	// numeric data
 	update_MSDP_bonus_exp(ch, NO_UPDATE);
+	update_MSDP_level(ch, NO_UPDATE);
 	MSDPSetNumber(desc, eMSDP_MONEY, total_coins(ch));
-	MSDPSetNumber(desc, eMSDP_LEVEL, get_approximate_level(ch));
-	MSDPSetNumber(desc, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
-	MSDPSetNumber(desc, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
 	
 	// lists
 	update_MSDP_affects(ch, NO_UPDATE);
@@ -3331,6 +3329,22 @@ void update_MSDP_empire_data_all(empire_data *emp, int claims_only, int delay) {
 void update_MSDP_gender(char_data *ch, int send_update) {
 	if (ch->desc) {
 		MSDPSetString(ch->desc, eMSDP_GENDER, genders[GET_SEX(ch)]);
+		check_send_msdp_update(ch, send_update);
+	}
+}
+
+
+/**
+* Updates level info for MSDP.
+*
+* @param char_data *ch A player.
+* @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
+*/
+void update_MSDP_level(char_data *ch, int send_update) {
+	if (ch->desc) {
+		MSDPSetNumber(ch->desc, eMSDP_LEVEL, get_approximate_level(ch));
+		MSDPSetNumber(ch->desc, eMSDP_GEAR_LEVEL, IS_NPC(ch) ? 0 : GET_GEAR_LEVEL(ch));
+		MSDPSetNumber(ch->desc, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
 		check_send_msdp_update(ch, send_update);
 	}
 }
