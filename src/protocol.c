@@ -3056,7 +3056,7 @@ void send_initial_MSDP(descriptor_data *desc) {
 	update_MSDP_gender(ch, NO_UPDATE);
 	
 	// numeric data
-	MSDPSetNumber(desc, eMSDP_BONUS_EXP, IS_NPC(ch) ? 0 : GET_DAILY_BONUS_EXPERIENCE(ch));
+	update_MSDP_bonus_exp(ch, NO_UPDATE);
 	MSDPSetNumber(desc, eMSDP_MONEY, total_coins(ch));
 	MSDPSetNumber(desc, eMSDP_LEVEL, get_approximate_level(ch));
 	MSDPSetNumber(desc, eMSDP_SKILL_LEVEL, IS_NPC(ch) ? 0 : GET_SKILL_LEVEL(ch));
@@ -3156,6 +3156,20 @@ void update_MSDP_attributes(char_data *ch, int send_update) {
 		MSDPSetNumber(ch->desc, eMSDP_CRAFTING_LEVEL, get_crafting_level(ch));
 		MSDPSetNumber(ch->desc, eMSDP_INVENTORY_MAX, CAN_CARRY_N(ch));
 		
+		check_send_msdp_update(ch, send_update);
+	}
+}
+
+
+/**
+* Updates bonus experience info for MSDP.
+*
+* @param char_data *ch A player.
+* @param int send_update NO_UPDATE, UPDATE_NOW (immediately send MSDP update), or UPDATE_SOON (send MSDP update within 1 second).
+*/
+void update_MSDP_bonus_exp(char_data *ch, int send_update) {
+	if (ch->desc) {
+		MSDPSetNumber(ch->desc, eMSDP_BONUS_EXP, GET_DAILY_BONUS_EXPERIENCE(ch));
 		check_send_msdp_update(ch, send_update);
 	}
 }

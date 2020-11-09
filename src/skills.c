@@ -987,11 +987,7 @@ bool gain_skill_exp(char_data *ch, any_vnum skill_vnum, double amount) {
 	if (gained) {
 		GET_DAILY_BONUS_EXPERIENCE(ch) = MAX(0, GET_DAILY_BONUS_EXPERIENCE(ch) - 1);
 		gained = gain_skill(ch, skill, 1);
-		
-		if (ch->desc) {
-			MSDPSetNumber(ch->desc, eMSDP_BONUS_EXP, GET_DAILY_BONUS_EXPERIENCE(ch));
-			queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
-		}
+		update_MSDP_bonus_exp(ch, UPDATE_SOON);
 	}
 	
 	queue_delayed_update(ch, CDU_MSDP_SKILLS);

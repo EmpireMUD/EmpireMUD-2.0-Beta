@@ -243,10 +243,7 @@ void finish_morphing(char_data *ch, morph_data *morph) {
 	}
 
 	// update msdp
-	if (ch->desc) {
-		MSDPSetString(ch->desc, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
-		queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
-	}
+	update_MSDP_name(ch, UPDATE_SOON);
 }
 
 

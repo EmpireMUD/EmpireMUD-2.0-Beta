@@ -2961,10 +2961,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig, int typ
 							int amt;
 							if (subfield && *subfield && (amt = atoi(subfield)) != 0 && !IS_NPC(c)) {
 								SAFE_ADD(GET_DAILY_BONUS_EXPERIENCE(c), amt, 0, UCHAR_MAX, FALSE);
-								if (c->desc) {
-									MSDPSetNumber(c->desc, eMSDP_BONUS_EXP, GET_DAILY_BONUS_EXPERIENCE(c));
-									queue_delayed_update(c, CDU_MSDP_SEND_UPDATES);
-								}
+								update_MSDP_bonus_exp(c, UPDATE_SOON);
 							}
 							snprintf(str, slen, "%d", GET_DAILY_BONUS_EXPERIENCE(c));
 						}

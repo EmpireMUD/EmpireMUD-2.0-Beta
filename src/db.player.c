@@ -3090,10 +3090,7 @@ void change_personal_lastname(char_data *ch, char *name) {
 	queue_delayed_update(ch, CDU_SAVE);
 	
 	// update msdp
-	if (ch->desc) {
-		MSDPSetString(ch->desc, eMSDP_CHARACTER_NAME, PERS(ch, ch, FALSE));
-		queue_delayed_update(ch, CDU_MSDP_SEND_UPDATES);
-	}
+	update_MSDP_name(ch, UPDATE_SOON);
 }
 
 

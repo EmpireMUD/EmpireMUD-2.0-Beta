@@ -616,6 +616,7 @@ char *flush_reduced_color_codes(descriptor_t *desc);
 void send_initial_MSDP(descriptor_t *desc);
 void update_MSDP_affects(char_data_t *ch, int send_update);
 void update_MSDP_attributes(char_data_t *ch, int send_update);
+void update_MSDP_bonus_exp(char_data_t *ch, int send_update);
 void update_MSDP_cooldowns(char_data_t *ch, int send_update);
 void update_MSDP_dots(char_data_t *ch, int send_update);
 void update_MSDP_empire_data(char_data_t *ch, int send_update);
