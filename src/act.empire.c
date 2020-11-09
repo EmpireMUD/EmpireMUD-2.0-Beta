@@ -6639,7 +6639,7 @@ ACMD(do_promote) {
 		}
 		else {
 			queue_delayed_update(victim, CDU_SAVE);
-			update_MSDP_empire_data(victim->desc, UPDATE_NOW);
+			update_MSDP_empire_data(victim, UPDATE_NOW);
 		}
 	}
 	
