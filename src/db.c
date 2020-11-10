@@ -101,6 +101,7 @@ void update_instance_world_size();
 void verify_empire_goals();
 void verify_running_events();
 void verify_sectors();
+void write_whole_mapout();
 int sort_abilities_by_data(ability_data *a, ability_data *b);
 int sort_archetypes_by_data(archetype_data *a, archetype_data *b);
 int sort_augments_by_data(augment_data *a, augment_data *b);
@@ -296,6 +297,7 @@ struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];	// master world map
 struct map_data *land_map = NULL;	// linked list of non-ocean
 int size_of_world = 1;	// used by the instancer to adjust instance counts
 struct shared_room_data ocean_shared_data;	// for BASIC_OCEAN tiles
+struct vnum_hash *mapout_update_requests = NULL;	// hash table of requests for mapout updates, by room vnum
 
 
 // DB_BOOT_x
@@ -455,6 +457,7 @@ void boot_db(void) {
 	chore_update();
 	
 	log("Final startup...");
+	write_whole_mapout();
 	// put things here
 	
 	// END

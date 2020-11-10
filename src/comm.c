@@ -92,6 +92,7 @@ void update_guard_towers();
 void update_instance_world_size();
 void update_trading_post();
 void weather_and_time();
+void write_mapout_updates();
 void write_running_events_file();
 
 // local functions
@@ -971,6 +972,9 @@ void heartbeat(unsigned long heart_pulse) {
 		
 		free_loaded_players();	// ensure this comes AFTER run_delayed_refresh
 		HEARTBEAT_LOG("37")
+		
+		write_mapout_updates();
+		HEARTBEAT_LOG("38")
 	}
 
 	/* Every pulse! Don't want them to stink the place up... */

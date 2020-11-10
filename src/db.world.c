@@ -43,6 +43,7 @@
 *   Helpers
 *   World Map System
 *   World Map Saving
+*   Mapout System
 */
 
 // external funcs
@@ -3978,55 +3979,13 @@ void write_city_data_file(void) {
 
 
 /**
-* Writes one tile entry to the graphical map data files.
-*
-* @param struct map_data *map The tile to write.
-* @param FILE *map_fl The geographical map file, open for writing.
-* @param FILE *pol_fl The political map file, open for writing.
-*/
-void write_graphical_map_data(struct map_data *map, FILE *map_fl, FILE *pol_fl) {
-	sector_data *sect = map->sector_type;
-	empire_data *emp;
-	
-	if (map->room && ROOM_AFF_FLAGGED(map->room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(map->room)) {
-		sect = map->base_sector;
-	}
-	
-	// normal map output
-	if (map_fl) {
-		if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && map->crop_type) {
-			fprintf(map_fl, "%c", mapout_color_tokens[GET_CROP_MAPOUT(map->crop_type)]);
-		}
-		else {
-			fprintf(map_fl, "%c", mapout_color_tokens[GET_SECT_MAPOUT(sect)]);
-		}
-	}
-
-	// political output
-	if (pol_fl && map->room && (emp = ROOM_OWNER(map->room)) && (!ROOM_AFF_FLAGGED(map->room, ROOM_AFF_CHAMELEON) || !IS_COMPLETE(map->room)) && EMPIRE_MAPOUT_TOKEN(emp) != 0) {
-		fprintf(pol_fl, "%c", EMPIRE_MAPOUT_TOKEN(emp));
-	}
-	else if (pol_fl) {
-		// no owner -- only some sects get printed
-		if (SECT_FLAGGED(sect, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
-			fprintf(pol_fl, "%c", mapout_color_tokens[GET_SECT_MAPOUT(sect)]);
-		}
-		else {
-			fprintf(pol_fl, "?");
-		}
-	}
-}
-
-
-/**
 * New function (as of b5.115) to combine the writing of the world_table and
-* world_map data, which are written out as base_map, the .wld files, and the
-* various text files that are used to build the graphical maps. Performing all
-* this at once is meant to reduce iterations over the various world tables and
-* lists.
+* world_map data, which are written out as base_map and the .wld files.
+* Performing all this at once is meant to reduce iterations over the various
+* world tables and lists.
 */
 void write_world_to_files(void) {
-	FILE *world_fl = NULL, *index_fl = NULL, *base_fl = NULL, *map_fl = NULL, *pol_fl = NULL;
+	FILE *world_fl = NULL, *index_fl = NULL, *base_fl = NULL;
 	struct track_data *track, *next_track;
 	room_data *iter, *next_iter;
 	room_vnum vnum;
@@ -4056,29 +4015,12 @@ void write_world_to_files(void) {
 			return;
 		}
 	}
-
-	// open geographical map data file
-	if (!(map_fl = fopen(GEOGRAPHIC_MAP_FILE TEMP_SUFFIX, "w"))) {
-		log("SYSERR: Unable to open file '%s' for writing", GEOGRAPHIC_MAP_FILE TEMP_SUFFIX);
-		return;
-	}
-	
-	// open political map data file
-	if (!(pol_fl = fopen(POLITICAL_MAP_FILE TEMP_SUFFIX, "w"))) {
-		log("SYSERR: Unable to open file '%s' for writing", POLITICAL_MAP_FILE TEMP_SUFFIX);
-		return;
-	}
-	
-	// write preliminary data
-	fprintf(map_fl, "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
-	fprintf(pol_fl, "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
 	
 	// write world_map:
 	for (y = 0; y < MAP_HEIGHT; ++y) {
 		// iterating x inside of y will ensure we're in vnum-order here
 		for (x = 0; x < MAP_WIDTH; ++x) {
 			map = &world_map[x][y];
-			write_graphical_map_data(map, map_fl, pol_fl);
 			
 			// save base map only if not blank ocean
 			if (map->shared != &ocean_shared_data) {
@@ -4125,10 +4067,6 @@ void write_world_to_files(void) {
 				}
 			}
 		}	// end X
-		
-		// end of row
-		fprintf(map_fl, "\n");
-		fprintf(pol_fl, "\n");	
 	}	// end Y
 	
 	// sort interior
@@ -4172,16 +4110,161 @@ void write_world_to_files(void) {
 		rename(WLD_PREFIX INDEX_FILE TEMP_SUFFIX, WLD_PREFIX INDEX_FILE);
 		need_world_index = FALSE;
 	}
-	if (map_fl) {
-		fclose(map_fl);
-		rename(GEOGRAPHIC_MAP_FILE TEMP_SUFFIX, GEOGRAPHIC_MAP_FILE);
-	}
-	if (pol_fl) {
-		fclose(pol_fl);
-		rename(POLITICAL_MAP_FILE TEMP_SUFFIX, POLITICAL_MAP_FILE);
-	}
 	
 	// additional work
 	save_instances();
 	write_city_data_file();
+}
+
+
+ //////////////////////////////////////////////////////////////////////////////
+//// MAPOUT SYSTEM ///////////////////////////////////////////////////////////
+
+/**
+* This is centralized to make sure it's always consistent, which is important
+* for fseek'ing the file.
+*
+* @return char* The header text for a mapout file (map.txt, etc).
+*/
+char *get_mapout_header(void) {
+	static char output[256];
+	snprintf(output, sizeof(output), "%dx%d\n", MAP_WIDTH, MAP_HEIGHT);
+	return output;
+}
+
+
+/**
+* Writes one tile entry to the graphical map data files.
+*
+* @param struct map_data *map The tile to write.
+* @param FILE *map_fl The geographical map file, open for writing.
+* @param FILE *pol_fl The political map file, open for writing.
+*/
+void write_graphical_map_data(struct map_data *map, FILE *map_fl, FILE *pol_fl) {
+	sector_data *sect = map->sector_type;
+	empire_data *emp;
+	
+	if (map->room && ROOM_AFF_FLAGGED(map->room, ROOM_AFF_CHAMELEON) && IS_COMPLETE(map->room)) {
+		sect = map->base_sector;
+	}
+	
+	// normal map output
+	if (SECT_FLAGGED(sect, SECTF_HAS_CROP_DATA) && map->crop_type) {
+		fputc(mapout_color_tokens[GET_CROP_MAPOUT(map->crop_type)], map_fl);
+	}
+	else {
+		fputc(mapout_color_tokens[GET_SECT_MAPOUT(sect)], map_fl);
+	}
+
+	// political output
+	if (map->room && (emp = ROOM_OWNER(map->room)) && (!ROOM_AFF_FLAGGED(map->room, ROOM_AFF_CHAMELEON) || !IS_COMPLETE(map->room)) && EMPIRE_MAPOUT_TOKEN(emp) != 0) {
+		fputc(EMPIRE_MAPOUT_TOKEN(emp), pol_fl);
+	}
+	else {
+		// no owner -- only some sects get printed
+		if (SECT_FLAGGED(sect, SECTF_SHOW_ON_POLITICAL_MAPOUT)) {
+			fputc(mapout_color_tokens[GET_SECT_MAPOUT(sect)], pol_fl);
+		}
+		else {
+			fputc('?', pol_fl);
+		}
+	}
+}
+
+
+/**
+* Writes the full mapout data (used to generate the graphical version of the
+* map). This is called at startup or with the 'mapout' command. Any changes
+* are updated piecemeal.
+*/
+void write_whole_mapout(void) {
+	FILE *map_fl, *pol_fl;
+	int x, y;
+
+	// open geographical map data file
+	if (!(map_fl = fopen(GEOGRAPHIC_MAP_FILE TEMP_SUFFIX, "w"))) {
+		log("SYSERR: Unable to open file '%s' for writing", GEOGRAPHIC_MAP_FILE TEMP_SUFFIX);
+		return;
+	}
+	
+	// open political map data file
+	if (!(pol_fl = fopen(POLITICAL_MAP_FILE TEMP_SUFFIX, "w"))) {
+		log("SYSERR: Unable to open file '%s' for writing", POLITICAL_MAP_FILE TEMP_SUFFIX);
+		return;
+	}
+	
+	// write header data
+	fprintf(map_fl, "%s", get_mapout_header());
+	fprintf(pol_fl, "%s", get_mapout_header());
+	
+	// write world_map:
+	for (y = 0; y < MAP_HEIGHT; ++y) {
+		// iterating x inside of y will ensure we're in vnum-order here
+		for (x = 0; x < MAP_WIDTH; ++x) {
+			write_graphical_map_data(&world_map[x][y], map_fl, pol_fl);
+		}	// end X
+		
+		// end of row
+		fprintf(map_fl, "\n");
+		fprintf(pol_fl, "\n");	
+	}	// end Y
+
+	// close files
+	fclose(map_fl);
+	rename(GEOGRAPHIC_MAP_FILE TEMP_SUFFIX, GEOGRAPHIC_MAP_FILE);
+	
+	fclose(pol_fl);
+	rename(POLITICAL_MAP_FILE TEMP_SUFFIX, POLITICAL_MAP_FILE);
+}
+
+
+/**
+* Updates the mapout files (used to generate the graphical map) with any tiles
+* that were added with request_mapout_update(vnum).
+*/
+void write_mapout_updates(void) {
+	FILE *map_fl, *pol_fl;
+	int x, y, header_size, pos;
+	struct vnum_hash *iter, *next_iter;
+	
+	if (!mapout_update_requests) {
+		return;	// no work
+	}
+	
+	// open geographical map data file
+	if (!(map_fl = fopen(GEOGRAPHIC_MAP_FILE, "r+"))) {
+		log("SYSERR: Unable to open file '%s' for updates; saving fresh file", GEOGRAPHIC_MAP_FILE);
+		write_whole_mapout();
+		return;
+	}
+	
+	// open political map data file
+	if (!(pol_fl = fopen(POLITICAL_MAP_FILE, "r+"))) {
+		log("SYSERR: Unable to open file '%s' for updates; saving fresh file", POLITICAL_MAP_FILE);
+		write_whole_mapout();
+		return;
+	}
+	
+	header_size = strlen(get_mapout_header());
+	
+	HASH_ITER(hh, mapout_update_requests, iter, next_iter) {
+		if (iter->vnum >= 0 && iter->vnum < MAP_SIZE) {
+			x = MAP_X_COORD(iter->vnum);
+			y = MAP_Y_COORD(iter->vnum);
+			
+			// each line after the header is width+1 (for the \n)
+			pos = header_size + (y * (MAP_WIDTH + 1)) + x;
+			fseek(map_fl, pos * sizeof(char), SEEK_SET);
+			
+			write_graphical_map_data(&world_map[x][y], map_fl, pol_fl);
+		}
+		
+		// cleanup
+		HASH_DEL(mapout_update_requests, iter);
+		free(iter);
+	}
+	
+	// close files
+	fclose(map_fl);
+	fclose(pol_fl);
 }

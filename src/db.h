@@ -837,6 +837,7 @@ extern struct map_data world_map[MAP_WIDTH][MAP_HEIGHT];
 extern struct map_data *land_map;
 extern bool need_world_index;
 extern int size_of_world;
+extern struct vnum_hash *mapout_update_requests;
 
 void add_room_to_world_tables(room_data *room);
 void annual_update_depletions(struct depletion_data **list);
