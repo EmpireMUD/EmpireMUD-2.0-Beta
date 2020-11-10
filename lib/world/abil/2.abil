@@ -439,7 +439,7 @@ abi -1 1.00 o 0
 A
 12 -1
 C
-ablate 7 0 2 11 4 2055 9 8 3 0
+ablate 7 bf 2 11 4 2055 9 8 3 0
 T c 3
 T b 2
 X b
@@ -548,7 +548,7 @@ S
 Thornlash~
 abi -1 1.00 o 0
 C
-thornlash 7 0 2 10 3 2067 9 8 3 0
+thornlash 7 bf 2 10 3 2067 9 8 3 0
 T c 4
 T d 6
 X c
