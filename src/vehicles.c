@@ -468,7 +468,9 @@ void finish_dismantle_vehicle(char_data *ch, vehicle_data *veh) {
 	}
 	
 	if (IN_ROOM(veh)) {
-		request_mapout_update(GET_ROOM_VNUM(IN_ROOM(veh)));
+		if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
+			request_mapout_update(GET_ROOM_VNUM(IN_ROOM(veh)));
+		}
 		DL_FOREACH2(ROOM_PEOPLE(IN_ROOM(veh)), iter, next_in_room) {
 			if (!IS_NPC(iter) && GET_ACTION(iter) == ACT_DISMANTLE_VEHICLE && GET_ACTION_VNUM(iter, 1) == VEH_CONSTRUCTION_ID(veh)) {
 				cancel_action(iter);
@@ -1053,7 +1055,9 @@ void start_dismantle_vehicle(vehicle_data *veh) {
 	}
 	
 	affect_total_room(IN_ROOM(veh));
-	request_mapout_update(GET_ROOM_VNUM(IN_ROOM(veh)));
+	if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
+		request_mapout_update(GET_ROOM_VNUM(IN_ROOM(veh)));
+	}
 }
 
 
@@ -1546,7 +1550,9 @@ void complete_vehicle(vehicle_data *veh) {
 	
 	if (room) {
 		affect_total_room(room);
-		request_mapout_update(GET_ROOM_VNUM(room));	// in case
+		if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
+			request_mapout_update(GET_ROOM_VNUM(room));	// in case
+		}
 	}
 }
 

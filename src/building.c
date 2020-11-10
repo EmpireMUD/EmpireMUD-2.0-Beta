@@ -1361,7 +1361,7 @@ void start_dismantle_building(room_data *loc) {
 	stop_room_action(loc, ACT_PICKING);
 	
 	affect_total_room(loc);
-	request_mapout_update(GET_ROOM_VNUM(room));
+	request_mapout_update(GET_ROOM_VNUM(loc));
 }
 
 

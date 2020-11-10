@@ -10130,8 +10130,8 @@ void vehicle_from_room(vehicle_data *veh) {
 	
 	affect_total_room(was_in);
 	
-	// update mapout if applicable TODO: determine when a vehicle affects mapout
-	if (TRUE) {
+	// update mapout if applicable
+	if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
 		request_mapout_update(GET_ROOM_VNUM(was_in));
 	}
 }
@@ -10167,8 +10167,8 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	// apply empire tech (which may be island-based)
 	adjust_vehicle_tech(veh, TRUE);
 	
-	// update mapout if applicable TODO: determine when a vehicle affects mapout
-	if (TRUE) {
+	// update mapout if applicable
+	if (VEH_IS_VISIBLE_ON_MAPOUT(veh)) {
 		request_mapout_update(GET_ROOM_VNUM(room));
 	}
 }
