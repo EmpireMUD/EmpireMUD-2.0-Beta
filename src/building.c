@@ -329,6 +329,7 @@ void complete_building(room_data *room) {
 	}
 	
 	affect_total_room(room);
+	request_mapout_update(GET_ROOM_VNUM(room));
 }
 
 
@@ -382,6 +383,7 @@ void construct_building(room_data *room, bld_vnum type) {
 	}
 	
 	load_wtrigger(room);
+	request_mapout_update(GET_ROOM_VNUM(room));
 }
 
 
@@ -645,6 +647,8 @@ void disassociate_building(room_data *room) {
 			// (totals do not change)
 		}
 	}
+	
+	request_mapout_update(GET_ROOM_VNUM(room));
 }
 
 
@@ -1357,6 +1361,7 @@ void start_dismantle_building(room_data *loc) {
 	stop_room_action(loc, ACT_PICKING);
 	
 	affect_total_room(loc);
+	request_mapout_update(GET_ROOM_VNUM(room));
 }
 
 

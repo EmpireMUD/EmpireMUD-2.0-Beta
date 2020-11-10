@@ -878,7 +878,7 @@ void affect_total(char_data *ch) {
 * @param room_data *room The room to check.
 */
 void affect_total_room(room_data *room) {
-	bool was_unclaimable = IS_SET(ROOM_AFF_FLAGS(room), ROOM_AFF_UNCLAIMABLE) ? TRUE : FALSE;
+	bitvector_t old_affs = ROOM_AFF_FLAGS(room);
 	struct affected_type *af;
 	vehicle_data *veh;
 	
@@ -908,8 +908,13 @@ void affect_total_room(room_data *room) {
 	}
 	
 	// if unclaimable changed, update room lights
-	if (was_unclaimable != (IS_SET(ROOM_AFF_FLAGS(room), ROOM_AFF_UNCLAIMABLE) ? TRUE : FALSE)) {
+	if (IS_SET(ROOM_AFF_FLAGS(room), ROOM_AFF_UNCLAIMABLE) != IS_SET(old_affs, ROOM_AFF_UNCLAIMABLE)) {
 		reset_light_count(room);
+	}
+	
+	// if chameleon changed, update mapout
+	if (IS_SET(ROOM_AFF_FLAGS(room), ROOM_AFF_CHAMELEON) != IS_SET(old_affs, ROOM_AFF_CHAMELEON)) {
+		request_mapout_update(GET_ROOM_VNUM(room));
 	}
 }
 
@@ -2973,6 +2978,7 @@ void perform_abandon_room(room_data *room) {
 	
 	affect_total_room(room);
 	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	request_mapout_update(GET_ROOM_VNUM(room));
 }
 
 
@@ -3071,6 +3077,7 @@ void perform_claim_room(room_data *room, empire_data *emp) {
 	
 	add_dropped_item_list(emp, ROOM_CONTENTS(room));
 	update_MSDP_empire_data_all(emp, TRUE, TRUE);
+	request_mapout_update(GET_ROOM_VNUM(room));
 }
 
 
@@ -10122,6 +10129,11 @@ void vehicle_from_room(vehicle_data *veh) {
 	IN_ROOM(veh) = NULL;
 	
 	affect_total_room(was_in);
+	
+	// update mapout if applicable TODO: determine when a vehicle affects mapout
+	if (TRUE) {
+		request_mapout_update(GET_ROOM_VNUM(was_in));
+	}
 }
 
 
@@ -10154,6 +10166,11 @@ void vehicle_to_room(vehicle_data *veh, room_data *room) {
 	
 	// apply empire tech (which may be island-based)
 	adjust_vehicle_tech(veh, TRUE);
+	
+	// update mapout if applicable TODO: determine when a vehicle affects mapout
+	if (TRUE) {
+		request_mapout_update(GET_ROOM_VNUM(room));
+	}
 }
 
 
